@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: niels $
+ *          last changes of: $Author: georgstraube $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-01-25 11:30:16 +0100 (Mo, 25. Jan 2010) $
+ * \date    $Date: 2010-02-19 17:54:57 +0100 (Fri, 19 Feb 2010) $
  *
- * \version $Revision: 5299 $
+ * \version $Revision: 5418 $
  */
 
 #ifndef PNAPI_PETRINODE_H
@@ -97,6 +97,9 @@ public:
 
   /// returns the name history
   std::deque<std::string> getNameHistory() const;
+
+  /// set new name of the node
+  void setName(std::string newName);
 
   /// adds a prefix to all names
   void prefixNameHistory(const std::string &);
@@ -193,6 +196,9 @@ public:
  
   /// add role
   void addRole(std::string role_name);
+
+  /// add a set of roles
+  void addRoles(std::set<std::string>::iterator first, std::set<std::string>::iterator second);
 
   /// get roles
   std::set<std::string> getRoles() const;

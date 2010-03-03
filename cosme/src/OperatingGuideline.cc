@@ -1,6 +1,5 @@
 #include "OperatingGuideline.h"
 
-
 OGMarking::OGMarking(const std::map<label_id_t, std::pair<label_id_t, og_service_index_t> > &successors,
 								unsigned has_FBit, unsigned has_SBit, unsigned has_TBit) {
 
@@ -125,10 +124,13 @@ bool OperatingGuideline::isSimulation(OperatingGuideline &B) const {
 		if ((this->marking(indexA)->TBit() && !B.marking(indexB)->TBit()) || 
 				(B.marking(indexB)->SBit() && !this->marking(indexA)->SBit()) ||
 				(B.marking(indexB)->FBit() && !this->marking(indexA)->FBit() && !this->marking(indexA)->SBit())) {
-			
+			status("bit compare failed in pair A[%d], B[%d]", indexA, indexB);
+			status("compared %d pairs of states", todo.size());
 			return false;
 		}
 		if (this->marking(indexA)->outDegree() > B.marking(indexB)->outDegree()) {
+			status("too few transitions in pair A[%d], B[%d]", indexA, indexB);
+			status("compared %d pairs of states", todo.size());
 			return false;
 		}
 		y = 0;
@@ -141,10 +143,13 @@ bool OperatingGuideline::isSimulation(OperatingGuideline &B) const {
 				todo.add(this->marking(indexA)->successor(x), B.marking(indexB)->successor(y));
 			}
 			else {
+				status("transition %d is missing in pair A[%d], B[%d]", B.marking(indexB)->label(y), indexA, indexB);
+				status("compared %d pairs of states", todo.size());		
 				return false;
 			}
 		}
 	}
+	status("compared %d pairs of states", todo.size());
 	return true;
 }
 
@@ -158,19 +163,25 @@ bool OperatingGuideline::isEquivalent(OperatingGuideline &B) const {
 		if ((this->marking(indexA)->SBit() != B.marking(indexB)->SBit()) || 
 				(this->marking(indexA)->FBit() != B.marking(indexB)->FBit()) ||
 				(this->marking(indexA)->TBit() != B.marking(indexB)->TBit())) {
-			
+			status("bit compare failed in pair A[%d], B[%d]", indexA, indexB);
+			status("compared %d pairs of states", todo.size());
 			return false;
 		}
 		if (this->marking(indexA)->outDegree() != B.marking(indexB)->outDegree()) {
+			status("too few transitions in pair A[%d], B[%d]", indexA, indexB);
+			status("compared %d pairs of states", todo.size());			
 			return false;
 		}
 		for (label_index_t x = 0; x < this->marking(indexA)->outDegree(); x++) {
 			if (this->marking(indexA)->label(x) != B.marking(indexB)->label(x)) {
+				status("transition %d is missing in pair A[%d], B[%d]", B.marking(indexB)->label(x), indexA, indexB);
+				status("compared %d pairs of states", todo.size());
 				return false;
 			}
 			todo.add(this->marking(indexA)->successor(x), B.marking(indexB)->successor(x));
 		}
 	}
+	status("compared %d pairs of states", todo.size());
 	return true;
 }
 
@@ -182,7 +193,11 @@ bool OperatingGuideline::isMatching(Service &C) {
 	label_index_t y;
 
 	while (todo.pop(indexC, indexB)) {
-		if (!isStateMatching(indexC, indexB, C)) return false;
+		if (!isStateMatching(indexC, indexB, C)) {
+			status("state match failed in pair A[%d], C[%d]", indexB, indexC);
+			status("compared %d pairs of states", todo.size());
+			return false;
+		}		
 		y = 0;
 		for (label_index_t x = 0; x < C.marking(indexC)->outDegree(); x++) {
 			if (C.marking(indexC)->label(x) == 0) {
@@ -197,11 +212,14 @@ bool OperatingGuideline::isMatching(Service &C) {
 					todo.add(C.marking(indexC)->successor(x), this->marking(indexB)->successor(y));
 				}
 				else {
+					status("transition %d is missing in pair A[%d], C[%d]", C.marking(indexC)->label(x), indexB, indexC);
+					status("compared %d pairs of states", todo.size());						
 					return false;
 				}
 			}
 		}
 	}
+	status("compared %d pairs of states", todo.size());
 	return true;
 }
 

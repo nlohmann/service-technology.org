@@ -6,13 +6,13 @@
  * \brief   Input/Output related Structures
  *
  * \author  Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: georgstraube $
  *
  * \since   2009/01/19
  *
- * \date    $Date: 2010-01-21 00:59:06 +0100 (Do, 21. Jan 2010) $
+ * \date    $Date: 2010-02-17 21:08:43 +0100 (Wed, 17 Feb 2010) $
  *
- * \version $Revision: 5253 $
+ * \version $Revision: 5408 $
  */
 
 
@@ -205,6 +205,9 @@ std::ios_base & lola(std::ios_base &);
 /// PNML file format
 std::ios_base & pnml(std::ios_base &);
 
+/// Woflan output format
+std::ostream & woflan(std::ostream &);
+
 /// meta information manipulator
 util::Manipulator<std::pair<MetaInformation, std::string> >
 meta(MetaInformation, const std::string &);
@@ -231,7 +234,7 @@ namespace util
 /* FORMAT IMPLEMENTATION: add format constant */
 
 /// possible I/O formats
-enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA, SA2SM, LOLA, PNML };
+enum Format { STAT, OWFN, DOT, GASTEX, ONWD, SA, SA2SM, LOLA, PNML, WOFLAN };
 
 /// I/O (sub-)mode
 enum Mode { NORMAL, PLACE, PLACE_TOKEN, ARC, INNER };
@@ -381,6 +384,20 @@ std::ostream & output(std::ostream &, const std::set<Edge *> &);
 std::ostream & output(std::ostream &, const std::set<std::string> &);
 }
 
+//****************************
+//*** Woflan output format ***
+//****************************
+
+/*!
+* \brief   Woflan I/O implementation
+*/
+namespace __woflan
+{
+std::ostream & output(std::ostream &, const PetriNet &);
+std::ostream & output(std::ostream &, const Arc &);
+std::ostream & output(std::ostream &, const Place &);
+std::ostream & output(std::ostream &, const Transition &);
+} /* namespace __woflan*/
 
 
 

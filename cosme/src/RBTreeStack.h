@@ -29,7 +29,8 @@ class RBTreeStack {
 		~RBTreeStack();
 
 		bool add(og_service_index_t indexOne, og_service_index_t indexTwo);
-		bool pop(og_service_index_t& indexOne, og_service_index_t& indexTwo);	
+		bool pop(og_service_index_t& indexOne, og_service_index_t& indexTwo);
+		inline og_service_index_t size() const { return this->mSize; } 
 
 	private:
 		inline void rightRotate(rbts_node_t* node);
@@ -38,11 +39,11 @@ class RBTreeStack {
 
 		void deleteHelper(rbts_node_t* node);
 
-
 	private:
 		rbts_node_t* mRoot;
 		rbts_node_t* mNil;
 		rbts_node_t* mTop;
+		og_service_index_t mSize;
 
 };
 

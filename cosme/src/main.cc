@@ -225,13 +225,16 @@ int main(int argc, char** argv)
 		C = parseService(args_info.ServiceC_arg);
 		A = parseOG(args_info.OGA_arg);
 
+		status("Service contains %d markings", C->size());
+		status("Operating guideline contains %d markings", A->size());
+
 		C->calculateBitSets(GlobalLabels);
 		A->calculateBitSets(GlobalLabels);
 
 		if (A->isMatching(*C)) 
-			message("Objective completed");
+			message("%s: %s", _cimportant_("Matching"), _cgood_("completed"));
 		else
-			message("Objective failed");
+			message("%s: %s", _cimportant_("Matching"), _cbad_("failed"));
 
 		// release memory (used to detect memory leaks)
 		if (args_info.finalize_flag) {
@@ -253,17 +256,20 @@ int main(int argc, char** argv)
 		A = parseOG(args_info.OGA_arg);
 		B = parseOG(args_info.OGB_arg);
 		
+		status("Operating guideline A contains %d markings", A->size());
+		status("Operating guideline B contains %d markings", B->size());
+
 		if (args_info.simulation_flag) {
 			if (A->isSimulation(*B))
-				message("Objective completed");
+				message("%s: %s", _cimportant_("Simulation"), _cgood_("completed"));
 			else
-				message("Objective failed");
+				message("%s: %s", _cimportant_("Simulation"), _cbad_("failed"));
 		}
 		else {
 			if (A->isEquivalent(*B))
-				message("Objective completed");
+				message("%s: %s", _cimportant_("Equivalence"), _cgood_("completed"));
 			else
-				message("Objective failed");
+				message("%s: %s", _cimportant_("Equivalence"), _cbad_("failed"));
 		}
 
 		// release memory (used to detect memory leaks)

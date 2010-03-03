@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: georgstraube $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2010-01-26 12:32:53 +0100 (Di, 26. Jan 2010) $
+ * \date    $Date: 2010-02-19 17:54:57 +0100 (Fri, 19 Feb 2010) $
  *
- * \version $Revision: 5305 $
+ * \version $Revision: 5418 $
  */
 
 #include "config.h"
@@ -198,6 +198,7 @@ void ComponentObserver::updateNodes(Node & node)
 }
 
 
+/// \bug Why is node1 not used?
 void ComponentObserver::updateNodesMerged(Node & node1, Node & node2)
 {
   //assert(node2.getNameHistory().empty());
@@ -234,6 +235,7 @@ void ComponentObserver::initializeNodeNameHistory(Node & node)
 }
 
 
+/// \bug Why is node not used?
 void ComponentObserver::finalizeNodeNameHistory(Node & node,
     const std::deque<std::string> & history)
 {
@@ -348,8 +350,8 @@ PetriNet::PetriNet() :
  * \note    The condition is standardly set to True.
  */
 PetriNet::PetriNet(const PetriNet & net) :
-  labels_(net.labels_),
   roles_(net.roles_),
+  labels_(net.labels_),
   observer_(*this),
   finalCondition_(net.finalCondition_, copyStructure(net)),
   meta_(net.meta_), warnings_(net.warnings_),
@@ -896,6 +898,8 @@ void PetriNet::compose(const PetriNet & net, const std::string & prefix,
  * \param prefixB the net prefix for the 2nd net
  *
  * The result is written to the net which has called the method.
+ *
+ * \bug Why is neither parameter used?
  */
 void PetriNet::composeByPorts(const PetriNet &net, const std::string &portA,
     const std::string &portB, const std::string &prefixA, const std::string &prefixB)
@@ -1388,6 +1392,13 @@ void PetriNet::addRole(std::string roleName)
   roles_.insert(roleName);
 }
 
+/*!
+ * \brief Adds a set of roles to transition
+ */
+void PetriNet::addRoles(std::set<std::string>::iterator first, std::set<std::string>::iterator last)
+{
+  roles_.insert(first, last);
+}
 
 /*!
  * \brief Removes a label to the interface
@@ -2095,3 +2106,17 @@ void PetriNet::normalize_rules()
 }
 
 } /* namespace pnapi */
+
+/*!
+ * This auxiliary function has the sole purpose to allow other tools to
+ * check whether they can link agains this PNAPI library using Autoconf's
+ * command "AC_CHECK_LIB(pnapi, libpnapi_is_present)".
+ *
+ * \return Always 0 to indicate successful termination.
+ */
+extern "C" {
+  char libpnapi_is_present() {
+      pnapi::PetriNet a();
+      return 0;
+  }
+}

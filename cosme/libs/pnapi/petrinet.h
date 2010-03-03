@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: georgstraube $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-01-26 12:32:53 +0100 (Di, 26. Jan 2010) $
+ * \date    $Date: 2010-02-19 17:54:57 +0100 (Fri, 19 Feb 2010) $
  *
- * \version $Revision: 5305 $
+ * \version $Revision: 5418 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -173,6 +173,9 @@ class PetriNet
 
   /// Petri net output, see pnapi::io
   friend std::ostream & io::__pnml::output(std::ostream &, const PetriNet &);
+
+  /// Petri net output, see pnapi::io
+  friend std::ostream & io::__woflan::output(std::ostream &, const PetriNet &);
 
 public:
 
@@ -417,6 +420,9 @@ public:
 
   /// adds a role
   void addRole(std::string roleName);
+
+  /// add a set of roles
+  void addRoles(std::set<std::string>::iterator first, std::set<std::string>::iterator second);
 
   /// removes a label from the interface
   void removeSynchronousLabel(std::string);

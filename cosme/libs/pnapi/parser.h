@@ -161,7 +161,7 @@ public:
    */
   virtual void afterChildren(const T &) =0;
 
-  virtual ~Visitor() {};
+  virtual ~Visitor() {}
 };
 
 }

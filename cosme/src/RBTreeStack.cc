@@ -16,6 +16,8 @@ RBTreeStack::RBTreeStack() {
 	tmpNode->mKey.mIndexOne = tmpNode->mKey.mIndexTwo = RBTS_NODE_KEY_UNUSED;
 
 	this->mRoot->mStackParent = this->mNil->mStackParent = this->mTop = NULL;
+	
+	this->mSize = 0;
 
 }
 
@@ -41,6 +43,8 @@ bool RBTreeStack::add(og_service_index_t indexOne, og_service_index_t indexTwo) 
 		free(x);
 		return false;		
 	}
+
+	this->mSize++;
 
 	newNode = this->mTop = x;
 	x->mRed = 1;	

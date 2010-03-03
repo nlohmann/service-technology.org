@@ -59,6 +59,7 @@ class Service {
 				this->mMarkings[i]->mEnabledTransitions = NULL;
 			}
 		}
+		inline og_service_index_t size() const { return this->mSize; }
 		std::string toString() const;
 
 	private:

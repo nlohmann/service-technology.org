@@ -13,6 +13,7 @@
 #include "RBTreeStack.h"
 #include "Service.h"
 #include "Output.h"
+#include "verbose.h"
 
 class OGMarking {
     public:

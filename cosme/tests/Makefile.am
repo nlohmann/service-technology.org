@@ -65,6 +65,7 @@ TESTFILES = /OGs/AP.bits.og \
 						/Services/DG-partner.owfn \
 						/Services/interface-partner.owfn \
 						/Services/internal_match.owfn \
+						/Services/internal_match-partner.owfn \
 						/Services/loanApprovalProcess.owfn \
 						/Services/loanApprovalProcess-partner.owfn \
 						/Services/myCoffee.owfn \

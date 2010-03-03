@@ -49,7 +49,6 @@ TESTFILES = /OGs/AP.bits.og \
 						/OGs/SD.og \
 						/OGs/simple.og \
 						/OGs/simple_smaller_interface.og \
-						/OGs/TPO.bits.og \
 						/OGs/TR.bits.og \
 						/OGs/TR.og \
 						/OGs/TR-pv.og \
@@ -84,8 +83,6 @@ TESTFILES = /OGs/AP.bits.og \
 						/Services/SD.owfn \
 						/Services/SD-partner.owfn \
 						/Services/T2.owfn \
-						/Services/TPO.owfn \
-						/Services/TPO-partner.owfn \
 						/Services/TR.owfn \
 						/Services/TR-partner.owfn
 

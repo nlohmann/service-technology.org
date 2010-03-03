@@ -142,13 +142,6 @@ AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
-AT_SETUP([TPO])
-AT_CHECK([cp TESTFILES/OGs/TPO.bits.og TESTFILES/Services/TPO-partner.owfn .])
-AT_CHECK([COSME --matching -a TPO.bits.og -c TPO-partner.owfn],0,ignore, stderr)
-AT_CHECK([GREP -q "Matching: completed" stderr])
-AT_KEYWORDS(matching)
-AT_CLEANUP
-
 AT_SETUP([TR])
 AT_CHECK([cp TESTFILES/OGs/TR.bits.og TESTFILES/Services/TR-partner.owfn .])
 AT_CHECK([COSME --matching -a TR.bits.og -c TR-partner.owfn],0,ignore, stderr)

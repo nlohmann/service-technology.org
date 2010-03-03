@@ -29,6 +29,143 @@
 using std::cout;
 using std::endl;
 
+
+/// writes the configuration into the configuration file
+void configurationResult(FILE *res) {
+    fprintf(res, "configuration: {\n");
+
+    fprintf(res, "  verification = \"");
+#ifdef LTLPROP
+    fprintf(res, "LTLPROP");
+#endif
+#ifdef REACHABILITY
+    fprintf(res, "REACHABILITY");
+#endif
+#ifdef BOUNDEDNET
+    fprintf(res, "BOUNDEDNET");
+#endif
+#ifdef BOUNDEDPLACE
+    fprintf(res, "BOUNDEDPLACE");
+#endif
+#ifdef DEADTRANSITION
+    fprintf(res, "DEADTRANSITION");
+#endif
+#ifdef DEADLOCK
+    fprintf(res, "DEADLOCK");
+#endif
+#ifdef HOME
+    fprintf(res, "HOME");
+#endif
+#ifdef REVERSIBILITY
+    fprintf(res, "REVERSIBILITY");
+#endif
+#ifdef MODELCHECKING
+#ifdef EXTENDEDCTL
+    fprintf(res, "MODELCHECKING+EXTENDEDCTL");
+#else
+    fprintf(res, "MODELCHECKING");
+#endif
+#endif
+#ifdef FINDPATH
+    fprintf(res, "FINDPATH");
+#endif
+#ifdef FULL
+    fprintf(res, "FULL");
+#endif
+#ifdef STATESPACE
+    fprintf(res, "STATESPACE");
+#endif
+#ifdef NONE
+    fprintf(res, "NONE");
+#endif
+#if defined(STATEPREDICATE) && !defined(LIVEPROP)
+    fprintf(res, "STATEPREDICATE");
+#endif
+#ifdef LIVEPROP
+    fprintf(res, "LIVEPROP");
+#endif
+    fprintf(res, "\";\n");
+    
+    fprintf(res, "  exploration = \"");
+#ifdef DEPTH_FIRST
+    fprintf(res, "DEPTH_FIRST");
+#else
+    fprintf(res, "BREADTH_FIRST");
+#endif
+    fprintf(res, "\";\n");
+
+    fprintf(res, "  reduction = {\n");
+
+
+#ifdef STUBBORN
+    fprintf(res, "    STUBBORN = true;\n");
+#endif
+#ifdef STATEPREDICATE
+#ifdef RELAXED
+    fprintf(res, "    RELAXED = true;\n");
+#else
+    fprintf(res, "    RELAXED = false;\n");
+#endif
+#endif
+#ifdef SYMMETRY
+    fprintf(res, "    SYMMETRY = true;\n");
+    fprintf(res, "    SYMMINTEGRATION = %d;\n", SYMMINTEGRATION);
+#endif
+#ifdef COVER
+    fprintf(res, "    COVER = true;\n");
+#endif
+#ifdef CYCLE
+    fprintf(res, "    CYCLE = true;\n");
+#endif
+#ifdef PREDUCTION
+    fprintf(res, "    PREDUCTION = true;\n");
+#endif
+#ifdef SMALLSTATE
+    fprintf(res, "    SMALLSTATE = true;\n");
+#endif
+#ifdef BITHASH
+    fprintf(res, "    BITHASH = true;\n");
+#endif
+#ifdef LIVEPROP
+#ifdef TWOPHASE
+    fprintf(res, "    TWOPHASE = true;\n");
+#ifdef RELAXED
+    fprintf(res, "    RELAXED = true;\n");
+#else
+    fprintf(res, "    RELAXED = false;\n");
+#endif
+#else
+    fprintf(res, "    TWOPHASE = false;\n");
+#endif
+#endif
+    fprintf(res, "  };\n");
+
+    fprintf(res, "  parameters = {\n");
+    fprintf(res, "    HASHSIZE = %d;\n", HASHSIZE);
+    fprintf(res, "    REPORTFREQUENCY = %d;\n", REPORTFREQUENCY);
+#if defined(CAPACITY) && CAPACITY > 0
+    fprintf(res, "    CAPACITY = %d;\n", CAPACITY);
+#endif
+#ifdef FINDPATH
+    fprintf(res, "    MAXPATH = %d;\n", MAXPATH);
+#endif
+#ifdef CYCLE
+    fprintf(res, "    MAXUNSAVED = %d;\n", MAXUNSAVED);
+#ifdef NONBRANCHINGONLY
+    fprintf(res, "    NONBRANCHINGONLY = true;\n");
+#endif
+#endif
+#if defined(SYMMETRY) && SYMMINTEGRATION == 4
+    fprintf(res, "    MAXATTEMPT = %d;\n", MAXATTEMPT);
+#endif
+#ifdef MAXIMALSTATES
+    fprintf(res, "    MAXIMALSTATES = %d;\n", MAXIMALSTATES);
+#endif
+    fprintf(res, "  };\n");
+
+    fprintf(res, "};\n");
+}
+
 void reportconfiguration()
 {
 	cout << "LoLA - A low level Analyzer" << endl;
@@ -153,9 +290,9 @@ void reportconfiguration()
 	case 3: cout << "  3 - (pre-compute generating set) use generators to" << endl;
 		cout << "      transform current marking into (lx.) small one" << endl; break;
 	case 4: cout << "  4 - (no generating set) compute approximation of " << endl;
-		cout << "      canonical representitive on the fly." << endl; break;
+		cout << "      canonical representative on the fly." << endl; break;
 	case 5: cout << "  5 - (no generating set) compute canonical " << endl;
-		cout << "      representitive on the fly." << endl; break;
+		cout << "      representative on the fly." << endl; break;
 	}
 #endif
 #ifdef LIVEPROP
@@ -189,7 +326,7 @@ void reportconfiguration()
 #endif
 #endif
 #if defined(SYMMETRY) && SYMMINTEGRATION == 4
-	cout << "  MAXATTEMPT      : " << "perform at most " << MAXATTEMPT << " loops of approximizing the canonical representitive." << endl;
+	cout << "  MAXATTEMPT      : " << "perform at most " << MAXATTEMPT << " loops of approximizing the canonical representative." << endl;
 #endif
 #ifdef MAXIMALSTATES
   cout << "  MAXIMALSTATES   : " << "generate at most " << MAXIMALSTATES << " states" << endl;

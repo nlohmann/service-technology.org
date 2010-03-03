@@ -345,6 +345,8 @@ void processCommandLine(int argc, char **argv) {
     if(!resultfile) {
       fprintf(stderr, "lola: could not create result file\n");
       exit(4);
+
+      configurationResult(resultfile);
     }
   }
 

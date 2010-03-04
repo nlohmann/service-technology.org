@@ -1,8 +1,10 @@
 AC_INIT(Sara, 0.9, sara@service-technology.org, sara, http://service-technology.org/sara)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_AUX_DIR([build-aux])
 
 AM_INIT_AUTOMAKE #(gnits)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # check for standard programs needed to compile
 AC_PROG_CXX
@@ -40,6 +42,8 @@ AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 # search for required tools
 #AC_PATH_PROG(LOLA, [lola-statespace], [])
 
+AC_PROG_LIBTOOL
+
 # search for optional tools needed by "make check"
 #AC_PATH_PROG(FIONA, [fiona], not found)
 #AC_PATH_PROG(SA2SM, [sa2sm], not found)
@@ -76,7 +80,7 @@ AC_TYPE_UINT32_T
 
 # write files
 AC_CONFIG_FILES([
-	Makefile libs/pnapi/Makefile src/Makefile 
+	Makefile libs/pnapi/Makefile libs/lp_solve/Makefile src/Makefile 
 	])
 AC_OUTPUT
 

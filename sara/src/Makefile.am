@@ -11,7 +11,7 @@ sara_SOURCES = main.cc problem.cc problem.h reachalyzer.cc reachalyzer.h imatrix
 # pass the sysconfdir to Wendy (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 #sara_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
 sara_CPPFLAGS = -I$(top_srcdir)/libs
-sara_LDADD = $(top_builddir)/libs/lp_solve_55/liblpsolve55.a
+sara_LDADD = $(top_builddir)/libs/lp_solve/liblpsolve55.la
 sara_LDFLAGS = -ldl
 #-lpthread
 
@@ -36,7 +36,7 @@ DISTCLEANFILES =
 #--------------------------------------------------------------#
 # GENERIC: organize distribution and cleaning of Bison sources #
 #--------------------------------------------------------------#
-BISON_FILES = $(filter %.yy,$(my_SOURCES))
+BISON_FILES = $(filter %.yy,$(sara_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)

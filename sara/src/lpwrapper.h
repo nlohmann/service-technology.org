@@ -18,7 +18,7 @@
 #define LPWRAPPER_H
 
 #include <map>
-#include "lp_solve_55/lp_lib.h"
+#include "lp_solve/lp_lib.h"
 #ifndef PNAPI_PNAPI_H
 #include "pnapi/pnapi.h"
 #endif

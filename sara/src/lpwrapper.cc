@@ -8,7 +8,7 @@
 #ifndef PNAPI_PNAPI_H
 #include "pnapi/pnapi.h"
 #endif
-#include "lp_solve_55/lp_lib.h"
+#include "lp_solve/lp_lib.h"
 
 #ifndef LPWRAPPER_H
 #include "lpwrapper.h"

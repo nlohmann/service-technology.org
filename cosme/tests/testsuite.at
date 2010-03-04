@@ -152,7 +152,7 @@ AT_CLEANUP
 AT_SETUP([internal])
 AT_CHECK([cp TESTFILES/OGs/internal.og TESTFILES/Services/internal_match.owfn .])
 AT_CHECK([COSME --matching -a internal.og -c internal_match.owfn],0,ignore, stderr)
-AT_CHECK([GREP -q "Matching: completed" stderr])
+AT_CHECK([GREP -q "Matching: failed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 

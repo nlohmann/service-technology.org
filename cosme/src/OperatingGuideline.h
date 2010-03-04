@@ -86,18 +86,27 @@ class OperatingGuideline {
 		inline bool isStateMatching(og_service_index_t indexC, og_service_index_t indexB, Service &C) {
 			if (this->marking(indexB)->TBit()) return true;
 			if (!C.marking(indexC)->mEnabledTransitions->isIntersectionEmpty(this->mOutputInterface)) return true;
-			if (this->marking(indexB)->FBit() && !C.marking(indexC)->isFinal()) return false;
-			if (this->marking(indexB)->SBit()) return false;
+			if (this->marking(indexB)->FBit() && !C.marking(indexC)->isFinal()) {
+				status("F-Bit check failed in pair A[%d], C[%d]", indexB, indexC);				
+				return false;
+			}
+			if (this->marking(indexB)->SBit()) {
+				status("S-Bit check failed in pair A[%d], C[%d]", indexB, indexC);				
+				return false;
+			}
 
 			BitSetC allowed(*this->mInputInterface);
 			allowed.makeDifference(C.marking(indexC)->mEnabledTransitions);
-			if (isPathExisting(indexB, &allowed)) return false;
+			if (isPathExisting(indexB, &allowed)) {
+				status("path check failed in pair A[%d], C[%d]", indexB, indexC);				
+				return false;
+			}
 
 			return true;
 		}
 
 		inline bool isPathExisting(og_service_index_t indexB, BitSetC *allowed) {
-			if (allowed->isSubset(this->marking(indexB)->mCheckedPaths)) return false;
+			if (allowed->isSubset(this->marking(indexB)->mCheckedPaths)) return false;		
 			this->marking(indexB)->mCheckedPaths->makeUnion(allowed);
 
 			RBTreeStack pTodo;

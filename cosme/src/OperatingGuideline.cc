@@ -105,10 +105,7 @@ void OperatingGuideline::calculateBitSets(Label &interface) {
 
 	for (og_service_index_t i = 0; i < this->mSize; i++) {
 		this->mMarkings[i]->mCheckedPaths = new BitSetC(interface.size(), false);
-		for (label_index_t j = 0; j < this->mMarkings[i]->outDegree(); j++) {
-			this->mMarkings[i]->mCheckedPaths->clearBit(this->mMarkings[i]->label(j));
-		}
-		this->mMarkings[i]->mCheckedPaths->makeUnion(this->mInputInterface);
+		this->mMarkings[i]->mCheckedPaths->makeDifference(this->mInputInterface);
 	}
 
 }
@@ -194,7 +191,6 @@ bool OperatingGuideline::isMatching(Service &C) {
 
 	while (todo.pop(indexC, indexB)) {
 		if (!isStateMatching(indexC, indexB, C)) {
-			status("state match failed in pair A[%d], C[%d]", indexB, indexC);
 			status("compared %d pairs of states", todo.size());
 			return false;
 		}		

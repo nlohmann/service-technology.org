@@ -245,6 +245,13 @@ AT_CHECK([GREP -q "Equivalence: completed" stderr])
 AT_KEYWORDS(equivalence)
 AT_CLEANUP
 
+AT_SETUP([branch vs. branch_compact])
+AT_CHECK([cp TESTFILES/OGs/branch.og TESTFILES/OGs/branch_compact.og .])
+AT_CHECK([COSME --equivalence -a branch.og -b branch_compact.og],0,ignore, stderr)
+AT_CHECK([GREP -q "Equivalence: completed" stderr])
+AT_KEYWORDS(equivalence)
+AT_CLEANUP
+
 AT_SETUP([branch vs. branch_chopped])
 AT_CHECK([cp TESTFILES/OGs/branch.og TESTFILES/OGs/branch_chopped.og .])
 AT_CHECK([COSME --equivalence -a branch.og -b branch_chopped.og],0,ignore, stderr)

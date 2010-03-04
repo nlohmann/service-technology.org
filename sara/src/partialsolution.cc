@@ -96,12 +96,12 @@ map<Transition*,int>& PartialSolution::getRemains() { return remains; }
 /** Set the vector of the full solution, i.e. firing sequence plus remainder.
 	@param ftv The solution as calculated by lp_solve.
 */
-void PartialSolution::setFullVector(map<Transition*,int>& ftv) { fulltv=ftv; };
+void PartialSolution::setFullVector(map<Transition*,int>& ftv) { fulltv=ftv; }
 
 /** Get the vector of the full solution, i.e. firing sequence plus remainder.
 	@return The solution as calculated by lp_solve.
 */
-map<Transition*,int>& PartialSolution::getFullVector() { return fulltv; };
+map<Transition*,int>& PartialSolution::getFullVector() { return fulltv; }
 
 /** Sets a single constraint.
 	@param c A constraint.

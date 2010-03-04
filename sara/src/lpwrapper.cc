@@ -47,13 +47,13 @@ extern vector<Place*> placeorder;
 	LPWrapper::LPWrapper(int columns) : cols(columns) {
 		lp = make_lp(0,cols);
 		assert(lp!=NULL);
-	};
+	}
 
 	/** Destructor
 	*/
 	LPWrapper::~LPWrapper() {
 		delete_lp(lp);
-	};
+	}
 
 /** Creates the marking equation for lp_solve.
 	@param m1 Initial marking.

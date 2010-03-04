@@ -43,7 +43,7 @@ using std::ostream;
 
 /** Standard constructor for class Constraint.
 */
-Constraint::Constraint() : rhs(0),jump(false) { posplace.clear(); subtrans.clear(); cs.clear(); };
+Constraint::Constraint() : rhs(0),jump(false) { posplace.clear(); subtrans.clear(); cs.clear(); }
 
 /** Jump constructor for class Constraint.
 	@param jmp A solution of lp_solve which is to be discriminated.
@@ -57,11 +57,11 @@ Constraint::Constraint(map<Transition*,int> jump) : rhs(-1)
 	map<Transition*,int>::iterator it;
 	for(it=jump.begin(); it!=jump.end(); ++it)
 	{	rhs += it->second; cs[it->first] = 1; }
-};
+}
 
 /** Destructor.
 */
-Constraint::~Constraint() { posplace.clear(); subtrans.clear(); cs.clear(); };
+Constraint::~Constraint() { posplace.clear(); subtrans.clear(); cs.clear(); }
 
 /** Adds a place to the constraint. The place represents its own preset,
 	i.e. the constraint will contain each transition t from the preset

@@ -39,20 +39,20 @@ using std::endl;
 
 /** Standard constructor. Creates one node for Tarjan's algorithm.
 */
-myTPNode::myTPNode() : index(-2),low(-1),instack(false),t(NULL),p(NULL) { nodes.clear(); };
+myTPNode::myTPNode() : index(-2),low(-1),instack(false),t(NULL),p(NULL) { nodes.clear(); }
 
 /** Destructor.
 */
-myTPNode::~myTPNode() {};
+myTPNode::~myTPNode() {}
 
 /** Deinitializer. Reverts a node back to the state it had after the constructor call.
 	The node is disconnected from any graph.
 */
-void myTPNode::reset() { index=-2; low=-1; instack=false; nodes.clear(); };
+void myTPNode::reset() { index=-2; low=-1; instack=false; nodes.clear(); }
 
 /** Initializer. Reverts a node back to the state it had before the first call of Tarjan's
 	algorithm, but after graph construction, i.e. the graph structure stays intact.
-void myTPNode::init() { if (index>-1) index=-1; low=-1; instack=false; };
+void myTPNode::init() { if (index>-1) index=-1; low=-1; instack=false; }
 
 	/*********************************
 	* Implementation of class Tarjan *
@@ -80,7 +80,7 @@ Tarjan::Tarjan(set<Transition*>& tset, set<Place*>& pset) {
 	}
 	st.clear();  // this is the stack for Tarjan's algorithm
 	verbose = 0;
-};
+}
 
 /** Destructor.
 */
@@ -91,7 +91,7 @@ Tarjan::~Tarjan() { // delete all myTPNodes:
 	map<Place*,myTPNode*>::iterator pit;
 	for(pit=pton.begin(); pit!=pton.end(); ++pit)
 		delete pit->second;
-};
+}
 
 /** Modification of Tarjans algorithm for finding strongly connected components.
 	We look for strongly connected components of either more than one node

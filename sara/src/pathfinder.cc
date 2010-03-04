@@ -54,11 +54,11 @@ extern map<Place*,int> revporder;
 	***************************************/
 
 /** Constructor */
-PathFinder::myNode::myNode() : index(-2),low(-1),instack(false),t(NULL) { nodes.clear(); };
+PathFinder::myNode::myNode() : index(-2),low(-1),instack(false),t(NULL) { nodes.clear(); }
 /** Destructor */
-PathFinder::myNode::~myNode() {};
+PathFinder::myNode::~myNode() {}
 /** Reset for reusability. Reaches the same state as the constructor. */
-void PathFinder::myNode::reset() { index=-2; low=-1; instack=false; nodes.clear(); };
+void PathFinder::myNode::reset() { index=-2; low=-1; instack=false; nodes.clear(); }
 
 	/*************************************
 	* Implementation of class PathFinder *
@@ -88,7 +88,7 @@ PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& 
 	st.clear();
 	shortcutmax=1000;
 	if (args_info.lookup_given) shortcutmax=args_info.lookup_arg;
-};
+}
 
 /** Destructor. Also frees any myNode objects in use.
 */
@@ -96,7 +96,7 @@ PathFinder::~PathFinder() {
 	map<Transition*,myNode*>::iterator it;
 	for(int i=0; i<tton.size(); ++i)
 		delete tton[i];
-};
+}
 
 /** Recursive algorithm for finding a firing sequence given a vector of
 	transitions.

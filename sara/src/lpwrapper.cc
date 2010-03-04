@@ -79,8 +79,8 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	if (colnr!=cols) cerr << "sara: LPWrapper error: column number mismatch" << endl;
 
 	//lp_solve objective: minimum firing sequence length
-	int colpoint[cols];
-	REAL mat[cols];
+	int *colpoint = new int[cols];
+	REAL *mat = new REAL[cols];
 	for(int y=0; y<cols; y++)
 	{
 		mat[y]=1;
@@ -175,7 +175,7 @@ unsigned char LPWrapper::getVariables(REAL* solution) {
 */
 bool LPWrapper::addConstraints(PartialSolution& ps) {
 	// add new constraints to lp model
-	REAL constraint[cols+1];
+	REAL *constraint = new REAL[cols+1];
 	for(int i=0; i<=cols; ++i) constraint[i]=0;
 	set<Constraint>::iterator cit;
 	for(cit=ps.getConstraints().begin(); cit!=ps.getConstraints().end(); ++cit)
@@ -203,7 +203,7 @@ bool LPWrapper::addConstraints(PartialSolution& ps) {
 	@return The solution map
 */
 map<Transition*,int>& LPWrapper::getTVector(PetriNet& pn) {
-	REAL sol[cols];
+	REAL *sol = new REAL[cols];
 	getVariables(sol);
 	if (verbose>1) cerr << "LPSOLVE: ";
 	for(int y=0; y<cols; ++y)
@@ -230,8 +230,8 @@ bool LPWrapper::findNearest() {
 		if (!add_columnex(lp,1,&val,&k)) return false;
 	}
 	set_add_rowmode(lp,true);
-	int colpoint[2*placeorder.size()];
-	REAL mat[2*placeorder.size()];
+	int *colpoint = new int[2*placeorder.size()];
+	REAL *mat = new REAL[2*placeorder.size()];
 	for(int k=0; k<2*placeorder.size(); ++k)
 	{
 		mat[k]=1;
@@ -249,7 +249,7 @@ bool LPWrapper::findNearest() {
 	int ret = solveSystem(); // solve the new equation with the new slack variables
 	if (ret==0 || ret==1) // we have found a solution
 	{
-		REAL sol[cols+1+2*placeorder.size()]; // container for the solution
+		REAL *sol = new REAL[cols+1+2*placeorder.size()]; // container for the solution
 		getVariables(sol); // get the solution of the new system
 		bool in = false; // need to change the initial marking?
 		bool out = false; // need to change the final marking?

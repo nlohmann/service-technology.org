@@ -44,6 +44,10 @@ AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
 
 AC_PROG_LIBTOOL
 
+# check for dlopen/ftime (required by lp_solve)
+AC_SEARCH_LIBS([dlopen], [dl zrldsrl])
+AC_SEARCH_LIBS([ftime], [compat])
+
 # search for optional tools needed by "make check"
 #AC_PATH_PROG(FIONA, [fiona], not found)
 #AC_PATH_PROG(SA2SM, [sa2sm], not found)

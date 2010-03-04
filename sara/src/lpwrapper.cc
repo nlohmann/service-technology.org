@@ -30,7 +30,7 @@ using std::map;
 using pnapi::PetriNet;
 using pnapi::Place;
 using pnapi::Transition;
-using pnapi::Arc;
+//using pnapi::Arc;
 using pnapi::Marking;
 
 extern vector<Transition*> transitionorder;
@@ -94,8 +94,8 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	for(int k=0; k<placeorder.size(); ++k)
 	{
 		for(int y=0; y<cols; ++y) mat[y]=0;
-		set<Arc*>::iterator ait;
-		set<Arc*> arcs = placeorder[k]->getPresetArcs(); 
+		set<pnapi::Arc*>::iterator ait;
+		set<pnapi::Arc*> arcs = placeorder[k]->getPresetArcs(); 
 		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
 		{
 			Transition* t = &((*ait)->getTransition());

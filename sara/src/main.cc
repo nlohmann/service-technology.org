@@ -34,7 +34,7 @@ using std::ifstream;
 using std::ofstream;
 using std::ostringstream;
 using std::setw;
-using namespace pnapi;
+//using namespace pnapi;
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -144,8 +144,8 @@ if (args_info.quasilive_given) {
 			}
 		outfile << ";" << endl;
 		outfile << "FINAL COVER ";
-		set<Arc*> arcs((*it)->getPresetArcs());
-		set<Arc*>::iterator ait;
+		set<pnapi::Arc*> arcs((*it)->getPresetArcs());
+		set<pnapi::Arc*>::iterator ait;
 		first = true;
 		for(ait=arcs.begin(); ait!=arcs.end(); ++ait) {
 			if (!first) outfile << ",";

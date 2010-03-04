@@ -27,7 +27,7 @@
 using pnapi::Marking;
 using pnapi::Transition;
 using pnapi::Place;
-using pnapi::Arc;
+//using pnapi::Arc;
 using pnapi::Node;
 using std::vector;
 using std::deque;
@@ -248,12 +248,12 @@ map<Place*,int> PartialSolution::produce() {
 	if (tseq.size()==0) return prod;
 	for(int i=0; i<tseq.size(); ++i)
 	{
-		set<Arc*> as(tseq[i]->getPostsetArcs());
-		set<Arc*>::iterator ait;
+		set<pnapi::Arc*> as(tseq[i]->getPostsetArcs());
+		set<pnapi::Arc*>::iterator ait;
 		for(ait=as.begin(); ait!=as.end(); ++ait)
 		{
 			Place& p = (*ait)->getPlace();
-			Arc* a = m.getPetriNet().findArc(p,*(tseq[i]));
+			pnapi::Arc* a = m.getPetriNet().findArc(p,*(tseq[i]));
 			int aw = (*ait)->getWeight();
 			if (a) aw -= a->getWeight();
 			if (aw<0) aw=0;
@@ -556,7 +556,7 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 						map<int,set<Transition*> > post; // transitions ordered by the weight of the place pit in their postset
 						for(fit=forbidden.begin(); fit!=forbidden.end(); ++fit)
 						{
-							Arc* a(m.getPetriNet().findArc(**fit,**pit)); // get the weight of the place in the postset
+							pnapi::Arc* a(m.getPetriNet().findArc(**fit,**pit)); // get the weight of the place in the postset
 							if (a) post[a->getWeight()].insert(*fit); else post[0].insert(*fit); // fit the place into the post map accordingly
 							// calculate how many tokens get lost due to firing the forbidden transition as often as required, and add this number
 							constmp -= im.getEntry(**fit,**pit)*remains[*fit];

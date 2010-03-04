@@ -30,7 +30,7 @@
 
 using pnapi::Place;
 using pnapi::Transition;
-using pnapi::Arc;
+//using pnapi::Arc;
 using std::set;
 using std::map;
 using std::cerr;
@@ -188,13 +188,13 @@ map<Transition*,int>& Constraint::calcConstraint() {
 		Place& p = *(pit->first);
 		if (&p==NULL) { cerr << "sara: Constraint error, null place" << endl; return cs; }
 		// find the t->p arcs
-		set<Arc*> arcs(p.getPresetArcs());
-		set<Arc*>::iterator ait;
+		set<pnapi::Arc*> arcs(p.getPresetArcs());
+		set<pnapi::Arc*>::iterator ait;
 		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
 		{
 			Transition& t = (*ait)->getTransition();
 			// find the p->t arcs
-			Arc* a = t.getPetriNet().findArc(p,t); 
+			pnapi::Arc* a = t.getPetriNet().findArc(p,t); 
 			// calculate if t produces more on p than it consumes
 			int tmp = (*ait)->getWeight(); 
 			if (a!=NULL) { tmp -= a->getWeight(); if (tmp<0) tmp=0; }
@@ -236,13 +236,13 @@ bool Constraint::checkSubTransition(Transition& tr) {
 		Place& p = *(pit->first);
 		if (&p==NULL) { cerr << "sara: Constraint error, null place" << endl; return false; }
 		// find all t->p arcs
-		set<Arc*> arcs(p.getPresetArcs());
-		set<Arc*>::iterator ait;
+		set<pnapi::Arc*> arcs(p.getPresetArcs());
+		set<pnapi::Arc*>::iterator ait;
 		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
 		{
 			Transition& t = (*ait)->getTransition();
 			// find a matching p->t arc
-			Arc* a = t.getPetriNet().findArc(p,t);
+			pnapi::Arc* a = t.getPetriNet().findArc(p,t);
 			// calculate if t effectively produces tokens 
 			int tmp = (*ait)->getWeight(); 
 			if (a!=NULL) { tmp -= a->getWeight(); if (tmp<0) tmp=0; }
@@ -265,13 +265,13 @@ bool Constraint::checkAnyTransition() const {
 		Place& p = *(pit->first);
 		if (&p==NULL) { cerr << "sara: Constraint error, null place" << endl; return false; }
 		// find all t->p arcs
-		set<Arc*> arcs(p.getPresetArcs());
-		set<Arc*>::iterator ait;
+		set<pnapi::Arc*> arcs(p.getPresetArcs());
+		set<pnapi::Arc*>::iterator ait;
 		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
 		{
 			Transition& t = (*ait)->getTransition();
 			// find a p->t arc
-			Arc* a = t.getPetriNet().findArc(p,t); 
+			pnapi::Arc* a = t.getPetriNet().findArc(p,t); 
 			// calculate the effective produce of t on p
 			int tmp = (*ait)->getWeight(); 
 			if (a!=NULL) { tmp -= a->getWeight(); if (tmp<0) tmp=0; }

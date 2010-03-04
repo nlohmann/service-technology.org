@@ -47,7 +47,7 @@ using std::ifstream;
 using std::ofstream;
 using std::ostringstream;
 using std::setw;
-using namespace pnapi;
+//using namespace pnapi;
 
 extern pnapi::parser::owfn::Parser paowfn;
 extern pnapi::parser::lola::Parser palola;
@@ -263,7 +263,7 @@ PetriNet* Problem::getPetriNet() {
 	            break;
 	        }
 	    }
-	} catch (io::InputError error) {
+	} catch (pnapi::io::InputError error) {
 	    cerr << "sara: " << error << endl;
 	    infile.close();
 	    exit(EXIT_FAILURE);
@@ -307,9 +307,9 @@ void Problem::calcPTOrder() {
 		pval[(*pit)] = 1;
 	tord[0] = tset;
 	pord[0] = pset;
-	map<int,set<Transition*> >::iterator tmit;
-	map<int,set<Place*> >::iterator pmit;
-	set<Arc*>::iterator ait;
+	map<int,set<pnapi::Transition*> >::iterator tmit;
+	map<int,set<pnapi::Place*> >::iterator pmit;
+	set<pnapi::Arc*>::iterator ait;
 	int min;
 	for(int i=0; i<5; ++i)
 	{

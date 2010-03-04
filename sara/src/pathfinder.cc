@@ -32,7 +32,7 @@
 using pnapi::Transition;
 using pnapi::Place;
 using pnapi::PetriNet;
-using pnapi::Arc;
+//using pnapi::Arc;
 using pnapi::Node;
 using std::vector;
 using std::deque;
@@ -343,16 +343,16 @@ void PathFinder::conflictTable(Transition* tstart) {
 		// if the transition is enabled, look for conflicting transitions
 		if (m0.activates(**it)) {
 			// put all conflicting transitions into the stubborn set
-			const set<Arc*> tpre = (*it)->getPresetArcs();
-			set<Arc*>::iterator prearc;
+			const set<pnapi::Arc*> tpre = (*it)->getPresetArcs();
+			set<pnapi::Arc*>::iterator prearc;
 			for(prearc=tpre.begin(); prearc!=tpre.end(); ++prearc)
 			{ // go through the preset
 				Place* p = &((*prearc)->getPlace());
-				Arc* a = pn.findArc(**it,*p);
+				pnapi::Arc* a = pn.findArc(**it,*p);
 				// places on which we effectively produce tokens do not lead to conflicts where the other transition must fire first
 				if (a) if ((*prearc)->getWeight()<=a->getWeight()) continue;
-				const set<Arc*> ppost = p->getPostsetArcs();
-				set<Arc*>::iterator postarc; // now check the postset of p for conflicting transitions
+				const set<pnapi::Arc*> ppost = p->getPostsetArcs();
+				set<pnapi::Arc*>::iterator postarc; // now check the postset of p for conflicting transitions
 				for(postarc=ppost.begin(); postarc!=ppost.end(); ++postarc)
 				{
 					// found a conflicting transition
@@ -390,8 +390,8 @@ void PathFinder::conflictTable(Transition* tstart) {
 	@return Pointer to an insufficiently marked place. Program exit on failure.
 */
 Place* PathFinder::hinderingPlace(Transition& t) {
-	set<Arc*> aset = t.getPresetArcs();
-	set<Arc*>::iterator ait;
+	set<pnapi::Arc*> aset = t.getPresetArcs();
+	set<pnapi::Arc*>::iterator ait;
 	set<Place*> pset;
 	set<Place*>::iterator pit;
 	for(ait=aset.begin(); ait!=aset.end(); ait++)
@@ -430,8 +430,8 @@ Place* PathFinder::hinderingPlace(Transition& t) {
 set<Transition*> PathFinder::requiredTransitions(Place& p) {
 	set<Transition*> tset;
 	tset.clear();
-	set<Arc*> prearc = p.getPresetArcs();
-	set<Arc*>::iterator ait;
+	set<pnapi::Arc*> prearc = p.getPresetArcs();
+	set<pnapi::Arc*>::iterator ait;
 	for(ait=prearc.begin(); ait!=prearc.end(); ait++)
 	{
 		// find transitions that produce tokens on p
@@ -439,7 +439,7 @@ set<Transition*> PathFinder::requiredTransitions(Place& p) {
 		// if they are required to fire at all ...
 		if (rec_tv[t]>0)
 		{
-			Arc *a = m0.getPetriNet().findArc(p,*t);
+			pnapi::Arc *a = m0.getPetriNet().findArc(p,*t);
 			// add them to the result list if they produce more than they consume
 			if (a==0) { tset.insert(t); continue; }
 			if (a->getWeight()<(*ait)->getWeight())

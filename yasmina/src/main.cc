@@ -19,6 +19,7 @@
 #include <cmath>
 #include <limits.h>
 #include "eventTerm.h"
+#include "Output.h"
 
 #include "adapternumerge.h"
 //#include "ppl.hh"
@@ -784,6 +785,8 @@ int main(int argc, char** argv) {
 	//time_t start_time, end_time;
 	clock_t start_clock;// = clock();
 	evaluateParameters(argc, argv);
+	Output::setTempfileTemplate(args_info.tmpfile_arg);
+	Output::setKeepTempfiles(args_info.noClean_flag);
 	std::cerr << PACKAGE << " processing ";
 	if(args_info.inputs_num>0) {
 		for (unsigned int i = 0; i < args_info.inputs_num; i++)

@@ -52,3 +52,20 @@ option "verbose" v
   "Verbose output"
   flag off
 
+section "Configuration"
+sectiondesc="These options configure Yasmina.\n"
+
+option "tmpfile" -
+  "Set the path and name of temporary files"
+  details="The filename Yasmina should use to create temporary files. The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/wendy-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by Yasmina is kept after Yasmina terminates.\n"
+  flag off
+  hidden

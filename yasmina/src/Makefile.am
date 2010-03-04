@@ -6,6 +6,7 @@ yasmina_SOURCES = syntax_mp.yy lexer_mp.ll \
                   main.cc \
                   cmdline.c cmdline.h \
                   verbose.cc verbose.h \
+                  Output.cc Output.h \
                   eventTerm.h eventTerm.cc 
 
 yasmina_LDADD =  $(top_builddir)/libs/pnapi/libpnapi.a \

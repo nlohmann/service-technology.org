@@ -12,7 +12,7 @@ sara_SOURCES = main.cc problem.cc problem.h reachalyzer.cc reachalyzer.h imatrix
 #sara_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
 sara_CPPFLAGS = -I$(top_srcdir)/libs
 sara_LDADD = $(top_builddir)/libs/lp_solve/liblpsolve55.la
-sara_LDFLAGS = -ldl
+#sara_LDFLAGS = -ldl
 #-lpthread
 
 # only add the local Petri net API if necessary

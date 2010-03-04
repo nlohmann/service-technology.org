@@ -1,0 +1,23 @@
+                            ____                   
+                           / ___|  __ _ _ __ __ _ 
+                           \___ \ / _` | '__/ _` |
+                            ___) | (_| | | | (_| |
+                           |____/ \__,_|_|  \__,_|
+		  				  
+                Structures for Automated Reachability Analysis
+                      http://service-technology.org/sara
+
+
+Version 0.9-unreleased
+======================
+
+* Solves reachability of markings and realizability of transition vectors
+
+* Calculates a solution or tries to reason about why it did not find one
+
+* Call ./sara -h for information on how to use
+
+
+See file ChangeLog <http://service-technology.org/files/sara/ChangeLog> for
+complete version history.
+

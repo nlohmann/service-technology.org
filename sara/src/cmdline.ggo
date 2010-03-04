@@ -1,0 +1,156 @@
+args "--include-getopt --show-required --no-handle-error"
+
+purpose "Structures for Automated Reachability Analysis:
+Deciding the reachability problem for Petri nets and more
+
+Given a problem of the form (N,i,f) where N is a low level Petri net in one of the formats *.llnet (LOLA) or *.owfn (OWFN), i is an initial marking, and f is an extended final marking, the program tries to decide whether f is reachable from i in the net N."
+
+section "Input and Output"
+sectiondesc="Input must be given explicitly (file or pipe), output goes to stdout/stderr by default."
+
+option "input" i
+  "Read problems from an input file and solve them."
+  typestr="FILENAME"
+  string
+  optional
+
+option "pipe" p
+  "Solve just created problems or take them from stdin."
+  details="If one of the options -q/-r/-R is specified, the problems generated there will be solved immediately. If no source of input can be found, the problems will be read from stdin and then solved.
+"
+  flag off
+
+option "output" o
+  "Redirect output messages from stdout to a file."
+  details="
+In general, sara will yield one of the following results as output:
+SOLUTION: A positive result, a possible firing sequence is presented.
+INFEASIBLE: A negative result. Either the marking equation is infeasible or it was impossible to borrow enough tokens (via T-invariants) to make some transition firable. In the latter case, all crucial points where this happened can be listed with the -v option; if the marking equation is infeasible changes to initial and final marking to make it solvable are suggested.
+UNSOLVED: A problem was detected. This means a solution might exist, but none was found. It can happen due to a numerical instability encountered by lp_solve or as a result of the option -T.
+Finally, sara could run for a very long time or terminate due to insufficient memory, which also falls under the UNSOLVED case.
+"
+  typestr="FILENAME"
+  string
+  optional
+
+option "log" l
+  "Redirect log and error messages to a file."
+  typestr="FILENAME"
+  string
+  optional
+
+section "Creating problem files"
+sectiondesc="See detailed help for the syntax of problems (e.g. for manual creation).\n"
+
+option "quasilive" q
+  "Create problems for checking enabling."
+  details="A problem file FILENAME.sara is generated for checking which transitions can be enabled at all in a given Petri net FILENAME
+"
+  typestr="FILENAME"
+  string
+  optional
+
+option "reachable" r
+  "Create a reachability problem (also coverability)."
+  details="Generates a problem file FILENAME.sara from the Petri net FILENAME for solving a reachability problem. The initial marking is also taken from this file, while the final marking is zero unless specified explicitly via -f.
+The problem will have the following syntax in the file:
+
+PROBLEM namestring:
+	GOAL REACHABILITY;
+	FILE petrinetfilename TYPE {LOLA|OWFN};
+	INITIAL initialmarking;
+	FINAL [COVER] finalmarking;
+
+The option COVER for a final marking means that all places of the Petri net not mentioned in the final marking may contain any number of tokens. Without the option, all such places must be empty finally.
+"
+  typestr="FILENAME"
+  string
+  optional
+
+option "realize" R
+  "Create a realizability problem."
+  details="Generates a problem file FILENAME.sara from the Petri net FILENAME for solving a realizability problem. The initial marking is also taken from this file, while the transition multiset must be specified via -f.
+The problem will have the following syntax in the file:
+
+PROBLEM namestring:
+	GOAL REALIZABILITY;
+	FILE petrinetfilename TYPE {LOLA|OWFN};
+	INITIAL initialmarking;
+	FINAL transitionmultiset;
+"
+  typestr="FILENAME"
+  string
+  optional
+
+option "final" f
+  "Specify an extended final marking."
+  details="Either an extended final marking (for option -r) or transition multiset to be used with -R must be given. In an extended final marking, there is a directive for each place stating whether the number of tokens must be reached exactly (:), covered (>), or bounded (<), so \"p:3,q>2,r<5,s\" denotes exactly 3 tokens on p, at least 2 on q, at most 5 on r, and exactly one token on s. Use quotation marks to avoid misinterpretation of < and >. Transition multisets contain transitions instead of places and < and > are forbidden (as in initial markings).
+"
+  typestr="string"
+  string
+  optional
+
+option "owfn" O
+  "Specify net as being *.owfn (instead of *.llnet)."
+  details="The Petri net used for creating a problem file is assumed to be in OWFN format (*.owfn). Default is LOLA (*.llnet)."
+  flag off
+
+section "Miscellaneous"
+
+option "time" t
+  "Measure time."
+  details="Show used time for each problem instance and all problems together.
+"
+  flag off
+
+option "verbose" v
+  "Show verbose output and reasoning."
+  details="Information about the number of jobs executed, how many are still in the queue, and (finally) how many crucial failures (that may lead to counterexamples) were encountered are given. If the marking equation fails a suggestion of how to change the markings is made. If the marking equation is feasible but the final marking unreachable the crucial failures constituting a counterexample are presented. At the end, the number of solutions found is summed up.
+"
+  flag off
+
+option "scapegoat" S
+  "Choose scapegoat nondeterministically." 
+  details="The scapegoat for the stubborn set method is chosen randomly instead of using the best place according to the global ordering of places. This might considerably change the run time, though it is unclear whether it becomes shorter or longer. Runs of the program will no longer be deterministic.
+"
+  flag off
+
+section "Thresholds"
+sectiondesc="These options allow to obtain control over the size of some data structures. They should only be used when in despair.\n"
+
+option "lookup" L
+  "Size of the lookup table."
+  details="The lookup table contains saved solutions of lp_solve including their (partial) realizability. Its size defaults to 1000. Do not increase this unless you get a warning with the -v option.
+"
+  typestr="n"
+  int
+  optional
+  hidden
+
+option "treemaxjob" T
+  "Maximal number of jobs per tree."
+  details="Stop trying to realize a transition vector after n new partial solutions (jobs) have been found. Solutions may be lost but the program may run faster (or not)."
+  typestr="n"
+  int
+  optional
+  hidden
+ 
+section "Debugging"
+
+option "break" b
+  "Break after n jobs."
+  details="The program execution is stopped after the n-th job has been executed.
+"
+  typestr="n"
+  int
+  optional
+  hidden
+
+option "debug" d
+  "Show debug info."
+  details="Show debug output: 0=none, 1=some, 2=more detail, 3=most detail."
+  typestr="0-3"
+  int
+  optional
+  hidden
+

@@ -76,12 +76,12 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 		set_int(lp,colnr+1,1); // declare all variables to be integer
 		tpos[t] = colnr; // remember the ordering of the transitions
 	}
-	if (colnr!=cols) cerr << "sara: LPWrapper error: column number mismatch" << endl;
+	if (colnr!=(int)(cols)) cerr << "sara: LPWrapper error: column number mismatch" << endl;
 
 	//lp_solve objective: minimum firing sequence length
 	int *colpoint = new int[cols];
 	REAL *mat = new REAL[cols];
-	for(int y=0; y<cols; y++)
+	for(unsigned int y=0; y<cols; y++)
 	{
 		mat[y]=1;
 		colpoint[y]=y+1;
@@ -93,7 +93,7 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	//create incidence matrix by adding rows to lp_solve
 	for(unsigned int k=0; k<placeorder.size(); ++k)
 	{
-		for(int y=0; y<cols; ++y) mat[y]=0;
+		for(unsigned int y=0; y<cols; ++y) mat[y]=0;
 		set<pnapi::Arc*>::iterator ait;
 		set<pnapi::Arc*> arcs = placeorder[k]->getPresetArcs(); 
 		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
@@ -117,7 +117,7 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	REAL r = 1;
 //	for(int y=1; y<=cols; ++y)
 //		set_lowbo(lp,y,0); // doesn't work, contradicting lp_solve manual
-	for(int y=1; y<=cols; ++y)
+	for(int y=1; y<=(int)(cols); ++y)
 		if (!add_constraintex(lp,1,&r,&y,GE,0)) return -1;
 
 	set_add_rowmode(lp,FALSE);	
@@ -178,7 +178,7 @@ unsigned char LPWrapper::getVariables(REAL* solution) {
 bool LPWrapper::addConstraints(PartialSolution& ps) {
 	// add new constraints to lp model
 	REAL *constraint = new REAL[cols+1];
-	for(int i=0; i<=cols; ++i) constraint[i]=0;
+	for(unsigned int i=0; i<=cols; ++i) constraint[i]=0;
 	set<Constraint>::iterator cit;
 	for(cit=ps.getConstraints().begin(); cit!=ps.getConstraints().end(); ++cit)
 	{
@@ -187,7 +187,7 @@ bool LPWrapper::addConstraints(PartialSolution& ps) {
 		bool jump = cit->isJump();
 		if (verbose>1) {
 			cerr << "LPWRAPPER: Constraint: ";
-			for(int j=1; j<=cols; ++j) if (constraint[j]>0) cerr << constraint[j] << getColName(j) << " ";
+			for(unsigned int j=1; j<=cols; ++j) if (constraint[j]>0) cerr << constraint[j] << getColName(j) << " ";
 			if (jump) cerr << " <= " << rhs << " for ";
 			else      cerr << " >= " << rhs << " for ";
 			cit->showConstraint(cerr);
@@ -208,7 +208,7 @@ map<Transition*,int>& LPWrapper::getTVector(PetriNet& pn) {
 	REAL *sol = new REAL[cols];
 	getVariables(sol);
 	if (verbose>1) cerr << "LPSOLVE: ";
-	for(int y=0; y<cols; ++y)
+	for(int y=0; y<(int)(cols); ++y)
 	{
 		if (verbose>1 && sol[y]>0) cerr << getColName(y+1) << "=" << sol[y] << " ";
 		tvector[pn.findTransition(getColName(y+1))] = static_cast<int>(sol[y]);

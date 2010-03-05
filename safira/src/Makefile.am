@@ -6,7 +6,7 @@ safira_SOURCES = og_syntax.yy og_lexer.ll \
                  Formula.h Formula.cc \
 		 Formula_toString.cc \
                  Formula_toCNF.cc \
-                 Formula_Substitute.cc \
+                 Formula_substitute.cc \
                  FormulaTree.h FormulaTree.cc \
                  Graph.h Graph.cc \
                  GraphComplement.h GraphComplement.cc \
@@ -31,7 +31,7 @@ testsafira_SOURCES = testmain.cc config.h \
                  FormulaTree.h FormulaTree.cc \
                  Formula_toString.cc \
                  Formula_toCNF.cc \
-                 Formula_Substitute.cc \
+                 Formula_substitute.cc \
                  Graph.h Graph.cc \
                  GraphComplement.h GraphComplement.cc \
                  GraphIntersection.h GraphIntersection.cc \

@@ -27,6 +27,7 @@
 #include "testGraph.h"
 #include "types.h"
 #include "helpers.h"
+#include "Output.h"
 
 using namespace std;
 map<string, int> label2id;
@@ -41,19 +42,29 @@ int lastLabelId;
 int lastInputId;
 int lastOutputId;
 
+void testClauseToString();
+
 int main() {
 
-	//test clauseToString();
+	testClauseToString();
+	testFormulaClass();
+	testNodeClass();
+
+	TestGraphComplement tgc;
+	tgc.initGraph();
+    tgc.complement();
+	Output o("testGraph_complement.eaa", "complement testGraph");
+	tgc.print(o);
+	cout << "testGraphClass... \t passed" << endl;
+
+	cout << "tests finished" << endl << endl;
+	exit(0);
+}
+
+void testClauseToString(){
 	Clause c;
 	c.literal0 = 23;
 	c.literal1 = 42;
 	c.literal2 = -1;
 	assert(clauseToString(c) == "  23 42 -1 ");
-
-
-	testFormulaClass();
-	testNodeClass();
-	testGraphClass();
-	cout << "tests finished" << endl << endl;
-	exit(0);
 }

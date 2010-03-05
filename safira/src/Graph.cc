@@ -56,7 +56,7 @@ Graph::~Graph(){
 //		delete n->second;
 //	}
 
-	delete globalFormula;
+//	delete globalFormula;
 
 }
 

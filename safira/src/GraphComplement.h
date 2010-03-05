@@ -22,34 +22,15 @@
 
 #include <map>
 #include "FormulaTree.h"
-//#include "Node.h"
 #include "Graph.h"
 
 using namespace std;
 
 class GraphComplement : public Graph {
-	private:
+	protected:
 		map<int, Node*> addedNodes;
 		Node* trap;
 		FormulaTree* root;
-        Node* getNode(Formula *f);
-        Node* getNode_stupid(Formula *f);
-        bool formulaFound(Formula *f, Formula *g);
-        Node* searchNode(Formula *f, FormulaTree *n);
-        void toDot_Nodes(FILE* out) const;
-        //	void toDot_addedNodes(FILE* out) const;
-        //  void printAddedNodes(ostream& o) const;
-
-    public:
-
-    	///constructor
-    	GraphComplement();
-
-    	///destructor
-    	~GraphComplement();
-
-    	/// computes the complement for the extended annotated graph
-    	void complement();
 
         /// complete the extended annotated graph - fast algorithm, but unreduced result
         void makeComplete_fast();
@@ -63,25 +44,37 @@ class GraphComplement : public Graph {
         /// make the extended annotated graph total
         void makeTotal();
 
+        void addTrapState();
+
+        Node* getNode(Formula *f);
+        Node* getNode_stupid(Formula *f);
+        bool formulaFound(Formula *f, Formula *g);
+        Node* searchNode(Formula *f, FormulaTree *n);
+
+        void toDot_Nodes(FILE* out) const;
+
+        int getSizeOfAddedNodes();
+        void appendAddedNodes(); //appends the added nodes to the nodes-mapâ
+
+        void generateGlobalFormula();
+
+
+    public:
+
+    	///constructor
+    	GraphComplement();
+
+    	///destructor
+    	~GraphComplement();
+
+    	/// computes the complement for the extended annotated graph
+    	void complement();
+
         /// Graphviz dot output
         void toDot(FILE* out, string title = "") const;
 
-        // Graph output as complement (it is required that makeTotal and makeComplete was executed before)
-        //void print(ostream& o) const;
-
-        //TODO: diese Funktion private?
-        //void getGlobalFormulaForComplement(ostream& o) const;
-
-        /// get the number of new nodes in the complement
-        int getSizeOfAddedNodes();
-
-        //TODO: diese Funktion private?
-        void generateGlobalFormula();
-
+		/// negates the global Formulaâ
         void negateGlobalFormula();
-
-        //TODO: diese Funktion private?
-        void appandAddedNodes();
 };
 
 #endif /* GRAPHCOMPLEMENT_H_ */

@@ -37,6 +37,7 @@ void testAND();
 void testOR();
 void testAND_OR_NOT();
 void testSat();
+void testDummy();
 
 
 

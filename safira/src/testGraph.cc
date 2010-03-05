@@ -52,9 +52,7 @@ extern  int lastLabelId;
 extern  int lastInputId;
 extern  int lastOutputId;
 
-Graph* testgraph;
-
-void initGraph(){
+void TestGraphComplement::initGraph(){
 	initFormulaClass();
 	Node::init();
 
@@ -64,24 +62,6 @@ void initGraph(){
 	firstOutputId = 5;
 	lastOutputId = 6;
 	lastLabelId = 6;
-
-	cout << "initGraphClass... \t passed" << endl;
-
-}
-
-
-void testGraphClass(){
-	testComplement();
-	cout << "testGraphClass... \t passed" << endl;
-
-}
-
-/* computes the complement of a given annotated Graph
- * the correctness of the result is checked by the testsuite.at
- * the Funtion make complete is also tested by this method
- */
-void testComplement(){
-	initGraph();
 
 	Formula* f0 = new FormulaOR(new FormulaLit(label2id["I"]), new FormulaLit(label2id["O"])); //f1 = I+O
 	Formula* f1 = new FormulaOR(new FormulaLit(label2id["O"]), new FormulaFinal()); //f2 = O + final
@@ -101,27 +81,27 @@ void testComplement(){
 	n0->addEdge(label2id["O"], n1); //n0--O->n1
 	n1->addEdge(label2id["O"], n0); //n1--O->n1
 
-	GraphComplement* g = new GraphComplement();
-	testgraph = g;
+	nodes[n0->id] = n0;
+	nodes[n1->id]  = n1;
+	addInitialNode(n0->id);
+	globalFormula = new FormulaOR(new FormulaNUM(n0->id), new FormulaNUM(n1->id)); // 0+1
+    globalFormulaAsString = globalFormula->toString();
 
-	testgraph->nodes[n0->id] = n0;
-	testgraph->nodes[n1->id]  = n1;
-	testgraph->addInitialNode(n0->id);
-	testgraph->globalFormula = new FormulaOR(new FormulaNUM(n0->id), new FormulaNUM(n1->id)); // 0+1
-    testgraph->globalFormulaAsString = testgraph->globalFormula->toString();
+	cout << "initGraphClass... \t passed" << endl;
 
-	g->makeTotal();
-	//Output o1("testGraph_total.eaa", "total testGraph");
-	//g->print(o1);
-	g->makeComplete_fast();
-	assert(g->getSizeOfAddedNodes() == 5);
-	g->generateGlobalFormula();
-	g->appandAddedNodes();
-	Output o2("testGraph_complement.eaa", "complement testGraph");
-	g->print(o2);
+}
 
 
-	//g->printNodes();
+/* computes the complement of a given annotated Graph
+ * the correctness of the result is checked by the testsuite.at
+ * the Function make complete is also tested by this method
+ */
+void TestGraphComplement::testComplement(){
+	initGraph();
 
-	delete g;
+
+
+    complement();
+	Output o("testGraph_complement.eaa", "complement testGraph");
+	print(o);
 }

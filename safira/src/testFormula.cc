@@ -49,10 +49,97 @@ void testFormulaClass(){
 	testNOT();
 	testAND();
 	testOR();
+
 	testAND_OR_NOT();
+	testDummy();
 
 	testSat();
 
+
+
+}
+
+void testDummy(){
+	/********************
+	 * ~((A * ~R) + ~~A)
+	 ********************/
+
+	Formula *a = new FormulaLit(label2id["A"]);
+	Formula *b = new FormulaLit(label2id["R"]);
+	Formula *c = new FormulaNOT(b);
+	Formula *d = new FormulaAND(a,c); //A*~R
+	Formula *e = new FormulaLit(label2id["A"]);
+	Formula *f = new FormulaNOT(e);
+	Formula *g = new FormulaNOT(f); //~~A
+	Formula *h = new FormulaOR(d,g);
+	Formula *i = new FormulaNOT(h); //~((A * ~R) + ~~A)
+
+
+	assert (i->formulaType == NOT);
+	assert (i->toString() == "~(((A * ~(R)) + ~(~(A))))");
+
+
+	/*****************
+	 * true * ~(A*I)
+	 *****************/
+	Formula *u = new FormulaTrue();
+	Formula *v = new FormulaLit(label2id["A"]);
+	Formula *w = new FormulaLit(label2id["I"]);
+	Formula *x = new FormulaAND(u, new FormulaNOT(new FormulaAND(v,w))); //true * (~(A*I))
+
+	assert (x->toString() == "(true * ~((A * I)))");
+
+	Formula* y = new FormulaAND(new FormulaDummy(i), new FormulaDummy(x)); // i*x
+	Formula* z = new FormulaAND(new FormulaNOT(new FormulaDummy(i)), new FormulaNOT(new FormulaDummy(x))); //~i*~x
+	Formula *yz = new FormulaOR(y,z);
+
+	assert(y->toString() == "(~(((A * ~(R)) + ~(~(A)))) * (true * ~((A * I))))");
+	assert(z->toString() == "(~(~(((A * ~(R)) + ~(~(A))))) * ~((true * ~((A * I)))))");
+	assert (yz->toString() == "((~(((A * ~(R)) + ~(~(A)))) * (true * ~((A * I)))) + (~(~(((A * ~(R)) + ~(~(A))))) * ~((true * ~((A * I))))))");
+	assert ((yz->moveNegation())->toString() == "((((~(A) + R) * ~(A)) * (true * (~(A) + ~(I)))) + (((A * ~(R)) + A) * (false + (A * I))))");
+
+	list<Clause> clauses =  yz->calculateCNF();
+
+	for (list<Clause>::iterator iter = clauses.begin(); iter != clauses.end(); ++iter){
+		printClause(*iter);
+	}
+
+	list<Clause>::iterator iter = clauses.begin();	assert(checkClause(*iter, 7,0,0));
+	++iter; assert(checkClause(*iter, -7, 8, 13 ));
+	++iter; assert(checkClause(*iter, 7, -8, 0));
+	++iter; assert(checkClause(*iter, 7, 0, -13));
+	++iter; assert(checkClause(*iter, 8, -9, -11));
+	++iter; assert(checkClause(*iter, -8, 9, 0));
+	++iter; assert(checkClause(*iter, -8, 0, 11));
+	++iter; assert(checkClause(*iter, 9, -10, 3));
+	++iter; assert(checkClause(*iter, -9, 10, 0));
+	++iter; assert(checkClause(*iter, -9, 0, -3));
+	++iter; assert(checkClause(*iter, -10, -3, 4));
+	++iter; assert(checkClause(*iter, 10, 3, 0));
+	++iter; assert(checkClause(*iter, 10, 0, -4));
+	++iter; assert(checkClause(*iter, -11, 12, 0));
+	++iter; assert(checkClause(*iter, 11, -12, 0));
+	++iter; assert(checkClause(*iter, -12, -3, -5));
+	++iter; assert(checkClause(*iter, 12, 3, 0));
+	++iter; assert(checkClause(*iter, 12, 0, 5));
+	++iter; assert(checkClause(*iter, 13, -14, -16));
+	++iter; assert(checkClause(*iter, -13, 14, 0));
+	++iter; assert(checkClause(*iter, -13, 0, 16));
+	++iter; assert(checkClause(*iter, -14, 15, 3));
+	++iter; assert(checkClause(*iter, 14, -15, 0));
+	++iter; assert(checkClause(*iter, 14, 0, -3));
+	++iter; assert(checkClause(*iter, 15, -3, 4));
+	++iter; assert(checkClause(*iter, -15, 3, 0));
+	++iter; assert(checkClause(*iter, -15, 0, -4));
+	++iter; assert(checkClause(*iter, -16, 17, 0));
+	++iter; assert(checkClause(*iter, 16, -17, 0));
+	++iter; assert(checkClause(*iter, 17, -3, -5));
+	++iter; assert(checkClause(*iter, -17, 3, 0));
+	++iter; assert(checkClause(*iter, -17, 0, 5));
+
+	delete yz;
+	delete i;
+	delete x;
 }
 
 void testSat(){

@@ -103,8 +103,8 @@ void GraphIntersection::intersection(Graph *g1, Graph *g2){
 
 void GraphIntersection::generateGlobalFormula(const Graph *g1, const Graph *g2){
 	//TODO: hier nicht Kopieren, sondern Kopiervorgan in die modify-Funktion verlagern und damit die Probleme mit const umgehen.
-	Formula *f1_copy = g1->globalFormula->getCopy();
-	Formula *f2_copy = g2->globalFormula->getCopy();
+	//Formula *f1_copy = g1->globalFormula->getCopy();
+	//Formula *f2_copy = g2->globalFormula->getCopy();
 
 	map<int,Formula*> formulaMap1;
 	map<int,string> formulaStringMap1;
@@ -163,10 +163,10 @@ void GraphIntersection::generateGlobalFormula(const Graph *g1, const Graph *g2){
 		}
 	}
 
-	f1_copy->modify(formulaMap1);
-	f2_copy->modify(formulaMap2);
+	//f1_copy->modify(formulaMap1);
+	//f2_copy->modify(formulaMap2);
 
-	globalFormula = new FormulaAND(f1_copy, f2_copy);
+	globalFormula = new FormulaAND(g1->globalFormula->substitute(formulaMap1), g2->globalFormula->substitute(formulaMap2));
 	globalFormulaAsString = globalFormula->toString();
 
 //	cout << "Global Formula: " << globalFormula->toString() << endl;
@@ -219,6 +219,8 @@ void GraphIntersection::product(Nodepair* qp){
 //	cout << "End Product(): [" << qp->n1->id << "," << qp->n2->id << "]-> " << qp->node->id << endl;
 }
 
+
+///converts "this" to a Graph object g
 void GraphIntersection::convertToGraph(Graph *g){
 	for (list<int>::iterator i = initialNodes.begin(); i != initialNodes.end(); ++i ){
 		g->initialNodes.push_back(*i);
@@ -234,6 +236,16 @@ void GraphIntersection::convertToGraph(Graph *g){
 
 
 }
+
+///converts the map of Nodepairs to a map of Nodes
+void GraphIntersection::convertTheMap(){
+	assert(nodes.size() == 0);
+	for (map<Intpair, Nodepair*>::const_iterator n = nodepairs.begin(); n != nodepairs.end(); ++n){
+		assert(nodes.find(n->second->node->id) == nodes.end());
+		nodes[n->second->node->id] = n->second->node;
+	}
+}
+
 
 //! \brief creates a dot output of the graph (result of intersection or union)
 //! \param out: output file
@@ -273,42 +285,3 @@ void GraphIntersection::convertToGraph(Graph *g){
 //
 //		fprintf(out, "}\n");
 //}
-//
-//
-//void GraphIntersection::printNodepairs(ostream& o) const{
-//	o << "\nNODES\n";
-//
-//    //print all nodes
-//	for (map<Intpair, Nodepair*>::const_iterator n = nodepairs.begin(); n != nodepairs.end(); ++n){
-//		o << "  " << n->second->node->id << ": " << n->second->node->formula->toString() << endl;
-//		for (int i = firstLabelId; i <= lastLabelId; ++i){
-//			for (list<Node*>::iterator s = n->second->node->outEdges[i].begin(); s != n->second->node->outEdges[i].end(); ++s){
-//				assert(id2label.find(i) != id2label.end());
-//				o << "    " << id2label[i] << " -> " << (*s)->id << endl;
-//			}
-//		}
-//		o << endl;
-//	}
-//}
-//
-//
-///// prints the Intersection as eaa
-//void GraphIntersection::print(ostream& o) const{
-//	printInterface(o);
-//	printInitialNodes(o);
-//	//printGlobalFormula(o);
-//	printNodepairs(o);
-//}
-//
-//void GraphIntersection::printGlobalFormula(ostream& o) const{
-//
-//}
-
-void GraphIntersection::convertTheMap(){
-	assert(nodes.size() == 0);
-	for (map<Intpair, Nodepair*>::const_iterator n = nodepairs.begin(); n != nodepairs.end(); ++n){
-		assert(nodes.find(n->second->node->id) == nodes.end());
-		nodes[n->second->node->id] = n->second->node;
-	}
-}
-

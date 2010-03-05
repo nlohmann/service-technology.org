@@ -26,7 +26,7 @@
 
 typedef std::vector<std::string> Labels;
 
-enum FormulaType {UNDEF, AND, OR, NOT, LIT, INT, TRUE, FALSE, FINAL};
+enum FormulaType {UNDEF, DUMMY, AND, OR, NOT, LIT, INT, TRUE, FALSE, FINAL};
 
 //struct Clause {
 //	std::string literal0;

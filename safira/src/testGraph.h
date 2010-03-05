@@ -17,11 +17,17 @@
  along with Safira.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef _TESTGRAPH_H
-#define _TESTGRAPH_H
+#ifndef _TESTGRAPHCOMPLEMENT_H
+#define _TESTGRAPHCOMPLEMENT_H
 
-void initGraph();
-void testGraphClass();
-void testComplement();
+#include "GraphComplement.h"
+
+class TestGraphComplement: public GraphComplement  {
+
+public:
+	void initGraph();
+	void testComplement();
+
+};
 
 #endif

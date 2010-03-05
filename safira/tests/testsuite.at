@@ -129,7 +129,7 @@ AT_CLEANUP
 
 #####################################
 
-AT_SETUP([intersection coffee - ohne globale Formel])
+AT_SETUP([intersection coffee - without global formula])
 AT_CHECK([cp TESTFILES/EMPTY TESTFILES/myCoffee.og TESTFILES/myMilk.og TESTFILES/myMilk_myCoffee_intersection_ref.eaa .])
 
 AT_CHECK([SAFIRA -oeaa myMilk.og myCoffee.og -i],0,stdout,stderr)
@@ -143,7 +143,7 @@ AT_CLEANUP
 
 #####################################
 
-AT_SETUP([intersection coffee - mit globaler Formuel])
+AT_SETUP([intersection coffee - with global formula])
 AT_CHECK([cp TESTFILES/EMPTY TESTFILES/myCoffeeIntersec.og TESTFILES/myMilkIntersec.og TESTFILES/myMilkIntersec_myCoffeeIntersec_intersection_ref.eaa .])
 
 AT_CHECK([SAFIRA -oeaa myMilkIntersec.og myCoffeeIntersec.og -i],0,stdout,stderr)

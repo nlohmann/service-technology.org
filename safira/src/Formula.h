@@ -21,15 +21,12 @@
 #define _FORMULA_H
 
 #include <string>
-#include <vector>
-//#include <set>
-#include <map>
 #include <list>
+#include <map>
 #include "types.h"
 #include "NumPrinter.h"
 
 using namespace std;
-
 
 /// a formula to be attached to a node
 class Formula {
@@ -61,8 +58,8 @@ public:
 	/// returns a satisfying assignment if there is one; returns NULL otherwise
 	vector<bool> * getSatisfyingAssignment();
 
+	/// calculates the CNF
 	list<Clause> calculateCNF();
-
 
 	/// returns a string representation of the formula
 	string toString() const;
@@ -79,10 +76,7 @@ public:
 	///return the time needed by minisat
 	static double getMinisatTime();
 
-	/// returns the set of all Literals (ids of the Labels, or ids of the states)
-//	virtual set<int> getLiterals() const = 0;
-
-	virtual const Formula* modify(map<int,Formula*> lits) const;
+	virtual const Formula* substitute(map<int,Formula*> lits) const;
 };
 
 
@@ -101,15 +95,15 @@ public:
 	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
-	const Formula* modify(map<int,Formula*> lits) const;
+	const Formula* substitute(map<int,Formula*> lits) const;
 };
+
 
 /// a formula to express a disjunction of two other formulae
 class FormulaOR : public Formula {
 private:
 	const Formula *left;  ///< left sub-formula
 	const Formula *right; ///< right sub-formula
-
 
 public:
 	FormulaOR(const Formula *left, const Formula *right);
@@ -120,14 +114,14 @@ public:
 	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
-	const Formula* modify(map<int,Formula*> lits) const;
+	const Formula* substitute(map<int,Formula*> lits) const;
 };
+
 
 /// a formula to express a negation of another formula
 class FormulaNOT :public Formula {
 private:
 	const Formula *f; ///< sub-formula
-
 
 public:
 	FormulaNOT(const Formula *f);
@@ -138,8 +132,9 @@ public:
 	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
-	const Formula* modify(map<int,Formula*> lits) const;
+	const Formula* substitute(map<int,Formula*> lits) const;
 };
+
 
 /// a formula to express a string literal
 class FormulaLit :public Formula {
@@ -170,7 +165,7 @@ public:
 	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
-	const Formula* modify(map<int,Formula*> lits) const;
+	const Formula* substitute(map<int,Formula*> lits) const;
 };
 
 
@@ -189,7 +184,6 @@ public:
 
 /// a formula to express falsity
 class FormulaFalse :public Formula {
-protected:
 public:
 	FormulaFalse();
 	~FormulaFalse(){}
@@ -212,5 +206,22 @@ public:
 };
 
 
+/// a dummy node in the Formula tree. It avoids that nodes below are deleted by the destructor call
+/* a dummy node is introduced if a formula h is generated temporarily by existing formulas f and g
+ * the call "delete h" will only delete nodes which are neither part of f nor part of g.
+ */
+class FormulaDummy : public Formula {
+private:
+	const Formula *f; ///< sub-formula
+public:
+	FormulaDummy(const Formula *f);
+	FormulaDummy(const FormulaDummy &formula);
+	~FormulaDummy();
+	virtual Formula * getCopy() const;
+	virtual string toString(NumPrinterBase* printer) const;
+	Formula* moveNegation(bool leadingNot) const;
+	list<Clause> toCNF(int varId, int& max) const;
+	const Formula* substitute(map<int,Formula*> lits) const;
+};
 
 #endif

@@ -120,14 +120,14 @@ private:
 	/// Name of the problem
 	string name;
 
-	/// The Petri net
-	PetriNet* pn;
-
 	/// Whether the Petri net must be unloaded after the problem is solved
 	bool deinit;
 
-	/// The Petri net type
-	int nettype;
+	/// Whether places not mentioned in the final marking are covered or reached
+	bool generalcover;
+
+	/// The problem type
+	int type;
 
 	/// The Petri net filename
 	string filename;
@@ -141,11 +141,12 @@ private:
 	/// The cover requirement (with place names instead of places)
 	map<string,int> cover;	
 
-	/// The problem type
-	int type;
+	/// The Petri net type
+	int nettype;
 
-	/// Whether places not mentioned in the final marking are covered or reached
-	bool generalcover;
+	/// The Petri net
+	PetriNet* pn;
+
 };
 
 #endif

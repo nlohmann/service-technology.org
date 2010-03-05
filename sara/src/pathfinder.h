@@ -117,14 +117,14 @@ private:
 	/// counts the leafs reached by the recursive function (just for protocol)
 	int pos;
 
-	/// counts all recursion steps for progress indicator
-	int recsteps;
-
 	/// inherited from Reachalyzer
 	map<map<Transition*,int>,vector<PartialSolution> >& shortcut;
 
+	/// counts all recursion steps for progress indicator
+	int recsteps;
+
 	/// maximal shortcut size (redefinable per command line switch)
-	int shortcutmax;
+	unsigned int shortcutmax;
 
 	/// temporary firing sequence pool for complex diamond checks
 	vector<vector<Transition*> > fpool;

@@ -56,7 +56,7 @@ extern gengetopt_args_info args_info;
 	@param verbose The level of verbosity (0-3).
 */
 Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, bool verbose, int debug, bool out, int brk) 
-	: m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols+1),error(0),im(pn),breakafter(brk) {
+	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols+1),im(pn),breakafter(brk) {
 	// inherit verbosity/debug level
 	this->verbose = debug;
 	// if output goes to a file
@@ -91,7 +91,7 @@ Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, bool verbose, i
 	@param verbose The level of verbosity (0-3).
 */
 Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, bool verbose, int debug, bool out, int brk) 
-	: m1(m0),net(pn),im(pn),cols(pn.getTransitions().size()),lpwrap(cols),error(0),breakafter(brk) {
+	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols),im(pn),breakafter(brk) {
 	// inherit verbosity/debug level
 	this->verbose = debug;
 	this->out = out;
@@ -265,13 +265,12 @@ void Reachalyzer::start() {
 void Reachalyzer::printResult() {
 	if (solved && !tps.empty()) // in case we have a solution:
 	{
-		int i;
 		PartialSolution* ps(tps.findSolution()); // find it
 		if (ps)
 		{ // and print it
 			vector<Transition*> solution = ps->getSequence();
 			cout << "sara: SOLUTION: ";
-			for(int j=0; j<solution.size(); ++j)
+			for(unsigned int j=0; j<solution.size(); ++j)
 				cout << solution[j]->getName() << " ";
 			cout << endl;
 		} else cerr << "sara: error: solved, but no solution found" << endl; // this should never happen
@@ -358,7 +357,7 @@ void Reachalyzer::extendTransitionOrder(map<Transition*,int> fullv, vector<Trans
 bool Reachalyzer::solutionSeen(map<Transition*,int>& tv) {
 	if (shortcut.find(tv)==shortcut.end()) return false;
 	vector<PartialSolution>& vp(shortcut[tv]);
-	for(int i=0; i<vp.size(); ++i)
+	for(unsigned int i=0; i<vp.size(); ++i)
 	{
 		vp[i].setConstraints(tps.first()->getConstraints());
 //		vp[i].setOrder(tps.first()->getOrder());

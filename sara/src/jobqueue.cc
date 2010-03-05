@@ -49,7 +49,7 @@ JobQueue::~JobQueue() {
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
 	{
-		for(int i=0; i<jit->second.size(); ++i)
+		for(unsigned int i=0; i<jit->second.size(); ++i)
 			delete jit->second[i];
 	}
 	delete active;
@@ -142,16 +142,16 @@ int JobQueue::find(PartialSolution* job) {
 	map<Transition*,int> tmap;
 	vector<Transition*> tseq(job->getSequence());
 	if (tseq.size()>0)
-		 for(int i=0; i<tseq.size(); ++i) ++tmap[tseq[i]];
+		 for(unsigned int i=0; i<tseq.size(); ++i) ++tmap[tseq[i]];
 	// go through the jobs with the same priority, but leave out first()
 	deque<PartialSolution*> deq(queue[pri]);
-	for(int i=0; i<deq.size(); ++i)
+	for(unsigned int i=0; i<deq.size(); ++i)
 	{
 		// count Parikh vector for queued job
 		map<Transition*,int> tmap2;
 		vector<Transition*> tseq2(deq[i]->getSequence());
 		if (tseq2.size()>0)
-			for(int j=0; j<tseq2.size(); ++j) ++tmap2[tseq2[j]];
+			for(unsigned int j=0; j<tseq2.size(); ++j) ++tmap2[tseq2[j]];
 		if (tmap==tmap2 && job->getRemains()==deq[i]->getRemains())
 		{
 			// test if the constraints are equal
@@ -199,7 +199,7 @@ PartialSolution* JobQueue::findSolution() {
 	if (active->isSolved()) return active;
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
-		for(int i=0; i<jit->second.size(); ++i)
+		for(unsigned int i=0; i<jit->second.size(); ++i)
 			if (jit->second[i]->isSolved()) return jit->second[i];
 	return NULL;
 }
@@ -211,7 +211,7 @@ bool JobQueue::checkMEInfeasible() {
 	bool infeasible = true;
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
-		for(int i=0; i<jit->second.size(); ++i)
+		for(unsigned int i=0; i<jit->second.size(); ++i)
 			if (jit->second[i]->isFeasible()) infeasible=false;
 	return infeasible;
 }
@@ -228,7 +228,7 @@ void JobQueue::push_fail(PartialSolution* job) {
 	map<const Place*,unsigned int> map1(job->getMarking().getMap()); // the marking of job
 	map<const Place*,unsigned int>::const_iterator mit;
 	map<int,deque<PartialSolution*> >::iterator jit;
-	int i; // we must remember i after the loop, so declare it here
+	unsigned int i; // we must remember i after the loop, so declare it here
 	for(jit=queue.begin(); jit!=queue.end(); ++jit) // iterate through the failure queue
 	{
 		for(i=0; i<jit->second.size(); ++i) // inner iteration
@@ -290,10 +290,10 @@ bool JobQueue::cleanFailure(map<Transition*,int>& p) {
 	bool result(false);
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
-		for(int i=0; i<jit->second.size(); ++i)
+		for(unsigned int i=0; i<jit->second.size(); ++i)
 		{ // walk all failure entries
 			vector<map<Transition*,int> >& parikh(jit->second[i]->getParikh());
-			for(int j=0; j<parikh.size(); ++j)
+			for(unsigned int j=0; j<parikh.size(); ++j)
 			{ // go through all parikh images in an entry
 				map<Transition*,int>::iterator mit,pit;
 				bool smaller(false); // compare if queue entry is smaller than p
@@ -331,7 +331,7 @@ bool JobQueue::cleanFailure(map<Transition*,int>& p) {
 void JobQueue::printFailure(IMatrix& im) {
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
-		for(int i=0; i<jit->second.size(); ++i)
+		for(unsigned int i=0; i<jit->second.size(); ++i)
 		{
 			PartialSolution* ps(jit->second[i]);
 			if (ps->isSolved()) continue; // this failure is obsolete
@@ -339,7 +339,7 @@ void JobQueue::printFailure(IMatrix& im) {
 			if (ps->getSequence().size()>0)
 			{
 				bool blank = false;
-				for(int j=0; j<ps->getSequence().size(); ++j)
+				for(unsigned int j=0; j<ps->getSequence().size(); ++j)
 				{
 					if (blank) cout << " ";
 					blank = true;
@@ -400,7 +400,7 @@ int JobQueue::trueSize() {
 	int counter=0;
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
-		for(int i=0; i<jit->second.size(); ++i)
+		for(unsigned int i=0; i<jit->second.size(); ++i)
 			if (!jit->second[i]->isSolved()) ++counter;
 	return counter;
 }

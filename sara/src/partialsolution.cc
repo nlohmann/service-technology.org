@@ -57,7 +57,7 @@ PartialSolution::PartialSolution(Marking& m1) : m(m1),markingEquation(false) {
 	@param m1 The marking reached after the partial firing sequence.
 	@param rvec The remaining (nonfirable) transitions. 
 */
-PartialSolution::PartialSolution(vector<Transition*>& ts,Marking& m1,map<Transition*,int>& rvec) : m(m1),tseq(ts),remains(rvec),markingEquation(false) {
+PartialSolution::PartialSolution(vector<Transition*>& ts,Marking& m1,map<Transition*,int>& rvec) : tseq(ts),m(m1),remains(rvec),markingEquation(false) {
 	constraints.clear();
 	fulltv.clear();
 	failure.clear();
@@ -200,7 +200,7 @@ bool PartialSolution::isFeasible() { return markingEquation; }
 */
 void PartialSolution::show() {
 	cerr << "SEQ:  ";
-	for(int j=0; j<getSequence().size(); j++)
+	for(unsigned int j=0; j<getSequence().size(); j++)
 		cerr << getSequence().at(j)->getName() << " ";
 	cerr << endl;
 	map<const Place*,unsigned int>::const_iterator mit;
@@ -246,7 +246,7 @@ map<Place*,int> PartialSolution::produce() {
 	map<Place*,int> prod;
 	prod.clear();
 	if (tseq.size()==0) return prod;
-	for(int i=0; i<tseq.size(); ++i)
+	for(unsigned int i=0; i<tseq.size(); ++i)
 	{
 		set<pnapi::Arc*> as(tseq[i]->getPostsetArcs());
 		set<pnapi::Arc*>::iterator ait;
@@ -373,7 +373,7 @@ void PartialSolution::calcCircleConstraints(IMatrix& im, Marking& m0) {
 			if (posmap.find(mit->first)==posmap.end()) posmap[mit->first]=0; // init
 			if (mit->second>0 && posmap[mit->first]<mit->second) posmap[mit->first]=mit->second;
 		}
-		if (!buildMultiConstraint(posmap,um,ftmp[i],im)) ; //cerr << "TJ: ERROR" << endl;
+		if (!buildMultiConstraint(posmap,um,ftmp[i])) ; //cerr << "TJ: ERROR" << endl;
 	}
 }
 */
@@ -386,7 +386,7 @@ void PartialSolution::calcCircleConstraints(IMatrix& im, Marking& m0) {
 	@param im The incidence matrix of the Petri net.
 	@return Whether the constraint is non-trivial and has thus been added.
 */
-bool PartialSolution::buildMultiConstraint(map<Place*,int>& pmap, int incr, set<Transition*>& forbidden, IMatrix& im) {
+bool PartialSolution::buildMultiConstraint(map<Place*,int>& pmap, int incr, set<Transition*>& forbidden) {
 	Constraint c;
 	map<Place*,int>::iterator pit;
 	for(pit=pmap.begin(); pit!=pmap.end(); ++pit)
@@ -396,7 +396,7 @@ bool PartialSolution::buildMultiConstraint(map<Place*,int>& pmap, int incr, set<
 		if (c.checkSubTransition(**tit)) c.addSubTransition(**tit);
 	map<Transition*,int>& cs(c.calcConstraint());
 	int allprod = 0;
-	for(int i=0; i<tseq.size(); ++i)
+	for(unsigned int i=0; i<tseq.size(); ++i)
 		if (cs.find(tseq[i])!=cs.end()) 
 			allprod += cs[tseq[i]];
 	int check = 0;
@@ -441,9 +441,9 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 		for(pit=pre.begin(); pit!=pre.end(); ++pit) // go through the preset
 		{
 			int cons = pit->second;
-			if (cons>m[*(pit->first)]) { // additional tokens are needed
+			if (cons>(int)(m[*(pit->first)])) { // additional tokens are needed
 				undermarked.insert(pit->first); // place hasn't got enough tokens, so tag it
-				if (undermarking[pit->first]==0 || undermarking[pit->first]>cons-m[*(pit->first)])
+				if (undermarking[pit->first]==0 || undermarking[pit->first]>cons-(int)(m[*(pit->first)]))
 					undermarking[pit->first]=cons-m[*(pit->first)]; // minimum amount needed to activate some transition
 			}
 		}
@@ -484,7 +484,7 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 	vector<set<Place*> > pcomp;
 	tj.getComponents(tcomp,pcomp);
 	// go through all the places in a component
-	for(int i=0; i<pcomp.size(); ++i)
+	for(unsigned int i=0; i<pcomp.size(); ++i)
 		if (pcomp[i].size()>0) // only create a new constraint if there are places at all
 		{
 			bool b=true; // true as long as all pre-pre-places of places are in the same component,
@@ -533,7 +533,7 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 						for(pit=pcomp[i].begin(); pit!=pcomp[i].end(); ++pit)
 						{ 	// calc need for the first instance (preset) and every later instance (change)
 							// of a forbidden transition.
-							if (pre[*pit]>inctmp+m[**pit]) inctmp=pre[*pit]-m[**pit]; // get enough for first firing
+							if (pre[*pit]>inctmp+(int)(m[**pit])) inctmp=pre[*pit]-m[**pit]; // get enough for first firing
 							int need = -addtimes*im.getEntry(**fit,**pit); // first + later firings
 							if (addtimes>0) { // and for later firings
 								if (need>inctmp) inctmp=need; 
@@ -585,7 +585,7 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 					incr = cons+postneed; // the overall minimum number of tokens needed in this component for the forbidden transitions 
 				}
 				// we now know a number of additional tokens needed, so we can build the constraint 
-				buildMultiConstraint(ptmp,incr,forbidden,im);
+				buildMultiConstraint(ptmp,incr,forbidden);
 			}
 		}
 }
@@ -793,7 +793,7 @@ set<Transition*> PartialSolution::disabledTransitions(map<Place*,int> pset, IMat
 		{
 			map<Place*,int> pre(im.getPreset(*(mtit->first)));
 			for(pit=pset.begin(); pit!=pset.end(); ++pit)
-				if (pre[pit->first]>m[*(pit->first)]) 
+				if (pre[pit->first]>(int)(m[*(pit->first)])) 
 					{ result.insert(mtit->first); break; }
 		}
 	return result;
@@ -807,7 +807,7 @@ set<Transition*> PartialSolution::disabledTransitions(map<Place*,int> pset, IMat
 int PartialSolution::getActualRHS(const Constraint& c) {
 	const map<Transition*,int>& cs(c.getLHS());
 	int allprod = 0;
-	for(int i=0; i<tseq.size(); ++i)
+	for(unsigned int i=0; i<tseq.size(); ++i)
 		if (cs.find(tseq[i])!=cs.end()) 
 			allprod += cs.find(tseq[i])->second;
 	return allprod;
@@ -818,7 +818,7 @@ int PartialSolution::getActualRHS(const Constraint& c) {
 map<Transition*,int> PartialSolution::calcParikh() {
 	parikh.clear();
 	map<Transition*,int> result;
-	for(int i=0; i<tseq.size(); ++i)
+	for(unsigned int i=0; i<tseq.size(); ++i)
 		++result[tseq[i]];
 	parikh.push_back(result);
 	return result;

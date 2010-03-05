@@ -39,7 +39,7 @@ using std::endl;
 /** Constructor
 	@param pn The Petri net for which the incidence matrix is to be built.
 */
-IMatrix::IMatrix(PetriNet& pn) : petrinet(pn),verbose(0) { mat.clear(); loop.clear(); }
+IMatrix::IMatrix(PetriNet& pn) : verbose(0),petrinet(pn) { mat.clear(); loop.clear(); }
 
 /** Calculates or just gets one column of the incidence matrix.
 	@param t The transition identifying the column.
@@ -230,7 +230,7 @@ bool IMatrix::checkRestrictedActivation(Marking& m, vector<Transition*>& tv, set
 	for(pit=restriction.begin(); pit!=restriction.end(); ++pit)
 	{
 		int tokens = m[**pit];
-		for(int i=0; i<tv.size(); ++i)
+		for(unsigned int i=0; i<tv.size(); ++i)
 		{
 			int entry = getEntry(*(tv[i]),**pit);
 			int loops = getLoops(*(tv[i]),**pit);
@@ -248,7 +248,7 @@ bool IMatrix::checkRestrictedActivation(Marking& m, vector<Transition*>& tv, set
 	}
 	if (verbose>2) {
 		cerr << "DIAMOND: " << tv.at(tv.size()-1)->getName() << " ";
-		for(int i=1; i<tv.size()-1; ++i) cerr << tv[i]->getName() << " ";
+		for(unsigned int i=1; i<tv.size()-1; ++i) cerr << tv[i]->getName() << " ";
 		cerr << tv.at(0)->getName() << endl;
 	}
 	return true;	

@@ -37,7 +37,7 @@ class LPWrapper {
 public:
 
 	/// Constructor (int=number of columns)
-	LPWrapper(int);
+	LPWrapper(unsigned int);
 
 	/// Destructor
 	~LPWrapper();
@@ -77,10 +77,10 @@ private:
 	lprec* lp;
 
 	/// The number of columns (transitions) in the system of equations
-	int cols;
+	unsigned int cols;
 
 	/// The number of rows in the system created from the marking equation
-	int basicrows;
+	unsigned int basicrows;
 
 	/// internal variables for positions of transitions in the system and for the solution
 	map<Transition*,int> tpos, tvector;

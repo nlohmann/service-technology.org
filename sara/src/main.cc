@@ -227,7 +227,7 @@ if (args_info.input_given || args_info.pipe_given) {
 	int loops = 0;
 	int solcnt = 0;
 	// walk through the problem list
-	for(int x=0; x<pbls.size(); ++x)
+	for(unsigned int x=0; x<pbls.size(); ++x)
 	{
 		cout << "sara: Problem " << ++loops << ": " << pbls.at(x).getName() << endl;
 		if (args_info.log_given)
@@ -248,11 +248,11 @@ if (args_info.input_given || args_info.pipe_given) {
 					reach.printResult(); // ... and print the result
 					if (debug>0) {
 						cerr << "Transition Order: ";
-						for(int o=0; o<transitionorder.size(); ++o)
+						for(unsigned int o=0; o<transitionorder.size(); ++o)
 							cerr << transitionorder[o]->getName() << " ";
 						cerr << endl;
 						cerr << "Place Order: ";
-						for(int o=0; o<placeorder.size(); ++o)
+						for(unsigned int o=0; o<placeorder.size(); ++o)
 							cerr << placeorder[o]->getName() << " ";
 						cerr << endl;
 					}

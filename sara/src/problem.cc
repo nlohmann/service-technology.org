@@ -72,7 +72,7 @@ Problem::Problem() : deinit(false),generalcover(false),type(REACHABLE),nettype(L
 	@param typ The problem type: REACHABILITY or REALIZABILITY.
 */
 Problem::Problem(string net, int pntype, map<string,int>& initialmarking, map<string,int>& requirement, int typ) 
-	: deinit(false),type(typ),filename(net),initial(initialmarking),required(requirement),nettype(pntype),generalcover(false),pn(NULL) {
+	: deinit(false),generalcover(false),type(typ),filename(net),initial(initialmarking),required(requirement),nettype(pntype),pn(NULL) {
 	name = "";
 	cover.clear();
 }
@@ -85,7 +85,7 @@ Problem::Problem(string net, int pntype, map<string,int>& initialmarking, map<st
 	@param coverplaces Whether token numbers on places must be covered, bounded, or reached exactly.
 */
 Problem::Problem(string net, int pntype, map<string,int>& initialmarking, map<string,int>& covermarking, map<string,int>& coverplaces) 
-	: deinit(false),filename(net),initial(initialmarking),required(covermarking),cover(coverplaces),nettype(pntype),generalcover(false),pn(NULL) {
+	: deinit(false),generalcover(false),filename(net),initial(initialmarking),required(covermarking),cover(coverplaces),nettype(pntype),pn(NULL) {
 	type = REACHABLE;
 	name = "";
 }
@@ -387,10 +387,10 @@ void Problem::calcPTOrder() {
 			placeorder.push_back(*pit);
 	}
 	revtorder.clear();
-	for(int i=0; i<transitionorder.size(); ++i)
+	for(unsigned int i=0; i<transitionorder.size(); ++i)
 		revtorder[transitionorder[i]]=i;
 	revporder.clear();
-	for(int i=0; i<placeorder.size(); ++i)
+	for(unsigned int i=0; i<placeorder.size(); ++i)
 		revporder[placeorder[i]]=i;
 }
 

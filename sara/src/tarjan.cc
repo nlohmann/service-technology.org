@@ -39,7 +39,7 @@ using std::endl;
 
 /** Standard constructor. Creates one node for Tarjan's algorithm.
 */
-myTPNode::myTPNode() : index(-2),low(-1),instack(false),t(NULL),p(NULL) { nodes.clear(); }
+myTPNode::myTPNode() : t(NULL),p(NULL),index(-2),low(-1),instack(false) { nodes.clear(); }
 
 /** Destructor.
 */
@@ -52,6 +52,7 @@ void myTPNode::reset() { index=-2; low=-1; instack=false; nodes.clear(); }
 
 /** Initializer. Reverts a node back to the state it had before the first call of Tarjan's
 	algorithm, but after graph construction, i.e. the graph structure stays intact.
+*/
 void myTPNode::init() { if (index>-1) index=-1; low=-1; instack=false; }
 
 	/*********************************

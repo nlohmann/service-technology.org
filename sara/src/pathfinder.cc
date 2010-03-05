@@ -54,7 +54,7 @@ extern map<Place*,int> revporder;
 	***************************************/
 
 /** Constructor */
-PathFinder::myNode::myNode() : index(-2),low(-1),instack(false),t(NULL) { nodes.clear(); }
+PathFinder::myNode::myNode() : t(NULL),index(-2),low(-1),instack(false) { nodes.clear(); }
 /** Destructor */
 PathFinder::myNode::~myNode() {}
 /** Reset for reusability. Reaches the same state as the constructor. */
@@ -75,7 +75,7 @@ void PathFinder::myNode::reset() { index=-2; low=-1; instack=false; nodes.clear(
 */
 PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& itps, IMatrix& imx, map<map<Transition*,int>,vector<PartialSolution> >& lookup) 
 	: m0(m),fulltvector(tv),rec_tv(tv),cols(col),tps(itps),im(imx),shortcut(lookup),recsteps(0) {
-	for(int i=0; i<transitionorder.size(); ++i)
+	for(unsigned int i=0; i<transitionorder.size(); ++i)
 	{
 		tton.push_back(new myNode());
 		tton[i]->t = transitionorder[i];
@@ -87,14 +87,14 @@ PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& 
 	cftab.clear();
 	st.clear();
 	shortcutmax=1000;
-	if (args_info.lookup_given) shortcutmax=args_info.lookup_arg;
+	if (args_info.lookup_given) shortcutmax=(unsigned int)(args_info.lookup_arg);
 }
 
 /** Destructor. Also frees any myNode objects in use.
 */
 PathFinder::~PathFinder() {
 	map<Transition*,myNode*>::iterator it;
-	for(int i=0; i<tton.size(); ++i)
+	for(unsigned int i=0; i<tton.size(); ++i)
 		delete tton[i];
 }
 
@@ -116,7 +116,7 @@ bool PathFinder::recurse() {
 	{ // begin scope to reduce visibility of local variables
 	// if the user has specified a maximal number of new jobs to be created by a tree
 	// and the number is reached, stop the recursion
-	if (args_info.treemaxjob_given && fpool.size()>=args_info.treemaxjob_arg) return false;
+	if (args_info.treemaxjob_given && (int)(fpool.size())>=args_info.treemaxjob_arg) return false;
 
 	// obtain a first node/transition (one that is activated and must fire eventually)
 	map<Transition*,int>::iterator recit;
@@ -137,7 +137,7 @@ bool PathFinder::recurse() {
 		if (verbose>0) {
 			if ((++pos)%1000==0) 
 				{ cerr << "sara: PATH: ";
-				for(int l=0; l<fseq.size(); ++l) cerr << fseq[l]->getName() << " ";
+				for(unsigned int l=0; l<fseq.size(); ++l) cerr << fseq[l]->getName() << " ";
 				cerr << " (" << pos << ")" << endl; }
 		}
 		// add path to pool for complex diamond check (optimization)
@@ -223,7 +223,7 @@ bool PathFinder::recurse() {
 	}
 	if (verbose>2) {
 		cerr << "tton: ";
-		for(int i=0; i<tton.size(); ++i)
+		for(unsigned int i=0; i<tton.size(); ++i)
 		{
 			cerr << transitionorder[i]->getName() << ":[";
 			set<int>::iterator xt;
@@ -247,7 +247,7 @@ bool PathFinder::recurse() {
 	tres = getSZK(); // get the stubborn set of activated transitions
 
 	// clear tton (conflict graph) for use in the next recursion step
-	for(int i=0; i<tton.size(); ++i)
+	for(unsigned int i=0; i<tton.size(); ++i)
 		tton[i]->reset();
 
 	if (verbose>2) {
@@ -266,15 +266,15 @@ bool PathFinder::recurse() {
 	vector<Transition*> tord;
 	tord.clear();
 	{
-	for(int o=0; o<transitionorder.size(); ++o)
+	for(unsigned int o=0; o<transitionorder.size(); ++o)
 		if (tres.find(transitionorder[o])!=tres.end()) tord.push_back(transitionorder[o]);
 	}
-	for(int o=0; o<tord.size(); ++o)
+	for(unsigned int o=0; o<tord.size(); ++o)
 	{
 		if (verbose>2) {
 			// debug output
 			cerr << "sara: PATH: ";
-			for(int l=0; l<fseq.size(); ++l) cerr << fseq[l]->getName() << " ";
+			for(unsigned int l=0; l<fseq.size(); ++l) cerr << fseq[l]->getName() << " ";
 			cerr << endl;
 			cerr << "sara: StubSet at (" << stubsets.size()-1 << "):";
 			set<Transition*>::iterator xx;
@@ -407,12 +407,12 @@ Place* PathFinder::hinderingPlace(Transition& t) {
 	{
 		int rnd = clock()%(pset.size());
 		pit = pset.begin();
-		for(int i=0; i<rnd; ++i,++pit);
+		for(int i=0; i<rnd; ++i,++pit) ;
 		Place *p = *pit;
 		return p;
 	}
 	// otherwise find the first place according to the global ordering placeorder/revporder
-	Place* p;
+	Place* p(NULL);
 	int pord = -1;
 	for(pit=pset.begin(); pit!=pset.end(); ++pit)
 		if (pord<0||revporder[*pit]>pord)
@@ -505,13 +505,14 @@ set<Transition*> PathFinder::getSZK() {
 	// empty the stack for Tarjan
 	st.clear();
 	set<Transition*> result;
-	for(int i=0; i<tton.size(); ++i)
+	for(unsigned int i=0; i<tton.size(); ++i)
 	{
 		// call Tarjans algorithm for all nodes that have not been visited.
 		if (tton[i]->index==-1) 
 			if (doTarjan(tton[i], result, maxdfs)) 
 				return result;
 	}
+	return result; // never reached (graph is never empty)
 }
 
 /** Checks for diamonds in the reachability graph that are about to be closed during the recursion.
@@ -544,12 +545,12 @@ bool PathFinder::checkForDiamonds()
 		} 
 	// if the checks against all recursion levels go wrong, no diamond is completed
 	// Now do the complex check against all remembered firing sequences, hope the pool remains small
-	for(int i=0; i<fpool.size(); ++i)
+	for(unsigned int i=0; i<fpool.size(); ++i)
 	{
 		map<Transition*,int> tmp;
 		if (fseq.size()<=fpool[i].size())
 		{
-			for(int j=0; j<fseq.size(); ++j)
+			for(unsigned int j=0; j<fseq.size(); ++j)
 			{
 				++tmp[fseq[j]];
 				--tmp[fpool[i][j]];
@@ -570,7 +571,7 @@ void PathFinder::printSolution() {
 	if (ps==NULL) { cout << "sara: UNSOLVED: solution is missing" << endl; return; }
 	vector<Transition*> solution = ps->getSequence();
 	cout << "sara: SOLUTION: ";
-	for(int j=0; j<solution.size(); ++j)
+	for(unsigned int j=0; j<solution.size(); ++j)
 		cout << solution[j]->getName() << " ";
 	cout << endl;
 }

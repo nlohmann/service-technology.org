@@ -107,7 +107,7 @@ private:
 	PetriNet& net;
 
 	/// # of transitions (columns in the marking equation)
-	int cols;
+	unsigned int cols;
 
 	/// object taking care of lp_solve
 	LPWrapper lpwrap;

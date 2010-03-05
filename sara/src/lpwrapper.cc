@@ -44,7 +44,7 @@ extern vector<Place*> placeorder;
 		@param cols The number of transitions in the net (equals the numbers
 			of columns in the linear system.
 	*/
-	LPWrapper::LPWrapper(int columns) : cols(columns) {
+	LPWrapper::LPWrapper(unsigned int columns) : cols(columns) {
 		lp = make_lp(0,cols);
 		assert(lp!=NULL);
 	}
@@ -63,13 +63,13 @@ extern vector<Place*> placeorder;
 	@return The number of equations on success, -1 otherwise.
 */
 int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover, bool verbose) {
-	PetriNet& pn = m1.getPetriNet();
+//	PetriNet& pn = m1.getPetriNet();
 	tpos.clear();
 	tvector.clear();
 
 	// set the column variables in lp_solve according to the global transition ordering
 	int colnr=0;
-	for(int o=0; o<transitionorder.size(); ++o,++colnr)
+	for(unsigned int o=0; o<transitionorder.size(); ++o,++colnr)
 	{
 		Transition* t(transitionorder[o]); // get the transitions according to the global ordering 
 		set_col_name(lp,colnr+1,const_cast<char*>(t->getName().c_str()));
@@ -91,7 +91,7 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	set_minim(lp);
 
 	//create incidence matrix by adding rows to lp_solve
-	for(int k=0; k<placeorder.size(); ++k)
+	for(unsigned int k=0; k<placeorder.size(); ++k)
 	{
 		for(int y=0; y<cols; ++y) mat[y]=0;
 		set<pnapi::Arc*>::iterator ait;
@@ -126,7 +126,7 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	basicrows = placeorder.size()+cols;
 	delete[] colpoint;
 	delete[] mat;
-	return basicrows;
+	return (int)(basicrows);
 }
 
 /** Removes all constraints not belonging to the original marking
@@ -224,17 +224,18 @@ map<Transition*,int>& LPWrapper::getTVector(PetriNet& pn) {
 bool LPWrapper::findNearest() {
 	if (!stripConstraints()) return false; // first get the naked marking equation
 	REAL val;
-	for(int k=1; k<=placeorder.size(); ++k)
+	for(unsigned int k=1; k<=placeorder.size(); ++k)
 	{
+		int kcopy = (int)(k);
 		val = 1.0; // for each place add a positive
-		if (!add_columnex(lp,1,&val,&k)) return false;
+		if (!add_columnex(lp,1,&val,&kcopy)) return false;
 		val = -1.0; // and a negative variable
-		if (!add_columnex(lp,1,&val,&k)) return false;
+		if (!add_columnex(lp,1,&val,&kcopy)) return false;
 	}
 	set_add_rowmode(lp,true);
 	int *colpoint = new int[2*placeorder.size()];
 	REAL *mat = new REAL[2*placeorder.size()];
-	for(int k=0; k<2*placeorder.size(); ++k)
+	for(unsigned int k=0; k<2*placeorder.size(); ++k)
 	{
 		mat[k]=1;
 		colpoint[k]=k+cols+1; // column of a new variable; for the objective (minimizing)
@@ -245,8 +246,11 @@ bool LPWrapper::findNearest() {
 	set_minim(lp); // and set the new objective: minimize the sum of all new variables
 
 	val = 1.0; // add lower bound of zero for all new variables (set_lowbo doesn't work)
-	for(int k=cols+1; k<cols+1+2*placeorder.size(); ++k)
-		if (!add_constraintex(lp,1,&val,&k,GE,0)) return false;
+	for(unsigned int k=cols+1; k<cols+1+2*placeorder.size(); ++k)
+	{
+		int kcopy = (int)(k);
+		if (!add_constraintex(lp,1,&val,&kcopy,GE,0)) return false;
+	}
 	set_add_rowmode(lp,false);
 	int ret = solveSystem(); // solve the new equation with the new slack variables
 	if (ret==0 || ret==1) // we have found a solution
@@ -255,14 +259,14 @@ bool LPWrapper::findNearest() {
 		getVariables(sol); // get the solution of the new system
 		bool in = false; // need to change the initial marking?
 		bool out = false; // need to change the final marking?
-		for(int y=cols; y<cols+2*placeorder.size(); y+=2)
+		for(unsigned int y=cols; y<cols+2*placeorder.size(); y+=2)
 		{
 			if (sol[y]>0) in = true; // positive variables mean we must increase the initial marking
 			if (sol[y+1]>0) out = true; // negative variables mean increasing the final marking
 		}
 		cout << "You might try to add";
 		bool comma = false;
-		if (in) for(int y=cols; y<cols+2*placeorder.size(); y+=2)
+		if (in) for(unsigned int y=cols; y<cols+2*placeorder.size(); y+=2)
 			if (sol[y]>0) { // print the change needed for the initial marking
 				if (comma) cout << ","; else cout << " ";
 				cout << placeorder[(y-cols)/2]->getName() << ":" << sol[y];
@@ -271,7 +275,7 @@ bool LPWrapper::findNearest() {
 		if (in) cout << " tokens to the initial marking";
 		if (in && out) cout << " and";
 		comma = false;
-		if (out) for(int y=cols; y<cols+2*placeorder.size(); y+=2)
+		if (out) for(unsigned int y=cols; y<cols+2*placeorder.size(); y+=2)
 			if (sol[y+1]>0) { // print the change needed for the final marking
 				if (comma) cout << ","; else cout << " ";
 				cout << placeorder[(y-cols)/2]->getName() << ":" << sol[y+1];

@@ -65,19 +65,18 @@ bool Formula::isSatisfiable(vector<bool> * assignment){
 
 	list<Clause> clauses = calculateCNF();
 
-	Clause* cl;
+	Clause cl;
 	for(int i = 1; i < label2id.size(); ++i){
-		cl = new Clause();
 		if(assignment->at(i) == true){
-			cl->literal0 = i;
+			cl.literal0 = i;
 		}
 		else{
 			assignment->at(i) == false;
-			cl->literal0 = i * -1;
+			cl.literal0 = i * -1;
 		}
-		cl->literal1 = emptyLiteral();
-		cl->literal2 = emptyLiteral();
-		clauses.push_back(*cl);
+		cl.literal1 = emptyLiteral();
+		cl.literal2 = emptyLiteral();
+		clauses.push_back(cl);
 	}
 
 	vector<vector<int> > clausesVector;
@@ -92,10 +91,14 @@ bool Formula::isSatisfiable(vector<bool> * assignment){
 	vector<bool>* satAssignment = minisat2(clausesVector); // assignmet is NULL if Formula is not satifiable
 	//	full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
 
+
+
 	if(satAssignment){
+		delete satAssignment;
 		return true;
 	}
 	else {
+		delete satAssignment;
 		return false;
 	}
 }

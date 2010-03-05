@@ -28,7 +28,7 @@ extern map<string, int> label2id;
  * substitute the literals/numbers in a formula with a formula (given by the map lits)
  ***********************************************************************/
 const Formula* Formula::substitute(map<int,Formula*> lits) const{
-	return this;
+	return this->getCopy();
 }
 
 
@@ -89,12 +89,12 @@ const Formula* FormulaNUM::substitute(map<int,Formula*> lits) const{
 		return f;
 	}
 	else {
-		return lits[number];
+		return new FormulaDummy(lits[number]);
 	}
 }
 
-const Formula* FormulaDummy::substitute(map<int,Formula*> lits) const{
-	const Formula* newf = f->substitute(lits);
-
-	return new FormulaDummy(newf);
-}
+//const Formula* FormulaDummy::substitute(map<int,Formula*> lits) const{
+//	const Formula* newf = f->substitute(lits);
+//
+//	return new FormulaDummy(newf);
+//}

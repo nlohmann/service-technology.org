@@ -32,7 +32,9 @@ extern map<string, int> label2id;
 
 string Formula::toString() const {
 	NumPrinterBase* printer = new NumPrinterSingle();
-	return this->toString(printer);
+	string s = this->toString(printer);
+	delete printer;
+	return s;
 }
 
 

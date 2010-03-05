@@ -304,6 +304,7 @@ vector<bool>* minisat2(vector< vector< int > > & in){
 
 
     if (!S->simplify()){
+    	delete S;
         return NULL; // UNSAT
     }
 
@@ -324,10 +325,12 @@ vector<bool>* minisat2(vector< vector< int > > & in){
     		}
     	}
 //    	printf("\n");
+    	delete S;
     	return assignment;
     }
     else {
 //    	printf("minisat2(): no satisfying assignment\n");
+    	delete S;
     	return NULL;
     }
 

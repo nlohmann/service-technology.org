@@ -37,6 +37,9 @@ class FormulaTree {
 		FormulaTree();
 		FormulaTree(Node * _node);
 		FormulaTree(vector<bool>* _satAssigment, FormulaTree* _yes, FormulaTree* _no);
+
+		///Destructor
+		~FormulaTree();
 };
 
 

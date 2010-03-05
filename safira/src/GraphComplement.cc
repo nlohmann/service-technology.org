@@ -59,6 +59,7 @@ GraphComplement::~GraphComplement(){
 //	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
 //		delete n->second;
 //	}
+	delete root;
 }
 
 ///computes the complement
@@ -68,12 +69,12 @@ void GraphComplement::complement(){
 	addTrapState();
 	makeTotal();
 
-	if (args_info.complement_arg == 0){
+	if (args_info.complement_arg == 0 || args_info.complement_arg == 1){
 		makeComplete_fast();
 	}
-	if (args_info.complement_arg == 1){
-		makeComplete_stupid();
-	}
+//	if (args_info.complement_arg == 1){
+//		makeComplete_stupid();
+//	}
 	if (args_info.complement_arg == 2){
 		makeComplete_efficient();
 	}
@@ -203,14 +204,24 @@ void GraphComplement::makeComplete_fast() {
 				if(f->isSatisfiable() == true){
 					//generate new node q with the formula f and add edge with label i to it
 
-					Node *q = new Node(f);
-					addedNodes[q->id] = q;
-					n->second->addEdge(i,q);
+					if(args_info.complement_arg == 0){ //"fast" was chosen
+						Node *q = new Node(f);
+						addedNodes[q->id] = q;
+						n->second->addEdge(i,q);
 
-					//connect q with the trap state
-					for (int l = firstLabelId; l <= lastLabelId; ++l){
-						q->addEdge(l,trap);
+						//connect q with the trap state
+						for (int l = firstLabelId; l <= lastLabelId; ++l){
+							q->addEdge(l,trap);
+						}
 					}
+					else { // "stupid" was chosen
+						assert(args_info.complement_arg == 1);
+
+						Node *q = getNode_stupid(f);
+						n->second->addEdge(i,q);
+
+					}
+
 
 					//printf("added: %d -%s-> %d   formula: %s\n", n->second->id, id2label[i].c_str(),q->id, q->formula->toString().c_str());
 				}
@@ -426,6 +437,7 @@ Node* GraphComplement::getNode_stupid(Formula *f){
 		if (formulaFound(f, n->second->formula)){
 			found = true;
 			q = n->second;
+			delete f;
 			break;
 		}
 	}
@@ -445,17 +457,19 @@ Node* GraphComplement::getNode_stupid(Formula *f){
 }
 
 bool GraphComplement::formulaFound(Formula *f, Formula *g){
-	Formula * h1 = new FormulaOR(f,g);
-	Formula * h2 = new FormulaOR(new FormulaNOT(f), new FormulaNOT(g));
-	Formula * h3 = new FormulaAND(h1,h2);
-	//cout << f->toString() << "   " << g->toString() << endl;
-	bool erg = h3->isSatisfiable();
+	//Formula * f_dummy = new FormulaDummy(f);
+	//Formula * g_dummy = new FormulaDummy(g);
 
-	if(erg){
-		//cout << "sind ungleich" << endl;
+	Formula * h1 = new FormulaOR(new FormulaDummy(f), new FormulaDummy(g));
+	Formula * h2 = new FormulaOR(new FormulaNOT(new FormulaDummy(f)), new FormulaNOT(new FormulaDummy(g)));
+	Formula * h3 = new FormulaAND(h1,h2);
+
+	bool result = h3->isSatisfiable();
+	delete h3;
+
+	if(result){
 		return false;
 	}
-	//cout << "sind gleich";
 	return true;
 }
 
@@ -478,11 +492,12 @@ Node* GraphComplement::searchNode(Formula *f, FormulaTree *n){
 			assert(!n->no);
 
     		//is f equals to n->node->formula?
-    		Formula * h1 = new FormulaOR(f,n->node->formula);
-    		Formula * h2 = new FormulaOR(new FormulaNOT(f), new FormulaNOT(n->node->formula));
+    		Formula * h1 = new FormulaOR(new FormulaDummy(f), new FormulaDummy(n->node->formula));
+    		Formula * h2 = new FormulaOR(new FormulaNOT(new FormulaDummy(f)), new FormulaNOT(new FormulaDummy(n->node->formula)));
     		Formula * h3 = new FormulaAND(h1,h2);
 //			cout << "searchNode(...): compare " << f->toString() << " and " << n->node->formula->toString() << endl;
     		vector<bool> * assignment = h3->getSatisfyingAssignment();
+    		delete h3;
 //    		cout << "searchNode(...): satisfying assignment: " << assignmentToString(assignment) << endl;
     		if(assignment){ //there is a satisfying assignment for h3 -> the two formulas are not equal
 //    			cout << "searchNode(...): Node doesn't exist yet!" << endl;
@@ -507,6 +522,7 @@ Node* GraphComplement::searchNode(Formula *f, FormulaTree *n){
     			else{
     				assert(f->isSatisfiable(assignment));
     				assert(!n->node->formula->isSatisfiable(assignment));
+
     				n->no = new FormulaTree(n->node);
     				n->node = NULL;
 
@@ -519,11 +535,14 @@ Node* GraphComplement::searchNode(Formula *f, FormulaTree *n){
     				}
     				n->yes = new FormulaTree(q);
     			}
+
+
     			return q;
 
     		}
     		else{
 //    			cout << "searchNode(...): Node already exists!" << endl;
+    			delete f;
     			return n->node;
     		}
     	}

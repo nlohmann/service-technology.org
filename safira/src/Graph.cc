@@ -52,12 +52,11 @@ Graph::Graph() : globalFormula(NULL), globalFormulaAsString(""){
 ///destructor
 Graph::~Graph(){
 
-//	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
-//		delete n->second;
-//	}
+	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
+		delete n->second;
+	}
 
-//	delete globalFormula;
-
+	delete globalFormula;
 }
 
 

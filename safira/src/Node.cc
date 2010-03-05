@@ -83,7 +83,7 @@ Nodepair::Nodepair(Formula* _f, Node* _n1, Node* _n2) : n1(_n1), n2(_n2) {
 /// destructor
 Nodepair::~Nodepair() {
 	//delete[] outEdges;
-	delete node;
+	//delete node;
 }
 
 /// add an outpoing edge to the node

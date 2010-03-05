@@ -96,13 +96,12 @@ void testDummy(){
 	assert(y->toString() == "(~(((A * ~(R)) + ~(~(A)))) * (true * ~((A * I))))");
 	assert(z->toString() == "(~(~(((A * ~(R)) + ~(~(A))))) * ~((true * ~((A * I)))))");
 	assert (yz->toString() == "((~(((A * ~(R)) + ~(~(A)))) * (true * ~((A * I)))) + (~(~(((A * ~(R)) + ~(~(A))))) * ~((true * ~((A * I))))))");
-	assert ((yz->moveNegation())->toString() == "((((~(A) + R) * ~(A)) * (true * (~(A) + ~(I)))) + (((A * ~(R)) + A) * (false + (A * I))))");
+
+	Formula *yz2 = yz->moveNegation();
+	assert (yz2->toString() == "((((~(A) + R) * ~(A)) * (true * (~(A) + ~(I)))) + (((A * ~(R)) + A) * (false + (A * I))))");
+	delete yz2;
 
 	list<Clause> clauses =  yz->calculateCNF();
-
-	for (list<Clause>::iterator iter = clauses.begin(); iter != clauses.end(); ++iter){
-		printClause(*iter);
-	}
 
 	list<Clause>::iterator iter = clauses.begin();	assert(checkClause(*iter, 7,0,0));
 	++iter; assert(checkClause(*iter, -7, 8, 13 ));

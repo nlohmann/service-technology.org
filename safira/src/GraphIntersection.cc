@@ -21,13 +21,7 @@
 #include <cstdio>
 #include <string>
 
-#include <algorithm>
-#include <sstream>
-//#include "cmdline.h"
 #include "GraphIntersection.h"
-//#include "helpers.h"
-#include <time.h>
-//#include <iostream>
 #include "NumPrinterDouble.h"
 #include "helpers.h"
 
@@ -51,9 +45,9 @@ GraphIntersection::GraphIntersection(){
 
 ///destructor
 GraphIntersection::~GraphIntersection(){
-//	for (map<Intpair, Nodepair*>::const_iterator n = nodepairs.begin(); n != nodepairs.end(); ++n) {
-//		delete n->second;
-//	}
+	for (map<Intpair, Nodepair*>::const_iterator n = nodepairs.begin(); n != nodepairs.end(); ++n) {
+		delete n->second;
+	}
 }
 
 void GraphIntersection::intersection(Graph *g1, Graph *g2){
@@ -61,7 +55,7 @@ void GraphIntersection::intersection(Graph *g1, Graph *g2){
 	Node::init();
 	for (list<int>::const_iterator q = g1->initialNodes.begin(); q != g1->initialNodes.end(); ++q){
 		for (list<int>::const_iterator p = g2->initialNodes.begin(); p != g2->initialNodes.end(); ++p){
-			f = new FormulaAND(g1->nodes[*q]->formula, g2->nodes[*p]->formula);
+			f = new FormulaAND(new FormulaDummy(g1->nodes[*q]->formula), new FormulaDummy(g2->nodes[*p]->formula));
 			if(f->isSatisfiable()){
 				Intpair ipair;
 				ipair.id1 = *q;
@@ -72,6 +66,9 @@ void GraphIntersection::intersection(Graph *g1, Graph *g2){
 				initialNodepairs.push_back(ipair);
 				initialNodes.push_back(qp->node->id);
 				unproc.push(qp);
+			}
+			else {
+				delete f;
 			}
 		}
 	}
@@ -102,9 +99,6 @@ void GraphIntersection::intersection(Graph *g1, Graph *g2){
 
 
 void GraphIntersection::generateGlobalFormula(const Graph *g1, const Graph *g2){
-	//TODO: hier nicht Kopieren, sondern Kopiervorgan in die modify-Funktion verlagern und damit die Probleme mit const umgehen.
-	//Formula *f1_copy = g1->globalFormula->getCopy();
-	//Formula *f2_copy = g2->globalFormula->getCopy();
 
 	map<int,Formula*> formulaMap1;
 	map<int,string> formulaStringMap1;
@@ -152,7 +146,7 @@ void GraphIntersection::generateGlobalFormula(const Graph *g1, const Graph *g2){
 					formulaStringMap2[*s] = intToString(n->second->node->id);
 				}
 				else{
-					f = new FormulaOR(formulaMap2[*s], new FormulaNUM(n->second->node->id));
+					f = new FormulaOR(formulaMap2[*s], new FormulaDummy(new FormulaNUM(n->second->node->id)));
 					string str = formulaStringMap2[*s] + " + " + intToString(n->second->node->id);
 					formulaStringMap2[*s] = str;
 				}
@@ -163,11 +157,16 @@ void GraphIntersection::generateGlobalFormula(const Graph *g1, const Graph *g2){
 		}
 	}
 
-	//f1_copy->modify(formulaMap1);
-	//f2_copy->modify(formulaMap2);
-
 	globalFormula = new FormulaAND(g1->globalFormula->substitute(formulaMap1), g2->globalFormula->substitute(formulaMap2));
 	globalFormulaAsString = globalFormula->toString();
+
+	for (map<int, Formula*>::iterator s = formulaMap1.begin(); s != formulaMap1.end(); ++s){
+		delete s->second;
+	}
+
+	for (map<int, Formula*>::const_iterator s = formulaMap2.begin(); s != formulaMap2.end(); ++s){
+		delete s->second;
+	}
 
 //	cout << "Global Formula: " << globalFormula->toString() << endl;
 //	cout << "Global Formula as String: " << globalFormulaAsString << endl;
@@ -193,7 +192,7 @@ void GraphIntersection::product(Nodepair* qp){
 				assert((*e1)->formula != NULL);
 				assert((*e2)->formula != NULL);
 
-				f = new FormulaAND((*e1)->formula, (*e2)->formula);
+				f = new FormulaAND(new FormulaDummy((*e1)->formula), new FormulaDummy((*e2)->formula));
 //				cout << f->toString() << endl;
 				if (f->isSatisfiable()){
 
@@ -211,6 +210,7 @@ void GraphIntersection::product(Nodepair* qp){
 					}
 					else{
 						qp->node->addEdge(l,nodepairs[ipair]->node);
+						delete f;
 					}
 				}
 			}

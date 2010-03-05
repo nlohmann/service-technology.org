@@ -221,7 +221,7 @@ public:
 	virtual string toString(NumPrinterBase* printer) const;
 	Formula* moveNegation(bool leadingNot) const;
 	list<Clause> toCNF(int varId, int& max) const;
-	const Formula* substitute(map<int,Formula*> lits) const;
+//	const Formula* substitute(map<int,Formula*> lits) const;
 };
 
 #endif

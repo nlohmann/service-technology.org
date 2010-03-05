@@ -124,6 +124,8 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	if (verbose) write_LP(lp,stdout);
 	else set_verbose(lp,CRITICAL);
 	basicrows = placeorder.size()+cols;
+	delete[] colpoint;
+	delete[] mat;
 	return basicrows;
 }
 

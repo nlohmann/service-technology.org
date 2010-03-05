@@ -43,12 +43,12 @@ using std::ostream;
 
 /** Standard constructor for class Constraint.
 */
-Constraint::Constraint() : rhs(0),jump(false) { posplace.clear(); subtrans.clear(); cs.clear(); }
+Constraint::Constraint() : rhs(0),jump(false),recent(true) { posplace.clear(); subtrans.clear(); cs.clear(); }
 
 /** Jump constructor for class Constraint.
 	@param jmp A solution of lp_solve which is to be discriminated.
 */
-Constraint::Constraint(map<Transition*,int> jump) : rhs(-1)
+Constraint::Constraint(map<Transition*,int> jump) : rhs(-1),recent(true)
 { 
 	posplace.clear(); 
 	subtrans.clear(); 

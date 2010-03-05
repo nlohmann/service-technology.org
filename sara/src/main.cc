@@ -87,7 +87,7 @@ void evaluateParameters(int argc, char** argv) {
 /// main
 int main(int argc, char** argv) {
 	// start timer
-	clock_t starttime, endtime;
+	clock_t starttime;
 	starttime = clock();
 
 	// evaluate command line
@@ -279,7 +279,7 @@ if (args_info.input_given || args_info.pipe_given) {
 		cout << endl;
 	}
 
-	endtime = clock();
+	clock_t endtime = clock();
 	if (args_info.verbose_given)
 		cout << "sara: " << solcnt << " Solution" << (solcnt!=1?"s":"") << " produced." << endl;
 	if (args_info.time_given)

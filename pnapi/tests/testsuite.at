@@ -1147,6 +1147,7 @@ AT_BANNER([Canonical DNF])
 
 m4_define([TEST_CDNF], [AT_CHECK([cp TESTFILES/NET.owfn .])
                         AT_CHECK([CDNF NET.owfn])
+                        AT_CHECK_FIONA
                         AT_CHECK([FIONA -t equivalence NET.owfn NET.cdnf.owfn], 0, ignore, ignore)
                         AT_KEYWORDS(cdnf)])
 

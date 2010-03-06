@@ -13,31 +13,55 @@ TAR="@AMTAR@"
 SRC="@abs_top_builddir@/src"
 MAKE="@MAKE@"
 
-TARBALL="http://esla.informatik.uni-rostock.de:8080/job/${TOOL}/lastSuccessfulBuild/artifact/${TOOL}/${TOOL}.tar.gz"
+SERVER="http://esla.informatik.uni-rostock.de:8080"
+TARBALL="${SERVER}/job/${TOOL}/lastSuccessfulBuild/artifact/${TOOL}/${TOOL}.tar.gz"
 
-# get customer tool
-${WGET} ${TARBALL}
-${TAR} xzf ${TOOL}.tar.gz
+if [ "$WGET" != "not found" ]; then
 
-# clear customer's library directory
-rm -rf ${TOOL}"/libs/pnapi/*"
+    # check server availability
+    OUTPUT=`ping -c 5 ${SERVER} 2>&1`
+    echo $OUTPUT | grep "5 packets transmitted, 5 packets received" > /dev/null
+    if [ $? -ne 0 ]; then
 
-# copy files
-cp ${SRC}/*.cc ${SRC}/*.h ${SRC}/*.yy ${SRC}/*.ll ${LIB}
-cp ${SRC}/Makefile.am.customer ${LIB}/Makefile.am
+        echo "Found no stable internet connection, so we skip some tests."
+        echo ""
+        exit 77
 
-# remove unnecessary files again
-rm -rf ${LIB}/config.h
+    else
 
-# change to the temp dir and build tool
-cd ${TOOL}
-autoreconf -i
-./configure --without-pnapi
-${MAKE}
-${MAKE} check
-result=$?
-cd ..
+        # get customer tool
+        ${WGET} ${TARBALL}
+        ${TAR} xzf ${TOOL}.tar.gz
 
-echo ""
+        # clear customer's library directory
+        rm -rf ${TOOL}"/libs/pnapi/*"
 
-exit $result
+        # copy files
+        cp ${SRC}/*.cc ${SRC}/*.h ${SRC}/*.yy ${SRC}/*.ll ${LIB}
+        cp ${SRC}/Makefile.am.customer ${LIB}/Makefile.am
+
+        # remove unnecessary files again
+        rm -rf ${LIB}/config.h
+
+        # change to the temp dir and build tool
+        cd ${TOOL}
+        autoreconf -i
+        ./configure --without-pnapi
+        ${MAKE}
+        ${MAKE} check
+        result=$?
+        cd ..
+
+        echo ""
+
+        exit $result
+
+    fi
+
+else
+
+    echo "Found no wget, so we skip some tests."
+    echo ""
+    exit 77
+
+fi

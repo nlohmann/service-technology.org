@@ -77,6 +77,9 @@ int main(int argc, char* argv[])
     \*************************************************/
     // evaluate command line options
     evaluate_command_line(argc, argv);
+    Output::setTempfileTemplate(args_info.tmpfile_arg);
+    Output::setKeepTempfiles(args_info.noClean_flag);
+
 
     // store invocation in a string for meta information in file output
     std::string invocation;

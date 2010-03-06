@@ -78,6 +78,9 @@ void out(Graph * g, string filename, string title);
 int main(int argc, char **argv) {
 
 	evaluateParameters(argc, argv);
+	Output::setTempfileTemplate(args_info.tmpfile_arg);
+	Output::setKeepTempfiles(args_info.noClean_flag);
+
 
 	/******************
 	 * Complement     *

@@ -88,7 +88,7 @@ void status(const char* format, ...) {
 
 
 /*!
- \param format  the debug message formatted as printf string
+ \param format  the status message formatted as printf string
 */
 void debug(const char* format, ...) {
     if (not args_info.debug_flag) {

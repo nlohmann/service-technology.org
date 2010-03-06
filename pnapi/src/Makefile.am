@@ -10,6 +10,7 @@ libpnapi_la_SOURCES = \
     parser-sa.yy      parser-sa-lexer.ll \
     pnapi.h pnapi.cc \
     Output.h Output.cc \
+    verbose.h verbose.cc \
     automaton.h automaton.cc\
     component.h component.cc \
     condition.h condition.cc \

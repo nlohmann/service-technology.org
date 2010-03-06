@@ -212,6 +212,9 @@ int main(int argc, char** argv) {
 
 	// Evaluate parameters
 	evaluateParameters(argc, argv);
+    Output::setTempfileTemplate(args_info.tmpfile_arg);
+    Output::setKeepTempfiles(args_info.noClean_flag);
+
 
 	if (args_info.quiet_flag) {
 

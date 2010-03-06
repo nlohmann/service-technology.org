@@ -83,16 +83,16 @@ option "config" c
 
 option "tmpfile" -
   "Set the path and name of temporary files"
-  details="The filename Wendy should use to create temporary files. The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  details="The filename Mia should use to create temporary files. The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
   string
   typestr="FILENAME"
-  default="/tmp/wendy-XXXXXX"
+  default="/tmp/mia-XXXXXX"
   optional
   hidden
 
 option "noClean" -
   "Do not delete temporary files."
-  details="Any temporary files created by Wendy is kept after Wendy terminates.\n"
+  details="Any temporary files created by Mia is kept after Mia terminates.\n"
   flag off
 
 text "\nReport bugs to mia@service-technology.org\nMia's home page: http://service-technology.org/mia"

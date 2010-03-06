@@ -1,20 +1,20 @@
 /*****************************************************************************\
- Wendy -- Synthesizing Partners for Services
+ Mia -- calculating migration information
 
- Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
+ Copyright (C) 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
 
- Wendy is free software: you can redistribute it and/or modify it under the
+ Mia is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free
  Software Foundation, either version 3 of the License, or (at your option)
  any later version.
 
- Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
+ Mia is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
+ along with Mia.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <string>
+
 
 /*!
  \brief output file organization
@@ -35,25 +36,43 @@
  To create a regular file, call the constructor with a filename and a
  description of the output (for verbose messages). To create a temporary
  file, call the constructor without arguments. Temporary files will be
- deleted when the object is destroyed unless the paramter '--noClean' is
- given. To redirect to standard output, use the the filename "-".
+ deleted when the object is destroyed unless function setKeepTempfiles() is
+ called. To redirect to standard output, use the the filename "-".
 
- The quite tricky constructor was taken from the Ubuntu Forums at
+ The quite tricky constructor was motivated from the Ubuntu Forums at
  http://ubuntuforums.org/showthread.php?p=5929211
- */
+*/
 class Output {
+    private: /* static members */
+        /// the template for temfiles to create
+        static std::string tempfileTemplate;
+
+        /// whether tempfiles should be deleted upon termination
+        static bool keepTempfiles;
+
+    public: /* static functions */
+        /// set the tempfile template
+        static void setTempfileTemplate(std::string);
+
+        /// set the whether tempfiles should be deleted upon termination
+        static void setKeepTempfiles(bool);
+
+    private: /* member functions */
+        /// helper function to create temp files
+        char* createTmp();
+
     public: /* member functions */
         /// constructor (creates temp file)
         Output();
 
         /// constructor (opens named stream or directs to std::cout)
-        Output(std::string, std::string);
+        Output(const std::string&, const std::string&);
 
         /// destructor (closes stream)
         ~Output();
 
         /// implicit conversation operator to ostream
-        operator std::ostream&();
+        operator std::ostream&() const;
 
         /// returns the filename of this object
         std::string name() const;
@@ -72,7 +91,7 @@ class Output {
         char* temp;
 
         /// the kind of the file
-        std::string kind;
+        const std::string kind;
 };
 
 #endif

@@ -167,6 +167,9 @@ int main(int argc, char** argv) {
     | 0. parse the command line parameters  |
     `--------------------------------------*/
     evaluateParameters(argc, argv);
+    Output::setTempfileTemplate(args_info.tmpfile_arg);
+    Output::setKeepTempfiles(args_info.noClean_flag);
+
 
     status("migrating '%s' to '%s", args_info.inputs[0], args_info.inputs[1]);
 
@@ -335,7 +338,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    message("%s%d jumper transitions found%s", _c0, jumperCount, _c_);
+    message("%d jumper transitions found%s", jumperCount, _c_);
 
     // release memory (used to detect memory leaks)
     if (args_info.finalize_flag) {

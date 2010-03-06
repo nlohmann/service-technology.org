@@ -68,7 +68,6 @@ Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, bool verbose, i
 
 	// initialize lp_solve
 	map<Place*,int> cover; // we look for reachability, not coverability, so this is empty
-	cover.clear();
 	lpwrap.verbose = debug;
 	if (lpwrap.createMEquation(m0,mf,cover,FALSE)<0) { 
 		cerr << "sara: error: createMEquation (lpsolve-init) failed" << endl; 
@@ -140,24 +139,14 @@ void Reachalyzer::start() {
 		// make a copy of the active job before we change it
 		PartialSolution ps(tps.first()->getSequence(),tps.first()->getMarking(),tps.first()->getRemains());
 		ps.setConstraints(tps.first()->getConstraints());
-//		ps.setOrder(tps.first()->getOrder());
 		if (!tps.first()->getRemains().empty()) // active job is no solution, modify it
 		{
 			oldvector = tps.first()->getFullVector();
-//			if (!tps.first()->isDuplicate()) // if the job is new
 			{ 
 				tps.first()->touchConstraints(); // mark all constraints so far as old
-//				tps.first()->calcCircleConstraints(im,m1);
+//				tps.first()->calcCircleConstraints(im,m1); // old version of constraint builder
 				tps.first()->buildSimpleConstraints(im); // add new constraints
 			}
-/*
-			if (tps.duplicateFirst()) if (verbose>1) // duplicate active job if it contains constraints with ranged RHS
-			{
-				cerr << "sara: Duplicated Partial Solution:" << endl;
-				tps.first()->show();
-				cerr << "*** DP ***" << endl;
-			}
-*/
 		}
 		if (!lpwrap.stripConstraints()) { // remove all constraints not belonging to the marking equation
 			cerr << "sara: error: resize_lp failed" << endl; 
@@ -215,7 +204,7 @@ void Reachalyzer::start() {
 				cerr << "*** JUMP ***" << endl;
 			}
 		}
-		if (!tps.first()->getRemains().empty()) // the active job is not a solution
+		if (!tps.first()->getRemains().empty()) // the active job is not a full solution
 		{
 			if (verbose>1) {
 				map<Transition*,int>::iterator mit;
@@ -226,7 +215,8 @@ void Reachalyzer::start() {
 				cerr << endl;
 			}
 			if (oldvector==fullvector)
-			{ // if lp_solve couldn't increase the solution, we have a portion of a counterexample
+			{ // if lp_solve didn't increase the solution, we have a portion of a counterexample
+				// this can only happen if no transitions are enabled
 				PartialSolution* fps(new PartialSolution(*(tps.first())));
 				fps->setFeasibility(true);
 				if (verbose>1) {
@@ -238,14 +228,13 @@ void Reachalyzer::start() {
 				tps.pop_front(); // and delete the job
 				if (verbose>1) cerr << endl;
 				++loops;
-				continue; // do not try to find a realization, we have done this in a the previous loop already
+				continue; // do not try to find a realization
 			}
 		}
 		if (!solutionSeen(fullvector)) // adapt known solutions (from a earlier loop) for the new constraints
 		{ // no solutions known so far, calculate them by trying to realize a firing sequence
 			PathFinder pf(m1,fullvector,cols,tps,im,shortcut);
 			pf.verbose = verbose;
-//			extendTransitionOrder(fullvector,tps.first()->getOrder(),tps.first()->getSequence());
 			solved = pf.recurse(); // main call to realize a solution
 		} 
 		tps.pop_front(); // we are through with this job
@@ -335,7 +324,6 @@ JobQueue& Reachalyzer::getFailureReasons() {
 
 /*
 void Reachalyzer::extendTransitionOrder(map<Transition*,int> fullv, vector<Transition*>& ord, vector<Transition*> fseq) {
-//	ord.clear();
 	for(int i=0; i<ord.size(); ++i)
 		fullv[ord[i]]=0;
 	for(int i=0; i<fseq.size(); ++i)
@@ -360,7 +348,6 @@ bool Reachalyzer::solutionSeen(map<Transition*,int>& tv) {
 	for(unsigned int i=0; i<vp.size(); ++i)
 	{
 		vp[i].setConstraints(tps.first()->getConstraints());
-//		vp[i].setOrder(tps.first()->getOrder());
 		PartialSolution* cp(new PartialSolution(vp[i]));
 		tps.push_back(cp);
 		if (verbose>1) {

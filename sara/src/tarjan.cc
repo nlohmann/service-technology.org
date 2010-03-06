@@ -39,7 +39,7 @@ using std::endl;
 
 /** Standard constructor. Creates one node for Tarjan's algorithm.
 */
-myTPNode::myTPNode() : t(NULL),p(NULL),index(-2),low(-1),instack(false) { nodes.clear(); }
+myTPNode::myTPNode() : t(NULL),p(NULL),index(-2),low(-1),instack(false) {}
 
 /** Destructor.
 */
@@ -124,7 +124,6 @@ void Tarjan::doTarjan(myTPNode* start, int& maxdfs, vector<set<Transition*> >& t
 	}
 	if (start->low == start->index) { // an SCC is found
 		myTPNode* go = NULL;
-//		bool ok = false;
 		set<Transition*> tres; // for collecting the transitions of this SCC
 		set<Place*> pres; // for collecting the places of this SCC
 		do {

@@ -1,6 +1,5 @@
 #include <cstdio>
 #include <cstdlib>
-#include <cassert>
 #include <set>
 #include <map>
 #include <algorithm>
@@ -46,7 +45,7 @@ extern vector<Place*> placeorder;
 	*/
 	LPWrapper::LPWrapper(unsigned int columns) : cols(columns) {
 		lp = make_lp(0,cols);
-		assert(lp!=NULL);
+		if (!lp) { cerr << "sara: error: could not create LP model." << endl; exit(EXIT_FAILURE); }
 	}
 
 	/** Destructor
@@ -63,8 +62,7 @@ extern vector<Place*> placeorder;
 	@return The number of equations on success, -1 otherwise.
 */
 int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover, bool verbose) {
-//	PetriNet& pn = m1.getPetriNet();
-	tpos.clear();
+	tpos.clear(); // probably not necessary
 	tvector.clear();
 
 	// set the column variables in lp_solve according to the global transition ordering
@@ -195,8 +193,12 @@ bool LPWrapper::addConstraints(PartialSolution& ps) {
 		}
 		// add the constraint to the lp model, normal constraints with >=, jumps with <=
 		if (success && (jump || rhs>0)) 
-			if (!addConstraint(constraint,(jump?LE:GE),rhs)) return false;
+			if (!addConstraint(constraint,(jump?LE:GE),rhs)) 
+			{ cerr << "sara: error: failed to add constraint to LP model." << endl; 
+			  delete[] constraint; 
+			  exit(EXIT_FAILURE); }
 	}
+	delete[] constraint;
 	return true;
 }
 
@@ -214,6 +216,7 @@ map<Transition*,int>& LPWrapper::getTVector(PetriNet& pn) {
 		tvector[pn.findTransition(getColName(y+1))] = static_cast<int>(sol[y]);
 	}
 	if (verbose>1) cerr << endl;
+	delete[] sol;
 	return tvector;
 }
 
@@ -244,6 +247,8 @@ bool LPWrapper::findNearest() {
 	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
 	if (!set_obj_fnex(lp,2*placeorder.size(),mat,colpoint)) return false;
 	set_minim(lp); // and set the new objective: minimize the sum of all new variables
+	delete[] mat;
+	delete[] colpoint;
 
 	val = 1.0; // add lower bound of zero for all new variables (set_lowbo doesn't work)
 	for(unsigned int k=cols+1; k<cols+1+2*placeorder.size(); ++k)
@@ -283,6 +288,7 @@ bool LPWrapper::findNearest() {
 			}
 		if (out) cout << " tokens to the final marking";
 		cout << "." << endl;
+		delete[] sol;
 		return true; // it worked, we are done.
 	} else return false;
 }

@@ -93,6 +93,17 @@ int main(int argc, char** argv) {
 	// evaluate command line
     evaluateParameters(argc, argv);
 
+/****************
+* NO ARGS GIVEN *
+****************/
+
+// can't use groups or modes in gengetopt; required options form two groups
+if (!args_info.input_given && !args_info.pipe_given
+	&& !args_info.quasilive_given && !args_info.reachable_given && !args_info.realize_given)
+{
+	cerr << "sara: Use options -i or -p for input, -q, -r, or -R for problem creation." << endl;
+}
+
 /*************************
 * REDIRECTING OUTPUT/LOG *
 *************************/

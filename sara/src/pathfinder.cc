@@ -54,7 +54,7 @@ extern map<Place*,int> revporder;
 	***************************************/
 
 /** Constructor */
-PathFinder::myNode::myNode() : t(NULL),index(-2),low(-1),instack(false) { nodes.clear(); }
+PathFinder::myNode::myNode() : t(NULL),index(-2),low(-1),instack(false) {}
 /** Destructor */
 PathFinder::myNode::~myNode() {}
 /** Reset for reusability. Reaches the same state as the constructor. */
@@ -81,11 +81,7 @@ PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& 
 		tton[i]->t = transitionorder[i];
 	}
 	pos=0;
-	mv.clear();
 	verbose=0;
-	stubsets.clear();
-	cftab.clear();
-	st.clear();
 	shortcutmax=1000;
 	if (args_info.lookup_given) shortcutmax=(unsigned int)(args_info.lookup_arg);
 }
@@ -237,7 +233,6 @@ bool PathFinder::recurse() {
 
 	// put an empty entry for the diamond check (no transitions yet) on the stack	
 	set<Transition*> tres;
-	tres.clear();
 	stubsets.push_back(tres); 
 
 	// put the local marking on the stack (also used for the diamond check)
@@ -264,11 +259,8 @@ bool PathFinder::recurse() {
 	// check recursively if one of the transitions in the stubborn set allows for 
 	// the firing of the remaining transition vector, use the global transition ordering 
 	vector<Transition*> tord;
-	tord.clear();
-	{
 	for(unsigned int o=0; o<transitionorder.size(); ++o)
 		if (tres.find(transitionorder[o])!=tres.end()) tord.push_back(transitionorder[o]);
-	}
 	for(unsigned int o=0; o<tord.size(); ++o)
 	{
 		if (verbose>2) {
@@ -328,12 +320,10 @@ void PathFinder::conflictTable(Transition* tstart) {
 	PetriNet& pn(m0.getPetriNet());
 	// create a todo-list
 	set<Transition*> tset;
-	tset.clear();
 	// begin with the start transition
 	tset.insert(tstart);
 	// marker for "has been done"
 	set<Transition*> marker;
-	marker.clear();
 	set<Transition*>::iterator it;
 	while (!tset.empty())
 	{
@@ -429,7 +419,6 @@ Place* PathFinder::hinderingPlace(Transition& t) {
 */
 set<Transition*> PathFinder::requiredTransitions(Place& p) {
 	set<Transition*> tset;
-	tset.clear();
 	set<pnapi::Arc*> prearc = p.getPresetArcs();
 	set<pnapi::Arc*>::iterator ait;
 	for(ait=prearc.begin(); ait!=prearc.end(); ait++)

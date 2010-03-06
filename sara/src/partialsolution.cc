@@ -44,11 +44,6 @@ using std::endl;
 	@param m1 The initial marking.
 */ 
 PartialSolution::PartialSolution(Marking& m1) : m(m1),markingEquation(false) {
-	tseq.clear();
-	remains.clear();
-	fulltv.clear();
-	constraints.clear();
-	failure.clear();
 	fullSolution = false;
 } 
 
@@ -58,9 +53,6 @@ PartialSolution::PartialSolution(Marking& m1) : m(m1),markingEquation(false) {
 	@param rvec The remaining (nonfirable) transitions. 
 */
 PartialSolution::PartialSolution(vector<Transition*>& ts,Marking& m1,map<Transition*,int>& rvec) : tseq(ts),m(m1),remains(rvec),markingEquation(false) {
-	constraints.clear();
-	fulltv.clear();
-	failure.clear();
 	fullSolution = false;
 }
 
@@ -116,18 +108,12 @@ bool PartialSolution::setConstraint(const Constraint& c) {
 	{
 		if (!c.isJump())
 		{
-			if (cit->getRHS()>=c.getRHS()) // && cit->getRHSLimit()>=c.getRHSLimit()) 
-				return false;
-//			if (cit->getRHS()<c.getRHS()) 
-				const_cast<Constraint*>(&(*cit))->setRHS(c.getRHS());
-//			if (cit->getRHSLimit()<c.getRHSLimit()) const_cast<Constraint*>(&(*cit))->setRHSLimit(c.getRHSLimit());
+			if (cit->getRHS()>=c.getRHS()) return false;
+			const_cast<Constraint*>(&(*cit))->setRHS(c.getRHS());
 			const_cast<Constraint*>(&(*cit))->setRecent(true);
 		} else {
-			if (cit->getRHS()<=c.getRHS()) // && cit->getRHSLimit()<=c.getRHSLimit()) 
-				return false;
-//			if (cit->getRHS()<c.getRHS()) 
-				const_cast<Constraint*>(&(*cit))->setRHS(c.getRHS());
-//			if (cit->getRHSLimit()<c.getRHSLimit()) const_cast<Constraint*>(&(*cit))->setRHSLimit(c.getRHSLimit());
+			if (cit->getRHS()<=c.getRHS()) return false;
+			const_cast<Constraint*>(&(*cit))->setRHS(c.getRHS());
 			const_cast<Constraint*>(&(*cit))->setRecent(true);
 		}
 	}
@@ -244,8 +230,6 @@ map<Place*,int> PartialSolution::underFinalMarking(IMatrix& im) {
 */
 map<Place*,int> PartialSolution::produce() {
 	map<Place*,int> prod;
-	prod.clear();
-	if (tseq.size()==0) return prod;
 	for(unsigned int i=0; i<tseq.size(); ++i)
 	{
 		set<pnapi::Arc*> as(tseq[i]->getPostsetArcs());
@@ -257,8 +241,7 @@ map<Place*,int> PartialSolution::produce() {
 			int aw = (*ait)->getWeight();
 			if (a) aw -= a->getWeight();
 			if (aw<0) aw=0;
-			if (prod.find(&p)!=prod.end()) prod[&p] += aw;
-			else prod[&p] = aw;
+			prod[&p] += aw;
 		}
 	}
 	return prod;
@@ -283,7 +266,6 @@ bool PartialSolution::betterSequenceThan(vector<Transition*> tv, Marking& m0, ma
 void PartialSolution::calcCircleConstraints(IMatrix& im, Marking& m0) {
 	set<Transition*> tset = m.getPetriNet().getTransitions();
 	set<Place*> pset;
-	pset.clear();
 	Tarjan tj(tset,pset);
 	map<Transition*,int>::iterator rit;
 	for(rit=getRemains().begin(); rit!=getRemains().end(); ++rit)
@@ -516,7 +498,7 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 				// component, the forbidden transitions cannot increase the token number
 				// on any of the places in the component upon firing. Therefore, all the
 				// necessary tokens must come from the outside.
-				if (tcomp[i].size()>0) // there transitions in the component
+				if (tcomp[i].size()>0) // there are transitions in the component
 				{
 					for(fit=tcomp[i].begin(); fit!=tcomp[i].end(); ++fit)
 					{

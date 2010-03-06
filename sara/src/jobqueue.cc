@@ -141,8 +141,7 @@ int JobQueue::find(PartialSolution* job) {
 	// count the Parikh vector of the transition sequence of job
 	map<Transition*,int> tmap;
 	vector<Transition*> tseq(job->getSequence());
-	if (tseq.size()>0)
-		 for(unsigned int i=0; i<tseq.size(); ++i) ++tmap[tseq[i]];
+	for(unsigned int i=0; i<tseq.size(); ++i) ++tmap[tseq[i]];
 	// go through the jobs with the same priority, but leave out first()
 	deque<PartialSolution*> deq(queue[pri]);
 	for(unsigned int i=0; i<deq.size(); ++i)
@@ -150,8 +149,7 @@ int JobQueue::find(PartialSolution* job) {
 		// count Parikh vector for queued job
 		map<Transition*,int> tmap2;
 		vector<Transition*> tseq2(deq[i]->getSequence());
-		if (tseq2.size()>0)
-			for(unsigned int j=0; j<tseq2.size(); ++j) ++tmap2[tseq2[j]];
+		for(unsigned int j=0; j<tseq2.size(); ++j) ++tmap2[tseq2[j]];
 		if (tmap==tmap2 && job->getRemains()==deq[i]->getRemains())
 		{
 			// test if the constraints are equal
@@ -161,12 +159,6 @@ int JobQueue::find(PartialSolution* job) {
 			set<Constraint>& cs(job->getConstraints());
 			set<Constraint>& cs2(deq[i]->getConstraints());
 			if (cs==cs2) return -1;
-/*			if (cs.size()!=cs2.size()) continue;
-			int k;
-			for(k=0; k<cs.size(); ++k)
-				if (cs[k].getRHS()!=cs2[k].getRHS() || cs[k].compare(cs2[k])==0) break;
-			if (k>=cs.size()) return -1;
-*/
 		}
 	}
 	return pri;
@@ -179,13 +171,12 @@ int JobQueue::find(PartialSolution* job) {
 	@return The priority.
 */
 int JobQueue::priority(PartialSolution* job) const {
-	int priority(0);
+	int priority(job->getConstraints().size());
 	map<Transition*,int>::iterator it;
 	for(it=job->getFullVector().begin(); it!=job->getFullVector().end(); ++it)
 		priority += it->second;
 	for(it=job->getRemains().begin(); it!=job->getRemains().end(); ++it)
 		priority += it->second;
-	priority += job->getConstraints().size();
 	set<Constraint>::iterator cit;
 	for(cit=job->getConstraints().begin(); cit!=job->getConstraints().end(); ++cit)
 		if (cit->isJump()) ++priority;
@@ -221,7 +212,7 @@ bool JobQueue::checkMEInfeasible() {
 	@param job The job to be added to the failure queue.
 */
 void JobQueue::push_fail(PartialSolution* job) {
-	if (!args_info.verbose_given && queue.size()>1) return;
+	if (!args_info.verbose_given && queue.size()>1) return; // user doesn't want to know about failure reasons
 	if (!almostEmpty()) job->setFeasibility(true); // first entry: marking equation may be infeasible
 	// check if there is an entry in the queue with an equivalent marking
 	bool found = false; // no equivalent entry so far

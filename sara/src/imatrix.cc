@@ -39,7 +39,7 @@ using std::endl;
 /** Constructor
 	@param pn The Petri net for which the incidence matrix is to be built.
 */
-IMatrix::IMatrix(PetriNet& pn) : verbose(0),petrinet(pn) { mat.clear(); loop.clear(); }
+IMatrix::IMatrix(PetriNet& pn) : verbose(0),petrinet(pn) {}
 
 /** Calculates or just gets one column of the incidence matrix.
 	@param t The transition identifying the column.
@@ -57,7 +57,6 @@ map<Place*,int>& IMatrix::getColumn(Transition& t) {
 	for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
 	{
 		Place* p = &((*ait)->getPlace());
-//		if (mat[&t].find(p)==mat[&t].end()) mat[&t][p]=0; // init
 		int preweight = (*ait)->getWeight();
 		int loops = (preweight>mat[&t][p] ? mat[&t][p] : preweight); // count the loops on a place
 		if (loops>0) loop[&t][p] = loops; // and save this number
@@ -87,8 +86,6 @@ map<Place*,int> IMatrix::getPostset(Transition& t) {
 	map<Place*,int>& loop(getLoopColumn(t)); // and its loops
 	map<Place*,int> result; // this will be the postset
 	map<Place*,int>::iterator it;
-//	for(it=loop.begin(); it!=loop.end(); ++it)
-//		if (it->second>0) result[it->first] = 0; // init
 	for(it=col.begin(); it!=col.end(); ++it)
 		if (it->second>0) result[it->first] = it->second; // add the change
 	for(it=loop.begin(); it!=loop.end(); ++it)
@@ -105,8 +102,6 @@ map<Place*,int> IMatrix::getPreset(Transition& t) {
 	map<Place*,int>& loop(getLoopColumn(t)); // and its loops
 	map<Place*,int> result; // this will be the preset
 	map<Place*,int>::iterator it;
-//	for(it=loop.begin(); it!=loop.end(); ++it)
-//		if (it->second>0) result[it->first] = 0; // init
 	for(it=col.begin(); it!=col.end(); ++it)
 		if (it->second<0) result[it->first] = -it->second; // subtract the change
 	for(it=loop.begin(); it!=loop.end(); ++it)
@@ -267,11 +262,7 @@ map<Place*,int> IMatrix::getChange(map<Transition*,int>& fv) {
 		map<Place*,int> col(getColumn(*(it->first))); // use the change
 		map<Place*,int>::iterator pit;
 		for(pit=col.begin(); pit!=col.end(); ++pit) // go through all places with changed token numbers 
-		{
-//			if (result.find(pit->first)!=result.end())
-				result[pit->first]+=(pit->second)*(it->second); // and multiply it with the weight of the transition
-//			else result[pit->first]=(pit->second)*(it->second);
-		}
+			result[pit->first]+=(pit->second)*(it->second); // and multiply it with the weight of the transition
 	}
 	return result;
 }

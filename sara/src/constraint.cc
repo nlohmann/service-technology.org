@@ -50,8 +50,6 @@ Constraint::Constraint() : rhs(0),jump(false),recent(true) { posplace.clear(); s
 */
 Constraint::Constraint(map<Transition*,int> jump) : rhs(-1),recent(true)
 { 
-	posplace.clear(); 
-	subtrans.clear(); 
 	this->jump = true;
 	// calculate the right-hand-side minus one
 	map<Transition*,int>::iterator it;
@@ -199,15 +197,7 @@ map<Transition*,int>& Constraint::calcConstraint() {
 			int tmp = (*ait)->getWeight(); 
 			if (a!=NULL) { tmp -= a->getWeight(); if (tmp<0) tmp=0; }
 			// add the lp_solve coefficient for non-forbidden transitions
-			if (subtrans.find(&t)==subtrans.end()) 
-			{
-				result[&t] += tmp;
-/*
-				// does int have a default value? If not:
-				if (result.find(&t)!=result.end()) result[&t] += tmp;
-				else result[&t] = tmp;
-*/
-			}
+			if (subtrans.find(&t)==subtrans.end()) result[&t] += tmp;
 		}
 	}
 	// transfer the result, eliminating zero entries
@@ -357,8 +347,6 @@ bool Constraint::operator<(const Constraint& right) const {
 	if (jump&&!right.jump) return false;
 	if (!jump&&right.jump) return true;
 	if (rhs<right.rhs) return true;
-//	if (rhs>right.rhs) return false;
-//	if (limit<right.limit) return true;
 	return false;
 }
 

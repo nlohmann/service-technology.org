@@ -74,7 +74,6 @@ Problem::Problem() : deinit(false),generalcover(false),type(REACHABLE),nettype(L
 Problem::Problem(string net, int pntype, map<string,int>& initialmarking, map<string,int>& requirement, int typ) 
 	: deinit(false),generalcover(false),type(typ),filename(net),initial(initialmarking),required(requirement),nettype(pntype),pn(NULL) {
 	name = "";
-	cover.clear();
 }
 
 /** Constructor for all variants of reachability including coverability.
@@ -167,7 +166,6 @@ string Problem::getName() { return name; }
 Marking Problem::getInitialMarking() {
 	if (pn==NULL) getPetriNet();
 	map<const Place*,unsigned int> result;
-	result.clear();
 	map<string,int>::iterator it;
 	for(it=initial.begin(); it!=initial.end(); ++it)
 	{
@@ -183,7 +181,6 @@ Marking Problem::getInitialMarking() {
 Marking Problem::getFinalMarking() {
 	if (pn==NULL) getPetriNet();
 	map<const Place*,unsigned int> result;
-	result.clear();
 	map<string,int>::iterator it;
 	for(it=required.begin(); it!=required.end(); ++it)
 	{
@@ -199,7 +196,6 @@ Marking Problem::getFinalMarking() {
 map<Place*,int> Problem::getCoverRequirement() {
 	if (pn==NULL) getPetriNet();
 	map<Place*,int> result;
-	result.clear();
 	map<string,int>::iterator it;
 	for(it=cover.begin(); it!=cover.end(); ++it)
 	{
@@ -223,7 +219,6 @@ map<Place*,int> Problem::getCoverRequirement() {
 map<Transition*,int> Problem::getVectorToRealize() {
 	if (pn==NULL) getPetriNet();
 	map<Transition*,int> result;
-	result.clear();
 	map<string,int>::iterator it;
 	for(it=required.begin(); it!=required.end(); ++it)
 	{
@@ -238,9 +233,6 @@ map<Transition*,int> Problem::getVectorToRealize() {
 */
 PetriNet* Problem::getPetriNet() {
 	if (pn) return pn;
-
-	// read from file only!
-//    string invocation = "";
 
 	// try to open file
 	ifstream infile(filename.c_str(), ifstream::in);
@@ -311,7 +303,7 @@ void Problem::calcPTOrder() {
 	map<int,set<pnapi::Place*> >::iterator pmit;
 	set<pnapi::Arc*>::iterator ait;
 	int min;
-	for(int i=0; i<5; ++i)
+	for(int i=0; i<5; ++i) // Probably five rounds are enough to make the order deterministic, but we can't be sure!
 	{
 		min = 0;
 		for(tmit=tord.begin(); tmit!=tord.end(); ++tmit)

@@ -169,6 +169,9 @@ int main(int argc, char** argv) {
     atexit(terminationHandler);
 
     evaluateParameters(argc, argv);
+    Output::setTempfileTemplate(args_info.tmpfile_arg);
+    Output::setKeepTempfiles(args_info.noClean_flag);
+
 
     // modes that read a service automaton
     if (args_info.mode_arg == mode_arg_matching or
@@ -232,9 +235,9 @@ int main(int argc, char** argv) {
         // statistical output
         status("calculating %s", cmdline_parser_mode_values[args_info.mode_arg]);
         status("source (SA): %s%s%s\t%u nodes",
-                _cb, basename(args_info.automaton_arg), _c_, static_cast<unsigned int>(A.nodes.size()));
+                _cb_, basename(args_info.automaton_arg), _c_, static_cast<unsigned int>(A.nodes.size()));
         status("target (OG): %s%s%s\t%u nodes",
-                _cb, basename(args_info.og_arg), _c_, static_cast<unsigned int>(B.nodes.size()));
+                _cb_, basename(args_info.og_arg), _c_, static_cast<unsigned int>(B.nodes.size()));
     }
 
 
@@ -254,11 +257,11 @@ int main(int argc, char** argv) {
     // do what you're told via "--mode" parameter
     switch (args_info.mode_arg) {
         case(mode_arg_simulation): {
-            message("%ssimilarity: %.2f%s", _c0, Simulation::simulation(), _c_); break;
+            message("similarity: %.2f%s", Simulation::simulation(), _c_); break;
         }
 
         case(mode_arg_matching): {
-            message("%smatching: %.2f%s", _c0, Matching::matching(), _c_); break;
+            message("matching: %.2f%s", Matching::matching(), _c_); break;
         }
     }
 

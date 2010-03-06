@@ -108,6 +108,9 @@ int main(int argc, char** argv) {
     } else {
     	abort( 4, "a costfile must be given");
     }
+    Output::setTempfileTemplate(args_info.tmpfile_arg);
+    Output::setKeepTempfiles(args_info.noClean_flag);
+
 
 
 

@@ -1,41 +1,34 @@
-AC_PREREQ([2.63])
 AC_INIT(Stanca, 0.1-unreleased, stanca@service-technology.org, stanca, http://service-technology.org/stanca)
-AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_AUX_DIR([build-aux])
 
-# Checks for programs.
+AC_PREREQ([2.63])
+AM_INIT_AUTOMAKE#(gnits)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+
+# check for standard programs needed to compile
 AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
-AC_PROG_SED
-AC_PROG_GREP
+
+# use the service-technology.org macros
+AC_ST_BASIC
+AC_ST_AUTOTEST
+AC_ST_PNAPI
+AC_ST_VERBOSE
+
+# search for optional tools
 AC_PROG_LN_S
-AC_PROG_RANLIB
-
-AM_MISSING_PROG(GENGETOPT, gengetopt)
-AM_MISSING_PROG(HELP2MAN, help2man)
-
-# allow the configure script to control assertions (just include config.h)
-AC_HEADER_ASSERT
-AH_BOTTOM([#ifdef __cplusplus
-#include <cassert>
-#else
-#include <assert.h>
-#endif])
-
-# set up autotest
-AM_MISSING_PROG(AUTOM4TE, autom4te)
-AC_CONFIG_TESTDIR(tests)
 
 AC_PATH_PROG(DOT, [dot], not found)
 if test "$DOT" = "not found"; then
   AC_MSG_WARN([Graphviz Dot was not found. See file README.])
   AC_DEFINE_UNQUOTED(CONFIG_DOT, "not found", [Graphviz Dot was not found.])
 else
-  AC_DEFINE_UNQUOTED(CONFIG_DOT, "${DOT}", [Graphviz Dot can be used.])
+  AC_DEFINE_UNQUOTED(CONFIG_DOT, "\"${DOT}\"", [Graphviz Dot can be used.])
 fi
 AC_SUBST(DOT)
 

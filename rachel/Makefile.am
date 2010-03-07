@@ -1,5 +1,8 @@
 SUBDIRS = src man doc tests exp
 
+# tell aclocal about the macros in the "m4" folder
+ACLOCAL_AMFLAGS = -I m4 --install
+
 #############################################################################
 # remove everything that cannot be built
 #############################################################################

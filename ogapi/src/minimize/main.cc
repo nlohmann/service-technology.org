@@ -40,6 +40,9 @@ void evaluateParameters(int argc, char** argv) {
 int main(int argc, char **argv)
 {
   evaluateParameters(argc, argv);
+  Output::setTempfileTemplate(args_info.tmpfile_arg);
+  Output::setKeepTempfiles(args_info.noClean_flag);
+
 
   if (args_info.inputs_num > 0)
     og_yyin = fopen(args_info.inputs[0], "r");

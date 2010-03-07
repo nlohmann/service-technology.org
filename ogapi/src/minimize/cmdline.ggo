@@ -21,20 +21,20 @@ option "verbose" v
   
 option "bug" -
   "Write configuration information into a file `bug.log'."
-  details="This output file gives information on the machine Wendy was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  details="This output file gives information on the machine Minimize was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
   flag off
   hidden
 
 option "tmpfile" -
   "Set the path and name of temporary files"
-  details="The filename Wendy should use to create temporary files (i.e., the intermediate Petri net passed to LoLA). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  details="The filename Minimize should use to create temporary files. The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
   string
   typestr="FILENAME"
-  default="/tmp/wendy-XXXXXX"
+  default="/tmp/minimize-XXXXXX"
   optional
   hidden
 
 option "noClean" -
   "Do not delete temporary files."
-  details="Any temporary files created by Wendy is kept after Wendy terminates.\n"
+  details="Any temporary files created by Minimize is kept after Minimize terminates.\n"
   flag off

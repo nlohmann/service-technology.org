@@ -16,33 +16,24 @@ AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-# Checks for programs.
+# check for standard programs needed to compile
 AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
-AC_PROG_SED
-AC_PROG_GREP
+
+# use the service-technology.org macros
+AC_ST_BASIC
+AC_ST_AUTOTEST
+AC_ST_VERBOSE
+
+
 AC_PROG_LN_S
 AC_PROG_RANLIB
 
-# check for additional programs needed to compile
-AM_MISSING_PROG(GENGETOPT, gengetopt)
-AM_MISSING_PROG(HELP2MAN, help2man)
-
-# allow the configure script to control assertions (just include config.h)
-AC_HEADER_ASSERT
-AH_BOTTOM([#ifdef __cplusplus
-#include <cassert>
-#else
-#include <assert.h>
-#endif])
 
 AC_CHECK_HEADERS([sys/time.h sys/resource.h zlib.h],,AC_MSG_ERROR([cannot use required headers]))
 
-# set up autotest
-AM_MISSING_PROG(AUTOM4TE, autom4te)
-AC_CONFIG_TESTDIR(tests)
 
 AC_PATH_PROG(DOT, [dot], not found)
 if test "$DOT" = "not found"; then

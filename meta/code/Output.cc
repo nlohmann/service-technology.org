@@ -1,23 +1,3 @@
-/*****************************************************************************\
- Wendy -- Synthesizing Partners for Services
-
- Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
-
- Wendy is free software: you can redistribute it and/or modify it under the
- terms of the GNU Affero General Public License as published by the Free
- Software Foundation, either version 3 of the License, or (at your option)
- any later version.
-
- Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
- more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
-
-
 #include <config.h>
 #include <libgen.h>
 #include <unistd.h>
@@ -26,9 +6,22 @@
 #include <cstdlib>
 #include "verbose.h"
 #include "Output.h"
-#include "cmdline.h"
 
-extern gengetopt_args_info args_info;
+#ifdef HAVE_CONFIG
+#include <config.h>
+#endif
+
+
+/******************
+ * STATIC MEMBERS *
+ ******************/
+
+#ifdef HAVE_CONFIG
+std::string Output::tempfileTemplate = std::string("/tmp/") + PACKAGE_TARNAME + "-XXXXXX";
+#else
+std::string Output::tempfileTemplate = "/tmp/temp-XXXXXX";
+#endif
+bool Output::keepTempfiles = true;
 
 
 /***************
@@ -40,7 +33,7 @@ extern gengetopt_args_info args_info;
 */
 Output::Output() :
     os(*(new std::ofstream(createTmp(), std::ofstream::out | std::ofstream::trunc))),
-    filename(temp), kind("")
+    filename(temp), temp(temp), kind("")
 {
     status("writing to temporary file '%s'", _cfilename_(filename));
 }
@@ -73,8 +66,9 @@ Output::Output(const std::string& str, const std::string& kind) :
  **************/
 
 /*!
- This destructor closes the associated file. Unless the "--noClean" parameter
- is given, temporary files are deleted after closing.
+ This destructor closes the associated file. Unless the class is configured
+ to keep temporary files (by calling setKeepTempfiles()), temporary files are
+ deleted after closing.
 */
 Output::~Output() {
     if (&os != &std::cout) {
@@ -82,7 +76,7 @@ Output::~Output() {
         if (temp == NULL) {
             status("closed file '%s'", _cfilename_(filename));
         } else {
-            if (args_info.noClean_flag) {
+            if (keepTempfiles) {
                 status("closed temporary file '%s'", _cfilename_(filename));
             } else {
                 if (remove(filename.c_str()) == 0) {
@@ -136,15 +130,28 @@ std::ostream& Output::stream() const {
 */
 char* Output::createTmp() {
 #ifdef __MINGW32__
-    temp = strdup(basename(args_info.tmpfile_arg));
+    temp = basename(const_cast<char*>(tempfileTemplate.c_str()));
     if (mktemp(temp) == NULL) {
-        abort(13, "could not create to temporary file '%s'", basename(args_info.tmpfile_arg));
+        abort(13, "could not create to temporary file '%s'", basename(const_cast<char*>(tempfileTemplate.c_str())));
     };
 #else
-    temp = strdup(args_info.tmpfile_arg);
+    temp = strdup(tempfileTemplate.c_str());
     if (mkstemp(temp) == -1) {
         abort(13, "could not create to temporary file '%s'", temp);
     };
 #endif
     return temp;
+}
+
+
+/***************************
+ * STATIC MEMBER FUNCTIONS *
+ ***************************/
+
+void Output::setTempfileTemplate(std::string s) {
+    tempfileTemplate = s;
+}
+
+void Output::setKeepTempfiles(bool b) {
+    keepTempfiles = b;
 }

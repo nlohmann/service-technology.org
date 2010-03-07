@@ -1,23 +1,3 @@
-/*****************************************************************************\
- Wendy -- Synthesizing Partners for Services
-
- Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
-
- Wendy is free software: you can redistribute it and/or modify it under the
- terms of the GNU Affero General Public License as published by the Free
- Software Foundation, either version 3 of the License, or (at your option)
- any later version.
-
- Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
- more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
-\*****************************************************************************/
-
-
 #ifndef VERBOSE_H
 #define VERBOSE_H
 
@@ -51,6 +31,8 @@ void displayFileError(char* filename, int lineno, char* token);
 
  The idea to check the "TERM" environment variable was inspired by the
  Google C++ testing framework (http://code.google.com/p/googletest/).
+ All colors can be found at
+ http://www.faqs.org/docs/Linux-HOWTO/Bash-Prompt-HOWTO.html#AEN343
 \**************************************************************************/
 
 /// whether to use colored output
@@ -77,22 +59,24 @@ const bool _useColor = false;
 #define _cm_ (_useColor ? "\033[0;35m" : "" )
 /// set foreground color to cyan
 #define _cc_ (_useColor ? "\033[0;36m" : "" )
+/// set foreground color to light grey
+#define _cl_ (_useColor ? "\033[0;37m" : "" )
 
-/// set foreground color to red (undelined)
+/// set foreground color to red (underlined)
 #define _cr__ (_useColor ? "\033[0;4;31m" : "" )
-/// set foreground color to green (undelined)
+/// set foreground color to green (underlined)
 #define _cg__ (_useColor ? "\033[0;4;32m" : "" )
-/// set foreground color to yellow (undelined)
+/// set foreground color to yellow (underlined)
 #define _cy__ (_useColor ? "\033[0;4;33m" : "" )
-/// set foreground color to blue (undelined)
+/// set foreground color to blue (underlined)
 #define _cb__ (_useColor ? "\033[0;4;34m" : "" )
-/// set foreground color to magenta (undelined)
+/// set foreground color to magenta (underlined)
 #define _cm__ (_useColor ? "\033[0;4;35m" : "" )
-/// set foreground color to cyan (undelined)
+/// set foreground color to cyan (underlined)
 #define _cc__ (_useColor ? "\033[0;4;36m" : "" )
+/// set foreground color to light grey (underlined)
+#define _cl__ (_useColor ? "\033[0;4;37m" : "" )
 
-/// set foreground color to black (bold)
-#define _c0_ (_useColor ? "\033[0;1;30m" : "" )
 /// set foreground color to red (bold)
 #define _cR_ (_useColor ? "\033[0;1;31m" : "" )
 /// set foreground color to green (bold)
@@ -105,9 +89,16 @@ const bool _useColor = false;
 #define _cM_ (_useColor ? "\033[0;1;35m" : "" )
 /// set foreground color to cyan (bold)
 #define _cC_ (_useColor ? "\033[0;1;36m" : "" )
+/// set foreground color to light grey (bold)
+#define _cL_ (_useColor ? "\033[0;1;37m" : "" )
+
 
 /// reset foreground color
-#define _c_ (_useColor ? "\033[m" : "")
+#define _c_ (_useColor ? "\033[0m" : "")
+/// other modifiers: 1 - bold, 4 - underline,
+/// 5 - blink, 7 - inverse and 8 - concealed
+#define _bold_ (_useColor ? "\033[1m" : "")
+#define _underline_ (_useColor ? "\033[4m" : "")
 
 /// color the name of a tool
 #define _ctool_(s)       (std::string(_cm_) + s + _c_).c_str()
@@ -122,7 +113,7 @@ const bool _useColor = false;
 /// color a warning
 #define _cwarning_(s)    (std::string(_cY_) + s + _c_).c_str()
 /// color an important message
-#define _cimportant_(s)  (std::string(_c0_) + s + _c_).c_str()
+#define _cimportant_(s)  (std::string(_bold_) + s + _c_).c_str()
 /// color a command-line parameter
 #define _cparameter_(s)  (std::string(_cC_) + s + _c_).c_str()
 

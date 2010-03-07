@@ -1,3 +1,6 @@
+# tell aclocal about the macros in the "m4" folder
+ACLOCAL_AMFLAGS = -I m4 --install
+       
 # process "libs" directory only if the Petri Net API needs to be compiled
 if COMPILE_PNAPI
 SUBDIRS = libs/pnapi src man doc maintainer tests

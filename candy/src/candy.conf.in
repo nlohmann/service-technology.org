@@ -1,0 +1,24 @@
+#                        ____                 _
+#                       / ___| __ _ _ __   __| |_   _ 
+#                      | |    / _` | '_ \ / _` | | | |
+#                      | |___| (_| | | | | (_| | |_| |
+#                       \____|\__,_|_| |_|\__,_|\__, |
+#                                               |___/ 
+#               synthesizing cost efficient partners for services
+#               http://service-technology.org/candy
+#
+
+# Configuration file for @PACKAGE_STRING@
+# @configure_input@
+
+# This file configures the paths to binaries needed by Candy. The configure
+# script already tried to suggest paths, but its entries might have been left
+# empty. In that case, you need to manually add the path to the respective
+# tool.
+
+# The filename Candy should use for temporary files can be specified below.
+# The filename should end with 'XXXXXX' which is replaced at runtime with a
+# random string. In case you use MinGW, path names are ignored and the basename
+# is used instead.
+
+tmpfile = /tmp/candy-XXXXXX

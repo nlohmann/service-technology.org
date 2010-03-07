@@ -12,6 +12,7 @@ AC_MSG_NOTICE()
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_AUX_DIR([build-aux])
 
 AM_INIT_AUTOMAKE(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -27,13 +28,11 @@ AC_ST_BASIC
 AC_ST_AUTOTEST
 AC_ST_VERBOSE
 
-
+# search for optional tools
 AC_PROG_LN_S
 AC_PROG_RANLIB
 
-
 AC_CHECK_HEADERS([sys/time.h sys/resource.h zlib.h],,AC_MSG_ERROR([cannot use required headers]))
-
 
 AC_PATH_PROG(DOT, [dot], not found)
 if test "$DOT" = "not found"; then

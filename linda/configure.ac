@@ -1,6 +1,8 @@
 AC_INIT(Linda, 0.6-unreleased, linda@service-technology.org)
+
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_AUX_DIR([build-aux])
 
 AM_INIT_AUTOMAKE(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])

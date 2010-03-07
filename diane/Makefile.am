@@ -9,6 +9,7 @@ svn-clean: maintainer-clean
 	rm -fr src/config.h.in~ src/Makefile.in libs/Makefile.in src/config.h.in
 	rm -fr doc/doxygen doc/Makefile.in doc/mdate-sh
 	rm -fr libs/pnapi/Makefile.in
+	rm -fr build-aux
 
 doxygen:
 	cd doc/ ; doxygen

@@ -2,6 +2,7 @@ AC_INIT(compilers, 1.00, compilers@service-technology.org, compilers, http://ser
 
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/config.h)
+AC_CONFIG_AUX_DIR([build-aux])
 
 AC_PREREQ(2.59)
 AM_INIT_AUTOMAKE(gnits)

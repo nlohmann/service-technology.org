@@ -21,6 +21,7 @@ svn-clean: maintainer-clean
 	-rm -f man/Makefile.in
 	-rm -f maintainer/Makefile.in
 	-rm -f INSTALL
+	-rm -fr build-aux
 	@echo -----------------------------------------------------
 	@echo To recreate installation status enter
 	@echo "  autoreconf -i"

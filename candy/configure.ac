@@ -18,6 +18,7 @@ AC_MSG_NOTICE()
 AC_PREREQ(2.59)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_AUX_DIR([build-aux])
 
 # initialize automake without full verbose messages
 AM_INIT_AUTOMAKE #(gnits)

@@ -9,3 +9,4 @@ svn-clean: maintainer-clean
 	rm -fr src/Makefile.in src/config.h.in~ src/config.h.in src/config-log.h
 	rm -fr tests/Makefile.in
 	rm -fr doc/mdate-sh doc/Makefile.in
+	rm -fr build-aux

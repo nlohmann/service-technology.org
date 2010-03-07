@@ -2,6 +2,7 @@ AC_INIT([OGAPI], 1.00-unreleased, ogapi@service-technology.org, ogapi, http://se
 
 AC_CONFIG_SRCDIR(src/productOG/main.cc)
 AC_CONFIG_HEADERS(src/config.h)
+AC_CONFIG_AUX_DIR([build-aux])
 
 AC_PREREQ(2.59)
 AM_INIT_AUTOMAKE#(gnits)

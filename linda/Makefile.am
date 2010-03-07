@@ -17,4 +17,5 @@ svn-clean: maintainer-clean
 	rm -fr doc/doxygen
 	rm -fr libs/lp_solve/Makefile.in libs/pnapi/Makefile.in
 	rm -fr tests/Makefile.in doc/Makefile.in doc/mdate-sh
+	rm -fr build-aux
 

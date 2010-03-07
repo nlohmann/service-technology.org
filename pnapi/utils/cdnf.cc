@@ -111,6 +111,9 @@ int main(int argc, char** argv) {
     atexit(terminationHandler);
   
     evaluateParameters(argc, argv);
+    Output::setTempfileTemplate(args_info.tmpfile_arg);
+    Output::setKeepTempfiles(args_info.noClean_flag);
+
 
     vector<FileObject> objects;
 

@@ -1,5 +1,8 @@
 SUBDIRS = libs/pnapi src man tests doc
 
+# tell aclocal about the macros in the "m4" folder
+ACLOCAL_AMFLAGS = -I m4 --install
+
 svn-clean: maintainer-clean
 	rm -fr configure Makefile.in depcomp compile INSTALL missing \
 	aclocal.m4 install-sh ylwrap src/Makefile.in src/config.h.in \

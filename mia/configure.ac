@@ -1,4 +1,5 @@
 AC_INIT(Mia, 1.2-unreleased, mia@service-technology.org, mia, http://service-technology.org/mia)
+
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -10,43 +11,24 @@ AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
-AC_PROG_RANLIB
-AC_PROG_SED
-AC_PROG_GREP
-AC_PROG_AWK
 
-# check for additional programs
-AM_MISSING_PROG(GENGETOPT, gengetopt)
-AM_MISSING_PROG(HELP2MAN, help2man)
+# use the service-technology.org macros
+AC_ST_BASIC
+AC_ST_AUTOTEST
+AC_ST_PNAPI
+AC_ST_VERBOSE
 
-# export tools needed to determine memory consumption
-AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
-AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
-
-# check and set exact unsigned types
-AC_TYPE_UINT8_T
-
-# set up autotest
-AM_MISSING_PROG(AUTOM4TE, autom4te)
-AC_CONFIG_TESTDIR(tests)
-
-# store the SVN revision number
-AC_DEFINE_UNQUOTED(VERSION_SVN, "`svnversion -n 2> /dev/null`", [The SVN revision.])
-
-# allow the configure script to control assertions
-AC_HEADER_ASSERT
-
-# check for required tools
+# search for optional tools needed by "make check"
 AC_PATH_PROG(LOLA_FULL, [lola-full], [])
 AC_PATH_PROG(LOLA_FULL1, [lola-full1], [${LOLA_FULL}])
 AC_PATH_PROG(WENDY, [wendy], [])
-
-# check for functions
-AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))
-AC_CHECK_FUNCS([vfprintf],,AC_MSG_WARN([cannot use required functions]))
-
-# check for optional tools needed by "make check"
 AC_PATH_PROG(VALGRIND, [valgrind], not found)
+
+# check for required functions and die if they are not found
+AC_CHECK_FUNCS([popen pclose],,AC_MSG_ERROR([cannot use required functions]))
+
+# check and set exact unsigned types
+AC_TYPE_UINT8_T
 
 # write files
 AC_CONFIG_FILES([

@@ -1,5 +1,8 @@
 SUBDIRS = src tests man maintainer
 
+# tell aclocal about the macros in the "m4" folder
+ACLOCAL_AMFLAGS = -I m4 --install
+
 # delete all files that can be created by other files
 svn-clean: maintainer-clean
 	-rm -f compile

@@ -1,42 +1,24 @@
 AC_INIT(compilers, 1.00, compilers@service-technology.org, compilers, http://service-technology.org/compilers)
 
-# the first line should be everything you will ever need to touch
-#############################################################################
+AC_CONFIG_SRCDIR(src/main.cc)
+AC_CONFIG_HEADERS(src/config.h)
 
 AC_PREREQ(2.59)
 AM_INIT_AUTOMAKE(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-# where to look for source code and how the config header should be called
-AC_CONFIG_SRCDIR(src/main.cc)
-AC_CONFIG_HEADERS(src/config.h)
-
-# check for generic programs
+# check for standard programs needed to compile
 AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
-AC_PROG_SED
-AC_PROG_GREP
 
-# allow the configure script to control assertions (just include config.h)
-AC_HEADER_ASSERT
-AH_BOTTOM([#ifdef __cplusplus
-#include <cassert>
-#else
-#include <assert.h>
-#endif])
+# use the service-technology.org macros
+AC_ST_BASIC
+AC_ST_AUTOTEST
+AC_ST_VERBOSE
 
-# check for additional programs
-AM_MISSING_PROG(GENGETOPT, gengetopt)
-AM_MISSING_PROG(HELP2MAN, help2man)
-
-
-# set up autotest
-AM_MISSING_PROG(AUTOM4TE, autom4te)
-AC_CONFIG_TESTDIR(tests)
-
-# search for Fiona and Wendy (nice to have for "make check")
+# search for optional tools needed by "make check"
 AC_PATH_PROG(FIONA, [fiona], not found)
 AC_PATH_PROG(WENDY, [wendy], not found)
 AC_PATH_PROG(SAYO,  [sayo],  not found)
@@ -44,9 +26,9 @@ AC_PATH_PROG(SA2SM, [sa2sm], not found)
 AC_PATH_PROG(PETRI, [petri], not found)
 AC_PATH_PROG(DIFF,  [diff],  not found)
 
-#############################################################################
-# create configured files (Makefiles, scripts, etc.)
-#############################################################################
+# check for required functions and die if they are not found
+AC_CHECK_FUNCS([popen pclose],,AC_MSG_ERROR([cannot use required functions]))
+
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  maintainer/Makefile maintainer/debian/changelog.template maintainer/debian/info maintainer/debian/README.Debian.template maintainer/debian/rules maintainer/macports/Portfile
@@ -54,4 +36,3 @@ AC_CONFIG_FILES([Makefile
                  man/Makefile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
-

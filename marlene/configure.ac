@@ -18,35 +18,19 @@ AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([gnits])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-# look up canonical build name and write it to the config header
-AC_CANONICAL_BUILD
-AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
+# check for standard programs needed to compile
+AC_PROG_CXX
+AM_PROG_CC_C_O
+AC_PROG_LEX
+AC_PROG_YACC
 
 # use the service-technology.org macros
 AC_ST_BASIC
-#AC_ST_LOLA([1.14])
 AC_ST_AUTOTEST
 AC_ST_PNAPI
 AC_ST_VERBOSE
 
-## check if this package was checkedout from a repository
-#AM_CONDITIONAL(FROMSVN,test -d ".svn")
-
-# check for programs needed to compile
-AC_PROG_YACC
-AC_PROG_CXX
-AC_PROG_CC
-AM_PROG_CC_C_O
-AC_PROG_LEX
-AC_PROG_MAKE_SET
-
-# store the SVN revision number
-AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
-AC_DEFINE_UNQUOTED(VERSION_SVN, "${VERSION_SVN}", [The SVN revision.])
-
-# check for required tools
-#AC_PATH_PROG(LOLA_STATESPACE, [lola-statespace], [])
-#AC_PATH_PROG(LOLA_FULL1, [lola-full1], [${LOLA_FULL}])
+# search for optional tools needed by "make check"
 AC_PATH_PROG(WENDY, [wendy], [])
 AC_PATH_PROG(CANDY, [candy], [])
 AC_PATH_PROG(VALGRIND, [valgrind], not found)
@@ -89,29 +73,11 @@ AC_MSG_CHECKING([weather to be sunny])
 AC_MSG_RESULT([better should be])
 
 # Checks for header files.
-#AC_FUNC_ALLOCA
 AC_HEADER_SYS_WAIT
-#AC_CHECK_HEADERS([inttypes.h libintl.h malloc.h stddef.h stdlib.h string.h unistd.h])
 
-# Checks for typedefs, structures, and compiler characteristics.
-#AC_HEADER_STDBOOL
-#AC_C_INLINE
-#AC_TYPE_INT16_T
-#AC_TYPE_INT32_T
-#AC_TYPE_INT8_T
-#AC_TYPE_SIZE_T
-#AC_TYPE_UINT16_T
-#AC_TYPE_UINT32_T
-#AC_TYPE_UINT8_T
-
-# Checks for library functions.
+# check for required functions and die if they are not found
 AC_FUNC_ERROR_AT_LINE
-#AC_FUNC_MALLOC
-#AC_FUNC_REALLOC
-#AC_CHECK_FUNCS([memset strchr strcspn strdup strspn strtol])
-#AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([Marlene cannot use UNIX pipes.]))
-#AC_CHECK_FUNCS([vfprintf],,AC_MSG_WARN([cannot use required functions]))
-
+AC_CHECK_FUNCS([popen pclose],,AC_MSG_ERROR([cannot use required functions]))
 
 
 #############################################################################

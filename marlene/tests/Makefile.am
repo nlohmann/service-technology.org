@@ -11,6 +11,7 @@ TESTFILES = test.owfn test.ar \
 	    test-n.owfn test-n.ar \
 	    ca1.owfn ca1_sync.owfn ca2.owfn td.owfn td_cyclic.owfn \
 	    td.ar td_sync.ar td_sync2.ar \
+		td_ret.owfn td_ret.ar \
 	    nopetrify.conf \
 	    wrongsyntax.owfn wrongsyntax.ar wronglexic.ar \
 	    sync1_exp.owfn sync2_exp.owfn sync3_exp.owfn \

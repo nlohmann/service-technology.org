@@ -3,11 +3,11 @@ AC_DEFUN([AC_ST_BASIC],[
 
 # store the SVN revision number
 AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
-AC_DEFINE_UNQUOTED(VERSION_SVN, "${VERSION_SVN}", [The SVN revision.])
+AC_DEFINE_UNQUOTED([VERSION_SVN], ["${VERSION_SVN}"], [The SVN revision.])
 
 # look up canonical build name and write it to config.h
 AC_CANONICAL_BUILD
-AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
+AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["${build}"], [The platform.])
 
 # check for basic tools (also important for GNU Autotest)
 AC_PROG_SED
@@ -15,8 +15,8 @@ AC_PROG_GREP
 AC_PROG_AWK
 
 # export tools needed to determine memory consumption
-AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
-AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
+AC_DEFINE_UNQUOTED(TOOL_AWK, "\"${AWK}\"", [awk])
+AC_DEFINE_UNQUOTED(TOOL_GREP, "\"${GREP}\"", [grep])
 
 # check for additional programs needed to compile
 AM_MISSING_PROG(GENGETOPT, gengetopt)

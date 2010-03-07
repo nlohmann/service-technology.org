@@ -5,45 +5,33 @@ AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-# Checks for programs.
-AM_PROG_CC_C_O
+# check for standard programs needed to compile
 AC_PROG_CXX
+AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
 AC_PROG_RANLIB
-AC_PROG_SED
-AC_PROG_GREP
-AC_PROG_AWK
+
+# use the service-technology.org macros
+AC_ST_BASIC
+AC_ST_AUTOTEST
+#AC_ST_PNAPI da geht irgendwas schief, denn ein Testfall schlägt fehl O_o
+AC_ST_VERBOSE
 
 # check if we can handle dynamic libs
 AC_DISABLE_SHARED
 AC_PROG_LIBTOOL
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_MISSING_PROG(GENGETOPT, gengetopt)
-AM_MISSING_PROG(HELP2MAN, help2man)
-
 # check and set exact unsigned types
 AC_TYPE_UINT8_T
 AC_TYPE_INT64_T
 
-
-# export tools needed to determine memory consumption
-AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
-AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
-
-
-# set up autotest
-AM_MISSING_PROG(AUTOM4TE, autom4te)
-AC_CONFIG_TESTDIR(tests)
-
-# check for diff (needed by testsuite)
+# search for optional tools needed by "make check"
 AC_PATH_PROG(DIFF, [diff], not found)
 
 # needed for the Petri Net API
 AC_DEFINE_UNQUOTED(CONFIG_PETRIFY, "not found", [Petrify is not used.])
-
-AC_HEADER_ASSERT
 
 # check for dlopen/ftime (required by lp_solve)
 AC_SEARCH_LIBS([dlopen], [dl zrldsrl])
@@ -67,7 +55,6 @@ if test "$enable_pnapi" = "yes"; then
 else
   AM_CONDITIONAL(COMPILE_PNAPI, [true])
 fi
-
 
 # check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use popen or pclose]))

@@ -23,7 +23,7 @@ public:
 	}
 
 	static std::string fillup(std::string s, int len) {
-		std::string result = string(len-s.length(), ' ');
+		std::string result = std::string(len-s.length(), ' ');
 		return s + result;
 	}
 

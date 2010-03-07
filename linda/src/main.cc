@@ -457,7 +457,7 @@ int main(int argc, char** argv) {
 
 		// Initialize Parser.
 		EventTermParser::initialize();
-		vector<int*>* term_vec = EventTermParser::parseFile(std::string(args_info.file_arg));
+		std::vector<int*>* term_vec = EventTermParser::parseFile(std::string(args_info.file_arg));
 
 		// For each system, evaluate all event terms
 		for (int i = 0; i <sysCounter; ++i) {

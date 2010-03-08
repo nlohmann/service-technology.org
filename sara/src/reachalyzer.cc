@@ -233,7 +233,7 @@ void Reachalyzer::start() {
 		}
 		if (!solutionSeen(fullvector)) // adapt known solutions (from a earlier loop) for the new constraints
 		{ // no solutions known so far, calculate them by trying to realize a firing sequence
-			PathFinder pf(m1,fullvector,cols,tps,im,shortcut);
+			PathFinder pf(m1,fullvector,cols,tps,solutions,im,shortcut);
 			pf.verbose = verbose;
 			solved = pf.recurse(); // main call to realize a solution
 		} 
@@ -245,13 +245,16 @@ void Reachalyzer::start() {
 	if (stateinfo)
 		cout << "sara: " << loops << " job" << (loops!=1?"s":"") << " done, " 
 			<< tps.size() << " in queue, " << failure.trueSize() <<  " failure" 
-			<< (failure.trueSize()!=1?"s":"") << "." << endl;
+			<< (failure.trueSize()!=1?"s":"") << ", " 
+			<< solutions.trueSize() << " solution" << (solutions.trueSize()!=1?"s":"") << "." << endl;
 	//stop counting time here
 	endtime = clock();
 }
 
 /** Prints the results of the reachability analysis to stderr. */
 void Reachalyzer::printResult() {
+	if (!solutions.almostEmpty()) solutions.printSolutions();
+/*
 	if (solved && !tps.empty()) // in case we have a solution:
 	{
 		PartialSolution* ps(tps.findSolution()); // find it
@@ -264,23 +267,28 @@ void Reachalyzer::printResult() {
 			cout << endl;
 		} else cerr << "sara: error: solved, but no solution found" << endl; // this should never happen
 	} // now check for errors (and other things) that disallow a decision
+*/
 	else if (errors) cout << "sara: UNSOLVED: Result is indecisive due to failure of lp_solve." << endl;
 	else if (args_info.treemaxjob_given) cout << "sara: UNSOLVED: solution may have been cut off due to command line switch -T" << endl;
-	else { // if we have a counterexample
-			if (failure.size()>0)
+	if (!errors && !args_info.treemaxjob_given && (args_info.all_given || solutions.almostEmpty()))
+	{ // if we have a counterexample or the all flag is set
+			if (failure.trueSize()>0)
 			{
-				cout << "sara: INFEASIBLE: ";
-				if (failure.checkMEInfeasible()) 
-				{ // it might be that the initial marking equation has no solution
-					cout << "the marking equation is infeasible." << endl; 
-					if (stateinfo) if (!lpwrap.findNearest())
-						cout << "sara: warning: unable to suggest changes, probably a failure of lp_solve" << endl;
-					return; 
-				}
-				// or the marking equation is feasible but still we cannot reach a solution 
-				cout << "unable to borrow enough tokens via T-invariants." << endl;
+				if (solutions.almostEmpty()) {
+					cout << "sara: INFEASIBLE: ";
+					if (failure.checkMEInfeasible() && solutions.almostEmpty())
+					{ // it might be that the initial marking equation has no solution
+						cout << "the marking equation is infeasible." << endl; 
+						if (stateinfo) if (!lpwrap.findNearest())
+							cout << "sara: warning: unable to suggest changes, probably a failure of lp_solve" << endl;
+						return; 
+					}
+					// or the marking equation is feasible but still we cannot reach a solution 
+					cout << "unable to borrow enough tokens via T-invariants." << endl;
+				} else if (stateinfo) cout << "sara: at the following points the algorithm got stuck:" << endl;
 				if (stateinfo) failure.printFailure(im); // then print the counterexample; the following shouldn't happen:
-			} else cout << "sara: UNSOLVED: Result is indecisive, no counterexamples found." << endl;
+			} else if (solutions.almostEmpty()) 
+				cout << "sara: UNSOLVED: Result is indecisive, no counterexamples found." << endl;
 	}
 }
 

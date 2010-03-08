@@ -74,8 +74,8 @@ void PathFinder::myNode::reset() { index=-2; low=-1; instack=false; nodes.clear(
 	@param im The incidence matrix created by the constructor call to IMatrix for the Petri net.
 	@param lookup The lookup table for solutions of lp_solve
 */
-PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& itps, IMatrix& imx, map<map<Transition*,int>,vector<PartialSolution> >& lookup) 
-	: m0(m),fulltvector(tv),rec_tv(tv),cols(col),tps(itps),im(imx),shortcut(lookup),recsteps(0) {
+PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& itps, JobQueue& sol, IMatrix& imx, map<map<Transition*,int>,vector<PartialSolution> >& lookup) 
+	: m0(m),fulltvector(tv),rec_tv(tv),cols(col),tps(itps),solutions(sol),im(imx),shortcut(lookup),recsteps(0) {
 	for(unsigned int i=0; i<transitionorder.size(); ++i)
 	{
 		tton.push_back(new myNode());
@@ -149,17 +149,20 @@ bool PathFinder::recurse() {
 		if (tps.almostEmpty() || !tps.first()->betterSequenceThan(fseq,m0,rec_tv))
 		{
 			// but only save it for later use (=adaption of constraints) if it is new or better than the things we already have
-			if (terminate) newps.setSolved(); // no more transitions to fire, so we have a solution
-			tps.push_back(new PartialSolution(newps)); // put the job into the queue
+			if (terminate) solutions.push_solved(new PartialSolution(newps)); // no more transitions to fire, so we have a solution
+			else tps.push_back(new PartialSolution(newps)); // put the job into the queue
+//			if (terminate) newps.setSolved(); // no more transitions to fire, so we have a solution
+//			tps.push_back(new PartialSolution(newps)); // put the job into the queue
 			// try to add this partial solution to the lookup table
 			if (shortcut.size()<shortcutmax) shortcut[fulltvector].push_back(newps);
 			else if (args_info.verbose_given && shortcut.size()==shortcutmax) 
 			{ 
-				cerr << "sara: warning: lookup table too large (" << shortcutmax << ")" << endl; 
+				status("warning: lookup table too large (%d)",shortcutmax); 
 				shortcut[fulltvector].push_back(newps); 
 			}
 			if (verbose>1) {
-				cerr << "sara: New Partial Solution:" << endl;
+				if (terminate) status("Full Solution found:"); 
+				else status("New Partial Solution:");
 				newps.show();
 				cerr << "*** PF ***" << endl;
 			}
@@ -167,7 +170,7 @@ bool PathFinder::recurse() {
 		} else if (verbose>2) cerr << "sara: CheckAgainstQueue-Hit" << endl;
 		// go up one level in the recursion, if there were nonfirable transitions left over,
 		// but terminate the recursion altogether if this partial solution is a full solution.
-		return terminate; 
+		return (args_info.all_given?false:terminate); // surpress termination if all flag is given
 	}
 
 	// Initialise tton(entries for conflict graph) and todo-list with the first transition

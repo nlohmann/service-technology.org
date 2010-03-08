@@ -90,6 +90,9 @@ private:
 	/// possible counterexamples, only valid if no solution can be found
 	JobQueue failure;
 
+	/// solutions of the problem
+	JobQueue solutions;
+
 	/// level of verbosity(stateinfo) and debug mode(verbose)
 	int verbose;
 	bool stateinfo;

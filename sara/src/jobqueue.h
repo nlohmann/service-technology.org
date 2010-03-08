@@ -91,6 +91,12 @@ public:
 	/// Gets the true size of a failure queue (excluding obsolete entries)
 	int trueSize();
 
+	/// Push a solution into the solution queue
+	void push_solved(PartialSolution* job);
+
+	/// Print all solutions
+	void printSolutions();
+
 private:
 	/// job or failure queue (from priority to sublist)
 	map<int,deque<PartialSolution*> > queue;

@@ -270,9 +270,10 @@ if (args_info.input_given || args_info.pipe_given) {
 				im.verbose = debug;
 				PartialSolution* ps(new PartialSolution(m1)); // create initial job
 				JobQueue tps(ps); // create a job list
+				JobQueue solutions; // create a job list
 				map<map<Transition*,int>,vector<PartialSolution> > dummy; // dummy, will be filled and immediately free'd
 				// create an instance of the realizability solver
-				PathFinder pf(m1,tv,pn->getTransitions().size(),tps,im,dummy);
+				PathFinder pf(m1,tv,pn->getTransitions().size(),tps,solutions,im,dummy);
 				pf.verbose = debug;
 				if (pf.recurse()) { pf.printSolution(); ++solcnt; } // solve the problem and print a possible solution
 				else cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;

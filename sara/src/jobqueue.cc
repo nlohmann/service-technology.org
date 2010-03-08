@@ -16,6 +16,7 @@
 
 #include "jobqueue.h"
 #include "cmdline.h"
+#include "verbose.h"
 #include <iostream>
 #include <set>
 #include <map>
@@ -288,25 +289,25 @@ bool JobQueue::cleanFailure(map<Transition*,int>& p) {
 			{ // go through all parikh images in an entry
 				map<Transition*,int>::iterator mit,pit;
 				bool smaller(false); // compare if queue entry is smaller than p
-				for(mit=parikh[j].begin(),pit=p.begin(); mit!=parikh[j].end(); ++mit)
+				for(mit=parikh[j].begin(),pit=p.begin(); pit!=p.end(); ++pit)
 				{
-					if (pit==p.end()) break;
+					if (mit==parikh[j].end()) break;
 					if (mit->first!=pit->first) continue;
 					if (mit->second>pit->second) break;
 					if (mit->second<pit->second) smaller=true;
-					++pit;
+					++mit;
 				}
 				// on a positive result, mark queue entry as obsolete
 				if (mit==parikh[j].end() && smaller) { jit->second[i]->setSolved(); break; }
 				if (!result) {
 					smaller=false; // compare if p is smaller than queue entry
-					for(mit=parikh[j].begin(),pit=p.begin(); pit!=p.end(); ++pit)
+					for(mit=parikh[j].begin(),pit=p.begin(); mit!=parikh[j].end(); ++mit)
 					{
-						if (mit==parikh[j].end()) break;
+						if (pit==p.end()) break;
 						if (mit->first!=pit->first) continue;
 						if (mit->second<pit->second) break;
 						if (mit->second>pit->second) smaller=true;
-						++mit;
+						++pit;
 					}
 					// on a positive result mark p as obsolete
 					if (pit==p.end() && smaller) { result=true; break; }
@@ -339,6 +340,7 @@ void JobQueue::printFailure(IMatrix& im) {
 			}
 			else cout << "<empty>";
 			cout << "\":" << endl;
+			if (ps->getConstraints().empty()) cout << " - final marking reached, no more transitions to fire" << endl;
 			set<Constraint>::iterator cit;
 			for(cit=ps->getConstraints().begin(); cit!=ps->getConstraints().end(); ++cit)
 			{
@@ -394,5 +396,84 @@ int JobQueue::trueSize() {
 		for(unsigned int i=0; i<jit->second.size(); ++i)
 			if (!jit->second[i]->isSolved()) ++counter;
 	return counter;
+}
+
+/** Add a job to a solution queue. The job will be matched against the queue, only incomparable
+	jobs will be inserted, bigger ones from the queue are eliminated.
+	@param job The job to be added to the solution queue.
+*/
+void JobQueue::push_solved(PartialSolution* job) {
+	map<Transition*,int> p(job->calcParikh());
+	bool result(false);
+	map<int,deque<PartialSolution*> >::iterator jit;
+	for(jit=queue.begin(); jit!=queue.end(); ++jit)
+	{
+		bool changed(false);
+		for(unsigned int i=0; i<jit->second.size(); ++i)
+		{ // walk all failure entries
+			vector<map<Transition*,int> >& parikh(jit->second[i]->getParikh());
+			for(unsigned int j=0; j<parikh.size(); ++j)
+			{ // go through all parikh images in an entry
+				map<Transition*,int>::iterator mit,pit;
+				bool smaller(false); // compare if queue entry is smaller or equal to p
+				if (!result) {
+					for(mit=parikh[j].begin(),pit=p.begin(); pit!=p.end(); ++pit)
+					{
+						if (mit==parikh[j].end()) break;
+						if (mit->first!=pit->first) continue;
+						if (mit->second>pit->second) break;
+						if (mit->second<pit->second) smaller=true;
+						++mit;
+					}
+					// on a positive result, mark queue entry as obsolete
+					if (mit==parikh[j].end()) { result=true; break; }
+				}
+				smaller=false; // compare if p is smaller than queue entry
+				for(mit=parikh[j].begin(),pit=p.begin(); mit!=parikh[j].end(); ++mit)
+				{
+					if (pit==p.end()) break;
+					if (mit->first!=pit->first) continue;
+					if (mit->second<pit->second) break;
+					if (mit->second>pit->second) smaller=true;
+					++pit;
+				}
+				// on a positive result mark p as obsolete
+				if (pit==p.end() && smaller) 
+				{ 
+					delete jit->second[i];
+					jit->second[i] = NULL;
+					changed = true;
+					break;
+				}
+			}
+		}
+		if (changed) { // replace the deque by one without null pointers
+			deque<PartialSolution*> dtmp;
+			for(unsigned int i=0; i<jit->second.size(); ++i)
+				if (jit->second[i]) dtmp.push_back(jit->second[i]);
+			jit->second = dtmp;
+		}
+	}
+	// if there is no smaller (or equal) solution in the queue, insert this one
+	if (!result) { ++cnt; queue[priority(job)].push_back(job);}
+	else delete job; // otherwise forget this solution
+}
+
+/** Prints a solution queue.
+	@param im Incidence matrix of the Petri net
+*/
+void JobQueue::printSolutions() {
+	if (queue.empty()) abort(14,"error: solved, but no solution found -- this should not happen");
+	map<int,deque<PartialSolution*> >::iterator jit;
+	for(jit=queue.begin(); jit!=queue.end(); ++jit)
+		for(unsigned int i=0; i<jit->second.size(); ++i)
+		{
+			PartialSolution* ps(jit->second[i]);
+			vector<Transition*> solution = ps->getSequence();
+			cout << "sara: SOLUTION: ";
+			for(unsigned int j=0; j<solution.size(); ++j)
+				cout << solution[j]->getName() << " ";
+			cout << endl;
+		}
 }
 

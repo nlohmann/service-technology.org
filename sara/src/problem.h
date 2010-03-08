@@ -102,7 +102,7 @@ public:
 	void checkForNetReference(Problem& p);
 
 	/// Calculate the global orderings for places and transitions
-	void calcPTOrder();
+	bool calcPTOrder();
 
 	/// Goals
 	enum Types {

@@ -135,10 +135,7 @@ if (args_info.quasilive_given) {
 	string outname = (string)args_info.quasilive_arg + ".sara";
 	problemfile = outname; // redirect later pipe input
 	ofstream outfile(outname.c_str(), ofstream::trunc);
-	if (!outfile.is_open()) {
-		cerr << "sara: could not write to file '" << outname << "'" << endl;
-		exit(EXIT_FAILURE);
-	}
+	if (!outfile.is_open()) abort(3,"error: could not write to file '%s'",outname.c_str());
 	for(it=tset.begin(); it!=tset.end(); ++it)
 	{
 		outfile << "PROBLEM enabling_of_" << (*it)->getName() << ":" << endl;
@@ -183,10 +180,7 @@ if (args_info.reachable_given || args_info.realize_given) {
 	string outname = pbl.getFilename() + ".sara";
 	problemfile = outname; // redirect later pipe input
 	ofstream outfile(outname.c_str(), ofstream::trunc);
-	if (!outfile.is_open()) {
-		cerr << "sara: could not write to file '" << outname << "'" << endl;
-		exit(EXIT_FAILURE);
-	}
+	if (!outfile.is_open()) abort(3,"error: could not write to file '%s'",outname.c_str());
 	// print the problem
 	outfile << "PROBLEM " << (args_info.reachable_given?"reach":"realiz") << "ability_in_" << pbl.getFilename() << ":" << endl;
 	if (args_info.reachable_given) outfile << "GOAL REACHABILITY;" << endl;
@@ -221,9 +215,7 @@ if (args_info.input_given || args_info.pipe_given) {
 	if (args_info.input_given) problemfile = args_info.input_arg;
 	if (problemfile=="stdin") sara_in = stdin;
 	else sara_in = fopen(problemfile.c_str(),"r");
-	if (!sara_in) {
-	    abort(11, "could not read problem information");
-	}
+	if (!sara_in) abort(1, "could not read problem information");
 	sara_parse();
 	if (sara_in!=stdin) fclose(sara_in);
 

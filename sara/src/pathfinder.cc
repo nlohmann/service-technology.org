@@ -22,6 +22,7 @@
 #include "imatrix.h"
 #include "jobqueue.h"
 #include "cmdline.h"
+#include "verbose.h"
 
 #include <vector>
 #include <map>
@@ -391,7 +392,8 @@ Place* PathFinder::hinderingPlace(Transition& t) {
 			pset.insert(&((*ait)->getPlace()));
 	}
 	// catch error of missing scapegoat
-	if (pset.empty()) { cerr << "sara: error: no scapegoat for stubborn set method" << endl; exit(EXIT_FAILURE); }
+	if (pset.empty()) abort(11,"error: no scapegoat for stubborn set method");
+//	if (pset.empty()) { cerr << "sara: error: no scapegoat for stubborn set method" << endl; exit(EXIT_FAILURE); }
 	// if the user opts for a random scapegoat, select one by time
 	if (args_info.scapegoat_given) 
 	{

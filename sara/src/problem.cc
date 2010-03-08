@@ -33,6 +33,7 @@
 #include "pathfinder.h"
 #include "reachalyzer.h"
 #include "problem.h"
+#include "cmdline.h"
 #include "lp_solve/lp_lib.h"
 
 using std::cerr;
@@ -55,6 +56,8 @@ extern vector<Transition*> transitionorder;
 extern vector<Place*> placeorder;
 extern map<Transition*,int> revtorder;
 extern map<Place*,int> revporder;
+
+extern gengetopt_args_info args_info;
 
 	/**************************************
 	* Implementation of the class Problem *
@@ -236,10 +239,7 @@ PetriNet* Problem::getPetriNet() {
 
 	// try to open file
 	ifstream infile(filename.c_str(), ifstream::in);
-	if (!infile.is_open()) {
-	    cerr << "sara: error: could not read from file '" << filename << "'" << endl;
-	    exit(EXIT_FAILURE);
-	}
+	if (!infile.is_open()) abort(2,"error: could not read from Petri net file '%s'",filename.c_str());
 
 	// try to parse net
 	try {
@@ -256,14 +256,14 @@ PetriNet* Problem::getPetriNet() {
 	        }
 	    }
 	} catch (pnapi::io::InputError error) {
-	    cerr << "sara: " << error << endl;
 	    infile.close();
-	    exit(EXIT_FAILURE);
+		cerr << "sara: error: " << error << endl;
+		abort(4,"error while reading Petri net from file");
 	}
 
 	infile.close();
 	deinit = true;
-	calcPTOrder();
+	if (!calcPTOrder() && args_info.verbose_given) status("place or transition ordering is non-deterministic");
 	return pn;
 }
 
@@ -283,8 +283,9 @@ void Problem::checkForNetReference(Problem& p) {
 }
 
 /** Calculate the global ordering of transitions and places for this problem.
+	@return If the ordering is deterministic.
 */
-void Problem::calcPTOrder() {
+bool Problem::calcPTOrder() {
 	set<Transition*> tset(pn->getTransitions());
 	set<Place*> pset(pn->getPlaces());
 	set<Transition*>::iterator tit;
@@ -303,7 +304,7 @@ void Problem::calcPTOrder() {
 	map<int,set<pnapi::Place*> >::iterator pmit;
 	set<pnapi::Arc*>::iterator ait;
 	int min;
-	for(int i=0; i<5; ++i) // Probably five rounds are enough to make the order deterministic, but we can't be sure!
+	for(int i=0; i<6; ++i) // Probably five rounds are enough to make the order deterministic, but we can't be sure!
 	{
 		min = 0;
 		for(tmit=tord.begin(); tmit!=tord.end(); ++tmit)
@@ -327,7 +328,7 @@ void Problem::calcPTOrder() {
 			min = ttmp.rbegin()->first + 1;	
 		}
 		tord.clear();
-		for(tmit=ttmp.begin(),min=0; tmit!=ttmp.end(); ++tmit,++min)
+		for(tmit=ttmp.begin(),min=1; tmit!=ttmp.end(); ++tmit,++min)
 		{
 			tord[min]=tmit->second;
 			for(tit=tmit->second.begin(); tit!=tmit->second.end(); ++tit)
@@ -344,7 +345,7 @@ void Problem::calcPTOrder() {
 				for(ait=(*pit)->getPresetArcs().begin(); ait!=(*pit)->getPresetArcs().end(); ++ait)
 					val += tval[&((*ait)->getTransition())]*(*ait)->getWeight();
 				for(ait=(*pit)->getPostsetArcs().begin(); ait!=(*pit)->getPostsetArcs().end(); ++ait)
-					val -= tval[&((*ait)->getTransition())]*(*ait)->getWeight();
+					val -= 2*tval[&((*ait)->getTransition())]*(*ait)->getWeight();
 				pval[(*pit)] = val;
 				if (val<minval) minval=val;
 			}
@@ -356,7 +357,7 @@ void Problem::calcPTOrder() {
 			min = ptmp.rbegin()->first + 1;	
 		}
 		pord.clear();
-		for(pmit=ptmp.begin(),min=0; pmit!=ptmp.end(); ++pmit,++min)
+		for(pmit=ptmp.begin(),min=1; pmit!=ptmp.end(); ++pmit,++min)
 		{
 			pord[min]=pmit->second;
 			for(pit=pmit->second.begin(); pit!=pmit->second.end(); ++pit)
@@ -366,17 +367,20 @@ void Problem::calcPTOrder() {
 	}
 
 	// push the result into the global vectors
+	bool deterministic(true);
 	transitionorder.clear();
 	for(tmit=tord.begin(); tmit!=tord.end(); ++tmit)
 	{
+		if (tmit->second.size()>1) deterministic=false;
 		for(tit=tmit->second.begin(); tit!=tmit->second.end(); ++tit)
 			transitionorder.push_back(*tit);
 	}
 	placeorder.clear();
 	for(pmit=pord.begin(); pmit!=pord.end(); ++pmit)
 	{
+		if (pmit->second.size()>1) deterministic=false;
 		for(pit=pmit->second.begin(); pit!=pmit->second.end(); ++pit)
-			placeorder.push_back(*pit);
+			placeorder.push_back(*pit); 
 	}
 	revtorder.clear();
 	for(unsigned int i=0; i<transitionorder.size(); ++i)
@@ -384,5 +388,6 @@ void Problem::calcPTOrder() {
 	revporder.clear();
 	for(unsigned int i=0; i<placeorder.size(); ++i)
 		revporder[placeorder[i]]=i;
+	return deterministic;
 }
 

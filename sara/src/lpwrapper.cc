@@ -8,6 +8,7 @@
 #include "pnapi/pnapi.h"
 #endif
 #include "lp_solve/lp_lib.h"
+#include "verbose.h"
 
 #ifndef LPWRAPPER_H
 #include "lpwrapper.h"
@@ -45,7 +46,8 @@ extern vector<Place*> placeorder;
 	*/
 	LPWrapper::LPWrapper(unsigned int columns) : cols(columns) {
 		lp = make_lp(0,cols);
-		if (!lp) { cerr << "sara: error: could not create LP model." << endl; exit(EXIT_FAILURE); }
+		if (!lp) abort(12,"error: could not create LP model");
+//		if (!lp) { cerr << "sara: error: could not create LP model." << endl; exit(EXIT_FAILURE); }
 	}
 
 	/** Destructor
@@ -194,9 +196,12 @@ bool LPWrapper::addConstraints(PartialSolution& ps) {
 		// add the constraint to the lp model, normal constraints with >=, jumps with <=
 		if (success && (jump || rhs>0)) 
 			if (!addConstraint(constraint,(jump?LE:GE),rhs)) 
-			{ cerr << "sara: error: failed to add constraint to LP model." << endl; 
+			{ 
 			  delete[] constraint; 
-			  exit(EXIT_FAILURE); }
+			  abort(13,"error: failed to add constraint to LP model");
+//			  cerr << "sara: error: failed to add constraint to LP model." << endl; 
+//			  exit(EXIT_FAILURE); 
+			}
 	}
 	delete[] constraint;
 	return true;

@@ -80,6 +80,6 @@ reach REACH
 
 void sara_error(const char *msg) {
   status("%d: error near '%s': %s", sara_lineno, sara_text, msg);
-  abort(10, "error while parsing the sara problem file");
+  abort(5, "error while parsing the sara problem file");
 }
 

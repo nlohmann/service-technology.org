@@ -404,13 +404,13 @@ int JobQueue::trueSize() {
 */
 void JobQueue::push_solved(PartialSolution* job) {
 	map<Transition*,int> p(job->calcParikh());
-	bool result(false);
+	bool result(false); // if we should refuse to add this solution
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
 	{
-		bool changed(false);
+		bool changed(false); // whether we have changed this deque
 		for(unsigned int i=0; i<jit->second.size(); ++i)
-		{ // walk all failure entries
+		{ // walk all solution entries
 			vector<map<Transition*,int> >& parikh(jit->second[i]->getParikh());
 			for(unsigned int j=0; j<parikh.size(); ++j)
 			{ // go through all parikh images in an entry
@@ -425,7 +425,7 @@ void JobQueue::push_solved(PartialSolution* job) {
 						if (mit->second<pit->second) smaller=true;
 						++mit;
 					}
-					// on a positive result, mark queue entry as obsolete
+					// on a positive result, mark p as not to be added
 					if (mit==parikh[j].end()) { result=true; break; }
 				}
 				smaller=false; // compare if p is smaller than queue entry
@@ -437,7 +437,7 @@ void JobQueue::push_solved(PartialSolution* job) {
 					if (mit->second>pit->second) smaller=true;
 					++pit;
 				}
-				// on a positive result mark p as obsolete
+				// on a positive result delete the entry and mark the deque as faulty
 				if (pit==p.end() && smaller) 
 				{ 
 					delete jit->second[i];
@@ -460,7 +460,6 @@ void JobQueue::push_solved(PartialSolution* job) {
 }
 
 /** Prints a solution queue.
-	@param im Incidence matrix of the Petri net
 */
 void JobQueue::printSolutions() {
 	if (queue.empty()) abort(14,"error: solved, but no solution found -- this should not happen");

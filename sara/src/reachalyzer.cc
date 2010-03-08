@@ -304,10 +304,10 @@ clock_t Reachalyzer::getTime() { return (endtime-starttime); }
 	@return The status of the problem.
 */
 int Reachalyzer::getStatus() {
-	if (solved && !tps.empty()) return SOLUTION_FOUND;
+	if (!solutions.almostEmpty()) return SOLUTION_FOUND;
 	if (error>0) return error;
 	if (errors) return LPSOLVE_RUNTIME_ERROR;
-	if (!failure.empty()) return COUNTEREXAMPLE_FOUND;
+	if (!failure.almostEmpty()) return COUNTEREXAMPLE_FOUND;
 	return UNSOLVED;	
 }
 

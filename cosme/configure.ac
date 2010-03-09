@@ -2,8 +2,9 @@ AC_INIT(Cosme, 0.7, cosme@service-technology.org, cosme, http://service-technolo
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_AUX_DIR([build-aux])
 
-AM_INIT_AUTOMAKE #(gnits)
+AM_INIT_AUTOMAKE#(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # check for standard programs needed to compile
@@ -11,49 +12,26 @@ AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
-AC_PROG_RANLIB
-AC_PROG_SED
-AC_PROG_GREP
-AC_PROG_AWK
 
-# check for additional programs needed to compile
-AM_MISSING_PROG(GENGETOPT, gengetopt)
-AM_MISSING_PROG(HELP2MAN, help2man)
+# use the service-technology.org macros
+AC_ST_BASIC
+AC_ST_AUTOTEST
+AC_ST_PNAPI
+AC_ST_VERBOSE
 
 # search for optional tools needed by "make check"
-AC_PATH_PROG(VALGRIND,    [valgrind], not found)
-
-# set up autotest
-AM_MISSING_PROG(AUTOM4TE, autom4te)
-AC_CONFIG_TESTDIR(tests)
-
-# store the SVN revision number
-AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
-AC_DEFINE_UNQUOTED(VERSION_SVN, "\"${VERSION_SVN}\"", [The SVN revision.])
-
-# stats
-AC_DEFINE_UNQUOTED(TOOL_AWK, "${AWK}", [awk])
-AC_DEFINE_UNQUOTED(TOOL_GREP, "${GREP}", [grep])
-
-# allow the configure script to control assertions (just include config.h)
-AC_HEADER_ASSERT
-AH_BOTTOM([#ifdef __cplusplus
-#include <cassert>
-#else
-#include <assert.h>
-#endif])
-
-# search for required tools
-AC_PATH_PROG(LOLA, [lola-statespace], [])
+AC_PATH_PROG(VALGRIND, [valgrind], not found)
+AC_PATH_PROG(LOLA,     [lola-statespace], [])
 
 # check for required functions and die if they are not found
-AC_CHECK_FUNCS([popen pclose mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
+AC_CHECK_FUNCS([popen pclose],,AC_MSG_ERROR([cannot use required functions]))
 
 # check and set exact unsigned types
 AC_TYPE_UINT8_T
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
+# write files
 AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

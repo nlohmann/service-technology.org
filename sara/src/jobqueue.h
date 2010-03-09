@@ -92,7 +92,7 @@ public:
 	int trueSize();
 
 	/// Push a solution into the solution queue
-	void push_solved(PartialSolution* job);
+	bool push_solved(PartialSolution* job);
 
 	/// Print all solutions
 	void printSolutions();

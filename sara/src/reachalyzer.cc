@@ -235,6 +235,7 @@ void Reachalyzer::start() {
 		{ // no solutions known so far, calculate them by trying to realize a firing sequence
 			PathFinder pf(m1,fullvector,cols,tps,solutions,im,shortcut);
 			pf.verbose = verbose;
+			pf.setMinimize();
 			solved = pf.recurse(); // main call to realize a solution
 		} 
 		tps.pop_front(); // we are through with this job
@@ -254,23 +255,9 @@ void Reachalyzer::start() {
 /** Prints the results of the reachability analysis to stderr. */
 void Reachalyzer::printResult() {
 	if (!solutions.almostEmpty()) solutions.printSolutions();
-/*
-	if (solved && !tps.empty()) // in case we have a solution:
-	{
-		PartialSolution* ps(tps.findSolution()); // find it
-		if (ps)
-		{ // and print it
-			vector<Transition*> solution = ps->getSequence();
-			cout << "sara: SOLUTION: ";
-			for(unsigned int j=0; j<solution.size(); ++j)
-				cout << solution[j]->getName() << " ";
-			cout << endl;
-		} else cerr << "sara: error: solved, but no solution found" << endl; // this should never happen
-	} // now check for errors (and other things) that disallow a decision
-*/
 	else if (errors) cout << "sara: UNSOLVED: Result is indecisive due to failure of lp_solve." << endl;
 	else if (args_info.treemaxjob_given) cout << "sara: UNSOLVED: solution may have been cut off due to command line switch -T" << endl;
-	if (!errors && !args_info.treemaxjob_given && (args_info.all_given || solutions.almostEmpty()))
+	if (!errors && !args_info.treemaxjob_given && (args_info.witness_given || solutions.almostEmpty()))
 	{ // if we have a counterexample or the all flag is set
 			if (failure.trueSize()>0)
 			{
@@ -285,7 +272,7 @@ void Reachalyzer::printResult() {
 					}
 					// or the marking equation is feasible but still we cannot reach a solution 
 					cout << "unable to borrow enough tokens via T-invariants." << endl;
-				} else if (stateinfo) cout << "sara: at the following points the algorithm got stuck:" << endl;
+				} else if (stateinfo) cout << "sara: at the following points the algorithm needed to backtrack:" << endl;
 				if (stateinfo) failure.printFailure(im); // then print the counterexample; the following shouldn't happen:
 			} else if (solutions.almostEmpty()) 
 				cout << "sara: UNSOLVED: Result is indecisive, no counterexamples found." << endl;

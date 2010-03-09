@@ -401,8 +401,9 @@ int JobQueue::trueSize() {
 /** Add a job to a solution queue. The job will be matched against the queue, only incomparable
 	jobs will be inserted, bigger ones from the queue are eliminated.
 	@param job The job to be added to the solution queue.
+	@return If the job was added to the queue.
 */
-void JobQueue::push_solved(PartialSolution* job) {
+bool JobQueue::push_solved(PartialSolution* job) {
 	map<Transition*,int> p(job->calcParikh());
 	bool result(false); // if we should refuse to add this solution
 	map<int,deque<PartialSolution*> >::iterator jit;
@@ -457,11 +458,13 @@ void JobQueue::push_solved(PartialSolution* job) {
 	// if there is no smaller (or equal) solution in the queue, insert this one
 	if (!result) { ++cnt; queue[priority(job)].push_back(job);}
 	else delete job; // otherwise forget this solution
+	return !result;
 }
 
 /** Prints a solution queue.
 */
 void JobQueue::printSolutions() {
+	if (args_info.forceprint_given) return; // solutions were printed earlier
 	if (queue.empty()) abort(14,"error: solved, but no solution found -- this should not happen");
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)

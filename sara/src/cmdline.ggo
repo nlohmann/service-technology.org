@@ -112,9 +112,21 @@ option "verbose" v
 section "Influencing the algorithm"
 sectiondesc="These options allow to obtain control over some parts of the algorithm.\n"
 
-option "all" a
-  "Find all solutions."
-  details="Continues the search for solutions after the first solution has been found. Tries to find all solutions minimal with respect to parikh vector comparison. If the -v option is used, also shows paths were the algorithm got stuck, i.e. candidates for witness of non-reachability, even if the problem was solved.
+option "continue" C
+  "Find 'all' solutions."
+  details="Continues the search for solutions after the first solution has been found. Tries to find all solutions minimal with respect to parikh vector comparison. The search might go on infinitely if the number of solutions is not finite.
+" 
+  flag off
+
+option "forceprint" P
+  "Force printing of a solution the moment it is found."
+  details="Normally, solutions are stored, compared to each other, and, if comparable, the worse solution is thrown away when using the -C option. Finally, all remaining solutions are printed. With this option, solutions are printed immediately, even duplicates might appear, but you will not have to wait for program termination.
+"
+  flag off
+
+option "witness" W
+  "Show witnesses for non-reachability even for solved problems."
+  details="Such witnesses are points were the algorithm cannot fire any transition it would like to fire and adding T-invariants to the to-be-fired list is not possible. The algorithm is stuck and has to backtrack.
 "
   flag off
 

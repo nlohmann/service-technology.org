@@ -84,6 +84,7 @@ PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& 
 	pos=0;
 	verbose=0;
 	shortcutmax=1000;
+	minimize = false;
 	if (args_info.lookup_given) shortcutmax=(unsigned int)(args_info.lookup_arg);
 }
 
@@ -149,8 +150,11 @@ bool PathFinder::recurse() {
 		if (tps.almostEmpty() || !tps.first()->betterSequenceThan(fseq,m0,rec_tv))
 		{
 			// but only save it for later use (=adaption of constraints) if it is new or better than the things we already have
-			if (terminate) solutions.push_solved(new PartialSolution(newps)); // no more transitions to fire, so we have a solution
-			else tps.push_back(new PartialSolution(newps)); // put the job into the queue
+			if (terminate) 
+			{
+				if (solutions.push_solved(new PartialSolution(newps))) // no more transitions to fire, so we have a solution
+					if (args_info.forceprint_given) printSolution(&newps); // should we print it immediately?
+			} else tps.push_back(new PartialSolution(newps)); // put the job into the queue
 //			if (terminate) newps.setSolved(); // no more transitions to fire, so we have a solution
 //			tps.push_back(new PartialSolution(newps)); // put the job into the queue
 			// try to add this partial solution to the lookup table
@@ -170,7 +174,7 @@ bool PathFinder::recurse() {
 		} else if (verbose>2) cerr << "sara: CheckAgainstQueue-Hit" << endl;
 		// go up one level in the recursion, if there were nonfirable transitions left over,
 		// but terminate the recursion altogether if this partial solution is a full solution.
-		return (args_info.all_given?false:terminate); // surpress termination if all flag is given
+		return (args_info.continue_given?false:terminate); // surpress termination if -C flag is given
 	}
 
 	// Initialise tton(entries for conflict graph) and todo-list with the first transition
@@ -509,6 +513,9 @@ set<Transition*> PathFinder::getSZK() {
 	return result; // never reached (graph is never empty)
 }
 
+/** Declare that the diamond checker should exclude paths that contain the same marking twice. */
+void PathFinder::setMinimize() { minimize=true; }
+
 /** Checks for diamonds in the reachability graph that are about to be closed during the recursion.
 	Also checks if a marking is reached twice, as then the active partial solution can't be optimal
 	(and therefore, if we can reach a solution, we will also reach a smaller one at some other point).
@@ -521,13 +528,14 @@ bool PathFinder::checkForDiamonds()
 	if (fseq.size()>1)
 		for(int i=fseq.size()-2; i>=0; --i) // don't check the transition against itself! (-> -2)
 		{
-			if (mv[i]==m0) return true; // if we reach a marking again, there would be a smaller solution, so dismiss this one
+			if (minimize && mv[i]==m0) return true; // if we reach a marking again, there would be a smaller solution, so dismiss this one
 			// if it isn't in some set, it either hasn't been done at that point or it can't fire
 			// in any case: there is no diamond
 			if (stubsets[i].find(t_active)==stubsets[i].end()) continue;
 			// now create a new firing sequence beginning at recursion level i by switching
 			// the transition on level i with the active transition.
 			Transition* t_check = fseq[i];
+			if (t_active==t_check) continue;
 			vector<Transition*> v;
 			v.assign(fseq.begin()+i,fseq.end());
 			v.front() = t_active;
@@ -560,13 +568,15 @@ bool PathFinder::checkForDiamonds()
 
 /** Print a full solution if there is one in the job list.
 */
-void PathFinder::printSolution() {
-	PartialSolution* ps(tps.findSolution());
-	if (ps==NULL) { cout << "sara: UNSOLVED: solution is missing" << endl; return; }
+void PathFinder::printSolution(PartialSolution* ps) {
+	cout << "\r";
+	if (ps==NULL) { cout << "sara: UNSOLVED: solution is missing -- this should not happen" << endl; return; }
 	vector<Transition*> solution = ps->getSequence();
 	cout << "sara: SOLUTION: ";
 	for(unsigned int j=0; j<solution.size(); ++j)
 		cout << solution[j]->getName() << " ";
+	if (solution.size()<6)
+		for(unsigned int j=solution.size(); j<6; ++j) cout << "   ";
 	cout << endl;
 }
 

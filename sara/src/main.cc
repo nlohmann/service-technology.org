@@ -275,8 +275,8 @@ if (args_info.input_given || args_info.pipe_given) {
 				// create an instance of the realizability solver
 				PathFinder pf(m1,tv,pn->getTransitions().size(),tps,solutions,im,dummy);
 				pf.verbose = debug;
-				if (pf.recurse()) { pf.printSolution(); ++solcnt; } // solve the problem and print a possible solution
-				else cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;
+				if (pf.recurse()) { solutions.printSolutions(); ++solcnt; } // solve the problem and print a possible solution
+				else if (solutions.almostEmpty()) cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;
 				break;
 			}
 		}

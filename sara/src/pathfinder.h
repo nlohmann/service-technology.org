@@ -59,7 +59,10 @@ public:
 	bool recurse();
 
 	/// If a solution has been found, this method will print it to stdout.
-	void printSolution();
+	void printSolution(PartialSolution* ps);
+
+	/// Only minimal paths without repeating markings are sought
+	void setMinimize();
 
 	/// Level of verbosity
 	int verbose;
@@ -131,6 +134,9 @@ private:
 
 	/// temporary firing sequence pool for complex diamond checks
 	vector<vector<Transition*> > fpool;
+
+	/// flag stating that this PathFinder should only find minimal paths (non-repeating markings)
+	bool minimize;
 
 	/// calculates the conflicts and dependencies for a given transition
 	void conflictTable(Transition*);

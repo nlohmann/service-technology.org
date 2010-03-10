@@ -1,26 +1,3 @@
-/*****************************************************************************\
- Wendy -- Synthesizing Partners for Services
-
- Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
-
- Wendy is free software: you can redistribute it and/or modify it under the
- terms of the GNU Affero General Public License as published by the Free
- Software Foundation, either version 3 of the License, or (at your option)
- any later version.
-
- Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
- more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
-
-/*!
- * \file  Output.h
- */
-
 #ifndef PNAPI_OUTPUT_H
 #define PNAPI_OUTPUT_H
 
@@ -44,50 +21,62 @@ namespace util
  To create a regular file, call the constructor with a filename and a
  description of the output (for verbose messages). To create a temporary
  file, call the constructor without arguments. Temporary files will be
- deleted when the object is destroyed unless the parameter '--noClean' is
- given. To redirect to standard output, use the the filename "-".
+ deleted when the object is destroyed unless function setKeepTempfiles() is
+ called. To redirect to standard output, use the the filename "-".
 
- The quite tricky constructor was taken from the Ubuntu Forums at
+ The quite tricky constructor was motivated from the Ubuntu Forums at
  http://ubuntuforums.org/showthread.php?p=5929211
- */
+*/
 class Output {
-private:
-  /// helper function to create temp files
-  char * createTmp();
+    private: /* static members */
+        /// the template for temfiles to create
+        static std::string tempfileTemplate;
 
-public: /* member functions */
+        /// whether tempfiles should be deleted upon termination
+        static bool keepTempfiles;
 
-  /// constructor (creates temp file)
-  Output();
+    public: /* static functions */
+        /// set the tempfile template
+        static void setTempfileTemplate(std::string);
 
-  /// constructor (opens named stream or directs to std::cout)
-  Output(const std::string &, const std::string &);
+        /// set the whether tempfiles should be deleted upon termination
+        static void setKeepTempfiles(bool);
 
-  /// destructor (closes stream)
-  ~Output();
+    private: /* member functions */
+        /// helper function to create temp files
+        char* createTmp();
 
-  /// implicit conversation operator to ostream
-  operator std::ostream&() const;
+    public: /* member functions */
+        /// constructor (creates temp file)
+        Output();
 
-  /// returns the filename of this object
-  std::string name() const;
+        /// constructor (opens named stream or directs to std::cout)
+        Output(const std::string&, const std::string&);
 
-  /// returns the stream of this object
-  std::ostream& stream() const;
+        /// destructor (closes stream)
+        ~Output();
 
-private: /* member attributes */
+        /// implicit conversation operator to ostream
+        operator std::ostream&() const;
 
-  /// the stream itself
-  std::ostream& os; 
+        /// returns the filename of this object
+        std::string name() const;
 
-  /// filename of the output stream
-  std::string filename;
+        /// returns the stream of this object
+        std::ostream& stream() const;
 
-  /// its a temp file if its not NULL
-  char * temp;
+    private: /* member attributes */
+        /// the stream itself
+        std::ostream& os;
 
-  /// the kind of the file
-  const std::string kind;
+        /// filename of the output stream
+        std::string filename;
+
+        /// its a temp file if its not NULL
+        char* temp;
+
+        /// the kind of the file
+        const std::string kind;
 };
 
 } /* namespace util */

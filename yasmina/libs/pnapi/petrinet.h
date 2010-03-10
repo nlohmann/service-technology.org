@@ -13,9 +13,9 @@
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-02-17 21:08:43 +0100 (Wed, 17 Feb 2010) $
+ * \date    $Date: 2010-02-19 17:54:57 +0100 (Fri, 19 Feb 2010) $
  *
- * \version $Revision: 5408 $
+ * \version $Revision: 5418 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -420,6 +420,9 @@ public:
 
   /// adds a role
   void addRole(std::string roleName);
+
+  /// add a set of roles
+  void addRoles(std::set<std::string>::iterator first, std::set<std::string>::iterator second);
 
   /// removes a label from the interface
   void removeSynchronousLabel(std::string);

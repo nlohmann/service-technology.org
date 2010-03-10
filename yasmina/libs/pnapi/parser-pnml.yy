@@ -100,8 +100,8 @@ std::string sanitize(char* s) {
     char const* delims = " \t\r\n";
 
     // trim leading whitespace
-    std::string::size_type  notwhite = str.find_first_not_of(delims);
-    str.erase(0,notwhite);
+    std::string::size_type notwhite = str.find_first_not_of(delims);
+    str.erase(0, notwhite);
 
     // trim trailing whitespace
     notwhite = str.find_last_not_of(delims); 
@@ -120,9 +120,9 @@ void close_element() {
 
     switch(file_part) {
         case(T_PORTS): {
-            std::string id = pnml_attributes[current_depth]["id"];
-            std::string name = pnml_attributes[current_depth]["__name__"];
-            std::string usedName = id;// = name.empty() ? id : name; 
+            const std::string id = pnml_attributes[current_depth]["id"];
+            const std::string name = pnml_attributes[current_depth]["__name__"];
+            const std::string usedName = id;// = name.empty() ? id : name; 
             switch(myType) {
                 case(T_INPUT): {
                     Place &p = pnapi_pnml_yynet.createPlace(usedName, Node::INPUT);
@@ -178,7 +178,7 @@ void close_element() {
                     if (!pnml_attributes[current_depth]["__receive__"].empty()) {
                         Node *inputPlace = pnml_id2node[pnml_attributes[current_depth]["__receive__"]];
                         if (!inputPlace) {
-                            yyerror(std::string("input place with id '" + pnml_attributes[current_depth]["__receive__    "] + "' not found").c_str());
+                            yyerror(std::string("input place with id '" + pnml_attributes[current_depth]["__receive__"] + "' not found").c_str());
                         }
                         pnapi_pnml_yynet.createArc(*inputPlace, *currentTransition);
                     }
@@ -199,14 +199,14 @@ void close_element() {
                     if (!target) {
                         yyerror(std::string("target node '" + pnml_attributes[current_depth]["target"] + "' not found").c_str());
                     }
-                    unsigned int weight = (pnml_attributes[current_depth]["__inscription__"].empty()) ? 1 : atoi(pnml_attributes[current_depth]["__inscription__"].c_str());
+                    const unsigned int weight = (pnml_attributes[current_depth]["__inscription__"].empty()) ? 1 : atoi(pnml_attributes[current_depth]["__inscription__"].c_str());
                     pnapi_pnml_yynet.createArc(*source, *target, weight);
                     break;
                 }
                 case(T_TEXT): {
                     // check the parent
                     if (elementStack[elementStack.size()-1] == T_INITIALMARKING) {
-                    // store data as parent's attribute
+                        // store data as parent's attribute
                         pnml_attributes[current_depth-2]["__initialMarking__"] = pnml_attributes[current_depth]["__data__"];
                     }
                     if (elementStack[elementStack.size()-1] == T_INSCRIPTION) {
@@ -215,7 +215,7 @@ void close_element() {
                     }
                     // check the parent
                     if (elementStack[elementStack.size()-1] == T_NAME) {
-                    // store data as parent's attribute
+                        // store data as parent's attribute
                         pnml_attributes[current_depth-2]["__name__"] = pnml_attributes[current_depth]["__data__"];
                     }
                     break;
@@ -251,7 +251,7 @@ void close_element() {
                 }
 
                 case(T_PLACE): {
-                    unsigned int tokens = atoi(pnml_attributes[current_depth]["__finalMarking__"].c_str());
+                    const unsigned int tokens = atoi(pnml_attributes[current_depth]["__finalMarking__"].c_str());
                     Node *place = pnml_id2node[pnml_attributes[current_depth]["idref"]];
                     if (!place) {
                         yyerror(std::string("place with id '" + pnml_attributes[current_depth]["idref"] + "' not found").c_str());
@@ -321,7 +321,7 @@ element:
   attribute_seq_opt empty_or_content
 ;
 empty_or_content:
-  XML_SLASH XML_CLOSE                {close_element();}
+  XML_SLASH XML_CLOSE                            {close_element();}
 | XML_CLOSE content XML_END name_opt XML_CLOSE   {close_element();}
 ;
 content:
@@ -338,6 +338,6 @@ attribute_seq_opt:
 | /*empty*/
 ;
 attribute:
-  XML_NAME                           { free($1);}
-| XML_NAME XML_EQ XML_VALUE          { store_attributes($1, $3); free($1); free($3);}
+  XML_NAME                           {free($1);}
+| XML_NAME XML_EQ XML_VALUE          {store_attributes($1, $3); free($1); free($3);}
 ;

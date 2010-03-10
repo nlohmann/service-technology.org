@@ -1,44 +1,32 @@
-/*****************************************************************************\
- Wendy -- Synthesizing Partners for Services
-
- Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
-
- Wendy is free software: you can redistribute it and/or modify it under the
- terms of the GNU Affero General Public License as published by the Free
- Software Foundation, either version 3 of the License, or (at your option)
- any later version.
-
- Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
- more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
-
-/*!
- * \file  Output.cc
- */
-
+#include <config.h>
+#include <libgen.h>
+#include <unistd.h>
 #include <fstream>
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
-#include <libgen.h>
-#include <unistd.h>
-#include "config.h"
+#include "verbose.h"
 #include "Output.h"
 
-/*!
- * \todo  Fix verbose output and error handling.
- */
+#ifdef HAVE_CONFIG
+#include <config.h>
+#endif
+
+
+/******************
+ * STATIC MEMBERS *
+ ******************/
 
 namespace pnapi
 {
 namespace util
 {
-char* tmpFileTemplate = (char*)"/tmp/pnapi-XXXXXX";
+
+#ifdef HAVE_CONFIG
+std::string Output::tempfileTemplate = std::string("/tmp/") + PACKAGE_TARNAME + "-XXXXXX";
+#else
+std::string Output::tempfileTemplate = "/tmp/temp-XXXXXX";
+#endif
+bool Output::keepTempfiles = true;
 }
 }
 
@@ -49,40 +37,35 @@ using namespace pnapi::util;
  ***************/
 
 /*!
- This constructor creates a temporary file using mktemp().
- In case of MinGW compilations, the
- basename has to be used to avoid problems with path names.
- */
+ This constructor creates a temporary file using createTmp() as helper.
+*/
 Output::Output() :
-  os(*(new std::ofstream(createTmp(), std::ofstream::out | std::ofstream::trunc))),
-  filename(temp), kind("")
+    os(*(new std::ofstream(createTmp(), std::ofstream::out | std::ofstream::trunc))),
+    filename(temp), temp(temp), kind("")
 {
-  // status("writing to temporary file '%s'", _cfilename_(filename));
+    status("writing to temporary file '%s'", _cfilename_(filename));
 }
 
 /*!
  This constructor creates a file with the given filename. In case the
  filename matches "-", no file is created, but std::cout is used as output.
- */
+*/
 Output::Output(const std::string& str, const std::string& kind) :
-  os((!str.compare("-")) ?
-      std::cout :
-      *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
-  ),
-  filename(str), temp(NULL), kind(kind)
+    os((!str.compare("-")) ?
+        std::cout :
+        *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
+    ),
+    filename(str), temp(NULL), kind(kind)
 {
-  if (not os.good()) {
-      // abort(11, "could not write to file '%s'", _cfilename_(filename));
-      std::cerr << "PNAPI: could not write to file '" << filename << "'" << std::endl;
-      exit(EXIT_FAILURE);
-  }
-  
-  /*
-  if (str.compare("-")) {
-      status("writing %s to file '%s'", _coutput_(kind), _cfilename_(filename));
-  } else {
-      status("writing %s to standard output", _coutput_(kind));
-  } //*/
+    if (not os.good()) {
+        abort(11, "could not write to file '%s'", _cfilename_(filename));
+    }
+
+    if (str.compare("-")) {
+        status("writing %s to file '%s'", _coutput_(kind), _cfilename_(filename));
+    } else {
+        status("writing %s to standard output", _coutput_(kind));
+    }
 }
 
 
@@ -91,33 +74,30 @@ Output::Output(const std::string& str, const std::string& kind) :
  **************/
 
 /*!
- This destructor closes the associated file. 
-Temporary files are deleted after closing.
- */
-Output::~Output() 
-{
-  if (&os != &std::cout) 
-  {
-    delete(&os);
-    /*
-    if (!temp) 
-    {
-      status("closed file '%s'", filename.c_str());
-    } 
-    else 
-    {
-      if (remove(filename.c_str()) == 0) 
-      {
-          status("closed and deleted temporary file '%s'", filename.c_str());
-      } 
-      else 
-      {
-          status("closed, but could not delete temporary file '%s'", filename.c_str());
-      }
-    } //*/
-    remove(filename.c_str());
-    free(temp);
-  }
+ This destructor closes the associated file. Unless the class is configured
+ to keep temporary files (by calling setKeepTempfiles()), temporary files are
+ deleted after closing.
+*/
+Output::~Output() {
+    if (&os != &std::cout) {
+        delete(&os);
+        if (temp == NULL) {
+            status("closed file '%s'", _cfilename_(filename));
+        } else {
+            if (keepTempfiles) {
+                status("closed temporary file '%s'", _cfilename_(filename));
+            } else {
+                if (remove(filename.c_str()) == 0) {
+                    status("closed and deleted temporary file '%s'", _cfilename_(filename));
+                } else {
+                    // this should never happen, because mkstemp creates temp
+                    // files in mode 0600.
+                    status("closed, but could not delete temporary file '%s'", _cfilename_(filename));
+                }
+            }
+            free(temp);
+        }
+    }
 }
 
 
@@ -128,9 +108,9 @@ Output::~Output()
 /*!
  This implicit conversation operator allows to use Output objects like
  ostream streams.
- */
+*/
 Output::operator std::ostream&() const {
-  return os;
+    return os;
 }
 
 
@@ -139,11 +119,11 @@ Output::operator std::ostream&() const {
  ********************/
 
 std::string Output::name() const {
-  return filename;
+    return filename;
 }
 
 std::ostream& Output::stream() const {
-  return os;
+    return os;
 }
 
 /*!
@@ -156,23 +136,30 @@ std::ostream& Output::stream() const {
  \note mkstemp already opens the temp file, so there is no need to check
        whether the creation of the std::ofstream succeeded.
 */
-char * Output::createTmp()
-{
+char* Output::createTmp() {
 #ifdef __MINGW32__
-    temp = strdup(basename(tmpFileTemplate));
-    if (mktemp(temp) == NULL)
-    {
-      // abort(13, "could not create to temporary file '%s'", basename(args_info.tmpfile_arg));
-      std::cerr << "could not create to temporary file '" << basename(tmpFileTemplate) << "'\n";
-      exit(EXIT_FAILURE);
+    temp = basename(const_cast<char*>(tempfileTemplate.c_str()));
+    if (mktemp(temp) == NULL) {
+        abort(13, "could not create to temporary file '%s'", basename(const_cast<char*>(tempfileTemplate.c_str())));
     };
 #else
-    temp = strdup(tmpFileTemplate);
+    temp = strdup(tempfileTemplate.c_str());
     if (mkstemp(temp) == -1) {
-      // abort(13, "could not create to temporary file '%s'", temp);
-      std::cerr << "could not create to temporary file '" << temp << "'\n";
-      exit(EXIT_FAILURE);
+        abort(13, "could not create to temporary file '%s'", temp);
     };
 #endif
     return temp;
+}
+
+
+/***************************
+ * STATIC MEMBER FUNCTIONS *
+ ***************************/
+
+void Output::setTempfileTemplate(std::string s) {
+    tempfileTemplate = s;
+}
+
+void Output::setKeepTempfiles(bool b) {
+    keepTempfiles = b;
 }

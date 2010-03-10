@@ -19,8 +19,8 @@ namespace pnapi
 /*!
  * \brief   constructs a new node
  *
- *          A new LinkNode for the interface place #place with 
- *          distribution mode #mode is created.
+ *          A new LinkNode for the interface place "place" with 
+ *          distribution mode "mode" is created.
  */
 LinkNode::LinkNode(Place & place, Mode mode, bool internalizePlace) : 
   place_(&place),
@@ -75,7 +75,7 @@ void LinkNode::joinPlaces()
  *          returned as a set. After calling #expand() for a node the node
  *          should no longer be used.
  */
-vector<LinkNode *> LinkNode::expand()
+std::vector<LinkNode *> LinkNode::expand()
 {
   assert(!links_.empty());
 
@@ -178,7 +178,7 @@ Place & LinkNode::connectPlace(Transition & trans)
 }
 
 
-vector<LinkNode *> LinkNode::createNodes(vector<Place *> & places)
+std::vector<LinkNode *> LinkNode::createNodes(std::vector<Place *> & places)
 {
   assert(places.size() == links_.size());
 
@@ -201,4 +201,4 @@ vector<LinkNode *> LinkNode::createNodes(vector<Place *> & places)
   return nodes;
 }
 
-}
+} /* namespace pnapi */

@@ -71,7 +71,7 @@ State::~State()
 
 /*!
  */
- const unsigned int State::name() const
+ unsigned int State::name() const
  {
    return name_;
  }
@@ -163,7 +163,7 @@ State::~State()
 
  /*!
   */
- const unsigned int State::hashValue()
+ unsigned int State::hashValue()
  {
    return hashValue_;
  }
@@ -171,7 +171,7 @@ State::~State()
 
  /*!
   */
- const unsigned int State::size() const
+ unsigned int State::size() const
  {
    if (m_ != NULL)
      return m_->size();
@@ -224,7 +224,7 @@ State::~State()
 
  /// copy a state from one automaton to another one
  State * State::copy(const State & s, PetriNet * net,
-     map<const Place*, const Place*> * placeMap)
+     std::map<const Place*, const Place*> * placeMap)
  {
    State * copy = new State(s.name_);
    copy->isFinal_ = s.isFinal_;

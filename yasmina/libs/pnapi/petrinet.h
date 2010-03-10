@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: niels $
+ *          last changes of: $Author: georgstraube $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-01-15 15:13:46 +0100 (Fri, 15 Jan 2010) $
+ * \date    $Date: 2010-02-17 21:08:43 +0100 (Wed, 17 Feb 2010) $
  *
- * \version $Revision: 5209 $
+ * \version $Revision: 5408 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -29,6 +29,7 @@
 #include "myio.h"
 #include "condition.h"
 #include "component.h"
+#include "interface.h"
 
 #ifndef CONFIG_PETRIFY
 #define CONFIG_PETRIFY "not found"
@@ -145,8 +146,8 @@ public:
  * \brief   A Petri net
  *
  * Class to represent Petri nets. The net consists of places of
- * class #Place, transitions of class #Transition and arcs of class
- * #Arc.
+ * class Place, transitions of class Transition and arcs of class
+ * Arc.
  */
 class PetriNet
 {
@@ -172,6 +173,9 @@ class PetriNet
 
   /// Petri net output, see pnapi::io
   friend std::ostream & io::__pnml::output(std::ostream &, const PetriNet &);
+
+  /// Petri net output, see pnapi::io
+  friend std::ostream & io::__woflan::output(std::ostream &, const PetriNet &);
 
 public:
 
@@ -311,7 +315,8 @@ public:
   /*!
    * \name   Basic Structural Changes
    *
-   * Functions to add nodes (Node, Place, Transition) and arcs (Arc).
+   * Functions to add nodes (Node, Place, Transition), arcs (Arc)
+   * and interface, i.e. ports (Port) and labels (Label).
    */
   //@{
 
@@ -327,6 +332,26 @@ public:
   Transition & createTransition(const std::string & = "",
       const std::set<std::string> & = std::set<std::string>());
 
+  /// creates a Port
+  Port & createPort(const std::string &);
+
+  /// creates an input Label
+  Label & createInputLabel(const std::string &, const std::string &);
+
+  /// creates an input Label
+  Label & createInputLabel(const std::string &, Port * = NULL);
+
+  /// creates an output Label
+  Label & createOutputLabel(const std::string &, const std::string &);
+
+  /// creates an output Label
+  Label & createOutputLabel(const std::string &, Port * = NULL);
+
+  /// creates a synchronous Label
+  Label & createSynchronizeLabel(const std::string &, const std::string &);
+
+  /// creates a synchronous Label
+  Label & createSynchronizeLabel(const std::string &, Port * = NULL);
 
   //@}
 
@@ -464,6 +489,9 @@ private:
 
   /// all synchronous labels
   std::set<std::string> labels_;
+
+  /// complete interface
+  Interface interface_;
 
   /* general properties */
 

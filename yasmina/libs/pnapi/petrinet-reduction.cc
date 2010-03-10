@@ -22,7 +22,7 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2009-11-29 14:51:22 +0100 (Sun, 29 Nov 2009) $
+ * \date    \$Date: 2010-02-18 17:09:06 +0100 (Thu, 18 Feb 2010) $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  *          für Petrinetze" ([Pil08])". These rules preserve lifeness and
  *          k-boundedness.         
  * 
- * \version \$Revision: 5107 $
+ * \version \$Revision: 5409 $
  *
  * \ingroup petrinet
  * 
@@ -701,7 +701,7 @@ unsigned int PetriNet::reduce_rule_4()
 /*!
  * \brief Checks, wether the postset of a set of nodes is empty.
  */
-bool PetriNet::reduce_emptyPostset(const set<Node*> & nodes)
+bool PetriNet::reduce_emptyPostset(const std::set<Node*> & nodes)
 {
   PNAPI_FOREACH(set<Node*>, nodes, n)
   {
@@ -714,7 +714,7 @@ bool PetriNet::reduce_emptyPostset(const set<Node*> & nodes)
 /*!
  * \brief Check if the preset of a set stores only one item.
  */
-bool PetriNet::reduce_singletonPreset(const set<Node*> & nodes)
+bool PetriNet::reduce_singletonPreset(const std::set<Node*> & nodes)
 {
   PNAPI_FOREACH(set<Node*>, nodes, n)
   {
@@ -1764,9 +1764,13 @@ unsigned int PetriNet::reduce_identical_transitions()
   // obsolete transitions and its "backup"-transition
   set<pair<Transition*, Transition*> > transitionPairs;
   map<Node*,bool> backupTransition; // must not be reduced
+  map<Node*,bool> obsoleteTransition; // must not be backup transitions
 
   PNAPI_FOREACH(set<Transition*>, transitions_, t)
+  {
     backupTransition[*t] = false;
+    obsoleteTransition[*t] = false;
+  }
 
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RB2 (elimination of identical transitions)...\n");
 
@@ -1810,6 +1814,9 @@ unsigned int PetriNet::reduce_identical_transitions()
     {
       PNAPI_FOREACH(set<Node*>, prePlace->getPostset(), t2)
       {
+        if(obsoleteTransition[*t2])
+          continue;
+        
         if ( (*t1 != *t2) &&		// precondition 1
             ((*t1)->getPreset() == (*t2)->getPreset()) &&	// precondition 2
             ((*t1)->getPostset() == (*t2)->getPostset()) ) // precondition 3
@@ -1840,6 +1847,8 @@ unsigned int PetriNet::reduce_identical_transitions()
           // transitions fullfill the preconditions
           transitionPairs.insert(pair<Transition*, Transition*>(*t1, static_cast<Transition*>(*t2)));
           backupTransition[*t2] = true; // mark t2 as backup transition
+          obsoleteTransition[*t1] = true; // t1 should not become a backup transition
+          break;
         }
       }
     }
@@ -1853,6 +1862,9 @@ unsigned int PetriNet::reduce_identical_transitions()
       {
         PNAPI_FOREACH(set<Node*>, postPlace->getPreset(), t2)
         {
+          if(obsoleteTransition[*t2])
+            continue;
+          
           if ( (*t1 != *t2) &&     // precondition 1
               ((*t2)->getPreset().empty()) && // precondition 2
               ((*t1)->getPostset() == (*t2)->getPostset()) ) // precondition 3
@@ -1874,6 +1886,8 @@ unsigned int PetriNet::reduce_identical_transitions()
             // transitions fullfill the preconditions
             transitionPairs.insert(pair<Transition*, Transition*>(*t1, static_cast<Transition*>(*t2)));
             backupTransition[*t2] = true; // mark t2 as backup transition
+            obsoleteTransition[*t1] = true; // t1 should not become a backup transition
+            break;
           }
         }
       }

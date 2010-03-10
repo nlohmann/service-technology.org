@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: georgstraube $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-01-21 00:59:06 +0100 (Thu, 21 Jan 2010) $
+ * \date    $Date: 2010-02-17 21:08:43 +0100 (Wed, 17 Feb 2010) $
  *
- * \version $Revision: 5253 $
+ * \version $Revision: 5408 $
  */
 
 #ifndef PNAPI_PETRINODE_H
@@ -97,6 +97,9 @@ public:
 
   /// returns the name history
   std::deque<std::string> getNameHistory() const;
+
+  /// set new name of the node
+  void setName(std::string newName);
 
   /// adds a prefix to all names
   void prefixNameHistory(const std::string &);
@@ -254,6 +257,9 @@ public:
   /// returns the number of tokens lying on this place
   unsigned int getTokenCount() const;
 
+  /// sets the number of tokens lying on this place
+  void setTokenCount(unsigned int);
+
   /// returns the capacity
   unsigned int getCapacity() const;
 
@@ -316,7 +322,7 @@ private:
  * \brief   arcs of the Petri net
  *
  * Class to represent arcs of Petri nets. An arc written as a tupel
- * (n1,n2) has n1 as #source and n2 as #target.
+ * (n1,n2) has n1 as source and n2 as target.
  */
 class Arc
 {

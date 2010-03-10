@@ -33,6 +33,8 @@
 #include <iostream>
 #include "pnapi.h"
 
+
+
 // forward declarations
 class Adapter;
 class RuleSet;
@@ -110,12 +112,12 @@ class Adapter
     //! vector of all nets being adapted
     std::vector< pnapi::PetriNet * > & _nets;
 
-    private:
+    
         
         //! pnapi::PetriNet containing the engine part of the adapter
 	   pnapi::PetriNet * _engine;
 
-        
+    private:    
         //! a #RuleSet which describes the engines behavior
         RuleSet & _rs;
         
@@ -230,14 +232,24 @@ class RuleSet {
                  * 
                  * \return the associated #rulepair
                  */
-                inline const rulepair & getRule() const;
+                //inline 
+				//const rulepair & getRule() const;
+			const rulepair & getRule() const 
+			{
+				
+				
+				return _rule; 
+			}
                 
                 /*!
                  * \brief Returns the #syncList associated with the object.
                  * 
                  * \return the associated #syncList
                  */
-                inline const syncList & getSyncList() const;
+			const syncList & getSyncList() const 
+			{	
+				return _syncList;
+			}
                 
                 /*!
                  * \brief Returns the modus of the transformation rule.

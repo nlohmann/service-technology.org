@@ -52,6 +52,10 @@ option "verbose" v
   "Verbose output"
   flag off
 
+option "net" n
+  "The composed net is printed to standard output"
+  flag off
+
 section "Configuration"
 sectiondesc="These options configure Yasmina.\n"
 

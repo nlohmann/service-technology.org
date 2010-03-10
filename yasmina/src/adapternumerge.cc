@@ -41,6 +41,7 @@
 //#include "Output.h"
 #include "pnapi.h"
 
+
 std::string toString(const int i){
 	
 	std::stringstream ssout;
@@ -537,7 +538,7 @@ void Adapter::createRuleTransitions()
         
         // add costs to the transition
         trans->setCost(rule.getCosts());
-        status("setting costs %d for %s", rule.getCosts(), transName.c_str());
+       // status("setting costs %d for %s", rule.getCosts(), transName.c_str());
 
         cost_file_content += "sync_" + transName + " " + toString(rule.getCosts()) + ";\n";
         
@@ -917,7 +918,7 @@ void RuleSet::addRules(FILE * inputStream)
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
     adapt_rules_yylex_destroy();
 #endif
-std::cout<<std::endl<<"I am here"<<std::endl;
+//std::cout<<std::endl<<"I am here"<<std::endl;
     
 }
 
@@ -972,19 +973,20 @@ RuleSet::AdapterRule::~AdapterRule()
     
 }
 
-inline const RuleSet::AdapterRule::rulepair & RuleSet::AdapterRule::getRule() const 
-{
+///inline 
+//const RuleSet::AdapterRule::rulepair & RuleSet::AdapterRule::getRule() const 
+//{
     
     
-    return _rule; 
-}
+  //  return _rule; 
+//}
 
-inline const RuleSet::AdapterRule::syncList & RuleSet::AdapterRule::getSyncList() const 
-{
+//inline const RuleSet::AdapterRule::syncList & RuleSet::AdapterRule::getSyncList() const 
+//{
     
     
-    return _syncList; 
-}
+  //  return _syncList; 
+//}
 
 inline const RuleSet::AdapterRule::cfMode & RuleSet::AdapterRule::getMode() const
 { 

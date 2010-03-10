@@ -106,9 +106,11 @@ PetriNet::PetriNet(const Automaton &sa) :
 
 /*!
  * \brief     creates a TG file of the graph
+ * 
  * \param     edgeLabels a reference to a vector of strings containing the old
  *            label names from this graph
  * \param     out a reference to the output class handleing the temporary file
+ * \param     converter the converter from Automatons to PetriNets
  * 
  * \pre       edgeLabels is empty
  * \post      edgeLabels stores a mapping from event number to event label
@@ -205,7 +207,7 @@ void Automaton::printToTransitionGraph(std::vector<std::string> & edgeLabels,
  * 
  * \post  delimeter ('/' or '_') will be replaced by ':')
  */
-string PetriNet::remap(string edge, vector<string> & edgeLabels)
+string PetriNet::remap(std::string edge, std::vector<std::string> & edgeLabels)
 {
   char delimeter = (automatonConverter_ == PETRIFY) ? '/' : '_';
 
@@ -228,14 +230,18 @@ string PetriNet::remap(string edge, vector<string> & edgeLabels)
 /*!
  * \brief   creates a petri net from an STG file
  *
+ * \param   edgeLabels mapping from edges' name (an unsigned integer) to their label
  * \param   fileName location of the STG file
+ * \param   inputPlacenames set of labels, that name input places
+ * \param   outputPlacenames set of labels, that name output places
+ * \param   synchronizeLabels set of labels, that name synchronization labels
  *
  * \note    - this function has been outsourced from fiona and recently only needed by fiona
  *          - petrify is needed to call this function
  *
  */
-void PetriNet::createFromSTG(vector<string> &edgeLabels,
-    const string &fileName,
+void PetriNet::createFromSTG(std::vector<std::string> &edgeLabels,
+    const std::string &fileName,
     std::set<std::string> &inputPlacenames,
     std::set<std::string> &outputPlacenames,
     std::set<std::string> &synchronizeLabels)
@@ -255,7 +261,8 @@ void PetriNet::createFromSTG(vector<string> &edgeLabels,
     systemcall = pathToGenet_ + " -k " + ss.str() + " " + fileName + " > " + pnFileName;
   }
 
-  int result = system(systemcall.c_str());
+  //int result = system(systemcall.c_str());
+  system(systemcall.c_str());
 
   /// does not work for Genet, there seems to be a bug in Cudd
   //assert(result == 0);

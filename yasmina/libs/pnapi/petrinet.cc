@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: niels $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2010-01-21 00:59:06 +0100 (Thu, 21 Jan 2010) $
+ * \date    $Date: 2010-02-12 08:13:44 +0100 (Fri, 12 Feb 2010) $
  *
- * \version $Revision: 5253 $
+ * \version $Revision: 5394 $
  */
 
 #include "config.h"
@@ -75,7 +75,7 @@ PetriNet & ComponentObserver::getPetriNet() const
 /*!
  */
 void ComponentObserver::updateNodeNameHistory(Node & node,
-    const std::deque<string> & oldHistory)
+    const std::deque<std::string> & oldHistory)
 {
   assert(net_.containsNode(node));
 
@@ -198,6 +198,7 @@ void ComponentObserver::updateNodes(Node & node)
 }
 
 
+/// \bug Why is node1 not used?
 void ComponentObserver::updateNodesMerged(Node & node1, Node & node2)
 {
   //assert(node2.getNameHistory().empty());
@@ -234,8 +235,9 @@ void ComponentObserver::initializeNodeNameHistory(Node & node)
 }
 
 
+/// \bug Why is node not used?
 void ComponentObserver::finalizeNodeNameHistory(Node & node,
-    const deque<string> & history)
+    const std::deque<std::string> & history)
 {
   deque<string>::const_iterator it = history.begin();
   //for (deque<string>::const_iterator it = history.begin();
@@ -318,10 +320,10 @@ void ComponentObserver::finalizePlaceType(Place & place, Node::Type type)
  */
 
 /// path to petrify
-string PetriNet::pathToPetrify_ = CONFIG_PETRIFY;
+std::string PetriNet::pathToPetrify_ = CONFIG_PETRIFY;
 
 /// path to genet
-string PetriNet::pathToGenet_ = CONFIG_GENET;
+std::string PetriNet::pathToGenet_ = CONFIG_GENET;
 
 /// converter Automaton => PetriNet
 PetriNet::AutomatonConverter PetriNet::automatonConverter_ = PETRIFY;
@@ -348,11 +350,12 @@ PetriNet::PetriNet() :
  * \note    The condition is standardly set to True.
  */
 PetriNet::PetriNet(const PetriNet & net) :
+  roles_(net.roles_),
   labels_(net.labels_),
   observer_(*this),
   finalCondition_(net.finalCondition_, copyStructure(net)),
-  meta_(net.meta_), warnings_(net.warnings_), ignoreRoles_(net.isIgnoringRoles()),
-  reducablePlaces_(NULL)
+  meta_(net.meta_), warnings_(net.warnings_),
+  reducablePlaces_(NULL), ignoreRoles_(net.isIgnoringRoles())
   {
   setConstraintLabels(net.constraints_);
   }
@@ -414,8 +417,8 @@ PetriNet & PetriNet::operator=(const PetriNet & net)
 
 /*!
  */
-map<const Place *, const Place *>
-PetriNet::copyPlaces(const PetriNet & net, const string & prefix)
+std::map<const Place *, const Place *>
+PetriNet::copyPlaces(const PetriNet & net, const std::string & prefix)
 {
   map<const Place *, const Place *> placeMapping;
   for (set<Place *>::iterator it = net.places_.begin();
@@ -434,8 +437,8 @@ PetriNet::copyPlaces(const PetriNet & net, const string & prefix)
  * \pre   the node names are unique (disjoint name sets); use
  *        prefixNodeNames() on <em>both</em> nets to achieve this
  */
-map<const Place *, const Place *>
-PetriNet::copyStructure(const PetriNet & net, const string & prefix)
+std::map<const Place *, const Place *>
+PetriNet::copyStructure(const PetriNet & net, const std::string & prefix)
 {
   // add all transitions of the net
   for (set<Transition *>::iterator it = net.transitions_.begin();
@@ -477,10 +480,10 @@ const Condition & PetriNet::finalCondition() const
 /*!
  * \brief Merges this net with a second net.
  * 
- * Given a second Petri net #net, a resulting net is created
+ * Given a second Petri net "net", a resulting net is created
  * by applying the following steps:
  * 
- * 1.: Internal places of this net and #net are prefixed and copied
+ * 1.: Internal places of this net and "net" are prefixed and copied
  *     in the resulting net
  * 2.: Input and output places are connected appropriatly 
  *     (if an input and an output place name of the two nets match)
@@ -503,8 +506,8 @@ const Condition & PetriNet::finalCondition() const
  * \todo  Think about synchronous transitions!!!
  * 
  */
-void PetriNet::compose(const PetriNet & net, const string & prefix,
-    const string & netPrefix)
+void PetriNet::compose(const PetriNet & net, const std::string & prefix,
+    const std::string & netPrefix)
 {
   PetriNet result;
   // mapping from source nets' places to result net's places
@@ -523,7 +526,7 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
     placeMap[*p] = &result.createPlace(prefix+(*p)->getName(), Node::INTERNAL, (*p)->getTokenCount());
   }
 
-  // copy internal places of #net
+  // copy internal places of "net"
   for (set<Place *>::iterator p = netPlaces.begin(); 
   p != netPlaces.end(); ++p)
   {
@@ -543,9 +546,9 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
   p != thisInput.end(); ++p)
   {
     Place *rp = NULL; // place in result net
-    Place *opponent = net.findPlace((*p)->getName()); // place in #net
+    Place *opponent = net.findPlace((*p)->getName()); // place in "net"
 
-    if ( (opponent == NULL) || // if this place doesn't occur in #net
+    if ( (opponent == NULL) || // if this place doesn't occur in "net"
         (opponent->getType() != Node::OUTPUT) ) // if the found place is no matching output place
     {
       // then the resulting place remains an interface place
@@ -557,7 +560,7 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
       rp = &result.createPlace((*p)->getName());
 
       /* places are already merged, so the corresponding
-       * output place can be removed from #net's output set. */ 
+       * output place can be removed from "net"'s output set. */ 
       netOutput.erase(opponent);
 
       placeMap[opponent] = rp;
@@ -571,9 +574,9 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
   p != thisOutput.end(); ++p)
   {
     Place *rp = NULL; // place in result net
-    Place *opponent = net.findPlace((*p)->getName()); // place in #net
+    Place *opponent = net.findPlace((*p)->getName()); // place in "net"
 
-    if ( (opponent == NULL) || // if this place doesn't occur in #net
+    if ( (opponent == NULL) || // if this place doesn't occur in "net"
         (opponent->getType() != Node::INPUT) ) // if the found place is no matching input place
     {
       // then the resulting place remains an interface place
@@ -585,7 +588,7 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
       rp = &result.createPlace((*p)->getName());
 
       /* places are already merged, so the corresponding
-       * input place can be removed from #net's input set. */ 
+       * input place can be removed from "net"'s input set. */ 
       netInput.erase(opponent);
 
       placeMap[opponent] = rp;
@@ -599,7 +602,7 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
    * places are also interface places in the resulting net
    */
 
-  // iterate #net's input places
+  // iterate "net"'s input places
   for (set<Place *>::iterator p = netInput.begin(); 
   p != netInput.end(); ++p)
   {
@@ -607,7 +610,7 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
     placeMap[*p] = np;
   }
 
-  // iterate #net's output places
+  // iterate "net"'s output places
   for (set<Place *>::iterator p = netOutput.begin(); 
   p != netOutput.end(); ++p)
   {
@@ -658,7 +661,7 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
     }
   }
 
-  // iterate through #net's transitions and copy transitions
+  // iterate through "net"'s transitions and copy transitions
   for (set<Transition *>::iterator t = net.getTransitions().begin(); 
   t != net.getTransitions().end(); ++t)
   {
@@ -739,14 +742,14 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
           result.createArc(rt, *const_cast<Place*>(placeMap[(Place*)&(*f)->getTargetNode()]), (*f)->getWeight());
         }
 
-        // copy #net's preset arcs
+        // copy "net"'s preset arcs
         for (set<Arc *>::iterator f = (*t2)->getPresetArcs().begin(); 
         f != (*t2)->getPresetArcs().end(); ++f)
         {
           result.createArc(*const_cast<Place*>(placeMap[(Place*)&(*f)->getSourceNode()]), rt, (*f)->getWeight());
         }
 
-        // copy #net's postset arcs
+        // copy "net"'s postset arcs
         for (set<Arc *>::iterator f = (*t2)->getPostsetArcs().begin(); 
         f != (*t2)->getPostsetArcs().end(); ++f)
         {
@@ -895,16 +898,18 @@ void PetriNet::compose(const PetriNet & net, const string & prefix,
  * \param prefixB the net prefix for the 2nd net
  *
  * The result is written to the net which has called the method.
+ *
+ * \bug Why is neither parameter used?
  */
-void PetriNet::composeByPorts(const PetriNet &net, const string &portA,
-    const string &portB, const string &prefixA, const string &prefixB)
+void PetriNet::composeByPorts(const PetriNet &net, const std::string &portA,
+    const std::string &portB, const std::string &prefixA, const std::string &prefixB)
 {
 }
 
 
 /*!
  */
-PetriNet PetriNet::composeByWiring(const map<string, PetriNet *> & nets)
+PetriNet PetriNet::composeByWiring(const std::map<std::string, PetriNet *> & nets)
 {
   PetriNet result;
 
@@ -944,7 +949,7 @@ PetriNet PetriNet::composeByWiring(const map<string, PetriNet *> & nets)
 /*!
  */
 void PetriNet::wire(const PetriNet & net1, const PetriNet & net2,
-    map<Place *, LinkNode *> & wiring)
+    std::map<Place *, LinkNode *> & wiring)
 {
   set<Place *> interface = net1.getInterfacePlaces();
 
@@ -974,8 +979,8 @@ void PetriNet::wire(const PetriNet & net1, const PetriNet & net2,
 /*!
  */
 PetriNet &
-PetriNet::createFromWiring(map<string, vector<PetriNet> > & instances,
-    const map<Place *, LinkNode *> & wiring)
+PetriNet::createFromWiring(std::map<std::string, std::vector<PetriNet> > & instances,
+    const std::map<Place *, LinkNode *> & wiring)
 {
   vector<LinkNode *> wiredNodes;
   wiredNodes.reserve(wiring.size());
@@ -1057,11 +1062,15 @@ Arc & PetriNet::createArc(Node & source, Node & target, unsigned int weight)
  *
  * \param   name  the (initial) name of the place
  * \param   type  communication type of the place (internal or interface)
+ * \param   tokens initial marking of this place
+ * \param   capacity capacity of this place
+ * \param   port the port this place belongs to
+ * 
  * \return  the newly created place
  */
-Place & PetriNet::createPlace(const string & name, Node::Type type,
+Place & PetriNet::createPlace(const std::string & name, Node::Type type,
     unsigned int tokens, unsigned int capacity,
-    const string & port)
+    const std::string & port)
 {
   return *new Place(*this, observer_,
       name.empty() ? getUniqueNodeName("p") : name, type,
@@ -1072,12 +1081,75 @@ Place & PetriNet::createPlace(const string & name, Node::Type type,
 /*!
  * If an empty name is given, one is generated using getUniqueNodeName().
  */
-Transition & PetriNet::createTransition(const string & name,
+Transition & PetriNet::createTransition(const std::string & name,
     const std::set<std::string> & labels)
 {
   return *new Transition(*this, observer_,
       name.empty() ? getUniqueNodeName("t") : name,
           labels);
+}
+
+
+/*!
+ * Introduces a new port to the open net.
+ */
+Port & PetriNet::createPort(const string & name)
+{
+  return interface_.addPort(name);
+}
+
+
+/*!
+ * Creates an input label.
+ */
+Label & PetriNet::createInputLabel(const string & name, Port *port)
+{
+  return interface_.addInputLabel(name, port);
+}
+
+
+/*!
+ * Creates an input label
+ */
+Label & PetriNet::createInputLabel(const string & name, const string & port)
+{
+  return interface_.addInputLabel(name, port);
+}
+
+
+/*!
+ * Creates an output label
+ */
+Label & PetriNet::createOutputLabel(const string & name, Port *port)
+{
+  return interface_.addOutputLabel(name, port);
+}
+
+
+/*!
+ * Creates an output label
+ */
+Label & PetriNet::createOutputLabel(const string & name, const string & port)
+{
+  return interface_.addOutputLabel(name, port);
+}
+
+
+/*!
+ * Creates a synchronous label
+ */
+Label & PetriNet::createSynchronizeLabel(const string & name, Port *port)
+{
+  return interface_.addSynchronousLabel(name, port);
+}
+
+
+/*!
+ * Creates a synchronous label
+ */
+Label & PetriNet::createSynchronizeLabel(const string & name, const string & port)
+{
+  return interface_.addSynchronousLabel(name, port);
 }
 
 
@@ -1091,7 +1163,7 @@ bool PetriNet::containsNode(Node & node) const
 
 /*!
  */
-bool PetriNet::containsNode(const string & name) const
+bool PetriNet::containsNode(const std::string & name) const
 {
   return findNode(name) != NULL;
 }
@@ -1099,7 +1171,7 @@ bool PetriNet::containsNode(const string & name) const
 
 /*!
  */
-Node * PetriNet::findNode(const string & name) const
+Node * PetriNet::findNode(const std::string & name) const
 {
   map<string, Node *>::const_iterator result = nodesByName_.find(name);
 
@@ -1114,7 +1186,7 @@ Node * PetriNet::findNode(const string & name) const
  * \return  a pointer to the place or a NULL pointer if the place was not
  *          found.
  */
-Place * PetriNet::findPlace(const string & name) const
+Place * PetriNet::findPlace(const std::string & name) const
 {
   // if we had a map placesByName we could avoid the dynamic cast here
   return dynamic_cast<Place *>(findNode(name));
@@ -1125,7 +1197,7 @@ Place * PetriNet::findPlace(const string & name) const
  * \return  a pointer to the transition or a NULL pointer if the transition
  *          was not found.
  */
-Transition * PetriNet::findTransition(const string & name) const
+Transition * PetriNet::findTransition(const std::string & name) const
 {
   // if we had a map transitionsByName we could avoid the dynamic cast here
   return dynamic_cast<Transition *>(findNode(name));
@@ -1149,7 +1221,7 @@ Arc * PetriNet::findArc(const Node & source, const Node & target) const
 
 /*!
  */
-const set<Node *> & PetriNet::getNodes() const
+const std::set<Node *> & PetriNet::getNodes() const
 {
   return nodes_;
 }
@@ -1157,7 +1229,7 @@ const set<Node *> & PetriNet::getNodes() const
 
 /*!
  */
-const set<Place *> & PetriNet::getPlaces() const
+const std::set<Place *> & PetriNet::getPlaces() const
 {
   return places_;
 }
@@ -1165,7 +1237,7 @@ const set<Place *> & PetriNet::getPlaces() const
 
 /*!
  */
-const set<Place *> & PetriNet::getInternalPlaces() const
+const std::set<Place *> & PetriNet::getInternalPlaces() const
 {
   return internalPlaces_;
 }
@@ -1173,7 +1245,7 @@ const set<Place *> & PetriNet::getInternalPlaces() const
 
 /*!
  */
-const set<Place *> & PetriNet::getInputPlaces() const
+const std::set<Place *> & PetriNet::getInputPlaces() const
 {
   return inputPlaces_;
 }
@@ -1181,7 +1253,7 @@ const set<Place *> & PetriNet::getInputPlaces() const
 
 /*!
  */
-const set<Place *> & PetriNet::getOutputPlaces() const
+const std::set<Place *> & PetriNet::getOutputPlaces() const
 {
   return outputPlaces_;
 }
@@ -1189,7 +1261,7 @@ const set<Place *> & PetriNet::getOutputPlaces() const
 
 /*!
  */
-const set<Place *> & PetriNet::getInterfacePlaces() const
+const std::set<Place *> & PetriNet::getInterfacePlaces() const
 {
   return interfacePlaces_;
 }
@@ -1197,7 +1269,7 @@ const set<Place *> & PetriNet::getInterfacePlaces() const
 
 /*!
  */
-set<Place *> PetriNet::getInterfacePlaces(const string & port) const
+std::set<Place *> PetriNet::getInterfacePlaces(const std::string & port) const
 {
   set<Place *> places;
   pair<multimap<string, Place *>::const_iterator,
@@ -1219,7 +1291,7 @@ const std::set<std::string> & PetriNet::getRoles() const
 
 /*!
  */
- const set<Transition *> & PetriNet::getTransitions() const
+ const std::set<Transition *> & PetriNet::getTransitions() const
  {
    return transitions_;
  }
@@ -1228,7 +1300,7 @@ const std::set<std::string> & PetriNet::getRoles() const
  /*!
   *
   */
- const set<Arc *> & PetriNet::getArcs() const
+ const std::set<Arc *> & PetriNet::getArcs() const
  {
    return arcs_;
  }
@@ -1252,7 +1324,7 @@ const std::set<std::string> & PetriNet::getRoles() const
  
  /*!
   */
- const set<Transition *> & PetriNet::getSynchronizedTransitions() const
+ const std::set<Transition *> & PetriNet::getSynchronizedTransitions() const
  {
    return synchronizedTransitions_;
  }
@@ -1267,7 +1339,7 @@ const std::set<std::string> & PetriNet::getRoles() const
   * 
   * \note  Throws an UnknownTransitionError if no such set exists.
   */
- const set<Transition *> & PetriNet::getSynchronizedTransitions(const string & label) const
+ const std::set<Transition *> & PetriNet::getSynchronizedTransitions(const std::string & label) const
  {
    map<string, set<Transition*> >::const_iterator t = transitionsByLabel_.find(label);
 
@@ -1348,7 +1420,7 @@ void PetriNet::removeRoles()
  * \param   base  base name
  * \return  a string to be used as a name for a new node
  */
-string PetriNet::getUniqueNodeName(const string & base) const
+std::string PetriNet::getUniqueNodeName(const std::string & base) const
 {
   int i = 1;
   string name;
@@ -1437,7 +1509,7 @@ bool PetriNet::isIgnoringRoles() const
  * \return  map<Transition *, string> a mapping representing the edge labels
  *          of the later service automaton.
  */
-const std::map<Transition *, string> PetriNet::normalize()
+const std::map<Transition *, std::string> PetriNet::normalize()
 {
   if (!getSynchronizedTransitions().empty())
   {
@@ -1506,8 +1578,8 @@ void PetriNet::makeInnerStructure()
  * \note  There is an error in definition 5: The arcs of the transitions
  *        with empty label are missing.
  */
-void PetriNet::produce(const PetriNet & net, const string & aPrefix,
-    const string & aNetPrefix) throw (io::InputError)
+void PetriNet::produce(const PetriNet & net, const std::string & aPrefix,
+    const std::string & aNetPrefix) throw (io::InputError)
     {
   typedef set<Transition *> Transitions;
   typedef map<Transition *, Transitions> Labels;
@@ -1578,7 +1650,7 @@ void PetriNet::produce(const PetriNet & net, const string & aPrefix,
 /*
  * \todo  maybe private again
  */
-void PetriNet::setConstraintLabels(const map<Transition *, set<string> > & labels)
+void PetriNet::setConstraintLabels(const std::map<Transition *, std::set<std::string> > & labels)
 {
   constraints_.clear();
   for (map<Transition *, set<string> >::const_iterator it = labels.begin();
@@ -1591,7 +1663,7 @@ void PetriNet::setConstraintLabels(const map<Transition *, set<string> > & label
 }
 
 
-map<Transition *, set<Transition *> >
+std::map<Transition *, std::set<Transition *> >
 PetriNet::translateConstraintLabels(const PetriNet & net)
 throw (io::InputError)
 {
@@ -1639,7 +1711,7 @@ Transition & PetriNet::createTransition(const Transition & t,
 /*!
  */
 void PetriNet::createArcs(Transition & trans, Transition & otherTrans,
-    const map<const Place *, const Place *> * placeMapping)
+    const std::map<const Place *, const Place *> * placeMapping)
 {
   typedef set<Arc *> Arcs;
 
@@ -1767,9 +1839,9 @@ void PetriNet::mirror()
  *** Private PetriNet Function Definitions
  ***************************************************************************/
 
-string PetriNet::getMetaInformation(std::ios_base & ios,
+std::string PetriNet::getMetaInformation(std::ios_base & ios,
     io::MetaInformation i,
-    const string & def) const
+    const std::string & def) const
     {
   map<io::MetaInformation, string> & streamMeta =
     io::util::MetaData::data(ios);
@@ -1787,7 +1859,7 @@ string PetriNet::getMetaInformation(std::ios_base & ios,
  * \param   prefix  the prefix to be added
  * \param   noInterface  whether interface places should not be prefixed
  */
-PetriNet & PetriNet::prefixNodeNames(const string & prefix, bool noInterface)
+PetriNet & PetriNet::prefixNodeNames(const std::string & prefix, bool noInterface)
 {
   if(noInterface)
   {
@@ -2027,3 +2099,17 @@ void PetriNet::normalize_rules()
 }
 
 } /* namespace pnapi */
+
+/*!
+ * This auxiliary function has the sole purpose to allow other tools to
+ * check whether they can link agains this PNAPI library using Autoconf's
+ * command "AC_CHECK_LIB(pnapi, libpnapi_is_present)".
+ *
+ * \return Always 0 to indicate successful termination.
+ */
+extern "C" {
+  char libpnapi_is_present() {
+      pnapi::PetriNet a();
+      return 0;
+  }
+}

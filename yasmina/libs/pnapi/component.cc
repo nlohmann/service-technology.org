@@ -32,7 +32,7 @@ using util::ComponentObserver;
 
 /*!
  */
-Node::Node(PetriNet & net, ComponentObserver & observer, const string & name,
+Node::Node(PetriNet & net, util::ComponentObserver & observer, const std::string & name,
     Type type) :
       net_(net), observer_(observer), type_(type)
       {
@@ -44,8 +44,8 @@ Node::Node(PetriNet & net, ComponentObserver & observer, const string & name,
 
 /*!
  */
-Node::Node(PetriNet & net, ComponentObserver & observer, const Node & node,
-    const string & prefix) :
+Node::Node(PetriNet & net, util::ComponentObserver & observer, const Node & node,
+    const std::string & prefix) :
       net_(net), observer_(observer), type_(node.type_), history_(node.history_)
       {
   assert(&observer.getPetriNet() == &net);
@@ -141,7 +141,7 @@ bool Node::isParallel(const Node & n2) const
 
 /*!
  */
-string Node::getName() const
+std::string Node::getName() const
 {
   assert(!history_.empty());
   return *history_.begin();
@@ -150,7 +150,7 @@ string Node::getName() const
 
 /*!
  */
-void Node::prefixNameHistory(const string & prefix)
+void Node::prefixNameHistory(const std::string & prefix)
 {
   assert(!prefix.empty());
   std::deque<string> oldHistory = history_;
@@ -163,11 +163,20 @@ void Node::prefixNameHistory(const string & prefix)
 
 /*!
  */
-std::deque<string> Node::getNameHistory() const
+std::deque<std::string> Node::getNameHistory() const
 {
   return history_;
 }
 
+/*!
+ */
+void Node::setName(std::string newName)
+{
+  // add history of node to this
+  std::deque<string> oldHistory = history_;
+  history_.push_front(newName);
+  observer_.updateNodeNameHistory(*this, oldHistory);
+}
 
 /*!
  */
@@ -179,7 +188,7 @@ PetriNet & Node::getPetriNet() const
 
 /*!
  */
-const set<Node *> & Node::getPreset() const
+const std::set<Node *> & Node::getPreset() const
 {
   return preset_;
 }
@@ -187,7 +196,7 @@ const set<Node *> & Node::getPreset() const
 
 /*!
  */
-const set<Node *> & Node::getPostset() const
+const std::set<Node *> & Node::getPostset() const
 {
   return postset_;
 }
@@ -195,7 +204,7 @@ const set<Node *> & Node::getPostset() const
 
 /*!
  */
-const set<Arc *> & Node::getPresetArcs() const
+const std::set<Arc *> & Node::getPresetArcs() const
 {
   return presetArcs_;
 }
@@ -203,7 +212,7 @@ const set<Arc *> & Node::getPresetArcs() const
 
 /*!
  */
-const set<Arc *> & Node::getPostsetArcs() const
+const std::set<Arc *> & Node::getPostsetArcs() const
 {
   return postsetArcs_;
 }
@@ -239,8 +248,11 @@ void Node::mergeNameHistory(Node & node)
 }
 
 
-void Node::mergeArcs(Node & node1, Node & node2, const set<Node *> & set1,
-    const set<Node *> & set2, bool addWeights,
+/*!
+ \bug Why is set1 not used?
+*/
+void Node::mergeArcs(Node & node1, Node & node2, const std::set<Node *> & set1,
+    const std::set<Node *> & set2, bool addWeights,
     bool isPostset)
 {
   for (set<Node *>::iterator it = set2.begin(); it != set2.end(); ++it)
@@ -272,9 +284,9 @@ void Node::mergeArcs(Node & node1, Node & node2, const set<Node *> & set1,
 
 /*!
  */
-Place::Place(PetriNet & net, ComponentObserver & observer,
-    const string & name, Type type, unsigned int tokens,
-    unsigned int capacity, const string & port) :
+Place::Place(PetriNet & net, util::ComponentObserver & observer,
+    const std::string & name, Type type, unsigned int tokens,
+    unsigned int capacity, const std::string & port) :
       Node(net, observer, name, type), tokens_(tokens), capacity_(capacity),
       wasInterface_(type == INTERNAL ? false : true), port_(port)
       {
@@ -288,8 +300,8 @@ Place::Place(PetriNet & net, ComponentObserver & observer,
 
 /*!
  */
-Place::Place(PetriNet & net, ComponentObserver & observer,
-    const Place & place, const string & prefix) :
+Place::Place(PetriNet & net, util::ComponentObserver & observer,
+    const Place & place, const std::string & prefix) :
       Node(net, observer, place, prefix), tokens_(place.tokens_),
       capacity_(place.capacity_), wasInterface_(place.wasInterface_),
       port_(place.port_), maxOccurrence_(place.maxOccurrence_)
@@ -319,6 +331,12 @@ unsigned int Place::getTokenCount() const
 }
 
 
+void Place::setTokenCount(unsigned int tokens)
+{
+  tokens_ = tokens;
+}
+
+
 /*!
  */
 unsigned int Place::getCapacity() const
@@ -329,7 +347,7 @@ unsigned int Place::getCapacity() const
 
 /*!
  */
-string Place::getPort() const
+std::string Place::getPort() const
 {
   return port_;
 }
@@ -338,7 +356,7 @@ string Place::getPort() const
 /*!
  * \todo  maybe private
  */
-void Place::setPort(string & port)
+void Place::setPort(std::string & port)
 {
   port_ = port;
 }
@@ -443,319 +461,319 @@ int Place::getMaxOccurrence()
 /*!
  * \brief constructor
  */
-Transition::Transition(PetriNet & net, ComponentObserver & observer,
-    const string & name, const set<string> & labels) :
-      Node(net, observer, name, INTERNAL), labels_(labels)
-      {
-      cost_ = 0;
-      observer_.updateTransitions(*this);
-      }
-
-
-    /*!
-     * \brief copy constructor
-     */
-    Transition::Transition(PetriNet & net, ComponentObserver & observer,
-        const Transition & trans, const string & prefix) :
-          Node(net, observer, trans, prefix), labels_(trans.labels_)
-          {
-      cost_ = trans.cost_;
-      observer_.updateTransitions(*this);
-          }
-
-    /*!
-     * \brief set transition cost
-     */
-    void Transition::setCost(int cost)
-    {
-      cost_ = cost;
-    }
-
-    /*!
-     * \brief get transition cost
-     */
-    int Transition::getCost() const
-    {
-      return cost_;
-    }
-
-    /*!
-     * \brief add role to transition
-     */
-    void Transition::addRole(std::string roleName)
-    {
-      roles_.insert(roleName);
-    }
-
-    /*!
-     * \brief get transition roles
-     */
-    std::set<string> Transition::getRoles() const
-    {
-      return roles_;
-    }
-
-    /*!
-     * \brief   checks if the transition is normal
-     *
-     * \note    This is a help method for normalize method
-     *          in class PetriNet.
-     */
-    bool Transition::isNormal() const
-    {
-      /* 
-       * counts interface places in the transitions preset and postset
-       * and the number of synchronized labels
-       */
-      unsigned int counter = labels_.size();
-
-      switch(getType())
-      {
-      case Node::INTERNAL : return (counter <= 1);
-      case Node::INOUT : return false;
-      case Node::INPUT : 
-      {
-        for(set<Arc*>::iterator a = getPresetArcs().begin();
-        a != getPresetArcs().end(); ++a)
-        {
-          if((*a)->getPlace().getType() == Node::INPUT)
-            counter += (*a)->getWeight();
-        }
-      }; break;        
-      case Node::OUTPUT :
-      {
-        for(set<Arc*>::iterator a = getPostsetArcs().begin();
-        a != getPostsetArcs().end(); ++a)
-        {
-          if((*a)->getPlace().getType() == Node::OUTPUT)
-            counter += (*a)->getWeight();
-        }
-      }; break;
-      default: assert(false);
-      }
-
-      return (counter <= 1);
-    }
-
-
-    /*!
-     * Merges the properties of the given node into this one.
-     *
-     * The following properties are merged:
-     * - NameHistory (concatenation)
-     * - Pre-/Postset (union)
-     *
-     * \pre   the transitions must reside in the same PetriNet instance
-     */
-    void Transition::merge(Transition & trans, bool addArcWeights)
-    {
-      // Node::merge does all the work
-      Node::merge(trans, addArcWeights);
-    }
-
-
-    /*!
-     */
-    void Transition::updateType()
-    {
-      Type newType = INTERNAL;
-      set<Node *> neighbors = util::setUnion(getPreset(), getPostset());
-
-      for (set<Node *>::iterator it = neighbors.begin(); it != neighbors.end();
-      ++it)
-      {
-        Type itType = (*it)->getType();
-        if (itType == INPUT || itType == OUTPUT)
-        {
-          if ((*it)->isComplementType(newType))
-          {
-            newType = INOUT;
-            break;
-          }
-          else
-            newType = itType;
-        }
-      }
-
-      setType(newType);
-    }
-
-
-    /*!
-     */
-    bool Transition::isSynchronized() const
-    {
-      return !labels_.empty();
-    }
-
-
-    /*!
-     */
-    const set<string> & Transition::getSynchronizeLabels() const
-    {
-      return labels_;
-    }
-
-    /*!
-     *
-     */
-    /*set<string> Transition::getSynchronizeLabels() const
-  {
-    return labels_;
-  }*/
-
-    /*!
-     */
-    void Transition::setSynchronizeLabels(const std::set<std::string> & labels)
-    {
-      labels_ = labels;
-      observer_.updateTransitionLabels(*this);
-    }
-
-
-
-    /****************************************************************************
-     *** Class Arc Function Definitions
-     ***************************************************************************/
-
-
-    /*!
-     */
-    Arc::Arc(PetriNet & net, ComponentObserver & observer, Node & source,
-        Node & target, unsigned int weight) :
-          net_(net), observer_(observer), source_(&source), target_(&target),
-          weight_(weight)
-          {
-      assert(&observer.getPetriNet() == &net);
-
-      observer_.updateArcCreated(*this);
-          }
-
-
-    /*!
-     */
-    Arc::Arc(PetriNet & net, ComponentObserver & observer, const Arc & arc) :
-      net_(net), observer_(observer),
-      source_(net.findNode(arc.source_->getName())),
-      target_(net.findNode(arc.target_->getName())), weight_(arc.weight_)
-      {
-      assert(&observer.getPetriNet() == &net);
-      assert(net.findNode(arc.source_->getName()) != NULL);
-      assert(net.findNode(arc.target_->getName()) != NULL);
-
-      observer_.updateArcCreated(*this);
-      }
-
-
-    /*!
-     */
-    Arc::Arc(PetriNet & net, ComponentObserver & observer, const Arc & arc,
-        Node & source, Node & target) :
-          net_(net), observer_(observer),
-          source_(&source),
-          target_(&target), weight_(arc.weight_)
-          {
-      assert(&observer.getPetriNet() == &net);
-      assert(net.containsNode(source));
-      assert(net.containsNode(target));
-
-      observer_.updateArcCreated(*this);
-          }
-
-
-    /*!
-     * You must not destroy an Arc directly.
-     */
-    Arc::~Arc()
-    {
-      assert(net_.findArc(*source_, *target_) == NULL);
-    }
-
-
-    /*!
-     */
-    PetriNet & Arc::getPetriNet() const
-    {
-      return net_;
-    }
-
-
-    /*!
-     */
-    Node & Arc::getSourceNode() const
-    {
-      return *source_;
-    }
-
-
-    /*!
-     */
-    Node & Arc::getTargetNode() const
-    {
-      return *target_;
-    }
-
-
-    /*!
-     */
-    Transition & Arc::getTransition() const
-    {
-      Transition * t = dynamic_cast<Transition *>(source_);
-      if (t != NULL)
-        return *t;
-
-      t = dynamic_cast<Transition *>(target_);
-      assert(t != NULL);
-      return *t;
-    }
-
-
-    /*!
-     */
-    Place & Arc::getPlace() const
-    {
-      Place * t = dynamic_cast<Place *>(source_);
-      if (t != NULL)
-        return *t;
-
-      t = dynamic_cast<Place *>(target_);
-      assert(t != NULL);
-      return *t;
-    }
-
-
-    /*!
-     */
-    unsigned int Arc::getWeight() const
-    {
-      return weight_;
-    }
-
-    /*!
-     */
-    void Arc::setWeight(unsigned int weight)
-    {
-      weight_ = weight;
-    }
-
-    /*!
-     */
-    void Arc::merge(Arc & arc)
-    {
-      weight_ += arc.weight_;
-    }
-
-
-    /*!
-     */
-    void Arc::mirror()
-    {
-      observer_.updateArcMirror(*this);
-      observer_.updateArcRemoved(*this);
-      Node * oldSource = source_;
-      source_ = target_;
-      target_ = oldSource;
-      observer_.updateArcCreated(*this);
-    }
-
+Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
+    const std::string & name, const std::set<std::string> & labels) :
+  Node(net, observer, name, INTERNAL), roles_(std::set<string>()), labels_(labels)
+{
+  cost_ = 0;
+  observer_.updateTransitions(*this);
 }
+
+
+/*!
+ * \brief copy constructor
+ */
+Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
+    const Transition & trans, const std::string & prefix) :
+      Node(net, observer, trans, prefix), roles_(trans.roles_), labels_(trans.labels_)
+      {
+  cost_ = trans.cost_;
+  observer_.updateTransitions(*this);
+      }
+
+/*!
+ * \brief set transition cost
+ */
+void Transition::setCost(int cost)
+{
+  cost_ = cost;
+}
+
+/*!
+ * \brief get transition cost
+ */
+int Transition::getCost() const
+{
+  return cost_;
+}
+
+/*!
+ * \brief add role to transition
+ */
+void Transition::addRole(std::string roleName)
+{
+  roles_.insert(roleName);
+}
+
+/*!
+ * \brief get transition roles
+ */
+std::set<std::string> Transition::getRoles() const
+{
+  return roles_;
+}
+
+/*!
+ * \brief   checks if the transition is normal
+ *
+ * \note    This is a help method for normalize method
+ *          in class PetriNet.
+ */
+bool Transition::isNormal() const
+{
+  /* 
+   * counts interface places in the transitions preset and postset
+   * and the number of synchronized labels
+   */
+  unsigned int counter = labels_.size();
+
+  switch(getType())
+  {
+  case Node::INTERNAL : return (counter <= 1);
+  case Node::INOUT : return false;
+  case Node::INPUT : 
+  {
+    for(set<Arc*>::iterator a = getPresetArcs().begin();
+    a != getPresetArcs().end(); ++a)
+    {
+      if((*a)->getPlace().getType() == Node::INPUT)
+        counter += (*a)->getWeight();
+    }
+  }; break;        
+  case Node::OUTPUT :
+  {
+    for(set<Arc*>::iterator a = getPostsetArcs().begin();
+    a != getPostsetArcs().end(); ++a)
+    {
+      if((*a)->getPlace().getType() == Node::OUTPUT)
+        counter += (*a)->getWeight();
+    }
+  }; break;
+  default: assert(false);
+  }
+
+  return (counter <= 1);
+}
+
+
+/*!
+ * Merges the properties of the given node into this one.
+ *
+ * The following properties are merged:
+ * - NameHistory (concatenation)
+ * - Pre-/Postset (union)
+ *
+ * \pre   the transitions must reside in the same PetriNet instance
+ */
+void Transition::merge(Transition & trans, bool addArcWeights)
+{
+  // Node::merge does all the work
+  Node::merge(trans, addArcWeights);
+}
+
+
+/*!
+ */
+void Transition::updateType()
+{
+  Type newType = INTERNAL;
+  set<Node *> neighbors = util::setUnion(getPreset(), getPostset());
+
+  for (set<Node *>::iterator it = neighbors.begin(); it != neighbors.end();
+  ++it)
+  {
+    Type itType = (*it)->getType();
+    if (itType == INPUT || itType == OUTPUT)
+    {
+      if ((*it)->isComplementType(newType))
+      {
+        newType = INOUT;
+        break;
+      }
+      else
+        newType = itType;
+    }
+  }
+
+  setType(newType);
+}
+
+
+/*!
+ */
+bool Transition::isSynchronized() const
+{
+  return !labels_.empty();
+}
+
+
+/*!
+ */
+const std::set<std::string> & Transition::getSynchronizeLabels() const
+{
+  return labels_;
+}
+
+/*!
+ *
+ */
+/*set<string> Transition::getSynchronizeLabels() const
+{
+  return labels_;
+}*/
+
+/*!
+ */
+void Transition::setSynchronizeLabels(const std::set<std::string> & labels)
+{
+  labels_ = labels;
+  observer_.updateTransitionLabels(*this);
+}
+
+
+
+/****************************************************************************
+ *** Class Arc Function Definitions
+ ***************************************************************************/
+
+
+/*!
+ */
+Arc::Arc(PetriNet & net, util::ComponentObserver & observer, Node & source,
+    Node & target, unsigned int weight) :
+      net_(net), observer_(observer), source_(&source), target_(&target),
+      weight_(weight)
+      {
+  assert(&observer.getPetriNet() == &net);
+
+  observer_.updateArcCreated(*this);
+      }
+
+
+/*!
+ */
+Arc::Arc(PetriNet & net, util::ComponentObserver & observer, const Arc & arc) :
+  net_(net), observer_(observer),
+  source_(net.findNode(arc.source_->getName())),
+  target_(net.findNode(arc.target_->getName())), weight_(arc.weight_)
+  {
+  assert(&observer.getPetriNet() == &net);
+  assert(net.findNode(arc.source_->getName()) != NULL);
+  assert(net.findNode(arc.target_->getName()) != NULL);
+
+  observer_.updateArcCreated(*this);
+  }
+
+
+/*!
+ */
+Arc::Arc(PetriNet & net, util::ComponentObserver & observer, const Arc & arc,
+    Node & source, Node & target) :
+      net_(net), observer_(observer),
+      source_(&source),
+      target_(&target), weight_(arc.weight_)
+      {
+  assert(&observer.getPetriNet() == &net);
+  assert(net.containsNode(source));
+  assert(net.containsNode(target));
+
+  observer_.updateArcCreated(*this);
+      }
+
+
+/*!
+ * You must not destroy an Arc directly.
+ */
+Arc::~Arc()
+{
+  assert(net_.findArc(*source_, *target_) == NULL);
+}
+
+
+/*!
+ */
+PetriNet & Arc::getPetriNet() const
+{
+  return net_;
+}
+
+
+/*!
+ */
+Node & Arc::getSourceNode() const
+{
+  return *source_;
+}
+
+
+/*!
+ */
+Node & Arc::getTargetNode() const
+{
+  return *target_;
+}
+
+
+/*!
+ */
+Transition & Arc::getTransition() const
+{
+  Transition * t = dynamic_cast<Transition *>(source_);
+  if (t != NULL)
+    return *t;
+
+  t = dynamic_cast<Transition *>(target_);
+  assert(t != NULL);
+  return *t;
+}
+
+
+/*!
+ */
+Place & Arc::getPlace() const
+{
+  Place * t = dynamic_cast<Place *>(source_);
+  if (t != NULL)
+    return *t;
+
+  t = dynamic_cast<Place *>(target_);
+  assert(t != NULL);
+  return *t;
+}
+
+
+/*!
+ */
+unsigned int Arc::getWeight() const
+{
+  return weight_;
+}
+
+/*!
+ */
+void Arc::setWeight(unsigned int weight)
+{
+  weight_ = weight;
+}
+
+/*!
+ */
+void Arc::merge(Arc & arc)
+{
+  weight_ += arc.weight_;
+}
+
+
+/*!
+ */
+void Arc::mirror()
+{
+  observer_.updateArcMirror(*this);
+  observer_.updateArcRemoved(*this);
+  Node * oldSource = source_;
+  source_ = target_;
+  target_ = oldSource;
+  observer_.updateArcCreated(*this);
+}
+
+} /* namespace pnapi */

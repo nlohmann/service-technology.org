@@ -929,15 +929,7 @@ const std::list< RuleSet::AdapterRule * > RuleSet::getRules() const
     return _adapterRules;
 }
 
-inline const std::string RuleSet::getMessageForId(const unsigned int id) const
-{
-    
-    std::map< unsigned int, std::string >::const_iterator iter = _messageIndex.find(id);
-    assert ( iter != _messageIndex.end() );
 
-    
-    return iter->second;
-}
 
 unsigned int RuleSet::getIdForMessage(std::string message)
 {

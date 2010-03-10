@@ -319,7 +319,17 @@ class RuleSet {
          * 
          * \return the message name connected to an ID
          */
-        inline const std::string getMessageForId(const unsigned int id) const; 
+    //    inline const std::string getMessageForId(const unsigned int id) const; 
+	const std::string getMessageForId(const unsigned int id) const
+	{
+		
+		std::map< unsigned int, std::string >::const_iterator iter = _messageIndex.find(id);
+		assert ( iter != _messageIndex.end() );
+		
+		
+		return iter->second;
+	}
+	
 
     private:
         //! a mapping from IDs to message names (contrary of #_messageId)

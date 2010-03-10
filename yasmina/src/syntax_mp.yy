@@ -35,9 +35,9 @@ extern unsigned short pType;
 /// the current place token as string
 extern std::string IDENT_token;
 /// final marking ids
-extern unsigned int nfm=0;
+ unsigned int nfm=0;
 /// constraint ids
-extern unsigned int nc=0;
+unsigned int nc=0;
 typedef struct constraintf{
 	unsigned int fmi; //final marking index
 	unsigned int termi; //term index

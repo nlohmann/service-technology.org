@@ -115,9 +115,10 @@ bool Formula::isSatisfiable(){
         clausesVector.push_back(currentClause);
     }
 
-    //	clock_t start_clock = clock();
-    return minisat(clausesVector);
-    //	full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
+    clock_t start_clock = clock();
+    bool result = minisat(clausesVector);
+    full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)); // / CLOCKS_PER_SEC;
+    return result;
 }
 
 vector<bool> * Formula::getSatisfyingAssignment(){
@@ -132,13 +133,13 @@ vector<bool> * Formula::getSatisfyingAssignment(){
         clausesVector.push_back(currentClause);
     }
 
-//	clock_t start_clock = clock();
-//	vector<bool>* satAssignment = minisat2(clausesVector); // satAssignmet is NULL if Formula is not satisfiable
-//	cout << "isSatisfiable(): satisfying assignment returned by minisat2: " << assignmentToString(satAssignment) << endl;
-//	return satAssignment;
-    return minisat2(clausesVector);
+    clock_t start_clock = clock();
+    vector<bool>* satAssignment = minisat2(clausesVector); // satAssignmet is NULL if Formula is not satisfiable
+    full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)); // / CLOCKS_PER_SEC;
 
-//	full_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC;
+    //	cout << "isSatisfiable(): satisfying assignment returned by minisat2: " << assignmentToString(satAssignment) << endl;
+
+	return satAssignment;
 }
 
 
@@ -565,5 +566,9 @@ Formula* FormulaFinal::moveNegation(bool leadingNot) const {
 
 Formula* FormulaDummy::moveNegation(bool leadingNot) const {
 	return f->moveNegation(leadingNot);
+}
+
+double Formula::getMinisatTime(){
+	return full_time / CLOCKS_PER_SEC;
 }
 

@@ -28,9 +28,9 @@ using namespace std;
 
 class GraphComplement : public Graph {
 	protected:
-		map<int, Node*> addedNodes;
 		Node* trap;
 		FormulaTree* root;
+		static double getNode_time;
 
         /// complete the extended annotated graph - fast algorithm, but unreduced result
         void makeComplete_fast();
@@ -60,6 +60,7 @@ class GraphComplement : public Graph {
 
 
     public:
+        map<int, Node*> addedNodes;
 
     	///constructor
     	GraphComplement();
@@ -75,6 +76,8 @@ class GraphComplement : public Graph {
 
 		/// negates the global Formulaâ
         void negateGlobalFormula();
+
+        static double getTime();
 };
 
 #endif /* GRAPHCOMPLEMENT_H_ */

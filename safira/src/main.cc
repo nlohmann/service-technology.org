@@ -108,6 +108,7 @@ int main(int argc, char **argv) {
 		initGlobalVariables();
 
 		time_t parsingTime_start = time(NULL);
+		clock_t parsingTime_start_clock = clock();
 
 		//parse
 		if ( og_yyparse() != 0) {cout << PACKAGE << "\nparse error\n" << endl; exit(1);}
@@ -117,20 +118,27 @@ int main(int argc, char **argv) {
 
 		if(args_info.time_given){
 			time_t parsingTime_end = time(NULL);
-			cout << "number of labels: " << label2id.size()-3 << endl;
-			cout << "number of nodes in the given extended annotated automaton: " << graph->nodes.size() << endl;
-			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
+			cout << "--------------------------------------" << endl;
+			cout << label2id.size()-3 << " labels" << endl;
+			cout << graph->nodes.size() << " nodes in the given extended annotated automaton"  << endl;
+			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl << endl;
 		}
 
 		time_t buildOG_start = time(NULL);
+		clock_t buildOG_start_clock = clock();
 
 		g->complement();
 
 		if(args_info.time_given){
 			time_t buildOG_end = time(NULL);
-			cout << "number of nodes in the complement: " << g->nodes.size() << endl;
+			cout << g->nodes.size() + g->addedNodes.size() << " nodes in the complement"  << endl;
 			cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
-			//cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
+			//cout << (static_cast<double>(clock()) - static_cast<double>(buildOG_start_clock)) / CLOCKS_PER_SEC << " s consumed for building the complement" << endl;
+
+			//cout << Formula::getMinisatTime() << " s consumed by minisat" << endl;
+			//cout << GraphComplement::getTime() << " s consumed for building and using the decision tree" << endl;
+			cout << "--------------------------------------" << endl;
+
 		}
 
 		stringstream o;
@@ -179,8 +187,9 @@ int main(int argc, char **argv) {
 
 		if(args_info.time_given){
 			time_t parsingTime_end = time(NULL);
-			cout << "number of nodes in the given extended annotated automaton (1st file): " << g1->nodes.size() << endl;
-			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing 1st file" << endl;
+			cout << "--------------------------------------" << endl;
+			cout << g1->nodes.size() << " nodes in the given extended annotated automaton (1st file)"  << endl;
+			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing 1st file" << endl << endl;
 		}
 
 		if (args_info.inputs_num == 2){
@@ -190,7 +199,6 @@ int main(int argc, char **argv) {
 			string tmpfilename = args_info.inputs[1];
 			tmpfilename = tmpfilename.substr(0, tmpfilename.find_last_of(".og")-2);
 			tmpfilename = tmpfilename.substr(tmpfilename.find_last_of("/")+1, tmpfilename.length());
-			//cout << "testtmp: " << tmpfilename << endl;
 			og_yyin = fopen(args_info.inputs[1], "r");
 			filename = filename + "_" + tmpfilename;
 
@@ -211,8 +219,8 @@ int main(int argc, char **argv) {
 
 		if(args_info.time_given){
 			time_t parsingTime_end = time(NULL);
-			cout << "number of nodes in the given extended annotated automaton (2nd file): " << g2->nodes.size() << endl;
-			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing 2nd file" << endl;
+			cout << g2->nodes.size() << " nodes in the given extended annotated automaton (2nd file)"  << endl;
+			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing 2nd file" << endl << endl;
 		}
 
 		time_t buildIntersection_start = time(NULL);
@@ -222,8 +230,9 @@ int main(int argc, char **argv) {
 
 		if(args_info.time_given){
 			time_t buildIntersection_end = time(NULL);
-			cout << "number of nodes in the intersection: " << g3->nodepairs.size() << endl;
+			cout << g3->nodepairs.size() << " nodes in the intersection"  << endl;
 			cout << difftime(buildIntersection_end, buildIntersection_start) << " s consumed for building the intersection" << endl;
+			cout << "--------------------------------------" << endl;
 		}
 
 		string title = filename + "_intersection    global formula: " + g3->globalFormulaAsString;
@@ -275,9 +284,10 @@ int main(int argc, char **argv) {
 
 		if(args_info.time_given){
 			time_t parsingTime_end = time(NULL);
-			cout << "number of labels: " << label2id.size()-3 << endl;
-			cout << "number of nodes in the given extended annotated automaton (1st file): " << graph->nodes.size() << endl;
-			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
+			cout << "--------------------------------------" << endl;
+			cout << label2id.size()-3 << " labels" <<  endl;
+			cout << graph->nodes.size() << " nodes in the given extended annotated automaton (1st file)"  << endl;
+			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl << endl;
 		}
 
 		time_t buildOG_start = time(NULL);
@@ -320,9 +330,9 @@ int main(int argc, char **argv) {
 
 		if(args_info.time_given){
 			time_t parsingTime_end = time(NULL);
-			cout << "number of labels: " << label2id.size()-3 << endl;
-			cout << "number of nodes in the given extended annotated automaton (2nd file): " << graph->nodes.size() << endl;
-			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl;
+			cout << label2id.size()-3 << " labels"  << endl;
+			cout << graph->nodes.size() << " nodes in the given extended annotated automaton (2nd file)" << endl;
+			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl << endl;
 		}
 
 		buildOG_start = time(NULL);
@@ -352,9 +362,10 @@ int main(int argc, char **argv) {
 
 		if(args_info.time_given){
 			time_t buildOG_end = time(NULL);
-			cout << "number of nodes in the complement: " << g4->nodes.size() << endl;
-			cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
+			cout << g4->nodes.size() << " number of nodes in the complement"  << endl;
+			cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the union" << endl;
 			//cout << Formula::getMinisatTime() << "s consumed by minisat" << endl;
+			cout << "--------------------------------------" << endl;
 		}
 
 		stringstream o;
@@ -367,6 +378,17 @@ int main(int argc, char **argv) {
 
 		//delete g1;
 		//delete g2;
+	}
+
+	if(args_info.time_given){
+		std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
+		FILE* ps = popen(call.c_str(), "r");
+		unsigned int memory;
+		int res = fscanf(ps, "%u", &memory);
+		assert(res != EOF);
+		pclose(ps);
+		printf( "memory consumption: %u KB\n", memory);
+		cout << "--------------------------------------" << endl;
 	}
 
 
@@ -450,6 +472,7 @@ void evaluateParameters(int argc, char** argv) {
 
 void out(Graph * g, string filename, string title){
 	bool printToStdout = true;
+
 	for (unsigned int j = 0; j<args_info.output_given; ++j){
 		switch(args_info.output_arg[j]) {
 

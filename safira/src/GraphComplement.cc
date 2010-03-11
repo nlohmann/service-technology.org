@@ -45,6 +45,7 @@ extern int lastLabelId;
 
 int start;
 int treeNumber;
+double GraphComplement::getNode_time = 0;
 
 using namespace std;
 
@@ -56,9 +57,9 @@ GraphComplement::GraphComplement() : trap(NULL){
 ///destructor
 GraphComplement::~GraphComplement(){
 
-//	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
-//		delete n->second;
-//	}
+	for (map<int, Node*>::const_iterator n = addedNodes.begin(); n != addedNodes.end(); ++n) {
+		delete n->second;
+	}
 	delete root;
 }
 
@@ -77,6 +78,7 @@ void GraphComplement::complement(){
 //	}
 	if (args_info.complement_arg == 2){
 		makeComplete_efficient();
+//		printFormulaTree(root, "decisionTree.pdf");
 	}
 
 	if (addedNodes.size() == 1){
@@ -425,7 +427,12 @@ void GraphComplement::makeComplete_efficient() {
 }
 
 Node* GraphComplement::getNode(Formula *f){
+	clock_t start_clock = clock();
+
 	Node *q = searchNode(f, root);
+
+	getNode_time += (static_cast<double>(clock()) - static_cast<double>(start_clock)); // / CLOCKS_PER_SEC;
+
 //	cout << "getNode(...): Node" << q->id << "  " << q->formula->toString() << endl;
 	return q;
 }
@@ -645,4 +652,8 @@ void GraphComplement::toDot_Nodes(FILE* out) const {
 
 int GraphComplement::getSizeOfAddedNodes(){
 	return addedNodes.size();
+}
+
+double GraphComplement::getTime(){
+	return getNode_time / CLOCKS_PER_SEC;
 }

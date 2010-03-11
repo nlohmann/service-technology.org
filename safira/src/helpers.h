@@ -49,5 +49,6 @@ string assignmentToString(std::vector<bool>* satAssignment);
 void printFormulaTree(FormulaTree* root, string filename);
 void FormulaTreeToDot(FILE* out, FormulaTree* root);
 void dfsTree(FILE* out, FormulaTree* root);
+bool graphIsPrinted();
 
 #endif

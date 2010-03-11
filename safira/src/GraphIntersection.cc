@@ -24,6 +24,10 @@
 #include "GraphIntersection.h"
 #include "NumPrinterDouble.h"
 #include "helpers.h"
+#include "cmdline.h"
+
+/// the command line parameters
+extern gengetopt_args_info args_info;
 
 using std::map;
 using std::string;
@@ -86,15 +90,16 @@ void GraphIntersection::intersection(Graph *g1, Graph *g2){
 	//NumPrinterBase* printer1 = new NumPrinterDouble(&nodepairs, true);
 	//NumPrinterBase* printer2 = new NumPrinterDouble(&nodepairs, false);
 
-	generateGlobalFormula(g1, g2);
-
 //	globalFormulaString = "("
 //			+ g1->globalFormula->toString(printer1)
 //			+ ") * ("
 //			+ g2->globalFormula->toString(printer2)
 //			+ ")";
 
-	convertTheMap();
+	if (args_info.union_given || graphIsPrinted()) {
+		generateGlobalFormula(g1, g2);
+		convertTheMap();
+	}
 }
 
 

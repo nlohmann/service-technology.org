@@ -24,6 +24,10 @@
 #include <iostream>
 #include <sstream>
 #include <map>
+#include "cmdline.h"
+
+/// the command line parameters
+extern gengetopt_args_info args_info;
 
 extern map<string, int> label2id;
 extern map<int, string> id2label;
@@ -315,4 +319,26 @@ void dfsTree(FILE* out, FormulaTree* n){
 		fprintf(out, "  %d -> %d [label=\"%s\"]\n", n->id, n->yes->id, "yes");
 		dfsTree(out, n->yes);
 	}
+
+	if(n->no){
+		fprintf(out, "  %d -> %d [label=\"%s\"]\n", n->id, n->no->id, "no");
+		dfsTree(out, n->no);
+	}
 }
+
+bool graphIsPrinted(){
+	bool printGraph;
+	if (args_info.output_given > 0){
+		printGraph = false;
+		for (unsigned int j = 0; j<args_info.output_given; ++j){
+			if (args_info.output_arg[j] != output_arg_none) {
+				printGraph = true;
+			}
+		}
+	}
+	else {
+		printGraph = true; //Graph is printed on stdout
+	}
+	return printGraph;
+}
+

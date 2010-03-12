@@ -234,9 +234,9 @@ std::string PetriNet::remap(const std::string & edge, std::vector<std::string> &
  *
  * \param   edgeLabels mapping from edges' name (an unsigned integer) to their label
  * \param   fileName location of the STG file
- * \param   inputPlacenames set of labels, that name input places
- * \param   outputPlacenames set of labels, that name output places
- * \param   synchronizeLabels set of labels, that name synchronization labels
+ * \param   inputLabels set of labels, that name input places
+ * \param   outputLabels set of labels, that name output places
+ * \param   synchronousLabels set of labels, that name synchronization labels
  *
  * \note    - this function has been outsourced from fiona and recently only needed by fiona
  *          - petrify is needed to call this function

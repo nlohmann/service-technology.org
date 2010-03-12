@@ -357,7 +357,7 @@ std::set<Label *> Interface::getAsynchronousLabels(const std::string & port) con
 /*!
  * \brief find a certain label
  */
-Label * Interface::findLabel(const string & label) const
+Label * Interface::findLabel(const std::string & label) const
 {
   PNAPI_FOREACH(i, ports_)
   {

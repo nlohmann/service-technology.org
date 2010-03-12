@@ -20,7 +20,7 @@
 #define PNAPI_UTIL_H
 
 /*!
-  \def FOREACH(I, C)
+  \def PNAPI_FOREACH(I, C)
   \brief a shortcut for STL iterations
   \details Assume you have the code:
   \code

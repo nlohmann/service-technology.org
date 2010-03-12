@@ -201,7 +201,7 @@ enum elementTypes
 bool is_whitelisted(char *);
 /// opens an element
 void open_element(char *);
-/// ???
+/// removes whitespace around given string
 std::string sanitize(char *);
 /// close an element
 void close_element();
@@ -232,11 +232,11 @@ extern const char * whitelist[];
 extern pnapi::Marking * currentMarking;
 /// depth in XML structure
 extern unsigned int current_depth;
-/// ???
+/// the depth of the last XML element that should be parsed (i.e., is interesting)
 extern unsigned int last_interesting_depth;
-/// whether to ignore something ???
+/// whether we are currently ignoring XML elements (and wait for the depth to be interesting again)
 extern bool ignoring;
-/// ???
+/// the part of the file we are currently parsing
 extern unsigned int file_part;
 /// stack of elements
 extern std::vector<unsigned int> elementStack;

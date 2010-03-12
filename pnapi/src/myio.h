@@ -221,8 +221,6 @@ enum Format {
   OWFN,
   /// dot output
   DOT,
-  /// ???
-  GASTEX,
   /// service automaton
   SA,
   /// LoLA format

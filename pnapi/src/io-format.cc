@@ -966,7 +966,7 @@ std::ostream & output(std::ostream & os, const formula::Conjunction & f)
     assert(false); // FIXME: don't know what to do in this case
   }
   else
-    return (os << f.getChildren()); // TODO: << delim(" ??? ") ?
+    return (os << f.getChildren());
 }
 
 /*!
@@ -1547,7 +1547,7 @@ std::ostream & output(std::ostream & os, const Transition & t)
 }
 
 /*!
- * \arc output
+ * \brief arc output
  */
 std::ostream & output(std::ostream & os, const Arc & arc)
 {

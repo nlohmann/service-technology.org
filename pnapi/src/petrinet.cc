@@ -1086,16 +1086,16 @@ const std::set<Transition *> & PetriNet::getSynchronizedTransitions() const
 }
 
 
-/*!
- * \brief Get synchronized Transitions to a given label
+/*
+ * brief Get synchronized Transitions to a given label
  * 
- * \param label specifies the label in question
+ * param label specifies the label in question
  * 
- * \return a set of transitions that are synchronized with this label 
+ * return a set of transitions that are synchronized with this label 
  * 
- * \note  Throws an UnknownTransitionError if no such set exists.
+ * note  Throws an UnknownTransitionError if no such set exists.
  * 
- * \todo review
+ * todo review
  */
 /*
 const std::set<Transition *> & PetriNet::getSynchronizedTransitions(const std::string & label) const
@@ -1585,7 +1585,6 @@ std::string PetriNet::getMetaInformation(std::ios_base & ios,
  * \brief All Places and Transitions of the net are prefixed.
  *
  * \param   prefix  the prefix to be added
- * \param   noInterface  whether interface places should not be prefixed
  */
 PetriNet & PetriNet::prefixNodeNames(const std::string & prefix)
 {

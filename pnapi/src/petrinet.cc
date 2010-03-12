@@ -347,10 +347,10 @@ PetriNet::copyStructure(const PetriNet & net, const std::string & prefix)
   PNAPI_FOREACH(it, net.transitions_)
   {
     assert(!containsNode((*it)->getName()));
-    Transition * t = new Transition(*this, observer_, **it, prefix);
+    Transition & t = createTransition(**it, prefix);
     PNAPI_FOREACH(l, (*it)->getLabels())
     {
-      t->addLabel(*labelMap[l->first], l->second);
+      t.addLabel(*labelMap[l->first], l->second);
     }
   }
 

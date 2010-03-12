@@ -308,8 +308,6 @@ private: /* private variables */
   std::map<io::MetaInformation, std::string> meta_;
   /// labels for constraint oWFNs
   std::map<Transition *, std::set<std::string> > constraints_;
-  /// if true, role information is ignored
-  bool ignoreRoles_;
   /// warning flags
   unsigned int warnings_;
   /// cache for reduction
@@ -435,9 +433,6 @@ public: /* public methods */
   void deleteTransition(Transition &);
   /// deletes an arc
   void deleteArc(Arc &);
-  /// suppresses role information
-  /// \todo make this a stream manipulator
-  void ignoreRoles();
   //@}
 
 
@@ -455,8 +450,6 @@ public: /* public methods */
   bool isNormal() const;
   /// checks whether a transition role name is specified
   bool isRoleSpecified(const std::string &) const;
-  /// returns true if role information is to be ignored
-  bool isIgnoringRoles() const;
 
   /// compose two nets by adding the given one and merging interfaces
   void compose(const PetriNet &, const std::string & = "net1",

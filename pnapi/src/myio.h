@@ -192,6 +192,8 @@ std::ios_base & lola(std::ios_base &);
 std::ios_base & pnml(std::ios_base &);
 /// formula output manipulator
 std::ostream & formula(std::ostream &);
+/// suppress role output
+std::ostream & noRoles(std::ostream &);
 /// Woflan output format
 std::ostream & woflan(std::ostream &);
 
@@ -502,6 +504,12 @@ struct Formula
   Formula() : formula(false) {}
 };
 
+/// role type
+struct Role
+{
+  bool role;
+  Role() : role(false) {}
+};
 
 /*** TEMPLATE CLASSES ***/
 
@@ -541,6 +549,7 @@ typedef StreamMetaData<io::util::Format> FormatData;
 typedef StreamMetaData<io::util::Mode> ModeData;
 typedef StreamMetaData<Delim> DelimData;
 typedef StreamMetaData<Formula> FormulaData;
+typedef StreamMetaData<Role> RoleData;
 typedef StreamMetaData<std::map<pnapi::io::MetaInformation, std::string> > MetaData;
 typedef Manipulator<std::pair<pnapi::io::MetaInformation, std::string> > MetaManipulator;
 

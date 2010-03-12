@@ -236,7 +236,7 @@ uint8_t PetriNet::genetCapacity_ = 2;
  */
 PetriNet::PetriNet() :
   observer_(*this), interface_(*this),
-  warnings_(0), reducablePlaces_(NULL), ignoreRoles_(false)
+  warnings_(0), reducablePlaces_(NULL)
 {
 }
 
@@ -246,7 +246,7 @@ PetriNet::PetriNet() :
 PetriNet::PetriNet(const Interface & interface1, const Interface & interface2, std::map<Label *, Label *> & label2label,
          std::map<Label *, Place *> & label2place, std::set<Label *> & commonLabels) :
   observer_(*this), interface_(*this, interface1, interface2, label2label, label2place, commonLabels),
-  warnings_(0), reducablePlaces_(NULL), ignoreRoles_(false)
+  warnings_(0), reducablePlaces_(NULL)
 {
 }
 
@@ -258,9 +258,8 @@ PetriNet::PetriNet(const Interface & interface1, const Interface & interface2, s
  */
 PetriNet::PetriNet(const PetriNet & net) :
   observer_(*this), interface_(*this),
-  roles_(net.roles_),
-  meta_(net.meta_), warnings_(net.warnings_),
-  reducablePlaces_(NULL), ignoreRoles_(net.ignoreRoles_),
+  roles_(net.roles_), meta_(net.meta_),
+  warnings_(net.warnings_), reducablePlaces_(NULL),
   finalCondition_(net.finalCondition_, copyStructure(net))
 {
   setConstraintLabels(net.constraints_);
@@ -427,10 +426,9 @@ const Condition & PetriNet::getFinalCondition() const
  * 
  * \todo  review me!
  * \todo  Think about synchronous transitions!!!
- * \todo  Rename "prefix" to "myPrefix"
  * 
  */
-void PetriNet::compose(const PetriNet & net, const std::string & prefix,
+void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
                        const std::string & netPrefix)
 {
   // ------------ STEP 1 -----------------------------
@@ -452,7 +450,7 @@ void PetriNet::compose(const PetriNet & net, const std::string & prefix,
   // copy internal places of this net
   PNAPI_FOREACH(p, places_)
   {
-    placeMap[*p] = &result.createPlace(prefix+(*p)->getName(), (*p)->getTokenCount());
+    placeMap[*p] = &result.createPlace(myPrefix+(*p)->getName(), (*p)->getTokenCount());
   }
 
   // copy internal places of "net"
@@ -474,7 +472,7 @@ void PetriNet::compose(const PetriNet & net, const std::string & prefix,
         (util::setIntersection((*t)->getSynchronousLabels(), commonLabels).empty()) ) // transition has no shared label
     {
       // create a prefixed transition in the resulting net
-      Transition & rt = result.createTransition(prefix+(*t)->getName());
+      Transition & rt = result.createTransition(myPrefix+(*t)->getName());
       rt.setCost((*t)->getCost()); // copy transition costs
 
       // copy preset arcs
@@ -712,7 +710,7 @@ void PetriNet::compose(const PetriNet & net, const std::string & prefix,
   PNAPI_FOREACH(t, lonelyTransitions1)
   {
     // create new transition by merging
-    Transition & rt = result.createTransition(prefix + (*t)->getName());
+    Transition & rt = result.createTransition(myPrefix + (*t)->getName());
     rt.setCost((*t)->getCost()); // copy transition costs
 
     // copy preset arcs
@@ -811,9 +809,8 @@ void PetriNet::compose(const PetriNet & net, const std::string & prefix,
   }
 
   // here be dragons
-  /// \todo rename to "conjunct"
-  result.finalCondition_.merge(finalCondition_, placeMap);
-  result.finalCondition_.merge(net.finalCondition_, placeMap);
+  result.finalCondition_.conjunct(finalCondition_, placeMap);
+  result.finalCondition_.conjunct(net.finalCondition_, placeMap);
 
   // overwrite this net with the resulting net
   *this = result;
@@ -1128,13 +1125,6 @@ void PetriNet::addRoles(const std::set<std::string> & roles)
   }
 }
 
-/*!
- * \brief suppresses role information
- */
-void PetriNet::ignoreRoles()
-{
-  ignoreRoles_ = true;
-}
 
 /*!
  * \brief get a unique node name
@@ -1222,15 +1212,6 @@ bool PetriNet::isRoleSpecified(const std::string & roleName) const
   return false;
 }
 
-/*!
- * \brief   Checks if role information is ignored
- *
- * \return  true iff role information is suppressed
- */
-bool PetriNet::isIgnoringRoles() const
-{
-  return ignoreRoles_;
-}
 
 /*!
  * \brief   normalizes the given Petri net
@@ -1321,8 +1302,8 @@ void PetriNet::produce(const PetriNet & net, const std::string & aPrefix,
   prefixNodeNames(prefix); // prefix nodes
   map<const Place *, const Place *> placeMapping = copyPlaces(net, netPrefix);
 
-  // merge final conditions
-  finalCondition_.merge(net.finalCondition_, placeMapping);
+  // conjunct final conditions
+  finalCondition_.conjunct(net.finalCondition_, placeMapping);
 
   // handle transitions with empty label
   PNAPI_FOREACH(it, net.transitions_)

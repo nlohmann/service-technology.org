@@ -168,8 +168,6 @@ Port::~Port()
 
 /*!
  * \brief adding a label
- * 
- * \todo remove me!
  */
 Label & Port::addLabel(Label & label)
 {

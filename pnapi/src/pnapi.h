@@ -71,9 +71,9 @@ using pnapi::operator&&;
  * Assigning a final condition
  * \code
  * // net from the previous example is recycled here
- * net.finalCondition() = ((p1 == 0) && (p2 == 1));
+ * net.getFinalCondition() = ((p1 == 0) && (p2 == 1));
  * Place & p3 = net.createPlace();
- * net.finalCondition() = (net.finalCondition().formula() && (p3 == 0));
+ * net.getFinalCondition() = (net.getFinalCondition().getFormula() && (p3 == 0));
  * \endcode
  * 
  * Reading from stream

@@ -77,10 +77,10 @@ const Formula & Condition::getFormula() const
 }
 
 /*!
- * \brief merges two condition with each other
+ * \brief conjuncts two conditions
  */
-void Condition::merge(const Condition & c,
-                      const std::map<const Place *, const Place *> & placeMapping)
+void Condition::conjunct(const Condition & c,
+                         const std::map<const Place *, const Place *> & placeMapping)
 {
   Formula * f = c.getFormula().clone(&placeMapping);
   *this = ((*formula_) && (*f));

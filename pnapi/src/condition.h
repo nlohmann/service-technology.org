@@ -64,8 +64,8 @@ public: /* public methods */
   Condition & operator=(const formula::Formula &);
   /// standard assignment operator for boolean values
   Condition & operator=(bool);
-  /// merges two condition with each other
-  void merge(const Condition &, const std::map<const Place *, const Place *> &);
+  /// conjuncts two conditions
+  void conjunct(const Condition &, const std::map<const Place *, const Place *> &);
   /// adds a proposition
   void addProposition(const formula::Proposition &, bool = true);
   /// creates a condition for the given marking and adds it

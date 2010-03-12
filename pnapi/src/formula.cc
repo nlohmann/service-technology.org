@@ -271,11 +271,9 @@ Disjunction::Disjunction(const std::set<const Formula *> & children,
 
 /*!
  * \brief constructor
- * 
- * \bug why is d not used?
  */
 Disjunction::Disjunction(const Disjunction & d) :
-  Operator(children_)
+  Operator(d.children_)
 {
   simplifyChildren();
 }

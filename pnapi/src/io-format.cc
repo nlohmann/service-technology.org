@@ -1068,6 +1068,15 @@ std::ios_base & owfn(std::ios_base & ios)
   return ios;
 }
 
+/*!
+ * \brief suppress role output
+ */
+std::ostream & noRules(std::ostream & os)
+{
+  util::RoleData::data(os).role = true;
+  return os;
+}
+
 
 namespace __owfn
 {
@@ -1096,7 +1105,7 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   << io::util::groupPlacesByCapacity(net.places_)
   << ";\n\n" << delim(", ");
   
-  if(!net.roles_.empty() && !net.ignoreRoles_)
+  if(!net.roles_.empty() && !(util::RoleData::data(os).role))
   {
     os << "ROLES\n  " << net.roles_ << ";\n\n";  
   }
@@ -1164,7 +1173,7 @@ std::ostream & output(std::ostream & os, const Transition & t)
   if(t.getCost() != 0)
     os << "  COST " << t.getCost() << ";\n";
 
-  if(!t.getRoles().empty() && !t.getPetriNet().isIgnoringRoles())
+  if(!t.getRoles().empty() && !(util::RoleData::data(os).role))
   {
     os << "  ROLES\n    " << t.getRoles() << ";\n";
   }

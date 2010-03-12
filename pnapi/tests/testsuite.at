@@ -459,7 +459,7 @@ m4_define([NET2],[bug14128.2.owfn])
 AT_CHECK([cp TESTFILES/NET1 .])
 AT_CHECK([cp TESTFILES/NET2 .])
 AT_CHECK([PETRI -iowfn -oowfn --compose=NET2 NET1], 0, ignore, stderr)
-AT_CHECK([GREP -q "z, v;" NET1.composed.owfn])
+AT_CHECK([GREP -q -e "z, v;" -e "v, z;" NET1.composed.owfn])
 AT_KEYWORDS([bug])
 AT_CLEANUP
 

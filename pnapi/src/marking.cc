@@ -32,7 +32,7 @@ namespace pnapi
  *
  * \note This constructor does not instantiate a Petri net object.
  */
-Marking::Marking()
+Marking::Marking() : net_(NULL)
 {
 }
 

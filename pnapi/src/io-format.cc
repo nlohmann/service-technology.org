@@ -1244,7 +1244,7 @@ std::ostream & output(std::ostream & os, const Interface & interface)
     {
       if(port->first != "")
       {
-        os << (port->second);
+        os << (*port->second);
       }
     }
   }

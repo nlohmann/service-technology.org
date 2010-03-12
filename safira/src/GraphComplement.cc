@@ -87,8 +87,10 @@ void GraphComplement::complement(){
 		addedNodes.clear();
 	}
 
-	generateGlobalFormula();
-	appendAddedNodes();
+	if (args_info.union_given || graphIsPrinted()) {
+		generateGlobalFormula();
+		appendAddedNodes();
+	}
 }
 
 void GraphComplement::addTrapState(){

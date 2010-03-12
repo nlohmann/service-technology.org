@@ -52,6 +52,8 @@ string foo(int num, bool isFromLeftGraph){
 
 //void bar(numToFormelString)
 
+void printUsedMemory();
+
 using namespace std;
 
 string invocation;
@@ -86,6 +88,8 @@ int main(int argc, char **argv) {
 	 * Complement     *
 	 ******************/
 	if(args_info.complement_given){
+		cout << "--------------------------------------" << endl;
+		printUsedMemory(); cout << "(before parsing)" << endl;
 
 		string filename = "stdin";
 
@@ -118,10 +122,10 @@ int main(int argc, char **argv) {
 
 		if(args_info.time_given){
 			time_t parsingTime_end = time(NULL);
-			cout << "--------------------------------------" << endl;
 			cout << label2id.size()-3 << " labels" << endl;
 			cout << graph->nodes.size() << " nodes in the given extended annotated automaton"  << endl;
 			cout << difftime(parsingTime_end, parsingTime_start) << " s consumed for parsing the file" << endl << endl;
+			printUsedMemory(); cout << "(after parsing)" << endl;
 		}
 
 		time_t buildOG_start = time(NULL);
@@ -133,11 +137,12 @@ int main(int argc, char **argv) {
 			time_t buildOG_end = time(NULL);
 			cout << g->nodes.size() + g->addedNodes.size() << " nodes in the complement"  << endl;
 			cout << difftime(buildOG_end, buildOG_start) << " s consumed for building the complement" << endl;
-			//cout << (static_cast<double>(clock()) - static_cast<double>(buildOG_start_clock)) / CLOCKS_PER_SEC << " s consumed for building the complement" << endl;
+			cout << (static_cast<double>(clock()) - static_cast<double>(buildOG_start_clock)) / CLOCKS_PER_SEC << " s consumed for building the complement" << endl;
 
-			//cout << Formula::getMinisatTime() << " s consumed by minisat" << endl;
-			//cout << GraphComplement::getTime() << " s consumed for building and using the decision tree" << endl;
+			cout << Formula::getMinisatTime() << " s consumed by minisat" << endl;
+			cout << GraphComplement::getTime() << " s consumed for building and using the decision tree" << endl;
 			cout << "--------------------------------------" << endl;
+			printUsedMemory(); cout << "(after calculation)" << endl;
 
 		}
 
@@ -380,18 +385,10 @@ int main(int argc, char **argv) {
 		//delete g2;
 	}
 
-	if(args_info.time_given){
-		std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
-		FILE* ps = popen(call.c_str(), "r");
-		unsigned int memory;
-		int res = fscanf(ps, "%u", &memory);
-		assert(res != EOF);
-		pclose(ps);
-		printf( "memory consumption: %u KB\n", memory);
-		cout << "--------------------------------------" << endl;
-	}
 
 
+	printUsedMemory(); cout << "(after all deletes)" << endl;
+	cout << "--------------------------------------" << endl;
 //	free(args_info.minisat_arg);
 	cmdline_parser_free(&args_info);
     return EXIT_SUCCESS;
@@ -527,3 +524,15 @@ void out(Graph * g, string filename, string title){
 	}
 }
 
+
+void printUsedMemory(){
+	if(args_info.time_given){
+		std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
+		FILE* ps = popen(call.c_str(), "r");
+		unsigned int memory = 0;
+		int res = fscanf(ps, "%u", &memory);
+		assert(res != EOF);
+		pclose(ps);
+		printf( "%u KB memory used", memory);
+	}
+}

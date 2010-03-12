@@ -40,6 +40,9 @@ AC_PROG_SED
 AC_PROG_AWK
 AC_PROG_GREP
 
+AM_MISSING_PROG(GENGETOPT, gengetopt)
+
+
 # Dot
 AC_PATH_PROG(DOT, [dot], not found)
 if test "$DOT" = "not found"; then

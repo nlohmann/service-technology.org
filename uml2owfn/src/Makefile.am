@@ -15,6 +15,7 @@ uml2owfn_SOURCES = uml2owfn.cc \
 		    frontend-lexer.ll \
 		    yystype.h \
 		    options.cc options.h \
+		    cmdline.c cmdline.h \
 		    getopt.h getopt.c getopt1.c \
 		    debug.cc debug.h \
 		    verbose.cc verbose.h \
@@ -22,9 +23,8 @@ uml2owfn_SOURCES = uml2owfn.cc \
 		    AST.cc AST.h AST-public.h \
 		    internal-representation.cc internal-representation.h UML-public.h
 		    
-
 # These sources have to be present before the rest is compiled.
-BUILT_SOURCES = frontend-parser.cc
+BUILT_SOURCES = frontend-parser.cc 
 
 # These files have to be distributed to compile without compiler generators.
 EXTRA_DIST = frontend-parser.h
@@ -50,5 +50,14 @@ CLEANFILES = *~ uml2owfn.exe.stackdump
 MAINTAINERCLEANFILES = frontend-parser.h frontend-parser.cc frontend-lexer.cc \
                         Doxyfile
 
+MAINTAINERCLEANFILES += $(GENGETOPT_FILES:.ggo=.c) $(GENGETOPT_FILES:.ggo=.h)
+
 #veryclean: clean
 #	-rm frontend-parser.cc frontend-lexer.cc
+
+.ggo.c:
+	$(AM_V_GEN)$(GENGETOPT) --input=$<
+GENGETOPT_FILES = cmdline.ggo
+BUILT_SOURCES += $(GENGETOPT_FILES:.ggo=.c)
+EXTRA_DIST += $(GENGETOPT_FILES)
+

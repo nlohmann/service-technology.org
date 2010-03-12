@@ -39,10 +39,10 @@
 
 #include "uml2owfn-io.h"
 #include "options.h"
+#include "cmdline.h"
 #include "helpers.h"
 #include "debug.h"
 #include "verbose.h"
-#include "getopt.h"	// for radon
 #include "globals.h"
 
 using std::cin;
@@ -52,9 +52,6 @@ using std::cerr;
 using std::flush;
 using std::pair;
 using std::ofstream;
-
-
-
 
 
 /******************************************************************************
@@ -82,26 +79,8 @@ map<possibleFormats, bool> formats;
 /// suffixes are defined in parse_command_line();
 map<possibleFormats, string> suffixes;
 
-/// long options (needed by GNU getopt)
-static struct option longopts[] =
-{
-  { "help",		no_argument,       NULL, 'h' },
-  { "version",		no_argument,       NULL, 'v' },
-  { "rolecut",	  no_argument      , NULL, 'R' },
-  { "input",		required_argument, NULL, 'i' },
-  { "output",		optional_argument, NULL, 'o' },
-  { "format",		required_argument, NULL, 'f' },
-  { "parameter",	required_argument, NULL, 'p' },
-  { "debug",		required_argument, NULL, 'd' },
-  { "skip",    required_argument, NULL, 's' },
-  { "reduce",		required_argument, NULL, 'r' },
-  { "roleexclusive",	required_argument, NULL, 'e' },
-  { "rolecontains",	required_argument, NULL, 'c' },
-  NULL
-};
-
-/// short options (needed by GNU getopt)
-const char *par_string = "hvRi:o::f:p:d:r:e:c:a:s:";
+/// the command line parameters
+gengetopt_args_info args_info;
 
 
 /******************************************************************************
@@ -109,105 +88,20 @@ const char *par_string = "hvRi:o::f:p:d:r:e:c:a:s:";
  *****************************************************************************/
 
 /*!
- * \brief prints an overview of all commandline arguments
- */
-void print_help()
-{
-	// 80 chars
-	//    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-	fprintf(stdout, "%s -- Translating UML Processes into Petri Net Models\n", PACKAGE_NAME);
-	fprintf(stdout, "\n");
-	fprintf(stdout, "Usage: %s [OPTION]\n", globals::program_name.c_str());
-	fprintf(stdout, "\n");
-	fprintf(stdout, "Options:\n");
-	fprintf(stdout, " -p, --parameter=PARAM     modify processing with given parameter\n");
-	fprintf(stdout, " -i, --input=FILE          read a BPEL process from FILE\n");
-	fprintf(stdout, " -o, --output[=NAME]       write output to file (NAME sets filename)\n");
-	fprintf(stdout, " -f, --format=FORMAT       create output of the given format\n");
-	fprintf(stdout, " -d, --debug=NUMBER        set a debug level (NUMBER=0..4 or \"flex\" or \"bison\")\n");
-	fprintf(stdout, " -r, --reduce=NUMBER       apply structural reduction level (NUMBER=0..5)\n");
-	fprintf(stdout, " -R, --rolecut             cuts away all swimlanes in a process that\n");
-	fprintf(stdout, "                           do not contain a startnode\n");
-	fprintf(stdout, " -e, --roleexclusive=ROLE  cuts away all swimlanes in a process that\n");
-	fprintf(stdout, "                           do not contain a startnode or don't have\n");
-	fprintf(stdout, "                           exactly the exclusive role\n");
-	fprintf(stdout, " -c, --rolecontains=ROLE   cuts away all swimlanes in a process that\n");
-	fprintf(stdout, "                           do not contain a startnode or are one of the\n");
-	fprintf(stdout, "                           contained roles\n");
-	fprintf(stdout, " -s, --skip=PROCESS-PROP   skip processes in the translation that have the given\n");
-  fprintf(stdout, "                           structural property\n");
-	fprintf(stdout, " -h, --help                print this help list and exit\n");
-	fprintf(stdout, " -v, --version             print program version and exit\n");
-	fprintf(stdout, "\n");
-  fprintf(stdout, "  PARAMETER is one of the following (multiple parameters permitted):\n");
-  fprintf(stdout, "    filter              filter out infeasible processes from the library\n");
-  fprintf(stdout, "                        equivalent to: '-s empty -s overlappingPins'\n");
-  fprintf(stdout, "    keeppins            keep unconnected pins\n");
-  fprintf(stdout, "    log                 write a log file for the translation\n");
-  fprintf(stdout, "    taskfile            write analysis task to a separate file\n");
-  fprintf(stdout, "    anon                anonymize the process output\n");
-  fprintf(stdout, "    ctl                 generate CTL model checking properties for analysis\n");
-  fprintf(stdout, "                        (if applicable)");
-	fprintf(stdout, "\n");
-	fprintf(stdout, "  FORMAT is one of the following (multiple formats permitted):\n");
-  fprintf(stdout, "    lola, owfn, dot, tpn\n");
-	fprintf(stdout, "\n");
-  fprintf(stdout, "  TASK is one of the following (multiple parameters permitted):\n");
-  fprintf(stdout, "    soundness           analyze for soundness\n");
-  fprintf(stdout, "    deadlocks           check for deadlocks (except in the final state),\n");
-  fprintf(stdout, "                        requires -a soundness\n");
-  fprintf(stdout, "    safe                analyze for safeness\n");
-  fprintf(stdout, "    stop                distinguish stop nodes from end nodes\n");
-  fprintf(stdout, "\n");
-  fprintf(stdout, "  the following TASK parameters determine the process termination semantics\n");
-  fprintf(stdout, "  that is used for the analysis, they are used mutually exclusive, all\n");
-  fprintf(stdout, "  parameters require '-a soundness'\n");
-  fprintf(stdout, "    noData              ignore state of data flow upon process termination,\n");
-  fprintf(stdout, "    wfNet               attempt to translate net into a workflow net,\n");
-  fprintf(stdout, "    orJoin              analyze net by assuming an implicit OR-join,\n");
-  fprintf(stdout, "\n");
-  //    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-  fprintf(stdout, "  PROCESS-PROP is one of the following (multiple parameters permitted):\n");
-  fprintf(stdout, "    empty               the process contains no nodes\n");
-  fprintf(stdout, "    multi               the process contains edges with token production\n");
-  fprintf(stdout, "                        or consumption different than 1\n");
-  fprintf(stdout, "    multiNonMatching    the process contains edges where token production and\n");
-  fprintf(stdout, "                        consumption do not match, e.g. produce 1, consume 2\n");
-  fprintf(stdout, "    overlappingPins     the process has overlapping pinsets\n");
-  fprintf(stdout, "    trivialInterface    the process has a trivial interface (at most one input\n");
-  fprintf(stdout, "                        place or output place), effective only with '-R'\n");
-  fprintf(stdout, "\n");
-	fprintf(stdout, "Examples:\n");
-	fprintf(stdout, "  uml2owfn -i library.xml -f dot -o\n");
-	fprintf(stdout, "  uml2owfn -i library.xml -f lola -a soundness -o\n");
-	fprintf(stdout, "\n");
-	//fprintf(stdout, "Report bugs to <" + string(PACKAGE_BUGREPORT) + ">.\n");
-}
-
-
-/*!
- * \brief prints version information
- */
-void print_version()
-{
-	// 80 chars
-	//    "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
-	fprintf(stdout, "%s (compiled %s)\n\n", PACKAGE_STRING, __DATE__);
-	fprintf(stdout, "Copyright (C) 2007, 2008, 2009 Martin Znamirowski, Dirk Fahland\n");
-}
-
-
-
-
-
-/*!
- * \brief parses the command line using GNU getopt
+ * \brief parses the command line using GNU gengetopt
  *
  * \param argc argument counter from #main
  * \param argv argument array from #main
  */
 void parse_command_line(int argc, char* argv[])
 {
+
+	// initialize the parameters structure
+  	struct cmdline_parser_params *params = cmdline_parser_params_create();
+
+	// call the cmdline parser
+  	cmdline_parser(argc, argv, &args_info);
+
 	// suffixes stores the file suffixes for the various supported file types
 	suffixes[F_LOLA] = "lola";
 	suffixes[F_OWFN] = "owfn";
@@ -221,234 +115,197 @@ void parse_command_line(int argc, char* argv[])
 	frontend_debug = 0;
 	frontend__flex_debug = 0;
 
-
-	// use GNU getopt to parse the command-line arguments
-	int optc = 0;
-	while ((optc = getopt_long (argc, argv, par_string, longopts, static_cast<int *>(0)))
-			!= EOF)
+	string parameter = "";
+	
+	if(args_info.input_given)
 	{
-		/// \todo call one of them argument and remove the rest
-		string parameter = "";
-		switch (optc)
+		options[O_INPUT] = true;
+		globals::filename = args_info.input_arg;
+		if (inputfiles.find(globals::filename) == inputfiles.end())
 		{
-		case 'h': options[O_HELP] = true; break;
-
-		case 'v': options[O_VERSION] = true; break;
-
-		case 'i':
+			inputfiles.insert(globals::filename);
+		}
+		else
 		{
-			options[O_INPUT] = true;
-			globals::filename = string(optarg);
-			if (inputfiles.find(globals::filename) == inputfiles.end())
-			{
-				inputfiles.insert(globals::filename);
-			}
-			else
-			{
-				trace(TRACE_WARNINGS, "WARNING: It makes no sense reading \n");
-				trace(TRACE_WARNINGS, "             "+ globals::filename + "\n");
-				trace(TRACE_WARNINGS, "         more than once.\n");
-				trace(TRACE_WARNINGS, "         So file will only be read once.\n");
-			}
-			break;
+			trace(TRACE_WARNINGS, "WARNING: It makes no sense reading \n");
+			trace(TRACE_WARNINGS, "             "+ globals::filename + "\n");
+			trace(TRACE_WARNINGS, "         more than once.\n");
+			trace(TRACE_WARNINGS, "         So file will only be read once.\n");
+		}	
+
+	}
+	
+	if(args_info.output_given)
+	{	if (options[O_OUTPUT]) {
+			abort(4, "Multiple output options are given, please choose only one!");
 		}
 
-		case 'o':
-		{
-			if (options[O_OUTPUT]) {
-				abort(4, "Multiple output options are given, please choose only one!");
-			}
+    	        options[O_OUTPUT] = true;
 
-      options[O_OUTPUT] = true;
+      		if (args_info.output_arg != NULL) {
+        		globals::output_filename = args_info.output_arg;
+        		trace(TRACE_INFORMATION, "output file name is: "+string(args_info.output_arg)+"\n");
+      		} else
+        		trace(TRACE_INFORMATION, "no output file name given\n");
 
-      if (optarg != NULL) {
-        globals::output_filename = string(optarg);
-        trace(TRACE_INFORMATION, "output file name is: "+string(optarg)+"\n");
-      } else
-        trace(TRACE_INFORMATION, "no output file name given\n");
-
-      break;
 		}
 
-		case 'f':
-		{
-			options[O_FORMAT] = true;
-			parameter = string(optarg);
+	if(args_info.format_given)
+	{
 
-			if (parameter == suffixes[F_LOLA])
-				formats[F_LOLA] = true;
-			else if (parameter == suffixes[F_OWFN])
-				formats[F_OWFN] = true;
-			else if (parameter == suffixes[F_DOT])
-				formats[F_DOT] = true;
-      else if (parameter == suffixes[F_TPN])
-        formats[F_TPN] = true;
-			else {
-				trace(TRACE_ALWAYS, "Unknown format \"" + parameter +"\".\n");
-				trace(TRACE_ALWAYS, "Use -h to get a list of valid formats.\n");
-				abort(4, "Parameter error");
-			}
-
-			break;
+		options[O_FORMAT] = true;
+		parameter = args_info.format_arg;
+		if (parameter == suffixes[F_LOLA])
+			formats[F_LOLA] = true;
+		else if (parameter == suffixes[F_OWFN])
+			formats[F_OWFN] = true;
+		else if (parameter == suffixes[F_DOT])
+			formats[F_DOT] = true;
+     		else if (parameter == suffixes[F_TPN])
+        		formats[F_TPN] = true;
+		else {
+			trace(TRACE_ALWAYS, "Unknown format \"" + parameter +"\".\n");
+			trace(TRACE_ALWAYS, "Use -h to get a list of valid formats.\n");
+			abort(4, "Parameter error");
 		}
+	
+	}
 
-		case 'p':
-		{
+	for (int i = 0; i < args_info.parameter_given; ++i)
+	{
 			options[O_PARAMETER] = true;
-			parameter = string(optarg);
-
-	    if (parameter == "filter") {
-	      options[O_SKIP_BY_FILTER] = true;
-	      globals::filterCharacteristics[PC_EMPTY] = true;
-	      //globals::filterCharacteristics[PC_PIN_MULTI_NONMATCH] = true;
-	      globals::filterCharacteristics[PC_OVERLAPPING] = true;
-	    } else if (parameter == "taskfile")
-        globals::parameters[P_TASKFILE] = true;
-	    else if (parameter == "keeppins")
-        globals::parameters[P_KEEP_UNCONN_PINS] = true;
-      else if (parameter == "log")
-        globals::parameters[P_LOG] = true;
-      else if (parameter == "anon")
-        globals::parameters[P_ANONYMIZE] = true;
-      else if (parameter == "ctl")
-        globals::parameters[P_CTL] = true;
+			parameter = args_info.parameter_arg[i];
+	    		if (parameter == "filter") {
+	      			options[O_SKIP_BY_FILTER] = true;
+	      			globals::filterCharacteristics[PC_EMPTY] = true;
+	      			//globals::filterCharacteristics[PC_PIN_MULTI_NONMATCH] = true;
+	      			globals::filterCharacteristics[PC_OVERLAPPING] = true;
+	    		} else if (parameter == "taskfile")
+        			globals::parameters[P_TASKFILE] = true;
+	    		else if (parameter == "keeppins")
+        			globals::parameters[P_KEEP_UNCONN_PINS] = true;
+      			else if (parameter == "log")
+        			globals::parameters[P_LOG] = true;
+      			else if (parameter == "anon")
+        			globals::parameters[P_ANONYMIZE] = true;
+      			else if (parameter == "ctl")
+        			globals::parameters[P_CTL] = true;
 			else {
 				trace(TRACE_ALWAYS, "Unknown parameter \"" + parameter +"\".\n");
 				trace(TRACE_ALWAYS, "Use -h to get a list of valid parameters.\n");
-        abort(4, "Parameter error");
+        			abort(4, "Parameter error");
 			}
 
-			break;
-		}
+	}
+	
+	for (int i = 0; i < args_info.skip_given; ++i)
+	{
+		options[O_SKIP_BY_FILTER] = true;
+		parameter = args_info.skip_arg[i];
+		if (parameter == "empty")
+        		globals::filterCharacteristics[PC_EMPTY] = true;
+     		else if (parameter == "multi")
+        		globals::filterCharacteristics[PC_PIN_MULTI] = true;
+      		else if (parameter == "multiNonMatching")
+        		globals::filterCharacteristics[PC_PIN_MULTI_NONMATCH] = true;
+      		else if (parameter == "overlappingPins")
+        		globals::filterCharacteristics[PC_OVERLAPPING] = true;
+     		else if (parameter == "trivialInterface")
+        		globals::filterCharacteristics[PC_TRIVIAL_INTERFACE] = true;
+      		else {
+        		trace(TRACE_ALWAYS, "Unknown filtering process characteristic \"" + parameter +"\".\n");
+        		trace(TRACE_ALWAYS, "Use -h to get a list of valid process characteristics.\n");
+        		abort(4, "Parameter error");
+      		}
 
-		case 's':
-		{
-		  options[O_SKIP_BY_FILTER] = true;
-		  parameter = string(optarg);
-
-		  if (parameter == "empty")
-        globals::filterCharacteristics[PC_EMPTY] = true;
-      else if (parameter == "multi")
-        globals::filterCharacteristics[PC_PIN_MULTI] = true;
-      else if (parameter == "multiNonMatching")
-        globals::filterCharacteristics[PC_PIN_MULTI_NONMATCH] = true;
-      else if (parameter == "overlappingPins")
-        globals::filterCharacteristics[PC_OVERLAPPING] = true;
-      else if (parameter == "trivialInterface")
-        globals::filterCharacteristics[PC_TRIVIAL_INTERFACE] = true;
-      else {
-        trace(TRACE_ALWAYS, "Unknown filtering process characteristic \"" + parameter +"\".\n");
-        trace(TRACE_ALWAYS, "Use -h to get a list of valid process characteristics.\n");
-        abort(4, "Parameter error");
-      }
-
-		  break;
-		}
-
-    case 'a':
-    {
-      options[O_ANALYSIS] = true;
-      parameter = string(optarg);
-
-      if (parameter == "soundness")
-        globals::analysis[A_SOUNDNESS] = true;
-      else if (parameter == "stop")
-        globals::analysis[A_STOP_NODES] = true;
-      else if (parameter == "deadlocks")
-        globals::analysis[A_DEADLOCKS] = true;
-      else if (parameter == "safe")
-        globals::analysis[A_SAFE] = true;
-      else if (parameter == "noData")
-        globals::analysis[A_TERM_IGNORE_DATA] = true;
-      else if (parameter == "wfNet")
-        globals::analysis[A_TERM_WF_NET] = true;
-      else if (parameter == "orJoin")
-        globals::analysis[A_TERM_ORJOIN] = true;
-      else {
-        trace(TRACE_ALWAYS, "Unknown analysis task \"" + parameter +"\".\n");
-        trace(TRACE_ALWAYS, "Use -h to get a list of valid analysis tasks.\n");
-        abort(4, "Parameter error");
-      }
-
-      break;
-    }
-
-		case 'd':
-		{
-			options[O_DEBUG] = true;
-			parameter = string(optarg);
-
-			if (parameter == "flex")
-				frontend__flex_debug = 1;
-			else if (parameter == "bison")
-				frontend_debug = 1;
-			else if (parameter == "1")
-				debug_level = TRACE_WARNINGS;
-			else if (parameter == "2")
-				debug_level = TRACE_INFORMATION;
-			else if (parameter == "3")
-				debug_level = TRACE_DEBUG;
-			else if (parameter == "4")
-				debug_level = TRACE_VERY_DEBUG;
-			else if (parameter == "0")
-				debug_level = TRACE_ERROR;
-			else {
-				trace(TRACE_ALWAYS, "Unrecognised debug mode: \"" + parameter +"\"!\n");
-				trace(TRACE_ALWAYS, "Use -h to get a list of valid debug modes.\n");
-        abort(4, "Parameter error");
-			}
-			break;
-		}
-
-		case 'r':
-		{
-			globals::reduction_level = toUInt(string(optarg));
-			if (globals::reduction_level == UINT_MAX)
-			{
-				trace(TRACE_ALWAYS, "Unrecognised reduction mode: \"" + string(optarg) +"\"!\n");
-				trace(TRACE_ALWAYS, "Define a number between 0 and 6.\n");
-        abort(4, "Parameter error");
-			}
-
-			break;
-		}
-
-		case 'R':
-		{
-      options[O_ROLECUT] = true;
-			break;
-		}
-
-		case 'e':
-		{
-      options[O_ROLECUT] = true;
-			parameter = string(optarg);
-      globals::exclusiveRoles.insert(string(parameter));
-			break;
-		}
-
-		case 'c':
-		{
-      options[O_ROLECUT] = true;
-			parameter = string(optarg);
-      globals::keepRoles.insert(string(parameter));
-			break;
-		}
-
-		default:
-		{
-			trace("Unknown option!\n");
-			trace(TRACE_ALWAYS, "Use -h to get a list of valid options.\n");
-      abort(4, "Parameter error");
-			break;
-		}
-		}
 	}
 
-	for ( ; optind < argc; ++optind)
+	for (int i = 0; i < args_info.analysis_given; ++i)
+	{
+		 options[O_ANALYSIS] = true;
+     		 parameter = args_info.analysis_arg[i];
+
+      		 if (parameter == "soundness")
+        	 	globals::analysis[A_SOUNDNESS] = true;
+      		else if (parameter == "stop")
+        		globals::analysis[A_STOP_NODES] = true;
+      		else if (parameter == "deadlocks")
+        		globals::analysis[A_DEADLOCKS] = true;
+      		else if (parameter == "safe")
+        		globals::analysis[A_SAFE] = true;
+      		else if (parameter == "noData")
+        		globals::analysis[A_TERM_IGNORE_DATA] = true;
+      		else if (parameter == "wfNet")
+        		globals::analysis[A_TERM_WF_NET] = true;
+      		else if (parameter == "orJoin")
+       	 		globals::analysis[A_TERM_ORJOIN] = true;
+      		else {
+        		trace(TRACE_ALWAYS, "Unknown analysis task \"" + parameter +"\".\n");
+        		trace(TRACE_ALWAYS, "Use -h to get a list of valid analysis tasks.\n");
+        		abort(4, "Parameter error");
+      		}
+
+	}
+
+	if(args_info.debug_given)
+	{
+		options[O_DEBUG] = true;
+		parameter = args_info.debug_arg;
+		if (parameter == "flex")
+			frontend__flex_debug = 1;
+		else if (parameter == "bison")
+			frontend_debug = 1;
+		else if (parameter == "1")
+			debug_level = TRACE_WARNINGS;
+		else if (parameter == "2")
+			debug_level = TRACE_INFORMATION;
+		else if (parameter == "3")
+			debug_level = TRACE_DEBUG;
+		else if (parameter == "4")
+			debug_level = TRACE_VERY_DEBUG;
+		else if (parameter == "0")
+			debug_level = TRACE_ERROR;
+		else {
+			trace(TRACE_ALWAYS, "Unrecognised debug mode: \"" + parameter +"\"!\n");
+			trace(TRACE_ALWAYS, "Use -h to get a list of valid debug modes.\n");
+       			abort(4, "Parameter error");
+		}
+	
+	}
+
+	if(args_info.reduce_given)
+	{
+		globals::reduction_level = toUInt(args_info.reduce_arg);
+		if (globals::reduction_level == UINT_MAX)
+		{
+			trace(TRACE_ALWAYS, "Unrecognised reduction mode: \"" + string(args_info.reduce_arg) +"\"!\n");
+			trace(TRACE_ALWAYS, "Define a number between 0 and 6.\n");
+        		abort(4, "Parameter error");
+		}
+
+	}
+	if(args_info.rolecut_given)
+		options[O_ROLECUT] = true;
+
+	if(args_info.roleexclusive_given)
+	{
+	        options[O_ROLECUT] = true;
+	        parameter = args_info.roleexclusive_arg;
+                globals::exclusiveRoles.insert(string(parameter));
+	}
+
+	if(args_info.rolecontains_given)
+	{
+		options[O_ROLECUT] = true;
+		parameter = string(args_info.rolecontains_arg);
+      		globals::keepRoles.insert(string(parameter));
+
+	}
+
+	for(int i=0;i<args_info.inputs_num;i++)
 	{
 		options[O_INPUT] = true;
-		globals::filename = string(argv[optind]);
+		globals::filename = string(args_info.inputs[i]);
 		if (inputfiles.find(globals::filename) == inputfiles.end())
 		{
 			inputfiles.insert(globals::filename);
@@ -460,23 +317,8 @@ void parse_command_line(int argc, char* argv[])
 			trace(TRACE_WARNINGS, "         more than once.\n");
 			trace(TRACE_WARNINGS, "         So file will only be read once.\n");
 		}
+
 	}
-
-	// print help and exit
-	if (options[O_HELP])
-	{
-		print_help();
-		exit(EXIT_SUCCESS);
-	}
-
-
-	// print version and exit
-	if (options[O_VERSION])
-	{
-		print_version();
-		exit(EXIT_SUCCESS);
-	}
-
 
 	// check whether all input files are available
 	if (options[O_INPUT])
@@ -488,144 +330,145 @@ void parse_command_line(int argc, char* argv[])
 	      abort(5, "File `%s' not found.", file->c_str());
 	    }
 	    fclose(fin);
-		}
+	  }
 	}
 
 	// set output file names consistent to parameters and input file names
-  if ( options[O_OUTPUT] )
-  {
-    createOutputFile = true;
+  	if ( options[O_OUTPUT] )
+  	{
+    	  createOutputFile = true;
 
-    if (globals::output_filename == "")
-    {
-      // set output file name to a standard output filename in case of no inputfiles
-      if ( not(options[O_INPUT]) )
-      {
-        globals::output_filename = "stdof";
-        trace(TRACE_ALWAYS, "Output file name set to standard: stdof\n");
-      }
-      else
-      {
-        set< string >::iterator file = inputfiles.begin();
-        globals::getOutputFileNameFromInput = true;
-        trace(TRACE_INFORMATION, "Generating output file name from input file name\n");
-      }
-    } else {
-      // separate output file name into path and file name
-      char* ffile = (char*)malloc(globals::output_filename.size() + sizeof(char));
-      strcpy(ffile, globals::output_filename.c_str());
+    	if (globals::output_filename == "")
+        {
+      	  // set output file name to a standard output filename in case of no inputfiles
+          if ( not(options[O_INPUT]) )
+      	  {
+            globals::output_filename = "stdof";
+            trace(TRACE_ALWAYS, "Output file name set to standard: stdof\n");
+          }
+          else
+          {
+           set< string >::iterator file = inputfiles.begin();
+           globals::getOutputFileNameFromInput = true;
+           trace(TRACE_INFORMATION, "Generating output file name from input file name\n");
+          }
+        } else {
+      	   // separate output file name into path and file name
+           char* ffile = (char*)malloc(globals::output_filename.size() + sizeof(char));
+           strcpy(ffile, globals::output_filename.c_str());
 
-      if (ffile[globals::output_filename.size()-1] != GetSeparatorChar()) {
-        // output file name does not end with a directory-slash -> interpret as filename
-        globals::output_directory = string(::dirname(ffile));
-        globals::output_filename = string(::basename(ffile));
-      } else {
-        // output file name does end with a directory-slash -> interpret as directory name for output directory
-        globals::output_directory = string(::dirname(ffile))+GetSeparatorChar()+string(::basename(ffile));
-        globals::output_filename = "";
-        globals::getOutputFileNameFromInput = true;
-      }
-      free(ffile);
-    }
-  }
+           if (ffile[globals::output_filename.size()-1] != GetSeparatorChar()) {
+           // output file name does not end with a directory-slash -> interpret as filename
+           globals::output_directory = string(::dirname(ffile));
+           globals::output_filename = string(::basename(ffile));
+           } else {
+            // output file name does end with a directory-slash -> interpret as directory name for output directory
+            globals::output_directory = string(::dirname(ffile))+GetSeparatorChar()+string(::basename(ffile));
+            globals::output_filename = "";
+            globals::getOutputFileNameFromInput = true;
+           }
+           free(ffile);
+         }
+        }
 
-  if (options[O_INPUT]) {
-    trace(TRACE_INFORMATION, " - input is read from \"" + globals::filename + "\"\n");
-  }
-  if (options[O_OUTPUT]) {
-    string outFileName = (globals::output_filename == "") ? "<in>" : globals::output_filename;
-    trace(TRACE_INFORMATION, " - output files will be named \"" + globals::output_directory+GetSeparatorChar()+outFileName + ".<ext>\"\n");
-  }
+	  if (options[O_INPUT]) {
+	    trace(TRACE_INFORMATION, " - input is read from \"" + globals::filename + "\"\n");
+	  }
+	  if (options[O_OUTPUT]) {
+	    string outFileName = (globals::output_filename == "") ? "<in>" : globals::output_filename;
+	    trace(TRACE_INFORMATION, " - output files will be named \"" + globals::output_directory+GetSeparatorChar()+outFileName + ".<ext>\"\n");
+	  }
 
-  if (options[O_ROLECUT]) {
-    if (globals::keepRoles.empty() && globals::exclusiveRoles.empty()) {
-      trace(TRACE_INFORMATION, "cutting processes, removing all roles not containing a start node\n");
-      globals::deriveRolesToCut = true;
-    } else {
-      if (!globals::keepRoles.empty())
-        trace(TRACE_INFORMATION, "cutting processes, preserving roles by containtment\n");
-      if (!globals::exclusiveRoles.empty())
-        trace(TRACE_INFORMATION, "cutting processes, preserving roles by exact match\n");
-    }
-  }
+	  if (options[O_ROLECUT]) {
+	    if (globals::keepRoles.empty() && globals::exclusiveRoles.empty()) {
+	      trace(TRACE_INFORMATION, "cutting processes, removing all roles not containing a start node\n");
+	      globals::deriveRolesToCut = true;
+	    } else {
+	      if (!globals::keepRoles.empty())
+		trace(TRACE_INFORMATION, "cutting processes, preserving roles by containtment\n");
+	      if (!globals::exclusiveRoles.empty())
+		trace(TRACE_INFORMATION, "cutting processes, preserving roles by exact match\n");
+	    }
+	  }
 
-  if (options[O_ANALYSIS]) {
+	  if (options[O_ANALYSIS]) {
 
-    if (globals::analysis[A_SOUNDNESS])
-      trace(TRACE_INFORMATION, "generating nets to analyze soundness\n");
-    if (globals::analysis[A_STOP_NODES]) {
-      trace(TRACE_INFORMATION, "distinguishing stop nodes from end nodes\n");
-      if (!globals::analysis[A_SOUNDNESS]) {
-        trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
-      }
-    }
-    if (globals::analysis[A_DEADLOCKS])
-      trace(TRACE_INFORMATION, "checking for absence of deadlocks\n");
-    if (globals::analysis[A_SAFE])
-      trace(TRACE_INFORMATION, "checking for safeness\n");
-    if (globals::analysis[A_SAFE] && globals::analysis[A_SOUNDNESS]) {
-      trace(TRACE_INFORMATION, "multiple model-checking analysis tasks: forcing analysis task files\n");
-      options[O_PARAMETER] = true;
-      globals::parameters[P_TASKFILE] = true;
-    }
+	    if (globals::analysis[A_SOUNDNESS])
+	      trace(TRACE_INFORMATION, "generating nets to analyze soundness\n");
+	    if (globals::analysis[A_STOP_NODES]) {
+	      trace(TRACE_INFORMATION, "distinguishing stop nodes from end nodes\n");
+	      if (!globals::analysis[A_SOUNDNESS]) {
+		trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
+	      }
+	    }
+	    if (globals::analysis[A_DEADLOCKS])
+	      trace(TRACE_INFORMATION, "checking for absence of deadlocks\n");
+	    if (globals::analysis[A_SAFE])
+	      trace(TRACE_INFORMATION, "checking for safeness\n");
+	    if (globals::analysis[A_SAFE] && globals::analysis[A_SOUNDNESS]) {
+	      trace(TRACE_INFORMATION, "multiple model-checking analysis tasks: forcing analysis task files\n");
+	      options[O_PARAMETER] = true;
+	      globals::parameters[P_TASKFILE] = true;
+	    }
 
-    // count how many termination semantics shall be applied
-    int terminationFlags = 0;
-    if (globals::analysis[A_TERM_IGNORE_DATA]) {
-      trace(TRACE_INFORMATION, "removing output pinsets\n");
-      if (!globals::analysis[A_SOUNDNESS]) {
-        trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
-      }
-      terminationFlags++;
-    }
-    if (globals::analysis[A_TERM_WF_NET]) {
-      trace(TRACE_INFORMATION, "creating a workflow net with a final AND-join\n");
-      if (!globals::analysis[A_SOUNDNESS]) {
-        trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
-      }
-      terminationFlags++;
-    }
-    if (globals::analysis[A_TERM_ORJOIN]) {
-      trace(TRACE_INFORMATION, "creating a workflow net with a final implicit OR-join\n");
-      if (!globals::analysis[A_SOUNDNESS]) {
-        trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
-      }
-      terminationFlags++;
-    }
+	    // count how many termination semantics shall be applied
+	    int terminationFlags = 0;
+	    if (globals::analysis[A_TERM_IGNORE_DATA]) {
+	      trace(TRACE_INFORMATION, "removing output pinsets\n");
+	      if (!globals::analysis[A_SOUNDNESS]) {
+		trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
+	      }
+	      terminationFlags++;
+	    }
+	    if (globals::analysis[A_TERM_WF_NET]) {
+	      trace(TRACE_INFORMATION, "creating a workflow net with a final AND-join\n");
+	      if (!globals::analysis[A_SOUNDNESS]) {
+		trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
+	      }
+	      terminationFlags++;
+	    }
+	    if (globals::analysis[A_TERM_ORJOIN]) {
+	      trace(TRACE_INFORMATION, "creating a workflow net with a final implicit OR-join\n");
+	      if (!globals::analysis[A_SOUNDNESS]) {
+		trace(TRACE_INFORMATION, "  - note: only reasonable if also analyzing soundness\n");
+	      }
+	      terminationFlags++;
+	    }
 
-    if (terminationFlags > 1) {
-      trace(TRACE_ALWAYS, "ERROR: more than one termination semantics selected, please choose at most one.\n");
-      abort(4, "Parameter error");
-    }
+	    if (terminationFlags > 1) {
+	      trace(TRACE_ALWAYS, "ERROR: more than one termination semantics selected, please choose at most one.\n");
+	      abort(4, "Parameter error");
+	    }
 
-  }
+	  }
 
-  if (options[O_SKIP_BY_FILTER]) {
-    if (globals::filterCharacteristics[PC_EMPTY])
-      trace(TRACE_INFORMATION, "skipping empty processes\n");
-    if (globals::filterCharacteristics[PC_PIN_MULTI])
-      trace(TRACE_INFORMATION, "skipping processes with pin multiplicities\n");
-    if (globals::filterCharacteristics[PC_PIN_MULTI_NONMATCH])
-      trace(TRACE_INFORMATION, "skipping processes with non-matching pin multiplicities\n");
-    if (globals::filterCharacteristics[PC_OVERLAPPING])
-      trace(TRACE_INFORMATION, "skipping processes with overlapping pinsets\n");
-    if (globals::filterCharacteristics[PC_TRIVIAL_INTERFACE]) {
-      trace(TRACE_INFORMATION, "skipping processes with trivial interface\n");
-      if (!options[O_ROLECUT])
-        trace(TRACE_INFORMATION, "  - note: effective only when cutting rules (option '-R')\n");
-    }
-  }
+	  if (options[O_SKIP_BY_FILTER]) {
+	    if (globals::filterCharacteristics[PC_EMPTY])
+	      trace(TRACE_INFORMATION, "skipping empty processes\n");
+	    if (globals::filterCharacteristics[PC_PIN_MULTI])
+	      trace(TRACE_INFORMATION, "skipping processes with pin multiplicities\n");
+	    if (globals::filterCharacteristics[PC_PIN_MULTI_NONMATCH])
+	      trace(TRACE_INFORMATION, "skipping processes with non-matching pin multiplicities\n");
+	    if (globals::filterCharacteristics[PC_OVERLAPPING])
+	      trace(TRACE_INFORMATION, "skipping processes with overlapping pinsets\n");
+	    if (globals::filterCharacteristics[PC_TRIVIAL_INTERFACE]) {
+	      trace(TRACE_INFORMATION, "skipping processes with trivial interface\n");
+	      if (!options[O_ROLECUT])
+		trace(TRACE_INFORMATION, "  - note: effective only when cutting rules (option '-R')\n");
+	    }
+	  }
 
-  if (options[O_PARAMETER]) {
-    if (globals::parameters[P_TASKFILE])
-      trace(TRACE_INFORMATION, "write analysis task in separate files\n");
-    if (globals::parameters[P_LOG])
-      trace(TRACE_INFORMATION, "write log file\n");
-    if (globals::parameters[P_ANONYMIZE])
-      trace(TRACE_INFORMATION, "anonymize output\n");
-    if (globals::parameters[P_KEEP_UNCONN_PINS])
-      trace(TRACE_INFORMATION, "keep unconnected pins\n");
-  }
+	  if (options[O_PARAMETER]) {
+	    if (globals::parameters[P_TASKFILE])
+	      trace(TRACE_INFORMATION, "write analysis task in separate files\n");
+	    if (globals::parameters[P_LOG])
+	      trace(TRACE_INFORMATION, "write log file\n");
+	    if (globals::parameters[P_ANONYMIZE])
+	      trace(TRACE_INFORMATION, "anonymize output\n");
+	    if (globals::parameters[P_KEEP_UNCONN_PINS])
+	      trace(TRACE_INFORMATION, "keep unconnected pins\n");
+	  }
+
 }
 
 

@@ -14,7 +14,7 @@ sa2sm_SOURCES = sa2sm.cc
 
 cdnf_SOURCES = cdnf.cc cdnf-cmdline.c cdnf-cmdline.h \
                Output.h Output.cc \
-               verbose.h verbose.cc \
+               verbose.h cdnf-verbose.cc \
                cdnf-lexic.ll cdnf-syntax.yy
 
 cphils_SOURCES = cphils.c

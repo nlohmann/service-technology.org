@@ -20,125 +20,155 @@
 #ifndef PORT_H
 #define PORT_H
 
-#include "component.h"
-#include "interface.h"
 #include <string>
-#include <vector>
+#include <set>
+#include "component.h"
 
 namespace pnapi
 {
 
-  // forward declarations
-  class Label;
+// forward declarations
+class PetriNet;
+class Interface;
+class Port;
 
-  class Port
+/*!
+ * \brief interface labels
+ */
+class Label
+{
+public: /* public types */
+  /// communication type
+  enum Type
   {
-  public:
-
-    /// standard constructor (e.g. for global port)
-    Port();
-
-    /// standard copy-constructor
-    Port(const Port &);
-
-    /// standard destructor
-    virtual ~Port();
-
-    Label & addLabel(Label &l);
-
-    /// adding a receive label
-    Label & addInputLabel(const std::string &label);
-
-    /// adding a send label
-    Label & addOutputLabel(const std::string &label);
-
-    /// adding a synchronous label
-    Label & addSynchronousLabel(const std::string &label);
-
-    /// returning the vector of input labels
-    const std::vector<Label *> inputLabels() const;
-
-    /// returning the vector of output labels
-    const std::vector<Label *> outputLabels() const;
-
-    /// returning the vector of synchronous label
-    const std::vector<Label *> synchronousLabels() const;
-
-    /// returning the port string
-    const std::string portString() const;
-
-    /// checks whether the port is empty
-    bool isEmpty() const;
-
-    Label * findLabel(const std::string &label) const;
-
-  private:
-    /// returning the port's input label string
-    const std::string inputLabelString() const;
-
-    /// returning the port's output label string
-    const std::string outputLabelString() const;
-
-    /// returning the port's synchronous label string
-    const std::string synchronousLabelString() const;
-
-  private:
-    /// asynchronous receive
-    std::vector<Label *> input_;
-
-    /// asynchronous send
-    std::vector<Label *> output_;
-
-    /// synchronous
-    std::vector<Label *> synchronous_;
-
+    INPUT,
+    OUTPUT,
+    SYNCHRONOUS
   };
 
+private: /* private variables */
+  /// the petri net this label belongs to
+  PetriNet & net_;
+  /// assigned port
+  Port & port_;
+  /// the label name
+  std::string name_;
+  /// the label type
+  Type type_;
+  /// set of transitions associated to this label
+  std::set<Transition *> transitions_;
+  
+public: /* public methods */
+  /// constructor
+  Label(PetriNet &, Port &, const std::string &, Type);
+  /// standard destructor
+  virtual ~Label();
 
-  class Label
-  {
-  public:
-    /// communication type
-    enum Type { INPUT, OUTPUT, SYNCHRONOUS };
+  /// adding a transition to the attached transitions
+  void addTransition(Transition &);
+  /// removing a transition from the attached transitions
+  void removeTransition(const Transition &);
+  /// swaps input and output labels
+  void mirror();
+  
+  /// returning the label's name
+  const std::string & getName() const;
+  /// returing the label's type
+  Type getType() const;
+  /// get set of connected transitions
+  const std::set<Transition *> & getTransitions() const;
+  /// get the underlying petri net
+  PetriNet & getPetriNet() const;
+  /// get the assigned port
+  Port & getPort() const; 
 
-    /// standard constructor (to be private)
-    Label();
+private: /* private methods */
+  /// no copying allowed
+  Label(const Label &);
+};
 
-    /// standard constructor
-    Label(const std::string &id, Type type);
 
-    /// standard copy constructor
-    Label(const Label &);
+/*!
+ * \brief port class storing interface labels
+ */
+class Port
+{
+private: /* private variables */
+  /// the net the port belongs to
+  PetriNet & net_;
+  /// name of the port
+  std::string name_;
+  /// asynchronous receive
+  std::set<Label *> input_;
+  /// asynchronous send
+  std::set<Label *> output_;
+  /// synchronous
+  std::set<Label *> synchronous_;
+  /// all labels for faster processing
+  std::set<Label *> allLabels_;
+    
+public: /* public methods */
+  /*!
+   * \name constructors and destructors
+   */
+  //@{
+  /// standard constructor (e.g. for global port)
+  Port(PetriNet &, const std::string &);
+  /// compose constructor
+  Port(PetriNet &, const Port &, const Port &, std::map<Label *, Label *> &,
+       std::map<Label *, Place *> &, std::set<Label *> &); 
+  /// standard destructor
+  virtual ~Port();
+  //@}
 
-    /// standard destructor
-    virtual ~Label();
+  /*!
+   * \name structural changes
+   */
+  //@{
+  /// adding a label
+  Label & addLabel(Label &);
+  /// adding a label with a given type
+  Label & addLabel(const std::string &, Label::Type);
+  /// adding an input label
+  Label & addInputLabel(const std::string &);
+  /// adding an output label
+  Label & addOutputLabel(const std::string &);
+  /// adding a synchronous label
+  Label & addSynchronousLabel(const std::string &);
+  /// deleting a label
+  void removeLabel(const std::string &);
+  /// swaps input and output labels
+  void mirror();
+  //@}
 
-    /// returning the label's identifier
-    const std::string label() const;
+  /*!
+   * \brief getter
+   */
+  //@{
+  /// return the name of the port
+  const std::string & getName() const;
+  /// returning the set of input labels
+  const std::set<Label *> & getInputLabels() const;
+  /// returning the set of output labels
+  const std::set<Label *> & getOutputLabels() const;
+  /// returning the set of synchronous label
+  const std::set<Label *> & getSynchronousLabels() const;
+  /// returning the set of all labels
+  const std::set<Label *> & getAllLabels() const;
+  /// returning the port string
+  const std::string getPortString() const;
+  /// checks whether the port is empty
+  bool isEmpty() const;
+  /// seach for a certain label
+  Label * findLabel(const std::string &) const;
+  /// get the underlying petri net
+  PetriNet & getPetriNet() const;
+  //@}
 
-    /// returing the label's type
-    Type type() const;
-
-    /// returning the label's typed string (e.g. for input a = ?a)
-    const std::string typedString() const;
-
-    /// adding a transition to the attached transitions
-    void addTransition(Transition *t);
-
-    /// removing a transition from the attached transitions
-    void removeTransition(const Transition *t);
-
-  private:
-    /// the label name
-    std::string id_;
-
-    /// the label type
-    Type type_;
-
-    /// set of transitions
-    std::vector<Transition *> transitions_;
-
-  };
+private: /* private methods */
+  /// no copying allowed
+  Port(const Port &);
+};
 
 } /* namespace pnapi */
 

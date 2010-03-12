@@ -4,16 +4,15 @@
 #include <cstring>
 #include <string>
 #include <fstream>
-//#include "cmdline.h"
+#include "cdnf-cmdline.h" // TODO: find proper solution for different commandline parsers
 #include "verbose.h"
 
-//extern gengetopt_args_info args_info;
+extern gengetopt_args_info args_info;
 
 
 /***************************************************************************\
  * syslog functionalities (to be enabled with "configure --enable-syslog") *
 \***************************************************************************/
-/*
 #ifdef USE_SYSLOG
 #include <syslog.h>
 
@@ -38,14 +37,13 @@ namespace st {
     Logger myLogger;
 }
 #endif
-*/
+
 
 /*!
  \param format  the status message formatted as printf string
  
  \note use this function rather sparsely in order not to spam the output
 */
-/*
 void message(const char* format, ...) {
     fprintf(stderr, "%s: ", _ctool_(PACKAGE));
 
@@ -62,16 +60,15 @@ void message(const char* format, ...) {
 
     fprintf(stderr, "\n");
 }
-*/
+
 
 /*!
  \param format  the status message formatted as printf string
 */
-/*
 void status(const char* format, ...) {
-    //if (not args_info.verbose_flag) {
-    //    return;
-    //}
+    if (not args_info.verbose_flag) {
+        return;
+    }
 
     fprintf(stderr, "%s: ", _ctool_(PACKAGE));
 
@@ -88,7 +85,7 @@ void status(const char* format, ...) {
 
     fprintf(stderr, "\n");
 }
-*/
+
 
 /*!
  \param code    the error code
@@ -96,7 +93,6 @@ void status(const char* format, ...) {
 
  \note The codes should be documented in the manual.
 */
-/*
 void abort(unsigned short code, const char* format, ...) {
     fprintf(stderr, "%s: %s", _ctool_(PACKAGE), _bold_);
 
@@ -120,9 +116,9 @@ void abort(unsigned short code, const char* format, ...) {
 
     exit(EXIT_FAILURE);
 }
-*/
 
-/*
+
+
 void displayFileError(char* filename, int lineno, char* token) {
     std::ifstream f(filename);
     std::string line;
@@ -141,4 +137,3 @@ void displayFileError(char* filename, int lineno, char* token) {
     }
     fprintf(stderr, "\n");
 }
-*/

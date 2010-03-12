@@ -57,6 +57,8 @@
 
 #include <cstring>
 
+ //TODO: get rid of redefinition warnings (hacks are ok)
+
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line
 #define yytext   pnapi::parser::token

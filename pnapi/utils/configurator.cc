@@ -113,13 +113,12 @@ int main(int argc, char** argv) {
     `----------------------------*/
     Place &pstart = net.createPlace("config_p0");
 
-    std::set<std::string> labels;
-    labels.insert("start");
-    net.addSynchronousLabels(labels);
-    Transition& start = net.createTransition("config_start", labels);
+    Label & label = net.getInterface().addSynchronousLabel("start");
+    Transition & start = net.createTransition("config_start");
+    start.addLabel(label);
     net.createArc(pstart, start);
 
-    PNAPI_FOREACH(std::set<Place*>, net.getInternalPlaces(), p) {
+    PNAPI_FOREACH(p, net.getPlaces()) {
         if ((*p)->getTokenCount() > 0) {
             net.createArc(start, **p, (*p)->getTokenCount());
             (*p)->setTokenCount(0);
@@ -133,14 +132,14 @@ int main(int argc, char** argv) {
     | 4. proceed with the configuration interface |
     `--------------------------------------------*/
     if (args_info.allowByDefault_given) {
-        PNAPI_FOREACH(std::set<Transition*>, originalTransitions, t) {
+        PNAPI_FOREACH(t, originalTransitions) {
             // only process transitions with role information if required
             if (args_info.roles_flag and (*t)->getRoles().empty()) {
                 continue;
             }
 
             // create a "guard" place for each transition and mark it
-            Place &pt = net.createPlace("config_pa_" + (*t)->getName(), Node::INTERNAL, 1);
+            Place & pt = net.createPlace("config_pa_" + (*t)->getName(), 1);
             net.createArc(pt, **t);
             net.createArc(**t, pt);
             
@@ -153,10 +152,9 @@ int main(int argc, char** argv) {
                 std::string role = *(roles.begin());
                 Transition *bt = net.findTransition("config_b_" + role);
                 if (bt == NULL) {
-                    std::set<std::string> temp_labels;
-                    temp_labels.insert("block_" + role);
-                    net.addSynchronousLabels(temp_labels);
-                    bt = &(net.createTransition("config_b_" + role, temp_labels));
+                    Label & temp_label = net.getInterface().addSynchronousLabel("block_" + role);
+                    bt = &(net.createTransition("config_b_" + role));
+                    bt->addLabel(temp_label);
 
                     // connect "block" transition
                     net.createArc(pstart, *bt);
@@ -165,10 +163,9 @@ int main(int argc, char** argv) {
                 net.createArc(pt, *bt);
             } else {
                 // create a "block" transition for each transition
-                std::set<std::string> temp_labels;
-                temp_labels.insert("block_" + (*t)->getName());
-                Transition &bt = net.createTransition("config_b_" + (*t)->getName(), temp_labels);
-                net.addSynchronousLabels(temp_labels);
+                Label & temp_label = net.getInterface().addSynchronousLabel("block_" + (*t)->getName());
+                Transition & bt = net.createTransition("config_b_" + (*t)->getName());
+                bt.addLabel(temp_label);
 
                 // connect "block" transition
                 net.createArc(pt, bt);
@@ -179,7 +176,7 @@ int main(int argc, char** argv) {
     }
 
     if (args_info.blockByDefault_given) {
-        PNAPI_FOREACH(std::set<Transition*>, originalTransitions, t) {
+        PNAPI_FOREACH(t, originalTransitions) {
             // only process transitions with role information if required
             if (args_info.roles_flag and (*t)->getRoles().empty()) {
                 continue;
@@ -199,26 +196,24 @@ int main(int argc, char** argv) {
                 std::string role = *(roles.begin());
                 Transition *at = net.findTransition("config_a_" + role);
                 if (at == NULL) {
-                    std::set<std::string> temp_labels;
-                    temp_labels.insert("allow_" + role);
-                    net.addSynchronousLabels(temp_labels);
-                    at = &(net.createTransition("config_a_" + role, temp_labels));
+                    Label & temp_label = net.getInterface().addSynchronousLabel("allow_" + role);
+                    at = &(net.createTransition("config_a_" + role));
+                    at->addLabel(temp_label);
 
                     // connect "allow" transition
                     net.createArc(pstart, *at);
                     net.createArc(*at, pstart);
 
                     // create a "guard" place to make net bounded
-                    Place &pbt = net.createPlace("config_pb_" + role, Node::INTERNAL, 1);
+                    Place &pbt = net.createPlace("config_pb_" + role, 1);
                     net.createArc(pbt, *at);
                 }
                 net.createArc(*at, pt);
             } else {
                 // create an "allow" transition for each transition
-                std::set<std::string> temp_labels;
-                temp_labels.insert("allow_" + (*t)->getName());
-                Transition &at = net.createTransition("config_a_" + (*t)->getName(), temp_labels);
-                net.addSynchronousLabels(temp_labels);
+                Label & temp_label = net.getInterface().addSynchronousLabel("allow_" + (*t)->getName());
+                Transition & at = net.createTransition("config_a_" + (*t)->getName());
+                at.addLabel(temp_label);
 
                 // connect "allow" transition
                 net.createArc(at, pt);
@@ -226,7 +221,7 @@ int main(int argc, char** argv) {
                 net.createArc(at, pstart);
 
                 // create a "guard" place to make net bounded
-                Place &pbt = net.createPlace("config_pb_" + (*t)->getName(), Node::INTERNAL, 1);
+                Place &pbt = net.createPlace("config_pb_" + (*t)->getName(), 1);
                 net.createArc(pbt, at);
             }
         }

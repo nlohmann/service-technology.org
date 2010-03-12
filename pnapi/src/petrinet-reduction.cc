@@ -57,7 +57,6 @@
  *****************************************************************************/
 
 #include "config.h"
-#include <cassert>
 
 #include <iostream>
 #include <list>
@@ -73,6 +72,7 @@ using std::cout;
 using std::flush;
 using std::endl;
 using std::list;
+using std::map;
 using std::pair;
 using std::set;
 
@@ -111,14 +111,18 @@ unsigned int PetriNet::reduce_unused_status_places()
   unsigned int result = 0;
 
   // find unused status places
-  PNAPI_FOREACH(set<Place*>, internalPlaces_, p)
+  PNAPI_FOREACH(p, places_)
+  {
     if ( ((*p)->getPostset().empty()) && // precondition 2
         __REDUCE_CHECK_FINAL(*p) && // precondition 4
         ((*p)->getTokenCount() == 0 ) ) // precondition 3
+    {
       unused_status_places.insert(*p);
+    }
+  }
 
   // remove unused places
-  PNAPI_FOREACH(set<Place*>, unused_status_places, p)
+  PNAPI_FOREACH(p, unused_status_places)
   {
     deletePlace(**p);
     ++result;    
@@ -155,21 +159,23 @@ unsigned int PetriNet::reduce_unused_status_places()
 unsigned int PetriNet::reduce_suspicious_transitions()
 {
   // trace(TRACE_DEBUG, "[PN]\tReducing suspicious transitions...\n");
-  set<Transition*> suspiciousTransitions;
+  set<Transition *> suspiciousTransitions;
   unsigned int result = 0;
 
   // find suspicious transitions
-  PNAPI_FOREACH(set<Transition*>, transitions_, t)
+  PNAPI_FOREACH(t, transitions_)
   {
     if ((*t)->isSynchronized())
       continue;
-    if ( (*t)->getPostset().empty() || 
-        (*t)->getPreset().empty() )
+    if ( ((*t)->getPostset().empty() && (*t)->getOutputLabels().empty()) || 
+         ((*t)->getPreset().empty() && (*t)->getInputLabels().empty()) )
+    {
       suspiciousTransitions.insert(*t);
+    }
   }
 
   // remove suspicious transitions
-  PNAPI_FOREACH(set<Transition*>, suspiciousTransitions, t)
+  PNAPI_FOREACH(t, suspiciousTransitions)
   {
     deleteTransition(**t);
     ++result;
@@ -213,24 +219,24 @@ unsigned int PetriNet::reduce_dead_nodes()
   {
     done = true;
 
-    set<Place*> deadPlaces;
-    set<Transition*> deadTransitions;
+    set<Place *> deadPlaces;
+    set<Transition *> deadTransitions;
 
     // find insufficiently marked places with empty preset
-    PNAPI_FOREACH(set<Place*>, internalPlaces_, p)
+    PNAPI_FOREACH(p, places_)
     {
       if ( ((*p)->getPreset().empty()) && // precondition 1 
           __REDUCE_CHECK_FINAL(*p) ) // precondition 3
       {
         // check the postset
-        bool arcs=true;		
+        bool arcs = true;		
 
-        PNAPI_FOREACH(set<Arc*>, (*p)->getPostsetArcs(), a)
+        PNAPI_FOREACH(a, (*p)->getPostsetArcs())
         {
           if( ((*a)->getWeight() <= (*p)->getTokenCount()) || // precondition 2
               ((*a)->getTransition().isSynchronized()) ) // precondition 4
           {
-            arcs=false; // there exists a transition that can fire or is synchronized
+            arcs = false; // there exists a transition that can fire or is synchronized
           }
         }
         if(arcs) 
@@ -238,9 +244,9 @@ unsigned int PetriNet::reduce_dead_nodes()
           deadPlaces.insert(*p); // p is a dead place
 
           // transitions in the postset of a dead place are dead
-          PNAPI_FOREACH(set<Node*>, (*p)->getPostset(), t)
+          PNAPI_FOREACH(t, (*p)->getPostset())
           {
-            deadTransitions.insert(static_cast<Transition*>(*t));
+            deadTransitions.insert(static_cast<Transition *>(*t));
             // trace(TRACE_VERY_DEBUG, "[PN]\tTransition t" + toString((*t)->id) + " is structurally dead\n");
           }
 
@@ -251,13 +257,13 @@ unsigned int PetriNet::reduce_dead_nodes()
     }
 
     // remove dead places and transitions
-    PNAPI_FOREACH(set<Place*>, deadPlaces, p)
+    PNAPI_FOREACH(p, deadPlaces)
     {
       deletePlace(**p);
       ++result;
     }   
 
-    PNAPI_FOREACH(set<Transition*>, deadTransitions, t)
+    PNAPI_FOREACH(t, deadTransitions)
     {
       deleteTransition(**t);
       ++result;
@@ -379,32 +385,31 @@ unsigned int PetriNet::reduce_remove_initially_marked_places_in_choreographies()
  */
 unsigned int PetriNet::reduce_rule_3p()
 {
-  set<Place*> obsoletePlaces, seenPlaces;
-  map<Place*, Place*> replaceRelation;
+  set<Place *> obsoletePlaces, seenPlaces;
+  map<Place *, Place *> replaceRelation;
 
   // iterate internal places
-  PNAPI_FOREACH(set<Place*>, internalPlaces_, p1) // precondition 4 for p1
+  PNAPI_FOREACH(p1, places_) // precondition 4 for p1
   { 
     /*
      * Since parallel places form an equivalence class, each place once
      * identified as parallel to an other place can be ignored.
      */
-    if(seenPlaces.find(*p1)!=seenPlaces.end())
+    if(seenPlaces.find(*p1) != seenPlaces.end())
       continue;
 
     // STEP 1: Get parallel places.
-    set<Place*> parallelPlaces;
+    set<Place *> parallelPlaces;
 
     // get a transition of the preset
-    Node* preTransition = *((*p1)->getPreset().begin());
+    Node * preTransition = *((*p1)->getPreset().begin());
     if(preTransition != NULL)
     {
-      PNAPI_FOREACH(set<Node*>, preTransition->getPostset(), p2)
+      PNAPI_FOREACH(p2, preTransition->getPostset())
       {
-        if ( ((*p2)->getType() == Node::INTERNAL) && // precondition 4 for p2
-             ((*p1)->isParallel(*(*p2))) ) // precondition 1
+        if ((*p1)->isParallel(*(*p2))) // precondition 1
         {
-          parallelPlaces.insert(static_cast<Place*>(*p2));
+          parallelPlaces.insert(static_cast<Place *>(*p2));
         }
       }
     }
@@ -412,14 +417,13 @@ unsigned int PetriNet::reduce_rule_3p()
     if((*p1)->getPreset().empty())
     {
       // get a transition of the postset
-      Node* postTransition = *((*p1)->getPostset().begin());
+      Node * postTransition = *((*p1)->getPostset().begin());
       if(postTransition != 0)
       {
-        PNAPI_FOREACH(set<Node*>, postTransition->getPreset(), p2)
-          if ( ((*p2)->getType() == Node::INTERNAL) && // precondition 4 for p2
-               ((*p1)->isParallel(*(*p2))) ) // precondition 1
+        PNAPI_FOREACH(p2, postTransition->getPreset())
+          if ((*p1)->isParallel(*(*p2))) // precondition 1
           {
-            parallelPlaces.insert(static_cast<Place*>(*p2));
+            parallelPlaces.insert(static_cast<Place *>(*p2));
           }
       }
     }
@@ -429,10 +433,10 @@ unsigned int PetriNet::reduce_rule_3p()
      * places as obsolete (precondition 2)
      */
 
-    Place* minPlace = *p1;
+    Place * minPlace = *p1;
     unsigned int minMark = minPlace->getTokenCount();
     
-    PNAPI_FOREACH(set<Place*>, parallelPlaces, p)
+    PNAPI_FOREACH(p, parallelPlaces)
     {
       if ((*p)->getTokenCount() < minMark)
       {
@@ -442,7 +446,7 @@ unsigned int PetriNet::reduce_rule_3p()
       seenPlaces.insert(*p); // mark places as seen
     }
     parallelPlaces.insert(*p1);
-    PNAPI_FOREACH(set<Place*>, parallelPlaces, p)
+    PNAPI_FOREACH(p, parallelPlaces)
     {
       if( ((*p) != minPlace) &&
           __REDUCE_CHECK_FINAL(*p) ) // precondition 3
@@ -454,10 +458,10 @@ unsigned int PetriNet::reduce_rule_3p()
   }
 
   // STEP 3: remove obsolete places
-  unsigned int result=0;
-  PNAPI_FOREACH(set<Place*>, obsoletePlaces, p1)
+  unsigned int result = 0;
+  PNAPI_FOREACH(p1, obsoletePlaces)
   {
-    Place* p2 = replaceRelation[*p1];
+    Place * p2 = replaceRelation[*p1];
     p2->mergeNameHistory(**p1);
     deletePlace(**p1);
     ++result;
@@ -486,34 +490,34 @@ unsigned int PetriNet::reduce_rule_3p()
  */
 unsigned int PetriNet::reduce_rule_3t()
 {
-  set<Transition*> obsoleteTransitions, seenTransitions;
-  map<Transition*, Transition*> replaceRelation;
+  set<Transition *> obsoleteTransitions, seenTransitions;
+  map<Transition *, Transition *> replaceRelation;
 
   // iterate transitions
-  PNAPI_FOREACH(set<Transition*>, transitions_, t1)
+  PNAPI_FOREACH(t1, transitions_)
   { 
     /*
      * Since parallel transitions form an equivalence class, 
      * each transition once identified as parallel to 
      * an other transition can be ignored.
      */
-    if(seenTransitions.find(*t1)!=seenTransitions.end())
+    if(seenTransitions.find(*t1) != seenTransitions.end())
       continue;
 
     // STEP 1: Get parallel transitions.
 
     // get a place of the preset
-    Node* prePlace = *((*t1)->getPreset().begin());
+    Node * prePlace = *((*t1)->getPreset().begin());
     if(prePlace != NULL)
     {
-      PNAPI_FOREACH(set<Node*>, prePlace->getPostset(), t2)
+      PNAPI_FOREACH(t2, prePlace->getPostset())
       {
         if ( ((*t1)->isParallel(*(*t2))) && // precondition 1
-            (!(static_cast<Transition*>(*t2)->isSynchronized())) ) // precondition 2
+             (!(static_cast<Transition*>(*t2)->isSynchronized())) ) // precondition 2
         {
-          seenTransitions.insert(static_cast<Transition*>(*t2)); // mark transition as seen
-          obsoleteTransitions.insert(static_cast<Transition*>(*t2));
-          replaceRelation[static_cast<Transition*>(*t2)]=*t1;
+          seenTransitions.insert(static_cast<Transition *>(*t2)); // mark transition as seen
+          obsoleteTransitions.insert(static_cast<Transition *>(*t2));
+          replaceRelation[static_cast<Transition *>(*t2)] = *t1;
         }
       }
     }
@@ -521,25 +525,25 @@ unsigned int PetriNet::reduce_rule_3t()
     if((*t1)->getPreset().empty())
     {
       // get a place of the postset
-      Node* postPlace = *((*t1)->getPostset().begin());
+      Node * postPlace = *((*t1)->getPostset().begin());
       if(postPlace != NULL)
       {
-        PNAPI_FOREACH(set<Node*>, postPlace->getPreset(), t2)
+        PNAPI_FOREACH(t2, postPlace->getPreset())
           if ((*t1)->isParallel(*(*t2))) // precondition 1
           {
-            seenTransitions.insert(static_cast<Transition*>(*t2)); // mark transition as seen
-            obsoleteTransitions.insert(static_cast<Transition*>(*t2));
-            replaceRelation[static_cast<Transition*>(*t2)]=*t1;
+            seenTransitions.insert(static_cast<Transition *>(*t2)); // mark transition as seen
+            obsoleteTransitions.insert(static_cast<Transition *>(*t2));
+            replaceRelation[static_cast<Transition *>(*t2)] = *t1;
           }
       }
     }
   }
 
   // STEP 2: remove obsolete transitions
-  unsigned int result=0;
-  PNAPI_FOREACH(set<Transition*>, obsoleteTransitions, t1)
+  unsigned int result = 0;
+  PNAPI_FOREACH(t1, obsoleteTransitions)
   {
-    Transition* t2 = replaceRelation[*t1];
+    Transition * t2 = replaceRelation[*t1];
     t2->mergeNameHistory(**t1);
     deleteTransition(**t1);
     ++result;
@@ -553,10 +557,10 @@ unsigned int PetriNet::reduce_rule_3t()
  * \brief Check whether transitions t1 and t2 are connected to all
  *        places in the same way, except the given places p1 and p2.
  */
-bool PetriNet::reduce_isEqual(Transition* t1, Transition* t2, Place* p1, Place* p2)
+bool PetriNet::reduce_isEqual(Transition * t1, Transition * t2, Place * p1, Place * p2)
 {
   // check for equal presets and postsets
-  set<Node*> places, pre1, pre2;
+  set<Node *> places, pre1, pre2;
   places.insert(p1);
   places.insert(p2);
   pre1 = util::setDifference(t1->getPreset(),places);
@@ -568,7 +572,7 @@ bool PetriNet::reduce_isEqual(Transition* t1, Transition* t2, Place* p1, Place* 
 
   // check for arc weights
   // iterate the preset
-  PNAPI_FOREACH(set<Node*>, t1->getPreset(), p)
+  PNAPI_FOREACH(p, t1->getPreset())
   {
     if (*p == p1)
       continue;
@@ -577,13 +581,14 @@ bool PetriNet::reduce_isEqual(Transition* t1, Transition* t2, Place* p1, Place* 
   }
 
   // iterate the postset
-  PNAPI_FOREACH(set<Node*>, t1->getPostset(), p)
+  PNAPI_FOREACH(p, t1->getPostset())
   {
     if(findArc(*t1,**p)->getWeight() != findArc(*t2,**p)->getWeight())
       return false;
   }
-
-  return true;
+  
+  // also check communication labels
+  return t1->equalLabels(*t2);
 }
 
 
@@ -621,13 +626,13 @@ unsigned int PetriNet::reduce_rule_4()
    * STEP 1:  get places with singleton postset which is connected
    *          with arc weight 1
    */
-  set<Place*> relevantPlaces;
+  set<Place *> relevantPlaces;
 
   // iterate internal places
-  PNAPI_FOREACH(set<Place*>, internalPlaces_, p)
+  PNAPI_FOREACH(p, places_)
   {
-    if( ( (*p)->getPostset().size()==1) && // precondition 2
-        ( (*((*p)->getPostsetArcs().begin()))->getWeight()==1 ) && // precondition 3
+    if( ( (*p)->getPostset().size() == 1) && // precondition 2
+        ( (*((*p)->getPostsetArcs().begin()))->getWeight() == 1 ) && // precondition 3
         ( !((*p)->getPreset().empty()) ) ) // precondition 5
     {
       relevantPlaces.insert(*p);
@@ -635,44 +640,43 @@ unsigned int PetriNet::reduce_rule_4()
   }
 
   // STEP 2: check those places for equality
-  set<pair<Place*,Place*> > equalPlaces;
-  set<Place*> seenPlaces; 
+  set<pair<Place *,Place *> > equalPlaces;
+  set<Place *> seenPlaces; 
 
-  PNAPI_FOREACH(set<Place*>, relevantPlaces, p1)
+  PNAPI_FOREACH(p1, relevantPlaces)
   {
     if(seenPlaces.find(*p1) != seenPlaces.end())
       continue;
 
-    for (set<Place*>::iterator p2 = (++p1)--; // precondition 1
-    p2 != relevantPlaces.end(); ++p2)
+    for (set<Place *>::iterator p2 = (++p1)--; // precondition 1
+          p2 != relevantPlaces.end(); ++p2)
     {
-      Transition* t1 = static_cast<Transition*>(*((*p1)->getPostset().begin()));
-      Transition* t2 = static_cast<Transition*>(*((*p2)->getPostset().begin()));
+      Transition * t1 = static_cast<Transition *>(*((*p1)->getPostset().begin()));
+      Transition * t2 = static_cast<Transition *>(*((*p2)->getPostset().begin()));
       if( (t1 != t2) &&
           __REDUCE_CHECK_FINAL(*p2) && // precondition 6
           (reduce_isEqual(t1,t2,*p1,*p2)) && // precondition 4
           (!(t2->isSynchronized())) ) // precondition 7
       {
-        equalPlaces.insert(pair<Place*,Place*>(*p1,*p2));
+        equalPlaces.insert(pair<Place *,Place *>(*p1,*p2));
         seenPlaces.insert(*p2);
       }
     }
   }
 
   // STEP 3: actual reduction
-  unsigned int result=0;
+  unsigned int result = 0;
 
-  for(set<pair<Place*,Place*> >::iterator equals = equalPlaces.begin();
-       equals != equalPlaces.end(); ++equals)
+  PNAPI_FOREACH(equals, equalPlaces)
   {
     // STEP 3.1: set arcs
-    Place* p1 = (*equals).first;
-    Place* p2 = (*equals).second;
+    Place * p1 = equals->first;
+    Place * p2 = equals->second;
 
-    PNAPI_FOREACH(set<Arc*>, p2->getPresetArcs(), a)
+    PNAPI_FOREACH(a, p2->getPresetArcs())
     {
       int weight = (*a)->getWeight();
-      Arc* a2 = findArc((*a)->getSourceNode(),*p1);
+      Arc * a2 = findArc((*a)->getSourceNode(),*p1);
       if(a2 != NULL)
       {
         weight += a2->getWeight();
@@ -682,14 +686,14 @@ unsigned int PetriNet::reduce_rule_4()
     }
 
     // STEP 3.2: set marking
-    p1->mark(p1->getTokenCount() + p2->getTokenCount());
+    p1->setTokenCount(p1->getTokenCount() + p2->getTokenCount());
 
     // save history
     p1->mergeNameHistory(*p2);
     (*(p1->getPostset().begin()))->mergeNameHistory(*(*(p2->getPostset().begin())));
 
     // STEP 3.3: remove place and transition
-    deleteTransition(*(static_cast<Transition*>(*(p2->getPostset().begin()))));
+    deleteTransition(*(static_cast<Transition *>(*(p2->getPostset().begin()))));
     deletePlace(*p2);
 
     ++result;
@@ -701,9 +705,9 @@ unsigned int PetriNet::reduce_rule_4()
 /*!
  * \brief Checks, wether the postset of a set of nodes is empty.
  */
-bool PetriNet::reduce_emptyPostset(const std::set<Node*> & nodes)
+bool PetriNet::reduce_emptyPostset(const std::set<Node *> & nodes)
 {
-  PNAPI_FOREACH(set<Node*>, nodes, n)
+  PNAPI_FOREACH(n, nodes)
   {
     if(!((*n)->getPostset().empty()))
       return false;
@@ -714,9 +718,9 @@ bool PetriNet::reduce_emptyPostset(const std::set<Node*> & nodes)
 /*!
  * \brief Check if the preset of a set stores only one item.
  */
-bool PetriNet::reduce_singletonPreset(const std::set<Node*> & nodes)
+bool PetriNet::reduce_singletonPreset(const std::set<Node *> & nodes)
 {
-  PNAPI_FOREACH(set<Node*>, nodes, n)
+  PNAPI_FOREACH(n, nodes)
   {
     if((*n)->getPreset().size() != 1)
       return false;
@@ -776,25 +780,29 @@ bool PetriNet::reduce_singletonPreset(const std::set<Node*> & nodes)
 unsigned int PetriNet::reduce_rule_5(bool keepNormal)
 {
   // search for places fullfilling the preconditions
-  set<Place*> obsoletePlaces;
-  map<Node*,unsigned int> v_;
+  set<Place *> obsoletePlaces;
+  map<Node *,unsigned int> v_;
 
   // transitions must not be in more than one reduction at once
-  map<Node*,bool> seenTransitions;
+  map<Node *,bool> seenTransitions;
   
-  PNAPI_FOREACH(set<Transition*>, transitions_, t)
-    seenTransitions[*t]=false;
+  PNAPI_FOREACH(t, transitions_)
+  {
+    seenTransitions[*t] = false;
+  }
 
   // iterate internal places
-  PNAPI_FOREACH(set<Place*>, internalPlaces_, p)
+  PNAPI_FOREACH(p, places_)
   {
     if(!(__REDUCE_CHECK_FINAL(*p)) ) // precondition f
+    {
       continue;
+    }
 
-    set<Node*> preset = (*p)->getPreset();
-    set<Arc*> preArcs = (*p)->getPresetArcs();
-    set<Node*> postset = (*p)->getPostset();
-    set<Arc*> postArcs = (*p)->getPostsetArcs();
+    set<Node *> preset = (*p)->getPreset();
+    set<Arc *> preArcs = (*p)->getPresetArcs();
+    set<Node *> postset = (*p)->getPostset();
+    set<Arc *> postArcs = (*p)->getPostsetArcs();
 
     {
       // precondition 10
@@ -804,48 +812,66 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
         bool precond10b = false;
 
         // check the preset
-        PNAPI_FOREACH(set<Node*>, preset, n)
-          if((*n)->getType() != Node::INTERNAL )
+        PNAPI_FOREACH(n, preset)
+        {
+          if(static_cast<Transition *>(*n)->getType() != Transition::INTERNAL )
           {
             precond10a = true;
             break;
           }
+        }
 
         // check the postset
-        PNAPI_FOREACH(set<Node*>, postset, n)
-          if((*n)->getType() != Node::INTERNAL )
+        PNAPI_FOREACH(n, postset)
+        {
+          if(static_cast<Transition *>(*n)->getType() != Transition::INTERNAL )
           {
             precond10b = true;
             break;
           }
+        }
 
         if(precond10a && precond10b)
+        {
           continue;
+        }
       }
     }
 
     // check for seen or synchronized (precondition 3a) transitions
     {
       bool seen = false;
-      PNAPI_FOREACH(set<Node*>, preset, t)
-        seen = (seen || seenTransitions[*t] || static_cast<Transition*>(*t)->isSynchronized());
-      PNAPI_FOREACH(set<Node*>, postset, t)
-        seen = (seen || seenTransitions[*t] || static_cast<Transition*>(*t)->isSynchronized());
+      PNAPI_FOREACH(t, preset)
+      {
+        seen = ( seen ||
+                 seenTransitions[*t] ||
+                 static_cast<Transition *>(*t)->isSynchronized() );
+      }
+      PNAPI_FOREACH(t, postset)
+      {
+        seen = ( seen ||
+                 seenTransitions[*t] ||
+                 static_cast<Transition *>(*t)->isSynchronized() );
+      }
       if(seen)
+      {
         continue;
+      }
     }
 
-    if((preset.empty()) || // precondition 1
+    if( (preset.empty()) || // precondition 1
         (postset.empty()) || // precondition 2
-        (!((util::setIntersection(preset,postset)).empty())) || // precondition 3
+        (!((util::setIntersection(preset, postset)).empty())) || // precondition 3
         (reduce_emptyPostset(postset)) || // precondition 4
         (!(reduce_singletonPreset(postset))) ) // precondition 5
+    {
       continue;
+    }
 
     unsigned int v = (*(postArcs.begin()))->getWeight();
     bool precond_6 = true;
 
-    PNAPI_FOREACH(set<Arc*>, postArcs, a)
+    PNAPI_FOREACH(a, postArcs)
     {
       if((*a)->getWeight() != v)
       {
@@ -855,12 +881,14 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
     }
 
     if(!precond_6) // precondition 6
+    {
       continue;
+    }
 
-    if( postset.size() == 1 ) // case a, precondition 7a
+    if(postset.size() == 1) // case a, precondition 7a
     {
       bool precond_8a = true;
-      PNAPI_FOREACH(set<Arc*>, preArcs, a)
+      PNAPI_FOREACH(a, preArcs)
       {
         if((*a)->getWeight() % v != 0)
         {  
@@ -871,20 +899,26 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
       if(precond_8a) // precondition 8a
       {
         obsoletePlaces.insert(*p);
-        v_[*p]=v;
-        PNAPI_FOREACH(set<Node*>, preset, t)
-          seenTransitions[*t]=true;
-        PNAPI_FOREACH(set<Node*>, postset, t)
-          seenTransitions[*t]=true;
+        v_[*p] = v;
+        PNAPI_FOREACH(t, preset)
+        {
+          seenTransitions[*t] = true;
+        }
+        PNAPI_FOREACH(t, postset)
+        {
+          seenTransitions[*t] = true;
+        }
       }
     }
     else // case b, precondition 7b
     {
       if((*p)->getTokenCount() >= v) // precondition 8b
+      {
         continue;
+      }
 
       bool precond_9b = true;
-      PNAPI_FOREACH(set<Arc*>, preArcs, a)
+      PNAPI_FOREACH(a, preArcs)
       {
         if((*a)->getWeight() != v)
         {
@@ -895,11 +929,15 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
       if(precond_9b) // precondition 9b
       {
         obsoletePlaces.insert(*p);
-        v_[*p]=v;
-        PNAPI_FOREACH(set<Node*>, preset, t)
-          seenTransitions[*t]=true;
-        PNAPI_FOREACH(set<Node*>, postset, t)
-          seenTransitions[*t]=true;
+        v_[*p] = v;
+        PNAPI_FOREACH(t, preset)
+        {
+          seenTransitions[*t] = true;
+        }
+        PNAPI_FOREACH(t, postset)
+        {
+          seenTransitions[*t] = true;
+        }
       }
     }
   }
@@ -907,67 +945,79 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
   // apply reduction
   unsigned int result = 0;
 
-  PNAPI_FOREACH(set<Place*>, obsoletePlaces, p)
+  PNAPI_FOREACH(p, obsoletePlaces)
   {
     // STEP 1
     while((*p)->getTokenCount() > v_[*p]) // if there are too much tokens stored in p
     {
       // fire the only transition in p's postset
-      Transition* t = static_cast<Transition*>(*((*p)->getPostset().begin()));
+      Transition * t = static_cast<Transition *>(*((*p)->getPostset().begin()));
 
-      (*p)->mark((*p)->getTokenCount() - v_[*p]); // consume tokens
+      (*p)->setTokenCount((*p)->getTokenCount() - v_[*p]); // consume tokens
 
-      PNAPI_FOREACH(set<Arc*>, t->getPostsetArcs(), a)
+      PNAPI_FOREACH(a, t->getPostsetArcs())
       {
-        Place* postP = static_cast<Place*>(&((*a)->getTargetNode())); 
-        postP->mark(postP->getTokenCount() + (*a)->getWeight()); // produce tokens
+        Place * postP = static_cast<Place *>(&((*a)->getTargetNode())); 
+        postP->setTokenCount(postP->getTokenCount() + (*a)->getWeight()); // produce tokens
       }
     }
 
     // STEP 2
-    PNAPI_FOREACH(set<Node*>, (*p)->getPreset(), t1)
-      PNAPI_FOREACH(set<Node*>, (*p)->getPostset(), t2)
+    PNAPI_FOREACH(t1, (*p)->getPreset())
+    {
+      PNAPI_FOREACH(t2, (*p)->getPostset())
       {
         // save the history
-        Transition* t12 = &createTransition();
+        Transition * t12 = &createTransition();
         t12->mergeNameHistory(**t1);
         t12->mergeNameHistory(**p);
         t12->mergeNameHistory(**t2);
 
         // copy incoming arcs
-        PNAPI_FOREACH(set<Arc*>, (*t1)->getPresetArcs(), a)
-          createArc((*a)->getSourceNode(),*t12,(*a)->getWeight());
-
-        // arrange outgoing arcs
-        set<Node*> newPostset;
-        map<Node*,unsigned int> weights;
-
-        PNAPI_FOREACH(set<Arc*>, (*t1)->getPostsetArcs(), a)
+        PNAPI_FOREACH(a, (*t1)->getPresetArcs())
         {
-          if(&((*a)->getTargetNode()) == (*p))
-            continue;
-          newPostset.insert(&((*a)->getTargetNode()));
-          weights[&((*a)->getTargetNode())]+=(*a)->getWeight();
+          createArc((*a)->getSourceNode(), *t12, (*a)->getWeight());
         }
 
-        PNAPI_FOREACH(set<Arc*>, (*t2)->getPostsetArcs(), a)
+        // arrange outgoing arcs
+        set<Node *> newPostset;
+        map<Node *, unsigned int> weights;
+
+        PNAPI_FOREACH(a, (*t1)->getPostsetArcs())
+        {
+          if(&((*a)->getTargetNode()) == (*p))
+          {
+            continue;
+          }
+          newPostset.insert(&((*a)->getTargetNode()));
+          weights[&((*a)->getTargetNode())] += (*a)->getWeight();
+        }
+
+        PNAPI_FOREACH(a, (*t2)->getPostsetArcs())
         {
           newPostset.insert(&((*a)->getTargetNode()));
           weights[&((*a)->getTargetNode())] += ((findArc((**t1),(**p))->getWeight()) / v_[*p]) * (*a)->getWeight();
         }
 
-        PNAPI_FOREACH(set<Node*>, newPostset, np)
-          createArc(*t12,(**np),weights[*np]);
+        PNAPI_FOREACH(np, newPostset)
+        {
+          createArc(*t12, (**np), weights[*np]);
+        }
       }
+    }
 
     // STEP 3:
-    set<Node*> preset = (*p)->getPreset();
-    set<Node*> postset = (*p)->getPostset();
+    set<Node *> preset = (*p)->getPreset();
+    set<Node *> postset = (*p)->getPostset();
     deletePlace(*(*p));
-    PNAPI_FOREACH(set<Node*>, preset, t)
-      deleteTransition(*static_cast<Transition*>(*t));
-    PNAPI_FOREACH(set<Node*>, postset, t)
-      deleteTransition(*static_cast<Transition*>(*t));
+    PNAPI_FOREACH(t, preset)
+    {
+      deleteTransition(*static_cast<Transition *>(*t));
+    }
+    PNAPI_FOREACH(t, postset)
+    {
+      deleteTransition(*static_cast<Transition *>(*t));
+    }
 
     ++result;
   }
@@ -1014,21 +1064,25 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
 unsigned int PetriNet::reduce_rule_6(bool keepNormal)
 { 
   // search for places fullfilling the preconditions
-  set<Place*> obsoletePlaces;
+  set<Place *> obsoletePlaces;
 
   // transitions must not be in more than one reduction at once
-  map<Node*,bool> seenTransitions;
-  PNAPI_FOREACH(set<Transition*>, transitions_, t)
-    seenTransitions[*t]=false;
+  map<Node *, bool> seenTransitions;
+  PNAPI_FOREACH(t, transitions_)
+  {
+    seenTransitions[*t] = false;
+  }
 
   // iterate internal places
-  PNAPI_FOREACH(set<Place*>, internalPlaces_, p)
+  PNAPI_FOREACH(p, places_)
   {
     if ( ((*p)->getPreset().size() != 1) || // precondition 1
         (!(__REDUCE_CHECK_FINAL(*p))) ) // precondition 8
+    {
       continue;
+    }
 
-    Transition* t = static_cast<Transition*>(*((*p)->getPreset().begin()));
+    Transition * t = static_cast<Transition *>(*((*p)->getPreset().begin()));
 
     {
       // precondition 10
@@ -1037,9 +1091,9 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
         bool precond10 = false;
 
         // check the postset
-        PNAPI_FOREACH(set<Node*>, (*p)->getPostset(), n)
+        PNAPI_FOREACH(t_, (*p)->getPostset())
         {
-          if((*n)->getType() != Node::INTERNAL )
+          if(static_cast<Transition *>(*t_)->getType() != Transition::INTERNAL )
           {
             precond10 = true;
             break;
@@ -1047,8 +1101,10 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
         }
 
         if( precond10 &&
-            (t->getType() != Node::INTERNAL ) ) 
+            (t->getType() != Transition::INTERNAL ) )
+        {
           continue;
+        }
       }
     }
 
@@ -1056,23 +1112,31 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
     {
       bool seen = (seenTransitions[t] || t->isSynchronized());
 
-      PNAPI_FOREACH(set<Node*>, (*p)->getPostset(), n)
-        seen = (seen || seenTransitions[*n] || static_cast<Transition*>(*n)->isSynchronized());
+      PNAPI_FOREACH(n, (*p)->getPostset())
+      {
+        seen = ( seen ||
+                 seenTransitions[*n] ||
+                 static_cast<Transition *>(*n)->isSynchronized() );
+      }
 
       if(seen)
+      {
         continue;
+      }
     }
 
     if( (t->getPostset().size() != 1) || // precondition 2
         ((*p)->getPostset().empty()) || // precondition 3
         ((*p)->getPostset().find(t) != (*p)->getPostset().end()) ) // precondition 4
+    {
       continue;
+    }
 
     // precondition 5
     {
       bool precond5 = false;
 
-      PNAPI_FOREACH(set<Node*>, t->getPreset(), n)
+      PNAPI_FOREACH(n, t->getPreset())
       {
         if((*n)->getPostset().size() != 1)
         {
@@ -1082,13 +1146,15 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
       }
 
       if(precond5) 
+      {
         continue;
+      }
     }
 
     unsigned int v = (*((*p)->getPresetArcs().begin()))->getWeight();
     bool precond6 = false;
 
-    PNAPI_FOREACH(set<Arc*>, (*p)->getPostsetArcs(), a)
+    PNAPI_FOREACH(a, (*p)->getPostsetArcs())
     {
       if((*a)->getWeight() != v)
       {
@@ -1099,72 +1165,80 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
 
     if( (precond6) ||  // precondition 6
         ((*p)->getTokenCount() >= v) ) // precondition 7
+    {
       continue;
+    }
 
     // all preconditions fullfilled
     obsoletePlaces.insert(*p); // mark p as obsolete
     seenTransitions[t] = true; // mark t as seen
-    PNAPI_FOREACH(set<Node*>, (*p)->getPostset(), n)
+    PNAPI_FOREACH(n, (*p)->getPostset())
+    {
       seenTransitions[*n] = true; // mark postset as seen
+    }
   }
 
   // apply reduction
   unsigned int result = 0;
 
-  PNAPI_FOREACH(set<Place*>, obsoletePlaces, p)
+  PNAPI_FOREACH(p, obsoletePlaces)
   {
     // STEP 1:
-    Transition* t = static_cast<Transition*>(*((*p)->getPreset().begin()));
+    Transition * t = static_cast<Transition *>(*((*p)->getPreset().begin()));
 
-    set<Node*> postset = (*p)->getPostset();
+    set<Node *> postset = (*p)->getPostset();
 
-    PNAPI_FOREACH(set<Node*>, postset, t__)
+    PNAPI_FOREACH(t__, postset)
     {
-      Transition* nt = &createTransition(); // get new transition
+      Transition * nt = &createTransition(); // get new transition
 
       nt->mergeNameHistory(*t); // save history
       nt->mergeNameHistory(**p); // save history
       nt->mergeNameHistory(**t__); // save history
 
       // arrange preset
-      set<Node*> preset;
-      map<Node*,unsigned int> weights;
+      set<Node *> preset;
+      map<Node *, unsigned int> weights;
 
-      PNAPI_FOREACH(set<Arc*>, t->getPresetArcs(), a)
+      PNAPI_FOREACH(a, t->getPresetArcs())
       {
         preset.insert(&((*a)->getSourceNode()));
         weights[&((*a)->getSourceNode())] += (*a)->getWeight();
       }
 
-      PNAPI_FOREACH(set<Arc*>, (*t__)->getPresetArcs(), a)
+      PNAPI_FOREACH(a, (*t__)->getPresetArcs())
       {
         if(&((*a)->getSourceNode()) == *p)
+        {
           continue;
+        }
         preset.insert(&((*a)->getSourceNode()));
         weights[&((*a)->getSourceNode())] += (*a)->getWeight();
       }
 
-      PNAPI_FOREACH(set<Node*>, preset, n)
+      PNAPI_FOREACH(n, preset)
       {
         createArc((**n),*nt,weights[*n]);
       }
 
       // copy postset
-      PNAPI_FOREACH(set<Arc*>, (*t__)->getPostsetArcs(), a)
+      PNAPI_FOREACH(a, (*t__)->getPostsetArcs())
+      {
         createArc(*nt,(*a)->getTargetNode(),(*a)->getWeight());
+      }
     }
 
 
     // STEP 2:
     deleteTransition(*t);
 
-    set<Node*> obsoleteTransitions = (*p)->getPostset();
+    set<Node *> obsoleteTransitions = (*p)->getPostset();
 
     deletePlace(**p);
 
-    PNAPI_FOREACH(set<Node*>, obsoleteTransitions, n)
+    PNAPI_FOREACH(n, obsoleteTransitions)
     {
-      deleteTransition(*static_cast<Transition*>(*n));
+      deleteTransition(*static_cast<Transition *>(*n));
     }
 
     ++result;
@@ -1195,21 +1269,23 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
 unsigned int PetriNet::reduce_rule_7()
 {
   // search for places fullfilling the preconditions
-  set<Place*> obsoletePlaces;
+  set<Place *> obsoletePlaces;
 
   // iterate internal places
-  PNAPI_FOREACH(set<Place*>, internalPlaces_, p)
+  PNAPI_FOREACH(p, places_)
   {
     if(!( ((*p)->getPreset() == (*p)->getPostset()) && // precondition 1 
-        (__REDUCE_CHECK_FINAL(*p)) )) // precondition 4 
+        (__REDUCE_CHECK_FINAL(*p)) )) // precondition 4
+    {
       continue;
+    }
 
     unsigned int m = (*p)->getTokenCount();
     bool precond = false;
 
-    PNAPI_FOREACH(set<Arc*>, (*p)->getPresetArcs(), a1)
+    PNAPI_FOREACH(a1, (*p)->getPresetArcs())
     {
-      Arc* a2 = findArc((**p),(*a1)->getSourceNode());
+      Arc * a2 = findArc((**p), (*a1)->getSourceNode());
       if( ((*a1)->getWeight() != a2->getWeight()) || // precondition 2
           (a2->getWeight() > m) ) // precondition 3
       {
@@ -1219,7 +1295,9 @@ unsigned int PetriNet::reduce_rule_7()
     }
 
     if(precond)
+    {
       continue;
+    }
 
     // p fullfilles the preconditions
     obsoletePlaces.insert(*p);
@@ -1228,15 +1306,19 @@ unsigned int PetriNet::reduce_rule_7()
   // apply reduction
   unsigned int result = 0;
 
-  set<Transition*> obsoleteTransitions;
+  set<Transition *> obsoleteTransitions;
 
-  PNAPI_FOREACH(set<Place*>, obsoletePlaces, p)
+  PNAPI_FOREACH(p, obsoletePlaces)
   {
     // check for isolated transitions
-    PNAPI_FOREACH(set<Node*>, (*p)->getPreset(), t)
-      if ( ((*t)->getPreset().size() == 1) &&
+    PNAPI_FOREACH(t, (*p)->getPreset())
+    {
+      if( ((*t)->getPreset().size() == 1) &&
           ((*t)->getPostset().size() == 1) )
-        obsoleteTransitions.insert(static_cast<Transition*>(*t));
+      {
+        obsoleteTransitions.insert(static_cast<Transition *>(*t));
+      }
+    }
 
     // remove place
     deletePlace(**p);
@@ -1244,10 +1326,12 @@ unsigned int PetriNet::reduce_rule_7()
   }
 
   // clean transitions
-  PNAPI_FOREACH(set<Transition*>, obsoleteTransitions, t)
+  PNAPI_FOREACH(t, obsoleteTransitions)
   {
     if((*t)->isSynchronized()) // precondition 5
+    {
       continue;
+    }
     deleteTransition(**t);
   }
 
@@ -1278,31 +1362,35 @@ unsigned int PetriNet::reduce_rule_7()
 unsigned int PetriNet::reduce_rule_8()
 {
   // search for transitions fullfilling the preconditions
-  set<Transition*> obsoleteTransitions;
+  set<Transition *> obsoleteTransitions;
 
   // don't reduce "backup"-transitions
-  map<Node*,bool> seenTransitions;
+  map<Node *, bool> seenTransitions;
 
-  PNAPI_FOREACH(set<Transition*>, transitions_, t)
+  PNAPI_FOREACH(t, transitions_)
   {
     seenTransitions[*t] = false;
   }
 
   // iterate transitions
-  PNAPI_FOREACH(set<Transition*>, transitions_, t)
+  PNAPI_FOREACH(t, transitions_)
   {
     if( (seenTransitions[*t]) || // check if t is a "backup"-transition
         ((*t)->isSynchronized()) ) // precondition 6
+    {
       continue;
+    }
 
     if(!((*t)->getPreset() == (*t)->getPostset())) // precondition 1
+    {
       continue;
+    }
 
     bool precond2 = false;
 
-    PNAPI_FOREACH(set<Arc*>, (*t)->getPresetArcs(), a1)
+    PNAPI_FOREACH(a1, (*t)->getPresetArcs())
     {
-      Arc* a2 = findArc((**t),(*a1)->getSourceNode());
+      Arc * a2 = findArc((**t),(*a1)->getSourceNode());
       if( ((*a1)->getWeight() != a2->getWeight()) ) // precondition 2
       {
         precond2 = true;
@@ -1311,19 +1399,23 @@ unsigned int PetriNet::reduce_rule_8()
     }
 
     if(precond2)
+    {
       continue;
+    }
 
-    PNAPI_FOREACH(set<Node*>, (*((*t)->getPreset().begin()))->getPostset(), t0)
+    PNAPI_FOREACH(t0, (*((*t)->getPreset().begin()))->getPostset())
     {
       if((*t)==(*t0)) // precondition 3
+      {
         continue;
+      }
 
       bool precond45 = false;
 
-      PNAPI_FOREACH(set<Arc*>, (*t)->getPresetArcs(), a1)
+      PNAPI_FOREACH(a1, (*t)->getPresetArcs())
       {
-        Arc* a2 = findArc((*a1)->getSourceNode(),(**t0));
-        if ( (a2 == NULL) || // precondition 4 
+        Arc * a2 = findArc((*a1)->getSourceNode(), (**t0));
+        if( (a2 == NULL) || // precondition 4 
             (a2->getWeight() < (*a1)->getWeight()) ) //precondition 5
         {
           precond45 = true;
@@ -1331,7 +1423,7 @@ unsigned int PetriNet::reduce_rule_8()
         }
       }
 
-      if (precond45)
+      if(precond45)
       {
         continue;
       }
@@ -1349,7 +1441,7 @@ unsigned int PetriNet::reduce_rule_8()
 
   unsigned int result = 0;
 
-  PNAPI_FOREACH(set<Transition*>, obsoleteTransitions, t)
+  PNAPI_FOREACH(t, obsoleteTransitions)
   {
     deleteTransition(**t);
     ++result;
@@ -1400,16 +1492,18 @@ unsigned int PetriNet::reduce_rule_8()
 unsigned int PetriNet::reduce_rule_9(bool keepNormal)
 {
   // search for places fullfilling the preconditions
-  set<Place*> obsoletePlaces;
+  set<Place *> obsoletePlaces;
 
   // transitions must not be in more than one reduction at once
-  map<Node*,bool> seenTransitions;
+  map<Node *, bool> seenTransitions;
 
-  PNAPI_FOREACH(set<Transition*>, transitions_, t)
-    seenTransitions[*t]=false;
+  PNAPI_FOREACH(t, transitions_)
+  {
+    seenTransitions[*t] = false;
+  }
 
   // iterate internal places
-  PNAPI_FOREACH(set<Place*>, internalPlaces_, p)
+  PNAPI_FOREACH(p, places_)
   { 
     // precondition 8
     if(keepNormal)
@@ -1417,9 +1511,9 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
       bool precond10 = false;
 
       // check the preset
-      PNAPI_FOREACH(set<Node*>, (*p)->getPreset(), n)
+      PNAPI_FOREACH(n, (*p)->getPreset())
       {
-        if((*n)->getType() != Node::INTERNAL )
+        if(static_cast<Transition *>(*n)->getType() != Transition::INTERNAL )
         {
           precond10 = true;
           break;
@@ -1428,69 +1522,83 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
 
       if( precond10 && // there is an interface transition in the preset
           ((*p)->getPostset().begin() != (*p)->getPostset().end()) && // there is a transition in the postset
-          ((*((*p)->getPostset().begin()))->getType() != Node::INTERNAL ) ) // this transition is also an interface transition
+          (static_cast<Transition *>(*((*p)->getPostset().begin()))->getType() != Transition::INTERNAL ) ) // this transition is also an interface transition
+      {
         continue;
+      }
     }
     
     {
       // check for seen or synchronized transitions (precondition 7)
       bool seen = ((*p)->getPostset().begin() == (*p)->getPostset().end()) ?
-          false : ( seenTransitions[*((*p)->getPostset().begin())] || 
-              static_cast<Transition*>(*((*p)->getPostset().begin()))->isSynchronized());
-      PNAPI_FOREACH(set<Node*>, (*p)->getPreset(), t)
+                  false :
+                  ( seenTransitions[*((*p)->getPostset().begin())] || 
+                    static_cast<Transition*>(*((*p)->getPostset().begin()))->isSynchronized() );
+      
+      PNAPI_FOREACH(t, (*p)->getPreset())
       {
-        seen = seen || seenTransitions[*t] || static_cast<Transition*>(*t)->isSynchronized();
+        seen = ( seen ||
+                 seenTransitions[*t] ||
+                 static_cast<Transition *>(*t)->isSynchronized() );
       }
 
       if(seen)
+      {
         continue;
+      }
     }
 
     if( ((*p)->getPostset().size() != 1) || // precondition 2a
         ((*p)->getPreset().empty()) || // precondition 3
         ((*((*p)->getPostsetArcs().begin()))->getWeight() != 1) || //precondition 2
         (!(__REDUCE_CHECK_FINAL(*p))) ) // precondition 6
+    {
       continue;
+    }
 
-    Transition* t = static_cast<Transition*>(*((*p)->getPostset().begin()));
+    Transition * t = static_cast<Transition *>(*((*p)->getPostset().begin()));
 
     if( (t->getPreset().size() != 1) || // precondition 1
         (t->getPostset().empty()) || // precondition 4
         (t->getPostset().find(*p) != t->getPostset().end()) ) // precondition 5
+    {
       continue;
+    }
 
     // p is fullfilling the preconditions
 
     obsoletePlaces.insert(*p);
     seenTransitions[t] = true; // mark t as seen
-    PNAPI_FOREACH(set<Node*>, (*p)->getPreset(), ti)
-      seenTransitions[*ti] = true; // mark preset of p as seen    
+    PNAPI_FOREACH(ti, (*p)->getPreset())
+    {
+      seenTransitions[*ti] = true; // mark preset of p as seen
+    }
   }
 
   // apply reduction  
   unsigned int result = 0;
 
-  PNAPI_FOREACH(set<Place*>, obsoletePlaces, p)
+  PNAPI_FOREACH(p, obsoletePlaces)
   {
     // STEP 1:
-    Transition* t = static_cast<Transition*>(*((*p)->getPostset().begin()));
+    Transition * t = static_cast<Transition *>(*((*p)->getPostset().begin()));
     unsigned int tokens = (*p)->getTokenCount();
 
-    PNAPI_FOREACH(set<Arc*>, t->getPostsetArcs(), a)
+    PNAPI_FOREACH(a, t->getPostsetArcs())
     { 
-      Place* pi = static_cast<Place*>(&((*a)->getTargetNode()));
-      pi->mark(pi->getTokenCount() + ((*a)->getWeight() * tokens));
+      Place * pi = static_cast<Place *>(&((*a)->getTargetNode()));
+      pi->setTokenCount(pi->getTokenCount() + ((*a)->getWeight() * tokens));
     }
 
-    (*p)->mark(0);
+    (*p)->setTokenCount(0);
 
     // STEP 2:
-    set<Node*> preset = (*p)->getPreset();
+    set<Node *> preset = (*p)->getPreset();
 
     // iterate preset of p
-    PNAPI_FOREACH(set<Node*>, preset, ti)
+    PNAPI_FOREACH(ti, preset)
     {
-      Transition* tj = &createTransition(); // create new Transition Tj
+      Transition * tj = &createTransition(); // create new Transition Tj
 
       // save history
       tj->mergeNameHistory(**ti);
@@ -1498,19 +1606,21 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
       tj->mergeNameHistory(*t);
 
       // copy preset
-      PNAPI_FOREACH(set<Arc*>, (*ti)->getPresetArcs(), a)
+      PNAPI_FOREACH(a, (*ti)->getPresetArcs())
       {
         createArc((*a)->getSourceNode(),*tj,(*a)->getWeight());
       }
 
       // arrange postset
-      set<Node*> np;
-      map<Node*,unsigned int> weights;
+      set<Node *> np;
+      map<Node *, unsigned int> weights;
 
-      PNAPI_FOREACH(set<Arc*>, (*ti)->getPostsetArcs(), a)
+      PNAPI_FOREACH(a, (*ti)->getPostsetArcs())
       {
         if(&((*a)->getTargetNode()) == *p)
+        {
           continue;
+        }
 
         np.insert(&((*a)->getTargetNode()));
         weights[&((*a)->getTargetNode())] += (*a)->getWeight();
@@ -1518,24 +1628,24 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
 
       unsigned int weight = findArc(**ti,**p)->getWeight();
 
-      PNAPI_FOREACH(set<Arc*>, t->getPostsetArcs(), a)
+      PNAPI_FOREACH(a, t->getPostsetArcs())
       {
         np.insert(&((*a)->getTargetNode()));
         weights[&((*a)->getTargetNode())] += ( weight * ((*a)->getWeight()) );
       }
 
-      PNAPI_FOREACH(set<Node*>, np, n)
+      PNAPI_FOREACH(n, np)
       {
-        createArc(*tj,**n,weights[*n]);
+        createArc(*tj, **n, weights[*n]);
       }
     }
 
     // STEP 3:
     deletePlace(**p);
 
-    PNAPI_FOREACH(set<Node*>, preset, ti)
+    PNAPI_FOREACH(ti, preset)
     {
-      deleteTransition(*static_cast<Transition*>(*ti));
+      deleteTransition(*static_cast<Transition *>(*ti));
     }
 
     deleteTransition(*t);
@@ -1575,19 +1685,21 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
 unsigned int PetriNet::reduce_identical_places()
 {
   // obsolete place and its "backup"-place 
-  set<pair<Place*, Place*> > placePairs;
+  map<Place *, Place *> placePairs;
 
   // these places either already will be deleted or must not be deleted in this iteration
-  map<Node*,bool> seenPlaces;  
+  map<Node *, bool> seenPlaces;  
 
-  PNAPI_FOREACH(set<Place*>, internalPlaces_, p)
+  PNAPI_FOREACH(p, places_)
+  {
     seenPlaces[*p] = false;
+  }
 
 
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RB1 (elimination of identical places)...\n");
 
   // iterate the internal places
-  PNAPI_FOREACH(set<Place*>, internalPlaces_, p1)
+  PNAPI_FOREACH(p1, places_)
   {
     if( (seenPlaces[*p1]) ||
         (!(__REDUCE_CHECK_FINAL(*p1))) ) // precondition 6
@@ -1600,7 +1712,7 @@ unsigned int PetriNet::reduce_identical_places()
       bool precond4 = false;
 
       // check preset
-      PNAPI_FOREACH(set<Arc*>, (*p1)->getPresetArcs(), a)
+      PNAPI_FOREACH(a, (*p1)->getPresetArcs())
       {
         if((*a)->getWeight() != 1)
         {
@@ -1610,7 +1722,7 @@ unsigned int PetriNet::reduce_identical_places()
       }
 
       // check postset
-      PNAPI_FOREACH(set<Arc*>, (*p1)->getPostsetArcs(), a)
+      PNAPI_FOREACH(a, (*p1)->getPostsetArcs())
       {
         if(((*a)->getWeight() != 1) || (precond4))
         {
@@ -1627,88 +1739,100 @@ unsigned int PetriNet::reduce_identical_places()
 
 
     // get a pretransition
-    Node* preTransition = *((*p1)->getPreset().begin());
+    Node * preTransition = *((*p1)->getPreset().begin());
 
     // test for null-pointer
     if(preTransition != NULL)
     {
       // check its postset
-      PNAPI_FOREACH(set<Node*>, preTransition->getPostset(), p2)
+      PNAPI_FOREACH(p2, preTransition->getPostset())
+      {
         if ( (!(seenPlaces[*p2])) &&
             (*p1 != *p2) &&   // precondition 1
             ((*p1)->getPreset() == (*p2)->getPreset()) && // precondition 2
             ((*p1)->getPostset() == (*p2)->getPostset()) && // precondition 3
             ((*p1)->getTokenCount() == 0) && // precondition 5
-            (static_cast<Place*>(*p2)->getTokenCount() == 0) ) // precondition 5
+            (static_cast<Place *>(*p2)->getTokenCount() == 0) ) // precondition 5
         {
-
           // precondition 4
           bool precond4 = false;
 
           // check preset
-          PNAPI_FOREACH(set<Arc*>, (*p2)->getPresetArcs(), a)
+          PNAPI_FOREACH(a, (*p2)->getPresetArcs())
+          {
             if((*a)->getWeight() != 1)
             {
               precond4 = true;
               break;
             }
+          }
 
           // check postset
-          PNAPI_FOREACH(set<Arc*>, (*p2)->getPostsetArcs(), a)
+          PNAPI_FOREACH(a, (*p2)->getPostsetArcs())
+          {
             if(((*a)->getWeight() != 1) || (precond4))
             {
               precond4 = true;
               break;
             }
+          }
 
           if(precond4)
-            continue;      
+          {
+            continue;
+          }
 
           // places fullfill the preconditions
-          placePairs.insert(pair<Place*, Place*>(*p1, static_cast<Place*>(*p2)));
+          placePairs[*p1] = static_cast<Place *>(*p2);
           seenPlaces[*p1] = true; // mark p1 as seen
           seenPlaces[*p2] = true; // mark p2 as seen
           break; // just one reduction at one iteration
         }
+      }
     }
     else // if there was no pretransition
     {
       // get a posttransition
-      Node* postTransition = *((*p1)->getPostset().begin());
+      Node * postTransition = *((*p1)->getPostset().begin());
 
       // check for null-pointer
       if(postTransition != NULL)
       {
-        PNAPI_FOREACH(set<Node*>, postTransition->getPreset(), p2)
+        PNAPI_FOREACH(p2, postTransition->getPreset())
+        {
           if ( (!(seenPlaces[*p2])) &&
               (*p1 != *p2) &&     // precondition 1
               ((*p2)->getPreset().empty()) && // precondition 2
               ((*p1)->getPostset() == (*p2)->getPostset()) && // precondition 3
               ((*p1)->getTokenCount() == 0) && // precondition 5
-              (static_cast<Place*>(*p2)->getTokenCount() == 0) ) // precondition 5
+              (static_cast<Place *>(*p2)->getTokenCount() == 0) ) // precondition 5
           {
             // precondition 4
             bool precond4 = false;
 
             // check postset
-            PNAPI_FOREACH(set<Arc*>, (*p2)->getPostsetArcs(), a)
+            PNAPI_FOREACH(a, (*p2)->getPostsetArcs())
+            {
               if((*a)->getWeight() != 1)
               {
                 precond4 = true;
                 break;
               }
+            }
 
             if(precond4)
-              continue;      
+            {
+              continue;
+            }
 
             // places fullfill the preconditions
-            placePairs.insert(pair<Place*, Place*>(*p1, static_cast<Place*>(*p2)));
+            placePairs[*p1] = static_cast<Place *>(*p2);
             seenPlaces[*p1] = true; // mark p1 as seen
             seenPlaces[*p2] = true; // mark p2 as seen
             break; // just one reduction at one iteration
           }
+        }
       }
-
     }
   }
 
@@ -1716,12 +1840,11 @@ unsigned int PetriNet::reduce_identical_places()
 
   unsigned int result = 0;
   // "merge" the found places
-  for(set<pair<Place*, Place*> >::iterator p = placePairs.begin();
-       p != placePairs.end(); ++p)
+  PNAPI_FOREACH(p, placePairs)
   {
     // get places from pair
-    Place* p1 = p->first;
-    Place* p2 = p->second;
+    Place * p1 = p->first;
+    Place * p2 = p->second;
 
     // save the history
     p2->mergeNameHistory(*p1);
@@ -1762,11 +1885,11 @@ unsigned int PetriNet::reduce_identical_places()
 unsigned int PetriNet::reduce_identical_transitions()
 {
   // obsolete transitions and its "backup"-transition
-  set<pair<Transition*, Transition*> > transitionPairs;
-  map<Node*,bool> backupTransition; // must not be reduced
-  map<Node*,bool> obsoleteTransition; // must not be backup transitions
+  map<Transition *, Transition *> transitionPairs;
+  map<Node *, bool> backupTransition; // must not be reduced
+  map<Node *, bool> obsoleteTransition; // must not be backup transitions
 
-  PNAPI_FOREACH(set<Transition*>, transitions_, t)
+  PNAPI_FOREACH(t, transitions_)
   {
     backupTransition[*t] = false;
     obsoleteTransition[*t] = false;
@@ -1775,77 +1898,92 @@ unsigned int PetriNet::reduce_identical_transitions()
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RB2 (elimination of identical transitions)...\n");
 
   // iterate the transitions
-  PNAPI_FOREACH(set<Transition*>, transitions_, t1)
+  PNAPI_FOREACH(t1, transitions_)
   {
     if( (backupTransition[*t1]) || 
         ((*t1)->isSynchronized()) ) // precondition 5
+    {
       continue;
+    }
 
     {
       // precondition 4
       bool precond4 = false;
 
       // check preset
-      PNAPI_FOREACH(set<Arc*>, (*t1)->getPresetArcs(), a)
+      PNAPI_FOREACH(a, (*t1)->getPresetArcs())
+      {
         if((*a)->getWeight() != 1)
         {
           precond4 = true;
           break;
         }
+      }
 
       // check postset
-      PNAPI_FOREACH(set<Arc*>, (*t1)->getPostsetArcs(), a)
+      PNAPI_FOREACH(a, (*t1)->getPostsetArcs())
+      {
         if(((*a)->getWeight() != 1) || (precond4))
         {
           precond4 = true;
           break;
         }
+      }
 
       if(precond4)
-        continue;      
+      {
+        continue;
+      }
     }
 
 
     // get a preplace
-    Node* prePlace = *((*t1)->getPreset().begin());
+    Node * prePlace = *((*t1)->getPreset().begin());
 
     // check for null-pointer
     if(prePlace != NULL)
     {
-      PNAPI_FOREACH(set<Node*>, prePlace->getPostset(), t2)
+      PNAPI_FOREACH(t2, prePlace->getPostset())
       {
         if(obsoleteTransition[*t2])
+        {
           continue;
+        }
         
         if ( (*t1 != *t2) &&		// precondition 1
             ((*t1)->getPreset() == (*t2)->getPreset()) &&	// precondition 2
             ((*t1)->getPostset() == (*t2)->getPostset()) ) // precondition 3
         {
-
           // precondition 4
           bool precond4 = false;
 
           // check preset
-          PNAPI_FOREACH(set<Arc*>, (*t2)->getPresetArcs(), a)
+          PNAPI_FOREACH(a, (*t2)->getPresetArcs())
+          {
             if((*a)->getWeight() != 1)
             {
               precond4 = true;
               break;
             }
+          }
 
           // check postset
-          PNAPI_FOREACH(set<Arc*>, (*t2)->getPostsetArcs(), a)
+          PNAPI_FOREACH(a, (*t2)->getPostsetArcs())
+          {
             if(((*a)->getWeight() != 1) || (precond4))
             {
               precond4 = true;
               break;
             }
+          }
 
           if(precond4)
+          {
             continue;
+          }
 
           // transitions fullfill the preconditions
-          transitionPairs.insert(pair<Transition*, Transition*>(*t1, static_cast<Transition*>(*t2)));
+          transitionPairs[*t1] = static_cast<Transition *>(*t2);
           backupTransition[*t2] = true; // mark t2 as backup transition
           obsoleteTransition[*t1] = true; // t1 should not become a backup transition
           break;
@@ -1855,17 +1993,19 @@ unsigned int PetriNet::reduce_identical_transitions()
     else // if there exists no preplace
     {
       // get a postplace
-      Node* postPlace = *((*t1)->getPostset().begin());
+      Node * postPlace = *((*t1)->getPostset().begin());
 
       // check for null-pointer
       if(postPlace != NULL)
       {
-        PNAPI_FOREACH(set<Node*>, postPlace->getPreset(), t2)
+        PNAPI_FOREACH(t2, postPlace->getPreset())
         {
           if(obsoleteTransition[*t2])
+          {
             continue;
+          }
           
-          if ( (*t1 != *t2) &&     // precondition 1
+          if( (*t1 != *t2) &&     // precondition 1
               ((*t2)->getPreset().empty()) && // precondition 2
               ((*t1)->getPostset() == (*t2)->getPostset()) ) // precondition 3
           {
@@ -1873,18 +2013,22 @@ unsigned int PetriNet::reduce_identical_transitions()
             bool precond4 = false;
 
             // check postset
-            PNAPI_FOREACH(set<Arc*>, (*t2)->getPostsetArcs(), a)
+            PNAPI_FOREACH(a, (*t2)->getPostsetArcs())
+            {
               if((*a)->getWeight() != 1)
               {
                 precond4 = true;
                 break;
               }
+            }
 
             if(precond4)
+            {
               continue;
+            }
 
             // transitions fullfill the preconditions
-            transitionPairs.insert(pair<Transition*, Transition*>(*t1, static_cast<Transition*>(*t2)));
+            transitionPairs[*t1] = static_cast<Transition*>(*t2);
             backupTransition[*t2] = true; // mark t2 as backup transition
             obsoleteTransition[*t1] = true; // t1 should not become a backup transition
             break;
@@ -1899,12 +2043,11 @@ unsigned int PetriNet::reduce_identical_transitions()
   unsigned int result = 0;
 
   // merge the found transitions
-  for(set<pair<Transition*, Transition*> >::iterator p = transitionPairs.begin();
-       p != transitionPairs.end(); ++p)
+  PNAPI_FOREACH(p, transitionPairs)
   {
     // get transitions
-    Transition* t1 = p->first;
-    Transition* t2 = p->second;
+    Transition * t1 = p->first;
+    Transition * t2 = p->second;
 
     // save history
     t2->mergeNameHistory(*t1);
@@ -1939,7 +2082,6 @@ unsigned int PetriNet::reduce_identical_transitions()
  * transition have a weight of 1 (precondition 5)
  * and q is not initially marked (precondition 6),
  * and q is not concerned by a final condition (precondition f)
- * and none of these places is communicating (precondition 7)
  * and t is not synchronized (precondition 8)
  * then the histories of t and q will be attached to p,
  * the postset of q will be connected with p in the same way it
@@ -1955,36 +2097,38 @@ unsigned int PetriNet::reduce_series_places()
 {
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RA1 (fusion of series places)...\n");
 
-  set<Transition*> uselessTransitions;
+  set<Transition *> uselessTransitions;
 
   // places must not be involved in more than one reduction at once
-  map<Node*,bool> seenPlaces;
+  map<Node *, bool> seenPlaces;
 
-  PNAPI_FOREACH(set<Place*>, internalPlaces_, p)
+  PNAPI_FOREACH(p, places_)
+  {
     seenPlaces[*p] = false;
+  }
 
   // iterate the transtions
-  PNAPI_FOREACH(set<Transition*>, transitions_, t)
+  PNAPI_FOREACH(t, transitions_)
   {
-    Place* prePlace = static_cast<Place*>(*((*t)->getPreset().begin()));
-    Place* postPlace = static_cast<Place*>(*((*t)->getPostset().begin()));
+    Place * prePlace = static_cast<Place *>(*((*t)->getPreset().begin()));
+    Place * postPlace = static_cast<Place *>(*((*t)->getPostset().begin()));
 
-    if ( (seenPlaces[prePlace]) ||
+    if( (seenPlaces[prePlace]) ||
         (seenPlaces[postPlace]) || 
         ((*t)->isSynchronized()) || // precondition 8
         (!(__REDUCE_CHECK_FINAL(postPlace))) ) // precondition f
+    {
       continue;
+    }
 
-    if ( ((*t)->getPreset().size() == 1) && // precondition 1
+    if( ((*t)->getPreset().size() == 1) && // precondition 1
         ((*t)->getPostset().size() == 1) && // precondition 1
         (prePlace != postPlace) &&			 // precondition 2
         (!(prePlace->getPreset().empty())) &&     // precondition 3
         (prePlace->getPostset().size() == 1) &&		 // precondition 4
         ((*((*t)->getPresetArcs().begin()))->getWeight() == 1) && // precondition 5
         ((*((*t)->getPostsetArcs().begin()))->getWeight() == 1) && // precondition 5
-        (postPlace->getTokenCount() == 0 ) && // precondition 6
-        (prePlace->getType() == Node::INTERNAL) &&	// precondition 7
-        (postPlace->getType() == Node::INTERNAL) ) // precondition 7
+        (postPlace->getTokenCount() == 0 ) ) // precondition 6
     {
       // transition fullfilles preconditions
       uselessTransitions.insert(*t);
@@ -1996,24 +2140,24 @@ unsigned int PetriNet::reduce_series_places()
   // apply reduction
   unsigned int result = 0;
 
-  PNAPI_FOREACH(set<Transition*>, uselessTransitions, t)
+  PNAPI_FOREACH(t, uselessTransitions)
   {
     // get preset and postset
-    Node* prePlace = *((*t)->getPreset().begin());
-    Node* postPlace = *((*t)->getPostset().begin());
+    Node * prePlace = *((*t)->getPreset().begin());
+    Node * postPlace = *((*t)->getPostset().begin());
 
     // save history
     prePlace->mergeNameHistory(**t);
     prePlace->mergeNameHistory(*postPlace);
 
     // set new postset
-    PNAPI_FOREACH(set<Arc*>, postPlace->getPostsetArcs(), a)
+    PNAPI_FOREACH(a, postPlace->getPostsetArcs())
     {
       createArc(*prePlace,(*a)->getTargetNode(),(*a)->getWeight());
     }
 
     // remove postplace and t
-    deletePlace(*(static_cast<Place*>(postPlace)));
+    deletePlace(*(static_cast<Place *>(postPlace)));
     deleteTransition(**t);
 
     ++result;
@@ -2063,39 +2207,44 @@ unsigned int PetriNet::reduce_series_places()
  * \return  number of removed places 
  * 
  */
-unsigned int PetriNet::reduce_series_transitions(bool keepNormal) {
+unsigned int PetriNet::reduce_series_transitions(bool keepNormal)
+{
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RA2 (fusion of series transitions)...\n");
 
-  set<Place*> uselessPlaces;
+  set<Place *> uselessPlaces;
 
   // transitions must not be involved in more than one reduction at once
-  map<Node*,bool> seenTransitions;
+  map<Node *, bool> seenTransitions;
 
-  PNAPI_FOREACH(set<Transition*>, transitions_, t)
+  PNAPI_FOREACH(t, transitions_)
+  {
     seenTransitions[*t] = false;
+  }
 
   // iterate the internal places
-  PNAPI_FOREACH(set<Place*>, internalPlaces_, p) 
+  PNAPI_FOREACH(p, places_) 
   {
-    if ( ((*p)->getPostset().size() == 1) && //precondition 1
+    if( ((*p)->getPostset().size() == 1) && //precondition 1
         ((*p)->getPreset().size() == 1) && //precondition 1
         __REDUCE_CHECK_FINAL(*p) && // precondition 2
         (!((*p)->getTokenCount() > 0)) ) // precondition 2
     {
-      Transition* t1 = static_cast<Transition*>(*((*p)->getPreset().begin()));
-      Transition* t2 = static_cast<Transition*>(*((*p)->getPostset().begin()));
+      Transition * t1 = static_cast<Transition *>(*((*p)->getPreset().begin()));
+      Transition * t2 = static_cast<Transition *>(*((*p)->getPostset().begin()));
 
       // check for seen transitions
       if( (seenTransitions[t1]) || 
           (seenTransitions[t2]) ||
           (t1->isSynchronized()) || // precondition 6
           (t2->isSynchronized()) ) // precondition 6
+      {
         continue;
+      }
 
-      if ( (t2->getPreset().size() == 1) && // precondition 3
+      if( (t2->getPreset().size() == 1) && // precondition 3
           (util::setIntersection(t1->getPostset(),t2->getPostset()).empty() ) && // precondition 4
-          (!( (t1->getType() != Node::INTERNAL) && 
-              (t2->getType() != Node::INTERNAL) && 
+          (!( (t1->getType() != Transition::INTERNAL) && 
+              (t2->getType() != Transition::INTERNAL) && 
               (keepNormal)) ) && //precondition 4
               ((*((*p)->getPresetArcs().begin()))->getWeight() == 1) && // precondition 5
               ((*((*p)->getPostsetArcs().begin()))->getWeight() == 1) ) // precondition 5
@@ -2110,13 +2259,13 @@ unsigned int PetriNet::reduce_series_transitions(bool keepNormal) {
   // apply reduction
   unsigned int result = 0;
 
-  PNAPI_FOREACH(set<Place*>, uselessPlaces, p) 
+  PNAPI_FOREACH(p, uselessPlaces) 
   {
     // create new transition
-    Transition* t = &createTransition();
+    Transition * t = &createTransition();
 
-    Transition* t1 = static_cast<Transition*>(*((*p)->getPreset().begin()));
-    Transition* t2 = static_cast<Transition*>(*((*p)->getPostset().begin()));
+    Transition * t1 = static_cast<Transition *>(*((*p)->getPreset().begin()));
+    Transition * t2 = static_cast<Transition *>(*((*p)->getPostset().begin()));
 
     // save history
     t->mergeNameHistory(*t1);
@@ -2124,15 +2273,32 @@ unsigned int PetriNet::reduce_series_transitions(bool keepNormal) {
     t->mergeNameHistory(*t2);
 
     // copy preset
-    PNAPI_FOREACH(set<Arc*>, t1->getPresetArcs(), a)
-      createArc((*a)->getSourceNode(),*t,(*a)->getWeight());
+    PNAPI_FOREACH(a, t1->getPresetArcs())
+    {
+      createArc((*a)->getSourceNode(), *t, (*a)->getWeight());
+    }
 
     // copy postset
-    PNAPI_FOREACH(set<Arc*>, t1->getPostsetArcs(), a)
+    PNAPI_FOREACH(a, t1->getPostsetArcs())
+    {
       createArc(*t,(*a)->getTargetNode(),(*a)->getWeight());
+    }
 
-    PNAPI_FOREACH(set<Arc*>, t2->getPostsetArcs(), a)
-      createArc(*t,(*a)->getTargetNode(),(*a)->getWeight());
+    PNAPI_FOREACH(a, t2->getPostsetArcs())
+    {
+      createArc(*t, (*a)->getTargetNode(), (*a)->getWeight());
+    }
+    
+    // copy labels
+    PNAPI_FOREACH(l, t1->getLabels())
+    {
+      t->addLabel(*l->first, l->second);
+    }
+    
+    PNAPI_FOREACH(l, t2->getLabels())
+    {
+      t->addLabel(*l->first, l->second);
+    }
 
     // delete place
     deletePlace(**p);
@@ -2188,19 +2354,23 @@ unsigned int PetriNet::reduce_self_loop_places()
   set<Place *> self_loop_places;
 
   // find places fulfilling the preconditions
-  PNAPI_FOREACH(set<Place *>, internalPlaces_, p)
-    if ( ((*p)->getPreset().size() == 1) &&       // precondition 1
+  PNAPI_FOREACH(p, places_)
+  {
+    if( ((*p)->getPreset().size() == 1) &&       // precondition 1
         ((*p)->getPreset() == (*p)->getPostset()) &&  // precodnition 2
         ((*((*p)->getPresetArcs().begin()))->getWeight() == 1) && // precondition 3
         ((*((*p)->getPostsetArcs().begin()))->getWeight() == 1) && // precondition 3
         ((*p)->getTokenCount() == 1 ) && // precondition 4
         __REDUCE_CHECK_FINAL(*p) ) // precondition 5
+    {
       self_loop_places.insert(*p);
+    }
+  }
 
   // remove useless places
   unsigned int result = 0;
 
-  PNAPI_FOREACH(set<Place*>, self_loop_places, p)
+  PNAPI_FOREACH(p, self_loop_places)
   {
     deletePlace(**p);
     ++result;
@@ -2248,21 +2418,25 @@ unsigned int PetriNet::reduce_self_loop_places()
 unsigned int PetriNet::reduce_self_loop_transitions()
 {
   // trace(TRACE_DEBUG, "[PN]\tApplying rule RC1 (Elimination of self-loop transitions)...\n");
-  set<Transition*> self_loop_transitions;
+  set<Transition *> self_loop_transitions;
 
   // find transitions fulfilling the preconditions
   unsigned int result = 0;
 
-  PNAPI_FOREACH(set<Transition*>, transitions_, t)
-    if ( ((*t)->getPreset().size() == 1) &&        // precondition 1
+  PNAPI_FOREACH(t, transitions_)
+  {
+    if( ((*t)->getPreset().size() == 1) &&        // precondition 1
         ((*t)->getPreset() == (*t)->getPostset()) &&   // precondition 2
         ((*((*t)->getPresetArcs().begin()))->getWeight() == 1) &&  // precondition 3
         ((*((*t)->getPostsetArcs().begin()))->getWeight() == 1) &&  // precondition 3
         (!((*t)->isSynchronized())) ) // precondition 4
+    {
       self_loop_transitions.insert(*t);
+    }
+  }
 
   // remove useless transitions
-  PNAPI_FOREACH(set<Transition*>, self_loop_transitions, t)
+  PNAPI_FOREACH(t, self_loop_transitions)
   {
     deleteTransition(**t);
     ++result;
@@ -2572,121 +2746,123 @@ unsigned int PetriNet::reduce(unsigned int reduction_level)
   unsigned int passes = 0;
 
   // places implied as empty can be reduced
-  reducablePlaces_ = new set<const Place*>(finalCondition().formula().emptyPlaces());
+  reducablePlaces_ = new set<const Place *>(finalCondition_.getFormula().getEmptyPlaces());
   
   {
-    set<const Place*> noReduce = finalCondition().concerningPlaces();
-    PNAPI_FOREACH(set<Place*>, internalPlaces_, p)
+    set<const Place *> noReduce = finalCondition_.concerningPlaces();
+    PNAPI_FOREACH(p, places_)
     {
       // places not concerned by the final condition can be reduced
       if(noReduce.count(*p) == 0)
+      {
         reducablePlaces_->insert(*p);
+      }
     }
   }
 
   // apply reductions
-  while (done > 0)
+  while(done > 0)
   {
     done = 0;
     ++passes;
 
 #ifdef USING_BPEL2OWFN
-    if ((reduction_level & UNUSED_STATUS_PLACES) == UNUSED_STATUS_PLACES)
+    if((reduction_level & UNUSED_STATUS_PLACES) == UNUSED_STATUS_PLACES)
     {
       done += reduce_unused_status_places();
     }
-    if ((reduction_level & SUSPICIOS_TRANSITIONS) == SUSPICIOS_TRANSITIONS)
+    if((reduction_level & SUSPICIOS_TRANSITIONS) == SUSPICIOS_TRANSITIONS)
     {
       done += reduce_suspicious_transitions();
     }
 #endif
 
-    if ((reduction_level & DEAD_NODES) == DEAD_NODES)
+    if((reduction_level & DEAD_NODES) == DEAD_NODES)
     {
       done += reduce_dead_nodes();
     }
 
-    if ((reduction_level & INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES) == INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES)
+    if((reduction_level & INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES) == INITIALLY_MARKED_PLACES_IN_CHOREOGRAPHIES)
     {
       done += reduce_remove_initially_marked_places_in_choreographies();
     }
 
-    if ((reduction_level & STARKE_RULE_3_PLACES) == STARKE_RULE_3_PLACES)
+    if((reduction_level & STARKE_RULE_3_PLACES) == STARKE_RULE_3_PLACES)
     {
       done += reduce_rule_3p();
     }
 
-    if ((reduction_level & STARKE_RULE_3_TRANSITIONS) == STARKE_RULE_3_TRANSITIONS)
+    if((reduction_level & STARKE_RULE_3_TRANSITIONS) == STARKE_RULE_3_TRANSITIONS)
     {
       done += reduce_rule_3t();
     }
 
-    if ((reduction_level & STARKE_RULE_4) == STARKE_RULE_4)
+    if((reduction_level & STARKE_RULE_4) == STARKE_RULE_4)
     {
       done += reduce_rule_4();
     }
 
-    if ((reduction_level & STARKE_RULE_5) == STARKE_RULE_5)
+    if((reduction_level & STARKE_RULE_5) == STARKE_RULE_5)
     {
       done += reduce_rule_5(keepNormal);
     }
 
-    if ((reduction_level & STARKE_RULE_6) == STARKE_RULE_6)
+    if((reduction_level & STARKE_RULE_6) == STARKE_RULE_6)
     {
       done += reduce_rule_6(keepNormal);
     }
 
-    if ((reduction_level & STARKE_RULE_7) == STARKE_RULE_7)
+    if((reduction_level & STARKE_RULE_7) == STARKE_RULE_7)
     {
       done += reduce_rule_7();
     }
 
-    if ((reduction_level & STARKE_RULE_8) == STARKE_RULE_8)
+    if((reduction_level & STARKE_RULE_8) == STARKE_RULE_8)
     {
       done += reduce_rule_8();
     }
 
-    if ((reduction_level & STARKE_RULE_9) == STARKE_RULE_9)
+    if((reduction_level & STARKE_RULE_9) == STARKE_RULE_9)
     {
       done += reduce_rule_9(keepNormal);
     }
 
-    if ((reduction_level & IDENTICAL_PLACES) == IDENTICAL_PLACES)
+    if((reduction_level & IDENTICAL_PLACES) == IDENTICAL_PLACES)
     {
       done += reduce_identical_places();  // RB1
     }
 
-    if ((reduction_level & IDENTICAL_TRANSITIONS) == IDENTICAL_TRANSITIONS)
+    if((reduction_level & IDENTICAL_TRANSITIONS) == IDENTICAL_TRANSITIONS)
     {
       done += reduce_identical_transitions(); // RB2
     }
 
-    if ((reduction_level & SERIES_PLACES) == SERIES_PLACES)
+    if((reduction_level & SERIES_PLACES) == SERIES_PLACES)
     {
       done += reduce_series_places();   // RA1
     }
 
-    if ((reduction_level & SERIES_TRANSITIONS) == SERIES_TRANSITIONS)
+    if((reduction_level & SERIES_TRANSITIONS) == SERIES_TRANSITIONS)
     {
       done += reduce_series_transitions(keepNormal);  // RA2
     }
 
-    if ((reduction_level & SELF_LOOP_PLACES) == SELF_LOOP_PLACES)
+    if((reduction_level & SELF_LOOP_PLACES) == SELF_LOOP_PLACES)
     {
       done += reduce_self_loop_places();  // RC1
     }
 
-    if ((reduction_level & SELF_LOOP_TRANSITIONS) == SELF_LOOP_TRANSITIONS)
+    if((reduction_level & SELF_LOOP_TRANSITIONS) == SELF_LOOP_TRANSITIONS)
     {
       done += reduce_self_loop_transitions(); // RC2
     }
 
-    if ((reduction_level & EQUAL_PLACES) == EQUAL_PLACES)
+    if((reduction_level & EQUAL_PLACES) == EQUAL_PLACES)
     {
       done += reduce_equal_places();    // RD1
     }
 
-    if ((reduction_level & ONCE) == ONCE)
+    if((reduction_level & ONCE) == ONCE)
       break;
   }
 

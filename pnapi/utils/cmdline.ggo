@@ -33,13 +33,6 @@ option "compose" -
   string
   optional
 
-option "wire" w
-  "Wire (i.e., compose) the given nets. Either a wiring description is given or the interfaces are composed according to their names."
-  typestr="FILE"
-  string
-  argoptional
-  optional
-  hidden
 
 option "produce" -
   "Calculate the product."

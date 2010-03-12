@@ -7,8 +7,10 @@
                         http://service-technology.org/pnapi
 
 
-Version 3.01-unreleased
+Version 4.00-unreleased
 =======================
+
+* HEAVY INTERFACE CHANGES
 
 * make check now tests, whether customer tools still work with the API (see
   `https://gna.org/task/?6813')
@@ -44,6 +46,8 @@ Version 3.01-unreleased
 
 * added pnapi::version() to get PNAPI package string in customer tools
 
+* introduced Interface class to handle input, output and synchronous labels
+
 * fixed bug #14274: PNAPI: Memory leaks
 
 * fixed bug #14856: PNAPI: Reduction by Starke rule #9 crashes under
@@ -53,7 +57,6 @@ Version 3.01-unreleased
 
 * fixed bug #15179: PNAPI: avoid using mktemp in Output.cc
 
+* fixed bug #15415: PNAPI: Assertion failure when reducing net
 
-See file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for
-complete version history.
-
+\nSee file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for\ncomplete version history.\n

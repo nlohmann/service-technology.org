@@ -3,23 +3,19 @@
  */
 
 #include "config.h"
-#include <cassert>
+
 #include <iostream>
 #include <vector>
 
-#ifndef NDEBUG
-#include "myio.h"
 #include "component.h"
-using std::cout;
-using std::endl;
-#endif
-
 #include "marking.h"
 #include "formula.h"
 #include "myio.h"
 #include "petrinet.h"
 #include "util.h"
 
+using std::cout;
+using std::endl;
 using std::map;
 using std::set;
 using std::ostream;
@@ -27,8 +23,87 @@ using std::vector;
 
 using pnapi::io::util::operator<<;
 
+
+
 namespace pnapi
 {
+
+/**************************************************************************
+ ***** Overloaded operators for formulas
+ *************************************************************************/
+
+/*!
+ * \brief formula construction operator
+ */
+formula::FormulaEqual operator==(const Place & p, unsigned int k)
+{
+  return formula::FormulaEqual(p, k);
+}
+
+/*!
+ * \brief formula construction operator
+ */
+formula::FormulaNotEqual operator!=(const Place & p, unsigned int k)
+{
+  return formula::FormulaNotEqual(p, k);
+}
+
+/*!
+ * \brief formula construction operator
+ */
+formula::FormulaGreater operator>(const Place & p, unsigned int k)
+{
+  return formula::FormulaGreater(p, k);
+}
+
+/*!
+ * \brief formula construction operator
+ */
+formula::FormulaGreaterEqual operator>=(const Place & p, unsigned int k)
+{
+  return formula::FormulaGreaterEqual(p, k);
+}
+
+/*!
+ * \brief formula construction operator
+ */
+formula::FormulaLess operator<(const Place & p, unsigned int k)
+{
+  return formula::FormulaLess(p, k);
+}
+
+/*!
+ * \brief formula construction operator
+ */
+formula::FormulaLessEqual operator<=(const Place & p, unsigned int k)
+{
+  return formula::FormulaLessEqual(p, k);
+}
+
+/*!
+ * \brief formula construction operator
+ */
+formula::Conjunction operator&&(const formula::Formula & f1, const formula::Formula & f2)
+{
+  return formula::Conjunction(f1, f2);
+}
+
+/*!
+ * \brief formula construction operator
+ */
+formula::Disjunction operator||(const formula::Formula & f1, const formula::Formula & f2)
+{
+  return formula::Disjunction(f1, f2);
+}
+
+/*!
+ * \brief formula construction operator
+ */
+formula::Negation operator!(const formula::Formula & f)
+{
+  return formula::Negation(f);
+}
+
 
 namespace formula
 {
@@ -37,255 +112,349 @@ namespace formula
  ***** Constructor() implementation
  **************************************************************************/
 
+/*!
+ * \brief constructor
+ */
 Operator::Operator()
 {
 }
 
+/*!
+ * \brief constructor
+ */
 Operator::Operator(const Formula & f)
 {
   children_.insert(f.clone());
 }
 
+/*!
+ * \brief constructor
+ */
 Operator::Operator(const Formula & l, const Formula & r)
 {
   children_.insert(l.clone());
   children_.insert(r.clone());
 
-
 #ifndef NDEBUG
   // consistency check
   const Proposition * child1 = NULL;
-  for (set<const Formula *>::iterator it = children_.begin(); 
-  it != children_.end(); ++it)
+  PNAPI_FOREACH(it, children_)
   {
     const Proposition * child2 = dynamic_cast<const Proposition *>(*it);
     if (child2 != NULL)
     {
       if (child1 != NULL)
-        assert(&child1->place().getPetriNet() == 
-          &child2->place().getPetriNet());
+      {
+        assert(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
+      }
       child1 = child2;
     }
   }
 #endif
 }
 
+/*!
+ * \brief constructor
+ */
 Operator::Operator(const std::set<const Formula *> & children,
-    const std::map<const Place *, const Place *> * places)
+                   const std::map<const Place *, const Place *> * places)
 {
-  for (set<const Formula *>::const_iterator it = children.begin();
-  it != children.end(); ++it)
+  PNAPI_FOREACH(it, children)
+  {
     children_.insert((*it)->clone(places));
+  }
 
 #ifndef NDEBUG
   // consistency check
   const Proposition * child1 = NULL;
-  for (set<const Formula *>::iterator it = children_.begin(); 
-  it != children_.end(); ++it)
+  PNAPI_FOREACH(it, children_)
   {
     const Proposition * child2 = dynamic_cast<const Proposition *>(*it);
     if (child2 != NULL)
     {
       if (child1 != NULL)
-        assert(&child1->place().getPetriNet() == 
-          &child2->place().getPetriNet());
+        assert(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
       child1 = child2;
     }
   }
 #endif
 }
 
+/*!
+ * \brief constructor
+ */
 Negation::Negation(const Formula & f) :
   Operator(f)
 {
 }
 
+/*!
+ * \brief constructor
+ */
 Negation::Negation(const std::set<const Formula *> & children,
-    const std::map<const Place *, const Place *> * places) :
+                   const std::map<const Place *, const Place *> * places) :
   Operator(children, places)
 {
 }
 
+/*!
+ * \brief constructor
+ */
 Negation::Negation(const Negation & n) :
   Operator(n.children_)
 {
 }
 
+/*!
+ * \brief constructor
+ */
 Conjunction::Conjunction() :
   Operator()
 {
 }
 
+/*!
+ * \brief constructor
+ */
 Conjunction::Conjunction(const Formula & f) :
   Operator(f)
 {
   simplifyChildren();
 }
 
+/*!
+ * \brief constructor
+ */
 Conjunction::Conjunction(const Formula & l, const Formula & r) :
   Operator(l, r)
 {
   simplifyChildren();
 }
 
+/*!
+ * \brief constructor
+ */
 Conjunction::Conjunction(const std::set<const Formula *> & children,
-    const std::map<const Place *, const Place *> * places) :
-      Operator(children, places)
+                         const std::map<const Place *, const Place *> * places) :
+  Operator(children, places)
 {
   simplifyChildren();
 }
 
+/*!
+ * \brief constructor
+ */
 Conjunction::Conjunction(const Conjunction & c) :
   Operator(c.children_)
 {
   simplifyChildren();
 }
 
+/*!
+ * \brief constructor
+ */
 Disjunction::Disjunction(const Formula & l, const Formula & r) :
   Operator(l, r)
 {
   simplifyChildren();
 }
 
+/*!
+ * \brief constructor
+ */
 Disjunction::Disjunction(const std::set<const Formula *> & children,
-    const std::map<const Place *, const Place *> * places) :
-      Operator(children, places)
+                         const std::map<const Place *, const Place *> * places) :
+  Operator(children, places)
 {
   simplifyChildren();
 }
 
-/// \bug Why is d not used?
+/*!
+ * \brief constructor
+ * 
+ * \bug why is d not used?
+ */
 Disjunction::Disjunction(const Disjunction & d) :
   Operator(children_)
 {
   simplifyChildren();
 }
 
+/*!
+ * \brief constructor
+ */
 Proposition::Proposition(const Place & p, unsigned int k,
-    const std::map<const Place *, const Place *> * places) :
-      place_(places == NULL ? p : *places->find(&p)->second), tokens_(k)
+                         const std::map<const Place *, const Place *> * places) :
+  place_((places == NULL) ? p : (*places->find(&p)->second)), tokens_(k)
 {
-  assert(places == NULL || places->find(&p)->second != NULL);
+  assert((places == NULL) || (places->find(&p)->second != NULL));
 }
 
+/*!
+ * \brief constructor
+ */
 FormulaEqual::FormulaEqual(const Place & p, unsigned int k,
-    const std::map<const Place *, const Place *> * places) :
-      Proposition(p, k, places)
+                           const std::map<const Place *, const Place *> * places) :
+  Proposition(p, k, places)
 {
 }
 
+/*!
+ * \brief constructor
+ */                           
 FormulaNotEqual::FormulaNotEqual(const Place & p, unsigned int k,
-    const std::map<const Place *, const Place *> * places) :
-      Proposition(p, k, places)
+                                 const std::map<const Place *, const Place *> * places) :
+  Proposition(p, k, places)
 {
 }
 
+/*!
+ * \brief constructor
+ */
 FormulaGreater::FormulaGreater(const Place & p, unsigned int k,
-    const std::map<const Place *, const Place *> * places) :
-      Proposition(p, k, places)
+                               const std::map<const Place *, const Place *> * places) :
+  Proposition(p, k, places)
 {
 }
 
+/*!
+ * \brief constructor
+ */
 FormulaGreaterEqual::FormulaGreaterEqual(const Place & p, unsigned int k,
-    const std::map<const Place *, const Place *> * places) :
-      Proposition(p, k, places)
+                                         const std::map<const Place *, const Place *> * places) :
+  Proposition(p, k, places)
 {
 }
 
+/*!
+ * \brief constructor
+ */
 FormulaLess::FormulaLess(const Place & p, unsigned int k,
-    const std::map<const Place *, const Place *> * places) :
-      Proposition(p, k, places)
+                         const std::map<const Place *, const Place *> * places) :
+  Proposition(p, k, places)
 {
 }
 
+/*!
+ * \brief constructor
+ */
 FormulaLessEqual::FormulaLessEqual(const Place & p, unsigned int k,
-    const std::map<const Place *, const Place *> * places) :
-      Proposition(p, k, places)
+                                   const std::map<const Place *, const Place *> * places) :
+  Proposition(p, k, places)
 {
 }
-
 
 
 /**************************************************************************
  ***** ~Destructor() implementation
  **************************************************************************/
 
+/*!
+ * \brief destructor
+ */
 Formula::~Formula()
 {
 }
 
+/*!
+ * \brief destructor
+ */
 Operator::~Operator()
 {
-  for (set<const Formula *>::iterator it = children_.begin();
-  it != children_.end(); ++it)
-    delete *it;
+  PNAPI_FOREACH(it, children_)
+  {
+    delete (*it);
+  }
 }
 
 /**************************************************************************
  ***** clone() implementation
  **************************************************************************/
 
+/*!
+ * \brief create a deep copy of the formula
+ */
 Negation * Negation::clone(const std::map<const Place *, const Place *> * places) const
 {
   return new Negation(children_, places);
 }
 
-Conjunction * Conjunction::clone(const std::map<const Place *,
-    const Place *> * places) const
+/*!
+ * \brief create a deep copy of the formula
+ */
+Conjunction * Conjunction::clone(const std::map<const Place *, const Place *> * places) const
 {
   return new Conjunction(children_, places);
 }
 
-Disjunction * Disjunction::clone(const std::map<const Place *,
-    const Place *> * places) const
+/*!
+ * \brief create a deep copy of the formula
+ */
+Disjunction * Disjunction::clone(const std::map<const Place *, const Place *> * places) const
 {
   return new Disjunction(children_, places);
 }
 
-FormulaTrue * FormulaTrue::clone(const std::map<const Place *,
-    const Place *> *) const
+/*!
+ * \brief create a deep copy of the formula
+ */
+FormulaTrue * FormulaTrue::clone(const std::map<const Place *, const Place *> *) const
 {
   return new FormulaTrue();
 }
 
-FormulaFalse * FormulaFalse::clone(const std::map<const Place *,
-    const Place *> *) const
+/*!
+ * \brief create a deep copy of the formula
+ */
+FormulaFalse * FormulaFalse::clone(const std::map<const Place *, const Place *> *) const
 {
   return new FormulaFalse();
 }
 
-FormulaEqual * FormulaEqual::clone(const std::map<const Place *,
-    const Place *> * places) const
+/*!
+ * \brief create a deep copy of the formula
+ */
+FormulaEqual * FormulaEqual::clone(const std::map<const Place *, const Place *> * places) const
 {
   return new FormulaEqual(place_, tokens_, places);
 }
 
-FormulaNotEqual * FormulaNotEqual::clone(const std::map<const Place *,
-    const Place *> * places) const
+/*!
+ * \brief create a deep copy of the formula
+ */
+FormulaNotEqual * FormulaNotEqual::clone(const std::map<const Place *, const Place *> * places) const
 {
   return new FormulaNotEqual(place_, tokens_, places);
 }
 
-FormulaGreater * FormulaGreater::clone(const std::map<const Place *,
-    const Place *> * places) const
+/*!
+ * \brief create a deep copy of the formula
+ */
+FormulaGreater * FormulaGreater::clone(const std::map<const Place *, const Place *> * places) const
 {
   return new FormulaGreater(place_, tokens_, places);
 }
 
-FormulaGreaterEqual * FormulaGreaterEqual::clone(const std::map<const Place *,
-    const Place *> * places) const
+/*!
+ * \brief create a deep copy of the formula
+ */
+FormulaGreaterEqual * FormulaGreaterEqual::clone(const std::map<const Place *, const Place *> * places) const
 {
   return new FormulaGreaterEqual(place_, tokens_, places);
 }
 
-FormulaLess * FormulaLess::clone(const std::map<const Place *,
-    const Place *> * places) const
+/*!
+ * \brief create a deep copy of the formula
+ */
+FormulaLess * FormulaLess::clone(const std::map<const Place *, const Place *> * places) const
 {
   return new FormulaLess(place_, tokens_, places);
 }
 
-FormulaLessEqual * FormulaLessEqual::clone(const std::map<const Place *,
-    const Place *> * places) const
+/*!
+ * \brief create a deep copy of the formula
+ */
+FormulaLessEqual * FormulaLessEqual::clone(const std::map<const Place *, const Place *> * places) const
 {
   return new FormulaLessEqual(place_, tokens_, places);
 }
@@ -296,6 +465,9 @@ FormulaLessEqual * FormulaLessEqual::clone(const std::map<const Place *,
  ***** isSatisfied() implementation
  **************************************************************************/
 
+/*!
+ * \brief evaluating the formula under the given marking
+ */
 bool Negation::isSatisfied(const Marking & m) const
 {
   return !(*children_.begin())->isSatisfied(m);
@@ -303,62 +475,92 @@ bool Negation::isSatisfied(const Marking & m) const
 
 /*!
  * \brief checks, whether this conjunction is satisfied by a given marking
- * \pre   the formel is unfolded
+ * \pre   the formula is unfolded
  */
 bool Conjunction::isSatisfied(const Marking & m) const
 {
-  for (set<const Formula *>::const_iterator f = children_.begin();
-  f != children_.end(); ++f)
+  PNAPI_FOREACH(f, children_)
+  {
     if (!(*f)->isSatisfied(m))
       return false;
+  }
 
   return true;
 }
 
+/*!
+ * \brief evaluating the formula under the given marking
+ */
 bool Disjunction::isSatisfied(const Marking & m) const
 {
-  for (set<const Formula *>::const_iterator f = children_.begin();
-  f != children_.end(); ++f)
+  PNAPI_FOREACH(f, children_)
+  {
     if ((*f)->isSatisfied(m))
       return true;
+  }
+  
   return false;
 }
 
+/*!
+ * \brief evaluating the formula under the given marking
+ */
 bool FormulaTrue::isSatisfied(const Marking &) const
 {
   return true;
 }
 
+/*!
+ * \brief evaluating the formula under the given marking
+ */
 bool FormulaFalse::isSatisfied(const Marking &) const
 {
   return false;
 }
 
+/*!
+ * \brief evaluating the formula under the given marking
+ */
 bool FormulaEqual::isSatisfied(const Marking & m) const
 {
   return m[place_] == tokens_;
 }
 
+/*!
+ * \brief evaluating the formula under the given marking
+ */
 bool FormulaNotEqual::isSatisfied(const Marking & m) const
 {
   return m[place_] != tokens_;
 }
 
+/*!
+ * \brief evaluating the formula under the given marking
+ */
 bool FormulaGreater::isSatisfied(const Marking & m) const
 {
   return m[place_] > tokens_;
 }
 
+/*!
+ * \brief evaluating the formula under the given marking
+ */
 bool FormulaGreaterEqual::isSatisfied(const Marking & m) const
 {
   return m[place_] >= tokens_;
 }
 
+/*!
+ * \brief evaluating the formula under the given marking
+ */
 bool FormulaLess::isSatisfied(const Marking & m) const
 {
   return m[place_] < tokens_;
 }
 
+/*!
+ * \brief evaluating the formula under the given marking
+ */
 bool FormulaLessEqual::isSatisfied(const Marking & m) const
 {
   return m[place_] <= tokens_;
@@ -372,12 +574,10 @@ bool FormulaLessEqual::isSatisfied(const Marking & m) const
 /*!
  * \brief   removes a place recursively
  * 
- * \return  true, if this formula has to be removed by parent
+ * \return  true, iff this formula has to be removed by parent
  *          due to this removal, false otherwise.
- *
- * \bug     Why is p not used?
  */
-bool Formula::removePlace(const Place & p)
+bool Formula::removePlace(const Place &)
 {
   return false;
 }
@@ -385,16 +585,15 @@ bool Formula::removePlace(const Place & p)
 /*!
  * \brief   removes a place recursively
  * 
- * \return  true, if this formula has to be removed by parent
+ * \return  true, iff this formula has to be removed by parent
  *          due to this removal, false otherwise.
  */
 bool Operator::removePlace(const Place & p)
 {
-  set<const Formula*> children = children_;
-  for(set<const Formula*>::iterator f = children.begin();
-       f != children.end(); ++f)
+  set<const Formula *> children = children_;
+  PNAPI_FOREACH(f, children)
   {
-    if(const_cast<Formula*>(*f)->removePlace(p))
+    if(const_cast<Formula *>(*f)->removePlace(p))
     {
       children_.erase(*f);
       delete (*f);
@@ -407,7 +606,7 @@ bool Operator::removePlace(const Place & p)
 /*!
  * \brief   removes a place recursively
  * 
- * \return  true, if this formula has to be removed by parent
+ * \return  true, iff this formula has to be removed by parent
  *          due to this removal, false otherwise.
  */
 bool Proposition::removePlace(const Place & p)
@@ -420,78 +619,119 @@ bool Proposition::removePlace(const Place & p)
  ***** output() implementation
  **************************************************************************/
 
+/*!
+ * \brief output the formula
+ */
 std::ostream & Negation::output(std::ostream & os) const
 {
   return os << *this;
 }
 
+/*!
+ * \brief output the formula
+ */
 std::ostream & Conjunction::output(std::ostream & os) const
 {
   return os << *this;
 }
 
+/*!
+ * \brief output the formula
+ */
 std::ostream & Disjunction::output(std::ostream & os) const
 {
   return os << *this;
 }
 
+/*!
+ * \brief output the formula
+ */
 std::ostream & FormulaTrue::output(std::ostream & os) const
 {
   return os << *this;
 }
 
+/*!
+ * \brief output the formula
+ */
 std::ostream & FormulaFalse::output(std::ostream & os) const
 {
   return os << *this;
 }
 
+/*!
+ * \brief output the formula
+ */
 std::ostream & FormulaEqual::output(std::ostream & os) const
 {
   return os << *this;
 }
 
+/*!
+ * \brief output the formula
+ */
 std::ostream & FormulaNotEqual::output(std::ostream & os) const
 {
   return os << *this;
 }
 
+/*!
+ * \brief output the formula
+ */
 std::ostream & FormulaGreater::output(std::ostream & os) const
 {
   return os << *this;
 }
 
+/*!
+ * \brief output the formula
+ */
 std::ostream & FormulaGreaterEqual::output(std::ostream & os) const
 {
   return os << *this;
 }
 
+/*!
+ * \brief output the formula
+ */
 std::ostream & FormulaLess::output(std::ostream & os) const
 {
   return os << *this;
 }
 
+/*!
+ * \brief output the formula
+ */
 std::ostream & FormulaLessEqual::output(std::ostream & os) const
 {
   return os << *this;
 }
 
 
-
 /**************************************************************************
  ***** accessor implementation
  **************************************************************************/
 
-const std::set<const Formula *> & Operator::children() const
+/*!
+ * \brief child formulae
+ */
+const std::set<const Formula *> & Operator::getChildren() const
 {
   return children_;
 }
 
-const Place & Proposition::place() const
+/*!
+ * \brief get the place concerned by this proposition
+ */
+const Place & Proposition::getPlace() const
 {
   return place_;
 }
 
-unsigned int Proposition::tokens() const
+/*!
+ * \brief get the tokens mentioned by this proposition
+ */
+unsigned int Proposition::getTokens() const
 {
   return tokens_;
 }
@@ -501,24 +741,32 @@ unsigned int Proposition::tokens() const
  ***** concerning/empty places implementation
  **************************************************************************/
 
-std::set<const Place *> Formula::places() const
+/*!
+ * \brief set of concerning places
+ */
+std::set<const Place *> Formula::getPlaces() const
 {
   return set<const Place *>();
 }
 
-std::set<const Place *> Operator::places() const
+/*!
+ * \brief set of concerning places
+ */
+std::set<const Place *> Operator::getPlaces() const
 {
   set<const Place *> places;
-  for (set<const Formula *>::const_iterator it = children_.begin();
-  it != children_.end(); ++it)
+  PNAPI_FOREACH(it, children_)
   {
-    set<const Place *> childCps = (*it)->places();
+    set<const Place *> childCps = (*it)->getPlaces();
     places.insert(childCps.begin(), childCps.end());
   }
   return places;
 }
 
-std::set<const Place *> Proposition::places() const
+/*!
+ * \brief set of concerning places
+ */
+std::set<const Place *> Proposition::getPlaces() const
 {
   set<const Place *> places;
   places.insert(&place_);
@@ -528,21 +776,20 @@ std::set<const Place *> Proposition::places() const
 /*!
  * \brief set of places implied to be empty
  */
-std::set<const Place *> Formula::emptyPlaces() const
+std::set<const Place *> Formula::getEmptyPlaces() const
 {
-  return set<const Place*>();
+  return set<const Place *>();
 }
 
 /*!
  * \brief set of places implied to be empty
  */
-std::set<const Place *> Conjunction::emptyPlaces() const
+std::set<const Place *> Conjunction::getEmptyPlaces() const
 {
-  set<const Place*> result;
-  for(set<const Formula*>::iterator f = children_.begin();
-       f != children_.end(); ++f)
+  set<const Place *> result;
+  PNAPI_FOREACH(f, children_)
   {
-    result = util::setUnion(result, (*f)->emptyPlaces());
+    result = util::setUnion(result, (*f)->getEmptyPlaces());
   }
   
   return result;
@@ -551,16 +798,18 @@ std::set<const Place *> Conjunction::emptyPlaces() const
 /*!
  * \brief set of places implied to be empty
  */
-std::set<const Place *> Disjunction::emptyPlaces() const
+std::set<const Place *> Disjunction::getEmptyPlaces() const
 {
   if(children_.empty())
-    return set<const Place*>();
+  {
+    return set<const Place *>();
+  }
     
-  set<const Place*> result = (*children_.begin())->emptyPlaces();
-  for(set<const Formula*>::iterator f = ++(children_.begin());
+  set<const Place *> result = (*children_.begin())->getEmptyPlaces();
+  for(set<const Formula *>::iterator f = ++(children_.begin());
        f != children_.end(); ++f)
   {
-    result = util::setIntersection(result, (*f)->emptyPlaces());
+    result = util::setIntersection(result, (*f)->getEmptyPlaces());
   }
   
   return result;
@@ -569,11 +818,37 @@ std::set<const Place *> Disjunction::emptyPlaces() const
 /*!
  * \brief set of places implied to be empty
  */
-std::set<const Place *> FormulaEqual::emptyPlaces() const
+std::set<const Place *> FormulaEqual::getEmptyPlaces() const
 {
-  set<const Place*> result;
+  set<const Place *> result;
   
   if(tokens_ == 0)
+    result.insert(&place_);
+  
+  return result;
+}
+
+/*!
+ * \brief set of places implied to be empty
+ */
+std::set<const Place *> FormulaLessEqual::getEmptyPlaces() const
+{
+  set<const Place *> result;
+  
+  if(tokens_ == 0)
+    result.insert(&place_);
+  
+  return result;
+}
+
+/*!
+ * \brief set of places implied to be empty
+ */
+std::set<const Place *> FormulaLess::getEmptyPlaces() const
+{
+  set<const Place *> result;
+  
+  if(tokens_ <= 1)
     result.insert(&place_);
   
   return result;
@@ -584,39 +859,50 @@ std::set<const Place *> FormulaEqual::emptyPlaces() const
  ***** simplify children implementation
  **************************************************************************/
 
+/*!
+ * \brief simplify child formulae
+ */
 void Negation::simplifyChildren()
 {
 }
 
+/*!
+ * \brief simplify child formulae
+ */
 void Conjunction::simplifyChildren()
 {
   set<const Formula *> children = children_;
-  for (set<const Formula *>::iterator it = children.begin(); 
-        it != children.end(); ++it)
+  PNAPI_FOREACH(it, children)
+  {
     if ((*it)->getType() == F_TRUE)
     {
       children_.erase(*it);
-      delete *it;
+      delete (*it);
     }
     else
     {
       const Operator * o = dynamic_cast<const Conjunction *> (*it);
       if (o != NULL)
       {
-        for (set<const Formula *>::const_iterator it = o->children().begin(); 
-              it != o->children().end(); ++it)
+        PNAPI_FOREACH(it, o->getChildren())
+        {
           children_.insert((*it)->clone());
+        }
         children_.erase(o);
         delete o;
       }
     }
+  }
 }
 
+/*!
+ * \brief simplify child formulae
+ */
 void Disjunction::simplifyChildren()
 {
   set<const Formula *> children = children_;
-  for (set<const Formula *>::iterator it = children.begin(); 
-        it != children.end(); ++it)
+  PNAPI_FOREACH(it, children)
+  {
     if ((*it)->getType() == F_FALSE)
     {
       children_.erase(*it);
@@ -627,13 +913,15 @@ void Disjunction::simplifyChildren()
       const Operator * o = dynamic_cast<const Disjunction *> (*it);
       if (o != NULL)
       {
-        for (set<const Formula *>::const_iterator it = o->children().begin(); 
-              it != o->children().end(); ++it)
+        PNAPI_FOREACH(it, o->getChildren())
+        {
           children_.insert((*it)->clone());
+        }
         children_.erase(o);
         delete o;
       }
     }
+  }
 }
 
 
@@ -757,8 +1045,7 @@ Formula * Conjunction::removeNegation() const
 {
   Conjunction * result = new Conjunction();
   
-  for(set<const Formula*>::iterator f = children_.begin();
-       f != children_.end(); ++f)
+  PNAPI_FOREACH(f, children_)
   {
     result->children_.insert((*f)->removeNegation());
   }
@@ -773,16 +1060,14 @@ Formula * Disjunction::removeNegation() const
 {
   set<const Formula*> children;
     
-  for(set<const Formula*>::iterator f = children_.begin();
-       f != children_.end(); ++f)
+  PNAPI_FOREACH(f, children_)
   {
     children.insert((*f)->removeNegation());
   }
   
   Disjunction * result = new Disjunction(children);
   
-  for(set<const Formula*>::iterator f = children.begin();
-       f != children.end(); ++f)
+  PNAPI_FOREACH(f, children)
   {
     delete (*f);
   }
@@ -811,18 +1096,16 @@ Formula * Negation::negate() const
  */
 Formula * Conjunction::negate() const
 {
-  set<const Formula*> children;
+  set<const Formula *> children;
   
-  for(set<const Formula*>::iterator f = children_.begin();
-       f != children_.end(); ++f)
+  PNAPI_FOREACH(f, children_)
   {
     children.insert((*f)->negate());
   }
   
-  Formula * result = static_cast<Formula*>(new Disjunction(children));
+  Formula * result = static_cast<Formula *>(new Disjunction(children));
   
-  for(set<const Formula*>::iterator f = children.begin();
-         f != children.end(); ++f)
+  PNAPI_FOREACH(f, children)
   {
     delete (*f);
   }
@@ -835,18 +1118,16 @@ Formula * Conjunction::negate() const
  */
 Formula * Disjunction::negate() const
 {
-  set<const Formula*> children;
+  set<const Formula *> children;
     
-  for(set<const Formula*>::iterator f = children_.begin();
-       f != children_.end(); ++f)
+  PNAPI_FOREACH(f, children_)
   {
     children.insert((*f)->negate());
   }
   
-  Formula * result = static_cast<Formula*>(new Conjunction(children));
+  Formula * result = static_cast<Formula *>(new Conjunction(children));
   
-  for(set<const Formula*>::iterator f = children.begin();
-         f != children.end(); ++f)
+  PNAPI_FOREACH(f, children)
   {
     delete (*f);
   }
@@ -859,7 +1140,7 @@ Formula * Disjunction::negate() const
  */
 Formula * FormulaTrue::negate() const
 {
-  return static_cast<Formula*>(new FormulaFalse());
+  return static_cast<Formula *>(new FormulaFalse());
 }
 
 /*!
@@ -867,7 +1148,7 @@ Formula * FormulaTrue::negate() const
  */
 Formula * FormulaFalse::negate() const
 {
-  return static_cast<Formula*>(new FormulaTrue());
+  return static_cast<Formula *>(new FormulaTrue());
 }
 
 /*!
@@ -875,7 +1156,7 @@ Formula * FormulaFalse::negate() const
  */
 Formula * FormulaEqual::negate() const
 {
-  return static_cast<Formula*>(((place_ < tokens_) || (place_ > tokens_)).clone());
+  return static_cast<Formula *>(((place_ < tokens_) || (place_ > tokens_)).clone());
 }
 
 /*!
@@ -883,7 +1164,7 @@ Formula * FormulaEqual::negate() const
  */
 Formula * FormulaNotEqual::negate() const
 {
-  return static_cast<Formula*>(new FormulaEqual(place_, tokens_));
+  return static_cast<Formula *>(new FormulaEqual(place_, tokens_));
 }
 
 /*!
@@ -891,7 +1172,7 @@ Formula * FormulaNotEqual::negate() const
  */
 Formula * FormulaGreater::negate() const
 {
-  return static_cast<Formula*>(new FormulaLessEqual(place_, tokens_));
+  return static_cast<Formula *>(new FormulaLessEqual(place_, tokens_));
 }
 
 /*!
@@ -899,7 +1180,7 @@ Formula * FormulaGreater::negate() const
  */
 Formula * FormulaGreaterEqual::negate() const
 {
-  return static_cast<Formula*>(new FormulaLess(place_, tokens_));
+  return static_cast<Formula *>(new FormulaLess(place_, tokens_));
 }
 
 /*!
@@ -907,7 +1188,7 @@ Formula * FormulaGreaterEqual::negate() const
  */
 Formula * FormulaLess::negate() const
 {
-  return static_cast<Formula*>(new FormulaGreaterEqual(place_, tokens_));
+  return static_cast<Formula *>(new FormulaGreaterEqual(place_, tokens_));
 }
 
 /*!
@@ -915,14 +1196,14 @@ Formula * FormulaLess::negate() const
  */
 Formula * FormulaLessEqual::negate() const
 {
-  return static_cast<Formula*>(new FormulaGreater(place_, tokens_));
+  return static_cast<Formula *>(new FormulaGreater(place_, tokens_));
 }
 
 /*! 
- * AND(a1,...,an,OR(b11,...,b1m1),...,OR(bl1,...,blml))
- * -> OR(AND(a1,...,an,b11,...,bl1), ...,
- *       AND(a1,...,an,b11,...,blml), ...,
- *       AND(a1,...,an,b1m1,...,blml))
+ * AND(a_1,...,a_n,OR(b_{1,1},...,b_{1,m_1}),...,OR(b_{l,1},...,b_{l,m_l}))
+ * -> OR(AND(a_1,...,a_n,b_{1,1},...,b_{l,1}), ...,
+ *       AND(a_1,...,a_n,b_{1,1},...,b_{l,m_l}), ...,
+ *       AND(a_1,...,a_n,b_{1,m_1},...,b_{l,m_l}))
  */
 
 /*!
@@ -938,12 +1219,11 @@ Formula * Formula::dnf() const
  */
 Formula * Conjunction::dnf() const
 {
-  set<const Formula*> atomics;
-  set<const Formula*> disjunctions;
+  set<const Formula *> atomics;
+  set<const Formula *> disjunctions;
   
   /// split children
-  for(set<const Formula*>::iterator f = children_.begin();
-       f != children_.end(); ++f)
+  PNAPI_FOREACH(f, children_)
   {
     if((*f)->getType() == F_DISJUNCTION)
     {
@@ -959,38 +1239,34 @@ Formula * Conjunction::dnf() const
   if(disjunctions.empty()) // just atomics
     return clone();
   
-  set<set<const Formula*> > disChildren;
+  set<set<const Formula *> > disChildren;
   /// calculate cartesian product
   {
-    set<set<const Formula*> > * result = new set<set<const Formula*> >();
+    set<set<const Formula *> > * result = new set<set<const Formula *> >();
     bool first = true;
     
-    for(set<const Formula*>::iterator f = disjunctions.begin();
-         f != disjunctions.end(); ++f)
+    PNAPI_FOREACH(f, disjunctions)
     {
-      set<set<const Formula*> > * newResult = new set<set<const Formula*> >();
-      const Disjunction * d = static_cast<const Disjunction*>(*f);
+      set<set<const Formula *> > * newResult = new set<set<const Formula *> >();
+      const Disjunction * d = static_cast<const Disjunction *>(*f);
       
       if(first)
       {
         first = false;
-        for(set<const Formula*>::iterator ff = d->children().begin();
-             ff != d->children().end(); ++ff)
+        PNAPI_FOREACH(ff, d->getChildren())
         {
-          set<const Formula*> tmpset;
+          set<const Formula *> tmpset;
           tmpset.insert(*ff);
           newResult->insert(tmpset);
         }
       }
       else
       {
-        for(set<const Formula*>::iterator ff = d->children().begin();
-             ff != d->children().end(); ++ff)
+        PNAPI_FOREACH(ff, d->getChildren())
         {
-          for(set<set<const Formula*> >::iterator fff = result->begin();
-               fff != result->end(); ++fff)
+          PNAPI_FOREACH(fff, (*result))
           {
-            set<const Formula*> tmpset = *fff;
+            set<const Formula *> tmpset = *fff;
             tmpset.insert(*ff);
             newResult->insert(tmpset);
           }
@@ -1005,25 +1281,22 @@ Formula * Conjunction::dnf() const
     delete result;
   }
   
-  set<const Formula*> conjunctions;
+  set<const Formula *> conjunctions;
   /// create conjunctions
-  for(set<set<const Formula*> >::iterator f = disChildren.begin();
-       f != disChildren.end(); ++f)
+  PNAPI_FOREACH(f, disChildren)
   {
-    set<const Formula*> tmpset = util::setUnion(atomics, *f);
-    conjunctions.insert(static_cast<Formula*>(new Conjunction(tmpset)));
+    set<const Formula *> tmpset = util::setUnion(atomics, *f);
+    conjunctions.insert(static_cast<Formula *>(new Conjunction(tmpset)));
   }
   
-  Formula * result = static_cast<Formula*>(new Disjunction(conjunctions));
+  Formula * result = static_cast<Formula *>(new Disjunction(conjunctions));
   
   // cleanup
-  for(set<const Formula*>::iterator f = conjunctions.begin();
-       f != conjunctions.end(); ++f)
+  PNAPI_FOREACH(f, conjunctions)
   {
     delete (*f);
   }
-  for(set<const Formula*>::iterator f = disjunctions.begin();
-       f != disjunctions.end(); ++f)
+  PNAPI_FOREACH(f, disjunctions)
   {
     delete (*f);
   }
@@ -1036,18 +1309,16 @@ Formula * Conjunction::dnf() const
  */
 Formula * Disjunction::dnf() const
 {
-  set<const Formula*> children;
+  set<const Formula *> children;
   
-  for(set<const Formula*>::iterator f = children_.begin();
-       f != children_.end(); ++f)
+  PNAPI_FOREACH(f, children_)
   {
     children.insert((*f)->dnf());
   }
   
-  Formula * result = static_cast<Formula*>(new Disjunction(children));
+  Formula * result = static_cast<Formula *>(new Disjunction(children));
   
-  for(set<const Formula*>::iterator f = children.begin();
-       f != children.end(); ++f)
+  PNAPI_FOREACH(f, children)
   {
     delete (*f);
   }

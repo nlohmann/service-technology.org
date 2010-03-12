@@ -8,7 +8,6 @@
 #include <set>
 #include <string>
 #include "myio.h"
-#include "parser.h"
 
 
 namespace pnapi
@@ -17,6 +16,13 @@ namespace pnapi
 /// forward declarations
 class Marking;
 class Automaton;
+namespace parser
+{
+namespace sa
+{
+int parse();
+} /* namespace sa */
+} /* namespace parser */
 
 
 /*!
@@ -29,59 +35,15 @@ class Automaton;
  */
 class State
 {
+  /// friend methods
   friend std::ostream & io::__sa::output(std::ostream &, const State &);
   friend int pnapi::parser::sa::parse();
 
+  /// friend classes
   friend class Automaton;
   friend class Edge;
 
-public:
-  /// standard constructor
-  State(unsigned int * = NULL);
-  /// standard constructor
-  State(const unsigned int);
-  /// standard constructor service automaton
-  State(Marking &m, std::map<const Place *, unsigned int> *,
-      unsigned int &);
-  /// standard copy constructor
-  State(const State &s);
-  /// standard destructor
-  ~State();
-
-  /// method which returns the state's name
-  unsigned int name() const;
-  /// method which returns the state's preset
-  const std::set<State *> preset() const;
-  /// method which returns the state's postset
-  const std::set<State *> postset() const;
-  /// method which returns the state's postset edges
-  const std::set<Edge *> postsetEdges() const;
-
-  /// method which returns the state's final property
-  bool isFinal() const;
-  /// method which toggles the state's final property to true
-  void final();
-  /// method which returns the state's initial property
-  bool isInitial() const;
-  /// method which toggles the state's initial property to true
-  void initial();
-
-
-  /// checks if 2 states are equal (by name, preset, and postset, or marking)
-  bool operator ==(const State &s2) const;
-
-  /// returns the state's marking
-  Marking * marking() const;
-  /// returns the state's hash value (only needed by service automaton)
-  unsigned int hashValue();
-  /// returns the size of the represented marking
-  unsigned int size() const;
-
-  /// copy a state from one automaton to another one
-  static State * copy(const State &, PetriNet* = NULL, 
-      std::map<const Place*, const Place*>* = NULL);
-
-private:
+private: /* private variabled */
   /// the state's name
   unsigned int name_;
   /// the state's preset
@@ -90,25 +52,82 @@ private:
   std::set<State *> postset_;
   /// the state's postset edges
   std::set<Edge *> postsetEdges_;
-  /// the state's final property
+  /// whether the state is a final state
   bool isFinal_;
-  /// the state's initial property
+  /// whether the state is an initial state
   bool isInitial_;
-
-  /// adding a state to the preset
-  void addPre(State &);
-  /// adding a state to the postset
-  void addPost(State &);
-  /// adding an edge to the postset edges
-  void addPostEdge(Edge &);
-
+  
   /*** optional properties ***/
   /// the marking which is represented by the state (needed by service a.)
-  Marking *m_;
+  Marking * m_;
   /// the hash value of the state (computed through the markings)
   unsigned int hashValue_;
-  void setHashValue(std::map<const Place *, unsigned int> *);
+  
+public: /* public methods */
+  /*!
+   * \name constructors and destructors
+   */
+  //@{
+  /// standard constructor
+  State(unsigned int *);
+  /// constructor
+  State(const unsigned int);
+  /// standard constructor service automaton
+  State(Marking &, std::map<const Place *, unsigned int> *, unsigned int &);
+  /// copy constructor
+  State(const State &);
+  /// copy a state from one automaton to another one
+  State(const State &, PetriNet *, 
+        std::map<const Place *, const Place *> * = NULL);
+  /// standard destructor
+  ~State();
+  //@}
 
+  /*!
+   * \name structural changes
+   */
+  //@{
+  /// make this state a final state
+  void setFinal();
+  /// make this state an initial state
+  void setInitial();
+  //@}
+  
+  /*!
+   * \name getter
+   */
+  //@{
+  /// method returning the state's name
+  unsigned int getName() const;
+  /// method returning the state's preset
+  const std::set<State *> & getPreset() const;
+  /// method returning the state's postset
+  const std::set<State *> & getPostset() const;
+  /// method returning the state's postset edges
+  const std::set<Edge *> & getPostsetEdges() const;
+  /// returns the state's marking
+  Marking * getMarking() const;
+  /// returns the state's hash value (only needed by service automaton)
+  unsigned int getHashValue() const;
+  /// returns the size of the represented marking
+  unsigned int size() const;
+  /// method returning whether the state is a final state
+  bool isFinal() const;
+  /// method returning whether the state is an initial state
+  bool isInitial() const;
+  /// checks if 2 states are equal (by name, preset, and postset, or marking)
+  bool operator==(const State &) const;
+  //@}
+
+private: /* private functions */
+  /// adding a state to the preset
+  void addPreState(State &);
+  /// adding a state to the postset
+  void addPostState(State &);
+  /// adding an edge to the postset edges
+  void addPostEdge(Edge &);
+  /// set the hash value
+  void setHashValue(std::map<const Place *, unsigned int> *);
 };
 
 
@@ -123,35 +142,41 @@ private:
  */
 class Edge
 {
-public:
-  /// standard constructor
-  Edge(State &source, State &destination, const std::string& label = "",
-      const Automaton::Type type = Automaton::TAU);
-  /// standard destructor
-  virtual ~Edge();
-
-  /// method which returns the edge's label
-  const std::string label() const;
-  /// method which returns the egde's source state
-  State &source() const;
-  /// method which returns the edge's destination state
-  State &destination() const;
-  /// method which returns the type according to the edge (sa)
-  Automaton::Type type() const;
-
-private:
+public: /* public types */
+  enum Type 
+  { 
+    INPUT, 
+    OUTPUT, 
+    TAU, 
+    SYNCHRONOUS 
+  };
+  
+private: /* private variables */
   /// edge's label
   std::string label_;
   /// edge's source state
-  State &source_;
+  State & source_;
   /// edge's destination state
-  State &destination_;
+  State & destination_;
   /// edge's type
-  Automaton::Type type_;
+  Type type_;
+    
+public: /* public methods */
+  /// constructor
+  Edge(State &, State &, const std::string & = "", Type = TAU);
+  /// standard destructor
+  virtual ~Edge();
 
+  /// method returning the edge's label
+  const std::string & getLabel() const;
+  /// method returning the egde's source state
+  State & getSource() const;
+  /// method returning the edge's destination state
+  State & getDestination() const;
+  /// method returning the type according to the edge (sa)
+  Type getType() const;
 };
 
-} /* END OF NAMESPACE pnapi */
+} /* namespace pnapi */
 
-#endif
-
+#endif /* STATE_H */

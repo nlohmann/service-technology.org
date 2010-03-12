@@ -15,12 +15,12 @@
 #ifndef PNAPI_PNAPI_H
 #define PNAPI_PNAPI_H
 
+#include <string>
 #include "myio.h"
 #include "condition.h"
 #include "petrinet.h"
 #include "automaton.h"
 #include "state.h"
-#include <string>
 
 // overloaded operators should be available globally
 using pnapi::io::operator<<;
@@ -116,6 +116,7 @@ using pnapi::operator&&;
  */
 namespace pnapi
 {
+/// Petri Net API's version string
 std::string version();
 }
 
@@ -135,5 +136,4 @@ extern "C" {
   char libpnapi_is_present();
 }
 
-#endif
-
+#endif /* PNAPI_PNAPI_H */

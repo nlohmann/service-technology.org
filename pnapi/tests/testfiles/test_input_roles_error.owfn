@@ -2,8 +2,6 @@
 
 PLACE
 
-ROLES a;
-
 INTERNAL
   p0,  { initial }
   p1,
@@ -14,6 +12,8 @@ INPUT
 
 OUTPUT
   Euro;
+
+ROLES a;
 
 INITIALMARKING
   p0:   1;

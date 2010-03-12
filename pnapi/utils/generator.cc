@@ -11,6 +11,7 @@
 #include <cstring>
 
 #include "pnapi.h"
+#include "util.h"
 
 using namespace std;
 using namespace pnapi;
@@ -71,7 +72,7 @@ PetriNet matrix2owfn(matrix &A) {
     // create places
     for (unsigned int i = 0; i < A.size(); i++) {
         if (i == 0) {
-            PN.createPlace("p" + toString(i), Node::INTERNAL, 1);
+            PN.createPlace("p" + toString(i), 1);
         } else {
             PN.createPlace("p" + toString(i));
         }
@@ -94,26 +95,26 @@ PetriNet matrix2owfn(matrix &A) {
     
     
     // add communication places
-    for (unsigned int i = 0; i < (sizeof inputLabels)/(sizeof inputLabels[0]); i++) {
-        PN.createPlace(inputLabels[i], Place::INPUT);
+    for (unsigned int i = 0; i < (sizeof inputLabels)/(sizeof inputLabels[0]); ++i) {
+        PN.getInterface().addInputLabel(inputLabels[i]);
     }
-    for (unsigned int i = 0; i < (sizeof outputLabels)/(sizeof outputLabels[0]); i++) {
-        PN.createPlace(outputLabels[i], Place::OUTPUT);
+    for (unsigned int i = 0; i < (sizeof outputLabels)/(sizeof outputLabels[0]); ++i) {
+        PN.getInterface().addOutputLabel(outputLabels[i]);
     }
     
     
     // connect interface
     set<Transition *> ts = PN.getTransitions();
-    for (set<Transition *>::iterator t = ts.begin(); t != ts.end(); t++) {
+    for (set<Transition *>::iterator t = ts.begin(); t != ts.end(); ++t) {
         unsigned int mode = rand() % (2 + A.size()/5);
         
         switch (mode) {
             case(0): {  /* input */
-                PN.createArc(*PN.findPlace(inputLabels[rand() % (sizeof inputLabels)/(sizeof inputLabels[0])]), **t);
+               (*t)->addLabel(*(PN.getInterface().findLabel(inputLabels[rand() % (sizeof inputLabels)/(sizeof inputLabels[0])])));
                 break;
             }
             case(1): {  /* output */
-                PN.createArc(**t, *PN.findPlace(outputLabels[rand() % (sizeof outputLabels)/(sizeof outputLabels[0])]));
+                (*t)->addLabel(*(PN.getInterface().findLabel(outputLabels[rand() % (sizeof outputLabels)/(sizeof outputLabels[0])])));
                 break;
             }
             default: {}  /* internal */
@@ -142,10 +143,13 @@ PetriNet matrix2owfn(matrix &A) {
     
     
     // add final marking
-    PN.finalCondition() = false;
-    for (set<Place*>::iterator p = PN.getInternalPlaces().begin(); p != PN.getInternalPlaces().end(); p++) {
+    PN.getFinalCondition() = false;
+    PNAPI_FOREACH(p, PN.getPlaces())
+    {
       if ((*p)->getPostset().empty())
-	PN.finalCondition().addProposition(**p == 1, false);
+      {
+        PN.getFinalCondition().addProposition(**p == 1, false);
+      }
     }
     
     return PN;
@@ -191,7 +195,7 @@ int main(int argc, char** argv) {
                 
         PetriNet PN = matrix2owfn(adjacency);
         
-        if (!PN.getInternalPlaces().empty() && !PN.getTransitions().empty()) {
+        if (!PN.getPlaces().empty() && !PN.getTransitions().empty()) {
             string filename = "generated-" + toString(size) + "-" + format(toString(filecount++), nets) + ".owfn";
             ofstream fout(filename.c_str());
             fout << io::owfn << PN;

@@ -162,6 +162,7 @@ int main(int argc, char** argv) {
 
         std::stringstream ss;
         ss << io::stat << *(current.net);
+        
         status("<stdin>: %s", ss.str().c_str());
 
         // store object
@@ -237,68 +238,7 @@ int main(int argc, char** argv) {
         }
     }
 
-
-    /*********
-    * WIRING *
-    **********/
-    if (args_info.wire_given) {
-        // collect parsed nets and store them in a mapping
-        map<string, PetriNet *> netsByName;
-        for (unsigned int i = 0; i < objects.size(); ++i) {
-            // strip filename extension
-            string name = objects[i].filename.substr(0, objects[i].filename.find_last_of("."));
-            netsByName[name] = objects[i].net;
-        }
-
-        PetriNet net; // to store composition
-        string compositionName; // to store the name of the composition
-
-        if (args_info.wire_arg) {
-            compositionName = args_info.wire_arg;
-
-            // try to open wiring file
-            ifstream infile(args_info.wire_arg, ifstream::in);
-            if (!infile.is_open()) {
-                abort(3, "could not read from wiring file '%s'", args_info.wire_arg);
-            }
-
-            status("composing %d nets according to '%s'", objects.size(), args_info.wire_arg);
-
-            // create a new net consisting of the composed nets
-            try {
-                infile >> meta(io::INPUTFILE, args_info.wire_arg)
-                    >> meta(io::CREATOR, PACKAGE_STRING)
-                    >> meta(io::INVOCATION, invocation)
-                    >> io::onwd >> pnapi::io::nets(netsByName) >> net;
-            } catch (io::InputError error) {
-                std::stringstream ss;
-                ss << error;
-                abort(2, "Input Error: %s", ss.str().c_str());
-            }
-        } else {
-            // no wiring file is given
-            compositionName = "composition"; //FIXME: choose a nicer name
-
-            status("composing %d nets using implicit wiring", objects.size());
-
-            // calling implicit composition
-            net = PetriNet::composeByWiring(netsByName);
-        }
-
-        std::stringstream ss;
-        ss << io::stat << net;
-        status("%s.owfn: %s", compositionName.c_str(), ss.str().c_str()); 
-
-        // remove the parsed objects
-        objects.clear();
-
-        FileObject current(compositionName);
-        current.type = TYPE_OPENNET;
-        current.net = new PetriNet(net);
-        objects.push_back(current);
-    }
-
-
+    
     /***************
      * COMPOSITION *
      ***************/
@@ -367,7 +307,7 @@ int main(int argc, char** argv) {
         for (unsigned int i = 0; i < objects.size(); ++i) {
             status("negating the final condition of net '%s'...", objects[i].filename.c_str());
 
-            objects[i].net->finalCondition().negate();
+            objects[i].net->getFinalCondition().negate();
         }
     }
 
@@ -385,7 +325,7 @@ int main(int argc, char** argv) {
         for (unsigned int i = 0; i < objects.size(); ++i) {
             status("calculation dnf of final condition of net '%s'...", objects[i].filename.c_str());
             
-            objects[i].net->finalCondition().dnf();
+            objects[i].net->getFinalCondition().dnf();
         }
     }
 
@@ -558,6 +498,6 @@ int main(int argc, char** argv) {
     }
 
     cmdline_parser_free(&args_info);
-
+    
     return EXIT_SUCCESS;
 }

@@ -1,7 +1,8 @@
 PLACE
 
-ROLES v, w, x, y, z;
 INTERNAL p1, p2, p3, p4, p5, p6;
+
+ROLES v, w, x, y, z;
 
 INITIALMARKING p1;
 FINALCONDITION (p6=1);

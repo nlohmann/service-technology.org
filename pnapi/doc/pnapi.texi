@@ -420,7 +420,7 @@ Terminals are defined below as regular expressions:
 
 @multitable @columnfractions .2 .8
 @item @code{id} @tab
-@code{[A-Za-z]+}
+@code{[A-Za-z._=\-\[\]]+}
 @item @code{number} @tab
 @code{[0-9]+}
 @item @code{negative_number} @tab

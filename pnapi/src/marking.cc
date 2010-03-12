@@ -3,7 +3,6 @@
  */
 
 #include "config.h"
-#include <cassert>
 
 #ifndef NDEBUG
 #include <iostream>
@@ -15,13 +14,14 @@ using std::endl;
 
 #include "petrinet.h"
 #include "marking.h"
+#include "util.h"
 
 using std::set;
 using std::map;
 
+
 namespace pnapi
 {
-
 
 /****************************************************************************
  *** Class Marking Function Definitions
@@ -42,17 +42,18 @@ Marking::Marking()
  *
  * Reads marking from the Petri net.
  *
- * \param   n
- * \param   empty          if true, initialize marking to empty marking
- *                         instead of reading marking from n
+ * \param n underlying petri net      
+ * \param empty  if true, initialize marking to empty marking
+ *               instead of reading marking from n
  */
-Marking::Marking(PetriNet &n, bool empty) :
+Marking::Marking(PetriNet & n, bool empty) :
   net_(&n)
+{
+  PNAPI_FOREACH(p, n.getPlaces())
   {
-  for (set<Place *>::const_iterator p = n.getPlaces().begin(); 
-  p != n.getPlaces().end(); ++p)
-    m_[*p] = empty ? 0 : (*p)->getTokenCount();
+    m_[*p] = empty ? 0 : ((*p)->getTokenCount());
   }
+}
 
 
 /*!
@@ -60,29 +61,28 @@ Marking::Marking(PetriNet &n, bool empty) :
  *
  * \param   m the other Marking
  */
-Marking::Marking(const Marking &m) :
+Marking::Marking(const Marking & m) :
   m_(m.m_), net_(m.net_)
-  {
-  }
+{
+}
 
 
 /*!
  * \brief   Another constructor.
  */
-Marking::Marking(std::map<const Place *, unsigned int> m, PetriNet *net) :
+Marking::Marking(std::map<const Place *, unsigned int> m, PetriNet * net) :
   m_(m), net_(net)
-  {
-  }
+{
+}
 
 /*!
  * \brief constructor for cross-net-copying
  */
-Marking::Marking(const Marking & m, PetriNet* net, 
-                  std::map<const Place*, const Place*>& placeMap) :
-    net_(net)
+Marking::Marking(const Marking & m, PetriNet * net, 
+                  std::map<const Place *, const Place *> & placeMap) :
+  net_(net)
 {
-  for(map<const Place*, unsigned int>::const_iterator it = m.m_.begin();
-  it != m.m_.end(); ++it)
+  PNAPI_FOREACH(it, m.m_)
   {
     m_[placeMap[it->first]] = it->second;
   }
@@ -119,7 +119,7 @@ std::map<const Place *, unsigned int>::const_iterator Marking::end() const
 /*!
  * \brief   Returns the size of the Marking
  */
-unsigned int Marking::size()
+unsigned int Marking::size() const
 {
   return m_.size();
 }
@@ -132,15 +132,16 @@ unsigned int Marking::size()
  *
  * \return  true iff this activates t
  */
-bool Marking::activates(const Transition &t)
+bool Marking::activates(const Transition & t) const
 {
-  for (set<Arc *>::const_iterator f = t.getPresetArcs().begin();
-  f != t.getPresetArcs().end(); ++f)
+  PNAPI_FOREACH(f, t.getPresetArcs())
   {
-    if ((**f).getWeight() > m_[&(**f).getPlace()])
+    map<const Place *, unsigned int>::const_iterator it = m_.find(static_cast<Place *>(&(*f)->getSourceNode()));
+    if((it == m_.end()) || ((**f).getWeight() > it->second))
+    {
       return false;
+    }
   }
-
 
   return true;
 }
@@ -151,19 +152,28 @@ bool Marking::activates(const Transition &t)
  *
  * \param   t Transition to be fired
  *
- * \return  Marking &m' which is the direct successor to this under t
+ * \return  direct successor of this marking under t
+ * 
+ * \note successor will be allocated on the heap;
+ *       you have to delete it, when you don't need it anymore
+ * 
+ * \todo review this and Automaton::dfs() to avoid memory leaks
  */
-Marking & Marking::successor(const Transition &t)
+Marking & Marking::getSuccessor(const Transition & t) const
 {
   set<Node *> Ppre = t.getPreset();
   set<Node *> Ppost = t.getPostset();
-  Marking &m = *new Marking(*this);
+  Marking & m = *new Marking(*this);
 
-  for (set<Node *>::const_iterator p = Ppre.begin(); p != Ppre.end(); ++p)
+  PNAPI_FOREACH(p, Ppre)
+  {
     m[*static_cast<Place *>(*p)] -= net_->findArc(**p, t)->getWeight();
+  }
 
-  for (set<Node *>::const_iterator p = Ppost.begin(); p != Ppost.end(); ++p)
+  PNAPI_FOREACH(p, Ppost)
+  {
     m[*static_cast<Place *>(*p)] += net_->findArc(t, **p)->getWeight();
+  }
 
   return m;
 }
@@ -177,30 +187,30 @@ unsigned int & Marking::operator [](const Place & offset)
   return m_[&offset];
 }
 
-
+/*!
+ * \brief   overloaded operator [] for Markings
+ */
 unsigned int Marking::operator[](const Place & p) const
 {
-  if (m_.find(&p) == m_.end())
-    return 0;
-  //assert(m_.find(&p) != m_.end());
+  map<const Place *, unsigned int>::const_iterator it = m_.find(&p); 
 
-  return m_.find(&p)->second;
+  return ((it == m_.end()) ? 0 : it->second);
 }
 
 
 /*!
  * \brief   overloaded operator == for Markings
  */
-bool Marking::operator ==(const Marking &m) const
+bool Marking::operator==(const Marking & m) const
 {
-  return m_ == m.getMap();
+  return (m_ == m.getMap());
 }
 
 
 /*!
  * \brief   overloaded assignment operator
  */
-Marking & Marking::operator =(const Marking &m)
+Marking & Marking::operator=(const Marking & m)
 {
   assert(this != &m);
 

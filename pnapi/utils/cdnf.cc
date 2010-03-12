@@ -155,7 +155,7 @@ int main(int argc, char** argv) {
     /*--------------------------------------------.
     | 2. write inner of the open net to LoLA file |
     `--------------------------------------------*/
-    Output* temp = new Output();
+    Output * temp = new Output();
     temp->stream() << pnapi::io::lola << net;
     
     /*------------------------------------------.
@@ -185,11 +185,11 @@ int main(int argc, char** argv) {
     /*-------------------------------.
     | 4. recalculate final condition |
     `-------------------------------*/
-    net.finalCondition() = false;
+    net.getFinalCondition() = false;
     for(set<Marking*>::iterator m = finalMarkings.begin();
          m != finalMarkings.end(); ++m)
     {
-      net.finalCondition().addMarking(**m);
+      net.getFinalCondition().addMarking(**m);
       delete (*m);
     }
     

@@ -5,6 +5,8 @@
 # replace its version of the API with the present one
 # and executes make check
 
+# vim: expandtab
+
 TOOL="$1"
 LIB=${TOOL}"/libs/pnapi"
 
@@ -18,45 +20,41 @@ TARBALL="${SERVER}/job/${TOOL}/lastSuccessfulBuild/artifact/${TOOL}/${TOOL}.tar.
 
 if [ "$WGET" != "not found" ]; then
 
-    # check server availability
-    OUTPUT=`ping -c 5 ${SERVER} 2>&1`
-    echo $OUTPUT | grep "5 packets transmitted, 5 packets received" > /dev/null
-    if [ $? -ne 0 ]; then
+  # get customer tool
+  ${WGET} ${TARBALL}
 
-        echo "Found no stable internet connection, so we skip some tests."
-        echo ""
-        exit 77
+  # test whether file has been downloaded (otherwise there is no internet)
+  if [ ! -e "${TOOL}.tar.gz" ]; then
+    echo "Found no stable internet connection, so we skip some tests."
+    echo ""
+    exit 77
+  fi
 
-    else
+  # extract tarball
+  ${TAR} xzf ${TOOL}.tar.gz
 
-        # get customer tool
-        ${WGET} ${TARBALL}
-        ${TAR} xzf ${TOOL}.tar.gz
+  # clear customer's library directory
+  rm -rf ${TOOL}"/libs/pnapi/*"
 
-        # clear customer's library directory
-        rm -rf ${TOOL}"/libs/pnapi/*"
+  # copy files
+  cp ${SRC}/*.cc ${SRC}/*.h ${SRC}/*.yy ${SRC}/*.ll ${LIB}
+  cp ${SRC}/Makefile.am.customer ${LIB}/Makefile.am
 
-        # copy files
-        cp ${SRC}/*.cc ${SRC}/*.h ${SRC}/*.yy ${SRC}/*.ll ${LIB}
-        cp ${SRC}/Makefile.am.customer ${LIB}/Makefile.am
+  # remove unnecessary files again
+  rm -rf ${LIB}/config.h
 
-        # remove unnecessary files again
-        rm -rf ${LIB}/config.h
+  # change to the temp dir and build tool
+  cd ${TOOL}
+  autoreconf -i
+  ./configure --without-pnapi
+  ${MAKE}
+  ${MAKE} check
+  result=$?
+  cd ..
 
-        # change to the temp dir and build tool
-        cd ${TOOL}
-        autoreconf -i
-        ./configure --without-pnapi
-        ${MAKE}
-        ${MAKE} check
-        result=$?
-        cd ..
+  echo ""
 
-        echo ""
-
-        exit $result
-
-    fi
+  exit $result
 
 else
 
@@ -65,3 +63,4 @@ else
     exit 77
 
 fi
+

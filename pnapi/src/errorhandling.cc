@@ -22,24 +22,34 @@ using std::string;
 
 namespace pnapi
 {
+
 namespace exceptions
 {
 
-GeneralException::GeneralException(std::string msg) : 
+/*!
+ * \brief General Exception Constructor
+ */
+GeneralException::GeneralException(const std::string & msg) : 
   msg_(msg)
-  {
-  }
+{
+}
 
-ComposeError::ComposeError(std::string msg) :
+/*!
+ * \brief Compose Error Constructor
+ */
+ComposeError::ComposeError(const std::string & msg) :
   GeneralException(msg)
-  {
-  }
+{
+}
 
+/*!
+ * \brief Unknown Transition Error Constructor
+ */
 UnknownTransitionError::UnknownTransitionError() :
   GeneralException("")
-  {
-  }
+{
+}
 
 } /* namespace exceptions */
-} /* namespace pnapi */
 
+} /* namespace pnapi */

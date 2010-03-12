@@ -68,7 +68,7 @@ state:
   KW_STATE NUMBER lowlink scc markings_or_transitions
   {
     pnapi::Marking tmp(marking, &net);
-    if(net.finalCondition().isSatisfied(tmp))
+    if(net.getFinalCondition().isSatisfied(tmp))
       finalMarkings.insert(new pnapi::Marking(tmp));
     marking.clear();
   }

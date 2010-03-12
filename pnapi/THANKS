@@ -7,5 +7,7 @@
                         http://service-technology.org/pnapi
 
 
-* The XML parser bases on the incredible elegant code of Bert Bos
-  (http://www.w3.org/XML/9707/XML-in-C).
+  * The XML parser bases on the incredible elegant code of Bert Bos
+    (http://www.w3.org/XML/9707/XML-in-C).
+  * Thanks to Mike Hordecki for a post on Stack Overflow with a portable
+    preprocessor macro to iterate C++ containers (see 'src/util.h').

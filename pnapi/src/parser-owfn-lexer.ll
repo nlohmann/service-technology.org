@@ -30,6 +30,7 @@
 
 #include <cstring>
 
+ // TODO: fix warnings; hacks ok
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line
 #define yytext   pnapi::parser::token
@@ -145,3 +146,4 @@ NOT                             { return OP_NOT; }
 .                               { yyerror("unexpected lexical token"); }
 
 %%
+

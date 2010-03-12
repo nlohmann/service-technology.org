@@ -3,7 +3,6 @@ lib_LTLIBRARIES = libpnapi.la
 # [CUSTOMER_B_SRC] this line is needed to build a customer Makefile. Do not remove!
 libpnapi_la_SOURCES = \
     parser-lola.yy    parser-lola-lexer.ll \
-    parser-onwd.yy    parser-onwd-lexer.ll \
     parser-owfn.yy    parser-owfn-lexer.ll \
     parser-pn.yy      parser-pn-lexer.ll \
     parser-pnml.yy    parser-pnml-lexer.ll \
@@ -17,7 +16,6 @@ libpnapi_la_SOURCES = \
     errorhandling.cc \
     formula.h formula.cc \
     interface.h interface.cc \
-    link.h link.cc \
     marking.h marking.cc \
     myio.h myio.cc io-format.cc \
     parser.h parser.cc \
@@ -46,7 +44,7 @@ libpnapi_la_SOURCES = \
 #    This release has a new, but backwards incompatible interface.
 #
 # For more info see section 6.3 of the GNU Libtool Manual.
-VERINFO = -version-info 1:1:1
+VERINFO = -version-info 2:0:0
 
 libpnapi_la_LDFLAGS = $(VERINFO) -no-undefined
 pkgconfigdir = $(libdir)/pkgconfig

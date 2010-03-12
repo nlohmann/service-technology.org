@@ -30,6 +30,7 @@
 
 #include <cstring>
 
+ // TODO: fix redefinition warnings; "hacks" can remain
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line
 #define yytext   pnapi::parser::token

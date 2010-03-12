@@ -17,6 +17,5 @@ std::string version() {
 }
 
 
-
 } /* namespace pnapi */
 

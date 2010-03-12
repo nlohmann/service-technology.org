@@ -113,6 +113,8 @@ namespace __dot
  * Creates a DOT output (see http://www.graphviz.org) of the net.
  * It uses the digraph-statement and adds labels to transitions,
  * places and arcs if neccessary.
+ * 
+ * \todo print final condition below net
  */
 std::ostream & output(std::ostream & os, const PetriNet & net)
 {
@@ -158,7 +160,7 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   << util::mode(io::util::ARC)
   << " // arcs\n"
   << " edge [fontname=\"Helvetica\" arrowhead=normal color=black]\n"
-  << net.arcs_
+  << net.arcs_ << endl
   << util::mode(io::util::PLACE)
   // actually not an appropriate mode but I did not want to introduce 
   // a further mode like e.g. "ARC2" for only this purpose.   
@@ -233,7 +235,7 @@ std::ostream & output(std::ostream & os, const Transition & t)
       default: assert(false);
       }
       
-      os << left << " -> " << right << attr.str();
+      os << " " << left << " -> " << right << attr.str();
     }
     
     return os;
@@ -338,12 +340,12 @@ std::ostream & output(std::ostream & os, const Port & port)
      << "'\n//// input\n node [shape=circle fillcolor=orange]\n" << port.getInputLabels()
      << "\n//// output\n node [shape=circle fillcolor=yellow]\n" << port.getOutputLabels()
      << "\n//// synchronous\n node [shape=box fillcolor=black]\n" << port.getSynchronousLabels() 
-     << "\n//// cluster\n subgraph port" << (++portNumber) << "\n {\n  "
+     << "\n//// cluster\n subgraph cluster_port" << (++portNumber) << "\n {\n  "
      << mode(util::INNER) << delim(" ")
      << port.getInputLabels() << "\n  "
      << port.getOutputLabels() << "\n  "
      << port.getSynchronousLabels()
-     << "\n  label=\"" << port.getName() << "\" style=\"dashed\"\n }\n\n"
+     << "\n  label=\"" << port.getName() << "\" style=\"filled,rounded\"; bgcolor=grey95  labelloc=t;\n }\n\n"
      << mode(oldMode) << delim("\n");
      
   return os;

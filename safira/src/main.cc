@@ -88,8 +88,8 @@ int main(int argc, char **argv) {
 	 * Complement     *
 	 ******************/
 	if(args_info.complement_given){
-		cout << "--------------------------------------" << endl;
-		printUsedMemory(); cout << "(before parsing)" << endl;
+		//cout << "--------------------------------------" << endl;
+		//printUsedMemory(); cout << "(before parsing)" << endl;
 
 		string filename = "stdin";
 
@@ -387,8 +387,8 @@ int main(int argc, char **argv) {
 
 
 
-	printUsedMemory(); cout << "(after all deletes)" << endl;
-	cout << "--------------------------------------" << endl;
+	//printUsedMemory(); cout << "(after all deletes)" << endl;
+	//cout << "--------------------------------------" << endl;
 //	free(args_info.minisat_arg);
 	cmdline_parser_free(&args_info);
     return EXIT_SUCCESS;

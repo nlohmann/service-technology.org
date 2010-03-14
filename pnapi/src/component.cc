@@ -4,12 +4,10 @@
 
 #include "config.h"
 
-#include <set>
-
-#include "util.h"
-#include "petrinet.h"
 #include "component.h"
+#include "petrinet.h"
 #include "port.h"
+#include "util.h"
 
 using std::set;
 using std::map;

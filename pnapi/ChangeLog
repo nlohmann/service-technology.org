@@ -7,8 +7,8 @@
                         http://service-technology.org/pnapi
 
 
-Version 4.00-unreleased
-=======================
+Version 4.00 (2010-03-14)
+=========================
 
 * HEAVY INTERFACE CHANGES
 
@@ -47,6 +47,10 @@ Version 4.00-unreleased
 * added pnapi::version() to get PNAPI package string in customer tools
 
 * introduced Interface class to handle input, output and synchronous labels
+
+* added handle for verbose output
+
+* rearranged exceptions
 
 * fixed bug #14274: PNAPI: Memory leaks
 

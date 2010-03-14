@@ -9,21 +9,13 @@
 
 #include "config.h"
 
-#include <cstdlib>
-#include <cstdio>
-#include <iostream>
-#include <fstream>
-#include <set>
-#include <sstream>
-#include <string>
-#include <vector>
-
 #include "automaton.h"
-#include "parser.h"
-#include "formula.h"
-#include "util.h"
 #include "Output.h"
-#include "state.h"
+#include "parser.h"
+#include "util.h"
+
+#include <fstream>
+#include <sstream>
 
 using std::cerr;
 using std::endl;

@@ -18,12 +18,12 @@
   * C declarations
   ****************************************************************************/
 %{
+
+#include "config.h"
+
 #include "parser.h"
-#include <string>
+
 #include <cstring>
-#include <sstream>
-#include <map>
-#include <vector>
 
 #define pnapi_pnml_yyerror pnapi::parser::error
 #define pnapi_pnml_yylex pnapi::parser::pnml::lex

@@ -4,15 +4,10 @@
 
 #include "config.h"
 
-#include <iostream>
-#include <sstream>
-#include <map>
-
 #include "automaton.h"
 #include "marking.h"
 #include "state.h"
 #include "util.h"
-
 
 using std::map;
 

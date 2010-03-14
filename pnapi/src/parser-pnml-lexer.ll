@@ -27,16 +27,12 @@
   ****************************************************************************/
 %{
 
+#include "config.h"
+
 #include "parser.h"
 #include "parser-pnml.h"
 
-#include <cstring>
-#include <cstdio>
-#include <ctype.h>
-#include <cstring>
-#include <cstdlib>
-
- // TODO: get rid of warnings; hacks ok
+#include <iostream>
 
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line

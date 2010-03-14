@@ -4,16 +4,14 @@
 
 #include "config.h"
 
+#include "automaton.h"
+#include "marking.h"
+#include "myio.h"
+#include "parser.h"
+#include "petrinet.h"
 
 #include <cstring>
-#include <fstream>
 #include <sstream>
-#include <iostream>
-
-#include "parser.h"
-#include "myio.h"
-#include "formula.h"
-#include "state.h"
 
 using std::cout;
 using std::cerr;
@@ -48,9 +46,9 @@ int line;
  */
 void error(const std::string & msg)
 {
-  throw io::InputError(io::InputError::SYNTAX_ERROR,
-                       io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
-                       parser::line, parser::token, msg);
+  throw exception::InputError(exception::InputError::SYNTAX_ERROR,
+                              io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
+                              parser::line, parser::token, msg);
 }
 
 
@@ -109,9 +107,9 @@ void check(bool condition, const std::string & msg)
 {
   if (!condition)
   {
-    throw io::InputError(io::InputError::SEMANTIC_ERROR, 
-                         io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
-                         parser::line, parser::token, msg);
+    throw exception::InputError(exception::InputError::SEMANTIC_ERROR, 
+                                io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
+                                parser::line, parser::token, msg);
   }
 }
 
@@ -224,9 +222,9 @@ void check(bool condition, const std::string & msg)
 {
   if (!condition)
   {
-    throw io::InputError(io::InputError::SEMANTIC_ERROR, 
-                         io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
-                         parser::line, parser::token, msg);
+    throw exception::InputError(exception::InputError::SEMANTIC_ERROR, 
+                                io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
+                                parser::line, parser::token, msg);
   }
 }
 
@@ -599,9 +597,9 @@ namespace lola
 void check(bool condition, const std::string & msg)
 {
   if (!condition)
-    throw io::InputError(io::InputError::SEMANTIC_ERROR, 
-        io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
-        parser::line, parser::token, msg);
+    throw exception::InputError(exception::InputError::SEMANTIC_ERROR, 
+                                io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
+                                parser::line, parser::token, msg);
 }
 
 /******************************************\

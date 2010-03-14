@@ -154,7 +154,7 @@ int main(int argc, char** argv) {
                     break;
                 }
             }
-        } catch (io::InputError error) {
+        } catch (exception::InputError error) {
             std::stringstream ss;
             ss << error;
             abort(2, "Input Error: %s", ss.str().c_str());
@@ -220,7 +220,7 @@ int main(int argc, char** argv) {
                         break;
                     }
                 }
-            } catch (io::InputError error) {
+            } catch (exception::InputError error) {
                 infile.close();
                 std::stringstream ss;
                 ss << error;

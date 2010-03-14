@@ -2,20 +2,23 @@
  * \file  state.h
  */
 
-#ifndef STATE_H
-#define STATE_H
+#ifndef PNAPI_STATE_H
+#define PNAPI_STATE_H
 
+#include <iostream>
 #include <set>
-#include <string>
-#include "myio.h"
-
+#include <map>
 
 namespace pnapi
 {
 
 /// forward declarations
-class Marking;
 class Automaton;
+class Edge;
+class Marking;
+class PetriNet;
+class Place;
+class State;
 namespace parser
 {
 namespace sa
@@ -23,6 +26,13 @@ namespace sa
 int parse();
 } /* namespace sa */
 } /* namespace parser */
+namespace io
+{
+namespace __sa
+{
+std::ostream & output(std::ostream &, const State &);
+} /* namespace __sa */
+} /* namespace io */
 
 
 /*!
@@ -179,4 +189,4 @@ public: /* public methods */
 
 } /* namespace pnapi */
 
-#endif /* STATE_H */
+#endif /* PNAPI_STATE_H */

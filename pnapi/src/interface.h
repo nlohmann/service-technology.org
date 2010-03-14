@@ -17,12 +17,11 @@
  * \version $Revision: $
  */
 
-#ifndef INTERFACE_H
-#define INTERFACE_H
+#ifndef PNAPI_INTERFACE_H
+#define PNAPI_INTERFACE_H
 
-#include <map>
-#include <string>
-#include <set>
+#include "config.h"
+
 #include "port.h"
 
 namespace pnapi
@@ -127,4 +126,4 @@ private: /* private methods */
 
 } /* namespace pnapi */
 
-#endif /* INTERFACE_H */
+#endif /* PNAPI_INTERFACE_H */

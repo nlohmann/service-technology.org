@@ -7,11 +7,13 @@
 #ifndef PNAPI_CONDITION_H
 #define PNAPI_CONDITION_H
 
+#include "config.h"
+
+#include "formula.h"
+
 #include <map>
 #include <set>
 #include <string>
-
-#include "formula.h"
 
 namespace pnapi
 {
@@ -19,19 +21,6 @@ namespace pnapi
 // forward declarations
 class Place;
 class Marking;
-namespace formula
-{
-class Formula;
-class Negation;
-class Conjunction;
-class Disjunction;
-class FormulaEqual;
-class FormulaNotEqual;
-class FormulaGreater;
-class FormulaGreaterEqual;
-class FormulaLess;
-class FormulaLessEqual;
-}
 
 
 /*!

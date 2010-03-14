@@ -8,23 +8,23 @@ libpnapi_la_SOURCES = \
     parser-pnml.yy    parser-pnml-lexer.ll \
     parser-sa.yy      parser-sa-lexer.ll \
     pnapi.h pnapi.cc \
-    Output.h Output.cc \
-    verbose.h verbose.cc \
     automaton.h automaton.cc\
     component.h component.cc \
     condition.h condition.cc \
-    errorhandling.cc \
+    exception.h exception.cc \
     formula.h formula.cc \
     interface.h interface.cc \
     marking.h marking.cc \
     myio.h myio.cc io-format.cc \
+    Output.h Output.cc \
     parser.h parser.cc \
     petrinet-pn.cc \
     petrinet-reduction.cc \
     petrinet.h petrinet.cc \
     port.h port.cc \
     state.h state.cc \
-    util.h
+    util.h \
+    verbose.h verbose.cc
 # [CUSTOMER_E_SRC] this line is needed to build a customer Makefile. Do not remove!
 
 
@@ -44,7 +44,7 @@ libpnapi_la_SOURCES = \
 #    This release has a new, but backwards incompatible interface.
 #
 # For more info see section 6.3 of the GNU Libtool Manual.
-VERINFO = -version-info 3:0:0
+VERINFO = -version-info 4:0:0
 
 libpnapi_la_LDFLAGS = $(VERINFO) -no-undefined
 pkgconfigdir = $(libdir)/pkgconfig

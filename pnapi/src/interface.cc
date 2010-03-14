@@ -19,13 +19,11 @@
 
 #include "config.h"
 
-#include <sstream>
-#include <iostream>
-
 #include "interface.h"
-#include "petrinet.h"
-#include "port.h"
 #include "util.h"
+
+#include <iostream>
+#include <vector>
 
 using std::cerr;
 using std::endl;

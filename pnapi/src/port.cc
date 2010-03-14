@@ -19,9 +19,6 @@
 
 #include "config.h"
 
-#include <iostream>
-#include <string>
-
 #include "port.h"
 #include "petrinet.h"
 #include "util.h"

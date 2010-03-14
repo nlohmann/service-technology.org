@@ -31,14 +31,11 @@
 #ifndef PNAPI_MYIO_H
 #define PNAPI_MYIO_H
 
-#include <set>
-#include <map>
-#include <list>
+#include "exception.h"
+#include "util.h"
+
 #include <vector>
 #include <ostream>
-#include <algorithm>
-
-#include "util.h"
 
 namespace pnapi
 {
@@ -108,47 +105,13 @@ enum MetaInformation
 
 
 /*!
- * \brief   Exception class thrown by operator>>()
- * 
- * \todo maybe move to a general error namespace
- */
-class InputError
-{
-public: /* public types */
-  /// types of errors
-  enum Type
-  {
-    SYNTAX_ERROR,
-    SEMANTIC_ERROR
-  };
-
-public: /* public constants */
-  /// type of error
-  const Type type;
-  /// error message
-  const std::string message;
-  /// last read token
-  const std::string token;
-  /// line number
-  const int line;
-  /// filename
-  const std::string filename;
-  
-public: /* public methods */
-  /// constructor
-  InputError(Type, const std::string &, int, const std::string &,
-             const std::string &);
-};
-
-
-/*!
  * \name  Input/Output Operators
  *
  * reading from and writing to files (and other streams)
  */
 //@{
 /// %PetriNet input
-std::istream & operator>>(std::istream &, PetriNet &) throw (InputError);
+std::istream & operator>>(std::istream &, PetriNet &) throw (exception::InputError);
 /// %MetaInformation manipulation
 std::istream & operator>>(std::istream &,
                           const util::Manipulator<std::pair<MetaInformation, std::string> > &);
@@ -157,8 +120,12 @@ template <typename T>
 std::istream & operator>>(std::istream &, const util::Manipulator<T>);
 /// %PetriNet output
 std::ostream & operator<<(std::ostream &, const PetriNet &);
+/// general exception output
+std::ostream & operator<<(std::ostream &, const exception::Error &);
 /// %InputError output
-std::ostream & operator<<(std::ostream &, const InputError &);
+std::ostream & operator<<(std::ostream &, const exception::InputError &);
+/// assertion output
+std::ostream & operator<<(std::ostream &, const exception::AssertionFailedError &);
 /// %MetaInformation manipulation
 std::ostream & operator<<(std::ostream &, const util::Manipulator<
     std::pair<MetaInformation, std::string> > &);

@@ -217,12 +217,84 @@ For using it, simply include the header file @file{pnapi.h} in your code:
 Everything you will use can be found in the following namespaces:
 @itemize
 @item @code{pnapi}
+@item @code{pnapi::exception}
 @item @code{pnapi::formula}
 @item @code{pnapi::io}
+@item @code{pnapi::verbose}
 @end itemize
 
 The classes @samp{pnapi::PetriNet} and @samp{pnapi::Automaton} provide the main 
 functionality and can serve as an entry point for getting an overview of the API's functionality. For more information, please go to the online API documentation reachable at @url{http://esla.informatik.uni-rostock.de:8080/job/pnapi/doclinks/1/}.
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@chapter Error Handling
+
+Whenever an error occurs whithin the API, an exception will be thrown. Here is a list of existing exceptions an when they will be thrown.
+
+@section Error
+Parent class of all exceptions containing a message, what happened. Catch this to catch everything the API ever will throw.
+
+@section InputError
+Exception thrown by parsing a Petri Net or a Service Automaton, containing filename, line and token, where the error occured, as well as the error kind, whether it was a syntactic error, violating the grammar below or a semantic error e.g. by giving two nodes the same name.
+
+@section NotImplementedError
+Thrown when use cases happend we not thought about, yet. If you ever catch such an exception, please report to @email{pnapi@@service-technology.org} which feature is missing.
+
+@section AssertionFailedError
+There are several sanity checks whithin the API e.g. to ensure that there a no conflicts with node names (i.e. there are no two places with the same name). When such a check failes, the API should not cause the program to fail but give it the chance to decide how to handle this error. Hence an exception is thrown instead of using the C @samp{assert} makro.
+
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@chapter Verbose Output
+
+Sometimes verbose output about processes whithin the API are desired, like
+
+@cartouche
+@smallexample
+TOOL: parsing Service Automaton from file 'myAutomaton.sa'
+TOOL: writing Service Automaton to temporary file '/tmp/temp-004200'
+TOOL: calling petrify
+TOOL: parsing petrify output
+TOOL: generating Petri Net from petrify output
+@end smallexample
+@end cartouche
+
+For this purpose there exists the function pointer@samp{pnapi::verbose::status}, by default pointing at @samp{pnapi::verbose::quiet}. If you wish to print verbose output you only have to provide an own output function and set @samp{pnapi::verbose::status} to it.
+
+Your output function must have the signature
+
+@cartouche
+@smallexample
+void myStatusFunction(const char *, ...);
+@end smallexample
+@end cartouche
+
+beeing a variadic function to be used like @samp{printf}.
+
+If you prefer to let the API write the output by itself, set the pointer to @samp{pnapi::verbose::defaultStatus}. This way all messages will be written like
+
+@cartouche
+@smallexample
+PNAPI: writing net to file 'result.lola'
+@end smallexample
+@end cartouche
+
+to standard error.
+
+Verbose output will be written at these situations:
+@itemize
+@item opening a temporary file
+@item closing a temporary file
+@end itemize
+
 
 
 @c --------------------------------------------------------------------------
@@ -247,17 +319,25 @@ Assigning a final condition
 @cartouche
 @smallexample
 // net from the previous example is recycled here
-net.finalCondition() = ((p1 == 0) && (p2 == 1));
+net.getFinalCondition() = ((p1 == 0) && (p2 == 1));
 Place & p3 = net.createPlace();
-net.finalCondition() = (net.finalCondition().formula() && (p3 == 0));
+net.getFinalCondition() = (net.getFinalCondition().getFormula() && (p3 == 0));
 @end smallexample
 @end cartouche
 
-Reading from stream
+Reading from stream and aborting if an error occurs
 @cartouche
 @smallexample
 istream is;
-is >> io::owfn >> net;
+try
+@{
+  is >> io::owfn >> net;
+@}
+catch (pnapi::exception::InputError error)
+@{
+  std::cerr << error;
+  exit(EXIT_FAILURE);
+@}
 @end smallexample
 @end cartouche
 
@@ -294,6 +374,15 @@ net.isWorkflow();
 @end smallexample
 @end cartouche
 
+Getting verbose output only when normalizing
+@cartouche
+@smallexample
+pnapi::verbose::status = myStatusFunction;
+net.normalize();
+pnapi::verbose::status = pnapi::verbose::quiet;
+@end smallexample
+@end cartouche
+
 @chapter Wildcards in Formulae
 
 Since Version 3.00 the formula classes have been refactored. I.e. from now on they 
@@ -303,7 +392,7 @@ only concern internal places and only two wildcards are left: @samp{ALL_OTHER_PL
 When parsing a net, the wildcard will be unfolded by using 
 @cartouche
 @smallexample
-net.finalCondition().allOtherPlacesEmpty(net);
+net.getFinalCondition().allOtherPlacesEmpty(net);
 @end smallexample
 @end cartouche
 
@@ -320,18 +409,17 @@ ALL_PLACES_EMPTY;
 @end smallexample
 @end cartouche
 
-A final condition is satisfied under a given marking, iff the formula is satisfied @emph{and} the interface is empty.
-
 Furthermore a wildcard can be transformed in disjunctive normal form by using 
 @cartouche
 @smallexample
-net.finalCondition().dnf();
+net.getFinalCondition().dnf();
 @end smallexample
 @end cartouche
 
 
 
 
+@c --------------------------------------------------------------------------
 
 @node Open Net File Format
 @chapter Open Net File Format

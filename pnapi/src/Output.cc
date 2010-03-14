@@ -19,27 +19,25 @@
 
 /*!
  * \file Output.cc
- * 
- * \todo fix verbose output and error handling
  */
 
-#include <config.h>
-#include <libgen.h>
-#include <unistd.h>
+#include "config.h"
+
+#include "exception.h"
+#include "Output.h"
+#include "verbose.h"
+
+#include <iostream>
 #include <fstream>
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
-// #include "verbose.h"
-#include "Output.h"
 
-#ifdef HAVE_CONFIG
-#include <config.h>
-#endif
-
+using std::string;
 
 namespace pnapi
 {
+
+using verbose::status;
 
 namespace util
 {
@@ -67,7 +65,7 @@ Output::Output() :
     os(*(new std::ofstream(createTmp(), std::ofstream::out | std::ofstream::trunc))),
     filename(temp), temp(temp), kind("")
 {
-    // status("writing to temporary file '%s'", _cfilename_(filename));
+    status("writing to temporary file '%s'", filename.c_str());
 }
 
 /*!
@@ -82,17 +80,14 @@ Output::Output(const std::string& str, const std::string& kind) :
     filename(str), temp(NULL), kind(kind)
 {
     if (not os.good()) {
-        // abort(11, "could not write to file '%s'", _cfilename_(filename));
-        exit(EXIT_FAILURE); // TODO: remove me, when fixed
+      throw exception::Error("could not write to file '" + filename + "'");
     }
 
-    /*
     if (str.compare("-")) {
-        status("writing %s to file '%s'", _coutput_(kind), _cfilename_(filename));
+        status("writing %s to file '%s'", kind.c_str(), filename.c_str());
     } else {
-        status("writing %s to standard output", _coutput_(kind));
+        status("writing %s to standard output", kind.c_str());
     }
-    //*/
 }
 
 
@@ -109,17 +104,17 @@ Output::~Output() {
     if (&os != &std::cout) {
         delete(&os);
         if (temp == NULL) {
-            // status("closed file '%s'", _cfilename_(filename));
+            status("closed file '%s'", filename.c_str());
         } else {
             if (keepTempfiles) {
-                // status("closed temporary file '%s'", _cfilename_(filename));
+                status("closed temporary file '%s'", filename.c_str());
             } else {
                 if (remove(filename.c_str()) == 0) {
-                    // status("closed and deleted temporary file '%s'", _cfilename_(filename));
+                    status("closed and deleted temporary file '%s'", filename.c_str());
                 } else {
                     // this should never happen, because mkstemp creates temp
                     // files in mode 0600.
-                    // status("closed, but could not delete temporary file '%s'", _cfilename_(filename));
+                    status("closed, but could not delete temporary file '%s'", filename.c_str());
                 }
             }
             free(temp);
@@ -167,14 +162,12 @@ char* Output::createTmp() {
 #ifdef __MINGW32__
     temp = basename(const_cast<char*>(tempfileTemplate.c_str()));
     if (mktemp(temp) == NULL) {
-        // abort(13, "could not create to temporary file '%s'", basename(const_cast<char*>(tempfileTemplate.c_str())));
-        exit(EXIT_FAILURE); // TODO: remove me, when fixed!
+        throw exception::Error("could not create to temporary file '" + basename(const_cast<char*>(tempfileTemplate.c_str())) + "'");
     };
 #else
     temp = strdup(tempfileTemplate.c_str());
     if (mkstemp(temp) == -1) {
-        // abort(13, "could not create to temporary file '%s'", temp);
-        exit(EXIT_FAILURE); // TODO: remove me, when fixed!
+        throw exception::Error(string("could not create to temporary file '") + temp + "'");
     };
 #endif
     return temp;

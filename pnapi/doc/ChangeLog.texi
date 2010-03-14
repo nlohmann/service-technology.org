@@ -1,4 +1,4 @@
-@heading Version 4.00-unreleased
+@heading Version 4.00 (2010-03-14)
 @itemize
 @item HEAVY INTERFACE CHANGES
 @item make check now tests, whether customer tools still work with the API (see @url{https://gna.org/task/?6813})
@@ -15,6 +15,8 @@
 @item adapted scripts etc. to finally use the PNAPI as shared library
 @item added pnapi::version() to get PNAPI package string in customer tools
 @item introduced Interface class to handle input, output and synchronous labels
+@item added handle for verbose output
+@item rearranged exceptions
 @item fixed bug #14274: PNAPI: Memory leaks
 @item fixed bug #14856: PNAPI: Reduction by Starke rule #9 crashes under certain conditions
 @item fixed bug #14887: PNAPI: make check fails under MinGW

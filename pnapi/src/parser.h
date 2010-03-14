@@ -13,24 +13,16 @@
 
 #include "config.h"
 
-#include <vector>
-#include <stack>
-#include <string>
-#include <istream>
+#include "port.h"
+#include "state.h"
 
-#include "myio.h"
-#include "automaton.h"
-#include "component.h"
-#include "petrinet.h"
-#include "marking.h"
+#include <vector>
 
 namespace pnapi
 {
 
 // forward declarations
-class PetriNet;
-class Place;
-class Marking;
+class Node;
 
 /*!
  * \brief   Generic Parser Framework
@@ -201,7 +193,7 @@ enum elementTypes
 bool is_whitelisted(char *);
 /// opens an element
 void open_element(char *);
-/// removes whitespace around given string
+/// ???
 std::string sanitize(char *);
 /// close an element
 void close_element();
@@ -232,11 +224,11 @@ extern const char * whitelist[];
 extern pnapi::Marking * currentMarking;
 /// depth in XML structure
 extern unsigned int current_depth;
-/// the depth of the last XML element that should be parsed (i.e., is interesting)
+/// ???
 extern unsigned int last_interesting_depth;
-/// whether we are currently ignoring XML elements (and wait for the depth to be interesting again)
+/// whether to ignore something ???
 extern bool ignoring;
-/// the part of the file we are currently parsing
+/// ???
 extern unsigned int file_part;
 /// stack of elements
 extern std::vector<unsigned int> elementStack;

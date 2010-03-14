@@ -4,22 +4,12 @@
 
 #include "config.h"
 
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <sstream>
-#include <set>
-#include <iostream>
-#include <cstdlib>
-
 #include "automaton.h"
-#include "component.h"
-#include "myio.h"
 #include "marking.h"
-#include "petrinet.h"
-#include "state.h"
+#include "port.h"
 #include "util.h"
-#include "Output.h"
+
+#include <sstream>
 
 using std::cerr;
 using std::cout;
@@ -28,7 +18,6 @@ using std::flush;
 using std::map;
 using std::set;
 using std::string;
-
 
 namespace pnapi
 {

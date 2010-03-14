@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
             s << pnapi::io::stat << net;
             status("read net: %s", s.str().c_str());
         }
-    } catch(pnapi::io::InputError error) {
+    } catch(pnapi::exception::InputError error) {
         std::ostringstream s;
         s << error;
         abort(2, "\b%s", s.str().c_str());

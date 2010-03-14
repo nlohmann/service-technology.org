@@ -19,15 +19,17 @@
   ****************************************************************************/
 %{
 
+#include "formula.h"
+#include "marking.h"
 #include "parser.h"
-#include <string>
+#include "petrinet.h"
+
 #include <sstream>
 
 #define pnapi_owfn_yyerror pnapi::parser::error
 #define pnapi_owfn_yylex pnapi::parser::owfn::lex
 #define yylex_destory pnapi::parser::owfn::lex_destroy
 #define pnapi_owfn_yyparse pnapi::parser::owfn::parse
-
 
 using namespace pnapi;
 using namespace pnapi::parser::owfn;

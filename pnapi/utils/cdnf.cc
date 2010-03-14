@@ -1,4 +1,8 @@
+#include "pnapi.h"
+#include "cdnf-cmdline.h"
+#include "config.h"
 #include "verbose.h"
+#include "Output.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -10,11 +14,6 @@
 #include <map>
 #include <string>
 #include <libgen.h>
-
-#include "pnapi.h"
-#include "cdnf-cmdline.h"
-#include "config.h"
-#include "Output.h"
 
 //*
 using std::cerr;
@@ -142,7 +141,7 @@ int main(int argc, char** argv) {
             s << pnapi::io::stat << net;
             status("read net: %s", s.str().c_str());
         }
-    } catch(pnapi::io::InputError error) {
+    } catch(pnapi::exception::InputError error) {
         std::ostringstream s;
         s << error;
         abort(2, "\b%s", s.str().c_str());

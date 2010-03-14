@@ -23,13 +23,12 @@
 
 #include "config.h"
 
-#include <inttypes.h>
-#include <vector>
-
-#include "myio.h"
-#include "condition.h"
 #include "component.h"
+#include "condition.h"
+#include "exception.h"
 #include "interface.h"
+
+#include <inttypes.h>
 
 #ifndef CONFIG_PETRIFY
 #define CONFIG_PETRIFY "not found"
@@ -40,7 +39,7 @@
 #endif
 
 #ifdef HAVE_STDINT_H
-#include <stdint.h>
+// #include <stdint.h>
 #endif
 
 namespace pnapi
@@ -48,12 +47,10 @@ namespace pnapi
 
 // forward declarations
 class PetriNet;
-class Condition;
 namespace io
 {
-class InputError;
 std::ostream & operator<<(std::ostream &, const PetriNet &);
-std::istream & operator>>(std::istream &, PetriNet &) throw (InputError);
+std::istream & operator>>(std::istream &, PetriNet &) throw (exception::InputError);
 }
 
 
@@ -107,53 +104,6 @@ private: /* private methods */
 
 } /* namespace util */
 
-/*!
- * \brief Petri Net API Exceptions
- * 
- * \todo maybe outsource in seperate file and collect
- *       all exceptions there (i.e. also the I/O Exceptions)
- */
-namespace exceptions
-{
-/*!
- * \brief general exception class
- */
-class GeneralException
-{
-public: /* public constants */
-  /// exception message
-  const std::string msg_;
-  
-public: /* public methods */
-  /// constructor
-  GeneralException(const std::string &);
-};
-
-/*!
- * \brief exception class thrown by PetriNet::compose()
- 
-   \deprecated Ist vielleicht nicht mehr noetig (sagt Christian)
- */
-class ComposeError : public GeneralException
-{
-public: /* public methods */
-  /// constructor
-  ComposeError(const std::string &);
-};
-
-/*!
- * \brief exception class thrown by PetriNet::getSynchronizedTransitions(std::string)
- * 
- * \todo check necessity!
- \deprecated Ist vielleicht nicht mehr noetig (sagt Christian)
- */
-class UnknownTransitionError : public GeneralException
-{
-public: /* public methods */
-  UnknownTransitionError();
-};
-
-} /* namespace exceptions */
 
 /*!
  * \brief   A Petri net
@@ -169,7 +119,7 @@ class PetriNet
   /// needs to update internal structures
   friend class util::ComponentObserver;
   /// Petri net input, see pnapi::io
-  friend std::istream & io::operator>>(std::istream &, PetriNet &) throw (io::InputError);
+  friend std::istream & io::operator>>(std::istream &, PetriNet &) throw (exception::InputError);
   /// Petri net output, see pnapi::io
   friend std::ostream & io::__dot::output(std::ostream &, const PetriNet &);
   /// Petri net output, see pnapi::io
@@ -382,8 +332,6 @@ public: /* public methods */
   const std::set<Transition *> & getTransitions() const;
   /// get synchronized transitions
   const std::set<Transition *> & getSynchronizedTransitions() const;
-  /// get transitions synchronized with a given label
-  // const std::set<Transition *> & getSynchronizedTransitions(const std::string &) const;
   /// get arcs
   const std::set<Arc *> & getArcs() const;
   /// get roles
@@ -460,7 +408,7 @@ public: /* public methods */
   unsigned int reduce(unsigned int = LEVEL_5);
   /// product with Constraint oWFN
   void produce(const PetriNet &, const std::string & = "net",
-               const std::string & = "constraint") throw (io::InputError);
+               const std::string & = "constraint") throw (exception::InputError);
   /// adds a given prefix to all nodes
   PetriNet & prefixNodeNames(const std::string &);
   /// swaps input and output labels
@@ -510,7 +458,7 @@ private: /* private methods */
                                  const std::string & = "") const;
   /// translates constraint labels to transitions
   std::map<Transition *, std::set<Transition *> >
-  translateConstraintLabels(const PetriNet &) throw (io::InputError);
+  translateConstraintLabels(const PetriNet &) throw (exception::InputError);
   /// compose constructor
   PetriNet(const Interface &, const Interface &, std::map<Label *, Label *> &,
            std::map<Label *, Place *> &, std::set<Label *> &);

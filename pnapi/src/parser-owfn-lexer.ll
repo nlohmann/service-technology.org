@@ -25,12 +25,14 @@
   ****************************************************************************/
 %{
 
+#include "config.h"
+
+#include "formula.h"
 #include "parser.h"
 #include "parser-owfn.h"
 
-#include <cstring>
+#include <iostream>
 
- // TODO: fix warnings; hacks ok
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line
 #define yytext   pnapi::parser::token

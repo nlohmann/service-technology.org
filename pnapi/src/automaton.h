@@ -5,20 +5,19 @@
 #ifndef PNAPI_AUTOMATON_H
 #define PNAPI_AUTOMATON_H
 
-#include <set>
-#include <string>
-#include <vector>
+#include "config.h"
+
 #include "myio.h"
 #include "Output.h"
 #include "petrinet.h" 
 #include "state.h"
-
 
 namespace pnapi
 {
 
 /// forward declaration
 class Marking;
+class PetriNet;
 
 /*!
  * \brief Service Automaton class

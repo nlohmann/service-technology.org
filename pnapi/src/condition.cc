@@ -4,40 +4,43 @@
 
 #include "config.h"
 
+#include "condition.h"
+#include "formula.h"
+#include "marking.h"
+#include "petrinet.h"
+#include "util.h"
+
 #ifndef NDEBUG
 #include <iostream>
-#include "myio.h"
+
 using std::cout;
 using std::endl;
 using pnapi::io::util::operator<<;
-#endif
-
-#include "marking.h"
-#include "condition.h"
-#include "petrinet.h"
-#include "util.h"
+#endif /* NDEBUG */
 
 using std::string;
 using std::map;
 using std::set;
 
-using pnapi::formula::Formula;
-using pnapi::formula::Proposition;
-using pnapi::formula::FormulaTrue;
-using pnapi::formula::FormulaFalse;
-using pnapi::formula::FormulaEqual;
-using pnapi::formula::FormulaNotEqual;
-using pnapi::formula::FormulaGreater;
-using pnapi::formula::FormulaGreaterEqual;
-using pnapi::formula::FormulaLess;
-using pnapi::formula::FormulaLessEqual;
-using pnapi::formula::Conjunction;
-using pnapi::formula::Disjunction;
-using pnapi::formula::Negation;
 
 
 namespace pnapi
 {
+
+using formula::Formula;
+using formula::Proposition;
+using formula::FormulaTrue;
+using formula::FormulaFalse;
+using formula::FormulaEqual;
+using formula::FormulaNotEqual;
+using formula::FormulaGreater;
+using formula::FormulaGreaterEqual;
+using formula::FormulaLess;
+using formula::FormulaLessEqual;
+using formula::Conjunction;
+using formula::Disjunction;
+using formula::Negation;
+
 
 /**************************************************************************
  ***** Condition implementation

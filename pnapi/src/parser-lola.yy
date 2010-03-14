@@ -19,8 +19,11 @@
   ****************************************************************************/
 %{
 
+#include "config.h"
+
 #include "parser.h"
-#include <string>
+#include "petrinet.h"
+
 #include <sstream>
 
 #define pnapi_lola_yyerror pnapi::parser::error

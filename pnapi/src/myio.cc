@@ -4,9 +4,9 @@
 
 #include "config.h"
 
-#include "parser.h"
 #include "automaton.h"
 #include "myio.h"
+#include "parser.h"
 #include "util.h"
 
 using std::map;
@@ -59,7 +59,7 @@ std::ostream & operator<<(std::ostream & os, const PetriNet & net)
  * The format of the stream data is not determined automatically.
  * You have to set it explicitly using a stream manipulator from pnapi::io.
  */
-std::istream & operator>>(std::istream & is, PetriNet & net) throw (InputError)
+std::istream & operator>>(std::istream & is, PetriNet & net) throw (exception::InputError)
 {
   switch (util::FormatData::data(is))
   {
@@ -492,49 +492,57 @@ std::ostream & operator<<(std::ostream & os, const Edge & e)
 /*!
  * \brief constructor for meta information manipulator
  */
- util::Manipulator<std::pair<MetaInformation, std::string> >
- meta(MetaInformation i, const std::string & s)
- {
-   return util::MetaManipulator(pair<MetaInformation, string>(i, s));
- }
+util::Manipulator<std::pair<MetaInformation, std::string> >
+meta(MetaInformation i, const std::string & s)
+{
+  return util::MetaManipulator(pair<MetaInformation, string>(i, s));
+}
 
 /*!
- * \brief constructor of input error
+ * \brief general exception output
  */
- InputError::InputError(Type type, const std::string & filename, int line,
-                        const std::string & token, const std::string & msg) :
-  type(type), message(msg), token(token), line(line), filename(filename)
+std::ostream & operator<<(std::ostream & os, const exception::Error & e)
 {
+  os << e.message;
 }
+
 
 /*!
  * \brief output input error
  */
- std::ostream & operator<<(std::ostream & os, const io::InputError & e)
- {
-   os << e.filename;
-   if (e.line > 0)
-     os << ":" << e.line;
-   os << ": error";
-   if (!e.token.empty())
-     switch (e.type)
-     {
-     case io::InputError::SYNTAX_ERROR:
-       os << " near '" << e.token << "'";
-       break;
-     case io::InputError::SEMANTIC_ERROR:
-       os << ": '" << e.token << "'";
-       break;
-     default: /* do nothing */ ;
-     }
-   return os << ": " << e.message;
- }
+std::ostream & operator<<(std::ostream & os, const exception::InputError & e)
+{
+  os << e.filename;
+  if (e.line > 0)
+    os << ":" << e.line;
+  os << ": error";
+  if (!e.token.empty())
+    switch (e.type)
+    {
+    case exception::InputError::SYNTAX_ERROR:
+      os << " near '" << e.token << "'";
+      break;
+    case exception::InputError::SEMANTIC_ERROR:
+      os << ": '" << e.token << "'";
+      break;
+    default: /* do nothing */ ;
+    }
+  return os << ": " << e.message;
+}
+
+/*!
+ * \brief assertion output
+ */
+std::ostream & operator<<(std::ostream & os, const exception::AssertionFailedError & e)
+{
+  os << e.file << ":" << e.line << ": assertion failed: " << e.message;
+}
 
 /*!
  * \brief write meta information to stream
  */
- std::istream & operator>>(std::istream & is,
-                           const util::Manipulator<std::pair<MetaInformation, std::string> > & m)
+std::istream & operator>>(std::istream & is,
+                          const util::Manipulator<std::pair<MetaInformation, std::string> > & m)
 {
   util::MetaData::data(is)[m.data.first] = m.data.second;
   return is;

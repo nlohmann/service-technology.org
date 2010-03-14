@@ -28,9 +28,8 @@
 #include "parser.h"
 #include "parser-lola.h"
 
-#include <cstring>
+#include <iostream>
 
- // TODO: fix redefinition warnings; "hacks" can remain
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line
 #define yytext   pnapi::parser::token

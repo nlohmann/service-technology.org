@@ -7,6 +7,8 @@
 #ifndef PNAPI_MARKING_H
 #define PNAPI_MARKING_H
 
+#include "config.h"
+
 #include <map>
 
 namespace pnapi

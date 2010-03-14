@@ -17,12 +17,10 @@
   ****************************************************************************/
 %{
 
-#include <iostream>
-#include <set>
-#include <sstream>
-#include <string>
+#include "config.h"
+
+#include "automaton.h"
 #include "parser.h"
-#include "pnapi.h"
 
 using namespace pnapi;
 

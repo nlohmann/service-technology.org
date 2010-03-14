@@ -4,15 +4,14 @@
 
 #include "config.h"
 
-#include <sstream>
-#include <iostream>
-
 #include "automaton.h"
 #include "interface.h"
 #include "petrinet.h"
 #include "state.h"
 #include "myio.h"
 #include "util.h"
+
+#include <sstream>
 
 using std::cerr;
 using std::endl;
@@ -631,7 +630,7 @@ std::ostream & output(std::ostream & os, const Arc & arc)
 std::ostream & output(std::ostream & os, const formula::Negation & f)
 {
   if (f.getChildren().empty())
-    assert(false); // FIXME: don't know what to do in this case
+    throw exception::NotImplementedError("don't know how to print a negation of nothing");
   else
     return (os << "NOT (" << **f.getChildren().begin() << ")");
 }
@@ -644,7 +643,7 @@ std::ostream & output(std::ostream & os, const formula::Conjunction & f)
   if(f.getChildren().empty())
   {
     //return os << formula::FormulaTrue();
-    assert(false); // FIXME: don't know what to do in this case
+    throw exception::NotImplementedError("don't know how to print an empty conjunction");
   }
   else
     return (os << "(" << delim(" AND ") << f.getChildren() << ")");
@@ -659,7 +658,7 @@ std::ostream & output(std::ostream & os, const formula::Disjunction & f)
   if(f.getChildren().empty())
   {
     //return os << formula::FormulaFalse();
-    assert(false); // FIXME: don't know what to do in this case
+    throw exception::NotImplementedError("don't know how to print an empty disjunction");
   }
   else
     return (os << "(" << delim(" OR ") << f.getChildren() << ")");
@@ -952,7 +951,7 @@ std::ostream & output(std::ostream & os, const Label & l)
 std::ostream & output(std::ostream & os, const formula::Negation & f)
 {
   if(f.getChildren().empty())
-    assert(false); // FIXME: don't know what to do in this case
+    throw exception::NotImplementedError("don't know how to print a negation of nothing");
   else
     return (os << "NOT (" << (**f.getChildren().begin()) << ")");
 }
@@ -965,7 +964,7 @@ std::ostream & output(std::ostream & os, const formula::Conjunction & f)
   if(f.getChildren().empty())
   {
     //return os << formula::FormulaTrue();
-    assert(false); // FIXME: don't know what to do in this case
+    throw exception::NotImplementedError("don't know how to print an empty conjunction");
   }
   else
     return (os << f.getChildren());
@@ -979,7 +978,7 @@ std::ostream & output(std::ostream & os, const formula::Disjunction & f)
   if(f.getChildren().empty())
   {
     //return os << formula::FormulaFalse();
-    assert(false); // FIXME: don't know what to do in this case
+    throw exception::NotImplementedError("don't know how to print an empty disjunction");
   }
   else
     return (os << delim("      </marking>\n      <marking>\n") << f.getChildren());

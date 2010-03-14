@@ -44,13 +44,9 @@
 #define PNAPI_FOREACH(I,C) for(__typeof((C).begin()) I=((C).begin()); I != (C).end(); ++I)
 
 #include <set>
-#include <string>
-#include <vector>
-#include <climits>
 #include <algorithm>
 #include <stack>
 #include <map>
-
 
 namespace pnapi
 {

@@ -25,9 +25,6 @@
 #ifndef PNAPI_OUTPUT_H
 #define PNAPI_OUTPUT_H
 
-#include <iostream>
-#include <string>
-
 namespace pnapi
 {
 

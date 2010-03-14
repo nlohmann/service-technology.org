@@ -7,20 +7,19 @@
 #ifndef PNAPI_FORMULA_H
 #define PNAPI_FORMULA_H
 
-#include <map>
-#include <set>
-#include <string>
-#include "marking.h"
+#include "config.h"
+
 #include "myio.h"
 
 namespace pnapi
 {
 
 // forward declarations
+namespace formula { class Conjunction; }
+class Marking;
+class Node;
 class PetriNet;
 class Place;
-class Node;
-
 
 /*!
  * \brief   Final Condition Formulae

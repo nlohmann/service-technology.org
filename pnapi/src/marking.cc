@@ -4,17 +4,16 @@
 
 #include "config.h"
 
-#ifndef NDEBUG
-#include <iostream>
-using std::cout;
-using std::endl;
-#endif
-
-#include <set>
-
 #include "petrinet.h"
 #include "marking.h"
 #include "util.h"
+
+#ifndef NDEBUG
+#include <iostream>
+
+using std::cout;
+using std::endl;
+#endif /* NDEBUG */
 
 using std::set;
 using std::map;

@@ -4,15 +4,12 @@
 
 #include "config.h"
 
-#include <iostream>
-#include <vector>
-
 #include "component.h"
-#include "marking.h"
 #include "formula.h"
-#include "myio.h"
-#include "petrinet.h"
+#include "marking.h"
 #include "util.h"
+
+#include <iostream>
 
 using std::cout;
 using std::endl;

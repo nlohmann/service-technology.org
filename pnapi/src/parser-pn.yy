@@ -47,14 +47,9 @@
  ****************************************************************************/
 %{
 
-#include "parser.h"
-#include <string>
-#include <sstream>
-#include <iostream>
-#include <set>
-#include <map>
-#include <cstdlib>
+#include "config.h"
 
+#include "parser.h"
 
 #define pnapi_pn_yyerror pnapi::parser::error
 #define pnapi_pn_yylex pnapi::parser::pn::lex

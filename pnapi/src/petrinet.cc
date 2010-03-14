@@ -20,21 +20,19 @@
 
 #include "config.h"
 
-#include <iostream>
-#include <sstream>
-
 #include "petrinet.h"
 #include "util.h"
 
+#include <iostream>
+#include <sstream>
+
 #ifndef NDEBUG
-#include <fstream>
-#include "myio.h"
 using std::cout;
 using std::cerr;
 using std::endl;
 using pnapi::io::operator<<;
 using pnapi::io::util::operator<<;
-#endif
+#endif /* NDEBUG */
 
 using std::deque;
 using std::map;
@@ -1083,29 +1081,6 @@ const std::set<Transition *> & PetriNet::getSynchronizedTransitions() const
 }
 
 
-/*
- * brief Get synchronized Transitions to a given label
- * 
- * param label specifies the label in question
- * 
- * return a set of transitions that are synchronized with this label 
- * 
- * note  Throws an UnknownTransitionError if no such set exists.
- * 
- * todo review
- */
-/*
-const std::set<Transition *> & PetriNet::getSynchronizedTransitions(const std::string & label) const
-{
-  map<string, set<Transition*> >::const_iterator t = transitionsByLabel_.find(label);
-
-  if(t == transitionsByLabel_.end())
-    throw exceptions::UnknownTransitionError(); 
-
-  return t->second;
-} //*/
-
-
 /*!
  * \brief Adds a role
  */
@@ -1286,7 +1261,7 @@ std::map<Transition *, std::string> PetriNet::normalize()
  *        with empty label are missing.
  */
 void PetriNet::produce(const PetriNet & net, const std::string & aPrefix,
-                       const std::string & aNetPrefix) throw (io::InputError)
+                       const std::string & aNetPrefix) throw (exception::InputError)
 {
   assert(!aPrefix.empty());
   assert(!aNetPrefix.empty());
@@ -1367,7 +1342,7 @@ void PetriNet::setConstraintLabels(const std::map<Transition *, std::set<std::st
  * \brief translates constraint labels to transitions
  */
 std::map<Transition *, std::set<Transition *> >
-PetriNet::translateConstraintLabels(const PetriNet & net) throw (io::InputError)
+PetriNet::translateConstraintLabels(const PetriNet & net) throw (exception::InputError)
 {
   map<Transition *, set<string> > labels = net.constraints_;
   map<Transition *, set<Transition *> > result;
@@ -1389,8 +1364,8 @@ PetriNet::translateConstraintLabels(const PetriNet & net) throw (io::InputError)
           ((net.meta_.find(io::INPUTFILE) != net.meta_.end())
           ? net.meta_.find(io::INPUTFILE)->second : "");
         
-        throw io::InputError(io::InputError::SEMANTIC_ERROR, filename,
-            0, *it2, "unknown transition");
+        throw exception::InputError(exception::InputError::SEMANTIC_ERROR, filename,
+                                    0, *it2, "unknown transition");
       }
     }
   }

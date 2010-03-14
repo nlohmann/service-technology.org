@@ -17,20 +17,22 @@
  * \version $Revision:$
  */
 
-#ifndef PORT_H
-#define PORT_H
+#ifndef PNAPI_PORT_H
+#define PNAPI_PORT_H
 
-#include <string>
+#include <map>
 #include <set>
-#include "component.h"
+#include <string>
 
 namespace pnapi
 {
 
 // forward declarations
-class PetriNet;
 class Interface;
+class PetriNet;
+class Place;
 class Port;
+class Transition;
 
 /*!
  * \brief interface labels
@@ -172,4 +174,4 @@ private: /* private methods */
 
 } /* namespace pnapi */
 
-#endif /* PORT_H */
+#endif /* PNAPI_PORT_H */

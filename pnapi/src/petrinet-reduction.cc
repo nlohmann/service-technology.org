@@ -58,14 +58,11 @@
 
 #include "config.h"
 
-#include <iostream>
-#include <list>
-#include <set>
-#include <utility>
-
 #include "petrinet.h"
 #include "util.h"		// helper functions (toString, setUnion, foreach)
-//#include "debug.h"		// (trace)
+
+#include <iostream>
+#include <list>
 
 using std::cerr;
 using std::cout;

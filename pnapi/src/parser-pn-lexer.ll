@@ -52,12 +52,12 @@
   ****************************************************************************/
 %{
 
+#include "config.h"
+
 #include "parser.h"
 #include "parser-pn.h"
 
-#include <cstring>
-
- //TODO: get rid of redefinition warnings (hacks are ok)
+#include <iostream>
 
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line

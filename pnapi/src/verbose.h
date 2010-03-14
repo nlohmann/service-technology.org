@@ -1,25 +1,28 @@
 #ifndef PNAPI_VERBOSE_H
 #define PNAPI_VERBOSE_H
 
-/*
-#include <config.h>
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <string>
-#include <unistd.h>
-*/
+/*!
+ * \file verbose.h
+ */
 
-/// unconditionally print a message
-// void message(const char* format, ...);
+namespace pnapi
+{
 
-/// print a message if "--verbose" parameter was given
-// void status(const char* format, ...);
+/*!
+ * \brief Handle for verbose output
+ */
+namespace verbose
+{
 
-/// abort with an error message and an error code
-// __attribute__((noreturn)) void abort(unsigned short code, const char* format, ...);
+/// print a verbose output if desired
+extern void (*status)(const char *, ...);
+/// target for function pointer "status"
+void quiet(const char *, ...);
+/// default output function printing to standard error
+void defaultStatus(const char *, ...);
 
-/// verbosely display an error in a file (still experimental)
-// void displayFileError(char* filename, int lineno, char* token);
+} /* namespace verbose */
+
+} /* namespace pnapi */
 
 #endif /* PNAPI_VERBOSE_H */

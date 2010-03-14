@@ -15,12 +15,14 @@
 #ifndef PNAPI_PNAPI_H
 #define PNAPI_PNAPI_H
 
-#include <string>
-#include "myio.h"
-#include "condition.h"
-#include "petrinet.h"
+#include "config.h"
+
 #include "automaton.h"
-#include "state.h"
+#include "condition.h"
+#include "exception.h"
+#include "marking.h"
+#include "myio.h"
+#include "petrinet.h"
 
 // overloaded operators should be available globally
 using pnapi::io::operator<<;
@@ -43,7 +45,7 @@ using pnapi::operator&&;
  *
  * For using it, simply include the header file pnapi.h in your code:
  * \code
- * #include "pnapi.h"
+ * // #include "pnapi.h"
  * \endcode
  *
  * Everything you will use can be found in the following namespaces:
@@ -71,9 +73,9 @@ using pnapi::operator&&;
  * Assigning a final condition
  * \code
  * // net from the previous example is recycled here
- * net.getFinalCondition() = ((p1 == 0) && (p2 == 1));
+ * net.finalCondition() = ((p1 == 0) && (p2 == 1));
  * Place & p3 = net.createPlace();
- * net.getFinalCondition() = (net.getFinalCondition().getFormula() && (p3 == 0));
+ * net.finalCondition() = (net.finalCondition().formula() && (p3 == 0));
  * \endcode
  * 
  * Reading from stream

@@ -10,6 +10,7 @@
 #include "util.h"
 
 #include <sstream>
+#include <ctime>
 
 using std::cerr;
 using std::cout;

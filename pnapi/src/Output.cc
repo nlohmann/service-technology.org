@@ -27,8 +27,10 @@
 #include "Output.h"
 #include "verbose.h"
 
+#include <libgen.h>
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
 #include <cstdlib>
 #include <cstring>
 
@@ -162,7 +164,7 @@ char* Output::createTmp() {
 #ifdef __MINGW32__
     temp = basename(const_cast<char*>(tempfileTemplate.c_str()));
     if (mktemp(temp) == NULL) {
-        throw exception::Error("could not create to temporary file '" + basename(const_cast<char*>(tempfileTemplate.c_str())) + "'");
+        throw exception::Error("could not create to temporary file '" + std::string(temp) + "'");
     };
 #else
     temp = strdup(tempfileTemplate.c_str());

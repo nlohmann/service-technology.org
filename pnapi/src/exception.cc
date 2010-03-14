@@ -1,5 +1,5 @@
 /*!
- * \file    errorhandling.cc
+ * \file    exception.cc
  *
  * \brief   Collection of exception classes
  *

@@ -55,7 +55,7 @@ extern gengetopt_args_info args_info;
 	@param mf The final marking
 	@param verbose The level of verbosity (0-3).
 */
-Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, bool verbose, int debug, bool out, int brk) 
+Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, Problem& pb, bool verbose, int debug, bool out, int brk) 
 	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols+1),im(pn),breakafter(brk) {
 	// inherit verbosity/debug level
 	this->verbose = debug;
@@ -69,7 +69,7 @@ Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, bool verbose, i
 	// initialize lp_solve
 	map<Place*,int> cover; // we look for reachability, not coverability, so this is empty
 	lpwrap.verbose = debug;
-	if (lpwrap.createMEquation(m0,mf,cover,FALSE)<0) { 
+	if (lpwrap.createMEquation(m0,mf,cover,pb,FALSE)<0) { 
 		cerr << "sara: error: createMEquation (lpsolve-init) failed" << endl; 
 		error=LPSOLVE_INIT_ERROR; 
 		return; 
@@ -89,7 +89,7 @@ Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, bool verbose, i
 			reached exactly).
 	@param verbose The level of verbosity (0-3).
 */
-Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, bool verbose, int debug, bool out, int brk) 
+Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, Problem& pb, bool verbose, int debug, bool out, int brk) 
 	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols),im(pn),breakafter(brk) {
 	// inherit verbosity/debug level
 	this->verbose = debug;
@@ -101,7 +101,7 @@ Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int>
 
 	//initialize lp_solve
 	lpwrap.verbose = debug;
-	if (lpwrap.createMEquation(m0,mf,cover,FALSE)<0) { 
+	if (lpwrap.createMEquation(m0,mf,cover,pb,FALSE)<0) { 
 		cerr << "sara: error: createMEquation (lpsolve-init) failed" << endl; 
 		error=LPSOLVE_INIT_ERROR; 
 		return; 
@@ -242,7 +242,7 @@ void Reachalyzer::start() {
 		if (verbose>0) cerr << endl;
 		++loops;
 	}
-	if (stateinfo && out) cout << "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
+	if (stateinfo && out) cout << "\r";
 	if (stateinfo)
 		cout << "sara: " << loops << " job" << (loops!=1?"s":"") << " done, " 
 			<< tps.size() << " in queue, " << failure.trueSize() <<  " failure" 

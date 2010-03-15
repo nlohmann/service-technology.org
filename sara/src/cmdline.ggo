@@ -90,6 +90,16 @@ option "final" f
   string
   optional
 
+option "constraint" c
+  "Specify a global place/transition constraint."
+  details="In addition to an extended final marking also constraints may be formulated. A constraint is an (in)equation where the left hand side is a weighted sum of places and transitions. Places denote tokens in the final marking while a transition stands for its number of occurrences in a firing sequence. The right hand side must be an integer. Examples would be \"p+q>5\" (p and q together can have 5 or more tokens) or \"2p-t:0\" (t occurs twice as often as there are tokens on p finally) or even \"3p1-4p2+t1-t2<17\".
+"
+  typestr="string"
+  dependon="reachable"
+  string
+  multiple
+  optional
+
 option "owfn" O
   "Specify net as being *.owfn (instead of *.llnet)."
   details="The Petri net used for creating a problem file is assumed to be in OWFN format (*.owfn). Default is LOLA (*.llnet)."

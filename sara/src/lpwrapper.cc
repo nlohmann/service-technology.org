@@ -60,10 +60,11 @@ extern vector<Place*> placeorder;
 	@param m1 Initial marking.
 	@param m2 Final marking.
 	@param cover Information on which token numbers must be reached and which covered.
+	@param pb An instance of the problem to solve, for getting the global constraints.
 	@param verbose If TRUE prints information on cout.
 	@return The number of equations on success, -1 otherwise.
 */
-int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover, bool verbose) {
+int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover, Problem& pb, bool verbose) {
 	tpos.clear(); // probably not necessary
 	tvector.clear();
 
@@ -120,10 +121,26 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	for(int y=1; y<=(int)(cols); ++y)
 		if (!add_constraintex(lp,1,&r,&y,GE,0)) return -1;
 
+	// now add the global constraints from the problem file
+	unsigned int cnr(pb.getNumberOfConstraints());
+	for(unsigned int i=0; i<cnr; ++i)
+	{
+		for(unsigned int y=0; y<cols; ++y) mat[y]=0;
+		map<Transition*,int> line;
+		int comp, rhs;
+		pb.getConstraint(i,line,comp,rhs);
+		map<Transition*,int>::iterator lit;
+		for(lit=line.begin(); lit!=line.end(); ++lit)
+		{
+			mat[tpos[lit->first]] = lit->second;	
+		}
+		if (!add_constraintex(lp,cols,mat,colpoint,comp,rhs)) return -1;
+	}
+
 	set_add_rowmode(lp,FALSE);	
 	if (verbose) write_LP(lp,stdout);
 	else set_verbose(lp,CRITICAL);
-	basicrows = placeorder.size()+cols;
+	basicrows = placeorder.size()+cols+cnr;
 	delete[] colpoint;
 	delete[] mat;
 	return (int)(basicrows);
@@ -199,8 +216,6 @@ bool LPWrapper::addConstraints(PartialSolution& ps) {
 			{ 
 			  delete[] constraint; 
 			  abort(13,"error: failed to add constraint to LP model");
-//			  cerr << "sara: error: failed to add constraint to LP model." << endl; 
-//			  exit(EXIT_FAILURE); 
 			}
 	}
 	delete[] constraint;

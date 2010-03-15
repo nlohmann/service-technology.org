@@ -34,7 +34,7 @@ std::string sara_NAME_token;
 void sara_error(const char *);
 %}
 
-name      [^,;:()\t \n\{\}<>][^,;:()\t \n\{\}<>]*
+name      [^,;:()\t \n\{\}<>+\-0-9][^,;:()\t \n\{\}<>+\-]*
 number    "-"?[0-9][0-9]*
 problem PROBLEM
 goal GOAL
@@ -48,6 +48,7 @@ initialm INITIAL
 finalm FINAL
 cover COVER
 reach REACH
+constraints CONSTRAINTS
 
 %%
 
@@ -55,7 +56,9 @@ reach REACH
 ","          { return COMMA; }
 ";"		{ return SEMICOLON; }
 ">"		{ return MYGEQ; }
-"<"		{ return MYLEQX; }
+"<"		{ return MYLEQ; }
+"+"		{ return PLUS; }
+"-"		{ return MINUS; }
 {problem}	{ return PROBLEM; }
 {goal}		{ return GOAL; }
 {reachability}	{ return REACHABILITY; }
@@ -68,6 +71,7 @@ reach REACH
 {finalm}	{ return FINALM; }
 {cover} { return COVER; }
 {reach}	{ return REACH; }
+{constraints}	{ return CONSTRAINTS; }
 {number}     { sara_lval.val = atoi(sara_text); return NUMBER; }
 
 {name}       { sara_NAME_token = sara_text; return NAME; }

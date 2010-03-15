@@ -108,6 +108,9 @@ void Problem::clear() {
 	required.clear();
 	cover.clear();
 	type = 0;
+	clhs.clear();
+	ccomp.clear();
+	crhs.clear();
 }
 
 /** Set the name of a problem.
@@ -389,5 +392,65 @@ bool Problem::calcPTOrder() {
 	for(unsigned int i=0; i<placeorder.size(); ++i)
 		revporder[placeorder[i]]=i;
 	return deterministic;
+}
+
+/** Add external (complex) constraint. This constraint is a weighted sum of places and transitions
+	compared to a number.
+	@param lhs The weighted sum of places and transitions, mapped by place/transition names.
+	@param comp The comparison operator as in lp_solve: GE, EQ, or LE.
+	@param rhs The right hand side of the comparison.
+*/
+void Problem::addConstraint(map<string,int> lhs, int comp, int rhs) {
+	clhs.push_back(lhs);
+	ccomp.push_back(comp);
+	crhs.push_back(rhs);
+}
+
+/** Get an external constraint. The constraint is translated into an (in)equation over transitions.
+	@param pos The number of the constraint.
+	@param lhs The left hand side of the constraint for use with lp_solve.
+	@param comp The comparator of the constraint for use with lp_solve.
+	@param rhs The right hand side of the constraint for use with lp_solve.
+*/
+void Problem::getConstraint(unsigned int pos, map<Transition*,int>& lhs, int& comp, int& rhs) {
+	if (pn==NULL) getPetriNet();
+	lhs.clear();
+	if (pos>=clhs.size()) { comp=GE; rhs=0; return; }
+	comp = ccomp[pos];
+	rhs = crhs[pos];
+	// calculate the left hand side
+	Marking m0(getInitialMarking());
+	map<string,int>::iterator it;
+	for(it=clhs[pos].begin(); it!=clhs[pos].end(); ++it)
+	{
+		Transition* t(pn->findTransition(it->first));
+		if (t) lhs[t]+=it->second; // if it's a transition, just add the factor
+		Place* p(pn->findPlace(it->first));
+		if (p) { // if it's a place we must add a line of the marking equation ...
+			set<pnapi::Arc*>::iterator ait;
+			set<pnapi::Arc*> arcs = p->getPresetArcs(); 
+			for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
+			{
+				Transition* t = &((*ait)->getTransition());
+				lhs[t] += (*ait)->getWeight();
+			}
+			arcs = p->getPostsetArcs();
+			for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
+			{
+				Transition* t = &((*ait)->getTransition());
+				lhs[t] -= (*ait)->getWeight();
+			}
+			rhs -= m0[*p];
+		}
+		if (!t && !p) status("warning: global constraint contains unknown object '%s'.",it->first.c_str());
+	}
+	return;
+}
+
+/** Get the overall number of constraints available.
+	@return The number of constraints.
+*/
+unsigned int Problem::getNumberOfConstraints() {
+	return clhs.size();
 }
 

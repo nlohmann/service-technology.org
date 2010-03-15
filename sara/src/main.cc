@@ -198,7 +198,19 @@ if (args_info.reachable_given || args_info.realize_given) {
 	outfile << ";" << endl;
 	outfile << "FINAL ";
 	if (args_info.final_given) outfile << args_info.final_arg;
-	outfile << ";" << endl << endl;
+	outfile << ";" << endl;
+	if (args_info.constraint_given) {
+		outfile << "CONSTRAINTS ";
+		first = true;
+		for(int i=0; i<args_info.constraint_given; ++i)
+		{
+			if (!first) outfile << ", ";
+			outfile << args_info.constraint_arg[i];
+			first = false;
+		}
+		outfile << ";" << endl;
+	}
+	outfile << endl;
 	outfile.close();
 }
 
@@ -243,7 +255,7 @@ if (args_info.input_given || args_info.pipe_given) {
 				Marking m2(pbls.at(x).getFinalMarking()); // get the extended final marking ...
 				map<Place*,int> cover(pbls.at(x).getCoverRequirement()); // including the directives for the places 
 				// obtain an instance of the reachability solver
-				Reachalyzer reach(*pn,m1,m2,cover,verbose,debug,out,(args_info.break_given?args_info.break_arg:0));
+				Reachalyzer reach(*pn,m1,m2,cover,pbls.at(x),verbose,debug,out,(args_info.break_given?args_info.break_arg:0));
 				if (reach.getStatus()!=Reachalyzer::LPSOLVE_INIT_ERROR) {
 					reach.start(); // if everything is ok, solve the problem
 					clock_t mytime(reach.getTime()); // ... and measure the time for that

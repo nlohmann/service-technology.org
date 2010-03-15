@@ -19,6 +19,7 @@
 
 #include <map>
 #include <set>
+#include <vector>
 #include <string>
 #ifndef PNAPI_PNAPI_H
 #include "pnapi/pnapi.h"
@@ -27,6 +28,7 @@
 using std::map;
 using std::string;
 using std::set;
+using std::vector;
 using pnapi::Place;
 using pnapi::Transition;
 using pnapi::PetriNet;
@@ -104,6 +106,15 @@ public:
 	/// Calculate the global orderings for places and transitions
 	bool calcPTOrder();
 
+	/// Add an external constraint
+	void addConstraint(map<string,int> lhs, int comp, int rhs);
+
+	/// Get external constraint
+	void getConstraint(unsigned int pos, map<Transition*,int>& lhs, int& comp, int& rhs);
+
+	/// Get the number of external constraints
+	unsigned int getNumberOfConstraints();
+
 	/// Goals
 	enum Types {
 		REACHABLE = 0,
@@ -147,6 +158,14 @@ private:
 	/// The Petri net
 	PetriNet* pn;
 
+	/// complex constraints, left hand
+	vector<map<string, int> > clhs;
+
+	/// complex constraints, comparator
+	vector<int> ccomp;
+
+	/// complex constraints, right hand
+	vector<int> crhs;
 };
 
 #endif

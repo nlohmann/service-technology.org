@@ -35,10 +35,10 @@ class Reachalyzer {
 public:
 
 	/// Constructor with a Petri net, initial and final marking, and debug level (0-3)
-	Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, bool verbose, int debug, bool out, int brk);
+	Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, Problem& pb, bool verbose, int debug, bool out, int brk);
 
 	/// Constructor for partially testing coverability instead of exact reachability
-	Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, bool verbose, int debug, bool out, int brk);
+	Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, Problem& pb, bool verbose, int debug, bool out, int brk);
 
 	/// Destructor
 	~Reachalyzer();

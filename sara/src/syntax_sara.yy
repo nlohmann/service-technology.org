@@ -17,7 +17,7 @@
  along with Sara.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
 
-%token COLON COMMA ARROW NUMBER NAME SEMICOLON PROBLEM GOAL REACHABILITY REALIZABILITY NFILE NTYPE TYPEOWFN TYPELOLA INITIALM FINALM COVER REACH MYLEQX MYGEQ
+%token COLON COMMA ARROW NUMBER NAME SEMICOLON PROBLEM GOAL REACHABILITY REALIZABILITY NFILE NTYPE TYPEOWFN TYPELOLA INITIALM FINALM COVER REACH MYLEQ MYGEQ CONSTRAINTS PLUS MINUS
 
 %defines
 %name-prefix="sara_"
@@ -39,6 +39,8 @@ using std::endl;
 Problem pbl;
 std::vector<Problem> pbls;
 bool cov;
+std::map<string,int> clhs;
+int ccomp,crhs;
 
 /// the current NAME token as string
 extern std::string sara_NAME_token;
@@ -69,7 +71,8 @@ problem:
 	NTYPE ntype SEMICOLON
 	INITIALM inodes SEMICOLON
 	FINALM mode { pbl.setGeneralCover(cov); } fnodes SEMICOLON
-	{ pbls.push_back(pbl); }
+	constraints
+	{ pbls.push_back(pbl); pbl.clear(); }
 ;
  
 gtype:
@@ -102,19 +105,54 @@ inode:
 ;
 
 fnodes:
-	fnode
+	/* empty */
+|	fnode
 |	fnode COMMA fnodes
 ;
 
 fnode:
-  /* empty */
-| NAME
+  NAME
 	{ pbl.setFinal(sara_NAME_token,1); if (cov) pbl.setCover(sara_NAME_token,GE); }
 | NAME COLON NUMBER
     { pbl.setFinal(sara_NAME_token,$3); }
 | NAME MYGEQ NUMBER
     { pbl.setFinal(sara_NAME_token,$3); pbl.setCover(sara_NAME_token,GE); }
-| NAME MYLEQX NUMBER
+| NAME MYLEQ NUMBER
     { pbl.setFinal(sara_NAME_token,$3); pbl.setCover(sara_NAME_token,LE); }
+;
+
+constraints:
+  /* empty */
+|  CONSTRAINTS constr SEMICOLON
+;
+
+constr:
+| constraint
+	{ pbl.addConstraint(clhs,ccomp,crhs); clhs.clear(); }
+| constr COMMA constraint
+	{ pbl.addConstraint(clhs,ccomp,crhs); clhs.clear(); }
+;
+
+constraint:
+	cnodes comparator NUMBER { crhs = $3; }
+;
+
+cnodes:
+	NAME { clhs[sara_NAME_token] = 1; }
+|	NUMBER NAME { clhs[sara_NAME_token] = $1; }
+|	cnodes cnode
+;
+
+cnode:
+	PLUS NAME { clhs[sara_NAME_token] = 1; }
+|	MINUS NAME { clhs[sara_NAME_token] = -1; }
+|	PLUS NUMBER NAME { clhs[sara_NAME_token] = $2; }
+|	NUMBER NAME { clhs[sara_NAME_token] = $1; }
+;
+
+comparator:
+	COLON { ccomp = EQ; }
+|	MYGEQ { ccomp = GE; }
+|	MYLEQ { ccomp = LE; }
 ;
 

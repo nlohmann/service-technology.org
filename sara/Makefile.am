@@ -3,13 +3,10 @@ ACLOCAL_AMFLAGS = -I m4 --install
 
 # process "libs" directory only if the Petri Net API needs to be compiled
 if COMPILE_PNAPI
-SUBDIRS = libs/pnapi libs/lp_solve src
+SUBDIRS = libs/pnapi libs/lp_solve src tests
 else
-SUBDIRS = libs/lp_solve src
+SUBDIRS = libs/lp_solve src tests
 endif
-
-# TODO move this into tests/Makefile.am
-DISTCLEANFILES = tests/atconfig
 
 svn-clean: maintainer-clean
 	rm -fr configure Makefile.in INSTALL aclocal.m4 src/Makefile.in \

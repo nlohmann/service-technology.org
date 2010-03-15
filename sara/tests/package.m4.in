@@ -1,0 +1,89 @@
+# @configure_input@
+
+#============================================================================#
+# AUTOTEST PACKAGE CONFIGURATION FILE                                        #
+# skeleton written by Niels Lohmann <niels.lohmann@uni-rostock.de>           #
+#============================================================================#
+
+# This file configures the Autotest test suite (usually file testsuite.at). The
+# configuration is read when generating the test scripts, and it is also used
+# in the test cases. The variables set here are accessible in the test cases
+# and usually hold the name of directories and tools.
+#
+# A configuration file like this usually consists of three parts:
+#
+# 1. A generic part that contains information that is not specific for this
+#    package. These information include the package's name and version, the
+#    current SVN revision, the absolute directory of the test files and the
+#    directory where benchmark results are written to, and the full name of
+#    the executables of the standard tools grep, awk, and sed. You must not
+#    change this part.
+#
+# 2. The main executable. This is the actual program you built in this
+#    package and that you now want to check. Usually, two variables are
+#    defined: The first variable "TOOL" calls the main executable through a
+#    wrapper script "cover.sh". This is required when code coverage should be
+#    checked. A second variable "TOOL_RAW" does not use this wrapper script.
+#    This is used if the executable is analyzed, for instance using Valgrind.
+#    All you need to change in this part is the name of the main tool(s) of
+#    your package.
+#
+# 3. Several helper tools that are used in the test script. Here, we
+#    distinguish two type of tools: optional tools and mandatory tools. An
+#    optional tool is defined by prefixing it with a script "wrap.sh". If the
+#    tool was not found, an exit code is return to the calling test script that
+#    yields skipping the current test case. Mandatory tools are called without
+#    this script and yield failures if the tool is not found. This part is
+#    optional. Add as many tools as you need. Please make sure you define the
+#    variables surrounded by @'s in the file "configure.ac". This is usually
+#    done by calling "AC_PATH_PROG(MIA, [mia], not found)".
+
+
+#-------------------------------------#
+# Part 1: Generic Package Information #
+#-------------------------------------#
+
+# Signature of the current package.
+m4_define([AT_PACKAGE_NAME],      [@PACKAGE_NAME@])
+m4_define([AT_PACKAGE_TARNAME],   [@PACKAGE_TARNAME@])
+m4_define([AT_PACKAGE_VERSION],   [@PACKAGE_VERSION@])
+m4_define([AT_PACKAGE_STRING],    [@PACKAGE_STRING@])
+m4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])
+
+# SVN Revision-URL
+m4_define([SVNURL],               [http://svn.gna.org/viewcvs/service-tech?rev=@VERSION_SVN@&view=rev])
+
+# directories
+m4_define([TESTFILES],            [@abs_srcdir@/testfiles])
+m4_define([BENCHRESULTS],         [@abs_srcdir@/benchmarks-results])
+
+# standard UNIX helper tools
+m4_define([GREP],                 [@GREP@])
+m4_define([AWK],                  [@AWK@])
+m4_define([SED],                  [@SED@])
+
+
+#------------------------------------------#
+# Part 2: The Package's Main Executable(s) #
+#------------------------------------------#
+
+# the main executable, called through a shell script for code coverage
+m4_define([SARA],                 [cover.sh @abs_top_builddir@/src/sara])
+
+# the main executable, directly called to allow for analysis
+m4_define([SARA_RAW],             [@abs_top_builddir@/src/sara])
+
+
+#---------------------------------------------#
+# Part 3: Optional and Mandatory Helper Tools #
+#---------------------------------------------#
+
+# tools needed by the testscript
+# m4_define([FIONA],                [wrap.sh @FIONA@])
+# m4_define([MIA],                  [wrap.sh @MIA@])
+# m4_define([MARLENE],              [wrap.sh @MARLENE@])
+# m4_define([SA2SM],                [wrap.sh @SA2SM@])
+# m4_define([LOLA],                 [@LOLA@])
+# m4_define([WENDY2FIONA],          [wrap.sh @WENDY2FIONA@])
+# m4_define([CNF2BITS],             [wrap.sh @CNF2BITS@])
+# m4_define([VALGRIND],             [wrap.sh @VALGRIND@])

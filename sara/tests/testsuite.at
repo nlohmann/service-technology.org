@@ -1,0 +1,32 @@
+AT_INIT
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([SARA --help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([SARA --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Add a fitting name for this test set])
+############################################################################
+
+AT_SETUP([Test 1])
+AT_CHECK([cp TESTFILES/test1.sara TESTFILES/test1.owfn .])
+AT_CHECK([SARA -i test1.sara],0,stdout,stderr)
+AT_CHECK([GREP -q "SOLUTION" stdout])
+AT_CLEANUP
+
+AT_SETUP([Test 2])
+AT_CHECK([cp TESTFILES/test2.sara TESTFILES/test2.owfn .])
+AT_CHECK([SARA -i test2.sara],0,stdout,stderr)
+AT_CHECK([GREP -q "SOLUTION" stdout])
+AT_CLEANUP

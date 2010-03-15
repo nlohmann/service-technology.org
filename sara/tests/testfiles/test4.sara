@@ -1,0 +1,6 @@
+PROBLEM test4:
+	GOAL REACHABILITY;
+	FILE test4.owfn TYPE OWFN;
+	INITIAL p1,q1;
+	FINAL p1:2,q1:2;
+

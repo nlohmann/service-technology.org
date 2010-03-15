@@ -1,0 +1,6 @@
+PROBLEM test8_8:
+	GOAL REACHABILITY;
+	FILE test8_8.owfn TYPE OWFN;
+	INITIAL i1:1,i2:1;
+	FINAL o1:1,o2:1;
+

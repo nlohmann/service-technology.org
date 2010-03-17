@@ -82,12 +82,14 @@ void Constraint::addPlace(Place& p, int num) {
 	@param p The place to be removed from the constraint.
 	@return If the removal was successfully done.
 */
+/*
 bool Constraint::removePlace(Place& p) {
 	map<Place*,int>::iterator it(posplace.find(&p));
 	bool ret = (it!=posplace.end());
 	if (ret) posplace.erase(it);
 	return ret;
 }
+*/
 
 /** Gets information about all places in the constraint, i.e. the latest
 	call to addPlace/removePlace for each place.
@@ -112,12 +114,14 @@ void Constraint::addSubTransition(Transition& t) {
 	@param t The transition to be allowed again.
 	@return If the operation was successful.
 */
+/*
 bool Constraint::removeSubTransition(Transition& t) {
 	set<Transition*>::iterator it(subtrans.find(&t));
 	bool ret = (it!=subtrans.end());
 	if (ret) subtrans.erase(it);
 	return ret;
 }
+*/
 
 /** Gets all forbidden transitions.
 	@return The set of forbidden transitions.

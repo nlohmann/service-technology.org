@@ -136,6 +136,7 @@ bool PartialSolution::setFailureConstraint(const Constraint& c) {
 	@return The right hand side of the constraint in the partial solution if a match was found,
 		-1 otherwise.
 */
+/*
 int PartialSolution::findRHS(Constraint& c) {
 	if (constraints.size()==0) return -1;
 	set<Constraint>::iterator cit;
@@ -144,18 +145,23 @@ int PartialSolution::findRHS(Constraint& c) {
 	if (cit!=constraints.end()) return cit->getRHS();
 	else return -1;
 }
+*/
 
 /** Removes all constraints from the partial solution.
 */
+/*
 void PartialSolution::clearConstraints() { 
 	constraints.clear(); 
 }
+*/
 
 /** Removes all failure constraints from the partial solution.
 */
+/*
 void PartialSolution::clearFailureConstraints() { 
 	failure.clear(); 
 }
+*/
 
 /** Sets all constraints of the partial solution at once, existing constraints are deleted.
 	@param cv The new constraints.

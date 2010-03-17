@@ -57,25 +57,25 @@ public:
 
 	/// Remove first job
 	bool pop_front();
-
+/*
 	/// Add job before all other jobs with the same (or higher) priority
 	void push_front(PartialSolution* job);
-
+*/
 	/// Add job after the last job with the same (or lower) priority
 	void push_back(PartialSolution* job);
-
+/*
 	/// Add job after the last job with the same (or lower) priority, but only if there is no equivalent job in the queue
 	bool insert(PartialSolution* job);
-
+*/
 	/// Find a job, if it is already in the list
 	int find(PartialSolution* job);
 
 	/// Calculate the priority of a job or a failure
 	int priority(PartialSolution* job) const;
-
+/*
 	/// Search the job list for a full solution and return it if found
 	PartialSolution* findSolution();
-
+*/
 	/// Check a failure queue for infeasibility of the marking equation
 	bool checkMEInfeasible();
 

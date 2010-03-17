@@ -65,10 +65,10 @@ public:
 
 	/// adds the preset of a place p with factor weight to the constraint	
 	void addPlace(Place& p, int weight);
-
+/*
 	/// sets the weight of place p to zero (the preset of p may still be influenced by other places)
 	bool removePlace(Place &p);
-
+*/
 	/// returns the map from places to their weights.
 	const map<Place*,int>& getPlaces() const;
 
@@ -80,10 +80,10 @@ public:
 
 	/// tests if the constraint has a transition with positive weight at all
 	bool checkAnyTransition() const;
-
+/*
 	/// deletes a Transition from the forbidden set
 	bool removeSubTransition(Transition& t);
-
+*/
 	/// return the set of forbidden transitions
 	const set<Transition*>& getSubTransitions() const;
 

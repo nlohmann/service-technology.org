@@ -102,11 +102,13 @@ bool JobQueue::pop_front() {
 	priority. The job will be added even if it is already in the queue.
 	@param job The job to be added to the queue.
 */
+/*
 void JobQueue::push_front(PartialSolution* job) {
 	if (empty()) active=job;
 	else queue[priority(job)].push_front(job);
 	++cnt;
 }
+*/
 
 /** Add a job to the queue. The job will be at the latest position available according to its
 	priority. The job will be added even if it is already in the queue.
@@ -123,6 +125,7 @@ void JobQueue::push_back(PartialSolution* job) {
 	@param job The job to be added to the queue.
 	@return If the job has been added.
 */
+/*
 bool JobQueue::insert(PartialSolution* job) {
 	if (empty()) { active=job; ++cnt; return true; }
 	int pri = find(job);
@@ -131,6 +134,7 @@ bool JobQueue::insert(PartialSolution* job) {
 	++cnt;
 	return true;
 }
+*/
 
 /** Find out if there is an equivalent job in the queue.
 	@param The job to be checked.
@@ -187,6 +191,7 @@ int JobQueue::priority(PartialSolution* job) const {
 /** Search the job queue for a full solution.
 	@return A full solution or NULL if none is found.
 */
+/*
 PartialSolution* JobQueue::findSolution() {
 	if (active->isSolved()) return active;
 	map<int,deque<PartialSolution*> >::iterator jit;
@@ -195,6 +200,7 @@ PartialSolution* JobQueue::findSolution() {
 			if (jit->second[i]->isSolved()) return jit->second[i];
 	return NULL;
 }
+*/
 
 /** Check in a failure job queue whether the marking equation was infeasible.
 	@return True if the marking equation is infeasible.	

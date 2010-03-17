@@ -39,13 +39,13 @@ class Problem {
 public:
 	/// Standard constructor
 	Problem();
-
+/*
 	/// Constructor for realizability and (exact) reachability
 	Problem(string net, int pntype, map<string,int>& initialmarking, map<string,int>& requirement, int type);
 	
 	/// Constructor for coverability
 	Problem(string net, int pntype, map<string,int>& initialmarking, map<string,int>& covermarking, map<string,int>& coverplaces);
-
+*/
 	/// Destructor
 	~Problem();
 

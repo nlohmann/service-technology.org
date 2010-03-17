@@ -84,10 +84,10 @@ public:
 
 	/// implements Tarjans algorithm for the conflict graph (with some optimization)
 	void doTarjan(myTPNode* start, int& maxdfs, vector<set<Transition*> >& tv, vector<set<Place*> >& pv);
-
+/*
 	/// Add an arc to the graph
 	bool addArc(Transition* tfrom, Transition* tto);
-
+*/
 	/// Add an arc to the graph
 	bool addArc(Transition* tfrom, Place* pto);
 
@@ -96,10 +96,10 @@ public:
 
 	/// Add an arc to the graph
 	bool addArc(Place* pfrom, Place* pto);
-
+/*
 	/// Remove an arc from the graph
 	bool removeArc(Transition* tfrom, Place* pto);
-
+*/
 	/// Level of verbosity
 	int verbose;
 

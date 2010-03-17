@@ -93,7 +93,7 @@ AT_BANNER([Finding infeasible T-invariants])
 
 AT_SETUP([Empty loop 2])
 AT_CHECK([cp TESTFILES/test3.sara TESTFILES/test3.owfn .])
-AT_CHECK([SARA -i test3.sara -v],0,stdout,stderr)
+AT_CHECK([SARA -i test3.sara -v -d2],0,stdout,stderr)
 AT_CHECK([GREP -q "1 failure, 0 solutions" stdout])
 AT_CHECK([GREP -q "INFEASIBLE: unable to borrow enough tokens via T-invariants" stdout])
 AT_CHECK([GREP -q "<empty>" stdout])
@@ -155,10 +155,10 @@ AT_CHECK([GREP -q "2 Solutions produced" stdout])
 AT_KEYWORDS(solver)
 AT_CLEANUP
 
-AT_SETUP([Hay-stack 2, x=5n, y=2, 1<=n<=10])
+AT_SETUP([Hay-stack 2, x=5n, y=2, 1<=n<=5])
 AT_CHECK([cp TESTFILES/test7.sara TESTFILES/test7_*.owfn .])
 AT_CHECK([SARA -i test7.sara -v],0,stdout,stderr)
-AT_CHECK([GREP -q "10 Solutions produced" stdout])
+AT_CHECK([GREP -q "5 Solutions produced" stdout])
 AT_KEYWORDS(solver)
 AT_CLEANUP
 

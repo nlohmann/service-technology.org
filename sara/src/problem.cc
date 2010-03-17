@@ -74,10 +74,12 @@ Problem::Problem() : deinit(false),generalcover(false),type(REACHABLE),nettype(L
 	@param requirement The final marking or the transition vector to realize.
 	@param typ The problem type: REACHABILITY or REALIZABILITY.
 */
+/*
 Problem::Problem(string net, int pntype, map<string,int>& initialmarking, map<string,int>& requirement, int typ) 
 	: deinit(false),generalcover(false),type(typ),filename(net),initial(initialmarking),required(requirement),nettype(pntype),pn(NULL) {
 	name = "";
 }
+*/
 
 /** Constructor for all variants of reachability including coverability.
 	@param net The name of the Petri net file.
@@ -86,11 +88,13 @@ Problem::Problem(string net, int pntype, map<string,int>& initialmarking, map<st
 	@param covermarking The final marking.
 	@param coverplaces Whether token numbers on places must be covered, bounded, or reached exactly.
 */
+/*
 Problem::Problem(string net, int pntype, map<string,int>& initialmarking, map<string,int>& covermarking, map<string,int>& coverplaces) 
 	: deinit(false),generalcover(false),filename(net),initial(initialmarking),required(covermarking),cover(coverplaces),nettype(pntype),pn(NULL) {
 	type = REACHABLE;
 	name = "";
 }
+*/
 
 /** Destructor.
 */

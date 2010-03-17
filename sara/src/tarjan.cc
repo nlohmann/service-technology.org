@@ -206,6 +206,7 @@ void Tarjan::getComponents(vector<set<Transition*> >& tv, vector<set<Place*> >& 
 	@param tto The sink transition of the arc.
 	@return False if one of the input parameters was a NULL pointer.
 */
+/*
 bool Tarjan::addArc(Transition* tfrom, Transition* tto) {
 	if (tfrom==NULL || tto==NULL) return false;
 	tton[tfrom]->nodes.insert(tton[tto]);
@@ -213,6 +214,7 @@ bool Tarjan::addArc(Transition* tfrom, Transition* tto) {
 	tton[tto]->index = -1;
 	return true;
 }
+*/
 
 /** Add an arc from transition to place in the graph for Tarjan's algorithm.
 	@param tfrom The source transition of the arc.
@@ -258,6 +260,7 @@ bool Tarjan::addArc(Place* pfrom, Place* pto) {
 	@param pto The sink place of the arc.
 	@return False if one of the input parameters was a NULL pointer.
 */
+/*
 bool Tarjan::removeArc(Transition* tfrom, Place* pto) {
 	if (tfrom==NULL || pto==NULL) return false;
 	tton[tfrom]->nodes.erase(pton[pto]);
@@ -265,4 +268,4 @@ bool Tarjan::removeArc(Transition* tfrom, Place* pto) {
 	pton[pto]->index = -1;
 	return true;
 }
-
+*/

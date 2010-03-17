@@ -81,7 +81,7 @@ public:
 
 	/// set one failure constraint
 	bool setFailureConstraint(const Constraint& c);
-
+/*
 	/// get the right hand side of a constraint (or -1 on failure)
 	int findRHS(Constraint& c);
 
@@ -90,7 +90,7 @@ public:
 
 	/// remove all failure constraints
 	void clearFailureConstraints();
-
+*/
 	/// set all constraints at once, existing constraints are overwritten
 	void setConstraints(set<Constraint> cv);
 

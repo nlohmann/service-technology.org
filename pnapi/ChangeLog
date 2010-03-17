@@ -7,6 +7,11 @@
                         http://service-technology.org/pnapi
 
 
+Version 4.01-unreleased
+=======================
+
+* removed memory leak (thanks to wendy)
+
 Version 4.00 (2010-03-14)
 =========================
 

@@ -121,8 +121,8 @@ Interface::Interface(PetriNet & net, const Interface & interface1, const Interfa
  */
 Interface::~Interface()
 {
-  // clear();
-  // delete (ports_[""]);
+  clear();
+  delete (ports_[""]);
 }
 
 /*!

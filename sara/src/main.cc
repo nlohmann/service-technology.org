@@ -202,7 +202,7 @@ if (args_info.reachable_given || args_info.realize_given) {
 	if (args_info.constraint_given) {
 		outfile << "CONSTRAINTS ";
 		first = true;
-		for(int i=0; i<args_info.constraint_given; ++i)
+		for(unsigned int i=0; i<args_info.constraint_given; ++i)
 		{
 			if (!first) outfile << ", ";
 			outfile << args_info.constraint_arg[i];

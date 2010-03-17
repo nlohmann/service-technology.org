@@ -16,17 +16,214 @@ AT_CLEANUP
 
 
 ############################################################################
-AT_BANNER([Add a fitting name for this test set])
+AT_BANNER([Finding positive answers])
 ############################################################################
 
-AT_SETUP([Test 1])
+AT_SETUP([Moving 50 tokens])
 AT_CHECK([cp TESTFILES/test1.sara TESTFILES/test1.owfn .])
 AT_CHECK([SARA -i test1.sara],0,stdout,stderr)
+AT_CHECK([GREP -q "sara: Problem 1: test1" stdout])
 AT_CHECK([GREP -q "SOLUTION" stdout])
+AT_KEYWORDS(solver)
 AT_CLEANUP
 
-AT_SETUP([Test 2])
+AT_SETUP([Hay-stack 1, x=5, y=2])
 AT_CHECK([cp TESTFILES/test2.sara TESTFILES/test2.owfn .])
 AT_CHECK([SARA -i test2.sara],0,stdout,stderr)
+AT_CHECK([GREP -q "sara: Problem 1: test2" stdout])
 AT_CHECK([GREP -q "SOLUTION" stdout])
+AT_KEYWORDS(solver)
 AT_CLEANUP
+
+AT_SETUP([Backward loop])
+AT_CHECK([cp TESTFILES/test5.sara TESTFILES/test5.owfn .])
+AT_CHECK([SARA -i test5.sara],0,stdout,stderr)
+AT_CHECK([GREP -q "sara: Problem 1: test5" stdout])
+AT_CHECK([GREP -q "SOLUTION: a1 c1 c2 c3 e2 e3 e4 d2 d3 d4 a1 a2 a3" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+AT_SETUP([Shortest path failure])
+AT_CHECK([cp TESTFILES/test6.sara TESTFILES/test6.owfn .])
+AT_CHECK([SARA -i test6.sara],0,stdout,stderr)
+AT_CHECK([GREP -q "sara: Problem 1: test6" stdout])
+AT_CHECK([GREP -q "SOLUTION: b1 b2 b3 b4 c1 b1 b2 b3 b4 c1 b1 b2 b3 b4 c1 b1 b2 b3 b4 c1 b1 b2 b3 b4 c1 b1 b2 b3 b4" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Finding multiple solutions])
+############################################################################
+
+AT_SETUP([Backward loop])
+AT_CHECK([cp TESTFILES/test5.sara TESTFILES/test5.owfn .])
+AT_CHECK([SARA -i test5.sara -C -v],0,stdout,stderr)
+AT_CHECK([GREP -q "3 solutions" stdout])
+AT_CHECK([GREP -q "SOLUTION: a1 c1 c2 c3 e2 e3 e4 d2 d3 d4 a1 a2 a3" stdout])
+AT_CHECK([GREP -q "SOLUTION: e1 c1 c2 c3 d1 e2 e3 e4 d2 d3 d4 a1 a2 a3" stdout])
+AT_CHECK([GREP -q "SOLUTION: c1 c2 c3 d1 e1 e2 e3 d2 e4 d1 d3 d4 e1 a2 a3" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Finding infeasible marking equations])
+############################################################################
+
+AT_SETUP([Failing Hay-stack 2, x=100, y=20, marking])
+AT_CHECK([cp TESTFILES/test10.sara TESTFILES/test10.owfn .])
+AT_CHECK([SARA -i test10.sara -v],0,stdout,stderr)
+AT_CHECK([GREP -q "1 job done, 0 in queue, 1 failure, 0 solutions" stdout])
+AT_CHECK([GREP -q "INFEASIBLE: the marking equation is infeasible" stdout])
+AT_CHECK([GREP -q "add p1:1 tokens to the initial marking" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+AT_SETUP([Empty loop 1])
+AT_CHECK([cp TESTFILES/test12.sara TESTFILES/test3.owfn .])
+AT_CHECK([SARA -i test12.sara -v],0,stdout,stderr)
+AT_CHECK([GREP -q "1 job done, 0 in queue, 1 failure, 0 solutions" stdout])
+AT_CHECK([GREP -q "INFEASIBLE: the marking equation is infeasible" stdout])
+AT_CHECK([GREP -q "add p2:1 tokens to the initial marking and p3:1 tokens to the final marking" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Finding infeasible T-invariants])
+############################################################################
+
+AT_SETUP([Empty loop 2])
+AT_CHECK([cp TESTFILES/test3.sara TESTFILES/test3.owfn .])
+AT_CHECK([SARA -i test3.sara -v],0,stdout,stderr)
+AT_CHECK([GREP -q "1 failure, 0 solutions" stdout])
+AT_CHECK([GREP -q "INFEASIBLE: unable to borrow enough tokens via T-invariants" stdout])
+AT_CHECK([GREP -q "<empty>" stdout])
+AT_CHECK([GREP -q "1 more token on place p2:0 to fire transition t1" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+AT_SETUP([Connected circles])
+AT_CHECK([cp TESTFILES/test4.sara TESTFILES/test4.owfn .])
+AT_CHECK([SARA -i test4.sara -v],0,stdout,stderr)
+AT_CHECK([GREP -q "1 failure, 0 solutions" stdout])
+AT_CHECK([GREP -q "INFEASIBLE: unable to borrow enough tokens via T-invariants" stdout])
+AT_CHECK([GREP -q "<empty>" stdout])
+AT_CHECK([GREP -q "1 more token on place set {p2:0,q2:0} to fire a transition in {t1,u1}" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+AT_SETUP([Failing Hay-stack 2, x=4, y=2, added loop])
+AT_CHECK([cp TESTFILES/test9.sara TESTFILES/test9.owfn .])
+AT_CHECK([SARA -i test9.sara -v],0,stdout,stderr)
+AT_CHECK([GREP -q "4 failures, 0 solutions" stdout])
+AT_CHECK([GREP -q "INFEASIBLE: unable to borrow enough tokens via T-invariants" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Realizability])
+############################################################################
+
+AT_SETUP([Backward loop])
+AT_CHECK([cp TESTFILES/test14.sara TESTFILES/test5.owfn .])
+AT_CHECK([SARA -i test14.sara -v],0,stdout,stderr)
+AT_CHECK([GREP -q "SOLUTION: e1 c1 c2 c3 d1 e2 e3 e4 d2 d3 d4 a1 x1 a2 a3 d4 e4 a1 a2 a3" stdout])
+AT_CHECK([GREP -q "SOLUTION: e1 c1 c2 c3 d1 e2 e3 e4 d2 d3 d4 a1 x1 x1 a2 a3 d4 e4 a1 a2 a3" stdout])
+AT_CHECK([GREP -q "INFEASIBLE: the transition multiset is not realizable" stdout])
+AT_CHECK([GREP -q "2 Solutions produced" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Multiple Problems])
+############################################################################
+
+AT_SETUP([Semaphore])
+AT_CHECK([cp TESTFILES/test15.sara TESTFILES/test15.owfn .])
+AT_CHECK([SARA -i test15.sara -v],0,stdout,stderr)
+AT_CHECK([GREP -q "INFEASIBLE: the marking equation is infeasible" stdout])
+AT_CHECK([GREP -q "SOLUTION: e1 e2" stdout])
+AT_CHECK([GREP -q "1 Solution produced" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+AT_SETUP([Decreasing Ring 3])
+AT_CHECK([cp TESTFILES/test11.sara TESTFILES/test11.owfn .])
+AT_CHECK([SARA -i test11.sara -v],0,stdout,stderr)
+AT_CHECK([GREP -q "INFEASIBLE: the marking equation is infeasible" stdout])
+AT_CHECK([GREP -q "SOLUTION: t1 t2 t3" stdout])
+AT_CHECK([GREP -q "2 Solutions produced" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+AT_SETUP([Hay-stack 2, x=5n, y=2, 1<=n<=10])
+AT_CHECK([cp TESTFILES/test7.sara TESTFILES/test7_*.owfn .])
+AT_CHECK([SARA -i test7.sara -v],0,stdout,stderr)
+AT_CHECK([GREP -q "10 Solutions produced" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+AT_SETUP([Garavel])
+AT_CHECK([cp TESTFILES/garavel.llnet.sara TESTFILES/garavel.llnet .])
+AT_CHECK([SARA -i garavel.llnet.sara -v],0,stdout,stderr)
+AT_CHECK([GREP -q "776 Solutions produced" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Error checks])
+############################################################################
+
+AT_SETUP([Missing Problem File])
+AT_CHECK([SARA -i test0.sara -v],1,stdout,stderr)
+AT_CHECK([GREP -q "aborting" stderr])
+AT_CHECK([GREP -q "#01" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Missing Petri Net])
+AT_CHECK([cp TESTFILES/test13.sara .])
+AT_CHECK([SARA -i test13.sara -v],1,stdout,stderr)
+AT_CHECK([GREP -q "aborting" stderr])
+AT_CHECK([GREP -q "#02" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Parser Error])
+AT_CHECK([cp TESTFILES/test3.owfn TESTFILES/test3.sara .])
+AT_CHECK([SARA -r test3.owfn -f"p3:1,p2>1"],1,stdout,stderr)
+AT_CHECK([GREP -q "aborting" stderr])
+AT_CHECK([GREP -q "#04" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Options])
+############################################################################
+
+AT_SETUP([Measuring Time])
+AT_CHECK([cp TESTFILES/test1.sara TESTFILES/test1.owfn .])
+AT_CHECK([SARA -i test1.sara -v -t],0,stdout,stderr)
+AT_CHECK([GREP -q "Time" stdout])
+AT_CHECK([GREP -q "seconds overall" stdout])
+AT_KEYWORDS(options)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Creating Problems])
+############################################################################
+
+AT_SETUP([Quasi-Liveness])
+AT_CHECK([cp TESTFILES/garavel.llnet .])
+AT_CHECK([cp TESTFILES/garavel.llnet.sara ./expout])
+AT_CHECK([SARA -q garavel.llnet],0,stdout,stderr)
+AT_CHECK([DIFF -a -q "garavel.llnet.sara" expout],0,ignore,ignore)
+AT_KEYWORDS(creation)
+AT_CLEANUP
+
+AT_SETUP([Reachability])
+AT_CHECK([cp TESTFILES/test3.owfn TESTFILES/test3.sara .])
+AT_CHECK([SARA -r test3.owfn -O -f"p3:1,p2>1"],0,stdout,stderr)
+AT_CHECK([DIFF -a -q test3.owfn.sara test3.sara],0,ignore,ignore)
+AT_KEYWORDS(creation)
+AT_CLEANUP
+

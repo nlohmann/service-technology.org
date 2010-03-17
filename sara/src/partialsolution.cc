@@ -214,6 +214,7 @@ void PartialSolution::show() {
 	@param im Incidence matrix.
 	@return A map from those places to the number of missing tokens.
 */
+/*
 map<Place*,int> PartialSolution::underFinalMarking(IMatrix& im) {
 	map<Place*,int> change(im.getChange(getRemains()));
 	map<Place*,int> result;
@@ -223,11 +224,13 @@ map<Place*,int> PartialSolution::underFinalMarking(IMatrix& im) {
 		if (pit->second>0) result[pit->first] = pit->second;
 	return result;
 }
+*/
 
 /** For each place for all transitions from the partial firing sequence that effectively produce tokens on this
 	place, the sum of the effects of the transitions is calculated.
 	@return A map from places to positive token effects.
 */
+/*
 map<Place*,int> PartialSolution::produce() {
 	map<Place*,int> prod;
 	for(unsigned int i=0; i<tseq.size(); ++i)
@@ -246,6 +249,7 @@ map<Place*,int> PartialSolution::produce() {
 	}
 	return prod;
 }
+*/
 
 /** Compares the partial solution to a given sequence, marking, and remainder.
 	@param tv A transition vector to compare with the partial firing sequence.

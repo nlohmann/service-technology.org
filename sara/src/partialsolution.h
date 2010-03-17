@@ -108,13 +108,13 @@ public:
 
 	/// prints the partial solution
 	void show();
-
+/*
 	/// calculate on which places the actual marking is less than the final marking and by which amount.
 	map<Place*,int> underFinalMarking(IMatrix& im);
 
 	/// calculates the number of effectively produced tokens for each transition in the partial firing sequence and adds them all up
 	map<Place*,int> produce();
-
+*/
 	/// checks if the partial firing sequence is "better" than a given one (tv)
 	bool betterSequenceThan(vector<Transition*> tv, Marking &m0, map<Transition*,int>& rem);
 

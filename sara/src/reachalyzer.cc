@@ -55,6 +55,7 @@ extern gengetopt_args_info args_info;
 	@param mf The final marking
 	@param verbose The level of verbosity (0-3).
 */
+/* unused
 Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, Problem& pb, bool verbose, int debug, bool out, int brk) 
 	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols+1),im(pn),breakafter(brk) {
 	// inherit verbosity/debug level
@@ -79,6 +80,7 @@ Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, Problem& pb, bo
 	PartialSolution* init(new PartialSolution(m0));
 	tps.push_back(init);
 }
+*/
 
 /** Constructor with a Petri net, an initial and a final marking to test whether
 	the final marking can be covered from the initial marking.

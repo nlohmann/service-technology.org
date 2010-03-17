@@ -43,10 +43,10 @@ public:
 
 	/// Get the column of the incidence matrix regarding a transition t.
 	map<Place*,int>& getColumn(Transition& t);
-
+/*
 	/// Get the postset (with weights) of a transition t
 	map<Place*,int> getPostset(Transition& t);
-
+*/
 	/// Get the preset (with weights) of a transition t
 	map<Place*,int> getPreset(Transition& t);
 
@@ -70,10 +70,10 @@ public:
 
 	/// Check if a transition vector can fire under a marking regarding a certain set of places only.
 	bool checkRestrictedActivation(Marking& m, vector<Transition*>& tv, set<Place*>& restriction);
-
+/*
 	/// Calculates the token change induced by firing a transition vector fv
 	map<Place*,int> getChange(map<Transition*,int>& fv);
-
+*/
 	/// Verbosity level.
 	int verbose;
 

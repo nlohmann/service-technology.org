@@ -187,9 +187,16 @@ AT_KEYWORDS(error)
 AT_CLEANUP
 
 AT_SETUP([Parser Error])
-AT_CHECK([cp TESTFILES/test3.owfn TESTFILES/test3.sara .])
+AT_CHECK([cp TESTFILES/test3.owfn .])
 AT_CHECK([SARA -r test3.owfn -f"p3:1,p2>1"],1,stdout,stderr)
 AT_CHECK([GREP -q "aborting ..04" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Parser Error 2])
+AT_CHECK([cp TESTFILES/test3.owfn .])
+AT_CHECK([SARA -i test3.owfn],1,stdout,stderr)
+AT_CHECK([GREP -q "aborting ..05" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
@@ -227,6 +234,25 @@ AT_CHECK([GREP -q "1 Solution produced" stdout])
 AT_KEYWORDS(options)
 AT_CLEANUP
 
+AT_SETUP([Force Print])
+AT_CHECK([cp TESTFILES/test5.sara TESTFILES/test5.owfn .])
+AT_CHECK([SARA -i test5.sara -v -C -P],0,stdout,stderr)
+AT_CHECK([GREP -q "3 solutions" stdout])
+AT_KEYWORDS(options)
+AT_CLEANUP
+
+AT_SETUP([Missing Options])
+AT_CHECK([SARA],0,stdout,stderr)
+AT_CHECK([GREP -q "Use options" stderr])
+AT_KEYWORDS(options)
+AT_CLEANUP
+
+AT_SETUP([Wrong Options])
+AT_CHECK([SARA --whatisthis],1,stdout,stderr)
+AT_CHECK([GREP -q "unrecognized option" stderr])
+AT_KEYWORDS(options)
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Creating Problems])
 ############################################################################
@@ -251,6 +277,13 @@ AT_CLEANUP
 AT_SETUP([Realizability])
 AT_CHECK([cp TESTFILES/test2.owfn .])
 AT_CHECK([SARA -R test2.owfn -O -f"a1:1,a2:1,b1:2,c1:2,d1:2" -p -v],0,stdout,stderr)
+AT_CHECK([GREP -q "1 Solution produced" stdout])
+AT_KEYWORDS(creation)
+AT_CLEANUP
+
+AT_SETUP([Reachability and Constraints])
+AT_CHECK([cp TESTFILES/test2.owfn .])
+AT_CHECK([SARA -r test2.owfn -O -f"COVER" -c"1o1+1o2>2" -c"i1-i2:0" -p -v],0,stdout,stderr)
 AT_CHECK([GREP -q "1 Solution produced" stdout])
 AT_KEYWORDS(creation)
 AT_CLEANUP

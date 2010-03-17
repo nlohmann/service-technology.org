@@ -131,13 +131,6 @@ bool PathFinder::recurse() {
 	}
 	// if no more transitions can fire:
 	if (recit==rec_tv.end()) {
-		// progress indication
-		if (verbose>0) {
-			if ((++pos)%1000==0) 
-				{ cerr << "sara: PATH: ";
-				for(unsigned int l=0; l<fseq.size(); ++l) cerr << fseq[l]->getName() << " ";
-				cerr << " (" << pos << ")" << endl; }
-		}
 		// add path to pool for complex diamond check (optimization)
 		fpool.push_back(fseq);
 		if (verbose>0) cerr << "sara: FPOOL size: " << fpool.size() << endl;
@@ -440,8 +433,7 @@ set<Transition*> PathFinder::requiredTransitions(Place& p) {
 			pnapi::Arc *a = m0.getPetriNet().findArc(p,*t);
 			// add them to the result list if they produce more than they consume
 			if (a==0) { tset.insert(t); continue; }
-			if (a->getWeight()<(*ait)->getWeight())
-				tset.insert(t);
+			if (a->getWeight()<(*ait)->getWeight()) tset.insert(t);
 		}
 	}	
 	return tset;

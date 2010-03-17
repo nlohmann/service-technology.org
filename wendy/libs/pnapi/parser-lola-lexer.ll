@@ -28,7 +28,7 @@
 #include "parser.h"
 #include "parser-lola.h"
 
-#include <cstring>
+#include <iostream>
 
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line

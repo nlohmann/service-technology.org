@@ -85,7 +85,7 @@ state:
   KW_STATE NUMBER lowlink scc markings_or_transitions
     {
         InnerMarking::markingMap[$2] = new InnerMarking($2, currentLabels, currentSuccessors,
-                                           InnerMarking::net->finalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
+                                           InnerMarking::net->getFinalCondition().isSatisfied(pnapi::Marking(marking, InnerMarking::net)));
 
         if (markingoutput) {
             markingoutput->stream() << $2 << ": ";

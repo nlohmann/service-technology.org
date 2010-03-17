@@ -25,10 +25,13 @@
   ****************************************************************************/
 %{
 
+#include "config.h"
+
+#include "formula.h"
 #include "parser.h"
 #include "parser-owfn.h"
 
-#include <cstring>
+#include <iostream>
 
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line
@@ -145,3 +148,4 @@ NOT                             { return OP_NOT; }
 .                               { yyerror("unexpected lexical token"); }
 
 %%
+

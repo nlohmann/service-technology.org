@@ -12,6 +12,7 @@
 @item added a parameter @option{-r}/@option{--resultFile} to write all analysis results into a single file in the file format of libconfig (see @url{http://www.hyperrealm.com/libconfig})
 
 @item fixed bug #15385 (see @url{https://gna.org/bugs/?15385}): runtime output using the @option{--stats} crashed under certain Linux systems
+@item updated to Petri Net API 4.00 (revision r5519)
 @end itemize
 
 

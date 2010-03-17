@@ -23,14 +23,15 @@
   ****************************************************************************/
 %{
 
-#include <iostream>
-using std::cerr;
-using std::endl;
+#include "config.h"
 
 #include "parser.h"
 #include "parser-sa.h"
 
-#include <cstring>
+#include <iostream>
+
+using std::cerr;
+using std::endl;
 
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line

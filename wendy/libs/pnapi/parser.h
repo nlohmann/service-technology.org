@@ -12,173 +12,42 @@
 #define PNAPI_PARSER_H
 
 #include "config.h"
-#include <cassert>
+
+#include "port.h"
+#include "state.h"
 
 #include <vector>
-#include <stack>
-#include <string>
-#include <istream>
-
-#include "myio.h"
-#include "link.h"
-#include "automaton.h"
-#include "component.h"
-#include "petrinet.h"
-#include "marking.h"
 
 namespace pnapi
 {
+
+// forward declarations
+class Node;
 
 /*!
  * \brief   Generic Parser Framework
  *
  * Provides C++ classes encapsulating flex/bison parsers. Documentation is
  * available under <https://ikaria/trac/mesu/wiki/ParserFramework>.
+ * 
+ * \todo check documentation availability; may move to API documentation
  */
 namespace parser
 {
 
-// forward declaration
-template <typename T> class Visitor;
-
-
 /// input stream for lexers
 extern std::istream * stream;
-
 /// last read lexer token
 extern char * token;
-
 /// line number in input
 extern int line;
-
 /// called by generated lexers/parsers
 void error(const std::string &);
-
-
-/*!
- * \brief   Node of an Abstract Syntax Tree (AST)
- * \param   T An instance (class) of the Node template.
- *
- * Provides tree structures and part of a visitor pattern (class Visitor).
- */
-template <typename T> class BaseNode
-{
-public:
-
-  /// standard constructor
-  BaseNode();
-
-  /// constructor
-  BaseNode(T *);
-
-  /// constructor
-  BaseNode(T *, T *);
-
-  /// constructor
-  BaseNode(T *, T *, T *);
-
-  /// constructor
-  BaseNode(T *, T *, T *, T *);
-
-  /// destructor
-  virtual ~BaseNode();
-
-  /// adds another node as a child of this one
-  T * addChild(T *);
-
-  /// receives a visitor for visiting the subtree rooted at this node
-  void visit(Visitor<T> &) const;
-
-  /// causes an error if condition is false
-  void check(bool, const std::string &, const std::string &) const;
-
-protected:
-
-  /// children of this node
-  std::vector<T *> children_;
-
-private:
-  int line;
-  std::string token;
-  std::string filename;
-};
-
-
-// hiding this from doxygen: \param   T An instance (class) of the BaseNode template.
-/*!
- * \brief   Generic Parser Capsule for flex/bison Parsers
- *
- * \todo    this class (and the visitor class as well) may be broken and deprecated.
- * 
- * All the functionality is provided by traditional C-style lexers and
- * parsers. To work with a parser, call #parse().
- */
-template <typename T> class Parser
-{
-public:
-
-  /// destructor
-  virtual ~Parser();
-
-  /// parses stream contents with the associated parser
-  T & parse(std::istream &);
-
-protected:
-
-  /// constructor to be used in derived classes (framework instances)
-  Parser(T * &, int (*)());
-
-private:
-  T * & parseResult_;
-  int (*yaccParse_)();
-  T * rootNode_;
-};
-
-
-/*!
- * \brief   Simple Visitor Pattern
- * \param   T An instance (class) of the Node template.
- *
- * Implemenation of a very basic visitor pattern. Visitor instances walk
- * along the abstract syntax tree (AST) and collect data to calculate the
- * result (e.g. a PetriNet object).
- */
-template <typename T> class Visitor
-{
-public:
-
-  /*!
-   * \brief   called before traversing the children of a Node
-   *
-   * Implementing only this method would result in a preorder traversal.
-   */
-  virtual void beforeChildren(const T &) =0;
-
-  /*!
-   * \brief   called after traversing the children of a Node
-   *
-   * Implementing only this method would result in a postorder traversal.
-   */
-  virtual void afterChildren(const T &) =0;
-
-  virtual ~Visitor() {};
-};
-
-}
-
 
 
 /*************************************************************************
  ***** OWFN Parser
  *************************************************************************/
-
-// forward declarations
-class PetriNet;
-class Place;
-class Marking;
-
-namespace parser
-{
 
 /*!
  * \brief   OWFN Parser
@@ -190,67 +59,59 @@ namespace owfn
 
 /// flex generated lexer function
 int lex();
-
 /// flex generated lexer cleanup function
 int lex_destroy();
-
 /// bison generated parser function
 int parse();
-
 /// "assertion"
 void check(bool, const std::string &);
 
 /******************************************\
  *  "global" variables for flex and bison *
-      \******************************************/
+\******************************************/
 
 /// generated petrinet
 extern PetriNet pnapi_owfn_yynet;
 
 /// mapping of names to places
-extern std::map<std::string, Place*> places_;
+extern std::map<std::string, Place *> places_;
 /// recently read transition
-extern Transition* transition_;
-/// cache of synchronous labels
-extern std::set<std::string> synchronousLabels_;
+extern Transition * transition_;
 /// all purpose place pointer
-extern Place* place_;
+extern Place * place_;
 /// target of an arc
 extern Node * * target_;
 /// source of an arc
 extern Node * * source_;
 /// converts NUMBER and IDENT in string
 extern std::stringstream nodeName_;
-/// type of recently read places
-extern Node::Type placeType_;
-/// labels for synchronous communication
-extern std::set<std::string> labels_;
+
+/// recent port
+extern Port * port_;
+/// recent interface label
+extern Label * label_;
+/// mapping from names to interface labels
+extern std::map<std::string, Label *> labels_;
+/// type of recent labels
+extern Label::Type labelType_;
+
 /// read capacity
 extern int capacity_;
-/// used port
-extern std::string port_;
 /// constrains
-extern std::map<Transition*, std::set<std::string> > constrains_;
+extern std::map<Transition *, std::set<std::string> > constrains_;
 /// whether read marking is the initial marking or a final marking
 extern bool markInitial_;
 /// pointer to a final marking
-extern Marking* finalMarking_;
+extern Marking * finalMarking_;
+
 /// preset/postset label for parse exception
 extern bool placeSetType_;
 /// precet/postset for fast checks
-extern std::set<Place*> placeSet_;
-/// whether to check labels
-extern bool checkLabels_;
-/// wildcard ALL[_OTHER]_PLACES_EMPTY given
+extern std::set<std::string> placeSet_;
+
+/// wildcard ALL_PLACES_EMPTY given
 extern bool wildcardGiven_;
-/// a Port object
-extern Port * o_port_;
-/// a Label object
-extern Label * label_;
-/// name -> Label
-extern std::map<std::string, Label *> o_labels_;
-/// label type
-extern Label::Type labelType_;
+
 
 /*!
  * \brief   Encapsulation of the flex/bison OWFN parser
@@ -259,18 +120,18 @@ extern Label::Type labelType_;
  */
 class Parser
 {
-public:
+public: /* public methods */
+  /// constructor
   Parser();
-  /// used to call clean() automaticly
+  /// destructor
   ~Parser();
-
   /// cleans global net
   void clean();
-
   /// parses stream contents with the associated parser
   const PetriNet & parse(std::istream &);
 };
-}
+
+} /* namespace owfn */
 
 
 
@@ -280,90 +141,118 @@ public:
 
 
 /*!
- * \brief   OWFN Parser
+ * \brief   PNML Parser
  *
- * Instantiation of the parser framework for parsing OWFN files.
+ * Instantiation of the parser framework for parsing PNML files.
  */
 namespace pnml
 {
 
 /// flex generated lexer function
 int lex();
-
 /// flex generated lexer cleanup function
 int lex_destroy();
-
 /// bison generated parser function
 int parse();
-
 /// "assertion"
 void check(bool, const std::string &);
 
+
+/*!
+ * \brief type of read element
+ */
+enum elementTypes
+{
+  T_PNML,
+  T_NET,
+  T_ARC,
+  T_PLACE,
+  T_TRANSITION,
+  T_INSCRIPTION,
+  T_INITIALMARKING,
+  T_ANNOTATION,
+  T_TEXT,
+  T_MODULE,
+  T_PORTS,
+  T_PORT,
+  T_INPUT,
+  T_OUTPUT,
+  T_SYNCHRONOUS,
+  T_RECEIVE,
+  T_SEND,
+  T_SYNCHRONIZE,
+  T_FINALMARKINGS,
+  T_MARKING,
+  T_PAGE,
+  T_NAME,
+  T_NONE
+};
+
+
+/// whether we care about a given element
+bool is_whitelisted(char *);
+/// opens an element
+void open_element(char *);
+/// ???
+std::string sanitize(char *);
+/// close an element
+void close_element();
+/// store attributes
+void store_attributes(char *, char *);
+/// store data
+void store_data(char *);
+
+
 /******************************************\
  *  "global" variables for flex and bison *
-      \******************************************/
+\******************************************/
 
 /// generated petrinet
 extern PetriNet pnapi_pnml_yynet;
-/*
-/// mapping of names to places
-extern std::map<std::string, Place*> places_;
-/// recently read transition
-extern Transition* transition_;
-/// cache of synchronous labels
-extern std::set<std::string> synchronousLabels_;
-/// all purpose place pointer
-extern Place* place_;
-/// target of an arc
-extern Node * * target_;
-/// source of an arc
-extern Node * * source_;
-/// converts NUMBER and IDENT in string
-extern std::stringstream nodeName_;
-/// type of recently read places
-extern Node::Type placeType_;
-/// labels for synchronous communication
-extern std::set<std::string> labels_;
-/// read capacity
-extern int capacity_;
-/// used port
-extern std::string port_;
-/// constrains
-extern std::map<Transition*, std::set<std::string> > constrains_;
-/// whether read marking is the initial marking or a final marking
-extern bool markInitial_;
-/// pointer to a final marking
-extern Marking* finalMarking_;
-/// preset/postset label for parse exception
-extern bool placeSetType_;
-/// precet/postset for fast checks
-extern std::set<Place*> placeSet_;
-/// whether to check labels
-extern bool checkLabels_;
-/// wildcard ALL[_OTHER]_PLACES_EMPTY given
-extern bool wildcardGiven_;
-*/
+
+/// a mapping to store the attributes, accessible by the parse depth
+extern std::map<unsigned int, std::map<std::string, std::string> > pnml_attributes;
+/// a mapping to store created Petri net nodes, accessible by the "id"
+extern std::map<std::string, Node *> pnml_id2node;
+/// a mapping to store created interface labels accessible by the "id"
+extern std::map<std::string, Label *> pnml_id2label;
+/// a mapping to store created Petri net names, accessible by the "id"
+extern std::map<std::string, std::string> pnml_id2name;
+// we only care about these elements
+extern const char * whitelist[];
+// a marking we build during parsing
+extern pnapi::Marking * currentMarking;
+/// depth in XML structure
+extern unsigned int current_depth;
+/// ???
+extern unsigned int last_interesting_depth;
+/// whether to ignore something ???
+extern bool ignoring;
+/// ???
+extern unsigned int file_part;
+/// stack of elements
+extern std::vector<unsigned int> elementStack;
+
+
 /*!
- * \brief   Encapsulation of the flex/bison OWFN parser
+ * \brief   Encapsulation of the flex/bison PNML parser
  *
  * Connects to the flex/bison implementation for parsing.
  */
 class Parser
 {
-public:
+public: /* public methods */
+  /// constructor
   Parser();
-  /// used to call clean() automaticly
+  /// destructor
   ~Parser();
-
   /// cleans global net
   void clean();
-
   /// parses stream contents with the associated parser
   const PetriNet & parse(std::istream &);
 };
-}
 
-
+} /* namespace pnml */
 
 
 /*************************************************************************
@@ -380,29 +269,26 @@ namespace lola
 
 /// flex generated lexer function
 int lex();
-
 /// flex generated lexer cleanup function
 int lex_destroy();
-
 /// bison generated parser function
 int parse();
-
 /// "assertion"
 void check(bool, const std::string &);
 
 /******************************************\
  *  "global" variables for flex and bison *
-      \******************************************/
+\******************************************/
 
 /// generated petrinet
 extern PetriNet pnapi_lola_yynet;
 
 /// mapping of names to places
-extern std::map<std::string, Place*> places_;
+extern std::map<std::string, Place *> places_;
 /// recently read transition
-extern Transition* transition_;
+extern Transition * transition_;
 /// all purpose place pointer
-extern Place* place_;
+extern Place * place_;
 /// target of an arc
 extern Node * * target_;
 /// source of an arc
@@ -411,164 +297,27 @@ extern Node * * source_;
 extern std::stringstream nodeName_;
 /// read capacity
 extern int capacity_;
-/// whether reading preset or postset places
-extern bool placeSetType_;
 
 
 /*!
- * \brief   Encapsulation of the flex/bison OWFN parser
+ * \brief   Encapsulation of the flex/bison LOLA parser
  *
  * Connects to the flex/bison implementation for parsing.
  */
 class Parser
 {
-public:
+public: /* public methods */
+  /// constructor
   Parser();
-  /// used to call clean() automaticly
+  /// destructor
   ~Parser();
-
   /// cleans global net
   void clean();
-
   /// parses stream contents with the associated parser
   const PetriNet & parse(std::istream &);
 };
-}
 
-
-
-/*************************************************************************
- ***** ONWD Parser
- *************************************************************************/
-
-/*!
- * \brief   ONWD Parser
- *
- * Instantiation of the parser framework for parsing ONWD files.
- */
-namespace onwd
-{
-
-// forward declarations
-class Node;
-class Visitor;
-
-
-/// BaseNode instantiation
-typedef BaseNode<Node> BaseNode;
-
-
-/// output node of parser
-extern Node * node;
-
-/// flex generated lexer function
-int lex();
-
-/// bison generated parser function
-int parse();
-
-
-/*!
- * \brief   Encapsulation of the flex/bison ONWD parser
- *
- * Connects to the flex/bison implementation for parsing (parse()) and
- * result retrieval (visit()). Call the two functions in this order.
- */
-class Parser : public parser::Parser<Node>
-{
-public:
-  Parser();
-};
-
-
-/*!
- * \brief   Node types
- */
-enum Type
-{
-  STRUCT, DATA, //< for simple structuring resp. data nodes
-  INSTANCES, INSTANCE, ANY_WIRING, ALL_WIRING, PLACE
-};
-
-
-/*!
- * \brief   Node of an ONWD AST
- *
- * Each Node has a Type which is the first parameter in a variety of
- * constructors. Furthermore other data collected during the parsing
- * process may be stored. Node
- * parameters in a constructor result in the nodes being added as
- * children.
- */
-class Node : public BaseNode
-{
-public:
-
-  const Type type;
-  const std::string string1;
-  const std::string string2;
-  const int number;
-
-  Node();
-  Node(Node *);
-  Node(Node *, Node *);
-  Node(Node *, Node *, Node *);
-
-  Node(Type, std::string *, int);
-  Node(Type, std::string *, std::string *);
-  Node(Type, std::string *, std::string *, int);
-
-  Node(Type);
-  Node(Type, Node *);
-  Node(Type, Node *, Node *);
-
-  void mergeData(Node *);
-  void mergeChildren(Node *);
-};
-
-
-/*!
- * \brief   Visitor for ONWD AST nodes
- *
- * Constructs a set of PetriNets during traversal via
- * Parser::visit().
- */
-class Visitor : public parser::Visitor<Node>
-{
-public:
-  Visitor(std::map<std::string, PetriNet *> &);
-
-  void beforeChildren(const Node &);
-  void afterChildren(const Node &);
-
-  std::map<std::string, std::vector<PetriNet> > & instances();
-  const std::map<Place *, LinkNode *> & wiring();
-
-private:
-  struct PlaceDescription
-  {
-    std::string netName;
-    PetriNet * instance;
-    std::string placeName;
-
-    PlaceDescription(const std::string & net, PetriNet & inst,
-        const std::string & place) :
-          netName(net), instance(&inst), placeName(place) {}
-  };
-
-  std::map<std::string, PetriNet *> & nets_;
-  std::map<std::string, std::vector<PetriNet> > instances_;
-  std::deque<std::vector<PlaceDescription> > places_;
-  std::map<Place *, LinkNode *> wiring_;
-
-  std::pair<Place *, bool> getPlace(const Node &, PlaceDescription &,
-      Place::Type);
-  LinkNode * getLinkNode(Place &, LinkNode::Mode, bool);
-  LinkNode::Mode getLinkNodeMode(Type);
-};
-
-} /* namespace onwd */
-
+} /* namespace lola */
 
 
 /*************************************************************************
@@ -577,55 +326,61 @@ private:
 
 namespace sa
 {
+
 // flex lexer
 int lex();
-
 /// flex generated lexer cleanup function
 int lex_destroy();
-
 // bison parser
 int parse();
 
-using namespace pnapi;
-
+/// generated automaton
 extern Automaton pnapi_sa_yyautomaton;
-extern PetriNet pnapi_sa_yynet;
-
+/// temporary list of idents
 extern std::vector<std::string> identlist;
+/// input labels
 extern std::set<std::string> input_;
+/// output labels
 extern std::set<std::string> output_;
+/// synchronous labels
 extern std::set<std::string> synchronous_;
 
-extern State *state_;
-extern bool final_;
-extern bool initial_;
-extern std::vector<unsigned int> succState_;
-extern std::vector<std::string> succLabel_;
-extern std::vector<Automaton::Type> succType_;
-extern std::map<Transition *, std::set<std::string> > synchlabel;
-
-extern State *edgeState_;
-extern std::string edgeLabel_;
-extern Automaton::Type edgeType_;
-
+/// temporary state pointer
+extern State * state_;
+/// states by name
 extern std::map<int, State *> states_;
+/// whether recent state is final
+extern bool final_;
+/// whether recent state is initial
+extern bool initial_;
+/// successors of recent state
+extern std::vector<unsigned int> succState_;
+/// labels of arcs to the successors of recent state
+extern std::vector<std::string> succLabel_;
+/// types of arcs to the successors of recent state
+extern std::vector<Edge::Type> succType_;
+/// label of recent edge
+extern std::string edgeLabel_;
+/// type of recent edge
+extern Edge::Type edgeType_;
 
-extern bool sa2sm;
 
-extern std::map<std::string, Place *> label2places_;
-extern std::map<int, Place *> places_;
-extern Place *place_;
-extern Place *edgePlace_;
-
-extern std::vector<Place *> finalPlaces_;
-
+/*!
+ * \brief   Encapsulation of the flex/bison SA parser
+ *
+ * Connects to the flex/bison implementation for parsing.
+ */
 class Parser
 {
-public:
+public: /* public methods */
+  /// constructor
   Parser();
-
+  /// destructor
+  ~Parser();
+  /// parses stream contents with the associated parser
   const Automaton & parse(std::istream &);
-  const PetriNet & parseSA2SM(std::istream &);
+  /// cleans global variables
+  void clean();
 };
 
 } /* namespace sa */
@@ -635,230 +390,61 @@ public:
  ***** Petrify Parser
  *************************************************************************/
 
+/*!
+ * \brief   Encapsulation of the flex/bison PN parser
+ *
+ * Connects to the flex/bison implementation for parsing.
+ * Parsing Genet/Petrify/etc. output.
+ */
 namespace pn
 {
+
 // flex lexer
 int lex();
-
 /// flex generated lexer cleanup function
 int lex_destroy();
-
 // bison parser
 int parse();
 
+/// set of transition names
 extern std::set<std::string> transitions_;
+/// set of place names
 extern std::set<std::string> places_;
+/// initial marking
 extern std::map<std::string, unsigned int> initialMarked_;
+/// interface labels
 extern std::set<std::string> interface_;
+/// parsed arcs
 extern std::map<std::string, std::map<std::string, unsigned int> > arcs_;
+/// temporary node mapping to parse arcs
 extern std::map<std::string, unsigned int> tempNodeMap_;
+/// whether parser is in a marking list
 extern bool in_marking_list;
+/// whether parser is in an arc list
 extern bool in_arc_list;
 
 /*!
- * \brief   Encapsulation of the flex/bison petrify parser
+ * \brief   Encapsulation of the flex/bison PN parser
  *
  * Connects to the flex/bison implementation for parsing.
  */
 class Parser
 {
-public:
+public: /* public methods */
+  /// constructor
   Parser();
-  /// used to call clean() automaticly
+  /// destructor
   ~Parser();
-
   /// parses stream contents with the associated parser
   void parse(std::istream &);
   /// cleans global variables
   void clean();
 };
+
 } /* namespace pn */
 
+} /* namespace parser */
 
-/*************************************************************************
- ***** Template Implementation
- *************************************************************************/
+} /* namespace pnapi */
 
-
-/*!
- */
-template <typename T>
-BaseNode<T>::BaseNode() :
-  line(parser::line), token(parser::token),
-  filename(io::util::MetaData::data(*parser::stream)[io::INPUTFILE])
-  {
-  }
-
-/*!
- */
-template <typename T>
-BaseNode<T>::BaseNode(T * node) :
-  line(parser::line), token(parser::token),
-  filename(io::util::MetaData::data(*parser::stream)[io::INPUTFILE])
-  {
-  assert(node != NULL);
-  addChild(node);
-  }
-
-/*!
- */
- template <typename T>
- BaseNode<T>::BaseNode(T * node1, T * node2) :
-   line(parser::line), token(parser::token),
-   filename(io::util::MetaData::data(*parser::stream)[io::INPUTFILE])
-   {
-   assert(node1 != NULL);
-   assert(node2 != NULL);
-   addChild(node1);
-   addChild(node2);
-   }
-
- /*!
-  */
-  template <typename T>
-  BaseNode<T>::BaseNode(T * node1, T * node2, T * node3) :
-    line(parser::line), token(parser::token),
-    filename(io::util::MetaData::data(*parser::stream)[io::INPUTFILE])
-    {
-    assert(node1 != NULL);
-    assert(node2 != NULL);
-    assert(node3 != NULL);
-    addChild(node1);
-    addChild(node2);
-    addChild(node3);
-    }
-
-  /*!
-   */
-  template <typename T>
-  BaseNode<T>::BaseNode(T * node1, T * node2, T * node3, T * node4) :
-    line(parser::line), token(parser::token),
-    filename(io::util::MetaData::data(*parser::stream)[io::INPUTFILE])
-    {
-    assert(node1 != NULL);
-    assert(node2 != NULL);
-    assert(node3 != NULL);
-    assert(node4 != NULL);
-    addChild(node1);
-    addChild(node2);
-    addChild(node3);
-    addChild(node4);
-    }
-
-  /*!
-   * Recursively destroys all children.
-   */
-  template <typename T> BaseNode<T>::~BaseNode()
-  {
-    for (typename std::vector<T *>::const_iterator it =
-      children_.begin(); it != children_.end(); ++it)
-      delete *it;
-  }
-
-  /*!
-   * \brief   adds another node as a child of this one
-   * \param   node  the child reference to be added
-   *
-   * Should be used to recursively construct the AST during parsing (in the
-   * C style bison parser).
-   */
-  template <typename T> T * BaseNode<T>::addChild(T * node)
-  {
-    children_.push_back(node);
-    return static_cast<T *>(this);
-  }
-
-  /*!
-   * \brief   receives a visitor for visiting the subtree rooted at this node
-   * \param   visitor  the visitor
-   *
-   * First calls Visitor::beforeChildren(), then visits all children and at
-   * last calls Visitor::afterChildren().
-   */
-  template <typename T> void BaseNode<T>::visit(Visitor<T> & visitor) const
-  {
-    visitor.beforeChildren(*static_cast<const T *>(this));
-    for (typename std::vector<T *>::const_iterator it =
-      children_.begin(); it != children_.end(); ++it)
-      (*it)->visit(visitor);
-    visitor.afterChildren(*static_cast<const T *>(this));
-  }
-
-  /*!
-   */
-  template <typename T>
-  void BaseNode<T>::check(bool condition, const std::string & token,
-      const std::string & msg) const
-      {
-    if (!condition)
-      throw io::InputError(io::InputError::SEMANTIC_ERROR, filename, line,
-          token, msg);
-      }
-
-  /*!
-   * \brief   destructor
-   *
-   * Destroys AST if available.
-   */
-  template <typename T> Parser<T>::~Parser()
-  {
-    delete rootNode_;
-  }
-
-  /*!
-   * \brief   constructor to be used in derived classes (framework instances)
-   * \param   parseResult a reference to a pointer variable that will contain
-   *                      the resulting AST after parsing
-   * \param   yaccParse   pointer to the parse() function of the bison parser
-   *
-   * Connects to the flex/bison parser. This constructor should be called
-   * from within the initialization section of specialized parser classes
-   * (see owfn::Parser::Parser() for an example).
-   */
-  template <typename T>
-  Parser<T>::Parser(T * & parseResult,
-      int (*yaccParse)()) :
-        parseResult_(parseResult),
-        yaccParse_(yaccParse),
-        rootNode_(NULL)
-        {
-        }
-
-  /*!
-   * \brief   parses stream contents with the associated parser
-   * \param   is  an input stream
-   * \return the current parser instance
-   *
-   * The resulting AST can be traversed using the visit() function.
-   */
-  template <typename T> T & Parser<T>::parse(std::istream & is)
-  {
-    // possibly clean up old AST
-    delete rootNode_;
-
-    // assign lexer input stream
-    stream = &is;
-
-    // reset line counter
-    line = 1;
-
-    // call the parser
-    if ((*yaccParse_)() != 0)
-      assert(false); // we should never end up here because the first error
-    // already results in an exception (maybe change this
-    // behavior in the future)
-
-    // copy result pointer
-    rootNode_ = parseResult_;
-
-    // cleanup and return
-    stream = NULL;
-    parseResult_ = NULL;
-    return *rootNode_;
-  }
-
-}
-
-}
-
-#endif
+#endif /* PNAPI_PARSER_H */

@@ -17,226 +17,425 @@
  * \version $Revision:$
  */
 
+#include "config.h"
+
 #include "port.h"
+#include "petrinet.h"
+#include "util.h"
 
 using std::string;
-using std::vector;
+using std::set;
 
 namespace pnapi
 {
 
-  /*!
-   * \class Port
-   */
+/*** port class ***/
 
-  Port::Port()
-  {
-  }
+/*!
+ * \brief constructor
+ */
+Port::Port(PetriNet & net, const std::string & name) :
+  net_(net), name_(name)
+{
+}
 
-  Port::Port(const Port &port) :
-    input_(port.input_.size()), output_(port.output_.size()), synchronous_(
-        port.synchronous_.size())
+/*!
+ * \brief compose constructor
+ */
+Port::Port(PetriNet & net, const Port & port1, const Port & port2,
+           std::map<Label *, Label *> & label2label, std::map<Label *, Place *> & label2place,
+           std::set<Label *> & commonLabels) :
+  net_(net), name_(port1.name_)
+{
+  // copy port1's input labels or compose them
+  PNAPI_FOREACH(l1, port1.input_)
   {
-    for (int i = 0; i < (int) port.input_.size(); ++i)
-      input_[i] = new Label(*port.input_[i]);
-    for (int i = 0; i < (int) port.output_.size(); ++i)
-      output_[i] = new Label(*port.output_[i]);
-    for (int i = 0; i < (int) port.synchronous_.size(); ++i)
-      synchronous_[i] = new Label(*port.synchronous_[i]);
-  }
-
-  Port::~Port()
-  {
-    for (int i = 0; i < (int) input_.size(); ++i)
-      delete input_[i];
-    for (int i = 0; i < (int) output_.size(); ++i)
-      delete output_[i];
-    for (int i = 0; i < (int) synchronous_.size(); ++i)
-      delete synchronous_[i];
-    input_.clear();
-    output_.clear();
-    synchronous_.clear();
-  }
-
-  Label & Port::addLabel(Label &label)
-  {
-    switch (label.type())
+    Label * l2 = port2.findLabel((*l1)->getName());
+    if((l2 == NULL) || (l2->getType() != Label::OUTPUT)) // no matching label
     {
-    case Label::INPUT:
-      input_.push_back(&label);
-      break;
-    case Label::OUTPUT:
-      output_.push_back(&label);
-      break;
-    case Label::SYNCHRONOUS:
-      synchronous_.push_back(&label);
-      break;
-    default:
-      break;
+      // copy label
+      Label * l = new Label(net_, *this, (*l1)->getName(), Label::INPUT);
+      input_.insert(l);
+      allLabels_.insert(l);
+      label2label[*l1] = l;
     }
-
-    return label;
-  }
-
-  Label & Port::addInputLabel(const string &label)
-  {
-    // TODO: maybe check whether label is already in this port
-    Label *l = new Label(label, Label::INPUT);
-    input_.push_back(l);
-    return *l;
-  }
-
-  Label & Port::addOutputLabel(const std::string &label)
-  {
-    // TODO: maybe check whether label is already in this port
-    Label *l = new Label(label, Label::OUTPUT);
-    output_.push_back(l);
-    return *l;
-  }
-
-  Label & Port::addSynchronousLabel(const std::string &label)
-  {
-    // TODO: maybe check whether label is already in this port
-    Label *l = new Label(label, Label::SYNCHRONOUS);
-    synchronous_.push_back(l);
-    return *l;
-  }
-
-  const std::vector<Label *> Port::inputLabels() const
-  {
-    return input_;
-  }
-
-  const std::vector<Label *> Port::outputLabels() const
-  {
-    return output_;
-  }
-
-  const std::vector<Label *> Port::synchronousLabels() const
-  {
-    return synchronous_;
-  }
-
-  /*!
-   * \brief returning the port's interface string (oWFN)
-   *
-   * \return result string as described below
-   *
-   *   INPUT <comma-separated-list>;
-   *
-   *   OUTPUT <comma-separated-list>;
-   *
-   *   SYNCHRONOUS <comma-separated-list>;
-   *
-   * \note This method does _neither_ include the keyword PORT
-   *       _nor_ the port's name!
-   */
-  const std::string Port::portString() const
-  {
-    string in = inputLabelString();
-    string out = outputLabelString();
-    string synch = synchronousLabelString();
-    string result;
-    result += in.empty() ? "" : "  INPUT " + in + ";\n";
-    result += out.empty() ? "" : "  OUTPUT " + out + ";\n";
-    result += synch.empty() ? "" : "  SYNCHRONOUS " + synch + ";\n";
-    return result;
-  }
-
-  const std::string Port::inputLabelString() const
-  {
-    string result;
-    for (int i = 0; i < (int) input_.size(); ++i)
-      result += i == 0 ? input_[i]->label() : (", " + input_[i]->label());
-    return result;
-  }
-
-  const std::string Port::outputLabelString() const
-  {
-    string result;
-    for (int i = 0; i < (int) input_.size(); ++i)
-      result += i == 0 ? input_[i]->label() : (", " + input_[i]->label());
-    return result;
-  }
-
-  const std::string Port::synchronousLabelString() const
-  {
-    string result;
-    for (int i = 0; i < (int) input_.size(); ++i)
-      result += i == 0 ? input_[i]->label() : (", " + input_[i]->label());
-    return result;
-  }
-
-  bool Port::isEmpty() const
-  {
-    return (input_.empty() && output_.empty() && synchronous_.empty());
-  }
-
-  Label * Port::findLabel(const string &label) const
-  {
-    for (int i = 0; i < (int) input_.size(); ++i)
-      if (input_[i]->label() == label)
-        return input_[i];
-    for (int i = 0; i < (int) output_.size(); ++i)
-      if (output_[i]->label() == label)
-        return output_[i];
-    for (int i = 0; i < (int) synchronous_.size(); ++i)
-      if (input_[i]->label() == label)
-        return synchronous_[i];
-    return NULL;
-  }
-
-  Label::Label(const std::string &id, Type type) :
-    id_(id), type_(type)
-  {
-  }
-
-  Label::Label(const Label &label) :
-    id_(label.id_), type_(label.type_)
-  {
-  }
-
-  Label::~Label()
-  {
-  }
-
-  const std::string Label::label() const
-  {
-    return id_;
-  }
-
-  Label::Type Label::type() const
-  {
-    return type_;
-  }
-
-  const std::string Label::typedString() const
-  {
-    switch (type_)
+    else
     {
-    case INPUT:
-      return "?" + id_;
-    case OUTPUT:
-      return "!" + id_;
-    case SYNCHRONOUS:
-      return "#" + id_;
+      // labels will be replaced by place
+      Place * p = &(net_.createPlace(l2->getName()));
+      label2place[*l1] = p;
+      label2place[l2] = p;
     }
   }
-
-  void Label::addTransition(Transition *t)
+  
+  // copy port1's output labels or compose them
+  PNAPI_FOREACH(l1, port1.output_)
   {
-    transitions_.push_back(t);
+    Label * l2 = port2.findLabel((*l1)->getName());
+    if((l2 == NULL) || (l2->getType() != Label::INPUT)) // no matching label
+    {
+      // copy label
+      Label * l = new Label(net_, *this, (*l1)->getName(), Label::OUTPUT);
+      input_.insert(l);
+      allLabels_.insert(l);
+      label2label[*l1] = l;
+    }
+    else
+    {
+      // labels will be replaced by place
+      Place * p = &(net_.createPlace(l2->getName()));
+      label2place[*l1] = p;
+      label2place[l2] = p;
+    }
   }
-
-  void Label::removeTransition(const Transition *t)
+  
+  // copy port2's input labels or compose them
+  PNAPI_FOREACH(l1, port2.input_)
   {
-    for (int i = 0; i < (int) transitions_.size(); ++i)
-      if (transitions_[i] == t)
-      {
-        transitions_[i] = transitions_[transitions_.size() - 1];
-        transitions_.pop_back();
-        break;
-      }
+    Label * l2 = port1.findLabel((*l1)->getName());
+    if((l2 == NULL) || (l2->getType() != Label::OUTPUT)) // no matching label
+    {
+      // copy label
+      Label * l = new Label(net_, *this, (*l1)->getName(), Label::INPUT);
+      input_.insert(l);
+      allLabels_.insert(l);
+      label2label[*l1] = l;
+    }
+    // else already copied above
   }
+  
+  // copy port2's output labels or compose them
+  PNAPI_FOREACH(l1, port2.output_)
+  {
+    Label * l2 = port1.findLabel((*l1)->getName());
+    if((l2 == NULL) || (l2->getType() != Label::INPUT)) // no matching label
+    {
+      // copy label
+      Label * l = new Label(net_, *this, (*l1)->getName(), Label::OUTPUT);
+      input_.insert(l);
+      allLabels_.insert(l);
+      label2label[*l1] = l;
+    }
+    // else already copied above
+  }
+  
+  // check synchronous labels
+  PNAPI_FOREACH(l1, port1.synchronous_)
+  {
+    Label * l2 = port2.findLabel((*l1)->getName());
+    if((l2 == NULL) || (l2->getType() != Label::SYNCHRONOUS)) // no matching label
+    {
+      // copy label
+      Label * l = new Label(net_, *this, (*l1)->getName(), Label::SYNCHRONOUS);
+      input_.insert(l);
+      allLabels_.insert(l);
+      label2label[*l1] = l;
+    }
+    else
+    {
+      commonLabels.insert(*l1);
+      commonLabels.insert(l2);
+    }
+  }
+  PNAPI_FOREACH(l1, port2.synchronous_)
+  {
+    Label * l2 = port1.findLabel((*l1)->getName());
+    if((l2 == NULL) || (l2->getType() != Label::SYNCHRONOUS)) // no matching label
+    {
+      // copy label
+      Label * l = new Label(net_, *this, (*l1)->getName(), Label::SYNCHRONOUS);
+      input_.insert(l);
+      allLabels_.insert(l);
+      label2label[*l1] = l;
+    }
+    // else already done
+  }
+}
+
+/*!
+ * \brief destructor
+ */
+Port::~Port()
+{
+  PNAPI_FOREACH(l, allLabels_)
+  {
+    delete (*l);
+  }
+}
+
+/*!
+ * \brief adding a label
+ */
+Label & Port::addLabel(Label & label)
+{
+  switch (label.getType())
+  {
+  case Label::INPUT:
+    input_.insert(&label);
+    break;
+  case Label::OUTPUT:
+    output_.insert(&label);
+    break;
+  case Label::SYNCHRONOUS:
+    synchronous_.insert(&label);
+    break;
+  default: /* do nothing */ ;
+  }
+  
+  allLabels_.insert(&label);
+
+  return label;
+}
+
+/*!
+ * \brief adding a label with a given type
+ */
+Label & Port::addLabel(const std::string & label, Label::Type type)
+{
+  Label * l = new Label(net_, *this, label, type);
+  return addLabel(*l);
+}
+
+/*!
+ * \brief adding an input label
+ */
+Label & Port::addInputLabel(const std::string & label)
+{
+  Label * l = new Label(net_, *this, label, Label::INPUT);
+  input_.insert(l);
+  allLabels_.insert(l);
+  return *l;
+}
+
+/*!
+ * \brief adding an output label
+ */
+Label & Port::addOutputLabel(const std::string & label)
+{
+  Label * l = new Label(net_, *this, label, Label::OUTPUT);
+  output_.insert(l);
+  allLabels_.insert(l);
+  return *l;
+}
+
+/*!
+ * \brief adding a synchronous label
+ */
+Label & Port::addSynchronousLabel(const std::string & label)
+{
+  Label * l = new Label(net_, *this, label, Label::SYNCHRONOUS);
+  synchronous_.insert(l);
+  allLabels_.insert(l);
+  return *l;
+}
+
+/*!
+ * \brief deleting a label
+ */
+void Port::removeLabel(const std::string & label)
+{
+  Label * l = findLabel(label);
+  if(l != NULL)
+  {
+    allLabels_.erase(l);
+    switch(l->getType())
+    {
+    case Label::INPUT: input_.erase(l); break;
+    case Label::OUTPUT: output_.erase(l); break;
+    case Label::SYNCHRONOUS: synchronous_.erase(l); break;
+    default: assert(false);
+    }
+    
+    delete l;
+  }
+}
+
+/*!
+ * \brief swaps input and output labels
+ */
+void Port::mirror()
+{
+  set<Label *> tmp = input_;
+  input_ = output_;
+  output_ = input_;
+  
+  PNAPI_FOREACH(label, input_)
+  {
+    (*label)->mirror();
+  }
+  
+  PNAPI_FOREACH(label, output_)
+  {
+    (*label)->mirror();
+  }
+}
+
+/*!
+ * \brief return the name of the port
+ */
+const std::string & Port::getName() const
+{
+  return name_;
+}
+
+/*!
+ * \brief returning the set of input labels
+ */
+const std::set<Label *> & Port::getInputLabels() const
+{
+  return input_;
+}
+
+/*!
+ * \brief returning the set of output labels
+ */
+const std::set<Label *> & Port::getOutputLabels() const
+{
+  return output_;
+}
+
+/*!
+ * \brief returning the set of synchronous labels
+ */
+const std::set<Label *> & Port::getSynchronousLabels() const
+{
+  return synchronous_;
+}
+
+/*!
+ * \brief returning the set of all labels
+ */
+const std::set<Label *> & Port::getAllLabels() const
+{
+  return allLabels_;
+}
+
+/*!
+ * \brief get the underlying petri net
+ */
+PetriNet & Port::getPetriNet() const
+{
+  return net_;
+}
+
+/*!
+ * \brief checks whether the port is empty
+ */
+bool Port::isEmpty() const
+{
+  return allLabels_.empty();
+}
+
+/*!
+ * \brief seach for a certain label
+ */
+Label * Port::findLabel(const std::string & label) const
+{
+  PNAPI_FOREACH(l, allLabels_)
+  {
+    if(((*l)->getName()) == label)
+    {
+      return *l;
+    }
+  }
+  
+  return NULL;
+}
+
+
+/*** label class ***/
+
+
+/*!
+ * \brief constructor
+ */
+Label::Label(PetriNet & net, Port & port, const std::string & name, Type type) :
+  net_(net), port_(port), name_(name), type_(type)
+{
+}
+
+
+/*!
+ * \brief destructor
+ */
+Label::~Label()
+{
+  PNAPI_FOREACH(t, transitions_)
+  {
+    (*t)->removeLabel(*this);    
+  }
+}
+
+/*!
+ * \brief swaps input and output labels
+ * 
+ * \note only mirror input or output labels
+ */
+void Label::mirror()
+{
+  switch(type_)
+  {
+  case INPUT: type_ = OUTPUT; break;
+  case OUTPUT: type_ = INPUT; break;
+  default: assert(false); // should not happen
+  }
+}
+
+/*!
+ * \brief returning the label's name
+ */
+const std::string & Label::getName() const
+{
+  return name_;
+}
+
+/*!
+ * \brief returing the label's type
+ */
+Label::Type Label::getType() const
+{
+  return type_;
+}
+
+/*!
+ * \brief get set of connected transitions
+ */
+const std::set<Transition *> & Label::getTransitions() const
+{
+  return transitions_;
+}
+
+/*!
+ * \brief get the underlying petri net
+ */
+PetriNet & Label::getPetriNet() const
+{
+  return net_;
+}
+
+/*!
+ * \brief get the assigned port
+ */
+Port & Label::getPort() const
+{
+  return port_;
+}
+
+
+/*!
+ * \brief adding a transition to the attached transitions
+ */
+void Label::addTransition(Transition & t)
+{
+  transitions_.insert(&t);
+}
+
+/*!
+ * \brief removing a transition from the attached transitions
+ */
+void Label::removeTransition(const Transition & t)
+{
+  transitions_.erase(const_cast<Transition *>(&t));
+}
 
 } /* namespace pnapi */

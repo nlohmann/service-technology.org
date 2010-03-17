@@ -47,22 +47,14 @@
  ****************************************************************************/
 %{
 
+#include "config.h"
+
 #include "parser.h"
-#include <string>
-#include <sstream>
-#include <iostream>
-#include <set>
-#include <map>
-#include <cstdlib>
 
-#undef yylex
-#undef yyparse
-#undef yyerror
-
-#define yyerror pnapi::parser::error
-#define yylex pnapi::parser::pn::lex
+#define pnapi_pn_yyerror pnapi::parser::error
+#define pnapi_pn_yylex pnapi::parser::pn::lex
 #define yylex_destroy pnapi::parser::pn::lex_destroy
-#define yyparse pnapi::parser::pn::parse
+#define pnapi_pn_yyparse pnapi::parser::pn::parse
 
 using namespace pnapi::parser::pn;
 
@@ -158,7 +150,8 @@ tp_list:
 pt_list:
   /* empty */
 | pt_list PLACENAME transition_list newline
-  { arcs_[$2] = tempNodeMap_;
+  {
+    arcs_[$2] = tempNodeMap_;
     tempNodeMap_.clear();
     free($2);
   }
@@ -168,3 +161,4 @@ newline:
   NEWLINE
 | NEWLINE NEWLINE
 ;
+

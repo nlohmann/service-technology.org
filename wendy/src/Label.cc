@@ -65,14 +65,14 @@ std::map<string, Label_ID> Label::name2id;
  */
 void Label::initialize() {
     // ASYNCHRONOUS RECEIVE EVENTS (?-step for us)
-    const set<Place*> outputPlaces(InnerMarking::net->getOutputPlaces());
-    for (set<Place*>::const_iterator p = outputPlaces.begin(); p != outputPlaces.end(); ++p, ++receive_events) {
-        id2name[++events] = (**p).getName();
+    const set<pnapi::Label*> outputLabels(InnerMarking::net->getInterface().getOutputLabels());
+    for (set<pnapi::Label*>::const_iterator l = outputLabels.begin(); l != outputLabels.end(); ++l, ++receive_events) {
+        id2name[++events] = (**l).getName();
         if (args_info.cover_given) {
-            Cover::labelCache[(**p).getName()] = events;
+            Cover::labelCache[(**l).getName()] = events;
         }
 
-        const set<Node*> preset((**p).getPreset());
+        const set<Transition*> preset((**l).getTransitions());
         FOREACH(t, preset) {
             name2id[(**t).getName()] = events;
         }
@@ -84,15 +84,15 @@ void Label::initialize() {
     // ASYNCHRONOUS RECEIVE SEND (!-step for us)
     first_send = events+1;
 
-    const set<Place*> inputPlaces(InnerMarking::net->getInputPlaces());
+    const set<pnapi::Label*> inputLabels(InnerMarking::net->getInterface().getInputLabels());
 
-    for (set<Place*>::const_iterator p = inputPlaces.begin(); p != inputPlaces.end(); ++p, ++send_events) {
-        id2name[++events] = (**p).getName();
+    for (set<pnapi::Label*>::const_iterator l = inputLabels.begin(); l != inputLabels.end(); ++l, ++send_events) {
+        id2name[++events] = (**l).getName();
         if (args_info.cover_given) {
-            Cover::labelCache[(**p).getName()] = events;
+            Cover::labelCache[(**l).getName()] = events;
         }
 
-        const set<Node*> postset((**p).getPostset());
+        const set<Transition*> postset((**l).getTransitions());
         FOREACH(t, postset) {
             name2id[(**t).getName()] = events;
         }
@@ -106,16 +106,15 @@ void Label::initialize() {
 
     // collect the labels
     std::map<string, Label_ID> sync_labels;
-    const set<string> sync_label_names(InnerMarking::net->getSynchronousLabels());
+    const set<pnapi::Label*> sync_label_names(InnerMarking::net->getInterface().getSynchronousLabels());
     FOREACH(l, sync_label_names) {
-        sync_labels[*l] = ++events;
-        id2name[events] = *l;
-    }
-
-    // collect the transitions with synchronous labels
-    const set<Transition*> trans(InnerMarking::net->getSynchronizedTransitions());
-    FOREACH(t, trans) {
-        name2id[(**t).getName()] = sync_labels[*(**t).getSynchronizeLabels().begin()];
+        sync_labels[(**l).getName()] = ++events;
+        id2name[events] = (**l).getName();
+        
+        const set<Transition*> trans((**l).getTransitions());
+        FOREACH(t, trans) {
+          name2id[(**t).getName()] = events;
+        }
     }
 
     last_sync = events;

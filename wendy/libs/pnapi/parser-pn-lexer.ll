@@ -52,10 +52,12 @@
   ****************************************************************************/
 %{
 
+#include "config.h"
+
 #include "parser.h"
 #include "parser-pn.h"
 
-#include <cstring>
+#include <iostream>
 
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line

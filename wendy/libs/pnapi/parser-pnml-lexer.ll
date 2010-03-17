@@ -27,14 +27,12 @@
   ****************************************************************************/
 %{
 
+#include "config.h"
+
 #include "parser.h"
 #include "parser-pnml.h"
 
-#include <cstring>
-#include <cstdio>
-#include <ctype.h>
-#include <cstring>
-#include <cstdlib>
+#include <iostream>
 
 #define yystream pnapi::parser::stream
 #define yylineno pnapi::parser::line
@@ -55,14 +53,16 @@
 #define fprintf(file,fmt,msg) \
    yyerror(msg);
 
+using namespace pnapi::parser::pnml;
+
 static int keep;                        /* To store start condition */
 
-static char* word(char *s)
+static char * word(char * s)
 {
-  char *buf;
+  char * buf;
   int i, k;
-  for (k = 0; isspace(s[k]) || s[k] == '<'; k++) ;
-  for (i = k; s[i] && ! isspace(s[i]); i++) ;
+  for(k = 0; (isspace(s[k]) || (s[k] == '<')); ++k);
+  for(i = k; (s[i] && (!isspace(s[i]))); ++i);
   buf = (char*)malloc((i - k + 1) * sizeof(char));
   strncpy(buf, &s[k], i - k);
   buf[i - k] = '\0';
@@ -95,21 +95,21 @@ string          \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 
 %%
 
-{comment}                {/* skip */}
-<INITIAL>"<?"{data}*"?>" {/* skip */}
+{comment}                  { /* skip */ }
+<INITIAL>"<?"{data}*"?>"   { /* skip */ }
 
-{ws}                    {/* skip */}
-<INITIAL>"/"            {return XML_SLASH;}
-<INITIAL>"="            {return XML_EQ;}
-<INITIAL>">"            {BEGIN(CONTENT); return XML_CLOSE;}
-<INITIAL>{name}         {pnapi_pnml_yylval.s = strdup(yytext); return XML_NAME;}
-<INITIAL>{string}       {pnapi_pnml_yylval.s = strdup(yytext); return XML_VALUE;}
+{ws}                       { /* skip */ }
+<INITIAL>"/"               { return XML_SLASH; }
+<INITIAL>"="               { return XML_EQ; }
+<INITIAL>">"               { BEGIN(CONTENT); return XML_CLOSE; }
+<INITIAL>{name}            { pnapi_pnml_yylval.s = strdup(yytext); return XML_NAME; }
+<INITIAL>{string}          { pnapi_pnml_yylval.s = strdup(yytext); return XML_VALUE; }
 
-{open}{name}            {BEGIN(INITIAL); pnapi_pnml_yylval.s= word(yytext); return XML_START;}
-{open}"/"               {BEGIN(INITIAL); return XML_END;}
+{open}{name}               { BEGIN(INITIAL); pnapi_pnml_yylval.s= word(yytext); return XML_START; }
+{open}"/"                  { BEGIN(INITIAL); return XML_END; }
 
-<CONTENT>{data}         {pnapi_pnml_yylval.s = strdup(yytext); return XML_DATA;}
+<CONTENT>{data}            { pnapi_pnml_yylval.s = strdup(yytext); return XML_DATA; }
 
-.                       {yyerror("lexial error");}
-<<EOF>>                 {return EOF;}
+.                          { yyerror("lexial error"); }
+<<EOF>>                    { return EOF; }
 

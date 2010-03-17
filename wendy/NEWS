@@ -36,7 +36,6 @@ Version 3.0-unreleased
 * fixed bug #15385 (see `https://gna.org/bugs/?15385'): runtime output
   using the `--stats' crashed under certain Linux systems
 
+* updated to Petri Net API 4.00 (revision r5519)
 
-See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
-complete version history.
-
+\nSee file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for\ncomplete version history.\n

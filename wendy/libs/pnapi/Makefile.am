@@ -1,35 +1,47 @@
+##################################
+# This file has been generated   #
+# automaticall by compiling      #
+# Petri Net API 4.01-unreleased #
+#                                #
+# You MUST NOT change this file. #
+##################################
+
 noinst_LIBRARIES = libpnapi.a
 
+# [CUSTOMER_B_SRC] this line is needed to build a customer Makefile. Do not remove!
 libpnapi_a_SOURCES = \
-    parser-owfn.yy    parser-owfn-lexer.ll \
-    parser-pnml.yy    parser-pnml-lexer.ll \
-    parser-pn.yy parser-pn-lexer.ll \
-    parser-onwd.yy    parser-onwd-lexer.ll \
     parser-lola.yy    parser-lola-lexer.ll \
+    parser-owfn.yy    parser-owfn-lexer.ll \
+    parser-pn.yy      parser-pn-lexer.ll \
+    parser-pnml.yy    parser-pnml-lexer.ll \
     parser-sa.yy      parser-sa-lexer.ll \
-    pnapi.h \
-    link.h link.cc \
-    component.h component.cc \
-    petrinet.h petrinet.cc \
-    parser.h parser.cc \
-    util.h \
-    formula.h formula.cc \
-    condition.h condition.cc \
-    petrinet-reduction.cc \
-    petrinet-pn.cc \
+    pnapi.h pnapi.cc \
     automaton.h automaton.cc\
-    state.h state.cc \
+    component.h component.cc \
+    condition.h condition.cc \
+    exception.h exception.cc \
+    formula.h formula.cc \
+    interface.h interface.cc \
     marking.h marking.cc \
     myio.h myio.cc io-format.cc \
-    errorhandling.cc \
     Output.h Output.cc \
-    interface.h interface.cc \
-    port.h port.cc
+    parser.h parser.cc \
+    petrinet-pn.cc \
+    petrinet-reduction.cc \
+    petrinet.h petrinet.cc \
+    port.h port.cc \
+    state.h state.cc \
+    util.h \
+    verbose.h verbose.cc
+# [CUSTOMER_E_SRC] this line is needed to build a customer Makefile. Do not remove!
 
 # to find customer's config.h header
 libpnapi_a_CPPFLAGS = -I$(top_srcdir)/src
 
 
+EXTRA_DIST =
+BUILT_SOURCES =
+# [CUSTOMER_B_GEN] this line is needed to build a customer Makefile. Do not remove!
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
 #############################################################################
@@ -37,8 +49,6 @@ libpnapi_a_CPPFLAGS = -I$(top_srcdir)/src
 #---------------------------------------------------#
 # GENERIC: initialization for other generic targets #
 #---------------------------------------------------#
-BUILT_SOURCES =
-EXTRA_DIST =
 MAINTAINERCLEANFILES =
 DISTCLEANFILES = 
 
@@ -49,4 +59,4 @@ BISON_FILES = $(filter %.yy,$(libpnapi_a_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
-# DISTCLEANFILES += $(BUILT_SOURCES) $(EXTRA_DIST)
+# [CUSTOMER_E_GEN] this line is needed to build a customer Makefile. Do not remove!

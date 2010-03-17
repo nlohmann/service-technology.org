@@ -103,7 +103,7 @@ public: /* static methods */
 
   /// fill the set of places and transitions to cover
   static void initialize(const std::vector<std::string>&, const std::vector<std::string>&);
-  static void initialize(const std::vector<pnapi::Place*>&, const std::vector<pnapi::Place*>&,
+  static void initialize(const std::vector<pnapi::Place*>&, const std::vector<pnapi::Label*>&,
                          const std::vector<pnapi::Transition*>&, const std::vector<pnapi::Transition*>&);
 
   /// cover all nodes of the given net

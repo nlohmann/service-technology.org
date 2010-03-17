@@ -30,7 +30,7 @@ TESTFILES = test1.owfn test1.sara test10.owfn test10.sara test11.owfn \
             test8_4.owfn test8_4.sara test8_5.owfn test8_5.sara test8_6.owfn \
             test8_6.sara test8_7.owfn test8_7.sara test8_8.owfn test8_8.sara \
             test8_9.owfn test8_9.sara test8_X.owfn test8_X.sara test9.owfn \
-            test9.sara tests.pdf
+            test9.sara tests.pdf garavel.llnet.sara garavel.llnet
 
 
 #-----------------------------------------#

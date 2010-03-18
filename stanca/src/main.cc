@@ -17,8 +17,7 @@
 
 #include "Output.h"
 
-using std::cout;
-using std::endl;
+
 
 using pnapi::PetriNet;
 using pnapi::Place;
@@ -26,9 +25,17 @@ using pnapi::Transition;
 using pnapi::Arc;
 
 
+using namespace std;
+using std::set;
+using std::map;
+using std::deque;
+using std::cout;
+using std::cerr;
+using std::endl;
 using std::set;
 using std::vector;
 using std::map;
+using std::string;
 using std::ofstream;
 using std::ifstream;
 using std::stringstream;
@@ -51,7 +58,7 @@ using pnapi::io::OUTPUTFILE;
 gengetopt_args_info args_info;
 
 
-using namespace std;
+
 
 string invocation;
 
@@ -374,7 +381,7 @@ int main(int argc, char **argv) {
 				//cout <<schwartzepit->toString()<<"kein schwartze"<<endl;
 					schwartzepit=new MConjunction(schwartzepit,ppit);
 			}
-
+			delete fp;
 		}
 		if (pit==NULL) {//cout<<"primul";
 			pit=schwartzepit;
@@ -440,10 +447,13 @@ int main(int argc, char **argv) {
 	if (ffinal==NULL) {
 		cout << "something is wrong";
 	}
+	else{	
+		if (args_info.verbose_flag) {
 //	else {
-//		cout<<"Final formula "<<ffinal->toString()<<endl;
-//	}
-	cout << "Final formula "<<endl;
+		cout<<"Final formula "<<ffinal->toString()<<endl;
+	}
+	
+	}
 	}
 	const MFormula *cnf=NULL; //cnf=computeCNF(ersteit);//
 	cnf=computeCNF(ffinal);
@@ -478,6 +488,18 @@ int main(int argc, char **argv) {
 	
 	if (rs!=NULL) {
 		cout << "the formula is satisfiable"<<endl;
+		cout << rs->size()<<endl;
+		for (int k=0; k<rs->size(); ++k) {
+			for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
+			// cout << (*it)->getName()<< " ";
+			 for(int kk=0; kk<mp.find((*it)->getName())->second.size(); ++kk)
+			 if(mp.find((*it)->getName())->second[kk]==k)
+			 cout << (*it)->getName()<<"^"<<kk;
+			 }
+			 //cout << mp.size()<<endl;
+			cout <<" "<< rs->at(k)<<endl;
+		}
+		cout << endl;
 		//r contains an assignement; we have to map it back to the original places (the formaula does not hold)
 	}
 	else{
@@ -492,6 +514,7 @@ int main(int argc, char **argv) {
 	}
 	cout << mp.size()<<endl;*/
 	// time
+	delete f;
 	std::cerr << endl << "Stanca : runtime: " << ((double(clock()) - double(start_time)) / CLOCKS_PER_SEC) << " sec\n";
 	//printf("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_time)) / CLOCKS_PER_SEC);
 	cout << endl;

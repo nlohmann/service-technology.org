@@ -235,20 +235,31 @@ vector<vector<int> > CNF2MSF(const MFormula *fcnf){
 				if (typeid(*pk->left)==typeid(PlLit)) {//cout<<"lit";
 					const PlLit *xpl = new PlLit(dynamic_cast<const PlLit&> (*pk->left));
 					vi.push_back(xpl->number);
+					delete xpl;
 				}
 				if (typeid(*pk->right)==typeid(PlLit)) {//cout<<"lit";
 					const PlLit *xpl = new PlLit(dynamic_cast<const PlLit&> (*pk->right));
 					vi.push_back(xpl->number);
+					delete xpl;
 				}
 				if (typeid(*pk->left)==typeid(MNegation)) {//cout<<"lit";
-					const MNegation *xplnl = new MNegation(dynamic_cast<const MNegation&> (*pk->left));
-					const PlLit *xpl = new PlLit(dynamic_cast<const PlLit&> (*xplnl->subf));
-					vi.push_back(-xpl->number);
+					//const MNegation *xplnr = new MNegation(dynamic_cast<const MNegation&> (*pk->left));
+					const MNegation *xplnr = static_cast<const MNegation *> (pk->left);
+					//cout << xplnr->toString();
+					//if (typeid(*xplnr->subf)==typeid(PlLit)) cout<<"not literal";
+					//const PlLit *xpl = new PlLit(dynamic_cast<const PlLit&> (*xplnr->subf));
+					const PlLit *xpl = new PlLit(static_cast<const PlLit&> (*xplnr->subf));
+					vi.push_back(-xpl->number);//cout<<-xpl->number;
+					//delete xplnr;
+					delete xpl;//}
+					//cout << xplnr->toString();
+					//delete xplnr;
 				}
 				if (typeid(*pk->right)==typeid(MNegation)) {//cout<<"lit";
 					const MNegation *xplnr = new MNegation(dynamic_cast<const MNegation&> (*pk->right));
 					const PlLit *xpr = new PlLit(dynamic_cast<const PlLit&> (*xplnr->subf));
 					vi.push_back(-xpr->number);
+					delete xplnr;delete xpr;
 				}
 				
 			}
@@ -260,15 +271,15 @@ vector<vector<int> > CNF2MSF(const MFormula *fcnf){
 				//cout << endl<<xpl->toString()<<endl;
 				vi.push_back(xpl->number);
 				//vi.insert((*it)->number);
-			
+			    delete xpl;
 			}
 			else if(typeid(**it)==typeid(MNegation)) {
 				//cout << endl<<cj-toString()<<<endl;
 				const MNegation *xplnr = new MNegation(dynamic_cast<const MNegation&> (**it));
 				//cout << endl<<xplnr->toString()<<endl;
-				const PlLit *xpr = new PlLit(dynamic_cast<const PlLit&> (*xplnr->subf));
-				
+				const PlLit *xpr = new PlLit(dynamic_cast<const PlLit&> (*xplnr->subf));				
 				vi.push_back(-xpr->number);
+				delete xpr;delete xplnr;
 				//vi.insert((*it)->number);
 			} 
 		msf.push_back(vi);++itt;

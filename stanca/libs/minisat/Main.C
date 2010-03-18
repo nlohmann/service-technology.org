@@ -293,20 +293,6 @@ vector<bool>*  minisat(vector< vector< int > > & in)
 	}
 
 	
-/*	if(result){  //if there is a satisfying assignment
-    	vector<bool> *assignment = new vector<bool>(S->model.size());
-    	//printf("\nerfuellende Belegung: ");
-    	for(unsigned int i = 0; i < S->model.size(); ++i) {
-    		//printf("%d  ", toInt(S->model[i]));
-    		assignment->at(i) = bool(toInt(S->model[i])+1);  //-1 has the meaning of false; 1 has the meaning og true
-    	}
-    	//printf("\n");
-    	return assignment;
-    }
-    else {
-    	return NULL;
-    }
-*/	
 	//printf(" \n");
 	/*for (int k=0; k<S.model.size(); ++k) {
 		lbool val=S.model[k];
@@ -347,21 +333,7 @@ vector<bool>*  minisat(vector< vector< int > > & in)
 	//printf(" %d ", S.nVars());
 	
 	
-	/*	if(result){  //if there is a satisfying assignment
-	 vector<bool> *assignment = new vector<bool>(S->model.size());
-	 //printf("\nerfuellende Belegung: ");
-	 for(unsigned int i = 0; i < S->model.size(); ++i) {
-	 //printf("%d  ", toInt(S->model[i]));
-	 assignment->at(i) = bool(toInt(S->model[i])+1);  //-1 has the meaning of false; 1 has the meaning og true
-	 }
-	 //printf("\n");
-	 return assignment;
-	 }
-	 else {
-	 return NULL;
-	 }
-	 */	
-	//printf(" \n");
+		//printf(" \n");
 	/*for (int k=0; k<S.model.size(); ++k) {
 	 lbool val=S.model[k];
 	 printf("%d %d\n",k+1,val.toInt());

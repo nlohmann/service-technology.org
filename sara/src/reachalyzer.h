@@ -66,6 +66,12 @@ public:
 	/// Check if a solution has been seen earlier already, using a lookup table
 	bool solutionSeen(map<Transition*,int>& tv);
 
+	/// Calculate all possible jumps and add them to the JobQueue
+	void createJumps(map<Transition*,int>& diff, PartialSolution& ps);
+
+	/// returns the maximal trace length after the solutions have been printed
+	int getMaxTraceLength();
+
 	/// Status
 	enum errorMessage {
 		SOLUTION_FOUND = 0,
@@ -123,6 +129,9 @@ private:
 
 	/// debug info for when to stop execution
 	int breakafter;
+
+	/// longest trace length, only valid after solutions have been printed
+	int maxsollen;
 };
 
 #endif

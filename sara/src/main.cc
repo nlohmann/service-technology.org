@@ -241,6 +241,7 @@ if (args_info.input_given || args_info.pipe_given) {
 	// counters for number of problems and solutions found
 	int loops = 0;
 	int solcnt = 0;
+	int maxtracelen = -1;
 	// walk through the problem list
 	for(unsigned int x=0; x<pbls.size(); ++x)
 	{
@@ -261,6 +262,8 @@ if (args_info.input_given || args_info.pipe_given) {
 					clock_t mytime(reach.getTime()); // ... and measure the time for that
 					if (reach.getStatus()==Reachalyzer::SOLUTION_FOUND) ++solcnt;
 					reach.printResult(); // ... and print the result
+					int mtl = reach.getMaxTraceLength();
+					if (mtl>maxtracelen) maxtracelen=mtl;
 					if (debug>0) {
 						cerr << "Transition Order: ";
 						for(unsigned int o=0; o<transitionorder.size(); ++o)
@@ -297,7 +300,11 @@ if (args_info.input_given || args_info.pipe_given) {
 
 	clock_t endtime = clock();
 	if (args_info.verbose_given)
-		cout << "sara: " << solcnt << " Solution" << (solcnt!=1?"s":"") << " produced." << endl;
+	{
+		cout << "sara: " << solcnt << " Solution" << (solcnt!=1?"s":"") << " produced";
+		if (solcnt>1 && maxtracelen>=0) cout << ", maximal solution length is " << maxtracelen;
+		cout << "." << endl;
+	}
 	if (args_info.time_given)
 		cout << "sara: Used " << (float)(endtime-starttime)/CLOCKS_PER_SEC << " seconds overall." << endl;
 }

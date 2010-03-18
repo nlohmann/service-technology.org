@@ -100,6 +100,7 @@ Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int>
 	stateinfo = verbose;
 	solved = false;
 	errors = false;
+	maxsollen = 0;
 
 	//initialize lp_solve
 	lpwrap.verbose = debug;
@@ -194,17 +195,18 @@ void Reachalyzer::start() {
 			if (vit->second>fullvector[vit->first]) break; // have we increased the solution or jumped to another minimal one?
 		if (vit==oldvector.end() && ret<2 && !diff.empty()) 
 		{	// if we have made a non-jump leading to a higher solution before we may make a jump next, so create such a job
-			Constraint c(diff); // build constraint to forbid the increase, so another minimal solution will be sought
-			c.setRecent(true);
-			ps.setConstraint(c);
+//			Constraint c(diff); // build constraint to forbid the increase, so another minimal solution will be sought
+//			c.setRecent(true);
+//			ps.setConstraint(c);
 			ps.setFullVector(oldvector); // a jump must compare to the former solution, not to the new one
-			PartialSolution* nps(new PartialSolution(ps));
-			tps.push_back(nps); // put the new job into the list
-			if (verbose>1) {
-				cerr << "sara: New Partial Solution:" << endl;
-				nps->show();
-				cerr << "*** JUMP ***" << endl;
-			}
+//			PartialSolution* nps(new PartialSolution(ps));
+//			tps.push_back(nps); // put the new job into the list
+//			if (verbose>1) {
+//				cerr << "sara: New Partial Solution:" << endl;
+//				nps->show();
+//				cerr << "*** JUMP ***" << endl;
+//			}
+			createJumps(diff,ps);
 		}
 		if (!tps.first()->getRemains().empty()) // the active job is not a full solution
 		{
@@ -256,7 +258,7 @@ void Reachalyzer::start() {
 
 /** Prints the results of the reachability analysis to stderr. */
 void Reachalyzer::printResult() {
-	if (!solutions.almostEmpty()) solutions.printSolutions();
+	if (!solutions.almostEmpty()) maxsollen = solutions.printSolutions();
 	else if (errors) cout << "sara: UNSOLVED: Result is indecisive due to failure of lp_solve." << endl;
 	else if (args_info.treemaxjob_given) cout << "sara: UNSOLVED: solution may have been cut off due to command line switch -T" << endl;
 	if (!errors && !args_info.treemaxjob_given && (args_info.witness_given || solutions.almostEmpty()))
@@ -356,3 +358,25 @@ bool Reachalyzer::solutionSeen(map<Transition*,int>& tv) {
 	return true;
 }
 
+void Reachalyzer::createJumps(map<Transition*,int>& diff, PartialSolution& ps) {
+	map<Transition*,int> tmp;
+	map<Transition*,int>::iterator mit;
+	for(mit=diff.begin(); mit!=diff.end(); ++mit)
+	if (mit->second>0)
+	{
+		PartialSolution* nps(new PartialSolution(ps));
+		tmp[mit->first] = mit->second;		
+		Constraint c(tmp); // build constraint to forbid the increase, so another minimal solution will be sought
+		c.setRecent(true);
+		nps->setConstraint(c);
+		tps.push_back(nps); // put the new job into the list
+		tmp.clear();
+		if (verbose>1) {
+			cerr << "sara: New Partial Solution:" << endl;
+			nps->show();
+			cerr << "*** JUMP ***" << endl;
+		}
+	}
+}
+
+int Reachalyzer::getMaxTraceLength() { return maxsollen; }

@@ -94,8 +94,8 @@ public:
 	/// Push a solution into the solution queue
 	bool push_solved(PartialSolution* job);
 
-	/// Print all solutions
-	void printSolutions();
+	/// Print all solutions and return the maximal trace length
+	int printSolutions();
 
 private:
 	/// job or failure queue (from priority to sublist)

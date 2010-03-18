@@ -469,8 +469,9 @@ bool JobQueue::push_solved(PartialSolution* job) {
 
 /** Prints a solution queue.
 */
-void JobQueue::printSolutions() {
-	if (args_info.forceprint_given) return; // solutions were printed earlier
+int JobQueue::printSolutions() {
+	int sollength=0;
+	if (args_info.forceprint_given) return -1; // solutions were printed earlier
 	if (queue.empty()) abort(14,"error: solved, but no solution found -- this should not happen");
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
@@ -478,10 +479,12 @@ void JobQueue::printSolutions() {
 		{
 			PartialSolution* ps(jit->second[i]);
 			vector<Transition*> solution = ps->getSequence();
-			cout << "sara: SOLUTION: ";
+			cout << "sara: SOLUTION(" << solution.size() << "): ";
+			if (solution.size()>sollength) sollength=solution.size();
 			for(unsigned int j=0; j<solution.size(); ++j)
 				cout << solution[j]->getName() << " ";
 			cout << endl;
 		}
+	return sollength;
 }
 

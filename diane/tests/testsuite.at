@@ -56,12 +56,12 @@ AT_CHECK([GREP -q "aborting \[[#01\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
-AT_SETUP([Input file not parsed])
-AT_CHECK([cp TESTFILES/PO.owfn .])
-AT_CHECK([DIANE PO.owfn],1,ignore,stderr)
-AT_CHECK([GREP -q "aborting \[[#02\]]" stderr])
-AT_KEYWORDS(error)
-AT_CLEANUP
+#AT_SETUP([Input file not parsed])
+#AT_CHECK([cp TESTFILES/PO.owfn .])
+#AT_CHECK([DIANE PO.owfn],1,ignore,stderr)
+#AT_CHECK([GREP -q "aborting \[[#02\]]" stderr])
+#AT_KEYWORDS(error)
+#AT_CLEANUP
 
 ############################################################################
 #AT_BANNER([Regression Tests])
@@ -86,6 +86,13 @@ AT_SETUP([Number of Service Components])
 AT_CHECK([cp TESTFILES/phils.lola .])
 AT_CHECK([DIANE phils.lola -q --service],0,stdout)
 AT_CHECK([GREP -q "number of components: 1" stdout],0)
+AT_KEYWORDS(service)
+AT_CLEANUP
+
+AT_SETUP([Open net input (with final marking)])
+AT_CHECK([cp TESTFILES/zeus.owfn .])
+AT_CHECK([DIANE zeus.owfn -q --service],0,stdout)
+AT_CHECK([GREP -q "number of components: 2" stdout],0)
 AT_KEYWORDS(service)
 AT_CLEANUP
 

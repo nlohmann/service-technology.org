@@ -129,8 +129,17 @@ int main(int argc, char *argv[])
     switch (args_info.mode_arg)
     {
     case (mode_arg_standard):
-      inputfile >> pnapi::io::lola >> net;
-      break;
+		{ //find out whether it is a .lola or a .owfn (for the final marking)
+		std::string s=args_info.inputs[0];
+		if(s.find(".owfn")!=string::npos)//compare(s.size()-4,4, "owfn")==0)
+		{
+			inputfile >> pnapi::io::owfn >> net;
+		}
+		else{ 	
+			inputfile >> pnapi::io::lola >> net; 
+		}
+			break;
+		}
     case (mode_arg_freechoice):
       inputfile >> pnapi::io::owfn >> net;
       break;

@@ -20,14 +20,18 @@
 
 #include <map>
 #include <set>
+#include <iostream>
 #include "cmdline.h"
 #include "decomposition.h"
+#include <typeinfo>
 
 using pnapi::Arc;
 using pnapi::Place;
 using pnapi::Transition;
 using std::map;
 using std::set;
+using std::cout;
+
 
 extern gengetopt_args_info args_info;
 
@@ -91,14 +95,48 @@ int decomposition::computeComponentsByUnionFind(PetriNet &net, int *tree, int si
 
   if (args_info.service_flag)
   {
-    for (set<Place *>::iterator it = net.getInternalPlaces().begin(); it != net.getInternalPlaces().end(); ++it)
-      if ((*it)->getTokenCount())
-      {
-        for (set<Node *>::iterator t = (*it)->getPreset().begin(); t != (*it)->getPreset().end(); ++t)
-          Union(remap[*it], remap[*t], tree);
-        for (set<Node *>::iterator t = (*it)->getPostset().begin(); t != (*it)->getPostset().end(); ++t)
-          Union(remap[*it], remap[*t], tree);
-      }
+	 
+	  net.finalCondition().dnf(); 
+	  const pnapi::formula::Formula * f=dynamic_cast<const pnapi::formula::Formula *>(&net.finalCondition().formula());
+	  
+	  std::set<std::string> ss;//set of marked places final markings 
+	  if(typeid(*f)==typeid(pnapi::formula::Disjunction)){ 
+		  const pnapi::formula::Disjunction *fd=dynamic_cast<const pnapi::formula::Disjunction *>(f);			
+		  for(std::set<const pnapi::formula::Formula *>::iterator cIt=fd->children().begin();cIt!=fd->children().end();++cIt){
+			  if(((*cIt)->getType()==pnapi::formula::Formula::F_CONJUNCTION)){//typeid(*cIt)==typeid(pnapi::formula::Conjunction)){ 
+				  const pnapi::formula::Conjunction *fc=dynamic_cast<const pnapi::formula::Conjunction *>(*cIt);
+				  for(std::set<const pnapi::formula::Formula *>::iterator ccIt=fc->children().begin();ccIt!=fc->children().end();++ccIt){
+					  const pnapi::formula::Proposition *fp=dynamic_cast<const pnapi::formula::Proposition *>(*ccIt);
+					  //const Place *pp=new Place(fp->place());
+					  if(fp->tokens()>0)//insert only if it is non-zero
+						  ss.insert(fp->place().getName() );
+				  }
+			  }
+			  
+		  }
+	  }
+	  if(typeid(*f)==typeid(pnapi::formula::Conjunction)){
+		  const pnapi::formula::Conjunction *fc=dynamic_cast<const pnapi::formula::Conjunction *>(f);
+		  for(std::set<const pnapi::formula::Formula *>::iterator cIt=fc->children().begin();cIt!=fc->children().end();++cIt){
+			  const pnapi::formula::Proposition *fp=dynamic_cast<const pnapi::formula::Proposition *>(*cIt);
+			  //const Place *pp=new Place(fp->place());
+			  if(fp->tokens()>0)
+				  ss.insert( fp->place().getName() );
+		  }
+	  }
+	  
+	  
+	  //std::set<const Place * > cp=net.finalCondition().concerningPlaces(); doesn't work :(
+	  for (set< Place *>::iterator it = net.getInternalPlaces().begin(); it != net.getInternalPlaces().end(); ++it){
+		const std::string sp=(*it)->getName();
+		  if ((*it)->getTokenCount()||(ss.find(sp)!=ss.end()))
+		  {
+          for (set<Node *>::iterator t = (*it)->getPreset().begin(); t != (*it)->getPreset().end(); ++t)
+            Union(remap[*it], remap[*t], tree);
+          for (set<Node *>::iterator t = (*it)->getPostset().begin(); t != (*it)->getPostset().end(); ++t)
+            Union(remap[*it], remap[*t], tree);
+        }
+	  }
   }
 
   // usage of rules 1 and 2

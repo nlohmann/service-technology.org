@@ -12,7 +12,8 @@ TESTFILES = PO.owfn.lola \
             T2.owfn.lola \
             choreography.lola \
             phils.lola \
-            zeus.lola
+            zeus.lola \
+			zeus.owfn
 
 
 # Below you can list all the files you do not want to have counted in the

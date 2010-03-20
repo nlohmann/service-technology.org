@@ -50,7 +50,7 @@ class PathFinder {
 public:
 
 	/// Constructor with initial marking m, transition vector tv, # of transitions col, initialized partial solutions tps, and incidence matrix im
-	PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& tps, JobQueue& sol, IMatrix& im, map<map<Transition*,int>,vector<PartialSolution> >& lookup);
+	PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& tps, JobQueue& sol, JobQueue& fail, IMatrix& im, map<map<Transition*,int>,vector<PartialSolution> >& lookup);
 
 	/// Destructor.
 	~PathFinder();
@@ -116,6 +116,9 @@ private:
 
 	/// Solutions queue:
 	JobQueue& solutions;
+
+	/// Failure queue:
+	JobQueue& failure;
 
 	/// Incidence matrix of the Petri net
 	IMatrix& im;

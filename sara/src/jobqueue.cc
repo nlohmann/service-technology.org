@@ -37,18 +37,23 @@ extern gengetopt_args_info args_info;
 /** Constructor for the empty queue
 	@param pn The Petri net for which the incidence matrix is to be built.
 */
-JobQueue::JobQueue() : cnt(0),active(NULL) {}
+JobQueue::JobQueue() : cnt(0),active(NULL),activeprio(0) {}
 
 /** Constructor for the initialized queue
 	@param job The first job
 */
-JobQueue::JobQueue(PartialSolution* job) : cnt(1),active(job) {}
+JobQueue::JobQueue(PartialSolution* job) : cnt(1),active(job),activeprio(0) {}
 
 /** Destructor. Frees the memory for all jobs in the queue
 */
 JobQueue::~JobQueue() {
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
+	{
+		for(unsigned int i=0; i<jit->second.size(); ++i)
+			delete jit->second[i];
+	}
+	for(jit=past.begin(); jit!=past.end(); ++jit)
 	{
 		for(unsigned int i=0; i<jit->second.size(); ++i)
 			delete jit->second[i];
@@ -85,15 +90,23 @@ PartialSolution* JobQueue::first() { return active; }
 */
 bool JobQueue::pop_front() {
 	if (empty()) return false;
-	delete active;
+	past[activeprio].push_back(active); // active job is now past
+//	delete active;
 	active=NULL;
 	--cnt;
 	if (!almostEmpty()) 
 	{ 
 		active = queue.begin()->second.front();
+		activeprio = queue.begin()->first;
 		queue.begin()->second.pop_front();
 		if (queue.begin()->second.empty())
 			queue.erase(queue.begin());
+	}
+	if (past.size()>5) // drop things that are too far in the past and will probably not come up again
+	{
+		for(unsigned int i=0; i<past.begin()->second.size(); ++i)
+			delete past.begin()->second[i];
+		past.erase(past.begin());
 	}
 	return true;
 }
@@ -145,28 +158,43 @@ int JobQueue::find(PartialSolution* job) {
 	if (queue.find(pri)==queue.end()) return pri;
 	// count the Parikh vector of the transition sequence of job
 	map<Transition*,int> tmap;
-	vector<Transition*> tseq(job->getSequence());
+	vector<Transition*>& tseq(job->getSequence());
 	for(unsigned int i=0; i<tseq.size(); ++i) ++tmap[tseq[i]];
 	// go through the jobs with the same priority, but leave out first()
-	deque<PartialSolution*> deq(queue[pri]);
+	deque<PartialSolution*>& deq(queue[pri]);
 	for(unsigned int i=0; i<deq.size(); ++i)
 	{
 		// count Parikh vector for queued job
 		map<Transition*,int> tmap2;
-		vector<Transition*> tseq2(deq[i]->getSequence());
+		vector<Transition*>& tseq2(deq[i]->getSequence());
 		for(unsigned int j=0; j<tseq2.size(); ++j) ++tmap2[tseq2[j]];
 		if (tmap==tmap2 && job->getRemains()==deq[i]->getRemains())
 		{
 			// test if the constraints are equal
-			map<set<Place*>,int>::iterator cit;
-			// the following vectors are assumed to have their elements in the same order.
-			// In most cases(?) this will be garantueed at creation time.
 			set<Constraint>& cs(job->getConstraints());
 			set<Constraint>& cs2(deq[i]->getConstraints());
 			if (cs==cs2) return -1;
 		}
 	}
 	return pri;
+}
+
+/** Find out if there was an equivalent job in the past.
+	@param The job to be checked.
+	@return True if the job was found in the past.
+*/
+bool JobQueue::findPast(PartialSolution* job) {
+	int pri(priority(job));
+	if (past.find(pri)==past.end()) return false;
+	// go through the past jobs with the same priority
+	deque<PartialSolution*>& deq(past[pri]);
+	for(unsigned int i=0; i<deq.size(); ++i)
+	{
+			set<Constraint>& cs(job->getConstraints());
+			set<Constraint>& cs2(deq[i]->getConstraints());
+			if (cs==cs2) return true;
+	}
+	return false;
 }
 
 /** Calculate the priority of a job. The number is calculated from the total number of transitions
@@ -176,15 +204,20 @@ int JobQueue::find(PartialSolution* job) {
 	@return The priority.
 */
 int JobQueue::priority(PartialSolution* job) const {
-	int priority(job->getConstraints().size());
-	map<Transition*,int>::iterator it;
-	for(it=job->getFullVector().begin(); it!=job->getFullVector().end(); ++it)
-		priority += it->second;
-	for(it=job->getRemains().begin(); it!=job->getRemains().end(); ++it)
-		priority += it->second;
-	set<Constraint>::iterator cit;
-	for(cit=job->getConstraints().begin(); cit!=job->getConstraints().end(); ++cit)
-		if (cit->isJump()) ++priority;
+	int priority(0);
+	if (args_info.joborder_given)
+	{
+		map<Transition*,int>::iterator it;
+		for(it=job->getFullVector().begin(); it!=job->getFullVector().end(); ++it)
+			priority += it->second;
+		for(it=job->getRemains().begin(); it!=job->getRemains().end(); ++it)
+			priority += it->second;
+	} else {
+		priority += (job->getConstraints().size());
+		set<Constraint>::iterator cit;
+		for(cit=job->getConstraints().begin(); cit!=job->getConstraints().end(); ++cit)
+			if (cit->isJump()) ++priority;
+	}
 	return priority;
 }
 

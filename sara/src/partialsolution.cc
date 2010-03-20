@@ -36,6 +36,9 @@ using std::string;
 using std::cerr;
 using std::endl;
 
+extern vector<Transition*> transitionorder;
+extern map<Transition*,int> revtorder;
+
 	/*************************************************************
 	* Implementation of the methods of the class PartialSolution *
 	*************************************************************/
@@ -131,12 +134,10 @@ bool PartialSolution::setFailureConstraint(const Constraint& c) {
 	return true;
 }
 
-/** Checks if there is a constraint in the partial solution with at most a differing right hand side.
+/* Checks if there is a constraint in the partial solution with at most a differing right hand side.
 	@param c The constraint to be checked.
 	@return The right hand side of the constraint in the partial solution if a match was found,
 		-1 otherwise.
-*/
-/*
 int PartialSolution::findRHS(Constraint& c) {
 	if (constraints.size()==0) return -1;
 	set<Constraint>::iterator cit;
@@ -147,17 +148,13 @@ int PartialSolution::findRHS(Constraint& c) {
 }
 */
 
-/** Removes all constraints from the partial solution.
-*/
-/*
+/* Removes all constraints from the partial solution.
 void PartialSolution::clearConstraints() { 
 	constraints.clear(); 
 }
 */
 
-/** Removes all failure constraints from the partial solution.
-*/
-/*
+/* Removes all failure constraints from the partial solution.
 void PartialSolution::clearFailureConstraints() { 
 	failure.clear(); 
 }
@@ -215,12 +212,10 @@ void PartialSolution::show() {
 	cerr << endl;
 }
 
-/** For those places where we have less tokens at the moment than in the final marking,
+/* For those places where we have less tokens at the moment than in the final marking,
 	calculate the amount missing.
 	@param im Incidence matrix.
 	@return A map from those places to the number of missing tokens.
-*/
-/*
 map<Place*,int> PartialSolution::underFinalMarking(IMatrix& im) {
 	map<Place*,int> change(im.getChange(getRemains()));
 	map<Place*,int> result;
@@ -232,11 +227,9 @@ map<Place*,int> PartialSolution::underFinalMarking(IMatrix& im) {
 }
 */
 
-/** For each place for all transitions from the partial firing sequence that effectively produce tokens on this
+/* For each place for all transitions from the partial firing sequence that effectively produce tokens on this
 	place, the sum of the effects of the transitions is calculated.
 	@return A map from places to positive token effects.
-*/
-/*
 map<Place*,int> PartialSolution::produce() {
 	map<Place*,int> prod;
 	for(unsigned int i=0; i<tseq.size(); ++i)
@@ -760,13 +753,14 @@ bool PartialSolution::isSolved() { return fullSolution; }
 void PartialSolution::setSolved() { fullSolution = true; }
 
 /** Mark all constraints as non-recent so they cannot be the reason for not finding solutions.
+	@param jump Whether jumps or normal constraint are to be touched.
 */
-void PartialSolution::touchConstraints() {
+void PartialSolution::touchConstraints(bool jump) {
 	set<Constraint>::iterator cit;
 	for(cit=constraints.begin(); cit!=constraints.end(); ++cit)
-		const_cast<Constraint*>(&(*cit))->setRecent(false);
+		if (cit->isJump()==jump) const_cast<Constraint*>(&(*cit))->setRecent(false);
 	for(cit=failure.begin(); cit!=failure.end(); ++cit)
-		const_cast<Constraint*>(&(*cit))->setRecent(false);
+		if (cit->isJump()==jump) const_cast<Constraint*>(&(*cit))->setRecent(false);
 }
 
 /** Calculates which forbidden transition are disabled because of the given set of places
@@ -826,4 +820,31 @@ void PartialSolution::addParikh(map<Transition*,int>& p) { parikh.push_back(p); 
 */
 vector<map<Transition*,int> >& PartialSolution::getParikh() { return parikh; }
 
+Transition* PartialSolution::getNextJC(int& val) { 
+	if (jc.empty()) return NULL;
+	val = jc.begin()->second;
+	return transitionorder[jc.begin()->first];
+}
 
+void PartialSolution::setJC(map<Transition*,int>& diff) { 
+	jc.clear();
+	map<Transition*,int>::iterator mit;
+	for(mit=diff.begin(); mit!=diff.end(); ++mit)
+		if (mit->second>0)
+			jc[revtorder[mit->first]] = mit->second;
+}
+
+void PartialSolution::popJC() { if (!jc.empty()) jc.erase(jc.begin()); }
+
+bool PartialSolution::compareSequence(vector<Transition*> seq) {
+	if (seq.size()!=tseq.size()) return false;
+	map<Transition*,int> cnt;
+	for(int i=0; i<tseq.size(); ++i) {
+		++cnt[tseq[i]];
+		--cnt[seq[i]];
+	}
+	map<Transition*,int>::iterator mit;
+	for(mit=cnt.begin(); mit!=cnt.end(); ++mit)
+		if (mit->second!=0) return false;
+	return true;
+}

@@ -141,8 +141,8 @@ public:
 	/// mark the partial solution as a full solution
 	void setSolved();
 
-	/// mark all constraints as old (not available for failure reasoning)
-	void touchConstraints();
+	/// mark constraints as old (not available for failure reasoning)
+	void touchConstraints(bool jump);
 
 	/// list all forbidden transitions that are disabled due to undermarking on pset
 	set<Transition*> disabledTransitions(map<Place*,int> pset, IMatrix& im);
@@ -158,6 +158,12 @@ public:
 
 	/// Get all parikh images of firing sequences for this failure
 	vector<map<Transition*,int> >& getParikh();
+
+	Transition* getNextJC(int& val);
+	void setJC(map<Transition*,int>& jumptransitions);
+	void popJC();
+
+	bool compareSequence(vector<Transition*> seq);
 
 private:	
 	/// the partial firing sequence
@@ -188,6 +194,9 @@ private:
 
 	/// flag marking this partial solution as a full solution
 	bool fullSolution;
+
+	/// map of transitions for creating jump constraints
+	map<int,int> jc;
 };
 
 #endif

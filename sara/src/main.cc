@@ -242,6 +242,7 @@ if (args_info.input_given || args_info.pipe_given) {
 	int loops = 0;
 	int solcnt = 0;
 	int maxtracelen = -1;
+	int avetracelen = 0;
 	// walk through the problem list
 	for(unsigned int x=0; x<pbls.size(); ++x)
 	{
@@ -264,6 +265,7 @@ if (args_info.input_given || args_info.pipe_given) {
 					reach.printResult(); // ... and print the result
 					int mtl = reach.getMaxTraceLength();
 					if (mtl>maxtracelen) maxtracelen=mtl;
+					if (mtl>=0) avetracelen+=mtl;
 					if (debug>0) {
 						cerr << "Transition Order: ";
 						for(unsigned int o=0; o<transitionorder.size(); ++o)
@@ -286,9 +288,10 @@ if (args_info.input_given || args_info.pipe_given) {
 				PartialSolution* ps(new PartialSolution(m1)); // create initial job
 				JobQueue tps(ps); // create a job list
 				JobQueue solutions; // create a job list
+				JobQueue failure; // create a dummy job list
 				map<map<Transition*,int>,vector<PartialSolution> > dummy; // dummy, will be filled and immediately free'd
 				// create an instance of the realizability solver
-				PathFinder pf(m1,tv,pn->getTransitions().size(),tps,solutions,im,dummy);
+				PathFinder pf(m1,tv,pn->getTransitions().size(),tps,solutions,failure,im,dummy);
 				pf.verbose = debug;
 				if (pf.recurse()) { solutions.printSolutions(); ++solcnt; } // solve the problem and print a possible solution
 				else if (solutions.almostEmpty()) cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;
@@ -301,9 +304,13 @@ if (args_info.input_given || args_info.pipe_given) {
 	clock_t endtime = clock();
 	if (args_info.verbose_given)
 	{
-		cout << "sara: " << solcnt << " Solution" << (solcnt!=1?"s":"") << " produced";
-		if (solcnt>1 && maxtracelen>=0) cout << ", maximal solution length is " << maxtracelen;
-		cout << "." << endl;
+		cout << "sara: " << solcnt << " Solution" << (solcnt!=1?"s":"") << " produced." << endl;
+		if (solcnt>1 && maxtracelen>=0)
+		{
+			cout << "sara: Maximal solution length is " << maxtracelen;
+			if (avetracelen!=maxtracelen*solcnt) cout << ", average is " << (avetracelen%solcnt==0?"":"about ") << avetracelen/solcnt+(avetracelen%solcnt>=solcnt/2?1:0);
+			cout << "." << endl;
+		}
 	}
 	if (args_info.time_given)
 		cout << "sara: Used " << (float)(endtime-starttime)/CLOCKS_PER_SEC << " seconds overall." << endl;

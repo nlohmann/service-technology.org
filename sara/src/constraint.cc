@@ -305,7 +305,7 @@ void Constraint::showConstraint(ostream& s) const {
 			s << cit->first->getName() << ":" << cit->second;
 			comma = true;
 		}
-		s << "]<=" << getRHS() << " "; //"-" << getRHSLimit() << " ";
+		s << "]<=" << getRHS() << (isRecent()?"(r) ":" ");
 		return;
 	}
 	// print all places in the constraint
@@ -324,7 +324,7 @@ void Constraint::showConstraint(ostream& s) const {
 		s << (*txit)->getName();
 		comma = true;
 	}
-	s << "]>=" << getRHS() << " "; //"-" << getRHSLimit() << " ";
+	s << "]>=" << getRHS() << (isRecent()?"(r) ":" ");
 }
 
 /** Set a flag determining whether a constraint is recent. Recent constraints

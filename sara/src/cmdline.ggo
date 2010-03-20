@@ -146,6 +146,12 @@ option "scapegoat" S
 "
   flag off
 
+option "joborder" J
+  "Change job priorities." 
+  details="Normally, jobs are prioritized by their number of constraints; this tends towards a depth-first-search. Setting this option will sort the jobs by expected firing sequences length which tends toward a breadth-first-search.
+"
+  flag off
+
 option "lookup" L
   "Size of the lookup table."
   details="The lookup table contains saved solutions of lp_solve including their (partial) realizability. Its size defaults to 1000. Do not increase this unless you get a warning with the -v option.

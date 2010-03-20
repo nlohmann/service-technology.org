@@ -74,8 +74,8 @@ void PathFinder::myNode::reset() { index=-2; low=-1; instack=false; nodes.clear(
 	@param im The incidence matrix created by the constructor call to IMatrix for the Petri net.
 	@param lookup The lookup table for solutions of lp_solve
 */
-PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& itps, JobQueue& sol, IMatrix& imx, map<map<Transition*,int>,vector<PartialSolution> >& lookup) 
-	: m0(m),fulltvector(tv),rec_tv(tv),cols(col),tps(itps),solutions(sol),im(imx),shortcut(lookup),recsteps(0) {
+PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& itps, JobQueue& sol, JobQueue& fail, IMatrix& imx, map<map<Transition*,int>,vector<PartialSolution> >& lookup) 
+	: m0(m),fulltvector(tv),rec_tv(tv),cols(col),tps(itps),solutions(sol),failure(fail),im(imx),shortcut(lookup),recsteps(0) {
 	for(unsigned int i=0; i<transitionorder.size(); ++i)
 	{
 		tton.push_back(new myNode());
@@ -139,7 +139,7 @@ bool PathFinder::recurse() {
 		PartialSolution newps(fseq,m0,rec_tv);
 		newps.setConstraints(tps.first()->getConstraints());
 		newps.setFullVector(fulltvector);
-		if (tps.find(&newps)>=0) { // job isn't already in the queue
+		if (!tps.findPast(&newps) && tps.find(&newps)>=0) { // job isn't already in the queue or past
 		if (tps.almostEmpty() || !tps.first()->betterSequenceThan(fseq,m0,rec_tv))
 		{
 			// but only save it for later use (=adaption of constraints) if it is new or better than the things we already have
@@ -147,7 +147,10 @@ bool PathFinder::recurse() {
 			{
 				if (solutions.push_solved(new PartialSolution(newps))) // no more transitions to fire, so we have a solution
 					if (args_info.forceprint_given) printSolution(&newps); // should we print it immediately?
-			} else tps.push_back(new PartialSolution(newps)); // put the job into the queue
+			} else {
+				if (tps.first()->compareSequence(fseq)) failure.push_fail(new PartialSolution(newps)); // sequence was not extended
+				tps.push_back(new PartialSolution(newps)); // put the job into the queue
+			}
 //			if (terminate) newps.setSolved(); // no more transitions to fire, so we have a solution
 //			tps.push_back(new PartialSolution(newps)); // put the job into the queue
 			// try to add this partial solution to the lookup table
@@ -158,8 +161,8 @@ bool PathFinder::recurse() {
 				shortcut[fulltvector].push_back(newps); 
 			}
 			if (verbose>1) {
-				if (terminate) status("Full Solution found:"); 
-				else status("New Partial Solution:");
+				if (terminate) cerr << "Full Solution found:" << endl; 
+				else cerr << "New Partial Solution:" << endl;
 				newps.show();
 				cerr << "*** PF ***" << endl;
 			}

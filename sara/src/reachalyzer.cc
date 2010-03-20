@@ -138,19 +138,19 @@ void Reachalyzer::start() {
 			tps.first()->show();
 		} 
 		if (verbose>1) cerr << "Lookup-Table-Size: " << shortcut.size() << endl;
-		map<Transition*,int> oldvector;
+		map<Transition*,int> oldvector(tps.first()->getFullVector());
 		// make a copy of the active job before we change it
-		PartialSolution ps(tps.first()->getSequence(),tps.first()->getMarking(),tps.first()->getRemains());
-		ps.setConstraints(tps.first()->getConstraints());
-		if (!tps.first()->getRemains().empty()) // active job is no solution, modify it
-		{
-			oldvector = tps.first()->getFullVector();
-			{ 
-				tps.first()->touchConstraints(); // mark all constraints so far as old
-//				tps.first()->calcCircleConstraints(im,m1); // old version of constraint builder
-				tps.first()->buildSimpleConstraints(im); // add new constraints
-			}
-		}
+		PartialSolution ps(*(tps.first()));
+//		PartialSolution ps(tps.first()->getSequence(),tps.first()->getMarking(),tps.first()->getRemains());
+//		ps.setConstraints(tps.first()->getConstraints());
+//		if (!tps.first()->getRemains().empty()) // active job is no solution, modify it
+//		{
+			nextJump(*(tps.first())); // create a new jump if one has been precomputed, before changes are made
+//			oldvector = tps.first()->getFullVector();
+			tps.first()->touchConstraints(false); // mark all normal constraints so far as old
+//			tps.first()->calcCircleConstraints(im,m1); // old version of constraint builder
+			tps.first()->buildSimpleConstraints(im); // add new constraints
+//		}
 		if (!lpwrap.stripConstraints()) { // remove all constraints not belonging to the marking equation
 			cerr << "sara: error: resize_lp failed" << endl; 
 			error=LPSOLVE_RESIZE_ERROR; 
@@ -184,6 +184,7 @@ void Reachalyzer::start() {
 			++loops; // count it, but ...
 			continue; // do not try to realize a firing sequence or create child jobs as lp_solve gave no solution
 		}
+		tps.first()->touchConstraints(true); // mark all jump constraints so far as old
 		// calculate what the new constraints changed in the solution of lp_solve
 		map<Transition*,int> fullvector(lpwrap.getTVector(net));
 		map<Transition*,int> diff; // this is the difference of the old and new solution
@@ -191,9 +192,10 @@ void Reachalyzer::start() {
 		for(vit=fullvector.begin(); vit!=fullvector.end(); ++vit)
 			if (vit->second>oldvector[vit->first])
 				diff[vit->first] = vit->second;
-		for(vit=oldvector.begin(); vit!=oldvector.end(); ++vit)
-			if (vit->second>fullvector[vit->first]) break; // have we increased the solution or jumped to another minimal one?
-		if (vit==oldvector.end() && ret<2 && !diff.empty()) 
+//		for(vit=oldvector.begin(); vit!=oldvector.end(); ++vit)
+//			if (vit->second>fullvector[vit->first]) break; // have we increased the solution or jumped to another minimal one?
+//		if (vit==oldvector.end() && ret<2 && !diff.empty()) 
+		if (ret<2 && !diff.empty()) 
 		{	// if we have made a non-jump leading to a higher solution before we may make a jump next, so create such a job
 //			Constraint c(diff); // build constraint to forbid the increase, so another minimal solution will be sought
 //			c.setRecent(true);
@@ -206,7 +208,7 @@ void Reachalyzer::start() {
 //				nps->show();
 //				cerr << "*** JUMP ***" << endl;
 //			}
-			createJumps(diff,ps);
+			createJumps(diff,*(tps.first()));
 		}
 		if (!tps.first()->getRemains().empty()) // the active job is not a full solution
 		{
@@ -237,7 +239,7 @@ void Reachalyzer::start() {
 		}
 		if (!solutionSeen(fullvector)) // adapt known solutions (from a earlier loop) for the new constraints
 		{ // no solutions known so far, calculate them by trying to realize a firing sequence
-			PathFinder pf(m1,fullvector,cols,tps,solutions,im,shortcut);
+			PathFinder pf(m1,fullvector,cols,tps,solutions,failure,im,shortcut);
 			pf.verbose = verbose;
 			pf.setMinimize();
 			solved = pf.recurse(); // main call to realize a solution
@@ -348,17 +350,44 @@ bool Reachalyzer::solutionSeen(map<Transition*,int>& tv) {
 	{
 		vp[i].setConstraints(tps.first()->getConstraints());
 		PartialSolution* cp(new PartialSolution(vp[i]));
-		tps.push_back(cp);
-		if (verbose>1) {
-			cerr << "sara: Seen Partial Solution:" << endl;
-			cp->show();
-			cerr << "*** LOOKUP ***" << endl;
+		if (!tps.findPast(cp))
+		{
+			tps.push_back(cp);
+			if (verbose>1) {
+				cerr << "sara: Seen Partial Solution:" << endl;
+				cp->show();
+				cerr << "*** LOOKUP ***" << endl;
+			}
 		}
 	}
 	return true;
 }
 
 void Reachalyzer::createJumps(map<Transition*,int>& diff, PartialSolution& ps) {
+	PartialSolution* nps(new PartialSolution(ps));
+	nps->setJC(diff); // make all jump alternatives available for future use
+	int val=0;
+	Transition* t(nps->getNextJC(val)); // get the first alternative
+	nps->popJC(); // and remove it from the list
+	// now create the according job
+	map<Transition*,int> tmp;
+	tmp[t] = val;
+	Constraint c(tmp); // build constraint to forbid the increase, so another minimal solution will be sought
+	c.setRecent(true);
+	nps->setConstraint(c);
+	if (!tps.findPast(nps))
+	{
+		tps.push_back(nps); // put the new job into the list
+		if (verbose>1) {
+			cerr << "sara: New Partial Solution:" << endl;
+			nps->show();
+			cerr << "*** CREATE JUMPS ***" << endl;
+		}
+	} else { 
+		nextJump(*nps);
+		delete nps;
+	} 
+/*
 	map<Transition*,int> tmp;
 	map<Transition*,int>::iterator mit;
 	for(mit=diff.begin(); mit!=diff.end(); ++mit)
@@ -369,14 +398,51 @@ void Reachalyzer::createJumps(map<Transition*,int>& diff, PartialSolution& ps) {
 		Constraint c(tmp); // build constraint to forbid the increase, so another minimal solution will be sought
 		c.setRecent(true);
 		nps->setConstraint(c);
-		tps.push_back(nps); // put the new job into the list
+		if (!tps.findPast(nps))
+		{
+			tps.push_back(nps); // put the new job into the list
+			if (verbose>1) {
+				cerr << "sara: New Partial Solution:" << endl;
+				nps->show();
+				cerr << "*** JUMP ***" << endl;
+			}
+		}
 		tmp.clear();
+	}
+*/
+}
+
+void Reachalyzer::nextJump(PartialSolution& ps) {
+	int val=0;
+	Transition* t(ps.getNextJC(val)); // get the next alternative jump
+	if (t==NULL) return; // [none available]
+	ps.popJC(); // and remove it from the list
+	PartialSolution* nps(new PartialSolution(ps));
+
+	// first remove the old jump constraint
+	set<Constraint>& cs(nps->getConstraints());
+	set<Constraint>::iterator cit;
+	for(cit=cs.begin(); cit!=cs.end(); ++cit)
+		if (cit->isRecent() && cit->isJump()) { cs.erase(cit); break; }
+
+	// then add the new one and create the according job
+	map<Transition*,int> tmp;
+	tmp[t] = val;
+	Constraint c(tmp); // build constraint to forbid the increase, so another minimal solution will be sought
+	c.setRecent(true);
+	nps->setConstraint(c);
+	if (!tps.findPast(nps))
+	{
+		tps.push_back(nps); // put the new job into the list
 		if (verbose>1) {
 			cerr << "sara: New Partial Solution:" << endl;
 			nps->show();
-			cerr << "*** JUMP ***" << endl;
+			cerr << "*** NEXT JUMP ***" << endl;
 		}
-	}
+	} else { 
+		delete nps;
+		nextJump(ps);
+	} 
 }
 
 int Reachalyzer::getMaxTraceLength() { return maxsollen; }

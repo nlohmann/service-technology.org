@@ -70,6 +70,9 @@ public:
 	/// Find a job, if it is already in the list
 	int find(PartialSolution* job);
 
+	/// Find out if a job has already been done in the past
+	bool findPast(PartialSolution* job);
+
 	/// Calculate the priority of a job or a failure
 	int priority(PartialSolution* job) const;
 /*
@@ -106,6 +109,12 @@ private:
 
 	/// active job, not saved in the queue
 	PartialSolution* active;
+
+	/// priority of the active job
+	int activeprio;
+
+	/// queue of past jobs for constraint comparisons
+	map<int,deque<PartialSolution*> > past;
 };
 
 #endif

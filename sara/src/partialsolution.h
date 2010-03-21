@@ -159,11 +159,23 @@ public:
 	/// Get all parikh images of firing sequences for this failure
 	vector<map<Transition*,int> >& getParikh();
 
+	/// Get the first jump constraint in the todo list
 	Transition* getNextJC(int& val);
+
+	/// Set a set of possible jump constraints to be used later
 	void setJC(map<Transition*,int>& jumptransitions);
+
+	/// Remove the first jump constraint from the todo list
 	void popJC();
 
+	/// check if the given firing sequence is a permutation of the one in this partial solution
 	bool compareSequence(vector<Transition*> seq);
+
+	/// alter jump constraints into normal ones
+	void transformJumps(map<Transition*,int>& fullvector);
+
+	int jumpsDone();
+	void setJumpsDone(int jd);
 
 private:	
 	/// the partial firing sequence
@@ -197,6 +209,9 @@ private:
 
 	/// map of transitions for creating jump constraints
 	map<int,int> jc;
+
+	/// number of jump constraints we have gone through so far, for job ordering
+	int jumpsdone;
 };
 
 #endif

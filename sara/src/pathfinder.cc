@@ -139,6 +139,7 @@ bool PathFinder::recurse() {
 		PartialSolution newps(fseq,m0,rec_tv);
 		newps.setConstraints(tps.first()->getConstraints());
 		newps.setFullVector(fulltvector);
+//		newps.setJumpsDone(tps.first()->jumpsDone());
 		if (!tps.findPast(&newps) && tps.find(&newps)>=0) { // job isn't already in the queue or past
 		if (tps.almostEmpty() || !tps.first()->betterSequenceThan(fseq,m0,rec_tv))
 		{
@@ -148,8 +149,9 @@ bool PathFinder::recurse() {
 				if (solutions.push_solved(new PartialSolution(newps))) // no more transitions to fire, so we have a solution
 					if (args_info.forceprint_given) printSolution(&newps); // should we print it immediately?
 			} else {
-				if (tps.first()->compareSequence(fseq)) failure.push_fail(new PartialSolution(newps)); // sequence was not extended
-				tps.push_back(new PartialSolution(newps)); // put the job into the queue
+				if (tps.first()->compareSequence(fseq) && !tps.first()->getRemains().empty()) 
+					failure.push_fail(new PartialSolution(newps)); // sequence was not extended
+				else tps.push_back(new PartialSolution(newps)); // put the job into the queue
 			}
 //			if (terminate) newps.setSolved(); // no more transitions to fire, so we have a solution
 //			tps.push_back(new PartialSolution(newps)); // put the job into the queue
@@ -166,8 +168,8 @@ bool PathFinder::recurse() {
 				newps.show();
 				cerr << "*** PF ***" << endl;
 			}
-		} else if (verbose>2) cerr << "sara: OldJobBetterThanNew-Hit" << endl;
-		} else if (verbose>2) cerr << "sara: CheckAgainstQueue-Hit" << endl;
+		} else if (verbose>1) cerr << "sara: OldJobBetterThanNew-Hit" << endl;
+		} else if (verbose>1) cerr << "sara: CheckAgainstQueue-Hit" << endl;
 		// go up one level in the recursion, if there were nonfirable transitions left over,
 		// but terminate the recursion altogether if this partial solution is a full solution.
 		return (args_info.continue_given?false:terminate); // surpress termination if -C flag is given

@@ -214,6 +214,7 @@ int JobQueue::priority(PartialSolution* job) const {
 			priority += it->second;
 	} else {
 		priority += (job->getConstraints().size());
+		priority += job->jumpsDone();
 		set<Constraint>::iterator cit;
 		for(cit=job->getConstraints().begin(); cit!=job->getConstraints().end(); ++cit)
 			if (cit->isJump()) ++priority;

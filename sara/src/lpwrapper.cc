@@ -35,6 +35,7 @@ using pnapi::Marking;
 
 extern vector<Transition*> transitionorder;
 extern vector<Place*> placeorder;
+extern map<Transition*,int> revtorder;
 
 	/*************************************
 	* Class LPWrapper method definitions *
@@ -138,6 +139,7 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	}
 
 	set_add_rowmode(lp,FALSE);	
+//	write_LP(lp,stdout);
 	if (verbose) write_LP(lp,stdout);
 	else set_verbose(lp,CRITICAL);
 	basicrows = placeorder.size()+cols+cnr;
@@ -193,6 +195,9 @@ unsigned char LPWrapper::getVariables(REAL* solution) {
 	@return TRUE if successful.
 */
 bool LPWrapper::addConstraints(PartialSolution& ps) {
+	// clear the RHS of single transitions in the model
+	for(int i=1; i<=(int)(cols); ++i)
+		set_rh(lp,(int)(placeorder.size())+i,0);
 	// add new constraints to lp model
 	REAL *constraint = new REAL[cols+1];
 	for(unsigned int i=0; i<=cols; ++i) constraint[i]=0;
@@ -211,14 +216,18 @@ bool LPWrapper::addConstraints(PartialSolution& ps) {
 			cerr << endl;
 		}
 		// add the constraint to the lp model, normal constraints with >=, jumps with <=
-		if (success && (jump || rhs>0)) 
-			if (!addConstraint(constraint,(jump?LE:GE),rhs)) 
+		if (success && (jump || rhs>0)) {
+			Transition* t(cit->isSingle());
+			if (t) set_rh(lp,placeorder.size()+revtorder[t]+1,rhs);
+			else if (!addConstraint(constraint,(jump?LE:GE),rhs)) 
 			{ 
 			  delete[] constraint; 
 			  abort(13,"error: failed to add constraint to LP model");
 			}
+		}
 	}
 	delete[] constraint;
+//	write_LP(lp,stdout);
 	return true;
 }
 

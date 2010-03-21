@@ -156,11 +156,12 @@ void Reachalyzer::start() {
 			error=LPSOLVE_RESIZE_ERROR; 
 			return; 
 		}
-		if (!lpwrap.addConstraints(*(tps.first()))) { // add the new constraints
-			cerr << "sara: error: addConstraints failed" << endl; 
-			error=LPSOLVE_UPDATE_ERROR; 
-			return; 
-		}
+		lpwrap.addConstraints(*(tps.first()));
+// { // add the new constraints
+//			cerr << "sara: error: addConstraints failed" << endl; 
+//			error=LPSOLVE_UPDATE_ERROR; 
+//			return; 
+//		}
 		int ret = lpwrap.solveSystem(); // now solve the system of marking equation + constraints
 		if (verbose>1) cerr << "sara: lp_solve returned " << ret << endl;
 		if (ret!=0 && ret!=1) { // in case we don't get a solution ...
@@ -200,7 +201,7 @@ void Reachalyzer::start() {
 //			Constraint c(diff); // build constraint to forbid the increase, so another minimal solution will be sought
 //			c.setRecent(true);
 //			ps.setConstraint(c);
-			ps.setFullVector(oldvector); // a jump must compare to the former solution, not to the new one
+//			ps.setFullVector(oldvector); // a jump must compare to the former solution, not to the new one
 //			PartialSolution* nps(new PartialSolution(ps));
 //			tps.push_back(nps); // put the new job into the list
 //			if (verbose>1) {
@@ -208,7 +209,8 @@ void Reachalyzer::start() {
 //				nps->show();
 //				cerr << "*** JUMP ***" << endl;
 //			}
-			createJumps(diff,*(tps.first()));
+			ps.touchConstraints(true); // mark all jump constraints so far as old
+			createJumps(diff,ps); //*(tps.first()));
 		}
 		if (!tps.first()->getRemains().empty()) // the active job is not a full solution
 		{
@@ -237,6 +239,7 @@ void Reachalyzer::start() {
 				continue; // do not try to find a realization
 			}
 		}
+		tps.first()->transformJumps(fullvector); // change jump constraints to normal ones
 		if (!solutionSeen(fullvector)) // adapt known solutions (from a earlier loop) for the new constraints
 		{ // no solutions known so far, calculate them by trying to realize a firing sequence
 			PathFinder pf(m1,fullvector,cols,tps,solutions,failure,im,shortcut);
@@ -372,7 +375,7 @@ void Reachalyzer::createJumps(map<Transition*,int>& diff, PartialSolution& ps) {
 	// now create the according job
 	map<Transition*,int> tmp;
 	tmp[t] = val;
-	Constraint c(tmp); // build constraint to forbid the increase, so another minimal solution will be sought
+	Constraint c(tmp,true); // build constraint to forbid the increase, so another minimal solution will be sought
 	c.setRecent(true);
 	nps->setConstraint(c);
 	if (!tps.findPast(nps))
@@ -395,7 +398,7 @@ void Reachalyzer::createJumps(map<Transition*,int>& diff, PartialSolution& ps) {
 	{
 		PartialSolution* nps(new PartialSolution(ps));
 		tmp[mit->first] = mit->second;		
-		Constraint c(tmp); // build constraint to forbid the increase, so another minimal solution will be sought
+		Constraint c(tmp,true); // build constraint to forbid the increase, so another minimal solution will be sought
 		c.setRecent(true);
 		nps->setConstraint(c);
 		if (!tps.findPast(nps))
@@ -428,7 +431,7 @@ void Reachalyzer::nextJump(PartialSolution& ps) {
 	// then add the new one and create the according job
 	map<Transition*,int> tmp;
 	tmp[t] = val;
-	Constraint c(tmp); // build constraint to forbid the increase, so another minimal solution will be sought
+	Constraint c(tmp,true); // build constraint to forbid the increase, so another minimal solution will be sought
 	c.setRecent(true);
 	nps->setConstraint(c);
 	if (!tps.findPast(nps))

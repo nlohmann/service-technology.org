@@ -54,11 +54,11 @@ using std::ostream;
 class Constraint {
 
 public:
-	/// standard constructor for the normal case
+	/// standard constructor for the normal case (place/token based)
 	Constraint();
 
-	/// standard constructor for the less-or-equal variant
-	Constraint(map<Transition*,int> jump);
+	/// standard constructor for the less-or-equal variant or transition-based ones
+	Constraint(map<Transition*,int> jump, bool isjump);
 
 	/// destructor
 	~Constraint();
@@ -125,6 +125,9 @@ public:
 
 	/// clean a set of failure constraints regarding this constraint
 	bool cleanConstraintSet(set<Constraint>& sc) const;
+
+	/// whether a constraint is a non-jump with only one transition with weight one, i.e. t>=n
+	Transition* isSingle() const;
 
 private:
 	/// weighted places, their presets will form the constraint

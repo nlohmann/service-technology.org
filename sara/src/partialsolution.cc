@@ -46,7 +46,7 @@ extern map<Transition*,int> revtorder;
 /** Constructor for the first partial solution (no output from lp_solve yet).
 	@param m1 The initial marking.
 */ 
-PartialSolution::PartialSolution(Marking& m1) : m(m1),markingEquation(false) {
+PartialSolution::PartialSolution(Marking& m1) : m(m1),markingEquation(false),jumpsdone(0) {
 	fullSolution = false;
 } 
 
@@ -55,7 +55,7 @@ PartialSolution::PartialSolution(Marking& m1) : m(m1),markingEquation(false) {
 	@param m1 The marking reached after the partial firing sequence.
 	@param rvec The remaining (nonfirable) transitions. 
 */
-PartialSolution::PartialSolution(vector<Transition*>& ts,Marking& m1,map<Transition*,int>& rvec) : tseq(ts),m(m1),remains(rvec),markingEquation(false) {
+PartialSolution::PartialSolution(vector<Transition*>& ts,Marking& m1,map<Transition*,int>& rvec) : tseq(ts),m(m1),remains(rvec),markingEquation(false),jumpsdone(0) {
 	fullSolution = false;
 }
 
@@ -120,7 +120,11 @@ bool PartialSolution::setConstraint(const Constraint& c) {
 			const_cast<Constraint*>(&(*cit))->setRecent(true);
 		}
 	}
-	else constraints.insert(c);
+	else {
+		constraints.insert(c);
+		if (c.isJump()) ++jumpsdone;
+		else if (c.isSingle()) --jumpsdone;
+	}
 	return true;
 }
 
@@ -151,6 +155,7 @@ int PartialSolution::findRHS(Constraint& c) {
 /* Removes all constraints from the partial solution.
 void PartialSolution::clearConstraints() { 
 	constraints.clear(); 
+	jumpsdone=0;
 }
 */
 
@@ -839,7 +844,7 @@ void PartialSolution::popJC() { if (!jc.empty()) jc.erase(jc.begin()); }
 bool PartialSolution::compareSequence(vector<Transition*> seq) {
 	if (seq.size()!=tseq.size()) return false;
 	map<Transition*,int> cnt;
-	for(int i=0; i<tseq.size(); ++i) {
+	for(unsigned int i=0; i<tseq.size(); ++i) {
 		++cnt[tseq[i]];
 		--cnt[seq[i]];
 	}
@@ -848,3 +853,27 @@ bool PartialSolution::compareSequence(vector<Transition*> seq) {
 		if (mit->second!=0) return false;
 	return true;
 }
+
+void PartialSolution::transformJumps(map<Transition*,int>& fullvector) {
+	bool hadjump(false);
+	set<Constraint>::iterator cit;
+	for(cit=constraints.begin(); cit!=constraints.end();)
+		if (cit->isJump()) {
+			constraints.erase(cit++);
+			hadjump = true;
+		} else ++cit;
+	if (!hadjump) return;
+	map<Transition*,int>::iterator mit;
+	for(mit=fullvector.begin(); mit!=fullvector.end(); ++mit)
+		if (mit->second>0) {
+			map<Transition*,int> tmp;
+			tmp[mit->first]=mit->second;
+			Constraint c(tmp,false);
+			setConstraint(c);
+		}	
+}
+
+int PartialSolution::jumpsDone() { return jumpsdone; }
+
+void PartialSolution::setJumpsDone(int jd) { jumpsdone=jd; }
+

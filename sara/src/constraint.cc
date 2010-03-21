@@ -48,10 +48,11 @@ Constraint::Constraint() : rhs(0),jump(false),recent(true) { posplace.clear(); s
 /** Jump constructor for class Constraint.
 	@param jmp A solution of lp_solve which is to be discriminated.
 */
-Constraint::Constraint(map<Transition*,int> jump) : rhs(-1),recent(true)
+Constraint::Constraint(map<Transition*,int> jump, bool isjump) : rhs(-1),recent(true)
 { 
-	this->jump = true;
-	// calculate the right-hand-side minus one
+	this->jump = isjump;
+	if (!isjump) rhs=0;
+	// calculate the right-hand-side (minus one if it is a jump)
 	map<Transition*,int>::iterator it;
 	for(it=jump.begin(); it!=jump.end(); ++it)
 	{	rhs += it->second; cs[it->first] = 1; }
@@ -296,8 +297,8 @@ int Constraint::compare(const Constraint& c) const {
 void Constraint::showConstraint(ostream& s) const {
 	// If a comma is needed for the comma separated list
 	bool comma = false;
-	s << "[";
 	if (jump) { // direct (jump) constraint, not via places
+		s << "[";
 		map<Transition*,int>::const_iterator cit;
 		for(cit=cs.begin(); cit!=cs.end(); ++cit)
 		{
@@ -308,7 +309,12 @@ void Constraint::showConstraint(ostream& s) const {
 		s << "]<=" << getRHS() << (isRecent()?"(r) ":" ");
 		return;
 	}
+	if (getPlaces().empty()) { // single transition constraint
+		s << cs.begin()->first->getName() << ">=" << getRHS() << " ";
+		return;
+	}
 	// print all places in the constraint
+	s << "[";
 	map<Place*,int>::const_iterator pxit;
 	for(pxit=getPlaces().begin(); pxit!=getPlaces().end(); ++pxit)
 	{
@@ -430,5 +436,15 @@ bool Constraint::cleanConstraintSet(set<Constraint>& sc) const {
 		++sit;
 	}
 	return result;
+}
+
+/** Computes whether this constraint is of the form t>=n.
+	@return If this is a single transition, non-jump constraint, the transition. Otherwise, NULL.
+*/
+Transition* Constraint::isSingle() const {
+	if (jump) return NULL;
+	if (cs.size()!=1) return NULL;
+	if (cs.begin()->second!=1) return NULL;
+	return cs.begin()->first;
 }
 

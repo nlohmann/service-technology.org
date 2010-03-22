@@ -109,6 +109,8 @@ string          \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 {open}"/"                  { BEGIN(INITIAL); return XML_END; }
 
 <CONTENT>{data}            { pnapi_pnml_yylval.s = strdup(yytext); return XML_DATA; }
+ /* the next line was added to parse ProM's PNML output */
+<CONTENT>.                 { pnapi_pnml_yylval.s = strdup(yytext); return XML_DATA; }
 
 .                          { yyerror("lexial error"); }
 <<EOF>>                    { return EOF; }

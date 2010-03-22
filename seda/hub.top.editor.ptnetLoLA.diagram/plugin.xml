@@ -59,7 +59,7 @@
   	  <wizard
   	     name="%newWizardName"
   	     icon="icons/document.net.bw_2.16.png"
-  	     category="org.eclipse.ui.Examples"
+  	     category="hub.top.editor.newWizards.category"
   	     class="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLACreationWizard"
   	     id="hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLACreationWizardID">
   	  	 <description>%newWizardDesc</description>  

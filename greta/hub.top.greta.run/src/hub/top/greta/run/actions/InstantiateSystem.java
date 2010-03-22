@@ -93,7 +93,7 @@ public class InstantiateSystem implements IWorkbenchWindowActionDelegate {
 			return;	// this system cannot be instantiated
 		
 		String parameter = fileName.substring(paramStart,paramEnd);
-		System.out.println("instantiating "+fileName+", parameter: "+parameter);
+		//System.out.println("instantiating "+fileName+", parameter: "+parameter);
 		
 		
 		IInputValidator intValidator = new IInputValidator() {
@@ -127,73 +127,7 @@ public class InstantiateSystem implements IWorkbenchWindowActionDelegate {
 		int paramRange_min = Integer.parseInt(minDiag.getValue());
 		int paramRange_max = Integer.parseInt(maxDiag.getValue());
 	
-		AdaptiveSystem inst = AdaptiveSystemFactory.eINSTANCE.createAdaptiveSystem();
-		AdaptiveProcess ap = AdaptiveSystemFactory.eINSTANCE.createAdaptiveProcess();
-		ap.setName("ap");
-
-		// copy all nodes of the adaptive process (modeling the initial state of the system)
-		for (Node n : adaptiveSystem.getAdaptiveProcess().getNodes()) {
-			
-			if (isParameterized(n.getName(), parameter)) {
-				
-				// create an instance of each node for each parameter value
-				for (int p = paramRange_min; p <= paramRange_max; p++) {
-					EcoreUtil.Copier copier = new EcoreUtil.Copier();
-					Node nInst = (Node)copier.copy(n);
-					copier.copyReferences();
-					
-					nInst.setName(instantiate(nInst.getName(), parameter, p, paramRange_min, paramRange_max));
-					
-					ap.getNodes().add(nInst);
-				}
-			} else {
-				// create a single copy of the node
-				EcoreUtil.Copier copier = new EcoreUtil.Copier();
-				Node nInst = (Node)copier.copy(n);
-				copier.copyReferences();
-				ap.getNodes().add(nInst);
-			}
-		}
-		inst.setAdaptiveProcess(ap);
-		
-		// copy all oclets of the adaptive system
-		for (Oclet o : adaptiveSystem.getOclets()) {
-			if (isParameterized(o.getName(), parameter)) {
-				
-				// create an instance of each oclet for each parameter value
-				for (int p = paramRange_min; p <= paramRange_max; p++) {
-					EcoreUtil.Copier copier = new EcoreUtil.Copier();
-					Oclet oInst = (Oclet)copier.copy(o);
-					copier.copyReferences();
-					
-					oInst.setName(instantiate(oInst.getName(), parameter, p, paramRange_min, paramRange_max));
-
-					// instantiate all nodes by instantiating their names
-					for (Node n : oInst.getPreNet().getNodes()) {
-						String name = n.getName();
-						if (!isParameterized(name, parameter))
-							continue;
-						
-						n.setName(instantiate(name, parameter, p, paramRange_min, paramRange_max));
-					}
-					for (Node n : oInst.getDoNet().getNodes()) {
-						String name = n.getName();
-						if (!isParameterized(name, parameter))
-							continue;
-						
-						n.setName(instantiate(name, parameter, p, paramRange_min, paramRange_max));
-					}
-					
-					inst.getOclets().add(oInst);
-				}
-			} else {
-				// create a single copy of the oclet without instantiating
-				EcoreUtil.Copier copier = new EcoreUtil.Copier();
-				Oclet oInst = (Oclet)copier.copy(o);
-				copier.copyReferences();
-				inst.getOclets().add(oInst);
-			}
-		}
+		AdaptiveSystem inst = instantiateSystem(adaptiveSystem, parameter, paramRange_min, paramRange_max);
 
 		String modelName = in.getFullPath().removeFileExtension().toString();
 		String targetPathInst = instantiate(modelName, parameter, paramRange_max, paramRange_min, paramRange_max);
@@ -201,8 +135,86 @@ public class InstantiateSystem implements IWorkbenchWindowActionDelegate {
 		System.out.println("write to "+targetPathInst);
 		ActionHelper.writeEcoreResourceToFile(workbenchWindow, URI.createFileURI(targetPathInst), inst);
 	}
+	
+	/**
+	 * @param adaptiveSystem
+	 * @param parameter
+	 * @param paramRange_min
+	 * @param paramRange_max
+	 * @return
+	 */
+	public static AdaptiveSystem instantiateSystem(AdaptiveSystem adaptiveSystem, String parameter, int paramRange_min, int paramRange_max) {
+    AdaptiveSystem inst = AdaptiveSystemFactory.eINSTANCE.createAdaptiveSystem();
+    AdaptiveProcess ap = AdaptiveSystemFactory.eINSTANCE.createAdaptiveProcess();
+    ap.setName("ap");
 
-	private boolean isParameterized(String pattern, String param) {
+    // copy all nodes of the adaptive process (modeling the initial state of the system)
+    for (Node n : adaptiveSystem.getAdaptiveProcess().getNodes()) {
+      
+      if (isParameterized(n.getName(), parameter)) {
+        
+        // create an instance of each node for each parameter value
+        for (int p = paramRange_min; p <= paramRange_max; p++) {
+          EcoreUtil.Copier copier = new EcoreUtil.Copier();
+          Node nInst = (Node)copier.copy(n);
+          copier.copyReferences();
+          
+          nInst.setName(instantiate(nInst.getName(), parameter, p, paramRange_min, paramRange_max));
+          
+          ap.getNodes().add(nInst);
+        }
+      } else {
+        // create a single copy of the node
+        EcoreUtil.Copier copier = new EcoreUtil.Copier();
+        Node nInst = (Node)copier.copy(n);
+        copier.copyReferences();
+        ap.getNodes().add(nInst);
+      }
+    }
+    inst.setAdaptiveProcess(ap);
+    
+    // copy all oclets of the adaptive system
+    for (Oclet o : adaptiveSystem.getOclets()) {
+      if (isParameterized(o.getName(), parameter)) {
+        
+        // create an instance of each oclet for each parameter value
+        for (int p = paramRange_min; p <= paramRange_max; p++) {
+          EcoreUtil.Copier copier = new EcoreUtil.Copier();
+          Oclet oInst = (Oclet)copier.copy(o);
+          copier.copyReferences();
+          
+          oInst.setName(instantiate(oInst.getName(), parameter, p, paramRange_min, paramRange_max));
+
+          // instantiate all nodes by instantiating their names
+          for (Node n : oInst.getPreNet().getNodes()) {
+            String name = n.getName();
+            if (!isParameterized(name, parameter))
+              continue;
+            
+            n.setName(instantiate(name, parameter, p, paramRange_min, paramRange_max));
+          }
+          for (Node n : oInst.getDoNet().getNodes()) {
+            String name = n.getName();
+            if (!isParameterized(name, parameter))
+              continue;
+            
+            n.setName(instantiate(name, parameter, p, paramRange_min, paramRange_max));
+          }
+          
+          inst.getOclets().add(oInst);
+        }
+      } else {
+        // create a single copy of the oclet without instantiating
+        EcoreUtil.Copier copier = new EcoreUtil.Copier();
+        Oclet oInst = (Oclet)copier.copy(o);
+        copier.copyReferences();
+        inst.getOclets().add(oInst);
+      }
+    }
+    return inst;
+	}
+
+	private static boolean isParameterized(String pattern, String param) {
 		int paramStart = pattern.indexOf('(')+1;
 		int paramEnd = pattern.indexOf(')');
 		if (paramStart == 0 || paramEnd == -1)
@@ -213,13 +225,13 @@ public class InstantiateSystem implements IWorkbenchWindowActionDelegate {
 		return (paramUse.indexOf(param) != -1);
 	}
 	
-	private String instantiate(String pattern, String param, int value, int min, int max) {
+	private static String instantiate(String pattern, String param, int value, int min, int max) {
 		int paramStart = pattern.indexOf('(')+1;
 		int paramEnd = pattern.indexOf(')');
 		
 		int a = value-min;	// shift value for proper module operation
 		
-		System.out.print("instantiate: "+pattern);
+		//System.out.print("instantiate: "+pattern);
 		
 		// identify use of '+' or '-' operators in the parameter use
 		String paramUse = pattern.substring(paramStart, paramEnd);

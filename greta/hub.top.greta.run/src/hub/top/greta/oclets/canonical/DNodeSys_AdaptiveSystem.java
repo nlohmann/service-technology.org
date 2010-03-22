@@ -292,6 +292,16 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 		DNodeSet ds = new DNodeSet(properNames.length);
 		for (DNode d : maxNodesOfO)
 			ds.add(d);
+		
+		// a maximal condition in the PreNet may not have a successor
+		// so translate the pre-net and add all additional maximal nodes to
+		// the DNode set as well
+		Collection<DNode> maxNodesOfHist = translateToDNodes(o.getPreNet(), false);
+    for (DNode d : maxNodesOfHist) {
+      if (!ds.allConditions.contains(d))
+        ds.add(d);
+    }
+		
 		return ds;
 	}
 	
@@ -313,4 +323,44 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 		return ds;
 	}
 
+	/**
+   * the maximal cut of each oclet's history in the system, required
+   * for finding implied scenarios
+   *
+	 * @return the maximal cut of each oclet's history in the system
+	 */
+	public LinkedList<DNode[]> getHistories() {
+	  LinkedList<DNode[]> histories = new LinkedList<DNode[]>();
+	  // iterate over all oclets
+	  for (Oclet o : ocletEncoding.keySet()) {
+	    // and return the maximal conditions of the pre-nets = global history
+	    Collection<Condition> histMax = o.getPreNet().getMarkedConditions();
+	    DNode[] dConditions = new DNode[histMax.size()];
+	    int i=0;
+	    for (Node p : histMax) {
+	      if (nodeEncoding.get(p) == null) System.err.println(p+" of "+o+"was not translated");
+	      dConditions[i++] = nodeEncoding.get(p);
+	    }
+	    DNode.sortIDs(dConditions);
+	    histories.add(dConditions);
+	  }
+	  return histories;
+	}
+	
+	@Override
+	public String getInfo() {
+    
+    int numPlaces = 0;
+    int numTransition = 0;
+    int numArcs = 0;
+    
+    for (Node n : nodeEncoding.keySet()) {
+      if (n instanceof Event)
+        numTransition++;
+      else
+        numPlaces++;
+      numArcs += n.getPreSet().size();
+    }
+	  return "|P| = "+numPlaces+" |T| = " + numTransition + " |F| = "+numArcs;
+	}
 }

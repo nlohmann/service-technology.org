@@ -486,6 +486,7 @@ public class ConditionDoNetTempEditPart extends LabelEditPart implements
 	protected void refreshFontColor() {
 		View view = (View) this.getParent().getModel();
 		Condition condition = (Condition) view.getElement();
+		if (condition == null) return;
 		if (condition.isSetDisabledByAntiOclet()
 				&& condition.isDisabledByAntiOclet()
 				|| condition.isSetDisabledByConflict()

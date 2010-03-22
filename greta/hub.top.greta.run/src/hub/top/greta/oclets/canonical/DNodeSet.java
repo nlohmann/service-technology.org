@@ -532,6 +532,7 @@ public class DNodeSet {
 		//String tokenFillString = "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
 		String cutOffFillString = "fillcolor=grey";
 		String antiFillString = "fillcolor=red";
+		String impliedFillString = "fillcolor=violet";
 		
 		HashSet<DNode> allNodes = getAllNodes();
 		
@@ -575,6 +576,8 @@ public class DNodeSet {
 			
 			if (n.isAnti)
 				b.append("  e"+n.globalId+" ["+antiFillString+"]\n");
+			else if (n.isImplied)
+        b.append("  e"+n.globalId+" ["+impliedFillString+"]\n");
 			else if (n.isCutOff)
 				b.append("  e"+n.globalId+" ["+cutOffFillString+"]\n");
 			else

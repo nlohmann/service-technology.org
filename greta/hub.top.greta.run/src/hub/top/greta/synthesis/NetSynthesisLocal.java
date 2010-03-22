@@ -133,13 +133,15 @@ public class NetSynthesisLocal {
           
           // compute pre_i = pre(post(i)) and pre_j = pre(post(j))
           HashSet<DNode> pre_i = new HashSet<DNode>();
-          for (DNode post_i : b_equiv[i].post) {
-            pre_i.addAll(Arrays.asList(post_i.pre));
-          }
+          if (b_equiv[i].post != null)
+            for (DNode post_i : b_equiv[i].post) {
+              pre_i.addAll(Arrays.asList(post_i.pre));
+            }
           HashSet<DNode> pre_j = new HashSet<DNode>();
-          for (DNode post_j : b_equiv[j].post) {
-            pre_j.addAll(Arrays.asList(post_j.pre));
-          }
+          if (b_equiv[j].post != null)
+            for (DNode post_j : b_equiv[j].post) {
+              pre_j.addAll(Arrays.asList(post_j.pre));
+            }
           
           // now check whether 'd' has a predecessor 'd_pre' that distinguishes i and j
           for (DNode d : diff) {
@@ -280,6 +282,19 @@ public class NetSynthesisLocal {
             PNAPI.mergeTransitions(net, trans[i], trans[j]);
             trans[j] = null;
           }
+        }
+      }
+    }
+
+    // check whether a implied condition is in the pre-/ and in the post-set
+    // of the same transition, if yes, put a token on this (redundant) place 
+    for (DNode d : impliedConditions_preserve) {
+      Place p = (Place)transMap.get(d);
+      
+      for (Transition t : p.getPostSet()) {
+        if (p.getPreSet().contains(t)) {
+          p.setToken(1);
+          break;
         }
       }
     }

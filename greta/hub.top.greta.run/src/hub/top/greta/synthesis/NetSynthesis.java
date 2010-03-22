@@ -37,6 +37,7 @@ package hub.top.greta.synthesis;
 
 import hub.top.editor.ptnetLoLA.Arc;
 import hub.top.editor.ptnetLoLA.Node;
+import hub.top.editor.ptnetLoLA.PNAPI;
 import hub.top.editor.ptnetLoLA.Place;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.editor.ptnetLoLA.PtnetLoLAFactory;
@@ -93,7 +94,7 @@ public class NetSynthesis {
     PtNet net = fact.createPtNet();
     
     for (DNode b: dBP.getAllConditions()) {
-      if (!b.isCutOff || equiv.get(b) == b) {
+      if (equiv.get(b) == null || equiv.get(b) == b) {
         Place p = fact.createPlace();
         p.setName(dAS.properNames[b.id]+"_"+b.globalId);
         net.getPlaces().add(p);
@@ -108,7 +109,7 @@ public class NetSynthesis {
     // now map each condition that has an equivalent counterpart to
     // the place that represents this counterpart
     for (DNode b: dBP.getAllConditions()) {
-      if (b.isCutOff && !b.isAnti) {
+      if (equiv.get(b) != null && equiv.get(b) != b && !b.isAnti) {
         d2n.put(b, d2n.get(equiv.get(b)));
       }
     }
@@ -165,6 +166,25 @@ public class NetSynthesis {
         a.setTarget(p);
         
         net.getArcs().add(a);
+      }
+    }
+    
+    Transition[] trans = net.getTransitions().toArray(new Transition[net.getTransitions().size()]);
+    for (int i=0; i<trans.length-1; i++) {
+      if (trans[i] == null) continue;
+      
+      for (int j=i+1; j<trans.length; j++) {
+        if (trans[j] == null) continue;
+        
+        String prefix_i = trans[i].getName().substring(0,trans[i].getName().lastIndexOf('_'));
+        String prefix_j = trans[j].getName().substring(0,trans[j].getName().lastIndexOf('_'));
+        
+        if (prefix_i.equals(prefix_j)) {
+          if (PNAPI.parallelTransitions(trans[i], trans[j], null)) {
+            PNAPI.mergeTransitions(net, trans[i], trans[j]);
+            trans[j] = null;
+          }
+        }
       }
     }
 

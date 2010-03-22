@@ -99,12 +99,11 @@ public class DNodeCutGenerator implements Iterator< DNode[] >{
 			}
 		}
 		
-		/*
-		System.out.println(cutCandidates);
-		for (i = 0; i< cutSize; i++)
-			System.out.println(i + ":" + possibleMatchList[i]);
-		 */
+		//System.out.println(cutCandidates);
+		//for (i = 0; i< cutSize; i++)
+		//	System.out.println(i + ":" + possibleMatchList[i]);
 
+		
 		for (i = 0; i < cutSize; i++) {
 			if (possibleMatchList[i].length() == 0) {
 				hasSomeCut = false;
@@ -167,14 +166,19 @@ public class DNodeCutGenerator implements Iterator< DNode[] >{
 	}
 	
 	private boolean isCut_co() {
+	  //System.out.println("check "+DNode.toString(currentCut));
+	  
 		for (int i=dirty;i<cutSize;i++) {
 			for (int j=0; j < i; j++) {
-				if (!co.get(currentCut[i]).contains(currentCut[j]))
+				if (!co.get(currentCut[i]).contains(currentCut[j])) {
+				  //System.out.println(currentCut[i]+" and "+currentCut[j]+" are not concurrent");
 					return false;
+				}
 			}
 			dirty++;	// concurrency for this node index (and below) has been
 						// verified
 		}
+		//System.out.println("is cut");
 		return true;
 	}
 	

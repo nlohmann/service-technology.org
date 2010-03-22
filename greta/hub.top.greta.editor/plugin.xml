@@ -10,15 +10,12 @@
 <plugin>
 
    <extension point="org.eclipse.ui.newWizards">
-      <category
-            id="org.eclipse.emf.ecore.Wizard.category.ID"
-            name="%_UI_Wizard_category"/>
       <wizard
             id="hub.top.adaptiveSystem.presentation.AdaptiveSystemModelWizardID"
             name="%_UI_AdaptiveSystemModelWizard_label"
             class="hub.top.adaptiveSystem.presentation.AdaptiveSystemModelWizard"
-            category="org.eclipse.emf.ecore.Wizard.category.ID"
-            icon="icons/full/obj16/AdaptiveSystemModelFile_old.gif">
+            category="hub.top.greta.Wizard.category.ID"
+            icon="icons/full/obj16/AdaptiveSystemModelFile.gif">
          <description>%_UI_AdaptiveSystemModelWizard_description</description>
          <selection class="org.eclipse.core.resources.IResource"/>
       </wizard>
@@ -28,7 +25,7 @@
       <editor
             id="hub.top.adaptiveSystem.presentation.AdaptiveSystemEditorID"
             name="%_UI_AdaptiveSystemEditor_label"
-            icon="icons/full/obj16/AdaptiveSystemModelFile_old.gif"
+            icon="icons/full/obj16/AdaptiveSystemModelFile.gif"
             extensions="adaptivesystem"
             class="hub.top.adaptiveSystem.presentation.AdaptiveSystemEditor"
             contributorClass="hub.top.adaptiveSystem.presentation.AdaptiveSystemActionBarContributor">

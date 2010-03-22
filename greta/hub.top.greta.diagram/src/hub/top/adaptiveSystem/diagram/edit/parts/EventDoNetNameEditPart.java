@@ -484,6 +484,7 @@ public class EventDoNetNameEditPart extends LabelEditPart implements
 	protected void refreshFontColor() {
 		View view = (View) this.getParent().getModel();
 		Event event = (Event) view.getElement();
+		if (event == null) return;
 		if (event.isSetDisabledByAntiOclet() && event.isDisabledByAntiOclet()
 				|| event.isSetDisabledByConflict()
 				&& event.isDisabledByConflict()) {

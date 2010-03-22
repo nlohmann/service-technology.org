@@ -217,4 +217,8 @@ public abstract class DNodeSys {
 	  }
 	  return null;
 	}
+	
+	public String getInfo () {
+	  return "";
+	}
 }

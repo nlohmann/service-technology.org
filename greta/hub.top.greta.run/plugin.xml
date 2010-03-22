@@ -153,6 +153,14 @@
                style="push"
                tooltip="build branching process of the system">
          </action>
+         <action
+               class="hub.top.greta.run.actions.CheckSoundness"
+               id="hub.top.GRETA.run.checkSoundness"
+               label="check soundness"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/analysis"
+               style="push"
+               tooltip="check soundness of the system">
+         </action>
       </actionSet>
       
       <!-- actions for transforming an adaptive system -->
@@ -248,6 +256,21 @@
                label="build transition system"
                menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
          </action>
+         <!-- check soundness -->
+         <action
+               class="hub.top.greta.run.actions.CheckSoundness"
+               id="hub.top.GRETA.run.checkSoundness"
+               label="check soundness"
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
+         </action>
+         <!-- build branching processes -->
+         <action
+               class="hub.top.greta.run.actions.BuildBranchingProcessMulti"
+               id="hub.top.GRETA.run.buildBranchingProcess_multi"
+               label="build branching process (i=1 .. n)"
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
+         </action>
+         
          <!-- synthesize a labeled Petri net -->
          <action
                class="hub.top.greta.synthesis.SynthesizeLabeledNetAction"
@@ -288,6 +311,32 @@
             </separator>
          </menu>
       </objectContribution>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <!-- general context menu structure for PtNet files -->
+      <objectContribution
+            id="hub.top.GRETA.run.menu.ptnet"
+            nameFilter="*.ptnet"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               id="hub.top.GRETA.run.menu.ptnet"
+               label="P/T nets"
+               path="additions">
+            <separator
+                  name="analysis">
+            </separator>
+         </menu>
+         
+         <!-- build branching processes -->
+         <action
+               class="hub.top.greta.run.actions.BuildBranchingPTnet"
+               id="hub.top.GRETA.run.buildBranchingProcess_ptnet"
+               label="build branching process"
+               menubarPath="hub.top.GRETA.run.menu.ptnet/analysis">
+         </action>
+     </objectContribution>
    </extension>
    <!-- end of menu and action specifications --> 
    

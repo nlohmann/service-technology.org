@@ -47,7 +47,7 @@
   	  <wizard
   	     name="%newWizardName"
   	     icon="icons/obj16/AdaptiveSystemDiagramFile.gif"
-  	     category="org.eclipse.ui.Examples"
+  	     category="hub.top.greta.Wizard.category.ID"
   	     class="hub.top.adaptiveSystem.diagram.part.AdaptiveSystemCreationWizard"
   	     id="hub.top.adaptiveSystem.diagram.part.AdaptiveSystemCreationWizardID">
   	  	 <description>%newWizardDesc</description>  

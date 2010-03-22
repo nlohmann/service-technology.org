@@ -21,5 +21,12 @@
             type="adaptivesystem"
             class="hub.top.adaptiveSystem.util.AdaptiveSystemResourceFactoryImpl"/>
    </extension>
+   
+   <!-- define category for wizard "new file" wizard menus --> 
+   <extension point="org.eclipse.ui.newWizards">
+      <category
+            id="hub.top.greta.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+   </extension>     
 
 </plugin>

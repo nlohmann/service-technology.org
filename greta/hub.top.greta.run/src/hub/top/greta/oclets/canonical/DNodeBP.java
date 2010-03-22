@@ -72,48 +72,52 @@ public class DNodeBP {
    *  compare each candidate event only with events that are predecessors
    *  of the candidate event
    */
-  public static boolean options_searchStrat_predecessor = false;
+  private boolean options_searchStrat_predecessor = false;
 	/**
 	 *  check for cut-off events using the lexicographic order on events:
 	 *  compare each candidate event only with events that have been added
 	 *  previously and which have a strictly smaller prime configuration
 	 */
-	public static boolean options_searchStrat_lexicographic = false;
+  private boolean options_searchStrat_lexicographic = false;
 	
   //// --- equivalence notions for detecting whether two events are equivalent
   /**
    *  check for equivalence of cuts by comparing their histories for
    *  enabling the same sets of events
    */
-  public static boolean options_cutOffEquiv_eventSignature = false;
+  private boolean options_cutOffEquiv_eventSignature = false;
   /**
    *  check for equivalence of cuts by comparing their histories for
    *  isomorphism to the maximal depth of the histories in the input system
    */
-  public static boolean options_cutOffEquiv_history = false;
+  private boolean options_cutOffEquiv_history = false;
 	/**
 	 * check for equivalence of cuts by comparing the reached markings only
 	 */
-	public static boolean options_cutOffEquiv_marking = false;
+  private boolean options_cutOffEquiv_marking = false;
 	/**
 	 *  check for equivalence of cuts by comparing the histories of conditions
 	 *  with respect to the conditions of the given system
 	 */
-	public static boolean options_cutOffEquiv_conditionHistory = false;
+  private boolean options_cutOffEquiv_conditionHistory = false;
 
 	//// --- analysis flags
 	/**
 	 * whether properties shall be checked on the fly at all
 	 */
-	public static boolean options_checkProperties = false;
+  private boolean options_checkProperties = false;
 	/**
 	 * check whether the system is unsafe
 	 */
-	public static boolean options_checkProperty_Unsafe = false;
+  private boolean options_checkProperty_Unsafe = false;
 	/**
 	 * check whether the system has dead conditions (which have no post-event
 	 */
-	public static boolean options_checkProperty_DeadCondition = false;
+  private boolean options_checkProperty_DeadCondition = false;
+	/**
+	 * stop BP construction if the property to be checked has been found
+	 */
+  private boolean options_stopIfPropertyFound = true;
 	
 	/**
 	 * A {@link DNode}-compatible representation of the original system for
@@ -151,7 +155,7 @@ public class DNodeBP {
 		options_cutOffEquiv_conditionHistory = true;
 		
     options_checkProperties = true;
-    options_checkProperty_Unsafe = true;
+    options_checkProperty_Unsafe = false;
     options_checkProperty_DeadCondition = true;
 	}
 
@@ -194,9 +198,17 @@ public class DNodeBP {
 			co.put(d, new HashSet<DNode>());
 		}
 		for (DNode d : bp.maxNodes) {
-			updateConcurrencyRelation(d);
+		  for (DNode d2 : bp.maxNodes) {
+		    if (d == d2) continue;
+		    co.get(d).add(d2);
+		    co.get(d2).add(d);
+		  }
+			//updateConcurrencyRelation(d);
 		}
-
+    
+		
+    //System.out.println("----- init done -----");
+    //System.out.println(co);
 	}
 	
 	private static DNode getPreEvent(DNode d) {
@@ -291,7 +303,8 @@ public class DNodeBP {
 				for (int i=0; i<preConditions.length; i++)
 					if (max.id == preConditions[i].id
 					    // consider only conditions which are NOT successors of a cutOff event
-					    && (max.pre == null || max.pre.length == 0 || !max.pre[0].isCutOff))
+					    //&& (max.pre == null || max.pre.length == 0 || !max.pre[0].isCutOff)
+					   )
 					{
 						possibleMatches = possibleMatches.add(max);
 					}
@@ -302,7 +315,8 @@ public class DNodeBP {
 				for (int i=0; i<preConditions.length; i++)
 					if (max.id == preConditions[i].id
               // consider only conditions which are NOT successors of a cutOff event
-              && (max.pre == null || max.pre.length == 0 || !max.pre[0].isCutOff))
+					    //&& (max.pre == null || max.pre.length == 0 || !max.pre[0].isCutOff)
+					   )
 					{
 						possibleMatches = possibleMatches.add(max);
 					}
@@ -310,6 +324,8 @@ public class DNodeBP {
 		// possibleMatches contains all nodes of max BP that have the same
 		// ID as one of the preconditions, but which are not marked as cutOff 
 		// generate cuts from these nodes
+		
+		//System.out.println("possible matches: "+possibleMatches);
 		
 		
 		// the mapping possibleMatches now assigns each node of patternToFind
@@ -348,39 +364,51 @@ public class DNodeBP {
 	 */
 	private EnablingInfo getAllEnabledEvents() {
 		EnablingInfo info = new EnablingInfo();
+		
+    //System.out.println(co);
 
 		short lastEnabledID = -1;
 		int beginIDs = 0;
 		for (DNode e : dNodeAS.fireableEvents)
 		{
 		
-			//System.out.println(e+" "+toString(e.pre)+":");
+			//System.out.println("ENABLED "+e+" "+DNode.toString(e.pre)+":");
 			LinkedList<DNode[]> cuts = findEnablingCuts(e.pre, co, null);
-
+			//System.out.println("checking enabling locations...");
+			
 			//Iterable<DNode> cutNodes = bp.maxNodes;
 			
 		  for (DNode[] cutNodes : cuts) {
 		    
-        //System.out.println(toString(cutNodes));
+        //System.out.println("@ "+DNode.toString(cutNodes) +" ???");
   
   			// see if this event is already present at the given cut
   
+		    boolean allCutOff = true;
+		    
   			int foundNum = 0;
   			for (DNode b : cutNodes)
   			{
-  				if (b.post != null)
+  			  if (!b.isCutOff) allCutOff = false;
+  				if (b.post != null) {
   					for (int j = 0; j < b.post.length; j++)
   						if (b.post[j].id == e.id) {
   							foundNum++;
   							break;
   						}
+  				}
   			}
   			// we found a post-event with the same ID as the transition that
   			// we want to fire at every node of the current location: the transition
   			// was already fired here, so skip this one
   			if (foundNum == cutNodes.length) {
   			  //System.out.println("foundNum == cutNodes.length");
+  			  //System.out.println(e+" is already present at "+DNode.toString(cutNodes)+ ", not firing ");
   				continue;	
+  			}
+  			if (allCutOff == true) {
+  			  //System.out.println("skipping "+DNode.toString(cutNodes)+" because all are cut-offs");
+  			  continue;
   			}
   
   			DNode[] loc = new DNode[e.pre.length];
@@ -413,7 +441,7 @@ public class DNodeBP {
   				
   				assert loc[e.pre.length] != null : "Error, adding invalid enabling location";
   			
-  
+  				//System.out.println("event is enabled");
   				if (lastEnabledID != e.id) {
   
   					// this is the first event with "name"
@@ -496,7 +524,7 @@ public class DNodeBP {
 			
 			if (info.synchronizedEvents.get(i) == null) {
 
-				//System.out.println("fire "+info.enabledEvents.get(i)+ " at "+toString(info.enablingLocation.get(i)));
+				//System.out.println("fire "+info.enabledEvents.get(i)+ " at "+DNode.toString(info.enablingLocation.get(i)));
 				DNode e = info.enabledEvents.get(i);
 
 				if (e.isAnti) {
@@ -510,7 +538,7 @@ public class DNodeBP {
 				DNode events[] = new DNode[info.synchronizedEvents.get(i).size()];
 				events = info.synchronizedEvents.get(i).toArray(events);
 
-				//System.out.println("fire "+toString(events)+ " at "+toString(info.enablingLocation.get(i)));
+				//System.out.println("fire "+DNode.toString(events)+ " at "+DNode.toString(info.enablingLocation.get(i)));
 				boolean isAnti = false;
 				for (int j=0;j<events.length;j++)
 					if (events[j].isAnti) {
@@ -558,6 +586,7 @@ public class DNodeBP {
   			// remember cutOff on post-conditions as well
   			if (newEvent.isCutOff == true)
   				for (DNode b : postConditions) {
+  				  //System.out.println("setting cut-off condition "+b+" because of "+newEvent);
   					b.isCutOff = true;
   					b.isAnti = newEvent.isAnti;	// copy the anti-flag
   				}
@@ -728,11 +757,11 @@ public class DNodeBP {
    *    0 if construction of the branching process is complete.
    */
   public int step() {
-    // System.out.println("----- next step -----");
+    //System.out.println("----- next step -----");
     EnablingInfo info = getAllEnabledEvents();
     int fired = fireAllEnabledEvents(info);
     
-    if (propertyCheck == PROP_NONE)
+    if (propertyCheck == PROP_NONE || !options_stopIfPropertyFound)
       return fired;
     else
       return 0; // abort if properties violated
@@ -809,12 +838,14 @@ public class DNodeBP {
    * Update the mapping that relates each new condition of a cutOff event to
    * its equivalent counterpart condition.
    * 
+   * @param newEvent
+   *     the new cut-off event
    * @param newConditions
    *     the new conditions
    * @param equivalentEvent
    *     the old conditions to which <code>newConditions</code> are equivalent
    */
-  private void updateCCpair(DNode[] newConditions, DNode equivalentConditions[]) {
+  private void updateCCpair(DNode newEvent, DNode[] newConditions, DNode equivalentConditions[]) {
     for (int i=0; i<newConditions.length; i++) {
       
       DNode existing = elementary_ccPair.get(equivalentConditions[i]);
@@ -823,10 +854,19 @@ public class DNodeBP {
       else
         elementary_ccPair.put(newConditions[i], existing);
       
-      if (newConditions[i] == equivalentConditions[i])
-        System.out.println("[DNodeBP:updateCCpair] WARNING: making "+newConditions[i]+" equivalent to itself");
-      else
+      if (newConditions[i] == equivalentConditions[i]) {
+        //System.out.println("[DNodeBP:updateCCpair] WARNING: making "+newConditions[i]+" equivalent to itself");
+      } else {
+        
+        // update mapping only for post-conditions of cut-off event
+        if (newConditions[i].pre != null && newConditions[i].pre.length > 0
+            && newConditions[i].pre[0] != newEvent) {
+          continue;
+        }
+        
+        //System.out.println("setting cut-off condition: "+newConditions[i]+" because of "+equivalentConditions[i]);
         newConditions[i].isCutOff = true; // remember it
+      }
     }
   }
   
@@ -898,7 +938,7 @@ public class DNodeBP {
 	private boolean findEquivalentCut_history(DNode newEvent, DNode[] newCut, Iterable<DNode> eventsToCompare) {
 
 		if (equivalentCuts_history(newCut, bp.initialCut)) {
-		  updateCCpair(newCut, bp.initialCut);
+		  updateCCpair(newEvent, newCut, bp.initialCut);
 			return true;
 		}
 		
@@ -908,7 +948,7 @@ public class DNodeBP {
 			DNode[] oldCut = bp.getPrimeCut(e, null);
 			if (equivalentCuts_history(newCut, oldCut)) {
 			  updateCCpair(newEvent, e); // update the cutOff mapping
-			  updateCCpair(newCut, oldCut);
+			  updateCCpair(newEvent, newCut, oldCut);
 				return true;
 			}
 		}
@@ -990,7 +1030,7 @@ public class DNodeBP {
 		// check the initial cut for equivalence
 		if (newCut.length == bp.initialCut.length)
 			if (equivalentCuts_eventSignature_predecessor(newCutSignature, bp.initialCut)) { 
-			  updateCCpair(newCut, bp.initialCut); // make new and old cut equivalent
+			  updateCCpair(newEvent, newCut, bp.initialCut); // make new and old cut equivalent
 				return true;
 			}
 		
@@ -1002,7 +1042,7 @@ public class DNodeBP {
 			if (newCut.length == oldCut.length)
 				if (equivalentCuts_eventSignature_predecessor(newCutSignature, oldCut)) {
 	        updateCCpair(newEvent, e);     // make new and old event equivalent
-	        updateCCpair(newCut, oldCut);  // make new and old cut equivalent
+	        updateCCpair(newEvent, newCut, oldCut);  // make new and old cut equivalent
 					return true;
 				}
 		}
@@ -1135,7 +1175,7 @@ public class DNodeBP {
 		if (newCut.length == bp.initialCut.length)
 			if (equivalentCuts_eventSignature_lexik(newEventSignature, bp.initialCut)) {
 				//System.out.println(toString(newCut)+ " equals initial");
-			  updateCCpair(newCut, bp.initialCut); // make new and old cut equivalent
+			  updateCCpair(newEvent, newCut, bp.initialCut); // make new and old cut equivalent
 				return true;
 			}
 		
@@ -1158,7 +1198,7 @@ public class DNodeBP {
 				if (equivalentCuts_eventSignature_lexik(newEventSignature, oldCut)) {
 					//System.out.println(toString(newCut)+ " equals " + toString(oldCut));
 	        updateCCpair(newEvent, e);    // make new and old event equivalent
-	        updateCCpair(newCut, oldCut); // make new and old cut equivalent
+	        updateCCpair(newEvent, newCut, oldCut); // make new and old cut equivalent
 					return true;
 				}
 			}
@@ -1234,7 +1274,7 @@ public class DNodeBP {
 	private boolean findEquivalentCut_marking_predecessor(DNode newEvent, DNode[] newCut, Iterable<DNode> eventsToCompare) {
 
 		if (equivalentCuts_marking(newCut, bp.initialCut)) {
-		  updateCCpair(newCut, bp.initialCut);
+		  updateCCpair(newEvent, newCut, bp.initialCut);
 			return true;
 		}
 		
@@ -1244,7 +1284,7 @@ public class DNodeBP {
 			DNode[] oldCut = bp.getPrimeCut(e, null);
 			if (equivalentCuts_marking(newCut, oldCut)) {
 	      updateCCpair(newEvent, e);    // make new and old event equivalent
-	      updateCCpair(newCut, oldCut); // make new and old cut equivalent
+	      updateCCpair(newEvent, newCut, oldCut); // make new and old cut equivalent
 				return true;
 			}
 		}
@@ -1339,7 +1379,7 @@ public class DNodeBP {
 		
 		if (newCut.length == bp.initialCut.length)
 			if (equivalentCuts_conditionSignature_history(newCutSignature, newCut, bp.initialCut)) {
-			  updateCCpair(newCut, bp.initialCut);
+			  updateCCpair(newEvent, newCut, bp.initialCut);
 				return true;
 			}
 		
@@ -1361,7 +1401,7 @@ public class DNodeBP {
 			if (newCut.length == oldCut.length)
 				if (equivalentCuts_conditionSignature_history(newCutSignature, newCut, oldCut)) {
 	        updateCCpair(newEvent, e); // update the cutOff mapping
-	        updateCCpair(newCut, oldCut);
+	        updateCCpair(newEvent, newCut, oldCut);
 					return true;
 				}
 		}
@@ -1590,22 +1630,36 @@ public class DNodeBP {
 	 *  
 	 * -------------------------------------------------------------------------- */
   
+  public int statistic_condNum = 0;
+  public int statistic_eventNum = 0;
+  public int statistic_cutOffNum = 0;
+  public int statistic_arcNum = 0;
+	
+  /**
+   * Compute statistics information for the branching process and store this
+   * information in the fields
+   *    {@link #statistic_arcNum}
+   *    {@link #statistic_condNum}
+   *    {@link #statistic_cutOffNum}
+   *    {@link #statistic_eventNum}
+   * @return a string representation of the statistics
+   */
 	public String getStatistics() {
-		int condNum = 0;
-		int eventNum = 0;
-		int cutOffNum = 0;
+
 		for (DNode n : bp.getAllNodes()) {
 			if (n.isEvent) {
-				eventNum++;
-
-				if (n.isCutOff && !n.isAnti)
-					cutOffNum++;
+			  statistic_eventNum++;
+  
+  			if (n.isCutOff && !n.isAnti)
+  			  statistic_cutOffNum++;
 				
 				//System.out.println(n+" : "+toString(bp.getPrimeCut(n, null)));
 			}
-			else condNum ++;
+			else statistic_condNum ++;
+			
+			statistic_arcNum += n.pre.length; 
 		}
-		return "|B|="+condNum +" |E|="+eventNum+" |E_cutOff|="+cutOffNum;
+		return "|B|="+statistic_condNum +" |E|="+statistic_eventNum+" |E_cutOff|="+statistic_cutOffNum+" |F|="+statistic_arcNum;
 	}
 	
 	/**
@@ -1656,9 +1710,9 @@ public class DNodeBP {
  *  
  * -------------------------------------------------------------------------- */
 	
-	private static final int PROP_NONE = 0;
-	private static final int PROP_UNSAFE = 1;
-	private static final int PROP_DEADCONDITION = 2;
+	public static final int PROP_NONE = 0;
+	public static final int PROP_UNSAFE = 1;
+	public static final int PROP_DEADCONDITION = 2;
 
 	private int propertyCheck = PROP_NONE;
 
@@ -1684,7 +1738,7 @@ public class DNodeBP {
         // if two neighboring conditions have equal IDs -> unsafe cut
         if (currentPrimeCut[i].id == currentPrimeCut[i+1].id) {
           propertyCheck |= PROP_UNSAFE;
-          System.out.println("Found an unsafe prime cut: "+toString(currentPrimeCut));
+          System.out.println("Found an unsafe prime cut: "+DNode.toString(currentPrimeCut));
         }
       }
     }
@@ -1692,6 +1746,11 @@ public class DNodeBP {
     return true;
   }
 	
+  /**
+   * stores all dead conditions that were found in {@link #findDeadConditions(boolean)}
+   */
+  private LinkedList<DNode> deadConditions;
+  
 	/**
 	 * Check the constructed branching process for containment of dead conditions.
 	 * A dead condition is a condition which has no successor event, i.e., where
@@ -1716,6 +1775,8 @@ public class DNodeBP {
 		if ((propertyCheck & PROP_UNSAFE) > 0)
 			return false;
 		
+		deadConditions = new LinkedList<DNode>();
+		
 		// find a non-cut-off condition in the maximal nodes of the BP
 		int numDeadConditions = 0;
 		for (DNode b : bp.maxNodes) {
@@ -1728,6 +1789,7 @@ public class DNodeBP {
 					System.out.println("Found dead condition: "+b);
 	        propertyCheck |= PROP_DEADCONDITION;
 					numDeadConditions++;
+          deadConditions.add(b);
 	        if (first) return true;
 				} else {
 				  // yes: this condition is structurally dead, no problem due to 'b'
@@ -1766,6 +1828,7 @@ public class DNodeBP {
 			          System.out.println("Found dead condition: "+c+" wrt. "+b);
 			          propertyCheck |= PROP_DEADCONDITION;
 			          numDeadConditions++;
+			          deadConditions.add(c);
 			          if (first) return true;
 				      }
 				    }
@@ -1775,6 +1838,370 @@ public class DNodeBP {
 		}
 		System.out.println("Number of dead conditions: "+numDeadConditions);
 		return (numDeadConditions > 0);
+	}
+	
+	/**
+	 * @return list of dead conditions found in {@link #findDeadConditions(boolean)}
+	 */
+	public LinkedList<DNode> getDeadConditions() {
+	  return deadConditions;
+	}
+	
+	public LinkedList<DNode> getImpliedScenarios() {
+	  LinkedList<DNode> implied = new LinkedList<DNode>();
+	  for (DNode e : bp.getAllEvents()) {
+	    if (e.isCutOff) continue;
+	    
+	    HashSet<Short> postIDs = new HashSet<Short>();
+	    // collect the IDs of all post-events of e
+	    if (e.post != null) {
+	      for (DNode b : e.post) {
+	        if (b.post != null) {
+	          for (DNode e2 : b.post) {
+	            postIDs.add(e2.id);
+	          }
+	        }
+	      }
+	    }
+	    
+	    // check for each transition t that occurs by event e
+	    // each post-transition t2 of t occurs as post-event of e (by postIDs)
+      for (int i=0; i<e.causedBy.length; i++) {
+        DNode t = dNodeAS.getTransitionForID(e.causedBy[i]);
+        // whether all successors of t are also successors of e
+        if (t.post == null || t.post.length == 0) continue;
+        for (DNode tPost : t.post) {
+          if (tPost.post == null || tPost.post.length == 0) continue;
+          DNode t2 = tPost.post[0]; // successor transition of t
+          if (!postIDs.contains(t2.id)) {
+            // t2 does not occur as post-event of e, e is implied behavior
+            implied.add(e);
+            e.isImplied = true;
+            break;
+          }
+        }
+        if (e.isImplied) break;
+      }
+	  }
+	  return implied;
+	}
+	
+	 public LinkedList<DNode> getImpliedScenarios_global() {
+	   LinkedList<DNode> impliedEvents = new LinkedList<DNode>();
+	   
+	   if (dNodeAS instanceof DNodeSys_AdaptiveSystem) {
+	     DNodeSys_AdaptiveSystem os = (DNodeSys_AdaptiveSystem)dNodeAS;
+	     LinkedList<DNode[]> histories = os.getHistories();
+	     
+	     int eventNum = 0;
+	     
+	     for (DNode e : bp.getAllEvents()) {
+	       eventNum++;
+	       //if (e.isCutOff) continue;
+	       
+	       for (int iCaused=0; iCaused<e.causedBy.length; iCaused++) {
+	         DNode t = dNodeAS.getTransitionForID(e.causedBy[iCaused]);
+	         // event e is an occurrence of a transition that has a its
+	         // preconditions in the history of an oclet
+	         DNode[] hist = null;
+	         HashSet<Short> preSetInHist = new HashSet<Short>();
+	         // check whether transition 't' has its preplaces in a global history of
+	         // an oclet (FIXME: can be improved, every 't' has exactly on such history or null)
+	         for (int iHist=0; iHist < histories.size() && hist == null; iHist++) {
+
+	           // check if all pre-places of t occur in the global history 'iHist'
+	           boolean all_pInHist = true;
+             for (DNode p : t.pre) {
+               boolean p_isInHist = false;
+  	           for (DNode pInHist : histories.get(iHist)){
+  	             if (pInHist == p) { p_isInHist = true; break; }
+  	           }
+  	           if (!p_isInHist) { all_pInHist = false; break; }
+  	         }
+  	         if (!all_pInHist) continue;
+  	         
+  	         // 'iHist' is the global history of transition 't'
+  	         hist = histories.get(iHist);
+  	         // remember the pre-places which alrady occur as pre-conditions of event 'e'
+  	         for (DNode p : t.pre) {
+  	           preSetInHist.add(p.id);
+	           }
+  	         break;
+	         }
+	         if (hist == null) // e not contributed by a minimal transition
+	           continue;       // of an oclet
+	         
+	         // all nodes concurrent to the pre-set of the event 'e'
+	         HashSet<DNode> uncoveredNodes = new HashSet<DNode>();
+	         for (DNode b : e.pre) {
+	           uncoveredNodes.addAll(co.get(b));
+	         }
+	         
+	         // all nodes covered by the histories and their predecessors
+	         // and successors
+	         HashSet<DNode> coveredNodes = new HashSet<DNode>();
+	         
+	         // check if these preconditions extend to an occurrence of the
+	         // entire history
+	         DNode.SortedLinearList possibleMatches = new DNode.SortedLinearList();	         
+	         for (DNode b : e.pre) {
+	           if (preSetInHist.contains(b.id)) {
+	             // already found the matching condition for the place with id == b.id
+	             possibleMatches.add(b);
+	           }
+	         }
+	           
+           // all nodes to search for cuts
+           for (DNode max : bp.getAllConditions()) {
+             // the pre-conditions of event e are fixed for this cut, ignore
+             // all other conditions with the same ID (assuming safe cuts here)
+             if (preSetInHist.contains(max.id)) continue;
+             // only conditions which are concurrent to the pre-conditions of 'e'
+             // can be part of a cut
+             if (!co.get(e.pre[0]).contains(max)) continue;
+             // add those conditions of the branching process that occur also
+             // in the history
+             for (int iCut=0; iCut<hist.length; iCut++) {
+               if (max.id == hist[iCut].id)
+               {
+                 possibleMatches = possibleMatches.add(max);
+               }
+             }
+           }
+           // possible matches contains all conditions that may extend to
+           // a cut which ends with 'hist'
+           
+           boolean histNotFound = false;
+           // get the cuts
+           DNodeCutGenerator cgen = new DNodeCutGenerator(hist, possibleMatches, co);
+           while (cgen.hasNext())
+           {
+             DNode[] cutNodes = cgen.next();
+
+             // see if each precondition of event e is
+             // in max BP (current maximal conditions of the current BP)
+             int iHist=0; 
+             for (; iHist<hist.length; iCaused++) {
+               boolean found = false;
+               // find a matching condition for hist[iHist] in cutNodes
+               for (DNode b : cutNodes)
+               {
+                 if (b.id == hist[iHist].id) {
+                   if (b.endsWith(hist[iHist])) {
+                     found = true;
+                     break;
+                   }
+                 }
+               }
+               iHist++;
+               if (!found) { // no match, cancel
+                 //System.out.println("no match for "+ e.pre[i]);
+                 break;
+               }
+             } // finish searching for matching preconditions in max BP
+             if ( iHist == hist.length ) {
+               //histFound = true;
+               //break;
+               
+               HashSet<DNode> intersectCoNodes = null;
+               // all nodes of the history are covered by it
+               for (DNode b : cutNodes) {
+                 coveredNodes.add(b);
+                 // construct the intersection of all conditions that are concurrent to
+                 // the cutNodes, the resulting conditions all occur in a cut that involves
+                 // the global history of 'e'
+                 if (intersectCoNodes == null) intersectCoNodes = new HashSet<DNode>(co.get(b));
+                 else intersectCoNodes.retainAll(co.get(b));
+               }
+               coveredNodes.addAll(intersectCoNodes);
+             }
+           } // all occurreces of the history of the oclet of e
+           
+           // compute all concurrent nodes that are not covered by a history
+           uncoveredNodes.removeAll(coveredNodes);
+
+           // cover all forwards reachable nodes
+           HashSet<DNode> processed = new HashSet<DNode>();
+           LinkedList<DNode> toProcess = new LinkedList<DNode>();
+           // to also cover all successors: mimic the firing of branching processes
+           // into all uncovered nodes: uncovered nodes should be direct successors of
+           // covered histories...
+           for (DNode b : coveredNodes) {
+             if (b.isEvent || b.post == null) continue;
+             for (DNode bPost : b.post) {
+               if (!coveredNodes.contains(bPost)) {
+                 toProcess.add(bPost);
+               }
+             }
+             processed.add(b);
+           }
+           
+           while (!toProcess.isEmpty()) {
+             DNode eProcess = toProcess.removeFirst();
+             
+             boolean preProcessed = true;
+             boolean reQueue = true;
+             for (DNode b : eProcess.pre) {
+               if (!processed.contains(b)) {
+                 preProcessed = false;
+                 // one predecessor of the event is not covered, so all successors are
+                 // also not covered, remove this event
+                 if (!coveredNodes.contains(b)) reQueue = false;
+               }
+             }
+             if (!preProcessed && reQueue) {
+               toProcess.addLast(eProcess);
+               continue;
+             }
+             
+             if (eProcess.post == null) continue;
+             for (DNode b : eProcess.post) {
+               // do not explore beyond unconvered nodes
+               if (!uncoveredNodes.contains(b)) continue;
+               
+               coveredNodes.add(b);
+               uncoveredNodes.remove(b);
+               processed.add(b);
+               if (b.post == null) continue;
+               for (DNode eSucc : b.post) {
+                 toProcess.addLast(eSucc);
+               }
+             }
+           }
+           
+           // cover all backwards reachable nodes
+           LinkedList<DNode> queue = new LinkedList<DNode>();
+           for (DNode b : coveredNodes) {
+             queue.add(b);
+           }
+
+           while (!queue.isEmpty()) {
+             DNode coveredNode = queue.removeFirst();
+             if (coveredNode.pre == null) continue;
+             for (DNode pre : coveredNode.pre) {
+               if (coveredNodes.contains(pre)) continue;
+               
+               uncoveredNodes.remove(pre);
+               coveredNodes.add(pre);
+               queue.addLast(pre);
+             }
+           }
+           // all predecessors of covered nodes eventually reach covered behavior, i.e.
+           // a cut where the global history of 'e' occurs
+           
+           if (!uncoveredNodes.isEmpty())
+             histNotFound = true;
+           
+           /*
+           HashSet<DNode> toCheck = new HashSet<DNode>(uncoveredNodes);
+           while (!toCheck.isEmpty())
+           {
+             DNode yetUncovered = toCheck.iterator().next();
+             toCheck.remove(yetUncovered);
+             // this node to check has been covered already, skip
+             if (!uncoveredNodes.contains(yetUncovered))
+               continue;
+             
+             // search all predecessor of 'yetUnconvered' whether it contains
+             // a covered node,
+             // - if the first covered node met on this path is a covered event,
+             //   then 'yetUncovered' is covered,
+             // - if the first covered node met on this path is a covered condition,
+             //   then 'yetUncovered' is uncovered
+             // - if no covered node is met, then the search reaches the minimal nodes of
+             //   the prefix, if there is covered concurrent condition, then 'yetUncovered'
+             //   is covered
+             queue.add(yetUncovered);
+             HashSet<DNode> visitedNodes = new HashSet<DNode>();
+             while (!queue.isEmpty()) {
+               DNode uncoveredPred = queue.removeFirst();
+               // collect all nodes visited on the descent, these node are covered
+               // iff 'yetUncovered' is covered
+               visitedNodes.add(uncoveredPred);
+               
+               if (uncoveredPred.pre == null || uncoveredPred.pre.length == 0) {
+                 // an uncovered node without predecessor
+                 boolean coveredByCo = false;
+                 // it is covered if it has a concurrent node that is covered
+                 // because it cannot be in conflict to any of the covered cuts
+                 for (DNode coNode : co.get(uncoveredPred)) {
+                   if (coveredNodes.contains(coNode)) {
+                     coveredNodes.addAll(visitedNodes);
+                     uncoveredNodes.removeAll(visitedNodes);
+                     coveredByCo = true;
+                     break;
+                   }
+                 }
+                 if (!coveredByCo) {
+                   histNotFound = true;
+                   break;
+                 }
+               } else {
+                 
+                 // an uncovered node with predecessor
+                 for (DNode pre : uncoveredPred.pre) {
+                   if (coveredNodes.contains(pre)) {
+                     if (pre.isEvent) {
+                       // the predecessor if this node is a covered event
+                       // so this condition is concurrent to a condition
+                       // which occurs in a cut where the global history of
+                       // 'e' occurs, we're done
+                       coveredNodes.addAll(visitedNodes);
+                       uncoveredNodes.removeAll(visitedNodes);
+                       break; // the inner loop for predecessors of 'uncovered'
+                     
+                     } else if (!coveredNodes.contains(uncoveredPred)) {
+                       // the predecessor of this node is a covered condition
+                       // but this node is uncovered or leads to an uncovered
+                       // node, so this node (and its successors) do not reach
+                       // a cut where the global history of 'e' occurs
+                       histNotFound = true;
+                       break;
+                     }
+                   } else {
+                     // visit this predecessor, because we don't know
+                     // whether it is covered or not
+                     if (!queue.contains(pre))
+                       queue.addLast(pre);
+                   }
+                 } // all predecessors of 'uncovered' node
+               }
+             }
+           }
+           */
+           if (histNotFound) {
+             System.out.println("event "+e+" is implied");
+             System.out.println("uncovered conditions: "+uncoveredNodes);
+             System.out.println("covered nodes: "+coveredNodes);
+             e.isImplied = true;
+             impliedEvents.add(e);
+           }
+	       }
+	     } // check event 'e' for being implied
+	   }
+	   return impliedEvents;
+	 }
+	
+	/**
+	 * @param d
+	 * @return
+	 *   all maximal conditions of the counter-example trace that
+	 *   reaches the {@link DNode} d, the trace is then all nodes that
+	 *   precede the returned conditions
+	 */
+	public DNode[] getCounterExample(DNode d) {
+	  DNode event = null;
+	  if (d.isEvent) {
+	    event = d;
+	  } else {
+	    if (d.pre != null && d.pre.length > 0) {
+	      event = d.pre[0];
+	    } else {
+	      return bp.initialCut;
+	    }
+	  }
+	  
+	  return bp.getPrimeCut(event, null);
 	}
 	
 	/**
@@ -1822,18 +2249,6 @@ public class DNodeBP {
   public boolean hasDeadCondition() {
     if (!options_checkProperty_DeadCondition) return true;
     return (propertyCheck & PROP_DEADCONDITION) > 0;
-  }
-
-  /**
-   * @param arr
-   * @return a string representation of the given {@link DNode} array
-   */
-  private static String toString(DNode[] arr) {
-    String result = "[";
-    for (DNode d : arr) {
-      result += d+", ";
-    }
-    return result + "]";
   }
 
   /**

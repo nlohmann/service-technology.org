@@ -37,12 +37,12 @@
 package hub.top.greta.run.actions;
 
 import hub.top.adaptiveSystem.AdaptiveSystem;
-import hub.top.adaptiveSystem.Event;
-import hub.top.adaptiveSystem.Oclet;
 import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.eclipse.ResourceHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.greta.oclets.canonical.DNodeBP;
+import hub.top.greta.oclets.canonical.InvalidModelException;
+import hub.top.greta.run.Activator;
 import hub.top.greta.synthesis.DNode2PtNet;
 import hub.top.greta.verification.BuildBP;
 
@@ -66,130 +66,136 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
+public class BuildBranchingPTnet implements IWorkbenchWindowActionDelegate {
 
-	public static final String ID = "hub.top.GRETA.run.buildBranchingProcess2";
-	
-	private IWorkbenchWindow workbenchWindow;
+  public static final String ID = "hub.top.GRETA.run.buildBranchingProcess_ptnet";
+  
+  private IWorkbenchWindow workbenchWindow;
 
-	private AdaptiveSystem adaptiveSystem;
-	
-	// fields for tracking the selection in the explorer 
-	private IFile 	selectedFile = null;
-	private URI 	selectedURI = null;
-	
-	public void dispose() {
-		// TODO Auto-generated method stub
+  private PtNet net;
+  
+  // fields for tracking the selection in the explorer 
+  private IFile   selectedFile = null;
+  private URI   selectedURI = null;
+  
+  public void dispose() {
+    // TODO Auto-generated method stub
 
-	}
+  }
 
-	public void init(IWorkbenchWindow window) {
-		workbenchWindow = window;
-	}
-	
+  public void init(IWorkbenchWindow window) {
+    workbenchWindow = window;
+  }
+  
 
-	public void run(IAction action) {
-		if (!action.getId().equals(ID))
-			return;
-		
-		// seek system to check from a given URI
-		adaptiveSystem = ActionHelper.getAdaptiveSystem(selectedURI);
-		
-		// if there was no system at the given URI, check the current editor
-		if (adaptiveSystem == null) {
-			IEditorPart editor = workbenchWindow.getActivePage().getActiveEditor();
-			adaptiveSystem = ActionHelper.getAdaptiveSystem(editor);
-			
-			// if this editor has input file, remember it
-			if (editor.getEditorInput() != null
-				&& editor.getEditorInput() instanceof IFileEditorInput)
-			{
-				selectedFile = ((IFileEditorInput)editor.getEditorInput()).getFile();
-			}
-		}
-		
-		if (adaptiveSystem == null)
-			return;
-			
-		//final DNodeBP bp = BuildBP.init(adaptiveSystem);
-		final BuildBP build = new BuildBP(adaptiveSystem, selectedFile);
-		
-		Job bpBuildJob = new Job("constructing branching process") 
-		{
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-			  
+  public void run(IAction action) {
+    if (!action.getId().equals(ID))
+      return;
+    
+    // seek system to check from a given URI
+    net = ActionHelper.getPtNet(selectedURI);
+    
+    /*
+    // if there was no system at the given URI, check the current editor
+    if (net == null) {
+      IEditorPart editor = workbenchWindow.getActivePage().getActiveEditor();
+      net = ActionHelper.getAdaptiveSystem(editor);
+      
+      // if this editor has input file, remember it
+      if (editor.getEditorInput() != null
+        && editor.getEditorInput() instanceof IFileEditorInput)
+      {
+        selectedFile = ((IFileEditorInput)editor.getEditorInput()).getFile();
+      }
+    }
+    */
+    if (net == null)
+      return;
+      
+    //final DNodeBP bp = BuildBP.init(net);
+    final BuildBP build;
+    
+    try {
+      build = new BuildBP(net, selectedFile);
+    } catch (InvalidModelException e) {
+      Activator.getPluginHelper().logError("Could not load model for verification.", e);
+      return;
+    }
+    
+    Job bpBuildJob = new Job("constructing branching process") 
+    {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        
         monitor.beginTask("constructing branching process", IProgressMonitor.UNKNOWN);
         
         // build branching process
         boolean interrupted = !build.run(monitor, System.out);
-			  build.printStatistics(System.out);
-			  build.analyze(monitor, System.out);
-				
-			  //build.minimize(monitor, System.out);
-			  build.writeBPtoFile(monitor, System.out, "_bp2");
-			  
-			  PtNet net = DNode2PtNet.process(build.getBranchingProcess());
-			  
+        build.printStatistics(System.out);
+        build.analyze(monitor, System.out);
+        
+        //build.minimize(monitor, System.out);
+        build.writeBPtoFile(monitor, System.out, "_bp2");
+        
+        PtNet net = DNode2PtNet.process(build.getBranchingProcess());
+        
         String modelName = selectedFile.getFullPath().removeFileExtension().lastSegment();
         IPath targetPath = selectedFile.getFullPath().removeLastSegments(1).append(modelName+"_bp2").addFileExtension("ptnet");
         TransactionalEditingDomain editing = GMFEditingDomainFactory.INSTANCE.createEditingDomain();
         FileIOHelper.writeEObjectToResource(net, editing, targetPath);
 
-        System.out.println("input model size: "+build.getBranchingProcess().getSystem().getInfo());
+        monitor.done();
+        
+        /*
+        if (interrupted)
+          return Status.CANCEL_STATUS;
+        else*/
+          return Status.OK_STATUS;
+        
+      }
+    };
+      
+    bpBuildJob.setUser(true);
+    bpBuildJob.schedule();
+  }
 
-			  monitor.done();
-				
-				/*
-				if (interrupted)
-					return Status.CANCEL_STATUS;
-				else*/
-					return Status.OK_STATUS;
-				
-			}
-		};
-			
-		bpBuildJob.setUser(true);
-		bpBuildJob.schedule();
-	}
-
-	public void selectionChanged(IAction action, ISelection selection) {
-	    selectedURI = null;
-	    selectedFile = null;
-	    action.setEnabled(false);
-	    if (selection instanceof IStructuredSelection == false
-	        || selection.isEmpty()) {
-	      return;
-	    }
-	    try {
-	      Object o = ((IStructuredSelection) selection).getFirstElement();
-	      if (o instanceof IFile) {
-	        selectedFile = (IFile) ((IStructuredSelection) selection).getFirstElement();
-	        selectedURI = URI.createPlatformResourceURI(selectedFile.getFullPath()
-	            .toString(), true);
-	        
-	      } else if (o instanceof EditPart) {
-	        EObject e = (EObject)((EditPart)o).getModel();
-	        selectedURI = e.eResource().getURI();
+  public void selectionChanged(IAction action, ISelection selection) {
+      selectedURI = null;
+      selectedFile = null;
+      action.setEnabled(false);
+      if (selection instanceof IStructuredSelection == false
+          || selection.isEmpty()) {
+        return;
+      }
+      try {
+        Object o = ((IStructuredSelection) selection).getFirstElement();
+        if (o instanceof IFile) {
+          selectedFile = (IFile) ((IStructuredSelection) selection).getFirstElement();
+          selectedURI = URI.createPlatformResourceURI(selectedFile.getFullPath()
+              .toString(), true);
+          
+        } else if (o instanceof EditPart) {
+          EObject e = (EObject)((EditPart)o).getModel();
+          selectedURI = e.eResource().getURI();
           selectedFile = ResourceHelper.uriToFile(selectedURI);
           
-	      } else {
-	        return;
-	      }
-	      
-		    action.setEnabled(true);
-	    } catch (ClassCastException e) {
-	    	// just catch, do nothing
-	    } catch (NullPointerException e) {
-	      // just catch, do nothing
-	    }
-	}
+        } else {
+          return;
+        }
+        
+        action.setEnabled(true);
+      } catch (ClassCastException e) {
+        // just catch, do nothing
+      } catch (NullPointerException e) {
+        // just catch, do nothing
+      }
+  }
 
-	private void writeDotFile (DNodeBP bp, IFile inputFile, String suffix) {
+  private void writeDotFile (DNodeBP bp, IFile inputFile, String suffix) {
 
-		String targetPathStr = inputFile.getFullPath().removeFileExtension().toString();
-		IPath targetPath = new Path(targetPathStr+suffix+".dot");
+    String targetPathStr = inputFile.getFullPath().removeFileExtension().toString();
+    IPath targetPath = new Path(targetPathStr+suffix+".dot");
 
-		ActionHelper.writeFile (targetPath, bp.toDot());
-	}
+    ActionHelper.writeFile (targetPath, bp.toDot());
+  }
 }

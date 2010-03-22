@@ -64,6 +64,7 @@ public class DNode {
 	public boolean	isEvent = false;
 	public boolean  isCutOff = false;
 	public boolean  isAnti = false;
+	public boolean  isImplied = false;  // event of an implied scenario
 	
 	/**
 	 * For finding cutOff events using the signature method, we compare whether
@@ -270,7 +271,7 @@ public class DNode {
 	 */
 	@Override
 	public String toString() {
-		return translationTable.properNames[this.id]+" ("+this.id+")["+this.globalId+"]"; 
+		return "'"+translationTable.properNames[this.id]+"' ("+this.id+")["+this.globalId+"]"; 
 	}
 
 	
@@ -283,6 +284,18 @@ public class DNode {
 	/* ------------------------------ merge sort ----------------------------- */ 
 	
 	/**
+   * @param arr
+   * @return a string representation of the given {@link DNode} array
+   */
+  public static String toString(DNode[] arr) {
+    String result = "[";
+    for (DNode d : arr) {
+      result += d+", ";
+    }
+    return result + "]";
+  }
+
+  /**
 	 * Merge two DNode arrays half1 and half2 into a DNode array by sorting
 	 * the nodes by their IDs in ascending order. The result is either written
 	 * to result[] or, if <code>result == null</code> a new appropriate array

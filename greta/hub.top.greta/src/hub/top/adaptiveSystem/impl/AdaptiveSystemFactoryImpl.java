@@ -180,6 +180,7 @@ public class AdaptiveSystemFactoryImpl extends EFactoryImpl implements AdaptiveS
 	 */
 	public Condition createCondition() {
 		ConditionImpl condition = new ConditionImpl();
+		condition.setName("");  // set the empty name
 		return condition;
 	}
 
@@ -190,6 +191,7 @@ public class AdaptiveSystemFactoryImpl extends EFactoryImpl implements AdaptiveS
 	 */
 	public Event createEvent() {
 		EventImpl event = new EventImpl();
+    event.setName("");  // set the empty name
 		return event;
 	}
 

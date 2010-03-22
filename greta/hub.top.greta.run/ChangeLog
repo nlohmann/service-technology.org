@@ -1,3 +1,17 @@
+Greta v1.1.5
+------------
+
++ [analysis] algorithm to check for implied scenarios on the branching process of an oclet system
++ [interface] check soundness of free-choice process and generate counter-example trace in graphical editor
++ [interface] build branching processes from parameterized models
++ [interface] build branching process of Petri nets (.ptnet)
+* [unfolding algorithm] options made member variables: can be set for different BP construction/verification jobs differently
+* [unfolding algorithm] to generate all 
+* [unfolding algorithm] fixed bug in computation of equivalence relation wrt. cut-off events
+* [synthesis] removing parallel transitions with the same label in synthesized net
++ [interface] statistics to print size of computed prefix
+* [interface] move Wizards to 'Adaptive System' category
+
 Greta v1.1.4
 ------------
 

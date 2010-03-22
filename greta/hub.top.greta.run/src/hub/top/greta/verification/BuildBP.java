@@ -36,12 +36,16 @@
 package hub.top.greta.verification;
 
 import java.io.PrintStream;
+import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import hub.top.adaptiveSystem.AdaptiveSystem;
+import hub.top.editor.ptnetLoLA.PtNet;
+import hub.top.greta.oclets.canonical.DNode;
 import hub.top.greta.oclets.canonical.DNodeBP;
+import hub.top.greta.oclets.canonical.InvalidModelException;
 
 public class BuildBP {
 
@@ -60,10 +64,26 @@ public class BuildBP {
   
   /**
    * @param adaptiveSystem
+   */
+  public BuildBP(PtNet net) throws InvalidModelException {
+    bp = BuildBP.init(net);
+  }
+  
+  /**
+   * @param adaptiveSystem
    * @param srcFile
    */
   public BuildBP(AdaptiveSystem adaptiveSystem, IFile srcFile) {
     bp = BuildBP.init(adaptiveSystem);
+    this.srcFile = srcFile;
+  }
+  
+  /**
+   * @param adaptiveSystem
+   * @param srcFile
+   */
+  public BuildBP(PtNet net, IFile srcFile) throws InvalidModelException  {
+    bp = BuildBP.init(net);
     this.srcFile = srcFile;
   }
   
@@ -124,15 +144,41 @@ public class BuildBP {
       return true;
   }
   
-  public boolean analyze(IProgressMonitor monitor, PrintStream out) {
-    boolean hasDeadlock = bp.hasDeadCondition();
-    boolean isUnsafe = !bp.isSafe();
+  public int analyze(IProgressMonitor monitor, PrintStream out) {
     
-    if (out != null) {
-      if (hasDeadlock) out.println("has a deadlock.");
-      if (isUnsafe) System.out.println("is unsafe.");
+    boolean hasDeadlock = bp.findDeadConditions(true);
+    boolean isUnsafe = !bp.isGloballySafe();
+    
+    int result = DNodeBP.PROP_NONE;
+    
+    if (hasDeadlock) {
+      if (out != null) out.println("has a deadlock.");
+      result |= DNodeBP.PROP_DEADCONDITION;
     }
-    return true;
+    if (isUnsafe) {
+      if (out != null) out.println("is unsafe.");
+      result |= DNodeBP.PROP_UNSAFE;
+    }
+    
+    LinkedList<DNode> implied = bp.getImpliedScenarios();
+    if (!implied.isEmpty()) {
+      if (out != null) out.println("has implied behavior (by incomplete successor events):.");
+      for (DNode d : implied) {
+        if (out != null) out.println(d); 
+      }
+    }
+    long startTime = System.currentTimeMillis();
+    implied = bp.getImpliedScenarios_global();
+    if (!implied.isEmpty()) {
+      if (out != null) out.println("has implied behavior (global history not found):");
+      for (DNode d : implied) {
+        if (out != null) out.println(d); 
+      }
+    }
+    long endTime = System.currentTimeMillis();
+    if (out != null) out.println("time for checking implied scenarios (global): "+(endTime-startTime)+"ms");
+    
+    return result;
   }
   
   public boolean minimize(IProgressMonitor monitor, PrintStream out) {
@@ -169,6 +215,10 @@ public class BuildBP {
   
   public static DNodeBP init(AdaptiveSystem adaptiveSystem) {
     return new DNodeBP(adaptiveSystem);
+  }
+  
+  public static DNodeBP init(PtNet net) throws InvalidModelException {
+    return new DNodeBP(net);
   }
   
   public static int step(DNodeBP bp) {

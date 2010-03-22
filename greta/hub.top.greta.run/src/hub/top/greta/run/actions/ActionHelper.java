@@ -40,6 +40,7 @@ import hub.top.adaptiveSystem.AdaptiveProcess;
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
 import hub.top.adaptiveSystem.presentation.AdaptiveSystemEditor;
+import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.greta.run.Activator;
 
 import java.io.ByteArrayInputStream;
@@ -152,6 +153,44 @@ public class ActionHelper {
 		}
 		return adaptiveSystem;
 	}
+	
+  /**
+   * Retrieve {@link PtNet} object from the resource at
+   * the given uri if the resource stores an {@link PtNet}.
+   * 
+   * @param uri
+   * @return
+   */
+  public static PtNet getPtNet(URI uri) {
+    PtNet net = null;
+    
+    if (uri != null) {
+      ResourceSet rs = new ResourceSetImpl();
+      Resource r = rs.getResource(uri, true);
+      
+      // check the contents of the resource
+      if (r.getContents() != null && r.getContents().size() > 0) {
+        // first element only
+        EObject o = r.getContents().get(0);
+        if (o instanceof PtNet) {
+          // the resource stores an adaptive system object, return it
+          net = (PtNet)o;
+        } else if (o instanceof Diagram) {
+          // the resource stores a diagram object
+          if ( ((Diagram)o).getElement() instanceof PtNet ) {
+            // which refers to an adaptive system object, return that
+            net = (PtNet)((Diagram)o).getElement();
+          }  else if ( ((Diagram)o).getElement() instanceof PtNet ) {
+            // which refers to an adaptive process object,
+            // which is contained in an adaptive process, return that
+            net = (PtNet)((Diagram)o).getElement().eContainer();
+          }
+        }
+      }
+    }
+    return net;
+  }
+  
 	
 	/**
 	 * Write <code>contents</code> to a resource of the Eclipse framework

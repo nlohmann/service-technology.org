@@ -37,12 +37,14 @@
 package hub.top.greta.run.actions;
 
 import hub.top.adaptiveSystem.AdaptiveSystem;
-import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Oclet;
 import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.eclipse.ResourceHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
+import hub.top.greta.oclets.canonical.DNode;
 import hub.top.greta.oclets.canonical.DNodeBP;
+import hub.top.greta.simulation.AdaptiveProcessSimulationView;
+import hub.top.greta.synthesis.DNode2Oclet;
 import hub.top.greta.synthesis.DNode2PtNet;
 import hub.top.greta.verification.BuildBP;
 
@@ -55,20 +57,27 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gef.EditPart;
+import org.eclipse.gmf.runtime.diagram.ui.editpolicies.CanonicalConnectionEditPolicy;
+import org.eclipse.gmf.runtime.diagram.ui.resources.editor.parts.DiagramDocumentEditor;
 import org.eclipse.gmf.runtime.emf.core.GMFEditingDomainFactory;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
+public class CheckSoundness implements IWorkbenchWindowActionDelegate {
 
-	public static final String ID = "hub.top.GRETA.run.buildBranchingProcess2";
+	public static final String ID = "hub.top.GRETA.run.checkSoundness";
 	
 	private IWorkbenchWindow workbenchWindow;
 
@@ -113,6 +122,7 @@ public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
 			
 		//final DNodeBP bp = BuildBP.init(adaptiveSystem);
 		final BuildBP build = new BuildBP(adaptiveSystem, selectedFile);
+		final Shell shell = workbenchWindow.getShell();
 		
 		Job bpBuildJob = new Job("constructing branching process") 
 		{
@@ -124,9 +134,56 @@ public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
         // build branching process
         boolean interrupted = !build.run(monitor, System.out);
 			  build.printStatistics(System.out);
-			  build.analyze(monitor, System.out);
+			  
+			  if (!interrupted) {
+  			  int result = build.analyze(monitor, System.out);
+  			  if ((result & DNodeBP.PROP_DEADCONDITION) != 0) {
+  			    final DNodeBP bp = build.getBranchingProcess();
+  			    
+  			    final AdaptiveProcessSimulationView apView = new AdaptiveProcessSimulationView();
+  			    apView.setProcessViewEditor_andFields(workbenchWindow.getActivePage().getActiveEditor());
+  			    
+            
+            Display.getDefault().syncExec(new Runnable() {
+              public void run() {         
+                MessageDialog.openError(shell, "Result of Soundness Analysis.", "The process has a deadlock.");
+              }
+            });
+  			    
+  			    if (apView.processViewEditor != null) {
+    			    
+    			    RecordingCommand createCounterExampleCmd = new RecordingCommand(apView.processViewEditor.getEditingDomain(), "show counter example") {
+    			      @Override
+    			      protected void doExecute() {
+    			        DNode lastToDL = bp.getDeadConditions().get(0).pre[0];
+    			        DNode[] maxTrace = bp.getCounterExample(bp.getDeadConditions().get(0));
+    			        
+    			        //Oclet o = DNode2Oclet.toCounterExampleOclet_normal(bp, maxTrace);
+    			        Oclet o = DNode2Oclet.toCounterExampleOclet_anti(bp, maxTrace, lastToDL);
+    			        apView.adaptiveSystem.getOclets().add(o);
+    			      }
+    			    };
+    			    
+    			    
+    			    createCounterExampleCmd.canExecute();
+    			    apView.processViewEditor.getEditingDomain().getCommandStack().execute(createCounterExampleCmd);
+
+    			    // refresh the diagram to get rid of nodes and edges
+    			    ((CanonicalConnectionEditPolicy) apView.processViewEditor
+    			        .getDiagramEditPart().getEditPolicy("Canonical")).refresh();
+  			    }
+
+  			  } else if (result == DNodeBP.PROP_NONE) {
+            Display.getDefault().syncExec(new Runnable() {
+              public void run() {         
+                MessageDialog.openInformation(shell, "Result of Soundness Analysis.", "The process is sound.");
+              }
+            });
+  			  }
+			  }
 				
-			  //build.minimize(monitor, System.out);
+			  /*
+			  build.minimize(monitor, System.out);
 			  build.writeBPtoFile(monitor, System.out, "_bp2");
 			  
 			  PtNet net = DNode2PtNet.process(build.getBranchingProcess());
@@ -135,8 +192,7 @@ public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
         IPath targetPath = selectedFile.getFullPath().removeLastSegments(1).append(modelName+"_bp2").addFileExtension("ptnet");
         TransactionalEditingDomain editing = GMFEditingDomainFactory.INSTANCE.createEditingDomain();
         FileIOHelper.writeEObjectToResource(net, editing, targetPath);
-
-        System.out.println("input model size: "+build.getBranchingProcess().getSystem().getInfo());
+        */
 
 			  monitor.done();
 				
@@ -184,6 +240,7 @@ public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
 	      // just catch, do nothing
 	    }
 	}
+
 
 	private void writeDotFile (DNodeBP bp, IFile inputFile, String suffix) {
 

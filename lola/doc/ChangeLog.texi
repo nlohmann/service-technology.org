@@ -5,6 +5,8 @@
 @item added a parameter @option{-r}/@option{--resultFile} to write all analysis results into a single file in the file format of libconfig (see @url{http://www.hyperrealm.com/libconfig})
 
 @item fixed bug #12910 and bug #15282 (@url{https://gna.org/bugs/?12910} and @url{https://gna.org/bugs/?15282}): file output for @option{-g} and @option{-m} parameter was broken
+
+@item added user configurations for the binaries used by the ProM plugin
 @end itemize
 
 

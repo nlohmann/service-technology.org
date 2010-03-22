@@ -90,8 +90,10 @@ void statistics(unsigned int s, unsigned int e, unsigned int h) {
 #ifndef STATESPACE
    cout << "\n\n>>>>> " << s << " States, " << e << " Edges, " << h << " Hash table entries\n\n";
 
-   if (resultfile) {
+   static bool first = true;
+   if (resultfile && first) {
      fprintf(resultfile, "statistics: {\n  states = %d;\n  edges = %d;\n  hash_table_entries = %d;\n};\n", s, e, h);
+     first = false;
    }
 #endif
 }
@@ -1554,11 +1556,12 @@ unsigned int depth_first() {
       }
 
 #ifndef BOUNDEDNET // there is still a bug...
+/*
       if (resultfile) {
         static bool first = true;
         if (first) {
           first = false;
-          fprintf(resultfile, "statespace: {\n  complete = true;\n  states = (\n");
+          fprintf(resultfile, "statespace: {\n  complete = false; // we cannot be sure\n  states = (\n");
         }
         
         static bool comma = false;
@@ -1594,6 +1597,7 @@ unsigned int depth_first() {
         }
         fprintf(resultfile, "); }");
       }
+*/
 #endif
 
 #endif
@@ -2764,11 +2768,25 @@ int reversibility() {
       if(!mutual_reach())
       {
          cout << "\nnot reversible: no return to m0 from reported state\n\n";
+
+         if (resultfile) {
+           fprintf(resultfile, "reversibility: {\n  result = false;\n");
+         }
+
          printstate("",CurrentMarking);
+
+         if (resultfile) {
+           fprintf(resultfile, "};\n");
+         }
+
          return 1;
       }
    }
    cout << "\n net is reversible!\n";
+
+   if (resultfile) {
+     fprintf(resultfile, "reversibility: {\n  result = true;\n};\n");
+   }
    return(0);
 }
 #endif

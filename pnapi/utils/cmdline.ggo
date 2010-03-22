@@ -9,14 +9,14 @@ section "Input and Output"
 option "input" i
   "Select the input file format"
   typestr="FORMAT"
-  values="owfn","lola","pnml","sa" enum
+  values="owfn","lola","pnml","sa","tpn" enum
   optional
   default="owfn"
 
 option "output" o
   "Select the output file format(s)"
   typestr="FORMAT"
-  values="owfn","lola","pnml","sa","dot","png","pdf","eps","svg" enum
+  values="owfn","lola","pnml","sa","tpn","dot","png","pdf","eps","svg" enum
   optional
   multiple
   

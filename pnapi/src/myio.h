@@ -157,12 +157,12 @@ std::ios_base & sa(std::ios_base &);
 std::ios_base & lola(std::ios_base &);
 /// PNML file format
 std::ios_base & pnml(std::ios_base &);
+/// WOFLAN file format
+std::ios_base & woflan(std::ios_base &);
 /// formula output manipulator
 std::ostream & formula(std::ostream &);
 /// suppress role output
 std::ostream & noRoles(std::ostream &);
-/// Woflan output format
-std::ostream & woflan(std::ostream &);
 
 /// meta information manipulator
 util::Manipulator<std::pair<MetaInformation, std::string> >
@@ -196,7 +196,7 @@ enum Format {
   LOLA,
   /// petri net modeling language (?)
   PNML,
-  /// WFLAN format
+  /// WOFLAN format
   WOFLAN
 };
 

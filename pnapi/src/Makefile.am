@@ -7,6 +7,7 @@ libpnapi_la_SOURCES = \
     parser-pn.yy      parser-pn-lexer.ll \
     parser-pnml.yy    parser-pnml-lexer.ll \
     parser-sa.yy      parser-sa-lexer.ll \
+    parser-woflan.yy  parser-woflan-lexer.ll \
     pnapi.h pnapi.cc \
     automaton.h automaton.cc\
     component.h component.cc \

@@ -443,6 +443,70 @@ public: /* public methods */
 
 } /* namespace pn */
 
+/*************************************************************************
+ ***** Woflan Parser
+ *************************************************************************/
+
+/*!
+ * \brief   Woflan Parser
+ *
+ * Instantiation of the parser framework for parsing Woflan files.
+ */
+namespace woflan
+{
+
+/// flex generated lexer function
+int lex();
+/// flex generated lexer cleanup function
+int lex_destroy();
+/// bison generated parser function
+int parse();
+/// "assertion"
+void check(bool, const std::string &);
+
+/******************************************\
+ *  "global" variables for flex and bison *
+\******************************************/
+
+/// generated petrinet
+extern PetriNet pnapi_woflan_yynet;
+
+/// mapping of names to places
+extern std::map<std::string, Place *> places_;
+/// recently read transition
+extern Transition * transition_;
+/// all purpose place pointer
+extern Place * place_;
+/// target of an arc
+extern Node * * target_;
+/// source of an arc
+extern Node * * source_;
+/// converts NUMBER and IDENT in string
+extern std::stringstream nodeName_;
+/// read capacity
+extern int capacity_;
+
+
+/*!
+ * \brief   Encapsulation of the flex/bison Woflan parser
+ *
+ * Connects to the flex/bison implementation for parsing.
+ */
+class Parser
+{
+public: /* public methods */
+  /// constructor
+  Parser();
+  /// destructor
+  ~Parser();
+  /// cleans global net
+  void clean();
+  /// parses stream contents with the associated parser
+  const PetriNet & parse(std::istream &);
+};
+
+} /* namespace woflan */
+
 } /* namespace parser */
 
 } /* namespace pnapi */

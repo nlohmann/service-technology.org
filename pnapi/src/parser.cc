@@ -853,6 +853,96 @@ void Parser::clean()
 
 } /* namespace pn */
 
+namespace woflan
+{
+
+/// "assertion"
+void check(bool condition, const std::string & msg)
+{
+  if (!condition)
+    throw exception::InputError(exception::InputError::SEMANTIC_ERROR, 
+                                io::util::MetaData::data(*parser::stream)[io::INPUTFILE],
+                                parser::line, parser::token, msg);
+}
+
+/******************************************\
+ *  "global" variables for flex and bison *
+\******************************************/
+
+/// generated petrinet
+PetriNet pnapi_woflan_yynet;
+
+/// mapping of names to places
+map<std::string, Place *> places_;
+/// recently read transition
+Transition * transition_ = NULL;
+/// all purpose place pointer
+Place * place_ = NULL;
+/// target of an arc
+Node * * target_ = NULL;
+/// source of an arc
+Node * * source_ = NULL;
+/// converts NUMBER and IDENT in string
+std::stringstream nodeName_;
+/// read capacity
+int capacity_ = 0;
+
+
+/*!
+ * \brief Constructor
+ */
+Parser::Parser()
+{
+}
+
+/*!
+ * \brief Destructor
+ * \note  Just used to call clean() automaticly
+ */
+Parser::~Parser()
+{
+  clean();
+}
+
+/*!
+ * \brief Overwrites read net with empty net to free memory.
+ */
+void Parser::clean()
+{
+  pnapi_woflan_yynet = PetriNet();
+}
+
+/*!
+ * \brief parses stream contents with the associated parser
+ */
+const PetriNet & Parser::parse(std::istream & is)
+{
+  // assign lexer input stream
+  stream = &is;
+
+  // reset line counter
+  line = 1;
+
+  pnapi_woflan_yynet = PetriNet();
+
+  // call the parser
+  woflan::parse();
+
+  // clean up lexer
+  woflan::lex_destroy();
+
+  // clean up global variables
+  places_.clear();
+  transition_ = NULL;
+  place_ = NULL;
+  source_ = target_ = NULL;
+  nodeName_.clear();
+
+  return pnapi_woflan_yynet;
+}
+
+} /* namespace woflan */
+
 } /* namespace parser */
 
 } /* namespace pnapi */

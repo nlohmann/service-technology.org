@@ -37,7 +37,7 @@ string suffix = "";
 /// a variable holding the time of the call
 clock_t start_clock = clock();
 
-typedef enum { TYPE_OPENNET, TYPE_LOLANET, TYPE_PNMLNET } objectType;
+typedef enum { TYPE_OPENNET, TYPE_LOLANET, TYPE_PNMLNET, TYPE_WOFLANNET } objectType;
 
 struct FileObject {
     objectType type;
@@ -153,6 +153,15 @@ int main(int argc, char** argv) {
                     current.type = TYPE_OPENNET;
                     break;
                 }
+	        case(input_arg_tpn): {
+                    current.net = new PetriNet();
+                    std::cin >> meta(io::INPUTFILE, current.filename)
+                        >> meta(io::CREATOR, PACKAGE_STRING)
+                        >> meta(io::INVOCATION, invocation) >> io::woflan >> *(current.net);
+
+                    current.type = TYPE_WOFLANNET;
+                    break;
+                }
             }
         } catch (exception::InputError error) {
             std::stringstream ss;
@@ -217,6 +226,15 @@ int main(int argc, char** argv) {
                         current.net = new PetriNet(sa);
 
                         current.type = TYPE_OPENNET;
+                        break;
+                    }
+		    case(input_arg_tpn): {
+                        current.net = new PetriNet();
+                        infile >> meta(io::INPUTFILE, current.filename)
+                            >> meta(io::CREATOR, PACKAGE_STRING)
+                            >> meta(io::INVOCATION, invocation) >> io::woflan >> *(current.net);
+
+                        current.type = TYPE_WOFLANNET;
                         break;
                     }
                 }
@@ -455,6 +473,12 @@ int main(int argc, char** argv) {
                     case (output_arg_sa): {
                         Automaton sauto(*(objects[i].net));
                         outfile.stream() << io::sa << sauto;
+                        break;
+                    }
+
+		    // create Woflan output
+                    case (output_arg_tpn): {
+                        outfile.stream() << io::woflan << *(objects[i].net);
                         break;
                     }
 

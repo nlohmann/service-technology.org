@@ -197,6 +197,16 @@ void PartialSolution::show() {
 	for(unsigned int j=0; j<getSequence().size(); j++)
 		cerr << getSequence().at(j)->getName() << " ";
 	cerr << endl;
+	vector<map<Transition*,int> >& pa(getParikh());
+	if (!pa.empty()) cerr << "Parikh Images:" << endl;
+	for(unsigned int i=0; i<pa.size(); ++i)
+	{
+		cerr << "- ";
+		map<Transition*,int>::iterator mit;
+		for(mit=pa[i].begin(); mit!=pa[i].end(); ++mit)
+			cerr << mit->first->getName() << ":" << mit->second << " ";
+		cerr << endl;
+	}
 	map<const Place*,unsigned int>::const_iterator mit;
 	cerr << "Marking: ";
 	for(mit=getMarking().begin(); mit!=getMarking().end(); ++mit)

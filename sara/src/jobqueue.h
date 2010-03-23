@@ -56,7 +56,7 @@ public:
 	PartialSolution* first();
 
 	/// Remove first job
-	bool pop_front();
+	bool pop_front(bool kill);
 /*
 	/// Add job before all other jobs with the same (or higher) priority
 	void push_front(PartialSolution* job);
@@ -100,6 +100,9 @@ public:
 	/// Print all solutions and return the maximal trace length
 	int printSolutions();
 
+	/// Prints a Jobqueue to stderr (possibly including past and active job)
+	void show(bool past);
+
 private:
 	/// job or failure queue (from priority to sublist)
 	map<int,deque<PartialSolution*> > queue;
@@ -111,7 +114,7 @@ private:
 	PartialSolution* active;
 
 	/// priority of the active job
-	int activeprio;
+//	int activeprio;
 
 	/// queue of past jobs for constraint comparisons
 	map<int,deque<PartialSolution*> > past;

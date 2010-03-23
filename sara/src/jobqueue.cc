@@ -26,6 +26,7 @@ using std::set;
 using std::map;
 using std::deque;
 using std::cout;
+using std::cerr;
 using std::endl;
 
 extern gengetopt_args_info args_info;
@@ -37,12 +38,12 @@ extern gengetopt_args_info args_info;
 /** Constructor for the empty queue
 	@param pn The Petri net for which the incidence matrix is to be built.
 */
-JobQueue::JobQueue() : cnt(0),active(NULL),activeprio(0) {}
+JobQueue::JobQueue() : cnt(0),active(NULL) {}
 
 /** Constructor for the initialized queue
 	@param job The first job
 */
-JobQueue::JobQueue(PartialSolution* job) : cnt(1),active(job),activeprio(0) {}
+JobQueue::JobQueue(PartialSolution* job) : cnt(1),active(job) {}
 
 /** Destructor. Frees the memory for all jobs in the queue
 */
@@ -86,23 +87,23 @@ int JobQueue::size() { return cnt; }
 PartialSolution* JobQueue::first() { return active; }
 
 /** Remove the first job in the queue.
+	@param kill Forbid this job's entry into the past list (e.g. if it is there already).
 	@return True if a job could be removed.
 */
-bool JobQueue::pop_front() {
+bool JobQueue::pop_front(bool kill) {
 	if (empty()) return false;
-	past[activeprio].push_back(active); // active job is now past
-//	delete active;
+	if (!kill) past[priority(active)].push_back(active); // active job is now past
 	active=NULL;
 	--cnt;
 	if (!almostEmpty()) 
 	{ 
 		active = queue.begin()->second.front();
-		activeprio = queue.begin()->first;
+//		activeprio = queue.begin()->first;
 		queue.begin()->second.pop_front();
 		if (queue.begin()->second.empty())
 			queue.erase(queue.begin());
 	}
-	if (past.size()>5) // drop things that are too far in the past and will probably not come up again
+	if (past.size()>20) // drop things that are too far in the past and will probably not come up again
 	{
 		for(unsigned int i=0; i<past.begin()->second.size(); ++i)
 			delete past.begin()->second[i];
@@ -155,12 +156,13 @@ bool JobQueue::insert(PartialSolution* job) {
 */
 int JobQueue::find(PartialSolution* job) {
 	int pri(priority(job));
-	if (queue.find(pri)==queue.end()) return pri;
+	if (queue.find(pri)==queue.end()) return pri; // it's not in the queue
+	set<Constraint>& cs(job->getConstraints()); // get job's constraints for later comparison
 	// count the Parikh vector of the transition sequence of job
 	map<Transition*,int> tmap;
 	vector<Transition*>& tseq(job->getSequence());
 	for(unsigned int i=0; i<tseq.size(); ++i) ++tmap[tseq[i]];
-	// go through the jobs with the same priority, but leave out first()
+	// go through the jobs with the same priority, but leave out active job
 	deque<PartialSolution*>& deq(queue[pri]);
 	for(unsigned int i=0; i<deq.size(); ++i)
 	{
@@ -171,7 +173,6 @@ int JobQueue::find(PartialSolution* job) {
 		if (tmap==tmap2 && job->getRemains()==deq[i]->getRemains())
 		{
 			// test if the constraints are equal
-			set<Constraint>& cs(job->getConstraints());
 			set<Constraint>& cs2(deq[i]->getConstraints());
 			if (cs==cs2) return -1;
 		}
@@ -185,15 +186,31 @@ int JobQueue::find(PartialSolution* job) {
 */
 bool JobQueue::findPast(PartialSolution* job) {
 	int pri(priority(job));
-	if (past.find(pri)==past.end()) return false;
-	// go through the past jobs with the same priority
-	deque<PartialSolution*>& deq(past[pri]);
-	for(unsigned int i=0; i<deq.size(); ++i)
+	set<Constraint>& cs(job->getConstraints());
+	if (past.find(pri)!=past.end())
 	{
-			set<Constraint>& cs(job->getConstraints());
-			set<Constraint>& cs2(deq[i]->getConstraints());
-			if (cs==cs2) return true;
+		// go through the past jobs with the same priority
+		deque<PartialSolution*>& deq(past[pri]);
+		for(unsigned int i=0; i<deq.size(); ++i)
+		{
+				set<Constraint>& cs2(deq[i]->getConstraints());
+/*
+				cerr << "*+*+* Compare " << endl;
+				job->show();
+				cerr << "*+*+* With" << endl;
+				deq[i]->show();
+				cerr << "*+*+* Result: " << (cs==cs2?"IDENTICAL":"DIFFERENT") << endl;
+*/
+				if (cs==cs2) return true;
+		}
 	}
+/*
+	if (active) // compare also with active job if there is one (except the initial job)
+	{
+		set<Constraint>& cs2(active->getConstraints());
+		if (cs==cs2 && active->getSequence()==job->getSequence()) return true;
+	}
+*/
 	return false;
 }
 
@@ -214,7 +231,7 @@ int JobQueue::priority(PartialSolution* job) const {
 			priority += it->second;
 	} else {
 		priority += (job->getConstraints().size());
-		priority += job->jumpsDone();
+//		priority += job->jumpsDone();
 		set<Constraint>::iterator cit;
 		for(cit=job->getConstraints().begin(); cit!=job->getConstraints().end(); ++cit)
 			if (cit->isJump()) ++priority;
@@ -337,6 +354,8 @@ bool JobQueue::cleanFailure(map<Transition*,int>& p) {
 					if (mit->second<pit->second) smaller=true;
 					++mit;
 				}
+				for(; pit!=p.end(); ++pit) // check if there are still positive entries
+					if (pit->second>0) smaller=true;
 				// on a positive result, mark queue entry as obsolete
 				if (mit==parikh[j].end() && smaller) { jit->second[i]->setSolved(); break; }
 				if (!result) {
@@ -349,6 +368,8 @@ bool JobQueue::cleanFailure(map<Transition*,int>& p) {
 						if (mit->second>pit->second) smaller=true;
 						++pit;
 					}
+					for(; mit!=parikh[j].end(); ++mit) // check if there are still positive entries
+						if (mit->second>0) smaller=true;
 					// on a positive result mark p as obsolete
 					if (pit==p.end() && smaller) { result=true; break; }
 				}
@@ -466,6 +487,8 @@ bool JobQueue::push_solved(PartialSolution* job) {
 						if (mit->second<pit->second) smaller=true;
 						++mit;
 					}
+					for(; pit!=p.end(); ++pit) // check if there are still positive entries
+						if (pit->second>0) smaller=true;
 					// on a positive result, mark p as not to be added
 					if (mit==parikh[j].end()) { result=true; break; }
 				}
@@ -478,6 +501,8 @@ bool JobQueue::push_solved(PartialSolution* job) {
 					if (mit->second>pit->second) smaller=true;
 					++pit;
 				}
+				for(; mit!=parikh[j].end(); ++mit) // check if there are still positive entries
+					if (mit->second>0) smaller=true;
 				// on a positive result delete the entry and mark the deque as faulty
 				if (pit==p.end() && smaller) 
 				{ 
@@ -522,3 +547,38 @@ int JobQueue::printSolutions() {
 	return sollength;
 }
 
+void JobQueue::show(bool past) {
+	if (past) {
+		cerr << "+++++ Past entries:" << endl;
+		map<int,deque<PartialSolution*> >::iterator jit;
+		for(jit=this->past.begin(); jit!=this->past.end(); ++jit)
+		{
+			cerr << "++++ Priority " << jit->first << endl;
+			for(unsigned int i=0; i<jit->second.size(); ++i)
+			{
+				cerr << "++ Next job:" << endl;
+				jit->second[i]->show();
+				cerr << endl;
+			}	
+		}
+		cerr << "++++++ Active entry:" << endl;
+		if (active) {
+			cerr << "++++ Priority " << priority(active) << endl;
+			active->show(); 
+			cerr << endl;
+		} else cerr << "++ No active job" << endl;
+	}
+	cerr << "++++++ Future entries:" << endl;
+	map<int,deque<PartialSolution*> >::iterator jit;
+	for(jit=queue.begin(); jit!=queue.end(); ++jit)
+	{
+		cerr << "+++++ Priority " << jit->first << endl;
+		for(unsigned int i=0; i<jit->second.size(); ++i)
+		{
+			if (jit->second[i]->isSolved() && !past) cerr << "++ Next job is obsolete:" << endl;
+			else cerr << "++ Next job:" << endl;
+			jit->second[i]->show();
+			cerr << endl;
+		}	
+	}
+}

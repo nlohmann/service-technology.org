@@ -1,4 +1,3 @@
-#include <sstream>
 #include "config.h"
 #include "Results.h"
 #include "verbose.h"
@@ -6,6 +5,9 @@
 
 Results::Results(std::string name) : filename(name), output(NULL), values() {}
 
+/*!
+ \todo the list output is very ad hoc and should be better integrated into the rest
+*/
 Results::~Results() {
     assert(output == NULL);
     output = new Output(filename, "results file");
@@ -14,6 +16,13 @@ Results::~Results() {
         output->stream() << part->first << ": {\n";
         FOREACH(entry, part->second) {
             output->stream() << "  " << entry->first << " = " << entry->second << ";\n";
+        }
+        output->stream() << "};\n\n";
+    }
+    FOREACH(part, lists) {
+        output->stream() << part->first << ": {\n";
+        FOREACH(entry, part->second) {
+            output->stream() << entry->second;
         }
         output->stream() << "};\n\n";
     }
@@ -91,4 +100,14 @@ void Results::add(std::string partname, bool value) {
 void Results::add(std::string part, std::string name, bool value) {
     std::string tmp = value ? "true" : "false";
     values[part][name] = tmp;
+}
+
+void Results::add(std::string partname, std::stringstream &value) {
+    std::string part = partname.substr(0, partname.find_first_of("."));
+    std::string name = partname.substr(partname.find_first_of(".")+1, partname.size());
+    add(part, name, value);
+}
+
+void Results::add(std::string part, std::string name, std::stringstream &value) {
+    lists[part][name] = value.str();
 }

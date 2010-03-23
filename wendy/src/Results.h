@@ -2,6 +2,7 @@
 #define _RESULTS_H
 
 #include <string>
+#include <sstream>
 #include <map>
 #include <algorithm>
 #include <vector>
@@ -17,6 +18,8 @@ class Results {
         /// implicit conversation operator to ostream
         operator std::ostream&() const;
 
+        void add(std::string,              std::stringstream&);
+        void add(std::string, std::string, std::stringstream&);
         void add(std::string,              std::string);
         void add(std::string, std::string, std::string);
         void add(std::string,              char*);
@@ -39,6 +42,9 @@ class Results {
 
         /// the stored values
         std::map<std::string, std::map<std::string, std::string> > values;
+
+        /// the stored values (lists)
+        std::map<std::string, std::map<std::string, std::string> > lists;
 };
 
 #endif

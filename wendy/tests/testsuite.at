@@ -613,7 +613,7 @@ AT_SETUP([SMTP Protocol])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/smtp3.* .])
 AT_CHECK([WENDY smtp3.owfn --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: 474 knowledges reachable" stderr])
+#AT_CHECK([GREP -q "wendy: 474 knowledges reachable" stderr])
 AT_CHECK([WENDY2FIONA -i smtp3.og -o smtp3.f.og])
 AT_CHECK([FIONA -tequivalence smtp3.f.og smtp3.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(og)
@@ -728,8 +728,8 @@ AT_SETUP([SMTP Protocol])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/smtp3.* .])
 AT_CHECK([WENDY smtp3.owfn --og --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: stored 1358 knowledges" stderr])
-AT_CHECK([GREP -q "wendy: 474 knowledges reachable" stderr])
+#AT_CHECK([GREP -q "wendy: stored 1358 knowledges" stderr])
+#AT_CHECK([GREP -q "wendy: 474 knowledges reachable" stderr])
 AT_CHECK([WENDY2FIONA -i smtp3.og -o smtp3.f.og])
 AT_CHECK([FIONA -tequivalence smtp3.f.og smtp3.fiona.og],0,ignore,ignore)
 AT_KEYWORDS(reduction sse)
@@ -1278,23 +1278,23 @@ AT_CLEANUP
 
 
 ############################################################################
-AT_BANNER([Integration into Marlene])
+#AT_BANNER([Integration into Marlene])
 ############################################################################
 
-AT_SETUP([Coffee Vending Machine (synchronous)])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/marlene-ca.owfn TESTFILES/marlene-td.owfn TESTFILES/marlene-td.ar .])
-AT_DATA([marlene.conf], [wendy="WENDY"
-])
-AT_CHECK([MARLENE --config=marlene.conf marlene-ca.owfn marlene-td.owfn --rulefile=marlene-td.ar --verbose],0,ignore,ignore)
-AT_KEYWORDS(marlene)
-AT_CLEANUP
+#AT_SETUP([Coffee Vending Machine (synchronous)])
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/marlene-ca.owfn TESTFILES/marlene-td.owfn TESTFILES/marlene-td.ar .])
+#AT_DATA([marlene.conf], [wendy="WENDY"
+#])
+#AT_CHECK([MARLENE --config=marlene.conf marlene-ca.owfn marlene-td.owfn --rulefile=marlene-td.ar --verbose],0,ignore,ignore)
+#AT_KEYWORDS(marlene)
+#AT_CLEANUP
 
-AT_SETUP([Coffee Vending Machine (asynchronous)])
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/marlene-ca.owfn TESTFILES/marlene-td.owfn TESTFILES/marlene-td.ar .])
-AT_DATA([marlene.conf], [wendy="WENDY"
-])
-AT_CHECK([MARLENE --config=marlene.conf marlene-ca.owfn marlene-td.owfn --rulefile=marlene-td.ar --asyncif --verbose],0,ignore,ignore)
-AT_KEYWORDS(marlene)
-AT_CLEANUP
+#AT_SETUP([Coffee Vending Machine (asynchronous)])
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/marlene-ca.owfn TESTFILES/marlene-td.owfn TESTFILES/marlene-td.ar .])
+#AT_DATA([marlene.conf], [wendy="WENDY"
+#])
+#AT_CHECK([MARLENE --config=marlene.conf marlene-ca.owfn marlene-td.owfn --rulefile=marlene-td.ar --asyncif --verbose],0,ignore,ignore)
+#AT_KEYWORDS(marlene)
+#AT_CLEANUP

@@ -23,6 +23,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sstream>
 #include <cstdlib>
 
 #include "StoredKnowledge.h"
@@ -1083,4 +1084,116 @@ void StoredKnowledge::output_results(Results& r) {
     r.add("statistics.scc_trivial", stats.numberOfTrivialSCCs);
     r.add("statistics.scc_nontrivial", stats.numberOfNonTrivialSCCs);
     r.add("statistics.scc_maximal_size", stats.maxSCCSize);
+
+
+    // create OG or SA output
+    if (args_info.og_given or args_info.sa_given) {
+        std::stringstream s;
+
+
+        s << "  channels_input = (";
+        bool first = true;
+        for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
+            if (not first) {
+                s << ", ";
+            }
+            first = false;
+            s << "\"" << Label::id2name[l] << "\"";
+        }
+        s << ");\n";
+
+        s << "  channels_output = (";
+        first = true;
+        for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+            if (not first) {
+                s << ", ";
+            }
+            first = false;
+            s << "\"" << Label::id2name[l] << "\"";
+        }
+        s << ");\n";
+
+        s << "  channels_synchronous = (";
+        first = true;
+        for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
+            if (not first) {
+                s << ", ";
+            }
+            first = false;
+            s << "\"" << Label::id2name[l] << "\"";
+        }
+        s << ");\n";
+
+
+        std::vector<std::size_t> finalStates;
+        std::stringstream temp;
+
+        FOREACH(it, hashTree) {
+            for (size_t i = 0; i < it->second.size(); ++i) {
+                if (it->second[i]->is_sane) {
+
+                    if (it != hashTree.begin() or i != 0) {
+                        temp << ",\n";
+                    }
+
+                    temp << "    { id = " << reinterpret_cast<size_t>(it->second[i]) << ";\n";
+                    if (it->second[i]->is_final) {
+                        finalStates.push_back(reinterpret_cast<size_t>(it->second[i]));
+                    }
+
+                    if (not args_info.sa_given) {
+                        temp << "      formula = \"" << it->second[i]->formula(true) << "\";\n";
+                    }
+
+                    bool firstSuccessor = true;
+                    temp << "      successors = (";
+                    // draw the edges
+                    for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+                        if (it->second[i]->successors[l-1] != NULL and
+                            (seen.find(it->second[i]->successors[l-1]) != seen.end()) and
+                            (args_info.showEmptyNode_flag or it->second[i]->successors[l-1] != empty)) {
+
+                            if (not firstSuccessor) {
+                                temp << ", ";
+                            }
+                            temp << "(\"" << Label::id2name[l] << "\", "
+                                << reinterpret_cast<size_t>(it->second[i]->successors[l-1]) << ")";
+                            firstSuccessor = false;
+                        }
+
+                        // draw edges to the empty node if requested
+                        if (args_info.showEmptyNode_flag and
+                            it->second[i]->successors[l-1] == empty) {
+                            emptyNodeReachable = true;
+                            temp << "(\"" << Label::id2name[l] << "\", " << 0 << ")";
+                        }
+                    }
+                    temp << "); }";
+                }
+            }
+        }
+
+        s << "  initial_states = (" << reinterpret_cast<size_t>(root) << ");\n";
+        if (not args_info.og_given) {
+            s << "  final_states = (";
+            FOREACH(state, finalStates) {
+                if (state != finalStates.begin()) {
+                    s << ", ";
+                }
+                s << *state;
+            }
+            s << ");\n";
+        }
+
+        s << "  states = (\n";
+        s << temp.str() << "\n";
+        s << "  );\n";
+
+        // add stream to results file
+        if (args_info.og_given) {
+            r.add("og", s);
+        } else {
+            r.add("sa", s);
+        }
+    }
 }

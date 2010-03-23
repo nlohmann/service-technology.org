@@ -59,7 +59,7 @@ public:
 //	PartialSolution* getSolution();
 
 	/// Returns all possible counterexamples (if status==COUNTEREXAMPLE_FOUND)
-	JobQueue& getFailureReasons();
+//	JobQueue& getFailureReasons();
 
 //	void extendTransitionOrder(map<Transition*,int> fullv, vector<Transition*>& ord, vector<Transition*> fseq);
 

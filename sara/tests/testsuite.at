@@ -21,7 +21,7 @@ AT_BANNER([Finding positive answers])
 
 AT_SETUP([Moving 50 tokens])
 AT_CHECK([cp TESTFILES/test1.sara TESTFILES/test1.owfn .])
-AT_CHECK([SARA -i test1.sara],0,stdout,stderr)
+AT_CHECK([SARA -i test1.sara -J],0,stdout,stderr)
 AT_CHECK([GREP -q "sara: Problem 1: test1" stdout])
 AT_CHECK([GREP -q "SOLUTION" stdout])
 AT_KEYWORDS(solver)
@@ -117,6 +117,14 @@ AT_CHECK([SARA -i test9.sara -v -d2],0,stdout,stderr)
 AT_CHECK([GREP -q "*** LOOKUP ***" stderr])
 AT_CHECK([GREP -q "3 failures, 0 solutions" stdout])
 AT_CHECK([GREP -q "INFEASIBLE: unable to borrow enough tokens via T-invariants" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
+AT_SETUP([Failing Hay-stack 2 as above, break at 28])
+AT_CHECK([cp TESTFILES/test9.sara TESTFILES/test9.owfn .])
+AT_CHECK([SARA -i test9.sara -v -b28],0,stdout,stderr)
+AT_CHECK([GREP -q "28 jobs done" stdout])
+AT_CHECK([GREP -q "UNSOLVED" stdout])
 AT_KEYWORDS(solver)
 AT_CLEANUP
 
@@ -218,6 +226,13 @@ AT_SETUP([Debug mode])
 AT_CHECK([cp TESTFILES/test8_1.sara TESTFILES/test8_1.owfn .])
 AT_CHECK([SARA -i test8_1.sara -v -d3],0,stdout,stderr)
 AT_CHECK([GREP -q "1 Solution produced" stdout])
+AT_KEYWORDS(options)
+AT_CLEANUP
+
+AT_SETUP([Break])
+AT_CHECK([cp TESTFILES/test8_1.sara TESTFILES/test8_1.owfn .])
+AT_CHECK([SARA -i test8_1.sara -v -b1],0,stdout,stderr)
+AT_CHECK([GREP -q "UNSOLVED: Result is indecisive due to a break" stdout])
 AT_KEYWORDS(options)
 AT_CLEANUP
 

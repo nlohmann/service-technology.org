@@ -267,7 +267,7 @@ void Reachalyzer::printResult() {
 	else if (args_info.treemaxjob_given) cout << "sara: UNSOLVED: solution may have been cut off due to command line switch -T" << endl;
 	if (!errors && !args_info.treemaxjob_given && (args_info.witness_given || solutions.almostEmpty()))
 	{ // if we have a counterexample or the all flag is set
-			if (failure.trueSize()>0)
+			if (failure.trueSize()>0 && !args_info.break_given)
 			{
 				if (solutions.almostEmpty()) {
 					cout << "sara: INFEASIBLE: ";
@@ -282,8 +282,8 @@ void Reachalyzer::printResult() {
 					cout << "unable to borrow enough tokens via T-invariants." << endl;
 				} else if (stateinfo) cout << "sara: at the following points the algorithm needed to backtrack:" << endl;
 				if (stateinfo) failure.printFailure(im); // then print the counterexample; the following shouldn't happen:
-			} else if (solutions.almostEmpty()) 
-				cout << "sara: UNSOLVED: Result is indecisive, no counterexamples found." << endl;
+			} else if (solutions.almostEmpty())
+				cout << "sara: UNSOLVED: Result is indecisive" << (args_info.break_given?" due to a break.":", no counterexamples found.") << endl;
 	}
 }
 
@@ -309,8 +309,6 @@ int Reachalyzer::getStatus() {
 /** Gets either a solution or one possible counterexample, depending on if one was found.
 	@return A solution if status is SOLUTION_FOUND or a counterexample if status is COUNTEREXAMPLE_FOUND,
 		null otherwise.
-*/
-/*
 PartialSolution* Reachalyzer::getSolution() {
 	if (solved && !tps.empty()) return (tps.findSolution());
 	if (!errors && !failure.empty()) return (failure.first());
@@ -320,10 +318,10 @@ PartialSolution* Reachalyzer::getSolution() {
 
 /** Gets all possible counterexamples. The result is valid only if status is COUNTEREXAMPLE_FOUND.
 	@return A list of possible counterexamples.
-*/
 JobQueue& Reachalyzer::getFailureReasons() {
 	return failure;
 }
+*/
 
 /*
 void Reachalyzer::extendTransitionOrder(map<Transition*,int> fullv, vector<Transition*>& ord, vector<Transition*> fseq) {

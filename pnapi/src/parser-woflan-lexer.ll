@@ -78,7 +78,7 @@ init				{ return KEY_INIT; }
 
  /* identifiers */
 [0-9]+          { pnapi_woflan_yylval.yt_int = atoi(yytext); return NUMBER; }
-[^,;:()\t \n\r\{\}]+ { pnapi_woflan_yylval.yt_str = strdup(yytext); return IDENT; }
+"\""[^\"]+"\""          { pnapi_woflan_yylval.yt_str = strdup(yytext); return IDENT; }
 
  /* whitespace */
 [ \n\r\t]                        { /* skip */ } 

@@ -1,0 +1,200 @@
+place "i" init 1;
+place "o";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:InputCondition";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Split_Trigger Replenishment Through Kanban Signal (3wdp)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Join_Trigger Replenishment Through Kanban Signal (3wdp)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Split_xor (3wei)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Join_xor (3wei)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Split_and (3wbl)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Join_and (3wbl)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:OutputCondition";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp)*Trigger Replenishment Through Kanban Signal (3wdp)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Trigger Replenishment Through Kanban Signal (3wdp)*xor (3wei)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei)*Join_Yes_xor (3wei)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei)*xor (3wep)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei)*xor (3wfa)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wep)*Replenishment In-House Production with Production Order (3wf3)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment In-House Production with Production Order (3wf3)*xor (3wbe)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wbe)*and (3wbl)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:and (3wbl)*Join_Yes_and (3wbl)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wfa)*Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)*xor (3wbe)";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split:busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_No_Trigger Replenishment Through Kanban Signal (3wdp):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Skip:busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Trigger Replenishment Through Kanban Signal (3wdp):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wep):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment In-House Production with Production Order (3wf3):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wbe):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:and (3wbl):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wfa):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_xor (3wei):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_xor (3wei):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_and (3wbl):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_and (3wbl):busy";
+place "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Output:busy";
+trans "*:Model.3wae--0-----u--:Model.3wae--0-----u--:start"~"*:Model.3wae--0-----u--:Model.3wae--0-----u--:start"
+    in "i"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:InputCondition"
+;
+trans "*:Model.3wae--0-----u--:Model.3wae--0-----u--:end"~"*:Model.3wae--0-----u--:Model.3wae--0-----u--:end"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:OutputCondition"
+   out "o"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Split:join:InputCondition"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Split:join:InputCondition"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:InputCondition"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split:busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Split:split:Split_Split_Trigger Replenishment Through Kanban Signal (3wdp)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Split:split:Split_Split_Trigger Replenishment Through Kanban Signal (3wdp)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split:busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Split_Trigger Replenishment Through Kanban Signal (3wdp)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_No_Trigger Replenishment Through Kanban Signal (3wdp):join:Split_Split_Trigger Replenishment Through Kanban Signal (3wdp)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_No_Trigger Replenishment Through Kanban Signal (3wdp):join:Split_Split_Trigger Replenishment Through Kanban Signal (3wdp)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Split_Trigger Replenishment Through Kanban Signal (3wdp)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_No_Trigger Replenishment Through Kanban Signal (3wdp):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_No_Trigger Replenishment Through Kanban Signal (3wdp):split:Split_Join_Trigger Replenishment Through Kanban Signal (3wdp)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_No_Trigger Replenishment Through Kanban Signal (3wdp):split:Split_Join_Trigger Replenishment Through Kanban Signal (3wdp)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_No_Trigger Replenishment Through Kanban Signal (3wdp):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Join_Trigger Replenishment Through Kanban Signal (3wdp)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp):join:Split_Split_Trigger Replenishment Through Kanban Signal (3wdp)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp):join:Split_Split_Trigger Replenishment Through Kanban Signal (3wdp)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Split_Trigger Replenishment Through Kanban Signal (3wdp)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp):split:Split_Join_Trigger Replenishment Through Kanban Signal (3wdp):Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp)*Trigger Replenishment Through Kanban Signal (3wdp)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp):split:Split_Join_Trigger Replenishment Through Kanban Signal (3wdp):Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp)*Trigger Replenishment Through Kanban Signal (3wdp)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Join_Trigger Replenishment Through Kanban Signal (3wdp)"
+       "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp)*Trigger Replenishment Through Kanban Signal (3wdp)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Skip:join:Split_Join_Trigger Replenishment Through Kanban Signal (3wdp)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Skip:join:Split_Join_Trigger Replenishment Through Kanban Signal (3wdp)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Join_Trigger Replenishment Through Kanban Signal (3wdp)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Skip:busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Skip:split:Join_Split_xor (3wei):Join_Split_and (3wbl)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Skip:split:Join_Split_xor (3wei):Join_Split_and (3wbl)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Skip:busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Split_xor (3wei)"
+       "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Split_and (3wbl)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Trigger Replenishment Through Kanban Signal (3wdp):join:Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp)*Trigger Replenishment Through Kanban Signal (3wdp)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Trigger Replenishment Through Kanban Signal (3wdp):join:Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp)*Trigger Replenishment Through Kanban Signal (3wdp)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Split_Yes_Trigger Replenishment Through Kanban Signal (3wdp)*Trigger Replenishment Through Kanban Signal (3wdp)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Trigger Replenishment Through Kanban Signal (3wdp):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Trigger Replenishment Through Kanban Signal (3wdp):split:Trigger Replenishment Through Kanban Signal (3wdp)*xor (3wei)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Trigger Replenishment Through Kanban Signal (3wdp):split:Trigger Replenishment Through Kanban Signal (3wdp)*xor (3wei)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Trigger Replenishment Through Kanban Signal (3wdp):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Trigger Replenishment Through Kanban Signal (3wdp)*xor (3wei)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei):join:Trigger Replenishment Through Kanban Signal (3wdp)*xor (3wei)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei):join:Trigger Replenishment Through Kanban Signal (3wdp)*xor (3wei)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Trigger Replenishment Through Kanban Signal (3wdp)*xor (3wei)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei):split:xor (3wei)*Join_Yes_xor (3wei)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei):split:xor (3wei)*Join_Yes_xor (3wei)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei)*Join_Yes_xor (3wei)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei):split:xor (3wei)*xor (3wep)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei):split:xor (3wei)*xor (3wep)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei)*xor (3wep)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei):split:xor (3wei)*xor (3wfa)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei):split:xor (3wei)*xor (3wfa)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei)*xor (3wfa)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wep):join:xor (3wei)*xor (3wep)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wep):join:xor (3wei)*xor (3wep)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei)*xor (3wep)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wep):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wep):split:xor (3wep)*Replenishment In-House Production with Production Order (3wf3)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wep):split:xor (3wep)*Replenishment In-House Production with Production Order (3wf3)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wep):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wep)*Replenishment In-House Production with Production Order (3wf3)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment In-House Production with Production Order (3wf3):join:xor (3wep)*Replenishment In-House Production with Production Order (3wf3)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment In-House Production with Production Order (3wf3):join:xor (3wep)*Replenishment In-House Production with Production Order (3wf3)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wep)*Replenishment In-House Production with Production Order (3wf3)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment In-House Production with Production Order (3wf3):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment In-House Production with Production Order (3wf3):split:Replenishment In-House Production with Production Order (3wf3)*xor (3wbe)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment In-House Production with Production Order (3wf3):split:Replenishment In-House Production with Production Order (3wf3)*xor (3wbe)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment In-House Production with Production Order (3wf3):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment In-House Production with Production Order (3wf3)*xor (3wbe)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wbe):join:Replenishment In-House Production with Production Order (3wf3)*xor (3wbe)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wbe):join:Replenishment In-House Production with Production Order (3wf3)*xor (3wbe)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment In-House Production with Production Order (3wf3)*xor (3wbe)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wbe):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wbe):join:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)*xor (3wbe)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wbe):join:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)*xor (3wbe)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)*xor (3wbe)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wbe):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wbe):split:xor (3wbe)*and (3wbl)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wbe):split:xor (3wbe)*and (3wbl)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wbe):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wbe)*and (3wbl)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:and (3wbl):join:xor (3wbe)*and (3wbl)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:and (3wbl):join:xor (3wbe)*and (3wbl)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wbe)*and (3wbl)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:and (3wbl):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:and (3wbl):split:and (3wbl)*Join_Yes_and (3wbl)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:and (3wbl):split:and (3wbl)*Join_Yes_and (3wbl)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:and (3wbl):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:and (3wbl)*Join_Yes_and (3wbl)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wfa):join:xor (3wei)*xor (3wfa)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wfa):join:xor (3wei)*xor (3wfa)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei)*xor (3wfa)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wfa):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wfa):split:xor (3wfa)*Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wfa):split:xor (3wfa)*Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wfa):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wfa)*Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz):join:xor (3wfa)*Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz):join:xor (3wfa)*Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wfa)*Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz):split:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)*xor (3wbe)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz):split:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)*xor (3wbe)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Replenishment External Procurement with Standard Purchase Order/Source List (3wbz)*xor (3wbe)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_xor (3wei):join:Join_Split_xor (3wei)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_xor (3wei):join:Join_Split_xor (3wei)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Split_xor (3wei)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_xor (3wei):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_xor (3wei):split:Join_Join_xor (3wei)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_xor (3wei):split:Join_Join_xor (3wei)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_xor (3wei):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Join_xor (3wei)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_xor (3wei):join:xor (3wei)*Join_Yes_xor (3wei):Join_Split_xor (3wei)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_xor (3wei):join:xor (3wei)*Join_Yes_xor (3wei):Join_Split_xor (3wei)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:xor (3wei)*Join_Yes_xor (3wei)"
+       "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Split_xor (3wei)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_xor (3wei):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_xor (3wei):split:Join_Join_xor (3wei)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_xor (3wei):split:Join_Join_xor (3wei)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_xor (3wei):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Join_xor (3wei)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_and (3wbl):join:Join_Split_and (3wbl)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_and (3wbl):join:Join_Split_and (3wbl)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Split_and (3wbl)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_and (3wbl):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_and (3wbl):split:Join_Join_and (3wbl)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_and (3wbl):split:Join_Join_and (3wbl)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_No_and (3wbl):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Join_and (3wbl)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_and (3wbl):join:and (3wbl)*Join_Yes_and (3wbl):Join_Split_and (3wbl)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_and (3wbl):join:and (3wbl)*Join_Yes_and (3wbl):Join_Split_and (3wbl)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:and (3wbl)*Join_Yes_and (3wbl)"
+       "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Split_and (3wbl)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_and (3wbl):busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_and (3wbl):split:Join_Join_and (3wbl)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_and (3wbl):split:Join_Join_and (3wbl)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Yes_and (3wbl):busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Join_and (3wbl)"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Output:join:Join_Join_xor (3wei):Join_Join_and (3wbl)"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Output:join:Join_Join_xor (3wei):Join_Join_and (3wbl)"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Join_xor (3wei)"
+       "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Join_Join_and (3wbl)"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Output:busy"
+;
+trans "t:Model.3wae--0-----u--:Model.3wae--0-----u--:Output:split:OutputCondition"~"t:Model.3wae--0-----u--:Model.3wae--0-----u--:Output:split:OutputCondition"
+    in "p:Model.3wae--0-----u--:Model.3wae--0-----u--:Output:busy"
+   out "p:Model.3wae--0-----u--:Model.3wae--0-----u--:OutputCondition"
+;
+

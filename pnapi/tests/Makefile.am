@@ -16,6 +16,9 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
             bug14208.2.owfn bug14335.owfn bug14411.owfn \
             bug14411-constraint.owfn bug14417.1.owfn bug14417.2.owfn \
             bug14856.owfn bug15415.owfn data.hlowfn eisen.hlowfn myCoffee.owfn phils.hlowfn \
+            Model.1bt1--0-----u--.xml.tpn Model.7c1w--0-----u--.xml.tpn \
+	    Model.4ose--0-----u--.xml.tpn Model.3wae--0-----u--.xml.tpn \
+	    Model.5e1y--0-----u--.xml.tpn Model.6mxu--0-----u--.xml.tpn \
             test_cdnf.owfn test_input.lola test_dead_nodes.net.owfn \
             test_dnf.owfn test_identical_places.net.owfn \
             test_identical_transitions.net.owfn test_input_roles.owfn \

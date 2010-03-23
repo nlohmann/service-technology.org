@@ -36,6 +36,7 @@ using namespace pnapi;
 using namespace pnapi::parser::woflan;
 
 bool needLabel = false;
+std::string transName;
 
 %}
 
@@ -97,6 +98,7 @@ transition:
   {
     check(!pnapi_woflan_yynet.containsNode($2), "node name already used");
     transition_ = &pnapi_woflan_yynet.createTransition($2); 
+    transName = $2;
   }
 | KEY_TRANSITION { needLabel = true; }
 ;
@@ -108,7 +110,8 @@ label:
   }
 | TILDE IDENT
   {
-    check(!pnapi_woflan_yynet.containsNode($2), "node name already used");
+    if($2 != transName)
+      check(!pnapi_woflan_yynet.containsNode($2), "node name already used");
     transition_->setName($2); 
   }
 ;

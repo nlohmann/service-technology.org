@@ -75,6 +75,21 @@ AT_CHECK([GREP -q "|P|= 8  |P_in|= 0  |P_out|= 0  |T|= 7  |F|= 17" stderr])
 AT_KEYWORDS([frontend input pnml])
 AT_CLEANUP
 
+AT_SETUP([Reading Woflan net from file])
+m4_define([NET], [Model.7c1w--0-----u--.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 150  |P_in|= 0  |P_out|= 0  |T|= 144  |F|= 342" stderr])
+AT_KEYWORDS([frontend input pnml])
+AT_CLEANUP
+
+AT_SETUP([Reading Woflan net from pipe])
+m4_define([NET], [Model.1bt1--0-----u--.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI --verbose --input=tpn < NET],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 61  |P_in|= 0  |P_out|= 0  |T|= 60  |F|= 140" stderr])
+AT_KEYWORDS([frontend input pnml])
+AT_CLEANUP
 
 ############################################################################
 AT_BANNER([Output])
@@ -135,6 +150,16 @@ AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --output=pnml],0)
 AT_CHECK([test -f NET.pnml])
 AT_KEYWORDS([frontend output pnml])
+AT_CLEANUP
+
+AT_SETUP([Writing Woflan net (from open net)])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=tpn],0)
+AT_CHECK([test -f NET.tpn])
+AT_CHECK([PETRI NET.tpn --input=tpn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 121  |P_in|= 0  |P_out|= 0  |T|= 88  |F|= 303" stderr])
+AT_KEYWORDS([frontend output])
 AT_CLEANUP
 
 AT_SETUP([Writing open net with roles])
@@ -344,6 +369,42 @@ AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET],1,ignore,stderr)
 AT_CHECK([GREP -q "role has not been specified" stderr])
 AT_KEYWORDS([oWFN roles])
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Woflan parser tests])
+############################################################################
+
+AT_SETUP([Example 1])
+m4_define([NET], [Model.4ose--0-----u--.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 22  |P_in|= 0  |P_out|= 0  |T|= 22  |F|= 46" stderr])
+AT_KEYWORDS([woflan parser])
+AT_CLEANUP
+
+AT_SETUP([Example 2])
+m4_define([NET], [Model.3wae--0-----u--.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 38  |P_in|= 0  |P_out|= 0  |T|= 39  |F|= 83" stderr])
+AT_KEYWORDS([woflan parser])
+AT_CLEANUP
+
+AT_SETUP([Example 3])
+m4_define([NET], [Model.5e1y--0-----u--.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 27  |P_in|= 0  |P_out|= 0  |T|= 27  |F|= 59" stderr])
+AT_KEYWORDS([woflan parser])
+AT_CLEANUP
+
+AT_SETUP([Example 4])
+m4_define([NET], [Model.6mxu--0-----u--.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 79  |P_in|= 0  |P_out|= 0  |T|= 76  |F|= 176" stderr])
+AT_KEYWORDS([woflan parser])
 AT_CLEANUP
 
 

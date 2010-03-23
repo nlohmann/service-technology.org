@@ -12,3 +12,6 @@
 
 // VERIFICATION PROBLEM
 #define HOME
+
+// for HOME
+#define TWOPHASE

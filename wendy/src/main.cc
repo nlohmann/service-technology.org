@@ -289,12 +289,12 @@ int main(int argc, char** argv) {
     | 5. call LoLA and parse reachability graph |
     `------------------------------------------*/
     // select LoLA binary and build LoLA command
-#if defined(__MINGW32__)
-    // MinGW does not understand pathnames with "/", so we use the basename
-    std::string command_line = std::string(basename(args_info.lola_arg)) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
-#else
+//#if defined(__MINGW32__)
+//    // MinGW does not understand pathnames with "/", so we use the basename
+//    std::string command_line = std::string(basename(args_info.lola_arg)) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
+//#else
     std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
-#endif
+//#endif
 
     // call LoLA
     status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());

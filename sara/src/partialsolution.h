@@ -114,13 +114,13 @@ public:
 
 	/// calculates the number of effectively produced tokens for each transition in the partial firing sequence and adds them all up
 	map<Place*,int> produce();
-*/
+
 	/// checks if the partial firing sequence is "better" than a given one (tv)
 	bool betterSequenceThan(vector<Transition*> tv, Marking &m0, map<Transition*,int>& rem);
 
 	// calculate constraints to make unfirable circles firable or to prevent them
-//	void calcCircleConstraints(IMatrix& im, Marking& m0);
-
+	void calcCircleConstraints(IMatrix& im, Marking& m0);
+*/
 	/// calculates the concrete values in a constraint from given sets of places and transitions and adds it to the constraint list
 	bool buildMultiConstraint(map<Place*,int>& pmap, int incr, set<Transition*>& forbidden);
 

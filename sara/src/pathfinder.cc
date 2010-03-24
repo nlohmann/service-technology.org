@@ -141,8 +141,8 @@ bool PathFinder::recurse() {
 		newps.setFullVector(fulltvector);
 //		newps.setJumpsDone(tps.first()->jumpsDone());
 		if (!tps.findPast(&newps) && tps.find(&newps)>=0) { // job isn't already in the queue or past
-		if (tps.almostEmpty() || !tps.first()->betterSequenceThan(fseq,m0,rec_tv))
-		{
+//		if (tps.almostEmpty() || !tps.first()->betterSequenceThan(fseq,m0,rec_tv))
+//		{
 			// but only save it for later use (=adaption of constraints) if it is new or better than the things we already have
 			if (terminate) 
 			{
@@ -164,11 +164,13 @@ bool PathFinder::recurse() {
 			}
 			if (verbose>1) {
 				if (terminate) cerr << "Full Solution found:" << endl; 
+				else if (tps.first()->compareSequence(fseq) && !tps.first()->getRemains().empty()) 
+					cerr << "Failure:" << endl;
 				else cerr << "New Partial Solution:" << endl;
 				newps.show();
 				cerr << "*** PF ***" << endl;
 			}
-		} else if (verbose>1) cerr << "sara: OldJobBetterThanNew-Hit" << endl;
+//		} else if (verbose>1) cerr << "sara: OldJobBetterThanNew-Hit" << endl;
 		} else if (verbose>1) cerr << "sara: CheckAgainstQueue-Hit" << endl;
 		// go up one level in the recursion, if there were nonfirable transitions left over,
 		// but terminate the recursion altogether if this partial solution is a full solution.
@@ -525,6 +527,7 @@ bool PathFinder::checkForDiamonds()
 	if (fseq.size()>1)
 		for(int i=fseq.size()-2; i>=0; --i) // don't check the transition against itself! (-> -2)
 		{
+			if (verbose>2 && minimize && mv[i]==m0) cerr << "DC: Duplicate Marking (Step " << i << ")" << endl;
 			if (minimize && mv[i]==m0) return true; // if we reach a marking again, there would be a smaller solution, so dismiss this one
 			// if it isn't in some set, it either hasn't been done at that point or it can't fire
 			// in any case: there is no diamond
@@ -540,6 +543,7 @@ bool PathFinder::checkForDiamonds()
 			// if that sequence can fire under the marking from level i, it has all been done
 			// and the diamond is complete.
 			set<Place*> pset(im.compareOutput(*t_active,*t_check));
+			if (verbose>2 && im.checkRestrictedActivation(mv[i],v,pset)) cerr << "DC: Transition Switch (Step " << i << ", " << t_active->getName() << "/" << t_check->getName() << ")" << endl;
 			if (im.checkRestrictedActivation(mv[i],v,pset)) return true;
 		} 
 	// if the checks against all recursion levels go wrong, no diamond is completed
@@ -557,6 +561,7 @@ bool PathFinder::checkForDiamonds()
 			map<Transition*,int>::iterator mit;
 			for(mit=tmp.begin(); mit!=tmp.end(); ++mit)
 				if (mit->second!=0) break;
+			if (verbose>2 && mit==tmp.end()) cerr << "DC: FPool Hit (Entry " << i << ")" << endl;
 			if (mit==tmp.end()) return true;
 		}
 	}

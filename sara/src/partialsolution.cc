@@ -270,7 +270,6 @@ map<Place*,int> PartialSolution::produce() {
 	@param m0 An initial marking.
 	@param rem A remainder of non-firable transitions.
 	@return If the partial solution is "better" than the parameters.
-*/
 bool PartialSolution::betterSequenceThan(vector<Transition*> tv, Marking& m0, map<Transition*,int>& rem) {
 	// the new firing sequence should be longer than the old one
 	if (tseq.size()>tv.size()) return true;
@@ -279,6 +278,7 @@ bool PartialSolution::betterSequenceThan(vector<Transition*> tv, Marking& m0, ma
 	if (m==m0) return true;
 	return false;
 }
+*/
 
 /*
 void PartialSolution::calcCircleConstraints(IMatrix& im, Marking& m0) {

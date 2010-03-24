@@ -82,14 +82,14 @@ Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, Problem& pb, bo
 }
 */
 
-/** Constructor with a Petri net, an initial and a final marking to test whether
+/*! Constructor with a Petri net, an initial and a final marking to test whether
 	the final marking can be covered from the initial marking.
-	@param pn The Petri net.
-	@param m0 The initial marking.
-	@param mf The final marking.
-	@param cover The set of places where the final marking need only be covered (instead of
+	\param pn The Petri net.
+	\param m0 The initial marking.
+	\param mf The final marking.
+	\param cover The set of places where the final marking need only be covered (instead of
 			reached exactly).
-	@param verbose The level of verbosity (0-3).
+	\param verbose The level of verbosity (0-3).
 */
 Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, Problem& pb, bool verbose, int debug, bool out, int brk) 
 	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols),im(pn),breakafter(brk) {
@@ -127,26 +127,14 @@ void Reachalyzer::start() {
 	int loops = 0; // counter for number of loops
 	if (stateinfo && out) cout << "JOBS(done/open):";
 	while (!solved && !tps.empty()) { // go through the job list as long as there are jobs in it and we have no solution
-		if (breakafter>0 && breakafter<=loops) 
-		{ 
-			if (args_info.verbose_given) {
-				cerr << endl << endl << "****** JobQueue ******" << endl;
-				tps.show(true); 
-				cerr << "****** SolutionQueue ******" << endl;
-				solutions.show(false); 
-				cerr << "****** FailureQueue ******" << endl;
-				failure.show(false); 
-				cerr << "****** End of Queues ******" << endl << endl;
-			}
-			break; 
-		} // debug option -break
+		if (breakafter>0 && breakafter<=loops) break; // debug option --break
 		if (stateinfo && out) { 
 			cout << setw(7) << loops << "/" << setw(7) << tps.size() << "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"; 
 			cout.flush();
 		} 
 		if (verbose>0) { // debug output, show active job
 			cerr << endl;
-			cerr << "sara: Round=" << (loops) << "   # Partial Solutions=" << tps.size() << endl;
+			cerr << "sara: Job " << (loops) << ",   To do: " << tps.size() << endl;
 			tps.first()->show();
 		} 
 		if (verbose>1) cerr << "Lookup-Table-Size: " << shortcut.size() << endl;
@@ -242,7 +230,7 @@ void Reachalyzer::start() {
 		if (!solutionSeen(fullvector)) // adapt known solutions (from an earlier loop) for the new constraints
 		{ // no solutions known so far, calculate them by trying to realize a firing sequence
 			PathFinder pf(m1,fullvector,cols,tps,solutions,failure,im,shortcut);
-			pf.verbose = verbose;
+			pf.verbose = ((breakafter>0 && breakafter<=loops+2)?3:verbose);
 			pf.setMinimize();
 			solved = pf.recurse(); // main call to realize a solution
 		} 
@@ -251,6 +239,16 @@ void Reachalyzer::start() {
 		++loops;
 	}
 	if (stateinfo && out) cout << "\r";
+	if (args_info.break_given && stateinfo) 
+	{ 
+		cerr << endl << endl << "****** JobQueue ******" << endl;
+		tps.show(true); 
+		cerr << "****** SolutionQueue ******" << endl;
+		solutions.show(false); 
+		cerr << "****** FailureQueue ******" << endl;
+		failure.show(false); 
+		cerr << "****** End of Queues ******" << endl << endl;
+	} // debug option --break
 	if (stateinfo)
 		cout << "sara: " << loops << " job" << (loops!=1?"s":"") << " done, " 
 			<< tps.size() << " in queue, " << failure.trueSize() <<  " failure" 

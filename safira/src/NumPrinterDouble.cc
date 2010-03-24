@@ -22,7 +22,7 @@
 #include "helpers.h"
 
 NumPrinterDouble::NumPrinterDouble(map<Intpair, Nodepair*, Cmp>* _nodepairs, bool _isForFirstFormula)
-	: nodepairs(nodepairs), isForFirstFormula(_isForFirstFormula) {
+	: nodepairs(_nodepairs), isForFirstFormula(_isForFirstFormula) {
 }
 
 string NumPrinterDouble::printNum(const int num) const {

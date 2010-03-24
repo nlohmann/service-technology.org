@@ -255,7 +255,7 @@ string assignmentToString(vector<bool>* assignment){
 	string s = "";
 	if(assignment){
 		assert(assignment->size() >= label2id.size());
-		for(int i = 1; i < label2id.size(); ++i){
+		for(unsigned int i = 1; i < label2id.size(); ++i){
 			if(assignment->at(i) == true){
 				s = s + id2label[i] + " ";
 				//cout << id2label[i] << " ";

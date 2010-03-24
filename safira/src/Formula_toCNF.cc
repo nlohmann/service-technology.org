@@ -66,7 +66,7 @@ bool Formula::isSatisfiable(vector<bool> * assignment){
 	list<Clause> clauses = calculateCNF();
 
 	Clause cl;
-	for(int i = 1; i < label2id.size(); ++i){
+	for(unsigned int i = 1; i < label2id.size(); ++i){
 		if(assignment->at(i) == true){
 			cl.literal0 = i;
 		}

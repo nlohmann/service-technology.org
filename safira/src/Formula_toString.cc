@@ -64,15 +64,15 @@ string FormulaNUM::toString(NumPrinterBase* printer) const {
     return printer->printNum(number);
 }
 
-string FormulaTrue::toString(NumPrinterBase* printer) const {
+string FormulaTrue::toString(NumPrinterBase* ) const {
     return ("true");
 }
 
-string FormulaFalse::toString(NumPrinterBase* printer) const {
+string FormulaFalse::toString(NumPrinterBase* ) const {
     return ("false");
 }
 
-string FormulaFinal::toString(NumPrinterBase* printer) const {
+string FormulaFinal::toString(NumPrinterBase* ) const {
     return ("final");
 }
 

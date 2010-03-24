@@ -150,6 +150,7 @@ AT_CHECK([ls *.lola | wc -l | GREP -q 25])
 AT_KEYWORDS(compiler)
 AT_CLEANUP
 
+
 ############################################################################
 AT_BANNER([File Formats])
 ############################################################################
@@ -187,6 +188,27 @@ AT_CHECK([test -f service_tech.Prcsss__coffeeMachine_unsound.owfn])
 AT_CHECK([GREP -q "ROLES CoffeeMachine, Customer;" service_tech.Prcsss__coffeeMachine_unsound.owfn])
 AT_CHECK([GREP -q "ROLES CoffeeMachine;" service_tech.Prcsss__coffeeMachine_unsound.owfn])
 AT_CHECK([GREP -q "ROLES Customer;" service_tech.Prcsss__coffeeMachine_unsound.owfn])
+AT_KEYWORDS([compiler formats])
+AT_CLEANUP
+
+AT_SETUP([Data interface output (*.lola)])
+AT_CHECK([cp TESTFILES/service-tech.xml .])
+AT_CHECK([UML2OWFN -i service-tech.xml -f lola -D --output=service_tech],0,ignore,stderr)
+AT_CHECK([test -f service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Data_Bsnss32t##Coffee_" service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Data_Bsnss32t##Coffee_Order_" service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Data_Bsnss32t##Euro_" service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Data_Bsnss32t##Tea_" service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Data_Bsnss32t##Tea_Order_" service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Control_await_coin_" service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Control_choose_beverage" service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Control_get_coffee_" service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Control_get_tea_" service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Control_insert_coin_" service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Control_make_coffee_" service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Control_make_tea_" service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Control_push_coffee_button_" service_tech.Prcsss__coffeeMachine_unsound.lola])
+AT_CHECK([GREP -q "Control_push_tea_button_" service_tech.Prcsss__coffeeMachine_unsound.lola])
 AT_KEYWORDS([compiler formats])
 AT_CLEANUP
 

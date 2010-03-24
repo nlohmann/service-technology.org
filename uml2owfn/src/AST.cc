@@ -153,7 +153,7 @@ void ASTNode::prepareInstances(list<Process*>& processes, list<SimpleTask*>& tas
     // input and output
     } else if (tag == "input") {
         if (currentInputCriterion == NULL) {
-            Pin* newPin = new Pin(attributes["name"],currNode);
+            Pin* newPin = new Pin(attributes["name"],currNode, /*input*/ true);
             currNode->inputPins.push_back(newPin);
             // set minimum and maximum range of pin multiplicities
             if (attributes.find("minimum") != attributes.end())
@@ -170,7 +170,7 @@ void ASTNode::prepareInstances(list<Process*>& processes, list<SimpleTask*>& tas
         }
     } else if (tag == "output") {
         if (currentOutputCriterion == NULL) {
-            Pin* newPin = new Pin(attributes["name"],currNode);
+            Pin* newPin = new Pin(attributes["name"],currNode, /*input*/ false);
             currNode->outputPins.push_back(newPin);
             // set minimum and maximum range of pin multiplicities
             if (attributes.find("minimum") != attributes.end())
@@ -240,17 +240,17 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
     // startnode, stopnode, endnode:
     if (tag == "startNode") {
         currNode = new AtomicCFN(attributes["name"], NSTARTNODE, this, currProcess);
-        currNode->outputPins.push_back(new Pin("default", currNode));
+        currNode->outputPins.push_back(new Pin("default", currNode, /*input*/ false));
         currProcess->addFCN(static_cast<AtomicCFN*>(currNode));
         currNodeNameMap[attributes["name"]] = currNode;
     } else if (tag == "stopNode") {
         currNode = new AtomicCFN(attributes["name"], NSTOPNODE, this, currProcess);
-        currNode->inputPins.push_back(new Pin("default", currNode));
+        currNode->inputPins.push_back(new Pin("default", currNode, /*input*/ true));
         currProcess->addFCN(static_cast<AtomicCFN*>(currNode));
         currNodeNameMap[attributes["name"]] = currNode;
     } else if (tag == "endNode") {
         currNode = new AtomicCFN(attributes["name"], NENDNODE, this, currProcess);
-        currNode->inputPins.push_back(new Pin("default", currNode));
+        currNode->inputPins.push_back(new Pin("default", currNode, /*input*/ true));
         currProcess->addFCN(static_cast<AtomicCFN*>(currNode));
         currNodeNameMap[attributes["name"]] = currNode;
 
@@ -335,7 +335,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
 
                 // copy all input pins
                 for(list<Pin*>::iterator copyInput = (*globalTask)->inputPins.begin(); copyInput != (*globalTask)->inputPins.end(); copyInput++) {
-                    Pin* newPin = new Pin((*copyInput)->getName(), currNode);
+                    Pin* newPin = new Pin((*copyInput)->getName(), currNode, /*input*/ true);
                     currNode->inputPins.push_back(newPin);
                     newPin->min = (*copyInput)->min;
                     newPin->max = (*copyInput)->max;
@@ -343,7 +343,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
 
                 // copy all output pins
                 for(list<Pin*>::iterator copyOutput = (*globalTask)->outputPins.begin(); copyOutput != (*globalTask)->outputPins.end(); copyOutput++) {
-                    Pin* newPin = new Pin((*copyOutput)->getName(), currNode);
+                    Pin* newPin = new Pin((*copyOutput)->getName(), currNode, /*input*/ false);
                     currNode->inputPins.push_back(newPin);
                     newPin->min = (*copyOutput)->min;
                     newPin->max = (*copyOutput)->max;
@@ -390,7 +390,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
 
                 // copy all input pins
                 for(list<Pin*>::iterator copyInput = (*globalService)->inputPins.begin(); copyInput != (*globalService)->inputPins.end(); copyInput++) {
-                    Pin* newPin = new Pin((*copyInput)->getName(), currNode);
+                    Pin* newPin = new Pin((*copyInput)->getName(), currNode, /*input*/ true);
                     currNode->inputPins.push_back(newPin);
                     newPin->min = (*copyInput)->min;
                     newPin->max = (*copyInput)->max;
@@ -398,7 +398,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
 
                 // copy all output pins
                 for(list<Pin*>::iterator copyOutput = (*globalService)->outputPins.begin(); copyOutput != (*globalService)->outputPins.end(); copyOutput++) {
-                    Pin* newPin = new Pin((*copyOutput)->getName(), currNode);
+                    Pin* newPin = new Pin((*copyOutput)->getName(), currNode, /*input*/ false);
                     currNode->inputPins.push_back(newPin);
                     newPin->min = (*copyOutput)->min;
                     newPin->max = (*copyOutput)->max;
@@ -445,7 +445,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
 
                 // copy all input pins
                 for(list<Pin*>::iterator copyInput = (*globalProcess)->inputPins.begin(); copyInput != (*globalProcess)->inputPins.end(); copyInput++) {
-                    Pin* newPin = new Pin((*copyInput)->getName(), currNode);
+                    Pin* newPin = new Pin((*copyInput)->getName(), currNode, /*input*/ true);
                     currNode->inputPins.push_back(newPin);
                     newPin->min = (*copyInput)->min;
                     newPin->max = (*copyInput)->max;
@@ -453,7 +453,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
 
                 // copy all output pins
                 for(list<Pin*>::iterator copyOutput = (*globalProcess)->outputPins.begin(); copyOutput != (*globalProcess)->outputPins.end(); copyOutput++) {
-                    Pin* newPin = new Pin((*copyOutput)->getName(), currNode);
+                    Pin* newPin = new Pin((*copyOutput)->getName(), currNode, /*input*/ false);
                     currNode->inputPins.push_back(newPin);
                     newPin->min = (*copyOutput)->min;
                     newPin->max = (*copyOutput)->max;
@@ -528,11 +528,11 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
 
     // additional input and additional output:
     } else if (tag == "additionalInput") {
-        Pin* newPin = new Pin(attributes["name"],currNode);
+        Pin* newPin = new Pin(attributes["name"],currNode, /*input*/ true);
         currNode->inputPins.push_back(newPin);
         additionalInput = newPin;
     } else if (tag == "additionalOutput") {
-        Pin* newPin = new Pin(attributes["name"],currNode);
+        Pin* newPin = new Pin(attributes["name"],currNode, /*input*/ false);
         currNode->outputPins.push_back(newPin);
         additionalOutput = newPin;
 
@@ -628,7 +628,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
         if (prozessSchachtelung) {
             if (currentInputCriterion == NULL) {
                 // instantiate a new pin
-                Pin* newPin = new Pin(attributes["name"],currNode);
+                Pin* newPin = new Pin(attributes["name"],currNode, /*input*/ true);
                 currNode->inputPins.push_back(newPin);
                 // set minimum and maximum range of pin multiplicities
                 if (attributes.find("minimum") != attributes.end())
@@ -637,10 +637,12 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                   newPin->max = toInt(attributes["maximum"]);
 
                 // if data is associated to this pin, then it is a data pin
-                if (attributes.find("associatedData") != attributes.end())
+                if (attributes.find("associatedData") != attributes.end()) {
                   newPin->isDataPin = true;
+                  newPin->setAssociatedData(attributes["associatedData"]);
+                }
 
-                newPin = new Pin(attributes["name"],currProcess);
+                newPin = new Pin(attributes["name"],currProcess, /*input*/ true);
                 currProcess->inputPins.push_back(newPin);
                 // set minimum and maximum range of pin multiplicities
                 if (attributes.find("minimum") != attributes.end())
@@ -649,8 +651,10 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                   newPin->max = toInt(attributes["maximum"]);
 
                 // if data is associated to this pin, then it is a data pin
-                if (attributes.find("associatedData") != attributes.end())
+                if (attributes.find("associatedData") != attributes.end()) {
                   newPin->isDataPin = true;
+                  newPin->setAssociatedData(attributes["associatedData"]);
+                }
             } else {
                 // assign a pin to the current input pinset
                 Pin* existingPin = currNode->getPinByName(attributes["name"]);
@@ -666,7 +670,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
         } else {
             if (currentInputCriterion == NULL) {
                 // instantiate a new pin
-                Pin* newPin = new Pin(attributes["name"],currNode);
+                Pin* newPin = new Pin(attributes["name"],currNode, /*input*/ true);
                 currNode->inputPins.push_back(newPin);
                 if (currentBranch != NULL) {
                     currentBranch->pins.push_back(newPin);
@@ -678,8 +682,10 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                   newPin->max = toInt(attributes["maximum"]);
 
                 // if data is associated to this pin, then it is a data pin
-                if (attributes.find("associatedData") != attributes.end())
+                if (attributes.find("associatedData") != attributes.end()) {
                   newPin->isDataPin = true;
+                  newPin->setAssociatedData(attributes["associatedData"]);
+                }
             } else {
                 // assign a pin to the current input pinset
                 Pin* existingPin = currNode->getPinByName(attributes["name"]);
@@ -693,7 +699,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
     } else if (tag == "output") {
         if (prozessSchachtelung) {
             if (currentOutputCriterion == NULL) {
-                Pin* newPin = new Pin(attributes["name"],currNode);
+                Pin* newPin = new Pin(attributes["name"],currNode, /*input*/ false);
                 currNode->outputPins.push_back(newPin);
                 // set minimum and maximum range of pin multiplicities
                 if (attributes.find("minimum") != attributes.end())
@@ -701,14 +707,25 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                 if (attributes.find("maximum") != attributes.end())
                   newPin->max = toInt(attributes["maximum"]);
 
+                // if data is associated to this pin, then it is a data pin
+                if (attributes.find("associatedData") != attributes.end()) {
+                  newPin->isDataPin = true;
+                  newPin->setAssociatedData(attributes["associatedData"]);
+                }
 
-                newPin = new Pin(attributes["name"],currProcess);
+                newPin = new Pin(attributes["name"],currProcess, /*input*/ false);
                 currProcess->outputPins.push_back(newPin);
                 // set minimum and maximum range of pin multiplicities
                 if (attributes.find("minimum") != attributes.end())
                   newPin->min = toInt(attributes["minimum"]);
                 if (attributes.find("maximum") != attributes.end())
                   newPin->max = toInt(attributes["maximum"]);
+
+                // if data is associated to this pin, then it is a data pin
+                if (attributes.find("associatedData") != attributes.end()) {
+                  newPin->isDataPin = true;
+                  newPin->setAssociatedData(attributes["associatedData"]);
+                }
 
             } else {
                 Pin* existingPin = currNode->getPinByName(attributes["name"]);
@@ -723,7 +740,7 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
             }
         } else {
             if (currentOutputCriterion == NULL) {
-                Pin* newPin = new Pin(attributes["name"],currNode);
+                Pin* newPin = new Pin(attributes["name"],currNode, /*input*/ false);
                 currNode->outputPins.push_back(newPin);
                 if (currentBranch != NULL) {
                     currentBranch->pins.push_back(newPin);
@@ -733,6 +750,12 @@ void ASTNode::finishInternal(list<Process*>& processes, list<SimpleTask*>& tasks
                   newPin->min = toInt(attributes["minimum"]);
                 if (attributes.find("maximum") != attributes.end())
                   newPin->max = toInt(attributes["maximum"]);
+
+                // if data is associated to this pin, then it is a data pin
+                if (attributes.find("associatedData") != attributes.end()) {
+                  newPin->isDataPin = true;
+                  newPin->setAssociatedData(attributes["associatedData"]);
+                }
 
             } else {
                 Pin* existingPin = currNode->getPinByName(attributes["name"]);

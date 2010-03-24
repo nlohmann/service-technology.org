@@ -164,6 +164,11 @@ class Pin {
     private:
         string name;
 
+        string associatedData;
+
+        /// whether this pin is an input pin of a process or task, if false, then it is an output pin
+        bool isInput;
+
         /// pointer to the one connection attached to this pin
         FlowContentConnection* attachedConnection;
 
@@ -187,32 +192,42 @@ class Pin {
         /// whether this pin takes data-flow tokens, plays a role when filtering pin multiplicities on forks and joins
         bool isDataPin;
 
+
+        /// constructor
+        Pin(string inputName, FlowContentNode* owner, bool isInput);
+
         /// returns the name
         string getName();
-
-        /// returns the name
-        void setPlace(pnapi::Place* placeToSet);
-
-        /// returns the name
-        pnapi::Place* getPlace();
-
-        /// returns true if there is no owning criterion
-        bool free();
-
-        /// sets the criterion owning this pin
-        void setCriterion(PinCombination* combination);
-
-        /// returns the attached connection
-        FlowContentConnection* getConnection();
-
-        /// attaches the connection
-        void setConnection(FlowContentConnection* attach);
 
         /// returns the owning node
         FlowContentNode*  getOwner();
 
-        /// constructor
-        Pin(string inputName, FlowContentNode* owner);
+        /// set the data type associated to this pin
+        void setAssociatedData(string associatedData);
+
+        /// get the data type associated to this pin
+        string getAssociatedData();
+
+        /// set the Petri net place representing this pin
+        void setPlace(pnapi::Place* placeToSet);
+
+        /// get the Petri net place representing this pin
+        pnapi::Place* getPlace();
+
+        /// sets the criterion owning this pin
+        void setCriterion(PinCombination* combination);
+
+        /// returns true if there is no owning criterion
+        bool free();
+
+        /// attaches the connection
+        void setConnection(FlowContentConnection* attach);
+
+        /// returns the attached connection
+        FlowContentConnection* getConnection();
+
+        /// translates this pin to its petri net pattern in the given petri net
+        void translateToNet(pnapi::ExtendedWorkflowNet* PN);
 
         /// generates a debug output on the console for this pin
         void debugOutput(string delay);

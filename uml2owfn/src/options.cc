@@ -116,7 +116,7 @@ void parse_command_line(int argc, char* argv[])
 	frontend__flex_debug = 0;
 
 	string parameter = "";
-	
+
 	if(args_info.input_given)
 	{
 		options[O_INPUT] = true;
@@ -131,10 +131,10 @@ void parse_command_line(int argc, char* argv[])
 			trace(TRACE_WARNINGS, "             "+ globals::filename + "\n");
 			trace(TRACE_WARNINGS, "         more than once.\n");
 			trace(TRACE_WARNINGS, "         So file will only be read once.\n");
-		}	
+		}
 
 	}
-	
+
 	if(args_info.output_given)
 	{	if (options[O_OUTPUT]) {
 			abort(4, "Multiple output options are given, please choose only one!");
@@ -168,7 +168,7 @@ void parse_command_line(int argc, char* argv[])
 			trace(TRACE_ALWAYS, "Use -h to get a list of valid formats.\n");
 			abort(4, "Parameter error");
 		}
-	
+
 	}
 
 	for (int i = 0; i < args_info.parameter_given; ++i)
@@ -197,7 +197,7 @@ void parse_command_line(int argc, char* argv[])
 			}
 
 	}
-	
+
 	for (int i = 0; i < args_info.skip_given; ++i)
 	{
 		options[O_SKIP_BY_FILTER] = true;
@@ -270,7 +270,7 @@ void parse_command_line(int argc, char* argv[])
 			trace(TRACE_ALWAYS, "Use -h to get a list of valid debug modes.\n");
        			abort(4, "Parameter error");
 		}
-	
+
 	}
 
 	if(args_info.reduce_given)
@@ -301,6 +301,9 @@ void parse_command_line(int argc, char* argv[])
       		globals::keepRoles.insert(string(parameter));
 
 	}
+
+	if(args_info.dataInterfaces_given)
+	  options[O_DATAINTERFACES] = true;
 
 	for(int i=0;i<args_info.inputs_num;i++)
 	{

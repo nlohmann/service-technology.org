@@ -13,7 +13,7 @@
 
 This manual is for UML2oWFN, version @value{VERSION}, a tool to translate models of the IBM WebSphere Business Modeler to Petri nets, last updated @value{UPDATED}.
 
-Copyright @copyright{} 2008-2009 Martin Znamirowski, Dirk Fahland, and Niels Lohmann
+Copyright @copyright{} 2008-2010 Martin Znamirowski, Dirk Fahland, and Niels Lohmann
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.2 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
@@ -194,6 +194,21 @@ processes shall not be translated. @samp{PROP} can take the following values
         pinsets. @acronym{UML2oWFN} can handle overlapping pinsets; the
         resulting Petri net is not free-choice.
 @end itemize
+
+@section Generate Interfaces for Decomposition
+
+@acronym{UML2oWFN} can name places of the Petri net that represent control flow
+and data flow links in a way that allows to decompose the resulting net into components
+or services with well-defined interfaces. Use option @samp{-D} to enable that
+functionality. 
+
+If option @samp{-D} is chosen, then places of control flow links will be named
+@samp{Control_<activity>_<id>} where @samp{<activity>} is the name of the source
+or target activity of the control flow link. If the link connects one activity with
+one control flow node, e.g. an AND-split or AND-join, then the name of the activity is
+chosen. Otherwise, the name of the source node is chosen. Places of data flow links
+will be named @samp{Control_<DataType>_<id>} where @samp{<DataType>} is the name
+of the data type associated to the source and target pins of the link.
 
 @c ----------------------------------------------------------------------------
 
@@ -666,7 +681,7 @@ bugfixes to @acronym{UML2oWFN} as they have been included in this release.
 
 @sp 3
 
-The most recent change log is available at Rachel's website at @url{http://service-technology.org/files/uml2owfn/ChangeLog}.
+The most recent change log is available at @acronym{UML2oWFN}'s website at @url{http://service-technology.org/files/uml2owfn/ChangeLog}.
 
 @c ----------------------------------------------------------------------------
 

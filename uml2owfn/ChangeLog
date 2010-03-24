@@ -6,6 +6,14 @@
         Translating IBM WebSphere Business Process Models to Petri Nets
                  http://www.service-technology.org/uml2owfn/
 
+Version 2.11
+============
+
+* UML2oWFN now writes .owfn files with ROLE annotations
+
+* added switch to distinguish places between activities and gateways as typed
+  interfaces (switch: `-D')
+
 Version 2.10
 ============
 

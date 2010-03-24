@@ -71,3 +71,7 @@ option "rolecontains" c
 string
 typestr="ROLE"
 optional
+
+option "dataInterfaces" D
+"distinguish places between activities and gateways as typed interfaces"
+flag off

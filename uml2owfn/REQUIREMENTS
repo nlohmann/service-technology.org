@@ -46,7 +46,7 @@ Development
 -----------
 
 In case you want to make changes to the source code, the following tools are
-required to reconfigure and compile Wendy.
+required to reconfigure and compile UML2oWFN.
 
    * Autoconf, `http://www.gnu.org/software/autoconf/'
 

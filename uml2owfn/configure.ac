@@ -1,4 +1,4 @@
-AC_INIT(UML2oWFN, 2.10, uml2owfn@service-technology.org, uml2owfn, http://service-technology.org/uml2owfn)
+AC_INIT(UML2oWFN, 2.11, uml2owfn@service-technology.org, uml2owfn, http://service-technology.org/uml2owfn)
 
 # prerequisites for Autoconf and Automake
 AC_PREREQ(2.59)

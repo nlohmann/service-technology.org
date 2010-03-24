@@ -90,7 +90,8 @@ typedef enum
    O_ROLECUT,      	///< automatically cut away all roles without start nodes
    O_ROLEEXCLUSIVE,	///< cut away all roles matching exactly a given string
    O_ROLECONTAINS,  ///< cut away all roles containing a given string
-   O_SKIP_BY_FILTER ///< filter processes according to processCharacteristics
+   O_SKIP_BY_FILTER, ///< filter processes according to processCharacteristics
+   O_DATAINTERFACES ///< distinguish places between activities and gateways as typed interfaces
 } possibleOptions;
 
 

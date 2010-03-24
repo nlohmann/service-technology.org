@@ -138,6 +138,9 @@ public:
   /// re-enumerate the roles of all nodes of the net
 	void anonymizeNodes();
 
+	/// rename places of the net to data interface scheme
+	void renamePlacesToInterfaces();
+
 	/// rename all identifier to LoLA compatible format
 	void toLoLAIdent();
 

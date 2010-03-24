@@ -260,6 +260,40 @@ void ExtendedWorkflowNet::anonymizeNodes() {
 }
 
 /*!
+ * \brief rename places of the net to data interface scheme
+ */
+void ExtendedWorkflowNet::renamePlacesToInterfaces() {
+
+  // count names of places to generate unique IDs
+  map<string, int>       sameIDcounter;
+
+  for (std::set<Place *>::iterator p = getPlaces().begin(); p != getPlaces().end(); p++) {
+    if ((*p)->getName().find("Data_") == 0 || (*p)->getName().find("Control_") == 0 ) {
+
+      int idBegin = (*p)->getName().find_last_of("_");
+      string name = (*p)->getName().substr(0,idBegin);
+
+      // get most recent ID for this name from the net
+      int id = 0;
+      for (map<string, int>::iterator nameIDs = sameIDcounter.begin(); nameIDs != sameIDcounter.end(); nameIDs++ ) {
+        if (name.compare(nameIDs->first) == 0) {
+          id = nameIDs->second;
+          break;
+        }
+      }
+
+      id++; // increase
+
+      // remember new id count and append to name
+      sameIDcounter[name] = id;
+      name = name + "_" + toString(id);
+
+      (*p)->setName(name);
+    }
+  }
+}
+
+/*!
  *
  */
 void ExtendedWorkflowNet::toLoLAIdent() {

@@ -114,7 +114,7 @@ FlowContentNode* Pin::getOwner() {
     return owningNode;
 }
 
-int pinID = 0;
+int pinIDs = 0;
 
 /// translates this pin to its petri net pattern in the given petri net
 void Pin::translateToNet(pnapi::ExtendedWorkflowNet* PN) {
@@ -122,16 +122,17 @@ void Pin::translateToNet(pnapi::ExtendedWorkflowNet* PN) {
   string name;
 
   if (options[O_DATAINTERFACES]) {
+
     // data interface naming: Data_DataTypeName_id
     if (this->isDataPin) {
-      name = "Data_"+this->getAssociatedData()+"_"+toString(pinID);
+      name = "Data_"+this->getAssociatedData() + "_" + toString(pinIDs);
     } else {
       if (isInput)
-        name = "Control_"+getOwner()->getName()+"_"+toString(pinID);
+        name = "Control_"+getOwner()->getName() + "_" + toString(pinIDs);
       else
-        name = "Control_"+getOwner()->getName()+"_"+toString(pinID);
+        name = "Control_"+getOwner()->getName() + "_" + toString(pinIDs);
     }
-    pinID++;
+    pinIDs++;
 
   } else {
     // standard pin names: nodeType.name.direction.pinName
@@ -144,8 +145,6 @@ void Pin::translateToNet(pnapi::ExtendedWorkflowNet* PN) {
               + ".output."
               + this->getName();
   }
-
-
 
   pnapi::Place &p = PN->createPlace(name, pnapi::Node::INTERNAL);
   //p.roles().insert(roles.begin(),roles.end());

@@ -185,6 +185,11 @@ string process_name_to_file_name (string processName) {
 void write_net_file(pnapi::ExtendedWorkflowNet *PN, analysis_t analysis) {
     trace(TRACE_DEBUG, "-> writing Petri net to file\n");
 
+
+    if (options[O_DATAINTERFACES]) {
+      PN->renamePlacesToInterfaces();
+    }
+
     // now the net will not change anymore, re-enumerate nodes of the net
     // to anonymize it
     if (globals::parameters[P_ANONYMIZE]) {

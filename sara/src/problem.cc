@@ -494,7 +494,7 @@ void Problem::showFinal() {
 				cout << required[placeorder[i]->getName()] << " ";
 			}
 		}
-	if (generalcover) cout << endl << "sara: - Unmentioned places may contain any number of tokens in the final marking";
+	if (generalcover) cout << endl << "sara: - Unmentioned places may have any number of tokens in the final marking";
 }
 
 void Problem::showConstraints() {

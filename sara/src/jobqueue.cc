@@ -194,23 +194,9 @@ bool JobQueue::findPast(PartialSolution* job) {
 		for(unsigned int i=0; i<deq.size(); ++i)
 		{
 				set<Constraint>& cs2(deq[i]->getConstraints());
-/*
-				cerr << "*+*+* Compare " << endl;
-				job->show();
-				cerr << "*+*+* With" << endl;
-				deq[i]->show();
-				cerr << "*+*+* Result: " << (cs==cs2?"IDENTICAL":"DIFFERENT") << endl;
-*/
 				if (cs==cs2) return true;
 		}
 	}
-/*
-	if (active) // compare also with active job if there is one (except the initial job)
-	{
-		set<Constraint>& cs2(active->getConstraints());
-		if (cs==cs2 && active->getSequence()==job->getSequence()) return true;
-	}
-*/
 	return false;
 }
 
@@ -231,27 +217,12 @@ int JobQueue::priority(PartialSolution* job) const {
 			priority += it->second;
 	} else {
 		priority += (job->getConstraints().size());
-//		priority += job->jumpsDone();
 		set<Constraint>::iterator cit;
 		for(cit=job->getConstraints().begin(); cit!=job->getConstraints().end(); ++cit)
 			if (cit->isJump()) priority+=1;
 	}
 	return priority;
 }
-
-/** Search the job queue for a full solution.
-	@return A full solution or NULL if none is found.
-*/
-/*
-PartialSolution* JobQueue::findSolution() {
-	if (active->isSolved()) return active;
-	map<int,deque<PartialSolution*> >::iterator jit;
-	for(jit=queue.begin(); jit!=queue.end(); ++jit)
-		for(unsigned int i=0; i<jit->second.size(); ++i)
-			if (jit->second[i]->isSolved()) return jit->second[i];
-	return NULL;
-}
-*/
 
 /** Check in a failure job queue whether the marking equation was infeasible.
 	@return True if the marking equation is infeasible.	
@@ -509,6 +480,7 @@ bool JobQueue::push_solved(PartialSolution* job) {
 					delete jit->second[i];
 					jit->second[i] = NULL;
 					changed = true;
+					--cnt;
 					break;
 				}
 			}
@@ -527,8 +499,10 @@ bool JobQueue::push_solved(PartialSolution* job) {
 }
 
 /** Prints a solution queue.
+	@param sum On Return: The sum over all solution lengths.
+	@return The maximal length of a solution.
 */
-int JobQueue::printSolutions() {
+int JobQueue::printSolutions(int& sum) {
 	int sollength=0;
 	if (args_info.forceprint_given) return -1; // solutions were printed earlier
 	if (queue.empty()) abort(14,"error: solved, but no solution found -- this should not happen");
@@ -540,6 +514,7 @@ int JobQueue::printSolutions() {
 			vector<Transition*> solution = ps->getSequence();
 			cout << "sara: SOLUTION(" << solution.size() << "): ";
 			if (solution.size()>sollength) sollength=solution.size();
+			sum += solution.size();
 			for(unsigned int j=0; j<solution.size(); ++j)
 				cout << solution[j]->getName() << " ";
 			cout << endl;

@@ -76,6 +76,12 @@ public:
 
 	/// returns the maximal trace length after the solutions have been printed
 	int getMaxTraceLength();
+	
+	/// returns the sum over all solution lengths
+	int getSumTraceLength();
+
+	/// Get the number of solutions in the solutions queue
+	int numberOfSolutions();
 
 	/// Status
 	enum errorMessage {
@@ -137,6 +143,9 @@ private:
 
 	/// longest trace length, only valid after solutions have been printed
 	int maxsollen;
+
+	/// sum of all trace lengths, only valid after solutions have been printed
+	int sumsollen;
 
 	/// If the problem was passed on from an earlier instance of the PathFinder
 	bool passedon;

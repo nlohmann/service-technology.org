@@ -297,15 +297,16 @@ if (args_info.input_given || args_info.pipe_given) {
 				// create an instance of the realizability solver
 				PathFinder pf(m1,tv,pn->getTransitions().size(),tps,solutions,failure,im,dummy);
 				pf.verbose = debug;
-				if (pf.recurse()) // solve the problem and print a possible solution
+				pf.recurse();
+				if (!solutions.almostEmpty()) // solve the problem and print a possible solution
 				{ 
-					int mtl = solutions.printSolutions(); // get the solution length for this problem
+					int mtl = solutions.printSolutions(avetracelen); // get the solution length for this problem
 					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
-					if (mtl>=0) avetracelen+=mtl; // sum up solution lengths for average calculation
-					++solcnt; 
+//					if (mtl>=0) avetracelen+=mtl; // sum up solution lengths for average calculation
+					solcnt+=solutions.size();
 				}
-				else if (solutions.almostEmpty()) cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;
-				if (!solutions.almostEmpty() || !verbose) break;
+				else cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;
+				if ((!solutions.almostEmpty() || !verbose) && !args_info.continue_given) break;
 				// if witnesses are sought and we have no solution, we pass the problem on
 				passedon = true;
 				m2 = m1; // but first, calculate the final marking
@@ -320,11 +321,12 @@ if (args_info.input_given || args_info.pipe_given) {
 				if (reach.getStatus()!=Reachalyzer::LPSOLVE_INIT_ERROR) {
 					reach.start(); // if everything is ok, solve the problem
 					clock_t mytime(reach.getTime()); // ... and measure the CPU time for that
-					if (reach.getStatus()==Reachalyzer::SOLUTION_FOUND) ++solcnt; // count the solutions
+					// count the solutions
+					if (reach.getStatus()==Reachalyzer::SOLUTION_FOUND) solcnt+=reach.numberOfSolutions(); 
 					reach.printResult(); // ... and print the result
 					int mtl = reach.getMaxTraceLength(); // get the maximal solution length for this problem
 					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
-					if (mtl>=0) avetracelen+=mtl; // sum up solution lengths for average calculation
+					avetracelen += reach.getSumTraceLength(); // sum up solution lengths for average calculation
 					if (debug>0) { // debug info, P/T orderings
 						cerr << "Transition Order: ";
 						for(unsigned int o=0; o<transitionorder.size(); ++o)

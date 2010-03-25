@@ -3,7 +3,9 @@ args "--include-getopt --show-required --no-handle-error"
 purpose "Structures for Automated Reachability Analysis:
 Deciding the reachability problem for Petri nets and more
 
-Given a problem of the form (N,i,f) where N is a low level Petri net in one of the formats *.llnet (LOLA) or *.owfn (OWFN), i is an initial marking, and f is an extended final marking, the program tries to decide whether f is reachable from i in the net N."
+Given a problem of the form (N,i,f) where N is a low level Petri net in one of the formats *.llnet (LOLA) or *.owfn (OWFN), i is an initial marking, and f is an extended final marking, the program tries to decide whether f is reachable from i in the net N.
+
+It is also possible to solve realizability problems, i.e. the question whether some transition vector can be tranformed into a firing sequence for given Petri net and initial marking."
 
 section "Input and Output"
 sectiondesc="Input must be given explicitly (file or pipe), output goes to stdout/stderr by default."
@@ -124,7 +126,7 @@ sectiondesc="These options allow to obtain control over some parts of the algori
 
 option "continue" C
   "Find 'all' solutions."
-  details="Continues the search for solutions after the first solution has been found. Tries to find all solutions minimal with respect to parikh vector comparison. The search might go on infinitely if the number of solutions is not finite.
+  details="Continues the search for solutions after the first solution has been found. Tries to find all solutions minimal with respect to parikh vector comparison. The search might go on infinitely if the number of solutions is not finite. For realizability problems, solutions with a smaller parikh image than the one given in the problem are sought.
 " 
   flag off
 

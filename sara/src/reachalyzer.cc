@@ -107,6 +107,7 @@ Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int>
 	solved = false;
 	errors = false;
 	maxsollen = 0;
+	sumsollen = 0;
 
 	//initialize lp_solve
 	lpwrap.verbose = debug;
@@ -277,7 +278,7 @@ void Reachalyzer::printResult() {
 	if (!solutions.almostEmpty()) 
 	{
 		if (passedon) cout << "sara: A shorter realizable firing sequence with the same token effect would be:" << endl;
-		maxsollen = solutions.printSolutions();
+		maxsollen = solutions.printSolutions(sumsollen);
 	}
 	else if (errors) cout << "sara: UNSOLVED: Result is indecisive due to failure of lp_solve." << endl;
 	else if (args_info.treemaxjob_given) cout << "sara: UNSOLVED: solution may have been cut off due to command line switch -T" << endl;
@@ -296,7 +297,7 @@ void Reachalyzer::printResult() {
 					}
 					// or the marking equation is feasible but still we cannot reach a solution 
 					cout << "unable to borrow enough tokens via T-invariants." << endl;
-					cout << "The following firing sequences cannot be extended/pumped towards the final marking." << endl;
+					cout << "There are firing sequences that could not be extended towards the final marking." << endl;
 				} else if (passedon && stateinfo) cout << "sara: at the following points the algorithm could not continue:" << endl;
 				else if (stateinfo) cout << "sara: at the following points the algorithm needed to backtrack:" << endl;
 				if (stateinfo) failure.printFailure(im); // then print the counterexample; the following shouldn't happen:
@@ -450,4 +451,14 @@ void Reachalyzer::nextJump(PartialSolution& ps) {
 /*! Get the recorded length of the longest solving firing sequence, if one has been found.
 */
 int Reachalyzer::getMaxTraceLength() { return maxsollen; }
+
+/*! Get the recorded length of the longest solving firing sequence, if one has been found.
+*/
+int Reachalyzer::getSumTraceLength() { return sumsollen; }
+
+/** Get the number of solutions in the solutions queue.
+	@return Number of solutions.
+*/
+int Reachalyzer::numberOfSolutions() { return solutions.size(); }
+
 

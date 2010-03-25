@@ -97,8 +97,8 @@ public:
 	/// Push a solution into the solution queue
 	bool push_solved(PartialSolution* job);
 
-	/// Print all solutions and return the maximal trace length
-	int printSolutions();
+	/// Print all solutions and return the maximal and sum trace length
+	int printSolutions(int& sum);
 
 	/// Prints a Jobqueue to stderr (possibly including past and active job)
 	void show(bool past);

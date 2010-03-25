@@ -85,6 +85,7 @@ PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& 
 	verbose=0;
 	shortcutmax=1000;
 	minimize = false;
+	passedon = false;
 	if (args_info.lookup_given) shortcutmax=(unsigned int)(args_info.lookup_arg);
 }
 
@@ -144,7 +145,9 @@ bool PathFinder::recurse() {
 //		if (tps.almostEmpty() || !tps.first()->betterSequenceThan(fseq,m0,rec_tv))
 //		{
 			// but only save it for later use (=adaption of constraints) if it is new or better than the things we already have
-			if (terminate) 
+			if (passedon && !isSmaller(fulltvector,torealize))
+				failure.push_fail(new PartialSolution(*(tps.first()))); // going beyond maximal sequence
+			else if (terminate) 
 			{
 				if (solutions.push_solved(new PartialSolution(newps))) // no more transitions to fire, so we have a solution
 					if (args_info.forceprint_given) printSolution(&newps); // should we print it immediately?
@@ -163,7 +166,9 @@ bool PathFinder::recurse() {
 				shortcut[fulltvector].push_back(newps); 
 			}
 			if (verbose>1) {
-				if (terminate) cerr << "Full Solution found:" << endl; 
+				if (passedon && !isSmaller(fulltvector,torealize))
+					cerr << "Beyond Passed on TVector:" << endl;
+				else if (terminate) cerr << "Full Solution found:" << endl; 
 				else if (tps.first()->compareSequence(fseq) && !tps.first()->getRemains().empty()) 
 					cerr << "Failure:" << endl;
 				else cerr << "New Partial Solution:" << endl;
@@ -644,3 +649,17 @@ vector<Transition*> PathFinder::calcOrder(set<Transition*> tset) {
 	return result;
 }
 */
+
+bool PathFinder::isSmaller(map<Transition*,int>& m1, map<Transition*,int>& m2) {
+	map<Transition*,int>::iterator mit1,mit2;
+	for(mit2=m2.begin(),mit1=m1.begin(); mit2!=m2.end(); ++mit2)
+	{
+		while (mit1!=m1.end() && mit1->second==0) ++mit1; 
+		if (mit1==m1.end()) return true;
+		if (mit2->first!=mit1->first) continue;
+		if (mit2->second<mit1->second) break;
+		++mit1;
+	}
+	return false;
+}
+

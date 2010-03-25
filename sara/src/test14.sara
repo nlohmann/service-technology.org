@@ -16,4 +16,9 @@ PROBLEM test14c:
 	INITIAL p1,q1,r1,s1;
 	FINAL a1:1,a3:1,c1:1,c2:1,c3:1,d2:1,d4:1,e2:1,e4:1,x1:1;
 
+PROBLEM test14d:
+	GOAL REALIZABILITY;
+	FILE test5.owfn TYPE OWFN;
+	INITIAL p1,q1,r1,s1;
+	FINAL d1:1,e1:1,a2:1,d3:1,e3:1,x1:1;
 

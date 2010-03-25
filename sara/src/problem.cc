@@ -458,3 +458,63 @@ unsigned int Problem::getNumberOfConstraints() {
 	return clhs.size();
 }
 
+void Problem::showTVector() {
+	for(unsigned int i=0; i<transitionorder.size(); ++i)
+		if (required.find(transitionorder[i]->getName())!=required.end())
+			cout << transitionorder[i]->getName() << ":" << required[transitionorder[i]->getName()] << " ";
+}
+
+void Problem::showInitial() {
+	for(unsigned int i=0; i<placeorder.size(); ++i)
+		if (initial.find(placeorder[i]->getName())!=initial.end())
+		{
+			cout << placeorder[i]->getName();
+			if (initial[placeorder[i]->getName()]>1) 
+				cout << ":" << initial[placeorder[i]->getName()];
+			cout << " ";
+		}
+}
+
+void Problem::showFinal() {
+	for(unsigned int i=0; i<placeorder.size(); ++i)
+		if (required.find(placeorder[i]->getName())!=required.end())
+		{
+			cout << placeorder[i]->getName(); 
+			if (cover.find(placeorder[i]->getName())==cover.end()) 
+			{
+				if (required[placeorder[i]->getName()]>1) 
+					cout << ":" << required[placeorder[i]->getName()];
+				cout << " ";
+			} else {
+				switch(cover[placeorder[i]->getName()]) {
+					case LE: cout << "<="; break;
+					case EQ: cout << ":"; break;
+					case GE: cout << ">="; break;
+				}
+				cout << required[placeorder[i]->getName()] << " ";
+			}
+		}
+	if (generalcover) cout << endl << "sara: - Unmentioned places may contain any number of tokens in the final marking";
+}
+
+void Problem::showConstraints() {
+	for(unsigned int i=0; i<clhs.size(); ++i)
+	{
+		map<Transition*,int> lhs;
+		int comp,rhs;
+		getConstraint(i,lhs,comp,rhs);
+		map<Transition*,int>::iterator mit;
+		for(mit=lhs.begin(); mit!=lhs.end(); ++mit)
+		{
+			if (mit!=lhs.begin() && mit->second>0) cout << "+";
+			cout << mit->second << mit->first->getName();
+		}
+		switch(comp) {
+			case LE: cout << "<="; break;
+			case EQ: cout << "="; break;
+			case GE: cout << ">="; break;
+		}
+		cout << rhs << " ";
+	}
+}
+

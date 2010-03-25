@@ -30,15 +30,15 @@ using pnapi::PetriNet;
 using pnapi::Marking;
 using std::vector;
 
-/** This class can analyze reachability problems. */
+/*! This class can analyze reachability problems. */
 class Reachalyzer {
 public:
 /* unused
-	/// Constructor with a Petri net, initial and final marking, and debug level (0-3)
+	// Constructor with a Petri net, initial and final marking, and debug level (0-3)
 	Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, Problem& pb, bool verbose, int debug, bool out, int brk);
 */
 	/// Constructor for partially testing coverability instead of exact reachability
-	Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, Problem& pb, bool verbose, int debug, bool out, int brk);
+	Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, Problem& pb, bool verbose, int debug, bool out, int brk, bool passedon);
 
 	/// Destructor
 	~Reachalyzer();
@@ -55,13 +55,15 @@ public:
 	/// Gets the status after the constructor call or for the final result
 	int getStatus();
 
+/*
 	// Gets the solution (if status==SOLUTION_FOUND) or one possible counterexample (if status==COUNTEREXAMPLE_FOUND)
-//	PartialSolution* getSolution();
+	PartialSolution* getSolution();
 
-	/// Returns all possible counterexamples (if status==COUNTEREXAMPLE_FOUND)
-//	JobQueue& getFailureReasons();
+	// Returns all possible counterexamples (if status==COUNTEREXAMPLE_FOUND)
+	JobQueue& getFailureReasons();
 
-//	void extendTransitionOrder(map<Transition*,int> fullv, vector<Transition*>& ord, vector<Transition*> fseq);
+	void extendTransitionOrder(map<Transition*,int> fullv, vector<Transition*>& ord, vector<Transition*> fseq);
+*/
 
 	/// Check if a solution has been seen earlier already, using a lookup table
 	bool solutionSeen(map<Transition*,int>& tv);
@@ -74,6 +76,8 @@ public:
 
 	/// returns the maximal trace length after the solutions have been printed
 	int getMaxTraceLength();
+
+	bool isSmaller(map<Transition*,int>& m1, map<Transition*,int>& m2);
 
 	/// Status
 	enum errorMessage {
@@ -135,6 +139,12 @@ private:
 
 	/// longest trace length, only valid after solutions have been printed
 	int maxsollen;
+
+	/// If the problem was passed on from an earlier instance of the PathFinder
+	bool passedon;
+
+	/// If the problem was passed on, torealize contains the transition multiset to realize
+	map<Transition*,int> torealize;
 };
 
 #endif

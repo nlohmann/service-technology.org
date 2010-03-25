@@ -255,7 +255,6 @@ bool IMatrix::checkRestrictedActivation(Marking& m, vector<Transition*>& tv, set
 	@param fv The multiset of transitions.
 	@return The token change.
 */
-/* unused
 map<Place*,int> IMatrix::getChange(map<Transition*,int>& fv) {
 	map<Place*,int> result; // this will be the resulting map, it may contain zero entries
 	result.clear();
@@ -269,4 +268,4 @@ map<Place*,int> IMatrix::getChange(map<Transition*,int>& fv) {
 	}
 	return result;
 }
-*/
+

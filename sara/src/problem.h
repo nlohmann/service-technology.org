@@ -115,6 +115,18 @@ public:
 	/// Get the number of external constraints
 	unsigned int getNumberOfConstraints();
 
+	/// Print the vector of transitions to realize
+	void showTVector();
+
+	/// Print the initial marking
+	void showInitial();
+
+	/// Print the extended final marking
+	void showFinal();
+
+	/// Print the global constraints
+	void showConstraints();
+
 	/// Goals
 	enum Types {
 		REACHABLE = 0,

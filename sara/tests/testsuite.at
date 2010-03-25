@@ -138,7 +138,9 @@ AT_CHECK([SARA -i test14.sara -v],0,stdout,stderr)
 AT_CHECK([GREP -q "SOLUTION(20): e1 c1 c2 c3 d1 e2 e3 e4 d2 d3 d4 a1 x1 a2 a3 d4 e4 a1 a2 a3" stdout])
 AT_CHECK([GREP -q "SOLUTION(21): e1 c1 c2 c3 d1 e2 e3 e4 d2 d3 d4 a1 x1 x1 a2 a3 d4 e4 a1 a2 a3" stdout])
 AT_CHECK([GREP -q "INFEASIBLE: the transition multiset is not realizable" stdout])
-AT_CHECK([GREP -q "2 Solutions produced" stdout])
+AT_CHECK([GREP -q "SOLUTION(3)" stdout])
+AT_CHECK([GREP -q "After the firing sequence .d1 e1.:" stdout])
+AT_CHECK([GREP -q "3 Solutions produced" stdout])
 AT_KEYWORDS(solver)
 AT_CLEANUP
 

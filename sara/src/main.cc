@@ -67,7 +67,10 @@ inline std::string to_string (const T& t)
 }
 */
 
-/// evaluate the command line parameters
+/*! Evaluate the command line parameters.
+	\param argc Number of arguments.
+	\param argv Argument list.
+*/
 void evaluateParameters(int argc, char** argv) {
     // set default values
     cmdline_parser_init(&args_info);
@@ -84,7 +87,10 @@ void evaluateParameters(int argc, char** argv) {
     free(params);
 }
 
-/// main
+/*! Main method of Sara.
+	\param argc Number of arguments.
+	\param argv Argument list.
+*/
 int main(int argc, char** argv) {
 	// start timer
 	clock_t starttime;
@@ -241,32 +247,85 @@ if (args_info.input_given || args_info.pipe_given) {
 	// counters for number of problems and solutions found
 	int loops = 0;
 	int solcnt = 0;
-	int maxtracelen = -1;
-	int avetracelen = 0;
+	int maxtracelen = -1; // maximal solution length (-1=no solution)
+	int avetracelen = 0; // average solution length
 	// walk through the problem list
 	for(unsigned int x=0; x<pbls.size(); ++x)
 	{
 		cout << "sara: Problem " << ++loops << ": " << pbls.at(x).getName() << endl;
-		if (args_info.log_given)
+		if (args_info.log_given) // print info also to log file if one has been given
 			cerr << "sara: Problem " << ++loops << ": " << pbls.at(x).getName() << endl;
 		PetriNet* pn(pbls.at(x).getPetriNet()); // obtain the Petri net and its P/T-ordering
-		if (x+1<pbls.size()) pbls.at(x+1).checkForNetReference(pbls.at(x)); // possibly advance it to the next problem
+		if (x+1<pbls.size()) pbls.at(x+1).checkForNetReference(pbls.at(x)); // possibly advance the net to the next problem (if it has the same net)
 		Marking m1(pbls.at(x).getInitialMarking()); // get the initial marking
-		switch (pbls.at(x).getGoal()) { // check for reachability or realizability
+		Marking m2(pbls.at(x).getFinalMarking()); // get the extended final marking (if there is one)
+		map<Place*,int> cover; // for the cover directives for the places 
+		bool passedon(false); // set to true when the problem is passed on from PathFinder to Reachalyzer 
+		if (verbose) // print the problem statement
+		{
+			cout << "sara: Trying to " << (pbls.at(x).getGoal()==Problem::REALIZABLE?"realize a transition vector ":"solve a reachability problem ") << "with inputs:" << endl;
+			cout << "sara: - Petri net \"" << pbls.at(x).getFilename() << "\"" << endl;
+			cout << "sara: - Initial marking "; 
+			pbls.at(x).showInitial(); 
+			cout << endl;
+			if (pbls.at(x).getGoal()==Problem::REALIZABLE) {
+				cout << "sara: - Transition vector "; 
+				pbls.at(x).showTVector();
+				cout << endl;
+			} else {
+				cout << "sara: - Final marking "; 
+				pbls.at(x).showFinal(); 
+				cout << endl;
+			}
+			if (pbls.at(x).getNumberOfConstraints()>0) {
+				cout << "sara: - Global constraints ";
+				pbls.at(x).showConstraints();
+				cout << endl;
+			}
+		}
+		cover = pbls.at(x).getCoverRequirement(); // get the cover directives for the places, if there are any 
+		switch (pbls.at(x).getGoal()) { // check for reachability or realizability?
+			case Problem::REALIZABLE: {
+				map<Transition*,int> tv(pbls.at(x).getVectorToRealize()); // the vector to realize
+				IMatrix im(*pn); // incidence matrix of the net
+				im.verbose = debug;
+				PartialSolution* ps(new PartialSolution(m1)); // create the initial job
+				JobQueue tps(ps); // create a job list
+				JobQueue solutions; // create a job list
+				JobQueue failure; // create a dummy job list
+				map<map<Transition*,int>,vector<PartialSolution> > dummy; // dummy, will be filled and immediately free'd
+				// create an instance of the realizability solver
+				PathFinder pf(m1,tv,pn->getTransitions().size(),tps,solutions,failure,im,dummy);
+				pf.verbose = debug;
+				if (pf.recurse()) // solve the problem and print a possible solution
+				{ 
+					int mtl = solutions.printSolutions(); // get the solution length for this problem
+					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
+					if (mtl>=0) avetracelen+=mtl; // sum up solution lengths for average calculation
+					++solcnt; 
+				}
+				else if (solutions.almostEmpty()) cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;
+				if (!solutions.almostEmpty() || !verbose) break;
+				// if witnesses are sought and we have no solution, we pass the problem on
+				passedon = true;
+				m2 = m1; // but first, calculate the final marking
+				map<Place*,int> change(im.getChange(tv));
+				map<Place*,int>::iterator mit;
+				for(mit=change.begin(); mit!=change.end(); ++mit)
+					m2[*(mit->first)]+=mit->second;
+			}
 			case Problem::REACHABLE: {
-				Marking m2(pbls.at(x).getFinalMarking()); // get the extended final marking ...
-				map<Place*,int> cover(pbls.at(x).getCoverRequirement()); // including the directives for the places 
 				// obtain an instance of the reachability solver
-				Reachalyzer reach(*pn,m1,m2,cover,pbls.at(x),verbose,debug,out,(args_info.break_given?args_info.break_arg:0));
+				Reachalyzer reach(*pn,m1,m2,cover,pbls.at(x),verbose,debug,out,(args_info.break_given?args_info.break_arg:0),passedon);
 				if (reach.getStatus()!=Reachalyzer::LPSOLVE_INIT_ERROR) {
 					reach.start(); // if everything is ok, solve the problem
-					clock_t mytime(reach.getTime()); // ... and measure the time for that
-					if (reach.getStatus()==Reachalyzer::SOLUTION_FOUND) ++solcnt;
+					clock_t mytime(reach.getTime()); // ... and measure the CPU time for that
+					if (reach.getStatus()==Reachalyzer::SOLUTION_FOUND) ++solcnt; // count the solutions
 					reach.printResult(); // ... and print the result
-					int mtl = reach.getMaxTraceLength();
-					if (mtl>maxtracelen) maxtracelen=mtl;
-					if (mtl>=0) avetracelen+=mtl;
-					if (debug>0) {
+					int mtl = reach.getMaxTraceLength(); // get the maximal solution length for this problem
+					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
+					if (mtl>=0) avetracelen+=mtl; // sum up solution lengths for average calculation
+					if (debug>0) { // debug info, P/T orderings
 						cerr << "Transition Order: ";
 						for(unsigned int o=0; o<transitionorder.size(); ++o)
 							cerr << transitionorder[o]->getName() << " ";
@@ -276,25 +335,9 @@ if (args_info.input_given || args_info.pipe_given) {
 							cerr << placeorder[o]->getName() << " ";
 						cerr << endl;
 					}
-					if (args_info.time_given)
+					if (args_info.time_given) // if --time was specified, print the time used
 						cout << "sara: Time: " << (float)(mytime)/CLOCKS_PER_SEC << " sec." << endl;
 				} else cout << "sara: UNSOLVED: error while initializing lp_solve" << endl;
-				break;
-			}
-			case Problem::REALIZABLE: {
-				map<Transition*,int> tv(pbls.at(x).getVectorToRealize()); // the vector to realize
-				IMatrix im(*pn); // incidence matrix of the net
-				im.verbose = debug;
-				PartialSolution* ps(new PartialSolution(m1)); // create initial job
-				JobQueue tps(ps); // create a job list
-				JobQueue solutions; // create a job list
-				JobQueue failure; // create a dummy job list
-				map<map<Transition*,int>,vector<PartialSolution> > dummy; // dummy, will be filled and immediately free'd
-				// create an instance of the realizability solver
-				PathFinder pf(m1,tv,pn->getTransitions().size(),tps,solutions,failure,im,dummy);
-				pf.verbose = debug;
-				if (pf.recurse()) { solutions.printSolutions(); ++solcnt; } // solve the problem and print a possible solution
-				else if (solutions.almostEmpty()) cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;
 				break;
 			}
 		}
@@ -312,7 +355,7 @@ if (args_info.input_given || args_info.pipe_given) {
 			cout << "." << endl;
 		}
 	}
-	if (args_info.time_given)
+	if (args_info.time_given) // print time use if --time was specified
 		cout << "sara: Used " << (float)(endtime-starttime)/CLOCKS_PER_SEC << " seconds overall." << endl;
 }
 

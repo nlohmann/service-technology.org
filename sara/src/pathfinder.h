@@ -67,6 +67,12 @@ public:
 	/// Level of verbosity
 	int verbose;
 
+	/// If the problem was passed on from an earlier instance of the PathFinder
+	bool passedon;
+
+	/// If the problem was passed on, torealize contains the transition multiset to realize
+	map<Transition*,int> torealize;
+
 private:
 	/** Graph for stubborn set method (for finding strongly connected components).
 	*/
@@ -160,6 +166,8 @@ private:
 	bool checkForDiamonds();
 
 //	vector<Transition*> calcOrder(set<Transition*> tset);
+
+	bool isSmaller(map<Transition*,int>& m1, map<Transition*,int>& m2);
 
 };
 

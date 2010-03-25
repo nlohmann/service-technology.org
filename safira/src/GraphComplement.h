@@ -74,8 +74,8 @@ class GraphComplement : public Graph {
         /// Graphviz dot output
         void toDot(FILE* out, string title = "") const;
 
-		/// negates the global Formulaâ
-        void negateGlobalFormula();
+//		/// negates the global Formulaâ
+//        void negateGlobalFormula();
 
         static double getTime();
 };

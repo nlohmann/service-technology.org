@@ -8,15 +8,46 @@
 
 # the files needed by the test cases (without `testfiles/' directory)
 TESTFILES = EMPTY \
-            minispec.og minispec_complement_ref.eaa minispec_expliciteTau.og minispec_expliciteTau_complement_ref.eaa \
-            myCoffee.og myCoffee_complement_ref.eaa myCoffee_expliciteTau.og myCoffee_expliciteTau_complement_ref.eaa myCoffee_complement_ref.dot\
+            \  
+            testGraph_complement_ref.eaa \
+            testGraph_total_ref.eaa \
+            \
+            minispec.og \
+            minispec_complement_ref.eaa \
+            minispec_expliciteTau.og \
+            minispec_expliciteTau_complement_ref.eaa \
+            \
+            myCoffee.og \
+            myCoffee_complement_ref.eaa \
+            myCoffee_complement_ref.dot\
+            \
+            myCoffee_expliciteTau.og \
+            myCoffee_expliciteTau_complement_ref.eaa \
+            \
             myCoffee_complement_reduced_ref.eaa \
-            PO.og PO_complement_ref.eaa PO_complement_reduced_ref.eaa \
-            CN_cyclic.og CN_cyclic_complement_reduced_ref.eaa \
-            testGraph_complement_ref.eaa testGraph_total_ref.eaa \
-            myMilk.og myMilk_myCoffee_intersection_ref.eaa myMilk_myCoffee_intersection_ref.dot \
-            myMilkIntersec.og myCoffeeIntersec.og myMilkIntersec_myCoffeeIntersec_intersection_ref.eaa myMilkIntersec_myCoffeeIntersec_intersection_ref.dot \
-            minispec2.og minispec2_minispec_union_ref.eaa minispec2_minispec_union_ref.pdf minispec_minispec2_union_ref.eaa minispec_minispec2_union_ref.pdf
+            \
+            PO.og \
+            PO_complement_ref.eaa \
+            PO_complement_reduced_ref.eaa \
+            \
+            CN_cyclic.og \
+            CN_cyclic_complement_reduced_ref.eaa \
+            \
+            myMilk.og \
+            myMilk_myCoffee_intersection_ref.eaa \
+            myMilk_myCoffee_intersection_ref.dot \
+            \
+            myMilkIntersec.og \
+            myCoffeeIntersec.og \
+            myMilkIntersec_myCoffeeIntersec_intersection_ref.eaa \
+            myMilkIntersec_myCoffeeIntersec_intersection_ref.dot \
+            \
+            minispec2.og \
+            minispec2_minispec_union_ref.eaa \
+            minispec_minispec2_union_ref.eaa \
+            \
+            myMilkIntersec_myCoffeeIntersec_union_ref.eaa \
+            myCoffeeIntersec_myMilkIntersec_union_ref.eaa
             
 
 

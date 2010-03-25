@@ -56,6 +56,9 @@ class Graph {
     	/// add an initial node to the graph
     	void addInitialNode(int id);
 
+		/// negates the global Formulaâ
+        void negateGlobalFormula();
+
     	/// Graphviz dot output
         virtual void toDot(FILE* out, string title = "") const;
 

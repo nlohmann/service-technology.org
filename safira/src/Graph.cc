@@ -66,6 +66,14 @@ void Graph::addInitialNode(int id){
 }
 
 
+void Graph::negateGlobalFormula(){
+	globalFormulaAsString = "~(" + globalFormulaAsString + ")";
+
+	Formula *h = new FormulaNOT(globalFormula);
+	globalFormula = h;
+}
+
+
 void Graph::printInterface(ostream& o) const {
 	o << "\nINTERFACE\n";
 	o << "  INPUT\n";

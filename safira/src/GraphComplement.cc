@@ -94,7 +94,6 @@ void GraphComplement::complement(){
 }
 
 void GraphComplement::addTrapState(){
-
 	if (NULL == trap){
 		//add trap state (with formula true and a self loop for every label) to the graph
 		Formula *t = new FormulaTrue();
@@ -568,12 +567,12 @@ Node* GraphComplement::searchNode(Formula *f, FormulaTree *n){
 	return n->node;
 }
 
-void GraphComplement::negateGlobalFormula(){
-	globalFormulaAsString = "~(" + globalFormulaAsString + ")";
-
-	Formula *h = new FormulaNOT(globalFormula);
-	globalFormula = h;
-}
+//void GraphComplement::negateGlobalFormula(){
+//	globalFormulaAsString = "~(" + globalFormulaAsString + ")";
+//
+//	Formula *h = new FormulaNOT(globalFormula);
+//	globalFormula = h;
+//}
 
 void GraphComplement::generateGlobalFormula(){
 	//generate global formula
@@ -626,7 +625,8 @@ void GraphComplement::toDot_Nodes(FILE* out) const {
 
 	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
         assert (trap != NULL);
-		if(n->second->id < trap->id){
+
+        if(n->second->id < trap->id){
 
 			fprintf(out, "  %d [label=\"%d\\n %s\"]\n", n->second->id, n->second->id, n->second->formula->toString().c_str());
 

@@ -235,7 +235,7 @@ int main(int argc, char **argv) {
 
 		// Complement of the Intersection
 
-		GraphComplement * g4 = new GraphComplement();
+		Graph * g4 = new Graph();
 		g3->convertToGraph(g4);
 
 

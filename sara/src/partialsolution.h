@@ -174,9 +174,6 @@ public:
 	/// alter jump constraints into normal ones
 	void transformJumps(map<Transition*,int>& fullvector);
 
-	int jumpsDone();
-	void setJumpsDone(int jd);
-
 private:	
 	/// the partial firing sequence
 	vector<Transition*> tseq;

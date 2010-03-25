@@ -77,8 +77,6 @@ public:
 	/// returns the maximal trace length after the solutions have been printed
 	int getMaxTraceLength();
 
-	bool isSmaller(map<Transition*,int>& m1, map<Transition*,int>& m2);
-
 	/// Status
 	enum errorMessage {
 		SOLUTION_FOUND = 0,

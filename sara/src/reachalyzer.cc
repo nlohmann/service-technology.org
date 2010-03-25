@@ -153,8 +153,7 @@ void Reachalyzer::start() {
 		tps.first()->buildSimpleConstraints(im); // compute and create new constraints
 		if (!lpwrap.stripConstraints()) { // remove all constraints not belonging to the marking equation
 			cerr << "sara: error: resize_lp failed" << endl; 
-			error=LPSOLVE_RESIZE_ERROR; 
-			return; 
+			error=LPSOLVE_RESIZE_ERROR; return; 
 		}
 		lpwrap.addConstraints(*(tps.first())); // add the constraints to the marking equation
 		int ret = lpwrap.solveSystem(); // now solve the system of marking equation + constraints
@@ -451,18 +450,4 @@ void Reachalyzer::nextJump(PartialSolution& ps) {
 /*! Get the recorded length of the longest solving firing sequence, if one has been found.
 */
 int Reachalyzer::getMaxTraceLength() { return maxsollen; }
-
-bool Reachalyzer::isSmaller(map<Transition*,int>& m1, map<Transition*,int>& m2) {
-	map<Transition*,int>::iterator mit1,mit2;
-	for(mit2=m2.begin(),mit1=m1.begin(); mit2!=m2.end(); ++mit2)
-	{
-		cerr << "IS: " << mit1->first->getName() << ":" << mit1->second << "  " << mit2->first->getName() << ":" << mit2->second << endl;
-		while (mit1!=m1.end() && mit1->second==0) ++mit1; 
-		if (mit1==m1.end()) return true;
-		if (mit2->first!=mit1->first) continue;
-		if (mit2->second<mit1->second) break;
-		++mit1;
-	}
-	return false;
-}
 

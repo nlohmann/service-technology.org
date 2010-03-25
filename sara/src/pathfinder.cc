@@ -166,8 +166,7 @@ bool PathFinder::recurse() {
 				shortcut[fulltvector].push_back(newps); 
 			}
 			if (verbose>1) {
-				if (passedon && !isSmaller(fulltvector,torealize))
-					cerr << "Beyond Passed on TVector:" << endl;
+				if (passedon && !isSmaller(fulltvector,torealize)) cerr << "Beyond Passed on TVector:" << endl;
 				else if (terminate) cerr << "Full Solution found:" << endl; 
 				else if (tps.first()->compareSequence(fseq) && !tps.first()->getRemains().empty()) 
 					cerr << "Failure:" << endl;

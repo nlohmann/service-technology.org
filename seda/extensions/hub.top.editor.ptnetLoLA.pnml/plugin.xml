@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="hub.top.editor.ptnetLoLA.pnml.pnml"
+            nameFilter="*.pnml"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               label="Convert to P/T net"
+               class="hub.top.editor.eclipse.ui.ConvertFileAction_PNMLtoPT"
+               menubarPath="additions"
+               enablesFor="1"
+               id="hub.top.editor.ptnetLoLA.pnml.ConvertToPtNet">
+         </action>
+      </objectContribution>
+      <objectContribution
+            id="hub.top.editor.ptnetLoLA.pnml.ptnet_diagram"
+            nameFilter="*.ptnet_diagram"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               label="Convert to PNML (Yasper)"
+               class="hub.top.editor.eclipse.ui.ConvertFileAction_PTnetDiagtoPNML_Yasper"
+               menubarPath="additions"
+               enablesFor="1"
+               id="hub.top.editor.ptnetLoLA.pnml.ConvertPTnetDiagtoPNML_Yasper">
+         </action>
+      </objectContribution>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.exportWizards">
+      <wizard
+            category="hub.top.editor.exportWizards.category"
+            class="hub.top.editor.ptnetlola.pnml.exportWizards.ExportWizard"
+            icon="resources/document.export.16.png"
+            id="hub.top.editor.exportWizards.PNMLExportWizard"
+            name="Export Petri net to PNML (Standard)">
+         <description>
+            Export the selection into standard PNML.
+         </description>
+      </wizard>
+            <wizard
+            category="hub.top.editor.exportWizards.category"
+            class="hub.top.editor.ptnetlola.yasper.exportWizards.ExportWizard"
+            icon="resources/document.export.16.png"
+            id="hub.top.editor.exportWizards.YasperExportWizard"
+            name="Export Petri net to PNML (Yasper)">
+         <description>
+            Export the selection into Yasper PNML.
+         </description>
+      </wizard>
+   </extension>
+   
+</plugin>

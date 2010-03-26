@@ -38,11 +38,6 @@
                enablesFor="1"
                id="hub.top.lang.flowcharts.diagram.ConvertToTINAAction">
          </action>
-      </objectContribution>
-      <objectContribution
-            id="hub.top.lang.flowcharts.diagram.ConvertToRomeo"
-            nameFilter="*.ptnet"
-            objectClass="org.eclipse.core.resources.IFile">
          <action
                label="Convert to Roméo file"
                class="hub.top.editor.eclipse.ui.ConvertDiagramFileAction_PTnetToRomeo"

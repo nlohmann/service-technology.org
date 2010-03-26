@@ -525,6 +525,9 @@ public class PNAPI {
   }
   
   public static String toLoLA_ident(String s) {
-    return s.substring(0,s.lastIndexOf('_'));
+    if (s.lastIndexOf('_') >= 0)
+      return s.substring(0,s.lastIndexOf('_'));
+    else
+      return s;
   }
 }

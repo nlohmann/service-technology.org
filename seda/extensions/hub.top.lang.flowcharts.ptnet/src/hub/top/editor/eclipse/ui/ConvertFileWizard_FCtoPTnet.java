@@ -1,7 +1,8 @@
 /*****************************************************************************\
- * Copyright (c) 2009 Dirk Fahland. All rights reserved. EPL1.0/GPL3.0/LGPL3.0
+ * Copyright (c) 2009 Konstanze Swist, Dirk Fahland. EPL1.0/AGPL3.0
+ * All rights reserved.
  * 
- * ServiceTechnolog.org - FlowChart Editors
+ * ServiceTechnolog.org - Modeling Languages
  * 
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License v1.0, which accompanies this
@@ -11,36 +12,38 @@
  * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
- *
- * The Original Code is this file as it was released on March 09, 2009.
+ * 
+ * The Original Code is this file as it was released on December 12, 2009.
  * The Initial Developer of the Original Code are
- * 		Dirk Fahland
+ *    Konstanze Swist
+ *    Dirk Fahland
  * 
  * Portions created by the Initial Developer are Copyright (c) 2009
  * the Initial Developer. All Rights Reserved.
- *
+ * 
  * Contributor(s):
- *
+ * 
  * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 3 or later (the "GPL"), or
- * the GNU Lesser General Public License Version 3 or later (the "LGPL"),
- * in which case the provisions of the GPL or the LGPL are applicable instead
- * of those above. If you wish to allow use of your version of this file only
- * under the terms of either the GPL or the LGPL, and not to allow others to
- * use your version of this file under the terms of the EPL, indicate your
- * decision by deleting the provisions above and replace them with the notice
- * and other provisions required by the GPL or the LGPL. If you do not delete
- * the provisions above, a recipient may use your version of this file under
- * the terms of any one of the EPL, the GPL or the LGPL.
+ * the GNU Affero General Public License Version 3 or later (the "GPL") in
+ * which case the provisions of the AGPL are applicable instead of those above.
+ * If you wish to allow use of your version of this file only under the terms
+ * of the AGPL and not to allow others to use your version of this file under
+ * the terms of the EPL, indicate your decision by deleting the provisions
+ * above and replace them with the notice and other provisions required by the 
+ * AGPL. If you do not delete the provisions above, a recipient may use your
+ * version of this file under the terms of any one of the EPL or the AGPL.
 \*****************************************************************************/
 
 package hub.top.editor.eclipse.ui;
 
 import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.eclipse.ui.ConvertFileWizard;
+import hub.top.editor.ptnetLoLA.PNAPI;
+import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.lang.flowcharts.ptnet.FCtoPTnet;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -69,15 +72,24 @@ public class ConvertFileWizard_FCtoPTnet extends ConvertFileWizard {
     	if (d.getElement() instanceof hub.top.lang.flowcharts.WorkflowDiagram) {
     		// we understand workflow diagrams, invoke translation to P/T-Net
     	  FCtoPTnet toPTnet = new FCtoPTnet(d.getElement());
-    	  //FileIOHelper.writeFile(targetFile, toPTnet.getText());
-    	  FileIOHelper.writeEcoreResourceToFile(win, targetURI, toPTnet.getModel());
+    	  PtNet net = toPTnet.getModel();
+    	  
+    	  FileIOHelper.writeEcoreResourceToFile(win, targetURI, net);
+    	  // write also as GraphViz dot
+    	  IPath targetDotPath = targetFile.getFullPath().removeFileExtension().addFileExtension("dot");
+        FileIOHelper.writeFile(targetDotPath, PNAPI.toDot(net));
+
     	  return true;
     	}
     } else if (modelObject instanceof hub.top.lang.flowcharts.WorkflowDiagram) {
   		// we understand workflow diagrams, invoke translation to PNML
       FCtoPTnet toPTnet = new FCtoPTnet((EObject)modelObject);
-      //FileIOHelper.writeFile(targetFile, toPTnet.getText());
-      FileIOHelper.writeEcoreResourceToFile(win, targetURI, toPTnet.getModel());
+      PtNet net = toPTnet.getModel();
+      
+      FileIOHelper.writeEcoreResourceToFile(win, targetURI, net);
+      // write also as GraphViz dot
+      IPath targetDotPath = targetFile.getFullPath().removeFileExtension().addFileExtension("dot");
+      FileIOHelper.writeFile(targetDotPath, PNAPI.toDot(net));
  	    return true;
     }
     return false;

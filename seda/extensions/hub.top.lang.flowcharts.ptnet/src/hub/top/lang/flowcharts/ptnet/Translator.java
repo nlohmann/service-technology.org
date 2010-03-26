@@ -1,40 +1,112 @@
+/*****************************************************************************\
+ * Copyright (c) 2009 Konstanze Swist, Dirk Fahland. EPL1.0/AGPL3.0
+ * All rights reserved.
+ * 
+ * ServiceTechnolog.org - Modeling Languages
+ * 
+ * This program and the accompanying materials are made available under
+ * the terms of the Eclipse Public License v1.0, which accompanies this
+ * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ * 
+ * The Original Code is this file as it was released on December 12, 2009.
+ * The Initial Developer of the Original Code are
+ *    Konstanze Swist
+ *    Dirk Fahland
+ * 
+ * Portions created by the Initial Developer are Copyright (c) 2009
+ * the Initial Developer. All Rights Reserved.
+ * 
+ * Contributor(s):
+ * 
+ * Alternatively, the contents of this file may be used under the terms of
+ * the GNU Affero General Public License Version 3 or later (the "GPL") in
+ * which case the provisions of the AGPL are applicable instead of those above.
+ * If you wish to allow use of your version of this file only under the terms
+ * of the AGPL and not to allow others to use your version of this file under
+ * the terms of the EPL, indicate your decision by deleting the provisions
+ * above and replace them with the notice and other provisions required by the 
+ * AGPL. If you do not delete the provisions above, a recipient may use your
+ * version of this file under the terms of any one of the EPL or the AGPL.
+\*****************************************************************************/
+
 package hub.top.lang.flowcharts.ptnet;
 
 import hub.top.editor.ptnetLoLA.ArcToPlaceExt;
 import hub.top.editor.ptnetLoLA.ArcToTransitionExt;
+import hub.top.editor.ptnetLoLA.Node;
+import hub.top.editor.ptnetLoLA.PNAPI;
+import hub.top.editor.ptnetLoLA.Place;
 import hub.top.editor.ptnetLoLA.PlaceExt;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.editor.ptnetLoLA.PtnetLoLAFactory;
 import hub.top.editor.ptnetLoLA.TransitionExt;
 import hub.top.lang.flowcharts.DiagramArc;
 import hub.top.lang.flowcharts.DiagramNode;
+import hub.top.lang.flowcharts.Endnode;
+import hub.top.lang.flowcharts.Event;
+import hub.top.lang.flowcharts.Flow;
+import hub.top.lang.flowcharts.MergeNode;
+import hub.top.lang.flowcharts.ResourceNode;
+import hub.top.lang.flowcharts.SimpleActivity;
+import hub.top.lang.flowcharts.SplitNode;
+import hub.top.lang.flowcharts.StartNode;
+import hub.top.lang.flowcharts.Subprocess;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
 public abstract class Translator {
-	DiagramNode node;
-	NodePair pair;
-	PtNet net;
+	DiagramNode  node;
+	NodePair     pair;
+	PtNet        net;
 	Hashtable<DiagramNode, NodePair> table;
-	Integer pct;
-	Integer tct;
+	int      placeNum;
+	int      transitionNum;
 	
-	public Integer getPct() {
-		return pct;
+	Translator   parentTranslator = null;
+	
+	// mapping to keep track of the merge results
+	HashMap<Place, Place>  mergeMap;
+	
+	public Translator() {
+	  mergedPlaces = new HashSet<Place>();
+	  mergeMap = new HashMap<Place, Place>();
+  }
+	
+  // remember the resource nodes by name for later reuse
+  Hashtable<String, NodePair> translatedResources;
+  
+  public Hashtable<String, NodePair> getTranslatedResources() {
+    return translatedResources;
+  }
+
+  public void setTranslatedResources(
+      Hashtable<String, NodePair> translatedResources) {
+    this.translatedResources = translatedResources;
+  }
+	
+	public int getPlaceNum() {
+		return placeNum;
 	}
 
-	public void setPct(Integer pct) {
-		this.pct = pct;
+	public void setPlaceNum(int pNum) {
+		this.placeNum = pNum;
 	}
 
-	public Integer getTct() {
-		return tct;
+	public int getTransitionNum() {
+		return transitionNum;
 	}
 
-	public void setTct(Integer tct) {
-		this.tct = tct;
+	public void setTransitionNum(int tNum) {
+		this.transitionNum = tNum;
 	}
 
 	public NodePair getPair() {
@@ -69,7 +141,186 @@ public abstract class Translator {
 		return(this.node);
 	}
 	
-	public void translate() {	}
+	public void translate() {
+    removeAllMergedPlaces();
+	}
+	
+	public void translateChildNode(DiagramNode node) {
+    Translator trans;
+
+    if (node instanceof StartNode) {
+      if (node.getLabel() != null && node.getLabel().equals("then"))
+        trans = new MidNodeTranslator();
+      else
+        trans = new StartNodeTranslator();
+    }
+    else if (node instanceof Endnode)        trans = new EndNodeTranslator();
+    else if (node instanceof SimpleActivity) trans = new SimpleActTranslator();
+    else if (node instanceof Event)          trans = new EventTranslator();
+    else if (node instanceof ResourceNode)   trans = new ResourceTranslator();
+    else if (node instanceof SplitNode)      trans = new SplitTranslator();
+    else if (node instanceof MergeNode)      trans = new MergeTranslator();
+    else if (node instanceof Subprocess)     trans = new SubprocessTranslator();
+    else if (node instanceof Flow)           trans = new FlowTranslator();
+    else throw new NullPointerException("Error while translating Node " + node.getLabel() + ". Node has no known or yet implemented Type.");
+
+    trans.setNet(this.getNet());
+    trans.setNode(node);
+    trans.setTable(this.getTable());
+    trans.setPlaceNum(this.getPlaceNum());
+    trans.setTransitionNum(this.getTransitionNum());
+    trans.setTranslatedResources(this.getTranslatedResources());
+    trans.parentTranslator = this;
+    trans.mergeMap = this.mergeMap;
+    
+    trans.translate();
+    
+    this.setTable(trans.getTable());
+    this.setNet(trans.getNet());
+    this.setTranslatedResources(trans.getTranslatedResources());
+    this.setPlaceNum(trans.getPlaceNum());
+    this.setTransitionNum(trans.getTransitionNum());
+	}
+	
+  /**
+   * Translate a {@link DiagramArc} to a Petri net to connect the arc's source
+   * and the arc's target {@link DiagramNode} also in the resulting Petri net.
+   * The method identifies the corresponding Petri net patterns of the src and
+   * the tgt node and their interface places. It then picks the right source and
+   * target places in the respective interface based on each node's {@link NodePair}
+   * that was built by {@link Translator} in {@link #translateChildNode(DiagramNode)}
+   * and all {@link Translator}s that inherit from this class.
+   * 
+   * @param arc
+   */
+	public void translateChildArc(DiagramArc arc) {
+	  
+	  DiagramNode src = arc.getSrc();
+	  DiagramNode tgt = arc.getTarget();
+	  
+	  //System.out.println("translate arc "+ arc.getSrc().getLabel() +" -> "+arc.getTarget().getLabel());
+	  
+    if (src == null || tgt == null)
+      throw new NullPointerException("Error in while translating arc: arc has no source- or targetNode in Diagram!");
+    
+    translateChildArc(src, tgt, arc);
+	}
+
+	/**
+	 * Create an arc from src to tgt. The reason for this arc is the given
+	 * {@link DiagramArc} arc, but this arc itself does not connect src and tgt directly.
+	 * Use for instance in {@link FCtoOclet}.
+	 * 
+   * The method identifies the corresponding Petri net patterns of the src and
+   * the tgt node and their interface places. It then picks the right source and
+   * target places in the respective interface based on each node's {@link NodePair}
+   * that was built by {@link Translator} in {@link #translateChildNode(DiagramNode)}
+   * and all {@link Translator}s that inherit from this class.
+	 *  
+	 * @param src
+	 * @param tgt
+	 * @param arc
+	 */
+  public void translateChildArc(DiagramNode src, DiagramNode tgt, DiagramArc arc) {
+	  
+    PlaceExt rightArcStart=null;
+    PlaceExt rightArcEnd=null;
+    
+    // Arc from ResourceNode
+    if (src instanceof ResourceNode) {
+      // Resources are always only one Place --> ArcStart is the resourcePlace
+      rightArcStart = this.getTable().get(src).getEnd().get(0);
+      // ArcEnd is the Endplace of the other Node which is marked as other Endplace of the resource
+      rightArcEnd = this.getTable().get(tgt).getOtherEndPlace(src, true);
+    }
+    // Arc to ResourceNode
+    else if (tgt instanceof ResourceNode) {
+      // ArcStart is the startPlace which is marked as other Startplace of the resource 
+      rightArcStart = this.getTable().get(src).getOtherEndPlace(tgt, false);
+      // ArcEnd is the resourcePlace
+      rightArcEnd = this.getTable().get(tgt).getStart().get(0);
+      
+      // Arc with weight-Intervall
+      if (arc.getMaxWeight() != arc.getMinWeight()) {
+        double prob = 1/(arc.getMaxWeight() - arc.getMinWeight());
+        for (int i = arc.getMinWeight(); i <= arc.getMaxWeight(); i++){
+          TransitionExt t = PtnetLoLAFactory.eINSTANCE.createTransitionExt();
+          t.setName("weightedArc" + i);
+          this.getNet().getTransitions().add(t);
+          
+          ArcToTransitionExt a1 = PtnetLoLAFactory.eINSTANCE.createArcToTransitionExt();
+          a1.setSource(rightArcStart); a1.setTarget(t);
+          a1.setProbability(prob);
+          this.getNet().getArcs().add(a1);
+          
+          ArcToPlaceExt a2 = PtnetLoLAFactory.eINSTANCE.createArcToPlaceExt();
+          a2.setSource(t); a2.setTarget(rightArcEnd);
+          a2.setWeight(i);
+          this.getNet().getArcs().add(a2);
+        }
+        return;
+      }
+    }
+    // other Arc
+    else
+    {
+      if (this.getTable().get(tgt) != null) { 
+        rightArcEnd = this.getTable().get(tgt).getOtherEndPlace(src, true);
+        // if there is no entry in the Hashtable (@see Translator.NodePair.otherEnds), there can be only one Endplace
+        if (rightArcEnd == null) rightArcEnd = this.getTable().get(src).getEnd().get(0);            
+      }
+    
+      if (this.getTable().get(src) != null) {
+        rightArcStart = this.getTable().get(src).getOtherEndPlace(tgt, false);
+        if (rightArcStart == null) rightArcStart = this.getTable().get(tgt).getStart().get(0);
+      }
+    }
+    
+    if (rightArcStart == null || rightArcEnd == null){
+      System.err.println("Could not translate arc "+src.getLabel()+" -> "+tgt.getLabel()+" ["+(this.node != null ? this.node.getLabel() : "root" )+"]");
+      System.err.println("Reason: arc has no source- or targetPlace");
+      //throw new NullPointerException("Error while translating arc: !");
+      return;
+    }
+    
+    Place pStart = getMergeResult(rightArcStart);
+    Place pEnd = getMergeResult(rightArcEnd);
+    
+    // merge the source and the target places of the arc
+    Place pMerged = PNAPI.mergePlaces(net, pStart, pEnd);
+    mergedPlaces.add(pStart);
+    mergedPlaces.add(pEnd);
+    mergeMap.put(rightArcStart, pMerged);
+    mergeMap.put(rightArcEnd, pMerged);
+	}
+	
+  /**
+   * @param p
+   * @return the place into which the given place was merged, returns p if
+   * p was not merged yet 
+   */
+  private Place getMergeResult(Place p) {
+    if (mergeMap.get(p) == null) return p;
+    else return mergeMap.get(p);
+  }
+  
+  /**
+   * The set of merged places, built up by calling {@link #mergedPlaces}.
+   * Call {@link #removeAllMergedPlaces()} to remove all places in this set
+   * from the net.
+   */
+  private HashSet<Place> mergedPlaces;
+  
+  /**
+   * Remove all places in {@link #mergedPlaces} from the net. Specifically
+   * remove all references to each place by clearing the marking and adjacent
+   * arcs.
+   */
+  private void removeAllMergedPlaces() {
+    for (Place p : this.mergedPlaces) {
+      PNAPI.removePlace(this.getNet(), p);
+    }
+  }
 	
 	/**
 	 * creates an XML-conform label from a String 
@@ -81,12 +332,12 @@ public abstract class Translator {
 	protected String createLabel (String label, Character x){
 		if (label == null || label.length() == 0){
 			if (x == 'p') {
-				label = "p"+this.getPct();
-				this.setPct(this.getPct()+1);
+				label = "p"+this.getPlaceNum();
+				this.setPlaceNum(this.getPlaceNum()+1);
 			}
 			else if (x == 't') {
-				label = "t" + this.getTct();
-				this.setTct(this.getTct()+1);
+				label = "t" + this.getTransitionNum();
+				this.setTransitionNum(this.getTransitionNum()+1);
 			}
 			return label;
 		}
@@ -121,7 +372,7 @@ public abstract class Translator {
 		for (DiagramArc arc: this.node.getIncoming()){
 			PlaceExt pIn = PtnetLoLAFactory.eINSTANCE.createPlaceExt(); 
 			if (node.getLabel() != null && arc.getSrc().getLabel() != null)
-				pIn.setName(node.getLabel()+"_In_"+arc.getSrc().getLabel());
+				pIn.setName(createLabel(node.getLabel()+"_In_"+arc.getSrc().getLabel(),'p'));
 			else pIn.setName(createLabel(null, 'p'));
 			this.net.getPlaces().add(pIn);	
 			
@@ -206,8 +457,7 @@ public abstract class Translator {
 				return null;
 			}
 			if (!this.getOtherEnds().containsValue(end)){
-				System.out.println("NodePair.getOtherEndPlace()! The " + end.getClass().getSimpleName() + " " + end.getLabel() + " is not in the List.");
-
+				// System.out.println("NodePair.getOtherEndPlace()! The " + end.getClass().getSimpleName() + " " + end.getLabel() + " is not in the List.");
 				return null;
 			}
 			else 

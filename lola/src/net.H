@@ -46,6 +46,17 @@ using std::endl;
 #define true 1
 #define false 0
 
+/// file names for input and output
+
+extern char * netfile;  ///< name of file containing LoLA net input
+extern char * analysefile; ///< name of file containing parameters of verification problem input
+extern char * graphfile; ///< name of file for reachability graph output
+extern char * pathfile; ///< name of file for witness/counterexample path output
+extern char * statefile; ///< name of file for witness/counterexample state output
+extern char * symmfile; ///< name of file for output of generating set of all symmetries
+extern char * netbasename; ///< base of net file name (used for generic output file names)
+extern FILE * resultfile; ///< the result file
+
 
 ///// 4 LINES ADDED BY NIELS
 extern void statistics(unsigned int s, unsigned int e, unsigned int h);
@@ -697,13 +708,18 @@ if(Places[(*p)]-> bounded)
 #endif
       CurrentMarking[* p] += * i;
 #ifdef CHECKCAPACITY
-	if(CurrentMarking[*p] > Places[*p]->capacity)
-	{
-    statistics(NrOfStates,Edges,NonEmptyHash);
-    fprintf(stderr, "lola: capacity of place '%s' exceeded: CAPACITY=%d, but m(%s)=%d\n",
-      Places[*p]->name, Places[*p]->capacity, Places[*p]->name, CurrentMarking[*p]);
-		exit(4);
-	}
+    if(CurrentMarking[*p] > Places[*p]->capacity) {
+        statistics(NrOfStates,Edges,NonEmptyHash);
+        fprintf(stderr, "lola: capacity of place '%s' exceeded: CAPACITY=%d, but m(%s)=%d\n",
+            Places[*p]->name, Places[*p]->capacity, Places[*p]->name, CurrentMarking[*p]);
+
+        if (resultfile) {
+          fprintf(resultfile, "capacity: {\n  exceeded = true;\n  capacity = %d;\n  place = \"%s\";\n  marking = %d;\n};\n", Places[*p]->capacity, Places[*p]->name, CurrentMarking[*p]);
+        }
+
+
+        exit(4);
+    }
 #endif
 #ifdef COVER
 #ifndef SWEEP
@@ -906,17 +922,6 @@ extern Transition * LastAttractor; ///< Last transition in list of
 ///< static attractor set. Attractor sets form always a prefix in the
 ///< list of stubborn transitions. Static attractor transitions are never
 ///< removed from that list.
-
-/// file names for input and output
-
-extern char * netfile;  ///< name of file containing LoLA net input
-extern char * analysefile; ///< name of file containing parameters of verification problem input
-extern char * graphfile; ///< name of file for reachability graph output
-extern char * pathfile; ///< name of file for witness/counterexample path output
-extern char * statefile; ///< name of file for witness/counterexample state output
-extern char * symmfile; ///< name of file for output of generating set of all symmetries
-extern char * netbasename; ///< base of net file name (used for generic output file names)
-extern FILE * resultfile; ///< the result file
 
 extern bool Aflg, Sflg, Yflg, Pflg,GMflg, aflg, sflg, yflg,pflg,gmflg; ///< flags for parsing command line
 extern char graphformat; ///< command line option (verbatim) for controlling reachability graph output format

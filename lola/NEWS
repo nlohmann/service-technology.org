@@ -22,6 +22,9 @@ Version 1.15-unreleased
 
 * added user configurations for the binaries used by the ProM plugin
 
+* fixed bug #15678 (`https://gna.org/bugs/?15678'): `HOME' now switches on
+  `TWOPHASE' if `STUBBORN' is also used
+
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for
 complete version history.

@@ -75,17 +75,17 @@
 // finally applied in the exectuable program.
 
 //#define COVER
-//#define STUBBORN
+#define STUBBORN
 //#define SYMMETRY
 //#define CYCLE
-//#define PREDUCTION
-//#define SMALLSTATE
+#define PREDUCTION
+#define SMALLSTATE
 //#define BITHASH
 //#define DISTRIBUTE
 //#define SWEEP
 
-#define NONBRANCHINGONLY
-#define MAXUNSAVED 5
+//#define NONBRANCHINGONLY
+//#define MAXUNSAVED 5
 
 // In connection with STATEPREDICATE (below), there exist two versions of
 // stubborn set. RELAXED selects the Kristensen/Valmari method (Petri net
@@ -110,8 +110,8 @@
 // 5 refers to the canonical representitive technique on the fly (i.e.
 //   without pre-computed symmetries) and maxiaml reduction (slower than 4)
 
-#define SYMMINTEGRATION 3
-#define MAXATTEMPT 8
+//#define SYMMINTEGRATION 3
+//#define MAXATTEMPT 8
 
 // GRAPH specifies the strategy of graph exploration. It must have
 // either value depth_first or value breadth_first.
@@ -148,9 +148,9 @@
 //#define BOUNDEDNET
 //#define DEADTRANSITION
 //#define REVERSIBILITY
-//#define HOME
+#define HOME
 //#define FINDPATH
-#define FULL
+//#define FULL
 //#define DEADLOCK
 //#define NONE
 //#define STATEPREDICATE
@@ -166,5 +166,5 @@
 
 //#define EXTENDEDCTL
 
-#define TWOPHASE
+//#define TWOPHASE
 //#define STRUCT

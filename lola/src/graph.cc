@@ -992,13 +992,22 @@ unsigned int depth_first() {
 #endif
 #ifdef STATEPREDICATE
   if(F -> initatomic()) {
+      if (resultfile) {
+        fprintf(resultfile, "statepredicate: {\n  result = true;\n  ");
+      }
 #if defined(LIVEPROP) && ! defined(TWOPHASE)
     largest_sat = 1;
 #else
     cout << "\nstate found!\n";
+
     printstate("",CurrentMarking);
     print_path(CurrentState);
     printincompletestates(CurrentState, graphstream);
+
+    if (resultfile) {
+      fprintf(resultfile, "};\n");
+    }
+
     statistics(NrOfStates,Edges,NonEmptyHash);
 #ifdef DISTRIBUTE
     heureka(resultfixedR, CurrentMarking);
@@ -1309,11 +1318,21 @@ unsigned int depth_first() {
 #if defined(LIVEPROP) && !defined(TWOPHASE)
     if(largest_sat < NewState -> dfs + 1) largest_sat = NewState -> dfs + 1;
 #else
+    if (resultfile) {
+      fprintf(resultfile, "statepredicate: {\n  result = true;\n  ");
+    }
+
     // early abortion
     cout << "\nstate found!\n";
     printstate("",CurrentMarking);
     print_path(NewState);
     printincompletestates(NewState, graphstream);
+
+    if (resultfile) {
+      fprintf(resultfile, "};\n");
+    }
+
+
     statistics(NrOfStates,Edges,NonEmptyHash);
     return 1;
 #endif
@@ -1814,6 +1833,10 @@ unsigned int depth_first() {
 #endif
 #if defined(STATEPREDICATE) && ! defined(LIVEPROP)
   cout << "\n predicate is not satisfiable!\n";
+  if (resultfile) {
+    fprintf(resultfile, "statepredicate: {\n  result = false;\n};\n");
+  }
+
 #endif
 #ifdef DEADTRANSITION
   cout << "\ntransition " << CheckTransition -> name << " is dead!\n";

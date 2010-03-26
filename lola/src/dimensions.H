@@ -484,6 +484,9 @@
   #ifndef STUBBORN
     #define STUBBORN
   #endif
+  #ifdef STUBBORN
+    #define TWOPHASE // see https://gna.org/bugs/?15678
+  #endif
   #define FIRELIST tsccstubbornlist
   //EXTENDED = enable ignored transitions management
   #define EXTENDED

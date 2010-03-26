@@ -19,7 +19,7 @@
     </children>
     <styles xmi:type="notation:ShapeStyle" xmi:id="_RhNMglDcEd2y3M5ZhOiktg"/>
     <element xmi:type="adaptiveSystem:AdaptiveProcess" href="flood2b.adaptivesystem#_RhNMgFDcEd2y3M5ZhOiktg"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_RhNMg1DcEd2y3M5ZhOiktg" x="24" y="12" width="433" height="889"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_RhNMg1DcEd2y3M5ZhOiktg" x="24" y="12" width="433" height="433"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_UzKsgVDcEd2y3M5ZhOiktg" type="1002">
     <children xmi:type="notation:Node" xmi:id="_UzKshFDcEd2y3M5ZhOiktg" type="4016"/>

@@ -1,8 +1,0 @@
-#Wed Apr 30 18:24:44 CEST 2008
-eclipse.preferences.version=1
-gmf_dashboard/domainGenerationModel=platform\:/resource/vdx/model/vdx.genmodel
-gmf_dashboard/domainModel=platform\:/resource/vdx/model/vdx.ecore
-gmf_dashboard/generationModel=platform\:/resource/vdx/model/vdx_abstract.gmfgen
-gmf_dashboard/graphicalDefinitionModel=platform\:/resource/vdx/model/vdx_abstract.gmfgraph
-gmf_dashboard/mappingModel=platform\:/resource/vdx/model/vdx_abstract.gmfmap
-gmf_dashboard/toolingDefinitionModel=platform\:/resource/vdx/model/vdx_abstract.gmftool

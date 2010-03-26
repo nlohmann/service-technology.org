@@ -1,0 +1,7 @@
+# Tracing options for the hub.top.lang.flowcharts.diagram plug-in
+
+# Common issues
+hub.top.lang.flowcharts.diagram/debug=false
+
+# Visual IDs
+hub.top.lang.flowcharts.diagram/debug/visualID=false

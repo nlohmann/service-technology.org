@@ -1,0 +1,5 @@
+This package defines an Eclipse plugin that provides additional 
+language support for the Service-Technology.org Editor Application Seda.
+The language is a variant of the Flowchart notation that has been
+extended with domain-specific concepts to support modeling processes
+in disaster management. 

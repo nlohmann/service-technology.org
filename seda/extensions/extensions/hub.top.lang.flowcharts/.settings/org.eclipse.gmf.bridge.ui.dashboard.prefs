@@ -1,0 +1,8 @@
+#Sat Mar 07 14:56:13 CET 2009
+eclipse.preferences.version=1
+gmf_dashboard/domainGenerationModel=platform\:/resource/hub.top.lang.flowcharts/model/flowchart.genmodel
+gmf_dashboard/domainModel=platform\:/resource/hub.top.lang.flowcharts/model/flowchart.ecore
+gmf_dashboard/generationModel=platform\:/resource/hub.top.lang.flowcharts/model/gmf/gfzWf2.gmfgen
+gmf_dashboard/graphicalDefinitionModel=platform\:/resource/hub.top.lang.flowcharts/model/gmf/flowchart.gmfgraph
+gmf_dashboard/mappingModel=platform\:/resource/hub.top.lang.flowcharts/model/gmf/flowchart.gmfmap
+gmf_dashboard/toolingDefinitionModel=platform\:/resource/hub.top.lang.flowcharts/model/gmf/flowchart.gmftool

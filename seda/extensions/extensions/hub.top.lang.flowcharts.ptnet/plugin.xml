@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.ui.popupMenus">
+      <?gmfgen generated="true"?>
+      <objectContribution
+            id="hub.top.lang.flowcharts.diagram.ConvertToPnml"
+            nameFilter="*.flow_diagram"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               label="Convert to P/T Net Model"
+               class="hub.top.editor.eclipse.ui.ConvertDiagramFileAction_FCtoPTnet"
+               menubarPath="additions"
+               enablesFor="1"
+               id="hub.top.lang.flowcharts.diagram.ConvertToPTnetAction">
+         </action>
+      </objectContribution>
+      <objectContribution
+            id="hub.top.lang.flowcharts.diagram.ConvertToINA"
+            nameFilter="*.ptnet"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               label="Convert to INA file"
+               class="hub.top.editor.eclipse.ui.ConvertDiagramFileAction_PTnetToINA"
+               menubarPath="additions"
+               enablesFor="1"
+               id="hub.top.lang.flowcharts.diagram.ConvertToINAAction">
+         </action>
+      </objectContribution>
+      <objectContribution
+            id="hub.top.lang.flowcharts.diagram.ConvertToTINA"
+            nameFilter="*.ptnet"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               label="Convert to TINA file"
+               class="hub.top.editor.eclipse.ui.ConvertDiagramFileAction_PTnetToTINA"
+               menubarPath="additions"
+               enablesFor="1"
+               id="hub.top.lang.flowcharts.diagram.ConvertToTINAAction">
+         </action>
+      </objectContribution>
+      <objectContribution
+            id="hub.top.lang.flowcharts.diagram.ConvertToRomeo"
+            nameFilter="*.ptnet"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               label="Convert to Roméo file"
+               class="hub.top.editor.eclipse.ui.ConvertDiagramFileAction_PTnetToRomeo"
+               menubarPath="additions"
+               enablesFor="1"
+               id="hub.top.lang.flowcharts.diagram.ConvertToRomeoAction">
+         </action>
+      </objectContribution>
+   </extension>
+</plugin>

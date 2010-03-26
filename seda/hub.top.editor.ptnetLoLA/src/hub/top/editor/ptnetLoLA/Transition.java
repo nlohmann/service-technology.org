@@ -6,6 +6,8 @@
  */
 package hub.top.editor.ptnetLoLA;
 
+import org.eclipse.emf.common.util.EList;
+
 
 /**
  * <!-- begin-user-doc -->
@@ -18,4 +20,15 @@ package hub.top.editor.ptnetLoLA;
  * @generated
  */
 public interface Transition extends Node {
+  
+  /**
+   * @return a list of all direct pre-places of this transition
+   */
+  EList<Place> getPreSet();
+
+  /**
+   * @return a list of all direct post-places of this transition
+   */
+  EList<Place> getPostSet();
+  
 } // Transition

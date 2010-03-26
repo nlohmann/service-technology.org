@@ -72,105 +72,105 @@ public class ArcToPlaceExtItemProvider
     IItemLabelProvider,
     IItemPropertySource {
   /**
-   * This constructs an instance from a factory and a notifier.
-   * <!-- begin-user-doc -->
+	 * This constructs an instance from a factory and a notifier.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public ArcToPlaceExtItemProvider(AdapterFactory adapterFactory) {
-    super(adapterFactory);
-  }
+		super(adapterFactory);
+	}
 
   /**
-   * This returns the property descriptors for the adapted class.
-   * <!-- begin-user-doc -->
+	 * This returns the property descriptors for the adapted class.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object) {
-    if (itemPropertyDescriptors == null) {
-      super.getPropertyDescriptors(object);
+		if (itemPropertyDescriptors == null) {
+			super.getPropertyDescriptors(object);
 
-      addProbabilityPropertyDescriptor(object);
-    }
-    return itemPropertyDescriptors;
-  }
+			addProbabilityPropertyDescriptor(object);
+		}
+		return itemPropertyDescriptors;
+	}
 
   /**
-   * This adds a property descriptor for the Probability feature.
-   * <!-- begin-user-doc -->
+	 * This adds a property descriptor for the Probability feature.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected void addProbabilityPropertyDescriptor(Object object) {
-    itemPropertyDescriptors.add
-      (createItemPropertyDescriptor
-        (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-         getResourceLocator(),
-         getString("_UI_ArcToPlaceExt_probability_feature"),
-         getString("_UI_PropertyDescriptor_description", "_UI_ArcToPlaceExt_probability_feature", "_UI_ArcToPlaceExt_type"),
-         PtnetLoLAPackage.Literals.ARC_TO_PLACE_EXT__PROBABILITY,
-         true,
-         false,
-         false,
-         ItemPropertyDescriptor.REAL_VALUE_IMAGE,
-         null,
-         null));
-  }
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_ArcToPlaceExt_probability_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_ArcToPlaceExt_probability_feature", "_UI_ArcToPlaceExt_type"),
+				 PtnetLoLAPackage.Literals.ARC_TO_PLACE_EXT__PROBABILITY,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.REAL_VALUE_IMAGE,
+				 null,
+				 null));
+	}
 
   /**
-   * This returns ArcToPlaceExt.gif.
-   * <!-- begin-user-doc -->
+	 * This returns ArcToPlaceExt.gif.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Object getImage(Object object) {
-    return overlayImage(object, getResourceLocator().getImage("full/obj16/ArcToPlaceExt"));
-  }
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/ArcToPlaceExt"));
+	}
 
   /**
-   * This returns the label text for the adapted class.
-   * <!-- begin-user-doc -->
+	 * This returns the label text for the adapted class.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public String getText(Object object) {
-    ArcToPlaceExt arcToPlaceExt = (ArcToPlaceExt)object;
-    return getString("_UI_ArcToPlaceExt_type") + " " + arcToPlaceExt.getWeight();
-  }
+		ArcToPlaceExt arcToPlaceExt = (ArcToPlaceExt)object;
+		return getString("_UI_ArcToPlaceExt_type") + " " + arcToPlaceExt.getWeight();
+	}
 
   /**
-   * This handles model notifications by calling {@link #updateChildren} to update any cached
-   * children and by creating a viewer notification, which it passes to {@link #fireNotifyChanged}.
-   * <!-- begin-user-doc -->
+	 * This handles model notifications by calling {@link #updateChildren} to update any cached
+	 * children and by creating a viewer notification, which it passes to {@link #fireNotifyChanged}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public void notifyChanged(Notification notification) {
-    updateChildren(notification);
+		updateChildren(notification);
 
-    switch (notification.getFeatureID(ArcToPlaceExt.class)) {
-      case PtnetLoLAPackage.ARC_TO_PLACE_EXT__PROBABILITY:
-        fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
-        return;
-    }
-    super.notifyChanged(notification);
-  }
+		switch (notification.getFeatureID(ArcToPlaceExt.class)) {
+			case PtnetLoLAPackage.ARC_TO_PLACE_EXT__PROBABILITY:
+				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
+				return;
+		}
+		super.notifyChanged(notification);
+	}
 
   /**
-   * This adds {@link org.eclipse.emf.edit.command.CommandParameter}s describing the children
-   * that can be created under this object.
-   * <!-- begin-user-doc -->
+	 * This adds {@link org.eclipse.emf.edit.command.CommandParameter}s describing the children
+	 * that can be created under this object.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected void collectNewChildDescriptors(Collection<Object> newChildDescriptors, Object object) {
-    super.collectNewChildDescriptors(newChildDescriptors, object);
-  }
+		super.collectNewChildDescriptors(newChildDescriptors, object);
+	}
 
 }

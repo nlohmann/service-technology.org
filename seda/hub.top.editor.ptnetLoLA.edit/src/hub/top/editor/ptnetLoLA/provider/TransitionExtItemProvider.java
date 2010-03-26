@@ -72,107 +72,179 @@ public class TransitionExtItemProvider
     IItemLabelProvider,
     IItemPropertySource {
   /**
-   * This constructs an instance from a factory and a notifier.
-   * <!-- begin-user-doc -->
+	 * This constructs an instance from a factory and a notifier.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public TransitionExtItemProvider(AdapterFactory adapterFactory) {
-    super(adapterFactory);
-  }
+		super(adapterFactory);
+	}
 
   /**
-   * This returns the property descriptors for the adapted class.
-   * <!-- begin-user-doc -->
+	 * This returns the property descriptors for the adapted class.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object) {
-    if (itemPropertyDescriptors == null) {
-      super.getPropertyDescriptors(object);
+		if (itemPropertyDescriptors == null) {
+			super.getPropertyDescriptors(object);
 
-      addProbabilityPropertyDescriptor(object);
-    }
-    return itemPropertyDescriptors;
-  }
+			addProbabilityPropertyDescriptor(object);
+			addMinTimePropertyDescriptor(object);
+			addCostPropertyDescriptor(object);
+			addMaxTimePropertyDescriptor(object);
+		}
+		return itemPropertyDescriptors;
+	}
 
   /**
-   * This adds a property descriptor for the Probability feature.
-   * <!-- begin-user-doc -->
+	 * This adds a property descriptor for the Probability feature.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected void addProbabilityPropertyDescriptor(Object object) {
-    itemPropertyDescriptors.add
-      (createItemPropertyDescriptor
-        (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-         getResourceLocator(),
-         getString("_UI_TransitionExt_probability_feature"),
-         getString("_UI_PropertyDescriptor_description", "_UI_TransitionExt_probability_feature", "_UI_TransitionExt_type"),
-         PtnetLoLAPackage.Literals.TRANSITION_EXT__PROBABILITY,
-         true,
-         false,
-         false,
-         ItemPropertyDescriptor.REAL_VALUE_IMAGE,
-         null,
-         null));
-  }
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_TransitionExt_probability_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TransitionExt_probability_feature", "_UI_TransitionExt_type"),
+				 PtnetLoLAPackage.Literals.TRANSITION_EXT__PROBABILITY,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.REAL_VALUE_IMAGE,
+				 null,
+				 null));
+	}
 
   /**
-   * This returns TransitionExt.gif.
-   * <!-- begin-user-doc -->
+	 * This adds a property descriptor for the Min Time feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addMinTimePropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_TransitionExt_minTime_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TransitionExt_minTime_feature", "_UI_TransitionExt_type"),
+				 PtnetLoLAPackage.Literals.TRANSITION_EXT__MIN_TIME,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+		/**
+	 * This adds a property descriptor for the Cost feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addCostPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_TransitionExt_cost_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TransitionExt_cost_feature", "_UI_TransitionExt_type"),
+				 PtnetLoLAPackage.Literals.TRANSITION_EXT__COST,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.REAL_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+		/**
+	 * This adds a property descriptor for the Max Time feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addMaxTimePropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_TransitionExt_maxTime_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_TransitionExt_maxTime_feature", "_UI_TransitionExt_type"),
+				 PtnetLoLAPackage.Literals.TRANSITION_EXT__MAX_TIME,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+		/**
+	 * This returns TransitionExt.gif.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Object getImage(Object object) {
-    return overlayImage(object, getResourceLocator().getImage("full/obj16/TransitionExt"));
-  }
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/TransitionExt"));
+	}
 
   /**
-   * This returns the label text for the adapted class.
-   * <!-- begin-user-doc -->
+	 * This returns the label text for the adapted class.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public String getText(Object object) {
-    String label = ((TransitionExt)object).getName();
-    return label == null || label.length() == 0 ?
-      getString("_UI_TransitionExt_type") :
-      getString("_UI_TransitionExt_type") + " " + label;
-  }
+		String label = ((TransitionExt)object).getName();
+		return label == null || label.length() == 0 ?
+			getString("_UI_TransitionExt_type") :
+			getString("_UI_TransitionExt_type") + " " + label;
+	}
 
   /**
-   * This handles model notifications by calling {@link #updateChildren} to update any cached
-   * children and by creating a viewer notification, which it passes to {@link #fireNotifyChanged}.
-   * <!-- begin-user-doc -->
+	 * This handles model notifications by calling {@link #updateChildren} to update any cached
+	 * children and by creating a viewer notification, which it passes to {@link #fireNotifyChanged}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public void notifyChanged(Notification notification) {
-    updateChildren(notification);
+		updateChildren(notification);
 
-    switch (notification.getFeatureID(TransitionExt.class)) {
-      case PtnetLoLAPackage.TRANSITION_EXT__PROBABILITY:
-        fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
-        return;
-    }
-    super.notifyChanged(notification);
-  }
+		switch (notification.getFeatureID(TransitionExt.class)) {
+			case PtnetLoLAPackage.TRANSITION_EXT__PROBABILITY:
+			case PtnetLoLAPackage.TRANSITION_EXT__MIN_TIME:
+			case PtnetLoLAPackage.TRANSITION_EXT__COST:
+			case PtnetLoLAPackage.TRANSITION_EXT__MAX_TIME:
+				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
+				return;
+		}
+		super.notifyChanged(notification);
+	}
 
   /**
-   * This adds {@link org.eclipse.emf.edit.command.CommandParameter}s describing the children
-   * that can be created under this object.
-   * <!-- begin-user-doc -->
+	 * This adds {@link org.eclipse.emf.edit.command.CommandParameter}s describing the children
+	 * that can be created under this object.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected void collectNewChildDescriptors(Collection<Object> newChildDescriptors, Object object) {
-    super.collectNewChildDescriptors(newChildDescriptors, object);
-  }
+		super.collectNewChildDescriptors(newChildDescriptors, object);
+	}
 
 }

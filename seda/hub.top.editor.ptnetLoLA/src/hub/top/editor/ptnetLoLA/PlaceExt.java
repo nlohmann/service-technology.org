@@ -47,6 +47,7 @@ package hub.top.editor.ptnetLoLA;
  * The following features are supported:
  * <ul>
  *   <li>{@link hub.top.editor.ptnetLoLA.PlaceExt#getProbability <em>Probability</em>}</li>
+ *   <li>{@link hub.top.editor.ptnetLoLA.PlaceExt#isIsStart <em>Is Start</em>}</li>
  * </ul>
  * </p>
  *
@@ -56,29 +57,57 @@ package hub.top.editor.ptnetLoLA;
  */
 public interface PlaceExt extends Place {
   /**
-   * Returns the value of the '<em><b>Probability</b></em>' attribute.
-   * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Probability</b></em>' attribute.
+	 * The default value is <code>"1.0"</code>.
+	 * <!-- begin-user-doc -->
    * <p>
    * If the meaning of the '<em>Probability</em>' attribute isn't clear,
    * there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * @return the value of the '<em>Probability</em>' attribute.
-   * @see #setProbability(double)
-   * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getPlaceExt_Probability()
-   * @model
-   * @generated
-   */
+	 * @return the value of the '<em>Probability</em>' attribute.
+	 * @see #setProbability(double)
+	 * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getPlaceExt_Probability()
+	 * @model default="1.0"
+	 * @generated
+	 */
   double getProbability();
 
   /**
-   * Sets the value of the '{@link hub.top.editor.ptnetLoLA.PlaceExt#getProbability <em>Probability</em>}' attribute.
-   * <!-- begin-user-doc -->
+	 * Sets the value of the '{@link hub.top.editor.ptnetLoLA.PlaceExt#getProbability <em>Probability</em>}' attribute.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Probability</em>' attribute.
-   * @see #getProbability()
-   * @generated
-   */
+	 * @param value the new value of the '<em>Probability</em>' attribute.
+	 * @see #getProbability()
+	 * @generated
+	 */
   void setProbability(double value);
+
+		/**
+	 * Returns the value of the '<em><b>Is Start</b></em>' attribute.
+	 * The default value is <code>"False"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Is Start</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Is Start</em>' attribute.
+	 * @see #setIsStart(boolean)
+	 * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getPlaceExt_IsStart()
+	 * @model default="False" required="true"
+	 * @generated
+	 */
+	boolean isIsStart();
+
+		/**
+	 * Sets the value of the '{@link hub.top.editor.ptnetLoLA.PlaceExt#isIsStart <em>Is Start</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Is Start</em>' attribute.
+	 * @see #isIsStart()
+	 * @generated
+	 */
+	void setIsStart(boolean value);
 
 } // PlaceExt

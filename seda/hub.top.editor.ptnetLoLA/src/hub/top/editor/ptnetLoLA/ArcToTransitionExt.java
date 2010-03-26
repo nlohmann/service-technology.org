@@ -56,29 +56,30 @@ package hub.top.editor.ptnetLoLA;
  */
 public interface ArcToTransitionExt extends ArcToTransition {
   /**
-   * Returns the value of the '<em><b>Probability</b></em>' attribute.
-   * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Probability</b></em>' attribute.
+	 * The default value is <code>"1.0"</code>.
+	 * <!-- begin-user-doc -->
    * <p>
    * If the meaning of the '<em>Probability</em>' attribute isn't clear,
    * there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * @return the value of the '<em>Probability</em>' attribute.
-   * @see #setProbability(double)
-   * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getArcToTransitionExt_Probability()
-   * @model
-   * @generated
-   */
+	 * @return the value of the '<em>Probability</em>' attribute.
+	 * @see #setProbability(double)
+	 * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getArcToTransitionExt_Probability()
+	 * @model default="1.0"
+	 * @generated
+	 */
   double getProbability();
 
   /**
-   * Sets the value of the '{@link hub.top.editor.ptnetLoLA.ArcToTransitionExt#getProbability <em>Probability</em>}' attribute.
-   * <!-- begin-user-doc -->
+	 * Sets the value of the '{@link hub.top.editor.ptnetLoLA.ArcToTransitionExt#getProbability <em>Probability</em>}' attribute.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Probability</em>' attribute.
-   * @see #getProbability()
-   * @generated
-   */
+	 * @param value the new value of the '<em>Probability</em>' attribute.
+	 * @see #getProbability()
+	 * @generated
+	 */
   void setProbability(double value);
 
 } // ArcToTransitionExt

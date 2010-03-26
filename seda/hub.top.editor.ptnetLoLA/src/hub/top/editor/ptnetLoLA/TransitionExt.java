@@ -37,6 +37,8 @@
  */
 package hub.top.editor.ptnetLoLA;
 
+import org.eclipse.emf.common.util.EList;
+
 
 /**
  * <!-- begin-user-doc -->
@@ -47,6 +49,9 @@ package hub.top.editor.ptnetLoLA;
  * The following features are supported:
  * <ul>
  *   <li>{@link hub.top.editor.ptnetLoLA.TransitionExt#getProbability <em>Probability</em>}</li>
+ *   <li>{@link hub.top.editor.ptnetLoLA.TransitionExt#getMinTime <em>Min Time</em>}</li>
+ *   <li>{@link hub.top.editor.ptnetLoLA.TransitionExt#getCost <em>Cost</em>}</li>
+ *   <li>{@link hub.top.editor.ptnetLoLA.TransitionExt#getMaxTime <em>Max Time</em>}</li>
  * </ul>
  * </p>
  *
@@ -56,29 +61,111 @@ package hub.top.editor.ptnetLoLA;
  */
 public interface TransitionExt extends Transition {
   /**
-   * Returns the value of the '<em><b>Probability</b></em>' attribute.
-   * <!-- begin-user-doc -->
+	 * Returns the value of the '<em><b>Probability</b></em>' attribute.
+	 * The default value is <code>"1.0"</code>.
+	 * <!-- begin-user-doc -->
    * <p>
    * If the meaning of the '<em>Probability</em>' attribute isn't clear,
    * there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * @return the value of the '<em>Probability</em>' attribute.
-   * @see #setProbability(double)
-   * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getTransitionExt_Probability()
-   * @model
-   * @generated
-   */
+	 * @return the value of the '<em>Probability</em>' attribute.
+	 * @see #setProbability(double)
+	 * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getTransitionExt_Probability()
+	 * @model default="1.0"
+	 * @generated
+	 */
   double getProbability();
 
   /**
-   * Sets the value of the '{@link hub.top.editor.ptnetLoLA.TransitionExt#getProbability <em>Probability</em>}' attribute.
-   * <!-- begin-user-doc -->
+	 * Sets the value of the '{@link hub.top.editor.ptnetLoLA.TransitionExt#getProbability <em>Probability</em>}' attribute.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @param value the new value of the '<em>Probability</em>' attribute.
-   * @see #getProbability()
-   * @generated
-   */
+	 * @param value the new value of the '<em>Probability</em>' attribute.
+	 * @see #getProbability()
+	 * @generated
+	 */
   void setProbability(double value);
+
+		/**
+	 * Returns the value of the '<em><b>Min Time</b></em>' attribute.
+	 * The default value is <code>"0"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Min Time</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Min Time</em>' attribute.
+	 * @see #setMinTime(int)
+	 * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getTransitionExt_MinTime()
+	 * @model default="0" unique="false"
+	 * @generated
+	 */
+	int getMinTime();
+
+		/**
+	 * Sets the value of the '{@link hub.top.editor.ptnetLoLA.TransitionExt#getMinTime <em>Min Time</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Min Time</em>' attribute.
+	 * @see #getMinTime()
+	 * @generated
+	 */
+	void setMinTime(int value);
+
+		/**
+	 * Returns the value of the '<em><b>Cost</b></em>' attribute.
+	 * The default value is <code>"0"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Cost</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Cost</em>' attribute.
+	 * @see #setCost(double)
+	 * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getTransitionExt_Cost()
+	 * @model default="0" unique="false"
+	 * @generated
+	 */
+	double getCost();
+
+		/**
+	 * Sets the value of the '{@link hub.top.editor.ptnetLoLA.TransitionExt#getCost <em>Cost</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Cost</em>' attribute.
+	 * @see #getCost()
+	 * @generated
+	 */
+	void setCost(double value);
+
+		/**
+	 * Returns the value of the '<em><b>Max Time</b></em>' attribute.
+	 * The default value is <code>"0"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Max Time</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Max Time</em>' attribute.
+	 * @see #setMaxTime(int)
+	 * @see hub.top.editor.ptnetLoLA.PtnetLoLAPackage#getTransitionExt_MaxTime()
+	 * @model default="0"
+	 * @generated
+	 */
+	int getMaxTime();
+
+		/**
+	 * Sets the value of the '{@link hub.top.editor.ptnetLoLA.TransitionExt#getMaxTime <em>Max Time</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Max Time</em>' attribute.
+	 * @see #getMaxTime()
+	 * @generated
+	 */
+	void setMaxTime(int value);
 
 } // TransitionExt

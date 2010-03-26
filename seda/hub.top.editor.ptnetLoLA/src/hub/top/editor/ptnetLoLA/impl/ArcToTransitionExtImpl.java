@@ -61,137 +61,137 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  */
 public class ArcToTransitionExtImpl extends ArcToTransitionImpl implements ArcToTransitionExt {
   /**
-   * The default value of the '{@link #getProbability() <em>Probability</em>}' attribute.
-   * <!-- begin-user-doc -->
+	 * The default value of the '{@link #getProbability() <em>Probability</em>}' attribute.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getProbability()
-   * @generated
-   * @ordered
-   */
-  protected static final double PROBABILITY_EDEFAULT = 0.0;
+	 * @see #getProbability()
+	 * @generated
+	 * @ordered
+	 */
+  protected static final double PROBABILITY_EDEFAULT = 1.0;
 
   /**
-   * The cached value of the '{@link #getProbability() <em>Probability</em>}' attribute.
-   * <!-- begin-user-doc -->
+	 * The cached value of the '{@link #getProbability() <em>Probability</em>}' attribute.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #getProbability()
-   * @generated
-   * @ordered
-   */
+	 * @see #getProbability()
+	 * @generated
+	 * @ordered
+	 */
   protected double probability = PROBABILITY_EDEFAULT;
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected ArcToTransitionExtImpl() {
-    super();
-  }
+		super();
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   protected EClass eStaticClass() {
-    return PtnetLoLAPackage.Literals.ARC_TO_TRANSITION_EXT;
-  }
+		return PtnetLoLAPackage.Literals.ARC_TO_TRANSITION_EXT;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public double getProbability() {
-    return probability;
-  }
+		return probability;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public void setProbability(double newProbability) {
-    double oldProbability = probability;
-    probability = newProbability;
-    if (eNotificationRequired())
-      eNotify(new ENotificationImpl(this, Notification.SET, PtnetLoLAPackage.ARC_TO_TRANSITION_EXT__PROBABILITY, oldProbability, probability));
-  }
+		double oldProbability = probability;
+		probability = newProbability;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, PtnetLoLAPackage.ARC_TO_TRANSITION_EXT__PROBABILITY, oldProbability, probability));
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Object eGet(int featureID, boolean resolve, boolean coreType) {
-    switch (featureID) {
-      case PtnetLoLAPackage.ARC_TO_TRANSITION_EXT__PROBABILITY:
-        return new Double(getProbability());
-    }
-    return super.eGet(featureID, resolve, coreType);
-  }
+		switch (featureID) {
+			case PtnetLoLAPackage.ARC_TO_TRANSITION_EXT__PROBABILITY:
+				return new Double(getProbability());
+		}
+		return super.eGet(featureID, resolve, coreType);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public void eSet(int featureID, Object newValue) {
-    switch (featureID) {
-      case PtnetLoLAPackage.ARC_TO_TRANSITION_EXT__PROBABILITY:
-        setProbability(((Double)newValue).doubleValue());
-        return;
-    }
-    super.eSet(featureID, newValue);
-  }
+		switch (featureID) {
+			case PtnetLoLAPackage.ARC_TO_TRANSITION_EXT__PROBABILITY:
+				setProbability(((Double)newValue).doubleValue());
+				return;
+		}
+		super.eSet(featureID, newValue);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public void eUnset(int featureID) {
-    switch (featureID) {
-      case PtnetLoLAPackage.ARC_TO_TRANSITION_EXT__PROBABILITY:
-        setProbability(PROBABILITY_EDEFAULT);
-        return;
-    }
-    super.eUnset(featureID);
-  }
+		switch (featureID) {
+			case PtnetLoLAPackage.ARC_TO_TRANSITION_EXT__PROBABILITY:
+				setProbability(PROBABILITY_EDEFAULT);
+				return;
+		}
+		super.eUnset(featureID);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public boolean eIsSet(int featureID) {
-    switch (featureID) {
-      case PtnetLoLAPackage.ARC_TO_TRANSITION_EXT__PROBABILITY:
-        return probability != PROBABILITY_EDEFAULT;
-    }
-    return super.eIsSet(featureID);
-  }
+		switch (featureID) {
+			case PtnetLoLAPackage.ARC_TO_TRANSITION_EXT__PROBABILITY:
+				return probability != PROBABILITY_EDEFAULT;
+		}
+		return super.eIsSet(featureID);
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public String toString() {
-    if (eIsProxy()) return super.toString();
+		if (eIsProxy()) return super.toString();
 
-    StringBuffer result = new StringBuffer(super.toString());
-    result.append(" (probability: ");
-    result.append(probability);
-    result.append(')');
-    return result.toString();
-  }
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (probability: ");
+		result.append(probability);
+		result.append(')');
+		return result.toString();
+	}
 
 } //ArcToTransitionExtImpl

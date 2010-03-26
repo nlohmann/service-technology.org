@@ -38,502 +38,502 @@ import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
  */
 public class PtnetLoLAItemProviderAdapterFactory extends PtnetLoLAAdapterFactory implements ComposeableAdapterFactory, IChangeNotifier, IDisposable {
 	/**
-   * This keeps track of the root adapter factory that delegates to this adapter factory.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the root adapter factory that delegates to this adapter factory.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected ComposedAdapterFactory parentAdapterFactory;
 
 	/**
-   * This is used to implement {@link org.eclipse.emf.edit.provider.IChangeNotifier}.
-   * <!-- begin-user-doc -->
+	 * This is used to implement {@link org.eclipse.emf.edit.provider.IChangeNotifier}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected IChangeNotifier changeNotifier = new ChangeNotifier();
 
 	/**
-   * This keeps track of all the supported types checked by {@link #isFactoryForType isFactoryForType}.
-   * <!-- begin-user-doc -->
+	 * This keeps track of all the supported types checked by {@link #isFactoryForType isFactoryForType}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected Collection<Object> supportedTypes = new ArrayList<Object>();
 
 	/**
-   * This constructs an instance.
-   * <!-- begin-user-doc -->
+	 * This constructs an instance.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public PtnetLoLAItemProviderAdapterFactory() {
-    supportedTypes.add(IEditingDomainItemProvider.class);
-    supportedTypes.add(IStructuredItemContentProvider.class);
-    supportedTypes.add(ITreeItemContentProvider.class);
-    supportedTypes.add(IItemLabelProvider.class);
-    supportedTypes.add(IItemPropertySource.class);
-  }
+		supportedTypes.add(IEditingDomainItemProvider.class);
+		supportedTypes.add(IStructuredItemContentProvider.class);
+		supportedTypes.add(ITreeItemContentProvider.class);
+		supportedTypes.add(IItemLabelProvider.class);
+		supportedTypes.add(IItemPropertySource.class);
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.Place} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.Place} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected PlaceItemProvider placeItemProvider;
 
 	/**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.Place}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.Place}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Adapter createPlaceAdapter() {
-    if (placeItemProvider == null) {
-      placeItemProvider = new PlaceItemProvider(this);
-    }
+		if (placeItemProvider == null) {
+			placeItemProvider = new PlaceItemProvider(this);
+		}
 
-    return placeItemProvider;
-  }
+		return placeItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.PtNet} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.PtNet} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected PtNetItemProvider ptNetItemProvider;
 
 	/**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.PtNet}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.PtNet}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Adapter createPtNetAdapter() {
-    if (ptNetItemProvider == null) {
-      ptNetItemProvider = new PtNetItemProvider(this);
-    }
+		if (ptNetItemProvider == null) {
+			ptNetItemProvider = new PtNetItemProvider(this);
+		}
 
-    return ptNetItemProvider;
-  }
+		return ptNetItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.Transition} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.Transition} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected TransitionItemProvider transitionItemProvider;
 
 	/**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.Transition}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.Transition}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Adapter createTransitionAdapter() {
-    if (transitionItemProvider == null) {
-      transitionItemProvider = new TransitionItemProvider(this);
-    }
+		if (transitionItemProvider == null) {
+			transitionItemProvider = new TransitionItemProvider(this);
+		}
 
-    return transitionItemProvider;
-  }
+		return transitionItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.Node} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.Node} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected NodeItemProvider nodeItemProvider;
 
 	/**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.Node}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.Node}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Adapter createNodeAdapter() {
-    if (nodeItemProvider == null) {
-      nodeItemProvider = new NodeItemProvider(this);
-    }
+		if (nodeItemProvider == null) {
+			nodeItemProvider = new NodeItemProvider(this);
+		}
 
-    return nodeItemProvider;
-  }
+		return nodeItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.Marking} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.Marking} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected MarkingItemProvider markingItemProvider;
 
 	/**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.Marking}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.Marking}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Adapter createMarkingAdapter() {
-    if (markingItemProvider == null) {
-      markingItemProvider = new MarkingItemProvider(this);
-    }
+		if (markingItemProvider == null) {
+			markingItemProvider = new MarkingItemProvider(this);
+		}
 
-    return markingItemProvider;
-  }
+		return markingItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.PlaceReference} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.PlaceReference} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected PlaceReferenceItemProvider placeReferenceItemProvider;
 
 	/**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.PlaceReference}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.PlaceReference}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Adapter createPlaceReferenceAdapter() {
-    if (placeReferenceItemProvider == null) {
-      placeReferenceItemProvider = new PlaceReferenceItemProvider(this);
-    }
+		if (placeReferenceItemProvider == null) {
+			placeReferenceItemProvider = new PlaceReferenceItemProvider(this);
+		}
 
-    return placeReferenceItemProvider;
-  }
+		return placeReferenceItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.RefMarkedPlace} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.RefMarkedPlace} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected RefMarkedPlaceItemProvider refMarkedPlaceItemProvider;
 
 	/**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.RefMarkedPlace}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.RefMarkedPlace}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Adapter createRefMarkedPlaceAdapter() {
-    if (refMarkedPlaceItemProvider == null) {
-      refMarkedPlaceItemProvider = new RefMarkedPlaceItemProvider(this);
-    }
+		if (refMarkedPlaceItemProvider == null) {
+			refMarkedPlaceItemProvider = new RefMarkedPlaceItemProvider(this);
+		}
 
-    return refMarkedPlaceItemProvider;
-  }
+		return refMarkedPlaceItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.Annotation} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.Annotation} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected AnnotationItemProvider annotationItemProvider;
 
 	/**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.Annotation}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.Annotation}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Adapter createAnnotationAdapter() {
-    if (annotationItemProvider == null) {
-      annotationItemProvider = new AnnotationItemProvider(this);
-    }
+		if (annotationItemProvider == null) {
+			annotationItemProvider = new AnnotationItemProvider(this);
+		}
 
-    return annotationItemProvider;
-  }
+		return annotationItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.Arc} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.Arc} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected ArcItemProvider arcItemProvider;
 
 	/**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.Arc}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.Arc}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Adapter createArcAdapter() {
-    if (arcItemProvider == null) {
-      arcItemProvider = new ArcItemProvider(this);
-    }
+		if (arcItemProvider == null) {
+			arcItemProvider = new ArcItemProvider(this);
+		}
 
-    return arcItemProvider;
-  }
+		return arcItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.ArcToPlace} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.ArcToPlace} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected ArcToPlaceItemProvider arcToPlaceItemProvider;
 
 	/**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.ArcToPlace}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.ArcToPlace}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Adapter createArcToPlaceAdapter() {
-    if (arcToPlaceItemProvider == null) {
-      arcToPlaceItemProvider = new ArcToPlaceItemProvider(this);
-    }
+		if (arcToPlaceItemProvider == null) {
+			arcToPlaceItemProvider = new ArcToPlaceItemProvider(this);
+		}
 
-    return arcToPlaceItemProvider;
-  }
+		return arcToPlaceItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.ArcToTransition} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.ArcToTransition} instances.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected ArcToTransitionItemProvider arcToTransitionItemProvider;
 
 	/**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.ArcToTransition}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.ArcToTransition}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Adapter createArcToTransitionAdapter() {
-    if (arcToTransitionItemProvider == null) {
-      arcToTransitionItemProvider = new ArcToTransitionItemProvider(this);
-    }
+		if (arcToTransitionItemProvider == null) {
+			arcToTransitionItemProvider = new ArcToTransitionItemProvider(this);
+		}
 
-    return arcToTransitionItemProvider;
-  }
+		return arcToTransitionItemProvider;
+	}
 
 	/**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.TransitionExt} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.TransitionExt} instances.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected TransitionExtItemProvider transitionExtItemProvider;
 
   /**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.TransitionExt}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.TransitionExt}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Adapter createTransitionExtAdapter() {
-    if (transitionExtItemProvider == null) {
-      transitionExtItemProvider = new TransitionExtItemProvider(this);
-    }
+		if (transitionExtItemProvider == null) {
+			transitionExtItemProvider = new TransitionExtItemProvider(this);
+		}
 
-    return transitionExtItemProvider;
-  }
+		return transitionExtItemProvider;
+	}
 
   /**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.PlaceExt} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.PlaceExt} instances.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected PlaceExtItemProvider placeExtItemProvider;
 
   /**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.PlaceExt}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.PlaceExt}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Adapter createPlaceExtAdapter() {
-    if (placeExtItemProvider == null) {
-      placeExtItemProvider = new PlaceExtItemProvider(this);
-    }
+		if (placeExtItemProvider == null) {
+			placeExtItemProvider = new PlaceExtItemProvider(this);
+		}
 
-    return placeExtItemProvider;
-  }
+		return placeExtItemProvider;
+	}
 
   /**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.ArcToPlaceExt} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.ArcToPlaceExt} instances.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected ArcToPlaceExtItemProvider arcToPlaceExtItemProvider;
 
   /**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.ArcToPlaceExt}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.ArcToPlaceExt}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Adapter createArcToPlaceExtAdapter() {
-    if (arcToPlaceExtItemProvider == null) {
-      arcToPlaceExtItemProvider = new ArcToPlaceExtItemProvider(this);
-    }
+		if (arcToPlaceExtItemProvider == null) {
+			arcToPlaceExtItemProvider = new ArcToPlaceExtItemProvider(this);
+		}
 
-    return arcToPlaceExtItemProvider;
-  }
+		return arcToPlaceExtItemProvider;
+	}
 
   /**
-   * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.ArcToTransitionExt} instances.
-   * <!-- begin-user-doc -->
+	 * This keeps track of the one adapter used for all {@link hub.top.editor.ptnetLoLA.ArcToTransitionExt} instances.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   protected ArcToTransitionExtItemProvider arcToTransitionExtItemProvider;
 
   /**
-   * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.ArcToTransitionExt}.
-   * <!-- begin-user-doc -->
+	 * This creates an adapter for a {@link hub.top.editor.ptnetLoLA.ArcToTransitionExt}.
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   @Override
   public Adapter createArcToTransitionExtAdapter() {
-    if (arcToTransitionExtItemProvider == null) {
-      arcToTransitionExtItemProvider = new ArcToTransitionExtItemProvider(this);
-    }
+		if (arcToTransitionExtItemProvider == null) {
+			arcToTransitionExtItemProvider = new ArcToTransitionExtItemProvider(this);
+		}
 
-    return arcToTransitionExtItemProvider;
-  }
+		return arcToTransitionExtItemProvider;
+	}
 
   /**
-   * This returns the root adapter factory that contains this factory.
-   * <!-- begin-user-doc -->
+	 * This returns the root adapter factory that contains this factory.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public ComposeableAdapterFactory getRootAdapterFactory() {
-    return parentAdapterFactory == null ? this : parentAdapterFactory.getRootAdapterFactory();
-  }
+		return parentAdapterFactory == null ? this : parentAdapterFactory.getRootAdapterFactory();
+	}
 
 	/**
-   * This sets the composed adapter factory that contains this factory.
-   * <!-- begin-user-doc -->
+	 * This sets the composed adapter factory that contains this factory.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public void setParentAdapterFactory(ComposedAdapterFactory parentAdapterFactory) {
-    this.parentAdapterFactory = parentAdapterFactory;
-  }
+		this.parentAdapterFactory = parentAdapterFactory;
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public boolean isFactoryForType(Object type) {
-    return supportedTypes.contains(type) || super.isFactoryForType(type);
-  }
+		return supportedTypes.contains(type) || super.isFactoryForType(type);
+	}
 
 	/**
-   * This implementation substitutes the factory itself as the key for the adapter.
-   * <!-- begin-user-doc -->
+	 * This implementation substitutes the factory itself as the key for the adapter.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Adapter adapt(Notifier notifier, Object type) {
-    return super.adapt(notifier, this);
-  }
+		return super.adapt(notifier, this);
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Object adapt(Object object, Object type) {
-    if (isFactoryForType(type)) {
-      Object adapter = super.adapt(object, type);
-      if (!(type instanceof Class) || (((Class<?>)type).isInstance(adapter))) {
-        return adapter;
-      }
-    }
+		if (isFactoryForType(type)) {
+			Object adapter = super.adapt(object, type);
+			if (!(type instanceof Class) || (((Class<?>)type).isInstance(adapter))) {
+				return adapter;
+			}
+		}
 
-    return null;
-  }
+		return null;
+	}
 
 	/**
-   * This adds a listener.
-   * <!-- begin-user-doc -->
+	 * This adds a listener.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public void addListener(INotifyChangedListener notifyChangedListener) {
-    changeNotifier.addListener(notifyChangedListener);
-  }
+		changeNotifier.addListener(notifyChangedListener);
+	}
 
 	/**
-   * This removes a listener.
-   * <!-- begin-user-doc -->
+	 * This removes a listener.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public void removeListener(INotifyChangedListener notifyChangedListener) {
-    changeNotifier.removeListener(notifyChangedListener);
-  }
+		changeNotifier.removeListener(notifyChangedListener);
+	}
 
 	/**
-   * This delegates to {@link #changeNotifier} and to {@link #parentAdapterFactory}.
-   * <!-- begin-user-doc -->
+	 * This delegates to {@link #changeNotifier} and to {@link #parentAdapterFactory}.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public void fireNotifyChanged(Notification notification) {
-    changeNotifier.fireNotifyChanged(notification);
+		changeNotifier.fireNotifyChanged(notification);
 
-    if (parentAdapterFactory != null) {
-      parentAdapterFactory.fireNotifyChanged(notification);
-    }
-  }
+		if (parentAdapterFactory != null) {
+			parentAdapterFactory.fireNotifyChanged(notification);
+		}
+	}
 
 	/**
-   * This disposes all of the item providers created by this factory. 
-   * <!-- begin-user-doc -->
+	 * This disposes all of the item providers created by this factory. 
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public void dispose() {
-    if (placeItemProvider != null) placeItemProvider.dispose();
-    if (ptNetItemProvider != null) ptNetItemProvider.dispose();
-    if (transitionItemProvider != null) transitionItemProvider.dispose();
-    if (nodeItemProvider != null) nodeItemProvider.dispose();
-    if (markingItemProvider != null) markingItemProvider.dispose();
-    if (placeReferenceItemProvider != null) placeReferenceItemProvider.dispose();
-    if (refMarkedPlaceItemProvider != null) refMarkedPlaceItemProvider.dispose();
-    if (annotationItemProvider != null) annotationItemProvider.dispose();
-    if (arcItemProvider != null) arcItemProvider.dispose();
-    if (arcToPlaceItemProvider != null) arcToPlaceItemProvider.dispose();
-    if (arcToTransitionItemProvider != null) arcToTransitionItemProvider.dispose();
-    if (transitionExtItemProvider != null) transitionExtItemProvider.dispose();
-    if (placeExtItemProvider != null) placeExtItemProvider.dispose();
-    if (arcToPlaceExtItemProvider != null) arcToPlaceExtItemProvider.dispose();
-    if (arcToTransitionExtItemProvider != null) arcToTransitionExtItemProvider.dispose();
-  }
+		if (placeItemProvider != null) placeItemProvider.dispose();
+		if (ptNetItemProvider != null) ptNetItemProvider.dispose();
+		if (transitionItemProvider != null) transitionItemProvider.dispose();
+		if (nodeItemProvider != null) nodeItemProvider.dispose();
+		if (markingItemProvider != null) markingItemProvider.dispose();
+		if (placeReferenceItemProvider != null) placeReferenceItemProvider.dispose();
+		if (refMarkedPlaceItemProvider != null) refMarkedPlaceItemProvider.dispose();
+		if (annotationItemProvider != null) annotationItemProvider.dispose();
+		if (arcItemProvider != null) arcItemProvider.dispose();
+		if (arcToPlaceItemProvider != null) arcToPlaceItemProvider.dispose();
+		if (arcToTransitionItemProvider != null) arcToTransitionItemProvider.dispose();
+		if (transitionExtItemProvider != null) transitionExtItemProvider.dispose();
+		if (placeExtItemProvider != null) placeExtItemProvider.dispose();
+		if (arcToPlaceExtItemProvider != null) arcToPlaceExtItemProvider.dispose();
+		if (arcToTransitionExtItemProvider != null) arcToTransitionExtItemProvider.dispose();
+	}
 
 }

@@ -23,22 +23,22 @@ import org.eclipse.emf.ecore.EClass;
  */
 public class ArcToPlaceImpl extends ArcImpl implements ArcToPlace {
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected ArcToPlaceImpl() {
-    super();
-  }
+		super();
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	protected EClass eStaticClass() {
-    return PtnetLoLAPackage.Literals.ARC_TO_PLACE;
-  }
+		return PtnetLoLAPackage.Literals.ARC_TO_PLACE;
+	}
 
 } //ArcToPlaceImpl

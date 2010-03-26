@@ -56,101 +56,101 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
  */
 public class PtnetLoLAFactoryImpl extends EFactoryImpl implements PtnetLoLAFactory {
 	/**
-   * Creates the default factory implementation.
-   * <!-- begin-user-doc -->
+	 * Creates the default factory implementation.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public static PtnetLoLAFactory init() {
-    try {
-      PtnetLoLAFactory thePtnetLoLAFactory = (PtnetLoLAFactory)EPackage.Registry.INSTANCE.getEFactory("http://www.informatik.hu-berlin.de/top/tools/editors/petrinets"); 
-      if (thePtnetLoLAFactory != null) {
-        return thePtnetLoLAFactory;
-      }
-    }
-    catch (Exception exception) {
-      EcorePlugin.INSTANCE.log(exception);
-    }
-    return new PtnetLoLAFactoryImpl();
-  }
+		try {
+			PtnetLoLAFactory thePtnetLoLAFactory = (PtnetLoLAFactory)EPackage.Registry.INSTANCE.getEFactory("http://www.informatik.hu-berlin.de/top/tools/editors/petrinets"); 
+			if (thePtnetLoLAFactory != null) {
+				return thePtnetLoLAFactory;
+			}
+		}
+		catch (Exception exception) {
+			EcorePlugin.INSTANCE.log(exception);
+		}
+		return new PtnetLoLAFactoryImpl();
+	}
 
 	/**
-   * Creates an instance of the factory.
-   * <!-- begin-user-doc -->
+	 * Creates an instance of the factory.
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public PtnetLoLAFactoryImpl() {
-    super();
-  }
+		super();
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public EObject create(EClass eClass) {
-    switch (eClass.getClassifierID()) {
-      case PtnetLoLAPackage.PLACE: return createPlace();
-      case PtnetLoLAPackage.PT_NET: return createPtNet();
-      case PtnetLoLAPackage.TRANSITION: return createTransition();
-      case PtnetLoLAPackage.NODE: return createNode();
-      case PtnetLoLAPackage.MARKING: return createMarking();
-      case PtnetLoLAPackage.PLACE_REFERENCE: return createPlaceReference();
-      case PtnetLoLAPackage.REF_MARKED_PLACE: return createRefMarkedPlace();
-      case PtnetLoLAPackage.ANNOTATION: return createAnnotation();
-      case PtnetLoLAPackage.ARC: return createArc();
-      case PtnetLoLAPackage.ARC_TO_PLACE: return createArcToPlace();
-      case PtnetLoLAPackage.ARC_TO_TRANSITION: return createArcToTransition();
-      case PtnetLoLAPackage.TRANSITION_EXT: return createTransitionExt();
-      case PtnetLoLAPackage.PLACE_EXT: return createPlaceExt();
-      case PtnetLoLAPackage.ARC_TO_PLACE_EXT: return createArcToPlaceExt();
-      case PtnetLoLAPackage.ARC_TO_TRANSITION_EXT: return createArcToTransitionExt();
-      default:
-        throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
-    }
-  }
+		switch (eClass.getClassifierID()) {
+			case PtnetLoLAPackage.PLACE: return createPlace();
+			case PtnetLoLAPackage.PT_NET: return createPtNet();
+			case PtnetLoLAPackage.TRANSITION: return createTransition();
+			case PtnetLoLAPackage.NODE: return createNode();
+			case PtnetLoLAPackage.MARKING: return createMarking();
+			case PtnetLoLAPackage.PLACE_REFERENCE: return createPlaceReference();
+			case PtnetLoLAPackage.REF_MARKED_PLACE: return createRefMarkedPlace();
+			case PtnetLoLAPackage.ANNOTATION: return createAnnotation();
+			case PtnetLoLAPackage.ARC: return createArc();
+			case PtnetLoLAPackage.ARC_TO_PLACE: return createArcToPlace();
+			case PtnetLoLAPackage.ARC_TO_TRANSITION: return createArcToTransition();
+			case PtnetLoLAPackage.TRANSITION_EXT: return createTransitionExt();
+			case PtnetLoLAPackage.PLACE_EXT: return createPlaceExt();
+			case PtnetLoLAPackage.ARC_TO_PLACE_EXT: return createArcToPlaceExt();
+			case PtnetLoLAPackage.ARC_TO_TRANSITION_EXT: return createArcToTransitionExt();
+			default:
+				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
+		}
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public Object createFromString(EDataType eDataType, String initialValue) {
-    switch (eDataType.getClassifierID()) {
-      case PtnetLoLAPackage.NODE_TYPE:
-        return createNodeTypeFromString(eDataType, initialValue);
-      default:
-        throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
-    }
-  }
+		switch (eDataType.getClassifierID()) {
+			case PtnetLoLAPackage.NODE_TYPE:
+				return createNodeTypeFromString(eDataType, initialValue);
+			default:
+				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+		}
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	public String convertToString(EDataType eDataType, Object instanceValue) {
-    switch (eDataType.getClassifierID()) {
-      case PtnetLoLAPackage.NODE_TYPE:
-        return convertNodeTypeToString(eDataType, instanceValue);
-      default:
-        throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
-    }
-  }
+		switch (eDataType.getClassifierID()) {
+			case PtnetLoLAPackage.NODE_TYPE:
+				return convertNodeTypeToString(eDataType, instanceValue);
+			default:
+				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
+		}
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public Place createPlace() {
-    PlaceImpl place = new PlaceImpl();
-    return place;
-  }
+		PlaceImpl place = new PlaceImpl();
+		return place;
+	}
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -166,173 +166,173 @@ public class PtnetLoLAFactoryImpl extends EFactoryImpl implements PtnetLoLAFacto
 	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public Transition createTransition() {
-    TransitionImpl transition = new TransitionImpl();
-    return transition;
-  }
+		TransitionImpl transition = new TransitionImpl();
+		return transition;
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public Node createNode() {
-    NodeImpl node = new NodeImpl();
-    return node;
-  }
+		NodeImpl node = new NodeImpl();
+		return node;
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public Marking createMarking() {
-    MarkingImpl marking = new MarkingImpl();
-    return marking;
-  }
+		MarkingImpl marking = new MarkingImpl();
+		return marking;
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public PlaceReference createPlaceReference() {
-    PlaceReferenceImpl placeReference = new PlaceReferenceImpl();
-    return placeReference;
-  }
+		PlaceReferenceImpl placeReference = new PlaceReferenceImpl();
+		return placeReference;
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public RefMarkedPlace createRefMarkedPlace() {
-    RefMarkedPlaceImpl refMarkedPlace = new RefMarkedPlaceImpl();
-    return refMarkedPlace;
-  }
+		RefMarkedPlaceImpl refMarkedPlace = new RefMarkedPlaceImpl();
+		return refMarkedPlace;
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public Annotation createAnnotation() {
-    AnnotationImpl annotation = new AnnotationImpl();
-    return annotation;
-  }
+		AnnotationImpl annotation = new AnnotationImpl();
+		return annotation;
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public Arc createArc() {
-    ArcImpl arc = new ArcImpl();
-    return arc;
-  }
+		ArcImpl arc = new ArcImpl();
+		return arc;
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public ArcToPlace createArcToPlace() {
-    ArcToPlaceImpl arcToPlace = new ArcToPlaceImpl();
-    return arcToPlace;
-  }
+		ArcToPlaceImpl arcToPlace = new ArcToPlaceImpl();
+		return arcToPlace;
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public ArcToTransition createArcToTransition() {
-    ArcToTransitionImpl arcToTransition = new ArcToTransitionImpl();
-    return arcToTransition;
-  }
+		ArcToTransitionImpl arcToTransition = new ArcToTransitionImpl();
+		return arcToTransition;
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public TransitionExt createTransitionExt() {
-    TransitionExtImpl transitionExt = new TransitionExtImpl();
-    return transitionExt;
-  }
+		TransitionExtImpl transitionExt = new TransitionExtImpl();
+		return transitionExt;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public PlaceExt createPlaceExt() {
-    PlaceExtImpl placeExt = new PlaceExtImpl();
-    return placeExt;
-  }
+		PlaceExtImpl placeExt = new PlaceExtImpl();
+		return placeExt;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public ArcToPlaceExt createArcToPlaceExt() {
-    ArcToPlaceExtImpl arcToPlaceExt = new ArcToPlaceExtImpl();
-    return arcToPlaceExt;
-  }
+		ArcToPlaceExtImpl arcToPlaceExt = new ArcToPlaceExtImpl();
+		return arcToPlaceExt;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
   public ArcToTransitionExt createArcToTransitionExt() {
-    ArcToTransitionExtImpl arcToTransitionExt = new ArcToTransitionExtImpl();
-    return arcToTransitionExt;
-  }
+		ArcToTransitionExtImpl arcToTransitionExt = new ArcToTransitionExtImpl();
+		return arcToTransitionExt;
+	}
 
   /**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public NodeType createNodeTypeFromString(EDataType eDataType, String initialValue) {
-    NodeType result = NodeType.get(initialValue);
-    if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
-    return result;
-  }
+		NodeType result = NodeType.get(initialValue);
+		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+		return result;
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public String convertNodeTypeToString(EDataType eDataType, Object instanceValue) {
-    return instanceValue == null ? null : instanceValue.toString();
-  }
+		return instanceValue == null ? null : instanceValue.toString();
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	public PtnetLoLAPackage getPtnetLoLAPackage() {
-    return (PtnetLoLAPackage)getEPackage();
-  }
+		return (PtnetLoLAPackage)getEPackage();
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @deprecated
-   * @generated
-   */
+	 * @deprecated
+	 * @generated
+	 */
 	@Deprecated
 	public static PtnetLoLAPackage getPackage() {
-    return PtnetLoLAPackage.eINSTANCE;
-  }
+		return PtnetLoLAPackage.eINSTANCE;
+	}
 
 } //PtnetLoLAFactoryImpl

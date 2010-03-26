@@ -23,22 +23,22 @@ import org.eclipse.emf.ecore.EClass;
  */
 public class ArcToTransitionImpl extends ArcImpl implements ArcToTransition {
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	protected ArcToTransitionImpl() {
-    super();
-  }
+		super();
+	}
 
 	/**
-   * <!-- begin-user-doc -->
+	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-   * @generated
-   */
+	 * @generated
+	 */
 	@Override
 	protected EClass eStaticClass() {
-    return PtnetLoLAPackage.Literals.ARC_TO_TRANSITION;
-  }
+		return PtnetLoLAPackage.Literals.ARC_TO_TRANSITION;
+	}
 
 } //ArcToTransitionImpl

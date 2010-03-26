@@ -7,3 +7,12 @@ in disaster management.
 This package provides an Visio XML file importer for Visio diagrams that
 use flow chart shapes. The importer generates model files and diagrams
 that comply to hub.top.lang.flowcharts
+
+To use this package, the Java source code for the Visio XML importer must
+be generated. To do this, "Generate Model Code", "Generate Edit Code", and
+"Generate Editor Code" from the ./model/vdx.genmodel file. This will produce
+Java code and Eclipse plugin files for
+
+hub.top.com.microsoft.schemas.visio._2003.vdx
+hub.top.com.microsoft.schemas.visio._2003.vdx.edit
+hub.top.com.microsoft.schemas.visio._2003.vdx.editor

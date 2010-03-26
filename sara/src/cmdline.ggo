@@ -156,7 +156,7 @@ option "joborder" J
 
 option "lookup" L
   "Size of the lookup table."
-  details="The lookup table contains saved solutions of lp_solve including their (partial) realizability. Its size defaults to 1000. Do not increase this unless you get a warning with the -v option.
+  details="The lookup table contains saved solutions of lp_solve including their (partial) realizability. Its size is normally unbounded, but you may limit it to any number (e.g. 1000) if you have memory problems.
 "
   typestr="n"
   int
@@ -170,12 +170,20 @@ option "treemaxjob" T
   int
   optional
   hidden
- 
+
+option "droppast" D
+  "Forget past jobs after some time."
+  details="Past jobs are normally remembered forever for comparison with future jobs to avoid doing jobs twice. With this option, the past memory becomes limited. Use this only if you have memory issues. A good first try might be a value of around 20. If you get repeated warnings that past jobs with the same priority have been dropped, you have set this option too low."
+  typestr="n"
+  int
+  optional
+  hidden
+  
 section "Debugging"
 
 option "break" b
   "Break after n jobs."
-  details="The program execution is stopped after the n-th job has been executed.
+  details="The program execution is stopped after the n-th job has been executed. All job queues (jobs to do, solutions, and failures) are printed. A value of zero will not terminate the program prematurely but will still print the job queues.
 "
   typestr="n"
   int

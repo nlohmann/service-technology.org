@@ -83,7 +83,7 @@ PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& 
 	}
 	pos=0;
 	verbose=0;
-	shortcutmax=1000;
+	shortcutmax=-1;
 	minimize = false;
 	passedon = false;
 	if (args_info.lookup_given) shortcutmax=(unsigned int)(args_info.lookup_arg);
@@ -159,9 +159,10 @@ bool PathFinder::recurse() {
 //			if (terminate) newps.setSolved(); // no more transitions to fire, so we have a solution
 //			tps.push_back(new PartialSolution(newps)); // put the job into the queue
 			// try to add this partial solution to the lookup table
-			if (shortcut.size()<shortcutmax) shortcut[fulltvector].push_back(newps);
+			if (shortcutmax<0 || shortcut.size()<shortcutmax) shortcut[fulltvector].push_back(newps);
 			else if (args_info.verbose_given && shortcut.size()==shortcutmax) 
 			{ 
+				cerr << "\r";
 				status("warning: lookup table too large (%d)",shortcutmax); 
 				shortcut[fulltvector].push_back(newps); 
 			}
@@ -586,69 +587,11 @@ void PathFinder::printSolution(PartialSolution* ps) {
 	cout << endl;
 }
 
-/*
-vector<Transition*> PathFinder::calcOrder(set<Transition*> tset) {
-	vector<Transition*> result;
-	set<Transition*> active,marked;
-	map<Place*,int> ch(im.getChange(rec_tv));
-	map<Place*,int>::iterator mit;
-	for(mit=ch.begin(); mit!=ch.end(); ++mit)
-	if (mit->second!=0)
-	{
-		set<Arc*>::iterator ait;
-		set<Arc*> arcs(mit->first->getPresetArcs());
-		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
-			active.insert(&((*ait)->getTransition()));
-		arcs = mit->first->getPostsetArcs();
-		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
-			active.insert(&((*ait)->getTransition()));
-	}
-	while (!tset.empty())
-	{
-		set<Place*> ack;
-		set<Transition*>::iterator tit;
-		for(tit=active.begin(); tit!=active.end(); ++tit)
-		{
-			marked.insert(*tit);
-			if (tset.find(*tit)!=tset.end()) 
-			{
-				result.push_back(*tit);
-				tset.erase(*tit);
-			}
-			map<Place*,int>& col(im.getColumn(**tit));
-			map<Place*,int>& loop(im.getLoopColumn(**tit));
-			map<Place*,int>::iterator cmit;
-			for(cmit=col.begin(); cmit!=col.end(); ++cmit) ack.insert(cmit->first);
-			map<Place*,int>::iterator lmit;
-			for(lmit=loop.begin(); lmit!=loop.end(); ++lmit) ack.insert(lmit->first);
-		}
-		active.clear();
-		set<Place*>::iterator pit;
-		for(pit=ack.begin(); pit!=ack.end(); ++pit)
-		{
-			set<Arc*>::iterator ait;
-			set<Arc*> arcs((*pit)->getPresetArcs());
-			for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
-			{
-				Transition* t(&((*ait)->getTransition()));
-				if (marked.find(t)==marked.end()) active.insert(t);
-			}
-			arcs = (*pit)->getPostsetArcs();
-			for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
-			{
-				Transition* t(&((*ait)->getTransition()));
-				if (marked.find(t)==marked.end()) active.insert(t);
-			}
-		}
-	}
-//	cerr << "TV: ";
-//	for(int i=0; i<result.size(); ++i)
-//		cerr << result[i]->getName() << " ";
-//	cerr << endl;
-	return result;
-}
+/** Componentwise comparison for m1<=m2.
+	@param m1 A transition vector.
+	@param m2 A transition vector.
+	@return True if m1<=m2.
 */
-
 bool PathFinder::isSmaller(map<Transition*,int>& m1, map<Transition*,int>& m2) {
 	map<Transition*,int>::iterator mit1,mit2;
 	for(mit2=m2.begin(),mit1=m1.begin(); mit2!=m2.end(); ++mit2)

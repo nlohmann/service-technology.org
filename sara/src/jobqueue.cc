@@ -103,8 +103,10 @@ bool JobQueue::pop_front(bool kill) {
 		if (queue.begin()->second.empty())
 			queue.erase(queue.begin());
 	}
-	if (past.size()>20) // drop things that are too far in the past and will probably not come up again
+	if (args_info.droppast_given && args_info.droppast_arg<past.size()) // drop things that are too far in the past and will probably not come up again
 	{
+		cerr << "\r";
+		status("warning: dropped all past jobs with priority %d",past.begin()->first);
 		for(unsigned int i=0; i<past.begin()->second.size(); ++i)
 			delete past.begin()->second[i];
 		past.erase(past.begin());

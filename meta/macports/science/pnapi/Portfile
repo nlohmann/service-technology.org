@@ -1,0 +1,17 @@
+# $Id$
+
+PortSystem          1.0
+
+name                pnapi
+version             4.00
+categories          science
+maintainers         niels.lohmann@uni-rostock.de
+description         Petri Net API
+long_description    The Petri Net API encapsulates Petri net-related functions in a C++ API.
+homepage            http://service-technology.org/pnapi
+platforms           darwin
+master_sites        http://service-technology.org/files/pnapi/
+
+checksums           md5 e3777c15fa1660927cd150ae118f4e99 \
+                    sha1 40f79f4bb8012f69227446b73e8eee43a493795b \
+                    rmd160 4e0f0282fdeacb99f64d151f723e3eb5cf0b5b90

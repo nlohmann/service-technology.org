@@ -1,0 +1,19 @@
+# $Id$
+
+PortSystem          1.0
+
+name                wendy
+version             2.7
+categories          science
+maintainers         niels.lohmann@uni-rostock.de
+description         Wendy
+long_description    Wendy is a tool to synthesize partners for services.
+homepage            http://service-technology.org/wendy
+platforms           darwin
+master_sites        http://service-technology.org/files/wendy/
+
+checksums           md5 ff27cc11c78bb20c99f676ea620c305d \
+                    sha1 4ef5af3325fd9342f2342206891d867e5955f401 \
+                    rmd160 d160362c5b0e6cb0d10d60e2f95d95f1694d2f5b
+
+depends_lib         port:lola

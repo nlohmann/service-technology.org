@@ -1,8 +1,7 @@
-@heading Version 3.0-unreleased
+@heading Version 3.0 (2 April 2010)
 @itemize
-@item introducing the livelock operating guideline: use @option{--correctness=livelock --og} to calculate the livelock operating guideline with appropriate annotations which are then printed out in the og-file; providing parameter @option{--dot} prints the respective annotations in the dot output
-
 @item implemented parameter @option{--pnml} to read a @acronym{PNML} file format
+
 @item moved the utility to minimize operating guidelines to the @samp{ogapi} trunk (see @url{http://svn.gna.org/viewcvs/service-tech/trunk/ogapi/})
 
 @item added a tool paper with a case study (see @file{doc/toolpaper.pdf})

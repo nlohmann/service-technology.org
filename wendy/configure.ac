@@ -1,4 +1,4 @@
-AC_INIT([Wendy], 3.0-unreleased, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
+AC_INIT([Wendy], 3.0, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
 
 AC_MSG_NOTICE([__        __             _       ])
 AC_MSG_NOTICE([\ \      / /__ _ __   __| |_   _ ])

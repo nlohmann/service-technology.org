@@ -8,13 +8,8 @@
                       http://service-technology.org/wendy
 
 
-Version 3.0-unreleased
-======================
-
-* introducing the livelock operating guideline: use `--correctness=livelock
-  --og' to calculate the livelock operating guideline with appropriate
-  annotations which are then printed out in the og-file; providing
-  parameter `--dot' prints the respective annotations in the dot output
+Version 3.0 (2 April 2010)
+==========================
 
 * implemented parameter `--pnml' to read a PNML file format
 
@@ -38,4 +33,7 @@ Version 3.0-unreleased
 
 * updated to Petri Net API 4.00 (revision r5519)
 
-\nSee file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for\ncomplete version history.\n
+
+See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
+complete version history.
+

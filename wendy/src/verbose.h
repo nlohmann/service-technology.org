@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -58,11 +58,11 @@ void displayFileError(char* filename, int lineno, char* token);
 /// whether to use colored output
 #if !defined(__MINGW32__) && !defined(USE_SYSLOG)
 const bool _useColor = isatty(fileno(stderr)) && (
-    !strcmp(getenv("TERM"), "linux") ||
-    !strcmp(getenv("TERM"), "cygwin") ||
-    !strcmp(getenv("TERM"), "xterm") ||
-    !strcmp(getenv("TERM"), "xterm-color") ||
-    !strcmp(getenv("TERM"), "xterm-256color"));
+                           !strcmp(getenv("TERM"), "linux") ||
+                           !strcmp(getenv("TERM"), "cygwin") ||
+                           !strcmp(getenv("TERM"), "xterm") ||
+                           !strcmp(getenv("TERM"), "xterm-color") ||
+                           !strcmp(getenv("TERM"), "xterm-256color"));
 #else
 const bool _useColor = false;
 #endif

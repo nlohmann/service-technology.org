@@ -39,8 +39,8 @@ using std::vector;
  */
 void Diagnosis::output_diagnosedot(std::ostream& file) {
     file << "digraph G {\n"
-        << " node [fontname=\"Helvetica\" fontsize=10]\n"
-        << " edge [fontname=\"Helvetica\" fontsize=10]\n";
+         << " node [fontname=\"Helvetica\" fontsize=10]\n"
+         << " edge [fontname=\"Helvetica\" fontsize=10]\n";
 
     // draw the nodes
     FOREACH(it, StoredKnowledge::hashTree) {
@@ -73,14 +73,14 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
                     if (inner_dead) {
                         reason += " (dl)";
                         message("node %p is blacklisted: m%u is internal deadlock",
-                            it->second[i], static_cast<size_t>(it->second[i]->inner[j]));
+                                it->second[i], static_cast<size_t>(it->second[i]->inner[j]));
                     }
                     if (not interface_sane) {
                         reason += " (mb)";
                         for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
                             if (it->second[i]->interface[j]->get(l) > InterfaceMarking::message_bound) {
                                 message("node %p is blacklisted: message bound violation on channel %s",
-                                    it->second[i], Label::id2name[l].c_str());
+                                        it->second[i], Label::id2name[l].c_str());
                             }
                         }
                     }
@@ -102,8 +102,8 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
                                 }
 
                                 for (unsigned int l = 0; l < resolvers.size(); ++l) {
-                                    char *a = p.decode();
-                                    if (a[resolvers[l]-Label::first_send] == 0) {
+                                    char* a = p.decode();
+                                    if (a[resolvers[l] - Label::first_send] == 0) {
                                         disallowedResolvers.push_back(resolvers[l]);
                                     }
                                 }
@@ -111,7 +111,7 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
                                     blacklisted = true;
                                     file << " <FONT COLOR=\"RED\">(uw)</FONT>";
                                     message("node %p is blacklisted: m%u cannot be safely resolved",
-                                        it->second[i], static_cast<size_t>(it->second[i]->inner[j]));
+                                            it->second[i], static_cast<size_t>(it->second[i]->inner[j]));
                                     hiddenStates.insert(it->second[i]->inner[j]);
                                 } else {
                                     file << " <FONT COLOR=\"ORANGE\">(w)</FONT>";
@@ -136,7 +136,7 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
                     FOREACH(it1, hiddenStates) {
                         FOREACH(it2, hiddenStates) {
                             if (*it1 != *it2) {
-                                message("you need to fix m%u", lastCommonPredecessor(*it1,*it2));
+                                message("you need to fix m%u", lastCommonPredecessor(*it1, *it2));
                             }
                         }
                     }
@@ -145,11 +145,11 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
                 // draw the edges
                 for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
                     if (it->second[i]->successors[l-1] != NULL and
-                        (StoredKnowledge::seen.find(it->second[i]->successors[l-1]) != StoredKnowledge::seen.end())) {
+                            (StoredKnowledge::seen.find(it->second[i]->successors[l-1]) != StoredKnowledge::seen.end())) {
                         file << "\"" << it->second[i] << "\" -> \""
-                            << it->second[i]->successors[l-1]
-                            << "\" [label=\"" << PREFIX(l)
-                            << Label::id2name[l] << "\"]\n";
+                             << it->second[i]->successors[l-1]
+                             << "\" [label=\"" << PREFIX(l)
+                             << Label::id2name[l] << "\"]\n";
                     }
                 }
             }
@@ -167,7 +167,7 @@ InnerMarking_ID Diagnosis::lastCommonPredecessor(InnerMarking_ID m1, InnerMarkin
         // for each marking: add yourself and your direct successors
         for (InnerMarking_ID m = 0; m < InnerMarking::stats.markings; ++m) {
             reachable[m].insert(m);
-            InnerMarking *current = InnerMarking::inner_markings[m];
+            InnerMarking* current = InnerMarking::inner_markings[m];
             for (uint8_t succ = 0; succ < current->out_degree; ++succ) {
                 reachable[m].insert(current->successors[succ]);
             }
@@ -178,7 +178,7 @@ InnerMarking_ID Diagnosis::lastCommonPredecessor(InnerMarking_ID m1, InnerMarkin
         do {
             done = true;
             for (InnerMarking_ID m = 0; m < InnerMarking::stats.markings; ++m) {
-                InnerMarking *current = InnerMarking::inner_markings[m];
+                InnerMarking* current = InnerMarking::inner_markings[m];
                 for (uint8_t succ = 0; succ < current->out_degree; ++succ) {
                     FOREACH(it, reachable[current->successors[succ]]) {
                         if (reachable[m].insert(*it).second) {

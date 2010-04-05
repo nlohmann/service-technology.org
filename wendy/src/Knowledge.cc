@@ -32,9 +32,9 @@ extern gengetopt_args_info args_info;
  ***************/
 
 Knowledge::Knowledge(InnerMarking_ID m)
-        : is_sane(1), posSendEventsDecoded(NULL), size(1), bubble(), todo(),
-          posSendEvents(NULL),
-          consideredReceivingEvents(Label::receive_events, false) {
+    : is_sane(1), posSendEventsDecoded(NULL), size(1), bubble(), todo(),
+      posSendEvents(NULL),
+      consideredReceivingEvents(Label::receive_events, false) {
     // add this marking to the bubble and the todo queue
     InterfaceMarking* empty = new InterfaceMarking();
     bubble[m].push_back(empty);
@@ -57,8 +57,8 @@ Knowledge::Knowledge(InnerMarking_ID m)
  \note no action in this constructor can introduce a duplicate
 */
 Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
-        : is_sane(1), posSendEventsDecoded(NULL), size(0), posSendEvents(NULL),
-          consideredReceivingEvents(Label::receive_events, false) {
+    : is_sane(1), posSendEventsDecoded(NULL), size(0), posSendEvents(NULL),
+      consideredReceivingEvents(Label::receive_events, false) {
     // tau does not make sense here
     assert(not SILENT(label));
 
@@ -121,7 +121,7 @@ Knowledge::Knowledge(const Knowledge* parent, const Label_ID& label)
     if (SYNC(label)) {
         FOREACH(pos, parent->bubble) {
             // check if this label makes the current inner marking possibly transient
-            if ( (InnerMarking::synchs[label].find(pos->first) != InnerMarking::synchs[label].end()) ) {
+            if ((InnerMarking::synchs[label].find(pos->first) != InnerMarking::synchs[label].end())) {
 
                 for (size_t i = 0; i < pos->second.size(); ++i) {
                     // copy the interface marking (won't change during synchronization)
@@ -323,7 +323,7 @@ bool Knowledge::receivingHelps() const {
                 bool resolved = false;
                 for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
                     if (pos->second[i]->marked(l) and
-                        InnerMarking::receivers[l].find(pos->first) != InnerMarking::receivers[l].end()) {
+                            InnerMarking::receivers[l].find(pos->first) != InnerMarking::receivers[l].end()) {
                         resolved = true;
                         break;
                     }
@@ -360,7 +360,7 @@ bool Knowledge::isWaitstateInCurrentKnowledge(const InnerMarking_ID& inner, cons
     // check if waitstate is resolved by interface marking
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (interface->marked(l) and
-            InnerMarking::receivers[l].find(inner) != InnerMarking::receivers[l].end()) {
+                InnerMarking::receivers[l].find(inner) != InnerMarking::receivers[l].end()) {
             return false;
         }
     }

@@ -38,7 +38,7 @@ class Results {
         std::string filename;
 
         /// the output object
-        Output *output;
+        Output* output;
 
         /// the stored values
         std::map<std::string, std::map<std::string, std::string> > values;

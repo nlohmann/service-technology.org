@@ -31,7 +31,7 @@
   Livelock Operating Guideline only
 
   a composite marking reflects a given stored knowledge, a certain inner marking and the respective interface
-  
+
   \todo Make this a member of StoredKnowledge?
   \todo make dfs, lowlink to size_t
 */
@@ -40,7 +40,7 @@ class CompositeMarking {
     public: /* member functions */
 
         /// constructor
-        CompositeMarking(const StoredKnowledge * _storedKnowledge,
+        CompositeMarking(const StoredKnowledge* _storedKnowledge,
                          const InnerMarking_ID _innerMarking_ID,
                          InterfaceMarking* _interface);
 
@@ -48,7 +48,7 @@ class CompositeMarking {
         ~CompositeMarking();
 
         /// returns a string representing the annotation of the composite marking with respect to the given set of knowledges
-        void getMyFormula(const std::set<StoredKnowledge *> & setOfKnowledges, SetOfEdges & setOfEdges, Clause * booleanClause, bool & emptyClause);
+        void getMyFormula(const std::set<StoredKnowledge*> & setOfKnowledges, SetOfEdges& setOfEdges, Clause* booleanClause, bool& emptyClause);
 
         /// compare two composite markings
         bool operator== (const CompositeMarking& other) const ;
@@ -62,10 +62,10 @@ class CompositeMarking {
         unsigned int lowlink;
 
         /// pointer to the stored knowledges associated with this composite marking
-        const StoredKnowledge * storedKnowledge;
+        const StoredKnowledge* storedKnowledge;
 
         /// pointer to the interface
-        InterfaceMarking * interface;
+        InterfaceMarking* interface;
 
         /// id of inner marking
         const InnerMarking_ID innerMarking_ID;
@@ -83,10 +83,10 @@ class CompositeMarkingsHandler {
     public: /* static functions */
 
         /// returns a pointer in case the given marking can be found in the set of visited markings; NULL otherwise
-        static CompositeMarking* getMarking(const CompositeMarking * marking);
+        static CompositeMarking* getMarking(const CompositeMarking* marking);
 
         /// stores given marking in the set of visited markings
-        static void visitMarking(CompositeMarking * marking);
+        static void visitMarking(CompositeMarking* marking);
 
         /// initializes all values
         static void initialize(const std::set<StoredKnowledge* > & setOfStoredKnowledges);
@@ -100,7 +100,7 @@ class CompositeMarkingsHandler {
     public: /* static attributes */
 
         /// an array storing all composite markings we have visited so far
-        static CompositeMarking ** visitedCompositeMarkings;
+        static CompositeMarking** visitedCompositeMarkings;
 
         /// stack of composite markings used for Tarjan algorithm
         static std::vector<CompositeMarking* > tarjanStack;

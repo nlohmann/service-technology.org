@@ -69,11 +69,11 @@ Clause* Clause::falseClause = reinterpret_cast<Clause*>(1);
  ******************/
 
 Clause::_stats::_stats()
-        : cumulativeSizeAllClauses(0), maximalSizeOfClause(0) {}
+    : cumulativeSizeAllClauses(0), maximalSizeOfClause(0) {}
 
 
 void Clause::initialize() {
-    bytes = ((Label::last_sync - 1) / 8) +1;
+    bytes = ((Label::last_sync - 1) / 8) + 1;
 }
 
 
@@ -86,7 +86,7 @@ void Clause::initialize() {
   \note we assume sizeof(uint8_t) == 1
 */
 Clause::Clause()
-  : storage((uint8_t*)calloc(bytes, 1)), finalKnowledges(NULL), numberOfFinalKnowledges(0), more_than_one_literal(0), decodedLabels(NULL) {
+    : storage((uint8_t*)calloc(bytes, 1)), finalKnowledges(NULL), numberOfFinalKnowledges(0), more_than_one_literal(0), decodedLabels(NULL) {
 
     assert(bytes > 0);
 }
@@ -118,7 +118,7 @@ Clause::~Clause() {
 */
 void Clause::addFinalKnowledge(const StoredKnowledge* _finalKnowledge) {
     if (finalKnowledges == NULL) {
-        if (not (finalKnowledges = (FinalKnowledge**) calloc(1, sizeof(FinalKnowledge*)))) {
+        if (not(finalKnowledges = (FinalKnowledge**) calloc(1, sizeof(FinalKnowledge*)))) {
             return ;
         }
     } else {
@@ -130,12 +130,12 @@ void Clause::addFinalKnowledge(const StoredKnowledge* _finalKnowledge) {
             }
         }
 
-        if (not (finalKnowledges = (FinalKnowledge**) realloc(finalKnowledges, (numberOfFinalKnowledges + 1) * sizeof(FinalKnowledge*)))) {
+        if (not(finalKnowledges = (FinalKnowledge**) realloc(finalKnowledges, (numberOfFinalKnowledges + 1) * sizeof(FinalKnowledge*)))) {
             return ;
         }
     }
 
-    FinalKnowledge * finalKnowledge = new FinalKnowledge(_finalKnowledge);
+    FinalKnowledge* finalKnowledge = new FinalKnowledge(_finalKnowledge);
 
     // store the given knowledge
     finalKnowledges[numberOfFinalKnowledges] = finalKnowledge;
@@ -155,8 +155,8 @@ void Clause::labelPossible(const Label_ID& l) {
     assert(storage != NULL);
     assert(SENDING(l) or RECEIVING(l) or SYNC(l));
 
-    const uint8_t myByte = (l-1) / 8;
-    const uint8_t myBit  = (l-1) % 8;
+    const uint8_t myByte = (l - 1) / 8;
+    const uint8_t myBit  = (l - 1) % 8;
     storage[myByte] += (1 << myBit);
 }
 
@@ -220,7 +220,7 @@ void Clause::decode() {
   \param dot the string shall be used in the dot output or not
   \param file a stream to which this clause goes to
 */
-void Clause::printToStream(const bool & dot, std::ostream& file) {
+void Clause::printToStream(const bool& dot, std::ostream& file) {
     // create the annotation of the current set of knowledges
     std::string stringOr = (dot) ? " &or; " : " + ";
 

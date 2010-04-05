@@ -82,7 +82,7 @@ void InnerMarking::initialize() {
     finalMarkingReachableMap.clear();
 
     status("stored %d inner markings (%d final, %d bad, %d inevitable deadlocks)",
-        stats.markings, stats.final_markings, stats.bad_states, stats.inevitable_deadlocks);
+           stats.markings, stats.final_markings, stats.bad_states, stats.inevitable_deadlocks);
 
     // in case of calculating the livelock operating guideline, we print out whether the inner is cyclic or not
     if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
@@ -115,9 +115,9 @@ InnerMarking::InnerMarking(const InnerMarking_ID& myId,
                            const std::vector<Label_ID>& _labels,
                            const std::vector<InnerMarking_ID>& _successors,
                            const bool& _is_final)
-        : is_final(_is_final), is_waitstate(0), is_bad(0),
-          out_degree(_successors.size()), labels(new Label_ID[out_degree]),
-          successors(new InnerMarking_ID[out_degree]), possibleSendEvents(NULL) {
+    : is_final(_is_final), is_waitstate(0), is_bad(0),
+      out_degree(_successors.size()), labels(new Label_ID[out_degree]),
+      successors(new InnerMarking_ID[out_degree]), possibleSendEvents(NULL) {
     assert(_labels.size() == out_degree);
     assert(out_degree < UCHAR_MAX);
 
@@ -191,8 +191,8 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
     for (uint8_t i = 0; i < out_degree; ++i) {
         // if a single successor is not a deadlock, everything is OK
         if (markingMap[successors[i]] != NULL and
-            deadlock_inevitable and
-            not markingMap[successors[i]]->is_bad) {
+                deadlock_inevitable and
+                not markingMap[successors[i]]->is_bad) {
             deadlock_inevitable = false;
         }
 
@@ -203,7 +203,7 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
 
         if (args_info.correctness_arg == correctness_arg_livelock) {
             if (markingMap[successors[i]] != NULL and
-                finalMarkingReachableMap[successors[i]]) {
+                    finalMarkingReachableMap[successors[i]]) {
                 finalMarkingReachableMap[myId] = true;
             }
         }
@@ -216,8 +216,8 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
 
     // deadlock cannot be avoided any more -- treat this marking as deadlock
     if (not is_final and
-        not is_bad and
-        deadlock_inevitable) {
+            not is_bad and
+            deadlock_inevitable) {
         is_bad = 1;
         ++stats.inevitable_deadlocks;
     }
@@ -296,7 +296,7 @@ void InnerMarking::calcReachableSendingEvents() {
                     (finalMarkingReachableMap.find(successors[i]) != finalMarkingReachableMap.end())) {
 
                 // direct successor reachable by sending event
-                if (SENDING(labels[i]) and (consideredLabels.find(labels[i]) == consideredLabels.end())) {
+                if (SENDING(labels[i]) and(consideredLabels.find(labels[i]) == consideredLabels.end())) {
 
                     // add current sending event
                     *possibleSendEvents |= PossibleSendEvents(false, labels[i]);
@@ -336,7 +336,7 @@ void InnerMarking::analyzeSCCOfInnerMarkings(std::set<InnerMarking_ID>& markingS
     FOREACH(iScc, markingSet) {
         // for each successor which is part of the current SCC, register the predecessor
 
-        InnerMarking * currentInnerMarking = markingMap.find((*iScc))->second;
+        InnerMarking* currentInnerMarking = markingMap.find((*iScc))->second;
 
         // get predecessor within current SCC
         for (uint8_t i = 0; i < currentInnerMarking->out_degree; i++) {
@@ -364,7 +364,7 @@ void InnerMarking::analyzeSCCOfInnerMarkings(std::set<InnerMarking_ID>& markingS
     }
 
     // remember possible sending events
-    PossibleSendEvents * tmpPossibleSendEvents = new PossibleSendEvents();
+    PossibleSendEvents* tmpPossibleSendEvents = new PossibleSendEvents();
 
     // evaluate each member
     while (not markingSet.empty()) {
@@ -386,7 +386,7 @@ void InnerMarking::analyzeSCCOfInnerMarkings(std::set<InnerMarking_ID>& markingS
         currentInnerMarking->calcReachableSendingEvents();
 
         // set of possible sending events has changed, so inform predecessors
-        if (not (*tmpPossibleSendEvents == *(currentInnerMarking->possibleSendEvents))) {
+        if (not(*tmpPossibleSendEvents == *(currentInnerMarking->possibleSendEvents))) {
             // tell each predecessor of current inner marking that the possibe sending events from this inner marking have changed
             /// \todo looks as if a set union would do the job here
             markingSet.insert(tempPredecessors[currentInnerMarkingID].begin(), tempPredecessors[currentInnerMarkingID].end());
@@ -413,7 +413,7 @@ void InnerMarking::finalMarkingReachableSCC(std::set<InnerMarking_ID>& markingSe
 
     // evaluate each member of the SCC
     FOREACH(iScc, markingSet) {
-        InnerMarking * currentInnerMarking = markingMap.find((*iScc))->second;
+        InnerMarking* currentInnerMarking = markingMap.find((*iScc))->second;
 
         // get successor of current inner marking
         for (uint8_t i = 0; i < currentInnerMarking->out_degree; i++) {

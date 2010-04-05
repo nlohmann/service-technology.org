@@ -37,7 +37,7 @@
   constructor
   \todo check if this constructor is always called before CompositeMarkingsHandler::getMarking() -- if yes, combine them
 */
-CompositeMarking::CompositeMarking(const StoredKnowledge * _storedKnowledge,
+CompositeMarking::CompositeMarking(const StoredKnowledge* _storedKnowledge,
                                    const InnerMarking_ID _innerMarking_ID,
                                    InterfaceMarking* _interface) : dfs(0), lowlink(0), storedKnowledge(_storedKnowledge), interface(_interface), innerMarking_ID(_innerMarking_ID)
 
@@ -66,10 +66,10 @@ CompositeMarking::~CompositeMarking() {
   \param booleanClause a pointer to the Boolean clause of the composite marking
   \param emptyClause if true, the clause of this composite marking is empty
 */
-void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledgeSet,
-                                    SetOfEdges & setOfEdges,
-                                    Clause * booleanClause,
-                                    bool & emptyClause) {
+void CompositeMarking::getMyFormula(const std::set<StoredKnowledge*> & knowledgeSet,
+                                    SetOfEdges& setOfEdges,
+                                    Clause* booleanClause,
+                                    bool& emptyClause) {
 
     // edges that belong to the stored knowledge
     std::set<Label_ID> edges;
@@ -87,10 +87,10 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledg
     for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
         // receiving event resolves deadlock
         if (interface->marked(l) and
-            (knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end() or
-                    (useEdges and edges.find(l-1) == edges.end())) and
-            storedKnowledge->successors[l-1] != NULL and storedKnowledge->successors[l-1] != StoredKnowledge::empty and
-            storedKnowledge->successors[l-1]->is_sane) {
+                (knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end() or
+                 (useEdges and edges.find(l - 1) == edges.end())) and
+                storedKnowledge->successors[l-1] != NULL and storedKnowledge->successors[l-1] != StoredKnowledge::empty and
+                storedKnowledge->successors[l-1]->is_sane) {
 
             booleanClause->labelPossible(l);
             emptyClause = false;
@@ -102,7 +102,7 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledg
         // synchronous communication resolves deadlock
         if (InnerMarking::synchs[l].find(innerMarking_ID) != InnerMarking::synchs[l].end() and
                 (knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end() or
-                        (useEdges and edges.find(l-1) == edges.end())) and
+                 (useEdges and edges.find(l - 1) == edges.end())) and
                 storedKnowledge->successors[l-1] != NULL and storedKnowledge->successors[l-1] != StoredKnowledge::empty and
                 storedKnowledge->successors[l-1]->is_sane) {
 
@@ -114,7 +114,7 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledg
     // collect outgoing !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if ((knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end()  or
-                (useEdges and edges.find(l-1) == edges.end())) and
+                (useEdges and edges.find(l - 1) == edges.end())) and
                 storedKnowledge->successors[l-1] != NULL and
                 storedKnowledge->successors[l-1]->is_sane) {
 
@@ -133,7 +133,7 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge *> & knowledg
 
 bool CompositeMarking::operator== (const CompositeMarking& other) const {
 
-    if (storedKnowledge != other.storedKnowledge or innerMarking_ID != other.innerMarking_ID or *interface != *(other.interface)) {
+    if (storedKnowledge != other.storedKnowledge or innerMarking_ID != other.innerMarking_ID or* interface != *(other.interface)) {
         return false;
     }
 
@@ -149,7 +149,7 @@ bool CompositeMarking::operator== (const CompositeMarking& other) const {
  * STATIC MEMBERS *
  ******************/
 
-CompositeMarking ** CompositeMarkingsHandler::visitedCompositeMarkings = NULL;
+CompositeMarking** CompositeMarkingsHandler::visitedCompositeMarkings = NULL;
 std::vector<CompositeMarking* > CompositeMarkingsHandler::tarjanStack;
 unsigned int CompositeMarkingsHandler::numberElements = 0;
 unsigned int CompositeMarkingsHandler::maxSize = 0;
@@ -165,15 +165,15 @@ std::vector<Clause* > CompositeMarkingsHandler::conjunctionOfDisjunctionsBoolean
   checks if the given marking has been visited already, if so return a pointer to the marking otherwise return NULL
   Note: in case the marking has been found, you may need to delete the given marking afterwards
   \param marking composite marking to be looked for
-  
+
   \todo Niels thinks the for loop can be simplified
 */
-CompositeMarking* CompositeMarkingsHandler::getMarking(const CompositeMarking * marking) {
+CompositeMarking* CompositeMarkingsHandler::getMarking(const CompositeMarking* marking) {
     if (numberElements == 0) {
         return NULL;
     }
 
-    CompositeMarking * storedMarking;
+    CompositeMarking* storedMarking;
 
     for (unsigned int i = 0; i < numberElements; ++i) {
         storedMarking = visitedCompositeMarkings[i];
@@ -193,7 +193,7 @@ CompositeMarking* CompositeMarkingsHandler::getMarking(const CompositeMarking * 
   store the given marking in the set of visited markings and set the Tarjan values of the marking to the current number of elements stored
   \param marking composite marking to be stored
 */
-void CompositeMarkingsHandler::visitMarking(CompositeMarking * marking) {
+void CompositeMarkingsHandler::visitMarking(CompositeMarking* marking) {
 
     assert(visitedCompositeMarkings != NULL);
     assert(numberElements < maxSize);
@@ -209,7 +209,7 @@ void CompositeMarkingsHandler::visitMarking(CompositeMarking * marking) {
   adds the given string clause to the conjunction of disjunctions associated with the current set of knowledges
   \param booleanClause a string containing a disjunction of events
 */
-void CompositeMarkingsHandler::addClause(Clause * booleanClause) {
+void CompositeMarkingsHandler::addClause(Clause* booleanClause) {
 
     // add whole clause to the conjunction of clauses
     conjunctionOfDisjunctionsBoolean.push_back(booleanClause);

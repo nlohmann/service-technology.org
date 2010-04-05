@@ -35,7 +35,7 @@
 /*!
     constructor
 */
-Edge::Edge(const StoredKnowledge* _knowledge, const Label_ID & _edge) : knowledge(_knowledge), edge(_edge) {
+Edge::Edge(const StoredKnowledge* _knowledge, const Label_ID& _edge) : knowledge(_knowledge), edge(_edge) {
 
 }
 
@@ -95,7 +95,7 @@ SCSHandler::~SCSHandler() {
     \todo  call error() in case no memory is returned from calloc/realloc
     \todo  Check if adding 1 element to mandatoryEdges can be improved
 */
-void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) {
+void SCSHandler::initialize(SetOfEdges& SCS, unsigned int& _numberOfAllEdges) {
 
     assert(mandatoryEdges == NULL);
 
@@ -107,14 +107,14 @@ void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) 
 
     // C array of edges needed to generate a subsystem of edges quickly
     edges = new Edge*[numberOfAllEdges];
-    
+
     unsigned int i = 0;
 
     // collect all incoming edges of one knowledge
     std::map<StoredKnowledge* , std::set< unsigned int > > incomingEdges;
 
     // initialize vector of mandatory edges
-    if (not (mandatoryEdges = (unsigned int*) calloc(1, sizeof(unsigned int)))) {
+    if (not(mandatoryEdges = (unsigned int*) calloc(1, sizeof(unsigned int)))) {
         return ;
     }
 
@@ -123,7 +123,7 @@ void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) 
         unsigned int edgeBitmask = 0;
 
         FOREACH(iterEdges, iter->second) {
-            Edge * edgeObject = new Edge((*iter).first, *iterEdges);
+            Edge* edgeObject = new Edge((*iter).first, *iterEdges);
 
             edges[i] = edgeObject;
 
@@ -138,7 +138,7 @@ void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) 
 
         // we can't skip the outgoing edges of the current knowledge when calculating a subsystem --> they are mandatory
         ++numberOfMandatoryEdges;
-        if (not (mandatoryEdges = (unsigned int*) realloc(mandatoryEdges, numberOfMandatoryEdges * sizeof(unsigned int)))) {
+        if (not(mandatoryEdges = (unsigned int*) realloc(mandatoryEdges, numberOfMandatoryEdges * sizeof(unsigned int)))) {
             return ;
         }
 
@@ -158,7 +158,7 @@ void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) 
         }
 
         ++numberOfMandatoryEdges;
-        if (not (mandatoryEdges = (unsigned int*) realloc(mandatoryEdges, numberOfMandatoryEdges * sizeof(unsigned int)))) {
+        if (not(mandatoryEdges = (unsigned int*) realloc(mandatoryEdges, numberOfMandatoryEdges * sizeof(unsigned int)))) {
             return ;
         }
 
@@ -180,7 +180,7 @@ void SCSHandler::initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges) 
     \param n bitmask
 */
 unsigned int SCSHandler::bitCount(unsigned int n) {
-    return (n==0) ? 0 : (n & 1) + bitCount( n / 2 );
+    return (n == 0) ? 0 : (n & 1) + bitCount(n / 2);
 }
 
 
@@ -216,7 +216,7 @@ bool SCSHandler::containsMandatoryEdges() const {
     \return true, if there exists a next subsystem; false, otherwise
 */
 bool SCSHandler::nextSubsystem() const {
-    return (currentBitMask < (unsigned int) (1 << numberOfAllEdges));
+    return (currentBitMask < (unsigned int)(1 << numberOfAllEdges));
 }
 
 
@@ -226,7 +226,7 @@ bool SCSHandler::nextSubsystem() const {
 SetOfEdges SCSHandler::getNextSubsystem() {
 
     // current bitmask is valid
-    assert(currentBitMask < (unsigned int) (1 << numberOfAllEdges));
+    assert(currentBitMask < (unsigned int)(1 << numberOfAllEdges));
 
     SetOfEdges subsystem;
 
@@ -234,12 +234,12 @@ SetOfEdges SCSHandler::getNextSubsystem() {
     // a subsystem has to have a minimum number of edges and
     // has to contain all mandatory edges
     if (bitCount(currentBitMask) < minNumberOfEdges or not containsMandatoryEdges()) {
-         ++currentBitMask;
-         return subsystem;
+        ++currentBitMask;
+        return subsystem;
     }
 
     for (unsigned int i = 0; i < numberOfAllEdges; ++i) {
-        if ( (currentBitMask & (1 << i)) > 0 ) {
+        if ((currentBitMask & (1 << i)) > 0) {
             subsystem[edges[i]->knowledge].insert(edges[i]->edge);
         }
     }

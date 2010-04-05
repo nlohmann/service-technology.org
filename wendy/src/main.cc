@@ -43,8 +43,8 @@
 
 
 // input files
-extern FILE *graph_in;
-extern FILE *cover_in;
+extern FILE* graph_in;
+extern FILE* cover_in;
 
 // the parsers
 extern int graph_parse();
@@ -59,7 +59,7 @@ gengetopt_args_info args_info;
 std::string invocation;
 
 /// a file to store a mapping from marking ids to actual Petri net markings
-Output *markingoutput = NULL;
+Output* markingoutput = NULL;
 
 /// a variable holding the time of the call
 clock_t start_clock = clock();
@@ -83,7 +83,7 @@ void evaluateParameters(int argc, char** argv) {
     }
 
     // initialize the parameters structure
-    struct cmdline_parser_params *params = cmdline_parser_params_create();
+    struct cmdline_parser_params* params = cmdline_parser_params_create();
 
     // call the cmdline parser
     if (cmdline_parser(argc, argv, &args_info) != 0) {
@@ -92,8 +92,10 @@ void evaluateParameters(int argc, char** argv) {
 
     // debug option
     if (args_info.bug_flag) {
-        { Output debug_output("bug.log", "configuration information");
-          debug_output.stream() << CONFIG_LOG; }
+        {
+            Output debug_output("bug.log", "configuration information");
+            debug_output.stream() << CONFIG_LOG;
+        }
         message("Please send file '%s' to %s!", _cfilename_("bug.log"), _coutput_(PACKAGE_BUGREPORT));
         exit(EXIT_SUCCESS);
     }
@@ -114,8 +116,8 @@ void evaluateParameters(int argc, char** argv) {
         // check for configuration files
         std::string conf_generic_filename = std::string(PACKAGE) + ".conf";
         std::string conf_filename = fileExists(conf_generic_filename) ? conf_generic_filename :
-                               (fileExists(std::string(SYSCONFDIR) + "/" + conf_generic_filename) ?
-                               (std::string(SYSCONFDIR) + "/" + conf_generic_filename) : "");
+                                    (fileExists(std::string(SYSCONFDIR) + "/" + conf_generic_filename) ?
+                                     (std::string(SYSCONFDIR) + "/" + conf_generic_filename) : "");
 
         if (conf_filename != "") {
             // initialize the config file parser
@@ -226,7 +228,7 @@ int main(int argc, char** argv) {
             s << pnapi::io::stat << *InnerMarking::net;
             status("read net: %s", s.str().c_str());
         }
-    } catch(pnapi::exception::InputError error) {
+    } catch (pnapi::exception::InputError error) {
         std::ostringstream s;
         s << error;
         abort(2, "\b%s", s.str().c_str());
@@ -335,7 +337,7 @@ int main(int argc, char** argv) {
 
     // statistics output
     status("stored %d knowledges, %d edges [%.0f sec]",
-        StoredKnowledge::stats.storedKnowledges, StoredKnowledge::stats.storedEdges, difftime(end_time, start_time));
+           StoredKnowledge::stats.storedKnowledges, StoredKnowledge::stats.storedEdges, difftime(end_time, start_time));
 
     // traverse all nodes reachable from the root
     StoredKnowledge::root->traverse();
@@ -379,9 +381,9 @@ int main(int argc, char** argv) {
         InnerMarking::output_results(results);
         Label::output_results(results);
 
-        results.add("meta.package_name", (char *)PACKAGE_NAME);
-        results.add("meta.package_version", (char *)PACKAGE_VERSION);
-        results.add("meta.svn_version", (char *)VERSION_SVN);
+        results.add("meta.package_name", (char*)PACKAGE_NAME);
+        results.add("meta.package_version", (char*)PACKAGE_VERSION);
+        results.add("meta.svn_version", (char*)VERSION_SVN);
         results.add("meta.invocation", invocation);
     }
 

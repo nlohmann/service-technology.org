@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -82,7 +82,7 @@ void Label::initialize() {
 
 
     // ASYNCHRONOUS RECEIVE SEND (!-step for us)
-    first_send = events+1;
+    first_send = events + 1;
 
     const set<pnapi::Label*> inputLabels(InnerMarking::net->getInterface().getInputLabels());
 
@@ -102,7 +102,7 @@ void Label::initialize() {
 
 
     // SYNCHRONOUS EVENTS (#-step for us)
-    first_sync = events+1;
+    first_sync = events + 1;
 
     // collect the labels
     std::map<string, Label_ID> sync_labels;
@@ -110,10 +110,10 @@ void Label::initialize() {
     FOREACH(l, sync_label_names) {
         sync_labels[(**l).getName()] = ++events;
         id2name[events] = (**l).getName();
-        
+
         const set<Transition*> trans((**l).getTransitions());
         FOREACH(t, trans) {
-          name2id[(**t).getName()] = events;
+            name2id[(**t).getName()] = events;
         }
     }
 

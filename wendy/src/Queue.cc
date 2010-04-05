@@ -30,9 +30,9 @@ size_t Queue::maximal_objects = 0;
 
 
 Queue::Queue()
-  : interface(static_cast<InterfaceMarking**>(malloc(initial_length * SIZEOF_VOIDP))),
-    inner(static_cast<InnerMarking_ID*>(malloc(initial_length * sizeof(InnerMarking_ID)))),
-    first(0), last(0) {
+    : interface(static_cast<InterfaceMarking**>(malloc(initial_length* SIZEOF_VOIDP))),
+      inner(static_cast<InnerMarking_ID*>(malloc(initial_length* sizeof(InnerMarking_ID)))),
+      first(0), last(0) {
     assert(interface);
     assert(inner);
     maximal_objects = (++current_objects > maximal_objects) ? current_objects : maximal_objects;
@@ -66,7 +66,7 @@ InterfaceMarking* Queue::popInterface() {
 }
 
 const InnerMarking_ID& Queue::popInner() {
-    assert(first-1 != last);
+    assert(first - 1 != last);
 
     return inner[first-1];
 }

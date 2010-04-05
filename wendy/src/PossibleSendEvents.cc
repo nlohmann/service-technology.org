@@ -39,7 +39,7 @@ uint8_t PossibleSendEvents::bytes = 0;
  ******************/
 
 void PossibleSendEvents::initialize() {
-    bytes = ((Label::send_events-1) / 8) +1;
+    bytes = ((Label::send_events - 1) / 8) + 1;
     status("send event detection requires %d bytes per inner marking", bytes);
 }
 
@@ -53,7 +53,7 @@ void PossibleSendEvents::initialize() {
   \note we assume sizeof(uint8_t) == 1
 */
 PossibleSendEvents::PossibleSendEvents()
-  : storage((uint8_t*)calloc(bytes, 1)), decodedLabels(NULL) {
+    : storage((uint8_t*)calloc(bytes, 1)), decodedLabels(NULL) {
     assert(bytes > 0);
 }
 
@@ -66,9 +66,9 @@ PossibleSendEvents::PossibleSendEvents()
   \note we assume sizeof(uint8_t) == 1
 */
 PossibleSendEvents::PossibleSendEvents(const bool& allValues, const Label_ID& l)
-  : storage((uint8_t*)malloc(bytes)), decodedLabels(NULL) {
+    : storage((uint8_t*)malloc(bytes)), decodedLabels(NULL) {
     assert(bytes > 0);
-    assert((allValues and l <= 1) or (not allValues and SENDING(l)));
+    assert((allValues and l <= 1) or(not allValues and SENDING(l)));
 
     // if allValues is set, initially all sending events are reachable
     memset(storage, (allValues ? 255 : 0), bytes);

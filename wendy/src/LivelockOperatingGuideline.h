@@ -50,18 +50,17 @@ class LivelockOperatingGuideline {
     public: /* static attributes */
         /// struct combining the statistics on the class LivelockOperatingGuideline
         static struct _stats {
-            public:
-                /// constructor
-                _stats();
+            /// constructor
+            _stats();
 
-                /// number of strongly connected sets within all knowledges
-                unsigned int numberOfSCSs;
+            /// number of strongly connected sets within all knowledges
+            unsigned int numberOfSCSs;
 
-                /// number of terminal strongly connected sets within all SCSs
-                unsigned int numberOfTSCCInSCSs;
+            /// number of terminal strongly connected sets within all SCSs
+            unsigned int numberOfTSCCInSCSs;
 
-                /// the number of all annotation elements
-                unsigned int numberAllElementsAnnotations;
+            /// the number of all annotation elements
+            unsigned int numberAllElementsAnnotations;
         } stats;
 
         /// livelock operating guideline only: annotation of all strongly connected sets
@@ -79,31 +78,31 @@ class LivelockOperatingGuideline {
         static void generateLLOG();
 
         /// write the annotation of the livelock operating guideline to the given output stream
-        static void output(const bool & dot, std::ostream& file);
+        static void output(const bool& dot, std::ostream& file);
 
     private: /* static functions */
 
         /// get all strongly connected components of the given set of knowledges
         inline static bool getSCCs(const std::set<StoredKnowledge* > & toBeVisited,
-                                   SetOfSCCs & setOfSCCs,
-                                   SetOfEdges & setOfEdges,
-                                   const bool & ignoreEdges);
+                                   SetOfSCCs& setOfSCCs,
+                                   SetOfEdges& setOfEdges,
+                                   const bool& ignoreEdges);
 
         /// searches for the given knowledge in the Tarjan stack
         inline static bool findNodeInStack(const StoredKnowledge* currentNode);
 
         /// get all edges the knowledges of the given SCS are connected with
         static void getEdgesOfSCS(const std::set<StoredKnowledge* > &  SCS,
-                                  SetOfEdges & setOfEdges,
-                                  unsigned int & countEdges);
+                                  SetOfEdges& setOfEdges,
+                                  unsigned int& countEdges);
 
         /// recursive function to get the strongly connected components
         static bool getSCCsRecursively(StoredKnowledge* currentNode,
-                                std::set<StoredKnowledge* > & visited,
-                                const std::set<StoredKnowledge* > & toBeVisited,
-                                SetOfEdges & setOfEdges,
-                                SetOfSCCs & setOfSCCs,
-                                const bool & ignoreEdges);
+                                       std::set<StoredKnowledge* > & visited,
+                                       const std::set<StoredKnowledge* > & toBeVisited,
+                                       SetOfEdges& setOfEdges,
+                                       SetOfSCCs& setOfSCCs,
+                                       const bool& ignoreEdges);
 
         /// recursive function to get the strongly connected sets
         static void getStronglyConnectedSetsRecursively(std::set<StoredKnowledge* > & fixedNodes,
@@ -111,27 +110,27 @@ class LivelockOperatingGuideline {
 
         /// get all terminal strongly connected components within the set of knowledges
         inline static void calculateTSCCInKnowledgeSet(const std::set<StoredKnowledge* > & knowledgeSCS,
-                                                       SetOfEdges & setOfEdges);
+                                                       SetOfEdges& setOfEdges);
 
         /// recursive function to get all terminal strongly connected components
-        static void calculateTSCCInKnowledgeSetRecursively(CompositeMarking * currentMarking,
+        static void calculateTSCCInKnowledgeSetRecursively(CompositeMarking* currentMarking,
                                                            const std::set<StoredKnowledge* > & knowledgeSCS,
-                                                           SetOfEdges & setOfEdges);
+                                                           SetOfEdges& setOfEdges);
 
         /// returns the pointer to the marking that corresponds to the given parameters
-        inline static CompositeMarking * getSuccessorMarking(const StoredKnowledge * storedKnowledge,
-                                                      const InnerMarking_ID innerMarking,
-                                                      InterfaceMarking * interface,
-                                                      bool & foundSuccessorMarking);
+        inline static CompositeMarking* getSuccessorMarking(const StoredKnowledge* storedKnowledge,
+                                                            const InnerMarking_ID innerMarking,
+                                                            InterfaceMarking* interface,
+                                                            bool& foundSuccessorMarking);
 
         /// inner marking is really a waitstate in the context of the current knowledge
         inline static bool isWaitstateInCurrentKnowledge(const InnerMarking_ID& inner, const InterfaceMarking* interface);
 
         /// write the annotation of the livelock operating guideline to the given output stream
-        static void output_acyclic(const bool & dot, std::ostream& file);
+        static void output_acyclic(const bool& dot, std::ostream& file);
 
         /// write the annotation of the livelock operating guideline to the given output stream
-        static void output_cyclic(const bool & dot, std::ostream& file);
+        static void output_cyclic(const bool& dot, std::ostream& file);
 };
 
 #endif /* LIVELOCKOPERATINGGUIDELINE_H_ */

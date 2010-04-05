@@ -41,10 +41,10 @@ class Edge {
     public:
 
         /// constructor
-        Edge(const StoredKnowledge* _knowledge, const Label_ID & _edge);
+        Edge(const StoredKnowledge* _knowledge, const Label_ID& _edge);
 
         /// knowledge which has the outgoing edge stored here
-        const StoredKnowledge * knowledge;
+        const StoredKnowledge* knowledge;
 
         /// label of the outgoing edge
         const Label_ID edge;
@@ -70,7 +70,7 @@ class SCSHandler {
         Edge** edges;
 
         /// (known) mandatory edges for keeping the SCS connected
-        unsigned int * mandatoryEdges;
+        unsigned int* mandatoryEdges;
 
         /// number of all edges
         unsigned int numberOfAllEdges;
@@ -107,7 +107,7 @@ class SCSHandler {
         SetOfEdges getNextSubsystem();
 
         /// initializes the handler
-        void initialize(SetOfEdges & SCS, unsigned int & _numberOfAllEdges);
+        void initialize(SetOfEdges& SCS, unsigned int& _numberOfAllEdges);
 
 };
 

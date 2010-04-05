@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 #ifndef COVER_H_
@@ -36,110 +36,110 @@
 
 /*!
  * \brief cover class
- * 
- * The cover class holds all variables and methods to calculate 
+ *
+ * The cover class holds all variables and methods to calculate
  * the global contraint of an operating guideline to cover
- * certain places or transitions. 
+ * certain places or transitions.
  */
 class Cover {
-public: /* data structures */
-  /// struct to collect all nodes to be covered
-  struct CoverData {
-    /// internal places
-    std::vector<unsigned int> inP;
-    /// interface places
-    std::vector<unsigned int> comP;
-    /// internal transitions
-    std::vector<unsigned int> inT;
-    /// interface transitions
-    std::vector<unsigned int> comT;
-  };
+    public: /* data structures */
+        /// struct to collect all nodes to be covered
+        struct CoverData {
+            /// internal places
+            std::vector<unsigned int> inP;
+            /// interface places
+            std::vector<unsigned int> comP;
+            /// internal transitions
+            std::vector<unsigned int> inT;
+            /// interface transitions
+            std::vector<unsigned int> comT;
+        };
 
-private: /* static attributes */
+    private: /* static attributes */
 
-  /// array of internal places to cover
-  static std::string* internalPlaces;
+        /// array of internal places to cover
+        static std::string* internalPlaces;
 
-  /// number of internal places to cover
-  static unsigned int internalPlaceCount;
+        /// number of internal places to cover
+        static unsigned int internalPlaceCount;
 
-  /// array of internal transitions to cover
-  static std::string* internalTransitions;
+        /// array of internal transitions to cover
+        static std::string* internalTransitions;
 
-  /// number of internal transitions to cover
-  static unsigned int internalTransitionCount;
+        /// number of internal transitions to cover
+        static unsigned int internalTransitionCount;
 
-  /// array of interface places to cover
-  static std::string* interfacePlaces;
+        /// array of interface places to cover
+        static std::string* interfacePlaces;
 
-  /// number of interface places to cover
-  static unsigned int interfacePlaceCount;
+        /// number of interface places to cover
+        static unsigned int interfacePlaceCount;
 
-  /// array of interface transitions to cover
-  static std::string* interfaceTransitions;
+        /// array of interface transitions to cover
+        static std::string* interfaceTransitions;
 
-  /// number of interface transitions to cover
-  static unsigned int interfaceTransitionCount;
+        /// number of interface transitions to cover
+        static unsigned int interfaceTransitionCount;
 
-  /// array of internal place pointer for a faster occur check
-  static pnapi::Place** internalPlaceCache;
+        /// array of internal place pointer for a faster occur check
+        static pnapi::Place** internalPlaceCache;
 
-  /// mapping  as array of interface place number to appropriate label
-  static Label_ID* interfacePlaceLabels;
+        /// mapping  as array of interface place number to appropriate label
+        static Label_ID* interfacePlaceLabels;
 
-  /// mapping of inner marking to CoverData
-  static std::map<InnerMarking_ID, CoverData> inner2CD;
+        /// mapping of inner marking to CoverData
+        static std::map<InnerMarking_ID, CoverData> inner2CD;
 
-  /// mapping of StoredKnowledge to CoverData
-  static std::map<StoredKnowledge*, CoverData> knowledge2CD;
+        /// mapping of StoredKnowledge to CoverData
+        static std::map<StoredKnowledge*, CoverData> knowledge2CD;
 
-  /// vectors of knowledges, that cover nodes
-  static std::vector<StoredKnowledge*>* coveringInternalPlaces;
-  static std::vector<StoredKnowledge*>* coveringInterfacePlaces;
-  static std::vector<StoredKnowledge*>* coveringInternalTransitions;
-  static std::vector<StoredKnowledge*>* coveringInterfaceTransitions;
+        /// vectors of knowledges, that cover nodes
+        static std::vector<StoredKnowledge*>* coveringInternalPlaces;
+        static std::vector<StoredKnowledge*>* coveringInterfacePlaces;
+        static std::vector<StoredKnowledge*>* coveringInternalTransitions;
+        static std::vector<StoredKnowledge*>* coveringInterfaceTransitions;
 
-public: /* static methods */
+    public: /* static methods */
 
-  /// fill the set of places and transitions to cover
-  static void initialize(const std::vector<std::string>&, const std::vector<std::string>&);
-  static void initialize(const std::vector<pnapi::Place*>&, const std::vector<pnapi::Label*>&,
-                         const std::vector<pnapi::Transition*>&, const std::vector<pnapi::Transition*>&);
+        /// fill the set of places and transitions to cover
+        static void initialize(const std::vector<std::string>&, const std::vector<std::string>&);
+        static void initialize(const std::vector<pnapi::Place*>&, const std::vector<pnapi::Label*>&,
+                               const std::vector<pnapi::Transition*>&, const std::vector<pnapi::Transition*>&);
 
-  /// cover all nodes of the given net
-  static void coverAll();
+        /// cover all nodes of the given net
+        static void coverAll();
 
-  /// checks for a given inner marking, which nodes are covered
-  static void checkInnerMarking(InnerMarking_ID, std::map<const pnapi::Place*, unsigned int>&, const std::set<std::string>&);
+        /// checks for a given inner marking, which nodes are covered
+        static void checkInnerMarking(InnerMarking_ID, std::map<const pnapi::Place*, unsigned int>&, const std::set<std::string>&);
 
-  /// deletes cache
-  static void clear();
+        /// deletes cache
+        static void clear();
 
-  /// checks for a given knowledge, which nodes are covered
-  static void checkKnowledge(StoredKnowledge*, const std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > &);
+        /// checks for a given knowledge, which nodes are covered
+        static void checkKnowledge(StoredKnowledge*, const std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > &);
 
-  /// removes knowledges when deleted
-  static void removeKnowledge(StoredKnowledge*);
+        /// removes knowledges when deleted
+        static void removeKnowledge(StoredKnowledge*);
 
-  /// calculates the global contraint
-  static void calculate(const std::set<StoredKnowledge*>&);
+        /// calculates the global contraint
+        static void calculate(const std::set<StoredKnowledge*>&);
 
-  /// writes the contraint to an output stream
-  static void write(std::ostream&);
+        /// writes the contraint to an output stream
+        static void write(std::ostream&);
 
-public: /* static attributs */
+    public: /* static attributs */
 
-  /// label cache; filled in Label::initialize()
-  static std::map<std::string, Label_ID> labelCache;
+        /// label cache; filled in Label::initialize()
+        static std::map<std::string, Label_ID> labelCache;
 
-  /// whether the constraint is satisfiable
-  static bool satisfiable;
+        /// whether the constraint is satisfiable
+        static bool satisfiable;
 
-  /// nodes to cover
-  static unsigned int nodeCount;
+        /// nodes to cover
+        static unsigned int nodeCount;
 
-  /// synchronous labels
-  static std::vector<std::string> synchronousLabels;
+        /// synchronous labels
+        static std::vector<std::string> synchronousLabels;
 };
 
 #endif /*COVER_H_*/

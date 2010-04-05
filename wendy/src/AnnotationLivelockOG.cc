@@ -36,7 +36,7 @@ AnnotationElement::_stats AnnotationElement::stats;
  ******************/
 
 AnnotationElement::_stats::_stats()
-        : cumulativeNumberOfClauses(0), maximalNumberOfClauses(0) {}
+    : cumulativeNumberOfClauses(0), maximalNumberOfClauses(0) {}
 
 
 /******************************************
@@ -50,12 +50,11 @@ AnnotationElement::_stats::_stats()
 */
 AnnotationElement::AnnotationElement(const std::set<StoredKnowledge* > & _setOfKnowledges,
                                      const std::vector<Clause* > & _annotationBoolean) :
-                                     // create C-Array to store the set of knowledges
-                                     setOfKnowledges(new StoredKnowledge*[_setOfKnowledges.size() + 1]),
-                                     // create C-Array to store the set of clauses
-                                     annotationBool(new Clause*[_annotationBoolean.size() + 1]),
-                                     successor(NULL)
-{
+    // create C-Array to store the set of knowledges
+    setOfKnowledges(new StoredKnowledge*[_setOfKnowledges.size() + 1]),
+    // create C-Array to store the set of clauses
+    annotationBool(new Clause*[_annotationBoolean.size() + 1]),
+    successor(NULL) {
     // copy values into the C arrays
     std::copy(_setOfKnowledges.begin(), _setOfKnowledges.end(), setOfKnowledges);
     std::copy(_annotationBoolean.begin(), _annotationBoolean.end(), annotationBool);
@@ -80,7 +79,7 @@ AnnotationElement::~AnnotationElement() {
     delete[] setOfKnowledges;
 
     // explicitly delete every (real) clause
-    for(unsigned int i = 0; annotationBool[i] != NULL; ++i) {
+    for (unsigned int i = 0; annotationBool[i] != NULL; ++i) {
         if (annotationBool[i] != Clause::falseClause) {
             delete annotationBool[i];
         }
@@ -99,12 +98,12 @@ AnnotationElement::~AnnotationElement() {
   \param dot the string shall be used in the dot output or not
   \param file a stream to which this annotation goes to
 */
-void AnnotationElement::myAnnotationToStream(const bool & dot, std::ostream& file) const {
+void AnnotationElement::myAnnotationToStream(const bool& dot, std::ostream& file) const {
 
     // create the annotation of the current set of knowledges
     std::string stringAnd = (dot) ? " &and; " : " * ";
 
-    for(unsigned int i = 0; annotationBool[i] != NULL; ++i) {
+    for (unsigned int i = 0; annotationBool[i] != NULL; ++i) {
 
         if (i != 0) {
             file << stringAnd;
@@ -144,7 +143,7 @@ AnnotationLivelockOG::~AnnotationLivelockOG() {
     initIterator();
 
     // delete all elements one by one
-    AnnotationElement * temp;
+    AnnotationElement* temp;
 
     while ((temp = pop()) != NULL) {
         delete temp;
@@ -170,7 +169,7 @@ void AnnotationLivelockOG::push(const std::set<StoredKnowledge* > & setOfKnowled
     }
 
     // create new annotation element
-    AnnotationElement * annotationElement = new AnnotationElement(setOfKnowledges, annotationBoolean);
+    AnnotationElement* annotationElement = new AnnotationElement(setOfKnowledges, annotationBoolean);
 
     // the queue is empty
     if (rootElement == NULL) {
@@ -185,9 +184,9 @@ void AnnotationLivelockOG::push(const std::set<StoredKnowledge* > & setOfKnowled
 /*!
  returns the first element of the queue
 */
-AnnotationElement * AnnotationLivelockOG::pop() {
+AnnotationElement* AnnotationLivelockOG::pop() {
     if (currentPointer != NULL) {
-        AnnotationElement * temp = currentPointer;
+        AnnotationElement* temp = currentPointer;
         currentPointer = temp->successor;
 
         return temp;

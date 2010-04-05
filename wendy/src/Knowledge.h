@@ -38,7 +38,7 @@ typedef std::map<InnerMarking_ID, std::vector<InterfaceMarking*> > Bubble;
  unnecessary information, yielding a compact representation.
 */
 class Knowledge {
-    friend class StoredKnowledge;
+        friend class StoredKnowledge;
 
     public: /* member functions */
         /// construct knowledge from (initial) inner marking

@@ -53,8 +53,8 @@ class FinalKnowledge {
 */
 class Clause {
 
-    friend class CompositeMarking;
-    friend class LivelockOperatingGuideline;
+        friend class CompositeMarking;
+        friend class LivelockOperatingGuideline;
 
     public: /* static functions */
 
@@ -65,15 +65,14 @@ class Clause {
 
         /// struct combining the statistics on the class Clause
         static struct _stats {
-            public:
-                /// constructor
-                _stats();
+            /// constructor
+            _stats();
 
-                ///
-                unsigned int cumulativeSizeAllClauses;
+            ///
+            unsigned int cumulativeSizeAllClauses;
 
-                /// maximal size a clause has reached
-                unsigned int maximalSizeOfClause;
+            /// maximal size a clause has reached
+            unsigned int maximalSizeOfClause;
         } stats;
 
         /// the clause holding literal false only (just a placeholder, no object!)
@@ -95,7 +94,7 @@ class Clause {
         void operator|=(const Clause&);
 
         /// returns a string representation of this clause
-        void printToStream(const bool & dot, std::ostream& file);
+        void printToStream(const bool& dot, std::ostream& file);
 
     private: /* member functions */
 
@@ -111,7 +110,7 @@ class Clause {
     private: /* member attributes */
 
         /// store the bits representing each label of the interface
-        uint8_t * storage;
+        uint8_t* storage;
 
         /// store a pointer to each final knowledge belonging to the current clause
         FinalKnowledge** finalKnowledges;

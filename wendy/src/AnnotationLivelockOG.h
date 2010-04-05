@@ -33,22 +33,21 @@
 */
 class AnnotationElement {
 
-    friend class AnnotationLivelockOG;
-    friend class LivelockOperatingGuideline;
+        friend class AnnotationLivelockOG;
+        friend class LivelockOperatingGuideline;
 
     public: /* static attributes */
 
         /// struct combining the statistics on the class AnnotationElement
         static struct _stats {
-            public:
-                /// constructor
-                _stats();
+            /// constructor
+            _stats();
 
-                ///
-                unsigned int cumulativeNumberOfClauses;
+            ///
+            unsigned int cumulativeNumberOfClauses;
 
-                /// maximal number of clauses per annotation element
-                unsigned int maximalNumberOfClauses;
+            /// maximal number of clauses per annotation element
+            unsigned int maximalNumberOfClauses;
         } stats;
 
     public: /* member functions */
@@ -61,17 +60,17 @@ class AnnotationElement {
         ~AnnotationElement();
 
         /// returns a string containing the annotation of this element
-        void myAnnotationToStream(const bool & dot, std::ostream& file) const;
+        void myAnnotationToStream(const bool& dot, std::ostream& file) const;
 
     private: /* member attributes */
         /// pointer to the set of knowledges
         StoredKnowledge** setOfKnowledges;
 
         /// vector of label ids representing the annotation
-        Clause ** annotationBool;
+        Clause** annotationBool;
 
         /// succeeding element
-        AnnotationElement * successor;
+        AnnotationElement* successor;
 
 };
 
@@ -97,7 +96,7 @@ class AnnotationLivelockOG {
                   const std::vector<Clause* > & annotationBoolean);
 
         /// returns the first element of the queue
-        AnnotationElement * pop();
+        AnnotationElement* pop();
 
         /// sets current pointer to the root element again
         void initIterator();
@@ -105,13 +104,13 @@ class AnnotationLivelockOG {
     private: /* member attributes */
 
         /// pointer to the first element of the queue
-        AnnotationElement * rootElement;
+        AnnotationElement* rootElement;
 
         /// pointer to the last element of the queue
-        AnnotationElement * lastElement;
+        AnnotationElement* lastElement;
 
         /// current pointer
-        AnnotationElement * currentPointer;
+        AnnotationElement* currentPointer;
 };
 
 

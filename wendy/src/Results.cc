@@ -37,7 +37,7 @@ Results::operator std::ostream&() const {
 
 void Results::add(std::string partname, std::string value) {
     std::string part = partname.substr(0, partname.find_first_of("."));
-    std::string name = partname.substr(partname.find_first_of(".")+1, partname.size());
+    std::string name = partname.substr(partname.find_first_of(".") + 1, partname.size());
     add(part, name, value);
 }
 
@@ -45,19 +45,19 @@ void Results::add(std::string part, std::string name, std::string value) {
     values[part][name] = "\"" + value + "\"";
 }
 
-void Results::add(std::string partname, char *value) {
+void Results::add(std::string partname, char* value) {
     std::string part = partname.substr(0, partname.find_first_of("."));
-    std::string name = partname.substr(partname.find_first_of(".")+1, partname.size());
+    std::string name = partname.substr(partname.find_first_of(".") + 1, partname.size());
     add(part, name, value);
 }
 
-void Results::add(std::string part, std::string name, char *value) {
+void Results::add(std::string part, std::string name, char* value) {
     values[part][name] = std::string("\"") + value + "\"";
 }
 
 void Results::add(std::string partname, float value) {
     std::string part = partname.substr(0, partname.find_first_of("."));
-    std::string name = partname.substr(partname.find_first_of(".")+1, partname.size());
+    std::string name = partname.substr(partname.find_first_of(".") + 1, partname.size());
     add(part, name, value);
 }
 
@@ -69,7 +69,7 @@ void Results::add(std::string part, std::string name, float value) {
 
 void Results::add(std::string partname, int value) {
     std::string part = partname.substr(0, partname.find_first_of("."));
-    std::string name = partname.substr(partname.find_first_of(".")+1, partname.size());
+    std::string name = partname.substr(partname.find_first_of(".") + 1, partname.size());
     add(part, name, value);
 }
 
@@ -81,7 +81,7 @@ void Results::add(std::string part, std::string name, int value) {
 
 void Results::add(std::string partname, unsigned int value) {
     std::string part = partname.substr(0, partname.find_first_of("."));
-    std::string name = partname.substr(partname.find_first_of(".")+1, partname.size());
+    std::string name = partname.substr(partname.find_first_of(".") + 1, partname.size());
     add(part, name, value);
 }
 
@@ -93,7 +93,7 @@ void Results::add(std::string part, std::string name, unsigned int value) {
 
 void Results::add(std::string partname, bool value) {
     std::string part = partname.substr(0, partname.find_first_of("."));
-    std::string name = partname.substr(partname.find_first_of(".")+1, partname.size());
+    std::string name = partname.substr(partname.find_first_of(".") + 1, partname.size());
     add(part, name, value);
 }
 
@@ -102,12 +102,12 @@ void Results::add(std::string part, std::string name, bool value) {
     values[part][name] = tmp;
 }
 
-void Results::add(std::string partname, std::stringstream &value) {
+void Results::add(std::string partname, std::stringstream& value) {
     std::string part = partname.substr(0, partname.find_first_of("."));
-    std::string name = partname.substr(partname.find_first_of(".")+1, partname.size());
+    std::string name = partname.substr(partname.find_first_of(".") + 1, partname.size());
     add(part, name, value);
 }
 
-void Results::add(std::string part, std::string name, std::stringstream &value) {
+void Results::add(std::string part, std::string name, std::stringstream& value) {
     lists[part][name] = value.str();
 }

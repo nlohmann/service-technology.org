@@ -34,14 +34,14 @@
  \brief knowledge (data structure for storing knowledges)
  */
 class StoredKnowledge {
-    /// the Diagnosis needs to traverse the hash tree
-    friend class Diagnosis;
+        /// the Diagnosis needs to traverse the hash tree
+        friend class Diagnosis;
 
-    /// calculation of a livelock operating guideline needs access to successors
-    friend class LivelockOperatingGuideline;
-    friend class CompositeMarking;
-    friend class CompositeMarkingsHandler;
-    friend class SCSHandler;
+        /// calculation of a livelock operating guideline needs access to successors
+        friend class LivelockOperatingGuideline;
+        friend class CompositeMarking;
+        friend class CompositeMarkingsHandler;
+        friend class SCSHandler;
 
     public: /* static functions */
         /// destroy all objects of this class
@@ -65,33 +65,32 @@ class StoredKnowledge {
     public: /* static attributes */
         /// struct combining the statistics on the class StoredKnowledge
         static struct _stats {
-            public:
-                /// constructor
-                _stats();
+            /// constructor
+            _stats();
 
-                /// the number of hash collisions (distinct knowledges with the same hash value)
-                unsigned int hashCollisions;
+            /// the number of hash collisions (distinct knowledges with the same hash value)
+            unsigned int hashCollisions;
 
-                /// the number of edges stored overall
-                unsigned int storedEdges;
+            /// the number of edges stored overall
+            unsigned int storedEdges;
 
-                /// the number of nodes that were built, but immediately detected insane
-                unsigned int builtInsaneNodes;
+            /// the number of nodes that were built, but immediately detected insane
+            unsigned int builtInsaneNodes;
 
-                /// maximal size of a hash bucket (1 means no collisions)
-                size_t maxBucketSize;
+            /// maximal size of a hash bucket (1 means no collisions)
+            size_t maxBucketSize;
 
-                /// the number of knowledges stored in the hash tree
-                unsigned int storedKnowledges;
+            /// the number of knowledges stored in the hash tree
+            unsigned int storedKnowledges;
 
-                /// maximum number of scc components
-                unsigned int maxSCCSize;
+            /// maximum number of scc components
+            unsigned int maxSCCSize;
 
-                /// total number of SCCs
-                unsigned int numberOfNonTrivialSCCs;
+            /// total number of SCCs
+            unsigned int numberOfNonTrivialSCCs;
 
-                /// number of trivial SCCs
-                unsigned int numberOfTrivialSCCs;
+            /// number of trivial SCCs
+            unsigned int numberOfTrivialSCCs;
         } stats;
 
         /// buckets of knowledges, indexed by hash values

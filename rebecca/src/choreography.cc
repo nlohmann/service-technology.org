@@ -663,7 +663,7 @@ bool Choreography::resolveDeadlocks()
 bool Choreography::bfs(int q, vector<int> &toBeDeleted)
 {
 #ifdef DEBUG
-  cerr << "bfs: checking " << q << endl;
+//  cerr << "bfs: checking " << q << endl;
 #endif
   if (isFinal(q))
   {

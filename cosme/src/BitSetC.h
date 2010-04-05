@@ -23,49 +23,51 @@
 #define BITNSLOTS(nb) ((nb + BITSET_BASE_T_BITS - 1) / BITSET_BASE_T_BITS)
 
 class BitSetC {
-	public:
-	
-		BitSetC(size_t bits, bool makeEmpty);
-		BitSetC(const BitSetC &other);
-		~BitSetC();		
+    public:
 
-		void makeUnion(BitSetC *a);
-		void makeIntersection(BitSetC *a);
-		void makeDifference(BitSetC *a);
-		inline bool getBit(size_t bit) const {
-			assert(bit < this->mBitCount);
-			return BITTEST(this->mBits, bit);
-		}
-		inline void setBit(size_t bit) {
-			assert(bit < this->mBitCount);
-			BITSET(this->mBits, bit);
-		}
-		inline void clearBit(size_t bit) {
-			assert(bit < this->mBitCount);
-			BITCLEAR(this->mBits, bit);
-		}
-		bool isIntersectionEmpty(BitSetC *a) const;
-		bool isSubset(BitSetC *a) const;
-		inline bool isEmpty() const {
-			for(size_t i = 0; i < BITNSLOTS(this->mBitCount); i++) {
-				if (this->mBits[i] != 0) return false;
-			}
-			return true;
-		}
-		bool isEqual(BitSetC *a) const;
-		inline size_t bitCount() const {
-			return this->mBitCount;
-		}
-		inline bitset_base_t getSlot(size_t slot) const {
-			assert(slot <= BITSLOT(this->mBitCount));
-			return this->mBits[slot];
-		}
-		std::string toString() const;
+        BitSetC(size_t bits, bool makeEmpty);
+        BitSetC(const BitSetC& other);
+        ~BitSetC();
 
-	private:
-		
-		bitset_base_t *mBits;
-		size_t mBitCount;
+        void makeUnion(BitSetC* a);
+        void makeIntersection(BitSetC* a);
+        void makeDifference(BitSetC* a);
+        inline bool getBit(size_t bit) const {
+            assert(bit < this->mBitCount);
+            return BITTEST(this->mBits, bit);
+        }
+        inline void setBit(size_t bit) {
+            assert(bit < this->mBitCount);
+            BITSET(this->mBits, bit);
+        }
+        inline void clearBit(size_t bit) {
+            assert(bit < this->mBitCount);
+            BITCLEAR(this->mBits, bit);
+        }
+        bool isIntersectionEmpty(BitSetC* a) const;
+        bool isSubset(BitSetC* a) const;
+        inline bool isEmpty() const {
+            for (size_t i = 0; i < BITNSLOTS(this->mBitCount); i++) {
+                if (this->mBits[i] != 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        bool isEqual(BitSetC* a) const;
+        inline size_t bitCount() const {
+            return this->mBitCount;
+        }
+        inline bitset_base_t getSlot(size_t slot) const {
+            assert(slot <= BITSLOT(this->mBitCount));
+            return this->mBits[slot];
+        }
+        std::string toString() const;
+
+    private:
+
+        bitset_base_t* mBits;
+        size_t mBitCount;
 
 };
 

@@ -3,6 +3,8 @@
 @item implemented intersection 
 @item implemented union
 @item fixed bug in CNF calculation
+
+@item removed zlib dependency
 @end itemize
 
 @heading Version 1.0

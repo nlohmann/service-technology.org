@@ -15,4 +15,9 @@ Version 2.0
 
 * fixed bug in CNF calculation
 
-\nSee file ChangeLog <http://service-technology.org/files/safira/ChangeLog> for\ncomplete version history.\n
+* removed zlib dependency
+
+
+See file ChangeLog <http://service-technology.org/files/safira/ChangeLog> for
+complete version history.
+

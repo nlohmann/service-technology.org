@@ -28,14 +28,14 @@
  * \brief   control flow graph (interface)
  *
  * This file provides the necessary classes for building a Control Flow Graph
- * 
+ *
  * \author  Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
- * 
+ *
  * \since   2006-01-19
  *
  * \date    \$Date: 2007/06/28 07:38:15 $
- * 
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
@@ -83,149 +83,148 @@ extern string filename;
 
 
 /// enumeration for the possible block types, that can occur in the CFG
-typedef enum
-{
-  CFGProcess = 1,
-  CFGFaultHandler,
-  CFGCatch,
-  CFGCatchAll,
-  CFGCompensationHandler,
-  CFGTerminationHandler,
-  CFGEventHandler,
-  CFGEmpty,
-  CFGOpaqueActivity,
-  CFGInvoke,
-  CFGReceive,
-  CFGReply,
-  CFGAssign,
-  CFGCopy,
-  CFGFrom,
-  CFGTo,
-  CFGWait,
-  CFGThrow,
-  CFGCompensate,
-  CFGTerminate,
-  CFGFlow,
-  CFGSwitch,
-  CFGCase,
-  CFGOtherwise,
-  CFGWhile,
-  CFGSequence,
-  CFGPick,
-  CFGOnAlarm,
-  CFGOnMessage,
-  CFGScope,
-  CFGTarget,
-  CFGSource,
-  // WS-BPEL 2.0
-  CFGValidate,
-  CFGExit,
-  CFGRethrow,
-  CFGCompensateScope,
-  CFGIf,
-  CFGElseIf,
-  CFGElse,
-  CFGForEach,
-  CFGRepeatUntil
+typedef enum {
+    CFGProcess = 1,
+    CFGFaultHandler,
+    CFGCatch,
+    CFGCatchAll,
+    CFGCompensationHandler,
+    CFGTerminationHandler,
+    CFGEventHandler,
+    CFGEmpty,
+    CFGOpaqueActivity,
+    CFGInvoke,
+    CFGReceive,
+    CFGReply,
+    CFGAssign,
+    CFGCopy,
+    CFGFrom,
+    CFGTo,
+    CFGWait,
+    CFGThrow,
+    CFGCompensate,
+    CFGTerminate,
+    CFGFlow,
+    CFGSwitch,
+    CFGCase,
+    CFGOtherwise,
+    CFGWhile,
+    CFGSequence,
+    CFGPick,
+    CFGOnAlarm,
+    CFGOnMessage,
+    CFGScope,
+    CFGTarget,
+    CFGSource,
+    // WS-BPEL 2.0
+    CFGValidate,
+    CFGExit,
+    CFGRethrow,
+    CFGCompensateScope,
+    CFGIf,
+    CFGElseIf,
+    CFGElse,
+    CFGForEach,
+    CFGRepeatUntil
 } CFGBlockType;
 
 // forward declarations
 class CFGBlock;
 
 /// map for assigning a target to its appropriate source object
-extern map<string, CFGBlock *> sources;
+extern map<string, CFGBlock*> sources;
 /// map for assigning a source to its appropriate target object
-extern map<string, CFGBlock *> targets;
+extern map<string, CFGBlock*> targets;
 
 /**
  * This class is a generic template for all blocks within
  * a CFG.
- * 
+ *
  */
 class CFGBlock {
-  public:
-    /// list of pointers to the previous blocks	  
-    list<CFGBlock *> prevBlocks;
-    /// list of pointers to the next blocks 
-    list<CFGBlock *> nextBlocks;
+    public:
+        /// list of pointers to the previous blocks
+        list<CFGBlock*> prevBlocks;
+        /// list of pointers to the next blocks
+        list<CFGBlock*> nextBlocks;
 
-    /// pointer to the first block of an activity
-    CFGBlock * firstBlock;
-    /// pointer to the last block of an activity
-    CFGBlock * lastBlock;
+        /// pointer to the first block of an activity
+        CFGBlock* firstBlock;
+        /// pointer to the last block of an activity
+        CFGBlock* lastBlock;
 
-    
-    /// type of the block
-    CFGBlockType type;
-    /// ID of the block
-    int id;
-    /// label of the block
-    string label;
 
-    /// constructor
-    CFGBlock();
-    /// constructor
-    CFGBlock(CFGBlockType, int, string);
-    /// generic constructor
-    CFGBlock(string id);
-    /// generic constructor
-    CFGBlock(int id);
-    /// generic destructor
-    virtual ~CFGBlock();
-    
-    /// returns the concrete type
-    CFGBlockType getType(); 
-    /// dot_output
-    virtual void print_dot();
-    /// the name of the dot node
-    virtual string dot_name();
+        /// type of the block
+        CFGBlockType type;
+        /// ID of the block
+        int id;
+        /// label of the block
+        string label;
 
-    /// additional name of the channel
-    string channel_name;
+        /// constructor
+        CFGBlock();
+        /// constructor
+        CFGBlock(CFGBlockType, int, string);
+        /// generic constructor
+        CFGBlock(string id);
+        /// generic constructor
+        CFGBlock(int id);
+        /// generic destructor
+        virtual ~CFGBlock();
 
-    /// resets the processed flag to false
-    void resetProcessedFlag();
-    
+        /// returns the concrete type
+        CFGBlockType getType();
+        /// dot_output
+        virtual void print_dot();
+        /// the name of the dot node
+        virtual string dot_name();
 
-/***************************** Program Analysis *******************************/
+        /// additional name of the channel
+        string channel_name;
 
-    /// checks if variables might be uninitialized
-    void checkForUninitializedVariables();
+        /// resets the processed flag to false
+        void resetProcessedFlag();
 
-    /// checks for cyclic links
-    void checkForCyclicLinks();
 
-    /// checks for cycles in control dependency (SA00082)
-    void checkForCyclicControlDependency();
+        /***************************** Program Analysis *******************************/
 
-    /// checks for conflicting receives
-    void checkForConflictingReceive();
+        /// checks if variables might be uninitialized
+        void checkForUninitializedVariables();
 
-  private:
-    /// flag, if block was dotted
-    bool dotted;
-    /// flag, if block was processed by an algorithm (has to be resetted afterwards)
-    bool processed;
+        /// checks for cyclic links
+        void checkForCyclicLinks();
 
-/***************************** Program Analysis *******************************/
-    /// set of initialized variables
-    set<string> initializedVariables;
+        /// checks for cycles in control dependency (SA00082)
+        void checkForCyclicControlDependency();
 
-    /// set of targets seen so far
-    set<string> targetsSeen;
+        /// checks for conflicting receives
+        void checkForConflictingReceive();
 
-    /// set of depending receives
-    set< pair< string, long > > receives;
+    private:
+        /// flag, if block was dotted
+        bool dotted;
+        /// flag, if block was processed by an algorithm (has to be resetted afterwards)
+        bool processed;
 
-    set< unsigned int > controllingPeers;
-    
+        /***************************** Program Analysis *******************************/
+        /// set of initialized variables
+        set<string> initializedVariables;
+
+        /// set of targets seen so far
+        set<string> targetsSeen;
+
+        /// set of depending receives
+        set< pair< string, long > > receives;
+
+        set< unsigned int > controllingPeers;
+
 };
 
 /// wrapper for dot printing (prints all the graph data)
-void cfgDot(CFGBlock *);
+void cfgDot(CFGBlock*);
 
 /// connects two blocks
-void connectBlocks(CFGBlock *, CFGBlock *);
+void connectBlocks(CFGBlock*, CFGBlock*);
 
 
 void processCFG();

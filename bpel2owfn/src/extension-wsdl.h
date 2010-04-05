@@ -33,7 +33,7 @@
  * \since   2007/04/30
  *
  * \date    \$Date: 2007/06/28 07:38:16 $
- * 
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
@@ -65,133 +65,128 @@ class ASTE; // forward declaration
 
 
 
-class WSDL_Message
-{
-  public:
-    /// name of the message
-    string name;
+class WSDL_Message {
+    public:
+        /// name of the message
+        string name;
 
-    /// name of a single part with the element attribute
-    pair<string, string> element;
+        /// name of a single part with the element attribute
+        pair<string, string> element;
 
-    /// parts of the message
-    map<string, string> parts;
+        /// parts of the message
+        map<string, string> parts;
 
-    /// constructor
-    WSDL_Message(string message_name);
+        /// constructor
+        WSDL_Message(string message_name);
 };
 
 
 
 
 
-class WSDL_Operation
-{
-  public:
-    /// name of the operation
-    string name;
+class WSDL_Operation {
+    public:
+        /// name of the operation
+        string name;
 
-    /// opetional faultName
-    string faultName;
+        /// opetional faultName
+        string faultName;
 
-    /// input message
-    WSDL_Message *input;
+        /// input message
+        WSDL_Message* input;
 
-    /// output message
-    WSDL_Message *output;
+        /// output message
+        WSDL_Message* output;
 
-    /// fault message
-    WSDL_Message *fault;
+        /// fault message
+        WSDL_Message* fault;
 
-    /// constructor
-    WSDL_Operation(string operation_name);
+        /// constructor
+        WSDL_Operation(string operation_name);
 };
 
 
 
 
 
-class WSDL_PortType
-{
-  public:
-    /// name of the portType
-    string name;
+class WSDL_PortType {
+    public:
+        /// name of the portType
+        string name;
 
-    /// map of all operations
-    map<string, WSDL_Operation*> Operations;
+        /// map of all operations
+        map<string, WSDL_Operation*> Operations;
 
-    /// pointer to the last (i.e., current) operation
-    WSDL_Operation *last;
+        /// pointer to the last (i.e., current) operation
+        WSDL_Operation* last;
 
-    /// constructor
-    WSDL_PortType(string portType_name);
+        /// constructor
+        WSDL_PortType(string portType_name);
 
-    /// add an operation to this portType
-    void addOperation(string operation_name);
+        /// add an operation to this portType
+        void addOperation(string operation_name);
 
-    /// add details of the current operation
-    void addOperationDetails(string type_name, string message_name, string fault_name = "");
+        /// add details of the current operation
+        void addOperationDetails(string type_name, string message_name, string fault_name = "");
 };
 
 
 
 
 
-class WSDL_PartnerLinkType
-{
-  public:
-    /// name of the partnerLinkType
-    string name;
+class WSDL_PartnerLinkType {
+    public:
+        /// name of the partnerLinkType
+        string name;
 
-    /// myRole (used for receiving communication)
-    pair<string, WSDL_PortType*> myRole;
+        /// myRole (used for receiving communication)
+        pair<string, WSDL_PortType*> myRole;
 
-    /// partnerRole (used for invoking communication)
-    pair<string, WSDL_PortType*> partnerRole;
+        /// partnerRole (used for invoking communication)
+        pair<string, WSDL_PortType*> partnerRole;
 
-    /// first temporary placeholder for a role
-    pair<string, WSDL_PortType*> role1;
+        /// first temporary placeholder for a role
+        pair<string, WSDL_PortType*> role1;
 
-    /// second temporary placeholder for a role
-    pair<string, WSDL_PortType*> role2;
+        /// second temporary placeholder for a role
+        pair<string, WSDL_PortType*> role2;
 
-    /// constructor
-    WSDL_PartnerLinkType(string my_name);
+        /// constructor
+        WSDL_PartnerLinkType(string my_name);
 
-    /// add a role to this partnerLinkType
-    void addRole(string role, string portType_name);
-    
-    /// corrects the order of roles when called by the bpel postprocess
-    void correctOrder(ASTE *plink);
+        /// add a role to this partnerLinkType
+        void addRole(string role, string portType_name);
+
+        /// corrects the order of roles when called by the bpel postprocess
+        void correctOrder(ASTE* plink);
 };
 
 
 
 
 
-class WSDL
-{
-  public:
-    /// the portTypes of the parsed WSDL file
-    map<string, WSDL_PortType*> portTypes;
+class WSDL {
+    public:
+        /// the portTypes of the parsed WSDL file
+        map<string, WSDL_PortType*> portTypes;
 
-    /// the partnerLinkTypes of the parsed WSDL file
-    map<string, WSDL_PartnerLinkType*> partnerLinkTypes; 
+        /// the partnerLinkTypes of the parsed WSDL file
+        map<string, WSDL_PartnerLinkType*> partnerLinkTypes;
 
-    /// the messages of the parsed WSDL file
-    map<string, WSDL_Message*> messages;
+        /// the messages of the parsed WSDL file
+        map<string, WSDL_Message*> messages;
 
-    /// check an operation
-    bool checkOperation(WSDL_PartnerLinkType *partnerLinkType, string operation_name) const;
+        /// check an operation
+        bool checkOperation(WSDL_PartnerLinkType* partnerLinkType, string operation_name) const;
 
-    /// check a partnerLinkType
-    bool checkPartnerLinkType(WSDL_PartnerLinkType *partnerLinkType, string partnerRole_name) const;
+        /// check a partnerLinkType
+        bool checkPartnerLinkType(WSDL_PartnerLinkType* partnerLinkType, string partnerRole_name) const;
 
-    /// check a combination of partnerLink, role and portType
-    bool checkPortType(string partnerLink, string role, string portType) const;
+        /// check a combination of partnerLink, role and portType
+        bool checkPortType(string partnerLink, string role, string portType) const;
 
-    /// check if a given variable has the correct message type/element
-    void checkVariable(ASTE *activity) const;
+        /// check if a given variable has the correct message type/element
+        void checkVariable(ASTE* activity) const;
 };
 
 #endif

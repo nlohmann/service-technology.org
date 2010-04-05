@@ -30,11 +30,11 @@
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
- * 
+ *
  * \since   2005/11/11
  *
  * \date    \$Date: 2007/07/18 08:17:48 $
- * 
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
@@ -54,12 +54,12 @@
 
 #include <config.h>
 #include <iostream>
-#include <fstream>	// (std::ofstream)
-#include <sstream>	// (std::ostringstream, std::istringstream)
+#include <fstream>  // (std::ofstream)
+#include <sstream>  // (std::ostringstream, std::istringstream)
 #include <string>
 #include <vector>
 
-#include "debug.h"	// (trace)
+#include "debug.h"  // (trace)
 #include "helpers.h"
 #include "options.h"
 
@@ -88,10 +88,9 @@ using std::vector;
  * \param i Kimwitu++ integer
  * \return  C++ string object representing i
  */
-string toString(kc::integer i)
-{
-  assert(i!=NULL);
-  return toString(i->value);
+string toString(kc::integer i) {
+    assert(i != NULL);
+    return toString(i->value);
 }
 #endif
 
@@ -105,13 +104,12 @@ string toString(kc::integer i)
  * \param i standard C int
  * \return  C++ string object representing i
  */
-string toString(int i)
-{
-  std::ostringstream buffer;
-  
-  buffer << i;
-  
-  return buffer.str();
+string toString(int i) {
+    std::ostringstream buffer;
+
+    buffer << i;
+
+    return buffer.str();
 }
 
 
@@ -125,19 +123,18 @@ string toString(int i)
  * \param v  an STL vector of unsigned ints
  * \return   C++ string object representation of v
  */
-string toString(const vector<unsigned int> &v)
-{
-  string result;
+string toString(const vector<unsigned int> &v) {
+    string result;
 
-  for (unsigned int i = 0; i < v.size(); i++)
-  {
-    if (i != 0)
-      result += ".";
+    for (unsigned int i = 0; i < v.size(); i++) {
+        if (i != 0) {
+            result += ".";
+        }
 
-    result += toString(v[i]);
-  }
+        result += toString(v[i]);
+    }
 
-  return result;
+    return result;
 }
 
 
@@ -150,18 +147,18 @@ string toString(const vector<unsigned int> &v)
  * \param s C++ string object
  * \return int representing s or INT_MAX if the conversion failed
  */
-int toInt(string s)
-{
-  int result;
-  istringstream isst;
-  isst.str(s);
- 
-  isst >> result;
+int toInt(string s) {
+    int result;
+    istringstream isst;
+    isst.str(s);
 
-  if (isst.fail())
-    return INT_MAX;
+    isst >> result;
 
-  return result;
+    if (isst.fail()) {
+        return INT_MAX;
+    }
+
+    return result;
 }
 
 
@@ -175,18 +172,18 @@ int toInt(string s)
  * \return unsigned int representing s or UINT_MAX if the conversion failed
  *         (e.g. a negative value was passed)
  */
-unsigned int toUInt(string s)
-{
-  unsigned int result;
-  istringstream isst;
-  isst.str(s);
- 
-  isst >> result;
+unsigned int toUInt(string s) {
+    unsigned int result;
+    istringstream isst;
+    isst.str(s);
 
-  if (isst.fail())
-    return UINT_MAX;
+    isst >> result;
 
-  return result;
+    if (isst.fail()) {
+        return UINT_MAX;
+    }
+
+    return result;
 }
 
 
@@ -198,12 +195,12 @@ unsigned int toUInt(string s)
  * \param b an unsigned int
  * \return max(a,b)
  */
-unsigned int max(unsigned int a, unsigned int b)
-{
-  if (a > b)
-    return a;
-  else
-    return b;
+unsigned int max(unsigned int a, unsigned int b) {
+    if (a > b) {
+        return a;
+    } else {
+        return b;
+    }
 }
 
 
@@ -216,11 +213,11 @@ unsigned int max(unsigned int a, unsigned int b)
  *
  * \note  The prefix "http:" is not removed.
  */
-string strip_namespace(string s)
-{
-  if (s.find_first_of(":") != string::npos &&
-      (s.substr(0, s.find_first_of(":")) != "http"))
-    return s.substr(s.find_first_of(":")+1, s.length());
-  else
-    return s;
+string strip_namespace(string s) {
+    if (s.find_first_of(":") != string::npos &&
+            (s.substr(0, s.find_first_of(":")) != "http")) {
+        return s.substr(s.find_first_of(":") + 1, s.length());
+    } else {
+        return s;
+    }
 }

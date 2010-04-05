@@ -82,14 +82,13 @@ class PetriNet;
  *
  * Possible answers to the question: What is the relation of A to B?
  */
-typedef enum
-{
-  AR_CONCURRENT,        ///< to activities are concurrent
-  AR_CONFLICT,          ///< to activities are conflict (like in switch)
-  AR_ENCLOSES,          ///< activity B is enclosed in activity A
-  AR_DESCENDS,          ///< activity B is a descendant of activity A
-  AR_BEFORE,            ///< activity A comes before activity B
-  AR_AFTER
+typedef enum {
+    AR_CONCURRENT,        ///< to activities are concurrent
+    AR_CONFLICT,          ///< to activities are conflict (like in switch)
+    AR_ENCLOSES,          ///< activity B is enclosed in activity A
+    AR_DESCENDS,          ///< activity B is a descendant of activity A
+    AR_BEFORE,            ///< activity A comes before activity B
+    AR_AFTER
 } activityRelationType;
 
 
@@ -107,13 +106,13 @@ void footer(kc::integer id, bool indent = false);
 void footer(int id, bool indent = false);
 
 
-activityRelationType activityRelation( unsigned int a, unsigned int b );
-void conflictingActivities( unsigned int a, unsigned int b );
-void enterConflictingActivities( set< unsigned int > a, set< unsigned int > b );
-void enclosedActivities( unsigned int a, unsigned int b );
-void enterEnclosedActivities( unsigned int a, set< unsigned int > b );
-void consecutiveActivities( unsigned int a, unsigned int b );
-void enterConsecutiveActivities( unsigned int a, unsigned int b );
+activityRelationType activityRelation(unsigned int a, unsigned int b);
+void conflictingActivities(unsigned int a, unsigned int b);
+void enterConflictingActivities(set< unsigned int > a, set< unsigned int > b);
+void enclosedActivities(unsigned int a, unsigned int b);
+void enterEnclosedActivities(unsigned int a, set< unsigned int > b);
+void consecutiveActivities(unsigned int a, unsigned int b);
+void enterConsecutiveActivities(unsigned int a, unsigned int b);
 void resetActivityRelations();
 
 
@@ -126,8 +125,8 @@ void next_index(vector<unsigned int> &current_index, const vector<unsigned int> 
  * Functions for checking SA00070 and SA00071
  *****************************************************************************/
 
-void check_SA00070( unsigned int id );
-void check_SA00071( unsigned int id );
+void check_SA00070(unsigned int id);
+void check_SA00071(unsigned int id);
 
 
 /******************************************************************************
@@ -137,8 +136,8 @@ void check_SA00071( unsigned int id );
 void in();
 void inup();
 void indown();
-void listAttributes ( unsigned int id );
-void listAttributes ( kc::integer id );
+void listAttributes(unsigned int id);
+void listAttributes(kc::integer id);
 
 /// comment me!
 void process_loop_bounds(const vector<unsigned int> &loop_bounds, const vector<unsigned int> &loop_identifiers, string prefix, unsigned int my_max);

@@ -33,7 +33,7 @@
  * \since   2007/04/30
  *
  * \date    \$Date: 2007/06/28 07:38:16 $
- * 
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
@@ -63,33 +63,32 @@ using std::set;
 
 
 
-class BPEL4Chor_participantSet
-{
-  friend class BPEL4Chor;
-  friend class BPEL4Chor_messageLink;
+class BPEL4Chor_participantSet {
+        friend class BPEL4Chor;
+        friend class BPEL4Chor_messageLink;
 
-  public:
-    /// maximal number of iterations (attribute "count")
-    unsigned int count;
-  
-  private:
-    /// name of the participantSet
-    string name;
+    public:
+        /// maximal number of iterations (attribute "count")
+        unsigned int count;
 
-    /// name of the forEach
-    string forEach_name;
+    private:
+        /// name of the participantSet
+        string name;
 
-    /// name of the participantType
-    string participantType_name;
+        /// name of the forEach
+        string forEach_name;
 
-    /// a set of iterator participant names
-    set<string> iterator_participant_names;
+        /// name of the participantType
+        string participantType_name;
 
-    /// a set of unique participant names
-    set<string> unique_participant_names;
+        /// a set of iterator participant names
+        set<string> iterator_participant_names;
 
-    /// constructor
-    BPEL4Chor_participantSet(map<string, string> &attribute_map);
+        /// a set of unique participant names
+        set<string> unique_participant_names;
+
+        /// constructor
+        BPEL4Chor_participantSet(map<string, string> &attribute_map);
 };
 
 
@@ -101,44 +100,43 @@ class BPEL4Chor_participantSet
  *
  * A BPEL4Chor messageLink.
  */
-class BPEL4Chor_messageLink
-{
-  friend class BPEL4Chor;
+class BPEL4Chor_messageLink {
+        friend class BPEL4Chor;
 
-  public:
-    /// attribute "name"
-    string name;
-  
-    /// a pointer to a forEach if an iterator participant is involved
-    BPEL4Chor_participantSet *participantSet;
+    public:
+        /// attribute "name"
+        string name;
 
-    // variables to organize multi-instances
-    bool sender_is_unique;
-    bool sender_is_iterator;
-    bool receiver_is_unique;
-    bool receiver_is_iterator;  
+        /// a pointer to a forEach if an iterator participant is involved
+        BPEL4Chor_participantSet* participantSet;
 
-  private:
-    /// the identifier of the messageLink (either attribute "id" or "name")
-    string id;
+        // variables to organize multi-instances
+        bool sender_is_unique;
+        bool sender_is_iterator;
+        bool receiver_is_unique;
+        bool receiver_is_iterator;
 
-    /// attribute "sender" or "senders"
-    string sender;
+    private:
+        /// the identifier of the messageLink (either attribute "id" or "name")
+        string id;
 
-    /// attribute "sendActivity" or "sendActivties"
-    string sendActivity;
+        /// attribute "sender" or "senders"
+        string sender;
 
-    /// attribute "receiver" or "receivers"
-    string receiver;
+        /// attribute "sendActivity" or "sendActivties"
+        string sendActivity;
 
-    /// attribute "receiveActivity" or "receiveActivities"
-    string receiveActivity;
+        /// attribute "receiver" or "receivers"
+        string receiver;
 
-    /// attribute "messageName"
-    string messageName;
+        /// attribute "receiveActivity" or "receiveActivities"
+        string receiveActivity;
 
-    /// constructor
-    BPEL4Chor_messageLink(map<string, string> &attribute_map);
+        /// attribute "messageName"
+        string messageName;
+
+        /// constructor
+        BPEL4Chor_messageLink(map<string, string> &attribute_map);
 };
 
 
@@ -150,54 +148,53 @@ class BPEL4Chor_messageLink
  *
  * This class organizes informations read from a BPEL4Chor topology file.
  */
-class BPEL4Chor
-{
-  friend class BPEL4Chor_participantSet;
-  friend class BPEL4Chor_messageLink;
+class BPEL4Chor {
+        friend class BPEL4Chor_participantSet;
+        friend class BPEL4Chor_messageLink;
 
-  private:
-    /// the currently parsed participantSet
-    BPEL4Chor_participantSet *current_participantSet;
+    private:
+        /// the currently parsed participantSet
+        BPEL4Chor_participantSet* current_participantSet;
 
-    /// the messageLinks, indexed by their name
-    map<string, BPEL4Chor_messageLink*> messageLinks;
+        /// the messageLinks, indexed by their name
+        map<string, BPEL4Chor_messageLink*> messageLinks;
 
-    /// the participantTypes with XMLNS, indexed by their name
-    map<string, string> participantTypes;
+        /// the participantTypes with XMLNS, indexed by their name
+        map<string, string> participantTypes;
 
-    /// the participantSets, indexed by their name
-    map<string, BPEL4Chor_participantSet*> participantSets;
+        /// the participantSets, indexed by their name
+        map<string, BPEL4Chor_participantSet*> participantSets;
 
-  public:
-    /// add a <participantType>
-    void add_participantType(map<string, string> &attribute_map);
+    public:
+        /// add a <participantType>
+        void add_participantType(map<string, string> &attribute_map);
 
-    /// add a <participant>
-    void add_participant(map<string, string> &attribute_map);
+        /// add a <participant>
+        void add_participant(map<string, string> &attribute_map);
 
-    /// start processing a <participantSet>
-    void start_participantSet(map<string, string> &attribute_map);
+        /// start processing a <participantSet>
+        void start_participantSet(map<string, string> &attribute_map);
 
-    /// end processing a <participantSet>
-    void end_participantSet();
+        /// end processing a <participantSet>
+        void end_participantSet();
 
-    /// add a <messageLink>
-    void add_messageLink(map<string, string> &attribute_map);
+        /// add a <messageLink>
+        void add_messageLink(map<string, string> &attribute_map);
 
-    /// find a channel name given an activity id or name
-    BPEL4Chor_messageLink *get_messageLink(unsigned int ASTE_id) const;
-    
-    /// find the number of instances to be created, given a process name
-    int instances(string process_name) const;
+        /// find a channel name given an activity id or name
+        BPEL4Chor_messageLink* get_messageLink(unsigned int ASTE_id) const;
 
-    /// find a forEach name given an activity id or name
-    unsigned int forEach_count(unsigned int ASTE_id) const;
+        /// find the number of instances to be created, given a process name
+        int instances(string process_name) const;
 
-    /// prints information about the BPEL4Chor topology
-    void print_information() const;
+        /// find a forEach name given an activity id or name
+        unsigned int forEach_count(unsigned int ASTE_id) const;
 
-    /// constructor
-    BPEL4Chor();
+        /// prints information about the BPEL4Chor topology
+        void print_information() const;
+
+        /// constructor
+        BPEL4Chor();
 };
 
 

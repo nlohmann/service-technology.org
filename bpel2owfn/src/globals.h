@@ -29,11 +29,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
- * 
+ *
  * \since   2007/03/05
  *
  * \date    \$Date: 2007/07/30 19:56:41 $
- * 
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
@@ -79,20 +79,19 @@ class BPEL4Chor;
 /*!
  * \brief process information
  */
-struct s_process_information
-{
-  unsigned int basic_activities;
-  unsigned int structured_activities;
-  unsigned int scopes;
-  unsigned int event_handlers;
-  unsigned int fault_handlers;
-  unsigned int termination_handlers;
-  unsigned int compensation_handlers;
-  unsigned int variables;
-  unsigned int links;
-  unsigned int implicit_activities;
-  unsigned int implicit_handlers;
-  unsigned int partner_links;
+struct s_process_information {
+    unsigned int basic_activities;
+    unsigned int structured_activities;
+    unsigned int scopes;
+    unsigned int event_handlers;
+    unsigned int fault_handlers;
+    unsigned int termination_handlers;
+    unsigned int compensation_handlers;
+    unsigned int variables;
+    unsigned int links;
+    unsigned int implicit_activities;
+    unsigned int implicit_handlers;
+    unsigned int partner_links;
 };
 
 
@@ -102,28 +101,26 @@ struct s_process_information
 /*!
  * \brief WSDL information
  */
-struct s_wsdl_information
-{
-  unsigned int imports;
-  unsigned int types;
-  unsigned int messages;
-  unsigned int portTypes;
-  unsigned int operations;
-  unsigned int bindings;
-  unsigned int services;
-  unsigned int properties;
-  unsigned int partnerLinkTypes;
+struct s_wsdl_information {
+    unsigned int imports;
+    unsigned int types;
+    unsigned int messages;
+    unsigned int portTypes;
+    unsigned int operations;
+    unsigned int bindings;
+    unsigned int services;
+    unsigned int properties;
+    unsigned int partnerLinkTypes;
 };
 
 
 /*!
  * \brief net reading modes
  */
-typedef enum
-{
-  OWFN,		  ///< OWFN file
-  PNML,			///< PNML file
-  NONE      ///< Not a valid format
+typedef enum {
+    OWFN,       ///< OWFN file
+    PNML,         ///< PNML file
+    NONE      ///< Not a valid format
 } net_modes;
 
 
@@ -132,173 +129,172 @@ typedef enum
 /*!
  * \brief namespace of all global variables
  */
-namespace globals
-{
-  /// prefix of the current scope (read by the stop pattern and used to direct
-  /// failures to the correct fault_in place)
-  extern string currentScope;
+namespace globals {
+    /// prefix of the current scope (read by the stop pattern and used to direct
+    /// failures to the correct fault_in place)
+    extern string currentScope;
 
-  /// maps the name of a node in the CFG to an actual block pointer
-  extern map <string, CFGBlock *> cfgMap;
+    /// maps the name of a node in the CFG to an actual block pointer
+    extern map <string, CFGBlock*> cfgMap;
 
-  /// used to generate parallel <forEach> scopes
-  extern string forEach_suffix;
+    /// used to generate parallel <forEach> scopes
+    extern string forEach_suffix;
 
-  /// mapping of AST phylum identifiers to ASTE objects
-  extern map<unsigned int, ASTE*> ASTEmap;
+    /// mapping of AST phylum identifiers to ASTE objects
+    extern map<unsigned int, ASTE*> ASTEmap;
 
-  /// set of input channel names
-  extern map<string, unsigned int> ASTE_inputChannels;
+    /// set of input channel names
+    extern map<string, unsigned int> ASTE_inputChannels;
 
-  /// set of output channel names
-  extern map<string, unsigned int> ASTE_outputChannels;
-  
-  /// a mapping from channel names to port names
-  extern map<string, string> ASTE_channel_to_port;
+    /// set of output channel names
+    extern map<string, unsigned int> ASTE_outputChannels;
 
-  /// set of (prefixed) correlation set names
-  extern set<string> ASTE_correlationSetNames;
+    /// a mapping from channel names to port names
+    extern map<string, string> ASTE_channel_to_port;
 
-  /// set of (prefixed) variable names
-  extern set<string> ASTE_variableNames;
+    /// set of (prefixed) correlation set names
+    extern set<string> ASTE_correlationSetNames;
 
-  /// set of (prefixed) messageExchange names
-  extern set<string> ASTE_messageExchangeNames;
+    /// set of (prefixed) variable names
+    extern set<string> ASTE_variableNames;
 
-  /// set of (prefixed) partner link names
-  extern set<string> ASTE_partnerLinkNames;
+    /// set of (prefixed) messageExchange names
+    extern set<string> ASTE_messageExchangeNames;
 
-  /// set of (prefixed) link names
-  extern set<string> ASTE_linkNames;
+    /// set of (prefixed) partner link names
+    extern set<string> ASTE_partnerLinkNames;
 
-  /// set of incoming message activities
-  extern set<unsigned int> ASTE_IMAs;
+    /// set of (prefixed) link names
+    extern set<string> ASTE_linkNames;
 
-  /// set of ASTE identifiers of the start activities
-  extern set<unsigned int> ASTE_startActivities;
+    /// set of incoming message activities
+    extern set<unsigned int> ASTE_IMAs;
 
-  /// mapping of (prefixed) variable names to corresponding message types
-  extern map<string, string> ASTE_variableMap;
+    /// set of ASTE identifiers of the start activities
+    extern set<unsigned int> ASTE_startActivities;
 
-  /// mapping of link names to ASTE identifiers
-  extern map<string, unsigned int> ASTE_linkIdMap;
+    /// mapping of (prefixed) variable names to corresponding message types
+    extern map<string, string> ASTE_variableMap;
 
-  /// mapping of scope names to ASTE identifiers
-  extern map<string, unsigned int> ASTE_scopeNames;
+    /// mapping of link names to ASTE identifiers
+    extern map<string, unsigned int> ASTE_linkIdMap;
 
-  /// mapping of partner links to ASTE identifiers
-  extern map<string, unsigned int> ASTE_partnerLinks;
+    /// mapping of scope names to ASTE identifiers
+    extern map<string, unsigned int> ASTE_scopeNames;
+
+    /// mapping of partner links to ASTE identifiers
+    extern map<string, unsigned int> ASTE_partnerLinks;
 
 
-  /*!
-   * variables used to evaluate join conditions
-   */
-  /// mapping of link names to temporary link numbers
-  extern map<string, unsigned int> joinCondition_links;
-  
-  /// mapping of temporary link numbers to Boolean value
-  extern map<unsigned int, bool> joinCondition_linkStatus;
-  
-  /// mapping of join conditions and an assignment number to a Boolean result.
-  extern map<unsigned int, map<unsigned int, bool > > joinCondition_result;
+    /*!
+     * variables used to evaluate join conditions
+     */
+    /// mapping of link names to temporary link numbers
+    extern map<string, unsigned int> joinCondition_links;
 
-  /// the identifier of the current scope
-  extern unsigned int PPcurrentScope;
+    /// mapping of temporary link numbers to Boolean value
+    extern map<unsigned int, bool> joinCondition_linkStatus;
 
-  /// statistics about the activities and handlers of the process
-  extern s_process_information process_information;
+    /// mapping of join conditions and an assignment number to a Boolean result.
+    extern map<unsigned int, map<unsigned int, bool > > joinCondition_result;
 
-  /// statistics about the optional WSDL file
-  extern s_wsdl_information wsdl_information;
+    /// the identifier of the current scope
+    extern unsigned int PPcurrentScope;
 
-  /// A temporary mapping of attributes. This mapping is filled during parsing
-  /// and is copied during post-processing to the AST annotation.
-  extern map<unsigned int, map<string, string> > temporaryAttributeMap;
+    /// statistics about the activities and handlers of the process
+    extern s_process_information process_information;
 
-  /// Identifier of the next AST element. The process's id is 1.
-  extern int ASTEid;  
+    /// statistics about the optional WSDL file
+    extern s_wsdl_information wsdl_information;
 
-  /// The root of the abstract syntax tree.
-  extern kc::tProcess AST;
+    /// A temporary mapping of attributes. This mapping is filled during parsing
+    /// and is copied during post-processing to the AST annotation.
+    extern map<unsigned int, map<string, string> > temporaryAttributeMap;
 
-  /// String to gather arc information for visualization
-  extern string visArcs;
+    /// Identifier of the next AST element. The process's id is 1.
+    extern int ASTEid;
 
-  /// string holding the invocation of BPEL2oWFN
-  extern string invocation;
+    /// The root of the abstract syntax tree.
+    extern kc::tProcess AST;
 
-  /// string holding the called program name of BPEL2oWFN
-  extern string program_name;
+    /// String to gather arc information for visualization
+    extern string visArcs;
 
-  /// filename of input file
-  extern string filename;
+    /// string holding the invocation of BPEL2oWFN
+    extern string invocation;
 
-  /// filename of output file
-  extern string output_filename;
+    /// string holding the called program name of BPEL2oWFN
+    extern string program_name;
 
-  /// filename of the optional BPEL4Chor choreography file
-  extern string choreography_filename;  
+    /// filename of input file
+    extern string filename;
 
-  /// filename of the optional WSDL file
-  extern string wsdl_filename;  
+    /// filename of output file
+    extern string output_filename;
 
-  /// filename of the OWFN file
-  extern string net_filename;  
+    /// filename of the optional BPEL4Chor choreography file
+    extern string choreography_filename;
 
-  /// parameters (set by #parse_command_line)
-  extern map<possibleParameters, bool> parameters;
+    /// filename of the optional WSDL file
+    extern string wsdl_filename;
 
-  /// the last token that was displayed in an error message
-  extern string last_error_token;
+    /// filename of the OWFN file
+    extern string net_filename;
 
-  /// the line of the last syntax error
-  extern string last_error_line;
+    /// parameters (set by #parse_command_line)
+    extern map<possibleParameters, bool> parameters;
 
-  /// number of detect static analysis errors
-  extern unsigned int static_analysis_errors;
+    /// the last token that was displayed in an error message
+    extern string last_error_token;
 
-  /// number of other detected warnings and errors
-  extern unsigned int other_errors;
+    /// the line of the last syntax error
+    extern string last_error_line;
 
-  /// true while parsing, false while postprocessing
-  extern bool parsing;
+    /// number of detect static analysis errors
+    extern unsigned int static_analysis_errors;
 
-  /// used to hide Handlers in Visualization
-  extern bool hideStandardHandlers;
+    /// number of other detected warnings and errors
+    extern unsigned int other_errors;
 
-  /// all elements that caused parse errors (either misplaced or nonstandard)
-  extern set<string> unknown_elements;
+    /// true while parsing, false while postprocessing
+    extern bool parsing;
 
-  /// true if process is abstract BPEL
-  extern bool abstract_process;
+    /// used to hide Handlers in Visualization
+    extern bool hideStandardHandlers;
 
-  /// the level of structural reduction
-  extern unsigned int reduction_level;
+    /// all elements that caused parse errors (either misplaced or nonstandard)
+    extern set<string> unknown_elements;
 
-  /// an object holding information from the optional WSDL file
-  extern WSDL WSDLInfo;
+    /// true if process is abstract BPEL
+    extern bool abstract_process;
 
-  /// an object holding information from the optional BPEL4Chor file
-  extern BPEL4Chor BPEL4ChorInfo;
+    /// the level of structural reduction
+    extern unsigned int reduction_level;
 
-  /// a temporary attribute mapping for the WSDL and BPEL4Chor parser
-  extern map<string, string> tempAttributes;
+    /// an object holding information from the optional WSDL file
+    extern WSDL WSDLInfo;
 
-  /// the number of instances to be created of current process (used in BPEL4Chor)
-  extern int instances_of_current_process;
-  
-  /// a mapping holding the number of branches for every <if> activity (indexed by the <if>'s id)
-  extern map<unsigned int, unsigned int> if_branches;
-  
-  /// a mapping for the commands that are attached to nodes in owfn files
-  extern map<string,string> owfn_commands;
+    /// an object holding information from the optional BPEL4Chor file
+    extern BPEL4Chor BPEL4ChorInfo;
 
-  /// the statepredicate of an owfn file
-  extern string owfn_statepredicate;
-  
-  /// the mode of reading a petrinet file
-  extern net_modes net_mode;
-  
+    /// a temporary attribute mapping for the WSDL and BPEL4Chor parser
+    extern map<string, string> tempAttributes;
+
+    /// the number of instances to be created of current process (used in BPEL4Chor)
+    extern int instances_of_current_process;
+
+    /// a mapping holding the number of branches for every <if> activity (indexed by the <if>'s id)
+    extern map<unsigned int, unsigned int> if_branches;
+
+    /// a mapping for the commands that are attached to nodes in owfn files
+    extern map<string, string> owfn_commands;
+
+    /// the statepredicate of an owfn file
+    extern string owfn_statepredicate;
+
+    /// the mode of reading a petrinet file
+    extern net_modes net_mode;
+
 }
 
 #endif

@@ -29,11 +29,11 @@
  *
  * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: nielslohmann $
- * 
+ *
  * \since   2007/03/05
  *
  * \date    \$Date: 2007/07/30 19:56:40 $
- * 
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
@@ -60,92 +60,92 @@
 
 
 namespace globals {
-  string currentScope;
+    string currentScope;
 
-  map <string, CFGBlock *> cfgMap;
+    map <string, CFGBlock*> cfgMap;
 
-  string forEach_suffix = "";
+    string forEach_suffix = "";
 
-  map<string, unsigned int> ASTE_inputChannels;
-  map<string, unsigned int> ASTE_outputChannels;
-  map<string, string> ASTE_channel_to_port;
-  set<string> ASTE_correlationSetNames;
-  set<string> ASTE_variableNames;
-  set<string> ASTE_messageExchangeNames;
-  set<string> ASTE_partnerLinkNames;
-  set<string> ASTE_linkNames;
-  set<unsigned int> ASTE_IMAs;
-  set<unsigned int> ASTE_startActivities;
+    map<string, unsigned int> ASTE_inputChannels;
+    map<string, unsigned int> ASTE_outputChannels;
+    map<string, string> ASTE_channel_to_port;
+    set<string> ASTE_correlationSetNames;
+    set<string> ASTE_variableNames;
+    set<string> ASTE_messageExchangeNames;
+    set<string> ASTE_partnerLinkNames;
+    set<string> ASTE_linkNames;
+    set<unsigned int> ASTE_IMAs;
+    set<unsigned int> ASTE_startActivities;
 
-  map<string, string> ASTE_variableMap;
-  map<string, unsigned int> ASTE_linkIdMap;
-  map<string, unsigned int> ASTE_scopeNames;
-  map<string, unsigned int> ASTE_partnerLinks;
+    map<string, string> ASTE_variableMap;
+    map<string, unsigned int> ASTE_linkIdMap;
+    map<string, unsigned int> ASTE_scopeNames;
+    map<string, unsigned int> ASTE_partnerLinks;
 
-  map<string, unsigned int> joinCondition_links;
-  map<unsigned int, bool> joinCondition_linkStatus;
-  map<unsigned int, map<unsigned int, bool > > joinCondition_result;
+    map<string, unsigned int> joinCondition_links;
+    map<unsigned int, bool> joinCondition_linkStatus;
+    map<unsigned int, map<unsigned int, bool > > joinCondition_result;
 
-  map<unsigned int, unsigned int> PPhasCompensateMap;
+    map<unsigned int, unsigned int> PPhasCompensateMap;
 
-  unsigned int PPcurrentScope = 0;
+    unsigned int PPcurrentScope = 0;
 
-  s_process_information process_information = {0,0,0,0,0,0,0,0,0,0,0};
-  s_wsdl_information wsdl_information = {0,0,0,0,0,0,0,0,0};
+    s_process_information process_information = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    s_wsdl_information wsdl_information = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-  map<unsigned int, ASTE*> ASTEmap;
+    map<unsigned int, ASTE*> ASTEmap;
 
-  map<unsigned int, map<string, string> > temporaryAttributeMap;
+    map<unsigned int, map<string, string> > temporaryAttributeMap;
 
-  int ASTEid = 1;
+    int ASTEid = 1;
 
-  kc::tProcess AST;
+    kc::tProcess AST;
 
 /// string holding the arcs of the visualization
-  string visArcs="";
+    string visArcs = "";
 
-  string invocation="";
-  
-  string filename = "<STDIN>";
-  string output_filename = "";
+    string invocation = "";
 
-  map<possibleParameters, bool> parameters;
+    string filename = "<STDIN>";
+    string output_filename = "";
 
-  string last_error_token = "";
-  string last_error_line = "";
+    map<possibleParameters, bool> parameters;
 
-  unsigned int static_analysis_errors = 0;
-  unsigned int other_errors = 0;
+    string last_error_token = "";
+    string last_error_line = "";
 
-  bool parsing = true;
+    unsigned int static_analysis_errors = 0;
+    unsigned int other_errors = 0;
 
-  bool hideStandardHandlers = false;
+    bool parsing = true;
 
-  set<string> unknown_elements;
+    bool hideStandardHandlers = false;
 
-  bool abstract_process = false;
+    set<string> unknown_elements;
 
-  unsigned int reduction_level = 0;
+    bool abstract_process = false;
 
-  string choreography_filename = "";
+    unsigned int reduction_level = 0;
 
-  string wsdl_filename = "";
+    string choreography_filename = "";
 
-  string net_filename = "";
+    string wsdl_filename = "";
 
-  WSDL WSDLInfo = WSDL();
+    string net_filename = "";
 
-  BPEL4Chor BPEL4ChorInfo = BPEL4Chor();
+    WSDL WSDLInfo = WSDL();
 
-  map<string, string> tempAttributes;
+    BPEL4Chor BPEL4ChorInfo = BPEL4Chor();
 
-  int instances_of_current_process = 0;
-  
-  map<unsigned int, unsigned int> if_branches;
+    map<string, string> tempAttributes;
 
-  map<string, string> owfn_commands;
-  
-  string owfn_statepredicate;
-  
-  net_modes net_mode;
+    int instances_of_current_process = 0;
+
+    map<unsigned int, unsigned int> if_branches;
+
+    map<string, string> owfn_commands;
+
+    string owfn_statepredicate;
+
+    net_modes net_mode;
 }

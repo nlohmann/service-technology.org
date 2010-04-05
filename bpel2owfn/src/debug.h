@@ -29,11 +29,11 @@
  *
  * \author  responsible: Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
  *          last changes of: \$Author: znamirow $
- * 
+ *
  * \since   2005/11/09
  *
  * \date    \$Date: 2007/07/23 08:10:37 $
- * 
+ *
  * \note    This file is part of the tool BPEL2oWFN and was created during the
  *          project "Tools4BPEL" at the Humboldt-Universität zu Berlin. See
  *          http://www.informatik.hu-berlin.de/top/tools4bpel for details.
@@ -85,14 +85,13 @@ using std::string;
  *
  * \ingroup debug
  */
-typedef enum
-{
-  TRACE_ERROR,		///< only trace error messages
-  TRACE_ALWAYS,		///< trace level for errors
-  TRACE_WARNINGS,       ///< trace level for warnings 
-  TRACE_INFORMATION,	///< trace level some more (useful) information
-  TRACE_DEBUG,          ///< trace level for detailed debug information
-  TRACE_VERY_DEBUG	///< trace level for everything
+typedef enum {
+    TRACE_ERROR,      ///< only trace error messages
+    TRACE_ALWAYS,     ///< trace level for errors
+    TRACE_WARNINGS,       ///< trace level for warnings
+    TRACE_INFORMATION,    ///< trace level some more (useful) information
+    TRACE_DEBUG,          ///< trace level for detailed debug information
+    TRACE_VERY_DEBUG  ///< trace level for everything
 } trace_level;
 
 
@@ -104,13 +103,12 @@ typedef enum
  *
  * \ingroup debug
  */
-typedef enum
-{
-  ERRORLEVEL_NOTICE,	///< BPEL2oWFN-relevant messages
-  ERRORLEVEL_SYNTAX,	///< syntax errors
-  ERRORLEVER_WARNING,	///< warnings
-  ERRORLEVEL_ERROR,	///< errors
-  ERRORLEVEL_CRITICAL	///< critical errors
+typedef enum {
+    ERRORLEVEL_NOTICE,    ///< BPEL2oWFN-relevant messages
+    ERRORLEVEL_SYNTAX,    ///< syntax errors
+    ERRORLEVER_WARNING,   ///< warnings
+    ERRORLEVEL_ERROR, ///< errors
+    ERRORLEVEL_CRITICAL   ///< critical errors
 } error_level;
 
 
@@ -135,7 +133,7 @@ void trace(string message);
 void show_process_information();
 void show_wsdl_information();
 void show_process_information_header();
-int frontend_error(const char *msg);
+int frontend_error(const char* msg);
 void SAerror(unsigned int code, string information = "", int lineNumber = 0);
 void SAerror(unsigned int code, string information, string lineNumber);
 void genericError(unsigned int code, string information, string line, error_level level = ERRORLEVER_WARNING);
@@ -167,8 +165,8 @@ void cleanup();
 */
 #ifndef NDEBUG
 #define ENTER(prefix) \
-  trace(TRACE_VERY_DEBUG, string(prefix) + "\t+" + string(__FUNCTION__) + \
-    "() [" + string(__FILE__) + ":" + toString(__LINE__) + "]\n")
+    trace(TRACE_VERY_DEBUG, string(prefix) + "\t+" + string(__FUNCTION__) + \
+          "() [" + string(__FILE__) + ":" + toString(__LINE__) + "]\n")
 #else
 #define ENTER(prefix)
 #endif
@@ -193,8 +191,8 @@ void cleanup();
  */
 #ifndef NDEBUG
 #define LEAVE(prefix) \
-  trace(TRACE_VERY_DEBUG, string(prefix) + "\t-" + string(__FUNCTION__) + \
-    "() [" + string(__FILE__) + ":" + toString(__LINE__) + "]\n")
+    trace(TRACE_VERY_DEBUG, string(prefix) + "\t-" + string(__FUNCTION__) + \
+          "() [" + string(__FILE__) + ":" + toString(__LINE__) + "]\n")
 #else
 #define LEAVE(prefix)
 #endif

@@ -93,14 +93,14 @@ unsigned int indentStep = 2;
  * \brief   returns a string used for identation.
  * \ingroup debug
  */
-string inString()
-{
-  string result = "";
+string inString() {
+    string result = "";
 
-  for(unsigned int i=0; i<indent; i++)
-    result += " ";
+    for (unsigned int i = 0; i < indent; i++) {
+        result += " ";
+    }
 
-  return result;
+    return result;
 }
 
 
@@ -118,12 +118,12 @@ string inString()
  *
  * \ingroup debug
 */
-void header(int id, bool myindent)
-{
-  trace(TRACE_DEBUG, "[PNU]" + inString() + "<" + globals::ASTEmap[id]->activityTypeName() + " id=" + toString(id) + ">\n");
+void header(int id, bool myindent) {
+    trace(TRACE_DEBUG, "[PNU]" + inString() + "<" + globals::ASTEmap[id]->activityTypeName() + " id=" + toString(id) + ">\n");
 
-  if (myindent)
-    indent += indentStep;
+    if (myindent) {
+        indent += indentStep;
+    }
 }
 
 
@@ -136,10 +136,9 @@ void header(int id, bool myindent)
  * \see header(int id, bool myindent)
  * \ingroup debug
 */
-void header(kc::integer id, bool myindent)
-{
-  assert(id!=NULL);
-  header(id->value, myindent);
+void header(kc::integer id, bool myindent) {
+    assert(id != NULL);
+    header(id->value, myindent);
 }
 
 
@@ -157,12 +156,12 @@ void header(kc::integer id, bool myindent)
 
  * \ingroup debug
  */
-void footer(int id, bool myindent)
-{
-  if (myindent)
-    indent -= indentStep;
+void footer(int id, bool myindent) {
+    if (myindent) {
+        indent -= indentStep;
+    }
 
-  trace(TRACE_DEBUG, "[PNU]" + inString() + "</" + globals::ASTEmap[id]->activityTypeName() + " id=" + toString(id) + ">\n");
+    trace(TRACE_DEBUG, "[PNU]" + inString() + "</" + globals::ASTEmap[id]->activityTypeName() + " id=" + toString(id) + ">\n");
 }
 
 
@@ -175,10 +174,9 @@ void footer(int id, bool myindent)
  * \see footer(int id, bool myindent)
  * \ingroup debug
  */
-void footer(kc::integer id, bool myindent)
-{
-  assert(id != NULL);
-  footer(id->value, myindent);
+void footer(kc::integer id, bool myindent) {
+    assert(id != NULL);
+    footer(id->value, myindent);
 }
 
 
@@ -186,69 +184,67 @@ void footer(kc::integer id, bool myindent)
 
 
 /*!
- * \param loop_bounds	    a vector holding the maximal indices of the ancestor loops
+ * \param loop_bounds       a vector holding the maximal indices of the ancestor loops
  * \param loop_identifiers  a vector holding the identifiers of the ancestor loops
  * \param prefix            the prefix of the calling <scope>
- * \param my_max	    the maximal index of the direct parent loop
+ * \param my_max        the maximal index of the direct parent loop
  */
-void process_loop_bounds(const vector<unsigned int> &loop_bounds, const vector<unsigned int> &loop_identifiers, string prefix, unsigned int my_max)
-{
-  extern PNapi::PetriNet PN;	// introduced in main.c
+void process_loop_bounds(const vector<unsigned int> &loop_bounds, const vector<unsigned int> &loop_identifiers, string prefix, unsigned int my_max) {
+    extern PNapi::PetriNet PN;    // introduced in main.c
 
-  vector<unsigned int> current_index(loop_bounds.size(), 1);
-  unsigned int number = 1;
+    vector<unsigned int> current_index(loop_bounds.size(), 1);
+    unsigned int number = 1;
 
-  // count the possible permutations of indices
-  for (unsigned int i = 0; i < loop_bounds.size(); i++)
-    number *= loop_bounds[i];
-
-  // create transitions, places and arcs
-  for (unsigned int i = 1; i <= number; i++)
-  {
-    Place *p1 = PN.newPlace(prefix + "c" + toString(current_index));
-    Place *p2 = PN.newPlace(prefix + "!c" + toString(current_index));
-    p2->mark(my_max);
-
-    Transition *t14 = PN.newTransition(prefix + "t14." + toString(i));
-    PN.newArc(PN.findPlace(prefix + "final1"), t14);
-    PN.newArc(PN.findPlace(prefix + "!Successful"), t14, READ);
-    PN.newArc(t14, PN.findPlace(prefix + "final"));
-
-    Transition *t15 = PN.newTransition(prefix + "t15." + toString(i));
-    PN.newArc(t15, p1);
-    PN.newArc(p2, t15);
-    PN.newArc(PN.findPlace(prefix + "final1"), t15);
-    PN.newArc(PN.findPlace(prefix + "Successful"), t15);
-    PN.newArc(t15, PN.findPlace(prefix + "!Successful"));
-    PN.newArc(t15, PN.findPlace(prefix + "final"));
-
-    Transition *t16 = PN.newTransition(prefix + "t16." + toString(i));
-    PN.newArc(p2, t16, READ, my_max);
-    PN.newArc(PN.findPlace(prefix + "compensated1"), t16);
-    PN.newArc(t16, PN.findPlace(prefix + "compensated"));
-
-    Transition *t17 = PN.newTransition(prefix + "t17." + toString(i));
-    PN.newArc(p1, t17);
-    PN.newArc(t17, p2);
-    PN.newArc(PN.findPlace(prefix + "compensate"), t17);
-    PN.newArc(t17, PN.findPlace(prefix + "ch_initial"));
-
-    PN.mergePlaces(prefix + "compensated1", prefix + "compensate");
-
-    // connect transitions with counters of ancestor loops
-    for (unsigned i = 0; i < loop_identifiers.size(); i++)
-    {
-      Place *p3 = PN.findPlace(toString(loop_identifiers[i]) + ".internal.count." + toString(current_index[i]));
-      assert(p3 != NULL);
-
-      PN.newArc(p3, t15, READ);
-      PN.newArc(p3, t16, READ);
-      PN.newArc(p3, t17, READ);
+    // count the possible permutations of indices
+    for (unsigned int i = 0; i < loop_bounds.size(); i++) {
+        number *= loop_bounds[i];
     }
 
-    // generate next index
-    next_index(current_index, loop_bounds);
-  }
+    // create transitions, places and arcs
+    for (unsigned int i = 1; i <= number; i++) {
+        Place* p1 = PN.newPlace(prefix + "c" + toString(current_index));
+        Place* p2 = PN.newPlace(prefix + "!c" + toString(current_index));
+        p2->mark(my_max);
+
+        Transition* t14 = PN.newTransition(prefix + "t14." + toString(i));
+        PN.newArc(PN.findPlace(prefix + "final1"), t14);
+        PN.newArc(PN.findPlace(prefix + "!Successful"), t14, READ);
+        PN.newArc(t14, PN.findPlace(prefix + "final"));
+
+        Transition* t15 = PN.newTransition(prefix + "t15." + toString(i));
+        PN.newArc(t15, p1);
+        PN.newArc(p2, t15);
+        PN.newArc(PN.findPlace(prefix + "final1"), t15);
+        PN.newArc(PN.findPlace(prefix + "Successful"), t15);
+        PN.newArc(t15, PN.findPlace(prefix + "!Successful"));
+        PN.newArc(t15, PN.findPlace(prefix + "final"));
+
+        Transition* t16 = PN.newTransition(prefix + "t16." + toString(i));
+        PN.newArc(p2, t16, READ, my_max);
+        PN.newArc(PN.findPlace(prefix + "compensated1"), t16);
+        PN.newArc(t16, PN.findPlace(prefix + "compensated"));
+
+        Transition* t17 = PN.newTransition(prefix + "t17." + toString(i));
+        PN.newArc(p1, t17);
+        PN.newArc(t17, p2);
+        PN.newArc(PN.findPlace(prefix + "compensate"), t17);
+        PN.newArc(t17, PN.findPlace(prefix + "ch_initial"));
+
+        PN.mergePlaces(prefix + "compensated1", prefix + "compensate");
+
+        // connect transitions with counters of ancestor loops
+        for (unsigned i = 0; i < loop_identifiers.size(); i++) {
+            Place* p3 = PN.findPlace(toString(loop_identifiers[i]) + ".internal.count." + toString(current_index[i]));
+            assert(p3 != NULL);
+
+            PN.newArc(p3, t15, READ);
+            PN.newArc(p3, t16, READ);
+            PN.newArc(p3, t17, READ);
+        }
+
+        // generate next index
+        next_index(current_index, loop_bounds);
+    }
 }
 
 
@@ -272,16 +268,15 @@ namespace {
  * Two activities are always in some kind of relationship. Either conflicting, concurrent, or consecutively.
  * This method returns this relationship as analyzed in postprocessing.
  *
- * \param a	the id of the first activity
- * \param b	the id of the second activity
+ * \param a the id of the first activity
+ * \param b the id of the second activity
  * \returns     the relationship of a and b
  *
  * \ingroup creation
  */
-activityRelationType activityRelation(unsigned int a, unsigned int b)
-{
+activityRelationType activityRelation(unsigned int a, unsigned int b) {
     ENTER("activityRelation");
-    return activityRelationMap[pair<unsigned int,unsigned int>(a,b)];
+    return activityRelationMap[pair<unsigned int, unsigned int>(a, b)];
     LEAVE("activityRelation");
 }
 
@@ -290,8 +285,7 @@ activityRelationType activityRelation(unsigned int a, unsigned int b)
  *
  * \ingroup creation
  */
-void resetActivityRelations()
-{
+void resetActivityRelations() {
     ENTER("resetActivityRelations");
     activityRelationMap.clear();
     beforeActivities.clear();
@@ -303,148 +297,132 @@ void resetActivityRelations()
 /*!
  * \brief Defines two activities as conflicting.
  *
- * \param a	the id of the first activity
- * \param b	the id of the second activity
+ * \param a the id of the first activity
+ * \param b the id of the second activity
  *
  * \ingroup creation
  */
-void conflictingActivities(unsigned int a, unsigned int b)
-{
+void conflictingActivities(unsigned int a, unsigned int b) {
     ENTER("conflictingActivities");
-    activityRelationMap[pair<unsigned int, unsigned int>(a,b)] = AR_CONFLICT;
-    activityRelationMap[pair<unsigned int, unsigned int>(b,a)] = AR_CONFLICT;
+    activityRelationMap[pair<unsigned int, unsigned int>(a, b)] = AR_CONFLICT;
+    activityRelationMap[pair<unsigned int, unsigned int>(b, a)] = AR_CONFLICT;
     LEAVE("conflictingActivities");
 }
 
 /*!
  * \brief For two sets of activities define each pair of an a and a b activity as conflicting.
  *
- * \param a	the first set activity ids
- * \param b	the second set activity ids
+ * \param a the first set activity ids
+ * \param b the second set activity ids
  *
  * \ingroup creation
  */
-void enterConflictingActivities( set< unsigned int > a, set< unsigned int > b )
-{
-  ENTER("enterConflictingActivities");
-  for ( set< unsigned int >::iterator id1 = a.begin();
-        id1 != a.end();
-        id1++ )
-  {
-    for ( set< unsigned int >::iterator id2 = b.begin();
-          id2 != b.end();
-          id2++ )
-    {
-      conflictingActivities( *id1, *id2 );
+void enterConflictingActivities(set< unsigned int > a, set< unsigned int > b) {
+    ENTER("enterConflictingActivities");
+    for (set< unsigned int >::iterator id1 = a.begin();
+            id1 != a.end();
+            id1++) {
+        for (set< unsigned int >::iterator id2 = b.begin();
+                id2 != b.end();
+                id2++) {
+            conflictingActivities(*id1, *id2);
+        }
     }
-  }
-  LEAVE("enterConflictingActivities");
+    LEAVE("enterConflictingActivities");
 }
 
 /*!
  * \brief Defines two activities as enclosed (a encloses b).
  *
- * \param a	the id of the first activity
- * \param b	the id of the second activity
+ * \param a the id of the first activity
+ * \param b the id of the second activity
  *
  * \ingroup creation
  */
-void enclosedActivities( unsigned int a, unsigned int b )
-{
+void enclosedActivities(unsigned int a, unsigned int b) {
     ENTER("enclosedActivities");
-    activityRelationMap[pair<unsigned int, unsigned int>(a,b)] = AR_ENCLOSES;
-    activityRelationMap[pair<unsigned int, unsigned int>(b,a)] = AR_DESCENDS;
+    activityRelationMap[pair<unsigned int, unsigned int>(a, b)] = AR_ENCLOSES;
+    activityRelationMap[pair<unsigned int, unsigned int>(b, a)] = AR_DESCENDS;
     LEAVE("enclosedActivities");
 }
 
 /*!
  * \brief For two sets of activities define each pair of an a and a b activity as enclosed.
  *
- * \param a	the first set activity ids
- * \param b	the second set activity ids
+ * \param a the first set activity ids
+ * \param b the second set activity ids
  *
  * \ingroup creation
  */
-void enterEnclosedActivities( unsigned int a, set< unsigned int > b )
-{
-  ENTER("enterEnclosedActivities");
-  for ( set< unsigned int >::iterator id = b.begin();
-        id != b.end();
-        id++ )
-  {
-    enclosedActivities( a, *id );
-  }
-  LEAVE("enterEnclosedActivities");
+void enterEnclosedActivities(unsigned int a, set< unsigned int > b) {
+    ENTER("enterEnclosedActivities");
+    for (set< unsigned int >::iterator id = b.begin();
+            id != b.end();
+            id++) {
+        enclosedActivities(a, *id);
+    }
+    LEAVE("enterEnclosedActivities");
 }
 
 /*!
  * \brief Defines two activities as consecutive (a before b).
  *
- * \param a	the id of the first activity
- * \param b	the id of the second activity
+ * \param a the id of the first activity
+ * \param b the id of the second activity
  *
  * \ingroup creation
  */
-void consecutiveActivities( unsigned int a, unsigned int b )
-{
+void consecutiveActivities(unsigned int a, unsigned int b) {
     ENTER("consecutiveActivities");
-    if ((a == 0) || (b == 0))
-    {
-      return;
+    if ((a == 0) || (b == 0)) {
+        return;
     }
     beforeActivities[b].insert(a);
     afterActivities[a].insert(b);
-    for (set< unsigned int >::iterator first = beforeActivities[b].begin(); first != beforeActivities[b].end(); first++)
-    {
-        for (set< unsigned int >::iterator second = afterActivities[a].begin(); second != afterActivities[a].end(); second++)
-        {
-            activityRelationMap[pair<unsigned int, unsigned int>(*first,*second)] = AR_BEFORE;
-            activityRelationMap[pair<unsigned int, unsigned int>(*second,*first)] = AR_AFTER;
+    for (set< unsigned int >::iterator first = beforeActivities[b].begin(); first != beforeActivities[b].end(); first++) {
+        for (set< unsigned int >::iterator second = afterActivities[a].begin(); second != afterActivities[a].end(); second++) {
+            activityRelationMap[pair<unsigned int, unsigned int>(*first, *second)] = AR_BEFORE;
+            activityRelationMap[pair<unsigned int, unsigned int>(*second, *first)] = AR_AFTER;
             beforeActivities[*second].insert(*first);
             afterActivities[*first].insert(*second);
-            for (set< unsigned int >::iterator innerFirst = globals::ASTEmap[ *first ]->enclosedActivities.begin(); innerFirst != globals::ASTEmap[ *first ]->enclosedActivities.end(); innerFirst++)
-            {
-                for (set< unsigned int >::iterator innerSecond = globals::ASTEmap[ *second ]->enclosedActivities.begin(); innerSecond != globals::ASTEmap[ *second ]->enclosedActivities.end(); innerSecond++)
-                {
-                    activityRelationMap[pair<unsigned int, unsigned int>(*innerFirst,*innerSecond)] = AR_BEFORE;
-                    activityRelationMap[pair<unsigned int, unsigned int>(*innerSecond,*innerFirst)] = AR_AFTER;
+            for (set< unsigned int >::iterator innerFirst = globals::ASTEmap[ *first ]->enclosedActivities.begin(); innerFirst != globals::ASTEmap[ *first ]->enclosedActivities.end(); innerFirst++) {
+                for (set< unsigned int >::iterator innerSecond = globals::ASTEmap[ *second ]->enclosedActivities.begin(); innerSecond != globals::ASTEmap[ *second ]->enclosedActivities.end(); innerSecond++) {
+                    activityRelationMap[pair<unsigned int, unsigned int>(*innerFirst, *innerSecond)] = AR_BEFORE;
+                    activityRelationMap[pair<unsigned int, unsigned int>(*innerSecond, *innerFirst)] = AR_AFTER;
                     beforeActivities[*innerSecond].insert(*innerFirst);
                     afterActivities[*innerFirst].insert(*innerSecond);
-                }            
+                }
             }
-            for (set< unsigned int >::iterator innerFirst = globals::ASTEmap[ *first ]->enclosedActivities.begin(); innerFirst != globals::ASTEmap[ *first ]->enclosedActivities.end(); innerFirst++)
-            {
-                    activityRelationMap[pair<unsigned int, unsigned int>(*innerFirst,*second)] = AR_BEFORE;
-                    activityRelationMap[pair<unsigned int, unsigned int>(*second,*innerFirst)] = AR_AFTER;
-                    beforeActivities[*second].insert(*innerFirst);
-                    afterActivities[*innerFirst].insert(*second);
+            for (set< unsigned int >::iterator innerFirst = globals::ASTEmap[ *first ]->enclosedActivities.begin(); innerFirst != globals::ASTEmap[ *first ]->enclosedActivities.end(); innerFirst++) {
+                activityRelationMap[pair<unsigned int, unsigned int>(*innerFirst, *second)] = AR_BEFORE;
+                activityRelationMap[pair<unsigned int, unsigned int>(*second, *innerFirst)] = AR_AFTER;
+                beforeActivities[*second].insert(*innerFirst);
+                afterActivities[*innerFirst].insert(*second);
             }
-                for (set< unsigned int >::iterator innerSecond = globals::ASTEmap[ *second ]->enclosedActivities.begin(); innerSecond != globals::ASTEmap[ *second ]->enclosedActivities.end(); innerSecond++)
-                {
-                    activityRelationMap[pair<unsigned int, unsigned int>(*first,*innerSecond)] = AR_BEFORE;
-                    activityRelationMap[pair<unsigned int, unsigned int>(*innerSecond,*first)] = AR_AFTER;
-                    beforeActivities[*innerSecond].insert(*first);
-                    afterActivities[*first].insert(*innerSecond);
-                }            
-        } 
+            for (set< unsigned int >::iterator innerSecond = globals::ASTEmap[ *second ]->enclosedActivities.begin(); innerSecond != globals::ASTEmap[ *second ]->enclosedActivities.end(); innerSecond++) {
+                activityRelationMap[pair<unsigned int, unsigned int>(*first, *innerSecond)] = AR_BEFORE;
+                activityRelationMap[pair<unsigned int, unsigned int>(*innerSecond, *first)] = AR_AFTER;
+                beforeActivities[*innerSecond].insert(*first);
+                afterActivities[*first].insert(*innerSecond);
+            }
+        }
     }
-    
+
     LEAVE("consecutiveActivities");
 }
 
 /*!
  * \brief For two sets of activities define each pair of an a and a b activity as consecutive (a before b).
  *
- * \param a	the first set activity ids
- * \param b	the second set activity ids
+ * \param a the first set activity ids
+ * \param b the second set activity ids
  *
  * \ingroup creation
  */
-void enterConsecutiveActivities( unsigned int a, unsigned int b )
-{
-  ENTER("enterConsecutiveActivities");
-  consecutiveActivities( a, b );
-  LEAVE("enterConsecutiveActivities");
+void enterConsecutiveActivities(unsigned int a, unsigned int b) {
+    ENTER("enterConsecutiveActivities");
+    consecutiveActivities(a, b);
+    LEAVE("enterConsecutiveActivities");
 }
 
 /******************************************************************************
@@ -457,45 +435,39 @@ void enterConsecutiveActivities( unsigned int a, unsigned int b )
  * \param id  the id of the item to be checked
  *
  */
-void check_SA00070( unsigned int id )
-{
-  ENTER("check_SA00070");
-  
-  // go through all enclosed activities and look if there have sources or targets
-  for ( set< unsigned int >::iterator activities = globals::ASTEmap[ id ]->enclosedActivities.begin();
-        activities != globals::ASTEmap[ id ]->enclosedActivities.end();
-        activities++ )
-  {
-    // whether it's source or target doesn't matter - the link must be defined inside the element that is checked
-    set< unsigned int > links = setUnion( globals::ASTEmap[ *activities ]->sourceLinks, globals::ASTEmap[ *activities ]->targetLinks );
-    
-    // so check every source and target
-    for ( set< unsigned int>::iterator link = links.begin(); link != links.end(); link++ )
-    {
-      // get the id of the <link> element
-      unsigned int linkId = globals::ASTE_linkIdMap[ globals::ASTEmap[ *link ]->linkName ];
-      
-      // look if the linkId is inside the set of enclosed activities
-      bool internal = false;
-      for ( set< unsigned int >::iterator activity = globals::ASTEmap[ id ]->enclosedActivities.begin();
-            activity != globals::ASTEmap[ id ]->enclosedActivities.end();
-            activity++ )
-      {
-        // is this the right id?
-        if ( *activity == linkId )
-        {
-          // yeah, everything is fine
-          internal = true;
+void check_SA00070(unsigned int id) {
+    ENTER("check_SA00070");
+
+    // go through all enclosed activities and look if there have sources or targets
+    for (set< unsigned int >::iterator activities = globals::ASTEmap[ id ]->enclosedActivities.begin();
+            activities != globals::ASTEmap[ id ]->enclosedActivities.end();
+            activities++) {
+        // whether it's source or target doesn't matter - the link must be defined inside the element that is checked
+        set< unsigned int > links = setUnion(globals::ASTEmap[ *activities ]->sourceLinks, globals::ASTEmap[ *activities ]->targetLinks);
+
+        // so check every source and target
+        for (set< unsigned int>::iterator link = links.begin(); link != links.end(); link++) {
+            // get the id of the <link> element
+            unsigned int linkId = globals::ASTE_linkIdMap[ globals::ASTEmap[ *link ]->linkName ];
+
+            // look if the linkId is inside the set of enclosed activities
+            bool internal = false;
+            for (set< unsigned int >::iterator activity = globals::ASTEmap[ id ]->enclosedActivities.begin();
+                    activity != globals::ASTEmap[ id ]->enclosedActivities.end();
+                    activity++) {
+                // is this the right id?
+                if (*activity == linkId) {
+                    // yeah, everything is fine
+                    internal = true;
+                }
+            }
+            // the linkId doesn't belong to the set of enclosed activities, so trigger the error
+            if (!internal) {
+                SAerror(70, globals::ASTEmap[ *link ]->linkName, globals::ASTEmap[ id ]->attributes[ "referenceLine" ]);
+            }
         }
-      }
-      // the linkId doesn't belong to the set of enclosed activities, so trigger the error
-      if ( !internal )
-      {
-        SAerror( 70, globals::ASTEmap[ *link ]->linkName, globals::ASTEmap[ id ]->attributes[ "referenceLine" ] );
-      }
     }
-  }
-  LEAVE("check_SA00070");
+    LEAVE("check_SA00070");
 }
 
 
@@ -508,47 +480,41 @@ void check_SA00070( unsigned int id )
  * \param id  the id of the item to be checked
  *
  */
-void check_SA00071( unsigned int id )
-{
-  ENTER("check_SA00071");
+void check_SA00071(unsigned int id) {
+    ENTER("check_SA00071");
 
-  for ( set< unsigned int >::iterator activities = globals::ASTEmap[ id ]->enclosedActivities.begin();
-          activities != globals::ASTEmap[ id ]->enclosedActivities.end();
-          activities++ )
-  {
-    // whether it's source or target doesn't matter - the link must be defined inside the element that is checked
-    set< unsigned int > targets = globals::ASTEmap[ *activities ]->targetLinks;
+    for (set< unsigned int >::iterator activities = globals::ASTEmap[ id ]->enclosedActivities.begin();
+            activities != globals::ASTEmap[ id ]->enclosedActivities.end();
+            activities++) {
+        // whether it's source or target doesn't matter - the link must be defined inside the element that is checked
+        set< unsigned int > targets = globals::ASTEmap[ *activities ]->targetLinks;
 
-    // so check every source and target
-    for ( set< unsigned int>::iterator link = targets.begin(); link != targets.end(); link++ )
-    {
-      // get the id of the <link> element
-      unsigned int linkId = globals::ASTE_linkIdMap[ globals::ASTEmap[ *link ]->linkName ];
-      
-      // look if the linkId is inside the set of enclosed activities
-      bool internal = false;
-      for ( set< unsigned int >::iterator activity = globals::ASTEmap[ id ]->enclosedActivities.begin();
-            activity != globals::ASTEmap[ id ]->enclosedActivities.end();
-            activity++ )
-      {
-        set< unsigned int > sources = globals::ASTEmap[ *activity ]->enclosedSourceLinks;
+        // so check every source and target
+        for (set< unsigned int>::iterator link = targets.begin(); link != targets.end(); link++) {
+            // get the id of the <link> element
+            unsigned int linkId = globals::ASTE_linkIdMap[ globals::ASTEmap[ *link ]->linkName ];
 
-        // is this the right id?
-        if ( sources.find( linkId ) != sources.end() )
-        {
-          // yeah, everything is fine
-          internal = true;
+            // look if the linkId is inside the set of enclosed activities
+            bool internal = false;
+            for (set< unsigned int >::iterator activity = globals::ASTEmap[ id ]->enclosedActivities.begin();
+                    activity != globals::ASTEmap[ id ]->enclosedActivities.end();
+                    activity++) {
+                set< unsigned int > sources = globals::ASTEmap[ *activity ]->enclosedSourceLinks;
+
+                // is this the right id?
+                if (sources.find(linkId) != sources.end()) {
+                    // yeah, everything is fine
+                    internal = true;
+                }
+            }
+            // the linkId doesn't belong to the set of enclosed activities, so trigger the error
+            if (!internal) {
+                SAerror(71, globals::ASTEmap[ linkId ]->linkName, globals::ASTEmap[ id ]->attributes[ "referenceLine" ]);
+            }
         }
-      }
-      // the linkId doesn't belong to the set of enclosed activities, so trigger the error
-      if ( !internal )
-      {
-        SAerror( 71, globals::ASTEmap[ linkId ]->linkName, globals::ASTEmap[ id ]->attributes[ "referenceLine" ] );
-      }
     }
-  }
 
-  LEAVE("check_SA00071");
+    LEAVE("check_SA00071");
 }
 
 
@@ -564,10 +530,10 @@ void check_SA00071( unsigned int id )
  * \see #inup #indown
  * \ingroup debug
  */
-void in()
-{
-  for(unsigned int i=0; i<indent; i++)
-    *output << " ";
+void in() {
+    for (unsigned int i = 0; i < indent; i++) {
+        *output << " ";
+    }
 }
 
 
@@ -579,10 +545,9 @@ void in()
  * \see #indown #in
  * \ingroup debug
  */
-void inup()
-{
-  in();
-  indent += indentStep;
+void inup() {
+    in();
+    indent += indentStep;
 }
 
 
@@ -594,10 +559,9 @@ void inup()
  * \see #inup #in
  * \ingroup debug
  */
-void indown()
-{
-  indent -= indentStep;
-  in();
+void indown() {
+    indent -= indentStep;
+    in();
 }
 
 
@@ -610,27 +574,24 @@ void indown()
  * \param id  the id of the activity, whose attributes should be printed
  *
  */
-void listAttributes ( unsigned int id )
-{
-  string result = "";
-  for (map< string, string >::iterator attribute = globals::ASTEmap[ id ]->attributes.begin(); attribute != globals::ASTEmap[ id ]->attributes.end(); attribute++ )
-  {
-    if ( attribute->second != "" &&
-         attribute->first != "referenceLine" &&
-         !( (attribute->first == "exitOnStandardFaults" ||
-             attribute->first == "createInstance" ||
-             attribute->first == "initializePartnerRole" ||
-             attribute->first == "initiate" ||
-             attribute->first == "isolated" ||
-             attribute->first == "surpressJoinFailure" ||
-             attribute->first == "validate")
-            && attribute->second == "no" )
-         )
-    {
-      result += " " + attribute->first + "=\""+ attribute->second +"\"";
+void listAttributes(unsigned int id) {
+    string result = "";
+    for (map< string, string >::iterator attribute = globals::ASTEmap[ id ]->attributes.begin(); attribute != globals::ASTEmap[ id ]->attributes.end(); attribute++) {
+        if (attribute->second != "" &&
+                attribute->first != "referenceLine" &&
+                !((attribute->first == "exitOnStandardFaults" ||
+                   attribute->first == "createInstance" ||
+                   attribute->first == "initializePartnerRole" ||
+                   attribute->first == "initiate" ||
+                   attribute->first == "isolated" ||
+                   attribute->first == "surpressJoinFailure" ||
+                   attribute->first == "validate")
+                  && attribute->second == "no")
+           ) {
+            result += " " + attribute->first + "=\"" + attribute->second + "\"";
+        }
     }
-  }
-  *output << result;
+    *output << result;
 }
 
 
@@ -654,20 +615,17 @@ void listAttributes ( unsigned int id )
  * \invariant Each index lies between 1 and its maximal value, i.e., 1 and the
  *            maximal value can be reached.
  */
-void next_index(vector<unsigned int> &current_index, const vector<unsigned int> &max_index)
-{
-  assert(current_index.size() == max_index.size());
+void next_index(vector<unsigned int> &current_index, const vector<unsigned int> &max_index) {
+    assert(current_index.size() == max_index.size());
 
-  for (unsigned int i = 0; i < current_index.size(); i++)
-  {
-    if (current_index[i] < max_index[i])
-    {
-      current_index[i]++;
-      break;
+    for (unsigned int i = 0; i < current_index.size(); i++) {
+        if (current_index[i] < max_index[i]) {
+            current_index[i]++;
+            break;
+        } else {
+            current_index[i] = 1;
+        }
     }
-    else
-      current_index[i] = 1;
-  }
 }
 
 
@@ -676,8 +634,7 @@ void next_index(vector<unsigned int> &current_index, const vector<unsigned int> 
 /*!
  * \todo Move me to the right place.
  */
-void listAttributes ( kc::integer id )
-{
-  assert(id!=NULL);
-  listAttributes ( id->value );
+void listAttributes(kc::integer id) {
+    assert(id != NULL);
+    listAttributes(id->value);
 }

@@ -81,21 +81,20 @@ using std::string;
 /*!
  * \brief enumeration of the possible options
  */
-typedef enum
-{
-   O_HELP,		///< show help screen
-   O_VERSION,		///< show version information
-   O_INPUT,		///< read input file
-   O_OUTPUT,		///< write output file
-   O_MODE,		///< choose mode (see #possibleModi)
-   O_LOG,		///< write a log-file
-   O_FORMAT,		///< choose output file format (see #possibleFormats)
-   O_PARAMETER,		///< set various parameters (see #possibleParameters)
-   O_DEBUG,		///< set the debug level
-   O_REDUCTION,		///< set level of structural reduction
-   O_TOPOLOGY,		///< parse a choreography file (BPEL4Chor)
-   O_WSDL,		///< parse a WSDL file
-   O_NET		///< parse an oWFN or PNML file
+typedef enum {
+    O_HELP,      ///< show help screen
+    O_VERSION,       ///< show version information
+    O_INPUT,     ///< read input file
+    O_OUTPUT,        ///< write output file
+    O_MODE,      ///< choose mode (see #possibleModi)
+    O_LOG,       ///< write a log-file
+    O_FORMAT,        ///< choose output file format (see #possibleFormats)
+    O_PARAMETER,     ///< set various parameters (see #possibleParameters)
+    O_DEBUG,     ///< set the debug level
+    O_REDUCTION,     ///< set level of structural reduction
+    O_TOPOLOGY,      ///< parse a choreography file (BPEL4Chor)
+    O_WSDL,      ///< parse a WSDL file
+    O_NET        ///< parse an oWFN or PNML file
 } possibleOptions;
 
 
@@ -105,14 +104,13 @@ typedef enum
 /*!
  * \brief enumeration of the possible modes
  */
-typedef enum
-{
-  M_AST = 1,		///< abstract syntax tree
-  M_PRETTY,			///< BPEL pretty-printer
-  M_PETRINET,		///< Petri net
-  M_CHOREOGRAPHY,	///< consistency (parse two input files)
-  M_CFG,			///< control flow analysis
-  M_VIS				///< BPEL process visualization
+typedef enum {
+    M_AST = 1,        ///< abstract syntax tree
+    M_PRETTY,         ///< BPEL pretty-printer
+    M_PETRINET,       ///< Petri net
+    M_CHOREOGRAPHY,   ///< consistency (parse two input files)
+    M_CFG,            ///< control flow analysis
+    M_VIS             ///< BPEL process visualization
 } possibleModi;
 
 
@@ -122,21 +120,20 @@ typedef enum
 /*!
  * \brief enumeration of the possible output file formats
  */
-typedef enum
-{
-  F_LOLA,		///< LoLA Petri net
-  F_TPN,		///< Woflan workflow net
-  F_OWFN,		///< Fiona open workflow net
-  F_DOT,		///< Graphviz dot format
-  F_PEP,		///< low-level PEP notation
-  F_APNN,		///< Abstract Petri Net Notation
-  F_INA,		///< INA Petri net
-  F_SPIN,		///< SPIN Petri net
-  F_INFO,		///< BPEL2oWFN information file
-  F_PNML,		///< Petri Net Markup Language
-  F_TXT,		///< ASCII output (for the abstract syntax tree)
-  F_XML,		///< XML output (for pretty-printed BPEL)
-  F_IOLOLA		///< LoLA Petri net with I/O annotation
+typedef enum {
+    F_LOLA,       ///< LoLA Petri net
+    F_TPN,        ///< Woflan workflow net
+    F_OWFN,       ///< Fiona open workflow net
+    F_DOT,        ///< Graphviz dot format
+    F_PEP,        ///< low-level PEP notation
+    F_APNN,       ///< Abstract Petri Net Notation
+    F_INA,        ///< INA Petri net
+    F_SPIN,       ///< SPIN Petri net
+    F_INFO,       ///< BPEL2oWFN information file
+    F_PNML,       ///< Petri Net Markup Language
+    F_TXT,        ///< ASCII output (for the abstract syntax tree)
+    F_XML,        ///< XML output (for pretty-printed BPEL)
+    F_IOLOLA      ///< LoLA Petri net with I/O annotation
 } possibleFormats;
 
 
@@ -146,19 +143,18 @@ typedef enum
 /*!
  * \brief enumeration of the possible parameters
  */
-typedef enum
-{
-  P_VARIABLES,		///< removes all variables from the model
-  P_STANDARDFAULTS,	///< only user-defined faults can occur
-  P_FHFAULTS,		///< activities inside the FH throw no faults
-  P_COMMUNICATIONONLY,	///< creates the smallest possible net
-  P_XOR,		///< use XOR as transition condition
-  P_LOOPCOUNT,		///< use loop counters
-  P_LOOPCONTROL,	///< add communication to loops
-  P_NOINTERFACE,	///< do not draw an interface
-  P_DEADLOCKTEST,	///< removes the deadlock from the final place
-  P_PORTS,		///< outputs ports (affects oWFN and dot output)
-  P_DECOMP ///< decompose the net using free choice conflicts
+typedef enum {
+    P_VARIABLES,      ///< removes all variables from the model
+    P_STANDARDFAULTS, ///< only user-defined faults can occur
+    P_FHFAULTS,       ///< activities inside the FH throw no faults
+    P_COMMUNICATIONONLY,  ///< creates the smallest possible net
+    P_XOR,        ///< use XOR as transition condition
+    P_LOOPCOUNT,      ///< use loop counters
+    P_LOOPCONTROL,    ///< add communication to loops
+    P_NOINTERFACE,    ///< do not draw an interface
+    P_DEADLOCKTEST,   ///< removes the deadlock from the final place
+    P_PORTS,      ///< outputs ports (affects oWFN and dot output)
+    P_DECOMP ///< decompose the net using free choice conflicts
 } possibleParameters;
 
 
@@ -171,9 +167,9 @@ typedef enum
 
 // from options.cc
 
-extern void closeOutput(ostream *file);
+extern void closeOutput(ostream* file);
 extern void parse_command_line(int argc, char* argv[]);
-extern ostream *openOutput(string name);
+extern ostream* openOutput(string name);
 
 
 
@@ -188,9 +184,9 @@ extern ostream *openOutput(string name);
 extern bool createOutputFile;
 extern set<string> inputfiles;
 extern string log_filename;
-extern istream *input;
-extern ostream *output;
-extern ostream *log_output;
+extern istream* input;
+extern ostream* output;
+extern ostream* log_output;
 extern possibleModi modus;
 extern map<possibleOptions,    bool> options;
 extern map<possibleParameters, bool> parameters;
@@ -199,7 +195,7 @@ extern map<possibleFormats,  string> suffixes;
 
 extern int frontend_debug;
 extern int frontend__flex_debug;
-extern FILE *frontend_in;
+extern FILE* frontend_in;
 
 
 

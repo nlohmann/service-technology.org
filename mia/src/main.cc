@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Mia.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Mia.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 #include "config.h"
@@ -62,9 +62,9 @@ extern unsigned int stat_tupleCount;
 extern unsigned int stat_tupleCountNew;
 
 // the input files
-extern FILE *graph_in;
-extern FILE *im_in;
-extern FILE *mi_in;
+extern FILE* graph_in;
+extern FILE* im_in;
+extern FILE* mi_in;
 
 // the parsers and lexers
 extern int graph_parse();
@@ -75,7 +75,7 @@ extern int im_lex_destroy();
 extern int mi_lex_destroy();
 
 bool fileExists(std::string filename) {
-    FILE *tmp = fopen(filename.c_str(), "r");
+    FILE* tmp = fopen(filename.c_str(), "r");
     if (tmp) {
         fclose(tmp);
         return true;
@@ -88,11 +88,11 @@ bool fileExists(std::string filename) {
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
     // set default values
-    argv[0] = (char *)PACKAGE;
+    argv[0] = (char*)PACKAGE;
 
     // debug option
     if (argc > 0 and std::string(argv[1]) == "--bug") {
-        FILE *debug_output = fopen("bug.log", "w");
+        FILE* debug_output = fopen("bug.log", "w");
         fprintf(debug_output, "%s\n", CONFIG_LOG);
         fclose(debug_output);
         fprintf(stderr, "Please send file 'bug.log' to %s.\n", PACKAGE_BUGREPORT);
@@ -100,7 +100,7 @@ void evaluateParameters(int argc, char** argv) {
     }
 
     // initialize the parameters structure
-    struct cmdline_parser_params *params = cmdline_parser_params_create();
+    struct cmdline_parser_params* params = cmdline_parser_params_create();
 
     // call the cmdline parser
     cmdline_parser(argc, argv, &args_info);
@@ -112,7 +112,7 @@ void evaluateParameters(int argc, char** argv) {
         params->override = 0;
 
         // call the config file parser
-        if (cmdline_parser_config_file (args_info.config_arg, &args_info, params) != 0) {
+        if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
             abort(12, "error reading configuration file '%s'", args_info.config_arg);
         } else {
             status("using configuration file '%s'", args_info.config_arg);
@@ -121,13 +121,13 @@ void evaluateParameters(int argc, char** argv) {
         // check for configuration files
         string conf_filename = fileExists("mia.conf") ? "mia.conf" :
                                (fileExists(string(SYSCONFDIR) + "/mia.conf") ?
-                               (string(SYSCONFDIR) + "/mia.conf") : "");
+                                (string(SYSCONFDIR) + "/mia.conf") : "");
 
         if (conf_filename != "") {
             // initialize the config file parser
             params->initialize = 0;
             params->override = 0;
-            if (cmdline_parser_config_file ((char*)conf_filename.c_str(), &args_info, params) != 0) {
+            if (cmdline_parser_config_file((char*)conf_filename.c_str(), &args_info, params) != 0) {
                 abort(12, "error reading configuration file '%s'", conf_filename.c_str());
             } else {
                 status("using configuration file '%s'", conf_filename.c_str());
@@ -190,7 +190,7 @@ int main(int argc, char** argv) {
     | 1. calculate most permissive partner and migration information |
     `---------------------------------------------------------------*/
     string wendy_command = string(args_info.wendy_arg) + " " + args_info.inputs[0]
-        + " --im=" + im_filename + " --sa=" + mpp_filename + " --mi=" + mi_filename;
+                           + " --im=" + im_filename + " --sa=" + mpp_filename + " --mi=" + mi_filename;
     if (args_info.messagebound_given) {
         std::stringstream s;
         s << args_info.messagebound_arg;
@@ -233,7 +233,7 @@ int main(int argc, char** argv) {
     if (not mpp_file) {
         abort(5, "could not read most-permissive partner");
     }
-    pnapi::Automaton *mpp_sa = new pnapi::Automaton();
+    pnapi::Automaton* mpp_sa = new pnapi::Automaton();
     mpp_file >> pnapi::io::sa >> *mpp_sa;
     mpp_file.close();
     if (args_info.verbose_flag) {
@@ -249,7 +249,7 @@ int main(int argc, char** argv) {
     if (not target_file) {
         abort(6, "could not read target service '%s'", args_info.inputs[1]);
     }
-    pnapi::PetriNet *target = new pnapi::PetriNet();
+    pnapi::PetriNet* target = new pnapi::PetriNet();
     target_file >> pnapi::io::owfn >> *target;
     target_file.close();
     if (args_info.verbose_flag) {
@@ -262,7 +262,7 @@ int main(int argc, char** argv) {
     | 6. transform most-permissive partner to open net |
     `-------------------------------------------------*/
     time(&start_time);
-    pnapi::PetriNet *mpp = new pnapi::PetriNet(mpp_sa->stateMachine());
+    pnapi::PetriNet* mpp = new pnapi::PetriNet(mpp_sa->stateMachine());
     time(&end_time);
     if (args_info.verbose_flag) {
         std::ostringstream s;
@@ -296,7 +296,7 @@ int main(int argc, char** argv) {
     composition_lolafile << pnapi::io::lola << *mpp;
     composition_lolafile.close();
     string lola_command = args_info.safe_flag ? args_info.lola_full1_arg : args_info.lola_full_arg;
-    lola_command += " " + lola_filename + " -M";    
+    lola_command += " " + lola_filename + " -M";
     if (!args_info.verbose_flag) {
         lola_command += " 2> /dev/null";
     }
@@ -346,7 +346,7 @@ int main(int argc, char** argv) {
         time(&start_time);
         cmdline_parser_free(&args_info);
         delete mpp_sa;
-   	delete target;
+        delete target;
         delete mpp;
         time(&end_time);
         status("released memory [%.0f sec]", difftime(end_time, start_time));

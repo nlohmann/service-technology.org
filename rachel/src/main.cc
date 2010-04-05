@@ -51,7 +51,7 @@ clock_t start_clock = clock();
 
 // lexer and parser
 extern int og_yyparse();
-extern FILE *og_yyin;
+extern FILE* og_yyin;
 
 /// the automaton
 Graph A("");
@@ -63,7 +63,7 @@ Graph B("");
 Graph G_parsedGraph("");
 
 /// the filename of the current file
-char *G_filename;
+char* G_filename;
 
 /// a map caching the best script for all action pairs
 map<Node, map<Node, ActionScript> > G_script_cache;
@@ -124,11 +124,12 @@ void evaluateParameters(int argc, char** argv) {
     cmdline_parser_init(&args_info);
 
     // initialize the parameters structure
-    struct cmdline_parser_params *params = cmdline_parser_params_create();
+    struct cmdline_parser_params* params = cmdline_parser_params_create();
 
     // call the cmdline parser
-    if (cmdline_parser (argc, argv, &args_info) != 0)
+    if (cmdline_parser(argc, argv, &args_info) != 0) {
         exit(EXIT_FAILURE);
+    }
 
     if (args_info.conf_file_given) {
         // initialize the config file parser
@@ -136,14 +137,17 @@ void evaluateParameters(int argc, char** argv) {
         params->override = 0;
 
         // call the config file parser
-        if (cmdline_parser_config_file (args_info.conf_file_arg, &args_info, params) != 0)
+        if (cmdline_parser_config_file(args_info.conf_file_arg, &args_info, params) != 0) {
             exit(EXIT_FAILURE);
+        }
     }
 
     // debug option
     if (args_info.bug_flag) {
-        { Output debug_output("bug.log", "configuration information");
-          debug_output.stream() << CONFIG_LOG << std::flush; }
+        {
+            Output debug_output("bug.log", "configuration information");
+            debug_output.stream() << CONFIG_LOG << std::flush;
+        }
         message("please send file 'bug.log' to %s!", PACKAGE_BUGREPORT);
         exit(EXIT_SUCCESS);
     }
@@ -175,13 +179,13 @@ int main(int argc, char** argv) {
 
     // modes that read a service automaton
     if (args_info.mode_arg == mode_arg_matching or
-        args_info.mode_arg == mode_arg_simulation or
-        args_info.mode_arg == mode_arg_sa) {
+            args_info.mode_arg == mode_arg_simulation or
+            args_info.mode_arg == mode_arg_sa) {
 
         // care about the automaton file input
         if (!args_info.automaton_given) {
             abort(1, ": '--automaton' ('-a') option required in mode '%s'",
-                cmdline_parser_mode_values[args_info.mode_arg]);
+                  cmdline_parser_mode_values[args_info.mode_arg]);
         } else {
             G_filename = args_info.automaton_arg;
             og_yyin = fopen(G_filename, "r");
@@ -200,13 +204,13 @@ int main(int argc, char** argv) {
 
     // modes that read an operating guideline
     if (args_info.mode_arg == mode_arg_matching or
-        args_info.mode_arg == mode_arg_simulation or
-        args_info.mode_arg == mode_arg_og) {
+            args_info.mode_arg == mode_arg_simulation or
+            args_info.mode_arg == mode_arg_og) {
 
         // care about the OG file input
         if (!args_info.og_given) {
             abort(3, "'--og' ('-o') option required in mode '%s'",
-                cmdline_parser_mode_values[args_info.mode_arg]);
+                  cmdline_parser_mode_values[args_info.mode_arg]);
         } else {
             G_filename = args_info.og_arg;
             og_yyin = fopen(G_filename, "r");
@@ -235,18 +239,18 @@ int main(int argc, char** argv) {
         // statistical output
         status("calculating %s", cmdline_parser_mode_values[args_info.mode_arg]);
         status("source (SA): %s%s%s\t%u nodes",
-                _cb_, basename(args_info.automaton_arg), _c_, static_cast<unsigned int>(A.nodes.size()));
+               _cb_, basename(args_info.automaton_arg), _c_, static_cast<unsigned int>(A.nodes.size()));
         status("target (OG): %s%s%s\t%u nodes",
-                _cb_, basename(args_info.og_arg), _c_, static_cast<unsigned int>(B.nodes.size()));
+               _cb_, basename(args_info.og_arg), _c_, static_cast<unsigned int>(B.nodes.size()));
     }
 
 
     // more statistical output
     if (args_info.mode_arg == mode_arg_matching) {
         status("OG characterizes %.3Le deterministic acyclic services (up to tree isomorphism)",
-                B.countServices());
+               B.countServices());
         status("OG has an average size of satisfying assignments of %f",
-                B.averageSatSize());
+               B.averageSatSize());
     }
 
     if (args_info.mode_arg == mode_arg_simulation) {
@@ -257,12 +261,14 @@ int main(int argc, char** argv) {
     // do what you're told via "--mode" parameter
     switch (args_info.mode_arg) {
         case(mode_arg_simulation): {
-            message("similarity: %.2f%s", Simulation::simulation(), _c_); break;
-        }
+                message("similarity: %.2f%s", Simulation::simulation(), _c_);
+                break;
+            }
 
         case(mode_arg_matching): {
-            message("matching: %.2f%s", Matching::matching(), _c_); break;
-        }
+                message("matching: %.2f%s", Matching::matching(), _c_);
+                break;
+            }
     }
 
 
@@ -271,16 +277,19 @@ int main(int argc, char** argv) {
         switch (args_info.mode_arg) {
             case(mode_arg_matching):
             case(mode_arg_simulation): {
-                outputEditScript(A, B).createDotFile(); break;
-            }
+                    outputEditScript(A, B).createDotFile();
+                    break;
+                }
 
             case(mode_arg_og): {
-                B.createDotFile(); break;
-            }
+                    B.createDotFile();
+                    break;
+                }
 
             case(mode_arg_sa): {
-                A.createDotFile(); break;
-            }
+                    A.createDotFile();
+                    break;
+                }
         }
     }
 

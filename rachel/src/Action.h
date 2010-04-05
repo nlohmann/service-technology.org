@@ -28,25 +28,25 @@ class Action {
     private:
         /// the type of the action
         action_type type;
-    
+
     public:
         /// set the type of the action (INSERT, DELETE, ...)
         void setType(const action_type t);
 
         /// get the type of the action
         action_type getType() const;
-    
+
         /// value of the action
         Value value;
-        
+
         Node stateA;
         Node stateB;
         Label label_old;
         Label label_new;
-        
+
         /// return a string representation of the action
         std::string toString() const;
-        
+
         // constructor
         Action(action_type myType, Value myValue,
                Node myNodeA = 0, Node myNodeB = 0);
@@ -58,21 +58,21 @@ class ActionScript {
     public:
         /// the vector of edit actions
         std::vector<Action> script;
-        
+
         /// the aggregated value of the script
         Value value;
-        
+
         /// add an action to the script
-        void add(const Action &a);
-        
+        void add(const Action& a);
+
         /// return a string representation of the script
         std::string toString() const;
-        
+
         /// constructor
         ActionScript();
-        
+
         /// constructor to construct a singleton script
-        ActionScript(const Action &a);
+        ActionScript(const Action& a);
 };
 
 

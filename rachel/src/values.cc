@@ -21,7 +21,7 @@
  * \file values.cc
  * \brief Implements functions for the node and label similarity
  */
- 
+
 #include "values.h"
 #include "cmdline.h"
 
@@ -38,7 +38,7 @@ extern gengetopt_args_info args_info;
  *************/
 
 /// node similarity
-Value N(const Graph &g1, const Graph &g2, Node q1, Node q2) {
+Value N(const Graph& g1, const Graph& g2, Node q1, Node q2) {
     // all nodes are equally similar
     return args_info.node_similarity_arg;
 }
@@ -54,22 +54,26 @@ Value N(const Graph &g1, const Graph &g2, Node q1, Node q2) {
  *
  * \return  the similarity between label l1 and l2
  */
-Value L(const Graph &g1, const Graph &g2, Label l1, Label l2) {
+Value L(const Graph& g1, const Graph& g2, Label l1, Label l2) {
     // avoid stuttering in both graphs
-    if (l1.empty() and l2.empty())
+    if (l1.empty() and l2.empty()) {
         return 0;
+    }
 
     // first graph stutters: insertion
-    if (l1.empty() and not l2.empty())
+    if (l1.empty() and not l2.empty()) {
         return args_info.benefit_insert_arg;
+    }
 
     // second graph stutters: deletion
-    if (not l1.empty() and l2.empty())
+    if (not l1.empty() and l2.empty()) {
         return args_info.benefit_delete_arg;
+    }
 
     // both labels are equal
-    if (l1 == l2)
+    if (l1 == l2) {
         return args_info.benefit_keep_arg;
+    }
 
     // label has to be changed
     return args_info.benefit_change_arg;

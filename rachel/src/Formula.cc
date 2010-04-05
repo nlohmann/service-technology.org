@@ -25,20 +25,20 @@
 /*
  * constructors
  */
-FormulaAND::FormulaAND(Formula *_left, Formula *_right)
-  : left(_left), right(_right) {
+FormulaAND::FormulaAND(Formula* _left, Formula* _right)
+    : left(_left), right(_right) {
     assert(_left);
     assert(_right);
 }
 
-FormulaOR::FormulaOR(Formula *_left, Formula *_right)
-  : left(_left), right(_right) {
+FormulaOR::FormulaOR(Formula* _left, Formula* _right)
+    : left(_left), right(_right) {
     assert(_left);
     assert(_right);
 }
 
 FormulaLit::FormulaLit(const Label& _literal)
-  : literal(_literal) {
+    : literal(_literal) {
 }
 
 
@@ -47,17 +47,19 @@ FormulaLit::FormulaLit(const Label& _literal)
  */
 
 std::string FormulaAND::toDot(bool noBrackets) const {
-    if (noBrackets)
+    if (noBrackets) {
         return left->toDot(false) + "<FONT>& and; </FONT>" + right->toDot(false);
-    else
+    } else {
         return "(" + left->toDot(false) + "<FONT>& and; </FONT>" + right->toDot(false) + ")";
+    }
 }
 
 std::string FormulaOR::toDot(bool noBrackets) const {
-    if (noBrackets)
+    if (noBrackets) {
         return left->toDot(false) + "<FONT>& or; </FONT>" + right->toDot(false);
-    else
+    } else {
         return "(" + left->toDot(false) + "<FONT>& or; </FONT>" + right->toDot(false) + ")";
+    }
 }
 
 std::string FormulaLit::toDot(bool noBrackets) const {
@@ -109,8 +111,8 @@ bool FormulaFalse::sat(const std::set<Label>& l) const {
  * nodes in which "final" occurred were not necessary, because in that case, a
  * further correction of the automaton would be suboptimal (because adding more
  * nodes beyond that point would increase the edit distance and will never be
- * necessary due to the requirement that final states are sink states). 
- * 
+ * necessary due to the requirement that final states are sink states).
+ *
  * When counting the services characterizes by an OG, however, the evaluation
  * for formulas in which "final" occurs is important. Then, we can set the
  * predicate "final" to true, because it does not change the number of

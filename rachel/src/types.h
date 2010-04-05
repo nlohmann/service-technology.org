@@ -67,7 +67,7 @@ typedef std::vector<Assignment> Assignments;
 typedef std::vector<Edge> Edges;
 
 /// a pair of graph's edges
-typedef std::pair<Edge,Edge> EdgePair;
+typedef std::pair<Edge, Edge> EdgePair;
 
 /// an edge permutations
 typedef std::set<EdgePair> Permutation;

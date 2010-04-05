@@ -87,20 +87,24 @@ inline Value N(const Node q1, const Node q2) {
  */
 inline Value L(const Label l1, const Label l2) {
     // avoid stuttering in both graphs
-    if (l1.empty() and l2.empty())
+    if (l1.empty() and l2.empty()) {
         return 0;
+    }
 
     // first graph stutters: insert
-    if (l1.empty() and not l2.empty())
+    if (l1.empty() and not l2.empty()) {
         return args_info.benefit_insert_arg;
+    }
 
     // second graph stutters: delete
-    if (not l1.empty() and l2.empty())
+    if (not l1.empty() and l2.empty()) {
         return args_info.benefit_delete_arg;
+    }
 
     // both labels are equal: keep
-    if (l1 == l2)
+    if (l1 == l2) {
         return args_info.benefit_keep_arg;
+    }
 
     // label has to be changed: modify
     return args_info.benefit_change_arg;

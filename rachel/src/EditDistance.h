@@ -33,12 +33,12 @@ class Graph;
  *       whereas an STL map would have logarithmic time complexity.
  *       Furthermore, no overhead (16 bytes per element for STL maps) is
  *       needed. The C-style array can only be used, because its size is known
- *       in advance. 
- */ 
+ *       in advance.
+ */
 class EditDistance {
     protected:
         /// result cache for dynamic programming
-        static Value **cache;
+        static Value** cache;
 
         /// value could be read from cache
         static unsigned int cache_hit;

@@ -50,7 +50,7 @@ class Edge {
 
     public:
         bool operator == (const Edge&) const;
-        bool operator <  (const Edge&) const;
+        bool operator < (const Edge&) const;
 
         Edge();
         Edge(Node, Node, const Label&);

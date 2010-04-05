@@ -48,7 +48,7 @@ using std::set;
  *
  * Compares edges for equality.
  */
-bool Edge::operator == (const Edge &e) const {
+bool Edge::operator == (const Edge& e) const {
     return (source == e.source and
             target == e.target and
             label == e.label);
@@ -60,7 +60,7 @@ bool Edge::operator == (const Edge &e) const {
  *
  * Compares edges using a lexicographical order.
  */
-bool Edge::operator < (const Edge &e) const {
+bool Edge::operator < (const Edge& e) const {
     if (label < e.label) {
         return true;
     }
@@ -83,7 +83,7 @@ bool Edge::operator < (const Edge &e) const {
  * Constructs an edge given source, target, and label.
  */
 Edge::Edge(Node _source, Node _target, const Label& _label)
-  : source(_source), target(_target), label(_label), type() {
+    : source(_source), target(_target), label(_label), type() {
 }
 
 
@@ -93,7 +93,7 @@ Edge::Edge(Node _source, Node _target, const Label& _label)
  * Constructs an empty edge, labeled with "" (epsilon).
  */
 Edge::Edge()
-  : source(0), target(0), label(""), type() {
+    : source(0), target(0), label(""), type() {
 }
 
 
@@ -106,8 +106,9 @@ Edges Graph::outEdges(Node q) {
     Edges result;
 
     for (size_t i = 0; i < edges[q].size(); ++i) {
-        if ( !addedNodes[edges[q][i].target] )
+        if (!addedNodes[edges[q][i].target]) {
             result.push_back(edges[q][i]);
+        }
     }
 
     return result;
@@ -115,10 +116,11 @@ Edges Graph::outEdges(Node q) {
 
 
 /// returns (at most 1!) successor of a node with a given label
-Edge Graph::successor(Node q, const Label &a) {
+Edge Graph::successor(Node q, const Label& a) {
     for (size_t i = 0; i < edges[q].size(); ++i) {
-        if (edges[q][i].label == a && addedNodes[edges[q][i].source] == false)
+        if (edges[q][i].label == a && addedNodes[edges[q][i].source] == false) {
             return edges[q][i];
+        }
     }
 
     return Edge();
@@ -151,7 +153,7 @@ Edge Graph::addEdge(Node q1, Node q2, const Label& l, action_type type) {
  *
  * \pre The pointer f is not NULL.
  */
-void Graph::addFormula(Node q, Formula *f) {
+void Graph::addFormula(Node q, Formula* f) {
     assert(f);
     formulas[q] = f;
 }
@@ -186,8 +188,8 @@ Assignments Graph::sat(Node q) {
  *
  */
 Graph::Graph(const std::string& _id)
-  : edges(), root(), finalNode(), max_value(0), insertionValue(),
-    deletionValue(), formulas(), id(_id),  nodes(), addedNodes() {
+    : edges(), root(), finalNode(), max_value(0), insertionValue(),
+      deletionValue(), formulas(), id(_id),  nodes(), addedNodes() {
 }
 
 
@@ -199,21 +201,21 @@ void Graph::createDotFile() {
         switch (args_info.mode_arg) {
             case(mode_arg_matching):
             case(mode_arg_simulation): {
-                dot_filename = std::string(basename(args_info.automaton_arg)) + "_" +
-                    std::string(basename(args_info.og_arg)) + "_" +
-                    cmdline_parser_mode_values[args_info.mode_arg] + ".dot";
-                break;
-            }
+                    dot_filename = std::string(basename(args_info.automaton_arg)) + "_" +
+                                   std::string(basename(args_info.og_arg)) + "_" +
+                                   cmdline_parser_mode_values[args_info.mode_arg] + ".dot";
+                    break;
+                }
 
             case(mode_arg_og): {
-                dot_filename = std::string(basename(args_info.og_arg)) + ".dot";
-                break;
-            }
+                    dot_filename = std::string(basename(args_info.og_arg)) + ".dot";
+                    break;
+                }
 
             case(mode_arg_sa): {
-                dot_filename = std::string(basename(args_info.automaton_arg)) + ".dot";
-                break;
-            }
+                    dot_filename = std::string(basename(args_info.automaton_arg)) + ".dot";
+                    break;
+                }
         }
     } else {
         dot_filename = args_info.dot_arg;
@@ -234,14 +236,14 @@ void Graph::createDotFile() {
             case(mode_arg_og):
             case(mode_arg_matching):
             case(mode_arg_simulation): {
-                toDot(dot_file);
-                break;
-            }
+                    toDot(dot_file);
+                    break;
+                }
 
             case(mode_arg_sa): {
-                toDot(dot_file, false);
-                break;
-            }
+                    toDot(dot_file, false);
+                    break;
+                }
         }
 
 
@@ -275,8 +277,9 @@ void Graph::toDot(std::ostream& o, bool drawFormulae) {
             o << "\"\"";
         }
 
-        if (addedNodes[nodes[i]])
+        if (addedNodes[nodes[i]]) {
             o << " style=dashed";
+        }
 
         if (finalNode[nodes[i]] && !drawFormulae) {
             o << " peripheries=\"2\"";
@@ -289,16 +292,24 @@ void Graph::toDot(std::ostream& o, bool drawFormulae) {
             o << " -> q_" << edges[nodes[i]][j].target;
             o << " [label=\"" << edges[nodes[i]][j].label << "\"";
 
-            if (addedNodes[edges[nodes[i]][j].source] || addedNodes[edges[nodes[i]][j].target])
+            if (addedNodes[edges[nodes[i]][j].source] || addedNodes[edges[nodes[i]][j].target]) {
                 o << " style=dashed";
+            }
 
             switch (edges[nodes[i]][j].type) {
-                case(DELETE): o << " color=red"; break;
-                case(INSERT): o << " color=green"; break;
-                case(MODIFY): o << " color=orange"; break;
+                case(DELETE):
+                    o << " color=red";
+                    break;
+                case(INSERT):
+                    o << " color=green";
+                    break;
+                case(MODIFY):
+                    o << " color=orange";
+                    break;
                 case(NONE):
                 case(KEEP):
-                default: break;
+                default:
+                    break;
             }
 
             o << "];";
@@ -351,8 +362,9 @@ bool Graph::isFinal(Node q) {
     test.insert("FINAL");
 
     if (formulas[q]) {
-        if (formulas[q]->sat(test))
+        if (formulas[q]->sat(test)) {
             return true;
+        }
     }
 
     return false;
@@ -381,8 +393,9 @@ void Graph::setFinal(Node q) {
 Node Graph::addNode(Node q) {
     // if node is present, return it
     for (size_t i = 0; i < nodes.size(); ++i) {
-        if (nodes[i] == q)
+        if (nodes[i] == q) {
             return q;
+        }
     }
 
     this->max_value = std::max(q, max_value);
@@ -422,8 +435,9 @@ Node Graph::addNewNode(Node q, const Label& l) {
 
 /// preprocess the graph with deletion values (helper)
 Value Graph::preprocessDeletionRecursively(Node q) {
-    if (deletionValue[q] != 0)
+    if (deletionValue[q] != 0) {
         return deletionValue[q];
+    }
 
     if (edges[q].empty()) {
         deletionValue[q] = 1;
@@ -443,8 +457,9 @@ Value Graph::preprocessDeletionRecursively(Node q) {
 
 /// preprocess the graph with insertion values (helper)
 Value Graph::preprocessInsertionRecursively(Node q) {
-    if (insertionValue[q] != 0)
+    if (insertionValue[q] != 0) {
         return insertionValue[q];
+    }
 
     // If the node's formula can be satisfied with "FINAL", any subsequent
     // addition of nodes would be sub-optimal.
@@ -473,7 +488,7 @@ Value Graph::preprocessInsertionRecursively(Node q) {
         bestValue = std::max(bestValue, newValue);
     }
 
-    bestValue += (1-discount());
+    bestValue += (1 - discount());
     insertionValue[q] = bestValue;
 
     return bestValue;
@@ -519,8 +534,9 @@ Value Graph::getInsertionValue(Node q) {
 long double Graph::countServicesRecursively(Node q) {
     // a cache for dynamic programming
     static map<Node, long double> cache;
-    if (cache[q] != 0)
+    if (cache[q] != 0) {
         return cache[q];
+    }
 
     Assignments assignments = sat(q);
 
@@ -573,8 +589,9 @@ bool Graph::isCyclicRecursively(Node q) {
     // the result so far
     static bool result = false;
 
-    if (result)
+    if (result) {
         return true;
+    }
 
     // check if this combination is already on the call stack
     for (size_t i = 0; i < call_stack.size(); ++i) {
@@ -633,7 +650,7 @@ void Graph::reenumerate() {
     }
 
     root = translation2[root];
-    max_value = nodes.size()-1;
+    max_value = nodes.size() - 1;
 
     nodes = new_nodes;
     edges = new_edges;

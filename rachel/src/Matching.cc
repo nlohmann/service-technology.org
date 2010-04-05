@@ -84,10 +84,12 @@ Permutation Matching::permuteEdges(const Edges& e1, const Edges& e2) {
             // returned.
             bool already = false;
 
-            if (e2[i].label.empty())
+            if (e2[i].label.empty()) {
                 already = already || !(insert_delete.insert(e1[i].label).second);
-            if (e1[i].label.empty())
+            }
+            if (e1[i].label.empty()) {
                 already = already || !(insert_delete.insert(e2[i].label).second);
+            }
 
             if (already) {
                 --permuteEdges_calls;
@@ -196,8 +198,8 @@ ActionScript Matching::w(Node q1, Node q2) {
                 }
 
                 current_value = (e2.label.empty()) ?
-                    L(e1.label, "") * A.getDeletionValue(q1) :
-                    L(e1.label, e2.label) * matching_recursively(e1.target, e2.target);
+                                L(e1.label, "") * A.getDeletionValue(q1) :
+                                L(e1.label, e2.label) * matching_recursively(e1.target, e2.target);
 
                 // if a node was added, use the new label for the action
                 if (e1.label.empty()) {
@@ -207,10 +209,12 @@ ActionScript Matching::w(Node q1, Node q2) {
                 Action current_action(MODIFY, current_value, e1.target, e2.target);
                 current_action.label_old = e1.label;
                 current_action.label_new = e2.label;
-                if (e1.label.empty() or A.addedNodes[e1.target])
+                if (e1.label.empty() or A.addedNodes[e1.target]) {
                     current_action.setType(INSERT);
-                if (e2.label.empty())
+                }
+                if (e2.label.empty()) {
                     current_action.setType(DELETE);
+                }
 
                 permutation_script.add(current_action);
             }
@@ -275,7 +279,7 @@ Value Matching::matching_recursively(Node q1, Node q2) {
     } else {
         // recursive call
         ActionScript s = w(q1, q2);
-        cache[q1][q2] = (1-discount()) * N(q1, q2) + s.value;
+        cache[q1][q2] = (1 - discount()) * N(q1, q2) + s.value;
         G_script_cache[q1][q2] = s;
     }
 
@@ -300,7 +304,7 @@ Value Matching::matching() {
     permuteEdges_calls = 0;
     calcPermutations_calls = 0;
     w_calls = 0;
-    matching_calls = 0;    
+    matching_calls = 0;
     cache_hit = 0;
     cache_miss = 0;
 
@@ -314,13 +318,13 @@ Value Matching::matching() {
     Value result = matching_recursively(A.getRoot(), B.getRoot());
 
     // statistical output
-    double hit_rate= 1 - (static_cast<double>(cache_miss) / static_cast<double>(cache_hit));
+    double hit_rate = 1 - (static_cast<double>(cache_miss) / static_cast<double>(cache_hit));
     status("cache: %u hits, %u misses, hit rate %.2f%%",
-            cache_hit, cache_miss, hit_rate * 100);
+           cache_hit, cache_miss, hit_rate * 100);
     status("%u added nodes",
-            static_cast<unsigned int>(A.addedNodes.size()));
+           static_cast<unsigned int>(A.addedNodes.size()));
     status("permuteEdges: %u, calcPermutations: %u, w: %u, matching: %u",
-            permuteEdges_calls, calcPermutations_calls, w_calls, matching_calls);
+           permuteEdges_calls, calcPermutations_calls, w_calls, matching_calls);
 
     // delete cache
     //emptyCache(A, B);

@@ -55,8 +55,8 @@ std::string Action::toString() const {
 
 // constructor
 Action::Action(action_type myType, Value myValue, Node myNodeA, Node myNodeB)
-  : type(myType), value(myValue), stateA(myNodeA), stateB(myNodeB),
-    label_old(""), label_new("") {
+    : type(myType), value(myValue), stateA(myNodeA), stateB(myNodeB),
+      label_old(""), label_new("") {
 }
 
 
@@ -66,8 +66,9 @@ void Action::setType(const action_type a) {
 
 
 action_type Action::getType() const {
-    if (type == MODIFY and label_new == label_old)
+    if (type == MODIFY and label_new == label_old) {
         return KEEP;
+    }
 
     return type;
 }
@@ -78,7 +79,7 @@ action_type Action::getType() const {
  **********************/
 
 /// add an action to the script
-void ActionScript::add(const Action &a) {
+void ActionScript::add(const Action& a) {
     value += a.value;
     script.push_back(a);
 }
@@ -89,8 +90,9 @@ std::string ActionScript::toString() const {
     std::string result;
 
     for (size_t i = 0; i < script.size(); ++i) {
-        if (i != 0)
+        if (i != 0) {
             result += ", ";
+        }
         result += script[i].toString();
     }
 
@@ -100,12 +102,12 @@ std::string ActionScript::toString() const {
 
 /// constructor
 ActionScript::ActionScript()
-  : script(), value(0) {
+    : script(), value(0) {
 }
 
 
 /// constructor to construct a singleton script
-ActionScript::ActionScript(const Action &a)
-  : script(), value(0) {
+ActionScript::ActionScript(const Action& a)
+    : script(), value(0) {
     add(a);
 }

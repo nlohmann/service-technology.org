@@ -59,8 +59,8 @@ class FormulaAND : public Formula {
 /// a formula to express a disjunction of two other formulae
 class FormulaOR : public Formula {
     private:
-        Formula *left;   ///< left sub-formula
-        Formula *right;  ///< right sub-formula
+        Formula* left;   ///< left sub-formula
+        Formula* right;  ///< right sub-formula
 
     public:
         FormulaOR(Formula*, Formula*);

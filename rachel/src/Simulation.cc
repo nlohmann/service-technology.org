@@ -66,7 +66,7 @@ ActionScript Simulation::w1(Node q1, Node q2) {
     // traverse B's edges and find edge with highest value if A stutters
     for (size_t i = 0; i < B.outEdges(q2).size(); ++i)  {
         Value currentvalue = L("", B.outEdges(q2)[i].label) *
-            simulation_recursively(q1, B.outEdges(q2)[i].target);
+                             simulation_recursively(q1, B.outEdges(q2)[i].target);
 
         if (currentvalue > action_insert.value) {
             action_insert.value = currentvalue;
@@ -98,7 +98,7 @@ ActionScript Simulation::w2(Node q1, Node q2) {
         // traverse B's edges: find edge with highest value if no-one stutters
         for (size_t j = 0; j < B.outEdges(q2).size(); ++j) {
             Value currentvalue = L(A.outEdges(q1)[i].label, B.outEdges(q2)[j].label) *
-                simulation_recursively(A.outEdges(q1)[i].target, B.outEdges(q2)[j].target);
+                                 simulation_recursively(A.outEdges(q1)[i].target, B.outEdges(q2)[j].target);
 
             if (currentvalue > action_modify.value) {
                 action_modify.value = currentvalue;
@@ -111,7 +111,7 @@ ActionScript Simulation::w2(Node q1, Node q2) {
 
         // B stutters
         Value value_delete = L(A.outEdges(q1)[i].label, "") *
-            simulation_recursively(A.outEdges(q1)[i].target, q2);
+                             simulation_recursively(A.outEdges(q1)[i].target, q2);
         Action action_delete(DELETE, value_delete, A.outEdges(q1)[i].target, q2);
         action_delete.label_old = A.outEdges(q1)[i].label;
 
@@ -162,7 +162,7 @@ Value Simulation::simulation_recursively(Node q1, Node q2) {
         G_script_cache[q1][q2] = bestScript;
 
         // calculate and cache value
-        cache[q1][q2] = (((1-discount()) * N(q1, q2)) + bestScript.value);
+        cache[q1][q2] = (((1 - discount()) * N(q1, q2)) + bestScript.value);
     }
 
 
@@ -178,7 +178,7 @@ Value Simulation::simulation_recursively(Node q1, Node q2) {
  * In addition to returning a single value, the function also creates an edit
  * script that describes how graph A has to be changed to acheive simulation
  * to B.
- * 
+ *
  * \return    the weighted weak quantitative simulation between graph A and
  *            graph B
  *
@@ -186,7 +186,7 @@ Value Simulation::simulation_recursively(Node q1, Node q2) {
  *       not terminate.
  *
  * \post Cache is cleared.
- */ 
+ */
 Value Simulation::simulation() {
     // reset static values
     cache_hit = 0;

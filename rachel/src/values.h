@@ -31,10 +31,10 @@ class Graph;
 
 
 /// node similarity
-inline Value N(const Graph &g1, const Graph &g2, Node q1, Node q2);
+inline Value N(const Graph& g1, const Graph& g2, Node q1, Node q2);
 
 /// label similarity
-inline Value L(const Graph &g1, const Graph &g2, Label l1, Label l2);
+inline Value L(const Graph& g1, const Graph& g2, Label l1, Label l2);
 
 
 #endif

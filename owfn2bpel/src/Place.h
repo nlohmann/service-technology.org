@@ -26,24 +26,23 @@
 #include <string>
 #include "BPEL.h"
 
-class Place
-{
-	public:
+class Place {
+    public:
         std::string name;
-        BPEL *bpel_code;
-        Place *next;
+        BPEL* bpel_code;
+        Place* next;
         int dfs;
         int lowlink;
 
-        Place(std::string str, Place *ptr = NULL);
-        
-        void append_bpel(BPEL *list);
+        Place(std::string str, Place* ptr = NULL);
+
+        void append_bpel(BPEL* list);
         void out();
         void pure_out();
         void owfn_out();
         void add_bpel(int bpel_id);
         void add_bpel(int bpel_id, std::string name);
-        void add_last_bpel(int bpel_id, std::string name);	
+        void add_last_bpel(int bpel_id, std::string name);
 };
 
 #endif

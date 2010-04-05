@@ -33,25 +33,23 @@
 #include "Place.h"
 
 
-extern int *stat_array;
+extern int* stat_array;
 extern int number_of_rounds;
-extern char *lola_ex;
+extern char* lola_ex;
 enum activities {EMPTY, REPLY, RECEIVE, FLOW, SWITCH, PICK, PROCESS, WHILE, SEQUENCE, EXIT, INVOKE, FOREACH, SCOPE, OPAQUE};
 
 
 
 
 
-class plists
-{
+class plists {
     public:
         std::string name;
-        plists *next;
+        plists* next;
 
-        plists(plists *ptr = NULL, std::string str = "") :
+        plists(plists* ptr = NULL, std::string str = "") :
             name(str),
-            next(ptr)
-        {
+            next(ptr) {
         }
 };
 
@@ -61,41 +59,36 @@ class plists
 
 //usage of class link: increment() once, create new instance in source and in target list with same id
 
-class Links
-{
+class Links {
     public:
         int link_id;
-        Links *next;
+        Links* next;
         static int link_counter;
 
-        Links(Links *ptr = NULL) :
+        Links(Links* ptr = NULL) :
             link_id(link_counter),
-            next(ptr)
-        {
+            next(ptr) {
         }
 
-        static void increment()
-        {
+        static void increment() {
             link_counter++;
         }
 };
 
 
 
-	
-	
-class Branch
-{
+
+
+class Branch {
     public:
-        BPEL *bpel_code;
-        Branch *next;
+        BPEL* bpel_code;
+        Branch* next;
         std::string pick_receive;
 
-        Branch(Branch *ptr = NULL) :
+        Branch(Branch* ptr = NULL) :
             bpel_code(NULL),
             next(ptr),
-            pick_receive("")    
-        {
+            pick_receive("") {
         }
 };
 
@@ -103,18 +96,16 @@ class Branch
 
 
 
-class PlaceList
-{
+class PlaceList {
     public:
-        Place *placeptr;
-        PlaceList *next;
+        Place* placeptr;
+        PlaceList* next;
         int ausgang;
 
-        PlaceList(Place *plptr, PlaceList *listptr) :
+        PlaceList(Place* plptr, PlaceList* listptr) :
             placeptr(plptr),
             next(listptr),
-            ausgang(0)    
-        {
+            ausgang(0) {
         }
 
         void out();
@@ -123,16 +114,14 @@ class PlaceList
 
 
 
-class TransitionList
-{
+class TransitionList {
     public:
-        Transition *transitionptr;
-        TransitionList *next;
+        Transition* transitionptr;
+        TransitionList* next;
 
-        TransitionList(Transition *transptr, TransitionList *listptr) :
+        TransitionList(Transition* transptr, TransitionList* listptr) :
             transitionptr(transptr),
-            next(listptr)
-        {
+            next(listptr) {
         }
 
         void out();
@@ -143,18 +132,16 @@ class TransitionList
 
 
 
-class Stack
-{
+class Stack {
     public:
-        Place *placeptr;
-        Transition *transptr;
-        Stack *next;
+        Place* placeptr;
+        Transition* transptr;
+        Stack* next;
 
-        Stack(Place *plptr, Transition *trptr, Stack *listptr) :
+        Stack(Place* plptr, Transition* trptr, Stack* listptr) :
             placeptr(plptr),
             transptr(trptr),
-            next(listptr)    
-        {
+            next(listptr) {
         }
 };
 

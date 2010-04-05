@@ -26,18 +26,17 @@
 #include <string>
 #include "Place.h"
 
-class Transition
-{
-	public:
+class Transition {
+    public:
         std::string name;
-        Place *consumes;
-        Place *produces;
-        BPEL *bpel_code;
-        Transition *next;	
+        Place* consumes;
+        Place* produces;
+        BPEL* bpel_code;
+        Transition* next;
         int dfs;
         int lowlink;
 
-        Transition(std::string str, Transition *ptr = NULL);
+        Transition(std::string str, Transition* ptr = NULL);
 
         void add_consume(std::string str);
         void add_produce(std::string str);
@@ -47,7 +46,7 @@ class Transition
         void add_bpel(int bpel_id);
         void add_bpel(int bpel_id, std::string name);
         void add_last_bpel(int bpel_id, std::string name);
-        void append_bpel(BPEL *list);
+        void append_bpel(BPEL* list);
         void out();
         void pure_out();
         void owfn_out();

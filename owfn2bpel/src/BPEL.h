@@ -30,30 +30,29 @@ class Links;
 class Branch;
 class plists;
 
-class BPEL
-{
-	public:
+class BPEL {
+    public:
         int activity;
         std::string name;
-        Links *source;
-        Links *target;
-        Branch *branches;
+        Links* source;
+        Links* target;
+        Branch* branches;
         int link_is_or;
-        BPEL *next;
-        
-        BPEL(int act, BPEL *ptr = NULL, std::string str = "");
+        BPEL* next;
+
+        BPEL(int act, BPEL* ptr = NULL, std::string str = "");
 
         //branch functions
         std::string remove_fullstop(std::string str);
         void delete_lists();
         void add_branch();
         void out();
-        void links_out(std::ofstream *bpel_file, int in = 0);
-        void code(std::ofstream *bpel_file, plists *ins = NULL, plists *outs = NULL, int in = 0);
+        void links_out(std::ofstream* bpel_file, int in = 0);
+        void code(std::ofstream* bpel_file, plists* ins = NULL, plists* outs = NULL, int in = 0);
         void add_source();
         void add_target();
         void add_target(int i);
-        BPEL *is_target();        
+        BPEL* is_target();
 };
 
 #endif

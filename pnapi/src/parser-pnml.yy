@@ -4,8 +4,21 @@
   * bison options 
   ****************************************************************************/
 
-/* plain c parser: the prefix is our "namespace" */
-%name-prefix="pnapi_pnml_yy"
+/* generate a c++ parser */
+%skeleton "lalr1.cc"
+
+/* generate your code in your own namespace */
+%define namespace "pnapi::parser::pnml::yy"
+
+/* do not call the generated class "parser" */
+%define parser_class_name "BisonParser"
+
+/* generate needed location classes */
+%locations
+
+/* pass overlying parser to generated parser and yylex-wrapper */
+%parse-param { Parser& parser_ }
+%lex-param   { Parser& parser_ }
 
 /* write tokens to parser-pnml.h for use by scanner */
 %defines
@@ -17,21 +30,21 @@
  /*****************************************************************************
   * C declarations
   ****************************************************************************/
+
+%code requires {
+  /* forward declarations */
+  namespace pnapi { namespace parser { namespace pnml {
+    class Parser;
+  } } } /* pnapi::parser::pnml */
+}
+
 %{
 
 #include "config.h"
 
-#include "parser.h"
+#include "parser-pnml-wrapper.h"
 
 #include <cstring>
-
-#define pnapi_pnml_yyerror pnapi::parser::error
-#define pnapi_pnml_yylex pnapi::parser::pnml::lex
-#define yylex_destory pnapi::parser::pnml::lex_destroy
-#define pnapi_pnml_yyparse pnapi::parser::pnml::parse
-
-using namespace pnapi;
-using namespace pnapi::parser::pnml;
 
 %}
 
@@ -59,20 +72,20 @@ using namespace pnapi::parser::pnml;
 element:
   XML_START
   {
-    open_element($1);
+    parser_.open_element($1);
     free($1);
   }
   attribute_seq_opt empty_or_content
 ;
 
 empty_or_content:
-  XML_SLASH XML_CLOSE                            { close_element(); }
-| XML_CLOSE content XML_END name_opt XML_CLOSE   { close_element(); }
+  XML_SLASH XML_CLOSE                            { parser_.close_element(); }
+| XML_CLOSE content XML_END name_opt XML_CLOSE   { parser_.close_element(); }
 ;
 
 content:
   /*empty*/
-| content XML_DATA                               { store_data($2); }
+| content XML_DATA                               { parser_.store_data($2); }
 | content element
 ;
 
@@ -90,7 +103,7 @@ attribute:
   XML_NAME                                       { free($1); }
 | XML_NAME XML_EQ XML_VALUE
   {
-    store_attributes($1, $3);
+    parser_.store_attributes($1, $3);
     free($1);
     free($3);
   }

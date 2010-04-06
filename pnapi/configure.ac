@@ -23,6 +23,9 @@ AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
 
+# using YACC doesn't work, need to call bison this way
+AC_PATH_PROG(BISON, [bison], not found)
+
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_LOLA([1.14])
@@ -83,6 +86,7 @@ AC_CONFIG_FILES([Makefile src/libpnapi.pc
                  man/Makefile
                  tests/Makefile tests/package.m4
                  utils/Makefile utils/unfolder/Makefile])
+AC_CONFIG_FILES([src/bison-wrapper.sh], [chmod +x src/bison-wrapper.sh])
 AC_CONFIG_FILES([tests/check_customer.sh], [chmod +x tests/check_customer.sh])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_CONFIG_FILES([utils/make_customer.sh], [chmod +x utils/make_customer.sh])

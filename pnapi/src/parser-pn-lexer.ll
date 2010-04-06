@@ -31,11 +31,17 @@
  * flex options 
  ****************************************************************************/
 
+/* create a c++ lexer */
+%option c++
+
+/* we provide out own class */
+%option yyclass="pnapi::parser::pn::yy::Lexer"
+
+/* we need to prefix its base class */
+%option prefix="Pn"
+
 /* created lexer should be called "lex.yy.c" to make the ylwrap script work */
 %option outfile="lex.yy.c"
-
-/* plain c scanner: the prefix is our "namespace" */
-%option prefix="pnapi_pn_yy"
 
 /* we read only one file */
 %option noyywrap
@@ -54,29 +60,12 @@
 
 #include "config.h"
 
-#include "parser.h"
-#include "parser-pn.h"
+#include "parser-pn-wrapper.h"
 
 #include <iostream>
 
-#define yystream pnapi::parser::stream
-#define yylineno pnapi::parser::line
-#define yytext   pnapi::parser::token
-#define yyerror  pnapi::parser::error
-
-#define yylex    pnapi::parser::pn::lex
-#define yylex_destroy pnapi::parser::pn::lex_destroy
-
-/* hack to read input from a C++ stream */
-#define YY_INPUT(buf,result,max_size)		\
-   yystream->read(buf, max_size); \
-   if (yystream->bad()) \
-     YY_FATAL_ERROR("input in flex scanner failed"); \
-   result = yystream->gcount();
-
-/* hack to overwrite YY_FATAL_ERROR behavior */
-#define fprintf(file,fmt,msg) \
-   yyerror(msg);
+/* tokens are defined in a struct in a class */
+typedef pnapi::parser::pn::yy::BisonParser::token tt;
 
 %}
 
@@ -106,37 +95,37 @@ transitionname3		"in."{name}
 <CAPACITY>[\n\r]               { BEGIN(INITIAL); }
 <CAPACITY>[^\n]*               { /* ignore */    }
 
-".model"                       { return K_MODEL; }
-".dummy"                       { return K_DUMMY; }
-".graph"                       { return K_GRAPH; }
-".marking"                     { return K_MARKING; }
-".end"                         { return K_END; }
+".model"                       { return tt::K_MODEL; }
+".dummy"                       { return tt::K_DUMMY; }
+".graph"                       { return tt::K_GRAPH; }
+".marking"                     { return tt::K_MARKING; }
+".end"                         { return tt::K_END; }
 
-".outputs"                     { BEGIN(G_OUTPUT); return K_OUTPUTS; }
+".outputs"                     { BEGIN(G_OUTPUT); return tt::K_OUTPUTS; }
 <G_OUTPUT>{transitionname1}    { /* ignore */ }
-<G_OUTPUT>[\n\r]               { BEGIN(INITIAL); return NEWLINE; }
+<G_OUTPUT>[\n\r]               { BEGIN(INITIAL); return tt::NEWLINE; }
 
-"{"                            { return OPENBRACE; }
-"}"                            { return CLOSEBRACE; }
+"{"                            { return tt::OPENBRACE; }
+"}"                            { return tt::CLOSEBRACE; }
 
-"("                            { BEGIN(ARCWEIGHT); return LPAR; }
-<ARCWEIGHT>{number}            { BEGIN(INITIAL); pnapi_pn_yylval.yt_uInt = atoi(pnapi_pn_yytext); return WEIGHT; }
-")"                            { return RPAR; }
+"("                            { BEGIN(ARCWEIGHT); return tt::LPAR; }
+<ARCWEIGHT>{number}            { BEGIN(INITIAL); yylval->yt_uInt = atoi(yytext); return tt::WEIGHT; }
+")"                            { return tt::RPAR; }
 
-{placename}	               { pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return PLACENAME; }
+{placename}	               { yylval->yt_str = strdup(yytext); return tt::PLACENAME; }
 
-{transitionname1}	       { pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return TRANSITIONNAME; }
+{transitionname1}	       { yylval->yt_str = strdup(yytext); return tt::TRANSITIONNAME; }
 
-{transitionname2}	       { pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return TRANSITIONNAME; }
+{transitionname2}	       { yylval->yt_str = strdup(yytext); return tt::TRANSITIONNAME; }
 
-{transitionname3}	       { pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return TRANSITIONNAME; }
+{transitionname3}	       { yylval->yt_str = strdup(yytext); return tt::TRANSITIONNAME; }
 
-"finalize"		       { pnapi_pn_yylval.yt_str = strdup(pnapi_pn_yytext); return TRANSITIONNAME; }
+"finalize"		       { yylval->yt_str = strdup(yytext); return tt::TRANSITIONNAME; }
 
-{name}		               { return IDENTIFIER; }
+{name}		               { return tt::IDENTIFIER; }
 
-[\n\r]                         { return NEWLINE; }
+[\n\r]                         { return tt::NEWLINE; }
 
 [ \t]                          { /* ingore */ }
 
-.                              { yyerror("unexpected lexical token"); }
+.                              { LexerError("unexpected lexical token"); }

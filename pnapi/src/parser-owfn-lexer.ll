@@ -4,11 +4,17 @@
   * flex options 
   ****************************************************************************/
 
+/* create a c++ lexer */
+%option c++
+
+/* we provide out own class */
+%option yyclass="pnapi::parser::owfn::yy::Lexer"
+
+/* we need to prefix its base class */
+%option prefix="Owfn"
+
 /* created lexer should be called "lex.yy.c" to make the ylwrap script work */
 %option outfile="lex.yy.c"
-
-/* plain c scanner: the prefix is our "namespace" */
-%option prefix="pnapi_owfn_yy"
 
 /* we read only one file */
 %option noyywrap
@@ -28,29 +34,12 @@
 #include "config.h"
 
 #include "formula.h"
-#include "parser.h"
-#include "parser-owfn.h"
+#include "parser-owfn-wrapper.h"
 
 #include <iostream>
 
-#define yystream pnapi::parser::stream
-#define yylineno pnapi::parser::line
-#define yytext   pnapi::parser::token
-#define yyerror  pnapi::parser::error
-
-#define yylex    pnapi::parser::owfn::lex
-#define yylex_destroy pnapi::parser::owfn::lex_destroy
-
-/* hack to read input from a C++ stream */
-#define YY_INPUT(buf,result,max_size)		\
-   yystream->read(buf, max_size); \
-   if (yystream->bad()) \
-     YY_FATAL_ERROR("input in flex scanner failed"); \
-   result = yystream->gcount();
-
-/* hack to overwrite YY_FATAL_ERROR behavior */
-#define fprintf(file,fmt,msg) \
-   yyerror(msg);
+/* tokens are defined in a struct in a class */
+typedef pnapi::parser::owfn::yy::BisonParser::token tt;
 
 %}
 
@@ -71,8 +60,8 @@
 %%
 
  /* control comments */ 
-"{$"                            { return LCONTROL; }
-"$}"                            { return RCONTROL; }
+"{$"                            { return tt::LCONTROL; }
+"$}"                            { return tt::RCONTROL; }
 
  /* comments */
 "{"                             { BEGIN(COMMENT); }
@@ -80,72 +69,72 @@
 <COMMENT>[^}]*                  { /* skip */ }
 
  /* control keywords */
-MAX_UNIQUE_EVENTS               { return KEY_MAX_UNIQUE_EVENTS; }
-ON_LOOP                         { return KEY_ON_LOOP; }
-MAX_OCCURRENCES                 { return KEY_MAX_OCCURRENCES; }
-TRUE                            { return KEY_TRUE; }
-FALSE                           { return KEY_FALSE; }
+MAX_UNIQUE_EVENTS               { return tt::KEY_MAX_UNIQUE_EVENTS; }
+ON_LOOP                         { return tt::KEY_ON_LOOP; }
+MAX_OCCURRENCES                 { return tt::KEY_MAX_OCCURRENCES; }
+TRUE                            { return tt::KEY_TRUE; }
+FALSE                           { return tt::KEY_FALSE; }
 
  /* keywords */
-SAFE                            { return KEY_SAFE; }
-PLACE                           { return KEY_PLACE; }
-INTERFACE                       { return KEY_INTERFACE; }
-INTERNAL                        { return KEY_INTERNAL; }
-INPUT                           { return KEY_INPUT; }
-OUTPUT                          { return KEY_OUTPUT; }
+SAFE                            { return tt::KEY_SAFE; }
+PLACE                           { return tt::KEY_PLACE; }
+INTERFACE                       { return tt::KEY_INTERFACE; }
+INTERNAL                        { return tt::KEY_INTERNAL; }
+INPUT                           { return tt::KEY_INPUT; }
+OUTPUT                          { return tt::KEY_OUTPUT; }
 
-TRANSITION                      { BEGIN(IDENT2); return KEY_TRANSITION; }
+TRANSITION                      { BEGIN(IDENT2); return tt::KEY_TRANSITION; }
 <IDENT2>[ \n\r\t]               { /* skip whitespaces */ }
-<IDENT2>[^,;:()\t \n\r\{\}]+    { BEGIN(INITIAL); pnapi_owfn_yylval.yt_str = strdup(yytext); return IDENT; }
-<IDENT2>.                       { yyerror("Unexpected symbol at transition identifier"); }
+<IDENT2>[^,;:()\t \n\r\{\}]+    { BEGIN(INITIAL); yylval->yt_str = strdup(yytext); return tt::IDENT; }
+<IDENT2>.                       { LexerError("Unexpected symbol at transition identifier"); }
 
-INITIALMARKING                  { return KEY_INITIALMARKING; }
-FINALMARKING                    { return KEY_FINALMARKING; }
-NOFINALMARKING                  { return KEY_NOFINALMARKING; }
-FINALCONDITION                  { return KEY_FINALCONDITION; }
-COST                            { return KEY_COST; }
-CONSUME                         { return KEY_CONSUME; }
-PRODUCE                         { return KEY_PRODUCE; }
-PORT                            { return KEY_PORT; }
-PORTS                           { return KEY_PORTS; }
-ROLES				{ return KEY_ROLES; }
-SYNCHRONOUS                     { return KEY_SYNCHRONOUS; }
-SYNCHRONIZE                     { return KEY_SYNCHRONIZE; }
-CONSTRAIN                       { return KEY_CONSTRAIN; }
+INITIALMARKING                  { return tt::KEY_INITIALMARKING; }
+FINALMARKING                    { return tt::KEY_FINALMARKING; }
+NOFINALMARKING                  { return tt::KEY_NOFINALMARKING; }
+FINALCONDITION                  { return tt::KEY_FINALCONDITION; }
+COST                            { return tt::KEY_COST; }
+CONSUME                         { return tt::KEY_CONSUME; }
+PRODUCE                         { return tt::KEY_PRODUCE; }
+PORT                            { return tt::KEY_PORT; }
+PORTS                           { return tt::KEY_PORTS; }
+ROLES				{ return tt::KEY_ROLES; }
+SYNCHRONOUS                     { return tt::KEY_SYNCHRONOUS; }
+SYNCHRONIZE                     { return tt::KEY_SYNCHRONIZE; }
+CONSTRAIN                       { return tt::KEY_CONSTRAIN; }
 
  /* keywords for final conditions */
-ALL_PLACES_EMPTY                { return KEY_ALL_PLACES_EMPTY; }
-ALL_OTHER_PLACES_EMPTY          { return KEY_ALL_OTHER_PLACES_EMPTY; }
-ALL_OTHER_INTERNAL_PLACES_EMPTY { return KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY; }
-ALL_OTHER_EXTERNAL_PLACES_EMPTY { return KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY; }
-AND                             { return OP_AND; }
-OR                              { return OP_OR; }
-NOT                             { return OP_NOT; }
-\>                              { return OP_GT; }
-\<                              { return OP_LT; }
-\>=                             { return OP_GE; }
-\<=                             { return OP_LE; }
-=                               { return OP_EQ; }
-\<\>                            { return OP_NE; }
-\#                              { return OP_NE; }
-\(                              { return LPAR; }
-\)                              { return RPAR; }
+ALL_PLACES_EMPTY                { return tt::KEY_ALL_PLACES_EMPTY; }
+ALL_OTHER_PLACES_EMPTY          { return tt::KEY_ALL_OTHER_PLACES_EMPTY; }
+ALL_OTHER_INTERNAL_PLACES_EMPTY { return tt::KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY; }
+ALL_OTHER_EXTERNAL_PLACES_EMPTY { return tt::KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY; }
+AND                             { return tt::OP_AND; }
+OR                              { return tt::OP_OR; }
+NOT                             { return tt::OP_NOT; }
+\>                              { return tt::OP_GT; }
+\<                              { return tt::OP_LT; }
+\>=                             { return tt::OP_GE; }
+\<=                             { return tt::OP_LE; }
+=                               { return tt::OP_EQ; }
+\<\>                            { return tt::OP_NE; }
+\#                              { return tt::OP_NE; }
+\(                              { return tt::LPAR; }
+\)                              { return tt::RPAR; }
 
  /* other characters */
-\:                              { return COLON; }
-\;                              { return SEMICOLON; }
-,                               { return COMMA; }
+\:                              { return tt::COLON; }
+\;                              { return tt::SEMICOLON; }
+,                               { return tt::COMMA; }
 
  /* identifiers */
-[0-9]+                          { pnapi_owfn_yylval.yt_int = atoi(yytext); return NUMBER; }
-"-"[0-9]+                       { pnapi_owfn_yylval.yt_int = atoi(yytext); return NEGATIVE_NUMBER; }
-[^,;:()\t \n\r\{\}=]+           { pnapi_owfn_yylval.yt_str = strdup(yytext); return IDENT; }
+[0-9]+                          { yylval->yt_int = atoi(yytext); return tt::NUMBER; }
+"-"[0-9]+                       { yylval->yt_int = atoi(yytext); return tt::NEGATIVE_NUMBER; }
+[^,;:()\t \n\r\{\}=]+           { yylval->yt_str = strdup(yytext); return tt::IDENT; }
 
  /* whitespace */
 [ \n\r\t]                       { /* skip */ }
 
  /* anything else */
-.                               { yyerror("unexpected lexical token"); }
+.                               { LexerError("unexpected lexical token"); }
 
 %%
 

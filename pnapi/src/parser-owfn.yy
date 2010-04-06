@@ -4,8 +4,21 @@
   * bison options 
   ****************************************************************************/
 
-/* plain c parser: the prefix is our "namespace" */
-%name-prefix="pnapi_owfn_yy"
+/* generate a c++ parser */
+%skeleton "lalr1.cc"
+
+/* generate your code in your own namespace */
+%define namespace "pnapi::parser::owfn::yy"
+
+/* do not call the generated class "parser" */
+%define parser_class_name "BisonParser"
+
+/* generate needed location classes */
+%locations
+
+/* pass overlying parser to generated parser and yylex-wrapper */
+%parse-param { Parser& parser_ }
+%lex-param   { Parser& parser_ }
 
 /* write tokens to parser-owfn.h for use by scanner */
 %defines
@@ -17,22 +30,22 @@
  /*****************************************************************************
   * C declarations
   ****************************************************************************/
+
+%code requires {
+  /* forward declarations */
+  namespace pnapi { namespace parser { namespace owfn {
+    class Parser;
+  } } } /* pnapi::parser::owfn */
+}
+
 %{
 
 #include "formula.h"
 #include "marking.h"
-#include "parser.h"
+#include "parser-owfn-wrapper.h"
 #include "petrinet.h"
 
 #include <sstream>
-
-#define pnapi_owfn_yyerror pnapi::parser::error
-#define pnapi_owfn_yylex pnapi::parser::owfn::lex
-#define yylex_destory pnapi::parser::owfn::lex_destroy
-#define pnapi_owfn_yyparse pnapi::parser::owfn::parse
-
-using namespace pnapi;
-using namespace pnapi::parser::owfn;
 
 %}
 
@@ -81,7 +94,7 @@ using namespace pnapi::parser::owfn;
 petrinet:
   interface markings transitions
   { 
-    pnapi_owfn_yynet.setConstraintLabels(constrains_); 
+    parser_.net_.setConstraintLabels(parser_.constrains_); 
   }
 ;
 
@@ -89,19 +102,19 @@ node_name:
   IDENT  
   { 
     // clear stringstream
-    nodeName_.str("");
-    nodeName_.clear();
+    parser_.nodeName_.str("");
+    parser_.nodeName_.clear();
 
-    nodeName_ << $1;
+    parser_.nodeName_ << $1;
     free($1); 
   }
 | NUMBER 
   { 
     // clear stringstream
-    nodeName_.str("");
-    nodeName_.clear();
+    parser_.nodeName_.str("");
+    parser_.nodeName_.clear();
 
-    nodeName_ << $1; 
+    parser_.nodeName_ << $1; 
   }
 ;
 
@@ -123,47 +136,47 @@ interface_ports:
 
 input_places:
   /* empty */
-| KEY_INPUT { labelType_ = Label::INPUT; } interface_labels SEMICOLON                
+| KEY_INPUT { parser_.labelType_ = Label::INPUT; } interface_labels SEMICOLON                
 ;
 
 output_places:
   /* empty */ 
-| KEY_OUTPUT { labelType_ = Label::OUTPUT; } interface_labels SEMICOLON                 
+| KEY_OUTPUT { parser_.labelType_ = Label::OUTPUT; } interface_labels SEMICOLON                 
 ;
 
 synchronous:
   /* empty */ 
-| KEY_SYNCHRONOUS { labelType_ = Label::SYNCHRONOUS; } interface_labels SEMICOLON
+| KEY_SYNCHRONOUS { parser_.labelType_ = Label::SYNCHRONOUS; } interface_labels SEMICOLON
 ;
 
   // NOTE: capacity kept due to compatibility reasons; is not actually used
 interface_labels: 
-  capacity interface_label_list { capacity_ = 0; }
-| interface_labels SEMICOLON capacity interface_label_list { capacity_ = 0; }
+  capacity interface_label_list { parser_.capacity_ = 0; }
+| interface_labels SEMICOLON capacity interface_label_list { parser_.capacity_ = 0; }
 ;
 
 capacity:
   /* empty */           
-| KEY_SAFE COLON        { capacity_ = 1; }
-| KEY_SAFE NUMBER COLON { capacity_ = $2; }
+| KEY_SAFE COLON        { parser_.capacity_ = 1; }
+| KEY_SAFE NUMBER COLON { parser_.capacity_ = $2; }
 ;
 
 interface_label_list:  
   /* empty */           
 | node_name 
   {
-    check(labels_[nodeName_.str()] == NULL, "node name already used");
-    check(places_[nodeName_.str()] == NULL, "node name already used");
-    label_ = & port_->addLabel(nodeName_.str(), labelType_);
-    labels_[nodeName_.str()] = label_;
-  } 
+    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
+    parser_.labels_[parser_.nodeName_.str()] = parser_.label_;
+  }
   controlcommands // NOTE: also kept due to compatibility reasons
 | interface_label_list COMMA node_name
   {
-    check(labels_[nodeName_.str()] == NULL, "node name already used");
-    check(places_[nodeName_.str()] == NULL, "node name already used");
-    label_ = & port_->addLabel(nodeName_.str(), labelType_);
-    labels_[nodeName_.str()] = label_;
+    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
+    parser_.labels_[parser_.nodeName_.str()] = parser_.label_;
   } 
   controlcommands // NOTE: also kept due to compatibility reasons
 ;
@@ -180,17 +193,17 @@ commands:
 | KEY_ON_LOOP OP_EQ KEY_FALSE commands
 | KEY_MAX_OCCURRENCES OP_EQ NUMBER
   {
-    if(place_ != NULL) // is only NULL when parsing interface
+    if(parser_.place_ != NULL) // is only NULL when parsing interface
     {
-      place_->setMaxOccurrence($3);
+      parser_.place_->setMaxOccurrence($3);
     }
   }
   commands
 | KEY_MAX_OCCURRENCES OP_EQ NEGATIVE_NUMBER
   {
-    if(place_ != NULL) // is only NULL when parsing interface
+    if(parser_.place_ != NULL) // is only NULL when parsing interface
     {
-      place_->setMaxOccurrence($3);
+      parser_.place_->setMaxOccurrence($3);
     }
   }
   commands
@@ -198,35 +211,35 @@ commands:
 
 port_list:
   KEY_PORT node_name
-  { port_ = &pnapi_owfn_yynet.getInterface().addPort(nodeName_.str()); } 
+  { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); } 
   input_places output_places synchronous              
 | port_list KEY_PORT node_name
-  { port_ = &pnapi_owfn_yynet.getInterface().addPort(nodeName_.str()); }
+  { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
   input_places output_places synchronous
 ;
 
 
 places: 
-  capacity place_list { capacity_ = 0; }
-| places SEMICOLON capacity place_list { capacity_ = 0; }
+  capacity place_list { parser_.capacity_ = 0; }
+| places SEMICOLON capacity place_list { parser_.capacity_ = 0; }
 ;
 
 place_list:  
   /* empty */           
 | node_name 
   {
-    check(labels_[nodeName_.str()] == NULL, "node name already used");
-    check(places_[nodeName_.str()] == NULL, "node name already used");
-    place_ = &pnapi_owfn_yynet.createPlace(nodeName_.str(), 0, capacity_);
-    places_[nodeName_.str()] = place_;
+    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    parser_.place_ = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+    parser_.places_[parser_.nodeName_.str()] = parser_.place_;
   } 
   controlcommands
 | place_list COMMA node_name
   {
-    check(labels_[nodeName_.str()] == NULL, "node name already used");
-    check(places_[nodeName_.str()] == NULL, "node name already used");
-    place_ = &pnapi_owfn_yynet.createPlace(nodeName_.str(), 0, capacity_);
-    places_[nodeName_.str()] = place_;
+    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    parser_.place_ = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+    parser_.places_[parser_.nodeName_.str()] = parser_.place_;
   } 
   controlcommands
 ;
@@ -239,9 +252,9 @@ roles:
 
 role_names:
   node_name
-  { pnapi_owfn_yynet.addRole(nodeName_.str()); }
+  { parser_.net_.addRole(parser_.nodeName_.str()); }
 | role_names COMMA node_name
-  { pnapi_owfn_yynet.addRole(nodeName_.str()); }
+  { parser_.net_.addRole(parser_.nodeName_.str()); }
 ;
 
 
@@ -263,33 +276,33 @@ ports:
 
 port_list2:
   node_name COLON
-  { port_ = & pnapi_owfn_yynet.getInterface().addPort(nodeName_.str()); }
+  { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
   port_participants SEMICOLON
 | port_list2 node_name COLON
-  { port_ = & pnapi_owfn_yynet.getInterface().addPort(nodeName_.str()); }
+  { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
   port_participants SEMICOLON 
 ;
 
 port_participants: 
   node_name 
   {
-    Label * l = labels_[nodeName_.str()];
-    check(l != NULL, "unknown interface label");
-    check((l->getPort().getName() == ""), "interface label already assigned to port '" + l->getPort().getName() +"'");
+    Label * l = parser_.labels_[parser_.nodeName_.str()];
+    parser_.check(l != NULL, "unknown interface label");
+    parser_.check((l->getPort().getName() == ""), "interface label already assigned to port '" + l->getPort().getName() +"'");
      
     Label::Type t = l->getType();
-    pnapi_owfn_yynet.getInterface().getPort()->removeLabel(nodeName_.str());
-    labels_[nodeName_.str()] = & port_->addLabel(nodeName_.str(), t);
-  } 
+    parser_.net_.getInterface().getPort()->removeLabel(parser_.nodeName_.str());
+    parser_.labels_[parser_.nodeName_.str()] = &(parser_.port_->addLabel(parser_.nodeName_.str(), t));
+  }
 | port_participants COMMA node_name
   {
-    Label * l = labels_[nodeName_.str()];
-    check(l != NULL, "unknown interface label");
-    check((l->getPort().getName() == ""), "interface label already assigned to port '" + l->getPort().getName() +"'");
+    Label * l = parser_.labels_[parser_.nodeName_.str()];
+    parser_.check(l != NULL, "unknown interface label");
+    parser_.check((l->getPort().getName() == ""), "interface label already assigned to port '" + l->getPort().getName() +"'");
      
     Label::Type t = l->getType();
-    pnapi_owfn_yynet.getInterface().getPort()->removeLabel(nodeName_.str());
-    labels_[nodeName_.str()] = & port_->addLabel(nodeName_.str(), t);
+    parser_.net_.getInterface().getPort()->removeLabel(parser_.nodeName_.str());
+    parser_.labels_[parser_.nodeName_.str()] = &(parser_.port_->addLabel(parser_.nodeName_.str(), t));
   } 
 ;
 
@@ -300,8 +313,8 @@ port_participants:
 
 
 markings:
-  KEY_INITIALMARKING { markInitial_ = true; } 
-  marking_list SEMICOLON { markInitial_ = false; } final
+  KEY_INITIALMARKING { parser_.markInitial_ = true; } 
+  marking_list SEMICOLON { parser_.markInitial_ = false; } final
 ;
 
 marking_list:
@@ -313,49 +326,49 @@ marking_list:
 marking: 
   node_name COLON NUMBER 
   { 
-    Place * p = places_[nodeName_.str()];
-    check(p != NULL, "unknown place");      
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(p != NULL, "unknown place");      
       
-    if(markInitial_)
+    if(parser_.markInitial_)
     {  
       p->setTokenCount($3);
     }
     else
     {
-      (*finalMarking_)[*p] = $3;
+      (*(parser_.finalMarking_))[*p] = $3;
     }
   }
 | node_name              
   { 
-    Place * p = places_[nodeName_.str()];
-    check(p != NULL, "unknown place");
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(p != NULL, "unknown place");
     
-    if(markInitial_)
+    if(parser_.markInitial_)
     {  
       p->setTokenCount(1);
     }
     else
     {
-      (*finalMarking_)[*p] = 1;
+      (*(parser_.finalMarking_))[*p] = 1;
     }
   }
 ;
 
 final:
   KEY_FINALMARKING
-  { finalMarking_ = new Marking(pnapi_owfn_yynet, true); } 
+  { parser_.finalMarking_ = new Marking(parser_.net_, true); } 
   finalmarkings SEMICOLON
   {
-    delete finalMarking_;
-    finalMarking_ = NULL;
+    delete parser_.finalMarking_;
+    parser_.finalMarking_ = NULL;
   } 
 | condition 
   {
-    pnapi_owfn_yynet.getFinalCondition() = (*$1);
-    if(wildcardGiven_)
+    parser_.net_.getFinalCondition() = (*$1);
+    if(parser_.wildcardGiven_)
     {
-      wildcardGiven_ = false;
-      pnapi_owfn_yynet.getFinalCondition().allOtherPlacesEmpty(pnapi_owfn_yynet);
+      parser_.wildcardGiven_ = false;
+      parser_.net_.getFinalCondition().allOtherPlacesEmpty(parser_.net_);
     }
     delete $1; 
   }
@@ -364,15 +377,15 @@ final:
 finalmarkings:
   marking_list
   {
-    pnapi_owfn_yynet.getFinalCondition().addMarking(*finalMarking_);
-    delete finalMarking_;
-    finalMarking_ = new Marking(pnapi_owfn_yynet, true);
+    parser_.net_.getFinalCondition().addMarking(*(parser_.finalMarking_));
+    delete parser_.finalMarking_;
+    parser_.finalMarking_ = new Marking(parser_.net_, true);
   }
 | finalmarkings SEMICOLON marking_list 
   {
-    pnapi_owfn_yynet.getFinalCondition().addMarking(*finalMarking_);
-    delete finalMarking_;
-    finalMarking_ = new Marking(pnapi_owfn_yynet, true);
+    parser_.net_.getFinalCondition().addMarking(*(parser_.finalMarking_));
+    delete parser_.finalMarking_;
+    parser_.finalMarking_ = new Marking(parser_.net_, true);
   }
 ;
 
@@ -388,7 +401,7 @@ formula:
 | KEY_FALSE         { $$ = new formula::FormulaFalse(); }
 | KEY_ALL_PLACES_EMPTY 
   { 
-    wildcardGiven_ = true;
+    parser_.wildcardGiven_ = true;
     $$ = new formula::FormulaTrue();
   }
 | OP_NOT formula
@@ -410,7 +423,7 @@ formula:
   }
 | formula OP_AND KEY_ALL_OTHER_PLACES_EMPTY
   {
-    wildcardGiven_ = true;
+    parser_.wildcardGiven_ = true;
     $$ = $1;
   }
 | formula OP_AND KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
@@ -423,43 +436,43 @@ formula:
   }
 | node_name OP_EQ NUMBER
   {
-    Place * p = places_[nodeName_.str()];
-    check(p != NULL, "unknown place");
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(p != NULL, "unknown place");
     
     $$ = new formula::FormulaEqual(*p, $3);
   }
 | node_name OP_NE NUMBER 
   {
-    Place * p = places_[nodeName_.str()];
-    check(p != NULL, "unknown place");
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(p != NULL, "unknown place");
 
     $$ = new formula::Negation(formula::FormulaEqual(*p, $3));
   }
 | node_name OP_LT NUMBER
   {
-    Place * p = places_[nodeName_.str()];
-    check(p != NULL, "unknown place");
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(p != NULL, "unknown place");
 
     $$ = new formula::FormulaLess(*p, $3);
   }
 | node_name OP_GT NUMBER
   {
-    Place * p = places_[nodeName_.str()];
-    check(p != NULL, "unknown place");
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(p != NULL, "unknown place");
 
     $$ = new formula::FormulaGreater(*p, $3);
   } 
 | node_name OP_GE NUMBER
   {
-    Place * p = places_[nodeName_.str()];
-    check(p != NULL, "unknown place");
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(p != NULL, "unknown place");
 
     $$ = new formula::FormulaGreaterEqual(*p, $3);
   }
 | node_name OP_LE NUMBER
   {
-    Place * p = places_[nodeName_.str()];
-    check(p != NULL, "unknown place");
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(p != NULL, "unknown place");
 
     $$ = new formula::FormulaLessEqual(*p, $3);
   }
@@ -479,25 +492,25 @@ transitions:
 transition: 
   KEY_TRANSITION node_name transition_cost
   {
-    check(labels_[nodeName_.str()] == NULL, "node name already used");
-    check(!pnapi_owfn_yynet.containsNode(nodeName_.str()), "node name already used");
-    transition_ = & pnapi_owfn_yynet.createTransition(nodeName_.str()); 
-    transition_->setCost($3);
+    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    parser_.check(!(parser_.net_.containsNode(parser_.nodeName_.str())), "node name already used");
+    parser_.transition_ = &(parser_.net_.createTransition(parser_.nodeName_.str())); 
+    parser_.transition_->setCost($3);
   }
   transition_roles
   KEY_CONSUME 
   { 
-    target_ = reinterpret_cast<Node * *>(&transition_);
-    source_ = reinterpret_cast<Node * *>(&place_); 
-    placeSet_.clear();
-    placeSetType_ = true;
+    parser_.target_ = reinterpret_cast<Node * *>(&(parser_.transition_));
+    parser_.source_ = reinterpret_cast<Node * *>(&(parser_.place_)); 
+    parser_.placeSet_.clear();
+    parser_.placeSetType_ = true;
   } 
   arcs SEMICOLON KEY_PRODUCE 
   { 
-    source_ = reinterpret_cast<Node * *>(&transition_);
-    target_ = reinterpret_cast<Node * *>(&place_); 
-    placeSet_.clear();
-    placeSetType_ = false;
+    parser_.source_ = reinterpret_cast<Node * *>(&(parser_.transition_));
+    parser_.target_ = reinterpret_cast<Node * *>(&(parser_.place_)); 
+    parser_.placeSet_.clear();
+    parser_.placeSetType_ = false;
   } 
   arcs SEMICOLON synchronize constrain
 ;
@@ -515,13 +528,13 @@ transition_roles:
 transition_role_names:
   node_name
   {
-    check(transition_->getPetriNet().isRoleSpecified(nodeName_.str()), "role has not been specified");
-    transition_->addRole(nodeName_.str());
+    parser_.check(parser_.transition_->getPetriNet().isRoleSpecified(parser_.nodeName_.str()), "role has not been specified");
+    parser_.transition_->addRole(parser_.nodeName_.str());
   }
 | transition_role_names COMMA node_name
   {
-    check(transition_->getPetriNet().isRoleSpecified(nodeName_.str()), "role has not been specified");
-    transition_->addRole(nodeName_.str());
+    parser_.check(parser_.transition_->getPetriNet().isRoleSpecified(parser_.nodeName_.str()), "role has not been specified");
+    parser_.transition_->addRole(parser_.nodeName_.str());
   }
 ;
 
@@ -534,43 +547,43 @@ arcs:
 arc: 
   node_name COLON NUMBER
   {
-    place_ = places_[nodeName_.str()];
-    label_ = labels_[nodeName_.str()];
-    check(!((place_ == NULL) && (label_ == NULL)), "unknown place");
-    check(placeSet_.find(nodeName_.str()) == placeSet_.end(), placeSetType_ ? "place already in preset" : "place already in postset");
-    check(!(placeSetType_ && (label_ != NULL) && (label_->getType() != Label::INPUT)), "can only consume from places and input labels");
-    check(!(!placeSetType_ && (label_ != NULL) && (label_->getType() != Label::OUTPUT)), "can only produce to places and output labels");
+    parser_.place_ = parser_.places_[parser_.nodeName_.str()];
+    parser_.label_ = parser_.labels_[parser_.nodeName_.str()];
+    parser_.check(!((parser_.place_ == NULL) && (parser_.label_ == NULL)), "unknown place");
+    parser_.check(parser_.placeSet_.find(parser_.nodeName_.str()) == parser_.placeSet_.end(), parser_.placeSetType_ ? "place already in preset" : "place already in postset");
+    parser_.check(!(parser_.placeSetType_ && (parser_.label_ != NULL) && (parser_.label_->getType() != Label::INPUT)), "can only consume from places and input labels");
+    parser_.check(!(!parser_.placeSetType_ && (parser_.label_ != NULL) && (parser_.label_->getType() != Label::OUTPUT)), "can only produce to places and output labels");
 
-    if(place_ != NULL)
+    if(parser_.place_ != NULL)
     {
-      pnapi_owfn_yynet.createArc(**source_, **target_, $3);
+      parser_.net_.createArc(**(parser_.source_), **(parser_.target_), $3);
     }
     else
     {
-      transition_->addLabel(*label_, $3);
+      parser_.transition_->addLabel(*(parser_.label_), $3);
     }
 
-    placeSet_.insert(nodeName_.str());
+    parser_.placeSet_.insert(parser_.nodeName_.str());
   }
 | node_name 
   {
-    place_ = places_[nodeName_.str()];
-    label_ = labels_[nodeName_.str()];
-    check(!((place_ == NULL) && (label_ == NULL)), "unknown place");
-    check(placeSet_.find(nodeName_.str()) == placeSet_.end(), placeSetType_ ? "place already in preset" : "place already in postset");
-    check(!(placeSetType_ && (label_ != NULL) && (label_->getType() != Label::INPUT)), "can only consume from places and input labels");
-    check(!(!placeSetType_ && (label_ != NULL) && (label_->getType() != Label::OUTPUT)), "can only produce to places and output labels");
+    parser_.place_ = parser_.places_[parser_.nodeName_.str()];
+    parser_.label_ = parser_.labels_[parser_.nodeName_.str()];
+    parser_.check(!((parser_.place_ == NULL) && (parser_.label_ == NULL)), "unknown place");
+    parser_.check(parser_.placeSet_.find(parser_.nodeName_.str()) == parser_.placeSet_.end(), parser_.placeSetType_ ? "place already in preset" : "place already in postset");
+    parser_.check(!(parser_.placeSetType_ && (parser_.label_ != NULL) && (parser_.label_->getType() != Label::INPUT)), "can only consume from places and input labels");
+    parser_.check(!(!parser_.placeSetType_ && (parser_.label_ != NULL) && (parser_.label_->getType() != Label::OUTPUT)), "can only produce to places and output labels");
 
-    if(place_ != NULL)
+    if(parser_.place_ != NULL)
     {
-      pnapi_owfn_yynet.createArc(**source_, **target_);
+      parser_.net_.createArc(**(parser_.source_), **(parser_.target_));
     }
     else
     {
-      transition_->addLabel(*label_);
+      parser_.transition_->addLabel(*(parser_.label_));
     }
 
-    placeSet_.insert(nodeName_.str());
+    parser_.placeSet_.insert(parser_.nodeName_.str());
   }	    
 ;
 
@@ -583,17 +596,17 @@ synchronize_labels:
   /* empty */
 | node_name
   {
-    label_ = labels_[nodeName_.str()];
-    check(label_ != NULL, "unknown label");
-    check(label_->getType() == Label::SYNCHRONOUS, "can only synchronize with synchronous labels");
-    transition_->addLabel(*label_);
+    parser_.label_ = parser_.labels_[parser_.nodeName_.str()];
+    parser_.check(parser_.label_ != NULL, "unknown label");
+    parser_.check(parser_.label_->getType() == Label::SYNCHRONOUS, "can only synchronize with synchronous labels");
+    parser_.transition_->addLabel(*(parser_.label_));
   }
 | synchronize_labels COMMA node_name
   {
-    label_ = labels_[nodeName_.str()];
-    check(label_ != NULL, "unknown label");
-    check(label_->getType() == Label::SYNCHRONOUS, "can only synchronize with synchronous labels");
-    transition_->addLabel(*label_);
+    parser_.label_ = parser_.labels_[parser_.nodeName_.str()];
+    parser_.check(parser_.label_ != NULL, "unknown label");
+    parser_.check(parser_.label_->getType() == Label::SYNCHRONOUS, "can only synchronize with synchronous labels");
+    parser_.transition_->addLabel(*(parser_.label_));
   }
 ;
 
@@ -604,8 +617,8 @@ constrain:
 
 constrain_labels:
   node_name
-  { constrains_[transition_].insert(nodeName_.str()); }
+  { parser_.constrains_[parser_.transition_].insert(parser_.nodeName_.str()); }
 | constrain_labels COMMA node_name
-  { constrains_[transition_].insert(nodeName_.str()); }
+  { parser_.constrains_[parser_.transition_].insert(parser_.nodeName_.str()); }
 ;
 

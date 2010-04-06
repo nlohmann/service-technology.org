@@ -2,12 +2,12 @@ lib_LTLIBRARIES = libpnapi.la
 
 # [CUSTOMER_B_SRC] this line is needed to build a customer Makefile. Do not remove!
 libpnapi_la_SOURCES = \
-    parser-lola.yy    parser-lola-lexer.ll \
-    parser-owfn.yy    parser-owfn-lexer.ll \
-    parser-pn.yy      parser-pn-lexer.ll \
-    parser-pnml.yy    parser-pnml-lexer.ll \
-    parser-sa.yy      parser-sa-lexer.ll \
-    parser-woflan.yy  parser-woflan-lexer.ll \
+    parser-lola.yy parser-lola-lexer.ll parser-lola-wrapper.h parser-lola-wrapper.cc \
+    parser-owfn.yy parser-owfn-lexer.ll parser-owfn-wrapper.h parser-owfn-wrapper.cc \
+    parser-pn.yy parser-pn-lexer.ll parser-pn-wrapper.h parser-pn-wrapper.cc \
+    parser-pnml.yy parser-pnml-lexer.ll parser-pnml-wrapper.h parser-pnml-wrapper.cc \
+    parser-sa.yy parser-sa-lexer.ll parser-sa-wrapper.h parser-sa-wrapper.cc \
+    parser-woflan.yy parser-woflan-lexer.ll parser-woflan-wrapper.h parser-woflan-wrapper.cc \
     pnapi.h pnapi.cc \
     automaton.h automaton.cc\
     component.h component.cc \
@@ -45,7 +45,7 @@ libpnapi_la_SOURCES = \
 #    This release has a new, but backwards incompatible interface.
 #
 # For more info see section 6.3 of the GNU Libtool Manual.
-VERINFO = -version-info 4:1:0
+VERINFO = -version-info 4:2:0
 
 libpnapi_la_LDFLAGS = $(VERINFO) -no-undefined
 pkgconfigdir = $(libdir)/pkgconfig
@@ -66,15 +66,33 @@ BUILT_SOURCES = Makefile.am.customer
 # GENERIC: initialization for other generic targets #
 #---------------------------------------------------#
 MAINTAINERCLEANFILES =
-DISTCLEANFILES = 
+DISTCLEANFILES =
 
 #--------------------------------------------------------------#
 # GENERIC: organize distribution and cleaning of Bison sources #
 #--------------------------------------------------------------#
 BISON_FILES = $(filter %.yy,$(libpnapi_la_SOURCES))
-BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
+# BUILT_SOURCES += $(BISON_FILES:.yy=.cc) # see line below
+BUILT_SOURCES += $(BISON_FILES:.yy=-location.h) # bison hack
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
+EXTRA_DIST += $(BISON_FILES:.yy=.cc)
+EXTRA_DIST += $(BISON_FILES:.yy=-location.h)
+EXTRA_DIST += $(BISON_FILES:.yy=-position.h)
+EXTRA_DIST += $(BISON_FILES:.yy=-stack.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.cc)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-location.h)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-position.h)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-stack.h)
+
+#-------------------------------------------------------------#
+# NOT GENERIC: Hack to fix include directive in bison parsers #
+#                                                             #
+# Bison need to be called this way since GNU Autotools lack   #
+# Bison C++ support.
+#-------------------------------------------------------------#
+%-location.h: %.yy
+	./bison-wrapper.sh $(<:.yy=)
 # [CUSTOMER_E_GEN] this line is needed to build a customer Makefile. Do not remove!
 
 #----------------------------------------#

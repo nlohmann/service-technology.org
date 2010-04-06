@@ -12,6 +12,10 @@ Version 4.01-unreleased
 
 * removed memory leak (thanks to wendy)
 
+* implemented Woflan parser
+
+* caged lexer and parser in classes (i.e. cleaned up global namespace)
+
 Version 4.00 (2010-03-14)
 =========================
 

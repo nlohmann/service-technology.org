@@ -1,6 +1,8 @@
 @heading Version 4.01-unreleased
 @itemize
 @item removed memory leak (thanks to wendy)
+@item implemented Woflan parser
+@item caged lexer and parser in classes (i.e. cleaned up global namespace)
 @end itemize
 
 @heading Version 4.00 (2010-03-14)

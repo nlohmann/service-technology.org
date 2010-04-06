@@ -26,14 +26,25 @@
  Fiona (see file COPYING). If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-
 /*****************************************************************************
  * bison options 
  ****************************************************************************/
 
-/* plain c parser: the prefix is our "namespace" */
-%name-prefix="pnapi_pn_yy"
+/* generate a c++ parser */
+%skeleton "lalr1.cc"
+
+/* generate your code in your own namespace */
+%define namespace "pnapi::parser::pn::yy"
+
+/* do not call the generated class "parser" */
+%define parser_class_name "BisonParser"
+
+/* generate needed location classes */
+%locations
+
+/* pass overlying parser to generated parser and yylex-wrapper */
+%parse-param { Parser& parser_ }
+%lex-param   { Parser& parser_ }
 
 /* write tokens to parser-owfn.h for use by scanner */
 %defines
@@ -45,18 +56,19 @@
 /*****************************************************************************
  * C declarations
  ****************************************************************************/
+
+%code requires {
+  /* forward declarations */
+  namespace pnapi { namespace parser { namespace pn {
+    class Parser;
+  } } } /* pnapi::parser::pn */
+}
+
 %{
 
 #include "config.h"
 
-#include "parser.h"
-
-#define pnapi_pn_yyerror pnapi::parser::error
-#define pnapi_pn_yylex pnapi::parser::pn::lex
-#define yylex_destroy pnapi::parser::pn::lex_destroy
-#define pnapi_pn_yyparse pnapi::parser::pn::parse
-
-using namespace pnapi::parser::pn;
+#include "parser-pn-wrapper.h"
 
 %}
 
@@ -78,23 +90,19 @@ using namespace pnapi::parser::pn;
 %type <yt_str> PLACENAME TRANSITIONNAME
 %type <yt_uInt> WEIGHT weight
 
-%defines
-
-%token_table
-
 %%
 
 stg:
   K_MODEL IDENTIFIER newline
   K_DUMMY transition_list newline
-  K_GRAPH newline { in_arc_list = true; }
+  K_GRAPH newline { parser_.in_arc_list = true; }
   tp_list pt_list
-  K_MARKING { in_marking_list = true; } OPENBRACE place_list CLOSEBRACE newline
+  K_MARKING { parser_.in_marking_list = true; } OPENBRACE place_list CLOSEBRACE newline
   K_END newline
 | K_OUTPUTS transition_list newline
-  K_GRAPH newline { in_arc_list = true; }
+  K_GRAPH newline { parser_.in_arc_list = true; }
   pt_list tp_list
-  K_MARKING { in_marking_list = true; } OPENBRACE place_list CLOSEBRACE newline
+  K_MARKING { parser_.in_marking_list = true; } OPENBRACE place_list CLOSEBRACE newline
   K_END newline
 ;
 
@@ -105,14 +113,14 @@ transition_list:
     std::string ident = $2;
     free($2);
 
-    if (in_arc_list) 
+    if(parser_.in_arc_list) 
     {
-      tempNodeMap_[ident] = $3;
-      transitions_.insert(ident);
+      parser_.tempNodeMap_[ident] = $3;
+      parser_.transitions_.insert(ident);
     } 
     else
     {
-      interface_.insert(ident);
+      parser_.interface_.insert(ident);
     }
   }
 ;
@@ -124,11 +132,15 @@ place_list:
     std::string ident = $2;
     free($2);
 
-    places_.insert(ident);
-    if (in_marking_list)
-      initialMarked_[ident] = 1;
+    parser_.places_.insert(ident);
+    if(parser_.in_marking_list)
+    {
+      parser_.initialMarked_[ident] = 1;
+    }
     else
-      tempNodeMap_[ident] = $3;
+    {
+      parser_.tempNodeMap_[ident] = $3;
+    }
   }
 ;
 
@@ -141,8 +153,8 @@ tp_list:
   /* empty */
 | tp_list TRANSITIONNAME place_list newline
   { 
-    arcs_[$2] = tempNodeMap_;
-    tempNodeMap_.clear();
+    parser_.arcs_[$2] = parser_.tempNodeMap_;
+    parser_.tempNodeMap_.clear();
     free($2);
   } 
 ;
@@ -151,8 +163,8 @@ pt_list:
   /* empty */
 | pt_list PLACENAME transition_list newline
   {
-    arcs_[$2] = tempNodeMap_;
-    tempNodeMap_.clear();
+    parser_.arcs_[$2] = parser_.tempNodeMap_;
+    parser_.tempNodeMap_.clear();
     free($2);
   }
 ;

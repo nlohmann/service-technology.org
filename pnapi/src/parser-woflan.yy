@@ -4,8 +4,21 @@
   * bison options 
   ****************************************************************************/
 
-/* plain c parser: the prefix is our "namespace" */
-%name-prefix="pnapi_woflan_yy"
+/* generate a c++ parser */
+%skeleton "lalr1.cc"
+
+/* generate your code in your own namespace */
+%define namespace "pnapi::parser::woflan::yy"
+
+/* do not call the generated class "parser" */
+%define parser_class_name "BisonParser"
+
+/* generate needed location classes */
+%locations
+
+/* pass overlying parser to generated parser and yylex-wrapper */
+%parse-param { Parser& parser_ }
+%lex-param   { Parser& parser_ }
 
 /* write tokens to parser-woflan.h for use by scanner */
 %defines
@@ -17,26 +30,22 @@
  /*****************************************************************************
   * C declarations
   ****************************************************************************/
+
+%code requires {
+  /* forward declarations */
+  namespace pnapi { namespace parser { namespace woflan {
+    class Parser;
+  } } } /* pnapi::parser::woflan */
+}
+
 %{
 
 #include "config.h"
 
-#include "parser.h"
+#include "parser-woflan-wrapper.h"
 #include "petrinet.h"
 
 #include <sstream>
-
-#define pnapi_woflan_yyerror pnapi::parser::error
-#define pnapi_woflan_yylex   pnapi::parser::woflan::lex
-#define yylex_destroy pnapi::parser::woflan::lex_destroy
-#define pnapi_woflan_yyparse pnapi::parser::woflan::parse
-
-
-using namespace pnapi;
-using namespace pnapi::parser::woflan;
-
-bool needLabel = false;
-std::string transName;
 
 %}
 
@@ -81,14 +90,14 @@ node:
 place:
   KEY_PLACE IDENT 
   {
-    check(places_[$2] == NULL, "node name already used");
-    places_[$2] = &pnapi_woflan_yynet.createPlace($2, 0, 0);
+    parser_.check(parser_.places_[$2] == NULL, "node name already used");
+    parser_.places_[$2] = &(parser_.net_.createPlace($2, 0, 0));
   }
 | KEY_PLACE IDENT KEY_INIT NUMBER
   {
-    check(places_[$2] == NULL, "node name already used");
-    places_[$2] = &pnapi_woflan_yynet.createPlace($2, 0, 0);
-    Place * p = places_[$2];
+    parser_.check(parser_.places_[$2] == NULL, "node name already used");
+    parser_.places_[$2] = &(parser_.net_.createPlace($2, 0, 0));
+    Place * p = parser_.places_[$2];
     p->setTokenCount($4);
   }
 ;
@@ -96,23 +105,25 @@ place:
 transition:
   KEY_TRANSITION IDENT 
   {
-    check(!pnapi_woflan_yynet.containsNode($2), "node name already used");
-    transition_ = &pnapi_woflan_yynet.createTransition($2); 
-    transName = $2;
+    parser_.check(!(parser_.net_.containsNode($2)), "node name already used");
+    parser_.transition_ = &(parser_.net_.createTransition($2)); 
+    parser_.transName = $2;
   }
-| KEY_TRANSITION { needLabel = true; }
+| KEY_TRANSITION { parser_.needLabel = true; }
 ;
 
 label:
   /*empty*/ 
   {
-    check(!needLabel, "transition must be labeled");  	
+    parser_.check(!(parser_.needLabel), "transition must be labeled");  	
   }
 | TILDE IDENT
   {
-    if($2 != transName)
-      check(!pnapi_woflan_yynet.containsNode($2), "node name already used");
-    transition_->setName($2); 
+    if($2 != parser_.transName)
+    {
+      parser_.check(!(parser_.net_.containsNode($2)), "node name already used");
+    }
+    parser_.transition_->setName($2); 
   }
 ;
 
@@ -120,8 +131,8 @@ ins:
   /*empty*/
 | KEY_IN
   { 
-    target_ = reinterpret_cast<Node * *>(&transition_);
-    source_ = reinterpret_cast<Node * *>(&place_);   
+    parser_.target_ = reinterpret_cast<Node * *>(&(parser_.transition_));
+    parser_.source_ = reinterpret_cast<Node * *>(&(parser_.place_));   
   }
   arcs
 ;
@@ -130,10 +141,9 @@ outs:
   /*empty*/
 | KEY_OUT
   { 
-    source_ = reinterpret_cast<Node * *>(&transition_);
-    target_ = reinterpret_cast<Node * *>(&place_); 
+    parser_.source_ = reinterpret_cast<Node * *>(&(parser_.transition_));
+    parser_.target_ = reinterpret_cast<Node * *>(&(parser_.place_)); 
   }
- 
   arcs
 ;
 
@@ -145,22 +155,18 @@ arcs:
 arc:
   IDENT
   {
-    place_ = places_[$1];
-    check(place_ != NULL, "unknown place");
+    parser_.place_ = parser_.places_[$1];
+    parser_.check(parser_.place_ != NULL, "unknown place");
 
-    Arc * a = pnapi_woflan_yynet.findArc(**source_, **target_);
+    Arc * a = parser_.net_.findArc(**(parser_.source_), **(parser_.target_));
     if(a != NULL)
     {
       a->setWeight(a->getWeight() + 1);
     }
     else
     {
-      pnapi_woflan_yynet.createArc(**source_, **target_, 1);
+      parser_.net_.createArc(**(parser_.source_), **(parser_.target_), 1);
     }
   }
 ;
-
-
-
-
 

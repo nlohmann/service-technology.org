@@ -4,11 +4,17 @@
   * flex options 
   ****************************************************************************/
 
+/* create a c++ lexer */
+%option c++
+
+/* we provide out own class */
+%option yyclass="pnapi::parser::woflan::yy::Lexer"
+
+/* we need to prefix its base class */
+%option prefix="Woflan"
+
 /* created lexer should be called "lex.yy.c" to make the ylwrap script work */
 %option outfile="lex.yy.c"
-
-/* plain c scanner: the prefix is our "namespace" */
-%option prefix="pnapi_woflan_yy"
 
 /* we read only one file */
 %option noyywrap
@@ -25,29 +31,12 @@
   ****************************************************************************/
 %{
 
-#include "parser.h"
-#include "parser-woflan.h"
+#include "parser-woflan-wrapper.h"
 
 #include <iostream>
 
-#define yystream pnapi::parser::stream
-#define yylineno pnapi::parser::line
-#define yytext   pnapi::parser::token
-#define yyerror  pnapi::parser::error
-
-#define yylex    pnapi::parser::woflan::lex
-#define yylex_destroy pnapi::parser::woflan::lex_destroy
-
-/* hack to read input from a C++ stream */
-#define YY_INPUT(buf,result,max_size)		\
-   yystream->read(buf, max_size); \
-   if (yystream->bad()) \
-     YY_FATAL_ERROR("input in flex scanner failed"); \
-   result = yystream->gcount();
-
-/* hack to overwrite YY_FATAL_ERROR behavior */
-#define fprintf(file,fmt,msg) \
-   yyerror(msg);
+/* tokens are defined in a struct in a class */
+typedef pnapi::parser::woflan::yy::BisonParser::token tt;
 
 %}
 
@@ -64,24 +53,24 @@
 
 
  /* keywords */
-place                           { return KEY_PLACE; }
-trans	                        { return KEY_TRANSITION; }
-in 				{ return KEY_IN; }
-out 				{ return KEY_OUT; }
-init				{ return KEY_INIT; }
+place                           { return tt::KEY_PLACE; }
+trans	                        { return tt::KEY_TRANSITION; }
+in 				{ return tt::KEY_IN; }
+out 				{ return tt::KEY_OUT; }
+init				{ return tt::KEY_INIT; }
 
  /* other characters */
-\:                              { return COLON; }
-\;                              { return SEMICOLON; }
-,                               { return COMMA; }
-~				{ return TILDE; }
+\:                              { return tt::COLON; }
+\;                              { return tt::SEMICOLON; }
+,                               { return tt::COMMA; }
+~				{ return tt::TILDE; }
 
  /* identifiers */
-[0-9]+          { pnapi_woflan_yylval.yt_int = atoi(yytext); return NUMBER; }
-"\""[^\"]+"\""          { pnapi_woflan_yylval.yt_str = strdup(yytext); return IDENT; }
+[0-9]+          { yylval->yt_int = atoi(yytext); return tt::NUMBER; }
+"\""[^\"]+"\""          { yylval->yt_str = strdup(yytext); return tt::IDENT; }
 
  /* whitespace */
 [ \n\r\t]                        { /* skip */ } 
 
  /* anything else */
-.                                { yyerror("unexpected lexical token"); }
+.                                { LexerError("unexpected lexical token"); }

@@ -4,11 +4,17 @@
   * flex options 
   ****************************************************************************/
 
+/* create a c++ lexer */
+%option c++
+
+/* we provide out own class */
+%option yyclass="pnapi::parser::pnml::yy::Lexer"
+
+/* we need to prefix its base class */
+%option prefix="Pnml"
+
 /* created lexer should be called "lex.yy.c" to make the ylwrap script work */
 %option outfile="lex.yy.c"
-
-/* plain c scanner: the prefix is our "namespace" */
-%option prefix="pnapi_pnml_yy"
 
 /* we read only one file */
 %option noyywrap
@@ -29,46 +35,12 @@
 
 #include "config.h"
 
-#include "parser.h"
-#include "parser-pnml.h"
+#include "parser-pnml-wrapper.h"
 
 #include <iostream>
 
-#define yystream pnapi::parser::stream
-#define yylineno pnapi::parser::line
-#define yytext   pnapi::parser::token
-#define yyerror  pnapi::parser::error
-
-#define yylex    pnapi::parser::pnml::lex
-#define yylex_destroy pnapi::parser::pnml::lex_destroy
-
-/* hack to read input from a C++ stream */
-#define YY_INPUT(buf,result,max_size)		\
-   yystream->read(buf, max_size); \
-   if (yystream->bad()) \
-     YY_FATAL_ERROR("input in flex scanner failed"); \
-   result = yystream->gcount();
-
-/* hack to overwrite YY_FATAL_ERROR behavior */
-#define fprintf(file,fmt,msg) \
-   yyerror(msg);
-
-using namespace pnapi::parser::pnml;
-
-static int keep;                        /* To store start condition */
-
-static char * word(char * s)
-{
-  char * buf;
-  int i, k;
-  for(k = 0; (isspace(s[k]) || (s[k] == '<')); ++k);
-  for(i = k; (s[i] && (!isspace(s[i]))); ++i);
-  buf = (char*)malloc((i - k + 1) * sizeof(char));
-  strncpy(buf, &s[k], i - k);
-  buf[i - k] = '\0';
-  return buf;
-}
-
+/* tokens are defined in a struct in a class */
+typedef pnapi::parser::pnml::yy::BisonParser::token tt;
 
 %}
 
@@ -99,19 +71,19 @@ string          \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 <INITIAL>"<?"{data}*"?>"   { /* skip */ }
 
 {ws}                       { /* skip */ }
-<INITIAL>"/"               { return XML_SLASH; }
-<INITIAL>"="               { return XML_EQ; }
-<INITIAL>">"               { BEGIN(CONTENT); return XML_CLOSE; }
-<INITIAL>{name}            { pnapi_pnml_yylval.s = strdup(yytext); return XML_NAME; }
-<INITIAL>{string}          { pnapi_pnml_yylval.s = strdup(yytext); return XML_VALUE; }
+<INITIAL>"/"               { return tt::XML_SLASH; }
+<INITIAL>"="               { return tt::XML_EQ; }
+<INITIAL>">"               { BEGIN(CONTENT); return tt::XML_CLOSE; }
+<INITIAL>{name}            { yylval->s = strdup(yytext); return tt::XML_NAME; }
+<INITIAL>{string}          { yylval->s = strdup(yytext); return tt::XML_VALUE; }
 
-{open}{name}               { BEGIN(INITIAL); pnapi_pnml_yylval.s= word(yytext); return XML_START; }
-{open}"/"                  { BEGIN(INITIAL); return XML_END; }
+{open}{name}               { BEGIN(INITIAL); yylval->s = word(yytext); return tt::XML_START; }
+{open}"/"                  { BEGIN(INITIAL); return tt::XML_END; }
 
-<CONTENT>{data}            { pnapi_pnml_yylval.s = strdup(yytext); return XML_DATA; }
+<CONTENT>{data}            { yylval->s = strdup(yytext); return tt::XML_DATA; }
  /* the next line was added to parse ProM's PNML output */
-<CONTENT>.                 { pnapi_pnml_yylval.s = strdup(yytext); return XML_DATA; }
+<CONTENT>.                 { yylval->s = strdup(yytext); return tt::XML_DATA; }
 
-.                          { yyerror("lexial error"); }
+.                          { LexerError("lexial error"); }
 <<EOF>>                    { return EOF; }
 

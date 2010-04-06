@@ -2,8 +2,21 @@
   * bison options 
   ****************************************************************************/
 
-/* plain c parser: the prefix is our "namespace" */
-%name-prefix="pnapi_sa_yy"
+/* generate a c++ parser */
+%skeleton "lalr1.cc"
+
+/* generate your code in your own namespace */
+%define namespace "pnapi::parser::sa::yy"
+
+/* do not call the generated class "parser" */
+%define parser_class_name "BisonParser"
+
+/* generate needed location classes */
+%locations
+
+/* pass overlying parser to generated parser and yylex-wrapper */
+%parse-param { Parser& parser_ }
+%lex-param   { Parser& parser_ }
 
 /* write tokens to parser-sa.h for use by scanner */
 %defines
@@ -15,19 +28,20 @@
  /*****************************************************************************
   * C declarations
   ****************************************************************************/
+
+%code requires {
+  /* forward declarations */
+  namespace pnapi { namespace parser { namespace sa {
+    class Parser;
+  } } } /* pnapi::parser::sa */
+}
+
 %{
 
 #include "config.h"
 
 #include "automaton.h"
-#include "parser.h"
-
-using namespace pnapi;
-
-#define pnapi_sa_yyerror pnapi::parser::error
-#define pnapi_sa_yylex   pnapi::parser::sa::lex
-#define yylex_destroy pnapi::parser::sa::lex_destroy
-#define pnapi_sa_yyparse pnapi::parser::sa::parse
+#include "parser-sa-wrapper.h"
 
 %}
 
@@ -65,12 +79,12 @@ input:
   /* empty */
 | KEY_INPUT identlist SEMICOLON
   {
-    for(int i = 0; i < (int)identlist.size(); ++i)
+    for(int i = 0; i < (int)parser_.identlist.size(); ++i)
     {
-      pnapi_sa_yyautomaton.addInputLabel(identlist[i]);
-      input_.insert(identlist[i]);
+      parser_.automaton_.addInputLabel(parser_.identlist[i]);
+      parser_.input_.insert(parser_.identlist[i]);
     }
-    identlist.clear();
+    parser_.identlist.clear();
   }
 ;
 
@@ -79,12 +93,12 @@ output:
   /* empty */
 | KEY_OUTPUT identlist SEMICOLON
   { 
-    for(int i = 0; i < (int)identlist.size(); ++i)
+    for(int i = 0; i < (int)parser_.identlist.size(); ++i)
     {
-      pnapi_sa_yyautomaton.addOutputLabel(identlist[i]);
-      output_.insert(identlist[i]);
+      parser_.automaton_.addOutputLabel(parser_.identlist[i]);
+      parser_.output_.insert(parser_.identlist[i]);
     }
-    identlist.clear();
+    parser_.identlist.clear();
   }
 ;
 
@@ -93,12 +107,12 @@ synchronous:
   /* empty */
 | KEY_SYNCHRONOUS identlist SEMICOLON
   {
-    for(int i = 0; i < (int)identlist.size(); ++i)
+    for(int i = 0; i < (int)parser_.identlist.size(); ++i)
     {
-      pnapi_sa_yyautomaton.addSynchronousLabel(identlist[i]);
-      synchronous_.insert(identlist[i]);
+      parser_.automaton_.addSynchronousLabel(parser_.identlist[i]);
+      parser_.synchronous_.insert(parser_.identlist[i]);
     }
-    identlist.clear();
+    parser_.identlist.clear();
   }
 ;
 
@@ -107,12 +121,12 @@ identlist:
   /* empty */
 | IDENT
   {
-    identlist.push_back(std::string($1));
+    parser_.identlist.push_back(std::string($1));
     free($1);
   }
 | identlist COMMA IDENT
   {
-    identlist.push_back(std::string($3));
+    parser_.identlist.push_back(std::string($3));
     free($3);
   }
 ;
@@ -122,41 +136,45 @@ nodes:
   /* empty */
 | nodes NUMBER annotation successors
   {
-    if(states_.count($2) == 0)
+    if(parser_.states_.count($2) == 0)
     {
-      state_ = &pnapi_sa_yyautomaton.createState($2);
-      states_[$2] = state_;
+      parser_.state_ = &(parser_.automaton_.createState($2));
+      parser_.states_[$2] = parser_.state_;
     }
     else
     {
-      state_ = states_[$2];
+      parser_.state_ = parser_.states_[$2];
     }
 
-    if(initial_)
-      state_->setInitial();
-
-    if(final_)
-      state_->setFinal();
-    
-    for(int i = 0; i < (int)succState_.size(); ++i)
+    if(parser_.initial_)
     {
-      pnapi_sa_yyautomaton.createEdge(*state_, *states_[succState_[i]], succLabel_[i], succType_[i]);
+      parser_.state_->setInitial();
+    }
+
+    if(parser_.final_)
+    {
+      parser_.state_->setFinal();
     }
     
-    final_ = false;
-    initial_ = false;
-    succState_.clear();
-    succLabel_.clear();
-    succType_.clear();
+    for(int i = 0; i < (int)parser_.succState_.size(); ++i)
+    {
+      parser_.automaton_.createEdge(*(parser_.state_), *(parser_.states_[parser_.succState_[i]]), parser_.succLabel_[i], parser_.succType_[i]);
+    }
+    
+    parser_.final_ = false;
+    parser_.initial_ = false;
+    parser_.succState_.clear();
+    parser_.succLabel_.clear();
+    parser_.succType_.clear();
   }
 ;
 
 
 annotation:
   /* empty */
-| COLON KEY_INITIAL                  { initial_ = true; }
-| COLON KEY_FINAL                    { final_ = true; }
-| COLON KEY_INITIAL COMMA KEY_FINAL  { initial_ = final_ = true; }
+| COLON KEY_INITIAL                  { parser_.initial_ = true; }
+| COLON KEY_FINAL                    { parser_.final_ = true; }
+| COLON KEY_INITIAL COMMA KEY_FINAL  { parser_.initial_ = parser_.final_ = true; }
 ;
 
 
@@ -164,34 +182,34 @@ successors:
   /* empty */
 | successors IDENT ARROW NUMBER
   {
-    if (states_.count($4) == 0)
+    if(parser_.states_.count($4) == 0)
     {
-      state_ = &pnapi_sa_yyautomaton.createState($4);
-      states_[$4] = state_;
+      parser_.state_ = &(parser_.automaton_.createState($4));
+      parser_.states_[$4] = parser_.state_;
     }
 
-    edgeLabel_ = $2;
+    parser_.edgeLabel_ = $2;
     free($2);
-    edgeType_ = Edge::TAU;
+    parser_.edgeType_ = Edge::TAU;
 
-    if (input_.count(edgeLabel_) > 0)
+    if(parser_.input_.count(parser_.edgeLabel_) > 0)
     {
-      edgeType_ = Edge::INPUT;
+      parser_.edgeType_ = Edge::INPUT;
     }
 
-    if (output_.count(edgeLabel_) > 0)
+    if(parser_.output_.count(parser_.edgeLabel_) > 0)
     {
-      edgeType_ = Edge::OUTPUT;
+      parser_.edgeType_ = Edge::OUTPUT;
     }
 
-    if (synchronous_.count(edgeLabel_) > 0)
+    if(parser_.synchronous_.count(parser_.edgeLabel_) > 0)
     {
-      edgeType_ = Edge::SYNCHRONOUS;
+      parser_.edgeType_ = Edge::SYNCHRONOUS;
     }
 
-    succState_.push_back($4);
-    succLabel_.push_back(edgeLabel_);
-    succType_.push_back(edgeType_);
+    parser_.succState_.push_back($4);
+    parser_.succLabel_.push_back(parser_.edgeLabel_);
+    parser_.succType_.push_back(parser_.edgeType_);
   }
 ;
 

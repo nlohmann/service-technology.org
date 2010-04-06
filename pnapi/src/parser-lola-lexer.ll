@@ -4,11 +4,17 @@
   * flex options 
   ****************************************************************************/
 
+/* create a c++ lexer */
+%option c++
+
+/* we provide out own class */
+%option yyclass="pnapi::parser::lola::yy::Lexer"
+
+/* we need to prefix its base class */
+%option prefix="Lola"
+
 /* created lexer should be called "lex.yy.c" to make the ylwrap script work */
 %option outfile="lex.yy.c"
-
-/* plain c scanner: the prefix is our "namespace" */
-%option prefix="pnapi_lola_yy"
 
 /* we read only one file */
 %option noyywrap
@@ -25,29 +31,12 @@
   ****************************************************************************/
 %{
 
-#include "parser.h"
-#include "parser-lola.h"
+#include "parser-lola-wrapper.h"
 
 #include <iostream>
 
-#define yystream pnapi::parser::stream
-#define yylineno pnapi::parser::line
-#define yytext   pnapi::parser::token
-#define yyerror  pnapi::parser::error
-
-#define yylex    pnapi::parser::lola::lex
-#define yylex_destroy pnapi::parser::lola::lex_destroy
-
-/* hack to read input from a C++ stream */
-#define YY_INPUT(buf,result,max_size)		\
-   yystream->read(buf, max_size); \
-   if (yystream->bad()) \
-     YY_FATAL_ERROR("input in flex scanner failed"); \
-   result = yystream->gcount();
-
-/* hack to overwrite YY_FATAL_ERROR behavior */
-#define fprintf(file,fmt,msg) \
-   yyerror(msg);
+/* tokens are defined in a struct in a class */
+typedef pnapi::parser::lola::yy::BisonParser::token tt;
 
 %}
 
@@ -62,8 +51,8 @@
 %%
 
  /* control comments */ 
-"{$"                            { return LCONTROL; }
-"$}"                            { return RCONTROL; }
+"{$"                            { return tt::LCONTROL; }
+"$}"                            { return tt::RCONTROL; }
 
  /* comments */
 "{"                             { BEGIN(COMMENT); }
@@ -71,29 +60,29 @@
 <COMMENT>[^}]*                  { /* skip */ }
 
  /* control keywords */
-TRUE                            { return KEY_TRUE; }
-FALSE                           { return KEY_FALSE; }
+TRUE                            { return tt::KEY_TRUE; }
+FALSE                           { return tt::KEY_FALSE; }
 
  /* keywords */
-SAFE                            { return KEY_SAFE; }
-PLACE                           { return KEY_PLACE; }
-TRANSITION                      { return KEY_TRANSITION; }
-MARKING                         { return KEY_MARKING; }
-CONSUME                         { return KEY_CONSUME; }
-PRODUCE                         { return KEY_PRODUCE; }
+SAFE                            { return tt::KEY_SAFE; }
+PLACE                           { return tt::KEY_PLACE; }
+TRANSITION                      { return tt::KEY_TRANSITION; }
+MARKING                         { return tt::KEY_MARKING; }
+CONSUME                         { return tt::KEY_CONSUME; }
+PRODUCE                         { return tt::KEY_PRODUCE; }
 
  /* other characters */
-\:                              { return COLON; }
-\;                              { return SEMICOLON; }
-,                               { return COMMA; }
+\:                              { return tt::COLON; }
+\;                              { return tt::SEMICOLON; }
+,                               { return tt::COMMA; }
 
  /* identifiers */
-[0-9]+          { pnapi_lola_yylval.yt_int = atoi(yytext); return NUMBER; }
-"-"[0-9]+       { pnapi_lola_yylval.yt_int = atoi(yytext); return NEGATIVE_NUMBER; }
-[^,;:()\t \n\r\{\}]+ { pnapi_lola_yylval.yt_str = strdup(yytext); return IDENT; }
+[0-9]+          { yylval->yt_int = atoi(yytext); return tt::NUMBER; }
+"-"[0-9]+       { yylval->yt_int = atoi(yytext); return tt::NEGATIVE_NUMBER; }
+[^,;:()\t \n\r\{\}]+ { yylval->yt_str = strdup(yytext); return tt::IDENT; }
 
  /* whitespace */
 [ \n\r\t]                          { /* skip */ }
 
  /* anything else */
-.                               { yyerror("unexpected lexical token"); }
+.                               { LexerError("unexpected lexical token"); }

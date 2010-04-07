@@ -424,6 +424,9 @@ Port & Label::getPort() const
 
 /*!
  * \brief adding a transition to the attached transitions
+ * 
+ * \note DO NOT use this function! It will be called by Transition::addLabel().
+ *       Use Transition::addLabel() instead.
  */
 void Label::addTransition(Transition & t)
 {

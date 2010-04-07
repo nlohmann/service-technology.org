@@ -159,7 +159,14 @@ int main(int argc, char** argv) {
                         >> meta(io::CREATOR, PACKAGE_STRING)
                         >> meta(io::INVOCATION, invocation) >> io::woflan >> *(current.net);
 
+
                     current.type = TYPE_WOFLANNET;
+
+		    if(args_info.canonicalNames_flag) {
+		      current.net->canonicalNames();
+
+		    }
+
                     break;
                 }
             }
@@ -235,6 +242,11 @@ int main(int argc, char** argv) {
                             >> meta(io::INVOCATION, invocation) >> io::woflan >> *(current.net);
 
                         current.type = TYPE_WOFLANNET;
+
+			if(args_info.canonicalNames_flag) {
+		      	  current.net->canonicalNames();
+		        }
+		
                         break;
                     }
                 }

@@ -381,6 +381,9 @@ public: /* public methods */
   void deleteTransition(Transition &);
   /// deletes an arc
   void deleteArc(Arc &);
+
+  /// renames nodes
+  void canonicalNames();
   //@}
 
 

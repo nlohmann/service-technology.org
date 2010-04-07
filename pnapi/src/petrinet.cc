@@ -1744,6 +1744,22 @@ void PetriNet::normalize_classical()
   }
 }
 
+void PetriNet::canonicalNames()
+{
+  int i = 1;
+  stringstream name;
+  PNAPI_FOREACH(n, nodes_)
+  {
+    name << "p" << i;
+    i++;
+    (**n).setName(name.str());
+    name.str("");
+    name.clear(); 
+
+  }
+
+}
+
 
 /*!
  * \brief normalization after [Aalst07]

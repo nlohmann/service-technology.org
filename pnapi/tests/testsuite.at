@@ -585,6 +585,17 @@ AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI --reduce=4 NET])
 AT_CLEANUP
 
+AT_SETUP([Bug 15794 (https://gna.org/bugs/?15794)])
+m4_define([NET], [Model.6mxu--0-----u--.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 79  |P_in|= 0  |P_out|= 0  |T|= 76  |F|= 176" stderr])
+AT_CHECK([PETRI NET --verbose --input=tpn --output=lola --canonicalNames],0,ignore,stderr)
+m4_define([NET2], [Model.6mxu--0-----u--.xml.tpn.lola])
+AT_CHECK([PETRI NET2 --verbose --input=lola],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 79  |P_in|= 0  |P_out|= 0  |T|= 76  |F|= 176" stderr])
+AT_KEYWORDS([woflan parser])
+AT_CLEANUP
 
 ############################################################################
 AT_BANNER([Murata Reduction Rules])

@@ -38,6 +38,7 @@ required to reconfigure and compile Rebecca.
 
    * Texinfo, `http://www.gnu.org/software/texinfo/'
 
-Please check our nightly build server at `http://service-technology.org/nightly'
-for the versions we use during development.
+Please check our nightly build server at
+`http://service-technology.org/nightly' for the versions we use during
+development.
 

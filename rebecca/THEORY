@@ -1,18 +1,9 @@
-                      ____      _
-                     |  _ \ ___| |__   ___  ___ ___ __ _
+                      ____      _                        
+                     |  _ \ ___| |__   ___  ___ ___ __ _ 
                      | |_) / _ \ '_ \ / _ \/ __/ __/ _` |
                      |  _ <  __/ |_) |  __/ (_| (_| (_| |
                      |_| \_\___|_.__/ \___|\___\___\__,_|
-                   checking realizability of choreographies
+                     http://service-technology.org/rebecca
 
-Rebecca implements the algorithm described in the following paper.
 
-Realizability is Controllability
-================================
-
-    Niels Lohmann and Karsten Wolf. Realizability is Controllability. 
-    In Cosimo Laneve and Jianwen Su, editors, Web Services and Formal Methods, 
-    6th International Workshop, WS-FM 2009, Bologna, Italy, September 4-5, 2009, 
-    Revised Selected Papers, Lecture Notes in Computer Science, September 2009. 
-    Springer-Verlag. (in press).
 

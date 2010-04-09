@@ -40,8 +40,7 @@ extern gengetopt_args_info args_info;
 */
 Output::Output() :
     os(*(new std::ofstream(createTmp(), std::ofstream::out | std::ofstream::trunc))),
-    filename(temp), kind("")
-{
+    filename(temp), kind("") {
     status("writing to temporary file '%s'", _cfilename_(filename));
 }
 
@@ -51,11 +50,10 @@ Output::Output() :
 */
 Output::Output(const std::string& str, const std::string& kind) :
     os((!str.compare("-")) ?
-        std::cout :
-        *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
-    ),
-    filename(str), temp(NULL), kind(kind)
-{
+       std::cout :
+       *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
+      ),
+    filename(str), temp(NULL), kind(kind) {
     if (not os.good()) {
         abort(11, "could not write to file '%s'", _cfilename_(filename));
     }

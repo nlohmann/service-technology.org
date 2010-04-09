@@ -201,21 +201,21 @@ void Graph::createDotFile() {
         switch (args_info.mode_arg) {
             case(mode_arg_matching):
             case(mode_arg_simulation): {
-                    dot_filename = std::string(basename(args_info.automaton_arg)) + "_" +
-                                   std::string(basename(args_info.og_arg)) + "_" +
-                                   cmdline_parser_mode_values[args_info.mode_arg] + ".dot";
-                    break;
-                }
+                dot_filename = std::string(basename(args_info.automaton_arg)) + "_" +
+                               std::string(basename(args_info.og_arg)) + "_" +
+                               cmdline_parser_mode_values[args_info.mode_arg] + ".dot";
+                break;
+            }
 
             case(mode_arg_og): {
-                    dot_filename = std::string(basename(args_info.og_arg)) + ".dot";
-                    break;
-                }
+                dot_filename = std::string(basename(args_info.og_arg)) + ".dot";
+                break;
+            }
 
             case(mode_arg_sa): {
-                    dot_filename = std::string(basename(args_info.automaton_arg)) + ".dot";
-                    break;
-                }
+                dot_filename = std::string(basename(args_info.automaton_arg)) + ".dot";
+                break;
+            }
         }
     } else {
         dot_filename = args_info.dot_arg;
@@ -236,14 +236,14 @@ void Graph::createDotFile() {
             case(mode_arg_og):
             case(mode_arg_matching):
             case(mode_arg_simulation): {
-                    toDot(dot_file);
-                    break;
-                }
+                toDot(dot_file);
+                break;
+            }
 
             case(mode_arg_sa): {
-                    toDot(dot_file, false);
-                    break;
-                }
+                toDot(dot_file, false);
+                break;
+            }
         }
 
 

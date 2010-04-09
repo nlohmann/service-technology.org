@@ -261,14 +261,14 @@ int main(int argc, char** argv) {
     // do what you're told via "--mode" parameter
     switch (args_info.mode_arg) {
         case(mode_arg_simulation): {
-                message("similarity: %.2f%s", Simulation::simulation(), _c_);
-                break;
-            }
+            message("similarity: %.2f%s", Simulation::simulation(), _c_);
+            break;
+        }
 
         case(mode_arg_matching): {
-                message("matching: %.2f%s", Matching::matching(), _c_);
-                break;
-            }
+            message("matching: %.2f%s", Matching::matching(), _c_);
+            break;
+        }
     }
 
 
@@ -277,19 +277,19 @@ int main(int argc, char** argv) {
         switch (args_info.mode_arg) {
             case(mode_arg_matching):
             case(mode_arg_simulation): {
-                    outputEditScript(A, B).createDotFile();
-                    break;
-                }
+                outputEditScript(A, B).createDotFile();
+                break;
+            }
 
             case(mode_arg_og): {
-                    B.createDotFile();
-                    break;
-                }
+                B.createDotFile();
+                break;
+            }
 
             case(mode_arg_sa): {
-                    A.createDotFile();
-                    break;
-                }
+                A.createDotFile();
+                break;
+            }
         }
     }
 

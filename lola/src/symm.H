@@ -15,7 +15,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with LoLA.  If not, see <http://www.gnu.org/licenses/>. 
+ along with LoLA.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -25,33 +25,30 @@
 #include "net.H"
 #include "dimensions.H"
 
-class SymmImage
-{
-public:
-  Node * value;
-  unsigned int * vector;
+class SymmImage {
+    public:
+        Node* value;
+        unsigned int* vector;
 };
 
-class SymmStore
-{
-public:
-  Node * arg;
-  unsigned int argnr,length,card,current;
-  unsigned int * reference;
-  SymmImage * image;
+class SymmStore {
+    public:
+        Node* arg;
+        unsigned int argnr, length, card, current;
+        unsigned int* reference;
+        SymmImage* image;
 };
 
 
-class Partition
-{
-public:
-  unsigned int nextorcard;
-  bool top;
+class Partition {
+    public:
+        unsigned int nextorcard;
+        bool top;
 };
 
-extern Partition * part;
+extern Partition* part;
 
-extern SymmStore * Store;
+extern SymmStore* Store;
 extern unsigned int CardStore;
 
 void canonize_on_the_fly();
@@ -60,10 +57,10 @@ void ComputeSymmetries(void);
 void FirstSymm(void);
 unsigned int NextSymm(unsigned int);
 
-extern unsigned int * CurrentSymm;
+extern unsigned int* CurrentSymm;
 
-extern unsigned int * kanrep;
-extern unsigned int * kanrep1;
+extern unsigned int* kanrep;
+extern unsigned int* kanrep1;
 
 extern unsigned int DeadBranches;
 extern unsigned int CardGenerators;

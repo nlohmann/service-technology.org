@@ -15,7 +15,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with LoLA.  If not, see <http://www.gnu.org/licenses/>. 
+ along with LoLA.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -25,5 +25,5 @@ using std::ofstream;
 
 void printnet();
 void printpnml();
-void printpnmltofile(ofstream &);
-void printnettofile(ofstream &);
+void printpnmltofile(ofstream&);
+void printnettofile(ofstream&);

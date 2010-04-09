@@ -619,17 +619,17 @@ namespace PNapi {
         // Decide in which set of places the place has to be inserted.
         switch (my_type) {
             case(IN):  {
-                    P_in.insert(p);
-                    break;
-                }
+                P_in.insert(p);
+                break;
+            }
             case(OUT): {
-                    P_out.insert(p);
-                    break;
-                }
+                P_out.insert(p);
+                break;
+            }
             default:    {
-                    P.insert(p);
-                    break;
-                }
+                P.insert(p);
+                break;
+            }
         }
 
         // Test if the place is already defined.
@@ -806,17 +806,17 @@ namespace PNapi {
         // Decide from which set of places the place has to be removed.
         switch (p->type) {
             case(IN):  {
-                    P_in.erase(p);
-                    break;
-                }
+                P_in.erase(p);
+                break;
+            }
             case(OUT): {
-                    P_out.erase(p);
-                    break;
-                }
+                P_out.erase(p);
+                break;
+            }
             default:   {
-                    P.erase(p);
-                    break;
-                }
+                P.erase(p);
+                break;
+            }
         }
 
         delete p;

@@ -15,7 +15,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with LoLA.  If not, see <http://www.gnu.org/licenses/>. 
+ along with LoLA.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -23,13 +23,12 @@
 #define SWEEP_H
 
 #ifdef SWEEP
-class pendinglist
-{
-public:
-	binDecision * content;
-	long int value; // progress_value;
-	pendinglist * next;  
-	int size;
+class pendinglist {
+    public:
+        binDecision* content;
+        long int value; // progress_value;
+        pendinglist* next;
+        int size;
 };
 
 int sweep();

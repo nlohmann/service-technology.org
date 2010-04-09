@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -61,7 +61,7 @@ namespace st {
 
 /*!
  \param format  the status message formatted as printf string
- 
+
  \note use this function rather sparsely in order not to spam the output
 */
 void message(const char* format, ...) {

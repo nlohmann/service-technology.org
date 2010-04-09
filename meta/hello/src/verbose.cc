@@ -41,7 +41,7 @@ namespace st {
 
 /*!
  \param format  the status message formatted as printf string
- 
+
  \note use this function rather sparsely in order not to spam the output
 */
 void message(const char* format, ...) {

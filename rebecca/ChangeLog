@@ -5,6 +5,7 @@
                      |_| \_\___|_.__/ \___|\___\___\__,_|
                      http://service-technology.org/rebecca
 
+
 Version 1.0-unreleased
 ======================
 
@@ -23,30 +24,9 @@ Version 1.0-unreleased
 
     3. resolution of dependencies: if a enables b implemented
 
-    4. resolution of dependencies: q_ab and q_ba are not equivalent (implemented)
+* added scripts to use LCOV
+  (`http://ltp.sourceforge.net/coverage/lcov.php') to determine test case
+  coverage (use `make cover' in `tests' directory)
 
-* added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
-  to determine test case coverage (use `make cover' in `tests' directory)
-  
-* implemented equivalence check for states
 
-* implemented output on stdout
 
-* added THEORY file
-
-* added routines to open and read from files
-
-* added testcase for new error code
-
-* fixed bug #14956 (https://gna.org/bugs/index.php?14956) (added
-  regression tests (bug14956a.chor and bug14956b.chor))
-
-* implemented synchronous communication consideration when projecting peers
-
-* fixed bug #14955 (https://gna.org/bugs/index.php?14955) by implementing
-  a deadlock checker
-  
-* added regression test (bug14955.chor)
-
-* implemented method to resolve dead paths (paths ending in a deadlock) (task
-#6897 (https://gna.org/task/?6897)

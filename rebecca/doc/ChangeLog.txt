@@ -16,8 +16,9 @@ Version 1.0-unreleased
 
     3. resolution of dependencies: if a enables b implemented
 
-* added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
-  to determine test case coverage (use `make cover' in `tests' directory)
+* added scripts to use LCOV
+  (`http://ltp.sourceforge.net/coverage/lcov.php') to determine test case
+  coverage (use `make cover' in `tests' directory)
 
 
 

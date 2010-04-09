@@ -102,7 +102,7 @@
 // 1 refers to the iteration of symmetries (leads to maximal reduction,
 //   fast for small symmetry groups, slow for large symmetry groups)
 // 2 refers to the iteration of states (leads to maximal reduction.
-//	 fast for large symmetry groups, slow for small symmetry griups)
+//   fast for large symmetry groups, slow for small symmetry griups)
 // 3 refers to the canonical representitive technique (does not lead
 //   to maximal reduction, fast for all kind of symmetry groups)
 // 4 refers to the canonical representitive technique on the fly (i.e.

@@ -351,216 +351,216 @@ void genericError(unsigned int code, string information, string line, error_leve
 
     switch (code) {
         case(100): { // skipped misplaced element
-                cerr << "skipped <" << information << ">: non-standard or misplaced element" << endl;
-                globals::unknown_elements.insert(information);
-                break;
-            }
+            cerr << "skipped <" << information << ">: non-standard or misplaced element" << endl;
+            globals::unknown_elements.insert(information);
+            break;
+        }
 
         case(101): { // skipped error in <partners>
-                cerr << "skipped <partners> due to syntax error" << endl;
-                break;
-            }
+            cerr << "skipped <partners> due to syntax error" << endl;
+            break;
+        }
 
         case(102): { // skipped error in <from> or <to>
-                cerr << "skipped <" << information << "> due to syntax error" << endl;
-                break;
-            }
+            cerr << "skipped <" << information << "> due to syntax error" << endl;
+            break;
+        }
 
         case(103): { // skipped error in <condition>
-                cerr << "skipped <condition> due to syntax error" << endl;
-                break;
-            }
+            cerr << "skipped <condition> due to syntax error" << endl;
+            break;
+        }
 
         case(104): { // abort due syntax error
-                cerr << "cannot proceed due to syntax errors";
+            cerr << "cannot proceed due to syntax errors";
 
-                if (!globals::unknown_elements.empty()) {
-                    cerr << "; try to remove these elements:" << endl;
-                    for (set<string>::iterator el = globals::unknown_elements.begin(); el != globals::unknown_elements.end(); el++) {
-                        if (*el != "scope") {
-                            cerr << "  <" << *el << ">" << endl;
-                        }
+            if (!globals::unknown_elements.empty()) {
+                cerr << "; try to remove these elements:" << endl;
+                for (set<string>::iterator el = globals::unknown_elements.begin(); el != globals::unknown_elements.end(); el++) {
+                    if (*el != "scope") {
+                        cerr << "  <" << *el << ">" << endl;
                     }
-                } else {
-                    cerr << endl;
                 }
-
-                break;
+            } else {
+                cerr << endl;
             }
+
+            break;
+        }
 
         case(105): { // process despite syntax error
-                cerr << "some elements were skipped due to syntax errors" << endl;
-                break;
-            }
+            cerr << "some elements were skipped due to syntax errors" << endl;
+            break;
+        }
 
         case(106): { // conflicting receives
-                cerr << information << endl;
-                break;
-            }
+            cerr << information << endl;
+            break;
+        }
 
         case(107): { // attribute missing
-                cerr << "required attribute " << information << endl;
-                break;
-            }
+            cerr << "required attribute " << information << endl;
+            break;
+        }
 
         case(108): { // attribute type error
-                cerr << "type error: " << information << endl;
-                break;
-            }
+            cerr << "type error: " << information << endl;
+            break;
+        }
 
         case(109): { // undefined variable
-                cerr << information << endl;
-                break;
-            }
+            cerr << information << endl;
+            break;
+        }
 
         case(110): { // undefined partner link
-                cerr << information << endl;
-                break;
-            }
+            cerr << information << endl;
+            break;
+        }
 
         case(111): { // undefined correlation set
-                cerr << information << endl;
-                break;
-            }
+            cerr << information << endl;
+            break;
+        }
 
         case(112): { // skipped error in literal
-                cerr << "skipped <literal> due to syntax error" << endl;
-                break;
-            }
+            cerr << "skipped <literal> due to syntax error" << endl;
+            break;
+        }
 
         case(113): { // skipped UTF-8 character
-                cerr << "skipped unsupported UTF-8 character `" << information << "'; this message is only shown once" << endl;
-                break;
-            }
+            cerr << "skipped unsupported UTF-8 character `" << information << "'; this message is only shown once" << endl;
+            break;
+        }
 
         case(114): { // uninitialized variable
-                cerr << information << endl;
-                break;
-            }
+            cerr << information << endl;
+            break;
+        }
 
         case(115): { // abstract process
-                cerr << "process is abstract; missing attributes might hamper translation and result in unnecessary warnings" << endl;
-                break;
-            }
+            cerr << "process is abstract; missing attributes might hamper translation and result in unnecessary warnings" << endl;
+            break;
+        }
 
         case(116): { // <opaqueActivity> replaced by <empty>
-                cerr << "assuming <empty> semantics for <opaqueActivity>" << endl;
-                break;
-            }
+            cerr << "assuming <empty> semantics for <opaqueActivity>" << endl;
+            break;
+        }
 
         case(117): { // ignoring attribute suppressJoinFailure="no"
-                cerr << "ignoring attribute `suppressJoinFailure' set to \"no\" in <" << information << ">; modeling \"yes\"" << endl;
-                break;
-            }
+            cerr << "ignoring attribute `suppressJoinFailure' set to \"no\" in <" << information << ">; modeling \"yes\"" << endl;
+            break;
+        }
 
         case(118): { // ignoring user-defined transition condition (set to true instead)
-                cerr << "ignoring user-defined <transitionCondition> in <" << information << ">; modeling \"true\"" << endl;
-                break;
-            }
+            cerr << "ignoring user-defined <transitionCondition> in <" << information << ">; modeling \"true\"" << endl;
+            break;
+        }
 
         case(119): { // ignoring user-defined transition condition (set to XOR instead)
-                cerr << "ignoring user-defined <transitionCondition> in <" << information << ">; modeling \"1-out-of-n\"" << endl;
-                break;
-            }
+            cerr << "ignoring user-defined <transitionCondition> in <" << information << ">; modeling \"1-out-of-n\"" << endl;
+            break;
+        }
 
         case(120): { // ignoring <scope> handlers in mode communicationonly
-                cerr << "FTC handlers of <scope> activity are not modeled" << endl;
-                break;
-            }
+            cerr << "FTC handlers of <scope> activity are not modeled" << endl;
+            break;
+        }
 
         case(121): { // ignoring activity in mode communicationonly
-                cerr << "<" << information << "> activity is modeled by <empty> activity" << endl;
-                break;
-            }
+            cerr << "<" << information << "> activity is modeled by <empty> activity" << endl;
+            break;
+        }
 
         case(122): { // syntax error in chorography file
-                cerr << "syntax error in chorography file" << endl;
-                break;
-            }
+            cerr << "syntax error in chorography file" << endl;
+            break;
+        }
 
         case(123): { // syntax error in WSDL file
-                cerr << "syntax error in WSDL file" << endl;
-                break;
-            }
+            cerr << "syntax error in WSDL file" << endl;
+            break;
+        }
 
         case(124): { // ignoring XML Schema
-                if (information == "/") {
-                    cerr << "skipped empty XML Schema element" << endl;
-                } else {
-                    cerr << "skipped XML Schema element: <" << information << ">" << endl;
-                }
-                break;
+            if (information == "/") {
+                cerr << "skipped empty XML Schema element" << endl;
+            } else {
+                cerr << "skipped XML Schema element: <" << information << ">" << endl;
             }
+            break;
+        }
 
         case(125): { // ignoring variable property element
-                cerr << "skipped variable property element: <" << information << ">" << endl;
-                break;
-            }
+            cerr << "skipped variable property element: <" << information << ">" << endl;
+            break;
+        }
 
         case(126): { // WSDL message not found
-                cerr << "<message> `" << information << "' referenced in <operation> not defined before" << endl;
-                break;
-            }
+            cerr << "<message> `" << information << "' referenced in <operation> not defined before" << endl;
+            break;
+        }
 
         case(127): { // WSDL portType not found
-                cerr << "<portType> `" << information << "' referenced in <role> not defined before" << endl;
-                break;
-            }
+            cerr << "<portType> `" << information << "' referenced in <role> not defined before" << endl;
+            break;
+        }
 
         case(128): { // WSDL operation not found
-                cerr << information << endl;
-                break;
-            }
+            cerr << information << endl;
+            break;
+        }
 
         case(129): { // WSDL partnerLinkType was found, but role was not found
-                cerr << information << endl;
-                break;
-            }
+            cerr << information << endl;
+            break;
+        }
 
         case(130): { // WSDL partnerLinkType was not found
-                cerr << information << endl;
-                break;
-            }
+            cerr << information << endl;
+            break;
+        }
 
         case(131): { // BPEL4Chor activity name is not part of a messageLink
-                cerr << information << endl;
-                break;
-            }
+            cerr << information << endl;
+            break;
+        }
 
         case(132): { // activity has neither a name nor a BPEL4Chor id
-                cerr << "activity <" + information + "> has neither a `name' nor an `id' attribute to reference a BPEL4Chor <messageLink>" << endl;
-                break;
-            }
+            cerr << "activity <" + information + "> has neither a `name' nor an `id' attribute to reference a BPEL4Chor <messageLink>" << endl;
+            break;
+        }
 
         case(133): { // <extensionActivity> replaced by <opaqueActivity>
-                cerr << "replacing <extensionActivity> with <opaqueActivity>" << endl;
-                break;
-            }
+            cerr << "replacing <extensionActivity> with <opaqueActivity>" << endl;
+            break;
+        }
 
         case(134): { // <participantType> already definied
-                cerr << "BPEL4Chor <participantType> `" << information << "' already defined" << endl;
-                break;
-            }
+            cerr << "BPEL4Chor <participantType> `" << information << "' already defined" << endl;
+            break;
+        }
 
         case(135): { // BPEL4Chor <participantType> not found for a <participant>
-                cerr << information << endl;
-                break;
-            }
+            cerr << information << endl;
+            break;
+        }
 
         case(136): { // BPEL4Chor forEach id not found
-                cerr << "<forEach> id or name `" << information << "' does not reference a BPEL4Chor <participant> or <participantSet>" << endl;
-                break;
-            }
+            cerr << "<forEach> id or name `" << information << "' does not reference a BPEL4Chor <participant> or <participantSet>" << endl;
+            break;
+        }
 
         case(137): { // BPEL4Chor XMLNS not found (either in BPEL4Chor file or in process)
-                cerr << information << endl;
-                break;
-            }
+            cerr << information << endl;
+            break;
+        }
 
         case(138): { // no "partnerLink" or "operation" attribute found -- using BPEL4Chor attributes instead
-                cerr << "using identifier `" << information << "' as a channel name; use BPEL4Chor topology for exact channel names" << endl;
-                break;
-            }
+            cerr << "using identifier `" << information << "' as a channel name; use BPEL4Chor topology for exact channel names" << endl;
+            break;
+        }
     }
 
     cerr << endl;
@@ -621,287 +621,287 @@ void SAerror(unsigned int code, string information, int lineNumber) {
 
     switch (code) {
         case(2): {
-                cerr << "operation `" << information << "' is overloaded in the WSDL file" << endl;
-                break;
-            }
+            cerr << "operation `" << information << "' is overloaded in the WSDL file" << endl;
+            break;
+        }
 
         case(3): {
-                cerr << "<catch> must not be applied to the standard fault `" << information << "' when parent scope has attribute `exitOnStandardFault' set to `yes'" << endl;
-                break;
-            }
+            cerr << "<catch> must not be applied to the standard fault `" << information << "' when parent scope has attribute `exitOnStandardFault' set to `yes'" << endl;
+            break;
+        }
 
         case(5): {
-                cerr << information << " does not match the portType specified by the combination of partnerLink and role in the WSDL description" << endl;
-                break;
-            }
+            cerr << information << " does not match the portType specified by the combination of partnerLink and role in the WSDL description" << endl;
+            break;
+        }
 
         case(6): {
-                cerr << "<rethrow> activity must only be used within <catch> or <catchAll>" << endl;
-                break;
-            }
+            cerr << "<rethrow> activity must only be used within <catch> or <catchAll>" << endl;
+            break;
+        }
 
         case(7): {
-                cerr << "<compensateScope> activity must only be used within an FTC-handler (critical)" << endl;
-                error();
-                break;
-            }
+            cerr << "<compensateScope> activity must only be used within an FTC-handler (critical)" << endl;
+            error();
+            break;
+        }
 
         case(8): {
-                cerr << "<compensate> activity must only be used within an FTC-handler" << endl;
-                break;
-            }
+            cerr << "<compensate> activity must only be used within an FTC-handler" << endl;
+            break;
+        }
 
         case(15): {
-                cerr << "<process> does not contain a start activity" << endl;
-                break;
-            }
+            cerr << "<process> does not contain a start activity" << endl;
+            break;
+        }
 
         case(16): {
-                cerr << "<partnerLink> `" << information << "' neither specifies `myRole' nor `partnerRole'" << endl;
-                break;
-            }
+            cerr << "<partnerLink> `" << information << "' neither specifies `myRole' nor `partnerRole'" << endl;
+            break;
+        }
 
         case(17): {
-                cerr << "<partnerLink> `" << information << "' uses `initializePartnerRole' but does not have a partner role" << endl;
-                break;
-            }
+            cerr << "<partnerLink> `" << information << "' uses `initializePartnerRole' but does not have a partner role" << endl;
+            break;
+        }
 
         case(18): {
-                cerr << "<partnerLink> `" << information << "' already defined in this scope/process" << endl;
-                break;
-            }
+            cerr << "<partnerLink> `" << information << "' already defined in this scope/process" << endl;
+            break;
+        }
 
         case(23): {
-                cerr << "<variable> `" << information << "' already defined in this scope/process" << endl;
-                break;
-            }
+            cerr << "<variable> `" << information << "' already defined in this scope/process" << endl;
+            break;
+        }
 
         case(24): {
-                cerr << "attribute `" << information << "' must be of type `BPELVariableName'" << endl;
-                break;
-            }
+            cerr << "attribute `" << information << "' must be of type `BPELVariableName'" << endl;
+            break;
+        }
 
         case(25): {
-                cerr << "<variable> `" << information << "' must either use `messageType', `type' or `element' attribute" << endl;
-                break;
-            }
+            cerr << "<variable> `" << information << "' must either use `messageType', `type' or `element' attribute" << endl;
+            break;
+        }
 
         case(32): {
-                cerr << "<" << information << "> has an invalid combination of attributes and/or elements" << endl;
-                break;
-            }
+            cerr << "<" << information << "> has an invalid combination of attributes and/or elements" << endl;
+            break;
+        }
 
         case(35): {
-                cerr << "attribute `endpointReference' in <from> element is only allowed to be `myRole' if a `myRole' attribute is definied for the used <partnerLink> `" << information << "'" << endl;
-                break;
-            }
+            cerr << "attribute `endpointReference' in <from> element is only allowed to be `myRole' if a `myRole' attribute is definied for the used <partnerLink> `" << information << "'" << endl;
+            break;
+        }
 
         case(36): {
-                cerr << "attribute `endpointReference' in <from> element is only allowed to be `partnerRole' if a `partnerRole' attribute is definied for the used <partnerLink> `" << information << "'" << endl;
-                break;
-            }
+            cerr << "attribute `endpointReference' in <from> element is only allowed to be `partnerRole' if a `partnerRole' attribute is definied for the used <partnerLink> `" << information << "'" << endl;
+            break;
+        }
 
         case(37): {
-                cerr << "<partnerLink> `" << information << "' referenced in a <to> element must define the attribute `partnerRole'" << endl;
-                break;
-            }
+            cerr << "<partnerLink> `" << information << "' referenced in a <to> element must define the attribute `partnerRole'" << endl;
+            break;
+        }
 
         case(44): {
-                cerr << "<correlationSet> `" << information << "' already defined in this scope/process" << endl;
-                break;
-            }
+            cerr << "<correlationSet> `" << information << "' already defined in this scope/process" << endl;
+            break;
+        }
 
         case(48): {
-                cerr << "<" << information << "> is using a variable of a wrong messageType" << endl;
-                break;
-            }
+            cerr << "<" << information << "> is using a variable of a wrong messageType" << endl;
+            break;
+        }
 
         case(51): {
-                cerr << "<invoke> must not be used with an inputVariable AND <toPart> elements" << endl;
-                break;
-            }
+            cerr << "<invoke> must not be used with an inputVariable AND <toPart> elements" << endl;
+            break;
+        }
 
         case(52): {
-                cerr << "<invoke> must not be used with an outputVariable AND <fromPart> elements" << endl;
-                break;
-            }
+            cerr << "<invoke> must not be used with an outputVariable AND <fromPart> elements" << endl;
+            break;
+        }
 
         case(55): {
-                cerr << "<receive> must not be used with a variable AND <fromPart> elements" << endl;
-                break;
-            }
+            cerr << "<receive> must not be used with a variable AND <fromPart> elements" << endl;
+            break;
+        }
 
         case(56): {
-                cerr << "<" << information << ">: start activity must not be preceeded by another activity" << endl;
-                break;
-            }
+            cerr << "<" << information << ">: start activity must not be preceeded by another activity" << endl;
+            break;
+        }
 
         case(57): {
-                cerr << "all start activities must share a correlation set with `initiate' set to \"join\"" << endl;
-                break;
-            }
+            cerr << "all start activities must share a correlation set with `initiate' set to \"join\"" << endl;
+            break;
+        }
 
         case(58): {
-                cerr << "<" << information << "> is using a variable of a wrong messageType" << endl;
-                break;
-            }
+            cerr << "<" << information << "> is using a variable of a wrong messageType" << endl;
+            break;
+        }
 
         case(59): {
-                cerr << "<reply> must not be used with a variable AND <toPart> elements" << endl;
-                break;
-            }
+            cerr << "<reply> must not be used with a variable AND <toPart> elements" << endl;
+            break;
+        }
 
         case(60): {
-                cerr << "could not find an explicit corresponding incoming message activity for the <reply>" << endl;
-                break;
-            }
+            cerr << "could not find an explicit corresponding incoming message activity for the <reply>" << endl;
+            break;
+        }
 
         case(61): {
-                cerr << "messageExchange \"" << information << "\" is not defined in any enclosing scope" << endl;
-                break;
-            }
+            cerr << "messageExchange \"" << information << "\" is not defined in any enclosing scope" << endl;
+            break;
+        }
 
         case(62): {
-                cerr << "<pick> start activity must only contain <onMessage> branches" << endl;
-                break;
-            }
+            cerr << "<pick> start activity must only contain <onMessage> branches" << endl;
+            break;
+        }
 
         case(63): {
-                cerr << "<onMessage> must not be used with a variable AND <fromPart> elements" << endl;
-                break;
-            }
+            cerr << "<onMessage> must not be used with a variable AND <fromPart> elements" << endl;
+            break;
+        }
 
         case(64): {
-                cerr << "<link> `" << information << "' already defined in this <flow>" << endl;
-                break;
-            }
+            cerr << "<link> `" << information << "' already defined in this <flow>" << endl;
+            break;
+        }
 
         case(65): {
-                cerr << "<link> `" << information << "' was not defined before" << endl;
-                break;
-            }
+            cerr << "<link> `" << information << "' was not defined before" << endl;
+            break;
+        }
 
         case(66): {
-                cerr << "<link> `" << information << "' must be used exactly once as source and target" << endl;
-                break;
-            }
+            cerr << "<link> `" << information << "' must be used exactly once as source and target" << endl;
+            break;
+        }
 
         case(67): {
-                cerr << "<link> " << information << " connect the same activity" << endl;
-                break;
-            }
+            cerr << "<link> " << information << " connect the same activity" << endl;
+            break;
+        }
 
         case(68): {
-                cerr << information << " more than once as source" << endl;
-                break;
-            }
+            cerr << information << " more than once as source" << endl;
+            break;
+        }
 
         case(69): {
-                cerr << information << " more than once as target" << endl;
-                break;
-            }
+            cerr << information << " more than once as target" << endl;
+            break;
+        }
 
         case(70): {
-                cerr << "<link> `" << information << "' crosses boundary of a repeatable construct or of a compensation handler" << endl;
-                break;
-            }
+            cerr << "<link> `" << information << "' crosses boundary of a repeatable construct or of a compensation handler" << endl;
+            break;
+        }
 
         case(71): {
-                cerr << "<link> `" << information << "' crosses boundary of a fault handler or a termination handler, but is inbound" << endl;
-                break;
-            }
+            cerr << "<link> `" << information << "' crosses boundary of a fault handler or a termination handler, but is inbound" << endl;
+            break;
+        }
 
         case(72): {
-                cerr << "<link> `" << information << "' closes a control cycle" << endl;
-                break;
-            }
+            cerr << "<link> `" << information << "' closes a control cycle" << endl;
+            break;
+        }
 
         case(73): {
-                cerr << "<link> `" << information << "' used in a join condition is not an incoming link of this activity" << endl;
-                break;
-            }
+            cerr << "<link> `" << information << "' used in a join condition is not an incoming link of this activity" << endl;
+            break;
+        }
 
         case(74): {
-                cerr << information << endl;
-                break;
-            }
+            cerr << information << endl;
+            break;
+        }
 
         case(75): {
-                cerr << "<forEach>'s constant <completionCondition> can never be fulfilled" << endl;
-                break;
-            }
+            cerr << "<forEach>'s constant <completionCondition> can never be fulfilled" << endl;
+            break;
+        }
 
         case(76): {
-                cerr << "<variable> `" << information << "' hides enclosing <forEach>'s `counterName'" << endl;
-                break;
-            }
+            cerr << "<variable> `" << information << "' hides enclosing <forEach>'s `counterName'" << endl;
+            break;
+        }
 
         case(77): {
-                cerr << "<scope> `" << information << "' is not immediately enclosed to current scope (critical)" << endl;
-                error();
-                break;
-            }
+            cerr << "<scope> `" << information << "' is not immediately enclosed to current scope (critical)" << endl;
+            error();
+            break;
+        }
 
         case(78): {
-                cerr << "`" << information << "' does not refer to a <scope> or an <invoke> activity (critical)" << endl;
-                error();
-                break;
-            }
+            cerr << "`" << information << "' does not refer to a <scope> or an <invoke> activity (critical)" << endl;
+            error();
+            break;
+        }
 
         case(79): {
-                cerr << "root <scope> inside <" << information << "> must not have a <compensationHandler>" << endl;
-                break;
-            }
+            cerr << "root <scope> inside <" << information << "> must not have a <compensationHandler>" << endl;
+            break;
+        }
 
         case(80): {
-                cerr << "<faultHandlers> have no <catch> or <catchAll> element" << endl;
-                break;
-            }
+            cerr << "<faultHandlers> have no <catch> or <catchAll> element" << endl;
+            break;
+        }
 
         case(81): {
-                cerr << "<catch> attribute " << information << endl;
-                break;
-            }
+            cerr << "<catch> attribute " << information << endl;
+            break;
+        }
 
         case(82): {
-                cerr << "peer-scope dependency relation must not include cycles" << endl;
-                break;
-            }
+            cerr << "peer-scope dependency relation must not include cycles" << endl;
+            break;
+        }
 
         case(83): {
-                cerr << "<eventHandlers> have neither <onEvent> nor <onAlarm> element" << endl;
-                break;
-            }
+            cerr << "<eventHandlers> have neither <onEvent> nor <onAlarm> element" << endl;
+            break;
+        }
 
         case(84): {
-                cerr << "partnerLink reference `" << information << "' of <onEvent> cannot be resolved" << endl;
-                break;
-            }
+            cerr << "partnerLink reference `" << information << "' of <onEvent> cannot be resolved" << endl;
+            break;
+        }
 
         case(87): {
-                cerr << "<" << information << "> is using a variable of a wrong messageType" << endl;
-                break;
-            }
+            cerr << "<" << information << "> is using a variable of a wrong messageType" << endl;
+            break;
+        }
 
         case(88): {
-                cerr << "<correlation> reference `" << information << "' of <onEvent> cannot be resolved" << endl;
-                break;
-            }
+            cerr << "<correlation> reference `" << information << "' of <onEvent> cannot be resolved" << endl;
+            break;
+        }
 
         case(91): {
-                cerr << "an isolated <scope> may not contain other isolated scopes" << endl;
-                break;
-            }
+            cerr << "an isolated <scope> may not contain other isolated scopes" << endl;
+            break;
+        }
 
         case(92): {
-                cerr << "<scope> with name `" << information << "' defined twice" << endl;
-                break;
-            }
+            cerr << "<scope> with name `" << information << "' defined twice" << endl;
+            break;
+        }
 
         case(93): {
-                cerr << "<catch> construct defined twice" << endl;
-                break;
-            }
+            cerr << "<catch> construct defined twice" << endl;
+            break;
+        }
 
         default:
             cerr << endl;

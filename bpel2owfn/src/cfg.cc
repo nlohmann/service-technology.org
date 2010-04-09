@@ -354,8 +354,8 @@ void CFGBlock::checkForUninitializedVariables() {
             break;
 
         default: {
-                /* A switch needs a default branch! */
-            }
+            /* A switch needs a default branch! */
+        }
     }
 
     if ((type == CFGReply || type == CFGFrom || type == CFGInvoke) && var != "") {
@@ -391,8 +391,8 @@ void CFGBlock::checkForUninitializedVariables() {
             break;
 
         default: {
-                /* A switch needs a default branch! */
-            }
+            /* A switch needs a default branch! */
+        }
     }
 
     if ((type == CFGReceive || type == CFGCatch || type == CFGTo || type == CFGInvoke || type == CFGOnMessage) && var != "") {

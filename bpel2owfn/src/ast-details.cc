@@ -248,108 +248,108 @@ void ASTE::checkAttributes() {
     // pass 1: set the default values
     switch (type) {
         case(K_PROCESS): {
-                string names[] = {"suppressJoinFailure", "exitOnStandardFault", "abstractProcess", "enableInstanceCompensation"};
-                string values[] = {"no", "no", "no", "no"};
-                setStandardAttributes(names, values, 3);
+            string names[] = {"suppressJoinFailure", "exitOnStandardFault", "abstractProcess", "enableInstanceCompensation"};
+            string values[] = {"no", "no", "no", "no"};
+            setStandardAttributes(names, values, 3);
 
-                // read the optional BPEL4Chor file to find the number of instances of this process
-                if (globals::choreography_filename != "") {
-                    globals::instances_of_current_process = globals::BPEL4ChorInfo.instances(attributes["name"]);
-                    if (globals::instances_of_current_process == -1) {
-                        genericError(137, "process `" + attributes["name"] + "' not found in BPEL4Chor topology file", attributes["referenceLine"], ERRORLEVEL_ERROR);
-                    }
+            // read the optional BPEL4Chor file to find the number of instances of this process
+            if (globals::choreography_filename != "") {
+                globals::instances_of_current_process = globals::BPEL4ChorInfo.instances(attributes["name"]);
+                if (globals::instances_of_current_process == -1) {
+                    genericError(137, "process `" + attributes["name"] + "' not found in BPEL4Chor topology file", attributes["referenceLine"], ERRORLEVEL_ERROR);
                 }
-
-                // if the process is abstract, print a notice
-                if (attributes["abstractProcess"] == "yes" || attributes["abstractProcessProfile"] != "") {
-                    globals::abstract_process = true;
-                    genericError(115, "", attributes["referenceLine"], ERRORLEVEL_NOTICE);
-                }
-
-                break;
             }
+
+            // if the process is abstract, print a notice
+            if (attributes["abstractProcess"] == "yes" || attributes["abstractProcessProfile"] != "") {
+                globals::abstract_process = true;
+                genericError(115, "", attributes["referenceLine"], ERRORLEVEL_NOTICE);
+            }
+
+            break;
+        }
 
         case(K_PICK): {
-                string names[] = {"createInstance"};
-                string values[] = {"no"};
-                setStandardAttributes(names, values, 1);
+            string names[] = {"createInstance"};
+            string values[] = {"no"};
+            setStandardAttributes(names, values, 1);
 
-                break;
-            }
+            break;
+        }
 
         case(K_RECEIVE): {
-                string names[] = {"createInstance"};
-                string values[] = {"no"};
-                setStandardAttributes(names, values, 1);
+            string names[] = {"createInstance"};
+            string values[] = {"no"};
+            setStandardAttributes(names, values, 1);
 
-                break;
-            }
+            break;
+        }
 
         case(K_PARTNERLINK): {
-                string names[] = {"initializePartnerRole"};
-                string values[] = {"no"};
-                setStandardAttributes(names, values, 1);
+            string names[] = {"initializePartnerRole"};
+            string values[] = {"no"};
+            setStandardAttributes(names, values, 1);
 
-                break;
-            }
+            break;
+        }
 
         case(K_CORRELATION): {
-                string names[] = {"initiate"};
-                string values[] = {"no"};
-                setStandardAttributes(names, values, 1);
+            string names[] = {"initiate"};
+            string values[] = {"no"};
+            setStandardAttributes(names, values, 1);
 
-                break;
-            }
+            break;
+        }
 
         case(K_SCOPE): {
-                string names[] = {"isolated", "variableAccessSerializable"};
-                string values[] = {"no", "no"};
-                setStandardAttributes(names, values, 2);
+            string names[] = {"isolated", "variableAccessSerializable"};
+            string values[] = {"no", "no"};
+            setStandardAttributes(names, values, 2);
 
-                break;
-            }
+            break;
+        }
 
         case(K_COPY): {
-                string names[] = {"keepSrcElementName"};
-                string values[] = {"no"};
-                setStandardAttributes(names, values, 1);
+            string names[] = {"keepSrcElementName"};
+            string values[] = {"no"};
+            setStandardAttributes(names, values, 1);
 
-                break;
-            }
+            break;
+        }
 
         case(K_BRANCHES): {
-                string names[] = {"successfulBranchesOnly"};
-                string values[] = {"no"};
-                setStandardAttributes(names, values, 1);
+            string names[] = {"successfulBranchesOnly"};
+            string values[] = {"no"};
+            setStandardAttributes(names, values, 1);
 
-                break;
-            }
+            break;
+        }
 
         case(K_ASSIGN): {
-                string names[] = {"validate"};
-                string values[] = {"no"};
-                setStandardAttributes(names, values, 1);
+            string names[] = {"validate"};
+            string values[] = {"no"};
+            setStandardAttributes(names, values, 1);
 
-                break;
-            }
+            break;
+        }
     }
 
 
     // pass 2: set the values of suppressJoinFailure and exitOnStandardFault
     switch (type) {
         case(K_SCOPE): {
-                /* organize the exitOnStandardFault attribute */
-                assert(globals::ASTEmap[parentScopeId] != NULL);
-                if (attributes["exitOnStandardFault"] == "") {
-                    attributes["exitOnStandardFault"] = globals::ASTEmap[parentScopeId]->attributes["exitOnStandardFault"];
-                } else {
-                    checkAttributeType("exitOnStandardFault", T_BOOLEAN);
-                }
-
-                assert(attributes["exitOnStandardFault"] != "");
-
-                /* no break here */
+            /* organize the exitOnStandardFault attribute */
+            assert(globals::ASTEmap[parentScopeId] != NULL);
+            if (attributes["exitOnStandardFault"] == "") {
+                attributes["exitOnStandardFault"] = globals::ASTEmap[parentScopeId]->attributes["exitOnStandardFault"];
+            } else {
+                checkAttributeType("exitOnStandardFault", T_BOOLEAN);
             }
+
+            assert(attributes["exitOnStandardFault"] != "");
+
+            /* no break here */
+        }
 
         case(K_EMPTY):
         case(K_INVOKE):
@@ -370,273 +370,273 @@ void ASTE::checkAttributes() {
         case(K_REPEATUNTIL):
         case(K_SEQUENCE):
         case(K_PICK): {
-                /* organize the suppressJoinFailure attribute */
-                assert(globals::ASTEmap[parentActivityId] != NULL);
-                assert(globals::ASTEmap[parentScopeId] != NULL);
-                if (attributes["suppressJoinFailure"] == "") {
-                    attributes["suppressJoinFailure"] = globals::ASTEmap[parentActivityId]->attributes["suppressJoinFailure"];
-                } else {
-                    checkAttributeType("suppressJoinFailure", T_BOOLEAN);
-                }
-
-                // if the attribute is not set now, the activity is directly enclosed
-                // to a fault, compensation, event or termination handler, thus the
-                // value of the surrounding scope should be taken.
-                if (attributes["suppressJoinFailure"] == "") {
-                    attributes["suppressJoinFailure"] = globals::ASTEmap[parentScopeId]->attributes["suppressJoinFailure"];
-                }
-
-                assert(attributes["suppressJoinFailure"] != "");
-
-                break;
+            /* organize the suppressJoinFailure attribute */
+            assert(globals::ASTEmap[parentActivityId] != NULL);
+            assert(globals::ASTEmap[parentScopeId] != NULL);
+            if (attributes["suppressJoinFailure"] == "") {
+                attributes["suppressJoinFailure"] = globals::ASTEmap[parentActivityId]->attributes["suppressJoinFailure"];
+            } else {
+                checkAttributeType("suppressJoinFailure", T_BOOLEAN);
             }
+
+            // if the attribute is not set now, the activity is directly enclosed
+            // to a fault, compensation, event or termination handler, thus the
+            // value of the surrounding scope should be taken.
+            if (attributes["suppressJoinFailure"] == "") {
+                attributes["suppressJoinFailure"] = globals::ASTEmap[parentScopeId]->attributes["suppressJoinFailure"];
+            }
+
+            assert(attributes["suppressJoinFailure"] != "");
+
+            break;
+        }
     }
 
 
     // pass 3: check the required attributes and perform other tests
     switch (type) {
         case(K_BRANCHES): {
-                checkAttributeType("successfulBranchesOnly", T_BOOLEAN);
-                break;
-            }
+            checkAttributeType("successfulBranchesOnly", T_BOOLEAN);
+            break;
+        }
 
         case(K_CATCH): {
-                checkAttributeType("faultVariable", T_BPELVARIABLENAME);
+            checkAttributeType("faultVariable", T_BPELVARIABLENAME);
 
-                // trigger [SA00081]
-                if (attributes["faultVariable"] != "" &&
-                        attributes["faultMessageType"] != "" &&
-                        attributes["faultElement"] != "") {
-                    SAerror(81, "`faultVariable' must not be used with `faultMessageType' AND `faultElement'", attributes["referenceLine"]);
-                }
-
-                if (attributes["faultMessageType"] != "" &&
-                        attributes["faultVariable"] == "") {
-                    SAerror(81, "`faultMessageType' must be used with `faultVariable'", attributes["referenceLine"]);
-                }
-
-                if (attributes["faultElement"] != "" &&
-                        attributes["faultVariable"] == "") {
-                    SAerror(81, "`faultElement' must be used with `faultVariable'", attributes["referenceLine"]);
-                }
-
-                string catchString = toString(parentScopeId)
-                                     + "|" + attributes["faultName"]
-                                     + "|" + attributes["faultVariable"]
-                                     + "|" + attributes["faultElement"]
-                                     + "|" + attributes["faultMessageType"];
-
-                // trigger [SA00093]
-                assert(globals::ASTEmap[parentActivityId] != NULL);
-                if (globals::ASTEmap[parentActivityId]->catches.find(catchString) != globals::ASTEmap[parentActivityId]->catches.end()) {
-                    SAerror(93, "", attributes["referenceLine"]);
-                } else {
-                    globals::ASTEmap[parentActivityId]->catches.insert(catchString);
-                }
-
-                break;
+            // trigger [SA00081]
+            if (attributes["faultVariable"] != "" &&
+                    attributes["faultMessageType"] != "" &&
+                    attributes["faultElement"] != "") {
+                SAerror(81, "`faultVariable' must not be used with `faultMessageType' AND `faultElement'", attributes["referenceLine"]);
             }
+
+            if (attributes["faultMessageType"] != "" &&
+                    attributes["faultVariable"] == "") {
+                SAerror(81, "`faultMessageType' must be used with `faultVariable'", attributes["referenceLine"]);
+            }
+
+            if (attributes["faultElement"] != "" &&
+                    attributes["faultVariable"] == "") {
+                SAerror(81, "`faultElement' must be used with `faultVariable'", attributes["referenceLine"]);
+            }
+
+            string catchString = toString(parentScopeId)
+                                 + "|" + attributes["faultName"]
+                                 + "|" + attributes["faultVariable"]
+                                 + "|" + attributes["faultElement"]
+                                 + "|" + attributes["faultMessageType"];
+
+            // trigger [SA00093]
+            assert(globals::ASTEmap[parentActivityId] != NULL);
+            if (globals::ASTEmap[parentActivityId]->catches.find(catchString) != globals::ASTEmap[parentActivityId]->catches.end()) {
+                SAerror(93, "", attributes["referenceLine"]);
+            } else {
+                globals::ASTEmap[parentActivityId]->catches.insert(catchString);
+            }
+
+            break;
+        }
 
         case(K_COMPENSATESCOPE): {
-                string required[] = {"target"};
-                checkRequiredAttributes(required, 1);
-                break;
-            }
+            string required[] = {"target"};
+            checkRequiredAttributes(required, 1);
+            break;
+        }
 
         case(K_CORRELATION): {
-                string required[] = {"set"};
-                checkRequiredAttributes(required, 1);
+            string required[] = {"set"};
+            checkRequiredAttributes(required, 1);
 
-                checkAttributeType("initiate", T_INITIATE);
-                checkAttributeType("pattern", T_PATTERN);
-                break;
-            }
+            checkAttributeType("initiate", T_INITIATE);
+            checkAttributeType("pattern", T_PATTERN);
+            break;
+        }
 
         case(K_CORRELATIONSET): {
-                string required[] = {"name", "properties"};
-                checkRequiredAttributes(required, 2);
-                break;
-            }
+            string required[] = {"name", "properties"};
+            checkRequiredAttributes(required, 2);
+            break;
+        }
 
         case(K_FOREACH): {
-                string required[] = {"counterName", "parallel"};
-                checkRequiredAttributes(required, 2);
+            string required[] = {"counterName", "parallel"};
+            checkRequiredAttributes(required, 2);
 
-                checkAttributeType("hu:maxloops", T_UINT);
-                checkAttributeType("parallel", T_BOOLEAN);
-                checkAttributeType("counterName", T_BPELVARIABLENAME);
-                break;
-            }
+            checkAttributeType("hu:maxloops", T_UINT);
+            checkAttributeType("parallel", T_BOOLEAN);
+            checkAttributeType("counterName", T_BPELVARIABLENAME);
+            break;
+        }
 
         case(K_FROM): {
-                checkAttributeType("variable", T_BPELVARIABLENAME);
-                break;
-            }
+            checkAttributeType("variable", T_BPELVARIABLENAME);
+            break;
+        }
 
         case(K_FROMPART): {
-                string required[] = {"part", "toVariable"};
-                checkRequiredAttributes(required, 2);
-                checkAttributeType("toVariable", T_BPELVARIABLENAME);
-                break;
-            }
+            string required[] = {"part", "toVariable"};
+            checkRequiredAttributes(required, 2);
+            checkAttributeType("toVariable", T_BPELVARIABLENAME);
+            break;
+        }
 
         case(K_INVOKE): {
-                if (globals::choreography_filename == "") {
-                    string required[] = {"partnerLink", "operation"};
-                    checkRequiredAttributes(required, 2);
-                }
-
-                checkAttributeType("inputVariable", T_BPELVARIABLENAME);
-                checkAttributeType("outputVariable", T_BPELVARIABLENAME);
-
-                break;
+            if (globals::choreography_filename == "") {
+                string required[] = {"partnerLink", "operation"};
+                checkRequiredAttributes(required, 2);
             }
+
+            checkAttributeType("inputVariable", T_BPELVARIABLENAME);
+            checkAttributeType("outputVariable", T_BPELVARIABLENAME);
+
+            break;
+        }
 
         case(K_ONMESSAGE): {
-                if (globals::choreography_filename == "") {
-                    string required[] = {"partnerLink", "operation"};
-                    checkRequiredAttributes(required, 2);
-                }
-
-                checkAttributeType("variable", T_BPELVARIABLENAME);
-
-                break;
+            if (globals::choreography_filename == "") {
+                string required[] = {"partnerLink", "operation"};
+                checkRequiredAttributes(required, 2);
             }
+
+            checkAttributeType("variable", T_BPELVARIABLENAME);
+
+            break;
+        }
 
         case(K_PARTNERLINK): {
-                string required[] = {"name", "partnerLinkType"};
-                checkRequiredAttributes(required, 2);
-                checkAttributeType("initializePartnerRole", T_BOOLEAN);
+            string required[] = {"name", "partnerLinkType"};
+            checkRequiredAttributes(required, 2);
+            checkAttributeType("initializePartnerRole", T_BOOLEAN);
 
-                // trigger [SA00016]
-                if (attributes["myRole"] == "" &&
-                        attributes["partnerRole"] == "") {
-                    SAerror(16, attributes["name"], attributes["referenceLine"]);
-                }
-
-                // trigger [SA00017]
-                if (attributes["partnerRole"] == "" &&
-                        attributes["initializePartnerRole"] == "yes") {
-                    SAerror(17, attributes["name"], attributes["referenceLine"]);
-                }
-
-                break;
+            // trigger [SA00016]
+            if (attributes["myRole"] == "" &&
+                    attributes["partnerRole"] == "") {
+                SAerror(16, attributes["name"], attributes["referenceLine"]);
             }
+
+            // trigger [SA00017]
+            if (attributes["partnerRole"] == "" &&
+                    attributes["initializePartnerRole"] == "yes") {
+                SAerror(17, attributes["name"], attributes["referenceLine"]);
+            }
+
+            break;
+        }
 
         case(K_PICK): {
-                checkAttributeType("createInstance", T_BOOLEAN);
+            checkAttributeType("createInstance", T_BOOLEAN);
 
-                if (attributes["createInstance"] == "yes") {
-                    isStartActivity = true;
-                }
-
-                break;
+            if (attributes["createInstance"] == "yes") {
+                isStartActivity = true;
             }
+
+            break;
+        }
 
         case(K_PROCESS): {
-                string required[] = {"name", "targetNamespace"};
-                checkRequiredAttributes(required, 2);
-                checkAttributeType("suppressJoinFailure", T_BOOLEAN);
-                checkAttributeType("exitOnStandardFault", T_BOOLEAN);
-                break;
-            }
+            string required[] = {"name", "targetNamespace"};
+            checkRequiredAttributes(required, 2);
+            checkAttributeType("suppressJoinFailure", T_BOOLEAN);
+            checkAttributeType("exitOnStandardFault", T_BOOLEAN);
+            break;
+        }
 
         case(K_RECEIVE): {
-                if (globals::choreography_filename == "") {
-                    string required[] = {"partnerLink", "operation"};
-                    checkRequiredAttributes(required, 2);
-                }
-
-                checkAttributeType("createInstance", T_BOOLEAN);
-                checkAttributeType("variable", T_BPELVARIABLENAME);
-
-                if (attributes["createInstance"] == "yes") {
-                    isStartActivity = true;
-                }
-
-                break;
+            if (globals::choreography_filename == "") {
+                string required[] = {"partnerLink", "operation"};
+                checkRequiredAttributes(required, 2);
             }
+
+            checkAttributeType("createInstance", T_BOOLEAN);
+            checkAttributeType("variable", T_BPELVARIABLENAME);
+
+            if (attributes["createInstance"] == "yes") {
+                isStartActivity = true;
+            }
+
+            break;
+        }
 
         case(K_REPEATUNTIL): {
-                checkAttributeType("hu:maxloops", T_UINT);
-                break;
-            }
+            checkAttributeType("hu:maxloops", T_UINT);
+            break;
+        }
 
         case(K_REPLY): {
-                if (globals::choreography_filename == "") {
-                    string required[] = {"partnerLink", "operation"};
-                    checkRequiredAttributes(required, 2);
-                }
-
-                checkAttributeType("variable", T_BPELVARIABLENAME);
-
-                break;
+            if (globals::choreography_filename == "") {
+                string required[] = {"partnerLink", "operation"};
+                checkRequiredAttributes(required, 2);
             }
+
+            checkAttributeType("variable", T_BPELVARIABLENAME);
+
+            break;
+        }
 
         case(K_SOURCE):
         case(K_TARGET): {
-                string required[] = {"linkName"};
-                checkRequiredAttributes(required, 1);
-                break;
-            }
+            string required[] = {"linkName"};
+            checkRequiredAttributes(required, 1);
+            break;
+        }
 
         case(K_SCOPE): {
-                checkAttributeType("isolated", T_BOOLEAN);
-                break;
-            }
+            checkAttributeType("isolated", T_BOOLEAN);
+            break;
+        }
 
         case(K_THROW): {
-                string required[] = {"faultName"};
-                checkRequiredAttributes(required, 1);
-                checkAttributeType("faultVariable", T_BPELVARIABLENAME);
-                break;
-            }
+            string required[] = {"faultName"};
+            checkRequiredAttributes(required, 1);
+            checkAttributeType("faultVariable", T_BPELVARIABLENAME);
+            break;
+        }
 
         case(K_TO): {
-                checkAttributeType("variable", T_BPELVARIABLENAME);
-                break;
-            }
+            checkAttributeType("variable", T_BPELVARIABLENAME);
+            break;
+        }
 
         case(K_TOPART): {
-                string required[] = {"part", "fromVariable"};
-                checkRequiredAttributes(required, 2);
-                checkAttributeType("fromVariable", T_BPELVARIABLENAME);
-                break;
-            }
+            string required[] = {"part", "fromVariable"};
+            checkRequiredAttributes(required, 2);
+            checkAttributeType("fromVariable", T_BPELVARIABLENAME);
+            break;
+        }
 
         case(K_VALIDATE): {
-                string required[] = {"variables"};
-                checkAttributeType("variables", T_BPELVARIABLENAME);  // in fact BPELVariableNameS
-                checkRequiredAttributes(required, 1);
-                break;
-            }
+            string required[] = {"variables"};
+            checkAttributeType("variables", T_BPELVARIABLENAME);  // in fact BPELVariableNameS
+            checkRequiredAttributes(required, 1);
+            break;
+        }
 
         case(K_VARIABLE): {
-                string required[] = {"name"};
-                checkRequiredAttributes(required, 1);
-                checkAttributeType("name", T_BPELVARIABLENAME);
+            string required[] = {"name"};
+            checkRequiredAttributes(required, 1);
+            checkAttributeType("name", T_BPELVARIABLENAME);
 
-                // trigger [SA00025]
-                if (attributes["messageType"] != "" &&
-                        attributes["type"] != "") {
-                    SAerror(25, attributes["name"], attributes["referenceLine"]);
-                }
-                if (attributes["messageType"] != "" &&
-                        attributes["element"] != "") {
-                    SAerror(25, attributes["name"], attributes["referenceLine"]);
-                }
-                if (attributes["element"] != "" &&
-                        attributes["type"] != "") {
-                    SAerror(25, attributes["name"], attributes["referenceLine"]);
-                }
-
-                break;
+            // trigger [SA00025]
+            if (attributes["messageType"] != "" &&
+                    attributes["type"] != "") {
+                SAerror(25, attributes["name"], attributes["referenceLine"]);
             }
+            if (attributes["messageType"] != "" &&
+                    attributes["element"] != "") {
+                SAerror(25, attributes["name"], attributes["referenceLine"]);
+            }
+            if (attributes["element"] != "" &&
+                    attributes["type"] != "") {
+                SAerror(25, attributes["name"], attributes["referenceLine"]);
+            }
+
+            break;
+        }
 
         case(K_WHILE): {
-                checkAttributeType("hu:maxloops", T_UINT);
-                break;
-            }
+            checkAttributeType("hu:maxloops", T_UINT);
+            break;
+        }
     }
 }
 
@@ -653,73 +653,73 @@ void ASTE::checkAttributes() {
 void ASTE::checkAttributeType(string attribute, ENUM_attribute_type type) {
     switch (type) {
         case(T_BOOLEAN): {
-                if (attributes[attribute] == "yes" ||
-                        attributes[attribute] == "no") {
-                    return;
-                }
-
-                string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tBoolean";
-                genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
-
-                break;
+            if (attributes[attribute] == "yes" ||
+                    attributes[attribute] == "no") {
+                return;
             }
+
+            string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tBoolean";
+            genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
+
+            break;
+        }
 
         case(T_INITIATE): {
-                if (attributes[attribute] == "yes" ||
-                        attributes[attribute] == "join" ||
-                        attributes[attribute] == "no") {
-                    return;
-                }
-
-                string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tInitiate";
-                genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
-
-                break;
+            if (attributes[attribute] == "yes" ||
+                    attributes[attribute] == "join" ||
+                    attributes[attribute] == "no") {
+                return;
             }
+
+            string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tInitiate";
+            genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
+
+            break;
+        }
 
         case(T_ROLES): {
-                if (attributes[attribute] == "myRole" ||
-                        attributes[attribute] == "partnerRole") {
-                    return;
-                }
-
-                string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tRoles";
-                genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
-
-                break;
+            if (attributes[attribute] == "myRole" ||
+                    attributes[attribute] == "partnerRole") {
+                return;
             }
+
+            string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tRoles";
+            genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
+
+            break;
+        }
 
         case(T_PATTERN): {
-                if (attributes[attribute] == "" ||
-                        attributes[attribute] == "request" ||
-                        attributes[attribute] == "response" ||
-                        attributes[attribute] == "request-response") {
-                    return;
-                }
-
-                string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tPattern";
-                genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
-
-                break;
+            if (attributes[attribute] == "" ||
+                    attributes[attribute] == "request" ||
+                    attributes[attribute] == "response" ||
+                    attributes[attribute] == "request-response") {
+                return;
             }
+
+            string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type tPattern";
+            genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
+
+            break;
+        }
 
         case(T_BPELVARIABLENAME): {
-                // trigger [SA00024]
-                if (attributes[attribute].find('.', 0) != string::npos) {
-                    SAerror(24, attribute, attributes["referenceLine"]);
-                }
-
-                break;
+            // trigger [SA00024]
+            if (attributes[attribute].find('.', 0) != string::npos) {
+                SAerror(24, attribute, attributes["referenceLine"]);
             }
+
+            break;
+        }
 
         case(T_UINT): {
-                if (attributes[attribute] != "" && toUInt(attributes[attribute]) == UINT_MAX) {
-                    string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type unsigned integer";
-                    genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
-                }
-
-                break;
+            if (attributes[attribute] != "" && toUInt(attributes[attribute]) == UINT_MAX) {
+                string errormessage = "attribute `" + attribute + "' in <" + activityTypeName() + "> must be of type unsigned integer";
+                genericError(108, errormessage, attributes["referenceLine"], ERRORLEVEL_SYNTAX);
             }
+
+            break;
+        }
     }
 }
 
@@ -755,24 +755,24 @@ string ASTE::createChannel(bool synchronousCommunication) {
                 // receiving activity
             case(K_RECEIVE):
             case(K_ONMESSAGE): {
-                    // depending on the channel count, create one or more input channel(s)
-                    globals::ASTE_inputChannels[channelName] = (messageLink->participantSet != NULL) ?
-                                                               messageLink->participantSet->count :
-                                                               0;
+                // depending on the channel count, create one or more input channel(s)
+                globals::ASTE_inputChannels[channelName] = (messageLink->participantSet != NULL) ?
+                                                           messageLink->participantSet->count :
+                                                           0;
 
-                    break;
-                }
+                break;
+            }
 
-                // sending activity
+            // sending activity
             case(K_INVOKE):
             case(K_REPLY): {
-                    // depending on the channel count, create one or more output channel(s)
-                    globals::ASTE_outputChannels[channelName] = (messageLink->participantSet != NULL) ?
-                                                                messageLink->participantSet->count :
-                                                                0;
+                // depending on the channel count, create one or more output channel(s)
+                globals::ASTE_outputChannels[channelName] = (messageLink->participantSet != NULL) ?
+                                                            messageLink->participantSet->count :
+                                                            0;
 
-                    break;
-                }
+                break;
+            }
         }
 
         return channelName;
@@ -802,37 +802,37 @@ string ASTE::createChannel(bool synchronousCommunication) {
     switch (type) {
         case(K_RECEIVE):
         case(K_ONMESSAGE): {
-                if (plRoleDetails != NULL) {
-                    channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
-                }
-
-                // no instances needed
-                globals::ASTE_inputChannels[channelName] = 0;
-                break;
+            if (plRoleDetails != NULL) {
+                channelName = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
             }
+
+            // no instances needed
+            globals::ASTE_inputChannels[channelName] = 0;
+            break;
+        }
 
         case(K_INVOKE):
         case(K_REPLY): {
+            if (plRoleDetails != NULL) {
+                channelName = plRoleDetails->myRole + "." + plRoleDetails->partnerRole + "." + attributes["operation"];
+            }
+
+            // no instances needed
+            globals::ASTE_outputChannels[channelName] = 0;
+
+            if (synchronousCommunication) {
+                string channelName2 = attributes["partnerLink"] + "." + attributes["operation"];
                 if (plRoleDetails != NULL) {
-                    channelName = plRoleDetails->myRole + "." + plRoleDetails->partnerRole + "." + attributes["operation"];
+                    channelName2 = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
                 }
+                this->channelName2 = channelName2;
 
                 // no instances needed
-                globals::ASTE_outputChannels[channelName] = 0;
-
-                if (synchronousCommunication) {
-                    string channelName2 = attributes["partnerLink"] + "." + attributes["operation"];
-                    if (plRoleDetails != NULL) {
-                        channelName2 = plRoleDetails->partnerRole + "." + plRoleDetails->myRole + "." + attributes["operation"];
-                    }
-                    this->channelName2 = channelName2;
-
-                    // no instances needed
-                    globals::ASTE_inputChannels[channelName2] = 0;
-                }
-
-                break;
+                globals::ASTE_inputChannels[channelName2] = 0;
             }
+
+            break;
+        }
 
         default:
             assert(false);

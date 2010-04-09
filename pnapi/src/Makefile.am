@@ -92,7 +92,7 @@ MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-stack.h)
 # Bison C++ support.
 #-------------------------------------------------------------#
 %-location.h: %.yy
-	./bison-wrapper.sh $(<:.yy=)
+	$(AM_V_GEN)./bison-wrapper.sh $(<:.yy=)
 # [CUSTOMER_E_GEN] this line is needed to build a customer Makefile. Do not remove!
 
 #----------------------------------------#

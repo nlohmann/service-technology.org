@@ -2,6 +2,8 @@ SUBDIRS = unfolder
 
 bin_PROGRAMS = petri sa2owfn sa2sm cdnf generator cphils configurator
 
+noinst_PROGRAMS = sound
+
 petri_SOURCES = petri.cc cmdline.c cmdline.h \
                 Output.h Output.cc \
                 verbose.h verbose.cc
@@ -24,12 +26,15 @@ configurator_SOURCES = configurator.cc \
                        Output.h Output.cc \
                        verbose.h verbose.cc
 
+sound_SOURCES = sound.cc
+
 petri_LDADD =  $(top_builddir)/src/libpnapi.la
 generator_LDADD =  $(top_builddir)/src/libpnapi.la
 sa2owfn_LDADD =  $(top_builddir)/src/libpnapi.la
 sa2sm_LDADD =  $(top_builddir)/src/libpnapi.la
 cdnf_LDADD =  $(top_builddir)/src/libpnapi.la
 configurator_LDADD =  $(top_builddir)/src/libpnapi.la
+sound_LDADD =  $(top_builddir)/src/libpnapi.la
 
 AM_CPPFLAGS = -I$(top_srcdir)/src
 

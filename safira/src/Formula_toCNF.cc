@@ -21,7 +21,7 @@
 #include <ctime>
 //#include <zlib.h>
 #include <sys/types.h>
-#include <sys/wait.h>
+//#include <sys/wait.h>
 #include <vector>
 #include "Formula.h"
 #include "helpers.h"

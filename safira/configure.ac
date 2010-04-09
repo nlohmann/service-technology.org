@@ -32,8 +32,6 @@ AC_ST_VERBOSE
 AC_PROG_LN_S
 AC_PROG_RANLIB
 
-AC_CHECK_HEADERS([sys/time.h sys/resource.h],,AC_MSG_ERROR([cannot use required headers]))
-
 AC_PATH_PROG(DOT, [dot], not found)
 if test "$DOT" = "not found"; then
   AC_MSG_WARN([Graphviz Dot was not found. See file README.])

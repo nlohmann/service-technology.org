@@ -22,7 +22,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include <stdint.h>
 #include <errno.h>
 
-#include <signal.h>
+//#include <signal.h>
 //#include <zlib.h>
 
 #include <vector>
@@ -36,22 +36,22 @@ using std::vector;
 #include <vector>
 
 /*************************************************************************************/
-#ifdef _MSC_VER
+// #ifdef _MSC_VER
 #include <ctime>
 
 static inline double cpuTime(void) {
     return (double)clock() / CLOCKS_PER_SEC; }
-#else
-
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <unistd.h>
-
-static inline double cpuTime(void) {
-    struct rusage ru;
-    getrusage(RUSAGE_SELF, &ru);
-    return (double)ru.ru_utime.tv_sec + (double)ru.ru_utime.tv_usec / 1000000; }
-#endif
+// #else
+// 
+// #include <sys/time.h>
+// #include <sys/resource.h>
+// #include <unistd.h>
+// 
+// static inline double cpuTime(void) {
+//     struct rusage ru;
+//     getrusage(RUSAGE_SELF, &ru);
+//     return (double)ru.ru_utime.tv_sec + (double)ru.ru_utime.tv_usec / 1000000; }
+// #endif
 
 
 #if defined(__linux__)
@@ -222,11 +222,11 @@ void printStats(Solver& solver)
 }
 
 Solver* solver;
-static void SIGINT_handler(int signum) {
-    reportf("\n"); reportf("*** INTERRUPTED ***\n");
-    printStats(*solver);
-    reportf("\n"); reportf("*** INTERRUPTED ***\n");
-    exit(1); }
+//static void SIGINT_handler(int signum) {
+//    reportf("\n"); reportf("*** INTERRUPTED ***\n");
+//    printStats(*solver);
+//    reportf("\n"); reportf("*** INTERRUPTED ***\n");
+//    exit(1); }
 
 
 //=================================================================================================
@@ -270,8 +270,8 @@ int minisat(vector< vector< int > > & in)
     double cpu_time = cpuTime();
 
     solver = &S;
-    signal(SIGINT,SIGINT_handler);
-    signal(SIGHUP,SIGINT_handler);
+//    signal(SIGINT,SIGINT_handler);
+//    signal(SIGHUP,SIGINT_handler);
 
     parse_DIMACS_main(in, S);
     //gzclose(in);
@@ -297,8 +297,8 @@ vector<bool>* minisat2(vector< vector< int > > & in){
     double cpu_time = cpuTime();
 
     solver = S;
-    signal(SIGINT,SIGINT_handler);
-    signal(SIGHUP,SIGINT_handler);
+//    signal(SIGINT,SIGINT_handler);
+//    signal(SIGHUP,SIGINT_handler);
 
     parse_DIMACS_main(in, *S);
     //gzclose(in);

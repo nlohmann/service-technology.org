@@ -2,7 +2,9 @@ AC_INIT(UML2oWFN, 2.11, uml2owfn@service-technology.org, uml2owfn, http://servic
 
 # prerequisites for Autoconf and Automake
 AC_PREREQ(2.59)
+
 AM_INIT_AUTOMAKE
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # Location of main() function and name of config header file.
 AC_CONFIG_SRCDIR(src/uml2owfn.cc)

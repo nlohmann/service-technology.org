@@ -946,10 +946,8 @@ Note that @samp{Prcsss} is replaced by @samp{s00000001} in the first occurrence 
 
 
 
-
-
-
-
+@node GNU Free Documentation License
+@appendix The GNU Free Documentation License
 @include fdl.texi
 
 @bye

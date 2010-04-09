@@ -52,16 +52,16 @@ attributes       ([[:alnum:]]+"="{string}{whitespace})*
 
  /* literal values inside <wbim:probability> are not anonymized */
  // <PROBABILITY>"<"{ns}"probability>" { BEGIN(currentView); printf(yytext);  }
-<PROBABILITY>"<"{ns}"literalValue>"{whitespace}{real}{whitespace}"</"{ns}"literalValue>" { printf(yytext); }
-<PROBABILITY>.                     { printf(yytext); }
-"<"{ns}"probability>"              { currentView = YY_START; BEGIN(PROBABILITY); printf(yytext); }
+<PROBABILITY>"<"{ns}"literalValue>"{whitespace}{real}{whitespace}"</"{ns}"literalValue>" { ECHO; }
+<PROBABILITY>.                     { ECHO; }
+"<"{ns}"probability>"              { currentView = YY_START; BEGIN(PROBABILITY); ECHO; }
 
  /* real numbers in any element are replaced by 0.0 */
 <INITIAL>{real} { printf("0.0"); }
 
  /* keep xsd:duration and xsd:dateTime */
-"<"{ns}"literalValue>"{xsdduration}"</"{ns}"literalValue>" { printf(yytext); }
-"<"{ns}"startTime>"{xsddatetime}"</"{ns}"startTime>"       { printf(yytext); }
+"<"{ns}"literalValue>"{xsdduration}"</"{ns}"literalValue>" { ECHO; }
+"<"{ns}"startTime>"{xsddatetime}"</"{ns}"startTime>"       { ECHO; }
 
 
  /* replace comments, <wbim:individualResourceRequirement> elements */
@@ -82,7 +82,7 @@ attributes       ([[:alnum:]]+"="{string}{whitespace})*
 
 
  /* attributes on the whitelist are not anonymized */
-{attrib_whitelist}"="{string}  { printf(yytext); }
+{attrib_whitelist}"="{string}  { ECHO; }
 
  /* any string checked if it has to be split and/or anonymized */
 {string}  { printf("\"%s\"", processString(yytext).c_str()); }

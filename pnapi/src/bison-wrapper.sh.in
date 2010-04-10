@@ -44,10 +44,6 @@ ${CALL} ${GEN_LOC} > ${TARGET_LOC}
 ${CALL} ${GEN_POS} > ${TARGET_POS}
 ${CALL} ${GEN_STACK} > ${TARGET_STACK}
 
-# correct lexer
-${SED} -e "s,\(.*isatty.*\),// \1," ${NAME}-lexer.cc > ${NAME}-lexer.tmp
-mv -f ${NAME}-lexer.tmp ${NAME}-lexer.cc
-
 # remove temporary files
 rm -f ${GEN_CC} ${GEN_H} ${GEN_LOC} ${GEN_POS} ${GEN_STACK}
 

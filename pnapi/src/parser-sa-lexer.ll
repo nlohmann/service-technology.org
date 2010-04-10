@@ -23,6 +23,9 @@
 /* maintain line number for error reporting */
 %option yylineno
 
+/* get rid of isatty */
+%option never-interactive
+
 
  /*****************************************************************************
   * C declarations

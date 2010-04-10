@@ -101,7 +101,7 @@ bool Condition::isSatisfied(const Marking & m) const
 /*!
  * \brief standard assignment operator
  */
-Condition & Condition::operator=(const Formula & f)
+Condition & Condition::operator=(const formula::Formula & f)
 {
   assert(formula_ != &f);
 
@@ -131,7 +131,7 @@ Condition & Condition::operator=(bool formulaTrue)
  * \param conjunct if true, the proposition is added by conjunction (default),
  *                 else the proposition is added by discunction
  */
-void Condition::addProposition(const Proposition & p, bool conjunct)
+void Condition::addProposition(const formula::Proposition & p, bool conjunct)
 {
   if (conjunct)
   {

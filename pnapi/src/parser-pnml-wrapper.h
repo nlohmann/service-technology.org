@@ -1,7 +1,7 @@
 // -*- C++ -*-
 
 /*!
- * \file    parser-pnmlwrapper.h
+ * \file    parser-pnml-wrapper.h
  * \brief   Parser Related Structures
  *
  * Since only one bison-generated parser can be included,

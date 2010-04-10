@@ -91,7 +91,7 @@ MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-stack.h)
 # Bison need to be called this way since GNU Autotools lack   #
 # Bison C++ support.
 #-------------------------------------------------------------#
-%-location.h: %.yy
+%-location.h: %.yy %-lexer.cc
 	$(AM_V_GEN)./bison-wrapper.sh $(<:.yy=)
 # [CUSTOMER_E_GEN] this line is needed to build a customer Makefile. Do not remove!
 

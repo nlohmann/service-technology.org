@@ -795,7 +795,9 @@ void LivelockOperatingGuideline::output_cyclic(const bool& dot, std::ostream& fi
 
             file << "<tr><td align=\"left\">";
 
-            for (unsigned int i = 0; temp->setOfKnowledges[i] != NULL;) {
+            unsigned int i = 0;
+
+            while(temp->setOfKnowledges[i] != NULL) {
 
                 bool lastNode = false;
 
@@ -822,7 +824,8 @@ void LivelockOperatingGuideline::output_cyclic(const bool& dot, std::ostream& fi
 
         while ((temp = LivelockOperatingGuideline::annotationLivelockOG.pop()) != NULL) {
 
-            for (unsigned int i = 0; temp->setOfKnowledges[i] != NULL;) {
+            unsigned int i = 0;
+            while (temp->setOfKnowledges[i] != NULL) {
 
                 bool lastNode = false;
 

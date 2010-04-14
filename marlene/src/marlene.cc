@@ -113,18 +113,18 @@ int main(int argc, char* argv[])
                     // adding a prefix to the net
                     if (args_info.withprefix_flag)
                     {
-                        net->prefixNodeNames(toString(i) + ".", false);
+                        net->prefixNodeNames(toString(i) + ".");
                     }
                     
                     nets.push_back(net);
-                    //std::cout << pnapi::io::dot << *net;
+                    // std::cerr << pnapi::io::owfn << *net;
 
                 }
                 else
                 {
                     abort(2, "Open net file %s could not be opened for reading", filename.c_str());
                 }
-            } catch (pnapi::io::InputError error) {
+            } catch (pnapi::exception::InputError error) {
                 std::cerr << PACKAGE << ":" << error << std::endl;
                 abort(2, " ");
             }
@@ -141,9 +141,9 @@ int main(int argc, char* argv[])
             // adding a prefix to the net
             if (args_info.withprefix_flag)
             {
-                net->prefixNodeNames("0.", false);
+                net->prefixNodeNames("0.");
             }
-        } catch (pnapi::io::InputError error) {
+        } catch (pnapi::exception::InputError error) {
             std::cerr << PACKAGE << ":" << error << std::endl;
             abort(2, " ");
         }

@@ -1,0 +1,33 @@
+{ simply sends an "a" and receives a "b" }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,
+  p2;
+INPUT
+  b;
+OUTPUT
+  a;
+
+
+INITIALMARKING
+  p0:   1;
+
+FINALMARKING
+  p2:   1;
+
+TRANSITION t1    { !a }
+CONSUME
+  p0;
+PRODUCE
+  p1, a;
+
+TRANSITION t2    { ?b }
+CONSUME
+  p1, b;
+PRODUCE
+  p2;
+
+
+{ END OF FILE }

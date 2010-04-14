@@ -2,8 +2,21 @@
   * bison options 
   ****************************************************************************/
 
-/* plain c parser: the prefix is our "namespace" */
-%name-prefix="pnapi_sa_yy"
+/* generate a c++ parser */
+%skeleton "lalr1.cc"
+
+/* generate your code in your own namespace */
+%define namespace "pnapi::parser::sa::yy"
+
+/* do not call the generated class "parser" */
+%define parser_class_name "BisonParser"
+
+/* generate needed location classes */
+%locations
+
+/* pass overlying parser to generated parser and yylex-wrapper */
+%parse-param { Parser& parser_ }
+%lex-param   { Parser& parser_ }
 
 /* write tokens to parser-sa.h for use by scanner */
 %defines
@@ -15,26 +28,20 @@
  /*****************************************************************************
   * C declarations
   ****************************************************************************/
+
+%code requires {
+  /* forward declarations */
+  namespace pnapi { namespace parser { namespace sa {
+    class Parser;
+  } } } /* pnapi::parser::sa */
+}
+
 %{
 
-#include <iostream>
-#include <set>
-#include <sstream>
-#include <string>
-#include "parser.h"
-#include "pnapi.h"
+#include "config.h"
 
-using namespace pnapi;
-
-#undef yylex
-#undef yyparse
-#undef yyerror
-
-#define yyerror pnapi::parser::error
-
-#define yylex   pnapi::parser::sa::lex
-#define yylex_destroy pnapi::parser::sa::lex_destroy
-#define yyparse pnapi::parser::sa::parse
+#include "automaton.h"
+#include "parser-sa-wrapper.h"
 
 %}
 
@@ -65,24 +72,6 @@ using namespace pnapi;
 
 sa:
   KEY_INTERFACE input output synchronous KEY_NODES nodes
-  {
-    if (sa2sm)
-    {
-      std::set<Transition *> transitions = pnapi_sa_yynet.getTransitions();
-      for (std::set<Transition *>::iterator t = transitions.begin(); t != transitions.end(); t++)
-      {
-        // same reason as in automaton.cc method stateMachine (see FIXME)
-        // making a copy of all transitions and give them the labels
-        Transition &tt = pnapi_sa_yynet.createTransition("", synchlabel[*t]);
-        for (std::set<Arc *>::iterator f = (*t)->getPresetArcs().begin(); f != (*t)->getPresetArcs().end(); f++)
-          pnapi_sa_yynet.createArc((*f)->getPlace(), tt, (*f)->getWeight());
-        for (std::set<Arc *>::iterator f = (*t)->getPostsetArcs().begin(); f != (*t)->getPostsetArcs().end(); f++)
-          pnapi_sa_yynet.createArc(tt, (*f)->getPlace(), (*f)->getWeight());
-  
-        pnapi_sa_yynet.deleteTransition(**t);
-      }
-    } 
-  }
 ;
 
 
@@ -90,18 +79,12 @@ input:
   /* empty */
 | KEY_INPUT identlist SEMICOLON
   {
-    for (int i = 0; i < (int) identlist.size(); i++)
+    for(int i = 0; i < (int)parser_.identlist.size(); ++i)
     {
-      if (sa2sm)
-      {
-        Place *p = &pnapi_sa_yynet.createPlace(identlist[i], Node::INPUT);
-        label2places_[identlist[i]] = p;
-      }
-      else
-        pnapi_sa_yyautomaton.addInput(identlist[i]);
-      input_.insert(identlist[i]);
+      parser_.automaton_.addInputLabel(parser_.identlist[i]);
+      parser_.input_.insert(parser_.identlist[i]);
     }
-    identlist.clear();
+    parser_.identlist.clear();
   }
 ;
 
@@ -110,18 +93,12 @@ output:
   /* empty */
 | KEY_OUTPUT identlist SEMICOLON
   { 
-    for (int i = 0; i < (int) identlist.size(); i++)
+    for(int i = 0; i < (int)parser_.identlist.size(); ++i)
     {
-      if (sa2sm)
-      {
-        Place *p = &pnapi_sa_yynet.createPlace(identlist[i], Node::OUTPUT);
-        label2places_[identlist[i]] = p;
-      }
-      else
-        pnapi_sa_yyautomaton.addOutput(identlist[i]);
-      output_.insert(identlist[i]);
+      parser_.automaton_.addOutputLabel(parser_.identlist[i]);
+      parser_.output_.insert(parser_.identlist[i]);
     }
-    identlist.clear();
+    parser_.identlist.clear();
   }
 ;
 
@@ -130,17 +107,28 @@ synchronous:
   /* empty */
 | KEY_SYNCHRONOUS identlist SEMICOLON
   {
-    for (int i = 0; i < (int) identlist.size(); i++)
-      synchronous_.insert(identlist[i]);
-    identlist.clear();
+    for(int i = 0; i < (int)parser_.identlist.size(); ++i)
+    {
+      parser_.automaton_.addSynchronousLabel(parser_.identlist[i]);
+      parser_.synchronous_.insert(parser_.identlist[i]);
+    }
+    parser_.identlist.clear();
   }
 ;
 
 
 identlist:
   /* empty */
-| IDENT                    { identlist.push_back(std::string($1)); free($1); }
-| identlist COMMA IDENT    { identlist.push_back(std::string($3)); free($3); }
+| IDENT
+  {
+    parser_.identlist.push_back(std::string($1));
+    free($1);
+  }
+| identlist COMMA IDENT
+  {
+    parser_.identlist.push_back(std::string($3));
+    free($3);
+  }
 ;
 
 
@@ -148,81 +136,45 @@ nodes:
   /* empty */
 | nodes NUMBER annotation successors
   {
-    if (sa2sm)
+    if(parser_.states_.count($2) == 0)
     {
-      if (places_.count($2) == 0)
-      {
-        std::stringstream ss;
-        std::string num;
-        ss << $2;
-        ss >> num;
-        place_ = &pnapi_sa_yynet.createPlace("p"+num);
-        places_[$2] = place_;
-      }
-      else
-        place_ = places_[$2];
-      if (initial_)
-        place_->mark();
-      if (final_)
-      {
-        finalPlaces_.push_back(place_);
-      }
-        
-      for (int i = 0; i < (int) succState_.size(); i++)
-      {
-        Transition *t = &pnapi_sa_yynet.createTransition();
-        if (succType_[i] == Automaton::INPUT)
-          pnapi_sa_yynet.createArc(*label2places_[succLabel_[i]], *t);
-        if (succType_[i] == Automaton::OUTPUT)
-          pnapi_sa_yynet.createArc(*t, *label2places_[succLabel_[i]]);
-        if (succType_[i] == Automaton::SYNCHRONOUS)
-        {
-          synchlabel[t].insert(succLabel_[i]);
-        }
-          
-        pnapi_sa_yynet.createArc(*place_, *t);
-        pnapi_sa_yynet.createArc(*t, *places_[succState_[i]]);
-        t = NULL;
-      }
-      
-      final_ = false;
-      initial_ = false;
-      succState_.clear();
-      succLabel_.clear();
-      succType_.clear();
+      parser_.state_ = &(parser_.automaton_.createState($2));
+      parser_.states_[$2] = parser_.state_;
     }
     else
     {
-	    if (states_.count($2) == 0)
-	    {
-	    	state_ = &pnapi_sa_yyautomaton.createState($2);
-	      states_[$2] = state_;
-	    }
-	    else
-	      state_ = states_[$2];
-	    if (initial_)
-	      state_->initial();
-	    if (final_)
-	      state_->final();
-	    
-	    for (int i = 0; i < (int) succState_.size(); i++)
-	      pnapi_sa_yyautomaton.createEdge(*state_, *states_[succState_[i]], succLabel_[i], succType_[i]);
-	    
-	    final_ = false;
-	    initial_ = false;
-	    succState_.clear();
-	    succLabel_.clear();
-	    succType_.clear();
-	  }
+      parser_.state_ = parser_.states_[$2];
+    }
+
+    if(parser_.initial_)
+    {
+      parser_.state_->setInitial();
+    }
+
+    if(parser_.final_)
+    {
+      parser_.state_->setFinal();
+    }
+    
+    for(int i = 0; i < (int)parser_.succState_.size(); ++i)
+    {
+      parser_.automaton_.createEdge(*(parser_.state_), *(parser_.states_[parser_.succState_[i]]), parser_.succLabel_[i], parser_.succType_[i]);
+    }
+    
+    parser_.final_ = false;
+    parser_.initial_ = false;
+    parser_.succState_.clear();
+    parser_.succLabel_.clear();
+    parser_.succType_.clear();
   }
 ;
 
 
 annotation:
   /* empty */
-| COLON KEY_INITIAL                  { initial_ = true; }
-| COLON KEY_FINAL                    { final_ = true; }
-| COLON KEY_INITIAL COMMA KEY_FINAL  { initial_ = final_ = true; }
+| COLON KEY_INITIAL                  { parser_.initial_ = true; }
+| COLON KEY_FINAL                    { parser_.final_ = true; }
+| COLON KEY_INITIAL COMMA KEY_FINAL  { parser_.initial_ = parser_.final_ = true; }
 ;
 
 
@@ -230,39 +182,34 @@ successors:
   /* empty */
 | successors IDENT ARROW NUMBER
   {
-    if (sa2sm)
+    if(parser_.states_.count($4) == 0)
     {
-      if (places_.count($4) == 0)
-      {
-        std::stringstream ss;
-        std::string num;
-        ss << $4;
-        ss >> num;
-        edgePlace_ = &pnapi_sa_yynet.createPlace("p"+num);
-        places_[$4] = edgePlace_;
-      }
+      parser_.state_ = &(parser_.automaton_.createState($4));
+      parser_.states_[$4] = parser_.state_;
     }
-    else
-    {
-	    if (states_.count($4) == 0)
-	    {
-	      edgeState_ = &pnapi_sa_yyautomaton.createState($4);
-	      states_[$4] = edgeState_;
-	    }
-	  }
 
-    edgeLabel_ = $2;
+    parser_.edgeLabel_ = $2;
     free($2);
-    edgeType_ = Automaton::TAU;
-    if (input_.count(edgeLabel_) > 0)
-      edgeType_ = Automaton::INPUT;
-    if (output_.count(edgeLabel_) > 0)
-      edgeType_ = Automaton::OUTPUT;
-    if (synchronous_.count(edgeLabel_) > 0)
-      edgeType_ = Automaton::SYNCHRONOUS;
-    succState_.push_back($4);
-    succLabel_.push_back(edgeLabel_);
-    succType_.push_back(edgeType_);
+    parser_.edgeType_ = Edge::TAU;
+
+    if(parser_.input_.count(parser_.edgeLabel_) > 0)
+    {
+      parser_.edgeType_ = Edge::INPUT;
+    }
+
+    if(parser_.output_.count(parser_.edgeLabel_) > 0)
+    {
+      parser_.edgeType_ = Edge::OUTPUT;
+    }
+
+    if(parser_.synchronous_.count(parser_.edgeLabel_) > 0)
+    {
+      parser_.edgeType_ = Edge::SYNCHRONOUS;
+    }
+
+    parser_.succState_.push_back($4);
+    parser_.succLabel_.push_back(parser_.edgeLabel_);
+    parser_.succType_.push_back(parser_.edgeType_);
   }
 ;
 

@@ -9,7 +9,8 @@
 Version 1.2-unreleased
 ======================
 
-* added new version of PNAPI - nets no longer become unbounded when normalized
+* update to version 4.0 of PNAPI (nets no longer become unbounded when
+  normalized, port support)
 
 * when building binary for Win32-Systems, path for temporary files is
   automatically set to %TEMP%
@@ -17,7 +18,7 @@ Version 1.2-unreleased
 * added experimental support for Candy
   (`http://service-technology.org/tools/candy')
 
-* added support for building controllers using Genet
+* added (highly experimentell) support for building controllers using Genet
 
 * open nets with synchronous interface are now supported
 

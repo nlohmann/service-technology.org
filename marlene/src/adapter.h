@@ -31,6 +31,7 @@
 
 #include <vector>
 #include <iostream>
+#include <list>
 #include "pnapi/pnapi.h"
 
 // forward declarations

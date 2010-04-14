@@ -15,7 +15,8 @@ TESTFILES = test.owfn test.ar \
 	    nopetrify.conf \
 	    wrongsyntax.owfn wrongsyntax.ar wronglexic.ar \
 	    sync1_exp.owfn sync2_exp.owfn sync3_exp.owfn \
-	    async1_exp.owfn async2_exp.owfn async3_exp.owfn
+	    async1_exp.owfn async2_exp.owfn async3_exp.owfn \
+	    bug_compplaces.owfn bug_compplaces.ar
 
 
 # Below you can list all the files you do not want to have counted in the

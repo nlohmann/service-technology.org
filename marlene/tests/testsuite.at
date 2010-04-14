@@ -214,6 +214,7 @@ AT_KEYWORDS(sample)
 AT_CLEANUP
 
 AT_SETUP([adding prefixes to nets (1)])
+AT_XFAIL_IF(true)
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 #AT_CHECK_PETRIFY
@@ -444,5 +445,16 @@ AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/wronglexic.ar .])
 AT_CHECK([MARLENE test-n.owfn --rulefile=wronglexic.ar --verbose],1,ignore,stderr)
 AT_CHECK([GREP -q "lexical error" stderr],0)
 AT_KEYWORDS(errorhandling)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Regression testing])
+############################################################################
+
+AT_SETUP([BUG: Wrongly added complementary places for places with loops ])
+AT_CHECK([cp TESTFILES/bug_compplaces.owfn TESTFILES/bug_compplaces.ar .])
+AT_CHECK([MARLENE bug_compplaces.owfn --rulefile=bug_compplaces.ar --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "writing final adapter to standard output" stderr],0)
+AT_KEYWORDS(bug regression)
 AT_CLEANUP
 

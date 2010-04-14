@@ -1,13 +1,13 @@
 @heading Version 1.2-unreleased
 @itemize
 
-@item added new version of PNAPI -- nets no longer become unbounded when normalized
+@item update to version 4.0 of PNAPI (nets no longer become unbounded when normalized, port support)
 
 @item when building binary for Win32-Systems, path for temporary files is automatically set to %TEMP%
 
 @item added experimental support for Candy (@url{http://service-technology.org/tools/candy})
 
-@item added support for building controllers using Genet
+@item added (highly experimentell) support for building controllers using Genet
 
 @item open nets with synchronous interface are now supported
 

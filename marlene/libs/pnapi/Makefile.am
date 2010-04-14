@@ -1,7 +1,7 @@
 ##################################
 # This file has been generated   #
 # automaticall by compiling      #
-# Petri Net API 3.01-unreleased #
+# Petri Net API 4.01-unreleased #
 #                                #
 # You MUST NOT change this file. #
 ##################################
@@ -10,30 +10,30 @@ noinst_LIBRARIES = libpnapi.a
 
 # [CUSTOMER_B_SRC] this line is needed to build a customer Makefile. Do not remove!
 libpnapi_a_SOURCES = \
-    parser-lola.yy    parser-lola-lexer.ll \
-    parser-onwd.yy    parser-onwd-lexer.ll \
-    parser-owfn.yy    parser-owfn-lexer.ll \
-    parser-pn.yy      parser-pn-lexer.ll \
-    parser-pnml.yy    parser-pnml-lexer.ll \
-    parser-sa.yy      parser-sa-lexer.ll \
+    parser-lola.yy parser-lola-lexer.ll parser-lola-wrapper.h parser-lola-wrapper.cc \
+    parser-owfn.yy parser-owfn-lexer.ll parser-owfn-wrapper.h parser-owfn-wrapper.cc \
+    parser-pn.yy parser-pn-lexer.ll parser-pn-wrapper.h parser-pn-wrapper.cc \
+    parser-pnml.yy parser-pnml-lexer.ll parser-pnml-wrapper.h parser-pnml-wrapper.cc \
+    parser-sa.yy parser-sa-lexer.ll parser-sa-wrapper.h parser-sa-wrapper.cc \
+    parser-woflan.yy parser-woflan-lexer.ll parser-woflan-wrapper.h parser-woflan-wrapper.cc \
     pnapi.h pnapi.cc \
-    Output.h Output.cc \
     automaton.h automaton.cc\
     component.h component.cc \
     condition.h condition.cc \
-    errorhandling.cc \
+    exception.h exception.cc \
     formula.h formula.cc \
     interface.h interface.cc \
-    link.h link.cc \
     marking.h marking.cc \
     myio.h myio.cc io-format.cc \
+    Output.h Output.cc \
     parser.h parser.cc \
     petrinet-pn.cc \
     petrinet-reduction.cc \
     petrinet.h petrinet.cc \
     port.h port.cc \
     state.h state.cc \
-    util.h
+    util.h \
+    verbose.h verbose.cc
 # [CUSTOMER_E_SRC] this line is needed to build a customer Makefile. Do not remove!
 
 # to find customer's config.h header
@@ -51,13 +51,31 @@ BUILT_SOURCES =
 # GENERIC: initialization for other generic targets #
 #---------------------------------------------------#
 MAINTAINERCLEANFILES =
-DISTCLEANFILES = 
+DISTCLEANFILES =
 
 #--------------------------------------------------------------#
 # GENERIC: organize distribution and cleaning of Bison sources #
 #--------------------------------------------------------------#
 BISON_FILES = $(filter %.yy,$(libpnapi_a_SOURCES))
-BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
+# BUILT_SOURCES += $(BISON_FILES:.yy=.cc) # see line below
+BUILT_SOURCES += $(BISON_FILES:.yy=-location.h) # bison hack
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
+EXTRA_DIST += $(BISON_FILES:.yy=.cc)
+EXTRA_DIST += $(BISON_FILES:.yy=-location.h)
+EXTRA_DIST += $(BISON_FILES:.yy=-position.h)
+EXTRA_DIST += $(BISON_FILES:.yy=-stack.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.cc)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-location.h)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-position.h)
+MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-stack.h)
+
+#-------------------------------------------------------------#
+# NOT GENERIC: Hack to fix include directive in bison parsers #
+#                                                             #
+# Bison need to be called this way since GNU Autotools lack   #
+# Bison C++ support.
+#-------------------------------------------------------------#
+%-location.h: %.yy
+	$(AM_V_GEN)./bison-wrapper.sh $(<:.yy=)
 # [CUSTOMER_E_GEN] this line is needed to build a customer Makefile. Do not remove!

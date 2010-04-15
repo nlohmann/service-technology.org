@@ -311,6 +311,7 @@ int main(int argc, char** argv) {
         objects[0].net->produce(constraintNet);
     }
 
+
     /****************
     * MODIFICATIONS *
     *****************/
@@ -347,6 +348,28 @@ int main(int argc, char** argv) {
             status("calculation dnf of final condition of net '%s'...", objects[i].filename.c_str());
 
             objects[i].net->getFinalCondition().dnf();
+        }
+    }
+
+    if (args_info.guessFormula_given) {
+        for (unsigned int i = 0; i < objects.size(); ++i) {
+            Place *sink = NULL;
+            PNAPI_FOREACH(p, objects[i].net->getPlaces()) {
+                if ((*p)->getPostset().empty()) {
+                    if (sink != NULL) {
+                        abort(7, "net has more than one sink place: '%s' and '%s'", sink->getName().c_str(), (*p)->getName().c_str());
+                    }
+                    sink = *p;
+                }
+            }
+
+            if (sink == NULL) {
+                abort(7, "did not find a sink place");
+            }
+
+            status("sink place is '%s'", sink->getName().c_str());
+            objects[i].net->getFinalCondition() = (*sink == 1);
+            objects[i].net->getFinalCondition().allOtherPlacesEmpty(*objects[i].net);
         }
     }
 

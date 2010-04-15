@@ -16,6 +16,9 @@ Version 4.01-unreleased
 
 * caged lexer and parser in classes (i.e. cleaned up global namespace)
 
+* added a parameter `--guessFormula' to the frontend tool to guess the
+  final condition from the structure of the net (i.e., use the sink place)
+
 Version 4.00 (2010-03-14)
 =========================
 

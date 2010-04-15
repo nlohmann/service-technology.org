@@ -24,6 +24,9 @@ option "formula" f
   "Places a final condition at the end of LoLA files. Has no effect to other output formats."
   flag off
 
+option "guessFormula" -
+  "Derive the final condition from the structure (i.e., the sink place) of the net."
+  flag off
 
 section "Composition and Product"
 
@@ -32,7 +35,6 @@ option "compose" -
   typestr="NET"
   string
   optional
-
 
 option "produce" -
   "Calculate the product."

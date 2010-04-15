@@ -3,6 +3,7 @@
 @item removed memory leak (thanks to wendy)
 @item implemented Woflan parser
 @item caged lexer and parser in classes (i.e. cleaned up global namespace)
+@item added a parameter @option{--guessFormula} to the frontend tool to guess the final condition from the structure of the net (i.e., use the sink place)
 @end itemize
 
 @heading Version 4.00 (2010-03-14)

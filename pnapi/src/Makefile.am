@@ -8,6 +8,7 @@ libpnapi_la_SOURCES = \
     parser-pnml.yy parser-pnml-lexer.ll parser-pnml-wrapper.h parser-pnml-wrapper.cc \
     parser-sa.yy parser-sa-lexer.ll parser-sa-wrapper.h parser-sa-wrapper.cc \
     parser-woflan.yy parser-woflan-lexer.ll parser-woflan-wrapper.h parser-woflan-wrapper.cc \
+    FlexLexer.h \
     pnapi.h pnapi.cc \
     automaton.h automaton.cc\
     component.h component.cc \
@@ -54,8 +55,8 @@ includedir = @includedir@/pnapi
 
 include_HEADERS = $(filter %.h,$(libpnapi_la_SOURCES))
 
-EXTRA_DIST = Makefile.am.customer
-BUILT_SOURCES = Makefile.am.customer
+EXTRA_DIST = Makefile.am.customer FlexLexer.h
+BUILT_SOURCES = Makefile.am.customer FlexLexer.h
 
 # [CUSTOMER_B_GEN] this line is needed to build a customer Makefile. Do not remove!
 #############################################################################
@@ -72,7 +73,6 @@ DISTCLEANFILES =
 # GENERIC: organize distribution and cleaning of Bison sources #
 #--------------------------------------------------------------#
 BISON_FILES = $(filter %.yy,$(libpnapi_la_SOURCES))
-# BUILT_SOURCES += $(BISON_FILES:.yy=.cc) # see line below
 BUILT_SOURCES += $(BISON_FILES:.yy=-location.h) # bison hack
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
 EXTRA_DIST += $(BISON_FILES:.yy=.cc)
@@ -91,9 +91,8 @@ MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-stack.h)
 # Bison need to be called this way since GNU Autotools lack   #
 # Bison C++ support.
 #-------------------------------------------------------------#
-%-location.h: %.yy
+%-location.h: %.yy %-lexer.cc
 	$(AM_V_GEN)./bison-wrapper.sh $(<:.yy=)
-# [CUSTOMER_E_GEN] this line is needed to build a customer Makefile. Do not remove!
 
 #----------------------------------------#
 # GENERIC: updating Makefile.am.customer #

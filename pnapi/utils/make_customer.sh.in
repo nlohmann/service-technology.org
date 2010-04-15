@@ -31,15 +31,10 @@ echo "" >> $1
 
 echo "noinst_LIBRARIES = libpnapi.a" >> $1
 echo "" >> $1
-${HEAD} -n ${SRC_END} $2 | ${TAIL} -n +${SRC_BEGIN} | ${SED} -e "s/_la_/_a_/" >> $1
+${HEAD} -n ${SRC_END} $2 | ${TAIL} -n +${SRC_BEGIN} | ${SED} -e "s/_la_/_a_/" | ${SED} -e "s/\([^ ]*\).yy/\1.h \1.cc \1-location.h \1-position.h \1-stack.h/g" | ${SED} -e "s/\([^ ]*\).ll/\1.cc/g" >> $1
 echo "" >> $1
 echo "# to find customer's config.h header" >> $1
 echo "libpnapi_a_CPPFLAGS = -I\$(top_srcdir)/src" >> $1
 echo "" >> $1
-echo "" >> $1
-echo "EXTRA_DIST =" >> $1
-echo "BUILT_SOURCES =" >> $1
-${HEAD} -n ${GEN_END} $2 | ${TAIL} -n +${GEN_BEGIN} | ${SED} -e "s/_la_/_a_/" >> $1
-
 
 result=0

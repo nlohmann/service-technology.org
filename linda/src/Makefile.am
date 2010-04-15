@@ -8,7 +8,6 @@
 #		cmdline.c cmdline.h \
 #		syntax_etc.yy lexer_etc.ll \
 #		syntax_et.yy lexer_et.ll \
-#		files.h files.cc \
 #		verbose.h verbose.cc \
 #		lindaAgent.h lindaAgent.cc \
 #		eventTermParser.h eventTermParser.cc
@@ -19,7 +18,7 @@
 # information for libtool
 #includedir = @includedir@/linda
 
-#include_HEADERS = lindaAgent.h setsOfFinalMarkings.h stateEquation.h eventTerm.h helpers.h cmdline.h files.h verbose.h
+#include_HEADERS = lindaAgent.h setsOfFinalMarkings.h stateEquation.h eventTerm.h helpers.h cmdline.h verbose.h
 
 # only add the local Petri net API if necessary
 #if COMPILE_PNAPI
@@ -39,7 +38,6 @@ linda_SOURCES = main.cc \
 		cmdline.c cmdline.h \
 		syntax_etc.yy lexer_etc.ll \
 		syntax_et.yy lexer_et.ll \
-		files.h files.cc \
 		verbose.h verbose.cc \
 		Output.h Output.cc \
 		lindaAgent.h lindaAgent.cc \

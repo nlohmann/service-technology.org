@@ -1,18 +1,18 @@
 #include "staticAnalysis.h"
 
 FlowMatrix::FlowMatrix(pnapi::PetriNet* net) {
+
+
 	terms = 0;
 	this->net = net;
 	root = 0;
 	last = 0;
-	width = net->getInternalPlaces().size() + net->getInterfacePlaces().size();
+	width = net->getPlaces().size() + LindaHelpers::NR_OF_EVENTS;
 	int index = 0;
 	maxNameLen = 0;
-
-	for (std::set<pnapi::Place*>::iterator eventIt =
-		net->getInterfacePlaces().begin(); eventIt
-		!= net->getInterfacePlaces().end(); ++eventIt) {
-		int nameLen = (*eventIt)->getName().length();
+/*
+	for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
+		int nameLen = LindaHelpers::EVENT_NAMES[i].length();
 		if (maxNameLen < nameLen) {
 			maxNameLen = nameLen;
 		}
@@ -26,10 +26,7 @@ FlowMatrix::FlowMatrix(pnapi::PetriNet* net) {
 
 		int count = 0;
 
-		for (std::set<pnapi::Place*>::iterator placeIt =
-			net->getInterfacePlaces().begin(); placeIt
-			!= net->getInterfacePlaces().end(); ++placeIt) {
-			pnapi::Place* p = (*placeIt);
+		for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
 			int inPre = 0;
 			int inPost = 0;
 			if (p->getPreset().find((*transIt)) != p->getPreset().end()) {
@@ -70,9 +67,12 @@ FlowMatrix::FlowMatrix(pnapi::PetriNet* net) {
 		++index;
 
 	}
+	*/
 }
 
 void FlowMatrix::computeTInvariants() {
+
+/*
 
 	int firstPlace = net->getInterfacePlaces().size();
 	int lastPlace = firstPlace + net->getInternalPlaces().size() - 1;
@@ -188,11 +188,11 @@ void FlowMatrix::computeTInvariants() {
 	}
 
 	width = firstPlace;
-
+*/
 }
 
 void FlowMatrix::createTerms(EventTermBound*** level0) {
-
+/*
 	ListElement<int*>* currentInList = 0;
 	ListElement<int*>* current = root;
 	while (current != 0) {
@@ -236,56 +236,7 @@ void FlowMatrix::createTerms(EventTermBound*** level0) {
 								}
 
 								}
-								/*
-
-								lprec* lp = make_lp(0, 2);
-								for (int i = 1; i <= 2; ++i) {
-									set_int(lp, i, TRUE);
-								}
-								set_debug(lp, FALSE);
-								set_verbose(lp, FALSE);
-								int* transCol;
-								REAL* transVal;
-								transCol = new int[2]();
-								transVal = new REAL[2]();
-								transCol[0] = 0;
-								transCol[1] = 1;
-
-								transVal[0] = abs(f1);
-								transVal[1] = abs(stored1);
-
-
-								add_constraintex(lp, 2, transVal, transCol, EQ, 0);
-
-								transCol = new int[2]();
-								transVal = new REAL[2]();
-								transCol[0] = 0;
-								transCol[1] = 1;
-
-								transVal[0] = abs(f2);
-								transVal[1] = abs(stored2);
-
-
-								add_constraintex(lp, 2, transVal, transCol, EQ, 0);
-
-								transCol = new int[2]();
-								transVal = new REAL[2]();
-								transCol[0] = 0;
-								transCol[1] = 1;
-
-								transVal[0] = 1;
-								transVal[1] = 1;
-
-								add_constraintex(lp, 2, transVal, transCol, NEQ, 0);
-
-								int ret = solve(lp);
-
-								if (ret != INFEASIBLE) {
-									alreadyStored = true;
-								}
-
-
-*/
+	
 								search = search->next;
 
 							}
@@ -320,10 +271,11 @@ void FlowMatrix::createTerms(EventTermBound*** level0) {
 		}
 		current = current->next;
 	}
+	*/
 }
 
 void FlowMatrix::output() {
-
+/*
 	for (std::set<pnapi::Place*>::iterator eventIt =
 		net->getInterfacePlaces().begin(); eventIt
 		!= net->getInterfacePlaces().end(); ++eventIt) {
@@ -341,10 +293,11 @@ void FlowMatrix::output() {
 		std::cerr << std::endl;
 		current = current->next;
 	}
+	*/
 }
 
 FlowMatrix::~FlowMatrix() {
-	{
+	/*{
 		ListElement<int*>* current = root;
 
 		while (current != 0) {
@@ -355,5 +308,5 @@ FlowMatrix::~FlowMatrix() {
 		}
 	}
 
-
+*/
 }

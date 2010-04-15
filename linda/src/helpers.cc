@@ -1,7 +1,7 @@
 #include "helpers.h"
 
 int LindaHelpers::NR_OF_EVENTS; //!< The number of events in the analyzed open nets.
-pnapi::Place** LindaHelpers::EVENT_PLACES; //!< The pointers to the interface places, inducing a global ID for each events: n-th element = n-th event.
+pnapi::Label** LindaHelpers::EVENT_LABELS; //!< The pointers to the labels, inducing a global ID for each events: n-th element = n-th event.
 std::string* LindaHelpers::EVENT_STRINGS; //!< The names of all events, stored in an array, using the global IDs.
 
 
@@ -17,7 +17,7 @@ int LindaHelpers::getEventID(std::string* s) {
 void LindaHelpers::initialize() {
 	NR_OF_EVENTS = 0;
 	EVENT_STRINGS = 0;
-	EVENT_PLACES = 0;
+	EVENT_LABELS = 0;
 }
 
 const std::string LindaHelpers::intToStr(const int x) {

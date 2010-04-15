@@ -4,8 +4,21 @@
   * bison options 
   ****************************************************************************/
 
-/* plain c parser: the prefix is our "namespace" */
-%name-prefix="pnapi_lola_"
+/* generate a c++ parser */
+%skeleton "lalr1.cc"
+
+/* generate your code in your own namespace */
+%define namespace "pnapi::parser::lola::yy"
+
+/* do not call the generated class "parser" */
+%define parser_class_name "BisonParser"
+
+/* generate needed location classes */
+%locations
+
+/* pass overlying parser to generated parser and yylex-wrapper */
+%parse-param { Parser& parser_ }
+%lex-param   { Parser& parser_ }
 
 /* write tokens to parser-lola.h for use by scanner */
 %defines
@@ -17,19 +30,22 @@
  /*****************************************************************************
   * C declarations
   ****************************************************************************/
+
+%code requires {
+  /* forward declarations */
+  namespace pnapi { namespace parser { namespace lola {
+    class Parser;
+  } } } /* pnapi::parser::lola */
+}
+
 %{
 
-#include <string>
-#include "parser.h"
+#include "config.h"
 
-#undef yylex
-#undef yyparse
-#undef yyerror
+#include "parser-lola-wrapper.h"
+#include "petrinet.h"
 
-#define yyerror pnapi::parser::error
-
-#define yylex   pnapi::parser::lola::lex
-#define yyparse pnapi::parser::lola::parse
+#include <sstream>
 
 %}
 
@@ -38,37 +54,19 @@
   * types, tokens, start symbol
   ****************************************************************************/
 
-%token KEY_SAFE KEY_INTERFACE KEY_PLACE KEY_INTERNAL KEY_INPUT KEY_OUTPUT
-%token KEY_SYNCHRONIZE KEY_SYNCHRONOUS
-%token KEY_MARKING KEY_FINALMARKING KEY_NOFINALMARKING KEY_FINALCONDITION
-%token KEY_TRANSITION KEY_CONSUME KEY_PRODUCE KEY_PORT KEY_PORTS
-%token KEY_ALL_PLACES_EMPTY
-%token KEY_ALL_OTHER_PLACES_EMPTY
-%token KEY_ALL_OTHER_INTERNAL_PLACES_EMPTY
-%token KEY_ALL_OTHER_EXTERNAL_PLACES_EMPTY
-%token KEY_MAX_UNIQUE_EVENTS KEY_ON_LOOP KEY_MAX_OCCURRENCES
-%token KEY_TRUE KEY_FALSE LCONTROL RCONTROL
-%token COMMA COLON SEMICOLON IDENT NUMBER NEGATIVE_NUMBER
-%token LPAR RPAR
+%token LCONTROL RCONTROL KEY_TRUE KEY_FALSE KEY_SAFE KEY_PLACE
+%token KEY_TRANSITION KEY_MARKING KEY_CONSUME KEY_PRODUCE
+%token COLON SEMICOLON COMMA NUMBER NEGATIVE_NUMBER IDENT
 
-%left     OP_OR OP_AND OP_NOT
-%nonassoc OP_EQ OP_NE OP_GT OP_LT OP_GE OP_LE
 
 %union 
 {
   int yt_int;
-  std::string * yt_string;
-  pnapi::parser::owfn::Node * yt_node;
+  char * yt_str;
 }
 
 %type <yt_int> NUMBER NEGATIVE_NUMBER
-%type <yt_string> IDENT
-
-%type <yt_node> node_name 
-%type <yt_node> place places place_list
-%type <yt_node>   capacity_place_list capacity lola_places
-%type <yt_node> transition transitions arc arcs preset_arcs postset_arcs
-%type <yt_node> marking marking_list initial
+%type <yt_str> IDENT
 
 %start net
 
@@ -78,90 +76,127 @@
   ****************************************************************************/
 %%
 
-net: KEY_PLACE lola_places initial transitions
-     { node = new Node($2, $3, $4); }
-     ;
+net: 
+  KEY_PLACE places SEMICOLON KEY_MARKING 
+  marking_list SEMICOLON transitions
+;
 
 node_name:   
-    IDENT  { $$ = new Node($1); }
-  | NUMBER { $$ = new Node($1); }
-  ;
+  IDENT  
+  { 
+    // clear stringstream
+    parser_.nodeName_.str("");
+    parser_.nodeName_.clear();
+
+    parser_.nodeName_ << $1;
+    free($1); 
+  }
+| NUMBER 
+  { 
+    // clear stringstream
+    parser_.nodeName_.str("");
+    parser_.nodeName_.clear();
+
+    parser_.nodeName_ << $1; 
+  }
+;
 
 
  /* PLACE */
 
-lola_places: 
-places SEMICOLON { $$ = new Node(pnapi::parser::owfn::INTERNAL, $1); }
-  ;
-
 places: 
-    capacity_place_list                  { $$ = new Node($1);     }
-  | places SEMICOLON capacity_place_list { $$ = $1->addChild($3); }
-  ;
-
-capacity_place_list:
-  capacity place_list { $$ = new Node(pnapi::parser::owfn::CAPACITY, $1, $2); }
-  ;
+  capacity place_list                  { parser_.capacity_ = 0; }                
+| places SEMICOLON capacity place_list { parser_.capacity_ = 0; }
+;
 
 capacity:
-    /* empty */           { $$ = new Node(0);  }
-  | KEY_SAFE COLON        { $$ = new Node(1);  }
-  | KEY_SAFE NUMBER COLON { $$ = new Node($2); }
-  ;
+  /* empty */           
+| KEY_SAFE COLON        { parser_.capacity_ = 1; }
+| KEY_SAFE NUMBER COLON { parser_.capacity_ = $2; }
+;
 
 place_list:  
-    place                  { $$ = new Node($1);     }
-  | place_list COMMA place { $$ = $1->addChild($3); }
-  ;
+  node_name    
+  {
+    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+  }	      
+| place_list COMMA node_name
+  {
+    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+  }
+;
 
-place: 
-  node_name { $$ = new Node(pnapi::parser::owfn::PLACE, $1); }
-  ;
 
 
  /* MARKING */
 
-initial:
-  KEY_MARKING marking_list SEMICOLON { $$ = new Node(pnapi::parser::owfn::INITIALMARKING, $2); }
-  ;
-
 marking_list:
-    /* empty */                { $$ = new Node();       }
-  | marking                    { $$ = new Node($1);     }
-  | marking_list COMMA marking { $$ = $1->addChild($3); }
-  ;
+  /* empty */                
+| marking                    
+| marking_list COMMA marking 
+;
 
 marking: 
-  node_name COLON NUMBER { $$ = new Node(pnapi::parser::owfn::MARK, $1, $3); }
-  ;
+  node_name COLON NUMBER 
+  { 
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(p != NULL, "unknown place");      
+      
+    p->setTokenCount($3);
+  }
+;
 
 
  /* TRANSITION */
 
 transitions: 
-    transitions transition { $$ = $1->addChild($2); }
-  | transition             { $$ = new Node($1);     }
-  ;
+  transitions transition 
+| transition             
+;
 
 transition: 
-  KEY_TRANSITION node_name preset_arcs postset_arcs
-    { $$ = new Node(pnapi::parser::owfn::TRANSITION, $2, $3, $4); }
-  ;
-
-preset_arcs:
-  KEY_CONSUME arcs SEMICOLON { $$ = new Node(pnapi::parser::owfn::PRESET, $2); }
-  ;
-
-postset_arcs:
-  KEY_PRODUCE arcs SEMICOLON { $$ = new Node(pnapi::parser::owfn::POSTSET, $2); }
-  ;
+  KEY_TRANSITION node_name 
+  { 
+    parser_.check(!parser_.net_.containsNode(parser_.nodeName_.str()), "node name already used");
+    parser_.transition_ = &(parser_.net_.createTransition(parser_.nodeName_.str())); 
+  }
+  KEY_CONSUME
+  {
+    parser_.target_ = reinterpret_cast<Node * *>(&(parser_.transition_));
+    parser_.source_ = reinterpret_cast<Node * *>(&(parser_.place_)); 
+  } 
+  arcs SEMICOLON
+  KEY_PRODUCE 
+  { 
+    parser_.source_ = reinterpret_cast<Node * *>(&(parser_.transition_));
+    parser_.target_ = reinterpret_cast<Node * *>(&(parser_.place_)); 
+  }
+  arcs SEMICOLON 
+;
 
 arcs: 
-    /* empty */    { $$ = new Node();       }
-  | arc            { $$ = new Node($1);     }
-  | arcs COMMA arc { $$ = $1->addChild($3); }
-  ;
+  /* empty */    
+| arc            
+| arcs COMMA arc 
+;
 
 arc: 
-  node_name COLON NUMBER { $$ = new Node(pnapi::parser::owfn::ARC, $1, $3); }
-  ;
+  node_name COLON NUMBER 
+  {
+    parser_.place_ = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(parser_.place_ != NULL, "unknown place");
+
+    Arc * a = parser_.net_.findArc(**(parser_.source_), **(parser_.target_));
+    if(a != NULL)
+    {
+      a->setWeight(a->getWeight() + $3);
+    }
+    else
+    {
+      parser_.net_.createArc(**(parser_.source_), **(parser_.target_), $3);
+    }
+  }
+;
+

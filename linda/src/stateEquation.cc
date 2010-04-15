@@ -16,7 +16,7 @@ bool ExtendedStateEquation::constructLP() {
 
 	// Our LP system has columns T1,T2,...,Tn,E1,...,Ek. We determine where events start and the like.
 	const unsigned int NR_OF_COLS = net->getTransitions().size()
-			+ net->getInterfacePlaces().size();
+			+ LindaHelpers::NR_OF_EVENTS;
 	const unsigned int START_TRANSITIONS = 1;
 	const unsigned int START_EVENTS = START_TRANSITIONS
 			+ net->getTransitions().size();
@@ -155,43 +155,18 @@ bool ExtendedStateEquation::constructLP() {
 		eventLines = new std::pair<int*, REAL*>[LindaHelpers::NR_OF_EVENTS]();
 		for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
 
-			pnapi::Place* p = LindaHelpers::EVENT_PLACES[i];
+			pnapi::Label* p = LindaHelpers::EVENT_LABELS[i];
 
-			int* transCol = new int[p->getPresetArcs().size()
-					+ p->getPostsetArcs().size() + 1];
-			REAL* transVal = new REAL[p->getPresetArcs().size()
-					+ p->getPostsetArcs().size() + 1];
+			int* transCol = new int[p->getTransitions().size() + 1];
+			REAL* transVal = new REAL[p->getTransitions().size() + 1];
 
 			int tr = 0;
 
-			std::stringstream pnstats;
-
-			// We now iterate over the preset of the place to retrieve all transitions positively effecting the place.
-			for (std::set<pnapi::Arc *>::iterator pIt =
-					p->getPresetArcs().begin(); pIt != p->getPresetArcs().end(); ++pIt) {
-
-				assert(pIt != p->getPresetArcs().end());
-				assert(*pIt != NULL);
-
-				pnapi::Transition& t = (*pIt)->getTransition();
-				// We add the transition, with the weight as a factor.
-				transCol[tr] = START_TRANSITIONS
-						+ transitionID->find(&t)->value;
-				transVal[tr++] = (*pIt)->getWeight();
+			for (std::set<pnapi::Transition*>::iterator tIt = p->getTransitions().begin(); tIt != p->getTransitions().end(); ++tIt) {
+				transCol[tr] = START_TRANSITIONS + transitionID->find(*tIt)->value;
+				transVal[tr++] = 1;
 			}
-
-			// We now iterate over the postset of the place to retrieve all transitions negatively effecting the place.
-			for (std::set<pnapi::Arc *>::iterator pIt =
-					p->getPostsetArcs().begin(); pIt
-					!= p->getPostsetArcs().end(); ++pIt) {
-
-				pnapi::Transition& t = (*pIt)->getTransition();
-				// We add the transition, with the weight as a factor.
-				transCol[tr] = START_TRANSITIONS
-						+ transitionID->find(&t)->value;
-				transVal[tr++] = (*pIt)->getWeight();
-			}
-
+			
 			transCol[tr] = START_EVENTS + i;
 			transVal[tr] = -1;
 
@@ -206,17 +181,15 @@ bool ExtendedStateEquation::constructLP() {
 		REAL* transVal = eventLines[i].second;
 
 		add_constraintex(
-				lp,
-				LindaHelpers::EVENT_PLACES[i]->getPresetArcs().size()
-						+ LindaHelpers::EVENT_PLACES[i]->getPostsetArcs().size()
-						+ 1, transVal, transCol, EQ, 0);
-
+				lp, LindaHelpers::EVENT_LABELS[i]->getTransitions().size() + 1, transVal, transCol, EQ, 0);
 	}
 
 	// We are done adding rows, so we leave the "add row mode" and set the flag.
 	set_add_rowmode(lp, FALSE);
 	isConstructed = true;
 
+	print_lp(lp);
+	
 	// We solve the linear program to see if it is feasible. objective function is min 0 at this point.
 	int ret = solve(lp);
 

@@ -7,18 +7,22 @@
  *
  * \since   2008/12/09
  *
- * \date    $Date: 2009-02-16 08:39:17 +0100 (Mon, 16 Feb 2009) $
+ * \date    $Date: 2010-03-14 13:44:15 +0100 (Sun, 14 Mar 2010) $
  *
- * \version $Revision: 3882 $
+ * \version $Revision: 5513 $
  */
 
 #ifndef PNAPI_PNAPI_H
 #define PNAPI_PNAPI_H
 
-#include "myio.h"
-#include "condition.h"
-#include "petrinet.h"
+#include "config.h"
+
 #include "automaton.h"
+#include "condition.h"
+#include "exception.h"
+#include "marking.h"
+#include "myio.h"
+#include "petrinet.h"
 
 // overloaded operators should be available globally
 using pnapi::io::operator<<;
@@ -41,17 +45,69 @@ using pnapi::operator&&;
  *
  * For using it, simply include the header file pnapi.h in your code:
  * \code
- * #include "pnapi.h"
+ * // #include "pnapi.h"
  * \endcode
  *
  * Everything you will use can be found in the following namespaces:
- * - pnapi
+ * - #pnapi
  * - pnapi::formula
  * - pnapi::io
  *
  * The classes pnapi::PetriNet and pnapi::Automaton provide the main 
  * functionality and can serve as
  * an entry point for getting an overview of the API's functionality.
+ * 
+ * \section sec Some Examples
+ * 
+ * Creating a small Petrinet
+ * \code
+ * PetriNet net;
+ * Place & p1 = net.createPlace();
+ * p1.mark();
+ * Place & p2 = net.createPlace();
+ * Transition & t = net.createTransition();
+ * net.createArc(p1,t);
+ * net.createArc(t,p2);
+ * \endcode
+ * 
+ * Assigning a final condition
+ * \code
+ * // net from the previous example is recycled here
+ * net.finalCondition() = ((p1 == 0) && (p2 == 1));
+ * Place & p3 = net.createPlace();
+ * net.finalCondition() = (net.finalCondition().formula() && (p3 == 0));
+ * \endcode
+ * 
+ * Reading from stream
+ * \code
+ * istream is;
+ * is >> io::owfn >> net;
+ * \endcode
+ * 
+ * Writing to a stream
+ * \code
+ * ostream os;
+ * // LoLA without formulae
+ * os << io::lola << net;
+ * // LoLA with formulae
+ * os << io::lola << io::formula << net;
+ * \endcode
+ * 
+ * Reducing by applying some rules
+ * \code
+ * net.reduce(PetriNet::SET_STARKE | PetriNet::KEEP_NORMAL);
+ * \endcode
+ * 
+ * Creating a service automaton
+ * \code
+ * Automaton sa(net);
+ * \endcode
+ * 
+ * Query structural information
+ * \code
+ * net.isNormal();
+ * net.isWorkflow();
+ * \endcode
  */
 
 
@@ -62,7 +118,24 @@ using pnapi::operator&&;
  */
 namespace pnapi
 {
+/// Petri Net API's version string
+std::string version();
 }
 
-#endif
+/*!
+ * \brief Auxiliary function to check whether the PetriNet Net API is
+ *        correctly installed.
+ *
+ * \note This function is necessary to use GNU Autoconf's AC_CHECK_LIB
+ *       function. A check to "main" would only check whether we can compile
+ *       against PNAPI, but now whether linking actually works. This is
+ *       necessary if an installed PNAPI has a different architecture as
+ *       the current architecture (e.g., 32 vs 64 bit or i386 vs. x86_64).
+ *
+ * \note This has to be a C function, so we cannot put this into a namespace.
+ */
+extern "C" {
+  char libpnapi_is_present();
+}
 
+#endif /* PNAPI_PNAPI_H */

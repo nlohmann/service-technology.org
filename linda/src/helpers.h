@@ -30,7 +30,7 @@ public:
 	static void initialize();
 
 	static int NR_OF_EVENTS; //!< The number of events in the analyzed open nets.
-	static pnapi::Place** EVENT_PLACES; //!< The pointers to the interface places, inducing a global ID for each events: n-th element = n-th event.
+	static pnapi::Label** EVENT_LABELS; //!< The pointers to the labels, inducing a global ID for each events: n-th element = n-th event.
 	static std::string* EVENT_STRINGS; //!< The names of all events, stored in an array, using the global IDs.
 
 	/// Returns the global ID of an event by its name.

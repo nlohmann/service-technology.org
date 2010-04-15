@@ -11,7 +11,6 @@
 #include "setsOfFinalMarkings.h"
 #include "eventTerm.h"
 #include "stateEquation.h"
-#include "files.h"
 #include "eventTermParser.h"
 #include "Output.h"
 #include "verbose.h"
@@ -77,8 +76,8 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 	bool first = true;
 
 	for (std::set<pnapi::Place *>::iterator it =
-			net->getInternalPlaces().begin(); it
-			!= net->getInternalPlaces().end(); ++it) {
+			net->getPlaces().begin(); it
+			!= net->getPlaces().end(); ++it) {
 
 		if (first) {
 			first = false;
@@ -96,8 +95,10 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 
 	first = true;
 
-	for (std::set<pnapi::Place *>::iterator it = net->getInputPlaces().begin(); it
-			!= net->getInputPlaces().end(); ++it) {
+	std::set<pnapi::Label *> inlabels = net->getInterface().getInputLabels();
+
+	for (std::set<pnapi::Label *>::iterator it = inlabels.begin(); it
+			!= inlabels.end(); ++it) {
 
 		if (first) {
 			first = false;
@@ -111,13 +112,17 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 
 	}
 
+	
+	
 	file << ";";
 	file << std::endl << "  OUTPUT";
 
 	first = true;
 
-	for (std::set<pnapi::Place *>::iterator it = net->getOutputPlaces().begin(); it
-			!= net->getOutputPlaces().end(); ++it) {
+	std::set<pnapi::Label *> outlabels = net->getInterface().getInputLabels();
+
+	for (std::set<pnapi::Label *>::iterator it = outlabels.begin(); it
+			!= outlabels.end(); ++it) {
 
 		if (first) {
 			first = false;
@@ -130,6 +135,7 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 		file << (*it)->getName();
 
 	}
+
 
 	file << ";";
 
@@ -245,26 +251,13 @@ int main(int argc, char** argv) {
 		pnstats << pnapi::io::stat << *(net);
 
 		status("read net %s", pnstats.str().c_str());
-	} catch (pnapi::io::InputError error) {
+	} catch (pnapi::exception::InputError error) {
 		std::stringstream inputerror;
 		inputerror << error;
 		abort(1, "pnapi error %i", inputerror.str().c_str());
 	}
 
-	// Create the global event IDs
-	LindaHelpers::NR_OF_EVENTS = net->getInterfacePlaces().size();
-	LindaHelpers::EVENT_STRINGS = new std::string[LindaHelpers::NR_OF_EVENTS]();
-	LindaHelpers::EVENT_PLACES
-	= new pnapi::Place*[LindaHelpers::NR_OF_EVENTS]();
 
-	int counter = 0;
-	for (std::set<pnapi::Place *>::iterator it =
-		net->getInterfacePlaces().begin(); it
-		!= net->getInterfacePlaces().end(); ++it) {
-		LindaHelpers::EVENT_STRINGS[counter] = (*it)->getName();
-		LindaHelpers::EVENT_PLACES[counter] = (*it);
-		++counter;
-	}
 
 
 	// Create the linear program for each final marking

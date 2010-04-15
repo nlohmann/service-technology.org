@@ -9,7 +9,7 @@ bool LindaAgent::initialize(pnapi::PetriNet* net,
 		std::map<std::string, uint8_t>& name2id,
 		std::map<uint8_t, std::string>& id2name,
 		bool keepHistory) {
-	mNet = net;
+/*	mNet = net;
 
 	LindaAgent::keepHistory = keepHistory;
 
@@ -32,7 +32,8 @@ bool LindaAgent::initialize(pnapi::PetriNet* net,
 	}
 
 	return (mNet != 0);
-}
+*/
+	}
 
 bool LindaAgent::initialize(pnapi::PetriNet* net,bool keepHistory) {
 	mNet = net;
@@ -43,18 +44,19 @@ bool LindaAgent::initialize(pnapi::PetriNet* net,bool keepHistory) {
 
 	LindaAgent::keepHistory = keepHistory;
 
+	std::set<pnapi::Label *> labels = net->getInterface().getAsynchronousLabels();
+
 	// Create the global event IDs
-	LindaHelpers::NR_OF_EVENTS = net->getInterfacePlaces().size();
+	LindaHelpers::NR_OF_EVENTS = labels.size();
 	LindaHelpers::EVENT_STRINGS = new std::string[LindaHelpers::NR_OF_EVENTS]();
-	LindaHelpers::EVENT_PLACES
-	= new pnapi::Place*[LindaHelpers::NR_OF_EVENTS]();
+	LindaHelpers::EVENT_LABELS
+	= new pnapi::Label*[LindaHelpers::NR_OF_EVENTS]();
 
 	int counter = 0;
-	for (std::set<pnapi::Place *>::iterator it =
-		net->getInterfacePlaces().begin(); it
-		!= net->getInterfacePlaces().end(); ++it) {
+	for (std::set<pnapi::Label *>::iterator it =
+		labels.begin(); it != labels.end(); ++it) {
 		LindaHelpers::EVENT_STRINGS[counter] = (*it)->getName();
-		LindaHelpers::EVENT_PLACES[counter] = (*it);
+		LindaHelpers::EVENT_LABELS[counter] = (*it);
 		++counter;
 	}
 
@@ -65,7 +67,9 @@ bool LindaAgent::initialize(pnapi::PetriNet* net,bool keepHistory) {
 
 bool LindaAgent::addFinalMarking(
 		std::map<const pnapi::Place*, unsigned int>* finalMarking) {
-	PartialMarking* p = new PartialMarking();
+
+/*
+		PartialMarking* p = new PartialMarking();
 
 	for (std::set<pnapi::Place*>::iterator it =
 		mNet->getInternalPlaces().begin(); it
@@ -78,13 +82,13 @@ bool LindaAgent::addFinalMarking(
 	}
 
 	return addFinalMarking(p);
-
+*/
 
 }
 
 bool LindaAgent::addFinalMarking(PartialMarking* finalMarking) {
 
-
+/*
 	ExtendedStateEquation* e = new ExtendedStateEquation(mNet, finalMarking, keepHistory);
 	if (e->constructLP()) {
 		mFinals->push_back(finalMarking);
@@ -93,7 +97,7 @@ bool LindaAgent::addFinalMarking(PartialMarking* finalMarking) {
 	}
 
 	return false;
-
+*/
 }
 
 /*
@@ -212,7 +216,7 @@ bool LindaAgent::addFinalMarkingsFromFinalCondition(uint8_t bound) {
 	// Calculate the final markings from the final condition
 
 	SetOfPartialMarkings* fSet = SetOfPartialMarkings::create(mNet,
-			&(mNet->finalCondition().formula()), bound);
+			&(mNet->getFinalCondition().getFormula()), bound);
 
 	status("Computed final markings:");
 	for (std::vector<PartialMarking*>::iterator finalMarkingIt =

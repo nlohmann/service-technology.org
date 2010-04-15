@@ -166,8 +166,6 @@ SetOfPartialMarkings* SetOfPartialMarkings::create(pnapi::PetriNet* net,
 
 	// The resulting set.
 	SetOfPartialMarkings* result = new SetOfPartialMarkings();
-
-	std::cerr << "Type: " << typeid(*src).name() << std::endl;
 	
 	// Disjunction means union of the children
 	if (typeid(*src) == typeid(pnapi::formula::Disjunction)) {
@@ -224,8 +222,7 @@ SetOfPartialMarkings* SetOfPartialMarkings::create(pnapi::PetriNet* net,
 									m->values.insert(&(castedSrc->getPlace()),
 											castedSrc->getTokens(), false);
 									result->partialMarkings.push_back(m);
-									std::cerr << castedSrc->getPlace().getName() << ": " <<
-											castedSrc->getTokens() << std::endl;
+									
 							}
 
 							// p1 > j means a new partial marking Mi for each 1 <= i <= bound - j where Mi(p1) = i+j+1
@@ -352,7 +349,7 @@ SetOfPartialMarkings* SetOfPartialMarkings::create(pnapi::PetriNet* net,
 																			}
 																	} else {
 																	
-																	std::cerr << "wtf?:"  << typeid(*src).name() << std::endl;
+																	assert(false);
 																	
 																	}
 

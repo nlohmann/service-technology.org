@@ -42,16 +42,10 @@ wget http://esla.informatik.uni-rostock.de:8080/job/pnapi/lastSuccessfulBuild/ar
 tar xfz pnapi.tar.gz
 
 # copy relevant files
-cp pnapi/src/*.cc pnapi/src/*.h pnapi/src/*.ll pnapi/src/*.yy pnapi/src/*.sh.in .
+cp pnapi/src/*.cc pnapi/src/*.h
 cp pnapi/src/Makefile.am.customer Makefile.am
 
 # cleanup
-rm -rf parser-*.cc
-rm -rf parser-*.h
-
-# cleanup cleans to much, we need the wrapper files
-cp pnapi/src/parser-*-wrapper.cc pnapi/src/parser-*-wrapper.h .
-
 rm -rf pnapi
 rm -rf pnapi.tar.gz
 

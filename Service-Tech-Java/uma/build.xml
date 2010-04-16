@@ -60,7 +60,7 @@
 	<target name="build" depends="pre-build"
 			description="Build ${build.name} classes.">
 		<echo message="Compiling in ${make.basedir}..." />
-		<mkdir dir="${bin}"/>
+		<mkdir dir="${bin}" />
 		<javac classpathref="base.path"
 			srcdir="${src}"
          	destdir="${bin}"
@@ -197,11 +197,11 @@
 	<!-- clean all files that have been generated -->
 	<target name="clean"
 			description="Clean all temporary build directories and temporary files.">
-		<delete dir="${distcheckdir}" includeemptydirs="true"/>
-		<delete dir="${distbindir}" includeemptydirs="true"/>
-		<delete dir="${distdir}" includeemptydirs="true"/>
-		<delete dir="${builddir}" includeemptydirs="true"/>
-		<delete>
+		<delete dir="${distcheckdir}" includeemptydirs="true" failonerror="false"/>
+		<delete dir="${distbindir}" includeemptydirs="true" failonerror="false"/>
+		<delete dir="${distdir}" includeemptydirs="true" failonerror="false"/>
+		<delete dir="${builddir}" includeemptydirs="true" failonerror="false"/>
+		<delete failonerror="false">
 			<fileset dir="${bin}">
 			    <include name="**/*.class"/>
 			</fileset>

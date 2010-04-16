@@ -192,6 +192,10 @@
 		</ant>
 		<ant target="check" antfile="build.xml" dir="${dir.distcheckdir}" inheritall="false" inheritrefs="false">
 		</ant>
+		
+		<!-- clean up -->
+		<delete dir="${dir.distcheckdir}" failonerror="false" includeemptydirs="true"/>
+		<delete dir="${dir.distdir}" failonerror="false" includeemptydirs="true"/>
 	</target>
 	
 	<!-- clean all files that have been generated -->
@@ -212,6 +216,11 @@
 	<!-- clean all files that have been generated -->
 	<target name="svn-clean" depends="clean"
 			description="Remove all generated files and set directory back to situation in the repository.">
+		<delete failonerror="false">
+			<fileset dir="${home}">
+				<include name="${build.target}*.zip"/>
+				<include name="${package}*.zip"/>
+			</fileset>
+		</delete>
 	</target>
-
 </project>

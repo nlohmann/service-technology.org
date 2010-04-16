@@ -1,5 +1,5 @@
 /*****************************************************************************\
- Marlene -- synthesizing behavioral adapters
+ Marlene -- building partial adapters for Yasmina
 
  Copyright (C) 2009  Christian Gierds <gierds@informatik.hu-berlin.de>
 
@@ -18,9 +18,9 @@
 \*****************************************************************************/
 
 /*!
- * \file    adapter.h
+ * \file    adapternumerge.h
  *
- * \brief   all functionality for adapter generation
+ * \brief   partial functionality for adapter
  *
  * \author  responsible: Christian Gierds <gierds@informatik.hu-berlin.de>
  *

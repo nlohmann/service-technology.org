@@ -143,7 +143,7 @@ const pnapi::PetriNet * Adapter::buildEngine()
     // we make a copy of the engine, #_engine is needed for the result
     // #_enginecopy for the synthesis of the controller
 
-  /*  _composed=new pnapi::PetriNet(*_engine);
+    _composed=new pnapi::PetriNet(*_engine);
 
     // compose engine with nets
     for (unsigned int i = 0; i < _nets.size(); i++)
@@ -157,13 +157,13 @@ const pnapi::PetriNet * Adapter::buildEngine()
             _composed->compose(*_nets[i], std::string(""), std::string("net"
                             + toString(i+1) + "."));
         }
-    }*/
+    }
 	//	return new pnapi::PetriNet(*_engine);//_composed;
 //}
 
 //const pnapi::PetriNet * Adapter::buildController()
 //{
- /*   
+ 
 
     using namespace pnapi;
 
@@ -351,7 +351,7 @@ const pnapi::PetriNet * Adapter::buildEngine()
     }
     pnapi::Automaton * mpp_sa = new pnapi::Automaton();
     sa_file >> pnapi::io::sa >> *mpp_sa;
-    sa_file.close();
+    sa_file.close();*/
 
     /***********************************************\
         * transform most-permissive partner to open net *

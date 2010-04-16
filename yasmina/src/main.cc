@@ -32,6 +32,7 @@ using pnapi::PetriNet;
 using pnapi::Place;
 using pnapi::Transition;
 using pnapi::Node;
+using pnapi::Arc;
 
 
 using namespace std;
@@ -820,9 +821,8 @@ int main(int argc, char** argv) {
  	map<int, std::set<std::string> > enforcedT;//for enforcing transitions/messages
 	map<int, std::set<std::string> > excludeE;//for excluding transitions
  	map<int, std::set<std::set<std::string> > >  enforcedFC;//enforcing free-choice clusters
-	int nPlaces;
-	int nTransitions;
-	lprec *lpfing;//adapter fingerprint
+
+	lprec *lpfing=NULL;//adapter fingerprint
 	//std::set<lprec *> retlpset;//set of all final markings of the composition I do not need this any more
  	
 	
@@ -939,6 +939,147 @@ int main(int argc, char** argv) {
 				try { ifs2 >> owfn >> net2;}
 				catch (InputError e) { std::cerr <<"net " <<i<<" failed"<< std::endl << e << endl; assert(false); }
 				ifs2.close();
+				//	//here check whether syntactically whether the composition can take place: use sets of labels
+				//option "composable" c
+				//"The composed net is printed to standard output"
+				//flag off
+				//pnapi::Interface& i1=net1.getInterface();pnapi::Interface i2=net2.getInterface();
+				bool syntb=false;set<string> inputplaces1,inputplaces2,outputplaces1,outputplaces2;
+				for (std::set<Place *>::iterator ssit=net1.getInputPlaces().begin(); ssit!=net1.getInputPlaces().end(); ++ssit) {
+					inputplaces1.insert((*ssit)->getName());
+				}
+				for (std::set<Place *>::iterator ssit=net1.getOutputPlaces().begin(); ssit!=net1.getOutputPlaces().end(); ++ssit) {
+					outputplaces1.insert((*ssit)->getName());
+				}
+				for (std::set<Place *>::iterator ssit=net2.getInputPlaces().begin(); ssit!=net2.getInputPlaces().end(); ++ssit) {
+					inputplaces2.insert((*ssit)->getName());
+				}
+				for (std::set<Place *>::iterator ssit=net2.getOutputPlaces().begin(); ssit!=net2.getOutputPlaces().end(); ++ssit) {
+					outputplaces2.insert((*ssit)->getName());
+				}
+				
+				for (std::set<Place *>::iterator ssit=net1.getInterfacePlaces().begin(); ssit!=net1.getInterfacePlaces().end(); ++ssit) {
+					//see whether it is an input place 
+					string ps=(*ssit)->getName();
+					if ((inputplaces1.find(ps)!=inputplaces1.end())&&(outputplaces2.find(ps)!=outputplaces2.end())) {
+					/*if ((net1.getInputPlaces().find(*ssit)!=net1.getInputPlaces().end())&&(net2.getOutputPlaces().find(*ssit)!=net2.getOutputPlaces().end())) {
+						//cout << "we consider only simple composition; we are considering instance composition for next versions of the tool";
+					*/	syntb=true;break;
+					}
+					else if ((inputplaces2.find(ps)!=inputplaces2.end())&&(outputplaces1.find(ps)!=outputplaces1.end()))
+					{ syntb=true;break;//matching
+					}
+					
+					
+				}
+						//const std::set<std::string> & getSynchronousLabels() const;
+				for(std::set<std::string>::iterator cit=net1.getSynchronousLabels().begin();cit!=net1.getSynchronousLabels().end();++cit){
+					if (net1.getSynchronousLabels().find(*cit)==net1.getSynchronousLabels().end()) {syntb=true;break;//not sync
+					}
+				}
+				if (!syntb) {
+					std::cout<<endl<<"not syntactically compatible"<<endl; exit(0);
+				}
+				else if (args_info.composable_flag) {
+					net1.compose(net2, "1", "2");string folder="./composed/";
+					set<string> itwas;
+					for (std::set<Place *>::iterator ssit=net1.getInternalPlaces().begin(); ssit!=net1.getInternalPlaces().end(); ++ssit) {
+						itwas.insert((*ssit)->getName());
+					}
+					for (set<string>::iterator ssit=inputplaces1.begin(); ssit!=inputplaces1.end(); ++ssit) {
+						//cout<<"itwas"<<(*ssit)->getName()<<endl;
+						Place *p=net1.findPlace(*ssit); //cout<<"was interface"<<p->wasInterface()<<" "<<p->getName()<<endl;
+						//cout<<endl<<"found"<<*itwas.find(*ssit)<<endl; && itwas.find(*ssit)!= itwas.end()
+						if(p!=NULL  && itwas.find(*ssit)!=itwas.end()){ //create complementary
+							//create place
+							Place * place = net1.findPlace(p->getName()+"_compl");
+							
+							//if ( php != NULL) cout<<"naspa";
+							if ( place == NULL )
+							{
+								Place *pc = &net1.createPlace(p->getName()+"_compl", Node::INTERNAL, 1,1);
+								
+								pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*pc,1));
+								net1.finalCondition().addProposition(prop);//nets[x]->finalCondition().formula().output(std::cout);
+								//cout<<php->getPresetArcs().size()
+								set<Arc *> preset = p->getPresetArcs();
+								for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
+								{//create a post rtansition for the complementary
+										//it is internal, create an arc for the complementary
+											//cout << "gasit"; initially marked
+										net1.createArc( *net1.findPlace(p->getName()+"_compl"),(*f)->getTransition(), (*f)->getWeight());
+										//	net1.createArc((*f)->getTransition(), *net1->findPlace(p->getName()+"_compl"), (*f)->getWeight());
+									//nets[x]->createArc(*netPlace, *t, (*f)->getWeight());
+								}
+								set<Arc *> postset = p->getPostsetArcs();
+								for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); ++f)
+								{
+										//it is internal, create an arc for the complementary
+										//if (net1.findPlace(place->getName()+"_compl")!=NULL) {
+											//cout << "gasit";
+											//if(place->getTokenCount()||place->getName()==sfp) nets[x]->createArc( *t, *nets[x]->findPlace(place->getName()+"_compl"),(*f)->getWeight());
+											net1.createArc( (*f)->getTransition(), *pc,(*f)->getWeight());
+										//}
+								}
+								
+							}
+							
+						}
+					}
+					for (set<string>::iterator ssit=outputplaces1.begin(); ssit!=outputplaces1.end(); ++ssit) {
+						Place *p=net1.findPlace(*ssit);//cout<<"was interface"<<p->wasInterface()<<" "<<p->getName()<<endl;
+													//create place
+							Place * place = net1.findPlace(p->getName()+"_compl");//cout<<*ssit<<endl;
+						//cout<<endl<<"not found"<<itwas.size()<<endl;//cout<<"input"<<*ssit<<endl;
+						//if(itwas.find(*ssit)!= itwas.end()) cout<<endl<<"help " <<endl;
+							//set<string>::iterator it=itwas.find(*ssit);
+						//if (it==itwas.end())cout<<endl<<"not found"<<itwas.size()<<endl;else cout<<"found"<<endl;
+							//if ( php != NULL) cout<<"naspa";&& itwas.find(*ssit)!= itwas.end()
+							if ( place == NULL && itwas.find(*ssit)!=itwas.end())
+							{ //cout<<"itwas"<<*ssit<<endl;
+								Place *pc = &net1.createPlace(p->getName()+"_compl", Node::INTERNAL, 1,1);
+								cout << "built interface"<<endl;
+								pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*pc,1));
+								net1.finalCondition().addProposition(prop);//nets[x]->finalCondition().formula().output(std::cout);
+								//cout<<php->getPresetArcs().size()
+								set<Arc *> preset = p->getPresetArcs();
+								for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
+								{//create a post rtansition for the complementary
+									//it is internal, create an arc for the complementary
+									//cout << "gasit"; initially marked
+									net1.createArc( *net1.findPlace(p->getName()+"_compl"),(*f)->getTransition(), (*f)->getWeight());
+									//	net1.createArc((*f)->getTransition(), *net1->findPlace(p->getName()+"_compl"), (*f)->getWeight());
+									//nets[x]->createArc(*netPlace, *t, (*f)->getWeight());
+								}
+								set<Arc *> postset = p->getPostsetArcs();
+								for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); ++f)
+								{
+									//it is internal, create an arc for the complementary
+									//if (net1.findPlace(place->getName()+"_compl")!=NULL) {
+										//cout << "gasit";
+										//if(place->getTokenCount()||place->getName()==sfp) nets[x]->createArc( *t, *nets[x]->findPlace(place->getName()+"_compl"),(*f)->getWeight());
+										net1.createArc(  (*f)->getTransition(),*pc,(*f)->getWeight());
+									//}
+								}
+								
+							}
+							
+						}
+					
+					string name1=args_info.inputs[0]; string name2=args_info.inputs[1];
+					Output output(folder+name1+name2, "open net");
+					output.stream() << pnapi::io::owfn << net1; exit(0);
+					//net1.compose(net2, s1, s2);
+				}
+				
+				/*if(args_info.composable_flag){
+					//maybe
+					set<Label *> l1a=net1.getInterface().getAsynchronousLabels();
+					set<Label *> l1s=net1.getInterface().getSynchronousLabels();
+					set<Label *> l2a=net2.getInterface().getAsynchronousLabels();
+					set<Label *> l2s=net2.getInterface().getSynchronousLabels();
+				}*/
+				
 				if((enforcedT.find(i+1)!=enforcedT.end())&&(args_info.enforceEvents_given>0)){
 					std::set<std::string> se=(enforcedT.find(i))->second;
 					for (std::set<std::string>::iterator it=se.begin(); it!=se.end(); it++)
@@ -953,6 +1094,7 @@ int main(int argc, char** argv) {
 				}
 				//else abort(3, "the transitions do not belong to the net");
 				if(i==1) s1="1@"; else s1=""; //
+				
 				net1.compose(net2, s1, s2);//cout<< s1<<"   "<<s2<<endl;
 				if ( args_info.adapterrules_given )
 				{//adapter
@@ -1077,8 +1219,7 @@ int main(int argc, char** argv) {
 		{
 			const RuleSet::AdapterRule & rule = **ruleIter;
 			
-			//nocolumns
-			unsigned int nbcol=0;
+			//nocolumns			unsigned int nbcol=0;
 			std::list< unsigned int > messageList = rule.getRule().first;
 			std::list< unsigned int >::iterator messageIter = messageList.begin();
 			while ( messageIter != messageList.end() )
@@ -1144,6 +1285,7 @@ int main(int argc, char** argv) {
 		}
 		if(lpfing == NULL) {
 			std::cerr<< "Unable to create new LP model"<<std::endl;
+			delete adapter;
 			return(1);
 		}
 		int k=1;
@@ -1172,6 +1314,7 @@ int main(int argc, char** argv) {
 				//get_nameindex(lp,const_cast<char *>(t.getName().c_str()),FALSE)
 				if(!add_constraintex(lpfing,2,sparserow, colno,EQ, 0.0))//lp, 2, sparserow, colno, GE, 3.0
 					cout<<"gata"<<endl;
+				delete[] colno;delete[] sparserow;
 			}
 			prevs=*cit;
 			
@@ -1203,6 +1346,7 @@ int main(int argc, char** argv) {
 	start_clock = clock();int res=0;//the result of the system
 	std::vector<lprec *> lpmps;// 
 	std::set<std::string> resultinp, resultout,resultsyn, result, resintern;//interface 
+	set<string> inputplaces1,outputplaces1;
 	//parse the message profile files
 	if(args_info.messageProfiles_given>0){
 		std::multimap<std::string,int> mpinvocation;set<std::string> hh;
@@ -1213,11 +1357,14 @@ int main(int argc, char** argv) {
 			
 		}
 		
-		std::set<std::string> inputp,outputp, syncp; // variables necessary for the composition
+		bool syncb=false;
+		std::set<std::string> inputp,outputp, syncp; // variables necessary for the composition for the previous
+		
 		for (set<std::string>::iterator sit=hh.begin(); sit!=hh.end(); ++sit) { //for each net
 			cout <<"Net id: "<< *sit;int no=0;//i=0;
 			std::vector<lprec *> mps;//mps for each net
 			std::set<std::string> resultinp, resultout,resultsyn, result, synct;//variables (initially they are)
+
 			
 			//build the set of constraints from the for the current net, result is the set of variables
 			for(std::multimap<std::string,int>::iterator it=mpinvocation.begin();it!=mpinvocation.end();++it){ //for each mp
@@ -1234,9 +1381,37 @@ int main(int argc, char** argv) {
 				}
 				term_vec = new std::vector<EventTerm*>();  ///initialize the event terms
 				mp_yyparse();
-				//cout << inputPlaces.size()<< outputPlaces.size()<<synchrT.size()<<endl;
+
+				//check whether we can make the composition by making the difference with the previous sset of places
+				//if()inputplaces1.find(ps)!=inputplaces1.ensitd()
+				if (sit!=hh.begin()) {
+					syncb=false;
+					cout << inputPlaces.size()<< outputPlaces.size()<<synchrT.size()<<"places"<<endl;
+					cout << inputplaces1.size()<< outputplaces1.size()<<"places1"<<endl;
+					for (std::set<std::string>::iterator ssit=outputplaces1.begin(); ssit!=outputplaces1.end(); ++ssit) {
+					// we can make composition for several nets !
+						cout<<*ssit<<" ";
+						if(inputPlaces.find(*ssit)!=inputPlaces.end()) syncb=true;
+							//inputplaces1.insert(*ssit);
+					}
+					for (std::set<std::string>::iterator ssit=inputplaces1.begin(); ssit!=inputplaces1.end(); ++ssit) {
+						// we can make composition for several nets !
+						cout<<*ssit<<" ";
+						if(outputPlaces.find(*ssit)!=outputPlaces.end()) syncb=true;
+						//inputplaces1.insert(*ssit);
+					}		
+					if (!syncb) {
+						std::cout<<endl<<"not syntactically compatible"<<endl; exit(0);
+					}
+				}
+				
+				
 				//inputp,outputp the set of places from the previous composition				
-				if (no == 1) { //get interface it==mpinvocation.begin()
+				if (no == 1) { //get interface it==mpinvocation.begin()//first time 
+					cout <<"here1"<< inputPlaces.size()<< outputPlaces.size()<<synchrT.size()<<endl;
+					cout << inputp.size()<< outputp.size()<<synct.size()<<endl;
+					cout << resultinp.size()<< resultout.size()<<resultsyn.size()<<endl;
+
 					for (std::set<std::string>::iterator ssit=inputPlaces.begin(); ssit!=inputPlaces.end(); ++ssit) {
 						if (inputp.find(*ssit)!=inputp.end()) {
 							cout << "we consider only simple composition; we are considering instance composition for next versions of the tool";
@@ -1264,6 +1439,14 @@ int main(int argc, char** argv) {
 						else synct.erase(*sit);
 						result.insert(*sit);
 					}
+/**/
+					for (std::set<std::string>::iterator ssit=inputPlaces.begin(); ssit!=inputPlaces.end(); ++ssit) {
+						inputplaces1.insert(*ssit);
+					}
+					for (std::set<std::string>::iterator ssit=outputPlaces.begin(); ssit!=outputPlaces.end(); ++ssit) {
+						outputplaces1.insert(*ssit);
+					}
+					cout<<inputplaces1.size()<<outputplaces1.size()<<"adding"<<endl;
 					//resultinp.insert(inputp.begin(),outputp.end());resultout.insert(outputp.begin(),outputp.end());
 					//resultsyn.insert(synct.begin(),synct.end());
 					lprec *lpt;//current set of constraints 
@@ -1313,6 +1496,7 @@ int main(int argc, char** argv) {
 						int kn=1;//cout<<"hello"<<term_vec->size()<<endl;
 						//int k=1;//
 						//print_lp(mps.at(ifm-1));
+						set_add_rowmode(mps.at(ifm-1), TRUE);
 						//cout<<ifm-1<<"in"<<get_Nrows(mps.at(0))<<get_Nrows(mps.at(1))<<get_Nrows(mps.at(2))<<endl;
 						REAL* roww=new REAL[1+inputPlaces.size()+ outputPlaces.size()+synchrT.size()]();
 						//initialize roww ith zero values
@@ -1346,7 +1530,8 @@ int main(int argc, char** argv) {
 								roww[get_nameindex(mps.at(ifm-1), cstr,FALSE)]=ite->second;
 							}//cout << (*fi)->lb<<" "<<(*fi)->ub<<endl;
 							int rhs=(*fi)->lb;//bd.first;
-							
+
+					
 							if(!add_constraint(mps.at(ifm-1), roww,GE, rhs))
 								cout<<"gata"<<endl;
 							if ((*fi)->ub!=USHRT_MAX) {//if (bd.second!=USHRT_MAX) {
@@ -1356,7 +1541,7 @@ int main(int argc, char** argv) {
 							else {
 								set_rh_range(mps.at(ifm-1),get_Nrows(mps.at(ifm-1)), get_infinite(mps.at(ifm-1)));
 							}
-							//set_add_rowmode(mps.at(ifm-1), FALSE);
+							
 							
 							kn++;
 						}
@@ -1365,11 +1550,41 @@ int main(int argc, char** argv) {
 						//lp=lpmc;cout<<get_col_name(lp,get_Ncolumns(lp))<<"help"<<endl;
 						//aici adauga constraints
 						//cout<<ifm-1<<" "; print_lp(mps.at(ifm-1));
+						set_add_rowmode(mps.at(ifm-1), FALSE);
 					}
 					//for (int ifm=1;ifm<nfm+1;++ifm){	print_lp(mps.at(ifm-1));};cout<<mps.size()<<endl;	
 					//add here to the previous set of constraints
+
+					/*bool syntb=false;//set<string> inputplaces1,inputplaces2,outputplaces1,outputplaces2;
+
+					 
+					 for (std::set<Place *>::iterator ssit=net1.getInterfacePlaces().begin(); ssit!=net1.getInterfacePlaces().end(); ++ssit) {
+					 //see whether it is an input place 
+					 string ps=(*ssit)->getName();
+					 if ((inputplaces1.find(ps)!=inputplaces1.end())&&(outputplaces2.find(ps)!=outputplaces2.end())) {
+					 syntb=true;break;
+					 }
+					 else if ((inputplaces2.find(ps)!=inputplaces2.end())&&(outputplaces1.find(ps)!=outputplaces1.end()))
+					 { syntb=true;break;//matching
+					 }
+					 
+					 
+					 }
+					 //const std::set<std::string> & getSynchronousLabels() const;
+					 for(std::set<std::string>::iterator cit=net1.getSynchronousLabels().begin();cit!=net1.getSynchronousLabels().end();++cit){
+					 if (net1.getSynchronousLabels().find(*cit)==net1.getSynchronousLabels().end()) {syntb=true;break;//not sync
+					 }
+					 }
+					 if (!syntb) {
+					 std::cout<<endl<<"not syntactically compatible"<<endl; exit(0);
+					 }*/
 					
 				}	
+
+
+				//cout << inputPlaces.size()<< outputPlaces.size()<<synchrT.size()<<endl;
+				//cout << inputp.size()<< outputp.size()<<synct.size()<<endl;
+				//cout << resultinp.size()<< resultout.size()<<resultsyn.size()<<endl;
 				
 			} //cout<<mps.size();
 			//here add final marking constraints; we can skip these ones
@@ -1446,12 +1661,15 @@ int main(int argc, char** argv) {
 				lpmps=st;
 			}	
 		}
-		
+		//cout << inputPlaces.size()<< outputPlaces.size()<<synchrT.size()<<endl;
+		//cout << inputp.size()<< outputp.size()<<endl;
+		//cout << resultinp.size()<< resultout.size()<<resultsyn.size()<<"gata"<<endl;
 		//mps+lpmps
 		// union of variables
 		status("finished adding all message profile files");
+
 		
-		//pt diferenta adauga variabile
+		//pt diferenta adauga variabile if (args_info.composable_flag) {;}
 		//insert 
 		//solve
 		if (args_info.inputs_num==0) {
@@ -1481,6 +1699,7 @@ int main(int argc, char** argv) {
 							}
 						}*/
 					}
+					set_add_rowmode(lpmps.at(ifm), TRUE);
 					for(int i=0;i<get_Nrows(lpfing);++i){
 						REAL * rowp=new REAL[1+get_Ncolumns(lpfing)](); 
 						//REAL * rowwpp=new REAL[hh]();//int *colp;
@@ -1488,13 +1707,14 @@ int main(int argc, char** argv) {
 						//for(int j=0;j<hh-1;j++)rowwpp[j]=0;
 				        //for(int j=0;j<get_Ncolumns(lpfing);j++){rowwpp[j+hh-get_Ncolumns(lpfing)]=rowp[j+1];}
 						//cout<<endl;for(int j=0;j<hh;j++){cout<<rowwpp[j]<<" ";}
-						//if( grex==-1) cout<<"gata";
+						if( grex==-1) cout<<"gata";
 						add_constraint(lpmps.at(ifm),rowp,get_constr_type(lpfing,i+1),get_rh(lpfing,i+1));
 						
 						//					for(int j=0;j<get_Ncolumns(lpmp);j++){set_mat(lp,get_Nrows(lp),1+get_Ncolumns(lp)-(get_Ncolumns(lpmp)-j),rowp[j]);cout<<rowwpp[j]<<" ";}
 						//					set_rh_range(lp,get_Nrows(lpmp),get_rh_range(lpmp,i+1));
 						//set_add_rowmode(lp,FALSE);
 					}
+					set_add_rowmode(lpmps.at(ifm), FALSE);
 				}
 				for(i=1;i<=get_Ncolumns(lpmps.at(ifm));i++){
 					set_int(lpmps.at(ifm),i,TRUE);
@@ -1507,7 +1727,7 @@ int main(int argc, char** argv) {
 				//write_LP(lpmps.at(ifm), stdout);
 				//cout<<"Solve "<<solve(lp)<<endl;
 				if(res==0){
-					//cout<<endl<<"Compatibility check inconclusive"<<endl;
+					cout<<endl<<"Compatibility check inconclusive"<<endl;
 					if (args_info.verbose_flag) {
 						cout<<endl<<"The constraint system has at least a solution:"<<endl;
 						REAL *sol;//[get_Ncolumns(lpmps.at(ifm))];
@@ -1519,7 +1739,7 @@ int main(int argc, char** argv) {
 					break;
 				}
 				else {
-					//std::cout<<endl<<"Not compatible wrt weak termination"<<endl;
+					std::cout<<endl<<"Not compatible wrt weak termination"<<endl;
 				}
 				
 			}
@@ -1527,9 +1747,7 @@ int main(int argc, char** argv) {
 	}
 	
 	
-	
-	
-	
+
 	
 	
 	//compute the set of final marmings as sets of constraints
@@ -1580,7 +1798,8 @@ int main(int argc, char** argv) {
 	// here we prepare for the the solving of the equation
 	// for each final marking one builds and solves  the state equation
 	unsigned int nofinal=lpmps.size();bool firstsolve=false;
-	
+	int nPlaces;
+	int nTransitions;
 	if(args_info.inputs_num>0){//args_info.adapterrules_given){//args_info.messageProfiles_given>0
 		status("State equation involved");
 		nPlaces = (int) net1.getPlaces().size();cout << "No of places "<< net1.getInternalPlaces().size() << endl;
@@ -1797,7 +2016,7 @@ int main(int argc, char** argv) {
 			if(!add_constraintex(lp,k,rowe,colno, EQ, rhs)) cout<<"nu merge"<<endl;
 			set_row_name(lp,get_Nrows(lp), cstr);
 			
-			delete[] colno, rowe, roww;
+			delete[] colno;delete[] rowe;delete[] roww;
 			//add the constrain's right side
 			//get the row with the palce row name
 			//cout<<endl<<get_nameindex(*citr,cstr,TRUE)<<" "<<get_rh(*citr, get_nameindex(*citr,cstr,TRUE))<<endl;

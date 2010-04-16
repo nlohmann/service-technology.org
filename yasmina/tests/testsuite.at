@@ -59,7 +59,7 @@ AT_CHECK([GREP -q "Not compatible" stdout])
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
-AT_SETUP([Compatibility check of adapter.])
+AT_SETUP([Compatibility check net with adapter.])
 AT_CHECK([cp TESTFILES/td.owfn .])
 AT_CHECK([cp TESTFILES/td.ar .])
 AT_CHECK([YASMINA -a td.ar td.owfn],0,stdout,stderr)
@@ -67,7 +67,7 @@ AT_CHECK([GREP -q "Compatibility check inconclusive" stdout])
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
-AT_SETUP([Compatibility check with adapter and message profile.])
+AT_SETUP([Compatibility check message profile with adapter.])
 AT_CHECK([cp TESTFILES/td.output .])
 AT_CHECK([cp TESTFILES/td.ar .])
 AT_CHECK([YASMINA -a td.ar -m td.output],0,stdout,stderr)
@@ -75,3 +75,29 @@ AT_CHECK([GREP -q "Compatibility check inconclusive" stdout])
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
+AT_SETUP([Incompatible check net adapter net.])
+AT_CHECK([cp TESTFILES/zeusn.owfn .])
+AT_CHECK([cp TESTFILES/zeusn.ar .])
+AT_CHECK([cp TESTFILES/zeusnp.owfn .])
+#AT_CHECK([YASMINA -a zeusn.ar zeusn.owfn zeusnp.owfn],0,stdout,stderr)
+#AT_CHECK([GREP -q "Not compatible" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Incompatible net adapter fingerprint.])
+AT_CHECK([cp TESTFILES/zeusn.owfn .])
+AT_CHECK([cp TESTFILES/zeusn.ar .])
+AT_CHECK([cp TESTFILES/zeusnp.output .])
+AT_CHECK([YASMINA -a zeusn.ar zeusn.owfn -m zeusnp.output],0,stdout,stderr)
+AT_CHECK([GREP -q "Not compatible" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Incompatible fingerprint adapter fingerprint.])
+AT_CHECK([cp TESTFILES/zeusn.output .])
+AT_CHECK([cp TESTFILES/zeusn.ar .])
+AT_CHECK([cp TESTFILES/zeusnp.output .])
+#AT_CHECK([YASMINA -a zeusn.ar -m zeusn.output -m zeusnp.output],0,stdout,stderr)
+#AT_CHECK([GREP -q "Not compatible" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP

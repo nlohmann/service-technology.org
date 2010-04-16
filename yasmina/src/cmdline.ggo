@@ -29,6 +29,10 @@ option "messageProfiles" m
 	string multiple
 	optional
 	
+option "composable" c
+	"For different inputs gives as an answer whether the nets/fingerprints are composable or not"
+	  flag off
+
 #option "constrain" c
 #	"use constraints - "
 #	optional
@@ -51,6 +55,9 @@ section "Debug"
 option "verbose" v
   "Verbose output"
   flag off
+
+
+
 
 option "net" n
   "The composed net is printed to standard output"

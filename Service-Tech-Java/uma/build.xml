@@ -60,17 +60,17 @@
 	<target name="build" depends="pre-build"
 			description="Build ${build.name} classes.">
 		<echo message="Compiling in ${make.basedir}..." />
-		<mkdir dir="${bin}" />
+		<mkdir dir="${dir.bin}" />
 		<javac classpathref="base.path"
-			srcdir="${src}"
-         	destdir="${bin}"
+			srcdir="${dir.src}"
+         	destdir="${dir.bin}"
          	debug="on" />
 	</target>
 	
 	<!-- call check script to run test-cases -->
 	<target name="check" depends="build"
 			description="Run test cases.">
-		<ant antfile="tests/build.xml" target="check" inheritall="true">
+		<ant antfile="${dir.tests}/build.xml" target="check" inheritall="true">
 		</ant>
 	</target>
 	
@@ -78,11 +78,11 @@
 	<target name="jar" depends="build"
 			description="Create Java Archive (JAR) of ${build.name}.">
 		<!-- create temporary build directory and copy files -->
-		<echo message="Copying all files to build directory ${builddir}/" />
-		<mkdir dir="${builddir}"/>
-		<copy todir="${builddir}">
+		<echo message="Copying all files to build directory ${dir.builddir}/" />
+		<mkdir dir="${dir.builddir}"/>
+		<copy todir="${dir.builddir}">
 			<!-- compiled class files -->
-			<fileset dir="${bin}">
+			<fileset dir="${dir.bin}">
 				<include name="**/*.class"/>
 			</fileset>
 			<!-- auxiliary files from home directory -->
@@ -97,7 +97,7 @@
 		
 		<!-- build distributable JAR file -->
 		<echo message="Creating distributable JAR file ${home}/${build.target}.jar" />
-		<jar destfile="${builddir}/${build.target}.jar" basedir="${builddir}/" manifest="META-INF/MANIFEST.MF">
+		<jar destfile="${dir.builddir}/${build.target}.jar" basedir="${dir.builddir}/" manifest="META-INF/MANIFEST.MF">
 			<include name="**/*.class"/>
 			<include name="AUTHORS"/>
 			<include name="ChangeLog"/>
@@ -110,20 +110,20 @@
 	<target name="dist"
 			description="Create source distribution .zip of ${build.name}.">
 		<!-- include all source files -->
-		<mkdir dir="${distdir}/src" />
-		<copy todir="${distdir}/src">
-			<fileset dir="${src}">
+		<mkdir dir="${dir.distdir}/${src}" />
+		<copy todir="${dir.distdir}/${src}">
+			<fileset dir="${dir.src}">
 				<include name="**/*.java"/>
 			</fileset>
 		</copy>
 		<!-- include all additional files defined in the configuration file -->
-		<copy todir="${distdir}">
+		<copy todir="${dir.distdir}">
 			<fileset dir="${home}">
 				<include name="${distfiles.includes}" />
 			</fileset>
 		</copy>
 		<!-- include the standard files of the distribution -->
-		<copy todir="${distdir}">
+		<copy todir="${dir.distdir}">
 			<fileset dir="${home}">
 				<include name="AUTHORS"/>
 				<include name="ChangeLog"/>
@@ -132,25 +132,25 @@
 			</fileset>
 		</copy>
 		
-		<mkdir dir="${distdir}/${libs.external}" />
-		<copy todir="${distdir}/${libs.external}">
+		<mkdir dir="${dir.distdir}/${libs.external}" />
+		<copy todir="${dir.distdir}/${libs.external}">
 			<fileset dir="${home}/${libs.external}">
 				<include name="*.jar" />
 			</fileset>
 		</copy>
 		
 		<!-- make all build files part of the source distribution -->
-		<copy file="${home}/build.xml" todir="${distdir}" />
-		<copy file="${home}/build.am.xml" todir="${distdir}" />
-		<copy file="${home}/configure.properties" todir="${distdir}" />
+		<copy file="${home}/build.xml" todir="${dir.distdir}" />
+		<copy file="${home}/build.am.xml" todir="${dir.distdir}" />
+		<copy file="${home}/configure.properties" todir="${dir.distdir}" />
 		
-		<mkdir dir="${distdir}/${tests.name}" />
-		<copy todir="${distdir}/${tests.name}">
-			<fileset dir="${home}/${tests.name}" />
+		<mkdir dir="${dir.distdir}/${tests}" />
+		<copy todir="${dir.distdir}/${tests}">
+			<fileset dir="${dir.tests}" />
 		</copy>
 
-		<zip destfile="${home}/${build.target}-${build.version}-src.zip">
-			<zipfileset dir="${distdir}" />
+		<zip destfile="${home}/${distdir}.zip">
+			<zipfileset dir="${dir.distdir}" />
 		</zip>
 	</target>
 	
@@ -158,18 +158,18 @@
 	<target name="dist-bin" depends="jar"
 			description="Create binary distribution .zip of ${build.name}.">
 		
-		<mkdir dir="${distbindir}/${libs}" />
-		<copy file="${builddir}/${build.target}.jar" todir="${distbindir}/${libs}" />
+		<mkdir dir="${dir.distbindir}/${libs}" />
+		<copy file="${dir.builddir}/${build.target}.jar" todir="${dir.distbindir}/${libs}" />
 		
-		<mkdir dir="${distbindir}/${libs.external}" />
-		<copy todir="${distbindir}/${libs.external}">
+		<mkdir dir="${dir.distbindir}/${libs.external}" />
+		<copy todir="${dir.distbindir}/${libs.external}">
 			<fileset dir="${home}/${libs.external}">
 				<include name="*.jar" />
 			</fileset>
 		</copy>
 		
-		<zip destfile="${home}/${build.target}-${build.version}.zip">
-			<zipfileset dir="${distbindir}" />
+		<zip destfile="${home}/${distdir}-bin.zip">
+			<zipfileset dir="${dir.distbindir}" />
 		</zip>
 	</target>
 	
@@ -177,7 +177,7 @@
 	<target name="jarcheck" depends="jar"
 			description="Run test cases for the Java Archive of ${build.name}.">
 		<antcall target="check">
-			<param name="compiled.classes" value="${builddir}/${build.target}.jar"/>
+			<param name="compiled.classes" value="${dir.builddir}/${build.target}.jar"/>
 			<param name="test.libs-external" value="${libs.external}"/>
 		</antcall>
 	</target>
@@ -185,24 +185,24 @@
 	<!-- build distributable file and run test cases on the distributable -->
 	<target name="distcheck" depends="dist"
 			description="Create source distribution of the ${build.name} and run extensive tests for that distribution.">
-		<mkdir dir="${distcheckdir}" />
-		<unzip dest="${distcheckdir}" overwrite="true" src="${home}/${build.target}-${build.version}-src.zip" />
+		<mkdir dir="${dir.distcheckdir}" />
+		<unzip dest="${dir.distcheckdir}" overwrite="true" src="${home}/${distdir}.zip" />
 
-		<ant target="build" antfile="build.xml" dir="${distcheckdir}" inheritall="false" inheritrefs="false">
+		<ant target="build" antfile="build.xml" dir="${dir.distcheckdir}" inheritall="false" inheritrefs="false">
 		</ant>
-		<ant target="check" antfile="build.xml" dir="${distcheckdir}" inheritall="false" inheritrefs="false">
+		<ant target="check" antfile="build.xml" dir="${dir.distcheckdir}" inheritall="false" inheritrefs="false">
 		</ant>
 	</target>
 	
 	<!-- clean all files that have been generated -->
 	<target name="clean"
 			description="Clean all temporary build directories and temporary files.">
-		<delete dir="${distcheckdir}" includeemptydirs="true" failonerror="false"/>
-		<delete dir="${distbindir}" includeemptydirs="true" failonerror="false"/>
-		<delete dir="${distdir}" includeemptydirs="true" failonerror="false"/>
-		<delete dir="${builddir}" includeemptydirs="true" failonerror="false"/>
+		<delete dir="${dir.distcheckdir}" includeemptydirs="true" failonerror="false"/>
+		<delete dir="${dir.distbindir}" includeemptydirs="true" failonerror="false"/>
+		<delete dir="${dir.distdir}" includeemptydirs="true" failonerror="false"/>
+		<delete dir="${dir.builddir}" includeemptydirs="true" failonerror="false"/>
 		<delete failonerror="false">
-			<fileset dir="${bin}">
+			<fileset dir="${dir.bin}">
 			    <include name="**/*.class"/>
 			</fileset>
 			<filename name="${home}/${build.target}.jar"/>

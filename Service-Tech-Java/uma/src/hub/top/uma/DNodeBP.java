@@ -1933,12 +1933,12 @@ public class DNodeBP {
    * @param arr
    * @return a string representation of the given <code>byte</code> array
    */
-  private static String toString(byte[] arr) {
-    String result = "[";
-    for (byte d : arr) {
-      result += d+", ";
-    }
-    return result + "]";
-  }
+//  private static String toString(byte[] arr) {
+//    String result = "[";
+//    for (byte d : arr) {
+//      result += d+", ";
+//    }
+//    return result + "]";
+//  }
   
 }

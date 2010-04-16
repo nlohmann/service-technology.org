@@ -32,7 +32,7 @@ using pnapi::PetriNet;
 using pnapi::Place;
 using pnapi::Transition;
 using pnapi::Node;
-using pnapi::Arc;
+// DO NOT USE -- Will not run under Windows // using pnapi::Arc;
 
 
 using namespace std;
@@ -1002,8 +1002,8 @@ int main(int argc, char** argv) {
 								pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*pc,1));
 								net1.finalCondition().addProposition(prop);//nets[x]->finalCondition().formula().output(std::cout);
 								//cout<<php->getPresetArcs().size()
-								set<Arc *> preset = p->getPresetArcs();
-								for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
+								set<pnapi::Arc *> preset = p->getPresetArcs();
+								for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
 								{//create a post rtansition for the complementary
 										//it is internal, create an arc for the complementary
 											//cout << "gasit"; initially marked
@@ -1011,8 +1011,8 @@ int main(int argc, char** argv) {
 										//	net1.createArc((*f)->getTransition(), *net1->findPlace(p->getName()+"_compl"), (*f)->getWeight());
 									//nets[x]->createArc(*netPlace, *t, (*f)->getWeight());
 								}
-								set<Arc *> postset = p->getPostsetArcs();
-								for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); ++f)
+								set<pnapi::Arc *> postset = p->getPostsetArcs();
+								for (set<pnapi::Arc *>::iterator f = postset.begin(); f != postset.end(); ++f)
 								{
 										//it is internal, create an arc for the complementary
 										//if (net1.findPlace(place->getName()+"_compl")!=NULL) {
@@ -1042,8 +1042,8 @@ int main(int argc, char** argv) {
 								pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*pc,1));
 								net1.finalCondition().addProposition(prop);//nets[x]->finalCondition().formula().output(std::cout);
 								//cout<<php->getPresetArcs().size()
-								set<Arc *> preset = p->getPresetArcs();
-								for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
+								set<pnapi::Arc *> preset = p->getPresetArcs();
+								for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
 								{//create a post rtansition for the complementary
 									//it is internal, create an arc for the complementary
 									//cout << "gasit"; initially marked
@@ -1051,8 +1051,8 @@ int main(int argc, char** argv) {
 									//	net1.createArc((*f)->getTransition(), *net1->findPlace(p->getName()+"_compl"), (*f)->getWeight());
 									//nets[x]->createArc(*netPlace, *t, (*f)->getWeight());
 								}
-								set<Arc *> postset = p->getPostsetArcs();
-								for (set<Arc *>::iterator f = postset.begin(); f != postset.end(); ++f)
+								set<pnapi::Arc *> postset = p->getPostsetArcs();
+								for (set<pnapi::Arc *>::iterator f = postset.begin(); f != postset.end(); ++f)
 								{
 									//it is internal, create an arc for the complementary
 									//if (net1.findPlace(place->getName()+"_compl")!=NULL) {

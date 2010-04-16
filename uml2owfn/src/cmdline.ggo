@@ -58,7 +58,7 @@ optional
 
 option "rolecut" R
 "cuts away all swimlanes in a process that do not contain a startnode"
-values="services", "scenarios"
+values="swimlanes", "services", "scenarios"
 typestr="ROLECUT-TYPE"
 optional
 

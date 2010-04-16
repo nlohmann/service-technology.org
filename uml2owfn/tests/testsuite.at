@@ -150,6 +150,14 @@ AT_CHECK([ls *.lola | wc -l | GREP -q 25])
 AT_KEYWORDS(compiler)
 AT_CLEANUP
 
+AT_SETUP([Swimlane decomposition])
+AT_CHECK([cp TESTFILES/service-tech.xml .])
+AT_CHECK([UML2OWFN -i service-tech.xml -f lola -R swimlane --output=service-tech],0,ignore,stderr)
+AT_CHECK([GREP -q "2 of 2 processes have been translated." stderr])
+AT_CHECK([ls *.lola | wc -l | GREP -q 6])
+AT_KEYWORDS(compiler)
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([File Formats])

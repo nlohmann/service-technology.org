@@ -289,13 +289,15 @@ void parse_command_line(int argc, char* argv[])
 	}
 	if(args_info.rolecut_given) {
 	  parameter = args_info.rolecut_arg;
-	  if (parameter == "services") {
-	    options[O_ROLECUT] = true;
+
+    options[O_ROLECUT] = true;
+	  if (parameter == "swimlanes")
+	    decomposeInto = CUT_SWIMLANES;
+	  else if (parameter == "services")
 	    decomposeInto = CUT_SERVICES;
-	  } else if (parameter == "scenarios") {
-      options[O_ROLECUT] = true;
+	  else if (parameter == "scenarios")
       decomposeInto = CUT_SCENARIOS;
-	  } else {
+	  else {
       trace(TRACE_ALWAYS, "Unrecognised decomposition mode: \"" + string(args_info.rolecut_arg) +"\"!\n");
       trace(TRACE_ALWAYS, "Use -h to get a list of valid decomposition modes.\n");
       abort(4, "Parameter error");

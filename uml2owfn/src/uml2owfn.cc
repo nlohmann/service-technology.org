@@ -281,76 +281,171 @@ int translate_process_soundness(pnapi::ExtendedWorkflowNet *PN, Process *process
 }
 
 /*!
+ * \brief decompose Petri net into its swimlanes
+ */
+void decompose_swimlanes(pnapi::ExtendedWorkflowNet *PN, int *res, std::list< pnapi::ExtendedWorkflowNet > *nets) {
+
+  // collect all swimlanes
+  std::set< std::set<string> > swimlanes;
+  for (std::set<pnapi::Transition*>::iterator t = PN->getTransitions().begin(); t != PN->getTransitions().end(); t++) {
+    swimlanes.insert((*t)->getRoles());
+  }
+
+  // for each swimlane
+  for (std::set< std::set<string> >::iterator roles = swimlanes.begin(); roles != swimlanes.end(); roles++) {
+    /*
+    cerr << "---lane---" << endl;
+    for (std::set<string>::iterator role = (*roles).begin(); role != (*roles).end(); role++) {
+      cerr << *role << " ";
+    }
+    cerr << endl;
+    */
+
+    // create a new Petri net
+    pnapi::ExtendedWorkflowNet PN_role;
+    PN_role.addRoles((*roles).begin(), (*roles).end());
+
+    // and copy all transitions of this swimlane with pre- and post-places to the new net
+    for (std::set<pnapi::Transition*>::iterator t = PN->getTransitions().begin(); t != PN->getTransitions().end(); t++) {
+      if (*roles == (*t)->getRoles()) {
+        // copy only transitions which are exactly in the swimlane
+        pnapi::Transition& tr = PN_role.createTransition((*t)->getName());
+
+        // copy the transition's pre-set
+        for (std::set<pnapi::Node*>::iterator p = (*t)->getPreset().begin(); p != (*t)->getPreset().end(); p++) {
+          pnapi::Place *pl = PN_role.findPlace((*p)->getName());
+          if (pl == NULL) pl = &PN_role.createPlace((*p)->getName());
+          PN_role.createArc(*pl, tr);
+        }
+
+        // copy the transition's post-set
+        for (std::set<pnapi::Node*>::iterator p = (*t)->getPostset().begin(); p != (*t)->getPostset().end(); p++) {
+          pnapi::Place *pl = PN_role.findPlace((*p)->getName());
+          if (pl == NULL) pl = &PN_role.createPlace((*p)->getName());
+          PN_role.createArc(tr, *pl);
+        }
+      }
+    }
+
+    // and save the net
+    nets->push_back(PN_role);
+  }
+}
+
+/*!
  * \brief translate the process for decomposition according to the decomposition
  *      parameters, calls #write_net_file() accordingly
  */
 int translate_process_decomposition(pnapi::ExtendedWorkflowNet *PN, Process *process, analysis_t analysis, unsigned int reduction_level) {
 
-  int res = RES_OK;
+    int res = RES_OK;
 
 #ifdef DEBUG
     trace(TRACE_DEBUG, "  cut net\n");
 #endif
-    //PN->cutByRoles();
-    cerr << "cutting by roles has been disabled in this version" << endl;
 
-    if (!PN->isStructurallyCorrect()) {
-      res |= RES_SKIPPED|RES_INCORR_STRUCTURE;
-      return res;   // do not translate in this case
+    std::list< pnapi::ExtendedWorkflowNet > nets;
+
+    if (decomposeInto == CUT_SWIMLANES) {
+      decompose_swimlanes(PN, &res, &nets);
+
+    } else if (decomposeInto == CUT_SERVICES) {
+      //PN->cutByRoles();
+      trace(TRACE_ALWAYS, "Decomposition into services has been disabled in this version.\n");
+      res |= RES_SKIPPED;
+
+    } else if (decomposeInto == CUT_SCENARIOS) {
+      // TODO: to implement, or separate tool?
+      trace(TRACE_ALWAYS, "Decomposition into scenarios has been disabled in this version.\n");
+      res |= RES_SKIPPED;
+
+    } else {
+      res |= RES_SKIPPED;
+      return res;
     }
 
-    if (globals::deriveRolesToCut) {
-      // we want to automatically find interesting services from
-      // role information in choreographies
-      if ( globals::filterCharacteristics[PC_TRIVIAL_INTERFACE]
-           && ((PN->inputSize() <= 1 && PN->outputSize() <= 1)
-               || PN->inputSize() == 0
-               || PN->outputSize() == 0))
+    // write each decomposed Petri net in a separate file
+    int netNum = 0;
+    for (std::list< pnapi::ExtendedWorkflowNet >::iterator net = nets.begin(); net != nets.end(); net++) {
+
+      pnapi::ExtendedWorkflowNet roleNet = static_cast<pnapi::ExtendedWorkflowNet>(*net);
+
+      netNum++;
+
+      if (decomposeInto == CUT_SERVICES)
       {
-        // but the current process has no interesting interface, and we are
-        // filtering
-        res |= RES_SKIPPED|RES_INSUFF_INTERFACE;
-        return res;
+        if (!roleNet.isStructurallyCorrect()) {
+          cerr << "structurally incorrect" << endl;
+          continue;
+          //res |= RES_SKIPPED|RES_INCORR_STRUCTURE;
+          //return res;   // do not translate in this case
+        }
+
+        // we want to automatically find interesting services from
+        // role information in choreographies
+        if ( globals::filterCharacteristics[PC_TRIVIAL_INTERFACE]
+             && ((roleNet.inputSize() <= 1 && roleNet.outputSize() <= 1)
+                 || roleNet.inputSize() == 0
+                 || roleNet.outputSize() == 0))
+        {
+          // but the current process has no interesting interface, and we are
+          // filtering
+          cerr << "trivial interface" << endl;
+          continue;
+          //res |= RES_SKIPPED|RES_INSUFF_INTERFACE;
+          //return res;
+        }
+
+#ifdef DEBUG
+        trace(TRACE_DEBUG, "-> decomposition: checking whether net is connected\n");
+#endif
+        if (!roleNet.isConnected()) {
+          cerr << "not connected" << endl;
+          continue;
+          //res |= RES_SKIPPED|RES_UNCONNECTED;
+          //trace(TRACE_WARNINGS, " [INFO] process is not connected.\n\n");
+          //return res;   // do not translate in this case
+        }
       }
-    }
 
-    // start of checking properties and generating verification formulas and files
-  #ifdef DEBUG
-    trace(TRACE_DEBUG, "-> decomposition: checking whether net is connected\n");
-  #endif
-    if (!PN->isConnected()) {
-      res |= RES_SKIPPED|RES_UNCONNECTED;
-      trace(TRACE_WARNINGS, " [INFO] process is not connected.\n\n");
-      return res;   // do not translate in this case
-    }
 
-    // perform structural reduction
-    if (reduction_level > 0) {
-      trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
-      PN->reduce(globals::reduction_level);
+      // perform structural reduction
+      if (reduction_level > 0) {
+        trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
+        roleNet.reduce(globals::reduction_level);
 
-      // check whether net reduction created an empty net
-      if (PN->getInternalPlaces().size() == 0) {
-        cerr << process->getName() << " retrying (reason: empty process)." << endl;
-        cerr << pnapi::io::stat << PN << endl;
-        return RES_SKIPPED|RES_EMPTY_PROCESS;
+        // check whether net reduction created an empty net
+        if ((*net).getInternalPlaces().size() == 0) {
+          continue;
+          //cerr << process->getName() << " retrying (reason: empty process)." << endl;
+          //cerr << pnapi::io::stat << PN << endl;
+          //return RES_SKIPPED|RES_EMPTY_PROCESS;
+        }
       }
+
+      cerr << process->getName() << "." << toString(netNum) << endl;
+
+      // set output file name by setting file name suffix for this net
+
+      // we have to reset the suffix in every iteration because we write
+      // several files with different suffixes, so re-obtain the process file name
+      string processName = "";
+      // set the current Process name and filename
+      if (Process* parent_process=dynamic_cast<Process*>(process->getParent())) {
+        processName = parent_process->getName() + "##" + process->getName();
+      } else {
+        processName = process->getName();
+      }
+
+      // set suffix for this process, so we have an output file name
+      globals::output_filename_suffix =  "." + process_name_to_file_name(processName);
+      globals::output_filename_suffix += "."+toString(netNum);
+
+      // generate the output for the given process
+      globals::currentProcessName = process->getName();  // for comments about origin in generated net files
+      write_net_file(&roleNet, analysis); // write out current process and further related files
+
     }
-
-    cerr << process->getName() << "." << endl;
-
-    // extend output file name suffix if necessary
-
-    // the local reduction level is less than the global reduction level set
-    // at the commandline
-    if (reduction_level < globals::reduction_level) {
-      // if we work with the unreduced net, extend the file name
-      globals::output_filename_suffix += ".unreduced";
-    }
-
-    // generate the output for the given process
-    globals::currentProcessName = process->getName();  // for comments about origin in generated net files
-    write_net_file(PN, analysis); // write out current process and further related files
 
     return res;
 }

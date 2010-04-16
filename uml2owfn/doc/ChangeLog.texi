@@ -1,5 +1,6 @@
 @heading Version 2.11
 @itemize
+@item added swimlane decomposition, parameter @samp{-R swimlane}
 @item UML2oWFN now writes .owfn files with ROLE annotations
 @item added switch to distinguish places between activities and gateways as typed interfaces (switch: @samp{-D})
 @end itemize

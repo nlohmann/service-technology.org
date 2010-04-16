@@ -158,6 +158,7 @@ typedef enum
 typedef enum
 {
   CUT_NONE,       ///< do not decompose
+  CUT_SWIMLANES,  ///< simple projection of process into its swimlanes
   CUT_SERVICES,   ///< cut into services with interface
   CUT_SCENARIOS   ///< cut into connected scenarios
 } decompositionType;
@@ -192,6 +193,7 @@ extern map<possibleOptions,    bool> options;
 extern map<possibleParameters, bool> parameters;
 extern map<possibleFormats,    bool> formats;
 extern map<possibleFormats,  string> suffixes;
+extern decompositionType decomposeInto;
 
 extern int frontend_debug;
 extern int frontend__flex_debug;

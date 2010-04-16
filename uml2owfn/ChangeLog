@@ -9,6 +9,8 @@
 Version 2.11
 ============
 
+* added swimlane decomposition, parameter `-R swimlane'
+
 * UML2oWFN now writes .owfn files with ROLE annotations
 
 * added switch to distinguish places between activities and gateways as typed

@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: UMA - an Unfolding-based Model Analyzer
+Bundle-SymbolicName: hub.top.uma
+Bundle-Version: 1.2.0
+Export-Package: hub.top.uma
+Bundle-Vendor: service-technology.org
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

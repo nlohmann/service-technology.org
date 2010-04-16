@@ -1,0 +1,55 @@
+
+                              _   _ __  __    _    
+                             | | | |  \/  |  / \   
+                             | | | | |\/| | / _ \  
+                             | |_| | |  | |/ ___ \ 
+                              \___/|_|  |_/_/   \_\
+                          http://service-technology.org/
+
+
+PURPOSE
+    UMA (an Unfolding-based Model Analyzer) has been implemented for the
+    validation of state-space construction techniques for place/transition
+    net state spaces and scenario-based specifications. Its particular
+    strengths include
+    
+     * a compact representation of a system's state-space based on McMillan's
+       technique of finite complete prefixes of Petri net unfoldings;
+     * applicable to scenario-based models with history-based enabling conditions; 
+
+    UMA is platform independent and runs on all platforms with a Java runtime
+    environment.
+
+
+COPYRIGHT
+    Copyright (c) 2008, 2009, 2010 Dirk Fahland
+
+
+AUTHORS
+    UMA is written and maintained by Dirk Fahland. See file "AUTHORS" for
+    more information.
+
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    UMA is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of UMA.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION (to be done)
+    UMA can be easily compiled and installed. See file "INSTALL" for
+    instructions.
+
+    UMA uses some generated code. If you want to make changes to the source
+    code, you might need the following tools to regenerate the code:
+     * ???
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of UMA.

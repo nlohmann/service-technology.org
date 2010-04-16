@@ -1,0 +1,9 @@
+<project default="pre-build">
+	
+	<!-- the pre-build hook, add here all dependencies and steps to be
+	     carried out before executing the project build task -->
+	
+	<target name="pre-build">
+	</target>
+
+</project>

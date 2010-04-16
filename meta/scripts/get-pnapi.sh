@@ -42,7 +42,7 @@ wget http://esla.informatik.uni-rostock.de:8080/job/pnapi/lastSuccessfulBuild/ar
 tar xfz pnapi.tar.gz
 
 # copy relevant files
-cp pnapi/src/*.cc pnapi/src/*.h
+cp pnapi/src/*.cc pnapi/src/*.h .
 cp pnapi/src/Makefile.am.customer Makefile.am
 
 # cleanup
@@ -53,12 +53,4 @@ rm -rf pnapi.tar.gz
 echo
 echo "  Finished installing PNAPI"
 echo "  Please check, whether all files are versioned properly in your tool."
-echo
-echo "  Please check, whether your configure.ac contains the following lines:"
-echo
-echo "   # using YACC doesn't work, need to call bison this way"
-echo "   AC_PATH_PROG(BISON, [bison], not found)"
-echo
-echo "   AC_CONFIG_FILES([libs/pnapi/bison-wrapper.sh], [chmod +x libs/pnapi/bison-wrapper.sh])"
-echo
 

@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
 
     // check 1: quasi-liveness
     std::cout << "quasiliveness: $(transitions:%=%.quasiliveness.result)\n";
-    std::cout << "-@grep -L "RESULT: 0" *.quasiliveness.result | tr '\n' ',' | sed 's/.$$//' | sed 's/,/, /g'\n";
+    std::cout << "-@grep -L \"RESULT: 0\" *.quasiliveness.result | tr '\n' ',' | sed 's/.$$//' | sed 's/,/, /g'\n";
     std::cout << "%.quasiliveness.result:\n";
     std::cout << "\t@echo \"ANALYSE TRANSITION $(@:%.quasiliveness.result=%)\" > $(@:%.result=%.task)\n";
     std::cout << "\t-@lola-deadtransition $(net) -a$(@:%.result=%.task) &> $@ ; echo \"RESULT: $$?\" >> $@\n\n";

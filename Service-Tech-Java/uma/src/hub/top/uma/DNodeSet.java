@@ -162,7 +162,6 @@ public class DNodeSet {
 	 * @return all nodes in this {@link DNodeSet} by backwards search from its
 	 * {@link DNodeSet#maxNodes}
 	 */
-	@Deprecated
 	public HashSet<DNode> getAllNodes() {
 		LinkedList<DNode> queue = new LinkedList<DNode>(maxNodes);
 		HashSet<DNode> allNodes = new HashSet<DNode>();

@@ -149,7 +149,7 @@
 			<fileset dir="${dir.tests}" />
 		</copy>
 
-		<zip destfile="${home}/${distdir}.zip">
+		<zip destfile="${home}/${package}.zip">
 			<zipfileset dir="${dir.distdir}" />
 		</zip>
 	</target>
@@ -168,7 +168,7 @@
 			</fileset>
 		</copy>
 		
-		<zip destfile="${home}/${distdir}-bin.zip">
+		<zip destfile="${home}/${package}-bin.zip">
 			<zipfileset dir="${dir.distbindir}" />
 		</zip>
 	</target>
@@ -186,7 +186,7 @@
 	<target name="distcheck" depends="dist"
 			description="Create source distribution of the ${build.name} and run extensive tests for that distribution.">
 		<mkdir dir="${dir.distcheckdir}" />
-		<unzip dest="${dir.distcheckdir}" overwrite="true" src="${home}/${distdir}.zip" />
+		<unzip dest="${dir.distcheckdir}" overwrite="true" src="${home}/${package}.zip" />
 
 		<ant target="build" antfile="build.xml" dir="${dir.distcheckdir}" inheritall="false" inheritrefs="false">
 		</ant>

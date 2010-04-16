@@ -10,12 +10,13 @@ noinst_LIBRARIES = libpnapi.a
 
 # [CUSTOMER_B_SRC] this line is needed to build a customer Makefile. Do not remove!
 libpnapi_a_SOURCES = \
-    parser-lola.yy parser-lola-lexer.ll parser-lola-wrapper.h parser-lola-wrapper.cc \
-    parser-owfn.yy parser-owfn-lexer.ll parser-owfn-wrapper.h parser-owfn-wrapper.cc \
-    parser-pn.yy parser-pn-lexer.ll parser-pn-wrapper.h parser-pn-wrapper.cc \
-    parser-pnml.yy parser-pnml-lexer.ll parser-pnml-wrapper.h parser-pnml-wrapper.cc \
-    parser-sa.yy parser-sa-lexer.ll parser-sa-wrapper.h parser-sa-wrapper.cc \
-    parser-woflan.yy parser-woflan-lexer.ll parser-woflan-wrapper.h parser-woflan-wrapper.cc \
+    parser-lola.h parser-lola.cc parser-lola-location.h parser-lola-position.h parser-lola-stack.h parser-lola-lexer.cc parser-lola-wrapper.h parser-lola-wrapper.cc \
+    parser-owfn.h parser-owfn.cc parser-owfn-location.h parser-owfn-position.h parser-owfn-stack.h parser-owfn-lexer.cc parser-owfn-wrapper.h parser-owfn-wrapper.cc \
+    parser-pn.h parser-pn.cc parser-pn-location.h parser-pn-position.h parser-pn-stack.h parser-pn-lexer.cc parser-pn-wrapper.h parser-pn-wrapper.cc \
+    parser-pnml.h parser-pnml.cc parser-pnml-location.h parser-pnml-position.h parser-pnml-stack.h parser-pnml-lexer.cc parser-pnml-wrapper.h parser-pnml-wrapper.cc \
+    parser-sa.h parser-sa.cc parser-sa-location.h parser-sa-position.h parser-sa-stack.h parser-sa-lexer.cc parser-sa-wrapper.h parser-sa-wrapper.cc \
+    parser-woflan.h parser-woflan.cc parser-woflan-location.h parser-woflan-position.h parser-woflan-stack.h parser-woflan-lexer.cc parser-woflan-wrapper.h parser-woflan-wrapper.cc \
+    FlexLexer.h \
     pnapi.h pnapi.cc \
     automaton.h automaton.cc\
     component.h component.cc \
@@ -39,43 +40,3 @@ libpnapi_a_SOURCES = \
 # to find customer's config.h header
 libpnapi_a_CPPFLAGS = -I$(top_srcdir)/src
 
-
-EXTRA_DIST =
-BUILT_SOURCES =
-# [CUSTOMER_B_GEN] this line is needed to build a customer Makefile. Do not remove!
-#############################################################################
-# EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
-#############################################################################
-
-#---------------------------------------------------#
-# GENERIC: initialization for other generic targets #
-#---------------------------------------------------#
-MAINTAINERCLEANFILES =
-DISTCLEANFILES =
-
-#--------------------------------------------------------------#
-# GENERIC: organize distribution and cleaning of Bison sources #
-#--------------------------------------------------------------#
-BISON_FILES = $(filter %.yy,$(libpnapi_a_SOURCES))
-# BUILT_SOURCES += $(BISON_FILES:.yy=.cc) # see line below
-BUILT_SOURCES += $(BISON_FILES:.yy=-location.h) # bison hack
-EXTRA_DIST += $(BISON_FILES:.yy=.h)
-EXTRA_DIST += $(BISON_FILES:.yy=.cc)
-EXTRA_DIST += $(BISON_FILES:.yy=-location.h)
-EXTRA_DIST += $(BISON_FILES:.yy=-position.h)
-EXTRA_DIST += $(BISON_FILES:.yy=-stack.h)
-MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
-MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.cc)
-MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-location.h)
-MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-position.h)
-MAINTAINERCLEANFILES += $(BISON_FILES:.yy=-stack.h)
-
-#-------------------------------------------------------------#
-# NOT GENERIC: Hack to fix include directive in bison parsers #
-#                                                             #
-# Bison need to be called this way since GNU Autotools lack   #
-# Bison C++ support.
-#-------------------------------------------------------------#
-%-location.h: %.yy
-	$(AM_V_GEN)./bison-wrapper.sh $(<:.yy=)
-# [CUSTOMER_E_GEN] this line is needed to build a customer Makefile. Do not remove!

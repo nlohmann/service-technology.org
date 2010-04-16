@@ -25,9 +25,6 @@ AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
 
-# using YACC doesn't work, need to call bison this way
-AC_PATH_PROG(BISON, [bison], not found)
-
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_AUTOTEST
@@ -114,7 +111,6 @@ AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  man/Makefile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
-AC_CONFIG_FILES([libs/pnapi/bison-wrapper.sh], [chmod +x libs/pnapi/bison-wrapper.sh])
 AC_OUTPUT
 
 

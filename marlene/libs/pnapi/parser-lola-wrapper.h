@@ -16,7 +16,7 @@
 #ifndef __FLEX_LEXER_H
 // do not include twice in lexer source files
 #define yyFlexLexer LolaFlexLexer
-#include <FlexLexer.h>
+#include "FlexLexer.h"
 #endif /* __FLEX_LEXER_H */
 
 #include "parser.h"

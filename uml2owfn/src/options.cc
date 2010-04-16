@@ -76,6 +76,9 @@ map<possibleOptions, bool> options;
 /// output file formats (set by #parse_command_line)
 map<possibleFormats, bool> formats;
 
+/// decompose process into
+decompositionType decomposeInto;
+
 /// suffixes are defined in parse_command_line();
 map<possibleFormats, string> suffixes;
 
@@ -268,7 +271,7 @@ void parse_command_line(int argc, char* argv[])
 		else {
 			trace(TRACE_ALWAYS, "Unrecognised debug mode: \"" + parameter +"\"!\n");
 			trace(TRACE_ALWAYS, "Use -h to get a list of valid debug modes.\n");
-       			abort(4, "Parameter error");
+      abort(4, "Parameter error");
 		}
 
 	}
@@ -280,26 +283,38 @@ void parse_command_line(int argc, char* argv[])
 		{
 			trace(TRACE_ALWAYS, "Unrecognised reduction mode: \"" + string(args_info.reduce_arg) +"\"!\n");
 			trace(TRACE_ALWAYS, "Define a number between 0 and 6.\n");
-        		abort(4, "Parameter error");
+      abort(4, "Parameter error");
 		}
 
 	}
-	if(args_info.rolecut_given)
-		options[O_ROLECUT] = true;
+	if(args_info.rolecut_given) {
+	  parameter = args_info.rolecut_arg;
+	  if (parameter == "services") {
+	    options[O_ROLECUT] = true;
+	    decomposeInto = CUT_SERVICES;
+	  } else if (parameter == "scenarios") {
+      options[O_ROLECUT] = true;
+      decomposeInto = CUT_SCENARIOS;
+	  } else {
+      trace(TRACE_ALWAYS, "Unrecognised decomposition mode: \"" + string(args_info.rolecut_arg) +"\"!\n");
+      trace(TRACE_ALWAYS, "Use -h to get a list of valid decomposition modes.\n");
+      abort(4, "Parameter error");
+	  }
+
+	}
 
 	if(args_info.roleexclusive_given)
 	{
-	        options[O_ROLECUT] = true;
-	        parameter = args_info.roleexclusive_arg;
-                globals::exclusiveRoles.insert(string(parameter));
+    options[O_ROLECUT] = true;
+    parameter = args_info.roleexclusive_arg;
+    globals::exclusiveRoles.insert(string(parameter));
 	}
 
 	if(args_info.rolecontains_given)
 	{
 		options[O_ROLECUT] = true;
 		parameter = string(args_info.rolecontains_arg);
-      		globals::keepRoles.insert(string(parameter));
-
+    globals::keepRoles.insert(string(parameter));
 	}
 
 	if(args_info.dataInterfaces_given)

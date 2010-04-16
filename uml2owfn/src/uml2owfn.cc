@@ -96,7 +96,7 @@ void analyze_cl(int argc, char *argv[])
 }
 
 /******************************************************************************
- * process translation and model generation method
+ * process translation and model generation methods
  *****************************************************************************/
 
 // translation result flags for handling errors during the translation
@@ -112,175 +112,98 @@ void analyze_cl(int argc, char *argv[])
 #define RES_NOT_PRESERVED     128 ///< did not preserve soundness
 
 /*!
- * \brief translate the process according to the given analysis flags,
- *      calls #write_net_file(), #write_task_file(), #extend_script_file()
+ * \brief translate the process for soundness analysis according to the given
+ *      analysis flags, calls #write_net_file(), #write_task_file(), #extend_script_file()
  *      accordingly
  */
-int translate_process(Process *process, analysis_t analysis, unsigned int reduction_level)
-{
+int translate_process_soundness(pnapi::ExtendedWorkflowNet *PN, Process *process, analysis_t analysis, unsigned int reduction_level) {
+
   int res = RES_OK;
 
-  trace(TRACE_WARNINGS, "\n");
-  trace(TRACE_WARNINGS, "generating Petri net for " + process->getName()+ "\n");
+  // ----------------------------------------------------------------
+  //  step 1) check given structure of the net (for statistics)
+  // ----------------------------------------------------------------
 
-  // Generates a petri net from the current process
-  pnapi::ExtendedWorkflowNet *PN = new pnapi::ExtendedWorkflowNet();   // get a new net
-  process->translateToNet(PN);
+  // check net structure: free choice?
+  trace(TRACE_DEBUG, "-> checking whether net is free-choice\n");
+  set<pnapi::Node *> nonFC = PN->isFreeChoice();
 
-#ifdef DEBUG
-  trace(TRACE_DEBUG, "  -> done\n");
-  trace(TRACE_DEBUG, "  modify net\n");
-#endif
-
-  // Delete places in the net that represent unused pins
-  // of tasks in the business object model
-  if (!globals::parameters[P_KEEP_UNCONN_PINS]) {
-#ifdef DEBUG
-    trace(TRACE_DEBUG, "-> removing unconnected pins\n");
-#endif
-    PN->removeUnconnectedPins();
-    //PN.removeEmptyOutputPinSets();
+  // see if the net contains nodes that violate the free-choice property
+  if (!nonFC.empty()) {
+    res |= RES_NOT_FREECHOICE;
+    string witnessString = "";
+    for (set<pnapi::Node*>::iterator n=nonFC.begin(); n!=nonFC.end(); n++) {
+      witnessString += " '"+(*n)->getName()+"'";
+    }
+    trace(TRACE_WARNINGS, " [INFO] process is not free-choice: transitions"+witnessString+" are not free-choice.\n");
   }
 
-  // if we ware to cut the process by its roles, we now cut the petrinet
-  // according to global parameters
-  if (options[O_ROLECUT]) {
-#ifdef DEBUG
-    trace(TRACE_DEBUG, "  cut net\n");
-#endif
-    //PN->cutByRoles();
-    cerr << "cutting by roles has been disabled in this version" << endl;
+  // ----------------------------------------------------------------
+  //  step 2) extend net to allow soundness analysis, depending on
+  //          the termination semantics
+  // ----------------------------------------------------------------
 
-    if (!PN->isStructurallyCorrect()) {
-      res |= RES_SKIPPED|RES_INCORR_STRUCTURE;
-      delete PN;    // finish Petri net
-      return res;   // do not translate in this case
-    }
+#ifdef DEBUG
+  trace(TRACE_DEBUG, "-> soundness analysis: creating alpha places\n");
+#endif
+  // create proper initial marking
+  PN->soundness_initialPlaces();
+
+  // set termination semantics that will be used for the analysis
+  terminationSemantics_t termination;
+  if (analysis[A_TERM_WF_NET]) termination = TERM_ORJOIN;
+  else if (analysis[A_TERM_IGNORE_DATA]) termination = TERM_IGNORE_DATA;
+  else if (analysis[A_TERM_ORJOIN]) termination = TERM_ORJOIN;
+  else termination = TERM_UML_STANDARD;
+
+  // add livelocks only if not creating a workflow net
+  bool liveLocks = (termination == TERM_WORKFLOW) ? false : true;
+  if (analysis[A_DEADLOCKS]) {
+    // create proper livelocks on the net to check for deadlocks
+#ifdef DEBUG
+    trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for deadlock analysis\n");
+#endif
+    PN->soundness_terminalPlaces(liveLocks, analysis[A_STOP_NODES], termination);
+  }
+  else
+  {
+#ifdef DEBUG
+    trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for general soundness analysis\n");
+#endif
+    PN->soundness_terminalPlaces(liveLocks, analysis[A_STOP_NODES], termination);
   }
 
-  // extend net for soundness checking
-  if (analysis[A_SOUNDNESS]) {
-
-    // check net structure: free choice?
-    trace(TRACE_DEBUG, "-> checking whether net is free-choice\n");
-    set<pnapi::Node *> nonFC = PN->isFreeChoice();
-
-    // see if the net contains nodes that violate the free-choice property
-    if (!nonFC.empty()) {
-      res |= RES_NOT_FREECHOICE;
-      string witnessString = "";
-      for (set<pnapi::Node*>::iterator n=nonFC.begin(); n!=nonFC.end(); n++) {
-        witnessString += " '"+(*n)->getName()+"'";
-      }
-      trace(TRACE_WARNINGS, " [INFO] process is not free-choice: transitions"+witnessString+" are not free-choice.\n");
-    }
-#ifdef DEBUG
-    trace(TRACE_DEBUG, "-> soundness analysis: creating alpha places\n");
-#endif
-
-    // create proper initial marking
-    trace(TRACE_DEBUG, "-> creating initial places\n");
-    PN->soundness_initialPlaces();
-
-    // set termination semantics that will be used for the analysis
-    terminationSemantics_t termination;
-    if (analysis[A_TERM_WF_NET]) termination = TERM_ORJOIN;
-    else if (analysis[A_TERM_IGNORE_DATA]) termination = TERM_IGNORE_DATA;
-    else if (analysis[A_TERM_ORJOIN]) termination = TERM_ORJOIN;
-    else termination = TERM_UML_STANDARD;
-
-    // add livelocks only if not creating a workflow net
-    bool liveLocks = (termination == TERM_WORKFLOW) ? false : true;
-    if (analysis[A_DEADLOCKS]) {
-      // create proper livelocks on the net to check for deadlocks
-#ifdef DEBUG
-      trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for deadlock analysis\n");
-#endif
-      PN->soundness_terminalPlaces(liveLocks, analysis[A_STOP_NODES], termination);
-    }
-    else
-    {
-#ifdef DEBUG
-      trace(TRACE_DEBUG, "-> soundness analysis: creating omega places for general soundness analysis\n");
-#endif
-      PN->soundness_terminalPlaces(liveLocks, analysis[A_STOP_NODES], termination);
-    }
-
-    // we want to analyze workflow nets: create a completion
-    if (analysis[A_TERM_WF_NET]) {
-      if (!PN->complete_to_WFnet_DPE())
-        res |= RES_NOT_PRESERVED;
-    }
-
-  } // soundness
-  // end of all net manipulations (except net reduction)
-
-  // start of checking properties and generating verification formulas and files
-#ifdef DEBUG
-  trace(TRACE_DEBUG, "-> checking whether net is connected2\n");
-#endif
-  //cout << "a" << endl;
-  if (options[O_ROLECUT] && !PN->isConnected()) {
-    //cout << "c" << endl;
-    res |= RES_SKIPPED|RES_UNCONNECTED;
-    trace(TRACE_WARNINGS, " [INFO] process is not connected.\n\n");
-    // TODO: WARNING: the allocated net is not freed to avoid
-    //                a bug with the GCC under Linux and Cygwin
-    //delete PN;    // finish Petri net
-    return res;   // do not translate in this case
+  // we want to analyze workflow nets: create a completion
+  if (analysis[A_TERM_WF_NET]) {
+    if (!PN->complete_to_WFnet_DPE())
+      res |= RES_NOT_PRESERVED;
   }
-  //cout << "d" << endl;
-#ifdef DEBUG
-  //cout << "d2" << endl;
-  //trace(TRACE_DEBUG, "-> done\n");
-  //cout << "d3" << endl;
-#endif
+  // finished extending the Petri net
 
-  //cout << "d4" << endl;
-  if (analysis[A_SOUNDNESS]) {
-    // check net structure: alpha to omega?
-#ifdef DEBUG
-    //trace(TRACE_DEBUG, "-> checking whether each node is on a path from alpha to omega\n");
-#endif
-    //cout << "e" << endl;
-    pnapi::Node* ll_node = NULL;
-    //cout << "f" << endl;
-    ll_node = PN->isPathCovered();
-    //cout << "g" << endl;
-    if (ll_node != NULL){
-      res |= RES_NO_WF_STRUCTURE;
-      //cout << "h" << endl;
-      trace(TRACE_WARNINGS, " [INFO] process has no workflow-structure: node " + ll_node->getName() + " is not on alpha-omega path\n.");
-    }
-    //cout << "i" << endl;
 
-    if (res != RES_OK) {
-      // the net either is not a free-choice net or has no WF-structure,
-      // cannot use deadlock analysis to decide soundness
-      analysis[A_DEADLOCKS] = false;
-    }
-  } else {
-    // not analyzing soundness
-    if (options[O_ROLECUT] && globals::deriveRolesToCut) {
-      // we want to automatically find interesting services from
-      // role information in choreographies
-      if ( globals::filterCharacteristics[PC_TRIVIAL_INTERFACE]
-           && ((PN->inputSize() <= 1 && PN->outputSize() <= 1)
-               || PN->inputSize() == 0
-               || PN->outputSize() == 0))
-      {
-        // but the current process has no interesting interface, and we are
-        // filtering
-        res |= RES_SKIPPED|RES_INSUFF_INTERFACE;
-        // TODO: WARNING: the allocated net is not freed to avoid
-        //                a bug with the GCC under Linux and Cygwin
-        //delete PN;    // finish Petri net
-        return res;
-      }
-    }
+  // ----------------------------------------------------------------
+  //  step 3) check extended net for errors
+  // ----------------------------------------------------------------
+  // alpha to omega?
+#ifdef DEBUG
+    trace(TRACE_DEBUG, "-> soundness analysis: checking whether each node is on a path from alpha to omega\n");
+#endif
+  pnapi::Node* ll_node = NULL;
+  ll_node = PN->isPathCovered();
+  if (ll_node != NULL){
+    res |= RES_NO_WF_STRUCTURE;
+    trace(TRACE_WARNINGS, " [INFO] process has no workflow-structure: node " + ll_node->getName() + " is not on alpha-omega path\n.");
   }
 
-  // perform structural reduction
+  if (res != RES_OK) {
+    // the net either is not a free-choice net or has no WF-structure,
+    // cannot use deadlock analysis to decide soundness
+    analysis[A_DEADLOCKS] = false;
+  }
+
+  // ----------------------------------------------------------------
+  //  step 4) structurally reduce the resulting Petri net
+  // ----------------------------------------------------------------
   if (reduction_level > 0) {
     trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
     PN->reduce(globals::reduction_level);
@@ -289,14 +212,16 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
     if (PN->getInternalPlaces().size() == 0) {
       cerr << process->getName() << " retrying (reason: empty process)." << endl;
       cerr << pnapi::io::stat << PN << endl;
-      // TODO: WARNING: the allocated net is not freed to avoid
-      //                a bug with the GCC under Linux and Cygwin
-      //delete PN;    // finish Petri net
       return RES_SKIPPED|RES_EMPTY_PROCESS;
     }
   }
 
-  // finished Petri net creation and manipulation, generate analysis files and scripts
+
+  // ----------------------------------------------------------------
+  //  step 5) generate temporal logic properties for checking
+  //          soundness, depending on analysis
+  // ----------------------------------------------------------------
+
   if (analysis[A_SOUNDNESS] && !analysis[A_DEADLOCKS]) {
     // generate formula that specifies the final state
     /*
@@ -320,6 +245,11 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
       // this field is evaluated when writing the task and script files
       analysis[A_SAFE] = false;
   }
+
+  // ----------------------------------------------------------------
+  //  step 6) write Petri net and temporal logic properties to
+  //          corresponding files and generate a script file entry
+  // ----------------------------------------------------------------
 
   cerr << process->getName() << "." << endl;
 
@@ -347,10 +277,181 @@ int translate_process(Process *process, analysis_t analysis, unsigned int reduct
     safeStateFormula = NULL;
   }
 
-// TODO: WARNING: the allocated net is not freed to avoid
-//                a bug with the GCC under Linux and Cygwin
-//  delete PN;    // finish Petri net
-//  PN = NULL;
+  return res;
+}
+
+/*!
+ * \brief translate the process for decomposition according to the decomposition
+ *      parameters, calls #write_net_file() accordingly
+ */
+int translate_process_decomposition(pnapi::ExtendedWorkflowNet *PN, Process *process, analysis_t analysis, unsigned int reduction_level) {
+
+  int res = RES_OK;
+
+#ifdef DEBUG
+    trace(TRACE_DEBUG, "  cut net\n");
+#endif
+    //PN->cutByRoles();
+    cerr << "cutting by roles has been disabled in this version" << endl;
+
+    if (!PN->isStructurallyCorrect()) {
+      res |= RES_SKIPPED|RES_INCORR_STRUCTURE;
+      return res;   // do not translate in this case
+    }
+
+    if (globals::deriveRolesToCut) {
+      // we want to automatically find interesting services from
+      // role information in choreographies
+      if ( globals::filterCharacteristics[PC_TRIVIAL_INTERFACE]
+           && ((PN->inputSize() <= 1 && PN->outputSize() <= 1)
+               || PN->inputSize() == 0
+               || PN->outputSize() == 0))
+      {
+        // but the current process has no interesting interface, and we are
+        // filtering
+        res |= RES_SKIPPED|RES_INSUFF_INTERFACE;
+        return res;
+      }
+    }
+
+    // start of checking properties and generating verification formulas and files
+  #ifdef DEBUG
+    trace(TRACE_DEBUG, "-> decomposition: checking whether net is connected\n");
+  #endif
+    if (!PN->isConnected()) {
+      res |= RES_SKIPPED|RES_UNCONNECTED;
+      trace(TRACE_WARNINGS, " [INFO] process is not connected.\n\n");
+      return res;   // do not translate in this case
+    }
+
+    // perform structural reduction
+    if (reduction_level > 0) {
+      trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
+      PN->reduce(globals::reduction_level);
+
+      // check whether net reduction created an empty net
+      if (PN->getInternalPlaces().size() == 0) {
+        cerr << process->getName() << " retrying (reason: empty process)." << endl;
+        cerr << pnapi::io::stat << PN << endl;
+        return RES_SKIPPED|RES_EMPTY_PROCESS;
+      }
+    }
+
+    cerr << process->getName() << "." << endl;
+
+    // extend output file name suffix if necessary
+
+    // the local reduction level is less than the global reduction level set
+    // at the commandline
+    if (reduction_level < globals::reduction_level) {
+      // if we work with the unreduced net, extend the file name
+      globals::output_filename_suffix += ".unreduced";
+    }
+
+    // generate the output for the given process
+    globals::currentProcessName = process->getName();  // for comments about origin in generated net files
+    write_net_file(PN, analysis); // write out current process and further related files
+
+    return res;
+}
+
+/*!
+ * \brief translate the process for decomposition according to the decomposition
+ *      parameters, calls #write_net_file() accordingly
+ */
+int translate_process_normal(pnapi::ExtendedWorkflowNet *PN, Process *process, analysis_t analysis, unsigned int reduction_level) {
+
+  int res = RES_OK;
+
+  // ----------------------------------------------------------------
+  //  step 1) structurally reduce the resulting Petri net
+  // ----------------------------------------------------------------
+  if (reduction_level > 0) {
+    trace(TRACE_INFORMATION, "-> Structurally simplifying Petri Net ...\n");
+    PN->reduce(globals::reduction_level);
+
+    // check whether net reduction created an empty net
+    if (PN->getInternalPlaces().size() == 0) {
+      cerr << process->getName() << " retrying (reason: empty process)." << endl;
+      cerr << pnapi::io::stat << PN << endl;
+      return RES_SKIPPED|RES_EMPTY_PROCESS;
+    }
+  }
+
+  // ----------------------------------------------------------------
+  //  step 2) write Petri net to corresponding files
+  // ----------------------------------------------------------------
+  cerr << process->getName() << "." << endl;
+
+  // extend output file name suffix if necessary
+
+  // the local reduction level is less than the global reduction level set
+  // at the commandline
+  if (reduction_level < globals::reduction_level) {
+    // if we work with the unreduced net, extend the file name
+    globals::output_filename_suffix += ".unreduced";
+  }
+
+  // generate the output for the given process
+  globals::currentProcessName = process->getName();  // for comments about origin in generated net files
+  write_net_file(PN, analysis); // write out current process and further related files
+
+  return res;
+}
+
+
+/*!
+ * \brief translate the process according to the given analysis flags,
+ *      calls #write_net_file(), #write_task_file(), #extend_script_file()
+ *      accordingly
+ */
+int translate_process(Process *process, analysis_t analysis, unsigned int reduction_level)
+{
+  int res = RES_OK;
+
+  trace(TRACE_WARNINGS, "\n");
+  trace(TRACE_WARNINGS, "generating Petri net for " + process->getName()+ "\n");
+
+  // Generates a petri net from the current process
+  pnapi::ExtendedWorkflowNet *PN = new pnapi::ExtendedWorkflowNet();   // get a new net
+  process->translateToNet(PN);
+#ifdef DEBUG
+  trace(TRACE_DEBUG, "  -> done\n");
+  trace(TRACE_DEBUG, "  modify net\n");
+#endif
+
+  // Fix some errors in the net due to invalid input models.
+  // Delete places in the net that represent unused pins
+  // of tasks in the business object model
+  if (!globals::parameters[P_KEEP_UNCONN_PINS]) {
+#ifdef DEBUG
+    trace(TRACE_DEBUG, "-> removing unconnected pins\n");
+#endif
+    PN->removeUnconnectedPins();
+    //PN.removeEmptyOutputPinSets();
+  }
+
+  // if we ware to cut the process by its roles, we now cut the petrinet
+  // according to global parameters
+  if (options[O_ROLECUT]) {
+  }
+
+  if (analysis[A_SOUNDNESS]) {
+    // extend net for soundness checking and write net to file,
+    // generate analysis tasks if applicable
+    res |= translate_process_soundness(PN, process, analysis, reduction_level);
+  } else if (options[O_ROLECUT]) {
+    // decompose net and write to net file(s)
+    res |= translate_process_decomposition(PN, process, analysis, reduction_level);
+  } else {
+    // just write the translated net to files
+    res |= translate_process_normal(PN, process, analysis, reduction_level);
+  }
+
+  // TODO: WARNING: the allocated net is not freed to avoid
+  //                a bug with the GCC under Linux and Cygwin
+  //  delete PN;    // finish Petri net
+  //  PN = NULL;
 
   return res;
 }

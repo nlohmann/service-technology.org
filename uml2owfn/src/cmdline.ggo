@@ -58,7 +58,9 @@ optional
 
 option "rolecut" R
 "cuts away all swimlanes in a process that do not contain a startnode"
-flag off
+values="services", "scenarios"
+typestr="ROLECUT-TYPE"
+optional
 
 option "roleexclusive" e
 "cuts away all swimlanes in a process that do not contain a startnode or don't have exactly the exclusive role"

@@ -87,7 +87,7 @@ typedef enum
    O_DEBUG,		    ///< set the debug level
    O_REDUCTION,   ///< set level of structural reduction
    O_ANALYSIS,      ///< set the analysis task
-   O_ROLECUT,      	///< automatically cut away all roles without start nodes
+   O_ROLECUT,      	///< decompose process wrt. role information
    O_ROLEEXCLUSIVE,	///< cut away all roles matching exactly a given string
    O_ROLECONTAINS,  ///< cut away all roles containing a given string
    O_SKIP_BY_FILTER, ///< filter processes according to processCharacteristics
@@ -154,6 +154,13 @@ typedef enum
   PC_UNCONNECTED,       ///< unconnected process
   PC_TRIVIAL_INTERFACE  ///< process has a trivial interface
 } processCharacteristics;
+
+typedef enum
+{
+  CUT_NONE,       ///< do not decompose
+  CUT_SERVICES,   ///< cut into services with interface
+  CUT_SCENARIOS   ///< cut into connected scenarios
+} decompositionType;
 
 /******************************************************************************
  * External functions

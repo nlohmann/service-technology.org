@@ -226,7 +226,7 @@ public class DNodeBP {
 		// the pre-event of newNode has just been added to the branching process
 		DNode preNew = getPreEvent(newNode);
 		
-		//System.out.println("newNode = "+newNode+", °newNode = "+preNew);
+		//System.out.println("newNode = "+newNode+", "newNode = "+preNew);
 		
 		//HashSet<CNode> coset = new HashSet<CNode>();
 		Set<DNode> coset = co.get(newNode);

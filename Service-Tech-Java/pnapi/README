@@ -1,0 +1,40 @@
+
+       ____      _        _   _   _      _        _    ____ ___     _  _
+      |  _ \ ___| |_ _ __(_) | \ | | ___| |_     / \  |  _ \_ _|   / /| |
+      | |_) / _ \ __| '__| | |  \| |/ _ \ __|   / _ \ | |_) | |   / / | |
+      |  __/  __/ |_| |  | | | |\  |  __/ |_   / ___ \|  __/| |  / / _| |
+      |_|   \___|\__|_|  |_| |_| \_|\___|\__| /_/   \_\_|  |___|/_/ (___|
+              encapsulating Petri net-related functions in a Java API
+                        http://service-technology.org/pnapi
+
+                        
+COPYRIGHT
+    Copyright (C) 2010       Dirk Fahland
+
+
+AUTHORS
+    The Petri Net API/Java is written by Dirk Fahland, based on the
+    Petri net API/C++ written by Stephan Mennicke, Christian Sura, and
+    Robert Waltemath. See file "AUTHORS" for more information.
+
+LICENSE
+    License LGPLv3+: GNU Lesser General Public License version 3 or later
+    <http://www.gnu.org/licenses/lgpl.html>
+
+    The Petri Net API/Java is free software: you are free to change and
+    redistribute it. There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of the Petri Net API/Java.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION
+
+    The Petri Net API/Java uses some generated code. If you want to make
+    changes to the source code, you might need the following tools to
+    regenerate the code:
+     * ANTLR (www.antlr.org), put antlr-3.2.jar into ./libs-build/
+
+
+DOCUMENTATION

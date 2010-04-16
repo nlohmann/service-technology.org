@@ -1,0 +1,27 @@
+PLACE
+    p1, p2;
+    SAFE : p3, p4;
+    SAFE 3 : p5, p6;
+
+MARKING
+	p1 : 1, p3 : 4;
+	
+TRANSITION t1
+CONSUME
+	p1 : 1;
+PRODUCE
+	p2 : 2;
+	
+TRANSITION t2
+CONSUME
+	p1 : 1,
+	p4 : 99;
+PRODUCE
+	p2 : 2,
+	p17 : 1;
+	
+TRANSITION t3
+CONSUME
+	;
+PRODUCE
+	;

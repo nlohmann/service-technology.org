@@ -1,0 +1,76 @@
+<project default="pre-build">
+	
+	<!-- the pre-build hook, add here all dependencies and steps to be
+	     carried out before executing the project build task -->
+	
+	<target name="pre-build" depends="parser_lola,parser_owfn">
+	</target>
+	
+	<target name="pre-svn-clean" depends="parser_clean">
+	</target>
+
+	<fileset dir="${home}" id="distfiles.includes">
+	    <include name="src/hub/top/petrinet/LoLA.g"/>
+		<include name="src/hub/top/petrinet/OWFN.g"/>
+	</fileset>
+
+	<!-- generate LoLA parser files -->
+	<target name="parser_lola.dependencies" 
+			description="Check dependencies for generating Java class files from ANTLR parser description.">
+	    <condition property="updateParser_lola.notRequired">
+	        <and>
+	    		<uptodate
+	    			targetfile="./src/hub/top/petrinet/LoLALexer.java"
+	    			srcfile="./src/hub/top/petrinet/LoLA.g" />
+	    		<uptodate
+	    			targetfile="./src/hub/top/petrinet/LoLAParser.java"
+	    			srcfile="./src/hub/top/petrinet/LoLA.g" />
+	        </and>
+	    </condition>
+	</target>
+	<target name="parser_lola" depends="parser_lola.dependencies" unless="updateParser_lola.notRequired"
+			description="Generate Java class files from ANTLR parser description.">
+		<echo message="Generating parser sources in ${home}..." />
+		<java classpath="libs-build/antlr-3.2.jar" classname="org.antlr.Tool">
+			<arg path="./src/hub/top/petrinet/LoLA.g"/>
+		</java>
+	</target>
+	
+	<!-- generate oWFN parser files -->
+	<target name="parser_owfn.dependencies" 
+			description="Check dependencies for generating Java class files from ANTLR parser description.">
+	    <condition property="updateParser_owfn.notRequired">
+	        <and>
+	    		<uptodate
+	    			targetfile="./src/hub/top/petrinet/OWFNLexer.java"
+	    			srcfile="./src/hub/top/petrinet/OWFN.g" />
+	    		<uptodate
+	    			targetfile="./src/hub/top/petrinet/OWFNParser.java"
+	    			srcfile="./src/hub/top/petrinet/OWFN.g" />
+	        </and>
+	    </condition>
+	</target>
+	<target name="parser_owfn" depends="parser_owfn.dependencies" unless="updateParser_owfn.notRequired"
+			description="Generate Java class files from ANTLR parser description.">
+		<echo message="Generating parser sources in ${home}..." />
+		<java classpath="libs-build/antlr-3.2.jar" classname="org.antlr.Tool">
+			<arg path="./src/hub/top/petrinet/OWFN.g"/>
+		</java>
+	</target>
+	
+	<!-- clean parser files -->
+	<target name="parser_clean">
+		<delete failonerror="false">
+			<fileset dir="${home}">
+				<include name="*.tokens"/>
+				<!--
+				<include name="src/**/LoLALexer.java"/>
+				<include name="src/**/LoLAParser.java"/>
+				<include name="src/**/OWFNLexer.java"/>
+				<include name="src/**/OWFNParser.java"/>
+				-->
+			</fileset>
+		</delete>
+	</target>
+	
+</project>

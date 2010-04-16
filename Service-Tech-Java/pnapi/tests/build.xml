@@ -1,0 +1,41 @@
+<project name="uma.test" default="check">
+	
+	<!-- retrieve basedir of this check script -->
+	<dirname property="test.basedir" file="${ant.file.uma.test}" />
+	
+	<property name="home" location=".." />
+	<property name="bin" location="${home}/bin" />
+	
+	<property name="testfiles" location="${test.basedir}/testfiles" />
+	
+	<property name="compiled.classes" location="${bin}" />
+	<property name="test.libs-external" location="${home}/libs-external/" />
+	
+	<path id="run.classpath">
+		<pathelement location="${compiled.classes}"/>
+      	<fileset dir="${test.libs-external}">
+        	<include name="**/*.jar"/>
+      	</fileset>
+	</path>
+	
+	<target name="check">
+		<echo message="Running tests in ${test.basedir}" />
+		<java classname="hub.top.petrinet.PetriNetIO" output="${testfiles}/test_input.lola.log" >
+			<classpath refid="run.classpath" />
+			<arg value="${testfiles}/test_input.lola"/>
+		</java>
+		<java classname="hub.top.petrinet.PetriNetIO" output="${testfiles}/phils.lola.log">
+			<classpath refid="run.classpath" />
+			<arg value="${testfiles}/phils.lola"/>
+		</java>
+		<java classname="hub.top.petrinet.PetriNetIO" output="${testfiles}/coffeeMachine_sound.owfn.log">
+			<classpath refid="run.classpath" />
+			<arg value="${testfiles}/coffeeMachine_sound.owfn"/>
+		</java>
+		<java classname="hub.top.petrinet.PetriNetIO" output="${testfiles}/coffeeMachine_unsound.owfn.log">
+			<classpath refid="run.classpath" />
+			<arg value="${testfiles}/coffeeMachine_unsound.owfn"/>
+		</java>
+	</target>
+	
+</project>

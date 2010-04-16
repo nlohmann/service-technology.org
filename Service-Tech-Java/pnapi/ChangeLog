@@ -1,0 +1,6 @@
+Petri Net API/Java v.1.0.0
+--------------------------
+
++ created basic Petri Net API function
++ created basic parser for reading Petri nets in LoLA format
++ created basic Petri net output in Graphviz DOT format

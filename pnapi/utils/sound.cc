@@ -4,6 +4,7 @@
 #include "verbose.h"
 
 using namespace pnapi;
+using pnapi::io::util::operator<<; // to output final conditions
 
 int main(int argc, char** argv) {
     PetriNet net;
@@ -11,17 +12,14 @@ int main(int argc, char** argv) {
     {
         std::ifstream i;
         i.open(argv[1], std::ios_base::in);
-
-//        try {
-//            i >> pnapi::io::owfn >> net;
-//        } catch(pnapi::exception::InputError e) {
-//            i.seekg(0, std::ios::beg);
-            i >> pnapi::io::lola >> net;
-//        }
+        i >> pnapi::io::owfn >> net;
+        std::ofstream o;
+        o.open((std::string(argv[1]) + ".lola").c_str(), std::ios_base::trunc);
+        o << pnapi::io::lola << net;
     }
 
     std::cout << ".PHONY : clean\n\n";
-    std::cout << "net = " << argv[1] << "\n";
+    std::cout << "net = " << argv[1] << ".lola\n";
     std::cout << "transitions = ";
     PNAPI_FOREACH(t, net.getTransitions()) {
          std::cout << (*t)->getName() << " ";
@@ -30,13 +28,14 @@ int main(int argc, char** argv) {
     PNAPI_FOREACH(p, net.getPlaces()) {
          std::cout << (*p)->getName() << " ";
     }
-    std::cout << "\n\n";
+    std::cout << "\nfinal = \"" << pnapi::io::lola << net.getFinalCondition() << "\"\n\n";
 
     // display help
     std::cout << "all:\n\t@echo \"Valid targets are quasiliveness, boundedness, and clean.\"\n\n";
 
     // check 1: quasi-liveness
-    std::cout << "quasiliveness: $(transitions:%=%.quasiliveness.result)\n\n";
+    std::cout << "quasiliveness: $(transitions:%=%.quasiliveness.result)\n";
+    std::cout << "-@grep -L "RESULT: 0" *.quasiliveness.result | tr '\n' ',' | sed 's/.$$//' | sed 's/,/, /g'\n";
     std::cout << "%.quasiliveness.result:\n";
     std::cout << "\t@echo \"ANALYSE TRANSITION $(@:%.quasiliveness.result=%)\" > $(@:%.result=%.task)\n";
     std::cout << "\t-@lola-deadtransition $(net) -a$(@:%.result=%.task) &> $@ ; echo \"RESULT: $$?\" >> $@\n\n";

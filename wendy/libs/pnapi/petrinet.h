@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: georgstraube $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-03-14 13:44:15 +0100 (Sun, 14 Mar 2010) $
+ * \date    $Date: 2010-04-07 18:06:20 +0200 (Wed, 07 Apr 2010) $
  *
- * \version $Revision: 5513 $
+ * \version $Revision: 5601 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -381,6 +381,9 @@ public: /* public methods */
   void deleteTransition(Transition &);
   /// deletes an arc
   void deleteArc(Arc &);
+
+  /// renames nodes
+  void canonicalNames();
   //@}
 
 

@@ -1494,14 +1494,21 @@ std::ostream & output(std::ostream & os, const Edge & e)
 /*************************************************************************
  ***** Woflan output
  *************************************************************************/
-
-/*!
- * \brief writes output type to stream 
- */
+/*
 std::ostream & woflan(std::ostream & os)
 {
   util::FormatData::data(os) = util::WOFLAN;
   return os;
+}
+*/
+
+/*!
+ * \brief writes output type to stream 
+ */
+std::ios_base & woflan(std::ios_base & ios)
+{
+  util::FormatData::data(ios) = util::WOFLAN;
+  return ios;
 }
 
 namespace __woflan

@@ -65,8 +65,7 @@ std::istream & operator>>(std::istream & is, PetriNet & net) throw (exception::I
   {
   case util::OWFN:
   {
-    parser::owfn::Parser parser;
-    net = parser.parse(is);
+    net = parser::owfn::parse(is);
 
     net.meta_ = util::MetaData::data(is);
     break;
@@ -74,8 +73,7 @@ std::istream & operator>>(std::istream & is, PetriNet & net) throw (exception::I
 
   case util::PNML:
   {
-    parser::pnml::Parser parser;
-    net = parser.parse(is);
+    net = parser::pnml::parse(is);
 
     net.meta_ = util::MetaData::data(is);
     break;
@@ -83,8 +81,15 @@ std::istream & operator>>(std::istream & is, PetriNet & net) throw (exception::I
 
   case util::LOLA:
   {
-    parser::lola::Parser parser;
-    net = parser.parse(is);
+    net = parser::lola::parse(is);
+
+    net.meta_ = util::MetaData::data(is);
+    break;
+  }
+
+  case util::WOFLAN:
+  {
+    net = parser::woflan::parse(is);
 
     net.meta_ = util::MetaData::data(is);
     break;
@@ -126,8 +131,7 @@ std::istream & operator>>(std::istream &is, Automaton &sa)
   {
   case util::SA:
   {
-    parser::sa::Parser parser;
-    sa = parser.parse(is);
+    sa = parser::sa::parse(is);
     break;
   }
   default: assert(false); /* unsupported format */
@@ -208,6 +212,7 @@ std::ostream & operator<<(std::ostream & os, const Interface & i)
   case DOT:  return __dot::output(os, i);
   case OWFN: return __owfn::output(os, i);
   case PNML: return __pnml::output(os, i);
+  
 
   default: assert(false);
   }

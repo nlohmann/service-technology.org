@@ -11,7 +11,7 @@
 
 #include "automaton.h"
 #include "Output.h"
-#include "parser.h"
+#include "parser-pn-wrapper.h"
 #include "util.h"
 
 #include <fstream>
@@ -267,18 +267,18 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
   ifstream ifs(pnFileName.c_str(), ifstream::in);
   assert(ifs.good());
 
-  parser::pn::Parser parser;
-  parser.parse(ifs);
+  parser::pn::Parser myParser;
+  myParser.parse(ifs);
   ifs.close();
 
   // create places
-  PNAPI_FOREACH(p, parser::pn::places_)
+  PNAPI_FOREACH(p, myParser.places_)
   {
-    createPlace(*p, parser::pn::initialMarked_[*p]);
+    createPlace(*p, myParser.initialMarked_[*p]);
   }
 
   // create interface labels out of dummy transitions
-  PNAPI_FOREACH(t, parser::pn::interface_)
+  PNAPI_FOREACH(t, myParser.interface_)
   {
     string remapped = remap(*t, edgeLabels);
 
@@ -315,7 +315,7 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
   }
 
   // create transitions
-  PNAPI_FOREACH(t, parser::pn::transitions_)
+  PNAPI_FOREACH(t, myParser.transitions_)
   {
     string remapped = remap(*t, edgeLabels);
 
@@ -360,7 +360,7 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
       }
 
       // create arcs t->p
-      map<string, unsigned int> & tmpPlaceNameMap = parser::pn::arcs_[*t];
+      map<string, unsigned int> & tmpPlaceNameMap = myParser.arcs_[*t];
       PNAPI_FOREACH(p, tmpPlaceNameMap)
       {
         createArc(*transition, *findPlace(p->first), p->second);
@@ -373,9 +373,9 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
   // Create a map of string sets for final condition creation.
   map<string, set<string> > finalCondMap;
 
-  PNAPI_FOREACH(p, parser::pn::places_)
+  PNAPI_FOREACH(p, myParser.places_)
   {
-    PNAPI_FOREACH(t, parser::pn::arcs_[*p])
+    PNAPI_FOREACH(t, myParser.arcs_[*p])
     {
       string transitionName = remap(t->first, edgeLabels);
 

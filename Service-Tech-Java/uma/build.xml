@@ -208,5 +208,10 @@
 			<filename name="${home}/${build.target}.jar"/>
 		</delete>
 	</target>
+	
+	<!-- clean all files that have been generated -->
+	<target name="svn-clean" depends="clean"
+			description="Remove all generated files and set directory back to situation in the repository.">
+	</target>
 
 </project>

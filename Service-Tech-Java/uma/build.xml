@@ -1,4 +1,4 @@
-<project name="uma" default="build">
+<project name="uma" default="all">
 	
 	<!--
 	
@@ -7,8 +7,8 @@
 	     
 	     Ant targets:
 	     
-	     - build: compile Java classes
-	     - build-jar: packaged compiled classes into Java Archive (JAR) and
+	     - all: compile Java classes
+	     - jar: packaged compiled classes into Java Archive (JAR) and
 	                  generate necessary meta-data information
 	                  
          - dist: create restributable source archive including all source files,
@@ -53,6 +53,9 @@
 
 	<import file="build.am.xml"  />
 	
+	<!-- default target all -->
+	<target name="all" depends="build" description="Build ${build.name}" />
+	
 	<!-- compile -->
 	<target name="build" depends="pre-build"
 			description="Build ${build.name} classes.">
@@ -72,7 +75,7 @@
 	</target>
 	
 	<!-- build jar file of this package -->
-	<target name="build-jar" depends="build"
+	<target name="jar" depends="build"
 			description="Create Java Archive (JAR) of ${build.name}.">
 		<!-- create temporary build directory and copy files -->
 		<echo message="Copying all files to build directory ${builddir}/" />
@@ -152,7 +155,7 @@
 	</target>
 	
 	<!-- build binary distribution file of this package -->
-	<target name="dist-bin" depends="build-jar"
+	<target name="dist-bin" depends="jar"
 			description="Create binary distribution .zip of ${build.name}.">
 		
 		<mkdir dir="${distbindir}/${libs}" />
@@ -171,7 +174,7 @@
 	</target>
 	
 	<!-- build jar file and run test cases on the distributable -->
-	<target name="jarcheck" depends="build-jar"
+	<target name="jarcheck" depends="jar"
 			description="Run test cases for the Java Archive of ${build.name}.">
 		<antcall target="check">
 			<param name="compiled.classes" value="${builddir}/${build.target}.jar"/>

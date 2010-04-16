@@ -1450,7 +1450,7 @@ public class DNodeBP {
 	 */
 	public void minimize() {
 
-	  System.out.println("minimize()");
+	  //System.out.println("minimize()");
 	  
 	  // run a breadth-first search from the maximal nodes of the branching
 	  // process to its initial nodes, for each node that has no equivalent
@@ -1478,7 +1478,7 @@ public class DNodeBP {
 	          // d0 also has no equivalent node, e.g. is not a cut-off node
 	          // then d and d0 are equivalent
 	          
-	          System.out.println(d+" --> "+d_img+" (max nodes)");
+	          //System.out.println(d+" --> "+d_img+" (max nodes)");
 	          elementary_ccPair.put(d, d_img);
 	          d.isCutOff = true;
 	        }
@@ -1511,13 +1511,13 @@ public class DNodeBP {
 
 	      // find the predecessor of the image of 'd's first successor  that has
 	      // same id (name) as DNode 'd', this predecessor should be 'd_img'
-	      System.out.print("checking 0: "+dPost_img[0]+"...");
+	      //System.out.print("checking 0: "+dPost_img[0]+"...");
 	      for (int j=0; j<dPost_img[0].pre.length; j++)
 	        if (dPost_img[0].pre[j].id == d.id) {
 	          d_img = dPost_img[0].pre[j];
 	          break;
 	        }
-	      System.out.println(" found "+d_img);
+	      //System.out.println(" found "+d_img);
 	      
 	      // the image of the first successor of 'd' has no predecessor with
 	      // the same id as 'd', there is no node we can make equivalent to 'd'
@@ -1537,7 +1537,7 @@ public class DNodeBP {
   	        for (int j=0; j<dPost_img[i].pre.length; j++) {
   	          if (dPost_img[i].pre[j] == d_img) {
   	            // the i-th successor has 'd_img' as predecessor
-  	            System.out.println(" found again");
+  	            //System.out.println(" found again");
   	            foundPreFor_i = true; break; 
   	          }
   	        }
@@ -1553,7 +1553,7 @@ public class DNodeBP {
 	      if (notFound)
 	        continue;  // no match :(
 	      
-	      System.out.println(d+" --> "+d_img+" (successor)");
+	      //System.out.println(d+" --> "+d_img+" (successor)");
 	      elementary_ccPair.put(d, d_img);
 	      d.isCutOff = true;
 	      // extended equivalence relation by 'd' ~ 'd_img' 

@@ -118,9 +118,7 @@
 		</copy>
 		<!-- include all additional files defined in the configuration file -->
 		<copy todir="${dir.distdir}">
-			<fileset dir="${home}">
-				<include name="${distfiles.includes}" />
-			</fileset>
+			<fileset refid="distfiles.includes" />
 		</copy>
 		<!-- include the standard files of the distribution -->
 		<copy todir="${dir.distdir}">
@@ -214,7 +212,7 @@
 	</target>
 	
 	<!-- clean all files that have been generated -->
-	<target name="svn-clean" depends="clean"
+	<target name="svn-clean" depends="clean,pre-svn-clean"
 			description="Remove all generated files and set directory back to situation in the repository.">
 		<delete failonerror="false">
 			<fileset dir="${home}">

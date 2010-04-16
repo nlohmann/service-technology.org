@@ -5,5 +5,12 @@
 	
 	<target name="pre-build">
 	</target>
+	
+	<target name="pre-svn-clean">
+	</target>
+	
+	<fileset dir="${home}" id="distfiles.includes">
+		<include name="README"/>
+	</fileset>
 
 </project>

@@ -56,7 +56,7 @@ includedir = @includedir@/pnapi
 include_HEADERS = $(filter %.h,$(libpnapi_la_SOURCES))
 
 EXTRA_DIST = Makefile.am.customer FlexLexer.h
-BUILT_SOURCES = Makefile.am.customer FlexLexer.h
+BUILT_SOURCES = Makefile.am.customer
 
 # [CUSTOMER_B_GEN] this line is needed to build a customer Makefile. Do not remove!
 #############################################################################

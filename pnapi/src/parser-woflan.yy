@@ -92,6 +92,7 @@ place:
   {
     parser_.check(parser_.places_[$2] == NULL, "node name already used");
     parser_.places_[$2] = &(parser_.net_.createPlace($2, 0, 0));
+    free($2);
   }
 | KEY_PLACE IDENT KEY_INIT NUMBER
   {
@@ -99,6 +100,7 @@ place:
     parser_.places_[$2] = &(parser_.net_.createPlace($2, 0, 0));
     Place * p = parser_.places_[$2];
     p->setTokenCount($4);
+    free($2);
   }
 ;
 
@@ -108,6 +110,7 @@ transition:
     parser_.check(!(parser_.net_.containsNode($2)), "node name already used");
     parser_.transition_ = &(parser_.net_.createTransition($2)); 
     parser_.transName = $2;
+    free($2);
   }
 | KEY_TRANSITION { parser_.needLabel = true; }
 ;
@@ -124,6 +127,7 @@ label:
       parser_.check(!(parser_.net_.containsNode($2)), "node name already used");
     }
     parser_.transition_->setName($2); 
+    free($2);
   }
 ;
 
@@ -167,6 +171,7 @@ arc:
     {
       parser_.net_.createArc(**(parser_.source_), **(parser_.target_), 1);
     }
+    free($1);
   }
 ;
 

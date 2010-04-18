@@ -43,6 +43,7 @@ AC_PATH_PROGS(MAKE, [gmake make], not found)
 AC_PATH_PROGS(FIONA, [fiona], not found)
 AC_PATH_PROGS(HEAD, [head], not found)
 AC_PATH_PROGS(TAIL, [tail], not found)
+AC_PATH_PROGS(VALGRIND, [valgrind], not found)
 
 #############################################################################
 # search for Dot, Petrify, and Genet and write results to file "src/config.h"

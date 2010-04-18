@@ -83,6 +83,7 @@ AT_CHECK([GREP -q "|P|= 61  |P_in|= 0  |P_out|= 0  |T|= 60  |F|= 140" stderr])
 AT_KEYWORDS([frontend input pnml])
 AT_CLEANUP
 
+
 ############################################################################
 AT_BANNER([Output])
 ############################################################################
@@ -184,6 +185,89 @@ AT_CLEANUP
 
 
 ############################################################################
+AT_BANNER([oWFN Syntax])
+############################################################################
+
+AT_SETUP([Syntax Example 1])
+m4_define([NET], [syntax_example.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([syntax])
+AT_CLEANUP
+
+AT_SETUP([Syntax Example 2])
+m4_define([NET], [syntax_example_new.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([syntax])
+AT_CLEANUP
+
+AT_SETUP([Syntax Example 3])
+m4_define([NET], [syntax_example_new_short.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([syntax])
+AT_CLEANUP
+
+AT_SETUP([Syntax Formula])
+m4_define([NET], [syntax_formula.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([syntax])
+AT_CLEANUP
+
+AT_SETUP([Syntax Maximum Occurrence])
+m4_define([NET], [syntax_max_occurrence.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([syntax])
+AT_CLEANUP
+
+AT_SETUP([Reading open net (parser/lexer test)])
+m4_define([NET], [syntax_example1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading open net (parser/lexer test)])
+m4_define([NET], [syntax_example2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading open net (parser/lexer test)])
+m4_define([NET], [syntax_example3.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading open net (parser/lexer test)])
+m4_define([NET], [syntax_example4.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading oWFN with roles])
+m4_define([NET], [test_input_roles.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([oWFN roles])
+AT_CLEANUP
+
+AT_SETUP([oWFN with unspecified role (error expected)])
+m4_define([NET], [test_input_roles_error.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],1,ignore,stderr)
+AT_CHECK([GREP -q "role has not been specified" stderr])
+AT_KEYWORDS([oWFN roles])
+AT_CLEANUP
+
+
+############################################################################
 AT_BANNER([PNML])
 ############################################################################
 
@@ -267,102 +351,6 @@ AT_CLEANUP
 
 
 ############################################################################
-AT_BANNER([Composition and Product])
-############################################################################
-
-AT_SETUP([Product with constraint net])
-AT_XFAIL_IF(true)
-AT_CHECK([cp TESTFILES/test_produce.onlineshop.constraint.owfn TESTFILES/test_produce.onlineshop.owfn .])
-AT_CHECK([PETRI test_produce.onlineshop.owfn --produce=test_produce.onlineshop.constraint.owfn --output=owfn],0)
-AT_CHECK([GREP -q "|P|= 20  |P_in|= 3  |P_out|= 5  |T|= 11  |F|= 43" test_produce.onlineshop.owfn.owfn])
-AT_CHECK([FIONA -t simulation test_produce.onlineshop.owfn test_produce.onlineshop.owfn.owfn -sempty],0,ignore,ignore)
-AT_KEYWORDS([composition])
-AT_CLEANUP
-
-
-############################################################################
-AT_BANNER([oWFN Syntax])
-############################################################################
-
-AT_SETUP([Syntax Example 1])
-m4_define([NET], [syntax_example.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([PETRI NET],0,ignore,stderr)
-AT_KEYWORDS([syntax])
-AT_CLEANUP
-
-AT_SETUP([Syntax Example 2])
-m4_define([NET], [syntax_example_new.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([PETRI NET],0,ignore,stderr)
-AT_KEYWORDS([syntax])
-AT_CLEANUP
-
-AT_SETUP([Syntax Example 3])
-m4_define([NET], [syntax_example_new_short.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([PETRI NET],0,ignore,stderr)
-AT_KEYWORDS([syntax])
-AT_CLEANUP
-
-AT_SETUP([Syntax Formula])
-m4_define([NET], [syntax_formula.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([PETRI NET],0,ignore,stderr)
-AT_KEYWORDS([syntax])
-AT_CLEANUP
-
-AT_SETUP([Syntax Maximum Occurrence])
-m4_define([NET], [syntax_max_occurrence.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([PETRI NET],0,ignore,stderr)
-AT_KEYWORDS([syntax])
-AT_CLEANUP
-
-AT_SETUP([Reading open net (parser/lexer test)])
-m4_define([NET], [syntax_example1.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([PETRI NET],0,ignore,stderr)
-AT_KEYWORDS([frontend input])
-AT_CLEANUP
-
-AT_SETUP([Reading open net (parser/lexer test)])
-m4_define([NET], [syntax_example2.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([PETRI NET],0,ignore,stderr)
-AT_KEYWORDS([frontend input])
-AT_CLEANUP
-
-AT_SETUP([Reading open net (parser/lexer test)])
-m4_define([NET], [syntax_example3.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([PETRI NET],0,ignore,stderr)
-AT_KEYWORDS([frontend input])
-AT_CLEANUP
-
-AT_SETUP([Reading open net (parser/lexer test)])
-m4_define([NET], [syntax_example4.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([PETRI NET],0,ignore,stderr)
-AT_KEYWORDS([frontend input])
-AT_CLEANUP
-
-AT_SETUP([Reading oWFN with roles])
-m4_define([NET], [test_input_roles.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([PETRI NET],0,ignore,stderr)
-AT_KEYWORDS([oWFN roles])
-AT_CLEANUP
-
-AT_SETUP([oWFN with unspecified role (error expected)])
-m4_define([NET], [test_input_roles_error.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([PETRI NET],1,ignore,stderr)
-AT_CHECK([GREP -q "role has not been specified" stderr])
-AT_KEYWORDS([oWFN roles])
-AT_CLEANUP
-
-############################################################################
 AT_BANNER([Woflan parser tests])
 ############################################################################
 
@@ -398,6 +386,18 @@ AT_CHECK([GREP -q "|P|= 79  |P_in|= 0  |P_out|= 0  |T|= 76  |F|= 176" stderr])
 AT_KEYWORDS([woflan parser])
 AT_CLEANUP
 
+############################################################################
+AT_BANNER([Composition and Product])
+############################################################################
+
+AT_SETUP([Product with constraint net])
+AT_XFAIL_IF(true)
+AT_CHECK([cp TESTFILES/test_produce.onlineshop.constraint.owfn TESTFILES/test_produce.onlineshop.owfn .])
+AT_CHECK([PETRI test_produce.onlineshop.owfn --produce=test_produce.onlineshop.constraint.owfn --output=owfn],0)
+AT_CHECK([GREP -q "|P|= 20  |P_in|= 3  |P_out|= 5  |T|= 11  |F|= 43" test_produce.onlineshop.owfn.owfn])
+AT_CHECK([FIONA -t simulation test_produce.onlineshop.owfn test_produce.onlineshop.owfn.owfn -sempty],0,ignore,ignore)
+AT_KEYWORDS([composition])
+AT_CLEANUP
 
 ############################################################################
 AT_BANNER([Regression Tests])
@@ -920,6 +920,41 @@ AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
 AT_CHECK([SA2SM NET.sa NET.sa.owfn], 0, ignore, ignore)
 AT_CHECK([FIONA -t equivalence NET NET.sa.owfn], 0, ignore, ignore)
 AT_KEYWORDS([automaton synthesis])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Memory Leaks])
+############################################################################
+
+AT_SETUP([Testing parser (lola)])
+m4_define([NET], [test_input.lola])
+m4_define([PARAMS], [--input=lola --verbose])
+TEST_LEAK
+AT_CLEANUP
+
+AT_SETUP([Testing parser (owfn)])
+m4_define([NET], [test_input.owfn])
+m4_define([PARAMS], [--input=owfn --verbose])
+TEST_LEAK
+AT_CLEANUP
+
+AT_SETUP([Testing parser (pn/sa)])
+m4_define([NET], [test_myCoffee.sa])
+m4_define([PARAMS], [--input=sa --verbose])
+TEST_LEAK
+AT_CLEANUP
+
+AT_SETUP([Testing parser (pnml)])
+m4_define([NET], [test_input.pnml])
+m4_define([PARAMS], [--input=pnml --verbose])
+TEST_LEAK
+AT_CLEANUP
+
+AT_SETUP([Testing parser (woflan)])
+m4_define([NET], [woflan1.xml.tpn])
+m4_define([PARAMS], [--input=tpn --verbose])
+TEST_LEAK
 AT_CLEANUP
 
 

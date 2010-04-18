@@ -14,6 +14,7 @@ m4_define([AT_CHECK_CUSTOMER],    [@abs_builddir@/check_customer.sh])
 # wrap tools called by the testscript
 m4_define([GREP],                 [@GREP@])
 m4_define([FIONA],                [wrap-tool.sh @FIONA@])
+m4_define([VALGRIND],             [wrap-tool.sh @VALGRIND@ --leak-check=full --show-reachable=yes])
 
 # pass tool paths to tests below
 m4_define([DOT],                  [@DOT@])
@@ -45,4 +46,9 @@ m4_define([TEST_CDNF], [AT_CHECK([cp TESTFILES/NET.owfn .])
                         AT_CHECK([CDNF NET.owfn])
                         AT_CHECK([FIONA -t equivalence NET.owfn NET.cdnf.owfn], 0, ignore, ignore)
                         AT_KEYWORDS(cdnf)])
+
+m4_define([TEST_LEAK], [AT_CHECK([cp TESTFILES/NET .])
+                        AT_CHECK([VALGRIND @abs_top_builddir@/utils/petri PARAMS NET], 0, ignore, stderr)
+                        AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+                        AT_KEYWORDS(leak)])
 

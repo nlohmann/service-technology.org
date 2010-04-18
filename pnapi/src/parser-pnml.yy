@@ -80,12 +80,12 @@ element:
 
 empty_or_content:
   XML_SLASH XML_CLOSE                            { parser_.close_element(); }
-| XML_CLOSE content XML_END name_opt XML_CLOSE   { parser_.close_element(); }
+| XML_CLOSE content XML_END name_opt XML_CLOSE   { parser_.close_element(); free($4); }
 ;
 
 content:
   /*empty*/
-| content XML_DATA                               { parser_.store_data($2); }
+| content XML_DATA                               { parser_.store_data($2); free($2); }
 | content element
 ;
 

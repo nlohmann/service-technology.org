@@ -1,13 +1,5 @@
 AT_INIT
 
-# check if several tools were found by the configure script
-m4_define(AT_CHECK_DOT, [AT_CHECK([if test "DOT" == "not found"; then exit 77; fi])])
-m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not found"; then exit 77; fi])])
-m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
-m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not found"; then exit 77; fi])])
-m4_define(AT_CHECK_WGET, [AT_CHECK([if test "WGET" == "not found"; then exit 77; fi])])
-
-
 ############################################################################
 AT_BANNER([Frontend Tool "petri" Standard Options])
 ############################################################################
@@ -76,7 +68,7 @@ AT_KEYWORDS([frontend input pnml])
 AT_CLEANUP
 
 AT_SETUP([Reading Woflan net from file])
-m4_define([NET], [Model.7c1w--0-----u--.xml.tpn])
+m4_define([NET], [woflan6.xml.tpn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 150  |P_in|= 0  |P_out|= 0  |T|= 144  |F|= 342" stderr])
@@ -84,7 +76,7 @@ AT_KEYWORDS([frontend input pnml])
 AT_CLEANUP
 
 AT_SETUP([Reading Woflan net from pipe])
-m4_define([NET], [Model.1bt1--0-----u--.xml.tpn])
+m4_define([NET], [woflan1.xml.tpn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI --verbose --input=tpn < NET],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 61  |P_in|= 0  |P_out|= 0  |T|= 60  |F|= 140" stderr])
@@ -283,7 +275,6 @@ AT_XFAIL_IF(true)
 AT_CHECK([cp TESTFILES/test_produce.onlineshop.constraint.owfn TESTFILES/test_produce.onlineshop.owfn .])
 AT_CHECK([PETRI test_produce.onlineshop.owfn --produce=test_produce.onlineshop.constraint.owfn --output=owfn],0)
 AT_CHECK([GREP -q "|P|= 20  |P_in|= 3  |P_out|= 5  |T|= 11  |F|= 43" test_produce.onlineshop.owfn.owfn])
-AT_CHECK_FIONA
 AT_CHECK([FIONA -t simulation test_produce.onlineshop.owfn test_produce.onlineshop.owfn.owfn -sempty],0,ignore,ignore)
 AT_KEYWORDS([composition])
 AT_CLEANUP
@@ -376,7 +367,7 @@ AT_BANNER([Woflan parser tests])
 ############################################################################
 
 AT_SETUP([Example 1])
-m4_define([NET], [Model.4ose--0-----u--.xml.tpn])
+m4_define([NET], [woflan3.xml.tpn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 22  |P_in|= 0  |P_out|= 0  |T|= 22  |F|= 46" stderr])
@@ -384,7 +375,7 @@ AT_KEYWORDS([woflan parser])
 AT_CLEANUP
 
 AT_SETUP([Example 2])
-m4_define([NET], [Model.3wae--0-----u--.xml.tpn])
+m4_define([NET], [woflan2.xml.tpn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 38  |P_in|= 0  |P_out|= 0  |T|= 39  |F|= 83" stderr])
@@ -392,7 +383,7 @@ AT_KEYWORDS([woflan parser])
 AT_CLEANUP
 
 AT_SETUP([Example 3])
-m4_define([NET], [Model.5e1y--0-----u--.xml.tpn])
+m4_define([NET], [woflan4.xml.tpn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 27  |P_in|= 0  |P_out|= 0  |T|= 27  |F|= 59" stderr])
@@ -400,7 +391,7 @@ AT_KEYWORDS([woflan parser])
 AT_CLEANUP
 
 AT_SETUP([Example 4])
-m4_define([NET], [Model.6mxu--0-----u--.xml.tpn])
+m4_define([NET], [woflan5.xml.tpn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 79  |P_in|= 0  |P_out|= 0  |T|= 76  |F|= 176" stderr])
@@ -431,7 +422,6 @@ AT_KEYWORDS([bug])
 AT_CLEANUP
 
 AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968) [[SA2OWFN]] ])
-AT_CHECK_PETRIFY
 m4_define([NET], [bug13968.sa])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([SA2OWFN NET NET.owfn], 0, ignore, stderr)
@@ -586,12 +576,12 @@ AT_CHECK([PETRI --reduce=4 NET])
 AT_CLEANUP
 
 AT_SETUP([Bug 15794 (https://gna.org/bugs/?15794)])
-m4_define([NET], [Model.6mxu--0-----u--.xml.tpn])
+m4_define([NET], [woflan5.xml.tpn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 79  |P_in|= 0  |P_out|= 0  |T|= 76  |F|= 176" stderr])
 AT_CHECK([PETRI NET --verbose --input=tpn --output=lola --canonicalNames],0,ignore,stderr)
-m4_define([NET2], [Model.6mxu--0-----u--.xml.tpn.lola])
+m4_define([NET2], [woflan5.xml.tpn.lola])
 AT_CHECK([PETRI NET2 --verbose --input=lola],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 79  |P_in|= 0  |P_out|= 0  |T|= 76  |F|= 176" stderr])
 AT_KEYWORDS([woflan parser])
@@ -848,7 +838,6 @@ m4_define([NET], [fiona_abnormal_input])
 m4_define([EXPECTED], [NET.normalized.expected.owfn])
 AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
 AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
-AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
 AT_KEYWORDS([normalize fiona])
 AT_CLEANUP
@@ -858,7 +847,6 @@ m4_define([NET], [fiona_abnormal_output])
 m4_define([EXPECTED], [NET.normalized.expected.owfn])
 AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
 AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
-AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
 AT_KEYWORDS([normalize fiona])
 AT_CLEANUP
@@ -868,7 +856,6 @@ m4_define([NET], [fiona_abnormal_both])
 m4_define([EXPECTED], [NET.normalized.expected.owfn])
 AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
 AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
-AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
 AT_KEYWORDS([normalize fiona])
 AT_CLEANUP
@@ -878,7 +865,6 @@ m4_define([NET], [fiona_abnormal_both2])
 m4_define([EXPECTED], [NET.normalized.expected.owfn])
 AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
 AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
-AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
 AT_KEYWORDS([normalize fiona])
 AT_CLEANUP
@@ -888,7 +874,6 @@ m4_define([NET], [fiona_coffee])
 m4_define([EXPECTED], [NET.normalized.expected.owfn])
 AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
 AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
-AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
 AT_KEYWORDS([normalize fiona])
 AT_CLEANUP
@@ -923,9 +908,7 @@ AT_SETUP([Behavior preservation (asynchronous, sa2owfn)])
 m4_define([NET], [test_automaton_behavior_async.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
-AT_CHECK_PETRIFY
 AT_CHECK([SA2OWFN NET.sa NET.sa.owfn], 0, ignore, ignore)
-AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence NET NET.sa.owfn], 0, ignore, ignore)
 AT_KEYWORDS([automaton synthesis])
 AT_CLEANUP
@@ -935,7 +918,6 @@ m4_define([NET], [test_automaton_behavior_async.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
 AT_CHECK([SA2SM NET.sa NET.sa.owfn], 0, ignore, ignore)
-AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence NET NET.sa.owfn], 0, ignore, ignore)
 AT_KEYWORDS([automaton synthesis])
 AT_CLEANUP
@@ -1100,12 +1082,10 @@ AT_BANNER([Net Synthesis])
 AT_SETUP([Synthesis using Petrify (sa2owfn)])
 m4_define([AUTOMATON], [test_myCoffee.sa])
 AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-sm.owfn .])
-AT_CHECK_PETRIFY
 AT_CHECK([SA2OWFN AUTOMATON AUTOMATON.owfn],0,ignore,ignore)
 AT_CHECK([test -f AUTOMATON.owfn])
 AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 9  |P_in|= 1  |P_out|= 3  |T|= 4  |F|= 13" stderr])
-AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-sm.owfn],0,ignore,ignore)
 AT_KEYWORDS([synthesis])
 AT_CLEANUP
@@ -1117,7 +1097,6 @@ AT_CHECK([SA2SM AUTOMATON AUTOMATON.owfn],0,ignore,ignore)
 AT_CHECK([test -f AUTOMATON.owfn])
 AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 11  |P_in|= 1  |P_out|= 3  |T|= 9  |F|= 27" stderr])
-AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-syn.owfn],0,ignore,ignore)
 AT_KEYWORDS([synthesis])
 AT_CLEANUP
@@ -1129,7 +1108,6 @@ AT_CHECK([PETRI -isa -oowfn --converter=statemachine AUTOMATON],0,ignore,ignore)
 AT_CHECK([test -f AUTOMATON.owfn])
 AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 11  |P_in|= 1  |P_out|= 3  |T|= 9  |F|= 27" stderr])
-AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-syn.owfn],0,ignore,ignore)
 AT_KEYWORDS([synthesis])
 AT_CLEANUP
@@ -1142,7 +1120,6 @@ AT_CHECK([PETRI -isa -oowfn --converter=petrify AUTOMATON],0,ignore,ignore)
 AT_CHECK([test -f AUTOMATON.owfn])
 AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 9  |P_in|= 1  |P_out|= 3  |T|= 4  |F|= 13" stderr])
-AT_CHECK_FIONA
 AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-sm.owfn],0,ignore,ignore)
 AT_KEYWORDS([synthesis])
 AT_CLEANUP
@@ -1213,12 +1190,6 @@ AT_CLEANUP
 ############################################################################
 AT_BANNER([Canonical DNF])
 ############################################################################
-
-m4_define([TEST_CDNF], [AT_CHECK([cp TESTFILES/NET.owfn .])
-                        AT_CHECK([CDNF NET.owfn])
-                        AT_CHECK_FIONA
-                        AT_CHECK([FIONA -t equivalence NET.owfn NET.cdnf.owfn], 0, ignore, ignore)
-                        AT_KEYWORDS(cdnf)])
 
 AT_SETUP([Syntax Check])
 m4_define([NET], [test_cdnf])

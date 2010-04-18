@@ -243,7 +243,7 @@ bool JobQueue::checkMEInfeasible() {
 	@param job The job to be added to the failure queue.
 */
 void JobQueue::push_fail(PartialSolution* job) {
-	if (!args_info.verbose_given && queue.size()>1) return; // user doesn't want to know about failure reasons
+	if (!args_info.verbose_given && queue.size()>1) { delete job; return; } // user doesn't want to know about failure reasons
 	if (!almostEmpty()) job->setFeasibility(true); // first entry: marking equation may be infeasible
 	// check if there is an entry in the queue with an equivalent marking
 	bool found = false; // no equivalent entry so far
@@ -303,6 +303,7 @@ void JobQueue::push_fail(PartialSolution* job) {
 	map<Transition*,int> parikh(job->calcParikh());
 	if (job->getSequence().size()<jit->second[i]->getSequence().size()) jit->second[i]->setSequence(job->getSequence());
 	if (cleanFailure(parikh)) jit->second[i]->setSolved();
+	delete job;
 }
 
 /** (Pseudo-)Cleans a failure queue from obsolete entries regarding one parikh image.

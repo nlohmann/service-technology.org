@@ -420,7 +420,7 @@ void Reachalyzer::nextJump(PartialSolution& ps) {
 	Transition* t(ps.getNextJC(val)); // get the next alternative jump
 	if (t==NULL) return; // [none available]
 	ps.popJC(); // and remove it from the list
-	PartialSolution* nps(new PartialSolution(ps)); // copy the job
+	PartialSolution* nps = new PartialSolution(ps); // copy the job
 
 	// first remove the old jump constraint (which is still tagged as recent)
 	set<Constraint>& cs(nps->getConstraints());

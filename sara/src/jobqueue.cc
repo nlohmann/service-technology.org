@@ -92,7 +92,8 @@ PartialSolution* JobQueue::first() { return active; }
 */
 bool JobQueue::pop_front(bool kill) {
 	if (empty()) return false;
-	if (!kill) past[priority(active)].push_back(active); // active job is now past
+	if (kill) delete active;
+	else past[priority(active)].push_back(active); // active job is now past
 	active=NULL;
 	--cnt;
 	if (!almostEmpty()) 

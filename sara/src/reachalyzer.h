@@ -72,7 +72,7 @@ public:
 	void createJumps(map<Transition*,int>& diff, PartialSolution& ps);
 
 	/// Create the next precalculated jump from the given partial solution
-	void nextJump(PartialSolution& ps);
+	void nextJump(PartialSolution ps);
 
 	/// returns the maximal trace length after the solutions have been printed
 	int getMaxTraceLength();

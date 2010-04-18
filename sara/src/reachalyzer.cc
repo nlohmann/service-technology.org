@@ -415,6 +415,39 @@ void Reachalyzer::createJumps(map<Transition*,int>& diff, PartialSolution& ps) {
 /*! Create a job for the next precomputed jump.
 	\param ps The job for the former jump containing the precomputed jump list.
 */
+void Reachalyzer::nextJump(PartialSolution ps) {
+	int val=0;
+	Transition* t(ps.getNextJC(val)); // get the next alternative jump
+	if (t==NULL) return; // [none available]
+	ps.popJC(); // and remove it from the list
+//	PartialSolution* nps = new PartialSolution(ps); // copy the job
+
+	// first remove the old jump constraint (which is still tagged as recent)
+	set<Constraint>& cs(ps.getConstraints());
+	set<Constraint>::iterator cit;
+	for(cit=cs.begin(); cit!=cs.end(); ++cit)
+		if (cit->isRecent() && cit->isJump()) { cs.erase(cit); break; }
+
+	// then add the new one and create the according job
+	map<Transition*,int> tmp;
+	tmp[t] = val;
+	Constraint c(tmp,true); // build constraint to forbid the increase, so another minimal solution will be sought
+	c.setRecent(true); // tag the new jump as recent
+	ps.setConstraint(c); // add it to the job
+	if (!tps.findPast(&ps) && tps.find(&ps)>=0)
+	{ // if it hasn't been done and wasn't planned so far
+		tps.push_back(new PartialSolution(ps)); // put the new job into the list
+		if (verbose>1) { // debug info
+			cerr << "sara: New Partial Solution:" << endl;
+			ps.show();
+			cerr << "*** NEXT JUMP ***" << endl;
+		}
+	} else { // otherwise:
+//		delete nps; // delete this job
+		nextJump(ps); // and move on to the next one in the list
+	} 
+}
+/*
 void Reachalyzer::nextJump(PartialSolution& ps) {
 	int val=0;
 	Transition* t(ps.getNextJC(val)); // get the next alternative jump
@@ -447,6 +480,7 @@ void Reachalyzer::nextJump(PartialSolution& ps) {
 		nextJump(ps); // and move on to the next one in the list
 	} 
 }
+*/
 
 /*! Get the recorded length of the longest solving firing sequence, if one has been found.
 */

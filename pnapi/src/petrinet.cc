@@ -1536,6 +1536,28 @@ std::string PetriNet::getMetaInformation(std::ios_base & ios,
   return def;
 }
 
+/*!
+ * \brief adds a prefix to all labels and nodes
+ */
+PetriNet & PetriNet::prefixNames(const std::string & prefix)
+{
+  prefixLabelNames(prefix);
+  prefixNodeNames(prefix);
+  return *this;
+}
+
+/*!
+ * \brief adds a prefix to all labels
+ */
+PetriNet & PetriNet::prefixLabelNames(const std::string & prefix)
+{
+  PNAPI_FOREACH(port, interface_.getPorts())
+  {
+    port->second->prefixLabels(prefix);
+  }
+  
+  return *this;
+}
 
 /*!
  * \brief All Places and Transitions of the net are prefixed.

@@ -412,6 +412,10 @@ public: /* public methods */
   /// product with Constraint oWFN
   void produce(const PetriNet &, const std::string & = "net",
                const std::string & = "constraint") throw (exception::InputError);
+  /// adds a prefix to all labels and nodes
+  PetriNet & prefixNames(const std::string &);
+  /// adds a prefix to all labels
+  PetriNet & prefixLabelNames(const std::string &);
   /// adds a given prefix to all nodes
   PetriNet & prefixNodeNames(const std::string &);
   /// swaps input and output labels

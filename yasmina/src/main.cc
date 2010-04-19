@@ -1323,7 +1323,7 @@ int main(int argc, char** argv) {
 		set_verbose(lpfing, NORMAL);
 		
 		//print_lp(lpfing);
-		//delete Adapter;
+		delete adapter;
 	}
 	
 	
@@ -1798,13 +1798,14 @@ int main(int argc, char** argv) {
 	// here we prepare for the the solving of the equation
 	// for each final marking one builds and solves  the state equation
 	unsigned int nofinal=lpmps.size();bool firstsolve=false;
-	int nPlaces;
-	int nTransitions;
+	//int nPlaces,nTransitions;
+	
 	if(args_info.inputs_num>0){//args_info.adapterrules_given){//args_info.messageProfiles_given>0
 		status("State equation involved");
-		nPlaces = (int) net1.getPlaces().size();cout << "No of places "<< net1.getInternalPlaces().size() << endl;
+		//nPlaces = (int) net1.getPlaces().size();
+		cout << "No of places "<< net1.getInternalPlaces().size() << endl;
 		
-		nTransitions = (int) net1.getTransitions().size();
+		int nTransitions = (int) net1.getTransitions().size();
 		pnapi::Marking m(net1);
 		net1.finalCondition().dnf(); 
 		const pnapi::formula::Formula * f=dynamic_cast<const pnapi::formula::Formula *>(&net1.finalCondition().formula());

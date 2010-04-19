@@ -181,7 +181,6 @@ terms: KEY_TERMS {nc=0;} term2
 ;
 
 term2: 
-CIDENT COLON sum SEMICOLON {term_vec->push_back($3);++nc;}
 |CIDENT COLON sum SEMICOLON {term_vec->push_back($3);++nc;} term2
 
 sum: produkt {$$ = $1;}

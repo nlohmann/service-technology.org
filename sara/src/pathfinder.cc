@@ -159,8 +159,8 @@ bool PathFinder::recurse() {
 //			if (terminate) newps.setSolved(); // no more transitions to fire, so we have a solution
 //			tps.push_back(new PartialSolution(newps)); // put the job into the queue
 			// try to add this partial solution to the lookup table
-			if (shortcutmax<0 || shortcut.size()<shortcutmax) shortcut[fulltvector].push_back(newps);
-			else if (args_info.verbose_given && shortcut.size()==shortcutmax) 
+			if (shortcutmax<0 || (int)(shortcut.size())<shortcutmax) shortcut[fulltvector].push_back(newps);
+			else if (args_info.verbose_given && (int)(shortcut.size())==shortcutmax) 
 			{ 
 				cerr << "\r";
 				status("warning: lookup table too large (%d)",shortcutmax); 

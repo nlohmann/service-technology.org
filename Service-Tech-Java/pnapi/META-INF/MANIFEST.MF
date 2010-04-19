@@ -2,10 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Petri Net API
 Bundle-SymbolicName: hub.top.pnapi
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.1
 Bundle-ClassPath: pnapi.jar,
  libs-external/antlr-runtime-3.2.jar
 Export-Package: hub.top.petrinet,
+ hub.top.petrinet.util,
  org.antlr.runtime,
  org.antlr.runtime.debug,
  org.antlr.runtime.misc,

@@ -18,24 +18,108 @@
       	</fileset>
 	</path>
 	
-	<target name="check">
-		<echo message="Running tests in ${test.basedir}" />
-		<java classname="hub.top.petrinet.PetriNetIO" output="${testfiles}/test_input.lola.log" >
-			<classpath refid="run.classpath" />
-			<arg value="${testfiles}/test_input.lola"/>
-		</java>
-		<java classname="hub.top.petrinet.PetriNetIO" output="${testfiles}/phils.lola.log">
-			<classpath refid="run.classpath" />
-			<arg value="${testfiles}/phils.lola"/>
-		</java>
-		<java classname="hub.top.petrinet.PetriNetIO" output="${testfiles}/coffeeMachine_sound.owfn.log">
-			<classpath refid="run.classpath" />
-			<arg value="${testfiles}/coffeeMachine_sound.owfn"/>
-		</java>
-		<java classname="hub.top.petrinet.PetriNetIO" output="${testfiles}/coffeeMachine_unsound.owfn.log">
-			<classpath refid="run.classpath" />
-			<arg value="${testfiles}/coffeeMachine_unsound.owfn"/>
-		</java>
+	<target name="check" depends="parser,inout-consistency,decomposition">
+		<echo message="Completed tests in ${test.basedir}" />
 	</target>
 	
+	<target name="parser">
+		<echo message="Checking parser." />
+		<property name="_dir" location="${testfiles}/parser" />
+		<mkdir dir="${_dir}" />
+
+		<copy file="${testfiles}/test_input.lola" todir="${_dir}"/>
+		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/test_input.lola.log" >
+			<classpath refid="run.classpath" />
+			<arg value="-i"/>
+			<arg value="${_dir}/test_input.lola"/>
+			<arg value="-f"/>
+			<arg value="owfn"/>
+		</java>
+		
+		<copy file="${testfiles}/phils.lola" todir="${_dir}"/>
+		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/phils.lola.log">
+			<classpath refid="run.classpath" />
+			<arg value="-i"/>
+			<arg value="${_dir}/phils.lola"/>
+			<arg value="-f"/>
+			<arg value="owfn"/>
+		</java>
+
+		<copy file="${testfiles}/coffeeMachine_sound.owfn" todir="${_dir}"/>
+		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/coffeeMachine_sound.owfn.log">
+			<classpath refid="run.classpath" />
+			<arg value="-i"/>
+			<arg value="${_dir}/coffeeMachine_sound.owfn"/>
+			<arg value="-f"/>
+			<arg value="owfn"/>
+		</java>
+		
+		<copy file="${testfiles}/coffeeMachine_unsound.owfn" todir="${_dir}"/>
+		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/coffeeMachine_unsound.owfn.log">
+			<classpath refid="run.classpath" />
+			<arg value="-i"/>
+			<arg value="${_dir}/coffeeMachine_unsound.owfn"/>
+			<arg value="-f"/>
+			<arg value="owfn"/>
+		</java>
+
+		<delete dir="${_dir}" includeemptydirs="true" />
+	</target>
+	
+	<target name="inout-consistency">
+		<echo message="Checking consistency of output and parser." />
+		<property name="_dir" location="${testfiles}/inout-consistency" />
+		<mkdir dir="${_dir}" />
+		
+		<copy file="${testfiles}/coffeeMachine_sound.owfn" todir="${_dir}"/>
+		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/coffeeMachine_sound.owfn.log">
+			<classpath refid="run.classpath" />
+			<arg value="-i"/>
+			<arg value="${_dir}/coffeeMachine_sound.owfn"/>
+			<arg value="-f"/>
+			<arg value="owfn"/>
+		</java>
+		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/coffeeMachine_sound.owfn.owfn.log">
+			<classpath refid="run.classpath" />
+			<arg value="-i"/>
+			<arg value="${_dir}/coffeeMachine_sound.owfn.owfn"/>
+			<arg value="-f"/>
+			<arg value="owfn"/>
+		</java>
+		
+		<copy file="${testfiles}/coffeeMachine_unsound.owfn" todir="${_dir}"/>
+		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/coffeeMachine_unsound.owfn.log">
+			<classpath refid="run.classpath" />
+			<arg value="-i"/>
+			<arg value="${_dir}/coffeeMachine_unsound.owfn"/>
+			<arg value="-f"/>
+			<arg value="owfn"/>
+		</java>
+		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/coffeeMachine_unsound.owfn.owfn.log">
+			<classpath refid="run.classpath" />
+			<arg value="-i"/>
+			<arg value="${_dir}/coffeeMachine_unsound.owfn.owfn"/>
+			<arg value="-f"/>
+			<arg value="owfn"/>
+		</java>
+		
+		<delete dir="${_dir}" includeemptydirs="true" />
+	</target>
+	
+	<target name="decomposition">
+		<echo message="Checking decomposition." />
+		<property name="_dir" location="${testfiles}/decomposition" />
+		<mkdir dir="${_dir}" />
+		
+		<copy file="${testfiles}/coffeeMachine_sound.owfn" todir="${_dir}"/>
+		<copy file="${testfiles}/coffeeMachine_unsound.owfn" todir="${_dir}"/>
+		<java classname="hub.top.petrinet.util.Decompose" output="${_dir}/decompose.log">
+			<classpath refid="run.classpath" />
+			<arg value="${_dir}"/>
+		</java>
+		
+		<delete dir="${_dir}" includeemptydirs="true" />
+
+	</target>
+		
 </project>

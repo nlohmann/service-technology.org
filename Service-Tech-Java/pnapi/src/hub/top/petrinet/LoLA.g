@@ -95,7 +95,7 @@ place_list:
 	    check(places_[nodeName_.str()] == NULL, "node name already used");
 	    places_[nodeName_.str()] = &pnapi_lola_yynet.createPlace(nodeName_.str(), 0, capacity_);
 	    */
-	    net.addPlace($name1.text);
+	    net.addPlace_unique($name1.text);
 	  }
   (	
   	COMMA name2=node_name
@@ -103,7 +103,7 @@ place_list:
 	    check(places_[nodeName_.str()] == NULL, "node name already used");
 	    places_[nodeName_.str()] = &pnapi_lola_yynet.createPlace(nodeName_.str(), 0, capacity_);
 	    */
-	    net.addPlace($name2.text);
+	    net.addPlace_unique($name2.text);
 	  }
   )*
 ;
@@ -130,7 +130,7 @@ transitions:
 transition: 
   KEY_TRANSITION node_name 
   {
-  	currentTransition = net.addTransition($node_name.text);
+  	currentTransition = net.addTransition_unique($node_name.text);
   	/* 
     check(!pnapi_lola_yynet.containsNode(nodeName_.str()), "node name already used");
     transition_ = &pnapi_lola_yynet.createTransition(nodeName_.str());

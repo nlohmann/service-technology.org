@@ -17,6 +17,10 @@
 
 package hub.top.petrinet;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * 
  * A node of a {@link PetriNet}. Represents all joint properties of {@link Place}s
@@ -24,19 +28,28 @@ package hub.top.petrinet;
  * 
  * @author Dirk Fahland
  */
-public class Node {
-
-  private String name;
+public abstract class Node {
   
-  public boolean tau;
+  private PetriNet  net;
+
+  private String    name;
+  public boolean    tau;
+  
+  private int id;
+  
+  // the roles this node is associated to
+  private HashSet<String> roles;
   
   /**
    * Create a new node.
    * 
    * @param name
    */
-  public Node (String name) {
+  public Node (PetriNet net, String name) {
+    this.net = net;
     this.setName(name);
+    this.roles = new HashSet<String>();
+    this.id = net.getNextNodeID();
   }
 
   /**
@@ -55,6 +68,13 @@ public class Node {
   public String getName() {
     return name;
   }
+  
+  /**
+   * @return this node's unique id
+   */
+  protected int getID() {
+    return id;
+  }
 
   /**
    * @return iff node is invisble
@@ -70,6 +90,67 @@ public class Node {
   public void setTau(boolean tau) {
     this.tau = tau;
   }
+  
+  /**
+   * set role of this node (and register the role at the node's net)
+   * @param role
+   */
+  public void addRole(String role) {
+    this.roles.add(role);
+    this.net.addRole(role);
+  }
+  
+  /**
+   * @return the roles of this node
+   */
+  public HashSet<String> getRoles() {
+    return this.roles;
+  }
 
+  /**
+   * @return pre-nodes of this node
+   */
+  public abstract List<? extends Node> getPreSet();
+  
+  /**
+   * @return post-nodes of this node
+   */
+  public abstract List<? extends Node> getPostSet();
 
+  /**
+   * @return incoming arcs of this node
+   */
+  public List<Arc> getIncoming() {
+    LinkedList<Arc> arcSet = new LinkedList<Arc>();
+    for (Arc a : net.getArcs()) {
+      if (a.getTarget() == this) arcSet.add(a); 
+    }
+    return arcSet;
+  }
+  
+  /**
+   * @return outgoing arcs of this node
+   */
+  public List<Arc> getOutgoing() {
+    LinkedList<Arc> arcSet = new LinkedList<Arc>();
+    for (Arc a : net.getArcs()) {
+      if (a.getSource() == this) arcSet.add(a); 
+    }
+    return arcSet;
+  }
+
+  /**
+   * @return a unique identifier for this node
+   */
+  public String getUniqueIdentifier() {
+    return "n"+id+"_"+getName();
+  }
+  
+  /*
+   * (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  public String toString() {
+    return getUniqueIdentifier();
+  }
 }

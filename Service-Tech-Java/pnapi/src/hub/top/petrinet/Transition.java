@@ -17,6 +17,9 @@
 
 package hub.top.petrinet;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * A {@link PetriNet} transition.
  * 
@@ -24,9 +27,32 @@ package hub.top.petrinet;
  */
 public class Transition extends Node {
 
-  public Transition(String name) {
-    super(name);
-    // TODO Auto-generated constructor stub
+  public Transition(PetriNet net, String name) {
+    super(net, name);
   }
 
+  @Override
+  public List<Place> getPreSet() {
+    LinkedList<Place> preSet = new LinkedList<Place>();
+    for (Arc a : getIncoming())
+      preSet.add((Place)a.getSource()); 
+    return preSet;
+  }
+  
+  @Override
+  public List<Place> getPostSet() {
+    LinkedList<Place> postSet = new LinkedList<Place>();
+    for (Arc a : getOutgoing())
+      postSet.add((Place)a.getTarget());
+    return postSet;
+  }
+  
+  /*
+   * (non-Javadoc)
+   * @see hub.top.petrinet.Node#getUniqueIdentifier()
+   */
+  @Override
+  public String getUniqueIdentifier() {
+    return "t"+getID()+"_"+getName();
+  }
 }

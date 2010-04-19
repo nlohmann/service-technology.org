@@ -1,3 +1,9 @@
+Petri Net API/Java v.1.0.1
+--------------------------
+
++ added decomposition into non-overlapping scenarios
++ added support for role annotations in OWFNs
+
 Petri Net API/Java v.1.0.0
 --------------------------
 

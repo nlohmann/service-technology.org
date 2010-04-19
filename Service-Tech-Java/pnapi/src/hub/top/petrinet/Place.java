@@ -17,6 +17,9 @@
 
 package hub.top.petrinet;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * A {@link PetriNet} place.
  * 
@@ -30,8 +33,8 @@ public class Place extends Node {
    * Create a new unmarked place
    * @param name
    */
-  public Place(String name) {
-    super(name);
+  public Place(PetriNet net, String name) {
+    super(net, name);
     setTokens(0);
   }
 
@@ -50,4 +53,28 @@ public class Place extends Node {
     return tokens;
   }
 
+  @Override
+  public List<Transition> getPreSet() {
+    LinkedList<Transition> preSet = new LinkedList<Transition>();
+    for (Arc a : getIncoming())
+      preSet.add((Transition)a.getSource());
+    return preSet;
+  }
+  
+  @Override
+  public List<Transition> getPostSet() {
+    LinkedList<Transition> postSet = new LinkedList<Transition>();
+    for (Arc a : getOutgoing())
+      postSet.add((Transition)a.getTarget());
+    return postSet;
+  }
+  
+  /*
+   * (non-Javadoc)
+   * @see hub.top.petrinet.Node#getUniqueIdentifier()
+   */
+  @Override
+  public String getUniqueIdentifier() {
+    return "p"+getID()+"_"+getName();
+  }
 }

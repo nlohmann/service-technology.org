@@ -20,6 +20,7 @@ package hub.top.petrinet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,6 +31,8 @@ import java.util.List;
  * @author Dirk Fahland
  */
 public class PetriNet {
+  
+  protected static int nodeId = 0;
 
   // all places of the net
   private HashSet<Place> places;
@@ -38,6 +41,9 @@ public class PetriNet {
   // all arcs of the net
   private HashSet<Arc> arcs;
   
+  // all roles of the net
+  private HashSet<String> roles;
+  
   /**
    * Create an empty Petri net
    */
@@ -45,6 +51,14 @@ public class PetriNet {
     this.places = new HashSet<Place>();
     this.transitions = new HashSet<Transition>();
     this.arcs = new HashSet<Arc>();
+    this.roles = new HashSet<String>();
+  }
+  
+  /**
+   * @return next unique id for a new node
+   */
+  protected int getNextNodeID () {
+    return ++nodeId;
   }
   
   /**
@@ -54,13 +68,22 @@ public class PetriNet {
    * @param name
    * @return the created place
    */
-  public Place addPlace(String name) {
+  public Place addPlace_unique(String name) {
     if (findPlace(name) != null) {
       assert false : "Tried to add existing place";
       return null;
     }
-    
-    Place p = new Place(name);
+    return addPlace(name);
+  }
+
+  /**
+   * Add place with the given name to the net.
+   * 
+   * @param name
+   * @return the created place
+   */
+  public Place addPlace(String name) {
+    Place p = new Place(this, name);
     places.add(p);
     return p;
   }
@@ -72,14 +95,23 @@ public class PetriNet {
    * @param name
    * @return the created transition
    */
-  public Transition addTransition(String name) {
+  public Transition addTransition_unique(String name) {
     if (findTransition(name) != null) {
       
       assert false : "Tried to add existing transition";
       return null;
     }
-    
-    Transition t = new Transition(name);
+    return addTransition(name);
+  }
+  
+  /**
+   * Add transition with the given name to the net.
+   * 
+   * @param name
+   * @return the created transition
+   */
+  public Transition addTransition(String name) {
+    Transition t = new Transition(this, name);
     transitions.add(t);
     return t;
   }
@@ -155,7 +187,8 @@ public class PetriNet {
   
   /**
    * @param name
-   * @return the place with the given name if it exists in the net
+   * @return the place with the given name if it exists in the net; assumes
+   * that that is at most one place with the given name in the net
    */
   public Place findPlace(String name) {
     for (Place p : places) {
@@ -167,7 +200,8 @@ public class PetriNet {
 
   /**
    * @param name
-   * @return the transition with the given name if it exists
+   * @return the transition with the given name if it exists; assumes
+   * that that is at most one transition with the given name in the net
    */
   public Transition findTransition(String name) {
     for (Transition t : transitions) {
@@ -175,6 +209,34 @@ public class PetriNet {
         return t;
     }
     return null;
+  }
+  
+  /**
+   * @return arcs of the net
+   */
+  public HashSet<Arc> getArcs() {
+    return arcs;
+  }
+  
+  /**
+   * @return transitions of the net
+   */
+  public HashSet<Transition> getTransitions() {
+    return transitions;
+  }
+  
+  /**
+   * @return places of the net
+   */
+  public HashSet<Place> getPlaces() {
+    return places;
+  }
+  
+  /**
+   * @return roles of the net
+   */
+  public HashSet<String> getRoles() {
+    return roles;
   }
   
   /**
@@ -218,74 +280,44 @@ public class PetriNet {
   }
 
   /**
-   * @param t
-   * @return pre-places of transition t
+   * Add role to the roles of the net. 
+   * @param role
    */
-  public List<Place> getPreSet(Transition t) {
-    LinkedList<Place> preSet = new LinkedList<Place>();
-    for (Arc a : getIncoming(t))
-      preSet.add((Place)a.getSource()); 
-    return preSet;
+  public void addRole(String role) {
+    this.roles.add(role);
   }
   
   /**
-   * @param p
-   * @return pre-transitions of p
+   * @param role
+   * @return if this net knows the given role
    */
-  public List<Transition> getPreSet(Place p) {
-    LinkedList<Transition> preSet = new LinkedList<Transition>();
-    for (Arc a : getIncoming(p))
-      preSet.add((Transition)a.getSource());
-    return preSet;
+  public boolean hasRole(String role) {
+    return this.roles.contains(role);
   }
 
   /**
-   * @param t
-   * @return post-places of t
+   * Let each place of the net acquire the roles of its
+   * pre- and post-transitions.
    */
-  public List<Place> getPostSet(Transition t) {
-    LinkedList<Place> postSet = new LinkedList<Place>();
-    for (Arc a : getOutgoing(t))
-      postSet.add((Place)a.getTarget());
-    return postSet;
-  }
-  
-  /**
-   * @param p
-   * @return post-transition of p
-   */
-  public List<Transition> getPostSet(Place p) {
-    LinkedList<Transition> postSet = new LinkedList<Transition>();
-    for (Arc a : getOutgoing(p))
-      postSet.add((Transition)a.getTarget());
-    return postSet;
-  }
-  
-  /**
-   * @param n
-   * @return incoming arcs of node n
-   */
-  public List<Arc> getIncoming(Node n) {
-    LinkedList<Arc> arcSet = new LinkedList<Arc>();
-    for (Arc a : arcs) {
-      if (a.getTarget() == n) arcSet.add(a); 
+  public void spreadRolesToPlaces_union() {
+    
+    for (Place p : places) {
+      for (Transition t : p.getPreSet())
+        for (String role : t.getRoles()) p.addRole(role);
+      for (Transition t : p.getPostSet())
+        for (String role : t.getRoles()) p.addRole(role);
     }
-    return arcSet;
   }
-
+  
   /**
-   * @param n
-   * @return outgoing arcs of node n
+   * Give each transition that has no role the explicit role "unassigned"
    */
-  public List<Arc> getOutgoing(Node n) {
-    LinkedList<Arc> arcSet = new LinkedList<Arc>();
-    for (Arc a : arcs) {
-      if (a.getSource() == n) arcSet.add(a); 
+  public void setRoles_unassigned() {
+    for (Transition t : transitions) {
+      if (t.getRoles().size() == 0)
+        t.addRole("unassigned");
     }
-    return arcSet;
   }
-
-
   
   /* -----------------------------------------------------------------------
    * 
@@ -302,13 +334,13 @@ public class PetriNet {
    * @param t2
    */
   public void mergeTransitions(Transition t1, Transition t2) {
-    for (Place p : getPreSet(t2)) {
-      if (!getPreSet(t1).contains(p)) {
+    for (Place p : t2.getPreSet()) {
+      if (!t1.getPreSet().contains(p)) {
         addArc(p, t1); 
       }
     }
-    for (Place p : getPostSet(t2)) {
-      if (!getPostSet(t1).contains(p)) {
+    for (Place p : t2.getPostSet()) {
+      if (!t1.getPostSet().contains(p)) {
         addArc(t1,p);
       }
     }
@@ -331,18 +363,18 @@ public class PetriNet {
     Place pMerged = addPlace(p1.getName()+"_"+p2.getName());
     setTokens(pMerged, p1.getTokens() + p2.getTokens());
 
-    for (Transition t : getPreSet(p1)) {
+    for (Transition t : p1.getPreSet()) {
       addArc(t, pMerged);
     }
-    for (Transition t : getPreSet(p2)) {
-      if (getPreSet(pMerged).contains(t)) continue;
+    for (Transition t : p1.getPreSet()) {
+      if (pMerged.getPreSet().contains(t)) continue;
       addArc(t, pMerged);
     }
-    for (Transition t : getPostSet(p1)) {
+    for (Transition t : p1.getPostSet()) {
       addArc(pMerged, t);
     }
-    for (Transition t : getPostSet(p2)) {
-      if (getPostSet(pMerged).contains(t)) continue;
+    for (Transition t : p2.getPostSet()) {
+      if (pMerged.getPostSet().contains(t)) continue;
       addArc(pMerged, t);
     }
     return pMerged;
@@ -355,8 +387,8 @@ public class PetriNet {
    */
   public void removeTransition(Transition t) {
     LinkedList<Arc> a_remove = new LinkedList<Arc>();
-    a_remove.addAll(getIncoming(t));
-    a_remove.addAll(getOutgoing(t));
+    a_remove.addAll(t.getIncoming());
+    a_remove.addAll(t.getOutgoing());
     for (Arc a : a_remove) {
       removeArc(a);
     }
@@ -379,8 +411,8 @@ public class PetriNet {
     setTokens(p, 0);
     
     LinkedList<Arc> a_remove = new LinkedList<Arc>();
-    a_remove.addAll(getIncoming(p));
-    a_remove.addAll(getOutgoing(p));
+    a_remove.addAll(p.getIncoming());
+    a_remove.addAll(p.getOutgoing());
     for (Arc a : a_remove) {
       removeArc(a);
     }
@@ -408,21 +440,21 @@ public class PetriNet {
    *    the set ignore
    */
   public boolean parallelTransitions(Transition t1, Transition t2, Collection<Place> ignore) {
-    for (Place p : getPreSet(t1)) {
+    for (Place p : t1.getPreSet()) {
       if (ignore != null && ignore.contains(p)) continue;
-      if (!getPreSet(t2).contains(p)) return false;
+      if (!t2.getPreSet().contains(p)) return false;
     }
-    for (Place p : getPostSet(t1)) {
+    for (Place p : t1.getPostSet()) {
       if (ignore != null && ignore.contains(p)) continue;
-      if (!getPostSet(t2).contains(p)) return false;
+      if (!t2.getPostSet().contains(p)) return false;
     }
-    for (Place p : getPreSet(t2)) {
+    for (Place p : t2.getPreSet()) {
       if (ignore != null && ignore.contains(p)) continue;
-      if (!getPreSet(t1).contains(p)) return false;
+      if (!t1.getPreSet().contains(p)) return false;
     }
-    for (Place p : getPostSet(t2)) {
+    for (Place p : t2.getPostSet()) {
       if (ignore != null && ignore.contains(p)) continue;
-      if (!getPostSet(t1).contains(p)) return false;
+      if (!t1.getPostSet().contains(p)) return false;
     }
     return true;
   }
@@ -458,9 +490,9 @@ public class PetriNet {
       netChanged = false;
       
       for (Transition t : taus) {
-        if (getPreSet(t).size() == 1 && getPostSet(t).size() == 1) {
-          Place pIn = getPreSet(t).get(0);
-          Place pOut = getPostSet(t).get(0);
+        if (t.getPreSet().size() == 1 && t.getPostSet().size() == 1) {
+          Place pIn = t.getPreSet().get(0);
+          Place pOut = t.getPostSet().get(0);
           mergePlaces(pIn, pOut);
           removeTransition(t);
           taus.remove(t);
@@ -477,9 +509,9 @@ public class PetriNet {
    */
   public void makePlacesInvisible() {
     for (Place p : places) {
-      if (getPreSet(p).size() != 1 || getPostSet(p).size() != 1) continue;
-      Transition t1 = getPreSet(p).get(0);
-      Transition t2 = getPostSet(p).get(0);
+      if (p.getPreSet().size() != 1 || p.getPostSet().size() != 1) continue;
+      Transition t1 = p.getPreSet().get(0);
+      Transition t2 = p.getPostSet().get(0);
       if (t1.isTau() && t2.isTau())
         p.setTau(true);
     }
@@ -491,13 +523,13 @@ public class PetriNet {
   public void removeIsolatedNodes() {
     LinkedList<Transition> t_remove = new LinkedList<Transition>();
     for (Transition t : transitions) {
-      if (getPreSet(t).size() == 0 && getPostSet(t).size() == 0) {
+      if (t.getPreSet().size() == 0 && t.getPostSet().size() == 0) {
         t_remove.add(t);
       }
     }
     LinkedList<Place> p_remove = new LinkedList<Place>();
     for (Place p : places) {
-      if (getPreSet(p).size() == 0 && getPostSet(p).size() == 0) {
+      if (p.getPreSet().size() == 0 && p.getPostSet().size() == 0) {
         p_remove.add(p);
       }
     }
@@ -544,7 +576,7 @@ public class PetriNet {
       else
         b.append("  p"+nodeID+" []\n");
       
-      String auxLabel = "";
+      String auxLabel = "ROLES: "+toString(p.getRoles());
         
       b.append("  p"+nodeID+"_l [shape=none];\n");
       b.append("  p"+nodeID+"_l -> p"+nodeID+" [headlabel=\""+toLoLA_ident(p.getName())+" "+auxLabel+"\"]\n");
@@ -559,7 +591,7 @@ public class PetriNet {
 
       b.append("  t"+nodeID+" []\n");
       
-      String auxLabel = "";
+      String auxLabel  = "ROLES: "+toString(t.getRoles());
       
       b.append("  t"+nodeID+"_l [shape=none];\n");
       b.append("  t"+nodeID+"_l -> t"+nodeID+" [headlabel=\""+toLoLA_ident(t.getName())+" "+auxLabel+"\"]\n");
@@ -589,7 +621,143 @@ public class PetriNet {
     b.append("}");
     return b.toString();
   }
+  
+  /**
+   * Write the Petri net in GraphViz dot format
+   * 
+   * @param net
+   * @return
+   */
+  public String toDot_swimlanes() {
+    StringBuilder b = new StringBuilder();
+    b.append("digraph BP {\n");
+    
+    // standard style for nodes and edges
+    b.append("graph [fontname=\"Helvetica\" nodesep=0.3 ranksep=\"0.2 equally\" fontsize=10];\n");
+    b.append("node [fontname=\"Helvetica\" fontsize=8 fixedsize width=\".3\" height=\".3\" label=\"\" style=filled fillcolor=white];\n");
+    b.append("edge [fontname=\"Helvetica\" fontsize=8 color=white arrowhead=none weight=\"20.0\"];\n");
 
+    String tokenFillString = "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
+    
+    HashMap<Node, Integer> nodeIDs = new HashMap<Node, Integer>();
+    int nodeID = 0;
+    
+    HashSet< HashSet<String> > swimlanes = new HashSet< HashSet<String> >();
+    for (Transition t : getTransitions()) {
+      swimlanes.add(t.getRoles());
+    }
+    HashSet< Place > printedPlaces = new HashSet<Place>();
+    
+    int laneNum=0;
+    
+    // for each swimlane
+    for (HashSet<String> lane : swimlanes) {
+      laneNum++;
+      
+      b.append("subgraph cluster_"+laneNum+" {");
+
+      // first print all places
+      b.append("\n\n");
+      b.append("node [shape=circle];\n");
+      for (Place p : places) {
+        
+        // only places that are exactly in the given lane
+        if (!lane.equals(p.getRoles())) continue;
+        printedPlaces.add(p);
+        
+        nodeID++;
+        nodeIDs.put(p, nodeID);
+        
+        if (p.getTokens() > 0)
+          b.append("  p"+nodeID+" ["+tokenFillString+"]\n");
+        else
+          b.append("  p"+nodeID+" []\n");
+        
+        String auxLabel = "ROLES: "+toString(p.getRoles());
+          
+        b.append("  p"+nodeID+"_l [shape=none];\n");
+        b.append("  p"+nodeID+"_l -> p"+nodeID+" [headlabel=\""+toLoLA_ident(p.getName())+" "+auxLabel+"\"]\n");
+      }
+  
+      // then print all events
+      b.append("\n\n");
+      b.append("node [shape=box];\n");
+      for (Transition t : transitions) {
+        
+        if (!lane.equals(t.getRoles())) continue;
+        
+        nodeID++;
+        nodeIDs.put(t, nodeID);
+  
+        b.append("  t"+nodeID+" []\n");
+        
+        String auxLabel  = "ROLES: "+toString(t.getRoles());
+        
+        b.append("  t"+nodeID+"_l [shape=none];\n");
+        b.append("  t"+nodeID+"_l -> t"+nodeID+" [headlabel=\""+toLoLA_ident(t.getName())+" "+auxLabel+"\"]\n");
+      }
+      
+      b.append("}\n\n");  //subgraph
+    }
+    
+    // print all remaining places
+    b.append("\n\n");
+    b.append("node [shape=circle];\n");
+    for (Place p : places) {
+      
+      // only places that have not been printed yet
+      if (printedPlaces.contains(p)) continue;
+      
+      nodeID++;
+      nodeIDs.put(p, nodeID);
+      
+      if (p.getTokens() > 0)
+        b.append("  p"+nodeID+" ["+tokenFillString+"]\n");
+      else
+        b.append("  p"+nodeID+" []\n");
+      
+      String auxLabel = "ROLES: "+toString(p.getRoles());
+        
+      b.append("  p"+nodeID+"_l [shape=none];\n");
+      b.append("  p"+nodeID+"_l -> p"+nodeID+" [headlabel=\""+toLoLA_ident(p.getName())+" "+auxLabel+"\"]\n");
+    }
+    
+    // finally, print all edges
+    b.append("\n\n");
+    b.append(" edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black];\n");
+    for (Arc arc : arcs) {
+      if (arc.getSource() instanceof Transition)
+        b.append("  t"+nodeIDs.get(arc.getSource())+" -> p"+nodeIDs.get(arc.getTarget())+" [weight=10000.0]\n");
+      else
+        b.append("  p"+nodeIDs.get(arc.getSource())+" -> t"+nodeIDs.get(arc.getTarget())+" [weight=10000.0]\n");
+    }
+    b.append("}");
+      
+    return b.toString();
+  }
+  
+  /**
+   * @return brief summary about this net
+   */
+  public String getInfo() {
+    return "|P|= "+places.size()+"  |P_in|= "+0+"  |P_out|= "+0+"  |T|= "+transitions.size()+"  |F|= "+arcs.size();
+  }
+  
+  /**
+   * Print a collection of strings into a string
+   * @param strings
+   * @return
+   */
+  public static String toString(Collection<String> strings) {
+    String result = "[";
+    Iterator<String> it = strings.iterator();
+    while (it.hasNext()) {
+      result += it.next();
+      if (it.hasNext()) result += ", ";
+    }
+    return result+"]";
+  }
+  
   /**
    * Convert arbitrary identifier into LoLA-compatible format.
    * @param s

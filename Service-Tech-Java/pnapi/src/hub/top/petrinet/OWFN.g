@@ -30,7 +30,7 @@ package hub.top.petrinet;
 	private PetriNet 	net;
 	
 	private boolean		produceArcs;	
-	private Transition  currentTransition;
+	private Transition  currentTransition = null;
 
     public static void main(String[] args) throws Exception {
         OWFNLexer lex = new OWFNLexer(new ANTLRFileStream(args[0]));
@@ -88,9 +88,21 @@ node_name returns [String text]:
 
 roles:
 	KEY_ROLES
-		node_name
+	  name1=node_name
+        {
+          if (currentTransition != null)
+            currentTransition.addRole($name1.text);
+          else
+            net.addRole($name1.text);
+        }
 	(
-	  COMMA node_name
+	  COMMA name2=node_name
+        {
+          if (currentTransition != null)
+            currentTransition.addRole($name2.text);
+          else
+            net.addRole($name2.text);
+        }
 	)*
 	SEMICOLON
 ;
@@ -116,7 +128,7 @@ place_list:
 	    check(places_[nodeName_.str()] == NULL, "node name already used");
 	    places_[nodeName_.str()] = &pnapi_lola_yynet.createPlace(nodeName_.str(), 0, capacity_);
 	    */
-	    net.addPlace($name1.text);
+	    net.addPlace_unique($name1.text);
 	  }
   (	
   	COMMA name2=node_name
@@ -124,7 +136,7 @@ place_list:
 	    check(places_[nodeName_.str()] == NULL, "node name already used");
 	    places_[nodeName_.str()] = &pnapi_lola_yynet.createPlace(nodeName_.str(), 0, capacity_);
 	    */
-	    net.addPlace($name2.text);
+	    net.addPlace_unique($name2.text);
 	  }
   )*
  )?
@@ -163,7 +175,7 @@ transitions:
 transition: 
   KEY_TRANSITION node_name 
   {
-  	currentTransition = net.addTransition($node_name.text);
+  	currentTransition = net.addTransition_unique($node_name.text);
   	/* 
     check(!pnapi_lola_yynet.containsNode(nodeName_.str()), "node name already used");
     transition_ = &pnapi_lola_yynet.createTransition(nodeName_.str());

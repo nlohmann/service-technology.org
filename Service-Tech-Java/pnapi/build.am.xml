@@ -30,7 +30,7 @@
 	</target>
 	<target name="parser_lola" depends="parser_lola.dependencies" unless="updateParser_lola.notRequired"
 			description="Generate Java class files from ANTLR parser description.">
-		<echo message="Generating parser sources in ${home}..." />
+		<echo message="Generating parser sources in ${make.basedir}..." />
 		<java classpath="libs-build/antlr-3.2.jar" classname="org.antlr.Tool">
 			<arg path="./src/hub/top/petrinet/LoLA.g"/>
 		</java>
@@ -52,7 +52,7 @@
 	</target>
 	<target name="parser_owfn" depends="parser_owfn.dependencies" unless="updateParser_owfn.notRequired"
 			description="Generate Java class files from ANTLR parser description.">
-		<echo message="Generating parser sources in ${home}..." />
+		<echo message="Generating parser sources in ${make.basedir}..." />
 		<java classpath="libs-build/antlr-3.2.jar" classname="org.antlr.Tool">
 			<arg path="./src/hub/top/petrinet/OWFN.g"/>
 		</java>

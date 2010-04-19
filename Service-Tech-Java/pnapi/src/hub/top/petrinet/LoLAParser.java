@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\LoLA.g 2010-04-16 22:38:31
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\LoLA.g 2010-04-19 23:10:13
 
 /*****************************************************************************\
 
@@ -341,7 +341,7 @@ public class LoLAParser extends Parser {
             	    check(places_[nodeName_.str()] == NULL, "node name already used");
             	    places_[nodeName_.str()] = &pnapi_lola_yynet.createPlace(nodeName_.str(), 0, capacity_);
             	    */
-            	    net.addPlace(name1);
+            	    net.addPlace_unique(name1);
             	  
             // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\LoLA.g:100:3: ( COMMA name2= node_name )*
             loop4:
@@ -368,7 +368,7 @@ public class LoLAParser extends Parser {
             	    	    check(places_[nodeName_.str()] == NULL, "node name already used");
             	    	    places_[nodeName_.str()] = &pnapi_lola_yynet.createPlace(nodeName_.str(), 0, capacity_);
             	    	    */
-            	    	    net.addPlace(name2);
+            	    	    net.addPlace_unique(name2);
             	    	  
 
             	    }
@@ -573,7 +573,7 @@ public class LoLAParser extends Parser {
             state._fsp--;
 
 
-              	currentTransition = net.addTransition(node_name5);
+              	currentTransition = net.addTransition_unique(node_name5);
               	/* 
                 check(!pnapi_lola_yynet.containsNode(nodeName_.str()), "node name already used");
                 transition_ = &pnapi_lola_yynet.createTransition(nodeName_.str());

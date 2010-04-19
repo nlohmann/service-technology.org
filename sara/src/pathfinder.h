@@ -139,7 +139,7 @@ private:
 	int recsteps;
 
 	/// maximal shortcut size (redefinable per command line switch)
-	unsigned int shortcutmax;
+	int shortcutmax;
 
 	/// temporary firing sequence pool for complex diamond checks
 	vector<vector<Transition*> > fpool;

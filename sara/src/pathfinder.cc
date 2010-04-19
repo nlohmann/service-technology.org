@@ -86,7 +86,7 @@ PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& 
 	shortcutmax=-1;
 	minimize = false;
 	passedon = false;
-	if (args_info.lookup_given) shortcutmax=(unsigned int)(args_info.lookup_arg);
+	if (args_info.lookup_given) shortcutmax=args_info.lookup_arg;
 }
 
 /** Destructor. Also frees any myNode objects in use.

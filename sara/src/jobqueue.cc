@@ -104,7 +104,7 @@ bool JobQueue::pop_front(bool kill) {
 		if (queue.begin()->second.empty())
 			queue.erase(queue.begin());
 	}
-	if (args_info.droppast_given && args_info.droppast_arg<past.size()) // drop things that are too far in the past and will probably not come up again
+	if (args_info.droppast_given && (unsigned int)(args_info.droppast_arg)<past.size()) // drop things that are too far in the past and will probably not come up again
 	{
 		cerr << "\r";
 		status("warning: dropped all past jobs with priority %d",past.begin()->first);
@@ -517,7 +517,7 @@ int JobQueue::printSolutions(int& sum) {
 			PartialSolution* ps(jit->second[i]);
 			vector<Transition*> solution = ps->getSequence();
 			cout << "sara: SOLUTION(" << solution.size() << "): ";
-			if (solution.size()>sollength) sollength=solution.size();
+			if ((int)(solution.size())>sollength) sollength=(int)(solution.size());
 			sum += solution.size();
 			for(unsigned int j=0; j<solution.size(); ++j)
 				cout << solution[j]->getName() << " ";

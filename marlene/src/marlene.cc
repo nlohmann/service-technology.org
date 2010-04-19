@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
                     // adding a prefix to the net
                     if (args_info.withprefix_flag)
                     {
-                        net->prefixNodeNames(toString(i) + ".");
+                        net->prefixNames(toString(i) + ".");
                     }
                     
                     nets.push_back(net);
@@ -141,7 +141,7 @@ int main(int argc, char* argv[])
             // adding a prefix to the net
             if (args_info.withprefix_flag)
             {
-                net->prefixNodeNames("0.");
+                net->prefixNames("0.");
             }
         } catch (pnapi::exception::InputError error) {
             std::cerr << PACKAGE << ":" << error << std::endl;

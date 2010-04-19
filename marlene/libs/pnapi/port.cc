@@ -271,6 +271,17 @@ void Port::mirror()
 }
 
 /*!
+ * \brief prefix all labels
+ */
+void Port::prefixLabels(const std::string & prefix)
+{
+  PNAPI_FOREACH(label, allLabels_)
+  {
+    (*label)->prefix(prefix);
+  }
+}
+
+/*!
  * \brief return the name of the port
  */
 const std::string & Port::getName() const
@@ -379,6 +390,14 @@ void Label::mirror()
   case OUTPUT: type_ = INPUT; break;
   default: assert(false); // should not happen
   }
+}
+
+/*!
+ * \brief prefix this label
+ */
+void Label::prefix(const std::string & prefix)
+{
+  name_ = prefix + name_;
 }
 
 /*!

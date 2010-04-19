@@ -214,7 +214,6 @@ AT_KEYWORDS(sample)
 AT_CLEANUP
 
 AT_SETUP([adding prefixes to nets (1)])
-AT_XFAIL_IF(true)
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 #AT_CHECK_PETRIFY

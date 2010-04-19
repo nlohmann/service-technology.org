@@ -432,14 +432,14 @@ namespace pnapi { namespace parser { namespace pnml { namespace yy {
 
 /* Line 677 of lalr1.cc  */
 #line 83 "parser-pnml.yy"
-    { parser_.close_element(); }
+    { parser_.close_element(); free((yysemantic_stack_[(5) - (4)].s)); }
     break;
 
   case 7:
 
 /* Line 677 of lalr1.cc  */
 #line 88 "parser-pnml.yy"
-    { parser_.store_data((yysemantic_stack_[(2) - (2)].s)); }
+    { parser_.store_data((yysemantic_stack_[(2) - (2)].s)); free((yysemantic_stack_[(2) - (2)].s)); }
     break;
 
   case 9:

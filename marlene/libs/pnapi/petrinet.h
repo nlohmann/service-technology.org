@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: georgstraube $
+ *          last changes of: $Author: cas $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-04-07 18:06:20 +0200 (Wed, 07 Apr 2010) $
+ * \date    $Date: 2010-04-18 18:01:24 +0200 (Sun, 18 Apr 2010) $
  *
- * \version $Revision: 5601 $
+ * \version $Revision: 5658 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -412,6 +412,10 @@ public: /* public methods */
   /// product with Constraint oWFN
   void produce(const PetriNet &, const std::string & = "net",
                const std::string & = "constraint") throw (exception::InputError);
+  /// adds a prefix to all labels and nodes
+  PetriNet & prefixNames(const std::string &);
+  /// adds a prefix to all labels
+  PetriNet & prefixLabelNames(const std::string &);
   /// adds a given prefix to all nodes
   PetriNet & prefixNodeNames(const std::string &);
   /// swaps input and output labels

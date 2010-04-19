@@ -72,6 +72,8 @@ public: /* public methods */
   void removeTransition(const Transition &);
   /// swaps input and output labels
   void mirror();
+  /// prefix this label
+  void prefix(const std::string &);
   
   /// returning the label's name
   const std::string & getName() const;
@@ -82,7 +84,7 @@ public: /* public methods */
   /// get the underlying petri net
   PetriNet & getPetriNet() const;
   /// get the assigned port
-  Port & getPort() const; 
+  Port & getPort() const;
 
 private: /* private methods */
   /// no copying allowed
@@ -141,6 +143,8 @@ public: /* public methods */
   void removeLabel(const std::string &);
   /// swaps input and output labels
   void mirror();
+  /// prefix all labels
+  void prefixLabels(const std::string &);
   //@}
 
   /*!

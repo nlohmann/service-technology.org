@@ -1,4 +1,4 @@
-AC_INIT([Marlene],[1.2-unreleased],[christian.gierds@service-technology.org])
+AC_INIT([Marlene],[1.2-unreleased],[marlene@service-technology.org])
 
 AC_MSG_NOTICE([  ______              _                    ])
 AC_MSG_NOTICE([ |  ___ \            | |                   ])

@@ -1,4 +1,5 @@
 #include <config.h>
+#include <cstdlib>
 #include <fstream>
 #include "pnapi.h"
 #include "verbose.h"
@@ -18,7 +19,8 @@ int main(int argc, char** argv) {
         o << pnapi::io::lola << net;
     }
 
-    std::cout << ".PHONY : clean\n\n";
+    std::cout << ".PHONY : clean veryclean\n\n";
+    std::cout << "SED = sed\n\n";
     std::cout << "net = " << argv[1] << ".lola\n";
     std::cout << "transitions = ";
     PNAPI_FOREACH(t, net.getTransitions()) {
@@ -35,15 +37,17 @@ int main(int argc, char** argv) {
 
     // check 1: quasi-liveness
     std::cout << "quasiliveness: $(transitions:%=%.quasiliveness.result)\n";
-    std::cout << "-@grep -L \"RESULT: 0\" *.quasiliveness.result | tr '\n' ',' | sed 's/.$$//' | sed 's/,/, /g'\n";
+    std::cout << "\t-@grep -L \"RESULT: 0\" *.quasiliveness.result | tr '\\n' ',' | $(SED) 's/.$$//' | $(SED) 's/,/, /g'\n\n";
     std::cout << "%.quasiliveness.result:\n";
     std::cout << "\t@echo \"ANALYSE TRANSITION $(@:%.quasiliveness.result=%)\" > $(@:%.result=%.task)\n";
     std::cout << "\t-@lola-deadtransition $(net) -a$(@:%.result=%.task) &> $@ ; echo \"RESULT: $$?\" >> $@\n\n";
 
     // check 2: boundedness (transitions)
-    std::cout << "boundedness: $(places:%=%.boundedness.result)\n\n";
+    std::cout << "boundedness: $(places:%=%.boundedness.result)\n";
+    std::cout << "\t-@grep -L \"RESULT: 1\" *.boundedness.result | tr '\\n' ',' | $(SED) 's/.$$//' | $(SED) 's/,/, /g'\n\n";
     std::cout << "%.boundedness.result:\n";
-    std::cout << "\t@echo \"ANALYSE PLACE $(@:%.boundedness.result=%)\" > $(@:%.result=%.task)\n\n";
+    std::cout << "\t@echo \"ANALYSE PLACE $(@:%.boundedness.result=%)\" > $(@:%.result=%.task)\n";
+    std::cout << "\t@-lola-boundedplace $(net) -a$(@:%.result=%.task) &> $@ ; echo \"RESULT: $$?\" >> $@\n\n";
 
     // check 2: boundedness (whole net)
     std::cout << "boundednessnet: boundednessnet.result\n\n";
@@ -52,7 +56,7 @@ int main(int argc, char** argv) {
 
     // check for quasiliveness by findpath
     std::cout << "quasilivenessfindpath: $(transitions:%=%.findpath.result)\n";
-    std::cout << "\t-@grep -L \"RESULT: 0\" *.findpath.result | sed -e 's/.findpath.result//' | xargs\n\n";
+    std::cout << "\t-@grep -L \"RESULT: 0\" *.findpath.result | $(SED) -e 's/.findpath.result//' | xargs\n\n";
 
     PNAPI_FOREACH(t, net.getTransitions()) {
          std::cout << (*t)->getName() << ".findpath.result:\n\t@echo \"FORMULA (";
@@ -63,7 +67,9 @@ int main(int argc, char** argv) {
              } else {
                  first = false;
              }
-             std::cout << " " << (*n)->getName() << " > 0";
+             Arc *a = net.findArc(**n, **t);
+             assert(a);
+             std::cout << " " << (*n)->getName() << " >= " << a->getWeight();
          }
          std::cout << " )\" > $(@:%.result=%.task)\n";
          std::cout << "\t-@lola-findpath $(net) -a$(@:%.result=%.task) &> $@ ; echo \"RESULT: $$?\" >> $@\n";
@@ -78,7 +84,8 @@ int main(int argc, char** argv) {
     std::cout << "\t@rm -f $(transitions:%=%.findpath.result)\n";
     std::cout << "\t@rm -f $(transitions:%=%.findpath.task)\n";
     std::cout << "\t@rm -f $(places:%=%.boundedness.task)\n";
-    std::cout << "\n";
+    std::cout << "\nveryclean: clean\n";
+    std::cout << "\t@rm -f $(net)\n";
 
-    return 0;
+    return EXIT_SUCCESS;
 }

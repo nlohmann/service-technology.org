@@ -8,7 +8,6 @@
 #include "helpers.h"
 #include "lindaAgent.h"
 #include "staticAnalysis.h"
-#include "setsOfFinalMarkings.h"
 #include "eventTerm.h"
 #include "stateEquation.h"
 #include "eventTermParser.h"

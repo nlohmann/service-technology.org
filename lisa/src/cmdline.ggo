@@ -1,0 +1,64 @@
+# This is the only input file for gengetopt.
+
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+
+description "About Lisa:"
+purpose "Lisa - LInear programming based Structural Analysis.\n This program implements basic structural analysis methods for petri nets."
+
+section "Input/Output"
+sectiondesc="When called without an input file, lisa reads from the standard input stream. When called without an output parameter, lisa writes to the standard output stream. If no filename is given for the output option lisa creates a file with a temporary name.\n"
+
+option "output" o
+  "lisa' output."
+  details="This option is used when lisa's output should be stored to a file.\n"
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
+section "Configuration"
+
+option "lisa" -
+  "Set the path and binary of lisa."
+  details="The lisa binary. lisa can be downloaded from http://service-technology.org/lisa and compiled using `make lisa'.\n"
+  string
+  typestr="FILENAME"
+  default="lisa"
+  optional
+  hidden
+
+option "tmpfile" -
+  "Set the path and name of temporary files."
+  details="The filename lisa should use to create temporary files (i.e., the output derived from lisa). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/lisa-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created will be kept after lisa terminates.\n"
+  flag off
+
+
+section "Debugging"
+sectiondesc="These options control how much debug output lisa creates.\n"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+
+option "bug" -
+  "Write configuration information into a file `bug.log'."
+  details="This output file gives information on the machine lisa was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  flag off
+  hidden
+
+option "stats" -
+  "Display time and memory consumption on termination."
+  details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
+  flag off
+  hidden
+

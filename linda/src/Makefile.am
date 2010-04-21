@@ -1,7 +1,6 @@
 #lib_LTLIBRARIES = liblinda.la
 
 #liblinda_la_SOURCES = main.cc \
-#		setsOfFinalMarkings.cc setsOfFinalMarkings.h \
 #		stateEquation.cc stateEquation.h \
 #		eventTerm.cc eventTerm.h \
 #		helpers.h helpers.cc \
@@ -18,7 +17,7 @@
 # information for libtool
 #includedir = @includedir@/linda
 
-#include_HEADERS = lindaAgent.h setsOfFinalMarkings.h stateEquation.h eventTerm.h helpers.h cmdline.h verbose.h
+#include_HEADERS = lindaAgent.h stateEquation.h eventTerm.h helpers.h cmdline.h verbose.h
 
 # only add the local Petri net API if necessary
 #if COMPILE_PNAPI
@@ -31,7 +30,6 @@
 bin_PROGRAMS = linda
 
 linda_SOURCES = main.cc \
-		setsOfFinalMarkings.cc setsOfFinalMarkings.h \
 		stateEquation.cc stateEquation.h \
 		eventTerm.cc eventTerm.h \
 		helpers.h helpers.cc \

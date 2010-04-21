@@ -4,22 +4,21 @@
 #include "config.h"
 #include "helpers.h"
 #include "eventTerm.h"
-#include "setsOfFinalMarkings.h"
 
 /// A data structure for the extended state equation of an open net.
 class ExtendedStateEquation {
 public:
-	static BinaryTree<const pnapi::Place*,std::pair<int, std::pair<int*,REAL*> > >* lines; //!< For the analyzed open net, those are the place<->transition lines in the equation system.
+	static BinaryTree<pnapi::Place*,std::pair<int, std::pair<int*,REAL*> > >* lines; //!< For the analyzed open net, those are the place<->transition lines in the equation system.
 	static std::pair<int*,REAL*>* eventLines; //!< For the analyzed open net, those are the event lines in the equation system.
 	static BinaryTree<pnapi::Transition*, unsigned int>* transitionID; //!< Quick transition referencing.
 
 	bool storeHistory;
 	lprec* lp; //!< The lp system for this state equation
 	pnapi::PetriNet* net; //!< The open net that is to be analyzed
-	PartialMarking* omega; //!< The partial final marking to be assumed
+	BinaryTree<pnapi::Place*,std::pair<int,int> >* finalMarking; //!< The partial final marking to be assumed
 
     /// Basic constructor, assigning/initializing fields.
-	ExtendedStateEquation(pnapi::PetriNet* aNet, PartialMarking* aFinalMarking, bool history=true) : storeHistory(history), net(aNet), omega(aFinalMarking), lp(NULL), isFeasible(false), isConstructed(false) {}
+	ExtendedStateEquation(pnapi::PetriNet* aNet, BinaryTree<pnapi::Place*,std::pair<int,int> >* aFinalMarking, bool history=true) : storeHistory(history), net(aNet), finalMarking(aFinalMarking), lp(NULL), isFeasible(false), isConstructed(false) {}
 
     /// Constructs the lp system from ExtendedStateEquation::lines and the final marking, returns true if no error occured.
 	bool constructLP();

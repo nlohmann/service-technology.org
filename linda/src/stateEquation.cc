@@ -5,8 +5,8 @@
 extern gengetopt_args_info args_info;
 
 /// Initialize the static members.
-BinaryTree<const pnapi::Place*, std::pair<int, std::pair<int*, REAL*> > >
-		* ExtendedStateEquation::lines = new BinaryTree<const pnapi::Place*,
+BinaryTree<pnapi::Place*, std::pair<int, std::pair<int*, REAL*> > >
+		* ExtendedStateEquation::lines = new BinaryTree<pnapi::Place*,
 				std::pair< int, std::pair<int*, REAL*>  > > ();
 std::pair<int*, REAL*>* ExtendedStateEquation::eventLines = 0;
 BinaryTree<pnapi::Transition*, unsigned int>
@@ -55,25 +55,31 @@ bool ExtendedStateEquation::constructLP() {
 	set_add_rowmode(lp, TRUE);
 
 	// Iterate over the places in this final marking
-	for (BinaryTreeIterator<const pnapi::Place*, int>* placesIt =
-			omega->values.begin(); placesIt->valid(); placesIt->next()) {
+	for (std::set<pnapi::Place*>::iterator placesIt =
+			net->getPlaces().begin(); net->getPlaces().end() != placesIt; ++placesIt) {
 
 		// Prepare the arrays for the column ids and values
 		int* transCol;
 		REAL* transVal;
 
 		// Get the place pointer
-		const pnapi::Place* place = placesIt->getKey();
+		pnapi::Place* place = *placesIt;
 
 		// Get the value of the place in the partial marking
-		int value = placesIt->getValue();
+		int value = 0;
+		int op = GE;
+		BinaryTreeNode<pnapi::Place*,std::pair<int,int> >* node = finalMarking->find(place);
+		if (node != 0) {
+			op = node->value.first;
+			value = node->value.second;
+		} 
 
 		// See how many transitions are connected to this place
 		int number_of_transitions_for_this_place =
 				place->getPresetArcs().size() + place->getPostsetArcs().size();
 
 		// See if this line was already created before (and thus is stored in the static member).
-		BinaryTreeNode<const pnapi::Place*, std::pair<int , std::pair<int*, REAL*> > >* line =
+		BinaryTreeNode<pnapi::Place*, std::pair<int , std::pair<int*, REAL*> > >* line =
 				lines->find(place);
 
 		// Counter for the columns with values.
@@ -147,7 +153,7 @@ bool ExtendedStateEquation::constructLP() {
 		//                                    the values for each affected column, the comparison operator,
 		//                                    the right hand side value.)
 		add_constraintex(lp, tr, transVal,
-				transCol, EQ, diffval);
+				transCol, op, diffval);
 	}
 
 	// If the event line array has not been initialized yet, do that now.
@@ -187,8 +193,6 @@ bool ExtendedStateEquation::constructLP() {
 	// We are done adding rows, so we leave the "add row mode" and set the flag.
 	set_add_rowmode(lp, FALSE);
 	isConstructed = true;
-
-	print_lp(lp);
 	
 	// We solve the linear program to see if it is feasible. objective function is min 0 at this point.
 	int ret = solve(lp);
@@ -198,8 +202,6 @@ bool ExtendedStateEquation::constructLP() {
 
 	// We find that the linear program is infeasible, so we do not take it into account anymore and return false.
 	if (!isFeasible) {
-		message("Final marking not reachable from initial marking: %s",
-				omega->toString().c_str());
 		return false;
 	}
 

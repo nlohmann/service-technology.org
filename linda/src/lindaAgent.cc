@@ -1,44 +1,15 @@
 #include "lindaAgent.h"
 
 pnapi::PetriNet* LindaAgent::mNet = 0;
-std::vector<PartialMarking*>* LindaAgent::mFinals = 0;
+std::vector<BinaryTree<pnapi::Place*,std::pair<int,int> >*>* LindaAgent::mFinals = 0;
 std::vector<ExtendedStateEquation*>* LindaAgent::mSystems = 0;
 bool LindaAgent::keepHistory;
 
-bool LindaAgent::initialize(pnapi::PetriNet* net,
-		std::map<std::string, uint8_t>& name2id,
-		std::map<uint8_t, std::string>& id2name,
-		bool keepHistory) {
-/*	mNet = net;
-
-	LindaAgent::keepHistory = keepHistory;
-
-	mFinals = new std::vector<PartialMarking*>();
-	mSystems = new std::vector<ExtendedStateEquation*>();
-
-	// Sync linda's order with wendy's order.
-	LindaHelpers::NR_OF_EVENTS = mNet->getInterfacePlaces().size();
-	LindaHelpers::EVENT_PLACES
-	= new pnapi::Place*[LindaHelpers::NR_OF_EVENTS]();
-	LindaHelpers::EVENT_STRINGS = new std::string[LindaHelpers::NR_OF_EVENTS]();
-
-	for (std::set<pnapi::Place *>::iterator it =
-		net->getInterfacePlaces().begin(); it
-		!= net->getInterfacePlaces().end(); ++it) {
-		int wendyID = name2id[(*it)->getName()] - 1;
-		LindaHelpers::EVENT_PLACES[wendyID] = (*it);
-		LindaHelpers::EVENT_STRINGS[wendyID] = (*it)->getName();
-
-	}
-
-	return (mNet != 0);
-*/
-	}
 
 bool LindaAgent::initialize(pnapi::PetriNet* net,bool keepHistory) {
 	mNet = net;
 
-	mFinals = new std::vector<PartialMarking*>();
+	mFinals = new std::vector<BinaryTree<pnapi::Place*,std::pair<int,int> >*>();
 	mSystems = new std::vector<ExtendedStateEquation*>();
 
 
@@ -54,7 +25,7 @@ bool LindaAgent::initialize(pnapi::PetriNet* net,bool keepHistory) {
 
 	int counter = 0;
 	for (std::set<pnapi::Label *>::iterator it =
-		labels.begin(); it != labels.end(); ++it) {
+	labels.begin(); it != labels.end(); ++it) {
 		LindaHelpers::EVENT_STRINGS[counter] = (*it)->getName();
 		LindaHelpers::EVENT_LABELS[counter] = (*it);
 		++counter;
@@ -65,53 +36,6 @@ bool LindaAgent::initialize(pnapi::PetriNet* net,bool keepHistory) {
 }
 
 
-bool LindaAgent::addFinalMarking(
-		std::map<const pnapi::Place*, unsigned int>* finalMarking) {
-
-/*
-		PartialMarking* p = new PartialMarking();
-
-	for (std::set<pnapi::Place*>::iterator it =
-		mNet->getInternalPlaces().begin(); it
-		!= mNet->getInternalPlaces().end(); ++it) {
-		if (finalMarking->find(*it) != finalMarking->end()) {
-			p->values.insert(*it, (*finalMarking)[*it], false);
-		} else {
-			p->values.insert(*it, 0, false);
-		}
-	}
-
-	return addFinalMarking(p);
-*/
-
-}
-
-bool LindaAgent::addFinalMarking(PartialMarking* finalMarking) {
-
-/*
-	ExtendedStateEquation* e = new ExtendedStateEquation(mNet, finalMarking, keepHistory);
-	if (e->constructLP()) {
-		mFinals->push_back(finalMarking);
-		mSystems->push_back(e);
-		return true;
-	}
-
-	return false;
-*/
-}
-
-/*
-bool LindaAgent::addFinalMarkingsFromFinalCondition(uint8_t bound) {
-	SetOfPartialMarkings* fSet = SetOfPartialMarkings::create(mNet,
-			&(mNet->finalCondition().formula()), bound);
-
-	for (int i = 0; i < fSet->size(); ++i) {
-		addFinalMarking(fSet->partialMarkings[i]);
-	}
-
-	return true;
-}
-*/
 
 uint8_t* LindaAgent::getXORTable(uint8_t firstOfInterest, uint8_t lastOfInterest) {
 
@@ -148,7 +72,7 @@ uint8_t* LindaAgent::getXORTable(uint8_t* eventsOfInterest, uint8_t count) {
 
 			uint8_t counter = 0;
 			for (std::vector<ExtendedStateEquation*>::iterator it =
-				mSystems->begin(); it != mSystems->end(); ++it) {
+			mSystems->begin(); it != mSystems->end(); ++it) {
 				EventTermBound* result = (*it)->evaluate(term);
 				bounds[counter++] = *result;
 
@@ -212,33 +136,146 @@ void LindaAgent::finalize() {
 	delete ExtendedStateEquation::transitionID;
 }
 
-bool LindaAgent::addFinalMarkingsFromFinalCondition(uint8_t bound) {
-	// Calculate the final markings from the final condition
+std::pair<BinaryTree<pnapi::Place*,std::pair<int,int> >**,int> LindaAgent::translateFinalCondition(pnapi::PetriNet* net) {
 
-	SetOfPartialMarkings* fSet = SetOfPartialMarkings::create(mNet,
-			&(mNet->getFinalCondition().getFormula()), bound);
-
-	status("Computed final markings:");
-	for (std::vector<PartialMarking*>::iterator finalMarkingIt =
-		fSet->partialMarkings.begin(); finalMarkingIt
-		!= fSet->partialMarkings.end(); ++finalMarkingIt) {
-		status("    %s", (*finalMarkingIt)->toString().c_str());
-
-		ExtendedStateEquation* XSE = new ExtendedStateEquation(mNet,(*finalMarkingIt));
-		if (XSE->constructLP()) {
-			mSystems->push_back(XSE);
-			mFinals->push_back(*finalMarkingIt);
-		}
-
-
-		// TODO: Access to args_info::showlp
-
+	pnapi::Condition& cond = net->getFinalCondition();
+	cond.dnf();
+	const pnapi::formula::Formula& form = cond.getFormula();
+	pnapi::formula::Disjunction dForm(form,pnapi::formula::FormulaFalse());
+	if (typeid(form) == typeid(pnapi::formula::Disjunction)) {
+		dForm = dynamic_cast<const pnapi::formula::Disjunction&>(form);
 	}
+	int size = dForm.getChildren().size();
+	BinaryTree<pnapi::Place*,std::pair<int,int> >** result = new BinaryTree<pnapi::Place*,std::pair<int,int> >*[size];
+	int i = 0;
+	for (std::set<const pnapi::formula::Formula *>::iterator dIt =
+	dForm.getChildren().begin(); dIt
+	!= dForm.getChildren().end(); ++dIt) {
+		
+		const pnapi::formula::Conjunction* cForm = dynamic_cast<const pnapi::formula::Conjunction*>(*dIt);
+		result[i] = new BinaryTree<pnapi::Place*,std::pair<int,int> >;
+		for (std::set<const pnapi::formula::Formula *>::iterator cIt =
+		cForm->getChildren().begin(); cIt
+		!= cForm->getChildren().end(); ++cIt) {
+			
+			const pnapi::formula::Formula* src = *cIt;
+			
+			// p1 = j means a new partial marking M with M(p1) = j
+			if (typeid(*src) == typeid(pnapi::formula::FormulaEqual)) {
 
+				const pnapi::formula::FormulaEqual
+				* const castedSrc = dynamic_cast<const pnapi::formula::FormulaEqual* const > (src);
 
+				result[i]->insert(const_cast<pnapi::Place*>(&(castedSrc->getPlace())), std::pair<int,int>(EQ, castedSrc->getTokens()), false);
+				
+			}
 
+			// p1 > j means a new partial marking Mi for each 1 <= i <= bound - j where Mi(p1) = i+j+1
+			else if (typeid(*src)
+					== typeid(pnapi::formula::FormulaGreater)) {
 
+				const pnapi::formula::FormulaGreater
+				* const castedSrc =
+				dynamic_cast<const pnapi::formula::FormulaGreater* const > (src);
 
+				result[i]->insert(const_cast<pnapi::Place*>(&(castedSrc->getPlace())), std::pair<int,int>(GE, castedSrc->getTokens()+1), false);
+
+			}
+
+			// p1 >= j means a new partial marking Mi for each 0 <= i <= bound - j where Mi(p1) = i+j
+			else if (typeid(*src)
+					== typeid(pnapi::formula::FormulaGreaterEqual)) {
+
+				const pnapi::formula::FormulaGreaterEqual
+				* const castedSrc =
+				dynamic_cast<const pnapi::formula::FormulaGreaterEqual* const > (src);
+				result[i]->insert(const_cast<pnapi::Place*>(&(castedSrc->getPlace())), std::pair<int,int>(GE, castedSrc->getTokens()), false);
+			}
+
+			// p1 < j means a new partial marking Mi for each 0 <= i <= j-1 where Mi(p1) = i
+			else if (typeid(*src)
+					== typeid(pnapi::formula::FormulaLess)) {
+				const pnapi::formula::FormulaLess
+				* const castedSrc =
+				dynamic_cast<const pnapi::formula::FormulaLess* const > (src);
+				result[i]->insert(const_cast<pnapi::Place*>(&(castedSrc->getPlace())), std::pair<int,int>(LE, castedSrc->getTokens()-1), false);
+			}
+
+			// p1 <= j means a new partial marking Mi for each 0 <= i <= j where Mi(p1) = i
+			else if (typeid(*src)
+					== typeid(pnapi::formula::FormulaLessEqual)) {
+				const pnapi::formula::FormulaLessEqual
+				* const castedSrc =
+				dynamic_cast<const pnapi::formula::FormulaLessEqual* const > (src);
+				result[i]->insert(const_cast<pnapi::Place*>(&(castedSrc->getPlace())), std::pair<int,int>(LE, castedSrc->getTokens()), false);
+			} else {
+				std::cerr << "Error: Unknown type <" << typeid(*src).name() << ">" << std::endl;  
+				assert(false);
+				
+			}
+			
+		}
+		
+		++i;
+		
+	}
+	
+	return std::pair<BinaryTree<pnapi::Place*,std::pair<int,int> >**,int> (result,size);
 }
 
 
+bool LindaAgent::addFinalMarkingsFromFinalCondition(uint8_t bound) {
+	// Calculate the final markings from the final condition
+
+	status("Computing final markings...");
+	std::pair<BinaryTree<pnapi::Place*,std::pair<int,int> >**,int> translated = translateFinalCondition(mNet);
+	status("Computed %i final markings",translated.second);
+	
+	for (int i = 0; i < translated.second; ++i) {
+		
+		ExtendedStateEquation* XSE = new ExtendedStateEquation(mNet,translated.first[i]);
+		if (XSE->constructLP()) {
+			mSystems->push_back(XSE);
+			mFinals->push_back(translated.first[i]);
+			status("    Final marking found: %s",
+			 LindaAgent::getFinalMarkingString(i).c_str());
+		}
+	}
+}
+
+std::string LindaAgent::getFinalMarkingString(int i) {
+		std::string result = "";
+		bool first = true;
+		for (std::set<pnapi::Place*>::iterator it = mNet->getPlaces().begin(); it != mNet->getPlaces().end(); ++it) {
+		if (first) {
+			first = false;
+		} else {
+			result += ", ";
+		}
+		int value = 0;
+		int op = GE;
+		BinaryTreeNode<pnapi::Place*,std::pair<int,int> >* node = (*mFinals)[i]->find(*it);
+		if (node != 0) {
+			op = node->value.first;
+			value = node->value.second;
+		}
+		
+		result += (*it)->getName();
+		if (op == GE) {
+		result += ">=";
+		}
+
+		else if (op == EQ) {
+		result += "=";
+		}
+
+		else if (op == LE) {
+		result += "<=";
+		}
+		
+		result += LindaHelpers::intToStr(value);
+		
+		}
+		return result + ";";
+		
+}

@@ -15,6 +15,7 @@
 #include "Output.h"
 #include "verbose.h"
 
+
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
@@ -67,6 +68,9 @@ extern int etc_yylex_destroy();
 #endif
 
 
+
+
+
 /// Output a message profile.
 void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet* net, uint8_t nr) {
 
@@ -76,8 +80,8 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 	bool first = true;
 
 	for (std::set<pnapi::Place *>::iterator it =
-			net->getPlaces().begin(); it
-			!= net->getPlaces().end(); ++it) {
+	net->getPlaces().begin(); it
+	!= net->getPlaces().end(); ++it) {
 
 		if (first) {
 			first = false;
@@ -98,7 +102,7 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 	std::set<pnapi::Label *> inlabels = net->getInterface().getInputLabels();
 
 	for (std::set<pnapi::Label *>::iterator it = inlabels.begin(); it
-			!= inlabels.end(); ++it) {
+	!= inlabels.end(); ++it) {
 
 		if (first) {
 			first = false;
@@ -122,7 +126,7 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 	std::set<pnapi::Label *> outlabels = net->getInterface().getInputLabels();
 
 	for (std::set<pnapi::Label *>::iterator it = outlabels.begin(); it
-			!= outlabels.end(); ++it) {
+	!= outlabels.end(); ++it) {
 
 		if (first) {
 			first = false;
@@ -143,7 +147,7 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 
 	for (int i = 0; i < nr; ++i) {
 		file << std::endl << "    F" << i+1 << ": "
-				<< systems[i]->omega->toString();
+		<<  LindaAgent::getFinalMarkingString(i);
 	}
 
 	int counter = 1;
@@ -151,8 +155,8 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 	file << std::endl << std::endl << "TERMS";
 
 	for (std::vector<int*>::iterator termsIt =
-			systems[0]->calculatedEventTerms.begin(); termsIt
-			!= systems[0]->calculatedEventTerms.end(); ++termsIt) {
+	systems[0]->calculatedEventTerms.begin(); termsIt
+	!= systems[0]->calculatedEventTerms.end(); ++termsIt) {
 		file << std::endl << "    T" << counter << ": ";
 		for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
 			if ((*termsIt)[i] == 0) {
@@ -176,15 +180,15 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 	for (int i = 0; i < nr; ++i) {
 
 		for (std::vector<EventTermBound*>::iterator termsIt =
-				systems[i]->calculatedBounds.begin(); termsIt
-				!= systems[i]->calculatedBounds.end(); ++termsIt) {
+		systems[i]->calculatedBounds.begin(); termsIt
+		!= systems[i]->calculatedBounds.end(); ++termsIt) {
 
 			if ((*termsIt)->upperBounded || (*termsIt)->lowerBounded) {
 
-			file << std::endl << "    F" << fCounter << ",T" << tCounter
-					<< ": ";
-			file << (*termsIt)->getLowerBoundString() << ","
-					<< (*termsIt)->getUpperBoundString() << ";";
+				file << std::endl << "    F" << fCounter << ",T" << tCounter
+				<< ": ";
+				file << (*termsIt)->getLowerBoundString() << ","
+				<< (*termsIt)->getUpperBoundString() << ";";
 
 			}
 
@@ -203,23 +207,23 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 int main(int argc, char** argv) {
 
 	/*
-	 * The Linda Workflow in short:
-	 * ----------------------------
-	 * Evaluate command line parameters
-	 * Parse an Open Net
-	 * If specified, create level 0 message profile.
-	 * If specified, create message profile from file.
-	 * If specified, create message profile from constraint file and try to decide compliance.
-	 * If specified, create an output file that contains all computed terms/bounds.
-	 */
+	* The Linda Workflow in short:
+	* ----------------------------
+	* Evaluate command line parameters
+	* Parse an Open Net
+	* If specified, create level 0 message profile.
+	* If specified, create message profile from file.
+	* If specified, create message profile from constraint file and try to decide compliance.
+	* If specified, create an output file that contains all computed terms/bounds.
+	*/
 
 	// Start the stopwatch
 	clock_t start_clock = clock();
 
 	// Evaluate parameters
 	evaluateParameters(argc, argv);
-    Output::setTempfileTemplate(args_info.tmpfile_arg);
-    Output::setKeepTempfiles(args_info.noClean_flag);
+	Output::setTempfileTemplate(args_info.tmpfile_arg);
+	Output::setKeepTempfiles(args_info.noClean_flag);
 
 
 	if (args_info.quiet_flag) {
@@ -255,10 +259,8 @@ int main(int argc, char** argv) {
 		std::stringstream inputerror;
 		inputerror << error;
 		abort(1, "pnapi error %i", inputerror.str().c_str());
-	}
-
-
-
+	}	
+	
 
 	// Create the linear program for each final marking
 
@@ -288,7 +290,7 @@ int main(int argc, char** argv) {
 		for (int x = 0; x < sysCounter; ++x) {
 
 			status("    Processing final marking: %s",
-					LindaAgent::getFinalMarking(x)->toString().c_str());
+			 LindaAgent::getFinalMarkingString(x).c_str());
 
 			level0[x] = new EventTermBound*[LindaHelpers::NR_OF_EVENTS];
 
@@ -317,9 +319,9 @@ int main(int argc, char** argv) {
 		for (int i = 0; i <sysCounter; ++i) {
 
 			status("    Processing final marking: %s",
-					LindaAgent::getFinalMarking(i)->toString().c_str());
+			 LindaAgent::getFinalMarkingString(i).c_str());
 
-			ListElement<int*>* currentTerm = f.terms;
+			 ListElement<int*>* currentTerm = f.terms;
 			while (currentTerm != 0) {
 				EventTermBound* b = LindaAgent::getSystem(i)->evaluate(currentTerm->element);
 				currentTerm = currentTerm->next;
@@ -339,9 +341,9 @@ int main(int argc, char** argv) {
 		for (int x = 0; x < sysCounter; ++x) {
 
 			status("    Processing final marking: %s",
-					LindaAgent::getFinalMarking(x)->toString().c_str());
+			 LindaAgent::getFinalMarkingString(x).c_str());
 
-			// For each event, we create a term and evaluate it
+		// For each event, we create a term and evaluate it
 			for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
 				BasicTerm* bt1 = new BasicTerm(i);
 				for (int j = i + 1; j < LindaHelpers::NR_OF_EVENTS; ++j) {
@@ -358,14 +360,14 @@ int main(int argc, char** argv) {
 							<= 1) {
 						if (b->upperBound == 1) {
 							status(
-									"        Events '%s' and '%s' are mutual exclusive.",
-									LindaHelpers::EVENT_STRINGS[i].c_str(),
-									LindaHelpers::EVENT_STRINGS[j].c_str());
+							"        Events '%s' and '%s' are mutual exclusive.",
+							LindaHelpers::EVENT_STRINGS[i].c_str(),
+							LindaHelpers::EVENT_STRINGS[j].c_str());
 						} else if (b->upperBound == 0) {
 							status(
-									"        Events '%s' and '%s' do not occur.",
-									LindaHelpers::EVENT_STRINGS[i].c_str(),
-									LindaHelpers::EVENT_STRINGS[j].c_str());
+							"        Events '%s' and '%s' do not occur.",
+							LindaHelpers::EVENT_STRINGS[i].c_str(),
+							LindaHelpers::EVENT_STRINGS[j].c_str());
 						}
 					}
 				}
@@ -384,8 +386,7 @@ int main(int argc, char** argv) {
 		for (int x = 0; x < sysCounter; ++x) {
 
 			status("    Processing final marking: %s",
-					LindaAgent::getFinalMarking(x)->toString().c_str());
-
+			 LindaAgent::getFinalMarkingString(x).c_str());
 			// For each event, we create a term and evaluate it
 			for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
 				BasicTerm* bt1 = new BasicTerm(i);
@@ -407,21 +408,22 @@ int main(int argc, char** argv) {
 
 	}
 
-		
+	
 	// MODE DBM Message Profile
 	if (args_info.dbm_flag) {
 		message("Evaluating dbm terms.");
 		status("Number of mutual exclsion terms: %i",
-				(LindaHelpers::NR_OF_EVENTS * LindaHelpers::NR_OF_EVENTS)
-				- LindaHelpers::NR_OF_EVENTS);
+		(LindaHelpers::NR_OF_EVENTS * LindaHelpers::NR_OF_EVENTS)
+		- LindaHelpers::NR_OF_EVENTS);
 
 		// Iterate over the finalmarkings/lps
 		for (int x = 0; x < sysCounter; ++x) {
 
 			status("    Processing final marking: %s",
-					LindaAgent::getFinalMarking(x)->toString().c_str());
+			 LindaAgent::getFinalMarkingString(x).c_str());
 
-			// For each event, we create a term and evaluate it
+		
+		// For each event, we create a term and evaluate it
 			for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
 				BasicTerm* bt1 = new BasicTerm(i);
 				
@@ -454,11 +456,11 @@ int main(int argc, char** argv) {
 
 		// For each system, evaluate all event terms
 		for (int i = 0; i <sysCounter; ++i) {
-
 			status("    Processing final marking: %s",
-					LindaAgent::getFinalMarking(i)->toString().c_str());
+			 LindaAgent::getFinalMarkingString(i).c_str());
 
-			// For each parsed event term...
+		
+		// For each parsed event term...
 			for (std::vector<int*>::iterator it = term_vec->begin(); it
 			!= term_vec->end(); ++it) {
 				EventTermBound* b = LindaAgent::getSystem(i)->evaluate((*it));
@@ -473,7 +475,7 @@ int main(int argc, char** argv) {
 	if (args_info.constraint_file_given) {
 
 		message("Evaluating constraints from file <%s>",
-				args_info.constraint_file_arg);
+		args_info.constraint_file_arg);
 
 		// Initialize parser
 		etc_yylineno = 1;
@@ -485,7 +487,7 @@ int main(int argc, char** argv) {
 		// If the file can not be read we warn the user and cancel the mode.
 		if (!etc_yyin) {
 			abort(1, "cannot open ETC file '%s' for reading!",
-					args_info.constraint_file_arg);
+			args_info.constraint_file_arg);
 		} else {
 
 			constraint_vec = new std::vector<EventTermConstraint*>();
@@ -495,30 +497,29 @@ int main(int argc, char** argv) {
 
 			// For each system...
 			for (int i = 0; i <sysCounter; ++i) {
+			status("    Processing final marking: %s",
+			 LindaAgent::getFinalMarkingString(i).c_str());
 
-				message("    Processing final marking: %s",
-						LindaAgent::getFinalMarking(i)->toString().c_str());
-
-				bool thereWereMaybes = false;
+			bool thereWereMaybes = false;
 
 				// For each term...
 				for (std::vector<EventTermConstraint*>::iterator it =
-					constraint_vec->begin(); it != constraint_vec->end(); ++it) {
+				constraint_vec->begin(); it != constraint_vec->end(); ++it) {
 					// Evaluate the term
 					EventTermBound* b = LindaAgent::getSystem(i)->evaluate(
-							(*it)->getEventTerm());
+					(*it)->getEventTerm());
 
 					// Try to decide if the given bounds are correct or not
 					if ((*it)->holds(b) == EventTermConstraint::is_false) {
 						message("        Constraint %s falsified",
-								(*it)->toString().c_str());
+						(*it)->toString().c_str());
 					} else if ((*it)->holds(b) == EventTermConstraint::is_true) {
 						message("        Constraint %s verified",
-								(*it)->toString().c_str());
+						(*it)->toString().c_str());
 					} else if ((*it)->holds(b) == EventTermConstraint::is_maybe) {
 						status(
-								"        Constraint %s could neither be verified nor falsified",
-								(*it)->toString().c_str());
+						"        Constraint %s could neither be verified nor falsified",
+						(*it)->toString().c_str());
 						thereWereMaybes = true;
 					}
 
@@ -527,7 +528,7 @@ int main(int argc, char** argv) {
 				// Print out the overall result.
 				if (thereWereMaybes) {
 					message(
-							"        Some constraints could neither be verified nor falsified.");
+					"        Some constraints could neither be verified nor falsified.");
 				}
 			}
 
@@ -559,12 +560,12 @@ int main(int argc, char** argv) {
 	}
 	// Verbose output the result of the stop watch
 	status("runtime: %.2f sec", ((double(clock()) - double(start_clock))
-			/ CLOCKS_PER_SEC));
+	/ CLOCKS_PER_SEC));
 	if (args_info.verbose_given) {
 		fprintf(stderr, "%s: memory consumption: ", PACKAGE);
 		system(
-				(std::string("ps | ") + TOOL_GREP + " " + PACKAGE + " | "
-						+ TOOL_AWK
-						+ " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+		(std::string("ps | ") + TOOL_GREP + " " + PACKAGE + " | "
+		+ TOOL_AWK
+		+ " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
 	}
 }

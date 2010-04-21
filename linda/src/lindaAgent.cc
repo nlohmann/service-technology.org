@@ -1,4 +1,6 @@
 #include "lindaAgent.h"
+#include "cmdline.h"
+extern gengetopt_args_info args_info;
 
 pnapi::PetriNet* LindaAgent::mNet = 0;
 std::vector<BinaryTree<pnapi::Place*,std::pair<int,int> >*>* LindaAgent::mFinals = 0;
@@ -238,7 +240,10 @@ bool LindaAgent::addFinalMarkingsFromFinalCondition(uint8_t bound) {
 			mSystems->push_back(XSE);
 			mFinals->push_back(translated.first[i]);
 			status("    Final marking found: %s",
-			 LindaAgent::getFinalMarkingString(i).c_str());
+			 LindaAgent::getFinalMarkingString(mFinals->size()-1).c_str());
+			if (args_info.show_lp_flag) {
+					XSE->output();
+			}
 		}
 	}
 }

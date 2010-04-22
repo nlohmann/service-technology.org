@@ -143,18 +143,36 @@ std::pair<BinaryTree<pnapi::Place*,std::pair<int,int> >**,int> LindaAgent::trans
 	pnapi::Condition& cond = net->getFinalCondition();
 	cond.dnf();
 	const pnapi::formula::Formula& form = cond.getFormula();
-	pnapi::formula::Disjunction dForm(form,pnapi::formula::FormulaFalse());
+	pnapi::formula::FormulaFalse* falseDummy = new pnapi::formula::FormulaFalse; 
+	pnapi::formula::FormulaTrue* trueDummy = new pnapi::formula::FormulaTrue; 
+	pnapi::formula::Conjunction* conjDummy = new pnapi::formula::Conjunction(form,*trueDummy);
+	pnapi::formula::Disjunction* disjDummy = new pnapi::formula::Disjunction(form,*falseDummy);
+	pnapi::formula::Disjunction* disjDummy2 = new pnapi::formula::Disjunction(*conjDummy,*falseDummy);
+
+	pnapi::formula::Disjunction dForm = pnapi::formula::Disjunction(*falseDummy,*falseDummy);
+
 	if (typeid(form) == typeid(pnapi::formula::Disjunction)) {
 		dForm = dynamic_cast<const pnapi::formula::Disjunction&>(form);
-	}
+		} else if (typeid(form) == typeid(pnapi::formula::Conjunction)) {
+		dForm = *disjDummy;
+		} else {
+		dForm = *disjDummy2;
+		}
 	int size = dForm.getChildren().size();
+	
 	BinaryTree<pnapi::Place*,std::pair<int,int> >** result = new BinaryTree<pnapi::Place*,std::pair<int,int> >*[size];
+	
 	int i = 0;
 	for (std::set<const pnapi::formula::Formula *>::iterator dIt =
 	dForm.getChildren().begin(); dIt
 	!= dForm.getChildren().end(); ++dIt) {
 		
+		
+		if ((*dIt)->getType() != pnapi::formula::Formula::F_CONJUNCTION) {
+			continue;
+		}
 		const pnapi::formula::Conjunction* cForm = dynamic_cast<const pnapi::formula::Conjunction*>(*dIt);
+
 		result[i] = new BinaryTree<pnapi::Place*,std::pair<int,int> >;
 		for (std::set<const pnapi::formula::Formula *>::iterator cIt =
 		cForm->getChildren().begin(); cIt
@@ -211,8 +229,7 @@ std::pair<BinaryTree<pnapi::Place*,std::pair<int,int> >**,int> LindaAgent::trans
 				dynamic_cast<const pnapi::formula::FormulaLessEqual* const > (src);
 				result[i]->insert(const_cast<pnapi::Place*>(&(castedSrc->getPlace())), std::pair<int,int>(LE, castedSrc->getTokens()), false);
 			} else {
-				std::cerr << "Error: Unknown type <" << typeid(*src).name() << ">" << std::endl;  
-				assert(false);
+				//assert(false);
 				
 			}
 			
@@ -222,7 +239,9 @@ std::pair<BinaryTree<pnapi::Place*,std::pair<int,int> >**,int> LindaAgent::trans
 		
 	}
 	
-	return std::pair<BinaryTree<pnapi::Place*,std::pair<int,int> >**,int> (result,size);
+	std::pair<BinaryTree<pnapi::Place*,std::pair<int,int> >**,int> res(result,size);
+	
+	return res;
 }
 
 
@@ -231,6 +250,7 @@ bool LindaAgent::addFinalMarkingsFromFinalCondition(uint8_t bound) {
 
 	status("Computing final markings...");
 	std::pair<BinaryTree<pnapi::Place*,std::pair<int,int> >**,int> translated = translateFinalCondition(mNet);
+	
 	status("Computed %i final markings",translated.second);
 	
 	for (int i = 0; i < translated.second; ++i) {

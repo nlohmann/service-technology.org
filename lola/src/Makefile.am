@@ -33,6 +33,7 @@ EXTRA_DIST = readnet-syntax.h cmdline.ggo \
              configs/userconfig.H.boundednet \
              configs/userconfig.H.deadlock \
              configs/userconfig.H.full \
+             configs/userconfig.H.full1 \
              configs/userconfig.H.fullcover \
              configs/userconfig.H.fulllimited \
              configs/userconfig.H.liveprop \

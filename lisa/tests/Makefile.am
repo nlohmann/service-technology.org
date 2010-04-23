@@ -10,9 +10,8 @@
 
 TESTFILES = myCoffee.owfn \
 	    uncontrollable.owfn \
-	    unnormal.owfn
-
-
+	    unnormal.owfn \
+	    simple1.owfn
 
 
 # Below you can list all the files you do not want to have counted in the

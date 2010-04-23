@@ -16,6 +16,12 @@ option "output" o
   argoptional
   optional
 
+section "Analysis"
+
+option "calculateMatrix" c
+  "Calculates and outputs the incident matrix"
+  flag off
+
 section "Configuration"
 
 option "lisa" -

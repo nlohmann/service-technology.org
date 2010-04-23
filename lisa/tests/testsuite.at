@@ -20,7 +20,14 @@ AT_CLEANUP
 
 
 ############################################################################
-AT_BANNER([Parameters])
+AT_BANNER([Algorithms])
 ############################################################################
 
+AT_SETUP([Determining incident matrix])
+m4_define([NET], [simple1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([LISA NET -c],0,ignore,stderr)
+AT_CHECK([GREP -q "1 1 0 0 -1" stderr])
+AT_KEYWORDS(algorithms)
+AT_CLEANUP
 

@@ -161,10 +161,12 @@ int main(int argc, char** argv) {
 
 
     /*----------------------------------------.
-    | 3. set some output parameters for Wendy |
+    | 3. print out incident matrix
     `----------------------------------------*/
 
-    matrix.printMatrix();
+    if(args_info.calculateMatrix_flag){
+	matrix.printMatrix();
+    } 
 
     return EXIT_SUCCESS;
 }

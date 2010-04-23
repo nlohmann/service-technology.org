@@ -32,6 +32,7 @@ using pnapi::PetriNet;
 using pnapi::Transition;
 using pnapi::Place;
 using pnapi::Marking;
+using pnapi::Node;
 using std::set;
 using std::map;
 using std::vector;
@@ -64,6 +65,8 @@ private:
 	vector<vector<int> > _matrix;
 	int _columnsCount;
 	int _rowsCount;
+	vector<Transition*> _transitions;
+	vector<Place*> _places;
 
 
 };

@@ -546,10 +546,16 @@ bool PathFinder::checkForDiamonds()
 			v.front() = t_active;
 			v.back() = t_check;
 			// if that sequence can fire under the marking from level i, it has all been done
-			// and the diamond is complete.
-			set<Place*> pset(im.compareOutput(*t_active,*t_check));
-			if (verbose>2 && im.checkRestrictedActivation(mv[i],v,pset)) cerr << "DC: Transition Switch (Step " << i << ", " << t_active->getName() << "/" << t_check->getName() << ")" << endl;
-			if (im.checkRestrictedActivation(mv[i],v,pset)) return true;
+			// and the diamond is complete. First test backward firability of t_check:
+			map<Place*,int> post(im.getPostset(*t_check));
+			map<Place*,int>::iterator mit;
+			for(mit=post.begin(); mit!=post.end(); ++mit)
+				if (mit->second>m0[*(mit->first)]) break;
+			if (mit==post.end()) { // t_check is firable as a last step, now check the rest
+				set<Place*> pset(im.compareOutput(*t_active,*t_check));
+				if (verbose>2 && im.checkRestrictedActivation(mv[i],v,pset)) cerr << "DC: Transition Switch (Step " << i << ", " << t_active->getName() << "/" << t_check->getName() << ")" << endl;
+				if (im.checkRestrictedActivation(mv[i],v,pset)) return true;
+			}
 		} 
 	// if the checks against all recursion levels go wrong, no diamond is completed
 	// Now do the complex check against all remembered firing sequences, hope the pool remains small

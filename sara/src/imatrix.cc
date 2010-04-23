@@ -81,7 +81,6 @@ map<Place*,int>& IMatrix::getColumn(Transition& t) {
 	@param t The transition.
 	@return The map from places to arc weights.
 */
-/* unused
 map<Place*,int> IMatrix::getPostset(Transition& t) {
 	map<Place*,int>& col(getColumn(t)); // get the change of the transition
 	map<Place*,int>& loop(getLoopColumn(t)); // and its loops
@@ -93,7 +92,6 @@ map<Place*,int> IMatrix::getPostset(Transition& t) {
 		if (it->second>0) result[it->first] += it->second; // and add the loops
 	return result;
 }
-*/
 
 /** Get the preset of a transition as a map.
 	@param t The transition.

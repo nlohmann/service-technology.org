@@ -43,10 +43,10 @@ public:
 
 	/// Get the column of the incidence matrix regarding a transition t.
 	map<Place*,int>& getColumn(Transition& t);
-/*
+
 	/// Get the postset (with weights) of a transition t
 	map<Place*,int> getPostset(Transition& t);
-*/
+
 	/// Get the preset (with weights) of a transition t
 	map<Place*,int> getPreset(Transition& t);
 

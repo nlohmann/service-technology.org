@@ -827,8 +827,9 @@ map<Transition*,int> PartialSolution::calcParikh() {
 
 /** Add a parikh image of a firing sequence to a failure.
 	@param The parikh image to add.
-void PartialSolution::addParikh(map<Transition*,int>& p) { parikh.push_back(p); }
 */
+void PartialSolution::addParikh(map<Transition*,int>& p) { parikh.clear(); parikh.push_back(p); }
+
 
 /** Get all parikh images of firing sequences for this failure.
 	@return A vector of parikh images.

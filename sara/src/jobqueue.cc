@@ -303,6 +303,7 @@ void JobQueue::push_fail(PartialSolution* job) {
 	jit->second[i]->setFeasibility(true);
 	map<Transition*,int> parikh(job->calcParikh());
 	if (job->getSequence().size()<jit->second[i]->getSequence().size()) jit->second[i]->setSequence(job->getSequence());
+	jit->second[i]->addParikh(parikh);
 	if (cleanFailure(parikh)) jit->second[i]->setSolved();
 	delete job;
 }

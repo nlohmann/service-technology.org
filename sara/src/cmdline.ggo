@@ -141,6 +141,7 @@ option "witness" W
   details="Such witnesses are points were the algorithm cannot fire any transition it would like to fire and adding T-invariants to the to-be-fired list is not possible. The algorithm is stuck and has to backtrack.
 "
   flag off
+  hidden
 
 option "scapegoat" S
   "Choose scapegoat nondeterministically." 
@@ -153,6 +154,7 @@ option "joborder" J
   details="Normally, jobs are prioritized by their number of constraints; this tends towards a depth-first-search. Setting this option will sort the jobs by expected firing sequences length which tends toward a breadth-first-search.
 "
   flag off
+  hidden
 
 option "lookup" L
   "Size of the lookup table."

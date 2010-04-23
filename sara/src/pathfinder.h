@@ -165,6 +165,9 @@ private:
 	/// checks if a diamond is about to be closed during recursion
 	bool checkForDiamonds();
 
+	/// checks whether a T-invariant can bring a transition closer to enabledness
+	bool checkIfClosingIn(int start);
+
 //	vector<Transition*> calcOrder(set<Transition*> tset);
 
 	bool isSmaller(map<Transition*,int>& m1, map<Transition*,int>& m2);

@@ -533,7 +533,7 @@ bool PathFinder::checkForDiamonds()
 		for(int i=fseq.size()-2; i>=0; --i) // don't check the transition against itself! (-> -2)
 		{
 			if (verbose>2 && minimize && mv[i]==m0) cerr << "DC: Duplicate Marking (Step " << i << ")" << endl;
-			if (minimize && mv[i]==m0) return true; // if we reach a marking again, there would be a smaller solution, so dismiss this one
+			if (minimize && mv[i]==m0) if (!checkIfClosingIn(i)) return true; // if we reach a marking again, there would be a smaller solution, so dismiss this one
 			// if it isn't in some set, it either hasn't been done at that point or it can't fire
 			// in any case: there is no diamond
 			if (stubsets[i].find(t_active)==stubsets[i].end()) continue;
@@ -570,6 +570,34 @@ bool PathFinder::checkForDiamonds()
 			if (mit==tmp.end()) return true;
 		}
 	}
+	return false;
+}
+
+/** Check whether one of the transitions that are expected to fire but have not so far
+	comes closer to enabledness during the firing of a T-invariant than before that.
+	@param start The starting point of the T-invariant in the active firing sequence.
+		The end of the T-invariant must coincide with the end of the firing sequence.
+*/
+bool PathFinder::checkIfClosingIn(int start) {
+	map<Transition*,int>::iterator recit; // to walk through the remainder of transitions
+	for(recit=rec_tv.begin(); recit!=rec_tv.end(); ++recit)
+		if (recit->second>0) { // the transition should fire in the future
+			map<Place*,int> pre(im.getPreset(*(recit->first))); // get its preset
+			int need(-1); // the minimal token need of the transition, -1=uninitialized
+			for(unsigned int i=0; i<mv.size(); ++i) // walk through the markings in the firing sequence
+			{
+				map<Place*,int>::iterator mit;
+				int ineed(0); // token need against this marking
+				for(mit=pre.begin(); mit!=pre.end(); ++mit) // go through the preset
+				{	// and add up all tokens necessary (additionally) for firing
+					if (mit->second>mv[i][*(mit->first)]) ineed+=mit->second-mv[i][*(mit->first)];
+				}
+				// check if this is lower than the value so far
+				// if we are after the start of the T-invariant and just lowered the value,
+				// the invariant pushes the transition towards enabledness
+				if (ineed<need || need<0) { need=ineed; if (i>start) return true; }
+			}
+		}
 	return false;
 }
 

@@ -32,14 +32,12 @@ int MonotoneProgress;
 unsigned int NrOfEquations;
 
 inline long int ggt(long int a, long int b) {
-    long int c;
-
-    while (1) {
-        a = a % b;
+    while (true) {
+        a %= b;
         if (!a) {
             return b;
         }
-        b = b % a;
+        b %= a;
         if (!b) {
             return a;
         }
@@ -47,167 +45,153 @@ inline long int ggt(long int a, long int b) {
 }
 
 void printeq(equation* e) {
-    summand* s;
-    for (s = e -> sum; s ; s = s -> next) {
-        cout << s -> value << "*" << (s -> var ? s -> var -> name : "nix") << " ";
+    for (summand* s = e->sum; s ; s = s->next) {
+        cout << s->value << "*" << (s->var ? s->var->name : "nix") << " ";
     }
 }
 
-summand::summand(Node* t, long int k) {
-    var = t;
-    value = k;
-}
+summand::summand(Node* t, long int k) : var(t), value(k) {}
 
 equation::equation(Node* p) {
-    summand* s;
     summand** anchor;
-    unsigned int i;
-    long int k;
-    Node* t;
 
     sum = NULL;
-    for (i = 0; i < p -> NrOfArriving; i++) {
-        t = p -> ArrivingArcs[i] -> Source;
-        k = p -> ArrivingArcs[i]->Multiplicity;
-        s = new summand(t, k);
-        for (anchor = & sum; * anchor ; anchor = & ((*anchor) -> next)) {
-            if ((*anchor)->var -> nr > t -> nr) {
+    for (unsigned int i = 0; i < p->NrOfArriving; ++i) {
+        Node* t = p->ArrivingArcs[i]->Source;
+        long int k = p->ArrivingArcs[i]->Multiplicity;
+        summand* s = new summand(t, k);
+        for (anchor = & sum; * anchor ; anchor = & ((*anchor)->next)) {
+            if ((*anchor)->var->nr > t->nr) {
                 break;
             }
         }
-        s -> next = * anchor;
-        * anchor = s;
+        s->next = *anchor;
+        *anchor = s;
     }
-    for (i = 0; i < p -> NrOfLeaving; i++) {
-        t = p -> LeavingArcs[i] -> Destination;
-        k = p -> LeavingArcs[i]->Multiplicity;
-        for (anchor = & sum; * anchor ; anchor = & ((*anchor) -> next)) {
-            if ((*anchor)->var -> nr >= t -> nr) {
+    for (unsigned int i = 0; i < p->NrOfLeaving; ++i) {
+        Node* t = p->LeavingArcs[i]->Destination;
+        long int k = p->LeavingArcs[i]->Multiplicity;
+        for (anchor = & sum; * anchor ; anchor = & ((*anchor)->next)) {
+            if ((*anchor)->var->nr >= t->nr) {
                 break;
             }
         }
         if ((*anchor) && (*anchor)->var == t) {
-            (*anchor)-> value -= k;
+            (*anchor)->value -= k;
             if ((*anchor)->value == 0) {
                 summand* tmp;
                 tmp = * anchor;
-                * anchor = tmp -> next;
+                *anchor = tmp->next;
                 delete tmp;
             }
         } else {
-            s = new summand(t, - k);
-            s -> next = * anchor;
-            * anchor = s;
+            summand* s = new summand(t, -k);
+            s->next = *anchor;
+            *anchor = s;
         }
     }
     if (!sum) {
         return;
     }
 #ifndef SWEEP
-    k = sum -> value;
-    for (s = sum -> next; s ; s = s -> next) {
+    long int k = sum->value;
+    for (summand* s = sum->next; s; s = s->next) {
         k = ggt(k, s->value);
     }
     if (k != 1) {
-        for (s = sum; s; s = s -> next) {
-            s -> value /= k;
+        for (summand* s = sum; s; s = s->next) {
+            s->value /= k;
         }
     }
 #endif
-    NrOfEquations ++;
+    ++NrOfEquations;
 }
 
 equation** esystem, **newesystem;
 unsigned int* lastconsidered;
 
-
 void equation::apply() {
     // use this to eliminate smallest var in next
     // this and next expected to have same smallest var
 
-    long int fthis, fnext, k;
-    summand* s, * ss;
-    summand** anchor;
-    equation* tmp;
-
 #ifdef DISTRIBUTE
     progress();
 #endif
-    k = ggt(sum -> value, next -> sum -> value);
-    fthis = next -> sum -> value / k;
-    fnext = sum -> value / k;
+    long int k = ggt(sum->value, next->sum->value);
+    long int fthis = next->sum->value / k;
+    long int fnext = sum->value / k;
 
-    s = next -> sum -> next;
-    delete next -> sum;
-    next -> sum = s;
+    summand* s = next->sum->next;
+    delete next->sum;
+    next->sum = s;
     s = sum->next;
-    anchor = & (next -> sum);
-    while (s && * anchor) {
-        if (s -> var -> nr < (*anchor) -> var -> nr) {
-            ss = new summand(s -> var, - fthis * s -> value);
-            ss -> next = * anchor;
-            * anchor = ss;
-            anchor = & (ss -> next);
-            s = s -> next;
+
+    summand** anchor = &(next->sum);
+    while (s && *anchor) {
+        summand* ss;
+        if (s->var->nr < (*anchor)->var->nr) {
+            ss = new summand(s->var, - fthis * s->value);
+            ss->next = *anchor;
+            *anchor = ss;
+            anchor = &(ss->next);
+            s = s->next;
         } else {
-            if (s -> var -> nr > (*anchor) -> var -> nr) {
-                (* anchor) -> value *= fnext;
-                anchor = & ((*anchor)->next);
+            if (s->var->nr > (*anchor)->var->nr) {
+                (*anchor)->value *= fnext;
+                anchor = &((*anchor)->next);
             } else {
-                (* anchor) -> value *= fnext;
-                (* anchor) -> value -= fthis * s -> value;
+                (*anchor)->value *= fnext;
+                (*anchor)->value -= fthis * s->value;
                 if (!((*anchor)->value)) {
-                    ss = * anchor;
-                    * anchor = ss -> next;
+                    ss = *anchor;
+                    *anchor = ss->next;
                     delete ss;
                 } else {
-                    anchor = & ((*anchor) -> next);
+                    anchor = &((*anchor)->next);
                 }
-                s = s -> next;
+                s = s->next;
             }
         }
     }
     while (s) {
-        * anchor = new summand(s -> var, - fthis * s -> value);
-        anchor = & ((*anchor) -> next);
-        * anchor = NULL;
-        s = s -> next;
+        *anchor = new summand(s->var, - fthis * s->value);
+        anchor = & ((*anchor)->next);
+        *anchor = NULL;
+        s = s->next;
     }
     while (*anchor) {
-        (*anchor) -> value *= fnext;
+        (*anchor)->value *= fnext;
         anchor = &((*anchor)->next);
     }
-    if (!(next -> sum)) {
-        tmp = next;
-        next = next -> next;
+    if (!(next->sum)) {
+        equation* tmp = next;
+        next = next->next;
         delete tmp;
         return;
     }
-    k = next -> sum -> value;
-    for (s = next -> sum -> next; s; s = s -> next) {
+    k = next->sum->value;
+    for (s = next->sum->next; s; s = s->next) {
         k = ggt(k, s->value);
     }
-    for (s = next -> sum; s; s = s -> next) {
-        s -> value /= k;
+    for (s = next->sum; s; s = s->next) {
+        s->value /= k;
     }
-    tmp = next;
-    next = next -> next;
+    equation* tmp = next;
+    next = next->next;
 #ifdef SWEEP
-    if (tmp -> sum -> var) {
+    if (tmp->sum->var) {
 #endif
-        tmp -> next = esystem[tmp -> sum -> var -> nr];
-        esystem[tmp -> sum -> var -> nr] = tmp;
+        tmp->next = esystem[tmp->sum->var->nr];
+        esystem[tmp->sum->var->nr] = tmp;
 #ifdef SWEEP
     } else {
-        tmp -> next = esystem[Places[0]->cnt];
+        tmp->next = esystem[Places[0]->cnt];
         esystem[Places[0]->cnt] = tmp;
     }
 #endif
 }
 
-
 #if defined(CYCLE) || defined(STRUCT)
-
 void tsolve() {
     int i;
     unsigned int round;
@@ -228,8 +212,8 @@ void tsolve() {
     NrOfEquations = 0;
 
     // load equations into esystem
-    for (i = 0; i < Transitions[0] -> cnt; i++) {
-        esystem[i] = newesystem[i] = (equation*) 0;
+    for (i = 0; i < Transitions[0]->cnt; i++) {
+        esystem[i] = newesystem[i] = NULL;
         lastconsidered[i] = 0;
     }
 
@@ -239,8 +223,8 @@ void tsolve() {
             delete e;
             continue;
         }
-        e -> next = esystem[e -> sum -> var -> nr];
-        esystem[e -> sum -> var -> nr] = e;
+        e->next = esystem[e->sum->var->nr];
+        esystem[e->sum->var->nr] = e;
         NrOfEquations ++;
 
     }
@@ -252,7 +236,7 @@ void tsolve() {
     }
 
     while (1) {
-        // Matrix -> obere Dreiecksform
+        // Matrix->obere Dreiecksform
 
         for (i = 0; i < Transitions[0]->cnt; i++) {
             while (esystem[i] && esystem[i]->next) {
@@ -263,24 +247,24 @@ void tsolve() {
         // extract variables and re-organize esystem
         bool newcyclic;
         newcyclic = false;
-        for (i = Transitions[i] -> cnt - 1; i >= 0; i--) {
+        for (i = Transitions[i]->cnt - 1; i >= 0; i--) {
             if (!esystem[i]) {
                 continue;
             }
             // consider equation with largest head variable first
             // look for unconsidered parameter variables and remove
             // already selected cycle transitions
-            anchor = & (esystem[i] -> sum -> next);
+            anchor = & (esystem[i]->sum->next);
             while (*anchor) {
                 if (((Transition*)((*anchor)->var))->cyclic) {
                     // remove
                     summand* tmp;
                     tmp = * anchor;
-                    * anchor = tmp -> next;
+                    * anchor = tmp->next;
                     delete tmp;
                 } else {
                     if (lastconsidered[(* anchor)->var->nr] < round) {
-                        // unconsidered parameter -> select head var
+                        // unconsidered parameter->select head var
                         newcyclic = ((Transition*)(esystem[i]->sum->var))->cyclic = true;
                         lastconsidered[(* anchor)->var->nr] = round;
                     }
@@ -288,12 +272,12 @@ void tsolve() {
                 }
             }
             lastconsidered[esystem[i]->sum->var->nr] = round;
-            if (((Transition*)(esystem[i]->sum->var)) -> cyclic) {
+            if (((Transition*)(esystem[i]->sum->var))->cyclic) {
                 unsigned int pos;
                 summand* tmp;
-                tmp = esystem[i] -> sum;
-                esystem[i]->sum = tmp -> next;
-                pos = esystem[i] -> sum ->var -> nr;
+                tmp = esystem[i]->sum;
+                esystem[i]->sum = tmp->next;
+                pos = esystem[i]->sum->var->nr;
                 esystem[i]->next = newesystem[pos];
                 newesystem[pos] = esystem[i];
                 esystem[i] = NULL;
@@ -310,7 +294,7 @@ void tsolve() {
                     while (newesystem[i]->sum) {
                         summand* tmp;
                         tmp = newesystem[i]->sum;
-                        newesystem[i]->sum = newesystem[i]->sum -> next;
+                        newesystem[i]->sum = newesystem[i]->sum->next;
                         delete tmp;
                     }
                     e = newesystem[i];
@@ -332,54 +316,48 @@ void tsolve() {
 
     }
 }
-
 #endif
 
-
 #ifdef PREDUCTION
-
 void psolve() {
-    int i;
-    equation* e;
-    summand* s;
-    summand** anchor;
-
-    esystem = new equation * [ Places[0]->cnt];
+    esystem = new equation*[Places[0]->cnt];
     NrOfEquations = 0;
 
     // load equations into esystem
-    for (i = 0; i < Places[0] -> cnt; i++) {
-        esystem[i] = (equation*) 0;
+    for (int i = 0; i < Places[0]->cnt; ++i) {
+        esystem[i] = NULL;
         Places[i]->nr = i;
     }
 
-    for (i = 0; i < Transitions[0]->cnt; i++) {
-        e = new equation(Transitions[i]);
+    for (int i = 0; i < Transitions[0]->cnt; ++i) {
+        equation* e = new equation(Transitions[i]);
         if (!e->sum) {
             delete e;
             continue;
         }
-        e -> next = esystem[e -> sum -> var -> nr];
-        esystem[e -> sum -> var -> nr] = e;
-        NrOfEquations ++;
-
+        e->next = esystem[e->sum->var->nr];
+        esystem[e->sum->var->nr] = e;
+        ++NrOfEquations;
     }
+
     if (NrOfEquations == 0) {
-        delete [] esystem;
+        delete[] esystem;
         return;
     }
-    // Matrix -> obere Dreiecksform
 
-    for (i = 0; i < Places[0]->cnt; i++) {
+    // Matrix->obere Dreiecksform
+    for (int i = 0; i < Places[0]->cnt; ++i) {
         while (esystem[i] && esystem[i]->next) {
             esystem[i]->apply();
         }
     }
+
     // set head variables as significant and remove equations
-    for (i = 0; i < Places[0]->cnt; i++) {
+    for (int i = 0; i < Places[0]->cnt; ++i) {
         if (esystem[i]) {
-            Places[i]-> significant  = true;
+            Places[i]->significant = true;
             while (esystem[i]->sum) {
+                summand* s;
                 s = esystem[i]->sum;
                 esystem[i]->sum = esystem[i]->sum->next;
                 delete s;
@@ -387,15 +365,11 @@ void psolve() {
             delete esystem[i];
         }
     }
-    delete [] esystem;
+    delete[] esystem;
 }
-
 #endif
 
-
 #ifdef SWEEP
-
-
 void progress_measure() {
     int i;
     summand* s;
@@ -412,8 +386,8 @@ void progress_measure() {
     NrOfEquations = 0;
 
     // load equations into esystem
-    for (i = 0; i < Places[0] -> cnt ; i++) {
-        esystem[i] = (equation*) 0;
+    for (i = 0; i < Places[0]->cnt ; i++) {
+        esystem[i] = NULL;
         Places[i]->nr = i;
     }
     esystem[Places[0]->cnt] = NULL;
@@ -423,11 +397,11 @@ void progress_measure() {
         // equations that cancel out all places are collected
         // in bucket esystem[Places[0]->cnt]].
         reference[i] = new equation(Transitions[i]);
-        for (anchor = &(reference[i] -> sum); *anchor; anchor = &((*anchor)->next));
+        for (anchor = &(reference[i]->sum); *anchor; anchor = &((*anchor)->next));
         *anchor = new summand(Transitions[i], 1);
-        (*anchor)-> next = NULL;
-        reference[i] -> next = esystem[reference[i] -> sum -> var -> nr];
-        esystem[reference[i] -> sum -> var -> nr] = reference[i];
+        (*anchor)->next = NULL;
+        reference[i]->next = esystem[reference[i]->sum->var->nr];
+        esystem[reference[i]->sum->var->nr] = reference[i];
         NrOfEquations ++;
 
     }
@@ -435,7 +409,7 @@ void progress_measure() {
         delete [] esystem;
         return;
     }
-    // Matrix -> obere Dreiecksform
+    // Matrix->obere Dreiecksform
 
     for (i = 0; i < Places[0]->cnt; i++) {
         while (esystem[i] && esystem[i]->next) {
@@ -444,17 +418,17 @@ void progress_measure() {
     }
     for (i = 0; i < Transitions[0]->cnt; i++) {
         if (reference[i]->sum->var->nr < Places[0]->cnt) {
-            // among the linear independent transitions -> progress value 1
+            // among the linear independent transitions->progress value 1
             value[i] = 1;
             denominator[i] = 1;
         } else {
             // linear dependent
             value[i] = 0;
-            for (s = reference[i] -> sum; s; s = s -> next) {
-                if (((Transition*) s -> var) == Transitions[i]) {
-                    denominator[i] = s -> value;
+            for (s = reference[i]->sum; s; s = s->next) {
+                if (((Transition*) s->var) == Transitions[i]) {
+                    denominator[i] = s->value;
                 } else {
-                    value[i] -= s -> value;
+                    value[i] -= s->value;
                 }
             }
             if (value[i] == 0) {
@@ -485,7 +459,7 @@ void progress_measure() {
     delete [] esystem;
     // multiply all values with gcd
     long int gcd = 1;
-    for (i = 0; i < Transitions[i] -> cnt; i++) {
+    for (i = 0; i < Transitions[i]->cnt; i++) {
         g = ggt(gcd, denominator[i]);
         gcd = (gcd / g);
         gcd = gcd * denominator[i];     // computes lcm
@@ -498,7 +472,7 @@ void progress_measure() {
     for (i = 0; i < Transitions[i]->cnt; i++) {
         long int p;
         p = Transitions[i]->progress_value =  value[i] * (gcd / denominator[i]);
-        cout << Transitions[i] -> name << " : " << Transitions[i] -> progress_value << endl;
+        cout << Transitions[i]->name << " : " << Transitions[i]->progress_value << endl;
         if (!p) {
             ZeroProgress = 1;
         }
@@ -516,10 +490,6 @@ void progress_measure() {
         MonotoneProgress = 1;
     }
 }
-
 #endif
 
-
-
 #endif
-

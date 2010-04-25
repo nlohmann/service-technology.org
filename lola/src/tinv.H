@@ -50,11 +50,10 @@ class invariant {
 void tsolve();
 void psolve();
 void progress_measure();
-
-
 #endif
 
 extern int ProgressSpan;
 extern int ZeroProgress;
 extern int MonotoneProgress;
+
 #endif

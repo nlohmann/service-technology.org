@@ -1,5 +1,7 @@
 UMA v.1.2.0
 -----------
 
++ added copy of Petri Net API/Java as standard interface for computing
+  finite complete prefixes of Petri nets 
 + extracted unfolder sources from Greta and made a separate project
   for earlier version information see hub.top.GRETA.run/Changelog

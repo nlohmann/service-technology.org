@@ -24,13 +24,19 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <vector>
+#include <map>
 
 #include <pnapi/pnapi.h>
 #include "config-log.h"
 #include "cmdline.h"
 #include "Output.h"
 #include "verbose.h"
-#include "IncidentMatrix.h"
+#include "InvariantFinder.h"
+#include "lpwrapper.h"
+
+using std::vector;
+using std::map;
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -44,6 +50,14 @@ Output* markingoutput = NULL;
 /// a variable holding the time of the call
 clock_t start_clock = clock();
 
+/// Global ordering of transitions for lp_solve
+vector<Transition*> transitionorder;
+/// Global ordering of places for lp_solve and determining a scapegoat (in the stubborn set method)
+vector<Place*> placeorder;
+/// inverted transitionorder for back references
+map<Transition*,int> revtorder;
+/// inverted placeorder for back references
+map<Place*,int> revporder;
 
 /// check if a file exists and can be opened for reading
 inline bool fileExists(const std::string& filename) {
@@ -152,21 +166,13 @@ int main(int argc, char** argv) {
         abort(2, "\b%s", s.str().c_str());
     }
 
-    /*---------------------------------.
-    | 2. create incident matrix
-    `---------------------------------*/
-
-    // create incident matrix for the net
-    IncidentMatrix matrix(net);
-
-
     /*----------------------------------------.
-    | 3. print out incident matrix
+    | 2. calculate and print t-invariant
     `----------------------------------------*/
-
-    if(args_info.calculateMatrix_flag){
-	matrix.printMatrix();
-    } 
+    if(args_info.findTInv_flag){
+      InvariantFinder invFinder(&net);
+      invFinder.findTInvariant();
+    }
 
     return EXIT_SUCCESS;
 }

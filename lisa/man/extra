@@ -1,11 +1,11 @@
 [EXIT STATUS]
-Hello exits with 0 on success, and with 1 if an error occurs. See Texinfo manual for detailed information.
+Lisa exits with 0 on success, and with 1 if an error occurs. See Texinfo manual for detailed information.
 
 [EXAMPLES]
 # <<-- CHANGE START (examples) -->>
 To normalize a service `service.owfn', pipe it to Wendy and get the result, execute
 .IP
-hello service.owfn
+Lisa service.owfn
 .PP
 The result will be written to the shell.
 # <<-- CHANGE END -->>
@@ -13,8 +13,8 @@ The result will be written to the shell.
 [FILES]
 Unless a configuration file is explicitly given using the
 .B --config
-parameter, Hello first tries to parse file
-.B hello.conf
+parameter, Lisa first tries to parse file
+.B Lisa.conf
 from the sysconf directory (usually `/usr/local/etc') and then from the current working directory.
 
 [BUGS]

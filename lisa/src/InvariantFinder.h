@@ -17,58 +17,41 @@
  along with Lisa.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef _INCIDENTMATRIX_H
-#define _INCIDENTMATRIX_H
+#ifndef _INVARIANTFINDER_H
+#define _INVARIANTFINDER_H
 
 #ifndef PNAPI_PNAPI_H
 #include "pnapi/pnapi.h"
 #endif
 
-#include <vector>
-#include <math.h>
-
-
-using pnapi::PetriNet;
-using pnapi::Transition;
-using pnapi::Place;
-using pnapi::Marking;
-using pnapi::Node;
-using std::set;
-using std::map;
-using std::vector;
+#include "lp_solve/lp_lib.h"
+#include "lpwrapper.h"
+#include "Output.h"
+#include "verbose.h"
 
 /*!
- \brief Implementation of incident matrices
+ \brief Calculating T- and P-invariants
   
 */
 
-class IncidentMatrix {
+class InvariantFinder{
+
 
 public:
-	/// Constructor - initializes matrix and sets underlying petri net
-	IncidentMatrix(PetriNet& net);
 
-	/// Calculates incident matrix
-	void calculateMatrix();
+	/// Constructor
+	InvariantFinder(PetriNet* net);
+	
+	// Calculate a deterministic order for places and transitions
+	bool calcPTOrder();
 
-	// Getter for underlying petri net
-	PetriNet& getPetriNet();
-
-	/// Set petri net
-	void setPetriNet(PetriNet& net);
-
-	/// Prints out the incidence matrix
-	void printMatrix();
+	// Find t-invariant
+	void findTInvariant();
 
 private:
-	PetriNet& _net;
-	vector<vector<int> > _matrix;
-	int _columnsCount;
-	int _rowsCount;
-	vector<Transition*> _transitions;
-	vector<Place*> _places;
 
+	PetriNet* _net;
+	LPWrapper lpw;
 
 };
-
 #endif

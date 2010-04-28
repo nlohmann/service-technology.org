@@ -8,11 +8,8 @@
 
 # the files needed by the test cases (without `testfiles/' directory)
 
-TESTFILES = myCoffee.owfn \
-	    uncontrollable.owfn \
-	    unnormal.owfn \
-	    simple1.owfn
-
+TESTFILES = t_invariant1.owfn \
+	    no_t_invariant.owfn
 
 # Below you can list all the files you do not want to have counted in the
 # coverability report that can be created by calling "make cover". Usually,

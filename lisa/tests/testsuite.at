@@ -23,11 +23,23 @@ AT_CLEANUP
 AT_BANNER([Algorithms])
 ############################################################################
 
-AT_SETUP([Determining incident matrix])
-m4_define([NET], [simple1.owfn])
+AT_SETUP([Calculating a t-invariant])
+m4_define([NET], [t_invariant1.owfn])
 AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([LISA NET -c],0,ignore,stderr)
-AT_CHECK([GREP -q "1 1 0 0 -1" stderr])
+AT_CHECK([LISA NET -t],0,ignore,stderr)
+AT_CHECK([GREP -q "t1: 1.000000" stderr])
+AT_CHECK([GREP -q "t2: 1.000000" stderr])
+AT_CHECK([GREP -q "t3: 1.000000" stderr])
+AT_CHECK([GREP -q "t4: 1.000000" stderr])
+AT_CHECK([GREP -q "t5: 3.000000" stderr])
+AT_KEYWORDS(algorithms)
+AT_CLEANUP
+
+AT_SETUP([Trying to find a non-existing t-invariant])
+m4_define([NET], [no_t_invariant.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([LISA NET -t],0,ignore,stderr)
+AT_CHECK([GREP -q "lisa: No t-invariant could be found" stderr])
 AT_KEYWORDS(algorithms)
 AT_CLEANUP
 

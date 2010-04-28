@@ -4,19 +4,24 @@ bin_PROGRAMS = lisa
 # the plain sources you need to compile (no generated code)
 
 lisa_SOURCES =  main.cc \
-		IncidentMatrix.cc IncidentMatrix.h \
+		InvariantFinder.cc InvariantFinder.h \
+		lpwrapper.h lpwrapper.cc \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h \
                 Output.cc Output.h
 
-# pass the sysconfdir to lisa (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
-lisa_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
+# pass the sysconfdir to Wendy (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
+#lisa_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
+lisa_CPPFLAGS = -I$(top_srcdir)/libs
+lisa_LDADD = $(top_builddir)/libs/lp_solve/liblpsolve55.la
+#lisa_LDFLAGS = -ldl
+#-lpthread
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI
-lisa_CPPFLAGS += -I$(top_srcdir)/libs
-lisa_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
+lisa_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a
 endif
+
 
 
 #############################################################################

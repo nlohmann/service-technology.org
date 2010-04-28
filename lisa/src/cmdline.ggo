@@ -18,8 +18,8 @@ option "output" o
 
 section "Analysis"
 
-option "calculateMatrix" c
-  "Calculates and outputs the incident matrix"
+option "findTInv" t
+  "Tries to calculate a t-invariant for a given petri net"
   flag off
 
 section "Configuration"

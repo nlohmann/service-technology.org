@@ -129,10 +129,17 @@ int LPWrapper::calcTInvariant(bool verbose) {
 	if(ret != 2){
 	  message("Found t-invariant");
 
-        get_variables(lp, mat);
-        for(int j = 0; j < cols; j++)
-          fprintf(stderr, "%s: %f\n", get_col_name(lp, j + 1), mat[j]);
-	  //message("%s: %f\n", get_col_name(lp, j + 1), mat[j]);	
+	  bool isNonNegative = true;
+          get_variables(lp, mat);
+          for(int j = 0; j < cols; j++){
+            fprintf(stderr, "%s: %f\n", get_col_name(lp, j + 1), mat[j]);
+	    //Check if t-invariant is non-negative
+	    if(mat[j]<0)
+	      isNonNegative = false;
+	  }
+          if(isNonNegative)
+	    message("t-invariant is non-negative");	
+	    message("petri net is covered by t-invariants");
 	}
 	else{
 	  message("No t-invariant could be found");

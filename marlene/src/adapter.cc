@@ -79,7 +79,7 @@ const pnapi::PetriNet * Adapter::buildEngine()
 
     // adapter specific reduction should take place here
     removeUnnecessaryRules();
-    //findConflictFreeTransitions();
+    findConflictFreeTransitions();
     
     // reduce engine with standard PNAPI methods
     _engine->reduce(pnapi::PetriNet::LEVEL_3); // due to bug https://gna.org/bugs/?15820, normally 4
@@ -197,7 +197,7 @@ const pnapi::PetriNet * Adapter::buildController()
         composed.normalize();
     }
     // \todo: Experiment, ob sich das hier noch lohnt.
-    // composed.reduce(pnapi::PetriNet::LEVEL_4 || pnapi::PetriNet::KEEP_NORMAL);
+    composed.reduce(pnapi::PetriNet::LEVEL_3 || pnapi::PetriNet::KEEP_NORMAL);
 
     /***********************************\
         * calculate most permissive partner *
@@ -244,6 +244,10 @@ const pnapi::PetriNet * Adapter::buildController()
         }
     }
     wendy_command += " -m" + toString(_messageBound);
+    if ( (args_info.type_arg == type_arg_arbitrary) and not (args_info.costoptimized_flag) )
+    {
+        wendy_command += " --waitstatesOnly --receivingBeforeSending --seqReceivingEvents --succeedingSendingEvent --quitAsSoonAsPossible";
+    }
 
     if (args_info.chatty_flag)
     {
@@ -798,7 +802,6 @@ void Adapter::removeUnnecessaryRules()
     FUNCOUT
 }
 
-/*
 void Adapter::findConflictFreeTransitions()
 {
     FUNCIN
@@ -817,60 +820,32 @@ void Adapter::findConflictFreeTransitions()
             std::set< Node *> preset = trans->getPreset();
             std::set< Node *>::iterator placeIter = preset.begin();
 
+            bool isit = not preset.empty();
             while (placeIter != preset.end() )
             {
-                if ( (*placeIter)->getType() == pnapi::Place::INTERNAL && (*placeIter)->getPostset().size() == 1)
+                if ( (*placeIter)->getPostset().size() > 1 )
                 {
-                    // if controller type is synchronous remove label
-                    if (_contType == SYNCHRONOUS)
-                    {
-                        std::set< std::string> labels =
-                                        trans->getSynchronizeLabels();
-                        labels.erase("sync_" + transname);
-                        trans->setSynchronizeLabels(labels);
-
-            // workaround for bug #14416 <https://gna.org/bugs/?14416>
-            // \TODO: remove!
-            std::set< std::string > labels (_engine->getSynchronousLabels());
-            labels.insert("sync_" + transName);
-            _engine->setSynchronousLabels(labels);
-            
-            status("known labels: %d", _engine->getSynchronousLabels().size());
-
-                    } 
-                    else // remove interface places
-                    {
-                        std::string controlplacename = "control_" + transname;
-                        std::string observeplacename = "observe_" + transname;
-
-                        pnapi::Place * p;
-
-                        p = _engine->findPlace(controlplacename);
-
-                        if (p != NULL)
-                        {
-                            _engine->deletePlace(*p);
-                        }
-
-                        p = _engine->findPlace(observeplacename);
-
-                        if (p != NULL)
-                        {
-                            _engine->deletePlace(*p);
-                        }
-
-                    }
+                    isit = false;
                     placeIter = preset.end();
                 } else
                 {
                     ++placeIter;
                 }
             }
+            if (isit)
+            {
+                const std::map<pnapi::Label *, unsigned int> labels =
+                                trans->getLabels();
+                for (std::map<pnapi::Label *, unsigned int>::const_iterator
+                                label = labels.begin(); label != labels.end(); ++label)
+                {
+                    trans->removeLabel(*(label->first));
+                }
+            }
         }
     }
     FUNCOUT
 }
-*/
 
 //! returns the name for the rule with index i
 inline std::string Adapter::getRuleName(unsigned int i)

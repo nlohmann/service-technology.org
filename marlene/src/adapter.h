@@ -148,7 +148,7 @@ class Adapter
          *        without any confict, and removes these transitions' interface
          *        to the controller.
          */
-        // void findConflictFreeTransitions();
+        void findConflictFreeTransitions();
         
         /*! 
          * \brief Returns the name for the rule with index i.

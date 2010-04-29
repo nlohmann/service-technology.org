@@ -6,12 +6,12 @@ description "About Marlene:"
 section "Core parameters"
 
 option "type" t
-  "Parameter for compatibility with Fiona: the parameter '-t og' is equivalent to '--og'."
+  "Chose between a most-permissive and an arbitrary adapter."
   string
   typestr="TYPE"
-  values="og","OG" enum
+  values="mp","arbitrary" enum
+  default="mp"
   optional
-  hidden
 
 option "rulefile" r
   "File containing rules for building the rewriter part of the adapter"

@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
     
     engine.compose(controller, "engine.", "controller.");
     
-    engine.reduce(pnapi::PetriNet::LEVEL_4);
+    engine.reduce(pnapi::PetriNet::LEVEL_3);
     {
         std::string filename = (args_info.output_given ? std::string(args_info.output_arg) : std::string("-"));
         Output outfile(filename, std::string("final adapter"));

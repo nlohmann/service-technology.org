@@ -1,4 +1,4 @@
-@heading Version 1.2-unreleased
+@heading Version 1.1-tscspecial
 @itemize
 
 @item update to version 4.0 of PNAPI (nets no longer become unbounded when normalized, port support)

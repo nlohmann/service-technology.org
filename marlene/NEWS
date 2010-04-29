@@ -6,7 +6,7 @@
                      http://service-technology.org/marlene
 
 
-Version 1.2-unreleased
+Version 1.1-tscspecial
 ======================
 
 * update to version 4.0 of PNAPI (nets no longer become unbounded when

@@ -89,16 +89,6 @@ const pnapi::PetriNet * Adapter::buildEngine()
     pnapi::Marking finalMarking (*_engine);
     finalCond.addMarking(finalMarking);
 
-    // create complementary places for the engine's internal places
-    if (_useCompPlaces)
-    {
-        Adapter::createComplementaryPlaces(*_engine);
-    }
-    else
-    {
-        status("skipping creation of complementary places once ..");
-    }
-
     FUNCOUT
     return _engine;
 }
@@ -116,6 +106,16 @@ const pnapi::PetriNet * Adapter::buildController()
     // #_enginecopy for the synthesis of the controller
 
     PetriNet composed (*_engine);
+
+    // create complementary places for the engine's internal places
+    if (_useCompPlaces)
+    {
+        Adapter::createComplementaryPlaces(composed);
+    }
+    else
+    {
+        status("skipping creation of complementary places once ..");
+    }
 
     // compose engine with nets
     for (unsigned int i = 0; i < _nets.size(); ++i)
@@ -140,6 +140,10 @@ const pnapi::PetriNet * Adapter::buildController()
         {
             const std::set< Label *> & ifPlaces = _nets[i]->getInterface().getAsynchronousLabels();
             std::set< Label *>::const_iterator placeIter = ifPlaces.begin();
+
+            Place * dictatorPlace = composed.findPlace("engine.comp_thegreatdictator");
+            assert(dictatorPlace);
+
             while (placeIter != ifPlaces.end() )
             {
                 // \todo: warum werden beide Platznamen gebraucht? wo geht hier beim Komponieren was schief?
@@ -165,6 +169,11 @@ const pnapi::PetriNet * Adapter::buildController()
                 while (nodeIter != postSet.end() )
                 {
                     composed.createArc(**nodeIter, *compPlace);
+                    if ((*placeIter)->getType() == Label::INPUT)
+                    {
+                        composed.createArc(**nodeIter, *dictatorPlace);
+                        composed.createArc(*dictatorPlace, **nodeIter);
+                    }
                     ++nodeIter;
                 }
 
@@ -173,6 +182,11 @@ const pnapi::PetriNet * Adapter::buildController()
                 while (nodeIter != preSet.end() )
                 {
                     composed.createArc(*compPlace, **nodeIter);
+                    if ((*placeIter)->getType() == Label::OUTPUT)
+                    {
+                        composed.createArc(**nodeIter, *dictatorPlace);
+                        composed.createArc(*dictatorPlace, **nodeIter);
+                    }
                     ++nodeIter;
                 }
 
@@ -180,6 +194,7 @@ const pnapi::PetriNet * Adapter::buildController()
                 Transition * dlTrans = &composed.createTransition("dl_"
                                 + placeName);
                 composed.createArc(*place, *dlTrans, _messageBound + 1);
+                composed.createArc(*dictatorPlace, *dlTrans);
 
                 ++placeIter;
             }
@@ -661,16 +676,34 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
     std::set< Place * > intPlaces = net.getPlaces();
     std::set< Place * >::iterator placeIter = intPlaces.begin();
     
+    Place & dictatorPlace = net.createPlace("comp_thegreatdictator", 1, 1);
+
+    {
+        // update final condition
+        Condition & finalCond = net.getFinalCondition();
+
+        formula::FormulaEqual prop (formula::FormulaEqual(dictatorPlace, 1));
+        finalCond.addProposition(prop);
+
+        //connect every transition to the dictator place via read arc
+        std::set< Transition * > transes = net.getTransitions();
+        for ( std::set< Transition * >::iterator trans = transes.begin(); trans != transes.end(); ++trans)
+        {
+            net.createArc(**trans, dictatorPlace);
+            net.createArc(dictatorPlace, **trans);
+        }
+    }
+
     while ( placeIter != intPlaces.end() )
     {
         Place & place = **placeIter;
         Place & compPlace = net.createPlace("comp_" + place.getName(),
-            place.getCapacity(), place.getCapacity());
+            place.getCapacity() + 1, place.getCapacity() + 1);
         
         // update final condition
         Condition & finalCond = net.getFinalCondition();
 
-        formula::FormulaEqual prop (formula::FormulaEqual(compPlace, place.getCapacity()));
+        formula::FormulaEqual prop (formula::FormulaEqual(compPlace, place.getCapacity() + 1));
         finalCond.addProposition(prop);
 
         std::set< Node * > preSet = place.getPreset();
@@ -682,7 +715,10 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
             Arc * b = net.findArc(place, **nodeIter);
             int y = (b != NULL)?b->getWeight():0;
             unsigned int weight = std::max(x - y,0);
-            if (weight > 0) net.createArc(compPlace, **nodeIter, weight);
+            if (weight > 0)
+            {
+                net.createArc(compPlace, **nodeIter, weight);
+            }
             ++nodeIter;
         }
         
@@ -695,10 +731,20 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
             Arc * b = net.findArc(place, **nodeIter);
             int y = (b != NULL)?b->getWeight():0;
             unsigned int weight = std::max(y - x,0);
-            if (weight > 0) net.createArc(**nodeIter, compPlace, weight);
+            if (weight > 0)
+            {
+                net.createArc(**nodeIter, compPlace, weight + 1);
+                net.createArc(compPlace, **nodeIter, weight);
+            }
             ++nodeIter;
         }
         
+        // deadlock transition
+        Transition & trans = net.createTransition("dl_" + place.getName());
+
+        net.createArc(place, trans, place.getCapacity() + 1);
+        net.createArc(dictatorPlace, trans);
+
         ++placeIter;
     }
     

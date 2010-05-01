@@ -141,8 +141,10 @@ const pnapi::PetriNet * Adapter::buildController()
             const std::set< Label *> & ifPlaces = _nets[i]->getInterface().getAsynchronousLabels();
             std::set< Label *>::const_iterator placeIter = ifPlaces.begin();
 
+            /*
             Place * dictatorPlace = composed.findPlace("engine.comp_thegreatdictator");
             assert(dictatorPlace);
+            */
 
             while (placeIter != ifPlaces.end() )
             {
@@ -168,12 +170,15 @@ const pnapi::PetriNet * Adapter::buildController()
                 std::set< Node *>::iterator nodeIter = postSet.begin();
                 while (nodeIter != postSet.end() )
                 {
-                    composed.createArc(**nodeIter, *compPlace);
+                    composed.createArc(*compPlace, **nodeIter);
+                    composed.createArc(**nodeIter, *compPlace, 2);
+                    /*
                     if ((*placeIter)->getType() == Label::INPUT)
                     {
                         composed.createArc(**nodeIter, *dictatorPlace);
                         composed.createArc(*dictatorPlace, **nodeIter);
                     }
+                    */
                     ++nodeIter;
                 }
 
@@ -182,19 +187,23 @@ const pnapi::PetriNet * Adapter::buildController()
                 while (nodeIter != preSet.end() )
                 {
                     composed.createArc(*compPlace, **nodeIter);
+                    /*
                     if ((*placeIter)->getType() == Label::OUTPUT)
                     {
                         composed.createArc(**nodeIter, *dictatorPlace);
                         composed.createArc(*dictatorPlace, **nodeIter);
                     }
+                    */
                     ++nodeIter;
                 }
 
+                /*
                 // deadlock transition for message bound violation of former interface
                 Transition * dlTrans = &composed.createTransition("dl_"
                                 + placeName);
                 composed.createArc(*place, *dlTrans, _messageBound + 1);
                 composed.createArc(*dictatorPlace, *dlTrans);
+                */
 
                 ++placeIter;
             }
@@ -253,8 +262,14 @@ const pnapi::PetriNet * Adapter::buildController()
                             + " --costfile=" + cost_filename;
         } else
         {
+            std::string property = "deadlock";
+            if (args_info.property_arg == property_arg_livelock)
+            {
+                property = "livelock";
+            }
             // default behavior
             wendy_command = std::string(args_info.wendy_arg) + " "
+                            + "--correctness=" + property + " "
                             + owfn_filename + " --sa=" + sa_filename; // + " --og=" + og_filename;
         }
     }
@@ -676,6 +691,7 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
     std::set< Place * > intPlaces = net.getPlaces();
     std::set< Place * >::iterator placeIter = intPlaces.begin();
     
+    /*
     Place & dictatorPlace = net.createPlace("comp_thegreatdictator", 1, 1);
 
     {
@@ -693,6 +709,7 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
             net.createArc(dictatorPlace, **trans);
         }
     }
+    */
 
     while ( placeIter != intPlaces.end() )
     {
@@ -739,11 +756,13 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
             ++nodeIter;
         }
         
+        /*
         // deadlock transition
         Transition & trans = net.createTransition("dl_" + place.getName());
 
         net.createArc(place, trans, place.getCapacity() + 1);
         net.createArc(dictatorPlace, trans);
+        */
 
         ++placeIter;
     }

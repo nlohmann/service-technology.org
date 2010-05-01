@@ -9,6 +9,11 @@
 Version 1.1-tscspecial
 ======================
 
+Initially planned as 1.2 release, therefore lot of features in this version :)
+
+* support for different properties - default is deadlock, optional is
+  livelock freedom
+
 * update to version 4.0 of PNAPI (nets no longer become unbounded when
   normalized, port support)
 

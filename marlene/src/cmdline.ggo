@@ -30,6 +30,14 @@ option "messagebound" m
   default="1"
   optional
 
+option "property" p
+  "Sets the property for the controller synthesis algoritm, s.t. PROPERTY freedom is guaranteed."
+  string
+  typestr="PROPERTY"
+  values="deadlock","livelock" enum
+  default="deadlock"
+  optional
+
 option "asyncif" a
   "Creates an asynchronous interface between adapter engine and controller. (Default is synchronous.)"
   flag off

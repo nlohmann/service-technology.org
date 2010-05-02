@@ -42,9 +42,10 @@ public:
 
 	/// Destructor
 	~LPWrapper();
-
-	/// Create a linear system for the marking equation including cover/bound information
+	
 	int calcTInvariant(bool b);
+
+	int calcPInvariant(bool b);
 
 	/// Level of verbosity of lp_solve
 	int verbose;
@@ -61,6 +62,10 @@ private:
 
 	/// internal variables for positions of transitions in the system and for the solution
 	map<Transition*,int> tpos, tvector;
+
+	/// internal variables for positions of places in the system and for the solution
+	map<Place*,int> ppos, pvector;
+	
 
 };
 

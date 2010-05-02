@@ -40,13 +40,16 @@ class InvariantFinder{
 public:
 
 	/// Constructor
-	InvariantFinder(PetriNet* net);
+	InvariantFinder(PetriNet* net, unsigned int);
 	
 	// Calculate a deterministic order for places and transitions
 	bool calcPTOrder();
 
 	// Find t-invariant
 	void findTInvariant();
+
+	// Find p-invariant
+	void findPInvariant();
 
 private:
 

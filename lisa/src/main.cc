@@ -170,8 +170,17 @@ int main(int argc, char** argv) {
     | 2. calculate and print t-invariant
     `----------------------------------------*/
     if(args_info.findTInv_flag){
-      InvariantFinder invFinder(&net);
+      InvariantFinder invFinder(&net, net.getTransitions().size());
       invFinder.findTInvariant();
+    }
+
+    /*----------------------------------------.
+    | 2. calculate and print p-invariant
+    `----------------------------------------*/
+
+    if(args_info.findPInv_flag){
+      InvariantFinder invFinder(&net, net.getPlaces().size());
+      invFinder.findPInvariant();
     }
 
     return EXIT_SUCCESS;

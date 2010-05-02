@@ -18,7 +18,7 @@ extern vector<Place*> placeorder;
 extern map<Transition*,int> revtorder;
 extern map<Place*,int> revporder;
 
-InvariantFinder::InvariantFinder(PetriNet* net) : _net(net), lpw((*net).getTransitions().size()){
+InvariantFinder::InvariantFinder(PetriNet* net, unsigned int cols) : _net(net), lpw(cols){
 
 }
 
@@ -26,6 +26,12 @@ void InvariantFinder::findTInvariant(){
 	calcPTOrder();
 	lpw.calcTInvariant(false);
 }
+
+void InvariantFinder::findPInvariant(){
+	calcPTOrder();
+	lpw.calcPInvariant(false);
+}
+
 
 /** Calculate the global ordering of transitions and places for this problem.
 	@author Harro Wimmel

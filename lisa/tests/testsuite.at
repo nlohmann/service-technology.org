@@ -43,3 +43,12 @@ AT_CHECK([GREP -q "lisa: No t-invariant could be found" stderr])
 AT_KEYWORDS(algorithms)
 AT_CLEANUP
 
+AT_SETUP([Calculating a p-invariant])
+m4_define([NET], [p_invariant1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([LISA NET -p],0,ignore,stderr)
+AT_CHECK([GREP -q "p1: 1.000000" stderr])
+AT_CHECK([GREP -q "p2: 1.000000" stderr])
+AT_CHECK([GREP -q "p3: 1.000000" stderr])
+AT_KEYWORDS(algorithms)
+AT_CLEANUP

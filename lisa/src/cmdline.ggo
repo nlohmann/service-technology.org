@@ -22,6 +22,11 @@ option "findTInv" t
   "Tries to calculate a t-invariant for a given petri net"
   flag off
 
+option "findPInv" p
+  "Tries to calculate a t-invariant for a given petri net"
+  flag off
+
+
 section "Configuration"
 
 option "lisa" -

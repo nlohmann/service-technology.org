@@ -405,19 +405,22 @@ unsigned int PetriNet::reduce_rule_3p()
     set<Place *> parallelPlaces;
 
     // get a transition of the preset
-    Node * preTransition = *((*p1)->getPreset().begin());
-    if(preTransition != NULL)
+    if ( not (*p1)->getPreset().empty() )
     {
-      PNAPI_FOREACH(p2, preTransition->getPostset())
-      {
-        if ((*p1)->isParallel(*(*p2))) // precondition 1
+        Node * preTransition = *((*p1)->getPreset().begin());
+        if(preTransition != NULL)
         {
-          parallelPlaces.insert(static_cast<Place *>(*p2));
+          PNAPI_FOREACH(p2, preTransition->getPostset())
+          {
+            if ((*p1)->isParallel(*(*p2))) // precondition 1
+            {
+              parallelPlaces.insert(static_cast<Place *>(*p2));
+            }
+          }
         }
-      }
     }
-
-    if((*p1)->getPreset().empty())
+    else
+    if( not (*p1)->getPostset().empty() )
     {
       // get a transition of the postset
       Node * postTransition = *((*p1)->getPostset().begin());
@@ -514,22 +517,26 @@ unsigned int PetriNet::reduce_rule_3t()
     // STEP 1: Get parallel transitions.
 
     // get a place of the preset
-    Node * prePlace = *((*t1)->getPreset().begin());
-    if(prePlace != NULL)
-    {
-      PNAPI_FOREACH(t2, prePlace->getPostset())
-      {
-        if ( ((*t1)->isParallel(*(*t2))) ) //CG && // precondition 1
-             //CG (!(static_cast<Transition*>(*t2)->isSynchronized())) ) // precondition 2
-        {
-          seenTransitions.insert(static_cast<Transition *>(*t2)); // mark transition as seen
-          obsoleteTransitions.insert(static_cast<Transition *>(*t2));
-          replaceRelation[static_cast<Transition *>(*t2)] = *t1;
-        }
-      }
-    }
 
-    if((*t1)->getPreset().empty())
+    if ( not (*t1)->getPreset().empty() )
+    {
+        Node * prePlace = *((*t1)->getPreset().begin());
+        if(prePlace != NULL)
+        {
+          PNAPI_FOREACH(t2, prePlace->getPostset())
+          {
+            if ( ((*t1)->isParallel(*(*t2))) && // precondition 1
+                 ((static_cast<Transition*>(*t2)->getLabels().empty())) ) // precondition 2
+            {
+              seenTransitions.insert(static_cast<Transition *>(*t2)); // mark transition as seen
+              obsoleteTransitions.insert(static_cast<Transition *>(*t2));
+              replaceRelation[static_cast<Transition *>(*t2)] = *t1;
+            }
+          }
+        }
+    }
+    else
+    if( not (*t1)->getPostset().empty())
     {
       // get a place of the postset
       Node * postPlace = *((*t1)->getPostset().begin());
@@ -666,8 +673,8 @@ unsigned int PetriNet::reduce_rule_4()
       if( (t1 != t2) &&
           __REDUCE_CHECK_FINAL(*p2) && // precondition 6
           (reduce_isEqual(t1,t2,*p1,*p2)) && // precondition 4a
-          t1->equalLabels(*t2) ) // precondition 4b
-          // (!(t2->isSynchronized())) ) // precondition 7
+          t1->equalLabels(*t2) && // precondition 4b
+          (!(t2->isSynchronized())) ) // precondition 7
       {
         equalPlaces.insert(pair<Place *,Place *>(*p1,*p2));
         seenPlaces.insert(*p2);
@@ -1271,6 +1278,17 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
       {
         createArc(*nt,(*a)->getTargetNode(),(*a)->getWeight());
       }
+
+      // copy labels
+      PNAPI_FOREACH(label, t->getLabels())
+      {
+          nt->addLabel(*(label->first), label->second);
+      }
+
+      PNAPI_FOREACH(label, (static_cast<Transition *>(*t__))->getLabels())
+      {
+          nt->addLabel(*(label->first), label->second);
+      }
     }
 
 
@@ -1359,7 +1377,8 @@ unsigned int PetriNet::reduce_rule_7()
     PNAPI_FOREACH(t, (*p)->getPreset())
     {
       if( ((*t)->getPreset().size() == 1) &&
-          ((*t)->getPostset().size() == 1) )
+          ((*t)->getPostset().size() == 1) &&
+          ((static_cast<Transition *>(*t))->getLabels().empty()) )
       {
         obsoleteTransitions.insert(static_cast<Transition *>(*t));
       }
@@ -1663,6 +1682,12 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
       PNAPI_FOREACH(a, (*ti)->getPresetArcs())
       {
         createArc((*a)->getSourceNode(),*tj,(*a)->getWeight());
+      }
+
+      // copy labels
+      PNAPI_FOREACH(label, (static_cast<Transition *>(*ti)->getLabels()))
+      {
+          tj->addLabel(*(label->first), label->second);
       }
 
       // arrange postset

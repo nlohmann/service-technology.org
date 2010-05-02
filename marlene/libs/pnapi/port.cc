@@ -17,6 +17,8 @@
  * \version $Revision:$
  */
 
+#include <iostream>
+
 #include "config.h"
 
 #include "port.h"
@@ -364,7 +366,6 @@ Label::Label(PetriNet & net, Port & port, const std::string & name, Type type) :
   net_(net), port_(port), name_(name), type_(type)
 {
 }
-
 
 /*!
  * \brief destructor

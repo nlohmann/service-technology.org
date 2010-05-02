@@ -60,9 +60,9 @@ Adapter::~Adapter()
 {
     FUNCIN
     // deleting the engine if it exists
-    delete (_engine);
+    //delete (_engine);
     _engine = NULL;
-    delete (_controller);
+    //delete (_controller);
     _controller = NULL;
     FUNCOUT
 }
@@ -82,7 +82,7 @@ const pnapi::PetriNet * Adapter::buildEngine()
     findConflictFreeTransitions();
     
     // reduce engine with standard PNAPI methods
-    _engine->reduce(pnapi::PetriNet::LEVEL_3); // due to bug https://gna.org/bugs/?15820, normally 4
+    _engine->reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // due to bug https://gna.org/bugs/?15820, normally 4
     
     // set final condition
     pnapi::Condition & finalCond = _engine->getFinalCondition();
@@ -214,14 +214,14 @@ const pnapi::PetriNet * Adapter::buildController()
     }
 
     // finally reduce the strucure of the net as far as possible
-    composed.reduce(pnapi::PetriNet::LEVEL_3); // due to bug https://gna.org/bugs/?15820, normally 4
+    composed.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // due to bug https://gna.org/bugs/?15820, normally 4
 
     if (_contType == ASYNCHRONOUS)
     {
         composed.normalize();
     }
     // \todo: Experiment, ob sich das hier noch lohnt.
-    composed.reduce(pnapi::PetriNet::LEVEL_3 || pnapi::PetriNet::KEEP_NORMAL);
+    composed.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT | pnapi::PetriNet::KEEP_NORMAL);
 
     /***********************************\
         * calculate most permissive partner *

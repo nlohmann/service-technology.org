@@ -18,11 +18,11 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Christian Sura <christian.sura@uni-rostock.de>,
- *          last changes of: \$Author: cas $
+ *          last changes of: \$Author: gierds $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2010-03-14 13:44:15 +0100 (Sun, 14 Mar 2010) $
+ * \date    \$Date: 2010-05-02 03:51:59 +0200 (Sun, 02 May 2010) $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  *          für Petrinetze" ([Pil08])". These rules preserve lifeness and
  *          k-boundedness.         
  * 
- * \version \$Revision: 5513 $
+ * \version \$Revision: 5686 $
  *
  * \ingroup petrinet
  * 
@@ -63,6 +63,7 @@
 
 #include <iostream>
 #include <list>
+#include <algorithm>
 
 using std::cerr;
 using std::cout;
@@ -193,12 +194,15 @@ unsigned int PetriNet::reduce_suspicious_transitions()
 /*!
  * Remove structural dead nodes.
  * 
- * If there exists a place p with empty preset (precondition 1)
+ * If there exists a place p with (empty preset (precondition 1a)
+ * or the preset is a subset of the postset (precondition 1b))
  * and for each transition t in its postset applies,
  * that the arc weight from p to t is higher than 
  * the amount of tokens stored in p (precondition 2)
  * and p is not concerned by a final condition (precondition 3)
- * and t is not synchronized (precondition 4)
+ * <del>and t is not synchronized (precondition 4)</del>
+ * [CG: Why this? As long as all labels of t
+ * remain in the interface, all should be fine.]
  * then this place and its postset can be removed. 
  *
  * \post  p and its postset are removed 
@@ -222,7 +226,9 @@ unsigned int PetriNet::reduce_dead_nodes()
     // find insufficiently marked places with empty preset
     PNAPI_FOREACH(p, places_)
     {
-      if ( ((*p)->getPreset().empty()) && // precondition 1 
+      if ( ((*p)->getPreset().empty() or // precondition 1a
+             includes((*p)->getPostset().begin(), (*p)->getPostset().end(),
+                 (*p)->getPreset().begin(), (*p)->getPreset().end()) ) && // precondition 1b
           __REDUCE_CHECK_FINAL(*p) ) // precondition 3
       {
         // check the postset
@@ -230,8 +236,8 @@ unsigned int PetriNet::reduce_dead_nodes()
 
         PNAPI_FOREACH(a, (*p)->getPostsetArcs())
         {
-          if( ((*a)->getWeight() <= (*p)->getTokenCount()) || // precondition 2
-              ((*a)->getTransition().isSynchronized()) ) // precondition 4
+          if( ((*a)->getWeight() <= (*p)->getTokenCount()) ) // || // precondition 2
+              //CG ((*a)->getTransition().isSynchronized()) ) // precondition 4
           {
             arcs = false; // there exists a transition that can fire or is synchronized
           }
@@ -244,10 +250,8 @@ unsigned int PetriNet::reduce_dead_nodes()
           PNAPI_FOREACH(t, (*p)->getPostset())
           {
             deadTransitions.insert(static_cast<Transition *>(*t));
-            // trace(TRACE_VERY_DEBUG, "[PN]\tTransition t" + toString((*t)->id) + " is structurally dead\n");
           }
 
-          // trace(TRACE_VERY_DEBUG, "[PN]\tPlace p" + toString((*p)->id) + " is structurally dead.\n");
           done = false; // repeat search for dead nodes once more
         }
       }
@@ -362,7 +366,9 @@ unsigned int PetriNet::reduce_remove_initially_marked_places_in_choreographies()
  * \brief Elimination of parallel places:
  * 
  * If there exist two parallel places p1 and p2 (precondition 1)
- * and both p1 and p2 are internal places (precondition 4)
+ * <del>and both p1 and p2 are internal places (precondition 4)</del>
+ * [CG: There are, since we now have also labels for asynchronous
+ * communication.]
  * and p1 has less than or as many tokens as p2 (precondition 2),
  * and p2 is not concerned by a final condition (precondition 3),
  * then p2 can be removed.
@@ -473,7 +479,11 @@ unsigned int PetriNet::reduce_rule_3p()
  * 
  * If there exist two parallel transitions t1 and t2 (precondition 1)
  * one of them can be removed.
- * Synchronized transitions will not be removed. (precondition 2)
+ * <del>Synchronized transitions will not be removed. (precondition 2)</del>
+ * [CG: Why only merge transitions with the same asynchronous labels?
+ * If two parallel transitions t1 and t2 share the same synchronous labels,
+ * then t1 is exactly then activated, if t2 is. So merging should be no
+ * problem.]
  *  
  * A transition is removed by merging its history with this one of
  * the transition parallel to it.
@@ -509,8 +519,8 @@ unsigned int PetriNet::reduce_rule_3t()
     {
       PNAPI_FOREACH(t2, prePlace->getPostset())
       {
-        if ( ((*t1)->isParallel(*(*t2))) && // precondition 1
-             (!(static_cast<Transition*>(*t2)->isSynchronized())) ) // precondition 2
+        if ( ((*t1)->isParallel(*(*t2))) ) //CG && // precondition 1
+             //CG (!(static_cast<Transition*>(*t2)->isSynchronized())) ) // precondition 2
         {
           seenTransitions.insert(static_cast<Transition *>(*t2)); // mark transition as seen
           obsoleteTransitions.insert(static_cast<Transition *>(*t2));
@@ -596,10 +606,13 @@ bool PetriNet::reduce_isEqual(Transition * t1, Transition * t2, Place * p1, Plac
  * with singleton postset t1 and t2 respectively (precondition 2)
  * connected by an arc weight of 1 respectively (precondition 3)
  * and both transitions are connected with all places different
- * from p1 and p2 in the same way (precondition 4)
+ * from p1 and p2 in the same way (precondition 4a)
+ * as well as both transitions share
+ * the same labels (precondition 4b)
  * and the preset of p1 and p2 respectively is not empty (precondition 5),
  * and p2 is not concerned by a final condition (precondition 6),
- * and t2 is not synchronized (precondition 7),
+ * <del>and t2 is not synchronized (precondition 7)<del>
+ * [CG: This should again be no problem, because t1 has the same labels.],
  * then the following changes can be applied:
  * 1.: For each transition t in the preset of p2 add an arc
  *     of the same weight to p1. If such an arc already exist,
@@ -652,8 +665,9 @@ unsigned int PetriNet::reduce_rule_4()
       Transition * t2 = static_cast<Transition *>(*((*p2)->getPostset().begin()));
       if( (t1 != t2) &&
           __REDUCE_CHECK_FINAL(*p2) && // precondition 6
-          (reduce_isEqual(t1,t2,*p1,*p2)) && // precondition 4
-          (!(t2->isSynchronized())) ) // precondition 7
+          (reduce_isEqual(t1,t2,*p1,*p2)) && // precondition 4a
+          t1->equalLabels(*t2) ) // precondition 4b
+          // (!(t2->isSynchronized())) ) // precondition 7
       {
         equalPlaces.insert(pair<Place *,Place *>(*p1,*p2));
         seenPlaces.insert(*p2);
@@ -700,13 +714,13 @@ unsigned int PetriNet::reduce_rule_4()
 }
 
 /*!
- * \brief Checks, wether the postset of a set of nodes is empty.
+ * \brief Checks, whether the postset of a set of nodes is empty.
  */
 bool PetriNet::reduce_emptyPostset(const std::set<Node *> & nodes)
 {
   PNAPI_FOREACH(n, nodes)
   {
-    if(!((*n)->getPostset().empty()))
+    if(not ((*n)->getPostset().empty()))
       return false;
   }
   return true;
@@ -728,12 +742,13 @@ bool PetriNet::reduce_singletonPreset(const std::set<Node *> & nodes)
 /*!
  * \brief Fusion of transitions:
  * 
- * If there exist a place p with a not empty preset t1 to tk (precondition 1),
- * a not empty postset t1' to tn' (precondition 2)
+ * If there exist a place p with a non-empty preset t1 to tk (precondition 1),
+ * a non-empty postset t1' to tn' (precondition 2)
  * which are distinct (precondition 3)
  * and not synchronized (precondition 3a)
- * and the postset's postset is not empty (precondition 4)
- * and the postsets preset is {p} (precondition 5)
+ * and the postset's postset is not empty (incl. output labels) (precondition 4)
+ * and the postset's preset is {p} (precondition 5a)
+ * and the postset's set of input labels is empty (precondition 5b)
  * and the arc weight from p to each transition of its postset is v (precondition 6)
  * and p is not concerned by a final condition (precondition f)
  * 
@@ -746,12 +761,16 @@ bool PetriNet::reduce_singletonPreset(const std::set<Node *> & nodes)
  * 
  * case b: n > 1 (precondition 7b),
  *         p stores less than v tokens (precondition 8b)
+ *         [CG: Suggest to change it to 0, or allow firing only, if no
+ *         posttransition contains no output labels.]
  *         and the weight of each ingoing arc of p is v (precondition 9b)
  * 
  * then the following changes can be applied:
  * 
  * 1.: If p stores at least v tokens, fire its posttransition until
  *     p stores less than v tokens.
+ *     [CG: This is only possibel, if posttransitions contain no
+ *     output labels, because we cannot mark labels.]
  * 2.: For each transition ti (1 <= i <= k) 
  *     and each transition tj' (1 <= j <= n)
  *     add a new transition tij so that firing of transition tij 
@@ -811,7 +830,7 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
         // check the preset
         PNAPI_FOREACH(n, preset)
         {
-          if(static_cast<Transition *>(*n)->getType() != Transition::INTERNAL )
+          if(not static_cast<Transition *>(*n)->getLabels().empty() )
           {
             precond10a = true;
             break;
@@ -821,7 +840,7 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
         // check the postset
         PNAPI_FOREACH(n, postset)
         {
-          if(static_cast<Transition *>(*n)->getType() != Transition::INTERNAL )
+          if(not static_cast<Transition *>(*n)->getLabels().empty() )
           {
             precond10b = true;
             break;
@@ -856,11 +875,26 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
       }
     }
 
+    // precondition 4b + 5b
+    bool no_outputlabels = true;
+    bool has_inputlabels = false;
+    PNAPI_FOREACH(t, postset)
+    {
+        if (not static_cast<Transition *> (*t)->getOutputLabels().empty())
+        {
+            no_outputlabels = false;
+        }
+        if (not static_cast<Transition *> (*t)->getInputLabels().empty())
+        {
+            has_inputlabels = true;
+        }
+    }
+
     if( (preset.empty()) || // precondition 1
         (postset.empty()) || // precondition 2
         (!((util::setIntersection(preset, postset)).empty())) || // precondition 3
-        (reduce_emptyPostset(postset)) || // precondition 4
-        (!(reduce_singletonPreset(postset))) ) // precondition 5
+        (reduce_emptyPostset(postset) and no_outputlabels) || // precondition 4
+        (( not reduce_singletonPreset(postset)) or has_inputlabels) ) // precondition 5
     {
       continue;
     }
@@ -909,7 +943,7 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
     }
     else // case b, precondition 7b
     {
-      if((*p)->getTokenCount() >= v) // precondition 8b
+      if((*p)->getTokenCount() >= 1) // precondition 8b CG: changed it from v to 1
       {
         continue;
       }
@@ -1027,10 +1061,12 @@ unsigned int PetriNet::reduce_rule_5(bool keepNormal)
  * \brief Fusion of transitions
  * 
  * If there exists a place p with only one pretransition t (precondition 1)
- * and p is the only postplace of t (precondition 2)
+ * and p is the only postplace of t (precondition 2a)
+ * and t has no output labels (precondition 2b)
  * and the postset of p is not empty (precondition 3)
  * and t is not in the postset of p (precondition 4)
- * and the postset of the preset of t contains only t (precondition 5)
+ * and the postset of the preset of t contains only t (precondition 5a)
+ * and there is no transition besides t using the same input labels as t (precondition 5b)
  * and all arcs to p or from p have the weight v (precondition 6)
  * and the amount of tokens stored in p is less than v (precondition 7)
  * and p is not concerned by a final condition (precondition 8)
@@ -1090,7 +1126,7 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
         // check the postset
         PNAPI_FOREACH(t_, (*p)->getPostset())
         {
-          if(static_cast<Transition *>(*t_)->getType() != Transition::INTERNAL )
+          if(not static_cast<Transition *>(*t_)->getLabels().empty() )
           {
             precond10 = true;
             break;
@@ -1098,7 +1134,7 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
         }
 
         if( precond10 &&
-            (t->getType() != Transition::INTERNAL ) )
+            (not t->getLabels().empty() ) )
         {
           continue;
         }
@@ -1122,7 +1158,8 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
       }
     }
 
-    if( (t->getPostset().size() != 1) || // precondition 2
+    if( (t->getPostset().size() != 1) || // precondition 2a
+        (not t->getOutputLabels().empty()) || // precondition 2b
         ((*p)->getPostset().empty()) || // precondition 3
         ((*p)->getPostset().find(t) != (*p)->getPostset().end()) ) // precondition 4
     {
@@ -1131,18 +1168,29 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
 
     // precondition 5
     {
-      bool precond5 = false;
+      bool precond5a = false;
+      bool precond5b = false;
 
       PNAPI_FOREACH(n, t->getPreset())
       {
         if((*n)->getPostset().size() != 1)
         {
-          precond5 = true;
+          precond5a = true;
           break;
         }
       }
 
-      if(precond5) 
+      std::set< Label * > labels = t->getInputLabels();
+      PNAPI_FOREACH(label, labels)
+      {
+          if ((*label)->getTransitions().size() != 1)
+          {
+              precond5b = true;
+              break;
+          }
+      }
+
+      if(precond5a or precond5b)
       {
         continue;
       }
@@ -1254,7 +1302,7 @@ unsigned int PetriNet::reduce_rule_6(bool keepNormal)
  * and p is not concerned by a final condition (precondition 4)
  * than this place can be removed as well as each transition
  * becoming isolated by this reduction, except those ones 
- * that are synchronized (precondition 5).
+ * that are labeled (precondition 5).
  * 
  * \post  this rule preserves lifeness and boundedness according to [Sta90]
  * 
@@ -1325,7 +1373,7 @@ unsigned int PetriNet::reduce_rule_7()
   // clean transitions
   PNAPI_FOREACH(t, obsoleteTransitions)
   {
-    if((*t)->isSynchronized()) // precondition 5
+    if(not (*t)->getLabels().empty()) // precondition 5
     {
       continue;
     }
@@ -1342,11 +1390,11 @@ unsigned int PetriNet::reduce_rule_7()
  * and for each place of the preset of t applies that the arc weight
  * from p to t equals the arc weight from t to p (precondition 2)
  * and there exists an transition t0 different from t (precondition 3)
- * and for eacht place p in the preset of t applies that
+ * and for each place p in the preset of t applies that
  * p is in the preset of t0 (precondition 4)
  * and the arc weight from p to t0 is greater than or equal to
  * the arc weight from p to t (precondition 5)
- * ant t is not synchronized (precondition 6)
+ * ant t is not labeled (precondition 6)
  * than t can be removed.
  * 
  * \post  this rule preserves lifeness and boundedness according to [Sta90]
@@ -1373,7 +1421,7 @@ unsigned int PetriNet::reduce_rule_8()
   PNAPI_FOREACH(t, transitions_)
   {
     if( (seenTransitions[*t]) || // check if t is a "backup"-transition
-        ((*t)->isSynchronized()) ) // precondition 6
+        (not (*t)->getLabels().empty( )) ) // precondition 6
     {
       continue;
     }
@@ -1400,6 +1448,8 @@ unsigned int PetriNet::reduce_rule_8()
       continue;
     }
 
+    if ( not (*t)->getPreset().empty() )
+    {
     PNAPI_FOREACH(t0, (*((*t)->getPreset().begin()))->getPostset())
     {
       if((*t)==(*t0)) // precondition 3
@@ -1432,6 +1482,11 @@ unsigned int PetriNet::reduce_rule_8()
         break; 
       }
     }
+    }
+    else
+    {
+        continue;
+    }
   }
 
   // apply reduction
@@ -1450,7 +1505,8 @@ unsigned int PetriNet::reduce_rule_8()
 /*!
  * \brief Fusion of Places.
  * 
- * If there exists a transition t with singleton preplace p (precondition 1)
+ * If there exists a transition t with singleton preplace p (precondition 1a)
+ * and t has no input labels (precondition 1b)
  * and the arc weight from p to t is 1 (precondition 2)
  * and t is the only posttransition of of p (precondition 2a)
  * and the preset of p is not empty (precondition 3)
@@ -1510,7 +1566,7 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
       // check the preset
       PNAPI_FOREACH(n, (*p)->getPreset())
       {
-        if(static_cast<Transition *>(*n)->getType() != Transition::INTERNAL )
+        if(not static_cast<Transition *>(*n)->getLabels().empty() )
         {
           precond10 = true;
           break;
@@ -1519,7 +1575,7 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
 
       if( precond10 && // there is an interface transition in the preset
           ((*p)->getPostset().begin() != (*p)->getPostset().end()) && // there is a transition in the postset
-          (static_cast<Transition *>(*((*p)->getPostset().begin()))->getType() != Transition::INTERNAL ) ) // this transition is also an interface transition
+          (not static_cast<Transition *>(*((*p)->getPostset().begin()))->getLabels().empty() ) ) // this transition is also an interface transition
       {
         continue;
       }
@@ -1555,7 +1611,8 @@ unsigned int PetriNet::reduce_rule_9(bool keepNormal)
 
     Transition * t = static_cast<Transition *>(*((*p)->getPostset().begin()));
 
-    if( (t->getPreset().size() != 1) || // precondition 1
+    if( (t->getPreset().size() != 1) || // precondition 1a
+        (not t->getInputLabels().empty()) || //precondition 1b
         (t->getPostset().empty()) || // precondition 4
         (t->getPostset().find(*p) != t->getPostset().end()) ) // precondition 5
     {
@@ -2075,11 +2132,11 @@ unsigned int PetriNet::reduce_identical_transitions()
  * that are distinct (precondition 2),
  * where the p's preset is not empty (precondition 3)
  * and p has no other outgoing arcs (precondition 4)
- * and alle arcs connected with this 
+ * and all arcs connected with this
  * transition have a weight of 1 (precondition 5)
  * and q is not initially marked (precondition 6),
  * and q is not concerned by a final condition (precondition f)
- * and t is not synchronized (precondition 8)
+ * and t is not labeled (precondition 8)
  * then the histories of t and q will be attached to p,
  * the postset of q will be connected with p in the same way it
  * was connected to q, and t and q will be removed.
@@ -2112,7 +2169,7 @@ unsigned int PetriNet::reduce_series_places()
 
     if( (seenPlaces[prePlace]) ||
         (seenPlaces[postPlace]) || 
-        ((*t)->isSynchronized()) || // precondition 8
+        (not (*t)->getLabels().empty()) || // precondition 8
         (!(__REDUCE_CHECK_FINAL(postPlace))) ) // precondition f
     {
       continue;
@@ -2177,8 +2234,10 @@ unsigned int PetriNet::reduce_series_places()
  *
  * If there exists a place p with singleton preset t1 and postset t2 (precondition 1),
  * which is not final or marked (precondition 2),
- * and if t2 has no other incoming arcs (precondition 3),
- * and if the postsets of t1 and t2 are distinct (precondition 4),
+ * and if t2 has no other incoming arcs (precondition 3a),
+ * and if t2 has no input labels (precondition 3b),
+ * and if the postsets of t1 and t2 are distinct (precondition 4a),
+ * and if the output labels of t1 and t2 are distinct (precondition 4b),
  * and the arc weight from t1 to p and from p to t2 is 1 (precondition 5),
  * and neither t1 nor t2 are synchronized (precondition 6),
  * then the following reduction can be applied:
@@ -2238,8 +2297,10 @@ unsigned int PetriNet::reduce_series_transitions(bool keepNormal)
         continue;
       }
 
-      if( (t2->getPreset().size() == 1) && // precondition 3
-          (util::setIntersection(t1->getPostset(),t2->getPostset()).empty() ) && // precondition 4
+      if( (t2->getPreset().size() == 1) && // precondition 3a
+          (t2->getInputLabels().empty()) && // precondition 3b
+          (util::setIntersection(t1->getPostset(),t2->getPostset()).empty() ) && // precondition 4a
+          (util::setIntersection(t1->getOutputLabels(),t2->getOutputLabels()).empty() ) && // precondition 4b
           (!( (t1->getType() != Transition::INTERNAL) && 
               (t2->getType() != Transition::INTERNAL) && 
               (keepNormal)) ) && //precondition 4
@@ -2406,7 +2467,7 @@ unsigned int PetriNet::reduce_self_loop_places()
  * If there exists a transition t with singleton preset p (precondition 1),
  * where the preset is identical to the postset (precondition 2),
  * and the arc weights both of (p->t) and of (t->p) is equal to 1 (precondition 3),
- * and t is not synchronized (precondition 4),
+ * and t is not labeled (precondition 4),
  * then this transition can be removed.
  * 
  * \todo: How to handle the history of removed transitions?
@@ -2426,7 +2487,7 @@ unsigned int PetriNet::reduce_self_loop_transitions()
         ((*t)->getPreset() == (*t)->getPostset()) &&   // precondition 2
         ((*((*t)->getPresetArcs().begin()))->getWeight() == 1) &&  // precondition 3
         ((*((*t)->getPostsetArcs().begin()))->getWeight() == 1) &&  // precondition 3
-        (!((*t)->isSynchronized())) ) // precondition 4
+        (*t)->getLabels().empty() ) // precondition 4
     {
       self_loop_transitions.insert(*t);
     }

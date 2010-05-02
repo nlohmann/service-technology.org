@@ -587,6 +587,24 @@ AT_CHECK([GREP -q "|P|= 79  |P_in|= 0  |P_out|= 0  |T|= 76  |F|= 176" stderr])
 AT_KEYWORDS([woflan parser])
 AT_CLEANUP
 
+AT_SETUP([Bug 15820 (https://gna.org/bugs/?15820) [[1]]])
+m4_define([NET],[bug_15820_sp.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --reduce=series_places -oowfn])
+AT_CHECK([PETRI --verbose NET.reduced.owfn], 0, ignore, stderr)
+AT_CHECK([GREP -q "|P|= 11  |P_in|= 2  |P_out|= 2  |T|= 6  |F|= 16" stderr])
+AT_KEYWORDS([bug reduction])
+AT_CLEANUP
+
+AT_SETUP([Bug 15820 (https://gna.org/bugs/?15820) [[2]]])
+m4_define([NET],[bug_15820_sp.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --reduce=series_transitions -oowfn])
+AT_CHECK([PETRI --verbose NET.reduced.owfn], 0, ignore, stderr)
+AT_CHECK([GREP -q "|P|= 9  |P_in|= 2  |P_out|= 2  |T|= 4  |F|= 12" stderr])
+AT_KEYWORDS([bug reduction])
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Murata Reduction Rules])
 ############################################################################

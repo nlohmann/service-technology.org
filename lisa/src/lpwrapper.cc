@@ -53,6 +53,77 @@ extern map<Transition*,int> revtorder;
 	}
 
 /** Creates the marking equation for lp_solve.
+	@param m1 Initial marking.
+	@param m2 Final marking.
+	@param verbose If TRUE prints information on cout.
+	@return The number of equations on success, -1 otherwise.
+*/
+int LPWrapper::createMEquation(Marking& m1, Marking& m2, bool verbose) {
+	tpos.clear(); // probably not necessary
+	tvector.clear();
+
+	// set the column variables in lp_solve according to the global transition ordering
+	int colnr=0;
+	for(unsigned int o=0; o<transitionorder.size(); ++o,++colnr)
+	{
+		Transition* t(transitionorder[o]); // get the transitions according to the global ordering 
+		set_col_name(lp,colnr+1,const_cast<char*>(t->getName().c_str()));
+		set_int(lp,colnr+1,1); // declare all variables to be integer
+		tpos[t] = colnr; // remember the ordering of the transitions
+	}
+	if (colnr!=(int)(cols)) cerr << "sara: LPWrapper error: column number mismatch" << endl;
+
+	//lp_solve objective: minimum firing sequence length
+	int *colpoint = new int[cols];
+	REAL *mat = new REAL[cols];
+	for(unsigned int y=0; y<cols; y++)
+	{
+		mat[y]=1;
+		colpoint[y]=y+1;
+	}
+	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
+	if (!set_obj_fnex(lp,cols,mat,colpoint)) return -1;
+	set_minim(lp);
+
+	//create incidence matrix by adding rows to lp_solve
+	for(unsigned int k=0; k<placeorder.size(); ++k)
+	{
+		for(unsigned int y=0; y<cols; ++y) mat[y]=0;
+		set<pnapi::Arc*>::iterator ait;
+		set<pnapi::Arc*> arcs = placeorder[k]->getPresetArcs(); 
+		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
+		{
+			Transition* t = &((*ait)->getTransition());
+			mat[tpos[t]] += (*ait)->getWeight();
+		}
+		arcs = placeorder[k]->getPostsetArcs();
+		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
+		{
+			Transition* t = &((*ait)->getTransition());
+			mat[tpos[t]] -= (*ait)->getWeight();
+		}
+		int mark = m2[*(placeorder[k])]-m1[*(placeorder[k])]; // calculate right hand side
+
+		//initialize the rows
+		if (!add_constraintex(lp,cols,mat,colpoint,EQ,mark)) return -1;
+	}
+
+	//allow only nonnegative solutions
+	REAL r = 1;
+	for(int y=1; y<=(int)(cols); ++y)
+		if (!add_constraintex(lp,1,&r,&y,GE,0)) return -1;
+
+	set_add_rowmode(lp,FALSE);	
+	if (verbose) write_LP(lp,stdout);
+	else set_verbose(lp,CRITICAL);
+	basicrows = placeorder.size()+cols;
+	delete[] colpoint;
+	delete[] mat;
+	return (int)(basicrows);
+}
+
+
+/** Creates equations for calculating t-invariants for lp_solve.
 	@param verbose If TRUE prints information on cout.
 	@return The number of equations on success, -1 otherwise.
 */
@@ -150,7 +221,7 @@ int LPWrapper::calcTInvariant(bool verbose) {
 	return (int)(basicrows);
 }
 
-/** Creates the marking equation for lp_solve.
+/** Creates equations for calculating p-invariants for lp_solve.
 	@param verbose If TRUE prints information on cout.
 	@return The number of equations on success, -1 otherwise.
 */

@@ -42,6 +42,8 @@ public:
 
 	/// Destructor
 	~LPWrapper();
+
+	int createMEquation(Marking& m1, Marking& m2, bool verbose);
 	
 	int calcTInvariant(bool b);
 

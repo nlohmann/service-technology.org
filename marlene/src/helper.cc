@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Marlene.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Marlene.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 #include <cstdarg>
@@ -46,9 +46,9 @@ unsigned int veryverboseindent = 0;
 void print_version (void)
 {
 #if defined(VERSION_SVN)
-  printf ("%s %s (rev. %s)\n", PACKAGE, VERSION, VERSION_SVN);
+    printf ("%s %s (rev. %s)\n", PACKAGE, VERSION, VERSION_SVN);
 #else
-  printf ("%s %s\n", PACKAGE, VERSION);
+    printf ("%s %s\n", PACKAGE, VERSION);
 #endif
 }
 
@@ -64,12 +64,14 @@ void evaluate_command_line(int argc, char* argv[])
     struct cmdline_parser_params *params = cmdline_parser_params_create();
 
     // call the cmdline parser
-    if (cmdline_parser(argc, argv, &args_info) != 0) {
+    if (cmdline_parser(argc, argv, &args_info) != 0)
+    {
         abort(7, "invalid command-line parameter(s)");
     }
 
     // debug option
-    if (args_info.bug_flag) {
+    if (args_info.bug_flag)
+    {
         FILE *debug_output = fopen("bug.log", "w");
         fprintf(debug_output, "%s\n", CONFIG_LOG);
         fclose(debug_output);
@@ -78,33 +80,45 @@ void evaluate_command_line(int argc, char* argv[])
     }
 
     // read a configuration file if necessary
-    if (args_info.config_given) {
+    if (args_info.config_given)
+    {
         // initialize the config file parser
         params->initialize = 0;
         params->override = 0;
 
         // call the config file parser
-        if (cmdline_parser_config_file (args_info.config_arg, &args_info, params) != 0) {
+        if (cmdline_parser_config_file (args_info.config_arg, &args_info, params) != 0)
+        {
             abort(14, "error reading configuration file '%s'", args_info.config_arg);
-        } else {
+        }
+        else
+        {
             status("using configuration file '%s'", args_info.config_arg);
         }
-    } else {
+    }
+    else
+    {
         // check for configuration files
         std::string conf_filename = fileExists("marlene.conf") ? "marlene.conf" :
-                               (fileExists(std::string(SYSCONFDIR) + "/marlene.conf") ?
-                               (std::string(SYSCONFDIR) + "/marlene.conf") : "");
+                                    (fileExists(std::string(SYSCONFDIR) + "/marlene.conf") ?
+                                     (std::string(SYSCONFDIR) + "/marlene.conf") : "");
 
-        if (conf_filename != "") {
+        if (conf_filename != "")
+        {
             // initialize the config file parser
             params->initialize = 0;
             params->override = 0;
-            if (cmdline_parser_config_file ((char*)conf_filename.c_str(), &args_info, params) != 0) {
+            if (cmdline_parser_config_file ((char*)conf_filename.c_str(), &args_info, params) != 0)
+            {
                 abort(14, "error reading configuration file '%s'", conf_filename.c_str());
-            } else {
+            }
+            else
+            {
                 status("using configuration file '%s'", conf_filename.c_str());
             }
-        } else {
+        }
+        else
+        {
             status("not using a configuration file");
         }
     }
@@ -114,14 +128,14 @@ void evaluate_command_line(int argc, char* argv[])
         print_version();
         exit(EXIT_SUCCESS);
     }
-    
+
     // evaluation of options
-    
+
     if (args_info.messagebound_given)
     {
         messageBound = args_info.messagebound_arg;
     }
-    
+
     if (args_info.nocomplementplaces_given)
     {
         useCompPlaces = (args_info.nocomplementplaces_flag == 0);
@@ -131,22 +145,26 @@ void evaluate_command_line(int argc, char* argv[])
     {
         contType = Adapter::ASYNCHRONOUS;
     }
-    
+
     if (args_info.veryverbose_given && args_info.veryverbose_flag)
     {
         veryverbose = true;
     }
-    
+
     free(params);
-    
+
 }
 
-bool fileExists(std::string filename) {
+bool fileExists(std::string filename)
+{
     FILE *tmp = fopen(filename.c_str(), "r");
-    if (tmp) {
+    if (tmp)
+    {
         fclose(tmp);
         return true;
-    } else {
+    }
+    else
+    {
         return false;
     }
 }
@@ -161,10 +179,10 @@ bool fileExists(std::string filename) {
  */
 std::string toString(int i)
 {
-  std::ostringstream buffer;
-  
-  buffer << i;
-  
-  return buffer.str();
+    std::ostringstream buffer;
+
+    buffer << i;
+
+    return buffer.str();
 }
 

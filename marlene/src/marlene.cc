@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Marlene.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Marlene.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 // include standard C++ headers
@@ -43,20 +43,22 @@
 clock_t start_clock = clock();
 
 /// a function collecting calls to organize termination (close files, ...)
-void terminationHandler() {
+void terminationHandler()
+{
     // release memory (used to detect memory leaks)
-/*    if (args_info.finalize_flag) {
-        time_t start_time, end_time;
-        time(&start_time);
-        cmdline_parser_free(&args_info);
-        InnerMarking::finalize();
-        StoredKnowledge::finalize();
-        time(&end_time);
-        status("released memory [%.0f sec]", difftime(end_time, start_time));
-    }
-*/
+    /*    if (args_info.finalize_flag) {
+            time_t start_time, end_time;
+            time(&start_time);
+            cmdline_parser_free(&args_info);
+            InnerMarking::finalize();
+            StoredKnowledge::finalize();
+            time(&end_time);
+            status("released memory [%.0f sec]", difftime(end_time, start_time));
+        }
+    */
     // print statistics
-    if (args_info.stats_flag) {
+    if (args_info.stats_flag)
+    {
         message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
         fprintf(stderr, "%s: memory consumption: ", PACKAGE);
         system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
@@ -66,12 +68,12 @@ void terminationHandler() {
 int main(int argc, char* argv[])
 {
     argv[0]=basename(argv[0]);
-    
+
     // set the function to call on normal termination
     atexit(terminationHandler);
 
     std::vector< pnapi::PetriNet * > nets;
-    
+
     /*************************************************\
     * Parsing the command line and evaluation options *
     \*************************************************/
@@ -83,7 +85,8 @@ int main(int argc, char* argv[])
 
     // store invocation in a string for meta information in file output
     std::string invocation;
-    for (int i = 0; i < argc; ++i) {
+    for (int i = 0; i < argc; ++i)
+    {
         invocation += std::string(argv[i]) + " ";
     }
 
@@ -99,23 +102,24 @@ int main(int argc, char* argv[])
         for ( unsigned i = 0; i < args_info.inputs_num; ++i )
         {
             pnapi::PetriNet * net = new pnapi::PetriNet();
-            
+
             std::string filename = args_info.inputs[i];
             status("reading open net from file \"%s\"", filename.c_str());
-            try {
+            try
+            {
                 std::ifstream inputfile(filename.c_str(), std::ios_base::in);
                 if (inputfile.good())
                 {
                     inputfile >> meta(pnapi::io::INPUTFILE, filename)
-                    >> meta(pnapi::io::CREATOR, PACKAGE_STRING)
-                    >> meta(pnapi::io::INVOCATION, invocation) >> pnapi::io::owfn >> *net;
+                              >> meta(pnapi::io::CREATOR, PACKAGE_STRING)
+                              >> meta(pnapi::io::INVOCATION, invocation) >> pnapi::io::owfn >> *net;
 
                     // adding a prefix to the net
                     if (args_info.withprefix_flag)
                     {
                         net->prefixNames(toString(i) + ".");
                     }
-                    
+
                     nets.push_back(net);
                     // std::cerr << pnapi::io::owfn << *net;
 
@@ -124,7 +128,9 @@ int main(int argc, char* argv[])
                 {
                     abort(2, "Open net file %s could not be opened for reading", filename.c_str());
                 }
-            } catch (pnapi::exception::InputError error) {
+            }
+            catch (pnapi::exception::InputError error)
+            {
                 std::cerr << PACKAGE << ":" << error << std::endl;
                 abort(2, " ");
             }
@@ -132,10 +138,12 @@ int main(int argc, char* argv[])
         }
     }
     else
-    { //! parsing open net for stdin aka std::cin
+    {
+        //! parsing open net for stdin aka std::cin
         pnapi::PetriNet * net = new pnapi::PetriNet();
         nets.push_back(net);
-        try {
+        try
+        {
             status("reading open net from STDIN");
             std::cin >> pnapi::io::owfn >> *net;
             // adding a prefix to the net
@@ -143,18 +151,20 @@ int main(int argc, char* argv[])
             {
                 net->prefixNames("0.");
             }
-        } catch (pnapi::exception::InputError error) {
+        }
+        catch (pnapi::exception::InputError error)
+        {
             std::cerr << PACKAGE << ":" << error << std::endl;
             abort(2, " ");
         }
     }
     time(&end_time);
     status("reading all input nets done [%.0f sec]", difftime(end_time, start_time));
-    
+
     /*************************\
     * All necessary variables *
     \*************************/
-    
+
     //! #rs contains a RuleSet that is provided for the adapter
     RuleSet rs;
     //! #adapter
@@ -179,11 +189,11 @@ int main(int argc, char* argv[])
         time(&end_time);
         status("reading all rules file done [%.0f sec]", difftime(end_time, start_time));
     }
-    
+
     /*********************\
     * Building the engine *
     \*********************/
-    
+
     time(&start_time);
     pnapi::PetriNet engine (*adapter.buildEngine());
     time(&end_time);
@@ -193,17 +203,17 @@ int main(int argc, char* argv[])
     {
         std::string filename = (args_info.output_given ? std::string(args_info.output_arg) : std::string("-"));
         Output outfile(filename, std::string("engine"));
-        outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING) 
-            << meta(pnapi::io::INVOCATION, invocation) << engine;
-        
+        outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING)
+                         << meta(pnapi::io::INVOCATION, invocation) << engine;
+
         //quit
         return 0;
     }
-    
+
     /*************************\
     * Building the controller *
     \*************************/
-    
+
     time(&start_time);
     pnapi::PetriNet controller (*adapter.buildController());
     time(&end_time);
@@ -213,25 +223,25 @@ int main(int argc, char* argv[])
     {
         std::string filename = (args_info.output_given ? std::string(args_info.output_arg) : std::string("-"));
         Output outfile(filename, std::string("controller"));
-        outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING) 
-            << meta(pnapi::io::INVOCATION, invocation) << controller;
-        
+        outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING)
+                         << meta(pnapi::io::INVOCATION, invocation) << controller;
+
         //quit
         return 0;
     }
-    
+
     /*******************************************************************\
     * Composing engine and controller in order to get the final adapter *
     \*******************************************************************/
-    
+
     engine.compose(controller, "engine.", "controller.");
-    
+
     engine.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); //
     {
         std::string filename = (args_info.output_given ? std::string(args_info.output_arg) : std::string("-"));
         Output outfile(filename, std::string("final adapter"));
-        outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING) 
-            << meta(pnapi::io::INVOCATION, invocation) << engine;
+        outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING)
+                         << meta(pnapi::io::INVOCATION, invocation) << engine;
     }
 
     /*******************\
@@ -243,7 +253,7 @@ int main(int argc, char* argv[])
         delete nets[index];
     }
     nets.clear();
-    
+
     cmdline_parser_free(&args_info);
 
     return 0;

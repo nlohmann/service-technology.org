@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Marlene.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Marlene.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 #include <config.h>
@@ -46,10 +46,10 @@
 /* For documentation of the following functions, please see header file. */
 
 Adapter::Adapter(std::vector< pnapi::PetriNet *> & nets, RuleSet & rs,
-                ControllerType contType, unsigned int messageBound, 
-                bool useCompPlaces) :
+                 ControllerType contType, unsigned int messageBound,
+                 bool useCompPlaces) :
     _engine(new pnapi::PetriNet), _controller(NULL), _nets(nets), _rs(rs), _contType(contType),
-                    _messageBound(messageBound), _useCompPlaces(useCompPlaces)
+    _messageBound(messageBound), _useCompPlaces(useCompPlaces)
 {
     FUNCIN
     /* empty */
@@ -80,10 +80,10 @@ const pnapi::PetriNet * Adapter::buildEngine()
     // adapter specific reduction should take place here
     removeUnnecessaryRules();
     findConflictFreeTransitions();
-    
+
     // reduce engine with standard PNAPI methods
     _engine->reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // due to bug https://gna.org/bugs/?15820, normally 4
-    
+
     // set final condition
     pnapi::Condition & finalCond = _engine->getFinalCondition();
     pnapi::Marking finalMarking (*_engine);
@@ -99,7 +99,7 @@ const pnapi::PetriNet * Adapter::buildController()
 
     using namespace pnapi;
 
-    // _engine should exist here 
+    // _engine should exist here
     assert(_engine != NULL);
 
     // we make a copy of the engine, #_engine is needed for the result
@@ -123,11 +123,12 @@ const pnapi::PetriNet * Adapter::buildController()
         if (i == 0)
         {
             composed.compose(*_nets[i], std::string("engine."),
-                std::string("net" + toString(i+1) + "."));
-        } else
+                             std::string("net" + toString(i+1) + "."));
+        }
+        else
         {
             composed.compose(*_nets[i], std::string(""), std::string("net"
-                            + toString(i+1) + "."));
+                             + toString(i+1) + "."));
         }
     }
 
@@ -161,7 +162,7 @@ const pnapi::PetriNet * Adapter::buildController()
                 assert(place);
 
                 Place * compPlace = &composed.createPlace("comp_" + placeName,
-                     _messageBound +1, _messageBound+1);
+                                    _messageBound +1, _messageBound+1);
 
                 formula::FormulaEqual prop (formula::FormulaEqual(*compPlace,_messageBound + 1));
                 finalCond.addProposition(prop);
@@ -208,7 +209,8 @@ const pnapi::PetriNet * Adapter::buildController()
                 ++placeIter;
             }
         }
-    } else
+    }
+    else
     {
         status("skipping creation of complementary places twice ..");
     }
@@ -247,7 +249,8 @@ const pnapi::PetriNet * Adapter::buildController()
     {
         wendy_command = std::string(args_info.wendy_arg) + " " + owfn_filename
                         + " --diagnose --im --mi --og=" + og_filename;
-    } else
+    }
+    else
     {
         if (args_info.costoptimized_flag)
         {
@@ -260,7 +263,8 @@ const pnapi::PetriNet * Adapter::buildController()
             candy_command = " | " + std::string(args_info.candy_arg)
                             + " --automata --output=" + sa_filename
                             + " --costfile=" + cost_filename;
-        } else
+        }
+        else
         {
             std::string property = "deadlock";
             if (args_info.property_arg == property_arg_livelock)
@@ -282,7 +286,8 @@ const pnapi::PetriNet * Adapter::buildController()
     if (args_info.chatty_flag)
     {
         wendy_command += " --succeedingSendingEvent";
-    } else if (args_info.arrogant_flag)
+    }
+    else if (args_info.arrogant_flag)
     {
         wendy_command += " --receivingBeforeSending";
     }
@@ -294,9 +299,9 @@ const pnapi::PetriNet * Adapter::buildController()
     candy_command += ((args_info.verbose_flag) ? " --verbose" : " 2> NUL");
 #else
     wendy_command += ((args_info.verbose_flag) ? " --verbose"
-                    : " 2> /dev/null");
+                      : " 2> /dev/null");
     candy_command += ((args_info.verbose_flag) ? " --verbose 1>&2"
-                    : " 1>&2 2> /dev/null");
+                      : " 1>&2 2> /dev/null");
 #endif
 
     if (args_info.costoptimized_flag)
@@ -347,8 +352,7 @@ const pnapi::PetriNet * Adapter::buildController()
         pnapi::PetriNet::setPetrify(args_info.petrify_arg);
         _controller = new pnapi::PetriNet(*mpp_sa);
     }
-    else
-    if (args_info.sa2on_arg == sa2on_arg_genet and std::string(args_info.genet_arg) != "\"not found\"") // && _contType == ASYNCHRONOUS)
+    else if (args_info.sa2on_arg == sa2on_arg_genet and std::string(args_info.genet_arg) != "\"not found\"")   // && _contType == ASYNCHRONOUS)
 
     {
         status("Using Genet for conversion from SA to open net.");
@@ -372,18 +376,18 @@ const pnapi::PetriNet * Adapter::buildController()
         pnapi::Port & oldport = *(_controller->getInterface().getPort());
         const std::set<Label *> netIf = oldport.getAllLabels();
         for (std::set<Label *>::const_iterator label = netIf.begin(); label
-                        != netIf.end(); ++label)
+                != netIf.end(); ++label)
         {
             pnapi::Label::Type labeltype = (*label)->getType();
             const std::string labelname((*label)->getName());
             {
                 // CG Workaround:
                 pnapi::Label & labelcopy = controllerport.addLabel(labelname,
-                    labeltype);
+                                           labeltype);
                 const std::set<Transition *> & transen =
-                                (*label)->getTransitions();
+                    (*label)->getTransitions();
                 for (std::set<Transition *>::const_iterator trans =
-                                transen.begin(); trans != transen.end(); ++trans)
+                            transen.begin(); trans != transen.end(); ++trans)
                 {
                     (*trans)->addLabel(labelcopy);
                 }
@@ -397,15 +401,15 @@ const pnapi::PetriNet * Adapter::buildController()
     if (args_info.verbose_flag)
     {
         std::cerr << PACKAGE << ": most-permissive partner: "
-                        << pnapi::io::stat << *_controller << std::endl;
+                  << pnapi::io::stat << *_controller << std::endl;
     }
     status("converting most-permissive partner done [%.0f sec]", difftime(
-        end_time, start_time));
+               end_time, start_time));
 
     FUNCOUT
     return _controller;
 }
-    
+
 /**
  * \brief   creates the interface towards the involved services
  */
@@ -413,14 +417,14 @@ void Adapter::createEngineInterface()
 {
     FUNCIN
     assert(_engine != NULL);
-    
+
     pnapi::Port & contport = *(_engine->getInterface().getPort("controller"));
 
     for (unsigned int netindex = 0; netindex < _nets.size(); ++netindex)
     {
         using namespace pnapi;
         // renaming the net is done when merging the nets
-        
+
         std::string portname = "net" + toString(netindex);
 
         pnapi::Port & netport = _engine->createPort(portname);
@@ -431,7 +435,7 @@ void Adapter::createEngineInterface()
 
         const std::set< Label * > netIf = _nets[netindex]->getInterface().getAsynchronousLabels();
         for (std::set< Label *>::const_iterator place = netIf.begin(); place
-                        != netIf.end(); ++place)
+                != netIf.end(); ++place)
         {
             pnapi::Label::Type labeltype = (*place)->getType();
             const std::string labelname ((*place)->getName());
@@ -458,31 +462,33 @@ void Adapter::createEngineInterface()
             {
                 internalname  = (labelname + "_int");
             }
-            
+
             Label * iflabel = NULL;
-            if (labeltype == Label::INPUT) {
+            if (labeltype == Label::INPUT)
+            {
                 iflabel = &netport.addOutputLabel(labelname);
             }
-            else {
+            else
+            {
                 iflabel = &netport.addInputLabel(labelname);
             }
-            
+
             Place * intplace = _engine->findPlace(internalname);
             if (intplace == NULL)
             {
                 //! the internal place which is a copy of the interface place
                 intplace = &_engine->createPlace(internalname,
-                                0, _messageBound);
-                
+                                                 0, _messageBound);
+
             }
             //! name of sending/receiving transition
             std::string inttransname(( (labeltype == Label::INPUT ) ? "t_send_"
-                            : "t_receive_") + labelname);
-            
+                                       : "t_receive_") + labelname);
+
             //! transition which moves the token between the interface place and its copy
             Transition & inttrans =_engine->createTransition( inttransname );
-            
-            // create arcs between the internal place, the transition 
+
+            // create arcs between the internal place, the transition
             // and the interface place
             if (labeltype == Label::INPUT)
             {
@@ -503,16 +509,18 @@ void Adapter::createEngineInterface()
                 inttrans.addLabel(contLabel);
 
                 cost_file_content += "sync_" + inttransname + " 0;\n";
-                
+
             }
             // else create interface place to the controller
             else
             {
-                if (labeltype == Label::INPUT) {
+                if (labeltype == Label::INPUT)
+                {
                     Label & inputLabel = contport.addInputLabel("send_" + labelname);
                     inttrans.addLabel(inputLabel);
                 }
-                else {
+                else
+                {
                     Label & outputLabel = contport.addOutputLabel("receive_" + labelname);
                     inttrans.addLabel(outputLabel);
                 }
@@ -526,16 +534,16 @@ void Adapter::createEngineInterface()
 
             // CG Workaround:
             pnapi::Label & labelcopy = partnerport.addLabel(labelname,
-                pnapi::Label::SYNCHRONOUS);
+                                       pnapi::Label::SYNCHRONOUS);
             const std::set<Transition *> & transen = (*iter)->getTransitions();
             for (std::set<Transition *>::const_iterator trans = transen.begin(); trans
-                            != transen.end(); ++trans)
+                    != transen.end(); ++trans)
             {
                 (*trans)->addLabel(labelcopy);
             }
             oldport.removeLabel(labelname);
         }
-        
+
     }
     FUNCOUT
 }
@@ -544,13 +552,13 @@ void Adapter::createRuleTransitions()
 {
     FUNCIN
     using namespace pnapi;
-    
+
     // we need the port to the controller for adding control labels
     pnapi::Port & contport = *(_engine->getInterface().getPort("controller"));
 
     // transitions are numbered
     unsigned int transNumber = 1;
-    
+
     // get given rules
     std::list< RuleSet::AdapterRule * > rules = _rs.getRules();
     // iterate them
@@ -558,27 +566,27 @@ void Adapter::createRuleTransitions()
     while ( ruleIter != rules.end() )
     {
         const RuleSet::AdapterRule & rule = **ruleIter;
-        
+
         std::string transName (Adapter::getRuleName(transNumber));
-        
+
         // create rule transition
-        
+
         // maybe transition alread exists (but why!)
         Transition * trans = _engine->findTransition(transName);
         // so let's have an assertion here
         assert (trans == NULL);
-        
+
         if (trans == NULL)
         {
             trans = &_engine->createTransition(transName);
         }
-        
+
         // add costs to the transition
         trans->setCost(rule.getCosts());
         // status("setting costs %d for %s", rule.getCosts(), transName.c_str());
 
         cost_file_content += "sync_" + transName + " " + toString(rule.getCosts()) + ";\n";
-        
+
         // now for the places, iterate and connect them to the transition
         std::list< unsigned int > messageList = rule.getRule().first;
         std::list< unsigned int >::iterator messageIter = messageList.begin();
@@ -586,44 +594,44 @@ void Adapter::createRuleTransitions()
         {
             // create places for precondition
             std::string placeName = _rs.getMessageForId(*messageIter) + "_int";
-            
+
             // let's look, if the place already exists
             Place * place = _engine->findPlace(placeName);
-            
+
             // nope, create it
             if ( place == NULL )
             {
                 place = &_engine->createPlace(placeName, 0, _messageBound);
             }
-            
+
             // create arc between this place and rule transition
             _engine->createArc(*place, *trans);
-            
+
             ++messageIter;
         }
-        
+
         messageList = rule.getRule().second;
         messageIter = messageList.begin();
         while ( messageIter != messageList.end() )
         {
             // create places for postcondition
             std::string placeName = _rs.getMessageForId(*messageIter) + "_int";
-            
+
             // let's look, if the place already exists
             Place * place = _engine->findPlace(placeName);
-            
+
             // nope, create it
             if ( place == NULL )
             {
                 place = &_engine->createPlace(placeName, 0, _messageBound);
             }
-            
+
             // create arc between this place and rule transition
             _engine->createArc(*trans, *place);
-            
+
             ++messageIter;
         }
-        
+
         // get synchronouns labels for this rule.
         std::set< std::string > syncLabel;
         messageList = rule.getSyncList();
@@ -637,7 +645,7 @@ void Adapter::createRuleTransitions()
             {
                 trans->addLabel(*syncLabel);
             }
-            else // This transition will never fire, so a dead place is added!
+            else     // This transition will never fire, so a dead place is added!
             {
                 Place * deadplace = _engine->findPlace(labelName);
                 if (deadplace == NULL)
@@ -646,10 +654,10 @@ void Adapter::createRuleTransitions()
                 }
                 _engine->createArc(*deadplace, *trans);
             }
-            
+
             ++messageIter;
         }
-        
+
         // if we have a synchronous interface, create label for transition
         if (_contType == SYNCHRONOUS)
         {
@@ -659,15 +667,15 @@ void Adapter::createRuleTransitions()
         // else create interface place to the controller
         else
         {
-            if (rule.getMode() == RuleSet::AdapterRule::AR_NORMAL 
-                            || rule.getMode() == RuleSet::AdapterRule::AR_CONTROLLABLE)
+            if (rule.getMode() == RuleSet::AdapterRule::AR_NORMAL
+                    || rule.getMode() == RuleSet::AdapterRule::AR_CONTROLLABLE)
             {
                 Label & inputlabel = contport.addInputLabel("control_" + transName);
                 trans->addLabel(inputlabel);
             }
-            
-            if (rule.getMode() == RuleSet::AdapterRule::AR_NORMAL 
-                            || rule.getMode() == RuleSet::AdapterRule::AR_OBSERVABLE)
+
+            if (rule.getMode() == RuleSet::AdapterRule::AR_NORMAL
+                    || rule.getMode() == RuleSet::AdapterRule::AR_OBSERVABLE)
             {
                 Label & outputlabel = contport.addOutputLabel("observe_" + transName);
                 trans->addLabel(outputlabel);
@@ -685,12 +693,12 @@ void Adapter::createRuleTransitions()
 void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
 {
     FUNCIN
-    
+
     using namespace pnapi;
-    
+
     std::set< Place * > intPlaces = net.getPlaces();
     std::set< Place * >::iterator placeIter = intPlaces.begin();
-    
+
     /*
     Place & dictatorPlace = net.createPlace("comp_thegreatdictator", 1, 1);
 
@@ -715,8 +723,8 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
     {
         Place & place = **placeIter;
         Place & compPlace = net.createPlace("comp_" + place.getName(),
-            place.getCapacity() + 1, place.getCapacity() + 1);
-        
+                                            place.getCapacity() + 1, place.getCapacity() + 1);
+
         // update final condition
         Condition & finalCond = net.getFinalCondition();
 
@@ -738,7 +746,7 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
             }
             ++nodeIter;
         }
-        
+
         std::set< Node * > postSet = place.getPostset();
         nodeIter = postSet.begin();
         while ( nodeIter != postSet.end() )
@@ -755,7 +763,7 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
             }
             ++nodeIter;
         }
-        
+
         /*
         // deadlock transition
         Transition & trans = net.createTransition("dl_" + place.getName());
@@ -766,7 +774,7 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
 
         ++placeIter;
     }
-    
+
     FUNCOUT
 }
 
@@ -798,7 +806,7 @@ void Adapter::removeUnnecessaryRules()
         }
 
         possibleDeadPlaces.clear();
-        
+
         // delete dead places and all depending nodes
         std::list<Place *>::iterator place2Delete = placeDeletionList.begin();
 
@@ -840,7 +848,7 @@ void Adapter::removeUnnecessaryRules()
 
                 std::set< Node * > deadCandidates = (*nodeIter)->getPostset();
                 std::set< Node * >::const_iterator cand = deadCandidates.begin();
-                
+
                 while ( cand != deadCandidates.end() )
                 {
                     // only internal places are appropriate for removal
@@ -850,7 +858,7 @@ void Adapter::removeUnnecessaryRules()
                     }
                     ++cand;
                 }
-                
+
 
                 _engine->deleteTransition(*(dynamic_cast<Transition*>(*nodeIter)));
                 // deleting adjacent interface places, if they exist
@@ -892,7 +900,8 @@ void Adapter::findConflictFreeTransitions()
                 {
                     no_enact = false;
                     // placeIter = preset.end();
-                } else
+                }
+                else
                 {
                     ++placeIter;
                 }
@@ -910,7 +919,8 @@ void Adapter::findConflictFreeTransitions()
                 {
                     no_notify = false;
                     // placeIter = postset.end();
-                } else
+                }
+                else
                 {
                     ++placeIter;
                 }
@@ -919,14 +929,14 @@ void Adapter::findConflictFreeTransitions()
             if (no_enact or no_notify)
             {
                 const std::map<pnapi::Label *, unsigned int> labels =
-                                trans->getLabels();
+                    trans->getLabels();
                 for (std::map<pnapi::Label *, unsigned int>::const_iterator
-                                label = labels.begin(); label != labels.end(); ++label)
+                        label = labels.begin(); label != labels.end(); ++label)
                 {
                     if ((label->first->getType() == pnapi::Label::INPUT and no_enact) or
-                        (label->first->getType() == pnapi::Label::OUTPUT and no_notify) or
-                        (no_enact and no_notify))
-                    trans->removeLabel(*(label->first));
+                            (label->first->getType() == pnapi::Label::OUTPUT and no_notify) or
+                            (no_enact and no_notify))
+                        trans->removeLabel(*(label->first));
                 }
             }
         }
@@ -957,7 +967,7 @@ RuleSet::~RuleSet()
     while (rule != _adapterRules.end())
     {
         delete *rule;
-        
+
         ++rule;
     }
     _adapterRules.clear();
@@ -984,12 +994,12 @@ void RuleSet::addRules(FILE * inputStream)
     extern int adapt_rules_yyparse();
 
     */
-    
-    
+
+
     workingSet = this;
     adapt_rules_yyin = inputStream;
     adapt_rules_yylineno = 1;
-    
+
     adapt_rules_yyparse();
     fclose(adapt_rules_yyin);
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
@@ -1020,7 +1030,7 @@ unsigned int RuleSet::getIdForMessage(std::string message)
 {
     FUNCIN
     // getting the id once is enough
-    unsigned int id = _messageId[message]; 
+    unsigned int id = _messageId[message];
     if ( id == 0 )
     {
         ++_maxId;
@@ -1037,7 +1047,7 @@ unsigned int RuleSet::getIdForMessage(std::string message)
 
 RuleSet::AdapterRule::AdapterRule(rulepair & rule, syncList & slist, cfMode modus, int costs) :
     _rule(rule), _syncList(slist), _modus(modus), _costs(costs)
-{   
+{
     FUNCIN
     /* empty */
     FUNCOUT
@@ -1050,31 +1060,31 @@ RuleSet::AdapterRule::~AdapterRule()
     FUNCOUT
 }
 
-inline const RuleSet::AdapterRule::rulepair & RuleSet::AdapterRule::getRule() const 
+inline const RuleSet::AdapterRule::rulepair & RuleSet::AdapterRule::getRule() const
 {
     FUNCIN
     FUNCOUT
-    return _rule; 
+    return _rule;
 }
 
-inline const RuleSet::AdapterRule::syncList & RuleSet::AdapterRule::getSyncList() const 
+inline const RuleSet::AdapterRule::syncList & RuleSet::AdapterRule::getSyncList() const
 {
     FUNCIN
     FUNCOUT
-    return _syncList; 
+    return _syncList;
 }
 
 inline const RuleSet::AdapterRule::cfMode & RuleSet::AdapterRule::getMode() const
-{ 
+{
     FUNCIN
     FUNCOUT
-    return _modus; 
+    return _modus;
 }
 
 inline const int & RuleSet::AdapterRule::getCosts() const
-{ 
+{
     FUNCIN
     FUNCOUT
-    return _costs; 
+    return _costs;
 }
 

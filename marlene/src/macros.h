@@ -14,7 +14,7 @@
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Marlene.  If not, see <http://www.gnu.org/licenses/>. 
+ along with Marlene.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 #ifndef MACROS_H
@@ -42,10 +42,10 @@ extern unsigned int veryverboseindent;
 #define FUNCIN  if (veryverbose) { INDENT INDENTP std::cerr << " enter function " << __FUNCTION__ << " in " << __FILE__ << "@" << __LINE__ << std::endl; }
 #define FUNCOUT if (veryverbose) { INDENTM INDENT std::cerr << " leave function " << __FUNCTION__ << " in " << __FILE__ << "@" << __LINE__ << std::endl; }
 #endif
-#else 
-#define FUNC 
-#define FUNCIN 
-#define FUNCOUT 
+#else
+#define FUNC
+#define FUNCIN
+#define FUNCOUT
 #endif
 
 // detect MinGW compilation under Cygwin

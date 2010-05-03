@@ -44,18 +44,22 @@ Output::Output() :
 */
 Output::Output(const std::string& str, const std::string& kind) :
     os((!str.compare("-")) ?
-        std::cout :
-        *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
-    ),
+       std::cout :
+       *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
+      ),
     filename(str), temp(NULL), kind(kind)
 {
-    if (not os.good()) {
+    if (not os.good())
+    {
         abort(11, "could not write to file '%s'", _cfilename_(filename));
     }
 
-    if (str.compare("-")) {
+    if (str.compare("-"))
+    {
         status("writing %s to file '%s'", _coutput_(kind), _cfilename_(filename));
-    } else {
+    }
+    else
+    {
         status("writing %s to standard output", _coutput_(kind));
     }
 }
@@ -70,18 +74,29 @@ Output::Output(const std::string& str, const std::string& kind) :
  to keep temporary files (by calling setKeepTempfiles()), temporary files are
  deleted after closing.
 */
-Output::~Output() {
-    if (&os != &std::cout) {
+Output::~Output()
+{
+    if (&os != &std::cout)
+    {
         delete(&os);
-        if (temp == NULL) {
+        if (temp == NULL)
+        {
             status("closed file '%s'", _cfilename_(filename));
-        } else {
-            if (keepTempfiles) {
+        }
+        else
+        {
+            if (keepTempfiles)
+            {
                 status("closed temporary file '%s'", _cfilename_(filename));
-            } else {
-                if (remove(filename.c_str()) == 0) {
+            }
+            else
+            {
+                if (remove(filename.c_str()) == 0)
+                {
                     status("closed and deleted temporary file '%s'", _cfilename_(filename));
-                } else {
+                }
+                else
+                {
                     // this should never happen, because mkstemp creates temp
                     // files in mode 0600.
                     status("closed, but could not delete temporary file '%s'", _cfilename_(filename));
@@ -101,7 +116,8 @@ Output::~Output() {
  This implicit conversation operator allows to use Output objects like
  ostream streams.
 */
-Output::operator std::ostream&() const {
+Output::operator std::ostream&() const
+{
     return os;
 }
 
@@ -110,11 +126,13 @@ Output::operator std::ostream&() const {
  * MEMBER FUNCTIONS *
  ********************/
 
-std::string Output::name() const {
+std::string Output::name() const
+{
     return filename;
 }
 
-std::ostream& Output::stream() const {
+std::ostream& Output::stream() const
+{
     return os;
 }
 
@@ -128,15 +146,18 @@ std::ostream& Output::stream() const {
  \note mkstemp already opens the temp file, so there is no need to check
        whether the creation of the std::ofstream succeeded.
 */
-char* Output::createTmp() {
+char* Output::createTmp()
+{
 #ifdef __MINGW32__
     temp = basename(const_cast<char*>(tempfileTemplate.c_str()));
-    if (mktemp(temp) == NULL) {
+    if (mktemp(temp) == NULL)
+    {
         abort(13, "could not create to temporary file '%s'", basename(const_cast<char*>(tempfileTemplate.c_str())));
     };
 #else
     temp = strdup(tempfileTemplate.c_str());
-    if (mkstemp(temp) == -1) {
+    if (mkstemp(temp) == -1)
+    {
         abort(13, "could not create to temporary file '%s'", temp);
     };
 #endif
@@ -148,10 +169,12 @@ char* Output::createTmp() {
  * STATIC MEMBER FUNCTIONS *
  ***************************/
 
-void Output::setTempfileTemplate(std::string s) {
+void Output::setTempfileTemplate(std::string s)
+{
     tempfileTemplate = s;
 }
 
-void Output::setKeepTempfiles(bool b) {
+void Output::setKeepTempfiles(bool b)
+{
     keepTempfiles = b;
 }

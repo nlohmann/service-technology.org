@@ -885,44 +885,47 @@ void Adapter::findConflictFreeTransitions()
             std::set< Node *> preset = trans->getPreset();
             std::set< Node *>::iterator placeIter = preset.begin();
 
-            bool isit = not preset.empty();
-            while (placeIter != preset.end() )
+            bool no_enact = not preset.empty();
+            while (no_enact and placeIter != preset.end() )
             {
                 if ( (*placeIter)->getPostset().size() > 1 )
                 {
-                    isit = false;
-                    placeIter = preset.end();
+                    no_enact = false;
+                    // placeIter = preset.end();
                 } else
                 {
                     ++placeIter;
                 }
             }
-            if (isit)
-            {
+
+
             // check every post place, if it is conflict free
             std::set< Node *> postset = trans->getPostset();
-            std::set< Node *>::iterator placeIter = postset.begin();
+            placeIter = postset.begin();
 
-            isit = not postset.empty();
-                while (false and placeIter != postset.end() )
+            bool no_notify = not postset.empty();
+            while (no_notify and placeIter != postset.end() )
+            {
+                if ( (*placeIter)->getPreset().size() > 1 )
                 {
-                    if ( (*placeIter)->getPreset().size() > 1 )
-                    {
-                        isit = false;
-                        placeIter = preset.end();
-                    } else
-                    {
-                        ++placeIter;
-                    }
+                    no_notify = false;
+                    // placeIter = postset.end();
+                } else
+                {
+                    ++placeIter;
                 }
             }
-            if (isit)
+
+            if (no_enact or no_notify)
             {
                 const std::map<pnapi::Label *, unsigned int> labels =
                                 trans->getLabels();
                 for (std::map<pnapi::Label *, unsigned int>::const_iterator
                                 label = labels.begin(); label != labels.end(); ++label)
                 {
+                    if ((label->first->getType() == pnapi::Label::INPUT and no_enact) or
+                        (label->first->getType() == pnapi::Label::OUTPUT and no_notify) or
+                        (no_enact and no_notify))
                     trans->removeLabel(*(label->first));
                 }
             }

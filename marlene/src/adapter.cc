@@ -899,6 +899,25 @@ void Adapter::findConflictFreeTransitions()
             }
             if (isit)
             {
+            // check every post place, if it is conflict free
+            std::set< Node *> postset = trans->getPostset();
+            std::set< Node *>::iterator placeIter = postset.begin();
+
+            isit = not postset.empty();
+                while (false and placeIter != postset.end() )
+                {
+                    if ( (*placeIter)->getPreset().size() > 1 )
+                    {
+                        isit = false;
+                        placeIter = preset.end();
+                    } else
+                    {
+                        ++placeIter;
+                    }
+                }
+            }
+            if (isit)
+            {
                 const std::map<pnapi::Label *, unsigned int> labels =
                                 trans->getLabels();
                 for (std::map<pnapi::Label *, unsigned int>::const_iterator

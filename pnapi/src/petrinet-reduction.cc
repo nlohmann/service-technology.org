@@ -2163,7 +2163,7 @@ unsigned int PetriNet::reduce_identical_transitions()
  * and q is not concerned by a final condition (precondition f)
  * and t is not labeled (precondition 8)
  * then the histories of t and q will be attached to p,
- * the postset of q will be connected with p in the same way it
+ * the postset and preset of q will be connected with p in the same way it
  * was connected to q, and t and q will be removed.
  * 
  * \post  this rule preserves lifeness and k-boundedness
@@ -2233,6 +2233,15 @@ unsigned int PetriNet::reduce_series_places()
     PNAPI_FOREACH(a, postPlace->getPostsetArcs())
     {
       createArc(*prePlace,(*a)->getTargetNode(),(*a)->getWeight());
+    }
+
+    // set new preset
+    PNAPI_FOREACH(a, postPlace->getPresetArcs())
+    {
+        if (&(*a)->getSourceNode() != (*t))
+            {
+                createArc((*a)->getSourceNode(), *prePlace, (*a)->getWeight());
+            }
     }
 
     // remove postplace and t

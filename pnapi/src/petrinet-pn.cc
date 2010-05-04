@@ -363,7 +363,15 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
       map<string, unsigned int> & tmpPlaceNameMap = myParser.arcs_[*t];
       PNAPI_FOREACH(p, tmpPlaceNameMap)
       {
-        createArc(*transition, *findPlace(p->first), p->second);
+        pnapi::Arc * arc = findArc(*transition, *findNode(p->first));
+        if ( arc )
+        {
+            arc->setWeight(arc->getWeight() + p->second);
+        }
+        else
+        {
+            createArc(*transition, *findNode(p->first), p->second);
+        }
       }      
     }
   }

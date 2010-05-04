@@ -93,18 +93,19 @@
 %%
 
 stg:
-  K_MODEL IDENTIFIER newline
-  K_DUMMY transition_list newline
-  K_GRAPH newline { parser_.in_arc_list = true; }
-  tp_list pt_list
-  K_MARKING { parser_.in_marking_list = true; } OPENBRACE place_list CLOSEBRACE newline
-  K_END newline
-| K_OUTPUTS transition_list newline
-  K_GRAPH newline { parser_.in_arc_list = true; }
-  pt_list tp_list
-  K_MARKING { parser_.in_marking_list = true; } OPENBRACE place_list CLOSEBRACE newline
-  K_END newline
+  K_MODEL IDENTIFIER NEWLINE
+  K_DUMMY transition_list NEWLINE
+  K_GRAPH NEWLINE { parser_.in_arc_list = true; }
+  arc_list
+  K_MARKING { parser_.in_marking_list = true; } OPENBRACE place_list CLOSEBRACE NEWLINE
+  K_END NEWLINE
+| K_OUTPUTS transition_list NEWLINE
+  K_GRAPH NEWLINE { parser_.in_arc_list = true; }
+  arc_list
+  K_MARKING { parser_.in_marking_list = true; } OPENBRACE place_list CLOSEBRACE NEWLINE
+  K_END NEWLINE
 ;
+
 
 transition_list:
   /* empty */
@@ -146,11 +147,28 @@ place_list:
 
 weight:
   /* empty */       { $$ = 1; }
-| LPAR WEIGHT RPAR  { $$ = $2; }
+| LPAR WEIGHT RPAR  { $$ = $2; std::cerr << "found weight " << $2 << std::endl; }
 ;
 
-tp_list:
+arc_list:
   /* empty */
+| arc_list TRANSITIONNAME place_list NEWLINE
+  { 
+    parser_.arcs_[$2] = parser_.tempNodeMap_;
+    parser_.tempNodeMap_.clear();
+    free($2);
+  } 
+| arc_list PLACENAME transition_list NEWLINE
+  {
+    parser_.arcs_[$2] = parser_.tempNodeMap_;
+    parser_.tempNodeMap_.clear();
+    free($2);
+  }
+;
+
+/*
+tp_list:
+  / * empty * /
 | tp_list TRANSITIONNAME place_list newline
   { 
     parser_.arcs_[$2] = parser_.tempNodeMap_;
@@ -160,17 +178,10 @@ tp_list:
 ;
 
 pt_list:
-  /* empty */
-| pt_list PLACENAME transition_list newline
-  {
-    parser_.arcs_[$2] = parser_.tempNodeMap_;
-    parser_.tempNodeMap_.clear();
-    free($2);
-  }
-;
+  / * empty * /
 
 newline:
   NEWLINE
 | NEWLINE NEWLINE
 ;
-
+*/

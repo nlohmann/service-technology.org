@@ -36,7 +36,7 @@ AC_TYPE_UINT32_T
 
 # write files
 AC_CONFIG_FILES([
-	Makefile libs/pnapi/Makefile libs/lp_solve/Makefile src/Makefile tests/Makefile tests/package.m4
+	Makefile libs/pnapi/Makefile libs/lp_solve/Makefile src/Makefile tests/Makefile tests/package.m4 doc/Makefile doc/Doxyfile
 	])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

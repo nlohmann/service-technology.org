@@ -1,0 +1,13 @@
+@c <<-- CHANGE START (version information) -->>
+@heading Version 0.9-unreleased (3 May 2010)
+@itemize
+@item first release of Sara
+
+@item <<-- tests reachability of markings and realizability of transition vectors in Petri nets. -->>
+
+@item <<-- CHANGES -->>
+
+@end itemize
+
+@heading Version 0.0-unreleased (32 October 2009)
+@c <<-- CHANGE END -->>

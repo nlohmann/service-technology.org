@@ -80,6 +80,7 @@
 %token PLACENAME TRANSITIONNAME IDENTIFIER WEIGHT
 %token K_MODEL K_DUMMY K_OUTPUTS K_GRAPH K_MARKING K_END NEWLINE
 %token OPENBRACE CLOSEBRACE LPAR RPAR
+%token EQUALS
 
 %union
 {
@@ -95,14 +96,14 @@
 stg:
   K_MODEL IDENTIFIER NEWLINE
   K_DUMMY transition_list NEWLINE
-  K_GRAPH NEWLINE { parser_.in_arc_list = true; }
+  K_GRAPH NEWLINE { parser_.in_arc_list = true; parser_.in_marking_list = false;}
   arc_list
-  K_MARKING { parser_.in_marking_list = true; } OPENBRACE place_list CLOSEBRACE NEWLINE
+  K_MARKING { parser_.in_marking_list = true; } OPENBRACE marking_list CLOSEBRACE NEWLINE
   K_END NEWLINE
 | K_OUTPUTS transition_list NEWLINE
-  K_GRAPH NEWLINE { parser_.in_arc_list = true; }
+  K_GRAPH NEWLINE { parser_.in_arc_list = true; parser_.in_marking_list = false;}
   arc_list
-  K_MARKING { parser_.in_marking_list = true; } OPENBRACE place_list CLOSEBRACE NEWLINE
+  K_MARKING { parser_.in_marking_list = true; } OPENBRACE marking_list CLOSEBRACE NEWLINE
   K_END NEWLINE
 ;
 
@@ -122,6 +123,7 @@ transition_list:
     else
     {
       parser_.interface_.insert(ident);
+      parser_.transitions_.insert(ident);
     }
   }
 ;
@@ -132,6 +134,7 @@ place_list:
   { 
     std::string ident = $2;
     free($2);
+
 
     parser_.places_.insert(ident);
     if(parser_.in_marking_list)
@@ -145,22 +148,42 @@ place_list:
   }
 ;
 
+marking_list:
+  /* empty */
+| marking_list PLACENAME
+  { 
+    std::string ident = $2;
+    free($2);
+
+    parser_.places_.insert(ident);
+      parser_.initialMarked_[ident] = 1;
+  }
+| marking_list PLACENAME EQUALS WEIGHT
+  { 
+    std::string ident = $2;
+    free($2);
+
+    parser_.places_.insert(ident);
+      parser_.initialMarked_[ident] = $4;
+  }
+;
+
 weight:
   /* empty */       { $$ = 1; }
-| LPAR WEIGHT RPAR  { $$ = $2; std::cerr << "found weight " << $2 << std::endl; }
+| LPAR WEIGHT RPAR  { $$ = $2; }
 ;
 
 arc_list:
   /* empty */
 | arc_list TRANSITIONNAME place_list NEWLINE
   { 
-    parser_.arcs_[$2] = parser_.tempNodeMap_;
+    parser_.arcs_[$2].insert(parser_.tempNodeMap_.begin(),parser_.tempNodeMap_.end());
     parser_.tempNodeMap_.clear();
     free($2);
   } 
 | arc_list PLACENAME transition_list NEWLINE
   {
-    parser_.arcs_[$2] = parser_.tempNodeMap_;
+    parser_.arcs_[$2].insert(parser_.tempNodeMap_.begin(),parser_.tempNodeMap_.end());
     parser_.tempNodeMap_.clear();
     free($2);
   }

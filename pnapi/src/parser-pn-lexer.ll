@@ -74,6 +74,7 @@ typedef pnapi::parser::pn::yy::BisonParser::token tt;
 %s COMMENT
 %s CAPACITY
 %s ARCWEIGHT
+%s MARKING
 %s G_OUTPUT
 
 namestart		[A-Za-z\200-\377_]
@@ -81,7 +82,7 @@ namechar		[A-Za-z\200-\377_0-9/.:]
 number			[0-9]+
 placename		"p"{number}
 name			{namestart}{namechar}*
-transitionname1		"t"{number}([_/]{number})?
+transitionname1		"t"{number}([_/]{number})*
 transitionname2		"out."{name}
 transitionname3		"in."{name}
 
@@ -125,6 +126,9 @@ transitionname3		"in."{name}
 "finalize"		       { yylval->yt_str = strdup(yytext); return tt::TRANSITIONNAME; }
 
 {name}		               { return tt::IDENTIFIER; }
+
+"="                            { BEGIN(MARKING); return tt::EQUALS; }
+<MARKING>{number}            { BEGIN(INITIAL); yylval->yt_uInt = atoi(yytext); return tt::WEIGHT; }
 
 [\n\r]                         { return tt::NEWLINE; }
 

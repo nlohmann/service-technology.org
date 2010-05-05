@@ -234,7 +234,7 @@ uint8_t PetriNet::genetCapacity_ = 2;
  */
 PetriNet::PetriNet() :
   observer_(*this), interface_(*this),
-  warnings_(0), reducablePlaces_(NULL)
+  warnings_(0), reductionCache_(NULL)
 {
 }
 
@@ -244,7 +244,7 @@ PetriNet::PetriNet() :
 PetriNet::PetriNet(const Interface & interface1, const Interface & interface2, std::map<Label *, Label *> & label2label,
          std::map<Label *, Place *> & label2place, std::set<Label *> & commonLabels) :
   observer_(*this), interface_(*this, interface1, interface2, label2label, label2place, commonLabels),
-  warnings_(0), reducablePlaces_(NULL)
+  warnings_(0), reductionCache_(NULL)
 {
 }
 
@@ -257,7 +257,7 @@ PetriNet::PetriNet(const Interface & interface1, const Interface & interface2, s
 PetriNet::PetriNet(const PetriNet & net) :
   observer_(*this), interface_(*this),
   roles_(net.roles_), meta_(net.meta_),
-  warnings_(net.warnings_), reducablePlaces_(NULL),
+  warnings_(net.warnings_), reductionCache_(NULL),
   finalCondition_(net.finalCondition_, copyStructure(net))
 {
   setConstraintLabels(net.constraints_);

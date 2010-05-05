@@ -61,7 +61,7 @@ void PetriNet::setAutomatonConverter(PetriNet::AutomatonConverter converter)
  */
 PetriNet::PetriNet(const Automaton & sa) :
   observer_(*this), interface_(*this),
-  warnings_(0), reducablePlaces_(NULL)
+  warnings_(0), reductionCache_(NULL)
 {
   if( (automatonConverter_ == PETRIFY) &&
       (pathToPetrify_ == "not found") )

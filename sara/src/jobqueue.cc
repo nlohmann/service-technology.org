@@ -124,7 +124,7 @@ void JobQueue::push_back(PartialSolution* job) {
 }
 
 /** Find out if there is an equivalent job in the queue.
-	@param The job to be checked.
+	@param job The job to be checked.
 	@return -1 if the job was found in the queue, its would-be priority otherwise.
 */
 int JobQueue::find(PartialSolution* job) {
@@ -154,7 +154,7 @@ int JobQueue::find(PartialSolution* job) {
 }
 
 /** Find out if there was an equivalent job in the past.
-	@param The job to be checked.
+	@param job The job to be checked.
 	@return True if the job was found in the past.
 */
 bool JobQueue::findPast(PartialSolution* job) {
@@ -280,7 +280,7 @@ void JobQueue::push_fail(PartialSolution* job) {
 
 /** (Pseudo-)Clean a failure queue from obsolete entries regarding one parikh image
 	of a partial firing sequence.
-	@param The parikh image to check against.
+	@param p The parikh image to check against.
 	@return If the parikh images itself is made obsolete by the queue.
 */
 bool JobQueue::cleanFailure(map<Transition*,int>& p) {

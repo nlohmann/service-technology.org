@@ -79,7 +79,7 @@ void PartialSolution::setMarking(Marking& m1) { m=m1; }
 vector<Transition*>& PartialSolution::getSequence() { return tseq; }
 
 /** Set method for the partial firing sequence.
-	@param The partial firing sequence.
+	@param seq The partial firing sequence.
 */
 void PartialSolution::setSequence(vector<Transition*> seq) { tseq=seq; }
 

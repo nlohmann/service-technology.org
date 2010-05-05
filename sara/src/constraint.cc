@@ -190,7 +190,7 @@ const map<Transition*,int>& Constraint::getLHS() const { return cs; }
 
 /** Checks if forbidding a transition will have any effect on an increment constraint. It is advised
 	not to forbid transitions if it would not have any effect.
-	@param t The transition to be checked for.
+	@param tr The transition to be checked for.
 	@return If forbidding the transition would have an effect.
 */
 bool Constraint::checkSubTransition(Transition& tr) { 

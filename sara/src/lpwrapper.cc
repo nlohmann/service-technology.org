@@ -180,7 +180,7 @@ char* LPWrapper::getColName(int col) {
 }
 
 /** Wrapper for get_variables
-	@param solution Array of REAL with at least #transitions elements
+	@param solution Array of REAL with at least number of transitions elements
 		to contain a solution of lp_solve. Will be filled by the method.
 	@return TRUE if successful.
 */

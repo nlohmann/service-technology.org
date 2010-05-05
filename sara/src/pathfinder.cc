@@ -544,7 +544,7 @@ bool PathFinder::checkForDiamonds()
 			map<Place*,int> post(im.getPostset(*t_check));
 			map<Place*,int>::iterator mit;
 			for(mit=post.begin(); mit!=post.end(); ++mit)
-				if (mit->second>m0[*(mit->first)]) break;
+				if (mit->second>(int)(m0[*(mit->first)])) break;
 			if (mit==post.end()) { // t_check is firable as a last step, now check the rest
 				set<Place*> pset(im.compareOutput(*t_active,*t_check));
 				if (verbose>2 && im.checkRestrictedActivation(mv[i],v,pset)) cerr << "DC: Transition Switch (Step " << i << ", " << t_active->getName() << "/" << t_check->getName() << ")" << endl;
@@ -591,12 +591,12 @@ bool PathFinder::checkIfClosingIn(int start) {
 				int ineed(0); // token need against this marking
 				for(mit=pre.begin(); mit!=pre.end(); ++mit) // go through the preset
 				{	// and add up all tokens necessary (additionally) for firing
-					if (mit->second>mv[i][*(mit->first)]) ineed+=mit->second-mv[i][*(mit->first)];
+					if (mit->second>(int)(mv[i][*(mit->first)])) ineed+=mit->second-mv[i][*(mit->first)];
 				}
 				// check if this is lower than the value so far
 				// if we are after the start of the T-invariant and just lowered the value,
 				// the invariant pushes the transition towards enabledness
-				if (ineed<need || need<0) { need=ineed; if (i>start) return true; }
+				if (ineed<need || need<0) { need=ineed; if (i>(unsigned int)(start)) return true; }
 			}
 		}
 	return false;

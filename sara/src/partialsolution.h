@@ -41,7 +41,7 @@ using std::map;
 using std::string;
 using std::set;
 
-/*! \brief For storing sets of constraints, partial firing sequences, and non-enabled remainders
+/*! \brief For storing sets of constraints, partial firing sequences, and non-enabled remainders, forming a job
 
 	This class represents partial solutions to the problem if a transition
 	vector is realizable.

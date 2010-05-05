@@ -33,14 +33,14 @@ using std::vector;
 using std::map;
 using std::set;
 
-/** Graph for stubborn set method (for finding strongly connected components).
+/*! \brief Nodes for Tarjan's algorithm used to find new constraints
 */
 class myTPNode {
  public:
-	/// Constructor
+	/// Constructor for nodes
 	myTPNode();
 
-	/// Destructor
+	/// Destructor for nodes
 	~myTPNode();
 
 	/// Deinitializer
@@ -58,14 +58,19 @@ class myTPNode {
 	/// Pointer to the place, if this node belongs to a place
 	Place* p;
 
-	/// Depth counters for Tarjan's algorithm
-	int index, low;
+	/// Depth counter for Tarjan's algorithm
+	int index;
+
+	/// Depth counter for Tarjan's algorithm
+	int low;
 
 	/// Flag showing if this node is in the stack at this moment
 	bool instack;
 };
 
-/** This class represents Tarjan's algorithm for finding strongly connected components
+/** \brief A specialized version of Tarjans algorithm for finding SCCs used for finding new constraints
+
+	This class represents Tarjans algorithm for finding strongly connected components
 	used to determine which places in a Petri net need more tokens. It operates on a
 	graph structure built from myTPNodes which should contain undermarked places and
 	non-firable transitions.
@@ -79,15 +84,12 @@ public:
 	/// Destructor.
 	~Tarjan();
 
-	/// returns a stubborn set of enabled transitions from the conflict graph
+	/// Get the SCCs as pairs of sets of transitions and places
 	void getComponents(vector<set<Transition*> >& tv, vector<set<Place*> >& pv);
 
-	/// implements Tarjans algorithm for the conflict graph (with some optimization)
+	/// Apply Tarjans algorithm for finding new constraints
 	void doTarjan(myTPNode* start, int& maxdfs, vector<set<Transition*> >& tv, vector<set<Place*> >& pv);
-/*
-	/// Add an arc to the graph
-	bool addArc(Transition* tfrom, Transition* tto);
-*/
+
 	/// Add an arc to the graph
 	bool addArc(Transition* tfrom, Place* pto);
 
@@ -96,22 +98,20 @@ public:
 
 	/// Add an arc to the graph
 	bool addArc(Place* pfrom, Place* pto);
-/*
-	/// Remove an arc from the graph
-	bool removeArc(Transition* tfrom, Place* pto);
-*/
+
 	/// Level of verbosity
 	int verbose;
 
 private:
-	/// pointers from (non-firable) transitions to their unique nodes in the graph
+	/// Pointers from (non-firable) transitions to their unique nodes in the graph
 	map<Transition*,myTPNode*> tton;
 
-	/// pointers from (undermarked) places to their unique nodes in the graph
+	/// Pointers from (undermarked) places to their unique nodes in the graph
 	map<Place*,myTPNode*> pton;
 
-	/// stack for Tarjans algorithm
+	/// A stack for Tarjans algorithm
 	vector<myTPNode*> st; 
 };
 
 #endif
+

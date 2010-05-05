@@ -48,37 +48,6 @@ extern gengetopt_args_info args_info;
 	* Implementation of the class Reachalyzer *
 	******************************************/
 
-/*  Constructor with a Petri net, an initial and a final marking to test whether
-	the final marking can be reached from the initial marking.
-	@param pn The Petri net.
-	@param m0 The initial marking.
-	@param mf The final marking
-	@param verbose The level of verbosity (0-3).
-Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, Problem& pb, bool verbose, int debug, bool out, int brk) 
-	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols+1),im(pn),breakafter(brk) {
-	// inherit verbosity/debug level
-	this->verbose = debug;
-	// if output goes to a file
-	this->out = out;
-	im.verbose = debug;
-	stateinfo = verbose;
-	solved = false; // if a solution has been found
-	errors = false; // if errors have occurred
-
-	// initialize lp_solve
-	map<Place*,int> cover; // we look for reachability, not coverability, so this is empty
-	lpwrap.verbose = debug;
-	if (lpwrap.createMEquation(m0,mf,cover,pb,FALSE)<0) { 
-		cerr << "sara: error: createMEquation (lpsolve-init) failed" << endl; 
-		error=LPSOLVE_INIT_ERROR; return;
-	}
-
-	// prepare solving marking equation, initialize first partial solution and job list
-	PartialSolution* init(new PartialSolution(m0));
-	tps.push_back(init);
-}
-*/
-
 /*! Constructor with a Petri net, an initial and a final marking to test whether
 	the final marking can be covered from the initial marking.
 	\param pn The Petri net.
@@ -150,7 +119,6 @@ void Reachalyzer::start() {
 		PartialSolution ps(*(tps.first()));
 		nextJump(*(tps.first())); // create a new jump if one has been precomputed, before changes are made
 		tps.first()->touchConstraints(false); // mark all normal constraints so far as old
-//		tps.first()->calcCircleConstraints(im,m1); // old version of constraint builder, not used anymore
 		tps.first()->buildSimpleConstraints(im); // compute and create new constraints
 		if (!lpwrap.stripConstraints()) { // remove all constraints not belonging to the marking equation
 			cerr << "sara: error: resize_lp failed" << endl; 
@@ -229,24 +197,12 @@ void Reachalyzer::start() {
 		}
 		if (!solutionSeen(fullvector)) // adapt known solutions (from an earlier loop) for the new constraints
 		{ // no solutions known so far, calculate them by trying to realize a firing sequence
-//			if (!passedon || isSmaller(fullvector,torealize)) {
 				PathFinder pf(m1,fullvector,cols,tps,solutions,failure,im,shortcut);
 				pf.verbose = ((breakafter>0 && breakafter<=loops+2)?3:verbose);
 				pf.setMinimize(); // do not allow repeating markings in firing sequences
 				pf.passedon = passedon;
 				if (passedon) pf.torealize = torealize;
 				solved = pf.recurse(); // main call to realize a solution
-/*			} else { // going past the original problem vector, this is a failure 
-				PartialSolution* fps(new PartialSolution(*(tps.first()))); // copy the job
-				fps->setFeasibility(true); // there was a solution, the marking equation is feasible
-				if (verbose>1) { // debug info
-					cerr << "sara: Failure:" << endl;
-					fps->show();
-					cerr << "*** BEYOND PASSED ON ***" << endl;
-				}
-				failure.push_fail(fps); // record the counterexample
-			}
-*/
 		} 
 		tps.pop_front(false); // we are through with this job, move it to the past jobs list
 		if (verbose>0) cerr << endl;
@@ -272,7 +228,7 @@ void Reachalyzer::start() {
 	endtime = clock();
 }
 
-/*! Prints the results of the reachability analysis to stderr. */
+/*! Print the results of the reachability analysis. */
 void Reachalyzer::printResult() {
 	// print all solutions first and find the longest solution length
 	if (!solutions.almostEmpty()) 
@@ -306,7 +262,7 @@ void Reachalyzer::printResult() {
 	}
 }
 
-/*! Gives the amount of CPU time used for solving the problem.
+/*! Calculate the amount of CPU time used for solving the problem.
 	\return The CPU time used.
 */
 clock_t Reachalyzer::getTime() { return (endtime-starttime); }
@@ -325,41 +281,10 @@ int Reachalyzer::getStatus() {
 	return UNSOLVED;	
 }
 
-/*  Gets either a solution or one possible counterexample, depending on if one was found.
-	\return A solution if status is SOLUTION_FOUND or a counterexample if status is COUNTEREXAMPLE_FOUND,
-		null otherwise.
-PartialSolution* Reachalyzer::getSolution() {
-	if (solved && !tps.empty()) return (tps.findSolution());
-	if (!errors && !failure.empty()) return (failure.first());
-	return NULL;
-}
-*/
-
-/*  Gets all possible counterexamples. The result is valid only if status is COUNTEREXAMPLE_FOUND.
-	@return A list of possible counterexamples.
-JobQueue& Reachalyzer::getFailureReasons() {
-	return failure;
-}
-*/
-
-/*
-void Reachalyzer::extendTransitionOrder(map<Transition*,int> fullv, vector<Transition*>& ord, vector<Transition*> fseq) {
-	for(int i=0; i<ord.size(); ++i)
-		fullv[ord[i]]=0;
-	for(int i=0; i<fseq.size(); ++i)
-	{
-		if (fullv[fseq[i]]>0) ord.push_back(fseq[i]);
-		fullv[fseq[i]]=0;
-	}
-	map<Transition*,int>::iterator mit;
-	for(mit=fullv.begin(); mit!=fullv.end(); ++mit)
-		if (mit->second>0) ord.push_back(mit->first);
-}
-*/
-
 /*! Check whether a solution of lp_solve has been found earlier. If this happened, use that
 	former solution to create the necessary new jobs without again trying to find realizations
 	of the solution in form of firing sequences, using a lookup table.
+	\param tv The new? solution.
 	\return If the solution has been calculated before.
 */
 bool Reachalyzer::solutionSeen(map<Transition*,int>& tv) {
@@ -420,7 +345,6 @@ void Reachalyzer::nextJump(PartialSolution ps) {
 	Transition* t(ps.getNextJC(val)); // get the next alternative jump
 	if (t==NULL) return; // [none available]
 	ps.popJC(); // and remove it from the list
-//	PartialSolution* nps = new PartialSolution(ps); // copy the job
 
 	// first remove the old jump constraint (which is still tagged as recent)
 	set<Constraint>& cs(ps.getConstraints());
@@ -443,50 +367,17 @@ void Reachalyzer::nextJump(PartialSolution ps) {
 			cerr << "*** NEXT JUMP ***" << endl;
 		}
 	} else { // otherwise:
-//		delete nps; // delete this job
 		nextJump(ps); // and move on to the next one in the list
 	} 
 }
-/*
-void Reachalyzer::nextJump(PartialSolution& ps) {
-	int val=0;
-	Transition* t(ps.getNextJC(val)); // get the next alternative jump
-	if (t==NULL) return; // [none available]
-	ps.popJC(); // and remove it from the list
-	PartialSolution* nps = new PartialSolution(ps); // copy the job
-
-	// first remove the old jump constraint (which is still tagged as recent)
-	set<Constraint>& cs(nps->getConstraints());
-	set<Constraint>::iterator cit;
-	for(cit=cs.begin(); cit!=cs.end(); ++cit)
-		if (cit->isRecent() && cit->isJump()) { cs.erase(cit); break; }
-
-	// then add the new one and create the according job
-	map<Transition*,int> tmp;
-	tmp[t] = val;
-	Constraint c(tmp,true); // build constraint to forbid the increase, so another minimal solution will be sought
-	c.setRecent(true); // tag the new jump as recent
-	nps->setConstraint(c); // add it to the job
-	if (!tps.findPast(nps) && tps.find(nps)>=0)
-	{ // if it hasn't been done and wasn't planned so far
-		tps.push_back(nps); // put the new job into the list
-		if (verbose>1) { // debug info
-			cerr << "sara: New Partial Solution:" << endl;
-			nps->show();
-			cerr << "*** NEXT JUMP ***" << endl;
-		}
-	} else { // otherwise:
-		delete nps; // delete this job
-		nextJump(ps); // and move on to the next one in the list
-	} 
-}
-*/
 
 /*! Get the recorded length of the longest solving firing sequence, if one has been found.
+	\return The length.
 */
 int Reachalyzer::getMaxTraceLength() { return maxsollen; }
 
-/*! Get the recorded length of the longest solving firing sequence, if one has been found.
+/*! Get the recorded sum of the lengths of the solving firing sequences.
+	\return The sum.
 */
 int Reachalyzer::getSumTraceLength() { return sumsollen; }
 

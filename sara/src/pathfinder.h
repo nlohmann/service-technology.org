@@ -42,14 +42,14 @@ using std::string;
 typedef map<Transition*,set<Transition*> > Cft;
 typedef map<Transition*,set<Transition*> >::iterator Cftit;
 
-/** The class responsible for realizing a transition vector into a firable firing sequence
+/** \brief The class responsible for realizing a transition vector into a firable firing sequence
 	if it exists.
 */
 class PathFinder {
 
 public:
 
-	/// Constructor with initial marking m, transition vector tv, # of transitions col, initialized partial solutions tps, and incidence matrix im
+	/// Constructor with initial marking m, transition vector tv, # of transitions col, initialized job queues tps, sol, and fail, and incidence matrix im
 	PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& tps, JobQueue& sol, JobQueue& fail, IMatrix& im, map<map<Transition*,int>,vector<PartialSolution> >& lookup);
 
 	/// Destructor.
@@ -74,7 +74,7 @@ public:
 	map<Transition*,int> torealize;
 
 private:
-	/** Graph for stubborn set method (for finding strongly connected components).
+	/*! \brief Graph structure for stubborn set method (for finding strongly connected components).
 	*/
 	class myNode {
 	 public:
@@ -87,91 +87,91 @@ private:
 		bool instack;
 	};
 
-	/// active marking
+	/// The active marking
 	Marking m0;
 
-	/// stack of markings for recursion, [0]=initial marking
+	/// A stack of markings for recursion, [0]=initial marking
 	vector<Marking> mv;
 
-	/// multiset of transitions to be realized
+	/// A multiset of transitions to be realized
 	map<Transition*,int> fulltvector;
 
-	/// remaining transitions to be fired
+	/// The remaining transitions to be fired
 	map<Transition*,int> rec_tv;
 
-	/// stack for firing sequence in recursion, [size-1]=last fired transition
+	/// A stack for firing sequences in recursion, [size-1]=last fired transition
 	vector<Transition*> fseq;
 
-	/// transitions to check against for diamonds while recursing, [size-1]=the active transition
+	/// The transitions to check against for diamonds while recursing, [size-1]=the active transition
 	vector<set<Transition*> > stubsets;
 
-	/// conflict and dependency table for stubborn set search
+	/// A conflict and dependency table for stubborn set search
 	Cft cftab;
 
-	/// pointers from transition to their unique nodes in the conflict graph
+	/// Pointers from transitions to their unique nodes in the conflict graph
 	vector<myNode*> tton;
 
-	/// stack for Tarjans algorithm
+	/// A stack for Tarjans algorithm
 	vector<Transition*> st; 
 
-	/// Column number for linear system (# of transitions)
+	/// The column number for the marking equation (# of transitions)
 	int cols;
 
-	/// JobQueue of recurse:
+	/// The JobQueue for recurse
 	JobQueue& tps;
 
-	/// Solutions queue:
+	/// The solutions queue
 	JobQueue& solutions;
 
-	/// Failure queue:
+	/// The failure queue
 	JobQueue& failure;
 
-	/// Incidence matrix of the Petri net
+	/// The incidence matrix of the Petri net
 	IMatrix& im;
 
-	/// counts the leafs reached by the recursive function (just for protocol)
+	/// counter for the leafs reached by the recursive function (just for protocol)
 	int pos;
 
-	/// inherited from Reachalyzer
+	/// List of solutions of lp_solve so far, inherited from Reachalyzer
 	map<map<Transition*,int>,vector<PartialSolution> >& shortcut;
 
-	/// counts all recursion steps for progress indicator
+	/// Counter of all recursion steps for the progress indicator
 	int recsteps;
 
-	/// maximal shortcut size (redefinable per command line switch)
+	/// Maximal shortcut size (redefinable per command line switch)
 	int shortcutmax;
 
-	/// temporary firing sequence pool for complex diamond checks
+	/// Temporary firing sequence pool for complex diamond checks
 	vector<vector<Transition*> > fpool;
 
-	/// flag stating that this PathFinder should only find minimal paths (non-repeating markings)
+	/// A flag stating that this PathFinder should only find minimal paths (non-repeating markings)
 	bool minimize;
 
-	/// calculates the conflicts and dependencies for a given transition
+	/// Calculate the conflicts and dependencies for a given transition
 	void conflictTable(Transition*);
 
-	/// calculates one place that is a reason for nonfirability of a transition
+	/// Calculate one place that is a reason for nonfirability of a transition
 	Place* hinderingPlace(Transition&);
 
-	/// calculates from the list of transitions to be fired those transitions that increment the token count on a place
+	/// Calculate from the list of transitions to be fired those transitions that increment the token count on a place
 	set<Transition*> requiredTransitions(Place&);
 
-	/// returns a stubborn set of enabled transitions from the conflict graph
+	/// Calculate a stubborn set of enabled transitions from the conflict graph
 	set<Transition*> getSZK();
 
-	/// implements Tarjans algorithm for the conflict graph (with some optimization)
+	/// Implementation of Tarjans algorithm for the conflict graph (with some optimization)
 	bool doTarjan(myNode*, set<Transition*>&, int&);
 
-	/// checks if a diamond is about to be closed during recursion
+	/// Check if a diamond is about to be closed during recursion
 	bool checkForDiamonds();
 
-	/// checks whether a T-invariant can bring a transition closer to enabledness
+	/// Checks whether a T-invariant can bring a transition closer to enabledness
 	bool checkIfClosingIn(int start);
 
-//	vector<Transition*> calcOrder(set<Transition*> tset);
-
+	/// Compare two multisets of transitions for componentwise inclusion
 	bool isSmaller(map<Transition*,int>& m1, map<Transition*,int>& m2);
 
 };
 
 #endif
+

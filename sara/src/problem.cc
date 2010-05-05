@@ -67,35 +67,6 @@ extern gengetopt_args_info args_info;
 */
 Problem::Problem() : deinit(false),generalcover(false),type(REACHABLE),nettype(LOLA),pn(NULL) {}
 
-/** Constructor. Cannot be used for coverability.
-	@param net The name of the Petri net file.
-	@param pntype The type of the Petri net format (LOLA/OWFN).
-	@param initialmarking The initial marking (may differ from the file).
-	@param requirement The final marking or the transition vector to realize.
-	@param typ The problem type: REACHABILITY or REALIZABILITY.
-*/
-/*
-Problem::Problem(string net, int pntype, map<string,int>& initialmarking, map<string,int>& requirement, int typ) 
-	: deinit(false),generalcover(false),type(typ),filename(net),initial(initialmarking),required(requirement),nettype(pntype),pn(NULL) {
-	name = "";
-}
-*/
-
-/** Constructor for all variants of reachability including coverability.
-	@param net The name of the Petri net file.
-	@param pntype The type of the Petri net format (LOLA/OWFN).
-	@param initialmarking The initial marking (may differ from the file).
-	@param covermarking The final marking.
-	@param coverplaces Whether token numbers on places must be covered, bounded, or reached exactly.
-*/
-/*
-Problem::Problem(string net, int pntype, map<string,int>& initialmarking, map<string,int>& covermarking, map<string,int>& coverplaces) 
-	: deinit(false),generalcover(false),filename(net),initial(initialmarking),required(covermarking),cover(coverplaces),nettype(pntype),pn(NULL) {
-	type = REACHABLE;
-	name = "";
-}
-*/
-
 /** Destructor.
 */
 Problem::~Problem() { clear(); }
@@ -144,7 +115,7 @@ void Problem::setNetType(int nt) { nettype = nt; }
 
 /** Set the initial marking for a problem.
 	@param s The name of a place in the Petri net file.
-	@param i The number of token initially on place s.
+	@param i The number of tokens initially on place s.
 */
 void Problem::setInit(string s, int i) { initial[s]=i; }
 
@@ -398,7 +369,7 @@ bool Problem::calcPTOrder() {
 	return deterministic;
 }
 
-/** Add external (complex) constraint. This constraint is a weighted sum of places and transitions
+/** Add an external (complex) constraint. This constraint is a weighted sum of places and transitions
 	compared to a number.
 	@param lhs The weighted sum of places and transitions, mapped by place/transition names.
 	@param comp The comparison operator as in lp_solve: GE, EQ, or LE.
@@ -458,12 +429,14 @@ unsigned int Problem::getNumberOfConstraints() {
 	return clhs.size();
 }
 
+/** Print the transition vector to be realized. */
 void Problem::showTVector() {
 	for(unsigned int i=0; i<transitionorder.size(); ++i)
 		if (required.find(transitionorder[i]->getName())!=required.end())
 			cout << transitionorder[i]->getName() << ":" << required[transitionorder[i]->getName()] << " ";
 }
 
+/** Print the initial marking. */
 void Problem::showInitial() {
 	for(unsigned int i=0; i<placeorder.size(); ++i)
 		if (initial.find(placeorder[i]->getName())!=initial.end())
@@ -475,6 +448,7 @@ void Problem::showInitial() {
 		}
 }
 
+/** Print the final marking. */
 void Problem::showFinal() {
 	for(unsigned int i=0; i<placeorder.size(); ++i)
 		if (required.find(placeorder[i]->getName())!=required.end())
@@ -497,6 +471,7 @@ void Problem::showFinal() {
 	if (generalcover) cout << endl << "sara: - Unmentioned places may have any number of tokens in the final marking";
 }
 
+/** Print the global constraints. */
 void Problem::showConstraints() {
 	for(unsigned int i=0; i<clhs.size(); ++i)
 	{

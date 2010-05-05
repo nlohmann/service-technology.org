@@ -34,22 +34,16 @@ using pnapi::Transition;
 using pnapi::PetriNet;
 using pnapi::Marking;
 
-/** Objects of this class contain problems (e.g. reachability) that are to be solved. */
+/*! \brief Objects of this class contain problems (e.g. reachability) that are to be solved. */
 class Problem {
 public:
-	/// Standard constructor
+	/// Standard constructor.
 	Problem();
-/*
-	/// Constructor for realizability and (exact) reachability
-	Problem(string net, int pntype, map<string,int>& initialmarking, map<string,int>& requirement, int type);
-	
-	/// Constructor for coverability
-	Problem(string net, int pntype, map<string,int>& initialmarking, map<string,int>& covermarking, map<string,int>& coverplaces);
-*/
-	/// Destructor
+
+	/// Destructor.
 	~Problem();
 
-	/// Deinitializer
+	/// Deinitializer.
 	void clear();
 
 	/// Set the problem name
@@ -82,7 +76,7 @@ public:
 	/// Get the initial marking
 	Marking getInitialMarking();
 
-	/// Get the finial marking
+	/// Get the final marking
 	Marking getFinalMarking();
 
 	/// Get the cover/bound/reach requirements for all places
@@ -100,7 +94,7 @@ public:
 	/// Get the problem name
 	string getName();
 
-	/// Check whether the this problem need the same Petri net and inherit it 
+	/// Check whether this problem needs the same Petri net and inherit it 
 	void checkForNetReference(Problem& p);
 
 	/// Calculate the global orderings for places and transitions
@@ -109,7 +103,7 @@ public:
 	/// Add an external constraint
 	void addConstraint(map<string,int> lhs, int comp, int rhs);
 
-	/// Get external constraint
+	/// Get an external constraint
 	void getConstraint(unsigned int pos, map<Transition*,int>& lhs, int& comp, int& rhs);
 
 	/// Get the number of external constraints
@@ -146,7 +140,7 @@ private:
 	/// Whether the Petri net must be unloaded after the problem is solved
 	bool deinit;
 
-	/// Whether places not mentioned in the final marking are covered or reached
+	/// Whether token numbers on places not mentioned in the final marking are covered or reached
 	bool generalcover;
 
 	/// The problem type
@@ -155,7 +149,7 @@ private:
 	/// The Petri net filename
 	string filename;
 
-	/// The initial marking (with places names instead of places)
+	/// The initial marking (with place names instead of places)
 	map<string,int> initial;
 
 	/// The final marking or transition vector (with object names instead of objects)

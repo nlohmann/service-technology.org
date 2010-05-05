@@ -54,9 +54,9 @@ extern map<Place*,int> revporder;
 	* myNodes are used for Tarjan's algor. *
 	***************************************/
 
-/** Constructor */
+/** Constructor for transition nodes for stubborn set analysis. */
 PathFinder::myNode::myNode() : t(NULL),index(-2),low(-1),instack(false) {}
-/** Destructor */
+/** Destructor. */
 PathFinder::myNode::~myNode() {}
 /** Reset for reusability. Reaches the same state as the constructor. */
 void PathFinder::myNode::reset() { index=-2; low=-1; instack=false; nodes.clear(); }
@@ -65,13 +65,15 @@ void PathFinder::myNode::reset() { index=-2; low=-1; instack=false; nodes.clear(
 	* Implementation of class PathFinder *
 	*************************************/
 
-/** Constructor.
+/** Constructor for a single job/partial solution.
 	@param m The marking where the firing sequence should start off.
 	@param tv The transition vector that should be realized.
-	@param col The number of columns (transition) in the marking equation
-	@param tps A JobQueue of partial solutions. At the start it should contain only one partial solution
+	@param col The number of columns (transitions) in the marking equation
+	@param itps A JobQueue of partial solutions. At the start it should contain only one partial solution
 		which should be initialized with just the start marking of the problem.
-	@param im The incidence matrix created by the constructor call to IMatrix for the Petri net.
+	@param sol A JobQueue for solutions, initially empty.
+	@param fail A JobQueue for failures, initially empty.
+	@param imx The incidence matrix created by the constructor call to IMatrix for the Petri net.
 	@param lookup The lookup table for solutions of lp_solve
 */
 PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& itps, JobQueue& sol, JobQueue& fail, IMatrix& imx, map<map<Transition*,int>,vector<PartialSolution> >& lookup) 
@@ -97,9 +99,9 @@ PathFinder::~PathFinder() {
 		delete tton[i];
 }
 
-/** Recursive algorithm for finding a firing sequence given a vector of
+/** Recursive algorithm for finding a firing sequence realizing a vector of
 	transitions.
-	@return If a firing sequence has been found.
+	@return If a firing sequence has been found and the overall algorithm should stop.
 */
 bool PathFinder::recurse() {
 	// on screen progress indicator
@@ -140,11 +142,7 @@ bool PathFinder::recurse() {
 		PartialSolution newps(fseq,m0,rec_tv);
 		newps.setConstraints(tps.first()->getConstraints());
 		newps.setFullVector(fulltvector);
-//		newps.setJumpsDone(tps.first()->jumpsDone());
 		if (!tps.findPast(&newps) && tps.find(&newps)>=0) { // job isn't already in the queue or past
-//		if (tps.almostEmpty() || !tps.first()->betterSequenceThan(fseq,m0,rec_tv))
-//		{
-			// but only save it for later use (=adaption of constraints) if it is new or better than the things we already have
 			if (passedon && !isSmaller(fulltvector,torealize))
 				failure.push_fail(new PartialSolution(*(tps.first()))); // going beyond maximal sequence
 			else if (terminate) 
@@ -156,8 +154,6 @@ bool PathFinder::recurse() {
 					failure.push_fail(new PartialSolution(newps)); // sequence was not extended
 				else tps.push_back(new PartialSolution(newps)); // put the job into the queue
 			}
-//			if (terminate) newps.setSolved(); // no more transitions to fire, so we have a solution
-//			tps.push_back(new PartialSolution(newps)); // put the job into the queue
 			// try to add this partial solution to the lookup table
 			if (shortcutmax<0 || (int)(shortcut.size())<shortcutmax) shortcut[fulltvector].push_back(newps);
 			else if (args_info.verbose_given && (int)(shortcut.size())==shortcutmax) 
@@ -175,7 +171,6 @@ bool PathFinder::recurse() {
 				newps.show();
 				cerr << "*** PF ***" << endl;
 			}
-//		} else if (verbose>1) cerr << "sara: OldJobBetterThanNew-Hit" << endl;
 		} else if (verbose>1) cerr << "sara: CheckAgainstQueue-Hit" << endl;
 		// go up one level in the recursion, if there were nonfirable transitions left over,
 		// but terminate the recursion altogether if this partial solution is a full solution.
@@ -405,7 +400,6 @@ Place* PathFinder::hinderingPlace(Transition& t) {
 	}
 	// catch error of missing scapegoat
 	if (pset.empty()) abort(11,"error: no scapegoat for stubborn set method");
-//	if (pset.empty()) { cerr << "sara: error: no scapegoat for stubborn set method" << endl; exit(EXIT_FAILURE); }
 	// if the user opts for a random scapegoat, select one by time
 	if (args_info.scapegoat_given) 
 	{
@@ -425,7 +419,7 @@ Place* PathFinder::hinderingPlace(Transition& t) {
 	return p;
 }
 
-/** Calculates a set of transitions that increments
+/** Calculate a set of transitions that increments
 	the number of tokens on a place p and is contained in a
 	to-be-fired list.
 	@param p The place where the token increment must occur.
@@ -500,7 +494,7 @@ bool PathFinder::doTarjan(myNode* start, set<Transition*>& result, int& maxdfs) 
 
 /** Outer loop for Tarjans algorithm, calls the inner algorithm for each
 	connected component.
-	@return Contains the activated transitions in the suitable strongly connected components.
+	@return Contains the activated transitions in the suitable strongly connected component(s).
 */
 set<Transition*> PathFinder::getSZK() {
 	int maxdfs = 0;
@@ -520,7 +514,7 @@ set<Transition*> PathFinder::getSZK() {
 /** Declare that the diamond checker should exclude paths that contain the same marking twice. */
 void PathFinder::setMinimize() { minimize=true; }
 
-/** Checks for diamonds in the reachability graph that are about to be closed during the recursion.
+/** Check for diamonds in the reachability graph that are about to be closed during the recursion.
 	Also checks if a marking is reached twice, as then the active partial solution can't be optimal
 	(and therefore, if we can reach a solution, we will also reach a smaller one at some other point).
 	@return If a diamond is about to be closed or the marking is repeated.
@@ -583,6 +577,7 @@ bool PathFinder::checkForDiamonds()
 	comes closer to enabledness during the firing of a T-invariant than before that.
 	@param start The starting point of the T-invariant in the active firing sequence.
 		The end of the T-invariant must coincide with the end of the firing sequence.
+	@return If the T-invariant has the desired positive effect.
 */
 bool PathFinder::checkIfClosingIn(int start) {
 	map<Transition*,int>::iterator recit; // to walk through the remainder of transitions
@@ -607,7 +602,8 @@ bool PathFinder::checkIfClosingIn(int start) {
 	return false;
 }
 
-/** Print a full solution if there is one in the job list.
+/** Print the given job as a full solution.
+	@param ps The job containing the full solution.
 */
 void PathFinder::printSolution(PartialSolution* ps) {
 	cout << "\r";

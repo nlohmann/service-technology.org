@@ -37,11 +37,11 @@ using std::endl;
 	* Implementation of class myTPNode *
 	***********************************/
 
-/** Standard constructor. Creates one node for Tarjan's algorithm.
+/** Standard node constructor. Creates one node for Tarjan's algorithm. Used in constraint building.
 */
 myTPNode::myTPNode() : t(NULL),p(NULL),index(-2),low(-1),instack(false) {}
 
-/** Destructor.
+/** Node destructor.
 */
 myTPNode::~myTPNode() {}
 
@@ -150,27 +150,6 @@ void Tarjan::doTarjan(myTPNode* start, int& maxdfs, vector<set<Transition*> >& t
 void Tarjan::getComponents(vector<set<Transition*> >& tv, vector<set<Place*> >& pv) {
 	map<Transition*,myTPNode*>::iterator git;
 	map<Place*,myTPNode*>::iterator pit;
-/*	cerr << "TJ: ";
-	for(git=tton.begin(); git!=tton.end(); ++git)
-	if (git->second->index>-2)
-	{
-		cerr << git->first->getName() << ":";
-		set<myTPNode*>::iterator nit;
-		for(nit=git->second->nodes.begin(); nit!=git->second->nodes.end(); ++nit)
-			if ((*nit)->p) cerr << (*nit)->p->getName() << " ";
-		cerr << "|";
-	}
-	for(pit=pton.begin(); pit!=pton.end(); ++pit)
-	if (pit->second->index>-2)
-	{
-		cerr << pit->first->getName() << ":";
-		set<myTPNode*>::iterator nit;
-		for(nit=pit->second->nodes.begin(); nit!=pit->second->nodes.end(); ++nit)
-			if ((*nit)->t) cerr << (*nit)->t->getName() << " ";
-		cerr << "|";
-	}	
-	cerr << endl;
-*/
 	int maxdfs = 0;
 	// empty the stack for Tarjan
 	st.clear();
@@ -186,35 +165,7 @@ void Tarjan::getComponents(vector<set<Transition*> >& tv, vector<set<Place*> >& 
 		if (pit->second->index==-1) 
 			doTarjan(pit->second, maxdfs, tv, pv); 
 	}
-/*	for(int i=0; i<tv.size(); ++i)
-	{
-		cerr << "TJ: ";
-		set<Transition*>::iterator tit;
-		for(tit=tv[i].begin(); tit!=tv[i].end(); ++tit)
-			cerr << (*tit)->getName() << " ";
-		cerr << ":";
-		set<Place*>::iterator pit;
-		for(pit=pv[i].begin(); pit!=pv[i].end(); ++pit)
-			cerr << (*pit)->getName() << " ";
-		cerr << endl;
-	}
-*/
 }
-
-/** Add an arc from transition to transition in the graph for Tarjan's algorithm.
-	@param tfrom The source transition of the arc.
-	@param tto The sink transition of the arc.
-	@return False if one of the input parameters was a NULL pointer.
-*/
-/*
-bool Tarjan::addArc(Transition* tfrom, Transition* tto) {
-	if (tfrom==NULL || tto==NULL) return false;
-	tton[tfrom]->nodes.insert(tton[tto]);
-	tton[tfrom]->index = -1;
-	tton[tto]->index = -1;
-	return true;
-}
-*/
 
 /** Add an arc from transition to place in the graph for Tarjan's algorithm.
 	@param tfrom The source transition of the arc.
@@ -255,17 +206,3 @@ bool Tarjan::addArc(Place* pfrom, Place* pto) {
 	return true;
 }
 
-/** Remove an arc from transition to place in the graph for Tarjan's algorithm.
-	@param tfrom The source transition of the arc.
-	@param pto The sink place of the arc.
-	@return False if one of the input parameters was a NULL pointer.
-*/
-/*
-bool Tarjan::removeArc(Transition* tfrom, Place* pto) {
-	if (tfrom==NULL || pto==NULL) return false;
-	tton[tfrom]->nodes.erase(pton[pto]);
-	tton[tfrom]->index = -1;
-	pton[pto]->index = -1;
-	return true;
-}
-*/

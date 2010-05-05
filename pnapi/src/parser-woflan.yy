@@ -45,7 +45,20 @@
 #include "parser-woflan-wrapper.h"
 #include "petrinet.h"
 
+#include <string.h>
+#include <stdlib.h>
+
 #include <sstream>
+
+
+char *substr(const char *pstr, int start, int numchars){
+
+char *pnew = (char*) malloc(numchars+1);
+strncpy(pnew, pstr + start, numchars);
+pnew[numchars] = '\0';
+return pnew;
+
+}
 
 %}
 
@@ -90,15 +103,16 @@ node:
 place:
   KEY_PLACE IDENT 
   {
-    parser_.check(parser_.places_[$2] == NULL, "node name already used");
-    parser_.places_[$2] = &(parser_.net_.createPlace($2, 0, 0));
+    char* strName = substr($2, 1, strlen($2) -2);
+    parser_.places_[strName] = &(parser_.net_.createPlace(strName, 0, 0));
     free($2);
   }
 | KEY_PLACE IDENT KEY_INIT NUMBER
   {
-    parser_.check(parser_.places_[$2] == NULL, "node name already used");
-    parser_.places_[$2] = &(parser_.net_.createPlace($2, 0, 0));
-    Place * p = parser_.places_[$2];
+    char* strName = substr($2, 1, strlen($2) -2);
+    parser_.check(parser_.places_[strName] == NULL, "node name already used");
+    parser_.places_[strName] = &(parser_.net_.createPlace(strName, 0, 0));
+    Place * p = parser_.places_[strName];
     p->setTokenCount($4);
     free($2);
   }
@@ -107,9 +121,10 @@ place:
 transition:
   KEY_TRANSITION IDENT 
   {
-    parser_.check(!(parser_.net_.containsNode($2)), "node name already used");
-    parser_.transition_ = &(parser_.net_.createTransition($2)); 
-    parser_.transName = $2;
+    char* strName = substr($2, 1, strlen($2) -2);
+    parser_.check(!(parser_.net_.containsNode(strName)), "node name already used");
+    parser_.transition_ = &(parser_.net_.createTransition(strName)); 
+    parser_.transName = strName;
     free($2);
   }
 | KEY_TRANSITION { parser_.needLabel = true; }
@@ -122,11 +137,12 @@ label:
   }
 | TILDE IDENT
   {
-    if($2 != parser_.transName)
+    char* strName = substr($2, 1, strlen($2) -2);
+    if(strName != parser_.transName)
     {
-      parser_.check(!(parser_.net_.containsNode($2)), "node name already used");
+      parser_.check(!(parser_.net_.containsNode(strName)), "node name already used");
     }
-    parser_.transition_->setName($2); 
+    parser_.transition_->setName(strName); 
     free($2);
   }
 ;
@@ -159,7 +175,8 @@ arcs:
 arc:
   IDENT
   {
-    parser_.place_ = parser_.places_[$1];
+    char* strName = substr($1, 1, strlen($1) -2);
+    parser_.place_ = parser_.places_[strName];
     parser_.check(parser_.place_ != NULL, "unknown place");
 
     Arc * a = parser_.net_.findArc(**(parser_.source_), **(parser_.target_));
@@ -174,4 +191,5 @@ arc:
     free($1);
   }
 ;
+
 

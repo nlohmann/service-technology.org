@@ -9,7 +9,7 @@
  *
  * \since   2009/10/12
  *
- * \date    $Date: 2009-10-12 09:30:00 +0200 (Mo, 12. Okt 2009) $
+ * \date    $Date: 2010-05-05 09:30:00 +0200 (Mi, 5. Mai 2010) $
  *
  * \version $Revision: -1 $
  */
@@ -46,7 +46,8 @@ using std::ostream;
 Constraint::Constraint() : rhs(0),jump(false),recent(true) { posplace.clear(); subtrans.clear(); cs.clear(); }
 
 /** Jump constructor for class Constraint.
-	@param jmp A solution of lp_solve which is to be discriminated.
+	@param jump A solution of lp_solve which is to be discriminated or a single transition.
+	@param isjump Whether a jump constraint or a single-transition constraint should be built.
 */
 Constraint::Constraint(map<Transition*,int> jump, bool isjump) : rhs(-1),recent(true)
 { 
@@ -62,7 +63,7 @@ Constraint::Constraint(map<Transition*,int> jump, bool isjump) : rhs(-1),recent(
 */
 Constraint::~Constraint() { posplace.clear(); subtrans.clear(); cs.clear(); }
 
-/** Adds a place to the constraint. The place represents its own preset,
+/** Adds a place to an increment constraint. The place represents its own preset,
 	i.e. the constraint will contain each transition t from the preset
 	of the place p weighted with the weight of the arc t->p.
 	@param p The place p.
@@ -76,31 +77,15 @@ void Constraint::addPlace(Place& p, int num) {
 	posplace[&p]=num;
 }
 
-/** Removes a place from the constraint. The difference to addPlace(p,0)
-	is that the place will be erased from the constraint. These two
-	methods lead to incomparable constraints, so removePlace(p) is the
-	advised method.
-	@param p The place to be removed from the constraint.
-	@return If the removal was successfully done.
-*/
-/*
-bool Constraint::removePlace(Place& p) {
-	map<Place*,int>::iterator it(posplace.find(&p));
-	bool ret = (it!=posplace.end());
-	if (ret) posplace.erase(it);
-	return ret;
-}
-*/
-
-/** Gets information about all places in the constraint, i.e. the latest
-	call to addPlace/removePlace for each place.
+/** Gets information about all places in the increment constraint, i.e. the latest
+	call to addPlace for each place.
 	@return A map from places to their weights in the constraint.
 */
 const map<Place*,int>& Constraint::getPlaces() const {
 	return posplace;
 }
 
-/** Forbids a transition to be in this constraint. The transition will not
+/** Forbids a transition to be in this increment constraint. The transition will not
 	appear no matter how often places with this transition in their
 	preset are added to the constraint via addPlace().
 	@param t The transition to be forbidden.
@@ -109,21 +94,6 @@ void Constraint::addSubTransition(Transition& t) {
 	subtrans.insert(&t);
 }
 
-/** Reallows a forbidden transition. If the transition is in the presets of
-	some places added via addPlace() to the constraint, the transition
-	will automatically appear with the correct weight.
-	@param t The transition to be allowed again.
-	@return If the operation was successful.
-*/
-/*
-bool Constraint::removeSubTransition(Transition& t) {
-	set<Transition*>::iterator it(subtrans.find(&t));
-	bool ret = (it!=subtrans.end());
-	if (ret) subtrans.erase(it);
-	return ret;
-}
-*/
-
 /** Gets all forbidden transitions.
 	@return The set of forbidden transitions.
 */
@@ -131,7 +101,7 @@ const set<Transition*>& Constraint::getSubTransitions() const {
 	return subtrans;
 }
 
-/** Sets the right hand side of the constraint, i.e. the rhs in " ... >= rhs".
+/** Sets the right hand side of an increment constraint, i.e. the rhs in " ... >= rhs".
 	@param rhs The right hand side of the constraint.
 */
 void Constraint::setRHS(int rhs) { this->rhs = rhs; }
@@ -142,7 +112,7 @@ void Constraint::setRHS(int rhs) { this->rhs = rhs; }
 int Constraint::getRHS() const { return rhs; }
 
 /** Whether the constraint should have a <= instead of >= (for jumping to incomparable solutions)
-	@return true if the constraint is of the form lhs(linear comb.) <= rhs(int)
+	@return true if the constraint is of the form lhs(linear comb.) <= rhs(int), i.e. a jump constraint
 */
 bool Constraint::isJump() const { return jump; }
 
@@ -179,7 +149,7 @@ bool Constraint::calcConstraint(REAL coeff[], map<Transition*,int>& tpos, int co
 
 /** Computes the constraint from the posplace and subtrans entries
 	@return The linear combination (left hand side) of the constraint
-		as a map. The map may be empty.
+		as a map. The map may be empty, in which case the constraint is invalid.
 */
 map<Transition*,int>& Constraint::calcConstraint() { 
 	if (!cs.empty()) return cs;
@@ -218,7 +188,7 @@ map<Transition*,int>& Constraint::calcConstraint() {
 */
 const map<Transition*,int>& Constraint::getLHS() const { return cs; }
 
-/** Checks if forbidding a transition will have any effect. It is advised
+/** Checks if forbidding a transition will have any effect on an increment constraint. It is advised
 	not to forbid transitions if it would not have any effect.
 	@param t The transition to be checked for.
 	@return If forbidding the transition would have an effect.
@@ -249,7 +219,8 @@ bool Constraint::checkSubTransition(Transition& tr) {
 	return false;
 }
 
-/** Checks whether the constraint contains any non-forbidden transitions at all.
+/** Checks whether an increment constraint contains any non-forbidden transitions at all.
+	If not, it is not advised to use this constraint.
 	@return If the constraint is semantically non-empty (in the above sense).
 */
 bool Constraint::checkAnyTransition() const { 
@@ -280,8 +251,8 @@ bool Constraint::checkAnyTransition() const {
 
 /** Compares two constraints.
 	@param c The second constraint.
-	@return 0 if constraints are incomparable (different places or 
-		forbidden transitions), 1 if this is stronger than c, -1 otherwise.
+	@return 0 if constraints are incomparable (different type, places or 
+		forbidden transitions), 1 if this' RHS is stricter than c's, -1 otherwise.
 */
 int Constraint::compare(const Constraint& c) const {
 	if (cs.empty() || c.cs.empty()) { cerr << "sara: warning: empty constraint in comparison" << endl; return 0; }
@@ -371,8 +342,8 @@ bool Constraint::operator==(const Constraint& right) const {
 	return (cs==right.cs);	
 } 
 
-/** Remove all constraints with more places and transitions from the set.
-	@param The set of constraints to clean up.
+/** Remove all constraints with more places and transitions than this from the set sc.
+	@param sc The set of constraints to clean up.
 	@return Whether this constraint should be inserted into the set.
 */
 bool Constraint::cleanConstraintSet(set<Constraint>& sc) const {
@@ -439,7 +410,7 @@ bool Constraint::cleanConstraintSet(set<Constraint>& sc) const {
 }
 
 /** Computes whether this constraint is of the form t>=n.
-	@return If this is a single transition, non-jump constraint, the transition. Otherwise, NULL.
+	@return If this is a single transition, non-jump constraint, the transition is returned. Otherwise, NULL.
 */
 Transition* Constraint::isSingle() const {
 	if (jump) return NULL;

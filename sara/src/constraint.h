@@ -34,7 +34,9 @@ using std::set;
 using std::map;
 using std::ostream;
 
-/** The class Constraint contains a single, additional constraint for the
+/*! \brief for computing and storing additional constraints to the marking equation
+
+	The class Constraint contains a single, additional constraint for the
 	marking equation. A constraint consists of weighted transitions
 	(the weight representing production of tokens minus their consumption
 	on a set of places). Transitions can only be added to a constraint
@@ -54,21 +56,18 @@ using std::ostream;
 class Constraint {
 
 public:
-	/// standard constructor for the normal case (place/token based)
+	/// Standard constructor for increment constraints (place/token based)
 	Constraint();
 
-	/// standard constructor for the less-or-equal variant or transition-based ones
+	/// Standard constructor for jump constraints or single-transition constraints
 	Constraint(map<Transition*,int> jump, bool isjump);
 
-	/// destructor
+	/// Destructor
 	~Constraint();
 
 	/// adds the preset of a place p with factor weight to the constraint	
 	void addPlace(Place& p, int weight);
-/*
-	/// sets the weight of place p to zero (the preset of p may still be influenced by other places)
-	bool removePlace(Place &p);
-*/
+
 	/// returns the map from places to their weights.
 	const map<Place*,int>& getPlaces() const;
 
@@ -80,10 +79,7 @@ public:
 
 	/// tests if the constraint has a transition with positive weight at all
 	bool checkAnyTransition() const;
-/*
-	/// deletes a Transition from the forbidden set
-	bool removeSubTransition(Transition& t);
-*/
+
 	/// return the set of forbidden transitions
 	const set<Transition*>& getSubTransitions() const;
 
@@ -130,23 +126,24 @@ public:
 	Transition* isSingle() const;
 
 private:
-	/// weighted places, their presets will form the constraint
+	/// Weighted places, their presets will form the increment constraint
 	map<Place*,int> posplace;
 
-	/// forbidden transitions, will not appear even if in the preset of a place from posplace
+	/// Forbidden transitions, will not appear even if in the preset of a place from posplace
 	set<Transition*> subtrans;
 
-	/// right hand side of the constraint
+	/// Right hand side of the constraint
 	int rhs;
 
-	/// semantics of the constraint, calculated on demand (or by initialization in case of a jump)
+	/// Semantics of the constraint, calculated on demand (or by initialization in case of a jump)
 	map<Transition*,int> cs;
 
-	/// whether the constraints has a <= (instead of >=), for jump constraints only
+	/// Whether the constraints has a <= (instead of >=), i.e. is a jump constraint
 	bool jump;
 
-	/// whether the constraint is new and may be the reason for a failure (not finding solutions)
+	/// Whether the constraint is new and may be the reason for a failure (not finding solutions)
 	bool recent;
 };
 
 #endif
+

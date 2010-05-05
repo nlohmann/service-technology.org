@@ -106,6 +106,7 @@ place:
     char* strName = substr($2, 1, strlen($2) -2);
     parser_.places_[strName] = &(parser_.net_.createPlace(strName, 0, 0));
     free($2);
+    free(strName);
   }
 | KEY_PLACE IDENT KEY_INIT NUMBER
   {
@@ -115,6 +116,7 @@ place:
     Place * p = parser_.places_[strName];
     p->setTokenCount($4);
     free($2);
+    free(strName);
   }
 ;
 
@@ -126,6 +128,7 @@ transition:
     parser_.transition_ = &(parser_.net_.createTransition(strName)); 
     parser_.transName = strName;
     free($2);
+    free(strName);
   }
 | KEY_TRANSITION { parser_.needLabel = true; }
 ;
@@ -144,6 +147,7 @@ label:
     }
     parser_.transition_->setName(strName); 
     free($2);
+    free(strName);
   }
 ;
 
@@ -189,6 +193,7 @@ arc:
       parser_.net_.createArc(**(parser_.source_), **(parser_.target_), 1);
     }
     free($1);
+    free(strName);
   }
 ;
 

@@ -45,20 +45,8 @@
 #include "parser-woflan-wrapper.h"
 #include "petrinet.h"
 
-#include <string.h>
-#include <stdlib.h>
-
+#include <cstring>
 #include <sstream>
-
-
-char *substr(const char *pstr, int start, int numchars){
-
-char *pnew = (char*) malloc(numchars+1);
-strncpy(pnew, pstr + start, numchars);
-pnew[numchars] = '\0';
-return pnew;
-
-}
 
 %}
 
@@ -103,14 +91,14 @@ node:
 place:
   KEY_PLACE IDENT 
   {
-    char* strName = substr($2, 1, strlen($2) -2);
+    char * strName = parser_.substr($2, 1, strlen($2) - 2);
     parser_.places_[strName] = &(parser_.net_.createPlace(strName, 0, 0));
     free($2);
     free(strName);
   }
 | KEY_PLACE IDENT KEY_INIT NUMBER
   {
-    char* strName = substr($2, 1, strlen($2) -2);
+    char * strName = parser_.substr($2, 1, strlen($2) - 2);
     parser_.check(parser_.places_[strName] == NULL, "node name already used");
     parser_.places_[strName] = &(parser_.net_.createPlace(strName, 0, 0));
     Place * p = parser_.places_[strName];
@@ -123,7 +111,7 @@ place:
 transition:
   KEY_TRANSITION IDENT 
   {
-    char* strName = substr($2, 1, strlen($2) -2);
+    char * strName = parser_.substr($2, 1, strlen($2) - 2);
     parser_.check(!(parser_.net_.containsNode(strName)), "node name already used");
     parser_.transition_ = &(parser_.net_.createTransition(strName)); 
     parser_.transName = strName;
@@ -140,7 +128,7 @@ label:
   }
 | TILDE IDENT
   {
-    char* strName = substr($2, 1, strlen($2) -2);
+    char * strName = parser_.substr($2, 1, strlen($2) - 2);
     if(strName != parser_.transName)
     {
       parser_.check(!(parser_.net_.containsNode(strName)), "node name already used");
@@ -179,7 +167,7 @@ arcs:
 arc:
   IDENT
   {
-    char* strName = substr($1, 1, strlen($1) -2);
+    char * strName = parser_.substr($1, 1, strlen($1) - 2);
     parser_.place_ = parser_.places_[strName];
     parser_.check(parser_.place_ != NULL, "unknown place");
 
@@ -196,5 +184,4 @@ arc:
     free(strName);
   }
 ;
-
 

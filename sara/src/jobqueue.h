@@ -26,48 +26,45 @@ using std::set;
 using std::map;
 using std::deque;
 
-/** Class for future jobs, i.e. unsolved partial solutions. Fast finding and inserting is essential,
+/*! \brief For queuing jobs (future and past), solutions, and failures
+
+	Class for future jobs, i.e. unsolved partial solutions. Fast finding and inserting is essential,
 	as the queue can become quite long. Jobs are ordered by length of the total solution, number
-	of unfirable transitions and number of constraints. Jobs with a lower position have priority
-	since they are expected to run faster.
+	of unfirable transitions, or number of constraints. Jobs with a lower position have priority
+	since they are expected to run faster. Past jobs are saved for later optimisations. A JobQueue
+	can also store solutions or failures and has specialised methods for handling these.
 */
 class JobQueue {
 
 public:
-	/// Standard constructor for job queues and failure queues
+	/// Standard constructor for job queues, solution queues, and failure queues
 	JobQueue();
 
-	/// Constructor with initialization
+	/// Constructor with initialization, i.e. a first job
 	JobQueue(PartialSolution* job);
 
 	/// Destructor
 	~JobQueue();
 
-	/// Check if a job queue is empty
+	/// Check if a job queue is empty, i.e. has no active and future jobs
 	bool empty();
 
-	/// Check if a job queue contains only the active job
+	/// Check if a job queue contains no future jobs, an active job is possible
 	bool almostEmpty();
 
-	/// Get the number of jobs in a queue
+	/// Get the number of jobs in a queue (not counting past jobs)
 	int size();
 
-	/// Get first job
+	/// Get the active job
 	PartialSolution* first();
 
-	/// Remove first job
+	/// Remove the active job, possibly shifting it into the past 
 	bool pop_front(bool kill);
-/*
-	/// Add job before all other jobs with the same (or higher) priority
-	void push_front(PartialSolution* job);
-*/
+
 	/// Add job after the last job with the same (or lower) priority
 	void push_back(PartialSolution* job);
-/*
-	/// Add job after the last job with the same (or lower) priority, but only if there is no equivalent job in the queue
-	bool insert(PartialSolution* job);
-*/
-	/// Find a job, if it is already in the list
+
+	/// Find a job if it is already in the list
 	int find(PartialSolution* job);
 
 	/// Find out if a job has already been done in the past
@@ -75,23 +72,20 @@ public:
 
 	/// Calculate the priority of a job or a failure
 	int priority(PartialSolution* job) const;
-/*
-	/// Search the job list for a full solution and return it if found
-	PartialSolution* findSolution();
-*/
+
 	/// Check a failure queue for infeasibility of the marking equation
 	bool checkMEInfeasible();
 
 	/// Add a failure to a failure queue, checking for duplicates
 	void push_fail(PartialSolution* job);
 
-	/// Cleans a failure queue from obsolete entries regarding one parikh image
+	/// Clean a failure queue from obsolete entries regarding one parikh image
 	bool cleanFailure(map<Transition*,int>& p);
 
 	/// Print a failure queue
 	void printFailure(IMatrix& im);
 
-	/// Gets the true size of a failure queue (excluding obsolete entries)
+	/// Get the true size of a failure queue (excluding obsolete entries)
 	int trueSize();
 
 	/// Push a solution into the solution queue
@@ -100,24 +94,22 @@ public:
 	/// Print all solutions and return the maximal and sum trace length
 	int printSolutions(int& sum);
 
-	/// Prints a Jobqueue to stderr (possibly including past and active job)
+	/// Print a Jobqueue to stderr (possibly including past and active job)
 	void show(bool past);
 
 private:
-	/// job or failure queue (from priority to sublist)
+	/// Job, solution, or failure queue (maps from priority to sublist)
 	map<int,deque<PartialSolution*> > queue;
 
-	/// size of the queue
+	/// The size of the queue
 	int cnt;
 
-	/// active job, not saved in the queue
+	/// The active job, not saved in the queue itself
 	PartialSolution* active;
 
-	/// priority of the active job
-//	int activeprio;
-
-	/// queue of past jobs for constraint comparisons
+	/// The queue of past jobs for constraint comparisons
 	map<int,deque<PartialSolution*> > past;
 };
 
 #endif
+

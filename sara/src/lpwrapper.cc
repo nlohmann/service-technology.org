@@ -41,26 +41,25 @@ extern map<Transition*,int> revtorder;
 	* Class LPWrapper method definitions *
 	*************************************/
 
-	/** Constructor for systems with a given number of variables (transitions).
-		@param cols The number of transitions in the net (equals the numbers
-			of columns in the linear system.
-	*/
-	LPWrapper::LPWrapper(unsigned int columns) : cols(columns) {
-		lp = make_lp(0,cols);
-		if (!lp) abort(12,"error: could not create LP model");
-//		if (!lp) { cerr << "sara: error: could not create LP model." << endl; exit(EXIT_FAILURE); }
-	}
+/** Constructor for systems with a given number of variables (transitions).
+	@param columns The number of transitions in the net (equals the numbers
+		of columns in the linear system).
+*/
+LPWrapper::LPWrapper(unsigned int columns) : cols(columns) {
+	lp = make_lp(0,cols);
+	if (!lp) abort(12,"error: could not create LP model");
+}
 
-	/** Destructor
-	*/
-	LPWrapper::~LPWrapper() {
-		delete_lp(lp);
-	}
+/** Destructor.
+*/
+LPWrapper::~LPWrapper() {
+	delete_lp(lp);
+}
 
-/** Creates the marking equation for lp_solve.
-	@param m1 Initial marking.
-	@param m2 Final marking.
-	@param cover Information on which token numbers must be reached and which covered.
+/** Create the marking equation for lp_solve.
+	@param m1 The initial marking.
+	@param m2 The final marking.
+	@param cover Information on which token numbers must be reached exactly and which only covered.
 	@param pb An instance of the problem to solve, for getting the global constraints.
 	@param verbose If TRUE prints information on cout.
 	@return The number of equations on success, -1 otherwise.
@@ -139,7 +138,6 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	}
 
 	set_add_rowmode(lp,FALSE);	
-//	write_LP(lp,stdout);
 	if (verbose) write_LP(lp,stdout);
 	else set_verbose(lp,CRITICAL);
 	basicrows = placeorder.size()+cols+cnr;
@@ -148,7 +146,7 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	return (int)(basicrows);
 }
 
-/** Removes all constraints not belonging to the original marking
+/** Remove all constraints not belonging to the original marking
 	equation as created by createMEquation().
 	@return TRUE on success.
 */
@@ -156,7 +154,7 @@ bool LPWrapper::stripConstraints() {
 	return resize_lp(lp,basicrows,cols);
 }
 
-/** Forwards a constraint to the internal lprec.
+/** Forward a constraint to the internal data structure lprec.
 	@param row A constraint.
 	@param constr_type LE, EQ oder GE.
 	@param rhs The right-hand-side of the constraint.
@@ -166,14 +164,14 @@ bool LPWrapper::addConstraint(REAL* row, int constr_type, REAL rhs) {
 	return add_constraint(lp,row,constr_type,rhs);
 }
 
-/** Wrapper for solve
+/** Wrapper for solving the system.
 	@return The result of solve(lp).
 */
 int LPWrapper::solveSystem() {
 	return solve(lp);
 }
 
-/** Wrapper for get_col_name
+/** Get the name of a transition belonging to a column, wrapper for get_col_name.
 	@param col Column number.
 	@return The result of get_col_name(lp,col).
 */
@@ -183,7 +181,7 @@ char* LPWrapper::getColName(int col) {
 
 /** Wrapper for get_variables
 	@param solution Array of REAL with at least #transitions elements
-		to contain a solution of lp_solve.
+		to contain a solution of lp_solve. Will be filled by the method.
 	@return TRUE if successful.
 */
 unsigned char LPWrapper::getVariables(REAL* solution) {
@@ -191,7 +189,7 @@ unsigned char LPWrapper::getVariables(REAL* solution) {
 }
 
 /** Add the constraints of a partial solution to the lp model.
-	@param ps The partial solution
+	@param ps The partial solution containing the constraints.
 	@return TRUE if successful.
 */
 bool LPWrapper::addConstraints(PartialSolution& ps) {
@@ -227,11 +225,10 @@ bool LPWrapper::addConstraints(PartialSolution& ps) {
 		}
 	}
 	delete[] constraint;
-//	write_LP(lp,stdout);
 	return true;
 }
 
-/** Returns the solutions of lp_solve as a map from transitions to multiplicities.
+/** Return the solution of lp_solve as a map from transitions to multiplicities.
 	@param pn The Petri net containing the transitions
 	@return The solution map
 */

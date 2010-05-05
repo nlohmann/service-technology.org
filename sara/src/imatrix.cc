@@ -43,8 +43,9 @@ IMatrix::IMatrix(PetriNet& pn) : verbose(0),petrinet(pn) {}
 
 /** Calculates or just gets one column of the incidence matrix.
 	@param t The transition identifying the column.
-	@return A map from places to int representing the row belonging to t. Only places
-			with an arc from or to t will be part of the map.
+	@return A map from places to int representing the column belonging to t. Only places
+			with an arc from or to t will be part of the map. A zero entry shows a place
+			with the same positive weight for both arc directions.
 */
 map<Place*,int>& IMatrix::getColumn(Transition& t) {
 	map<Transition*,map<Place*,int> >::iterator matit(mat.find(&t));
@@ -77,7 +78,7 @@ map<Place*,int>& IMatrix::getColumn(Transition& t) {
 	return mat[&t];
 }
 
-/** Get the postset of a transition as a map.
+/** Get the postset of a transition as a map. Places not contained in the postset will not appear in the map.
 	@param t The transition.
 	@return The map from places to arc weights.
 */
@@ -93,7 +94,7 @@ map<Place*,int> IMatrix::getPostset(Transition& t) {
 	return result;
 }
 
-/** Get the preset of a transition as a map.
+/** Get the preset of a transition as a map. Places not in the preset will not appear in the map.
 	@param t The transition.
 	@return The map from places to arc weights.
 */
@@ -131,7 +132,7 @@ int IMatrix::getLoops(Transition&t, Place& p) {
 
 /** Calculate the loops at some transition.
 	@param t The transition.
-	@return A map from all place with loops at t to the (lesser) arc weight in the loop.
+	@return A map from all places with loops at t to the (lesser) arc weight in the loop.
 */
 map<Place*,int>& IMatrix::getLoopColumn(Transition&t) {
 	getColumn(t); // calculate change and loops if not already done
@@ -139,8 +140,9 @@ map<Place*,int>& IMatrix::getLoopColumn(Transition&t) {
 }
 
 /** Calculate the marking before firing a transition.
-	@param m The marking. The method changes this marking by reverse-firing t.
-	@param t The transition whose effetcs should be reversed.
+	@param m The marking. The method changes this marking by reverse-firing t. No checks
+		are done if this reverse firing is possible, i.e. the resulting marking may be invalid.
+	@param t The transition whose effects should be reversed.
 */
 void IMatrix::predecessor(Marking& m, Transition &t)
 {
@@ -153,7 +155,8 @@ void IMatrix::predecessor(Marking& m, Transition &t)
 }
 
 /** Calculate the successor of marking after firing a transition.
-	@param m The marking. The method changes this marking by firing t.
+	@param m The marking. The method changes this marking by firing t, even if t is not enabled.
+		In this case, the marking may become invalid.
 	@param t The transition to be fired.
 */
 void IMatrix::successor(Marking& m, Transition &t)
@@ -211,7 +214,9 @@ set<Place*> IMatrix::compareOutput(Transition& t1, Transition& t2)
 }
 
 /** Checks whether a firing sequence is activated under a marking m
-	disregarding all places not in a given restriction set.
+	disregarding all places not in a given restriction set. On places outside the set
+	the marking is automatically assumed to contain infinitely may tokens (independent
+	from the actual value in m).
 	@param m The marking.
 	@param tv The transition vector containing the firing sequence
 	@param restriction The set of places which should be tested for undermarking.
@@ -250,6 +255,7 @@ bool IMatrix::checkRestrictedActivation(Marking& m, vector<Transition*>& tv, set
 }
 
 /** Calculate the change in the marking a multiset of transitions will bring upon firing.
+	No check for realizability of the multiset is performed.
 	@param fv The multiset of transitions.
 	@return The token change.
 */

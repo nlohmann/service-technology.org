@@ -302,7 +302,6 @@ if (args_info.input_given || args_info.pipe_given) {
 				{ 
 					int mtl = solutions.printSolutions(avetracelen); // get the solution length for this problem
 					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
-//					if (mtl>=0) avetracelen+=mtl; // sum up solution lengths for average calculation
 					solcnt+=solutions.size();
 				}
 				else cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;

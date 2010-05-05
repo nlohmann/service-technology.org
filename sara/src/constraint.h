@@ -65,64 +65,64 @@ public:
 	/// Destructor
 	~Constraint();
 
-	/// adds the preset of a place p with factor weight to the constraint	
+	/// Adds the preset of a place p with factor weight to an increment constraint	
 	void addPlace(Place& p, int weight);
 
-	/// returns the map from places to their weights.
+	/// Returns the map from places to their weights.
 	const map<Place*,int>& getPlaces() const;
 
-	/// forbids a transition to appear in the constraint
+	/// Forbids a transition to appear in an increment constraint
 	void addSubTransition(Transition &t);
 
-	/// tests if a transition can be forbidden, i.e. if it appears with positive weight
+	/// Tests if a transition can be forbidden, i.e. if it appears with positive weight
 	bool checkSubTransition(Transition &t);
 
-	/// tests if the constraint has a transition with positive weight at all
+	/// Tests if the increment constraint has a transition with positive weight at all
 	bool checkAnyTransition() const;
 
-	/// return the set of forbidden transitions
+	/// Returns the set of forbidden transitions in an increment constraint
 	const set<Transition*>& getSubTransitions() const;
 
-	/// sets the right hand side of the constraint
+	/// Sets the right hand side of an increment constraint
 	void setRHS(int rhs);
 
-	/// returns the right hand side of the constraint
+	/// Returns the right hand side of the constraint
 	int getRHS() const;
 
-	/// calculates the weighted sum of transitions in the constraint for lp_solve
+	/// Calculates the weighted sum of transitions in the constraint for lp_solve
 	bool calcConstraint(REAL coeff[], map<Transition*,int>& tpos, int cols) const;
 
-	/// calculates the weighted sum of transitions in a constraint
+	/// Calculates the weighted sum of transitions in an increment constraint
 	map<Transition*,int>& calcConstraint();
 
-	/// gets the weighted sum of transitions if it has been calculated
+	/// Gets the weighted sum of transitions if it has been calculated
 	const map<Transition*,int>& getLHS() const;
 
-	/// compares two constraints, 0:incomparable, 1:RHS>c.RHS, -1:RHS<=c.RHS
+	/// Compares two constraints, 0:incomparable (different LHS), 1:RHS>c.RHS, -1:RHS<=c.RHS
 	int compare(const Constraint& c) const;
 
-	/// prints a constraint
+	/// Prints a constraint
 	void showConstraint(ostream& s) const;
 
-	/// whether the constraint is used for jumping to incomparable solutions
+	/// Whether the constraint is used for jumping to incomparable solutions
 	bool isJump() const;
 
-	/// set the recent flag making a constraint recent (able to be reason for failures) or old
+	/// Set the recent flag making a constraint recent (able to be reason for failures) or old
 	void setRecent(bool r);
 
-	/// check the recent flag
+	/// Check the recent flag
 	bool isRecent() const;
 
-	/// comparison for set::less
+	/// Comparison method for set::less
 	bool operator<(const Constraint& rhs) const;
 
-	/// equivalence for constraints
+	/// Equivalence of constraints
 	bool operator==(const Constraint& rhs) const;
 
-	/// clean a set of failure constraints regarding this constraint
+	/// Clean a set of failure constraints regarding this constraint
 	bool cleanConstraintSet(set<Constraint>& sc) const;
 
-	/// whether a constraint is a non-jump with only one transition with weight one, i.e. t>=n
+	/// Whether a constraint is a non-jump with only one transition with weight one, i.e. t>=n
 	Transition* isSingle() const;
 
 private:

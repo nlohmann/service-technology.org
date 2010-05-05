@@ -32,12 +32,17 @@ using pnapi::PetriNet;
 using std::map;
 
 
+/*! \brief For wrapping the needed functionality of lp_solve
 
+	This class contains methods for an easy transfer of data from and to lp_solve.
+	It specifically supports construction of the marking equation from the Petri net
+	and its repeated modification by constraints including a reset capability.
+*/
 class LPWrapper {
 
 public:
 
-	/// Constructor (int=number of columns)
+	/// Constructor (int=number of columns/transitions)
 	LPWrapper(unsigned int);
 
 	/// Destructor
@@ -49,10 +54,10 @@ public:
 	/// Remove all constraints not belonging to the marking equation
 	bool stripConstraints();
 
-	/// add a new constraint to the linear system
+	/// Add a new constraint to the linear system
 	bool addConstraint(REAL*, int, REAL);
 
-	/// solve the linear system
+	/// Solve the linear system
 	int solveSystem();
 
 	/// Get a variable name for a column
@@ -83,8 +88,12 @@ private:
 	/// The number of rows in the system created from the marking equation
 	unsigned int basicrows;
 
-	/// internal variables for positions of transitions in the system and for the solution
-	map<Transition*,int> tpos, tvector;
+	/// Internal variables for position of transitions in the system
+	map<Transition*,int> tpos;
+
+	/// Internal variables for the solution
+	map<Transition*,int> tvector;
 };
 
 #endif
+

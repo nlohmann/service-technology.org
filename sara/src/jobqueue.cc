@@ -35,8 +35,7 @@ extern gengetopt_args_info args_info;
 	* Implementation of the methods of the class JobQueue *
 	******************************************************/
 
-/** Constructor for the empty queue
-	@param pn The Petri net for which the incidence matrix is to be built.
+/** Constructor for the empty queue.
 */
 JobQueue::JobQueue() : cnt(0),active(NULL) {}
 
@@ -45,7 +44,7 @@ JobQueue::JobQueue() : cnt(0),active(NULL) {}
 */
 JobQueue::JobQueue(PartialSolution* job) : cnt(1),active(job) {}
 
-/** Destructor. Frees the memory for all jobs in the queue
+/** Destructor. Frees the memory for all jobs in the queue, past, active, or future.
 */
 JobQueue::~JobQueue() {
 	map<int,deque<PartialSolution*> >::iterator jit;
@@ -69,24 +68,24 @@ bool JobQueue::empty() {
 	return (!active);
 }
 
-/** Test whether the job queue contains at most the active job.
+/** Test whether the job queue contains at most the active job and past jobs, but no future jobs.
 	@return If the queue is "almost" empty.
 */
 bool JobQueue::almostEmpty() {
 	return (queue.empty());
 }
 
-/** Get the number of jobs in a queue.
+/** Get the number of jobs in a queue, excluding past jobs.
 	@return Size of the queue.
 */
 int JobQueue::size() { return cnt; }
 
-/** Get the first job in the queue.
+/** Get the first, i.e. active, job in the queue.
 	@return The first job.
 */
 PartialSolution* JobQueue::first() { return active; }
 
-/** Remove the first job in the queue.
+/** Remove the active job from the queue, possibly pushing it into the past.
 	@param kill Forbid this job's entry into the past list (e.g. if it is there already).
 	@return True if a job could be removed.
 */
@@ -99,7 +98,6 @@ bool JobQueue::pop_front(bool kill) {
 	if (!almostEmpty()) 
 	{ 
 		active = queue.begin()->second.front();
-//		activeprio = queue.begin()->first;
 		queue.begin()->second.pop_front();
 		if (queue.begin()->second.empty())
 			queue.erase(queue.begin());
@@ -115,18 +113,6 @@ bool JobQueue::pop_front(bool kill) {
 	return true;
 }
 
-/** Add a job to the queue. The job will be at the earliest position available according to its
-	priority. The job will be added even if it is already in the queue.
-	@param job The job to be added to the queue.
-*/
-/*
-void JobQueue::push_front(PartialSolution* job) {
-	if (empty()) active=job;
-	else queue[priority(job)].push_front(job);
-	++cnt;
-}
-*/
-
 /** Add a job to the queue. The job will be at the latest position available according to its
 	priority. The job will be added even if it is already in the queue.
 	@param job The job to be added to the queue.
@@ -137,25 +123,9 @@ void JobQueue::push_back(PartialSolution* job) {
 	++cnt;
 }
 
-/** Add a job to the queue. The job will be at the latest position available according to its
-	priority. The job will not be added if there is an equivalent one in the queue.
-	@param job The job to be added to the queue.
-	@return If the job has been added.
-*/
-/*
-bool JobQueue::insert(PartialSolution* job) {
-	if (empty()) { active=job; ++cnt; return true; }
-	int pri = find(job);
-	if (pri<0) return false;
-	queue[pri].push_back(job);
-	++cnt;
-	return true;
-}
-*/
-
 /** Find out if there is an equivalent job in the queue.
 	@param The job to be checked.
-	@return -1 if the job was found in the queue, its priority otherwise.
+	@return -1 if the job was found in the queue, its would-be priority otherwise.
 */
 int JobQueue::find(PartialSolution* job) {
 	int pri(priority(job));
@@ -204,7 +174,7 @@ bool JobQueue::findPast(PartialSolution* job) {
 }
 
 /** Calculate the priority of a job. The number is calculated from the total number of transitions
-	to be fired, the number of non-firable transitions, and the number of constraints in the job.
+	to be fired, the number of non-firable transitions, or the number of constraints in the job.
 	Lower numbers mean higher priorities. The result will always be non-negative.
 	@param job The job for which the priority is to be calculated.
 	@return The priority.
@@ -308,8 +278,10 @@ void JobQueue::push_fail(PartialSolution* job) {
 	delete job;
 }
 
-/** (Pseudo-)Cleans a failure queue from obsolete entries regarding one parikh image.
+/** (Pseudo-)Clean a failure queue from obsolete entries regarding one parikh image
+	of a partial firing sequence.
 	@param The parikh image to check against.
+	@return If the parikh images itself is made obsolete by the queue.
 */
 bool JobQueue::cleanFailure(map<Transition*,int>& p) {
 	bool result(false);
@@ -354,7 +326,7 @@ bool JobQueue::cleanFailure(map<Transition*,int>& p) {
 	return result;
 }
 
-/** Prints a failure queue.
+/** Print a failure queue.
 	@param im Incidence matrix of the Petri net
 */
 void JobQueue::printFailure(IMatrix& im) {
@@ -423,7 +395,7 @@ void JobQueue::printFailure(IMatrix& im) {
 		}
 }
 
-/** Counts the size of a failure queue which may contain obsolete entries.
+/** Count the size of a failure queue which may contain obsolete entries.
 	@return The size.
 */
 int JobQueue::trueSize() {
@@ -503,7 +475,7 @@ bool JobQueue::push_solved(PartialSolution* job) {
 	return !result;
 }
 
-/** Prints a solution queue.
+/** Print a solution queue.
 	@param sum On Return: The sum over all solution lengths.
 	@return The maximal length of a solution.
 */
@@ -527,6 +499,11 @@ int JobQueue::printSolutions(int& sum) {
 	return sollength;
 }
 
+/** Print the queue including past, active, and future jobs for debug purposes.
+	@param past Whether the past jobs and the active job should be printed at all.
+		Choose false for solution and failure queues as these do not have past and
+		active jobs.
+*/
 void JobQueue::show(bool past) {
 	if (past) {
 		cerr << "+++++ Past entries:" << endl;

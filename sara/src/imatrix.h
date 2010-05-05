@@ -31,7 +31,10 @@ using std::set;
 using std::map;
 using std::vector;
 
-/** Class for the incidence matrix of a Petri net. The incidence matrix is partially built only 
+/*! \brief For dynamically computing and storing incidence and loop matrices of a Petri net
+	and handling the firing of transitions
+	
+	Class for the incidence matrix of a Petri net. The incidence matrix is partially built only 
 	on demand, one map (from places to int) per transition. Additionally, loops are accounted for,
 	so IMatrix can contain the full structure information of the Petri net.
 */
@@ -59,19 +62,19 @@ public:
 	/// Get the number of loops between a transition and all its neighboring places.
 	map<Place*,int>& getLoopColumn(Transition& t);
 
-	/// Calculate the predecessor marking (before firing t).
+	/// Calculate the predecessor marking (before t has been fired).
 	void predecessor(Marking& m, Transition& t);
 
 	/// Calculate the successor marking (after firing t).
 	void successor(Marking& m, Transition& t);
 
-	/// Compare the net result of two transition and deliver all places where the first transition yields less tokens than the second.
+	/// Compare the net result of two transitions and deliver all places where the first transition yields less tokens than the second.
 	set<Place*> compareOutput(Transition& t1, Transition& t2);
 
 	/// Check if a transition vector can fire under a marking regarding a certain set of places only.
 	bool checkRestrictedActivation(Marking& m, vector<Transition*>& tv, set<Place*>& restriction);
 
-	/// Calculates the token change induced by firing a transition vector fv
+	/// Calculates the token change induced by firing a transition vector
 	map<Place*,int> getChange(map<Transition*,int>& fv);
 
 	/// Verbosity level.
@@ -81,8 +84,12 @@ private:
 	/// The Petri net for this incidence matrix
 	const PetriNet& petrinet;
 
-	/// The matrices for incidence and loops
-	map<Transition*,map<Place*,int> > mat,loop;
+	/// The incidence matrix
+	map<Transition*,map<Place*,int> > mat;
+
+	/// The matrix containing the loops (all entries non-negative)
+	map<Transition*,map<Place*,int> > loop;
 };
 
 #endif
+

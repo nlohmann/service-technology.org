@@ -98,7 +98,7 @@ void PartialSolution::setFullVector(map<Transition*,int>& ftv) { fulltv=ftv; }
 */
 map<Transition*,int>& PartialSolution::getFullVector() { return fulltv; }
 
-/** Sets a single constraint.
+/** Set a single constraint.
 	@param c A constraint.
 	@return False, if the constraint was already in the set of constraints of the partial solution.
 		True, if the constraint is new or the right hand side has changed.
@@ -128,54 +128,26 @@ bool PartialSolution::setConstraint(const Constraint& c) {
 	return true;
 }
 
-/** Sets a single failure constraint.
+/** Set a single failure constraint.
 	@param c A constraint.
-	@return False, if the constraint was already in the set of failure constraints of the partial solution.
-		True, if the constraint is new or the right hand side has changed.
+	@return True always.
 */
 bool PartialSolution::setFailureConstraint(const Constraint& c) {
 	failure.insert(c);
 	return true;
 }
 
-/* Checks if there is a constraint in the partial solution with at most a differing right hand side.
-	@param c The constraint to be checked.
-	@return The right hand side of the constraint in the partial solution if a match was found,
-		-1 otherwise.
-int PartialSolution::findRHS(Constraint& c) {
-	if (constraints.size()==0) return -1;
-	set<Constraint>::iterator cit;
-	for(cit=constraints.begin(); cit!=constraints.end(); ++cit)
-		if (cit->compare(c)!=0) break;
-	if (cit!=constraints.end()) return cit->getRHS();
-	else return -1;
-}
-*/
-
-/* Removes all constraints from the partial solution.
-void PartialSolution::clearConstraints() { 
-	constraints.clear(); 
-	jumpsdone=0;
-}
-*/
-
-/* Removes all failure constraints from the partial solution.
-void PartialSolution::clearFailureConstraints() { 
-	failure.clear(); 
-}
-*/
-
-/** Sets all constraints of the partial solution at once, existing constraints are deleted.
+/** Set all constraints of the partial solution at once, existing constraints are deleted.
 	@param cv The new constraints.
 */
 void PartialSolution::setConstraints(set<Constraint> cv) { constraints = cv; }
 
-/** Gets all constraints in the partial solution.
+/** Get all constraints in the partial solution.
 	@return The constraints.
 */
 set<Constraint>& PartialSolution::getConstraints() { return constraints; }
 
-/** Gets all failed constraints in the partial solution.
+/** Get all failed constraints in the partial solution.
 	@return The constraints.
 */
 set<Constraint>& PartialSolution::getFailureConstraints() { return failure; }
@@ -227,163 +199,11 @@ void PartialSolution::show() {
 	cerr << endl;
 }
 
-/* For those places where we have less tokens at the moment than in the final marking,
-	calculate the amount missing.
-	@param im Incidence matrix.
-	@return A map from those places to the number of missing tokens.
-map<Place*,int> PartialSolution::underFinalMarking(IMatrix& im) {
-	map<Place*,int> change(im.getChange(getRemains()));
-	map<Place*,int> result;
-	result.clear();
-	map<Place*,int>::iterator pit;
-	for(pit=change.begin(); pit!=change.end(); ++pit)
-		if (pit->second>0) result[pit->first] = pit->second;
-	return result;
-}
-*/
-
-/* For each place for all transitions from the partial firing sequence that effectively produce tokens on this
-	place, the sum of the effects of the transitions is calculated.
-	@return A map from places to positive token effects.
-map<Place*,int> PartialSolution::produce() {
-	map<Place*,int> prod;
-	for(unsigned int i=0; i<tseq.size(); ++i)
-	{
-		set<pnapi::Arc*> as(tseq[i]->getPostsetArcs());
-		set<pnapi::Arc*>::iterator ait;
-		for(ait=as.begin(); ait!=as.end(); ++ait)
-		{
-			Place& p = (*ait)->getPlace();
-			pnapi::Arc* a = m.getPetriNet().findArc(p,*(tseq[i]));
-			int aw = (*ait)->getWeight();
-			if (a) aw -= a->getWeight();
-			if (aw<0) aw=0;
-			prod[&p] += aw;
-		}
-	}
-	return prod;
-}
-*/
-
-/** Compares the partial solution to a given sequence, marking, and remainder.
-	@param tv A transition vector to compare with the partial firing sequence.
-	@param m0 An initial marking.
-	@param rem A remainder of non-firable transitions.
-	@return If the partial solution is "better" than the parameters.
-bool PartialSolution::betterSequenceThan(vector<Transition*> tv, Marking& m0, map<Transition*,int>& rem) {
-	// the new firing sequence should be longer than the old one
-	if (tseq.size()>tv.size()) return true;
-	// it should not reach the same marking and have the same nonfirable transitions as the old one
-	if (rem!=remains) return false;
-	if (m==m0) return true;
-	return false;
-}
-*/
-
-/*
-void PartialSolution::calcCircleConstraints(IMatrix& im, Marking& m0) {
-	set<Transition*> tset = m.getPetriNet().getTransitions();
-	set<Place*> pset;
-	Tarjan tj(tset,pset);
-	map<Transition*,int>::iterator rit;
-	for(rit=getRemains().begin(); rit!=getRemains().end(); ++rit)
-		if (rit->second>0) {
-			map<Place*,int>& postset(im.getColumn(*(rit->first)));
-			map<Place*,int>::iterator pit;
-			for(pit=postset.begin(); pit!=postset.end(); ++pit)
-			{
-				set<Arc*> arcs(pit->first->getPostsetArcs());
-				set<Arc*>::iterator ait;
-				for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
-				{
-					Transition* t(&(*ait)->getTransition());
-					if (getRemains().find(t)!=getRemains().end() && getRemains()[t]>0) 
-						tj.addArc(rit->first,t);
-				}
-			}
-		}
-	vector<set<Transition*> > tcomp;
-	vector<set<Place*> > pcomp;
-	tj.getComponents(tcomp,pcomp);
-	for(int i=0; i<tcomp.size(); ++i)
-	{
-//		vector<set<Transition*> > tv;
-//		vector<set<Place*> > pv;
-//		cerr << "MX TCOMP: ";
-//		set<Transition*>::iterator xtit;
-//		for(xtit=tcomp[i].begin(); xtit!=tcomp[i].end(); ++xtit)
-//			cerr << (*xtit)->getName() << " ";
-//		cerr << " P: ";
-//
-		set<Place*> ptcomp(getPlacesForZSK(tcomp[i],im));
-//		set<Place*>::iterator xpit;
-//		for(xpit=ptcomp.begin(); xpit!=ptcomp.end(); ++xpit)
-//			cerr << (*xpit)->getName() << " ";
-//		cerr << endl;
-//
-		ttmp.push_back(tcomp[i]);
-		ptmp.push_back(ptcomp);
-		ftmp.push_back(tcomp[i]);
-	}
-	for(int i=0; i<ttmp.size(); ++i)
-	{
-		// if there are undermarked places markable only by the component, it has to be made firable
-		set<Place*> deadp(findPlacesDead(ttmp[i],im));
-		if (!deadp.empty()) ptmp[i] = findPlacesIn(ttmp[i],im);
-
-//		cerr << "MX TTMP/PTMP: ";
-//		set<Transition*>::iterator xtit;
-//		for(xtit=ttmp[i].begin(); xtit!=ttmp[i].end(); ++xtit)
-//			cerr << (*xtit)->getName() << " ";
-//		set<Place*>::iterator xpit;
-//		for(xpit=ptmp[i].begin(); xpit!=ptmp[i].end(); ++xpit)
-//			cerr << (*xpit)->getName() << " ";
-//		cerr << endl;
-//
-		int um = checkUndermarking(m0,ttmp[i],ptmp[i],deadp,im);
-//		cerr << "UM: " << um << endl;
-		if (um<=0) continue;
-//		if (um>1) um=1; // increment should be limited to one, but this doesn't work!
-
-		map<Place*,int> posmap,loopmap;
-		set<Transition*>::iterator sit;
-		for(sit=ttmp[i].begin(); sit!=ttmp[i].end(); ++sit)
-		{
-			map<Place*,int> post = im.getColumn(**sit);
-			map<Place*,int> loops = im.getLoopColumn(**sit);
-			int cnt = count(tseq.begin(),tseq.end(),*sit)+getRemains()[*sit];
-			map<Place*,int>::iterator mit;
-			for(mit=post.begin(); mit!=post.end(); ++mit)
-				if (ptmp[i].find(mit->first)!=ptmp[i].end()) 
-					if (post[mit->first]>0) {
-						if (posmap.find(mit->first)!=posmap.end()) 
-							posmap[mit->first] += mit->second * cnt;
-						else posmap[mit->first] = mit->second * cnt; // init
-					}
-			for(mit=loops.begin(); mit!=loops.end(); ++mit)
-				if (ptmp[i].find(mit->first)!=ptmp[i].end()) {
-					if (loopmap.find(mit->first)==loopmap.end()) loopmap[mit->first]=0; //init
-					if (loops[mit->first]>0 && loopmap[mit->first]<loops[mit->first]+post[mit->first])
-						loopmap[mit->first]=loops[mit->first]+post[mit->first];
-				}
-		}		
-		map<Place*,int>::iterator mit;
-		for(mit=loopmap.begin(); mit!=loopmap.end(); ++mit)
-		{
-			if (posmap.find(mit->first)==posmap.end()) posmap[mit->first]=0; // init
-			if (mit->second>0 && posmap[mit->first]<mit->second) posmap[mit->first]=mit->second;
-		}
-		if (!buildMultiConstraint(posmap,um,ftmp[i])) ; //cerr << "TJ: ERROR" << endl;
-	}
-}
-*/
-
-/** Constructs a new constraint from a given weighted set of places and forbidden transitions and
+/** Constructs a new increment constraint from a given weighted set of places and forbidden transitions and
 	adds it to the partial solution.
 	@param pmap The places (weighted) that need additional tokens.
 	@param incr The number of additional tokens needed.
 	@param forbidden A set of transitions that is not allowed to deliver these tokens.
-	@param im The incidence matrix of the Petri net.
 	@return Whether the constraint is non-trivial and has thus been added.
 */
 bool PartialSolution::buildMultiConstraint(map<Place*,int>& pmap, int incr, set<Transition*>& forbidden) {
@@ -421,8 +241,7 @@ bool PartialSolution::buildMultiConstraint(map<Place*,int>& pmap, int incr, set<
 }
 
 /** Create constraints for places that hinder transitions by missing tokens. The new constraint
-	forces an additional token on each such place (instead of one token over all such places like the
-	normal constraint would do). This will increase the speed of the algorithm significantly.
+	forces an additional token on each such place.
 	@param im The incidence matrix of the Petri net.
 */
 void PartialSolution::buildSimpleConstraints(IMatrix& im) {
@@ -590,174 +409,6 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 		}
 }
 
-/*
-int PartialSolution::checkUndermarking(Marking& m0, set<Transition*>& tset, set<Place*>& pset, set<Place*>& dead, IMatrix& im) {
-	map<Transition*,map<Place*,int> > ipt,lpt;
-	map<Transition*,int> cnt;
-	set<Place*>::iterator pit;	
-	set<Transition*>::iterator tit;
-	for(tit=tset.begin(); tit!=tset.end(); ++tit)
-	{
-		map<Place*,int> pmap,lmap;
-		for(pit=pset.begin(); pit!=pset.end(); ++pit)
-		{
-			Arc* a(m0.getPetriNet().findArc(**pit,**tit));
-			int aw = 0;
-			if (a) aw = a->getWeight();
-			pmap[*pit]=aw;
-			a = m0.getPetriNet().findArc(**tit,**pit);
-			if (a) {
-				pmap[*pit]-=a->getWeight(); 
-				if (pmap[*pit]>=0) lmap[*pit]=a->getWeight(); 
-				else { pmap[*pit]=0; lmap[*pit]=aw; }
-			}
-		}
-		ipt[*tit] = pmap;
-		lpt[*tit] = lmap;
-		cnt[*tit] = count(tseq.begin(),tseq.end(),*tit)+getRemains()[*tit];
-	}
-
-	Marking m1(m0);
-	// calculate the minimal token need (-1 stating artificially that the variable is not initialized)
-	int minneed = -1;
-	// if the component won't fire, the necessary tokens have to be generated by other means, this is the maximal need
-	if (dead.empty())
-	{
-		minneed = 0;
-		map<Place*,int> fneed(underFinalMarking(im));
-		set<Place*> pa(getPlacesForZSK(tset,im));
-		set<Place*>::iterator pmit;
-		for(pmit=pa.begin(); pmit!=pa.end(); ++pmit)
-			minneed += fneed[*pmit];
-	} 
-	// if the component can be activated, only the tokens necessary for its activation are needed
-	// we check for the minimal need at any point in the firing sequence so far and at any transition
-	for(int i=0; i<=tseq.size(); ++i)
-	{
-		if (i>0) im.successor(m1,*(tseq[i-1]));
-		if (i>0) --cnt[tseq[i-1]];
-		// if a dead place (undermarked, not markable) is in the preset of a transition, this transition cannot be made firable
-		// tgo is the set that POSSIBLY COULD be made firable
-		set<Transition*> tgo;
-		for(tit=tset.begin(); tit!=tset.end(); ++tit)
-		{
-			bool b = true;
-			for(pit=dead.begin(); pit!=dead.end(); ++pit)
-			{
-				Arc* a(m0.getPetriNet().findArc(**pit,**tit));
-				if (a && a->getWeight()>m1[**pit]) b = false;
-			}
-			if (b) tgo.insert(*tit);
-		}
-		// now go through the candidates and calc the minimal undermarking (minneed)
-		for(tit=tgo.begin(); tit!=tgo.end(); ++tit)
-		if (cnt[*tit]>0) // the transition appears in the preliminal solution
-		{
-			int internneed = 0;
-			for(pit=pset.begin(); pit!=pset.end(); ++pit)
-			{
-				if (m1[**pit]<ipt[*tit][*pit]*cnt[*tit]+lpt[*tit][*pit]) 
-					internneed+=ipt[*tit][*pit]*cnt[*tit]+lpt[*tit][*pit]-m1[**pit];
-			}
-			if (minneed<0 || minneed>internneed) minneed=internneed;
-		}
-		
-	}
-	return (minneed==0 ? 1 : minneed);
-}
-*/
-
-/*
-set<Place*> PartialSolution::getPlacesForZSK(const set<Transition*>& tset, IMatrix& im) {
-	set<Place*> pre,post,all;
-	set<Transition*>::iterator it;
-	for(it=tset.begin(); it!=tset.end(); ++it)
-	{
-		map<Place*,int>& col(im.getColumn(**it));
-		map<Place*,int>& loop(im.getLoopColumn(**it));
-		map<Place*,int>::iterator mit;
-		for(mit=col.begin(); mit!=col.end(); ++mit)
-		{
-			if (mit->second>0) post.insert(mit->first);
-			if (mit->second<0) pre.insert(mit->first);
-		}
-		for(mit=loop.begin(); mit!=loop.end(); ++mit)
-		{
-			if (mit->second>0) all.insert(mit->first);
-		}
-	}
-	set<Place*>::iterator pit;
-	for(pit=post.begin(); pit!=post.end(); ++pit)
-			all.insert(*pit);
-	return all;
-}
-*/
-
-/*
-map<Place*,int> PartialSolution::findPlacesAfter(set<Transition*>& szk, IMatrix& im) {
-	map<Place*,int> pmap,result;
-	map<Place*,int>::iterator mit;
-	set<Transition*>::iterator it;
-	// calculate the total produce-consume on each incident place
-	for(it=szk.begin(); it!=szk.end(); ++it)
-	{
-		map<Place*,int> padd(im.getColumn(**it));
-		for(mit=padd.begin(); mit!=padd.end(); ++mit)
-			if (pmap.find(mit->first)!=pmap.end()) pmap[mit->first]+=mit->second;
-			else pmap[mit->first]=mit->second;
-	}
-	for(mit=pmap.begin(); mit!=pmap.end(); ++mit)
-	{
-		// eliminate zero entries
-		if (mit->second>0) result[mit->first]=mit->second;
-	}
-	return result;
-}
-*/
-
-/*
-set<Place*> PartialSolution::findPlacesIn(set<Transition*>& szk, IMatrix& im) {
-	set<Place*> result;
-	map<Place*,int>::iterator mit;
-	set<Transition*>::iterator it;
-	// calculate the tokens produced (even if consumed at the same time) on each incident place
-	for(it=szk.begin(); it!=szk.end(); ++it)
-	{
-		map<Place*,int>& padd(im.getColumn(**it));
-		for(mit=padd.begin(); mit!=padd.end(); ++mit)
-			if (mit->second>0) result.insert(mit->first);
-		map<Place*,int>& ploop(im.getLoopColumn(**it));
-		for(mit=ploop.begin(); mit!=ploop.end(); ++mit)
-			if (mit->second>0) result.insert(mit->first);
-	}
-	return result;
-}
-*/
-
-/*
-set<Place*> PartialSolution::findPlacesDead(set<Transition*>& szk, IMatrix& im) {
-	map<Place*,int> pch = im.getChange(getRemains());
-	map<Place*,int>::iterator mit;
-	set<Place*> pset;
-	set<Transition*>::iterator it;
-	for(it=szk.begin(); it!=szk.end(); ++it)
-	{
-		map<Place*,int> post = im.getColumn(**it);
-		for(mit=post.begin(); mit!=post.end(); ++mit)
-			if (mit->second>0 && pch[mit->first]>0) 
-			{
-				bool b = true;
-				set<Arc*> arcs(mit->first->getPresetArcs());
-				set<Arc*>::iterator ait;
-				for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
-					if (szk.find(&((*ait)->getTransition()))==szk.end()) b=false;
-				if (b) pset.insert(mit->first);
-			}
-	}
-	return pset;
-}
-*/
-
 /** Check whether this partial solution is a full solution.
 	@return If this represents a full solution.
 */
@@ -768,7 +419,7 @@ bool PartialSolution::isSolved() { return fullSolution; }
 void PartialSolution::setSolved() { fullSolution = true; }
 
 /** Mark all constraints as non-recent so they cannot be the reason for not finding solutions.
-	@param jump Whether jumps or normal constraint are to be touched.
+	@param jump Whether jumps or increment constraint are to be touched.
 */
 void PartialSolution::touchConstraints(bool jump) {
 	set<Constraint>::iterator cit;
@@ -778,7 +429,7 @@ void PartialSolution::touchConstraints(bool jump) {
 		if (cit->isJump()==jump) const_cast<Constraint*>(&(*cit))->setRecent(false);
 }
 
-/** Calculates which forbidden transition are disabled because of the given set of places
+/** Calculate which forbidden transition are disabled because of the given set of places
 	in this partial solution.
 	@param pset The set of places of interest (second part of the map is irrelevant).
 	@param im Reference to the incidence matrix of the Petri net
@@ -802,7 +453,7 @@ set<Transition*> PartialSolution::disabledTransitions(map<Place*,int> pset, IMat
 
 /** Calculate the value of the LHS of the constraint under the marking reached
 	by the firing sequence of this partial solution.
-	@param c The constraint to evaluate.
+	@param c The constraint to be evaluated.
 	@return The value of the LHS.
 */
 int PartialSolution::getActualRHS(const Constraint& c) {
@@ -815,6 +466,7 @@ int PartialSolution::getActualRHS(const Constraint& c) {
 }
 
 /** Calculate the parikh image of the firing sequence and store it.
+	@return The parikh image.
 */
 map<Transition*,int> PartialSolution::calcParikh() {
 	parikh.clear();
@@ -825,8 +477,8 @@ map<Transition*,int> PartialSolution::calcParikh() {
 	return result;
 }
 
-/** Add a parikh image of a firing sequence to a failure.
-	@param The parikh image to add.
+/** Set a parikh image of a firing sequence in a failure.
+	@param p The parikh image to SET.
 */
 void PartialSolution::addParikh(map<Transition*,int>& p) { parikh.clear(); parikh.push_back(p); }
 
@@ -836,7 +488,7 @@ void PartialSolution::addParikh(map<Transition*,int>& p) { parikh.clear(); parik
 */
 vector<map<Transition*,int> >& PartialSolution::getParikh() { return parikh; }
 
-/** Get the next jump in the list of calculated jumps.
+/** Get the next jump in the list of precalculated jumps.
 	@param val On return: the right hand side n of the jump constraint.
 	@return The transition t on the left hand side of the jump constraint t<=n.
 */
@@ -846,7 +498,7 @@ Transition* PartialSolution::getNextJC(int& val) {
 	return transitionorder[jc.begin()->first];
 }
 
-/** Set the list of precalculated jump constraints.
+/** Create the list of precalculated jump constraints.
 	@param diff A map of jump constraints to be made.
 */
 void PartialSolution::setJC(map<Transition*,int>& diff) { 
@@ -878,12 +530,13 @@ bool PartialSolution::compareSequence(vector<Transition*> seq) {
 	return true;
 }
 
-/** Transform jumps constraints (with <=) in this partial solution into
+/** Transform jump constraints (with <=) in this partial solution into
 	normal constraints (with >=).
 	@param fullvector The solution vector generated by lp_solve to determine the normal constraints.
 */
 void PartialSolution::transformJumps(map<Transition*,int>& fullvector) {
 	bool hadjump(false);
+	// Delete the jumps t<=m
 	set<Constraint>::iterator cit;
 	for(cit=constraints.begin(); cit!=constraints.end();)
 		if (cit->isJump()) {
@@ -891,6 +544,7 @@ void PartialSolution::transformJumps(map<Transition*,int>& fullvector) {
 			hadjump = true;
 		} else ++cit;
 	if (!hadjump) return;
+	// Now create the constraints of the form t>=n so we always get at least this solution
 	map<Transition*,int>::iterator mit;
 	for(mit=fullvector.begin(); mit!=fullvector.end(); ++mit)
 		if (mit->second>0) {

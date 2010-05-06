@@ -66,7 +66,7 @@ state:
 	/*save current state*/
 	{ 
 		ServiceMarking *newMarking = new ServiceMarking(CurrentServiceSuccessors, 
-																			tmpNet.finalCondition().isSatisfied(pnapi::Marking(CurrentMarking, &tmpNet)));
+																			tmpNet.getFinalCondition().isSatisfied(pnapi::Marking(CurrentMarking, &tmpNet)));
 		ServiceMarkings.insert ( std::make_pair(CurrentStateNumber, newMarking) );
 	}
 ;

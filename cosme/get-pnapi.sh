@@ -42,18 +42,15 @@ wget http://esla.informatik.uni-rostock.de:8080/job/pnapi/lastSuccessfulBuild/ar
 tar xfz pnapi.tar.gz
 
 # copy relevant files
-cp pnapi/src/*.cc pnapi/src/*.h pnapi/src/*.ll pnapi/src/*.yy .
+cp pnapi/src/*.cc pnapi/src/*.h .
 cp pnapi/src/Makefile.am.customer Makefile.am
 
 # cleanup
 rm -rf pnapi
 rm -rf pnapi.tar.gz
-rm -rf parser-*.cc
-rm -rf parser-*.h
 
 # tell user we have finished
 echo
 echo "  Finished installing PNAPI"
 echo "  Please check, whether all files are versioned properly in your tool."
-echo
 

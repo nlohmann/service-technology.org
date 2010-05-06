@@ -12,6 +12,7 @@
 #include "cmdline.h"
 #include "Output.h"
 #include "verbose.h"
+#include "util.h"
 #include <pnapi/pnapi.h>
 
 // lexer and parser
@@ -109,32 +110,32 @@ inline void parseService_LabelHelper() {
     label_id_t curLabel;
     std::pair<std::map<std::string, label_id_t>::iterator, bool> ret;
 
-    const std::set<pnapi::Place*> outputPlaces(tmpNet.getOutputPlaces());
-    for (std::set<pnapi::Place*>::const_iterator p = outputPlaces.begin(); p != outputPlaces.end(); ++p) {
-        // save current !-event
+    const std::set<pnapi::Label*> outputLabels(tmpNet.getInterface().getOutputLabels());
+    FOREACH(l, outputLabels) {
+    	// save current !-event
         string tmpStr("!");
-        tmpStr += (*p)->getName();
+        tmpStr += (*l)->getName();
         curLabel = GlobalLabels.mapLabel(tmpStr);
         ServiceInterface.insert(curLabel);
 
-        const std::set<pnapi::Node*> preset((*p)->getPreset());
-        for (std::set<pnapi::Node*>::const_iterator t = preset.begin(); t != preset.end(); ++t) {
+        const std::set<pnapi::Transition*> preset((**l).getTransitions());
+        FOREACH(t, preset) {
             // save current Transitionlabel
             ret = TransitionLabels.insert(make_pair((*t)->getName(), curLabel));
             assert(ret.second);
         }
     }
 
-    const std::set<pnapi::Place*> inputPlaces(tmpNet.getInputPlaces());
-    for (std::set<pnapi::Place*>::const_iterator p = inputPlaces.begin(); p != inputPlaces.end(); ++p) {
-        // save current ?-event
+    const std::set<pnapi::Label*> inputLabels(tmpNet.getInterface().getInputLabels());
+    FOREACH(l, inputLabels) { 
+	// save current ?-event
         string tmpStr("?");
-        tmpStr += (*p)->getName();
+        tmpStr += (*l)->getName();
         curLabel = GlobalLabels.mapLabel(tmpStr);
         ServiceInterface.insert(curLabel);
 
-        const std::set<pnapi::Node*> postset((*p)->getPostset());
-        for (std::set<pnapi::Node*>::const_iterator t = postset.begin(); t != postset.end(); ++t) {
+        const std::set<pnapi::Transition*> postset((**l).getTransitions());
+        FOREACH(t, postset) {
             ret = TransitionLabels.insert(make_pair((*t)->getName(), curLabel));
             assert(ret.second);
         }

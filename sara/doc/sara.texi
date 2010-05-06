@@ -141,10 +141,11 @@ The distribution contains several directories:
 The Texinfo documentation of Sara. The documentation can be created using @samp{make pdf}. Note you need to have Hello properly installed before (see installation description above).
 
 @item libs
-The Petri Net @acronym{API} used by Sara to parse and organize the open net.
+The Petri Net @acronym{API} used by Sara to parse and organize a Petri net.
+Also, the Integer Programming tool lp_solve used by Sara to solve the marking equation of a Petri net.
 
-@item man
-The manpage of Sara which can be displayed using @samp{man sara} after having Sara installed (see installation description above).
+@c @item man
+@c The manpage of Sara which can be displayed using @samp{man sara} after having Sara installed (see installation description above).
 
 @item src
 The source code of Sara.
@@ -275,7 +276,14 @@ See @url{http://service-technology.org/publications} for more information.
 @chapter Exit and Error Codes
 @section Exit Codes
 
-Sara will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input open net could be read, <<-- MORE ERRORS -->>. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+Sara will exit with code @samp{0} in case everything went fine. 
+That is, the command-line parameters were valid, the input file(s) could be read,
+and Sara terminated with some result, but did not abort the computation.
+It does not matter if the result was positive (a solution was found) or
+negative (the marking equation is infeasible or no transition vector could be
+realized).
+
+In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
 
 @section Error Codes
 
@@ -286,11 +294,94 @@ In case any error occurs, Sara aborts with exit code @samp{1} and prints a messa
 @c <<-- CHANGE START (exit/error codes) -->>
 
 @item #01
-<<-- ERROR DESCRIPTION -->>
+The file or pipe containing the information about the problem that Sara should solve could not be read. 
+Either the file does not exist or read access was not allowed.
 
 @smallexample
 @cartouche
-sara: <<-- ERROR MESSAGE -->> -- aborting [#01]
+sara: could not read problem information -- aborting [#01]
+@end cartouche
+@end smallexample
+
+@item #02
+The problem information contains the filename of a Petri net that must be loaded to solve the problem.
+The file corresponding to this filename either does not exist or read access was not granted.
+
+@smallexample
+@cartouche
+sara: could not read from Petri net file '[filename]' -- aborting [#02]
+@end cartouche
+@end smallexample
+
+@item #03
+The file system did not allow to create a file and write to it. Typically, the user tried to
+make Sara create a problem information file and did not get write access, either to
+the directory or the file itself.
+
+@smallexample
+@cartouche
+sara: could not write to file '[filename]' -- aborting [#03]
+@end cartouche
+@end smallexample
+
+@item #04
+A syntax error occurred while parsing a Petri net file. Either the file itself contains a syntax
+error or Sara was directed to the wrong parser. Check if the problem file contains the correct
+type (LOLA or OWFN) or, if the creation of a problem file went wrong, if the command line option
+for the correct Petri net type was used (-O).
+
+@smallexample
+@cartouche
+sara: error while reading Petri net from file -- aborting [#04]
+@end cartouche
+@end smallexample
+
+@item #05
+A syntax error occurred while parsing a problem file. Check that file.
+
+@smallexample
+@cartouche
+sara: error while parsing the sara problem file -- aborting [#05]
+@end cartouche
+@end smallexample
+
+@item #11
+Internal error. A set of places was empty where it should not be. This is a bug.
+
+@smallexample
+@cartouche
+sara: no scapegoat for stubborn set method -- aborting [#11]
+@end cartouche
+@end smallexample
+
+@item #12
+Internal error. The Integer Programming tool lp_solve was unable to create the data structures
+for solving the marking equation of a Petri net. This can be a bug or a problem
+instance is too large and will not fit into the memory.
+
+@smallexample
+@cartouche
+sara: could not create LP model -- aborting [#12]
+@end cartouche
+@end smallexample
+
+@item #13
+Internal error of lp_solve. This can be a bug of lp_solve or can happen due to
+insufficient memory.
+
+@smallexample
+@cartouche
+sara: failed to add constraint to LP model -- aborting [#13]
+@end cartouche
+@end smallexample
+
+@item #14
+Internal error. Sara generated solutions to a problem, but for some reason the
+solutions were not stored. This is a bug.
+
+@smallexample
+@cartouche
+sara: solved, but no solution found -- aborting [#14]
 @end cartouche
 @end smallexample
 

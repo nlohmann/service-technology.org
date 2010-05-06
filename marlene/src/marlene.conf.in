@@ -9,11 +9,11 @@
 # Marlene needs a Wendy binary (version 1.4 and above). Recent distribtions
 # are available at http://service-technology.org/files/wendy.
 
-wendy = @WENDY@
+wendy = '"@WENDY@"'
 
 # If you want to cost-optimize the adapters, you have to provide a Candy binary.
 
-candy = @CANDY@
+candy = '"@CANDY@"'
 
 # Providing the binary for Petrify result in nices controller
 
@@ -28,5 +28,5 @@ genet = '"@GENET@"'
 # 'XXXXXX' which is replaced at runtime with a random string.
 
 
-tmpfile = @TEMPFOLDER@
+tmpfile = '"@TEMPFOLDER@"'
 

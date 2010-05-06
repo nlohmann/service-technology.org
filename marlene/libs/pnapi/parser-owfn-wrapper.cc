@@ -78,7 +78,7 @@ Parser::Parser() :
   AbstractParser<yy::BisonParser, yy::Lexer, Parser>(),
   transition_(NULL), place_(NULL), target_(NULL), source_(NULL),
   port_(net_.getInterface().getPort()), label_(NULL), capacity_(0), finalMarking_(NULL),
-  wildcardGiven_(false)
+  wildcardGiven_(false), markInitial_(false), placeSetType_(false)
 {
 }
 

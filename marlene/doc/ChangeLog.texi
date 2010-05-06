@@ -12,7 +12,7 @@ Initially planned as 1.2 release, therefore lot of features in this version :)
 
 @item added experimental support for Candy (@url{http://service-technology.org/tools/candy})
 
-@item added (highly experimentell) support for building controllers using Genet
+@item added support for building controllers using Genet (which will be default, Petrify is still backup)
 
 @item open nets with synchronous interface are now supported
 

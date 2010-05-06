@@ -107,6 +107,10 @@ public: /* public methods */
 protected: /* protected methods */
   /// make this class concrete
   void implementMe() {};
+  
+private: /* private methods */
+  /// get the substring of a given string
+  char * substr(const char *, int, int);
 };
 
 } /* namespace woflan */

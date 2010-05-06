@@ -223,7 +223,7 @@ const pnapi::PetriNet * Adapter::buildController()
         composed.normalize();
     }
     // \todo: Experiment, ob sich das hier noch lohnt.
-    composed.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT | pnapi::PetriNet::KEEP_NORMAL);
+    composed.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // | pnapi::PetriNet::KEEP_NORMAL);
 
     /***********************************\
         * calculate most permissive partner *

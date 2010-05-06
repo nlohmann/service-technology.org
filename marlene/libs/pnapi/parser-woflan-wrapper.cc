@@ -12,6 +12,7 @@
 #include "petrinet.h"
 
 #include <cstring>
+#include <cstdlib>
 #include <sstream>
 
 using std::cout;
@@ -79,6 +80,17 @@ Parser::Parser() :
   transition_(NULL), place_(NULL), target_(NULL), source_(NULL),
   capacity_(0), needLabel(false)
 {
+}
+
+/*!
+ * \brief get the substring of a given string
+ */
+char * Parser::substr(const char * pstr, int start, int numchars)
+{
+  char * pnew = (char *) malloc(numchars + 1);
+  strncpy(pnew, pstr + start, numchars);
+  pnew[numchars] = '\0';
+  return pnew;
 }
 
 } } } /* namespace pnapi::parser::lola */

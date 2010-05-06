@@ -240,4 +240,35 @@ void Condition::dnf()
   formula_ = tmp;
 }
 
+/*!
+ * \brief get valid interval of a place
+ */
+formula::Interval Condition::getPlaceInterval(const Place & p) const
+{
+  return formula_->getPlaceInterval(p);
+}
+
+/*!
+ * \brief evaluates the formula partially and replaces propositions by constants
+ * 
+ * I.e. if a place fullfills a proposotion with its recent marking, the proposition
+ * will be replaced by FormulaTrue, otherwise by FormulaFalse.
+ */
+void Condition::evaluatePlace(const Place & p)
+{
+  Formula * tmp = formula_->evaluatePlace(p);
+  delete formula_;
+  formula_ = tmp;
+}
+
+/*!
+ * \brief replace place references
+ */
+void Condition::replacePlace(const Place & p1, const Place & p2)
+{
+  Formula * tmp = formula_->replacePlace(p1, p2);
+  delete formula_;
+  formula_ = tmp;
+}
+
 } /* namespace pnapi */

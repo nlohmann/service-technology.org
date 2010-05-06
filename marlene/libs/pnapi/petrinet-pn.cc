@@ -61,7 +61,7 @@ void PetriNet::setAutomatonConverter(PetriNet::AutomatonConverter converter)
  */
 PetriNet::PetriNet(const Automaton & sa) :
   observer_(*this), interface_(*this),
-  warnings_(0), reducablePlaces_(NULL)
+  warnings_(0), reductionCache_(NULL)
 {
   if( (automatonConverter_ == PETRIFY) &&
       (pathToPetrify_ == "not found") )
@@ -322,10 +322,10 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
     if(remapped.substr(0, 5) != "FINAL")
     {
       // create transition if necessary
-      Transition * transition = findTransition("t" + remapped);
+      Transition * transition = findTransition("t" + *t);
       if(transition == NULL)
       {
-        transition = &createTransition("t" + remapped);
+        transition = &createTransition("t" + *t);
         
         // link transition to corresponding label
         string labelName = remapped.substr( 0, remapped.find('/') );      // remove possible /
@@ -363,25 +363,32 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
       map<string, unsigned int> & tmpPlaceNameMap = myParser.arcs_[*t];
       PNAPI_FOREACH(p, tmpPlaceNameMap)
       {
-        createArc(*transition, *findPlace(p->first), p->second);
-      }      
+        pnapi::Arc * arc = findArc(*transition, *findNode(p->first));
+        if ( arc )
+        {
+            arc->setWeight(arc->getWeight() + p->second);
+        }
+        else
+        {
+            createArc(*transition, *findNode(p->first), p->second);
+        }
+      }
     }
   }
 
-  // create arcs p->t
+    // create arcs p->t
 
   // Create a map of string sets for final condition creation.
   map<string, set<string> > finalCondMap;
-
   PNAPI_FOREACH(p, myParser.places_)
   {
     PNAPI_FOREACH(t, myParser.arcs_[*p])
     {
-      string transitionName = remap(t->first, edgeLabels);
+      string transitionName = t->first; //remap(t->first, edgeLabels);
 
-      if (transitionName.substr(0,5) != "FINAL")
+      if (remap(t->first, edgeLabels).substr(0,5) != "FINAL")
       {
-        createArc(*findPlace(*p), *findTransition("t" + transitionName), t->second);
+          createArc(*findPlace(*p), *findTransition("t" + transitionName), t->second);
       }
       else
       {
@@ -391,6 +398,41 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
     }
   }
 
+  /*
+  PNAPI_FOREACH(arc_list, myParser.arcs_)
+  {
+    PNAPI_FOREACH(n, arc_list->second)
+    {
+      string sourceName = arc_list->first;
+      string targetName = n->first; //remap(t->first, edgeLabels);
+      string transitionName = "t" + sourceName;
+      string placeName = targetName;
+
+      if (targetName.substr(0,1) == "t")
+      {
+          transitionName = "t" + targetName;
+          placeName = sourceName;
+      }
+
+      // if (remap(targetName, edgeLabels).substr(0,5) != "FINAL" and remap(sourceName, edgeLabels).substr(0,5) != "FINAL")
+      {
+          if (sourceName.substr(0,1) == "t")
+              sourceName = "t" + sourceName;
+          if (targetName.substr(0,1) == "t")
+              targetName = "t" + targetName;
+
+          std::cerr << sourceName << " -> " << targetName << std::endl;
+          createArc(*findNode(sourceName), *findNode(targetName), n->second);
+      }
+
+      else
+      {
+        // This place is the result of a final node
+        finalCondMap[transitionName].insert(placeName);
+      }
+    }
+  }
+      */
   // fill interface places not occurring in the automaton
   PNAPI_FOREACH(input, inputLabels)
   {
@@ -479,7 +521,7 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
   finalCondition_.allOtherPlacesEmpty(*this);
 
   // cleaning up
-  remove(pnFileName.c_str());
+  //remove(pnFileName.c_str());
 }
 
 } /* namespace pnapi */

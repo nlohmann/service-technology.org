@@ -15,7 +15,10 @@ namespace pnapi
 {
 
 // forward declarations
-namespace formula { class Conjunction; }
+namespace formula {
+class Conjunction;
+class Interval;
+}
 class Marking;
 class Node;
 class PetriNet;
@@ -26,7 +29,8 @@ class Place;
  * 
  * \todo go through all constructors and check whether they are still needed
  */
-namespace formula {
+namespace formula
+{
 
 /*!
  * \brief abstract formula parent class
@@ -76,6 +80,8 @@ public: /* public methods */
   virtual std::set<const Place *> getPlaces() const;
   /// set of places implied to be empty
   virtual std::set<const Place *> getEmptyPlaces() const;
+  /// get the valid interval of a place
+  virtual Interval getPlaceInterval(const Place &) const = 0;
   /// returns formula type
   virtual Type getType() const = 0;
   /// removes negation
@@ -84,6 +90,10 @@ public: /* public methods */
   virtual Formula * negate() const = 0;
   /// forms formula in disjunctive normal form
   virtual Formula * dnf() const;
+  /// evaluates the formula partially and replaces propositions by constants
+  virtual Formula * evaluatePlace(const Place &) const;
+  /// replace place references
+  virtual Formula * replacePlace(const Place &, const Place &) const;
   //@}
 };
 
@@ -176,7 +186,13 @@ public: /* public methods */
   /// removes negation
   Formula * removeNegation() const;
   /// negates the formula
-  Formula * negate() const;  
+  Formula * negate() const;
+  /// evaluates the formula partially and replaces propositions by constants
+  Formula * evaluatePlace(const Place &) const;
+  /// get the valid interval of a place
+  Interval getPlaceInterval(const Place &) const;
+  /// replace place references
+  Formula * replacePlace(const Place &, const Place &) const;
   //@}
   
 protected: /* protected methods */
@@ -221,6 +237,8 @@ public: /* public methods */
   std::ostream & output(std::ostream &) const;
   /// set of places implied to be empty
   std::set<const Place *> getEmptyPlaces() const;
+  /// get the valid interval of a place
+  Interval getPlaceInterval(const Place &) const;
   /// returns formula type
   Type getType() const;
   /// removes negation
@@ -229,6 +247,10 @@ public: /* public methods */
   Formula * negate() const;
   /// forms formula in disjunctive normal form
   Formula * dnf() const;
+  /// evaluates the formula partially and replaces propositions by constants
+  Formula * evaluatePlace(const Place &) const;
+  /// replace place references
+  Formula * replacePlace(const Place &, const Place &) const;
   //@}
   
 protected: /* protected methods */
@@ -268,6 +290,8 @@ public: /* public methods */
   std::ostream & output(std::ostream &) const;
   /// set of places implied to be empty
   std::set<const Place *> getEmptyPlaces() const;
+  /// get the valid interval of a place
+  Interval getPlaceInterval(const Place &) const;
   /// returns formula type
   Type getType() const;
   /// removes negation
@@ -276,11 +300,19 @@ public: /* public methods */
   Formula * negate() const;
   /// forms formula in disjunctive normal form
   Formula * dnf() const;
+  /// evaluates the formula partially and replaces propositions by constants
+  Formula * evaluatePlace(const Place &) const;
+  /// replace place references
+  Formula * replacePlace(const Place &, const Place &) const;
   //@}
   
 protected: /* protected methods */
   /// simplify child formulae
   void simplifyChildren();
+  
+private: /* private methods */
+  /// constructor needed by evaluatePlace and replacePlace
+  Disjunction();
 };
 
 
@@ -332,6 +364,8 @@ public: /* public methods */
   Type getType() const;
   /// negates the formula
   Formula * negate() const;
+  /// get the valid interval of a place
+  Interval getPlaceInterval(const Place &) const;
 };
 
 /*!
@@ -350,6 +384,8 @@ public: /* public methods */
   Type getType() const;
   /// negates the formula
   Formula * negate() const;
+  /// get the valid interval of a place
+  Interval getPlaceInterval(const Place &) const;
 };
 
 /*!
@@ -367,12 +403,18 @@ public: /* public methods */
   FormulaEqual * clone(const std::map<const Place *, const Place *> * = NULL) const;
   /// output the formula
   std::ostream & output(std::ostream &) const;
-  /// set of places implied to be empty
-  std::set<const Place *> getEmptyPlaces() const;
   /// returns formula type
   Type getType() const;
   /// negates the formula
   Formula * negate() const;
+  /// evaluates the formula partially and replaces propositions by constants
+  Formula * evaluatePlace(const Place &) const;
+  /// set of places implied to be empty
+  std::set<const Place *> getEmptyPlaces() const;
+  /// get the valid interval of a place
+  Interval getPlaceInterval(const Place &) const;
+  /// replace place references
+  Formula * replacePlace(const Place &, const Place &) const;
 };
 
 /*!
@@ -396,6 +438,12 @@ public: /* public methods */
   Formula * removeNegation() const;
   /// negates the formula
   Formula * negate() const;
+  /// evaluates the formula partially and replaces propositions by constants
+  Formula * evaluatePlace(const Place &) const;
+  /// get the valid interval of a place
+  Interval getPlaceInterval(const Place &) const;
+  /// replace place references
+  Formula * replacePlace(const Place &, const Place &) const;
 };
 
 /*!
@@ -417,6 +465,12 @@ public: /* public methods */
   Type getType() const;
   /// negates the formula
   Formula * negate() const;
+  /// evaluates the formula partially and replaces propositions by constants
+  Formula * evaluatePlace(const Place &) const;
+  /// get the valid interval of a place
+  Interval getPlaceInterval(const Place &) const;
+  /// replace place references
+  Formula * replacePlace(const Place &, const Place &) const;
 };
 
 /*!
@@ -438,6 +492,12 @@ public: /* public methods */
   Type getType() const;
   /// negates the formula
   Formula * negate() const;
+  /// evaluates the formula partially and replaces propositions by constants
+  Formula * evaluatePlace(const Place &) const;
+  /// get the valid interval of a place
+  Interval getPlaceInterval(const Place &) const;
+  /// replace place references
+  Formula * replacePlace(const Place &, const Place &) const;
 };
 
 /*!
@@ -455,12 +515,18 @@ public: /* public methods */
   FormulaLess * clone(const std::map<const Place *, const Place *> * = NULL) const;
   /// output the formula
   std::ostream & output(std::ostream &) const;
-  /// set of places implied to be empty
-  std::set<const Place *> getEmptyPlaces() const;
   /// returns formula type
   Type getType() const;
   /// negates the formula
   Formula * negate() const;
+  /// evaluates the formula partially and replaces propositions by constants
+  Formula * evaluatePlace(const Place &) const;
+  /// set of places implied to be empty
+  std::set<const Place *> getEmptyPlaces() const;
+  /// get the valid interval of a place
+  Interval getPlaceInterval(const Place &) const;
+  /// replace place references
+  Formula * replacePlace(const Place &, const Place &) const;
 };
 
 /*!
@@ -478,13 +544,57 @@ public: /* public methods */
   FormulaLessEqual * clone(const std::map<const Place *, const Place *> * = NULL) const;
   /// output the formula
   std::ostream & output(std::ostream &) const;
-  /// set of places implied to be empty
-  std::set<const Place *> getEmptyPlaces() const;
   /// returns formula type
   Type getType() const;
   /// negates the formula
   Formula * negate() const;
+  /// evaluates the formula partially and replaces propositions by constants
+  Formula * evaluatePlace(const Place &) const;
+  /// get the valid interval of a place
+  Interval getPlaceInterval(const Place &) const;
+  /// set of places implied to be empty
+  std::set<const Place *> getEmptyPlaces() const;
+  /// replace place references
+  Formula * replacePlace(const Place &, const Place &) const;
 };
+
+/*!
+ * \brief interval of the marking of a place to fullfill the condition
+ * 
+ * The lower bound ranges from 0 to any positive number. The upper bound
+ * ranges from any positive number to -2, whereas 0 means there a at most
+ * 0 token allowed, -2 means there is no limit and -1 means, there are at most
+ * less than 0 token allowed, which means the final condition equals to false
+ * at any given marking for the place in question.
+ */
+class Interval
+{
+private: /* private variables */
+  /// lower bound
+  int lower_;
+  /// upper bound
+  int upper_;
+  /// excluded intervals
+  std::map<int, int> excludes_;
+  
+public: /* public methods */
+  /// constructor
+  Interval(int = 0, int = -2);
+  /// exclude an interval
+  void exclude(int, int);
+  /// union of two intervals
+  Interval & operator||(const Interval &);
+  /// intersection of two intervals
+  Interval & operator&&(const Interval &);
+  
+  /// whether inteval contains the given value
+  bool isIn(int) const;
+  /// upper bound
+  int getUpper() const;
+  /// lower bound
+  int getLower() const;
+};
+
 
 } /* namespace formula */
 

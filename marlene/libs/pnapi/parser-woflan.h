@@ -129,7 +129,7 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
     {
 
 /* Line 34 of lalr1.cc  */
-#line 63 "parser-woflan.yy"
+#line 64 "parser-woflan.yy"
 
   int yt_int;
   char * yt_str;

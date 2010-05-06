@@ -113,8 +113,8 @@ option "sa2on" -
   "Sets the kind of converter from a state automaton to an open net. (State machine conversion is always the fall back)."
   string
   typestr="TYPE"
-  values="petrify","genet","statemachine" enum
-  default="petrify"
+  values="genet","petrify","statemachine" enum
+  default="genet"
   optional
   hidden
   

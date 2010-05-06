@@ -13,9 +13,9 @@
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-04-18 18:01:24 +0200 (Sun, 18 Apr 2010) $
+ * \date    $Date: 2010-05-05 02:40:00 +0200 (Wed, 05 May 2010) $
  *
- * \version $Revision: 5658 $
+ * \version $Revision: 5700 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -159,8 +159,7 @@ public: /* public types */
     SELF_LOOP_PLACES = (1 << 16),
     SELF_LOOP_TRANSITIONS = (1 << 17),
     EQUAL_PLACES = (1 << 18),
-    KEEP_NORMAL = (1 << 19),
-    ONCE = (1 << 20),
+    ONCE = (1 << 19),
     LEVEL_1 = DEAD_NODES,
     LEVEL_2 = (LEVEL_1 | UNUSED_STATUS_PLACES | SUSPICIOUS_TRANSITIONS),
     LEVEL_3 = (LEVEL_2 | IDENTICAL_PLACES | IDENTICAL_TRANSITIONS),
@@ -204,6 +203,50 @@ public: /* public types */
     W_NONE = 0,
     W_INTERFACE_PLACE_IN_FINAL_CONDITION = 1
   };
+  
+private: /* private types */
+  /*!
+   * \brief Cache for reductions 
+   */
+  struct ReductionCache
+  {
+    /// constructor
+    ReductionCache(PetriNet &);
+    
+    /// reference to own net
+    PetriNet & net_;
+    
+    /// add a place to the cache
+    void addPlace(Place &);
+    /// add a transition to the cache
+    void addTransition(Transition &);
+    /// remove a place from the cache
+    void removePlace(Place &);
+    /// remove a transition from the cache
+    void removeTransition(Transition &);
+    
+    /// places with empty preset
+    std::set<Place *> emptyPresetP_;
+    /// transitions with empty preset
+    std::set<Transition *> emptyPresetT_;
+    /// places with empty postset
+    std::set<Place *> emptyPostsetP_;
+    /// transitions with empty postset
+    std::set<Transition *> emptyPostsetT_;
+    
+    /// places with singleton preset
+    std::set<Place *> singletonPresetP_;
+    /// transitions with singleton preset
+    std::set<Transition *> singletonPresetT_;
+    /// places with singleton postset
+    std::set<Place *> singletonPostsetP_;
+    /// transitions with singleton postset
+    std::set<Transition *> singletonPostsetT_;
+    
+    /// interval of valid final place markings
+    std::map<Place *, formula::Interval> intervals_;
+  };
+  
   
 private: /* private static variables */
   /// path to petrify
@@ -261,7 +304,7 @@ private: /* private variables */
   /// warning flags
   unsigned int warnings_;
   /// cache for reduction
-  std::set<const Place *> * reducablePlaces_;
+  ReductionCache * reductionCache_;
   //@}
   
   /*!
@@ -508,15 +551,15 @@ private: /* private methods */
   /// check if the preset of a set stores only one item
   bool reduce_singletonPreset(const std::set<Node *> &);
   /// fusion of pre- with posttransition (m to n)
-  unsigned int reduce_rule_5(bool);
+  unsigned int reduce_rule_5();
   /// fusion of pre- with posttransition (1 to n)
-  unsigned int reduce_rule_6(bool);
+  unsigned int reduce_rule_6();
   /// elimination of self-loop places
   unsigned int reduce_rule_7();
   /// elimination of self-loop transitions
   unsigned int reduce_rule_8();
   /// fusion of pre- with postplaces
-  unsigned int reduce_rule_9(bool);
+  unsigned int reduce_rule_9();
   /// elimination of identical places
   unsigned int reduce_identical_places();
   /// elimination of identical transitions
@@ -524,7 +567,7 @@ private: /* private methods */
   /// fusion of series places
   unsigned int reduce_series_places();
   /// fusion of series transitions
-  unsigned int reduce_series_transitions(bool);
+  unsigned int reduce_series_transitions();
   /// elimination of self-loop places
   unsigned int reduce_self_loop_places();
   /// elimination of self-loop transitions

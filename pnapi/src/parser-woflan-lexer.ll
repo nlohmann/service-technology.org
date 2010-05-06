@@ -68,8 +68,8 @@ init				{ return tt::KEY_INIT; }
 ~				{ return tt::TILDE; }
 
  /* identifiers */
-[0-9]+          { yylval->yt_int = atoi(yytext); return tt::NUMBER; }
-"\""[^\"]+"\""          { yylval->yt_str = strdup(yytext); return tt::IDENT; }
+[0-9]+                  { yylval->yt_int = atoi(yytext); return tt::NUMBER; }
+"\""[^\"]+"\""          { yylval->yt_str = strndup(yytext + 1, strlen(yytext) - 2); return tt::IDENT; }
 
  /* whitespace */
 [ \n\r\t]                        { /* skip */ } 

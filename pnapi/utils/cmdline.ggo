@@ -19,6 +19,10 @@ option "output" o
   values="owfn","lola","pnml","sa","tpn","dot","png","pdf","eps","svg" enum
   optional
   multiple
+
+option "canonicalNames" -
+  "Renames nodes in Woflan nets to avoid problems with conversion to other formats"
+  flag off
   
 option "formula" f
   "Places a final condition at the end of LoLA files. Has no effect to other output formats."
@@ -140,11 +144,6 @@ option "suffix_sa" -
 option "stats" -
   "Display time and memory consumption on termination."
   details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
-  flag off
-  hidden
-
-option "canonicalNames" -
-  "Renames nodes in Woflan nets to avoid problems with conversion to LoLA format"
   flag off
   hidden
 

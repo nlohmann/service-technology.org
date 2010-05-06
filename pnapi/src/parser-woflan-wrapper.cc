@@ -82,15 +82,5 @@ Parser::Parser() :
 {
 }
 
-/*!
- * \brief get the substring of a given string
- */
-char * Parser::substr(const char * pstr, int start, int numchars)
-{
-  char * pnew = (char *) malloc(numchars + 1);
-  strncpy(pnew, pstr + start, numchars);
-  pnew[numchars] = '\0';
-  return pnew;
-}
 
 } } } /* namespace pnapi::parser::lola */

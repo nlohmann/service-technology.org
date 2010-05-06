@@ -11,11 +11,13 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
             syntax_example3.owfn syntax_example4.owfn bug13579.owfn \
             bug13968.sa bug13990.1.owfn bug13990.2.owfn bug13990.3.owfn \
             bug14064.owfn bug14116.owfn bug14117.sa bug14119.1.owfn \
-            bug14119.2.owfn bug14125.1.owfn bug14125.2.owfn bug14127.owfn \
+            bug14119.2.owfn bug14127.owfn \
             bug14128.1.owfn bug14128.2.owfn bug14206.lola bug14208.1.owfn \
             bug14208.2.owfn bug14335.owfn bug14411.owfn \
             bug14411-constraint.owfn bug14417.1.owfn bug14417.2.owfn \
-            bug14856.owfn bug15415.owfn data.hlowfn eisen.hlowfn myCoffee.owfn phils.hlowfn \
+            bug14856.owfn bug15415.owfn \
+	    bug_15820_sp.owfn bug_15820_sp_2.owfn \
+            data.hlowfn eisen.hlowfn myCoffee.owfn phils.hlowfn \
             woflan1.xml.tpn woflan2.xml.tpn woflan3.xml.tpn \
 	    woflan4.xml.tpn woflan5.xml.tpn woflan6.xml.tpn \
             test_cdnf.owfn test_input.lola test_dead_nodes.net.owfn \
@@ -24,7 +26,6 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
             test_input_roles_error.owfn test_self_loop_places.net.owfn \
             test_self_loop_transitions.net.owfn test_series_places.net.owfn \
             test_series_transitions.net.owfn \
-            test_series_transitions_keepnormal.net.owfn \
             test_starke_3p.net.owfn test_starke_3t.net.owfn \
             test_starke_4.net.owfn test_starke_5.net.owfn \
             test_starke_6.net.owfn test_starke_7.net.owfn \
@@ -80,8 +81,7 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
             prom-g24_alphaPlusPlusAlgorithm.pnml prom-testnet.pnml \
             prom-Heuristic_withLazyTasks.pnml prom-OverlyPreciseModel.pnml \
             prom-originalModel.pnml N0.owfn N1.owfn N2.owfn N3.owfn \
-            travel.owfn travel2.owfn prom-bla.pnml \
-            bug_15820_sp.owfn bug_15820_sp_2.owfn
+            travel.owfn travel2.owfn prom-bla.pnml
 
 
 # Below you can list all the files you do not want to have counted in the

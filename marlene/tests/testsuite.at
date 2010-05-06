@@ -324,6 +324,8 @@ AT_CHECK_LOLA
 #AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_DATA([my.conf],[verbose
+genet =
+petrify =
 ])
 AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --conf=my.conf --stats],0,ignore,stderr)
 AT_CHECK([GREP -q "using configuration file 'my.conf'" stderr],0)
@@ -336,6 +338,8 @@ AT_CHECK_LOLA
 #AT_CHECK_PETRIFY
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_DATA([marlene.conf],[verbose
+genet =
+petrify =
 ])
 AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --stats],0,ignore,stderr)
 AT_CHECK([GREP -q "using configuration file 'marlene.conf'" stderr],0)

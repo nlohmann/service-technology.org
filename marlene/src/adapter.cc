@@ -246,13 +246,13 @@ const pnapi::PetriNet * Adapter::buildController()
     std::string candy_command;
 
     std::string path2wendy = std::string(args_info.wendy_arg);
-    if ( path2wendy == "" or path2wendy == "\"not found\"")
+    if ( path2wendy == "" or path2wendy == "\"\"")
     {
         path2wendy = std::string(CONFIG_WENDY);
     }
 
     std::string path2candy = std::string(args_info.candy_arg);
-    if ( path2candy == "" or path2candy == "\"not found\"" )
+    if ( path2candy == "" or path2candy == "\"\"" )
     {
         path2candy = std::string(CONFIG_CANDY);
     }
@@ -358,13 +358,13 @@ const pnapi::PetriNet * Adapter::buildController()
     status("Argument path to petrify %s", args_info.petrify_arg);
 
     std::string path2genet = std::string(args_info.genet_arg);
-    if ( path2genet == "" or path2genet == "\"not found\"" )
+    if ( path2genet == "" or path2genet == "\"\"" )
     {
         path2genet = std::string(CONFIG_GENET);
     }
 
     std::string path2petrify = std::string(args_info.petrify_arg);
-    if ( path2petrify == "" or path2petrify == "\"not found\"" )
+    if ( path2petrify == "" or path2petrify == "\"\"" )
     {
         path2petrify = std::string(CONFIG_PETRIFY);
     }

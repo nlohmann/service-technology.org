@@ -3,7 +3,7 @@ args "--include-getopt"
 description "About Cosme:"
 purpose "Cosme (Check Operating Guidelines for Simulation, Matching and Equivalence) is a tool for 3-bit Operating Guidelines."
 
-section "Input"
+section "Input/Output"
 
 option "OGA" a
   "Input file for first Operating Guideline (smaller one). "
@@ -20,6 +20,13 @@ option "ServiceC" c
   "Input file for service. "
   string
   typestr="FILENAME"
+  optional
+
+option "resultFile" r
+  "Results output."
+  string
+  typestr="FILENAME"
+  argoptional
   optional
 
 section "Tasks"

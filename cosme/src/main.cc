@@ -13,6 +13,7 @@
 #include "Output.h"
 #include "verbose.h"
 #include "util.h"
+#include "Results.h"
 #include <pnapi/pnapi.h>
 
 // lexer and parser
@@ -219,6 +220,12 @@ int main(int argc, char** argv) {
     // set the function to call on normal termination
     atexit(terminationHandler);
 
+    // set a standard filename
+    std::string filename = std::string(PACKAGE) + "_output";
+
+    // return value
+    bool ret = false;
+
     evaluateParameters(argc, argv);
 
     if (args_info.matching_flag) {
@@ -231,7 +238,9 @@ int main(int argc, char** argv) {
         C->calculateBitSets(GlobalLabels);
         A->calculateBitSets(GlobalLabels);
 
-        if (A->isMatching(*C)) {
+	ret = A->isMatching(*C);	
+
+        if (ret) {
             message("%s: %s", _cimportant_("Matching"), _cgood_("completed"));
         } else {
             message("%s: %s", _cimportant_("Matching"), _cbad_("failed"));
@@ -260,13 +269,15 @@ int main(int argc, char** argv) {
         status("Operating guideline B contains %d markings", B->size());
 
         if (args_info.simulation_flag) {
-            if (A->isSimulation(*B)) {
+	    ret = A->isSimulation(*B);
+            if (ret) {
                 message("%s: %s", _cimportant_("Simulation"), _cgood_("completed"));
             } else {
                 message("%s: %s", _cimportant_("Simulation"), _cbad_("failed"));
             }
         } else {
-            if (A->isEquivalent(*B)) {
+	    ret = A->isEquivalent(*B);
+            if (ret) {
                 message("%s: %s", _cimportant_("Equivalence"), _cgood_("completed"));
             } else {
                 message("%s: %s", _cimportant_("Equivalence"), _cbad_("failed"));
@@ -285,6 +296,26 @@ int main(int argc, char** argv) {
             time(&end_time);
             status("released memory [%.0f sec]", difftime(end_time, start_time));
         }
+
+    }
+
+    // results output
+    if (args_info.resultFile_given) {
+	std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : filename + ".results";
+        Results results(results_filename);
+
+        results.add("meta.package_name", (char*)PACKAGE_NAME);
+        results.add("meta.package_version", (char*)PACKAGE_VERSION);
+        results.add("meta.svn_version", (char*)VERSION_SVN);
+        results.add("meta.invocation", invocation);
+
+	if (args_info.matching_flag) {
+	    results.add("matching.result", ret);
+	} else if (args_info.simulation_flag) {
+	    results.add("simulation.result", ret);	
+	} else if (args_info.equivalence_flag) {
+            results.add("equivalence.result", ret);
+	}
 
     }
 

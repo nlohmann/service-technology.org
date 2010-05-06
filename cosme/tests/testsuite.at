@@ -18,7 +18,6 @@ AT_CHECK([COSME --version],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
-
 ############################################################################
 AT_BANNER([Parameters])
 ############################################################################
@@ -29,6 +28,14 @@ AT_CHECK([cp TESTFILES/OGs/AP.bits.og TESTFILES/Services/AP-partner.owfn .])
 AT_CHECK([COSME --matching -a AP.bits.og -c AP-partner.owfn --stats], 0, ignore, stderr)
 AT_CHECK([GREP -q "runtime" stderr])
 AT_CHECK([GREP -q "memory consumption" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Results output])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/OGs/AP.bits.og TESTFILES/Services/AP-partner.owfn .])
+AT_CHECK([COSME --matching -a AP.bits.og -c AP-partner.owfn --resultFile=AP.results], 0, ignore, stderr)
+AT_CHECK([GREP -q "result = true;" AP.results])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 

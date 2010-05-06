@@ -5,6 +5,7 @@ cosme_SOURCES = og-syntax.yy og-lexic.ll \
               graph-syntax.yy graph-lexic.ll \
 	      util.h \
               main.cc types.h \
+	      Results.cc Results.h \	
               BitSetC.cc BitSetC.h \
               Label.cc Label.h \
               OperatingGuideline.cc OperatingGuideline.h \

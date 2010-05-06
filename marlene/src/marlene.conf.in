@@ -28,5 +28,5 @@ genet = '"@GENET@"'
 # 'XXXXXX' which is replaced at runtime with a random string.
 
 
-tmpfile = '"@TEMPFOLDER@"'
+tmpfile = @TEMPFOLDER@
 

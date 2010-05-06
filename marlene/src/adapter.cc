@@ -25,6 +25,7 @@
 #include <sstream>
 #include <algorithm> // for min/max
 #include <ctime>
+#include <cstdio>
 #include <sys/types.h>
 #if defined(HAVE_SYS_WAIT_H) && ! defined(__MINGW32__)
 # include <sys/wait.h>
@@ -244,10 +245,22 @@ const pnapi::PetriNet * Adapter::buildController()
     std::string wendy_command;
     std::string candy_command;
 
+    std::string path2wendy = std::string(args_info.wendy_arg);
+    if ( path2wendy == "" )
+    {
+        path2wendy = std::string(CONFIG_WENDY);
+    }
+
+    std::string path2candy = std::string(args_info.candy_arg);
+    if ( path2candy == "" )
+    {
+        path2candy = std::string(CONFIG_CANDY);
+    }
+
     // should we diagnose?
     if (args_info.diagnosis_flag)
     {
-        wendy_command = std::string(args_info.wendy_arg) + " " + owfn_filename
+        wendy_command = path2wendy + " " + owfn_filename
                         + " --diagnose --im --mi --og=" + og_filename;
     }
     else
@@ -258,9 +271,9 @@ const pnapi::PetriNet * Adapter::buildController()
             cf_file.stream() << cost_file_content;
 
             // optimization
-            wendy_command = std::string(args_info.wendy_arg) + " "
+            wendy_command = path2wendy + " "
                             + owfn_filename + " --og=-";
-            candy_command = " | " + std::string(args_info.candy_arg)
+            candy_command = " | " + path2candy
                             + " --automata --output=" + sa_filename
                             + " --costfile=" + cost_filename;
         }
@@ -272,7 +285,7 @@ const pnapi::PetriNet * Adapter::buildController()
                 property = "livelock";
             }
             // default behavior
-            wendy_command = std::string(args_info.wendy_arg) + " "
+            wendy_command = path2wendy + " "
                             + "--correctness=" + property + " "
                             + owfn_filename + " --sa=" + sa_filename; // + " --og=" + og_filename;
         }
@@ -341,23 +354,37 @@ const pnapi::PetriNet * Adapter::buildController()
     time(&start_time);
     delete _controller;
 
-    status("Path to petrify %s", args_info.petrify_arg);
-    status("Path to genet %s", args_info.genet_arg);
+    status("Argument path to genet %s", args_info.genet_arg);
+    status("Argument path to petrify %s", args_info.petrify_arg);
 
-    if (args_info.sa2on_arg == sa2on_arg_petrify and std::string(args_info.petrify_arg) != "\"not found\"") // && _contType == ASYNCHRONOUS)
+    std::string path2genet = std::string(args_info.genet_arg);
+    if ( path2genet == "" )
+    {
+        path2genet = std::string(CONFIG_GENET);
+    }
 
+    std::string path2petrify = std::string(args_info.petrify_arg);
+    if ( path2petrify == "" )
+    {
+        path2petrify = std::string(CONFIG_PETRIFY);
+    }
+
+    status("Path to genet %s", path2genet.c_str());
+    status("Path to petrify %s", path2petrify.c_str());
+
+    if (args_info.sa2on_arg == sa2on_arg_genet and (path2genet != "\"not found\""))   // && _contType == ASYNCHRONOUS)
+
+        {
+            status("Using Genet for conversion from SA to open net.");
+            pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::GENET);
+            pnapi::PetriNet::setGenet(path2genet);
+            _controller = new pnapi::PetriNet(*mpp_sa);
+        }
+    else if (args_info.sa2on_arg == sa2on_arg_petrify and path2petrify != "\"not found\"") // && _contType == ASYNCHRONOUS)
     {
         status("Using Petrify for conversion from SA to open net.");
         pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::PETRIFY);
-        pnapi::PetriNet::setPetrify(args_info.petrify_arg);
-        _controller = new pnapi::PetriNet(*mpp_sa);
-    }
-    else if (args_info.sa2on_arg == sa2on_arg_genet and std::string(args_info.genet_arg) != "\"not found\"")   // && _contType == ASYNCHRONOUS)
-
-    {
-        status("Using Genet for conversion from SA to open net.");
-        pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::GENET);
-        pnapi::PetriNet::setGenet(args_info.genet_arg);
+        pnapi::PetriNet::setPetrify(path2petrify);
         _controller = new pnapi::PetriNet(*mpp_sa);
     }
     else
@@ -367,6 +394,21 @@ const pnapi::PetriNet * Adapter::buildController()
         _controller = new pnapi::PetriNet(*mpp_sa);
     }
     delete mpp_sa;
+
+    //cleaning up files
+    if ( not args_info.noClean_flag )
+    {
+        status("cleaning up temporary files.");
+        status(" ... deleting %s.", sa_filename.c_str());
+        remove(sa_filename.c_str());
+        if (args_info.costoptimized_flag)
+        {
+            status(" ... deleting %s.", og_filename.c_str());
+            remove(og_filename.c_str());
+            status(" ... deleting %s.", cost_filename.c_str());
+            remove(cost_filename.c_str());
+        }
+    }
 
     {
         // CG workaround

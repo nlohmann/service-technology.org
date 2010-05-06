@@ -35,7 +35,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @title Marlene
 
 @subtitle Making adapters behave
-@subtitle @url{http://service-technology.org/marlene}
+@subtitle @url{http://service-technology.org/tools/marlene}
 @vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}
 

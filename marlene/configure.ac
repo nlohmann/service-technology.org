@@ -1,4 +1,4 @@
-AC_INIT([Marlene],[1.1-tscspecial],[marlene@service-technology.org])
+AC_INIT([Marlene],[1.1-tscspecial],[marlene@service-technology.org],[marlene],[http://service-technology.org/tools/marlene])
 
 AC_MSG_NOTICE([  ______              _                    ])
 AC_MSG_NOTICE([ |  ___ \            | |                   ])
@@ -9,7 +9,7 @@ AC_MSG_NOTICE([ |_||_||_|\_||_|_|   |_|\____)_| |_|\____) ])
 AC_MSG_NOTICE()
 #AC_MSG_NOTICE([ Generating behavioral adapters ])
 AC_MSG_NOTICE([ Making adapters behave ])
-AC_MSG_NOTICE([ http://service-technology.org/marlene ])
+AC_MSG_NOTICE([ http://service-technology.org/tools/marlene ])
 AC_MSG_NOTICE([ version ${PACKAGE_VERSION} ])
 AC_MSG_NOTICE()
 
@@ -33,10 +33,26 @@ AC_ST_PNAPI
 AC_ST_VERBOSE
 
 # search for optional tools needed by "make check"
-AC_PATH_PROG(WENDY, [wendy], [])
-AC_PATH_PROG(CANDY, [candy], [])
 AC_PATH_PROG(VALGRIND, [valgrind], not found)
 AC_PATH_PROG(DIFF, [diff], not found)
+
+AC_PATH_PROGS(WENDY, [wendy], not found)
+if test "$WENDY" = "not found"; then
+  AC_MSG_WARN([Wendy was not found. See file README.])
+  AC_DEFINE(CONFIG_WENDY, "not found", [Wendy was not found.])
+else
+  AC_DEFINE_UNQUOTED(CONFIG_WENDY, "${WENDY}", [Wendy can be used.])
+fi
+AC_SUBST(WENDY)
+
+AC_PATH_PROGS(CANDY, [candy], not found)
+if test "$CANDY" = "not found"; then
+  AC_MSG_WARN([Candy was not found. See file README.])
+  AC_DEFINE(CONFIG_CANDY, "not found", [Candy was not found.])
+else
+  AC_DEFINE_UNQUOTED(CONFIG_CANDY, "${CANDY}", [Candy can be used.])
+fi
+AC_SUBST(CANDY)
 
 AC_PATH_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], not found)
 if test "$PETRIFY" = "not found"; then

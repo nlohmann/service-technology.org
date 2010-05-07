@@ -36,12 +36,12 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @title Sara
 
-@subtitle <<-- MISSION STATEMENT -->>
+@subtitle Structures for Automated Reachability Analysis
 @subtitle @url{http://service-technology.org/sara}
 @vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}
 
-@author <<-- AUTHOR -->>
+@author Harro Wimmel
 @page
 @vskip 0pt plus 1filll
 @insertcopying
@@ -138,7 +138,7 @@ The distribution contains several directories:
 
 @table @file
 @item doc
-The Texinfo documentation of Sara. The documentation can be created using @samp{make pdf}. Note you need to have Hello properly installed before (see installation description above).
+The Texinfo documentation of Sara. The documentation can be created using @samp{make pdf}. Note you need to have Sara properly installed before (see installation description above).
 
 @item libs
 The Petri Net @acronym{API} used by Sara to parse and organize a Petri net.
@@ -209,38 +209,202 @@ Please check our nightly build server at @url{http://service-technology.org/nigh
 
 Sara is a command line tool and does not come with a fancy @acronym{GUI}. However, Sara can be easily scripted and combined with other tools.
 
+@section What Sara can do
+
+Sara is a tool for solving the reachability problem for Petri nets. Given a low-level Petri net, i.e. sets of places and
+transitions with weighted arcs between them, and an initial and a final marking, Sara tries to determine whether the final
+marking can be reached from the initial marking by firing a sequence of transitions in the Petri net. While the initial
+marking must be a map from the places to non-negative integers, that means one single marking, the final marking can be
+somewhat generalized. It is possible -- for each place on its own -- to declare that the given number must be reached
+exactly (as for the initial marking), covered (a higher value is allowed), or bounded (a lower value is permissible).
+In addition, more general constraints may be formulated which the final marking must fulfill. Such a constraint can be
+any linear (in)equation built from places and transitions.
+
+As a by-product, also problems of form ``given a Petri net, an initial marking, and a transition multiset, is the
+multiset realizable?'' can be solved. Realizable means that there is a firing sequence in the Petri net that
+contains each transition exactly as often as the transition multiset dictates.
+
+If Sara can compute the problem given, it should either tell the user that there is a solution and present a firing
+sequence proving this, or it should tell that the problem is infeasible. In the latter case, Sara might provide
+additional information that gives some insight into why the problem is infeasible. 
+
 @section Command Line Options
 
-For an overview of the command line options, type @samp{sara -h} to see the following help screen:
+For an overview of the command line options, type @samp{sara --detailed-help} to see the following help screen:
 
 @smallexample
 @verbatiminclude cmdline.out
 @end smallexample
 
+@section Creating a Problem
 
-@section Configuration Files
-
-The parameters can also be controlled using a configuration file that can be read using the @samp{config} option; for example:
+Before solving problems is possible one must first be able to formulate these problems. Sara offers several
+options here. Assume there is a Petri net @file{test2.owfn} in one of the formats supported by the parsers, here the
+open net format *.owfn (all example nets can be found in the @file{tests/testfiles} folder). The Petri net
+file is expected to contain the net itself and the initial marking. If the initial marking is missing, it is assumed to
+be zero on all places. In our example, the initial marking is @samp{i1+i2}, i.e. one token on place @samp{i1}, one token on @samp{i2},
+and no other tokens. For the final marking @samp{o1+o}2 is chosen. A problem statement can now be generated.
 
 @cartouche
 @smallexample
-sara net.owfn --config=myconf.conf
+sara -r test2.owfn -O -f"o1,o2"
 @end smallexample
 @end cartouche
 
-A configuration file consistes of @code{paramter = value} lines, each line setting the value of a parameter. Note: If not all parameters are defined, the standard values apply.
+The command line option @samp{-r} declares @file{test2.owfn} as input for a reachability problem, using the file's net structure
+and initial marking. The option @samp{-O} declares the net to be in the open net format (compared to the LOLA *.llnet-format
+without the option). The final marking is taken from the @samp{-f} option that should be followed by a comma-separated list
+with one entry for each place having more than zero tokens. If there is no number of tokens given, like here, it is
+assumed a place should have exactly one token.
 
-The configure script creates a default configuration file @file{hello.conf} which located in the @file{src} folder. When installing Hello, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
+The result is a new file @file{test2.owfn.sara} (with just .sara appended to the original filename).
+It has the following content, defining the problem statement.
 
-When Hello is executed, it evaluates parameters as follows:
-@enumerate
-@item When a configuration file is given via @option{--config}, it is used.
-@item Otherwise, the configuration file @file{hello.conf} in the local directory is used if present.
-@item Otherwise, the configuration file @file{hello.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
-@item Otherwise, no configuration file is used.
-@end enumerate
-Parameters given via command-line will overwrite parameters given via configuration files.
+@cartouche
+@smallexample
+@verbatiminclude ../tests/testfiles/test2.sara
+@end smallexample
+@end cartouche
 
+The problem statement can of course be edited and e.g. the initial or final marking can be changed.
+In the file @file{test11.sara} there are three problem statements specifying very different final markings.
+
+@cartouche
+@smallexample
+@verbatiminclude ../tests/testfiles/test11.sara
+@end smallexample
+@end cartouche
+
+In each problem the initial marking contains exactly five tokens on each of the three places of the Petri
+net given in @file{test11.owfn}. The first problem specifies the final marking to have exactly four tokens 
+on each of the places, in the second problem any marking with at most four tokens on each place is considered
+to be fulfilling the goal, and in the last problem any of the infinitely many markings with at least four
+tokens on each of the places is a valid final marking.
+
+To obtain a problem statement like the third one, one could invoke Sara like this:
+
+@cartouche
+@smallexample
+sara -r test11.owfn -O -f"p1>4,p2>4,p3>4"
+@end smallexample
+@end cartouche
+
+Note the citation marks that are necessary to ensure the shell will not misinterpret the is-greater-than sign
+(actually meaning ``is greater or equal'' here) with its built-in output redirection functionality.
+
+If the user does not specify the number of tokens on some place in the initial or final marking, it is assumed
+to be zero. Usually, when a Petri net is large, there are many places with zero tokens in the initial or final
+marking. For the final marking, we have the option whether this number zero should be reached exactly (which is
+the same as an upper bound of zero) or if the number zero should be covered, meaning that any (non-negative)
+number of tokens is allowed. There is a global option selecting all unmentioned places in the final
+marking to be either exactly zero or to allow any number of tokens.
+
+@cartouche
+@smallexample
+sara -r test11.owfn -O -f"p1>4"
+sara -r test11.owfn -O -f"REACH p1>4"
+sara -r test11.owfn -O -f"p1>4,p2>0,p3>0"
+sara -r test11.owfn -O -f"COVER p1>4"
+@end smallexample
+@end cartouche
+
+The first two calls are synonymous and specify that the number of tokens on the places @samp{p2} and @samp{p3} should
+be exactly zero in the final marking. The third and fourth line both do not specify the number of tokens on @samp{p2}
+and @samp{p3}, i.e. they may be arbitrarily high.
+
+Either in addition to or as a replacement of the final marking global constraints can be formulated. Two example
+problems are given in @file{test15.sara}.
+
+@cartouche
+@smallexample
+@verbatiminclude ../tests/testfiles/test15.sara
+@end smallexample
+@end cartouche
+
+Here, @samp{c1} and @samp{c2} are places of the Petri net forming a global constraint @samp{c1+c2>=2}. The places represent
+the critical sections of two processes connected via a semaphore. Sara will test if it is possible to
+reach either both critical sections simultaneously or -- in case autoconcurrency should be possible --
+if a process can reach its critical section more than once at the same time. The first problem statement
+is generated by the following call:
+
+@cartouche
+@smallexample
+sara -r test15.owfn -O -f"COVER" -c"c1+c2>2"
+@end smallexample
+@end cartouche
+
+The option @samp{-f"COVER"} disregards unmentioned places (i.e. every place) in the final marking while the @samp{-c} option
+generates the linear constraint. The option @samp{-c} can be given more than once and the constraints may be more
+complex, allowing e.g. @samp{-c"3p1+5t1-7t3+p2<9"} where each of the places @samp{p1, p2} represent the number of token
+that place should have in the final marking and each of the transitions @samp{t1, t3} represent the number of
+occurrences of this transition in the firing sequence generated by Sara for the solution. Coefficients
+are just weights, the above line translates to: ``Three times the number of tokens on @samp{p1} plus five times
+the number of appearances of @samp{t1} in the firing sequence minus seven times of that of @samp{t3} plus the token number
+on @samp{p2} must be less than or equal to nine''.
+
+Besides the reachability check there are some more options that will generate other problem instances.
+A check if a Petri net contains any dead transitions can be generated for example by
+
+@cartouche
+@smallexample
+sara -q garavel.llnet
+@end smallexample
+@end cartouche
+
+Here, we use a Petri net in the LOLA-format that has been posted by H.Garavel in 2003 as a challenge. It contains
+776 transitions for which needs to be checked if they can fire at all or if they are dead. Sara generates a problem
+file @file{garavel.llnet.sara} with 776 problem instances, one for each transition.
+
+Also, a check whether a transition multiset is realizable can be generated. The file @file{test14.sara} contains four
+such problems that can be created by invoking Sara like this (each call creating only one of the problems):
+
+@cartouche
+@smallexample
+sara -R test14.owfn -O -f"a1:2,a2:2,a3:2,c1,c2,c3,d1,d2,d3,d4:2,e1,e2,e3,e4:2,x1"
+sara -R test14.owfn -O -f"a1:2,a2:2,a3:2,c1,c2,c3,d1,d2,d3,d4:2,e1,e2,e3,e4:2,x1:2"
+sara -R test14.owfn -O -f"a1,a3,c1,c2,c3,d2,d4,e2,e4,x1"
+sara -R test14.owfn -O -f"d1,e1,a2,d3,e3,x1"
+@end smallexample
+@end cartouche
+
+Again, writing @samp{:1} or omitting it does not make a difference. No greater-than or less-than signs are allowed, though. 
+The option @samp{-f}
+does not represent a final marking here but a transition multiset; @samp{a1,a2,a3,...} are all transitions of the Petri net.
+If Sara is fed with these problems, the tool will search for a firing sequence in which every transition appears
+exactly as often as mentioned in the multiset.
+ 
+@section Solving a Problem
+
+After creating a problem, Sara can try to solve it. There are three possible sources for problem instances that
+Sara can solve. A problem can be solved directly after its creation. An example for this could be:
+
+@cartouche
+@smallexample
+sara -q garavel.llnet -p
+@end smallexample
+@end cartouche
+
+Here, Sara creates the 776 problem instances checking Garavel's net for dead transitions and internally
+pipes them to its solving unit. The problem file @file{garavel.llnet.sara} is still written.
+
+Problems can also come in from the outside, either by a pipe through stdin or in form of a file.
+To read from stdin, the pipe option @samp{-p} needs to be specified.
+
+@cartouche
+@smallexample
+sara -p
+@end smallexample
+@end cartouche
+
+To read from a file, there is an option @samp{-i} available.
+
+@cartouche
+@smallexample
+sara -i garavel.llnet.sara
+@end smallexample
+@end cartouche
+
+@section Getting Output and Interpreting the Result
 
 @c --------------------------------------------------------------------------
 

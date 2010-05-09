@@ -2,7 +2,10 @@
 info_TEXINFOS = pnapi.texi
 
 # any other files you need to add (images)
-EXTRA_DIST =
+EXTRA_DIST = templates/parser-FORMAT.yy \
+	     templates/parser-FORMAT-lexer.ll \
+	     templates/parser-FORMAT-wrapper.h \
+	     templates/parser-FORMAT-wrapper.cc
 
 # the height of the README's ASCII art + URL + 3 spaces
 BANNERHEIGHT = 9

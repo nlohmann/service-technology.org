@@ -1070,7 +1070,7 @@ std::ios_base & owfn(std::ios_base & ios)
 /*!
  * \brief suppress role output
  */
-std::ostream & noRules(std::ostream & os)
+std::ostream & noRoles(std::ostream & os)
 {
   util::RoleData::data(os).role = true;
   return os;
@@ -1494,13 +1494,6 @@ std::ostream & output(std::ostream & os, const Edge & e)
 /*************************************************************************
  ***** Woflan output
  *************************************************************************/
-/*
-std::ostream & woflan(std::ostream & os)
-{
-  util::FormatData::data(os) = util::WOFLAN;
-  return os;
-}
-*/
 
 /*!
  * \brief writes output type to stream 

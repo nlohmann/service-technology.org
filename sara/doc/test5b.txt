@@ -1,0 +1,5 @@
+sara: Problem 1: test5
+sara: SOLUTION(13): a1 c1 c2 c3 e2 e3 e4 d2 d3 d4 a1 a2 a3 
+sara: SOLUTION(15): c1 c2 c3 d1 e1 e2 e3 d2 e4 d1 d3 d4 e1 a2 a3 
+sara: SOLUTION(14): e1 c1 c2 c3 d1 e2 e3 e4 d2 d3 d4 a1 a2 a3 
+

@@ -1,0 +1,15 @@
+PROBLEM semaphore_with_1_token:
+	GOAL REACHABILITY;
+	FILE test15.owfn TYPE OWFN;
+	INITIAL p1,p2,s;
+	FINAL COVER; 
+	CONSTRAINTS c1+c2>2;
+
+PROBLEM semaphore_with_2_tokens:
+	GOAL REACHABILITY;
+	FILE test15.owfn TYPE OWFN;
+	INITIAL p1,p2,s:2;
+	FINAL COVER;
+	CONSTRAINTS c1+c2>2;
+
+

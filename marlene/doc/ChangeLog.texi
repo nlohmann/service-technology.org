@@ -1,3 +1,11 @@
+@heading Version 1.2-unreleased
+
+@itemize
+
+@item improved test coverage of code
+
+@end itemize
+
 @heading Version 1.1-tscspecial
 
 Initially planned as 1.2 release, therefore lot of features in this version :)

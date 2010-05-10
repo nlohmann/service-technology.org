@@ -9,11 +9,8 @@ m4_define(AT_CHECK_DIFF, [AT_CHECK([if test "DIFF" == "not found"; then exit 77;
 m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not found"; then exit 77; fi])])
 m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not found"; then exit 77; fi])])
 m4_define(AT_GET_CONF, [cp CONFFILE .])
-#m4_define(AT_CHECK_FIONA, [AT_CHECK([if test "FIONA" == "not found"; then exit 77; fi])])
 
 AT_TESTED(versions.sh)
-#AT_TESTED(WENDY)
-#AT_TESTED(LOLA_FULL)
 
 
 ############################################################################
@@ -37,79 +34,96 @@ AT_BANNER([Small examples])
 AT_SETUP([Small test (synchronous 1)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar TESTFILES/sync1_exp.owfn .])
 AT_CHECK([MARLENE test.owfn --rulefile=test.ar --verbose],0,stdout,ignore)
-#AT_CHECK_DIFF
-#AT_CHECK([DIFF stdout sync1_exp.owfn])
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
 AT_SETUP([Small test (synchronous 2)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td.owfn TESTFILES/td_sync2.ar TESTFILES/sync2_exp.owfn .])
 AT_CHECK([MARLENE ca1_sync.owfn td.owfn --rulefile=td_sync2.ar --verbose],0,stdout,ignore)
-#AT_CHECK_DIFF
-#AT_CHECK([DIFF stdout sync2_exp.owfn])
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
 AT_SETUP([Small test (synchronous 3)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td_cyclic.owfn TESTFILES/td_sync2.ar TESTFILES/sync3_exp.owfn .])
 AT_CHECK([MARLENE ca1_sync.owfn td_cyclic.owfn --rulefile=td_sync2.ar --verbose],0,stdout,ignore)
-#AT_CHECK_DIFF
-#AT_CHECK([DIFF stdout sync3_exp.owfn])
+AT_KEYWORDS(sample)
+AT_CLEANUP
+
+AT_SETUP([Small test (synchronous 4)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_GET_CONF
+AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/some-rules.ar .])
+AT_CHECK([MARLENE ca1.owfn --rulefile=some-rules.ar --verbose],0,stdout,ignore)
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
 AT_SETUP([Small test (asynchronous 1)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar TESTFILES/async1_exp.owfn .])
 AT_CHECK([MARLENE test.owfn --rulefile=test.ar --asyncif --verbose],0,stdout,ignore)
-#AT_CHECK_DIFF
-#AT_CHECK([DIFF stdout async1_exp.owfn])
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
 AT_SETUP([Small test (asynchronous 2)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td.owfn TESTFILES/td_sync2.ar TESTFILES/async2_exp.owfn .])
 AT_CHECK([MARLENE ca1_sync.owfn td.owfn --rulefile=td_sync2.ar --asyncif --verbose],0,stdout,ignore)
-#AT_CHECK_DIFF
-#AT_CHECK([DIFF stdout async2_exp.owfn])
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
 AT_SETUP([Small test (asynchronous 3)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/ca1_sync.owfn TESTFILES/td_cyclic.owfn TESTFILES/td_sync2.ar TESTFILES/async3_exp.owfn .])
 AT_CHECK([MARLENE ca1_sync.owfn td_cyclic.owfn --rulefile=td_sync2.ar --asyncif --verbose],0,stdout,ignore)
-#AT_CHECK_DIFF
-#AT_CHECK([DIFF stdout async3_exp.owfn])
+AT_KEYWORDS(sample)
+AT_CLEANUP
+
+AT_SETUP([Small test (weak termination)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_GET_CONF
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar TESTFILES/sync1_exp.owfn .])
+AT_CHECK([MARLENE test.owfn --rulefile=test.ar --verbose --property=livelock],0,stdout,ignore)
+AT_KEYWORDS(sample)
+AT_CLEANUP
+
+AT_SETUP([Small test (arbitrary adapter)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_GET_CONF
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar TESTFILES/sync1_exp.owfn .])
+AT_CHECK([MARLENE test.owfn --rulefile=test.ar --verbose --type=arbitrary],0,stdout,ignore)
+AT_KEYWORDS(sample)
+AT_CLEANUP
+
+AT_SETUP([Small test (weak termination, arbitrary)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_GET_CONF
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar TESTFILES/sync1_exp.owfn .])
+AT_CHECK([MARLENE test.owfn --rulefile=test.ar --verbose --property=livelock --type=arbitrary],0,stdout,ignore)
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
 AT_SETUP([Small test (no complement)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/test-n.ar .])
 AT_CHECK([MARLENE test-n.owfn --rulefile=test-n.ar --nocomplementplaces --verbose],0,ignore,stderr)
@@ -120,7 +134,6 @@ AT_CLEANUP
 AT_SETUP([Small test (piping)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/test-n.ar .])
 AT_CHECK([MARLENE --rulefile=test-n.ar --nocomplementplaces --verbose < test-n.owfn > out.owfn],0,ignore,ignore)
@@ -130,7 +143,6 @@ AT_CLEANUP
 AT_SETUP([Small test (saving result)])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/test-n.owfn TESTFILES/test-n.ar .])
 AT_CHECK([MARLENE --rulefile=test-n.ar --nocomplementplaces --output=out.owfn --verbose < test-n.owfn],0,ignore,ignore)
@@ -145,7 +157,6 @@ AT_BANNER([Special options])
 AT_SETUP([Verbose and very verbose information])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
 AT_CHECK([MARLENE test.owfn --rulefile=test.ar --verbose --veryverbose],0,ignore,ignore)
@@ -174,7 +185,6 @@ AT_BANNER([Special adapters])
 AT_SETUP([control of rules])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --verbose],0,ignore,ignore)
@@ -184,7 +194,6 @@ AT_CLEANUP
 AT_SETUP([chatty adapter])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/ca2.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_CHECK([MARLENE ca2.owfn td.owfn --rulefile=td.ar --asyncif --chatty --verbose],0,ignore,ignore)
@@ -194,7 +203,6 @@ AT_CLEANUP
 AT_SETUP([arrogant adapter])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/ca2.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_CHECK([MARLENE ca2.owfn td.owfn --rulefile=td.ar --asyncif --arrogant --verbose],0,ignore,ignore)
@@ -205,14 +213,13 @@ AT_SETUP([costs optimized adapter])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_CHECK_CANDY
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td_ret.owfn TESTFILES/td_ret.ar .])
 AT_CHECK([MARLENE ca1.owfn td_ret.owfn --rulefile=td_ret.ar --costoptimized --verbose],0,ignore,ignore)
 AT_KEYWORDS(specadapters)
 AT_CLEANUP
 
-AT_SETUP([engine only])
+AT_SETUP([engine only [[1]]])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
 AT_GET_CONF
@@ -221,30 +228,47 @@ AT_CHECK([MARLENE test.owfn --rulefile=test.ar --engineonly --verbose],0,ignore,
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
-AT_SETUP([controller only])
+AT_SETUP([engine only [[2]]])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
+AT_GET_CONF
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
+AT_CHECK([MARLENE test.owfn --rulefile=test.ar --engineonly --verbose --output=out.owfn],0,ignore,ignore)
+AT_CHECK([test -f out.owfn])
+AT_KEYWORDS(sample)
+AT_CLEANUP
+
+AT_SETUP([controller only [[1]]])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
 AT_CHECK([MARLENE test.owfn --rulefile=test.ar --controlleronly --verbose],0,ignore,ignore)
 AT_KEYWORDS(sample)
 AT_CLEANUP
 
-AT_SETUP([adding prefixes to nets (1)])
+AT_SETUP([controller only [[2]]])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
+AT_GET_CONF
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
+AT_CHECK([MARLENE test.owfn --rulefile=test.ar --controlleronly --verbose --output=out.owfn],0,ignore,ignore)
+AT_CHECK([test -f out.owfn])
+AT_KEYWORDS(sample)
+AT_CLEANUP
+
+AT_SETUP([adding prefixes to nets [[1]]])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_CHECK([MARLENE ca1.owfn td.owfn td.owfn --rulefile=td.ar --withprefix --verbose],0,ignore,ignore)
 AT_KEYWORDS(specadapters)
 AT_CLEANUP
 
-AT_SETUP([adding prefix to net (2)])
+AT_SETUP([adding prefix to net [[2]]])
 AT_CHECK_WENDY
 AT_CHECK_LOLA
-#AT_CHECK_PETRIFY
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test.ar .])
 AT_CHECK([MARLENE --rulefile=test.ar --withprefix --verbose < test.owfn],0,ignore,ignore)
@@ -326,6 +350,8 @@ AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
 AT_DATA([my.conf],[verbose
 genet =
 petrify =
+wendy =
+candy =
 ])
 AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --conf=my.conf --stats],0,ignore,stderr)
 AT_CHECK([GREP -q "using configuration file 'my.conf'" stderr],0)
@@ -458,7 +484,7 @@ AT_CHECK([GREP -q "Wendy returned with status" stderr],0)
 AT_KEYWORDS(errorhandling)
 AT_CLEANUP
 
-AT_SETUP([Reading oWFN with wrong syntax (1)])
+AT_SETUP([Reading oWFN with wrong syntax [[1]]])
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/wrongsyntax.owfn .])
 AT_CHECK([MARLENE wrongsyntax.owfn --verbose],1,ignore,stderr)
@@ -466,7 +492,7 @@ AT_CHECK([GREP -q "wrongsyntax.owfn:1: error" stderr],0)
 AT_KEYWORDS(errorhandling)
 AT_CLEANUP
 
-AT_SETUP([Reading oWFN with wrong syntax (2)])
+AT_SETUP([Reading oWFN with wrong syntax [[2]]])
 AT_GET_CONF
 AT_CHECK([cp TESTFILES/wrongsyntax.owfn .])
 AT_CHECK([MARLENE --verbose < wrongsyntax.owfn],1,ignore,stderr)

@@ -16,7 +16,8 @@ TESTFILES = test.owfn test.ar \
 	    wrongsyntax.owfn wrongsyntax.ar wronglexic.ar \
 	    sync1_exp.owfn sync2_exp.owfn sync3_exp.owfn \
 	    async1_exp.owfn async2_exp.owfn async3_exp.owfn \
-	    bug_compplaces.owfn bug_compplaces.ar
+	    bug_compplaces.owfn bug_compplaces.ar \
+            some-rules.ar
 
 
 # Below you can list all the files you do not want to have counted in the
@@ -104,10 +105,11 @@ cover.info:
 # use ZCOV for branch coverage
 cover-branch: cover-prepare $(TESTSUITE)
 	test ! -d cover || rm -fr cover
+	test ! -d cover-html || rm -fr cover-html
 	$(MKDIR_P) cover
 	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=ZCOV
 	zcov/zcov-merge cover/output.zcov cover/*.zcov
-	zcov/zcov-genhtml cover/output.zcov cover-html
+	zcov/zcov-genhtml --root=$(top_abs_srcdir) cover/output.zcov cover-html
 	@echo see `pwd`/cover-html/index.html for a coverage report
 
 

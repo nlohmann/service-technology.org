@@ -1,0 +1,4 @@
+dead1 -- dead2 -> dead3;
+HIDDEN dead4 -- dead5 -> dead6;
+--dead7->;
+

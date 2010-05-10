@@ -19,7 +19,7 @@ void status(const char* format, ...);
 __attribute__((noreturn)) void abort(unsigned short code, const char* format, ...);
 
 /// verbosely display an error in a file (still experimental)
-void displayFileError(char* filename, int lineno, char* token);
+void displayFileError(const char* filename, int lineno, const char* token);
 
 
 /**************************************************************************\

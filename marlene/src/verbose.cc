@@ -128,7 +128,7 @@ void abort(unsigned short code, const char* format, ...)
 
 
 
-void displayFileError(char* filename, int lineno, char* token)
+void displayFileError(const char* filename, int lineno, const char* token)
 {
     std::ifstream f(filename);
     std::string line;

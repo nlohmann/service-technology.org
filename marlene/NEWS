@@ -6,37 +6,10 @@
                   http://service-technology.org/tools/marlene
 
 
-Version 1.1-tscspecial
+Version 1.2-unreleased
 ======================
 
-Initially planned as 1.2 release, therefore lot of features in this version :)
-
-* support for different properties - default is deadlock, optional is
-  livelock freedom
-
-* update to version 4.0 of PNAPI (nets no longer become unbounded when
-  normalized, port support)
-
-* when building binary for Win32-Systems, path for temporary files is
-  automatically set to %TEMP%
-
-* added experimental support for Candy
-  (`http://service-technology.org/tools/candy')
-
-* added support for building controllers using Genet (which will be default,
-  Petrify is still backup)
-
-* open nets with synchronous interface are now supported
-
-* to be more consistent, engine interface is partioned into ports
-
-* added initial CMake support (all rules, to build binaries, but no
-  documentation or tests)
-
-* known issues:
-
-     * cost-optimization is not fully working
-
+* improved test coverage of code
 
 
 \nSee file ChangeLog <http://service-technology.org/files/marlene/ChangeLog> for\ncomplete version history.\n

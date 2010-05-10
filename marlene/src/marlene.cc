@@ -132,6 +132,7 @@ int main(int argc, char* argv[])
             catch (pnapi::exception::InputError error)
             {
                 std::cerr << PACKAGE << ":" << error << std::endl;
+		displayFileError(error.filename.c_str(), error.line, error.token.c_str());
                 abort(2, " ");
             }
 

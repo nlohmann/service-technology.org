@@ -841,7 +841,6 @@ void Adapter::removeUnnecessaryRules()
         {
             if ((*placeIter)->getPreset().empty() )
             {
-                //status("Place %s is dead.", (*placeIter)->getName().c_str());
                 placeDeletionList.push_back(*placeIter);
             }
             ++placeIter;
@@ -863,54 +862,20 @@ void Adapter::removeUnnecessaryRules()
 
             while (nodeIter != postset.end() )
             {
-                if (_contType == ASYNCHRONOUS)
-                {
-                    status("Deleting transition %s.", (*nodeIter)->getName().c_str());
-
-                    std::string controlplacename = "control_" + (*nodeIter)->getName();
-                    std::string observeplacename = "observe_" + (*nodeIter)->getName();
-
-                    Place * p;
-
-                    p = _engine->findPlace(controlplacename);
-
-                    if (p != NULL)
-                    {
-                        _engine->deletePlace(*p);
-                    }
-
-                    p = _engine->findPlace(observeplacename);
-
-                    if (p != NULL)
-                    {
-                        _engine->deletePlace(*p);
-                    }
-
-                }
-
                 std::set< Node * > deadCandidates = (*nodeIter)->getPostset();
                 std::set< Node * >::const_iterator cand = deadCandidates.begin();
 
                 while ( cand != deadCandidates.end() )
                 {
-                    // only internal places are appropriate for removal
-//                    if ( (*cand)->getType() == Label::INTERNAL )
-                    {
-                        possibleDeadPlaces.insert( dynamic_cast<Place*>(*cand) );
-                    }
+                    possibleDeadPlaces.insert( dynamic_cast<Place*>(*cand) );
                     ++cand;
                 }
 
-
                 _engine->deleteTransition(*(dynamic_cast<Transition*>(*nodeIter)));
-                // deleting adjacent interface places, if they exist
-
                 ++nodeIter;
             }
 
-            //status("Deleting place %s.", p->getName().c_str());
             _engine->deletePlace(*p);
-
             ++place2Delete;
         }
     }

@@ -398,41 +398,6 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
     }
   }
 
-  /*
-  PNAPI_FOREACH(arc_list, myParser.arcs_)
-  {
-    PNAPI_FOREACH(n, arc_list->second)
-    {
-      string sourceName = arc_list->first;
-      string targetName = n->first; //remap(t->first, edgeLabels);
-      string transitionName = "t" + sourceName;
-      string placeName = targetName;
-
-      if (targetName.substr(0,1) == "t")
-      {
-          transitionName = "t" + targetName;
-          placeName = sourceName;
-      }
-
-      // if (remap(targetName, edgeLabels).substr(0,5) != "FINAL" and remap(sourceName, edgeLabels).substr(0,5) != "FINAL")
-      {
-          if (sourceName.substr(0,1) == "t")
-              sourceName = "t" + sourceName;
-          if (targetName.substr(0,1) == "t")
-              targetName = "t" + targetName;
-
-          std::cerr << sourceName << " -> " << targetName << std::endl;
-          createArc(*findNode(sourceName), *findNode(targetName), n->second);
-      }
-
-      else
-      {
-        // This place is the result of a final node
-        finalCondMap[transitionName].insert(placeName);
-      }
-    }
-  }
-      */
   // fill interface places not occurring in the automaton
   PNAPI_FOREACH(input, inputLabels)
   {
@@ -521,7 +486,7 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
   finalCondition_.allOtherPlacesEmpty(*this);
 
   // cleaning up
-  //remove(pnFileName.c_str());
+  remove(pnFileName.c_str());
 }
 
 } /* namespace pnapi */

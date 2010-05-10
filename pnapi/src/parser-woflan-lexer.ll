@@ -69,7 +69,7 @@ init				{ return tt::KEY_INIT; }
 
  /* identifiers */
 [0-9]+                  { yylval->yt_int = atoi(yytext); return tt::NUMBER; }
-"\""[^\"]+"\""          { yylval->yt_str = strndup(yytext + 1, strlen(yytext) - 2); return tt::IDENT; }
+"\""[^\"]+"\""          { yylval->yt_str = (char *) malloc(sizeof(char) * strlen(yytext) - 1); strncpy(yylval->yt_str, yytext + 1, strlen(yytext) - 2); yylval->yt_str[strlen(yytext) - 2] = '\0'; return tt::IDENT; }
 
  /* whitespace */
 [ \n\r\t]                        { /* skip */ } 

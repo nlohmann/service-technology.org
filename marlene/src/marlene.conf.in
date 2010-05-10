@@ -15,13 +15,17 @@ wendy = '"@WENDY@"'
 
 candy = '"@CANDY@"'
 
-# Providing the binary for Petrify result in nices controller
+# Providing the binary for Petrify result in nicer controller
 
 petrify = '"@PETRIFY@"'
 
-# Providing the binary for Petrify result in nices controller
+# Providing the binary for Petrify result in nicer controller
 
 genet = '"@GENET@"'
+
+# Which shall be the primary converter?
+
+sa2on = @CONVERTER@
 
 # Wendy needs to create a temporary file to pass it to LoLA. The filename
 # Wendy should use can be specified below. The filename should end with

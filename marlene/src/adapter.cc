@@ -246,16 +246,9 @@ const pnapi::PetriNet * Adapter::buildController()
     std::string candy_command;
 
     std::string path2wendy = std::string(args_info.wendy_arg);
-    if ( path2wendy == "" or path2wendy == "\"\"")
-    {
-        path2wendy = std::string(CONFIG_WENDY);
-    }
-
+    // wendy is really essential
+    assert(path2wendy != "");
     std::string path2candy = std::string(args_info.candy_arg);
-    if ( path2candy == "" or path2candy == "\"\"" )
-    {
-        path2candy = std::string(CONFIG_CANDY);
-    }
 
     // should we diagnose?
     if (args_info.diagnosis_flag)
@@ -267,6 +260,7 @@ const pnapi::PetriNet * Adapter::buildController()
     {
         if (args_info.costoptimized_flag)
         {
+            assert(path2candy != "");
             Output cf_file(cost_filename, "cost file");
             cf_file.stream() << cost_file_content;
 
@@ -354,25 +348,10 @@ const pnapi::PetriNet * Adapter::buildController()
     time(&start_time);
     delete _controller;
 
-    status("Argument path to genet %s", args_info.genet_arg);
-    status("Argument path to petrify %s", args_info.petrify_arg);
-
     std::string path2genet = std::string(args_info.genet_arg);
-    if ( path2genet == "" or path2genet == "\"\"" )
-    {
-        path2genet = std::string(CONFIG_GENET);
-    }
-
     std::string path2petrify = std::string(args_info.petrify_arg);
-    if ( path2petrify == "" or path2petrify == "\"\"" )
-    {
-        path2petrify = std::string(CONFIG_PETRIFY);
-    }
 
-    status("Path to genet %s", path2genet.c_str());
-    status("Path to petrify %s", path2petrify.c_str());
-
-    if (args_info.sa2on_arg == sa2on_arg_genet and (path2genet != "\"not found\""))   // && _contType == ASYNCHRONOUS)
+    if (args_info.sa2on_arg == sa2on_arg_genet and (path2genet != ""))
 
         {
             status("Using Genet for conversion from SA to open net.");
@@ -380,7 +359,7 @@ const pnapi::PetriNet * Adapter::buildController()
             pnapi::PetriNet::setGenet(path2genet);
             _controller = new pnapi::PetriNet(*mpp_sa);
         }
-    else if (args_info.sa2on_arg == sa2on_arg_petrify and path2petrify != "\"not found\"") // && _contType == ASYNCHRONOUS)
+    else if (args_info.sa2on_arg == sa2on_arg_petrify and path2petrify != "")
     {
         status("Using Petrify for conversion from SA to open net.");
         pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::PETRIFY);

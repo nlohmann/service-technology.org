@@ -49,6 +49,8 @@ public:
 
 	int calcPInvariant(bool b);
 
+	int calcTrap(bool b);
+
 	/// Level of verbosity of lp_solve
 	int verbose;
 

@@ -52,3 +52,12 @@ AT_CHECK([GREP -q "p2: 1.000000" stderr])
 AT_CHECK([GREP -q "p3: 1.000000" stderr])
 AT_KEYWORDS(algorithms)
 AT_CLEANUP
+
+AT_SETUP([Calculating a trap])
+m4_define([NET], [has_trap.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([LISA NET --findTrap],0,ignore,stderr)
+AT_CHECK([GREP -q "p3: 1.000000" stderr])
+AT_CHECK([GREP -q "p5: 1.000000" stderr])
+AT_KEYWORDS(algorithms)
+AT_CLEANUP

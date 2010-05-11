@@ -12,11 +12,13 @@
 using std::map;
 using std::set;
 using std::vector;
+using pnapi::Arc;
 
 extern vector<Transition*> transitionorder;
 extern vector<Place*> placeorder;
 extern map<Transition*,int> revtorder;
 extern map<Place*,int> revporder;
+extern set<pnapi::Arc*> arcs;
 
 InvariantFinder::InvariantFinder(PetriNet* net, unsigned int cols) : _net(net), lpw(cols){
 
@@ -32,6 +34,10 @@ void InvariantFinder::findPInvariant(){
 	lpw.calcPInvariant(false);
 }
 
+void InvariantFinder::findTrap(){
+	calcPTOrder();
+	lpw.calcTrap(false);
+}
 
 /** Calculate the global ordering of transitions and places for this problem.
 	@author Harro Wimmel
@@ -141,5 +147,8 @@ bool InvariantFinder::calcPTOrder() {
 	revporder.clear();
 	for(unsigned int i=0; i<placeorder.size(); ++i)
 		revporder[placeorder[i]]=i;
+
+	arcs = _net->getArcs();
+	
 	return deterministic;
 }

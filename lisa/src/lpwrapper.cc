@@ -4,6 +4,7 @@
 #include <map>
 #include <algorithm>
 #include <vector>
+#include <typeinfo>
 
 #ifndef PNAPI_PNAPI_H
 #include "pnapi/pnapi.h"
@@ -24,12 +25,14 @@ using std::vector;
 using pnapi::PetriNet;
 using pnapi::Place;
 using pnapi::Transition;
-//using pnapi::Arc;
+using pnapi::Arc;
 using pnapi::Marking;
+using pnapi::Node;
 
 extern vector<Transition*> transitionorder;
 extern vector<Place*> placeorder;
 extern map<Transition*,int> revtorder;
+extern set<Arc*> arcs;
 
 
 	/*************************************
@@ -314,6 +317,112 @@ int LPWrapper::calcPInvariant(bool verbose) {
 	  message("No p-invariant could be found");
 	}
 	
+	delete[] colpoint;
+	delete[] mat;
+	return (int)(basicrows);
+}
+
+/** Creates equations for calculating a trap that is minimal, i.e. it 
+    it contains the smallest set of places among all traps.
+    Implementation follows "Verification of Safety Properties Using Integer
+    Programming: Beyond the State Equation" by Javier Esparza and Stephan Melzer
+	@param verbose If TRUE prints information on cout.
+	@return The number of equations on success, -1 otherwise.
+*/
+
+int LPWrapper::calcTrap(bool verbose) {
+	ppos.clear(); // probably not necessary
+	pvector.clear();
+
+	// set the column variables in lp_solve according to the global place ordering
+	int colnr=0;
+	for(unsigned int o=0; o<placeorder.size(); ++o,++colnr)
+	{
+		Place* t(placeorder[o]); // get the places according to the global ordering 
+		set_col_name(lp,colnr+1,const_cast<char*>(t->getName().c_str()));
+		set_int(lp,colnr+1,1); // declare all variables to be integer
+		ppos[t] = colnr; // remember the ordering of the place
+	}
+	if (colnr!=(int)(cols)) cerr << "lisa: LPWrapper error: column number mismatch" << endl;
+
+	//lp_solve objective: minimum firing sequence length
+	int *colpoint = new int[cols];
+	REAL *mat = new REAL[cols];
+	for(unsigned int y=0; y<cols; y++)
+	{
+		mat[y]=1;
+		colpoint[y]=y+1;
+	}
+	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
+	if (!set_obj_fnex(lp,cols,mat,colpoint)) return -1;
+	
+	set_minim(lp);
+	
+	set<Arc*>::iterator ait;
+	for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
+	{
+		for(unsigned int y=0; y<cols; ++y) mat[y]=0;
+
+		try{
+	   	  Place& p = dynamic_cast<Place&>((*ait)->getSourceNode());
+ 		  Transition& t = dynamic_cast<Transition&>((*ait)->getTargetNode());
+	 
+		  for(unsigned int j=0; j<placeorder.size(); ++j){
+		    if(placeorder[j]->getName() == p.getName() && t.getPostset().find((Node*) placeorder[j]) == t.getPostset().end()){
+			mat[ppos[placeorder[j]]] = -1;
+		    }
+		    else{
+		      if(placeorder[j]->getName() != p.getName() && t.getPostset().find((Node*) placeorder[j]) != t.getPostset().end()){
+		        mat[ppos[placeorder[j]]] = 1;
+		      }
+		      else{
+			mat[ppos[placeorder[j]]] = 0;
+		      }
+		    }
+		  }
+		  int mark = 0; // right hand side equals zero as we want to calculate invariants
+		  //initialize the rows
+		  if (!add_constraintex(lp,cols,mat,colpoint,GE,mark)) return -1;
+		
+   		}
+		catch(std::bad_cast & b){
+
+		}
+
+	}
+
+	//allow only nonnegative solutions
+	REAL r = 1;
+
+	for(int y=1; y<=(int)(cols); ++y)
+		if (!add_constraintex(lp,1,&r,&y,GE,0)) return -1;
+
+	//exclude trivial solution	for(unsigned int y=0; y<cols; y++){
+		mat[y]=1;
+		colpoint[y]=y+1;
+	}
+	if (!add_constraintex(lp,cols,mat,colpoint,GE,1)) return -1;
+	
+
+	set_add_rowmode(lp,FALSE);	
+	if (verbose) write_LP(lp,stdout);
+	else set_verbose(lp,CRITICAL);
+	basicrows = placeorder.size()+cols;
+
+	int ret = solve(lp);
+
+	if(ret != 2){
+	  message("Found trap");
+
+	  bool isNonNegative = true;
+          get_variables(lp, mat);
+          for(int j = 0; j < cols; j++)
+            fprintf(stderr, "%s: %f\n", get_col_name(lp, j + 1), mat[j]);
+	}
+	else
+	  message("No trap could be found");
+
+		
 	delete[] colpoint;
 	delete[] mat;
 	return (int)(basicrows);

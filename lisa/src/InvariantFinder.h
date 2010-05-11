@@ -51,6 +51,9 @@ public:
 	// Find p-invariant
 	void findPInvariant();
 
+	// Find trap
+	void findTrap();
+
 private:
 
 	PetriNet* _net;

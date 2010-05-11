@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 
 #include <pnapi/pnapi.h>
 #include "config-log.h"
@@ -37,6 +38,8 @@
 
 using std::vector;
 using std::map;
+using std::set;
+using pnapi::Arc;
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -58,6 +61,8 @@ vector<Place*> placeorder;
 map<Transition*,int> revtorder;
 /// inverted placeorder for back references
 map<Place*,int> revporder;
+/// set of arcs
+set<Arc*> arcs;
 
 /// check if a file exists and can be opened for reading
 inline bool fileExists(const std::string& filename) {
@@ -182,6 +187,16 @@ int main(int argc, char** argv) {
       InvariantFinder invFinder(&net, net.getPlaces().size());
       invFinder.findPInvariant();
     }
+
+    /*----------------------------------------.
+    | 2. calculate and print trap
+    `----------------------------------------*/
+
+    if(args_info.findTrap_flag){
+      InvariantFinder invFinder(&net, net.getPlaces().size());
+      invFinder.findTrap();
+    }
+
 
     return EXIT_SUCCESS;
 }

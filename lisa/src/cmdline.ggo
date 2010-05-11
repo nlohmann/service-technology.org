@@ -23,9 +23,12 @@ option "findTInv" t
   flag off
 
 option "findPInv" p
-  "Tries to calculate a t-invariant for a given petri net"
+  "Tries to calculate a p-invariant for a given petri net"
   flag off
 
+option "findTrap" -
+  "Tries to find a trap for a given petri net."
+  flag off
 
 section "Configuration"
 

@@ -7,8 +7,8 @@
                         http://service-technology.org/pnapi
 
 
-Version 4.01-unreleased
-=======================
+Version 4.01 (2010-05-11)
+=========================
 
 * removed memory leak (thanks to wendy)
 
@@ -19,7 +19,6 @@ Version 4.01-unreleased
 * added a parameter `--guessFormula' to the frontend tool to guess the
   final condition from the structure of the net (i.e., use the sink place)
 
+* added parameter `--canonicalNames' to rename nodes
 
-See file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for
-complete version history.
-
+\nSee file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for\ncomplete version history.\n

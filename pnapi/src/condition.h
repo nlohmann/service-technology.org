@@ -85,6 +85,8 @@ public: /* public methods */
   std::set<const Place *> concerningPlaces() const;
   /// get valid interval of a place
   formula::Interval getPlaceInterval(const Place &) const;
+  /// compares formula with a boolean
+  bool operator==(bool) const;
   //@}
 
 private: /* private methods */

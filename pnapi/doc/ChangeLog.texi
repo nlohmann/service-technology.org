@@ -1,9 +1,10 @@
-@heading Version 4.01-unreleased
+@heading Version 4.01 (2010-05-11)
 @itemize
 @item removed memory leak (thanks to wendy)
 @item implemented Woflan parser
 @item caged lexer and parser in classes (i.e. cleaned up global namespace)
 @item added a parameter @option{--guessFormula} to the frontend tool to guess the final condition from the structure of the net (i.e., use the sink place)
+@item added parameter @option{--canonicalNames} to rename nodes
 @end itemize
 
 @heading Version 4.00 (2010-03-14)

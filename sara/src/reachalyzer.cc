@@ -253,7 +253,7 @@ void Reachalyzer::printResult() {
 					}
 					// or the marking equation is feasible but still we cannot reach a solution 
 					cout << "unable to borrow enough tokens via T-invariants." << endl;
-					cout << "There are firing sequences that could not be extended towards the final marking." << endl;
+					if (stateinfo) cout << "There are firing sequences that could not be extended towards the final marking." << endl;
 				} else if (passedon && stateinfo) cout << "sara: at the following points the algorithm could not continue:" << endl;
 				else if (stateinfo) cout << "sara: at the following points the algorithm needed to backtrack:" << endl;
 				if (stateinfo) failure.printFailure(im); // then print the counterexample; the following shouldn't happen:

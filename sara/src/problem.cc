@@ -50,8 +50,8 @@ using std::ostringstream;
 using std::setw;
 //using namespace pnapi;
 
-extern pnapi::parser::owfn::Parser paowfn;
-extern pnapi::parser::lola::Parser palola;
+//extern pnapi::parser::owfn::Parser paowfn;
+//extern pnapi::parser::lola::Parser palola;
 extern vector<Transition*> transitionorder;
 extern vector<Place*> placeorder;
 extern map<Transition*,int> revtorder;
@@ -75,6 +75,7 @@ Problem::~Problem() { clear(); }
 */
 void Problem::clear() {
 	name = "";
+	if (deinit) delete pn;
 	deinit = false;
 	pn = NULL;
 	nettype = 0;
@@ -219,17 +220,21 @@ PetriNet* Problem::getPetriNet() {
 	ifstream infile(filename.c_str(), ifstream::in);
 	if (!infile.is_open()) abort(2,"error: could not read from Petri net file '%s'",filename.c_str());
 
+	pn = new PetriNet();
+
 	// try to parse net
 	try {
 	    switch (nettype) {
 	        case(OWFN): {
-				paowfn.clean();
-				pn = &(const_cast<PetriNet&>(paowfn.parse(infile)));
+				infile >> pnapi::io::owfn >> (*pn);
+//				paowfn.clean();
+//				pn = &(const_cast<PetriNet&>(paowfn.parse(infile)));
 	            break;
 	        }
 	        case(LOLA): {
-				palola.clean();
-				pn = &(const_cast<PetriNet&>(palola.parse(infile)));
+				infile >> pnapi::io::lola >> (*pn);
+//				palola.clean();
+//				pn = &(const_cast<PetriNet&>(palola.parse(infile)));
 	            break;
 	        }
 	    }

@@ -45,8 +45,8 @@ extern int sara_parse();
 extern vector<Problem> pbls;
 
 /// parser for Petri nets
-pnapi::parser::owfn::Parser paowfn;
-pnapi::parser::lola::Parser palola;
+//pnapi::parser::owfn::Parser paowfn;
+//pnapi::parser::lola::Parser palola;
 
 /// Global ordering of transitions for lp_solve and the PathFinder
 vector<Transition*> transitionorder;

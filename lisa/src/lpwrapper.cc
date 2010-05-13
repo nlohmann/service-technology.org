@@ -358,7 +358,7 @@ int LPWrapper::calcTrap(bool verbose) {
 	
 	set_minim(lp);
 	
-	set<Arc*>::iterator ait;
+	set<pnapi::Arc*>::iterator ait;
 	for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
 	{
 		for(unsigned int y=0; y<cols; ++y) mat[y]=0;

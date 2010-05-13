@@ -62,7 +62,7 @@ map<Transition*,int> revtorder;
 /// inverted placeorder for back references
 map<Place*,int> revporder;
 /// set of arcs
-set<Arc*> arcs;
+set<pnapi::Arc*> arcs;
 
 /// check if a file exists and can be opened for reading
 inline bool fileExists(const std::string& filename) {

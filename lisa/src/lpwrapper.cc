@@ -32,7 +32,7 @@ using pnapi::Node;
 extern vector<Transition*> transitionorder;
 extern vector<Place*> placeorder;
 extern map<Transition*,int> revtorder;
-extern set<Arc*> arcs;
+extern set<pnapi::Arc*> arcs;
 
 
 	/*************************************

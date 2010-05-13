@@ -39,7 +39,6 @@
 using std::vector;
 using std::map;
 using std::set;
-using pnapi::Arc;
 
 /// the command line parameters
 gengetopt_args_info args_info;

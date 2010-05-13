@@ -12,7 +12,6 @@
 using std::map;
 using std::set;
 using std::vector;
-using pnapi::Arc;
 
 extern vector<Transition*> transitionorder;
 extern vector<Place*> placeorder;

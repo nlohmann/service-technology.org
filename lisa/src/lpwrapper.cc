@@ -25,7 +25,6 @@ using std::vector;
 using pnapi::PetriNet;
 using pnapi::Place;
 using pnapi::Transition;
-using pnapi::Arc;
 using pnapi::Marking;
 using pnapi::Node;
 

@@ -271,4 +271,16 @@ void Condition::replacePlace(const Place & p1, const Place & p2)
   formula_ = tmp;
 }
 
+/*!
+ * \brief compares formula with a boolean
+ * 
+ * \return true iff
+ *         a) b is true and the formula is just a FormulaTrue or
+ *         b) b is false and the formula is just a FormulaFalse.
+ */
+bool Condition::operator==(bool b) const
+{
+  return (b ? (formula_->getType() == formula::Formula::F_TRUE) : (formula_->getType() == formula::Formula::F_FALSE));
+}
+
 } /* namespace pnapi */

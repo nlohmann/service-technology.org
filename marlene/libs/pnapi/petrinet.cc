@@ -13,9 +13,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2010-05-05 02:40:00 +0200 (Wed, 05 May 2010) $
+ * \date    $Date: 2010-05-17 19:37:28 +0200 (Mon, 17 May 2010) $
  *
- * \version $Revision: 5700 $
+ * \version $Revision: 5738 $
  */
 
 #include "config.h"
@@ -206,20 +206,31 @@ void ComponentObserver::updateNodes(Node & node)
 
 
 /****************************************************************************
- *** Static PetriNet Variables
+ *** Static PetriNet Variables and their setters
  ***************************************************************************/
 
-/// path to petrify
-std::string PetriNet::pathToPetrify_ = CONFIG_PETRIFY;
-
 /// path to genet
-std::string PetriNet::pathToGenet_ = CONFIG_GENET;
+std::string PetriNet::pathToGenet_ = "";
 
-/// converter Automaton => PetriNet
-PetriNet::AutomatonConverter PetriNet::automatonConverter_ = PETRIFY;
+/// path to petrify
+std::string PetriNet::pathToPetrify_ = "";
 
-/// capacity for genet
-uint8_t PetriNet::genetCapacity_ = 2;
+
+/*!
+ * \brief setting path to Genet
+ */
+void PetriNet::setGenet(const std::string & genet)
+{
+  pathToGenet_ = genet;
+}
+
+/*!
+ * \brief setting path to Petrify
+ */
+void PetriNet::setPetrify(const std::string & petrify)
+{ 
+  pathToPetrify_ = petrify; 
+}
 
 /****************************************************************************
  *** Class PetriNet Function Defintions
@@ -234,7 +245,8 @@ uint8_t PetriNet::genetCapacity_ = 2;
  */
 PetriNet::PetriNet() :
   observer_(*this), interface_(*this),
-  warnings_(0), reductionCache_(NULL)
+  warnings_(0), reductionCache_(NULL),
+  genetCapacity_(2), automatonConverter_(STATEMACHINE)
 {
 }
 
@@ -244,7 +256,8 @@ PetriNet::PetriNet() :
 PetriNet::PetriNet(const Interface & interface1, const Interface & interface2, std::map<Label *, Label *> & label2label,
          std::map<Label *, Place *> & label2place, std::set<Label *> & commonLabels) :
   observer_(*this), interface_(*this, interface1, interface2, label2label, label2place, commonLabels),
-  warnings_(0), reductionCache_(NULL)
+  warnings_(0), reductionCache_(NULL),
+  genetCapacity_(2), automatonConverter_(STATEMACHINE)
 {
 }
 
@@ -258,7 +271,8 @@ PetriNet::PetriNet(const PetriNet & net) :
   observer_(*this), interface_(*this),
   roles_(net.roles_), meta_(net.meta_),
   warnings_(net.warnings_), reductionCache_(NULL),
-  finalCondition_(net.finalCondition_, copyStructure(net))
+  finalCondition_(net.finalCondition_, copyStructure(net)),
+  genetCapacity_(2), automatonConverter_(STATEMACHINE)
 {
   setConstraintLabels(net.constraints_);
 }

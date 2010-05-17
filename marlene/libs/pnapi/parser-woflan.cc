@@ -42,13 +42,12 @@
 #include "parser-woflan-wrapper.h"
 #include "petrinet.h"
 
-#include <cstring>
 #include <sstream>
 
 
 
 /* Line 310 of lalr1.cc  */
-#line 52 "parser-woflan.cc"
+#line 51 "parser-woflan.cc"
 
 
 #include "parser-woflan.h"
@@ -57,7 +56,7 @@
 
 
 /* Line 316 of lalr1.cc  */
-#line 61 "parser-woflan.cc"
+#line 60 "parser-woflan.cc"
 
 #ifndef YY_
 # if defined YYENABLE_NLS && YYENABLE_NLS
@@ -125,7 +124,7 @@ do {					\
 namespace pnapi { namespace parser { namespace woflan { namespace yy {
 
 /* Line 379 of lalr1.cc  */
-#line 129 "parser-woflan.cc"
+#line 128 "parser-woflan.cc"
 #if YYERROR_VERBOSE
 
   /* Return YYSTR after stripping away unnecessary quotes and
@@ -416,55 +415,50 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
 	  case 6:
 
 /* Line 677 of lalr1.cc  */
-#line 93 "parser-woflan.yy"
+#line 92 "parser-woflan.yy"
     {
-    char * strName = parser_.substr((yysemantic_stack_[(2) - (2)].yt_str), 1, strlen((yysemantic_stack_[(2) - (2)].yt_str)) - 2);
-    parser_.places_[strName] = &(parser_.net_.createPlace(strName, 0, 0));
+    parser_.check(parser_.places_[(yysemantic_stack_[(2) - (2)].yt_str)] == NULL, "node name already used");
+    parser_.places_[(yysemantic_stack_[(2) - (2)].yt_str)] = &(parser_.net_.createPlace((yysemantic_stack_[(2) - (2)].yt_str), 0, 0));
     free((yysemantic_stack_[(2) - (2)].yt_str));
-    free(strName);
   }
     break;
 
   case 7:
 
 /* Line 677 of lalr1.cc  */
-#line 100 "parser-woflan.yy"
+#line 98 "parser-woflan.yy"
     {
-    char * strName = parser_.substr((yysemantic_stack_[(4) - (2)].yt_str), 1, strlen((yysemantic_stack_[(4) - (2)].yt_str)) - 2);
-    parser_.check(parser_.places_[strName] == NULL, "node name already used");
-    parser_.places_[strName] = &(parser_.net_.createPlace(strName, 0, 0));
-    Place * p = parser_.places_[strName];
+    parser_.check(parser_.places_[(yysemantic_stack_[(4) - (2)].yt_str)] == NULL, "node name already used");
+    parser_.places_[(yysemantic_stack_[(4) - (2)].yt_str)] = &(parser_.net_.createPlace((yysemantic_stack_[(4) - (2)].yt_str), 0, 0));
+    Place * p = parser_.places_[(yysemantic_stack_[(4) - (2)].yt_str)];
     p->setTokenCount((yysemantic_stack_[(4) - (4)].yt_int));
     free((yysemantic_stack_[(4) - (2)].yt_str));
-    free(strName);
   }
     break;
 
   case 8:
 
 /* Line 677 of lalr1.cc  */
-#line 113 "parser-woflan.yy"
+#line 109 "parser-woflan.yy"
     {
-    char * strName = parser_.substr((yysemantic_stack_[(2) - (2)].yt_str), 1, strlen((yysemantic_stack_[(2) - (2)].yt_str)) - 2);
-    parser_.check(!(parser_.net_.containsNode(strName)), "node name already used");
-    parser_.transition_ = &(parser_.net_.createTransition(strName)); 
-    parser_.transName = strName;
+    parser_.check(!(parser_.net_.containsNode((yysemantic_stack_[(2) - (2)].yt_str))), "node name already used");
+    parser_.transition_ = &(parser_.net_.createTransition((yysemantic_stack_[(2) - (2)].yt_str))); 
+    parser_.transName = (yysemantic_stack_[(2) - (2)].yt_str);
     free((yysemantic_stack_[(2) - (2)].yt_str));
-    free(strName);
   }
     break;
 
   case 9:
 
 /* Line 677 of lalr1.cc  */
-#line 121 "parser-woflan.yy"
+#line 115 "parser-woflan.yy"
     { parser_.needLabel = true; }
     break;
 
   case 10:
 
 /* Line 677 of lalr1.cc  */
-#line 126 "parser-woflan.yy"
+#line 120 "parser-woflan.yy"
     {
     parser_.check(!(parser_.needLabel), "transition must be labeled");  	
   }
@@ -473,23 +467,21 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
   case 11:
 
 /* Line 677 of lalr1.cc  */
-#line 130 "parser-woflan.yy"
+#line 124 "parser-woflan.yy"
     {
-    char * strName = parser_.substr((yysemantic_stack_[(2) - (2)].yt_str), 1, strlen((yysemantic_stack_[(2) - (2)].yt_str)) - 2);
-    if(strName != parser_.transName)
+    if((yysemantic_stack_[(2) - (2)].yt_str) != parser_.transName)
     {
-      parser_.check(!(parser_.net_.containsNode(strName)), "node name already used");
+      parser_.check(!(parser_.net_.containsNode((yysemantic_stack_[(2) - (2)].yt_str))), "node name already used");
     }
-    parser_.transition_->setName(strName); 
+    parser_.transition_->setName((yysemantic_stack_[(2) - (2)].yt_str)); 
     free((yysemantic_stack_[(2) - (2)].yt_str));
-    free(strName);
   }
     break;
 
   case 13:
 
 /* Line 677 of lalr1.cc  */
-#line 145 "parser-woflan.yy"
+#line 137 "parser-woflan.yy"
     { 
     parser_.target_ = reinterpret_cast<Node * *>(&(parser_.transition_));
     parser_.source_ = reinterpret_cast<Node * *>(&(parser_.place_));   
@@ -499,7 +491,7 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
   case 16:
 
 /* Line 677 of lalr1.cc  */
-#line 155 "parser-woflan.yy"
+#line 147 "parser-woflan.yy"
     { 
     parser_.source_ = reinterpret_cast<Node * *>(&(parser_.transition_));
     parser_.target_ = reinterpret_cast<Node * *>(&(parser_.place_)); 
@@ -509,10 +501,9 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
   case 20:
 
 /* Line 677 of lalr1.cc  */
-#line 169 "parser-woflan.yy"
+#line 161 "parser-woflan.yy"
     {
-    char * strName = parser_.substr((yysemantic_stack_[(1) - (1)].yt_str), 1, strlen((yysemantic_stack_[(1) - (1)].yt_str)) - 2);
-    parser_.place_ = parser_.places_[strName];
+    parser_.place_ = parser_.places_[(yysemantic_stack_[(1) - (1)].yt_str)];
     parser_.check(parser_.place_ != NULL, "unknown place");
 
     Arc * a = parser_.net_.findArc(**(parser_.source_), **(parser_.target_));
@@ -525,14 +516,13 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
       parser_.net_.createArc(**(parser_.source_), **(parser_.target_), 1);
     }
     free((yysemantic_stack_[(1) - (1)].yt_str));
-    free(strName);
   }
     break;
 
 
 
 /* Line 677 of lalr1.cc  */
-#line 536 "parser-woflan.cc"
+#line 526 "parser-woflan.cc"
 	default:
           break;
       }
@@ -874,9 +864,9 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
   const unsigned char
   BisonParser::yyrline_[] =
   {
-         0,    82,    82,    83,    87,    88,    92,    99,   112,   121,
-     126,   129,   142,   145,   144,   152,   155,   154,   163,   164,
-     168
+         0,    81,    81,    82,    86,    87,    91,    97,   108,   115,
+     120,   123,   134,   137,   136,   144,   147,   146,   155,   156,
+     160
   };
 
   // Print the state stack on the debug stream.
@@ -969,6 +959,6 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
 } } } } // pnapi::parser::woflan::yy
 
 /* Line 1053 of lalr1.cc  */
-#line 973 "parser-woflan.cc"
+#line 963 "parser-woflan.cc"
 
 

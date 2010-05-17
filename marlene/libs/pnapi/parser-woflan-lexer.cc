@@ -750,7 +750,7 @@ case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
 #line 72 "parser-woflan-lexer.ll"
-{ yylval->yt_str = strdup(yytext); return tt::IDENT; }
+{ yylval->yt_str = (char *) malloc(sizeof(char) * strlen(yytext) - 1); strncpy(yylval->yt_str, yytext + 1, strlen(yytext) - 2); yylval->yt_str[strlen(yytext) - 2] = '\0'; return tt::IDENT; }
 	YY_BREAK
 /* whitespace */
 case 13:

@@ -355,22 +355,19 @@ const pnapi::PetriNet * Adapter::buildController()
 
         {
             status("Using Genet for conversion from SA to open net.");
-            pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::GENET);
             pnapi::PetriNet::setGenet(path2genet);
-            _controller = new pnapi::PetriNet(*mpp_sa);
+            _controller = new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::GENET, args_info.messagebound_arg + 1);
         }
     else if (args_info.sa2on_arg == sa2on_arg_petrify and path2petrify != "")
     {
         status("Using Petrify for conversion from SA to open net.");
-        pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::PETRIFY);
         pnapi::PetriNet::setPetrify(path2petrify);
-        _controller = new pnapi::PetriNet(*mpp_sa);
+        _controller = new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::PETRIFY);
     }
     else
     {
         status("Using a state machine for conversion from SA to open net.");
-        pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::STATEMACHINE);
-        _controller = new pnapi::PetriNet(*mpp_sa);
+        _controller = new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::STATEMACHINE);
     }
     delete mpp_sa;
 

@@ -44,6 +44,11 @@ struct FileObject {
     FileObject(string f) : filename(f), net(NULL) {}
 };
 
+/// check if a file exists and can be opened for reading
+inline bool fileExists(const std::string& filename) {
+    std::ifstream tmp(filename.c_str(), std::ios_base::in);
+    return tmp.good();
+}
 
 /// evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
@@ -55,6 +60,39 @@ void evaluateParameters(int argc, char** argv) {
         abort(1, "invalid command-line parameter(s)");
     }
 
+    // read a configuration file if necessary
+    if (args_info.config_given) {
+        // initialize the config file parser
+        params->initialize = 0;
+        params->override = 0;
+
+        // call the config file parser
+        if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
+            abort(14, "error reading configuration file '%s'", args_info.config_arg);
+        } else {
+            status("using configuration file '%s'", _cfilename_(args_info.config_arg));
+        }
+    } else {
+        // check for configuration files
+        std::string conf_generic_filename = "petri.conf";
+        std::string conf_filename = fileExists(conf_generic_filename) ? conf_generic_filename :
+                                    (fileExists(std::string(SYSCONFDIR) + "/" + conf_generic_filename) ?
+                                     (std::string(SYSCONFDIR) + "/" + conf_generic_filename) : "");
+
+        if (conf_filename != "") {
+            // initialize the config file parser
+            params->initialize = 0;
+            params->override = 0;
+            if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
+                abort(14, "error reading configuration file '%s'", conf_filename.c_str());
+            } else {
+                status("using configuration file '%s'", _cfilename_(conf_filename));
+            }
+        } else {
+            status("not using a configuration file");
+        }
+    }
+    
     free(params);
 }
 
@@ -84,24 +122,13 @@ int main(int argc, char** argv) {
         invocation += string(argv[i]) + " ";
     }
 
-    if (args_info.converter_given) {
-        switch (args_info.converter_arg) {
-            case(converter_arg_petrify): {
-                pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::PETRIFY);
-                break;
-            }
-            case(converter_arg_genet): {
-                pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::GENET);
-                break;
-            }
-            case(converter_arg_statemachine): {
-                pnapi::PetriNet::setAutomatonConverter(pnapi::PetriNet::STATEMACHINE);
-                break;
-            }
-            default:
-                assert(false);
-        }
-    }
+    
+    // set configured tools
+    PetriNet::setGenet(args_info.genet_arg);
+    PetriNet::setPetrify(args_info.petrify_arg);
+    
+    PetriNet::AutomatonConverter aConverter = (args_info.petrify_given ? PetriNet::PETRIFY :
+                                               (args_info.genet_given ? PetriNet::GENET : PetriNet::STATEMACHINE));
 
     /********
     * INPUT *
@@ -145,7 +172,7 @@ int main(int argc, char** argv) {
                     std::cin >> meta(io::INPUTFILE, current.filename)
                              >> meta(io::CREATOR, PACKAGE_STRING)
                              >> meta(io::INVOCATION, invocation) >> io::sa >> sa;
-                    current.net = new PetriNet(sa);
+                    current.net = new PetriNet(sa, aConverter);
 
                     current.type = TYPE_OPENNET;
                     break;
@@ -223,7 +250,7 @@ int main(int argc, char** argv) {
                         infile >> meta(io::INPUTFILE, current.filename)
                                >> meta(io::CREATOR, PACKAGE_STRING)
                                >> meta(io::INVOCATION, invocation) >> io::sa >> sa;
-                        current.net = new PetriNet(sa);
+                        current.net = new PetriNet(sa, aConverter);
 
                         current.type = TYPE_OPENNET;
                         break;
@@ -576,15 +603,12 @@ int main(int argc, char** argv) {
                     case(output_arg_eps):
                     case(output_arg_pdf):
                     case(output_arg_svg): {
-                        if (!strcmp(CONFIG_DOT, "not found")) {
-                            abort(5, "Graphviz dot was not found by configure script");
-                        }
 #if !defined(HAVE_POPEN) or !defined(HAVE_PCLOSE)
                         abort(6, "petri: cannot open UNIX pipe to Graphviz dot");
 #endif
                         ostringstream d;
                         d << io::dot << *(objects[i].net);
-                        string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + outname;
+                        string call = string(args_info.dot_arg) + " -T" + args_info.output_orig[j] + " -q -o " + outname;
                         FILE* s = popen(call.c_str(), "w");
                         assert(s);
                         fprintf(s, "%s\n", d.str().c_str());

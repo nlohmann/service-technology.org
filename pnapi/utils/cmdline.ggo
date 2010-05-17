@@ -1,4 +1,4 @@
-args "--unamed-opts=FILES --include-getopt --show-required --no-handle-error"
+args "--unamed-opts=FILES --include-getopt --show-required --no-handle-error --conf-parser"
 
 package "petri"
 purpose "A command-line frontend for the Petri Net API"
@@ -32,6 +32,26 @@ option "guessFormula" -
   "Derive the final condition from the structure (i.e., the sink place) of the net."
   flag off
 
+defgroup "Automaton Converter"
+  groupdesc="Defining a program, to convert Service Automata to Petri Nets"
+
+groupoption "genet" -
+  "Use Genet; specify the path"
+  string
+  group="Automaton Converter"
+  typestr="FILENAME"
+  default="genet"
+  argoptional
+
+groupoption "petrify" -
+  "Use Petrify; specify the path"
+  string
+  group="Automaton Converter"
+  typestr="FILENAME"
+  default="petrify"
+  argoptional
+
+
 section "Composition and Product"
 
 option "compose" -
@@ -45,7 +65,6 @@ option "produce" -
   typestr="CONSTRAINT"
   string
   optional
-
 
 section "Check for Structural Properties"
 
@@ -97,10 +116,18 @@ option "dnf" -
 
 section "Configuration"
 
-option "converter" -
-  "Specifies, which converter should be used to transform service automata in petri nets."
-  typestr="CONVERTER"
-  values="petrify","genet","statemachine" enum
+option "config" -
+  "Read configuration from file."
+  details="If no file is given, Petri first tries to parse file `petri.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Petri was installed) and then from the current working directory. If neither file was found, the standard values are assumed.\n"
+  string
+  typestr="FILE"
+  optional
+
+option "dot" -
+  "Set the path an binary of dot."
+  string
+  typestr="FILENAME"
+  default="dot"
   optional
   hidden
 

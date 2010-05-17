@@ -1,3 +1,9 @@
+@heading Version 4.02-unreleased
+@itemize
+@item made petri configurable (paths to external tools, configuration file)
+@item removed sa2sm and sa2owfn
+@end itemize
+
 @heading Version 4.01 (2010-05-11)
 @itemize
 @item removed memory leak (thanks to wendy)

@@ -1,6 +1,6 @@
 SUBDIRS = unfolder
 
-bin_PROGRAMS = petri sa2owfn sa2sm cdnf generator cphils configurator
+bin_PROGRAMS = petri cdnf generator cphils configurator
 
 noinst_PROGRAMS = sound
 
@@ -9,10 +9,6 @@ petri_SOURCES = petri.cc cmdline.c cmdline.h \
                 verbose.h verbose.cc
 
 generator_SOURCES = generator.cc cmdline.ggo
-
-sa2owfn_SOURCES = sa2owfn.cc
-
-sa2sm_SOURCES = sa2sm.cc
 
 cdnf_SOURCES = cdnf.cc cdnf-cmdline.c cdnf-cmdline.h \
                Output.h Output.cc \
@@ -28,10 +24,14 @@ configurator_SOURCES = configurator.cc \
 
 sound_SOURCES = sound.cc
 
+# the configuration files
+sysconf_DATA = petri.conf
+
+# pass the sysconfdir to Petri (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
+petri_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
+
 petri_LDADD =  $(top_builddir)/src/libpnapi.la
 generator_LDADD =  $(top_builddir)/src/libpnapi.la
-sa2owfn_LDADD =  $(top_builddir)/src/libpnapi.la
-sa2sm_LDADD =  $(top_builddir)/src/libpnapi.la
 cdnf_LDADD =  $(top_builddir)/src/libpnapi.la
 configurator_LDADD =  $(top_builddir)/src/libpnapi.la
 sound_LDADD =  $(top_builddir)/src/libpnapi.la

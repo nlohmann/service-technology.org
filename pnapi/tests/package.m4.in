@@ -36,9 +36,6 @@ m4_define([CDNF],                 [AT_CHECK_LOLA
 m4_define([CONFIGURATOR],         [cover.sh @abs_top_builddir@/utils/configurator])
 m4_define([GENERATOR],            [cover.sh @abs_top_builddir@/utils/generator])
 m4_define([PETRI],                [cover.sh @abs_top_builddir@/utils/petri])
-m4_define([SA2OWFN],              [AT_CHECK_PETRIFY
-                                   cover.sh @abs_top_builddir@/utils/sa2owfn])
-m4_define([SA2SM],                [cover.sh @abs_top_builddir@/utils/sa2sm])
 m4_define([UNFOLDER],             [cover.sh @abs_top_builddir@/utils/unfolder/unfolder])
 
 # makro used in testsuite

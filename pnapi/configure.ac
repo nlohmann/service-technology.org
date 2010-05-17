@@ -1,4 +1,4 @@
-AC_INIT([Petri Net API], 4.01, pnapi@service-technology.org, pnapi, http://service-technology.org/pnapi)
+AC_INIT([Petri Net API], 4.02-unreleased, pnapi@service-technology.org, pnapi, http://service-technology.org/pnapi)
 
 AC_MSG_NOTICE([ ____      _        _            _        _    ____ ___ ])
 AC_MSG_NOTICE([|  _ \ ___| |_ _ __(_)_ __   ___| |_     / \  |  _ \_ _|])
@@ -86,7 +86,7 @@ AC_CONFIG_FILES([Makefile src/libpnapi.pc
                  src/Makefile src/pnapi.cc
                  man/Makefile
                  tests/Makefile tests/package.m4
-                 utils/Makefile utils/unfolder/Makefile])
+                 utils/Makefile utils/unfolder/Makefile utils/petri.conf])
 AC_CONFIG_FILES([src/bison-wrapper.sh], [chmod +x src/bison-wrapper.sh])
 AC_CONFIG_FILES([tests/check_customer.sh], [chmod +x tests/check_customer.sh])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])

@@ -121,7 +121,7 @@ AT_CLEANUP
 AT_SETUP([Writing Graphviz dot file (from open net)])
 m4_define([NET], [test_input.owfn])
 AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([PETRI NET --output=dot],0)
+AT_CHECK([PETRI NET --dot=DOT --output=dot],0)
 AT_CHECK([test -f NET.dot])
 # the generated service automaton is expected to have 534 edges
 AT_CHECK([GREP "\->" NET.dot | wc -l | GREP -q 534],0)
@@ -410,10 +410,10 @@ AT_CHECK([PETRI NET],0,ignore,stderr)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
-AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968) [[SA2SM]] ])
+AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968) [[Statemachine]] ])
 m4_define([NET], [bug13968.sa])
 AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([SA2SM NET NET.owfn], 0, ignore, stderr)
+AT_CHECK([PETRI -isa -oowfn NET], 0, ignore, stderr)
 AT_CHECK([GREP -q "SYNCHRONOUS" NET.owfn])
 AT_CHECK([GREP -q "sync_rule_1;" NET.owfn])
 AT_CHECK([GREP -q "sync_rule_7;" NET.owfn])
@@ -421,10 +421,10 @@ AT_CHECK([GREP -q "myUnknownLabel" NET.owfn])
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
-AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968) [[SA2OWFN]] ])
+AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968) [[Petrify]] ])
 m4_define([NET], [bug13968.sa])
 AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([SA2OWFN NET NET.owfn], 0, ignore, stderr)
+AT_CHECK([PETRI -isa -oowfn --petrify=PETRIFY NET], 0, ignore, stderr)
 AT_CHECK([GREP -q "SYNCHRONOUS" NET.owfn])
 AT_CHECK([GREP -q "sync_rule_1;" NET.owfn])
 AT_CHECK([GREP -q "sync_rule_7;" NET.owfn])
@@ -526,7 +526,6 @@ AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI -iowfn -osa NET])
 AT_CHECK([GREP -q "x;" NET.sa])
 AT_CHECK([GREP -q "x ->" NET.sa])
-AT_CHECK([SA2SM NET.sa NET.sa.owfn], 0, ignore, ignore)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
@@ -905,20 +904,20 @@ AT_CHECK([PETRI NET -osa],0,ignore,ignore)
 AT_KEYWORDS([automaton])
 AT_CLEANUP
 
-AT_SETUP([Behavior preservation (asynchronous, sa2owfn)])
+AT_SETUP([Behavior preservation (asynchronous, petrify)])
 m4_define([NET], [test_automaton_behavior_async.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
-AT_CHECK([SA2OWFN NET.sa NET.sa.owfn], 0, ignore, ignore)
+AT_CHECK([PETRI -isa -oowfn --petrify=PETRIFY NET.sa], 0, ignore, ignore)
 AT_CHECK([FIONA -t equivalence NET NET.sa.owfn], 0, ignore, ignore)
 AT_KEYWORDS([automaton synthesis])
 AT_CLEANUP
 
-AT_SETUP([Behavior preservation (asynchronous, sa2sm)])
+AT_SETUP([Behavior preservation (asynchronous, statemachine)])
 m4_define([NET], [test_automaton_behavior_async.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
-AT_CHECK([SA2SM NET.sa NET.sa.owfn], 0, ignore, ignore)
+AT_CHECK([PETRI -isa -oowfn NET.sa], 0, ignore, ignore)
 AT_CHECK([FIONA -t equivalence NET NET.sa.owfn], 0, ignore, ignore)
 AT_KEYWORDS([automaton synthesis])
 AT_CLEANUP
@@ -1115,21 +1114,10 @@ AT_CLEANUP
 AT_BANNER([Net Synthesis])
 ############################################################################
 
-AT_SETUP([Synthesis using Petrify (sa2owfn)])
-m4_define([AUTOMATON], [test_myCoffee.sa])
-AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-sm.owfn .])
-AT_CHECK([SA2OWFN AUTOMATON AUTOMATON.owfn],0,ignore,ignore)
-AT_CHECK([test -f AUTOMATON.owfn])
-AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "|P|= 9  |P_in|= 1  |P_out|= 3  |T|= 4  |F|= 13" stderr])
-AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-sm.owfn],0,ignore,ignore)
-AT_KEYWORDS([synthesis])
-AT_CLEANUP
-
-AT_SETUP([Synthesis using state machine transition (sa2sm)])
+AT_SETUP([Synthesis using state machine transition])
 m4_define([AUTOMATON], [test_myCoffee.sa])
 AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-syn.owfn .])
-AT_CHECK([SA2SM AUTOMATON AUTOMATON.owfn],0,ignore,ignore)
+AT_CHECK([PETRI -isa -oowfn AUTOMATON],0,ignore,ignore)
 AT_CHECK([test -f AUTOMATON.owfn])
 AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 11  |P_in|= 1  |P_out|= 3  |T|= 9  |F|= 27" stderr])
@@ -1137,22 +1125,11 @@ AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-syn.owfn],0,ignore,i
 AT_KEYWORDS([synthesis])
 AT_CLEANUP
 
-AT_SETUP([Synthesis using state machine transition (petri)])
-m4_define([AUTOMATON], [test_myCoffee.sa])
-AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-syn.owfn .])
-AT_CHECK([PETRI -isa -oowfn --converter=statemachine AUTOMATON],0,ignore,ignore)
-AT_CHECK([test -f AUTOMATON.owfn])
-AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
-AT_CHECK([GREP -q "|P|= 11  |P_in|= 1  |P_out|= 3  |T|= 9  |F|= 27" stderr])
-AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-syn.owfn],0,ignore,ignore)
-AT_KEYWORDS([synthesis])
-AT_CLEANUP
-
-AT_SETUP([Synthesis using Petrify (petri)])
+AT_SETUP([Synthesis using Petrify])
 m4_define([AUTOMATON], [test_myCoffee.sa])
 AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-sm.owfn .])
 AT_CHECK_PETRIFY
-AT_CHECK([PETRI -isa -oowfn --converter=petrify AUTOMATON],0,ignore,ignore)
+AT_CHECK([PETRI -isa -oowfn --petrify=PETRIFY AUTOMATON],0,ignore,ignore)
 AT_CHECK([test -f AUTOMATON.owfn])
 AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 9  |P_in|= 1  |P_out|= 3  |T|= 4  |F|= 13" stderr])
@@ -1160,11 +1137,11 @@ AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-sm.owfn],0,ignore,ig
 AT_KEYWORDS([synthesis])
 AT_CLEANUP
 
-AT_SETUP([Synthesis using Genet (petri)])
+AT_SETUP([Synthesis using Genet])
 m4_define([AUTOMATON], [test_myCoffee.sa])
 AT_CHECK([cp TESTFILES/AUTOMATON .])
 AT_CHECK_GENET
-AT_CHECK([PETRI -isa -oowfn --converter=genet AUTOMATON],0,ignore,ignore)
+AT_CHECK([PETRI -isa -oowfn --genet=GENET AUTOMATON],0,ignore,ignore)
 AT_CHECK([test -f AUTOMATON.owfn])
 AT_KEYWORDS([synthesis])
 AT_CLEANUP

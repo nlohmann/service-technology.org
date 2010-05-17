@@ -7,6 +7,13 @@
                         http://service-technology.org/pnapi
 
 
+Version 4.02-unreleased
+=======================
+
+* made petri configurable (paths to external tools, configuration file)
+
+* removed sa2sm and sa2owfn
+
 Version 4.01 (2010-05-11)
 =========================
 

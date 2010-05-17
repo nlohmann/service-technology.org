@@ -10,12 +10,6 @@
 
 dot = "@DOT@"
 
-# PNAPI may use an external tool, Genet or Petrify, to compute a Petri Net
-# back from its appropriate automaton.
-
-genet = "@GENET@"
-petrify = "@PETRIFY@"
-
 # PNAPI needs to create a temporary file to pass it to Petrify. The filename
 # PNAPI should use can be specified below. The filename should end with
 # 'XXXXXX' which is replaced at runtime with a random string. In case you use

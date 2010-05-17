@@ -28,7 +28,7 @@ sound_SOURCES = sound.cc
 sysconf_DATA = petri.conf
 
 # pass the sysconfdir to Petri (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
-petri_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
+petri_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\" -I$(top_srcdir)/src
 
 petri_LDADD =  $(top_builddir)/src/libpnapi.la
 generator_LDADD =  $(top_builddir)/src/libpnapi.la

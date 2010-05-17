@@ -65,10 +65,14 @@ public class RunConfiguration {
 
 	protected AdaptiveSystem 	as;
 	protected AdaptiveProcess	initialState;
+  protected boolean inWaitForUser;
+
+
 
 	public RunConfiguration(AdaptiveSystem as) {
 		this.as = as;
 		this.initialState = (AdaptiveProcess)EcoreUtil.copy(as.getAdaptiveProcess());
+		this.inWaitForUser = false;
 	}
 	
 	
@@ -179,6 +183,8 @@ public class RunConfiguration {
 		// refresh the diagram to get rid of nodes and edges
 		((CanonicalConnectionEditPolicy) editor
 				.getDiagramEditPart().getEditPolicy("Canonical")).refresh();
+		
+		this.inWaitForUser = false;
 	}
 	
 	/**

@@ -181,21 +181,21 @@ public class SimulationInt_EventAction extends SimulationInteractiveAction {
    * Insert all activated normal transitions in {@link hub.top.adaptiveSystem.AdaptiveProcess}
    */  
   private void insertActivatedNormalTransitions() {
-    ////System.out.println("START insertActivatedNormalTransions()");
+    System.out.println("START insertActivatedNormalTransions()");
     //get every activated normal oclet
     for(EMap<Condition, Condition> currentInsertMap : activatedNormalTransitions) {
       if(currentInsertMap != null && !currentInsertMap.isEmpty()) {
-        ////System.out.println("insert normal oclet " + ((Oclet) ((Condition) currentInsertMap.get(0).getKey()).eContainer().eContainer()).getName());
+        System.out.println("insert normal transition "+currentInsertMap.get(0).getKey().getPostSet().get(0).getName()+" from " + ((Oclet) ((Condition) currentInsertMap.get(0).getKey()).eContainer().eContainer()).getName());
         // insert at most one transition (and its post-set)
         insertNodes(currentInsertMap, 1); 
       }
-      ////else System.out.println("insert normal oclet " + currentInsertMap);
+      else System.out.println("insert normal transition " + currentInsertMap);
       
     }//END for - iterate all oclets
     
     activatedNormalTransitions.clear();
     
-    ////System.out.println("END insertActivatedNormalTransitions()");
+    System.out.println("END insertActivatedNormalTransitions()");
   }
   
   /**
@@ -205,7 +205,7 @@ public class SimulationInt_EventAction extends SimulationInteractiveAction {
    * @author Manja Wolf
    */
   private void applyActivatedAntiTransitions() {
-    ////System.out.println("START applyActivatedAntiTransitions()");
+    System.out.println("START applyActivatedAntiTransitions()");
     //get every activated anti oclet
     for(EMap<Condition, Condition> disableMap : activatedAntiTransitions) {
       disableNodes_anti(disableMap);
@@ -213,7 +213,7 @@ public class SimulationInt_EventAction extends SimulationInteractiveAction {
     
     activatedAntiTransitions.clear();
      
-    ////System.out.println("END applyActivatedAntiTransitions()");
+    System.out.println("END applyActivatedAntiTransitions()");
   }
   
   /**

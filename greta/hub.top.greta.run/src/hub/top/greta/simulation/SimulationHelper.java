@@ -37,7 +37,7 @@
 
 package hub.top.greta.simulation;
 
-import hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewer;
+//import hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewer;
 import hub.top.adaptiveSystem.AdaptiveProcess;
 import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
@@ -93,14 +93,17 @@ public class SimulationHelper {
     // - either in the AdaptiveProcessEditPart of the editor
     // - or in the separate Process Viewer
   	GraphicalEditPart	apCanvasEditPart = null;
-  	if (apEditPart instanceof hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveProcessEditPart)
+  	if (apEditPart instanceof hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveProcessEditPart) {
   		// the AdaptiveProcessEditPart has its canvas inside a compartment
   		apCanvasEditPart = (GraphicalEditPart) apEditPart.getChildren().get(0);
+  	} 
+  	/*
   	else if (apEditPart instanceof hub.top.adaptiveProcess.diagram.edit.parts.AP_ProcessEditPart) {
   		// the AP_ProcessEditPart IS the canvas
   		apCanvasEditPart = (GraphicalEditPart) apEditPart;
   	}
-  
+   */
+  	
   	List<EditPart> editPartsToArrange = null;
   	ArrangeRequest request = null;
   	// arrange ALL nodes in the canvas

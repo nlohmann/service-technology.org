@@ -1,6 +1,7 @@
 Greta v1.1.5
 ------------
 
++ [simulation] fixed several bugs in the simulation code
 + [analysis] algorithm to check for implied scenarios on the branching process of an oclet system
 + [interface] check soundness of free-choice process and generate counter-example trace in graphical editor
 + [interface] build branching processes from parameterized models
@@ -10,6 +11,7 @@ Greta v1.1.5
 * [unfolding algorithm] fixed bug in computation of equivalence relation wrt. cut-off events
 * [synthesis] removing parallel transitions with the same label in synthesized net
 + [interface] statistics to print size of computed prefix
++ [interface] added support to print specifications via Eclipse printing API
 * [interface] move Wizards to 'Adaptive System' category
 
 Greta v1.1.4

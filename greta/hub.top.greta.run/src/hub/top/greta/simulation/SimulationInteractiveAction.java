@@ -87,7 +87,7 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
 
   // internal flag of the action that signals whether the action now
   // waits for the user to select an enabled event for firing
-  private boolean inWaitForFireEvent = false;
+  //private boolean inWaitForUser = false;
   
   public void init(IWorkbenchWindow window) {
     workbenchWindow = window;
@@ -108,8 +108,11 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
       return;
     }
     
+    RunConfiguration rc = StartAction.getActiveRunConfiguration(simView.adaptiveSystem);
+    if (rc == null) return;
+    
     extendAdaptiveProcess();
-    inWaitForFireEvent = true;
+    rc.inWaitForUser = true;
     action.setEnabled(false);
   }
 
@@ -132,18 +135,22 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
         if (action.isEnabled()) {
           action.setEnabled(false);
         }
-        
+
         if (!StartAction.isSimuluationRunning()) {
-          inWaitForFireEvent = false;  // no simulation running: reset internal configuration
+          //inWaitForUser = false;  // no simulation running: reset internal configuration
         }
 
         return;
       }
       
+      RunConfiguration rc = StartAction.getActiveRunConfiguration(simView.adaptiveSystem);
+      if (rc == null) return;
+
+      
       // changed the editor?
       if (simView.processViewEditor != simView.oldProcessViewEditor) {
         // reset action's internal state
-        inWaitForFireEvent = false;
+        rc.inWaitForUser = false;
         simView.processViewEditor.getDiagramGraphicalViewer().select(simView.apEditPart);
         return;
       }
@@ -153,12 +160,13 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
       if (simView.adaptiveSystem.isSetWellformednessToOclets()) {
 
         // the editor changed silently, we have a new model:
-        if(simView.oldAdaptiveSystem != null && !simView.oldAdaptiveSystem.equals(simView.adaptiveSystem))
+        if(simView.oldAdaptiveSystem != null && !simView.oldAdaptiveSystem.equals(simView.adaptiveSystem)) {
           // reset action
-          inWaitForFireEvent = false;
+          rc.inWaitForUser = false;
+        }
         
         // an event was selected: fire it
-        if(inWaitForFireEvent && ((StructuredSelection) selection).getFirstElement() instanceof EventAPEditPart)
+        if(rc.inWaitForUser && ((StructuredSelection) selection).getFirstElement() instanceof EventAPEditPart)
         {
           EventAPEditPart eventEP = (EventAPEditPart) ((StructuredSelection) selection).getFirstElement();
           Event event = (Event) ((org.eclipse.gmf.runtime.notation.Node) eventEP.getModel()).getElement();
@@ -167,18 +175,18 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
             fireSelectedEvent(event);
             eventEP.getViewer().deselect(eventEP);  // auto-deselect the fired transition
 
-            inWaitForFireEvent = false;
+            rc.inWaitForUser = false;
           }
           return;
         }
         
-        if(!inWaitForFireEvent && !action.isEnabled()) {
+        if(!rc.inWaitForUser && !action.isEnabled()) {
           action.setEnabled(true);
         }
         
       } else {  // well-formedness of oclets not checked yet 
         if(action.isEnabled()) {
-          inWaitForFireEvent = false;
+          rc.inWaitForUser = false;
           action.setEnabled(false);
           return;
         }
@@ -186,7 +194,8 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
     } else {  // invalid context
 
       if (action.isEnabled()) {
-        inWaitForFireEvent = false;
+        RunConfiguration rc = StartAction.getActiveRunConfiguration(simView.adaptiveSystem);
+        if (rc != null) rc.inWaitForUser = false;
         action.setEnabled(false);
       }
     }
@@ -410,152 +419,48 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
     for(ListIterator<Map.Entry<Condition, Condition>> li = currentInsertMap.listIterator(); li.hasNext();) {
       Map.Entry<Condition, Condition> ctupel = li.next();
       Condition oCondition = ctupel.getKey(); //oclet condition
-      Condition mpCondition = ctupel.getValue(); //adaptive process condition
+      Condition apCondition = ctupel.getValue(); //adaptive process condition
 
-      ////System.out.println("   next condition from currentInsertMap : " + oCondition.getName());
+      System.out.println("   next condition from currentInsertMap : " + oCondition.getName());
       
       if(!oCondition.getPostEvents().isEmpty()) {
         //there is only one event in postSet, because of wellformedness of oclet (it is an occurrence net)
         Event oPostEvent = oCondition.getPostEvents().get(0);
-        if(!mpCondition.getPostEvents().isEmpty()) {
+        if(!apCondition.getPostEvents().isEmpty()) {
           //is on postSet of mpCondition an event with same label than on oPostEvent?
-          Event mpPostEvent = null;
-          ////System.out.println("   is there an event in adaptive process with same name than oclet event? mpCondition " + mpCondition.getName());
-          for(Event event : mpCondition.getPostEvents()) {
-            if(event.getName().equals(oPostEvent.getName())) {
-              mpPostEvent = event;
-              break;
-            }
-          }
-          //YES, this event is in adaptive process
-          if(mpPostEvent != null) {
-            ////System.out.println("   YES. event " + oPostEvent.getName() + " is in adaptiveProcess.");
-            // look for additional conditions in preSet of event (in oclet)
-            if(oPostEvent.getPreConditions().size() != mpPostEvent.getPreConditions().size()) {
-              ////System.out.println("   the number of preConditions of mpEvent differs from the number of preConditions of oPostEvent");
-              //INSERT CASE 2
-              //the number of preConditions of mpEvent differs from the number of preConditions of oPostEvent
-              //therefore create a new event and connect with preSet
-              insertedMap.put(oPostEvent, createNode(oPostEvent));
-              for(Condition oPreCondition : oPostEvent.getPreConditions()) {
-                //create an arc between adaptive process event and every associated adaptiveProcessPreCondition of oclet
-                if(currentInsertMap.containsKey(oPreCondition)) {
-                  createArc(currentInsertMap.get(oPreCondition), insertedMap.get(oPostEvent));
-                } else
-                if(insertedMap.containsKey(oPreCondition)) {
-                  createArc(insertedMap.get(oPreCondition), insertedMap.get(oPostEvent));
-                } else {
-                  //the condition does not exist - should not occur
-                  ////System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
-                }
-              } //END for - connect all preConditions with new adaptive process event
-              // create all postConditions on adaptive process event and connect them
-              for(Condition oPostCondition : oPostEvent.getPostConditions()) {
-                insertedMap.put(oPostCondition, createNode(oPostCondition));
-                createArc(insertedMap.get(oPostEvent), insertedMap.get(oPostCondition));
-                nextInsertMap.put(oPostCondition, (Condition) insertedMap.get(oPostCondition));
-              } //END Insert actual level - CASE 2
-            } else {
-              //if the preConditions of the both events (oclet and adaptive process) are same
-              //than the event exists yet (maybe from insert of another oclet)
-              boolean isSamePreSet = true;
-              for(Condition oPreCondition : oPostEvent.getPreConditions()) {
-                boolean foundNode = false;
-                for(Condition mpPreCondition : mpPostEvent.getPreConditions()) {
-                  //found different condition in preSets
-                  if(oPreCondition.getName().equals(mpPreCondition.getName())) {
-                    //System.out.println("   equal preSet node.");
-                    foundNode = true;
-                  }
-                }
-                if(!foundNode) {
-                  isSamePreSet = false;
+          Event apPostEvent = null;
+          
+          boolean finishInsert = false;
+          
+          ////System.out.println("   is there an event in adaptive process with same name than oclet event? mpCondition " + apCondition.getName());
+          for(Event event : apCondition.getPostEvents()) {
+            if ( event.getName().equals(oPostEvent.getName())
+              && haveSamePresets(oPostEvent, event, currentInsertMap, insertedMap))
+            {
+              boolean event_enabled = true;
+              for (Condition eventPreCondition : event.getPreConditions()) {
+                if (eventPreCondition.getToken() == 0) {
+                  event_enabled = false;
                   break;
                 }
               }
-              if(isSamePreSet) {
-                ////System.out.println("   is same preSet. Don't create event.");
-                //INSERT CASE 3
-                //associate the ocletEvent with the adaptiveprocessEvent
-                insertedMap.put(oPostEvent, mpPostEvent);
-                //look for postConditions on adaptive process event
-                if(!mpPostEvent.getPostConditions().isEmpty()) {
-                  //there are postConditions on adaptive process event
-                  //look whether all postConditions of oclet event have associated postConditions on adaptive process event
-                  for(Condition oPostCondition : oPostEvent.getPostConditions()) {
-                    Condition mpPostCondition = null;
-                    for(Condition transientCondition : mpPostEvent.getPostConditions()) {
-                      if(oPostCondition.getName().equals(transientCondition.getName())) {
-                        //System.out.println("   the associated postCondition " + oPostCondition.getName() + " of oclet exists on adaptive process event.");
-                        mpPostCondition = transientCondition;
-                        break;
-                      }
-                    }
-                    //if oPostCondition does not exist, than create it and connect it to event in adaptive process
-                    if(mpPostCondition == null) {
-                      insertedMap.put(oPostCondition, createNode(oPostCondition));
-                      createArc(mpPostEvent, insertedMap.get(oPostCondition));
-                    } else {
-                      insertedMap.put(oPostCondition, mpPostCondition);
-                    }
-                    nextInsertMap.put(oPostCondition, (Condition) insertedMap.get(oPostCondition)); //END actual insert level - CASE 3
-                  } //END oPostCondition in mpPostEvent.postCondition? 
-                } //END are there postConditions on adaptive process event?
-              } //END isSamePreSet
-              else {
-                //INSERT CASE 2
-                //is not the same preSet
-                //therefore create a new event and connect with preSet
-                insertedMap.put(oPostEvent, createNode(oPostEvent));
-                for(Condition oPreCondition : oPostEvent.getPreConditions()) {
-                  //create an arc between adaptive process event and every associated adaptiveProcessPreCondition of oclet
-                  if(currentInsertMap.containsKey(oPreCondition)) {
-                    createArc(currentInsertMap.get(oPreCondition), insertedMap.get(oPostEvent));
-                  } else
-                  if(insertedMap.containsKey(oPreCondition)) {
-                    createArc(insertedMap.get(oPreCondition), insertedMap.get(oPostEvent));
-                  } else {
-                    //the condition does not exist - should not occur
-                    ////System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
-                  }
-                } //END for - connect all preConditions with new adaptive process event
-                // create all postConditions on adaptive process event and connect them
-                for(Condition oPostCondition : oPostEvent.getPostConditions()) {
-                  insertedMap.put(oPostCondition, createNode(oPostCondition));
-                  createArc(insertedMap.get(oPostEvent), insertedMap.get(oPostCondition));
-                  nextInsertMap.put(oPostCondition, (Condition) insertedMap.get(oPostCondition));
-                } //END Insert actual level - CASE 2
-                break;
+              if (!event_enabled)
+                continue;
+              
+              apPostEvent = event;
+
+              //YES, this event is in adaptive process
+              if (!insertNodes_existingEvents(currentInsertMap, insertedMap, nextInsertMap, oPostEvent, apPostEvent)) {
+                finishInsert = true;
               }
-            } //END else - means: oPostEvent had only 1 preCondition 
-          } else {
-          //INSERT CASE 2
-          //NO, this event is not in adaptive process
-            //create an event with attribute values of the oPostEvent
-            insertedMap.put(oPostEvent, createNode(oPostEvent));
-            
-            //look for preConditions of the oclet event and create connections if they exist
-            for(Condition oPreCondition : oPostEvent.getPreConditions()) {
-              //is the oCondition in initial Map?
-              if(currentInsertMap.containsKey(oPreCondition)) {
-                //the condition exists in adaptive Process (is in cut) 
-                createArc(currentInsertMap.get(oPreCondition), insertedMap.get(oPostEvent));
-              } else if(insertedMap.containsKey(oPreCondition)) {
-                //the condition exists in adaptive process (was created during this step)
-                createArc(insertedMap.get(oPreCondition), insertedMap.get(oPostEvent));
-              } else {
-                //the condition doesn't exist in adaptive process
-                //should not occur !!!
-                ////System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
-              }
+              break;
             }
-            //if the oPostEvent has postConditions create those conditions in adaptive process
-            //and connect them with associated adaptive process event
-            for(Condition oPostCondition : oPostEvent.getPostConditions()) {
-              insertedMap.put(oPostCondition, createNode(oPostCondition));
-              createArc(insertedMap.get(oPostEvent), insertedMap.get(oPostCondition));
-              nextInsertMap.put(oPostCondition, (Condition) insertedMap.get(oPostCondition)); //END actual insert level - CASE 2
-            }
+          }
+          if (finishInsert) break;  // stop insertion of oPostEvent
+          
+          if(apPostEvent == null) {
+            // if no event in the post-set of apCondition matched oPostEvent
+            insertNodes_newEvent(currentInsertMap, insertedMap, nextInsertMap, oPostEvent, apPostEvent);
           }
         } else {
           //mpCondition has no postEvent -> create an event with attribute values of oPostEvent
@@ -600,7 +505,7 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
               //event is in a future insert level
               //put the condition in the nextLevelMap
               ////System.out.println("      insert postEvent of oclet condition " + oCondition.getName() + " in next Level.");
-              nextInsertMap.put(oCondition, mpCondition);
+              nextInsertMap.put(oCondition, apCondition);
             }
           } else {
             //oPostEvent has only 1 preCondition
@@ -654,6 +559,179 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
   }
   
   /**
+   * @param oPostEvent
+   * @param apPostEvent
+   * @param currentInsertMap
+   * @param insertedMap
+   * @return <code>true</code> iff oPostEvent and apPostEvent have the same pre-set
+   */
+  private boolean haveSamePresets(
+      Event oPostEvent, Event apPostEvent,
+      EMap<Condition, Condition> currentInsertMap, 
+      EMap<Node , Node> insertedMap)
+  {
+    boolean isSamePreSet = true;
+    for(Condition oPreCondition : oPostEvent.getPreConditions()) {
+      System.out.println("   checking "+oPreCondition.getName());
+      boolean foundNode = false;
+      
+      if (currentInsertMap.containsKey(oPreCondition)) foundNode = true;
+      else if (insertedMap.containsKey(oPreCondition)) foundNode = true;
+      /*
+      else {
+        for(Condition apPreCondition : apPostEvent.getPreConditions()) {
+          System.out.println("      comparing with "+apPreCondition.getName());
+          //found different condition in preSets
+          if(oPreCondition.getName().equals(apPreCondition.getName())) {
+            System.out.println("   equal preSet node.");
+            foundNode = true;
+            break;
+          }
+        }
+      }*/
+      if(!foundNode) {
+        isSamePreSet = false;
+        break;
+      }
+    }
+    return isSamePreSet;
+  }
+
+  
+  private boolean insertNodes_existingEvents(
+      EMap<Condition, Condition> currentInsertMap, 
+      EMap<Node , Node> insertedMap,
+      EMap<Condition, Condition> nextInsertMap,
+      Event oPostEvent, Event apPostEvent)
+  {
+    System.out.println("   YES. event " + oPostEvent.getName() + " is in adaptiveProcess.");
+    // look for additional conditions in preSet of event (in oclet)
+    if(oPostEvent.getPreConditions().size() != apPostEvent.getPreConditions().size()) {
+      ////System.out.println("   the number of preConditions of mpEvent differs from the number of preConditions of oPostEvent");
+      //INSERT CASE 2
+      //the number of preConditions of mpEvent differs from the number of preConditions of oPostEvent
+      //therefore create a new event and connect with preSet
+      System.out.println("   YES. create new event (different pre-conditions (size)");
+      insertedMap.put(oPostEvent, createNode(oPostEvent));
+      for(Condition oPreCondition : oPostEvent.getPreConditions()) {
+        //create an arc between adaptive process event and every associated adaptiveProcessPreCondition of oclet
+        if(currentInsertMap.containsKey(oPreCondition)) {
+          createArc(currentInsertMap.get(oPreCondition), insertedMap.get(oPostEvent));
+        } else
+        if(insertedMap.containsKey(oPreCondition)) {
+          createArc(insertedMap.get(oPreCondition), insertedMap.get(oPostEvent));
+        } else {
+          //the condition does not exist - should not occur
+          ////System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
+        }
+      } //END for - connect all preConditions with new adaptive process event
+      // create all postConditions on adaptive process event and connect them
+      for(Condition oPostCondition : oPostEvent.getPostConditions()) {
+        insertedMap.put(oPostCondition, createNode(oPostCondition));
+        createArc(insertedMap.get(oPostEvent), insertedMap.get(oPostCondition));
+        nextInsertMap.put(oPostCondition, (Condition) insertedMap.get(oPostCondition));
+      } //END Insert actual level - CASE 2
+    } else {
+      //if the preConditions of the both events (oclet and adaptive process) are same
+      //than the event exists yet (maybe from insert of another oclet)
+
+      if(haveSamePresets(oPostEvent, apPostEvent, currentInsertMap, insertedMap)) {
+        System.out.println("   is same preSet. Don't create event.");
+        //INSERT CASE 3
+        //associate the ocletEvent with the adaptiveprocessEvent
+        insertedMap.put(oPostEvent, apPostEvent);
+        //look for postConditions on adaptive process event
+        if(!apPostEvent.getPostConditions().isEmpty()) {
+          //there are postConditions on adaptive process event
+          //look whether all postConditions of oclet event have associated postConditions on adaptive process event
+          for(Condition oPostCondition : oPostEvent.getPostConditions()) {
+            Condition apPostCondition = null;
+            for(Condition transientCondition : apPostEvent.getPostConditions()) {
+              if(oPostCondition.getName().equals(transientCondition.getName())) {
+                //System.out.println("   the associated postCondition " + oPostCondition.getName() + " of oclet exists on adaptive process event.");
+                apPostCondition = transientCondition;
+                break;
+              }
+            }
+            //if oPostCondition does not exist, than create it and connect it to event in adaptive process
+            if(apPostCondition == null) {
+              insertedMap.put(oPostCondition, createNode(oPostCondition));
+              createArc(apPostEvent, insertedMap.get(oPostCondition));
+            } else {
+              insertedMap.put(oPostCondition, apPostCondition);
+            }
+            nextInsertMap.put(oPostCondition, (Condition) insertedMap.get(oPostCondition)); //END actual insert level - CASE 3
+          } //END oPostCondition in mpPostEvent.postCondition? 
+        } //END are there postConditions on adaptive process event?
+      } //END isSamePreSet
+      else {
+        //INSERT CASE 2
+        //is not the same preSet
+        //therefore create a new event and connect with preSet
+        System.out.println("   YES. create new event (different pre-conditions (pattern)");
+        insertedMap.put(oPostEvent, createNode(oPostEvent));
+        for(Condition oPreCondition : oPostEvent.getPreConditions()) {
+          //create an arc between adaptive process event and every associated adaptiveProcessPreCondition of oclet
+          if(currentInsertMap.containsKey(oPreCondition)) {
+            createArc(currentInsertMap.get(oPreCondition), insertedMap.get(oPostEvent));
+          } else
+          if(insertedMap.containsKey(oPreCondition)) {
+            createArc(insertedMap.get(oPreCondition), insertedMap.get(oPostEvent));
+          } else {
+            //the condition does not exist - should not occur
+            ////System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
+          }
+        } //END for - connect all preConditions with new adaptive process event
+        // create all postConditions on adaptive process event and connect them
+        for(Condition oPostCondition : oPostEvent.getPostConditions()) {
+          insertedMap.put(oPostCondition, createNode(oPostCondition));
+          createArc(insertedMap.get(oPostEvent), insertedMap.get(oPostCondition));
+          nextInsertMap.put(oPostCondition, (Condition) insertedMap.get(oPostCondition));
+        } //END Insert actual level - CASE 2
+        return false; // break; -- interrupt insertion of events
+      }
+    } //END else - means: oPostEvent had only 1 preCondition 
+    return true;
+  }
+  
+  private boolean insertNodes_newEvent(
+      EMap<Condition, Condition> currentInsertMap, 
+      EMap<Node , Node> insertedMap,
+      EMap<Condition, Condition> nextInsertMap,
+      Event oPostEvent, Event apPostEvent)
+  {
+    System.out.println("   NO. event " + oPostEvent.getName() + " is NOT in adaptiveProcess.");
+    
+    //NO, this event is not in adaptive process
+    //create an event with attribute values of the oPostEvent
+    insertedMap.put(oPostEvent, createNode(oPostEvent));
+    
+    //look for preConditions of the oclet event and create connections if they exist
+    for(Condition oPreCondition : oPostEvent.getPreConditions()) {
+      //is the oCondition in initial Map?
+      if(currentInsertMap.containsKey(oPreCondition)) {
+        //the condition exists in adaptive Process (is in cut) 
+        createArc(currentInsertMap.get(oPreCondition), insertedMap.get(oPostEvent));
+      } else if(insertedMap.containsKey(oPreCondition)) {
+        //the condition exists in adaptive process (was created during this step)
+        createArc(insertedMap.get(oPreCondition), insertedMap.get(oPostEvent));
+      } else {
+        //the condition doesn't exist in adaptive process
+        //should not occur !!!
+        ////System.out.println("the oclet preCondition " + oPreCondition.getName() + " of event " + oPostEvent.getName() + " don't exist in adaptive process. Should not occur!!");
+      }
+    }
+    //if the oPostEvent has postConditions create those conditions in adaptive process
+    //and connect them with associated adaptive process event
+    for(Condition oPostCondition : oPostEvent.getPostConditions()) {
+      insertedMap.put(oPostCondition, createNode(oPostCondition));
+      createArc(insertedMap.get(oPostEvent), insertedMap.get(oPostCondition));
+      nextInsertMap.put(oPostCondition, (Condition) insertedMap.get(oPostCondition)); //END actual insert level - CASE 2
+    } 
+    return true;
+  }
+  
+  /**
    * Create a copy of ocletNode and add it to adaptiveProcess nodeList
    * @author Manja Wolf
    * @param ocletNode
@@ -665,7 +743,7 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
     Node copiedNode = null;
     
     if(ocletNode instanceof Condition) {
-      ////System.out.println("      create condition " + ocletNode.getName());
+      System.out.println("      create condition " + ocletNode.getName());
       Condition ocletCondition = (Condition) ocletNode;
       Condition copiedCondition = AdaptiveSystemFactory.eINSTANCE.createCondition();
       copiedCondition.unsetAbstract(); //TODO: fixme
@@ -795,13 +873,13 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
     if(disableMap == null || disableMap.isEmpty())
       return;
 
-    ////System.out.println("apply anti oclet " + ((Oclet) ((Condition) disableMap.get(0).getKey()).eContainer().eContainer()).getName());
+    System.out.println("apply anti oclet " + ((Oclet) ((Condition) disableMap.get(0).getKey()).eContainer().eContainer()).getName());
     
     //iterate over marked preNet conditions
     for(ListIterator<Map.Entry<Condition, Condition>> li = disableMap.listIterator(); li.hasNext();) {
       Map.Entry<Condition, Condition> ctupel = li.next();
       Condition oCondition = ctupel.getKey(); //oclet condition
-      Condition mpCondition = ctupel.getValue(); //adaptive process condition
+      Condition apCondition = ctupel.getValue(); //adaptive process condition
       
       if(!oCondition.getPostEvents().isEmpty()) {
         //There is only one postEvent
@@ -818,20 +896,20 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
         }
         if(preSetIsInMap) {
           //all preConditions in disabledMap => look for the same labeled event in adaptive process with same preSet
-          Event mpEventToDisable = null;
+          Event apEventToDisable = null;
           //is there a same labeled event with same preConditions like oPostEvent on mpCondition 
-          for(Event mpPostEvent : mpCondition.getPostEvents()) {
+          for(Event apPostEvent : apCondition.getPostEvents()) {
             //there is an event with same name like the event of oclet on mpCondition
-            if(mpPostEvent.getName().equals(oPostEvent.getName()) 
-              && mpPostEvent.getPreConditions().size() == oPostEvent.getPreConditions().size()) {
+            if(apPostEvent.getName().equals(oPostEvent.getName()) 
+              && apPostEvent.getPreConditions().size() == oPostEvent.getPreConditions().size()) {
               //the preSets have same cardinality
               //check the label of preConditions
               boolean isSamePreSet = true;
-              for(Condition mpPreCondition : mpPostEvent.getPreConditions()) {
+              for(Condition apPreCondition : apPostEvent.getPreConditions()) {
                 boolean foundCondition = false;
                 for(Condition oPreCondition : oPostEvent.getPreConditions()) {
-                  if(disableMap.containsValue(mpPreCondition) 
-                      && disableMap.get(oPreCondition).equals(mpPreCondition)) {
+                  if(disableMap.containsValue(apPreCondition) 
+                      && disableMap.get(oPreCondition).equals(apPreCondition)) {
                     //is the same preCondition
                     foundCondition = true;
                     break;
@@ -843,13 +921,13 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
                 }
               } //END for check every preCondition of adaptive process event
               if(isSamePreSet) {
-                mpEventToDisable = mpPostEvent;
+                apEventToDisable = apPostEvent;
                 break;
               }
             } //else - name is different or preSet has other size - check next mpPostEvent
           }
-          if(mpEventToDisable != null) {
-            disableEvent(mpEventToDisable);
+          if(apEventToDisable != null) {
+            disableEvent(apEventToDisable);
           }
         } else {
           ////System.out.println("Do nothing. The Event is deeper in path and will be disabled by another event.");

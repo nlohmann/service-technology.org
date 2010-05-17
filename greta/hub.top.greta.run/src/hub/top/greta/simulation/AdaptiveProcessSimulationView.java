@@ -35,7 +35,7 @@
 
 package hub.top.greta.simulation;
 
-import hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewer;
+//import hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewer;
 import hub.top.adaptiveSystem.AdaptiveProcess;
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.diagram.edit.parts.AdaptiveProcessEditPart;
@@ -55,7 +55,7 @@ public class AdaptiveProcessSimulationView {
 	public AdaptiveSystem oldAdaptiveSystem;
 	public AdaptiveProcess adaptiveProcess;
 	public EditPart apEditPart;
-
+	
 	public AdaptiveProcessSimulationView() {
 		this.oldProcessViewEditor = null;
 		this.processViewEditor = null;
@@ -102,7 +102,7 @@ public class AdaptiveProcessSimulationView {
 					break;
 				}
 			}
-			
+			/*
 		} else if (editor instanceof AdaptiveProcessDiagramViewer) {
 			ed = (DiagramDocumentEditor)editor;
 			
@@ -110,7 +110,7 @@ public class AdaptiveProcessSimulationView {
 			ap = (AdaptiveProcess) ed.getDiagram().getElement();
 			as = (AdaptiveSystem) ap.eContainer();
 			apE = ed.getDiagramEditPart();
-			
+			*/
 		} else {
 			ed = null; ap = null; as = null; apE = null;
 		}

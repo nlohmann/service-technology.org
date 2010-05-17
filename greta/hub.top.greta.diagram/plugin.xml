@@ -102,6 +102,16 @@
          </ViewId>
       </GlobalActionHandlerProvider>
       <GlobalActionHandlerProvider
+         class="org.eclipse.gmf.runtime.diagram.ui.printing.render.providers.DiagramWithPrintGlobalActionHandlerProvider"
+         id="AdaptiveSystemPresentationPrint">
+         <Priority name="Lowest"/>
+         <ViewId id="hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorID">
+            <ElementType class="org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart">
+               <GlobalActionId actionId="print"/>
+            </ElementType>
+         </ViewId>
+      </GlobalActionHandlerProvider>
+      <GlobalActionHandlerProvider
          class="org.eclipse.gmf.runtime.diagram.ui.providers.ide.providers.DiagramIDEGlobalActionHandlerProvider"
          id="AdaptiveSystemPresentationIDE">
          <Priority name="Lowest"/>
@@ -574,5 +584,15 @@
          contextId="hub.top.adaptiveSystem.diagram.ui.diagramContext"
          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
          sequence="F5"/>
+   </extension>
+   
+   <extension point="org.eclipse.gmf.runtime.common.ui.services.action.contributionItemProviders">
+      <?gmfgen generated="true"?>
+      <contributionItemProvider class="hub.top.adaptiveSystem.diagram.providers.AdaptiveSystemContributionItemProvider">
+         <Priority name="Low"/>
+         <partContribution id="hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditorID">
+            <partAction menubarPath="/file/print" id="printPreviewAction"/>
+         </partContribution>
+      </contributionItemProvider>
    </extension>
 </plugin>

@@ -201,7 +201,6 @@ public class StartAction implements
 		// notify all actions
 		simView.processViewEditor.getDiagramGraphicalViewer().deselectAll();
 		simView.processViewEditor.getDiagramGraphicalViewer().select(simView.apEditPart);
-
 	}
 	
 	// -----------------------------------------------------------------

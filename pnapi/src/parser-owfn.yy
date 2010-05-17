@@ -125,28 +125,48 @@ node_name:
 
 
 interface: 
-  KEY_INTERFACE interface_ports KEY_PLACE places SEMICOLON roles
-| KEY_PLACE typed_places roles ports
+  KEY_INTERFACE interface_ports
+| KEY_PLACE typed_interface ports
+;
+
+interface_place:
+  KEY_PLACE places SEMICOLON
 ;
 
 interface_ports:
-  input_places output_places synchronous 
-| port_list                          
+  interface_ports_list
+| port_list port_list_tail
+;
+
+port_list_tail:
+  /* empty */
+| port_list_tail interface_place
+| port_list_tail roles
+;
+
+interface_ports_list:
+  /* empty */
+| interface_ports_list interface_ports_list_element
+;
+
+interface_ports_list_element:
+  input_places
+| output_places
+| synchronous
+| roles
+| interface_place
 ;
 
 input_places:
-  /* empty */
-| KEY_INPUT { parser_.labelType_ = Label::INPUT; } interface_labels SEMICOLON                
+  KEY_INPUT { parser_.labelType_ = Label::INPUT; } interface_labels SEMICOLON                
 ;
 
 output_places:
-  /* empty */ 
-| KEY_OUTPUT { parser_.labelType_ = Label::OUTPUT; } interface_labels SEMICOLON                 
+  KEY_OUTPUT { parser_.labelType_ = Label::OUTPUT; } interface_labels SEMICOLON                 
 ;
 
 synchronous:
-  /* empty */ 
-| KEY_SYNCHRONOUS { parser_.labelType_ = Label::SYNCHRONOUS; } interface_labels SEMICOLON
+  KEY_SYNCHRONOUS { parser_.labelType_ = Label::SYNCHRONOUS; } interface_labels SEMICOLON
 ;
 
   // NOTE: capacity kept due to compatibility reasons; is not actually used
@@ -212,12 +232,26 @@ commands:
 port_list:
   KEY_PORT node_name
   { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); } 
-  input_places output_places synchronous              
+  port_input_places port_output_places port_synchronous              
 | port_list KEY_PORT node_name
   { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
-  input_places output_places synchronous
+  port_input_places port_output_places port_synchronous
 ;
 
+port_input_places:
+  /* empty */
+| input_places
+;
+
+port_output_places:
+  /* empty */
+| output_places
+;
+
+port_synchronous:
+  /* empty */
+| synchronous
+;
 
 places: 
   capacity place_list { parser_.capacity_ = 0; }
@@ -246,8 +280,7 @@ place_list:
 
 
 roles:
-  /* empty */
-| KEY_ROLES role_names SEMICOLON
+  KEY_ROLES role_names SEMICOLON
 ;
 
 role_names:
@@ -258,14 +291,26 @@ role_names:
 ;
 
 
-typed_places: 
-  internal_places input_places output_places synchronous 
-| places SEMICOLON
+typed_interface:
+  typed_interface_list
+| places SEMICOLON roles
+;
+
+typed_interface_list:
+  /* empty */
+| typed_interface_list typed_interface_list_element
+;
+
+typed_interface_list_element:
+  internal_places
+| input_places
+| output_places
+| synchronous
+| roles
 ;
 
 internal_places:
-  /* empty */
-| KEY_INTERNAL places SEMICOLON                   
+  KEY_INTERNAL places SEMICOLON                   
 ;
 
 

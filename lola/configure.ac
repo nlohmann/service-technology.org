@@ -41,6 +41,8 @@ AM_CONDITIONAL(USE_LIBCONFIG, [test ${ac_cv_lib_configpp_main} = "yes"])
 AM_MISSING_PROG(GENGETOPT, gengetopt)
 AM_MISSING_PROG(HELP2MAN, help2man)
 
+AC_CHECK_FUNCS([drand48])
+
 # set up autotest
 AM_MISSING_PROG(AUTOM4TE, autom4te)
 AC_CONFIG_TESTDIR(tests)

@@ -20,6 +20,7 @@
 
 
 #include <cstdlib>
+#include <config.h>
 #include "dimensions.H"
 #include "net.H"
 #include "formula.H"
@@ -36,12 +37,18 @@ unsigned int Rescounter; // next free entry in Reserve
 unsigned int* hashcounter;
 unsigned int* globalhashcounter;
 
+#ifdef HAVE_DRAND48
+#define myRand() drand48()
+#else
+#define myRand() rand()
+#endif
+
 #define stubbinsert(X)  {\
         if(!((X)->instubborn == StubbornStamp))\
         {\
             if((X)->enabled)\
             {\
-                if((drand48() <= (1.0 / (1.0 + globalhashcounter[(Places[0]->hash_value+(X)->hash_change) % HASHSIZE] ))))\
+                if((myRand() <= (1.0 / (1.0 + globalhashcounter[(Places[0]->hash_value+(X)->hash_change) % HASHSIZE] ))))\
                 {\
                     return(X);\
                 }\

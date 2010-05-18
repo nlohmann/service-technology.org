@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
     std::cout << "\t-@grep -L \"RESULT: 0\" *.quasiliveness.result | tr '\\n' ',' | $(SED) 's/.$$//' | $(SED) 's/,/, /g'\n\n";
     std::cout << "%.quasiliveness.result:\n";
     std::cout << "\t@echo \"ANALYSE TRANSITION $(@:%.quasiliveness.result=%)\" > $(@:%.result=%.task)\n";
-    std::cout << "\t-@lola-deadtransition $(net) -a$(@:%.result=%.task) &> $@ ; echo \"RESULT: $$?\" >> $@\n\n";
+    std::cout << "\t-@lola-deadtransition $(net) -a$(@:%.result=%.task) > $@ ; echo \"RESULT: $$?\" >> $@\n\n";
 
 
     // quasi-liveness using findpath
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
             std::cout << " " << (*n)->getName() << " >= " << a->getWeight();
         }
         std::cout << " )\" > $(@:%.result=%.task)\n";
-        std::cout << "\t-@lola-findpath $(net) -a$(@:%.result=%.task) &> $@ ; echo \"RESULT: $$?\" >> $@\n";
+        std::cout << "\t-@lola-findpath $(net) -a$(@:%.result=%.task) > $@ ; echo \"RESULT: $$?\" >> $@\n";
     }
     std::cout << "\n";
 
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
     std::cout << "\t-@grep -q \"RESULT: 0\" liveness.result\n\n";
     std::cout << "liveness.result:\n";
     std::cout << "\t@echo \"FORMULA \"$(final) > $(@:%.result=%.task)\n";
-    std::cout << "\t-@lola-liveprop $(net) -a$(@:%.result=%.task) -S &> $@ ; echo \"RESULT: $$?\" >> $@\n\n";
+    std::cout << "\t-@lola-liveprop $(net) -a$(@:%.result=%.task) -S > $@ ; echo \"RESULT: $$?\" >> $@\n\n";
 
     // boundedness using boundedplace
     std::cout << "\n##############################################################################\n";
@@ -124,7 +124,7 @@ int main(int argc, char** argv) {
     std::cout << "\t-@grep -L \"RESULT: 1\" *.boundedness.result | tr '\\n' ',' | $(SED) 's/.$$//' | $(SED) 's/,/, /g'\n\n";
     std::cout << "%.boundedness.result:\n";
     std::cout << "\t@echo \"ANALYSE PLACE $(@:%.boundedness.result=%)\" > $(@:%.result=%.task)\n";
-    std::cout << "\t@-lola-boundedplace $(net) -a$(@:%.result=%.task) &> $@ ; echo \"RESULT: $$?\" >> $@\n\n";
+    std::cout << "\t@-lola-boundedplace $(net) -a$(@:%.result=%.task) > $@ ; echo \"RESULT: $$?\" >> $@\n\n";
 
     // boundedness using boundednet
     std::cout << "\n##############################################################################\n";
@@ -132,7 +132,7 @@ int main(int argc, char** argv) {
     std::cout << "##############################################################################\n";
     std::cout << "boundednessnet: boundednessnet.result\n\n";
     std::cout << "boundednessnet.result:\n";
-    std::cout << "\t-@lola-boundednet $(net) &> $@ ; echo \"RESULT: $$?\" >> $@\n\n";
+    std::cout << "\t-@lola-boundednet $(net) > $@ ; echo \"RESULT: $$?\" >> $@\n\n";
 
     // relaxed soundness 
     std::cout << "\n##############################################################################\n";
@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
     std::cout << "relaxed: $(transitions:%=%.relaxed.result)\n";
     std::cout << "\t-@grep -L \"RESULT: 1\" *.relaxed.result | tr '\\n' ',' | $(SED) 's/.$$//' | $(SED) 's/,/, /g'\n\n";
     std::cout << "%.relaxed.result:\n";
-    std::cout << "\t-@lola-statepredicate $(net:.lola=).$(@:%.relaxed.result=%).lola &> $@ ; echo \"RESULT: $$?\" >> $@\n\n";
+    std::cout << "\t-@lola-statepredicate $(net:.lola=).$(@:%.relaxed.result=%).lola > $@ ; echo \"RESULT: $$?\" >> $@\n\n";
 
     // clean up
     std::cout << "\n##############################################################################\n";

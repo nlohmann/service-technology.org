@@ -8,7 +8,7 @@ QUASILIVENESS="true"
 
 for TRANSITION in `ls *.quasiliveness.result`; do
   TRANSITIONNAME=`echo $TRANSITION | sed 's/.quasiliveness.result//'`
-  grep -q "RESULT: 0" $TRANSITION
+  grep -q "RESULT: 1" $TRANSITION
   if [ "$?" != "1" ]; then
     DEADTRANSITIONS="$DEADTRANSITIONS $TRANSITIONNAME"
     QUASILIVENESS="false"

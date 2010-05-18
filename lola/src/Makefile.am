@@ -31,7 +31,10 @@ lola_EXTRASOURCES = ltl.H ltl.cc
 
 EXTRA_DIST = readnet-syntax.h cmdline.ggo \
              configs/userconfig.H.boundednet \
+             configs/userconfig.H.boundedplace \
              configs/userconfig.H.deadlock \
+             configs/userconfig.H.deadtransition \
+             configs/userconfig.H.findpath \
              configs/userconfig.H.full \
              configs/userconfig.H.full1 \
              configs/userconfig.H.fullcover \

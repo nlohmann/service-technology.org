@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <fstream>
 #include "pnapi.h"
-#include "verbose.h"
 
 using namespace pnapi;
 using pnapi::io::util::operator<<; // to output final conditions
@@ -10,6 +9,7 @@ using pnapi::io::util::operator<<; // to output final conditions
 int main(int argc, char** argv) {
     PetriNet net;
 
+    fprintf(stderr, "transforming net\n");
     {
         std::ifstream i;
         i.open(argv[1], std::ios_base::in);
@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
         o << pnapi::io::lola << net;
     }
 
+    fprintf(stderr, "creating nets for relaxed soundness\n");
     PNAPI_FOREACH(t, net.getTransitions()) {
         PetriNet relaxedNet(net);
         Place& p1 = relaxedNet.createPlace();
@@ -49,6 +50,7 @@ int main(int argc, char** argv) {
 
 
     // write the Makefile
+    fprintf(stderr, "creating Makefile\n");
 
     std::cout << ".PHONY : clean veryclean\n\n";
     std::cout << "SED = sed\n\n";
@@ -112,7 +114,7 @@ int main(int argc, char** argv) {
     std::cout << "\t-@grep -q \"RESULT: 0\" liveness.result\n\n";
     std::cout << "liveness.result:\n";
     std::cout << "\t@echo \"FORMULA \"$(final) > $(@:%.result=%.task)\n";
-    std::cout << "\t-@lola-liveprop $(net) -a$(@:%.result=%.task) &> $@ ; echo \"RESULT: $$?\" >> $@\n\n";
+    std::cout << "\t-@lola-liveprop $(net) -a$(@:%.result=%.task) -S &> $@ ; echo \"RESULT: $$?\" >> $@\n\n";
 
     // boundedness using boundedplace
     std::cout << "\n##############################################################################\n";

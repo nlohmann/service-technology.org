@@ -1,6 +1,7 @@
 SUBDIRS = unfolder
 
 bin_PROGRAMS = petri cdnf generator cphils configurator
+dist_noinst_SCRIPTS = process.sh make_customer.sh
 
 noinst_PROGRAMS = sound
 
@@ -40,7 +41,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/src
 
 GGOFILES = cmdline.ggo cdnf-cmdline.ggo configurator-cmdline.ggo
 BUILT_SOURCES = $(GGOFILES:.ggo=.c)
-EXTRA_DIST = $(GGOFILES) make_customer.sh
+EXTRA_DIST = $(GGOFILES)
 DISTCLEANFILES = $(GGOFILES:.ggo=.c) $(GGOFILES:.ggo=.h)
 
 ################################################################

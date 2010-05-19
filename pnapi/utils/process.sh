@@ -35,7 +35,7 @@ BOUNDEDNESS="true"
 
 for PLACE in `ls *.boundedness.result`; do
   PLACENAME=`echo $PLACE | sed 's/.boundedness.result//'`
-  grep -q "RESULT: 1" $TRANSITION
+  grep -q "RESULT: 0" $PLACE
   if [ "$?" != "1" ]; then
     UNBOUNDEDPLACES="$UNBOUNDEDPLACES $PLACENAME"
     BOUNDEDNESS="false"
@@ -72,7 +72,7 @@ fi
 # INFERENCE #
 #############
 
-if [ "$BOUNDEDNESS" == "false" ]; then
+if [ "$BOUNDEDNESS" = "false" ]; then
   echo "soundness = false;"
   echo "weaksoundness = false;"
   echo "relaxedsoundness = false;"
@@ -81,7 +81,7 @@ fi
 
 # bounded + quasiliveness = relaxedsoundness
 
-if [ "$QUASILIVENESS" == "true" ]; then
+if [ "$QUASILIVENESS" = "true" ]; then
   echo "relaxedsoundness = true;"
 else
   echo "relaxedsoundness = false;"
@@ -89,13 +89,13 @@ fi
 
 # bounded + liveness = weak soundness
 
-if [ "$LIVENESS" == "true" ]; then
+if [ "$LIVENESS" = "true" ]; then
   echo "weaksoundness = true;"
 else
   echo "weaksoundness = false;"
 fi
 
-if ([ "$QUASILIVENESS" == "true" ] && [ "$LIVENESS" == "true" ]); then
+if ([ "$QUASILIVENESS" = "true" ] && [ "$LIVENESS" = "true" ]); then
   echo "soundness = true;"
 else
   echo "soundness = false;"

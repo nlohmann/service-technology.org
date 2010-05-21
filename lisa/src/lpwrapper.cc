@@ -62,31 +62,8 @@ extern set<pnapi::Arc*> arcs;
 	@return The number of equations on success, -1 otherwise.
 */
 int LPWrapper::createMEquation(Marking& m1, Marking& m2, bool verbose) {
-	tpos.clear(); // probably not necessary
-	tvector.clear();
 
-	// set the column variables in lp_solve according to the global transition ordering
-	int colnr=0;
-	for(unsigned int o=0; o<transitionorder.size(); ++o,++colnr)
-	{
-		Transition* t(transitionorder[o]); // get the transitions according to the global ordering 
-		set_col_name(lp,colnr+1,const_cast<char*>(t->getName().c_str()));
-		set_int(lp,colnr+1,1); // declare all variables to be integer
-		tpos[t] = colnr; // remember the ordering of the transitions
-	}
-	if (colnr!=(int)(cols)) cerr << "sara: LPWrapper error: column number mismatch" << endl;
-
-	//lp_solve objective: minimum firing sequence length
-	int *colpoint = new int[cols];
-	REAL *mat = new REAL[cols];
-	for(unsigned int y=0; y<cols; y++)
-	{
-		mat[y]=1;
-		colpoint[y]=y+1;
-	}
-	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
-	if (!set_obj_fnex(lp,cols,mat,colpoint)) return -1;
-	set_minim(lp);
+	setupT();
 
 	//create incidence matrix by adding rows to lp_solve
 	for(unsigned int k=0; k<placeorder.size(); ++k)
@@ -120,9 +97,8 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, bool verbose) {
 	if (verbose) write_LP(lp,stdout);
 	else set_verbose(lp,CRITICAL);
 	basicrows = placeorder.size()+cols;
-	delete[] colpoint;
-	delete[] mat;
-	return (int)(basicrows);
+
+	return cleanup();
 }
 
 
@@ -131,32 +107,8 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, bool verbose) {
 	@return The number of equations on success, -1 otherwise.
 */
 int LPWrapper::calcTInvariant(bool verbose) {
-	tpos.clear(); // probably not necessary
-	tvector.clear();
 
-	// set the column variables in lp_solve according to the global transition ordering
-	int colnr=0;
-	for(unsigned int o=0; o<transitionorder.size(); ++o,++colnr)
-	{
-		Transition* t(transitionorder[o]); // get the transitions according to the global ordering 
-		set_col_name(lp,colnr+1,const_cast<char*>(t->getName().c_str()));
-		set_int(lp,colnr+1,1); // declare all variables to be integer
-		tpos[t] = colnr; // remember the ordering of the transitions
-	}
-	if (colnr!=(int)(cols)) cerr << "lisa: LPWrapper error: column number mismatch" << endl;
-
-	//lp_solve objective: minimum firing sequence length
-	int *colpoint = new int[cols];
-	REAL *mat = new REAL[cols];
-	for(unsigned int y=0; y<cols; y++)
-	{
-		mat[y]=1;
-		colpoint[y]=y+1;
-	}
-	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
-	if (!set_obj_fnex(lp,cols,mat,colpoint)) return -1;
-	
-	set_minim(lp);
+	setupT();
 	
 	//create incidence matrix by adding rows to lp_solve
 	for(unsigned int k=0; k<placeorder.size(); ++k)
@@ -180,27 +132,7 @@ int LPWrapper::calcTInvariant(bool verbose) {
 		if (!add_constraintex(lp,cols,mat,colpoint,EQ,mark)) return -1;
 	}
 
-	//allow only nonnegative solutions
-	REAL r = 1;
-
-	for(int y=1; y<=(int)(cols); ++y)
-		if (!add_constraintex(lp,1,&r,&y,GE,0)) return -1;
-
-	//exclude trivial solution	for(unsigned int y=0; y<cols; y++){
-		mat[y]=1;
-		colpoint[y]=y+1;
-	}
-	if (!add_constraintex(lp,cols,mat,colpoint,GE,1)) return -1;
-	
-
-	set_add_rowmode(lp,FALSE);	
-	if (verbose) write_LP(lp,stdout);
-	else set_verbose(lp,CRITICAL);
-	basicrows = placeorder.size()+cols;
-
-	int ret = solve(lp);
-
-	if(ret != 2){
+	if(solveLP() != 2){
 	  message("Found t-invariant");
 
 	  bool isNonNegative = true;
@@ -219,9 +151,7 @@ int LPWrapper::calcTInvariant(bool verbose) {
 	  message("No t-invariant could be found");
 	}
 	
-	delete[] colpoint;
-	delete[] mat;
-	return (int)(basicrows);
+	return cleanup();
 }
 
 /** Creates equations for calculating p-invariants for lp_solve.
@@ -229,32 +159,8 @@ int LPWrapper::calcTInvariant(bool verbose) {
 	@return The number of equations on success, -1 otherwise.
 */
 int LPWrapper::calcPInvariant(bool verbose) {
-	ppos.clear(); // probably not necessary
-	pvector.clear();
-
-	// set the column variables in lp_solve according to the global place ordering
-	int colnr=0;
-	for(unsigned int o=0; o<placeorder.size(); ++o,++colnr)
-	{
-		Place* t(placeorder[o]); // get the places according to the global ordering 
-		set_col_name(lp,colnr+1,const_cast<char*>(t->getName().c_str()));
-		set_int(lp,colnr+1,1); // declare all variables to be integer
-		ppos[t] = colnr; // remember the ordering of the place
-	}
-	if (colnr!=(int)(cols)) cerr << "lisa: LPWrapper error: column number mismatch" << endl;
-
-	//lp_solve objective: minimum firing sequence length
-	int *colpoint = new int[cols];
-	REAL *mat = new REAL[cols];
-	for(unsigned int y=0; y<cols; y++)
-	{
-		mat[y]=1;
-		colpoint[y]=y+1;
-	}
-	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
-	if (!set_obj_fnex(lp,cols,mat,colpoint)) return -1;
 	
-	set_minim(lp);
+	setupP();
 	
 	//create incidence matrix by adding rows to lp_solve
 	for(unsigned int k=0; k<transitionorder.size(); ++k)
@@ -278,27 +184,7 @@ int LPWrapper::calcPInvariant(bool verbose) {
 		if (!add_constraintex(lp,cols,mat,colpoint,EQ,mark)) return -1;
 	}
 
-	//allow only nonnegative solutions
-	REAL r = 1;
-
-	for(int y=1; y<=(int)(cols); ++y)
-		if (!add_constraintex(lp,1,&r,&y,GE,0)) return -1;
-
-	//exclude trivial solution	for(unsigned int y=0; y<cols; y++){
-		mat[y]=1;
-		colpoint[y]=y+1;
-	}
-	if (!add_constraintex(lp,cols,mat,colpoint,GE,1)) return -1;
-	
-
-	set_add_rowmode(lp,FALSE);	
-	if (verbose) write_LP(lp,stdout);
-	else set_verbose(lp,CRITICAL);
-	basicrows = placeorder.size()+cols;
-
-	int ret = solve(lp);
-
-	if(ret != 2){
+	if(solveLP() != 2){
 	  message("Found p-invariant");
 
 	  bool isNonNegative = true;
@@ -317,9 +203,7 @@ int LPWrapper::calcPInvariant(bool verbose) {
 	  message("No p-invariant could be found");
 	}
 	
-	delete[] colpoint;
-	delete[] mat;
-	return (int)(basicrows);
+	return cleanup();
 }
 
 /** Creates equations for calculating a trap that is minimal, i.e. it 
@@ -331,33 +215,9 @@ int LPWrapper::calcPInvariant(bool verbose) {
 */
 
 int LPWrapper::calcTrap(bool verbose) {
-	ppos.clear(); // probably not necessary
-	pvector.clear();
-
-	// set the column variables in lp_solve according to the global place ordering
-	int colnr=0;
-	for(unsigned int o=0; o<placeorder.size(); ++o,++colnr)
-	{
-		Place* t(placeorder[o]); // get the places according to the global ordering 
-		set_col_name(lp,colnr+1,const_cast<char*>(t->getName().c_str()));
-		set_int(lp,colnr+1,1); // declare all variables to be integer
-		ppos[t] = colnr; // remember the ordering of the place
-	}
-	if (colnr!=(int)(cols)) cerr << "lisa: LPWrapper error: column number mismatch" << endl;
-
-	//lp_solve objective: minimum firing sequence length
-	int *colpoint = new int[cols];
-	REAL *mat = new REAL[cols];
-	for(unsigned int y=0; y<cols; y++)
-	{
-		mat[y]=1;
-		colpoint[y]=y+1;
-	}
-	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
-	if (!set_obj_fnex(lp,cols,mat,colpoint)) return -1;
 	
-	set_minim(lp);
-	
+	setupP();
+
 	set<pnapi::Arc*>::iterator ait;
 	for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
 	{
@@ -390,28 +250,8 @@ int LPWrapper::calcTrap(bool verbose) {
 		}
 
 	}
-
-	//allow only nonnegative solutions
-	REAL r = 1;
-
-	for(int y=1; y<=(int)(cols); ++y)
-		if (!add_constraintex(lp,1,&r,&y,GE,0)) return -1;
-
-	//exclude trivial solution	for(unsigned int y=0; y<cols; y++){
-		mat[y]=1;
-		colpoint[y]=y+1;
-	}
-	if (!add_constraintex(lp,cols,mat,colpoint,GE,1)) return -1;
 	
-
-	set_add_rowmode(lp,FALSE);	
-	if (verbose) write_LP(lp,stdout);
-	else set_verbose(lp,CRITICAL);
-	basicrows = placeorder.size()+cols;
-
-	int ret = solve(lp);
-
-	if(ret != 2){
+	if(solveLP() != 2){
 	  message("Found trap containing the following places");
 
 	  bool isNonNegative = true;
@@ -425,13 +265,10 @@ int LPWrapper::calcTrap(bool verbose) {
 	else
 	  message("No trap could be found");
 
-		
-	delete[] colpoint;
-	delete[] mat;
-	return (int)(basicrows);
+	return cleanup();
 }
 
-/** Creates equations for calculating a siphons that is minimal, i.e. it 
+/** Creates equations for calculating a siphon that is minimal, i.e. it 
     it contains the smallest set of places among all siphons.
     Implementation follows "Verification of Safety Properties Using Integer
     Programming: Beyond the State Equation" by Javier Esparza and Stephan Melzer
@@ -440,32 +277,7 @@ int LPWrapper::calcTrap(bool verbose) {
 */
 
 int LPWrapper::calcSiphon(bool verbose) {
-	ppos.clear(); // probably not necessary
-	pvector.clear();
-
-	// set the column variables in lp_solve according to the global place ordering
-	int colnr=0;
-	for(unsigned int o=0; o<placeorder.size(); ++o,++colnr)
-	{
-		Place* t(placeorder[o]); // get the places according to the global ordering 
-		set_col_name(lp,colnr+1,const_cast<char*>(t->getName().c_str()));
-		set_int(lp,colnr+1,1); // declare all variables to be integer
-		ppos[t] = colnr; // remember the ordering of the place
-	}
-	if (colnr!=(int)(cols)) cerr << "lisa: LPWrapper error: column number mismatch" << endl;
-
-	//lp_solve objective: minimum firing sequence length
-	int *colpoint = new int[cols];
-	REAL *mat = new REAL[cols];
-	for(unsigned int y=0; y<cols; y++)
-	{
-		mat[y]=1;
-		colpoint[y]=y+1;
-	}
-	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
-	if (!set_obj_fnex(lp,cols,mat,colpoint)) return -1;
-	
-	set_minim(lp);
+	setupP();
 	
 	set<pnapi::Arc*>::iterator ait;
 	for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
@@ -500,6 +312,92 @@ int LPWrapper::calcSiphon(bool verbose) {
 
 	}
 
+	if(solveLP() != 2){
+	  message("Found siphon containing the following places");
+
+	  bool isNonNegative = true;
+          get_variables(lp, mat);
+	  fprintf(stderr, "Places:\n");
+          for(int j = 0; j < cols; j++){
+	    if(mat[j] > 0)
+              fprintf(stderr, "%s\n", get_col_name(lp, j + 1));
+	  }
+	}
+	else
+	  message("No siphon could be found");
+
+	return cleanup();
+}
+
+int LPWrapper::setupP(){
+	ppos.clear(); // probably not necessary
+	pvector.clear();
+
+	// set the column variables in lp_solve according to the global place ordering
+	colnr=0;
+	for(unsigned int o=0; o<placeorder.size(); ++o,++colnr)
+	{
+		Place* t(placeorder[o]); // get the places according to the global ordering 
+		set_col_name(lp,colnr+1,const_cast<char*>(t->getName().c_str()));
+		set_int(lp,colnr+1,1); // declare all variables to be integer
+		ppos[t] = colnr; // remember the ordering of the place
+	}
+	if (colnr!=(int)(cols)) cerr << "lisa: LPWrapper error: column number mismatch" << endl;
+
+	//lp_solve objective: minimum firing sequence length
+	colpoint = new int[cols];
+	mat = new REAL[cols];
+	for(unsigned int y=0; y<cols; y++)
+	{
+		mat[y]=1;
+		colpoint[y]=y+1;
+	}
+	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
+	if (!set_obj_fnex(lp,cols,mat,colpoint)) return -1;
+	
+	set_minim(lp);
+
+}
+
+int LPWrapper::setupT(){
+	tpos.clear(); // probably not necessary
+	tvector.clear();
+
+	// set the column variables in lp_solve according to the global transition ordering
+	colnr=0;
+	for(unsigned int o=0; o<transitionorder.size(); ++o,++colnr)
+	{
+		Transition* t(transitionorder[o]); // get the transitions according to the global ordering 
+		set_col_name(lp,colnr+1,const_cast<char*>(t->getName().c_str()));
+		set_int(lp,colnr+1,1); // declare all variables to be integer
+		tpos[t] = colnr; // remember the ordering of the transitions
+	}
+	if (colnr!=(int)(cols)) cerr << "lisa: LPWrapper error: column number mismatch" << endl;
+
+	//lp_solve objective: minimum firing sequence length
+	colpoint = new int[cols];
+	mat = new REAL[cols];
+	for(unsigned int y=0; y<cols; y++)
+	{
+		mat[y]=1;
+		colpoint[y]=y+1;
+	}
+	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
+	if (!set_obj_fnex(lp,cols,mat,colpoint)) return -1;
+	
+	set_minim(lp);
+
+}
+
+int LPWrapper::cleanup(){
+
+	delete[] colpoint;
+	delete[] mat;
+	return (int)(basicrows);
+
+}
+
+int LPWrapper::solveLP(){
 	//allow only nonnegative solutions
 	REAL r = 1;
 
@@ -518,26 +416,8 @@ int LPWrapper::calcSiphon(bool verbose) {
 	else set_verbose(lp,CRITICAL);
 	basicrows = placeorder.size()+cols;
 
-	int ret = solve(lp);
+	return solve(lp);
 
-	if(ret != 2){
-	  message("Found siphon containing the following places");
-
-	  bool isNonNegative = true;
-          get_variables(lp, mat);
-	  fprintf(stderr, "Places:\n");
-          for(int j = 0; j < cols; j++){
-	    if(mat[j] > 0)
-              fprintf(stderr, "%s\n", get_col_name(lp, j + 1));
-	  }
-	}
-	else
-	  message("No siphon could be found");
-
-		
-	delete[] colpoint;
-	delete[] mat;
-	return (int)(basicrows);
 }
 
 /** Calculate the global ordering of transitions and places for this problem.

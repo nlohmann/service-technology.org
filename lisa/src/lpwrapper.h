@@ -69,6 +69,11 @@ private:
 	/// The number of columns (transitions) in the system of equations
 	unsigned int cols;
 
+	/// Variables used for constructing the equations 
+	int colnr;
+	int *colpoint;
+	REAL *mat;
+
 	/// The number of rows in the system created from the marking equation
 	unsigned int basicrows;
 
@@ -77,6 +82,18 @@ private:
 
 	/// internal variables for positions of places in the system and for the solution
 	map<Place*,int> ppos, pvector;
+
+	/// setting up the column variables as places
+	int setupP();
+
+	/// setting up the column variables as transitions
+	int setupT();
+
+	/// cleans up
+	int cleanup();
+	
+	/// solves the problem
+	int solveLP();
 	
 
 };

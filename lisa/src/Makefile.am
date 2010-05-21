@@ -4,7 +4,6 @@ bin_PROGRAMS = lisa
 # the plain sources you need to compile (no generated code)
 
 lisa_SOURCES =  main.cc \
-		InvariantFinder.cc InvariantFinder.h \
 		lpwrapper.h lpwrapper.cc \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h \

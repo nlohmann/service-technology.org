@@ -30,6 +30,10 @@ option "findTrap" -
   "Tries to find a trap for a given petri net."
   flag off
 
+option "findSiphon" -
+  "Tries to find a siphon for a given petri net."
+  flag off
+
 section "Configuration"
 
 option "lisa" -

@@ -38,7 +38,7 @@ class LPWrapper {
 public:
 
 	/// Constructor (int=number of columns)
-	LPWrapper(unsigned int);
+	LPWrapper(unsigned int, PetriNet*);
 
 	/// Destructor
 	~LPWrapper();
@@ -51,10 +51,18 @@ public:
 
 	int calcTrap(bool b);
 
+	int calcSiphon(bool b);
+
+	bool calcPTOrder();
+
 	/// Level of verbosity of lp_solve
 	int verbose;
 
 private:
+
+	/// The petri net
+	PetriNet* _net;	
+
 	/// The lp_solve structure
 	lprec* lp;
 

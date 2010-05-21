@@ -33,7 +33,6 @@
 #include "cmdline.h"
 #include "Output.h"
 #include "verbose.h"
-#include "InvariantFinder.h"
 #include "lpwrapper.h"
 
 using std::vector;
@@ -170,31 +169,46 @@ int main(int argc, char** argv) {
         abort(2, "\b%s", s.str().c_str());
     }
 
+
     /*----------------------------------------.
     | 2. calculate and print t-invariant
     `----------------------------------------*/
     if(args_info.findTInv_flag){
-      InvariantFinder invFinder(&net, net.getTransitions().size());
-      invFinder.findTInvariant();
+      LPWrapper lpw(net.getTransitions().size(), &net);
+      lpw.calcPTOrder();
+      lpw.calcTInvariant(false);
     }
 
     /*----------------------------------------.
-    | 2. calculate and print p-invariant
+    | 3. calculate and print p-invariant
     `----------------------------------------*/
 
     if(args_info.findPInv_flag){
-      InvariantFinder invFinder(&net, net.getPlaces().size());
-      invFinder.findPInvariant();
+      LPWrapper lpw(net.getPlaces().size(), &net);
+      lpw.calcPTOrder();
+      lpw.calcPInvariant(false);
     }
 
     /*----------------------------------------.
-    | 2. calculate and print trap
+    | 4. calculate and print trap
     `----------------------------------------*/
 
     if(args_info.findTrap_flag){
-      InvariantFinder invFinder(&net, net.getPlaces().size());
-      invFinder.findTrap();
+      LPWrapper lpw(net.getPlaces().size(), &net);
+      lpw.calcPTOrder();
+      lpw.calcTrap(false);
     }
+
+
+    /*----------------------------------------.
+    | 5. calculate and print siphon
+    `----------------------------------------*/
+
+    if(args_info.findSiphon_flag){
+      LPWrapper lpw(net.getPlaces().size(), &net);
+      lpw.calcPTOrder();
+      lpw.calcSiphon(false);
+    }	
 
 
     return EXIT_SUCCESS;

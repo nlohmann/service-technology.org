@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Ajax upload demo</title>
+
+<link rel="shortcut icon" href="../resource/favicon.ico" type="image/x-icon" />
+<link rel="icon" href="../resource/favicon.ico" type="image/x-icon" />
+
+<script type="text/javascript" src="../resource/js/jquery-1.2.6.pack.js"></script>
+<script type="text/javascript" src="../resource/js/jquery.ajax_upload.0.6.min.js"></script>
+
+<script type= "text/javascript">/*<![CDATA[*/
+$(document).ready(function(){
+	var allowed = ['bpel', 'owfn', 'og'];
+	
+	var type_names = [];
+	type_names["owfn"] = "open net";
+	type_names["bpel"] = "WS-BPEL process";
+	type_names["og"] = "operating guidelines";
+	
+	var allfiles = [];
+	var uploaded_files = [];
+	uploaded_files["owfn"] = 0;
+	uploaded_files["bpel"] = 0;
+	uploaded_files["og"] = 0;
+	
+	var current_ext;
+	
+	$.ajax_upload('#button2', {
+		action: 'upload.php',
+		
+		onSubmit : function(file , ext){	  
+			if ($.inArray(ext, allowed ) === -1){
+				// extension is not allowed
+				alert('Error: only WS-BPEL processes (.bpel) and open nets (.owfn) are allowed.');
+				
+				// cancel upload
+				return false;
+			}
+			
+			current_ext = ext;
+
+			$('#button2').get(0).disabled = true;
+			this.disable();			
+		},
+		
+		onSuccess : function(file){
+      uploaded_files[current_ext]++;
+
+		  var filename = file.replace(/^.*[\/\\]/g, '');
+		  
+			$('<li></li>').appendTo('#example2 .files').text(type_names[current_ext] + ' #' + uploaded_files[current_ext].toString(10) + ': ' + filename);
+
+			$('#button2').get(0).disabled = false;
+			this.enable();
+			
+			// reset previous guess
+			$('#example2 .analysis').empty();
+			allfiles["og"] = uploaded_files["og"];
+			allfiles["owfn"] = uploaded_files["owfn"];
+			allfiles["bpel"] = uploaded_files["bpel"];
+
+	    // WS-BPEL process: translate to open net
+	    for (i=1; i<=allfiles["bpel"]; i++) {
+	      $('<li></li>').appendTo('#example2 .analysis').text('translate WS-BPEL process #' + i.toString(10) + ' to an open net (yielding open net #' + (allfiles["owfn"]+1).toString(10) + ')');
+	      allfiles["owfn"]++;
+	    }
+	    
+	    // open net: check controllability
+	    for (i=1; i<=allfiles["owfn"]; i++) {
+	      $('<li></li>').appendTo('#example2 .analysis').text('check if open net #' + i.toString(10) + ' is controllable');
+	    }
+
+      m=allfiles["owfn"];
+	    // open net: calculate partner
+	    for (i=1; i<=m; i++) {
+	      $('<li></li>').appendTo('#example2 .analysis').text('calculate partner for open net #' + i.toString(10) + ' (yielding open net #' + (allfiles["owfn"]+1).toString(10) + ')');
+	      allfiles["owfn"]++;
+      }
+	    
+	    // open net: calculate operating guidelines
+	    for (i=1; i<=allfiles["owfn"]; i++) {
+	      $('<li></li>').appendTo('#example2 .analysis').text('calculate operating guidelines of open net #' + i.toString(10) + ' (yielding operating guidelines #' + (allfiles["og"]+1).toString(10) + ')');
+	      allfiles["og"]++;
+	    }
+
+	    // operating guidelines: count services
+	    for (i=1; i<=allfiles["og"]; i++) {
+	      $('<li></li>').appendTo('#example2 .analysis').text('count services characterized by operating guidelines #' + i.toString(10));
+	    }
+
+	    // operating guidelines: reduce
+	    for (i=1; i<=allfiles["og"]; i++) {
+	      $('<li></li>').appendTo('#example2 .analysis').text('reduce operating guidelines #' + i.toString(10));
+	    }
+
+	    // operating guidelines: public view
+	    for (i=1; i<=allfiles["og"]; i++) {
+	      $('<li></li>').appendTo('#example2 .analysis').text('calculate public view for operating guidelines #' + i.toString(10));
+	    }
+
+	    // operating guidelines: test cases
+	    for (i=1; i<=allfiles["og"]; i++) {
+	      $('<li></li>').appendTo('#example2 .analysis').text('calculate test cases for operating guidelines #' + i.toString(10));
+	    }
+	    
+	    // open net + operating guidelines: matching
+	    for (i=1; i<=allfiles["owfn"]; i++) {
+	      for (j=1; j<=allfiles["og"]; j++) {
+	        $('<li></li>').appendTo('#example2 .analysis').text('check if open net #' + i.toString(10) + ' is characterized by operating guidelines #' + j.toString(10));
+        }
+	    }
+
+	    // >1 operating guidelines: accordance
+	    for (i=1; i<=allfiles["og"]; i++) {
+	      for (j=1; j<=allfiles["og"]; j++) {
+	        if (j != i) {
+	          $('<li></li>').appendTo('#example2 .analysis').text('check if operating guidelines #' + i.toString(10) + ' characterize at most the partners of operating guidelines #' + j.toString(10));
+          }
+        }
+	    }
+
+	    // >1 operating guidelines: equivalence
+	    for (i=1; i<=allfiles["og"]; i++) {
+	      for (j=i; j<=allfiles["og"]; j++) {
+	        if (j != i) {
+            $('<li></li>').appendTo('#example2 .analysis').text('check if operating guidelines #' + i.toString(10) + ' and operating guidelines #' + j.toString(10) + ' are equivalent');
+          }
+        }
+	    }
+	    
+		}
+	});
+});/*]]>*/</script>
+</head>
+<body>
+
+	<div id="example2" class="example">
+	<form>
+		<p>You can upload a WS-BPEL process or an open net.</p>
+		<input type="button" value="Upload file" id="button2" />
+
+		<h2>Uploaded files:</h2>
+		<ul class="files"></ul>
+		
+		<h2>Possible Analysis:</h2>
+		<ul class="analysis"></ul>
+	</form>
+	</div>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+{
+  generator:    Wendy 3.0-unreleased (i386-apple-darwin10.2.0)
+  invocation:   wendy 06-03-23_BPM06_shop_sect_3.owfn --og --verbose --dot 
+  events:       4 send, 3 receive, 0 synchronous
+  statistics:   12 nodes
+}
+
+INTERFACE
+  INPUT
+    out.client.onlineshop.confirm, out.client.onlineshop.deliver, out.client.onlineshop.invoice;
+  OUTPUT
+    in.client.onlineshop.abort, in.client.onlineshop.login, in.client.onlineshop.order, in.client.onlineshop.terms;
+
+NODES
+  2124992 : (in.client.onlineshop.abort + in.client.onlineshop.login + in.client.onlineshop.order)
+    out.client.onlineshop.confirm -> 0
+    out.client.onlineshop.deliver -> 0
+    out.client.onlineshop.invoice -> 0
+    in.client.onlineshop.abort -> 2108496
+    in.client.onlineshop.login -> 2110912
+    in.client.onlineshop.order -> 2118800
+  2101296 : (in.client.onlineshop.abort + in.client.onlineshop.terms)
+    out.client.onlineshop.confirm -> 0
+    out.client.onlineshop.deliver -> 0
+    out.client.onlineshop.invoice -> 0
+    in.client.onlineshop.abort -> 2117600
+    in.client.onlineshop.terms -> 2133104
+  2108496 : final
+    out.client.onlineshop.confirm -> 0
+    out.client.onlineshop.deliver -> 0
+    out.client.onlineshop.invoice -> 0
+  2110912 : in.client.onlineshop.order
+    out.client.onlineshop.confirm -> 0
+    out.client.onlineshop.deliver -> 0
+    out.client.onlineshop.invoice -> 0
+    in.client.onlineshop.order -> 2120240
+  2117600 : final
+    out.client.onlineshop.confirm -> 0
+    out.client.onlineshop.deliver -> 0
+    out.client.onlineshop.invoice -> 0
+  2118800 : in.client.onlineshop.login
+    out.client.onlineshop.confirm -> 0
+    out.client.onlineshop.deliver -> 0
+    out.client.onlineshop.invoice -> 0
+    in.client.onlineshop.login -> 2120240
+  2120240 : out.client.onlineshop.confirm * (out.client.onlineshop.deliver + out.client.onlineshop.invoice)
+    out.client.onlineshop.confirm -> 2101296
+    out.client.onlineshop.deliver -> 2136528
+    out.client.onlineshop.invoice -> 2127248
+  2127248 : out.client.onlineshop.deliver
+    out.client.onlineshop.confirm -> 0
+    out.client.onlineshop.deliver -> 2132032
+    out.client.onlineshop.invoice -> 0
+  2131728 : out.client.onlineshop.deliver
+    out.client.onlineshop.confirm -> 0
+    out.client.onlineshop.deliver -> 2132032
+    out.client.onlineshop.invoice -> 0
+  2132032 : final
+    out.client.onlineshop.confirm -> 0
+    out.client.onlineshop.deliver -> 0
+    out.client.onlineshop.invoice -> 0
+  2133104 : (out.client.onlineshop.deliver + out.client.onlineshop.invoice)
+    out.client.onlineshop.confirm -> 0
+    out.client.onlineshop.deliver -> 2136528
+    out.client.onlineshop.invoice -> 2131728
+  2136528 : out.client.onlineshop.invoice
+    out.client.onlineshop.confirm -> 0
+    out.client.onlineshop.deliver -> 0
+    out.client.onlineshop.invoice -> 2132032
+  0 : true
+    out.client.onlineshop.confirm -> 0
+    out.client.onlineshop.deliver -> 0
+    out.client.onlineshop.invoice -> 0
+    in.client.onlineshop.abort -> 0
+    in.client.onlineshop.login -> 0
+    in.client.onlineshop.order -> 0
+    in.client.onlineshop.terms -> 0

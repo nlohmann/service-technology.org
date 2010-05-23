@@ -1,0 +1,38 @@
+{
+  generator:    Wendy 3.0-unreleased (i386-apple-darwin10.2.0)
+  invocation:   wendy 06-03-23_BPM06_shop_sect_3.owfn --sa --waitstatesOnly --verbose --dot 
+  events:       4 send, 3 receive, 0 synchronous
+  statistics:   11 nodes
+}
+
+INTERFACE
+  INPUT
+    out.client.onlineshop.confirm, out.client.onlineshop.deliver, out.client.onlineshop.invoice;
+  OUTPUT
+    in.client.onlineshop.abort, in.client.onlineshop.login, in.client.onlineshop.order, in.client.onlineshop.terms;
+
+NODES
+  2124992 : INITIAL
+    in.client.onlineshop.abort -> 2108496
+    in.client.onlineshop.login -> 2110912
+  2101296
+    in.client.onlineshop.abort -> 2117600
+    in.client.onlineshop.terms -> 2133104
+  2108496 : FINAL
+  2110912
+    in.client.onlineshop.order -> 2120240
+  2117600 : FINAL
+  2120240
+    out.client.onlineshop.confirm -> 2101296
+    out.client.onlineshop.deliver -> 2136528
+    out.client.onlineshop.invoice -> 2127248
+  2127248
+    out.client.onlineshop.deliver -> 2132032
+  2131728
+    out.client.onlineshop.deliver -> 2132032
+  2132032 : FINAL
+  2133104
+    out.client.onlineshop.deliver -> 2136528
+    out.client.onlineshop.invoice -> 2131728
+  2136528
+    out.client.onlineshop.invoice -> 2132032

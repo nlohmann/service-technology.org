@@ -1,0 +1,38 @@
+INTERFACE
+  INPUT
+    a,
+    b,
+    c;
+  OUTPUT
+    x,
+    y,
+    z;
+
+NODES
+  0 : !x : blue,
+  7 : final : blue : finalnode,
+  26 : ((?a + ?b) * ?c) : blue,
+  27 : (final + !z) : blue,
+  29 : (!y + ?a) : blue,
+  30 : !y : blue,
+  31 : final : blue : finalnode,
+  34 : ?a : blue,
+  37 : (!y + ?b) : blue,
+  38 : ?b : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 26 : !x,
+  26 -> 27 : ?c,
+  26 -> 29 : ?b,
+  26 -> 37 : ?a,
+  27 -> 7 : !z,
+  29 -> 30 : ?a,
+  29 -> 34 : !y,
+  30 -> 31 : !y,
+  34 -> 31 : ?a,
+  37 -> 30 : ?b,
+  37 -> 38 : !y,
+  38 -> 31 : ?b;

@@ -1,0 +1,131 @@
+.console {
+  margin-left: auto;
+  margin-right: auto;
+  width: 558px; /* width of console.png */
+}
+
+.console .title {
+  height: 23px;
+  background-image: url(../images/console.png);
+  background-repeat:no-repeat;
+  background-position-top: 0px;
+  z-index: 10;
+}
+
+.console .title img {
+  padding-top: 5px;
+}
+
+.console .title img.toggle {
+  padding-right: 10px;
+  float: right;
+}
+
+.console .title img.close {
+  padding-left: 10px;
+  float: left;
+}
+
+.console .title img.minimize,
+.console .title img.resize {
+  padding-left: 6px;
+  float: left;
+}
+
+.console .command {
+  font-weight: bold;
+  margin-top: 0.5em;
+  margin-bottom: 1em;
+}
+
+.console .content {
+  white-space: pre;
+  position: relative;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 0.5em;
+  
+  height: 300px;
+  min-height: 300px;
+  
+  border-left-color: gray;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-right-color: gray;
+  border-right-style: solid;
+  border-right-width: 1px;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  font-family: Consolas, typewriter;
+  font-size: 8pt;
+  color: #0F0;
+  
+  z-index: 0;
+
+  background: #222;
+
+/*  overflow-x: auto;*/ /* Use horizontal scroller if needed; for Firefox 2, not needed in Firefox 3 */
+  white-space: pre-wrap; /* css-3 */
+  white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+  white-space: -pre-wrap; /* Opera 4-6 */
+  white-space: -o-pre-wrap; /* Opera 7 */
+}
+
+.console .status,
+.console .status2 {
+  position: relative;  
+  height: 15px;
+
+  margin-bottom: 10px;
+  padding-left: 10px;
+  
+  border-left-color: gray;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-right-color: gray;
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-bottom-color: gray;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+
+  color: #000;
+  font-size: 8pt;
+  font-weight: normal;
+  font-family: tahoma, sans serif;
+  
+  background: url(../images/status.png) repeat-x bottom;
+}
+
+.console .status {
+  top: 0px;
+  margin-top: 0px;
+
+  z-index: 20;
+}
+
+.console .status2 {
+  top: 331px;
+  margin-top: -26px;
+
+  z-index: 10;
+}
+
+.console .status img {
+  padding-top: 2px;
+  padding-right: 5px;
+  float: left;
+}
+
+.console .status2 img {
+  padding-top: 2px;
+  padding-right: 10px;
+  z-index: 11;
+  width: 43px;
+  height: 11px;
+  float: left;
+}

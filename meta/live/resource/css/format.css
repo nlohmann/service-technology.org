@@ -1,0 +1,155 @@
+/* http://www.xs4all.nl/~peterned/examples/csslayout1.html */
+html, body {
+	margin:0;
+	padding:0;
+	height:100%; /* needed for container min-height */
+	background:gray;
+}
+
+#container {
+	position:relative; /* needed for footer positioning*/
+	margin:0 auto; /* center, not in IE5 */
+	width:850px;
+	background:#fff;
+	height:auto !important; /* real browsers */
+	height:100%; /* IE6: treaded as min-height*/
+	min-height:100%; /* real browsers */
+	
+  border-left-color: #000;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-right-color: #000;
+  border-right-style: solid;
+  border-right-width: 1px;
+}
+
+#content {
+  padding: 10px;
+  padding-bottom: 48px;
+}
+
+#footer {
+	position:absolute;
+	text-align: center;
+	width:100%;
+	bottom:0; /* stick to bottom */
+	background:gray;
+	padding-top:10px;
+}
+
+#header {
+	padding:1em;
+	background:#ddd;
+	border-bottom:6px double gray;
+}
+
+ul {
+  list-style-type: square;
+}
+
+body {
+  font-family: tahoma, sans-serif;
+  font-size: 10pt;
+  color: #444;
+}
+
+h1 {
+  font-size: 14pt;
+}
+
+h2 {
+  letter-spacing: -0.5px;
+  padding-top: 30px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  background: url(/resource/images/dots.gif) repeat-x bottom;
+  font-size: 11pt;
+}
+
+h3 {
+  letter-spacing: -0.5px;
+  font-size: 10pt;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+td {
+  text-align: center;
+}
+
+td a img {
+  border: 0px;
+}
+
+td.module {
+  text-align: left;
+  font-weight: bold;
+}
+
+th {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+label:hover {
+    cursor: pointer;
+    color: #000;
+}
+
+div#tabs {
+  width: 800px;
+}
+
+div#bpel2owfn.ui-tabs-panel,
+div#fiona.ui-tabs-panel,
+div#wendy.ui-tabs-panel,
+div#migration.ui-tabs-panel,
+div#rachel.ui-tabs-panel,
+div#pnog.ui-tabs-panel,
+div#adapter.ui-tabs-panel {
+  background: #EEE;
+  width: 800px;
+}
+
+div#running {
+  width: 250px;
+  background: #EEE;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+div#running img {
+  margin-right: 10px;
+  text-align: right;
+}
+
+
+.dotimg {
+  display: none;
+  padding: 10px;
+  text-align: center;
+}
+
+.dotimg .doterror {
+  text-align: left;
+}
+
+.dotimg .doterror img {
+  padding-bottom: 0px;
+  margin-left: -10px;
+  padding-top: 2px;
+  padding-right: 5px;
+}
+
+.dotimg img {
+  border: 0px;
+  border-style: none;
+}
+
+.dotimg .label {
+  padding-top: 10px;
+}

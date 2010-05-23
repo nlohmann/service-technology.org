@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <title>service-technology.org/live</title>
+
+  <link rel="shortcut icon" href="resource/favicon.ico" type="image/x-icon" />
+  <link rel="icon" href="resource/favicon.ico" type="image/x-icon" />
+
+  <link rel="stylesheet" type="text/css" href="resource/css/format.css" />
+  <link rel="stylesheet" type="text/css" href="resource/css/layout_tabs.css" />
+
+  <script type="text/javascript" src="resource/js/jquery-1.2.6.pack.js"></script>
+  <script type="text/javascript" src="resource/js/ui.core.js"></script>
+  <script type="text/javascript" src="resource/js/ui.tabs.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $("#tabs > ul").tabs();
+    });
+  </script>
+</head>
+
+<body>
+  <div id="container">
+    <div id="content">
+      
+      <h1 style="font-family: Georgia;">service-technology.org/live</h1>
+
+      <div id="tabs" class="flora">
+        <ul>
+          <li><a href="#bpel2owfn"><span>BPEL2oWFN</span></a></li>
+          <li><a href="#fiona"><span>Fiona</span></a></li>
+          <li><a href="#wendy"><span>Wendy</span></a></li>
+          <li><a href="#rachel"><span>Rachel</span></a></li>
+          <li><a href="#adapter"><span>Adapter Synthesis</span></a></li>
+          <li><a href="#pnog"><span>Petri Net OG</span></a></li>
+          <li><a href="#migration"><span>Instance Migration</span></a></li>
+        </ul>
+      </div>
+
+      <div id="bpel2owfn">
+        <form action="bpel2owfn.php" method="post" enctype="multipart/form-data">
+          <fieldset>
+            <legend>Input BPEL Process</legend>
+            <input type="radio" name="input" value="given" checked="checked" id="bpel2owfn_given" /><label for="bpel2owfn_given"> Use a given BPEL process:</label>
+            <select name="input_service" size="1">
+              <optgroup label="WS-BPEL Specification">
+                <option value="auctionService">Auction Service</option>
+                <option value="loanApprovalProcess">Loan Approval Process</option>
+                <option value="OrderingServiceProcess">Ordering Service Process</option>
+                <option value="purchaseOrderProcess">Purchase Order Process</option>
+                <option value="shippingService">Shipping Service</option>
+              </optgroup>
+            </select><br />
+            <input type="radio" name="input" value="file" id="bpel2owfn_file" /><label for="bpel2owfn_file"> Use an uploaded BPEL process:</label><input name="input_file" type="file" accept="text/*" /><br/>
+            <input type="radio" name="input" value="url" id="bpel2owfn_url" /><label for="bpel2owfn_url"> Use a BPEL process from a URL:</label><input name="input_url" type="text" size="30" placeholder="enter URL of BPEL process" /><br />
+            <p>
+              Note that uploaded files or files given as URL will be stored on our server for at most 24 hours. They will, however, not be accessible by  other users.
+            </p>
+          </fieldset>
+
+          <fieldset>
+            <legend>Petri Net Patterns</legend>
+            <input type="radio" name="patterns" value="small" checked="checked" id="bpel2owfn_patterns_small" /><label for="bpel2owfn_patterns_small"> Use small patterns (no fault or compensation handling)</label><br />
+            <input type="radio" name="patterns" value="standardfaults" id="bpel2owfn_patterns_standardfaults" /><label for="bpel2owfn_patterns_standardfaults"> Use complete patterns</label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Output File Format</legend>
+            <input type="radio" name="format" value="owfn" checked="checked" /> Create a Fiona open net<br />
+            <input type="radio" name="format" value="lola" /> Create a LoLA Petri net
+          </fieldset>
+
+          <fieldset>
+            <legend>Translation Options</legend>
+            Apply structural reduction rules: 
+            <select name="reduce" size="1">
+              <option value="0">no rules</option>
+              <option value="1">remove structurally dead nodes</option>
+              <option value="2">remove unused status places</option>
+              <option value="3">remove identical nodes</option>
+              <option value="4">remove serial nodes</option>
+              <option value="5">remove self-loop nodes</option>
+            </select>
+          </fieldset>
+
+          <fieldset>
+            <legend>Output</legend>
+            <input type="radio" name="output" value="full" checked="checked" /> Display full translation output (output file and graphics)<br />
+            <input type="radio" name="output" value="result" /> Display output file only<br />
+          </fieldset>
+
+          <p><input type="submit" value="run BPEL2oWFN" /></p>
+        </form>
+      </div>
+
+
+      <div id="fiona">
+        <form action="fiona.php" method="post" enctype="multipart/form-data">
+          <fieldset>
+            <legend>Input Open Net</legend>
+            <input type="radio" name="input" value="given" checked="checked" /> Use a given open net:
+            <select name="input_service" size="1">
+              <optgroup label="Examples">
+                <option value="06-03-23_BPM06_shop_sect_3">BPM 2006 Online Shop 1</option>
+                <option value="06-03-23_BPM06_shop_sect_6">BPM 2006 Online Shop 2</option>
+                <option value="dke07_shop_sect_3">DKE 2008 Online Shop 1</option>
+                <option value="dke07_shop_sect_6">DKE 2008 Online Shop 2</option>
+                <option value="myCoffee">Coffee Vending Machine</option>
+              </optgroup>
+              <optgroup label="Academic Examples">
+                <option>sequence3</option>
+                <option>sequence4</option>
+                <option>sequence5</option>
+                <option>sequence6</option>
+                <option>sequence7</option>
+                <option>sequence8</option>
+                <option>sequence9</option>
+                <option>sequence10</option>
+                <option>sequence11</option>
+                <option>sequence12</option>
+                <option>sequence13</option>
+                <option>sequence14</option>
+                <option>sequence15</option>
+                <option>sequence16</option>
+                <option>sequence17</option>
+                <option>sequence18</option>
+                <option>sequence19</option>
+                <option>sequence20</option>
+                <option value="phcontrol3.unf">phcontrol3</option>
+              </optgroup>
+            </select><br/>
+            <input type="radio" name="input" value="file" /> Use an uploaded open net: <input name="input_file" type="file" accept="text/*" /><br/>
+            <input type="radio" name="input" value="url" /> Use an open net from a URL: <input name="input_url" type="text" size="30" placeholder="enter URL of open net" /><br />
+            <p>Note that uploaded files or files given as URL will be stored on our server for at most 24 hours. They will, however, not be accessible by other users.</p>
+          </fieldset>
+
+          <fieldset>
+            <legend>Verification Goal</legend>
+            <input type="radio" name="mode" value="og" checked="checked" /> Calculate the operating guidelines<br />
+            <input type="radio" name="mode" value="ig" /> Calculate the interaction graph
+          </fieldset>
+
+          <fieldset>
+            <legend>Verification Options</legend>
+            <input type="checkbox" name="reduce" value="yes" /> Apply reduction techniques<br />
+            <input type="checkbox" name="responsive" value="yes" /> Create responsive partners
+          </fieldset>
+
+          <fieldset>
+            <legend>Output</legend>
+            <input type="radio" name="output" value="full" checked="checked" /> Display full verification output (output file and graphics)<br />
+            <input type="radio" name="output" value="result" /> Display output file only
+          </fieldset>
+
+          <p><input type="submit" value="run Fiona" /></p>
+        </form>
+      </div>
+
+
+      <div id="wendy">
+        <form action="wendy.php" method="post" enctype="multipart/form-data">
+          <fieldset>
+            <legend>Input Open Net</legend>
+            <input type="radio" name="input" value="given" checked="checked" id="wendy_given" /><label for="wendy_given"> Use a given open net:
+            <select name="input_service" size="1">
+              <optgroup label="Examples">
+                <option value="06-03-23_BPM06_shop_sect_3">BPM 2006 Online Shop 1</option>
+                <option value="06-03-23_BPM06_shop_sect_6">BPM 2006 Online Shop 2</option>
+                <option value="myCoffee">Coffee Vending Machine</option>
+                <option value="zeus">ZEUS Buyer Service</option>
+              </optgroup>
+              <optgroup label="Academic Examples">
+                <option>sequence3</option>
+                <option>sequence4</option>
+                <option>sequence5</option>
+                <option>sequence6</option>
+                <option>sequence7</option>
+                <option>sequence8</option>
+                <option>sequence9</option>
+                <option>sequence10</option>
+                <option>sequence11</option>
+                <option>sequence12</option>
+                <option>sequence13</option>
+                <option>sequence14</option>
+                <option>sequence15</option>
+                <option>sequence16</option>
+                <option>sequence17</option>
+                <option>sequence18</option>
+                <option>sequence19</option>
+                <option>sequence20</option>
+                <option value="phcontrol3.unf">phcontrol3</option>
+              </optgroup>
+            </select></label><br/>
+            <input type="radio" name="input" value="file" id="wendy_file" />
+            <label for="wendy_file"> Use an uploaded open net: <input name="input_file" type="file" accept="text/*" /></label><br/>
+            <input type="radio" name="input" value="url" id="wendy_url" />
+            <label for="wendy_url"> Use an open net from a URL: <input name="input_url" type="text" size="30" placeholder="enter URL of open net" /></label>
+
+            <p>Note that uploaded files or files given as URL will be stored on our server for at most 24 hours. They will, however, not be accessible by other users.</p>
+          </fieldset>
+
+          <fieldset>
+            <legend>Verification Goal</legend>
+            <input type="radio" name="mode" value="og" id="wendy_og" checked="checked" />
+            <label for="wendy_og"> Calculate the operating guidelines (characterization of all partners)</label><br />
+            <input type="radio" name="mode" value="ig" id="wendy_ig" />
+            <label for="wendy_ig"> Synthesize a partner (compatible by design)</label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Reduction Rules</legend>
+            <input type="checkbox" name="reduce_wait" value="yes" id="wendy_reduce_wait" />
+            <label for="wendy_reduce_wait"> Only consider waitstates when calculating successors</label><br />
+            <input type="checkbox" name="reduce_reic" value="yes" id="wendy_reduce_reic" />
+            <label for="wendy_reduce_reic"> Only send if receiving does not resolve all waitstates</label><br />
+            <input type="checkbox" name="reduce_sequ" value="yes" id="wendy_reduce_sequ" />
+            <label for="wendy_reduce_sequ"> Sequentialize receiving events</label><br />
+            <input type="checkbox" name="reduce_succ" value="yes" id="wendy_reduce_succ" />
+            <label for="wendy_reduce_succ"> One succeeding sending event is enough</label><br />
+            <input type="checkbox" name="reduce_quit" value="yes" id="wendy_reduce_quit" />
+            <label for="wendy_reduce_quit"> Once all waitstates of a knowledge are resolved, no more successor knowledges are calculated</label><br />
+          </fieldset>
+
+          <fieldset>
+            <legend>Output</legend>
+            <input type="radio" name="output" value="full" checked="checked" id="wendy_full" />
+            <label for="wendy_full"> Display full verification output (output file and graphics)</label><br />
+            <input type="radio" name="output" value="result" id="wendy_result" />
+            <label for="wendy_result"> Display output file only</label>
+          </fieldset>
+
+          <p><input type="submit" value="run Wendy" /></p>
+        </form>
+      </div>
+
+      <div id="rachel">
+        <form action="rachel.php" method="post" enctype="multipart/form-data">
+          <fieldset>
+            <legend>Service Choreography</legend>
+            Use a given choreography: 
+            <select name="chor" size="1">
+              <optgroup label="Case Study for BPM 2008">
+                <option value="running_example">Running Example (Traveler, Travel Agency, Airline)</option>
+                <option value="auction_service">Auction Service</option>
+                <option value="car_return">Car Return</option>
+                <option value="credit_preparation">Credit Preparation</option>
+                <option value="customer_service">Customer Service</option>
+                <option value="internal_order">Internal Order</option>
+                <option value="loan_approval">Loan Approval</option>
+                <option value="online_shop">Online Shop</option>
+                <option value="order_process">Order Process</option>
+                <option value="purchase_order">Purchase Order</option>
+                <option value="register_request">Register Request</option>
+                <option value="supply_order">Supply Order</option>
+              </optgroup>
+            </select>
+          </fieldset>
+
+          <fieldset>
+            <legend>Goal</legend>
+            <input type="radio" name="mode" value="matching" checked="checked" /> Calculate matching-based edit distance<br />
+            <input type="radio" name="mode" value="simulation" /> Calculate simulation-based edit distance
+          </fieldset>
+
+          <p><input type="submit" value="run Rachel" /></p>
+        </form>
+      </div>
+
+      <div id="adapter">
+<!--        <p>This site demonstrates the results of a paper submitted to the <a href="http://www.informatik.uni-augsburg.de/acsd/">ACSD 2009</a> conference. Select a service model and press the button to calculate the result in your browser.</p> -->
+        <form action="adapter.php" method="post" enctype="multipart/form-data">
+          <fieldset>
+            <legend>Service model</legend>
+            Use a given service model: 
+            <select name="example" size="1">
+              <optgroup label="Simple Example Services">
+                <option value="coffee1">Coffee Vending Machine 1</option>
+                <option value="coffee2">Coffee Vending Machine 2</option>
+              </optgroup>
+            </select>
+          </fieldset>
+
+          <p><input type="submit" value="synthesize adapter" /></p>
+        </form>
+<!--        <p>Alternatively, <a href="examples.zip">a ZIP archive</a> containing all service models can be downloaded.</p> -->
+      </div>
+
+      <div id="pnog">
+        <p>This site demonstrates the results of a paper to be presented at the <a href="http://www.informatik.uni-augsburg.de/acsd/">ACSD 2009</a> conference. Select a service model and press the button to calculate the result in your browser.</p>
+        <form action="pnog.php" method="post" enctype="multipart/form-data">
+          <fieldset>
+            <legend>Service model</legend>
+            Use a given service model: 
+            <select name="service" size="1">
+              <optgroup label="Simple Example Services">
+                <option value="auctionService">Auction Service</option>
+                <option value="myCoffee">Coffee Vending Machine</option>
+                <option value="loanApprovalProcess">Loan Approval Process</option>
+                <option value="phcontrol3.unf">Dining Philosophers</option>
+              </optgroup>
+              <optgroup label="Case Study used in the ACSD 2009 paper">
+                <option selected="selected" value="RE">Running Example (Fig. 1)</option>
+                <option value="SD">Technical Example (Fig. 3)</option>
+                <option value="CN">Contract Negotiation</option>
+                <option value="DG">Deliver Finished Goods</option>
+                <option value="BH">Internal Order</option>
+                <option value="OS">Online Shop</option>
+                <option value="QR">Quotation Requisition</option>
+                <option value="AP">Passport Application</option>
+                <option value="PO">Purchase Order</option>
+                <option value="RS">Reservations</option>
+                <option value="T2">Travel Service</option>
+                <option value="TR">Ticket Reservation</option>
+              </optgroup>
+            </select>
+          </fieldset>
+
+          <p><input type="submit" value="create Petri Net OG" /></p>
+        </form>
+        <p>Alternatively, <a href="pnog/examples.zip">a ZIP archive</a> containing all service models can be downloaded.</p>
+      </div>
+
+      <div id="migration">
+        <p>This site demonstrates the results of a paper submitted to the <a href="http://icsoc.org/">ICSOC 2009</a> conference. Select a service model and press the button to calculate the result in your browser.</p>
+        <form action="migration.php" method="post" enctype="multipart/form-data">
+          <fieldset>
+            <legend>Service model</legend>
+            Use a given service model: 
+            <select name="service" size="1">
+              <optgroup label="Simple Example Services">
+                <option value="reg_old">Registration Service</option>
+              </optgroup>
+              <optgroup label="Case Study for ICSOC 2009 submission">
+                <option selected="selected" value="service-a">Running Example (Fig. 1-3)</option>
+                <option value="service-d">Technical Example (Fig. 4(a)-(c))</option>
+                <option value="service-f">Technical Example (Fig. 4(d)-(f))</option>
+                <option value="CN">Contract Negotiation</option>
+                <option value="DG">Deliver Finished Goods</option>
+                <option value="BH">Internal Order</option>
+                <option value="AP">Passport Application</option>
+                <option value="PO">Purchase Order</option>
+                <option value="T2">Travel Service</option>
+                <option value="TR">Ticket Reservation</option>
+              </optgroup>
+            </select>
+          </fieldset>
+
+          <p><input type="submit" value="calculate migration" /></p>
+        </form>
+<!--        <p>Alternatively, <a href="examples.zip">a ZIP archive</a> containing all service models can be downloaded.</p> -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{
+  generator:    Wendy 3.0-unreleased (i386-apple-darwin10.2.0)
+  invocation:   wendy zeus.owfn --og --verbose --dot 
+  events:       2 send, 2 receive, 0 synchronous
+  statistics:   6 nodes
+}
+
+INTERFACE
+  INPUT
+    accept, reject;
+  OUTPUT
+    offer, invoice;
+
+NODES
+  2099344 : (invoice + offer)
+    accept -> 0
+    reject -> 0
+    offer -> 2098704
+    invoice -> 2101600
+  2098704 : (accept + invoice) * (invoice + reject)
+    accept -> 2100160
+    reject -> 2099344
+    invoice -> 2101136
+  2100160 : invoice
+    accept -> 0
+    reject -> 0
+    invoice -> 2101264
+  2101136 : accept * reject
+    accept -> 2101264
+    reject -> 2101600
+  2101264 : final
+    accept -> 0
+    reject -> 0
+  2101600 : offer
+    accept -> 0
+    reject -> 0
+    offer -> 2101136
+  0 : true
+    accept -> 0
+    reject -> 0
+    offer -> 0
+    invoice -> 0

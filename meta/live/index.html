@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-  <title>service-technology.org/live</title>
+  <title>Service Technology as a Service</title>
 
   <link rel="shortcut icon" href="resource/favicon.ico" type="image/x-icon" />
   <link rel="icon" href="resource/favicon.ico" type="image/x-icon" />
@@ -26,7 +26,7 @@
   <div id="container">
     <div id="content">
       
-      <h1 style="font-family: Georgia;">service-technology.org/live</h1>
+      <h1>Service Technology as a Service</h1>
 
       <div id="tabs" class="flora">
         <ul>
@@ -35,6 +35,7 @@
           <li><a href="#wendy"><span>Wendy</span></a></li>
           <li><a href="#rachel"><span>Rachel</span></a></li>
           <li><a href="#adapter"><span>Adapter Synthesis</span></a></li>
+          <li><a href="#marlene"><span>Adapter Synthesis (Marlene)</span></a></li>
           <li><a href="#pnog"><span>Petri Net OG</span></a></li>
           <li><a href="#migration"><span>Instance Migration</span></a></li>
         </ul>
@@ -270,7 +271,6 @@
       </div>
 
       <div id="adapter">
-<!--        <p>This site demonstrates the results of a paper submitted to the <a href="http://www.informatik.uni-augsburg.de/acsd/">ACSD 2009</a> conference. Select a service model and press the button to calculate the result in your browser.</p> -->
         <form action="adapter.php" method="post" enctype="multipart/form-data">
           <fieldset>
             <legend>Service model</legend>
@@ -285,7 +285,23 @@
 
           <p><input type="submit" value="synthesize adapter" /></p>
         </form>
-<!--        <p>Alternatively, <a href="examples.zip">a ZIP archive</a> containing all service models can be downloaded.</p> -->
+      </div>
+
+      <div id="marlene">
+        <form action="marlene.php" method="post" enctype="multipart/form-data">
+          <fieldset>
+            <legend>Service model</legend>
+            Use a given service model: 
+            <select name="example" size="1">
+              <optgroup label="Simple Example Services">
+                <option value="coffee1">Coffee Vending Machine 1</option>
+                <option value="coffee2">Coffee Vending Machine 2</option>
+              </optgroup>
+            </select>
+          </fieldset>
+
+          <p><input type="submit" value="synthesize adapter" /></p>
+        </form>
       </div>
 
       <div id="pnog">
@@ -353,6 +369,7 @@
 <!--        <p>Alternatively, <a href="examples.zip">a ZIP archive</a> containing all service models can be downloaded.</p> -->
       </div>
     </div>
+    <a href="http://site24x7.com/login/status.do?execute=StatusReport&u=true&p=fnzF5zQzr6S1hFv4vjSO6ltpsVcZRoBrK9NAvHJn4mB0hOYYpmWnXA%3D%3D" style="color:#FFFFFF;text-decoration:none;cursor:pointer;"><span style="text-align:center;display:inline-block;text-transform:0px;text-indent:2px;background-color:#FF6600;font-weight:bold;line-height:12px;margin:0px;padding:0px;border:1px solid #E84B00;  font-family:Verdana; font-size:9px;"><b>Website Uptime</b><b style="background-color:#FFFFFF; color:#000000;padding:0px 2px 0px 3px;"><script type="text/javascript" src="http://ext1.site24x7.com/website-uptime.html?v=fnzF5zQzr6RIa4oA1BvOlL8FU%2B%2BkkoRh"></script></b></span></a>
   </div>
 </body>
 </html>

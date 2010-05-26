@@ -1,0 +1,12 @@
+sara: Problem 1: test4
+sara: Trying to solve a reachability problem with inputs:
+sara: - Petri net "test4.owfn"
+sara: - Initial marking p1 q1 
+sara: - Final marking p1:2 q1:2 
+sara: 6 jobs done, 0 in queue, 1 failure, 0 solutions.
+sara: INFEASIBLE: unable to borrow enough tokens via T-invariants.
+There are firing sequences that could not be extended towards the final marking.
+After the firing sequence "<empty>":
+ - need at least 1 more token on place set {p2:0,q2:0} to fire a transition in {t1,u1}
+
+sara: 0 Solutions produced.

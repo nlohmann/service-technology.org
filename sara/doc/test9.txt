@@ -1,0 +1,23 @@
+sara: Problem 1: test9
+sara: Trying to solve a reachability problem with inputs:
+sara: - Petri net "test9.owfn"
+sara: - Initial marking i1 i2 
+sara: - Final marking o1 o2 
+sara: 67 jobs done, 0 in queue, 4 failures, 0 solutions.
+sara: INFEASIBLE: unable to borrow enough tokens via T-invariants.
+There are firing sequences that could not be extended towards the final marking.
+After the firing sequence "a1 a2 l2 b1 l3 b1 l3 l2 b1 d1 d1 d1 d1 c1 c1 c1 c1 b1":
+ - need at least 1 more token on place set {o1:0,y2:4,z1:0,z2:0} to fire a transition 
+   in {a3,b2,c1,c2,l1}
+After the firing sequence "a1 a2 l2 b1 l3 b1 d1 d1 d1 d1 c1 c1 c1 c1 c1 b1":
+ - need at least 1 more token on place set {o1:0,y1:3,z1:0,z2:0,z3:0} to fire a transition 
+   in {a3,b1,b2,c2,d2,l1,l2,l3}
+After the firing sequence "a1 a2 l2 b1 l3 b1 l3 c1 c1 c1 c1 c1 b1 d1 d1 d1 b1":
+ - need at least 1 more token on place set {o1:0,y3:3,z1:0,z2:0,z3:0} to fire a transition 
+   in {a3,b2,c2,d1,d2,l1,l2,l3}
+After the firing sequence "a1 a2 a4":
+ - need at least 4 more tokens on place y1:0 to fire all transitions in {a3,b2}
+ - need at least 5 more tokens on place y2:0 to fire all transitions in {a3,c2}
+ - need at least 4 more tokens on place y3:0 to fire all transitions in {a3,d2}
+
+sara: 0 Solutions produced.

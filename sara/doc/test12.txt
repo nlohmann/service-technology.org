@@ -1,0 +1,10 @@
+sara: Problem 1: test12
+sara: Trying to solve a reachability problem with inputs:
+sara: - Petri net "test3.owfn"
+sara: - Initial marking p1:2 
+sara: - Final marking p2:3 p3 
+sara: 1 job done, 0 in queue, 1 failure, 0 solutions.
+sara: INFEASIBLE: the marking equation is infeasible.
+You might try to add p2:1 tokens to the initial marking and p3:1 tokens to the final marking.
+
+sara: 0 Solutions produced.

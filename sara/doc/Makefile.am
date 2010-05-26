@@ -2,7 +2,7 @@
 info_TEXINFOS = sara.texi
 
 # any other files you need to add (images)
-EXTRA_DIST = test2.sara test11.sara test15.sara test5a.txt test5b.txt test5c.txt test14.sara test12.txt test4.jpg test4.txt test9.txt
+EXTRA_DIST = test2.sara test11.sara test15.sara test5a.txt test5b.txt test5c.txt test14.sara test12.txt test4.jpg test4.eps test4.txt test9.txt
 
 # the height of the README's ASCII art + URL + 3 spaces
 BANNERHEIGHT = 10

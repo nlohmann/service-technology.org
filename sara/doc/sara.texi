@@ -567,6 +567,65 @@ sara -i test9.sara -v
 @end smallexample
 @end cartouche
 
+@section Optimizations including Non-determinism
+
+Sara normally tries to compute its results deterministically so reproduction of results with the
+same time consumption is possible. There are some algorithms
+that need a total ordering of the transitions and the places of the input Petri net for this determinism
+(and also for some optimisations).
+Sara will compute these orderings from the structure of the Petri net after it has been loaded. Since
+only the structure, but not the names of transitions and places are used, it can happen that a unique
+ordering cannot be found (due to a total symmetry of the net). If the option @option{-v} is set, Sara 
+will prompt a message to stderr in this case:
+
+@cartouche
+@smallexample
+sara: place or transition ordering is non-deterministic
+@end smallexample
+@end cartouche
+
+Sara iterates to find this ordering and will stop after some number of loops, even if a unique total
+ordering has not been found. If that happens, the same message is printed.
+
+The user can also make the computation non-deterministic. In the partial order reduction there is
+a so-called scapegoat that can be chosen freely from some set of places. Theory shows that the best
+option for a low runtime is to make the choice non-deterministically. Sara allows for this by using
+the option @option{-S}:
+
+@cartouche
+@smallexample
+./sara -i test7.sara -S
+@end smallexample
+@end cartouche
+
+The runtime of Sara will now be different at each invocation, even if all input is identical.
+
+
+Sara also offers some options that deal with the place/time tradeoff. Without any options, Sara
+assumes that memory is not an issue. Since the reachability problem is EXPSPACE-hard, there
+will be instances where memory is a big problem and we cannot do anything about it. Sara stores
+not only information about future jobs but also about past ones. When the past becomes bigger
+than the future (difficult to tell if and when this will happen), it is possible to constrain
+that part of the memory dedicated to the past.
+
+@cartouche
+@smallexample
+./sara ... -Dm -Ln
+@end smallexample
+@end cartouche
+
+The option @option{-D} followed by a number (try 10 or 20 at first) will limit the jobs that are remembered
+after Sara is through with them. If a remembered job comes up again later (this can easily happen), Sara
+knows that it has already been done. The lower the number, the less jobs are remembered (though the
+number does not represent the size of the memory reserved but more something like a distance from
+the job Sara works on at the moment).
+
+The option @option{-L} limits the number of solutions of linear systems Sara stores. If a stored
+solution is encountered again, Sara does not need to go through any permutations of transition
+sequences to check if the solution can be realized. As a starting limit try 100 or 1000. 
+
+Sara will put a message to stderr if the limit for one of the above options is reached.
+
 @c --------------------------------------------------------------------------
 
 

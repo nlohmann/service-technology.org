@@ -3,9 +3,9 @@ args "--include-getopt --show-required --no-handle-error"
 purpose "Structures for Automated Reachability Analysis:
 Deciding the reachability problem for Petri nets and more
 
-Given a problem of the form (N,i,f) where N is a low level Petri net in one of the formats *.llnet (LOLA) or *.owfn (OWFN), i is an initial marking, and f is an extended final marking, the program tries to decide whether f is reachable from i in the net N.
+Given a problem of the form (N,i,f) with a low level Petri net N in *.llnet (LOLA) or *.owfn (OWFN) format, an initial marking i, and an extended final marking f, Sara tries to decide whether f is reachable from i in the net N.
 
-It is also possible to solve realizability problems, i.e. the question whether some transition vector can be tranformed into a firing sequence for given Petri net and initial marking."
+It is also possible to solve realizability, i.e. whether some transition vector can be tranformed into a firing sequence for given (N,i)."
 
 section "Input and Output"
 sectiondesc="Input must be given explicitly (file or pipe), output goes to stdout/stderr by default."
@@ -25,11 +25,11 @@ option "pipe" p
 option "output" o
   "Redirect output messages from stdout to a file."
   details="
-In general, sara will yield one of the following results as output:
-SOLUTION: A positive result, a possible firing sequence is presented.
-INFEASIBLE: A negative result. Either the marking equation is infeasible or it was impossible to borrow enough tokens (via T-invariants) to make some transition firable. In the latter case, all crucial points where this happened can be listed with the -v option; if the marking equation is infeasible changes to initial and final marking to make it solvable are suggested.
-UNSOLVED: A problem was detected. This means a solution might exist, but none was found. It can happen due to a numerical instability encountered by lp_solve or as a result of the option -T.
-Finally, sara could run for a very long time or terminate due to insufficient memory, which also falls under the UNSOLVED case.
+Sara will yield one of the following results as output:
+SOLUTION: A firing sequence.
+INFEASIBLE: Either the marking equation is infeasible or it was impossible to borrow enough tokens (via T-invariants) to make some transition firable. Use the -v option for details/reasoning. 
+UNSOLVED: A problem was detected, e.g. due to a numerical instability encountered by lp_solve.
+Finally, Sara could run for a very long time or terminate due to insufficient memory, which also falls under the UNSOLVED case.
 "
   typestr="FILENAME"
   string
@@ -54,7 +54,7 @@ option "quasilive" q
 
 option "reachable" r
   "Create a reachability problem (also coverability)."
-  details="Generates a problem file FILENAME.sara from the Petri net FILENAME for solving a reachability problem. The initial marking is also taken from this file, while the final marking is zero unless specified explicitly via -f.
+  details="Generates a problem file FILENAME.sara from the Petri net FILENAME for solving a reachability problem. The final marking has to be specified via option -f.
 The problem will have the following syntax in the file:
 
 PROBLEM namestring:
@@ -63,7 +63,7 @@ PROBLEM namestring:
 	INITIAL initialmarking;
 	FINAL [COVER] finalmarking;
 
-The option COVER for a final marking means that all places of the Petri net not mentioned in the final marking may contain any number of tokens. Without the option, all such places must be empty finally.
+The option COVER declares that all unmentioned places may contain arbitrary many tokens (instead of exactly zero).
 "
   typestr="FILENAME"
   string
@@ -86,7 +86,7 @@ PROBLEM namestring:
 
 option "final" f
   "Specify an extended final marking."
-  details="Either an extended final marking (for option -r) or transition multiset to be used with -R must be given. In an extended final marking, there is a directive for each place stating whether the number of tokens must be reached exactly (:), covered (>), or bounded (<), so \"p:3,q>2,r<5,s\" denotes exactly 3 tokens on p, at least 2 on q, at most 5 on r, and exactly one token on s. Use quotation marks to avoid misinterpretation of < and >. Transition multisets contain transitions instead of places and < and > are forbidden (as in initial markings).
+  details="An extended final marking (option -r) or transition multiset (option -R) must be given. In the former, for a place p with n tokens, specify \"p:n\" (exactly n), \"p>n\" (at least n) or \"p<n\" (at most n). \":1\" can be omitted. Combinations as in \"p:3,q>2,r<5,s\" are allowed. Use quotation marks to avoid misinterpretation of < and >. Transition multisets contain transitions instead of places and < and > are forbidden.
 "
   typestr="string"
   string
@@ -94,7 +94,7 @@ option "final" f
 
 option "constraint" c
   "Specify a global place/transition constraint."
-  details="In addition to an extended final marking also constraints may be formulated. A constraint is an (in)equation where the left hand side is a weighted sum of places and transitions. Places denote tokens in the final marking while a transition stands for its number of occurrences in a firing sequence. The right hand side must be an integer. Examples would be \"p+q>5\" (p and q together can have 5 or more tokens) or \"2p-t:0\" (t occurs twice as often as there are tokens on p finally) or even \"3p1-4p2+t1-t2<17\".
+  details="A constraint is an (in)equation where the left hand side is a weighted sum of places and transitions. Places denote tokens in the final marking while a transition stands for its number of occurrences in a firing sequence. The right hand side must be an integer. Examples would be \"p+q>5\" (p and q together can have 5 or more tokens) or \"2p-t:0\" (t occurs twice as often as there are tokens on p finally) or even \"3p1-4p2+t1-t2<17\".
 "
   typestr="string"
   dependon="reachable"

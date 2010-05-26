@@ -519,7 +519,7 @@ If the Marking Equation has a solution, the solution might not be realizable. In
 we can reach the final marking @samp{p2:2,q2:2} from the initial marking @samp{p1:1,q1:1} according to the
 Marking Equation. We just need to fire each transition once.
 
-@center{@image{test4}}
+@center @image{test4}
 
 Of course, each of the two transitions @samp{t1} and @samp{u1} can fire only after the other one has fired, since @samp{t1} puts
 a token on @samp{q2} where @samp{u1} needs it, and @samp{u1} puts a token on @samp{p2} where @samp{t1}

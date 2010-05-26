@@ -37,7 +37,22 @@ option "constraint-file" c
   string typestr="path"
   optional
 
+section "Costs"
 
+option "costs" -
+  "Activate the cost analysis mode"
+  optional
+ 
+option "costprofile" -
+  "Path to the cost profile"
+  string typestr="path"
+  optional
+
+option "request" -
+  "Path to the request"
+  string typestr="path"
+  optional
+   
 section "Output options"
 
 option "output" o

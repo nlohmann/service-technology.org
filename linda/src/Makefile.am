@@ -40,7 +40,8 @@ linda_SOURCES = main.cc \
 		Output.h Output.cc \
 		lindaAgent.h lindaAgent.cc \
 		eventTermParser.h eventTermParser.cc \
-		staticAnalysis.h staticAnalysis.cc
+		staticAnalysis.h staticAnalysis.cc \
+		costs.cc costs.h
 
 linda_LDADD = $(top_builddir)/libs/lp_solve/liblpsolve55.la
 linda_CPPFLAGS = -I$(top_srcdir)/libs/lp_solve

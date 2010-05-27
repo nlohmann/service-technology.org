@@ -36,18 +36,23 @@
 
 package hub.top.editor.eclipse.ui;
 
+import fr.lip6.move.pnml.ptnet.hlapi.PetriNetDocHLAPI;
 import hub.top.editor.eclipse.FileIOHelper;
-import hub.top.editor.eclipse.ui.ConvertFileWizard;
+import hub.top.editor.ptnetLoLA.PtNet;
+import hub.top.editor.ptnetlola.pnml.PNMLtoPT;
 import hub.top.lang.flowcharts.ptnet.pnml.FCtoPNML;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.osgi.util.NLS;
 
-public class ConvertFileWizard_FCtoPNML extends ConvertFileWizard {
+public class ConvertFileWizard_FCtoPTnetDiag extends ConvertFileWizard {
 
-	public ConvertFileWizard_FCtoPNML(URI domainModelURI, EObject resourceRoot,
+	public ConvertFileWizard_FCtoPTnetDiag(URI domainModelURI, Object resourceRoot,
 			TransactionalEditingDomain editingDomain, String targetExtension)
 	{
 		super(domainModelURI, resourceRoot, editingDomain, targetExtension);
@@ -55,23 +60,53 @@ public class ConvertFileWizard_FCtoPNML extends ConvertFileWizard {
 
 	@Override
 	public boolean performFinish() {
-	    IFile targetFile = pageFileCreation.createNewFile();
-	    FileIOHelper.setCharset(targetFile);
+	    //IFile targetFile = pageFileCreation.createNewFile();
+	    //FileIOHelper.setCharset(targetFile);
+	  
+      // create the resource at the given path/URI
+      final IPath targetPath = pageFileCreation.getContainerFullPath().append(pageFileCreation.getFileName());
 
 	    if (modelObject instanceof org.eclipse.gmf.runtime.notation.Diagram) {
 	    	org.eclipse.gmf.runtime.notation.Diagram d = (org.eclipse.gmf.runtime.notation.Diagram)modelObject;
 	    	if (d.getElement() instanceof hub.top.lang.flowcharts.WorkflowDiagram) {
 	    		// we understand workflow diagrams, invoke translation to PNML
-	    	    FCtoPNML toPNML = new FCtoPNML(d.getElement());
-	    	    FileIOHelper.writeFile(targetFile, toPNML.getText());
-	    	    return true;
+	    	  process(targetPath, d.getElement());
+	    	  return true;
 	    	}
 	    } else if (modelObject instanceof hub.top.lang.flowcharts.WorkflowDiagram) {
     		// we understand workflow diagrams, invoke translation to PNML
-    	    FCtoPNML toPNML = new FCtoPNML(modelObject);
-    	    FileIOHelper.writeFile(targetFile, toPNML.getText());
+	        process(targetPath, (EObject)modelObject);
     	    return true;
 	    }
 	    return false;
 	}
+	
+	private void process(IPath targetPath, EObject modelObject) {
+	  // translate FC to PNML
+    FCtoPNML toPNML = new FCtoPNML(modelObject);
+    
+    FileIOHelper.writeFile(targetPath.addFileExtension("pnml"), toPNML.getText());
+    
+    PetriNetDocHLAPI doc = toPNML.getPNMLDoc();
+    
+    // translate PNML to P/T net
+    PNMLtoPT toPT = new PNMLtoPT();
+    toPT.process(doc);
+    PtNet net = toPT.getNets().get(0);
+    Resource r = FileIOHelper.writeEObjectToResource(net, myEditingDomain, targetPath);
+
+    // initialize diagram for P/T net with a wizard
+    Wizard wizard = new hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLANewDiagramFileWizard(
+        r.getURI(), net, myEditingDomain);
+    wizard
+        .setWindowTitle(NLS
+            .bind(
+                hub.top.editor.ptnetLoLA.diagram.part.Messages.PtnetLoLAInitDiagramFileAction_InitDiagramFileWizardTitle,
+                hub.top.editor.ptnetLoLA.diagram.edit.parts.PtNetEditPart.MODEL_ID));
+    hub.top.editor.ptnetLoLA.diagram.part.PtnetLoLADiagramEditorUtil.runWizard(
+        getShell(), wizard, "InitDiagramFile"); //$NON-NLS-1$
+	}
+	
+
+	
 }

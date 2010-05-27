@@ -38,20 +38,19 @@
 package hub.top.editor.eclipse.ui;
 
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 
 public class ConvertDiagramFileAction_FCtoPNML extends ConvertDiagramFileAction {
 
 
 	/**
-	 * Create a {@link ConvertFileWizard_FCtoPNML} to convert a selected
+	 * Create a {@link ConvertDiagramFileAction_FCtoPTnetDiag} to convert a selected
 	 * Flowchart diagram to a PNML document.
 	 * 
 	 * @see hub.top.editor.eclipse.ui.ConvertDiagramFileAction#createConvertFileWizard(org.eclipse.emf.common.util.URI, org.eclipse.emf.ecore.EObject, org.eclipse.emf.transaction.TransactionalEditingDomain)
 	 */
 	@Override
-	public ConvertFileWizard createConvertFileWizard(URI srcURI, EObject root,
+	public ConvertFileWizard createConvertFileWizard(URI srcURI, Object root,
 			TransactionalEditingDomain editingDomain)
 	{
 		ConvertFileWizard wizard = new ConvertFileWizard_FCtoPNML(

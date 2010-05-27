@@ -1,6 +1,9 @@
 #include "helpers.h"
 #include <vector>
 
+class UseCase;
+class ElementalConstraint;
+
 class CostAgent {
 public:
 	static std::vector<pnapi::Transition*>* transitions;
@@ -12,60 +15,78 @@ public:
 	static std::vector<pnapi::Label*>* labels;
 	static int getLabelID(std::string label);
 	
+	static void buildBasicStateEquation();
+	static lprec* basicStateEquation;
 	
-	static int* getCleanIntArray(int len);
+	static void buildStateEquationWithAssertions(UseCase* usecase, std::vector<ElementalConstraint*>* clause);
+	static lprec* currentStateEquationWithAssertions;
+	
+	static BinaryTree<pnapi::Place*, std::pair<int, std::pair<int*, REAL*> > >* lines;
+	
+	static double* getCleanDoubleArray(int len);
 };
 
 class ElementalConstraint {
 public:
-	int* lhs;
-	int sign;
-	int rhs;
+	double* lhs;
+	double sign;
+	double rhs;
 	int len;
 	ElementalConstraint(int length) {
 		len = length;
-		lhs = CostAgent::getCleanIntArray(len);
+		lhs = CostAgent::getCleanDoubleArray(len);
 		sign = 0;
 		rhs = 0;
 	}
+	ElementalConstraint() {
+		lhs = 0;
+		len = 0;
+		sign = 0;
+		rhs = 0;
+	}
+
 	ElementalConstraint* convert (); //Converts a label constraint to a transition constraint
 };
 
 class UseCase {
 public:
 	UseCase() {
-		marking = CostAgent::getCleanIntArray(CostAgent::places->size());
+		marking = CostAgent::getCleanDoubleArray(CostAgent::places->size());
 		constraint = new std::vector<ElementalConstraint*>();
-		variableCosts = CostAgent::getCleanIntArray(CostAgent::transitions->size());
+		variableCosts = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());
 		fixCosts = 0;
 		policyLHS = 0;
 		policyRHS = 0;
 	}
 	std::vector<ElementalConstraint*>* constraint; // A conjunction.
-	int* marking; // An integer array with an int for each place
-	int* variableCosts; // An integer array with an int for each transition
-	int fixCosts;
-	int policyLHS;
-	int policyRHS;
+	double* marking; // An integer array with an int for each place
+	double* variableCosts; // An integer array with an int for each transition
+	double fixCosts;
+	double policyLHS;
+	double policyRHS;
+	void output();
 };
 
 
 class CostProfile {
 public:
-	std::vector<UseCase*> usecases;
+	std::vector<UseCase*>* usecases;
+	CostProfile() {
+	usecases = new std::vector<UseCase*>();
+	}
 };
 
 class Grant {
 public:
 	std::vector<ElementalConstraint*>* constraint;
-	int* variableCosts; // An integer array with an int for each label
-	int fixCosts;
+	double* variableCosts; // An integer array with an int for each label
+	double fixCosts;
 	Grant() {
 		constraint = new std::vector<ElementalConstraint*>();
-		variableCosts = CostAgent::getCleanIntArray(CostAgent::labels->size());
+		variableCosts = CostAgent::getCleanDoubleArray(CostAgent::labels->size());
 		fixCosts = 0;
 	}
-	void convertConstraints (); // convert the label constraints to transition constraints
+	Grant* convert (); // convert the label constraints to transition constraints
 };
 
 class Request {
@@ -73,5 +94,7 @@ public:
 	std::vector<std::vector<ElementalConstraint*>* >* assertions; // A disjunction (outer vector) of conjunctions (inner vectors).
 	std::vector<Grant*>* grants; 
 	void convertAssertions (); // convert the label constraints to transitio constraints
-};
+	void convertGrants (); // convert the label constraints to transitio constraints
+
+	};
 

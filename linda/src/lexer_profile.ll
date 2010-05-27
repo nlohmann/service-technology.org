@@ -8,6 +8,7 @@
 %{
 #define YY_NO_UNPUT         // We don't need yyunput().
 #include <string>
+#include "costs.h"
 #include "syntax_profile.h"      // list of all tokens used
 
 extern int profile_yyerror(const char *msg);

@@ -17,14 +17,17 @@ extern char* request_yytext;
 extern int request_yylineno;
 extern int request_yylex();
 
-// #include "eventTerm.h"
+#include "costs.h"
 #include <iostream>
 #include <string>
 #include <vector>
 #include <cstdlib>
 
-extern std::vector<int*>* term_vec;
-extern bool stop_interaction;
+extern double* curterm;
+std::vector<ElementalConstraint*>* curclause = 0;
+Grant* curgrant = 0;
+Request* request = new Request();
+
 
 int request_yyerror(const char* msg)
 {
@@ -53,11 +56,13 @@ int request_yyerror(const char* msg)
 {
   int yt_int;
   std::string* yt_string;
+  ElementalConstraint* yt_constraint;
 }
 
 
 %type <yt_int> VALUE
 %type <yt_string> IDENT
+%type <yt_constraint> constraint
 
 %%
 
@@ -68,62 +73,145 @@ requests:
         ;
 
 request:
-       KEY_ASSERTIONS opt_assertion 
-       KEY_GRANT grant
+       KEY_ASSERTIONS {request->assertions = new std::vector<std::vector<ElementalConstraint*> *>; } opt_assertion 
+       KEY_GRANT {request->grants = new std::vector<Grant*>(); } grants 
        ;
 
 opt_assertion:
-             assertion
+             assertion SEMMELKORN
              |
              /* empty */
              ;
 
 assertion:
-         clause OP_OR assertion
-         |
-         clause
-         ;
+	clause {if (curclause != 0) {request->assertions->push_back(curclause); curclause = 0;}}OP_OR assertion
+	|
+    clause
+    {if (curclause != 0) {request->assertions->push_back(curclause);  curclause = 0;}}
+	 ;
 
 clause:
       constraint OP_AND clause
+      { 
+		if(curclause == 0) {
+			curclause = new std::vector<ElementalConstraint*>();
+			
+		}
+		curclause->push_back($1);
+      }
       |
       constraint
-      ;
+      {
+		if(curclause == 0) {
+			curclause = new std::vector<ElementalConstraint*>();
+			
+
+			}
+		curclause->push_back($1);
+     }
+     ;
 
 constraint:
-          term OP_LE VALUE
-          |
-          term OP_GE VALUE
-          |
-          term OP_EQ VALUE
-          ;
+        term OP_LE VALUE
+		{ 
+			ElementalConstraint* cons = new ElementalConstraint();
+			cons->lhs = curterm;
+			curterm = 0;
+			cons->len = CostAgent::labels->size();
+			cons->sign = 1;
+			cons->rhs = $3;	
+			$$ = cons;
+		}
+        |
+        term OP_GE VALUE
+		{ 
+			ElementalConstraint* cons = new ElementalConstraint();
+			cons->lhs = curterm;
+			curterm = 0;
+			cons->len = CostAgent::labels->size();
+			cons->sign = 2;
+			cons->rhs = $3;	
+			$$ = cons;
+		}
+        |
+        term OP_EQ VALUE
+		{ 
+			ElementalConstraint* cons = new ElementalConstraint();
+			cons->lhs = curterm;
+			curterm = 0;
+			cons->len = CostAgent::labels->size();
+			cons->sign = 3;
+			cons->rhs = $3;	
+			$$ = cons;
+		}
+        ;
 term:
     VALUE OP_TIMES IDENT term
+ 	{ 
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
+		curterm[CostAgent::getLabelID(*$3)] += (double) $1;
+    }
     |
-    IDENT term
-    |
+   	IDENT term
+	{ 
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
+		++curterm[CostAgent::getLabelID(*$1)];
+    }
+	|
     VALUE OP_TIMES IDENT
-    |
+	{ 
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
+		curterm[CostAgent::getLabelID(*$3)] += (double) $1;
+    }      
+	|
     IDENT
-    |
-    VALUE
+	{ 
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
+		++curterm[CostAgent::getLabelID(*$1)];
+    }
     ;
 
-grant:
-     KEY_CONSTRAINT clause SEMMELKORN
-     KEY_PAYMENT payment SEMMELKORN
+grants:
+	grant grants
+	|
+	grant
+	;
+	
+grant: { curgrant = new Grant(); }
+     KEY_CONSTRAINT {curclause = 0; } clause {delete curgrant->constraint; curgrant->constraint = curclause; } SEMMELKORN
+     KEY_PAYMENT { curterm = 0; } payment {if (curterm != 0) {delete curgrant->variableCosts; curgrant->variableCosts = curterm;} } SEMMELKORN
+	 { request->grants->push_back(curgrant); curclause = 0; curterm = 0;} 
      ;
 
 payment:
        VALUE OP_TIMES IDENT payment
+		{ 
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
+		curterm[CostAgent::getLabelID(*$3)] += $1;
+		}
        |
        IDENT payment
+		{ 
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
+		++curterm[CostAgent::getLabelID(*$1)];
+		}
        |
        VALUE OP_TIMES IDENT
+	{ 
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
+		curterm[CostAgent::getLabelID(*$3)] += $1;
+    }      
        |
        IDENT
+	{ 
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
+		++curterm[CostAgent::getLabelID(*$1)];
+    }
        |
        VALUE
+	{ 
+		curgrant->fixCosts += $1;
+    }
        ;
 
 

@@ -26,6 +26,7 @@ extern int profile_yylex();
 
 CostProfile * profile = new CostProfile();
 UseCase * usecase = NULL;
+double* curterm = 0;
 
 int profile_yyerror(const char* msg)
 {
@@ -54,11 +55,14 @@ int profile_yyerror(const char* msg)
 {
   int yt_int;
   std::string* yt_string;
+  ElementalConstraint* yt_constr;
+  int* yt_intarray;
 }
 
 
 %type <yt_int> VALUE
 %type <yt_string> IDENT
+%type <yt_constr> constraint
 
 %%
 
@@ -71,14 +75,16 @@ usecases:
 usecase:
        KEY_USECASE
        {
-            usecase = new UseCase();
+        std::cerr << "Creating new use case" << std::endl;    
+		usecase = new UseCase();
        }
        KEY_CONSTRAINT opt_constraints SEMMELKORN
        KEY_MARKING opt_marking SEMMELKORN
        KEY_COSTS costs SEMMELKORN
        KEY_POLICY policy SEMMELKORN
        {
-            profile->usecases.push_back(usecase);
+        usecase->output();    
+		profile->usecases->push_back(usecase);
        }
        ;
 
@@ -90,27 +96,70 @@ opt_constraints:
 
 constraints:
            constraint OP_AND constraints
+	   { usecase->constraint->push_back($1); }
            |
            constraint
+	   { usecase->constraint->push_back($1); }
            ;
 
 constraint:
           term OP_LE VALUE
+	  { 
+		ElementalConstraint* cons = new ElementalConstraint();
+		cons->lhs = curterm;
+		curterm = 0;
+		cons->len = CostAgent::transitions->size();
+		cons->sign = 1;
+		cons->rhs = $3;	
+		$$ = cons;
+	  }
           |
           term OP_GE VALUE
+	  { 
+		ElementalConstraint* cons = new ElementalConstraint();
+		cons->lhs = curterm;
+		curterm = 0;
+		cons->len = CostAgent::transitions->size();
+		cons->sign = 2;
+		cons->rhs = $3;
+		$$ = cons;	
+	  }
           |
           term OP_EQ VALUE
+	  { 
+		ElementalConstraint* cons = new ElementalConstraint();
+		cons->lhs = curterm;
+		curterm = 0;
+		cons->len = CostAgent::transitions->size();
+		cons->sign = 3;
+		cons->rhs = $3;
+		$$ = cons;	
+	  }
           ;
 term:
     VALUE OP_TIMES IDENT term
+    { 
+	if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());}
+	curterm[CostAgent::getTransitionID(*$3)] += $1;
+    }
     |
     IDENT term
+    { 
+	if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());}
+	++curterm[CostAgent::getTransitionID(*$1)];
+    }
     |
     VALUE OP_TIMES IDENT
+    { 
+	if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());}
+	curterm[CostAgent::getTransitionID(*$3)] += $1;
+    }
     |
     IDENT
-    |
-    VALUE
+    { 
+	if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());}
+	++curterm[CostAgent::getTransitionID(*$1)];
+    }
     ;
 
 opt_marking:
@@ -121,22 +170,38 @@ opt_marking:
 
 marking:
        IDENT COLON VALUE COMMA marking
+       { usecase->marking[CostAgent::getPlaceID(*$1)] = $3; }
        |
        IDENT COMMA marking
+       { usecase->marking[CostAgent::getPlaceID(*$1)] = 1; }
        |
        IDENT COLON VALUE
+       { usecase->marking[CostAgent::getPlaceID(*$1)] = $3; }
        |
        IDENT
+       { usecase->marking[CostAgent::getPlaceID(*$1)] = 1; }
        ;
 
 costs:
      VALUE OP_TIMES IDENT costs
+     {
+      	usecase->variableCosts[CostAgent::getTransitionID(*$3)] += $1;
+     }
      |
      IDENT costs
+     {
+      	++usecase->variableCosts[CostAgent::getTransitionID(*$1)];
+     }
      |
      VALUE OP_TIMES IDENT
+     {
+      	usecase->variableCosts[CostAgent::getTransitionID(*$3)] += $1;
+     }
      |
      IDENT
+     {
+      	++usecase->variableCosts[CostAgent::getTransitionID(*$1)];
+     }
      |
      VALUE
      {

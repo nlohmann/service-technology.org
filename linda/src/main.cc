@@ -562,7 +562,7 @@ int main(int argc, char** argv) {
 			message("To produce output to a file, use \"-o <path/to/file>\", to output to standard out, use \"-o-\". ");
 		}
 	} else { // The cost parameter was given
-	
+		
 		// parse the open net
 		message("Processing %s", args_info.inputs[0]);
 		pnapi::PetriNet* net = new pnapi::PetriNet;
@@ -590,76 +590,99 @@ int main(int argc, char** argv) {
 			abort(1, "pnapi error %i", inputerror.str().c_str());
 		}	
 
-	// build helpers
+		// build helpers
 
-	CostAgent::places = new std::vector<pnapi::Place*>(net->getPlaces().size());
-	for (std::set<pnapi::Place*>::iterator placeIt =  net->getPlaces().begin(); placeIt != net->getPlaces().end(); ++placeIt) {
-		CostAgent::places->push_back(*placeIt);
-	}
+		CostAgent::places = new std::vector<pnapi::Place*>();
+		for (std::set<pnapi::Place*>::iterator placeIt =  net->getPlaces().begin(); placeIt != net->getPlaces().end(); ++placeIt) {
+			CostAgent::places->push_back(*placeIt);
+		}
 
-	CostAgent::transitions = new std::vector<pnapi::Transition*>(net->getTransitions().size());
-	for (std::set<pnapi::Transition*>::iterator transitionIt =  net->getTransitions().begin(); transitionIt != net->getTransitions().end(); ++transitionIt) {
-		CostAgent::transitions->push_back(*transitionIt);
-	}
+		CostAgent::transitions = new std::vector<pnapi::Transition*>(1);
+		for (std::set<pnapi::Transition*>::iterator transitionIt =  net->getTransitions().begin(); transitionIt != net->getTransitions().end(); ++transitionIt) {
+			CostAgent::transitions->push_back(*transitionIt);
+		}
+		
+		std::set<pnapi::Label *> thelabels = net->getInterface().getAsynchronousLabels();
+		CostAgent::labels = new std::vector<pnapi::Label*>();
+		for (std::set<pnapi::Label*>::iterator labelIt = thelabels.begin(); labelIt != thelabels.end(); ++labelIt) {
+			CostAgent::labels->push_back(*labelIt);
+		}
 
-	std::set<pnapi::Label *> thelabels = net->getInterface().getAsynchronousLabels();
-	CostAgent::labels = new std::vector<pnapi::Label*>(thelabels.size());
-	for (std::set<pnapi::Label*>::iterator labelIt = thelabels.begin(); labelIt != thelabels.end(); ++labelIt) {
-		CostAgent::labels->push_back(*labelIt);
-	}
+		// parse cost profile
+		if (args_info.costprofile_given)
+		{
+			status("Parsing cost profile `%s'", args_info.costprofile_arg);
+			extern FILE * profile_yyin;
+			if ( not (profile_yyin = fopen(args_info.costprofile_arg, "r")))
+			{
+				status("File not found: %s", args_info.costprofile_arg);
+				exit(1);
+			}
 
-	// parse cost profile
-	if (args_info.costprofile_given)
-	{
-	    status("Parsing cost profile `%s'", args_info.costprofile_arg);
-	    extern FILE * profile_yyin;
-	    if ( not (profile_yyin = fopen(args_info.costprofile_arg, "r")))
-	    {
-	        status("File not found: %s", args_info.costprofile_arg);
-	        exit(1);
-	    }
+			extern int profile_yyparse();
+			profile_yyparse();
+			fclose(profile_yyin);
 
-	    extern int profile_yyparse();
-	    profile_yyparse();
-        fclose(profile_yyin);
+		}
+		// parse request
+		if (args_info.request_given)
+		{
+			status("Parsing request `%s'", args_info.request_arg);
+			extern FILE * request_yyin;
+			if ( not (request_yyin = fopen(args_info.request_arg, "r")))
+			{
+				status("File not found: %s", args_info.request_arg);
+				exit(1);
+			}
 
-	}
-	// parse request
-    if (args_info.request_given)
-    {
-        status("Parsing request `%s'", args_info.request_arg);
-        extern FILE * request_yyin;
-        if ( not (request_yyin = fopen(args_info.request_arg, "r")))
-        {
-            status("File not found: %s", args_info.request_arg);
-            exit(1);
-        }
+			extern int request_yyparse();
+			request_yyparse();
+			fclose(request_yyin);
 
-        extern int request_yyparse();
-        request_yyparse();
-        fclose(request_yyin);
+		}
 
-    }
+		extern CostProfile* profile;
+		extern Request* request;
+		
+		// Convert any label-based stuff to transition-based equivalent stuff
+		request->convertAssertions();
 
-	// for each conjunctive clause in assertion-section of the request
-		// event-constraint -> transition-constraint
-	// for each grant in request
-		// event-constraint -> transition-constraint
-	
-	// for each use case in the cost profile...
+		request->convertGrants();
 		// build basic state equation
-		// for each conjunctive clause in the assertions-section of the request
-			// augment state equation with conjunctive clause
-			// for each grant
+		CostAgent::buildBasicStateEquation();	
+		
+		
+		// for each use case in the cost profile...
+		for (int usecaseCounter = 0; usecaseCounter < profile->usecases->size(); ++usecaseCounter) {
+			// for each conjunctive clause in the assertions-section of the request
+
+			for (int clauseCounter = 0; clauseCounter < request->assertions->size(); ++clauseCounter) {
+				std::vector<ElementalConstraint*>* clause = (*request->assertions)[clauseCounter];
+				// augment state equation with conjunctive clause
+				std::cerr << "Clause nr " << clauseCounter << std::endl;
+				if (clause->size() > 0) {
+					CostAgent::buildStateEquationWithAssertions((*profile->usecases)[usecaseCounter], clause);
+
+					
+					// for each grant			
+					/*			for (int grantCounter = 0; grantCounter < request->grants->size(); ++grantCounter) {
 				// augment state equation with grant-constraint
+				CostAgent::buildStateEquationWithGrant((*profile->usecases)[usecaseCounter],(*request->grants)[grantCounter]);
 				// solve program with cost-function - payment-function
+				CostAgent::checkPolicy(profile);
 				// check if values are inside policy
 				// if values are outside policy: exit.
-
-	// done.
-	
-	
-	
+			}
+*/	
+				}
+			}
+			
+			
+			// done.
+			
+			
+			
+		}
 	}
 	
 	

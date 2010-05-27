@@ -4,7 +4,6 @@
 %option noyywrap
 %option yylineno
 %option nodefault
-%option debug
 
 %{
 #define YY_NO_UNPUT         // We don't need yyunput().

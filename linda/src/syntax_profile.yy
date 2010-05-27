@@ -43,7 +43,7 @@ int profile_yyerror(const char* msg)
 %defines
 
 %token KEY_USECASE KEY_CONSTRAINT KEY_MARKING KEY_COSTS KEY_POLICY
-%token OP_LE OP_EQ OP_GE OP_PLUS OP_MINUS OP_TIMES OP_SLASH
+%token OP_LE OP_EQ OP_GE OP_PLUS OP_MINUS OP_TIMES OP_SLASH OP_AND
 %token IDENT
 %token VALUE
 %token COMMA SEMMELKORN COLON
@@ -89,7 +89,7 @@ opt_constraints:
                ;
 
 constraints:
-           constraint COMMA constraints
+           constraint OP_AND constraints
            |
            constraint
            ;
@@ -102,9 +102,13 @@ constraint:
           term OP_EQ VALUE
           ;
 term:
-    VALUE OP_TIMES IDENT OP_PLUS term
+    VALUE OP_TIMES IDENT term
     |
-    IDENT OP_PLUS term
+    IDENT term
+    |
+    VALUE OP_TIMES IDENT
+    |
+    IDENT
     |
     VALUE
     ;
@@ -126,9 +130,13 @@ marking:
        ;
 
 costs:
-     VALUE OP_TIMES IDENT OP_PLUS costs
+     VALUE OP_TIMES IDENT costs
      |
-     IDENT OP_PLUS costs
+     IDENT costs
+     |
+     VALUE OP_TIMES IDENT
+     |
+     IDENT
      |
      VALUE
      {

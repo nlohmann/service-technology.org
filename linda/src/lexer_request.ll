@@ -29,7 +29,7 @@ extern int request_yyerror(const char *msg);
 [a-zA-Z][^,\-\+\*;:()\t \n\r\{\}]* { 
             request_yylval.yt_string = new std::string(yytext); return IDENT; }
 [0-9][0-9]*     		{ request_yylval.yt_int = atoi(yytext); return VALUE; }
-"-"[0-9][0-9]*     		{ request_yylval.yt_int = atoi(yytext); return VALUE; }
+"-"[1-9][0-9]*     		{ request_yylval.yt_int = atoi(yytext); return VALUE; }
 
 "<="                            { return OP_LE; }
 ">="                            { return OP_GE; }

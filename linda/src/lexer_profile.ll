@@ -23,10 +23,12 @@ extern int profile_yyerror(const char *msg);
 "MARKING"                       { return KEY_MARKING; }
 "COSTS"                         { return KEY_COSTS; }
 "POLICY"                        { return KEY_POLICY; }
+"AND"                           { return OP_AND; }
 
 [a-zA-Z][^,\-\+\*;:()\t \n\r\{\}]* { 
             profile_yylval.yt_string = new std::string(yytext); return IDENT; }
 [0-9][0-9]*     		{ profile_yylval.yt_int = atoi(yytext); return VALUE; }
+"+"[0-9][0-9]*     		{ profile_yylval.yt_int = atoi(yytext); return VALUE; }
 "-"[0-9][0-9]*     		{ profile_yylval.yt_int = atoi(yytext); return VALUE; }
 
 "<="                            { return OP_LE; }

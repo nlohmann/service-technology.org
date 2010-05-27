@@ -69,7 +69,7 @@ requests:
 
 request:
        KEY_ASSERTIONS opt_assertion 
-       KEY_GRANT grant SEMMELKORN
+       KEY_GRANT grant
        ;
 
 opt_assertion:
@@ -98,22 +98,30 @@ constraint:
           term OP_EQ VALUE
           ;
 term:
-    VALUE OP_TIMES IDENT OP_PLUS term
+    VALUE OP_TIMES IDENT term
     |
-    IDENT OP_PLUS term
+    IDENT term
+    |
+    VALUE OP_TIMES IDENT
+    |
+    IDENT
     |
     VALUE
     ;
 
 grant:
-     KEY_CONSTRAINT constraint
-     KEY_PAYMENT payment
+     KEY_CONSTRAINT clause SEMMELKORN
+     KEY_PAYMENT payment SEMMELKORN
      ;
 
 payment:
-       VALUE OP_TIMES IDENT OP_PLUS payment
+       VALUE OP_TIMES IDENT payment
        |
-       IDENT OP_PLUS payment
+       IDENT payment
+       |
+       VALUE OP_TIMES IDENT
+       |
+       IDENT
        |
        VALUE
        ;

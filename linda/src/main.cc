@@ -4,6 +4,11 @@
 #include <cstdio>
 #include <ctime>
 #include <sstream>
+#include <cstdarg>
+//#include <libgen.h>
+#include <fstream>
+#include <string>
+
 #include "cmdline.h"
 #include "helpers.h"
 #include "lindaAgent.h"
@@ -16,16 +21,6 @@
 //#include "costProfileParser.h"
 //#include "requestParser.h"
 #include "costs.h"
-
-
-#include <cstdarg>
-#include <cstdio>
-#include <cstdlib>
-#include <ctime>
-#include <libgen.h>
-#include <fstream>
-#include <sstream>
-#include <string>
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -613,9 +608,38 @@ int main(int argc, char** argv) {
 		CostAgent::labels->push_back(*labelIt);
 	}
 
-	
 	// parse cost profile
+	if (args_info.costprofile_given)
+	{
+	    status("Parsing cost profile `%s'", args_info.costprofile_arg);
+	    extern FILE * profile_yyin;
+	    if ( not (profile_yyin = fopen(args_info.costprofile_arg, "r")))
+	    {
+	        status("File not found: %s", args_info.costprofile_arg);
+	        exit(1);
+	    }
+
+	    extern int profile_yyparse();
+	    profile_yyparse();
+        fclose(profile_yyin);
+
+	}
 	// parse request
+    if (args_info.request_given)
+    {
+        status("Parsing request `%s'", args_info.request_arg);
+        extern FILE * request_yyin;
+        if ( not (request_yyin = fopen(args_info.request_arg, "r")))
+        {
+            status("File not found: %s", args_info.request_arg);
+            exit(1);
+        }
+
+        extern int request_yyparse();
+        request_yyparse();
+        fclose(request_yyin);
+
+    }
 
 	// for each conjunctive clause in assertion-section of the request
 		// event-constraint -> transition-constraint

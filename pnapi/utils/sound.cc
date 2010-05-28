@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
     std::cout << "# check for quasi-liveness by checking whether any transition is dead\n";
     std::cout << "##############################################################################\n";
     std::cout << "quasiliveness: $(transitions:%=%.quasiliveness.result)\n";
-    std::cout << "\t-@grep -L \"RESULT: 0\" *.quasiliveness.result | tr '\\n' ',' | $(SED) 's/.$$//' | $(SED) 's/,/, /g'\n\n";
+//    std::cout << "\t-@grep -L \"RESULT: 0\" *.quasiliveness.result | tr '\\n' ',' | $(SED) 's/.$$//' | $(SED) 's/,/, /g'\n\n";
     std::cout << "%.quasiliveness.result:\n";
     std::cout << "\t@echo \"ANALYSE TRANSITION $(@:%.quasiliveness.result=%)\" > $(@:%.result=%.task)\n";
     std::cout << "\t-@lola-deadtransition $(net) -a$(@:%.result=%.task) > $@ ; echo \"RESULT: $$?\" >> $@\n\n";
@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
     std::cout << "# check for quasi-liveness by finding a path to enable every transition\n";
     std::cout << "##############################################################################\n";
     std::cout << "quasilivenessfindpath: $(transitions:%=%.findpath.result)\n";
-    std::cout << "\t-@grep -L \"RESULT: 0\" *.findpath.result | $(SED) -e 's/.findpath.result//' | xargs\n\n";
+//    std::cout << "\t-@grep -L \"RESULT: 0\" *.findpath.result | $(SED) -e 's/.findpath.result//' | xargs\n\n";
 
     PNAPI_FOREACH(t, net.getTransitions()) {
         std::cout << (*t)->getName() << ".findpath.result:\n\t@echo \"FORMULA (";
@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
     std::cout << "# check for liveness of the final marking\n";
     std::cout << "##############################################################################\n";
     std::cout << "liveness: liveness.result\n";
-    std::cout << "\t-@grep -q \"RESULT: 0\" liveness.result\n\n";
+//    std::cout << "\t-@grep -q \"RESULT: 0\" liveness.result\n\n";
     std::cout << "liveness.result:\n";
     std::cout << "\t@echo \"FORMULA \"$(final) > $(@:%.result=%.task)\n";
     std::cout << "\t-@lola-liveprop $(net) -a$(@:%.result=%.task) -S > $@ ; echo \"RESULT: $$?\" >> $@\n\n";
@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
     std::cout << "# check for boundedness by checking each place\n";
     std::cout << "##############################################################################\n";
     std::cout << "boundedness: $(places:%=%.boundedness.result)\n";
-    std::cout << "\t-@grep -L \"RESULT: 1\" *.boundedness.result | tr '\\n' ',' | $(SED) 's/.$$//' | $(SED) 's/,/, /g'\n\n";
+//    std::cout << "\t-@grep -L \"RESULT: 1\" *.boundedness.result | tr '\\n' ',' | $(SED) 's/.$$//' | $(SED) 's/,/, /g'\n\n";
     std::cout << "%.boundedness.result:\n";
     std::cout << "\t@echo \"ANALYSE PLACE $(@:%.boundedness.result=%)\" > $(@:%.result=%.task)\n";
     std::cout << "\t@-lola-boundedplace $(net) -a$(@:%.result=%.task) > $@ ; echo \"RESULT: $$?\" >> $@\n\n";
@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
     std::cout << "# check relaxed soundness by checking special reachability problem\n";
     std::cout << "##############################################################################\n";
     std::cout << "relaxed: $(transitions:%=%.relaxed.result)\n";
-    std::cout << "\t-@grep -L \"RESULT: 1\" *.relaxed.result | tr '\\n' ',' | $(SED) 's/.$$//' | $(SED) 's/,/, /g'\n\n";
+//    std::cout << "\t-@grep -L \"RESULT: 0\" *.relaxed.result | tr '\\n' ',' | $(SED) 's/.$$//' | $(SED) 's/,/, /g'\n\n";
     std::cout << "%.relaxed.result:\n";
     std::cout << "\t-@lola-statepredicate $(net:.lola=).$(@:%.relaxed.result=%).lola > $@ ; echo \"RESULT: $$?\" >> $@\n\n";
 

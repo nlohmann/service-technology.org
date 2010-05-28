@@ -1,5 +1,32 @@
 #/bin/bash
 
+#####################
+# RELAXED SOUNDNESS #
+#####################
+
+RELAXED="true"
+
+for TRANSITION in `ls *.relaxed.result`; do
+  TRANSITIONNAME=`echo $TRANSITION | sed 's/.relaxed.result//'`
+  grep -q "RESULT: 1" $TRANSITION
+  if [ "$?" != "1" ]; then
+    UNCOVEREDTRANSITIONS="$UNCOVEREDTRANSITIONS $TRANSITIONNAME"
+    RELAXED="false"
+  fi
+done
+
+echo "transitioncover = $TRANSITIONCOVER;"
+
+COMMA=""
+echo -n "uncoveredtransitions = ("
+for UNCOVEREDTRANSITION in $UNCOVEREDTRANSITIONS; do
+  echo -n "$COMMA\"$UNCOVEREDTRANSITION\""
+  COMMA=", "
+done
+echo ");"
+
+
+
 #################
 # QUASILIVENESS #
 #################
@@ -72,32 +99,21 @@ fi
 # INFERENCE #
 #############
 
-if [ "$BOUNDEDNESS" = "false" ]; then
-  echo "soundness = false;"
-  echo "weaksoundness = false;"
-  echo "relaxedsoundness = false;"
-  exit;
-fi
-
-# bounded + quasiliveness = relaxedsoundness
-
-if [ "$QUASILIVENESS" = "true" ]; then
+if ([ "$BOUNDEDNESS" = "true" ] && [ "$QUASILIVENESS" = "true" ] && [ "$LIVENESS" = "true" ]); then
+  echo "soundness = true;"
+  echo "weaksoundness = true;"
   echo "relaxedsoundness = true;"
 else
-  echo "relaxedsoundness = false;"
-fi
-
-# bounded + liveness = weak soundness
-
-if [ "$LIVENESS" = "true" ]; then
-  echo "weaksoundness = true;"
-else
-  echo "weaksoundness = false;"
-fi
-
-if ([ "$QUASILIVENESS" = "true" ] && [ "$LIVENESS" = "true" ]); then
-  echo "soundness = true;"
-else
   echo "soundness = false;"
+  if ([ "$BOUNDEDNESS" = "true" ] && [ "$LIVENESS" = "true" ]); then
+    echo "weaksoundness = true;"
+  else
+    echo "weaksoundness = false;"
+  fi
+  if [ "$RELAXED" = "true" ] ; then
+    echo "relaxedsoundness = true;"
+  else
+    echo "relaxedsoundness = false;"
+  fi
 fi
-  
+

@@ -42,12 +42,12 @@ void evaluateParameters(int argc, char** argv) {
 	}
 
 	if (args_info.costs_given && !(args_info.costprofile_given && args_info.request_given)) {
-		abort(1, "In cost mode, both the 'costprofile' and 'request' parameters are obligatory.");
+		abort(2, "In cost mode, both the 'costprofile' and 'request' parameters are obligatory.");
 	}
 	
 	// check whether at least one file is given
 	if (args_info.inputs_num != 1) {
-		abort(1, "Exactly one input file (open net) must be given.");
+		abort(2, "Exactly one input file (open net) must be given.");
 	}
 
 	free(params);
@@ -206,6 +206,9 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 
 
 int main(int argc, char** argv) {
+	bool dirty = false; // Setting this bit means that linda should exit with an exit code != 0, but should be further executed.
+
+
 
 	/*
 	* The Linda Workflow in short:
@@ -261,7 +264,7 @@ int main(int argc, char** argv) {
 		} catch (pnapi::exception::InputError error) {
 			std::stringstream inputerror;
 			inputerror << error;
-			abort(1, "pnapi error %i", inputerror.str().c_str());
+			abort(3, "pnapi error %i", inputerror.str().c_str());
 		}	
 		
 
@@ -489,7 +492,7 @@ int main(int argc, char** argv) {
 
 			// If the file can not be read we warn the user and cancel the mode.
 			if (!etc_yyin) {
-				abort(1, "cannot open ETC file '%s' for reading!",
+				abort(3, "cannot open ETC file '%s' for reading!",
 				args_info.constraint_file_arg);
 			} else {
 
@@ -587,14 +590,16 @@ int main(int argc, char** argv) {
 		} catch (pnapi::exception::InputError error) {
 			std::stringstream inputerror;
 			inputerror << error;
-			abort(1, "pnapi error %i", inputerror.str().c_str());
+			abort(3, "pnapi error %i", inputerror.str().c_str());
 		}	
 
 		// build helpers
 
 		CostAgent::places = new std::vector<pnapi::Place*>();
+		CostAgent::initialMarking = new int[net->getPlaces().size()];
 		for (std::set<pnapi::Place*>::iterator placeIt =  net->getPlaces().begin(); placeIt != net->getPlaces().end(); ++placeIt) {
 			CostAgent::places->push_back(*placeIt);
+			CostAgent::initialMarking[CostAgent::places->size()-1] = (int) (*placeIt)->getTokenCount();
 		}
 
 		CostAgent::transitions = new std::vector<pnapi::Transition*>(1);
@@ -644,40 +649,48 @@ int main(int argc, char** argv) {
 		extern CostProfile* profile;
 		extern Request* request;
 		
-		// Convert any label-based stuff to transition-based equivalent stuff
-		request->convertAssertions();
-
-		request->convertGrants();
-		// build basic state equation
+		if (request->assertions->size() == 0) {
+			ElementalConstraint* dummy = new ElementalConstraint(CostAgent::transitions->size());
+			request->assertions->push_back(new std::vector<ElementalConstraint*>);
+			(*request->assertions)[0]->push_back(dummy);
+		}
+		
 		CostAgent::buildBasicStateEquation();	
 		
 		
 		// for each use case in the cost profile...
 		for (int usecaseCounter = 0; usecaseCounter < profile->usecases->size(); ++usecaseCounter) {
+		
+		status("Use case nr %i",usecaseCounter);
+		
+		CostAgent::buildStateEquationWithUseCase((*profile->usecases)[usecaseCounter]);	
+			
 			// for each conjunctive clause in the assertions-section of the request
-
+		
 			for (int clauseCounter = 0; clauseCounter < request->assertions->size(); ++clauseCounter) {
 				std::vector<ElementalConstraint*>* clause = (*request->assertions)[clauseCounter];
 				// augment state equation with conjunctive clause
-				std::cerr << "Clause nr " << clauseCounter << std::endl;
-				if (clause->size() > 0) {
-					CostAgent::buildStateEquationWithAssertions((*profile->usecases)[usecaseCounter], clause);
-
-					
-					// for each grant			
-					/*			for (int grantCounter = 0; grantCounter < request->grants->size(); ++grantCounter) {
+				status("    Clause nr %i",clauseCounter);
+				CostAgent::buildStateEquationWithAssertions((*profile->usecases)[usecaseCounter], clause);
+				
+				// for each grant			
+				
+				for (int grantCounter = 0; grantCounter < request->grants->size(); ++grantCounter) {
+				status("        Grant nr %i", grantCounter);
 				// augment state equation with grant-constraint
 				CostAgent::buildStateEquationWithGrant((*profile->usecases)[usecaseCounter],(*request->grants)[grantCounter]);
 				// solve program with cost-function - payment-function
-				CostAgent::checkPolicy(profile);
-				// check if values are inside policy
-				// if values are outside policy: exit.
-			}
-*/	
+				bool b = CostAgent::checkPolicy((*profile->usecases)[usecaseCounter],(*request->grants)[grantCounter]);
+				if (!b) {
+					dirty = true;
+					message("Policy check failed! (use case %i, clause %i, grant %i)",usecaseCounter, clauseCounter, grantCounter);
 				}
 			}
+			}
 			
-			
+			if (dirty) {
+				message("At least one policy check failed!");
+			}
 			// done.
 			
 			
@@ -696,4 +709,7 @@ int main(int argc, char** argv) {
 		+ TOOL_AWK
 		+ " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
 	}
+	
+	if (dirty) return 1;
+	
 }

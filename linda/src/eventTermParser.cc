@@ -30,7 +30,7 @@ std::vector<int*>* EventTermParser::parseFile(std::string filename) {
 
 	et_yyin = fopen(filename.c_str(), "r");
 	if (!et_yyin) {
-		abort(1, "cannot open ET file '%s' for reading", filename.c_str());
+		abort(3, "cannot open ET file '%s' for reading", filename.c_str());
 	}
 
 	// Initialize the vector that stores the parsed events

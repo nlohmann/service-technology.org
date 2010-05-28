@@ -117,7 +117,7 @@ constraint:
 			ElementalConstraint* cons = new ElementalConstraint();
 			cons->lhs = curterm;
 			curterm = 0;
-			cons->len = CostAgent::labels->size();
+			cons->len = CostAgent::transitions->size();
 			cons->sign = 1;
 			cons->rhs = $3;	
 			$$ = cons;
@@ -128,7 +128,7 @@ constraint:
 			ElementalConstraint* cons = new ElementalConstraint();
 			cons->lhs = curterm;
 			curterm = 0;
-			cons->len = CostAgent::labels->size();
+			cons->len = CostAgent::transitions->size();
 			cons->sign = 2;
 			cons->rhs = $3;	
 			$$ = cons;
@@ -139,7 +139,7 @@ constraint:
 			ElementalConstraint* cons = new ElementalConstraint();
 			cons->lhs = curterm;
 			curterm = 0;
-			cons->len = CostAgent::labels->size();
+			cons->len = CostAgent::transitions->size();
 			cons->sign = 3;
 			cons->rhs = $3;	
 			$$ = cons;
@@ -148,27 +148,30 @@ constraint:
 term:
     VALUE OP_TIMES IDENT term
  	{ 
-		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
-		curterm[CostAgent::getLabelID(*$3)] += (double) $1;
-    }
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());}
+		CostAgent::increaseAllXLabeledTransitionsInTermByY(curterm, $3, $1);
+    	}
     |
    	IDENT term
 	{ 
-		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
-		++curterm[CostAgent::getLabelID(*$1)];
-    }
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());}
+		CostAgent::increaseAllXLabeledTransitionsInTerm(curterm, $1);
+
+	}
 	|
     VALUE OP_TIMES IDENT
 	{ 
-		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
-		curterm[CostAgent::getLabelID(*$3)] += (double) $1;
-    }      
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());}
+		CostAgent::increaseAllXLabeledTransitionsInTermByY(curterm, $3, $1);
+
+	}      
 	|
     IDENT
 	{ 
-		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
-		++curterm[CostAgent::getLabelID(*$1)];
-    }
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());}
+		CostAgent::increaseAllXLabeledTransitionsInTerm(curterm, $1);
+
+	}
     ;
 
 grants:
@@ -186,26 +189,26 @@ grant: { curgrant = new Grant(); }
 payment:
        VALUE OP_TIMES IDENT payment
 		{ 
-		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
-		curterm[CostAgent::getLabelID(*$3)] += $1;
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());}
+		CostAgent::increaseAllXLabeledTransitionsInTermByY(curterm, $3, $1);
 		}
        |
        IDENT payment
 		{ 
-		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
-		++curterm[CostAgent::getLabelID(*$1)];
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());}
+		CostAgent::increaseAllXLabeledTransitionsInTerm(curterm, $1);
 		}
        |
        VALUE OP_TIMES IDENT
 	{ 
-		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
-		curterm[CostAgent::getLabelID(*$3)] += $1;
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());}
+		CostAgent::increaseAllXLabeledTransitionsInTermByY(curterm, $3, $1);
     }      
        |
        IDENT
 	{ 
-		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::labels->size());}
-		++curterm[CostAgent::getLabelID(*$1)];
+		if (curterm == 0) {curterm = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());}
+		CostAgent::increaseAllXLabeledTransitionsInTerm(curterm, $1);
     }
        |
        VALUE

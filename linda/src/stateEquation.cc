@@ -44,7 +44,7 @@ bool ExtendedStateEquation::constructLP() {
 
 	// If for some reason the lp system is null, we exit.
 	if (lp == NULL) {
-		abort(1, "Unable to create new LP model");
+		abort(4, "Unable to create new LP model");
 	}
 
 	// Set debug and verbose of this linear problem to FALSE

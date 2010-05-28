@@ -75,7 +75,7 @@ usecases:
 usecase:
        KEY_USECASE
        {
-        std::cerr << "Creating new use case" << std::endl;    
+//        std::cerr << "Creating new use case" << std::endl;    
 		usecase = new UseCase();
        }
        KEY_CONSTRAINT opt_constraints SEMMELKORN
@@ -83,7 +83,7 @@ usecase:
        KEY_COSTS costs SEMMELKORN
        KEY_POLICY policy SEMMELKORN
        {
-        usecase->output();    
+        // usecase->output();    
 		profile->usecases->push_back(usecase);
        }
        ;
@@ -213,7 +213,26 @@ policy:
       VALUE COMMA VALUE
       {
       usecase->policyLHS = $1;
+	  usecase->policyLB = true;
       usecase->policyRHS = $3;
+	  usecase->policyRB = true;
+      }
+	  | 
+      COMMA VALUE
+      {
+      usecase->policyRHS = $2;
+	  usecase->policyRB = true;
+      }
+	  | 
+	  VALUE COMMA
+      {
+      usecase->policyLHS = $1;
+	  usecase->policyLB = true;
+      }
+	  |      
+	  COMMA
+      {
+		/* nothing do be done */
       }
       ;
 

@@ -3,9 +3,12 @@
 std::vector<pnapi::Place*>* CostAgent::places;
 std::vector<pnapi::Transition*>* CostAgent::transitions;
 std::vector<pnapi::Label*>* CostAgent::labels;
+int* CostAgent::initialMarking;
 
 lprec* CostAgent::basicStateEquation = 0;
+lprec* CostAgent::currentStateEquationWithUseCase = 0;
 lprec* CostAgent::currentStateEquationWithAssertions = 0;
+lprec* CostAgent::currentStateEquationWithGrant = 0;
 
 BinaryTree<pnapi::Place*, std::pair<int, std::pair<int*, REAL*> > >
 * CostAgent::lines = new BinaryTree<pnapi::Place*,
@@ -71,7 +74,6 @@ void Request::convertAssertions () {
 	for (int i = 0; i < assertions->size(); ++i) {
 		newassertions->push_back(new std::vector<ElementalConstraint*>());
 		assert((*assertions)[i] != 0);
-		std::cerr << (*assertions)[i]->size()<< std::endl;
 		for (int j = 0; j < (*assertions)[i]->size(); ++j) {
 			(*newassertions)[i]->push_back((*(*assertions)[i])[j]->convert());
 		}
@@ -161,7 +163,7 @@ void CostAgent::buildBasicStateEquation() {
 	
 	// If for some reason the lp system is null, we exit.
 	if (basicStateEquation== NULL) {
-		abort(1, "Unable to create new LP model");
+		abort(4, "Unable to create new LP model");
 	}
 
 	// Set debug and verbose of this linear problem to FALSE
@@ -206,8 +208,7 @@ void CostAgent::buildBasicStateEquation() {
 				pnapi::Transition& t = (*pIt)->getTransition();
 
 				// We add the transition, with the weight as a factor.
-				transCol[tr] = START_TRANSITIONS
-				+ getTransitionID(t.getName());
+				transCol[tr] = getTransitionID(t.getName());
 				transVal[tr] = (*pIt)->getWeight();
 				++tr;
 			}
@@ -219,7 +220,7 @@ void CostAgent::buildBasicStateEquation() {
 
 				pnapi::Transition& t = (*pIt)->getTransition();
 				if (place->getPreset().find(&t) != place->getPreset().end()) {
-					int thisID = START_TRANSITIONS +  getTransitionID(t.getName());
+					int thisID = getTransitionID(t.getName());
 					for (int i = 0; i < tr; ++i) {
 						if (transCol[i] == thisID) {
 							transVal[i] +=  -1 * (int) (*pIt)->getWeight();
@@ -229,8 +230,7 @@ void CostAgent::buildBasicStateEquation() {
 				} else {
 
 					// We add the transition, with the weight as a factor.
-					transCol[tr] = START_TRANSITIONS
-					+  getTransitionID(t.getName());
+					transCol[tr] = getTransitionID(t.getName());
 					transVal[tr] = -1 * (int) (*pIt)->getWeight();
 
 					++tr;
@@ -248,30 +248,102 @@ void CostAgent::buildBasicStateEquation() {
 			transVal = line->value.second.second;
 		}
 		
-		add_constraintex(basicStateEquation, tr, transVal, transCol, GE, 0);
+		add_constraintex(basicStateEquation, tr, transVal, transCol, EQ, 0);
+		char* name = const_cast<char*>(place->getName().c_str());
+		set_row_name(basicStateEquation, placecounter+1, name);
 		
 	}
 
 	set_add_rowmode(basicStateEquation, FALSE);
 	
-	print_lp(basicStateEquation);
+	// print_lp(basicStateEquation);
 	
 }
 
-void CostAgent::buildStateEquationWithAssertions(UseCase* usecase, std::vector<ElementalConstraint*>* clause) {
-	if (clause->size() == 0) return;
-	delete_lp(currentStateEquationWithAssertions);
-	currentStateEquationWithAssertions = copy_lp(basicStateEquation);
-	lprec* se = currentStateEquationWithAssertions;
+void CostAgent::buildStateEquationWithUseCase(UseCase* usecase) {
+	delete_lp(currentStateEquationWithUseCase);
+	currentStateEquationWithUseCase = copy_lp(basicStateEquation);
+	lprec* se = currentStateEquationWithUseCase;
 	set_add_rowmode(se, TRUE);
 	for (int i = 0; i < CostAgent::places->size(); ++i) {
-		set_rh(se,i+1,usecase->marking[i]);
+		set_rh(se,i+1,usecase->marking[i]-initialMarking[i]);
 	}
 	// print_lp(se);
-	for (int i = 0; i < clause->size(); ++i) {
-			std::cerr << add_constraint(se,(*clause)[i]->lhs,(*clause)[i]->sign,(*clause)[i]->rhs) << std::endl;
-	}
+		
+	for (int i = 0; i < usecase->constraint->size(); ++i) {
+			add_constraint(se,(*usecase->constraint)[i]->lhs,(*usecase->constraint)[i]->sign,(*usecase->constraint)[i]->rhs);
+	}	
+	
 	set_add_rowmode(se, FALSE);
-	print_lp(se);
+	//print_lp(se);
 }
 
+
+void CostAgent::buildStateEquationWithAssertions(UseCase* usecase, std::vector<ElementalConstraint*>* clause) {
+	delete_lp(currentStateEquationWithAssertions);
+	currentStateEquationWithAssertions = copy_lp(currentStateEquationWithUseCase);
+	lprec* se = currentStateEquationWithAssertions;
+	set_add_rowmode(se, TRUE);
+	for (int i = 0; i < clause->size(); ++i) {
+			add_constraint(se,(*clause)[i]->lhs,(*clause)[i]->sign,(*clause)[i]->rhs);
+	}
+	set_add_rowmode(se, FALSE);
+	//print_lp(se);
+}
+
+void CostAgent::buildStateEquationWithGrant(UseCase* usecase, Grant* grant) {
+	delete_lp(currentStateEquationWithGrant);
+	currentStateEquationWithGrant = copy_lp(currentStateEquationWithAssertions);
+	lprec* se = currentStateEquationWithGrant;
+	set_add_rowmode(se, TRUE);
+	
+	double* diff = getCleanDoubleArray(transitions->size()); 
+	
+	for (int i = 1; i < transitions->size(); ++i) {
+		diff[i] = grant->variableCosts[i] - usecase->variableCosts[i];
+	}
+		
+	set_obj_fn(se,diff);
+	
+	for (int i = 0; i < grant->constraint->size(); ++i) {
+			add_constraint(se,(*grant->constraint)[i]->lhs,(*grant->constraint)[i]->sign,(*grant->constraint)[i]->rhs);
+	}	
+	
+	set_add_rowmode(se, FALSE);
+	//print_lp(se);
+}
+
+bool CostAgent::checkPolicy(UseCase* usecase, Grant* grant) {
+	lprec* se = currentStateEquationWithGrant;
+	
+	
+	set_maxim(se);
+	int returnValue = solve(se);
+	
+	if (returnValue == INFEASIBLE) {
+		status("            System was infeasible.");
+		//print_lp(se);
+		return true;
+	}
+	
+	if (returnValue == UNBOUNDED) { 	status("            Maximize resulted in unbounded"); 
+return !usecase->policyRB; }
+	
+	double maxResult = get_objective(se) - usecase->fixCosts + grant->fixCosts;
+	status("            Maximize resulted in %d", maxResult); 
+	
+	if (usecase->policyRB && maxResult > usecase->policyRHS) return false;
+	
+	set_minim(se);
+	returnValue = solve(se);
+
+	if (returnValue == UNBOUNDED) { 	status("            Minimize resulted in unbounded"); 
+return !usecase->policyLB; }
+	
+	double minResult = get_objective(se) - usecase->fixCosts + grant->fixCosts;
+	status("            Minimize resulted in %d", minResult); 
+	
+	if (usecase->policyLB && minResult < usecase->policyLHS) return false;
+	
+	return true;
+}

@@ -77,25 +77,32 @@ public class PTnetToINA {
 		
 		Integer tct = 0;
 		for (Transition tr : this.net.getTransitions()){	
-			TransitionExt t = (TransitionExt) tr;
+			//TransitionExt t = (TransitionExt) tr;
 			
-			int time = t.getMinTime();
-			if (time <= 0) time = 0; 
+			int minTime = 0;
+			int maxTime = 0;
+			
+			if (tr instanceof TransitionExt) {
+				minTime = ((TransitionExt)tr).getMinTime();
+				maxTime = ((TransitionExt)tr).getMaxTime();
+			}
+
+			if (minTime <= 0) minTime = 0; 
 			String tName = "";
-			if (t.getName().length() == 0) tName = "t" + tct;
-			else tName = name(t.getName());
-			transdata += cr + "       " + tct + ": " + tName + "        0    " + time;
-			times += tct + ":0," + (t.getMaxTime()-t.getMinTime()) + cr;
-			transitions.put(t, tct);
+			if (tr.getName().length() == 0) tName = "t" + tct;
+			else tName = name(tr.getName());
+			transdata += cr + "       " + tct + ": " + tName + "        0    " + minTime;
+			times += tct + ":0," + (maxTime-minTime) + cr;
+			transitions.put(tr, tct);
 			tct++;
 		}
 		
 		Integer pct = 0;
 		for (Place pl : this.net.getPlaces()){
-			PlaceExt p = (PlaceExt) pl;
+			//PlaceExt p = (PlaceExt) pl;
 			String pName = "";
-			if (p.getName() == null || p.getName().length() == 0) pName = "p" + pct;
-			else pName = name(p.getName());
+			if (pl.getName() == null || pl.getName().length() == 0) pName = "p" + pct;
+			else pName = name(pl.getName());
 			placedata += cr + "       " + pct + ": " + pName + "       oo    0";
 
 			String pre = "";
@@ -107,7 +114,7 @@ public class PTnetToINA {
 			for (Transition t : pl.getPostSet()){
 				post += transitions.get(t)+": " + findArc(pl, t).getWeight() + " ";
 			}
-			netstruct += cr + "  " + pct + " " + p.getToken() + "    " + pre;
+			netstruct += cr + "  " + pct + " " + pl.getToken() + "    " + pre;
 			if (!(post.length() == 0)) netstruct+= ", " + post;
 			pct++;
 		}

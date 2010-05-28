@@ -76,7 +76,6 @@ of any one of the EPL, the GPL or the LGPL.
       <import plugin="org.eclipse.gmf.runtime.diagram.ui"/>
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.core.resources"/>
-      <import plugin="hub.sam.tef"/>
       <import plugin="org.eclipse.emf.transaction"/>
       <import plugin="org.eclipse.osgi.services"/>
       <import plugin="org.eclipse.osgi.util"/>
@@ -108,6 +107,8 @@ of any one of the EPL, the GPL or the LGPL.
       <import plugin="org.eclipse.gmf.runtime.diagram.ui.printing.render"/>
       <import plugin="org.eclipse.emf.edit"/>
       <import plugin="org.eclipse.emf.transaction" version="1.2.1" match="greaterOrEqual"/>
+      <import plugin="hub.top.editor.resource" version="1.0.6" match="greaterOrEqual"/>
+      <import plugin="hub.sam.tef" version="1.0.9" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -151,5 +152,11 @@ of any one of the EPL, the GPL or the LGPL.
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
+   <plugin
+         id="hub.top.pnapi"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>

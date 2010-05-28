@@ -1,7 +1,8 @@
 /*****************************************************************************\
- * Copyright (c) 2009 Dirk Fahland. All rights reserved. EPL1.0/GPL3.0/LGPL3.0
+ * Copyright (c) 2008, 2009, 2010 Dirk Fahland. EPL1.0/GPL3.0/LGPL3.0
+ * All rights reserved.
  * 
- * ServiceTechnolog.org - FlowChart Editors
+ * ServiceTechnolog.org - PetriNet Editor Framework
  * 
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License v1.0, which accompanies this
@@ -12,11 +13,11 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is this file as it was released on March 09, 2009.
- * The Initial Developer of the Original Code are
- * 		Dirk Fahland
+ * The Original Code is this file as it was released on July 30, 2008.
+ * The Initial Developer of the Original Code is
+ *    Dirk Fahland
  * 
- * Portions created by the Initial Developer are Copyright (c) 2009
+ * Portions created by the Initial Developer are Copyright (c) 2008
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):

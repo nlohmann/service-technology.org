@@ -9,6 +9,30 @@
       </editingDomain>
    </extension>
 
-
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <!-- general context menu structure for PtNet files -->
+      <objectContribution
+            id="hub.top.GRETA.run.menu.ptnet"
+            nameFilter="*.ptnet"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               id="hub.top.GRETA.run.menu.ptnet"
+               label="P/T nets"
+               path="additions">
+            <separator
+                  name="analysis">
+            </separator>
+         </menu>
+         
+         <!-- convert to GraphViz DOT -->
+         <action
+               class="hub.top.editor.eclipse.ui.ConvertFileAction_PTnetToDot"
+               id="hub.top.editor.ptnetLoLA.convertToDot"
+               label="conver to DOT"
+               menubarPath="hub.top.GRETA.run.menu.ptnet/analysis">
+         </action>
+     </objectContribution>
+   </extension>
    
 </plugin>

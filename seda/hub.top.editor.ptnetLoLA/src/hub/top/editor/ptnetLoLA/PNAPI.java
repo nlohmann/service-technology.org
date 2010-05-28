@@ -38,6 +38,7 @@ package hub.top.editor.ptnetLoLA;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -126,7 +127,7 @@ public class PNAPI {
     
     return pMerged;
   }
-
+  
   /**
    * Remove transition t from the net. Remove also all adjacent arcs.
    * 
@@ -134,14 +135,12 @@ public class PNAPI {
    * @param t
    */
   public static void removeTransition(PtNet net, Transition t) {
-    for (Arc a : t.getIncoming()) {
-      a.setSource(null);
+    LinkedList<Arc> a_remove = new LinkedList<Arc>();
+    a_remove.addAll(t.getIncoming());
+    a_remove.addAll(t.getOutgoing());
+    for (Arc a : a_remove) {
+      removeArc(net, a);
     }
-    for (Arc a : t.getOutgoing()) {
-      a.setTarget(null);
-    }
-    net.getArcs().removeAll(t.getIncoming());
-    net.getArcs().removeAll(t.getOutgoing());
     net.getTransitions().remove(t);
   }
   
@@ -161,14 +160,14 @@ public class PNAPI {
     
     p.setToken(0);
     p.setFinalMarking(0);
-    for (Arc a : p.getIncoming()) {
-      a.setSource(null);
+
+    LinkedList<Arc> a_remove = new LinkedList<Arc>();
+    a_remove.addAll(p.getIncoming());
+    a_remove.addAll(p.getOutgoing());
+    for (Arc a : a_remove) {
+      removeArc(net, a);
     }
-    for (Arc a : p.getOutgoing()) {
-      a.setTarget(null);
-    }
-    net.getArcs().removeAll(p.getIncoming());
-    net.getArcs().removeAll(p.getOutgoing());
+    
     net.getPlaces().remove(p);
   }
   
@@ -226,6 +225,60 @@ public class PNAPI {
    */
   public static boolean parallelTransitions(Transition t1, Transition t2) {
     return parallelTransitions(t1, t2, null);
+  }
+  
+
+  public static void removeTauTransitions(PtNet net) {
+    LinkedList<Transition> taus = new LinkedList<Transition>();
+    for (Transition t : net.getTransitions()) {
+      if (t.getName().startsWith("tau")) {
+        taus.add(t);
+      }
+    }
+    
+    boolean netChanged = true;
+    while (netChanged) {
+      netChanged = false;
+      
+      for (Transition t : taus) {
+        if (t.getPreSet().size() == 1 && t.getPostSet().size() == 1) {
+          Place pIn = t.getPreSet().get(0);
+          Place pOut = t.getPostSet().get(0);
+          mergePlaces(net, pIn, pOut);
+          removeTransition(net, t);
+          taus.remove(t);
+          netChanged = true;
+          break;
+        }
+      }
+    }
+  }
+  
+  public static void makePlacesInvisible(PtNet net) {
+    for (Place p : net.getPlaces()) {
+      if (p.getPreSet().size() != 1 || p.getPostSet().size() != 1) continue;
+      Transition t1 = p.getPreSet().get(0);
+      Transition t2 = p.getPostSet().get(0);
+      if (t1.getName().startsWith("tau") && t2.getName().startsWith("tau"))
+        p.setName("");
+    }
+  }
+
+  public static void removeIsolatedNodes(PtNet net) {
+    LinkedList<Transition> t_remove = new LinkedList<Transition>();
+    for (Transition t : net.getTransitions()) {
+      if (t.getPreSet().size() == 0 && t.getPostSet().size() == 0) {
+        t_remove.add(t);
+      }
+    }
+    LinkedList<Place> p_remove = new LinkedList<Place>();
+    for (Place p : net.getPlaces()) {
+      if (p.getPreSet().size() == 0 && p.getPostSet().size() == 0) {
+        p_remove.add(p);
+      }
+    }
+    for (Transition t : t_remove) removeTransition(net, t);
+    for (Place p : p_remove) removePlace(net, p);
   }
 
   /**

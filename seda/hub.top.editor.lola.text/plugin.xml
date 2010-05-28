@@ -89,8 +89,48 @@
                enablesFor="1"
                id="hub.top.editor.lola.text.ConvertToPtNet">
          </action>
+         <action
+               class="hub.top.editor.eclipse.ui.ConvertFileAction_LOLAtoDot"
+               enablesFor="1"
+               id="hub.top.editor.lola.text.ConvertToDot"
+               label="Convert to DOT"
+               menubarPath="additions">
+         </action>
       </objectContribution>
    </extension>
+   <extension point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="hub.top.editor.owfn.text.popupMenus"
+            nameFilter="*.owfn"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               id="hub.top.editor.lola.text.owfnMenu"
+               label="Petri Nets"
+               path="additions">
+            <separator
+                  name="convert">
+            </separator>
+            <separator
+                  name="operations">
+            </separator>
+         </menu>
+         <action
+               class="hub.top.editor.eclipse.ui.ConvertFileAction_LOLAtoDot"
+               enablesFor="1"
+               id="hub.top.editor.lola.text.ConvertToDot"
+               label="Convert to DOT"
+               menubarPath="hub.top.editor.lola.text.owfnMenu/convert">
+         </action>
+         <action
+               class="hub.top.editor.eclipse.ui.ConvertFileAction_DecomposeScenario"
+               enablesFor="1"
+               id="hub.top.editor.lola.text.DecomposeIntoScenarios"
+               label="Decompose into Scenarios"
+               menubarPath="hub.top.editor.lola.text.owfnMenu/operations">
+         </action>
+      </objectContribution>
+   </extension>
+   
    <extension
          point="hub.top.editor.resource.modelToTextTransformation">
       <transformation

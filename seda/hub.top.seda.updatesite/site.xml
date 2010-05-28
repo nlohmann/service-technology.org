@@ -3,16 +3,37 @@
    <description url="http://download.gna.org/service-tech/seda/updatesite/">
       This site provides access to official releases of the Service-Technology.org Editor Application &quot;Seda&quot;.
    </description>
-   <feature url="features/hub.top.seda_1.0.5.200904091350.jar" id="hub.top.seda" version="1.0.5.200904091350">
-      <category name="Service-Technology.org Editor Application"/>
+   <feature url="features/hub.top.greta_1.2.0.201005282203.jar" id="hub.top.greta" version="1.2.0.201005282203">
+      <category name="Greta"/>
    </feature>
-   <feature url="features/hub.top.seda.tef_1.0.8.200904091350.jar" id="hub.top.seda.tef" version="1.0.8.200904091350">
+   <feature url="features/hub.top.uma_1.2.0.jar" id="hub.top.uma" version="1.2.0">
+      <category name="Greta"/>
+   </feature>
+   <feature url="features/hub.top.seda_1.1.0.201005282201.jar" id="hub.top.seda" version="1.1.0.201005282201">
+      <category name="Seda"/>
+   </feature>
+   <feature url="features/hub.top.seda.tef_1.0.9.201005282201.jar" id="hub.top.seda.tef" version="1.0.9.201005282201">
       <category name="3rd-Party Seda Runtime Files"/>
    </feature>
-   <feature url="features/hub.top.seda.rcp_1.0.5.200904091350.jar" id="hub.top.seda.rcp" version="1.0.5.200904091350">
+   <feature url="features/hub.top.seda.rcp_1.0.5.201005282201.jar" id="hub.top.seda.rcp" version="1.0.5.201005282201">
       <category name="Seda Standalone"/>
    </feature>
-   <category-def name="Service-Technology.org Editor Application" label="Service-Technology.org Editor Application">
+   <feature url="features/hub.top.com.microsoft.schemas.visio_1.0.0.jar" id="hub.top.com.microsoft.schemas.visio" version="1.0.0">
+      <category name="Modeling Languages"/>
+   </feature>
+   <feature url="features/hub.top.lang.flowcharts_1.0.1.201005282201.jar" id="hub.top.lang.flowcharts" version="1.0.1.201005282201">
+      <category name="Modeling Languages"/>
+   </feature>
+   <feature url="features/hub.top.lang.flowcharts.visioimport_1.0.1.jar" id="hub.top.lang.flowcharts.visioimport" version="1.0.1">
+      <category name="Modeling Languages"/>
+   </feature>
+   <feature url="features/hub.top.editor.pnml_1.0.4.201005282201.jar" id="hub.top.editor.pnml" version="1.0.4.201005282201">
+      <category name="Petri Nets"/>
+   </feature>
+   <feature url="features/hub.top.pnapi_1.0.1.jar" id="hub.top.pnapi" version="1.0.1">
+      <category name="Petri Nets"/>
+   </feature>
+   <category-def name="Seda" label="Seda">
       <description>
          The core of the Service-Technology.org Editor Application.
       </description>
@@ -25,6 +46,21 @@
    <category-def name="Seda Standalone" label="Seda Standalone">
       <description>
          Packages and updates for the standalone Rich Client Platform application for Seda.
+      </description>
+   </category-def>
+   <category-def name="Greta" label="Greta">
+      <description>
+         Graphical Runtime EnvironmenT for Adaptive Processes
+      </description>
+   </category-def>
+   <category-def name="Modeling Languages" label="Modeling Languages">
+      <description>
+         High level modeling languages from which Petri net models can be created.
+      </description>
+   </category-def>
+   <category-def name="Petri Nets" label="Petri Nets">
+      <description>
+         Editors, file formats, analysis tools, and converters for Petri nets.
       </description>
    </category-def>
 </site>

@@ -55,6 +55,8 @@
     <genClasses ecoreClass="ptnetLoLA.ecore#//ArcToTransition"/>
     <genClasses ecoreClass="ptnetLoLA.ecore#//TransitionExt">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//TransitionExt/probability"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//TransitionExt/time"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//TransitionExt/cost"/>
     </genClasses>
     <genClasses ecoreClass="ptnetLoLA.ecore#//PlaceExt">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ptnetLoLA.ecore#//PlaceExt/probability"/>

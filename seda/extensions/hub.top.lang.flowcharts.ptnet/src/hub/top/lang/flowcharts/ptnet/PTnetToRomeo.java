@@ -92,28 +92,30 @@ public class PTnetToRomeo {
 				
 		// describe all Places
 		for (Place pl : this.net.getPlaces()){
-			PlaceExt p = (PlaceExt) pl;
+			//PlaceExt p = (PlaceExt) pl;
 			
-			places.put(p, pct);
-			pldesc += this.addPlace(pct, p, xPos, yPos);
+			places.put(pl, pct);
+			pldesc += this.addPlace(pct, pl, xPos, yPos);
 			yPos += 100;
 			pct++;
 			
 			// if after p comes a optional activity with duration > 0, insert another place p1
-			if (p.getPostSet().size() > 1){
-				for (Transition t : p.getPostSet()){
-					if (((TransitionExt) t).getMaxTime() > 0) {
-						PlaceExt p1 = PtnetLoLAFactory.eINSTANCE.createPlaceExt();
-						p1.setName("decided_" + t.getName());
-						places.put(p1, pct);
-						
-						ExtArc e = new ExtArc(p, (TransitionExt) t, p1);
-						extended.put((TransitionExt) t, e);
-						
-						pldesc += this.addPlace(pct, p1, xPos, yPos);
-						yPos += 100;
-						pct++;
-						
+			if (pl.getPostSet().size() > 1){
+				for (Transition t : pl.getPostSet()){
+					if (t instanceof TransitionExt) {
+						if (((TransitionExt) t).getMaxTime() > 0) {
+							Place p1 = PtnetLoLAFactory.eINSTANCE.createPlace();
+							p1.setName("decided_" + t.getName());
+							places.put(p1, pct);
+							
+							ExtArc e = new ExtArc(pl, (TransitionExt) t, p1);
+							extended.put((TransitionExt) t, e);
+							
+							pldesc += this.addPlace(pct, p1, xPos, yPos);
+							yPos += 100;
+							pct++;
+							
+						}
 					}
 				}
 			}
@@ -125,22 +127,22 @@ public class PTnetToRomeo {
 		
 		// describe all Transitions
 		for (Transition tr : this.net.getTransitions()){	
-			TransitionExt t = (TransitionExt) tr;
-			transitions.put(t, tct);
-			trdesc += this.addTransition(tct, t, xPos, yPos);
+			//TransitionExt t = (TransitionExt) tr;
+			transitions.put(tr, tct);
+			trdesc += this.addTransition(tct, tr, xPos, yPos);
 			tct++;
 			yPos += 100;
 			
 			// if t is optional with duration > 0, insert another transition
-			if (extended.containsKey(t)){
+			if (extended.containsKey(tr)){
 				TransitionExt t1 = PtnetLoLAFactory.eINSTANCE.createTransitionExt();
-				t1.setName("run_"+t.getName());
+				t1.setName("run_"+tr.getName());
 				t1.setCost(0.0);
 				t1.setProbability(1.0);
 				t1.setMaxTime(0);
 				
 				transitions.put(t1, tct);
-				extended.get(t).setNewTransition(t1);
+				extended.get(tr).setNewTransition(t1);
 				
 				trdesc += this.addTransition(tct, t1, xPos, yPos);
 				tct++;
@@ -217,7 +219,7 @@ public class PTnetToRomeo {
 		return this.out;
 	}
 	
-	private String addPlace(Integer pct, PlaceExt p, double xPos, double yPos){
+	private String addPlace(Integer pct, Place p, double xPos, double yPos){
 		String pName = "";
 		if (p.getName() == null || p.getName().length() == 0) pName = "p" + pct;
 		else pName = name(p.getName());
@@ -231,11 +233,20 @@ public class PTnetToRomeo {
 			   + cr);
 	}
 	
-	private String addTransition(Integer tct, TransitionExt t, double xPos, double yPos){
+	private String addTransition(Integer tct, Transition t, double xPos, double yPos){
 		String tName = "";
 		if (t.getName() == null || t.getName().length() == 0) tName = "p" + tct;
 		else tName = name(t.getName());
-		return ("\t<transition id=\"" + tct + "\" label=\"" + tName + "\" eft=\"" + t.getMinTime() + "\" lft=\"" + t.getMaxTime() + "\">" + cr
+		
+		int minTime = 0;
+		int maxTime = 0;
+		if (t instanceof TransitionExt) {
+			minTime = ((TransitionExt)t).getMinTime();
+			maxTime = ((TransitionExt)t).getMaxTime();
+		}
+		
+		
+		return ("\t<transition id=\"" + tct + "\" label=\"" + tName + "\" eft=\"" + minTime + "\" lft=\"" + maxTime + "\">" + cr
 					+ "\t\t<graphics color=\"0\">" + cr
 					+ "\t\t\t<position x=\"" + xPos + "\" y=\"" + yPos + "\"/>" + cr
 					+ "\t\t\t<deltaLabel deltax=\"35\" deltay=\"-7\"/>" + cr
@@ -250,12 +261,12 @@ public class PTnetToRomeo {
 	}
 	
 	private class ExtArc{
-		PlaceExt src;
-		TransitionExt tgt;
-		PlaceExt newPlace;
-		TransitionExt newTransition;
+		Place src;
+		Transition tgt;
+		Place newPlace;
+		Transition newTransition;
 		
-		public TransitionExt getNewTransition() {
+		public Transition getNewTransition() {
 			return newTransition;
 		}
 
@@ -263,20 +274,20 @@ public class PTnetToRomeo {
 			this.newTransition = newTransition;
 		}
 
-		public PlaceExt getSrc() {
+		public Place getSrc() {
 			return src;
 		}
 
-		public TransitionExt getTgt() {
+		public Transition getTgt() {
 			return tgt;
 		}
 
-		public PlaceExt getNewPlace() {
+		public Place getNewPlace() {
 			return newPlace;
 		}
 
-		public ExtArc(PlaceExt src, TransitionExt tgt, PlaceExt newPlace,
-				TransitionExt newTransition) {
+		public ExtArc(Place src, Transition tgt, Place newPlace,
+				Transition newTransition) {
 			super();
 			this.src = src;
 			this.tgt = tgt;
@@ -285,7 +296,7 @@ public class PTnetToRomeo {
 			
 		}
 		
-		public ExtArc(PlaceExt src, TransitionExt tgt, PlaceExt newPlace) {
+		public ExtArc(Place src, Transition tgt, Place newPlace) {
 			super();
 			this.src = src;
 			this.tgt = tgt;

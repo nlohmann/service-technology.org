@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="hub.top.lang.flowcharts.visioimport"
+      id="hub.top.com.microsoft.schemas.visio"
       label="Visio XML import"
       version="1.0.0"
       provider-name="service-technology.org">

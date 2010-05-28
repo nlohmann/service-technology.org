@@ -6,11 +6,7 @@ Bundle-Version: 1.0.4.qualifier
 Bundle-Activator: hub.top.editor.ptnetlola.pnml.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- fr.lip6.move.pnml.framework.3rdpartimports,
- fr.lip6.move.pnml.framework.ptnet,
- fr.lip6.move.pnml.framework.utils,
  hub.top.editor.resource;bundle-version="1.0.5",
- fr.lip6.move.pnml.framework.coremodel;bundle-version="2.1.6",
  hub.top.editor.ptnetLoLA;bundle-version="1.0.5",
  org.eclipse.emf.transaction;bundle-version="1.2.1",
  org.eclipse.emf.workspace;bundle-version="1.2.3",
@@ -21,8 +17,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Vendor: %providerName
-Import-Package: fr.lip6.move.pnml.pnmlcoremodel.hlapi,
- org.eclipse.core.resources,
+Import-Package: org.eclipse.core.resources,
  org.eclipse.emf.transaction,
  org.eclipse.gef.editparts,
  org.eclipse.gmf.runtime.diagram.ui.editparts,

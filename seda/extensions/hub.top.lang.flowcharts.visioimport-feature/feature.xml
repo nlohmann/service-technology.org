@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="hub.top.lang.flowcharts.visioimport_feature"
+      id="hub.top.lang.flowcharts.visioimport"
       label="Flowcharts Visio XML import"
-      version="1.0.0"
+      version="1.0.1"
       provider-name="service-technology.org">
 
    <description url="http://www.service-technology.org/">

@@ -2,7 +2,7 @@
 <feature
       id="hub.top.lang.flowcharts"
       label="Flowcharts Modeling Language and Semantics"
-      version="1.0.0"
+      version="1.0.1.qualifier"
       provider-name="service-technology.org">
 
    <description url="http://www.service-technology.org/">
@@ -90,13 +90,13 @@ EPL.
       <import plugin="org.eclipse.gmf.runtime.draw2d.ui"/>
       <import plugin="org.eclipse.draw2d"/>
       <import plugin="org.eclipse.gef"/>
-      <import plugin="hub.top.editor.resource" version="1.0.6" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.edit"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="hub.top.editor.ptnetLoLA"/>
       <import plugin="org.eclipse.emf.common"/>
       <import plugin="org.eclipse.emf.transaction"/>
       <import plugin="org.eclipse.gmf.runtime.notation"/>
+      <import plugin="hub.top.editor.resource" version="1.0.6" match="greaterOrEqual"/>
    </requires>
 
    <plugin

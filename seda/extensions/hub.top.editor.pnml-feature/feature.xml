@@ -973,16 +973,17 @@ For more information on this, and how to apply and follow the GNU AGPL, see
       <discovery label="PNML Framework Update Site" url="http://pnml.lip6.fr/pnmlframework/updatesite/"/>
    </url>
 
+   <includes
+         id="org.eclipse.xsd"
+         version="0.0.0"
+         search-location="both"/>
+
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.emf.ecore"/>
       <import plugin="org.eclipse.emf.ecore.xmi"/>
       <import plugin="org.eclipse.ui"/>
-      <import plugin="fr.lip6.move.pnml.framework.3rdpartimports"/>
-      <import plugin="fr.lip6.move.pnml.framework.ptnet"/>
-      <import plugin="fr.lip6.move.pnml.framework.utils"/>
       <import plugin="hub.top.editor.resource" version="1.0.5" match="greaterOrEqual"/>
-      <import plugin="fr.lip6.move.pnml.framework.coremodel" version="2.1.6" match="greaterOrEqual"/>
       <import plugin="hub.top.editor.ptnetLoLA" version="1.0.5" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.transaction" version="1.2.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.workspace" version="1.2.3" match="greaterOrEqual"/>

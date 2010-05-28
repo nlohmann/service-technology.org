@@ -43,7 +43,7 @@ public:
 	/// Destructor
 	~LPWrapper();
 
-	int createMEquation(Marking& m1, Marking& m2, bool verbose);
+	int checkReachability(Marking& m1, Marking& m2, bool verbose);
 	
 	int calcTInvariant(bool b);
 
@@ -93,7 +93,7 @@ private:
 	int cleanup();
 	
 	/// solves the problem
-	int solveLP();
+	int solveLP(bool verbose);
 	
 
 };

@@ -199,7 +199,6 @@ int main(int argc, char** argv) {
       lpw.calcTrap(false);
     }
 
-
     /*----------------------------------------.
     | 5. calculate and print siphon
     `----------------------------------------*/
@@ -208,6 +207,19 @@ int main(int argc, char** argv) {
       LPWrapper lpw(net.getPlaces().size(), &net);
       lpw.calcPTOrder();
       lpw.calcSiphon(false);
+    }	
+
+    /*----------------------------------------.
+    | 6. reachability check
+    `----------------------------------------*/
+
+    if(args_info.isReachable_given){
+      LPWrapper lpw(net.getTransitions().size(), &net);
+      lpw.calcPTOrder();
+      Marking m1(net, false);
+      Marking m2(net, true);
+      //TODO: Implement input for marking to be reached.
+      lpw.checkReachability(m1, m2, false);
     }	
 
 

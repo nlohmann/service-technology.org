@@ -34,6 +34,12 @@ option "findSiphon" -
   "Tries to find a siphon for a given petri net."
   flag off
 
+option "isReachable" r
+  "Checks if a given marking is reachable from the inital marking."
+  typestr="FILENAME"
+  string
+  optional
+
 section "Configuration"
 
 option "lisa" -

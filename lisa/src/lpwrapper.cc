@@ -55,13 +55,13 @@ extern set<pnapi::Arc*> arcs;
 		delete_lp(lp);
 	}
 
-/** Creates the marking equation for lp_solve.
+/** Checks if a given marking is reachable
 	@param m1 Initial marking.
 	@param m2 Final marking.
 	@param verbose If TRUE prints information on cout.
 	@return The number of equations on success, -1 otherwise.
 */
-int LPWrapper::createMEquation(Marking& m1, Marking& m2, bool verbose) {
+int LPWrapper::checkReachability(Marking& m1, Marking& m2, bool verbose) {
 
 	setupT();
 
@@ -98,9 +98,15 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, bool verbose) {
 	else set_verbose(lp,CRITICAL);
 	basicrows = placeorder.size()+cols;
 
+	int ret = solve(lp);
+
+	if(ret == -2)
+	 message("marking is not reachable");
+	else
+         message("marking is reachable");
+
 	return cleanup();
 }
-
 
 /** Creates equations for calculating t-invariants for lp_solve.
 	@param verbose If TRUE prints information on cout.
@@ -132,7 +138,7 @@ int LPWrapper::calcTInvariant(bool verbose) {
 		if (!add_constraintex(lp,cols,mat,colpoint,EQ,mark)) return -1;
 	}
 
-	if(solveLP() != 2){
+	if(solveLP(verbose) != 2){
 	  message("Found t-invariant");
 
 	  bool isNonNegative = true;
@@ -184,20 +190,31 @@ int LPWrapper::calcPInvariant(bool verbose) {
 		if (!add_constraintex(lp,cols,mat,colpoint,EQ,mark)) return -1;
 	}
 
-	if(solveLP() != 2){
+	if(solveLP(verbose) != 2){
 	  message("Found p-invariant");
 
 	  bool isNonNegative = true;
+	  bool isPositive = true;
           get_variables(lp, mat);
           for(int j = 0; j < cols; j++){
             fprintf(stderr, "%s: %f\n", get_col_name(lp, j + 1), mat[j]);
-	    //Check if t-invariant is non-negative
-	    if(mat[j]<0)
+	    //Check if p-invariant is non-negative
+	    if(mat[j]<0){
 	      isNonNegative = false;
+              isPositive = false;
+	    }
+	    else{
+	      //Check if p-invariant is positive, i.e. all components are greather than zero
+	      if(mat[j]==0)
+                isPositive = false;
+	    }
 	  }
-          if(isNonNegative)
+          if(isNonNegative){
 	    message("p-invariant is non-negative");	
 	    message("petri net is covered by p-invariants");
+	  }
+	  if(isPositive)
+            message("petri net is bounded");
 	}
 	else{
 	  message("No p-invariant could be found");
@@ -251,7 +268,7 @@ int LPWrapper::calcTrap(bool verbose) {
 
 	}
 	
-	if(solveLP() != 2){
+	if(solveLP(verbose) != 2){
 	  message("Found trap containing the following places");
 
 	  bool isNonNegative = true;
@@ -312,7 +329,7 @@ int LPWrapper::calcSiphon(bool verbose) {
 
 	}
 
-	if(solveLP() != 2){
+	if(solveLP(verbose) != 2){
 	  message("Found siphon containing the following places");
 
 	  bool isNonNegative = true;
@@ -397,7 +414,7 @@ int LPWrapper::cleanup(){
 
 }
 
-int LPWrapper::solveLP(){
+int LPWrapper::solveLP(bool verbose){
 	//allow only nonnegative solutions
 	REAL r = 1;
 
@@ -533,4 +550,5 @@ bool LPWrapper::calcPTOrder() {
 	
 	return deterministic;
 }
+
 

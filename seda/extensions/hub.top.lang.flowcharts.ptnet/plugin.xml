@@ -2,7 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension point="org.eclipse.ui.popupMenus">
-      <?gmfgen generated="true"?>
       <objectContribution
             id="hub.top.lang.flowcharts.diagram.ConvertToPnml"
             nameFilter="*.flow_diagram"

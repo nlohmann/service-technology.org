@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" copyrightText="XML Schema for EPNML 1.1 with &lt;toolspecific> extensions for Yasper, version 3&#xD;&#xA;by Maarten Leurs and Reinier Post, (c) Yasper/Petriweb project, TU Eindhoven/Deloitte &#xD;&#xA;&#xD;&#xA;Eclipse packages and parsers for reading EPNML 1.1 with &lt;toolspecific>&#xD;&#xA;extensions for Yasper Copyright (c) Dirk Fahland 2009, 2010. EPL1.0/AGPL3.0&#xD;&#xA;&#xD;&#xA;This package and the accompanying materials are made available under&#xD;&#xA;the terms of&#xD;&#xA;&#xD;&#xA; - the Eclipse Public License v1.0 (&quot;EPL&quot;), which accompanies this&#xD;&#xA;   distribution, and is available at&#xD;&#xA;   http://www.eclipse.org/legal/epl-v10.html,&#xD;&#xA;&#xD;&#xA;OR ALTERNATIVELY&#xD;&#xA;&#xD;&#xA; - the GNU Affero General Public License Version 3 or later (&quot;AGPL&quot;), which&#xD;&#xA;   accompanies this distribution, and is available at&#xD;&#xA;   http://www.gnu.org/licenses/agpl-3.0-standalone.html,&#xD;&#xA;   &#xD;&#xA;Software distributed under the License is distributed on an &quot;AS IS&quot; basis,&#xD;&#xA;WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License&#xD;&#xA;for the specific language governing rights and limitations under the&#xD;&#xA;License.&#xD;&#xA;&#xD;&#xA;For Original Creators and Contributors, and the respective copyright&#xD;&#xA;ownership, see AUTHORS file. &#xD;&#xA;&#xD;&#xA;If you wish to allow use of your version of this file only under the terms&#xD;&#xA;of the AGPL and not to allow others to use your version of this file under&#xD;&#xA;the terms of the EPL, indicate your decision by deleting the provisions&#xD;&#xA;above and replace them with the notice and other provisions required by the &#xD;&#xA;AGPL. If you do not delete the provisions above, a recipient may use your&#xD;&#xA;version of this file under the terms of any one of the EPL or the AGPL."
+    modelDirectory="/hub.top.lang.ptnet.yasper.pnml/src" editDirectory="/hub.top.lang.ptnet.yasper.pnml.edit/src"
+    editorDirectory="/hub.top.lang.ptnet.yasper.pnml.editor/src" modelPluginID="hub.top.lang.ptnet.yasper.pnml"
+    modelName="PNML (Yasper) Support" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="5.0" copyrightFields="false">
+  <foreignModel>YasperEPNML114.ecore</foreignModel>
+  <genPackages prefix="pnml" basePackage="hub.top.lang.ptnet.yasper" resource="XML"
+      disposableProviderFactory="true" fileExtensions="pnml" ecorePackage="YasperEPNML114.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="YasperEPNML114.ecore#//TextType1">
+      <genEnumLiterals ecoreEnumLiteral="YasperEPNML114.ecore#//TextType1/AND"/>
+      <genEnumLiterals ecoreEnumLiteral="YasperEPNML114.ecore#//TextType1/XOR"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="YasperEPNML114.ecore#//TextType2">
+      <genEnumLiterals ecoreEnumLiteral="YasperEPNML114.ecore#//TextType2/channel"/>
+      <genEnumLiterals ecoreEnumLiteral="YasperEPNML114.ecore#//TextType2/store"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="YasperEPNML114.ecore#//TextTypeMember0">
+      <genEnumLiterals ecoreEnumLiteral="YasperEPNML114.ecore#//TextTypeMember0/inflow"/>
+      <genEnumLiterals ecoreEnumLiteral="YasperEPNML114.ecore#//TextTypeMember0/outflow"/>
+      <genEnumLiterals ecoreEnumLiteral="YasperEPNML114.ecore#//TextTypeMember0/biflow"/>
+      <genEnumLiterals ecoreEnumLiteral="YasperEPNML114.ecore#//TextTypeMember0/inhibitor"/>
+      <genEnumLiterals ecoreEnumLiteral="YasperEPNML114.ecore#//TextTypeMember0/reset"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="YasperEPNML114.ecore#//Tool">
+      <genEnumLiterals ecoreEnumLiteral="YasperEPNML114.ecore#//Tool/Yasper"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="YasperEPNML114.ecore#//Version">
+      <genEnumLiterals ecoreEnumLiteral="YasperEPNML114.ecore#//Version/_1"/>
+    </genEnums>
+    <genDataTypes ecoreDataType="YasperEPNML114.ecore#//NonNegativeDecimal"/>
+    <genDataTypes ecoreDataType="YasperEPNML114.ecore#//TextType"/>
+    <genDataTypes ecoreDataType="YasperEPNML114.ecore#//TextTypeMember0Object"/>
+    <genDataTypes ecoreDataType="YasperEPNML114.ecore#//TextTypeMember1"/>
+    <genDataTypes ecoreDataType="YasperEPNML114.ecore#//TextTypeObject"/>
+    <genDataTypes ecoreDataType="YasperEPNML114.ecore#//TextTypeObject1"/>
+    <genDataTypes ecoreDataType="YasperEPNML114.ecore#//ToolObject"/>
+    <genDataTypes ecoreDataType="YasperEPNML114.ecore#//VersionObject"/>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//AnnotationGraphics">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//AnnotationGraphics/offset"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//Arc">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Arc/group"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Arc/type"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Arc/graphics"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Arc/inscription"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Arc/name"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Arc/description"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Arc/toolspecific"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Arc/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Arc/source"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Arc/target"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//ArcType">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//ArcType/text"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//ConnectionWeight">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//ConnectionWeight/weight"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//ConnectionWeight/connection"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//ConnectionWeights">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//ConnectionWeights/connectionWeight"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//Cost">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Cost/fixed"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Cost/variable"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//DocumentRoot">
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//DocumentRoot/mixed"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//DocumentRoot/xMLNSPrefixMap"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//DocumentRoot/xSISchemaLocation"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//DocumentRoot/pnml"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//EdgeGraphics">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//EdgeGraphics/position"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//InitialMarking">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//InitialMarking/text"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//InitialMarking/graphics"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//Inscription">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Inscription/text"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Inscription/graphics"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//Net">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Net/group"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Net/graphics"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Net/place"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Net/transition"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Net/arc"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Net/page"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Net/name"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Net/description"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Net/toolspecific"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Net/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Net/type"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//NetGraphics">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//NetGraphics/group"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//NetGraphics/position"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//NetGraphics/dimension"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//NodeGraphics">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//NodeGraphics/group"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//NodeGraphics/position"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//NodeGraphics/dimension"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//Page">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Page/group"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Page/referencePlace"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Page/graphics"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Page/type"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Page/place"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Page/transition"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Page/arc"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Page/page"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Page/name"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Page/description"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Page/toolspecific"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Page/id"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//Place">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Place/group"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Place/type"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Place/graphics"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Place/initialMarking"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Place/name"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Place/description"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Place/toolspecific"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Place/id"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//PlaceType">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//PlaceType/text"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//PlaceType1"/>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//Pnml">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Pnml/group"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Pnml/net"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Pnml/toolspecific"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//PnmlAnnotation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//PnmlAnnotation/text"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//PnmlAnnotation/graphics"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//ProcessingTime">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//ProcessingTime/mean"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//ProcessingTime/deviation"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//ReferencePlace">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//ReferencePlace/group"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//ReferencePlace/graphics"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//ReferencePlace/name"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//ReferencePlace/description"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//ReferencePlace/toolspecific"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//ReferencePlace/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//ReferencePlace/ref"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//ReferencePlaceSpecific">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//ReferencePlaceSpecific/pathGraphics"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//ReferencePlaceSpecific/tool"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//ReferencePlaceSpecific/version"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//Role">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Role/text"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//Roles">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Roles/role"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//Stat">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Stat/text"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//ToolspecificType">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//ToolspecificType/mixed"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//ToolspecificType/group"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//ToolspecificType/any"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//ToolspecificType/tool"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//ToolspecificType/version"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//Transformation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Transformation/text"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Transformation/graphics"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//Transition">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Transition/group"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Transition/type"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Transition/graphics"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Transition/transformation"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Transition/name"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Transition/description"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//Transition/toolspecific"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//Transition/id"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//TransitionSpecific">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//TransitionSpecific/tokenCaseSensitive"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//TransitionSpecific/roles"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//TransitionSpecific/cost"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference YasperEPNML114.ecore#//TransitionSpecific/processingTime"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//TransitionSpecific/tool"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//TransitionSpecific/version"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//TransitionType">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//TransitionType/text"/>
+    </genClasses>
+    <genClasses ecoreClass="YasperEPNML114.ecore#//TwoDimVector">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//TwoDimVector/x"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute YasperEPNML114.ecore#//TwoDimVector/y"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

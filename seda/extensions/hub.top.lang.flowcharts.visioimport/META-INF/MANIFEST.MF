@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Flowchart Visio XML Import
+Bundle-SymbolicName: hub.top.lang.flowcharts.visioimport;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: hub.top.lang.flowcharts.vdximport.Activator
+Bundle-Vendor: Humboldt-Universitaet zu Berlin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ hub.top.editor.resource,
+ hub.top.com.microsoft.schemas.visio._2003.vdx,
+ hub.top.com.microsoft.schemas.visio._2003.vdx.edit,
+ hub.top.com.microsoft.schemas.visio._2003.vdx.editor,
+ hub.top.lang.flowcharts.diagram,
+ org.eclipse.emf.transaction,
+ org.eclipse.emf.workspace,
+ org.eclipse.gmf.runtime.emf.commands.core,
+ org.eclipse.gmf.runtime.common.core,
+ org.eclipse.gmf.runtime.diagram.core
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy

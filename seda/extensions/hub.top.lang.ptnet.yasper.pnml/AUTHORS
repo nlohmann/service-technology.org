@@ -1,0 +1,15 @@
+XML Schema for EPNML 1.1 with <toolspecific> extensions for Yasper, version 3
+by Maarten Leurs and Reinier Post, (c) Yasper/Petriweb project, TU Eindhoven/Deloitte 
+
+Eclipse packages and parsers for reading EPNML 1.1 with <toolspecific>
+extensions for Yasper Copyright (c) Dirk Fahland 2009, 2010. EPL1.0/AGPL3.0
+
+This program and the accompanying materials are made available under
+the terms of the Eclipse Public License v1.0, or alternatively the
+GNU Affero General Public License Version 3 (or later), see LICENSE file.
+
+   
+Copyright (c) 2009, 2010 Dirk Fahland.
+
+Dirk Fahland, Institut fuer Informatik,
+Lehrstuhl Theorie der Programmierung, Humboldt-Universitaet zu Berlin.

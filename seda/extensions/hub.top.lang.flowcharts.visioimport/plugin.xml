@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+ <copyright>
+ </copyright>
+
+ $Id$
+-->
+
+<plugin>
+
+
+  <extension
+        point="org.eclipse.ui.editorActions">
+     <editorContribution
+           id="vdx.editor.menuContribution"
+           targetID="com.microsoft.schemas.visio._2003.vdx.presentation.vdxEditorID">
+        <action
+              class="com.microsoft.schemas.visio._2003.vdx.editor.actions.ProcessVdxDelegate"
+              id="vdx.editor.actionProcessVDX"
+              label="Convert Visio XML to Flowchart Diagram"
+              menubarPath="com.microsoft.schemas.visio._2003.vdxMenuID/additions-end"
+              tooltip="Convert Visio XML to Flowchart Diagram">
+        </action>
+     </editorContribution>
+  </extension>
+
+  <extension point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="hub.top.lang.flowcharts.visioimport.ConvertToFlow"
+            nameFilter="*.vdx"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               label="Convert to Flowchart Model"
+               class="hub.top.editor.eclipse.ui.ConvertFileAction_VDXtoFlow"
+               menubarPath="additions"
+               enablesFor="1"
+               id="hub.top.lang.flowcharts.visioimport.ConvertToFlowAction">
+         </action>
+      </objectContribution>
+   </extension>
+
+</plugin>

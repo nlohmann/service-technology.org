@@ -1,0 +1,15 @@
+This package defines an Eclipse plugin that provides additional 
+language support for the Service-Technology.org Editor Application Seda.
+
+This package provides file reading and writing support for PNML with
+extensions supported by the tool Yasper, see http://www.yasper.org/
+
+To use this package, the Java source code for the Yasper PNML support must
+be generated. To do this, "Generate Model Code" (and optionally
+"Generate Edit Code", and "Generate Editor Code") from the 
+./model/Yasper_EPNML_1_1_4.genmodel file. This will produce Java code and
+Eclipse plugin files for
+
+hub.top.lang.ptnet.yasper.pnml
+hub.top.lang.ptnet.yasper.pnml.edit   (optional)
+hub.top.lang.ptnet.yasper.pnml.editor (optional)

@@ -1038,7 +1038,18 @@ can catch it and decide by itself, how to handle this error.
 This also applies to assertions. If something you want to make sure within the API went wrong, do not
 terminate the whole program by using asserts but inform the program by using appropriate exceptions.
 
-There will be a makro to be used like asserts, soon.
+There exists two macros that can be used like @samp{assert(expr)}. The first one is @samp{PNAPI_ASSERT(expr)}.
+It evaluates the given expression and throws an @samp{AssertionFailedError} containing the file and line of the
+assertion, when evaluation to false. Like assert, this macro can be disabled by declaring the symbol NDEBUG.
+
+Some errors, however, depend on the user input. These errors should still be reportet when usual assertions
+are disabled. For this purpose you can use the macros @samp{PNAPI_ASSERT_USER(expr)},
+@samp{PNAPI_ASSERT_USER(expr, msg)} or @samp{PNAPI_ASSERT_USER(expr, msg, type)}, optionally specifying
+a proper error message and an error type (for a better handling in a catch block).
+Default message will be the expression itself and the default type will be @samp{UE_NONE}.
+
+Note that, since these kind of errors are to be caused by the user, no debugging in the API itself is expected,
+so there will be no further information (file, line), where the error occurred.
 
 @subsection Inclusion and "using"
 Within a source file (*.cc) you can do as you wish, but keep the headers as clean as possible.

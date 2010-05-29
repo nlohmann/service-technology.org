@@ -53,10 +53,20 @@ NotImplementedError::NotImplementedError(const std::string & msg) :
 }
   
 
-/// constructor
+/*!
+ * \brief constructor
+ */
 AssertionFailedError::AssertionFailedError(const std::string & file_, unsigned int line_,
                                            const std::string & assertion) :
   Error(assertion), file(file_), line(line_)
+{
+}
+
+/*!
+ * \brief constructor
+ */
+UserCausedError::UserCausedError(UE_Type type_, const std::string & msg) :
+  Error(msg), type(type_)
 {
 }
 

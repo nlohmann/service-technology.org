@@ -12,6 +12,10 @@
 #include <ctime>
 
 #include "pnapi.h"
+#ifdef PNAPI_ASSERT_H /* inclusion check */
+#error DO NOT include pnapi-assert.h
+#endif
+
 #include "cmdline.h"
 #include "Output.h"
 #include "verbose.h"

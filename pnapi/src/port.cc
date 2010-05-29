@@ -21,6 +21,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "port.h"
 #include "petrinet.h"
 #include "util.h"
@@ -245,7 +247,7 @@ void Port::removeLabel(const std::string & label)
     case Label::INPUT: input_.erase(l); break;
     case Label::OUTPUT: output_.erase(l); break;
     case Label::SYNCHRONOUS: synchronous_.erase(l); break;
-    default: assert(false);
+    default: PNAPI_ASSERT(false);
     }
     
     delete l;
@@ -389,7 +391,7 @@ void Label::mirror()
   {
   case INPUT: type_ = OUTPUT; break;
   case OUTPUT: type_ = INPUT; break;
-  default: assert(false); // should not happen
+  default: PNAPI_ASSERT(false); // should not happen
   }
 }
 

@@ -9,6 +9,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "automaton.h"
 #include "Output.h"
 #include "parser-pn-wrapper.h"
@@ -84,7 +86,7 @@ void Automaton::printToTransitionGraph(std::vector<std::string> & edgeLabels,
   {
   case PetriNet::PETRIFY :
   case PetriNet::GENET : break;
-  default : assert(false); // do not call with other converters
+  default : PNAPI_ASSERT(false); // do not call with other converters
   }
 
   // create and fill stringstream for buffering graph information
@@ -229,11 +231,11 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
   system(systemcall.c_str());
 
   /// does not work for Genet, there seems to be a bug in Cudd
-  //assert(result == 0);
+  //PNAPI_ASSERT(result == 0);
 
   // parse generated file
   ifstream ifs(pnFileName.c_str(), ifstream::in);
-  assert(ifs.good());
+  PNAPI_ASSERT(ifs.good());
 
   parser::pn::Parser myParser;
   myParser.parse(ifs);
@@ -252,7 +254,7 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
 
     if(remapped.substr(0,5) != "FINAL")
     {
-      assert(remapped.find('/') == remapped.npos); // petrify should not rename/create dummy transitions
+      PNAPI_ASSERT(remapped.find('/') == remapped.npos); // petrify should not rename/create dummy transitions
 
       if(inputLabels.count(remapped) > 0)
       {

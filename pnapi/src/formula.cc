@@ -4,6 +4,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "component.h"
 #include "formula.h"
 #include "marking.h"
@@ -143,7 +145,7 @@ Operator::Operator(const Formula & l, const Formula & r)
     {
       if (child1 != NULL)
       {
-        assert(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
+        PNAPI_ASSERT(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
       }
       child1 = child2;
     }
@@ -171,7 +173,7 @@ Operator::Operator(const std::set<const Formula *> & children,
     if (child2 != NULL)
     {
       if (child1 != NULL)
-        assert(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
+        PNAPI_ASSERT(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
       child1 = child2;
     }
   }
@@ -288,7 +290,7 @@ Proposition::Proposition(const Place & p, unsigned int k,
                          const std::map<const Place *, const Place *> * places) :
   place_((places == NULL) ? p : (*places->find(&p)->second)), tokens_(k)
 {
-  assert((places == NULL) || (places->find(&p)->second != NULL));
+  PNAPI_ASSERT((places == NULL) || (places->find(&p)->second != NULL));
 }
 
 /*!

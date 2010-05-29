@@ -19,6 +19,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "interface.h"
 #include "util.h"
 
@@ -145,7 +147,7 @@ void Interface::clear()
  */
 Port & Interface::addPort(const std::string & name)
 {
-  assert(ports_[name] == NULL);
+  PNAPI_ASSERT(ports_[name] == NULL);
 
   Port * p = new Port(net_, name);
   ports_[name] = p;
@@ -165,7 +167,7 @@ Label & Interface::addInputLabel(const std::string & label, Port & port)
  */
 Label & Interface::addInputLabel(const std::string & label, const std::string & port)
 {
-  assert(ports_[port] != NULL);
+  PNAPI_ASSERT(ports_[port] != NULL);
   return ports_[port]->addInputLabel(label);
 }
 
@@ -182,7 +184,7 @@ Label & Interface::addOutputLabel(const std::string & label, Port & port)
  */
 Label & Interface::addOutputLabel(const std::string & label, const std::string & port)
 {
-  assert(ports_[port] != NULL);
+  PNAPI_ASSERT(ports_[port] != NULL);
   return ports_[port]->addOutputLabel(label);
 }
 
@@ -199,7 +201,7 @@ Label & Interface::addSynchronousLabel(const std::string & label, Port & port)
  */
 Label & Interface::addSynchronousLabel(const std::string & label, const std::string & port)
 {
-  assert(ports_[port] != NULL);
+  PNAPI_ASSERT(ports_[port] != NULL);
   return ports_[port]->addSynchronousLabel(label);
 }
 

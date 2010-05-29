@@ -4,6 +4,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "automaton.h"
 #include "marking.h"
 #include "port.h"
@@ -212,7 +214,7 @@ Automaton::~Automaton()
 State & Automaton::createState()
 {
   State * s = new State(&stateCounter_);
-  assert(s != NULL);
+  PNAPI_ASSERT(s != NULL);
   states_.push_back(s);
   return *s;
 }
@@ -238,7 +240,7 @@ State & Automaton::createState(const unsigned int name)
     }
   }
   State * s = new State(name);
-  assert(s != NULL);
+  PNAPI_ASSERT(s != NULL);
   states_.push_back(s);
   return *s;
 }
@@ -257,7 +259,7 @@ State & Automaton::createState(const unsigned int name)
 State & Automaton::createState(Marking & m)
 {
   State * s = new State(m, weights_, stateCounter_);
-  assert(s != NULL);
+  PNAPI_ASSERT(s != NULL);
   states_.push_back(s);
   return *s;
 }
@@ -515,7 +517,7 @@ void Automaton::dfs(State & start)
 
   // assuming that each state has a marking
   Marking * m = start.getMarking();
-  assert(m != NULL);
+  PNAPI_ASSERT(m != NULL);
 
   // final state
   if(net_->getFinalCondition().isSatisfied(*m))

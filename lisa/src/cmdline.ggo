@@ -35,7 +35,8 @@ option "findSiphon" -
   flag off
 
 option "isReachable" r
-  "Checks if a given marking is reachable from the inital marking."
+  "Checks if a given marking is reachable from the initial marking. \nOnly a necessary condition is checked, i.e. a marking that is reachable might not be realizable. \nThe marking to be reached is to be written as a initial marking in the net that is passed to this parameter. This net must be identical with
+the net passed as an input argument to lisa."
   typestr="FILENAME"
   string
   optional

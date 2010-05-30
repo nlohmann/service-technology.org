@@ -216,10 +216,37 @@ int main(int argc, char** argv) {
     if(args_info.isReachable_given){
       LPWrapper lpw(net.getTransitions().size(), &net);
       lpw.calcPTOrder();
+     
+      pnapi::PetriNet net2;
+
+      
+      // open input file as an input file stream
+      std::ifstream inputStream(args_info.isReachable_arg);
+      // ... and abort, if an error occurs
+      if (!inputStream) {
+        abort(1, "could not open file '%s'", args_info.isReachable_arg);
+      }
+
+      // parse the open net from the input file stream
+      inputStream >> meta(pnapi::io::INPUTFILE, args_info.isReachable_arg)
+                        >> pnapi::io::owfn >> net2;
+      
+
       Marking m1(net, false);
-      Marking m2(net, true);
-      //TODO: Implement input for marking to be reached.
-      lpw.checkReachability(m1, m2, false);
+      
+      // assign new marking to petri net
+      std::set<Place* > places = net2.getPlaces();
+      std::set<Place* >::iterator it;
+      for(it = places.begin(); it != places.end(); ++it){
+        if(net.findPlace((*it)->getName()) != NULL)
+          net.findPlace((*it)->getName())->mark((*it)->getTokenCount());  
+        else
+          abort(1, "petri nets are not identical");
+      }
+
+      Marking m2(net, false);
+
+      lpw.checkReachability(m1, m2, true);
     }	
 
 

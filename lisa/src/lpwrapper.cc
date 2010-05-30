@@ -55,7 +55,7 @@ extern set<pnapi::Arc*> arcs;
 		delete_lp(lp);
 	}
 
-/** Checks if a given marking is reachable
+/** Checks if a given marking might be reachable. If there is no solution, the marking is definitely not reachable.
 	@param m1 Initial marking.
 	@param m2 Final marking.
 	@param verbose If TRUE prints information on cout.
@@ -83,6 +83,8 @@ int LPWrapper::checkReachability(Marking& m1, Marking& m2, bool verbose) {
 			mat[tpos[t]] -= (*ait)->getWeight();
 		}
 		int mark = m2[*(placeorder[k])]-m1[*(placeorder[k])]; // calculate right hand side
+	        std::cout << "m2: " << m2[*(placeorder[k])];
+	        std::cout << " m1: " << m1[*(placeorder[k])] << std::endl;
 
 		//initialize the rows
 		if (!add_constraintex(lp,cols,mat,colpoint,EQ,mark)) return -1;
@@ -100,10 +102,14 @@ int LPWrapper::checkReachability(Marking& m1, Marking& m2, bool verbose) {
 
 	int ret = solve(lp);
 
-	if(ret == -2)
+	if(ret != 0)
 	 message("marking is not reachable");
-	else
-         message("marking is reachable");
+	else{
+         message("marking might be reachable");
+	 get_variables(lp, mat);
+         for(int j = 0; j < cols; j++)
+           fprintf(stderr, "%s: %f\n", get_col_name(lp, j + 1), mat[j]);
+	}
 
 	return cleanup();
 }

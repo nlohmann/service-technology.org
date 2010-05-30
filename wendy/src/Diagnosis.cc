@@ -24,6 +24,7 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 #include "Diagnosis.h"
 #include "verbose.h"
 #include "util.h"
@@ -32,6 +33,144 @@ using std::map;
 using std::set;
 using std::string;
 using std::vector;
+
+
+void Diagnosis::output_results(Results& r) {
+    std::stringstream temp;
+    
+    temp << "  states = (\n";
+
+    FOREACH(it, StoredKnowledge::hashTree) {
+        for (size_t i = 0; i < it->second.size(); ++i) {
+            if (StoredKnowledge::seen.find(it->second[i]) != StoredKnowledge::seen.end()) {
+
+                if (it != StoredKnowledge::hashTree.begin() or i != 0) {
+                    temp << ",\n";
+                }
+
+                temp << "    { id = " << reinterpret_cast<size_t>(it->second[i]) << ";\n";
+
+
+
+
+
+                bool blacklisted = false;
+
+                // collect possible send events for the waitstates
+                PossibleSendEvents p = PossibleSendEvents(true, 1);
+                for (unsigned int j = 0; j < it->second[i]->sizeDeadlockMarkings; ++j) {
+                    p &= *InnerMarking::inner_markings[it->second[i]->inner[j]]->possibleSendEvents;
+                }
+
+                set<InnerMarking_ID> hiddenStates;
+                for (unsigned int j = 0; j < it->second[i]->sizeAllMarkings; ++j) {
+                    bool inner_waitstate = (j < it->second[i]->sizeDeadlockMarkings);
+                    bool inner_final = InnerMarking::inner_markings[it->second[i]->inner[j]]->is_final;
+                    bool inner_dead = InnerMarking::inner_markings[it->second[i]->inner[j]]->is_bad;
+                    bool interface_empty = it->second[i]->interface[j]->unmarked();
+                    bool interface_sane = it->second[i]->interface[j]->sane();
+                    bool interface_pendingOutput = it->second[i]->interface[j]->pendingOutput();
+
+//                    file << "m" << static_cast<size_t>(it->second[i]->inner[j]) << " ";
+//                    file << *(it->second[i]->interface[j]);
+
+                    if (inner_dead) {
+                        temp << "      internalDeadlock = true;\n";
+                        temp << "      deadlockMarking = " << static_cast<size_t>(it->second[i]->inner[j]) << ";\n";
+                        if (!blacklisted) {
+                            temp << "      blacklisted = true;\n";
+                        }
+                        blacklisted = true;
+//                        message("node %p is blacklisted: m%u is internal deadlock",
+//                                it->second[i], static_cast<size_t>(it->second[i]->inner[j]));
+                    }
+                    if (not interface_sane) {
+                        temp << "      messageBoundViolation = true;\n";
+                        if (!blacklisted) {
+                            temp << "      blacklisted = true;\n";
+                        }
+                        blacklisted = true;
+                        for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
+                            if (it->second[i]->interface[j]->get(l) > InterfaceMarking::message_bound) {
+                                temp << "      violatedChannel = \"" << Label::id2name[l] << "\";\n";
+                            }
+                        }
+                    }
+
+//                    if (blacklisted) {
+//                        temp << "      blacklisted = true;\n";
+//                    } else {
+                        if (inner_final and interface_empty) {
+//                            file << " <FONT COLOR=\"GREEN\">(f)</FONT>";
+                        } else {
+                            if (inner_waitstate and not interface_pendingOutput) {
+                                // check who can resolve this waitstate
+                                vector<Label_ID> resolvers, disallowedResolvers;
+                                for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+                                    if (InnerMarking::receivers[l].find(it->second[i]->inner[j]) != InnerMarking::receivers[l].end()) {
+                                        resolvers.push_back(l);
+                                    }
+                                }
+
+                                for (unsigned int l = 0; l < resolvers.size(); ++l) {
+                                    char* a = p.decode();
+                                    if (a[resolvers[l] - Label::first_send] == 0) {
+                                        disallowedResolvers.push_back(resolvers[l]);
+                                    }
+                                }
+                                if (disallowedResolvers.size() == resolvers.size()) {
+                                    if (!blacklisted) {
+                                        temp << "      blacklisted = true;\n";
+                                    }
+                                    blacklisted = true;
+                                    temp << "      unresolvableWaitstate = " << static_cast<size_t>(it->second[i]->inner[j]) << ";\n";
+//                                    file << " <FONT COLOR=\"RED\">(uw)</FONT>";
+//                                    message("node %p is blacklisted: m%u cannot be safely resolved",
+//                                            it->second[i], static_cast<size_t>(it->second[i]->inner[j]));
+                                    hiddenStates.insert(it->second[i]->inner[j]);
+                                } else {
+//                                    file << " <FONT COLOR=\"ORANGE\">(w)</FONT>";
+                                }
+                            } else {
+//                                file << " (t)";
+                            }
+                        }
+//                    }
+
+//                    file << "<BR/>";
+                }
+
+
+
+
+
+                bool firstSuccessor = true;
+                temp << "      successors = (";
+                // draw the edges
+                for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
+                    if (it->second[i]->successors[l-1] != NULL and
+                            (StoredKnowledge::seen.find(it->second[i]->successors[l-1]) != StoredKnowledge::seen.end())) {
+
+                        if (not firstSuccessor) {
+                            temp << ", ";
+                        }
+                        temp << "(\"" << Label::id2name[l] << "\", "
+                             << reinterpret_cast<size_t>(it->second[i]->successors[l-1]) << ")";
+                        firstSuccessor = false;
+                    }
+                }
+                temp << "); }";
+            }
+        }
+    }
+
+    temp << "\n  );\n";
+
+    temp << "  initial_states = (" << reinterpret_cast<size_t>(StoredKnowledge::root) << ");\n";
+
+    r.add("diagnosis", temp);
+}
+
 
 /*!
   \param[in,out] file  the output stream to write the dot representation to

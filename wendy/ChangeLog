@@ -8,6 +8,14 @@
                       http://service-technology.org/wendy
 
 
+Version 3.1-unreleased
+======================
+
+* implemented parameter `--noDeadlockDetection' to switch off early
+  deadlock detection for more detailed diagnosis information
+
+* implemented result-file output for the diagnosis mode
+
 Version 3.0 (2 April 2010)
 ==========================
 

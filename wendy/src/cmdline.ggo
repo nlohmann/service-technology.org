@@ -165,6 +165,12 @@ option "diagnose" -
   argoptional
   optional
 
+option "noDeadlockDetection" -
+  "Switch off early deadlock detection."
+  details="Does not preprocess the reachability graph of the inner of the net to allow for more detailed diagnosis information."
+  flag on
+  hidden
+
 option "reportFrequency" -
   "Report frequency for knowledge bubbles."
   details="Note that small values might slow down the execution. To switch reporting off completely, set it to `0'.\n"

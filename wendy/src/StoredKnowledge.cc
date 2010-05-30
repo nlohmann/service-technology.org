@@ -1092,7 +1092,6 @@ void StoredKnowledge::output_results(Results& r) {
     if (args_info.og_given or args_info.sa_given) {
         std::stringstream s;
 
-
         s << "  channels_input = (";
         bool first = true;
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {

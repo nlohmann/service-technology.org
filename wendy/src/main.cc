@@ -381,6 +381,10 @@ int main(int argc, char** argv) {
         InnerMarking::output_results(results);
         Label::output_results(results);
 
+        if (args_info.diagnose_given) {
+            Diagnosis::output_results(results);
+        }
+
         results.add("meta.package_name", (char*)PACKAGE_NAME);
         results.add("meta.package_version", (char*)PACKAGE_VERSION);
         results.add("meta.svn_version", (char*)VERSION_SVN);
@@ -405,7 +409,6 @@ int main(int argc, char** argv) {
             /// \todo move me to class wherever
             /// \todo --dot should not need --og
             if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
-
                 status("number of strongly connected sets within knowledges: %d", LivelockOperatingGuideline::stats.numberOfSCSs);
                 status("number of terminal strongly connected sets: %d", LivelockOperatingGuideline::stats.numberOfTSCCInSCSs);
 

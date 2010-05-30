@@ -187,7 +187,8 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
     finalMarkingReachableMap[myId] = (args_info.correctness_arg == correctness_arg_livelock) ? is_final : true;
 
     // variable to detect whether this marking has only deadlocking successors
-    bool deadlock_inevitable = true;
+    // standard: "true", otherwise evaluate noDeadlockDetection flag
+    bool deadlock_inevitable = not args_info.noDeadlockDetection_flag;
     for (uint8_t i = 0; i < out_degree; ++i) {
         // if a single successor is not a deadlock, everything is OK
         if (markingMap[successors[i]] != NULL and

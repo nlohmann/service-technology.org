@@ -1,3 +1,9 @@
+@heading Version 3.1-unreleased
+@itemize
+@item implemented parameter @option{--noDeadlockDetection} to switch off early deadlock detection for more detailed diagnosis information
+@item implemented result-file output for the diagnosis mode
+@end itemize
+
 @heading Version 3.0 (2 April 2010)
 @itemize
 @item implemented parameter @option{--pnml} to read a @acronym{PNML} file format

@@ -8,30 +8,13 @@
                       http://service-technology.org/wendy
 
 
-Version 3.0 (2 April 2010)
-==========================
+Version 3.1-unreleased
+======================
 
-* implemented parameter `--pnml' to read a PNML file format
+* implemented parameter `--noDeadlockDetection' to switch off early
+  deadlock detection for more detailed diagnosis information
 
-* moved the utility to minimize operating guidelines to the `ogapi' trunk
-  (see `http://svn.gna.org/viewcvs/service-tech/trunk/ogapi/')
-
-* added a tool paper with a case study (see `doc/toolpaper.pdf')
-
-* Wendy now checks whether it can use an installed version of the Petri Net
-  API (`libpnapi') and only compiles its shipped version (see `libs/pnapi')
-  if the installed version is missing, the installed version cannot be
-  linked (e.g., due to a wrong architecture), or the configure script
-  option `--without-pnapi' is used.
-
-* added a parameter `-r'/`--resultFile' to write all analysis results into
-  a single file in the file format of libconfig (see
-  `http://www.hyperrealm.com/libconfig')
-
-* fixed bug #15385 (see `https://gna.org/bugs/?15385'): runtime output
-  using the `--stats' crashed under certain Linux systems
-
-* updated to Petri Net API 4.00 (revision r5519)
+* implemented result-file output for the diagnosis mode
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

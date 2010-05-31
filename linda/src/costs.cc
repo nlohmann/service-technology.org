@@ -314,8 +314,11 @@ void CostAgent::buildStateEquationWithGrant(UseCase* usecase, Grant* grant) {
 }
 
 bool CostAgent::checkPolicy(UseCase* usecase, Grant* grant) {
+	//std::cerr << grant->fixCosts << usecase->fixCosts << std::endl; 
+	//status("             %.2f %.2f",grant->fixCosts,usecase->fixCosts);
 	lprec* se = currentStateEquationWithGrant;
-	
+	// print_lp(se);
+
 	
 	set_maxim(se);
 	int returnValue = solve(se);
@@ -329,9 +332,10 @@ bool CostAgent::checkPolicy(UseCase* usecase, Grant* grant) {
 	if (returnValue == UNBOUNDED) { 	status("            Maximize resulted in unbounded"); 
 return !usecase->policyRB; }
 	
-	double maxResult = get_objective(se) - usecase->fixCosts + grant->fixCosts;
-	status("            Maximize resulted in %d", maxResult); 
-	
+	double maxResult = get_objective(se) - (double) usecase->fixCosts + grant->fixCosts;
+	status("            Maximize resulted in %.2f", maxResult); 
+
+
 	if (usecase->policyRB && maxResult > usecase->policyRHS) return false;
 	
 	set_minim(se);
@@ -341,7 +345,7 @@ return !usecase->policyRB; }
 return !usecase->policyLB; }
 	
 	double minResult = get_objective(se) - usecase->fixCosts + grant->fixCosts;
-	status("            Minimize resulted in %d", minResult); 
+	status("            Minimize resulted in %.2f", minResult); 
 	
 	if (usecase->policyLB && minResult < usecase->policyLHS) return false;
 	

@@ -205,7 +205,7 @@ costs:
      |
      VALUE
      {
-        usecase->fixCosts += $1;
+        usecase->fixCosts += (double) $1;
      }
      ;
 

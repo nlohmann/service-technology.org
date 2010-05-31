@@ -108,7 +108,7 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
     if (adaptiveSystem == null)
       return;
       
-    final BuildBP build = new BuildBP(adaptiveSystem, selectedFile);
+    final BuildBP build = new BuildBP(BuildBP.initSynthesis(adaptiveSystem), selectedFile);
     
     Job bpBuildJob = new Job("Synthesizing Labeled Net") 
     {

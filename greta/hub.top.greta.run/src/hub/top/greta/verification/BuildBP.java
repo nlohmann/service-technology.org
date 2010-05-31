@@ -63,17 +63,33 @@ public class BuildBP {
   private IFile srcFile = null;
   
   /**
+   * @param system
+   * @param srcFile
+   */
+  public BuildBP(DNodeBP bp, IFile srcFile) {
+    this.bp = bp;
+    this.srcFile = srcFile;
+  }
+  
+  /**
+   * @param system
+   */
+  public BuildBP(DNodeBP bp) {
+    this(bp, null);
+  }
+  
+  /**
    * @param adaptiveSystem
    */
   public BuildBP(AdaptiveSystem adaptiveSystem) {
-    bp = BuildBP.init(adaptiveSystem);
+    this(BuildBP.init(adaptiveSystem));
   }
   
   /**
    * @param adaptiveSystem
    */
   public BuildBP(PtNet net) throws InvalidModelException {
-    bp = BuildBP.init(net);
+    this(BuildBP.init(net));
   }
   
   /**
@@ -81,8 +97,7 @@ public class BuildBP {
    * @param srcFile
    */
   public BuildBP(AdaptiveSystem adaptiveSystem, IFile srcFile) {
-    bp = BuildBP.init(adaptiveSystem);
-    this.srcFile = srcFile;
+    this(BuildBP.init(adaptiveSystem), srcFile);
   }
   
   /**
@@ -90,8 +105,7 @@ public class BuildBP {
    * @param srcFile
    */
   public BuildBP(PtNet net, IFile srcFile) throws InvalidModelException  {
-    bp = BuildBP.init(net);
-    this.srcFile = srcFile;
+    this(BuildBP.init(net), srcFile);
   }
   
   /**
@@ -228,6 +242,15 @@ public class BuildBP {
     DNodeSys_AdaptiveSystem system = new DNodeSys_AdaptiveSystem(adaptiveSystem);
     DNodeBP bp = new DNodeBP_Scenario(system);
     bp.configure_buildOnly();
+    bp.configure_Scenarios();
+    //bp.configure_stopIfUnSafe();
+    return bp;
+  }
+  
+  public static DNodeBP initSynthesis(AdaptiveSystem adaptiveSystem) {
+    DNodeSys_AdaptiveSystem system = new DNodeSys_AdaptiveSystem(adaptiveSystem);
+    DNodeBP bp = new DNodeBP_Scenario(system);
+    bp.configure_synthesis();
     bp.configure_Scenarios();
     //bp.configure_stopIfUnSafe();
     return bp;

@@ -108,7 +108,7 @@ public class SynthesizeNetAction implements IWorkbenchWindowActionDelegate {
     if (adaptiveSystem == null)
       return;
       
-    final BuildBP build = new BuildBP(adaptiveSystem, selectedFile);
+    final BuildBP build = new BuildBP(BuildBP.initSynthesis(adaptiveSystem), selectedFile);
     
     Job bpBuildJob = new Job("Synthesizing Petri Net") 
     {

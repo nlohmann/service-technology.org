@@ -122,34 +122,6 @@
             label="Adaptive System Analysis Actions"
             visible="true">
          <action
-               class="hub.top.greta.run.actions.OcletDependencies"
-               id="hub.top.GRETA.run.ocletDependencies"
-               label="check dependencies"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/analysis"
-               style="push"
-               tooltip="check dependencies of oclets">
-         </action>
-         <!-- use branching processes only
-         <action
-               class="hub.top.greta.run.actions.BuildStateSpace"
-               id="hub.top.GRETA.run.buildStateSpace"
-               label="build transition system"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/analysis"
-               style="push"
-               tooltip="build state space of the system">
-         </action>
-          -->
-         <!--
-         <action
-               class="hub.top.greta.run.actions.BuildBranchingProcess"
-               id="hub.top.GRETA.run.buildBranchingProcess"
-               label="build branching process"
-               menubarPath="hub.top.GRETA.menus.gretaMenu/analysis"
-               style="push"
-               tooltip="build branching process of the system">
-         </action>
-         -->
-         <action
                class="hub.top.greta.run.actions.BuildBranchingProcess2"
                id="hub.top.GRETA.run.buildBranchingProcess2"
                label="build branching process"
@@ -252,16 +224,6 @@
                label="build branching process"
                menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
          </action>
-         <!-- build state space -->
-         <!-- disabled in this version
-         <action
-               class="hub.top.greta.run.actions.BuildStateSpace"
-               enablesFor="1"
-               id="hub.top.GRETA.run.buildStateSpace"
-               label="build transition system"
-               menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
-         </action>
-          -->
          <!-- check soundness -->
          <action
                class="hub.top.greta.run.actions.CheckSoundness"

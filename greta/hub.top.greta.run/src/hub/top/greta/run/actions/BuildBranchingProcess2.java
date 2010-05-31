@@ -37,12 +37,10 @@
 package hub.top.greta.run.actions;
 
 import hub.top.adaptiveSystem.AdaptiveSystem;
-import hub.top.adaptiveSystem.Event;
-import hub.top.adaptiveSystem.Oclet;
 import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.eclipse.ResourceHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
-import hub.top.greta.oclets.canonical.DNodeBP;
+import hub.top.uma.DNodeBP;
 import hub.top.greta.synthesis.DNode2PtNet;
 import hub.top.greta.verification.BuildBP;
 
@@ -79,8 +77,6 @@ public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
 	private URI 	selectedURI = null;
 	
 	public void dispose() {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void init(IWorkbenchWindow window) {
@@ -185,7 +181,8 @@ public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
 	    }
 	}
 
-	private void writeDotFile (DNodeBP bp, IFile inputFile, String suffix) {
+	@SuppressWarnings("unused")
+  private void writeDotFile (DNodeBP bp, IFile inputFile, String suffix) {
 
 		String targetPathStr = inputFile.getFullPath().removeFileExtension().toString();
 		IPath targetPath = new Path(targetPathStr+suffix+".dot");

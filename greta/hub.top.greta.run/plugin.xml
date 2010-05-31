@@ -66,6 +66,7 @@
                toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/simulation"
                tooltip="start simulation of adaptive process">
          </action>
+         <!-- feature currently broken TODO: repair simulation code
          <action
                class="hub.top.greta.simulation.SimulationInt_OcletAction"
                disabledIcon="icons/adaptiveProcessStepDisabled4.png"
@@ -77,6 +78,7 @@
                toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/simulation"
                tooltip="extend by all enabled oclets">
          </action>
+          -->
          <action
                class="hub.top.greta.simulation.SimulationInt_EventAction"
                disabledIcon="icons/full/dlcl16/resume_co.gif"
@@ -127,6 +129,7 @@
                style="push"
                tooltip="check dependencies of oclets">
          </action>
+         <!-- use branching processes only
          <action
                class="hub.top.greta.run.actions.BuildStateSpace"
                id="hub.top.GRETA.run.buildStateSpace"
@@ -135,6 +138,7 @@
                style="push"
                tooltip="build state space of the system">
          </action>
+          -->
          <!--
          <action
                class="hub.top.greta.run.actions.BuildBranchingProcess"
@@ -249,6 +253,7 @@
                menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
          </action>
          <!-- build state space -->
+         <!-- disabled in this version
          <action
                class="hub.top.greta.run.actions.BuildStateSpace"
                enablesFor="1"
@@ -256,11 +261,12 @@
                label="build transition system"
                menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
          </action>
+          -->
          <!-- check soundness -->
          <action
                class="hub.top.greta.run.actions.CheckSoundness"
                id="hub.top.GRETA.run.checkSoundness"
-               label="check soundness"
+               label="check soundness (free-choice)"
                menubarPath="hub.top.GRETA.run.apDiagramMenu/analysis">
          </action>
          <!-- build branching processes -->
@@ -280,6 +286,7 @@
                menubarPath="hub.top.GRETA.run.apDiagramMenu/synthesis">
          </action>
          <!-- synthesize an unlabeled Petri net -->
+         <!-- disabled in this version
          <action
                class="hub.top.greta.synthesis.SynthesizeNetAction"
                enablesFor="1"
@@ -287,6 +294,7 @@
                label="synthesize Petri net"
                menubarPath="hub.top.GRETA.run.apDiagramMenu/synthesis">
          </action>
+          -->
 
       </objectContribution>
 

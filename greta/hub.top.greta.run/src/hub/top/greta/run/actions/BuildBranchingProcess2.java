@@ -124,7 +124,7 @@ public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
         // build branching process
         boolean interrupted = !build.run(monitor, System.out);
 			  build.printStatistics(System.out);
-			  build.analyze(monitor, System.out);
+			  //build.analyze(monitor, System.out);
 				
 			  //build.minimize(monitor, System.out);
 			  build.writeBPtoFile(monitor, System.out, "_bp2");

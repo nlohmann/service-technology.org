@@ -1,1 +1,56 @@
-see hub.top.GREATE/README
+ServiceTechnolog.org - Graphical Runtime Environment for Adaptive Processes
+Animated Execution Plugin (hub.top.GRETA.run)
+===========================================================================
+
+PURPOSE
+    The Animated Execution Plugin for GRETA provides an execution engine
+    for the GRETA (http://service-technology.org/greta). The plugin has
+    been implemented to demonstrate the feasibility of scenario-based
+    modeling of distributed systems in the context of Petri nets. In
+    addition, it demonstrates a flexible approach to modeling distributed
+    systems by integrating graphical modeler and execution engine. 
+
+    GRETA is platform independent and runs on all platforms with a Java runtime
+    environment; see hub.top.GRETA/README.
+    
+COPYRIGHT
+    Copyright (c) 2008 Manja Wolf
+    Copyright (c) 2009, 2010 Dirk Fahland
+
+
+AUTHORS
+    GRETA is written and maintained by Dirk Fahland. See file "AUTHORS" for
+    more information.
+
+
+LICENSE
+    This program and the accompanying materials are made available under
+    the terms of the Eclipse Public License v1.0, or alternatively the
+    GNU Affero General Public License Version 3 (or later).
+
+    GRETA is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "LICENSE" for the license of GRETA.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION (to be done)
+    GRETA can be easily compiled and installed. The Animated Execution Plugin
+    (hub.top.GRETA.run) requires the packages specified in the file
+    META-INF/MANIFEST.MF in the 'Require-Bundle' section. Most packages are
+    provides by Eclipse and standard plugins (see www.eclipse.org). The following
+    non-standard packages are required:
+    
+    * hub.top.GRETA.diagram (and its dependencies) available from
+      svn://svn.gna.org/svn/service-tech/trunk/greta/
+      
+    * hub.top.editor.resource and hub.top.editor.ptnetLoLA available from
+      svn://svn.gna.org/svn/service-tech/trunk/seda/
+      
+    * hub.top.uma available from
+      svn://svn.gna.org/svn/service-tech/trunk/Service-Tech-Java/uma
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of GRETA.

@@ -43,10 +43,10 @@ import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.editor.ptnetLoLA.PtnetLoLAFactory;
 import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 import hub.top.editor.ptnetLoLA.Transition;
-import hub.top.greta.oclets.canonical.DNode;
-import hub.top.greta.oclets.canonical.DNodeBP;
-import hub.top.greta.oclets.canonical.DNodeSet;
-import hub.top.greta.oclets.canonical.DNodeSys;
+import hub.top.uma.DNode;
+import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeSet;
+import hub.top.uma.DNodeSys;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -118,7 +118,10 @@ public class NetSynthesis {
       
       if (!e.isCutOff || equiv.get(e) == e) {
         Transition t = fact.createTransition();
-        t.setName(dAS.properNames[e.id]+"_"+e.globalId);
+        if (e.isAnti && !e.isHot)
+          t.setName("tau_"+e.globalId);   // hide cold anti-events
+        else
+          t.setName(dAS.properNames[e.id]+"_"+e.globalId);
         net.getTransitions().add(t);
         d2n.put(e, t);
       }
@@ -126,7 +129,7 @@ public class NetSynthesis {
     
     for (DNode e : dBP.getAllEvents()) {
       
-      if (e.isAnti)
+      if (e.isAnti && e.isHot)
         continue;
       
       Transition t = null;
@@ -136,7 +139,10 @@ public class NetSynthesis {
         DNode e2 = equiv.get(e);
         if (e2 == null) {
           t = fact.createTransition();
-          t.setName(dAS.properNames[e.id]+"_"+e.globalId);
+          if (e.isAnti && !e.isHot)
+            t.setName("tau_"+e.globalId);   // hide cold anti-events
+          else
+            t.setName(dAS.properNames[e.id]+"_"+e.globalId);
           net.getTransitions().add(t);
           d2n.put(e, t);
         } else {
@@ -146,7 +152,7 @@ public class NetSynthesis {
       
       for (DNode b : e.pre) {
         Place p = (Place)d2n.get(b);
-        if (t.getPreSet().contains(p))
+        if (p == null || t.getPreSet().contains(p))
           continue;
         
         Arc a = fact.createArcToTransition();
@@ -158,7 +164,7 @@ public class NetSynthesis {
       
       for (DNode b : e.post) {
         Place p = (Place)d2n.get(b);
-        if (t.getPostSet().contains(p))
+        if (p == null || t.getPostSet().contains(p))
           continue;
 
         Arc a = fact.createArcToPlace();
@@ -337,14 +343,14 @@ public class NetSynthesis {
     // 3. count occurrences of each event (eventCount, eventCountConfig)
     for (DNode e : bp.getBranchingProcess().getAllEvents()) {
       // do not compute successors of cut-off events or anti-events
-      if (e.isCutOff || e.isAnti) continue;
+      if (e.isCutOff || (e.isAnti && e.isHot)) continue;
       
       HashSet<DNode> ePostEvents = new HashSet<DNode>();
       for (DNode e2 : bp.getBranchingProcess().getAllEvents()) {
         if (e == e2) continue;
         // but allow cut-off events here to build a complete mapping
         // of all successors, do not consider anti-events
-        if (e2.isAnti) continue;
+        if (e2.isAnti && e.isHot) continue;
         
         if (depth.get(e2) - depth.get(e) == 2) {
           // event e2 could be a direct causal successor of event e

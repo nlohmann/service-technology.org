@@ -43,11 +43,18 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.editor.ptnetLoLA.PtNet;
-import hub.top.greta.oclets.canonical.DNode;
-import hub.top.greta.oclets.canonical.DNodeBP;
-import hub.top.greta.oclets.canonical.InvalidModelException;
+import hub.top.uma.DNodeBP_Scenario;
+import hub.top.uma.DNodeSys_PtNet;
+import hub.top.uma.DNode;
+import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeSys_AdaptiveSystem;
+import hub.top.uma.InvalidModelException;
 
 public class BuildBP {
+  
+  // limit construction of complete finite prefix to systems with bound MAX_BOUND
+  // if no other parameter is supplied
+  private static int MAX_BOUND = 3;
 
   private       DNodeBP bp;
   private long  analysisTime = 0;
@@ -160,23 +167,27 @@ public class BuildBP {
       result |= DNodeBP.PROP_UNSAFE;
     }
     
-    LinkedList<DNode> implied = bp.getImpliedScenarios();
-    if (!implied.isEmpty()) {
-      if (out != null) out.println("has implied behavior (by incomplete successor events):.");
-      for (DNode d : implied) {
-        if (out != null) out.println(d); 
+    if (bp instanceof DNodeBP_Scenario) {
+      DNodeBP_Scenario bps = (DNodeBP_Scenario)bp;
+    
+      LinkedList<DNode> implied = bps.getImpliedScenarios();
+      if (!implied.isEmpty()) {
+        if (out != null) out.println("has implied behavior (by incomplete successor events):.");
+        for (DNode d : implied) {
+          if (out != null) out.println(d); 
+        }
       }
-    }
-    long startTime = System.currentTimeMillis();
-    implied = bp.getImpliedScenarios_global();
-    if (!implied.isEmpty()) {
-      if (out != null) out.println("has implied behavior (global history not found):");
-      for (DNode d : implied) {
-        if (out != null) out.println(d); 
+      long startTime = System.currentTimeMillis();
+      implied = bps.getImpliedScenarios_global();
+      if (!implied.isEmpty()) {
+        if (out != null) out.println("has implied behavior (global history not found):");
+        for (DNode d : implied) {
+          if (out != null) out.println(d); 
+        }
       }
+      long endTime = System.currentTimeMillis();
+      if (out != null) out.println("time for checking implied scenarios (global): "+(endTime-startTime)+"ms");
     }
-    long endTime = System.currentTimeMillis();
-    if (out != null) out.println("time for checking implied scenarios (global): "+(endTime-startTime)+"ms");
     
     return result;
   }
@@ -214,11 +225,21 @@ public class BuildBP {
   }
   
   public static DNodeBP init(AdaptiveSystem adaptiveSystem) {
-    return new DNodeBP(adaptiveSystem);
+    DNodeSys_AdaptiveSystem system = new DNodeSys_AdaptiveSystem(adaptiveSystem);
+    DNodeBP bp = new DNodeBP_Scenario(system);
+    bp.configure_buildOnly();
+    bp.configure_Scenarios();
+    //bp.configure_stopIfUnSafe();
+    return bp;
   }
   
   public static DNodeBP init(PtNet net) throws InvalidModelException {
-    return new DNodeBP(net);
+    DNodeSys_PtNet system = new DNodeSys_PtNet(net);
+    DNodeBP bp = new DNodeBP(system);
+    bp.configure_buildOnly();
+    bp.configure_PetriNet();
+    bp.configure_stopIfUnSafe();
+    return bp;
   }
   
   public static int step(DNodeBP bp) {

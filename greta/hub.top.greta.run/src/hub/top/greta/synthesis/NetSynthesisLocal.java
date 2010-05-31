@@ -44,10 +44,10 @@ import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.editor.ptnetLoLA.PtnetLoLAFactory;
 import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 import hub.top.editor.ptnetLoLA.Transition;
-import hub.top.greta.oclets.canonical.DNode;
-import hub.top.greta.oclets.canonical.DNodeBP;
-import hub.top.greta.oclets.canonical.DNodeSet;
-import hub.top.greta.oclets.canonical.DNodeSys;
+import hub.top.uma.DNode;
+import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeSet;
+import hub.top.uma.DNodeSys;
 
 import java.util.Arrays;
 import java.util.HashMap;

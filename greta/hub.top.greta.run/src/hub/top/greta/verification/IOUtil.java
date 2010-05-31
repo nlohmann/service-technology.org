@@ -35,7 +35,7 @@
 
 package hub.top.greta.verification;
 
-import hub.top.greta.oclets.canonical.DNodeBP;
+import hub.top.uma.DNodeBP;
 import hub.top.greta.run.actions.ActionHelper;
 
 import org.eclipse.core.resources.IFile;

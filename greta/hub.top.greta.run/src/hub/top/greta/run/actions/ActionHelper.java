@@ -35,7 +35,7 @@
 
 package hub.top.greta.run.actions;
 
-import hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewer;
+//import hub.top.adaptiveProcess.diagram.part.AdaptiveProcessDiagramViewer;
 import hub.top.adaptiveSystem.AdaptiveProcess;
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
@@ -89,11 +89,14 @@ public class ActionHelper {
 				adaptiveSystem = (AdaptiveSystem)r0.getContents().get(0);
 			}
 			
+			/*
 		// FIXME: remove this dependency from the hub.top.GRETA.diagram.process package
 		} else if (editor instanceof AdaptiveProcessDiagramViewer) {
 			AdaptiveProcessDiagramViewer apViewer = (AdaptiveProcessDiagramViewer)editor;
 			AdaptiveProcess ap = (AdaptiveProcess)apViewer.getDiagram().getElement();
 			adaptiveSystem = (AdaptiveSystem)ap.eContainer();
+      */
+
 		}
 		
 		return adaptiveSystem;

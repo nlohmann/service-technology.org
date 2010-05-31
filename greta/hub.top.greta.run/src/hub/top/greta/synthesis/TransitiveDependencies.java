@@ -41,10 +41,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import hub.top.adaptiveSystem.Oclet;
-import hub.top.greta.oclets.canonical.DNode;
-import hub.top.greta.oclets.canonical.DNodeBP;
-import hub.top.greta.oclets.canonical.DNodeSet;
-import hub.top.greta.oclets.canonical.DNodeSys;
+import hub.top.uma.DNode;
+import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeSet;
+import hub.top.uma.DNodeSys;
 
 /**
  * Compute the transitive dependencies between events of a branching process

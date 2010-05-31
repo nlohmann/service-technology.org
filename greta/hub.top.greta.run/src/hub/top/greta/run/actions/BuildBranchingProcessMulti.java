@@ -43,7 +43,7 @@ import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.eclipse.ResourceHelper;
 import hub.top.editor.ptnetLoLA.Node;
 import hub.top.editor.ptnetLoLA.PtNet;
-import hub.top.greta.oclets.canonical.DNodeBP;
+import hub.top.uma.DNodeBP;
 import hub.top.greta.synthesis.DNode2PtNet;
 import hub.top.greta.verification.BuildBP;
 
@@ -163,7 +163,7 @@ public class BuildBranchingProcessMulti implements IWorkbenchWindowActionDelegat
         monitor.beginTask("constructing", (paramRange_max-paramRange_min));
 
         final StringBuilder sb = new StringBuilder();
-        sb.append("#;events;conditions;arcs;cut-offs;time(ms);");
+        sb.append("#;events;conditions;arcs;cut-offs;time(ms);\n");
 
         int min=1;
         for (int max=paramRange_min; max <= paramRange_max; max++) {
@@ -173,7 +173,7 @@ public class BuildBranchingProcessMulti implements IWorkbenchWindowActionDelegat
           AdaptiveSystem inst = InstantiateSystem.instantiateSystem(adaptiveSystem, parameter, min, max);
           
           final BuildBP build = new BuildBP(inst, selectedFile);
-          boolean interrupted = false;//!build.run(monitor, System.out);
+          boolean interrupted = !build.run(monitor, System.out);
           DNodeBP bp = build.getBranchingProcess();
           bp.getStatistics();
           

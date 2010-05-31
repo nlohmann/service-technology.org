@@ -12,18 +12,16 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.gmf.runtime.diagram.ui;bundle-version="1.1.2",
  org.eclipse.ui.ide,
  hub.top.GRETA.diagram;bundle-version="1.1.2";visibility:=reexport,
- hub.top.GRETA.diagram.process;bundle-version="1.1.2",
  org.eclipse.gmf.runtime.diagram.ui.resources.editor,
  org.eclipse.jface.text,
  org.eclipse.ui.editors,
  hub.top.editor.resource;bundle-version="1.0.5";visibility:=reexport,
- hub.top.editor.ptnetLoLA;bundle-version="1.0.5";visibility:=reexport
+ hub.top.editor.ptnetLoLA;bundle-version="1.0.5";visibility:=reexport,
+ hub.top.uma;bundle-version="1.2.0";visibility:=reexport
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: hub.top.adaptiveSystem,
  hub.top.adaptiveSystem.diagram.edit.commands,
- hub.top.adaptiveProcess.diagram.edit.parts,
- hub.top.adaptiveProcess.diagram.edit.policies,
  hub.top.adaptiveSystem.diagram.part,
  hub.top.adaptiveSystem.diagram.providers,
  hub.top.adaptiveSystem.diagram.view.factories,
@@ -32,7 +30,7 @@ Import-Package: hub.top.adaptiveSystem,
  hub.top.adaptiveSystem.provider,
  hub.top.adaptiveSystem.util
 Bundle-Vendor: service-technology.org
-Export-Package: hub.top.greta.oclets.canonical,
- hub.top.greta.run.actions,
+Export-Package: hub.top.greta.run.actions,
  hub.top.greta.synthesis,
- hub.top.greta.verification
+ hub.top.greta.verification,
+ hub.top.uma

@@ -18,6 +18,8 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
             bug14856.owfn bug15415.owfn \
 	    bug_15820_sp.owfn bug_15820_sp_2.owfn \
             data.hlowfn eisen.hlowfn myCoffee.owfn phils.hlowfn \
+	    error_parser_lola_01.lola error_parser_lola_02.lola \
+	    error_parser_lola_03.lola \
             woflan1.xml.tpn woflan2.xml.tpn woflan3.xml.tpn \
 	    woflan4.xml.tpn woflan5.xml.tpn woflan6.xml.tpn \
             test_cdnf.owfn test_input.lola test_dead_nodes.net.owfn \

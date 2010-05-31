@@ -1,0 +1,14 @@
+PLACE
+  p1, p2, p3, p3;
+
+MARKING
+  p1 : 1,
+  p2 : 1;
+
+TRANSITION t1
+  CONSUME
+    p1 : 1,
+    p2 : 1;
+  PRODUCE
+    p3 : 1;
+

@@ -118,13 +118,31 @@ capacity:
 place_list:  
   node_name    
   {
-    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+    // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    try
+    {
+      parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+    }
+    catch(exception::UserCausedError e)
+    {
+      throw exception::InputError(exception::InputError::SEMANTIC_ERROR, 
+                                  io::util::MetaData::data(*parser_.is_)[io::INPUTFILE],
+                                  parser_.lexer_.lineno(), parser_.lexer_.YYText(), e.message);      
+    }
   }	      
 | place_list COMMA node_name
   {
-    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+    // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    try
+    {
+      parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+    }
+    catch(exception::UserCausedError e)
+    {
+      throw exception::InputError(exception::InputError::SEMANTIC_ERROR, 
+                                  io::util::MetaData::data(*parser_.is_)[io::INPUTFILE],
+                                  parser_.lexer_.lineno(), parser_.lexer_.YYText(), e.message);      
+    }
   }
 ;
 
@@ -139,12 +157,14 @@ marking_list:
 ;
 
 marking: 
-  node_name COLON NUMBER 
+  node_name
+  {
+    parser_.place_ = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(parser_.place_ != NULL, "unknown place");
+  }
+  COLON NUMBER 
   { 
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");      
-      
-    p->setTokenCount($3);
+    parser_.place_->setTokenCount($4);
   }
 ;
 
@@ -159,8 +179,17 @@ transitions:
 transition: 
   KEY_TRANSITION node_name 
   { 
-    parser_.check(!parser_.net_.containsNode(parser_.nodeName_.str()), "node name already used");
-    parser_.transition_ = &(parser_.net_.createTransition(parser_.nodeName_.str())); 
+    // parser_.check(!parser_.net_.containsNode(parser_.nodeName_.str()), "node name already used");
+    try
+    {
+      parser_.transition_ = &(parser_.net_.createTransition(parser_.nodeName_.str()));
+    }
+    catch(exception::UserCausedError e)
+    {
+      throw exception::InputError(exception::InputError::SEMANTIC_ERROR, 
+                                  io::util::MetaData::data(*parser_.is_)[io::INPUTFILE],
+                                  parser_.lexer_.lineno(), parser_.lexer_.YYText(), e.message);      
+    }
   }
   KEY_CONSUME
   {
@@ -183,19 +212,21 @@ arcs:
 ;
 
 arc: 
-  node_name COLON NUMBER 
+  node_name
   {
     parser_.place_ = parser_.places_[parser_.nodeName_.str()];
     parser_.check(parser_.place_ != NULL, "unknown place");
-
+  }
+  COLON NUMBER 
+  {
     Arc * a = parser_.net_.findArc(**(parser_.source_), **(parser_.target_));
     if(a != NULL)
     {
-      a->setWeight(a->getWeight() + $3);
+      a->setWeight(a->getWeight() + $4);
     }
     else
     {
-      parser_.net_.createArc(**(parser_.source_), **(parser_.target_), $3);
+      parser_.net_.createArc(**(parser_.source_), **(parser_.target_), $4);
     }
   }
 ;

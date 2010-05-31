@@ -11,6 +11,10 @@
 #include "parser.h"
 #include "util.h"
 
+#include <fstream>
+
+using std::endl;
+using std::ifstream;
 using std::map;
 using std::set;
 using std::string;
@@ -521,7 +525,9 @@ std::ostream & operator<<(std::ostream & os, const exception::InputError & e)
 {
   os << e.filename;
   if (e.line > 0)
+  {
     os << ":" << e.line;
+  }
   os << ": error";
   if (!e.token.empty())
     switch (e.type)
@@ -534,7 +540,33 @@ std::ostream & operator<<(std::ostream & os, const exception::InputError & e)
       break;
     default: /* do nothing */ ;
     }
-  return os << ": " << e.message;
+  os << ": " << e.message;
+
+  ifstream ifs(e.filename.c_str());
+  if(ifs.good())
+  {
+    string line, arrows;
+    for(int i = 0; i < e.line; ++i)
+    {
+      getline(ifs, line);
+    }
+    
+    size_t firstpos(line.find(e.token));
+    
+    for(unsigned int i = 0; i < firstpos; ++i)
+    {
+      arrows += " ";
+    }
+    for(unsigned int i = 0; i < e.token.size(); ++i)
+    {
+      arrows += "^";
+    }
+    
+    os << endl << endl << line << endl << arrows << endl << endl;  
+  }
+  ifs.close();
+  
+  return os;
 }
 
 /*!

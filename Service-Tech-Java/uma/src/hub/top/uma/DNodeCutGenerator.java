@@ -19,6 +19,7 @@ package hub.top.uma;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +33,7 @@ public class DNodeCutGenerator implements Iterator< DNode[] >{
 	protected DNode[] cutToMatch;	// a fixed order of the DNodes for which we want to find a cut
 	private DNode[] currentCut;
 	private int cutSize;
+	private int cutSize_minusOne;
 	
 	private HashSet<DNode> currentPasts[];
 	
@@ -48,6 +50,7 @@ public class DNodeCutGenerator implements Iterator< DNode[] >{
 			/*HashSet<DNode> knownPartialCut, */ Map<DNode, Set<DNode>> coRelation) {
 
 		cutSize = cutPattern.length;
+		cutSize_minusOne = cutSize - 1;
 		
 		cutToMatch = cutPattern;
 		currentCut = new DNode[cutSize];
@@ -59,9 +62,9 @@ public class DNodeCutGenerator implements Iterator< DNode[] >{
 
 		// distribute the cutCandidates onto the possible matches
 		// create one list for each ID in the cutToMatch
-		DNode.SortedLinearList possibleMatchList[] = new DNode.SortedLinearList[cutSize];
+		LinkedList<DNode> possibleMatchList[] = new LinkedList[cutSize];
 		for (int i = 0; i<cutSize; i++)
-			possibleMatchList[i] = new DNode.SortedLinearList();
+			possibleMatchList[i] = new LinkedList<DNode>();
 
 		// then do a JOIN over cutCandidates and cutToMatch on their IDs
 		int i = 0;
@@ -77,7 +80,7 @@ public class DNodeCutGenerator implements Iterator< DNode[] >{
 			// if pointer is legal and id matches, store candidate
 			// as a possible match for the current cutToMatch-node
 			if (i < cutSize && cand.id == cutToMatch[i].id) {
-				possibleMatchList[i] = possibleMatchList[i].add(cand);
+				possibleMatchList[i].add(cand);
 			}
 		}
 		
@@ -87,12 +90,12 @@ public class DNodeCutGenerator implements Iterator< DNode[] >{
 
 		
 		for (i = 0; i < cutSize; i++) {
-			if (possibleMatchList[i].length() == 0) {
+			if (possibleMatchList[i].size() == 0) {
 				hasSomeCut = false;
 				break;
 			}
 
-			possibleMatches[i] = new DNode[possibleMatchList[i].length()];
+			possibleMatches[i] = new DNode[possibleMatchList[i].size()];
 
 			// store the list of possibleMatches in an array
 			int j = 0;
@@ -210,15 +213,15 @@ public class DNodeCutGenerator implements Iterator< DNode[] >{
 	}
 	
 	private void ensureNextCut () {
-		while (!isCut()) {
-			if (!next(cutSize-1))
+		while (!isCut_co()) {
+			if (!next(cutSize_minusOne))
 				break;	// cancel in case we iterated over all combinations
 		}
 	}
 	
 	public DNode[] next() {
 		DNode[] result = currentCut.clone();
-		if (next(cutSize-1))
+		if (next(cutSize_minusOne))
 			ensureNextCut();
 		return result;
 	}

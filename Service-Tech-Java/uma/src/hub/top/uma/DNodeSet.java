@@ -204,11 +204,21 @@ public class DNodeSet {
 	
 	/**
 	 *  This is a private field that gets updated in every call of
-	 *  {@link DNodeSet#getPrimeCut(DNode, hub.top.uma.DNode.SortedLinearList)}
+	 *  {@link DNodeSet#getPrimeCut(DNode, boolean)}
 	 *  The field contains the number of predecessor events of the
 	 *  parameter 'event', not including 'event' itself.
 	 */
-	public int getPrimeCut_configSize;
+	public int getPrimeConfiguration_size;
+	
+	/**
+   *  This is a public field that gets updated in every call of
+   *  {@link DNodeSet#getPrimeCut(DNode, boolean)}
+   *  if parameter 'collectPredecessors' is set to <code>true</code>.
+   *
+   *  The field contains all predecessor events of the parameter 'event',
+   *  unsorted and iterable.
+	 */
+	public HashSet<DNode> getPrimeConfiguration;
 	
 	/**
 	 * Compute the prime cut and all predecessor events of the given event. 
@@ -216,17 +226,17 @@ public class DNodeSet {
 	 * @param event
 	 *           the event for which the prime cut and
 	 *           the predecessors shall be computed
-	 * @param predecessors
+	 * @param collectPredecessors
 	 *           a list that gets filled with all predecessor events of
 	 *           <code>event</code>. Can be <code>null</code>, then the
 	 *           predecessors of <code>event</code> are not stored.
+	 * @param configIncludeEvent
+	 *           whether the prime configuration shall contain 'event'
 	 * @return
 	 *         a sorted array of {@link DNode}s representing the prime cut of
 	 *         <code>event</code>
 	 */
-	public DNode[] getPrimeCut(DNode event, DNode.SortedLinearList predecessors) {
-		
-		getPrimeCut_configSize = 0;
+	public DNode[] getPrimeCut(DNode event, boolean collectPredecessors, boolean configIncludeEvent) {
 		
 		// the set of post-conditions of all predecessors of 'event', this set gets
 		// updated as the predecessors of 'event' are discovered
@@ -237,9 +247,8 @@ public class DNodeSet {
     LinkedList<DNode> queue = new LinkedList<DNode>();
     queue.add(event);
     
-		// an index structure for faster detection whether a node is already in the queue
-		HashSet<DNode> queued = new HashSet<DNode>();
-		queued.add(event);
+		// the events of the prime configuration of 'event'
+		HashSet<DNode> primeConfiguration = new HashSet<DNode>();
 		
 		// conditions with a post-event that is a predecessor of 'event', these
 		// conditions cannot be in the prime cut of 'event'
@@ -249,6 +258,7 @@ public class DNodeSet {
 		while (!queue.isEmpty()) {
 			
 			DNode first = queue.removeFirst();
+	    primeConfiguration.add(first);
 			
 			// add all post-conditions to the prime-cut that are not consumed by successors
 			for (DNode post : first.post) {
@@ -263,15 +273,9 @@ public class DNodeSet {
 				
 				// add all predecessor events to the queue
 				for (DNode preEvent : preCondition.pre) {
-					if (!queued.contains(preEvent)) {
+					if (!primeConfiguration.contains(preEvent)) {
 					  // only add to the queue if not queued already
 						queue.add(preEvent);
-						queued.add(preEvent);
-						// remember all predecessors of this event
-						getPrimeCut_configSize++;   // one more predecessor event 
-						if (predecessors != null) {
-							predecessors = predecessors.add(preEvent);
-						}
 					}
 				} // all predecessor events of preCondition
 			} // all preconditions of the current event
@@ -290,6 +294,23 @@ public class DNodeSet {
 		DNode[] primeCut = new DNode[postConditions.size()];
 		postConditions.toArray(primeCut);
 		DNode.sortIDs(primeCut);
+
+		// remove the 'event' from the prime configuration if desired
+    if (!configIncludeEvent) primeConfiguration.remove(event);
+		getPrimeConfiguration_size = primeConfiguration.size();
+		  
+		if (collectPredecessors) {
+		  /*
+  		getPrimeCut_predecessors = new DNode[primeConfiguration.size()];
+  		primeConfiguration.toArray(getPrimeCut_predecessors);
+  		DNode.sortIDs(getPrimeCut_predecessors);
+  		*/
+      getPrimeConfiguration = primeConfiguration;
+
+		} else {
+		  //getPrimeCut_predecessors = null;
+		  getPrimeConfiguration = null;
+		}
 		
 		return primeCut;
 	}

@@ -66,6 +66,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	private int						nodeNum;	// counter number of nodes 
 	
 	private Map<Node, DNode>     nodeEncoding;    // encoding of oclet Nodes as DNodes
+	private Map<DNode, Node>     nodeOrigin;      // inverse of #nodeEncoding
 	private Map<Oclet, DNodeSet> ocletEncoding;   // encoding of oclets to DNodeSets
 
 	
@@ -86,6 +87,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 		// create a name table initialize the translation tables
 		buildNameTable(as);
 		nodeEncoding = new HashMap<Node, DNode>(nodeNum);
+		nodeOrigin = new HashMap<DNode, Node>(nodeNum);
 		ocletEncoding = new HashMap<Oclet, DNodeSet>(as.getOclets().size());
 		
 		// then translate all oclets
@@ -138,38 +140,58 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	 * 
 	 * @param o
 	 * @param isAnti
+	 * @param beginAtMarked
 	 * @return
 	 */
-	private Collection<DNode> translateToDNodes(OccurrenceNet o, boolean isAnti) {
+	private Collection<DNode> translateToDNodes(OccurrenceNet o, boolean isAnti, boolean beginAtMarked) {
 		LinkedList<DNode> maxNodes = new LinkedList<DNode>();
 		LinkedList<Node> searchQueue = new LinkedList<Node>();
 		
 		Map<Node, Integer> depth = new HashMap<Node, Integer>();
 		
-		// fill the queue with all maximal nodes of the oclet
-		for (Node n : o.getNodes()) {
-			if (n instanceof Event) {
-				Event e = (Event)n;
-				if (e.getPostConditions().isEmpty()) {
-					searchQueue.add(n);
-					
-					// we compute the length of the longest path that ends in an
-					// event, if this event has no predecessor, the corresponding
-					// path has length 0
-					depth.put(n, 0);
-				}
-			}			
-			if (n instanceof Condition) {
-				Condition b = (Condition)n;
-				if (b.getPostEvents().isEmpty()) {
-					searchQueue.add(n);
-					
-					// we compute the length of the longest path that ends in an
-					// event, a path that ends in the pre-event of this condition
-					// has one edge lass than a path that ends in this condition
-					depth.put(n, -1);	
-				}
-			}
+		// construct DNode representation only from marked conditions
+		if (beginAtMarked) {
+		  for (Node n : o.getNodes()) {
+		    if (n instanceof Condition) {
+          Condition b = (Condition)n;
+          if (b.getToken() == 1) {
+            searchQueue.add(b);
+            
+            // we compute the length of the longest path that ends in an
+            // event, a path that ends in the pre-event of this condition
+            // has one edge lass than a path that ends in this condition
+            depth.put(n, -1); 
+          }
+		    }
+		  }
+		  
+		// construct DNode representation from all nodes
+		} else {
+  		// fill the queue with all maximal nodes of the occurrence net
+  		for (Node n : o.getNodes()) {
+  			if (n instanceof Event) {
+  				Event e = (Event)n;
+  				if (e.getPostConditions().isEmpty()) {
+  					searchQueue.add(n);
+  					
+  					// we compute the length of the longest path that ends in an
+  					// event, if this event has no predecessor, the corresponding
+  					// path has length 0
+  					depth.put(n, 0);
+  				}
+  			}			
+  			if (n instanceof Condition) {
+  				Condition b = (Condition)n;
+  				if (b.getPostEvents().isEmpty()) {
+  					searchQueue.add(n);
+  					
+  					// we compute the length of the longest path that ends in an
+  					// event, a path that ends in the pre-event of this condition
+  					// has one edge lass than a path that ends in this condition
+  					depth.put(n, -1);	
+  				}
+  			}
+  		}
 		}
 
 		// then do a breadth-first search on the structure of the oclet
@@ -277,6 +299,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 				}
 			}
 			nodeEncoding.put(n, d);		// store new pair
+			nodeOrigin.put(d, n);     // and its reverse mapping
 		}
 		return maxNodes;
 	}
@@ -289,7 +312,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	 */
 	private DNodeSet buildDNodeRepresentation(Oclet o) {
 		
-		Collection<DNode> maxNodesOfO = translateToDNodes(o.getDoNet(), o.getOrientation() == Orientation.ANTI);
+		Collection<DNode> maxNodesOfO = translateToDNodes(o.getDoNet(), o.getOrientation() == Orientation.ANTI, false);
 		
 		// store the constructed DNodes in a DNodeSet, this represents the oclet
 		DNodeSet ds = new DNodeSet(properNames.length);
@@ -299,7 +322,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 		// a maximal condition in the PreNet may not have a successor
 		// so translate the pre-net and add all additional maximal nodes to
 		// the DNode set as well
-		Collection<DNode> maxNodesOfHist = translateToDNodes(o.getPreNet(), false);
+		Collection<DNode> maxNodesOfHist = translateToDNodes(o.getPreNet(), false, false);
     for (DNode d : maxNodesOfHist) {
       if (!ds.allConditions.contains(d))
         ds.add(d);
@@ -317,7 +340,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	 */
 	private DNodeSet buildDNodeRepresentation(AdaptiveProcess ap) {
 		
-		Collection<DNode> maxNodesOfAP = translateToDNodes(ap, false);
+		Collection<DNode> maxNodesOfAP = translateToDNodes(ap, false, true);
 		
 		// store the constructed DNodes in a DNodeSet, this represents the oclet
 		DNodeSet ds = new DNodeSet(properNames.length);
@@ -348,6 +371,14 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	    histories.add(dConditions);
 	  }
 	  return histories;
+	}
+	
+	/**
+	 * @param d
+	 * @return the node that caused the definition of {@link DNode} 'd' in this system
+	 */
+	public Node getOriginalNode(DNode d) {
+	  return nodeOrigin.get(d);
 	}
 	
 	@Override

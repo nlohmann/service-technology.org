@@ -80,6 +80,19 @@
          </action>
           -->
          <action
+               class="hub.top.greta.simulation.SimulationInt_EventAction2"
+               disabledIcon="icons/full/dlcl16/resume_co.gif"
+               icon="icons/full/elcl16/resume_co.gif"
+               id="hub.top.GRETA.run.processD"
+               label="fire single event"
+               menubarPath="hub.top.GRETA.menus.gretaMenu/simulation"
+               state="false"
+               style="push"
+               toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/simulation"
+               tooltip="fire single event">
+         </action>
+         <!--
+         <action
                class="hub.top.greta.simulation.SimulationInt_EventAction"
                disabledIcon="icons/full/dlcl16/resume_co.gif"
                icon="icons/full/elcl16/resume_co.gif"
@@ -91,6 +104,7 @@
                toolbarPath="hub.top.GRETA.toolbars.gretaToolbar/simulation"
                tooltip="fire single event">
          </action>
+           -->
          <action
                class="hub.top.greta.simulation.ResetAction"
                disabledIcon="icons/full/dlcl16/refresh.gif"

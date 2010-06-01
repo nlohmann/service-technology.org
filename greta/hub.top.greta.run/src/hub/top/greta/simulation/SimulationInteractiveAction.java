@@ -1,5 +1,5 @@
 /*****************************************************************************\
- * Copyright (c) 2008, 2009 Manja Wolf, Dirk Fahland. EPL1.0/AGPL3.0
+ * Copyright (c) 2008, 2009, 2010 Manja Wolf, Dirk Fahland. EPL1.0/AGPL3.0
  * All rights reserved.
  * 
  * ServiceTechnolog.org - Greta
@@ -49,6 +49,7 @@ import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.Oclet;
+import hub.top.adaptiveSystem.Temp;
 import hub.top.adaptiveSystem.diagram.edit.parts.EventAPEditPart;
 
 import org.eclipse.emf.common.command.Command;
@@ -792,6 +793,38 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
     return copiedNode;
   }
   
+  protected Event createEvent(String name, Temp temp, boolean isAnti) {
+    Event event = AdaptiveSystemFactory.eINSTANCE.createEvent();
+    event.unsetAbstract(); // TODO: fixme
+    event.setName(name);
+    event.setTemp(temp);
+    event.setDisabledByAntiOclet(isAnti);
+    event.setDisabledByConflict(false);
+    
+    AddCommand cmd = new AddCommand(simView.processViewEditor.getEditingDomain(), simView.adaptiveProcess, AdaptiveSystemPackage.eINSTANCE.getOccurrenceNet_Nodes(), event);
+    cmd.canExecute();
+    ((CommandStack) ((EditingDomain) simView.processViewEditor.getEditingDomain()).getCommandStack()).execute(cmd);
+
+    newNodes.add(event);
+    return event;
+  }
+  
+  protected Condition createCondition(String name, Temp temp, boolean isAnti) {
+    Condition cond = AdaptiveSystemFactory.eINSTANCE.createCondition();
+    cond.unsetAbstract(); // TODO: fixme
+    cond.setName(name);
+    cond.setTemp(temp);
+    cond.setDisabledByAntiOclet(isAnti);
+    cond.setDisabledByConflict(false);
+    
+    AddCommand cmd = new AddCommand(simView.processViewEditor.getEditingDomain(), simView.adaptiveProcess, AdaptiveSystemPackage.eINSTANCE.getOccurrenceNet_Nodes(), cond);
+    cmd.canExecute();
+    ((CommandStack) ((EditingDomain) simView.processViewEditor.getEditingDomain()).getCommandStack()).execute(cmd);
+
+    newNodes.add(cond);
+    return cond;
+  }
+  
   /**
    * Create an arc and add it to adaptiveProcess arcList
    * 
@@ -799,7 +832,7 @@ public abstract class SimulationInteractiveAction implements IWorkbenchWindowAct
    * @param source
    * @param target
    */
-  private boolean createArc(Node source, Node target) {
+  protected boolean createArc(Node source, Node target) {
     
     //create an arcToEvent
     if(source instanceof Condition && target instanceof Event) {

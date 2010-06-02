@@ -46,7 +46,7 @@ libpnapi_la_SOURCES = \
 #    This release has a new, but backwards incompatible interface.
 #
 # For more info see section 6.3 of the GNU Libtool Manual.
-VERINFO = -version-info 6:0:1
+VERINFO = -version-info 6:2:1
 
 libpnapi_la_LDFLAGS = $(VERINFO) -no-undefined
 pkgconfigdir = $(libdir)/pkgconfig

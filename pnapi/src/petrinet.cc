@@ -1395,12 +1395,23 @@ PetriNet::translateConstraintLabels(const PetriNet & net) throw (exception::Inpu
       }
       else
       {
-        string filename =
-          ((net.meta_.find(io::INPUTFILE) != net.meta_.end())
-          ? net.meta_.find(io::INPUTFILE)->second : "");
-        
-        throw exception::InputError(exception::InputError::SEMANTIC_ERROR, filename,
-                                    0, *it2, "unknown transition");
+        Label * interfaceLabel = interface_.findLabel(*it2);
+        if(interfaceLabel != NULL)
+        {
+          PNAPI_FOREACH(tt, interfaceLabel->getTransitions())
+          {
+            result[&t].insert(*tt);
+          }
+        }
+        else
+        {
+          string filename =
+            ((net.meta_.find(io::INPUTFILE) != net.meta_.end())
+            ? net.meta_.find(io::INPUTFILE)->second : "");
+          
+          throw exception::InputError(exception::InputError::SEMANTIC_ERROR, filename,
+                                      0, *it2, "unknown transition");
+        }
       }
     }
   }

@@ -3,7 +3,7 @@ SUBDIRS = unfolder
 bin_PROGRAMS = petri cdnf generator cphils configurator
 dist_noinst_SCRIPTS = process.sh make_customer.sh
 
-noinst_PROGRAMS = sound
+noinst_PROGRAMS = sound artifact
 
 petri_SOURCES = petri.cc cmdline.c cmdline.h \
                 Output.h Output.cc \
@@ -25,6 +25,8 @@ configurator_SOURCES = configurator.cc \
 
 sound_SOURCES = sound.cc
 
+artifact_SOURCES = artifact.cc
+
 # the configuration files
 sysconf_DATA = petri.conf
 
@@ -36,6 +38,7 @@ generator_LDADD =  $(top_builddir)/src/libpnapi.la
 cdnf_LDADD =  $(top_builddir)/src/libpnapi.la
 configurator_LDADD =  $(top_builddir)/src/libpnapi.la
 sound_LDADD =  $(top_builddir)/src/libpnapi.la
+artifact_LDADD =  $(top_builddir)/src/libpnapi.la
 
 AM_CPPFLAGS = -I$(top_srcdir)/src
 

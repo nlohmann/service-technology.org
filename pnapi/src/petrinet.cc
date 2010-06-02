@@ -1288,6 +1288,8 @@ std::map<Transition *, std::string> PetriNet::normalize()
  *
  * \note  There is an error in definition 5: The arcs of the transitions
  *        with empty label are missing.
+ * 
+ * \pre   Interface of 'net' is empty.
  */
 void PetriNet::produce(const PetriNet & net, const std::string & aPrefix,
                        const std::string & aNetPrefix) throw (exception::InputError)
@@ -1342,6 +1344,10 @@ void PetriNet::produce(const PetriNet & net, const std::string & aPrefix,
       Transition & prodTrans = createTransition(); // (t, t')
       createArcs(prodTrans, trans);
       createArcs(prodTrans, netTrans, &placeMapping);
+      PNAPI_FOREACH(l, trans.getLabels())
+      {
+        prodTrans.addLabel(*(l->first), l->second);
+      }
     }
   }
 

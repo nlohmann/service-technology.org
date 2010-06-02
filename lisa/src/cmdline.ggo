@@ -35,7 +35,7 @@ option "findSiphon" -
   flag off
 
 option "isReachable" r
-  "Checks if a given marking is reachable from the initial marking. \nOnly a necessary condition is checked, i.e. a marking that is reachable might not be realizable. The marking to be reached is to be written as a final marking."
+  "Checks if a given marking is reachable from the initial marking. \nOnly a necessary condition is checked, i.e. a marking that is reachable might not be realizable. The marking to be reached is to be written as a final marking. Places not mentioned in the final marking are assumed to not be marked."
   flag off
 
 section "Configuration"

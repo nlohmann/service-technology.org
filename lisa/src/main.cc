@@ -27,6 +27,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <typeinfo>
 
 #include <pnapi/pnapi.h>
 #include "config-log.h"
@@ -222,15 +223,25 @@ int main(int argc, char** argv) {
       pnapi::formula::Conjunction c = net.finalCondition().formula();
       std::set<const pnapi::formula::Formula *> fset = c.children(); 
       std::set<const pnapi::formula::Formula *>::iterator fit;
+      std::set<Place *> places = net.getPlaces();
+      std::set<Place *>::iterator pit;
+      for(pit = places.begin(); pit != places.end(); ++pit)
+        (*pit)->mark(0);
       for(fit = fset.begin(); fit != fset.end(); ++fit){
-        const Place & p = dynamic_cast<const pnapi::formula::FormulaEqual* >(*fit)->place();  
-        unsigned int tokenCount = dynamic_cast<const pnapi::formula::FormulaEqual* >(*fit)->tokens();      
-        net.findPlace(p.getName())->mark(tokenCount);  
+        try{
+          const Place & p = (dynamic_cast<const pnapi::formula::FormulaEqual* >(*fit))->place();  
+          unsigned int tokenCount = (dynamic_cast<const pnapi::formula::FormulaEqual* >(*fit))->tokens();      
+          net.findPlace(p.getName())->mark(tokenCount);
+        }
+	catch(std::bad_cast & b){
+	  abort(1, "could not evaluate final marking");
+	}
+  
       }
 
       Marking m2(net, false);
 
-      lpw.checkReachability(m1, m2, true);
+      lpw.checkReachability(m1, m2, false);
 
     }	
 

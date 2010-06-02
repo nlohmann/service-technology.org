@@ -83,8 +83,6 @@ int LPWrapper::checkReachability(Marking& m1, Marking& m2, bool verbose) {
 			mat[tpos[t]] -= (*ait)->getWeight();
 		}
 		int mark = m2[*(placeorder[k])]-m1[*(placeorder[k])]; // calculate right hand side
-	        std::cout << "m2: " << m2[*(placeorder[k])];
-	        std::cout << " m1: " << m1[*(placeorder[k])] << std::endl;
 
 		//initialize the rows
 		if (!add_constraintex(lp,cols,mat,colpoint,EQ,mark)) return -1;
@@ -106,6 +104,7 @@ int LPWrapper::checkReachability(Marking& m1, Marking& m2, bool verbose) {
 	 message("marking is not reachable");
 	else{
          message("marking might be reachable");
+         message("following is the parikh vector possibly realizing the marking");
 	 get_variables(lp, mat);
          for(int j = 0; j < cols; j++)
            fprintf(stderr, "%s: %f\n", get_col_name(lp, j + 1), mat[j]);

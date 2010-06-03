@@ -41,9 +41,8 @@ namespace pnapi
  * \param capacity to be passed to Genet when using genet
  */
 PetriNet::PetriNet(const Automaton & sa, AutomatonConverter ac, uint8_t capacity) :
-  observer_(*this), interface_(*this),
-  warnings_(0), reductionCache_(NULL),
-  genetCapacity_(capacity), automatonConverter_(ac)
+  observer_(*this), warnings_(0), reductionCache_(NULL),
+  genetCapacity_(capacity), automatonConverter_(ac), interface_(*this)
 {
   if(automatonConverter_ == STATEMACHINE)
   {

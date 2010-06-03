@@ -256,9 +256,8 @@ void PetriNet::setPetrify(const std::string & petrify)
  * \note The condition is set to True by default.
  */
 PetriNet::PetriNet() :
-  observer_(*this), interface_(*this),
-  warnings_(0), reductionCache_(NULL),
-  genetCapacity_(2), automatonConverter_(STATEMACHINE)
+  observer_(*this), warnings_(0), reductionCache_(NULL), genetCapacity_(2), 
+  automatonConverter_(STATEMACHINE), interface_(*this)
 {
 }
 
@@ -267,9 +266,9 @@ PetriNet::PetriNet() :
  */
 PetriNet::PetriNet(const Interface & interface1, const Interface & interface2, std::map<Label *, Label *> & label2label,
          std::map<Label *, Place *> & label2place, std::set<Label *> & commonLabels) :
-  observer_(*this), interface_(*this, interface1, interface2, label2label, label2place, commonLabels),
-  warnings_(0), reductionCache_(NULL),
-  genetCapacity_(2), automatonConverter_(STATEMACHINE)
+  observer_(*this), warnings_(0), reductionCache_(NULL),
+  genetCapacity_(2), automatonConverter_(STATEMACHINE),
+  interface_(*this, interface1, interface2, label2label, label2place, commonLabels)
 {
 }
 
@@ -280,11 +279,10 @@ PetriNet::PetriNet(const Interface & interface1, const Interface & interface2, s
  * \note copyStructure has to be called BEFORE interface is copied
  */
 PetriNet::PetriNet(const PetriNet & net) :
-  observer_(*this), interface_(*this),
-  roles_(net.roles_), meta_(net.meta_),
-  warnings_(net.warnings_), reductionCache_(NULL),
-  finalCondition_(net.finalCondition_, copyStructure(net)),
-  genetCapacity_(2), automatonConverter_(STATEMACHINE)
+  observer_(*this), roles_(net.roles_), meta_(net.meta_),
+  warnings_(net.warnings_), reductionCache_(NULL), genetCapacity_(2),
+  automatonConverter_(STATEMACHINE), interface_(*this),
+  finalCondition_(net.finalCondition_, copyStructure(net))
 {
   setConstraintLabels(net.constraints_);
 }

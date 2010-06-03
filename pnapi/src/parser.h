@@ -177,7 +177,7 @@ const PetriNet & AbstractParser<P, L, C>::parse(std::istream & is)
  */
 template <class P, class Bst, class F>
 AbstractLexer<P, Bst, F>::AbstractLexer(P & p) :
-  F(), yylval(NULL), parser_(p)
+  F(), parser_(p), yylval(NULL)
 {
 }
 

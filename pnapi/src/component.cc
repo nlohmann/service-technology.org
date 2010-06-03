@@ -419,7 +419,7 @@ void Place::setWasInterface(bool wasInterface)
  */
 Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
                        const std::string & name) :
-  Node(net, observer, name), cost_(0), type_(INTERNAL)
+  Node(net, observer, name), type_(INTERNAL), cost_(0)
 {
   observer_.updateTransitions(*this);
 }
@@ -430,8 +430,8 @@ Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
  */
 Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
                        const Transition & trans, const std::string & prefix) :
-  Node(net, observer, trans, prefix), roles_(trans.roles_),
-  type_(trans.type_), cost_(trans.cost_)
+  Node(net, observer, trans, prefix), type_(trans.type_),
+  cost_(trans.cost_), roles_(trans.roles_)
 {
   observer_.updateTransitions(*this);
 }

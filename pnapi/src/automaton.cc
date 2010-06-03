@@ -134,8 +134,7 @@ Automaton::Automaton(const Automaton & a) :
   input_(a.input_), output_(a.output_),
   synchronous_(a.synchronous_),
   edgeLabels_(NULL), edgeTypes_(NULL),
-  weights_(NULL), hashTable_(NULL),
-  stateCounter_(a.stateCounter_), net_(NULL)
+  weights_(NULL), net_(NULL), hashTable_(NULL), stateCounter_(a.stateCounter_)
 {
   map<const Place *, const Place *> placeMap;
 

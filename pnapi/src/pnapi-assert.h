@@ -48,9 +48,9 @@
 #define PNAPI_ASSERT_USER__(...) PNAPI_ASSERT_USER___(__VA_ARGS__) // expand PNAPI_PP_NARG (see below)
 #define PNAPI_ASSERT_USER___(x, ...) PNAPI_ASSERT_USER_ ## x(__VA_ARGS__)  
 
-#define PNAPI_ASSERT_USER_1(expr) if(!(expr)) { throw pnapi::exception::UserCausedError(pnapi::exception::UserCausedError::UE_NONE, #expr); }
-#define PNAPI_ASSERT_USER_2(expr, msg) if(!(expr)) { throw pnapi::exception::UserCausedError(pnapi::exception::UserCausedError::UE_NONE, msg); }
-#define PNAPI_ASSERT_USER_3(expr, msg, type) if(!(expr)) { throw pnapi::exception::UserCausedError(type, msg); }
+#define PNAPI_ASSERT_USER_1(expr) ((expr) ? static_cast<void>(0) : (throw pnapi::exception::UserCausedError(pnapi::exception::UserCausedError::UE_NONE, #expr)))
+#define PNAPI_ASSERT_USER_2(expr, msg) ((expr) ? static_cast<void>(0) : (throw pnapi::exception::UserCausedError(pnapi::exception::UserCausedError::UE_NONE, msg)))
+#define PNAPI_ASSERT_USER_3(expr, msg, type) ((expr) ? static_cast<void>(0) : (throw pnapi::exception::UserCausedError(type, msg)))
 
 /********************\
  * assertion makros *
@@ -66,7 +66,7 @@
 #ifdef NDEBUG
 #define PNAPI_ASSERT(expr) assert(expr)
 #else
-#define PNAPI_ASSERT(expr) if(!(expr)) { throw pnapi::exception::AssertionFailedError( __FILE__ , __LINE__ , #expr ); }
+#define PNAPI_ASSERT(expr) ((expr) ? static_cast<void>(0) : (throw pnapi::exception::AssertionFailedError( __FILE__ , __LINE__ , #expr ))) 
 #endif /* NDEBUG */
 
 #endif /* PNAPI_USE_C_ASSERTS */

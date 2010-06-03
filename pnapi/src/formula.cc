@@ -288,9 +288,11 @@ Disjunction::Disjunction()
  */
 Proposition::Proposition(const Place & p, unsigned int k,
                          const std::map<const Place *, const Place *> * places) :
-  place_((places == NULL) ? p : (*places->find(&p)->second)), tokens_(k)
+  place_((places == NULL) ? p :
+         (PNAPI_ASSERT((places->find(&p) != places->end()) && (places->find(&p)->second != NULL)),
+          (*places->find(&p)->second))),
+  tokens_(k)
 {
-  PNAPI_ASSERT((places == NULL) || (places->find(&p)->second != NULL));
 }
 
 /*!

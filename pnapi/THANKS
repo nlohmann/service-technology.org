@@ -11,3 +11,5 @@
     (http://www.w3.org/XML/9707/XML-in-C).
   * Thanks to Mike Hordecki for a post on Stack Overflow with a portable
     preprocessor macro to iterate C++ containers (see 'src/util.h').
+  * Thanks to Laurent Deniau for a post in a Google Group about
+    variadic macros (see 'pnapi-assert.h').

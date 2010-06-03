@@ -290,8 +290,15 @@ Exception thrown by parsing a Petri Net or a Service Automaton, containing filen
 @section NotImplementedError
 Thrown when use cases happend we not thought about, yet. If you ever catch such an exception, please report to @email{pnapi@@service-technology.org} which feature is missing.
 
-@section AssertionFailedError
-There are several sanity checks within the API e.g. to ensure that there a no conflicts with node names (i.e. there are no two places with the same name). When such a check failes, the API should not cause the program to fail but give it the chance to decide how to handle this error. Hence an exception is thrown instead of using the C @samp{assert} makro.
+@section AssertionFailedError and UserCausedError
+There are several sanity checks within the API e.g. to ensure that there a no conflicts with node names (i.e. there are no two places with the same
+name). When such a check failes, the API should not cause the program to fail but give it the chance to decide how to handle this error.
+Hence an exception is thrown instead of using the C @samp{assert} macro.
+
+There exist two macros within the API: The first one is used like @samp{assert}, throws an @samp{AssertionFailedError} when the assertion failed,
+and can be disabled by defining the symbol @samp{NDEBUG}. The second one checks user inputs (like node names), throws a @samp{UserCausedError}
+when the assertion failed, and can not be disabled by defining @samp{NDEBUG}. Both macros can be replaced by @samp{assert} by defining
+the symbol @samp{PNAPI_USE_C_ASSERTS}. This way, also the second macro will be disabled by defining @samp{NDEBUG}.
 
 
 

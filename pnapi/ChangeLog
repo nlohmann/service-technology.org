@@ -14,6 +14,10 @@ Version 4.02-unreleased
 
 * removed sa2sm and sa2owfn
 
+* allowed parsing of Final Conditions only
+
+* introduced method to guess place relations
+
 Version 4.01 (2010-05-11)
 =========================
 

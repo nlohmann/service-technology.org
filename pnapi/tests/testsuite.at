@@ -266,6 +266,14 @@ AT_CHECK([GREP -q "role has not been specified" stderr])
 AT_KEYWORDS([oWFN roles])
 AT_CLEANUP
 
+AT_SETUP([Final Condition only])
+m4_define([NET], [finalcondition_only.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI --verbose NET], 0, ignore, stderr)
+AT_CHECK([GREP -q "|P|= 2" stderr])
+AT_KEYWORDS([owfn condition])
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([PNML])

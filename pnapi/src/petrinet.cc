@@ -424,6 +424,23 @@ const Condition & PetriNet::getFinalCondition() const
   return finalCondition_;
 }
 
+/*!
+ * \brief guess a place relation
+ * 
+ * Given a second net, this method guesses a relation from the other net's
+ * places tho this net's places to be used when merging Final Conditions.
+ */
+std::map<const Place *, const Place *> PetriNet::guessPlaceRelation(const PetriNet & net) const
+{
+  map<const Place *, const Place *> result;
+  
+  PNAPI_FOREACH(p, net.places_)
+  {
+    result[*p] = findPlace((*p)->getName());
+  }
+  
+  return result;
+}
 
 /*!
  * \brief Compose this net to a second net.

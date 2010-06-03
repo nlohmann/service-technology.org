@@ -391,6 +391,8 @@ public: /* public methods */
   Condition & getFinalCondition();
   /// get the final condition
   const Condition & getFinalCondition() const;
+  /// guess a place relation
+  std::map<const Place *, const Place *> guessPlaceRelation(const PetriNet &) const;
   //@}
   
   

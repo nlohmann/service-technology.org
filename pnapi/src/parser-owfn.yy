@@ -80,7 +80,7 @@
 %type <yt_int> NUMBER NEGATIVE_NUMBER 
 %type <yt_int> transition_cost
 %type <yt_str> IDENT
-%type <yt_formula> condition formula
+%type <yt_formula> condition formula fo_formula
 
 %start petrinet
 
@@ -96,6 +96,7 @@ petrinet:
   { 
     parser_.net_.setConstraintLabels(parser_.constrains_); 
   }
+| finalcondition_only
 ;
 
 node_name:   
@@ -440,6 +441,11 @@ condition:
 | KEY_FINALCONDITION formula SEMICOLON { $$ = $2; }
 ;
 
+finalcondition_only:
+  KEY_FINALCONDITION SEMICOLON
+| KEY_FINALCONDITION fo_formula SEMICOLON
+;
+
 formula: 
   LPAR formula RPAR { $$ = $2; }
 | KEY_TRUE          { $$ = new formula::FormulaTrue(); }
@@ -518,6 +524,91 @@ formula:
   {
     Place * p = parser_.places_[parser_.nodeName_.str()];
     parser_.check(p != NULL, "unknown place");
+
+    $$ = new formula::FormulaLessEqual(*p, $3);
+  }
+;
+
+
+
+fo_formula:
+  LPAR fo_formula RPAR { $$ = $2; }
+| KEY_TRUE          { $$ = new formula::FormulaTrue(); }
+| KEY_FALSE         { $$ = new formula::FormulaFalse(); }
+| OP_NOT fo_formula
+  { 
+    $$ = new formula::Negation(*$2);
+    delete $2;
+  }
+| fo_formula OP_OR fo_formula
+  {
+    $$ = new formula::Disjunction(*$1, *$3);
+    delete $1;
+    delete $3;
+  }
+| fo_formula OP_AND fo_formula 
+  {
+    $$ = new formula::Conjunction(*$1, *$3);
+    delete $1;
+    delete $3;
+  }
+| node_name OP_EQ NUMBER
+  {
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    if(p == NULL)
+    {
+      p = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
+    }
+    
+    $$ = new formula::FormulaEqual(*p, $3);
+  }
+| node_name OP_NE NUMBER 
+  {
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    if(p == NULL)
+    {
+      p = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
+    }
+
+    $$ = new formula::Negation(formula::FormulaEqual(*p, $3));
+  }
+| node_name OP_LT NUMBER
+  {
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    if(p == NULL)
+    {
+      p = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
+    }
+
+    $$ = new formula::FormulaLess(*p, $3);
+  }
+| node_name OP_GT NUMBER
+  {
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    if(p == NULL)
+    {
+      p = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
+    }
+
+    $$ = new formula::FormulaGreater(*p, $3);
+  } 
+| node_name OP_GE NUMBER
+  {
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    if(p == NULL)
+    {
+      p = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
+    }
+
+    $$ = new formula::FormulaGreaterEqual(*p, $3);
+  }
+| node_name OP_LE NUMBER
+  {
+    Place * p = parser_.places_[parser_.nodeName_.str()];
+    if(p == NULL)
+    {
+      p = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
+    }
 
     $$ = new formula::FormulaLessEqual(*p, $3);
   }

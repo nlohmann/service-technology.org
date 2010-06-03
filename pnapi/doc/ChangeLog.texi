@@ -2,6 +2,8 @@
 @itemize
 @item made petri configurable (paths to external tools, configuration file)
 @item removed sa2sm and sa2owfn
+@item allowed parsing of Final Conditions only
+@item introduced method to guess place relations
 @end itemize
 
 @heading Version 4.01 (2010-05-11)

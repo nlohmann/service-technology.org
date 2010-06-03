@@ -116,8 +116,8 @@ InnerMarking::InnerMarking(const InnerMarking_ID& myId,
                            const std::vector<InnerMarking_ID>& _successors,
                            const bool& _is_final)
     : is_final(_is_final), is_waitstate(0), is_bad(0),
-      out_degree(_successors.size()), labels(new Label_ID[out_degree]),
-      successors(new InnerMarking_ID[out_degree]), possibleSendEvents(NULL) {
+      out_degree(_successors.size()), successors(new InnerMarking_ID[out_degree]),
+      labels(new Label_ID[out_degree]), possibleSendEvents(NULL) {
     assert(_labels.size() == out_degree);
     assert(out_degree < UCHAR_MAX);
 

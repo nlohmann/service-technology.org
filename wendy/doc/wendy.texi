@@ -592,7 +592,8 @@ A marking activates two transitions with the same synchronous label. This is not
 
 @smallexample
 @cartouche
-wendy: synchronous label of `a' already using in this marking -- aborting [#17]
+wendy: synchronous label `a' of transition `t' already used in this
+       marking -- aborting [#17]
 @end cartouche
 @end smallexample
 

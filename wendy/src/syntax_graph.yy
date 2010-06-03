@@ -195,7 +195,7 @@ transition:
       if (Label::sync_events > 0) {
           for (size_t i = 0; i < currentLabels.size(); ++i) {
               if (SYNC(Label::name2id[$1]) and currentLabels[i] == Label::name2id[$1]) {
-                  abort(17, "synchronous label of '%s' already using in this marking", $1, Label::id2name[Label::name2id[$1]].c_str());
+                  abort(17, "synchronous label '%s' of transition '%s' already used in this marking", Label::id2name[Label::name2id[$1]].c_str(), $1);
               }
           }
       }

@@ -59,7 +59,7 @@ name      [^,;:()\t \n\{\}]+
 
 %%
 
-void cover_error(const char *msg) 
+__attribute__((noreturn)) void cover_error(const char *msg) 
 {
   status("%d: error near '%s': %s", cover_lineno, cover_text, msg);
   abort(15, "error while parsing the cover file");

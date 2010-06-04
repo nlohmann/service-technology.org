@@ -51,7 +51,7 @@ number    [0-9][0-9]*
 
 %%
 
-void graph_error(const char* msg) {
+__attribute__((noreturn)) void graph_error(const char* msg) {
   status("error near '%s': %s", graph_text, msg);
   abort(6, "error while parsing the reachability graph");
 }

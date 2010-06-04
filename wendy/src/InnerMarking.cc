@@ -184,7 +184,8 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
     }
 
     // when only deadlocks are considered, we don't care about final markings
-    finalMarkingReachableMap[myId] = (args_info.correctness_arg == correctness_arg_livelock) ? is_final : true;
+    finalMarkingReachableMap[myId] = (args_info.correctness_arg == correctness_arg_livelock and
+                                      not args_info.noDeadlockDetection_flag) ? is_final : true;
 
     // variable to detect whether this marking has only deadlocking successors
     // standard: "true", otherwise evaluate noDeadlockDetection flag
@@ -202,7 +203,8 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
             deadlock_inevitable = false;
         }
 
-        if (args_info.correctness_arg == correctness_arg_livelock) {
+        if (args_info.correctness_arg == correctness_arg_livelock and
+                not args_info.noDeadlockDetection_flag) {
             if (markingMap[successors[i]] != NULL and
                     finalMarkingReachableMap[successors[i]]) {
                 finalMarkingReachableMap[myId] = true;
@@ -326,6 +328,7 @@ void InnerMarking::calcReachableSendingEvents() {
  \post markingSet is empty
 */
 void InnerMarking::analyzeSCCOfInnerMarkings(std::set<InnerMarking_ID>& markingSet) {
+
     // a temporary data structure to store the predecessor relation
     std::map<InnerMarking_ID, std::set<InnerMarking_ID> > tempPredecessors;
 

@@ -37,7 +37,7 @@ using std::vector;
 
 void Diagnosis::output_results(Results& r) {
     std::stringstream temp;
-    
+
     temp << "  states = (\n";
 
     FOREACH(it, StoredKnowledge::hashTree) {
@@ -100,41 +100,41 @@ void Diagnosis::output_results(Results& r) {
 //                    if (blacklisted) {
 //                        temp << "      blacklisted = true;\n";
 //                    } else {
-                        if (inner_final and interface_empty) {
+                    if (inner_final and interface_empty) {
 //                            file << " <FONT COLOR=\"GREEN\">(f)</FONT>";
-                        } else {
-                            if (inner_waitstate and not interface_pendingOutput) {
-                                // check who can resolve this waitstate
-                                vector<Label_ID> resolvers, disallowedResolvers;
-                                for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-                                    if (InnerMarking::receivers[l].find(it->second[i]->inner[j]) != InnerMarking::receivers[l].end()) {
-                                        resolvers.push_back(l);
-                                    }
+                    } else {
+                        if (inner_waitstate and not interface_pendingOutput) {
+                            // check who can resolve this waitstate
+                            vector<Label_ID> resolvers, disallowedResolvers;
+                            for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
+                                if (InnerMarking::receivers[l].find(it->second[i]->inner[j]) != InnerMarking::receivers[l].end()) {
+                                    resolvers.push_back(l);
                                 }
+                            }
 
-                                for (unsigned int l = 0; l < resolvers.size(); ++l) {
-                                    char* a = p.decode();
-                                    if (a[resolvers[l] - Label::first_send] == 0) {
-                                        disallowedResolvers.push_back(resolvers[l]);
-                                    }
+                            for (unsigned int l = 0; l < resolvers.size(); ++l) {
+                                char* a = p.decode();
+                                if (a[resolvers[l] - Label::first_send] == 0) {
+                                    disallowedResolvers.push_back(resolvers[l]);
                                 }
-                                if (disallowedResolvers.size() == resolvers.size()) {
-                                    if (!blacklisted) {
-                                        temp << "      blacklisted = true;\n";
-                                    }
-                                    blacklisted = true;
-                                    temp << "      unresolvableWaitstate = " << static_cast<size_t>(it->second[i]->inner[j]) << ";\n";
+                            }
+                            if (disallowedResolvers.size() == resolvers.size()) {
+                                if (!blacklisted) {
+                                    temp << "      blacklisted = true;\n";
+                                }
+                                blacklisted = true;
+                                temp << "      unresolvableWaitstate = " << static_cast<size_t>(it->second[i]->inner[j]) << ";\n";
 //                                    file << " <FONT COLOR=\"RED\">(uw)</FONT>";
 //                                    message("node %p is blacklisted: m%u cannot be safely resolved",
 //                                            it->second[i], static_cast<size_t>(it->second[i]->inner[j]));
-                                    hiddenStates.insert(it->second[i]->inner[j]);
-                                } else {
-//                                    file << " <FONT COLOR=\"ORANGE\">(w)</FONT>";
-                                }
+                                hiddenStates.insert(it->second[i]->inner[j]);
                             } else {
-//                                file << " (t)";
+//                                    file << " <FONT COLOR=\"ORANGE\">(w)</FONT>";
                             }
+                        } else {
+//                                file << " (t)";
                         }
+                    }
 //                    }
 
 //                    file << "<BR/>";

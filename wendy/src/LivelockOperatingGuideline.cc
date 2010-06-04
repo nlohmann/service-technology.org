@@ -797,7 +797,7 @@ void LivelockOperatingGuideline::output_cyclic(const bool& dot, std::ostream& fi
 
             unsigned int i = 0;
 
-            while(temp->setOfKnowledges[i] != NULL) {
+            while (temp->setOfKnowledges[i] != NULL) {
 
                 bool lastNode = false;
 

@@ -185,6 +185,12 @@ public class ArcToConditionEditPart extends ConnectionNodeEditPart implements
 		 * @generated NOT
 		 */
 		protected void refreshColor() {
+		  
+      if (ArcToConditionEditPart.this.getModel() == null
+          || ArcToConditionEditPart.this.getModelSource() == null
+          || ArcToConditionEditPart.this.getModelTarget() == null) {
+        return;
+      }
 
 			Condition destination = (Condition) ((Node) ArcToConditionEditPart.this
 					.getModelTarget()).getElement();

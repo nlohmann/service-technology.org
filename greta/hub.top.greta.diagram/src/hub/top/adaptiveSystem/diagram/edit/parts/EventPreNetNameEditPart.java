@@ -484,7 +484,9 @@ public class EventPreNetNameEditPart extends LabelEditPart implements
 	protected void refreshFontColor() {
 		View view = (View) this.getParent().getModel();
 		Event event = (Event) view.getElement();
-		if (event.isSetDisabledByAntiOclet() && event.isDisabledByAntiOclet()
+		if (event == null) {
+		  setFontColor(ColorConstants.black);
+		} else if (event.isSetDisabledByAntiOclet() && event.isDisabledByAntiOclet()
 				|| event.isSetDisabledByConflict()
 				&& event.isDisabledByConflict()) {
 			setFontColor(ColorConstants.lightGray);

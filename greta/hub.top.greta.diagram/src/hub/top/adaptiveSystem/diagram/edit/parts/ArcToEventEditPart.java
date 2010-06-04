@@ -178,6 +178,13 @@ public class ArcToEventEditPart extends ConnectionNodeEditPart implements
 		 * @generated NOT
 		 */
 		protected void refreshColor() {
+		  
+		  if (ArcToEventEditPart.this.getModel() == null
+		      || ArcToEventEditPart.this.getModelSource() == null
+		      || ArcToEventEditPart.this.getModelTarget() == null) {
+		    return;
+		  }
+		  
 			Condition source = (Condition) ((Node) ArcToEventEditPart.this
 					.getModelSource()).getElement();
 			Event destination = (Event) ((Node) ArcToEventEditPart.this

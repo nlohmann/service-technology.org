@@ -353,25 +353,38 @@ void JobQueue::printFailure(IMatrix& im) {
 			set<Constraint>::iterator cit;
 			for(cit=ps->getConstraints().begin(); cit!=ps->getConstraints().end(); ++cit)
 			{
-				int diff = (cit->getRHS()-ps->getActualRHS(*cit)); // needed tokens (at least)
-				cout << " - need at least " << diff
-						<< " more token" << (diff==1?"":"s") << " on place" 
-						<< (cit->getPlaces().size()==1?" ":" set {");
-				bool comma = false;
-				// get the set of undermarked places
+				// get the undermarked places
 				map<Place*,int> pmap(cit->getPlaces());
 				map<Place*,int>::iterator mit;
+				// get the set of hindered transitions in the SCC
+				set<Transition*> tset(cit->getSubTransitions());
+				set<Transition*>::iterator tit;
+				int diff = (cit->getRHS()-ps->getActualRHS(*cit)); // needed tokens (at least)
+				if (!tset.empty()) // calculate the missing tokens directly in this case
+				{
+					diff=-1;
+					for(tit=tset.begin(); tit!=tset.end(); ++tit)
+					{
+						int miss=0;
+						for(mit=pmap.begin(); mit!=pmap.end(); ++mit)
+							if (ps->getMarking()[*(mit->first)]<im.getPreset(**tit)[mit->first])
+								miss += im.getPreset(**tit)[mit->first]-ps->getMarking()[*(mit->first)];
+						if (diff<0 || miss<diff) diff=miss;
+					}
+				}
+				cout << " - need at least " << diff
+						<< " more token" << (diff==1?"":"s") << " on place" 
+						<< (pmap.size()==1?" ":" set {");
+				bool comma = false;
 				for(mit=pmap.begin(); mit!=pmap.end(); ++mit)
 				{
 					if (comma) cout << ",";
 					comma = true;
 					cout << mit->first->getName() << ":" << ps->getMarking()[*(mit->first)];
 				}
-				cout << (cit->getPlaces().size()==1?"":"}") << " to fire ";
+				cout << (pmap.size()==1?"":"}") << " to fire ";
 				comma = false;
-				// get the set of hindered transitions in the SCC
-				set<Transition*> tset(cit->getSubTransitions());
-				// if it is empty, fall back to the transitions just relying on the SCC
+				// if tset is empty, fall back to the transitions just relying on the SCC
 				if (tset.empty()) 
 				{ 
 					tset=ps->disabledTransitions(pmap,im); 
@@ -383,7 +396,6 @@ void JobQueue::printFailure(IMatrix& im) {
 					if (tset.size()==1) cout << "transition ";
 					else cout << "a transition in {";
 				}
-				set<Transition*>::iterator tit;
 				for(tit=tset.begin(); tit!=tset.end(); ++tit)
 				{
 					if (comma) cout << ",";

@@ -349,6 +349,8 @@ void PathFinder::conflictTable(Transition* tstart) {
 				pnapi::Arc* a = pn.findArc(**it,*p);
 				// places on which we effectively produce tokens do not lead to conflicts where the other transition must fire first
 				if (a) if ((*prearc)->getWeight()<=a->getWeight()) continue;
+				int itcons((*prearc)->getWeight()); // get the arc weights
+				int itprod(a?a->getWeight():0);
 				const set<pnapi::Arc*> ppost = p->getPostsetArcs();
 				set<pnapi::Arc*>::iterator postarc; // now check the postset of p for conflicting transitions
 				for(postarc=ppost.begin(); postarc!=ppost.end(); ++postarc)
@@ -357,6 +359,11 @@ void PathFinder::conflictTable(Transition* tstart) {
 					Transition* cft = &((*postarc)->getTransition());
 					// if it is the same or shouldn't fire anyway, we don't need it
 					if (cft==*it || rec_tv[cft]==0) continue;
+					pnapi::Arc* a2 = pn.findArc(*cft,*p); // get the arc weights
+					int cftprod(a2?a2->getWeight():0);
+					int cftcons((*postarc)->getWeight());
+					// check if there is a conflict at all
+					if (itprod>=cftcons && cftprod-cftcons<=0) continue; // we produce enough to let the other one live, and the other one cannot enable us
 					// mark it as conflicting, i.e. it possibly has priority
 					cftab[*it].insert(cft);
 					// if we haven't worked on it yet, insert it into the todo-list

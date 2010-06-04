@@ -73,6 +73,7 @@ public class DNodeSys_PetriNet extends DNodeSys {
 		
 		finalize_setPreConditions();
 		finalize_initialRun();
+		finalize_generateIndexes();
 	}
 	
 	/**

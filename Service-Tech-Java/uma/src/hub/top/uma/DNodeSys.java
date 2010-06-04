@@ -66,6 +66,12 @@ public abstract class DNodeSys {
 	public DNode.SortedLinearList fireableEvents;
 	
 	/**
+	 * A total linear order of all IDs of all fireable events. Used for the
+	 * lexicographic search strategy in the branching process construction.
+	 */
+	public HashMap<Short, Short> fireableEventIndex;
+	
+	/**
 	 * A {@link DNodeSys} has two kinds of events. This set contains all events of
    * the system that occur in preconditions of {@link #fireableEvents}. These
    * precondition events cannot be fired by themselves.
@@ -101,6 +107,7 @@ public abstract class DNodeSys {
 		
 		fireableEvents = new DNode.SortedLinearList();
 		preConEvents = new DNode.SortedLinearList();
+		fireableEventIndex = new HashMap<Short, Short>();
 		
 		init_setProperNames();
 	}
@@ -135,9 +142,9 @@ public abstract class DNodeSys {
 	}
 
 	/**
-	 * Update data structure that stores all pre-conditions of all
-	 * events in the system. This method must be called by an
-	 * implementation after filling the preConEvents and fireableEvents 
+	 *  Update data structure that stores all pre-conditions of all
+	 *  events in the system. This method must be called by an
+	 *  implementation after filling the preConEvents and fireableEvents.
 	 */
 	protected void finalize_setPreConditions () {
 		// remember all preconditions of an event for checking
@@ -174,6 +181,22 @@ public abstract class DNodeSys {
       d.causedBy = new int[1]; d.causedBy[0] = d.globalId;
     }
 	}
+	
+	 /**
+   * Generate all indexes for the construction of the branching process.
+   * These are {@link #fireableEventIndex}.
+   * 
+   * This method must be called by an implementation as the last method after
+   * all other fields have been set.
+   */
+  protected void finalize_generateIndexes() {
+     
+    short currentIndex = 0;
+    for (DNode e : fireableEvents) {
+      if (fireableEventIndex.containsKey(e.id)) continue;
+      fireableEventIndex.put(e.id, currentIndex++);
+    }
+  }
 	
 	/**
 	 * @param d

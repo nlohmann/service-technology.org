@@ -1,5 +1,6 @@
 /*****************************************************************************\
- * Copyright (c) 2008, 2009. All rights reserved. Dirk Fahland. AGPL3.0
+ * Copyright (c) 2008, 2009, 2010. Dirk Fahland. AGPL3.0
+ * All rights reserved.
  * 
  * ServiceTechnology.org - Uma, an Unfolding-based Model Analyzer
  * 
@@ -314,6 +315,38 @@ public class DNodeSet {
 		
 		return primeCut;
 	}
+	
+  public int getConfigSize(DNode[] extensionLocation) {
+    
+    // find all predecessor events of 'extensionLocation'
+    // by backwards breadth-first search from 'extensionLocation'
+    LinkedList<DNode> queue = new LinkedList<DNode>();
+    for (int i=0;i<extensionLocation.length;i++)
+      queue.add(extensionLocation[i]);
+    
+    // the events of the configuration before 'extensionLocation'
+    HashSet<DNode> configuration = new HashSet<DNode>();
+    
+    // run breadth-first search
+    while (!queue.isEmpty()) {
+      
+      DNode first = queue.removeFirst();
+      configuration.add(first);
+      
+      for (DNode preCondition : first.pre)
+      {
+        // add all predecessor events to the queue
+        for (DNode preEvent : preCondition.pre) {
+          if (!configuration.contains(preEvent)) {
+            // only add to the queue if not queued already
+            queue.add(preEvent);
+          }
+        } // all predecessor events of preCondition
+      } // all preconditions of the current event
+    } // breadth-first search
+
+    return configuration.size();
+  }
 	
 	/**
 	 * Fire ocletEvent in this set at the given location. This

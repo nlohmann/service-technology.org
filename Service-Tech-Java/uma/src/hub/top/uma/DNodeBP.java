@@ -1,5 +1,6 @@
 /*****************************************************************************\
- * Copyright (c) 2008, 2009. All rights reserved. Dirk Fahland. AGPL3.0
+ * Copyright (c) 2008, 2009, 2010. Dirk Fahland. AGPL3.0
+ * All rights reserved. 
  * 
  * ServiceTechnology.org - Uma, an Unfolding-based Model Analyzer
  * 
@@ -18,6 +19,8 @@
 package hub.top.uma;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -233,11 +236,15 @@ public class DNodeBP {
 	 * initializes the explicit concurrency relation for the algorithm.
 	 */
 	private void initialize() {
+	  
+	  executionTimeProfile.append("time;numConditions;maxDim;Tfind;numCuts;Tcuts\n");
 	
 		// get initial BP
 		bp = dNodeAS.initialRun;
 		bp.setInitialConditions();
 		bp.addInitialNodesToAllNodes();
+		
+		//System.out.println("max nodes: "+bp.maxNodes);
 		
 		// initialize explicit concurrency relation
 		for (DNode d : bp.maxNodes) {
@@ -330,6 +337,9 @@ public class DNodeBP {
 		co.put(newNode, coset);
 	}
 	
+	public StringBuilder executionTimeProfile = new StringBuilder();
+	long t0 = System.currentTimeMillis();
+	
 	/**
 	 * Find all cuts that match the given <code>preConditions</code>.
 	 * 
@@ -338,39 +348,67 @@ public class DNodeBP {
 	 * @param conditionsToSearch
 	 * @return
 	 */
-	public LinkedList<DNode[]> findEnablingCuts(DNode[] preConditions, Map<DNode, Set<DNode>> coRelation, DNode[] conditionsToSearch)
+	@SuppressWarnings("unchecked")
+  public LinkedList<DNode[]> findEnablingCuts(DNode[] preConditions, Map<DNode, Set<DNode>> coRelation, DNode[] conditionsToSearch)
 	{
+    
+    long t1 = System.currentTimeMillis();
+    
 //System.out.println("findEnablingCuts()");
-		DNode.SortedLinearList possibleMatches = new DNode.SortedLinearList();
+	  LinkedList<DNode> possibleMatchList[] = (LinkedList<DNode>[])(new LinkedList[preConditions.length]);
+	  for (int i = 0; i< preConditions.length; i++) {
+	    possibleMatchList[i] = new LinkedList<DNode>();
+	  }
+	  HashMap<Short, Integer> preConIndex = new HashMap<Short, Integer>();
+	  for (int i=0; i<preConditions.length; i++) {
+	    preConIndex.put(preConditions[i].id, i);
+	  }
 
 		if (conditionsToSearch != null) {
 
 			// limited set of nodes to search for cuts
-			for (DNode max : conditionsToSearch)
-				for (int i=0; i<preConditions.length; i++)
-					if (max.id == preConditions[i].id
-					    // consider only conditions which are NOT successors of a cutOff event
-					    //&& (max.pre == null || max.pre.length == 0 || !max.pre[0].isCutOff)
-					   )
-					{
-						possibleMatches = possibleMatches.add(max);
-					}
+			for (DNode cond : conditionsToSearch) {
+
+			  // no event is enabled at an anti-condition
+			  if (cond.isAnti) continue;
+			  
+        // check whether condition max has an id that also occurs in the preConditions
+			  Integer putIndex = preConIndex.get(cond.id);
+			  if (putIndex == null) continue;
+			  
+        // consider only conditions which are NOT successors of a cutOff event
+        if (options_cutOffTermination_reachability
+            && (cond.pre != null && cond.pre.length > 0 && cond.pre[0].isCutOff))
+        {
+          continue;
+        }
+        
+        // put condition of the branching process to the corresponding index 
+        possibleMatchList[putIndex].addLast(cond);
+			}
+			
 		} else {
 			
 			// all nodes to search for cuts
-			for (DNode max : bp.getAllConditions())
-				for (int i=0; i<preConditions.length; i++)
-					if (max.id == preConditions[i].id)
-					{
-            // consider only conditions which are NOT successors of a cutOff event
-					  if (options_cutOffTermination_reachability
-					      && (max.pre != null && max.pre.length > 0 && max.pre[0].isCutOff))
-					  {
-					    continue;
-					  }
-					  
-						possibleMatches = possibleMatches.add(max);
-					}
+			for (DNode cond : bp.getAllConditions()) {
+			  
+        // no event is enabled at an anti-condition
+        if (cond.isAnti) continue;
+			  
+        // check whether condition max has an id that also occurs in the preConditions
+        Integer putIndex = preConIndex.get(cond.id);
+        if (putIndex == null) continue;
+        
+        // consider only conditions which are NOT successors of a cutOff event
+        if (options_cutOffTermination_reachability
+            && (cond.pre != null && cond.pre.length > 0 && cond.pre[0].isCutOff))
+        {
+          continue;
+        }
+        
+        // put condition of the branching process to the corresponding index 
+        possibleMatchList[putIndex].addLast(cond);
+			}
 		}
 		// possibleMatches contains all nodes of max BP that have the same
 		// ID as one of the preconditions, but which are not marked as cutOff 
@@ -378,20 +416,79 @@ public class DNodeBP {
 		
 		//System.out.println("possible matches: "+possibleMatches);
 		
+		long t2 = System.currentTimeMillis();
+		long size = 1;
+		int max = 0;
+		for (int i=0;i<possibleMatchList.length; i++) {
+		  size *= possibleMatchList[i].size();
+		  max = (max > possibleMatchList[i].size() ? max : possibleMatchList[i].size());
+		}
+		
+		System.out.print("#"+size+" < "+max+"^"+possibleMatchList.length+" in "+(t2-t1)+"ms ");
+		
 //System.out.println("  generate cuts from "+possibleMatches.length()+" conditions");
 		// the mapping possibleMatches now assigns each node of patternToFind
 		// possible candidate nodes for matching in the candidate set and uses
 		// at least one node from the partial cut
-		DNodeCutGenerator cgen = new DNodeCutGenerator(preConditions, possibleMatches,
+
+    LinkedList<DNode[]> result = new LinkedList<DNode[]>();
+		/*
+		DNodeCutGenerator cgen = new DNodeCutGenerator(preConditions, possibleMatchList,
 				coRelation);
-		LinkedList<DNode[]> result = new LinkedList<DNode[]>();
 		while (cgen.hasNext()) {
-//		  System.out.print(",");
+		  System.out.print(",");
 			result.add(cgen.next());
 		}
+		*/
+    result = generateCuts(possibleMatchList);
+		
+		long t3 = System.currentTimeMillis();
+    System.out.println(" found "+result.size()+" in "+(t3-t2)+"ms");
+    executionTimeProfile.append((t3-t0)+";"+size+";"+max+";"+(t2-t1)+";"+result.size()+";"+(t3-t2)+"\n");
+		
 //System.out.println("\n  done: "+result.size());		
 		return result;
 	}
+  
+  private LinkedList< DNode[] > generateCuts( LinkedList<DNode> possibleMatchList[] ) {
+    
+    if (possibleMatchList.length == 0) return new LinkedList<DNode[]>();
+    
+    LinkedList< DNode[] > partialCuts = new LinkedList<DNode[]>();
+    for (DNode d : possibleMatchList[0]) {
+      DNode[] pCut = new DNode[1]; pCut[0] = d;
+      partialCuts.addLast(pCut);
+    }
+    
+    for (int i=1; i< possibleMatchList.length; i++) {
+      partialCuts = extendByCo(partialCuts, possibleMatchList[i], i);
+    }
+    
+    return partialCuts;
+  }
+  
+  
+  private LinkedList< DNode[] > extendByCo( LinkedList< DNode[]> existingCo, LinkedList<DNode> newConditions, int size ) {
+    int newSize = size + 1;
+    LinkedList< DNode[] > extendedCo = new LinkedList<DNode[]>();
+    for (DNode[] partialCut : existingCo ) {
+      for (DNode bNew : newConditions) {
+        boolean inConflict = false;
+        for (int i=0;i<size; i++) {
+          if (!co.get(bNew).contains(partialCut[i])) {
+            inConflict = true; break;
+          }
+        }
+        if (!inConflict) {
+          DNode[] extendedCut = new DNode[newSize];
+          for (int i=0;i<size;i++) extendedCut[i] = partialCut[i];
+          extendedCut[size] = bNew;
+          extendedCo.addLast(extendedCut);
+        }
+      }
+    }
+    return extendedCo;
+  }
 
 	/**
 	 * Collect the events that are enabled in the current construction step
@@ -433,7 +530,7 @@ public class DNodeBP {
 			
 		  for (DNode[] cutNodes : cuts) {
 		    
-        //System.out.println("@ "+DNode.toString(cutNodes) +" ???");
+        //System.out.println("  @ "+DNode.toString(cutNodes) +" ???");
   
   			// see if this event is already present at the given cut
   
@@ -497,34 +594,70 @@ public class DNodeBP {
   				
   				assert loc[e.pre.length] != null : "Error, adding invalid enabling location";
   			
-  				//System.out.println("event is enabled");
+  				//System.out.println("  event is enabled");
   				if (lastEnabledID != e.id) {
   
-  					// this is the first event with "name"
-  					lastEnabledID = e.id;
-  					info.enablingLocation.addLast(loc);
-  					info.enabledEvents.addLast(e);
-  
-  					info.synchronizedEvents.addLast(null);
-  					
-  					// remember first entry of events with this name
-  					beginIDs = info.enabledEvents.size()-1;
+            // skip to fire any anti-event that occurs as first event at that location, i.e.
+            // the anti-event would not block any other event
+            if (!e.isAnti) {
+    					// this is the first event with "name"
+    					lastEnabledID = e.id;
+    					info.enablingLocation.addLast(loc);
+    					info.enabledEvents.addLast(e);
+    
+    					info.synchronizedEvents.addLast(null);
+    					
+    					// remember first entry of events with this name
+    					beginIDs = info.enabledEvents.size()-1;
+            }
+            
   				} else {
-  					
-  					int syncEntry = -1;
-  					for (int j=beginIDs; j<info.enablingLocation.size(); j++) {
-  						if (Arrays.equals(loc, info.enablingLocation.get(j))) {
-  							syncEntry = j;
-  							break;
-  						}
-  					}
-  					
+  				  
+  				  // we have multiple events with the same id that are enabled
+  				  // synchronize them properly
+  				  
+            // search for an event with the same ID to synchronize with
+            int syncEntry = -1;
+  				  
+  				  if (!e.isAnti) {
+  				    // history-based synchronization: two enabled events synchronize
+  				    // iff they have the same ID and occur at the same enabling location
+  				    // if they synchronize, their synchronized occurrence results in one event
+  				    // if they don't synchronize, each occurs as a separate event
+  				    
+    					for (int j=beginIDs; j<info.enablingLocation.size(); j++) {
+    						if (Arrays.equals(loc, info.enablingLocation.get(j))) {
+    							syncEntry = j;
+    							break;
+    						}
+    					}
+            } else {
+              // history-contained synchronization: two enabled events synchronize
+              // iff they have the same ID and one enabling location is contained in
+              // the other enabling location
+              
+              for (int j=beginIDs; j<info.enablingLocation.size(); j++) {
+                DNode[] otherLoc = info.enablingLocation.get(j);
+                if (containedIn(loc, otherLoc)) {
+                  syncEntry = j;
+                  break;
+                }
+              }
+            }
+  				  
+            // if there is a synchronizing event synchronize, their synchronized occurrence
+  				  // results in one event; if they don't synchronize, each occurs as a separate event
   					if (syncEntry == -1) {
-  						// this is the first event with "name" at this location
-  						info.enablingLocation.addLast(loc);
-  						info.enabledEvents.addLast(e);
-  
-  						info.synchronizedEvents.addLast(null);
+              // this is the first event with "name" at this location
+
+              // skip to fire any anti-event that occurs as first event at that location, i.e.
+  					  // the anti-event would not block any other event
+  					  if (!e.isAnti) {
+    						info.enablingLocation.addLast(loc);
+    						info.enabledEvents.addLast(e);
+    
+    						info.synchronizedEvents.addLast(null);
+  					  }
   						
   					} else {
   						// this is the second/n-th event with "name" at the same
@@ -545,12 +678,32 @@ public class DNodeBP {
   					}
   				}
   			} else {
-  			  //System.out.println("incomplete match");
+  			  //System.out.println("  incomplete match");
   			}
 		  } // for all cuts
 		}
-		
 		return info;
+	}
+	
+	private static boolean containedIn(DNode[] first, DNode[] second) {
+    
+	  for (int i=0,j=0; i < first.length; i++) {
+      // search in otherLoc for node with same id as loc[l]
+      while (j < second.length && first[i].id > second[j].id) j++;
+      if (j == second.length) return false; // not found
+
+      // now check whether first[i] == second[j], it may be that
+      // second contains another node with the same id, iterate
+      // over these but remember j
+      boolean match = false;
+      int j_offset = j;
+      while (j_offset < second.length && first[i].id == second[j_offset].id) {
+        if (first[i] == second[j_offset]) { match = true; break; }
+        j_offset++;
+      }
+      if (!match) return false;
+    }
+	  return true;
 	}
 	
 	/**
@@ -563,9 +716,25 @@ public class DNodeBP {
 		if (info.enabledEvents.size() == 0)
 			return 0;
 		
+		HashMap<Integer, LinkedList<Integer> > priorityQueue = new HashMap<Integer, LinkedList<Integer> >();
+		int maxSize = 0;
+		for (int i=0; i<info.enabledEvents.size(); i++) {
+		  int configSize = bp.getConfigSize(info.enablingLocation.get(i));
+		  maxSize = (maxSize > configSize ? maxSize : configSize);
+		  if (!priorityQueue.containsKey(configSize)) {
+		    priorityQueue.put(configSize, new LinkedList<Integer>() );
+		  }
+		  priorityQueue.get(configSize).addLast(i);
+		}
+		
 		int firedEvents = 0;
 		
-		for (int i=0; i<info.enabledEvents.size(); i++) {
+		//for (int fireIndex=0; fireIndex<info.enabledEvents.size(); fireIndex++) {
+		for (int i=0;i<=maxSize;i++)
+		{
+		 if (!priorityQueue.containsKey(i)) continue;
+		 // fire all events with priority i
+		 for (Integer fireIndex : priorityQueue.get(i)) {
 
 			// flag, set to true iff this event corresponds to an event of an anti-oclet,
 			// in this case the event will be added to the branching process (BP) but no
@@ -580,10 +749,10 @@ public class DNodeBP {
 			// firing this event
 			DNode[] postConditions = null;
 			
-			if (info.synchronizedEvents.get(i) == null) {
+			if (info.synchronizedEvents.get(fireIndex) == null) {
 
 				//System.out.println("fire "+info.enabledEvents.get(i)+ " at "+DNode.toString(info.enablingLocation.get(i)));
-				DNode e = info.enabledEvents.get(i);
+				DNode e = info.enabledEvents.get(fireIndex);
 
 				if (e.isAnti) {
 					// remember that this event was an anti-event
@@ -593,11 +762,11 @@ public class DNodeBP {
 				if (e.isHot) {
 				  setHot = true;
 				}
-				postConditions = bp.fire(e, info.enablingLocation.get(i));
+				postConditions = bp.fire(e, info.enablingLocation.get(fireIndex));
 
 			} else {
-				DNode events[] = new DNode[info.synchronizedEvents.get(i).size()];
-				events = info.synchronizedEvents.get(i).toArray(events);
+				DNode events[] = new DNode[info.synchronizedEvents.get(fireIndex).size()];
+				events = info.synchronizedEvents.get(fireIndex).toArray(events);
 
 				//System.out.println("fire "+DNode.toString(events)+ " at "+DNode.toString(info.enablingLocation.get(i)));
 				for (int j=0;j<events.length;j++) {
@@ -611,7 +780,7 @@ public class DNodeBP {
 					  setHot = true;
 					}
 				}
-				postConditions = bp.fire(events, info.enablingLocation.get(i));
+				postConditions = bp.fire(events, info.enablingLocation.get(fireIndex));
 			}
 			
 			// we did not fire this event
@@ -666,6 +835,7 @@ public class DNodeBP {
 			
 			if (options_checkProperties)
 				checkProperties();
+		 }
 		}
 		return firedEvents;
 	}
@@ -758,8 +928,8 @@ public class DNodeBP {
   
   /**
    * Set fields {@link #currentPrimeCut} {@link #currentPrimeConfig} and update
-   * fields {@link #primeConfigurationSize} and {@link #primeConfigurationHash}
-   * for 'event' that has just been fired.
+   * fields {@link #primeConfigurationSize}, {@link #primeConfigurationHash}, and
+   * {@link #primeConfigurationString} for 'event' that has just been fired.
    * 
    * @param event
    */
@@ -778,6 +948,20 @@ public class DNodeBP {
     
     primeConfigurationSize.put(event, currentConfigSize);
     primeConfigurationHash.put(event, hashCut(currentPrimeCut));
+    
+//    DNode[] currentPrimeConfig_sorted = new DNode[currentPrimeConfig.size()];
+//    currentPrimeConfig.toArray(currentPrimeConfig_sorted);
+//    DNode.sortIDs(currentPrimeConfig_sorted);
+    
+    short[] currentPrimeConfigIDs = new short[currentPrimeConfig.size()];
+    int i = 0;
+    for (DNode e : currentPrimeConfig) {
+      currentPrimeConfigIDs[i++] = e.id;
+    }
+    Arrays.sort(currentPrimeConfigIDs);
+    
+    //primeConfigurationString.put(event, getLexicographicString_acc(currentPrimeConfig));
+    primeConfigurationString.put(event, currentPrimeConfigIDs);
   }
   
   /**
@@ -1477,6 +1661,73 @@ public class DNodeBP {
 	  return false;
 	}
 	
+	 /**
+   * Compare two prime configurations of equal size whether one is lexicographically
+   * smaller than the other.
+   * 
+   * @param oldConfigIDs
+   * @param newConfigIDs
+   * @return <code>true</code> iff oldConfig is smaller than newConfig
+   */
+  private boolean isSmaller_lexicographic(short[] oldConfigIDs, short[] newConfigIDs) {
+    if (options_searchStrat_lexicographic == false) return false;
+    if (oldConfigIDs.length != newConfigIDs.length) {
+      System.err.println("Error: lexicographically comparing configurations of different size");
+      return false;
+    }
+
+    // both configurations have same size by assumption
+    // iterate over the ID-sorted configurations and compare configs lexicographically
+    for (int i=0; i<oldConfigIDs.length; i++) {
+      // old is smaller than new at the first difference
+      if (oldConfigIDs[i] < newConfigIDs[i]) { return true; }
+      // old is larger than new at the first difference
+      if (oldConfigIDs[i] > newConfigIDs[i]) { return false; }
+    }
+    // old and new are equal until the end
+    return false;
+  }
+	
+	 /**
+   * Compare two prime configurations of equal size whether one is lexicographically
+   * smaller than the other.
+   * 
+   * @param oldConfig
+   * @param newConfig
+   * @return <code>true</code> iff oldConfig is smaller than newConfig
+   */
+  private boolean isSmaller_lexicographic_acc(byte[] oldConfig, byte[] newConfig) {
+    if (options_searchStrat_lexicographic == false) return false;
+
+    // both configurations have same size by assumption
+    // iterate over the ID-sorted configurations and compare configs lexicographically
+    for (int eventID=0; eventID<oldConfig.length; eventID++) {
+      // old has more smaller events than new at the first difference, old is smaller
+      if (oldConfig[eventID] > newConfig[eventID]) { return true; }
+      // old has less smaller events than new at the first difference, old is larger
+      if (oldConfig[eventID] < newConfig[eventID]) { return false; }
+    }
+    // old and new are equal until the end
+    return false;
+  }
+  
+  /**
+   * @param configuration
+   * @return an id-sorted array telling for each event-id how of the event
+   * occurs in the given configuration
+   */
+  private byte[] getLexicographicString_acc(HashSet<DNode> configuration) {
+    byte[] lstring = new byte[dNodeAS.fireableEventIndex.size()];
+    for (DNode e : configuration) {
+      lstring[dNodeAS.fireableEventIndex.get(e.id)]++;
+    }
+    return lstring;
+  }
+	
+	/**
+	 * @param cut
+	 * @return hash value of the given cut
+	 */
 	private int hashCut(DNode[] cut) {
 	  int result = 0;
 	  int exp = 1;
@@ -1488,6 +1739,8 @@ public class DNodeBP {
 	}
 	
 	HashMap<DNode, Integer> primeConfigurationSize = new HashMap<DNode, Integer>();
+	
+	HashMap<DNode, short[]> primeConfigurationString = new HashMap<DNode, short[]>();
 	
 	HashMap<DNode, Integer> primeConfigurationHash = new HashMap<DNode, Integer>();
 	
@@ -1517,7 +1770,7 @@ public class DNodeBP {
 		
 		// compute the lexikographic string that represents the prime configuration
 		// of 'newEvent'
-    DNode[] currentPrimeConfig_sorted = null;
+//    DNode[] currentPrimeConfig_sorted = null;
     int newEventHash = primeConfigurationHash.get(newEvent);
 		
 		Iterator<DNode> it = eventsToCompare.iterator();
@@ -1527,9 +1780,12 @@ public class DNodeBP {
 			// do not check the event that has just been added
 			// the cuts would be equal...
 			if (e == newEvent) continue;
-			
+			  
       // newCut is only equivalent to oldCut if the configuration of newCut
       // is (lexicographically) larger than the configuration of oldCut
+      if (!primeConfigurationSize.containsKey(e)) {
+        continue;
+      }
       if (newCutConfigSize < primeConfigurationSize.get(e)) {
         // the old one is larger, not equivalent
         continue;
@@ -1548,20 +1804,20 @@ public class DNodeBP {
         // if not lexicographic, cannot be cut-off
 			  if (!options_searchStrat_lexicographic) continue;
 			  
-			  // compute sorted prime config only when really needed
-			  if (currentPrimeConfig_sorted == null) {
-			    currentPrimeConfig_sorted = new DNode[currentPrimeConfig.size()];
-			    currentPrimeConfig.toArray(currentPrimeConfig_sorted);
-			    DNode.sortIDs(currentPrimeConfig_sorted);
-			  }
-			  
- 	      HashSet<DNode> oldPrimeConfig = bp.getPrimeConfiguration;
- 	      DNode[] oldPrimeConfig_sorted = new DNode[oldPrimeConfig.size()];
- 	      oldPrimeConfig.toArray(oldPrimeConfig_sorted);
- 	      DNode.sortIDs(oldPrimeConfig_sorted);
-			  
-			  if (!isSmaller_lexicographic(oldPrimeConfig_sorted, currentPrimeConfig_sorted))
-			    continue;
+//			  // compute sorted prime config only when really needed
+//			  if (currentPrimeConfig_sorted == null) {
+//			    currentPrimeConfig_sorted = new DNode[currentPrimeConfig.size()];
+//			    currentPrimeConfig.toArray(currentPrimeConfig_sorted);
+//			    DNode.sortIDs(currentPrimeConfig_sorted);
+//			  }
+//			  
+// 	      HashSet<DNode> oldPrimeConfig = bp.getPrimeConfiguration;
+// 	      DNode[] oldPrimeConfig_sorted = new DNode[oldPrimeConfig.size()];
+// 	      oldPrimeConfig.toArray(oldPrimeConfig_sorted);
+// 	      DNode.sortIDs(oldPrimeConfig_sorted);
+        
+        if (!isSmaller_lexicographic(primeConfigurationString.get(e), primeConfigurationString.get(newEvent)))
+          continue;
 			}
 			
 			if (newCut.length == oldCut.length)
@@ -1573,6 +1829,15 @@ public class DNodeBP {
 		}
 		
 		return false;
+	}
+	
+	private static String toString(short[] array) {
+	  String result = "[";
+	  for (int i=0;i<array.length;i++) {
+	    if (i > 0) result += ",";
+	    result+=array[i];
+	  }
+	  return result+"]";
 	}
 
 	/**

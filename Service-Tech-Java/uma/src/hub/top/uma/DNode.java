@@ -18,6 +18,7 @@
 package hub.top.uma;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 
 /**
@@ -254,7 +255,7 @@ public class DNode {
 	 */
 	@Override
 	public String toString() {
-		return "'"+translationTable.properNames[this.id]+"' ("+this.id+")["+this.globalId+"]"; 
+		return "'"+translationTable.properNames[this.id]+"' ("+this.id+")["+this.globalId+"]" + (isAnti ? "-" : ""); 
 	}
 
 	
@@ -491,5 +492,14 @@ public class DNode {
 	    result[i++] = d;
 	  return result;
 	}
+	
+  
+  public static Comparator<DNode> compare = new Comparator<DNode>() {
+    public int compare(DNode o1, DNode o2) {
+      if (o1.id < o2.id) return -1;
+      if (o1.id == o2.id) return 0;
+      return 1;
+    }
+  };
 	
 }

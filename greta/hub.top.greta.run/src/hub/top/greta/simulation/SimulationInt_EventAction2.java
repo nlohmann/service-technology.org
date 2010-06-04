@@ -41,6 +41,7 @@ import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.Temp;
+import hub.top.greta.run.actions.ActionHelper;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeBP_Scenario;
@@ -50,6 +51,7 @@ import hub.top.uma.DNodeSys_AdaptiveSystem;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CommandStack;
 import org.eclipse.emf.common.util.BasicEList;
@@ -57,6 +59,8 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.edit.command.DeleteCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IFileEditorInput;
 
 public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
 
@@ -86,12 +90,15 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
     return SimulationInt_EventAction2.ID;
   }
 	
+  //private static int simulatioStepNum = 0;  // for debugging purposes
+  
   /**
    * @see hub.top.greta.simulation.SimulationInteractiveAction#extendAdaptiveProcess()
    */
   @Override
 	protected void extendAdaptiveProcess() {
-
+    //System.out.println("step!");
+    
     // some pre-processing to clear situation from previous step
     
     // delete the nodes that are not part of the process instance
@@ -110,9 +117,31 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
     DNodeBP bp = new DNodeBP_Scenario(system);
     bp.configure_buildOnly();
     
+// for debugging
+//    IEditorInput in = simView.processViewEditor.getEditorInput();
+//    IFile inFile = null;
+//    if (in instanceof IFileEditorInput) {
+//      IFileEditorInput fileIn = (IFileEditorInput) in;
+//      inFile = fileIn.getFile();
+//    }
+//
+//    if (inFile != null) {
+//      ActionHelper.writeDotFile(bp, inFile, "_"+Integer.toString(simulatioStepNum)+"_history");
+//      simulatioStepNum++;
+//
+//    }
+    
     // let Uma compute one step = fire all events that are enabled at the end
     // of the current process instance
     int eventNum = bp.step();
+    
+// for debugging
+//    if (inFile != null) {
+//      ActionHelper.writeDotFile(bp, inFile, "_"+Integer.toString(simulatioStepNum)+"_enabled");
+//      simulatioStepNum++;
+//    }
+    
+    //System.out.println("fired "+eventNum+" events");
 
     // visualize all fired events 
     if (eventNum > 0) {
@@ -183,12 +212,15 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
     // remove all events that had been added temporarily to the process
     // instance to show enabling information
     for (Node n : newNodes) {
-      // keep all events that show alternatives that could not be taken
-      if (n.isDisabledByAntiOclet()) continue;
-      if (n.isDisabledByConflict()) continue;
       // keep the event that was fired and its postconditions
       if (n == e) continue;
       if (e.getPostSet().contains(n)) continue;
+
+      // TODO: make configurable, which nodes are preserved
+      // keep all events that show alternatives that could not be taken
+      //if (n.isDisabledByAntiOclet()) continue;
+      //if (n.isDisabledByConflict()) continue;
+      
       // delete everything else
       toDelete.add(n);
     }

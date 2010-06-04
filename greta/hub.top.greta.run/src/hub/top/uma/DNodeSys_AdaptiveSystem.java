@@ -90,14 +90,20 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 		nodeOrigin = new HashMap<DNode, Node>(nodeNum);
 		ocletEncoding = new HashMap<Oclet, DNodeSet>(as.getOclets().size());
 		
-		// then translate all oclets
+		// then translate all oclets, first normal oclets, then anti-oclets
 		for (Oclet o : as.getOclets())
-			ocletEncoding.put(o, buildDNodeRepresentation(o));
+		  if (o.getOrientation() == Orientation.NORMAL)
+		    ocletEncoding.put(o, buildDNodeRepresentation(o));
+	  for (Oclet o : as.getOclets())
+	    if (o.getOrientation() == Orientation.ANTI)
+	      ocletEncoding.put(o, buildDNodeRepresentation(o));
+	  
 		// and the adaptive process
 		initialRun = buildDNodeRepresentation(as.getAdaptiveProcess());
 		
 		finalize_setPreConditions();
 		finalize_initialRun();
+		finalize_generateIndexes();
 	}
 
 	/**
@@ -243,23 +249,17 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 			if (nodeEncoding.containsKey(n))	// node was already translated, skip
 				continue;
 			
-			LinkedList<Node> preNodes = new LinkedList<Node>();
-			int postSize;
-			if (n instanceof Event) {
-				Event e = (Event)n;
-				preNodes.addAll(e.getPreConditions());
-				postSize = e.getPostConditions().size();
-			} else {
-				Condition b = (Condition)n;
-				preNodes.addAll(b.getPreEvents());
-				postSize = b.getPostEvents().size();
-			}
+      // save the predecessors of node n in an array
+      DNode pre[] = new DNode[n.getPreSet().size()];
+      for (int i=0; i<pre.length; i++) {
+        pre[i] = nodeEncoding.get(n.getPreSet().get(i));
+      }
 			
-			// save the predecessors of node n in an array
-			DNode pre[] = new DNode[preNodes.size()];
-			for (int i=0; i<pre.length; i++) {
-				pre[i] = nodeEncoding.get(preNodes.get(i));
-			}
+			// count all successors that will be translated to a DNode
+			int postSize = 0; 
+      for (Node postNode : n.getPostSet()) {
+        if (depth.containsKey(postNode)) postSize++;
+      }
 			
 			// create new DNode d for Node n
 			DNode d = new DNode(nameToID.get(n.getName()), pre);

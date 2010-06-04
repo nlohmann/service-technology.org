@@ -40,6 +40,7 @@ import hub.top.uma.DNode;
 import hub.top.uma.DNodeCutGenerator;
 import hub.top.uma.DNodeSys_AdaptiveSystem;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -146,7 +147,7 @@ public class DNodeBP_Scenario extends DNodeBP {
           
           // check if these preconditions extend to an occurrence of the
           // entire history
-          DNode.SortedLinearList possibleMatches = new DNode.SortedLinearList();          
+          LinkedList<DNode> possibleMatches = new LinkedList<DNode>();          
           for (DNode b : e.pre) {
             if (preSetInHist.contains(b.id)) {
               // already found the matching condition for the place with id == b.id
@@ -167,12 +168,15 @@ public class DNodeBP_Scenario extends DNodeBP {
             for (int iCut=0; iCut<hist.length; iCut++) {
               if (max.id == hist[iCut].id)
               {
-                possibleMatches = possibleMatches.add(max);
+                possibleMatches.add(max);
               }
             }
           }
           // possible matches contains all conditions that may extend to
           // a cut which ends with 'hist'
+          
+          // TODO: adapt algorithmic solution from DNodeBP#findEnablingCuts() 
+          Collections.sort(possibleMatches, DNode.compare);
           
           boolean histNotFound = false;
           // get the cuts

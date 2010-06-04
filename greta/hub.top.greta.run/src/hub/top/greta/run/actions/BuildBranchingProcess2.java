@@ -181,12 +181,4 @@ public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
 	    }
 	}
 
-	@SuppressWarnings("unused")
-  private void writeDotFile (DNodeBP bp, IFile inputFile, String suffix) {
-
-		String targetPathStr = inputFile.getFullPath().removeFileExtension().toString();
-		IPath targetPath = new Path(targetPathStr+suffix+".dot");
-
-		ActionHelper.writeFile (targetPath, bp.toDot());
-	}
 }

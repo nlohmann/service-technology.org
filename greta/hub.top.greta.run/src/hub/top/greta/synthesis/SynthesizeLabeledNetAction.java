@@ -41,6 +41,7 @@ import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.greta.run.actions.ActionHelper;
 import hub.top.greta.verification.BuildBP;
+import hub.top.greta.verification.IOUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -125,6 +126,8 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
 
           PtNet net = NetSynthesis.foldToNet_labeled(build.getBranchingProcess());
           IPath targetPath = selectedFile.getFullPath().removeFileExtension().addFileExtension("ptnet");
+          
+          build.writeBPtoFile(monitor, null, "_synbp");
           
           TransactionalEditingDomain editing = GMFEditingDomainFactory.INSTANCE.createEditingDomain();
           FileIOHelper.writeEObjectToResource(net, editing, targetPath);

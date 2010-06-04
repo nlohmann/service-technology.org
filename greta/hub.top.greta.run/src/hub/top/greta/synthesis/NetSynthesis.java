@@ -73,13 +73,13 @@ public class NetSynthesis {
     bp.printEquivalenceRelation();
     
     try {
-      bp.minimize();
+      //bp.minimize();
       bp.relax();
     } catch (NullPointerException e) {
       
     }
     
-    bp.printEquivalenceRelation();
+    //bp.printEquivalenceRelation();
     
     DNodeSys dAS = bp.getSystem();
     DNodeSet dBP = bp.getBranchingProcess();
@@ -94,6 +94,9 @@ public class NetSynthesis {
     PtNet net = fact.createPtNet();
     
     for (DNode b: dBP.getAllConditions()) {
+      if (b.isAnti && b.isHot)
+        continue;
+      
       if (equiv.get(b) == null || equiv.get(b) == b) {
         Place p = fact.createPlace();
         p.setName(dAS.properNames[b.id]+"_"+b.globalId);
@@ -109,12 +112,18 @@ public class NetSynthesis {
     // now map each condition that has an equivalent counterpart to
     // the place that represents this counterpart
     for (DNode b: dBP.getAllConditions()) {
+      if (b.isAnti && b.isHot)
+        continue;
+
       if (equiv.get(b) != null && equiv.get(b) != b && !b.isAnti) {
         d2n.put(b, d2n.get(equiv.get(b)));
       }
     }
 
     for (DNode e : dBP.getAllEvents()) {
+      
+      if (e.isAnti && e.isHot)
+        continue;
       
       if (!e.isCutOff || equiv.get(e) == e) {
         Transition t = fact.createTransition();

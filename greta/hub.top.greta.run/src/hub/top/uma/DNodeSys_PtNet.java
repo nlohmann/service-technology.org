@@ -87,6 +87,7 @@ public class DNodeSys_PtNet extends DNodeSys {
 		
 		finalize_setPreConditions();
 		finalize_initialRun();
+		finalize_generateIndexes();
 	}
 	
 	/**

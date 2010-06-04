@@ -42,6 +42,7 @@ import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
 import hub.top.adaptiveSystem.presentation.AdaptiveSystemEditor;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.greta.run.Activator;
+import hub.top.uma.DNodeBP;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -55,6 +56,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -274,4 +276,19 @@ public class ActionHelper {
 		ByteArrayInputStream cStream = new ByteArrayInputStream(contents.getBytes());
 		writeFile(targetPath, cStream);
 	}
+	
+
+	/**
+	 * Write given {@link DNodeBP} as dot graphics and write it at the given location.
+	 * @param bp
+	 * @param inputFile
+	 * @param suffix
+	 */
+  public static void writeDotFile (DNodeBP bp, IFile inputFile, String suffix) {
+
+    String targetPathStr = inputFile.getFullPath().removeFileExtension().toString();
+    IPath targetPath = new Path(targetPathStr+suffix+".dot");
+
+    ActionHelper.writeFile (targetPath, bp.toDot());
+  }
 }

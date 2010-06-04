@@ -35,6 +35,7 @@
 
 package hub.top.greta.verification;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.LinkedList;
 
@@ -42,6 +43,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import hub.top.adaptiveSystem.AdaptiveSystem;
+import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.uma.DNodeBP_Scenario;
 import hub.top.uma.DNodeSys_PtNet;
@@ -220,6 +222,11 @@ public class BuildBP {
     if (srcFile != null) {
       monitor.subTask("writing dot file");
       IOUtil.writeDotFile(bp, srcFile, outFileAppendix);
+      try {
+        FileIOHelper.writeFile(srcFile.getRawLocation()+outFileAppendix+".csv", bp.executionTimeProfile.toString());
+      } catch (IOException e) {
+        
+      }
       return true;
     }
     return false;

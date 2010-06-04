@@ -309,7 +309,7 @@ public class InstantiateSystem implements IWorkbenchWindowActionDelegate {
     HashMap<String, Integer> max = new HashMap<String, Integer>();
     parameters.add(parameter);
     min.put(parameter, paramRange_min);
-    max.put(parameter, paramRange_min);
+    max.put(parameter, paramRange_max);
     
     return instantiateSystem(adaptiveSystem, parameters, min, max);
     

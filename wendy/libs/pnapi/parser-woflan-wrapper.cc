@@ -12,6 +12,7 @@
 #include "petrinet.h"
 
 #include <cstring>
+#include <cstdlib>
 #include <sstream>
 
 using std::cout;
@@ -80,5 +81,6 @@ Parser::Parser() :
   capacity_(0), needLabel(false)
 {
 }
+
 
 } } } /* namespace pnapi::parser::lola */

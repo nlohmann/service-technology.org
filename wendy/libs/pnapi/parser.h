@@ -16,6 +16,7 @@
 #include "petrinet.h"
 #include "port.h"
 #include "state.h"
+#include "exception.h"
 
 #include <sstream>
 #include <vector>
@@ -60,6 +61,8 @@ public: /* public methods */
   void check(bool, const std::string &);
   /// parses stream contents with the associated parser
   const PetriNet & parse(std::istream &);
+  /// rethrow a caught exception as InputError
+  void rethrow(const exception::Error &);
   
 protected: /* protected methods */
   /// make this class abstract
@@ -171,13 +174,24 @@ const PetriNet & AbstractParser<P, L, C>::parse(std::istream & is)
   return net_;
 }
 
+/*!
+ * \brief rethrow a caught exception as InputError
+ */
+template <class P, class L, class C>
+void AbstractParser<P, L, C>::rethrow(const exception::Error & e)
+{
+  throw exception::InputError(exception::InputError::SEMANTIC_ERROR, 
+                              io::util::MetaData::data(*is_)[io::INPUTFILE],
+                              lexer_.lineno(), lexer_.YYText(), e.message);
+}
+
 
 /*!
  * \brief constructor
  */
 template <class P, class Bst, class F>
 AbstractLexer<P, Bst, F>::AbstractLexer(P & p) :
-  F(), yylval(NULL), parser_(p)
+  F(), parser_(p), yylval(NULL)
 {
 }
 

@@ -4,6 +4,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "component.h"
 #include "formula.h"
 #include "marking.h"
@@ -12,6 +14,7 @@
 #include <iostream>
 
 using std::cout;
+using std::cerr;
 using std::endl;
 using std::map;
 using std::set;
@@ -142,7 +145,7 @@ Operator::Operator(const Formula & l, const Formula & r)
     {
       if (child1 != NULL)
       {
-        assert(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
+        PNAPI_ASSERT(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
       }
       child1 = child2;
     }
@@ -170,7 +173,7 @@ Operator::Operator(const std::set<const Formula *> & children,
     if (child2 != NULL)
     {
       if (child1 != NULL)
-        assert(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
+        PNAPI_ASSERT(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
       child1 = child2;
     }
   }
@@ -275,14 +278,21 @@ Disjunction::Disjunction(const Disjunction & d) :
   simplifyChildren();
 }
 
+/// constructor needed by evaluatePlace and replacePlace
+Disjunction::Disjunction()
+{
+}
+
 /*!
  * \brief constructor
  */
 Proposition::Proposition(const Place & p, unsigned int k,
                          const std::map<const Place *, const Place *> * places) :
-  place_((places == NULL) ? p : (*places->find(&p)->second)), tokens_(k)
+  place_((places == NULL) ? p :
+         (PNAPI_ASSERT((places->find(&p) != places->end()) && (places->find(&p)->second != NULL)),
+          (*places->find(&p)->second))),
+  tokens_(k)
 {
-  assert((places == NULL) || (places->find(&p)->second != NULL));
 }
 
 /*!
@@ -1319,6 +1329,723 @@ Formula * Disjunction::dnf() const
   }
   
   return result;
+}
+
+
+/**************************************************************************
+ ***** evaluate Place implementation
+ **************************************************************************/
+
+/*!
+ * \brief evaluates the formula partially and replaces propositions by constants
+ */
+Formula * Formula::evaluatePlace(const Place &) const
+{
+  return clone();
+}
+
+/*!
+ * \brief evaluates the formula partially and replaces propositions by constants
+ */
+Formula * Negation::evaluatePlace(const Place & p) const
+{
+  Formula * tmp = (*(children_.begin()))->evaluatePlace(p);
+  Negation * result = new Negation(*tmp);
+  delete tmp;
+  return result;
+}
+
+/*!
+ * \brief evaluates the formula partially and replaces propositions by constants
+ */
+Formula * Conjunction::evaluatePlace(const Place & p) const
+{
+  Conjunction * result = new Conjunction();
+  
+  PNAPI_FOREACH(f, children_)
+  {
+    result->children_.insert((*f)->evaluatePlace(p));
+  }
+  
+  return result;
+}
+
+/*!
+ * \brief evaluates the formula partially and replaces propositions by constants
+ */
+Formula * Disjunction::evaluatePlace(const Place & p) const
+{
+  Disjunction * result = new Disjunction();
+  
+  PNAPI_FOREACH(f, children_)
+  {
+    result->children_.insert((*f)->evaluatePlace(p));
+  }
+  
+  return result;
+}
+
+/*!
+ * \brief evaluates the formula partially and replaces propositions by constants
+ */
+Formula * FormulaEqual::evaluatePlace(const Place & p) const
+{
+  if(&place_ != &p)
+  {
+    return clone();
+  }
+  
+  if(p.getTokenCount() == tokens_)
+  {
+    return new FormulaTrue();
+  }
+  else
+  {
+    return new FormulaFalse();
+  }
+}
+
+/*!
+ * \brief evaluates the formula partially and replaces propositions by constants
+ */
+Formula * FormulaNotEqual::evaluatePlace(const Place & p) const
+{
+  if(&place_ != &p)
+  {
+    return clone();
+  }
+  
+  if(p.getTokenCount() != tokens_)
+  {
+    return new FormulaTrue();
+  }
+  else
+  {
+    return new FormulaFalse();
+  }
+}
+
+/*!
+ * \brief evaluates the formula partially and replaces propositions by constants
+ */
+Formula * FormulaGreater::evaluatePlace(const Place & p) const
+{
+  if(&place_ != &p)
+  {
+    return clone();
+  }
+  
+  if(p.getTokenCount() > tokens_)
+  {
+    return new FormulaTrue();
+  }
+  else
+  {
+    return new FormulaFalse();
+  }
+}
+
+/*!
+ * \brief evaluates the formula partially and replaces propositions by constants
+ */
+Formula * FormulaGreaterEqual::evaluatePlace(const Place & p) const
+{
+  if(&place_ != &p)
+  {
+    return clone();
+  }
+  
+  if(p.getTokenCount() >= tokens_)
+  {
+    return new FormulaTrue();
+  }
+  else
+  {
+    return new FormulaFalse();
+  }
+}
+
+/*!
+ * \brief evaluates the formula partially and replaces propositions by constants
+ */
+Formula * FormulaLess::evaluatePlace(const Place & p) const
+{
+  if(&place_ != &p)
+  {
+    return clone();
+  }
+  
+  if(p.getTokenCount() < tokens_)
+  {
+    return new FormulaTrue();
+  }
+  else
+  {
+    return new FormulaFalse();
+  }
+}
+
+/*!
+ * \brief evaluates the formula partially and replaces propositions by constants
+ */
+Formula * FormulaLessEqual::evaluatePlace(const Place & p) const
+{
+  if(&place_ != &p)
+  {
+    return clone();
+  }
+  
+  if(p.getTokenCount() <= tokens_)
+  {
+    return new FormulaTrue();
+  }
+  else
+  {
+    return new FormulaFalse();
+  }
+}
+
+
+/**************************************************************************
+ ***** replacePlace implementation
+ **************************************************************************/
+
+/*!
+ * \brief replace place references
+ */
+Formula * Formula::replacePlace(const Place &, const Place &) const
+{
+  return clone();
+}
+
+/*!
+ * \brief replace place references
+ */
+Formula * Negation::replacePlace(const Place & p1, const Place & p2) const
+{
+  Formula * tmp = (*(children_.begin()))->replacePlace(p1, p2);
+  Negation * result = new Negation(*tmp);
+  delete tmp;
+  return result;
+}
+
+/*!
+ * \brief replace place references
+ */
+Formula * Conjunction::replacePlace(const Place & p1, const Place & p2) const
+{
+  Conjunction * result = new Conjunction();
+  PNAPI_FOREACH(f, children_)
+  {
+    result->children_.insert((*f)->replacePlace(p1, p2));
+  }
+  return result;
+}
+
+/*!
+ * \brief replace place references
+ */
+Formula * Disjunction::replacePlace(const Place & p1, const Place & p2) const
+{
+  Disjunction * result = new Disjunction();
+  PNAPI_FOREACH(f, children_)
+  {
+    result->children_.insert((*f)->replacePlace(p1, p2));
+  }
+  return result;
+}
+
+/*!
+ * \brief replace place references
+ */
+Formula * FormulaEqual::replacePlace(const Place & p1, const Place & p2) const
+{
+  if(&place_ == &p1)
+  {
+    return new FormulaEqual(p2, tokens_);
+  }
+  
+  return clone();
+}
+
+/*!
+ * \brief replace place references
+ */
+Formula * FormulaNotEqual::replacePlace(const Place & p1, const Place & p2) const
+{
+  if(&place_ == &p1)
+  {
+    return new FormulaNotEqual(p2, tokens_);
+  }
+  
+  return clone();
+}
+
+/*!
+ * \brief replace place references
+ */
+Formula * FormulaGreater::replacePlace(const Place & p1, const Place & p2) const
+{
+  if(&place_ == &p1)
+  {
+    return new FormulaGreater(p2, tokens_);
+  }
+  
+  return clone();
+}
+
+/*!
+ * \brief replace place references
+ */
+Formula * FormulaGreaterEqual::replacePlace(const Place & p1, const Place & p2) const
+{
+  if(&place_ == &p1)
+  {
+    return new FormulaGreaterEqual(p2, tokens_);
+  }
+  
+  return clone();
+}
+
+/*!
+ * \brief replace place references
+ */
+Formula * FormulaLess::replacePlace(const Place & p1, const Place & p2) const
+{
+  if(&place_ == &p1)
+  {
+    return new FormulaLess(p2, tokens_);
+  }
+  
+  return clone();
+}
+
+/*!
+ * \brief replace place references
+ */
+Formula * FormulaLessEqual::replacePlace(const Place & p1, const Place & p2) const
+{
+  if(&place_ == &p1)
+  {
+    return new FormulaLessEqual(p2, tokens_);
+  }
+  
+  return clone();
+}
+
+
+/**************************************************************************
+ ***** getPlaceInterval implementation
+ **************************************************************************/
+
+/*!
+ * \brief get the valid interval of a place
+ */
+Interval Negation::getPlaceInterval(const Place & p) const
+{
+  Formula * tmp = (*(children_.begin()))->negate();
+  Interval result = tmp->getPlaceInterval(p);
+  delete tmp;
+  return result;
+}
+
+/*!
+ * \brief get the valid interval of a place
+ */
+Interval Conjunction::getPlaceInterval(const Place & p) const
+{
+  Interval result(0, -2);
+  
+  PNAPI_FOREACH(f, children_)
+  {
+    result = result && (*f)->getPlaceInterval(p);
+  }
+  
+  return result;
+}
+
+/*!
+ * \brief get the valid interval of a place
+ */
+Interval Disjunction::getPlaceInterval(const Place & p) const
+{
+  Interval result(0, -1);
+  PNAPI_FOREACH(f, children_)
+  {
+    result = result || (*f)->getPlaceInterval(p);
+  }
+  
+  return result;
+}
+
+/*!
+ * \brief get the valid interval of a place
+ */
+Interval FormulaTrue::getPlaceInterval(const Place & p) const
+{
+  return Interval();
+}
+
+/*!
+ * \brief get the valid interval of a place
+ */
+Interval FormulaFalse::getPlaceInterval(const Place & p) const
+{
+  return Interval(0, -1);
+}
+
+/*!
+ * \brief get the valid interval of a place
+ */
+Interval FormulaEqual::getPlaceInterval(const Place & p) const
+{
+  if(&p == &place_)
+  {
+    return Interval(tokens_, tokens_);
+  }
+  
+  return Interval();
+}
+
+/*!
+ * \brief get the valid interval of a place
+ */
+Interval FormulaNotEqual::getPlaceInterval(const Place & p) const
+{
+  if(&p == &place_)
+  {
+    Interval result;
+    result.exclude(tokens_, tokens_);
+    return result;
+  }
+  
+  return Interval();
+}
+
+/*!
+ * \brief get the valid interval of a place
+ */
+Interval FormulaGreater::getPlaceInterval(const Place & p) const
+{
+  if(&p == &place_)
+  {
+    return Interval(tokens_ + 1, -2);
+  }
+  
+  return Interval();
+}
+
+/*!
+ * \brief get the valid interval of a place
+ */
+Interval FormulaGreaterEqual::getPlaceInterval(const Place & p) const
+{
+  if(&p == &place_)
+  {
+    return Interval(tokens_, -2);
+  }
+  
+  return Interval();
+}
+
+/*!
+ * \brief get the valid interval of a place
+ */
+Interval FormulaLess::getPlaceInterval(const Place & p) const
+{
+  if(&p == &place_)
+  {
+    return Interval(0, tokens_ - 1);
+  }
+  
+  return Interval();
+}
+
+/*!
+ * \brief get the valid interval of a place
+ */
+Interval FormulaLessEqual::getPlaceInterval(const Place & p) const
+{
+  if(&p == &place_)
+  {
+    return Interval(0, tokens_);
+  }
+  
+  return Interval();
+}
+
+
+/**************************************************************************
+ ***** Interval implementation
+ **************************************************************************/
+
+/*!
+ * \brief constructor
+ */
+Interval::Interval(int lower, int upper) :
+  lower_(lower), upper_(upper)
+{
+}
+
+/*!
+ * \brief exclude an interval
+ */
+void Interval::exclude(int lower, int upper)
+{
+  if( ((upper_ != -2) && (upper >= upper_)) ||
+      (upper == -2))
+  {
+    upper_ = (((upper_ != -2) && (upper_ < lower - 1)) ? upper_ : (lower - 1));
+    
+    if((upper_ != -2) && (upper_ < lower_))
+    {
+      upper_ = -1;
+      lower_ = 0;
+      excludes_.clear();
+    }
+    else
+    {
+      map<int, int> backup = excludes_;
+      excludes_.clear();
+      PNAPI_FOREACH(e, backup)
+      {
+        exclude(e->first, e->second);
+      }
+    }
+    return;
+  }
+  
+  if(lower <= lower_)
+  {
+    lower_ = ((lower_ > upper + 1) ? lower_ : (upper + 1));
+    map<int, int> backup = excludes_;
+    excludes_.clear();
+    PNAPI_FOREACH(e, backup)
+    {
+      exclude(e->first, e->second);
+    }
+    return;
+  }
+  
+  bool excluded = false;
+  
+  PNAPI_FOREACH(e, excludes_)
+  {
+    if(e->second < lower - 1)
+    {
+      continue;
+    }
+    
+    if(e->first > upper + 1)
+    {
+      break;
+    }
+    
+    int l = ((lower < e->first) ? lower : (e->first));
+    int u = ((upper > e->second) ? upper : (e->second));
+    
+    set<int> del;
+    
+    for(map<int, int>::iterator e2 = e; e2 != excludes_.end(); ++e2)
+    {
+      if(e2->second <= u)
+      {
+        del.insert(e2->first);
+        continue;
+      }
+      
+      if(e2->first <= u + 1)
+      {
+        u = e2->second;
+        del.insert(e2->first);
+        break;
+      }
+    }
+
+    PNAPI_FOREACH(d, del)
+    {
+      excludes_.erase(*d);
+    }
+
+    excludes_[l] = u;
+    excluded = true;
+    break;
+  }
+  
+  if(!excluded)
+  {
+    excludes_[lower] = upper;
+  }
+}
+
+/*!
+ * \brief union of two intervals
+ */
+Interval & Interval::operator||(const Interval & other)
+{
+  int l1, l2, u1, u2;
+  map<int, int> ex1, ex2;
+  if(lower_ < other.lower_)
+  {
+    l1 = lower_;
+    ex1 = excludes_;
+    u1 = upper_;
+    l2 = other.lower_;
+    u2 = other.upper_;
+    ex2 = other.excludes_;
+  }
+  else
+  {
+    l1 = other.lower_;
+    ex1 = other.excludes_;
+    u1 = other.upper_;
+    l2 = lower_;
+    u2 = upper_;
+    ex2 = excludes_;
+  }
+  
+  excludes_.clear();
+  lower_ = l1;
+  if((u1 == -2) || (u2 == -2))
+  {
+    upper_ = -2;
+  }
+  else
+  {
+    upper_ = ((u1 > u2) ? u1 : u2);
+  }
+  
+  if((u1 != -2) && (u1 < l2 - 1))
+  {
+    exclude(u1 + 1, l2 - 1);
+  }
+  
+  map<int, int>::iterator it1 = ex1.begin();
+  map<int, int>::iterator it2 = ex2.begin();
+  
+  while((it1 != ex1.end()) && (it1->second < l2))
+  {
+    exclude(it1->first, it1->second);
+    ++it1;
+  }
+  if((it1 != ex1.end()) && (it1->first < l2))
+  {
+    exclude(it1->first, l2 - 1);
+  }
+  
+  while((it1 != ex1.end()) && (it2 != ex2.end()))
+  {
+    map<int, int>::iterator * itP1 = ((it1->first < it2->first) ? &it1 : &it2);
+    map<int, int>::iterator * itP2 = ((it1->first < it2->first) ? &it2 : &it1);
+    
+    if((*itP1)->second < (*itP2)->first)
+    {
+      ++(*itP1);
+      continue;
+    }
+    
+    int tmp;
+    exclude((*itP2)->first, (((*itP1)->second < (*itP2)->second)
+                             ? (tmp = (*itP1)->second, ++(*itP1), tmp)
+                             : (tmp = (*itP2)->second, ++(*itP2), tmp)));
+  }
+  
+  if( ((it1 != ex1.end()) && (u2 != -2)) ||
+      ((it2 != ex2.end()) && (u1 != -2)) )
+  {
+    int u = ((it1 == ex1.end()) ? u1 : u2);
+    map<int, int> & ex((it1 == ex1.end()) ? ex2 : ex1);
+    map<int, int>::iterator & it((it1 == ex1.end()) ? it2 : it1);
+    
+    while((it != ex.end()) && (it->second < u))
+    {
+      ++it;
+    }
+    if(it != ex.end())
+    {
+      exclude(u + 1, it->second);
+      ++it;
+    }
+    
+    while(it != ex.end())
+    {
+      exclude(it->first, it->second);
+      ++it;
+    }
+  }
+  
+  return (*this);
+}
+
+/*!
+ * \brief intersection of two intervals
+ */
+Interval & Interval::operator&&(const Interval & other)
+{ 
+  map<int, int> backup = excludes_;
+  excludes_.clear();
+  
+  if(other.lower_ != 0)
+  {
+    exclude(0, other.lower_ - 1);
+  }
+  
+  if(other.upper_ != -2)
+  {
+    exclude(other.upper_ + 1, -2);
+  }
+  
+  PNAPI_FOREACH(e, backup)
+  {
+    exclude(e->first, e->second);
+  }
+  
+  PNAPI_FOREACH(e, other.excludes_)
+  {
+    exclude(e->first, e->second);
+  }
+  
+  return (*this);
+}
+
+/*!
+ * \brief whether inteval contains the given value
+ */
+bool Interval::isIn(int v) const
+{
+  if( (v < lower_) ||
+      ((upper_ != -2) && (v > upper_)))
+  {
+    return false;
+  }
+  
+  PNAPI_FOREACH(e, excludes_)
+  {
+    if(e->second < v)
+    {
+      continue;
+    }
+    
+    return (e->first > v);
+  }
+  
+  return true;
+}
+
+/*!
+ * \brief upper bound
+ */
+int Interval::getUpper() const
+{
+  return upper_;
+}
+
+/*!
+ * \brief lower bound
+ */
+int Interval::getLower() const
+{
+  return lower_;
 }
 
 } /* namespace formula */

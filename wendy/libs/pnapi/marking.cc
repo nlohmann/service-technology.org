@@ -4,6 +4,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "petrinet.h"
 #include "marking.h"
 #include "util.h"
@@ -211,7 +213,7 @@ bool Marking::operator==(const Marking & m) const
  */
 Marking & Marking::operator=(const Marking & m)
 {
-  assert(this != &m);
+  PNAPI_ASSERT(this != &m);
 
   this->~Marking();
   return *new (this) Marking(m);

@@ -412,35 +412,35 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
 	  case 2:
 
 /* Line 677 of lalr1.cc  */
-#line 98 "parser-pn.yy"
-    { parser_.in_arc_list = true; }
+#line 99 "parser-pn.yy"
+    { parser_.in_arc_list = true; parser_.in_marking_list = false;}
     break;
 
   case 3:
 
 /* Line 677 of lalr1.cc  */
-#line 100 "parser-pn.yy"
+#line 101 "parser-pn.yy"
     { parser_.in_marking_list = true; }
     break;
 
   case 5:
 
 /* Line 677 of lalr1.cc  */
-#line 103 "parser-pn.yy"
-    { parser_.in_arc_list = true; }
+#line 104 "parser-pn.yy"
+    { parser_.in_arc_list = true; parser_.in_marking_list = false;}
     break;
 
   case 6:
 
 /* Line 677 of lalr1.cc  */
-#line 105 "parser-pn.yy"
+#line 106 "parser-pn.yy"
     { parser_.in_marking_list = true; }
     break;
 
   case 9:
 
 /* Line 677 of lalr1.cc  */
-#line 112 "parser-pn.yy"
+#line 114 "parser-pn.yy"
     { 
     std::string ident = (yysemantic_stack_[(3) - (2)].yt_str);
     free((yysemantic_stack_[(3) - (2)].yt_str));
@@ -453,6 +453,7 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
     else
     {
       parser_.interface_.insert(ident);
+      parser_.transitions_.insert(ident);
     }
   }
     break;
@@ -460,10 +461,11 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
   case 11:
 
 /* Line 677 of lalr1.cc  */
-#line 131 "parser-pn.yy"
+#line 134 "parser-pn.yy"
     { 
     std::string ident = (yysemantic_stack_[(3) - (2)].yt_str);
     free((yysemantic_stack_[(3) - (2)].yt_str));
+
 
     parser_.places_.insert(ident);
     if(parser_.in_marking_list)
@@ -477,37 +479,63 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
   }
     break;
 
-  case 12:
-
-/* Line 677 of lalr1.cc  */
-#line 148 "parser-pn.yy"
-    { (yyval.yt_uInt) = 1; }
-    break;
-
   case 13:
 
 /* Line 677 of lalr1.cc  */
-#line 149 "parser-pn.yy"
-    { (yyval.yt_uInt) = (yysemantic_stack_[(3) - (2)].yt_uInt); }
+#line 154 "parser-pn.yy"
+    { 
+    std::string ident = (yysemantic_stack_[(2) - (2)].yt_str);
+    free((yysemantic_stack_[(2) - (2)].yt_str));
+
+    parser_.places_.insert(ident);
+      parser_.initialMarked_[ident] = 1;
+  }
+    break;
+
+  case 14:
+
+/* Line 677 of lalr1.cc  */
+#line 162 "parser-pn.yy"
+    { 
+    std::string ident = (yysemantic_stack_[(4) - (2)].yt_str);
+    free((yysemantic_stack_[(4) - (2)].yt_str));
+
+    parser_.places_.insert(ident);
+      parser_.initialMarked_[ident] = (yysemantic_stack_[(4) - (4)].yt_uInt);
+  }
     break;
 
   case 15:
 
 /* Line 677 of lalr1.cc  */
-#line 155 "parser-pn.yy"
+#line 172 "parser-pn.yy"
+    { (yyval.yt_uInt) = 1; }
+    break;
+
+  case 16:
+
+/* Line 677 of lalr1.cc  */
+#line 173 "parser-pn.yy"
+    { (yyval.yt_uInt) = (yysemantic_stack_[(3) - (2)].yt_uInt); }
+    break;
+
+  case 18:
+
+/* Line 677 of lalr1.cc  */
+#line 179 "parser-pn.yy"
     { 
-    parser_.arcs_[(yysemantic_stack_[(4) - (2)].yt_str)] = parser_.tempNodeMap_;
+    parser_.arcs_[(yysemantic_stack_[(4) - (2)].yt_str)].insert(parser_.tempNodeMap_.begin(),parser_.tempNodeMap_.end());
     parser_.tempNodeMap_.clear();
     free((yysemantic_stack_[(4) - (2)].yt_str));
   }
     break;
 
-  case 17:
+  case 19:
 
 /* Line 677 of lalr1.cc  */
-#line 165 "parser-pn.yy"
+#line 185 "parser-pn.yy"
     {
-    parser_.arcs_[(yysemantic_stack_[(4) - (2)].yt_str)] = parser_.tempNodeMap_;
+    parser_.arcs_[(yysemantic_stack_[(4) - (2)].yt_str)].insert(parser_.tempNodeMap_.begin(),parser_.tempNodeMap_.end());
     parser_.tempNodeMap_.clear();
     free((yysemantic_stack_[(4) - (2)].yt_str));
   }
@@ -516,7 +544,7 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
 
 
 /* Line 677 of lalr1.cc  */
-#line 520 "parser-pn.cc"
+#line 548 "parser-pn.cc"
 	default:
           break;
       }
@@ -721,16 +749,16 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
 
   /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
      STATE-NUM.  */
-  const signed char BisonParser::yypact_ninf_ = -18;
+  const signed char BisonParser::yypact_ninf_ = -11;
   const signed char
   BisonParser::yypact_[] =
   {
-        13,     3,   -18,     6,    -6,     5,   -18,    11,    17,    14,
-      19,   -18,   -18,    25,   -18,    -6,     5,    16,   -18,    22,
-     -18,   -18,    -6,    31,   -18,   -18,    15,   -18,     5,   -18,
-     -18,    32,   -18,    -1,    21,     2,    14,   -18,   -18,   -18,
-     -18,     0,    23,    -6,   -18,    27,     1,    -6,    -6,   -18,
-      28,    -6,   -18
+        14,    17,   -11,     6,    -3,     3,   -11,    18,     8,    15,
+     -11,    22,   -11,    19,     4,    12,   -11,    20,   -11,   -11,
+      21,     1,   -11,   -11,   -11,   -11,   -11,     5,    -2,    23,
+      16,   -11,     8,   -11,   -11,   -11,   -11,    -1,    24,    13,
+      26,   -11,    27,    28,     0,   -11,    29,    30,   -11,    32,
+      33,   -11
   };
 
   /* YYDEFACT[S] -- default rule to reduce with in state S when YYTABLE
@@ -739,28 +767,28 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
   const unsigned char
   BisonParser::yydefact_[] =
   {
-         0,     0,     8,     0,     0,     0,     1,    18,     0,    12,
-       0,    19,     8,     0,     9,     0,     0,     0,     5,     0,
-      13,    16,     0,    14,     2,     8,     0,    14,     0,    10,
-       6,    16,    17,     0,     0,     0,    12,    15,    10,     3,
-      11,     0,     0,     0,    10,     0,     0,     0,     0,     7,
-       0,     0,     4
+         0,     0,     8,     0,     0,     0,     1,     0,    15,     0,
+       8,     0,     9,     0,     0,     0,     5,     0,    16,    17,
+       0,     0,     2,     8,    10,     6,    17,     0,     0,     0,
+       0,    19,    15,    18,    12,     3,    11,     0,     0,    13,
+       0,    12,     0,     0,     0,    14,     0,     0,     7,     0,
+       0,     4
   };
 
   /* YYPGOTO[NTERM-NUM].  */
   const signed char
   BisonParser::yypgoto_[] =
   {
-       -18,   -18,   -18,   -18,   -18,   -18,   -11,   -17,     8,    18,
-      10,    -5
+       -11,   -11,   -11,   -11,   -11,   -11,   -10,   -11,    -6,     9,
+      10
   };
 
   /* YYDEFGOTO[NTERM-NUM].  */
   const signed char
   BisonParser::yydefgoto_[] =
   {
-        -1,     3,    27,    42,    21,    34,     5,    33,    14,    26,
-      23,     8
+        -1,     3,    26,    38,    19,    29,     5,    28,    37,    12,
+      21
   };
 
   /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -770,22 +798,22 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
   const unsigned char
   BisonParser::yytable_[] =
   {
-        10,    16,    36,    36,    36,    25,     6,     7,     4,     9,
-      18,    19,     7,    39,    28,    43,    48,    24,     7,    29,
-       1,    41,     2,    32,    11,    12,    30,    46,    37,    15,
-      13,    17,    22,    20,    25,    38,    29,    44,    45,    47,
-      51,    35,    49,    50,    40,    31,    52
+        14,    32,    39,    39,    23,    24,     6,     8,     8,     8,
+       7,    33,    25,    27,    40,    47,     9,    17,    31,    23,
+      24,     1,     4,     2,    11,    13,    10,    35,    15,    18,
+      20,    42,    16,    45,    22,    44,    30,    34,    41,    43,
+      46,    36,    48,    49,    50,     0,    51
   };
 
   /* YYCHECK.  */
-  const unsigned char
+  const signed char
   BisonParser::yycheck_[] =
   {
-         5,    12,     3,     3,     3,     3,     0,    13,     5,     4,
-      15,    16,    13,    11,    25,    15,    15,    22,    13,     4,
-       7,    38,     9,    28,    13,     8,    11,    44,    33,    10,
-      16,     6,    10,    17,     3,    14,     4,    14,    43,    12,
-      12,    31,    47,    48,    36,    27,    51
+        10,     3,     3,     3,     3,     4,     0,     4,     4,     4,
+      13,    13,    11,    23,    15,    15,    13,    13,    13,     3,
+       4,     7,     5,     9,    16,    10,     8,    11,     6,    17,
+      10,    18,    13,     6,    13,    41,    26,    14,    14,    13,
+      12,    32,    13,    13,    12,    -1,    13
   };
 
   /* STOS_[STATE-NUM] -- The (internal number of the) accessing
@@ -793,12 +821,12 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
   const unsigned char
   BisonParser::yystos_[] =
   {
-         0,     7,     9,    19,     5,    24,     0,    13,    29,     4,
-      29,    13,     8,    16,    26,    10,    24,     6,    29,    29,
-      17,    22,    10,    28,    29,     3,    27,    20,    24,     4,
-      11,    27,    29,    25,    23,    28,     3,    29,    14,    11,
-      26,    25,    21,    15,    14,    29,    25,    12,    15,    29,
-      29,    12,    29
+         0,     7,     9,    20,     5,    25,     0,    13,     4,    13,
+       8,    16,    28,    10,    25,     6,    13,    13,    17,    23,
+      10,    29,    13,     3,     4,    11,    21,    25,    26,    24,
+      29,    13,     3,    13,    14,    11,    28,    27,    22,     3,
+      15,    14,    18,    13,    27,     6,    12,    15,    13,    13,
+      12,    13
   };
 
 #if YYDEBUG
@@ -808,7 +836,7 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
   BisonParser::yytoken_number_[] =
   {
          0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272
+     265,   266,   267,   268,   269,   270,   271,   272,   273
   };
 #endif
 
@@ -816,16 +844,16 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
   const unsigned char
   BisonParser::yyr1_[] =
   {
-         0,    18,    20,    21,    19,    22,    23,    19,    24,    24,
-      25,    25,    26,    26,    27,    27,    28,    28,    29,    29
+         0,    19,    21,    22,    20,    23,    24,    20,    25,    25,
+      26,    26,    27,    27,    27,    28,    28,    29,    29,    29
   };
 
   /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
   const unsigned char
   BisonParser::yyr2_[] =
   {
-         0,     2,     0,     0,    19,     0,     0,    16,     0,     3,
-       0,     3,     0,     3,     0,     4,     0,     4,     1,     2
+         0,     2,     0,     0,    18,     0,     0,    15,     0,     3,
+       0,     3,     0,     2,     4,     0,     3,     0,     4,     4
   };
 
 #if YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
@@ -837,8 +865,8 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
     "$end", "error", "$undefined", "PLACENAME", "TRANSITIONNAME",
   "IDENTIFIER", "WEIGHT", "K_MODEL", "K_DUMMY", "K_OUTPUTS", "K_GRAPH",
   "K_MARKING", "K_END", "NEWLINE", "OPENBRACE", "CLOSEBRACE", "LPAR",
-  "RPAR", "$accept", "stg", "$@1", "$@2", "$@3", "$@4", "transition_list",
-  "place_list", "weight", "tp_list", "pt_list", "newline", 0
+  "RPAR", "EQUALS", "$accept", "stg", "$@1", "$@2", "$@3", "$@4",
+  "transition_list", "place_list", "marking_list", "weight", "arc_list", 0
   };
 #endif
 
@@ -847,14 +875,14 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
   const BisonParser::rhs_number_type
   BisonParser::yyrhs_[] =
   {
-        19,     0,    -1,    -1,    -1,     7,     5,    29,     8,    24,
-      29,    10,    29,    20,    27,    28,    11,    21,    14,    25,
-      15,    29,    12,    29,    -1,    -1,    -1,     9,    24,    29,
-      10,    29,    22,    28,    27,    11,    23,    14,    25,    15,
-      29,    12,    29,    -1,    -1,    24,     4,    26,    -1,    -1,
-      25,     3,    26,    -1,    -1,    16,     6,    17,    -1,    -1,
-      27,     4,    25,    29,    -1,    -1,    28,     3,    24,    29,
-      -1,    13,    -1,    13,    13,    -1
+        20,     0,    -1,    -1,    -1,     7,     5,    13,     8,    25,
+      13,    10,    13,    21,    29,    11,    22,    14,    27,    15,
+      13,    12,    13,    -1,    -1,    -1,     9,    25,    13,    10,
+      13,    23,    29,    11,    24,    14,    27,    15,    13,    12,
+      13,    -1,    -1,    25,     4,    28,    -1,    -1,    26,     3,
+      28,    -1,    -1,    27,     3,    -1,    27,     3,    18,     6,
+      -1,    -1,    16,     6,    17,    -1,    -1,    29,     4,    26,
+      13,    -1,    29,     3,    25,    13,    -1
   };
 
   /* YYPRHS[YYN] -- Index of the first RHS symbol of rule number YYN in
@@ -862,16 +890,16 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
   const unsigned char
   BisonParser::yyprhs_[] =
   {
-         0,     0,     3,     4,     5,    25,    26,    27,    44,    45,
-      49,    50,    54,    55,    59,    60,    65,    66,    71,    73
+         0,     0,     3,     4,     5,    24,    25,    26,    42,    43,
+      47,    48,    52,    53,    56,    61,    62,    66,    67,    72
   };
 
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
   const unsigned char
   BisonParser::yyrline_[] =
   {
-         0,    98,    98,   100,    96,   103,   105,   102,   109,   111,
-     128,   130,   148,   149,   152,   154,   162,   164,   173,   174
+         0,    99,    99,   101,    97,   104,   106,   103,   111,   113,
+     131,   133,   151,   153,   161,   172,   173,   176,   178,   184
   };
 
   // Print the state stack on the debug stream.
@@ -938,7 +966,7 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17
+      15,    16,    17,    18
     };
     if ((unsigned int) t <= yyuser_token_number_max_)
       return translate_table[t];
@@ -948,14 +976,14 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
 
   const int BisonParser::yyeof_ = 0;
   const int BisonParser::yylast_ = 46;
-  const int BisonParser::yynnts_ = 12;
+  const int BisonParser::yynnts_ = 11;
   const int BisonParser::yyempty_ = -2;
   const int BisonParser::yyfinal_ = 6;
   const int BisonParser::yyterror_ = 1;
   const int BisonParser::yyerrcode_ = 256;
-  const int BisonParser::yyntokens_ = 18;
+  const int BisonParser::yyntokens_ = 19;
 
-  const unsigned int BisonParser::yyuser_token_number_max_ = 272;
+  const unsigned int BisonParser::yyuser_token_number_max_ = 273;
   const BisonParser::token_number_type BisonParser::yyundef_token_ = 2;
 
 
@@ -964,6 +992,6 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
 } } } } // pnapi::parser::pn::yy
 
 /* Line 1053 of lalr1.cc  */
-#line 968 "parser-pn.cc"
+#line 996 "parser-pn.cc"
 
 

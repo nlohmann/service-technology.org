@@ -417,87 +417,104 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
 /* Line 677 of lalr1.cc  */
 #line 92 "parser-woflan.yy"
     {
-    parser_.check(parser_.places_[(yysemantic_stack_[(2) - (2)].yt_str)] == NULL, "node name already used");
-    parser_.places_[(yysemantic_stack_[(2) - (2)].yt_str)] = &(parser_.net_.createPlace((yysemantic_stack_[(2) - (2)].yt_str), 0, 0));
-  }
-    break;
-
-  case 7:
-
-/* Line 677 of lalr1.cc  */
-#line 97 "parser-woflan.yy"
+    try
     {
-    parser_.check(parser_.places_[(yysemantic_stack_[(4) - (2)].yt_str)] == NULL, "node name already used");
-    parser_.places_[(yysemantic_stack_[(4) - (2)].yt_str)] = &(parser_.net_.createPlace((yysemantic_stack_[(4) - (2)].yt_str), 0, 0));
-    Place * p = parser_.places_[(yysemantic_stack_[(4) - (2)].yt_str)];
-    p->setTokenCount((yysemantic_stack_[(4) - (4)].yt_int));
-  }
-    break;
-
-  case 8:
-
-/* Line 677 of lalr1.cc  */
-#line 107 "parser-woflan.yy"
+      parser_.places_[(yysemantic_stack_[(2) - (2)].yt_str)] = parser_.place_ = &(parser_.net_.createPlace((yysemantic_stack_[(2) - (2)].yt_str), 0, 0));
+    }
+    catch(exception::Error e)
     {
-    parser_.check(!(parser_.net_.containsNode((yysemantic_stack_[(2) - (2)].yt_str))), "node name already used");
-    parser_.transition_ = &(parser_.net_.createTransition((yysemantic_stack_[(2) - (2)].yt_str))); 
-    parser_.transName = (yysemantic_stack_[(2) - (2)].yt_str);
+      parser_.rethrow(e);
+    }
+
+    free((yysemantic_stack_[(2) - (2)].yt_str));
   }
     break;
 
   case 9:
 
 /* Line 677 of lalr1.cc  */
-#line 112 "parser-woflan.yy"
-    { parser_.needLabel = true; }
+#line 110 "parser-woflan.yy"
+    {
+    parser_.place_->setTokenCount((yysemantic_stack_[(2) - (2)].yt_int));
+  }
     break;
 
   case 10:
 
 /* Line 677 of lalr1.cc  */
 #line 117 "parser-woflan.yy"
-    {
-    parser_.check(!(parser_.needLabel), "transition must be labeled");  	
-  }
+    { parser_.needLabel = true; }
     break;
 
   case 11:
 
 /* Line 677 of lalr1.cc  */
-#line 121 "parser-woflan.yy"
+#line 119 "parser-woflan.yy"
     {
-    if((yysemantic_stack_[(2) - (2)].yt_str) != parser_.transName)
+    try
     {
-      parser_.check(!(parser_.net_.containsNode((yysemantic_stack_[(2) - (2)].yt_str))), "node name already used");
+      parser_.transition_ = &(parser_.net_.createTransition((yysemantic_stack_[(1) - (1)].yt_str)));
     }
-    parser_.transition_->setName((yysemantic_stack_[(2) - (2)].yt_str)); 
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+
+    parser_.transName = (yysemantic_stack_[(1) - (1)].yt_str);
+    free((yysemantic_stack_[(1) - (1)].yt_str));
+    parser_.needLabel = false;
   }
+    break;
+
+  case 12:
+
+/* Line 677 of lalr1.cc  */
+#line 137 "parser-woflan.yy"
+    { parser_.check(!(parser_.needLabel), "transition must be labeled"); }
     break;
 
   case 13:
 
 /* Line 677 of lalr1.cc  */
-#line 133 "parser-woflan.yy"
+#line 139 "parser-woflan.yy"
+    {
+    try
+    {
+      parser_.transition_->setName((yysemantic_stack_[(2) - (2)].yt_str));
+    }
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+
+    free((yysemantic_stack_[(2) - (2)].yt_str));
+  }
+    break;
+
+  case 15:
+
+/* Line 677 of lalr1.cc  */
+#line 156 "parser-woflan.yy"
     { 
     parser_.target_ = reinterpret_cast<Node * *>(&(parser_.transition_));
     parser_.source_ = reinterpret_cast<Node * *>(&(parser_.place_));   
   }
     break;
 
-  case 16:
+  case 18:
 
 /* Line 677 of lalr1.cc  */
-#line 143 "parser-woflan.yy"
+#line 166 "parser-woflan.yy"
     { 
     parser_.source_ = reinterpret_cast<Node * *>(&(parser_.transition_));
     parser_.target_ = reinterpret_cast<Node * *>(&(parser_.place_)); 
   }
     break;
 
-  case 20:
+  case 22:
 
 /* Line 677 of lalr1.cc  */
-#line 157 "parser-woflan.yy"
+#line 180 "parser-woflan.yy"
     {
     parser_.place_ = parser_.places_[(yysemantic_stack_[(1) - (1)].yt_str)];
     parser_.check(parser_.place_ != NULL, "unknown place");
@@ -511,13 +528,14 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
     {
       parser_.net_.createArc(**(parser_.source_), **(parser_.target_), 1);
     }
+    free((yysemantic_stack_[(1) - (1)].yt_str));
   }
     break;
 
 
 
 /* Line 677 of lalr1.cc  */
-#line 521 "parser-woflan.cc"
+#line 539 "parser-woflan.cc"
 	default:
           break;
       }
@@ -722,13 +740,14 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
 
   /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
      STATE-NUM.  */
-  const signed char BisonParser::yypact_ninf_ = -23;
+  const signed char BisonParser::yypact_ninf_ = -25;
   const signed char
   BisonParser::yypact_[] =
   {
-        -6,   -14,   -13,     0,   -23,    -7,     3,   -23,    -1,   -23,
-     -23,   -23,    -5,     2,    -2,   -23,   -23,     4,   -23,     1,
-     -23,     6,   -23,     1,   -23,     1,   -23,   -23,     1
+        -6,   -14,   -13,     0,   -25,    -7,   -25,     3,   -25,   -25,
+     -25,   -25,    -5,     1,     2,   -25,   -25,     4,    -4,   -25,
+      -2,   -25,     5,   -25,   -25,    -2,   -25,    -2,   -25,   -25,
+      -2
   };
 
   /* YYDEFACT[S] -- default rule to reduce with in state S when YYTABLE
@@ -737,25 +756,26 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
   const unsigned char
   BisonParser::yydefact_[] =
   {
-         0,     9,     0,     0,     2,     0,    10,     8,     6,     1,
-       3,     4,     0,    12,     0,    11,    13,    15,     7,     0,
-      16,     0,    20,    14,    18,     0,     5,    19,    17
+         0,    10,     0,     0,     2,     0,    11,    12,     6,     1,
+       3,     4,     0,    14,     8,    13,    15,    17,     0,     7,
+       0,    18,     0,     9,    22,    16,    20,     0,     5,    21,
+      19
   };
 
   /* YYPGOTO[NTERM-NUM].  */
   const signed char
   BisonParser::yypgoto_[] =
   {
-       -23,   -23,    13,   -23,   -23,   -23,   -23,   -23,   -23,   -23,
-      -8,   -22
+       -25,   -25,    14,   -25,   -25,   -25,   -25,   -25,   -25,   -25,
+     -25,   -25,    -9,   -24
   };
 
   /* YYDEFGOTO[NTERM-NUM].  */
   const signed char
   BisonParser::yydefgoto_[] =
   {
-        -1,     3,     4,     5,     6,    13,    17,    19,    21,    25,
-      23,    24
+        -1,     3,     4,     5,    14,    19,     7,    13,    17,    20,
+      22,    27,    25,    26
   };
 
   /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -765,18 +785,16 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
   const unsigned char
   BisonParser::yytable_[] =
   {
-         9,    27,     1,     2,     7,     8,    27,    11,     1,     2,
-      12,    14,    16,    15,    18,    20,    10,    28,     0,    22,
-      26
+         9,    29,     1,     2,     6,     8,    29,    11,     1,     2,
+      12,    16,    23,    15,    18,    21,    24,    10,    30,    28
   };
 
   /* YYCHECK.  */
-  const signed char
+  const unsigned char
   BisonParser::yycheck_[] =
   {
-         0,    23,     8,     9,    18,    18,    28,    14,     8,     9,
-       7,    12,    10,    18,    16,    11,     3,    25,    -1,    18,
-      14
+         0,    25,     8,     9,    18,    18,    30,    14,     8,     9,
+       7,    10,    16,    18,    12,    11,    18,     3,    27,    14
   };
 
   /* STOS_[STATE-NUM] -- The (internal number of the) accessing
@@ -784,9 +802,10 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
   const unsigned char
   BisonParser::yystos_[] =
   {
-         0,     8,     9,    20,    21,    22,    23,    18,    18,     0,
-      21,    14,     7,    24,    12,    18,    10,    25,    16,    26,
-      11,    27,    18,    29,    30,    28,    14,    30,    29
+         0,     8,     9,    20,    21,    22,    18,    25,    18,     0,
+      21,    14,     7,    26,    23,    18,    10,    27,    12,    24,
+      28,    11,    29,    16,    18,    31,    32,    30,    14,    32,
+      31
   };
 
 #if YYDEBUG
@@ -804,18 +823,18 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
   const unsigned char
   BisonParser::yyr1_[] =
   {
-         0,    19,    20,    20,    21,    21,    22,    22,    23,    23,
-      24,    24,    25,    26,    25,    27,    28,    27,    29,    29,
-      30
+         0,    19,    20,    20,    21,    21,    23,    22,    24,    24,
+      25,    25,    26,    26,    27,    28,    27,    29,    30,    29,
+      31,    31,    32
   };
 
   /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
   const unsigned char
   BisonParser::yyr2_[] =
   {
-         0,     2,     1,     2,     2,     5,     2,     4,     2,     1,
-       0,     2,     0,     0,     3,     0,     0,     3,     1,     2,
-       1
+         0,     2,     1,     2,     2,     6,     0,     4,     0,     2,
+       0,     1,     0,     2,     0,     0,     3,     0,     0,     3,
+       1,     2,     1
   };
 
 #if YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
@@ -827,8 +846,8 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
     "$end", "error", "$undefined", "LCONTROL", "RCONTROL", "KEY_TRUE",
   "KEY_FALSE", "TILDE", "KEY_TRANSITION", "KEY_PLACE", "KEY_IN", "KEY_OUT",
   "KEY_INIT", "COLON", "SEMICOLON", "COMMA", "NUMBER", "NEGATIVE_NUMBER",
-  "IDENT", "$accept", "net", "node", "place", "transition", "label", "ins",
-  "$@1", "outs", "$@2", "arcs", "arc", 0
+  "IDENT", "$accept", "net", "node", "place", "$@1", "place_tail",
+  "transition_name", "label", "ins", "$@2", "outs", "$@3", "arcs", "arc", 0
   };
 #endif
 
@@ -838,11 +857,11 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
   BisonParser::yyrhs_[] =
   {
         20,     0,    -1,    21,    -1,    20,    21,    -1,    22,    14,
-      -1,    23,    24,    25,    27,    14,    -1,     9,    18,    -1,
-       9,    18,    12,    16,    -1,     8,    18,    -1,     8,    -1,
-      -1,     7,    18,    -1,    -1,    -1,    10,    26,    29,    -1,
-      -1,    -1,    11,    28,    29,    -1,    30,    -1,    29,    30,
-      -1,    18,    -1
+      -1,     8,    25,    26,    27,    29,    14,    -1,    -1,     9,
+      18,    23,    24,    -1,    -1,    12,    16,    -1,    -1,    18,
+      -1,    -1,     7,    18,    -1,    -1,    -1,    10,    28,    31,
+      -1,    -1,    -1,    11,    30,    31,    -1,    32,    -1,    31,
+      32,    -1,    18,    -1
   };
 
   /* YYPRHS[YYN] -- Index of the first RHS symbol of rule number YYN in
@@ -850,18 +869,18 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
   const unsigned char
   BisonParser::yyprhs_[] =
   {
-         0,     0,     3,     5,     8,    11,    17,    20,    25,    28,
-      30,    31,    34,    35,    36,    40,    41,    42,    46,    48,
-      51
+         0,     0,     3,     5,     8,    11,    18,    19,    24,    25,
+      28,    29,    31,    32,    35,    36,    37,    41,    42,    43,
+      47,    49,    52
   };
 
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
   const unsigned char
   BisonParser::yyrline_[] =
   {
-         0,    81,    81,    82,    86,    87,    91,    96,   106,   112,
-     117,   120,   130,   133,   132,   140,   143,   142,   151,   152,
-     156
+         0,    81,    81,    82,    86,    87,    92,    91,   107,   109,
+     117,   118,   137,   138,   153,   156,   155,   163,   166,   165,
+     174,   175,   179
   };
 
   // Print the state stack on the debug stream.
@@ -937,8 +956,8 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
   }
 
   const int BisonParser::yyeof_ = 0;
-  const int BisonParser::yylast_ = 20;
-  const int BisonParser::yynnts_ = 12;
+  const int BisonParser::yylast_ = 19;
+  const int BisonParser::yynnts_ = 14;
   const int BisonParser::yyempty_ = -2;
   const int BisonParser::yyfinal_ = 9;
   const int BisonParser::yyterror_ = 1;
@@ -954,6 +973,6 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
 } } } } // pnapi::parser::woflan::yy
 
 /* Line 1053 of lalr1.cc  */
-#line 958 "parser-woflan.cc"
+#line 977 "parser-woflan.cc"
 
 

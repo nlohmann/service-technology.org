@@ -4,11 +4,17 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "automaton.h"
 #include "myio.h"
 #include "parser.h"
 #include "util.h"
 
+#include <fstream>
+
+using std::endl;
+using std::ifstream;
 using std::map;
 using std::set;
 using std::string;
@@ -47,7 +53,7 @@ std::ostream & operator<<(std::ostream & os, const PetriNet & net)
   case util::PNML: return __pnml::output(os, net);
   case util::WOFLAN: return __woflan::output(os, net);
 	
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
 }
 
@@ -95,7 +101,7 @@ std::istream & operator>>(std::istream & is, PetriNet & net) throw (exception::I
     break;
   }
   
-  default: assert(false);  // unsupported input format
+  default: PNAPI_ASSERT(false);  // unsupported input format
   }
 
   return is;
@@ -115,7 +121,7 @@ std::ostream & operator<<(std::ostream & os, const Automaton & sa)
   case      util::DOT: __dot::output(os, sa); break;
   case      util::SA:  __sa::output(os, sa);   break;
   case      util::STAT: __stat::output(os, sa); break;
-  default:  assert(false); // unsupported output format
+  default:  PNAPI_ASSERT(false); // unsupported output format
   }
 
   return os;
@@ -134,7 +140,7 @@ std::istream & operator>>(std::istream &is, Automaton &sa)
     sa = parser::sa::parse(is);
     break;
   }
-  default: assert(false); /* unsupported format */
+  default: PNAPI_ASSERT(false); /* unsupported format */
   }
 
   return is;
@@ -163,7 +169,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Arc & arc)
   case PNML: return __pnml::output(os, arc);
   case WOFLAN: return __woflan::output(os, arc);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
 }
 
@@ -180,7 +186,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Place & p)
   case PNML: return __pnml::output(os, p);
   case WOFLAN: return __woflan::output(os, p);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
 }
 
@@ -197,7 +203,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Transition & t)
   case PNML: return __pnml::output(os, t);
   case WOFLAN: return __woflan::output(os, t);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -214,7 +220,7 @@ std::ostream & operator<<(std::ostream & os, const Interface & i)
   case PNML: return __pnml::output(os, i);
   
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -230,7 +236,7 @@ std::ostream & operator<<(std::ostream & os, const Port & p)
   case OWFN: return __owfn::output(os, p);
   case PNML: return __pnml::output(os, p);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -246,7 +252,7 @@ std::ostream & operator<<(std::ostream & os, const Label & l)
   case OWFN: return __owfn::output(os, l);
   case PNML: return __pnml::output(os, l);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -262,7 +268,7 @@ std::ostream & operator<<(std::ostream & os, const formula::Negation & f)
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -278,7 +284,7 @@ std::ostream & operator<<(std::ostream & os, const formula::Conjunction & f)
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -294,7 +300,7 @@ std::ostream & operator<<(std::ostream & os, const formula::Disjunction & f)
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -310,7 +316,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaTrue & f)
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -326,7 +332,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaFalse & f)
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -342,7 +348,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaEqual & f)
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -358,7 +364,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaNotEqual & f)
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -374,7 +380,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaGreater & f)
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -390,7 +396,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaGreaterEqual 
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -406,7 +412,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaLess & f)
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -422,7 +428,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaLessEqual & f
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
   return os;
 }
@@ -439,7 +445,7 @@ std::ostream & operator<<(std::ostream & os, const std::pair<std::string, std::s
   case OWFN: return __owfn::output(os, p);
   //case DOT:  return __dot::output(os, p);
 
-  default: assert(false);
+  default: PNAPI_ASSERT(false);
   }
 }
 
@@ -452,7 +458,7 @@ std::ostream & operator<<(std::ostream & os, const std::pair<unsigned int, std::
     {
         case OWFN: return __owfn::output(os, p);
         
-        default: assert(false);
+        default: PNAPI_ASSERT(false);
     }
 }
 
@@ -465,7 +471,7 @@ std::ostream & operator<<(std::ostream & os, const State & s)
   {
   case SA: return __sa::output(os, s);
   
-  default: assert(false); // unsupported format
+  default: PNAPI_ASSERT(false); // unsupported format
   }
 }
 
@@ -478,7 +484,7 @@ std::ostream & operator<<(std::ostream & os, const Edge & e)
   {
   case SA: return __sa::output(os, e);
   
-  default: assert(false); // unsupported format
+  default: PNAPI_ASSERT(false); // unsupported format
   }
 }
 
@@ -519,7 +525,9 @@ std::ostream & operator<<(std::ostream & os, const exception::InputError & e)
 {
   os << e.filename;
   if (e.line > 0)
+  {
     os << ":" << e.line;
+  }
   os << ": error";
   if (!e.token.empty())
     switch (e.type)
@@ -532,7 +540,33 @@ std::ostream & operator<<(std::ostream & os, const exception::InputError & e)
       break;
     default: /* do nothing */ ;
     }
-  return os << ": " << e.message;
+  os << ": " << e.message;
+
+  ifstream ifs(e.filename.c_str());
+  if(ifs.good())
+  {
+    string line, arrows;
+    for(int i = 0; i < e.line; ++i)
+    {
+      getline(ifs, line);
+    }
+    
+    size_t firstpos(line.find(e.token));
+    
+    for(unsigned int i = 0; i < firstpos; ++i)
+    {
+      arrows += " ";
+    }
+    for(unsigned int i = 0; i < e.token.size(); ++i)
+    {
+      arrows += "^";
+    }
+    
+    os << endl << endl << line << endl << arrows << endl << endl;  
+  }
+  ifs.close();
+  
+  return os;
 }
 
 /*!

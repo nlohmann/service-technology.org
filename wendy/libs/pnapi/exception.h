@@ -1,9 +1,26 @@
+// -*- C++ -*-
+
+/*!
+ * \file    exception.h
+ *
+ * \brief   exception classes
+ *
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: $Author: cas $
+ *
+ * \since   2005/11/11
+ *
+ * \date    $Date: 2010-05-29 23:35:16 +0200 (Sat, 29 May 2010) $
+ *
+ * \version $Revision: 5779 $
+ */
+
 #ifndef PNAPI_EXCEPTION_H
 #define PNAPI_EXCEPTION_H
 
 #include "config.h"
 
-#include <cassert>
 #include <string>
 
 namespace pnapi
@@ -70,7 +87,7 @@ public: /* public methods */
 };
 
 /*!
- * \brief
+ * \brief Exception thrown when an internal assertion failed
  */
 class AssertionFailedError : public Error
 {
@@ -86,25 +103,33 @@ public: /* public methods */
                        const std::string &);
 };
 
+/*!
+ * \brief Exception thrown when user caused an error.
+ */
+class UserCausedError : public Error
+{
+public: /* public types */
+  /// user error types
+  enum UE_Type
+  {
+    UE_NONE,
+    UE_NODE_NAME_CONFLICT,
+    UE_LABEL_NAME_CONFLICT,
+    UE_ARC_CONFLICT
+  };
+  
+public: /* public constants */
+  /// user error type
+  const UE_Type type;
+  
+public: /* public methods */
+  /// constructor
+  UserCausedError(UE_Type, const std::string &);
+};
+
 
 } /* namespace exception */
 
 } /* namespace pnapi */
-
-/*******************\
- * assertion makro *
-\*******************/
-
-#ifdef PNAPI_USE_C_ASSERTS
-#define PNAPI_ASSERT(expr) assert(expr)
-#else
-
-#ifdef NDEBUG
-#define PNAPI_ASSERT(expr) assert(expr)
-#else
-#define PNAPI_ASSERT(expr) if(!(expr)) { throw pnapi::exception::AssertionFailedError( __FILE__ , __LINE__ , #expr ); }
-#endif /* NDEBUG */
-
-#endif /* PNAPI_USE_C_ASSERTS */
 
 #endif /* PNAPI_EXCEPTION_H */

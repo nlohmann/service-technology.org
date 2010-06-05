@@ -444,6 +444,10 @@ condition:
 finalcondition_only:
   KEY_FINALCONDITION SEMICOLON
 | KEY_FINALCONDITION fo_formula SEMICOLON
+  {
+    parser_.net_.getFinalCondition() = (*$2);
+    delete $2;
+  }
 ;
 
 formula: 

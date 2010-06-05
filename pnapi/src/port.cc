@@ -196,6 +196,13 @@ Label & Port::addLabel(Label & label)
  */
 Label & Port::addLabel(const std::string & label, Label::Type type)
 {
+  PNAPI_ASSERT_USER(net_.findNode(label) == NULL,
+                    string("net already contains a node named '") + label + "'", 
+                    exception::UserCausedError::UE_NODE_NAME_CONFLICT);
+  PNAPI_ASSERT_USER(net_.getInterface().findLabel(label) == NULL,
+                    string("net already contains a label named '") + label + "'", 
+                    exception::UserCausedError::UE_LABEL_NAME_CONFLICT);
+  
   Label * l = new Label(net_, *this, label, type);
   return addLabel(*l);
 }

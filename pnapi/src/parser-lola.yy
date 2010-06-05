@@ -125,9 +125,7 @@ place_list:
     }
     catch(exception::UserCausedError e)
     {
-      throw exception::InputError(exception::InputError::SEMANTIC_ERROR, 
-                                  io::util::MetaData::data(*parser_.is_)[io::INPUTFILE],
-                                  parser_.lexer_.lineno(), parser_.lexer_.YYText(), e.message);      
+      parser_.rethrow(e);
     }
   }	      
 | place_list COMMA node_name
@@ -139,9 +137,7 @@ place_list:
     }
     catch(exception::UserCausedError e)
     {
-      throw exception::InputError(exception::InputError::SEMANTIC_ERROR, 
-                                  io::util::MetaData::data(*parser_.is_)[io::INPUTFILE],
-                                  parser_.lexer_.lineno(), parser_.lexer_.YYText(), e.message);      
+      parser_.rethrow(e);
     }
   }
 ;
@@ -186,9 +182,7 @@ transition:
     }
     catch(exception::UserCausedError e)
     {
-      throw exception::InputError(exception::InputError::SEMANTIC_ERROR, 
-                                  io::util::MetaData::data(*parser_.is_)[io::INPUTFILE],
-                                  parser_.lexer_.lineno(), parser_.lexer_.YYText(), e.message);      
+      parser_.rethrow(e);      
     }
   }
   KEY_CONSUME

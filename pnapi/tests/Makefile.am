@@ -20,6 +20,19 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
             data.hlowfn eisen.hlowfn myCoffee.owfn phils.hlowfn \
 	    error_parser_lola_01.lola error_parser_lola_02.lola \
 	    error_parser_lola_03.lola \
+	    error_parser_owfn_01.owfn error_parser_owfn_02.owfn \
+	    error_parser_owfn_03.owfn error_parser_owfn_04.owfn \
+	    error_parser_owfn_05.owfn error_parser_owfn_06.owfn \
+	    error_parser_owfn_07.owfn error_parser_owfn_08.owfn \
+	    error_parser_owfn_09.owfn error_parser_owfn_10.owfn \
+	    error_parser_owfn_11.owfn error_parser_owfn_12.owfn \
+	    error_parser_owfn_13.owfn error_parser_owfn_14.owfn \
+	    error_parser_owfn_15.owfn error_parser_owfn_16.owfn \
+	    error_parser_owfn_17.owfn error_parser_owfn_18.owfn \
+	    error_parser_owfn_19.owfn error_parser_owfn_20.owfn \
+	    error_parser_woflan_01.tpn error_parser_woflan_02.tpn \
+	    error_parser_woflan_03.tpn error_parser_woflan_04.tpn \
+	    error_parser_woflan_05.tpn error_parser_woflan_06.tpn \
             woflan1.xml.tpn woflan2.xml.tpn woflan3.xml.tpn \
 	    woflan4.xml.tpn woflan5.xml.tpn woflan6.xml.tpn \
             test_cdnf.owfn test_input.lola test_dead_nodes.net.owfn \

@@ -1,0 +1,8 @@
+place "i" init 1;
+place "o";
+
+trans "t"
+    in "i"
+   out "p"
+;
+

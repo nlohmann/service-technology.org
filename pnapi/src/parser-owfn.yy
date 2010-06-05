@@ -80,7 +80,7 @@
 %type <yt_int> NUMBER NEGATIVE_NUMBER 
 %type <yt_int> transition_cost
 %type <yt_str> IDENT
-%type <yt_formula> condition formula fo_formula
+%type <yt_formula> condition formula fo_formula formula_proposition
 
 %start petrinet
 
@@ -186,17 +186,33 @@ interface_label_list:
   /* empty */           
 | node_name 
   {
-    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
+    // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    try
+    {
+      parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
+    }
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+
     parser_.labels_[parser_.nodeName_.str()] = parser_.label_;
   }
   controlcommands // NOTE: also kept due to compatibility reasons
 | interface_label_list COMMA node_name
   {
-    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
+    // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    try
+    {
+      parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
+    }
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+
     parser_.labels_[parser_.nodeName_.str()] = parser_.label_;
   } 
   controlcommands // NOTE: also kept due to compatibility reasons
@@ -263,17 +279,33 @@ place_list:
   /* empty */           
 | node_name 
   {
-    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.place_ = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+    // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    try
+    {
+      parser_.place_ = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+    }
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+
     parser_.places_[parser_.nodeName_.str()] = parser_.place_;
   } 
   controlcommands
 | place_list COMMA node_name
   {
-    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.place_ = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+    // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    try
+    {
+      parser_.place_ = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+    }
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+
     parser_.places_[parser_.nodeName_.str()] = parser_.place_;
   } 
   controlcommands
@@ -370,32 +402,35 @@ marking_list:
 ;
 
 marking: 
-  node_name COLON NUMBER 
-  { 
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");      
-      
+  node_name
+  {
+    parser_.place_ = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(parser_.place_ != NULL, "unknown place");
+  }
+  marking_tail
+;
+
+marking_tail:
+  COLON NUMBER 
+  {      
     if(parser_.markInitial_)
     {  
-      p->setTokenCount($3);
+      parser_.place_->setTokenCount($2);
     }
     else
     {
-      (*(parser_.finalMarking_))[*p] = $3;
+      (*(parser_.finalMarking_))[*parser_.place_] = $2;
     }
   }
-| node_name              
-  { 
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
-    
+| /* empty */
+  {
     if(parser_.markInitial_)
     {  
-      p->setTokenCount(1);
+      parser_.place_->setTokenCount(1);
     }
     else
     {
-      (*(parser_.finalMarking_))[*p] = 1;
+      (*(parser_.finalMarking_))[*parser_.place_] = 1;
     }
   }
 ;
@@ -489,47 +524,41 @@ formula:
   {
     $$ = $1; // obsolete; kept due to compatibility
   }
-| node_name OP_EQ NUMBER
+| node_name
   {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
-    
-    $$ = new formula::FormulaEqual(*p, $3);
+    parser_.place_ = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(parser_.place_ != NULL, "unknown place");
   }
-| node_name OP_NE NUMBER 
+  formula_proposition
   {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
-
-    $$ = new formula::Negation(formula::FormulaEqual(*p, $3));
+    $$ = $3;
   }
-| node_name OP_LT NUMBER
-  {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
+;
 
-    $$ = new formula::FormulaLess(*p, $3);
+formula_proposition:
+  OP_EQ NUMBER
+  { 
+    $$ = new formula::FormulaEqual(*parser_.place_, $2);
   }
-| node_name OP_GT NUMBER
+| OP_NE NUMBER 
   {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
-
-    $$ = new formula::FormulaGreater(*p, $3);
+    $$ = new formula::Negation(formula::FormulaEqual(*parser_.place_, $2));
+  }
+| OP_LT NUMBER
+  {
+    $$ = new formula::FormulaLess(*parser_.place_, $2);
+  }
+| OP_GT NUMBER
+  {
+    $$ = new formula::FormulaGreater(*parser_.place_, $2);
   } 
-| node_name OP_GE NUMBER
+| OP_GE NUMBER
   {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
-
-    $$ = new formula::FormulaGreaterEqual(*p, $3);
+    $$ = new formula::FormulaGreaterEqual(*parser_.place_, $2);
   }
-| node_name OP_LE NUMBER
+| OP_LE NUMBER
   {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
-
-    $$ = new formula::FormulaLessEqual(*p, $3);
+    $$ = new formula::FormulaLessEqual(*parser_.place_, $2);
   }
 ;
 
@@ -556,67 +585,21 @@ fo_formula:
     delete $1;
     delete $3;
   }
-| node_name OP_EQ NUMBER
+| node_name
   {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    if(p == NULL)
+    parser_.place_ = parser_.places_[parser_.nodeName_.str()];
+    if(parser_.place_ == NULL)
     {
-      p = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
+      parser_.place_ = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
     }
-    
-    $$ = new formula::FormulaEqual(*p, $3);
   }
-| node_name OP_NE NUMBER 
+  formula_proposition
   {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    if(p == NULL)
-    {
-      p = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
-    }
-
-    $$ = new formula::Negation(formula::FormulaEqual(*p, $3));
-  }
-| node_name OP_LT NUMBER
-  {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    if(p == NULL)
-    {
-      p = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
-    }
-
-    $$ = new formula::FormulaLess(*p, $3);
-  }
-| node_name OP_GT NUMBER
-  {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    if(p == NULL)
-    {
-      p = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
-    }
-
-    $$ = new formula::FormulaGreater(*p, $3);
-  } 
-| node_name OP_GE NUMBER
-  {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    if(p == NULL)
-    {
-      p = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
-    }
-
-    $$ = new formula::FormulaGreaterEqual(*p, $3);
-  }
-| node_name OP_LE NUMBER
-  {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    if(p == NULL)
-    {
-      p = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
-    }
-
-    $$ = new formula::FormulaLessEqual(*p, $3);
+    $$ = $3;
   }
 ;
+
+ 
 
 
  /*******************/
@@ -630,12 +613,22 @@ transitions:
 ;
 
 transition: 
-  KEY_TRANSITION node_name transition_cost
+  KEY_TRANSITION node_name
   {
-    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.check(!(parser_.net_.containsNode(parser_.nodeName_.str())), "node name already used");
-    parser_.transition_ = &(parser_.net_.createTransition(parser_.nodeName_.str())); 
-    parser_.transition_->setCost($3);
+    // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    // parser_.check(!(parser_.net_.containsNode(parser_.nodeName_.str())), "node name already used");
+    try
+    {
+      parser_.transition_ = &(parser_.net_.createTransition(parser_.nodeName_.str()));
+    }
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+  }
+  transition_cost
+  {
+    parser_.transition_->setCost($4);
   }
   transition_roles
   KEY_CONSUME 
@@ -685,35 +678,34 @@ arcs:
 ;
 
 arc: 
-  node_name COLON NUMBER
+  node_name
   {
     parser_.place_ = parser_.places_[parser_.nodeName_.str()];
     parser_.label_ = parser_.labels_[parser_.nodeName_.str()];
-    parser_.check(!((parser_.place_ == NULL) && (parser_.label_ == NULL)), "unknown place");
+    parser_.check(!((parser_.place_ == NULL) && (parser_.label_ == NULL)), "unknown place or interface label");
     parser_.check(parser_.placeSet_.find(parser_.nodeName_.str()) == parser_.placeSet_.end(), parser_.placeSetType_ ? "place already in preset" : "place already in postset");
     parser_.check(!(parser_.placeSetType_ && (parser_.label_ != NULL) && (parser_.label_->getType() != Label::INPUT)), "can only consume from places and input labels");
     parser_.check(!(!parser_.placeSetType_ && (parser_.label_ != NULL) && (parser_.label_->getType() != Label::OUTPUT)), "can only produce to places and output labels");
+  }
+  arc_tail
+;
 
+arc_tail:
+  COLON NUMBER
+  {
     if(parser_.place_ != NULL)
     {
-      parser_.net_.createArc(**(parser_.source_), **(parser_.target_), $3);
+      parser_.net_.createArc(**(parser_.source_), **(parser_.target_), $2);
     }
     else
     {
-      parser_.transition_->addLabel(*(parser_.label_), $3);
+      parser_.transition_->addLabel(*(parser_.label_), $2);
     }
 
     parser_.placeSet_.insert(parser_.nodeName_.str());
   }
-| node_name 
+| /* empty */
   {
-    parser_.place_ = parser_.places_[parser_.nodeName_.str()];
-    parser_.label_ = parser_.labels_[parser_.nodeName_.str()];
-    parser_.check(!((parser_.place_ == NULL) && (parser_.label_ == NULL)), "unknown place");
-    parser_.check(parser_.placeSet_.find(parser_.nodeName_.str()) == parser_.placeSet_.end(), parser_.placeSetType_ ? "place already in preset" : "place already in postset");
-    parser_.check(!(parser_.placeSetType_ && (parser_.label_ != NULL) && (parser_.label_->getType() != Label::INPUT)), "can only consume from places and input labels");
-    parser_.check(!(!parser_.placeSetType_ && (parser_.label_ != NULL) && (parser_.label_->getType() != Label::OUTPUT)), "can only produce to places and output labels");
-
     if(parser_.place_ != NULL)
     {
       parser_.net_.createArc(**(parser_.source_), **(parser_.target_));

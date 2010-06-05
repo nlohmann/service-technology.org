@@ -84,49 +84,68 @@ net:
 
 node:
   place SEMICOLON
-| transition label ins outs SEMICOLON
+| KEY_TRANSITION transition_name label ins outs SEMICOLON
 ;
 
 place:
   KEY_PLACE IDENT 
   {
-    parser_.check(parser_.places_[$2] == NULL, "node name already used");
-    parser_.places_[$2] = &(parser_.net_.createPlace($2, 0, 0));
+    try
+    {
+      parser_.places_[$2] = parser_.place_ = &(parser_.net_.createPlace($2, 0, 0));
+    }
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+
     free($2);
   }
-| KEY_PLACE IDENT KEY_INIT NUMBER
+  place_tail
+;
+
+place_tail:
+  /* empty */
+| KEY_INIT NUMBER
   {
-    parser_.check(parser_.places_[$2] == NULL, "node name already used");
-    parser_.places_[$2] = &(parser_.net_.createPlace($2, 0, 0));
-    Place * p = parser_.places_[$2];
-    p->setTokenCount($4);
-    free($2);
+    parser_.place_->setTokenCount($2);
   }
 ;
 
-transition:
-  KEY_TRANSITION IDENT 
+transition_name:
+  /* empty */
+  { parser_.needLabel = true; }
+| IDENT 
   {
-    parser_.check(!(parser_.net_.containsNode($2)), "node name already used");
-    parser_.transition_ = &(parser_.net_.createTransition($2)); 
-    parser_.transName = $2;
-    free($2);
+    try
+    {
+      parser_.transition_ = &(parser_.net_.createTransition($1));
+    }
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+
+    parser_.transName = $1;
+    free($1);
+    parser_.needLabel = false;
   }
-| KEY_TRANSITION { parser_.needLabel = true; }
 ;
 
 label:
   /*empty*/ 
-  {
-    parser_.check(!(parser_.needLabel), "transition must be labeled");  	
-  }
+  { parser_.check(!(parser_.needLabel), "transition must be labeled"); }
 | TILDE IDENT
   {
-    if($2 != parser_.transName)
+    try
     {
-      parser_.check(!(parser_.net_.containsNode($2)), "node name already used");
+      parser_.transition_->setName($2);
     }
-    parser_.transition_->setName($2); 
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+
     free($2);
   }
 ;

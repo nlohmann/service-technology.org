@@ -62,7 +62,7 @@ public: /* public methods */
   /// parses stream contents with the associated parser
   const PetriNet & parse(std::istream &);
   /// rethrow a caught exception as InputError
-  void rethrow(const exception::Error &);
+  void rethrow(const exception::Error &) __attribute__((noreturn));
   
 protected: /* protected methods */
   /// make this class abstract
@@ -178,7 +178,7 @@ const PetriNet & AbstractParser<P, L, C>::parse(std::istream & is)
  * \brief rethrow a caught exception as InputError
  */
 template <class P, class L, class C>
-__attribute__((noreturn)) void AbstractParser<P, L, C>::rethrow(const exception::Error & e)
+void AbstractParser<P, L, C>::rethrow(const exception::Error & e)
 {
   throw exception::InputError(exception::InputError::SEMANTIC_ERROR, 
                               io::util::MetaData::data(*is_)[io::INPUTFILE],

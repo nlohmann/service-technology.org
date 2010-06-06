@@ -25,7 +25,11 @@ configurator_SOURCES = configurator.cc \
 
 sound_SOURCES = sound.cc
 
-artifact_SOURCES = artifact.cc
+artifact_SOURCES = artifact.cc \
+                   artifact-cmdline.c artifact-cmdline.h \
+                   Output.h Output.cc \
+                   verbose.h verbose.cc
+
 
 # the configuration files
 sysconf_DATA = petri.conf
@@ -42,7 +46,7 @@ artifact_LDADD =  $(top_builddir)/src/libpnapi.la
 
 AM_CPPFLAGS = -I$(top_srcdir)/src
 
-GGOFILES = cmdline.ggo cdnf-cmdline.ggo configurator-cmdline.ggo
+GGOFILES = cmdline.ggo cdnf-cmdline.ggo configurator-cmdline.ggo artifact-cmdline.ggo
 BUILT_SOURCES = $(GGOFILES:.ggo=.c)
 EXTRA_DIST = $(GGOFILES)
 DISTCLEANFILES = $(GGOFILES:.ggo=.c) $(GGOFILES:.ggo=.h)

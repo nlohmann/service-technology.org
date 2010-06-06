@@ -2,30 +2,97 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <libgen.h>
 #include "pnapi.h"
+#include "util.h"
+#include "verbose.h"
+#include "Output.h"
+#include "artifact-cmdline.h"
 
 using namespace pnapi;
 
-int main() {
-    std::vector<std::string> nets;
-    nets.push_back("cup");
-    nets.push_back("coin");
-    nets.push_back("state");
+/// the command line parameters
+gengetopt_args_info args_info;
+
+/// the invocation string
+std::string invocation;
+
+
+/// evaluate the command line parameters
+void evaluateParameters(int argc, char** argv) {
+    // overwrite invocation for consistent error messages
+    argv[0] = basename(argv[0]);
+
+    // store invocation in a std::string for meta information in file output
+    for (int i = 0; i < argc; ++i) {
+        invocation += std::string(argv[i]) + " ";
+    }
+
+    // initialize the parameters structure
+    struct cmdline_parser_params* params = cmdline_parser_params_create();
+
+    // call the cmdline parser
+    if (cmdline_parser(argc, argv, &args_info) != 0) {
+        abort(1, "invalid command-line parameter(s)");
+    }
+
+    free(params);
+}
+
+
+std::string stripSuffix(std::string s) {
+    return (s.substr(0, s.find_first_of(".")));
+}
+
+
+int main(int argc, char** argv) {
+    /*--------------------------------------.
+    | 0. parse the command line parameters  |
+    `--------------------------------------*/
+    evaluateParameters(argc, argv);
 
     PetriNet all;
 
-    PNAPI_FOREACH(netname, nets){
+    /*************\
+     * ARTIFACTS *
+    \*************/
+    for (unsigned int i = 0; i < args_info.artifacts_given; ++i) {
         PetriNet n;
-        std::ifstream infile(std::string(*netname + ".owfn").c_str(), std::ifstream::in);
-        infile >> io::owfn >> n;
-        n.prefixNames(*netname + ".");
+        std::ifstream net_file(args_info.artifacts_arg[i], std::ifstream::in);
+        try {
+            net_file >> io::owfn >> n;
+        } catch (exception::InputError error) {
+            std::stringstream ss;
+            ss << error;
+            abort(2, "Input Error: %s", ss.str().c_str());
+        }
+        n.prefixNames(stripSuffix(args_info.artifacts_arg[i]) + ".");
         all.compose(n, "", "");
     }
 
-    PetriNet policy;
-    std::ifstream policy_file("policy.owfn", std::ifstream::in);
-    policy_file >> io::owfn >> policy;
-    all.produce(policy, "net", "policy");
+
+    /****************\
+     * FINAL MARKING *
+    \****************/
+    if (args_info.goal_given) {
+        PetriNet m;
+        std::ifstream marking_file(args_info.goal_arg, std::ifstream::in);
+        marking_file >> io::owfn >> m;
+        all.getFinalCondition().conjunct(m.getFinalCondition(), all.guessPlaceRelation(m));
+    }
+
+
+    /************\
+     * POLICIES *
+    \************/
+    for (unsigned int i = 0; i < args_info.policies_given; ++i) {
+        PetriNet policy;
+        std::ifstream policy_file(args_info.policies_arg[i], std::ifstream::in);
+        policy_file >> io::owfn >> policy;
+        all.produce(policy, "net", stripSuffix(args_info.policies_arg[i]));
+    }
+
 
     std::cout << io::owfn << all;
 

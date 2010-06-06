@@ -24,8 +24,11 @@ option "policies" p
   optional
   multiple
 
-section "Debugging"
+section "Output"
 
-option "verbose" v
-  "Show verbose output"
-  flag off
+option "output" o
+  "Output filename - \"-\" for stdout"
+  string
+  typestr="FILENAME"
+  optional
+  default="-"

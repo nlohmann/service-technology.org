@@ -228,6 +228,7 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
 
   //int result = system(systemcall.c_str());
   int doNotCare_JustFixWarning = system(systemcall.c_str());
+  doNotCare_JustFixWarning = doNotCare_JustFixWarning; // get rid of compilerwarning
 
   /// does not work for Genet, there seems to be a bug in Cudd
   //PNAPI_ASSERT(result == 0);

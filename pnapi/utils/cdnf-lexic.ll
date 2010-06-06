@@ -53,7 +53,7 @@ number    [0-9]+
 
 %%
 
-int yyerror(const char* msg) {
+__attribute__((noreturn)) int yyerror(const char* msg) {
   status("error near '%s': %s", yytext, msg);
   abort(6, "error while parsing the reachability graph");
 }

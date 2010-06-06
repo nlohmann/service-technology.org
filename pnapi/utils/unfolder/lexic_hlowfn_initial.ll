@@ -55,7 +55,7 @@ number         [0-9]+
 	
 %%
 
-int hlowfn_initial_error(const char *s) {
+__attribute__((noreturn)) int hlowfn_initial_error(const char *s) {
     fprintf(stderr, "hl-net:%d: %s near '%s'\n", hlowfn_initial_lineno, s, hlowfn_initial_text);
     exit(EXIT_FAILURE);
 }

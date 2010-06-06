@@ -62,7 +62,7 @@ public: /* public methods */
   /// parses stream contents with the associated parser
   const PetriNet & parse(std::istream &);
   /// rethrow a caught exception as InputError
-  void rethrow(const exception::Error &);
+  void rethrow(const exception::Error &) __attribute__((noreturn));
   
 protected: /* protected methods */
   /// make this class abstract
@@ -199,7 +199,7 @@ AbstractLexer<P, Bst, F>::AbstractLexer(P & p) :
  * \brief overwrite YY_FATAL_ERROR behavior
  */
 template <class P, class Bst, class F>
-__attribute__((noreturn)) void AbstractLexer<P, Bst, F>::LexerError(const char * msg)
+void AbstractLexer<P, Bst, F>::LexerError(const char * msg)
 {
   parser::error(*(parser_.is_), F::lineno(), F::YYText(), msg);
 }

@@ -45,7 +45,7 @@ number         [0-9]+
 
 %%
 
-int llowfn_final_error(const char *s) {
+__attribute__((noreturn)) int llowfn_final_error(const char *s) {
     fprintf(stderr, "ll-net:%d: %s near '%s'\n", llowfn_final_lineno, s, llowfn_final_text);
     exit(EXIT_FAILURE);
 }

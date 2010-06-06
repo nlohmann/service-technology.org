@@ -82,6 +82,14 @@ int main(int argc, char* argv[])
     Output::setTempfileTemplate(args_info.tmpfile_arg);
     Output::setKeepTempfiles(args_info.noClean_flag);
 
+    // diagnosis is only possible, if libconfig was found
+#if not defined(HAVE_LIBCONFIGXX)
+    if (args_info.diagnosis_flag)
+    {
+        message("Diagnosis of adapters is only possible, if %s was compiled with libconfig++ support",PACKAGE);
+        exit(1);
+    }
+#endif
 
     // store invocation in a string for meta information in file output
     std::string invocation;
@@ -216,7 +224,7 @@ int main(int argc, char* argv[])
     \*************************/
 
     time(&start_time);
-    pnapi::PetriNet controller (*adapter.buildController());
+    const pnapi::PetriNet * controller = adapter.buildController();
     time(&end_time);
     status("controller built [%.0f sec]", difftime(end_time, start_time));
 
@@ -225,7 +233,7 @@ int main(int argc, char* argv[])
         std::string filename = (args_info.output_given ? std::string(args_info.output_arg) : std::string("-"));
         Output outfile(filename, std::string("controller"));
         outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING)
-                         << meta(pnapi::io::INVOCATION, invocation) << controller;
+                         << meta(pnapi::io::INVOCATION, invocation) << *controller;
 
         //quit
         return 0;
@@ -235,14 +243,17 @@ int main(int argc, char* argv[])
     * Composing engine and controller in order to get the final adapter *
     \*******************************************************************/
 
-    engine.compose(controller, "engine.", "controller.");
-
-    engine.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); //
+    if (not args_info.diagnosis_flag)
     {
-        std::string filename = (args_info.output_given ? std::string(args_info.output_arg) : std::string("-"));
-        Output outfile(filename, std::string("final adapter"));
-        outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING)
-                         << meta(pnapi::io::INVOCATION, invocation) << engine;
+        engine.compose(*controller, "engine.", "controller.");
+
+        engine.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); //
+        {
+            std::string filename = (args_info.output_given ? std::string(args_info.output_arg) : std::string("-"));
+            Output outfile(filename, std::string("final adapter"));
+            outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING)
+                             << meta(pnapi::io::INVOCATION, invocation) << engine;
+        }
     }
 
     /*******************\

@@ -5,9 +5,12 @@
 bin_PROGRAMS = marlene
 
 marlene_SOURCES = parser_adapt_rules.yy lexer_adapt_rules.ll \
+		  parser_marking_information.yy lexer_marking_information.ll \
 		  marlene.h marlene.cc \
 		  helper.h helper.cc \
 		  adapter.h adapter.cc\
+		  diagnosis.h diagnosis.cc \
+		  markings.h markings.cc \
 		  cmdline.c cmdline.h \
 		  Output.h Output.cc \
 		  verbose.h verbose.cc \
@@ -67,4 +70,5 @@ MAINTAINERCLEANFILES += $(GENGETOPT_FILES:.ggo=.c) $(GENGETOPT_FILES:.ggo=.h)
 
 doxygen:
 	cd ../doc ; doxygen
+
 

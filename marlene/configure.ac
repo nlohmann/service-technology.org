@@ -79,6 +79,17 @@ AC_SUBST(TEMPFOLDER)
 AC_MSG_CHECKING([weather to be sunny])
 AC_MSG_RESULT([better should be])
 
+# check for libconfig
+AC_LANG([C++])
+#AC_CHECK_LIB(config++, config_init)
+PKG_CHECK_MODULES([LIBCONFIGXX], [libconfig++ >= 1.4],
+  AC_DEFINE([HAVE_LIBCONFIGXX],[],[libconfig++ is present, diagnosis is possible]),
+  AC_MSG_WARN([libconfig++ 1.4 or newer not found.])
+)
+LIBS="${LIBS} ${LIBCONFIGXX_LIBS}"
+CFLAGS="${CFLAGS} ${LIBCONFIGXX_CFLAGS}"
+CXXFLAGS="${CXXFLAGS} ${LIBCONFIGXX_CFLAGS}"
+
 # Checks for header files.
 AC_HEADER_SYS_WAIT
 
@@ -103,9 +114,9 @@ AC_SUBST(builddir)
 #############################################################################
 
 # substitute configure Flags in Makefiles
-AC_SUBST(configured_CXXFLAGS)
-AC_SUBST(configured_CFLAGS)
-AC_SUBST(configured_LDFLAGS)
+#AC_SUBST(configured_CXXFLAGS)
+#AC_SUBST(configured_CFLAGS)
+#AC_SUBST(configured_LDFLAGS)
 
 AC_CONFIG_FILES([Makefile
                  libs/pnapi/Makefile

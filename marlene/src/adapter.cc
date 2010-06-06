@@ -17,7 +17,7 @@
  along with Marlene.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#include <config.h>
+#include "config.h"
 
 #include <iostream>
 #include <fstream>
@@ -42,6 +42,8 @@
 #include "helper.h"
 #include "cmdline.h"
 #include "Output.h"
+#include "diagnosis.h"
+#include "markings.h"
 #include "pnapi/pnapi.h"
 
 /* For documentation of the following functions, please see header file. */
@@ -78,12 +80,16 @@ const pnapi::PetriNet * Adapter::buildEngine()
     createEngineInterface();
     createRuleTransitions();
 
-    // adapter specific reduction should take place here
-    removeUnnecessaryRules();
-    findConflictFreeTransitions();
 
-    // reduce engine with standard PNAPI methods
-    _engine->reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // due to bug https://gna.org/bugs/?15820, normally 4
+    if(not args_info.diagnosis_flag)
+    {
+        // adapter specific reduction should take place here
+        removeUnnecessaryRules();
+        findConflictFreeTransitions();
+
+        // reduce engine with standard PNAPI methods
+        _engine->reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // due to bug https://gna.org/bugs/?15820, normally 4
+    }
 
     // set final condition
     pnapi::Condition & finalCond = _engine->getFinalCondition();
@@ -216,19 +222,25 @@ const pnapi::PetriNet * Adapter::buildController()
         status("skipping creation of complementary places twice ..");
     }
 
-    // finally reduce the strucure of the net as far as possible
-    composed.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // due to bug https://gna.org/bugs/?15820, normally 4
+    if(not args_info.diagnosis_flag)
+    {
+        // finally reduce the strucure of the net as far as possible
+        composed.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // due to bug https://gna.org/bugs/?15820, normally 4
+    }
 
     if (_contType == ASYNCHRONOUS)
     {
         composed.normalize();
     }
-    // \todo: Experiment, ob sich das hier noch lohnt.
-    composed.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // | pnapi::PetriNet::KEEP_NORMAL);
+    if(not args_info.diagnosis_flag)
+    {
+        // \todo: Experiment, ob sich das hier noch lohnt.
+        composed.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); // | pnapi::PetriNet::KEEP_NORMAL);
+    }
 
     /***********************************\
-        * calculate most permissive partner *
-     \***********************************/
+    * calculate most permissive partner *
+    \***********************************/
     // create a unique temporary file name
     Output owfn_temp;
     //        Output sa_temp;
@@ -238,6 +250,8 @@ const pnapi::PetriNet * Adapter::buildController()
     std::string sa_filename = owfn_filename + ".sa";
     std::string og_filename = owfn_filename + ".og";
     std::string cost_filename = owfn_filename + ".cf";
+    std::string diag_filename = owfn_filename + ".diag";
+    std::string mi_filename = owfn_filename + ".mi";
 
 
     owfn_temp.stream() << pnapi::io::owfn << composed << std::flush;
@@ -253,8 +267,16 @@ const pnapi::PetriNet * Adapter::buildController()
     // should we diagnose?
     if (args_info.diagnosis_flag)
     {
+        std::string property = "deadlock";
+        if (args_info.property_arg == property_arg_livelock)
+        {
+            property = "livelock";
+        }
         wendy_command = path2wendy + " " + owfn_filename
-                        + " --diagnose --im --mi --og=" + og_filename;
+                        + " --diagnose --noDeadlockDetection"
+                        + " --correctness=" + property
+                        + " --mi=" + mi_filename
+                        + " --resultFile=" + diag_filename;
     }
     else
     {
@@ -322,54 +344,71 @@ const pnapi::PetriNet * Adapter::buildController()
     time(&end_time);
     status("Wendy done [%.0f sec]", difftime(end_time, start_time));
 
-    if (result != 0)
+    if (result != 0 and not args_info.diagnosis_flag)
     {
         message("Wendy returned with status %d.", result);
         message("Controller could not be built! No adapter was created, exiting.");
         exit(EXIT_FAILURE);
     }
 
-    /*******************************\
-        * parse most-permissive partner *
-     \*******************************/
-    std::ifstream sa_file(sa_filename.c_str(), std::ios_base::in);
-    if (!sa_file)
+    if (args_info.diagnosis_flag)
     {
-        message("Controller was not built! No adapter was created, exiting.");
-        exit(EXIT_FAILURE);
-    }
-    pnapi::Automaton * mpp_sa = new pnapi::Automaton();
-    sa_file >> pnapi::io::sa >> *mpp_sa;
-    sa_file.close();
+        /********* *\
+        * diagnosis *
+        \***********/
+        status("Going into diagnosis mode ...");
 
-    /***********************************************\
-        * transform most-permissive partner to open net *
-     \***********************************************/
-    time(&start_time);
-    delete _controller;
+#if defined(HAVE_LIBCONFIGXX)
+        MarkingInformation mi(mi_filename);
+        Diagnosis diag(diag_filename, mi);
+        diag.evaluateDeadlocks(_nets, *_engine);
+#endif
 
-    std::string path2genet = std::string(args_info.genet_arg);
-    std::string path2petrify = std::string(args_info.petrify_arg);
-
-    if (args_info.sa2on_arg == sa2on_arg_genet and (path2genet != ""))
-
-        {
-            status("Using Genet for conversion from SA to open net.");
-            pnapi::PetriNet::setGenet(path2genet);
-            _controller = new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::GENET, args_info.messagebound_arg + 1);
-        }
-    else if (args_info.sa2on_arg == sa2on_arg_petrify and path2petrify != "")
-    {
-        status("Using Petrify for conversion from SA to open net.");
-        pnapi::PetriNet::setPetrify(path2petrify);
-        _controller = new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::PETRIFY);
     }
     else
     {
-        status("Using a state machine for conversion from SA to open net.");
-        _controller = new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::STATEMACHINE);
+        /*******************************\
+        * parse most-permissive partner *
+        \*******************************/
+        std::ifstream sa_file(sa_filename.c_str(), std::ios_base::in);
+        if (!sa_file)
+        {
+            message("Controller was not built! No adapter was created, exiting.");
+            exit(EXIT_FAILURE);
+        }
+        pnapi::Automaton * mpp_sa = new pnapi::Automaton();
+        sa_file >> pnapi::io::sa >> *mpp_sa;
+        sa_file.close();
+
+        /***********************************************\
+            * transform most-permissive partner to open net *
+         \***********************************************/
+        time(&start_time);
+        delete _controller;
+
+        std::string path2genet = std::string(args_info.genet_arg);
+        std::string path2petrify = std::string(args_info.petrify_arg);
+
+        if (args_info.sa2on_arg == sa2on_arg_genet and (path2genet != ""))
+
+            {
+                status("Using Genet for conversion from SA to open net.");
+                pnapi::PetriNet::setGenet(path2genet);
+                _controller = new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::GENET, args_info.messagebound_arg + 1);
+            }
+        else if (args_info.sa2on_arg == sa2on_arg_petrify and path2petrify != "")
+        {
+            status("Using Petrify for conversion from SA to open net.");
+            pnapi::PetriNet::setPetrify(path2petrify);
+            _controller = new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::PETRIFY);
+        }
+        else
+        {
+            status("Using a state machine for conversion from SA to open net.");
+            _controller = new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::STATEMACHINE);
+        }
+        delete mpp_sa;
     }
-    delete mpp_sa;
 
     //cleaning up files
     if ( not args_info.noClean_flag )
@@ -384,8 +423,16 @@ const pnapi::PetriNet * Adapter::buildController()
             status(" ... deleting %s.", cost_filename.c_str());
             remove(cost_filename.c_str());
         }
+        else if (args_info.diagnosis_flag)
+        {
+            status(" ... deleting %s.", diag_filename.c_str());
+            remove(diag_filename.c_str());
+            status(" ... deleting %s.", mi_filename.c_str());
+            remove(mi_filename.c_str());
+        }
     }
 
+    if (not args_info.diagnosis_flag)
     {
         // CG workaround
         status("Port work-around: adding all labels to port `controller'.");
@@ -416,7 +463,7 @@ const pnapi::PetriNet * Adapter::buildController()
 
     time(&end_time);
 
-    if (args_info.verbose_flag)
+    if (args_info.verbose_flag and not args_info.diagnosis_flag)
     {
         std::cerr << PACKAGE << ": most-permissive partner: "
                   << pnapi::io::stat << *_controller << std::endl;

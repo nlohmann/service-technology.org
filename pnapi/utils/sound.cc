@@ -9,7 +9,7 @@ using pnapi::io::util::operator<<; // to output final conditions
 int main(int argc, char** argv) {
     PetriNet net;
     
-    if(argc < 1) {
+    if(argc < 2) {
         fprintf(stderr, "no input given\n");
         exit(EXIT_FAILURE);
     }

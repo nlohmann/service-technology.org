@@ -178,7 +178,7 @@ const PetriNet & AbstractParser<P, L, C>::parse(std::istream & is)
  * \brief rethrow a caught exception as InputError
  */
 template <class P, class L, class C>
-void AbstractParser<P, L, C>::rethrow(const exception::Error & e)
+__attribute__((noreturn)) void AbstractParser<P, L, C>::rethrow(const exception::Error & e)
 {
   throw exception::InputError(exception::InputError::SEMANTIC_ERROR, 
                               io::util::MetaData::data(*is_)[io::INPUTFILE],
@@ -199,7 +199,7 @@ AbstractLexer<P, Bst, F>::AbstractLexer(P & p) :
  * \brief overwrite YY_FATAL_ERROR behavior
  */
 template <class P, class Bst, class F>
-void AbstractLexer<P, Bst, F>::LexerError(const char * msg)
+__attribute__((noreturn)) void AbstractLexer<P, Bst, F>::LexerError(const char * msg)
 {
   parser::error(*(parser_.is_), F::lineno(), F::YYText(), msg);
 }

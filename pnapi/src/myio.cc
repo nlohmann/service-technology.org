@@ -514,7 +514,7 @@ meta(MetaInformation i, const std::string & s)
  */
 std::ostream & operator<<(std::ostream & os, const exception::Error & e)
 {
-  os << e.message;
+  return (os << e.message);
 }
 
 
@@ -574,7 +574,7 @@ std::ostream & operator<<(std::ostream & os, const exception::InputError & e)
  */
 std::ostream & operator<<(std::ostream & os, const exception::AssertionFailedError & e)
 {
-  os << e.file << ":" << e.line << ": assertion failed: " << e.message;
+  return (os << e.file << ":" << e.line << ": assertion failed: " << e.message);
 }
 
 /*!

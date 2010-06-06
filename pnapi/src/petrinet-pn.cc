@@ -227,7 +227,7 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
   }
 
   //int result = system(systemcall.c_str());
-  system(systemcall.c_str());
+  int doNotCare_JustFixWarning = system(systemcall.c_str());
 
   /// does not work for Genet, there seems to be a bug in Cudd
   //PNAPI_ASSERT(result == 0);

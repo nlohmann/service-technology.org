@@ -30,14 +30,6 @@
 
 #include <inttypes.h>
 
-#ifndef CONFIG_PETRIFY
-#define CONFIG_PETRIFY "not found"
-#endif
-
-#ifndef CONFIG_GENET
-#define CONFIG_GENET "not found"
-#endif
-
 #ifdef HAVE_STDINT_H
 // #include <stdint.h>
 #endif
@@ -47,12 +39,6 @@ namespace pnapi
 
 // forward declarations
 class PetriNet;
-namespace io
-{
-std::ostream & operator<<(std::ostream &, const PetriNet &);
-std::istream & operator>>(std::istream &, PetriNet &) throw (exception::InputError);
-}
-
 
 namespace util
 {

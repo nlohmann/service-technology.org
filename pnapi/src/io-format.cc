@@ -168,6 +168,8 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   << net.transitions_ // interface arcs
 
   << "\n}\n";
+  
+  return os;
 }
 
 /*!

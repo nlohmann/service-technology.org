@@ -38,8 +38,8 @@
  *          but no k-boundedness.
  *          Section 3 contains rules from "Thomas Pillat - 
  *          Gegenüberstellung struktureller Reduktionstechniken
- *          für Petrinetze" ([Pil08])". These rules preserve lifeness and
- *          k-boundedness.         
+ *          für Petrinetze" ([Pil08]). These rules preserve lifeness and
+ *          k-boundedness.
  * 
  * \version \$Revision$
  *

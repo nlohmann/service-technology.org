@@ -1681,7 +1681,7 @@ Interval Disjunction::getPlaceInterval(const Place & p) const
 /*!
  * \brief get the valid interval of a place
  */
-Interval FormulaTrue::getPlaceInterval(const Place & p) const
+Interval FormulaTrue::getPlaceInterval(const Place &) const
 {
   return Interval();
 }
@@ -1689,7 +1689,7 @@ Interval FormulaTrue::getPlaceInterval(const Place & p) const
 /*!
  * \brief get the valid interval of a place
  */
-Interval FormulaFalse::getPlaceInterval(const Place & p) const
+Interval FormulaFalse::getPlaceInterval(const Place &) const
 {
   return Interval(0, -1);
 }

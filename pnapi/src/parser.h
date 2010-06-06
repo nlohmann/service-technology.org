@@ -62,7 +62,7 @@ public: /* public methods */
   /// parses stream contents with the associated parser
   const PetriNet & parse(std::istream &);
   /// rethrow a caught exception as InputError
-  void rethrow(const exception::Error &) __attribute__((noreturn));
+  void rethrow(const exception::Error &);
   
 protected: /* protected methods */
   /// make this class abstract

@@ -81,14 +81,14 @@ AC_MSG_RESULT([better should be])
 
 # check for libconfig
 AC_LANG([C++])
-#AC_CHECK_LIB(config++, config_init)
-PKG_CHECK_MODULES([LIBCONFIGXX], [libconfig++ >= 1.4],
-  AC_DEFINE([HAVE_LIBCONFIGXX],[],[libconfig++ is present, diagnosis is possible]),
-  AC_MSG_WARN([libconfig++ 1.4 or newer not found.])
-)
-LIBS="${LIBS} ${LIBCONFIGXX_LIBS}"
-CFLAGS="${CFLAGS} ${LIBCONFIGXX_CFLAGS}"
-CXXFLAGS="${CXXFLAGS} ${LIBCONFIGXX_CFLAGS}"
+AC_CHECK_LIB(config++, config_init)
+#PKG_CHECK_MODULES([LIBCONFIGXX], [libconfig++ >= 1.4],
+#  AC_DEFINE([HAVE_LIBCONFIGXX],[],[libconfig++ is present, diagnosis is possible]),
+#  AC_MSG_WARN([libconfig++ 1.4 or newer not found.])
+#)
+#LIBS="${LIBS} ${LIBCONFIGXX_LIBS}"
+#CFLAGS="${CFLAGS} ${LIBCONFIGXX_CFLAGS}"
+#CXXFLAGS="${CXXFLAGS} ${LIBCONFIGXX_CFLAGS}"
 
 # Checks for header files.
 AC_HEADER_SYS_WAIT

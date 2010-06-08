@@ -177,14 +177,14 @@ int LPWrapper::calcPInvariant(bool verbose) {
 	for(unsigned int k=0; k<transitionorder.size(); ++k)
 	{
 		for(unsigned int y=0; y<cols; ++y) mat[y]=0;
-		set<pnapi::Arc*>::iterator ait;
-		set<pnapi::Arc*> arcs = transitionorder[k]->getPresetArcs(); 
+		set<pnapi::Arc*>::iterator ait;	
+		set<pnapi::Arc*> arcs = transitionorder[k]->getPostsetArcs();
 		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
 		{
 			Place* t = &((*ait)->getPlace());
 			mat[ppos[t]] += (*ait)->getWeight();
 		}
-		arcs = transitionorder[k]->getPostsetArcs();
+		arcs = transitionorder[k]->getPresetArcs(); 
 		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
 		{
 			Place* t = &((*ait)->getPlace());
@@ -347,6 +347,85 @@ int LPWrapper::calcSiphon(bool verbose) {
 	}
 	else
 	  message("No siphon could be found");
+
+	return cleanup();
+}
+
+/** Checks if the petri net is bounded for all initial markings.
+	@param verbose If TRUE prints information on cout.
+	@return The number of equations on success, -1 otherwise.
+*/
+int LPWrapper::isBounded(bool verbose) {
+	
+	ppos.clear(); // probably not necessary
+	pvector.clear();
+
+	// set the column variables in lp_solve according to the global place ordering
+	colnr=0;
+	for(unsigned int o=0; o<placeorder.size(); ++o,++colnr)
+	{
+		Place* t(placeorder[o]); // get the places according to the global ordering 
+		set_col_name(lp,colnr+1,const_cast<char*>(t->getName().c_str()));
+		ppos[t] = colnr; // remember the ordering of the place
+	}
+	if (colnr!=(int)(cols)) cerr << "lisa: LPWrapper error: column number mismatch" << endl;
+
+	//lp_solve objective: minimum firing sequence length
+	colpoint = new int[cols];
+	mat = new REAL[cols];
+	for(unsigned int y=0; y<cols; y++)
+	{
+		mat[y]=1;
+		colpoint[y]=y+1;
+	}
+	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
+	if (!set_obj_fnex(lp,cols,mat,colpoint)) return -1;
+	
+	set_minim(lp);
+	
+	//create incidence matrix by adding rows to lp_solve
+	for(unsigned int k=0; k<transitionorder.size(); ++k)
+	{
+		for(unsigned int y=0; y<cols; ++y) mat[y]=0;
+		set<pnapi::Arc*>::iterator ait;	
+		set<pnapi::Arc*> arcs = transitionorder[k]->getPostsetArcs();
+		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
+		{
+			Place* t = &((*ait)->getPlace());
+			mat[ppos[t]] += (*ait)->getWeight();
+		}
+		arcs = transitionorder[k]->getPresetArcs(); 
+		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
+		{
+			Place* t = &((*ait)->getPlace());
+			mat[ppos[t]] -= (*ait)->getWeight();
+		}
+		int mark = 0; // right hand side equals zero as we want to calculate invariants
+		//initialize the rows
+		if (!add_constraintex(lp,cols,mat,colpoint,EQ,mark)) return -1;
+	}
+
+	//allow only nonnegative solutions
+	REAL r = 1;
+
+	for(int y=1; y<=(int)(cols); ++y)
+		if (!add_constraintex(lp,1,&r,&y,GE,0.000001)) return -1;
+
+	set_add_rowmode(lp,FALSE);	
+	if (verbose) write_LP(lp,stdout);
+	else set_verbose(lp,CRITICAL);
+	basicrows = placeorder.size()+cols;
+
+	int ret = solve(lp);
+
+	if(ret != 0)
+	 message("petri net is not bounded");
+	else{
+         message("petri net is bounded for all initial markings");
+	 get_variables(lp, mat);
+         for(int j = 0; j < cols; j++)
+           fprintf(stderr, "%s: %f\n", get_col_name(lp, j + 1), mat[j]);
+	}
 
 	return cleanup();
 }
@@ -555,5 +634,7 @@ bool LPWrapper::calcPTOrder() {
 	
 	return deterministic;
 }
+
+
 
 

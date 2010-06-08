@@ -11,7 +11,9 @@
 TESTFILES = t_invariant1.owfn \
 	    no_t_invariant.owfn \
 	    p_invariant1.owfn \
-	    has_trap.owfn
+	    has_trap.owfn \
+	    bounded.owfn \
+	    unbounded.owfn
 
 # Below you can list all the files you do not want to have counted in the
 # coverability report that can be created by calling "make cover". Usually,

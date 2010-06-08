@@ -53,6 +53,8 @@ public:
 
 	int calcSiphon(bool b);
 
+	int isBounded(bool b);
+
 	bool calcPTOrder();
 
 	/// Level of verbosity of lp_solve

@@ -614,6 +614,8 @@ int main(int argc, char** argv) {
 		}
 
 		// parse cost profile
+		extern CostProfile* profile;
+
 		if (args_info.costprofile_given)
 		{
 			status("Parsing cost profile `%s'", args_info.costprofile_arg);
@@ -630,8 +632,10 @@ int main(int argc, char** argv) {
 
 		}
 		// parse request
-		if (args_info.request_given)
-		{
+		extern Request* request;
+		std::vector<Request*> requests;
+		
+		if (strncmp(args_info.request_arg,"random",6) != 0) {
 			status("Parsing request `%s'", args_info.request_arg);
 			extern FILE * request_yyin;
 			if ( not (request_yyin = fopen(args_info.request_arg, "r")))
@@ -643,19 +647,85 @@ int main(int argc, char** argv) {
 			extern int request_yyparse();
 			request_yyparse();
 			fclose(request_yyin);
+	
+			requests.push_back(request);
+			
+		} else {
+		
+			status("Using random requests");
+			
+			std::string random(args_info.request_arg);
+			std::string relevant = random.substr(6);
+			int pos = relevant.find(".") + 1;
+			int pos2 = relevant.find(".",pos) + 1;
+			
+			int nrOfRandomRequests = atoi(relevant.substr(0,pos-1).c_str());
+			int nrOfGrantsPerRequest = atoi(relevant.substr(pos,pos2-1).c_str());
+			int nrOfConstraintsPerGrant = atoi(relevant.substr(pos2).c_str());
+			
+			status("Nr of random requests: %i with each %i grants having %i constraints each.", nrOfRandomRequests, nrOfGrantsPerRequest, nrOfConstraintsPerGrant);
+			
+			for (int i = 0; i < nrOfRandomRequests; ++i) {
+			
+				request = new Request();
+				
+				request->assertions = new std::vector<std::vector<ElementalConstraint*>* >(); // A disjunction (outer vector) of conjunctions (inner vectors).
+				request->grants = new std::vector<Grant*>(); 
 
+				for (int j = 0; j < nrOfGrantsPerRequest; ++j) {
+					
+					Grant* g = new Grant();
+					delete g->variableCosts;
+					g->variableCosts = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());
+					for (int k = 1; k <= CostAgent::transitions->size(); ++k) {
+						int vorzeichen = std::rand() % 2;
+						g->variableCosts[k] = (- vorzeichen) * (std::rand() % 100);
+					}
+					int vorzeichen = std::rand() % 2;
+					g->fixCosts = (- vorzeichen) * (std::rand() % 100);
+
+					for (int x = 0; x < nrOfConstraintsPerGrant; ++x) {
+						
+						ElementalConstraint* e = new ElementalConstraint(CostAgent::transitions->size());
+												
+						for (int c = 1; c < CostAgent::transitions->size(); ++c) {
+//							std::cerr << "here";
+							vorzeichen = std::rand() % 2;
+							(e->lhs)[c] = (- vorzeichen) * (std::rand() % 10);
+							vorzeichen = std::rand() % 2;
+							e->rhs = (- vorzeichen) * (std::rand() % 10);
+							e->sign = (std::rand() % 4) + 1;
+						}
+
+						
+						
+						g->constraint->push_back(e);
+					
+					}
+					
+					request->grants->push_back(g);
+					
+				
+				}
+				
+				requests.push_back(request);
+			
+			}
+			
 		}
 
-		extern CostProfile* profile;
-		extern Request* request;
+		
+		CostAgent::buildBasicStateEquation();	
+
+		for (int reqcounter = 0; reqcounter < requests.size(); ++reqcounter) {
+		
+		request = requests[reqcounter];
 		
 		if (request->assertions->size() == 0) {
 			ElementalConstraint* dummy = new ElementalConstraint(CostAgent::transitions->size());
 			request->assertions->push_back(new std::vector<ElementalConstraint*>);
 			(*request->assertions)[0]->push_back(dummy);
 		}
-		
-		CostAgent::buildBasicStateEquation();	
 		
 		
 		// for each use case in the cost profile...
@@ -695,6 +765,7 @@ int main(int argc, char** argv) {
 			
 			
 			
+		}
 		}
 	}
 	

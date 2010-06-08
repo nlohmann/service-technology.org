@@ -677,7 +677,7 @@ int main(int argc, char** argv) {
 					Grant* g = new Grant();
 					delete g->variableCosts;
 					g->variableCosts = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());
-					for (int k = 1; k <= CostAgent::transitions->size(); ++k) {
+					for (int k = 1; k < CostAgent::transitions->size(); ++k) {
 						int vorzeichen = std::rand() % 2;
 						g->variableCosts[k] = (- vorzeichen) * (std::rand() % 100);
 					}

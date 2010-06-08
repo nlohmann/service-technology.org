@@ -656,20 +656,57 @@ int main(int argc, char** argv) {
 			
 			std::string random(args_info.request_arg);
 			std::string relevant = random.substr(6);
-			int pos = relevant.find(".") + 1;
-			int pos2 = relevant.find(".",pos) + 1;
 			
-			int nrOfRandomRequests = atoi(relevant.substr(0,pos-1).c_str());
-			int nrOfGrantsPerRequest = atoi(relevant.substr(pos,pos2-1).c_str());
-			int nrOfConstraintsPerGrant = atoi(relevant.substr(pos2).c_str());
 			
-			status("Nr of random requests: %i with each %i grants having %i constraints each.", nrOfRandomRequests, nrOfGrantsPerRequest, nrOfConstraintsPerGrant);
+			int pos1 = 0;
+			int pos2 = relevant.find(".",pos1) + 1;
+			int pos3 = relevant.find(".",pos2) + 1;
+			int pos4 = relevant.find(".",pos3) + 1;
+			int pos5 = relevant.find(".",pos4) + 1;
+			
+			int len1 = pos2 - pos1 - 1;
+			int len2 = pos3 - pos2 - 1;
+			int len3 = pos4 - pos3 - 1;
+			int len4 = pos5 - pos4 - 1;
+			
+			int nrOfRandomRequests = atoi(relevant.substr(pos1,len1).c_str());
+			int nrOfAssertionsPerRequest = atoi(relevant.substr(pos2,len2).c_str());
+			int nrOfConstraintsPerAssertion = atoi(relevant.substr(pos3,len3).c_str());
+			int nrOfGrantsPerRequest = atoi(relevant.substr(pos4,len4).c_str());
+			int nrOfConstraintsPerGrant = atoi(relevant.substr(pos5).c_str());
+			
+//			status("Nr of random requests: %i with each %i grants having %i constraints each.", nrOfRandomRequests, nrOfGrantsPerRequest, nrOfConstraintsPerGrant);
 			
 			for (int i = 0; i < nrOfRandomRequests; ++i) {
 			
 				request = new Request();
 				
 				request->assertions = new std::vector<std::vector<ElementalConstraint*>* >(); // A disjunction (outer vector) of conjunctions (inner vectors).
+				
+				for (int j = 0; j < nrOfAssertionsPerRequest; ++j) {
+				
+					std::vector<ElementalConstraint*>* assertion = new std::vector<ElementalConstraint*>;
+					
+					for (int k = 0; k < nrOfConstraintsPerAssertion; ++k) {
+						ElementalConstraint* e = new ElementalConstraint(CostAgent::transitions->size());
+												
+						for (int c = 1; c < CostAgent::transitions->size(); ++c) {
+//							std::cerr << "here";
+							int vorzeichen = std::rand() % 2;
+							(e->lhs)[c] = (- vorzeichen) * (std::rand() % 10);
+							vorzeichen = std::rand() % 2;
+							e->rhs = (- vorzeichen) * (std::rand() % 10);
+							e->sign = (std::rand() % 4) + 1;
+						}
+						
+						assertion->push_back(e);
+
+					}
+					
+					request->assertions->push_back(assertion);
+				
+				}
+				
 				request->grants = new std::vector<Grant*>(); 
 
 				for (int j = 0; j < nrOfGrantsPerRequest; ++j) {

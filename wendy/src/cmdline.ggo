@@ -168,7 +168,7 @@ option "diagnose" -
 option "noDeadlockDetection" -
   "Switch off early deadlock detection."
   details="Does not preprocess the reachability graph of the inner of the net to allow for more detailed diagnosis information."
-  flag on
+  flag off
   hidden
 
 option "reportFrequency" -

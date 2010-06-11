@@ -616,8 +616,7 @@ int main(int argc, char** argv) {
 		// parse cost profile
 		extern CostProfile* profile;
 
-		if (args_info.costprofile_given)
-		{
+	if (strncmp(args_info.costprofile_arg,"random",6) != 0) {
 			status("Parsing cost profile `%s'", args_info.costprofile_arg);
 			extern FILE * profile_yyin;
 			if ( not (profile_yyin = fopen(args_info.costprofile_arg, "r")))
@@ -630,6 +629,69 @@ int main(int argc, char** argv) {
 			profile_yyparse();
 			fclose(profile_yyin);
 
+		} else {
+		
+			status("Using random profiles");
+			
+			std::string random(args_info.costprofile_arg);
+			std::string relevant = random.substr(6);
+			
+			int pos1 = 0;
+			int pos2 = relevant.find(".",pos1) + 1;
+			int len1 = pos2 - pos1 - 1;
+			
+			int nrOfUseCases = atoi(relevant.substr(pos1,len1).c_str());
+			int nrOfConstraintsPerUseCase = atoi(relevant.substr(pos2).c_str());
+
+			profile = new CostProfile;
+			
+			for (int i = 0; i < nrOfUseCases; ++i) {
+			
+				UseCase* usecase = new UseCase();
+				
+				// use case policy
+				
+				int lowerbound = std::rand() % 2;
+				int upperbound = std::rand() % 2;
+				
+				usecase->policyLB = lowerbound == 1;
+				usecase->policyRB = upperbound == 1;
+				int vorzeichen = std::rand() % 2;
+				
+				usecase->policyLHS = (-1*vorzeichen) + (std::rand() % 1000);
+				usecase->policyRHS = std::rand() % 1000 + usecase->policyLHS;
+				
+				usecase->fixCosts = std::rand() % 100;
+				
+				for (int j = 0; j < CostAgent::places->size(); ++j) {
+					usecase->marking[j] = std::rand() % 3;
+				}
+				
+				for (int k = 0; k < nrOfConstraintsPerUseCase; ++k) {
+						ElementalConstraint* e = new ElementalConstraint(CostAgent::transitions->size());
+												
+						for (int c = 1; c < CostAgent::transitions->size(); ++c) {
+							int vorzeichen = std::rand() % 2;
+							(e->lhs)[c] = (- vorzeichen) * (std::rand() % 10);
+							vorzeichen = std::rand() % 2;
+							e->rhs = (- vorzeichen) * (std::rand() % 10);
+							e->sign = (std::rand() % 4) + 1;
+						}
+	
+						usecase->constraint->push_back(e);
+	
+	
+				}
+	
+					usecase->variableCosts = CostAgent::getCleanDoubleArray(CostAgent::transitions->size());
+					for (int k = 1; k < CostAgent::transitions->size(); ++k) {
+						int vorzeichen = std::rand() % 2;
+						usecase->variableCosts[k] = (- vorzeichen) * (std::rand() % 100);
+					}
+	
+				profile->usecases->push_back(usecase);
+			}
+		
 		}
 		// parse request
 		extern Request* request;

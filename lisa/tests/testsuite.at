@@ -71,19 +71,3 @@ AT_CHECK([GREP -q "p3" stderr])
 AT_CHECK([GREP -q "p5" stderr])
 AT_KEYWORDS(algorithms)
 AT_CLEANUP
-
-AT_SETUP([Checking boundedness])
-m4_define([NET], [bounded.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([LISA NET --isBounded],0,ignore,stderr)
-AT_CHECK([GREP -q "petri net is bounded" stderr])
-AT_KEYWORDS(algorithms)
-AT_CLEANUP
-
-AT_SETUP([Checking unboundedness])
-m4_define([NET], [unbounded.owfn])
-AT_CHECK([cp TESTFILES/NET .])
-AT_CHECK([LISA NET --isBounded],0,ignore,stderr)
-AT_CHECK([GREP -q "petri net is not bounded" stderr])
-AT_KEYWORDS(algorithms)
-AT_CLEANUP

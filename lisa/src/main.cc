@@ -177,7 +177,7 @@ int main(int argc, char** argv) {
     if(args_info.findTInv_flag){
       LPWrapper lpw(net.getTransitions().size(), &net);
       lpw.calcPTOrder();
-      lpw.calcTInvariant(true);
+      lpw.calcTInvariant(false);
     }
 
     /*----------------------------------------.
@@ -187,7 +187,7 @@ int main(int argc, char** argv) {
     if(args_info.findPInv_flag){
       LPWrapper lpw(net.getPlaces().size(), &net);
       lpw.calcPTOrder();
-      lpw.calcPInvariant(true);
+      lpw.calcPInvariant(false);
     }
 
     /*----------------------------------------.
@@ -244,18 +244,6 @@ int main(int argc, char** argv) {
       lpw.checkReachability(m1, m2, false);
 
     }	
-
-    /*----------------------------------------.
-    | 7. check if petri net is bounded
-    `----------------------------------------*/
-
-    if(args_info.isBounded_flag){
-      LPWrapper lpw(net.getPlaces().size(), &net);
-      lpw.calcPTOrder();
-      lpw.isBounded(true);
-    }	
-
-
 
     return EXIT_SUCCESS;
 }

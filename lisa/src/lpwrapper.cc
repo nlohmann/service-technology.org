@@ -138,9 +138,8 @@ int LPWrapper::calcTInvariant(bool verbose) {
 			Transition* t = &((*ait)->getTransition());
 			mat[tpos[t]] -= (*ait)->getWeight();
 		}
-		int mark = 0; // right hand side equals zero as we want to calculate invariants
 		//initialize the rows
-		if (!add_constraintex(lp,cols,mat,colpoint,EQ,mark)) return -1;
+		if (!add_constraintex(lp,cols,mat,colpoint,EQ,0)) return -1;
 	}
 
 	if(solveLP(verbose) != 2){
@@ -190,9 +189,8 @@ int LPWrapper::calcPInvariant(bool verbose) {
 			Place* t = &((*ait)->getPlace());
 			mat[ppos[t]] -= (*ait)->getWeight();
 		}
-		int mark = 0; // right hand side equals zero as we want to calculate invariants
 		//initialize the rows
-		if (!add_constraintex(lp,cols,mat,colpoint,EQ,mark)) return -1;
+		if (!add_constraintex(lp,cols,mat,colpoint,EQ,0)) return -1;
 	}
 
 	if(solveLP(verbose) != 2){
@@ -262,9 +260,8 @@ int LPWrapper::calcTrap(bool verbose) {
 		      }
 		    }
 		  }
-		  int mark = 0; // right hand side equals zero as we want to calculate invariants
 		  //initialize the rows
-		  if (!add_constraintex(lp,cols,mat,colpoint,GE,mark)) return -1;
+		  if (!add_constraintex(lp,cols,mat,colpoint,GE,0)) return -1;
 		
    		}
 		catch(std::bad_cast & b){
@@ -323,9 +320,8 @@ int LPWrapper::calcSiphon(bool verbose) {
 		      }
 		    }
 		  }
-		  int mark = 0; // right hand side equals zero as we want to calculate invariants
 		  //initialize the rows
-		  if (!add_constraintex(lp,cols,mat,colpoint,GE,mark)) return -1;
+		  if (!add_constraintex(lp,cols,mat,colpoint,GE,0)) return -1;
 		
    		}
 		catch(std::bad_cast & b){
@@ -351,10 +347,9 @@ int LPWrapper::calcSiphon(bool verbose) {
 	return cleanup();
 }
 
-/** Checks if the petri net is bounded for all initial markings.
-	@param verbose If TRUE prints information on cout.
-	@return The number of equations on success, -1 otherwise.
-*/
+/*
+
+
 int LPWrapper::isBounded(bool verbose) {
 	
 	ppos.clear(); // probably not necessary
@@ -400,16 +395,16 @@ int LPWrapper::isBounded(bool verbose) {
 			Place* t = &((*ait)->getPlace());
 			mat[ppos[t]] -= (*ait)->getWeight();
 		}
-		int mark = 0; // right hand side equals zero as we want to calculate invariants
 		//initialize the rows
-		if (!add_constraintex(lp,cols,mat,colpoint,EQ,mark)) return -1;
+		if (!add_constraintex(lp,cols,mat,colpoint,LE,0)) return -1;
 	}
 
-	//allow only nonnegative solutions
+	//allow only solutions that are greater than zero
+  	//this cannot be expressed directly in lp_solve
 	REAL r = 1;
 
 	for(int y=1; y<=(int)(cols); ++y)
-		if (!add_constraintex(lp,1,&r,&y,GE,0.000001)) return -1;
+		if (!add_constraintex(lp,1,&r,&y,GE,0.001)) return -1;
 
 	set_add_rowmode(lp,FALSE);	
 	if (verbose) write_LP(lp,stdout);
@@ -422,13 +417,11 @@ int LPWrapper::isBounded(bool verbose) {
 	 message("petri net is not bounded");
 	else{
          message("petri net is bounded for all initial markings");
-	 get_variables(lp, mat);
-         for(int j = 0; j < cols; j++)
-           fprintf(stderr, "%s: %f\n", get_col_name(lp, j + 1), mat[j]);
 	}
 
 	return cleanup();
 }
+*/
 
 int LPWrapper::setupP(){
 	ppos.clear(); // probably not necessary

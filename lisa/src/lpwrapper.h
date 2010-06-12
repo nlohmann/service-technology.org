@@ -53,7 +53,10 @@ public:
 
 	int calcSiphon(bool b);
 
-	int isBounded(bool b);
+	//Boundedness check might be not providing reliable results
+	//int isBounded(bool b);
+
+	int isTerminating(bool b);
 
 	bool calcPTOrder();
 

@@ -74,7 +74,7 @@ State::State(const State & s) :
 State::State(const State & s, PetriNet * net,
              std::map<const Place *, const Place *> * placeMap) :
   name_(s.name_), isFinal_(s.isFinal_), isInitial_(s.isInitial_),
-  hashValue_(s.hashValue_), m_(NULL) 
+  m_(NULL), hashValue_(s.hashValue_)
 {
   if(s.m_ != NULL)
   {

@@ -4,6 +4,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "component.h"
 #include "formula.h"
 #include "marking.h"
@@ -143,7 +145,7 @@ Operator::Operator(const Formula & l, const Formula & r)
     {
       if (child1 != NULL)
       {
-        assert(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
+        PNAPI_ASSERT(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
       }
       child1 = child2;
     }
@@ -171,7 +173,7 @@ Operator::Operator(const std::set<const Formula *> & children,
     if (child2 != NULL)
     {
       if (child1 != NULL)
-        assert(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
+        PNAPI_ASSERT(&child1->getPlace().getPetriNet() == &child2->getPlace().getPetriNet());
       child1 = child2;
     }
   }
@@ -286,9 +288,11 @@ Disjunction::Disjunction()
  */
 Proposition::Proposition(const Place & p, unsigned int k,
                          const std::map<const Place *, const Place *> * places) :
-  place_((places == NULL) ? p : (*places->find(&p)->second)), tokens_(k)
+  place_((places == NULL) ? p :
+         (PNAPI_ASSERT((places->find(&p) != places->end()) && (places->find(&p)->second != NULL)),
+          (*places->find(&p)->second))),
+  tokens_(k)
 {
-  assert((places == NULL) || (places->find(&p)->second != NULL));
 }
 
 /*!
@@ -1677,7 +1681,7 @@ Interval Disjunction::getPlaceInterval(const Place & p) const
 /*!
  * \brief get the valid interval of a place
  */
-Interval FormulaTrue::getPlaceInterval(const Place & p) const
+Interval FormulaTrue::getPlaceInterval(const Place &) const
 {
   return Interval();
 }
@@ -1685,7 +1689,7 @@ Interval FormulaTrue::getPlaceInterval(const Place & p) const
 /*!
  * \brief get the valid interval of a place
  */
-Interval FormulaFalse::getPlaceInterval(const Place & p) const
+Interval FormulaFalse::getPlaceInterval(const Place &) const
 {
   return Interval(0, -1);
 }

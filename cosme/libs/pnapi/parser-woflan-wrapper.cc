@@ -65,7 +65,7 @@ Lexer::Lexer(Parser & p) :
 /*!
  * \brief implement parser error handling
  */
-void BisonParser::error(const location_type & loc, const std::string & msg)
+void BisonParser::error(const location_type &, const std::string & msg)
 {
   parser::error(*(parser_.is_), parser_.lexer_.lineno(), parser_.lexer_.YYText(), msg);
 }
@@ -82,15 +82,5 @@ Parser::Parser() :
 {
 }
 
-/*!
- * \brief get the substring of a given string
- */
-char * Parser::substr(const char * pstr, int start, int numchars)
-{
-  char * pnew = (char *) malloc(numchars + 1);
-  strncpy(pnew, pstr + start, numchars);
-  pnew[numchars] = '\0';
-  return pnew;
-}
 
 } } } /* namespace pnapi::parser::lola */

@@ -65,7 +65,7 @@ bool Output::keepTempfiles = true;
 */
 Output::Output() :
     os(*(new std::ofstream(createTmp(), std::ofstream::out | std::ofstream::trunc))),
-    filename(temp), temp(temp), kind("")
+    filename(temp), kind("")
 {
     status("writing to temporary file '%s'", filename.c_str());
 }

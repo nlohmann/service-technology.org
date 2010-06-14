@@ -49,7 +49,7 @@ public: /* public methods */
   /// constructor
   Marking(const Marking &, PetriNet *, std::map<const Place *, const Place *> &);
   /// destructor
-  virtual ~Marking() {};
+  virtual ~Marking() {}
   /// assignment operator
   Marking & operator=(const Marking &);
   //@}

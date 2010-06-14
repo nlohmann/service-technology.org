@@ -421,10 +421,10 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
     break;
 
-  case 3:
+  case 4:
 
 /* Line 677 of lalr1.cc  */
-#line 103 "parser-owfn.yy"
+#line 104 "parser-owfn.yy"
     { 
     // clear stringstream
     parser_.nodeName_.str("");
@@ -435,10 +435,10 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
     break;
 
-  case 4:
+  case 5:
 
 /* Line 677 of lalr1.cc  */
-#line 112 "parser-owfn.yy"
+#line 113 "parser-owfn.yy"
     { 
     // clear stringstream
     parser_.nodeName_.str("");
@@ -448,286 +448,322 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
     break;
 
-  case 10:
-
-/* Line 677 of lalr1.cc  */
-#line 139 "parser-owfn.yy"
-    { parser_.labelType_ = Label::INPUT; }
-    break;
-
-  case 13:
-
-/* Line 677 of lalr1.cc  */
-#line 144 "parser-owfn.yy"
-    { parser_.labelType_ = Label::OUTPUT; }
-    break;
-
-  case 16:
-
-/* Line 677 of lalr1.cc  */
-#line 149 "parser-owfn.yy"
-    { parser_.labelType_ = Label::SYNCHRONOUS; }
-    break;
-
-  case 18:
-
-/* Line 677 of lalr1.cc  */
-#line 154 "parser-owfn.yy"
-    { parser_.capacity_ = 0; }
-    break;
-
-  case 19:
-
-/* Line 677 of lalr1.cc  */
-#line 155 "parser-owfn.yy"
-    { parser_.capacity_ = 0; }
-    break;
-
   case 21:
 
 /* Line 677 of lalr1.cc  */
-#line 160 "parser-owfn.yy"
-    { parser_.capacity_ = 1; }
+#line 162 "parser-owfn.yy"
+    { parser_.labelType_ = Label::INPUT; }
     break;
 
-  case 22:
+  case 23:
 
 /* Line 677 of lalr1.cc  */
-#line 161 "parser-owfn.yy"
-    { parser_.capacity_ = (yysemantic_stack_[(3) - (2)].yt_int); }
+#line 166 "parser-owfn.yy"
+    { parser_.labelType_ = Label::OUTPUT; }
     break;
 
-  case 24:
+  case 25:
 
 /* Line 677 of lalr1.cc  */
-#line 167 "parser-owfn.yy"
-    {
-    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
-    parser_.labels_[parser_.nodeName_.str()] = parser_.label_;
-  }
+#line 170 "parser-owfn.yy"
+    { parser_.labelType_ = Label::SYNCHRONOUS; }
     break;
 
-  case 26:
+  case 27:
 
 /* Line 677 of lalr1.cc  */
 #line 175 "parser-owfn.yy"
+    { parser_.capacity_ = 0; }
+    break;
+
+  case 28:
+
+/* Line 677 of lalr1.cc  */
+#line 176 "parser-owfn.yy"
+    { parser_.capacity_ = 0; }
+    break;
+
+  case 30:
+
+/* Line 677 of lalr1.cc  */
+#line 181 "parser-owfn.yy"
+    { parser_.capacity_ = 1; }
+    break;
+
+  case 31:
+
+/* Line 677 of lalr1.cc  */
+#line 182 "parser-owfn.yy"
+    { parser_.capacity_ = (yysemantic_stack_[(3) - (2)].yt_int); }
+    break;
+
+  case 33:
+
+/* Line 677 of lalr1.cc  */
+#line 188 "parser-owfn.yy"
     {
-    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
+    // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    try
+    {
+      parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
+    }
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+
     parser_.labels_[parser_.nodeName_.str()] = parser_.label_;
   }
     break;
 
-  case 34:
+  case 35:
 
 /* Line 677 of lalr1.cc  */
-#line 195 "parser-owfn.yy"
+#line 204 "parser-owfn.yy"
     {
-    if(parser_.place_ != NULL) // is only NULL when parsing interface
+    // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    try
     {
-      parser_.place_->setMaxOccurrence((yysemantic_stack_[(3) - (3)].yt_int));
+      parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
     }
-  }
-    break;
-
-  case 36:
-
-/* Line 677 of lalr1.cc  */
-#line 203 "parser-owfn.yy"
+    catch(exception::Error e)
     {
-    if(parser_.place_ != NULL) // is only NULL when parsing interface
-    {
-      parser_.place_->setMaxOccurrence((yysemantic_stack_[(3) - (3)].yt_int));
+      parser_.rethrow(e);
     }
+
+    parser_.labels_[parser_.nodeName_.str()] = parser_.label_;
   }
-    break;
-
-  case 38:
-
-/* Line 677 of lalr1.cc  */
-#line 214 "parser-owfn.yy"
-    { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
-    break;
-
-  case 40:
-
-/* Line 677 of lalr1.cc  */
-#line 217 "parser-owfn.yy"
-    { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
-    break;
-
-  case 42:
-
-/* Line 677 of lalr1.cc  */
-#line 223 "parser-owfn.yy"
-    { parser_.capacity_ = 0; }
     break;
 
   case 43:
 
 /* Line 677 of lalr1.cc  */
-#line 224 "parser-owfn.yy"
-    { parser_.capacity_ = 0; }
+#line 232 "parser-owfn.yy"
+    {
+    if(parser_.place_ != NULL) // is only NULL when parsing interface
+    {
+      parser_.place_->setMaxOccurrence((yysemantic_stack_[(3) - (3)].yt_int));
+    }
+  }
     break;
 
   case 45:
 
 /* Line 677 of lalr1.cc  */
-#line 230 "parser-owfn.yy"
+#line 240 "parser-owfn.yy"
     {
-    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.place_ = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
-    parser_.places_[parser_.nodeName_.str()] = parser_.place_;
+    if(parser_.place_ != NULL) // is only NULL when parsing interface
+    {
+      parser_.place_->setMaxOccurrence((yysemantic_stack_[(3) - (3)].yt_int));
+    }
   }
     break;
 
   case 47:
 
 /* Line 677 of lalr1.cc  */
-#line 238 "parser-owfn.yy"
+#line 251 "parser-owfn.yy"
+    { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
+    break;
+
+  case 49:
+
+/* Line 677 of lalr1.cc  */
+#line 254 "parser-owfn.yy"
+    { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
+    break;
+
+  case 57:
+
+/* Line 677 of lalr1.cc  */
+#line 274 "parser-owfn.yy"
+    { parser_.capacity_ = 0; }
+    break;
+
+  case 58:
+
+/* Line 677 of lalr1.cc  */
+#line 275 "parser-owfn.yy"
+    { parser_.capacity_ = 0; }
+    break;
+
+  case 60:
+
+/* Line 677 of lalr1.cc  */
+#line 281 "parser-owfn.yy"
     {
-    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.place_ = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+    // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    try
+    {
+      parser_.place_ = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+    }
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+
     parser_.places_[parser_.nodeName_.str()] = parser_.place_;
   }
     break;
 
-  case 51:
+  case 62:
 
 /* Line 677 of lalr1.cc  */
-#line 255 "parser-owfn.yy"
-    { parser_.net_.addRole(parser_.nodeName_.str()); }
-    break;
-
-  case 52:
-
-/* Line 677 of lalr1.cc  */
-#line 257 "parser-owfn.yy"
-    { parser_.net_.addRole(parser_.nodeName_.str()); }
-    break;
-
-  case 59:
-
-/* Line 677 of lalr1.cc  */
-#line 279 "parser-owfn.yy"
-    { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
-    break;
-
-  case 61:
-
-/* Line 677 of lalr1.cc  */
-#line 282 "parser-owfn.yy"
-    { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
-    break;
-
-  case 63:
-
-/* Line 677 of lalr1.cc  */
-#line 288 "parser-owfn.yy"
+#line 297 "parser-owfn.yy"
     {
-    Label * l = parser_.labels_[parser_.nodeName_.str()];
-    parser_.check(l != NULL, "unknown interface label");
-    parser_.check((l->getPort().getName() == ""), "interface label already assigned to port '" + l->getPort().getName() +"'");
-     
-    Label::Type t = l->getType();
-    parser_.net_.getInterface().getPort()->removeLabel(parser_.nodeName_.str());
-    parser_.labels_[parser_.nodeName_.str()] = &(parser_.port_->addLabel(parser_.nodeName_.str(), t));
-  }
-    break;
-
-  case 64:
-
-/* Line 677 of lalr1.cc  */
-#line 298 "parser-owfn.yy"
+    // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
+    try
     {
-    Label * l = parser_.labels_[parser_.nodeName_.str()];
-    parser_.check(l != NULL, "unknown interface label");
-    parser_.check((l->getPort().getName() == ""), "interface label already assigned to port '" + l->getPort().getName() +"'");
-     
-    Label::Type t = l->getType();
-    parser_.net_.getInterface().getPort()->removeLabel(parser_.nodeName_.str());
-    parser_.labels_[parser_.nodeName_.str()] = &(parser_.port_->addLabel(parser_.nodeName_.str(), t));
+      parser_.place_ = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
+    }
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+
+    parser_.places_[parser_.nodeName_.str()] = parser_.place_;
   }
     break;
 
   case 65:
 
 /* Line 677 of lalr1.cc  */
-#line 316 "parser-owfn.yy"
-    { parser_.markInitial_ = true; }
+#line 321 "parser-owfn.yy"
+    { parser_.net_.addRole(parser_.nodeName_.str()); }
     break;
 
   case 66:
 
 /* Line 677 of lalr1.cc  */
-#line 317 "parser-owfn.yy"
+#line 323 "parser-owfn.yy"
+    { parser_.net_.addRole(parser_.nodeName_.str()); }
+    break;
+
+  case 79:
+
+/* Line 677 of lalr1.cc  */
+#line 357 "parser-owfn.yy"
+    { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
+    break;
+
+  case 81:
+
+/* Line 677 of lalr1.cc  */
+#line 360 "parser-owfn.yy"
+    { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
+    break;
+
+  case 83:
+
+/* Line 677 of lalr1.cc  */
+#line 366 "parser-owfn.yy"
+    {
+    Label * l = parser_.labels_[parser_.nodeName_.str()];
+    parser_.check(l != NULL, "unknown interface label");
+    parser_.check((l->getPort().getName() == ""), "interface label already assigned to port '" + l->getPort().getName() +"'");
+     
+    Label::Type t = l->getType();
+    parser_.net_.getInterface().getPort()->removeLabel(parser_.nodeName_.str());
+    parser_.labels_[parser_.nodeName_.str()] = &(parser_.port_->addLabel(parser_.nodeName_.str(), t));
+  }
+    break;
+
+  case 84:
+
+/* Line 677 of lalr1.cc  */
+#line 376 "parser-owfn.yy"
+    {
+    Label * l = parser_.labels_[parser_.nodeName_.str()];
+    parser_.check(l != NULL, "unknown interface label");
+    parser_.check((l->getPort().getName() == ""), "interface label already assigned to port '" + l->getPort().getName() +"'");
+     
+    Label::Type t = l->getType();
+    parser_.net_.getInterface().getPort()->removeLabel(parser_.nodeName_.str());
+    parser_.labels_[parser_.nodeName_.str()] = &(parser_.port_->addLabel(parser_.nodeName_.str(), t));
+  }
+    break;
+
+  case 85:
+
+/* Line 677 of lalr1.cc  */
+#line 394 "parser-owfn.yy"
+    { parser_.markInitial_ = true; }
+    break;
+
+  case 86:
+
+/* Line 677 of lalr1.cc  */
+#line 395 "parser-owfn.yy"
     { parser_.markInitial_ = false; }
     break;
 
-  case 71:
+  case 91:
 
 /* Line 677 of lalr1.cc  */
-#line 328 "parser-owfn.yy"
-    { 
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");      
-      
+#line 406 "parser-owfn.yy"
+    {
+    parser_.place_ = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(parser_.place_ != NULL, "unknown place");
+  }
+    break;
+
+  case 93:
+
+/* Line 677 of lalr1.cc  */
+#line 415 "parser-owfn.yy"
+    {      
     if(parser_.markInitial_)
     {  
-      p->setTokenCount((yysemantic_stack_[(3) - (3)].yt_int));
+      parser_.place_->setTokenCount((yysemantic_stack_[(2) - (2)].yt_int));
     }
     else
     {
-      (*(parser_.finalMarking_))[*p] = (yysemantic_stack_[(3) - (3)].yt_int);
+      (*(parser_.finalMarking_))[*parser_.place_] = (yysemantic_stack_[(2) - (2)].yt_int);
     }
   }
     break;
 
-  case 72:
+  case 94:
 
 /* Line 677 of lalr1.cc  */
-#line 342 "parser-owfn.yy"
-    { 
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
-    
+#line 426 "parser-owfn.yy"
+    {
     if(parser_.markInitial_)
     {  
-      p->setTokenCount(1);
+      parser_.place_->setTokenCount(1);
     }
     else
     {
-      (*(parser_.finalMarking_))[*p] = 1;
+      (*(parser_.finalMarking_))[*parser_.place_] = 1;
     }
   }
     break;
 
-  case 73:
+  case 95:
 
 /* Line 677 of lalr1.cc  */
-#line 359 "parser-owfn.yy"
+#line 440 "parser-owfn.yy"
     { parser_.finalMarking_ = new Marking(parser_.net_, true); }
     break;
 
-  case 74:
+  case 96:
 
 /* Line 677 of lalr1.cc  */
-#line 361 "parser-owfn.yy"
+#line 442 "parser-owfn.yy"
     {
     delete parser_.finalMarking_;
     parser_.finalMarking_ = NULL;
   }
     break;
 
-  case 75:
+  case 97:
 
 /* Line 677 of lalr1.cc  */
-#line 366 "parser-owfn.yy"
+#line 447 "parser-owfn.yy"
     {
     parser_.net_.getFinalCondition() = (*(yysemantic_stack_[(1) - (1)].yt_formula));
     if(parser_.wildcardGiven_)
@@ -739,10 +775,10 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
     break;
 
-  case 76:
+  case 98:
 
 /* Line 677 of lalr1.cc  */
-#line 379 "parser-owfn.yy"
+#line 460 "parser-owfn.yy"
     {
     parser_.net_.getFinalCondition().addMarking(*(parser_.finalMarking_));
     delete parser_.finalMarking_;
@@ -750,10 +786,10 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
     break;
 
-  case 77:
+  case 99:
 
 /* Line 677 of lalr1.cc  */
-#line 385 "parser-owfn.yy"
+#line 466 "parser-owfn.yy"
     {
     parser_.net_.getFinalCondition().addMarking(*(parser_.finalMarking_));
     delete parser_.finalMarking_;
@@ -761,72 +797,82 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
     break;
 
-  case 78:
+  case 100:
 
 /* Line 677 of lalr1.cc  */
-#line 393 "parser-owfn.yy"
+#line 474 "parser-owfn.yy"
     { (yyval.yt_formula) = new formula::FormulaTrue(); }
     break;
 
-  case 79:
+  case 101:
 
 /* Line 677 of lalr1.cc  */
-#line 394 "parser-owfn.yy"
+#line 475 "parser-owfn.yy"
     { (yyval.yt_formula) = new formula::FormulaFalse(); }
     break;
 
-  case 80:
+  case 102:
 
 /* Line 677 of lalr1.cc  */
-#line 395 "parser-owfn.yy"
+#line 476 "parser-owfn.yy"
     { (yyval.yt_formula) = (yysemantic_stack_[(3) - (2)].yt_formula); }
     break;
 
-  case 81:
+  case 104:
 
 /* Line 677 of lalr1.cc  */
-#line 399 "parser-owfn.yy"
+#line 482 "parser-owfn.yy"
+    {
+    parser_.net_.getFinalCondition() = (*(yysemantic_stack_[(3) - (2)].yt_formula));
+    delete (yysemantic_stack_[(3) - (2)].yt_formula);
+  }
+    break;
+
+  case 105:
+
+/* Line 677 of lalr1.cc  */
+#line 489 "parser-owfn.yy"
     { (yyval.yt_formula) = (yysemantic_stack_[(3) - (2)].yt_formula); }
     break;
 
-  case 82:
+  case 106:
 
 /* Line 677 of lalr1.cc  */
-#line 400 "parser-owfn.yy"
+#line 490 "parser-owfn.yy"
     { (yyval.yt_formula) = new formula::FormulaTrue(); }
     break;
 
-  case 83:
+  case 107:
 
 /* Line 677 of lalr1.cc  */
-#line 401 "parser-owfn.yy"
+#line 491 "parser-owfn.yy"
     { (yyval.yt_formula) = new formula::FormulaFalse(); }
     break;
 
-  case 84:
+  case 108:
 
 /* Line 677 of lalr1.cc  */
-#line 403 "parser-owfn.yy"
+#line 493 "parser-owfn.yy"
     { 
     parser_.wildcardGiven_ = true;
     (yyval.yt_formula) = new formula::FormulaTrue();
   }
     break;
 
-  case 85:
+  case 109:
 
 /* Line 677 of lalr1.cc  */
-#line 408 "parser-owfn.yy"
+#line 498 "parser-owfn.yy"
     { 
     (yyval.yt_formula) = new formula::Negation(*(yysemantic_stack_[(2) - (2)].yt_formula));
     delete (yysemantic_stack_[(2) - (2)].yt_formula);
   }
     break;
 
-  case 86:
+  case 110:
 
 /* Line 677 of lalr1.cc  */
-#line 413 "parser-owfn.yy"
+#line 503 "parser-owfn.yy"
     {
     (yyval.yt_formula) = new formula::Disjunction(*(yysemantic_stack_[(3) - (1)].yt_formula), *(yysemantic_stack_[(3) - (3)].yt_formula));
     delete (yysemantic_stack_[(3) - (1)].yt_formula);
@@ -834,10 +880,10 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
     break;
 
-  case 87:
+  case 111:
 
 /* Line 677 of lalr1.cc  */
-#line 419 "parser-owfn.yy"
+#line 509 "parser-owfn.yy"
     {
     (yyval.yt_formula) = new formula::Conjunction(*(yysemantic_stack_[(3) - (1)].yt_formula), *(yysemantic_stack_[(3) - (3)].yt_formula));
     delete (yysemantic_stack_[(3) - (1)].yt_formula);
@@ -845,122 +891,213 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
     break;
 
-  case 88:
+  case 112:
 
 /* Line 677 of lalr1.cc  */
-#line 425 "parser-owfn.yy"
+#line 515 "parser-owfn.yy"
     {
     parser_.wildcardGiven_ = true;
     (yyval.yt_formula) = (yysemantic_stack_[(3) - (1)].yt_formula);
   }
     break;
 
-  case 89:
+  case 113:
 
 /* Line 677 of lalr1.cc  */
-#line 430 "parser-owfn.yy"
+#line 520 "parser-owfn.yy"
     {
     (yyval.yt_formula) = (yysemantic_stack_[(3) - (1)].yt_formula); // obsolete; kept due to compatibility
   }
     break;
 
-  case 90:
+  case 114:
 
 /* Line 677 of lalr1.cc  */
-#line 434 "parser-owfn.yy"
+#line 524 "parser-owfn.yy"
     {
     (yyval.yt_formula) = (yysemantic_stack_[(3) - (1)].yt_formula); // obsolete; kept due to compatibility
   }
     break;
 
-  case 91:
+  case 115:
 
 /* Line 677 of lalr1.cc  */
-#line 438 "parser-owfn.yy"
+#line 528 "parser-owfn.yy"
     {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
-    
-    (yyval.yt_formula) = new formula::FormulaEqual(*p, (yysemantic_stack_[(3) - (3)].yt_int));
+    parser_.place_ = parser_.places_[parser_.nodeName_.str()];
+    parser_.check(parser_.place_ != NULL, "unknown place");
   }
     break;
 
-  case 92:
+  case 116:
 
 /* Line 677 of lalr1.cc  */
-#line 445 "parser-owfn.yy"
+#line 533 "parser-owfn.yy"
     {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
-
-    (yyval.yt_formula) = new formula::Negation(formula::FormulaEqual(*p, (yysemantic_stack_[(3) - (3)].yt_int)));
+    (yyval.yt_formula) = (yysemantic_stack_[(3) - (3)].yt_formula);
   }
     break;
 
-  case 93:
+  case 117:
 
 /* Line 677 of lalr1.cc  */
-#line 452 "parser-owfn.yy"
-    {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
-
-    (yyval.yt_formula) = new formula::FormulaLess(*p, (yysemantic_stack_[(3) - (3)].yt_int));
+#line 540 "parser-owfn.yy"
+    { 
+    (yyval.yt_formula) = new formula::FormulaEqual(*parser_.place_, (yysemantic_stack_[(2) - (2)].yt_int));
   }
     break;
 
-  case 94:
+  case 118:
 
 /* Line 677 of lalr1.cc  */
-#line 459 "parser-owfn.yy"
+#line 544 "parser-owfn.yy"
     {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
-
-    (yyval.yt_formula) = new formula::FormulaGreater(*p, (yysemantic_stack_[(3) - (3)].yt_int));
+    (yyval.yt_formula) = new formula::Negation(formula::FormulaEqual(*parser_.place_, (yysemantic_stack_[(2) - (2)].yt_int)));
   }
     break;
 
-  case 95:
+  case 119:
 
 /* Line 677 of lalr1.cc  */
-#line 466 "parser-owfn.yy"
+#line 548 "parser-owfn.yy"
     {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
-
-    (yyval.yt_formula) = new formula::FormulaGreaterEqual(*p, (yysemantic_stack_[(3) - (3)].yt_int));
+    (yyval.yt_formula) = new formula::FormulaLess(*parser_.place_, (yysemantic_stack_[(2) - (2)].yt_int));
   }
     break;
 
-  case 96:
+  case 120:
 
 /* Line 677 of lalr1.cc  */
-#line 473 "parser-owfn.yy"
+#line 552 "parser-owfn.yy"
     {
-    Place * p = parser_.places_[parser_.nodeName_.str()];
-    parser_.check(p != NULL, "unknown place");
-
-    (yyval.yt_formula) = new formula::FormulaLessEqual(*p, (yysemantic_stack_[(3) - (3)].yt_int));
+    (yyval.yt_formula) = new formula::FormulaGreater(*parser_.place_, (yysemantic_stack_[(2) - (2)].yt_int));
   }
     break;
 
-  case 99:
+  case 121:
 
 /* Line 677 of lalr1.cc  */
-#line 494 "parser-owfn.yy"
+#line 556 "parser-owfn.yy"
     {
-    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
-    parser_.check(!(parser_.net_.containsNode(parser_.nodeName_.str())), "node name already used");
-    parser_.transition_ = &(parser_.net_.createTransition(parser_.nodeName_.str())); 
-    parser_.transition_->setCost((yysemantic_stack_[(3) - (3)].yt_int));
+    (yyval.yt_formula) = new formula::FormulaGreaterEqual(*parser_.place_, (yysemantic_stack_[(2) - (2)].yt_int));
   }
     break;
 
-  case 100:
+  case 122:
 
 /* Line 677 of lalr1.cc  */
-#line 502 "parser-owfn.yy"
+#line 560 "parser-owfn.yy"
+    {
+    (yyval.yt_formula) = new formula::FormulaLessEqual(*parser_.place_, (yysemantic_stack_[(2) - (2)].yt_int));
+  }
+    break;
+
+  case 123:
+
+/* Line 677 of lalr1.cc  */
+#line 568 "parser-owfn.yy"
+    { (yyval.yt_formula) = (yysemantic_stack_[(3) - (2)].yt_formula); }
+    break;
+
+  case 124:
+
+/* Line 677 of lalr1.cc  */
+#line 569 "parser-owfn.yy"
+    { (yyval.yt_formula) = new formula::FormulaTrue(); }
+    break;
+
+  case 125:
+
+/* Line 677 of lalr1.cc  */
+#line 570 "parser-owfn.yy"
+    { (yyval.yt_formula) = new formula::FormulaFalse(); }
+    break;
+
+  case 126:
+
+/* Line 677 of lalr1.cc  */
+#line 572 "parser-owfn.yy"
+    { 
+    (yyval.yt_formula) = new formula::Negation(*(yysemantic_stack_[(2) - (2)].yt_formula));
+    delete (yysemantic_stack_[(2) - (2)].yt_formula);
+  }
+    break;
+
+  case 127:
+
+/* Line 677 of lalr1.cc  */
+#line 577 "parser-owfn.yy"
+    {
+    (yyval.yt_formula) = new formula::Disjunction(*(yysemantic_stack_[(3) - (1)].yt_formula), *(yysemantic_stack_[(3) - (3)].yt_formula));
+    delete (yysemantic_stack_[(3) - (1)].yt_formula);
+    delete (yysemantic_stack_[(3) - (3)].yt_formula);
+  }
+    break;
+
+  case 128:
+
+/* Line 677 of lalr1.cc  */
+#line 583 "parser-owfn.yy"
+    {
+    (yyval.yt_formula) = new formula::Conjunction(*(yysemantic_stack_[(3) - (1)].yt_formula), *(yysemantic_stack_[(3) - (3)].yt_formula));
+    delete (yysemantic_stack_[(3) - (1)].yt_formula);
+    delete (yysemantic_stack_[(3) - (3)].yt_formula);
+  }
+    break;
+
+  case 129:
+
+/* Line 677 of lalr1.cc  */
+#line 589 "parser-owfn.yy"
+    {
+    parser_.place_ = parser_.places_[parser_.nodeName_.str()];
+    if(parser_.place_ == NULL)
+    {
+      parser_.place_ = parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str()));
+    }
+  }
+    break;
+
+  case 130:
+
+/* Line 677 of lalr1.cc  */
+#line 597 "parser-owfn.yy"
+    {
+    (yyval.yt_formula) = (yysemantic_stack_[(3) - (3)].yt_formula);
+  }
+    break;
+
+  case 133:
+
+/* Line 677 of lalr1.cc  */
+#line 617 "parser-owfn.yy"
+    {
+    // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
+    // parser_.check(!(parser_.net_.containsNode(parser_.nodeName_.str())), "node name already used");
+    try
+    {
+      parser_.transition_ = &(parser_.net_.createTransition(parser_.nodeName_.str()));
+    }
+    catch(exception::Error e)
+    {
+      parser_.rethrow(e);
+    }
+  }
+    break;
+
+  case 134:
+
+/* Line 677 of lalr1.cc  */
+#line 630 "parser-owfn.yy"
+    {
+    parser_.transition_->setCost((yysemantic_stack_[(4) - (4)].yt_int));
+  }
+    break;
+
+  case 135:
+
+/* Line 677 of lalr1.cc  */
+#line 635 "parser-owfn.yy"
     { 
     parser_.target_ = reinterpret_cast<Node * *>(&(parser_.transition_));
     parser_.source_ = reinterpret_cast<Node * *>(&(parser_.place_)); 
@@ -969,10 +1106,10 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
     break;
 
-  case 101:
+  case 136:
 
 /* Line 677 of lalr1.cc  */
-#line 509 "parser-owfn.yy"
+#line 642 "parser-owfn.yy"
     { 
     parser_.source_ = reinterpret_cast<Node * *>(&(parser_.transition_));
     parser_.target_ = reinterpret_cast<Node * *>(&(parser_.place_)); 
@@ -981,77 +1118,77 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
     break;
 
-  case 103:
+  case 138:
 
 /* Line 677 of lalr1.cc  */
-#line 519 "parser-owfn.yy"
+#line 652 "parser-owfn.yy"
     { (yyval.yt_int) = 0;  }
     break;
 
-  case 104:
+  case 139:
 
 /* Line 677 of lalr1.cc  */
-#line 520 "parser-owfn.yy"
+#line 653 "parser-owfn.yy"
     { (yyval.yt_int) = (yysemantic_stack_[(3) - (2)].yt_int); }
     break;
 
-  case 107:
+  case 142:
 
 /* Line 677 of lalr1.cc  */
-#line 530 "parser-owfn.yy"
+#line 663 "parser-owfn.yy"
     {
     parser_.check(parser_.transition_->getPetriNet().isRoleSpecified(parser_.nodeName_.str()), "role has not been specified");
     parser_.transition_->addRole(parser_.nodeName_.str());
   }
     break;
 
-  case 108:
+  case 143:
 
 /* Line 677 of lalr1.cc  */
-#line 535 "parser-owfn.yy"
+#line 668 "parser-owfn.yy"
     {
     parser_.check(parser_.transition_->getPetriNet().isRoleSpecified(parser_.nodeName_.str()), "role has not been specified");
     parser_.transition_->addRole(parser_.nodeName_.str());
   }
     break;
 
-  case 112:
+  case 147:
 
 /* Line 677 of lalr1.cc  */
-#line 549 "parser-owfn.yy"
+#line 682 "parser-owfn.yy"
     {
     parser_.place_ = parser_.places_[parser_.nodeName_.str()];
     parser_.label_ = parser_.labels_[parser_.nodeName_.str()];
-    parser_.check(!((parser_.place_ == NULL) && (parser_.label_ == NULL)), "unknown place");
+    parser_.check(!((parser_.place_ == NULL) && (parser_.label_ == NULL)), "unknown place or interface label");
     parser_.check(parser_.placeSet_.find(parser_.nodeName_.str()) == parser_.placeSet_.end(), parser_.placeSetType_ ? "place already in preset" : "place already in postset");
     parser_.check(!(parser_.placeSetType_ && (parser_.label_ != NULL) && (parser_.label_->getType() != Label::INPUT)), "can only consume from places and input labels");
     parser_.check(!(!parser_.placeSetType_ && (parser_.label_ != NULL) && (parser_.label_->getType() != Label::OUTPUT)), "can only produce to places and output labels");
+  }
+    break;
 
+  case 149:
+
+/* Line 677 of lalr1.cc  */
+#line 695 "parser-owfn.yy"
+    {
     if(parser_.place_ != NULL)
     {
-      parser_.net_.createArc(**(parser_.source_), **(parser_.target_), (yysemantic_stack_[(3) - (3)].yt_int));
+      parser_.net_.createArc(**(parser_.source_), **(parser_.target_), (yysemantic_stack_[(2) - (2)].yt_int));
     }
     else
     {
-      parser_.transition_->addLabel(*(parser_.label_), (yysemantic_stack_[(3) - (3)].yt_int));
+      parser_.transition_->addLabel(*(parser_.label_), (yysemantic_stack_[(2) - (2)].yt_int));
     }
 
     parser_.placeSet_.insert(parser_.nodeName_.str());
   }
     break;
 
-  case 113:
+  case 150:
 
 /* Line 677 of lalr1.cc  */
-#line 569 "parser-owfn.yy"
+#line 708 "parser-owfn.yy"
     {
-    parser_.place_ = parser_.places_[parser_.nodeName_.str()];
-    parser_.label_ = parser_.labels_[parser_.nodeName_.str()];
-    parser_.check(!((parser_.place_ == NULL) && (parser_.label_ == NULL)), "unknown place");
-    parser_.check(parser_.placeSet_.find(parser_.nodeName_.str()) == parser_.placeSet_.end(), parser_.placeSetType_ ? "place already in preset" : "place already in postset");
-    parser_.check(!(parser_.placeSetType_ && (parser_.label_ != NULL) && (parser_.label_->getType() != Label::INPUT)), "can only consume from places and input labels");
-    parser_.check(!(!parser_.placeSetType_ && (parser_.label_ != NULL) && (parser_.label_->getType() != Label::OUTPUT)), "can only produce to places and output labels");
-
     if(parser_.place_ != NULL)
     {
       parser_.net_.createArc(**(parser_.source_), **(parser_.target_));
@@ -1065,10 +1202,10 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
     break;
 
-  case 117:
+  case 154:
 
 /* Line 677 of lalr1.cc  */
-#line 598 "parser-owfn.yy"
+#line 730 "parser-owfn.yy"
     {
     parser_.label_ = parser_.labels_[parser_.nodeName_.str()];
     parser_.check(parser_.label_ != NULL, "unknown label");
@@ -1077,10 +1214,10 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
     break;
 
-  case 118:
+  case 155:
 
 /* Line 677 of lalr1.cc  */
-#line 605 "parser-owfn.yy"
+#line 737 "parser-owfn.yy"
     {
     parser_.label_ = parser_.labels_[parser_.nodeName_.str()];
     parser_.check(parser_.label_ != NULL, "unknown label");
@@ -1089,24 +1226,24 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
     break;
 
-  case 121:
+  case 158:
 
 /* Line 677 of lalr1.cc  */
-#line 620 "parser-owfn.yy"
+#line 752 "parser-owfn.yy"
     { parser_.constrains_[parser_.transition_].insert(parser_.nodeName_.str()); }
     break;
 
-  case 122:
+  case 159:
 
 /* Line 677 of lalr1.cc  */
-#line 622 "parser-owfn.yy"
+#line 754 "parser-owfn.yy"
     { parser_.constrains_[parser_.transition_].insert(parser_.nodeName_.str()); }
     break;
 
 
 
 /* Line 677 of lalr1.cc  */
-#line 1110 "parser-owfn.cc"
+#line 1247 "parser-owfn.cc"
 	default:
           break;
       }
@@ -1311,32 +1448,36 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
      STATE-NUM.  */
-  const short int BisonParser::yypact_ninf_ = -133;
+  const short int BisonParser::yypact_ninf_ = -178;
   const short int
   BisonParser::yypact_[] =
   {
-        70,     5,    59,     7,    -1,  -133,   106,    20,    27,    45,
-      31,    38,   106,    32,    81,   108,  -133,  -133,  -133,    38,
-    -133,  -133,  -133,    38,  -133,   115,   106,  -133,   100,   127,
-    -133,   130,   121,   106,   137,    27,   106,   149,   131,   106,
-     108,   133,    38,  -133,  -133,  -133,  -133,    43,   134,   106,
-     106,  -133,    16,   106,  -133,   115,   135,    22,  -133,   106,
-    -133,    43,  -133,   138,    27,    51,   139,    38,   108,    71,
-    -133,  -133,   130,   106,  -133,   136,   106,  -133,   140,   106,
-    -133,   150,   106,   134,   106,   115,  -133,    43,   141,    27,
-     124,   126,   132,   146,   134,  -133,  -133,   145,  -133,  -133,
-      98,   147,  -133,   138,  -133,  -133,  -133,    43,   115,   148,
-     129,   123,  -133,  -133,   106,  -133,  -133,  -133,    92,  -133,
-    -133,   151,   163,   134,  -133,    71,    71,    71,  -133,  -133,
-    -133,    58,   106,   106,  -133,  -133,  -133,  -133,   109,   109,
-      40,   -22,  -133,   106,   171,  -133,  -133,  -133,  -133,    71,
-      71,   106,  -133,    84,   155,   156,   -26,  -133,   153,   158,
-     159,   161,   162,   165,  -133,    79,   109,  -133,   102,  -133,
-    -133,  -133,  -133,  -133,    23,  -133,  -133,  -133,  -133,  -133,
-    -133,  -133,  -133,  -133,  -133,  -133,  -133,   106,  -133,   106,
-     155,  -133,   166,   114,  -133,   167,   106,   175,  -133,  -133,
-    -133,   106,   118,   185,   106,   195,  -133,   119,   106,  -133,
-     106,  -133,  -133,   122,  -133,   106,  -133,  -133
+        61,    17,    13,   107,    48,    27,  -178,    34,  -178,   115,
+      42,    -8,    34,    50,    73,   120,  -178,  -178,  -178,  -178,
+    -178,   122,   122,  -178,    31,  -178,  -178,  -178,  -178,    95,
+    -178,  -178,  -178,    34,  -178,  -178,  -178,  -178,  -178,  -178,
+      34,    58,  -178,    83,  -178,    74,     8,    34,  -178,    95,
+    -178,  -178,  -178,  -178,  -178,  -178,    39,  -178,   134,  -178,
+     122,   122,    34,   108,   126,    93,    95,    95,    95,  -178,
+     -21,  -178,  -178,  -178,  -178,   118,    34,    34,  -178,   104,
+      34,   139,  -178,   116,   148,   156,   157,   161,   163,  -178,
+    -178,  -178,  -178,    70,  -178,    34,  -178,  -178,   162,    13,
+     160,    34,   166,   167,    34,  -178,   126,    84,  -178,  -178,
+      74,  -178,   169,    13,  -178,  -178,  -178,  -178,  -178,  -178,
+     171,    34,  -178,  -178,  -178,   197,    13,  -178,   174,    13,
+      13,  -178,   162,   159,   164,   165,   177,   118,    34,  -178,
+     173,  -178,  -178,   143,   189,  -178,  -178,    34,   118,    34,
+     197,   175,   158,   152,  -178,  -178,  -178,   112,    34,  -178,
+    -178,  -178,    79,  -178,  -178,   178,  -178,   174,  -178,  -178,
+    -178,    84,    84,    84,  -178,  -178,    34,  -178,   127,    34,
+    -178,  -178,  -178,  -178,    22,    22,  -178,    56,   182,   199,
+     118,  -178,  -178,  -178,    84,    84,  -178,  -178,   187,   186,
+      91,  -178,   134,  -178,    65,    22,  -178,    34,   206,  -178,
+    -178,  -178,     4,  -178,  -178,  -178,  -178,  -178,  -178,  -178,
+    -178,   131,  -178,   187,    34,  -178,    34,  -178,  -178,   132,
+    -178,   191,    34,   209,   190,  -178,  -178,  -178,  -178,    34,
+     137,   215,    34,   218,  -178,   140,    34,  -178,    34,  -178,
+    -178,   151,  -178,    34,  -178,  -178
   };
 
   /* YYDEFACT[S] -- default rule to reduce with in state S when YYTABLE
@@ -1345,113 +1486,125 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   const unsigned char
   BisonParser::yydefact_[] =
   {
-         0,     9,    55,     0,     0,    10,     0,     0,    12,     8,
-       0,    20,    44,     0,    49,     9,     1,    65,    97,    20,
-       3,     4,    38,    20,    13,    15,     0,    21,     0,     0,
-      45,    42,    20,     0,    57,    12,    68,     2,     0,    23,
-       9,     0,    20,    16,     7,    40,    22,    56,    28,     0,
-      44,    51,     0,     0,     6,    15,    72,     0,    69,     0,
-      98,    11,    24,    18,    12,    20,     0,    20,     9,    30,
-      46,    47,    43,     0,    50,     0,    58,    53,     0,     0,
-      66,   103,    23,    28,     0,    15,     5,    14,     0,    12,
-       0,     0,     0,     0,    28,    52,    59,     0,    71,    70,
-       0,     0,    99,    19,    25,    26,    39,    17,    15,     0,
-       0,     0,    29,    48,     0,    61,    73,    78,     0,    67,
-      75,     0,   105,    28,    41,    30,    30,    30,    34,    36,
-      63,     0,     0,    68,    84,    82,    83,    79,     0,     0,
-       0,     0,   104,     0,     0,    27,    31,    32,    33,    30,
-      30,     0,    60,     0,    76,     0,     0,    85,     0,     0,
-       0,     0,     0,     0,    80,     0,     0,   107,     0,   100,
-      35,    37,    64,    62,    68,    81,    96,    95,    93,    94,
-      92,    91,    88,    89,    90,    87,    86,     0,   106,   109,
-      77,   108,   113,     0,   110,     0,     0,     0,   112,   111,
-     101,   109,     0,   114,   116,   119,   117,     0,     0,   102,
-       0,   115,   121,     0,   118,     0,   120,   122
+         0,    14,    69,     0,     0,     0,     3,     0,     6,     9,
+      11,     0,    59,     0,    77,    67,   124,   125,   103,     4,
+       5,     0,     0,   129,     0,     1,    85,   131,    47,    29,
+      21,    23,    25,     0,    20,    15,    16,    17,    18,    19,
+       0,    10,    30,     0,    60,    57,    29,     0,     7,    29,
+      72,    73,    74,    75,    70,    71,     0,   126,     0,   104,
+       0,     0,    88,     2,    51,     0,    29,    29,    29,    65,
+       0,    49,    12,    13,    31,    37,     0,    59,    68,     0,
+      78,     0,   123,     0,     0,     0,     0,     0,     0,   130,
+     128,   127,    91,     0,    89,     0,   132,    52,    53,     8,
+       0,    32,     0,     0,     0,    64,    51,    39,    61,    62,
+      58,    79,     0,    76,   122,   121,   119,   120,   118,   117,
+      94,     0,    86,   133,    54,    55,    22,    33,    27,    24,
+      26,    66,    53,     0,     0,     0,     0,    37,     0,    81,
+       0,    92,    90,     0,   138,    56,    48,    32,    37,     0,
+      55,     0,     0,     0,    38,    63,    83,     0,     0,    93,
+      95,   100,     0,    87,    97,     0,   134,    28,    34,    35,
+      50,    39,    39,    39,    43,    45,     0,    80,     0,    88,
+     108,   106,   107,   101,     0,     0,   115,     0,     0,   140,
+      37,    40,    41,    42,    39,    39,    84,    82,    98,     0,
+       0,   109,     0,   102,     0,     0,   139,     0,     0,    36,
+      44,    46,    88,   105,   116,   112,   113,   114,   111,   110,
+     142,     0,   135,    99,     0,   141,   144,   143,   147,     0,
+     145,   150,     0,     0,     0,   148,   146,   136,   149,   144,
+       0,   151,   153,   156,   154,     0,     0,   137,     0,   152,
+     158,     0,   155,     0,   157,   159
   };
 
   /* YYPGOTO[NTERM-NUM].  */
   const short int
   BisonParser::yypgoto_[] =
   {
-      -133,  -133,    -6,  -133,  -133,   -11,  -133,   -30,  -133,   -53,
-    -133,   -29,   -16,   125,  -133,  -133,   -75,   -43,  -133,  -133,
-    -133,  -133,  -133,    17,   160,  -133,  -133,   143,  -133,  -133,
-    -133,  -133,  -133,  -133,  -133,    80,  -133,  -133,  -133,  -132,
-     142,  -133,  -133,  -133,  -133,  -129,  -133,  -133,  -133,  -133,
-    -133,  -133,  -133,  -133,    10,    18,  -133,  -133,  -133,  -133
+      -178,  -178,    -7,  -178,   192,  -178,  -178,  -178,  -178,     9,
+    -178,    10,  -178,    19,  -178,   125,   -45,    87,  -178,  -178,
+    -134,  -163,  -178,  -178,  -178,  -178,  -178,   124,    99,    86,
+     -12,   168,  -178,  -178,    -3,  -178,  -178,  -178,  -178,  -178,
+    -178,  -178,  -178,  -178,    80,  -178,  -178,  -178,  -177,   119,
+    -178,  -178,  -178,  -178,  -178,  -178,  -178,  -127,  -178,    35,
+     -15,  -178,  -178,  -178,  -178,  -178,  -178,  -178,  -178,  -178,
+    -178,     3,    11,  -178,  -178,  -178,  -178,  -178,  -178
   };
 
   /* YYDEFGOTO[NTERM-NUM].  */
   const short int
   BisonParser::yydefgoto_[] =
   {
-        -1,     3,   140,     4,     7,     8,    19,    25,    42,    44,
-      67,    38,    12,    63,    83,   123,    70,    93,   149,   150,
-       9,    40,    68,    13,    31,    48,    94,    34,    52,    14,
-      15,    54,    76,   114,   132,   131,    18,    36,   100,    57,
-      58,   119,   133,   155,   120,   141,    37,    60,   122,   189,
-     201,   102,   144,   168,   193,   194,   205,   207,   209,   213
+        -1,     4,    23,     5,    34,     8,    41,     9,    35,    97,
+      66,   124,    67,   145,    68,   100,    12,   128,   148,   190,
+     108,   136,   194,   195,    10,    64,   106,    98,   125,   146,
+      13,    45,    75,   137,    39,    70,    14,    15,    54,    55,
+      48,    80,   138,   158,   157,    27,    62,   143,    93,    94,
+     120,   141,   163,   179,   199,   164,     6,   187,   202,    89,
+      24,    58,    63,    96,   144,   189,   226,   239,   166,   208,
+     221,   229,   230,   231,   235,   243,   245,   247,   251
   };
 
   /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
      positive, shift that token.  If negative, reduce the rule which
      number is the opposite.  If zero, do what YYDEFACT says.  */
-  const signed char BisonParser::yytable_ninf_ = -75;
+  const signed char BisonParser::yytable_ninf_ = -97;
   const short int
   BisonParser::yytable_[] =
   {
-        22,   154,    77,    39,    35,    55,    30,    16,   104,   156,
-     157,    17,     5,    66,   164,   175,    50,   165,   166,   113,
-      45,   165,   166,   -74,     6,    23,    39,    51,    29,    64,
-      56,    50,   106,    62,    85,    24,   185,   186,    88,   -74,
-      41,    10,   190,    71,    30,    82,    10,    75,   145,    50,
-      73,    39,    74,    81,    10,   124,    79,    89,    80,   108,
-      20,    21,    10,   -49,    26,    11,    27,    95,    32,    28,
-      97,    82,    33,    56,     1,     2,    62,   -20,   105,   -20,
-     -20,   -20,   146,   147,   148,   158,   159,   160,   161,   162,
-     163,    82,   151,   -20,   152,   -20,   -20,   -20,    90,    91,
-      92,   134,    33,   182,   183,   184,   170,   171,   130,   135,
-     136,   116,   117,   118,   134,     5,    20,    21,   151,   138,
-     173,   139,   135,   136,    10,    43,   130,    56,   137,    20,
-      21,   134,   138,   -54,   139,    46,   187,   167,   188,   135,
-     136,   -54,   -54,    20,    21,   172,    20,    21,   196,   138,
-     197,   139,   196,   210,   203,   211,   215,    53,   216,   126,
-     127,   128,   129,    47,    49,    59,    69,    61,    56,    65,
-      78,    96,    84,   101,   109,    87,   110,   107,    98,   112,
-     115,   191,   111,   192,   143,   121,   125,   142,   169,    79,
-     192,   176,   174,   200,   204,   192,   177,   178,   206,   179,
-     180,   195,   212,   181,   214,   198,   208,   103,    86,   217,
-      72,   202,   153,     0,   199,     0,     0,     0,     0,     0,
-       0,    99
+        28,    77,   198,   155,   -96,    44,    56,    57,   191,   192,
+     193,    11,    53,   104,   168,   105,    11,    65,    36,    37,
+     -96,   101,   101,   101,    50,    51,    69,    42,    38,    33,
+      43,   210,   211,    71,    52,   223,     7,    81,    73,    26,
+      79,    19,    20,    78,   180,    90,    91,   -29,    25,   -29,
+     -29,   -29,   181,   182,    77,    92,   209,   200,   201,    19,
+      20,    40,   184,    29,   185,     1,     2,    59,    77,   109,
+      44,    19,    20,   112,    60,    61,     3,   218,   219,    33,
+      82,   147,    60,    61,   147,   147,    46,   180,   123,   215,
+     216,   217,   203,    47,   127,   181,   182,   131,    11,   204,
+     205,   180,    19,    20,   121,   184,   122,   185,    76,   181,
+     182,   133,   134,   135,    92,   183,    19,    20,    74,   184,
+      29,   185,    30,    31,    95,    32,    49,    30,    31,    99,
+      32,   156,   213,    30,   204,   205,    33,    16,    17,   111,
+     127,    33,   169,    18,    19,    20,   176,    21,   177,    22,
+     107,   156,    16,    17,   114,   186,   160,   161,   162,    19,
+      20,   176,    21,   197,    22,   224,   232,   225,   233,   196,
+      31,   232,    92,   241,   248,   113,   249,   186,   186,    83,
+      84,    85,    86,    87,    88,   253,   115,   254,   172,   173,
+     174,   175,   102,   103,   116,   117,   126,   186,   186,   118,
+     220,   119,   129,   130,   139,    92,   140,    32,   149,   151,
+     154,   159,   165,   171,   152,   153,   188,   227,   206,   228,
+     207,   121,   212,   222,   242,   228,   234,   237,   238,   246,
+     132,   150,   228,    72,   167,   244,   170,   214,   178,   250,
+     142,   252,   240,   236,     0,   110,   255
   };
 
   /* YYCHECK.  */
   const short int
   BisonParser::yycheck_[] =
   {
-         6,   133,    55,    19,    15,    35,    12,     0,    83,   138,
-     139,    12,     7,    42,    36,    41,    32,    43,    44,    94,
-      26,    43,    44,     0,    19,     5,    42,    33,    11,    40,
-      36,    47,    85,    39,    64,     8,   165,   166,    67,    16,
-      23,     3,   174,    49,    50,    61,     3,    53,   123,    65,
-      34,    67,    36,    59,     3,   108,    34,    68,    36,    89,
-      37,    38,     3,    12,    19,     6,    35,    73,    36,    38,
-      76,    87,    21,    79,     4,     5,    82,    34,    84,    36,
-      37,    38,   125,   126,   127,    45,    46,    47,    48,    49,
-      50,   107,    34,    34,    36,    36,    37,    38,    27,    28,
-      29,    22,    21,    24,    25,    26,   149,   150,   114,    30,
-      31,    13,    14,    15,    22,     7,    37,    38,    34,    40,
-      36,    42,    30,    31,     3,    10,   132,   133,    36,    37,
-      38,    22,    40,    12,    42,    35,    34,   143,    36,    30,
-      31,    20,    21,    37,    38,   151,    37,    38,    34,    40,
-      36,    42,    34,    34,    36,    36,    34,    20,    36,    30,
-      31,    38,    39,    36,    34,    16,    32,    36,   174,    36,
-      35,    35,    34,    23,    50,    36,    50,    36,    38,    33,
-      35,   187,    50,   189,    21,    38,    38,    36,    17,    34,
-     196,    38,    36,    18,     9,   201,    38,    38,   204,    38,
-      38,    35,   208,    38,   210,    38,    11,    82,    65,   215,
-      50,   201,   132,    -1,   196,    -1,    -1,    -1,    -1,    -1,
-      -1,    79
+         7,    46,   179,   137,     0,    12,    21,    22,   171,   172,
+     173,     3,    15,    34,   148,    36,     3,    29,     9,     9,
+      16,    66,    67,    68,    15,    15,    33,    35,     9,    21,
+      38,   194,   195,    40,    15,   212,    19,    49,    41,    12,
+      47,    37,    38,    46,    22,    60,    61,    34,     0,    36,
+      37,    38,    30,    31,    99,    62,   190,   184,   185,    37,
+      38,    19,    40,     5,    42,     4,     5,    36,   113,    76,
+      77,    37,    38,    80,    43,    44,    15,   204,   205,    21,
+      41,   126,    43,    44,   129,   130,    36,    22,    95,    24,
+      25,    26,    36,    20,   101,    30,    31,   104,     3,    43,
+      44,    22,    37,    38,    34,    40,    36,    42,    34,    30,
+      31,    27,    28,    29,   121,    36,    37,    38,    35,    40,
+       5,    42,     7,     8,    16,    10,     6,     7,     8,    36,
+      10,   138,    41,     7,    43,    44,    21,    30,    31,    35,
+     147,    21,   149,    36,    37,    38,    34,    40,    36,    42,
+      32,   158,    30,    31,    38,   162,    13,    14,    15,    37,
+      38,    34,    40,    36,    42,    34,    34,    36,    36,   176,
+       8,    34,   179,    36,    34,    36,    36,   184,   185,    45,
+      46,    47,    48,    49,    50,    34,    38,    36,    30,    31,
+      38,    39,    67,    68,    38,    38,    36,   204,   205,    38,
+     207,    38,    36,    36,    35,   212,    35,    10,    34,    50,
+      33,    38,    23,    38,    50,    50,    38,   224,    36,   226,
+      21,    34,    36,    17,     9,   232,    35,    18,    38,    11,
+     106,   132,   239,    41,   147,   242,   150,   202,   158,   246,
+     121,   248,   239,   232,    -1,    77,   253
   };
 
   /* STOS_[STATE-NUM] -- The (internal number of the) accessing
@@ -1459,28 +1612,32 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   const unsigned char
   BisonParser::yystos_[] =
   {
-         0,     4,     5,    52,    54,     7,    19,    55,    56,    71,
-       3,     6,    63,    74,    80,    81,     0,    12,    87,    57,
-      37,    38,    53,     5,     8,    58,    19,    35,    38,    74,
-      53,    75,    36,    21,    78,    56,    88,    97,    62,    63,
-      72,    74,    59,    10,    60,    53,    35,    36,    76,    34,
-      63,    53,    79,    20,    82,    58,    53,    90,    91,    16,
-      98,    36,    53,    64,    56,    36,    62,    61,    73,    32,
-      67,    53,    75,    34,    36,    53,    83,    60,    35,    34,
-      36,    53,    63,    65,    34,    58,    78,    36,    62,    56,
-      27,    28,    29,    68,    77,    53,    35,    53,    38,    91,
-      89,    23,   102,    64,    67,    53,    60,    36,    58,    50,
-      50,    50,    33,    67,    84,    35,    13,    14,    15,    92,
-      95,    38,    99,    66,    60,    38,    30,    31,    38,    39,
-      53,    86,    85,    93,    22,    30,    31,    36,    40,    42,
-      53,    96,    36,    21,   103,    67,    68,    68,    68,    69,
-      70,    34,    36,    86,    90,    94,    96,    96,    45,    46,
-      47,    48,    49,    50,    36,    43,    44,    53,   104,    17,
-      68,    68,    53,    36,    36,    41,    38,    38,    38,    38,
-      38,    38,    24,    25,    26,    96,    96,    34,    36,   100,
-      90,    53,    53,   105,   106,    35,    34,    36,    38,   106,
-      18,   101,   105,    36,     9,   107,    53,   108,    11,   109,
-      34,    36,    53,   110,    53,    34,    36,    53
+         0,     4,     5,    15,    52,    54,   107,    19,    56,    58,
+      75,     3,    67,    81,    87,    88,    30,    31,    36,    37,
+      38,    40,    42,    53,   111,     0,    12,    96,    53,     5,
+       7,     8,    10,    21,    55,    59,    60,    62,    64,    85,
+      19,    57,    35,    38,    53,    82,    36,    20,    91,     6,
+      60,    62,    64,    85,    89,    90,   111,   111,   112,    36,
+      43,    44,    97,   113,    76,    81,    61,    63,    65,    53,
+      86,    53,    55,    85,    35,    83,    34,    67,    85,    53,
+      92,    81,    41,    45,    46,    47,    48,    49,    50,   110,
+     111,   111,    53,    99,   100,    16,   114,    60,    78,    36,
+      66,    67,    66,    66,    34,    36,    77,    32,    71,    53,
+      82,    35,    53,    36,    38,    38,    38,    38,    38,    38,
+     101,    34,    36,    53,    62,    79,    36,    53,    68,    36,
+      36,    53,    78,    27,    28,    29,    72,    84,    93,    35,
+      35,   102,   100,    98,   115,    64,    80,    67,    69,    34,
+      79,    50,    50,    50,    33,    71,    53,    95,    94,    38,
+      13,    14,    15,   103,   106,    23,   119,    68,    71,    53,
+      80,    38,    30,    31,    38,    39,    34,    36,    95,   104,
+      22,    30,    31,    36,    40,    42,    53,   108,    38,   116,
+      70,    72,    72,    72,    73,    74,    53,    36,    99,   105,
+     108,   108,   109,    36,    43,    44,    36,    21,   120,    71,
+      72,    72,    36,    41,   110,    24,    25,    26,   108,   108,
+      53,   121,    17,    99,    34,    36,   117,    53,    53,   122,
+     123,   124,    34,    36,    35,   125,   123,    18,    38,   118,
+     122,    36,     9,   126,    53,   127,    11,   128,    34,    36,
+      53,   129,    53,    34,    36,    53
   };
 
 #if YYDEBUG
@@ -1502,38 +1659,44 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   const unsigned char
   BisonParser::yyr1_[] =
   {
-         0,    51,    52,    53,    53,    54,    54,    55,    55,    56,
-      57,    56,    58,    59,    58,    60,    61,    60,    62,    62,
-      63,    63,    63,    64,    65,    64,    66,    64,    67,    67,
-      68,    68,    68,    68,    69,    68,    70,    68,    72,    71,
-      73,    71,    74,    74,    75,    76,    75,    77,    75,    78,
-      78,    79,    79,    80,    80,    81,    81,    82,    82,    84,
-      83,    85,    83,    86,    86,    88,    89,    87,    90,    90,
-      90,    91,    91,    93,    92,    92,    94,    94,    95,    95,
-      95,    96,    96,    96,    96,    96,    96,    96,    96,    96,
-      96,    96,    96,    96,    96,    96,    96,    97,    97,    99,
-     100,   101,    98,   102,   102,   103,   103,   104,   104,   105,
-     105,   105,   106,   106,   107,   107,   108,   108,   108,   109,
-     109,   110,   110
+         0,    51,    52,    52,    53,    53,    54,    54,    55,    56,
+      56,    57,    57,    57,    58,    58,    59,    59,    59,    59,
+      59,    61,    60,    63,    62,    65,    64,    66,    66,    67,
+      67,    67,    68,    69,    68,    70,    68,    71,    71,    72,
+      72,    72,    72,    73,    72,    74,    72,    76,    75,    77,
+      75,    78,    78,    79,    79,    80,    80,    81,    81,    82,
+      83,    82,    84,    82,    85,    86,    86,    87,    87,    88,
+      88,    89,    89,    89,    89,    89,    90,    91,    91,    93,
+      92,    94,    92,    95,    95,    97,    98,    96,    99,    99,
+      99,   101,   100,   102,   102,   104,   103,   103,   105,   105,
+     106,   106,   106,   107,   107,   108,   108,   108,   108,   108,
+     108,   108,   108,   108,   108,   109,   108,   110,   110,   110,
+     110,   110,   110,   111,   111,   111,   111,   111,   111,   112,
+     111,   113,   113,   115,   116,   117,   118,   114,   119,   119,
+     120,   120,   121,   121,   122,   122,   122,   124,   123,   125,
+     125,   126,   126,   127,   127,   127,   128,   128,   129,   129
   };
 
   /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
   const unsigned char
   BisonParser::yyr2_[] =
   {
-         0,     2,     3,     1,     1,     6,     4,     3,     1,     0,
-       0,     4,     0,     0,     4,     0,     0,     4,     2,     4,
-       0,     2,     3,     0,     0,     3,     0,     5,     0,     3,
-       0,     4,     4,     4,     0,     5,     0,     5,     0,     6,
-       0,     7,     2,     4,     0,     0,     3,     0,     5,     0,
-       3,     1,     3,     4,     2,     0,     3,     0,     2,     0,
+         0,     2,     3,     1,     1,     1,     2,     3,     3,     1,
+       2,     0,     2,     2,     0,     2,     1,     1,     1,     1,
+       1,     0,     4,     0,     4,     0,     4,     2,     4,     0,
+       2,     3,     0,     0,     3,     0,     5,     0,     3,     0,
+       4,     4,     4,     0,     5,     0,     5,     0,     6,     0,
+       7,     0,     1,     0,     1,     0,     1,     2,     4,     0,
+       0,     3,     0,     5,     3,     1,     3,     1,     3,     0,
+       2,     1,     1,     1,     1,     1,     3,     0,     2,     0,
        5,     0,     6,     1,     3,     0,     0,     6,     0,     1,
-       3,     3,     1,     0,     4,     1,     1,     3,     1,     2,
-       3,     3,     1,     1,     1,     2,     3,     3,     3,     3,
-       3,     3,     3,     3,     3,     3,     3,     0,     2,     0,
-       0,     0,    15,     0,     3,     0,     3,     1,     3,     0,
-       1,     3,     3,     1,     0,     3,     0,     1,     3,     0,
-       3,     1,     3
+       3,     0,     3,     2,     0,     0,     4,     1,     1,     3,
+       1,     2,     3,     2,     3,     3,     1,     1,     1,     2,
+       3,     3,     3,     3,     3,     0,     3,     2,     2,     2,
+       2,     2,     2,     3,     1,     1,     2,     3,     3,     0,
+       3,     0,     2,     0,     0,     0,     0,    16,     0,     3,
+       0,     3,     1,     3,     0,     1,     3,     0,     3,     2,
+       0,     0,     3,     0,     1,     3,     0,     3,     1,     3
   };
 
 #if YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
@@ -1554,16 +1717,21 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   "LCONTROL", "RCONTROL", "COMMA", "COLON", "SEMICOLON", "IDENT", "NUMBER",
   "NEGATIVE_NUMBER", "LPAR", "RPAR", "OP_NOT", "OP_AND", "OP_OR", "OP_LE",
   "OP_GE", "OP_LT", "OP_GT", "OP_NE", "OP_EQ", "$accept", "petrinet",
-  "node_name", "interface", "interface_ports", "input_places", "$@1",
-  "output_places", "$@2", "synchronous", "$@3", "interface_labels",
-  "capacity", "interface_label_list", "$@4", "$@5", "controlcommands",
-  "commands", "$@6", "$@7", "port_list", "$@8", "$@9", "places",
-  "place_list", "$@10", "$@11", "roles", "role_names", "typed_places",
+  "node_name", "interface", "interface_place", "interface_ports",
+  "port_list_tail", "interface_ports_list", "interface_ports_list_element",
+  "input_places", "$@1", "output_places", "$@2", "synchronous", "$@3",
+  "interface_labels", "capacity", "interface_label_list", "$@4", "$@5",
+  "controlcommands", "commands", "$@6", "$@7", "port_list", "$@8", "$@9",
+  "port_input_places", "port_output_places", "port_synchronous", "places",
+  "place_list", "$@10", "$@11", "roles", "role_names", "typed_interface",
+  "typed_interface_list", "typed_interface_list_element",
   "internal_places", "ports", "port_list2", "$@12", "$@13",
   "port_participants", "markings", "$@14", "$@15", "marking_list",
-  "marking", "final", "$@16", "finalmarkings", "condition", "formula",
-  "transitions", "transition", "$@17", "$@18", "$@19", "transition_cost",
-  "transition_roles", "transition_role_names", "arcs", "arc",
+  "marking", "$@16", "marking_tail", "final", "$@17", "finalmarkings",
+  "condition", "finalcondition_only", "formula", "$@18",
+  "formula_proposition", "fo_formula", "$@19", "transitions", "transition",
+  "$@20", "$@21", "$@22", "$@23", "transition_cost", "transition_roles",
+  "transition_role_names", "arcs", "arc", "$@24", "arc_tail",
   "synchronize", "synchronize_labels", "constrain", "constrain_labels", 0
   };
 #endif
@@ -1573,44 +1741,52 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   const BisonParser::rhs_number_type
   BisonParser::yyrhs_[] =
   {
-        52,     0,    -1,    54,    87,    97,    -1,    37,    -1,    38,
-      -1,     4,    55,     5,    74,    36,    78,    -1,     5,    80,
-      78,    82,    -1,    56,    58,    60,    -1,    71,    -1,    -1,
-      -1,     7,    57,    62,    36,    -1,    -1,    -1,     8,    59,
-      62,    36,    -1,    -1,    -1,    10,    61,    62,    36,    -1,
-      63,    64,    -1,    62,    36,    63,    64,    -1,    -1,     3,
-      35,    -1,     3,    38,    35,    -1,    -1,    -1,    53,    65,
-      67,    -1,    -1,    64,    34,    53,    66,    67,    -1,    -1,
-      32,    68,    33,    -1,    -1,    27,    50,    38,    68,    -1,
-      28,    50,    30,    68,    -1,    28,    50,    31,    68,    -1,
-      -1,    29,    50,    38,    69,    68,    -1,    -1,    29,    50,
-      39,    70,    68,    -1,    -1,    19,    53,    72,    56,    58,
-      60,    -1,    -1,    71,    19,    53,    73,    56,    58,    60,
-      -1,    63,    75,    -1,    74,    36,    63,    75,    -1,    -1,
-      -1,    53,    76,    67,    -1,    -1,    75,    34,    53,    77,
-      67,    -1,    -1,    21,    79,    36,    -1,    53,    -1,    79,
-      34,    53,    -1,    81,    56,    58,    60,    -1,    74,    36,
-      -1,    -1,     6,    74,    36,    -1,    -1,    20,    83,    -1,
-      -1,    53,    35,    84,    86,    36,    -1,    -1,    83,    53,
-      35,    85,    86,    36,    -1,    53,    -1,    86,    34,    53,
-      -1,    -1,    -1,    12,    88,    90,    36,    89,    92,    -1,
-      -1,    91,    -1,    90,    34,    91,    -1,    53,    35,    38,
-      -1,    53,    -1,    -1,    13,    93,    94,    36,    -1,    95,
-      -1,    90,    -1,    94,    36,    90,    -1,    14,    -1,    15,
-      36,    -1,    15,    96,    36,    -1,    40,    96,    41,    -1,
-      30,    -1,    31,    -1,    22,    -1,    42,    96,    -1,    96,
-      44,    96,    -1,    96,    43,    96,    -1,    96,    43,    24,
-      -1,    96,    43,    25,    -1,    96,    43,    26,    -1,    53,
-      50,    38,    -1,    53,    49,    38,    -1,    53,    47,    38,
-      -1,    53,    48,    38,    -1,    53,    46,    38,    -1,    53,
-      45,    38,    -1,    -1,    97,    98,    -1,    -1,    -1,    -1,
-      16,    53,   102,    99,   103,    17,   100,   105,    36,    18,
-     101,   105,    36,   107,   109,    -1,    -1,    23,    38,    36,
-      -1,    -1,    21,   104,    36,    -1,    53,    -1,   104,    34,
-      53,    -1,    -1,   106,    -1,   105,    34,   106,    -1,    53,
-      35,    38,    -1,    53,    -1,    -1,     9,   108,    36,    -1,
-      -1,    53,    -1,   108,    34,    53,    -1,    -1,    11,   110,
-      36,    -1,    53,    -1,   110,    34,    53,    -1
+        52,     0,    -1,    54,    96,   113,    -1,   107,    -1,    37,
+      -1,    38,    -1,     4,    56,    -1,     5,    87,    91,    -1,
+       5,    81,    36,    -1,    58,    -1,    75,    57,    -1,    -1,
+      57,    55,    -1,    57,    85,    -1,    -1,    58,    59,    -1,
+      60,    -1,    62,    -1,    64,    -1,    85,    -1,    55,    -1,
+      -1,     7,    61,    66,    36,    -1,    -1,     8,    63,    66,
+      36,    -1,    -1,    10,    65,    66,    36,    -1,    67,    68,
+      -1,    66,    36,    67,    68,    -1,    -1,     3,    35,    -1,
+       3,    38,    35,    -1,    -1,    -1,    53,    69,    71,    -1,
+      -1,    68,    34,    53,    70,    71,    -1,    -1,    32,    72,
+      33,    -1,    -1,    27,    50,    38,    72,    -1,    28,    50,
+      30,    72,    -1,    28,    50,    31,    72,    -1,    -1,    29,
+      50,    38,    73,    72,    -1,    -1,    29,    50,    39,    74,
+      72,    -1,    -1,    19,    53,    76,    78,    79,    80,    -1,
+      -1,    75,    19,    53,    77,    78,    79,    80,    -1,    -1,
+      60,    -1,    -1,    62,    -1,    -1,    64,    -1,    67,    82,
+      -1,    81,    36,    67,    82,    -1,    -1,    -1,    53,    83,
+      71,    -1,    -1,    82,    34,    53,    84,    71,    -1,    21,
+      86,    36,    -1,    53,    -1,    86,    34,    53,    -1,    88,
+      -1,    81,    36,    85,    -1,    -1,    88,    89,    -1,    90,
+      -1,    60,    -1,    62,    -1,    64,    -1,    85,    -1,     6,
+      81,    36,    -1,    -1,    20,    92,    -1,    -1,    53,    35,
+      93,    95,    36,    -1,    -1,    92,    53,    35,    94,    95,
+      36,    -1,    53,    -1,    95,    34,    53,    -1,    -1,    -1,
+      12,    97,    99,    36,    98,   103,    -1,    -1,   100,    -1,
+      99,    34,   100,    -1,    -1,    53,   101,   102,    -1,    35,
+      38,    -1,    -1,    -1,    13,   104,   105,    36,    -1,   106,
+      -1,    99,    -1,   105,    36,    99,    -1,    14,    -1,    15,
+      36,    -1,    15,   108,    36,    -1,    15,    36,    -1,    15,
+     111,    36,    -1,    40,   108,    41,    -1,    30,    -1,    31,
+      -1,    22,    -1,    42,   108,    -1,   108,    44,   108,    -1,
+     108,    43,   108,    -1,   108,    43,    24,    -1,   108,    43,
+      25,    -1,   108,    43,    26,    -1,    -1,    53,   109,   110,
+      -1,    50,    38,    -1,    49,    38,    -1,    47,    38,    -1,
+      48,    38,    -1,    46,    38,    -1,    45,    38,    -1,    40,
+     111,    41,    -1,    30,    -1,    31,    -1,    42,   111,    -1,
+     111,    44,   111,    -1,   111,    43,   111,    -1,    -1,    53,
+     112,   110,    -1,    -1,   113,   114,    -1,    -1,    -1,    -1,
+      -1,    16,    53,   115,   119,   116,   120,    17,   117,   122,
+      36,    18,   118,   122,    36,   126,   128,    -1,    -1,    23,
+      38,    36,    -1,    -1,    21,   121,    36,    -1,    53,    -1,
+     121,    34,    53,    -1,    -1,   123,    -1,   122,    34,   123,
+      -1,    -1,    53,   124,   125,    -1,    35,    38,    -1,    -1,
+      -1,     9,   127,    36,    -1,    -1,    53,    -1,   127,    34,
+      53,    -1,    -1,    11,   129,    36,    -1,    53,    -1,   129,
+      34,    53,    -1
   };
 
   /* YYPRHS[YYN] -- Index of the first RHS symbol of rule number YYN in
@@ -1618,38 +1794,44 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   const unsigned short int
   BisonParser::yyprhs_[] =
   {
-         0,     0,     3,     7,     9,    11,    18,    23,    27,    29,
-      30,    31,    36,    37,    38,    43,    44,    45,    50,    53,
-      58,    59,    62,    66,    67,    68,    72,    73,    79,    80,
-      84,    85,    90,    95,   100,   101,   107,   108,   114,   115,
-     122,   123,   131,   134,   139,   140,   141,   145,   146,   152,
-     153,   157,   159,   163,   168,   171,   172,   176,   177,   180,
-     181,   187,   188,   195,   197,   201,   202,   203,   210,   211,
-     213,   217,   221,   223,   224,   229,   231,   233,   237,   239,
-     242,   246,   250,   252,   254,   256,   259,   263,   267,   271,
-     275,   279,   283,   287,   291,   295,   299,   303,   304,   307,
-     308,   309,   310,   326,   327,   331,   332,   336,   338,   342,
-     343,   345,   349,   353,   355,   356,   360,   361,   363,   367,
-     368,   372,   374
+         0,     0,     3,     7,     9,    11,    13,    16,    20,    24,
+      26,    29,    30,    33,    36,    37,    40,    42,    44,    46,
+      48,    50,    51,    56,    57,    62,    63,    68,    71,    76,
+      77,    80,    84,    85,    86,    90,    91,    97,    98,   102,
+     103,   108,   113,   118,   119,   125,   126,   132,   133,   140,
+     141,   149,   150,   152,   153,   155,   156,   158,   161,   166,
+     167,   168,   172,   173,   179,   183,   185,   189,   191,   195,
+     196,   199,   201,   203,   205,   207,   209,   213,   214,   217,
+     218,   224,   225,   232,   234,   238,   239,   240,   247,   248,
+     250,   254,   255,   259,   262,   263,   264,   269,   271,   273,
+     277,   279,   282,   286,   289,   293,   297,   299,   301,   303,
+     306,   310,   314,   318,   322,   326,   327,   331,   334,   337,
+     340,   343,   346,   349,   353,   355,   357,   360,   364,   368,
+     369,   373,   374,   377,   378,   379,   380,   381,   398,   399,
+     403,   404,   408,   410,   414,   415,   417,   421,   422,   426,
+     429,   430,   431,   435,   436,   438,   442,   443,   447,   449
   };
 
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
   const unsigned short int
   BisonParser::yyrline_[] =
   {
-         0,    95,    95,   102,   111,   128,   129,   133,   134,   137,
-     139,   139,   142,   144,   144,   147,   149,   149,   154,   155,
-     158,   160,   161,   164,   167,   166,   175,   174,   184,   186,
-     189,   191,   192,   193,   195,   194,   203,   202,   214,   213,
-     217,   216,   223,   224,   227,   230,   229,   238,   237,   248,
-     250,   254,   256,   262,   263,   266,   268,   272,   274,   279,
-     278,   282,   281,   287,   297,   316,   317,   316,   320,   322,
-     323,   327,   341,   359,   358,   365,   378,   384,   393,   394,
-     395,   399,   400,   401,   402,   407,   412,   418,   424,   429,
-     433,   437,   444,   451,   458,   465,   472,   487,   489,   494,
-     502,   509,   493,   519,   520,   523,   525,   529,   534,   541,
-     543,   544,   548,   568,   590,   592,   595,   597,   604,   613,
-     615,   619,   621
+         0,    95,    95,    99,   103,   112,   129,   130,   134,   138,
+     139,   142,   144,   145,   148,   150,   154,   155,   156,   157,
+     158,   162,   162,   166,   166,   170,   170,   175,   176,   179,
+     181,   182,   185,   188,   187,   204,   203,   221,   223,   226,
+     228,   229,   230,   232,   231,   240,   239,   251,   250,   254,
+     253,   258,   260,   263,   265,   268,   270,   274,   275,   278,
+     281,   280,   297,   296,   316,   320,   322,   328,   329,   332,
+     334,   338,   339,   340,   341,   342,   346,   350,   352,   357,
+     356,   360,   359,   365,   375,   394,   395,   394,   398,   400,
+     401,   406,   405,   414,   426,   440,   439,   446,   459,   465,
+     474,   475,   476,   480,   481,   489,   490,   491,   492,   497,
+     502,   508,   514,   519,   523,   528,   527,   539,   543,   547,
+     551,   555,   559,   568,   569,   570,   571,   576,   582,   589,
+     588,   610,   612,   617,   630,   635,   642,   616,   652,   653,
+     656,   658,   662,   667,   674,   676,   677,   682,   681,   694,
+     708,   722,   724,   727,   729,   736,   745,   747,   751,   753
   };
 
   // Print the state stack on the debug stream.
@@ -1728,10 +1910,10 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
 
   const int BisonParser::yyeof_ = 0;
-  const int BisonParser::yylast_ = 221;
-  const int BisonParser::yynnts_ = 60;
+  const int BisonParser::yylast_ = 246;
+  const int BisonParser::yynnts_ = 79;
   const int BisonParser::yyempty_ = -2;
-  const int BisonParser::yyfinal_ = 16;
+  const int BisonParser::yyfinal_ = 25;
   const int BisonParser::yyterror_ = 1;
   const int BisonParser::yyerrcode_ = 256;
   const int BisonParser::yyntokens_ = 51;
@@ -1745,6 +1927,6 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 } } } } // pnapi::parser::owfn::yy
 
 /* Line 1053 of lalr1.cc  */
-#line 1749 "parser-owfn.cc"
+#line 1931 "parser-owfn.cc"
 
 

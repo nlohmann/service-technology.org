@@ -4,6 +4,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "component.h"
 #include "petrinet.h"
 #include "port.h"
@@ -30,7 +32,7 @@ Node::Node(PetriNet & net, util::ComponentObserver & observer,
            const std::string & name) :
   net_(net), observer_(observer)
 {
-  assert(&observer.getPetriNet() == &net);
+  PNAPI_ASSERT(&observer.getPetriNet() == &net);
   history_.push_back(name);
 }
 
@@ -42,7 +44,7 @@ Node::Node(PetriNet & net, util::ComponentObserver & observer,
            const Node & node, const std::string & prefix) :
   net_(net), observer_(observer), history_(node.history_)
 {
-  assert(&observer.getPetriNet() == &net);
+  PNAPI_ASSERT(&observer.getPetriNet() == &net);
   if (!prefix.empty())
   {
     PNAPI_FOREACH(it, history_)
@@ -61,7 +63,7 @@ Node::Node(PetriNet & net, util::ComponentObserver & observer,
  */
 Node::~Node()
 {
-  assert(!net_.containsNode(*this));
+  PNAPI_ASSERT(!net_.containsNode(*this));
 }
 
 /*!
@@ -124,7 +126,7 @@ bool Node::isParallel(const Node & n2) const
  */
 std::string Node::getName() const
 {
-  assert(!history_.empty());
+  PNAPI_ASSERT(!history_.empty());
   return *history_.begin();
 }
 
@@ -134,7 +136,7 @@ std::string Node::getName() const
  */
 void Node::prefixNameHistory(const std::string & prefix)
 {
-  assert(!prefix.empty());
+  PNAPI_ASSERT_USER(!prefix.empty(), string("no prefix given while prefixing node '") + (*history_.begin()) + "'");
   std::deque<string> oldHistory = history_;
   PNAPI_FOREACH(it, history_)
   {
@@ -220,7 +222,7 @@ const std::set<Arc *> & Node::getPostsetArcs() const
  */
 void Node::merge(Node & node, bool addArcWeights)
 {
-  assert(&net_ == &node.net_);
+  PNAPI_ASSERT(&net_ == &node.net_);
 
   mergeNameHistory(node);
 
@@ -278,7 +280,7 @@ void Node::mergeArcs(const Node & node, bool addWeights, bool isPostset)
       }
       else
       {
-        assert(arc1->getWeight() == (*arc2)->getWeight());
+        PNAPI_ASSERT(arc1->getWeight() == (*arc2)->getWeight());
       }
     }
   }
@@ -417,7 +419,7 @@ void Place::setWasInterface(bool wasInterface)
  */
 Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
                        const std::string & name) :
-  Node(net, observer, name), cost_(0), type_(INTERNAL)
+  Node(net, observer, name), type_(INTERNAL), cost_(0)
 {
   observer_.updateTransitions(*this);
 }
@@ -428,8 +430,8 @@ Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
  */
 Transition::Transition(PetriNet & net, util::ComponentObserver & observer,
                        const Transition & trans, const std::string & prefix) :
-  Node(net, observer, trans, prefix), roles_(trans.roles_),
-  type_(trans.type_), cost_(trans.cost_)
+  Node(net, observer, trans, prefix), type_(trans.type_),
+  cost_(trans.cost_), roles_(trans.roles_)
 {
   observer_.updateTransitions(*this);
 }
@@ -769,7 +771,7 @@ Arc::Arc(PetriNet & net, util::ComponentObserver & observer,
   net_(net), observer_(observer),
   source_(&source), target_(&target), weight_(weight)
 {
-  assert(&observer.getPetriNet() == &net);
+  PNAPI_ASSERT(&observer.getPetriNet() == &net);
 
   observer_.updateArcCreated(*this);
 }
@@ -783,9 +785,9 @@ Arc::Arc(PetriNet & net, util::ComponentObserver & observer, const Arc & arc) :
   source_(net.findNode(arc.source_->getName())),
   target_(net.findNode(arc.target_->getName())), weight_(arc.weight_)
 {
-  assert(&observer.getPetriNet() == &net);
-  assert(source_ != NULL);
-  assert(target_ != NULL);
+  PNAPI_ASSERT(&observer.getPetriNet() == &net);
+  PNAPI_ASSERT(source_ != NULL);
+  PNAPI_ASSERT(target_ != NULL);
 
   observer_.updateArcCreated(*this);
 }
@@ -799,9 +801,9 @@ Arc::Arc(PetriNet & net, util::ComponentObserver & observer,
   net_(net), observer_(observer),
   source_(&source), target_(&target), weight_(arc.weight_)
 {
-  assert(&observer.getPetriNet() == &net);
-  assert(net.containsNode(source));
-  assert(net.containsNode(target));
+  PNAPI_ASSERT(&observer.getPetriNet() == &net);
+  PNAPI_ASSERT(net.containsNode(source));
+  PNAPI_ASSERT(net.containsNode(target));
 
   observer_.updateArcCreated(*this);
 }
@@ -814,7 +816,7 @@ Arc::Arc(PetriNet & net, util::ComponentObserver & observer,
  */
 Arc::~Arc()
 {
-  assert(net_.findArc(*source_, *target_) == NULL);
+  PNAPI_ASSERT(net_.findArc(*source_, *target_) == NULL);
 }
 
 
@@ -855,7 +857,7 @@ Transition & Arc::getTransition() const
     return *t;
 
   t = dynamic_cast<Transition *>(target_);
-  assert(t != NULL);
+  PNAPI_ASSERT(t != NULL);
   return *t;
 }
 
@@ -870,7 +872,7 @@ Place & Arc::getPlace() const
     return *t;
 
   t = dynamic_cast<Place *>(target_);
-  assert(t != NULL);
+  PNAPI_ASSERT(t != NULL);
   return *t;
 }
 

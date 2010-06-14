@@ -4,6 +4,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "automaton.h"
 #include "interface.h"
 #include "petrinet.h"
@@ -166,6 +168,8 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   << net.transitions_ // interface arcs
 
   << "\n}\n";
+  
+  return os;
 }
 
 /*!
@@ -231,7 +235,7 @@ std::ostream & output(std::ostream & os, const Transition & t)
         right = getLabelName(*l->first);
         attr << "]\n";
         break;
-      default: assert(false);
+      default: PNAPI_ASSERT(false);
       }
       
       os << " " << left << " -> " << right << attr.str();
@@ -845,7 +849,7 @@ std::ostream & output(std::ostream & os, const Transition & t)
     case Label::INPUT: os << "receive"; break;
     case Label::OUTPUT: os << "send"; break;
     case Label::SYNCHRONOUS: os << "synchronize"; break;
-    default: assert(false);
+    default: PNAPI_ASSERT(false);
     }
     
     os << " idref=\"" + label->first->getName() + "\" />\n";
@@ -939,7 +943,7 @@ std::ostream & output(std::ostream & os, const Label & l)
   case Label::INPUT: os << "input"; break;
   case Label::OUTPUT: os << "output"; break;
   case Label::SYNCHRONOUS: os << "synchronous"; break;
-  default: assert(false); 
+  default: PNAPI_ASSERT(false); 
   }
   
   return (os << " id=\"" << l.getName() << "\" />");
@@ -1070,7 +1074,7 @@ std::ios_base & owfn(std::ios_base & ios)
 /*!
  * \brief suppress role output
  */
-std::ostream & noRules(std::ostream & os)
+std::ostream & noRoles(std::ostream & os)
 {
   util::RoleData::data(os).role = true;
   return os;
@@ -1494,13 +1498,6 @@ std::ostream & output(std::ostream & os, const Edge & e)
 /*************************************************************************
  ***** Woflan output
  *************************************************************************/
-/*
-std::ostream & woflan(std::ostream & os)
-{
-  util::FormatData::data(os) = util::WOFLAN;
-  return os;
-}
-*/
 
 /*!
  * \brief writes output type to stream 

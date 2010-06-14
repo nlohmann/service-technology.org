@@ -37,7 +37,7 @@ namespace parser
 /*!
  * \brief called by generated lexers/parsers
  */
-void error(std::istream & is, unsigned int line, const std::string & token, const std::string & msg)
+__attribute__((noreturn)) void error(std::istream & is, unsigned int line, const std::string & token, const std::string & msg)
 {
   throw exception::InputError(exception::InputError::SYNTAX_ERROR,
                               io::util::MetaData::data(is)[io::INPUTFILE],

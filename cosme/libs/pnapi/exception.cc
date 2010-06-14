@@ -8,9 +8,9 @@
  *
  * \since   2009-08-04
  *
- * \date    $Date: 2010-03-14 14:22:21 +0100 (Sun, 14 Mar 2010) $
+ * \date    $Date: 2010-05-29 23:35:16 +0200 (Sat, 29 May 2010) $
  *
- * \version $Revision: 5514 $
+ * \version $Revision: 5779 $
  */
 
 #include "config.h"
@@ -53,10 +53,20 @@ NotImplementedError::NotImplementedError(const std::string & msg) :
 }
   
 
-/// constructor
+/*!
+ * \brief constructor
+ */
 AssertionFailedError::AssertionFailedError(const std::string & file_, unsigned int line_,
                                            const std::string & assertion) :
   Error(assertion), file(file_), line(line_)
+{
+}
+
+/*!
+ * \brief constructor
+ */
+UserCausedError::UserCausedError(UE_Type type_, const std::string & msg) :
+  Error(msg), type(type_)
 {
 }
 

@@ -1,7 +1,7 @@
 ##################################
 # This file has been generated   #
 # automaticall by compiling      #
-# Petri Net API 4.01-unreleased #
+# Petri Net API 4.02-unreleased #
 #                                #
 # You MUST NOT change this file. #
 ##################################
@@ -17,7 +17,7 @@ libpnapi_a_SOURCES = \
     parser-sa.h parser-sa.cc parser-sa-location.h parser-sa-position.h parser-sa-stack.h parser-sa-lexer.cc parser-sa-wrapper.h parser-sa-wrapper.cc \
     parser-woflan.h parser-woflan.cc parser-woflan-location.h parser-woflan-position.h parser-woflan-stack.h parser-woflan-lexer.cc parser-woflan-wrapper.h parser-woflan-wrapper.cc \
     FlexLexer.h \
-    pnapi.h pnapi.cc \
+    pnapi.h pnapi.cc pnapi-assert.h \
     automaton.h automaton.cc\
     component.h component.cc \
     condition.h condition.cc \

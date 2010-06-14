@@ -114,7 +114,7 @@ public: /* public methods */
   
 protected: /* protected methods */
   /// make this class concrete
-  void implementMe() {};
+  void implementMe() {}
 };
 
 } /* namespace sa */

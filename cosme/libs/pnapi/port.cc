@@ -21,6 +21,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "port.h"
 #include "petrinet.h"
 #include "util.h"
@@ -194,6 +196,13 @@ Label & Port::addLabel(Label & label)
  */
 Label & Port::addLabel(const std::string & label, Label::Type type)
 {
+  PNAPI_ASSERT_USER(net_.findNode(label) == NULL,
+                    string("net already contains a node named '") + label + "'", 
+                    exception::UserCausedError::UE_NODE_NAME_CONFLICT);
+  PNAPI_ASSERT_USER(net_.getInterface().findLabel(label) == NULL,
+                    string("net already contains a label named '") + label + "'", 
+                    exception::UserCausedError::UE_LABEL_NAME_CONFLICT);
+  
   Label * l = new Label(net_, *this, label, type);
   return addLabel(*l);
 }
@@ -245,7 +254,7 @@ void Port::removeLabel(const std::string & label)
     case Label::INPUT: input_.erase(l); break;
     case Label::OUTPUT: output_.erase(l); break;
     case Label::SYNCHRONOUS: synchronous_.erase(l); break;
-    default: assert(false);
+    default: PNAPI_ASSERT(false);
     }
     
     delete l;
@@ -389,7 +398,7 @@ void Label::mirror()
   {
   case INPUT: type_ = OUTPUT; break;
   case OUTPUT: type_ = INPUT; break;
-  default: assert(false); // should not happen
+  default: PNAPI_ASSERT(false); // should not happen
   }
 }
 

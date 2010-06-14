@@ -433,7 +433,7 @@ public: /* public methods */
    */
   //@{
   /// checks the Petri net for workflow criteria
-  bool isWorkflow();
+  bool isWorkflow() const;
   /// checks the Petri net for free choice criterion
   bool isFreeChoice() const;
   /// checks the Petri net for being normalized

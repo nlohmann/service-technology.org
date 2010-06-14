@@ -1490,80 +1490,61 @@ void PetriNet::createArcs(Transition & trans, Transition & otherTrans,
  *          Daniela nach Alorithmus fragen; Funktion const machen;
  *          anschlieﬂend methode const machen
  */
-bool PetriNet::isWorkflow()
+bool PetriNet::isWorkflow() const
 {
   Place * first = NULL;
   Place * last  = NULL;
 
+  // each 2 nodes \f$x,y \in P \cup T\f$ are in a directed cycle
+  // (strongly connected net using tarjan's algorithm)
+  unsigned int index = 0; ///< count index
+  map<Node *, int> indices; ///< index property for nodes
+  map<Node *, unsigned int> lowlink; ///< lowlink property for nodes
+  set<Node *> stacked; ///< the stack indication for nodes
+  
   // finding places described in condition (1) & (2)
   PNAPI_FOREACH(p, places_)
   {
-    if ((*p)->getPreset().empty())
+    // set all places' index values to ``undefined''
+    indices[*p] = (-1);
+    
+    if((*p)->getPreset().empty())
     {
-      if (first == NULL)
+      if(first == NULL)
+      {
         first = *p;
+      }
       else
+      {
         return false;
+      }
     }
-    if ((*p)->getPostset().empty())
+    if((*p)->getPostset().empty())
     {
-      if (last == NULL)
+      if(last == NULL)
+      {
         last = *p;
+      }
       else
+      {
         return false;
+      }
     }
   }
   
   if((first == NULL) || (last == NULL))
-    return false;
-
-  // insert new transition which consumes from last and produces on first to form a cycle
-  Transition & tarjan = createTransition("tarjan");
-  createArc(*last, tarjan);
-  createArc(tarjan, *first);
-
-  // each 2 nodes \f$x,y \in P \cup T\f$ are in a directed cycle
-  // (strongly connected net using tarjan's algorithm)
-  unsigned int i = 0; ///< count index
-  map<Node *, int> index; ///< index property for nodes
-  map<Node *, unsigned int> lowlink; ///< lowlink property for nodes
-  set<Node *> stacked; ///< the stack indication for nodes
-  stack<Node *> S; ///< stack used by Tarjan's algorithm
-
-  // set all nodes' index values to ``undefined''
-  PNAPI_FOREACH(p, places_)
   {
-    index[*p] = (-1);
+    return false;
   }
+
+  // set all transitions' index values to ``undefined''
   PNAPI_FOREACH(t, transitions_)
   {
-    index[*t] = (-1);
+    indices[*t] = (-1);
   }
 
   // getting the number of strongly connected components reachable from first
-  unsigned int sscCount = util::dfsTarjan<Node *>(first, S, stacked, i, index, lowlink);
-
-  deleteTransition(tarjan);
-
-  // check set $P \cup T$
-  set<Node *> nodeSet;
-  PNAPI_FOREACH(p, places_)
-  {
-    nodeSet.insert(*p);
-  }
-  PNAPI_FOREACH(t, transitions_)
-  {
-    nodeSet.insert(*t);
-  }
-
-  /*
-   * true iff only one strongly connected component found from first and all nodes
-   * of $\mathcal{N}$ are members of this component
-   */
-  if((sscCount == 1) && (util::setDifference(nodeSet, stacked).empty()))
-    return true;
-  else
-    return false;
+  return util::dfsTarjan<Node *>(first, last, stacked, index, indices, lowlink, nodes_.size());
 }
 
 

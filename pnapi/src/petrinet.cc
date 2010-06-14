@@ -1485,10 +1485,6 @@ void PetriNet::createArcs(Transition & trans, Transition & otherTrans,
  *
  * \return  true iff (1), (2) and (3) are fulfilled
  * \return  false in any other case
- * 
- * \todo    Erkennung der SZK ohne Hinzufuegen der Transition
- *          Daniela nach Alorithmus fragen; Funktion const machen;
- *          anschlieﬂend methode const machen
  */
 bool PetriNet::isWorkflow() const
 {

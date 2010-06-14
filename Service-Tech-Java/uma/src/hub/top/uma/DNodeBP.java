@@ -18,9 +18,10 @@
 
 package hub.top.uma;
 
+import hub.top.uma.DNodeSet.DNodeSetElement;
+import hub.top.uma.DNodeSys.EventPreSet;
+
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -121,7 +122,13 @@ public class DNodeBP {
 	 * stop BP construction if the property to be checked has been found
 	 */
   private boolean options_stopIfPropertyFound = true;
-	
+
+  public StringBuilder log = new StringBuilder();
+  
+  ////--- fields and members of the branching process construction algorithm
+  
+  private boolean abort = false;  // set to true to abort construction after this step
+  
 	/**
 	 * A {@link DNode}-compatible representation of the original system for
 	 * which the McMillan unfolding shall be constructed.
@@ -138,6 +145,11 @@ public class DNodeBP {
 	 * condition of the branching process all its concurrent conditions.
 	 */
 	protected HashMap<DNode, Set<DNode>> co = new HashMap<DNode, Set<DNode> >();
+	
+	/**
+	 * Summarizes for each node the ids of the nodes in its {@link #co}-set
+	 */
+	protected HashMap<DNode, Set< Short>> coID = new HashMap<DNode, Set<Short> >();
 	
 
 	/**
@@ -237,7 +249,7 @@ public class DNodeBP {
 	 */
 	private void initialize() {
 	  
-	  executionTimeProfile.append("time;numConditions;maxDim;Tfind;numCuts;Tcuts\n");
+	  _debug_executionTimeProfile.append("time;numConditions;numConditions_red;numConditions_red2;maxDim;Tfind;numCuts;Tcuts\n");
 	
 		// get initial BP
 		bp = dNodeAS.initialRun;
@@ -249,12 +261,15 @@ public class DNodeBP {
 		// initialize explicit concurrency relation
 		for (DNode d : bp.maxNodes) {
 			co.put(d, new HashSet<DNode>());
+			coID.put(d, new HashSet<Short>());
 		}
 		for (DNode d : bp.maxNodes) {
 		  for (DNode d2 : bp.maxNodes) {
 		    if (d == d2) continue;
 		    co.get(d).add(d2);
 		    co.get(d2).add(d);
+		    coID.get(d).add(d2.id);
+		    coID.get(d2).add(d.id);
 		  }
 			//updateConcurrencyRelation(d);
 		}
@@ -297,7 +312,10 @@ public class DNodeBP {
 				// both are concurrent
 				coset.add(existing);
 				cosetEx.add(newNode);
-				
+        
+        coID.get(newNode).add(existing.id);
+        coID.get(existing).add(newNode.id);
+        
 				// check for unsafe behavior
 				if (options_checkProperty_Unsafe) {
 				  if (existing.id == newNode.id) {
@@ -323,6 +341,9 @@ public class DNodeBP {
 				coset.add(existing);
 				cosetEx.add(newNode);
 				
+				coID.get(newNode).add(existing.id);
+				coID.get(existing).add(newNode.id);
+				
         // check for unsafe behavior
         if (options_checkProperty_Unsafe) {
           if (existing.id == newNode.id) {
@@ -337,7 +358,17 @@ public class DNodeBP {
 		co.put(newNode, coset);
 	}
 	
-	public StringBuilder executionTimeProfile = new StringBuilder();
+	/**
+	 * This map stores for each local history of an event in the system all
+	 * cuts that have been found in the current {@link #step()} of the
+	 * branching process construction. {@link #findEnablingCuts(EventPreSet, Map, DNode[], boolean)
+	 * fills this map and re-uses found cuts for events with the same local
+	 * history. This improves performance in finding all cuts where an event
+	 * is enabled.
+	 */
+	private HashMap<EventPreSet, LinkedList<DNode[]>> cashedCuts = new HashMap<EventPreSet, LinkedList<DNode[]>>();
+	
+	public StringBuilder _debug_executionTimeProfile = new StringBuilder();
 	long t0 = System.currentTimeMillis();
 	
 	/**
@@ -346,107 +377,238 @@ public class DNodeBP {
 	 * @param preConditions
 	 * @param coRelation
 	 * @param conditionsToSearch
+	 * @param synchronizes
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-  public LinkedList<DNode[]> findEnablingCuts(DNode[] preConditions, Map<DNode, Set<DNode>> coRelation, DNode[] conditionsToSearch)
+  public LinkedList<DNode[]> findEnablingCuts(EventPreSet preConditions, Map<DNode, Set<DNode>> coRelation, DNodeSetElement conditionsToSearch, boolean synchronizes)
 	{
+    // check if cuts for the current pre-conditions have already been found
+    // in the curren step
+    if (cashedCuts.containsKey(preConditions)) {
+      // yes, so return the previously found cuts
+      return cashedCuts.get(preConditions);
+    }
     
-    long t1 = System.currentTimeMillis();
+//    long _debug_t1 = System.currentTimeMillis();
     
-//System.out.println("findEnablingCuts()");
-	  LinkedList<DNode> possibleMatchList[] = (LinkedList<DNode>[])(new LinkedList[preConditions.length]);
-	  for (int i = 0; i< preConditions.length; i++) {
-	    possibleMatchList[i] = new LinkedList<DNode>();
+    // we generate three arrays of lists of conditions
+    // for each condition 'b' in preConditions, we collect all conditions in this
+    // branching process that end with 'b'; only these conditions can be part of
+    // a cut that enables an event with having 'preConditions' as pre-set
+	  LinkedList<DNode> possibleMatches[] = (LinkedList<DNode>[])(new LinkedList[preConditions.conds.length]);
+	  // first optimization: reduces 'possibleMatchList' to those conditions that
+	  // can be a extended to a complete cut of that ends with 'preConditions'
+	  LinkedList<DNode> canCompleteToCut[] = (LinkedList<DNode>[])(new LinkedList[preConditions.conds.length]);
+	  // second optimization: contains only those conditions that can be extended
+	  // to a cut that contains at least one new condition, i.e. rules out all cuts
+	  // that have been examined in a preceding step
+	  LinkedList<DNode> canCompleteToNewCut[] = (LinkedList<DNode>[])(new LinkedList[preConditions.conds.length]);
+	  
+	  // initialize all lists
+	  for (int i = 0; i< preConditions.conds.length; i++) {
+	    possibleMatches[i] = new LinkedList<DNode>();
+	    canCompleteToCut[i] = new LinkedList<DNode>();
+	    canCompleteToNewCut[i] = new LinkedList<DNode>();
 	  }
+	  
+	  // an auxiliary map that helps to store conditions of the current
+	  // branching process in the right entry of 'possibleMatches'
 	  HashMap<Short, Integer> preConIndex = new HashMap<Short, Integer>();
-	  for (int i=0; i<preConditions.length; i++) {
-	    preConIndex.put(preConditions[i].id, i);
+	  for (int i=0; i<preConditions.conds.length; i++) {
+	    // conditions with the same ID as the i-th precondition are
+	    // stored in the i-th entry of 'possibleMatches'
+	    preConIndex.put(preConditions.conds[i].id, i);
 	  }
+	  
+	  // ==========================================================================
+	  // FIRST STEP: find all condition of the current branching process
+	  // that end with one of the 'preConditions'
+    // ==========================================================================
+	  // store each found condition in the corresponding entry of 'possibleMatches'
+	  
+    // if no restriction: search all conditions
+		if (conditionsToSearch == null)
+		  conditionsToSearch = bp.getAllConditions();
+		
+		for (DNode cond : conditionsToSearch) {
 
-		if (conditionsToSearch != null) {
+		  // no event is enabled at an anti-condition
+		  if (cond.isAnti) continue;
+		  
+      // check whether condition max has an id that also occurs in the preConditions
+		  Integer putIndex = preConIndex.get(cond.id);
+		  if (putIndex == null) continue;  // no, skip condition
+		  
+      // consider only conditions which are NOT successors of a cutOff event
+      if (options_cutOffTermination_reachability
+          && (cond.pre != null && cond.pre.length > 0 && cond.pre[0].isCutOff))
+      {
+        continue;
+      }
 
-			// limited set of nodes to search for cuts
-			for (DNode cond : conditionsToSearch) {
-
-			  // no event is enabled at an anti-condition
-			  if (cond.isAnti) continue;
-			  
-        // check whether condition max has an id that also occurs in the preConditions
-			  Integer putIndex = preConIndex.get(cond.id);
-			  if (putIndex == null) continue;
-			  
-        // consider only conditions which are NOT successors of a cutOff event
-        if (options_cutOffTermination_reachability
-            && (cond.pre != null && cond.pre.length > 0 && cond.pre[0].isCutOff))
-        {
-          continue;
+      // check whether the branching process condition 'cond' ends with the
+      // corresponding condition of 'preConditions' (based on the ID of 'cond')
+      if (!cond.endsWith(preConditions.conds[putIndex]))
+        continue;   //no: skip
+      
+      // optimization: check whether 'cond' could in principle participate in a
+      // cut that ends with 'preConditions', this holds true only if 'cond' for each
+      // condition 'b' of 'preConditions', there exists some condition 'b*' that is
+      // concurrent to 'cond' and has the same ID; the set of "concurrent IDs" is
+      // stored in coID
+      boolean canComplete = true;
+      for (int i=0; i<preConditions.conds.length; i++) {
+        // don't check for concurrency of its own ID
+        if (preConditions.conds[i].id == cond.id) continue;
+        // for the i-th ID, 'cond' has no concurrent condition
+        if (!coID.get(cond).contains(preConditions.conds[i].id)) {
+          canComplete = false;  // cannot complete
+          break;
         }
-        
-        // put condition of the branching process to the corresponding index 
-        possibleMatchList[putIndex].addLast(cond);
-			}
-			
-		} else {
-			
-			// all nodes to search for cuts
-			for (DNode cond : bp.getAllConditions()) {
-			  
-        // no event is enabled at an anti-condition
-        if (cond.isAnti) continue;
-			  
-        // check whether condition max has an id that also occurs in the preConditions
-        Integer putIndex = preConIndex.get(cond.id);
-        if (putIndex == null) continue;
-        
-        // consider only conditions which are NOT successors of a cutOff event
-        if (options_cutOffTermination_reachability
-            && (cond.pre != null && cond.pre.length > 0 && cond.pre[0].isCutOff))
-        {
-          continue;
-        }
-        
-        // put condition of the branching process to the corresponding index 
-        possibleMatchList[putIndex].addLast(cond);
-			}
+      }
+      if (!canComplete)
+        continue; // skip all conditions that cannot complete to a cut
+      
+      // we have a match: put condition of the branching process to the corresponding index 
+      possibleMatches[putIndex].addLast(cond);
 		}
-		// possibleMatches contains all nodes of max BP that have the same
-		// ID as one of the preconditions, but which are not marked as cutOff 
-		// generate cuts from these nodes
+		// 'possibleMatches' contains all conditions of the branching process that
+		// end with one of the 'preConditions' and can in principle participate in
+		// a cut that ends with 'possibleMatches'. We have to find all cuts that end
+		// with 'preConditions'. To do this, we compute all combinations of all
+		// 'possibleMatches' index-wise. 
 		
 		//System.out.println("possible matches: "+possibleMatches);
 		
-		long t2 = System.currentTimeMillis();
-		long size = 1;
-		int max = 0;
-		for (int i=0;i<possibleMatchList.length; i++) {
-		  size *= possibleMatchList[i].size();
-		  max = (max > possibleMatchList[i].size() ? max : possibleMatchList[i].size());
-		}
+    // ==========================================================================
+		// SECOND STEP: to reduce the computational effort, we remove from
+		// 'possibleMatches' all conditions which cannot participate in a cut ending
+		// with 'preConditions' by two simple heuristics, this step is optional
+    // ==========================================================================
 		
-		System.out.print("#"+size+" < "+max+"^"+possibleMatchList.length+" in "+(t2-t1)+"ms ");
+   	// --------------------------------------------------------------------------
+		// FIRST OPTIMIZATION: a condition 'b' in dimension i of 'possibleMatches'
+		// participates in a cut only if in each dimension j < i of 'possibleMatches'
+		// there exists a condition 'c' that is concurrent to 'b'. 
+    // --------------------------------------------------------------------------
 		
-//System.out.println("  generate cuts from "+possibleMatches.length()+" conditions");
-		// the mapping possibleMatches now assigns each node of patternToFind
-		// possible candidate nodes for matching in the candidate set and uses
-		// at least one node from the partial cut
+		// We compute for each dimension j the set of all conditions that are concurrent
+		// to the conditions in j. For a second optimization below, we split these sets of
+		// concurrent conditions in old conditions that have been considered in the last step
+		// and new conditions that have been added in the last step.
+    HashSet<DNode> coNodes_old[] = new HashSet[preConditions.conds.length];
+    HashSet<DNode> coNodes_new[] = new HashSet[preConditions.conds.length];
+    for (int i=0;i<preConditions.conds.length; i++) {
+      coNodes_old[i] = new HashSet<DNode>();
+      coNodes_new[i] = new HashSet<DNode>();
+    }
 
-    LinkedList<DNode[]> result = new LinkedList<DNode[]>();
-		/*
-		DNodeCutGenerator cgen = new DNodeCutGenerator(preConditions, possibleMatchList,
-				coRelation);
-		while (cgen.hasNext()) {
-		  System.out.print(",");
-			result.add(cgen.next());
+//		long _debug_size = 1;
+//		long _debug_size2 = 1;
+//		long _debug_size3 = 1;
+//    int _debug_max = 0;
+    
+		int min = Integer.MAX_VALUE;
+
+		// check for each dimension i
+		for (int i=0;i<possibleMatches.length; i++) {
+		  // and each condition in i
+		  for (DNode d : possibleMatches[i]) {
+        // whether d is concurrent to at least one of the other possible conditions,
+	      // for each dimension j < i
+        boolean canMatch = true;
+        for (int j=0; j<i; j++) {
+          // each j < i dimension needs to contain d as co-node          
+          if (!coNodes_old[j].contains(d) && !coNodes_new[j].contains(d)) {
+            // this one does not: remove from matches
+            canMatch = false; break; 
+          }
+        }
+        
+        if (canMatch) {
+          // all nodes that occur in the co-set of all j < i can complete
+          // to a cut
+          canCompleteToCut[i].add(d);
+          // extend the set of concurrent conditions of dimension i by the
+          // co-set of node 'd' - separated into conditions added in the last step()
+          if (d._isNew) coNodes_new[i].addAll(co.get(d));
+          // and conditions that have already been checked in the last step()
+          else coNodes_old[i].addAll(co.get(d));
+        }
+		  }
+//		  _debug_size *= possibleMatches[i].size();
+//		  _debug_size2 *= canCompleteToCut[i].size();
 		}
-		*/
-    result = generateCuts(possibleMatchList);
+		// 'canCompleteToCut' contains only nodes s.t. for all dimensions j < i, each
+		// condition 'b' in i is concurrent to at least one condition 'c' in j
 		
-		long t3 = System.currentTimeMillis();
-    System.out.println(" found "+result.size()+" in "+(t3-t2)+"ms");
-    executionTimeProfile.append((t3-t0)+";"+size+";"+max+";"+(t2-t1)+";"+result.size()+";"+(t3-t2)+"\n");
+    // --------------------------------------------------------------------------
+    // SECOND OPTIMIZATION: We ignore all cuts that have been checked in an
+		// earlier iteration. In such an "old" cut, all conditions b evaluate
+		// b._isNew = false. Thus, a condition 'b' is only in this step if it is
+		// either "new" by itself or concurrent to a "new" condition condition.
+    // --------------------------------------------------------------------------
 		
-//System.out.println("\n  done: "+result.size());		
+		
+    for (int i=0;i<canCompleteToCut.length; i++) {
+
+      // This optimization only works of 'preConditions' describes all preconditions
+      // of the event to fire. This is not the case if the event may synchronize with
+      // another event.
+      if (!synchronizes) {
+        for (DNode d : canCompleteToCut[i]) {
+          // a new condition can participate in any cut of other conditions
+          boolean canMatch_someJ = d._isNew ? true : false;
+          // an old conditions needs another new condition in all its cuts
+          if (!canMatch_someJ) {
+            // check whether some new condition is concurrent to 'd' 
+            for (int j=0; j<canCompleteToCut.length; j++) {
+              if (i == j) continue; // skip self
+              // some new condition of dimension j is concurrent to 'd'  
+              if (coNodes_new[j].contains(d)) { canMatch_someJ = true; break; }
+            }
+          }
+          if (canMatch_someJ) {
+            // condition 'd' can participate in a cut with a new condition, keep it
+            canCompleteToNewCut[i].add(d);
+          }
+        }
+        
+      } else {
+        // a synchronizing event may depend here only on old conditions as it might
+        // synchronize with events depending on new conditions later
+        canCompleteToNewCut[i] = canCompleteToCut[i];
+      }
+      // remember smallest number of candidates per dimension
+      min = (canCompleteToNewCut[i].size() < min ? canCompleteToNewCut[i].size() : min);
+      
+//      _debug_max = (_debug_max > canCompleteToNewCut[i].size() ? _debug_max : canCompleteToNewCut[i].size());
+//      _debug_size3 *= canCompleteToNewCut[i].size();
+      
+    }
+		
+//		long _debug_t2 = System.currentTimeMillis();
+//		System.out.print("#"+_debug_size3+" < #"+_debug_size2+" < #"+_debug_size+" < ["+min+","+_debug_max+"]^"+possibleMatches.length+" of "+DNode.toString(preConditions.conds)+" in "+(_debug_t2-_debug_t1)+"ms ");
+		
+    // ==========================================================================
+    // THIRD STEP: compute all combinations of conditions per dimension that
+		// are pairwise concurrent; these conditions form a cut that ends with
+		// 'preConditions'
+    // ==========================================================================
+    //System.out.println("  generate cuts from "+_debug_size3+" conditions");
+    
+    LinkedList<DNode[]> result;
+    if (min > 0)
+      result = generateCuts_order(canCompleteToNewCut);
+    else
+      result = new LinkedList<DNode[]>();
+		
+//		long _debug_t3 = System.currentTimeMillis();
+//    System.out.println(" found "+result.size()+" in "+(_debug_t3-_debug_t2)+"ms");
+//    _debug_executionTimeProfile.append((_debug_t3-t0)+";"+_debug_size+";"+_debug_size2+";"+_debug_size3+";"+_debug_max+";"+(_debug_t2-_debug_t1)+";"+result.size()+";"+(_debug_t3-_debug_t2)+"\n");
+		
+    cashedCuts.put(preConditions, result); // cache the found cuts for later use
 		return result;
 	}
   
@@ -454,6 +616,45 @@ public class DNodeBP {
     
     if (possibleMatchList.length == 0) return new LinkedList<DNode[]>();
     
+    LinkedList< DNode[] > partialCutsOld = new LinkedList<DNode[]>();
+    LinkedList< DNode[] > partialCutsNew = new LinkedList<DNode[]>();
+    for (DNode d : possibleMatchList[0]) {
+      DNode[] pCut = new DNode[1]; pCut[0] = d;
+      if (d._isNew) partialCutsNew.addLast(pCut);
+      else partialCutsOld.addLast(pCut);
+    }
+    
+    for (int i=1; i< possibleMatchList.length; i++) {
+      
+      LinkedList<DNode> next_old = new LinkedList<DNode>();
+      LinkedList<DNode> next_new = new LinkedList<DNode>();
+      for (DNode d : possibleMatchList[i]) {
+        if (d._isNew) next_new.addLast(d);
+        else next_old.addLast(d);
+      }
+      
+      LinkedList< DNode[] > extendedCutsOld = new LinkedList<DNode[]>();
+      if (i < possibleMatchList.length-1) {
+        extendByCo(partialCutsOld, next_old, i, extendedCutsOld);
+      } else {
+        //System.out.print(" skipping "+partialCutsOld.size()*next_old.size()+" ");
+      }
+
+      LinkedList< DNode[] > extendedCutsNew = new LinkedList<DNode[]>();
+      extendByCo(partialCutsOld, next_new, i, extendedCutsNew);
+      extendByCo(partialCutsNew, next_old, i, extendedCutsNew);
+      extendByCo(partialCutsNew, next_new, i, extendedCutsNew);
+      
+      partialCutsOld = extendedCutsOld;
+      partialCutsNew = extendedCutsNew;
+    }
+    
+    return partialCutsNew;
+  }
+  
+  private LinkedList< DNode[] > generateCuts_order( LinkedList<DNode> possibleMatchList[] ) {
+    if (possibleMatchList.length == 0) return new LinkedList<DNode[]>();
+
     LinkedList< DNode[] > partialCuts = new LinkedList<DNode[]>();
     for (DNode d : possibleMatchList[0]) {
       DNode[] pCut = new DNode[1]; pCut[0] = d;
@@ -461,18 +662,94 @@ public class DNodeBP {
     }
     
     for (int i=1; i< possibleMatchList.length; i++) {
-      partialCuts = extendByCo(partialCuts, possibleMatchList[i], i);
+      
+      if (i == possibleMatchList.length - 1) {
+        LinkedList<DNode> next_old = new LinkedList<DNode>();
+        LinkedList<DNode> next_new = new LinkedList<DNode>();
+        for (DNode d : possibleMatchList[i]) {
+          if (d._isNew) next_new.addLast(d);
+          else next_old.addLast(d);
+        }
+        
+        LinkedList<DNode[]> partialCutsOld = new LinkedList<DNode[]>();
+        LinkedList<DNode[]> partialCutsNew = new LinkedList<DNode[]>();
+        for (DNode[] pCut : partialCuts) {
+          boolean hasNew = false;
+          for (DNode d : pCut) if (d._isNew) { hasNew = true; break; }
+          if (hasNew) partialCutsNew.addLast(pCut);
+          else partialCutsOld.addLast(pCut);
+        }
+        LinkedList< DNode[] > extendedCuts = new LinkedList<DNode[]>();
+        extendByCo(partialCutsOld, next_new, i, extendedCuts);
+        extendByCo(partialCutsNew, next_old, i, extendedCuts);
+        extendByCo(partialCutsNew, next_new, i, extendedCuts);
+        partialCuts = extendedCuts;
+      } else {
+        LinkedList< DNode[] > extendedCuts = new LinkedList<DNode[]>();
+        extendByCo(partialCuts, possibleMatchList[i], i, extendedCuts);
+        partialCuts = extendedCuts;
+      }
+    }
+    return partialCuts;
+  }
+  
+  private int getShortest ( LinkedList<DNode> possibleMatchList[], boolean taken[] ) {
+    int min = Integer.MAX_VALUE;
+    int minIndex = -1;
+    for (int i=0; i < possibleMatchList.length; i++) {
+      if (taken[i]) continue;
+      /*
+      if (min > possibleMatchList[i].size()) {
+        min = possibleMatchList[i].size();
+        minIndex = i;
+      }
+      */
+      return i;
+    }
+    return minIndex;
+  }
+  
+  private LinkedList< DNode[] > generateCuts_all( LinkedList<DNode> possibleMatchList[] ) {
+    
+    if (possibleMatchList.length == 0) return new LinkedList<DNode[]>();
+    
+    boolean[] taken = new boolean[possibleMatchList.length];
+    int[] orderIndex = new int[possibleMatchList.length];
+    
+    int current = 0;
+    int minIndex = getShortest(possibleMatchList, taken);
+    taken[minIndex] = true;
+    
+    LinkedList< DNode[] > partialCuts = new LinkedList<DNode[]>();
+    for (DNode d : possibleMatchList[minIndex]) {
+      DNode[] pCut = new DNode[1]; pCut[0] = d;
+      partialCuts.addLast(pCut);
+    }
+    orderIndex[current] = minIndex;
+    current++;
+    
+    while (current < possibleMatchList.length) {
+      LinkedList< DNode[] > extendedCuts = new LinkedList<DNode[]>();
+      minIndex = getShortest(possibleMatchList, taken);
+      taken[minIndex] = true;
+      
+      extendByCo(partialCuts, possibleMatchList[minIndex], current, extendedCuts);
+      partialCuts = extendedCuts;
+      
+      orderIndex[current] = minIndex;
+      current++;
     }
     
     return partialCuts;
   }
+
   
   
-  private LinkedList< DNode[] > extendByCo( LinkedList< DNode[]> existingCo, LinkedList<DNode> newConditions, int size ) {
+  private void extendByCo( LinkedList< DNode[]> existingCo, LinkedList<DNode> nextConditions, int size, LinkedList< DNode[] > extendedCo ) {
+
     int newSize = size + 1;
-    LinkedList< DNode[] > extendedCo = new LinkedList<DNode[]>();
     for (DNode[] partialCut : existingCo ) {
-      for (DNode bNew : newConditions) {
+      for (DNode bNew : nextConditions) {
         boolean inConflict = false;
         for (int i=0;i<size; i++) {
           if (!co.get(bNew).contains(partialCut[i])) {
@@ -484,10 +761,10 @@ public class DNodeBP {
           for (int i=0;i<size;i++) extendedCut[i] = partialCut[i];
           extendedCut[size] = bNew;
           extendedCo.addLast(extendedCut);
+          //extendedCo.addLast(DNode.sortIDs(extendedCut));
         }
       }
     }
-    return extendedCo;
   }
 
 	/**
@@ -523,7 +800,7 @@ public class DNodeBP {
 		{
 		
 			//System.out.println("ENABLED "+e+" "+DNode.toString(e.pre)+":");
-			LinkedList<DNode[]> cuts = findEnablingCuts(e.pre, co, null);
+			LinkedList<DNode[]> cuts = findEnablingCuts(dNodeAS.eventPreSetAbstraction.get(e), co, null, e.isAnti);
 			//System.out.println("checking enabling locations...");
 			
 			//Iterable<DNode> cutNodes = bp.maxNodes;
@@ -535,17 +812,26 @@ public class DNodeBP {
   			// see if this event is already present at the given cut
   
 		    boolean allCutOff = true;
+		    boolean foundCutOff = false;
+		    boolean noCompletenessPred = true; 
 		    
   			int foundNum = 0;
   			for (DNode b : cutNodes)
   			{
   			  if (!b.isCutOff) allCutOff = false;
+  			  if (b.isCutOff) foundCutOff = true;
   				if (b.post != null) {
   					for (int j = 0; j < b.post.length; j++)
   						if (b.post[j].id == e.id) {
   							foundNum++;
   							break;
   						}
+  				}
+  				if (b.pre != null && b.pre.length > 0) {
+  				  DNode event = b.pre[0];
+  				  if (!event.isCutOff) {
+  				    noCompletenessPred = false;
+  				  }
   				}
   			}
   			// we found a post-event with the same ID as the transition that
@@ -563,6 +849,14 @@ public class DNodeBP {
   			  //System.out.println("skipping "+DNode.toString(cutNodes)+" because all are cut-offs");
   			  continue;
   			}
+  			if (foundCutOff && noCompletenessPred) {
+  			  // the event depends on a cut-off event and none of its predecessor
+  			  // events requires dependency completeness; do not explore this event 
+  			  System.out.print("#");
+  			  continue;
+  			}
+  			
+  			//log.append(e+" has valid cut at "+DNode.toString(cutNodes)+"\n");
   
   			DNode[] loc = new DNode[e.pre.length];
   			  
@@ -591,6 +885,8 @@ public class DNodeBP {
   			
   			if ( i == e.pre.length ) {
   				// all precondition of event i have been found in max BP
+  			  
+  	      //log.append(e+" is enabled at "+DNode.toString(cutNodes)+"\n");
   				
   				assert loc[e.pre.length] != null : "Error, adding invalid enabling location";
   			
@@ -682,6 +978,15 @@ public class DNodeBP {
   			}
 		  } // for all cuts
 		}
+		
+		for (Entry<EventPreSet, LinkedList<DNode[]>> cuts : cashedCuts.entrySet()) cuts.getValue().clear();
+		cashedCuts.clear();
+		
+		// set all existing conditions to old
+		for (DNode b : bp.allConditions) {
+		  b._isNew = false;
+		}
+		
 		return info;
 	}
 	
@@ -751,7 +1056,8 @@ public class DNodeBP {
 			
 			if (info.synchronizedEvents.get(fireIndex) == null) {
 
-				//System.out.println("fire "+info.enabledEvents.get(i)+ " at "+DNode.toString(info.enablingLocation.get(i)));
+				//System.out.println("fire "+info.enabledEvents.get(fireIndex)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex)));
+			  //log.append("fire "+info.enabledEvents.get(fireIndex)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex))+"\n");
 				DNode e = info.enabledEvents.get(fireIndex);
 
 				if (e.isAnti) {
@@ -767,8 +1073,9 @@ public class DNodeBP {
 			} else {
 				DNode events[] = new DNode[info.synchronizedEvents.get(fireIndex).size()];
 				events = info.synchronizedEvents.get(fireIndex).toArray(events);
-
-				//System.out.println("fire "+DNode.toString(events)+ " at "+DNode.toString(info.enablingLocation.get(i)));
+				
+				//System.out.println("fire "+DNode.toString(events)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex)));
+				//log.append("fire "+DNode.toString(events)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex))+"\n");
 				for (int j=0;j<events.length;j++) {
 					if (events[j].isAnti) {
 	          // remember that the fired event does not occur in the final result
@@ -790,6 +1097,7 @@ public class DNodeBP {
 			// update co-relation for all new post-conditions
 			for (DNode d : postConditions) {
 				co.put(d, new HashSet<DNode>());
+				coID.put(d, new HashSet<Short>());
 			}
 			for (DNode d : postConditions) {
 				updateConcurrencyRelation(d);
@@ -798,6 +1106,10 @@ public class DNodeBP {
 			if (postConditions.length > 0) {
 			  
   			DNode newEvent = postConditions[0].pre[0];
+  			
+  			log.append("created new event "+newEvent+" at "+DNode.toString(info.enablingLocation.get(fireIndex))+"\n");
+  			log.append("having post-conditions "+DNode.toString(postConditions)+"\n");
+  			log.append("from "+toString(newEvent.causedBy)+"\n");
   			
   			setCurrentPrimeConfig(newEvent);
   			newEvent.isHot = setHot;   // remember temperature of event
@@ -811,13 +1123,17 @@ public class DNodeBP {
             newEvent.isCutOff = true;
           }
           // System.out.println("created anti-event "+newEvent);
+          log.append("created anti-event "+toString(primeConfigurationString.get(newEvent))+"\n");
         } else {
           
           // for all other events, check whether it is a cutOff event
     			if (isCutOffEvent(newEvent)) {
     				newEvent.isCutOff = true;
+    				log.append("is a cut-off event because of "+elementary_ccPair.get(newEvent)+"\n");
+    				log.append(toString(primeConfigurationString.get(newEvent))+"\n");//" > "+toString(primeConfigurationString.get(elementary_ccPair.get(newEvent)))+"\n");
+    			} else {
+    			  log.append(toString(primeConfigurationString.get(newEvent))+"\n");
     			}
-    			
         }
 
   			// remember cutOff on post-conditions as well
@@ -851,7 +1167,10 @@ public class DNodeBP {
 	{
 		byte enabledCount = 0;
 		
-		LinkedList<DNode[]> cuts = findEnablingCuts(e.pre, co, cut);
+		DNodeSetElement cut2 = new DNodeSetElement();
+		for (DNode b : cut) cut2.addLast(b);
+		
+		LinkedList<DNode[]> cuts = findEnablingCuts(dNodeAS.eventPreSetAbstraction.get(e), co, cut2, e.isAnti);
 			
 		for (DNode[] cutNodes : cuts) {
 
@@ -1041,6 +1360,8 @@ public class DNodeBP {
     EnablingInfo info = getAllEnabledEvents();
     int fired = fireAllEnabledEvents(info);
     
+    if (abort) return 0;
+    
     if (propertyCheck == PROP_NONE || !options_stopIfPropertyFound)
       return fired;
     else
@@ -1089,7 +1410,7 @@ public class DNodeBP {
    * unfolding are isomorphic. Cut-off events that are equivalent to the
    * initial cut have no entry in this map.
    * 
-   * This mapping is update by {@link #updateCCpair(DNode, DNode)} and
+   * This mapping is updated by {@link #updateCCpair(DNode, DNode)} and
    * {@link #updateCCpair(DNode[], DNode[])} and is used for computing foldings
    * of the McMillan prefix ({@link #minimize()} and {@link #relax()}) and
    * for deciding behavioral properties ({@link #checkProperties()}).
@@ -1831,7 +2152,17 @@ public class DNodeBP {
 		return false;
 	}
 	
-	private static String toString(short[] array) {
+	 
+  public static String toString(int[] array) {
+    String result = "[";
+    for (int i=0;i<array.length;i++) {
+      if (i > 0) result += ",";
+      result+=array[i];
+    }
+    return result+"]";
+  }
+	
+	public static String toString(short[] array) {
 	  String result = "[";
 	  for (int i=0;i<array.length;i++) {
 	    if (i > 0) result += ",";
@@ -2047,7 +2378,7 @@ public class DNodeBP {
 	        break;
 	    }
 	    if (i < e.pre.length) {
-	      System.out.println("events "+e+" and "+e0+" are not fully compatible by "+e.pre[i]+" and "+e0.pre[i]);
+	      //System.out.println("events "+e+" and "+e0+" are not fully compatible by "+e.pre[i]+" and "+e0.pre[i]);
 	      elementary_ccPair.remove(e);
 	      e.isCutOff = false;
 	    }

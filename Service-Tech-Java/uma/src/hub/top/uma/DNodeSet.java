@@ -46,7 +46,7 @@ public class DNodeSet {
    * 
    * @author Dirk Fahland
    */
-	public class DNodeSetElement extends java.util.LinkedList<DNode>  {
+	public static class DNodeSetElement extends java.util.LinkedList<DNode>  {
 
 		private static final long serialVersionUID = -9020905669586738898L;
 
@@ -568,14 +568,10 @@ public class DNodeSet {
 		String impliedFillString = "fillcolor=violet";
 		String hiddenFillString = "fillcolor=grey";
 		
-		HashSet<DNode> allNodes = getAllNodes();
-		
 		// first print all conditions
 		b.append("\n\n");
 		b.append("node [shape=circle];\n");
-		for (DNode n : allNodes) {
-			if (n.isEvent)
-				continue;
+		for (DNode n : getAllConditions()) {
 			
 			if (!option_printAnti && n.isAnti)
 				continue;
@@ -600,9 +596,7 @@ public class DNodeSet {
     // then print all events
 		b.append("\n\n");
 		b.append("node [shape=box];\n");
-		for (DNode n : allNodes) {
-			if (!n.isEvent)
-				continue;
+		for (DNode n : getAllEvents()) {
 			
 			if (!option_printAnti && n.isAnti)
 				continue;
@@ -640,7 +634,7 @@ public class DNodeSet {
 		// finally, print all edges
 		b.append("\n\n");
 		b.append(" edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black];\n");
-		for (DNode n : allNodes) {
+		for (DNode n : allConditions) {
 			String prefix = n.isEvent ? "e" : "c";
 			for (int i=0; i<n.pre.length; i++) {
 				if (n.pre[i] == null) continue;
@@ -652,6 +646,20 @@ public class DNodeSet {
 					b.append("  c"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0]\n");
 			}
 		}
+    for (DNode n : allEvents) {
+      String prefix = n.isEvent ? "e" : "c";
+      for (int i=0; i<n.pre.length; i++) {
+        if (n.pre[i] == null) continue;
+        if (!option_printAnti && n.isAnti) continue;
+        
+        if (n.pre[i].isEvent)
+          b.append("  e"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0]\n");
+        else
+          b.append("  c"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0]\n");
+      }
+    }
+
+		
 		b.append("}");
 		return b.toString();
 	}

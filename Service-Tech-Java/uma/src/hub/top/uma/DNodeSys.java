@@ -19,6 +19,8 @@ package hub.top.uma;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -83,6 +85,66 @@ public abstract class DNodeSys {
 	 * {@link #finalize_setPreConditions()} to set this field.
 	 */
 	public DNode[] 				preConditions;		// set of all preconditions of an event
+	
+	public class EventPreSet {
+	  public DNode[] conds;
+	  
+	  public EventPreSet(int size) {
+	    conds = new DNode[size];
+    }
+	  
+	  public EventPreSet(DNode[] preSet) {
+	    this(preSet.length);
+      // copy the IDs of the event's preconditions, e.pre[i] is sorted by .id,
+      // so e_presetIDs is sorted
+	    for (int i=0; i<preSet.length; i++)
+	      conds[i] = preSet[i];
+	  }
+	  
+	  public boolean equals(EventPreSet other) {
+	    if (conds.length != other.conds.length) return false;
+	    for (int i=0;i<conds.length;i++) {
+	      if (!conds[i].structuralEquals(other.conds[i])) return false;
+	    }
+	    return true;
+	  }
+	  
+	  public boolean equals(DNode other[]) {
+	      if (conds.length != other.length) return false;
+	      for (int i=0;i<conds.length;i++) {
+	        if (!conds[i].structuralEquals(other[i])) return false;
+	      }
+	      return true;
+	  }
+	   
+	  @Override
+	  public boolean equals(Object obj) {
+  	   if (obj instanceof EventPreSet) return equals((EventPreSet)obj);
+  	   if (obj instanceof DNode[]) return equals((DNode[])obj);
+  	   return false;
+	  }
+	   
+	  @Override
+	  public String toString() {
+	    String result = "[";
+	    for (int i=0; i< conds.length; i++) {
+	      if (i>0) result += ",";
+	      result += conds[i];
+	    }
+	    return result+"]";
+	  }
+	}
+	
+	/**
+	 * Each array in this set represents all IDs of the preconditions of
+	 * a fireable event. This set is used to gain efficiency when searching
+	 * for cuts that enable a fireable event. For each array in this set,
+	 * all corresponding cuts of the branching process will be searched. The
+	 * found cuts will be re-used for events that have the same preset IDs.
+	 */
+	public LinkedList< EventPreSet > eventPreSetIDs;
+	
+	public HashMap<DNode, EventPreSet> eventPreSetAbstraction;
 
 	/**
 	 * Every system has an initial state or more generally an initial run. The
@@ -156,6 +218,9 @@ public abstract class DNodeSys {
 		for (DNode e : fireableEvents) {
 			preCondNum += e.pre.length;
 		}
+		
+		eventPreSetIDs = new LinkedList<EventPreSet>();
+		eventPreSetAbstraction = new HashMap<DNode, EventPreSet>();
 		preConditions = new DNode[preCondNum];
 		preCondNum = 0;
 		for (DNode e : preConEvents) {
@@ -163,9 +228,31 @@ public abstract class DNodeSys {
 				preConditions[preCondNum++] = b;
 		}
 		for (DNode e : fireableEvents) {
-			for (DNode b : e.pre)
-				preConditions[preCondNum++] = b;
+			for (int i = 0; i<e.pre.length; i++) {
+				preConditions[preCondNum++] = e.pre[i];
+			}
+			
+			EventPreSet e_preSetIDs = new EventPreSet(e.pre);
+			
+			//System.out.println("adding "+e_preSetIDs);
+			
+			if (!eventPreSetIDs.contains(e_preSetIDs)) {
+			  eventPreSetIDs.addLast(e_preSetIDs);
+		    //System.out.println("new");
+			} else {
+			  for (EventPreSet existing : eventPreSetIDs) {
+			    if (existing.equals(e_preSetIDs)) {
+			      e_preSetIDs = existing;
+			      break;
+			    }
+			  }
+			}
+			eventPreSetAbstraction.put(e, e_preSetIDs);
 		}
+
+		//for (EventPreSet pre : eventPreSetIDs) {
+		//  System.out.println(pre);
+		//}
 	}
 	
 	/**

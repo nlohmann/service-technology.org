@@ -51,6 +51,13 @@ public class DNode {
 	public boolean  isImplied = false;  // event of an implied scenario
 	
 	/**
+	 * field set during construction of the branching process, a node is new
+	 * if it has just been added to the branching process. It becomes old after
+	 * all possible extensions in the next step are computed.
+	 */
+	public boolean  _isNew = true; 
+	
+	/**
 	 * For finding cutOff events using the signature method, we compare whether
 	 * two events in the branching process are fired by the same set of oclet
 	 * events (see {@link DNodeBP#equivalentCuts_signature}). This array stores
@@ -91,6 +98,24 @@ public class DNode {
 		DNode other = (DNode)obj;
 		return (this.id == other.id
 				&& pre.equals(other.pre));
+	}
+	
+	/**
+	 * Comparative equals methods for comparing two DNodes
+	 * for structural equality.
+	 * 
+	 * @param other
+	 * @return
+	 */
+	public boolean structuralEquals(DNode other) {
+	  if (this.id != other.id) return false;
+	  if (this.pre == null && other.pre == null) return true;
+	  if (this.pre == null && other.pre != null || this.pre != null && other.pre == null) return false;
+	  if (this.pre.length != other.pre.length) return false;
+	  for (int i=0; i<this.pre.length; i++) {
+	    if (!this.pre[i].structuralEquals(other.pre[i])) return false;
+	  }
+	  return true;
 	}
 	
 	/**
@@ -473,7 +498,6 @@ public class DNode {
 			return result + "]";
 		}
 	}
-	
 	
   /* ---------------------------- misc. util functions ---------------------- */
 	

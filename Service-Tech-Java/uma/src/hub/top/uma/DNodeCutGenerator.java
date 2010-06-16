@@ -297,12 +297,14 @@ public class DNodeCutGenerator implements Iterator< DNode[] >{
     for (DNode[] partialCut : partialCuts ) {
       for (DNode bNew : nextConditions) {
         boolean inConflict = false;
+        // see if one of the nodes in the partial cut is in conflict with the new node
         for (int i=0; i < size; i++) {
           if (!co.get(bNew).contains(partialCut[i])) {
             inConflict = true; break;
           }
         }
         if (!inConflict) {
+          // if not, create a larger cut extended by the new event
           DNode[] extendedCut = new DNode[newSize];
           for (int i=0; i < size; i++) extendedCut[i] = partialCut[i];
           extendedCut[size] = bNew;

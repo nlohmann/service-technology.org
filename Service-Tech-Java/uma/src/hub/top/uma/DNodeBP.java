@@ -541,9 +541,12 @@ public class DNodeBP {
     //System.out.println("  generate cuts from "+_debug_size3+" conditions");
     
     LinkedList<DNode[]> result;
-    if (min > 0)
-      result = DNodeCutGenerator.generateCuts_noOld(canCompleteToNewCut, co);
-    else
+    if (min > 0) {
+      if (synchronizes)
+        result = DNodeCutGenerator.generateCuts(canCompleteToNewCut, co);
+      else
+        result = DNodeCutGenerator.generateCuts_noOld(canCompleteToNewCut, co);
+    } else
       result = new LinkedList<DNode[]>();
 		
 //		long _debug_t3 = System.currentTimeMillis();

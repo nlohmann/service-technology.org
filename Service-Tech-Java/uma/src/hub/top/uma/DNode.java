@@ -290,9 +290,34 @@ public class DNode {
 	     
 	   ======================================================================= */
 	
-	/* ------------------------------ merge sort ----------------------------- */ 
+  /**
+   * @param first
+   * @param second
+   * @return <code>true</code> iff the nodes in <code>first</code>
+   * are also nodes in <code>second</code> by strict identity
+   */
+  public static boolean containedIn(DNode[] first, DNode[] second) {
+    
+    for (int i=0,j=0; i < first.length; i++) {
+      // search in otherLoc for node with same id as loc[l]
+      while (j < second.length && first[i].id > second[j].id) j++;
+      if (j == second.length) return false; // not found
+  
+      // now check whether first[i] == second[j], it may be that
+      // second contains another node with the same id, iterate
+      // over these but remember j
+      boolean match = false;
+      int j_offset = j;
+      while (j_offset < second.length && first[i].id == second[j_offset].id) {
+        if (first[i] == second[j_offset]) { match = true; break; }
+        j_offset++;
+      }
+      if (!match) return false;
+    }
+    return true;
+  }
 	
-	/**
+  /**
    * @param arr
    * @return a string representation of the given {@link DNode} array
    */
@@ -303,6 +328,9 @@ public class DNode {
     }
     return result + "]";
   }
+  
+  /* ------------------------------ merge sort ----------------------------- */ 
+  
 
   /**
 	 * Merge two DNode arrays half1 and half2 into a DNode array by sorting

@@ -17,6 +17,7 @@
 
 package hub.top.uma;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -245,5 +246,297 @@ public class DNodeCutGenerator implements Iterator< DNode[] >{
 		// never remove elements from the given set
 	}
 	
+	// =========================================================================
+	//  Static functions to compute all cuts from a "comb" of potentially 
+	//  concurrent conditions.
+	//
+	//  The "comb" is given as an array of lists of  conditions. A cut contains
+	//  one condition from each list s.t. all conditions are pairwise 
+	//  concurrent. The following functions compute all combinations of
+	//  conditions of each list and determine to determine all cuts in th
+	//  "comb".
+  // =========================================================================
+	
+  // -------------------------------------------------------------------------
+	//
+	//  To compute the cuts, we use a simple form of dynamic programming. We
+	//  compute "partial cuts" of increasing size. Beginning in cuts of size 1,
+	//  we extend a list of partial cuts by new conditions as follows:
+	//
+	//     for each partial cut {b1,...,bk}
+	//       for each condition b(k+1)
+	//         if b(k+1) is concurrent to each bi, i=1,...,k then
+	//           store {b1,...,bk,(k+1)} as an extended cut
+	//         else
+	//           discard {b1,...,bk,(k+1)}
+	//
+	//  method #extendByCo implements this procedure.
+	//
+  // -------------------------------------------------------------------------
+
+	/**
+	 * Extend a list of partial cuts of given <code>size</code> to a list of
+	 * partial cuts of <code>size + 1</code>. A partial cut {b1,...,bk} in
+	 * <code>partialCuts</code> extends to a partial cut {b1,...,bk,b(k+1)} in
+	 * <code>extendedCuts</code> iff condition b(k+1) from <code>nextCuts</code>
+	 * is concurrent (according to <code>co</code>) to each bi, i=1,...,k.
+	 * 
+	 * @param partialCuts  list of given partial cuts s.t.
+	 *                     <code>partialCuts[i].id &lt; partialCuts[i+1].id</code>
+	 *                     for all <code>i=1,...,size</code>
+	 * @param nextConditions  list of conditions to extend the partial cuts
+	 * @param size  size of all cuts in partial cuts, given explicitly to avoid 
+	 *              recomputation from input data
+	 * @param co  concurrency relation as computed by {@link DNodeBP}
+	 * @param extendedCuts  list to take the results of the extension, can be
+	 *                      nonempty; new cuts will be appended to the list
+	 */
+  public static void extendByCo( LinkedList< DNode[]> partialCuts, LinkedList<DNode> nextConditions, int size, HashMap<DNode, Set<DNode>> co, LinkedList< DNode[] > extendedCuts ) {
+
+    int newSize = size + 1;
+    for (DNode[] partialCut : partialCuts ) {
+      for (DNode bNew : nextConditions) {
+        boolean inConflict = false;
+        for (int i=0; i < size; i++) {
+          if (!co.get(bNew).contains(partialCut[i])) {
+            inConflict = true; break;
+          }
+        }
+        if (!inConflict) {
+          DNode[] extendedCut = new DNode[newSize];
+          for (int i=0; i < size; i++) extendedCut[i] = partialCut[i];
+          extendedCut[size] = bNew;
+          extendedCuts.addLast(extendedCut);
+        }
+      }
+    }
+  }
+  
+  /**
+   * Standard method to compute all cuts from the conditions in the "comb"
+   * <code>possibleMatchList</code>. A <b>cut</b> is a set of conditions {b1,...,bk}
+   * where <code>possibleMatchList[i].contains(bi)</code> and all <code>bi</code>
+   * are pairwise concurrent: <code>co.get(bi).contains(bj)</code> for all
+   * i=1,...k and i != j.
+   * 
+   * The returned cuts are ordered "lexicographically" by the {@link DNode#globalId}s
+   * of the conditions.
+   * 
+   * @param possibleMatchList
+   * @param co
+   * @return the list of cuts
+   */
+  public static LinkedList< DNode[] > generateCuts( LinkedList<DNode> possibleMatchList[], HashMap<DNode, Set<DNode>> co ) {
+    
+    if (possibleMatchList.length == 0) return new LinkedList<DNode[]>();
+
+    int current = 0;
+    
+    // we compute cuts by iteratively constructing partial cuts of increasing size
+    // begin with the trivial partial cut for possibleMatchList[0]
+    LinkedList< DNode[] > partialCuts = new LinkedList<DNode[]>();
+    for (DNode d : possibleMatchList[0]) {
+      DNode[] pCut = new DNode[1]; pCut[0] = d;
+      partialCuts.addLast(pCut);
+    }
+    current++;
+    
+    // extend the current partial cuts by the next list of conditions to a larger
+    // partial cut
+    while (current < possibleMatchList.length) {
+      LinkedList< DNode[] > extendedCuts = new LinkedList<DNode[]>();
+      
+      extendByCo(partialCuts, possibleMatchList[current], current, co, extendedCuts);
+      partialCuts = extendedCuts;
+      current++;
+    }
+    
+    // until the complete cuts have been computed, return these
+    return partialCuts;
+  }
+  
+  /**
+   * Optimized method compute all cuts from the conditions in the "comb"
+   * <code>possibleMatchList</code>. 
+   * 
+   * This method optimizes {@link #generateCuts(LinkedList[], HashMap)}
+   * by extending partial cuts with the least number of conditions that
+   * have not been considered yet. In other words, for the partial cuts
+   * {b1,...,bk}, b1 is taken from the shortest list
+   * <code>possibleMatchList[i_1]</code>, b2 is taken from the second to
+   * shortest list <code>possibleMatchList[i_2]</code>, etc. 
+   * 
+   * This way, the number of partial cuts computed intermediately remains
+   * smaller than the number of partial cuts computed in {@link #generateCuts(LinkedList[], HashMap)}.
+   * 
+   * As a drawback, the computed partial cuts are not ordered by their IDs
+   * and have to be ordered again before returned. So, in the worst case,
+   * this method has a higher complexity than {@link #generateCuts(LinkedList[], HashMap)}.
+   * 
+   * @param possibleMatchList
+   * @param co
+   * @return the list of cuts
+   */
+  public static LinkedList< DNode[] > generateCuts_bySize( LinkedList<DNode> possibleMatchList[], HashMap<DNode, Set<DNode>> co ) {
+    
+    if (possibleMatchList.length == 0) return new LinkedList<DNode[]>();
+    
+    // remember which list of conditions has already been considered
+    boolean[] considered = new boolean[possibleMatchList.length];
+    
+    // determine the shortest list of conditions in the comb
+    int minIndex = getShortestList(possibleMatchList, considered);
+    considered[minIndex] = true;
+    // count the number of dimensions of the comb that have been considered
+    int current = 0;
+    
+    // we compute cuts by iteratively constructing partial cuts of increasing size
+    // begin with the trivial partial cut consisting of a minimal set of conditions
+    LinkedList< DNode[] > partialCuts = new LinkedList<DNode[]>();
+    for (DNode d : possibleMatchList[minIndex]) {
+      DNode[] pCut = new DNode[1]; pCut[0] = d;
+      partialCuts.addLast(pCut);
+    }
+    current++;
+    
+    // extend the current partial cuts by the next shortest list of conditions
+    // to a larger partial cut
+    while (current < possibleMatchList.length) {
+      LinkedList< DNode[] > extendedCuts = new LinkedList<DNode[]>();
+      minIndex = getShortestList(possibleMatchList, considered);
+      considered[minIndex] = true;
+      
+      extendByCo(partialCuts, possibleMatchList[minIndex], current, co, extendedCuts);
+      partialCuts = extendedCuts;
+      
+      current++;
+    }
+    
+    // the partial cuts are not sorted by their IDs, do this now
+    LinkedList< DNode[] > sortedCuts = new LinkedList<DNode[]>();
+    for (DNode[] unsortedCut : partialCuts) {
+      sortedCuts.addLast(DNode.sortIDs(unsortedCut));
+    }
+    
+    return sortedCuts;
+  }
+  
+  /**
+   * @param possibleMatchList
+   * @param considered
+   * @return index of the shortest <code>possibleMatchList</code> that has not been
+   * <code>considered</code> yet, <code>-1</code> if all have been considered already  
+   */
+  private static int getShortestList ( LinkedList<DNode> possibleMatchList[], boolean considered[] ) {
+    int min = Integer.MAX_VALUE;
+    int minIndex = -1;
+    // iterate over all lists
+    for (int i=0; i < possibleMatchList.length; i++) {
+      // skip lists that were considered
+      if (considered[i]) continue;  
+      // remember the shortest list
+      if (min > possibleMatchList[i].size()) {
+        min = possibleMatchList[i].size();
+        minIndex = i;
+      }
+      return i;
+    }
+    return minIndex;
+  }
+	
+	/**
+   * Optimized method compute all cuts from the conditions in the "comb"
+   * <code>possibleMatchList</code>. 
+   * 
+   * This method optimizes {@link #generateCuts(LinkedList[], HashMap)}
+   * by skipping each cut that consist only of "old" conditions. Such a
+   * cut has already been considered in a previous step. 
+   * 
+   * Old and new conditions are identified by {@link DNode#_isNew}. For
+   * correctness of this method, two properties must hold: 
+   * 
+   * (1) each {@link DNode} <code>d</code> that is added to a branching
+   * process evaluates <code>d._isNew == true</code>
+   * (2) before firing all enabled events, all conditions of the branching
+   * process must be set to <code>d._isNew = false</code>
+   * 
+   * Thiss method computes and returns less cuts compared to
+   * {@link #generateCuts(LinkedList[], HashMap)}. The non-considered
+   * cuts would yield only possible extensions of the branching process
+   * in {@link DNodeBP} that have already been added. So, this
+   * optimized method is complete.
+   * 
+   * As a drawback, this method returns the cuts in a different order
+   * compared to {@link #generateCuts(LinkedList[], HashMap)}: the cuts
+   * are not ordedered lexicographically. Thus may lead to cut-off events
+   * being identified later in {@link DNodeBP} and hence to larger
+   * branching processes. 
+   *
+	 * @param possibleMatchList
+	 * @param co
+	 * @return
+	 */
+  public static LinkedList< DNode[] > generateCuts_noOld( LinkedList<DNode> possibleMatchList[], HashMap<DNode, Set<DNode>> co ) {
+    if (possibleMatchList.length == 0) return new LinkedList<DNode[]>();
+
+    // we compute cuts by iteratively constructing partial cuts of increasing size
+    // begin with the trivial partial cut for possibleMatchList[0]
+    LinkedList< DNode[] > partialCuts = new LinkedList<DNode[]>();
+    for (DNode d : possibleMatchList[0]) {
+      DNode[] pCut = new DNode[1]; pCut[0] = d;
+      partialCuts.addLast(pCut);
+    }
+
+    // extend the current partial cuts by the next list of conditions to a larger
+    // partial cut
+    for (int i=1; i< possibleMatchList.length; i++) {
+      
+      if (i == possibleMatchList.length - 1) {
+        // when reaching the last extension step, do not compute
+        // those combinations of conditions that yield cuts only
+        // consisting of old conditions.
+        
+        // split the conditions that shall extend the current
+        // 'partialCuts' into old and new
+        LinkedList<DNode> next_old = new LinkedList<DNode>();
+        LinkedList<DNode> next_new = new LinkedList<DNode>();
+        for (DNode d : possibleMatchList[i]) {
+          if (d._isNew) next_new.addLast(d);
+          else next_old.addLast(d);
+        }
+        
+        // and split all partial cuts into cuts consisting only of old
+        // conditions and cuts containing at least one new condition
+        LinkedList<DNode[]> partialCutsOld = new LinkedList<DNode[]>();
+        LinkedList<DNode[]> partialCutsNew = new LinkedList<DNode[]>();
+        for (DNode[] pCut : partialCuts) {
+          boolean hasNew = false;
+          // see if the current partial cut has a new condition
+          for (DNode d : pCut) if (d._isNew) { hasNew = true; break; }
+          if (hasNew) partialCutsNew.addLast(pCut);
+          else partialCutsOld.addLast(pCut);
+        }
+        // now compute only those combinations that involves at least
+        // one new condition
+        LinkedList< DNode[] > extendedCuts = new LinkedList<DNode[]>();
+        extendByCo(partialCutsOld, next_new, i, co, extendedCuts);
+        extendByCo(partialCutsNew, next_old, i, co, extendedCuts);
+        extendByCo(partialCutsNew, next_new, i, co, extendedCuts);
+        partialCuts = extendedCuts;
+        
+      } else {
+        // if not in the last step, compute all combinations including old
+        // ones because the last extension step may provide a new condition
+        // for the cut
+        LinkedList< DNode[] > extendedCuts = new LinkedList<DNode[]>();
+        extendByCo(partialCuts, possibleMatchList[i], i, co, extendedCuts);
+        partialCuts = extendedCuts;
+      }
+    }
+    return partialCuts;
+  }
+  
+
+
 	
 }

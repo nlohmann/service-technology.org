@@ -49,85 +49,17 @@ import java.util.Map.Entry;
  */
 public class DNodeBP {
   
-  //// --- search strategies for finding cut-off events
   /**
-   *  check for cut-off events using the lexicographic order on events:
-   *  compare each candidate event only with events that are predecessors
-   *  of the candidate event
+   * all configuration options used in the construction of the branching process 
    */
-  private boolean options_searchStrat_predecessor = false;
-	/**
-	 *  check for cut-off events using the size of the local configurations:
-	 *  compare each candidate event only with events that have been added
-	 *  previously and which have a strictly smaller prime configuration
-	 */
-  private boolean options_searchStrat_size = false;
-  /**
-   *  check for cut-off events using a lexicographic order in the transition names:
-   *  compare each candidate event only with events that have been added
-   *  previously and which have a smaller or equal prime configuration, if
-   *  two configurations have equal size, then their lexicographic order determines
-   *  the order of the configuration
-   */
-  private boolean options_searchStrat_lexicographic = false;
-	
-  //// --- equivalence notions for detecting whether two events are equivalent
-  /**
-   *  check for equivalence of cuts by comparing their histories for
-   *  enabling the same sets of events
-   */
-  private boolean options_cutOffEquiv_eventSignature = false;
-  /**
-   *  check for equivalence of cuts by comparing their histories for
-   *  isomorphism to the maximal depth of the histories in the input system
-   */
-  private boolean options_cutOffEquiv_history = false;
-	/**
-	 * check for equivalence of cuts by comparing the reached markings only
-	 */
-  private boolean options_cutOffEquiv_marking = false;
-	/**
-	 *  check for equivalence of cuts by comparing the histories of conditions
-	 *  with respect to the conditions of the given system
-	 */
-  private boolean options_cutOffEquiv_conditionHistory = false;
-  
-  /**
-   * compute finite complete prefix until all reachable states have been
-   * computed (default: <code>true</code>)
-   */
-  private boolean options_cutOffTermination_reachability = true;
-  /**
-   * compute finite complete prefix until finite complete prefix is successor
-   * complete and can be folded into an equivalent Petri net
-   * (default: <code>false</code>)
-   */
-  private boolean options_cutOffTermination_synthesis = false;
+  private Options options;
 
-
-	//// --- analysis flags
-	/**
-	 * whether properties shall be checked on the fly at all
-	 */
-  private boolean options_checkProperties = false;
-	/**
-	 * check whether the system is unsafe
-	 */
-  private boolean options_checkProperty_Unsafe = false;
-	/**
-	 * check whether the system has dead conditions (which have no post-event
-	 */
-  private boolean options_checkProperty_DeadCondition = false;
-	/**
-	 * stop BP construction if the property to be checked has been found
-	 */
-  private boolean options_stopIfPropertyFound = true;
-
-  public StringBuilder log = new StringBuilder();
-  
   ////--- fields and members of the branching process construction algorithm
   
-  private boolean abort = false;  // set to true to abort construction after this step
+  /**
+   * set to true to abort construction after this step
+   */
+  private boolean abort = false; 
   
 	/**
 	 * A {@link DNode}-compatible representation of the original system for
@@ -166,26 +98,28 @@ public class DNodeBP {
 		
 		initialize();
 		
-    options_searchStrat_size = true;
-		options_cutOffEquiv_conditionHistory = true;
+    options.searchStrat_size = true;
+		options.cutOffEquiv_conditionHistory = true;
 		
-    options_checkProperties = true;
-    options_checkProperty_Unsafe = false;
-    options_checkProperty_DeadCondition = true;
+    options.checkProperties = true;
+    options.checkProperty_Unsafe = false;
+    options.checkProperty_DeadCondition = true;
 	}
+	
+	// ----- various configuration settings for different use cases -------
 	
   /**
    * configure unfolding algorithm for scenario-based specifications
    */
   public void configure_Scenarios() {
     // search strategy: lexicographic
-    options_searchStrat_size = true;
-    options_searchStrat_predecessor = false;
-    options_searchStrat_lexicographic = true;
+    options.searchStrat_size = true;
+    options.searchStrat_predecessor = false;
+    options.searchStrat_lexicographic = true;
     
     // determine equivalence of cuts by history
-    options_cutOffEquiv_conditionHistory = true;
-    options_cutOffEquiv_marking = false;
+    options.cutOffEquiv_conditionHistory = true;
+    options.cutOffEquiv_marking = false;
   }
 	
 	 /**
@@ -193,54 +127,61 @@ public class DNodeBP {
    */
   public void configure_PetriNet() {
     // search strategy: predecessor
-    options_searchStrat_size = true;
-    options_searchStrat_predecessor = false;
-    options_searchStrat_lexicographic = true;
+    options.searchStrat_size = true;
+    options.searchStrat_predecessor = false;
+    options.searchStrat_lexicographic = true;
     
     // determine equivalence of cuts by markings
-    options_cutOffEquiv_conditionHistory = true;
-    options_cutOffEquiv_marking = false;
+    options.cutOffEquiv_conditionHistory = true;
+    options.cutOffEquiv_marking = false;
   }
   
   /**
    * configure unfolding algorithm to construct BP only
    */
   public void configure_buildOnly() {
-      options_checkProperties = false;
-      options_checkProperty_Unsafe = false;
-      options_checkProperty_DeadCondition = false;
+      options.checkProperties = false;
+      options.checkProperty_Unsafe = false;
+      options.checkProperty_DeadCondition = false;
       
-      options_cutOffTermination_reachability = true;
+      options.cutOffTermination_reachability = true;
   }
   
   /**
    * configure unfolding algorithm to construct BP only
    */
   public void configure_checkProperties() {
-      options_checkProperties = true;
-      options_checkProperty_Unsafe = true;
-      options_checkProperty_DeadCondition = true;
+      options.checkProperties = true;
+      options.checkProperty_Unsafe = true;
+      options.checkProperty_DeadCondition = true;
   }
   
   /**
    * configure unfolding algorithm to stop if system is unsafe
    */
   public void configure_stopIfUnSafe() {
-      options_checkProperties = true;
-      options_checkProperty_Unsafe = true;
+      options.checkProperties = true;
+      options.checkProperty_Unsafe = true;
   }
   
   /**
    * configure unfolding algorithm to stop if system is unsafe
    */
   public void configure_synthesis() {
-    options_checkProperties = false;
-    options_checkProperty_Unsafe = false;
-    options_checkProperty_DeadCondition = false;
+    options.checkProperties = false;
+    options.checkProperty_Unsafe = false;
+    options.checkProperty_DeadCondition = false;
       
-    options_cutOffTermination_reachability = false;
-    options_cutOffTermination_synthesis = true;
+    options.cutOffTermination_reachability = false;
+    options.cutOffTermination_synthesis = true;
   }
+  
+  /* ==========================================================================
+   * 
+   *  Main branching process construction algorithm.
+   *  
+   * ==========================================================================
+   */
 
 	/**
 	 * Initialize all members for the branching process construction.
@@ -279,8 +220,12 @@ public class DNodeBP {
     //System.out.println(co);
 	}
 	
-	private static DNode getPreEvent(DNode d) {
-		return (d.pre.length > 0) ? d.pre[0] : null;
+	/**
+	 * @param b
+	 * @return pre-event of condition 'b'
+	 */
+	private static DNode getPreEvent(DNode b) {
+		return (b.pre.length > 0) ? b.pre[0] : null;
 	}
 	
 	/**
@@ -317,7 +262,7 @@ public class DNodeBP {
         coID.get(existing).add(newNode.id);
         
 				// check for unsafe behavior
-				if (options_checkProperty_Unsafe) {
+				if (options.checkProperty_Unsafe) {
 				  if (existing.id == newNode.id) {
 				    propertyCheck |= PROP_UNSAFE;
 				    System.out.println("found two concurrent conditions with the same name: "+existing+", "+newNode);
@@ -345,7 +290,7 @@ public class DNodeBP {
 				coID.get(existing).add(newNode.id);
 				
         // check for unsafe behavior
-        if (options_checkProperty_Unsafe) {
+        if (options.checkProperty_Unsafe) {
           if (existing.id == newNode.id) {
             propertyCheck |= PROP_UNSAFE;
             System.out.println("found two concurrent conditions with the same name: "+existing+", "+newNode);
@@ -367,9 +312,6 @@ public class DNodeBP {
 	 * is enabled.
 	 */
 	private HashMap<EventPreSet, LinkedList<DNode[]>> cashedCuts = new HashMap<EventPreSet, LinkedList<DNode[]>>();
-	
-	public StringBuilder _debug_executionTimeProfile = new StringBuilder();
-	long t0 = System.currentTimeMillis();
 	
 	/**
 	 * Find all cuts that match the given <code>preConditions</code>.
@@ -441,7 +383,7 @@ public class DNodeBP {
 		  if (putIndex == null) continue;  // no, skip condition
 		  
       // consider only conditions which are NOT successors of a cutOff event
-      if (options_cutOffTermination_reachability
+      if (options.cutOffTermination_reachability
           && (cond.pre != null && cond.pre.length > 0 && cond.pre[0].isCutOff))
       {
         continue;
@@ -600,172 +542,19 @@ public class DNodeBP {
     
     LinkedList<DNode[]> result;
     if (min > 0)
-      result = generateCuts_order(canCompleteToNewCut);
+      result = DNodeCutGenerator.generateCuts_noOld(canCompleteToNewCut, co);
     else
       result = new LinkedList<DNode[]>();
 		
 //		long _debug_t3 = System.currentTimeMillis();
 //    System.out.println(" found "+result.size()+" in "+(_debug_t3-_debug_t2)+"ms");
-//    _debug_executionTimeProfile.append((_debug_t3-t0)+";"+_debug_size+";"+_debug_size2+";"+_debug_size3+";"+_debug_max+";"+(_debug_t2-_debug_t1)+";"+result.size()+";"+(_debug_t3-_debug_t2)+"\n");
+//    _debug_executionTimeProfile.append((_debug_t3-_debug_t0)+";"+_debug_size+";"+_debug_size2+";"+_debug_size3+";"+_debug_max+";"+(_debug_t2-_debug_t1)+";"+result.size()+";"+(_debug_t3-_debug_t2)+"\n");
 		
     cashedCuts.put(preConditions, result); // cache the found cuts for later use
 		return result;
 	}
   
-  private LinkedList< DNode[] > generateCuts( LinkedList<DNode> possibleMatchList[] ) {
-    
-    if (possibleMatchList.length == 0) return new LinkedList<DNode[]>();
-    
-    LinkedList< DNode[] > partialCutsOld = new LinkedList<DNode[]>();
-    LinkedList< DNode[] > partialCutsNew = new LinkedList<DNode[]>();
-    for (DNode d : possibleMatchList[0]) {
-      DNode[] pCut = new DNode[1]; pCut[0] = d;
-      if (d._isNew) partialCutsNew.addLast(pCut);
-      else partialCutsOld.addLast(pCut);
-    }
-    
-    for (int i=1; i< possibleMatchList.length; i++) {
-      
-      LinkedList<DNode> next_old = new LinkedList<DNode>();
-      LinkedList<DNode> next_new = new LinkedList<DNode>();
-      for (DNode d : possibleMatchList[i]) {
-        if (d._isNew) next_new.addLast(d);
-        else next_old.addLast(d);
-      }
-      
-      LinkedList< DNode[] > extendedCutsOld = new LinkedList<DNode[]>();
-      if (i < possibleMatchList.length-1) {
-        extendByCo(partialCutsOld, next_old, i, extendedCutsOld);
-      } else {
-        //System.out.print(" skipping "+partialCutsOld.size()*next_old.size()+" ");
-      }
 
-      LinkedList< DNode[] > extendedCutsNew = new LinkedList<DNode[]>();
-      extendByCo(partialCutsOld, next_new, i, extendedCutsNew);
-      extendByCo(partialCutsNew, next_old, i, extendedCutsNew);
-      extendByCo(partialCutsNew, next_new, i, extendedCutsNew);
-      
-      partialCutsOld = extendedCutsOld;
-      partialCutsNew = extendedCutsNew;
-    }
-    
-    return partialCutsNew;
-  }
-  
-  private LinkedList< DNode[] > generateCuts_order( LinkedList<DNode> possibleMatchList[] ) {
-    if (possibleMatchList.length == 0) return new LinkedList<DNode[]>();
-
-    LinkedList< DNode[] > partialCuts = new LinkedList<DNode[]>();
-    for (DNode d : possibleMatchList[0]) {
-      DNode[] pCut = new DNode[1]; pCut[0] = d;
-      partialCuts.addLast(pCut);
-    }
-    
-    for (int i=1; i< possibleMatchList.length; i++) {
-      
-      if (i == possibleMatchList.length - 1) {
-        LinkedList<DNode> next_old = new LinkedList<DNode>();
-        LinkedList<DNode> next_new = new LinkedList<DNode>();
-        for (DNode d : possibleMatchList[i]) {
-          if (d._isNew) next_new.addLast(d);
-          else next_old.addLast(d);
-        }
-        
-        LinkedList<DNode[]> partialCutsOld = new LinkedList<DNode[]>();
-        LinkedList<DNode[]> partialCutsNew = new LinkedList<DNode[]>();
-        for (DNode[] pCut : partialCuts) {
-          boolean hasNew = false;
-          for (DNode d : pCut) if (d._isNew) { hasNew = true; break; }
-          if (hasNew) partialCutsNew.addLast(pCut);
-          else partialCutsOld.addLast(pCut);
-        }
-        LinkedList< DNode[] > extendedCuts = new LinkedList<DNode[]>();
-        extendByCo(partialCutsOld, next_new, i, extendedCuts);
-        extendByCo(partialCutsNew, next_old, i, extendedCuts);
-        extendByCo(partialCutsNew, next_new, i, extendedCuts);
-        partialCuts = extendedCuts;
-      } else {
-        LinkedList< DNode[] > extendedCuts = new LinkedList<DNode[]>();
-        extendByCo(partialCuts, possibleMatchList[i], i, extendedCuts);
-        partialCuts = extendedCuts;
-      }
-    }
-    return partialCuts;
-  }
-  
-  private int getShortest ( LinkedList<DNode> possibleMatchList[], boolean taken[] ) {
-    int min = Integer.MAX_VALUE;
-    int minIndex = -1;
-    for (int i=0; i < possibleMatchList.length; i++) {
-      if (taken[i]) continue;
-      /*
-      if (min > possibleMatchList[i].size()) {
-        min = possibleMatchList[i].size();
-        minIndex = i;
-      }
-      */
-      return i;
-    }
-    return minIndex;
-  }
-  
-  private LinkedList< DNode[] > generateCuts_all( LinkedList<DNode> possibleMatchList[] ) {
-    
-    if (possibleMatchList.length == 0) return new LinkedList<DNode[]>();
-    
-    boolean[] taken = new boolean[possibleMatchList.length];
-    int[] orderIndex = new int[possibleMatchList.length];
-    
-    int current = 0;
-    int minIndex = getShortest(possibleMatchList, taken);
-    taken[minIndex] = true;
-    
-    LinkedList< DNode[] > partialCuts = new LinkedList<DNode[]>();
-    for (DNode d : possibleMatchList[minIndex]) {
-      DNode[] pCut = new DNode[1]; pCut[0] = d;
-      partialCuts.addLast(pCut);
-    }
-    orderIndex[current] = minIndex;
-    current++;
-    
-    while (current < possibleMatchList.length) {
-      LinkedList< DNode[] > extendedCuts = new LinkedList<DNode[]>();
-      minIndex = getShortest(possibleMatchList, taken);
-      taken[minIndex] = true;
-      
-      extendByCo(partialCuts, possibleMatchList[minIndex], current, extendedCuts);
-      partialCuts = extendedCuts;
-      
-      orderIndex[current] = minIndex;
-      current++;
-    }
-    
-    return partialCuts;
-  }
-
-  
-  
-  private void extendByCo( LinkedList< DNode[]> existingCo, LinkedList<DNode> nextConditions, int size, LinkedList< DNode[] > extendedCo ) {
-
-    int newSize = size + 1;
-    for (DNode[] partialCut : existingCo ) {
-      for (DNode bNew : nextConditions) {
-        boolean inConflict = false;
-        for (int i=0;i<size; i++) {
-          if (!co.get(bNew).contains(partialCut[i])) {
-            inConflict = true; break;
-          }
-        }
-        if (!inConflict) {
-          DNode[] extendedCut = new DNode[newSize];
-          for (int i=0;i<size;i++) extendedCut[i] = partialCut[i];
-          extendedCut[size] = bNew;
-          extendedCo.addLast(extendedCut);
-          //extendedCo.addLast(DNode.sortIDs(extendedCut));
-        }
-      }
-    }
-  }
 
 	/**
 	 * Collect the events that are enabled in the current construction step
@@ -856,7 +645,7 @@ public class DNodeBP {
   			  continue;
   			}
   			
-  			//log.append(e+" has valid cut at "+DNode.toString(cutNodes)+"\n");
+  			//_debug_log.append(e+" has valid cut at "+DNode.toString(cutNodes)+"\n");
   
   			DNode[] loc = new DNode[e.pre.length];
   			  
@@ -886,7 +675,7 @@ public class DNodeBP {
   			if ( i == e.pre.length ) {
   				// all precondition of event i have been found in max BP
   			  
-  	      //log.append(e+" is enabled at "+DNode.toString(cutNodes)+"\n");
+  	      //_debug_log.append(e+" is enabled at "+DNode.toString(cutNodes)+"\n");
   				
   				assert loc[e.pre.length] != null : "Error, adding invalid enabling location";
   			
@@ -934,7 +723,7 @@ public class DNodeBP {
               
               for (int j=beginIDs; j<info.enablingLocation.size(); j++) {
                 DNode[] otherLoc = info.enablingLocation.get(j);
-                if (containedIn(loc, otherLoc)) {
+                if (DNode.containedIn(loc, otherLoc)) {
                   syncEntry = j;
                   break;
                 }
@@ -990,27 +779,6 @@ public class DNodeBP {
 		return info;
 	}
 	
-	private static boolean containedIn(DNode[] first, DNode[] second) {
-    
-	  for (int i=0,j=0; i < first.length; i++) {
-      // search in otherLoc for node with same id as loc[l]
-      while (j < second.length && first[i].id > second[j].id) j++;
-      if (j == second.length) return false; // not found
-
-      // now check whether first[i] == second[j], it may be that
-      // second contains another node with the same id, iterate
-      // over these but remember j
-      boolean match = false;
-      int j_offset = j;
-      while (j_offset < second.length && first[i].id == second[j_offset].id) {
-        if (first[i] == second[j_offset]) { match = true; break; }
-        j_offset++;
-      }
-      if (!match) return false;
-    }
-	  return true;
-	}
-	
 	/**
 	 * Fire all events from the given {@link EnablingInfo}.
 	 * 
@@ -1057,7 +825,7 @@ public class DNodeBP {
 			if (info.synchronizedEvents.get(fireIndex) == null) {
 
 				//System.out.println("fire "+info.enabledEvents.get(fireIndex)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex)));
-			  //log.append("fire "+info.enabledEvents.get(fireIndex)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex))+"\n");
+			  //_debug_log.append("fire "+info.enabledEvents.get(fireIndex)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex))+"\n");
 				DNode e = info.enabledEvents.get(fireIndex);
 
 				if (e.isAnti) {
@@ -1075,7 +843,7 @@ public class DNodeBP {
 				events = info.synchronizedEvents.get(fireIndex).toArray(events);
 				
 				//System.out.println("fire "+DNode.toString(events)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex)));
-				//log.append("fire "+DNode.toString(events)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex))+"\n");
+				//_debug_log.append("fire "+DNode.toString(events)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex))+"\n");
 				for (int j=0;j<events.length;j++) {
 					if (events[j].isAnti) {
 	          // remember that the fired event does not occur in the final result
@@ -1107,9 +875,9 @@ public class DNodeBP {
 			  
   			DNode newEvent = postConditions[0].pre[0];
   			
-  			log.append("created new event "+newEvent+" at "+DNode.toString(info.enablingLocation.get(fireIndex))+"\n");
-  			log.append("having post-conditions "+DNode.toString(postConditions)+"\n");
-  			log.append("from "+toString(newEvent.causedBy)+"\n");
+  			_debug_log.append("created new event "+newEvent+" at "+DNode.toString(info.enablingLocation.get(fireIndex))+"\n");
+  			_debug_log.append("having post-conditions "+DNode.toString(postConditions)+"\n");
+  			_debug_log.append("from "+toString(newEvent.causedBy)+"\n");
   			
   			setCurrentPrimeConfig(newEvent);
   			newEvent.isHot = setHot;   // remember temperature of event
@@ -1123,16 +891,16 @@ public class DNodeBP {
             newEvent.isCutOff = true;
           }
           // System.out.println("created anti-event "+newEvent);
-          log.append("created anti-event "+toString(primeConfigurationString.get(newEvent))+"\n");
+          _debug_log.append("created anti-event "+toString(primeConfigurationString.get(newEvent))+"\n");
         } else {
           
           // for all other events, check whether it is a cutOff event
     			if (isCutOffEvent(newEvent)) {
     				newEvent.isCutOff = true;
-    				log.append("is a cut-off event because of "+elementary_ccPair.get(newEvent)+"\n");
-    				log.append(toString(primeConfigurationString.get(newEvent))+"\n");//" > "+toString(primeConfigurationString.get(elementary_ccPair.get(newEvent)))+"\n");
+    				_debug_log.append("is a cut-off event because of "+elementary_ccPair.get(newEvent)+"\n");
+    				_debug_log.append(toString(primeConfigurationString.get(newEvent))+"\n");//" > "+toString(primeConfigurationString.get(elementary_ccPair.get(newEvent)))+"\n");
     			} else {
-    			  log.append(toString(primeConfigurationString.get(newEvent))+"\n");
+    			  _debug_log.append(toString(primeConfigurationString.get(newEvent))+"\n");
     			}
         }
 
@@ -1149,7 +917,7 @@ public class DNodeBP {
 			
 			firedEvents++;
 			
-			if (options_checkProperties)
+			if (options.checkProperties)
 				checkProperties();
 		 }
 		}
@@ -1247,7 +1015,7 @@ public class DNodeBP {
   
   /**
    * Set fields {@link #currentPrimeCut} {@link #currentPrimeConfig} and update
-   * fields {@link #primeConfigurationSize}, {@link #primeConfigurationHash}, and
+   * fields {@link #primeConfiguration_Size}, {@link #primeConfiguration_CutHash}, and
    * {@link #primeConfigurationString} for 'event' that has just been fired.
    * 
    * @param event
@@ -1257,30 +1025,20 @@ public class DNodeBP {
     boolean computePredecessors = false;
     boolean includeEvent = false;
     
-    if (options_searchStrat_predecessor || options_searchStrat_lexicographic) computePredecessors = true;
-    if (options_searchStrat_size) includeEvent = true;
+    if (options.searchStrat_predecessor || options.searchStrat_lexicographic) computePredecessors = true;
+    if (options.searchStrat_size) includeEvent = true;
     
     currentPrimeCut = bp.getPrimeCut(event, computePredecessors, includeEvent);
     int currentConfigSize = bp.getPrimeConfiguration_size;
     // collected all predecessor events if using the lexicographic search strategy
     currentPrimeConfig = bp.getPrimeConfiguration;
     
-    primeConfigurationSize.put(event, currentConfigSize);
-    primeConfigurationHash.put(event, hashCut(currentPrimeCut));
+    primeConfiguration_Size.put(event, currentConfigSize);
+    primeConfiguration_CutHash.put(event, hashCut(currentPrimeCut));
     
-//    DNode[] currentPrimeConfig_sorted = new DNode[currentPrimeConfig.size()];
-//    currentPrimeConfig.toArray(currentPrimeConfig_sorted);
-//    DNode.sortIDs(currentPrimeConfig_sorted);
-    
-    short[] currentPrimeConfigIDs = new short[currentPrimeConfig.size()];
-    int i = 0;
-    for (DNode e : currentPrimeConfig) {
-      currentPrimeConfigIDs[i++] = e.id;
-    }
-    Arrays.sort(currentPrimeConfigIDs);
-    
+    // LEXIK: optimization for size-lexicographic search strategy
+    primeConfigurationString.put(event, getLexicographicString(currentPrimeConfig));
     //primeConfigurationString.put(event, getLexicographicString_acc(currentPrimeConfig));
-    primeConfigurationString.put(event, currentPrimeConfigIDs);
   }
   
   /**
@@ -1296,27 +1054,27 @@ public class DNodeBP {
   private boolean isCutOffEvent(DNode event) {
 
     // pick a search strategy for determing the cut off event
-    if (options_searchStrat_predecessor) {
+    if (options.searchStrat_predecessor) {
       
       // pick an equivalence criterion for determining equivalent cuts
-      if (options_cutOffEquiv_history) {
+      if (options.cutOffEquiv_history) {
         if (findEquivalentCut_history(event, currentPrimeCut, currentPrimeConfig)) {
           return true;
         }
         
-      } else if (options_cutOffEquiv_marking) {
+      } else if (options.cutOffEquiv_marking) {
         if (findEquivalentCut_marking_predecessor(event, currentPrimeCut, currentPrimeConfig)) {
           return true;
         }
         
-      } else if (options_cutOffEquiv_conditionHistory ) {
+      } else if (options.cutOffEquiv_conditionHistory ) {
         int currentConfigSize = bp.getPrimeConfiguration_size;
         if (findEquivalentCut_conditionHistory_signature_size(
             currentConfigSize, event, currentPrimeCut, currentPrimeConfig)) {
           return true;
         }
         
-      } else if (options_cutOffEquiv_eventSignature) {
+      } else if (options.cutOffEquiv_eventSignature) {
         if (findEquivalentCut_eventSignature_predecessor(event, currentPrimeCut, currentPrimeConfig)) {
           return true;
         }
@@ -1324,19 +1082,19 @@ public class DNodeBP {
         assert false : "No valid search strategy given.";
       }
       
-    } else if (options_searchStrat_size) {
+    } else if (options.searchStrat_size) {
       // search for cut off events in all previously constructed events
 
       // pick an equivalence criterion for determining equivalent cuts
-      if (options_cutOffEquiv_conditionHistory ) {
+      if (options.cutOffEquiv_conditionHistory ) {
         if (findEquivalentCut_conditionHistory_signature_size(
-            primeConfigurationSize.get(event), event, currentPrimeCut, bp.getAllEvents())) {
+            primeConfiguration_Size.get(event), event, currentPrimeCut, bp.getAllEvents())) {
           return true;
         }
         
-      } else if (options_cutOffEquiv_eventSignature) {
+      } else if (options.cutOffEquiv_eventSignature) {
         if (findEquivalentCut_eventSignature_size(
-            primeConfigurationSize.get(event), event, currentPrimeCut, bp.getAllEvents())) {
+            primeConfiguration_Size.get(event), event, currentPrimeCut, bp.getAllEvents())) {
           return true;
         }
         
@@ -1362,7 +1120,7 @@ public class DNodeBP {
     
     if (abort) return 0;
     
-    if (propertyCheck == PROP_NONE || !options_stopIfPropertyFound)
+    if (propertyCheck == PROP_NONE || !options.stopIfPropertyFound)
       return fired;
     else
       return 0; // abort if properties violated
@@ -1573,7 +1331,7 @@ public class DNodeBP {
 	 * respective event is enabled in the cut.
 	 * 
 	 * This method assumes that it is called within a search scheme for predecessor
-	 * search ({@link #options_searchStrat_predecessor}. This way, we can assume
+	 * search ({@link Options#searchStrat_predecessor}. This way, we can assume
 	 * that each old cut against which we check for equivalence has all its
 	 * successor events built.
    * TODO: REALLY????
@@ -1615,7 +1373,7 @@ public class DNodeBP {
 	
   /**
    * The search strategy for {@link #equivalentCuts_eventSignature_predecessor(byte[], DNode[])}.
-   * A predecessor based search strategy ({@link #options_searchStrat_predecessor}).
+   * A predecessor based search strategy ({@link Options#searchStrat_predecessor}).
    * 
    * @param newEvent
    * @param newCut
@@ -1709,7 +1467,7 @@ public class DNodeBP {
    * respective event is enabled in the cut.
    * 
    * This method assumes that it is called within a search scheme for lexicographic
-   * search ({@link #options_searchStrat_size}. This strategy must
+   * search ({@link Options#searchStrat_size}. This strategy must
    * compute for each event how often it is enabled in the respective cut.
    * (in contrast to {@link #equivalentCuts_eventSignature_predecessor(byte[], DNode[])})
    * 
@@ -1746,7 +1504,7 @@ public class DNodeBP {
 
   /**
    * The search strategy for {@link #equivalentCuts_eventSignature_predecessor(byte[], DNode[])}.
-   * A size-based search strategy ({@link #options_searchStrat_size}).
+   * A size-based search strategy ({@link Options#searchStrat_size}).
    * 
    * @param newCutConfigSize
    *      number of events in the prime configuration of the new event
@@ -1863,7 +1621,7 @@ public class DNodeBP {
 	
   /**
    * The search strategy for {@link #equivalentCuts_marking(DNode[], DNode[])}.
-   * A predecessor based search strategy ({@link #options_searchStrat_predecessor}).
+   * A predecessor based search strategy ({@link Options#searchStrat_predecessor}).
    * 
    * @param newEvent
    * @param newCut
@@ -1954,44 +1712,261 @@ public class DNodeBP {
     
     return true;
   }
-
-	/**
-	 * Compare two prime configurations of equal size whether one is lexicographically
-	 * smaller than the other.
-	 * 
-	 * @param oldConfig
-	 * @param newConfig
-	 * @return <code>true</code> iff oldConfig is smaller than newConfig
-	 */
-	private boolean isSmaller_lexicographic(DNode[] oldConfig, DNode[] newConfig) {
-	  if (options_searchStrat_lexicographic == false) return false;
-	  if (oldConfig.length != newConfig.length) {
-	    System.err.println("Error: lexicographically comparing configurations of different size");
-	    return false;
-	  }
-
-    // both configurations have same size by assumption
-    // iterate over the ID-sorted configurations and compare configs lexicographically
-    for (int i=0; i<oldConfig.length; i++) {
-      // old is smaller than new at the first difference
-      if (oldConfig[i].id < newConfig[i].id) { return true; }
-      // old is larger than new at the first difference
-      if (oldConfig[i].id > newConfig[i].id) { return false; }
-    }
-    // old and new are equal until the end
-	  return false;
-	}
 	
-	 /**
+  /**
+   * The search strategy for {@link #equivalentCuts_conditionSignature_history(byte[], DNode[], DNode[])}.
+   * A size-based search strategy ({@link Options#searchStrat_size}). 
+   * 
+   * The method has be extended to determine cut-off events by a lexicographic
+   * search strategy. 
+   * 
+   * @param newEvent  event that has been added to the branching process
+   * @param newCut    the cut reached by 'newEvent'
+   * @param eventsToCompare
+   * @return <code>true</code> iff <code>newEvent</code> is a cut-off event
+   * because of some equivalent event in <code>eventsToCompare</code>.
+   */
+  private boolean findEquivalentCut_conditionHistory_signature_size (
+      int newCutConfigSize,
+      DNode newEvent,
+      DNode[] newCut,
+      Iterable<DNode> eventsToCompare)
+  {
+    // all extensions to support the size-lexicographic search-strategy
+    // or marked with LEXIK
+    
+    // optimization: determine equivalence of reached cuts by the
+    // help of a 'condition signature, initialize 'empty' signature
+    // for 'newEvent', see #equivalentCuts_conditionSignature_history
+    byte[] newCutSignature = cutSignature_conditions_init255();
+    
+    // compare the cut reached by 'newEvent' to the initial cut
+    if (newCut.length == bp.initialCut.length)
+      if (equivalentCuts_conditionSignature_history(newCutSignature, newCut, bp.initialCut)) {
+        // yes, newEvent reaches the initial cut again
+        updateCCpair(newEvent, newCut, bp.initialCut);
+        return true; // 'newEvent' is a cut-off event 
+      }
+    
+    // Check whether 'eventsToCompare' contains a "smaller" event that reaches
+    // the same cut as 'newEvent'. 
+    
+    // Optimization: to quickly avoid comparing configurations of events that
+    // do not reach the same cut as 'newEvent', compare and store hash values
+    // of the reached configurations. 
+    
+    // get hash value of the cut reached by 'newEvent'
+    int newEventHash = primeConfiguration_CutHash.get(newEvent);
+    
+    // check whether 'newEvent' is a cut-off event by comparing to all other
+    // given events
+    Iterator<DNode> it = eventsToCompare.iterator();
+    while (it.hasNext()) {
+      DNode e = it.next();
+      
+      // do not check the event that has just been added, the cuts would be equal...
+      if (e == newEvent) continue;
+        
+      // newCut is only equivalent to oldCut if the configuration of newCut
+      // is (lexicographically) larger than the configuration of oldCut
+      if (!primeConfiguration_Size.containsKey(e)) {
+        // the old event 'e' has incomplete information about its prime
+        // configuration, cannot be used to check for cutoff
+        continue;
+      }
+      // optimization: compared hashed values of the sizes of the prime configurations 
+      if (newCutConfigSize < primeConfiguration_Size.get(e)) {
+        // the old one is larger, not equivalent
+        continue;
+      }
+      
+      // optimization: compare reached states by their hash values
+      // only if hash values are equal, 'newEvent' and 'e' could be equivalent 
+      if (primeConfiguration_CutHash.get(e) != newEventHash)
+        continue;
+
+      // retrieve the cut reached by the old event 'e'
+      DNode[] oldCut = bp.getPrimeCut(e, options.searchStrat_lexicographic, options.searchStrat_lexicographic);
+      
+      // cuts of different lenghts cannot reach the same state, skip
+      if (newCut.length != oldCut.length)
+        continue;
+
+      // if both configurations have the same size:
+      if (newCutConfigSize == bp.getPrimeConfiguration_size) {
+        
+        // and if not lexicographic, then the new event cannot be cut-off event
+        if (!options.searchStrat_lexicographic) continue;
+        // LEXIK: otherwise compare whether the old event's configuration is
+        // lexicographically smaller than the new event's configuration
+        if (!isSmaller_lexicographic(primeConfigurationString.get(e), primeConfigurationString.get(newEvent)))
+          continue;
+      }
+      
+      // The prime configuration of 'e' is either smaller or lexicographically
+      // smaller than the prime configuration of 'newEvent'. Further, both events
+      // reach cuts of the same size. Check whether both cuts reach the same histories
+      // by comparing their condition signatures
+      if (equivalentCuts_conditionSignature_history(newCutSignature, newCut, oldCut)) {
+        // yes, equivalent cuts, make events and conditions equivalent
+        updateCCpair(newEvent, e);
+        updateCCpair(newEvent, newCut, oldCut);
+        // and yes, 'newEvent' is a cut-off event
+        return true;
+      }
+    }
+    // no smaller equivalent has been found
+    return false;
+  }
+  
+  /**
+   * @return
+   *   a fresh condition signature stating that the number of occurrences
+   *   of conditions in a cut is unknown (value 255)
+   */
+  private byte[] cutSignature_conditions_init255() {
+    byte signature[] = new byte[dNodeAS.preConditions.length];
+
+    for (int i=0; i<signature.length; i++)
+      signature[i] = (byte) 255;
+    return signature;
+  }
+  
+  /**
+   * Optimizes finding a cut-off event.
+   * 
+   * Stores the size of the prime configuration for each event of the branching process.
+   * used in {@link #findEquivalentCut_conditionHistory_signature_size(int, DNode, DNode[], Iterable)}
+   */
+  private HashMap<DNode, Integer> primeConfiguration_Size = new HashMap<DNode, Integer>();
+
+  /**
+   * Optimizes finding a cut-off event.
+   * 
+   * Stores a hash-value of the cut reached by the prime configuration of an event. 
+   * Two events with different hash-values cannot reach the same state. Used in
+   * {@link #findEquivalentCut_conditionHistory_signature_size(int, DNode, DNode[], Iterable)}
+   * 
+   * Hash-values of the cut is computed by {@link #hashCut(DNode[])}.
+   */
+  private HashMap<DNode, Integer> primeConfiguration_CutHash = new HashMap<DNode, Integer>();
+  
+   /**
+   * @param cut
+   * @return hash value of the given cut, can be stored in and compared to values
+   * in {@link #primeConfiguration_CutHash}
+   */
+  private int hashCut(DNode[] cut) {
+    int result = 0;
+    int exp = 1;
+    for (int i=0;i<cut.length;i++) {
+      result += cut[i].id*exp;
+      exp *= 64;
+    }
+    return result;
+  }
+	
+  
+  /* --------------------------------------------------------------------------
+   * 
+   *  Size-Lexicographic Search Strategy, optimizes the size-based search
+   *  strategy for the case when two prime configurations have the same size. 
+   *  
+   *  Let s1 = a1 a2 a3 ... an and
+   *      s2 = b1 b2 b3 ... bn
+   *      
+   *  be two strings of equal size and let < be a total order over the
+   *  characters of the alphabet of s1 and s2. s1 is lexicographically smaller
+   *  than s2 if there exists an index i s.t. aj = bj for all j < i and
+   *  ai < bi. 
+   * --------------------------------------------------------------------------
+   */
+  
+  /*
+   * 
+   * There are different ways to represent the prime configuration of an event
+   * as a lexicographically ordered string. Basically, the alphabet are the IDs
+   * of the events (DNode#id). Their order is the order < on the shorts by which
+   * IDs are encoded.
+   * 
+   * Programmatically, the string that represents an event's prime configuration
+   * can be encoded in several ways. 
+   * 
+   * (1) The prime configuration of an event 'e' can be turned into a string by
+   *     storing all events of the prime configuration of 'e' including 'e' in an
+   *     array of DNodes sorted by their IDs.
+   *     
+   *     Whether one such configuration is smaller than another configuration 
+   *     follows from the order of the ids of the DNodes in that array. This
+   *     approach is not implemented.
+   *     
+   * (2) Alternatively, the IDs can be stored directly in an array of sorted
+   *     shorts, i.e. directly representing the string of IDs.
+   *     This approach is implemented in this class and used.
+   *     
+   * (3) Alternatively, an array stores for each ID (of all IDs used in the system)
+   *     the number of events having this ID.
+   *     This approach is implemented in this class but not used.
+   *     
+   * While approach (3) is more memory intensive in case of small configurations but
+   * many IDs, it gets more efficient compared to (2) in systems where configurations
+   * contain many IDs.
+   */
+
+  /**
+   * @param configuration
+   * @return lexicographic string of IDs (sorted in ascending order) of the
+   * events in the given <code>configuration</code>
+   */
+  private short[] getLexicographicString (HashSet<DNode> configuration) {
+    // implements approach (2) to represent lexicographic strings
+    short[] currentPrimeConfigIDs = new short[configuration.size()];
+    int i = 0;
+    for (DNode e : configuration) {
+      currentPrimeConfigIDs[i++] = e.id;
+    }
+    Arrays.sort(currentPrimeConfigIDs);
+    return currentPrimeConfigIDs;
+  }
+  
+  
+  /**
+   * @param configuration
+   * @return an id-sorted array telling for each event-ID how often the ID
+   * occurs in the given configuration
+   */
+  @SuppressWarnings("unused")
+  private byte[] getLexicographicString_acc(HashSet<DNode> configuration) {
+    // implements approach (3) to represent lexicographic strings
+    byte[] lstring = new byte[dNodeAS.fireableEventIndex.size()];
+    for (DNode e : configuration) {
+      lstring[dNodeAS.fireableEventIndex.get(e.id)]++;
+    }
+    return lstring;
+  }
+
+  /**
+   * Optimizes finding a cut-off event.
+   * 
+   * Stores a lexicographic string representation of the prime configuration reached
+   * by an event. The string is computed using {@link #getLexiographicString(HashSet)}.
+   * This field is used in
+   * {@link #findEquivalentCut_conditionHistory_signature_size(int, DNode, DNode[], Iterable)}
+   */
+  private HashMap<DNode, short[]> primeConfigurationString = new HashMap<DNode, short[]>();
+	
+  
+  /**
    * Compare two prime configurations of equal size whether one is lexicographically
-   * smaller than the other.
+   * smaller than the other. Use this method to compare strings computed by
+   * {@link #getLexicographicString(HashSet)}.
    * 
    * @param oldConfigIDs
    * @param newConfigIDs
    * @return <code>true</code> iff oldConfig is smaller than newConfig
    */
   private boolean isSmaller_lexicographic(short[] oldConfigIDs, short[] newConfigIDs) {
-    if (options_searchStrat_lexicographic == false) return false;
+    if (options.searchStrat_lexicographic == false) return false;
     if (oldConfigIDs.length != newConfigIDs.length) {
       System.err.println("Error: lexicographically comparing configurations of different size");
       return false;
@@ -2008,17 +1983,20 @@ public class DNodeBP {
     // old and new are equal until the end
     return false;
   }
-	
-	 /**
+
+  
+   /**
    * Compare two prime configurations of equal size whether one is lexicographically
-   * smaller than the other.
+   * smaller than the other. Use this method to compare strings computed by
+   * {@link #getLexicographicString_acc(HashSet)}.
    * 
    * @param oldConfig
    * @param newConfig
    * @return <code>true</code> iff oldConfig is smaller than newConfig
    */
+  @SuppressWarnings("unused")
   private boolean isSmaller_lexicographic_acc(byte[] oldConfig, byte[] newConfig) {
-    if (options_searchStrat_lexicographic == false) return false;
+    if (options.searchStrat_lexicographic == false) return false;
 
     // both configurations have same size by assumption
     // iterate over the ID-sorted configurations and compare configs lexicographically
@@ -2031,158 +2009,10 @@ public class DNodeBP {
     // old and new are equal until the end
     return false;
   }
+
   
-  /**
-   * @param configuration
-   * @return an id-sorted array telling for each event-id how of the event
-   * occurs in the given configuration
-   */
-  private byte[] getLexicographicString_acc(HashSet<DNode> configuration) {
-    byte[] lstring = new byte[dNodeAS.fireableEventIndex.size()];
-    for (DNode e : configuration) {
-      lstring[dNodeAS.fireableEventIndex.get(e.id)]++;
-    }
-    return lstring;
-  }
-	
-	/**
-	 * @param cut
-	 * @return hash value of the given cut
-	 */
-	private int hashCut(DNode[] cut) {
-	  int result = 0;
-	  int exp = 1;
-	  for (int i=0;i<cut.length;i++) {
-	    result += cut[i].id*exp;
-	    exp *= 64;
-	  }
-	  return result;
-	}
-	
-	HashMap<DNode, Integer> primeConfigurationSize = new HashMap<DNode, Integer>();
-	
-	HashMap<DNode, short[]> primeConfigurationString = new HashMap<DNode, short[]>();
-	
-	HashMap<DNode, Integer> primeConfigurationHash = new HashMap<DNode, Integer>();
-	
-  /**
-   * The search strategy for {@link #equivalentCuts_conditionSignature_history(byte[], DNode[], DNode[])}.
-   * A size-based search strategy ({@link #options_searchStrat_size}).
-   * 
-   * @param newEvent
-   * @param newCut
-   * @param eventsToCompare
-   * @return
-   */
-	private boolean findEquivalentCut_conditionHistory_signature_size (
-			int newCutConfigSize,
-			DNode newEvent,
-			DNode[] newCut,
-			Iterable<DNode> eventsToCompare)
-	{
 
-		byte[] newCutSignature = cutSignature_conditions_init255();
-		
-		if (newCut.length == bp.initialCut.length)
-			if (equivalentCuts_conditionSignature_history(newCutSignature, newCut, bp.initialCut)) {
-			  updateCCpair(newEvent, newCut, bp.initialCut);
-				return true;
-			}
-		
-		// compute the lexikographic string that represents the prime configuration
-		// of 'newEvent'
-//    DNode[] currentPrimeConfig_sorted = null;
-    int newEventHash = primeConfigurationHash.get(newEvent);
-		
-		Iterator<DNode> it = eventsToCompare.iterator();
-		while (it.hasNext()) {
-			DNode e = it.next();
-			
-			// do not check the event that has just been added
-			// the cuts would be equal...
-			if (e == newEvent) continue;
-			  
-      // newCut is only equivalent to oldCut if the configuration of newCut
-      // is (lexicographically) larger than the configuration of oldCut
-      if (!primeConfigurationSize.containsKey(e)) {
-        continue;
-      }
-      if (newCutConfigSize < primeConfigurationSize.get(e)) {
-        // the old one is larger, not equivalent
-        continue;
-      }
-      
-      // compare reached states by their hash values
-      // only if hash values are equal, 'newEvent' and 'e' could be equivalent 
-      if (primeConfigurationHash.get(e) != newEventHash)
-        continue;
 
-			DNode[] oldCut = bp.getPrimeCut(e, options_searchStrat_lexicographic, options_searchStrat_lexicographic);
-			
-			if (newCutConfigSize == bp.getPrimeConfiguration_size) {
-        // both configurations have the same size:
-			  
-        // if not lexicographic, cannot be cut-off
-			  if (!options_searchStrat_lexicographic) continue;
-			  
-//			  // compute sorted prime config only when really needed
-//			  if (currentPrimeConfig_sorted == null) {
-//			    currentPrimeConfig_sorted = new DNode[currentPrimeConfig.size()];
-//			    currentPrimeConfig.toArray(currentPrimeConfig_sorted);
-//			    DNode.sortIDs(currentPrimeConfig_sorted);
-//			  }
-//			  
-// 	      HashSet<DNode> oldPrimeConfig = bp.getPrimeConfiguration;
-// 	      DNode[] oldPrimeConfig_sorted = new DNode[oldPrimeConfig.size()];
-// 	      oldPrimeConfig.toArray(oldPrimeConfig_sorted);
-// 	      DNode.sortIDs(oldPrimeConfig_sorted);
-        
-        if (!isSmaller_lexicographic(primeConfigurationString.get(e), primeConfigurationString.get(newEvent)))
-          continue;
-			}
-			
-			if (newCut.length == oldCut.length)
-				if (equivalentCuts_conditionSignature_history(newCutSignature, newCut, oldCut)) {
-	        updateCCpair(newEvent, e); // update the cutOff mapping
-	        updateCCpair(newEvent, newCut, oldCut);
-					return true;
-				}
-		}
-		
-		return false;
-	}
-	
-	 
-  public static String toString(int[] array) {
-    String result = "[";
-    for (int i=0;i<array.length;i++) {
-      if (i > 0) result += ",";
-      result+=array[i];
-    }
-    return result+"]";
-  }
-	
-	public static String toString(short[] array) {
-	  String result = "[";
-	  for (int i=0;i<array.length;i++) {
-	    if (i > 0) result += ",";
-	    result+=array[i];
-	  }
-	  return result+"]";
-	}
-
-	/**
-	 * @return
-	 *   a fresh condition signature stating that the number of occurrences
-	 *   of conditions in a cut is unknown (value 255)
-	 */
-	private byte[] cutSignature_conditions_init255() {
-		byte signature[] = new byte[dNodeAS.preConditions.length];
-
-		for (int i=0; i<signature.length; i++)
-			signature[i] = (byte) 255;
-		return signature;
-	}
 	
   /* ==========================================================================
    * 
@@ -2392,38 +2222,6 @@ public class DNodeBP {
 	 *  
 	 * -------------------------------------------------------------------------- */
   
-  public int statistic_condNum = 0;
-  public int statistic_eventNum = 0;
-  public int statistic_cutOffNum = 0;
-  public int statistic_arcNum = 0;
-	
-  /**
-   * Compute statistics information for the branching process and store this
-   * information in the fields
-   *    {@link #statistic_arcNum}
-   *    {@link #statistic_condNum}
-   *    {@link #statistic_cutOffNum}
-   *    {@link #statistic_eventNum}
-   * @return a string representation of the statistics
-   */
-	public String getStatistics() {
-
-		for (DNode n : bp.getAllNodes()) {
-			if (n.isEvent) {
-			  statistic_eventNum++;
-  
-  			if (n.isCutOff && !n.isAnti)
-  			  statistic_cutOffNum++;
-				
-				//System.out.println(n+" : "+toString(bp.getPrimeCut(n, null)));
-			}
-			else statistic_condNum ++;
-			
-			statistic_arcNum += n.pre.length; 
-		}
-		return "|B|="+statistic_condNum +" |E|="+statistic_eventNum+" |E_cutOff|="+statistic_cutOffNum+" |F|="+statistic_arcNum;
-	}
-	
 	/**
 	 * @return the system that creates the branching process
 	 */
@@ -2446,24 +2244,47 @@ public class DNodeBP {
     // FIXME: return only after computation finished?
     return elementary_ccPair;
   }
-	
+
+  // remember all statistics values in fields of the class
+  // for later retrieval
+  public int statistic_condNum = 0;
+  public int statistic_eventNum = 0;
+  public int statistic_cutOffNum = 0;
+  public int statistic_arcNum = 0;
+  
+  /**
+   * Compute statistics information for the branching process and store this
+   * information in the fields
+   *    {@link #statistic_arcNum}
+   *    {@link #statistic_condNum}
+   *    {@link #statistic_cutOffNum}
+   *    {@link #statistic_eventNum}
+   * @return a string representation of the statistics
+   */
+  public String getStatistics() {
+
+    for (DNode n : bp.getAllNodes()) {
+      if (n.isEvent) {
+        statistic_eventNum++;
+  
+        if (n.isCutOff && !n.isAnti)
+          statistic_cutOffNum++;
+        
+        //System.out.println(n+" : "+toString(bp.getPrimeCut(n, null)));
+      }
+      else statistic_condNum ++;
+      
+      statistic_arcNum += n.pre.length; 
+    }
+    return "|B|="+statistic_condNum +" |E|="+statistic_eventNum+" |E_cutOff|="+statistic_cutOffNum+" |F|="+statistic_arcNum;
+  }
+  
+  /**
+   * @return GraphViz Dot representation of the computed branching process,
+   * calls {@link DNodeSet#toDot()}
+   */
 	public String toDot() {
 		return bp.toDot();
-	}
-	
-	public void printEquivalenceRelation() {
-	  System.out.println("--- equivalence relation ---");
-	  System.out.println("EVENTS:");
-    for (DNode e : bp.getAllEvents()) {
-      DNode e0 = elementary_ccPair.get(e);
-      System.out.println(e+" -> "+e0);
-    }
-    System.out.println("CONDITIONS:");
-    for (DNode b : bp.getAllConditions()) {
-      DNode b0 = elementary_ccPair.get(b);
-      System.out.println(b+" -> "+b0);
-    }
-    System.out.println("--- /equivalence relation ---");
 	}
 	
 /* --------------------------------------------------------------------------
@@ -2489,7 +2310,7 @@ public class DNodeBP {
 	 */
   private boolean checkProperties() {
     
-    if (options_checkProperty_Unsafe) {
+    if (options.checkProperty_Unsafe) {
       
       if (currentPrimeCut == null)
         return true;
@@ -2529,7 +2350,7 @@ public class DNodeBP {
 	public boolean findDeadConditions (boolean first) {
 	  
 	  // do not check for dead conditions unless needed
-    if (!options_checkProperty_DeadCondition)
+    if (!options.checkProperty_DeadCondition)
       return false;
 		
 		// do not check if the BP is unsafe, in this case, the construction
@@ -2643,7 +2464,7 @@ public class DNodeBP {
 	 */
 	public boolean isGloballySafe() {
 		
-		if (!options_checkProperty_Unsafe)
+		if (!options.checkProperty_Unsafe)
 			return true;
 		
 		// compare all concurrent conditions
@@ -2667,7 +2488,7 @@ public class DNodeBP {
 	 * @return true iff the process is safe
 	 */
 	public boolean isSafe() {
-	  if (!options_checkProperty_Unsafe) return true;
+	  if (!options.checkProperty_Unsafe) return true;
 	  return (propertyCheck & PROP_UNSAFE) == 0;
 	}
 	
@@ -2676,7 +2497,7 @@ public class DNodeBP {
    * {@link #findDeadConditions(boolean)} first, to find the dead conditions
    */
   public boolean hasDeadCondition() {
-    if (!options_checkProperty_DeadCondition) return true;
+    if (!options.checkProperty_DeadCondition) return true;
     return (propertyCheck & PROP_DEADCONDITION) > 0;
   }
 
@@ -2692,4 +2513,143 @@ public class DNodeBP {
 //    return result + "]";
 //  }
   
+  /**
+   * Stores all options used in the construction of the branching process 
+   */
+  public static class Options {
+    //// --- search strategies for finding cut-off events
+    /**
+     *  check for cut-off events using the lexicographic order on events:
+     *  compare each candidate event only with events that are predecessors
+     *  of the candidate event
+     */
+    protected boolean searchStrat_predecessor = false;
+    /**
+     *  check for cut-off events using the size of the local configurations:
+     *  compare each candidate event only with events that have been added
+     *  previously and which have a strictly smaller prime configuration
+     */
+    protected boolean searchStrat_size = false;
+    /**
+     *  check for cut-off events using a lexicographic order in the transition names:
+     *  compare each candidate event only with events that have been added
+     *  previously and which have a smaller or equal prime configuration, if
+     *  two configurations have equal size, then their lexicographic order determines
+     *  the order of the configuration
+     */
+    protected boolean searchStrat_lexicographic = false;
+    
+    //// --- equivalence notions for detecting whether two events are equivalent
+    /**
+     *  check for equivalence of cuts by comparing their histories for
+     *  enabling the same sets of events
+     */
+    protected boolean cutOffEquiv_eventSignature = false;
+    /**
+     *  check for equivalence of cuts by comparing their histories for
+     *  isomorphism to the maximal depth of the histories in the input system
+     */
+    protected boolean cutOffEquiv_history = false;
+    /**
+     * check for equivalence of cuts by comparing the reached markings only
+     */
+    protected boolean cutOffEquiv_marking = false;
+    /**
+     *  check for equivalence of cuts by comparing the histories of conditions
+     *  with respect to the conditions of the given system
+     */
+    protected boolean cutOffEquiv_conditionHistory = false;
+    
+    /**
+     * compute finite complete prefix until all reachable states have been
+     * computed (default: <code>true</code>)
+     */
+    protected boolean cutOffTermination_reachability = true;
+    /**
+     * compute finite complete prefix until finite complete prefix is successor
+     * complete and can be folded into an equivalent Petri net
+     * (default: <code>false</code>)
+     */
+    protected boolean cutOffTermination_synthesis = false;
+
+
+    //// --- analysis flags
+    /**
+     * whether properties shall be checked on the fly at all
+     */
+    protected boolean checkProperties = false;
+    /**
+     * check whether the system is unsafe
+     */
+    protected boolean checkProperty_Unsafe = false;
+    /**
+     * check whether the system has dead conditions (which have no post-event
+     */
+    protected boolean checkProperty_DeadCondition = false;
+    /**
+     * stop BP construction if the property to be checked has been found
+     */
+    protected boolean stopIfPropertyFound = true;
+  } // end of Options
+  
+  // =========================================================================
+  //  members and methods used for debugging
+  // =========================================================================
+  
+  // use to log procedure calls and intermediate results in a separate file
+  public StringBuilder _debug_log = new StringBuilder();
+
+  // use to log execution times and statistical data to profile performance of
+  // the algorithm and its optimizations
+  public StringBuilder _debug_executionTimeProfile = new StringBuilder();
+  
+  // remember when we started with the branching process construction for
+  // the exeuction time profile
+  long _debug_t0 = System.currentTimeMillis();
+
+  /**
+   * print which events and which conditions are equivalent according
+   * to {@link #elementary_ccPair}.
+   */
+  public void debug_printEquivalenceRelation() {
+    System.out.println("--- equivalence relation ---");
+    System.out.println("EVENTS:");
+    for (DNode e : bp.getAllEvents()) {
+      DNode e0 = elementary_ccPair.get(e);
+      System.out.println(e+" -> "+e0);
+    }
+    System.out.println("CONDITIONS:");
+    for (DNode b : bp.getAllConditions()) {
+      DNode b0 = elementary_ccPair.get(b);
+      System.out.println(b+" -> "+b0);
+    }
+    System.out.println("--- /equivalence relation ---");
+  }
+
+  /**
+   * @param array
+   * @return string representation of the int array
+   */
+  public static String toString(int[] array) {
+    String result = "[";
+    for (int i=0;i<array.length;i++) {
+      if (i > 0) result += ",";
+      result+=array[i];
+    }
+    return result+"]";
+  }
+
+  /**
+   * @param array
+   * @return string representation of the short array
+   */
+  public static String toString(short[] array) {
+    String result = "[";
+    for (int i=0;i<array.length;i++) {
+      if (i > 0) result += ",";
+      result+=array[i];
+    }
+    return result+"]";
+  }
+
 }

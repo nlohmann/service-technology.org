@@ -97,7 +97,8 @@ public class DNodeBP {
 		dNodeAS = system;
 		
 		initialize();
-		
+
+		options = new Options();
     options.searchStrat_size = true;
 		options.cutOffEquiv_conditionHistory = true;
 		

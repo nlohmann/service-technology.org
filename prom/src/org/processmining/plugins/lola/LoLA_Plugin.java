@@ -16,7 +16,7 @@ import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.models.connections.petrinets.behavioral.MarkingNetConnection;
+import org.processmining.models.connections.petrinets.behavioral.InitialMarkingConnection;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.semantics.petrinet.Marking;
 import org.processmining.plugins.configuration.Configuration;
@@ -53,7 +53,7 @@ public class LoLA_Plugin {
 	@UITopiaVariant(affiliation = "Universit&#228;t Rostock", author = "K. Wolf and N. Lohmann", email = "lola@service-technology.org", website = "http://service-technology.org/lola")
 	@PluginVariant(variantLabel = "LoLA: A Low-Level Petri Net Analyzer", requiredParameterLabels = { 1 })
 	public LoLADiagnosis plug(UIPluginContext context, Petrinet net) throws Exception {
-		Marking marking = context.tryToFindOrConstructFirstObject(Marking.class, MarkingNetConnection.class, MarkingNetConnection.MARKING, net);
+		Marking marking = context.tryToFindOrConstructFirstObject(Marking.class, InitialMarkingConnection.class, InitialMarkingConnection.MARKING, net);
 		return work(context, net, marking);
 	}
 
@@ -67,7 +67,7 @@ public class LoLA_Plugin {
 	// the actual working method
 	private LoLADiagnosis work(UIPluginContext context, Petrinet net, Marking marking) throws Exception {
 		// check if the net and marking are related
-		context.getConnectionManager().getConnections(MarkingNetConnection.class, context, net, marking);
+		context.getConnectionManager().getConnections(InitialMarkingConnection.class, context, net, marking);
 
 		// ask user what we should do
 		InteractionResult wish = getUserChoice(context);

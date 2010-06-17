@@ -7,7 +7,8 @@ import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.models.connections.petrinets.behavioral.BehavioralAnalysisInformationConnection;
-import org.processmining.models.connections.petrinets.behavioral.MarkingNetConnection;
+import org.processmining.models.connections.petrinets.behavioral.BoundednessInfoConnection;
+import org.processmining.models.connections.petrinets.behavioral.InitialMarkingConnection;
 import org.processmining.models.connections.petrinets.behavioral.UnboundedPlacesConnection;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.graphbased.directed.petrinet.analysis.NetAnalysisInformation;
@@ -41,7 +42,7 @@ public class LoLA_Boundedness {
 //	@UITopiaVariant(affiliation = "Universit&#228;t Rostock", author = "N. Lohmann", email = "niels.lohmann@uni-rostock.de", website = "http://service-technology.org/lola")
 	@PluginVariant(variantLabel = "Analyze Boundedness with LoLA", requiredParameterLabels = { 0 })
 	public Object[] plug(PluginContext context, Petrinet net) throws Exception {
-		Marking marking = context.tryToFindOrConstructFirstObject(Marking.class, MarkingNetConnection.class, MarkingNetConnection.MARKING, net);
+		Marking marking = context.tryToFindOrConstructFirstObject(Marking.class, InitialMarkingConnection.class, InitialMarkingConnection.MARKING, net);
 		return checkBoundedness(context, net, marking);
 	}
 	
@@ -55,7 +56,7 @@ public class LoLA_Boundedness {
 	// do the actual work
 	private Object[] checkBoundedness(PluginContext context, Petrinet net, Marking marking) throws Exception {
 		// check if the net and marking are related
-		context.getConnectionManager().getConnections(MarkingNetConnection.class, context, net, marking);
+		context.getConnectionManager().getConnections(InitialMarkingConnection.class, context, net, marking);
 
 		// call LoLA and get a results file
 		Configuration cfg = lola.executeLoLA(context, net, marking);
@@ -78,7 +79,7 @@ public class LoLA_Boundedness {
 		
 		// connect results to context
 		Object[] result = { boundednessInfo, unboundedPlacesSet, vis };
-		context.addConnection(new BehavioralAnalysisInformationConnection(net, marking, PetrinetSemanticsFactory.regularPetrinetSemantics(Petrinet.class),
+		context.addConnection(new BoundednessInfoConnection(net, marking, PetrinetSemanticsFactory.regularPetrinetSemantics(Petrinet.class),
 				(NetAnalysisInformation) result[0]));
 		context.addConnection(new UnboundedPlacesConnection(net, (UnboundedPlacesSet) result[1], marking, PetrinetSemanticsFactory.regularPetrinetSemantics(Petrinet.class)));
 		context.getFutureResult(0).setLabel("Boundedness Analysis of " + net.getLabel());

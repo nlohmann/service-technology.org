@@ -1,4 +1,5 @@
-@heading Version 0.1-unreleased
+@heading Version 1.0 (18 June 2010)
 @itemize
-@item Siphon-trap check using minisat
+@item Siphon-trap check using MINISAT
+@item Siphon output
 @end itemize

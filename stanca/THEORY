@@ -2,8 +2,13 @@
                      http://service-technology.org/stanca
 
 
-PURPOSE
-    Stanca checks the siphon-trap property using minisat.
 
+Stanca implements the siphon-trap property check using MINISAT. The approach is presented in the following published article.
 
+New Algorithms for Deciding the Siphon-Trap Property
+Olivia Oanea and Harro Wimmel and Karsten Wolf
+ In Johan Lilius and Wojciech Penczek, editors, 
+ 31st International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, 
+ PETRI NETS 2010, Braga, Portugal, June 21-25, 2010, Proceedings, 
+ volume 6128 of Lecture Notes in Computer Science, pages 267-286, June 2010. Springer-Verlag
 

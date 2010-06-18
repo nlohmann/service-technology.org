@@ -3,6 +3,14 @@
 
 
 PURPOSE
-    Stanca checks the siphon-trap property using minisat.
+    Stanca checks the siphon-trap property using MINISAT.
+
+Version 1.0 (18 June 2010)
+==========================
+
+* Siphon-trap check using MINISAT
+
+* Siphon output
+
 
 

@@ -489,10 +489,10 @@ int main(int argc, char **argv) {
 	if (rs!=NULL) {
 		cout << "the formula is satisfiable"<<endl;
 		cout << rs->size()<<endl;
-		for (int k=0; k<rs->size(); ++k) {
+		for (unsigned int k=0; k<rs->size(); ++k) {
 			for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
 			// cout << (*it)->getName()<< " ";
-			 for(int kk=0; kk<mp.find((*it)->getName())->second.size(); ++kk)
+			 for(unsigned int kk=0; kk<mp.find((*it)->getName())->second.size(); ++kk)
 			 if(mp.find((*it)->getName())->second[kk]==k)
 			 cout << (*it)->getName()<<"^"<<kk;
 			 }

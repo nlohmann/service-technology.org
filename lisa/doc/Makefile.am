@@ -33,15 +33,16 @@ lisa_TEXINFOS += cmdline.out
 #-----------------------------------------------------------#
 # GENERIC: create ASCII files out README and Texinfo manual #
 #-----------------------------------------------------------#
-all: $(top_srcdir)/ChangeLog
-lisa_TEXINFOS += ChangeLog.texi
-
-$(top_srcdir)/ChangeLog: ChangeLog.texi
-	$(MAKEINFO) -o ChangeLog.txt --no-split --no-headers --fill-column=79 $(srcdir)/$(PACKAGE).texi
+../ChangeLog: ChangeLog.texi
+	$(MAKEINFO) -o ChangeLog.txt --no-split --no-headers --fill-column=81 sayo.texi
 	$(SED) -n '/procrastination/,/The most recent change log/w ChangeLog2.txt' ChangeLog.txt
 	$(SED) '1,2d' ChangeLog2.txt | $(SED) -e '$$d' | $(SED) -e '$$d' | $(SED) 's/^   //' > ChangeLog.txt
 	rm ChangeLog2.txt
-	head -n$(BANNERHEIGHT) $(top_srcdir)/README > $(top_srcdir)/ChangeLog
-	cat ChangeLog.txt >> $(top_srcdir)/ChangeLog
-	head -n$(BANNERHEIGHT) $(top_srcdir)/README > $(top_srcdir)/NEWS
-	head -n `($(GREP) -n -m2 "^Version " ChangeLog.txt | $(SED) -n '2p' | $(SED) -e 's/:/ /' | $(AWK) '{print $$1-1}')` ChangeLog.txt >> $(top_srcdir)/
+	head -n9 ../README > ../ChangeLog
+	cat ChangeLog.txt >> ../ChangeLog
+	head -n9 ../README > ../NEWS
+	head -n `($(GREP) -n -m2 "^Version " ChangeLog.txt | $(SED) -n '2p' | $(SED) -e 's/:/ /' | $(AWK) '{print $$1-1}')` ChangeLog.txt >> ../NEWS
+	echo "\nSee file ChangeLog <http://service-technology.org/files/$(PACKAGE)/ChangeLog> for\ncomplete version history.\n" >> ../NEWS
+	rm ChangeLog.txt
+
+

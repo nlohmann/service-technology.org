@@ -61,7 +61,6 @@ Permission is granted to copy, distribute and/or modify this document under the 
 * First Steps::How to set up and install Lisa.
 * Command Line Options::How to run Lisa.
 * Example usage::Examples of how to use Lisa
-* ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
 @end menu
 
@@ -364,23 +363,6 @@ p1
 p5
 @end smallexample
 @end cartouche
-
-
-@c --------------------------------------------------------------------------
-
-
-@node ChangeLog
-@chapter Version History
-
-Lisa is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
-
-@include ChangeLog.texi
-
-@sp 3
-
-The most recent change log is available at Lisa's website at @url{http://service-technology.org/files/Lisa/ChangeLog}.
-
-
 
 @c --------------------------------------------------------------------------
 

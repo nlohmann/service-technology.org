@@ -29,23 +29,3 @@ cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
 EXTRA_DIST += cmdline.out 
 MAINTAINERCLEANFILES = cmdline.out
 lisa_TEXINFOS += cmdline.out
-
-#-----------------------------------------------------------#
-# GENERIC: create ASCII files out README and Texinfo manual #
-#-----------------------------------------------------------#
-all: $(top_srcdir)/ChangeLog
-lisa_TEXINFOS += ChangeLog.texi
-EXTRA_DIST += $(top_srcdir)/REQUIREMENTS $(top_srcdir)/THEORY
-
-$(top_srcdir)/ChangeLog: ChangeLog.texi
-	$(MAKEINFO) -o ChangeLog.txt --no-split --no-headers --fill-column=79 $(srcdir)/$(PACKAGE).texi
-	$(SED) -n '/procrastination/,/The most recent change log/w ChangeLog2.txt' ChangeLog.txt
-	$(SED) '1,2d' ChangeLog2.txt | $(SED) -e '$$d' | $(SED) -e '$$d' | $(SED) 's/^   //' > ChangeLog.txt
-	rm ChangeLog2.txt
-	head -n$(BANNERHEIGHT) $(top_srcdir)/README > $(top_srcdir)/ChangeLog
-	cat ChangeLog.txt >> $(top_srcdir)/ChangeLog
-	head -n$(BANNERHEIGHT) $(top_srcdir)/README > $(top_srcdir)/NEWS
-	head -n `($(GREP) -n -m2 "^Version " ChangeLog.txt | $(SED) -n '2p' | $(SED) -e 's/:/ /' | $(AWK) '{print $$1-1}')` ChangeLog.txt >> $(top_srcdir)/NEWS
-	echo "\nSee file ChangeLog <http://service-technology.org/files/$(PACKAGE)/ChangeLog> for\ncomplete version history.\n" >> $(top_srcdir)/NEWS
-	rm ChangeLog.txt
-

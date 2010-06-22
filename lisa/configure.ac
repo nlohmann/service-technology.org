@@ -1,4 +1,4 @@
-AC_INIT(Lisa, 1.0-unreleased)
+AC_INIT(Lisa, 1.0-unreleased, lisa@service-technology.org, lisa, http://service-technology.org/lisa)
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
@@ -31,7 +31,7 @@ AC_CHECK_FUNCS([popen pclose],,AC_MSG_ERROR([cannot use required functions]))
 # write files
 AC_CONFIG_FILES([
 	Makefile libs/pnapi/Makefile libs/lp_solve/Makefile src/Makefile
-	man/Makefile maintainer/Makefile
+	man/Makefile maintainer/Makefile doc/Makefile doc/Doxyfile
 	maintainer/debian/changelog.template maintainer/debian/info
 	maintainer/debian/rules maintainer/macports/Portfile tests/Makefile
 	tests/package.m4])

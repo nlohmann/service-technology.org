@@ -1,9 +1,9 @@
 \input texinfo
-@setfilename mia.info
+@setfilename lisa.info
 @include version.texi
 @afourpaper
 @finalout
-@settitle Mia User's Manual
+@settitle Lisa User's Manual
 
 @c --------------------------------------------------------------------------
 
@@ -11,9 +11,9 @@
 
 @b{About this document:}
 
-This manual is for Mia, version @value{VERSION}, a tool to calculate information for instance migration, last updated @value{UPDATED}.
+This manual is for Lisa, version @value{VERSION}, a tool for structural analysis of petri nets, last updated @value{UPDATED}.
 
-Copyright @copyright{} 2009 Niels Lohmann
+Copyright @copyright{} 2010 Georg Straube
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document under the terms of the @acronym{GNU} Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A @acronym{GNU} Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``@acronym{GNU} Free Documentation License.''
@@ -24,7 +24,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @dircategory service-technology.org
 @direntry
-* mia: (mia).       Mia.
+* lisa: (lisa).       Lisa.
 @end direntry
 
 
@@ -32,14 +32,14 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @titlepage
 
-@title Mia
+@title Lisa
 
-@subtitle Migration of Instances of Services
-@subtitle @url{http://service-technology.org/mia}
+@subtitle Structural analysis of petri nets based on linear programming
+@subtitle @url{http://service-technology.org/Lisa}
 @vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}
 
-@author Niels Lohmann
+@author Georg Straube
 @page
 
 
@@ -51,16 +51,16 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @ifnottex
 @node Top
-@top Mia
+@top Lisa
 @insertcopying
 @end ifnottex
 
 @c --------------------------------------------------------------------------
 
 @menu
-* First Steps::How to set up and install Mia.
-* Command Line Options::How to run Mia.
-* Theory::The theory behind Mia.
+* First Steps::How to set up and install Lisa.
+* Command Line Options::How to run Lisa.
+* Example usage::Examples of how to use Lisa
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
 @end menu
@@ -78,18 +78,18 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @section Setup and Installation
 
 @enumerate
-@item Go to @url{http://service-technology.org/files/mia} and download the latest release version of Mia, say @file{mia-@value{VERSION}.tar.gz}. To setup and compile Mia, change into your download directory and type
+@item Go to @url{http://service-technology.org/files/lisa} and download the latest release version of Lisa, say @file{lisa-@value{VERSION}.tar.gz}. To setup and compile Lisa, change into your download directory and type
 
 @cartouche
 @smallexample
-tar xfz mia-@value{VERSION}.tar.gz
-cd mia-@value{VERSION}
+tar xfz lisa-@value{VERSION}.tar.gz
+cd lisa-@value{VERSION}
 ./configure
 make
 @end smallexample
 @end cartouche
 
-After compilation, a binary @samp{src/mia} is generated.@footnote{On Microsoft Windows, the file will be called @file{mia.exe}.} If you experience any compiler warnings, don't panic: Mia contains some generated or third party code that we cannot influence.
+After compilation, a binary @samp{src/lisa} is generated.@footnote{On Microsoft Windows, the file will be called @file{lisa.exe}.} If you experience any compiler warnings, don't panic: Lisa contains some generated or third party code that we cannot influence.
 
 @item To test whether everything went fine, type
 
@@ -99,17 +99,17 @@ make check
 @end smallexample
 @end cartouche
 
-to execute the testcases located in @file{tests}. If everything went fine, you should see something like:@footnote{Some tests use Fiona to check whether the calculated operating guidelines are correct. If Fiona was not found by the configure script, theses tests are skipped.}
+to execute the testcases located in @file{tests}. If everything went fine, you should see something like:
 
 @smallexample
 ## ------------- ##
 ## Test results. ##
 ## ------------- ##
 
-All 9 tests were successful.
+All 7 tests were successful.
 @end smallexample
 
-If an error occurs, please send the output to @email{mia@@service-technology.org}.
+If an error occurs, please send the output to @email{lisa@@service-technology.org}.
 
 @item To install the binary, the manpage, and the documentation, type
 
@@ -131,16 +131,16 @@ The distribution contains several directories:
 
 @table @file
 @item doc
-The Texinfo documentation of Mia. The documentation can be created using @samp{make pdf}. Note you need to have Mia properly installed before (see installation description above).
+The Texinfo documentation of Lisa. The documentation can be created using @samp{make pdf}. Note you need to have Lisa properly installed before (see installation description above).
 
 @item man
-The manpage of Mia which can be displayed using @samp{man mia} after having Mia installed (see installation description above).
+The manpage of Lisa which can be displayed using @samp{man lisa} after having Lisa installed (see installation description above).
 
 @item src
-The source code of Mia.
+The source code of Lisa.
 
 @item tests
-Testcases for Mia which check the generated binary.
+Testcases for Lisa which check the generated binary.
 @end table
 
 
@@ -149,20 +149,6 @@ Testcases for Mia which check the generated binary.
 
 
 @c --------------------------------------------------------------------------
-
-
-@section Requirements
-
-In order to run, compile, and develop Mia, several tools are required.
-
-@unnumberedsec Runtime
-@itemize
-@item Wendy (@url{http://service-technology.org/wendy}), at least version 1.4
-@item LoLA (@url{http://service-technology.org/lola}), compiled with the @samp{FULL} option
-@end itemize
-
-Mia's configure script checks whether these tools (with binaries @file{wendy} and @file{lola-full}) are found in the path and adjusts the configuration file @file{src/mia.conf} accordingly.
-
 
 @unnumberedsec Compilation
 To compile the source code from a source distribution, the following tools are required.
@@ -173,7 +159,7 @@ To compile the source code from a source distribution, the following tools are r
 @end itemize
 
 @unnumberedsec Development
-In case you want to make changes to the source code, the following tools are required to reconfigure and compile Mia.
+In case you want to make changes to the source code, the following tools are required to reconfigure and compile Lisa.
 
 @itemize
 @item Autoconf, @url{http://www.gnu.org/software/autoconf/}
@@ -185,56 +171,199 @@ In case you want to make changes to the source code, the following tools are req
 @item Texinfo, @url{http://www.gnu.org/software/texinfo/}
 @end itemize
 
-
-
-
 Please check our nightly build server at @url{http://service-technology.org/nightly} for the versions we use during development.
-
-
-
-
-
-
 
 @c --------------------------------------------------------------------------
 
 
 @node Command Line Options
-@chapter Invoking Mia
+@chapter Invoking Lisa
 
-Mia is a command line tool and does not come with a fancy @acronym{GUI}. However, Mia can be easily scripted and combined with other tools.
+Lisa is a command line tool and does not come with a fancy @acronym{GUI}. However, Lisa can be easily scripted and combined with other tools.
 
 @section Command Line Options
 
-For an overview of the command line options, type @samp{mia --help} to see the following help screen:
+For an overview of the command line options, type @samp{lisa --help} to see the following help screen:
 
 @smallexample
 @verbatiminclude cmdline.out
 @end smallexample
 
 
-
-
-
 @c --------------------------------------------------------------------------
 
 
-@node Theory
-@chapter Theory
+@node Example usage
+@chapter Example usage
 
-@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
-Mia implements several algorithms and result published in several scientific articles.
+@section P-invariants
 
-@section Runtime Migration
+To calculate a p-invariant invoke Lisa with the filename of a given net and 
+parameter - -findPInv or -p for short.
 
-@quotation
-Nannette Liske, Niels Lohmann, Christian Stahl, and Karsten Wolf. @b{Another Approach to Service Instance Migration}. In Luciano Baresi, Chi-Hung Chi, and Jun Suzuki, editors, @i{Service-Oriented Computing - ICSOC 2009, 7th International Conference, Stockholm, Sweden, November 24-27, 2009. Proceedings}, Lecture Notes in Computer Science, November 2009. Springer-Verlag.
-@end quotation
+@cartouche
+@smallexample
+lisa net.owfn --findPInv
+@end smallexample
+@end cartouche
 
-@sp 3
+If not p-invariant could be found, you will see the following output:
 
-@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
-See @url{http://service-technology.org/publications} for more information.
+@cartouche
+@smallexample
+lisa: No p-invariant could be found
+@end smallexample
+@end cartouche
+
+Otherwise Lisa will output the p-invariant and inform you if the p-invariant is
+non-negative, the petri net is covered by p-invariants or bounded.
+
+@cartouche
+@smallexample
+lisa: Found p-invariant
+p2: 1.000000
+p1: 1.000000
+p3: 1.000000
+lisa: p-invariant is non-negative
+lisa: petri net is covered by p-invariants
+lisa: petri net is bounded
+@end smallexample
+@end cartouche
+
+@section T-invariants
+
+To calculate a t-invariant invoke Lisa with the filename of a given net and 
+parameter - -findTInv or -t for short.
+
+@cartouche
+@smallexample
+lisa net.owfn --findTInv
+@end smallexample
+@end cartouche
+
+If not t-invariant could be found, you will see the following output:
+
+@cartouche
+@smallexample
+lisa: No t-invariant could be found
+@end smallexample
+@end cartouche
+
+Otherwise Lisa will output the t-invariant and inform you if the t-invariant is
+non-negative and if the petri net is covered by t-invariants.
+
+@cartouche
+@smallexample
+lisa: Found t-invariant
+t4: 1.000000
+t2: 1.000000
+t5: 3.000000
+t3: 1.000000
+t1: 1.000000
+lisa: t-invariant is non-negative
+lisa: petri net is covered by t-invariants
+@end smallexample
+@end cartouche
+
+@section Reachability check
+
+Please keep in mind that only the necessary condition
+for reachability is checked, i.e. a marking that is
+reachable might not be realizable.
+
+To test whether a given marking is reachable state
+the marking to be reached as a final marking. Then call
+Lisa with the filename and parameter - -isReachable or
+-r.
+
+@cartouche
+@smallexample
+lisa net.owfn --isReachable
+@end smallexample
+@end cartouche
+
+If the marking is not reachable, you will see the following output:
+
+@cartouche
+@smallexample
+lisa: marking is not reachable
+@end smallexample
+@end cartouche
+
+Otherwise Lisa tells you that the marking might be reachable:
+
+@cartouche
+@smallexample
+lisa: marking might be reachable
+@end smallexample
+@end cartouche
+
+@section Siphons
+
+Lisa can check if a given petri net possesses siphons. If the
+answer is yes, it will calculate the siphon with the minimal number
+of places among all siphons. 
+Call Lisa with filename and option - -findSiphon.
+
+@cartouche
+@smallexample
+lisa net.owfn --findSiphon
+@end smallexample
+@end cartouche
+
+If the petri net contains no siphons, you will see the following output:
+
+@cartouche
+@smallexample
+lisa: No siphon could be found
+@end smallexample
+@end cartouche
+
+Otherwise Lisa outputs the places of the siphon:
+
+@cartouche
+@smallexample
+lisa: Found siphon containing the following places
+Places:
+p3
+p1
+p2
+p4
+@end smallexample
+@end cartouche
+
+@section Traps
+
+Lisa can check if a given petri net possesses traps. If the
+answer is yes, it will calculate the trap with the minimal number
+of places among all traps. 
+Call Lisa with filename and option - -findTrap.
+
+@cartouche
+@smallexample
+lisa net.owfn --findTrap
+@end smallexample
+@end cartouche
+
+If the petri net contains no traps, you will see the following output:
+
+@cartouche
+@smallexample
+lisa: No trap could be found
+@end smallexample
+@end cartouche
+
+Otherwise Lisa outputs the places of the trap:
+
+@cartouche
+@smallexample
+lisa: Found trap containing the following places
+Places:
+p3
+p1
+p5
+@end smallexample
+@end cartouche
 
 
 @c --------------------------------------------------------------------------
@@ -243,13 +372,13 @@ See @url{http://service-technology.org/publications} for more information.
 @node ChangeLog
 @chapter Version History
 
-Mia is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+Lisa is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
 
 @include ChangeLog.texi
 
 @sp 3
 
-The most recent change log is available at Mia's website at @url{http://service-technology.org/files/mia/ChangeLog}.
+The most recent change log is available at Lisa's website at @url{http://service-technology.org/files/Lisa/ChangeLog}.
 
 
 

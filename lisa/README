@@ -1,19 +1,17 @@
-			 __    __   _______  __       __        ______   
-			|  |  |  | |   ____||  |     |  |      /  __  \  
-			|  |__|  | |  |__   |  |     |  |     |  |  |  | 
-			|   __   | |   __|  |  |     |  |     |  |  |  | 
-			|  |  |  | |  |____ |  `----.|  `----.|  `--'  | 
-			|__|  |__| |_______||_______||_______| \______/  
-			<<-- Hello World (Short Mission Statement) -->>
-			http://service-technology.org/hello
+						| |   (_)___  __ _ 
+						| |   | / __|/ _` |
+						| |___| \__ \ (_| |
+						|_____|_|___/\__,_|
+ 
+				Lisa -- Linear programming based structural analysis
 
 
 PURPOSE
-    <<-- PURPOSE -->>
+    Lisa is a tool for structural analysis of petri nets.
 
 
 COPYRIGHT
-    Copyright (c) <<-- 20XX AUTHOR1, AUTHOR2, ... -->>
+    Copyright (c) 2010 Georg Straube
 
 
 AUTHORS
@@ -24,20 +22,20 @@ LICENSE
     License AGPLv3+: GNU Affero General Public License version 3 or later
     <http://www.gnu.org/licenses/agpl.html>
 
-    Hello is free software: you are free to change and redistribute it.
+    Lisa is free software: you are free to change and redistribute it.
     There is NO WARRANTY, to the extent permitted by law.
 
-    See file "COPYING" for the license of Hello.
+    See file "COPYING" for the license of Lisa.
 
     Any different licensing scheme may be negotiated with the author(s).
 
 
 INSTALLATION
-    Hello can be easily compiled and installed. See file "INSTALL" for
+    Lisa can be easily compiled and installed. See file "INSTALL" for
     instructions. Please also have a look at the file "REQUIREMENTS" for
-    information on the tools required to run, compile, and develop Hello.
+    information on the tools required to run, compile, and develop Lisa.
 
 
 DOCUMENTATION
-    The directory "doc" contains a documentation of Hello. It can also be
-    downloaded at <http://service-technology.org/files/hello/hello.pdf>.
+    The directory "doc" contains a documentation of Lisa. It can also be
+    downloaded at <http://service-technology.org/files/lisa/lisa.pdf>.

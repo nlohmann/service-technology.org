@@ -1,7 +1,5 @@
 AT_INIT
 
-AT_TESTED(versions.sh)
-
 ############################################################################
 AT_BANNER([Basic Options])
 ############################################################################
@@ -63,6 +61,16 @@ AT_KEYWORDS(algorithms)
 AT_CLEANUP
 
 AT_SETUP([Calculating a siphon])
+m4_define([NET], [has_siphon.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([LISA NET --findSiphon],0,ignore,stderr)
+AT_CHECK([GREP -q "p1" stderr])
+AT_CHECK([GREP -q "p3" stderr])
+AT_CHECK([GREP -q "p5" stderr])
+AT_KEYWORDS(algorithms)
+AT_CLEANUP
+
+AT_SETUP([Calculating a siphon 2])
 m4_define([NET], [no_t_invariant.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([LISA NET --findSiphon],0,ignore,stderr)
@@ -71,3 +79,6 @@ AT_CHECK([GREP -q "p3" stderr])
 AT_CHECK([GREP -q "p5" stderr])
 AT_KEYWORDS(algorithms)
 AT_CLEANUP
+
+
+

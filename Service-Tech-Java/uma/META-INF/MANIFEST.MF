@@ -3,6 +3,9 @@ Bundle-ManifestVersion: 2
 Bundle-Name: UMA - an Unfolding-based Model Analyzer
 Bundle-SymbolicName: hub.top.uma
 Bundle-Version: 1.2.1
-Export-Package: hub.top.uma
+Export-Package: hub.top.petrinet,
+ hub.top.uma,
+ hub.top.uma.synthesis,
+ hub.top.uma.view
 Bundle-Vendor: service-technology.org
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

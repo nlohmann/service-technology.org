@@ -1,6 +1,8 @@
 UMA v.1.2.1
 -----------
 
++ added methods for view generation
+* fixed bug #16115: folding routine may result violate 1-safeness of the model
 * performance improvements and bug fixes
 
 UMA v.1.2.0

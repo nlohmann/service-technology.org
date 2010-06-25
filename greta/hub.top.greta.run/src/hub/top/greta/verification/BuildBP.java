@@ -46,6 +46,7 @@ import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.uma.DNodeBP_Scenario;
+import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys_PtNet;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
@@ -222,8 +223,14 @@ public class BuildBP {
     if (srcFile != null) {
       monitor.subTask("writing dot file");
       IOUtil.writeDotFile(bp, srcFile, outFileAppendix);
+      
+      DNodeSet.option_printAnti = false;
+      IOUtil.writeDotFile(bp, srcFile, outFileAppendix+"_positive");
+      DNodeSet.option_printAnti = true;
+      
       try {
-        FileIOHelper.writeFile(srcFile.getRawLocation()+outFileAppendix+".csv", bp.executionTimeProfile.toString());
+        FileIOHelper.writeFile(srcFile.getRawLocation()+outFileAppendix+".csv", bp._debug_executionTimeProfile.toString());
+        FileIOHelper.writeFile(srcFile.getRawLocation()+outFileAppendix+".log", bp._debug_log.toString());
       } catch (IOException e) {
         
       }
@@ -250,7 +257,7 @@ public class BuildBP {
     DNodeBP bp = new DNodeBP_Scenario(system);
     bp.configure_buildOnly();
     bp.configure_Scenarios();
-    //bp.configure_stopIfUnSafe();
+    bp.configure_stopIfUnSafe();
     return bp;
   }
   
@@ -259,7 +266,7 @@ public class BuildBP {
     DNodeBP bp = new DNodeBP_Scenario(system);
     bp.configure_synthesis();
     bp.configure_Scenarios();
-    //bp.configure_stopIfUnSafe();
+    bp.configure_stopIfUnSafe();
     return bp;
   }
   

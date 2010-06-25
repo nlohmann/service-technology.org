@@ -21,13 +21,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedList;
-
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.EarlyExitException;
-import org.antlr.runtime.MismatchedTokenException;
-import org.antlr.runtime.RecognitionException;
 
 /**
  * 
@@ -35,73 +28,7 @@ import org.antlr.runtime.RecognitionException;
  * 
  * @author Dirk Fahland
  */
-public class PetriNetIO {
-  
-  /**
-   * Read Petri net from a text-file.
-   * 
-   * @param fileName
-   * @return the Petri net written in <code>fileName</code>
-   * @throws IOException
-   */
-  public static PetriNet readNetFromFile(String fileName) throws IOException {
-    
-    String ext = fileName.substring(fileName.lastIndexOf('.')+1);
-    
-    if ("lola".equals(ext)) {
-    
-      LoLALexer lex = new LoLALexer(new ANTLRFileStream(fileName));
-      CommonTokenStream tokens = new CommonTokenStream(lex);
-  
-      LoLAParser parser = new LoLAParser(tokens);
-  
-      try {
-        PetriNet result = parser.net();
-        return result;
-          
-      } catch (RecognitionException e)  {
-        if (e instanceof EarlyExitException) {
-          EarlyExitException e2 = (EarlyExitException)e;
-          System.err.println("failed parsing "+fileName);
-          System.err.println("found unexpected '"+e2.token.getText()+"' in "
-              +"line "+e2.line+ " at column "+e2.charPositionInLine);
-          System.exit(1);
-        } else {
-          e.printStackTrace();
-        }
-      }
-      
-    } else if ("owfn".equals(ext)) {
-
-      OWFNLexer lex = new OWFNLexer(new ANTLRFileStream(fileName));
-      CommonTokenStream tokens = new CommonTokenStream(lex);
-  
-      OWFNParser parser = new OWFNParser(tokens);
-  
-      try {
-        PetriNet result = parser.net();
-        return result;
-          
-      } catch (RecognitionException e)  {
-          if (e instanceof EarlyExitException) {
-            EarlyExitException e2 = (EarlyExitException)e;
-            System.err.println("failed parsing "+fileName);
-            System.err.println("found unexpected '"+e2.token.getText()+"' in "
-                +"line "+e2.line+ " at column "+(e2.charPositionInLine+1));
-            System.exit(1);
-          } else if (e instanceof MismatchedTokenException) {
-            MismatchedTokenException e2 = (MismatchedTokenException)e;
-            System.err.println("failed parsing "+fileName);
-            System.err.println("line "+e2.line+":"+(e2.charPositionInLine+1)+" found unexpected "+e2.token.getText());
-            System.exit(1);
-          } else {
-            e.printStackTrace();
-          }
-      }
-    }
-    
-    return null;
-  }
+public class PetriNetIO_out {
   
   public static final int FORMAT_DOT = 1;
   public static final int FORMAT_LOLA = 2;
@@ -120,11 +47,11 @@ public class PetriNetIO {
   public static String toLoLA(PetriNet net) {
     StringBuilder b = new StringBuilder();
     
-    b.append("{\n");
-    b.append("  input file:\n");
-    b.append("  invocation:\n");
-    b.append("  net size:     "+net.getInfo()+"\n");
-    b.append("}\n\n");
+//    b.append("{\n");
+//    b.append("  input file:\n");
+//    b.append("  invocation:\n");
+//    b.append("  net size:     "+net.getInfo()+"\n");
+//    b.append("}\n\n");
     
     // ---------------------- places ------------------------
     b.append("PLACE");
@@ -177,11 +104,11 @@ public class PetriNetIO {
   public static String toOWFN(PetriNet net) {
     StringBuilder b = new StringBuilder();
     
-    b.append("{\n");
-    b.append("  input file:\n");
-    b.append("  invocation:\n");
-    b.append("  net size:     "+net.getInfo()+"\n");
-    b.append("}\n\n");
+//    b.append("{\n");
+//    b.append("  input file:\n");
+//    b.append("  invocation:\n");
+//    b.append("  net size:     "+net.getInfo()+"\n");
+//    b.append("}\n\n");
     
     // ---------------------- places ------------------------
     b.append("PLACE");
@@ -305,57 +232,13 @@ public class PetriNetIO {
       else
         out.write(net.toDot());
     } else if (format == FORMAT_LOLA) {
-      out.write(PetriNetIO.toLoLA(net));
+      out.write(PetriNetIO_out.toLoLA(net));
     } else if (format == FORMAT_OWFN) {
-      out.write(PetriNetIO.toOWFN(net));
+      out.write(PetriNetIO_out.toOWFN(net));
     }
 
     //Close the output stream
     out.close();
 
-  }
-  
-  private static String options_inFile = null;
-  private static int options_outputFormat = 0;
-  
-  private static void parseCommandLine(String args[]) {
-    for (int i=0; i<args.length; i++) {
-      if ("-i".equals(args[i])) {
-        options_inFile = args[++i];
-      }
-      
-      if ("-f".equals(args[i])) {
-        ++i;
-        if ("dot".equals(args[i]))
-          options_outputFormat = FORMAT_DOT;
-        else if ("lola".equals(args[i]))
-          options_outputFormat = FORMAT_LOLA;
-        else if ("owfn".equals(args[i]))
-          options_outputFormat = FORMAT_OWFN;
-      }
-    }
-  }
-
-  /**
-   * Read Petri net from a text-file and write a GraphViz Dot representation
-   * of the net to standard out.
-   * 
-   * @param args
-   * @throws Exception
-   */
-  public static void main(String args[]) throws Exception {
-    
-    parseCommandLine(args);
-    
-    if (options_inFile == null) return;
-    
-    PetriNet net = readNetFromFile(options_inFile);
-    net.anonymizeNet();
-    if (net == null) System.exit(1);
-    
-    if (options_outputFormat == 0)
-      options_outputFormat = FORMAT_DOT;
-    
-    writeToFile(net, options_inFile, options_outputFormat, 0);
   }
 }

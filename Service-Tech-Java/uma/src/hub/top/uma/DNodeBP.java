@@ -103,7 +103,7 @@ public class DNodeBP {
 		options.cutOffEquiv_conditionHistory = true;
 		
     options.checkProperties = true;
-    options.checkProperty_Unsafe = false;
+    configure_setBound(0);
     options.checkProperty_DeadCondition = true;
 	}
 	
@@ -142,8 +142,9 @@ public class DNodeBP {
    */
   public void configure_buildOnly() {
       options.checkProperties = false;
-      options.checkProperty_Unsafe = false;
       options.checkProperty_DeadCondition = false;
+      
+      configure_setBound(0);
       
       options.cutOffTermination_reachability = true;
   }
@@ -153,7 +154,7 @@ public class DNodeBP {
    */
   public void configure_checkProperties() {
       options.checkProperties = true;
-      options.checkProperty_Unsafe = true;
+      configure_setBound(1);
       options.checkProperty_DeadCondition = true;
   }
   
@@ -162,7 +163,7 @@ public class DNodeBP {
    */
   public void configure_stopIfUnSafe() {
       options.checkProperties = true;
-      options.checkProperty_Unsafe = true;
+      configure_setBound(1);
   }
   
   /**
@@ -170,12 +171,31 @@ public class DNodeBP {
    */
   public void configure_synthesis() {
     options.checkProperties = false;
-    options.checkProperty_Unsafe = false;
     options.checkProperty_DeadCondition = false;
+    configure_setBound(0);
       
     options.cutOffTermination_reachability = false;
     options.cutOffTermination_synthesis = true;
   }
+  
+	/**
+	 * set bound of computed prefix, i.e. maximum number of conditions
+	 * with the same label in a cut
+	 * 
+	 * @param k
+	 */
+	public void configure_setBound(int k) {
+		options.boundToCheck = k;
+	}
+	
+	/**
+	 * configure unfolding algorithm to construct BP only
+	 */
+	public void configure_checkSoundness() {
+		options.checkProperties = true;
+	  configure_setBound(1);
+	  options.checkProperty_DeadCondition = true;
+	}
   
   /* ==========================================================================
    * 
@@ -191,8 +211,17 @@ public class DNodeBP {
 	 */
 	private void initialize() {
 	  
-	  _debug_executionTimeProfile.append("time;numConditions;numConditions_red;numConditions_red2;maxDim;Tfind;numCuts;Tcuts\n");
-	
+	  // for computing cuts
+	  //_debug_executionTimeProfile.append("time;numConditions;numConditions_red;numConditions_red2;maxDim;Tfind;numCuts;Tcuts\n");
+	  // for computing event firings
+    _debug_executionTimeProfile.append(
+        "time;"
+       +"sort events;"+"sorted events;"
+       +"fire event;"+"s/m;"
+       +"co;"+"co-checks;"
+       +"primeConfig;"
+       +"cutOff\n");
+
 		// get initial BP
 		bp = dNodeAS.initialRun;
 		bp.setInitialConditions();
@@ -201,12 +230,12 @@ public class DNodeBP {
 		//System.out.println("max nodes: "+bp.maxNodes);
 		
 		// initialize explicit concurrency relation
-		for (DNode d : bp.maxNodes) {
+		for (DNode d : bp.initialConditions) {
 			co.put(d, new HashSet<DNode>());
 			coID.put(d, new HashSet<Short>());
 		}
-		for (DNode d : bp.maxNodes) {
-		  for (DNode d2 : bp.maxNodes) {
+		for (DNode d : bp.initialConditions) {
+		  for (DNode d2 : bp.initialConditions) {
 		    if (d == d2) continue;
 		    co.get(d).add(d2);
 		    co.get(d2).add(d);
@@ -229,80 +258,219 @@ public class DNodeBP {
 		return (b.pre.length > 0) ? b.pre[0] : null;
 	}
 	
+	private void setConcurrent(DNode existing, Set<DNode> cosetEx, DNode newConditions[]) {
+	  
+	  Set<Short> cosetIdEx = coID.get(existing);
+
+	  for (DNode dSymm : newConditions) {
+      
+      if (dSymm == existing) continue;
+      
+      // both are concurrent
+      co.get(dSymm).add(existing);
+      cosetEx.add(dSymm);
+      
+      coID.get(dSymm).add(existing.id);
+      cosetIdEx.add(dSymm.id);
+      
+      // check for unsafe behavior
+      if (options.boundToCheck == 1) {
+        if (existing.id == dSymm.id) {
+          propertyCheck |= PROP_UNSAFE;
+          System.out.println("found two concurrent conditions with the same name: "+existing+", "+dSymm);
+        }
+      }
+    }
+
+	}
+	
 	/**
 	 * Set the explicit concurrency relation for <code>newNode</code> that
 	 * has just been added to the branching process.
+	 * Assumption: <code>newNode.pre != null</code>
 	 * 
 	 * @param newNode
+	 * @param symmetric the same co-relation holds for all nodes in symmetric
 	 */
-	private void updateConcurrencyRelation (DNode newNode) {
+	private void updateConcurrencyRelation (DNode newNode, DNode symmetric[]) {
 		if (newNode.isEvent) return;
 		
 		// the pre-event of newNode has just been added to the branching process
-		DNode preNew = getPreEvent(newNode);
+		DNode preNew = (newNode.pre.length > 0) ? newNode.pre[0] : null;
 		
-		//System.out.println("newNode = "+newNode+", "newNode = "+preNew);
+		if (preNew == null) {
+	    for (DNode existing : bp.getAllConditions()) {
+	      if (existing == newNode)
+	        continue;
+	      
+	      // this applies to all nodes in symmetric (including newNode)
+	      setConcurrent(existing, co.get(existing), symmetric);
+	    }		  
+		}
 		
-		//HashSet<CNode> coset = new HashSet<CNode>();
-		Set<DNode> coset = co.get(newNode);
-		
+		/*
 		for (DNode existing : bp.getAllConditions()) {
 			if (existing == newNode)
 				continue;
 			
-			DNode preExisting = getPreEvent(existing);
-			Set<DNode> cosetEx = co.get(existing);
+			_debug_coCheckCount++;
+			
+			DNode preExisting = (existing.pre.length > 0) ? existing.pre[0] : null;
 			
 			// both have the same predecessor (which is an event)
-			if (preNew == preExisting || preNew == null ) {
-				// both are concurrent
-				coset.add(existing);
-				cosetEx.add(newNode);
-        
-        coID.get(newNode).add(existing.id);
-        coID.get(existing).add(newNode.id);
-        
-				// check for unsafe behavior
-				if (options.checkProperty_Unsafe) {
-				  if (existing.id == newNode.id) {
-				    propertyCheck |= PROP_UNSAFE;
-				    System.out.println("found two concurrent conditions with the same name: "+existing+", "+newNode);
-				  }
-				}
-				
+			if (preNew == preExisting) {
+			  
+			  System.out.println("set co "+existing+" || "+DNode.toString(symmetric));
+			  
+        // both are concurrent
+        // this applies to all nodes in symmetric (including newNode)
+        setConcurrent(existing, co.get(existing), symmetric);
 				continue;
 			}
-			
-			boolean notCo = false;
-			for (DNode p : preNew.pre) {
-				if (!cosetEx.contains(p)) {
-					notCo = true;
-					//System.out.println("~("+existing+" co "+ p+") --> ~("+existing+" co "+newNode+")");
-					break;
-				}
-			}
-			// DNode existing is concurrent to every predecessor of
-			// DNode newNode's pre-event: both are concurrent
-			if (!notCo) {
-				coset.add(existing);
-				cosetEx.add(newNode);
-				
-				coID.get(newNode).add(existing.id);
-				coID.get(existing).add(newNode.id);
-				
-        // check for unsafe behavior
-        if (options.checkProperty_Unsafe) {
-          if (existing.id == newNode.id) {
-            propertyCheck |= PROP_UNSAFE;
-            System.out.println("found two concurrent conditions with the same name: "+existing+", "+newNode);
-          }
-        }
-
-			}
 		}
+		 */
 		
-		co.put(newNode, coset);
+		// collect all nodes that are concurrent to every predecessor node of
+		// the pre-event of 'newNode'
+		HashSet<DNode> preNewPreCo = new HashSet<DNode>();
+		preNewPreCo.addAll(co.get(preNew.pre[0]));
+		for (int i=1; i<preNew.pre.length; i++) {
+		  preNewPreCo.retainAll(co.get(preNew.pre[i]));
+		  
+      _debug_coCheckCount += co.get(preNew.pre[i]).size();
+		}
+ 
+		for (DNode existing : preNewPreCo) {
+		  
+		  _debug_coCheckCount++;
+			
+			// DNode 'existing' is concurrent to every predecessor of
+			// DNode newNode's pre-event: 'existing' and 'newNode' are concurrent
+        
+      // this applies to all nodes in symmetric (including newNode)
+      setConcurrent(existing, co.get(existing), symmetric);
+		}
+		//co.put(newNode, coset);
+		
+    // check for violation of k-boundedness
+    if (options.boundToCheck > 1) {
+      int coNum = 0;
+      for (DNode other : co.get(newNode)) {
+        if (other.id == newNode.id) coNum++;
+      }
+      
+      if (coNum >= options.boundToCheck) {
+        // found k other concurrent conditions with the same id
+        // bound violated
+        propertyCheck |= PROP_UNSAFE;
+        System.out.println("conditions "+newNode+" has "+coNum+" concurrent conditions with the same name");
+      }
+    }
 	}
+	
+	/*
+	private void updateConcurrencyRelation (DNode newNode, DNode symmetric[]) {
+	    if (newNode.isEvent) return;
+	    
+	    // the pre-event of newNode has just been added to the branching process
+	    DNode preNew = (newNode.pre.length > 0) ? newNode.pre[0] : null;
+	    
+	    //System.out.println("newNode = "+newNode+", "newNode = "+preNew);
+	    
+	    //HashSet<CNode> coset = new HashSet<CNode>();
+	    //Set<DNode> coset = co.get(newNode);
+	    
+	    for (DNode existing : bp.getAllConditions()) {
+	      if (existing == newNode)
+	        continue;
+	      
+	      _debug_coCheckCount++;
+	      
+	      DNode preExisting = (existing.pre.length > 0) ? existing.pre[0] : null;
+	      Set<DNode> cosetEx = co.get(existing);
+	      
+	      // both have the same predecessor (which is an event)
+	      if (preNew == preExisting || preNew == null ) {
+	        // both are concurrent
+	        
+	        // this applies to all nodes in symmetric (including newNode)
+	        for (DNode dSymm : symmetric) {
+	          
+	          if (dSymm == existing) continue;
+	          
+	          // both are concurrent
+	          co.get(dSymm).add(existing);
+	          cosetEx.add(dSymm);
+	          
+	          coID.get(dSymm).add(existing.id);
+	          coID.get(existing).add(dSymm.id);
+	          
+	          // check for unsafe behavior
+	          if (options.boundToCheck == 1) {
+	            if (existing.id == dSymm.id) {
+	              propertyCheck |= PROP_UNSAFE;
+	              System.out.println("found two concurrent conditions with the same name: "+existing+", "+dSymm);
+	            }
+	          }
+	        }
+	        
+	        continue;
+	      }
+	      
+	      boolean notCo = false;
+	      for (DNode p : preNew.pre) {
+	        _debug_coCheckCount++;
+	        if (!cosetEx.contains(p)) {
+	          notCo = true;
+	          //System.out.println("~("+existing+" co "+ p+") --> ~("+existing+" co "+newNode+")");
+	          break;
+	        }
+	      }
+	      // DNode existing is concurrent to every predecessor of
+	      // DNode newNode's pre-event: both are concurrent
+	      if (!notCo) {
+	        // both are concurrent
+	        
+	        // this applies to all nodes in symmetric (including newNode)
+	        for (DNode dSymm : symmetric) {
+	          
+	          if (dSymm == existing) continue;
+	          
+	          co.get(dSymm).add(existing);
+	          cosetEx.add(dSymm);
+	          
+	          coID.get(dSymm).add(existing.id);
+	          coID.get(existing).add(dSymm.id);
+	          
+	          // check for unsafe behavior
+	          if (options.boundToCheck == 1) {
+	            if (existing.id == dSymm.id) {
+	              propertyCheck |= PROP_UNSAFE;
+	              System.out.println("found two concurrent conditions with the same name: "+existing+", "+dSymm);
+	            }
+	          }
+	        }
+
+	      }
+	    }
+	    //co.put(newNode, coset);
+	    
+	    // check for violation of k-boundedness
+	    if (options.boundToCheck > 1) {
+	      int coNum = 0;
+	      for (DNode other : co.get(newNode)) {
+	        if (other.id == newNode.id) coNum++;
+	      }
+	      
+	      if (coNum >= options.boundToCheck) {
+	        // found k other concurrent conditions with the same id
+	        // bound violated
+	        propertyCheck |= PROP_UNSAFE;
+	        System.out.println("conditions "+newNode+" has "+coNum+" concurrent conditions with the same name");
+	      }
+	    }
+	  }
+	*/
 	
 	/**
 	 * This map stores for each local history of an event in the system all
@@ -568,7 +736,7 @@ public class DNodeBP {
 	 * Also stores whether a set of events is synchronously enabled at a given
 	 * location.  
 	 */
-	class EnablingInfo {
+	public static class EnablingInfo {
 		public LinkedList< DNode > enabledEvents = new LinkedList<DNode>();
 		public LinkedList< DNode[] > enablingLocation = new LinkedList<DNode[]>();
 		
@@ -681,7 +849,7 @@ public class DNodeBP {
   			  
   	      //_debug_log.append(e+" is enabled at "+DNode.toString(cutNodes)+"\n");
   				
-  				assert loc[e.pre.length] != null : "Error, adding invalid enabling location";
+  				assert loc[e.pre.length-1] != null : "Error, adding invalid enabling location";
   			
   				//System.out.println("  event is enabled");
   				if (lastEnabledID != e.id) {
@@ -793,6 +961,8 @@ public class DNodeBP {
 		if (info.enabledEvents.size() == 0)
 			return 0;
 		
+		long _debug_t1a = System.currentTimeMillis();
+		
 		HashMap<Integer, LinkedList<Integer> > priorityQueue = new HashMap<Integer, LinkedList<Integer> >();
 		int maxSize = 0;
 		for (int i=0; i<info.enabledEvents.size(); i++) {
@@ -803,6 +973,9 @@ public class DNodeBP {
 		  }
 		  priorityQueue.get(configSize).addLast(i);
 		}
+		
+		long _debug_t1b_sort_events = System.currentTimeMillis();
+		int _debug_t1_numSortedEvents = info.enabledEvents.size(); 
 		
 		int firedEvents = 0;
 		
@@ -825,6 +998,9 @@ public class DNodeBP {
 			// array containing the post-conditions that are newly created in the BP by
 			// firing this event
 			DNode[] postConditions = null;
+			
+		  long _debug_t2a = System.currentTimeMillis();
+		  boolean _debug_t2a_multi = false;
 			
 			if (info.synchronizedEvents.get(fireIndex) == null) {
 
@@ -860,21 +1036,24 @@ public class DNodeBP {
 					}
 				}
 				postConditions = bp.fire(events, info.enablingLocation.get(fireIndex));
+				
+				_debug_t2a_multi = true;
 			}
 			
 			// we did not fire this event
 			if (postConditions == null)
 				continue;
+			
+      long _debug_t2b_t3a_fireEvent = System.currentTimeMillis();
 
 			// update co-relation for all new post-conditions
-			for (DNode d : postConditions) {
-				co.put(d, new HashSet<DNode>());
-				coID.put(d, new HashSet<Short>());
-			}
-			for (DNode d : postConditions) {
-				updateConcurrencyRelation(d);
-			}
-
+			updateConcurrencyRelation(postConditions);
+			
+			long _debug_t3b_t4a_co = System.currentTimeMillis();
+			long _debug_t4b_t5a_primeConfig = 0;
+			long _debug_t5b_cutOff = 0;
+			boolean _debug_t5_computed_cutOff = false;
+			
 			if (postConditions.length > 0) {
 			  
   			DNode newEvent = postConditions[0].pre[0];
@@ -883,9 +1062,11 @@ public class DNodeBP {
   			_debug_log.append("having post-conditions "+DNode.toString(postConditions)+"\n");
   			_debug_log.append("from "+toString(newEvent.causedBy)+"\n");
   			
-  			setCurrentPrimeConfig(newEvent);
+  			setCurrentPrimeConfig(newEvent, true);
   			newEvent.isHot = setHot;   // remember temperature of event
   			
+        _debug_t4b_t5a_primeConfig = System.currentTimeMillis();
+        
         // prevent that an anti-event gets successors in
         // the BP, mark each anti-event as a cutoff event
         if (setAnti) {
@@ -897,6 +1078,7 @@ public class DNodeBP {
           // System.out.println("created anti-event "+newEvent);
           _debug_log.append("created anti-event "+toString(primeConfigurationString.get(newEvent))+"\n");
         } else {
+          _debug_t5_computed_cutOff = true;
           
           // for all other events, check whether it is a cutOff event
     			if (isCutOffEvent(newEvent)) {
@@ -907,6 +1089,8 @@ public class DNodeBP {
     			  _debug_log.append(toString(primeConfigurationString.get(newEvent))+"\n");
     			}
         }
+        
+        _debug_t5b_cutOff = System.currentTimeMillis();
 
   			// remember cutOff on post-conditions as well
   			if (newEvent.isCutOff == true)
@@ -923,9 +1107,55 @@ public class DNodeBP {
 			
 			if (options.checkProperties)
 				checkProperties();
+			
+			long _debug_cutOfftime = (_debug_t5_computed_cutOff ? (_debug_t5b_cutOff-_debug_t4b_t5a_primeConfig) : 0);
+			String _debug_multi = (_debug_t2a_multi ? "m" : "s");
+			
+			_debug_executionTimeProfile.append(
+			    (_debug_t5b_cutOff-_debug_t0)+";"
+			   +(_debug_t1b_sort_events-_debug_t1a)+";"+_debug_t1_numSortedEvents+";"
+			   +(_debug_t2b_t3a_fireEvent-_debug_t2a)+";"+_debug_multi+";"
+			   +(_debug_t3b_t4a_co-_debug_t2b_t3a_fireEvent)+";"+_debug_coCheckCount+";"
+         +(_debug_t4b_t5a_primeConfig-_debug_t3b_t4a_co)+";"
+         +(_debug_cutOfftime)+"\n"
+			);
 		 }
 		}
 		return firedEvents;
+	}
+	
+	int _debug_coCheckCount = 0;
+	
+	/**
+	 * Set concurrency relation for post conditions of a new event
+	 * of the branching process.
+	 * 
+	 * @param postConditions
+	 */
+	public void updateConcurrencyRelation(DNode[] postConditions) {
+	  _debug_coCheckCount = 0;
+	  
+    for (DNode d : postConditions) {
+      co.put(d, new HashSet<DNode>());
+      coID.put(d, new HashSet<Short>());
+    }
+    
+    // all post-conditions are mutually concurrent, set the corresponding maps
+    for (int i=0;i<postConditions.length;i++) {
+      Set<DNode> co_i = co.get(postConditions[i]);
+      Set<Short> coID_i = coID.get(postConditions[i]);
+      for (int j=i+1;j<postConditions.length;j++) {
+        co_i.add(postConditions[j]);
+        co.get(postConditions[j]).add(postConditions[i]);
+        coID_i.add(postConditions[j].id);
+        coID.get(postConditions[j]).add(postConditions[i].id);
+      }
+    }
+    
+    //for (DNode d : postConditions) {
+    //  updateConcurrencyRelation(d, new DNode[]{d});
+    //}
+    updateConcurrencyRelation(postConditions[0], postConditions);
 	}
 	
 	/**
@@ -1023,26 +1253,31 @@ public class DNodeBP {
    * {@link #primeConfigurationString} for 'event' that has just been fired.
    * 
    * @param event
+   * @param storeValues  set to <code>true</code> when calling this
+   * method for the first time for 'event', otherwise set to <code>false</code>
    */
-  private void setCurrentPrimeConfig(DNode event) {
+  public void setCurrentPrimeConfig(DNode event, boolean storeValues) {
     
     boolean computePredecessors = false;
     boolean includeEvent = false;
-    
+
+    // collected all predecessor events if using the lexicographic search strategy
     if (options.searchStrat_predecessor || options.searchStrat_lexicographic) computePredecessors = true;
     if (options.searchStrat_size) includeEvent = true;
     
     currentPrimeCut = bp.getPrimeCut(event, computePredecessors, includeEvent);
-    int currentConfigSize = bp.getPrimeConfiguration_size;
-    // collected all predecessor events if using the lexicographic search strategy
     currentPrimeConfig = bp.getPrimeConfiguration;
     
-    primeConfiguration_Size.put(event, currentConfigSize);
-    primeConfiguration_CutHash.put(event, hashCut(currentPrimeCut));
-    
-    // LEXIK: optimization for size-lexicographic search strategy
-    primeConfigurationString.put(event, getLexicographicString(currentPrimeConfig));
-    //primeConfigurationString.put(event, getLexicographicString_acc(currentPrimeConfig));
+    if (storeValues) {
+      int currentConfigSize = bp.getPrimeConfiguration_size;
+
+      primeConfiguration_Size.put(event, currentConfigSize);
+      primeConfiguration_CutHash.put(event, hashCut(currentPrimeCut));
+      
+      // LEXIK: optimization for size-lexicographic search strategy
+      primeConfigurationString.put(event, getLexicographicString(currentPrimeConfig));
+      //primeConfigurationString.put(event, getLexicographicString_acc(currentPrimeConfig));
+    }
   }
   
   /**
@@ -1055,8 +1290,8 @@ public class DNodeBP {
    * @return
    *      true iff <code>event</code> is a cut off event
    */
-  private boolean isCutOffEvent(DNode event) {
-
+  public boolean isCutOffEvent(DNode event) {
+    
     // pick a search strategy for determing the cut off event
     if (options.searchStrat_predecessor) {
       
@@ -2032,13 +2267,13 @@ public class DNodeBP {
 	 */
 	public void minimize() {
 
-	  System.out.println("minimize()");
+	  //System.out.println("minimize()");
 	  
 	  // run a breadth-first search from the maximal nodes of the branching
 	  // process to its initial nodes, for each node that has no equivalent
 	  // smaller node yet, seek an equivalent image node,  
 	  LinkedList<DNode> queue = new LinkedList<DNode>();
-	  queue.addAll(bp.maxNodes);
+	  queue.addAll(bp.getCurrentMaxNodes());
 	  
 	  while (!queue.isEmpty()) {
 	    DNode d = queue.removeFirst();
@@ -2049,7 +2284,7 @@ public class DNodeBP {
 
 	      if (d.post == null || d.post.length == 0) {
 	        // d has no successor, search in all maximal nodes for an equivalent node
-	        for (DNode d_img : bp.maxNodes) {
+	        for (DNode d_img : bp.getCurrentMaxNodes()) {
 	          if (d_img == d) continue;
 	          if (d_img.id != d.id) continue;
 	          // do not map normal nodes to non-existing nodes
@@ -2060,7 +2295,7 @@ public class DNodeBP {
 	          // d0 also has no equivalent node, e.g. is not a cut-off node
 	          // then d and d0 are equivalent
 	          
-	          System.out.println(d+" --> "+d_img+" (max nodes)");
+	          //System.out.println(d+" --> "+d_img+" (max nodes)");
 	          elementary_ccPair.put(d, d_img);
 	          d.isCutOff = true;
 	        }
@@ -2093,13 +2328,13 @@ public class DNodeBP {
 
 	      // find the predecessor of the image of 'd's first successor  that has
 	      // same id (name) as DNode 'd', this predecessor should be 'd_img'
-	      System.out.print("checking 0: "+dPost_img[0]+"...");
+	      //System.out.print("checking 0: "+dPost_img[0]+"...");
 	      for (int j=0; j<dPost_img[0].pre.length; j++)
 	        if (dPost_img[0].pre[j].id == d.id) {
 	          d_img = dPost_img[0].pre[j];
 	          break;
 	        }
-	      System.out.println(" found "+d_img);
+	      //System.out.println(" found "+d_img);
 	      
 	      // the image of the first successor of 'd' has no predecessor with
 	      // the same id as 'd', there is no node we can make equivalent to 'd'
@@ -2114,17 +2349,17 @@ public class DNodeBP {
 	      boolean notFound = false;
 	      for (int i=1; i<dPost_img.length; i++) {
           boolean foundPreFor_i = false;
-          System.out.print("checking "+i+": "+dPost_img[i]+"...");
+          //System.out.print("checking "+i+": "+dPost_img[i]+"...");
           if (dPost_img[i] != null)
   	        for (int j=0; j<dPost_img[i].pre.length; j++) {
   	          if (dPost_img[i].pre[j] == d_img) {
   	            // the i-th successor has 'd_img' as predecessor
-  	            System.out.println(" found again");
+  	            //System.out.println(" found again");
   	            foundPreFor_i = true; break; 
   	          }
   	        }
           if (!foundPreFor_i) {
-            System.out.println(" found not");
+            //System.out.println(" found not");
             // if the ith successor does not have 'd_img' as predecessor,
             // then we have no node we can make equivalent to 'd' 
             notFound = true;
@@ -2135,7 +2370,7 @@ public class DNodeBP {
 	      if (notFound)
 	        continue;  // no match :(
 	      
-	      System.out.println(d+" --> "+d_img+" (successor)");
+	      //System.out.println(d+" --> "+d_img+" (successor)");
 	      elementary_ccPair.put(d, d_img);
 	      d.isCutOff = true;
 	      // extended equivalence relation by 'd' ~ 'd_img' 
@@ -2169,7 +2404,7 @@ public class DNodeBP {
 	        DNode preEquiv = elementary_ccPair.get(d.pre[0]);
 	        for (DNode d0 : preEquiv.post) {
 	          if (d0.id == d.id) {
-	            System.out.println(d+" --> "+d0+" (initial)");
+	            //System.out.println(d+" --> "+d0+" (initial)");
 	            d.isCutOff = true;
 	            updateCCpair(d, d0);
 	            break;
@@ -2266,6 +2501,11 @@ public class DNodeBP {
    * @return a string representation of the statistics
    */
   public String getStatistics() {
+    
+    statistic_condNum = 0;
+    statistic_eventNum = 0;
+    statistic_cutOffNum = 0;
+    statistic_arcNum = 0;
 
     for (DNode n : bp.getAllNodes()) {
       if (n.isEvent) {
@@ -2314,7 +2554,8 @@ public class DNodeBP {
 	 */
   private boolean checkProperties() {
     
-    if (options.checkProperty_Unsafe) {
+    if (options.boundToCheck == 1) {
+      // TODO: generalize to check k-boundedness
       
       if (currentPrimeCut == null)
         return true;
@@ -2366,7 +2607,7 @@ public class DNodeBP {
 		
 		// find a non-cut-off condition in the maximal nodes of the BP
 		int numDeadConditions = 0;
-		for (DNode b : bp.maxNodes) {
+		for (DNode b : bp.getCurrentMaxNodes()) {
 			
 			if (!b.isCutOff) {
 				// this is a non-cut-off condition, see if it corresponds to a
@@ -2468,22 +2709,27 @@ public class DNodeBP {
 	 */
 	public boolean isGloballySafe() {
 		
-		if (!options.checkProperty_Unsafe)
+		if (options.boundToCheck == 0)
 			return true;
 		
-		// compare all concurrent conditions
-		for (Entry<DNode, Set<DNode>> coPairs : co.entrySet()) {
-			// and see if two of them have the same ID
-			short id = coPairs.getKey().id;
-			for (DNode d : coPairs.getValue())
-				// yes: then there is a reachable marking putting two tokens
-				// on the same place, the system is unsafe
-				if (d.id == id) {
-				  propertyCheck |= PROP_UNSAFE;
-					System.out.println("Found two concurrent conditions with the same name: "+coPairs.getKey()+", "+d);
-					return false;
-				}
-		}
+    // compare all concurrent conditions
+    for (Entry<DNode, Set<DNode>> coPairs : co.entrySet()) {
+      // and see if two of them have the same ID
+      short id = coPairs.getKey().id;
+      
+      int coNum = 0;
+      for (DNode d : coPairs.getValue()) {
+        if (d.id == id) coNum++;
+      }
+      
+      if (coNum >= options.boundToCheck) {
+        // found k other concurrent conditions with the same id
+        // bound violated
+        propertyCheck |= PROP_UNSAFE;
+        System.out.println("conditions "+coPairs.getKey()+" has "+coNum+" concurrent conditions with the same name");
+        return false;
+      }
+    }
 		
 		return true;
 	}
@@ -2492,7 +2738,7 @@ public class DNodeBP {
 	 * @return true iff the process is safe
 	 */
 	public boolean isSafe() {
-	  if (!options.checkProperty_Unsafe) return true;
+	  if (options.boundToCheck == 0) return true;
 	  return (propertyCheck & PROP_UNSAFE) == 0;
 	}
 	
@@ -2521,7 +2767,8 @@ public class DNodeBP {
    * Stores all options used in the construction of the branching process 
    */
   public static class Options {
-    //// --- search strategies for finding cut-off events
+    
+	//// --- search strategies for finding cut-off events
     /**
      *  check for cut-off events using the lexicographic order on events:
      *  compare each candidate event only with events that are predecessors
@@ -2583,9 +2830,9 @@ public class DNodeBP {
      */
     protected boolean checkProperties = false;
     /**
-     * check whether the system is unsafe
+     * check whether the system is k-bounded
      */
-    protected boolean checkProperty_Unsafe = false;
+    protected int boundToCheck = 0;
     /**
      * check whether the system has dead conditions (which have no post-event
      */

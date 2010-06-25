@@ -209,31 +209,18 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 			
 			int n_depth = depth.get(n);
 			
-			if (n instanceof Event) {
-				Event e = (Event)n;
-				for (Node post : e.getPreConditions()) {
-					searchQueue.addLast(post);
-					
-					Integer d = depth.get(post);
-					if (d == null || d <= n_depth) {
-						depth.put(post, n_depth+1);	// increment depth of node
-						// and remember maximum depth of a node
-						maxHistoryDepth = Math.max(n_depth+1, maxHistoryDepth);
-					}
-				}
-			} else {
-				Condition b = (Condition)n;
-				for (Node post : b.getPreEvents()) {
-					searchQueue.addLast(post);
-					
-					Integer d = depth.get(post);
-					if (d == null || d <= n_depth) {
-						depth.put(post, n_depth+1);	// increment depth
-						// and remember maximum depth of a node
-						maxHistoryDepth = Math.max(n_depth+1, maxHistoryDepth);
-					}
+			for (Node post : n.getPreSet()) {
+
+	      Integer d = depth.get(post);
+				searchQueue.addLast(post);
+
+				if (d == null || d <= n_depth) {
+					depth.put(post, n_depth+1);	// increment depth of node
+					// and remember maximum depth of a node
+					maxHistoryDepth = Math.max(n_depth+1, maxHistoryDepth);
 				}
 			}
+			if (buildStack.contains(n)) buildStack.remove(n);
 			buildStack.addFirst(n);
 		}
 		

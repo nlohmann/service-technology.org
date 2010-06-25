@@ -40,6 +40,7 @@ import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.eclipse.ResourceHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
+import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.greta.synthesis.DNode2PtNet;
 import hub.top.greta.verification.BuildBP;
@@ -106,6 +107,8 @@ public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
 		
 		if (adaptiveSystem == null)
 			return;
+		
+		DNode.idGen = 0;
 			
 		//final DNodeBP bp = BuildBP.init(adaptiveSystem);
 		final BuildBP build = new BuildBP(adaptiveSystem, selectedFile);

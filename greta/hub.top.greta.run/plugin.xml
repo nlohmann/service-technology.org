@@ -271,6 +271,14 @@
                menubarPath="hub.top.GRETA.run.apDiagramMenu/synthesis">
          </action>
           -->
+         <!-- generate traces for process mining -->
+         <action
+               class="hub.top.greta.synthesis.GenerateLogTraces"
+               enablesFor="1"
+               id="hub.top.GRETA.run.GenerateLogTraces"
+               label="generate log traces"
+               menubarPath="hub.top.GRETA.run.apDiagramMenu/synthesis">
+         </action>
 
       </objectContribution>
 
@@ -318,6 +326,14 @@
                class="hub.top.greta.run.actions.BuildBranchingPTnet"
                id="hub.top.GRETA.run.buildBranchingProcess_ptnet"
                label="build branching process"
+               menubarPath="hub.top.GRETA.run.menu.ptnet/analysis">
+         </action>
+         <!-- compare two branching processes -->
+         <action
+               class="hub.top.greta.run.actions.CompareBranchingPTnet"
+               enablesFor="2"
+               id="hub.top.GRETA.run.compareBranchingProcess_ptnet"
+               label="compare branching processes"
                menubarPath="hub.top.GRETA.run.menu.ptnet/analysis">
          </action>
      </objectContribution>

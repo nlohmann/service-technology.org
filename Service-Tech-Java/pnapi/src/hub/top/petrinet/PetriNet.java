@@ -32,14 +32,12 @@ import java.util.List;
  */
 public class PetriNet {
   
-  protected static int nodeId = 0;
+  protected int nodeId;
 
   // all places of the net
   private HashSet<Place> places;
   // all transitions of the net
   private HashSet<Transition> transitions;
-  // all arcs of the net
-  private HashSet<Arc> arcs;
   
   // all roles of the net
   private HashSet<String> roles;
@@ -50,8 +48,53 @@ public class PetriNet {
   public PetriNet () {
     this.places = new HashSet<Place>();
     this.transitions = new HashSet<Transition>();
-    this.arcs = new HashSet<Arc>();
     this.roles = new HashSet<String>();
+    
+    nodeId = 0;
+  }
+  
+  /**
+   * Create a copy of the given net.
+   * @param net
+   */
+  public PetriNet (PetriNet net) {
+    
+    this();   // initialize basic fields
+    
+    HashMap<Place, Place> createMap = new HashMap<Place, Place>();
+    
+    // and copy the existing Petri net
+    for (Transition t : net.getTransitions()) {
+
+      // consisting of all transitions
+      Transition t_ = this.addTransition(t.getName());
+      
+      // together with their pre-sets
+      for (Place p : t.getPreSet()) {
+        // see if place already exists in the net
+        Place p_ = createMap.get(p);
+        if (p_ == null) {
+          // if not: create it
+          p_ = this.addPlace(p.getName());
+          p_.setTokens(p.getTokens());
+          createMap.put(p, p_);
+        }
+        this.addArc(p_, t_);
+      }
+    
+      // and post-sets
+      for (Place p : t.getPostSet()) {
+        // see if place already exists in the net
+        Place p_ = createMap.get(p);
+        if (p_ == null) {
+          // if not: create it
+          p_ = this.addPlace(p.getName());
+          p_.setTokens(p.getTokens());
+          createMap.put(p, p_);
+        }
+        this.addArc(t_, p_);
+      }
+    }
   }
   
   /**
@@ -125,12 +168,13 @@ public class PetriNet {
    * @return arc from src to tgt
    */
   private Arc _addArc(Node src, Node tgt) {
-    for (Arc a : arcs) {
-      if (a.getSource() == src && a.getTarget() == tgt) return a;
+    for (Arc a : src.getOutgoing()) {
+      if (a.getTarget() == tgt) return a;
     }
     
     Arc a = new Arc(src,tgt);
-    arcs.add(a);
+    src.attachArc(a);
+    tgt.attachArc(a);
     return a;
   }
   
@@ -212,9 +256,32 @@ public class PetriNet {
   }
   
   /**
-   * @return arcs of the net
+   * replace all names of places and transitions with identifiers pNUM and tNUM, respectively
+   */
+  public void anonymizeNet() {
+    int num = 0;
+    for (Transition t : transitions) {
+      this.setName(t, "t"+num);
+      num++;
+    }
+    num = 0;
+    for (Place p : places) {
+      this.setName(p, "p"+num);
+      num++;
+    }
+
+  }
+  
+  /**
+   * @return arcs of the net, iterates over all nodes of the net
+   * and returns the arcs
    */
   public HashSet<Arc> getArcs() {
+    HashSet<Arc> arcs = new HashSet<Arc>();
+    for (Transition t : transitions) {
+      arcs.addAll(t.getIncoming());
+      arcs.addAll(t.getOutgoing());
+    }
     return arcs;
   }
   
@@ -424,7 +491,10 @@ public class PetriNet {
    * @param a
    */
   public void removeArc(Arc a) {
-    arcs.remove(a);
+    Node src = a.getSource();
+    Node tgt = a.getTarget();
+    src.detachArc(a);
+    tgt.detachArc(a);
   }
 
   /**
@@ -471,6 +541,35 @@ public class PetriNet {
   public boolean parallelTransitions(Transition t1, Transition t2) {
     return parallelTransitions(t1, t2, null);
   }
+  
+  public void removeParallelTransitions() {
+    Transition[] trans = getTransitions().toArray(new Transition[getTransitions().size()]);
+    for (int i=0; i<trans.length-1; i++) {
+      if (trans[i] == null) continue;
+      
+      for (int j=i+1; j<trans.length; j++) {
+        if (trans[j] == null) continue;
+        
+        String prefix_i = trans[i].getName();
+        String prefix_j = trans[j].getName();
+        
+        if (prefix_i.equals(prefix_j)) {
+  
+          if (parallelTransitions(trans[i], trans[j], null)) {
+            if (trans[i].id < trans[j].id) {
+              removeTransition(trans[j]);
+              trans[j] = null;
+            } else {
+              removeTransition(trans[i]);
+              trans[i] = null;
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
 
   /**
    * structurally reduce the Petri net to remove all tau transitions
@@ -576,10 +675,10 @@ public class PetriNet {
       else
         b.append("  p"+nodeID+" []\n");
       
-      String auxLabel = "ROLES: "+toString(p.getRoles());
+      String auxLabel = ""; //"ROLES: "+toString(p.getRoles());
         
       b.append("  p"+nodeID+"_l [shape=none];\n");
-      b.append("  p"+nodeID+"_l -> p"+nodeID+" [headlabel=\""+toLoLA_ident(p.getName())+" "+auxLabel+"\"]\n");
+      b.append("  p"+nodeID+"_l -> p"+nodeID+" [headlabel=\""+p.getName()+" "+auxLabel+"\"]\n");
     }
 
     // then print all events
@@ -591,10 +690,10 @@ public class PetriNet {
 
       b.append("  t"+nodeID+" []\n");
       
-      String auxLabel  = "ROLES: "+toString(t.getRoles());
+      String auxLabel  = "";  //"ROLES: "+toString(t.getRoles());
       
       b.append("  t"+nodeID+"_l [shape=none];\n");
-      b.append("  t"+nodeID+"_l -> t"+nodeID+" [headlabel=\""+toLoLA_ident(t.getName())+" "+auxLabel+"\"]\n");
+      b.append("  t"+nodeID+"_l -> t"+nodeID+" [headlabel=\""+t.getName()+" "+auxLabel+"\"]\n");
     }
     
     /*
@@ -612,7 +711,7 @@ public class PetriNet {
     // finally, print all edges
     b.append("\n\n");
     b.append(" edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black];\n");
-    for (Arc arc : arcs) {
+    for (Arc arc : getArcs()) {
       if (arc.getSource() instanceof Transition)
         b.append("  t"+nodeIDs.get(arc.getSource())+" -> p"+nodeIDs.get(arc.getTarget())+" [weight=10000.0]\n");
       else
@@ -638,6 +737,7 @@ public class PetriNet {
     b.append("edge [fontname=\"Helvetica\" fontsize=8 color=white arrowhead=none weight=\"20.0\"];\n");
 
     String tokenFillString = "fillcolor=black peripheries=2 height=\".2\" width=\".2\" ";
+    String preconditionFillString = "fillcolor=gray66";
     
     HashMap<Node, Integer> nodeIDs = new HashMap<Node, Integer>();
     int nodeID = 0;
@@ -670,13 +770,15 @@ public class PetriNet {
         
         if (p.getTokens() > 0)
           b.append("  p"+nodeID+" ["+tokenFillString+"]\n");
+        else if (p.getIncoming().isEmpty())
+          b.append("  p"+nodeID+" ["+preconditionFillString+"]\n");
         else
           b.append("  p"+nodeID+" []\n");
         
-        String auxLabel = "ROLES: "+toString(p.getRoles());
+        String auxLabel = "";//"ROLES: "+toString(p.getRoles());
           
         b.append("  p"+nodeID+"_l [shape=none];\n");
-        b.append("  p"+nodeID+"_l -> p"+nodeID+" [headlabel=\""+toLoLA_ident(p.getName())+" "+auxLabel+"\"]\n");
+        b.append("  p"+nodeID+"_l -> p"+nodeID+" [headlabel=\""+p.getName()+" "+auxLabel+"\"]\n");
       }
   
       // then print all events
@@ -691,10 +793,10 @@ public class PetriNet {
   
         b.append("  t"+nodeID+" []\n");
         
-        String auxLabel  = "ROLES: "+toString(t.getRoles());
+        String auxLabel  = "";//"ROLES: "+toString(t.getRoles());
         
         b.append("  t"+nodeID+"_l [shape=none];\n");
-        b.append("  t"+nodeID+"_l -> t"+nodeID+" [headlabel=\""+toLoLA_ident(t.getName())+" "+auxLabel+"\"]\n");
+        b.append("  t"+nodeID+"_l -> t"+nodeID+" [headlabel=\""+t.getName()+" "+auxLabel+"\"]\n");
       }
       
       b.append("}\n\n");  //subgraph
@@ -713,6 +815,8 @@ public class PetriNet {
       
       if (p.getTokens() > 0)
         b.append("  p"+nodeID+" ["+tokenFillString+"]\n");
+      else if (p.getIncoming().isEmpty())
+        b.append("  p"+nodeID+" ["+preconditionFillString+"]\n");
       else
         b.append("  p"+nodeID+" []\n");
       
@@ -725,7 +829,7 @@ public class PetriNet {
     // finally, print all edges
     b.append("\n\n");
     b.append(" edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black];\n");
-    for (Arc arc : arcs) {
+    for (Arc arc : getArcs()) {
       if (arc.getSource() instanceof Transition)
         b.append("  t"+nodeIDs.get(arc.getSource())+" -> p"+nodeIDs.get(arc.getTarget())+" [weight=10000.0]\n");
       else
@@ -740,7 +844,7 @@ public class PetriNet {
    * @return brief summary about this net
    */
   public String getInfo() {
-    return "|P|= "+places.size()+"  |P_in|= "+0+"  |P_out|= "+0+"  |T|= "+transitions.size()+"  |F|= "+arcs.size();
+    return "|P|= "+places.size()+"  |P_in|= "+0+"  |P_out|= "+0+"  |T|= "+transitions.size()+"  |F|= "+getArcs().size();
   }
   
   /**

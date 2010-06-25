@@ -53,9 +53,9 @@ public class DNodeSet {
 	}
 
 	/**
-	 * nodes without successor
+	 * nodes without successor before firing the first event
 	 */
-	public DNodeSetElement maxNodes = null;
+	private HashSet<DNode> maxNodesInitial = null;
 	
 	/**
 	 * The conditions in this {@link DNodeSet} that are maximal before the first
@@ -77,7 +77,7 @@ public class DNodeSet {
 	 * @param num  initial number of nodes in this set
 	 */
 	public DNodeSet (int num) {
-		maxNodes = new DNodeSetElement();	// initialize hash-table size
+	  maxNodesInitial = new HashSet<DNode>();	// initialize hash-table size
 		allConditions = new DNodeSetElement();
 		allEvents = new DNodeSetElement();
 	}
@@ -94,7 +94,7 @@ public class DNodeSet {
 		initialConditions = new DNodeSetElement();	// initialize hash-table size
 		// all maximal nodes of the branching process before firing any event
 		// represent the initial conditions of this branching process, store them
-		initialConditions.addAll(maxNodes);
+		initialConditions.addAll(maxNodesInitial);
 		
 		// and translate into the array for detecting cut-off events 
 		initialCut = new DNode[initialConditions.size()];
@@ -117,16 +117,19 @@ public class DNodeSet {
 	  // add all initial nodes and all their transitive predecessors to the
 	  // set of all nodes of this set
 	  queue.addAll(initialConditions);
+	  seen.addAll(initialConditions);
 	  while (!queue.isEmpty()) {
 	    DNode d = queue.removeFirst();
-	    seen.add(d);
 	    
 	    if (d.isEvent) allEvents.add(d);
 	    //if (!d.isEvent && !initialConditions.contains(d)) allConditions.add(d);
 	    
 	    if (d.pre != null)
 	      for (DNode pre : d.pre) {
-	        if (!seen.contains(pre)) queue.add(pre);
+	        if (!seen.contains(pre)) {
+	          queue.add(pre);
+	          seen.add(pre);
+	        }
 	      }
 	  }
 	}
@@ -145,14 +148,14 @@ public class DNodeSet {
 		// the predecessors of newNode are no longer maxNodes in this set
 		// remove all nodes from this set's maxNodes that are in the pre-set of newNode
 		DNodeSetElement toRemove = new DNodeSetElement();
-		for (DNode d : maxNodes) {
+		for (DNode d : maxNodesInitial) {
 			if (newNode.preContains_identity(d)) {
 				toRemove.add(d);
 			}
 		}
-		maxNodes.removeAll(toRemove);
+		maxNodesInitial.removeAll(toRemove);
 		// and add the newNode to maxNodes
-		maxNodes.add(newNode);
+		maxNodesInitial.add(newNode);
 		
 		// and store the newNode as event or condition
 		if (newNode.isEvent) allEvents.add(newNode);
@@ -163,19 +166,39 @@ public class DNodeSet {
 	 * @return all nodes in this {@link DNodeSet} by backwards search from its
 	 * {@link DNodeSet#maxNodes}
 	 */
-	public HashSet<DNode> getAllNodes() {
+	public DNodeSetElement getAllNodes() {
+	  /*
 		LinkedList<DNode> queue = new LinkedList<DNode>(maxNodes);
-		HashSet<DNode> allNodes = new HashSet<DNode>();
+		HashSet<DNode> allNodes = new HashSet<DNode>(maxNodes);
 		while (!queue.isEmpty()) {
 			DNode n = queue.removeFirst();
 			if (n == null) continue;
-			allNodes.add(n);
 			for (int i=0; i<n.pre.length; i++) {
-			  if (!allNodes.contains(n.pre[i]))
+			  if (n.pre[i] == null) continue;
+			  if (!allNodes.contains(n.pre[i])) {
 			    queue.add(n.pre[i]);
+		      allNodes.add(n.pre[i]);
+			  }
 			}
-		}
+		}*/
+	  DNodeSetElement allNodes = new DNodeSetElement();
+	  allNodes.addAll(allConditions);
+	  allNodes.addAll(allEvents);
 		return allNodes;
+	}
+	
+	/**
+	 * @return a list of all nodes that have no successor
+	 */
+	public LinkedList<DNode> getCurrentMaxNodes() {
+	  LinkedList<DNode> currentMaxNodes = new LinkedList<DNode>();
+	  for (DNode b : allConditions) {
+	    if (b.post == null || b.post.length == 0) currentMaxNodes.add(b);
+	  }
+    for (DNode e : allEvents) {
+      if (e.post == null || e.post.length == 0) currentMaxNodes.add(e);
+    }
+	  return currentMaxNodes;
 	}
 	
 	/**
@@ -242,14 +265,15 @@ public class DNodeSet {
 		// the set of post-conditions of all predecessors of 'event', this set gets
 		// updated as the predecessors of 'event' are discovered
 		HashSet<DNode> postConditions = new HashSet<DNode>();
+		
+    // the events of the prime configuration of 'event'
+    HashSet<DNode> primeConfiguration = new HashSet<DNode>();
 
     // find all predecessor events of 'event' and their post-conditions
     // by backwards breadth-first search from 'event'
     LinkedList<DNode> queue = new LinkedList<DNode>();
     queue.add(event);
-    
-		// the events of the prime configuration of 'event'
-		HashSet<DNode> primeConfiguration = new HashSet<DNode>();
+    primeConfiguration.add(event);
 		
 		// conditions with a post-event that is a predecessor of 'event', these
 		// conditions cannot be in the prime cut of 'event'
@@ -259,8 +283,7 @@ public class DNodeSet {
 		while (!queue.isEmpty()) {
 			
 			DNode first = queue.removeFirst();
-	    primeConfiguration.add(first);
-			
+      
 			// add all post-conditions to the prime-cut that are not consumed by successors
 			for (DNode post : first.post) {
 				if (!consumedConditions.contains(post))
@@ -277,6 +300,7 @@ public class DNodeSet {
 					if (!primeConfiguration.contains(preEvent)) {
 					  // only add to the queue if not queued already
 						queue.add(preEvent);
+			      primeConfiguration.add(preEvent);
 					}
 				} // all predecessor events of preCondition
 			} // all preconditions of the current event
@@ -317,21 +341,29 @@ public class DNodeSet {
 	}
 	
   public int getConfigSize(DNode[] extensionLocation) {
-    
-    // find all predecessor events of 'extensionLocation'
-    // by backwards breadth-first search from 'extensionLocation'
-    LinkedList<DNode> queue = new LinkedList<DNode>();
-    for (int i=0;i<extensionLocation.length;i++)
-      queue.add(extensionLocation[i]);
-    
-    // the events of the configuration before 'extensionLocation'
+    return getConfiguration(extensionLocation).size();
+  }
+  
+  public HashSet<DNode> getConfiguration(DNode[] cut) {
+    // the events of the configuration before 'cut'
     HashSet<DNode> configuration = new HashSet<DNode>();
-    
+
+    // find all predecessor events of 'cut'
+    // by backwards breadth-first search from 'cut'
+    LinkedList<DNode> queue = new LinkedList<DNode>();
+    for (DNode b : cut) {
+      for (DNode preEvent : b.pre) {
+        if (!configuration.contains(preEvent)) {
+          // only add to the queue if not queued already
+          queue.add(preEvent);
+          configuration.add(preEvent);
+        }
+      }
+    }
     // run breadth-first search
     while (!queue.isEmpty()) {
       
       DNode first = queue.removeFirst();
-      configuration.add(first);
       
       for (DNode preCondition : first.pre)
       {
@@ -340,12 +372,13 @@ public class DNodeSet {
           if (!configuration.contains(preEvent)) {
             // only add to the queue if not queued already
             queue.add(preEvent);
+            configuration.add(preEvent);
           }
         } // all predecessor events of preCondition
       } // all preconditions of the current event
     } // breadth-first search
 
-    return configuration.size();
+    return configuration;
   }
 	
 	/**
@@ -371,28 +404,26 @@ public class DNodeSet {
 		newEvent.causedBy[0] = ocletEvent.globalId;
 		
 		// set post-node of conditions
-		for (DNode preNode : fireLocation)	
+		for (DNode preNode : fireLocation) {
 			preNode.addPostNode(newEvent);
+			
+	    // remove pre-set of newEvent from the maxNodes
+			//maxNodes.remove(preNode);
+		}
 		
 		// instantiate the post-conditions of the oclet event
 		DNode postConditions[] = new DNode[ocletEvent.post.length];
 		for (int i=0; i<postConditions.length; i++) {
-			postConditions[i] = new DNode(ocletEvent.post[i].id, 1);
+			postConditions[i] = new DNode(ocletEvent.post[i].id, newEvent);
 			allConditions.add(postConditions[i]);
-
-			// predecessor is the new event
-			postConditions[i].pre[0] = newEvent;
-
-			assert postConditions[i] != null : "Error, created null post-condition!";
+			//assert postConditions[i] != null : "Error, created null post-condition!";
+			
+		  // add post-set of newEvent to the maxNodes
+			//maxNodes.add(postConditions[i]);
 		}
-		
 		// set post-nodes of the event
 		newEvent.post = postConditions;
 		
-		// remove pre-set of newEvent from the maxNodes
-		maxNodes.removeAll(Arrays.asList(fireLocation));
-		// add post-set of newEvent to the maxNodes
-		maxNodes.addAll(Arrays.asList(postConditions));
 		return postConditions;
 	}
 	
@@ -414,50 +445,59 @@ public class DNodeSet {
 		allEvents.add(newEvent);
 		
 		// set post-node of conditions
-		for (DNode preNode : fireLocation)
+		for (DNode preNode : fireLocation) {
 			preNode.addPostNode(newEvent);
+		  // remove pre-set of newEvent from the maxNodes
+			//maxNodes.remove(preNode);
+		}
 
     // remember the oclet event that caused this node, required for determining
     // cutOff events
 		newEvent.causedBy = new int[ocletEvents.length];
+
+    // collect the IDs of all post-conditions of all events
+		// for improved efficiency, create a boolean-array for all condition IDs
+		// in the post-conditions of 'ocletEvents'
 		
-		// create a sorted list of all post-conditions of all events
-		DNode.SortedLinearList list = new DNode.SortedLinearList();
-		for (int i=0; i<ocletEvents.length; i++) {
-			
-	    // remember the oclet event that caused this node, required for determining
-	    // cutOff events
-			newEvent.causedBy[i] = ocletEvents[i].globalId;
-			
-			for (int j=0; j<ocletEvents[i].post.length; j++)
-				list = list.add(ocletEvents[i].post[j]);
+		// get length of the array = max ID
+		short maxPostConditionID = 0; 
+		for (DNode e : ocletEvents) {
+		  if (e.post[e.post.length-1].id > maxPostConditionID)
+		    maxPostConditionID = e.post[e.post.length-1].id;
 		}
-		
-		// remove duplicate post-conditions (these are merged)
-		list.removeDuplicateIDs();
+		// set array entry to true if a post-condition has the corresponding ID
+		boolean[] postConditionIDs = new boolean[maxPostConditionID+1];
+		int postCount = 0;
+		for (int i=0; i<ocletEvents.length; i++) {
+
+      // remember the oclet event that caused this node, required for determining
+      // cutOff events
+      newEvent.causedBy[i] = ocletEvents[i].globalId;
+      for (DNode b : ocletEvents[i].post) {
+        if (!postConditionIDs[b.id]) {
+          postCount++;
+          postConditionIDs[b.id] = true;  
+        }
+      }
+    }
+    // now convert the boolean array to a short array of IDs 
 		
 		// instantiate the remaining post-conditions of the new oclet event
-		DNode postConditions[] = new DNode[list.length()];
+		DNode postConditions[] = new DNode[postCount];
 		int i = 0;
-		for (DNode post : list) {
-			postConditions[i] = new DNode(post.id, 1);
-			allConditions.add(postConditions[i]);
-
-			// predecessor is the new event
-			postConditions[i].pre[0] = newEvent;
+		for (short id = 0; id < postConditionIDs.length; id++) {
+		  if (!postConditionIDs[id]) continue;
+			DNode b = new DNode(id, newEvent);
+			allConditions.add(b);
+			//maxNodes.add(b);
+			//assert postConditions[i] != null : "Error, created null post-condition!";
 			
-			assert postConditions[i] != null : "Error, created null post-condition!";
-			
+			postConditions[i] = b;
 			i++;
 		}
-		
 		// set post-nodes of the event
 		newEvent.post = postConditions;
 		
-		// remove pre-set of newEvent from the maxNodes
-		maxNodes.removeAll(Arrays.asList(fireLocation));
-		// add post-set of newEvent to the maxNodes
-		maxNodes.addAll(Arrays.asList(postConditions));
 		return postConditions;
 	}
 	

@@ -27,6 +27,7 @@ import hub.top.petrinet.Transition;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.InvalidModelException;
+import hub.top.uma.DNodeSet.DNodeSetElement;
 
 public class Unfolder_PetriNet {
   
@@ -83,7 +84,7 @@ public class Unfolder_PetriNet {
   public PetriNet getUnfoldingAsPetriNet() {
 
     PetriNet unfolding = new PetriNet();
-    HashSet<DNode> allNodes = bp.getBranchingProcess().getAllNodes();
+    DNodeSetElement allNodes = bp.getBranchingProcess().getAllNodes();
     
     HashMap<Integer, Node> nodeMap = new HashMap<Integer, Node>();
     

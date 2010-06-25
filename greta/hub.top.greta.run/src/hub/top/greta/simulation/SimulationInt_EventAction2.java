@@ -115,6 +115,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
     // TODO: compute system when starting simulation, update adaptive process only
     DNodeSys_AdaptiveSystem system = new DNodeSys_AdaptiveSystem(simView.adaptiveSystem);
     DNodeBP bp = new DNodeBP_Scenario(system);
+    bp.configure_Scenarios();
     bp.configure_buildOnly();
     
 // for debugging
@@ -150,7 +151,7 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
       // we identify the fired events as the pre-events of the maximal conditions
       // of the current process instance as computed by Uma
       HashSet<DNode> firedEvents = new HashSet<DNode>();
-      for (DNode b : bps.maxNodes) {
+      for (DNode b : bps.getCurrentMaxNodes()) {
         if (b.pre == null || b.pre.length == 0) continue;
         firedEvents.add(b.pre[0]);
       }

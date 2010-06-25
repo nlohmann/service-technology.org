@@ -59,7 +59,7 @@ public abstract class DNodeSys {
 	/**
 	 * The highest name ID that has been given.
 	 */
-  public short currentNameID = 0;
+  public short currentNameID;
 	
 	/**
 	 * A {@link DNodeSys} has two kinds of events. This set contains all events of
@@ -164,6 +164,8 @@ public abstract class DNodeSys {
 	protected DNodeSys () {
 		DNode.idGen = 0;				// reset IDs
 		
+		currentNameID = 0;
+		
 		maxHistoryDepth = -1;
 		DNode.translationTable = this;	// everything happens wrt. to this class
 		
@@ -193,9 +195,12 @@ public abstract class DNodeSys {
 	 * <code>(name_i, i)</code> with indices i=0,...,(nameToID.size() - 1)
 	 */
 	protected void finalize_setProperNames () {
-	  
+
 	  if (!nameToID.containsKey(NAME_TAU))
 	    nameToID.put(NAME_TAU, currentNameID++);
+
+	  if (!nameToID.containsKey("uma_end_event"))
+	    nameToID.put("uma_end_event", currentNameID++);
 	  
 		properNames = new String[nameToID.size()];
 		for (Entry<String,Short> line : nameToID.entrySet()) {

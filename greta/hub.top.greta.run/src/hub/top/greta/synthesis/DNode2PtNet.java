@@ -37,7 +37,6 @@
 package hub.top.greta.synthesis;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 import hub.top.editor.ptnetLoLA.ArcToPlace;
 import hub.top.editor.ptnetLoLA.ArcToTransition;
@@ -49,6 +48,7 @@ import hub.top.editor.ptnetLoLA.PtnetLoLAPackage;
 import hub.top.editor.ptnetLoLA.Transition;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeSet.DNodeSetElement;
 
 /**
  * Output a branching process as a Petri net model {@link PtNet} for
@@ -62,7 +62,7 @@ public class DNode2PtNet {
     
     PtnetLoLAFactory fact = PtnetLoLAPackage.eINSTANCE.getPtnetLoLAFactory();
     PtNet net = fact.createPtNet();
-    HashSet<DNode> allNodes = bp.getBranchingProcess().getAllNodes();
+    DNodeSetElement allNodes = bp.getBranchingProcess().getAllNodes();
     
     HashMap<Integer, Node> nodeMap = new HashMap<Integer, Node>();
     

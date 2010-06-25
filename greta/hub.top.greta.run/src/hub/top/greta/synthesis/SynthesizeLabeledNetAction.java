@@ -35,13 +35,20 @@
 
 package hub.top.greta.synthesis;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedList;
+
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.Oclet;
 import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
+import hub.top.greta.run.Activator;
 import hub.top.greta.run.actions.ActionHelper;
 import hub.top.greta.verification.BuildBP;
 import hub.top.greta.verification.IOUtil;
+import hub.top.petrinet.Place;
+import hub.top.petrinet.Transition;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -116,21 +123,83 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         
+        long t0 = System.currentTimeMillis();
+        
         monitor.beginTask("Synthesizing Labeled Net", IProgressMonitor.UNKNOWN);
 
         // build branching process
         boolean interrupted = !build.run(monitor, System.out);
         
+        long t1 = System.currentTimeMillis();
+        System.out.println("completeted after "+(t1-t0)+"ms ");
+        System.out.println(build.getBranchingProcess().getStatistics());
+        
         if (!interrupted && selectedFile != null) {
           monitor.subTask("generating labeled net");
 
+          /*
           PtNet net = NetSynthesis.foldToNet_labeled(build.getBranchingProcess());
           IPath targetPath = selectedFile.getFullPath().removeFileExtension().addFileExtension("ptnet");
+          */
           
           build.writeBPtoFile(monitor, null, "_synbp");
           
+          /*
           TransactionalEditingDomain editing = GMFEditingDomainFactory.INSTANCE.createEditingDomain();
           FileIOHelper.writeEObjectToResource(net, editing, targetPath);
+          */
+
+          try {
+            hub.top.petrinet.PetriNet net2 = hub.top.uma.synthesis.NetSynthesis.foldToNet_labeled(build.getBranchingProcess());
+            
+            hub.top.petrinet.PetriNetIO_out.writeToFile(net2, selectedFile.getRawLocation().removeFileExtension().toString(), hub.top.petrinet.PetriNetIO_out.FORMAT_LOLA, 0);
+
+            
+            hub.top.petrinet.PetriNet net_controller = new hub.top.petrinet.PetriNet(net2);
+            String[] keep = new String[] { "controller" };
+            removeAllNodesNotIn(net_controller, keep);
+            net_controller.removeParallelTransitions();
+            net_controller.removeIsolatedNodes();
+            hub.top.petrinet.PetriNetIO_out.writeToFile(net_controller, selectedFile.getRawLocation().removeFileExtension().toString()+"_controller", hub.top.petrinet.PetriNetIO_out.FORMAT_LOLA, 0);
+
+            hub.top.petrinet.PetriNet net_Floor1Btn = new hub.top.petrinet.PetriNet(net2);
+            keep = new String[] { "Floor1Btn" };
+            removeAllNodesNotIn(net_Floor1Btn, keep);
+            net_Floor1Btn.removeParallelTransitions();
+            net_Floor1Btn.removeIsolatedNodes();
+            hub.top.petrinet.PetriNetIO_out.writeToFile(net_Floor1Btn, selectedFile.getRawLocation().removeFileExtension().toString()+"_Floor1Btn", hub.top.petrinet.PetriNetIO_out.FORMAT_LOLA, 0);
+            
+            hub.top.petrinet.PetriNet net_Floor2Btn = new hub.top.petrinet.PetriNet(net2);
+            keep = new String[] { "Floor2Btn" };
+            removeAllNodesNotIn(net_Floor2Btn, keep);            
+            net_Floor2Btn.removeParallelTransitions();
+            net_Floor2Btn.removeIsolatedNodes();
+            hub.top.petrinet.PetriNetIO_out.writeToFile(net_Floor2Btn, selectedFile.getRawLocation().removeFileExtension().toString()+"_Floor2Btn", hub.top.petrinet.PetriNetIO_out.FORMAT_LOLA, 0);
+
+            hub.top.petrinet.PetriNet net_Floor3Btn = new hub.top.petrinet.PetriNet(net2);
+            keep = new String[] { "Floor3Btn" };
+            removeAllNodesNotIn(net_Floor3Btn, keep);            
+            net_Floor3Btn.removeParallelTransitions();
+            net_Floor3Btn.removeIsolatedNodes();
+            hub.top.petrinet.PetriNetIO_out.writeToFile(net_Floor3Btn, selectedFile.getRawLocation().removeFileExtension().toString()+"_Floor3Btn", hub.top.petrinet.PetriNetIO_out.FORMAT_LOLA, 0);
+
+            hub.top.petrinet.PetriNet net_elevator = new hub.top.petrinet.PetriNet(net2);
+            keep = new String[] { "e.floor", "e.doors" };
+            removeAllNodesNotIn(net_elevator, keep);            
+            net_elevator.removeParallelTransitions();
+            net_elevator.removeIsolatedNodes();
+            hub.top.petrinet.PetriNetIO_out.writeToFile(net_elevator, selectedFile.getRawLocation().removeFileExtension().toString()+"_elevator", hub.top.petrinet.PetriNetIO_out.FORMAT_LOLA, 0);
+
+            hub.top.petrinet.PetriNet net_user = new hub.top.petrinet.PetriNet(net2);
+            keep = new String[] { "user" };
+            removeAllNodesNotIn(net_user, keep);            
+            net_user.removeParallelTransitions();
+            net_user.removeIsolatedNodes();
+            hub.top.petrinet.PetriNetIO_out.writeToFile(net_user, selectedFile.getRawLocation().removeFileExtension().toString()+"_user", hub.top.petrinet.PetriNetIO_out.FORMAT_LOLA, 0);
+          
+          } catch (IOException e) {
+            Activator.getPluginHelper().logError("Could not write Petri net plain text file", e);
+          }
         }
         monitor.done();
         
@@ -144,6 +213,39 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
       
     bpBuildJob.setUser(true);
     bpBuildJob.schedule();
+  }
+  
+  public static void removeAllNodesNotIn(hub.top.petrinet.PetriNet net, String[] keep) {
+    LinkedList<hub.top.petrinet.Node> toRemove = new LinkedList<hub.top.petrinet.Node>();
+    for (hub.top.petrinet.Place p : net.getPlaces()) {
+      boolean containsKeep = false;
+      for (String s : keep) {
+        if (p.getName().startsWith(s)) {
+          containsKeep = true; break;
+        }
+      }
+      if (!containsKeep) toRemove.add(p);
+    }
+    
+    for (hub.top.petrinet.Transition t : net.getTransitions()) {
+      boolean neededTransition = false;
+      for (hub.top.petrinet.Place p : t.getPreSet()) {
+        if (!toRemove.contains(p)) {
+          neededTransition = true; break;
+        }
+      }
+      for (hub.top.petrinet.Place p : t.getPostSet()) {
+        if (!toRemove.contains(p)) {
+          neededTransition = true;
+        }
+      }
+      if (!neededTransition) toRemove.add(t);
+    }
+    
+    for (hub.top.petrinet.Node n : toRemove) {
+      if (n instanceof hub.top.petrinet.Place) net.removePlace((hub.top.petrinet.Place)n);
+      else if (n instanceof hub.top.petrinet.Transition) net.removeTransition((hub.top.petrinet.Transition)n);
+    }
   }
   
   public void selectionChanged(IAction action, ISelection selection) {

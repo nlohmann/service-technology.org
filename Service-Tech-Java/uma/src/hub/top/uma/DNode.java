@@ -66,6 +66,18 @@ public class DNode {
 	 */
 	public int causedBy[] = null;	// remember globalIDs of events that generated this event
 	
+	 /**
+   * New node with a single known predecessors node.
+   * 
+   * @param id   of the new node
+   * @param pre  predecessor node
+   */
+  public DNode (short id, DNode pre) {
+    //origin = n;
+    this.id = id;
+    this.pre = new DNode[]{pre};
+  }
+	
 	/**
 	 * New node with known predecessors nodes. Sorts the precedessor array by
 	 * their ids.
@@ -76,7 +88,6 @@ public class DNode {
 		//origin = n;
 		this.id = id;
 		this.pre = sortIDs(pre);
-
 	}
 	
 	/**

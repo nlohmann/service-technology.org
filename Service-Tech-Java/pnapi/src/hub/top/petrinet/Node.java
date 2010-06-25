@@ -18,7 +18,6 @@
 package hub.top.petrinet;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -35,10 +34,17 @@ public abstract class Node {
   private String    name;
   public boolean    tau;
   
-  private int id;
+  public final int id;
   
   // the roles this node is associated to
   private HashSet<String> roles;
+  
+  // incoming arcs
+  private HashSet<Arc> incoming;
+
+  // outgoing arcs
+  private HashSet<Arc> outgoing;
+
   
   /**
    * Create a new node.
@@ -50,6 +56,9 @@ public abstract class Node {
     this.setName(name);
     this.roles = new HashSet<String>();
     this.id = net.getNextNodeID();
+    
+    this.incoming = new HashSet<Arc>();
+    this.outgoing = new HashSet<Arc>();
   }
 
   /**
@@ -116,27 +125,49 @@ public abstract class Node {
    * @return post-nodes of this node
    */
   public abstract List<? extends Node> getPostSet();
+  
+  /**
+   * Register arc as incoming or outgoing arc of this node, depending on
+   * whether this node is source or target of the arc.
+   *  
+   * @param a
+   */
+  public void attachArc(Arc a) {
+    if (a.getSource() == this) {
+      outgoing.add(a); return;
+    }
+    if (a.getTarget() == this) {
+      incoming.add(a); return;
+    }
+  }
+  
+  /**
+   * Remove arc from incoming or outgoing arcs depending on whether this node
+   * is source or target of the arc.
+   *  
+   * @param a
+   */
+  public void detachArc(Arc a) {
+    if (a.getSource() == this) {
+      outgoing.remove(a); return;
+    }
+    if (a.getTarget() == this) {
+      incoming.remove(a); return;
+    }
+  }
 
   /**
    * @return incoming arcs of this node
    */
-  public List<Arc> getIncoming() {
-    LinkedList<Arc> arcSet = new LinkedList<Arc>();
-    for (Arc a : net.getArcs()) {
-      if (a.getTarget() == this) arcSet.add(a); 
-    }
-    return arcSet;
+  public HashSet<Arc> getIncoming() {
+    return incoming;
   }
   
   /**
    * @return outgoing arcs of this node
    */
-  public List<Arc> getOutgoing() {
-    LinkedList<Arc> arcSet = new LinkedList<Arc>();
-    for (Arc a : net.getArcs()) {
-      if (a.getSource() == this) arcSet.add(a); 
-    }
-    return arcSet;
+  public HashSet<Arc> getOutgoing() {
+    return outgoing;
   }
 
   /**

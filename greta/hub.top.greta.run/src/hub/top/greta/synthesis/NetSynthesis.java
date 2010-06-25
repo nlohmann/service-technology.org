@@ -61,6 +61,16 @@ import java.util.Map;
  * @author Dirk Fahland
  */
 public class NetSynthesis {
+  
+  public static String toLoLA(String ident) {
+    String result = ident.replace(' ', '_');
+    result = result.replace('(', '_');
+    result = result.replace(')', '_');
+    result = result.replace('[', '_');
+    result = result.replace(']', '_');
+    result = result.replace('=', '_');
+    return result;
+  }
 
   /**
    * Fold the given branching process into a possibly labeled Petri net.
@@ -70,7 +80,7 @@ public class NetSynthesis {
    */
   public static PtNet foldToNet_labeled(DNodeBP bp) {
     
-    bp.printEquivalenceRelation();
+    //bp.printEquivalenceRelation();
     
     try {
       //bp.minimize();
@@ -99,7 +109,7 @@ public class NetSynthesis {
       
       if (equiv.get(b) == null || equiv.get(b) == b) {
         Place p = fact.createPlace();
-        p.setName(dAS.properNames[b.id]+"_"+b.globalId);
+        p.setName(toLoLA(dAS.properNames[b.id]+"_"+b.globalId));
         net.getPlaces().add(p);
         
         if (b.pre == null || b.pre.length == 0)
@@ -130,7 +140,7 @@ public class NetSynthesis {
         if (e.isAnti && !e.isHot)
           t.setName("tau_"+e.globalId);   // hide cold anti-events
         else
-          t.setName(dAS.properNames[e.id]+"_"+e.globalId);
+          t.setName(toLoLA(dAS.properNames[e.id]+"_"+e.globalId));
         net.getTransitions().add(t);
         d2n.put(e, t);
       }
@@ -151,7 +161,7 @@ public class NetSynthesis {
           if (e.isAnti && !e.isHot)
             t.setName("tau_"+e.globalId);   // hide cold anti-events
           else
-            t.setName(dAS.properNames[e.id]+"_"+e.globalId);
+            t.setName(toLoLA(dAS.properNames[e.id]+"_"+e.globalId));
           net.getTransitions().add(t);
           d2n.put(e, t);
         } else {

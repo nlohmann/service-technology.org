@@ -267,40 +267,31 @@ public class Decompose {
   }
   
   public static PetriNet toScenarios3(PetriNet net) {
-    // create a new Petri net
-    PetriNet scenario_net = new PetriNet();
-    for (Transition t : net.getTransitions()) {
-        // consisting of all transitions that belong to this swimlane
+    HashMap<Transition, Integer> sa = getScenarioAssignment_disjoint(net);
+    return materializeScenarios_roles(net, sa);
+  }
+  
+  /**
+   * Compute an assignment of the net's transitions into disjoint scenarios.
+   * @param net
+   * @return
+   */
+  public static HashMap<Transition, Integer> getScenarioAssignment_disjoint(PetriNet net) {
     
-      Transition t_ = scenario_net.addTransition(t.getName());
-      
-      // together with their pre-sets
-      for (Place p : t.getPreSet()) {
-        // see if place already exists in the net
-        Place p_ = scenario_net.findPlace(p.getName());
-        if (p_ == null) // if not: create it
-          p_ = scenario_net.addPlace(p.getName());
-        scenario_net.addArc(p_, t_);
-      }
-    
-      // and post-sets
-      for (Place p : t.getPostSet()) {
-        // see if place already exists in the net
-        Place p_ = scenario_net.findPlace(p.getName());
-        if (p_ == null) // if not: create it
-          p_ = scenario_net.addPlace(p.getName());
-        scenario_net.addArc(t_, p_);
-      }
-    }
-    
-    HashSet<Transition> left_globally = new HashSet<Transition>(scenario_net.getTransitions());
+    // set of transitions that are not assigned yet to some scenario
+    HashSet<Transition> left_globally = new HashSet<Transition>(net.getTransitions());
 
+    // map that stores for each transition which other transitions must not be in the
+    // same scenario as this transition (at least), because these transitions consume from
+    // or produce on the same places
     HashMap<Transition, HashSet<Transition> > toSplit = new HashMap<Transition, HashSet<Transition>>();
-    for (Transition t : scenario_net.getTransitions()) {
+    for (Transition t : net.getTransitions()) {
+      // init map for each transition
       toSplit.put(t, new HashSet<Transition>());
     }
 
-    for (Place p : scenario_net.getPlaces()) {
+    // then add for each transition 't' its conflicting transitions 't2'
+    for (Place p : net.getPlaces()) {
       for (Transition t : p.getPreSet()) {
         for (Transition t2 : p.getPreSet()) {
           toSplit.get(t).add(t2);
@@ -312,31 +303,41 @@ public class Decompose {
         }
       }
     }
-    
-    HashMap<Transition, Integer> scenarioAssignment = new HashMap<Transition, Integer>();
-    
-    int scenarioNum = 0;
 
+    // assign each transition of the net to one scenario
+    HashMap<Transition, Integer> scenarioAssignment = new HashMap<Transition, Integer>();
+    int scenarioNum = 0;
+    // as long as there is an unassigned transition
     while (!left_globally.isEmpty()) {
       Transition t = left_globally.iterator().next();  // get some transition
-      scenarioNum++;
+      scenarioNum++;      // put it in a new scenario
       
+      // and augment this new scenario with other compatible
+      // transitions by simultaneous forward and backward
+      // breadth-first search
       HashSet<Transition> inCurrentScenario = new HashSet<Transition>();
       LinkedList<Transition> queue = new LinkedList<Transition>();
       queue.addLast(t);
+      // as long as there is some reachable compatible transition
       while (!queue.isEmpty()) {
-        Transition s = queue.removeFirst();
+        // take it and add it to the current scenario
+        Transition s = queue.removeFirst();     
         scenarioAssignment.put(s, scenarioNum);
         left_globally.remove(s);
         inCurrentScenario.add(s);
         
+        // then explore all direct predecessor transitions
         for (Place p : s.getPreSet()) {
           if (p.getPreSet().size() == 1 && p.getPostSet().size() == 1) {
+            // only a place with one pre- and one post-transition can be
+            // within the same scenario as transition s
             Transition r = p.getPreSet().get(0);
+            // skip the current transition s
             if (r == s) continue;
+            // skip transitions that have already been considered
             if (!left_globally.contains(r)) continue;
             if (queue.contains(r)) continue;
-            
+            // and stop exploration when reaching a conflicting transition
             boolean wouldConflict = false;
             for (Transition conflicting : toSplit.get(r)) {
               if (inCurrentScenario.contains(conflicting)) {
@@ -344,17 +345,21 @@ public class Decompose {
               }
             }
             if (wouldConflict) continue;
-            
+            // breadth-first search
             queue.addLast(r);
           }
         }
         for (Place p : s.getPostSet()) {
           if (p.getPostSet().size() == 1 && p.getPreSet().size() == 1) {
+            // only a place with one pre- and one post-transition can be
+            // within the same scenario as transition s
             Transition r = p.getPostSet().get(0);
+            // skip the current transition s
             if (r == s) continue;
+            // skip transitions that have already been considered
             if (!left_globally.contains(r)) continue;
             if (queue.contains(r)) continue;
-            
+            // and stop exploration when reaching a conflicting transition
             boolean wouldConflict = false;
             for (Transition conflicting : toSplit.get(r)) {
               if (inCurrentScenario.contains(conflicting)) {
@@ -362,47 +367,95 @@ public class Decompose {
               }
             }
             if (wouldConflict) continue;
-            
+            // breadth-first search            
             queue.addLast(r);
           }
         }
-      }
-    }
+      } // end of breadth-first search from unassigned transition
+    } // until all transitions are assigned
 
+    return scenarioAssignment;
+  }
+  
+  /**
+   * Map the given scenario assignment into roles of the net.
+   *  
+   * @param net
+   * @param scenarioAssignment
+   * @return a new Petri net
+   */
+  public static PetriNet materializeScenarios_roles(PetriNet net, HashMap<Transition, Integer> scenarioAssignment) {
     // materialize scenarios
-    PetriNet scenario_net2 = new PetriNet();
+    PetriNet scenario_net = new PetriNet(net);  // make a copy of the net
+    // write roles to the net
     for (Transition t : scenario_net.getTransitions()) {
+      Transition tOld = net.findTransition(t.getName());
+      String sRole = Integer.toString(scenarioAssignment.get(tOld));
+      t.addRole(sRole);
+    }
+    // assign roles to places
+    scenario_net.spreadRolesToPlaces_union();
+    
+    return scenario_net;    
+  }
+  
+  /**
+   * Decompose the given Petri net into components according to the scenario
+   * assignment. Each connected component is a scenario.
+   * 
+   * @param net
+   * @param scenarioAssignment
+   * @return a new Petri net
+   */
+  public static PetriNet materializeScenarios_split(PetriNet net, HashMap<Transition, Integer> scenarioAssignment) {
+    
+    // materialize scenarios
+    PetriNet scenario_net = new PetriNet();
+    for (Transition t : net.getTransitions()) {
       
       String sRole = Integer.toString(scenarioAssignment.get(t));
       
-      Transition t2 = scenario_net2.addTransition(t.getName());
+      Transition t2 = scenario_net.addTransition(t.getName());
       t2.addRole(sRole);
       for (Place p : t.getPreSet()) {
         // see if place already exists in the net
-        Place p2 = scenario_net2.findPlace(p.getName());
+        Place p2 = scenario_net.findPlace(p.getName());
         if (p2 == null || !p2.getRoles().contains(sRole)) {
-          // if not: create it
-          p2 = scenario_net2.addPlace(p.getName());
-          p2.addRole(sRole);
+          // does note exist yet or in the wrong scenario: create new place
+          p2 = scenario_net.addPlace(p.getName());
+          p2.addRole(sRole);  // put place into current scenario
         }
-        scenario_net2.addArc(p2, t2);
+        scenario_net.addArc(p2, t2);
       }
       for (Place p : t.getPostSet()) {
         // see if place already exists in the net
-        Place p2 = scenario_net2.findPlace(p.getName());
+        Place p2 = scenario_net.findPlace(p.getName());
         if (p2 == null || !p2.getRoles().contains(sRole)) {
-          // if not: create it
-          p2 = scenario_net2.addPlace(p.getName());
-          p2.addRole(sRole);
+          // does note exist yet or in the wrong scenario: create new place
+          p2 = scenario_net.addPlace(p.getName());
+          p2.addRole(sRole);  // put place into current scenario
         }
-        scenario_net2.addArc(t2, p2);
+        scenario_net.addArc(t2, p2);
       }
-
     }
     
-    return scenario_net2;
+    // create initial state
+    for (Place p : net.getPlaces()) {
+      for (int i=0; i< p.getTokens(); i++) {
+        Place p2 = scenario_net.addPlace(p.getName());
+        p2.addRole("initial");
+        p2.setTokens(1);
+      }
+    }
+    
+    scenario_net.spreadRolesToPlaces_union();
+    return scenario_net;    
   }
   
+  public static PetriNet decomposeToScenarios_split(PetriNet net) {
+    HashMap<Transition, Integer> sa = getScenarioAssignment_disjoint(net);
+    return materializeScenarios_split(net, sa);
+  }
   
   public static void decomposeToScenarios2(String fileName) {
 
@@ -413,15 +466,15 @@ public class Decompose {
       System.out.println("size of net: "+net.getInfo());
       
       net.setRoles_unassigned();
-      PetriNet scenarioNet = toScenarios3(net);
-      scenarioNet.spreadRolesToPlaces_union();
-      PetriNetIO.writeToFile(scenarioNet, fileName+"_scenario", PetriNetIO.FORMAT_DOT);
+      PetriNet scenarioNet = decomposeToScenarios_split(net);
+      scenarioNet.anonymizeNet();
+      PetriNetIO.writeToFile(scenarioNet, fileName+"_scenario", PetriNetIO.FORMAT_DOT, PetriNetIO.PARAM_SWIMLANE);
       
       /*
       LinkedList<PetriNet> scenarios = toScenarios(net);
       for (int i=0; i<scenarios.size(); i++) {
         System.out.println("size of net "+i+": "+scenarios.get(i).getInfo());
-        PetriNetIO.writeToFile(scenarios.get(i), args[0]+"_"+i, PetriNetIO.FORMAT_DOT);
+        PetriNetIO.writeToFile(scenarios.get(i), fileName+"_"+i, PetriNetIO.FORMAT_DOT);
       }
       */
       

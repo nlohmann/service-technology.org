@@ -1,6 +1,7 @@
 Greta v1.1.5
 ------------
 
+* [synthesis] moved central synthesis code to hub.top.uma
 + [simulation] fixed several bugs in the simulation code
 + [analysis] algorithm to check for implied scenarios on the branching process of an oclet system
 + [interface] check soundness of free-choice process and generate counter-example trace in graphical editor

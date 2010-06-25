@@ -232,7 +232,7 @@ public class DNodeSys_PetriNet extends DNodeSys {
 				pre = new DNode[n.getIncoming().size()];
 				int i = 0;
 				for (Arc a : n.getIncoming()) {
-					pre[i++] = new DNode(nameToID.get(a.getSource().getName()), null);
+					pre[i++] = new DNode(nameToID.get(a.getSource().getName()), (DNode[])null);
 				}
 				DNode.sortIDs(pre);
 			} else {

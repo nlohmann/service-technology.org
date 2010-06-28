@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
     Output::setKeepTempfiles(args_info.noClean_flag);
 
     // diagnosis is only possible, if libconfig was found
-#if not defined(HAVE_LIBCONFIGXX)
+#if not defined(HAVE_LIBCONFIG__)
     if (args_info.diagnosis_flag)
     {
         message("Diagnosis of adapters is only possible, if %s was compiled with libconfig++ support",PACKAGE);

@@ -252,6 +252,7 @@ const pnapi::PetriNet * Adapter::buildController()
     std::string cost_filename = owfn_filename + ".cf";
     std::string diag_filename = owfn_filename + ".diag";
     std::string mi_filename = owfn_filename + ".mi";
+    std::string dot_filename = owfn_filename + ".dot";
 
 
     owfn_temp.stream() << pnapi::io::owfn << composed << std::flush;
@@ -276,6 +277,7 @@ const pnapi::PetriNet * Adapter::buildController()
                         + " --diagnose --noDeadlockDetection"
                         + " --correctness=" + property
                         + " --mi=" + mi_filename
+                        + " --dot=" + dot_filename
                         + " --resultFile=" + diag_filename;
     }
     else
@@ -358,7 +360,7 @@ const pnapi::PetriNet * Adapter::buildController()
         \***********/
         status("Going into diagnosis mode ...");
 
-#if defined(HAVE_LIBCONFIGXX)
+#if defined(HAVE_LIBCONFIG__) and HAVE_LIBCONFIG__ == 1
         MarkingInformation mi(mi_filename);
         Diagnosis diag(diag_filename, mi);
         diag.evaluateDeadlocks(_nets, *_engine);
@@ -429,6 +431,8 @@ const pnapi::PetriNet * Adapter::buildController()
             remove(diag_filename.c_str());
             status(" ... deleting %s.", mi_filename.c_str());
             remove(mi_filename.c_str());
+            status(" ... deleting %s.", dot_filename.c_str());
+            remove(dot_filename.c_str());
         }
     }
 

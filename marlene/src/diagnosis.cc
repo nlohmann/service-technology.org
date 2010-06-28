@@ -19,7 +19,7 @@
 
 #include "config.h"
 
-#if defined(HAVE_LIBCONFIGXX)
+#if defined(HAVE_LIBCONFIG__) and HAVE_LIBCONFIG__ == 1
 
 #include <utility> // just for make_pair
 #include <list>
@@ -128,52 +128,65 @@ void Diagnosis::evaluateDeadlocks(std::vector< pnapi::PetriNet *> & nets, pnapi:
     for ( unsigned int i = 0; i < dgraph->deadlockNodes.size(); ++i )
     {
         DNode * node = dgraph->deadlockNodes[i];
-        message("Deadlock %d (node %d)", i + 1, node->getID());
-        for ( unsigned int j = 0; j < node->deadlockMarkings.size(); ++j)
+        bool seen = false;
+        for ( unsigned int prev = 0; prev < i and not seen; ++prev)
         {
-            Marking & m = *(mi.markings[node->deadlockMarkings[j]]);
-            std::vector< std::string > pending = m.getPendingMessages(engine, prefix);
-            for ( unsigned int p = 0; p < pending.size(); ++p )
+            if ( node->deadlockMarkings == dgraph->deadlockNodes[prev]->deadlockMarkings )
             {
-                message("Message %s is pending", pending[p].c_str());
-            }
-            for ( unsigned int net = 0; net < nets.size(); ++net )
-            {
-                std::string prefix = "net" + toString(net + 1) + ".";
-                std::vector< std::string > required = m.getRequiredMessages(*(nets[net]), prefix);
-                if (required[required.size()-1] == "yes")
+                if ( node->rulesApplied == dgraph->deadlockNodes[prev]->rulesApplied)
                 {
-                    message("Net %s is already in a final state", prefix.c_str());
+                    seen = true;
                 }
-                for ( unsigned int p = 0; p < required.size() - 1; ++p )
-                {
-                    message("Message %s is required", required[p].c_str());
-                }
-            }
-            message("The following rules where previously applied:");
-            if ( node->rulesApplied.empty() )
-            {
-                std::cerr << "      none." << std::endl;
-            }
-            else
-            {
-                bool first = true;
-                for ( std::set< std::string >::iterator rule = node->rulesApplied.begin(); rule != node->rulesApplied.end(); ++rule)
-                {
-                    if ( first )
-                    {
-                        std::cerr << "      " << *rule;
-                        first = false;
-                    }
-                    else
-                    {
-                        std::cerr << ", " << *rule;
-                    }
-                }
-                std::cerr << std::endl;
             }
         }
-
+        if ( not seen )
+        {
+            message("Deadlock %d (node %d)", i + 1, node->getID());
+            for ( unsigned int j = 0; j < node->deadlockMarkings.size(); ++j)
+            {
+                Marking & m = *(mi.markings[node->deadlockMarkings[j]]);
+                std::vector< std::string > pending = m.getPendingMessages(engine, prefix);
+                for ( unsigned int p = 0; p < pending.size(); ++p )
+                {
+                    message("Message %s is pending", pending[p].c_str());
+                }
+                for ( unsigned int net = 0; net < nets.size(); ++net )
+                {
+                    std::string prefix = "net" + toString(net + 1) + ".";
+                    std::vector< std::string > required = m.getRequiredMessages(*(nets[net]), prefix);
+                    if (required[required.size()-1] == "yes")
+                    {
+                        message("Net %s is already in a final state", prefix.c_str());
+                    }
+                    for ( unsigned int p = 0; p < required.size() - 1; ++p )
+                    {
+                        message("Message %s is required", required[p].c_str());
+                    }
+                }
+                message("The following rules where previously applied:");
+                if ( node->rulesApplied.empty() )
+                {
+                    std::cerr << "      none." << std::endl;
+                }
+                else
+                {
+                    bool first = true;
+                    for ( std::set< std::string >::iterator rule = node->rulesApplied.begin(); rule != node->rulesApplied.end(); ++rule)
+                    {
+                        if ( first )
+                        {
+                            std::cerr << "      " << *rule;
+                            first = false;
+                        }
+                        else
+                        {
+                            std::cerr << ", " << *rule;
+                        }
+                    }
+                    std::cerr << std::endl;
+                }
+            }
+        }
     }
 
     FUNCOUT
@@ -264,11 +277,14 @@ void DGraph::collectRules()
         {
             std::string label = getLabelForID( node->successors[s].first );
             DNode * snode = nodeMap[node->successors[s].second];
+            unsigned int before = snode->rulesApplied.size();
 
+            /*
             if ( not seen[node->successors[s].second] )
             {
                 queue.push_back(node->successors[s].second);
             }
+            */
 
             if ( label.find("sync_rule_") == 0)
             {
@@ -281,31 +297,37 @@ void DGraph::collectRules()
                 snode->rulesApplied.insert(*rule);
             }
 
-            message("The following rules where previously applied for node %d:", id);
-            if ( node->rulesApplied.empty() )
+            if ( ((snode->rulesApplied.size() - before) > 0 or not seen[node->successors[s].second]) )
             {
-                std::cerr << "      none." << std::endl;
-            }
-            else
-            {
-                bool first = true;
-                for ( std::set< std::string >::iterator rule = node->rulesApplied.begin(); rule != node->rulesApplied.end(); ++rule)
-                {
-                    if ( first )
-                    {
-                        std::cerr << "      " << *rule;
-                        first = false;
-                    }
-                    else
-                    {
-                        std::cerr << ", " << *rule;
-                    }
-                }
-                std::cerr << std::endl;
+                queue.remove(node->successors[s].second);
+                queue.push_back(node->successors[s].second);
             }
 
-            // status("label %s leads to node %d", label.c_str(), node->successors[s].second);
+            status("label %s leads to node %d", label.c_str(), node->successors[s].second);
         }
+        message("The following rules where previously applied for node %d:", id);
+        if ( node->rulesApplied.empty() )
+        {
+            std::cerr << "      none." << std::endl;
+        }
+        else
+        {
+            bool first = true;
+            for ( std::set< std::string >::iterator rule = node->rulesApplied.begin(); rule != node->rulesApplied.end(); ++rule)
+            {
+                if ( first )
+                {
+                    std::cerr << "      " << *rule;
+                    first = false;
+                }
+                else
+                {
+                    std::cerr << ", " << *rule;
+                }
+            }
+            std::cerr << std::endl;
+        }
+
     }
 }
 

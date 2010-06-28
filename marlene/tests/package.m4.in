@@ -22,6 +22,7 @@ m4_define([MKDIR],                [@MKDIR_P@])
 m4_define([DIFF],                 [@DIFF@])
 m4_define([NOPETRIFY],            ['""'])
 m4_define([NOGENET],              ['""'])
+m4_define([LIBCONFIGPRESENT],     [@LIBCONFIG@])
 
 m4_define([DEFAULTPARAMETERS],    [--sa2on=@CONVERTER@ --wendy=@WENDY@ --genet=@GENET@ --petrify=@PETRIFY@])
 

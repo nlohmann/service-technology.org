@@ -41,7 +41,7 @@ AH_BOTTOM([#ifdef __cplusplus
 #include <assert.h>
 #endif])
 
-AC_CONFIG_FILES([Makefile src/og2dot/Makefile src/chor2dot/Makefile tests/Makefile tests/package.m4])
+AC_CONFIG_FILES([Makefile src/og2dot/Makefile src/chor2dot/Makefile src/rg2dot/Makefile tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 
 AC_OUTPUT

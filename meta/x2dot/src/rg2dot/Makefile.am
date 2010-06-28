@@ -1,7 +1,7 @@
 bin_PROGRAMS = rg2dot
 
 rg2dot_SOURCES = rg-syntax.yy rg-lexic.ll \
-                 main.cc config.h \
+                 main.cc \
 		 verbose.cc verbose.h \
                  cmdline.c cmdline.h 
 

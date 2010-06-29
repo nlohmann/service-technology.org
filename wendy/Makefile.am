@@ -11,4 +11,5 @@ endif
 svn-clean: maintainer-clean
 	rm -fr configure Makefile.in INSTALL aclocal.m4 src/Makefile.in \
 		src/config.h.in libs/pnapi/Makefile.in \
-		tests/Makefile.in doc/Makefile.in doc/mdate-sh src/config-log.h build-aux
+		tests/Makefile.in doc/Makefile.in doc/mdate-sh src/config-log.h \
+		build-aux

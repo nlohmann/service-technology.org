@@ -39,7 +39,7 @@ case $COVER in
     result=$?
 
     # evaluate coverage result of LCOV
-    $LCOV --capture --directory @abs_top_builddir@ --output-file $INFOFILE --test-name $TESTNAME
+    $LCOV --capture --directory @abs_top_builddir@ --output-file $INFOFILE --test-name $TESTNAME >& /dev/null
 
     # remove profile information on C++ sources and headers
     $LCOV --extract $INFOFILE "@abs_top_builddir@/*" -o $INFOFILE

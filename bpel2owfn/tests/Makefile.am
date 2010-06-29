@@ -95,7 +95,7 @@ descriptions: $(TESTSUITE)
 cover-check: cover-prepare $(TESTSUITE)
 	test ! -d cover || rm -fr cover
 	$(MKDIR_P) cover
-	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=TRUE
+	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=LCOV
 
 # exclude generated code using the wildcards specified in NO_COVER_FILES
 cover.info:

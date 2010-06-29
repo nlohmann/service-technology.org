@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="src" path="src-Plugins"/>
 	<classpathentry kind="lib" path="stdlib/ProM-Framework/ProM-Framework.jar"/>
 	<classpathentry kind="lib" path="stdlib/ProM-Contexts/ProM-Contexts.jar"/>
 	<classpathentry kind="lib" path="stdlib/axis.jar"/>

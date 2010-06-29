@@ -6,7 +6,6 @@ import java.util.TreeSet;
 import org.processmining.framework.plugin.PluginContext;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.models.connections.petrinets.behavioral.BehavioralAnalysisInformationConnection;
 import org.processmining.models.connections.petrinets.behavioral.BoundednessInfoConnection;
 import org.processmining.models.connections.petrinets.behavioral.InitialMarkingConnection;
 import org.processmining.models.connections.petrinets.behavioral.UnboundedPlacesConnection;
@@ -63,8 +62,8 @@ public class LoLA_Boundedness {
 
 		// extract boundedness information from results file
 		Boolean unbounded = cfg.getValue("unbounded.result", null);
-		NetAnalysisInformation boundednessInfo = new NetAnalysisInformation("Boundedness Info");
-		boundednessInfo.put(NetAnalysisInformation.BOUNDEDNESS, unbounded ? NetAnalysisInformation.FALSE : NetAnalysisInformation.TRUE);
+		NetAnalysisInformation.BOUNDEDNESS boundednessInfo = new NetAnalysisInformation.BOUNDEDNESS();
+		boundednessInfo.setValue(unbounded ? NetAnalysisInformation.UnDetBool.FALSE : NetAnalysisInformation.UnDetBool.TRUE);
 
 		// extract unbounded places from results file
 		UnboundedPlacesSet unboundedPlacesSet = new UnboundedPlacesSet();
@@ -80,7 +79,7 @@ public class LoLA_Boundedness {
 		// connect results to context
 		Object[] result = { boundednessInfo, unboundedPlacesSet, vis };
 		context.addConnection(new BoundednessInfoConnection(net, marking, PetrinetSemanticsFactory.regularPetrinetSemantics(Petrinet.class),
-				(NetAnalysisInformation) result[0]));
+				(NetAnalysisInformation.BOUNDEDNESS) result[0]));
 		context.addConnection(new UnboundedPlacesConnection(net, (UnboundedPlacesSet) result[1], marking, PetrinetSemanticsFactory.regularPetrinetSemantics(Petrinet.class)));
 		context.getFutureResult(0).setLabel("Boundedness Analysis of " + net.getLabel());
 		context.getFutureResult(1).setLabel("Unbounded Places of " + net.getLabel());

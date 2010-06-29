@@ -1,9 +1,9 @@
 SUBDIRS = unfolder
 
-bin_PROGRAMS = petri cdnf generator cphils configurator
+bin_PROGRAMS = petri cdnf generator cphils configurator artifact
 dist_noinst_SCRIPTS = process.sh make_customer.sh
 
-noinst_PROGRAMS = sound artifact
+noinst_PROGRAMS = sound
 
 petri_SOURCES = petri.cc cmdline.c cmdline.h \
                 Output.h Output.cc \

@@ -4,14 +4,14 @@
 # RELAXED SOUNDNESS #
 #####################
 
-RELAXED="true"
+TRANSITIONCOVER="true"
 
 for TRANSITION in `ls *.relaxed.result`; do
   TRANSITIONNAME=`echo $TRANSITION | sed 's/.relaxed.result//'`
   grep -q "RESULT: 1" $TRANSITION
   if [ "$?" != "1" ]; then
     UNCOVEREDTRANSITIONS="$UNCOVEREDTRANSITIONS $TRANSITIONNAME"
-    RELAXED="false"
+    TRANSITIONCOVER="false"
   fi
 done
 
@@ -88,6 +88,7 @@ grep -q "RESULT: 1" liveness.result
 if [ "$?" != "1" ]; then
   echo "liveness = false;"
   LIVENESS="false"
+  echo "counter = \"`sed -n '/STATE/,/RESULT/p' liveness.result | sed '1d;$d' | xargs`\";"
 else
   echo "liveness = true;"
   LIVENESS="true"
@@ -110,7 +111,7 @@ else
   else
     echo "weaksoundness = false;"
   fi
-  if [ "$RELAXED" = "true" ] ; then
+  if [ "$TRANSITIONCOVER" = "true" ] ; then
     echo "relaxedsoundness = true;"
   else
     echo "relaxedsoundness = false;"

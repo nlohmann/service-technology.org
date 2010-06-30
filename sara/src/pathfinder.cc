@@ -366,6 +366,7 @@ void PathFinder::conflictTable(Transition* tstart) {
 					if (itprod>=cftcons && cftprod-cftcons<=0) continue; // we produce enough to let the other one live, and the other one cannot enable us
 					// mark it as conflicting, i.e. it possibly has priority
 					cftab[*it].insert(cft);
+//					cftab[cft].insert(*it); // upsets are singletons, downsets are empty (deep theory!)
 					// if we haven't worked on it yet, insert it into the todo-list
 					if (marker.find(cft)==marker.end()) tset.insert(cft);
 				}
@@ -488,7 +489,8 @@ bool PathFinder::doTarjan(myNode* start, set<Transition*>& result, int& maxdfs) 
 			tton[revtorder[go]]->instack = false;
 			st.pop_back();
 			// stop looking for strongly connected components once we have found one with an enabled and required transition
-			if (rec_tv[go]>0 && m0.activates(*go)) 
+			// any transition in rec_tv forms an up set; if such a transition is enabled, it ensures progress, thus we can stop here
+			if (rec_tv[go]>0 && m0.activates(*go))
 			{
 				ok=true;
 				result.insert(go);

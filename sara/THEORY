@@ -2,13 +2,76 @@ No README
 Sara implements several algorithms and result published in several scientific
 articles.
 
-<<- THEORY ->>
-==============
+Decidability of Reachability in General
+=======================================
 
-<<- THEORY ->>
-..............
+The Reachability problem is known to be decidable since the early 1980's,
+which was shown independently by two researchers.
 
-     <<- THEORY ->>
+     E. Mayr. An Algorithm for the General Petri Net Reachability Problem.
+     SIAM Journal of Computing 13:3, pp.441-460, 1984.
+
+     S.R. Kosaraju. Decidability of Reachability in Vector Addition Systems.
+     Proceedings of the 14th Annual ACM STOC, pp.267-281, 1982.
+
+Later, a different (possibly better) presentation of the topic was given.
+
+     J.L. Lambert. A Structure to Decide Reachability in Petri Nets.
+     Theoretical Computer Science 99, pp.79-104, 1992.
+
+For those firm in the German language, a version with additional explanation
+and a running example can also be found in the book
+
+     H.Wimmel. Entscheidbarkeit bei Petri Netzen. Springer, ISBN
+     978-3-540-85470-8, 2008.
+
+Sara's Algorithm
+================
+
+Sara solves the reachability problem by first solving (a possibly extended
+version of) the Marking Equation and then trying to transform a solution
+vector (if found) into a firing sequence. At the moment, there are no
+publications yet showing the details of Sara's algorithm and how it works.
+There are publications about the tools and general methods used by Sara,
+though.
+
+Solving the Marking Equation
+............................
+
+Since the Marking Equation is just a linear system of equations over integers
+with results in the non-negative integers, a simple integer programming tool
+can solve it.  General information on linear and integer programming can be
+found in:
+
+     A. Schrijver. Theory of Linear and Integer Programming. Wiley, ISBN
+     978-0-471-98232-6, 1998.
+
+Sara, in specific, uses the lp_solve library, for which a documentation can be
+found online.
+
+     M. Berkelaar, K. Eikland, P. Notebaert. Lp_solve Reference Guide.
+     http://lpsolve.sourceforge.net/5.5/ (30.6.2010).
+
+Transforming a Solution Vector into a Firing Sequence
+.....................................................
+
+To find an ordering of the transitions given by a solution vector so that a
+firing sequence is generated can in principle be done by brute force. This
+leads to the state space explosion problem that has been dealt with in- and
+extensively in the literature. Sara uses methods of partial order reduction to
+counter the state space explosion, especially the stubborn set method.
+
+     D.A. Peled. All from One, One for All: Model Checking Using
+     Representatives. Proceedings of CAV'93, Lecture Notes in Computer Science
+     697, pp.409-423, Springer, 1993.
+
+     P. Godefroid. Partial-Order Methods for the Verification of Concurrent
+     Systems - An Approach to the State-Explosion Problem. Lecture Notes in
+     Computer Science 1032, Springer, 1996.
+
+     L.M. Kristensen, K. Schmidt, A. Valmari. Question-guided Stubborn Set
+     Methods for State Properties. Formal Methods in System Design 29:3,
+     pp.215-251, Springer, 2006.
 
 
 

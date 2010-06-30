@@ -367,7 +367,7 @@ void JobQueue::printFailure(IMatrix& im) {
 					{
 						int miss=0;
 						for(mit=pmap.begin(); mit!=pmap.end(); ++mit)
-							if (ps->getMarking()[*(mit->first)]<im.getPreset(**tit)[mit->first])
+							if (ps->getMarking()[*(mit->first)]<(unsigned int)(im.getPreset(**tit)[mit->first]))
 								miss += im.getPreset(**tit)[mit->first]-ps->getMarking()[*(mit->first)];
 						if (diff<0 || miss<diff) diff=miss;
 					}

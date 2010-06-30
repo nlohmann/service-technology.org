@@ -641,6 +641,7 @@ bool PathFinder::isSmaller(map<Transition*,int>& m1, map<Transition*,int>& m2) {
 		if (mit2->second<mit1->second) break;
 		++mit1;
 	}
-	return false;
+	while (mit1!=m1.end() && mit1->second==0) ++mit1; 
+	return (mit1==m1.end());
 }
 

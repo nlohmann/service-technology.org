@@ -238,7 +238,7 @@ PetriNet* Problem::getPetriNet() {
 	            break;
 	        }
 	    }
-	} catch (pnapi::io::InputError error) {
+	} catch (pnapi::exception::InputError error) {
 	    infile.close();
 		cerr << "sara: error: " << error << endl;
 		abort(4,"error while reading Petri net from file");

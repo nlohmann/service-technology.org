@@ -252,9 +252,9 @@ if (args_info.input_given || args_info.pipe_given) {
 	// walk through the problem list
 	for(unsigned int x=0; x<pbls.size(); ++x)
 	{
-		cout << "sara: Problem " << ++loops << ": " << pbls.at(x).getName() << endl;
+		cout << "sara: Problem " << (++loops) << ": " << pbls.at(x).getName() << endl;
 		if (args_info.log_given) // print info also to log file if one has been given
-			cerr << "sara: Problem " << ++loops << ": " << pbls.at(x).getName() << endl;
+			cerr << "sara: Problem " << (++loops) << ": " << pbls.at(x).getName() << endl;
 		PetriNet* pn(pbls.at(x).getPetriNet()); // obtain the Petri net and its P/T-ordering
 		if (x+1<pbls.size()) pbls.at(x+1).checkForNetReference(pbls.at(x)); // possibly advance the net to the next problem (if it has the same net)
 		Marking m1(pbls.at(x).getInitialMarking()); // get the initial marking

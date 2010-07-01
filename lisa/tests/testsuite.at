@@ -55,8 +55,8 @@ AT_SETUP([Calculating a trap])
 m4_define([NET], [has_trap.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([LISA NET --findTrap],0,ignore,stderr)
-AT_CHECK([GREP -q "p3" stderr])
-AT_CHECK([GREP -q "p5" stderr])
+AT_CHECK([GREP -q "p4" stderr])
+AT_CHECK([GREP -q "p6" stderr])
 AT_KEYWORDS(algorithms)
 AT_CLEANUP
 

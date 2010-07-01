@@ -164,7 +164,7 @@ int main(int argc, char** argv) {
             s << pnapi::io::stat << net;
             status("read net: %s", s.str().c_str());
         }
-    } catch (pnapi::io::InputError error) {
+    } catch (pnapi::exception::InputError error) {
         std::ostringstream s;
         s << error;
         abort(2, "\b%s", s.str().c_str());
@@ -220,18 +220,18 @@ int main(int argc, char** argv) {
 
       Marking m1(net, false);
 
-      pnapi::formula::Conjunction c = net.finalCondition().formula();
-      std::set<const pnapi::formula::Formula *> fset = c.children(); 
+      pnapi::formula::Conjunction c = net.getFinalCondition().getFormula();
+      std::set<const pnapi::formula::Formula *> fset = c.getChildren(); 
       std::set<const pnapi::formula::Formula *>::iterator fit;
       std::set<Place *> places = net.getPlaces();
       std::set<Place *>::iterator pit;
       for(pit = places.begin(); pit != places.end(); ++pit)
-        (*pit)->mark(0);
+        (*pit)->setTokenCount(0);
       for(fit = fset.begin(); fit != fset.end(); ++fit){
         try{
-          const Place & p = (dynamic_cast<const pnapi::formula::FormulaEqual* >(*fit))->place();  
-          unsigned int tokenCount = (dynamic_cast<const pnapi::formula::FormulaEqual* >(*fit))->tokens();      
-          net.findPlace(p.getName())->mark(tokenCount);
+          const Place & p = (dynamic_cast<const pnapi::formula::FormulaEqual* >(*fit))->getPlace();  
+          unsigned int tokenCount = (dynamic_cast<const pnapi::formula::FormulaEqual* >(*fit))->getTokens();      
+          net.findPlace(p.getName())->setTokenCount(tokenCount);
         }
 	catch(std::bad_cast & b){
 	  abort(1, "could not evaluate final marking");

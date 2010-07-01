@@ -226,8 +226,8 @@ int LPWrapper::calcPInvariant(bool verbose) {
 	return cleanup();
 }
 
-/** Creates equations for calculating a trap that is minimal, i.e. it 
-    it contains the smallest set of places among all traps.
+/** Creates equations for calculating a trap that is minimal, i.e. it is
+    among the set of trap with a minimal number of places.
     Implementation follows "Verification of Safety Properties Using Integer
     Programming: Beyond the State Equation" by Javier Esparza and Stephan Melzer
 	@param verbose If TRUE prints information on cout.
@@ -287,8 +287,8 @@ int LPWrapper::calcTrap(bool verbose) {
 	return cleanup();
 }
 
-/** Creates equations for calculating a siphon that is minimal, i.e. it 
-    it contains the smallest set of places among all siphons.
+/** Creates equations for calculating a siphon that is minimal, i.e. it is
+    among the set of siphons with a minimal number of places.
     Implementation follows "Verification of Safety Properties Using Integer
     Programming: Beyond the State Equation" by Javier Esparza and Stephan Melzer
 	@param verbose If TRUE prints information on cout.

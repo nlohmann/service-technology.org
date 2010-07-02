@@ -41,53 +41,31 @@ public class OcletTest {
     
     lastTest = "Detect wrong prefix in oclet";
     
-    LinkedList<String> b_h = new LinkedList<String>();
-    b_h.add("p1a"); b_h.add("p1b"); b_h.add("p1c");
-    b_h.add("p2a"); b_h.add("p2b"); b_h.add("p2c");
+    Oclet o = new Oclet(false);
+    o.addPlace("p1a", true); o.addPlace("p1b", true); o.addPlace("p1c", true);
+    o.addPlace("p2a", true); o.addPlace("p2b", true); o.addPlace("p2c", true);
     
-    LinkedList<String> b_c = new LinkedList<String>();
-    b_c.add("p3a"); b_c.add("p3b"); b_c.add("p3c");
+    o.addPlace("p3a", false); o.addPlace("p3b", false); o.addPlace("p3c", false);
     
-    LinkedList<String[]> arcs = new LinkedList<String[]>();
-    
-    LinkedList<String> e_h = new LinkedList<String>();
-    e_h.add("e1a");
-    // CONSUME
-      arcs.add( new String[] { "p1a", "e1a"} );
-      arcs.add( new String[] { "p1b", "e1a"} );
-    // PRODUCE
-      arcs.add( new String[] { "e1a", "p2a"} );
+    o.addTransition("e1a", true);
+      o.addArc( "p1a", "e1a" ); o.addArc( "p1b", "e1a" );
+      o.addArc( "e1a", "p2a" );
       
-    e_h.add("e1b");
-    // CONSUME
-      arcs.add( new String[] { "p1c", "e1b"} );
-    // PRODUCE
-      arcs.add( new String[] { "e1b", "p2b"} );
-      arcs.add( new String[] { "e1b", "p2c"} );
+    o.addTransition("e1b", true);
+      o.addArc( "p1c", "e1b" );
+      o.addArc( "e1b", "p2b" ); o.addArc("e1b", "p2c" );
       
-    LinkedList<String> e_c = new LinkedList<String>();
+    o.addTransition("e2a", false);
+      o.addArc( "p2a", "e2a" ); o.addArc( "p2b", "e2a" );
+      o.addArc( "e2a", "p3a" );
       
-    e_c.add("e2a");
-    // CONSUME
-      arcs.add( new String[] { "p2a", "e2a"} );
-      arcs.add( new String[] { "p2b", "e2a"} );
-    // PRODUCE
-      arcs.add( new String[] { "e2a", "p3a"} );
-      
-    e_c.add("e2b");
-    // CONSUME
-      arcs.add( new String[] { "p2c", "e2b"} );
-    // PRODUCE
-      arcs.add( new String[] { "e2b", "p3b"} );
-      arcs.add( new String[] { "e2b", "p3c"} );
-      
-    e_c.add("e3");
-    // CONSUME
-      arcs.add( new String[] { "p3c", "e3"} );
-    // PRODUCE
-      arcs.add( new String[] { "e3", "p1b"} );
-      
-    Oclet o = new Oclet(false, b_h, e_h, b_c, e_c, arcs);
+    o.addTransition("e2b", false);
+      o.addArc( "p2c", "e2b" );
+      o.addArc( "e2b", "p3b" ); o.addArc( "e2b", "p3c" );
+
+    o.addTransition("e3", false);
+      o.addArc( "p3c", "e3" );
+      o.addArc( "e3", "p1b" );
     
     assertTrue(o.isCausalNet() == true && o.historyIsPrefix() == false);
   }
@@ -96,54 +74,32 @@ public class OcletTest {
     
     lastTest = "Detect cycle in oclet";
     
-    LinkedList<String> b_h = new LinkedList<String>();
-    b_h.add("p1a"); b_h.add("p1b"); b_h.add("p1c");
-    b_h.add("p2a"); b_h.add("p2b"); b_h.add("p2c");
+    Oclet o = new Oclet(false);
+    o.addPlace("p1a", true); o.addPlace("p1b", true); o.addPlace("p1c", true);
+    o.addPlace("p2a", true); o.addPlace("p2b", true); o.addPlace("p2c", true);
     
-    LinkedList<String> b_c = new LinkedList<String>();
-    b_c.add("p3a"); b_c.add("p3b"); b_c.add("p3c");
+    o.addPlace("p3a", false); o.addPlace("p3b", false); o.addPlace("p3c", false);
     
-    LinkedList<String[]> arcs = new LinkedList<String[]>();
-    
-    LinkedList<String> e_h = new LinkedList<String>();
-    e_h.add("e1a");
-    // CONSUME
-      arcs.add( new String[] { "p1a", "e1a"} );
-      arcs.add( new String[] { "p1b", "e1a"} );
-    // PRODUCE
-      arcs.add( new String[] { "e1a", "p2a"} );
+    o.addTransition("e1a", true);
+      o.addArc( "p1a", "e1a" ); o.addArc( "p1b", "e1a" );
+      o.addArc( "e1a", "p2a" );
       
-    e_h.add("e1b");
-    // CONSUME
-      arcs.add( new String[] { "p1c", "e1b"} );
-    // PRODUCE
-      arcs.add( new String[] { "e1b", "p2b"} );
-      arcs.add( new String[] { "e1b", "p2c"} );
+    o.addTransition("e1b", true);
+      o.addArc( "p1c", "e1b" );
+      o.addArc( "e1b", "p2b" ); o.addArc("e1b", "p2c" );
       
-    LinkedList<String> e_c = new LinkedList<String>();
+    o.addTransition("e2a", false);
+      o.addArc( "p2a", "e2a" ); o.addArc( "p2b", "e2a" );
+      o.addArc( "e2a", "p3a" );
       
-    e_c.add("e2a");
-    // CONSUME
-      arcs.add( new String[] { "p2a", "e2a"} );
-      arcs.add( new String[] { "p2b", "e2a"} );
-    // PRODUCE
-      arcs.add( new String[] { "e2a", "p3a"} );
+    o.addTransition("e2b", false);
+      o.addArc( "p2c", "e2b" );
+      o.addArc( "e2b", "p3b" ); o.addArc( "e2b", "p3c" );
+
+    o.addTransition("e3", false);
+      o.addArc( "p3a", "e3" );
+      o.addArc( "e3", "p1b" );
       
-    e_c.add("e2b");
-    // CONSUME
-      arcs.add( new String[] { "p2c", "e2b"} );
-    // PRODUCE
-      arcs.add( new String[] { "e2b", "p3b"} );
-      arcs.add( new String[] { "e2b", "p3c"} );
-      
-    e_c.add("e3");
-    // CONSUME
-      arcs.add( new String[] { "p3a", "e3"} );
-    // PRODUCE
-      arcs.add( new String[] { "e3", "p1b"} );
-      
-    Oclet o = new Oclet(false, b_h, e_h, b_c, e_c, arcs);
-    
     assertFalse( o.isCausalNet() );
   }
   
@@ -151,54 +107,33 @@ public class OcletTest {
     
     lastTest = "Check valid oclet";
     
-    LinkedList<String> b_h = new LinkedList<String>();
-    b_h.add("p1a"); b_h.add("p1b"); b_h.add("p1c");
-    b_h.add("p2a"); b_h.add("p2b"); b_h.add("p2c");
+    Oclet o = new Oclet(false);
+    o.addPlace("p1a", true); o.addPlace("p1b", true); o.addPlace("p1c", true);
+    o.addPlace("p2a", true); o.addPlace("p2b", true); o.addPlace("p2c", true);
     
-    LinkedList<String> b_c = new LinkedList<String>();
-    b_c.add("p3a"); b_c.add("p3b"); b_c.add("p3c"); b_c.add("p4");
+    o.addPlace("p3a", false); o.addPlace("p3b", false); o.addPlace("p3c", false);
+    o.addPlace("p4", false);
     
-    LinkedList<String[]> arcs = new LinkedList<String[]>();
-    
-    LinkedList<String> e_h = new LinkedList<String>();
-    e_h.add("e1a");
-    // CONSUME
-      arcs.add( new String[] { "p1a", "e1a"} );
-      arcs.add( new String[] { "p1b", "e1a"} );
-    // PRODUCE
-      arcs.add( new String[] { "e1a", "p2a"} );
+    o.addTransition("e1a", true);
+      o.addArc( "p1a", "e1a" ); o.addArc( "p1b", "e1a" );
+      o.addArc( "e1a", "p2a" );
       
-    e_h.add("e1b");
-    // CONSUME
-      arcs.add( new String[] { "p1c", "e1b"} );
-    // PRODUCE
-      arcs.add( new String[] { "e1b", "p2b"} );
-      arcs.add( new String[] { "e1b", "p2c"} );
+    o.addTransition("e1b", true);
+      o.addArc( "p1c", "e1b" );
+      o.addArc( "e1b", "p2b" ); o.addArc("e1b", "p2c" );
       
-    LinkedList<String> e_c = new LinkedList<String>();
+    o.addTransition("e2a", false);
+      o.addArc( "p2a", "e2a" ); o.addArc( "p2b", "e2a" );
+      o.addArc( "e2a", "p3a" );
       
-    e_c.add("e2a");
-    // CONSUME
-      arcs.add( new String[] { "p2a", "e2a"} );
-      arcs.add( new String[] { "p2b", "e2a"} );
-    // PRODUCE
-      arcs.add( new String[] { "e2a", "p3a"} );
+    o.addTransition("e2b", false);
+      o.addArc( "p2c", "e2b" );
+      o.addArc( "e2b", "p3b" ); o.addArc( "e2b", "p3c" );
+
+    o.addTransition("e3", false);
+      o.addArc( "p3a", "e3" );
+      o.addArc( "e3", "p4" );
       
-    e_c.add("e2b");
-    // CONSUME
-      arcs.add( new String[] { "p2c", "e2b"} );
-    // PRODUCE
-      arcs.add( new String[] { "e2b", "p3b"} );
-      arcs.add( new String[] { "e2b", "p3c"} );
-      
-    e_c.add("e3");
-    // CONSUME
-      arcs.add( new String[] { "p3c", "e3"} );
-    // PRODUCE
-      arcs.add( new String[] { "e3", "p4"} );
-      
-    Oclet o = new Oclet(false, b_h, e_h, b_c, e_c, arcs);
-    
     assertTrue( o.isValidOclet() );
   }  
 }

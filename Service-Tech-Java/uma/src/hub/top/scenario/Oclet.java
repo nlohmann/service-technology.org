@@ -1,5 +1,6 @@
 /*****************************************************************************\
- * Copyright (c) 2008, 2009. All rights reserved. Dirk Fahland. AGPL3.0
+ * Copyright (c) 2008, 2009, 2010. Dirk Fahland. AGPL3.0
+ * All rights reserved. 
  * 
  * ServiceTechnology.org - Uma, an Unfolding-based Model Analyzer
  * 
@@ -28,6 +29,8 @@ public class Oclet extends hub.top.petrinet.PetriNet {
 
   private HashSet<Node> history;
   
+  private HashSet<Node> hotNodes;
+  
   /**
    * whether this oclet describes an anti-oclet
    */
@@ -40,6 +43,7 @@ public class Oclet extends hub.top.petrinet.PetriNet {
     super();
     history = new HashSet<Node>();
     isAnti = anti;
+    hotNodes = new HashSet<Node>();
   }
   
   /**
@@ -141,12 +145,67 @@ public class Oclet extends hub.top.petrinet.PetriNet {
   }
   
   /**
+   * @return <code>true</code> iff the oclet is an anti-oclet
+   */
+  public boolean isAntiOclet() {
+    return isAnti;
+  }
+  
+  /**
    * @param n
    * @return <code>true</code> iff node n is node of the history
    */
   public boolean isInHistory(Node n) {
     return history.contains(n);
   }
+  
+  /**
+   * Set temperature of node to hot. 
+   * @param n
+   */
+  public void makeHotNode(Node n) {
+    if (!getPlaces().contains(n) && !getTransitions().contains(n)) return;
+    hotNodes.add(n);
+  }
+  
+  /**
+   * Set temperature of node to hot. 
+   * @param n
+   */
+  public void makeColdNode(Node n) {
+    if (!getPlaces().contains(n) && !getTransitions().contains(n)) return;
+    hotNodes.remove(n);
+  }
+  
+  /**
+   * @param n
+   * @return <code>true</code> iff Node 'n' is hot
+   */
+  public boolean isHotNode(Node n) {
+    return hotNodes.contains(n);
+  }
+  
+  /**
+   * @return the list of maximal conditions of this oclet's history
+   */
+  public LinkedList<Place> getMaxHistory() {
+    LinkedList<Place> max = new LinkedList<Place>();
+    for (Place p : getPlaces()) {
+      if (isInHistory(p)) {
+        boolean successorInHist = false;
+        for (Transition t : p.getPostSet()) {
+          if (isInHistory(t)) {
+            successorInHist = true;
+            break;
+          }
+        }
+        if (!successorInHist)
+          max.add(p);
+      }
+    }
+    return max;
+  }
+
 
   /**
    * @return <code>true</code> iff the net is a causal net: every condition
@@ -186,7 +245,7 @@ public class Oclet extends hub.top.petrinet.PetriNet {
       
       boolean changedStack = false;
       for (Node m : n.getPostSet()) {
-        // reaching node 'mÄ again on the depth-first stack
+        // reaching node 'm' again on the depth-first stack
         if (dfsStack.contains(m)) return false;
         // otherwise, explore an unexplored successor of 'n'
         if (!visited.contains(m)) {
@@ -226,7 +285,12 @@ public class Oclet extends hub.top.petrinet.PetriNet {
     }
     return true;
   }
-  
+
+  /**
+   * @return <code>true</code> iff the net satisfies all structural
+   * constraints of an oclet: a labeled causal net where the history
+   * is a prefix
+   */
   public boolean isValidOclet() {
 
     if (!isCausalNet()) return false;
@@ -243,9 +307,6 @@ public class Oclet extends hub.top.petrinet.PetriNet {
         }
       }
     }
-    
-
-    
     return true;
   }
 }

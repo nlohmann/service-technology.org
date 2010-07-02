@@ -359,7 +359,7 @@ public class DNodeBP {
         if (other.id == newNode.id) coNum++;
       }
       
-      if (coNum >= options.boundToCheck) {
+      if (coNum > options.boundToCheck) {
         // found k other concurrent conditions with the same id
         // bound violated
         propertyCheck |= PROP_UNSAFE;
@@ -2722,7 +2722,7 @@ public class DNodeBP {
         if (d.id == id) coNum++;
       }
       
-      if (coNum >= options.boundToCheck) {
+      if (coNum > options.boundToCheck) {
         // found k other concurrent conditions with the same id
         // bound violated
         propertyCheck |= PROP_UNSAFE;

@@ -300,8 +300,10 @@ lisa: marking might be reachable
 @section Siphons
 
 Lisa can check if a given petri net possesses siphons. If the
-answer is yes, it will calculate the siphon with the minimal number
-of places among all siphons. 
+answer is yes, it will calculate a siphon with a minimal number
+of places. Places mentioned in the final marking will be included in 
+the siphon.
+
 Call Lisa with filename and option - -findSiphon.
 
 @cartouche
@@ -310,7 +312,7 @@ lisa net.owfn --findSiphon
 @end smallexample
 @end cartouche
 
-If the petri net contains no siphons, you will see the following output:
+If no siphon was found, you will see the following output:
 
 @cartouche
 @smallexample
@@ -334,8 +336,9 @@ p4
 @section Traps
 
 Lisa can check if a given petri net possesses traps. If the
-answer is yes, it will calculate the trap with the minimal number
-of places among all traps. 
+answer is yes, it will calculate a trap with a minimal number
+of places. Places mentioned in the final marking will be included in 
+the trap.
 Call Lisa with filename and option - -findTrap.
 
 @cartouche
@@ -344,7 +347,7 @@ lisa net.owfn --findTrap
 @end smallexample
 @end cartouche
 
-If the petri net contains no traps, you will see the following output:
+If no trap was found, you will see the following output:
 
 @cartouche
 @smallexample

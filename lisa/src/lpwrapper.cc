@@ -234,9 +234,17 @@ int LPWrapper::calcPInvariant(bool verbose) {
 	@return The number of equations on success, -1 otherwise.
 */
 
-int LPWrapper::calcTrap(bool verbose) {
+int LPWrapper::calcTrap(bool verbose, std::set<const Place*> places) {
 	
 	setupP();
+
+	set<const Place*>::iterator pit;
+	for(pit=places.begin(); pit!=places.end(); ++pit){
+          for(unsigned int y=0; y<cols; ++y) mat[y]=0;
+          Place* p = _net->findPlace((*pit)->getName());
+	  mat[ppos[p]] = 1;
+          add_constraintex(lp,cols,mat,colpoint,EQ,1);
+        }
 
 	set<pnapi::Arc*>::iterator ait;
 	for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
@@ -295,9 +303,17 @@ int LPWrapper::calcTrap(bool verbose) {
 	@return The number of equations on success, -1 otherwise.
 */
 
-int LPWrapper::calcSiphon(bool verbose) {
+int LPWrapper::calcSiphon(bool verbose, std::set<const Place*> places) {
 	setupP();
 	
+	set<const Place*>::iterator pit;
+	for(pit=places.begin(); pit!=places.end(); ++pit){
+          for(unsigned int y=0; y<cols; ++y) mat[y]=0;
+          Place* p = _net->findPlace((*pit)->getName());
+	  mat[ppos[p]] = 1;
+          add_constraintex(lp,cols,mat,colpoint,EQ,1);
+        }
+
 	set<pnapi::Arc*>::iterator ait;
 	for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
 	{
@@ -346,6 +362,7 @@ int LPWrapper::calcSiphon(bool verbose) {
 
 	return cleanup();
 }
+
 
 /*
 

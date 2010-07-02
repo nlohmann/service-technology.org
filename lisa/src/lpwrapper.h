@@ -49,14 +49,12 @@ public:
 
 	int calcPInvariant(bool b);
 
-	int calcTrap(bool b);
+	int calcTrap(bool b, std::set<const Place*> places);
 
-	int calcSiphon(bool b);
+	int calcSiphon(bool b, std::set<const Place*> places);
 
 	//Boundedness check might be not providing reliable results
 	//int isBounded(bool b);
-
-	int isTerminating(bool b);
 
 	bool calcPTOrder();
 

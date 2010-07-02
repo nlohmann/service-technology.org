@@ -197,7 +197,26 @@ int main(int argc, char** argv) {
     if(args_info.findTrap_flag){
       LPWrapper lpw(net.getPlaces().size(), &net);
       lpw.calcPTOrder();
-      lpw.calcTrap(false);
+
+      //Get all places mentioned in the final marking. They have 
+      //to be included when calculating the trap.
+      std::set<const Place*> relevantPlaces;
+      pnapi::formula::Conjunction c = net.getFinalCondition().getFormula();
+      std::set<const pnapi::formula::Formula *> fset = c.getChildren(); 
+      std::set<const pnapi::formula::Formula *>::iterator fit;
+      for(fit = fset.begin(); fit != fset.end(); ++fit){
+        try{
+          const Place & p = (dynamic_cast<const pnapi::formula::FormulaEqual* >(*fit))->getPlace();  
+          unsigned int tokenCount = (dynamic_cast<const pnapi::formula::FormulaEqual* >(*fit))->getTokens();      
+          if(tokenCount != 0)
+            relevantPlaces.insert(&p);
+        }
+	catch(std::bad_cast & b){
+	  abort(1, "could not evaluate final marking");
+	}
+      }
+
+      lpw.calcTrap(false, relevantPlaces);
     }
 
     /*----------------------------------------.
@@ -207,7 +226,26 @@ int main(int argc, char** argv) {
     if(args_info.findSiphon_flag){
       LPWrapper lpw(net.getPlaces().size(), &net);
       lpw.calcPTOrder();
-      lpw.calcSiphon(false);
+
+      //Get all places mentioned in the final marking. They have 
+      //to be included when calculating the siphon.
+      std::set<const Place*> relevantPlaces;
+      pnapi::formula::Conjunction c = net.getFinalCondition().getFormula();
+      std::set<const pnapi::formula::Formula *> fset = c.getChildren(); 
+      std::set<const pnapi::formula::Formula *>::iterator fit;
+      for(fit = fset.begin(); fit != fset.end(); ++fit){
+        try{
+          const Place & p = (dynamic_cast<const pnapi::formula::FormulaEqual* >(*fit))->getPlace();  
+          unsigned int tokenCount = (dynamic_cast<const pnapi::formula::FormulaEqual* >(*fit))->getTokens();      
+          if(tokenCount != 0)
+            relevantPlaces.insert(&p);
+        }
+	catch(std::bad_cast & b){
+	  abort(1, "could not evaluate final marking");
+	}
+      }
+
+      lpw.calcSiphon(false, relevantPlaces);
     }	
 
     /*----------------------------------------.

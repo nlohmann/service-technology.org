@@ -17,19 +17,19 @@
 
 package hub.top.petrinet.unfold;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
 import hub.top.petrinet.Arc;
 import hub.top.petrinet.Node;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.Place;
-
 import hub.top.uma.DNode;
+import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * A {@link DNodeSys} representation of a Petri net for constructing a McMillan
@@ -114,7 +114,8 @@ public class DNodeSys_PetriNet extends DNodeSys {
 	 * @param other
 	 * @param toAdd
 	 */
-	private void addToPostNodes(DNode other, DNode toAdd) {
+	@SuppressWarnings("unused")
+  private void addToPostNodes(DNode other, DNode toAdd) {
 		int j=0;
 		for (; j<other.post.length; j++) {
 			if (other.post[j] == null) {
@@ -134,7 +135,8 @@ public class DNodeSys_PetriNet extends DNodeSys {
    * @param other
    * @param toAdd
    */
-	private void addToPreNodes(DNode other, DNode toAdd) {
+	@SuppressWarnings("unused")
+  private void addToPreNodes(DNode other, DNode toAdd) {
 		int j=0;
 		for (; j<other.pre.length; j++) {
 			if (other.pre[j] == null) {
@@ -243,7 +245,7 @@ public class DNodeSys_PetriNet extends DNodeSys {
 			// create new DNode d for Node n
 			DNode d = new DNode(nameToID.get(n.getName()), pre);
 			d.isEvent = true;
-			fireableEvents = fireableEvents.add(d);
+			fireableEvents.add(d);
 			
 			// create pre-/post-set for successor/predecessor nodes of d
 			DNode[] dPostPre = new DNode[1]; dPostPre[0] = d;

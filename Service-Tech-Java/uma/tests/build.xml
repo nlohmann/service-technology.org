@@ -6,6 +6,9 @@
 	<property name="home" location=".." />
 	<property name="bin" location="${home}/bin" />
 	
+	<property name="dir.test-src" location="${test.basedir}/src-test" />
+	<property name="dir.test-bin" location="${test.basedir}/bin-test" />
+	
 	<property name="testfiles" location="${test.basedir}/testfiles" />
 	
 	<property name="compiled.classes" location="${bin}" />
@@ -16,13 +19,31 @@
       	<fileset dir="${test.libs-external}">
         	<include name="**/*.jar"/>
       	</fileset>
+		<pathelement location="${dir.test-bin}"/>
 	</path>
 	
-	<target name="check">
+	<target name="build-test">
+		<mkdir dir="${dir.test-bin}" />
+		<javac classpathref="run.classpath"
+			srcdir="${dir.test-src}"
+         	destdir="${dir.test-bin}"
+         	debug="on" />
+	</target>
+	
+	<target name="check" depends="build-test">
 		<echo message="Running tests in ${test.basedir}" />
-		<java classname="hub.top.uma.Uma">
+		<java classname="hub.top.scenario.OcletTest">
 			<classpath refid="run.classpath" />
 		</java>
+		<java classname="hub.top.uma.UmaTest">
+			<classpath refid="run.classpath" />
+		</java>
+		
+		<antcall target="clean" />
+	</target>
+	
+	<target name="clean">
+		<delete dir="${dir.test-bin}" includeemptydirs="true" failonerror="false"/>
 	</target>
 	
 </project>

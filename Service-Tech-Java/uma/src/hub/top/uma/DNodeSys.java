@@ -19,7 +19,6 @@ package hub.top.uma;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -65,7 +64,7 @@ public abstract class DNodeSys {
 	 * A {@link DNodeSys} has two kinds of events. This set contains all events of
 	 * the system that can be fired.
 	 */
-	public DNode.SortedLinearList fireableEvents;
+	public DNodeSet.DNodeSetElement fireableEvents;
 	
 	/**
 	 * A total linear order of all IDs of all fireable events. Used for the
@@ -78,7 +77,7 @@ public abstract class DNodeSys {
    * the system that occur in preconditions of {@link #fireableEvents}. These
    * precondition events cannot be fired by themselves.
 	 */
-	public DNode.SortedLinearList preConEvents;
+	public DNodeSet.DNodeSetElement preConEvents;
 	
 	/**
 	 * Stores all conditions that are pre-condition of an event. Use
@@ -169,8 +168,8 @@ public abstract class DNodeSys {
 		maxHistoryDepth = -1;
 		DNode.translationTable = this;	// everything happens wrt. to this class
 		
-		fireableEvents = new DNode.SortedLinearList();
-		preConEvents = new DNode.SortedLinearList();
+		fireableEvents = new DNodeSet.DNodeSetElement();
+		preConEvents = new DNodeSet.DNodeSetElement();
 		fireableEventIndex = new HashMap<Short, Short>();
 		
 		init_setProperNames();

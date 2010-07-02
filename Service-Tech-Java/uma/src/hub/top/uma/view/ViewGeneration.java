@@ -286,9 +286,14 @@ public class ViewGeneration {
           DNode cut[] = new DNode[runCut.size()];
           runCut.toArray(cut);
           DNode.sortIDs(cut);
+          
+          DNode tauPre[] = new DNode[runCut.size()];
+          for (int iCut = 0; iCut < cut.length; iCut++) {
+            tauPre[i] = new DNode(cut[iCut].id, (DNode[])null);
+          }
 
-          DNode tauEvent = new DNode(t.id, cut);
-          for (DNode b : cut) {
+          DNode tauEvent = new DNode(t.id, tauPre);
+          for (DNode b : tauPre) {
             b.addPostNode(tauEvent);
           }
           for (DNode b : t.pre) {

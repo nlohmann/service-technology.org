@@ -1812,7 +1812,7 @@ public class DNodeBP {
 	 */
   private byte[] cutSignature_events_newCut(DNode[] newCut) {
     
-    byte signature[] = new byte[dNodeAS.fireableEvents.length()+dNodeAS.preConEvents.length()];
+    byte signature[] = new byte[dNodeAS.fireableEvents.size()+dNodeAS.preConEvents.size()];
 
     int sigIndex = 0;
     for (DNode e : dNodeAS.fireableEvents) {

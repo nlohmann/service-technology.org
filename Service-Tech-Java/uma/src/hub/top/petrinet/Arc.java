@@ -49,5 +49,10 @@ public class Arc {
    */
   public Node getTarget() {
     return target;
-  }  
+  }
+  
+  @Override
+  public String toString() {
+    return getSource()+" -> "+getTarget();
+  }
 }

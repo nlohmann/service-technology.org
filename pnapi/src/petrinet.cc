@@ -358,7 +358,7 @@ PetriNet::copyStructure(const PetriNet & net, const std::string & prefix)
   map<Label *, Label *> labelMap;
   PNAPI_FOREACH(port, net.interface_.getPorts())
   {
-    Port & p = ((port->first == "") ? (*interface_.getPort()) : interface_.addPort(port->first));
+    Port & p = interface_.addPort(port->first));
     PNAPI_FOREACH(label, port->second->getAllLabels())
     {
       Label * l = new Label(*this, p, (*label)->getName(), (*label)->getType());

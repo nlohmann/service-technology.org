@@ -559,6 +559,10 @@ int main(int argc, char** argv) {
 
                 outfile.stream() << meta(io::CREATOR, std::string(PACKAGE_STRING) + " Frontend (" + CONFIG_BUILDSYSTEM + ")");
                 outfile.stream() << meta(io::OUTPUTFILE, outname);
+                
+                if(args_info.removePorts_flag) {
+                  outfile.stream() << io::removePorts;
+                }
 
                 switch (args_info.output_arg[j]) {
 
@@ -612,6 +616,9 @@ int main(int argc, char** argv) {
                         abort(6, "petri: cannot open UNIX pipe to Graphviz dot");
 #endif
                         ostringstream d;
+                        if(args_info.removePorts_flag) {
+                          d << io::removePorts;
+                        }
                         d << io::dot << *(objects[i].net);
                         string call = string(args_info.dot_arg) + " -T" + args_info.output_orig[j] + " -q -o " + outname;
                         FILE* s = popen(call.c_str(), "w");

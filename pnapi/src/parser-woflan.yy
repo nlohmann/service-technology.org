@@ -94,7 +94,7 @@ place:
     {
       parser_.places_[$2] = parser_.place_ = &(parser_.net_.createPlace($2, 0, 0));
     }
-    catch(exception::Error e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }
@@ -121,7 +121,7 @@ transition_name:
     {
       parser_.transition_ = &(parser_.net_.createTransition($1));
     }
-    catch(exception::Error e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }
@@ -141,7 +141,7 @@ label:
     {
       parser_.transition_->setName($2);
     }
-    catch(exception::Error e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }

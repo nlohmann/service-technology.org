@@ -101,6 +101,8 @@ private: /* private variables */
   std::map<std::string, Label *> labels_;
   /// type of recent labels
   Label::Type labelType_;
+  /// mapping from label names to types
+  std::map<std::string, Label::Type> labelTypes_;
 
   /// read capacity
   int capacity_;

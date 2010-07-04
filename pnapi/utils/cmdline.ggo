@@ -28,6 +28,10 @@ option "formula" f
   "Places a final condition at the end of LoLA files. Has no effect to other output formats."
   flag off
 
+option "removePorts" -
+  "Removes ports in output files."
+  flag off
+
 option "guessFormula" -
   "Derive the final condition from the structure (i.e., the sink place) of the net."
   flag off

@@ -122,10 +122,6 @@ std::istream & operator>>(std::istream &, const util::Manipulator<T>);
 std::ostream & operator<<(std::ostream &, const PetriNet &);
 /// general exception output
 std::ostream & operator<<(std::ostream &, const exception::Error &);
-/// %InputError output
-std::ostream & operator<<(std::ostream &, const exception::InputError &);
-/// assertion output
-std::ostream & operator<<(std::ostream &, const exception::AssertionFailedError &);
 /// %MetaInformation manipulation
 std::ostream & operator<<(std::ostream &, const util::Manipulator<
     std::pair<MetaInformation, std::string> > &);
@@ -163,6 +159,8 @@ std::ios_base & woflan(std::ios_base &);
 std::ostream & formula(std::ostream &);
 /// suppress role output
 std::ostream & noRoles(std::ostream &);
+/// remove all ports
+std::ostream & removePorts(std::ostream &);
 
 /// meta information manipulator
 util::Manipulator<std::pair<MetaInformation, std::string> >
@@ -279,8 +277,6 @@ std::ostream & output(std::ostream &, const formula::FormulaGreaterEqual &);
 
 /*!
  * \brief   PNML I/O implementation
- * 
- * \todo review formula output
  */
 namespace __pnml
 {
@@ -478,6 +474,13 @@ struct Role
   Role() : role(false) {}
 };
 
+/// port removal type
+struct PortRemoval
+{
+  bool remove;
+  PortRemoval() : remove(false) {}
+};
+
 /*** TEMPLATE CLASSES ***/
 
 /*!
@@ -517,6 +520,7 @@ typedef StreamMetaData<io::util::Mode> ModeData;
 typedef StreamMetaData<Delim> DelimData;
 typedef StreamMetaData<Formula> FormulaData;
 typedef StreamMetaData<Role> RoleData;
+typedef StreamMetaData<PortRemoval> PortData;
 typedef StreamMetaData<std::map<pnapi::io::MetaInformation, std::string> > MetaData;
 typedef Manipulator<std::pair<pnapi::io::MetaInformation, std::string> > MetaManipulator;
 
@@ -533,8 +537,6 @@ bool compareContainerElements(const formula::Formula *, const formula::Formula *
 bool compareContainerElements(Label *, Label *);
 bool compareContainerElements(const Label *, const Label *);
 bool compareContainerElements(Edge *, Edge *);
-
-/// \todo check for obsolete methods
 
 std::set<Place *> filterMarkedPlaces(const std::set<Place *> &);
 std::multimap<unsigned int, Place *> groupPlacesByCapacity(const std::set<Place *> &);

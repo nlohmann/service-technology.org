@@ -506,7 +506,7 @@ m4_define([NET1],[bug14128.1.owfn])
 m4_define([NET2],[bug14128.2.owfn])
 AT_CHECK([cp TESTFILES/NET1 .])
 AT_CHECK([cp TESTFILES/NET2 .])
-AT_CHECK([PETRI -iowfn -oowfn --compose=NET2 NET1], 0, ignore, stderr)
+AT_CHECK([PETRI -iowfn -oowfn --removePorts --compose=NET2 NET1], 0, ignore, stderr)
 AT_CHECK([GREP -q -e "z, v;" -e "v, z;" NET1.composed.owfn])
 AT_KEYWORDS([bug])
 AT_CLEANUP
@@ -651,7 +651,7 @@ AT_SETUP([OWFN parser #02])
 m4_define([NET], [error_parser_owfn_02.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
-AT_CHECK([GREP -q "net already contains a label named 'i'" stderr])
+AT_CHECK([GREP -q "label name 'i' already used" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
@@ -659,7 +659,7 @@ AT_SETUP([OWFN parser #03])
 m4_define([NET], [error_parser_owfn_03.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
-AT_CHECK([GREP -q "net already contains a node named 'p1'" stderr])
+AT_CHECK([GREP -q "node name 'p1' already used" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
@@ -675,7 +675,7 @@ AT_SETUP([OWFN parser #05])
 m4_define([NET], [error_parser_owfn_05.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
-AT_CHECK([GREP -q "'x': unknown interface label" stderr])
+AT_CHECK([GREP -q "unknown label 'x'" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
@@ -683,7 +683,7 @@ AT_SETUP([OWFN parser #06])
 m4_define([NET], [error_parser_owfn_06.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
-AT_CHECK([GREP -q "'p1': unknown interface label" stderr])
+AT_CHECK([GREP -q "unknown label 'p1'" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 

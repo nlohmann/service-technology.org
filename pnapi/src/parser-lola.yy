@@ -123,7 +123,7 @@ place_list:
     {
       parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
     }
-    catch(exception::UserCausedError e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }
@@ -135,7 +135,7 @@ place_list:
     {
       parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
     }
-    catch(exception::UserCausedError e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }
@@ -180,7 +180,7 @@ transition:
     {
       parser_.transition_ = &(parser_.net_.createTransition(parser_.nodeName_.str()));
     }
-    catch(exception::UserCausedError e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);      
     }

@@ -302,22 +302,19 @@ std::ostream & output(std::ostream & os, const Interface & interface)
   
   map<string, Port *> ports = interface.getPorts();
   
-  if(ports.size() > 1)
+  if(util::PortData::data(os).remove)
   {
-    PNAPI_FOREACH(port, ports)
-    {
-      if(port->first != "")
-      {
-        os << (*port->second) << endl;
-      }
-    }
+    os << "/// input\n node [shape=circle fillcolor=orange]\n"<< interface.getInputLabels()
+       << "\n/// output\n node [shape=circle fillcolor=yellow]\n" << interface.getOutputLabels()
+       << "\n/// synchronous\n node [shape=box fillcolor=black]\n" << interface.getSynchronousLabels()
+       << endl;
   }
   else
   {
-    os << "/// input\n node [shape=circle fillcolor=orange]\n"<< interface.getPort()->getInputLabels()
-       << "\n/// output\n node [shape=circle fillcolor=yellow]\n" << interface.getPort()->getOutputLabels()
-       << "\n/// synchronous\n node [shape=box fillcolor=black]\n" << interface.getPort()->getSynchronousLabels()
-       << endl;
+    PNAPI_FOREACH(port, ports)
+    {
+      os << (*port->second) << endl;
+    }
   }
   
   return (os << endl);
@@ -901,22 +898,10 @@ std::ostream & output(std::ostream & os, const Interface & interface)
 {
   os << "    <ports>\n";
   
-  if(interface.getPorts().size() > 1)
+  PNAPI_FOREACH(port, interface.getPorts())
   {
-    PNAPI_FOREACH(port, interface.getPorts())
-    {
-      if(port->first != "")
-      {
-        os << "      <port id=\"" << port->first << "\">\n"
-           << (*port->second)
-           << "      </port>\n";
-      }
-    }
-  }
-  else
-  {
-    os << "      <port id=\"portId1\">\n"
-       << (*interface.getPort())
+    os << "      <port id=\"" << port->first << "\">\n"
+       << (*port->second)
        << "      </port>\n";
   }
     
@@ -1077,6 +1062,15 @@ std::ios_base & owfn(std::ios_base & ios)
 std::ostream & noRoles(std::ostream & os)
 {
   util::RoleData::data(os).role = true;
+  return os;
+}
+
+/*!
+ * \brief remove all ports
+ */
+std::ostream & removePorts(std::ostream & os)
+{
+  util::PortData::data(os).remove = true;
   return os;
 }
 
@@ -1252,29 +1246,26 @@ std::ostream & output(std::ostream & os, const Interface & interface)
 {
   os << "INTERFACE\n" << delim(", ");
   
-  if(interface.getPorts().size() > 1)
+  if(util::PortData::data(os).remove)
   {
-    PNAPI_FOREACH(port, interface.getPorts())
+    if(!interface.getInputLabels().empty())
     {
-      if(port->first != "")
-      {
-        os << (*port->second);
-      }
+      os << "  INPUT\n    " << interface.getInputLabels() << ";\n"; 
+    }
+    if(!interface.getOutputLabels().empty())
+    {
+      os << "  OUTPUT\n    " << interface.getOutputLabels() << ";\n"; 
+    }
+    if(!interface.getSynchronousLabels().empty())
+    {
+      os << "  SYNCHRONOUS\n    " << interface.getSynchronousLabels() << ";\n"; 
     }
   }
   else
   {
-    if(!interface.getPort()->getInputLabels().empty())
+    PNAPI_FOREACH(port, interface.getPorts())
     {
-      os << "  INPUT\n    " << interface.getPort()->getInputLabels() << ";\n"; 
-    }
-    if(!interface.getPort()->getOutputLabels().empty())
-    {
-      os << "  OUTPUT\n    " << interface.getPort()->getOutputLabels() << ";\n"; 
-    }
-    if(!interface.getPort()->getSynchronousLabels().empty())
-    {
-      os << "  SYNCHRONOUS\n    " << interface.getPort()->getSynchronousLabels() << ";\n"; 
+      os << (*port->second);  
     }
   }
   

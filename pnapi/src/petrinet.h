@@ -260,7 +260,6 @@ private: /* private variables */
   
   /*!
    * \name (overlapping) sets for net structure
-   * \todo Vielleicht auch sendTransitions_ ?
    */
   //@{
   /// set of all nodes
@@ -281,7 +280,7 @@ private: /* private variables */
   
   /*! 
    * \name general properties
-     \todo Vielleicht Rollen symmetrisch zu Kosten organisieren.
+   * \todo Vielleicht Rollen symmetrisch zu Kosten organisieren.
    */
   //@{
   /// meta information

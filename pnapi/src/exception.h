@@ -22,6 +22,7 @@
 #include "config.h"
 
 #include <string>
+#include <iostream>
 
 namespace pnapi
 {
@@ -44,6 +45,8 @@ public: /* public constants */
 public: /* public methods */
   /// constructor
   Error(const std::string &);
+  /// output method
+  virtual std::ostream & output(std::ostream &) const;
 };
 
 
@@ -74,6 +77,8 @@ public: /* public methods */
   /// constructor
   InputError(Type, const std::string &, int, const std::string &,
              const std::string &);
+  /// output method
+  virtual std::ostream & output(std::ostream &) const;
 };
 
 /*!
@@ -83,7 +88,7 @@ class NotImplementedError : public Error
 {
 public: /* public methods */
   /// constructor
-  NotImplementedError(const std::string &); 
+  NotImplementedError(const std::string &);
 };
 
 /*!
@@ -101,6 +106,8 @@ public: /* public methods */
   /// constructor
   AssertionFailedError(const std::string &, unsigned int,
                        const std::string &);
+  /// output method
+  virtual std::ostream & output(std::ostream &) const;
 };
 
 /*!
@@ -115,7 +122,8 @@ public: /* public types */
     UE_NONE,
     UE_NODE_NAME_CONFLICT,
     UE_LABEL_NAME_CONFLICT,
-    UE_ARC_CONFLICT
+    UE_ARC_CONFLICT,
+    UE_COMPOSE_ERROR
   };
   
 public: /* public constants */

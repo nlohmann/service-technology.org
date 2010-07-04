@@ -46,6 +46,7 @@
 #include "petrinet.h"
 
 #include <sstream>
+#include <string>
 
 %}
 
@@ -190,9 +191,16 @@ interface_label_list:
     // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
     try
     {
-      parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
+      if(parser_.port_ == NULL)
+      {
+        parser_.label_ = &(parser_.net_.getInterface().addLabel(parser_.nodeName_.str(), parser_.labelType_));
+      }
+      else
+      {
+        parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
+      }
     }
-    catch(exception::Error e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }
@@ -206,9 +214,16 @@ interface_label_list:
     // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
     try
     {
-      parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
+      if(parser_.port_ == NULL)
+      {
+        parser_.label_ = &(parser_.net_.getInterface().addLabel(parser_.nodeName_.str(), parser_.labelType_));
+      }
+      else
+      {
+        parser_.label_ = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelType_));
+      }
     }
-    catch(exception::Error e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }
@@ -248,10 +263,28 @@ commands:
 
 port_list:
   KEY_PORT node_name
-  { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); } 
+  {
+    try
+    {
+      parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str()));
+    }
+    catch(exception::Error & e)
+    {
+      parser_.rethrow(e);
+    }
+  }
   port_input_places port_output_places port_synchronous              
 | port_list KEY_PORT node_name
-  { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
+  {
+    try
+    {
+      parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str()));
+    }
+    catch(exception::Error & e)
+    {
+      parser_.rethrow(e);
+    }
+  }
   port_input_places port_output_places port_synchronous
 ;
 
@@ -285,7 +318,7 @@ place_list:
     {
       parser_.place_ = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
     }
-    catch(exception::Error e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }
@@ -301,7 +334,7 @@ place_list:
     {
       parser_.place_ = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
     }
-    catch(exception::Error e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }
@@ -336,51 +369,136 @@ typed_interface_list:
 
 typed_interface_list_element:
   internal_places
-| input_places
-| output_places
-| synchronous
+| input_places_2
+| output_places_2
+| synchronous_2
 | roles
+;
+
+input_places_2:
+  KEY_INPUT { parser_.labelType_ = Label::INPUT; } interface_labels_2 SEMICOLON                
+;
+
+output_places_2:
+  KEY_OUTPUT { parser_.labelType_ = Label::OUTPUT; } interface_labels_2 SEMICOLON                 
+;
+
+synchronous_2:
+  KEY_SYNCHRONOUS { parser_.labelType_ = Label::SYNCHRONOUS; } interface_labels_2 SEMICOLON
+;
+
+  // NOTE: capacity kept due to compatibility reasons; is not actually used
+interface_labels_2: 
+  capacity interface_label_list_2 { parser_.capacity_ = 0; }
+| interface_labels_2 SEMICOLON capacity interface_label_list_2 { parser_.capacity_ = 0; }
+;
+
+interface_label_list_2:  
+  /* empty */           
+| node_name
+  {
+    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, std::string("label name '") + parser_.nodeName_.str() + "' already used");
+    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, std::string("node name '") + parser_.nodeName_.str() + "' already used");
+    parser_.check(parser_.labelTypes_.find(parser_.nodeName_.str()) == parser_.labelTypes_.end(), std::string("label name '") + parser_.nodeName_.str() + "' already used");
+
+    parser_.labelTypes_[parser_.nodeName_.str()] = parser_.labelType_;
+  }
+  controlcommands // NOTE: also kept due to compatibility reasons
+| interface_label_list_2 COMMA node_name
+  {
+    parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, std::string("label name '") + parser_.nodeName_.str() + "' already used");
+    parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, std::string("node name '") + parser_.nodeName_.str() + "' already used");
+    parser_.check(parser_.labelTypes_.find(parser_.nodeName_.str()) == parser_.labelTypes_.end(), std::string("label name '") + parser_.nodeName_.str() + "' already used");
+
+    parser_.labelTypes_[parser_.nodeName_.str()] = parser_.labelType_;
+  }
+  controlcommands // NOTE: also kept due to compatibility reasons
 ;
 
 internal_places:
   KEY_INTERNAL places SEMICOLON                   
 ;
 
-
 ports:
-  /* empty */         
+  /* empty */
+  {
+    try
+    {
+      PNAPI_FOREACH(l, parser_.labelTypes_)
+      {
+        parser_.labels_[l->first] = &(parser_.net_.getInterface().addLabel(l->first, l->second));
+      }
+    }
+    catch(exception::Error & e)
+    {
+      parser_.rethrow(e);
+    }
+    parser_.labelTypes_.clear();
+  }
 | KEY_PORTS port_list2 
 ;
 
 port_list2:
   node_name COLON
-  { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
+  {
+    try
+    {
+      parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str()));
+    }
+    catch(exception::Error & e)
+    {
+      parser_.rethrow(e);
+    }
+  }
   port_participants SEMICOLON
 | port_list2 node_name COLON
-  { parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str())); }
+  {
+    try
+    {
+      parser_.port_ = &(parser_.net_.getInterface().addPort(parser_.nodeName_.str()));
+    }
+    catch(exception::Error & e)
+    {
+      parser_.rethrow(e);
+    }
+  }
   port_participants SEMICOLON 
 ;
 
 port_participants: 
   node_name 
   {
-    Label * l = parser_.labels_[parser_.nodeName_.str()];
-    parser_.check(l != NULL, "unknown interface label");
-    parser_.check((l->getPort().getName() == ""), "interface label already assigned to port '" + l->getPort().getName() +"'");
-     
-    Label::Type t = l->getType();
-    parser_.net_.getInterface().getPort()->removeLabel(parser_.nodeName_.str());
-    parser_.labels_[parser_.nodeName_.str()] = &(parser_.port_->addLabel(parser_.nodeName_.str(), t));
+    parser_.check(parser_.label_ == NULL,
+                  ((parser_.label_ = parser_.net_.getInterface().findLabel(parser_.nodeName_.str())) ?
+                   ("interface label already assigned to port '" + parser_.label_->getPort().getName() +"'") : ""));
+    parser_.check(parser_.labelTypes_.find(parser_.nodeName_.str()) != parser_.labelTypes_.end(),
+                  std::string("unknown label '") + parser_.nodeName_.str() + "'");
+
+    try
+    {
+      parser_.labels_[parser_.nodeName_.str()] = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelTypes_[parser_.nodeName_.str()]));
+    }
+    catch(exception::Error & e)
+    {
+      parser_.rethrow(e);
+    }
   }
 | port_participants COMMA node_name
   {
-    Label * l = parser_.labels_[parser_.nodeName_.str()];
-    parser_.check(l != NULL, "unknown interface label");
-    parser_.check((l->getPort().getName() == ""), "interface label already assigned to port '" + l->getPort().getName() +"'");
-     
-    Label::Type t = l->getType();
-    parser_.net_.getInterface().getPort()->removeLabel(parser_.nodeName_.str());
-    parser_.labels_[parser_.nodeName_.str()] = &(parser_.port_->addLabel(parser_.nodeName_.str(), t));
+    parser_.check(parser_.label_ == NULL,
+                  ((parser_.label_ = parser_.net_.getInterface().findLabel(parser_.nodeName_.str())) ?
+                   ("interface label already assigned to port '" + parser_.label_->getPort().getName() +"'") : ""));
+    parser_.check(parser_.labelTypes_.find(parser_.nodeName_.str()) != parser_.labelTypes_.end(),
+                  std::string("unknown label '") + parser_.nodeName_.str() + "'");
+
+    try
+    {
+      parser_.labels_[parser_.nodeName_.str()] = &(parser_.port_->addLabel(parser_.nodeName_.str(), parser_.labelTypes_[parser_.nodeName_.str()]));
+    }
+    catch(exception::Error & e)
+    {
+      parser_.rethrow(e);
+    }
   } 
 ;
 
@@ -621,7 +739,7 @@ transition:
     {
       parser_.transition_ = &(parser_.net_.createTransition(parser_.nodeName_.str()));
     }
-    catch(exception::Error e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }

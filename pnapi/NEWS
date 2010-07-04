@@ -18,4 +18,12 @@ Version 4.02-unreleased
 
 * introduced method to guess place relations
 
+* refactored interface classes (labels without a port will get their own
+  ports)
+
+* refactored compose according to the tpp glossar (i.e. two ports be
+  composed iff they match perfectly)
+
+* added parameter -removePorts to remove ports in output files (dot, owfn)
+
 \nSee file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for\ncomplete version history.\n

@@ -538,7 +538,7 @@ std::ostream & output(std::ostream & os, const formula::Negation & f)
  */
 std::ostream & output(std::ostream & os, const formula::Conjunction & f)
 {
-  return (os << "(" << delim(" /\\\\ ") << f.getChildren() << ")");
+  return (os << "(" << delim(" &and; ") << f.getChildren() << ")");
 }
 
 /*!
@@ -546,7 +546,7 @@ std::ostream & output(std::ostream & os, const formula::Conjunction & f)
  */
 std::ostream & output(std::ostream & os, const formula::Disjunction & f)
 {
-  return (os << "(" << delim(" \\\\/ ") << f.getChildren() << ")");
+  return (os << "(" << delim(" &or; ") << f.getChildren() << ")");
 }
 
 /*!
@@ -554,7 +554,7 @@ std::ostream & output(std::ostream & os, const formula::Disjunction & f)
  */
 std::ostream & output(std::ostream & os, const formula::FormulaTrue &)
 {
-  return (os << "T");
+  return (os << "True");
 }
 
 /*!
@@ -562,7 +562,7 @@ std::ostream & output(std::ostream & os, const formula::FormulaTrue &)
  */
 std::ostream & output(std::ostream & os, const formula::FormulaFalse &)
 {
-  return (os << "F");
+  return (os << "False");
 }
 
 /*!

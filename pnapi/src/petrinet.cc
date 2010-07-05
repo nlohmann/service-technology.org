@@ -100,8 +100,10 @@ void ComponentObserver::updateNodeNameHistory(Node & node,
 void ComponentObserver::initializeNodeNameHistory(Node & node)
 {
   string name = node.getName();
-  PNAPI_ASSERT( (net_.nodesByName_.find(name) == net_.nodesByName_.end()) ||
-                     ((net_.nodesByName_.find(name))->second == &node) );
+  PNAPI_ASSERT_USER(((net_.nodesByName_.find(name) == net_.nodesByName_.end()) ||
+                     ((net_.nodesByName_.find(name))->second == &node)),
+                    string("node '") + name + "' already exists",
+                    exception::UserCausedError::UE_NODE_NAME_CONFLICT);
 
   net_.nodesByName_[name] = &node;
 }

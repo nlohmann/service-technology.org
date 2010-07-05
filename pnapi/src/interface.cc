@@ -186,13 +186,16 @@ Port & Interface::addPort(const std::string & name)
  */
 Label & Interface::addLabel(const std::string & name, Label::Type type, const std::string & port)
 {
+  Label * result = NULL;
   switch(type)
   {
-  case Label::INPUT: addInputLabel(name, port); break;
-  case Label::OUTPUT: addOutputLabel(name, port); break;
-  case Label::SYNCHRONOUS: addSynchronousLabel(name, port); break;
+  case Label::INPUT: result = &addInputLabel(name, port); break;
+  case Label::OUTPUT: result = &addOutputLabel(name, port); break;
+  case Label::SYNCHRONOUS: result = &addSynchronousLabel(name, port); break;
   default: PNAPI_ASSERT(false);
   }
+  
+  return *result;
 }
 
 /*!

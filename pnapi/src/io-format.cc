@@ -130,7 +130,8 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\""
   << " remincross=true label=\""
   << "Petri net"
-  << (filename.empty() ? "" : " generated from " + filename) << "\"]\n"
+  << (filename.empty() ? "" : " generated from " + filename) << "\\n"
+  << "&Omega;=" << net.getFinalCondition() << "\"]\n"
   
   << " node [fontname=\"Helvetica\" fixedsize width=\".3\""
   << " height=\".3\" label=\"\" style=filled]\n"
@@ -522,6 +523,94 @@ std::ostream & output(std::ostream & os, const Automaton & sa)
   }
   
   return (os << "}\n}\n");
+}
+
+/*!
+ * \brief negation output
+ */
+std::ostream & output(std::ostream & os, const formula::Negation & f)
+{
+  return (os << "&not;" << (*f.getChildren().begin())); 
+}
+
+/*!
+ * \brief conjunction output
+ */
+std::ostream & output(std::ostream & os, const formula::Conjunction & f)
+{
+  return (os << "(" << delim(" /\\\\ ") << f.getChildren() << ")");
+}
+
+/*!
+ * \brief disjunction output
+ */
+std::ostream & output(std::ostream & os, const formula::Disjunction & f)
+{
+  return (os << "(" << delim(" \\\\/ ") << f.getChildren() << ")");
+}
+
+/*!
+ * \brief FormulaTrue output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaTrue &)
+{
+  return (os << "T");
+}
+
+/*!
+ * \brief FormulaFalse output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaFalse &)
+{
+  return (os << "F");
+}
+
+/*!
+ * \brief FormulaEqual output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaEqual & f)
+{
+  return (os << "(" << f.getPlace().getName() << "=" << f.getTokens() << ")");
+}
+
+/*!
+ * \brief FormulaNotEqual output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaNotEqual & f)
+{
+  return (os << "(" << f.getPlace().getName() << "&ne;" << f.getTokens() << ")");
+}
+
+/*!
+ * \brief FormulaLess output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaLess & f)
+{
+  return (os << "(" << f.getPlace().getName() << "&lt;" << f.getTokens() << ")");
+}
+
+/*!
+ * \brief FormulaLessEqual output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaLessEqual & f)
+{
+  return (os << "(" << f.getPlace().getName() << "&le;" << f.getTokens() << ")");
+}
+
+/*!
+ * \brief FormulaGreater output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaGreater & f)
+{
+  return (os << "(" << f.getPlace().getName() << "&gt;" << f.getTokens() << ")");
+}
+
+/*!
+ * \brief FormulaGreaterEqual output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaGreaterEqual & f)
+{
+  return (os << "(" << f.getPlace().getName() << "&ge;" << f.getTokens() << ")");
 }
 
 

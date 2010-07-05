@@ -24,7 +24,10 @@ Version 4.02-unreleased
 * refactored compose according to the tpp glossar (i.e. two ports be
   composed iff they match perfectly)
 
-* added parameter -removePorts to remove ports in output files (dot, owfn)
+* added parameter `--removePorts' to remove ports in output files (dot,
+  owfn)
+
+* using dot output, the final condition will now be written below the net
 
 Version 4.01 (2010-05-11)
 =========================

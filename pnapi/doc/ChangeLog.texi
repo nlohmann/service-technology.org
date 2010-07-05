@@ -6,7 +6,8 @@
 @item introduced method to guess place relations
 @item refactored interface classes (labels without a port will get their own ports)
 @item refactored compose according to the tpp glossar (i.e. two ports be composed iff they match perfectly)
-@item added parameter --removePorts to remove ports in output files (dot, owfn)
+@item added parameter @option{--removePorts} to remove ports in output files (dot, owfn)
+@item using dot output, the final condition will now be written below the net
 @end itemize
 
 @heading Version 4.01 (2010-05-11)

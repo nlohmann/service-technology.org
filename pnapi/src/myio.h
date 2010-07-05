@@ -344,6 +344,28 @@ std::ostream & output(std::ostream &, const Port &);
 std::ostream & output(std::ostream &, const Label &);
 /// node with attribut
 std::ostream & output(std::ostream &, const Node &, const std::string &);
+/// negation output
+std::ostream & output(std::ostream &, const formula::Negation &);
+/// conjunction output
+std::ostream & output(std::ostream &, const formula::Conjunction &);
+/// disjunction output
+std::ostream & output(std::ostream &, const formula::Disjunction &);
+/// FormulaTrue output
+std::ostream & output(std::ostream &, const formula::FormulaTrue &);
+/// FormulaFalse output
+std::ostream & output(std::ostream &, const formula::FormulaFalse &);
+/// FormulaEqual output
+std::ostream & output(std::ostream &, const formula::FormulaEqual &);
+/// FormulaNotEqual output
+std::ostream & output(std::ostream &, const formula::FormulaNotEqual &);
+/// FormulaLess output
+std::ostream & output(std::ostream &, const formula::FormulaLess &);
+/// FormulaLessEqual output
+std::ostream & output(std::ostream &, const formula::FormulaLessEqual &);
+/// FormulaGreater output
+std::ostream & output(std::ostream &, const formula::FormulaGreater &);
+/// FormulaGreaterEqual output
+std::ostream & output(std::ostream &, const formula::FormulaGreaterEqual &);
 /// get a unique node name for dot output
 std::string getNodeName(const Node &, bool = false);
 /// get a unique label name for dot output

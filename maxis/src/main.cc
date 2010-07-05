@@ -1,3 +1,22 @@
+/*****************************************************************************\
+ Maxis -- Construct maximal services
+
+ Copyright (C) 2010  Jarungjit Parnjai <parnjai@informatik.hu-berlin.de>
+
+ Maxis is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ Maxis is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Maxis.  If not, see <http://www.gnu.org/licenses/>.
+\*****************************************************************************/
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -72,13 +91,15 @@ set<unsigned int> finalIDs;
 multimap<string, unsigned int> removeArcs;
 
 /// number of nodes/states
-unsigned int numberOfNodes = 0;
+unsigned int number_of_nodes = 0;
 unsigned int node_index = 0;
+
+liberal liberal_flag = normal;
 
 /****************************************
  * evaluate the command line parameters *
  ****************************************/
-void evaluateParameters(int argc, char** argv)
+void evaluate_parameters(int argc, char** argv)
 {
 	// initialize the parameters structure
 	struct cmdline_parser_params *params = cmdline_parser_params_create();
@@ -92,6 +113,31 @@ void evaluateParameters(int argc, char** argv)
 	if (args_info.verbose_flag) {
 		for (int idx = 0; idx < argc; ++idx) {
 			message("arg[%d] is %s ", idx, argv[idx]);
+		}
+	}
+
+	if(args_info.liberal_given) {
+		switch (args_info.liberal_arg) {
+			case 0 :  liberal_flag = normal;
+					  if(args_info.verbose_flag)
+						  message("the liberal flag is not set");
+					  break;
+			case 1 :  liberal_flag = minimal;
+					  if(args_info.verbose_flag)
+						  message("the liberal flag is set to minimal");
+					  break;
+			case 2 :  message("the liberal flag is set to maximal");
+					  message("sorry, the most liberal maximal partner is currently under construction!");
+					  status("terminated with failure!");
+					  exit(EXIT_FAILURE);
+/*
+					  liberal_flag = maximal;
+					  if(args_info.verbose_flag)
+						  message("the liberal flag is set to maximal");
+					  break;
+*/
+			default : liberal_flag = normal;
+					  break;
 		}
 	}
 
@@ -129,7 +175,7 @@ void evaluateParameters(int argc, char** argv)
 /***********************
  * parse OG input file *
  ***********************/
-void parseOG()
+void parse_OG()
 {
     // open file and link input file pointer
     yyin = fopen(args_info.inputs[0], "r");
@@ -217,7 +263,7 @@ void convertFormulaToDNF()
  * for each formula,                                                            *
  *    add an internal tau choice of all outgoing arcs described by the formulas *
  ********************************************************************************/
-void addAnInternalChoice(set<Formula *> childrenFormula,
+void add_an_internal_choice(set<Formula *> childrenFormula,
 		unsigned int sourceNode,
 		multimap<string, unsigned int> * arcMap)
 {
@@ -254,31 +300,32 @@ void addAnInternalChoice(set<Formula *> childrenFormula,
    	arcMap->insert( multimap<string, unsigned int>::value_type("TAU", node_index) );
 }
 
-void addLiteralNode(unsigned int sourceNode, Literal * literal)
+void add_literal_node(unsigned int sourceNode, Literal * literal)
 {
 	// read all outgoing arc label from a source node;
 	multimap<string, unsigned int> arcMap = succ[sourceNode];
 
 	//	if literal string is "true"
+	// #TODO : then add all (least/most liberal) possible combinations according to liberal flag
 	/* #TODO : case insensitive string comparison */
  	if (literal->operator==("true")) {
 		for( multimap<string, unsigned int>::iterator it=arcMap.begin(); it!=arcMap.end(); ++it) {
 			Literal aLiteral(it->first);
 			set<Formula *> childrenFormula;
 			childrenFormula.insert(& aLiteral);
-			addAnInternalChoice(childrenFormula, sourceNode, & succ[sourceNode]);
+			add_an_internal_choice(childrenFormula, sourceNode, & succ[sourceNode]);
 		}
 	} else {
 		//	if literal string is not "false"
 		if (!literal->operator==("false")) {
 			set<Formula *> childrenFormula;
 			childrenFormula.insert(dynamic_cast<Formula *> (literal));
-			addAnInternalChoice(childrenFormula, sourceNode, & succ[sourceNode]);
+			add_an_internal_choice(childrenFormula, sourceNode, & succ[sourceNode]);
 		}
 	}	// in case literal string is "false", do nothing
 }
 
-void addConjunctionNode(unsigned int sourceNode, Formula * formula)
+void add_conjunction_node(unsigned int sourceNode, Formula * formula)
 {
 	set<Formula *> elements = formula->getElements();
 	set<string> ss;
@@ -293,28 +340,28 @@ void addConjunctionNode(unsigned int sourceNode, Formula * formula)
 		return;
 
 	// add an transition
-	addAnInternalChoice(formula->getElements(), sourceNode, & succ[sourceNode]);
+	add_an_internal_choice(formula->getElements(), sourceNode, & succ[sourceNode]);
 }
 
-void addDisjunctionNode(unsigned int sourceNode, Formula * formula)
+void add_disjunction_node(unsigned int sourceNode, Formula * formula)
 {
 	// assume formula is dnf; a disjunction of either literal or conjunction
 	set<Formula *> dnfElements = formula->getElements();
 	for (set<Formula *>::iterator it=dnfElements.begin(); it!=dnfElements.end(); ++it)	{
 		Literal * l = dynamic_cast<Literal *> (formula);
 		if (l != NULL)
-			addLiteralNode(sourceNode, l);
+			add_literal_node(sourceNode, l);
 		else
-			addConjunctionNode(sourceNode, *it);
+			add_conjunction_node(sourceNode, *it);
 	}
 }
 
 /****************************************
  * construct a maximal partner from OGs *
  ****************************************/
-void constructMaximalPartner()
+void construct_maximal_partner()
 {
-	numberOfNodes = succ.size();
+	number_of_nodes = succ.size();
 
     for( map<unsigned int, Formula *>::iterator it=formulae.begin(); it!=formulae.end(); ++it)
     {
@@ -344,13 +391,13 @@ void constructMaximalPartner()
 	    	if (l != NULL)  {
 	    		/* #TODO : case insensitive string comparison */
 	    		if (l->getString().compare("false")!=0)
-	    			addLiteralNode(node, l);
+	    			add_literal_node(node, l);
 	    	} else {
 	    		// formula must be an operator
 	    		if ( dynamic_cast<Conjunction *> (formula) != NULL)
-	    			addConjunctionNode(node, formula);
+	    			add_conjunction_node(node, formula);
 	    		else
-	    			addDisjunctionNode(node, formula);
+	    			add_disjunction_node(node, formula);
 	    	}
 	    }
 
@@ -376,7 +423,7 @@ void constructMaximalPartner()
 /* *************************************
  * write output as a service automaton *
  ***************************************/
-void writeOutputSA()
+void write_output_SA()
 {
 	bool initialState = false;
 
@@ -450,7 +497,7 @@ void writeOutputSA()
 /**************************
  * generate DNF structure *
  **************************/
-void generateDNFStructure() {
+void generate_DNF_structure() {
     for( map<unsigned int, Formula *>::iterator it=formulae.begin(); it!=formulae.end(); ++it) {
 
     	cout << "======================" << endl;
@@ -478,19 +525,39 @@ void generateDNFStructure() {
 	   Disjunction * aFormula = aDNF->get_DNF();
    	   formulae[node] = static_cast<Formula *>(aFormula);
 
-   	   if (args_info.verbose_flag) {
-   		   cout << PACKAGE << ": DNF = ";
-   		   aDNF->out(cout);
-		   cout << PACKAGE << ": minimizing DNF structure..." << endl;
+   	   switch (liberal_flag) {
+		   case minimal :  if (args_info.verbose_flag) {
+							   cout << PACKAGE << ": DNF = ";
+							   aDNF->out(cout);
+							   cout << PACKAGE << ": minimizing DNF structure..." << endl;
+							}
+
+						   aDNF->minimize(cout);
+						   {
+							   Disjunction * minimizedFormula = aDNF->get_DNF();
+							   formulae[node] = static_cast<Formula *>(minimizedFormula);
+						   }
+						   break;
+
+		   case maximal : // message("maximizing function is currently under construction...");
+						   //break;
+						   if (args_info.verbose_flag) {
+							   cout << PACKAGE << ": DNF = ";
+							   aDNF->out(cout);
+							   cout << PACKAGE << ": maximizing DNF structure..." << endl;
+							}
+
+						   aDNF->maximize(cout);
+						   {
+							   Disjunction * maximizedFormula = aDNF->get_DNF();
+							   formulae[node] = static_cast<Formula *>(maximizedFormula);
+						   }
+						   break;
+		   default : break;
    	   }
 
-  	   aDNF->minimize(cout);
-   	   Disjunction * minimizedFormula = aDNF->get_DNF();
-
-   	   formulae[node] = static_cast<Formula *>(minimizedFormula);
-
    	   if (args_info.verbose_flag) {
- 		   cout << PACKAGE << ": minimized DNF = ";
+ 		   cout << PACKAGE << ": calculated DNF = ";
  		   aDNF->out(cout);
    		   cout << PACKAGE << ": deleting DNF structure..." << endl;
    	   }
@@ -504,7 +571,7 @@ void finalize()
     if(initialID != NULL)
     {
     	message("initialID = [%d] ", (*initialID));
-    	message("number of nodes before = %d ", numberOfNodes);
+    	message("number of nodes before = %d ", number_of_nodes);
     	message("number of nodes after  = %d ", succ.size());
         if (finalIDs.empty())
 			message("there is no final state.");
@@ -545,11 +612,11 @@ int main(int argc, char** argv)
 {
     // parse the command line parameters
     message("evaluating command line parameters... ");
-    evaluateParameters(argc, argv);
+    evaluate_parameters(argc, argv);
 
     // parse OG input file
     message("parsing an OG input file... ");
-    parseOG();
+    parse_OG();
 
     // dump all parsed variables to standard output
     // message("dumping all variables to standard output... ");
@@ -557,15 +624,15 @@ int main(int argc, char** argv)
 
     // generate complete DNF structure
     message("generating DNF structure...");
-    generateDNFStructure();
+    generate_DNF_structure();
 
     // construct a maximal partner
     message("constructing a maximal partner... ");
-    constructMaximalPartner();
+    construct_maximal_partner();
 
     // write output
     message("writing an output service automaton...");
-    writeOutputSA();
+    write_output_SA();
 
     // summarizing information...
     message("post-processing...");

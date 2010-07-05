@@ -80,8 +80,6 @@ class Conjunction : public Operator
 {
   friend class Disjunction;
 private:
-  // yet another constructor
-  Conjunction(const std::set<Formula *> &);
   // remove "and true" and "x and x"
   Formula * killLiterals() const;
 public:
@@ -89,6 +87,8 @@ public:
   Conjunction(Formula *, Formula *);
   // copyconstructor
   Conjunction(const Conjunction &);
+  // yet another constructor
+  Conjunction(const std::set<Formula *> &);
   // destructor
   ~Conjunction();
   // clone the formula

@@ -23,8 +23,22 @@ option "show-states" -
   flag off
 
 
+defgroup "Options" groupdesc="These options control how a maximal partner is calculated.\n" required
+
+groupoption "liberal" l
+  "Calculate a set of satisfiable assignments for each Boolean formula:
+0 - as stated in the input file 
+1 - the least liberal (minimum)
+2 - the most liberal (maximum)\n"
+  group="Options"
+  values="0","1","2" enum
+  default="0"
+  typestr="MODE"
+  argoptional 
+
+
 section "Debugging"
-sectiondesc="These options control how much debug output the comiplers create.\n"
+sectiondesc="These options control how much debug output the compilers create.\n"
 
 option "verbose" v
   "Show verbose messages."

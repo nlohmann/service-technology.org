@@ -22,9 +22,12 @@
 
 #include <string>
 #include <set>
+#include <map>
 #include <stack>
 
 #include "formula.h"
+
+enum liberal { normal, minimal, maximal };
 
 class PartialOrder {
 private:
@@ -48,6 +51,8 @@ public:
    Formula * get_aFormula();
    /// has a child
    bool has_child();
+   /// number of all dnf clauses
+   int number_of_clauses();
    /// insert a partial order element
    void insert_poset(PartialOrder *);
    /// remove a partial order element
@@ -61,14 +66,20 @@ private:
 	Formula * originalFormula;
 	std::set<Formula *> disjuncts;
 	std::set<std::string> all_literals;
+	std::map<int, std::set<PartialOrder *> > po_map;
 	PartialOrder * po;
-	bool minimal;
-	bool maximal;
+	liberal liberal_flag;
 
-    void traverseDelete(PartialOrder *);
- 	std::ostringstream & traverseOutput(std::ostringstream &, PartialOrder *);
+	bool search_po_map(int, PartialOrder *);
+    void insert_po_map(int, PartialOrder *);
+    void fill_DNF_structure(PartialOrder *, std::ostream &);
+    void update_DNF_structure(PartialOrder *, std::set<std::string>, std::ostream &);
+    void delete_DNF_structure(std::set<PartialOrder *>);
+//    void traverse_delete(PartialOrder *);
+    Disjunction * normalize_conjuct(std::set<std::string> conjuncts);
+ 	std::ostringstream & traverse_output(std::ostringstream &, PartialOrder *);
 	std::set<std::string> conjunction_string_literals(const Conjunction *) const;
-    std::pair<PartialOrder *, PartialOrder *> lookup(const PartialOrder *, std::ostream &) const;
+	std::pair< std::set<PartialOrder *>, std::set<PartialOrder *> > lookup(PartialOrder *, std::ostream &) const;
 
 public:
     // constructor
@@ -78,9 +89,7 @@ public:
 	/// construct a minimal DNF
 	void minimize(std::ostream &);
 	/// construct a complete DNF
-	void maximize();
-	/// does DNF cover a given conjunction
-	bool is_covered(const Conjunction &) const;
+	void maximize(std::ostream & os);
 	/// is the partial order set of DNF minimal
 	bool is_minimal() const;
 	/// is the partial order set of DNF maximal

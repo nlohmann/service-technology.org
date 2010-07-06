@@ -111,7 +111,7 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 		int mark = m2[*(placeorder[k])]-m1[*(placeorder[k])]; // calculate right hand side
 		int comp = (cover.find(placeorder[k])==cover.end() ? EQ : cover[placeorder[k]]); // reach or cover this place in the final marking?
 		//initialize the rows
-		if (!add_constraintex(lp,cols,mat,colpoint,comp,mark)) return -1;
+		if (!add_constraintex(lp,cols,mat,colpoint,comp,mark)) { delete[] colpoint; delete[] mat; return -1; }
 	}
 
 	//allow only nonnegative solutions
@@ -119,7 +119,7 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 //	for(int y=1; y<=cols; ++y)
 //		set_lowbo(lp,y,0); // doesn't work, contradicting lp_solve manual
 	for(int y=1; y<=(int)(cols); ++y)
-		if (!add_constraintex(lp,1,&r,&y,GE,0)) return -1;
+		if (!add_constraintex(lp,1,&r,&y,GE,0)) { delete[] colpoint; delete[] mat; return -1; }
 
 	// now add the global constraints from the problem file
 	unsigned int cnr(pb.getNumberOfConstraints());
@@ -134,7 +134,7 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 		{
 			mat[tpos[lit->first]] = lit->second;	
 		}
-		if (!add_constraintex(lp,cols,mat,colpoint,comp,rhs)) return -1;
+		if (!add_constraintex(lp,cols,mat,colpoint,comp,rhs)) { delete[] colpoint; delete[] mat; return -1; }
 	}
 
 	set_add_rowmode(lp,FALSE);	

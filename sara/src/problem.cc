@@ -107,7 +107,7 @@ void Problem::setFilename(string fn) { filename = fn; }
 /** Get the filename for a problem.
 	@return The filename of the Petri net file.
 */
-string Problem::getFilename() { return filename; }
+string Problem::getFilename() const { return filename; }
 
 /** Set the type of Petri net.
 	@param nt LOLA or OWFN.
@@ -140,7 +140,7 @@ void Problem::setGeneralCover(bool cov) { generalcover = cov; }
 /** Get the name of a problem.
 	@return The name.
 */
-string Problem::getName() { return name; }
+string Problem::getName() const { return name; }
 
 /** Get the initial marking of a problem.
 	@return The initial marking.
@@ -253,7 +253,7 @@ PetriNet* Problem::getPetriNet() {
 /** Get the goal of a problem.
 	@return REACHABILITY or REALIZABILITY.
 */
-int Problem::getGoal() {
+int Problem::getGoal() const {
 	return type;
 }
 

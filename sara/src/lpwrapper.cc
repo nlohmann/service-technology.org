@@ -45,7 +45,7 @@ extern map<Transition*,int> revtorder;
 	@param columns The number of transitions in the net (equals the numbers
 		of columns in the linear system).
 */
-LPWrapper::LPWrapper(unsigned int columns) : cols(columns) {
+LPWrapper::LPWrapper(unsigned int columns) : verbose(0),cols(columns),basicrows(0) {
 	lp = make_lp(0,cols);
 	if (!lp) abort(12,"error: could not create LP model");
 }
@@ -88,7 +88,7 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 		colpoint[y]=y+1;
 	}
 	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
-	if (!set_obj_fnex(lp,cols,mat,colpoint)) return -1;
+	if (!set_obj_fnex(lp,cols,mat,colpoint)) { delete[] colpoint; delete[] mat; return -1; }
 	set_minim(lp);
 
 	//create incidence matrix by adding rows to lp_solve
@@ -221,6 +221,7 @@ bool LPWrapper::addConstraints(PartialSolution& ps) {
 			{ 
 			  delete[] constraint; 
 			  abort(13,"error: failed to add constraint to LP model");
+			  return false; // never reached, prevents memory leak detection
 			}
 		}
 	}
@@ -271,7 +272,7 @@ bool LPWrapper::findNearest() {
 		set_int(lp,colpoint[k],1); // make the new variables integers
 	}
 	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
-	if (!set_obj_fnex(lp,2*placeorder.size(),mat,colpoint)) return false;
+	if (!set_obj_fnex(lp,2*placeorder.size(),mat,colpoint)) { delete[] mat; delete[] colpoint; return false; }
 	set_minim(lp); // and set the new objective: minimize the sum of all new variables
 	delete[] mat;
 	delete[] colpoint;

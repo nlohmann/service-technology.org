@@ -47,13 +47,13 @@ public:
 	~JobQueue();
 
 	/// Check if a job queue is empty, i.e. has no active and future jobs
-	bool empty();
+	bool empty() const;
 
 	/// Check if a job queue contains no future jobs, an active job is possible
 	bool almostEmpty();
 
 	/// Get the number of jobs in a queue (not counting past jobs)
-	int size();
+	int size() const;
 
 	/// Get the active job
 	PartialSolution* first();

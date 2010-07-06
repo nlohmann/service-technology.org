@@ -56,7 +56,7 @@ public:
 	void setFilename(string fn);
 
 	/// Get the Petri net filename
-	string getFilename();
+	string getFilename() const;
 
 	/// Set the Petri net type
 	void setNetType(int nt);
@@ -89,10 +89,10 @@ public:
 	PetriNet* getPetriNet();
 
 	/// Get the problem goal
-	int getGoal();
+	int getGoal() const;
 
 	/// Get the problem name
-	string getName();
+	string getName() const;
 
 	/// Check whether this problem needs the same Petri net and inherit it 
 	void checkForNetReference(Problem& p);

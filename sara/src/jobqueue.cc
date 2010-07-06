@@ -64,7 +64,7 @@ JobQueue::~JobQueue() {
 /** Test whether the job queue is empty.
 	@return If it is empty.
 */
-bool JobQueue::empty() {
+bool JobQueue::empty() const {
 	return (!active);
 }
 
@@ -78,7 +78,7 @@ bool JobQueue::almostEmpty() {
 /** Get the number of jobs in a queue, excluding past jobs.
 	@return Size of the queue.
 */
-int JobQueue::size() { return cnt; }
+int JobQueue::size() const { return cnt; }
 
 /** Get the first, i.e. active, job in the queue.
 	@return The first job.

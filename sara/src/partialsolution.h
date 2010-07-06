@@ -100,7 +100,7 @@ public:
 	void setFeasibility(bool);
 
 	/// Get flag about feasibility of the constrained marking equation
-	bool isFeasible();
+	bool isFeasible() const;
 
 	/// Print the partial solution
 	void show();
@@ -112,7 +112,7 @@ public:
 	void buildSimpleConstraints(IMatrix& im);
 
 	/// Check whether this partial solution solves the full problem
-	bool isSolved();
+	bool isSolved() const;
 
 	/// Tag the partial solution as a full solution
 	void setSolved();

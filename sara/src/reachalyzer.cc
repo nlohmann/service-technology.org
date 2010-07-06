@@ -265,7 +265,7 @@ void Reachalyzer::printResult() {
 /*! Calculate the amount of CPU time used for solving the problem.
 	\return The CPU time used.
 */
-clock_t Reachalyzer::getTime() { return (endtime-starttime); }
+clock_t Reachalyzer::getTime() const { return (endtime-starttime); }
 
 /*! Find out about the status of the problem. Directly after calling the constructor, the status
 	should be checked for LPSOLVE_INIT_ERROR as in that case calling start() will lead to
@@ -374,12 +374,12 @@ void Reachalyzer::nextJump(PartialSolution ps) {
 /*! Get the recorded length of the longest solving firing sequence, if one has been found.
 	\return The length.
 */
-int Reachalyzer::getMaxTraceLength() { return maxsollen; }
+int Reachalyzer::getMaxTraceLength() const { return maxsollen; }
 
 /*! Get the recorded sum of the lengths of the solving firing sequences.
 	\return The sum.
 */
-int Reachalyzer::getSumTraceLength() { return sumsollen; }
+int Reachalyzer::getSumTraceLength() const { return sumsollen; }
 
 /** Get the number of solutions in the solutions queue.
 	@return Number of solutions.

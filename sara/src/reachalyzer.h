@@ -46,7 +46,7 @@ public:
 	void printResult();
 
 	/// Get the CPU time used to solve the problem
-	clock_t getTime();
+	clock_t getTime() const;
 
 	/// Get the status after the constructor call or for the final result
 	int getStatus();
@@ -61,10 +61,10 @@ public:
 	void nextJump(PartialSolution ps);
 
 	/// Get the maximal trace length after the solutions have been printed
-	int getMaxTraceLength();
+	int getMaxTraceLength() const;
 	
 	/// Get the sum over all solution lengths
-	int getSumTraceLength();
+	int getSumTraceLength() const;
 
 	/// Get the number of solutions in the solutions queue
 	int numberOfSolutions();

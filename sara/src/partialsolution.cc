@@ -160,7 +160,7 @@ void PartialSolution::setFeasibility(bool mef) { markingEquation=mef; }
 /** Check if the flag for feasibility of the marking equation is set.
 	@return The flag.
 */
-bool PartialSolution::isFeasible() { return markingEquation; }
+bool PartialSolution::isFeasible() const { return markingEquation; }
 
 /** Prints the partial solution on cerr for debugging purposes.
 */
@@ -412,7 +412,7 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 /** Check whether this partial solution is a full solution.
 	@return If this represents a full solution.
 */
-bool PartialSolution::isSolved() { return fullSolution; }
+bool PartialSolution::isSolved() const { return fullSolution; }
 
 /** Mark the partial solution as a full one, i.e. we have just solved the reachability problem.
 */

@@ -349,7 +349,7 @@ void PathFinder::conflictTable(Transition* tstart) {
 				pnapi::Arc* a = pn.findArc(**it,*p);
 				// places on which we effectively produce tokens do not lead to conflicts where the other transition must fire first
 				if (a) if ((*prearc)->getWeight()<=a->getWeight()) continue;
-				int itcons((*prearc)->getWeight()); // get the arc weights
+//				int itcons((*prearc)->getWeight()); // get the arc weights
 				int itprod(a?a->getWeight():0);
 				const set<pnapi::Arc*> ppost = p->getPostsetArcs();
 				set<pnapi::Arc*>::iterator postarc; // now check the postset of p for conflicting transitions

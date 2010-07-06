@@ -1,4 +1,4 @@
-AC_INIT(Sara, 0.9, sara@service-technology.org, sara, http://service-technology.org/sara)
+AC_INIT(Sara, 0.91, sara@service-technology.org, sara, http://service-technology.org/sara)
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])

@@ -227,14 +227,14 @@ PetriNet* Problem::getPetriNet() {
 	    switch (nettype) {
 	        case(OWFN): {
 				infile >> pnapi::io::owfn >> (*pn);
-//				paowfn.clean();
-//				pn = &(const_cast<PetriNet&>(paowfn.parse(infile)));
 	            break;
 	        }
 	        case(LOLA): {
 				infile >> pnapi::io::lola >> (*pn);
-//				palola.clean();
-//				pn = &(const_cast<PetriNet&>(palola.parse(infile)));
+	            break;
+	        }
+	        case(PNML): {
+				infile >> pnapi::io::pnml >> (*pn);
 	            break;
 	        }
 	    }

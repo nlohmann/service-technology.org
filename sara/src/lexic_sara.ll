@@ -44,6 +44,7 @@ nfile FILE
 ntype TYPE
 typeowfn OWFN
 typelola LOLA
+typepnml PNML
 initialm INITIAL
 finalm FINAL
 cover COVER
@@ -67,6 +68,7 @@ constraints CONSTRAINTS
 {ntype}	{ return NTYPE; }
 {typeowfn}	{ return TYPEOWFN; }
 {typelola}	{ return TYPELOLA; }
+{typepnml}	{ return TYPEPNML; }
 {initialm}	{ return INITIALM; }
 {finalm}	{ return FINALM; }
 {cover} { return COVER; }

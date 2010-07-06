@@ -3,7 +3,7 @@ args "--include-getopt --show-required --no-handle-error"
 purpose "Structures for Automated Reachability Analysis:
 Deciding the reachability problem for Petri nets and more
 
-Given a problem of the form (N,i,f) with a low level Petri net N in *.llnet (LOLA) or *.owfn (OWFN) format, an initial marking i, and an extended final marking f, Sara tries to decide whether f is reachable from i in the net N.
+Given a problem of the form (N,i,f) with a low level Petri net N in *.llnet (LOLA), *.owfn (OWFN), or PNML format, an initial marking i, and an extended final marking f, Sara tries to decide whether f is reachable from i in the net N.
 
 It is also possible to solve realizability, i.e. whether some transition vector can be tranformed into a firing sequence for given (N,i)."
 
@@ -25,11 +25,11 @@ option "pipe" p
 option "output" o
   "Redirect output messages from stdout to a file."
   details="
-Sara will yield one of the following results as output:
+Sara will yield one of the following results:
 SOLUTION: A firing sequence.
-INFEASIBLE: Either the marking equation is infeasible or it was impossible to borrow enough tokens (via T-invariants) to make some transition firable. Use the -v option for details/reasoning. 
+INFEASIBLE: The marking equation is infeasible or it was impossible to borrow enough tokens (via T-invariants) to make some transition firable. Use the -v option for details/reasoning.
 UNSOLVED: A problem was detected, e.g. due to a numerical instability encountered by lp_solve.
-Finally, Sara could run for a very long time or terminate due to insufficient memory, which also falls under the UNSOLVED case.
+Finally, Sara could run for a long time or terminate due to insufficient memory, which also falls under the UNSOLVED case.
 "
   typestr="FILENAME"
   string
@@ -59,7 +59,7 @@ The problem will have the following syntax in the file:
 
 PROBLEM namestring:
 	GOAL REACHABILITY;
-	FILE petrinetfilename TYPE {LOLA|OWFN};
+	FILE petrinetfilename TYPE {LOLA|OWFN|PNML};
 	INITIAL initialmarking;
 	FINAL [COVER] finalmarking;
 
@@ -76,7 +76,7 @@ The problem will have the following syntax in the file:
 
 PROBLEM namestring:
 	GOAL REALIZABILITY;
-	FILE petrinetfilename TYPE {LOLA|OWFN};
+	FILE petrinetfilename TYPE {LOLA|OWFN|PNML};
 	INITIAL initialmarking;
 	FINAL transitionmultiset;
 "
@@ -94,7 +94,7 @@ option "final" f
 
 option "constraint" c
   "Specify a global place/transition constraint."
-  details="A constraint is an (in)equation where the left hand side is a weighted sum of places and transitions. Places denote tokens in the final marking while a transition stands for its number of occurrences in a firing sequence. The right hand side must be an integer. Examples would be \"p+q>5\" (p and q together can have 5 or more tokens) or \"2p-t:0\" (t occurs twice as often as there are tokens on p finally) or even \"3p1-4p2+t1-t2<17\".
+  details="A constraint works much like a final marking and is an (in)equation where the left hand side is a weighted sum of places and transitions. Places denote tokens in the final marking while a transition stands for its number of occurrences in a firing sequence. The right hand side must be an integer. Examples would be \"p+q>5\" (p and q together can have 5 or more tokens) or \"2p-t:0\" (t occurs twice as often as there are tokens on p finally) or even \"3p1-4p2+t1-t2<17\".
 "
   typestr="string"
   dependon="reachable"
@@ -102,9 +102,21 @@ option "constraint" c
   multiple
   optional
 
-option "owfn" O
-  "Specify net as being *.owfn (instead of *.llnet)."
-  details="The Petri net used for creating a problem file is assumed to be in OWFN format (*.owfn). Default is LOLA (*.llnet)."
+option "owfn" -
+  "Specify net as being in OWFN format (instead of PNML)."
+  details="The Petri net used for creating a problem file is assumed to be in OWFN format (*.owfn). The option is not necessary if the filename contains 'owfn'.
+"
+  flag off
+
+option "lola" -
+  "Specify net as being in LOLA llnet format (instead of PNML)."
+  details="The Petri net used for creating a problem file is assumed to be in LOLA format (*.llnet). The option is not necessary if the filename contains 'llnet'.
+"
+  flag off
+
+option "pnml" -
+  "Specify net as being in PNML format."
+  details="The Petri net used for creating a problem file is assumed to be in PNML format. The option may be necessary if the filename contains either 'owfn' or 'llnet'."
   flag off
 
 section "Miscellaneous"
@@ -126,13 +138,13 @@ sectiondesc="These options allow to obtain control over some parts of the algori
 
 option "continue" C
   "Find 'all' solutions."
-  details="Continues the search for solutions after the first solution has been found. Tries to find all solutions minimal with respect to parikh vector comparison. The search might go on infinitely if the number of solutions is not finite. For realizability problems, solutions with a smaller parikh image than the one given in the problem are sought.
+  details="Continues the search for solutions after the first solution has been found. Tries to find all solutions minimal with respect to parikh vector comparison. The search might go on infinitely if the number of solutions is not finite. For realizability problems, solutions with a smaller parikh image than the one given in the problem are sought. Information about counterexample witnesses may be lost when using this option.
 " 
   flag off
 
 option "forceprint" P
   "Force printing of a solution the moment it is found."
-  details="Normally, solutions are stored, compared to each other, and, if comparable, the worse solution is thrown away when using the -C option. Finally, all remaining solutions are printed. With this option, solutions are printed immediately, even duplicates might appear, but you will not have to wait for program termination.
+  details="Normally, solutions are stored, compared to each other, and, if comparable, the worse solution is thrown away when using the -C option. Finally, all remaining solutions are printed. With this option, solutions are printed immediately, even duplicates might appear, but one will not have to wait for program termination.
 "
   flag off
 
@@ -167,7 +179,8 @@ option "lookup" L
 
 option "treemaxjob" T
   "Maximal number of jobs per tree."
-  details="Stop trying to realize a transition vector after n new partial solutions (jobs) have been found. Solutions may be lost but the program may run faster (or not)."
+  details="Stop trying to realize a transition vector after n new partial solutions (jobs) have been found. Solutions may be lost but the program may run faster (or not).
+"
   typestr="n"
   int
   optional

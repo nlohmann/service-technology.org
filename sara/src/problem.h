@@ -130,7 +130,8 @@ public:
 	/// Types of Petri nets
 	enum NetTypes {
 		OWFN = 0,
-		LOLA = 1
+		LOLA = 1,
+		PNML = 2
 	};
 
 private:

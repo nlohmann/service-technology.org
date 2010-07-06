@@ -17,7 +17,7 @@
  along with Sara.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
 
-%token COLON COMMA ARROW NUMBER NAME SEMICOLON PROBLEM GOAL REACHABILITY REALIZABILITY NFILE NTYPE TYPEOWFN TYPELOLA INITIALM FINALM COVER REACH MYLEQ MYGEQ CONSTRAINTS PLUS MINUS
+%token COLON COMMA ARROW NUMBER NAME SEMICOLON PROBLEM GOAL REACHABILITY REALIZABILITY NFILE NTYPE TYPEOWFN TYPELOLA TYPEPNML INITIALM FINALM COVER REACH MYLEQ MYGEQ CONSTRAINTS PLUS MINUS
 
 %defines
 %name-prefix="sara_"
@@ -83,6 +83,7 @@ gtype:
 ntype:
 	TYPEOWFN { pbl.setNetType(Problem::OWFN); }
 |	TYPELOLA { pbl.setNetType(Problem::LOLA); }
+|	TYPEPNML { pbl.setNetType(Problem::PNML); }
 ;
 
 mode:

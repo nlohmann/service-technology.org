@@ -1,17 +1,18 @@
 No README
+Version 0.91-unreleased (6 Jul 2010)
+====================================
+
+* adding support for PNML
+
+* detecting type of a Petri net from the filename
+
 Version 0.9-unreleased (3 May 2010)
 ===================================
 
-* first release of Sara
+* first version of Sara
 
-* <<- tests reachability of markings and realizability of transition
-  vectors in Petri nets. ->>
-
-* <<- CHANGES ->>
-
-
-Version 0.0-unreleased (32 October 2009)
-========================================
+* tests reachability of markings and realizability of transition vectors in
+  Petri nets
 
 
 

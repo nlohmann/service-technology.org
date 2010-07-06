@@ -1,13 +1,13 @@
 @c <<-- CHANGE START (version information) -->>
-@heading Version 0.9-unreleased (3 May 2010)
+@heading Version 0.91-unreleased (6 Jul 2010)
 @itemize
-@item first release of Sara
-
-@item <<-- tests reachability of markings and realizability of transition vectors in Petri nets. -->>
-
-@item <<-- CHANGES -->>
-
+@item adding support for PNML
+@item detecting type of a Petri net from the filename
 @end itemize
 
-@heading Version 0.0-unreleased (32 October 2009)
+@heading Version 0.9-unreleased (3 May 2010)
+@itemize
+@item first version of Sara
+@item tests reachability of markings and realizability of transition vectors in Petri nets
+@end itemize
 @c <<-- CHANGE END -->>

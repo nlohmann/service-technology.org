@@ -129,8 +129,14 @@ string problemfile("stdin"); // name of the problem file to be executed (input)
 if (args_info.quasilive_given) {
 	// load the Petri net
 	Problem pbl;
-	pbl.setFilename(args_info.quasilive_arg);
-	pbl.setNetType((args_info.owfn_given?(Problem::OWFN):(Problem::LOLA)));
+	pbl.setFilename(args_info.quasilive_arg); // select filename and net type
+	int nettype(Problem::PNML);
+	if (strstr(args_info.quasilive_arg,"owfn") || strstr(args_info.quasilive_arg,"OWFN")) nettype=Problem::OWFN;
+	if (strstr(args_info.quasilive_arg,"llnet") || strstr(args_info.quasilive_arg,"LLNET")) nettype=Problem::LOLA;
+	if (args_info.owfn_given) nettype = Problem::OWFN;
+	if (args_info.lola_given) nettype = Problem::LOLA;
+	if (args_info.pnml_given) nettype = Problem::PNML;
+	pbl.setNetType(nettype);
 	PetriNet* pn(pbl.getPetriNet());
 	Marking m(Marking(*pn,false));
 	// get all transitions
@@ -146,8 +152,13 @@ if (args_info.quasilive_given) {
 	{
 		outfile << "PROBLEM enabling_of_" << (*it)->getName() << ":" << endl;
 		outfile << "GOAL REACHABILITY;" << endl;
-		outfile << "FILE " << args_info.quasilive_arg << " TYPE " << (args_info.owfn_given?"OWFN":"LOLA") << ";" << endl;
-		outfile << "INITIAL ";
+		outfile << "FILE " << args_info.quasilive_arg << " TYPE ";
+		switch(nettype) {
+			case Problem::OWFN: outfile << "OWFN"; break;
+			case Problem::LOLA: outfile << "LOLA"; break;
+			case Problem::PNML: outfile << "PNML"; break;
+		}
+		outfile << ";" << endl << "INITIAL ";
 		bool first = true;
 		map<const Place*,unsigned int>::const_iterator pit;
 		for(pit=m.begin(); pit!=m.end(); ++pit)
@@ -177,9 +188,15 @@ if (args_info.quasilive_given) {
 if (args_info.reachable_given || args_info.realize_given) {
 	// load the Petri net
 	Problem pbl;
-	if (args_info.reachable_given) pbl.setFilename(args_info.reachable_arg);
-	else pbl.setFilename(args_info.realize_arg);
-	pbl.setNetType((args_info.owfn_given?(Problem::OWFN):(Problem::LOLA)));
+	char* filename((args_info.reachable_given ? args_info.reachable_arg : args_info.realize_arg));
+	pbl.setFilename(filename);
+	int nettype(Problem::PNML);
+	if (strstr(filename,"owfn") || strstr(filename,"OWFN")) nettype=Problem::OWFN;
+	if (strstr(filename,"llnet") || strstr(filename,"LLNET")) nettype=Problem::LOLA;
+	if (args_info.owfn_given) nettype = Problem::OWFN;
+	if (args_info.lola_given) nettype = Problem::LOLA;
+	if (args_info.pnml_given) nettype = Problem::PNML;
+	pbl.setNetType(nettype);
 	PetriNet* pn(pbl.getPetriNet());
 	Marking m(Marking(*pn,false));
 	// open the .sara file for output
@@ -191,8 +208,13 @@ if (args_info.reachable_given || args_info.realize_given) {
 	outfile << "PROBLEM " << (args_info.reachable_given?"reach":"realiz") << "ability_in_" << pbl.getFilename() << ":" << endl;
 	if (args_info.reachable_given) outfile << "GOAL REACHABILITY;" << endl;
 	else outfile << "GOAL REALIZABILITY;" << endl;
-	outfile << "FILE " << pbl.getFilename() << " TYPE " << (args_info.owfn_given?"OWFN":"LOLA") << ";" << endl;
-	outfile << "INITIAL ";
+	outfile << "FILE " << pbl.getFilename() << " TYPE ";
+	switch(nettype) {
+		case Problem::OWFN: outfile << "OWFN"; break;
+		case Problem::LOLA: outfile << "LOLA"; break;
+		case Problem::PNML: outfile << "PNML"; break;
+	}
+	outfile << ";" << endl << "INITIAL ";
 	bool first = true;
 	map<const Place*,unsigned int>::const_iterator pit;
 	for(pit=m.begin(); pit!=m.end(); ++pit)

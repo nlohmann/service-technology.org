@@ -1,1 +1,44 @@
-No README
+                           ____                 
+                          / ___|  __ _ _ __ __ _ 
+                          \___ \ / _` | '__/ _` |
+                           ___) | (_| | | | (_| |
+                          |____/ \__,_|_|  \__,_|
+               Structures for Automated Reachability Analysis
+                     http://service-technology.org/sara
+
+
+PURPOSE
+	Given a Petri Net with initial marking and a final condition, Sara analyzes
+	the structure of the net to decide if the final condition is reachable.
+
+
+COPYRIGHT
+    Copyright (c) 2010 Harro Wimmel
+
+
+AUTHOR
+    Sara is written and maintained by Harro Wimmel. See file "AUTHORS"
+    for more information.
+
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    Sara is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of Sara.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION
+    Sara can be easily compiled and installed. See file "INSTALL" for
+    instructions. Please also have a look at the file "REQUIREMENTS" for
+    information on the tools required to run, compile, and develop Sara.
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of Sara. It can also be
+    downloaded at <http://service-technology.org/files/sara/sara.pdf>.

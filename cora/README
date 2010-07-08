@@ -1,0 +1,46 @@
+                            ____                 
+                           / ___| ___  _ __ __ _ 
+                          | |    / _ \| '__/ _` |
+                          | |___| (_) | | | (_| |
+                           \____|\___/|_|  \__,_|
+                COverability graphs for Reachability Analysis
+                     http://service-technology.org/cora
+
+
+PURPOSE
+    From a Petri net Cora generates a (partial) coverability graph and splits 
+	the graph's nodes for the purpose of either solving the reachability problem 
+	for a given final marking or finding a firing sequence leading to a given
+	node in the graph.
+
+
+COPYRIGHT
+    Copyright (c) 2010 Harro Wimmel
+
+
+AUTHOR
+    Cora is written and maintained by Harro Wimmel. See file "AUTHORS"
+    for more information.
+
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    Cora is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of Cora.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION
+    Cora can be easily compiled and installed. See file "INSTALL" for
+    instructions. Please also have a look at the file "REQUIREMENTS" for
+    information on the tools required to run, compile, and develop Cora.
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of Cora. It can also be
+    downloaded at <http://service-technology.org/files/cora/cora.pdf>.

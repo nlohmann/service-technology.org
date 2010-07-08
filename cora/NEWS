@@ -1,0 +1,13 @@
+No README
+Version 0.1-unreleased (07 Jul 2010)
+===================================
+
+* first version of Cora
+
+* builds a (partial, nondeterministic) coverability graph
+
+* splits nodes according to enabledness of a path
+
+* tests reachability of a marking and computes an enabled path to a given node
+
+\nSee file ChangeLog <http://service-technology.org/files/core/ChangeLog> for\ncomplete version history.\n

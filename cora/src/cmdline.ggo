@@ -1,0 +1,80 @@
+args "--include-getopt --show-required --no-handle-error"
+
+purpose "Nondeterministic Coverability Graph Builder"
+
+section "Input"
+sectiondesc="Input must be given explicitly (in form of a file or pipe). If no goal (neither -s nor -m) is given, the initial marking is taken as goal."
+
+option "input" i
+  "Read the Petri net from an input file."
+  typestr="FILENAME"
+  string
+  optional
+
+option "pipe" p
+  "Read the Petri net from stdin."
+  flag off
+
+option "lola" -
+  "Declare the Petri net to be in LOLA format (instead of PNML). Not necessary if the filename contains 'llnet'."
+  flag off
+
+option "owfn" -
+  "Declare the Petri net to be in OWFN format (instead of PNML). Not necessary if the filename contains 'owfn'."
+  flag off
+
+option "pnml" -
+  "Declare the Petri net to be in PNML format, even if the filename ends with 'owfn' or 'llnet'."
+  flag off
+
+option "sequence" s
+  "Define a node of a coverability graph by a (non-firable) sequence of transitions leading to it."
+  typestr="string"
+  string
+  optional
+
+option "marking" m
+  "Define a marking that should be reached. Do not use with -s."
+  typestr="string"
+  string
+  optional
+
+
+section "Output"
+sectiondesc="Output goes to stdout/stderr by default."
+
+option "output" o
+  "Redirect output messages from stdout to a file."
+  typestr="FILENAME"
+  string
+  optional
+
+option "fullgraph" f
+  "Create the full coverability graph instead of just the necessary portion. The graph will be printed even without the -v option."
+  flag off
+
+option "log" l
+  "Redirect log and error messages to a file."
+  typestr="FILENAME"
+  string
+  optional
+
+
+section "Miscellaneous"
+
+option "time" t
+  "Measure time."
+  flag off
+
+option "verbose" v
+  "Show the partial, splitted, and nondeterministic coverability graph and count the number of paths encountered until the goal was found."
+  flag off
+
+  
+section "Debugging"
+
+option "debug" d
+  "Show debug info."
+  flag off
+  hidden
+

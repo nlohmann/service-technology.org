@@ -314,6 +314,14 @@ public class DNodeSys_OcletSpecification extends DNodeSys {
 	  return nodeOrigin.get(d);
 	}
 	
+	 /**
+   * @param d
+   * @return the node that represents {@link Node} 'n' in this system
+   */
+  public DNode getResultNode(Node n) {
+    return nodeEncoding.get(n);
+  }
+	
 	@Override
 	public String getInfo() {
     

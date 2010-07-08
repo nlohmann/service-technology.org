@@ -196,6 +196,30 @@ public class DNodeBP {
 	  configure_setBound(1);
 	  options.checkProperty_DeadCondition = true;
 	}
+	
+	/**
+	 * Construct BP to check whether the event with the given
+	 * label ID is executable in the system.
+	 * 
+	 * @param eventID
+	 */
+	public void configure_checkExecutable(short eventID) {
+	  options.checkProperties = true;
+    options.checkProperty_ExecutableEventID = eventID;
+    options.cutOffTermination_reachability = true;
+	}
+	
+	 /**
+   * Construct BP to check whether the given event from
+   * {@link DNodeSys#fireableEvents} is executable.
+   * 
+   * @param event
+   */
+  public void configure_checkExecutable(DNode event) {
+    options.checkProperties = true;
+    options.checkProperty_ExecutableEvent = event.globalId;
+    options.cutOffTermination_reachability = true;
+  }
   
   /* ==========================================================================
    * 
@@ -1099,6 +1123,10 @@ public class DNodeBP {
   					b.isCutOff = true;
   					b.isAnti = newEvent.isAnti && newEvent.isHot;	// copy the anti-flag
   				}
+  			
+        if (options.checkProperties)
+          checkProperties(newEvent);
+        
 			} else {
 			  currentPrimeCut = null;
 			}
@@ -1362,7 +1390,7 @@ public class DNodeBP {
     if (propertyCheck == PROP_NONE || !options.stopIfPropertyFound)
       return fired;
     else
-      return 0; // abort if properties violated
+      return 0; // abort if properties violated/abortion condition holds
   }
 
 
@@ -2540,6 +2568,7 @@ public class DNodeBP {
 	public static final int PROP_NONE = 0;
 	public static final int PROP_UNSAFE = 1;
 	public static final int PROP_DEADCONDITION = 2;
+	public static final int PROP_EXECUTEDEVENT = 4;
 
 	private int propertyCheck = PROP_NONE;
 
@@ -2571,6 +2600,38 @@ public class DNodeBP {
       }
     }
     
+    return true;
+  }
+  
+  /**
+   * Entry for checking properties wrt. the most recently fired event, while
+   * constructing the branching process. This method is to be called after
+   * every firing of an event.
+   * 
+   * @param firedEvent
+   * @return
+   *     <code>false</code> iff the construction
+   *     of the branching process shall be interrupted
+   */
+  private boolean checkProperties(DNode firedEvent) {
+
+    if (!firedEvent.isAnti
+        && options.checkProperty_ExecutableEventID == firedEvent.id)
+    {
+      // event with the configured labeled was fired
+      propertyCheck |= PROP_EXECUTEDEVENT;
+      return false;
+    }
+    
+    if (!firedEvent.isAnti && options.checkProperty_ExecutableEvent != -1) {
+      for (int i=0; i<firedEvent.causedBy.length; i++) {
+        if (options.checkProperty_ExecutableEvent == firedEvent.causedBy[i]) {
+          // event with the configured ID was fired
+          propertyCheck |= PROP_EXECUTEDEVENT;
+          return false;
+        }
+      }
+    }
     return true;
   }
 	
@@ -2742,6 +2803,18 @@ public class DNodeBP {
 	  return (propertyCheck & PROP_UNSAFE) == 0;
 	}
 	
+	/**
+	 * @return <code>true</code> iff the event specified by {@link #configure_checkExecutable(short)}
+	 * is executable in the system
+	 */
+	public boolean canExecuteEvent() {
+	  if (options.checkProperty_ExecutableEventID != -1)
+	    return (propertyCheck & PROP_EXECUTEDEVENT) == PROP_EXECUTEDEVENT;
+	  if (options.checkProperty_ExecutableEvent != -1)
+	    return (propertyCheck & PROP_EXECUTEDEVENT) == PROP_EXECUTEDEVENT;
+	  return true;
+	}
+	
 	 /**
    * @return true iff the process has a deadlock, call
    * {@link #findDeadConditions(boolean)} first, to find the dead conditions
@@ -2841,6 +2914,15 @@ public class DNodeBP {
      * stop BP construction if the property to be checked has been found
      */
     protected boolean stopIfPropertyFound = true;
+    /**
+     * check whether the event with the given label-ID can be executed 
+     */
+    protected short checkProperty_ExecutableEventID = -1;
+    /**
+     * check whether the given event (in terms of its global ID from
+     * {@link DNodeSys}) can be executed 
+     */
+    protected int checkProperty_ExecutableEvent = -1;
   } // end of Options
   
   // =========================================================================

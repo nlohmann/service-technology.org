@@ -34,7 +34,11 @@ public class UmaTest {
     testPetrinetPrefix_lexic();
     testPetrinet2Bounded();
     testPetrinet1Bounded_violated();
+    
     testOcletPrefix_lexic();
+    testOcletPrefix_executable1();
+    testOcletPrefix_executable2();
+    testOcletPrefix_executable3();
   }
 
   public static void main(String[] args) {
@@ -179,10 +183,7 @@ public class UmaTest {
     }
   }
   
-  public void testOcletPrefix_lexic() {
-    
-    lastTest = "Construct prefix of oclet specification";
-
+  private OcletSpecification getOcletSpec() {
     OcletSpecification os = new OcletSpecification();
     
     Oclet init = new Oclet(false);
@@ -211,7 +212,7 @@ public class UmaTest {
     b1 = o3.addPlace("a", true); b2 = o3.addPlace("b", true);
     b3 = o3.addPlace("a", false); b4 = o3.addPlace("b", false);
     
-    Transition f = o3.addTransition("X", false);
+    Transition f = o3.addTransition("X", true);
       o3.addArc(b0, f);
       o3.addArc(f, b1);
     
@@ -228,6 +229,15 @@ public class UmaTest {
     os.addOclet(o3);
     os.setInitialRun(init);
     
+    return os;
+  }
+  
+  public void testOcletPrefix_lexic() {
+    
+    lastTest = "Construct prefix of oclet specification";
+
+    OcletSpecification os = getOcletSpec();
+    
     DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
     DNodeBP build = new DNodeBP(sys);
     build.configure_buildOnly();
@@ -243,7 +253,146 @@ public class UmaTest {
         && build.statistic_condNum == 10
         && build.statistic_cutOffNum == 2
         && build.statistic_arcNum == 16);
+  }
+  
+  public void testOcletPrefix_executable1() {
+    
+    lastTest = "Test for executability of events of an oclet specification 1";
 
+    OcletSpecification os = getOcletSpec();
+    
+    DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
+    short eventToCheck = sys.nameToID.get("X");
+    DNodeBP build = new DNodeBP(sys);
+    build.configure_buildOnly();
+    build.configure_Scenarios();
+    build.configure_checkExecutable(eventToCheck);
+    
+    while (build.step() > 0) {
+    }
+    
+    build.getStatistics();
+    
+    assertTrue(build.statistic_eventNum == 2
+        && build.statistic_condNum == 6
+        && build.statistic_cutOffNum == 1
+        && build.statistic_arcNum == 8
+        && build.canExecuteEvent());
+  }
+  
+  public void testOcletPrefix_executable2() {
+    
+    lastTest = "Test for executability of events of an oclet specification 2";
+
+    OcletSpecification os = getOcletSpec();
+    
+    Oclet o4 = new Oclet(false);
+    Place b0 = o4.addPlace("a", true);
+    Place b1 = o4.addPlace("a", true); Place b2 = o4.addPlace("b", true);
+    Place b3 = o4.addPlace("a", true); Place b4 = o4.addPlace("b", true);
+    Place b5 = o4.addPlace("a", false); Place b6 = o4.addPlace("b", false);
+    
+    Transition e1 = o4.addTransition("X", true);
+      o4.addArc(b0, e1);
+      o4.addArc(e1, b1);
+    
+    Transition e2 = o4.addTransition("Y", true);
+      o4.addArc(b1, e2); o4.addArc(b2, e2);
+      o4.addArc(e2, b3); o4.addArc(e2, b4);
+      
+    Transition e3 = o4.addTransition("Z", false);
+      o4.addArc(b3, e3); o4.addArc(b4, e3);
+      o4.addArc(e3, b5); o4.addArc(e3, b6);
+      
+    os.addOclet(o4);
+    
+    DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
+    short eventToCheck = sys.nameToID.get("Z");
+    DNodeBP build = new DNodeBP(sys);
+    build.configure_buildOnly();
+    build.configure_Scenarios();
+    build.configure_checkExecutable(eventToCheck);
+    
+    while (build.step() > 0) {
+    }
+    
+    build.getStatistics();
+    
+    assertTrue(build.statistic_eventNum == 4
+        && build.statistic_condNum == 10
+        && build.statistic_cutOffNum == 2
+        && build.statistic_arcNum == 16
+        && !build.canExecuteEvent());
+  }
+  
+  public void testOcletPrefix_executable3() {
+    
+    lastTest = "Test for executability of events of an oclet specification 3";
+
+    OcletSpecification os = getOcletSpec();
+    
+    Oclet o4 = new Oclet(false);
+    Place b0 = o4.addPlace("a", true);
+    Place b1 = o4.addPlace("a", true); Place b2 = o4.addPlace("b", true);
+    Place b3 = o4.addPlace("a", true); Place b4 = o4.addPlace("b", true);
+    Place b5 = o4.addPlace("a", false); Place b6 = o4.addPlace("b", false);
+    
+    Transition e1 = o4.addTransition("X", true);
+      o4.addArc(b0, e1);
+      o4.addArc(e1, b1);
+    
+    Transition e2 = o4.addTransition("Y", true);
+      o4.addArc(b1, e2); o4.addArc(b2, e2);
+      o4.addArc(e2, b3); o4.addArc(e2, b4);
+      
+    Transition e3 = o4.addTransition("X", false);
+      o4.addArc(b3, e3); o4.addArc(b4, e3);
+      o4.addArc(e3, b5); o4.addArc(e3, b6);
+      
+    os.addOclet(o4);
+
+    // first check for executability of event e3
+    DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
+    DNode eventToCheck = sys.getResultNode(e3);
+    
+    DNodeBP build = new DNodeBP(sys);
+    build.configure_buildOnly();
+    build.configure_Scenarios();
+    build.configure_checkExecutable(eventToCheck);
+    
+    while (build.step() > 0) {
+    }
+    
+    build.getStatistics();
+    
+    assertTrue(build.statistic_eventNum == 4
+        && build.statistic_condNum == 10
+        && build.statistic_cutOffNum == 2
+        && build.statistic_arcNum == 16
+        && !build.canExecuteEvent());
+
+    
+    lastTest = "Test for executability of events of an oclet specification 4";
+
+    // then check for executability of an event with the same label as e3
+    sys = new DNodeSys_OcletSpecification(os);
+    short eventLabelToCheck = sys.nameToID.get(e3.getName());    
+    
+    build = new DNodeBP(sys);
+    build.configure_buildOnly();
+    build.configure_Scenarios();
+    build.configure_checkExecutable(eventLabelToCheck);
+    
+    while (build.step() > 0) {
+    }
+    
+    build.getStatistics();
+    
+    assertTrue(build.statistic_eventNum == 2
+        && build.statistic_condNum == 6
+        && build.statistic_cutOffNum == 1
+        && build.statistic_arcNum == 8
+        && build.canExecuteEvent());
   }
 
 }

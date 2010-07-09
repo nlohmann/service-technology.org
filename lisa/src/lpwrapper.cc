@@ -40,7 +40,7 @@ extern set<pnapi::Arc*> arcs;
 	*************************************/
 
 	/** Constructor for systems with a given number of variables (transitions).
-		@param cols The number of transitions in the net (equals the numbers
+		@param columns The number of transitions in the net (equals the numbers
 			of columns in the linear system.
 	*/
 	LPWrapper::LPWrapper(unsigned int columns, PetriNet* net) : cols(columns), _net(net) {
@@ -85,13 +85,13 @@ int LPWrapper::checkReachability(Marking& m1, Marking& m2, bool verbose) {
 		int mark = m2[*(placeorder[k])]-m1[*(placeorder[k])]; // calculate right hand side
 
 		//initialize the rows
-		if (!add_constraintex(lp,cols,mat,colpoint,EQ,mark)) return -1;
+		if (!add_constraintex(lp,cols,mat,colpoint,EQ,mark)) { cleanup(); return -1; }
 	}
 
 	//allow only nonnegative solutions
 	REAL r = 1;
 	for(int y=1; y<=(int)(cols); ++y)
-		if (!add_constraintex(lp,1,&r,&y,GE,0)) return -1;
+		if (!add_constraintex(lp,1,&r,&y,GE,0)) { cleanup(); return -1; }
 
 	set_add_rowmode(lp,FALSE);	
 	if (verbose) write_LP(lp,stdout);
@@ -106,7 +106,7 @@ int LPWrapper::checkReachability(Marking& m1, Marking& m2, bool verbose) {
          message("marking might be reachable");
          message("following is the parikh vector possibly realizing the marking");
 	 get_variables(lp, mat);
-         for(int j = 0; j < cols; j++)
+         for(int j = 0; j < (int)(cols); j++)
            fprintf(stderr, "%s: %f\n", get_col_name(lp, j + 1), mat[j]);
 	}
 
@@ -139,7 +139,7 @@ int LPWrapper::calcTInvariant(bool verbose) {
 			mat[tpos[t]] -= (*ait)->getWeight();
 		}
 		//initialize the rows
-		if (!add_constraintex(lp,cols,mat,colpoint,EQ,0)) return -1;
+		if (!add_constraintex(lp,cols,mat,colpoint,EQ,0)) { cleanup(); return -1; }
 	}
 
 	if(solveLP(verbose) != 2){
@@ -147,7 +147,7 @@ int LPWrapper::calcTInvariant(bool verbose) {
 
 	  bool isNonNegative = true;
           get_variables(lp, mat);
-          for(int j = 0; j < cols; j++){
+          for(int j = 0; j < (int)(cols); j++){
             fprintf(stderr, "%s: %f\n", get_col_name(lp, j + 1), mat[j]);
 	    //Check if t-invariant is non-negative
 	    if(mat[j]<0)
@@ -190,7 +190,7 @@ int LPWrapper::calcPInvariant(bool verbose) {
 			mat[ppos[t]] -= (*ait)->getWeight();
 		}
 		//initialize the rows
-		if (!add_constraintex(lp,cols,mat,colpoint,EQ,0)) return -1;
+		if (!add_constraintex(lp,cols,mat,colpoint,EQ,0)) { cleanup(); return -1; }
 	}
 
 	if(solveLP(verbose) != 2){
@@ -199,7 +199,7 @@ int LPWrapper::calcPInvariant(bool verbose) {
 	  bool isNonNegative = true;
 	  bool isPositive = true;
           get_variables(lp, mat);
-          for(int j = 0; j < cols; j++){
+          for(int j = 0; j < (int)(cols); j++){
             fprintf(stderr, "%s: %f\n", get_col_name(lp, j + 1), mat[j]);
 	    //Check if p-invariant is non-negative
 	    if(mat[j]<0){
@@ -227,7 +227,7 @@ int LPWrapper::calcPInvariant(bool verbose) {
 }
 
 /** Creates equations for calculating a trap that is minimal, i.e. it is
-    among the set of trap with a minimal number of places.
+    among the sets of traps with a minimal number of places.
     Implementation follows "Verification of Safety Properties Using Integer
     Programming: Beyond the State Equation" by Javier Esparza and Stephan Melzer
 	@param verbose If TRUE prints information on cout.
@@ -269,7 +269,7 @@ int LPWrapper::calcTrap(bool verbose, std::set<const Place*> places) {
 		    }
 		  }
 		  //initialize the rows
-		  if (!add_constraintex(lp,cols,mat,colpoint,GE,0)) return -1;
+		  if (!add_constraintex(lp,cols,mat,colpoint,GE,0)) { cleanup(); return -1; }
 		
    		}
 		catch(std::bad_cast & b){
@@ -284,7 +284,7 @@ int LPWrapper::calcTrap(bool verbose, std::set<const Place*> places) {
 	  bool isNonNegative = true;
           get_variables(lp, mat);
 	  fprintf(stderr, "Places:\n");
-          for(int j = 0; j < cols; j++){
+          for(int j = 0; j < (int)(cols); j++){
 	    if(mat[j] > 0)
               fprintf(stderr, "%s\n", get_col_name(lp, j + 1));   
 	  }
@@ -337,7 +337,7 @@ int LPWrapper::calcSiphon(bool verbose, std::set<const Place*> places) {
 		    }
 		  }
 		  //initialize the rows
-		  if (!add_constraintex(lp,cols,mat,colpoint,GE,0)) return -1;
+		  if (!add_constraintex(lp,cols,mat,colpoint,GE,0)) { cleanup(); return -1; }
 		
    		}
 		catch(std::bad_cast & b){
@@ -352,7 +352,7 @@ int LPWrapper::calcSiphon(bool verbose, std::set<const Place*> places) {
 	  bool isNonNegative = true;
           get_variables(lp, mat);
 	  fprintf(stderr, "Places:\n");
-          for(int j = 0; j < cols; j++){
+          for(int j = 0; j < (int)(cols); j++){
 	    if(mat[j] > 0)
               fprintf(stderr, "%s\n", get_col_name(lp, j + 1));
 	  }
@@ -391,7 +391,7 @@ int LPWrapper::isBounded(bool verbose) {
 		colpoint[y]=y+1;
 	}
 	set_add_rowmode(lp,TRUE); // go to rowmode (faster)
-	if (!set_obj_fnex(lp,cols,mat,colpoint)) return -1;
+	if (!set_obj_fnex(lp,cols,mat,colpoint)) { cleanup(); return -1; }
 	
 	set_minim(lp);
 	
@@ -413,7 +413,7 @@ int LPWrapper::isBounded(bool verbose) {
 			mat[ppos[t]] -= (*ait)->getWeight();
 		}
 		//initialize the rows
-		if (!add_constraintex(lp,cols,mat,colpoint,LE,0)) return -1;
+		if (!add_constraintex(lp,cols,mat,colpoint,LE,0)) { cleanup(); return -1; }
 	}
 
 	//allow only solutions that are greater than zero
@@ -421,7 +421,7 @@ int LPWrapper::isBounded(bool verbose) {
 	REAL r = 1;
 
 	for(int y=1; y<=(int)(cols); ++y)
-		if (!add_constraintex(lp,1,&r,&y,GE,0.001)) return -1;
+		if (!add_constraintex(lp,1,&r,&y,GE,0.001)) { cleanup(); return -1; }
 
 	set_add_rowmode(lp,FALSE);	
 	if (verbose) write_LP(lp,stdout);
@@ -515,7 +515,8 @@ int LPWrapper::solveLP(bool verbose){
 	for(int y=1; y<=(int)(cols); ++y)
 		if (!add_constraintex(lp,1,&r,&y,GE,0)) return -1;
 
-	//exclude trivial solution	for(unsigned int y=0; y<cols; y++){
+	//exclude trivial solution
+	for(unsigned int y=0; y<cols; y++){
 		mat[y]=1;
 		colpoint[y]=y+1;
 	}

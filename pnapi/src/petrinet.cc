@@ -1837,6 +1837,65 @@ void PetriNet::normalize_rules()
   normalize_classical();
 }
 
+
+/*!
+ * The node's n cluster [n] follows the
+ * definition in [].
+ *
+ * \return ...
+ * \todo fulfill doxygen's documentation part
+ * \todo apply pnapi style to this method
+ * \todo place the method into the right section
+ */
+set<Node *> PetriNet::cluster(Node &n) const
+{
+	set<Node *> result;
+	bool change = true;
+	map<Node *, bool> seen;
+	/*
+	 * 1. Inserting canonical node
+	 */
+	result.insert(&n);
+	/*
+	 * 2. Inserting cluster nodes
+	 */
+	while (change)
+	{
+		// do the magic
+		change = false;
+		PNAPI_FOREACH(r, result)
+		{
+			// 1. if r is a place r* is in [r]
+			if (dynamic_cast<Place *>(*r) != NULL)
+			{
+				PNAPI_FOREACH(t, (*r)->getPostset())
+				{
+					if (!result.count(*t))
+					{
+						result.insert(*t);
+						change = true;
+					}
+				}
+			}
+			// 2. if r is a transition *r is in [r]
+			if (dynamic_cast<Transition *>(*r) != NULL)
+			{
+				PNAPI_FOREACH(p, (*r)->getPreset())
+				{
+					if (!result.count(*p))
+					{
+						result.insert(*p);
+						change = true;
+					}
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
+
 } /* namespace pnapi */
 
 /*!

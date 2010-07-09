@@ -440,6 +440,9 @@ public: /* public methods */
   /// checks whether a transition role name is specified
   bool isRoleSpecified(const std::string &) const;
 
+  /// returns one node's free-choice cluster
+  std::set<Node *> cluster(Node &) const;
+
   /// compose two nets by adding the given one and merging interfaces
   void compose(const PetriNet &, const std::string & = "net1",
                const std::string & = "net2");

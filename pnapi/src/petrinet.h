@@ -360,6 +360,8 @@ public: /* public methods */
   Arc * findArc(const Node &, const Node &) const;
   /// get the interface
   Interface & getInterface();
+  /// get the interface
+  const Interface & getInterface() const;
   /// get all nodes
   const std::set<Node *> & getNodes() const;
   /// get places

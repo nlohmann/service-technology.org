@@ -367,9 +367,9 @@ std::ostream & output(std::ostream &, const formula::FormulaGreater &);
 /// FormulaGreaterEqual output
 std::ostream & output(std::ostream &, const formula::FormulaGreaterEqual &);
 /// get a unique node name for dot output
-std::string getNodeName(const Node &, bool = false);
+std::string getNodeName(std::ostream &, const Node &, bool = false);
 /// get a unique label name for dot output
-std::string getLabelName(const Label &, bool = false);
+std::string getLabelName(std::ostream &, const Label &, bool = false);
 /// automaton output
 std::ostream & output(std::ostream &, const Automaton &);
 }
@@ -503,6 +503,16 @@ struct PortRemoval
   PortRemoval() : remove(false) {}
 };
 
+/*!
+ * \brief node name type
+ * 
+ * Mapping from node names to dot IDs.
+ */
+struct DotNodeName
+{
+  std::map<std::string, std::string> names;
+};
+
 /*** TEMPLATE CLASSES ***/
 
 /*!
@@ -543,6 +553,7 @@ typedef StreamMetaData<Delim> DelimData;
 typedef StreamMetaData<Formula> FormulaData;
 typedef StreamMetaData<Role> RoleData;
 typedef StreamMetaData<PortRemoval> PortData;
+typedef StreamMetaData<DotNodeName> DotNameData;
 typedef StreamMetaData<std::map<pnapi::io::MetaInformation, std::string> > MetaData;
 typedef Manipulator<std::pair<pnapi::io::MetaInformation, std::string> > MetaManipulator;
 

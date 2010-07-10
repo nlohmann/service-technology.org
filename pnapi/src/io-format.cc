@@ -120,6 +120,48 @@ namespace __dot
 std::ostream & output(std::ostream & os, const PetriNet & net)
 {
   string filename = net.getMetaInformation(os, io::INPUTFILE);
+  
+  // initialize node name cache
+  unsigned int dotID = 0;
+  set<Place *> places = net.getPlaces();
+  PNAPI_FOREACH(it, places)
+  {
+    stringstream ss; ss << "p" << (++dotID);
+    util::DotNameData::data(os).names[(*it)->getName()] = ss.str();
+  }
+
+  dotID = 0;
+  set<Transition *> transitions = net.getTransitions();
+  PNAPI_FOREACH(it, transitions)
+  {
+    stringstream ss; ss << "t" << ++dotID;
+    util::DotNameData::data(os).names[(*it)->getName()] = ss.str();
+  }
+  
+  dotID = 0;
+  set<Label *> input = net.getInterface().getInputLabels();
+  PNAPI_FOREACH(it, input)
+  {
+    stringstream ss; ss << "i" << (++dotID);
+    util::DotNameData::data(os).names[(*it)->getName()] = ss.str();
+  }
+
+  dotID = 0;
+  set<Label *> output = net.getInterface().getOutputLabels();
+  PNAPI_FOREACH(it, output)
+  {
+    stringstream ss; ss << "o" << (++dotID);
+    util::DotNameData::data(os).names[(*it)->getName()] = ss.str();
+  }
+  
+  dotID = 0;
+  set<Label *> synchronous = net.getInterface().getSynchronousLabels();
+  PNAPI_FOREACH(it, synchronous)
+  {
+    stringstream ss; ss << "s" << (++dotID);
+    util::DotNameData::data(os).names[(*it)->getName()] = ss.str();
+  }
+
 
   os  //< output everything to this stream
 
@@ -227,13 +269,13 @@ std::ostream & output(std::ostream & os, const Transition & t)
       case Label::SYNCHRONOUS:
         attr << " arrowhead=none";
       case Label::INPUT:
-        left = getLabelName(*l->first);
-        right = getNodeName(t);
+        left = getLabelName(os, *l->first);
+        right = getNodeName(os, t);
         attr << "]\n";
         break;
       case Label::OUTPUT:
-        left = getNodeName(t);
-        right = getLabelName(*l->first);
+        left = getNodeName(os, t);
+        right = getLabelName(os, *l->first);
         attr << "]\n";
         break;
       default: PNAPI_ASSERT(false);
@@ -361,8 +403,8 @@ std::ostream & output(std::ostream & os, const Label & label)
   {
   case util::NORMAL:
   {
-    string labelName =  getLabelName(label);
-    string labelName_l = getLabelName(label, true);
+    string labelName =  getLabelName(os, label);
+    string labelName_l = getLabelName(os, label, true);
     
     os << labelName
        << ((label.getType() == Label::SYNCHRONOUS) ? "\t[width=.1]\n  " : "\n  ")
@@ -374,7 +416,7 @@ std::ostream & output(std::ostream & os, const Label & label)
   }
   case util::INNER:
   {
-    os << getLabelName(label) << " " << getLabelName(label, true);
+    os << getLabelName(os, label) << " " << getLabelName(os, label, true);
     break;
   }
     
@@ -388,8 +430,8 @@ std::ostream & output(std::ostream & os, const Label & label)
  */
 std::ostream & output(std::ostream & os, const Node & n, const std::string & attr)
 {
-  string dotName   = getNodeName(n);
-  string dotName_l = getNodeName(n, true);
+  string dotName   = getNodeName(os, n);
+  string dotName_l = getNodeName(os, n, true);
 
   os << dotName;
 
@@ -421,34 +463,9 @@ std::ostream & output(std::ostream & os, const Node & n, const std::string & att
  * 
  * \pre all nodes and labels have distinct names
  */
-std::string getNodeName(const Node & n, bool withSuffix)
+std::string getNodeName(std::ostream & os, const Node & n, bool withSuffix)
 {
-  static PetriNet * net = NULL;
-  static map<string, string> names;
-
-  if (net != &n.getPetriNet())
-  {
-    net = &n.getPetriNet();
-    names.clear();
-
-    int i = 0;
-    set<Place *> places = net->getPlaces();
-    PNAPI_FOREACH(it, places)
-    {
-      stringstream ss; ss << "p" << (++i);
-      names[(*it)->getName()] = ss.str();
-    }
-
-    i = 0;
-    set<Transition *> transitions = net->getTransitions();
-    PNAPI_FOREACH(it, transitions)
-    {
-      stringstream ss; ss << "t" << ++i;
-      names[(*it)->getName()] = ss.str();
-    }
-  }
-
-  return names[n.getName()] + string(withSuffix ? "_l" : "");
+  return util::DotNameData::data(os).names[n.getName()] + string(withSuffix ? "_l" : "");
 }
 
 /*!
@@ -456,42 +473,9 @@ std::string getNodeName(const Node & n, bool withSuffix)
  * 
  * \pre all nodes and labels have distinct names
  */
-std::string getLabelName(const Label & l, bool withSuffix)
+std::string getLabelName(std::ostream & os, const Label & l, bool withSuffix)
 {
-  static PetriNet * net = NULL;
-  static map<string, string> names;
-
-  if (net != &l.getPetriNet())
-  {
-    net = &l.getPetriNet();
-    names.clear();
-
-    int i = 0;
-    set<Label *> input = net->getInterface().getInputLabels();
-    PNAPI_FOREACH(it, input)
-    {
-      stringstream ss; ss << "i" << (++i);
-      names[(*it)->getName()] = ss.str();
-    }
-
-    i = 0;
-    set<Label *> output = net->getInterface().getOutputLabels();
-    PNAPI_FOREACH(it, output)
-    {
-      stringstream ss; ss << "o" << (++i);
-      names[(*it)->getName()] = ss.str();
-    }
-    
-    i = 0;
-    set<Label *> synchronous = net->getInterface().getSynchronousLabels();
-    PNAPI_FOREACH(it, synchronous)
-    {
-      stringstream ss; ss << "s" << (++i);
-      names[(*it)->getName()] = ss.str();
-    }
-  }
-
-  return names[l.getName()] + string(withSuffix ? "_l" : "");
+  return util::DotNameData::data(os).names[l.getName()] + string(withSuffix ? "_l" : "");
 }
 
 /*!

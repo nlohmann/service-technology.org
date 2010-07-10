@@ -29,6 +29,8 @@ Version 4.02-unreleased
 
 * using dot output, the final condition will now be written below the net
 
+* removed bug with node IDs in dot output
+
 Version 4.01 (2010-05-11)
 =========================
 

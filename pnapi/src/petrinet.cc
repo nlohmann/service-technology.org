@@ -1059,6 +1059,12 @@ Interface & PetriNet::getInterface()
   return interface_;
 }
 
+/// get the interface
+const Interface & PetriNet::getInterface() const
+{
+  return interface_;
+}
+
 /*!
  * \brief get all nodes
  */

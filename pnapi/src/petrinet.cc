@@ -1839,50 +1839,49 @@ void PetriNet::normalize_rules()
 
 
 /*!
+ * \brief returns one node's free-choice cluster
+ * 
  * The node's n cluster [n] follows the
  * definition in [].
  *
  * \return ...
  * \todo fulfill doxygen's documentation part
- * \todo apply pnapi style to this method
- * \todo place the method into the right section
  */
-set<Node *> PetriNet::cluster(Node &n) const
+set<Node *> PetriNet::getCluster(const Node & n) const
 {
 	set<Node *> result;
 	bool change = true;
 	map<Node *, bool> seen;
-	/*
-	 * 1. Inserting canonical node
-	 */
-	result.insert(&n);
-	/*
-	 * 2. Inserting cluster nodes
-	 */
-	while (change)
+	
+	// 1. Inserting canonical node
+	result.insert(const_cast<Node *>(&n));
+	
+	// 2. Inserting cluster nodes
+	while(change)
 	{
 		// do the magic
 		change = false;
 		PNAPI_FOREACH(r, result)
 		{
 			// 1. if r is a place r* is in [r]
-			if (dynamic_cast<Place *>(*r) != NULL)
+			if(dynamic_cast<Place *>(*r) != NULL)
 			{
 				PNAPI_FOREACH(t, (*r)->getPostset())
 				{
-					if (!result.count(*t))
+					if(!result.count(*t))
 					{
 						result.insert(*t);
 						change = true;
 					}
 				}
 			}
+			
 			// 2. if r is a transition *r is in [r]
-			if (dynamic_cast<Transition *>(*r) != NULL)
+			if(dynamic_cast<Transition *>(*r) != NULL)
 			{
 				PNAPI_FOREACH(p, (*r)->getPreset())
 				{
-					if (!result.count(*p))
+					if(!result.count(*p))
 					{
 						result.insert(*p);
 						change = true;

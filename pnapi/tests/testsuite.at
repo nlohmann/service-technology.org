@@ -1476,11 +1476,11 @@ AT_CLEANUP
 AT_BANNER([Customer Tools])
 ############################################################################
 
-#AT_SETUP([Wendy])
-#AT_CHECK_WGET
-#AT_CHECK([AT_CHECK_CUSTOMER wendy], 0, ignore, ignore)
-#AT_KEYWORDS([customer])
-#AT_CLEANUP
+AT_SETUP([Wendy])
+AT_CHECK_WGET
+AT_CHECK([AT_CHECK_CUSTOMER wendy], 0, ignore, ignore)
+AT_KEYWORDS([customer])
+AT_CLEANUP
 
 #AT_SETUP([Mia])
 #AT_CHECK_WGET

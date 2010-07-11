@@ -37,7 +37,7 @@ if [ "$WGET" != "not found" ]; then
   rm -rf ${TOOL}"/libs/pnapi/*"
 
   # copy files
-  cp ${SRC}/*.cc ${SRC}/*.h ${SRC}/*.yy ${SRC}/*.ll ${LIB}
+  cp ${SRC}/*.cc ${SRC}/*.h ${LIB}
   cp ${SRC}/Makefile.am.customer ${LIB}/Makefile.am
 
   # remove unnecessary files again

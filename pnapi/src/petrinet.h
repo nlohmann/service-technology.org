@@ -425,7 +425,7 @@ public: /* public methods */
   void deleteArc(Arc &);
 
   /// renames nodes
-  void canonicalNames();
+  std::map<std::string, std::string> canonicalNames();
   //@}
 
 

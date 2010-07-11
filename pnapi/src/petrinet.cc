@@ -1812,20 +1812,21 @@ void PetriNet::normalize_classical()
   }
 }
 
-void PetriNet::canonicalNames()
+std::map<std::string, std::string> PetriNet::canonicalNames()
 {
-  int i = 1;
+  map<string, string> result;
+  int i = 0;
   stringstream name;
   PNAPI_FOREACH(n, nodes_)
   {
-    name << "p" << i;
-    i++;
+    name << "p" << (++i);
+    result[(*n)->getName()] = name.str();
     (**n).setName(name.str());
     name.str("");
     name.clear(); 
-
   }
 
+  return result;
 }
 
 

@@ -192,8 +192,17 @@ int main(int argc, char** argv) {
                     break;
                 }
             }
-            if (args_info.canonicalNames_flag) {
-                current.net->canonicalNames();
+            if (args_info.canonicalNames_given) {
+                map<string, string> names = current.net->canonicalNames();
+                
+                if(args_info.canonicalNames_arg != NULL) {
+                    // try to open file to write
+                    Output outfile(args_info.canonicalNames_arg, "names output");
+                    
+                    PNAPI_FOREACH(n, names) {
+                        outfile.stream() << (n->second) << ": " << (n->first) << std::endl;
+                    }
+                }
             }
         } catch (exception::InputError error) {
             std::stringstream ss;
@@ -270,8 +279,17 @@ int main(int argc, char** argv) {
                         break;
                     }
                 }
-                if (args_info.canonicalNames_flag) {
-                    current.net->canonicalNames();
+                if (args_info.canonicalNames_given) {
+                    map<string, string> names = current.net->canonicalNames();
+                    
+                    if(args_info.canonicalNames_arg != NULL) {
+                        // try to open file to write
+                        Output outfile(args_info.canonicalNames_arg, "names output");
+                        
+                        PNAPI_FOREACH(n, names) {
+                            outfile.stream() << (n->second) << ": " << (n->first) << std::endl;
+                        }
+                    }
                 }
             } catch (exception::InputError error) {
                 infile.close();

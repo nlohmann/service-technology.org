@@ -21,8 +21,11 @@ option "output" o
   multiple
 
 option "canonicalNames" -
-  "Renames nodes in Woflan nets to avoid problems with conversion to other formats"
-  flag off
+  "Renames nodes to avoid problems with conversion to other formats. Mapping may be written to a given file."
+  string
+  typestr="FILENAME"
+  optional
+  argoptional
   
 option "formula" f
   "Places a final condition at the end of LoLA files. Has no effect to other output formats."

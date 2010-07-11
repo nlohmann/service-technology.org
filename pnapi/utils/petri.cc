@@ -200,7 +200,7 @@ int main(int argc, char** argv) {
                     Output outfile(args_info.canonicalNames_arg, "names output");
                     
                     PNAPI_FOREACH(n, names) {
-                        outfile.stream() << (n->second) << ": " << (n->first) << std::endl;
+                        outfile.stream() << (n->first) << ": " << (n->second) << std::endl;
                     }
                 }
             }
@@ -287,7 +287,7 @@ int main(int argc, char** argv) {
                         Output outfile(args_info.canonicalNames_arg, "names output");
                         
                         PNAPI_FOREACH(n, names) {
-                            outfile.stream() << (n->second) << ": " << (n->first) << std::endl;
+                            outfile.stream() << (n->first) << ": " << (n->second) << std::endl;
                         }
                     }
                 }

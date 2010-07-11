@@ -1820,7 +1820,7 @@ std::map<std::string, std::string> PetriNet::canonicalNames()
   PNAPI_FOREACH(n, nodes_)
   {
     name << "p" << (++i);
-    result[(*n)->getName()] = name.str();
+    result[name.str()] = (*n)->getName();
     (**n).setName(name.str());
     name.str("");
     name.clear(); 

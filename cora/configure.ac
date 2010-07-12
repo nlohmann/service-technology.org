@@ -1,4 +1,4 @@
-AC_INIT(Cora, 0.1, cora@service-technology.org, mycg, http://service-technology.org/cora)
+AC_INIT(Cora, 0.1, cora@service-technology.org, cora, http://service-technology.org/cora)
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
@@ -15,7 +15,7 @@ AC_PROG_YACC
 
 # use the service-technology.org macros
 AC_ST_BASIC
-# AC_ST_AUTOTEST
+AC_ST_AUTOTEST
 AC_ST_PNAPI
 AC_ST_VERBOSE
 
@@ -36,7 +36,7 @@ AC_TYPE_UINT32_T
 
 # write files
 AC_CONFIG_FILES([
-	Makefile libs/pnapi/Makefile src/Makefile
+	Makefile libs/pnapi/Makefile src/Makefile tests/Makefile tests/package.m4
 	])
-# AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
+AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

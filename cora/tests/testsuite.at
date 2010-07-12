@@ -1,0 +1,115 @@
+AT_INIT
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([CORA --help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([CORA --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Finding a marking])
+############################################################################
+
+AT_SETUP([Reachability 1])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([CORA -i test.owfn -m"p1:3,p2:3"],0,stdout,stderr)
+AT_CHECK([GREP -q "SOLUTION(26)" stdout])
+AT_KEYWORDS(marking)
+AT_CLEANUP
+
+AT_SETUP([Reachability 2])
+AT_CHECK([cp TESTFILES/test2.owfn .])
+AT_CHECK([CORA -i test2.owfn -m"s4:2"],0,stdout,stderr)
+AT_CHECK([GREP -q "SOLUTION(6): t5 t1 t2 t. t. t3" stdout])
+AT_KEYWORDS(marking)
+AT_CLEANUP
+
+AT_SETUP([Nonreachability])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([CORA -i test.owfn -m"p1:0"],0,stdout,stderr)
+AT_CHECK([GREP -q "NO SOLUTION" stdout])
+AT_KEYWORDS(marking)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Finding a firable sequence])
+############################################################################
+
+AT_SETUP([Firable Sequence])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([CORA -i test.owfn -s "t1;a1;u1" -v],0,stdout,stderr)
+AT_CHECK([GREP -q "SOLUTION(6): t1 a1 a1 a1 a1 u1" stdout])
+AT_KEYWORDS(sequence)
+AT_CLEANUP
+
+AT_SETUP([No Firable Sequence])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([CORA -i test.owfn -s"a1;u1"],0,stdout,stderr)
+AT_CHECK([GREP -q "UNSOLVABLE:" stdout])
+AT_KEYWORDS(sequence)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Computing the coverability graph])
+############################################################################
+
+AT_SETUP([Full Cover Graph])
+AT_CHECK([cp TESTFILES/test5.owfn .])
+AT_CHECK([CORA -i test5.owfn -f],0,stdout,stderr)
+AT_CHECK([GREP -q "s2:4" stdout])
+AT_CHECK([GREP -q "s2:0+" stdout])
+AT_CHECK([GREP -q "s.:2,s.:2" stdout])
+AT_CHECK([GREP -q "s.:0+,s.:0+" stdout])
+AT_CHECK([GREP -q " --t4-> s.:0+,s.:0+,s.:0+" stdout])
+AT_KEYWORDS(cgraph)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Error checks])
+############################################################################
+
+AT_SETUP([Missing Petri Net])
+AT_CHECK([CORA -i test1.owfn -v],1,stdout,stderr)
+AT_CHECK([GREP -q "aborting ..02" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Wrong Parser])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([CORA -i test.owfn -m"p1:3,p2:3" --lola],1,stdout,stderr)
+AT_CHECK([GREP -q "aborting ..04" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Options])
+############################################################################
+
+AT_SETUP([Measuring Time])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([CORA -i test.owfn -m"p1:3,p2:3" -v -t],0,stdout,stderr)
+AT_CHECK([GREP -q "seconds overall" stdout])
+AT_KEYWORDS(options)
+AT_CLEANUP
+
+AT_SETUP([Missing Options])
+AT_CHECK([CORA],0,stdout,stderr)
+AT_CHECK([GREP -q "Use options" stderr])
+AT_KEYWORDS(options)
+AT_CLEANUP
+
+AT_SETUP([Wrong Options])
+AT_CHECK([CORA --whatisthis],1,stdout,stderr)
+AT_CHECK([GREP -q "unrecognized option" stderr])
+AT_KEYWORDS(options)
+AT_CLEANUP
+

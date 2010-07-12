@@ -75,6 +75,14 @@ int main(int argc, char** argv) {
 	// evaluate command line
     evaluateParameters(argc, argv);
 
+/****************
+* NO ARGS GIVEN *
+****************/
+
+if (!args_info.input_given && !args_info.pipe_given)
+{
+	cerr << "sara: Use options -i or -p for input, -m, -s, or -f to define goal." << endl;
+}
 
 /*************************
 * REDIRECTING OUTPUT/LOG *
@@ -245,7 +253,7 @@ if (args_info.input_given || args_info.pipe_given) {
 	}
 	clock_t endtime = clock();
 	if (args_info.time_given) // print time use if --time was specified
-		cout << "mycg: Used " << (float)(endtime-starttime)/CLOCKS_PER_SEC << " seconds overall." << endl;
+		cout << "cora: Used " << (float)(endtime-starttime)/CLOCKS_PER_SEC << " seconds overall." << endl;
 }
 
 /*************************

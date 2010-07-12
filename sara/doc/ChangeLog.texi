@@ -1,4 +1,9 @@
 @c <<-- CHANGE START (version information) -->>
+@heading Version 1.0 (12 Jul 2010)
+@itemize
+@item first release of Sara
+@end itemize
+
 @heading Version 0.91-unreleased (6 Jul 2010)
 @itemize
 @item adding support for PNML

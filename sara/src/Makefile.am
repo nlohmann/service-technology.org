@@ -8,7 +8,7 @@ sara_SOURCES = main.cc problem.cc problem.h reachalyzer.cc reachalyzer.h imatrix
 # the configuration files
 #sysconf_DATA = sara.conf
 
-# pass the sysconfdir to Wendy (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
+# pass the sysconfdir to Sara (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 #sara_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
 sara_CPPFLAGS = -I$(top_srcdir)/libs
 sara_LDADD = $(top_builddir)/libs/lp_solve/liblpsolve55.la

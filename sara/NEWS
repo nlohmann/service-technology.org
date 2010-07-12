@@ -1,9 +1,16 @@
-No README
-Version 0.91-unreleased (6 Jul 2010)
-====================================
+                           ____                 
+                          / ___|  __ _ _ __ __ _ 
+                          \___ \ / _` | '__/ _` |
+                           ___) | (_| | | | (_| |
+                          |____/ \__,_|_|  \__,_|
+               Structures for Automated Reachability Analysis
+                     http://service-technology.org/sara
 
-* adding support for PNML
 
-* detecting type of a Petri net from the filename
+PURPOSE
+Version 1.0 (12 Jul 2010)
+=========================
+
+* first release of Sara
 
 \nSee file ChangeLog <http://service-technology.org/files/sara/ChangeLog> for\ncomplete version history.\n

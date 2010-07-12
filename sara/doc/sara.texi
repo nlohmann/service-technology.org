@@ -651,6 +651,8 @@ additional debugging output.
 
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
 Sara implements several algorithms and result published in several scientific articles.
+Sara tries to solve the general reachability problem, known to be EXPSPACE-hard, with
+an acceptable runtime for as many problem instances as possible.
 
 @section Decidability of Reachability in General
 

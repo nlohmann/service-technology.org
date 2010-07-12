@@ -9,7 +9,9 @@
 
 PURPOSE
 Sara implements several algorithms and result published in several scientific
-articles.
+articles.  Sara tries to solve the general reachability problem, known to be
+EXPSPACE-hard, with an acceptable runtime for as many problem instances as
+possible.
 
 Decidability of Reachability in General
 =======================================

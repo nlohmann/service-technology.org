@@ -285,7 +285,7 @@ Place* StubbornSet::hinderingPlace(Transition& t) {
 	set<pnapi::Arc*>::iterator ait;
 	set<Place*> pset;
 	set<Place*>::iterator pit;
-	for(ait=aset.begin(); ait!=aset.end(); ait++)
+	for(ait=aset.begin(); ait!=aset.end(); ++ait)
 	{
 		// check if this place has enough tokens, record it as candidate if not
 		if (m0.isOpen((*ait)->getPlace())) continue; // it has an unlimited number, that's enough
@@ -321,7 +321,7 @@ set<Transition*> StubbornSet::requiredTransitions(Place& p) {
 	set<Transition*> tset;
 	set<pnapi::Arc*> prearc = p.getPresetArcs();
 	set<pnapi::Arc*>::iterator ait;
-	for(ait=prearc.begin(); ait!=prearc.end(); ait++)
+	for(ait=prearc.begin(); ait!=prearc.end(); ++ait)
 	{
 		// find transitions that produce tokens on p
 		Transition* t = &((*ait)->getTransition());
@@ -351,7 +351,7 @@ bool StubbornSet::doTarjan(Node* start, set<Transition*>& result, int& maxdfs) {
 	// marker for "is contained in the stack"
 	start->instack = true;
 	set<int>::iterator it; // int corresponds to Transition* via transitionorder/revtorder, but our choice of ordering
-	for(it=start->nodes.begin(); it!=start->nodes.end(); it++)
+	for(it=start->nodes.begin(); it!=start->nodes.end(); ++it)
 	{
 		Node* mn(tton[*it]);
 		if (mn->index<0) {
@@ -415,7 +415,7 @@ set<Transition*> StubbornSet::changesMarkingOn(Place* p, bool lower) {
 	if (!p) return result; // check if the place is given
 	set<pnapi::Arc*> arcs = (lower ? p->getPresetArcs() : p->getPostsetArcs()); // get the arcs doing the right thing on p
 	set<pnapi::Arc*>::iterator ait;
-	for(ait=arcs.begin(); ait!=arcs.end(); ait++) // iterate through the arcs
+	for(ait=arcs.begin(); ait!=arcs.end(); ++ait) // iterate through the arcs
 	{
 		// find the transition connected to p
 		Transition* t = &((*ait)->getTransition());

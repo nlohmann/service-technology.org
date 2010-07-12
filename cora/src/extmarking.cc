@@ -531,7 +531,7 @@ Place* ExtMarking::distinguish(Marking& m) {
 		else // finally check for closed intervals of this, if m(p) lies within the interval
 		{
 			if (lb.find(p)==lb.end()) { if (mit->second<=(unsigned int)(ub[p])) continue; } // it's in [0,ub[p]]
-			else if (mit->second>=lb[p] && mit->second<=(unsigned int)(ub[p])) continue; // it's in [lb[p],ub[p]]
+			else if (mit->second>=(unsigned int)(lb[p]) && mit->second<=(unsigned int)(ub[p])) continue; // it's in [lb[p],ub[p]]
 		}
 		return p; // m could be distinguished from this at place p, so return it
 	}

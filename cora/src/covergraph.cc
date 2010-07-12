@@ -65,6 +65,7 @@ CoverGraph::~CoverGraph() { // just free all the memory, including nodes and sub
 				delete subnodes[i]; // and free them
 		delete (*rit).cnode; // finally free the global (=root) node
 	}
+	init = NULL;
 }
 
 /** Check whether an edge labelled by transition t starting at the root node cn already

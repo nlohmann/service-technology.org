@@ -40,6 +40,7 @@ import java.util.Map;
 public class DNodeSys_PetriNet extends DNodeSys {
 
 	private int						      nodeNum;       // counter number of nodes 
+  private Map<DNode, Node>    nodeOrigin;      // inverse of #nodeEncoding
 	private Map<Node, DNode>		nodeEncoding;  // encoding of net Nodes as DNodes
 	
 	/**
@@ -64,6 +65,7 @@ public class DNodeSys_PetriNet extends DNodeSys {
 		// create a name table initialize the translation tables
 		buildNameTable(net);
 		nodeEncoding = new HashMap<Node, DNode>(nodeNum);
+    nodeOrigin = new HashMap<DNode, Node>(nodeNum);
 		
 		// then translate the net
 		buildDNodeRepresentation(net);
@@ -272,6 +274,7 @@ public class DNodeSys_PetriNet extends DNodeSys {
 			}
 			
 			nodeEncoding.put(n, d);		// store new pair
+	    nodeOrigin.put(d, n);     // and its reverse mapping
 		}
 	}
 	
@@ -306,4 +309,20 @@ public class DNodeSys_PetriNet extends DNodeSys {
 	public boolean isTerminal(DNode d) {
       return terminalNodes.contains(d.id);
 	}
+	
+	 /**
+   * @param d
+   * @return the node that caused the definition of {@link DNode} 'd' in this system
+   */
+  public Node getOriginalNode(DNode d) {
+    return nodeOrigin.get(d);
+  }
+  
+   /**
+   * @param d
+   * @return the node that represents {@link Node} 'n' in this system
+   */
+  public DNode getResultNode(Node n) {
+    return nodeEncoding.get(n);
+  }
 }

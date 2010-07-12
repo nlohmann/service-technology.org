@@ -357,7 +357,6 @@ bool ExtMarking::operator<(const ExtMarking& right) const {
 	bit2 = right.type.begin();
 	lit2 = right.lb.begin();
 	Place* p; // the next place to check
-	bool isless = false;
 	
 	while (true) {
 		p = NULL; // the following lines find the earliest (remaining) place appearing in any of the four maps
@@ -522,17 +521,17 @@ Place* ExtMarking::distinguish(Marking& m) {
 		if (type.find(p)==type.end()) // if this has a single value entry
 		{
 			if (lb.find(p)==lb.end()) { if (mit->second==0) continue; } // check if both markings are zero here, if so, look for another place
-			else if (mit->second == lb[p]) continue; // otherwise check if they have the same value, then look for another place
+			else if (mit->second == (unsigned int)(lb[p])) continue; // otherwise check if they have the same value, then look for another place
 		} 
 		else if (type[p]) // in case this has an open interval
 		{
 			if (lb.find(p)==lb.end()) continue; // if it begins at zero, m might be contained
-			else if (mit->second >= lb[p]) continue; // if m has more tokens than the lower bound, it may be contained
+			else if (mit->second >= (unsigned int)(lb[p])) continue; // if m has more tokens than the lower bound, it may be contained
 		}
 		else // finally check for closed intervals of this, if m(p) lies within the interval
 		{
-			if (lb.find(p)==lb.end()) { if (mit->second<=ub[p]) continue; } // it's in [0,ub[p]]
-			else if (mit->second>=lb[p] && mit->second<=ub[p]) continue; // it's in [lb[p],ub[p]]
+			if (lb.find(p)==lb.end()) { if (mit->second<=(unsigned int)(ub[p])) continue; } // it's in [0,ub[p]]
+			else if (mit->second>=lb[p] && mit->second<=(unsigned int)(ub[p])) continue; // it's in [lb[p],ub[p]]
 		}
 		return p; // m could be distinguished from this at place p, so return it
 	}
@@ -554,8 +553,8 @@ bool ExtMarking::lessThanOn(Marking& m, Place& p) {
 	if (type.find(&p)==type.end()) // if this has a single value for p
 	{
 		if (lb.find(&p)==lb.end()) { if (m[p]>0) return true; } // and it is zero, just check m[p]>0
-		else if (m[p]>lb[&p]) return true; // otherwise check if the value is lower than m[p]
-	} else if (!type[&p] && m[p]>ub[&p]) return true; // for closed intervals, check the upper bound
+		else if (m[p]>(unsigned int)(lb[&p])) return true; // otherwise check if the value is lower than m[p]
+	} else if (!type[&p] && m[p]>(unsigned int)(ub[&p])) return true; // for closed intervals, check the upper bound
 	return false; // this isn't smaller (happen especially if this has an open interval for p)
 }
 
@@ -587,7 +586,7 @@ int ExtMarking::distanceTo(Marking& m) {
 		Place* p(const_cast<Place*>(mit->first)); // get such a place
 		if (type.find(p)!=type.end()) continue; // if this has an interval here, don't do anything
 		if (lb.find(p)==lb.end()) result += mit->second; // if this is zero here, add m[p] to the distance
-		else if (mit->second>lb[p]) result += ((int)(mit->second)-lb[p]); // otherwise add the difference between the markings
+		else if (mit->second>(unsigned int)(lb[p])) result += ((int)(mit->second)-lb[p]); // otherwise add the difference between the markings
 		else result -= ((int)(mit->second)-lb[p]); // resp. subtract it if it's negative
 	}
 	map<Place*,int>::iterator emit;

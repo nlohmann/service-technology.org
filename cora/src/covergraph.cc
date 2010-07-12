@@ -80,7 +80,7 @@ bool CoverGraph::createSuccessor(CNode& cn, Transition& t) {
 	ExtMarking em(cn.getMarking()); // extract the active extmarking
 	if (em.isDisabled(t,imat)) return false; // check if t can fire at all, if not, no successor
 	em.successor(t,true,imat); // obtain the t-successor's extmarking
-	bool newomega(cn.addOmega(em)); // and check if we need to set some numbers to omega (and do so)
+	cn.addOmega(em); // and check if we need to set some numbers to omega (and do so)
 	CNode* c(new CNode(em)); // create a new node from the extmarking
 	RNode r(*c); // and also contain it in a root list entry to check if we already created it
 	if (nodes.find(r)==nodes.end()) // if the extmarking does not exists in the coverability graph ...
@@ -269,7 +269,7 @@ deque<Transition*> CoverGraph::findPath(CNode& cn) {
 						next.insert(*cit); // and tag this node as todo, but only in the next run of the loop
 					}
 					if (*cit==&cn) { found=true; break; } // if we reach the node we were looking for, stop
-					else if (cn.getRoot()==&cn && (*cit)->getRoot()==&cn) { found==true; break; }
+					else if (cn.getRoot()==&cn && (*cit)->getRoot()==&cn) { found=true; break; }
 					// also stop if we were looking for a global node of which this node is a subnode
 				}
 				if (found) break; // leave the loops if we have found a path
@@ -298,9 +298,9 @@ deque<Transition*> CoverGraph::findPath(ExtMarking& em) {
 	set<CNode*> go; // a set of nodes to work on
 	go.insert(init); // beginning with just the initial node
 	bool found(false); // if we have found the path we are looking for
-	CNode* follow; // then we need to know which node we reached
+	CNode* follow(init); // then we need to know which node we reached
 	// first check if the initial node is already our aim ...
-	if (init->getMarking().hasIntersectionWith(em)) { found=true; follow=init; }
+	if (init->getMarking().hasIntersectionWith(em)) found=true;
 	while (!go.empty() && !found) // as long as there is work to do, go on ...
 	{
 		set<CNode*> next; // the next set of nodes to work upon, initially empty

@@ -66,7 +66,7 @@ void StubbornSet::Node::reset() { index=-2; low=-1; instack=false; nodes.clear()
 	@param goal The marking the stubborn set methods are aiming at for reachability testing.
 	@param imx The incidence matrix created by the constructor call to IMatrix for the Petri net.
 */
-StubbornSet::StubbornSet(vector<Transition*> tlist, Marking& goal, IMatrix& imx) : tord(tlist),aim(goal),im(imx) {
+StubbornSet::StubbornSet(vector<Transition*> tlist, Marking& goal, IMatrix& imx) : aim(goal),tord(tlist),im(imx) {
 	for(unsigned int i=0; i<tord.size(); ++i)
 	{
 		tton.push_back(new Node());
@@ -140,7 +140,7 @@ vector<Transition*> StubbornSet::compute(ExtMarking& m) {
 			cftit = cftab.find(next);
 			if (cftit!=cftab.end()) {
 				set<Transition*>::iterator cit;
-				for(cit=cftit->second.begin(); cit!=cftit->second.end(); cit++)
+				for(cit=cftit->second.begin(); cit!=cftit->second.end(); ++cit)
 				{
 					int cpos(revtord[*cit]); // the conflicting transition's number
 					// new depending or conflicting transitions are added to the todo-list recursively
@@ -232,7 +232,7 @@ void StubbornSet::conflictTable(Transition* tstart) {
 				pnapi::Arc* a = pn.findArc(**it,*p);
 				// places on which we effectively produce tokens do not lead to conflicts where the other transition must fire first
 				if (a) if ((*prearc)->getWeight()<=a->getWeight()) continue;
-				int itcons((*prearc)->getWeight());
+//				int itcons((*prearc)->getWeight());
 				int itprod(a?a->getWeight():0);
 				const set<pnapi::Arc*> ppost = p->getPostsetArcs();
 				set<pnapi::Arc*>::iterator postarc; // now check the postset of p for conflicting transitions
@@ -289,7 +289,7 @@ Place* StubbornSet::hinderingPlace(Transition& t) {
 	{
 		// check if this place has enough tokens, record it as candidate if not
 		if (m0.isOpen((*ait)->getPlace())) continue; // it has an unlimited number, that's enough
-		if ((*ait)->getWeight()>m0.getLowerBound((*ait)->getPlace())) 
+		if ((*ait)->getWeight()>(unsigned int)(m0.getLowerBound((*ait)->getPlace()))) 
 			pset.insert(&((*ait)->getPlace()));
 	}
 	// catch error of missing scapegoat

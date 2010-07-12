@@ -446,7 +446,7 @@ bool CNode::preSplit(Transition& t, CNode& cn, IMatrix& im, StubbornSet* sb) {
 */ 
 void CNode::show(ostream& o, vector<Place*>& pord) {
 	CNode* src(getRoot()); // get the root of this node
-	for(unsigned int i=0; i<src->pos; ++i) // go through all subnodes
+	for(unsigned int i=0; i<(unsigned int)(src->pos); ++i) // go through all subnodes
 	{
 		cout << "(" << i << "): "; // index of the subnode
 		if (src->lson[i]>=0 || src->rson[i]>=0) // if this is a decision node, print the if-then-else
@@ -530,7 +530,7 @@ void CNode::setStubbornSet(vector<Transition*> stubset) { stubbornset=stubset;
 //for(unsigned int i=0; i<stubbornset.size(); ++i)
 //	cout << stubbornset[i]->getName() << ",";
 //cout << endl;
-};
+}
 
 /** Get/Compute the stubborn set for this node.
 	@param stubset The Stubborn Set structure needed for computing stubborn sets.

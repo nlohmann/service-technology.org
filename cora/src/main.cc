@@ -148,14 +148,13 @@ if (args_info.input_given || args_info.pipe_given) {
 	if (args_info.sequence_given) // if a sequence leading to a node (instead of a final marking) is given
 	{
 		char* seq(args_info.sequence_arg); // get the sequence of interest in the coverability graph
-		char* dlim(" :,;");
-		char* tok = strtok(seq,dlim); // split the sequence into tokens (transitions)
+		char* tok = strtok(seq," :,;"); // split the sequence into tokens (transitions)
 		vector<Transition*> tvec;
 		while (tok!=NULL) { // create a vector of transitions from the sequence
 			Transition* t(pn->findTransition(tok));
 			if (t==NULL) abort(1,"token '%s' in input transition sequence is not a transition",tok);
 			tvec.push_back(t);
-			tok = strtok(NULL,dlim);
+			tok = strtok(NULL," :,;");
 		}
 		if (!cg.createPath(tvec)) { // create the path formed by the given sequence in the coverability graph
 			cout << "UNSOLVABLE: The given path does not exist in the coverability graph." << endl; 

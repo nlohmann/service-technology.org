@@ -129,7 +129,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
     {
 
 /* Line 34 of lalr1.cc  */
-#line 74 "parser-owfn.yy"
+#line 75 "parser-owfn.yy"
 
   int yt_int;
   pnapi::formula::Formula * yt_formula;
@@ -316,7 +316,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
 #if YYDEBUG
     /// A type to store symbol numbers and -1.
-    typedef signed char rhs_number_type;
+    typedef short int rhs_number_type;
     /// A `-1'-separated list of the rules' RHS.
     static const rhs_number_type yyrhs_[];
     /// For each rule, the index of the first RHS symbol in \a yyrhs_.

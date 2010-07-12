@@ -148,7 +148,7 @@ public: /* public methods */
 
 protected: /* protected methods */
   /// make this class concrete
-  void implementMe() {};
+  void implementMe() {}
   
 private: /* private methods */
   /// whether we care about a given element

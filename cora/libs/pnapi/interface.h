@@ -48,6 +48,8 @@ private: /* private variables */
   std::map<std::string, Port *> ports_;
   /// the net the interface belongs to
   PetriNet & net_;
+  /// next free port number
+  unsigned int nextID_;
   
 public: /* public methods */
   /*!
@@ -69,6 +71,8 @@ public: /* public methods */
   //@{
   /// adding a single port
   Port & addPort(const std::string &);
+  /// adding a label
+  Label & addLabel(const std::string &, Label::Type, const std::string & = "");
   /// adding an input label
   Label & addInputLabel(const std::string &, Port &);
   /// adding an input label
@@ -122,6 +126,8 @@ public: /* public methods */
 private: /* private methods */
   /// no copying allowed
   Interface(const Interface &);
+  /// generate unused port name
+  std::string generatePortName();
 };
 
 } /* namespace pnapi */

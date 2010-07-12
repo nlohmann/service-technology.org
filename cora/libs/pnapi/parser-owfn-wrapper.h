@@ -101,6 +101,8 @@ private: /* private variables */
   std::map<std::string, Label *> labels_;
   /// type of recent labels
   Label::Type labelType_;
+  /// mapping from label names to types
+  std::map<std::string, Label::Type> labelTypes_;
 
   /// read capacity
   int capacity_;
@@ -125,7 +127,7 @@ public: /* public methods */
   
 protected: /* protected methods */
   /// make this class concrete
-  void implementMe() {};
+  void implementMe() {}
 };
 
 } /* namespace owfn */

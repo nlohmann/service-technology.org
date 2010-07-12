@@ -11,9 +11,9 @@
  *
  * \since   2005/11/11
  *
- * \date    $Date: 2010-03-14 13:44:15 +0100 (Sun, 14 Mar 2010) $
+ * \date    $Date: 2010-06-14 15:12:32 +0200 (Mon, 14 Jun 2010) $
  *
- * \version $Revision: 5513 $
+ * \version $Revision: 5831 $
  */
 
 #ifndef PNAPI_UTIL_H
@@ -60,60 +60,80 @@ namespace util
 {
 
 /*
- * \brief   DFS using Tarjan's algorithm.
+ * \brief   modified Tarjan's algorithm.
  *
- * \param   Node n which is to check
- * \param   Stack S is the stack used in the Tarjan algorithm
- * \param   Set stacked which is needed to identify a node which is already
+ * \param   n Node which is to check
+ * \param   last node without postset
+ * \param   stacked Set which is needed to identify a node which is already
  *          stacked
- * \param   int \f$i \in \fmathbb{N}\f$ which is the equivalent to Tarjan's
- *          index variable
- * \param   Map index which describes the index property of a node
- * \param   Map lowlink which describes the lowlink property of a node
+ * \param   index the equivalent to Tarjan's index variable
+ * \param   indices map which describes the index property of a node
+ * \param   lowlink map which describes the lowlink property of a node
+ * \param   nodeCount amount of nodes in the net
  *
- * \return  the number of strongly connected components reachable from the
- *          start node.
+ * \return  whether the net has workflow structure
  *
- * \note    Used by method isWorkflowNet() to check condition (3) - only
+ * \note    Used by method isWorkflow() to check condition (3) - only
  *          working for this method.
+ * 
+ * To Tarjan's algorithm the following modifications have been applied:
+ * 1.: If the recent node is the "last" node, the lowlink will be set to 0,
+ *     since the method PetrNet::isWorkflow() actually checks, whether
+ *     the net is strongly connected when a single transition, consuming
+ *     from the last place and producing to the first place, is added.
+ *     So instead of adding this transition, the lowlink value 0 will
+ *     directly be assigned.
+ * 2.: If a scc has been found, the index has to be 0 and the stack must
+ *     hold nodeCount nodes. Otherwise the net is not strongly connected.
  */
 template <typename T>
-unsigned int dfsTarjan(T n, std::stack<T> & S, std::set<T> & stacked,
-                       unsigned int & i, std::map<T, int> & index,
-                       std::map<T, unsigned int> & lowlink)
+bool dfsTarjan(T n, T last, std::set<T> & stacked,
+               unsigned int & index, std::map<T, int> & indices,
+               std::map<T, unsigned int> & lowlink, unsigned int nodeCount)
 {
-  unsigned int retVal = 0;
-
-  index[n] = i;
-  lowlink[n] = i;
-  ++i;
-  S.push(n);
+  indices[n] = lowlink[n] = index++;
+  if(n == last)
+  {
+    lowlink[n] = 0;
+  }
   stacked.insert(n);
   
   PNAPI_FOREACH(nn, n->getPostset())
   {
-    if (index[*nn] < 0)
+    if(indices[*nn] < 0)
     {
-      retVal += dfsTarjan(*nn, S, stacked, i, index, lowlink);
+      // new node in dfs-tree
+      if(!dfsTarjan(*nn, last, stacked, index, indices, lowlink, nodeCount))
+      {
+        // scc found whithin the net
+        return false;
+      }
       lowlink[n] = std::min(lowlink[n], lowlink[*nn]);
     }
     else
     {
-      if (stacked.count(*nn) > 0)
-        lowlink[n] = std::min(lowlink[n], lowlink[*nn]);
+      if(stacked.count(*nn) > 0)
+      {
+        lowlink[n] = std::min(lowlink[n], static_cast<unsigned int>(indices[*nn]));
+      }
     }
   }
   
-  if(static_cast<int>(lowlink[n]) == index[n])
+  if(static_cast<int>(lowlink[n]) == indices[n])
   {
-    ++retVal;
-    while(!S.empty() && (lowlink[S.top()] == lowlink[n]))
+    // scc found
+    if((indices[n] == 0) && // this node is the start node
+       (stacked.size() == nodeCount)) // all nodes belong to this scc
     {
-      S.pop();
+      return true;
+    }
+    else
+    {
+      return false;
     }
   }
 
-  return retVal;
+  return true;
 }
 
 

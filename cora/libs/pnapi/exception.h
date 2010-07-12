@@ -1,10 +1,28 @@
+// -*- C++ -*-
+
+/*!
+ * \file    exception.h
+ *
+ * \brief   exception classes
+ *
+ * \author  Niels Lohmann <nlohmann@informatik.hu-berlin.de>,
+ *          Christian Gierds <gierds@informatik.hu-berlin.de>,
+ *          last changes of: $Author: cas $
+ *
+ * \since   2005/11/11
+ *
+ * \date    $Date: 2010-07-05 01:12:42 +0200 (Mon, 05 Jul 2010) $
+ *
+ * \version $Revision: 5874 $
+ */
+
 #ifndef PNAPI_EXCEPTION_H
 #define PNAPI_EXCEPTION_H
 
 #include "config.h"
 
-#include <cassert>
 #include <string>
+#include <iostream>
 
 namespace pnapi
 {
@@ -27,6 +45,8 @@ public: /* public constants */
 public: /* public methods */
   /// constructor
   Error(const std::string &);
+  /// output method
+  virtual std::ostream & output(std::ostream &) const;
 };
 
 
@@ -57,6 +77,8 @@ public: /* public methods */
   /// constructor
   InputError(Type, const std::string &, int, const std::string &,
              const std::string &);
+  /// output method
+  virtual std::ostream & output(std::ostream &) const;
 };
 
 /*!
@@ -66,11 +88,11 @@ class NotImplementedError : public Error
 {
 public: /* public methods */
   /// constructor
-  NotImplementedError(const std::string &); 
+  NotImplementedError(const std::string &);
 };
 
 /*!
- * \brief
+ * \brief Exception thrown when an internal assertion failed
  */
 class AssertionFailedError : public Error
 {
@@ -84,27 +106,38 @@ public: /* public methods */
   /// constructor
   AssertionFailedError(const std::string &, unsigned int,
                        const std::string &);
+  /// output method
+  virtual std::ostream & output(std::ostream &) const;
+};
+
+/*!
+ * \brief Exception thrown when user caused an error.
+ */
+class UserCausedError : public Error
+{
+public: /* public types */
+  /// user error types
+  enum UE_Type
+  {
+    UE_NONE,
+    UE_NODE_NAME_CONFLICT,
+    UE_LABEL_NAME_CONFLICT,
+    UE_ARC_CONFLICT,
+    UE_COMPOSE_ERROR
+  };
+  
+public: /* public constants */
+  /// user error type
+  const UE_Type type;
+  
+public: /* public methods */
+  /// constructor
+  UserCausedError(UE_Type, const std::string &);
 };
 
 
 } /* namespace exception */
 
 } /* namespace pnapi */
-
-/*******************\
- * assertion makro *
-\*******************/
-
-#ifdef PNAPI_USE_C_ASSERTS
-#define PNAPI_ASSERT(expr) assert(expr)
-#else
-
-#ifdef NDEBUG
-#define PNAPI_ASSERT(expr) assert(expr)
-#else
-#define PNAPI_ASSERT(expr) if(!(expr)) { throw pnapi::exception::AssertionFailedError( __FILE__ , __LINE__ , #expr ); }
-#endif /* NDEBUG */
-
-#endif /* PNAPI_USE_C_ASSERTS */
 
 #endif /* PNAPI_EXCEPTION_H */

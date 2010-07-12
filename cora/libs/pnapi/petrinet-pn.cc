@@ -9,6 +9,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "automaton.h"
 #include "Output.h"
 #include "parser-pn-wrapper.h"
@@ -32,55 +34,22 @@ namespace pnapi
 {
 
 /*!
- * \brief setting path to Petrify
- */
-void PetriNet::setPetrify(const std::string & petrify)
-{ 
-  pathToPetrify_ = petrify; 
-}
-
-/*!
- * \brief setting path to Genet
- */
-void PetriNet::setGenet(const std::string & genet, uint8_t capacity)
-{
-  pathToGenet_ = genet;
-  genetCapacity_ = capacity;
-}
-
-/*!
- * \brief setting automaton converter
- */
-void PetriNet::setAutomatonConverter(PetriNet::AutomatonConverter converter)
-{
-  automatonConverter_ = converter;
-}
-
-/*!
  * The constructor transforming an automaton to a Petri net.
+ * 
+ * \param sa automaton to be converted
+ * \param ac automaton converter to be used
+ * \param capacity to be passed to Genet when using genet
  */
-PetriNet::PetriNet(const Automaton & sa) :
-  observer_(*this), interface_(*this),
-  warnings_(0), reductionCache_(NULL)
+PetriNet::PetriNet(const Automaton & sa, AutomatonConverter ac, uint8_t capacity) :
+  observer_(*this), warnings_(0), reductionCache_(NULL),
+  genetCapacity_(capacity), automatonConverter_(ac), interface_(*this)
 {
-  if( (automatonConverter_ == PETRIFY) &&
-      (pathToPetrify_ == "not found") )
-  {
-    automatonConverter_ = GENET;
-  }
-
-  if( (automatonConverter_ == GENET) &&
-      (pathToGenet_ == "not found") )
-  {
-    automatonConverter_ = STATEMACHINE;
-  }  
-
   if(automatonConverter_ == STATEMACHINE)
   {
     (*this) = sa.toStateMachine();
     return;
   }
-
+  
   util::Output out;
 
   std::vector<std::string> edgeLabels;
@@ -116,7 +85,7 @@ void Automaton::printToTransitionGraph(std::vector<std::string> & edgeLabels,
   {
   case PetriNet::PETRIFY :
   case PetriNet::GENET : break;
-  default : assert(false); // do not call with other converters
+  default : PNAPI_ASSERT(false); // do not call with other converters
   }
 
   // create and fill stringstream for buffering graph information
@@ -258,14 +227,15 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
   }
 
   //int result = system(systemcall.c_str());
-  system(systemcall.c_str());
+  int doNotCare_JustFixWarning = system(systemcall.c_str());
+  doNotCare_JustFixWarning = doNotCare_JustFixWarning; // get rid of compilerwarning
 
   /// does not work for Genet, there seems to be a bug in Cudd
-  //assert(result == 0);
+  //PNAPI_ASSERT(result == 0);
 
   // parse generated file
   ifstream ifs(pnFileName.c_str(), ifstream::in);
-  assert(ifs.good());
+  PNAPI_ASSERT(ifs.good());
 
   parser::pn::Parser myParser;
   myParser.parse(ifs);
@@ -284,7 +254,7 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
 
     if(remapped.substr(0,5) != "FINAL")
     {
-      assert(remapped.find('/') == remapped.npos); // petrify should not rename/create dummy transitions
+      PNAPI_ASSERT(remapped.find('/') == remapped.npos); // petrify should not rename/create dummy transitions
 
       if(inputLabels.count(remapped) > 0)
       {

@@ -22,7 +22,7 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2010-05-05 02:40:00 +0200 (Wed, 05 May 2010) $
+ * \date    \$Date: 2010-06-06 14:46:01 +0200 (Sun, 06 Jun 2010) $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
@@ -38,10 +38,10 @@
  *          but no k-boundedness.
  *          Section 3 contains rules from "Thomas Pillat - 
  *          Gegenüberstellung struktureller Reduktionstechniken
- *          für Petrinetze" ([Pil08])". These rules preserve lifeness and
- *          k-boundedness.         
+ *          für Petrinetze" ([Pil08]). These rules preserve lifeness and
+ *          k-boundedness.
  * 
- * \version \$Revision: 5700 $
+ * \version \$Revision: 5813 $
  *
  * \ingroup petrinet
  * 
@@ -422,8 +422,9 @@ unsigned int PetriNet::reduce_rule_3p()
       PNAPI_FOREACH(p2, preTransition->getPostset())
       {
         if(((*p1)->isParallel(**p2)) && // precondition 1
-           (reductionCache_->intervals_[static_cast<Place *>(*p2)].getLower() ==
-            reductionCache_->intervals_[static_cast<Place *>(*p2)].getUpper())) // precondition 3
+           ((finalCondition_ == true) ||
+             (reductionCache_->intervals_[static_cast<Place *>(*p2)].getLower() ==
+              reductionCache_->intervals_[static_cast<Place *>(*p2)].getUpper()))) // precondition 3
         {
           // can reduce place
           parallelPlaces.insert(static_cast<Place *>(*p2));
@@ -444,8 +445,9 @@ unsigned int PetriNet::reduce_rule_3p()
         PNAPI_FOREACH(p2, postTransition->getPreset())
         {
           if(((*p1)->isParallel(**p2)) && // precondition 1
-             (reductionCache_->intervals_[static_cast<Place *>(*p2)].getLower() ==
-              reductionCache_->intervals_[static_cast<Place *>(*p2)].getUpper())) // precondition 3
+             ((finalCondition_ == true) ||
+               (reductionCache_->intervals_[static_cast<Place *>(*p2)].getLower() ==
+                reductionCache_->intervals_[static_cast<Place *>(*p2)].getUpper()))) // precondition 3
           {
             // can reduce place
             parallelPlaces.insert(static_cast<Place *>(*p2));
@@ -672,8 +674,9 @@ unsigned int PetriNet::reduce_rule_4()
   PNAPI_FOREACH(p, possiblyRelevantPlaces)
   {
     if( ( (*((*p)->getPostsetArcs().begin()))->getWeight() == 1 ) && // precondition 3
-        ( reductionCache_->intervals_[*p].getLower() == 0 ) &&
-        ( reductionCache_->intervals_[*p].getUpper() == 0 )) // precondition 6
+        ( (finalCondition_ == true) ||
+          ((reductionCache_->intervals_[*p].getLower() == 0 ) &&
+           (reductionCache_->intervals_[*p].getUpper() == 0 )))) // precondition 6
     {
       relevantPlaces.insert(*p);
     }
@@ -883,8 +886,8 @@ unsigned int PetriNet::reduce_rule_5()
           (reduce_emptyPostset(postset) && (!sendingPostset)) || // precondition 4
           (!(reduce_singletonPreset(postset))) || // precondition 5a
           ((!pretransitionsTau) && sendingPostset) || // precondition l
-          (reductionCache_->intervals_[*p].getLower() != v__) ||
-          (reductionCache_->intervals_[*p].getUpper() != v__) ) // precondition f
+          ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getLower() != v__)) ||
+          ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getUpper() != v__)) ) // precondition f
       {
         continue;
       }
@@ -1134,8 +1137,8 @@ unsigned int PetriNet::reduce_rule_6()
     if( (t->getPostset().size() != 1) || // precondition 2a
         (!(t->getOutputLabels().empty())) || // precondition 2b
         ((*p)->getPostset().find(t) != (*p)->getPostset().end()) || // precondition 4
-        (reductionCache_->intervals_[*p].getLower() != (*p)->getTokenCount()) ||
-        (reductionCache_->intervals_[*p].getUpper() != (*p)->getTokenCount()) ) // precondition 8
+        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getLower() != (*p)->getTokenCount())) ||
+        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getUpper() != (*p)->getTokenCount())) ) // precondition 8
     {
       continue;
     }
@@ -1597,8 +1600,8 @@ unsigned int PetriNet::reduce_rule_9()
     }
 
     if( ((*((*p)->getPostsetArcs().begin()))->getWeight() != 1) || //precondition 2
-        (reductionCache_->intervals_[*p].getLower() != 0) ||
-        (reductionCache_->intervals_[*p].getUpper() != 0) ) // precondition 6
+        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getLower() != 0)) ||
+        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getUpper() != 0)) ) // precondition 6
     {
       continue;
     }
@@ -2186,8 +2189,8 @@ unsigned int PetriNet::reduce_series_places()
     if( (seenPlaces[prePlace]) ||
         (seenPlaces[postPlace]) || 
         (!((*t)->getLabels().empty())) || // precondition 7
-        (reductionCache_->intervals_[postPlace].getLower() != 0) ||
-        (reductionCache_->intervals_[postPlace].getUpper() != 0) ) // precondition f
+        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[postPlace].getLower() != 0)) ||
+        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[postPlace].getUpper() != 0)) ) // precondition f
     {
       continue;
     }
@@ -2308,8 +2311,9 @@ unsigned int PetriNet::reduce_series_transitions()
   // iterate the internal places
   PNAPI_FOREACH(p, candidates) 
   {
-    if( (reductionCache_->intervals_[*p].getLower() == 0) &&
-        (reductionCache_->intervals_[*p].getUpper() == 0) && // precondition f
+    if( ((finalCondition_ == true) ||
+         ((reductionCache_->intervals_[*p].getLower() == 0) &&
+          (reductionCache_->intervals_[*p].getUpper() == 0))) && // precondition f
         (((*p)->getTokenCount() == 0)) ) // precondition 2
     {
       Transition * t1 = static_cast<Transition *>(*((*p)->getPreset().begin()));

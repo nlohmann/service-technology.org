@@ -13,9 +13,9 @@
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-05-05 02:40:00 +0200 (Wed, 05 May 2010) $
+ * \date    $Date: 2010-07-11 17:35:31 +0200 (Sun, 11 Jul 2010) $
  *
- * \version $Revision: 5700 $
+ * \version $Revision: 5893 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -30,14 +30,6 @@
 
 #include <inttypes.h>
 
-#ifndef CONFIG_PETRIFY
-#define CONFIG_PETRIFY "not found"
-#endif
-
-#ifndef CONFIG_GENET
-#define CONFIG_GENET "not found"
-#endif
-
 #ifdef HAVE_STDINT_H
 // #include <stdint.h>
 #endif
@@ -47,12 +39,6 @@ namespace pnapi
 
 // forward declarations
 class PetriNet;
-namespace io
-{
-std::ostream & operator<<(std::ostream &, const PetriNet &);
-std::istream & operator>>(std::istream &, PetriNet &) throw (exception::InputError);
-}
-
 
 namespace util
 {
@@ -249,14 +235,15 @@ private: /* private types */
   
   
 private: /* private static variables */
-  /// path to petrify
-  static std::string pathToPetrify_;
+  /*!
+   * \name paths to external tools
+   */
+  //@{
   /// path to genet
   static std::string pathToGenet_;
-  /// capacity for genet
-  static uint8_t genetCapacity_;
-  /// converter Automaton => PetriNet
-  static AutomatonConverter automatonConverter_;
+  /// path to petrify
+  static std::string pathToPetrify_;
+  //@}
   
 private: /* private variables */
   /*!
@@ -273,7 +260,6 @@ private: /* private variables */
   
   /*!
    * \name (overlapping) sets for net structure
-   * \todo Vielleicht auch sendTransitions_ ?
    */
   //@{
   /// set of all nodes
@@ -294,7 +280,7 @@ private: /* private variables */
   
   /*! 
    * \name general properties
-     \todo Vielleicht Rollen symmetrisch zu Kosten organisieren.
+   * \todo Vielleicht Rollen symmetrisch zu Kosten organisieren.
    */
   //@{
   /// meta information
@@ -305,6 +291,10 @@ private: /* private variables */
   unsigned int warnings_;
   /// cache for reduction
   ReductionCache * reductionCache_;
+  /// capacity for genet
+  uint8_t genetCapacity_;
+  /// converter Automaton => PetriNet
+  AutomatonConverter automatonConverter_;
   //@}
   
   /*!
@@ -322,12 +312,15 @@ private: /* private variables */
   //@}
   
 public: /* public static methods */
-  /// setting path to Petrify
-  static void setPetrify(const std::string & = CONFIG_PETRIFY);
+  /*!
+   * \name path setting methods
+   */
+  //@{
   /// setting path to Genet
-  static void setGenet(const std::string & = CONFIG_GENET, uint8_t = 2);
-  /// setting automaton converter
-  static void setAutomatonConverter(AutomatonConverter = PETRIFY);
+  static void setGenet(const std::string &);
+  /// setting path to Petrify
+  static void setPetrify(const std::string &);
+  //@}
 
 public: /* public methods */
   /*!
@@ -337,7 +330,7 @@ public: /* public methods */
   /// standard constructor
   PetriNet();
   /// constructor Automaton => Petri net
-  PetriNet(const Automaton &);
+  PetriNet(const Automaton &, AutomatonConverter = STATEMACHINE, uint8_t = 2);
   /// copy constructor
   PetriNet(const PetriNet &);
   /// destructor
@@ -367,6 +360,8 @@ public: /* public methods */
   Arc * findArc(const Node &, const Node &) const;
   /// get the interface
   Interface & getInterface();
+  /// get the interface
+  const Interface & getInterface() const;
   /// get all nodes
   const std::set<Node *> & getNodes() const;
   /// get places
@@ -383,6 +378,10 @@ public: /* public methods */
   Condition & getFinalCondition();
   /// get the final condition
   const Condition & getFinalCondition() const;
+  /// guess a place relation
+  std::map<const Place *, const Place *> guessPlaceRelation(const PetriNet &) const;
+  /// returns one node's free-choice cluster
+  std::set<Node *> getCluster(const Node &) const;
   //@}
   
   
@@ -426,7 +425,7 @@ public: /* public methods */
   void deleteArc(Arc &);
 
   /// renames nodes
-  void canonicalNames();
+  std::map<std::string, std::string> canonicalNames();
   //@}
 
 
@@ -437,7 +436,7 @@ public: /* public methods */
    */
   //@{
   /// checks the Petri net for workflow criteria
-  bool isWorkflow();
+  bool isWorkflow() const;
   /// checks the Petri net for free choice criterion
   bool isFreeChoice() const;
   /// checks the Petri net for being normalized

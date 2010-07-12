@@ -6,13 +6,13 @@
  * \brief   Input/Output related Structures
  *
  * \author  Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: georgstraube $
+ *          last changes of: $Author: cas $
  *
  * \since   2009/01/19
  *
- * \date    $Date: 2010-03-22 20:02:11 +0100 (Mon, 22 Mar 2010) $
+ * \date    $Date: 2010-07-10 20:34:52 +0200 (Sat, 10 Jul 2010) $
  *
- * \version $Revision: 5538 $
+ * \version $Revision: 5892 $
  */
 
 
@@ -122,10 +122,6 @@ std::istream & operator>>(std::istream &, const util::Manipulator<T>);
 std::ostream & operator<<(std::ostream &, const PetriNet &);
 /// general exception output
 std::ostream & operator<<(std::ostream &, const exception::Error &);
-/// %InputError output
-std::ostream & operator<<(std::ostream &, const exception::InputError &);
-/// assertion output
-std::ostream & operator<<(std::ostream &, const exception::AssertionFailedError &);
 /// %MetaInformation manipulation
 std::ostream & operator<<(std::ostream &, const util::Manipulator<
     std::pair<MetaInformation, std::string> > &);
@@ -163,6 +159,8 @@ std::ios_base & woflan(std::ios_base &);
 std::ostream & formula(std::ostream &);
 /// suppress role output
 std::ostream & noRoles(std::ostream &);
+/// remove all ports
+std::ostream & removePorts(std::ostream &);
 
 /// meta information manipulator
 util::Manipulator<std::pair<MetaInformation, std::string> >
@@ -279,8 +277,6 @@ std::ostream & output(std::ostream &, const formula::FormulaGreaterEqual &);
 
 /*!
  * \brief   PNML I/O implementation
- * 
- * \todo review formula output
  */
 namespace __pnml
 {
@@ -348,10 +344,32 @@ std::ostream & output(std::ostream &, const Port &);
 std::ostream & output(std::ostream &, const Label &);
 /// node with attribut
 std::ostream & output(std::ostream &, const Node &, const std::string &);
+/// negation output
+std::ostream & output(std::ostream &, const formula::Negation &);
+/// conjunction output
+std::ostream & output(std::ostream &, const formula::Conjunction &);
+/// disjunction output
+std::ostream & output(std::ostream &, const formula::Disjunction &);
+/// FormulaTrue output
+std::ostream & output(std::ostream &, const formula::FormulaTrue &);
+/// FormulaFalse output
+std::ostream & output(std::ostream &, const formula::FormulaFalse &);
+/// FormulaEqual output
+std::ostream & output(std::ostream &, const formula::FormulaEqual &);
+/// FormulaNotEqual output
+std::ostream & output(std::ostream &, const formula::FormulaNotEqual &);
+/// FormulaLess output
+std::ostream & output(std::ostream &, const formula::FormulaLess &);
+/// FormulaLessEqual output
+std::ostream & output(std::ostream &, const formula::FormulaLessEqual &);
+/// FormulaGreater output
+std::ostream & output(std::ostream &, const formula::FormulaGreater &);
+/// FormulaGreaterEqual output
+std::ostream & output(std::ostream &, const formula::FormulaGreaterEqual &);
 /// get a unique node name for dot output
-std::string getNodeName(const Node &, bool = false);
+std::string getNodeName(std::ostream &, const Node &, bool = false);
 /// get a unique label name for dot output
-std::string getLabelName(const Label &, bool = false);
+std::string getLabelName(std::ostream &, const Label &, bool = false);
 /// automaton output
 std::ostream & output(std::ostream &, const Automaton &);
 }
@@ -478,6 +496,23 @@ struct Role
   Role() : role(false) {}
 };
 
+/// port removal type
+struct PortRemoval
+{
+  bool remove;
+  PortRemoval() : remove(false) {}
+};
+
+/*!
+ * \brief node name type
+ * 
+ * Mapping from node names to dot IDs.
+ */
+struct DotNodeName
+{
+  std::map<std::string, std::string> names;
+};
+
 /*** TEMPLATE CLASSES ***/
 
 /*!
@@ -517,6 +552,8 @@ typedef StreamMetaData<io::util::Mode> ModeData;
 typedef StreamMetaData<Delim> DelimData;
 typedef StreamMetaData<Formula> FormulaData;
 typedef StreamMetaData<Role> RoleData;
+typedef StreamMetaData<PortRemoval> PortData;
+typedef StreamMetaData<DotNodeName> DotNameData;
 typedef StreamMetaData<std::map<pnapi::io::MetaInformation, std::string> > MetaData;
 typedef Manipulator<std::pair<pnapi::io::MetaInformation, std::string> > MetaManipulator;
 
@@ -533,8 +570,6 @@ bool compareContainerElements(const formula::Formula *, const formula::Formula *
 bool compareContainerElements(Label *, Label *);
 bool compareContainerElements(const Label *, const Label *);
 bool compareContainerElements(Edge *, Edge *);
-
-/// \todo check for obsolete methods
 
 std::set<Place *> filterMarkedPlaces(const std::set<Place *> &);
 std::multimap<unsigned int, Place *> groupPlacesByCapacity(const std::set<Place *> &);

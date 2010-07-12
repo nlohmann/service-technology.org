@@ -1,4 +1,13 @@
-No README
+                           ____                 
+                          / ___|  __ _ _ __ __ _ 
+                          \___ \ / _` | '__/ _` |
+                           ___) | (_| | | | (_| |
+                          |____/ \__,_|_|  \__,_|
+               Structures for Automated Reachability Analysis
+                     http://service-technology.org/sara
+
+
+PURPOSE
 In order to run, compile, and develop Sara, several tools are required.
 
 Runtime

@@ -122,7 +122,7 @@ In a joint project, researchers at Humboldt-Universit@"at zu Berlin and the Semi
 @b{More information:}
 @itemize
 @item
-Milos Krstic, Eckhard Grass, and Christian Stahl. @b{Request-Driven @acronym{GALS} Technique for Wireless Communication System}. In @i{Proceedings of the 11th International Symposium on Advanced Research in Asynchronous Circuits and Systems (@acronym{ASYNC} 2005)}, New York, NY, USA, pages 76-85, March 2005. @acronym{IEEE} Computer Society.
+Christian Stahl, Wolfgang Reisig, and Milos Krstic. @b{Hazard Detection in a GALS Wrapper: A Case Study}. In Jörg Desel and Y. Watanabe, editors, @i{Proceedings of the Fifth International Conference on Application of Concurrency to System Design (@acronym{ACSD}'05), St. Malo, France}, pages 234-243, June 2005. IEEE Computer Society.
 @end itemize
 
 

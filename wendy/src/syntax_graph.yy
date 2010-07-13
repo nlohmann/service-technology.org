@@ -130,7 +130,7 @@ state:
                     /* analyze all members of current SCC with respect to possible sending events and final markings reachable */
                     InnerMarking::analyzeSCCOfInnerMarkings(currentSCC);
                 }
-            } else if (args_info.ignoreUnreceivedMessages_flag and args_info.correctness_arg == correctness_arg_livelock and not args_info.noDeadlockDetection_flag) {
+            } else if (args_info.ignoreUnreceivedMessages_flag and args_info.correctness_arg == correctness_arg_livelock) {
                 // no smart sending event reduction but livelock freedom is turned on
                 InnerMarking::finalMarkingReachableSCC(currentSCC);
             }

@@ -147,11 +147,13 @@ void evaluateParameters(int argc, char** argv) {
         abort(12, "'--og' and '--sa' parameter are mutually exclusive");
     }
 
-    // --diagnose implies several reduction rules
+    // --diagnose implies several reduction rules and does not need deadlock
+    // detection
     if (args_info.diagnose_given) {
         args_info.ignoreUnreceivedMessages_flag = 0;
         args_info.waitstatesOnly_flag = 1;
         args_info.receivingBeforeSending_flag = 1;
+        args_info.noDeadlockDetection_flag = 1;
     }
 
     free(params);

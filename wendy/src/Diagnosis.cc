@@ -86,8 +86,6 @@ std::string DiagnosisObject::output_results() {
 
 
     if (not unresolvableWaitstates.empty()) {
-        temp << (blacklisted ? ",\n" : "\n");
-
         blacklisted = true;
         temp << "      unresolvableWaitstates = (";
         FOREACH(uw, unresolvableWaitstates) {

@@ -156,7 +156,17 @@ void Diagnosis::output_results(Results& r) {
                     }
 
                     if (livelock and not markings2scc[it->second[i]->inner[j]].empty()) {
-                        current.internalLivelocks.insert(markings2scc[it->second[i]->inner[j]]);
+                        set<InnerMarking_ID> ll;
+                        
+                        // traverse this node's states
+                        for (unsigned int k = 0; k < it->second[i]->sizeAllMarkings; ++k) {
+                            if (markings2scc[it->second[i]->inner[j]].find(it->second[i]->inner[k]) != markings2scc[it->second[i]->inner[j]].end()) {
+                                ll.insert(it->second[i]->inner[k]);
+                            }
+                        }
+                        current.internalLivelocks.insert(ll);
+                        
+//                        current.internalLivelocks.insert(markings2scc[it->second[i]->inner[j]]);
                     }
                     
 //                    temp << "m" << static_cast<size_t>(it->second[i]->inner[j]) << " ";

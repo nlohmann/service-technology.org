@@ -232,7 +232,7 @@ PetriNet* PNLoader::getPetriNet() {
 		        }
 		    }
 		} catch (pnapi::exception::InputError error) {
-			cerr << "sara-cg: error: " << error << endl;
+			cerr << "cora: error: " << error << endl;
 			abort(5,"error while reading Petri net from stdin");
 		}
 
@@ -243,7 +243,7 @@ PetriNet* PNLoader::getPetriNet() {
 
 	// try to open file
 	ifstream infile(filename.c_str(), ifstream::in);
-	if (!infile.is_open()) abort(2,"error: could not read from Petri net file '%s'",filename.c_str());
+	if (!infile.is_open()) abort(1,"error: could not read from Petri net file '%s'",filename.c_str());
 
 	pn = new PetriNet();
 
@@ -265,7 +265,7 @@ PetriNet* PNLoader::getPetriNet() {
 	    }
 	} catch (pnapi::exception::InputError error) {
 	    infile.close();
-		cerr << "sara-cg: error: " << error << endl;
+		cerr << "cora: error: " << error << endl;
 		abort(4,"error while reading Petri net from file");
 	}
 

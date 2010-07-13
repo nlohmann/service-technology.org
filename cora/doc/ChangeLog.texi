@@ -1,0 +1,14 @@
+@c <<-- CHANGE START (version information) -->>
+@heading Version 0.2-unreleased (13 Jul 2010)
+@itemize
+@item added partial documentation
+@end itemize
+
+@heading Version 0.1-unreleased (13 Jul 2010)
+@itemize
+@item first version of Cora
+@item tests reachability based on the coverability graph by splitting nodes
+@item computes a firable sequence to a given node
+@item computes and print the full coverability graph on demand (only)
+@end itemize
+@c <<-- CHANGE END -->>

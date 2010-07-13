@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
 
 if (!args_info.input_given && !args_info.pipe_given)
 {
-	cerr << "sara: Use options -i or -p for input, -m, -s, or -f to define goal." << endl;
+	cerr << "cora: Use options -i or -p for input, -m, -s, or -f to define goal." << endl;
 }
 
 /*************************
@@ -138,7 +138,7 @@ if (args_info.input_given || args_info.pipe_given) {
 		{
 			tok = strtok(subargs[k],":"); // to get their name
 			Place* p(pn->findPlace(tok));
-			if (p==NULL) abort(1,"token '%s' in input marking is not a place",tok);
+			if (p==NULL) abort(2,"wrong token '%s' in input marking",tok);
 			tok = strtok(NULL," ,;.:"); // and their token number
 			int i(1);
 			if (tok!=NULL) i=atoi(tok);
@@ -160,7 +160,7 @@ if (args_info.input_given || args_info.pipe_given) {
 		vector<Transition*> tvec;
 		while (tok!=NULL) { // create a vector of transitions from the sequence
 			Transition* t(pn->findTransition(tok));
-			if (t==NULL) abort(1,"token '%s' in input transition sequence is not a transition",tok);
+			if (t==NULL) abort(3,"wrong token '%s' in input transition sequence",tok);
 			tvec.push_back(t);
 			tok = strtok(NULL," :,;");
 		}

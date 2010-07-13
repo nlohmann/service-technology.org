@@ -1,0 +1,525 @@
+\input texinfo
+@setfilename cora.info
+@include version.texi
+@afourpaper
+@finalout
+@settitle Cora User's Manual
+
+
+@c --------------------------------------------------------------------------
+
+
+@copying
+@b{About this document:}
+
+This manual is for Cora, version @value{VERSION}, a coverability graph builder, last updated @value{UPDATED}.
+
+Copyright @copyright{} Harro Wimmel
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify this GNU Manual. Buying copies from GNU Press supports the FSF in developing GNU and promoting software freedom.''
+@end quotation
+@end copying
+
+@dircategory service-technology.org
+@direntry
+* Cora: (cora).       Coverability Graphs for Reachability Analysis.
+@end direntry
+
+
+@c --------------------------------------------------------------------------
+
+
+@titlepage
+
+@title Cora
+
+@subtitle Coverability Graphs for Reachability Analysis
+@subtitle @url{http://service-technology.org/cora}
+@vskip 0.5em
+@subtitle Version @value{VERSION}, @value{UPDATED}
+
+@author Harro Wimmel
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+
+@c --------------------------------------------------------------------------
+
+
+@ifnottex
+@node Top
+@top Cora
+@insertcopying
+@end ifnottex
+
+
+@c --------------------------------------------------------------------------
+
+
+@menu
+* First Steps::How to set up and install Cora.
+* Command Line Options::How to run Cora.
+* Theory::The theory behind Cora.
+* Exit and Error Codes::What the error and exit codes of Cora mean.
+* ChangeLog::Version history.
+* GNU Free Documentation License::The license of this manual.
+@end menu
+
+@c --------------------------------------------------------------------------
+
+
+@contents
+@paragraphindent none
+
+
+@c --------------------------------------------------------------------------
+
+
+@node First Steps
+@chapter First Steps
+@section Setup and Installation
+
+@enumerate
+@item Go to @url{http://service-technology.org/files/cora} and download the latest release version of Sara, say @file{sara-@value{VERSION}.tar.gz}. To setup and compile Sara, change into your download directory and type
+
+@cartouche
+@smallexample
+tar xfz cora-@value{VERSION}.tar.gz
+cd cora-@value{VERSION}
+./configure
+make
+@end smallexample
+@end cartouche
+
+After compilation, a binary @samp{src/cora} is generated.@footnote{On Microsoft Windows, the file will be called @file{cora.exe}.} If you experience any compiler warnings, don't panic: Cora contains some generated or third party code that we cannot influence.
+
+@item To test whether everything went fine, type
+
+@cartouche
+@smallexample
+make check
+@end smallexample
+@end cartouche
+
+to execute the testcases located in @file{tests}. If everything went fine, you should see something like:
+
+@smallexample
+## ------------- ##
+## Test results. ##
+## ------------- ##
+
+All 13 tests were successful.
+@end smallexample
+
+If an error occurs, please send the output to @email{cora@@service-technology.org}.
+
+@item To install the binary, the manpage, and the documentation, type
+
+@cartouche
+@smallexample
+make install
+@end smallexample
+@end cartouche
+
+You might need superuser permissions to do so.
+@end enumerate
+
+If you need any further information, see file @file{INSTALL} for detailed instructions.
+
+
+@section Contents of the Distribution
+
+The distribution contains several directories:
+
+@table @file
+@item doc
+The Texinfo documentation of Cora. The documentation can be created using @samp{make pdf}. Note you need to have Cora properly installed before (see installation description above).
+
+@item libs
+The Petri Net @acronym{API} used by Cora to parse and organize a Petri net.
+
+@c @item man
+@c The manpage of Cora which can be displayed using @samp{man cora} after having Sara installed (see installation description above).
+
+@item src
+The source code of Cora.
+
+@item tests
+Testcases for Cora which check the generated binary.
+@end table
+
+
+@c --------------------------------------------------------------------------
+
+
+@section Requirements
+@anchor{Requirements}
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+In order to run, compile, and develop Cora, several tools are required.
+
+@c <<-- CHANGE START (tools required, etc.) -->>
+
+@subsection Runtime
+@itemize
+@item No additional tools are necessary at runtime.
+@end itemize
+
+@c <<-- CHANGE END -->>
+
+@subsection Compilation
+To compile the source code from a source distribution, the following tools are required.
+
+@itemize
+@item GCC (@url{http://gcc.gnu.org/})
+@item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/})
+@end itemize
+
+
+@subsection Development
+In case you want to make changes to the source code, the following tools are required to reconfigure and compile Cora.
+
+@itemize
+@item Autoconf, @url{http://www.gnu.org/software/autoconf/}
+@item Automake, @url{http://www.gnu.org/software/automake/}
+@item Bison, @url{http://www.gnu.org/software/bison/}
+@item flex, @url{http://flex.sourceforge.net/}
+@item Gengetopt, @url{http://www.gnu.org/software/gengetopt/}
+@item help2man, @url{http://www.gnu.org/software/help2man/}
+@item Texinfo, @url{http://www.gnu.org/software/texinfo/}
+@end itemize
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Please check our nightly build server at @url{http://service-technology.org/nightly} for the versions we use during development.
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Command Line Options
+@chapter Invoking Cora
+
+Cora is a command line tool and does not come with a fancy @acronym{GUI}. However, Cora can be easily scripted and combined with other tools.
+
+@section What Cora can do
+
+Sara is a tool for partially creating an advanced form of a coverability graph and using it to 
+solve the reachability problem for Petri nets. Given a low-level Petri net, i.e. sets of places and
+transitions with weighted arcs between them, and an initial and a final marking, Cora successively
+add paths and nodes to the coverability graph until a goal node containing the final marking is found.
+For each such goal node, Cora checks if there is a path exactly constructing the final marking.
+If so, a solution (including a firing sequence) is found. Otherwise the coverability graph is
+constructed until it becomes clear that there is no solution.
+
+Cora can also determine a firable path to a given node of the coverability graph and can print
+the full coverability graph.
+
+If Cora can compute the problem given, it should either tell the user that there is a solution and present a firing
+sequence proving this, or it should tell that the problem is infeasible. 
+
+@section Command Line Options
+
+For an overview of the command line options, type @samp{cora --help} to see the following help screen:
+
+@smallexample
+@verbatiminclude cmdline.out
+@end smallexample
+ 
+@section Constructing a full Coverability Graph
+
+Assume Cora is given a Petri Net in some supported format like the following open net @samp{test.owfn}:
+
+@smallexample
+@verbatiminclude test.owfn
+@end smallexample
+
+Note that Cora determines from the filename (ending in @samp{*.owfn}) that the input is in the open net
+format. A filename containing @samp{llnet} is assumed to point to a net in the LOLA low level format,
+everything else is assumed to be @acronym{PNML}. There are options @option{--owfn}, @option{--lola},
+and @option{--pnml} to override the detection from filename.
+ 
+Now, the full coverability graph can be constructed with the command line
+
+@cartouche
+@smallexample
+cora -i test.owfn -f
+@end smallexample
+@end cartouche
+
+which produces the output
+
+@smallexample
+@verbatiminclude test.out
+@end smallexample
+
+Here, each node is printed on a separate line followed by one line per edge going away
+from that node. Lines defining an edge begin with @samp{--?->} where the question mark
+is a placeholder for the edge label. So, there is a node @samp{p1} from which an edge labelled by @samp{a1}
+goes to @samp{o1:0+,p1}. While @samp{p1} represents one single marking, namely the one
+where there is exactly one token on @samp{p1} and no tokens on other places, the node @samp{o1:0+,p1} has exactly one token
+on @samp{p1} and at least zero tokens (usually written as a greek omega) on @samp{o1}.
+From here, one edge labelled @samp{a1} loops on this node while another edge labelled
+@samp{u1} leads to @samp{o1:0+,p2:0+,p1} with one token on @samp{p1} and at least zero
+on @samp{o1} and @samp{p2}. Naturally, all other places, here @samp{o2} and @samp{s}, 
+contain exactly zero tokens.
+
+Note also the last node @samp{o2:0+,o1:0+,p2:0+,p1:0+} corresponding to an extended
+marking of @math{(0,\omega,\omega,\omega,\omega)} where the initial place @samp{s} has exactly
+zero tokens while all the other places may contain any number. From this node, there are four
+edges, all leading back to this same node.
+
+The last line of the output contains the initial node to the coverability graph,
+representing the initial marking of the Petri net. In this case, this marking is @samp{s}
+(which can also be written as @samp{s:1}).
+
+@section Input and Output
+
+While the user has to define explicitly where Cora gets its input from, output and error
+message usually go to the standard pipes stdout and stderr. This can be redefined by the
+options @option{-o} and @option{-l}.
+
+@cartouche
+@smallexample
+cora -i test.owfn -f -o test.out
+cora -i test.owfn -f -l test.log
+@end smallexample
+@end cartouche
+
+The first line will redirect the output including the result to the file @file{test.out}
+while the second command sends all log and error messages to @file{test.log}.
+
+The input Petri net can also come from a pipe, using the option @option{-p}, in which case 
+Cora will not try to detect
+the format of the Petri net from the filename. In such a case, the format can be specified
+by an explicit option, @option{--owfn}, @option{--lola}, or @option{--pnml} (default).
+These options can also be given with @option{-i} to override the autodetection of the format.
+So, piping in a Petri net in the LOLA *.llnet format via stdin to obtain the full
+coverability graph would look like this:
+
+@cartouche
+@smallexample
+cora -p --lola -f
+@end smallexample
+@end cartouche
+
+
+@section Finding a firable sequence to a given node
+
+
+@section Testing if a marking is reachable
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Theory
+@chapter Theory
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Cora implements several algorithms and result published in several scientific articles.
+Cora constructs a portion of a coverability graph to decide reachability, find a firable
+sequence to a node of the coverability graph, or print the full coverability graph.
+
+@section The Coverability Graph
+
+Coverability Graph and Coverability Tree go back a long way.
+
+@quotation
+R.M. Karp, R.E. Miller. @b{Parallel Program Schemata}. @i{Journal of Computer and System Sciences} @b{3}, pp.147--195, 1969.
+@end quotation
+
+Coverability Graphs are not unique and may vary in size (for the same net) depending on the
+construction algorithm. While there is a minimal one, other variants may be faster to implement
+and/or have faster runtimes. 
+
+@quotation
+A. Finkel. @b{The Minimal Coverability Graph for Petri Nets}. @i{Lecture Notes in Computer Science} @b{674}, pp.210--243, 1993.
+@end quotation
+
+Cora uses a simple algorithm here as the main computing power goes
+into a splitting algorithm for the coverability graph's nodes while
+the construction of nodes is minimized using partial order reduction.
+
+@section The Reachability Problem
+
+The Reachability problem is known to be decidable since the early 1980's,
+which was shown independently by two researchers.
+
+@quotation
+E. Mayr. @b{An Algorithm for the General Petri Net Reachability Problem}. @i{SIAM Journal of Computing} @b{13}:3, pp.441--460, 1984.
+@end quotation
+
+@quotation
+S.R. Kosaraju. @b{Decidability of Reachability in Vector Addition Systems}. @i{Proceedings of the 14th Annual ACM STOC}, pp.267--281, 1982. 
+@end quotation
+
+Later, a different (possibly better) presentation of the topic was given.
+
+@quotation
+J.L. Lambert. @b{A Structure to Decide Reachability in Petri Nets}. @i{Theoretical Computer Science} @b{99}, pp.79--104, 1992.
+@end quotation
+
+For those firm in the German language, a version with additional explanation and a running example can also be found in the book
+
+@quotation
+H.Wimmel. @b{Entscheidbarkeit bei Petri Netzen}. Springer, ISBN 978-3-540-85470-8, 2008.
+@end quotation
+
+
+@section Stubborn Sets
+
+Since the coverability graph has no upper limit on its size in relation to its
+Petri net, it is a good idea to use optimisations to reduce redundancy with respect
+to the goal. If that goal is testing reachability, partial order reductions are a good
+approach. Cora implements a stubborn set method.
+
+@quotation
+D.A. Peled. @b{All from One, One for All: Model Checking Using Representatives}. @i{Proceedings of CAV'93}, Lecture Notes in Computer Science @b{697}, pp.409--423, Springer, 1993.
+@end quotation
+
+@quotation
+P. Godefroid. @b{Partial-Order Methods for the Verification of Concurrent Systems - An Approach to the State-Explosion Problem}. Lecture Notes in Computer Science @b{1032}, Springer, 1996.
+@end quotation
+
+@quotation
+L.M. Kristensen, K. Schmidt, A. Valmari. @b{Question-guided Stubborn Set Methods for State Properties}. @i{Formal Methods in System Design} @b{29}:3, pp.215--251, Springer, 2006.
+@end quotation
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+See @url{http://service-technology.org/publications} for more information.
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Exit and Error Codes
+@chapter Exit and Error Codes
+@section Exit Codes
+
+Cora will exit with code @samp{0} in case everything went fine. 
+That is, the command-line parameters were valid, the input file could be read,
+and Cora terminated with some result, but did not abort the computation.
+It does not matter if the result was positive (a solution was found) or
+negative.
+
+In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+
+@section Error Codes
+
+In case any error occurs, Cora aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
+
+@table @asis
+
+@c <<-- CHANGE START (exit/error codes) -->>
+
+@item #01
+The problem information contains the filename of a Petri net that must be loaded to solve the problem.
+The file corresponding to this filename either does not exist or read access was not granted.
+
+@smallexample
+@cartouche
+cora: could not read from Petri net file '[filename]' -- aborting [#01]
+@end cartouche
+@end smallexample
+
+@item #02
+The final marking given via the option @option{-m} contains a name [place] that cannot
+be matched with the list of places in the Petri net. This may just be a syntax error.
+
+@smallexample
+@cartouche
+cora: wrong token '[place]' in input marking -- aborting [#02]
+@end cartouche
+@end smallexample
+
+@item #03
+The sequence given via the option @option{-s} contains a name [transition] that cannot
+be matched with the list of transitions in the Petri net. Check if the sequence really
+contains transitions only. This may just be a syntax error.
+
+@smallexample
+@cartouche
+cora: wrong token '[transition]' in input transition sequence -- aborting [#03]
+@end cartouche
+@end smallexample
+
+@item #04
+A syntax error occurred while parsing a Petri net file. Either the file itself contains a syntax
+error or Cora was directed to the wrong parser. Check if the filename contains one of the strings
+@samp{owfn} or @samp{llnet}. Use one of the options @option{--owfn}, @option{--lola}, or 
+@option{--pnml} to override format detection from the filename. Note that @acronym{PNML}
+is the default format.
+
+@smallexample
+@cartouche
+cora: error while reading Petri net from file -- aborting [#04]
+@end cartouche
+@end smallexample
+
+@item #05
+A syntax error occurred while parsing a Petri net from stdin. Either the pipe delivered a syntax
+error or Cora was directed to the wrong parser. Use one of the options @option{--owfn} or
+@option{--lola} to override the default format @acronym{PNML}.
+
+@smallexample
+@cartouche
+cora: error while reading Petri net from stdin -- aborting [#05]
+@end cartouche
+@end smallexample
+
+@item #11
+Internal error. An index in the subnode management went out of bounds. This is a bug.
+
+@smallexample
+@cartouche
+cora: internal error, non-existent subtree node -- aborting [#11]
+@end cartouche
+@end smallexample
+
+@item #12
+Internal error. A set of places was empty where it should not be. This is a bug.
+
+@smallexample
+@cartouche
+cora: internal error, no scapegoat for stubborn set method -- aborting [#12]
+@end cartouche
+@end smallexample
+
+@c <<-- CHANGE END -->>
+
+@end table
+
+
+@c --------------------------------------------------------------------------
+
+
+@node ChangeLog
+@chapter Version History
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Cora is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+
+@include ChangeLog.texi
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+The most recent change log is available at Cora's website at @url{http://service-technology.org/files/cora/ChangeLog}.
+
+
+@c --------------------------------------------------------------------------
+
+@node GNU Free Documentation License
+@appendix The GNU Free Documentation License
+
+@include fdl.texi
+
+@bye

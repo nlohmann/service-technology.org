@@ -79,7 +79,7 @@ AT_BANNER([Error checks])
 
 AT_SETUP([Missing Petri Net])
 AT_CHECK([CORA -i test1.owfn -v],1,stdout,stderr)
-AT_CHECK([GREP -q "aborting ..02" stderr])
+AT_CHECK([GREP -q "aborting ..01" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 

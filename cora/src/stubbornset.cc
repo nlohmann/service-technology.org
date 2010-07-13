@@ -293,7 +293,7 @@ Place* StubbornSet::hinderingPlace(Transition& t) {
 			pset.insert(&((*ait)->getPlace()));
 	}
 	// catch error of missing scapegoat
-	if (pset.empty()) abort(11,"error: no scapegoat for stubborn set method");
+	if (pset.empty()) abort(12,"internal error, no scapegoat for stubborn set method");
 	// if the user opts for a random scapegoat, select one by time
 //	if (args_info.scapegoat_given) 
 //	{

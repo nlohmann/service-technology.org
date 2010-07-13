@@ -1,13 +1,28 @@
-No README
-Version 0.1-unreleased (08 Jul 2010)
-===================================
+                            ____                 
+                           / ___| ___  _ __ __ _ 
+                          | |    / _ \| '__/ _` |
+                          | |___| (_) | | | (_| |
+                           \____|\___/|_|  \__,_|
+                COverability graphs for Reachability Analysis
+                     http://service-technology.org/cora
+
+
+PURPOSE
+Version 0.2-unreleased (13 Jul 2010)
+====================================
+
+* added partial documentation
+
+Version 0.1-unreleased (13 Jul 2010)
+====================================
 
 * first version of Cora
 
-* builds (partial, nondeterministic) coverability graph
+* tests reachability based on the coverability graph by splitting nodes
 
-* allows to split nodes according to enabledness of a path
+* computes a firable sequence to a given node
 
-* tests a marking for reachability or delivers a firable path to a node
+* computes and print the full coverability graph on demand (only)
+
 
 

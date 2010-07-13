@@ -43,6 +43,7 @@ class Diagnosis {
         ~Diagnosis();
 
         void evaluateDeadlocks(std::vector< pnapi::PetriNet *> & nets, pnapi::PetriNet & engine);
+        void evaluateLivelocks(std::vector< pnapi::PetriNet *> & nets, pnapi::PetriNet & engine);
 };
 
 class DGraph {
@@ -64,6 +65,7 @@ class DGraph {
         std::map< unsigned int, DNode * > nodeMap;
         unsigned int initialNode;
         std::vector< DNode * > deadlockNodes;
+        std::vector< DNode * > livelockNodes;
         std::map< unsigned int, unsigned int > noOfPredecessors;
 
         unsigned int getIDForName(int nameId);
@@ -104,6 +106,7 @@ class DNode {
 
         std::vector< std::pair< unsigned int, unsigned int > > successors;
         std::vector< unsigned int > deadlockMarkings;
+        std::vector< unsigned int > livelockMarkings;
         std::set< std::string > rulesApplied;
 
 };

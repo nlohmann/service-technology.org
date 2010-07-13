@@ -366,6 +366,11 @@ const pnapi::PetriNet * Adapter::buildController()
         MarkingInformation mi(mi_filename);
         Diagnosis diag(diag_filename, mi);
         diag.evaluateDeadlocks(_nets, *_engine);
+        if (args_info.property_arg == property_arg_livelock)
+        {
+            diag.evaluateLivelocks(_nets, *_engine);
+        }
+
         // diagnosis_superfluous = diag.superfluous;
         if (diag.superfluous)
         {

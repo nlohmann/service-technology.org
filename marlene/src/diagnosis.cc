@@ -111,14 +111,48 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned in
         // add node
         DNode * node = new DNode(init);
         dgraph->nodeMap[init.id] = node;
-        if ( init.has_deadlock )
+        //if ( init.has_deadlock )
+        try
         {
+            for(int j = 0; j < states[i]["internalDeadlocks"].getLength(); ++j)
+            {
+                node->deadlockMarkings.push_back(mi.getIDForMarking(states[i]["internalDeadlocks"][j]));
+            }
+            /*
             int dlID = 0;
             states[i].lookupValue("deadlockMarking", dlID);
             status("Deadlock marking %d = %d", dlID, mi.getIDForMarking(dlID));
             node->deadlockMarkings.push_back(mi.getIDForMarking(dlID));
+            */
 
             dgraph->deadlockNodes.push_back(node);
+        }
+        catch (libconfig::SettingNotFoundException ex)
+        {
+ //           status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
+        }
+
+        try
+        {
+            for(int j = 0; j < states[i]["internalLivelocks"].getLength(); ++j)
+            {
+                for(int k = 0; k < states[i]["internalLivelocks"][j].getLength(); ++k)
+                {
+                    node->livelockMarkings.push_back(mi.getIDForMarking(states[i]["internalLivelocks"][j][k]));
+                }
+            }
+            /*
+            int dlID = 0;
+            states[i].lookupValue("deadlockMarking", dlID);
+            status("Deadlock marking %d = %d", dlID, mi.getIDForMarking(dlID));
+            node->deadlockMarkings.push_back(mi.getIDForMarking(dlID));
+            */
+
+            dgraph->livelockNodes.push_back(node);
+        }
+        catch (libconfig::SettingNotFoundException ex)
+        {
+            status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
         }
 
         dgraph->nodes.push_back(node);
@@ -128,7 +162,7 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned in
 
     dgraph->collectRules();
 
-    diagInfo.write(stderr);
+    // diagInfo.write(stderr);
 }
 
 Diagnosis::~Diagnosis()
@@ -207,6 +241,84 @@ void Diagnosis::evaluateDeadlocks(std::vector< pnapi::PetriNet *> & nets, pnapi:
                     }
                     std::cerr << std::endl;
                 }
+            }
+        }
+    }
+
+    FUNCOUT
+}
+
+void Diagnosis::evaluateLivelocks(std::vector< pnapi::PetriNet *> & nets, pnapi::PetriNet & engine)
+{
+    FUNCIN
+    if (superfluous)
+    {
+        FUNCOUT
+        return;
+    }
+
+    std::string prefix = "engine.";
+
+    for ( unsigned int i = 0; i < dgraph->livelockNodes.size(); ++i )
+    {
+        DNode * node = dgraph->livelockNodes[i];
+        bool seen = false;
+        for ( unsigned int prev = 0; prev < i and not seen; ++prev)
+        {
+            if ( node->livelockMarkings == dgraph->livelockNodes[prev]->livelockMarkings )
+            {
+                if ( node->rulesApplied == dgraph->livelockNodes[prev]->rulesApplied)
+                {
+                    seen = true;
+                }
+            }
+        }
+        if ( not seen )
+        {
+            message("Livelock %d (node %d)", i + 1, node->getID());
+            for ( unsigned int j = 0; j < node->livelockMarkings.size(); ++j)
+            {
+                Marking & m = *(mi.markings[node->livelockMarkings[j]]);
+                std::vector< std::string > pending = m.getPendingMessages(engine, prefix);
+                for ( unsigned int p = 0; p < pending.size(); ++p )
+                {
+                    message("Message %s is pending", pending[p].c_str());
+                }
+                for ( unsigned int net = 0; net < nets.size(); ++net )
+                {
+                    std::string prefix = "net" + toString(net + 1) + ".";
+                    std::vector< std::string > required = m.getRequiredMessages(*(nets[net]), prefix);
+                    if (required[required.size()-1] == "yes")
+                    {
+                        message("Net %s is already in a final state", prefix.c_str());
+                    }
+                    for ( unsigned int p = 0; p < required.size() - 1; ++p )
+                    {
+                        message("Message %s is required", required[p].c_str());
+                    }
+                }
+            }
+            message("The following rules where previously applied:");
+            if ( node->rulesApplied.empty() )
+            {
+                std::cerr << "      none." << std::endl;
+            }
+            else
+            {
+                bool first = true;
+                for ( std::set< std::string >::iterator rule = node->rulesApplied.begin(); rule != node->rulesApplied.end(); ++rule)
+                {
+                    if ( first )
+                    {
+                        std::cerr << "      " << *rule;
+                        first = false;
+                    }
+                    else
+                    {
+                        std::cerr << ", " << *rule;
+                    }
+                }
+                std::cerr << std::endl;
             }
         }
     }

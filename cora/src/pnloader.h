@@ -1,7 +1,7 @@
 // -*- C++ -*-
 
 /*!
- * \file    problem.h
+ * \file    pnloader.h
  *
  * \brief   Class PNLoader
  *

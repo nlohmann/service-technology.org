@@ -343,6 +343,8 @@ set<Transition*> CNode::getEdgeLabels() {
 	@param p The place on which the split is based.
 	@param token The number of tokens for the decision based on p.
 	@param im The incidence matrix of the Petri net involved.
+	@param sb The stubborn set structure for partial order reductions. NULL if no partial order
+		reduction should occur.
 	@return If the split was done.
 */
 bool CNode::simpleSplit(Place& p, int token, IMatrix& im, StubbornSet* sb) {

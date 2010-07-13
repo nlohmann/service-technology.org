@@ -40,6 +40,8 @@ using std::endl;
 		omegas, the node's ExtMarking can be changed after the constructor returns.
 		This ExtMarking must remain regular, i.e. places may only be attributed with
 		one single number of tokens or with omega (no other intervals).
+	@param stubset The stubborn set structure for partial order reductions.
+		Use NULL if no partial order reduction should occur.
 */ 
 CoverGraph::CoverGraph(PetriNet& pn, IMatrix& im, Marking& m, StubbornSet* stubset) : net(pn),imat(im),sb(stubset) {
 	init = new CNode(ExtMarking(m)); // construct the initial node
@@ -454,7 +456,7 @@ void CoverGraph::pushToDo(CNode* cn) {
 }
 
 /** Enable or disable (set to NULL) the stubborn set method.
-	@param A pointer to a StubbornSet object implementing the stubborn set methods.
+	@param stubset A pointer to a StubbornSet object implementing the stubborn set methods.
 		NULL to disable the stubborn set methods.
 */
 void CoverGraph::useStubbornSetMethod(StubbornSet* stubset) { sb=stubset; }

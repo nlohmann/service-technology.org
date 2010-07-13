@@ -226,7 +226,10 @@ int main(int argc, char* argv[])
     time(&start_time);
     const pnapi::PetriNet * controller = adapter.buildController();
     time(&end_time);
-    status("controller built [%.0f sec]", difftime(end_time, start_time));
+    if ( not args_info.diagnosis_flag)
+    {
+        status("controller built [%.0f sec]", difftime(end_time, start_time));
+    }
 
     if (args_info.controlleronly_flag)
     {

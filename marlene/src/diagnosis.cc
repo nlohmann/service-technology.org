@@ -33,17 +33,33 @@
 
 #include "diagnosis.h"
 
-Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned int messageBound) : dgraph(new DGraph), mi(pmi)
+Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned int messageBound) : dgraph(new DGraph), mi(pmi), superfluous(false)
 {
 
     libconfig::Config diagInfo;
-    diagInfo.readFile(filename.c_str());
+    try {
+        diagInfo.readFile(filename.c_str());
+    }
+    catch (libconfig::ParseException pex)
+    {
+        message("Parse error `%s' in diagnosis file `%s' in line %d.", pex.getError(), pex.getFile(), pex.getLine());
+    }
 
     bool result = false;
     std::string criterion;
 
-    int innermarkings;
-    int nodes;
+    diagInfo.lookupValue("controllability.result", result);
+    diagInfo.lookupValue("controllability.criterion", criterion);
+
+    if (result)
+    {
+        superfluous = true;
+        message("The nets are adaptable, please run in non-diagnosis mode.");
+        return;
+    }
+
+    int innermarkings = 0;
+    int nodes = 0;
 
     diagInfo.lookupValue("statistics.inner_markings", innermarkings);
     diagInfo.lookupValue("statistics.nodes", nodes);
@@ -123,6 +139,12 @@ Diagnosis::~Diagnosis()
 void Diagnosis::evaluateDeadlocks(std::vector< pnapi::PetriNet *> & nets, pnapi::PetriNet & engine)
 {
     FUNCIN
+    if (superfluous)
+    {
+        FUNCOUT
+        return;
+    }
+
     std::string prefix = "engine.";
 
     for ( unsigned int i = 0; i < dgraph->deadlockNodes.size(); ++i )
@@ -279,17 +301,10 @@ void DGraph::collectRules()
             DNode * snode = nodeMap[node->successors[s].second];
             unsigned int before = snode->rulesApplied.size();
 
-            /*
-            if ( not seen[node->successors[s].second] )
-            {
-                queue.push_back(node->successors[s].second);
-            }
-            */
-
             if ( label.find("sync_rule_") == 0)
             {
                 snode->rulesApplied.insert(label.substr(10));
-                status("adding rule %s to node %d", label.substr(10).c_str(), node->successors[s].second);
+                // status("adding rule %s to node %d", label.substr(10).c_str(), node->successors[s].second);
             }
 
             PNAPI_FOREACH(rule, node->rulesApplied)
@@ -303,9 +318,10 @@ void DGraph::collectRules()
                 queue.push_back(node->successors[s].second);
             }
 
-            status("label %s leads to node %d", label.c_str(), node->successors[s].second);
+            //status("label %s leads to node %d", label.c_str(), node->successors[s].second);
         }
-        message("The following rules where previously applied for node %d:", id);
+        // message("The following rules where previously applied for node %d:", id);
+        /*
         if ( node->rulesApplied.empty() )
         {
             std::cerr << "      none." << std::endl;
@@ -327,6 +343,7 @@ void DGraph::collectRules()
             }
             std::cerr << std::endl;
         }
+        */
 
     }
 }

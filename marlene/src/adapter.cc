@@ -274,8 +274,9 @@ const pnapi::PetriNet * Adapter::buildController()
             property = "livelock";
         }
         wendy_command = path2wendy + " " + owfn_filename
-                        + " --diagnose --noDeadlockDetection"
+                        + " --diagnose" // --noDeadlockDetection"
                         + " --correctness=" + property
+                        + " --sa=" + sa_filename
                         + " --mi=" + mi_filename
                         + " --dot=" + dot_filename
                         + " --resultFile=" + diag_filename;
@@ -353,6 +354,7 @@ const pnapi::PetriNet * Adapter::buildController()
         exit(EXIT_FAILURE);
     }
 
+    // bool diagnosis_superfluous = false;
     if (args_info.diagnosis_flag)
     {
         /********* *\
@@ -364,10 +366,15 @@ const pnapi::PetriNet * Adapter::buildController()
         MarkingInformation mi(mi_filename);
         Diagnosis diag(diag_filename, mi);
         diag.evaluateDeadlocks(_nets, *_engine);
+        // diagnosis_superfluous = diag.superfluous;
+        if (diag.superfluous)
+        {
+            args_info.diagnosis_flag = 0;
+        }
 #endif
 
     }
-    else
+    if (not args_info.diagnosis_flag)
     {
         /*******************************\
         * parse most-permissive partner *
@@ -393,11 +400,11 @@ const pnapi::PetriNet * Adapter::buildController()
 
         if (args_info.sa2on_arg == sa2on_arg_genet and (path2genet != ""))
 
-            {
-                status("Using Genet for conversion from SA to open net.");
-                pnapi::PetriNet::setGenet(path2genet);
-                _controller = new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::GENET, args_info.messagebound_arg + 1);
-            }
+        {
+            status("Using Genet for conversion from SA to open net.");
+            pnapi::PetriNet::setGenet(path2genet);
+            _controller = new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::GENET, args_info.messagebound_arg + 1);
+        }
         else if (args_info.sa2on_arg == sa2on_arg_petrify and path2petrify != "")
         {
             status("Using Petrify for conversion from SA to open net.");
@@ -471,9 +478,9 @@ const pnapi::PetriNet * Adapter::buildController()
     {
         std::cerr << PACKAGE << ": most-permissive partner: "
                   << pnapi::io::stat << *_controller << std::endl;
+        status("converting most-permissive partner done [%.0f sec]", difftime(
+                   end_time, start_time));
     }
-    status("converting most-permissive partner done [%.0f sec]", difftime(
-               end_time, start_time));
 
     FUNCOUT
     return _controller;

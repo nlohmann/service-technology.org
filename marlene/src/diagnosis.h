@@ -36,6 +36,8 @@ class Diagnosis {
         MarkingInformation & mi;
 
     public:
+        bool superfluous;
+
         Diagnosis(std::string filename, MarkingInformation & pmi, unsigned int messageBound = 1);
 
         ~Diagnosis();

@@ -113,7 +113,7 @@ state:
 
             // insert representative into current SCC of inner markings
             currentSCC.insert($2);
-
+            
             // we have found a non-trivial SCC within the inner markings, so the reachability graph
             // contains a cycle
             if (currentSCC.size() > 1) {

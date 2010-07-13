@@ -34,6 +34,78 @@ using std::set;
 using std::string;
 using std::vector;
 
+std::map<InnerMarking_ID, std::set<InnerMarking_ID> > Diagnosis::markings2scc;
+
+std::string DiagnosisObject::output_results() {
+    bool blacklisted = false;
+    std::stringstream temp;
+
+    if (not internalDeadlocks.empty()) {
+        blacklisted = true;
+        temp << "      internalDeadlocks = (";
+        FOREACH(dl, internalDeadlocks) {
+            if (dl != internalDeadlocks.begin()) {
+                temp << ", ";
+            }
+            temp << *dl;
+        }
+        temp << ");\n";
+    }
+
+    if (not internalLivelocks.empty()) {
+        blacklisted = true;
+        temp << "      internalLivelocks = (";
+        FOREACH(ll, internalLivelocks) {
+            if (ll != internalLivelocks.begin()) {
+                temp << ", ";
+            }
+            temp << "(";
+            FOREACH(m, *ll) {
+                if (m != ll->begin()) {
+                    temp << ", ";
+                }
+                temp << *m;
+            }
+            temp << ")";
+        }
+        temp << ");\n";
+    }
+
+
+    if (not violatedChannels.empty()) {
+        blacklisted = true;
+        temp << "      violatedChannels = (";
+        FOREACH(c, violatedChannels) {
+            if (c != violatedChannels.begin()) {
+                temp << ", ";
+            }
+            temp <<  Label::id2name[*c];
+        }
+        temp << ");\n";
+    }
+
+
+    if (not unresolvableWaitstates.empty()) {
+        temp << (blacklisted ? ",\n" : "\n");
+
+        blacklisted = true;
+        temp << "      unresolvableWaitstates = (";
+        FOREACH(uw, unresolvableWaitstates) {
+            if (uw != unresolvableWaitstates.begin()) {
+                temp << ", ";
+            }
+            temp << *uw;
+        }
+        temp << ");\n";
+    }
+    
+    if (blacklisted) {
+        temp << "      blacklisted = true;\n";
+    }
+    
+    return temp.str();
+}
+
 
 void Diagnosis::output_results(Results& r) {
     std::stringstream temp;
@@ -50,7 +122,8 @@ void Diagnosis::output_results(Results& r) {
 
                 temp << "    { id = " << reinterpret_cast<size_t>(it->second[i]) << ";\n";
 
-
+                // the current diagnosis object as container for the knowledge
+                DiagnosisObject current;
 
 
 
@@ -62,6 +135,7 @@ void Diagnosis::output_results(Results& r) {
                     p &= *InnerMarking::inner_markings[it->second[i]->inner[j]]->possibleSendEvents;
                 }
 
+
                 set<InnerMarking_ID> hiddenStates;
                 for (unsigned int j = 0; j < it->second[i]->sizeAllMarkings; ++j) {
                     bool inner_waitstate = (j < it->second[i]->sizeDeadlockMarkings);
@@ -71,10 +145,34 @@ void Diagnosis::output_results(Results& r) {
                     bool interface_sane = it->second[i]->interface[j]->sane();
                     bool interface_pendingOutput = it->second[i]->interface[j]->pendingOutput();
 
-//                    file << "m" << static_cast<size_t>(it->second[i]->inner[j]) << " ";
-//                    file << *(it->second[i]->interface[j]);
 
+                    /*******************************
+                    * check if there is an internal livelock *
+                    *******************************/
+                    bool livelock = true;
+                    FOREACH(m, markings2scc[it->second[i]->inner[j]]) {
+                        if (InnerMarking::inner_markings[*m]->is_final) {
+                            livelock = false;
+                            return;
+                        }
+                    }
+
+                    if (livelock and not markings2scc[it->second[i]->inner[j]].empty()) {
+                        current.internalLivelocks.insert(markings2scc[it->second[i]->inner[j]]);
+                    }
+                    
+//                    temp << "m" << static_cast<size_t>(it->second[i]->inner[j]) << " ";
+//                    temp << *(it->second[i]->interface[j]);
+//                    temp << " " << InnerMarking::inner_markings[it->second[i]->inner[j]]->is_bad;
+
+
+                    /*******************************
+                    * check if there is an internal deadlock *
+                    *******************************/
                     if (inner_dead) {
+                        current.internalDeadlocks.insert(it->second[i]->inner[j]);
+
+/*                        
                         temp << "      internalDeadlock = true;\n";
                         temp << "      deadlockMarking = " << static_cast<size_t>(it->second[i]->inner[j]) << ";\n";
                         if (!blacklisted) {
@@ -83,8 +181,22 @@ void Diagnosis::output_results(Results& r) {
                         blacklisted = true;
 //                        message("node %p is blacklisted: m%u is internal deadlock",
 //                                it->second[i], static_cast<size_t>(it->second[i]->inner[j]));
+*/
                     }
+
+
+
+                    /*******************************
+                    * check if there is a message bound violation *
+                    *******************************/
                     if (not interface_sane) {
+                        for (Label_ID l = Label::first_receive; l <= Label::last_send; ++l) {
+                            if (it->second[i]->interface[j]->get(l) > InterfaceMarking::message_bound) {
+                                current.violatedChannels.insert(l);
+                            }
+                        }
+                    }
+/*                        
                         temp << "      messageBoundViolation = true;\n";
                         if (!blacklisted) {
                             temp << "      blacklisted = true;\n";
@@ -96,7 +208,7 @@ void Diagnosis::output_results(Results& r) {
                             }
                         }
                     }
-
+*/
 //                    if (blacklisted) {
 //                        temp << "      blacklisted = true;\n";
 //                    } else {
@@ -119,15 +231,16 @@ void Diagnosis::output_results(Results& r) {
                                 }
                             }
                             if (disallowedResolvers.size() == resolvers.size()) {
-                                if (!blacklisted) {
-                                    temp << "      blacklisted = true;\n";
-                                }
-                                blacklisted = true;
-                                temp << "      unresolvableWaitstate = " << static_cast<size_t>(it->second[i]->inner[j]) << ";\n";
+//                                if (!blacklisted) {
+//                                    temp << "      blacklisted = true;\n";
+//                                }
+//                                blacklisted = true;
+                                current.unresolvableWaitstates.insert(it->second[i]->inner[j]);
+//                                temp << "      unresolvableWaitstate = " << static_cast<size_t>(it->second[i]->inner[j]) << ";\n";
 //                                    file << " <FONT COLOR=\"RED\">(uw)</FONT>";
 //                                    message("node %p is blacklisted: m%u cannot be safely resolved",
 //                                            it->second[i], static_cast<size_t>(it->second[i]->inner[j]));
-                                hiddenStates.insert(it->second[i]->inner[j]);
+//                                hiddenStates.insert(it->second[i]->inner[j]);
                             } else {
 //                                    file << " <FONT COLOR=\"ORANGE\">(w)</FONT>";
                             }
@@ -141,7 +254,7 @@ void Diagnosis::output_results(Results& r) {
                 }
 
 
-
+                temp << current.output_results();
 
 
                 bool firstSuccessor = true;

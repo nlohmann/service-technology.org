@@ -26,11 +26,27 @@
 #include "InnerMarking.h"
 #include "Results.h"
 
+
+class DiagnosisObject {
+    public:
+        /// output diagnosis information as results file
+        std::string output_results();
+
+        std::set<Label_ID> violatedChannels;
+        std::set<InnerMarking_ID> internalDeadlocks;
+        std::set<std::set<InnerMarking_ID> > internalLivelocks;
+        std::set<InnerMarking_ID> unresolvableWaitstates;
+};
+
+
 /*!
  \brief diagnosis information for uncontrollable services
  */
 class Diagnosis {
     public:
+        /// a mapping from an inner marking to its SCC
+        static std::map<InnerMarking_ID, std::set<InnerMarking_ID> > markings2scc;
+
         /// print a dot representation for diagnosis
         static void output_diagnosedot(std::ostream&);
 

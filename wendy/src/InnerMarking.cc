@@ -22,6 +22,7 @@
 #include <climits>
 #include <algorithm>
 #include "InnerMarking.h"
+#include "Diagnosis.h"
 #include "Label.h"
 #include "cmdline.h"
 #include "verbose.h"
@@ -341,6 +342,11 @@ void InnerMarking::analyzeSCCOfInnerMarkings(std::set<InnerMarking_ID>& markingS
         // for each successor which is part of the current SCC, register the predecessor
 
         InnerMarking* currentInnerMarking = markingMap.find((*iScc))->second;
+
+        // copy SCC to Diagnose class for future usage
+        if (args_info.diagnose_given) {
+            Diagnosis::markings2scc[*iScc] = markingSet;
+        }
 
         // get predecessor within current SCC
         for (uint8_t i = 0; i < currentInnerMarking->out_degree; i++) {

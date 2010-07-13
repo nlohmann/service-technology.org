@@ -380,8 +380,10 @@ public: /* public methods */
   const Condition & getFinalCondition() const;
   /// guess a place relation
   std::map<const Place *, const Place *> guessPlaceRelation(const PetriNet &) const;
-  /// returns one node's free-choice cluster
-  std::set<Node *> getCluster(const Node &) const;
+  /// returns one node's conflict cluster
+  std::set<Node *> getConflictCluster(const Node &) const;
+  /// returns net's conflict clusters
+  std::vector<std::set<Node *> > getConflictClusters() const;
   //@}
   
   

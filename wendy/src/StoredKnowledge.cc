@@ -232,7 +232,7 @@ void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& knowled
             /// \todo looks as if a set union would do the job here
             knowledgeSet.insert(tempPredecessors[currentKnowledge].begin(), tempPredecessors[currentKnowledge].end());
 
-        } else if (args_info.correctness_arg == correctness_arg_livelock) {
+        } else if (args_info.correctness_arg == correctness_arg_livelock and currentKnowledge->is_sane) {
             currentKnowledge->is_final_reachable = 1;
         }
     }

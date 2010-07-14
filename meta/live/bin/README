@@ -1,0 +1,12 @@
+common
+------
+
+* update.sh holt sich die aktuellsten Tarballs der benutzten Tools
+* install.sh installiert diese Tools
+* die Binaries liegen in /live/bin/common/bin
+
+
+frozen
+------
+
+* install.sh installiert die jeweilige eingefrorene Version

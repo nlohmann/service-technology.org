@@ -2,7 +2,7 @@
 info_TEXINFOS = cora.texi
 
 # any other files you need to add (images)
-EXTRA_DIST = test.owfn test.out
+EXTRA_DIST = test.owfn test.out test.out2 test.out3 test.out4
 
 # the height of the README's ASCII art + URL + 3 spaces
 BANNERHEIGHT = 10

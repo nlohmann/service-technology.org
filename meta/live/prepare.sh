@@ -1,6 +1,6 @@
 #!/bin/sh
 
-mkdir tmp
+mkdir -p tmp
 
 for DIR in adapter bpel2owfn fiona marlene migration pnog rachel tmp
 do

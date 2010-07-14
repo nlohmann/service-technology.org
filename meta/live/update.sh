@@ -1,6 +1,7 @@
 #!/bin/sh
 
 mkdir -p local/bin
+chmod a+x local/bin
 
 cd local
 

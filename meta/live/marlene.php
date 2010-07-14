@@ -59,7 +59,7 @@
         $call_result = console($call, 'cd marlene; '.$call.' ');
       ?>
 
-      <?php system('cd marlene; fiona -t png '.$service1.'_'.$service2.'_result.owfn -p no-png &> /dev/null'); ?>
+      <?php $output = shell_exec('cd marlene; fiona -t png '.$service1.'_'.$service2.'_result.owfn -p no-png &> /dev/null'); echo "$output"; ?>
       <?php dotimg('in=marlene/'.$service1.'_'.$service2.'_result.owfn.out&thumbnail_size=400&label='.urlencode("adapter")); ?>
 
       <p>

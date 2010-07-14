@@ -1,0 +1,33 @@
+Partial Coverability Graph with Split Nodes:
+p1
+  p1 --a1-> [o1:0+,p1](7): o1,p1
+s
+  s --t1-> p1
+  s --t2-> p2
+o1:0+,p1 has been split into:
+  (1): o1:4+,p1 --a1-> [o1:0+,p1](1): o1:4+,p1
+  (5): o1:2,p1 --a1-> [o1:0+,p1](3): o1:3,p1
+  (3): o1:3,p1 --a1-> [o1:0+,p1](1): o1:4+,p1
+  (7): o1,p1 --a1-> [o1:0+,p1](5): o1:2,p1
+  (8): p1 --a1-> [o1:0+,p1](7): o1,p1
+  (1): o1:4+,p1 --u1-> o1:0+,p2:0+,p1
+p2
+o1:0+,p2:0+,p1
+Initial Node: s
+
+Original Partial Coverability Graph:
+p1
+ --a1-> o1:0+,p1
+s
+ --t1-> p1
+ --t2-> p2
+o1:0+,p1
+ --a1-> o1:0+,p1
+ --u1-> o1:0+,p2:0+,p1
+p2
+o1:0+,p2:0+,p1
+Initial Node: s
+
+SOLUTION(6): t1 a1 a1 a1 a1 u1 
+6 paths to the node o1:0+,p2:0+,p1 were investigated.
+cora: Used 0 seconds overall.

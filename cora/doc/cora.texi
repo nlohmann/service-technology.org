@@ -85,7 +85,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @section Setup and Installation
 
 @enumerate
-@item Go to @url{http://service-technology.org/files/cora} and download the latest release version of Sara, say @file{sara-@value{VERSION}.tar.gz}. To setup and compile Sara, change into your download directory and type
+@item Go to @url{http://service-technology.org/files/cora} and download the latest release version of Cora, say @file{cora-@value{VERSION}.tar.gz}. To setup and compile Cora, change into your download directory and type
 
 @cartouche
 @smallexample
@@ -210,7 +210,7 @@ Cora is a command line tool and does not come with a fancy @acronym{GUI}. Howeve
 
 @section What Cora can do
 
-Sara is a tool for partially creating an advanced form of a coverability graph and using it to 
+Cora is a tool for partially creating an advanced form of a coverability graph and using it to 
 solve the reachability problem for Petri nets. Given a low-level Petri net, i.e. sets of places and
 transitions with weighted arcs between them, and an initial and a final marking, Cora successively
 add paths and nodes to the coverability graph until a goal node containing the final marking is found.
@@ -234,7 +234,7 @@ For an overview of the command line options, type @samp{cora --help} to see the 
  
 @section Constructing a full Coverability Graph
 
-Assume Cora is given a Petri Net in some supported format like the following open net @samp{test.owfn}:
+Assume Cora is given a Petri net in some supported format like the following open net @samp{test.owfn}:
 
 @smallexample
 @verbatiminclude test.owfn
@@ -309,12 +309,113 @@ cora -p --lola -f
 @end smallexample
 @end cartouche
 
+If Cora is solving a problem instead of just creating a coverability graph it is
+possible to print additional information besides the solution. Such additional
+information usually consists of an advanced form of coverability graph with
+split nodes and nondeterminism, a portion of the normal coverability graph
+as created by @option{-f}, and information on how many paths, i.e. sequences
+of transitions, were investigated until the computation terminated (with or
+without a solution). To obtain this additional information the option @option{-v}
+is used.
+
+@cartouche
+@smallexample
+cora -i test.owfn -s"t1;a1;u1" -v -t
+@end smallexample
+@end cartouche
+
+The option @option{-t} allows for measuring time; the option @option{-s} defines a goal
+and will be explained in the following section. The result to the above call
+will look like this:
+
+@smallexample
+@verbatiminclude test.out2
+@end smallexample
+
+Let us begin at the end. Cora tells us how much time it used (where a value of
+zero means less than one time slice of the processor). Before that Cora shows
+the number of paths investigated which includes the solution if one exists.
+In this case five other paths were searched, the first one being @samp{t1;a1;u1}.
+Cora also prints the portion of the coverability graph that needed to be built.
+As we can see, it contains only five nodes and five edges where the full
+coverability graph has ten nodes and 26 edges. Finally, the first part of the
+output is the advanced form of the coverability graph where nodes can have
+subnodes. A look at the node @samp{o1:0+,p1} shows us that this node has been
+split internally into five subnodes which are distinguished by the number of
+tokens on @samp{o1}: 0, 1, 2, 3, or 4+ (at least four). While all subnodes allow
+for an edge with label @samp{a1} (increasing the token count by one), only the
+subnode @samp{o1:4+,p1} has an edge labelled @samp{u1}. Note how the edge from
+@samp{p1} goes to the subnode (7), i.e. @samp{o1,p1}, of @samp{o1:0+,p1}, while
+in the normal coverability graph the edge just leads to the node @samp{o1:0+,p1}.
+
+Sometimes, though not in this example, an edge can lead to more than one subnode
+of the same node, shown by additional output lines beginning with @samp{--->}. 
+When a path leading through such an edge is investigated, the
+nondeterminism is resolved. Therefore, nondeterminism may occur in the advanced
+coverability graph but is not relevant for the problem to be solved.
+
+For any given problem Cora may tell the user (via stderr) that the place or
+transition ordering of the Petri net is nondeterministic. This is nothing to
+worry about, Cora just tries to order the places and transition in a nice way,
+using only the structure of the net (and not the names of the places and transitions).
+With nondeterminism in the net you might get slightly differently solutions
+if you call Cora more than once with the same arguments.
 
 @section Finding a firable sequence to a given node
 
+A path from the initial node to some other node of the coverability graph
+defines a sequence of transitions of the Petri net. This sequence may be firable
+or not. If it is not firable, Cora can determine a firable sequence leading to
+the same node.
+
+@cartouche
+@smallexample
+cora -i test.owfn -s t1;a1;u1
+@end smallexample
+@end cartouche
+
+The sequence is given to Cora using the option @option{-s} followed by a string
+containing that sequence. Separators in the sequence may be commas, colons, semicolons,
+or blanks. Note that the shell may have problems with blanks as the blank is also
+the separator between arguments.
+
+If Cora is given a firable sequence this is of course its own solution, but if the
+sequence does not exist in the coverability graph, it does not lead to any node and
+there is no solution.
+
+@cartouche
+@smallexample
+cora -i test.owfn -s a1,u1
+@end smallexample
+
+@verbatiminclude test.out3
+@end cartouche
 
 @section Testing if a marking is reachable
 
+The main purpose of Cora is to test if a given marking is reachable in the Petri net.
+The marking to be reached can be defined via the option @option{-m}. Cora will try
+to insert nodes into the coverability graph until one of them contains the given marking.
+Then, Cora tries to find a firable path to that node. If a firable path leads to the given marking,
+it is a solution. If no firable path leads to the marking, Cora returns to inserting nodes
+into the (partial) coverability graph until the graph is complete (besides redundancies
+eliminated by partial order reduction). If the coverability graph becomes complete, no
+solution exists.
+
+@cartouche
+@smallexample
+cora -i test.owfn -m p1:3,p2:3
+@end smallexample
+
+@verbatiminclude test.out4
+@end cartouche
+
+In this example, Cora tries to reach the marking with three tokens on each of @samp{p1}
+and @samp{p2} and no tokens anywhere else. The token number for a place is given by
+the name of the place followed by a colon and the number. In any term @samp{p:1}
+the colon followed by the number one may be omitted. Different places are separated
+by commas, semicolons, or blanks, but again beware of the shell's interpretation of
+blanks and use shell's escape mechanism, e.g. quotation marks.
 
 @c --------------------------------------------------------------------------
 
@@ -422,8 +523,7 @@ In case any error occurs, Cora aborts with exit code @samp{1} and prints a messa
 @c <<-- CHANGE START (exit/error codes) -->>
 
 @item #01
-The problem information contains the filename of a Petri net that must be loaded to solve the problem.
-The file corresponding to this filename either does not exist or read access was not granted.
+The file corresponding to the [filename] of the Petri net either does not exist or read access was not granted.
 
 @smallexample
 @cartouche
@@ -433,7 +533,7 @@ cora: could not read from Petri net file '[filename]' -- aborting [#01]
 
 @item #02
 The final marking given via the option @option{-m} contains a name [place] that cannot
-be matched with the list of places in the Petri net. This may just be a syntax error.
+be matched with the list of places in the Petri net. This may just be a spelling mistake.
 
 @smallexample
 @cartouche
@@ -444,7 +544,7 @@ cora: wrong token '[place]' in input marking -- aborting [#02]
 @item #03
 The sequence given via the option @option{-s} contains a name [transition] that cannot
 be matched with the list of transitions in the Petri net. Check if the sequence really
-contains transitions only. This may just be a syntax error.
+contains transitions only. This may just be a spelling mistake.
 
 @smallexample
 @cartouche
@@ -506,7 +606,7 @@ cora: internal error, no scapegoat for stubborn set method -- aborting [#12]
 @chapter Version History
 
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
-Cora is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+Cora is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though these releases might not always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
 
 @include ChangeLog.texi
 @sp 3

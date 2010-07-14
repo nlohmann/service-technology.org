@@ -47,10 +47,10 @@
 
       <h2>Input Service Models</h2>
 
-      <?php system('cd marlene; fiona -t png '.$service1.'.owfn -p no-png &> /dev/null'); ?>
-      <?php system('cd marlene; fiona -t png '.$service2.'.owfn -p no-png &> /dev/null'); ?>
-      <?php dotimg('in=marlene/'.$service1.'.owfn.out&thumbnail_size=400&label='.urlencode("service 1")); ?>
-      <?php dotimg('in=marlene/'.$service2.'.owfn.out&thumbnail_size=400&label='.urlencode("service 2")); ?>
+      <?php system('cd marlene; petri -o dot '.$service1.'.owfn'); ?>
+      <?php system('cd marlene; petri -o dot '.$service2.'.owfn'); ?>
+      <?php dotimg('in=marlene/'.$service1.'.owfn.dot&thumbnail_size=400&label='.urlencode("service 1")); ?>
+      <?php dotimg('in=marlene/'.$service2.'.owfn.dot&thumbnail_size=400&label='.urlencode("service 2")); ?>
 
 
       <h2>Synthesized Adapter</h2>

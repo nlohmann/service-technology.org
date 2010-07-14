@@ -6,7 +6,7 @@
   include 'resource/php/dotimg.php';
   include 'resource/php/getnumber.php';
 
-putenv("PATH=/var/www/service-tech/live/local/bin:$PATH");
+  putenv("PATH=/var/www/service-tech/live/local/bin:$PATH");
 
   header("Content-Type: text/html");
   echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';

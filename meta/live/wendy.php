@@ -5,6 +5,8 @@
   include 'resource/php/console.php';
   include 'resource/php/dotimg.php';
 
+  putenv("PATH=/var/www/service-tech/live/local/bin:$PATH");
+
   // case: service was chosen from drop down menu
   if (!strcmp($_REQUEST['input'], 'given')) {
     $inputfilename = $_REQUEST['input_service'];

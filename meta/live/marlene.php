@@ -6,7 +6,7 @@
   include 'resource/php/dotimg.php';
   include 'resource/php/getnumber.php';
 
-putenv("PATH=/usr/local/bin:/usr/bin:/users/teo00/nl/local/bin/petri");
+putenv("PATH=/var/www/service-tech/live/local/bin:$PATH");
 
   header("Content-Type: text/html");
   echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
@@ -26,7 +26,7 @@ putenv("PATH=/usr/local/bin:/usr/bin:/users/teo00/nl/local/bin/petri");
   }
   
   // fiona -t adapter myCoffee.owfn myCustomer.owfn -a coffee.ar
-  $call = 'marlene '.$service1.'.owfn '.$service2.'.owfn  -o '.$service1.'_'.$service2.'_result.owfn -v -r '.$rules;
+  $call = 'marlene '.$service1.'.owfn '.$service2.'.owfn  -o '.$service1.'_'.$service2.'_result.owfn -v -r '.$rules.' 2>&1';
   
 ?>
 
@@ -49,8 +49,8 @@ putenv("PATH=/usr/local/bin:/usr/bin:/users/teo00/nl/local/bin/petri");
 
       <h2>Input Service Models</h2>
 
-      <?php system('cd marlene; petri -o dot '.$service1.'.owfn'); ?>
-      <?php system('cd marlene; petri -o dot '.$service2.'.owfn'); ?>
+      <?php system('cd marlene; petri --removePorts -o dot '.$service1.'.owfn'); ?>
+      <?php system('cd marlene; petri --removePorts -o dot '.$service2.'.owfn'); ?>
       <?php dotimg('in=marlene/'.$service1.'.owfn.dot&thumbnail_size=400&label='.urlencode("service 1")); ?>
       <?php dotimg('in=marlene/'.$service2.'.owfn.dot&thumbnail_size=400&label='.urlencode("service 2")); ?>
 
@@ -61,8 +61,8 @@ putenv("PATH=/usr/local/bin:/usr/bin:/users/teo00/nl/local/bin/petri");
         $call_result = console($call, 'cd marlene; '.$call.' ');
       ?>
 
-      <?php system('cd marlene; fiona -t png '.$service1.'_'.$service2.'_result.owfn -p no-png &> /dev/null'); ?>
-      <?php dotimg('in=marlene/'.$service1.'_'.$service2.'_result.owfn.out&thumbnail_size=400&label='.urlencode("adapter")); ?>
+      <?php system('cd marlene; petri -o dot '.$service1.'_'.$service2.'_result.owfn'); ?>
+      <?php dotimg('in=marlene/'.$service1.'_'.$service2.'_result.owfn.dot&thumbnail_size=400&label='.urlencode("adapter")); ?>
 
       <p>
       	<a href="./#marlene" title="back to reality">Back to live</a>

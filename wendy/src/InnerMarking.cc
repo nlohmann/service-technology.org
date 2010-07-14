@@ -64,7 +64,10 @@ void InnerMarking::initialize() {
     // copy data from STL mapping (used during parsing) to a C array
     for (InnerMarking_ID i = 0; i < stats.markings; ++i) {
         inner_markings[i] = markingMap[i];
-        inner_markings[i]->is_bad = (inner_markings[i]->is_bad or (not finalMarkingReachableMap[i] and not args_info.noDeadlockDetection_flag));
+        inner_markings[i]->is_bad = (inner_markings[i]->is_bad or
+                                        (finalMarkingReachableMap.find(i) != finalMarkingReachableMap.end()
+                                                and finalMarkingReachableMap[i] == false
+                                                and not args_info.noDeadlockDetection_flag));
 
         // register markings that may become activated by sending a message
         // to them or by synchronization
@@ -186,7 +189,7 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
 
     // when only deadlocks are considered, we don't care about final markings
     finalMarkingReachableMap[myId] = (args_info.correctness_arg == correctness_arg_livelock and
-                                      not args_info.noDeadlockDetection_flag) ? is_final : true;
+                                          not args_info.noDeadlockDetection_flag) ? is_final : true;
 
     // variable to detect whether this marking has only deadlocking successors
     // standard: "true", otherwise evaluate noDeadlockDetection flag
@@ -207,7 +210,9 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
         if (args_info.correctness_arg == correctness_arg_livelock and
                 not args_info.noDeadlockDetection_flag) {
             if (markingMap[successors[i]] != NULL and
-                    finalMarkingReachableMap[successors[i]]) {
+                    (finalMarkingReachableMap.find(successors[i]) != finalMarkingReachableMap.end() and
+                            finalMarkingReachableMap[successors[i]] == true)) {
+
                 finalMarkingReachableMap[myId] = true;
             }
         }
@@ -360,7 +365,8 @@ void InnerMarking::analyzeSCCOfInnerMarkings(std::set<InnerMarking_ID>& markingS
             // check if there exists a successor (within or outside of the current SCC) from which a
             // final inner marking is reachable
             if (markingMap[currentInnerMarking->successors[i]] != NULL and
-                    finalMarkingReachableMap.find((*iScc)) != finalMarkingReachableMap.end()) {
+                    finalMarkingReachableMap.find(*iScc) != finalMarkingReachableMap.end() and
+                    finalMarkingReachableMap[*iScc] == true) {
                 is_final_reachable = true;
             }
         }
@@ -429,7 +435,9 @@ void InnerMarking::finalMarkingReachableSCC(std::set<InnerMarking_ID>& markingSe
         for (uint8_t i = 0; i < currentInnerMarking->out_degree; i++) {
             // is a final inner marking reachable
             if (markingMap[currentInnerMarking->successors[i]] != NULL and
-                    finalMarkingReachableMap.find((*iScc)) != finalMarkingReachableMap.end()) {
+                    finalMarkingReachableMap.find((*iScc)) != finalMarkingReachableMap.end()
+                    and finalMarkingReachableMap[*iScc] == true) {
+
                 // ... yes, remember this and get out
                 is_final_reachable = true;
                 break;

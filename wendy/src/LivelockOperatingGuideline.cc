@@ -302,7 +302,7 @@ CompositeMarking* LivelockOperatingGuideline::getSuccessorMarking(const StoredKn
 
     for (innermarkingcount_t i = 0; i < storedKnowledge->sizeAllMarkings; ++i) {
 
-        if (storedKnowledge->inner[i] == innerMarking and(*storedKnowledge->interface[i] == *interface)) {
+        if (storedKnowledge->inner[i] == innerMarking and (*storedKnowledge->interface[i] == *interface)) {
 
             marking = new CompositeMarking(storedKnowledge, innerMarking, interface);
 
@@ -319,9 +319,6 @@ CompositeMarking* LivelockOperatingGuideline::getSuccessorMarking(const StoredKn
             return marking;
         }
     }
-
-    // this should never happen!
-    assert(false);
 
     return NULL;
 }

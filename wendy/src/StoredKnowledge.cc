@@ -558,11 +558,15 @@ void StoredKnowledge::addSuccessor(const Label_ID& label, StoredKnowledge* const
       states or unmarked final markings are removed from the marking array
 */
 bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
+
+    bool is_on_tarjan_stack = false;
+
     // if we find a sending successor, this node is OK
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
         if (successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
 
             if (checkOnTarjanStack and successors[l-1]->is_on_tarjan_stack) {
+                is_on_tarjan_stack = true;
                 continue;
             }
 
@@ -576,9 +580,11 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
         }
     }
 
+    bool resolved = false;
+
     // now each deadlock must have ?-successors
     for (innermarkingcount_t i = 0; i < sizeDeadlockMarkings; ++i) {
-        bool resolved = false;
+        resolved = false;
 
         // we found a deadlock -- check whether for at least one marked
         // output place exists a respective receiving edge
@@ -588,6 +594,7 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
                     successors[l-1]->is_sane) {
 
                 if (checkOnTarjanStack and successors[l-1]->is_on_tarjan_stack) {
+                    is_on_tarjan_stack = true;
                     continue;
                 }
 
@@ -613,6 +620,7 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
                     successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
 
                 if (checkOnTarjanStack and successors[l-1]->is_on_tarjan_stack) {
+                    is_on_tarjan_stack = true;
                     continue;
                 }
 
@@ -631,6 +639,15 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
         if (not resolved and not(InnerMarking::inner_markings[inner[i]]->is_final and interface[i]->unmarked())) {
             return false;
         }
+    }
+
+    // in case of livelock freedom
+    // current knowledge is definitely not sane iff
+    // (1) no deadlock has been resolved, which means that there are no deadlocks because otherwise we would have returned false already
+    // (2) the current knowledge is not on the Tarjan stack anymore
+    // (3) no final knowledge is reachable
+    if (args_info.correctness_arg == correctness_arg_livelock and not resolved and not is_on_tarjan_stack and not is_final_reachable) {
+        return false;
     }
 
     // if we reach this line, every deadlock was resolved

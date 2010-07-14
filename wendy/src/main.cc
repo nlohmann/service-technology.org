@@ -348,7 +348,9 @@ int main(int argc, char** argv) {
     ///\todo rausfinden, was mit dot ist (kann ich eine LL-OG dotten)
     // in case of livelock freedom and if the operating guideline shall be
     // calculated, we have to analyse every strongly connected set of knowledges
-    if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
+    if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given and
+            (StoredKnowledge::root->is_sane or args_info.diagnose_given)) {
+
         time(&start_time);
         LivelockOperatingGuideline::initialize();
         LivelockOperatingGuideline::generateLLOG();

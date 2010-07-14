@@ -6,6 +6,8 @@
   include 'resource/php/dotimg.php';
   include 'resource/php/getnumber.php';
 
+putenv("PATH=/usr/local/bin:/usr/bin:/users/teo00/nl/local/bin/petri");
+
   header("Content-Type: text/html");
   echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
 
@@ -59,7 +61,7 @@
         $call_result = console($call, 'cd marlene; '.$call.' ');
       ?>
 
-      <?php $output = shell_exec('cd marlene; fiona -t png '.$service1.'_'.$service2.'_result.owfn -p no-png &> /dev/null'); echo "$output"; ?>
+      <?php system('cd marlene; fiona -t png '.$service1.'_'.$service2.'_result.owfn -p no-png &> /dev/null'); ?>
       <?php dotimg('in=marlene/'.$service1.'_'.$service2.'_result.owfn.out&thumbnail_size=400&label='.urlencode("adapter")); ?>
 
       <p>

@@ -5,7 +5,7 @@ PATH=`pwd`/bin:$PATH
 
 cd src
 
-for TOOL in wendy
+for TOOL in `cat ../tools` genet
 do
   tar xfz $TOOL.tar.gz
   cd $TOOL

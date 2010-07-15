@@ -295,6 +295,8 @@ int LPWrapper::calcTrap(bool verbose, std::set<const Place*> places) {
 	return cleanup();
 }
 
+
+
 /** Creates equations for calculating a siphon that is minimal, i.e. it is
     among the set of siphons with a minimal number of places.
     Implementation follows "Verification of Safety Properties Using Integer
@@ -305,6 +307,8 @@ int LPWrapper::calcTrap(bool verbose, std::set<const Place*> places) {
 
 int LPWrapper::calcSiphon(bool verbose, std::set<const Place*> places) {
 	setupP();
+        std::set<std::string> siphonPlaces;
+	std::set<std::string> trapPlaces;
 	
 	set<const Place*>::iterator pit;
 	for(pit=places.begin(); pit!=places.end(); ++pit){
@@ -346,6 +350,8 @@ int LPWrapper::calcSiphon(bool verbose, std::set<const Place*> places) {
 
 	}
 
+       
+
 	if(solveLP(verbose) != 2){
 	  message("Found siphon containing the following places");
 
@@ -353,12 +359,94 @@ int LPWrapper::calcSiphon(bool verbose, std::set<const Place*> places) {
           get_variables(lp, mat);
 	  fprintf(stderr, "Places:\n");
           for(int j = 0; j < (int)(cols); j++){
-	    if(mat[j] > 0)
-              fprintf(stderr, "%s\n", get_col_name(lp, j + 1));
+	    if(mat[j] > 0){
+              fprintf(stderr, "%s\n", get_col_name(lp, j + 1));	
+              siphonPlaces.insert(get_col_name(lp, j + 1));
+	    }
 	  }
 	}
 	else
 	  message("No siphon could be found");
+
+        lp = make_lp(0,cols);
+	if (!lp) abort(12,"error: could not create LP model");
+	setupP();
+
+	for(pit=places.begin(); pit!=places.end(); ++pit){
+          for(unsigned int y=0; y<cols; ++y) mat[y]=0;
+          Place* p = _net->findPlace((*pit)->getName());
+	  mat[ppos[p]] = 1;
+          add_constraintex(lp,cols,mat,colpoint,EQ,1);
+        }
+
+	for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
+	{
+		for(unsigned int y=0; y<cols; ++y) mat[y]=0;
+
+		try{
+	   	  Place& p = dynamic_cast<Place&>((*ait)->getSourceNode());
+ 		  Transition& t = dynamic_cast<Transition&>((*ait)->getTargetNode());
+	 
+		  for(unsigned int j=0; j<placeorder.size(); ++j){
+		    if(placeorder[j]->getName() == p.getName() && t.getPostset().find((Node*) placeorder[j]) == t.getPostset().end()){
+			mat[ppos[placeorder[j]]] = -1;
+		    }
+		    else{
+		      if(placeorder[j]->getName() != p.getName() && t.getPostset().find((Node*) placeorder[j]) != t.getPostset().end()){
+		        mat[ppos[placeorder[j]]] = 1;
+		      }
+		      else{
+			mat[ppos[placeorder[j]]] = 0;
+		      }
+		    }
+		  }
+		  //initialize the rows
+		  if (!add_constraintex(lp,cols,mat,colpoint,GE,0)) { cleanup(); return -1; }
+		
+   		}
+		catch(std::bad_cast & b){
+
+		}
+
+	}
+	
+	if(solveLP(verbose) != 2){
+	  //message("Found trap containing the following places");
+
+	  bool isNonNegative = true;
+          get_variables(lp, mat);
+	  //fprintf(stderr, "Places:\n");
+          for(int j = 0; j < (int)(cols); j++){
+	    if(mat[j] > 0){
+              //fprintf(stderr, "%s\n", get_col_name(lp, j + 1));   
+	      trapPlaces.insert(get_col_name(lp, j + 1));
+            }
+	  }
+	}
+	std::set<std::string>::iterator sit;
+	bool containsTrap = true;
+
+	for(sit = trapPlaces.begin(); sit != trapPlaces.end(); ++sit){
+	  if(siphonPlaces.find(*sit) == siphonPlaces.end()){
+	    containsTrap = false;
+            break;
+	  }
+	}
+	
+	if(containsTrap == true){
+          containsTrap = false;
+	  for(sit = trapPlaces.begin(); sit != trapPlaces.end(); ++sit){
+	    if(_net->findPlace(*sit)->getTokenCount() > 0){ 
+              containsTrap = true;
+              break;
+            }
+	  }
+        }
+
+        if(containsTrap)
+          message("Siphon contains an initially marked trap");
+        else
+          message("Siphon contains no initially marked trap");
 
 	return cleanup();
 }

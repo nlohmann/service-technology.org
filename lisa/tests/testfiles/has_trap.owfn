@@ -13,7 +13,9 @@ OUTPUT
 
 INITIALMARKING
   p1:	1,
-  p2:   1;
+  p2:   1,
+  p5:   1,
+  p3:   1;
 
 FINALMARKING
   p5;

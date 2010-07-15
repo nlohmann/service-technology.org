@@ -249,7 +249,7 @@ int main(int argc, char** argv) {
     }	
 
     /*----------------------------------------.
-    | 6. reachability check
+    | 7. reachability check
     `----------------------------------------*/
 
     if(args_info.isReachable_given){

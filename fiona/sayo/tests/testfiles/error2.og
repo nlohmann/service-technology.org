@@ -1,8 +1,0 @@
-INTERFACE
-  INPUT
-    a;
-  OUTPUT;
- 
-NODES
-  0 : ( ~(TRUE * FALSE) + FINAL + ident )
-    a -> 0;

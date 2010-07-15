@@ -1,9 +1,0 @@
-INTERFACE
-  INPUT;
-  OUTPUT;
-  SYNCHRONOUS
-    a;
-
-NODES
-  0
-    a -> 0;

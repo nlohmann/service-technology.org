@@ -1,7 +1,0 @@
-FORMULA 
-op.m4.p.2 > 0 AND
-op.m4.p.clk.TRUE > 0 AND
-op.m4.p.ack_b.FALSE > 0 AND
-op.m4.p.donv.TRUE > 0 AND
-ip.m66.p.n_a > 0 AND
-ip.m67.p.n_b > 0

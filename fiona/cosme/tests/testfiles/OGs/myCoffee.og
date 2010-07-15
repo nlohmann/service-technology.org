@@ -1,0 +1,40 @@
+{
+  generator:    Wendy 2.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy ../cosme/tests/Niels/myCoffee.owfn --og --formula=bits --lola=src/lola-statespace 
+  events:       3 send, 1 receive, 0 synchronous
+  statistics:   7 nodes
+}
+
+INTERFACE
+  INPUT
+    B;
+  OUTPUT
+    E, T, C;
+
+NODES
+  153105000 :: S
+    B -> 0
+    E -> 153091792
+    T -> 153093800
+    C -> 153091744
+  153091416
+    B -> 153093160
+  153091744 :: S
+    B -> 0
+    E -> 153094552
+  153091792 :: S
+    B -> 0
+    T -> 153091416
+    C -> 153094552
+  153093160 :: F
+    B -> 0
+  153093800 :: S
+    B -> 0
+    E -> 153091416
+  153094552
+    B -> 153093160
+  0
+    B -> 0
+    E -> 0
+    T -> 0
+    C -> 0

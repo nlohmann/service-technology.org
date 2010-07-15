@@ -1,0 +1,567 @@
+@heading Version 1.14 (18 January 2010)
+@itemize
+@item updated maintainer scripts
+
+@item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
+
+@item added scripts to use ZCOV (@url{http://minormatter.com/zcov}) to determine test branch case coverage (use @samp{make cover-branch} in @file{tests} directory)
+
+@item cleaned code:
+@itemize
+@item removed support for aspects -- not used any more
+
+@item removed @acronym{BPMN} output -- this does not belong here
+
+@item removed 2-bit annotation -- Wendy can do this
+@end itemize
+
+@item implemented Wendy's new IG/OG formats
+
+@item added target for benchmarks (execute @samp{make bench -C tests})
+
+@item implemented parameter @option{--stats} to display information on runtime and memory consumption (the latter uses @code{ps} and does not work under Cygwin)
+
+@item colored status messages
+@end itemize
+
+
+@heading Version 1.13 (6 June 2009)
+@itemize
+@item the bit annotations are now written inside the nodes of the Graphviz dot annotation
+
+@item service automata can be drawn as Graphviz dot graphs using mode @option{sa} combined with @option{--dot} (@option{-d})
+
+@item removed @option{--noop} flag
+
+@item reorganized and cleaned up Dot output; in case of calculating an edit distance, only the result is printed; use mode @option{og} or @option{sa} to create a graphic for the input files
+
+@item moved command line parameters for GNU Gengetopt from Makefile to file @file{cmdline.ggo}
+
+@item adapted maintainer scripts for binary distributions to match the filenames used in Fiona
+
+@item Rachel can be translated using the @acronym{LLVM}-frontend for GCC (see @url{http://llvm.org/})
+
+@item updated @file{Doxyfile} and moved in into the @file{doc} directory; the documentation can be created using @samp{make doxygen} which creates the directory @file{doc/doxygen}
+
+@item made adaptions to the Makefile options to be able to create Mac Universal binaries for 64 bit architectures (XCode 3.0 with SDK @samp{MacOSX10.5.sdk} is needed)
+
+@item if Graphviz dot has not been found by the configure script, the dependent tests are skipped instead of throwing an error
+
+@item tests are now organized by @acronym{GNU} Autotest
+@end itemize
+
+
+@heading Version 1.12 (17 January 2009)
+@itemize
+@item implemented methods to calculate a compact representation of the formulae annotated to the operating guideline's states according to the paper submitted to ACSD 2009; the new method can be triggered with the new mode @option{-m annotation}
+
+@item in mode @option{-m annotation}, the @option{--dot} (@option{-d}) parameter creates a version of the input operating guidelines in which the explicit formulae are replaced by different colors representing the bit representation
+
+@item File input options @option{--og} (@option{-o}) and @option{--automaton} (@option{-a}) are now optional for Gengetopt, but are checked in the @file{main.cc} file. This was necessary, because the @option{-m annotation} mode did not need to parse a service automaton.
+
+@item implemented a mode @option{-m bpmn} to create a rudimentary @acronym{BPMN, Business Process Modeling Notation} output in Graphviz dot format of a service automaton (given by @option{--automaton}); the path of the used stencils can be changed with @option{--shapedir}
+
+@item when using the @option{--dot} (@option{-d}) parameter, a @acronym{PNG, Portable Network Graphics} file is now only created if the parameter @option{--png} is given
+
+@item overworked and beautified Graphviz dot output for operating guidelines: annotated formulae now use mathematical symbols for conjunctions and disjunctions, and the initial state is marked
+@end itemize
+
+
+@heading Version 1.11 (2 November 2008)
+@itemize
+@item implemented Fiona's modified OG file format (an OG file now also consists of an interface definition) and adjusted the respective test cases --- note that Rachel's parser is backwards compatible and still accepts OG files without interface definition
+
+@item renamed configure script parameter @option{--enable-use64bit} to @option{--enable-64bit} to achieve parameter compatibility with Fiona
+
+@item explicitly handling the disabling of assertions (with parameter @option{--disable-assert}) similar to Fiona's configure script
+
+@item canonized names of constants generated for file @file{src/config.h} and adjusted the output of the @option{--bug} parameter
+
+@item removed unnecessary files @file{src/getopt.c}, @file{src/getopt1.c}, and @file{src/getopt.h}
+
+@item used option @option{gnits} for Automake, see @url{http://www.gnu.org/software/automake/manual/automake.html#Gnits}
+
+@item moved acknowledgements from file @file{AUTHOR} to file @file{THANKS} to meet the strict Gnits requirements
+
+@item updated documentation
+
+@item the configure script now takes care about the compilation flags; for example @command{./configure --enable-64bit} sets the flags necessary to build a 64 bit executable with @command{make}
+
+@item adapted code to avoid warnings of GCC 4.2 (mostly deprecation warnings)
+
+@item overworked test scripts: creation of output files is checked now
+
+@item simplified header inclusion: all typedefs are now made in @file{types.h}
+
+@item added a command line parameter @option{--threshold}/@option{-t} to set a threshold to control the matching algorithm: whenever a formula's assignment reaches this value, it is immediately returned instead of the optimum; this results in faster, yet sub-optimal results 
+@end itemize
+
+
+
+@heading Version 1.10 (20 August 2008)
+@itemize
+@item Rachel does not need to be installed to execute @command{make experiments}
+
+@item added configure script parameter @option{--enable-universal} to set flags to build a Mac universal binary (@url{http://www.apple.com/universal})
+
+@item added configure script parameter @option{--enable-win32} to set flags to build a Windows binary which uses the MinGW framework (@url{http://www.mingw.org}) to be independent of the @file{cygwin1.dll} provided by Cygwin (@url{http://www.cygwin.com})
+
+@item added configure script parameter @option{--enable-use64bit} to set flags to build a 64 bit binary (e.g. for x86_64, ppc64, or 64-Bit SPARC)
+
+@item chosen configure script parameters are printed when using @option{--bug} command line parameter
+
+@item made the configure script option @option{--disable-aspects} standard
+
+@item added a command line parameter @option{--noop} to exit after parsing the input files -- mostly for debug information, e.g. if you want to count the services characterized by an OG (combined with @option{--verbose})
+
+@item fixed a bug: the requirements to calculate matching-based edit distance (final states are sink states) led to incorrect formula evaluation (see @url{https://gna.org/bugs/?11944}) when calculating the number of characterized services
+
+@item removed orphaned code for linear programming
+
+@item added more test cases (also expected failures)
+
+@item added code coverage checks using LTP LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}); checks can be invoked in directory @file{tests} with @command{make prepare-cover cover}
+@end itemize
+
+
+
+@heading Version 1.09 (7 August 2008)
+
+@itemize
+@item fixed bug #12153 (@url{https://gna.org/bugs/?12153}): the patch for the aspected sources now works on x86_64 machines
+
+@item fixed a bug in test script @file{tests/test4}: the wrong return value was returned to @command{make check}
+
+@item improved portability of Makefiles by using more built-in variables such as @code{$(MAKE) $(AM_MAKEFLAGS)} or @code{$(SED)}
+
+@item added file @file{doc/cmdline.out} to the distribution to avoid complete compilation just to execute @command{make doc}
+
+@item code complies to ISO C++
+
+@item listing the tools required to re-generated code (Flex, Bison, Gengetopt, and Kimwitu++) in the @file{README} file
+
+@item completed task #6131 (@url{https://gna.org/task/?6131}): whether or not the aspects of AspectC++ are used during compilation can be controlled by parameters of the configure script:
+
+@itemize
+@item @command{./configure}: use aspects
+@item @command{./configure --enable-aspects}: use aspects
+@item @command{./configure --enable-aspects=true}: use aspects
+@item @command{./configure --disable-aspects}: do not use aspects
+@item @command{./configure --enable-aspects=false}: do not used aspects
+@end itemize
+
+If aspects are disabled, the files @file{src/xxxx.cc} are directly copied to @file{src/aspected-xxxx.cc}, and the AspectC++ tools are not at all invoked.
+
+@item MAINTAINER: overworked the Makefile target @option{deb} in the directory @file{maintainer} to create a Debian source package
+
+Note that @command{make deb} can only be executed on a machine where the tools @command{dpkg-buildpackage} and @code{date -R} are present. To upload the source package to a Launchpad PPA (it is currently uploaded to @url{https://launchpad.net/~niels-lohmann/+archive}), the tool @command{dput} is needed. Furthermore, the tools  @command{fakeroot} and @command{alien} are needed to create an RPM binary package from the Debian binary package.
+@end itemize
+
+
+
+@heading Version 1.08 (3 August 2008)
+
+@itemize
+@item MAINTAINER: added a directory @file{maintainer/debian} containing files to create Debian and Redhat packages
+
+@item MAINTAINER: moved maintenance Makefile targets (@option{upload}) to @file{maintainer} directory
+
+@item the file @file{NEWS} is now extracted from file @file{doc/ChangeLog.texi}
+@end itemize
+
+
+
+@heading Version 1.07 (29 July 2008)
+
+@itemize
+@item fixed bug #12112 (@url{https://gna.org/bugs/?12112}): allow to compile Rachel using GCC 4.3.1
+
+@item some changes in the way the change log is created
+
+@item minor changes to avoid compiler warnings
+@end itemize
+
+
+
+@heading Version 1.06 (16 July 2008)
+
+@itemize
+@item added a Makefile target @command{make bindist} to create a zipped archive with a binary and a documentation
+
+@item added an undocumented command line option @option{--bug} to display debugging information that is meant to be emailed to the bugreport address in case a bug is found; looks like:
+
+@cartouche
+@smallexample
+Please email the following information to @email{rachel@@service-technology.org}:
+- tool:              Rachel
+- version:           1.06
+- compilation date:  Jul 16 2008
+- compiler version:  4.0.1 (Apple Inc. build 5484)
+- platform:          i386-apple-darwin9.4.0
+@end smallexample
+@end cartouche
+
+@item minor changes in Makefiles and configure script
+
+@item updated @file{src/Doxyfile.in} template for @command{doxygen} version 1.5.5
+@end itemize
+
+
+
+@heading Version 1.05 (8 July 2008)
+
+@itemize
+@item fixed a memory leak in the OG lexer
+
+@item fixed a memory leak in the command line parser
+@end itemize
+
+
+
+@heading Version 1.04 (30 June 2008)
+
+@itemize
+@item added the experiments (file @file{exp/bpm2008.tgz}) from the paper
+
+Niels Lohmann. @b{Correcting Deadlocking Service Choreographies Using a Simulation-Based Graph Edit Distance}. In Marlon Dumas, Manfred Reichert, and Ming-Chien Shan, editors, @i{Business Process Management, 6th International Conference, BPM 2008, Milan, Italy, September 1--4, 2008, Proceedings}, volume 5240 of Lecture Notes in Computer Science, pages 132--147. Springer-Verlag, September 2008.
+
+@item experiments can be invoked using @command{make experiments}
+
+@item added PDF document (file @file{doc/background.pdf}) containing the paper
+
+Niels Lohmann. @b{Fixing Deadlocking Service Choreographies Using a Simulation-based Graph Edit Distance}. In Monika Solanki, Barry Norton, and Stephan Reiff-Marganiec, editors, @i{3rd Young Researchers Workshop on Service Oriented Computing, YR-SOC 2008, London, UK, 12--13 June 2008, Proceedings}, pages 13--20, June 2008.
+
+@item overworked the documentation
+@end itemize
+
+
+
+@heading Version 1.03 (22 June 2008)
+
+@itemize
+@item some adjustments to improve the compatibility between AspectC++ (@url{http://www.aspectc.org}) and Cygwin
+@end itemize
+
+
+
+@heading Version 1.02 (14 May 2008)
+
+@itemize
+@item added more files to the deletion list of Makefile target @code{cvs-clean}
+
+@item acknowledged @url{service-technology.org} where possible (e.g., in the bug address @email{rachel@@service-technology.org})
+
+@item adjusted the parser to cope with Fiona's new OG file format; Rachel's parser stays backward compatible
+
+@item the parser now aborts the program in case of an error to avoid subsequent crashes caused by parse errors
+
+@item the lexer was overworked to be backward compatible with older Flex versions
+@end itemize
+
+
+
+@heading Version 1.01 (6 May 2008)
+
+@itemize
+@item adding copyright notices to comply to the @acronym{GNU} @acronym{GPL}
+
+@item added comments
+
+@item overworked documentation
+@end itemize
+
+
+
+@heading Version 1.00 (6 May 2008)
+
+@itemize
+@item tool is now called Rachel = ``@b{R}epairing @b{A}utomata for @b{Ch}oreographies by @b{E}diting @b{L}abels''
+
+@item adjusted the parameters: changing is now preferred over deletion and insertion
+
+@item the service counting function @code{Graph::countServices} now uses @code{long double} to count up to @math{10^{4932}}
+
+@item added a function to calculate the average size of satisfying assignments of the OG's nodes (called with @option{verbose} parameter)
+
+@item added a preprocessing function to calculate values for node deletion in advance
+@end itemize
+
+
+
+@heading Version 0.20
+
+@itemize
+@item the check for acyclicity is done right after parsing and not during matching or simulation calculation
+
+@item added a function to re-enumerate the graphs' nodes to allow the usage of C-style arrays
+
+@item finally, using C-style multidimensional arrays to cache simulation values in @code{Simulation} and @code{Matching} classes
+
+@item re-organized @code{Simulation} and @code{Matching} classes: both now inherit from a new class @code{EditDistance} to avoid replication of code
+@end itemize
+
+
+
+@heading Version 0.19
+
+@itemize
+@item the aspected sources are automatically patched such that @code{size_t} is used instead of @code{unsigned long} in the generated @code{new}-operator
+
+@item @command{lp_solve} is currently not integrated for unsolved compatibility problems --- an archive @file{lp-solve.tar.gz} is still in the @file{src} folder
+
+@item documented usage of configuration files and added a sample configuration file
+
+@item @code{matching} is now the standard for the @option{--mode} parameter
+
+@item added a preprocessing function to calculate values for node insertion in advance
+
+@item added a function to count the deterministic acyclic services characterized by the OG (called with @option{verbose} parameter)
+
+@item the ChangeLog is automatically generated from the Texinfo sources
+@end itemize
+
+
+
+@heading Version 0.18
+
+@itemize
+@item overworked Makefiles
+
+@item manpage now shows result for @option{--detailed-help}
+
+@item added a @option{--debug} mode to trace all function calls of classes Matching and Simulation
+
+@item added a @option{--verbose} mode to display intermediate progress output
+
+@item using AspectC++ (@url{http://www.aspectc.org}) to add aspects like the trace calls
+
+@item added a great optimization in function @code{Matching::permuteEdges} by avoiding subsequent deletion and insertion of the same edge
+
+@item the ChangeLog is automatically integrated into documentation using a sed script
+@end itemize
+
+
+
+@heading Version 0.17
+
+@itemize
+@item overworked documentation
+
+@item caches are cleared after simulation/matching has been calculated
+
+@item more comments
+@end itemize
+
+
+
+@heading Version 0.16
+
+@itemize
+@item cleaned and commented code
+
+@item tidied Makefiles
+
+@item added a testscript for linear programming translatation
+
+@item commented linear programming translation
+
+@item linear programming translation is by @command{lp_solve} library
+
+@item dramatically improved performance of @code{Matching::perms()} function
+@end itemize
+
+
+
+@heading Version 0.15
+
+@itemize
+@item added a linear programming calculation for simulation (@option{--mode=lpsim})
+
+@item the translation to linear programming bases on the algorithm presented in the paper "Simulation-based graph similarity" by Oleg Sokolsky et al. (TACAS 2006)
+
+@item added @command{lp_solve} (@url{http://lpsolve.sourceforge.net/5.5}) to the distributed and linked it as static library (see @file{src/lp_solve/README.txt} for more information)
+
+@item the @samp{--mode} parameter is now passed as enumeration from getopt
+@end itemize
+
+
+
+@heading Version 0.14
+
+@itemize
+@item added testscripts for @command{make check}
+
+@item cache for simulation is again handled by an STL map
+@end itemize
+
+
+
+@heading Version 0.13
+
+@itemize
+@item Tool is now called ``WS-Fix''
+
+@item first release at @url{http://www.informatik.uni-rostock.de/~nl/tools}
+
+@item added cycle detection
+@end itemize
+
+
+
+@heading Version 0.12
+
+@itemize
+@item Dot and @acronym{PNG,Portable Network Graphics} file is created when @option{--dot} parameter is used
+
+@item extension and path is cropped from filenames to avoid errors from Dot
+
+@item reorganized files: helper functions moved to @file{helper.cc/h}
+
+@item fixed header inclusion to allow compilation on Unix machines
+
+@item added a Texinfo documentation
+
+@item using C-style multidimensional arrays to cache simulation values
+
+@item some statistical output in the main function
+
+@item the cost functions are declared as inline functions
+@end itemize
+
+
+
+@heading Version 0.11
+
+@itemize
+@item removed Gnulib again and replaced it by @file{getopt1.c}, @file{getopt.c}, and @file{getopt.h}
+
+@item usage line is now generated by @acronym{GNU} Gengetopt
+
+@item a manpage is created using @command{help2man}
+
+@item values of the algorithm can be configured using the command line or a configuration file
+@end itemize
+
+
+
+@heading Version 0.10
+
+@itemize
+@item @acronym{GNU} Gengetopt is not needed to configure/make
+
+@item Automake's missing script is found
+
+@item included headers for @code{assert} macro
+
+@item tidied configure script
+
+@item using Gnulib -- The @acronym{GNU} Portability Library (@url{http://www.gnu.org/software/gnulib}) to provide @file{getopt.h}
+@end itemize
+
+
+
+@heading Version 0.9
+
+@itemize
+@item using @acronym{GNU} Gengetopt (@url{http://www.gnu.org/software/gengetopt}) to parse command line parameters
+
+@item added parameter @option{-h} for help
+
+@item added parameter @option{-V} for version information
+
+@item added parameter @option{-a} for automaton file
+
+@item added parameter @option{-o} for OG file
+
+@item added parameter @option{-m} to select mode (standard: @code{simulation})
+@end itemize
+
+
+
+@heading Version 0.8
+
+@itemize
+@item the edit actions are annotated to a graph and can be dotted
+@end itemize
+
+
+
+@heading Version 0.7
+
+@itemize
+@item new nodes are rather added than inserted
+
+@item nodes are only insered once
+
+@item nodes are rather deleted than merged
+
+@item newly added nodes are not considered in function @code{successor()} or @code{outEdges()}
+
+@item newly added nodes are dotted as dashed nodes
+@end itemize
+
+
+
+@heading Version 0.6
+
+@itemize
+@item implemented @code{isFinal()} check to test whether final satisfies a formula of the OG
+
+@item the root node is now read from file instead of being assumed to be @code{1}
+
+@item nodes are explicitly stored to allow future operations such as adding nodes
+@end itemize
+
+
+
+@heading Version 0.5
+
+@itemize
+@item matching now returns the action edit actions and outputs them
+
+@item added Doxygen configuration file
+
+@item reorgaized headers again (added headers for simulation)
+@end itemize
+
+
+
+@heading Version 0.4
+
+@itemize
+@item parsed annotations are now used for simulation and matching
+
+@item reorganized headers (split omnipresent @file{main.h})
+@end itemize
+
+
+
+@heading Version 0.3
+
+@itemize
+@item annotations are parsed, but not used for calculation
+
+@item Dot output for graphs implemented
+@end itemize
+
+
+
+@heading Version 0.2
+
+@itemize
+@item added parser for OG files (taken and adapted from Fiona (@url{http://www.informatik.hu-berlin.de/top/tools4bpel/fiona}))
+
+@item currently ignores the annotations, but already works for service automata (simulation checking)
+@end itemize
+
+
+
+@heading Version 0.1
+
+@itemize
+@item simulation implemented
+
+@item matching rudimentarily implemented
+
+@item using @acronym{GNU} autotools
+@end itemize

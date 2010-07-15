@@ -1,0 +1,558 @@
+PLACE
+	terminated.[1|1],
+	terminated.[2|1],
+	terminated.[1|2],
+	terminated.[2|2],
+	waiting.[1|1],
+	waiting.[2|1],
+	waiting.[1|2],
+	waiting.[2|2],
+	pending.<[1|1]|[2|1]|[2|1]>,
+	pending.<[2|2]|[1|2]|[1|2]>,
+	pending.<[1|2]|[1|1]|[1|1]>,
+	pending.<[2|1]|[1|1]|[1|1]>,
+	pending.<[2|2]|[2|1]|[2|1]>,
+	pending.<[1|2]|[2|2]|[2|2]>,
+	pending.<[2|1]|[2|2]|[2|2]>,
+	pending.<[1|1]|[1|2]|[1|2]>,
+	pending.<[1|1]|[2|1]|[2|2]>,
+	pending.<[1|1]|[1|2]|[2|2]>,
+	pending.<[1|2]|[2|2]|[2|1]>,
+	pending.<[1|2]|[1|1]|[2|1]>,
+	pending.<[2|2]|[1|2]|[1|1]>,
+	pending.<[2|2]|[2|1]|[1|1]>,
+	pending.<[2|1]|[2|2]|[1|2]>,
+	pending.<[2|1]|[1|1]|[1|2]>,
+	pending.<[1|1]|[1|2]|[2|1]>,
+	pending.<[2|1]|[1|1]|[2|2]>,
+	pending.<[1|2]|[2|2]|[1|1]>,
+	pending.<[1|1]|[2|1]|[1|2]>,
+	pending.<[1|2]|[1|1]|[2|2]>,
+	pending.<[2|1]|[2|2]|[1|1]>,
+	pending.<[2|2]|[2|1]|[1|2]>,
+	pending.<[2|2]|[1|2]|[2|1]>,
+	quiet.[1|1],
+	quiet.[2|1],
+	quiet.[1|2],
+	quiet.[2|2],
+	mailbox.<[1|1]|[2|1]|[2|1]>,
+	mailbox.<[1|2]|[2|2]|[2|2]>,
+	mailbox.<[2|1]|[2|2]|[2|2]>,
+	mailbox.<[2|1]|[1|1]|[1|1]>,
+	mailbox.<[1|1]|[1|2]|[1|2]>,
+	mailbox.<[1|2]|[1|1]|[1|1]>,
+	mailbox.<[2|2]|[2|1]|[2|1]>,
+	mailbox.<[2|2]|[1|2]|[1|2]>,
+	uninformed.<[2|2]|[1|1]>,
+	uninformed.<[1|1]|[2|2]>,
+	uninformed.<[1|2]|[2|1]>,
+	uninformed.<[2|1]|[1|2]>,
+	uninformed.<[2|1]|[1|1]>,
+	uninformed.<[1|2]|[1|1]>,
+	uninformed.<[1|2]|[2|2]>,
+	uninformed.<[2|1]|[2|2]>,
+	uninformed.<[2|2]|[1|2]>,
+	uninformed.<[2|2]|[2|1]>,
+	uninformed.<[1|1]|[2|1]>,
+	uninformed.<[1|1]|[1|2]>,
+	accepted.<[1|1]|[2|2]>,
+	accepted.<[1|2]|[2|1]>,
+	accepted.<[2|1]|[1|2]>,
+	accepted.<[2|2]|[1|1]>,
+	accepted.<[1|2]|[2|2]>,
+	accepted.<[2|1]|[2|2]>,
+	accepted.<[2|2]|[1|2]>,
+	accepted.<[2|2]|[2|1]>,
+	accepted.<[1|1]|[1|2]>,
+	accepted.<[1|1]|[2|1]>,
+	accepted.<[1|2]|[1|1]>,
+	accepted.<[2|1]|[1|1]>,
+	mailbox.<[2|2]|[1|2]|[2|2]>,
+	mailbox.<[1|1]|[2|1]|[1|1]>,
+	mailbox.<[2|2]|[2|1]|[2|2]>,
+	mailbox.<[2|1]|[2|2]|[2|1]>,
+	mailbox.<[1|2]|[1|1]|[1|2]>,
+	mailbox.<[2|1]|[1|1]|[2|1]>,
+	mailbox.<[1|2]|[2|2]|[1|2]>,
+	mailbox.<[1|1]|[1|2]|[1|1]>,
+	mailbox.<[1|1]|[2|1]|[2|2]>,
+	mailbox.<[1|1]|[1|2]|[2|2]>,
+	mailbox.<[2|2]|[1|2]|[1|1]>,
+	mailbox.<[2|1]|[2|2]|[1|2]>,
+	mailbox.<[1|2]|[1|1]|[2|1]>,
+	mailbox.<[2|1]|[1|1]|[1|2]>,
+	mailbox.<[2|2]|[2|1]|[1|1]>,
+	mailbox.<[1|2]|[2|2]|[2|1]>,
+	mailbox.<[1|2]|[2|2]|[1|1]>,
+	mailbox.<[1|2]|[1|1]|[2|2]>,
+	mailbox.<[2|1]|[2|2]|[1|1]>,
+	mailbox.<[1|1]|[1|2]|[2|1]>,
+	mailbox.<[2|2]|[2|1]|[1|2]>,
+	mailbox.<[2|2]|[1|2]|[2|1]>,
+	mailbox.<[1|1]|[2|1]|[1|2]>,
+	mailbox.<[2|1]|[1|1]|[2|2]>;
+MARKING
+	quiet.[1|1] : 1,
+	quiet.[2|1] : 1,
+	quiet.[1|2] : 1,
+	quiet.[2|2] : 1,
+	uninformed.<[2|2]|[1|1]> : 1,
+	uninformed.<[1|1]|[2|2]> : 1,
+	uninformed.<[1|2]|[2|1]> : 1,
+	uninformed.<[2|1]|[1|2]> : 1,
+	uninformed.<[2|1]|[1|1]> : 1,
+	uninformed.<[1|2]|[1|1]> : 1,
+	uninformed.<[1|2]|[2|2]> : 1,
+	uninformed.<[2|1]|[2|2]> : 1,
+	uninformed.<[2|2]|[1|2]> : 1,
+	uninformed.<[2|2]|[2|1]> : 1,
+	uninformed.<[1|1]|[2|1]> : 1,
+	uninformed.<[1|1]|[1|2]> : 1;
+TRANSITION t5.[x=[2|2]]
+	CONSUME
+		terminated.[2|2] : 1;
+	PRODUCE
+		quiet.[2|2] : 1;
+TRANSITION t5.[x=[1|2]]
+	CONSUME
+		terminated.[1|2] : 1;
+	PRODUCE
+		quiet.[1|2] : 1;
+TRANSITION t5.[x=[2|1]]
+	CONSUME
+		terminated.[2|1] : 1;
+	PRODUCE
+		quiet.[2|1] : 1;
+TRANSITION t5.[x=[1|1]]
+	CONSUME
+		terminated.[1|1] : 1;
+	PRODUCE
+		quiet.[1|1] : 1;
+TRANSITION t1.[x=[1|1]]
+	CONSUME
+		quiet.[1|1] : 1;
+	PRODUCE
+		mailbox.<[2|1]|[1|1]|[1|1]> : 1,
+		mailbox.<[1|2]|[1|1]|[1|1]> : 1,
+		waiting.[1|1] : 1;
+TRANSITION t1.[x=[2|1]]
+	CONSUME
+		quiet.[2|1] : 1;
+	PRODUCE
+		mailbox.<[1|1]|[2|1]|[2|1]> : 1,
+		mailbox.<[2|2]|[2|1]|[2|1]> : 1,
+		waiting.[2|1] : 1;
+TRANSITION t1.[x=[2|2]]
+	CONSUME
+		quiet.[2|2] : 1;
+	PRODUCE
+		mailbox.<[1|2]|[2|2]|[2|2]> : 1,
+		mailbox.<[2|1]|[2|2]|[2|2]> : 1,
+		waiting.[2|2] : 1;
+TRANSITION t1.[x=[1|2]]
+	CONSUME
+		quiet.[1|2] : 1;
+	PRODUCE
+		mailbox.<[2|2]|[1|2]|[1|2]> : 1,
+		mailbox.<[1|1]|[1|2]|[1|2]> : 1,
+		waiting.[1|2] : 1;
+TRANSITION t3.[s=[1|1]|x=[2|1]|z=[1|1]]
+	CONSUME
+		mailbox.<[2|1]|[1|1]|[1|1]> : 1,
+		uninformed.<[2|1]|[1|1]> : 1;
+	PRODUCE
+		pending.<[2|1]|[1|1]|[1|1]> : 1,
+		mailbox.<[2|2]|[2|1]|[1|1]> : 1;
+TRANSITION t3.[s=[1|1]|x=[1|2]|z=[1|1]]
+	CONSUME
+		mailbox.<[1|2]|[1|1]|[1|1]> : 1,
+		uninformed.<[1|2]|[1|1]> : 1;
+	PRODUCE
+		pending.<[1|2]|[1|1]|[1|1]> : 1,
+		mailbox.<[2|2]|[1|2]|[1|1]> : 1;
+TRANSITION t4.[s=[1|1]|x=[2|1]|z=[1|1]]
+	CONSUME
+		mailbox.<[2|1]|[2|2]|[1|1]> : 1,
+		pending.<[2|1]|[1|1]|[1|1]> : 1;
+	PRODUCE
+		mailbox.<[1|1]|[2|1]|[1|1]> : 1,
+		accepted.<[2|1]|[1|1]> : 1;
+TRANSITION t4.[s=[1|1]|x=[1|2]|z=[1|1]]
+	CONSUME
+		mailbox.<[1|2]|[2|2]|[1|1]> : 1,
+		pending.<[1|2]|[1|1]|[1|1]> : 1;
+	PRODUCE
+		mailbox.<[1|1]|[1|2]|[1|1]> : 1,
+		accepted.<[1|2]|[1|1]> : 1;
+TRANSITION t3.[s=[2|1]|x=[1|1]|z=[2|1]]
+	CONSUME
+		mailbox.<[1|1]|[2|1]|[2|1]> : 1,
+		uninformed.<[1|1]|[2|1]> : 1;
+	PRODUCE
+		pending.<[1|1]|[2|1]|[2|1]> : 1,
+		mailbox.<[1|2]|[1|1]|[2|1]> : 1;
+TRANSITION t3.[s=[1|2]|x=[1|1]|z=[2|1]]
+	CONSUME
+		mailbox.<[1|1]|[2|1]|[1|2]> : 1,
+		uninformed.<[1|1]|[1|2]> : 1;
+	PRODUCE
+		pending.<[1|1]|[2|1]|[1|2]> : 1,
+		mailbox.<[1|2]|[1|1]|[1|2]> : 1;
+TRANSITION t3.[s=[2|1]|x=[1|1]|z=[1|2]]
+	CONSUME
+		mailbox.<[1|1]|[1|2]|[2|1]> : 1,
+		uninformed.<[1|1]|[2|1]> : 1;
+	PRODUCE
+		pending.<[1|1]|[1|2]|[2|1]> : 1,
+		mailbox.<[2|1]|[1|1]|[2|1]> : 1;
+TRANSITION t3.[s=[1|2]|x=[1|1]|z=[1|2]]
+	CONSUME
+		mailbox.<[1|1]|[1|2]|[1|2]> : 1,
+		uninformed.<[1|1]|[1|2]> : 1;
+	PRODUCE
+		pending.<[1|1]|[1|2]|[1|2]> : 1,
+		mailbox.<[2|1]|[1|1]|[1|2]> : 1;
+TRANSITION t3.[s=[1|2]|x=[2|1]|z=[1|1]]
+	CONSUME
+		mailbox.<[2|1]|[1|1]|[1|2]> : 1,
+		uninformed.<[2|1]|[1|2]> : 1;
+	PRODUCE
+		pending.<[2|1]|[1|1]|[1|2]> : 1,
+		mailbox.<[2|2]|[2|1]|[1|2]> : 1;
+TRANSITION t3.[s=[2|1]|x=[1|2]|z=[1|1]]
+	CONSUME
+		mailbox.<[1|2]|[1|1]|[2|1]> : 1,
+		uninformed.<[1|2]|[2|1]> : 1;
+	PRODUCE
+		pending.<[1|2]|[1|1]|[2|1]> : 1,
+		mailbox.<[2|2]|[1|2]|[2|1]> : 1;
+TRANSITION t4.[s=[2|1]|x=[1|1]|z=[2|1]]
+	CONSUME
+		mailbox.<[1|1]|[1|2]|[2|1]> : 1,
+		pending.<[1|1]|[2|1]|[2|1]> : 1;
+	PRODUCE
+		mailbox.<[2|1]|[1|1]|[2|1]> : 1,
+		accepted.<[1|1]|[2|1]> : 1;
+TRANSITION t4.[s=[1|2]|x=[1|1]|z=[2|1]]
+	CONSUME
+		mailbox.<[1|1]|[1|2]|[1|2]> : 1,
+		pending.<[1|1]|[2|1]|[1|2]> : 1;
+	PRODUCE
+		mailbox.<[2|1]|[1|1]|[1|2]> : 1,
+		accepted.<[1|1]|[1|2]> : 1;
+TRANSITION t4.[s=[2|1]|x=[1|1]|z=[1|2]]
+	CONSUME
+		mailbox.<[1|1]|[2|1]|[2|1]> : 1,
+		pending.<[1|1]|[1|2]|[2|1]> : 1;
+	PRODUCE
+		mailbox.<[1|2]|[1|1]|[2|1]> : 1,
+		accepted.<[1|1]|[2|1]> : 1;
+TRANSITION t4.[s=[1|2]|x=[1|1]|z=[1|2]]
+	CONSUME
+		mailbox.<[1|1]|[2|1]|[1|2]> : 1,
+		pending.<[1|1]|[1|2]|[1|2]> : 1;
+	PRODUCE
+		mailbox.<[1|2]|[1|1]|[1|2]> : 1,
+		accepted.<[1|1]|[1|2]> : 1;
+TRANSITION t4.[s=[1|2]|x=[2|1]|z=[1|1]]
+	CONSUME
+		mailbox.<[2|1]|[2|2]|[1|2]> : 1,
+		pending.<[2|1]|[1|1]|[1|2]> : 1;
+	PRODUCE
+		mailbox.<[1|1]|[2|1]|[1|2]> : 1,
+		accepted.<[2|1]|[1|2]> : 1;
+TRANSITION t4.[s=[2|1]|x=[1|2]|z=[1|1]]
+	CONSUME
+		mailbox.<[1|2]|[2|2]|[2|1]> : 1,
+		pending.<[1|2]|[1|1]|[2|1]> : 1;
+	PRODUCE
+		mailbox.<[1|1]|[1|2]|[2|1]> : 1,
+		accepted.<[1|2]|[2|1]> : 1;
+TRANSITION t3.[s=[1|1]|x=[2|1]|z=[2|2]]
+	CONSUME
+		mailbox.<[2|1]|[2|2]|[1|1]> : 1,
+		uninformed.<[2|1]|[1|1]> : 1;
+	PRODUCE
+		pending.<[2|1]|[2|2]|[1|1]> : 1,
+		mailbox.<[1|1]|[2|1]|[1|1]> : 1;
+TRANSITION t3.[s=[1|1]|x=[1|2]|z=[2|2]]
+	CONSUME
+		mailbox.<[1|2]|[2|2]|[1|1]> : 1,
+		uninformed.<[1|2]|[1|1]> : 1;
+	PRODUCE
+		pending.<[1|2]|[2|2]|[1|1]> : 1,
+		mailbox.<[1|1]|[1|2]|[1|1]> : 1;
+TRANSITION t3.[s=[1|1]|x=[2|2]|z=[2|1]]
+	CONSUME
+		mailbox.<[2|2]|[2|1]|[1|1]> : 1,
+		uninformed.<[2|2]|[1|1]> : 1;
+	PRODUCE
+		pending.<[2|2]|[2|1]|[1|1]> : 1,
+		mailbox.<[1|2]|[2|2]|[1|1]> : 1;
+TRANSITION t3.[s=[2|2]|x=[1|1]|z=[2|1]]
+	CONSUME
+		mailbox.<[1|1]|[2|1]|[2|2]> : 1,
+		uninformed.<[1|1]|[2|2]> : 1;
+	PRODUCE
+		pending.<[1|1]|[2|1]|[2|2]> : 1,
+		mailbox.<[1|2]|[1|1]|[2|2]> : 1;
+TRANSITION t3.[s=[1|1]|x=[2|2]|z=[1|2]]
+	CONSUME
+		mailbox.<[2|2]|[1|2]|[1|1]> : 1,
+		uninformed.<[2|2]|[1|1]> : 1;
+	PRODUCE
+		pending.<[2|2]|[1|2]|[1|1]> : 1,
+		mailbox.<[2|1]|[2|2]|[1|1]> : 1;
+TRANSITION t3.[s=[2|2]|x=[1|1]|z=[1|2]]
+	CONSUME
+		mailbox.<[1|1]|[1|2]|[2|2]> : 1,
+		uninformed.<[1|1]|[2|2]> : 1;
+	PRODUCE
+		pending.<[1|1]|[1|2]|[2|2]> : 1,
+		mailbox.<[2|1]|[1|1]|[2|2]> : 1;
+TRANSITION t3.[s=[2|2]|x=[2|1]|z=[1|1]]
+	CONSUME
+		mailbox.<[2|1]|[1|1]|[2|2]> : 1,
+		uninformed.<[2|1]|[2|2]> : 1;
+	PRODUCE
+		pending.<[2|1]|[1|1]|[2|2]> : 1,
+		mailbox.<[2|2]|[2|1]|[2|2]> : 1;
+TRANSITION t3.[s=[2|2]|x=[1|2]|z=[1|1]]
+	CONSUME
+		mailbox.<[1|2]|[1|1]|[2|2]> : 1,
+		uninformed.<[1|2]|[2|2]> : 1;
+	PRODUCE
+		pending.<[1|2]|[1|1]|[2|2]> : 1,
+		mailbox.<[2|2]|[1|2]|[2|2]> : 1;
+TRANSITION t4.[s=[1|1]|x=[2|1]|z=[2|2]]
+	CONSUME
+		mailbox.<[2|1]|[1|1]|[1|1]> : 1,
+		pending.<[2|1]|[2|2]|[1|1]> : 1;
+	PRODUCE
+		mailbox.<[2|2]|[2|1]|[1|1]> : 1,
+		accepted.<[2|1]|[1|1]> : 1;
+TRANSITION t4.[s=[1|1]|x=[1|2]|z=[2|2]]
+	CONSUME
+		mailbox.<[1|2]|[1|1]|[1|1]> : 1,
+		pending.<[1|2]|[2|2]|[1|1]> : 1;
+	PRODUCE
+		mailbox.<[2|2]|[1|2]|[1|1]> : 1,
+		accepted.<[1|2]|[1|1]> : 1;
+TRANSITION t4.[s=[1|1]|x=[2|2]|z=[2|1]]
+	CONSUME
+		mailbox.<[2|2]|[1|2]|[1|1]> : 1,
+		pending.<[2|2]|[2|1]|[1|1]> : 1;
+	PRODUCE
+		mailbox.<[2|1]|[2|2]|[1|1]> : 1,
+		accepted.<[2|2]|[1|1]> : 1;
+TRANSITION t4.[s=[2|2]|x=[1|1]|z=[2|1]]
+	CONSUME
+		mailbox.<[1|1]|[1|2]|[2|2]> : 1,
+		pending.<[1|1]|[2|1]|[2|2]> : 1;
+	PRODUCE
+		mailbox.<[2|1]|[1|1]|[2|2]> : 1,
+		accepted.<[1|1]|[2|2]> : 1;
+TRANSITION t4.[s=[1|1]|x=[2|2]|z=[1|2]]
+	CONSUME
+		mailbox.<[2|2]|[2|1]|[1|1]> : 1,
+		pending.<[2|2]|[1|2]|[1|1]> : 1;
+	PRODUCE
+		mailbox.<[1|2]|[2|2]|[1|1]> : 1,
+		accepted.<[2|2]|[1|1]> : 1;
+TRANSITION t4.[s=[2|2]|x=[1|1]|z=[1|2]]
+	CONSUME
+		mailbox.<[1|1]|[2|1]|[2|2]> : 1,
+		pending.<[1|1]|[1|2]|[2|2]> : 1;
+	PRODUCE
+		mailbox.<[1|2]|[1|1]|[2|2]> : 1,
+		accepted.<[1|1]|[2|2]> : 1;
+TRANSITION t4.[s=[2|2]|x=[2|1]|z=[1|1]]
+	CONSUME
+		mailbox.<[2|1]|[2|2]|[2|2]> : 1,
+		pending.<[2|1]|[1|1]|[2|2]> : 1;
+	PRODUCE
+		mailbox.<[1|1]|[2|1]|[2|2]> : 1,
+		accepted.<[2|1]|[2|2]> : 1;
+TRANSITION t4.[s=[2|2]|x=[1|2]|z=[1|1]]
+	CONSUME
+		mailbox.<[1|2]|[2|2]|[2|2]> : 1,
+		pending.<[1|2]|[1|1]|[2|2]> : 1;
+	PRODUCE
+		mailbox.<[1|1]|[1|2]|[2|2]> : 1,
+		accepted.<[1|2]|[2|2]> : 1;
+TRANSITION t3.[s=[1|2]|x=[2|1]|z=[2|2]]
+	CONSUME
+		mailbox.<[2|1]|[2|2]|[1|2]> : 1,
+		uninformed.<[2|1]|[1|2]> : 1;
+	PRODUCE
+		pending.<[2|1]|[2|2]|[1|2]> : 1,
+		mailbox.<[1|1]|[2|1]|[1|2]> : 1;
+TRANSITION t3.[s=[2|1]|x=[1|2]|z=[2|2]]
+	CONSUME
+		mailbox.<[1|2]|[2|2]|[2|1]> : 1,
+		uninformed.<[1|2]|[2|1]> : 1;
+	PRODUCE
+		pending.<[1|2]|[2|2]|[2|1]> : 1,
+		mailbox.<[1|1]|[1|2]|[2|1]> : 1;
+TRANSITION t3.[s=[2|1]|x=[2|2]|z=[2|1]]
+	CONSUME
+		mailbox.<[2|2]|[2|1]|[2|1]> : 1,
+		uninformed.<[2|2]|[2|1]> : 1;
+	PRODUCE
+		pending.<[2|2]|[2|1]|[2|1]> : 1,
+		mailbox.<[1|2]|[2|2]|[2|1]> : 1;
+TRANSITION t3.[s=[1|2]|x=[2|2]|z=[2|1]]
+	CONSUME
+		mailbox.<[2|2]|[2|1]|[1|2]> : 1,
+		uninformed.<[2|2]|[1|2]> : 1;
+	PRODUCE
+		pending.<[2|2]|[2|1]|[1|2]> : 1,
+		mailbox.<[1|2]|[2|2]|[1|2]> : 1;
+TRANSITION t3.[s=[2|1]|x=[2|2]|z=[1|2]]
+	CONSUME
+		mailbox.<[2|2]|[1|2]|[2|1]> : 1,
+		uninformed.<[2|2]|[2|1]> : 1;
+	PRODUCE
+		pending.<[2|2]|[1|2]|[2|1]> : 1,
+		mailbox.<[2|1]|[2|2]|[2|1]> : 1;
+TRANSITION t3.[s=[1|2]|x=[2|2]|z=[1|2]]
+	CONSUME
+		mailbox.<[2|2]|[1|2]|[1|2]> : 1,
+		uninformed.<[2|2]|[1|2]> : 1;
+	PRODUCE
+		pending.<[2|2]|[1|2]|[1|2]> : 1,
+		mailbox.<[2|1]|[2|2]|[1|2]> : 1;
+TRANSITION t4.[s=[1|2]|x=[2|1]|z=[2|2]]
+	CONSUME
+		mailbox.<[2|1]|[1|1]|[1|2]> : 1,
+		pending.<[2|1]|[2|2]|[1|2]> : 1;
+	PRODUCE
+		mailbox.<[2|2]|[2|1]|[1|2]> : 1,
+		accepted.<[2|1]|[1|2]> : 1;
+TRANSITION t4.[s=[2|1]|x=[1|2]|z=[2|2]]
+	CONSUME
+		mailbox.<[1|2]|[1|1]|[2|1]> : 1,
+		pending.<[1|2]|[2|2]|[2|1]> : 1;
+	PRODUCE
+		mailbox.<[2|2]|[1|2]|[2|1]> : 1,
+		accepted.<[1|2]|[2|1]> : 1;
+TRANSITION t4.[s=[2|1]|x=[2|2]|z=[2|1]]
+	CONSUME
+		mailbox.<[2|2]|[1|2]|[2|1]> : 1,
+		pending.<[2|2]|[2|1]|[2|1]> : 1;
+	PRODUCE
+		mailbox.<[2|1]|[2|2]|[2|1]> : 1,
+		accepted.<[2|2]|[2|1]> : 1;
+TRANSITION t4.[s=[1|2]|x=[2|2]|z=[2|1]]
+	CONSUME
+		mailbox.<[2|2]|[1|2]|[1|2]> : 1,
+		pending.<[2|2]|[2|1]|[1|2]> : 1;
+	PRODUCE
+		mailbox.<[2|1]|[2|2]|[1|2]> : 1,
+		accepted.<[2|2]|[1|2]> : 1;
+TRANSITION t4.[s=[2|1]|x=[2|2]|z=[1|2]]
+	CONSUME
+		mailbox.<[2|2]|[2|1]|[2|1]> : 1,
+		pending.<[2|2]|[1|2]|[2|1]> : 1;
+	PRODUCE
+		mailbox.<[1|2]|[2|2]|[2|1]> : 1,
+		accepted.<[2|2]|[2|1]> : 1;
+TRANSITION t4.[s=[1|2]|x=[2|2]|z=[1|2]]
+	CONSUME
+		mailbox.<[2|2]|[2|1]|[1|2]> : 1,
+		pending.<[2|2]|[1|2]|[1|2]> : 1;
+	PRODUCE
+		mailbox.<[1|2]|[2|2]|[1|2]> : 1,
+		accepted.<[2|2]|[1|2]> : 1;
+TRANSITION t3.[s=[2|2]|x=[2|1]|z=[2|2]]
+	CONSUME
+		mailbox.<[2|1]|[2|2]|[2|2]> : 1,
+		uninformed.<[2|1]|[2|2]> : 1;
+	PRODUCE
+		pending.<[2|1]|[2|2]|[2|2]> : 1,
+		mailbox.<[1|1]|[2|1]|[2|2]> : 1;
+TRANSITION t3.[s=[2|2]|x=[1|2]|z=[2|2]]
+	CONSUME
+		mailbox.<[1|2]|[2|2]|[2|2]> : 1,
+		uninformed.<[1|2]|[2|2]> : 1;
+	PRODUCE
+		pending.<[1|2]|[2|2]|[2|2]> : 1,
+		mailbox.<[1|1]|[1|2]|[2|2]> : 1;
+TRANSITION t4.[s=[2|2]|x=[2|1]|z=[2|2]]
+	CONSUME
+		mailbox.<[2|1]|[1|1]|[2|2]> : 1,
+		pending.<[2|1]|[2|2]|[2|2]> : 1;
+	PRODUCE
+		mailbox.<[2|2]|[2|1]|[2|2]> : 1,
+		accepted.<[2|1]|[2|2]> : 1;
+TRANSITION t4.[s=[2|2]|x=[1|2]|z=[2|2]]
+	CONSUME
+		mailbox.<[1|2]|[1|1]|[2|2]> : 1,
+		pending.<[1|2]|[2|2]|[2|2]> : 1;
+	PRODUCE
+		mailbox.<[2|2]|[1|2]|[2|2]> : 1,
+		accepted.<[1|2]|[2|2]> : 1;
+TRANSITION t2.[x=[2|2]]
+	CONSUME
+		mailbox.<[2|2]|[1|2]|[2|2]> : 1,
+		mailbox.<[2|2]|[2|1]|[2|2]> : 1,
+		waiting.[2|2] : 1;
+	PRODUCE
+		terminated.[2|2] : 1;
+TRANSITION t2.[x=[1|2]]
+	CONSUME
+		mailbox.<[1|2]|[2|2]|[1|2]> : 1,
+		mailbox.<[1|2]|[1|1]|[1|2]> : 1,
+		waiting.[1|2] : 1;
+	PRODUCE
+		terminated.[1|2] : 1;
+TRANSITION t2.[x=[2|1]]
+	CONSUME
+		mailbox.<[2|1]|[1|1]|[2|1]> : 1,
+		mailbox.<[2|1]|[2|2]|[2|1]> : 1,
+		waiting.[2|1] : 1;
+	PRODUCE
+		terminated.[2|1] : 1;
+TRANSITION t2.[x=[1|1]]
+	CONSUME
+		mailbox.<[1|1]|[2|1]|[1|1]> : 1,
+		mailbox.<[1|1]|[1|2]|[1|1]> : 1,
+		waiting.[1|1] : 1;
+	PRODUCE
+		terminated.[1|1] : 1;
+TRANSITION t6.[x=[2|1]]
+	CONSUME
+		accepted.<[1|1]|[2|1]> : 1,
+		accepted.<[1|2]|[2|1]> : 1,
+		accepted.<[2|2]|[2|1]> : 1;
+	PRODUCE
+		uninformed.<[1|1]|[2|1]> : 1,
+		uninformed.<[1|2]|[2|1]> : 1,
+		uninformed.<[2|2]|[2|1]> : 1;
+TRANSITION t6.[x=[1|2]]
+	CONSUME
+		accepted.<[1|1]|[1|2]> : 1,
+		accepted.<[2|1]|[1|2]> : 1,
+		accepted.<[2|2]|[1|2]> : 1;
+	PRODUCE
+		uninformed.<[1|1]|[1|2]> : 1,
+		uninformed.<[2|1]|[1|2]> : 1,
+		uninformed.<[2|2]|[1|2]> : 1;
+TRANSITION t6.[x=[2|2]]
+	CONSUME
+		accepted.<[1|1]|[2|2]> : 1,
+		accepted.<[1|2]|[2|2]> : 1,
+		accepted.<[2|1]|[2|2]> : 1;
+	PRODUCE
+		uninformed.<[1|1]|[2|2]> : 1,
+		uninformed.<[1|2]|[2|2]> : 1,
+		uninformed.<[2|1]|[2|2]> : 1;
+TRANSITION t6.[x=[1|1]]
+	CONSUME
+		accepted.<[1|2]|[1|1]> : 1,
+		accepted.<[2|1]|[1|1]> : 1,
+		accepted.<[2|2]|[1|1]> : 1;
+	PRODUCE
+		uninformed.<[1|2]|[1|1]> : 1,
+		uninformed.<[2|1]|[1|1]> : 1,
+		uninformed.<[2|2]|[1|1]> : 1;

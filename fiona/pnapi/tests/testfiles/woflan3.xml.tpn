@@ -1,0 +1,113 @@
+place "i" init 1;
+place "o";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:InputCondition";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Split_Rebate / Commission Calculation Processing (4ou3)";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Join_Rebate / Commission Calculation Processing (4ou3)";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Split_Rebate Credit Memo (4ouh)";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Join_Rebate Credit Memo (4ouh)";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:outputCondition";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Yes_Rebate / Commission Calculation Processing (4ou3)*Rebate / Commission Calculation Processing (4ou3)";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate / Commission Calculation Processing (4ou3)*Credit Memo Request for Rebate Settlement (4otp)";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Credit Memo Request for Rebate Settlement (4otp)*Rebate Credit Memo (4ouh)";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate Credit Memo (4ouh)*Join_Yes_Rebate Credit Memo (4ouh)";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split:busy";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_No_Rebate / Commission Calculation Processing (4ou3):busy";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Yes_Rebate / Commission Calculation Processing (4ou3):busy";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Skip:busy";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate / Commission Calculation Processing (4ou3):busy";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Credit Memo Request for Rebate Settlement (4otp):busy";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate Credit Memo (4ouh):busy";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_No_Rebate Credit Memo (4ouh):busy";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Yes_Rebate Credit Memo (4ouh):busy";
+place "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Output:busy";
+trans "*:Model.4ose--0-----u--:Model.4ose--0-----u--:start"~"*:Model.4ose--0-----u--:Model.4ose--0-----u--:start"
+    in "i"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:InputCondition"
+;
+trans "*:Model.4ose--0-----u--:Model.4ose--0-----u--:end"~"*:Model.4ose--0-----u--:Model.4ose--0-----u--:end"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:outputCondition"
+   out "o"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Split:join:InputCondition"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Split:join:InputCondition"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:InputCondition"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split:busy"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Split:split:Split_Split_Rebate / Commission Calculation Processing (4ou3)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Split:split:Split_Split_Rebate / Commission Calculation Processing (4ou3)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split:busy"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Split_Rebate / Commission Calculation Processing (4ou3)"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_No_Rebate / Commission Calculation Processing (4ou3):join:Split_Split_Rebate / Commission Calculation Processing (4ou3)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_No_Rebate / Commission Calculation Processing (4ou3):join:Split_Split_Rebate / Commission Calculation Processing (4ou3)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Split_Rebate / Commission Calculation Processing (4ou3)"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_No_Rebate / Commission Calculation Processing (4ou3):busy"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_No_Rebate / Commission Calculation Processing (4ou3):split:Split_Join_Rebate / Commission Calculation Processing (4ou3)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_No_Rebate / Commission Calculation Processing (4ou3):split:Split_Join_Rebate / Commission Calculation Processing (4ou3)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_No_Rebate / Commission Calculation Processing (4ou3):busy"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Join_Rebate / Commission Calculation Processing (4ou3)"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Yes_Rebate / Commission Calculation Processing (4ou3):join:Split_Split_Rebate / Commission Calculation Processing (4ou3)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Yes_Rebate / Commission Calculation Processing (4ou3):join:Split_Split_Rebate / Commission Calculation Processing (4ou3)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Split_Rebate / Commission Calculation Processing (4ou3)"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Yes_Rebate / Commission Calculation Processing (4ou3):busy"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Yes_Rebate / Commission Calculation Processing (4ou3):split:Split_Join_Rebate / Commission Calculation Processing (4ou3):Split_Yes_Rebate / Commission Calculation Processing (4ou3)*Rebate / Commission Calculation Processing (4ou3)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Yes_Rebate / Commission Calculation Processing (4ou3):split:Split_Join_Rebate / Commission Calculation Processing (4ou3):Split_Yes_Rebate / Commission Calculation Processing (4ou3)*Rebate / Commission Calculation Processing (4ou3)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Yes_Rebate / Commission Calculation Processing (4ou3):busy"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Join_Rebate / Commission Calculation Processing (4ou3)"
+       "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Yes_Rebate / Commission Calculation Processing (4ou3)*Rebate / Commission Calculation Processing (4ou3)"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Skip:join:Split_Join_Rebate / Commission Calculation Processing (4ou3)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Skip:join:Split_Join_Rebate / Commission Calculation Processing (4ou3)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Join_Rebate / Commission Calculation Processing (4ou3)"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Skip:busy"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Skip:split:Join_Split_Rebate Credit Memo (4ouh)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Skip:split:Join_Split_Rebate Credit Memo (4ouh)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Skip:busy"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Split_Rebate Credit Memo (4ouh)"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate / Commission Calculation Processing (4ou3):join:Split_Yes_Rebate / Commission Calculation Processing (4ou3)*Rebate / Commission Calculation Processing (4ou3)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate / Commission Calculation Processing (4ou3):join:Split_Yes_Rebate / Commission Calculation Processing (4ou3)*Rebate / Commission Calculation Processing (4ou3)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Split_Yes_Rebate / Commission Calculation Processing (4ou3)*Rebate / Commission Calculation Processing (4ou3)"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate / Commission Calculation Processing (4ou3):busy"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate / Commission Calculation Processing (4ou3):split:Rebate / Commission Calculation Processing (4ou3)*Credit Memo Request for Rebate Settlement (4otp)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate / Commission Calculation Processing (4ou3):split:Rebate / Commission Calculation Processing (4ou3)*Credit Memo Request for Rebate Settlement (4otp)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate / Commission Calculation Processing (4ou3):busy"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate / Commission Calculation Processing (4ou3)*Credit Memo Request for Rebate Settlement (4otp)"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Credit Memo Request for Rebate Settlement (4otp):join:Rebate / Commission Calculation Processing (4ou3)*Credit Memo Request for Rebate Settlement (4otp)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Credit Memo Request for Rebate Settlement (4otp):join:Rebate / Commission Calculation Processing (4ou3)*Credit Memo Request for Rebate Settlement (4otp)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate / Commission Calculation Processing (4ou3)*Credit Memo Request for Rebate Settlement (4otp)"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Credit Memo Request for Rebate Settlement (4otp):busy"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Credit Memo Request for Rebate Settlement (4otp):split:Credit Memo Request for Rebate Settlement (4otp)*Rebate Credit Memo (4ouh)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Credit Memo Request for Rebate Settlement (4otp):split:Credit Memo Request for Rebate Settlement (4otp)*Rebate Credit Memo (4ouh)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Credit Memo Request for Rebate Settlement (4otp):busy"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Credit Memo Request for Rebate Settlement (4otp)*Rebate Credit Memo (4ouh)"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate Credit Memo (4ouh):join:Credit Memo Request for Rebate Settlement (4otp)*Rebate Credit Memo (4ouh)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate Credit Memo (4ouh):join:Credit Memo Request for Rebate Settlement (4otp)*Rebate Credit Memo (4ouh)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Credit Memo Request for Rebate Settlement (4otp)*Rebate Credit Memo (4ouh)"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate Credit Memo (4ouh):busy"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate Credit Memo (4ouh):split:Rebate Credit Memo (4ouh)*Join_Yes_Rebate Credit Memo (4ouh)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate Credit Memo (4ouh):split:Rebate Credit Memo (4ouh)*Join_Yes_Rebate Credit Memo (4ouh)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate Credit Memo (4ouh):busy"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate Credit Memo (4ouh)*Join_Yes_Rebate Credit Memo (4ouh)"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_No_Rebate Credit Memo (4ouh):join:Join_Split_Rebate Credit Memo (4ouh)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_No_Rebate Credit Memo (4ouh):join:Join_Split_Rebate Credit Memo (4ouh)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Split_Rebate Credit Memo (4ouh)"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_No_Rebate Credit Memo (4ouh):busy"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_No_Rebate Credit Memo (4ouh):split:Join_Join_Rebate Credit Memo (4ouh)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_No_Rebate Credit Memo (4ouh):split:Join_Join_Rebate Credit Memo (4ouh)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_No_Rebate Credit Memo (4ouh):busy"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Join_Rebate Credit Memo (4ouh)"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Yes_Rebate Credit Memo (4ouh):join:Rebate Credit Memo (4ouh)*Join_Yes_Rebate Credit Memo (4ouh):Join_Split_Rebate Credit Memo (4ouh)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Yes_Rebate Credit Memo (4ouh):join:Rebate Credit Memo (4ouh)*Join_Yes_Rebate Credit Memo (4ouh):Join_Split_Rebate Credit Memo (4ouh)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Rebate Credit Memo (4ouh)*Join_Yes_Rebate Credit Memo (4ouh)"
+       "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Split_Rebate Credit Memo (4ouh)"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Yes_Rebate Credit Memo (4ouh):busy"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Yes_Rebate Credit Memo (4ouh):split:Join_Join_Rebate Credit Memo (4ouh)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Yes_Rebate Credit Memo (4ouh):split:Join_Join_Rebate Credit Memo (4ouh)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Yes_Rebate Credit Memo (4ouh):busy"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Join_Rebate Credit Memo (4ouh)"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Output:join:Join_Join_Rebate Credit Memo (4ouh)"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Output:join:Join_Join_Rebate Credit Memo (4ouh)"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Join_Join_Rebate Credit Memo (4ouh)"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Output:busy"
+;
+trans "t:Model.4ose--0-----u--:Model.4ose--0-----u--:Output:split:outputCondition"~"t:Model.4ose--0-----u--:Model.4ose--0-----u--:Output:split:outputCondition"
+    in "p:Model.4ose--0-----u--:Model.4ose--0-----u--:Output:busy"
+   out "p:Model.4ose--0-----u--:Model.4ose--0-----u--:outputCondition"
+;
+

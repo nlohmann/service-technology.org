@@ -1,0 +1,325 @@
+{
+  generator:    Wendy 1.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy --formula=2bits --og --lola=../tools/lola/src/lola-full phcontrol3.unf.owfn 
+  events:       3 send, 3 receive, 0 synchronous
+  statistics:   67 nodes
+}
+
+INTERFACE
+  INPUT
+    interface_out_1, interface_out_2, interface_out_3;
+  OUTPUT
+    interface_in_1, interface_in_2, interface_in_3;
+
+NODES
+  143382024 :: S
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_1 -> 143381888
+    interface_in_2 -> 143379384
+    interface_in_3 -> 143456128
+  143375936
+    interface_out_1 -> 0
+    interface_out_2 -> 143455840
+    interface_out_3 -> 143377616
+  143377616
+    interface_out_1 -> 0
+    interface_out_2 -> 143456520
+    interface_out_3 -> 0
+  143379384
+    interface_out_1 -> 0
+    interface_out_2 -> 143429168
+    interface_out_3 -> 0
+    interface_in_1 -> 143469192
+    interface_in_3 -> 143440568
+  143380160
+    interface_out_1 -> 143381104
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+  143380216
+    interface_out_1 -> 0
+    interface_out_2 -> 143381104
+    interface_out_3 -> 0
+  143381104 :: F
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+  143381888
+    interface_out_1 -> 143411680
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_2 -> 143469192
+    interface_in_3 -> 143407192
+  143402424 :: S
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_2 -> 143466320
+  143402576
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 143468664
+  143407192
+    interface_out_1 -> 143459232
+    interface_out_2 -> 0
+    interface_out_3 -> 143455768
+  143407440
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 143440456
+    interface_in_1 -> 143432896
+  143409176
+    interface_out_1 -> 0
+    interface_out_2 -> 143475072
+    interface_out_3 -> 0
+    interface_in_3 -> 143473680
+  143411680 :: S
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_2 -> 143409176
+    interface_in_3 -> 143469296
+  143429168 :: S
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_1 -> 143433016
+    interface_in_3 -> 143407440
+  143430872
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 143456520
+  143431696
+    interface_out_1 -> 0
+    interface_out_2 -> 143495368
+    interface_out_3 -> 0
+    interface_in_1 -> 143496008
+  143432896
+    interface_out_1 -> 143443296
+    interface_out_2 -> 0
+    interface_out_3 -> 143450656
+  143433016
+    interface_out_1 -> 143449488
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_3 -> 143432896
+  143434776
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 143468664
+  143440320
+    interface_out_1 -> 143446936
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+  143440456 :: S
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_1 -> 143440320
+  143440568
+    interface_out_1 -> 0
+    interface_out_2 -> 143485136
+    interface_out_3 -> 143486432
+  143443296
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 143477160
+  143446936 :: F
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+  143449488 :: S
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_3 -> 143434776
+  143450288 :: S
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_1 -> 143457768
+    interface_in_2 -> 143431696
+  143450656
+    interface_out_1 -> 143477160
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+  143455768
+    interface_out_1 -> 143475552
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_2 -> 143482824
+  143455840
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 143456520
+  143456128
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 143450288
+    interface_in_1 -> 143407192
+    interface_in_2 -> 143440568
+  143456520 :: F
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+  143457224
+    interface_out_1 -> 0
+    interface_out_2 -> 143456520
+    interface_out_3 -> 0
+  143457768
+    interface_out_1 -> 143499424
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_2 -> 143496008
+  143458136
+    interface_out_1 -> 143476304
+    interface_out_2 -> 0
+    interface_out_3 -> 143450656
+  143459232
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 143475552
+    interface_in_2 -> 143375936
+  143460608 :: F
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+  143462056
+    interface_out_1 -> 0
+    interface_out_2 -> 143462616
+    interface_out_3 -> 0
+    interface_in_3 -> 143469752
+  143462616 :: S
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_3 -> 143470272
+  143462840
+    interface_out_1 -> 143462616
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_3 -> 143458136
+  143466320
+    interface_out_1 -> 0
+    interface_out_2 -> 143460608
+    interface_out_3 -> 0
+  143468664 :: F
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+  143469192
+    interface_out_1 -> 143462056
+    interface_out_2 -> 143462840
+    interface_out_3 -> 0
+  143469296
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 143402424
+    interface_in_2 -> 143473680
+  143469752
+    interface_out_1 -> 0
+    interface_out_2 -> 143430872
+    interface_out_3 -> 143457224
+  143470272
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 143468664
+  143473680
+    interface_out_1 -> 0
+    interface_out_2 -> 143455840
+    interface_out_3 -> 143457224
+  143475072 :: S
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_3 -> 143402576
+  143475552 :: S
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_2 -> 143480864
+  143476304
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 143477160
+  143477160 :: F
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+  143480864
+    interface_out_1 -> 0
+    interface_out_2 -> 143460608
+    interface_out_3 -> 0
+  143482824
+    interface_out_1 -> 143380216
+    interface_out_2 -> 143380160
+    interface_out_3 -> 0
+  143484264
+    interface_out_1 -> 0
+    interface_out_2 -> 143460608
+    interface_out_3 -> 0
+  143485136
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 143485736
+    interface_in_1 -> 143488968
+  143485736 :: S
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_1 -> 143486592
+  143486432
+    interface_out_1 -> 0
+    interface_out_2 -> 143485736
+    interface_out_3 -> 0
+    interface_in_1 -> 143489080
+  143486592
+    interface_out_1 -> 143446936
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+  143488968
+    interface_out_1 -> 143443296
+    interface_out_2 -> 0
+    interface_out_3 -> 143492560
+  143489080
+    interface_out_1 -> 143497296
+    interface_out_2 -> 143496624
+    interface_out_3 -> 0
+  143492560
+    interface_out_1 -> 143477160
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+  143495368 :: S
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_1 -> 143503464
+  143496008
+    interface_out_1 -> 143497296
+    interface_out_2 -> 143380160
+    interface_out_3 -> 0
+  143496624
+    interface_out_1 -> 143381104
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+  143497296
+    interface_out_1 -> 0
+    interface_out_2 -> 143381104
+    interface_out_3 -> 0
+  143499424 :: S
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_2 -> 143484264
+  143503464
+    interface_out_1 -> 143446936
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+  0
+    interface_out_1 -> 0
+    interface_out_2 -> 0
+    interface_out_3 -> 0
+    interface_in_1 -> 0
+    interface_in_2 -> 0
+    interface_in_3 -> 0

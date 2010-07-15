@@ -1,0 +1,42 @@
+{
+  generator:    Wendy 3.0 (x86_64-unknown-linux-gnu)
+  invocation:   wendy -v zeus.owfn --o=zeus.wendy.og
+  events:       2 send, 2 receive, 0 synchronous
+  statistics:   6 nodes
+}
+
+INTERFACE
+  INPUT
+    reject, accept;
+  OUTPUT
+    offer, invoice;
+
+NODES
+  28634432 : (invoice + offer)
+    reject -> 0
+    accept -> 0
+    offer -> 28619360
+    invoice -> 28613344
+  28589616 : accept * reject
+    reject -> 28613344
+    accept -> 28619824
+  28613344 : offer
+    reject -> 0
+    accept -> 0
+    offer -> 28589616
+  28619360 : (accept + invoice) * (invoice + reject)
+    reject -> 28634432
+    accept -> 28623152
+    invoice -> 28589616
+  28619824 : final
+    reject -> 0
+    accept -> 0
+  28623152 : invoice
+    reject -> 0
+    accept -> 0
+    invoice -> 28619824
+  0 : true
+    reject -> 0
+    accept -> 0
+    offer -> 0
+    invoice -> 0

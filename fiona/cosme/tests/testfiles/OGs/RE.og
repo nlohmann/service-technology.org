@@ -1,0 +1,66 @@
+{
+  generator:    Wendy 2.4-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy ../cosme/tests/Niels/RE.owfn --og --formula=bits --lola=src/lola-statespace 
+  events:       3 send, 3 receive, 0 synchronous
+  statistics:   10 nodes
+}
+
+INTERFACE
+  INPUT
+    a, b, c;
+  OUTPUT
+    x, y, z;
+
+NODES
+  152742208 :: S
+    a -> 0
+    b -> 0
+    c -> 0
+    x -> 152759416
+  152759416
+    a -> 152759888
+    b -> 152765112
+    c -> 152765456
+  152759888
+    a -> 0
+    b -> 152783064
+    c -> 0
+    y -> 152761336
+  152761272 :: F
+    a -> 0
+    b -> 0
+    c -> 0
+  152761336
+    a -> 0
+    b -> 152761272
+    c -> 0
+  152761472
+    a -> 152761272
+    b -> 0
+    c -> 0
+  152765112
+    a -> 152783064
+    b -> 0
+    c -> 0
+    y -> 152761472
+  152765456 :: F
+    a -> 0
+    b -> 0
+    c -> 0
+    z -> 152765520
+  152765520 :: F
+    a -> 0
+    b -> 0
+    c -> 0
+  152783064 :: S
+    a -> 0
+    b -> 0
+    c -> 0
+    y -> 152761272
+  0
+    a -> 0
+    b -> 0
+    c -> 0
+    x -> 0
+    y -> 0
+    z -> 0

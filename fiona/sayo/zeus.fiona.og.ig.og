@@ -1,0 +1,28 @@
+INTERFACE
+  INPUT
+    accept,
+    reject;
+  OUTPUT
+    invoice,
+    offer;
+
+NODES
+  0 : !offer : blue,
+  1 : (?reject * (!invoice + ?accept)) : blue,
+  2 : (?reject * ?accept) : blue,
+  3 : !offer : blue,
+  4 : final : blue : finalnode,
+  5 : !invoice : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 1 : !offer,
+  1 -> 0 : ?reject,
+  1 -> 2 : !invoice,
+  1 -> 5 : ?accept,
+  2 -> 3 : ?reject,
+  2 -> 4 : ?accept,
+  3 -> 2 : !offer,
+  5 -> 4 : !invoice;

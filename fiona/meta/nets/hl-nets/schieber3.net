@@ -1,0 +1,234 @@
+SORT 
+	Xcoos = [ 0 , 5 ];    { assume one add. space }
+	Ycoos = [ 0 , 6 ];   
+	Coos = RECORD
+		x : Xcoos;
+		y : Ycoos;
+	END;
+
+FUNCTION pair(xx : Xcoos; yy : Ycoos) : Coos
+
+VAR p : Coos;
+
+BEGIN
+	p . x = xx;
+	p . y = yy;
+	RETURN p
+END
+
+FUNCTION L(xx : Xcoos) : Xcoos
+BEGIN
+	RETURN xx - 1
+END
+FUNCTION R(xx : Xcoos) : Xcoos
+BEGIN
+	RETURN xx + 1
+END
+FUNCTION U(xx : Ycoos) : Ycoos
+BEGIN
+	RETURN xx - 1
+END
+FUNCTION D(xx : Ycoos) : Ycoos
+BEGIN
+	RETURN xx + 1
+END
+
+FUNCTION emptypairsl3() : Coos
+	VAR p : Coos;
+BEGIN
+	p . x = 2;
+	p . y = 5;
+	RETURN p;
+	p . x = 3;
+	p . y = 5;
+	RETURN p
+END
+FUNCTION singlepairsl3() : Coos
+	VAR p : Coos;
+BEGIN
+	p . x = 1;
+	p . y = 3;
+	RETURN p;
+	p . x = 1;
+	p . y = 4;
+	RETURN p;
+	p . x = 1;
+	p . y = 5;
+	RETURN p;
+	p . x = 2;
+	p . y = 4;
+	RETURN p;
+	p . x = 3;
+	p . y = 4;
+	RETURN p;
+	p . x = 4;
+	p . y = 3;
+	RETURN p;
+	p . x = 4;
+	p . y = 4;
+	RETURN p;
+	p . x = 4;
+	p . y = 5;
+	RETURN p
+END
+FUNCTION doublehorpairsl3() : Coos
+	VAR p : Coos;
+BEGIN
+	p . x = 2;
+	p . y = 3;
+	RETURN p
+END
+FUNCTION doublevertpairsl3() : Coos
+	VAR p : Coos;
+BEGIN
+	p . x = 1;
+	p . y = 1;
+	RETURN p;
+	p . x = 4;
+	p . y = 1;
+	RETURN p
+END
+FUNCTION quadpairsl3() : Coos
+	VAR p : Coos;
+BEGIN
+	p . x = 2;
+	p . y = 1;
+	RETURN p
+END
+
+ 
+
+{------------------------------------------------------------------------------------}
+{ Section 2: Specify actual net }
+
+PLACE SAFE : 
+empty : Coos , 
+single : Coos , 
+doublehor : Coos , 
+doublevert : Coos , 
+quad : Coos ; 
+
+{convention: position of large squares is given as upper left corner }
+
+
+MARKING empty : emptypairsl3(),
+	single : singlepairsl3(),
+	doublehor : doublehorpairsl3(),
+	doublevert : doublevertpairsl3(),
+	quad : quadpairsl3();
+
+
+TRANSITION singleup 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME single : pair( x , y),
+		empty : pair( x , U( y ));
+	PRODUCE single : pair(x , U(y)) , 
+		empty : pair( x , y );
+TRANSITION singledown 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME single : pair( x , y),
+		empty : pair( x , D( y ));
+	PRODUCE single : pair(x , D(y)) , 
+		empty : pair( x , y );
+TRANSITION singleleft 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME single : pair( x , y),
+		empty : pair( L(x) , y );
+	PRODUCE single : pair(L(x) , y) , 
+		empty : pair( x , y );
+TRANSITION singleright 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME single : pair( x , y),
+		empty : pair( R(x) , y);
+	PRODUCE single : pair(R(x) , y) , 
+		empty : pair( x , y );
+TRANSITION doublehorup 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME doublehor : pair( x , y),
+		empty : pair( x , U( y )),
+		empty : pair( R(x) , U( y ));
+	PRODUCE doublehor : pair(x , U(y)) , 
+		empty : pair( x , y ),
+		empty : pair( R(x) , y );
+TRANSITION doublehordown 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME doublehor : pair( x , y),
+		empty : pair( x , D( y )),
+		empty : pair( R(x) , D( y ));
+	PRODUCE doublehor : pair(x , D(y)) , 
+		empty : pair( x , y ),
+		empty : pair( R(x) , y );
+TRANSITION doublehorleft 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME doublehor : pair( x , y),
+		empty : pair( L(x) , y);
+	PRODUCE doublehor : pair(L(x) , y) , 
+		empty : pair( R(x) , y );
+TRANSITION doublehorright 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME doublehor : pair( x , y),
+		empty : pair( R(R(x)) , y );
+	PRODUCE doublehor : pair(R(x) , y) , 
+		empty : pair( x , y );
+TRANSITION doublevertup 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME doublevert : pair( x , y),
+		empty : pair( x , U( y ));
+	PRODUCE doublevert : pair(x , U(y)) , 
+		empty : pair( x , D(y) );
+TRANSITION doublevertdown 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME doublevert : pair( x , y),
+		empty : pair( x , D(D( y )));
+	PRODUCE doublevert : pair(x , D(y)) , 
+		empty : pair( x , y );
+TRANSITION doublevertleft 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME doublevert : pair( x , y),
+		empty : pair( L(x) , y ),
+		empty : pair( L(x) , D(y) );
+	PRODUCE doublevert : pair(L(x) , y) , 
+		empty : pair( x , y ),
+		empty : pair( x , D(y) );
+TRANSITION doublevertright 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME doublevert : pair( x , y),
+		empty : pair( R(x) , y),
+		empty : pair( R(x) , D(y));
+	PRODUCE doublevert : pair(R(x) , y) , 
+		empty : pair( x , y ),
+		empty : pair( x , D(y) );
+TRANSITION quadup 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME quad : pair( x , y),
+		empty : pair( x , U( y )),
+		empty : pair( R(x) , U( y ));
+	PRODUCE quad : pair(x , U(y)) , 
+		empty : pair( x , D(y) ),
+		empty : pair( R(x) , D(y) );
+TRANSITION quaddown 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME quad : pair( x , y),
+		empty : pair( x , D(D( y))),
+		empty : pair( R(x) , D(D( y)));
+	PRODUCE quad : pair(x , D(y)) , 
+		empty : pair( x , y ),
+		empty : pair( R(x) , y );
+TRANSITION quadleft 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME quad : pair( x , y),
+		empty : pair( L(x) , y ),
+		empty : pair( L(x) , D(y) );
+	PRODUCE quad : pair(L(x) , y) , 
+		empty : pair( R(x) , y ),
+		empty : pair( R(x) , D(y) );
+TRANSITION quadright 
+	VAR x : Xcoos; y : Ycoos;
+	CONSUME quad : pair( x , y),
+		empty : pair( R(R(x)) , y),
+		empty : pair( R(R(x)) , D(y));
+	PRODUCE quad : pair(R(x) , y) , 
+		empty : pair( x , y ),
+		empty : pair( x , D(y) );
+
+FORMULA quad.<2|4> = 1

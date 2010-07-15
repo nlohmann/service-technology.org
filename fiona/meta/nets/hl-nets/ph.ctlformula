@@ -1,0 +1,12 @@
+FORMULA 
+
+
+ALLPATH ALWAYS EXPATH EVENTUALLY  
+{ ea.2 > 0 AND ea.3 > 0  } { mutex } 
+
+{ ALL  x : phil : ( hr .  ( x ) > 0 OR  [ x = 2 ]  ) }
+
+{ ALL  x : phil : ( hl .  ( x ) > 0 )  }
+{ hl.1 > 0 }
+{ hr.1 > 0 }
+ALL  x : phil : ( ea .  ( x ) > 0 ) 

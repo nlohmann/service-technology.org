@@ -1,0 +1,98 @@
+#                             -*- compilation -*-
+5. testsuite.at:42: testing ...
+./testsuite.at:43: cp /home/jeed/workspace/cosme/tests/testfiles/OGs/AP.bits.og /home/jeed/workspace/cosme/tests/testfiles/Services/AP-partner.owfn .
+./testsuite.at:44: if test "/usr/local/bin/lola-statespace" == ""; then exit 77; fi
+./testsuite.at:45: wrap.sh /usr/bin/valgrind --leak-check=full --show-reachable=yes /home/jeed/workspace/cosme/src/cosme --matching -a AP.bits.og -c AP-partner.owfn --finalize
+stderr:
+==8264== Memcheck, a memory error detector
+==8264== Copyright (C) 2002-2009, and GNU GPL'd, by Julian Seward et al.
+==8264== Using Valgrind-3.6.0.SVN-Debian and LibVEX; rerun with -h for copyright info
+==8264== Command: /home/jeed/workspace/cosme/src/cosme --matching -a AP.bits.og -c AP-partner.owfn --finalize
+==8264== 
+cosme: Matching: completed
+==8264== Invalid read of size 4
+==8264==    at 0x51EA12B: std::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() (in /usr/lib/libstdc++.so.6.0.13)
+==8264==    by 0x592862F: __cxa_finalize (cxa_finalize.c:56)
+==8264==    by 0x4E71605: ??? (in /usr/local/lib/libpnapi.so.4.0.8)
+==8264==    by 0x4F12D30: ??? (in /usr/local/lib/libpnapi.so.4.0.8)
+==8264==    by 0x5928261: exit (exit.c:78)
+==8264==    by 0x590DC53: (below main) (libc-start.c:258)
+==8264==  Address 0x5c71670 is 16 bytes inside a block of size 34 free'd
+==8264==    at 0x4C26DCF: operator delete(void*) (vg_replace_malloc.c:387)
+==8264==    by 0x51EA128: std::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() (in /usr/lib/libstdc++.so.6.0.13)
+==8264==    by 0x5928261: exit (exit.c:78)
+==8264==    by 0x590DC53: (below main) (libc-start.c:258)
+==8264== 
+==8264== Invalid write of size 4
+==8264==    at 0x51EA131: std::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() (in /usr/lib/libstdc++.so.6.0.13)
+==8264==    by 0x592862F: __cxa_finalize (cxa_finalize.c:56)
+==8264==    by 0x4E71605: ??? (in /usr/local/lib/libpnapi.so.4.0.8)
+==8264==    by 0x4F12D30: ??? (in /usr/local/lib/libpnapi.so.4.0.8)
+==8264==    by 0x5928261: exit (exit.c:78)
+==8264==    by 0x590DC53: (below main) (libc-start.c:258)
+==8264==  Address 0x5c71670 is 16 bytes inside a block of size 34 free'd
+==8264==    at 0x4C26DCF: operator delete(void*) (vg_replace_malloc.c:387)
+==8264==    by 0x51EA128: std::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() (in /usr/lib/libstdc++.so.6.0.13)
+==8264==    by 0x5928261: exit (exit.c:78)
+==8264==    by 0x590DC53: (below main) (libc-start.c:258)
+==8264== 
+==8264== Invalid free() / delete / delete[]
+==8264==    at 0x4C26DCF: operator delete(void*) (vg_replace_malloc.c:387)
+==8264==    by 0x51EA128: std::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() (in /usr/lib/libstdc++.so.6.0.13)
+==8264==    by 0x592862F: __cxa_finalize (cxa_finalize.c:56)
+==8264==    by 0x4E71605: ??? (in /usr/local/lib/libpnapi.so.4.0.8)
+==8264==    by 0x4F12D30: ??? (in /usr/local/lib/libpnapi.so.4.0.8)
+==8264==    by 0x5928261: exit (exit.c:78)
+==8264==    by 0x590DC53: (below main) (libc-start.c:258)
+==8264==  Address 0x5c71660 is 0 bytes inside a block of size 34 free'd
+==8264==    at 0x4C26DCF: operator delete(void*) (vg_replace_malloc.c:387)
+==8264==    by 0x51EA128: std::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() (in /usr/lib/libstdc++.so.6.0.13)
+==8264==    by 0x5928261: exit (exit.c:78)
+==8264==    by 0x590DC53: (below main) (libc-start.c:258)
+==8264== 
+==8264== 
+==8264== HEAP SUMMARY:
+==8264==     in use at exit: 83 bytes in 2 blocks
+==8264==   total heap usage: 62,638 allocs, 62,638 frees, 4,072,583 bytes allocated
+==8264== 
+==8264== 34 bytes in 1 blocks are definitely lost in loss record 1 of 2
+==8264==    at 0x4C27CC1: operator new(unsigned long) (vg_replace_malloc.c:261)
+==8264==    by 0x51E8D98: std::string::_Rep::_S_create(unsigned long, unsigned long, std::allocator<char> const&) (in /usr/lib/libstdc++.so.6.0.13)
+==8264==    by 0x51E98B4: ??? (in /usr/lib/libstdc++.so.6.0.13)
+==8264==    by 0x51E9A52: std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, std::allocator<char> const&) (in /usr/lib/libstdc++.so.6.0.13)
+==8264==    by 0x4EFD7A6: global constructors keyed to petrinet.cc (petrinet.cc:216)
+==8264==    by 0x4F12D15: ??? (in /usr/local/lib/libpnapi.so.4.0.8)
+==8264==    by 0x4E6CD8A: ??? (in /usr/local/lib/libpnapi.so.4.0.8)
+==8264==    by 0x7FF000467: ???
+==8264==    by 0x736B726F772F6464: ???
+==8264==    by 0x736F632F6563616F: ???
+==8264==    by 0x632F6372732F656C: ???
+==8264==    by 0x6D2D2D00656D736E: ???
+==8264== 
+==8264== 49 bytes in 1 blocks are definitely lost in loss record 2 of 2
+==8264==    at 0x4C27CC1: operator new(unsigned long) (vg_replace_malloc.c:261)
+==8264==    by 0x51E8D98: std::string::_Rep::_S_create(unsigned long, unsigned long, std::allocator<char> const&) (in /usr/lib/libstdc++.so.6.0.13)
+==8264==    by 0x51E98B4: ??? (in /usr/lib/libstdc++.so.6.0.13)
+==8264==    by 0x51E9A52: std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, std::allocator<char> const&) (in /usr/lib/libstdc++.so.6.0.13)
+==8264==    by 0x4EFD776: global constructors keyed to petrinet.cc (petrinet.cc:213)
+==8264==    by 0x4F12D15: ??? (in /usr/local/lib/libpnapi.so.4.0.8)
+==8264==    by 0x4E6CD8A: ??? (in /usr/local/lib/libpnapi.so.4.0.8)
+==8264==    by 0x7FF000467: ???
+==8264==    by 0x736B726F772F6464: ???
+==8264==    by 0x736F632F6563616F: ???
+==8264==    by 0x632F6372732F656C: ???
+==8264==    by 0x6D2D2D00656D736E: ???
+==8264== 
+==8264== LEAK SUMMARY:
+==8264==    definitely lost: 83 bytes in 2 blocks
+==8264==    indirectly lost: 0 bytes in 0 blocks
+==8264==      possibly lost: 0 bytes in 0 blocks
+==8264==    still reachable: 0 bytes in 0 blocks
+==8264==         suppressed: 0 bytes in 0 blocks
+==8264== 
+==8264== For counts of detected and suppressed errors, rerun with: -v
+==8264== ERROR SUMMARY: 8 errors from 5 contexts (suppressed: 4 from 4)
+stdout:
+./testsuite.at:46: /bin/grep -q "All heap blocks were freed -- no leaks are possible" stderr
+./testsuite.at:46: exit code was 1, expected 0
+5. testsuite.at:42: 5. Checking for memory leaks (Matching) (testsuite.at:42): FAILED (testsuite.at:46)

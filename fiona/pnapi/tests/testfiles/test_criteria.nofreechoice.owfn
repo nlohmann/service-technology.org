@@ -1,0 +1,31 @@
+
+PLACE
+  INTERNAL
+    p1, p2, p3, p4, p5;
+  INPUT
+    ;
+  OUTPUT
+    ;
+    
+INITIALMARKING
+  ;
+
+FINALCONDITION
+  TRUE;
+  
+TRANSITION t1
+  CONSUME p1, p3;
+  PRODUCE p5;
+  
+TRANSITION t2
+  CONSUME p2, p4;
+  PRODUCE p5;
+  
+TRANSITION t3
+  CONSUME p1, p2, p3, p4;
+  PRODUCE p5;
+  
+TRANSITION t4
+  CONSUME p2, p4;
+  PRODUCE p5;
+

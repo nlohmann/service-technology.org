@@ -1,0 +1,5 @@
+INTERFACE
+  INPUT
+    b;
+  OUTPUT
+    a;

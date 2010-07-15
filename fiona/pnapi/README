@@ -1,0 +1,44 @@
+             ____      _        _   _   _      _        _    ____ ___ 
+            |  _ \ ___| |_ _ __(_) | \ | | ___| |_     / \  |  _ \_ _|
+            | |_) / _ \ __| '__| | |  \| |/ _ \ __|   / _ \ | |_) | | 
+            |  __/  __/ |_| |  | | | |\  |  __/ |_   / ___ \|  __/| | 
+            |_|   \___|\__|_|  |_| |_| \_|\___|\__| /_/   \_\_|  |___|
+              encapsulating Petri net-related functions in a C++ API
+                        http://service-technology.org/pnapi
+
+
+COPYRIGHT
+    Copyright (C) 2009       Stephan Mennicke, Christian Sura, and
+                             Robert Walthemath
+
+    Copyright (C) 2008       Niels Lohmann
+
+    Copyright (C) 2006, 2007 Niels Lohmann, Christian Gierds, and
+                             Martin Znamirowski
+
+    Copyright (C) 2005       Niels Lohmann and Christian Gierds
+
+
+AUTHOR
+    The Petri Net API is written by Stephan Mennicke, Christian Sura, and
+    Robert Waltemath, based on code taken from GNU BPEL2oWFN written by
+    Niels Lohmann, Christian Gierds, and Martin Znamirowski. See file
+    "AUTHORS" for more information.
+
+
+LICENSE
+    License LGPLv3+: GNU Lesser General Public License version 3 or later
+    <http://www.gnu.org/licenses/lgpl.html>
+
+    The Petri Net API is free software: you are free to change and
+    redistribute it. There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of the Petri Net API.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION
+
+
+DOCUMENTATION

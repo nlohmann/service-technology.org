@@ -1,0 +1,8 @@
+hello (YYYYYYYY-1) hardy; urgency=low
+
+  * Maintainer package release of Hello 1.0-unreleased (Revision 5750M).
+    See the file ChangeLog at
+    <http://service-technology.org/files/hello/ChangeLog>
+    for more information.
+
+ -- Niels Lohmann <niels.lohmann@uni-rostock.de>  XXXXXXXX

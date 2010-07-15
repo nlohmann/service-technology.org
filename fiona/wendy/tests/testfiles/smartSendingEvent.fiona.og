@@ -1,0 +1,36 @@
+{
+  generator:    Wendy 1.9-unreleased (i686-pc-cygwin)
+  invocation:   wendy tests/testfiles/smartSendingEvent.owfn -v --smartSendingEvent --fionaFormat --og 
+  events:       1 send, 2 receive, 0 synchronous
+  statistics:   4 nodes
+}
+
+INTERFACE
+  INPUT
+    b,
+    c;
+  OUTPUT
+    a;
+
+NODES
+  0 :  true,
+  16208600 : final,
+  16210472 : ?c,
+  16212344 : ?b,
+  16248888 : (?b + ?c);
+
+INITIALNODE
+  16248888;
+
+TRANSITIONS
+  16208600 -> 0 : ?b,
+  16208600 -> 0 : ?c,
+  16210472 -> 0 : ?b,
+  16210472 -> 16208600 : ?c,
+  16212344 -> 16208600 : ?b,
+  16212344 -> 0 : ?c,
+  16248888 -> 16210472 : ?b,
+  16248888 -> 16212344 : ?c,
+  0 -> 0 : ?b,
+  0 -> 0 : ?c,
+  0 -> 0 : !a;

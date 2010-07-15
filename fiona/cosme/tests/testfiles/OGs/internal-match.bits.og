@@ -1,0 +1,18 @@
+{
+  generator:    Wendy 3.0-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy internal_match.owfn --og
+  events:       2 send, 0 receive, 0 synchronous
+  statistics:   3 nodes
+}
+
+INTERFACE
+  OUTPUT
+    a, b;
+
+NODES
+  167017224 :: S
+    a -> 167037112
+    b -> 167029008
+  167029008 :: F
+  167037112 :: F
+

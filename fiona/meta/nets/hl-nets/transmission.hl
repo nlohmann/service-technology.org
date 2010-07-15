@@ -1,0 +1,125 @@
+SORT data = [ 101 , 120 ] ;
+     int = [ 1 , 20 ] ;
+     packet = RECORD 
+		num : int ;
+		dat : data ;
+	      END ;
+    dot = [ 1 , 1 ];
+	bo = BOOLEAN ;
+
+FUNCTION max ( a , b : int ) : int
+BEGIN
+	IF a > b THEN RETURN a ELSE RETURN b END
+END
+
+FUNCTION twodots() : dot
+BEGIN
+	RETURN 1;
+	RETURN 1
+END
+
+FUNCTION halfdot(b : bo) : dot
+BEGIN
+	IF NOT b THEN RETURN 1 END
+END
+
+FUNCTION fulldot() : dot
+BEGIN
+	RETURN 1
+END
+
+FUNCTION makepacket ( a : int ; d : data ) : packet
+VAR p : packet;
+BEGIN
+	p . num = a ;
+	p . dat = d ;
+	RETURN p
+END
+
+FUNCTION makep ( a : int ; d : data ; n : int ; k : int) : packet
+VAR p : packet;
+BEGIN
+	p . num = a ;
+	p . dat = d ;
+	IF n = k THEN RETURN p END
+END
+
+FUNCTION halfpacket (p : packet ; b : bo) : packet
+BEGIN
+	IF b THEN RETURN p END
+END
+
+FUNCTION halfint (n : int ; b : bo) : int
+BEGIN
+	IF b THEN RETURN n END
+END
+
+FUNCTION halfsucc (n : int; k : int) : int
+BEGIN
+	IF n = k THEN RETURN k + 1 ELSE RETURN k END
+END
+
+FUNCTION succ (i : int ; k : int ; n : int ) : int
+BEGIN
+	IF n = k THEN RETURN i + 1 ELSE RETURN i END
+END
+
+FUNCTION allpackages() : packet
+VAR i : int ;
+    k : int ;
+BEGIN
+	k = i - 1;
+	FOR ALL i DO IF i # k THEN RETURN makepacket ( i , i + 100 ) END END
+END
+
+FUNCTION one() : int
+BEGIN
+	RETURN 1 
+END
+
+
+PLACE send : packet , 
+	nextsend : int ,
+	limit : dot ,
+	A : packet ,
+	B : packet ,
+	C : int ,
+	D : int ,
+	nextrec : int ,
+	index : int,
+	received : packet ;
+
+
+MARKING
+	send : allpackages () ,
+	nextsend : one(),
+	limit : twodots() ,
+	nextrec : one (),
+	index : one();
+
+TRANSITION senddata
+VAR n : int ; d : data ;
+CONSUME send : makepacket ( n , d ) , nextsend : n , limit : fulldot() ;
+PRODUCE send : makepacket ( n , d ) , nextsend : n , A : makepacket ( n , d ) ; 
+
+TRANSITION recack
+VAR k , n : int ;
+CONSUME nextsend : k , D : n ;
+PRODUCE nextsend : max ( k , n ) , limit : fulldot() ;
+
+TRANSITION transdata
+VAR p : packet ; b : bo ;
+CONSUME A : p ;
+PRODUCE B : halfpacket ( p , b ) , limit : halfdot(b);
+
+TRANSITION transack
+VAR n : int ; b : bo ;
+CONSUME C : n ;
+PRODUCE D : halfint ( n , b ) , limit : halfdot(b);
+
+TRANSITION recdata
+VAR i : int ; n : int ; k : int ; d : data ;
+GUARD i < n + 2 AND k < n + 2 AND n < k + 2 AND n < i + 2
+CONSUME 
+B : makepacket( n , d ) , nextrec : k , index : i;
+PRODUCE received : makep( i , d , n , k) , nextrec : halfsucc ( n , k  ) , index : succ ( i ,n , k) , C : halfsucc ( n , k  ) ;

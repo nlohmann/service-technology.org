@@ -1,0 +1,35 @@
+PLACE
+  INTERNAL
+    p1, p2, p3;
+
+  INPUT
+    r, a, d, e;
+
+  OUTPUT
+    s, b, c, f;
+
+INITIALMARKING;
+
+FINALCONDITION
+  (ALL_PLACES_EMPTY);
+
+
+TRANSITION t1
+  CONSUME r, a;
+  PRODUCE p1;
+
+TRANSITION t2
+  CONSUME p1;
+  PRODUCE p2, c;
+
+TRANSITION t3
+  CONSUME p1;
+  PRODUCE p3, b;
+
+TRANSITION t4
+  CONSUME p2, e;
+  PRODUCE s;
+
+TRANSITION t5
+  CONSUME p3, d;
+  PRODUCE s;

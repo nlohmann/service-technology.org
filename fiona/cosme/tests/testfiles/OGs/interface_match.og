@@ -1,0 +1,17 @@
+INTERFACE
+  INPUT
+    b;
+  OUTPUT
+    a;
+
+NODES
+  0 :: S
+		a -> 1
+		b -> 4
+  1
+		b -> 2
+  2 :: F
+		b -> 4
+  4
+		a -> 4
+		b -> 4

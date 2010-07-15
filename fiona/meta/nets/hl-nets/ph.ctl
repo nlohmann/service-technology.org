@@ -1,0 +1,1 @@
+FORMULA ALLPATH [  ea.1 = 0 UNTIL hl.1 > 0 ]

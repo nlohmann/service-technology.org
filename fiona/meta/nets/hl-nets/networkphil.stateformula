@@ -1,0 +1,7 @@
+FORMULA  
+
+critical.[1|1]  
+> 0 AND 
+critical.[1|2]  > 0 
+
+

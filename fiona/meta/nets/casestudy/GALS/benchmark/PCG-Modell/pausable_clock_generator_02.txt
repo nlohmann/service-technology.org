@@ -1,0 +1,145 @@
+{Pausable Clock Generator des zweiten Wrappers (unverändert zu dem im ersten)}
+
+{01: konkret, unreduziert}
+{02: alle Komponenten zu einem Modul zusammengefasst; abstrahiert:}
+{      * STOPI- löst anfangs LCLK+}
+{      * danach werden durch Marke auf internem LCLK-Flankenplatz LCLK-Flanken}
+{        erzeugt}
+{      * STOPI+ bei LCLK=0 konsumiert interne LCLK-Flankenmarke und stoppt so}
+{        weitere Produktion von LCLK-Flanke}
+{      * Mutex-Verhalten durch herkömmliches Lesen von Pegeln realisiert}
+
+PLACE
+    pcg.p.STOPI,
+    pcg.p.n_STOPI,
+    pcg.p.REQI1,
+    pcg.p.n_REQI1,
+    pcg.p.STRETCH,
+    pcg.p.n_STRETCH,
+    pcg.p.ACKI1,
+    pcg.p.n_ACKI1,
+    pcg.p.LCLK,
+    pcg.p.n_LCLK,
+    pcg.p.LCLK_intern,
+    pcg.p.n_LCLK_intern,
+    pcg.p.pegel_STOPI_0,
+    pcg.p.pegel_STOPI_1,
+    pcg.p.pegel_REQI1_0,
+    pcg.p.pegel_REQI1_1,
+    pcg.p.pegel_STRETCH_0,
+    pcg.p.pegel_STRETCH_1,
+    pcg.p.pegel_LCLK_0,
+    pcg.p.pegel_LCLK_1;
+    
+
+
+MARKING
+    pcg.p.n_STOPI: 1,
+    pcg.p.n_REQI1: 1,
+    pcg.p.n_STRETCH: 1,
+    pcg.p.n_ACKI1: 1,
+    pcg.p.n_LCLK: 1,
+    pcg.p.n_LCLK_intern: 1,
+    pcg.p.pegel_STOPI_1: 1, {STOPI initial 1}
+    pcg.p.pegel_REQI1_0: 1,
+    pcg.p.pegel_STRETCH_0: 1,
+    pcg.p.pegel_LCLK_0: 1;
+
+
+{STOPI-Flanke}
+
+{STOPI- startet Generierung von LCLK-Flanken falls nicht verhindert durch}
+{REQI1=1 oder STRETCH=1}
+TRANSITION pcg.t.STOPI-
+CONSUME pcg.p.STOPI: 1, pcg.p.pegel_STOPI_1: 1,pcg.p.pegel_LCLK_0: 1,
+        pcg.p.pegel_REQI1_0: 1, pcg.p.pegel_STRETCH_0: 1, pcg.p.n_LCLK: 1,
+        pcg.p.n_LCLK_intern: 1;
+PRODUCE pcg.p.n_STOPI: 1, pcg.p.pegel_STOPI_0: 1, pcg.p.pegel_LCLK_1: 1,
+        pcg.p.pegel_REQI1_0: 1, pcg.p.pegel_STRETCH_0: 1, pcg.p.LCLK: 1,
+        pcg.p.LCLK_intern: 1;
+
+{STOPI+ stoppt Generierung von LCLK-Flanken; entfernt Flankenmarke von}
+{internem LCLK-Flankenplatz}
+TRANSITION pcg.t.STOPI+
+CONSUME pcg.p.STOPI: 1, pcg.p.pegel_STOPI_0: 1, pcg.p.pegel_LCLK_0: 1,
+        pcg.p.LCLK_intern: 1;
+PRODUCE pcg.p.n_STOPI: 1, pcg.p.pegel_STOPI_1: 1, pcg.p.pegel_LCLK_0: 1,
+        pcg.p.n_LCLK_intern: 1;
+
+
+{LCLK_intern-Flanke}
+
+{LCLK+ wird erzeugt, wenn weder STOPI=1 noch REQI1=1 noch STRETCH=1 das}
+{verhindern}
+TRANSITION pcg.t.LCLK+
+CONSUME pcg.p.LCLK_intern: 1, pcg.p.pegel_LCLK_0: 1, pcg.p.pegel_STOPI_0: 1,
+        pcg.p.pegel_REQI1_0: 1, pcg.p.pegel_STRETCH_0: 1, pcg.p.n_LCLK: 1;
+PRODUCE pcg.p.LCLK_intern: 1, pcg.p.pegel_LCLK_1: 1, pcg.p.pegel_STOPI_0: 1,
+        pcg.p.pegel_REQI1_0: 1, pcg.p.pegel_STRETCH_0: 1, pcg.p.LCLK: 1;
+
+{LCLK- wird erzeugt, wenn STOPI=1 das nicht verhindert}
+TRANSITION pcg.t.LCLK-
+CONSUME pcg.p.LCLK_intern: 1, pcg.p.pegel_LCLK_1: 1, pcg.p.pegel_STOPI_0: 1,
+        pcg.p.n_LCLK: 1;
+PRODUCE pcg.p.LCLK_intern: 1, pcg.p.pegel_LCLK_0: 1, pcg.p.pegel_STOPI_0: 1,
+        pcg.p.LCLK: 1;
+
+
+{REQI1-Flanke}
+
+{ACKI1+ wird erzeugt, wenn LCLK=1 das nicht verhindert}
+TRANSITION pcg.t.REQI1+
+CONSUME pcg.p.REQI1: 1, pcg.p.pegel_REQI1_0: 1, pcg.p.pegel_LCLK_0: 1,
+        pcg.p.n_ACKI1: 1;
+PRODUCE pcg.p.n_REQI1: 1, pcg.p.pegel_REQI1_1: 1, pcg.p.pegel_LCLK_0: 1,
+        pcg.p.ACKI1: 1;
+
+TRANSITION pcg.t.REQI1-
+CONSUME pcg.p.REQI1: 1, pcg.p.pegel_REQI1_1: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.p.n_REQI1: 1, pcg.p.pegel_REQI1_0: 1, pcg.p.ACKI1: 1;
+
+
+{STRETCH-Flanke}
+
+{STRETCH analog zu REQI1}
+TRANSITION pcg.t.STRETCH+
+CONSUME pcg.p.STRETCH: 1, pcg.p.pegel_STRETCH_0: 1, pcg.p.pegel_LCLK_0: 1;
+PRODUCE pcg.p.n_STRETCH: 1, pcg.p.pegel_STRETCH_1: 1, pcg.p.pegel_LCLK_0: 1;
+
+TRANSITION pcg.t.STRETCH-
+CONSUME pcg.p.STRETCH: 1, pcg.p.pegel_STRETCH_1: 1;
+PRODUCE pcg.p.n_STRETCH: 1, pcg.p.pegel_STRETCH_0: 1;
+
+
+
+
+{Anbindung an die Außenwelt}
+
+{STOPI produzieren}
+TRANSITION pcg.t.STOPI
+CONSUME pcg.p.n_STOPI: 1;
+PRODUCE pcg.p.STOPI: 1;
+
+{REQI1 produzieren}
+TRANSITION pcg.t.REQI1
+CONSUME pcg.p.n_REQI1: 1;
+PRODUCE pcg.p.REQI1: 1;
+
+{STRETCH produzieren}
+TRANSITION pcg.t.STRETCH
+CONSUME pcg.p.n_STRETCH: 1;
+PRODUCE pcg.p.STRETCH: 1;
+
+{ACKI1 abräumen}
+TRANSITION pcg.t.ACKI1
+CONSUME pcg.p.ACKI1: 1;
+PRODUCE pcg.p.n_ACKI1: 1;
+
+{LCLK abräumen}
+TRANSITION pcg.t.LCLK
+CONSUME pcg.p.LCLK: 1;
+PRODUCE pcg.p.n_LCLK: 1;
+
+
+
+{ vim: set ft=lola: }

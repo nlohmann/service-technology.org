@@ -1,0 +1,27 @@
+{ sequence_unnormal.owfn }
+
+PLACE
+  INTERNAL
+    p1, p2, p3;
+
+  INPUT
+    a;
+
+  OUTPUT
+    b, x;
+
+INITIALMARKING
+  p1 : 1;
+
+FINALCONDITION
+  (p1 = 0 AND p2 = 0 AND p3 > 0);
+
+TRANSITION t1
+  CONSUME p1, a;
+  PRODUCE p2, x;
+
+TRANSITION t2
+  CONSUME p2;
+  PRODUCE p3, b;
+
+{ END OF FILE '' }

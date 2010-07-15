@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<pnml>
+<module>
+<ports>
+<port id="node2">
+<name>
+<text>
+p1</text>
+</name>
+<graphics>
+<position x="30.25" y="126.25"/>
+<dimension x="38.5" y="228.5"/>
+<fill color="#f2f2f2"/>
+</graphics>
+<input id="node0">
+<name>
+<text>
+Euro</text>
+</name>
+<graphics>
+<position x="20.75" y="20.75"/>
+<dimension x="17.5" y="17.5"/>
+</graphics>
+</input>
+<output id="node1">
+<name>
+<text>
+B</text>
+</name>
+<graphics>
+<position x="19.75" y="211.75"/>
+<dimension x="17.5" y="17.5"/>
+</graphics>
+</output>
+</port>
+<port id="node5">
+<name>
+<text>
+User decision</text>
+</name>
+<graphics>
+<position x="95.25" y="106.25"/>
+<dimension x="50.5" y="55.5"/>
+<fill color="#f2f2f2"/>
+</graphics>
+<synchronous id="node3">
+<name>
+<text>
+T</text>
+</name>
+<graphics>
+<position x="95.5" y="105.25"/>
+<dimension x="10.0" y="17.5"/>
+</graphics>
+</synchronous>
+<synchronous id="node4">
+<name>
+<text>
+C</text>
+</name>
+<graphics>
+<position x="75.0" y="87.25"/>
+<dimension x="10.0" y="17.5"/>
+</graphics>
+</synchronous>
+</port>
+</ports>
+<net id="net1" type="http://www.pnml.org/version-2009/grammar/pnmlcoremodel">
+<name>
+<text>
+Petri net Empty net (imported from cyclicFullCoffee.pnml)</text>
+</name>
+<page id="node6">
+<name>
+<text>
+Page 1</text>
+</name>
+<graphics>
+<position x="219.25" y="133.25"/>
+<dimension x="116.5" y="244.5"/>
+<fill color="#f2f2f2"/>
+</graphics>
+<place id="node7">
+<name>
+<text>
+p0</text>
+</name>
+<graphics>
+<position x="247.75" y="19.75"/>
+<dimension x="17.5" y="17.5"/>
+</graphics>
+<initialMarking>
+<text>
+1</text>
+</initialMarking>
+</place>
+<place id="node8">
+<name>
+<text>
+p1</text>
+</name>
+<graphics>
+<position x="200.25" y="56.75"/>
+<dimension x="17.5" y="17.5"/>
+</graphics>
+</place>
+<place id="node9">
+<name>
+<text>
+p2</text>
+</name>
+<graphics>
+<position x="170.75" y="130.25"/>
+<dimension x="17.5" y="17.5"/>
+</graphics>
+</place>
+<place id="node10">
+<name>
+<text>
+p3</text>
+</name>
+<graphics>
+<position x="219.75" y="146.75"/>
+<dimension x="17.5" y="17.5"/>
+</graphics>
+</place>
+<place id="node11">
+<name>
+<text>
+p4</text>
+</name>
+<graphics>
+<position x="193.75" y="224.75"/>
+<dimension x="17.5" y="17.5"/>
+</graphics>
+</place>
+<transition id="node12">
+<name>
+<text>
+t1</text>
+</name>
+<graphics>
+<position x="200.0" y="21.0"/>
+<dimension x="20.0" y="20.0"/>
+</graphics>
+<receive idref="node0"/>
+</transition>
+<transition id="node13">
+<name>
+<text>
+t2</text>
+</name>
+<graphics>
+<position x="171.0" y="88.0"/>
+<dimension x="20.0" y="20.0"/>
+</graphics>
+<synchronize idref="node4"/>
+</transition>
+<transition id="node14">
+<name>
+<text>
+t3</text>
+</name>
+<graphics>
+<position x="220.0" y="103.5"/>
+<dimension x="20.0" y="20.0"/>
+</graphics>
+<synchronize idref="node3"/>
+</transition>
+<transition id="node15">
+<name>
+<text>
+t4</text>
+</name>
+<graphics>
+<position x="171.5" y="170.5"/>
+<dimension x="20.0" y="20.0"/>
+</graphics>
+<send idref="node1"/>
+</transition>
+<transition id="node16">
+<name>
+<text>
+t5</text>
+</name>
+<graphics>
+<position x="220.0" y="191.0"/>
+<dimension x="20.0" y="20.0"/>
+</graphics>
+<send idref="node1"/>
+</transition>
+<transition id="node17">
+<name>
+<text>
+t6</text>
+</name>
+<graphics>
+<position x="247.5" y="225.5"/>
+<dimension x="20.0" y="20.0"/>
+</graphics>
+</transition>
+<arc id="arc18" source="node15" target="node11">
+<name>
+<text>
+1</text>
+</name>
+<inscription>
+<text>
+1</text>
+</inscription>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc19" source="node9" target="node15">
+<name>
+<text>
+1</text>
+</name>
+<inscription>
+<text>
+1</text>
+</inscription>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc20" source="node17" target="node7">
+<name>
+<text>
+1</text>
+</name>
+<inscription>
+<text>
+1</text>
+</inscription>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc21" source="node11" target="node17">
+<name>
+<text>
+1</text>
+</name>
+<inscription>
+<text>
+1</text>
+</inscription>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc22" source="node16" target="node11">
+<name>
+<text>
+1</text>
+</name>
+<inscription>
+<text>
+1</text>
+</inscription>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc23" source="node12" target="node8">
+<name>
+<text>
+1</text>
+</name>
+<inscription>
+<text>
+1</text>
+</inscription>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc24" source="node8" target="node13">
+<name>
+<text>
+1</text>
+</name>
+<inscription>
+<text>
+1</text>
+</inscription>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc25" source="node13" target="node9">
+<name>
+<text>
+1</text>
+</name>
+<inscription>
+<text>
+1</text>
+</inscription>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc26" source="node8" target="node14">
+<name>
+<text>
+1</text>
+</name>
+<inscription>
+<text>
+1</text>
+</inscription>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc27" source="node10" target="node16">
+<name>
+<text>
+1</text>
+</name>
+<inscription>
+<text>
+1</text>
+</inscription>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc28" source="node7" target="node12">
+<name>
+<text>
+1</text>
+</name>
+<inscription>
+<text>
+1</text>
+</inscription>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+<arc id="arc29" source="node14" target="node10">
+<name>
+<text>
+1</text>
+</name>
+<inscription>
+<text>
+1</text>
+</inscription>
+<arctype>
+<text>
+normal</text>
+</arctype>
+</arc>
+</page>
+</net>
+<finalmarkings>
+<marking>
+<place idref="node7">
+<text>
+1</text>
+</place>
+<place idref="node8">
+<text>
+0</text>
+</place>
+<place idref="node9">
+<text>
+0</text>
+</place>
+<place idref="node10">
+<text>
+0</text>
+</place>
+<place idref="node11">
+<text>
+0</text>
+</place>
+</marking>
+</finalmarkings>
+</module>
+</pnml>

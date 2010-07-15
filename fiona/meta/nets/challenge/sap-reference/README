@@ -1,0 +1,103 @@
+SAP REFERENCE MODELS
+====================
+
+About
+-----
+
+* Added by: Niels Lohmann <niels.lohmann@uni-rostock.de>
+* Original source: Eric Verbeek <H.M.W.Verbeek@tue.nl>
+* Net type:
+  * Workflow nets (all but 9)
+  * non Free Choice (all but 3)
+* Format: Woflan TPN format, translated from EPCs
+
+
+Translation
+-----------
+
+Nets can be translated to LoLA format using the Petri Net API:
+
+    petri *.tpn -itpn -olola -v
+
+Initial marking is given. Final marking needs to be deduced from net structure
+by finding the sink place of the workflow net.
+
+BUG: The generated files are currently not accepted by LoLA due to mismatches
+     in the grammar.
+
+
+Statistics
+----------
+
+* 590 nets
+* 28845 places (average: 48, minimum: 12, maximum: 262)
+* 28807 transitions (average: 48, minimum: 12, maximum: 267)
+* 66332 arcs (average: 112, minimum: 24, maximum: 691)
+
+* 94 processes with more than 1000000 states
+* (at least) 8 unbounded processes
+* for the rest (496):
+  * 16385986 states (average: 33036, minimum: 22, maximum: 882367)
+  * 84719201 edges (average: 170804, minimum: 21, maximum: 5763573)
+
+* Non-workflow nets:
+  * Model.3zzv--0-----u--.xml.tpn
+  * Model.5vna--0-----u--.xml.tpn
+  * Model.6mxu--0-----u--.xml.tpn
+  * Model.b2z3--0-----u--.xml.tpn
+  * Model.g0mo--0-----u--.xml.tpn
+  * Model.kxnh--0-----u--.xml.tpn
+  * Model.l6i9--0-----u--.xml.tpn
+  * Model.lcn5--0-----u--.xml.tpn
+  * Model.nuwn--0-----u--.xml.tpn
+* Free Choice nets:
+  * Model.3zzv--0-----u--.xml.tpn
+  * Model.g0mo--0-----u--.xml.tpn
+  * Model.kxnh--0-----u--.xml.tpn
+* Unbounded processes:
+  * Model.3zzv--0-----u--.xml.tpn
+  * Model.9soy--0-----u--.xml.tpn
+  * Model.ahnr--0-----u--.xml.tpn
+  * Model.bxuo--0-----u--.xml.tpn
+  * Model.g0mo--0-----u--.xml.tpn
+  * Model.kxnh--0-----u--.xml.tpn
+  * Model.lgn9--0-----u--.xml.tpn
+  * Model.ma2i--0-----u--.xml.tpn
+* Processes where lola-boundednet needs more than 4 GB RAM
+  * Model.7coq--0-----u--.xml.tpn
+  * Model.7vev--0-----u--.xml.tpn
+  * Model.903f--0-----u--.xml.tpn
+  * Model.9mgu--0-----u--.xml.tpn
+  * Model.at4y--0-----u--.xml.tpn
+  * Model.b8et--0-----u--.xml.tpn
+  * Model.bb6y--0-----u--.xml.tpn
+  * Model.bip2--0-----u--.xml.tpn
+  * Model.btq3--0-----u--.xml.tpn
+  * Model.ce0j--0-----u--.xml.tpn
+  * Model.e1oz--0-----u--.xml.tpn
+  * Model.e43l--0-----u--.xml.tpn
+  * Model.hhi9--0-----u--.xml.tpn
+  * Model.hsc3--0-----u--.xml.tpn
+  * Model.hsto--0-----u--.xml.tpn
+  * Model.ixso--0-----u--.xml.tpn
+  * Model.j73d--0-----u--.xml.tpn
+  * Model.jh6h--0-----u--.xml.tpn
+  * Model.jqw9--0-----u--.xml.tpn
+  * Model.max4--0-----u--.xml.tpn
+
+
+References
+----------
+
+* Jan Mendling, Michael Moser, Gustaf Neumann, H. M. W. Verbeek, Boudewijn F.
+  van Dongen, Wil M. P. van der Aalst: Faulty EPCs in the SAP Reference Model.
+  Business Process Management 2006: 451-457
+
+* Boudewijn F. van Dongen, Monique H. Jansen-Vullers, H. M. W. Verbeek, Wil M.
+  P. van der Aalst: Verification of the SAP reference models using EPC
+  reduction, state-space analysis, and invariants. Computers in Industry
+  58(6):578-601 (2007)
+
+* Jan Mendling, H. M. W. Verbeek, Boudewijn F. van Dongen, Wil M. P. van der
+  Aalst, Gustaf Neumann: Detection and prediction of errors in EPCs of the SAP
+  reference model. Data Knowl. Eng. 64(1): 312-329 (2008)

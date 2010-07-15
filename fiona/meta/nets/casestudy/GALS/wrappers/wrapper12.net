@@ -1,0 +1,3740 @@
+{ Annahmen: }
+{- Flanken können sich nicht überholen}
+{- zu Beginn alle Pegel auf 0, bis auf Pegel, denen Negator vorgeschaltet ist}
+{- im clock generator Ausgang von NOR-Gatter auf 1}
+
+SORT Anzahl =  [ 0 , 2 ];
+
+FUNCTION inc(x: Anzahl): Anzahl
+BEGIN
+	RETURN x + 1
+END
+
+FUNCTION reset(x: Anzahl): Anzahl
+BEGIN
+	RETURN 0
+END
+
+FUNCTION zero(): Anzahl
+BEGIN
+	RETURN 0
+END
+
+
+FUNCTION tt(): BOOLEAN
+BEGIN
+	RETURN TRUE
+END
+
+
+FUNCTION ff(): BOOLEAN
+BEGIN
+	RETURN FALSE
+END
+
+
+FUNCTION und(x : BOOLEAN; y : BOOLEAN): BOOLEAN
+BEGIN
+	RETURN x AND y
+END
+
+
+FUNCTION oder(x : BOOLEAN; y : BOOLEAN): BOOLEAN
+BEGIN
+	RETURN x OR y
+END
+
+
+FUNCTION neg(x : BOOLEAN): BOOLEAN
+BEGIN
+    RETURN NOT x
+END
+
+
+
+PLACE
+	p.REQ_A : BOOLEAN,
+	p.n_REQ_A,
+	p.ACK_A : BOOLEAN,
+	p.n_ACK_A,
+	p.REQ_B : BOOLEAN,
+	p.n_REQ_B,
+	p.ACK_B : BOOLEAN,
+	p.n_ACK_B,
+	p.DLE: BOOLEAN,
+	p.n_DLE,
+
+
+	{Timeout-Generator (tog)}
+
+	{tog.p.REQ_A = p.REQ_A}
+	tog.p.LCLK : BOOLEAN, 
+	tog.p.n_LCLK, 
+	tog.p.RST : BOOLEAN,
+	tog.p.n_RST,
+	{tog.p.REQ_A1 = ip.p.REQ_A1}
+	{tog.p.ST = ip.p.ST, and.p.a}
+
+	{m20: D-FF mit D=1 und RST}
+	tog.m20.p.clk : BOOLEAN,   		{Input-Flanken}
+	tog.m20.p.n_clk,
+	tog.m20.p.rst : BOOLEAN,
+	tog.m20.p.n_rst,
+	tog.m20.p.q : BOOLEAN,     		{Output-Flanke}
+	tog.m20.p.pegel_0_0,       		{Pegel: (rst, q)}
+	tog.m20.p.pegel_0_1,
+	tog.m20.p.pegel_1_0,
+	tog.m20.p.n_q,             		{Komplementärplatz}
+
+	{m21: D-FF mit D=1 und RST}
+	tog.m21.p.clk : BOOLEAN,   		{Input-Flanke}
+	tog.m21.p.rst : BOOLEAN,
+	tog.m21.p.q: BOOLEAN,      		{Output-Flanke}
+	tog.m21.p.pegel_0_0,       		{Pegel: (rst, q)}
+	tog.m21.p.pegel_0_1,
+	tog.m21.p.pegel_1_0,
+	tog.m21.p.n_q,
+	tog.m21.p.n_clk,
+	tog.m21.p.n_rst,
+
+	{m22: Mutex}
+	{tog.m22.p.a_in = tog.m20.p.q}
+	{tog.m22.p.b_in = tog.m21.p.q}
+	{tog.m22.p.a_out = tog.m20.p.rst, tog.m23.p.clk}   {Output: Flanke}
+	{tog.m22.p.b_out = tog.m21.p.rst, tog.m25.p.a, tog.m23.p.rst: b}
+	tog.m22.p.pegel_0_0_0_0,                     {zu speichernde Pegel}
+	tog.m22.p.pegel_0_1_0_1,
+	tog.m22.p.pegel_1_0_1_0,
+	tog.m22.p.pegel_1_1_0_1,
+	tog.m22.p.pegel_1_1_1_0,
+
+	{m23: Counter}
+	tog.m23.p.clk: BOOLEAN,      		{Input-Flanke}
+	tog.m23.p.rst: BOOLEAN,
+	tog.m23.p.out: BOOLEAN,      		{Output-Flanke}
+	tog.m23.p.active,
+	tog.m23.p.deactive,          		{Status des counter}
+	tog.m23.p.value : Anzahl,    		{counter-Wert}
+	tog.m23.p.n_rst,
+	tog.m23.p.n_out,
+	tog.m23.p.n_clk,
+
+	{m24: D-FF mit D=1 und RST}
+	tog.m24.p.rst : BOOLEAN,    		{Input-Flanke}
+	{tog.m24.p.clk = tog.m23.p.out}
+	tog.m24.p.q: BOOLEAN,       		{Output-Flanke}
+	tog.m24.p.pegel_0_0,
+	tog.m24.p.pegel_0_1,
+	tog.m24.p.pegel_1_0,        		{Pegel: (rst, q)}
+	tog.m24.p.n_q,              		{Komplementärplatz}
+	tog.m24.p.n_rst,
+
+	{m25: OR}
+	tog.m25.p.a: BOOLEAN,              	{Input-Flanken}
+	tog.m25.p.b: BOOLEAN,
+	{tog.m25.p.out = tog.m24.p.rst}    	{Output-Flanke}
+	tog.m25.p.pegel_0_0,
+	tog.m25.p.pegel_0_1,
+	tog.m25.p.pegel_1_0,
+	tog.m25.p.pegel_1_1,              	 {alte Pegel}
+	tog.m25.p.n_a,
+	tog.m25.p.n_b,
+
+	{m26: Mutex}
+	{tog.m26.p.a_in = p.REQ_A}
+	{tog.m26.p.b_in = tog.m24.p.q}
+	{tog.m26.p.a_out = ip.p.REQ_A1}
+	tog.m26.p.b_out: BOOLEAN,    		{Output: Flanke}
+	tog.m26.p.n_b_out,
+	tog.m26.p.pegel_0_0_0_0,     		{zu speichernde Pegel}
+	tog.m26.p.pegel_0_1_0_1,
+	tog.m26.p.pegel_1_0_1_0,
+	tog.m26.p.pegel_1_1_0_1,
+	tog.m26.p.pegel_1_1_1_0,
+
+	{m27: D-FF mit D=1 und RST}
+	tog.m27.p.rst : BOOLEAN,
+	tog.m27.p.n_rst,
+	{tog.m27.p.clk = tog.m26.p.b_out}
+	{tog.m27.p.q = tog.m25.p.b, tog.p.ST (= ip.p.ST, and.p.a)}
+	tog.m27.p.pegel_0_0,    		{Pegel: (rst, q)}
+	tog.m27.p.pegel_0_1,
+	tog.m27.p.pegel_1_0,
+
+
+	{Input Port (ip)}
+
+	{Ein- und Ausgabesignale des Input Port als Flanken}
+	ip.p.LCLKM   : BOOLEAN,  		{Eingabesignale}
+	ip.p.n_LCLKM,
+	ip.p.INT_CLK : BOOLEAN,
+	ip.p.n_INT_CLK,
+	ip.p.REQ_A1  : BOOLEAN,
+	ip.p.n_REQ_A1,
+	ip.p.STOP    : BOOLEAN,
+	ip.p.n_STOP,
+	ip.p.ACKI1   : BOOLEAN,
+	ip.p.n_ACKI1,
+	ip.p.ST      : BOOLEAN,
+	ip.p.n_ST,
+	ip.p.ACK_INT : BOOLEAN,
+	ip.p.n_ACK_INT,
+	{ip.p.DATAV_IN = lsm.p.DATAV_IN}  	{Ausgabesignale}
+	{ip.p.REQ_INT = cc.p.REQ_INT, or.p.a, op.p.REQ_INT}
+	{ip.p.RST = tog.p.RST, cc.p.RST}
+	{ip.p.REQI1 = pcg.p.REQI1}
+	{ip.p.ACK_A = p.ACK_A}
+	{ip.p.DLE = p.DLE}
+
+	{m61: AND}
+	{ip.m61.p.a = ip.p.LCLKM} 		{Input-Flanken}
+	ip.m61.p.b: BOOLEAN,
+	ip.m61.p.n_b,
+	ip.m61.p.out: BOOLEAN,    		{Output-Flanke}
+	ip.m61.p.n_out,
+	ip.m61.p.pegel_0_0,
+	ip.m61.p.pegel_0_1,
+	ip.m61.p.pegel_1_0,
+	ip.m61.p.pegel_1_1,       		{alte Pegel}
+
+	{m62: D-FF mit D=0 und SET}
+	{ip.m62.p.clk = ip.m61.p.out} 		{Input-Flanke}
+	ip.m62.p.set : BOOLEAN,
+	ip.m62.p.n_set,
+	{ip.m62.p.q = ip.p.DATAV_IN}  		{Output-Flanke}
+	ip.m62.p.pegel_0_0,        		{Pegel: (set, q)}
+	ip.m62.p.pegel_0_1,
+	ip.m62.p.pegel_1_1,
+
+	{m63: AND}
+	ip.m63.p.a: BOOLEAN,      		{Input-Flanken}
+	ip.m63.p.b: BOOLEAN,
+	{ip.m63.p.out = ip.m65.p.a}  		{Output-Flanke}
+	ip.m63.p.pegel_0_0,       		{alte Pegel}
+	ip.m63.p.pegel_0_1,
+	ip.m63.p.pegel_1_0,
+	ip.m63.p.pegel_1_1,
+	ip.m63.p.n_a,
+	ip.m63.p.n_b,
+
+	{m64: AND}
+	ip.m64.p.a: BOOLEAN,       		{Input-Flanken}
+	ip.m64.p.b: BOOLEAN,
+	ip.m64.p.n_a,
+	ip.m64.p.n_b,
+	{ip.m64.p.out = ip.m65.p.b}    		{Output-Flanke}
+	ip.m64.p.pegel_0_0,         		{alte Pegel}
+	ip.m64.p.pegel_0_1,
+	ip.m64.p.pegel_1_0,
+	ip.m64.p.pegel_1_1,
+
+	{m65: OR}
+	ip.m65.p.a: BOOLEAN,                               {Input-Flanken}
+	ip.m65.p.b: BOOLEAN,
+	ip.m65.p.n_a,
+	ip.m65.p.n_b,
+	{ip.m65.p.out = ip.m62.p.set, ip.p.DLE (= p.DLE)}  {Output-Flanke}
+	ip.m65.p.pegel_0_0,                                {alte Pegel}
+	ip.m65.p.pegel_0_1,
+	ip.m65.p.pegel_1_0,
+	ip.m65.p.pegel_1_1,
+
+	{m66: AND}
+	ip.m66.p.a: BOOLEAN,      		{Input-Flanken}
+	ip.m66.p.b: BOOLEAN,
+	ip.m66.p.n_a,
+	ip.m66.p.n_b,
+	{ip.m66.p.out = ip.m68.p.b}  		{Output-Flanke}
+	ip.m66.p.pegel_0_0,       		{alte Pegel}
+	ip.m66.p.pegel_0_1,
+	ip.m66.p.pegel_1_0,
+	ip.m66.p.pegel_1_1,
+
+	{m67: AND}
+	ip.m67.p.a: BOOLEAN,      		{Input-Flanken}
+	ip.m67.p.b: BOOLEAN,
+	ip.m67.p.n_a,
+	ip.m67.p.n_b,
+	{ip.m67.p.out = ip.m68.p.a}  		{Output-Flanke}
+	ip.m67.p.pegel_0_0,       		{alte Pegel}
+	ip.m67.p.pegel_0_1,
+	ip.m67.p.pegel_1_0,
+	ip.m67.p.pegel_1_1,
+
+	{m68: OR}
+	ip.m68.p.a: BOOLEAN,                    {Input-Flanken}
+	ip.m68.p.b: BOOLEAN,
+	ip.m68.p.n_a,
+	ip.m68.p.n_b,
+	{ip.m68.p.out = ip.m69.p.ackc, ip.m64.p.a}    {Output-Flanke}
+	ip.m68.p.pegel_0_0,                     {alte Pegel}
+	ip.m68.p.pegel_0_1,
+	ip.m68.p.pegel_1_0,
+	ip.m68.p.pegel_1_1,
+
+	{m69: Input Controller}
+	ip.m69.p.0, ip.m69.p.1, ip.m69.p.2,     {Zustände des Input Controllers}
+	ip.m69.p.3, ip.m69.p.4, ip.m69.p.5,
+	ip.m69.p.6, ip.m69.p.7, ip.m69.p.8,
+	{ip.m69.p.req_a1 = ip.p.REQ_A1}      	{Ein- und Ausgabesignale als Flanken}
+	ip.m69.p.st     : BOOLEAN,
+	ip.m69.p.n_st,
+	{ip.m69.p.ack_a = ip.m63.p.a, ip.p.ACK_A (= p.ACK_A)}
+	{ip.m69.p.rst = ip.p.RST}
+	{ip.m69.p.acken = ip.m64.p.b, ip.m67.p.a}
+	{ip.m69.p.req_int = ip.p.REQ_INT}
+	ip.m69.p.ackc   : BOOLEAN,
+	ip.m69.p.n_ackc,
+	{ip.m69.p.stop = ip.p.STOP}
+	{ip.m69.p.reqi1 = ip.p.REQI1}
+	{ip.m69.p.acki1 = ip.p.ACKI1}
+
+
+	{Clock Control (cc)}
+	cc.p.LCLKM: BOOLEAN,
+	cc.p.n_LCLKM,
+	cc.p.RST : BOOLEAN,
+	cc.p.REQ_INT : BOOLEAN,
+	{cc.p.STOPI = pcg.p.STOPI}
+	{cc.p.STOP = ip.p.STOP}
+	cc.p.n_RST,
+	cc.p.n_REQ_INT,
+
+	{m10: Counter}
+	cc.m10.p.clk: BOOLEAN,                		{Input-Flanke}
+	cc.m10.p.n_clk,
+	{cc.m10.p.rst = cc.p.RST}
+	{cc.m10.p.out = cc.p.STOP, cc.m11.p.clk}    	{Output-Flanke}
+	cc.m10.p.active,                      		{Status des counter}
+	cc.m10.p.deactive,
+	cc.m10.p.value : Anzahl,              		{counter-Wert}
+
+	{m11: D-FF mit D=1 und RST}
+	cc.m11.p.clk : BOOLEAN,    			{Input-Flanke}
+	cc.m11.p.n_clk,
+	{cc.m11.p.rst = cc.p.REQ_INT}
+	{cc.m11.p.q = cc.p.STOPI}    			{Output-Flanke}
+	cc.m11.p.pegel_0_0,
+	cc.m11.p.pegel_0_1,
+	cc.m11.p.pegel_1_0,        			{Pegel: (rst, q)}
+
+
+
+	{Pausable Clock Generator (pcg)}
+
+	pcg.p.REQI1: BOOLEAN,
+	pcg.p.n_REQI1,
+	{pcg.p.ACKI1: = ip.p.ACKI1}
+	pcg.p.STRETCH: BOOLEAN,
+	pcg.p.n_STRETCH,
+	pcg.p.STOPI: BOOLEAN,
+	pcg.p.n_STOPI,
+	{pcg.p.LCLK = tog.p.LCLK, and.p.b}
+
+	{m1: NOR}
+	pcg.m1.p.a: BOOLEAN,                             {Input-Flanken}
+	pcg.m1.p.n_a,
+	{pcg.m1.p.b = pcg.p.STOPI}
+	{pcg.m1.p.out = pcg.m2.p.b_in, pcg.m3.p.b_in, pcg.m5.p.b}   {Output-Flanke}
+	pcg.m1.p.pegel_0_0,
+	pcg.m1.p.pegel_0_1,
+	pcg.m1.p.pegel_1_0,
+	pcg.m1.p.pegel_1_1,                              {alte Pegel}
+
+	{m2: Mutex}
+	{pcg.m2.p.a_in = pcg.p.REQI1}
+	pcg.m2.p.b_in: BOOLEAN,
+	pcg.m2.p.n_b_in,
+	{pcg.m2.p.a_out = pcg.p.ACKI1}    		{Output: Flanke}
+	{pcg.m2.p.b_out = pcg.m4.p.b}
+	pcg.m2.p.pegel_0_0_0_0,       			{zu speichernde Pegel}
+	pcg.m2.p.pegel_0_1_0_1,
+	pcg.m2.p.pegel_1_0_1_0,
+	pcg.m2.p.pegel_1_1_0_1,
+	pcg.m2.p.pegel_1_1_1_0,
+
+	{m3: Mutex}
+	{pcg.m3.p.a_in = pcg.p.STRETCH}
+	pcg.m3.p.b_in: BOOLEAN,
+	pcg.m3.p.n_b_in,
+	{pcg.m3.p.a_out entfaellt}
+	{pcg.m3.p.b_out = pcg.m4.p.a}    		{Output: Flanke}
+	pcg.m3.p.pegel_0_0_0_0,
+	pcg.m3.p.pegel_0_1_0_1,      			{zu speichernde Pegel}
+	pcg.m3.p.pegel_1_0_1_0,
+	pcg.m3.p.pegel_1_1_0_1,
+	pcg.m3.p.pegel_1_1_1_0,
+
+	{m4: OR}
+	pcg.m4.p.a: BOOLEAN,
+	pcg.m4.p.n_a,
+	pcg.m4.p.b: BOOLEAN,
+	pcg.m4.p.n_b,
+	{pcg.m4.p.out = pcg.m5.p.a}    			{Output-Flanke}
+	pcg.m4.p.pegel_0_0,        			{alte Pegel}
+	pcg.m4.p.pegel_0_1,
+	pcg.m4.p.pegel_1_0,
+	pcg.m4.p.pegel_1_1,
+
+	{m5: MCE}
+	pcg.m5.p.a: BOOLEAN,
+	pcg.m5.p.n_a,
+	pcg.m5.p.b: BOOLEAN,               		{Input-Flanke}
+	pcg.m5.p.n_b,
+	{pcg.m5.p.out = pcg.m1.p.a, pcg.p.LCLK}    	{Output-Flanke}
+	pcg.m5.p.pegel_0_0_0,
+	pcg.m5.p.pegel_0_1_0,              		{alte Pegel (a_b_c)}
+	pcg.m5.p.pegel_1_0_0,
+	pcg.m5.p.pegel_0_1_1,
+	pcg.m5.p.pegel_1_0_1,
+	pcg.m5.p.pegel_1_1_1,
+
+
+
+	{AND (and)}
+	and.p.a: BOOLEAN,      						{Input-Flanken}
+	and.p.b: BOOLEAN,
+	and.p.n_a,
+	and.p.n_b,
+	{and.p.out = ip.p.LCLKM, or.p.b, op.p.LCLKM, cc.p.LCLKM}    	{Output-Flanke}
+	and.p.pegel_0_0,       {alte Pegel}
+	and.p.pegel_0_1,
+	and.p.pegel_1_0,
+	and.p.pegel_1_1,
+
+
+
+	{OR (or)}
+	or.p.a: BOOLEAN,      						{Input-Flanken}
+	or.p.b: BOOLEAN,
+	or.p.n_a,
+	or.p.n_b,
+	{or.p.out = ip.p.INT_CLK, lsm.p.INT_CLK, op.p.INT_CLK}    	{Output-Flanke}
+	or.p.pegel_0_0,       						{alte Pegel}
+	or.p.pegel_0_1,
+	or.p.pegel_1_0,
+	or.p.pegel_1_1;
+
+
+
+	{Output Port (op)}
+	op.p.INT_CLK: BOOLEAN,
+	op.p.n_INT_CLK,
+	op.p.DATAV_OUT: BOOLEAN,
+	op.p.n_DATAV_OUT,
+	op.p.LCLKM: BOOLEAN,
+	op.p.n_LCLKM,
+	op.p.REQ_INT: BOOLEAN,
+	op.p.n_REQ_INT,
+	{op.p.ACK_INT = ip.p.ACK_INT}
+	{op.p.REQ_B = p.REQ_B}
+	{op.p.ACK_B = p.ACK_B}
+	{op.p.STRETCH = pcg.p.STRETCH}
+
+	{m1: OR}
+	{op.m1.p.a = op.p.LCLKM}    					{Input-Flanken}
+	{op.m1.p.b = op.p.REQ_INT}
+	{op.m1.p.out = neg(op.m2.p.rst), neg(op.m3.p.rst), op.m4.p.clk) {Output-Flanke}
+	op.m1.p.pegel_0_0,       {alte Pegel}
+	op.m1.p.pegel_0_1,
+	op.m1.p.pegel_1_0,
+	op.m1.p.pegel_1_1,
+
+	{m2: D-FF mit D beliebig und RST}
+	op.m2.p.clk : BOOLEAN,    					{Input-Flanke}
+	op.m2.p.d   : BOOLEAN,
+	op.m2.p.rst : BOOLEAN,
+	op.m2.p.n_clk,
+	op.m2.p.n_d,
+	op.m2.p.n_rst,
+	{op.m2.p.q = op.m4.p.donv}   					{Output-Flanke}
+	op.m2.p.pegel_0_0_0,      					{Pegel: (d, rst, q)}
+	op.m2.p.pegel_0_0_1,
+	op.m2.p.pegel_0_1_0,
+	op.m2.p.pegel_1_0_0,
+	op.m2.p.pegel_1_0_1,
+	op.m2.p.pegel_1_1_0,
+
+	{m3: D-FF mit D beliebig und RST}
+	op.m3.p.clk : BOOLEAN,    					{Input-Flanke}
+	op.m3.p.d   : BOOLEAN,
+	op.m3.p.rst : BOOLEAN,
+	op.m3.p.n_clk,
+	op.m3.p.n_d,
+	op.m3.p.n_rst,
+	{op.m3.p.q = op.m4.p.dov}   					{Output-Flanke}
+	op.m3.p.pegel_0_0_0,      					{Pegel: (d, rst, q)}
+	op.m3.p.pegel_0_0_1,
+	op.m3.p.pegel_0_1_0,
+	op.m3.p.pegel_1_0_0,
+	op.m3.p.pegel_1_0_1,
+	op.m3.p.pegel_1_1_0,
+
+	{m4: Output Controller}
+	op.m4.p.0,               			{Zustände des Output Controllers}
+	op.m4.p.1,
+	op.m4.p.2,
+	op.m4.p.3,
+	op.m4.p.clk: BOOLEAN,    			{Ein- und Ausgabesignale als Flanken}
+	op.m4.p.dov: BOOLEAN,
+	op.m4.p.donv: BOOLEAN,
+	op.m4.p.ack_b: BOOLEAN,
+	op.m4.p.n_clk,
+	op.m4.p.n_dov,
+	op.m4.p.n_donv,
+	op.m4.p.n_ack_b,
+	{op.m4.p.req_b = op.p.REQ_B, op.m5.p.a, op.m6.p.set}
+	{op.m4.p.ack_int = op.p.ACK_INT}
+
+	{m5: OR}
+	op.m5.p.a: BOOLEAN,      				{Input-Flanken}
+	op.m5.p.b: BOOLEAN,
+	op.m5.p.n_a,
+	op.m5.p.n_b,
+	{op.m5.p.out = neg(op.m6.p.clk)}    			{Output-Flanke}
+	op.m5.p.pegel_0_0,       				{alte Pegel}
+	op.m5.p.pegel_0_1,
+	op.m5.p.pegel_1_0,
+	op.m5.p.pegel_1_1,
+
+	{m6: D-FF mit D=0 und SET}
+	op.m6.p.clk : BOOLEAN,    				{Input-Flanke}
+	op.m6.p.set : BOOLEAN,
+	op.m6.p.n_clk,
+	op.m6.p.n_set,
+	{op.m6.p.q = op.p.STRETCH}   				{Output-Flanke}
+	op.m6.p.pegel_0_0,        				{Pegel: (set, q)}
+	op.m6.p.pegel_0_1,
+	op.m6.p.pegel_1_1,
+
+
+
+	{Locally Synchronous Module (lsm)}
+	lsm.p.INT_CLK: BOOLEAN,
+	lsm.p.DATAV_IN: BOOLEAN,
+	lsm.p.datav_pegel: BOOLEAN,
+	lsm.p.n_INT_CLK,
+	lsm.p.n_DATAV_IN,
+	lsm.p.n_datav_pegel;
+
+MARKING
+	p.REQ_A: tt(),
+	p.n_ACK_A: 1,
+	p.n_REQ_B: 1,
+	p.n_ACK_B: 1,
+	p.n_DLE: 1,
+
+	tog.p.n_LCLK: 1,
+	tog.p.n_RST: 1, 
+	tog.m20.p.pegel_0_0: 1,
+	tog.m20.p.n_q: 1,
+	tog.m20.p.n_clk: 1,
+	tog.m20.p.n_rst: 1,
+	tog.m21.p.pegel_0_0: 1,
+	tog.m21.p.n_q: 1,
+	tog.m21.p.n_clk: 1,
+	tog.m21.p.n_rst: 1,
+	tog.m22.p.pegel_0_0_0_0 : 1,
+	tog.m23.p.active: 1,
+	tog.m23.p.value: zero(),
+	tog.m23.p.n_rst: 1,
+	tog.m23.p.n_out: 1,
+	tog.m23.p.n_clk: 1,
+	tog.m24.p.pegel_0_0: 1,
+	tog.m24.p.n_q: 1,
+	tog.m24.p.n_rst: 1,
+	tog.m25.p.pegel_0_0: 1,
+	tog.m25.p.n_a: 1,
+	tog.m25.p.n_b: 1,
+	tog.m26.p.pegel_0_0_0_0 : 1,
+	tog.m26.p.n_b_out: 1,
+	tog.m27.p.pegel_0_0: 1,
+	tog.m27.p.n_rst: 1,
+
+	ip.p.n_LCLKM: 1,
+	ip.p.n_INT_CLK: 1,
+	ip.p.n_REQ_A1: 1,
+	ip.p.n_STOP: 1,
+	ip.p.n_ACKI1: 1,
+	ip.p.n_ST: 1,
+	ip.p.n_ACK_INT: 1,
+	ip.m61.p.pegel_0_0: 1,
+	ip.m61.p.n_out: 1,
+	ip.m61.p.n_b: 1,
+	ip.m62.p.n_set: 1,
+	ip.m62.p.pegel_0_0: 1,
+	ip.m63.p.pegel_0_0: 1,
+	ip.m64.p.pegel_0_0: 1,
+	ip.m65.p.pegel_0_0: 1,
+	ip.m66.p.pegel_0_1: 1,  {Pegel 01, weil b-Eingang negiert}
+	ip.m67.p.pegel_0_0: 1,
+	ip.m68.p.pegel_0_0: 1,
+	ip.m69.p.0: 1,
+	ip.m63.p.n_a: 1,
+	ip.m63.p.n_b: 1,
+	ip.m64.p.n_a: 1,
+	ip.m64.p.n_b: 1,
+	ip.m65.p.n_a: 1,
+	ip.m65.p.n_b: 1,
+	ip.m66.p.n_a: 1,
+	ip.m66.p.n_b: 1,
+	ip.m67.p.n_a: 1,
+	ip.m67.p.n_b: 1,
+	ip.m68.p.n_a: 1,
+	ip.m68.p.n_b: 1,
+	ip.m69.p.n_st: 1,
+	ip.m69.p.n_ackc: 1,
+
+	cc.p.n_LCLKM: 1,
+	cc.m10.p.n_clk: 1,
+	cc.m10.p.active: 1,
+	cc.m10.p.value: zero(),
+	cc.m11.p.pegel_0_0: 1,
+	cc.p.n_RST: 1,
+	cc.p.n_REQ_INT: 1,
+	cc.m11.p.n_clk: 1,
+
+	pcg.p.n_REQI1: 1,
+	pcg.p.n_STRETCH: 1,
+	pcg.p.n_STOPI: 1,
+	pcg.m1.p.n_a: 1,
+	pcg.m1.p.pegel_0_0: 1,
+	pcg.m2.p.pegel_0_0_0_0 : 1,
+	pcg.m2.p.b_in: tt(),    {vom NOR davor}
+	{pcg.m2.p.n_b_in mit 1 markieren, falls pcg.m2.p.b_in anfangs leer ist}
+	pcg.m3.p.pegel_0_0_0_0 : 1,
+	pcg.m3.p.b_in: tt(),    {vom NOR davor}
+	{pcg.m3.p.n_b_in mit 1 markieren, falls pcg.m3.p.b_in anfangs leer ist}
+	pcg.m4.p.pegel_0_0: 1,
+	pcg.m4.p.n_a: 1,
+	pcg.m4.p.n_b: 1,
+	pcg.m5.p.pegel_0_0_0: 1,
+	pcg.m5.p.n_a: 1,
+	pcg.m5.p.b: tt(),       {vom NOR davor}
+
+	and.p.pegel_0_0: 1,
+	and.p.n_a: 1,
+	and.p.n_b: 1,
+
+	or.p.n_a: 1,
+	or.p.n_b: 1,
+	or.p.pegel_0_0: 1,
+
+	op.p.n_LCLKM: 1,
+	op.p.n_INT_CLK: 1,
+	op.p.n_DATAV_OUT: 1,
+	op.p.n_REQ_INT: 1,
+	op.m1.p.pegel_0_0: 1,
+	op.m2.p.n_clk: 1,
+	op.m2.p.n_d: 1,
+	op.m2.p.n_rst: 1,
+	op.m2.p.pegel_1_1_0: 1, {D- und RST-Eingang negiert}
+	op.m3.p.pegel_0_1_0: 1, {RST-Eingang negiert}
+	op.m3.p.n_clk: 1,
+	op.m3.p.n_d: 1,
+	op.m3.p.n_rst: 1,
+	op.m4.p.0: 1,
+	op.m4.p.n_clk: 1,
+	op.m4.p.n_dov: 1,
+	op.m4.p.n_donv: 1,
+	op.m4.p.n_ack_b: 1,
+	op.m5.p.pegel_0_0: 1,
+	op.m5.p.n_a: 1,
+	op.m5.p.n_b: 1,
+	op.m6.p.pegel_0_0: 1,
+	op.m6.p.n_clk: 1,
+	op.m6.p.n_set: 1,
+
+	lsm.p.n_INT_CLK: 1,
+	lsm.p.n_DATAV_IN: 1,
+	lsm.p.datav_pegel: ff();
+
+
+{ Timeout-Generator }
+
+{tog.t20: Negation}
+TRANSITION tog.t20
+VAR clk: BOOLEAN;
+CONSUME tog.p.LCLK: clk, tog.m20.p.n_clk: 1;
+PRODUCE tog.m20.p.clk: neg(clk), tog.p.n_LCLK: 1;
+
+{t21: Verzweigung}
+TRANSITION tog.t21
+VAR rst: BOOLEAN;
+CONSUME tog.p.RST: rst, tog.m21.p.n_clk: 1, tog.m27.p.n_rst: 1;
+PRODUCE tog.m21.p.clk: rst, tog.m27.p.rst: rst, tog.p.n_RST: 1;
+
+
+{m20: D-FF mit D=1 und RST}
+TRANSITION tog.m20.t.clk0_0_0
+CONSUME tog.m20.p.clk: ff(), tog.m20.p.pegel_0_0 : 1;
+PRODUCE tog.m20.p.pegel_0_0 : 1, tog.m20.p.n_clk: 1;
+
+TRANSITION tog.m20.t.clk0_0_1
+CONSUME tog.m20.p.clk: ff(), tog.m20.p.pegel_0_1 : 1;
+PRODUCE tog.m20.p.pegel_0_1 : 1, tog.m20.p.n_clk: 1;
+
+TRANSITION tog.m20.t.clk0_1_0
+CONSUME tog.m20.p.clk: ff(), tog.m20.p.pegel_1_0 : 1;
+PRODUCE tog.m20.p.pegel_1_0 : 1, tog.m20.p.n_clk: 1;
+
+TRANSITION tog.m20.t.clk1_0_0
+CONSUME tog.m20.p.clk: tt(), tog.m20.p.pegel_0_0 : 1, tog.m20.p.n_q: 1;
+PRODUCE tog.m20.p.pegel_0_1 : 1, tog.m20.p.q: tt(), tog.m20.p.n_clk: 1;
+
+TRANSITION tog.m20.t.clk1_0_1
+CONSUME tog.m20.p.clk: tt(), tog.m20.p.pegel_0_1 : 1;
+PRODUCE tog.m20.p.pegel_0_1 : 1, tog.m20.p.n_clk: 1;
+
+TRANSITION tog.m20.t.clk1_1_0
+CONSUME tog.m20.p.clk: tt(), tog.m20.p.pegel_1_0 : 1;
+PRODUCE tog.m20.p.pegel_1_0 : 1, tog.m20.p.n_clk: 1;
+
+TRANSITION tog.m20.t.rst0_0_0
+CONSUME tog.m20.p.rst: ff(), tog.m20.p.pegel_0_0 : 1;
+PRODUCE tog.m20.p.pegel_0_0 : 1, tog.m20.p.n_rst: 1;
+
+TRANSITION tog.m20.t.rst0_0_1
+CONSUME tog.m20.p.rst: ff(), tog.m20.p.pegel_0_1 : 1;
+PRODUCE tog.m20.p.pegel_0_1 : 1, tog.m20.p.n_rst: 1;
+
+TRANSITION tog.m20.t.rst0_1_0
+CONSUME tog.m20.p.rst: ff(), tog.m20.p.pegel_1_0 : 1;
+PRODUCE tog.m20.p.pegel_0_0 : 1, tog.m20.p.n_rst: 1;
+
+TRANSITION tog.m20.t.rst1_0_0
+CONSUME tog.m20.p.rst: tt(), tog.m20.p.pegel_0_0 : 1;
+PRODUCE tog.m20.p.pegel_1_0 : 1, tog.m20.p.n_rst: 1;
+
+TRANSITION tog.m20.t.rst1_0_1
+CONSUME tog.m20.p.rst: tt(), tog.m20.p.pegel_0_1 : 1, tog.m20.p.n_q: 1;
+PRODUCE tog.m20.p.pegel_1_0 : 1, tog.m20.p.q: ff(), tog.m20.p.n_rst: 1;
+
+TRANSITION tog.m20.t.rst1_1_0
+CONSUME tog.m20.p.rst: tt(), tog.m20.p.pegel_1_0 : 1;
+PRODUCE tog.m20.p.pegel_1_0 : 1, tog.m20.p.n_rst: 1;
+
+
+{m21: D-FF mit D=1 und RST}
+TRANSITION tog.m21.t.clk0_0_0
+CONSUME tog.m21.p.clk: ff(), tog.m21.p.pegel_0_0 : 1;
+PRODUCE tog.m21.p.pegel_0_0 : 1, tog.m21.p.n_clk: 1;
+
+TRANSITION tog.m21.t.clk0_0_1
+CONSUME tog.m21.p.clk: ff(), tog.m21.p.pegel_0_1 : 1;
+PRODUCE tog.m21.p.pegel_0_1 : 1, tog.m21.p.n_clk: 1;
+
+TRANSITION tog.m21.t.clk0_1_0
+CONSUME tog.m21.p.clk: ff(), tog.m21.p.pegel_1_0 : 1;
+PRODUCE tog.m21.p.pegel_1_0 : 1, tog.m21.p.n_clk: 1;
+
+TRANSITION tog.m21.t.clk1_0_0
+CONSUME tog.m21.p.clk: tt(), tog.m21.p.pegel_0_0 : 1, tog.m21.p.n_q: 1;
+PRODUCE tog.m21.p.pegel_0_1 : 1, tog.m21.p.q: tt(), tog.m21.p.n_clk: 1;
+
+TRANSITION tog.m21.t.clk1_0_1
+CONSUME tog.m21.p.clk: tt(), tog.m21.p.pegel_0_1 : 1;
+PRODUCE tog.m21.p.pegel_0_1 : 1, tog.m21.p.n_clk: 1;
+
+TRANSITION tog.m21.t.clk1_1_0
+CONSUME tog.m21.p.clk: tt(), tog.m21.p.pegel_1_0 : 1;
+PRODUCE tog.m21.p.pegel_1_0 : 1, tog.m21.p.n_clk: 1;
+
+TRANSITION tog.m21.t.rst0_0_0
+CONSUME tog.m21.p.rst: ff(), tog.m21.p.pegel_0_0 : 1;
+PRODUCE tog.m21.p.pegel_0_0 : 1, tog.m21.p.n_rst: 1;
+
+TRANSITION tog.m21.t.rst0_0_1
+CONSUME tog.m21.p.rst: ff(), tog.m21.p.pegel_0_1 : 1;
+PRODUCE tog.m21.p.pegel_0_1 : 1, tog.m21.p.n_rst: 1;
+
+TRANSITION tog.m21.t.rst0_1_0
+CONSUME tog.m21.p.rst: ff(), tog.m21.p.pegel_1_0 : 1;
+PRODUCE tog.m21.p.pegel_0_0 : 1, tog.m21.p.n_rst: 1;
+
+TRANSITION tog.m21.t.rst1_0_0
+CONSUME tog.m21.p.rst: tt(), tog.m21.p.pegel_0_0 : 1;
+PRODUCE tog.m21.p.pegel_1_0 : 1, tog.m21.p.n_rst: 1;
+
+TRANSITION tog.m21.t.rst1_0_1
+CONSUME tog.m21.p.rst: tt(), tog.m21.p.pegel_0_1 : 1, tog.m21.p.n_q: 1;
+PRODUCE tog.m21.p.pegel_1_0 : 1, tog.m21.p.q: ff(), tog.m21.p.n_rst: 1;
+
+TRANSITION tog.m21.t.rst1_1_0
+CONSUME tog.m21.p.rst: tt(), tog.m21.p.pegel_1_0 : 1;
+PRODUCE tog.m21.p.pegel_1_0 : 1, tog.m21.p.n_rst: 1;
+
+
+
+
+{m22: MUTEX}
+TRANSITION tog.m22.t.a0_pegel_0_0_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME tog.m20.p.q: a, tog.m22.p.pegel_0_0_0_0 : 1;
+PRODUCE tog.m22.p.pegel_0_0_0_0 : 1, tog.m20.p.n_q: 1;
+
+TRANSITION tog.m22.t.a0_pegel_0_1_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME tog.m20.p.q: a, tog.m22.p.pegel_0_1_0_1 : 1;
+PRODUCE tog.m22.p.pegel_0_1_0_1 : 1, tog.m20.p.n_q: 1;
+
+TRANSITION tog.m22.t.a0_pegel_1_0_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME tog.m20.p.q: a, tog.m22.p.pegel_1_0_1_0 : 1, tog.m23.p.n_clk: 1, tog.m20.p.n_rst: 1;
+PRODUCE tog.m22.p.pegel_0_0_0_0 : 1, tog.m20.p.rst: ff(), tog.m23.p.clk: ff(), tog.m20.p.n_q: 1;
+
+TRANSITION tog.m22.t.a0_pegel_1_1_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME tog.m20.p.q: a, tog.m22.p.pegel_1_1_0_1 : 1;
+PRODUCE tog.m22.p.pegel_0_1_0_1 : 1, tog.m20.p.n_q: 1;
+
+TRANSITION tog.m22.t.a0_pegel_1_1_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME tog.m20.p.q: a, tog.m22.p.pegel_1_1_1_0 : 1, tog.m23.p.n_clk: 1,
+        tog.m23.p.n_rst: 1, tog.m25.p.n_a: 1, tog.m20.p.n_rst: 1, tog.m21.p.n_rst: 1;
+PRODUCE tog.m22.p.pegel_0_1_0_1 : 1, tog.m20.p.rst: ff(), tog.m23.p.clk: ff(),
+        tog.m21.p.rst: tt(), tog.m23.p.rst: tt(), tog.m25.p.a: tt(), tog.m20.p.n_q: 1;
+
+
+TRANSITION tog.m22.t.a1_pegel_0_0_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME tog.m20.p.q: a, tog.m22.p.pegel_0_0_0_0 : 1, tog.m23.p.n_clk: 1, tog.m20.p.n_rst: 1;
+PRODUCE tog.m22.p.pegel_1_0_1_0 : 1, tog.m20.p.rst: tt(), tog.m23.p.clk: tt(), tog.m20.p.n_q: 1;
+
+TRANSITION tog.m22.t.a1_pegel_0_1_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME tog.m20.p.q: a, tog.m22.p.pegel_0_1_0_1 : 1;
+PRODUCE tog.m22.p.pegel_1_1_0_1 : 1, tog.m20.p.n_q: 1;
+
+TRANSITION tog.m22.t.a1_pegel_1_0_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME tog.m20.p.q: a, tog.m22.p.pegel_1_0_1_0 : 1;
+PRODUCE tog.m22.p.pegel_1_0_1_0 : 1, tog.m20.p.n_q: 1;
+
+TRANSITION tog.m22.t.a1_pegel_1_1_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME tog.m20.p.q: a, tog.m22.p.pegel_1_1_0_1 : 1;
+PRODUCE tog.m22.p.pegel_1_1_0_1 : 1, tog.m20.p.n_q: 1;
+
+TRANSITION tog.m22.t.a1_pegel_1_1_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME tog.m20.p.q: a, tog.m22.p.pegel_1_1_1_0 : 1;
+PRODUCE tog.m22.p.pegel_1_1_1_0 : 1, tog.m20.p.n_q: 1;
+
+
+
+TRANSITION tog.m22.t.b0_pegel_0_0_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m21.p.q: b, tog.m22.p.pegel_0_0_0_0 : 1;
+PRODUCE tog.m22.p.pegel_0_0_0_0 : 1, tog.m21.p.n_q: 1;
+
+TRANSITION tog.m22.t.b0_pegel_0_1_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m21.p.q: b, tog.m22.p.pegel_0_1_0_1 : 1, tog.m23.p.n_rst: 1, tog.m25.p.n_a: 1,
+	tog.m21.p.n_rst: 1;
+PRODUCE tog.m22.p.pegel_0_0_0_0 : 1, tog.m21.p.rst: ff(), tog.m23.p.rst: ff(),
+        tog.m25.p.a: ff(), tog.m21.p.n_q: 1;
+
+TRANSITION tog.m22.t.b0_pegel_1_0_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m21.p.q: b, tog.m22.p.pegel_1_0_1_0 : 1;
+PRODUCE tog.m22.p.pegel_1_0_1_0 : 1, tog.m21.p.n_q: 1;
+
+TRANSITION tog.m22.t.b0_pegel_1_1_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m21.p.q: b, tog.m22.p.pegel_1_1_0_1 : 1, tog.m23.p.n_clk: 1,
+        tog.m23.p.n_rst: 1, tog.m25.p.n_a: 1, tog.m20.p.n_rst: 1, tog.m21.p.n_rst: 1;
+PRODUCE tog.m22.p.pegel_1_0_1_0 : 1, tog.m20.p.rst: tt(), tog.m23.p.clk: tt(),
+        tog.m21.p.rst: ff(), tog.m23.p.rst: ff(), tog.m25.p.a: ff(), tog.m21.p.n_q: 1;
+
+TRANSITION tog.m22.t.b0_pegel_1_1_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m21.p.q: b, tog.m22.p.pegel_1_1_1_0 : 1;
+PRODUCE tog.m22.p.pegel_1_0_1_0 : 1, tog.m21.p.n_q: 1;
+
+
+TRANSITION tog.m22.t.b1_pegel_0_0_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m21.p.q: b, tog.m22.p.pegel_0_0_0_0 : 1, tog.m23.p.n_rst: 1, tog.m25.p.n_a: 1,
+	tog.m21.p.n_rst: 1;
+PRODUCE tog.m22.p.pegel_0_1_0_1 : 1, tog.m21.p.rst: tt(), tog.m23.p.rst: tt(),
+        tog.m25.p.a: tt(), tog.m21.p.n_q: 1;
+
+TRANSITION tog.m22.t.b1_pegel_0_1_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m21.p.q: b, tog.m22.p.pegel_0_1_0_1 : 1;
+PRODUCE tog.m22.p.pegel_0_1_0_1 : 1, tog.m21.p.n_q: 1;
+
+TRANSITION tog.m22.t.b1_pegel_1_0_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m21.p.q: b, tog.m22.p.pegel_1_0_1_0 : 1;
+PRODUCE tog.m22.p.pegel_1_1_1_0 : 1, tog.m21.p.n_q: 1;
+
+TRANSITION tog.m22.t.b1_pegel_1_1_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m21.p.q: b, tog.m22.p.pegel_1_1_0_1 : 1;
+PRODUCE tog.m22.p.pegel_1_1_0_1 : 1, tog.m21.p.n_q: 1;
+
+TRANSITION tog.m22.t.b1_pegel_1_1_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m21.p.q: b, tog.m22.p.pegel_1_1_1_0 : 1;
+PRODUCE tog.m22.p.pegel_1_1_1_0 : 1, tog.m21.p.n_q: 1;
+
+
+
+
+{m23: Counter}
+
+TRANSITION tog.m23.t.max
+VAR clk: BOOLEAN; n: Anzahl;
+GUARD clk AND (n = 0)						{n=max}
+CONSUME tog.m23.p.clk: clk, tog.m23.p.value: n, tog.m23.p.active: 1, tog.m23.p.n_out: 1;
+PRODUCE tog.m23.p.out: tt(), tog.m23.p.active: 1, tog.m23.p.value: n, tog.m23.p.n_clk: 1;
+
+TRANSITION tog.m23.t.count
+VAR clk: BOOLEAN; n: Anzahl;
+GUARD clk AND (n <> 0)
+CONSUME tog.m23.p.clk: clk, tog.m23.p.value: n, tog.m23.p.active: 1;
+PRODUCE tog.m23.p.active: 1, tog.m23.p.value: inc(n), tog.m23.p.n_clk: 1;
+
+TRANSITION tog.m23.t.not_count1
+VAR clk: BOOLEAN;
+GUARD (NOT clk)
+CONSUME tog.m23.p.clk: clk, tog.m23.p.active: 1;
+PRODUCE tog.m23.p.active: 1, tog.m23.p.n_clk: 1;
+
+TRANSITION tog.m23.t.not_count2
+VAR clk: BOOLEAN;
+GUARD (NOT clk)
+CONSUME tog.m23.p.clk: clk, tog.m23.p.deactive: 1;
+PRODUCE tog.m23.p.deactive: 1, tog.m23.p.n_clk: 1;
+
+TRANSITION tog.m23.t.hazard
+VAR clk, rst: BOOLEAN;
+CONSUME tog.m23.p.clk: clk, tog.m23.p.rst: rst, tog.m23.p.active: 1;
+PRODUCE tog.m23.p.active: 1, tog.m23.p.n_rst: 1, tog.m23.p.n_clk: 1;
+
+TRANSITION tog.m23.t.rst0
+VAR rst: BOOLEAN;
+GUARD (NOT rst)
+CONSUME tog.m23.p.rst: rst, tog.m23.p.deactive: 1;
+PRODUCE tog.m23.p.active: 1, tog.m23.p.n_rst: 1;
+
+TRANSITION tog.m23.t.rst1
+VAR rst: BOOLEAN; n: Anzahl;
+GUARD rst
+CONSUME tog.m23.p.rst: rst, tog.m23.p.active: 1, tog.m23.p.value: n, tog.m23.p.n_out: 1; 
+PRODUCE tog.m23.p.deactive: 1, tog.m23.p.value: reset(n), tog.m23.p.out: ff(), tog.m23.p.n_rst: 1;
+
+
+{m24: D-FF}
+TRANSITION tog.m24.t.clk0_0_0
+CONSUME tog.m23.p.out: ff(), tog.m24.p.pegel_0_0 : 1;
+PRODUCE tog.m24.p.pegel_0_0 : 1, tog.m23.p.n_out: 1;
+
+TRANSITION tog.m24.t.clk0_0_1
+CONSUME tog.m23.p.out: ff(), tog.m24.p.pegel_0_1 : 1;
+PRODUCE tog.m24.p.pegel_0_1 : 1, tog.m23.p.n_out: 1;
+
+TRANSITION tog.m24.t.clk0_1_0
+CONSUME tog.m23.p.out: ff(), tog.m24.p.pegel_1_0 : 1;
+PRODUCE tog.m24.p.pegel_1_0 : 1, tog.m23.p.n_out: 1;
+
+TRANSITION tog.m24.t.clk1_0_0
+CONSUME tog.m23.p.out: tt(), tog.m24.p.pegel_0_0 : 1, tog.m24.p.n_q: 1;
+PRODUCE tog.m24.p.pegel_0_1 : 1, tog.m24.p.q: tt(), tog.m23.p.n_out: 1;
+
+TRANSITION tog.m24.t.clk1_0_1
+CONSUME tog.m23.p.out: tt(), tog.m24.p.pegel_0_1 : 1;
+PRODUCE tog.m24.p.pegel_0_1 : 1, tog.m23.p.n_out: 1;
+
+TRANSITION tog.m24.t.clk1_1_0
+CONSUME tog.m23.p.out: tt(), tog.m24.p.pegel_1_0 : 1;
+PRODUCE tog.m24.p.pegel_1_0 : 1, tog.m23.p.n_out: 1;
+
+TRANSITION tog.m24.t.rst0_0_0
+CONSUME tog.m24.p.rst: ff(), tog.m24.p.pegel_0_0 : 1;
+PRODUCE tog.m24.p.pegel_0_0 : 1, tog.m24.p.n_rst: 1;
+
+TRANSITION tog.m24.t.rst0_0_1
+CONSUME tog.m24.p.rst: ff(), tog.m24.p.pegel_0_1 : 1;
+PRODUCE tog.m24.p.pegel_0_1 : 1, tog.m24.p.n_rst: 1;
+
+TRANSITION tog.m24.t.rst0_1_0
+CONSUME tog.m24.p.rst: ff(), tog.m24.p.pegel_1_0 : 1;
+PRODUCE tog.m24.p.pegel_0_0 : 1, tog.m24.p.n_rst: 1;
+
+TRANSITION tog.m24.t.rst1_0_0
+CONSUME tog.m24.p.rst: tt(), tog.m24.p.pegel_0_0 : 1;
+PRODUCE tog.m24.p.pegel_1_0 : 1, tog.m24.p.n_rst: 1;
+
+TRANSITION tog.m24.t.rst1_0_1
+CONSUME tog.m24.p.rst: tt(), tog.m24.p.pegel_0_1 : 1, tog.m24.p.n_q: 1;
+PRODUCE tog.m24.p.pegel_1_0 : 1, tog.m24.p.q: ff(), tog.m24.p.n_rst: 1;
+
+TRANSITION tog.m24.t.rst1_1_0
+CONSUME tog.m24.p.rst: tt(), tog.m24.p.pegel_1_0 : 1;
+PRODUCE tog.m24.p.pegel_1_0 : 1, tog.m24.p.n_rst: 1;
+
+
+
+
+{m25: OR-Gatter}
+TRANSITION tog.m25.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME tog.m25.p.a: a, tog.m25.p.pegel_0_0: 1;
+PRODUCE tog.m25.p.pegel_0_0: 1, tog.m25.p.n_a: 1;
+
+TRANSITION tog.m25.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME tog.m25.p.a: a, tog.m25.p.pegel_0_1: 1;
+PRODUCE tog.m25.p.pegel_0_1: 1, tog.m25.p.n_a: 1;
+
+TRANSITION tog.m25.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME tog.m25.p.a: a, tog.m25.p.pegel_1_0: 1, tog.m24.p.n_rst: 1;
+PRODUCE tog.m25.p.pegel_0_0: 1, tog.m24.p.rst: ff(), tog.m25.p.n_a: 1;
+
+TRANSITION tog.m25.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME tog.m25.p.a: a, tog.m25.p.pegel_1_1: 1;
+PRODUCE tog.m25.p.pegel_0_1: 1, tog.m25.p.n_a: 1;
+
+TRANSITION tog.m25.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME tog.m25.p.a: a, tog.m25.p.pegel_0_0: 1, tog.m24.p.n_rst: 1;
+PRODUCE tog.m25.p.pegel_1_0: 1, tog.m24.p.rst: tt(), tog.m25.p.n_a: 1;
+
+TRANSITION tog.m25.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME tog.m25.p.a: a, tog.m25.p.pegel_0_1: 1;
+PRODUCE tog.m25.p.pegel_1_1: 1, tog.m25.p.n_a: 1;
+
+TRANSITION tog.m25.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME tog.m25.p.a: a, tog.m25.p.pegel_1_0: 1;
+PRODUCE tog.m25.p.pegel_1_0: 1, tog.m25.p.n_a: 1;
+
+TRANSITION tog.m25.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME tog.m25.p.a: a, tog.m25.p.pegel_1_1: 1;
+PRODUCE tog.m25.p.pegel_1_1: 1, tog.m25.p.n_a: 1;
+
+
+TRANSITION tog.m25.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m25.p.b: b, tog.m25.p.pegel_0_0: 1;
+PRODUCE tog.m25.p.pegel_0_0: 1, tog.m25.p.n_b: 1;
+
+TRANSITION tog.m25.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m25.p.b: b, tog.m25.p.pegel_0_1: 1, tog.m24.p.n_rst: 1;
+PRODUCE tog.m25.p.pegel_0_0: 1, tog.m24.p.rst: ff(), tog.m25.p.n_b: 1;
+
+TRANSITION tog.m25.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m25.p.b: b, tog.m25.p.pegel_1_0: 1;
+PRODUCE tog.m25.p.pegel_1_0: 1, tog.m25.p.n_b: 1;
+
+TRANSITION tog.m25.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m25.p.b: b, tog.m25.p.pegel_1_1: 1;
+PRODUCE tog.m25.p.pegel_1_0: 1, tog.m25.p.n_b: 1;
+
+TRANSITION tog.m25.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m25.p.b: b, tog.m25.p.pegel_0_0: 1, tog.m24.p.n_rst: 1;
+PRODUCE tog.m25.p.pegel_0_1: 1, tog.m24.p.rst: tt(), tog.m25.p.n_b: 1;
+
+TRANSITION tog.m25.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m25.p.b: b, tog.m25.p.pegel_0_1: 1;
+PRODUCE tog.m25.p.pegel_0_1: 1, tog.m25.p.n_b: 1;
+
+TRANSITION tog.m25.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m25.p.b: b, tog.m25.p.pegel_1_0: 1;
+PRODUCE tog.m25.p.pegel_1_1: 1, tog.m25.p.n_b: 1;
+
+TRANSITION tog.m25.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m25.p.b: b, tog.m25.p.pegel_1_1: 1;
+PRODUCE tog.m25.p.pegel_1_1: 1, tog.m25.p.n_b: 1;
+
+
+
+{m26: MUTEX}
+
+TRANSITION tog.m26.t.a0_pegel_0_0_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME p.REQ_A: a, tog.m26.p.pegel_0_0_0_0 : 1;
+PRODUCE tog.m26.p.pegel_0_0_0_0 : 1, p.n_REQ_A: 1;
+
+TRANSITION tog.m26.t.a0_pegel_0_1_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME p.REQ_A: a, tog.m26.p.pegel_0_1_0_1 : 1;
+PRODUCE tog.m26.p.pegel_0_1_0_1 : 1, p.n_REQ_A: 1;
+
+TRANSITION tog.m26.t.a0_pegel_1_0_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME p.REQ_A: a, tog.m26.p.pegel_1_0_1_0 : 1, ip.p.n_REQ_A1: 1;
+PRODUCE tog.m26.p.pegel_0_0_0_0 : 1, ip.p.REQ_A1: ff(), p.n_REQ_A: 1;
+
+TRANSITION tog.m26.t.a0_pegel_1_1_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME p.REQ_A: a, tog.m26.p.pegel_1_1_0_1 : 1;
+PRODUCE tog.m26.p.pegel_0_1_0_1 : 1, p.n_REQ_A: 1;
+
+TRANSITION tog.m26.t.a0_pegel_1_1_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME p.REQ_A: a, tog.m26.p.pegel_1_1_1_0 : 1, tog.m26.p.n_b_out: 1, ip.p.n_REQ_A1: 1;
+PRODUCE tog.m26.p.pegel_0_1_0_1 : 1, ip.p.REQ_A1: ff(), tog.m26.p.b_out: tt(), p.n_REQ_A: 1;
+
+
+TRANSITION tog.m26.t.a1_pegel_0_0_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME p.REQ_A: a, tog.m26.p.pegel_0_0_0_0 : 1, ip.p.n_REQ_A1: 1;
+PRODUCE tog.m26.p.pegel_1_0_1_0 : 1, ip.p.REQ_A1: tt(), p.n_REQ_A: 1;
+
+TRANSITION tog.m26.t.a1_pegel_0_1_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME p.REQ_A: a, tog.m26.p.pegel_0_1_0_1 : 1;
+PRODUCE tog.m26.p.pegel_1_1_0_1 : 1, p.n_REQ_A: 1;
+
+TRANSITION tog.m26.t.a1_pegel_1_0_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME p.REQ_A: a, tog.m26.p.pegel_1_0_1_0 : 1;
+PRODUCE tog.m26.p.pegel_1_0_1_0 : 1, p.n_REQ_A: 1;
+
+TRANSITION tog.m26.t.a1_pegel_1_1_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME p.REQ_A: a, tog.m26.p.pegel_1_1_0_1 : 1;
+PRODUCE tog.m26.p.pegel_1_1_0_1 : 1, p.n_REQ_A: 1;
+
+TRANSITION tog.m26.t.a1_pegel_1_1_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME p.REQ_A: a, tog.m26.p.pegel_1_1_1_0 : 1;
+PRODUCE tog.m26.p.pegel_1_1_1_0 : 1, p.n_REQ_A: 1;
+
+
+
+TRANSITION tog.m26.t.b0_pegel_0_0_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m24.p.q: b, tog.m26.p.pegel_0_0_0_0 : 1;
+PRODUCE tog.m26.p.pegel_0_0_0_0 : 1, tog.m24.p.n_q: 1;
+
+TRANSITION tog.m26.t.b0_pegel_0_1_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m24.p.q: b, tog.m26.p.pegel_0_1_0_1 : 1, tog.m26.p.n_b_out: 1;
+PRODUCE tog.m26.p.pegel_0_0_0_0 : 1, tog.m26.p.b_out: ff(), tog.m24.p.n_q: 1;
+
+TRANSITION tog.m26.t.b0_pegel_1_0_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m24.p.q: b, tog.m26.p.pegel_1_0_1_0 : 1;
+PRODUCE tog.m26.p.pegel_1_0_1_0 : 1, tog.m24.p.n_q: 1;
+
+TRANSITION tog.m26.t.b0_pegel_1_1_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m24.p.q: b, tog.m26.p.pegel_1_1_0_1 : 1, tog.m26.p.n_b_out: 1, ip.p.n_REQ_A1: 1;
+PRODUCE tog.m26.p.pegel_1_0_1_0 : 1, ip.p.REQ_A1: tt(), tog.m26.p.b_out: ff(), tog.m24.p.n_q: 1;
+
+TRANSITION tog.m26.t.b0_pegel_1_1_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME tog.m24.p.q: b, tog.m26.p.pegel_1_1_1_0 : 1;
+PRODUCE tog.m26.p.pegel_1_0_1_0 : 1, tog.m24.p.n_q: 1;
+
+
+TRANSITION tog.m26.t.b1_pegel_0_0_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m24.p.q: b, tog.m26.p.pegel_0_0_0_0 : 1, tog.m26.p.n_b_out: 1;
+PRODUCE tog.m26.p.pegel_0_1_0_1 : 1, tog.m26.p.b_out: tt(), tog.m24.p.n_q: 1;
+
+TRANSITION tog.m26.t.b1_pegel_0_1_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m24.p.q: b, tog.m26.p.pegel_0_1_0_1 : 1;
+PRODUCE tog.m26.p.pegel_0_1_0_1 : 1, tog.m24.p.n_q: 1;
+
+TRANSITION tog.m26.t.b1_pegel_1_0_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m24.p.q: b, tog.m26.p.pegel_1_0_1_0 : 1;
+PRODUCE tog.m26.p.pegel_1_1_1_0 : 1, tog.m24.p.n_q: 1;
+
+TRANSITION tog.m26.t.b1_pegel_1_1_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m24.p.q: b, tog.m26.p.pegel_1_1_0_1 : 1;
+PRODUCE tog.m26.p.pegel_1_1_0_1 : 1, tog.m24.p.n_q: 1;
+
+TRANSITION tog.m26.t.b1_pegel_1_1_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME tog.m24.p.q: b, tog.m26.p.pegel_1_1_1_0 : 1;
+PRODUCE tog.m26.p.pegel_1_1_1_0 : 1, tog.m24.p.n_q: 1;
+
+
+
+
+{m27: D-FF} 
+TRANSITION tog.m27.t.clk0_0_0
+CONSUME tog.m26.p.b_out: ff(), tog.m27.p.pegel_0_0 : 1;
+PRODUCE tog.m27.p.pegel_0_0 : 1, tog.m26.p.n_b_out: 1;
+
+TRANSITION tog.m27.t.clk0_0_1
+CONSUME tog.m26.p.b_out: ff(), tog.m27.p.pegel_0_1 : 1;
+PRODUCE tog.m27.p.pegel_0_1 : 1, tog.m26.p.n_b_out: 1;
+
+TRANSITION tog.m27.t.clk0_1_0
+CONSUME tog.m26.p.b_out: ff(), tog.m27.p.pegel_1_0 : 1;
+PRODUCE tog.m27.p.pegel_1_0 : 1, tog.m26.p.n_b_out: 1;
+
+TRANSITION tog.m27.t.clk1_0_0
+CONSUME tog.m26.p.b_out: tt(), tog.m27.p.pegel_0_0 : 1, tog.m25.p.n_b: 1, ip.p.n_ST: 1, and.p.n_a: 1;
+PRODUCE tog.m27.p.pegel_0_1 : 1, tog.m25.p.b: tt(), ip.p.ST: tt(),
+        and.p.a: tt(), tog.m26.p.n_b_out: 1;
+
+TRANSITION tog.m27.t.clk1_0_1
+CONSUME tog.m26.p.b_out: tt(), tog.m27.p.pegel_0_1 : 1;
+PRODUCE tog.m27.p.pegel_0_1 : 1, tog.m26.p.n_b_out: 1;
+
+TRANSITION tog.m27.t.clk1_1_0
+CONSUME tog.m26.p.b_out: tt(), tog.m27.p.pegel_1_0 : 1;
+PRODUCE tog.m27.p.pegel_1_0 : 1, tog.m26.p.n_b_out: 1;
+
+TRANSITION tog.m27.t.rst0_0_0
+CONSUME tog.m27.p.rst: ff(), tog.m27.p.pegel_0_0 : 1;
+PRODUCE tog.m27.p.pegel_0_0 : 1, tog.m27.p.n_rst: 1;
+
+TRANSITION tog.m27.t.rst0_0_1
+CONSUME tog.m27.p.rst: ff(), tog.m27.p.pegel_0_1 : 1;
+PRODUCE tog.m27.p.pegel_0_1 : 1, tog.m27.p.n_rst: 1;
+
+TRANSITION tog.m27.t.rst0_1_0
+CONSUME tog.m27.p.rst: ff(), tog.m27.p.pegel_1_0 : 1;
+PRODUCE tog.m27.p.pegel_0_0 : 1, tog.m27.p.n_rst: 1;
+
+TRANSITION tog.m27.t.rst1_0_0
+CONSUME tog.m27.p.rst: tt(), tog.m27.p.pegel_0_0 : 1;
+PRODUCE tog.m27.p.pegel_1_0 : 1, tog.m27.p.n_rst: 1;
+
+TRANSITION tog.m27.t.rst1_0_1
+CONSUME tog.m27.p.rst: tt(), tog.m27.p.pegel_0_1 : 1, tog.m25.p.n_b: 1, ip.p.n_ST: 1, and.p.n_a: 1;
+PRODUCE tog.m27.p.pegel_1_0 : 1, tog.m25.p.b: ff(), ip.p.ST: ff(),
+        and.p.a: ff(), tog.m27.p.n_rst: 1;
+
+TRANSITION tog.m27.t.rst1_1_0
+CONSUME tog.m27.p.rst: tt(), tog.m27.p.pegel_1_0 : 1;
+PRODUCE tog.m27.p.pegel_1_0 : 1, tog.m27.p.n_rst: 1;
+
+
+
+
+
+{Input Port (ip)}
+
+
+{Verzweigungen}
+TRANSITION ip.t.int_clk
+VAR x: BOOLEAN;
+CONSUME ip.p.INT_CLK: x, ip.m63.p.n_b: 1, ip.m61.p.n_b: 1;
+PRODUCE ip.m61.p.b: x, ip.m63.p.b: x, ip.p.n_INT_CLK: 1;
+
+TRANSITION ip.t.st
+VAR x: BOOLEAN;
+CONSUME ip.p.ST: x, ip.m66.p.n_b: 1, ip.m69.p.n_st: 1;
+PRODUCE ip.m66.p.b: neg(x), ip.m69.p.st: x, ip.p.n_ST: 1;
+
+TRANSITION ip.t.ack_int
+VAR x: BOOLEAN;
+CONSUME ip.p.ACK_INT: x, ip.m66.p.n_a: 1, ip.m67.p.n_b: 1;
+PRODUCE ip.m66.p.a: x, ip.m67.p.b: x, ip.p.n_ACK_INT: 1;
+
+
+
+{m61: AND}
+
+TRANSITION ip.m61.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.p.LCLKM: a, ip.m61.p.pegel_0_0: 1;
+PRODUCE ip.m61.p.pegel_0_0: 1, ip.p.n_LCLKM: 1;
+
+TRANSITION ip.m61.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.p.LCLKM: a, ip.m61.p.pegel_0_1: 1;
+PRODUCE ip.m61.p.pegel_0_1: 1, ip.p.n_LCLKM: 1;
+
+TRANSITION ip.m61.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.p.LCLKM: a, ip.m61.p.pegel_1_0: 1;
+PRODUCE ip.m61.p.pegel_0_0: 1, ip.p.n_LCLKM: 1;
+
+TRANSITION ip.m61.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.p.LCLKM: a, ip.m61.p.pegel_1_1: 1, ip.m61.p.n_out: 1;
+PRODUCE ip.m61.p.pegel_0_1: 1, ip.m61.p.out: ff(), ip.p.n_LCLKM: 1;
+
+TRANSITION ip.m61.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.p.LCLKM: a, ip.m61.p.pegel_0_0: 1;
+PRODUCE ip.m61.p.pegel_1_0: 1, ip.p.n_LCLKM: 1;
+
+TRANSITION ip.m61.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.p.LCLKM: a, ip.m61.p.pegel_0_1: 1, ip.m61.p.n_out: 1;
+PRODUCE ip.m61.p.pegel_1_1: 1, ip.m61.p.out: tt(), ip.p.n_LCLKM: 1;
+
+TRANSITION ip.m61.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.p.LCLKM: a, ip.m61.p.pegel_1_0: 1;
+PRODUCE ip.m61.p.pegel_1_0: 1, ip.p.n_LCLKM: 1;
+
+TRANSITION ip.m61.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.p.LCLKM: a, ip.m61.p.pegel_1_1: 1;
+PRODUCE ip.m61.p.pegel_1_1: 1, ip.p.n_LCLKM: 1;
+
+
+TRANSITION ip.m61.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m61.p.b: b, ip.m61.p.pegel_0_0: 1;
+PRODUCE ip.m61.p.pegel_0_0: 1, ip.m61.p.n_b: 1;
+
+TRANSITION ip.m61.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m61.p.b: b, ip.m61.p.pegel_0_1: 1;
+PRODUCE ip.m61.p.pegel_0_0: 1, ip.m61.p.n_b: 1;
+
+TRANSITION ip.m61.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m61.p.b: b, ip.m61.p.pegel_1_0: 1;
+PRODUCE ip.m61.p.pegel_1_0: 1, ip.m61.p.n_b: 1;
+
+TRANSITION ip.m61.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m61.p.b: b, ip.m61.p.pegel_1_1: 1, ip.m61.p.n_out: 1;
+PRODUCE ip.m61.p.pegel_1_0: 1, ip.m61.p.out: ff(), ip.m61.p.n_b: 1;
+
+TRANSITION ip.m61.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m61.p.b: b, ip.m61.p.pegel_0_0: 1;
+PRODUCE ip.m61.p.pegel_0_1: 1, ip.m61.p.n_b: 1;
+
+TRANSITION ip.m61.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m61.p.b: b, ip.m61.p.pegel_0_1: 1;
+PRODUCE ip.m61.p.pegel_0_1: 1, ip.m61.p.n_b: 1;
+
+TRANSITION ip.m61.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m61.p.b: b, ip.m61.p.pegel_1_0: 1, ip.m61.p.n_out: 1;
+PRODUCE ip.m61.p.pegel_1_1: 1, ip.m61.p.out: tt(), ip.m61.p.n_b: 1;
+
+TRANSITION ip.m61.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m61.p.b: b, ip.m61.p.pegel_1_1: 1;
+PRODUCE ip.m61.p.pegel_1_1: 1, ip.m61.p.n_b: 1;
+
+
+
+{m62: D-FF mit D=0 und SET}
+
+TRANSITION ip.m62.t.clk0_0_0
+CONSUME ip.m61.p.out: ff(), ip.m62.p.pegel_0_0 : 1;
+PRODUCE ip.m62.p.pegel_0_0 : 1, ip.m61.p.n_out: 1;
+
+TRANSITION ip.m62.t.clk0_0_1
+CONSUME ip.m61.p.out: ff(), ip.m62.p.pegel_0_1 : 1;
+PRODUCE ip.m62.p.pegel_0_1 : 1, ip.m61.p.n_out: 1;
+
+TRANSITION ip.m62.t.clk0_1_1
+CONSUME ip.m61.p.out: ff(), ip.m62.p.pegel_1_1 : 1;
+PRODUCE ip.m62.p.pegel_1_1 : 1, ip.m61.p.n_out: 1;
+
+TRANSITION ip.m62.t.clk1_0_0
+CONSUME ip.m61.p.out: tt(), ip.m62.p.pegel_0_0 : 1;
+PRODUCE ip.m62.p.pegel_0_0 : 1, ip.m61.p.n_out: 1;
+
+TRANSITION ip.m62.t.clk1_0_1
+CONSUME ip.m61.p.out: tt(), ip.m62.p.pegel_0_1 : 1, lsm.p.n_DATAV_IN: 1;
+PRODUCE ip.m62.p.pegel_0_0 : 1, lsm.p.DATAV_IN: ff(), ip.m61.p.n_out: 1;
+
+TRANSITION ip.m62.t.clk1_1_1
+CONSUME ip.m61.p.out: tt(), ip.m62.p.pegel_1_1 : 1;
+PRODUCE ip.m62.p.pegel_1_1 : 1, ip.m61.p.n_out: 1;
+
+TRANSITION ip.m62.t.set0_0_0
+CONSUME ip.m62.p.set: ff(), ip.m62.p.pegel_0_0 : 1;
+PRODUCE ip.m62.p.pegel_0_0 : 1, ip.m62.p.n_set: 1;
+
+TRANSITION ip.m62.t.set0_0_1
+CONSUME ip.m62.p.set: ff(), ip.m62.p.pegel_0_1 : 1;
+PRODUCE ip.m62.p.pegel_0_1 : 1, ip.m62.p.n_set: 1;
+
+TRANSITION ip.m62.t.set0_1_1
+CONSUME ip.m62.p.set: ff(), ip.m62.p.pegel_1_1 : 1;
+PRODUCE ip.m62.p.pegel_0_1 : 1, ip.m62.p.n_set: 1;
+
+TRANSITION ip.m62.t.set1_0_0
+CONSUME ip.m62.p.set: tt(), ip.m62.p.pegel_0_0 : 1, lsm.p.n_DATAV_IN: 1;
+PRODUCE ip.m62.p.pegel_1_1 : 1, lsm.p.DATAV_IN: tt(), ip.m62.p.n_set: 1;
+
+TRANSITION ip.m62.t.set1_0_1
+CONSUME ip.m62.p.set: tt(), ip.m62.p.pegel_0_1 : 1;
+PRODUCE ip.m62.p.pegel_1_1 : 1, ip.m62.p.n_set: 1;
+
+TRANSITION ip.m62.t.set1_1_1
+CONSUME ip.m62.p.set: tt(), ip.m62.p.pegel_1_1 : 1;
+PRODUCE ip.m62.p.pegel_1_1 : 1, ip.m62.p.n_set: 1;
+
+
+
+{m63: AND}
+TRANSITION ip.m63.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m63.p.a: a, ip.m63.p.pegel_0_0: 1;
+PRODUCE ip.m63.p.pegel_0_0: 1, ip.m63.p.n_a: 1;
+
+TRANSITION ip.m63.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m63.p.a: a, ip.m63.p.pegel_0_1: 1;
+PRODUCE ip.m63.p.pegel_0_1: 1, ip.m63.p.n_a: 1;
+
+TRANSITION ip.m63.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m63.p.a: a, ip.m63.p.pegel_1_0: 1;
+PRODUCE ip.m63.p.pegel_0_0: 1, ip.m63.p.n_a: 1;
+
+TRANSITION ip.m63.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m63.p.a: a, ip.m63.p.pegel_1_1: 1, ip.m65.p.n_a: 1;
+PRODUCE ip.m63.p.pegel_0_1: 1, ip.m65.p.a: ff(), ip.m63.p.n_a: 1;
+
+TRANSITION ip.m63.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m63.p.a: a, ip.m63.p.pegel_0_0: 1;
+PRODUCE ip.m63.p.pegel_1_0: 1, ip.m63.p.n_a: 1;
+
+TRANSITION ip.m63.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m63.p.a: a, ip.m63.p.pegel_0_1: 1, ip.m65.p.n_a: 1;
+PRODUCE ip.m63.p.pegel_1_1: 1, ip.m65.p.a: tt(), ip.m63.p.n_a: 1;
+
+TRANSITION ip.m63.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m63.p.a: a, ip.m63.p.pegel_1_0: 1;
+PRODUCE ip.m63.p.pegel_1_0: 1, ip.m63.p.n_a: 1;
+
+TRANSITION ip.m63.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m63.p.a: a, ip.m63.p.pegel_1_1: 1;
+PRODUCE ip.m63.p.pegel_1_1: 1, ip.m63.p.n_a: 1;
+
+
+TRANSITION ip.m63.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m63.p.b: b, ip.m63.p.pegel_0_0: 1;
+PRODUCE ip.m63.p.pegel_0_0: 1, ip.m63.p.n_b: 1;
+
+TRANSITION ip.m63.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m63.p.b: b, ip.m63.p.pegel_0_1: 1;
+PRODUCE ip.m63.p.pegel_0_0: 1, ip.m63.p.n_b: 1;
+
+TRANSITION ip.m63.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m63.p.b: b, ip.m63.p.pegel_1_0: 1;
+PRODUCE ip.m63.p.pegel_1_0: 1, ip.m63.p.n_b: 1;
+
+TRANSITION ip.m63.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m63.p.b: b, ip.m63.p.pegel_1_1: 1, ip.m65.p.n_a: 1;
+PRODUCE ip.m63.p.pegel_1_0: 1, ip.m65.p.a: ff(), ip.m63.p.n_b: 1;
+
+TRANSITION ip.m63.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m63.p.b: b, ip.m63.p.pegel_0_0: 1;
+PRODUCE ip.m63.p.pegel_0_1: 1, ip.m63.p.n_b: 1;
+
+TRANSITION ip.m63.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m63.p.b: b, ip.m63.p.pegel_0_1: 1;
+PRODUCE ip.m63.p.pegel_0_1: 1, ip.m63.p.n_b: 1;
+
+TRANSITION ip.m63.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m63.p.b: b, ip.m63.p.pegel_1_0: 1, ip.m65.p.n_a: 1;
+PRODUCE ip.m63.p.pegel_1_1: 1, ip.m65.p.a: tt(), ip.m63.p.n_b: 1;
+
+TRANSITION ip.m63.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m63.p.b: b, ip.m63.p.pegel_1_1: 1;
+PRODUCE ip.m63.p.pegel_1_1: 1, ip.m63.p.n_b: 1;
+
+
+
+{m64: AND}
+TRANSITION ip.m64.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m64.p.a: a, ip.m64.p.pegel_0_0: 1;
+PRODUCE ip.m64.p.pegel_0_0: 1, ip.m64.p.n_a: 1;
+
+TRANSITION ip.m64.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m64.p.a: a, ip.m64.p.pegel_0_1: 1;
+PRODUCE ip.m64.p.pegel_0_1: 1, ip.m64.p.n_a: 1;
+
+TRANSITION ip.m64.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m64.p.a: a, ip.m64.p.pegel_1_0: 1;
+PRODUCE ip.m64.p.pegel_0_0: 1, ip.m64.p.n_a: 1;
+
+TRANSITION ip.m64.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m64.p.a: a, ip.m64.p.pegel_1_1: 1, ip.m65.p.n_b: 1;
+PRODUCE ip.m64.p.pegel_0_1: 1, ip.m65.p.b: ff(), ip.m64.p.n_a: 1;
+
+TRANSITION ip.m64.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m64.p.a: a, ip.m64.p.pegel_0_0: 1;
+PRODUCE ip.m64.p.pegel_1_0: 1, ip.m64.p.n_a: 1;
+
+TRANSITION ip.m64.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m64.p.a: a, ip.m64.p.pegel_0_1: 1, ip.m65.p.n_b: 1;
+PRODUCE ip.m64.p.pegel_1_1: 1, ip.m65.p.b: tt(), ip.m64.p.n_a: 1;
+
+TRANSITION ip.m64.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m64.p.a: a, ip.m64.p.pegel_1_0: 1;
+PRODUCE ip.m64.p.pegel_1_0: 1, ip.m64.p.n_a: 1;
+
+TRANSITION ip.m64.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m64.p.a: a, ip.m64.p.pegel_1_1: 1;
+PRODUCE ip.m64.p.pegel_1_1: 1, ip.m64.p.n_a: 1;
+
+
+TRANSITION ip.m64.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m64.p.b: b, ip.m64.p.pegel_0_0: 1;
+PRODUCE ip.m64.p.pegel_0_0: 1, ip.m64.p.n_b: 1;
+
+TRANSITION ip.m64.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m64.p.b: b, ip.m64.p.pegel_0_1: 1;
+PRODUCE ip.m64.p.pegel_0_0: 1, ip.m64.p.n_b: 1;
+
+TRANSITION ip.m64.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m64.p.b: b, ip.m64.p.pegel_1_0: 1;
+PRODUCE ip.m64.p.pegel_1_0: 1, ip.m64.p.n_b: 1;
+
+TRANSITION ip.m64.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m64.p.b: b, ip.m64.p.pegel_1_1: 1, ip.m65.p.n_b: 1;
+PRODUCE ip.m64.p.pegel_1_0: 1, ip.m65.p.b: ff(), ip.m64.p.n_b: 1;
+
+TRANSITION ip.m64.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m64.p.b: b, ip.m64.p.pegel_0_0: 1;
+PRODUCE ip.m64.p.pegel_0_1: 1, ip.m64.p.n_b: 1;
+
+TRANSITION ip.m64.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m64.p.b: b, ip.m64.p.pegel_0_1: 1;
+PRODUCE ip.m64.p.pegel_0_1: 1, ip.m64.p.n_b: 1;
+
+TRANSITION ip.m64.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m64.p.b: b, ip.m64.p.pegel_1_0: 1, ip.m65.p.n_b: 1;
+PRODUCE ip.m64.p.pegel_1_1: 1, ip.m65.p.b: tt(), ip.m64.p.n_b: 1;
+
+TRANSITION ip.m64.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m64.p.b: b, ip.m64.p.pegel_1_1: 1;
+PRODUCE ip.m64.p.pegel_1_1: 1, ip.m64.p.n_b: 1;
+
+
+
+{m65: OR}
+TRANSITION ip.m65.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m65.p.a: a, ip.m65.p.pegel_0_0: 1;
+PRODUCE ip.m65.p.pegel_0_0: 1, ip.m65.p.n_a: 1;
+
+TRANSITION ip.m65.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m65.p.a: a, ip.m65.p.pegel_0_1: 1;
+PRODUCE ip.m65.p.pegel_0_1: 1, ip.m65.p.n_a: 1;
+
+TRANSITION ip.m65.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m65.p.a: a, ip.m65.p.pegel_1_0: 1, ip.m62.p.n_set: 1, p.n_DLE: 1;
+PRODUCE ip.m65.p.pegel_0_0: 1, p.DLE: ff(), ip.m62.p.set: ff(), ip.m65.p.n_a: 1;
+
+TRANSITION ip.m65.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m65.p.a: a, ip.m65.p.pegel_1_1: 1;
+PRODUCE ip.m65.p.pegel_0_1: 1, ip.m65.p.n_a: 1;
+
+TRANSITION ip.m65.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m65.p.a: a, ip.m65.p.pegel_0_0: 1, ip.m62.p.n_set: 1, p.n_DLE: 1;
+PRODUCE ip.m65.p.pegel_1_0: 1, p.DLE: tt(), ip.m62.p.set: tt(), ip.m65.p.n_a: 1;
+
+TRANSITION ip.m65.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m65.p.a: a, ip.m65.p.pegel_0_1: 1;
+PRODUCE ip.m65.p.pegel_1_1: 1, ip.m65.p.n_a: 1;
+
+TRANSITION ip.m65.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m65.p.a: a, ip.m65.p.pegel_1_0: 1;
+PRODUCE ip.m65.p.pegel_1_0: 1, ip.m65.p.n_a: 1;
+
+TRANSITION ip.m65.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m65.p.a: a, ip.m65.p.pegel_1_1: 1;
+PRODUCE ip.m65.p.pegel_1_1: 1, ip.m65.p.n_a: 1;
+
+
+TRANSITION ip.m65.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m65.p.b: b, ip.m65.p.pegel_0_0: 1;
+PRODUCE ip.m65.p.pegel_0_0: 1, ip.m65.p.n_b: 1;
+
+TRANSITION ip.m65.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m65.p.b: b, ip.m65.p.pegel_0_1: 1, ip.m62.p.n_set: 1, p.n_DLE: 1;
+PRODUCE ip.m65.p.pegel_0_0: 1, p.DLE: ff(), ip.m62.p.set: ff(), ip.m65.p.n_b: 1;
+
+TRANSITION ip.m65.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m65.p.b: b, ip.m65.p.pegel_1_0: 1;
+PRODUCE ip.m65.p.pegel_1_0: 1, ip.m65.p.n_b: 1;
+
+TRANSITION ip.m65.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m65.p.b: b, ip.m65.p.pegel_1_1: 1;
+PRODUCE ip.m65.p.pegel_1_0: 1, ip.m65.p.n_b: 1;
+
+TRANSITION ip.m65.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m65.p.b: b, ip.m65.p.pegel_0_0: 1, ip.m62.p.n_set: 1, p.n_DLE: 1;
+PRODUCE ip.m65.p.pegel_0_1: 1, p.DLE: tt(), ip.m62.p.set: tt(), ip.m65.p.n_b: 1;
+
+TRANSITION ip.m65.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m65.p.b: b, ip.m65.p.pegel_0_1: 1;
+PRODUCE ip.m65.p.pegel_0_1: 1, ip.m65.p.n_b: 1;
+
+TRANSITION ip.m65.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m65.p.b: b, ip.m65.p.pegel_1_0: 1;
+PRODUCE ip.m65.p.pegel_1_1: 1, ip.m65.p.n_b: 1;
+
+TRANSITION ip.m65.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m65.p.b: b, ip.m65.p.pegel_1_1: 1;
+PRODUCE ip.m65.p.pegel_1_1: 1, ip.m65.p.n_b: 1;
+
+
+
+{m66: AND}
+TRANSITION ip.m66.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m66.p.a: a, ip.m66.p.pegel_0_0: 1;
+PRODUCE ip.m66.p.pegel_0_0: 1, ip.m66.p.n_a: 1;
+
+TRANSITION ip.m66.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m66.p.a: a, ip.m66.p.pegel_0_1: 1;
+PRODUCE ip.m66.p.pegel_0_1: 1, ip.m66.p.n_a: 1;
+
+TRANSITION ip.m66.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m66.p.a: a, ip.m66.p.pegel_1_0: 1;
+PRODUCE ip.m66.p.pegel_0_0: 1, ip.m66.p.n_a: 1;
+
+TRANSITION ip.m66.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m66.p.a: a, ip.m66.p.pegel_1_1: 1, ip.m68.p.n_b: 1;
+PRODUCE ip.m66.p.pegel_0_1: 1, ip.m68.p.b: ff(), ip.m66.p.n_a: 1;
+
+TRANSITION ip.m66.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m66.p.a: a, ip.m66.p.pegel_0_0: 1;
+PRODUCE ip.m66.p.pegel_1_0: 1, ip.m66.p.n_a: 1;
+
+TRANSITION ip.m66.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m66.p.a: a, ip.m66.p.pegel_0_1: 1, ip.m68.p.n_b: 1;
+PRODUCE ip.m66.p.pegel_1_1: 1, ip.m68.p.b: tt(), ip.m66.p.n_a: 1;
+
+TRANSITION ip.m66.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m66.p.a: a, ip.m66.p.pegel_1_0: 1;
+PRODUCE ip.m66.p.pegel_1_0: 1, ip.m66.p.n_a: 1;
+
+TRANSITION ip.m66.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m66.p.a: a, ip.m66.p.pegel_1_1: 1;
+PRODUCE ip.m66.p.pegel_1_1: 1, ip.m66.p.n_a: 1;
+
+
+TRANSITION ip.m66.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m66.p.b: b, ip.m66.p.pegel_0_0: 1;
+PRODUCE ip.m66.p.pegel_0_0: 1, ip.m66.p.n_b: 1;
+
+TRANSITION ip.m66.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m66.p.b: b, ip.m66.p.pegel_0_1: 1;
+PRODUCE ip.m66.p.pegel_0_0: 1, ip.m66.p.n_b: 1;
+
+TRANSITION ip.m66.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m66.p.b: b, ip.m66.p.pegel_1_0: 1;
+PRODUCE ip.m66.p.pegel_1_0: 1, ip.m66.p.n_b: 1;
+
+TRANSITION ip.m66.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m66.p.b: b, ip.m66.p.pegel_1_1: 1, ip.m68.p.n_b: 1;
+PRODUCE ip.m66.p.pegel_1_0: 1, ip.m68.p.b: ff(), ip.m66.p.n_b: 1;
+
+TRANSITION ip.m66.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m66.p.b: b, ip.m66.p.pegel_0_0: 1;
+PRODUCE ip.m66.p.pegel_0_1: 1, ip.m66.p.n_b: 1;
+
+TRANSITION ip.m66.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m66.p.b: b, ip.m66.p.pegel_0_1: 1;
+PRODUCE ip.m66.p.pegel_0_1: 1, ip.m66.p.n_b: 1;
+
+TRANSITION ip.m66.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m66.p.b: b, ip.m66.p.pegel_1_0: 1, ip.m68.p.n_b: 1;
+PRODUCE ip.m66.p.pegel_1_1: 1, ip.m68.p.b: tt(), ip.m66.p.n_b: 1;
+
+TRANSITION ip.m66.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m66.p.b: b, ip.m66.p.pegel_1_1: 1;
+PRODUCE ip.m66.p.pegel_1_1: 1, ip.m66.p.n_b: 1;
+
+
+
+{m67: AND}
+TRANSITION ip.m67.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m67.p.a: a, ip.m67.p.pegel_0_0: 1;
+PRODUCE ip.m67.p.pegel_0_0: 1, ip.m67.p.n_a: 1;
+
+TRANSITION ip.m67.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m67.p.a: a, ip.m67.p.pegel_0_1: 1;
+PRODUCE ip.m67.p.pegel_0_1: 1, ip.m67.p.n_a: 1;
+
+TRANSITION ip.m67.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m67.p.a: a, ip.m67.p.pegel_1_0: 1;
+PRODUCE ip.m67.p.pegel_0_0: 1, ip.m67.p.n_a: 1;
+
+TRANSITION ip.m67.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m67.p.a: a, ip.m67.p.pegel_1_1: 1, ip.m68.p.n_a: 1;
+PRODUCE ip.m67.p.pegel_0_1: 1, ip.m68.p.a: ff(), ip.m67.p.n_a: 1;
+
+TRANSITION ip.m67.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m67.p.a: a, ip.m67.p.pegel_0_0: 1;
+PRODUCE ip.m67.p.pegel_1_0: 1, ip.m67.p.n_a: 1;
+
+TRANSITION ip.m67.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m67.p.a: a, ip.m67.p.pegel_0_1: 1, ip.m68.p.n_a: 1;
+PRODUCE ip.m67.p.pegel_1_1: 1, ip.m68.p.a: tt(), ip.m67.p.n_a: 1;
+
+TRANSITION ip.m67.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m67.p.a: a, ip.m67.p.pegel_1_0: 1;
+PRODUCE ip.m67.p.pegel_1_0: 1, ip.m67.p.n_a: 1;
+
+TRANSITION ip.m67.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m67.p.a: a, ip.m67.p.pegel_1_1: 1;
+PRODUCE ip.m67.p.pegel_1_1: 1, ip.m67.p.n_a: 1;
+
+
+TRANSITION ip.m67.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m67.p.b: b, ip.m67.p.pegel_0_0: 1;
+PRODUCE ip.m67.p.pegel_0_0: 1, ip.m67.p.n_b: 1;
+
+TRANSITION ip.m67.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m67.p.b: b, ip.m67.p.pegel_0_1: 1;
+PRODUCE ip.m67.p.pegel_0_0: 1, ip.m67.p.n_b: 1;
+
+TRANSITION ip.m67.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m67.p.b: b, ip.m67.p.pegel_1_0: 1;
+PRODUCE ip.m67.p.pegel_1_0: 1, ip.m67.p.n_b: 1;
+
+TRANSITION ip.m67.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m67.p.b: b, ip.m67.p.pegel_1_1: 1, ip.m68.p.n_a: 1;
+PRODUCE ip.m67.p.pegel_1_0: 1, ip.m68.p.a: ff(), ip.m67.p.n_b: 1;
+
+TRANSITION ip.m67.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m67.p.b: b, ip.m67.p.pegel_0_0: 1;
+PRODUCE ip.m67.p.pegel_0_1: 1, ip.m67.p.n_b: 1;
+
+TRANSITION ip.m67.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m67.p.b: b, ip.m67.p.pegel_0_1: 1;
+PRODUCE ip.m67.p.pegel_0_1: 1, ip.m67.p.n_b: 1;
+
+TRANSITION ip.m67.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m67.p.b: b, ip.m67.p.pegel_1_0: 1, ip.m68.p.n_a: 1;
+PRODUCE ip.m67.p.pegel_1_1: 1, ip.m68.p.a: tt(), ip.m67.p.n_b: 1;
+
+TRANSITION ip.m67.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m67.p.b: b, ip.m67.p.pegel_1_1: 1;
+PRODUCE ip.m67.p.pegel_1_1: 1, ip.m67.p.n_b: 1;
+
+
+
+{m68: OR}
+TRANSITION ip.m68.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m68.p.a: a, ip.m68.p.pegel_0_0: 1;
+PRODUCE ip.m68.p.pegel_0_0: 1, ip.m68.p.n_a: 1;
+
+TRANSITION ip.m68.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m68.p.a: a, ip.m68.p.pegel_0_1: 1;
+PRODUCE ip.m68.p.pegel_0_1: 1, ip.m68.p.n_a: 1;
+
+TRANSITION ip.m68.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m68.p.a: a, ip.m68.p.pegel_1_0: 1, ip.m64.p.n_a: 1, ip.m69.p.n_ackc: 1;
+PRODUCE ip.m68.p.pegel_0_0: 1, ip.m69.p.ackc: ff(), ip.m64.p.a: ff(), ip.m68.p.n_a: 1;
+
+TRANSITION ip.m68.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME ip.m68.p.a: a, ip.m68.p.pegel_1_1: 1;
+PRODUCE ip.m68.p.pegel_0_1: 1, ip.m68.p.n_a: 1;
+
+TRANSITION ip.m68.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m68.p.a: a, ip.m68.p.pegel_0_0: 1, ip.m64.p.n_a: 1, ip.m69.p.n_ackc: 1;
+PRODUCE ip.m68.p.pegel_1_0: 1, ip.m69.p.ackc: tt(), ip.m64.p.a: tt(), ip.m68.p.n_a: 1;
+
+TRANSITION ip.m68.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m68.p.a: a, ip.m68.p.pegel_0_1: 1;
+PRODUCE ip.m68.p.pegel_1_1: 1, ip.m68.p.n_a: 1;
+
+TRANSITION ip.m68.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m68.p.a: a, ip.m68.p.pegel_1_0: 1;
+PRODUCE ip.m68.p.pegel_1_0: 1, ip.m68.p.n_a: 1;
+
+TRANSITION ip.m68.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME ip.m68.p.a: a, ip.m68.p.pegel_1_1: 1;
+PRODUCE ip.m68.p.pegel_1_1: 1, ip.m68.p.n_a: 1;
+
+
+TRANSITION ip.m68.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m68.p.b: b, ip.m68.p.pegel_0_0: 1;
+PRODUCE ip.m68.p.pegel_0_0: 1, ip.m68.p.n_b: 1;
+
+TRANSITION ip.m68.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m68.p.b: b, ip.m68.p.pegel_0_1: 1, ip.m64.p.n_a: 1, ip.m69.p.n_ackc: 1;
+PRODUCE ip.m68.p.pegel_0_0: 1, ip.m69.p.ackc: ff(), ip.m64.p.a: ff(), ip.m68.p.n_b: 1;
+
+TRANSITION ip.m68.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m68.p.b: b, ip.m68.p.pegel_1_0: 1;
+PRODUCE ip.m68.p.pegel_1_0: 1, ip.m68.p.n_b: 1;
+
+TRANSITION ip.m68.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME ip.m68.p.b: b, ip.m68.p.pegel_1_1: 1;
+PRODUCE ip.m68.p.pegel_1_0: 1, ip.m68.p.n_b: 1;
+
+TRANSITION ip.m68.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m68.p.b: b, ip.m68.p.pegel_0_0: 1, ip.m64.p.n_a: 1, ip.m69.p.n_ackc: 1;
+PRODUCE ip.m68.p.pegel_0_1: 1, ip.m69.p.ackc: tt(), ip.m64.p.a: tt(), ip.m68.p.n_b: 1;
+
+TRANSITION ip.m68.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m68.p.b: b, ip.m68.p.pegel_0_1: 1;
+PRODUCE ip.m68.p.pegel_0_1: 1, ip.m68.p.n_b: 1;
+
+TRANSITION ip.m68.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m68.p.b: b, ip.m68.p.pegel_1_0: 1;
+PRODUCE ip.m68.p.pegel_1_1: 1, ip.m68.p.n_b: 1;
+
+TRANSITION ip.m68.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME ip.m68.p.b: b, ip.m68.p.pegel_1_1: 1;
+PRODUCE ip.m68.p.pegel_1_1: 1, ip.m68.p.n_b: 1;
+
+
+
+{m69: Input Controller}
+TRANSITION ip.m69.t40
+VAR req_a1 : BOOLEAN;
+GUARD req_a1
+CONSUME ip.m69.p.0: 1, ip.p.REQ_A1: req_a1, cc.p.n_RST: 1, ip.m63.p.n_a: 1, tog.p.n_RST: 1, 
+	cc.p.n_REQ_INT: 1, or.p.n_a: 1, op.p.n_REQ_INT: 1, p.n_ACK_A: 1;
+PRODUCE ip.m69.p.1: 1, cc.p.REQ_INT: tt(), op.p.REQ_INT: tt(), or.p.a: tt(),
+        tog.p.RST: tt(), cc.p.RST: tt(), p.ACK_A: tt(), ip.m63.p.a: tt(), ip.p.n_REQ_A1: 1;
+
+TRANSITION ip.m69.t41
+VAR ackc, req_a1: BOOLEAN;
+GUARD ackc AND (NOT req_a1)
+CONSUME ip.m69.p.1: 1, ip.m69.p.ackc: ackc, ip.p.REQ_A1: req_a1, cc.p.n_RST: 1, ip.m63.p.n_a: 1,
+	tog.p.n_RST: 1, cc.p.n_REQ_INT: 1, or.p.n_a: 1, op.p.n_REQ_INT: 1, p.n_ACK_A: 1;
+PRODUCE ip.m69.p.2: 1, cc.p.REQ_INT: ff(), op.p.REQ_INT: ff(), or.p.a: ff(),
+        tog.p.RST: ff(), cc.p.RST: ff(), p.ACK_A: ff(), ip.m63.p.a: ff(), ip.p.n_REQ_A1: 1, 
+	ip.m69.p.n_ackc: 1;
+
+TRANSITION ip.m69.t42
+VAR ackc, req_a1: BOOLEAN;
+GUARD NOT(ackc) AND req_a1
+CONSUME ip.m69.p.2: 1, ip.m69.p.ackc: ackc, ip.p.REQ_A1: req_a1, cc.p.n_RST: 1, ip.m63.p.n_a: 1,
+	tog.p.n_RST: 1, p.n_ACK_A: 1;
+PRODUCE ip.m69.p.1: 1, tog.p.RST: tt(), p.ACK_A: tt(), ip.m63.p.a: tt(),
+        cc.p.RST: tt(), ip.p.n_REQ_A1: 1, ip.m69.p.n_ackc: 1;
+
+TRANSITION ip.m69.t43
+VAR ackc, st: BOOLEAN;
+GUARD NOT(ackc) AND st
+CONSUME ip.m69.p.2: 1, ip.m69.p.ackc: ackc, ip.m69.p.st: st;
+PRODUCE ip.m69.p.3: 1, ip.m69.p.n_st: 1, ip.m69.p.n_ackc: 1;
+
+TRANSITION ip.m69.t44
+VAR stop: BOOLEAN;
+GUARD stop
+CONSUME ip.m69.p.3: 1, ip.p.STOP: stop, cc.p.n_RST: 1, tog.p.n_RST: 1;
+PRODUCE ip.m69.p.4: 1, tog.p.RST: tt(), cc.p.RST: tt(), ip.p.n_STOP: 1;
+
+TRANSITION ip.m69.t45
+VAR stop, st: BOOLEAN;
+GUARD NOT(stop) AND NOT(st)
+CONSUME ip.m69.p.4: 1, ip.p.STOP: stop, ip.m69.p.st: st, cc.p.n_RST: 1, tog.p.n_RST: 1;
+PRODUCE ip.m69.p.0: 1, tog.p.RST: ff(), cc.p.RST: ff(), ip.p.n_STOP: 1, ip.m69.p.n_st: 1;
+
+TRANSITION ip.m69.t46
+VAR req_a1: BOOLEAN;
+GUARD req_a1
+CONSUME ip.m69.p.3: 1, ip.p.REQ_A1: req_a1, pcg.p.n_REQI1: 1;
+PRODUCE ip.m69.p.5: 1, pcg.p.REQI1: tt(), ip.p.n_REQ_A1: 1;
+
+TRANSITION ip.m69.t47
+VAR acki1: BOOLEAN;
+GUARD acki1
+CONSUME ip.m69.p.5: 1, ip.p.ACKI1: acki1, ip.m64.p.n_b: 1, ip.m67.p.n_a: 1, pcg.p.n_REQI1: 1;
+PRODUCE ip.m69.p.6: 1, ip.m64.p.b: tt(), ip.m67.p.a: tt(), pcg.p.REQI1: ff(), ip.p.n_ACKI1: 1;
+
+TRANSITION ip.m69.t48
+VAR acki1, ackc: BOOLEAN;
+GUARD NOT(acki1) AND ackc
+CONSUME ip.m69.p.6: 1, ip.p.ACKI1: acki1, ip.m69.p.ackc: ackc;
+PRODUCE ip.m69.p.7: 1, ip.p.n_ACKI1: 1, ip.m69.p.n_ackc: 1;
+
+TRANSITION ip.m69.t49
+VAR ackc: BOOLEAN;
+GUARD NOT(ackc)
+CONSUME ip.m69.p.7: 1, ip.m69.p.ackc: ackc, cc.p.n_RST: 1, ip.m63.p.n_a: 1, tog.p.n_RST: 1, 
+	p.n_ACK_A: 1;
+PRODUCE ip.m69.p.8: 1, p.ACK_A: tt(), ip.m63.p.a: tt(), tog.p.RST: tt(),
+        cc.p.RST: tt(), ip.m69.p.n_ackc: 1;
+
+TRANSITION ip.m69.t50
+VAR req_a1, st: BOOLEAN;
+GUARD NOT(req_a1) AND NOT(st)
+CONSUME ip.m69.p.8: 1, ip.p.REQ_A1: req_a1, ip.m69.p.st: st, cc.p.n_RST: 1, ip.m63.p.n_a: 1,
+	tog.p.n_RST: 1, ip.m64.p.n_b: 1, ip.m67.p.n_a: 1, p.n_ACK_A: 1;
+PRODUCE ip.m69.p.0: 1, p.ACK_A: ff(), ip.m63.p.a: ff(), tog.p.RST: ff(),
+        ip.m64.p.b: ff(), ip.m67.p.a: ff(), cc.p.RST: ff(), ip.p.n_REQ_A1: 1, ip.m69.p.n_st: 1;
+
+
+
+{Clock Control (cc)}
+
+TRANSITION cc.m10.t.lclkm
+VAR clk: BOOLEAN;
+CONSUME cc.p.LCLKM: clk, cc.m10.p.n_clk: 1;
+PRODUCE cc.m10.p.clk: neg(clk), cc.p.n_LCLKM: 1;
+
+
+{m10: Counter}
+
+TRANSITION cc.m10.t.max
+VAR clk: BOOLEAN; n: Anzahl;
+GUARD clk AND (n = 2)						{n=max}
+CONSUME cc.m10.p.clk: clk, cc.m10.p.value: n, 
+        cc.m10.p.active: 1, ip.p.n_STOP: 1, cc.m11.p.n_clk: 1;
+PRODUCE cc.m11.p.clk: tt(), ip.p.STOP: tt(), cc.m10.p.active: 1, 
+        cc.m10.p.value: n, cc.m10.p.n_clk: 1;
+
+TRANSITION cc.m10.t.count
+VAR clk: BOOLEAN; n: Anzahl;
+GUARD clk AND (n <> 2)
+CONSUME cc.m10.p.clk: clk, cc.m10.p.value: n, 
+        cc.m10.p.active: 1;
+PRODUCE cc.m10.p.active: 1, cc.m10.p.value: inc(n), cc.m10.p.n_clk: 1;
+
+TRANSITION cc.m10.t.not_count1
+VAR clk: BOOLEAN;
+GUARD (NOT clk)
+CONSUME cc.m10.p.clk: clk, cc.m10.p.active: 1;
+PRODUCE cc.m10.p.active: 1, cc.m10.p.n_clk: 1;
+
+TRANSITION cc.m10.t.not_count2
+VAR clk: BOOLEAN;
+GUARD (NOT clk)
+CONSUME cc.m10.p.clk: clk, cc.m10.p.deactive: 1;
+PRODUCE cc.m10.p.deactive: 1, cc.m10.p.n_clk: 1;
+
+TRANSITION cc.m10.t.hazard
+VAR clk, rst: BOOLEAN;
+CONSUME cc.m10.p.clk: clk, cc.p.RST: rst, 
+        cc.m10.p.active: 1;
+PRODUCE cc.m10.p.active: 1, cc.m10.p.n_clk: 1, cc.p.n_RST: 1;
+
+TRANSITION cc.m10.t.rst0
+VAR rst: BOOLEAN;
+GUARD (NOT rst)
+CONSUME cc.p.RST: rst, cc.m10.p.deactive: 1;
+PRODUCE cc.m10.p.active: 1, cc.p.n_RST: 1;
+
+TRANSITION cc.m10.t.rst1
+VAR rst: BOOLEAN; n: Anzahl;
+GUARD rst
+CONSUME cc.p.RST: rst, cc.m10.p.active: 1, 
+        cc.m10.p.value: n, ip.p.n_STOP: 1, cc.m11.p.n_clk: 1; 
+PRODUCE cc.m10.p.deactive: 1, cc.m10.p.value: reset(n), 
+        cc.m11.p.clk: ff(), ip.p.STOP: ff(), cc.p.n_RST: 1;
+
+
+
+{m11: D-FF}
+
+TRANSITION cc.m11.t.clk0_0_0
+CONSUME cc.m11.p.clk: ff(), cc.m11.p.pegel_0_0 : 1;
+PRODUCE cc.m11.p.pegel_0_0 : 1, cc.m11.p.n_clk: 1;
+
+TRANSITION cc.m11.t.clk0_0_1
+CONSUME cc.m11.p.clk: ff(), cc.m11.p.pegel_0_1 : 1;
+PRODUCE cc.m11.p.pegel_0_1 : 1, cc.m11.p.n_clk: 1;
+
+TRANSITION cc.m11.t.clk0_1_0
+CONSUME cc.m11.p.clk: ff(), cc.m11.p.pegel_1_0 : 1;
+PRODUCE cc.m11.p.pegel_1_0 : 1, cc.m11.p.n_clk: 1;
+
+TRANSITION cc.m11.t.clk1_0_0
+CONSUME cc.m11.p.clk: tt(), cc.m11.p.pegel_0_0 : 1, pcg.p.n_STOPI: 1;
+PRODUCE cc.m11.p.pegel_0_1 : 1, pcg.p.STOPI: tt(), cc.m11.p.n_clk: 1;
+
+TRANSITION cc.m11.t.clk1_0_1
+CONSUME cc.m11.p.clk: tt(), cc.m11.p.pegel_0_1 : 1;
+PRODUCE cc.m11.p.pegel_0_1 : 1, cc.m11.p.n_clk: 1;
+
+TRANSITION cc.m11.t.clk1_1_0
+CONSUME cc.m11.p.clk: tt(), cc.m11.p.pegel_1_0 : 1;
+PRODUCE cc.m11.p.pegel_1_0 : 1, cc.m11.p.n_clk: 1;
+
+TRANSITION cc.m11.t.rst0_0_0
+CONSUME cc.p.REQ_INT: ff(), cc.m11.p.pegel_0_0 : 1;
+PRODUCE cc.m11.p.pegel_0_0 : 1, cc.p.n_REQ_INT: 1;
+
+TRANSITION cc.m11.t.rst0_0_1
+CONSUME cc.p.REQ_INT: ff(), cc.m11.p.pegel_0_1 : 1;
+PRODUCE cc.m11.p.pegel_0_1 : 1, cc.p.n_REQ_INT: 1;
+
+TRANSITION cc.m11.t.rst0_1_0
+CONSUME cc.p.REQ_INT: ff(), cc.m11.p.pegel_1_0 : 1;
+PRODUCE cc.m11.p.pegel_0_0 : 1, cc.p.n_REQ_INT: 1;
+
+TRANSITION cc.m11.t.rst1_0_0
+CONSUME cc.p.REQ_INT: tt(), cc.m11.p.pegel_0_0 : 1;
+PRODUCE cc.m11.p.pegel_1_0 : 1, cc.p.n_REQ_INT: 1;
+
+TRANSITION cc.m11.t.rst1_0_1
+CONSUME cc.p.REQ_INT: tt(), cc.m11.p.pegel_0_1 : 1, pcg.p.n_STOPI: 1;
+PRODUCE cc.m11.p.pegel_1_0 : 1, pcg.p.STOPI: ff(), cc.p.n_REQ_INT: 1;
+
+TRANSITION cc.m11.t.rst1_1_0
+CONSUME cc.p.REQ_INT: tt(), cc.m11.p.pegel_1_0 : 1;
+PRODUCE cc.m11.p.pegel_1_0 : 1, cc.p.n_REQ_INT: 1;
+
+
+
+{Pausable Clock Generator (pcg)}
+
+{m1: NOR-Gatter}
+
+TRANSITION pcg.m1.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m1.p.a: a, pcg.m1.p.pegel_0_0: 1;
+PRODUCE pcg.m1.p.pegel_0_0: 1, pcg.m1.p.n_a: 1;
+
+TRANSITION pcg.m1.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m1.p.a: a, pcg.m1.p.pegel_0_1: 1;
+PRODUCE pcg.m1.p.pegel_0_1: 1, pcg.m1.p.n_a: 1;
+
+TRANSITION pcg.m1.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m1.p.a: a, pcg.m1.p.pegel_1_0: 1, pcg.m3.p.n_b_in: 1,
+        pcg.m2.p.n_b_in: 1, pcg.m5.p.n_b: 1;
+PRODUCE pcg.m1.p.pegel_0_0: 1, pcg.m2.p.b_in: tt(), pcg.m3.p.b_in: tt(), pcg.m5.p.b: tt(), 
+	pcg.m1.p.n_a: 1;
+
+TRANSITION pcg.m1.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m1.p.a: a, pcg.m1.p.pegel_1_1: 1;
+PRODUCE pcg.m1.p.pegel_0_1: 1, pcg.m1.p.n_a: 1;
+
+TRANSITION pcg.m1.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m1.p.a: a, pcg.m1.p.pegel_0_0: 1, pcg.m3.p.n_b_in: 1,
+        pcg.m2.p.n_b_in: 1, pcg.m5.p.n_b: 1;
+PRODUCE pcg.m1.p.pegel_1_0: 1, pcg.m2.p.b_in: ff(), pcg.m3.p.b_in: ff(), pcg.m5.p.b: ff(), 
+	pcg.m1.p.n_a: 1;
+
+TRANSITION pcg.m1.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m1.p.a: a, pcg.m1.p.pegel_0_1: 1;
+PRODUCE pcg.m1.p.pegel_1_1: 1, pcg.m1.p.n_a: 1;
+
+TRANSITION pcg.m1.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m1.p.a: a, pcg.m1.p.pegel_1_0: 1;
+PRODUCE pcg.m1.p.pegel_1_0: 1, pcg.m1.p.n_a: 1;
+
+TRANSITION pcg.m1.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m1.p.a: a, pcg.m1.p.pegel_1_1: 1;
+PRODUCE pcg.m1.p.pegel_1_1: 1, pcg.m1.p.n_a: 1;
+
+
+TRANSITION pcg.m1.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.p.STOPI: b, pcg.m1.p.pegel_0_0: 1;
+PRODUCE pcg.m1.p.pegel_0_0: 1, pcg.p.n_STOPI: 1;
+
+TRANSITION pcg.m1.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.p.STOPI: b, pcg.m1.p.pegel_0_1: 1, pcg.m3.p.n_b_in: 1,
+        pcg.m2.p.n_b_in: 1, pcg.m5.p.n_b: 1;
+PRODUCE pcg.m1.p.pegel_0_0: 1, pcg.m2.p.b_in: tt(), pcg.m3.p.b_in: tt(), pcg.m5.p.b: tt(), 
+	pcg.p.n_STOPI: 1;
+
+TRANSITION pcg.m1.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.p.STOPI: b, pcg.m1.p.pegel_1_0: 1;
+PRODUCE pcg.m1.p.pegel_1_0: 1, pcg.p.n_STOPI: 1;
+
+TRANSITION pcg.m1.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.p.STOPI: b, pcg.m1.p.pegel_1_1: 1;
+PRODUCE pcg.m1.p.pegel_1_0: 1, pcg.p.n_STOPI: 1;
+
+TRANSITION pcg.m1.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.p.STOPI: b, pcg.m1.p.pegel_0_0: 1, pcg.m3.p.n_b_in: 1,
+        pcg.m2.p.n_b_in: 1, pcg.m5.p.n_b: 1;
+PRODUCE pcg.m1.p.pegel_0_1: 1, pcg.m2.p.b_in: ff(), pcg.m3.p.b_in: ff(), pcg.m5.p.b: ff(), 
+	pcg.p.n_STOPI: 1;
+
+TRANSITION pcg.m1.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.p.STOPI: b, pcg.m1.p.pegel_0_1: 1;
+PRODUCE pcg.m1.p.pegel_0_1: 1, pcg.p.n_STOPI: 1;
+
+TRANSITION pcg.m1.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.p.STOPI: b, pcg.m1.p.pegel_1_0: 1;
+PRODUCE pcg.m1.p.pegel_1_1: 1, pcg.p.n_STOPI: 1;
+
+TRANSITION pcg.m1.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.p.STOPI: b, pcg.m1.p.pegel_1_1: 1;
+PRODUCE pcg.m1.p.pegel_1_1: 1, pcg.p.n_STOPI: 1;
+
+
+{m2: Mutex}
+
+TRANSITION pcg.m2.t.a0_pegel_0_0_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.p.REQI1: a, pcg.m2.p.pegel_0_0_0_0 : 1;
+PRODUCE pcg.m2.p.pegel_0_0_0_0 : 1, pcg.p.n_REQI1: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_0_1_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.p.REQI1: a, pcg.m2.p.pegel_0_1_0_1 : 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1 : 1, pcg.p.n_REQI1: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_1_0_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.p.REQI1: a, pcg.m2.p.pegel_1_0_1_0 : 1, ip.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_0_0_0_0 : 1, ip.p.ACKI1: ff(), pcg.p.n_REQI1: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_1_1_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.p.REQI1: a, pcg.m2.p.pegel_1_1_0_1 : 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1 : 1, pcg.p.n_REQI1: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_1_1_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.p.REQI1: a, pcg.m2.p.pegel_1_1_1_0 : 1, pcg.m4.p.n_b: 1, ip.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1 : 1, ip.p.ACKI1: ff(), pcg.m4.p.b: tt(), pcg.p.n_REQI1: 1;
+
+
+TRANSITION pcg.m2.t.a1_pegel_0_0_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.p.REQI1: a, pcg.m2.p.pegel_0_0_0_0 : 1, ip.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0 : 1, ip.p.ACKI1: tt(), pcg.p.n_REQI1: 1;
+
+TRANSITION pcg.m2.t.a1_pegel_0_1_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.p.REQI1: a, pcg.m2.p.pegel_0_1_0_1 : 1;
+PRODUCE pcg.m2.p.pegel_1_1_0_1 : 1, pcg.p.n_REQI1: 1;
+
+TRANSITION pcg.m2.t.a1_pegel_1_0_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.p.REQI1: a, pcg.m2.p.pegel_1_0_1_0 : 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0 : 1, pcg.p.n_REQI1: 1;
+
+TRANSITION pcg.m2.t.a1_pegel_1_1_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.p.REQI1: a, pcg.m2.p.pegel_1_1_0_1 : 1;
+PRODUCE pcg.m2.p.pegel_1_1_0_1 : 1, pcg.p.n_REQI1: 1;
+
+TRANSITION pcg.m2.t.a1_pegel_1_1_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.p.REQI1: a, pcg.m2.p.pegel_1_1_1_0 : 1;
+PRODUCE pcg.m2.p.pegel_1_1_1_0 : 1, pcg.p.n_REQI1: 1;
+
+
+
+TRANSITION pcg.m2.t.b0_pegel_0_0_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m2.p.b_in: b, pcg.m2.p.pegel_0_0_0_0 : 1;
+PRODUCE pcg.m2.p.pegel_0_0_0_0 : 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_0_1_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m2.p.b_in: b, pcg.m2.p.pegel_0_1_0_1 : 1, pcg.m4.p.n_b: 1;
+PRODUCE pcg.m2.p.pegel_0_0_0_0 : 1, pcg.m4.p.b: ff(), pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_1_0_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m2.p.b_in: b, pcg.m2.p.pegel_1_0_1_0 : 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0 : 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_1_1_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m2.p.b_in: b, pcg.m2.p.pegel_1_1_0_1 : 1, pcg.m4.p.n_b: 1, ip.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0 : 1, ip.p.ACKI1: tt(), pcg.m4.p.b: ff(),
+        pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_1_1_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m2.p.b_in: b, pcg.m2.p.pegel_1_1_1_0 : 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0 : 1, pcg.m2.p.n_b_in: 1;
+
+
+TRANSITION pcg.m2.t.b1_pegel_0_0_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m2.p.b_in: b, pcg.m2.p.pegel_0_0_0_0 : 1, pcg.m4.p.n_b: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1 : 1, pcg.m4.p.b: tt(), pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b1_pegel_0_1_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m2.p.b_in: b, pcg.m2.p.pegel_0_1_0_1 : 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1 : 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b1_pegel_1_0_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m2.p.b_in: b, pcg.m2.p.pegel_1_0_1_0 : 1;
+PRODUCE pcg.m2.p.pegel_1_1_1_0 : 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b1_pegel_1_1_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m2.p.b_in: b, pcg.m2.p.pegel_1_1_0_1 : 1;
+PRODUCE pcg.m2.p.pegel_1_1_0_1 : 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b1_pegel_1_1_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m2.p.b_in: b, pcg.m2.p.pegel_1_1_1_0 : 1;
+PRODUCE pcg.m2.p.pegel_1_1_1_0 : 1, pcg.m2.p.n_b_in: 1;
+
+
+{m3: Mutex}
+
+TRANSITION pcg.m3.t.a0_pegel_0_0_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.p.STRETCH: a, pcg.m3.p.pegel_0_0_0_0 : 1;
+PRODUCE pcg.m3.p.pegel_0_0_0_0 : 1, pcg.p.n_STRETCH: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_0_1_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.p.STRETCH: a, pcg.m3.p.pegel_0_1_0_1 : 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1 : 1, pcg.p.n_STRETCH: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_1_0_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.p.STRETCH: a, pcg.m3.p.pegel_1_0_1_0 : 1;
+PRODUCE pcg.m3.p.pegel_0_0_0_0 : 1, pcg.p.n_STRETCH: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_1_1_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.p.STRETCH: a, pcg.m3.p.pegel_1_1_0_1 : 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1 : 1, pcg.p.n_STRETCH: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_1_1_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.p.STRETCH: a, pcg.m3.p.pegel_1_1_1_0 : 1, pcg.m4.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1 : 1, pcg.m4.p.a: tt(), pcg.p.n_STRETCH: 1;
+
+
+TRANSITION pcg.m3.t.a1_pegel_0_0_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.p.STRETCH: a, pcg.m3.p.pegel_0_0_0_0 : 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0 : 1, pcg.p.n_STRETCH: 1;
+
+TRANSITION pcg.m3.t.a1_pegel_0_1_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.p.STRETCH: a, pcg.m3.p.pegel_0_1_0_1 : 1;
+PRODUCE pcg.m3.p.pegel_1_1_0_1 : 1, pcg.p.n_STRETCH: 1;
+
+TRANSITION pcg.m3.t.a1_pegel_1_0_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.p.STRETCH: a, pcg.m3.p.pegel_1_0_1_0 : 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0 : 1, pcg.p.n_STRETCH: 1;
+
+TRANSITION pcg.m3.t.a1_pegel_1_1_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.p.STRETCH: a, pcg.m3.p.pegel_1_1_0_1 : 1;
+PRODUCE pcg.m3.p.pegel_1_1_0_1 : 1, pcg.p.n_STRETCH: 1;
+
+TRANSITION pcg.m3.t.a1_pegel_1_1_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.p.STRETCH: a, pcg.m3.p.pegel_1_1_1_0 : 1;
+PRODUCE pcg.m3.p.pegel_1_1_1_0 : 1, pcg.p.n_STRETCH: 1;
+
+
+
+TRANSITION pcg.m3.t.b0_pegel_0_0_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m3.p.b_in: b, pcg.m3.p.pegel_0_0_0_0 : 1;
+PRODUCE pcg.m3.p.pegel_0_0_0_0 : 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_0_1_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m3.p.b_in: b, pcg.m3.p.pegel_0_1_0_1 : 1, pcg.m4.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_0_0_0_0 : 1, pcg.m4.p.a: ff(), pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_1_0_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m3.p.b_in: b, pcg.m3.p.pegel_1_0_1_0 : 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0 : 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_1_1_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m3.p.b_in: b, pcg.m3.p.pegel_1_1_0_1 : 1, pcg.m4.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0 : 1, pcg.m4.p.a: ff(), pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_1_1_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m3.p.b_in: b, pcg.m3.p.pegel_1_1_1_0 : 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0 : 1, pcg.m3.p.n_b_in: 1;
+
+
+TRANSITION pcg.m3.t.b1_pegel_0_0_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m3.p.b_in: b, pcg.m3.p.pegel_0_0_0_0 : 1, pcg.m4.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1 : 1, pcg.m4.p.a: tt(), pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b1_pegel_0_1_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m3.p.b_in: b, pcg.m3.p.pegel_0_1_0_1 : 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1 : 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b1_pegel_1_0_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m3.p.b_in: b, pcg.m3.p.pegel_1_0_1_0 : 1;
+PRODUCE pcg.m3.p.pegel_1_1_1_0 : 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b1_pegel_1_1_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m3.p.b_in: b, pcg.m3.p.pegel_1_1_0_1 : 1;
+PRODUCE pcg.m3.p.pegel_1_1_0_1 : 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b1_pegel_1_1_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m3.p.b_in: b, pcg.m3.p.pegel_1_1_1_0 : 1;
+PRODUCE pcg.m3.p.pegel_1_1_1_0 : 1, pcg.m3.p.n_b_in: 1;
+
+
+
+
+{m4: AND-Muster}
+TRANSITION pcg.m4.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m4.p.a: a, pcg.m4.p.pegel_0_0: 1;
+PRODUCE pcg.m4.p.pegel_0_0: 1, pcg.m4.p.n_a: 1;
+
+TRANSITION pcg.m4.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m4.p.a: a, pcg.m4.p.pegel_0_1: 1;
+PRODUCE pcg.m4.p.pegel_0_1: 1, pcg.m4.p.n_a: 1;
+
+TRANSITION pcg.m4.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m4.p.a: a, pcg.m4.p.pegel_1_0: 1;
+PRODUCE pcg.m4.p.pegel_0_0: 1, pcg.m4.p.n_a: 1;
+
+TRANSITION pcg.m4.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m4.p.a: a, pcg.m4.p.pegel_1_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m4.p.pegel_0_1: 1, pcg.m5.p.a: ff(), pcg.m4.p.n_a: 1;
+
+TRANSITION pcg.m4.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m4.p.a: a, pcg.m4.p.pegel_0_0: 1;
+PRODUCE pcg.m4.p.pegel_1_0: 1, pcg.m4.p.n_a: 1;
+
+TRANSITION pcg.m4.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m4.p.a: a, pcg.m4.p.pegel_0_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m4.p.pegel_1_1: 1, pcg.m5.p.a: tt(), pcg.m4.p.n_a: 1;
+
+TRANSITION pcg.m4.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m4.p.a: a, pcg.m4.p.pegel_1_0: 1;
+PRODUCE pcg.m4.p.pegel_1_0: 1, pcg.m4.p.n_a: 1;
+
+TRANSITION pcg.m4.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m4.p.a: a, pcg.m4.p.pegel_1_1: 1;
+PRODUCE pcg.m4.p.pegel_1_1: 1, pcg.m4.p.n_a: 1;
+
+
+TRANSITION pcg.m4.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m4.p.b: b, pcg.m4.p.pegel_0_0: 1;
+PRODUCE pcg.m4.p.pegel_0_0: 1, pcg.m4.p.n_b: 1;
+
+TRANSITION pcg.m4.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m4.p.b: b, pcg.m4.p.pegel_0_1: 1;
+PRODUCE pcg.m4.p.pegel_0_0: 1, pcg.m4.p.n_b: 1;
+
+TRANSITION pcg.m4.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m4.p.b: b, pcg.m4.p.pegel_1_0: 1;
+PRODUCE pcg.m4.p.pegel_1_0: 1, pcg.m4.p.n_b: 1;
+
+TRANSITION pcg.m4.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m4.p.b: b, pcg.m4.p.pegel_1_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m4.p.pegel_1_0: 1, pcg.m5.p.a: ff(), pcg.m4.p.n_b: 1;
+
+TRANSITION pcg.m4.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m4.p.b: b, pcg.m4.p.pegel_0_0: 1;
+PRODUCE pcg.m4.p.pegel_0_1: 1, pcg.m4.p.n_b: 1;
+
+TRANSITION pcg.m4.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m4.p.b: b, pcg.m4.p.pegel_0_1: 1;
+PRODUCE pcg.m4.p.pegel_0_1: 1, pcg.m4.p.n_b: 1;
+
+TRANSITION pcg.m4.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m4.p.b: b, pcg.m4.p.pegel_1_0: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m4.p.pegel_1_1: 1, pcg.m5.p.a: tt(), pcg.m4.p.n_b: 1;
+
+TRANSITION pcg.m4.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m4.p.b: b, pcg.m4.p.pegel_1_1: 1;
+PRODUCE pcg.m4.p.pegel_1_1: 1, pcg.m4.p.n_b: 1;
+
+
+
+
+
+{m5 MCE}
+
+TRANSITION pcg.m5.t.a0_pegel_0_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m5.p.a: a, pcg.m5.p.pegel_0_0_0: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a0_pegel_0_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m5.p.a: a, pcg.m5.p.pegel_0_1_0: 1;
+PRODUCE pcg.m5.p.pegel_0_1_0: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a0_pegel_1_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m5.p.a: a, pcg.m5.p.pegel_1_0_0: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a0_pegel_1_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m5.p.a: a, pcg.m5.p.pegel_1_0_1: 1, and.p.n_b: 1, tog.p.n_LCLK: 1, pcg.m1.p.n_a: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m1.p.a: ff(), tog.p.LCLK: ff(),
+        and.p.b: ff(), pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a0_pegel_0_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m5.p.a: a, pcg.m5.p.pegel_0_1_1: 1;
+PRODUCE pcg.m5.p.pegel_0_1_1: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a0_pegel_1_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME pcg.m5.p.a: a, pcg.m5.p.pegel_1_1_1: 1;
+PRODUCE pcg.m5.p.pegel_0_1_1: 1, pcg.m5.p.n_a: 1;
+
+
+TRANSITION pcg.m5.t.a1_pegel_0_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m5.p.a: a, pcg.m5.p.pegel_0_0_0: 1;
+PRODUCE pcg.m5.p.pegel_1_0_0: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a1_pegel_0_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m5.p.a: a, pcg.m5.p.pegel_0_1_0: 1, and.p.n_b: 1, tog.p.n_LCLK: 1, pcg.m1.p.n_a: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m1.p.a: tt(), tog.p.LCLK: tt(),
+        and.p.b: tt(), pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a1_pegel_1_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m5.p.a: a, pcg.m5.p.pegel_1_0_0: 1;
+PRODUCE pcg.m5.p.pegel_1_0_0: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a1_pegel_1_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m5.p.a: a, pcg.m5.p.pegel_1_0_1: 1;
+PRODUCE pcg.m5.p.pegel_1_0_1: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a1_pegel_0_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m5.p.a: a, pcg.m5.p.pegel_0_1_1: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a1_pegel_1_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME pcg.m5.p.a: a, pcg.m5.p.pegel_1_1_1: 1;
+PRODUCE pcg.m5.p.pegel_0_1_1: 1, pcg.m5.p.n_a: 1;
+
+
+
+TRANSITION pcg.m5.t.b0_pegel_0_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m5.p.b: b, pcg.m5.p.pegel_0_0_0: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b0_pegel_0_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m5.p.b: b, pcg.m5.p.pegel_0_1_0: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b0_pegel_1_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m5.p.b: b, pcg.m5.p.pegel_1_0_0: 1;
+PRODUCE pcg.m5.p.pegel_1_0_0: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b0_pegel_1_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m5.p.b: b, pcg.m5.p.pegel_1_0_1: 1;
+PRODUCE pcg.m5.p.pegel_1_0_1: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b0_pegel_0_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m5.p.b: b, pcg.m5.p.pegel_0_1_1: 1, and.p.n_b: 1, tog.p.n_LCLK: 1, pcg.m1.p.n_a: 1, 
+	and.p.n_b: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m1.p.a: ff(), tog.p.LCLK: ff(),
+        and.p.b: ff(), pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b0_pegel_1_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME pcg.m5.p.b: b, pcg.m5.p.pegel_1_1_1: 1;
+PRODUCE pcg.m5.p.pegel_1_0_1: 1, pcg.m5.p.n_b: 1;
+
+
+TRANSITION pcg.m5.t.b1_pegel_0_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m5.p.b: b, pcg.m5.p.pegel_0_0_0: 1;
+PRODUCE pcg.m5.p.pegel_0_1_0: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b1_pegel_0_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m5.p.b: b, pcg.m5.p.pegel_0_1_0: 1;
+PRODUCE pcg.m5.p.pegel_0_1_0: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b1_pegel_1_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m5.p.b: b, pcg.m5.p.pegel_1_0_0: 1, and.p.n_b: 1, tog.p.n_LCLK: 1, pcg.m1.p.n_a: 1, 
+	and.p.n_b: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m1.p.a: tt(), tog.p.LCLK: tt(),
+        and.p.b: tt(), pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b1_pegel_1_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m5.p.b: b, pcg.m5.p.pegel_1_0_1: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b1_pegel_0_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m5.p.b: b, pcg.m5.p.pegel_0_1_1: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b1_pegel_1_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME pcg.m5.p.b: b, pcg.m5.p.pegel_1_1_1: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m5.p.n_b: 1;
+
+
+
+
+{AND (and)}
+
+TRANSITION and.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME and.p.a: a, and.p.pegel_0_0: 1;
+PRODUCE and.p.pegel_0_0: 1, and.p.n_a: 1;
+
+TRANSITION and.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME and.p.a: a, and.p.pegel_0_1: 1;
+PRODUCE and.p.pegel_0_1: 1, and.p.n_a: 1;
+
+TRANSITION and.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME and.p.a: a, and.p.pegel_1_0: 1;
+PRODUCE and.p.pegel_0_0: 1, and.p.n_a: 1;
+
+TRANSITION and.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME and.p.a: a, and.p.pegel_1_1: 1, op.p.n_LCLKM: 1, or.p.n_b: 1,
+        ip.p.n_LCLKM: 1, cc.p.n_LCLKM: 1;
+PRODUCE and.p.pegel_0_1: 1, ip.p.LCLKM: ff(), cc.p.LCLKM: ff(), or.p.b: ff(),
+        op.p.LCLKM: ff(), and.p.n_a: 1;
+
+TRANSITION and.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME and.p.a: a, and.p.pegel_0_0: 1;
+PRODUCE and.p.pegel_1_0: 1, and.p.n_a: 1;
+
+TRANSITION and.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME and.p.a: a, and.p.pegel_0_1: 1, op.p.n_LCLKM: 1, or.p.n_b: 1,
+        ip.p.n_LCLKM: 1, cc.p.n_LCLKM: 1;
+PRODUCE and.p.pegel_1_1: 1, ip.p.LCLKM: tt(), cc.p.LCLKM: tt(), or.p.b: tt(),
+        op.p.LCLKM: tt(), and.p.n_a: 1;
+
+TRANSITION and.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME and.p.a: a, and.p.pegel_1_0: 1;
+PRODUCE and.p.pegel_1_0: 1, and.p.n_a: 1;
+
+TRANSITION and.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME and.p.a: a, and.p.pegel_1_1: 1;
+PRODUCE and.p.pegel_1_1: 1, and.p.n_a: 1;
+
+
+TRANSITION and.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME and.p.b: b, and.p.pegel_0_0: 1;
+PRODUCE and.p.pegel_0_0: 1, and.p.n_b: 1;
+
+TRANSITION and.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME and.p.b: b, and.p.pegel_0_1: 1;
+PRODUCE and.p.pegel_0_0: 1, and.p.n_b: 1;
+
+TRANSITION and.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME and.p.b: b, and.p.pegel_1_0: 1;
+PRODUCE and.p.pegel_1_0: 1, and.p.n_b: 1;
+
+TRANSITION and.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME and.p.b: b, and.p.pegel_1_1: 1, op.p.n_LCLKM: 1, or.p.n_b: 1,
+        ip.p.n_LCLKM: 1, cc.p.n_LCLKM: 1;
+PRODUCE and.p.pegel_1_0: 1, ip.p.LCLKM: ff(), cc.p.LCLKM: ff(), or.p.b: ff(),
+        op.p.LCLKM: ff(), and.p.n_b: 1;
+
+TRANSITION and.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME and.p.b: b, and.p.pegel_0_0: 1;
+PRODUCE and.p.pegel_0_1: 1, and.p.n_b: 1;
+
+TRANSITION and.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME and.p.b: b, and.p.pegel_0_1: 1;
+PRODUCE and.p.pegel_0_1: 1, and.p.n_b: 1;
+
+TRANSITION and.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME and.p.b: b, and.p.pegel_1_0: 1, op.p.n_LCLKM: 1, or.p.n_b: 1,
+        ip.p.n_LCLKM: 1, cc.p.n_LCLKM: 1;
+PRODUCE and.p.pegel_1_1: 1, ip.p.LCLKM: tt(), cc.p.LCLKM: tt(), or.p.b: tt(),
+        op.p.LCLKM: tt(), and.p.n_b: 1;
+
+TRANSITION and.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME and.p.b: b, and.p.pegel_1_1: 1;
+PRODUCE and.p.pegel_1_1: 1, and.p.n_b: 1;
+
+
+
+{OR (or)}
+
+TRANSITION or.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME or.p.a: a, or.p.pegel_0_0: 1;
+PRODUCE or.p.pegel_0_0: 1, or.p.n_a: 1;
+
+TRANSITION or.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME or.p.a: a, or.p.pegel_0_1: 1;
+PRODUCE or.p.pegel_0_1: 1, or.p.n_a: 1;
+
+TRANSITION or.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME or.p.a: a, or.p.pegel_1_0: 1, ip.p.n_INT_CLK: 1, op.p.n_INT_CLK: 1, lsm.p.n_INT_CLK: 1;
+PRODUCE or.p.pegel_0_0: 1, ip.p.INT_CLK: ff(), lsm.p.INT_CLK: ff(),
+        op.p.INT_CLK: ff(), or.p.n_a: 1;
+
+TRANSITION or.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME or.p.a: a, or.p.pegel_1_1: 1;
+PRODUCE or.p.pegel_0_1: 1, or.p.n_a: 1;
+
+TRANSITION or.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME or.p.a: a, or.p.pegel_0_0: 1, ip.p.n_INT_CLK: 1, op.p.n_INT_CLK: 1, lsm.p.n_INT_CLK: 1;
+PRODUCE or.p.pegel_1_0: 1, ip.p.INT_CLK: tt(), lsm.p.INT_CLK: tt(),
+        op.p.INT_CLK: tt(), or.p.n_a: 1;
+
+TRANSITION or.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME or.p.a: a, or.p.pegel_0_1: 1;
+PRODUCE or.p.pegel_1_1: 1, or.p.n_a: 1;
+
+TRANSITION or.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME or.p.a: a, or.p.pegel_1_0: 1;
+PRODUCE or.p.pegel_1_0: 1, or.p.n_a: 1;
+
+TRANSITION or.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME or.p.a: a, or.p.pegel_1_1: 1;
+PRODUCE or.p.pegel_1_1: 1, or.p.n_a: 1;
+
+
+TRANSITION or.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME or.p.b: b, or.p.pegel_0_0: 1;
+PRODUCE or.p.pegel_0_0: 1, or.p.n_b: 1;
+
+TRANSITION or.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME or.p.b: b, or.p.pegel_0_1: 1, ip.p.n_INT_CLK: 1, op.p.n_INT_CLK: 1, lsm.p.n_INT_CLK: 1;
+PRODUCE or.p.pegel_0_0: 1, ip.p.INT_CLK: ff(), lsm.p.INT_CLK: ff(),
+        op.p.INT_CLK: ff(), or.p.n_b: 1;
+
+TRANSITION or.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME or.p.b: b, or.p.pegel_1_0: 1;
+PRODUCE or.p.pegel_1_0: 1, or.p.n_b: 1;
+
+TRANSITION or.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME or.p.b: b, or.p.pegel_1_1: 1;
+PRODUCE or.p.pegel_1_0: 1, or.p.n_b: 1;
+
+TRANSITION or.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME or.p.b: b, or.p.pegel_0_0: 1, ip.p.n_INT_CLK: 1, op.p.n_INT_CLK: 1, lsm.p.n_INT_CLK: 1;
+PRODUCE or.p.pegel_0_1: 1, ip.p.INT_CLK: tt(), lsm.p.INT_CLK: tt(),
+        op.p.INT_CLK: tt(), or.p.n_b: 1;
+
+TRANSITION or.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME or.p.b: b, or.p.pegel_0_1: 1;
+PRODUCE or.p.pegel_0_1: 1, or.p.n_b: 1;
+
+TRANSITION or.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME or.p.b: b, or.p.pegel_1_0: 1;
+PRODUCE or.p.pegel_1_1: 1, or.p.n_b: 1;
+
+TRANSITION or.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME or.p.b: b, or.p.pegel_1_1: 1;
+PRODUCE or.p.pegel_1_1: 1, or.p.n_b: 1;
+
+
+
+
+{Output Port (op)}
+
+{Signalverzweigung}
+TRANSITION op.t.int_clk
+VAR x: BOOLEAN;
+CONSUME op.p.INT_CLK: x, op.m2.p.n_clk: 1, op.m3.p.n_clk: 1;
+PRODUCE op.m2.p.clk: x, op.m3.p.clk: x, op.p.n_INT_CLK: 1;
+
+{Signalverzweigung mit Negation}
+TRANSITION op.t.datav_out
+VAR x: BOOLEAN;
+CONSUME op.p.DATAV_OUT: x, op.m2.p.n_d: 1, op.m3.p.n_d: 1;
+PRODUCE op.m2.p.d: neg(x), op.m3.p.d: x, op.p.n_DATAV_OUT: 1;
+
+{Signalverzweigung}
+TRANSITION op.t.ack_b
+VAR x: BOOLEAN;
+CONSUME p.ACK_B: x, op.m4.p.n_ack_b: 1, op.m5.p.n_b: 1;
+PRODUCE op.m4.p.ack_b: x, op.m5.p.b: x, p.n_ACK_B: 1;
+
+
+
+{m1: OR}
+TRANSITION op.m1.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME op.p.LCLKM: a, op.m1.p.pegel_0_0: 1;
+PRODUCE op.m1.p.pegel_0_0: 1, op.p.n_LCLKM: 1;
+
+TRANSITION op.m1.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME op.p.LCLKM: a, op.m1.p.pegel_0_1: 1;
+PRODUCE op.m1.p.pegel_0_1: 1, op.p.n_LCLKM: 1;
+
+TRANSITION op.m1.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME op.p.LCLKM: a, op.m1.p.pegel_1_0: 1, op.m2.p.n_rst: 1, op.m3.p.n_rst: 1, op.m4.p.n_clk: 1;
+PRODUCE op.m1.p.pegel_0_0: 1, op.m4.p.clk: ff(), op.m2.p.rst: tt(), op.m3.p.rst: tt(), op.p.n_LCLKM: 1;
+
+TRANSITION op.m1.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME op.p.LCLKM: a, op.m1.p.pegel_1_1: 1;
+PRODUCE op.m1.p.pegel_0_1: 1, op.p.n_LCLKM: 1;
+
+TRANSITION op.m1.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME op.p.LCLKM: a, op.m1.p.pegel_0_0: 1, op.m2.p.n_rst: 1, op.m3.p.n_rst: 1, op.m4.p.n_clk: 1;
+PRODUCE op.m1.p.pegel_1_0: 1, op.m4.p.clk: tt(), op.m2.p.rst: ff(), op.m3.p.rst: ff(), op.p.n_LCLKM: 1;
+
+TRANSITION op.m1.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME op.p.LCLKM: a, op.m1.p.pegel_0_1: 1;
+PRODUCE op.m1.p.pegel_1_1: 1, op.p.n_LCLKM: 1;
+
+TRANSITION op.m1.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME op.p.LCLKM: a, op.m1.p.pegel_1_0: 1;
+PRODUCE op.m1.p.pegel_1_0: 1, op.p.n_LCLKM: 1;
+
+TRANSITION op.m1.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME op.p.LCLKM: a, op.m1.p.pegel_1_1: 1;
+PRODUCE op.m1.p.pegel_1_1: 1, op.p.n_LCLKM: 1;
+
+
+TRANSITION op.m1.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME op.p.REQ_INT: b, op.m1.p.pegel_0_0: 1;
+PRODUCE op.m1.p.pegel_0_0: 1, op.p.n_REQ_INT: 1;
+
+TRANSITION op.m1.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME op.p.REQ_INT: b, op.m1.p.pegel_0_1: 1, op.m2.p.n_rst: 1, op.m3.p.n_rst: 1, op.m4.p.n_clk: 1;
+PRODUCE op.m1.p.pegel_0_0: 1, op.m4.p.clk: ff(), op.m2.p.rst: tt(), op.m3.p.rst: tt(), 
+	op.p.n_REQ_INT: 1;
+
+TRANSITION op.m1.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME op.p.REQ_INT: b, op.m1.p.pegel_1_0: 1;
+PRODUCE op.m1.p.pegel_1_0: 1, op.p.n_REQ_INT: 1;
+
+TRANSITION op.m1.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME op.p.REQ_INT: b, op.m1.p.pegel_1_1: 1;
+PRODUCE op.m1.p.pegel_1_0: 1, op.p.n_REQ_INT: 1;
+
+TRANSITION op.m1.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME op.p.REQ_INT: b, op.m1.p.pegel_0_0: 1, op.m2.p.n_rst: 1, op.m3.p.n_rst: 1, op.m4.p.n_clk: 1;
+PRODUCE op.m1.p.pegel_0_1: 1, op.m4.p.clk: tt(), op.m2.p.rst: ff(), op.m3.p.rst: ff(), 
+	op.p.n_REQ_INT: 1;
+
+TRANSITION op.m1.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME op.p.REQ_INT: b, op.m1.p.pegel_0_1: 1;
+PRODUCE op.m1.p.pegel_0_1: 1, op.p.n_REQ_INT: 1;
+
+TRANSITION op.m1.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME op.p.REQ_INT: b, op.m1.p.pegel_1_0: 1;
+PRODUCE op.m1.p.pegel_1_1: 1, op.p.n_REQ_INT: 1;
+
+TRANSITION op.m1.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME op.p.REQ_INT: b, op.m1.p.pegel_1_1: 1;
+PRODUCE op.m1.p.pegel_1_1: 1, op.p.n_REQ_INT: 1;
+
+
+
+{m2: D-FF mit D beliebig und RST}
+
+TRANSITION op.m2.t.d0_0_0_0
+CONSUME op.m2.p.d: ff(), op.m2.p.pegel_0_0_0: 1;
+PRODUCE op.m2.p.pegel_0_0_0: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d0_0_0_1
+CONSUME op.m2.p.d: ff(), op.m2.p.pegel_0_0_1: 1;
+PRODUCE op.m2.p.pegel_0_0_1: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d0_0_1_0
+CONSUME op.m2.p.d: ff(), op.m2.p.pegel_0_1_0: 1;
+PRODUCE op.m2.p.pegel_0_1_0: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d0_1_0_0
+CONSUME op.m2.p.d: ff(), op.m2.p.pegel_1_0_0: 1;
+PRODUCE op.m2.p.pegel_0_0_0: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d0_1_0_1
+CONSUME op.m2.p.d: ff(), op.m2.p.pegel_1_0_1: 1;
+PRODUCE op.m2.p.pegel_0_0_1: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d0_1_1_0
+CONSUME op.m2.p.d: ff(), op.m2.p.pegel_1_1_0: 1;
+PRODUCE op.m2.p.pegel_0_1_0: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d1_0_0_0
+CONSUME op.m2.p.d: tt(), op.m2.p.pegel_0_0_0: 1;
+PRODUCE op.m2.p.pegel_1_0_0: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d1_0_0_1
+CONSUME op.m2.p.d: tt(), op.m2.p.pegel_0_0_1: 1;
+PRODUCE op.m2.p.pegel_1_0_1: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d1_0_1_0
+CONSUME op.m2.p.d: tt(), op.m2.p.pegel_0_1_0: 1;
+PRODUCE op.m2.p.pegel_1_1_0: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d1_1_0_0
+CONSUME op.m2.p.d: tt(), op.m2.p.pegel_1_0_0: 1;
+PRODUCE op.m2.p.pegel_1_0_0: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d1_1_0_1
+CONSUME op.m2.p.d: tt(), op.m2.p.pegel_1_0_1: 1;
+PRODUCE op.m2.p.pegel_1_0_1: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d1_1_1_0
+CONSUME op.m2.p.d: tt(), op.m2.p.pegel_1_1_0: 1;
+PRODUCE op.m2.p.pegel_1_1_0: 1, op.m2.p.n_d: 1;
+
+
+TRANSITION op.m2.t.clk0_0_0_0
+CONSUME op.m2.p.clk: ff(), op.m2.p.pegel_0_0_0: 1;
+PRODUCE op.m2.p.pegel_0_0_0: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk0_0_0_1
+CONSUME op.m2.p.clk: ff(), op.m2.p.pegel_0_0_1: 1;
+PRODUCE op.m2.p.pegel_0_0_1: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk0_0_1_0
+CONSUME op.m2.p.clk: ff(), op.m2.p.pegel_0_1_0: 1;
+PRODUCE op.m2.p.pegel_0_1_0: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk0_1_0_0
+CONSUME op.m2.p.clk: ff(), op.m2.p.pegel_1_0_0: 1;
+PRODUCE op.m2.p.pegel_1_0_0: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk0_1_0_1
+CONSUME op.m2.p.clk: ff(), op.m2.p.pegel_1_0_1: 1;
+PRODUCE op.m2.p.pegel_1_0_1: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk0_1_1_0
+CONSUME op.m2.p.clk: ff(), op.m2.p.pegel_1_1_0: 1;
+PRODUCE op.m2.p.pegel_1_1_0: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk1_0_0_0
+CONSUME op.m2.p.clk: tt(), op.m2.p.pegel_0_0_0: 1;
+PRODUCE op.m2.p.pegel_0_0_0: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk1_0_0_1
+CONSUME op.m2.p.clk: tt(), op.m2.p.pegel_0_0_1: 1, op.m4.p.n_donv: 1;
+PRODUCE op.m2.p.pegel_0_0_0: 1, op.m4.p.donv: ff(), op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk1_0_1_0
+CONSUME op.m2.p.clk: tt(), op.m2.p.pegel_0_1_0: 1;
+PRODUCE op.m2.p.pegel_0_1_0: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk1_1_0_0
+CONSUME op.m2.p.clk: tt(), op.m2.p.pegel_1_0_0: 1, op.m4.p.n_donv: 1;
+PRODUCE op.m2.p.pegel_1_0_1: 1, op.m4.p.donv: tt(), op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk1_1_0_1
+CONSUME op.m2.p.clk: tt(), op.m2.p.pegel_1_0_1: 1;
+PRODUCE op.m2.p.pegel_1_0_1: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk1_1_1_0
+CONSUME op.m2.p.clk: tt(), op.m2.p.pegel_1_1_0: 1;
+PRODUCE op.m2.p.pegel_1_1_0: 1, op.m2.p.n_clk: 1;
+
+
+TRANSITION op.m2.t.rst0_0_0_0
+CONSUME op.m2.p.rst: ff(), op.m2.p.pegel_0_0_0: 1;
+PRODUCE op.m2.p.pegel_0_0_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst0_0_0_1
+CONSUME op.m2.p.rst: ff(), op.m2.p.pegel_0_0_1: 1;
+PRODUCE op.m2.p.pegel_0_0_1: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst0_0_1_0
+CONSUME op.m2.p.rst: ff(), op.m2.p.pegel_0_1_0: 1;
+PRODUCE op.m2.p.pegel_0_0_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst0_1_0_0
+CONSUME op.m2.p.rst: ff(), op.m2.p.pegel_1_0_0: 1;
+PRODUCE op.m2.p.pegel_1_0_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst0_1_0_1
+CONSUME op.m2.p.rst: ff(), op.m2.p.pegel_1_0_1: 1;
+PRODUCE op.m2.p.pegel_1_0_1: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst0_1_1_0
+CONSUME op.m2.p.rst: ff(), op.m2.p.pegel_1_1_0: 1;
+PRODUCE op.m2.p.pegel_1_0_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_0_0_0
+CONSUME op.m2.p.rst: tt(), op.m2.p.pegel_0_0_0: 1;
+PRODUCE op.m2.p.pegel_0_1_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_0_0_1
+CONSUME op.m2.p.rst: tt(), op.m2.p.pegel_0_0_1: 1, op.m4.p.n_donv: 1;
+PRODUCE op.m2.p.pegel_0_1_0: 1, op.m4.p.donv: ff(), op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_0_1_0
+CONSUME op.m2.p.rst: tt(), op.m2.p.pegel_0_1_0: 1;
+PRODUCE op.m2.p.pegel_0_1_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_1_0_0
+CONSUME op.m2.p.rst: tt(), op.m2.p.pegel_1_0_0: 1;
+PRODUCE op.m2.p.pegel_1_1_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_1_0_1
+CONSUME op.m2.p.rst: tt(), op.m2.p.pegel_1_0_1: 1, op.m4.p.n_donv: 1;
+PRODUCE op.m2.p.pegel_1_1_0: 1, op.m4.p.donv: ff(), op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_1_1_0
+CONSUME op.m2.p.rst: tt(), op.m2.p.pegel_1_1_0: 1;
+PRODUCE op.m2.p.pegel_1_1_0: 1, op.m2.p.n_rst: 1;
+
+
+
+{m3: D-FF mit D beliebig und RST}
+
+TRANSITION op.m3.t.d0_0_0_0
+CONSUME op.m3.p.d: ff(), op.m3.p.pegel_0_0_0: 1;
+PRODUCE op.m3.p.pegel_0_0_0: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d0_0_0_1
+CONSUME op.m3.p.d: ff(), op.m3.p.pegel_0_0_1: 1;
+PRODUCE op.m3.p.pegel_0_0_1: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d0_0_1_0
+CONSUME op.m3.p.d: ff(), op.m3.p.pegel_0_1_0: 1;
+PRODUCE op.m3.p.pegel_0_1_0: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d0_1_0_0
+CONSUME op.m3.p.d: ff(), op.m3.p.pegel_1_0_0: 1;
+PRODUCE op.m3.p.pegel_0_0_0: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d0_1_0_1
+CONSUME op.m3.p.d: ff(), op.m3.p.pegel_1_0_1: 1;
+PRODUCE op.m3.p.pegel_0_0_1: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d0_1_1_0
+CONSUME op.m3.p.d: ff(), op.m3.p.pegel_1_1_0: 1;
+PRODUCE op.m3.p.pegel_0_1_0: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d1_0_0_0
+CONSUME op.m3.p.d: tt(), op.m3.p.pegel_0_0_0: 1;
+PRODUCE op.m3.p.pegel_1_0_0: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d1_0_0_1
+CONSUME op.m3.p.d: tt(), op.m3.p.pegel_0_0_1: 1;
+PRODUCE op.m3.p.pegel_1_0_1: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d1_0_1_0
+CONSUME op.m3.p.d: tt(), op.m3.p.pegel_0_1_0: 1;
+PRODUCE op.m3.p.pegel_1_1_0: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d1_1_0_0
+CONSUME op.m3.p.d: tt(), op.m3.p.pegel_1_0_0: 1;
+PRODUCE op.m3.p.pegel_1_0_0: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d1_1_0_1
+CONSUME op.m3.p.d: tt(), op.m3.p.pegel_1_0_1: 1;
+PRODUCE op.m3.p.pegel_1_0_1: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d1_1_1_0
+CONSUME op.m3.p.d: tt(), op.m3.p.pegel_1_1_0: 1;
+PRODUCE op.m3.p.pegel_1_1_0: 1, op.m3.p.n_d: 1;
+
+
+TRANSITION op.m3.t.clk0_0_0_0
+CONSUME op.m3.p.clk: ff(), op.m3.p.pegel_0_0_0: 1;
+PRODUCE op.m3.p.pegel_0_0_0: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk0_0_0_1
+CONSUME op.m3.p.clk: ff(), op.m3.p.pegel_0_0_1: 1;
+PRODUCE op.m3.p.pegel_0_0_1: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk0_0_1_0
+CONSUME op.m3.p.clk: ff(), op.m3.p.pegel_0_1_0: 1;
+PRODUCE op.m3.p.pegel_0_1_0: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk0_1_0_0
+CONSUME op.m3.p.clk: ff(), op.m3.p.pegel_1_0_0: 1;
+PRODUCE op.m3.p.pegel_1_0_0: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk0_1_0_1
+CONSUME op.m3.p.clk: ff(), op.m3.p.pegel_1_0_1: 1;
+PRODUCE op.m3.p.pegel_1_0_1: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk0_1_1_0
+CONSUME op.m3.p.clk: ff(), op.m3.p.pegel_1_1_0: 1;
+PRODUCE op.m3.p.pegel_1_1_0: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk1_0_0_0
+CONSUME op.m3.p.clk: tt(), op.m3.p.pegel_0_0_0: 1;
+PRODUCE op.m3.p.pegel_0_0_0: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk1_0_0_1
+CONSUME op.m3.p.clk: tt(), op.m3.p.pegel_0_0_1: 1, op.m4.p.n_dov: 1;
+PRODUCE op.m3.p.pegel_0_0_0: 1, op.m4.p.dov: ff(), op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk1_0_1_0
+CONSUME op.m3.p.clk: tt(), op.m3.p.pegel_0_1_0: 1;
+PRODUCE op.m3.p.pegel_0_1_0: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk1_1_0_0
+CONSUME op.m3.p.clk: tt(), op.m3.p.pegel_1_0_0: 1, op.m4.p.n_dov: 1;
+PRODUCE op.m3.p.pegel_1_0_1: 1, op.m4.p.dov: tt(), op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk1_1_0_1
+CONSUME op.m3.p.clk: tt(), op.m3.p.pegel_1_0_1: 1;
+PRODUCE op.m3.p.pegel_1_0_1: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk1_1_1_0
+CONSUME op.m3.p.clk: tt(), op.m3.p.pegel_1_1_0: 1;
+PRODUCE op.m3.p.pegel_1_1_0: 1, op.m3.p.n_clk: 1;
+
+
+TRANSITION op.m3.t.rst0_0_0_0
+CONSUME op.m3.p.rst: ff(), op.m3.p.pegel_0_0_0: 1;
+PRODUCE op.m3.p.pegel_0_0_0: 1;
+
+TRANSITION op.m3.t.rst0_0_0_1
+CONSUME op.m3.p.rst: ff(), op.m3.p.pegel_0_0_1: 1;
+PRODUCE op.m3.p.pegel_0_0_1: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst0_0_1_0
+CONSUME op.m3.p.rst: ff(), op.m3.p.pegel_0_1_0: 1;
+PRODUCE op.m3.p.pegel_0_0_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst0_1_0_0
+CONSUME op.m3.p.rst: ff(), op.m3.p.pegel_1_0_0: 1;
+PRODUCE op.m3.p.pegel_1_0_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst0_1_0_1
+CONSUME op.m3.p.rst: ff(), op.m3.p.pegel_1_0_1: 1;
+PRODUCE op.m3.p.pegel_1_0_1: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst0_1_1_0
+CONSUME op.m3.p.rst: ff(), op.m3.p.pegel_1_1_0: 1;
+PRODUCE op.m3.p.pegel_1_0_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_0_0_0
+CONSUME op.m3.p.rst: tt(), op.m3.p.pegel_0_0_0: 1;
+PRODUCE op.m3.p.pegel_0_1_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_0_0_1
+CONSUME op.m3.p.rst: tt(), op.m3.p.pegel_0_0_1: 1, op.m4.p.n_dov: 1;
+PRODUCE op.m3.p.pegel_0_1_0: 1, op.m4.p.dov: ff(), op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_0_1_0
+CONSUME op.m3.p.rst: tt(), op.m3.p.pegel_0_1_0: 1;
+PRODUCE op.m3.p.pegel_0_1_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_1_0_0
+CONSUME op.m3.p.rst: tt(), op.m3.p.pegel_1_0_0: 1;
+PRODUCE op.m3.p.pegel_1_1_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_1_0_1
+CONSUME op.m3.p.rst: tt(), op.m3.p.pegel_1_0_1: 1, op.m4.p.n_dov: 1;
+PRODUCE op.m3.p.pegel_1_1_0: 1, op.m4.p.dov: ff(), op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_1_1_0
+CONSUME op.m3.p.rst: tt(), op.m3.p.pegel_1_1_0: 1;
+PRODUCE op.m3.p.pegel_1_1_0: 1, op.m3.p.n_rst: 1;
+
+
+
+{m4: Output Controller}
+
+TRANSITION op.m4.t.01
+CONSUME op.m4.p.0: 1, op.m4.p.clk: tt(), op.m4.p.dov: tt(), ip.p.n_ACK_INT: 1, op.m5.p.n_a: 1, 
+	op.m6.p.n_set: 1, p.n_REQ_B: 1;
+PRODUCE op.m4.p.1: 1, p.REQ_B: tt(), op.m5.p.a: tt(), op.m6.p.set: tt(),
+        ip.p.ACK_INT: tt(), op.m4.p.n_clk: 1, op.m4.p.n_dov: 1;
+
+TRANSITION op.m4.t.03
+CONSUME op.m4.p.0: 1, op.m4.p.clk: tt(), op.m4.p.donv: tt(), ip.p.n_ACK_INT: 1;
+PRODUCE op.m4.p.3: 1, ip.p.ACK_INT: tt(), op.m4.p.n_clk: 1, op.m4.p.n_donv: 1;
+
+TRANSITION op.m4.t.12
+CONSUME op.m4.p.1: 1, op.m4.p.ack_b: tt(), op.m4.p.clk: ff(), op.m4.p.dov: ff(), ip.p.n_ACK_INT: 1, 
+	op.m5.p.n_a: 1, op.m6.p.n_set: 1, p.n_REQ_B: 1;
+PRODUCE op.m4.p.2: 1, p.REQ_B: ff(), op.m5.p.a: ff(), op.m6.p.set: ff(),
+        ip.p.ACK_INT: ff(), op.m4.p.n_clk: 1, op.m4.p.n_dov: 1, op.m4.p.n_ack_b: 1;
+
+TRANSITION op.m4.t.21
+CONSUME op.m4.p.2: 1, op.m4.p.ack_b: ff(), op.m4.p.clk: tt(), op.m4.p.dov: tt(), ip.p.n_ACK_INT: 1, 
+	op.m5.p.n_a: 1, op.m6.p.n_set: 1, p.n_REQ_B: 1;
+PRODUCE op.m4.p.1: 1, p.REQ_B: tt(), op.m5.p.a: tt(), op.m6.p.set: tt(),
+        ip.p.ACK_INT: tt(), op.m4.p.n_clk: 1, op.m4.p.n_dov: 1, op.m4.p.n_ack_b: 1;
+
+TRANSITION op.m4.t.23
+CONSUME op.m4.p.2: 1, op.m4.p.clk: tt(), op.m4.p.ack_b: ff(), op.m4.p.donv: tt(), ip.p.n_ACK_INT: 1;
+PRODUCE op.m4.p.3: 1, ip.p.ACK_INT: tt(), op.m4.p.n_clk: 1, op.m4.p.n_donv: 1, op.m4.p.n_ack_b: 1;
+
+TRANSITION op.m4.t.30
+CONSUME op.m4.p.3: 1, op.m4.p.clk: ff(), op.m4.p.donv: ff(), ip.p.n_ACK_INT: 1;
+PRODUCE op.m4.p.0: 1, ip.p.ACK_INT: ff(), op.m4.p.n_clk: 1, op.m4.p.n_donv: 1;
+
+
+
+{m5: OR}
+
+TRANSITION op.m5.t.a0_pegel_0_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME op.m5.p.a: a, op.m5.p.pegel_0_0: 1;
+PRODUCE op.m5.p.pegel_0_0: 1, op.m5.p.n_a: 1;
+
+TRANSITION op.m5.t.a0_pegel_0_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME op.m5.p.a: a, op.m5.p.pegel_0_1: 1;
+PRODUCE op.m5.p.pegel_0_1: 1, op.m5.p.n_a: 1;
+
+TRANSITION op.m5.t.a0_pegel_1_0
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME op.m5.p.a: a, op.m5.p.pegel_1_0: 1, op.m6.p.n_clk: 1;
+PRODUCE op.m5.p.pegel_0_0: 1, op.m6.p.clk: tt(), op.m5.p.n_a: 1;
+
+TRANSITION op.m5.t.a0_pegel_1_1
+VAR a : BOOLEAN;
+GUARD NOT(a)
+CONSUME op.m5.p.a: a, op.m5.p.pegel_1_1: 1;
+PRODUCE op.m5.p.pegel_0_1: 1, op.m5.p.n_a: 1;
+
+TRANSITION op.m5.t.a1_pegel_0_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME op.m5.p.a: a, op.m5.p.pegel_0_0: 1, op.m6.p.n_clk: 1;
+PRODUCE op.m5.p.pegel_1_0: 1, op.m6.p.clk: ff(), op.m5.p.n_a: 1;
+
+TRANSITION op.m5.t.a1_pegel_0_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME op.m5.p.a: a, op.m5.p.pegel_0_1: 1;
+PRODUCE op.m5.p.pegel_1_1: 1, op.m5.p.n_a: 1;
+
+TRANSITION op.m5.t.a1_pegel_1_0
+VAR a : BOOLEAN;
+GUARD a
+CONSUME op.m5.p.a: a, op.m5.p.pegel_1_0: 1;
+PRODUCE op.m5.p.pegel_1_0: 1, op.m5.p.n_a: 1;
+
+TRANSITION op.m5.t.a1_pegel_1_1
+VAR a : BOOLEAN;
+GUARD a
+CONSUME op.m5.p.a: a, op.m5.p.pegel_1_1: 1;
+PRODUCE op.m5.p.pegel_1_1: 1, op.m5.p.n_a: 1;
+
+
+TRANSITION op.m5.t.b0_pegel_0_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME op.m5.p.b: b, op.m5.p.pegel_0_0: 1;
+PRODUCE op.m5.p.pegel_0_0: 1, op.m5.p.n_b: 1;
+
+TRANSITION op.m5.t.b0_pegel_0_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME op.m5.p.b: b, op.m5.p.pegel_0_1: 1, op.m6.p.n_clk: 1;
+PRODUCE op.m5.p.pegel_0_0: 1, op.m6.p.clk: tt(), op.m5.p.n_b: 1;
+
+TRANSITION op.m5.t.b0_pegel_1_0
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME op.m5.p.b: b, op.m5.p.pegel_1_0: 1;
+PRODUCE op.m5.p.pegel_1_0: 1, op.m5.p.n_b: 1;
+
+TRANSITION op.m5.t.b0_pegel_1_1
+VAR b : BOOLEAN;
+GUARD NOT(b)
+CONSUME op.m5.p.b: b, op.m5.p.pegel_1_1: 1;
+PRODUCE op.m5.p.pegel_1_0: 1, op.m5.p.n_b: 1;
+
+TRANSITION op.m5.t.b1_pegel_0_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME op.m5.p.b: b, op.m5.p.pegel_0_0: 1, op.m6.p.n_clk: 1;
+PRODUCE op.m5.p.pegel_0_1: 1, op.m6.p.clk: ff(), op.m5.p.n_b: 1;
+
+TRANSITION op.m5.t.b1_pegel_0_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME op.m5.p.b: b, op.m5.p.pegel_0_1: 1;
+PRODUCE op.m5.p.pegel_0_1: 1, op.m5.p.n_b: 1;
+
+TRANSITION op.m5.t.b1_pegel_1_0
+VAR b : BOOLEAN;
+GUARD b
+CONSUME op.m5.p.b: b, op.m5.p.pegel_1_0: 1;
+PRODUCE op.m5.p.pegel_1_1: 1, op.m5.p.n_b: 1;
+
+TRANSITION op.m5.t.b1_pegel_1_1
+VAR b : BOOLEAN;
+GUARD b
+CONSUME op.m5.p.b: b, op.m5.p.pegel_1_1: 1;
+PRODUCE op.m5.p.pegel_1_1: 1, op.m5.p.n_b: 1;
+
+
+
+{m6: D-FF mit D=0 und SET}
+
+TRANSITION op.m6.t.clk0_0_0
+CONSUME op.m6.p.clk: ff(), op.m6.p.pegel_0_0 : 1;
+PRODUCE op.m6.p.pegel_0_0 : 1, op.m6.p.n_clk: 1;
+
+TRANSITION op.m6.t.clk0_0_1
+CONSUME op.m6.p.clk: ff(), op.m6.p.pegel_0_1 : 1;
+PRODUCE op.m6.p.pegel_0_1 : 1, op.m6.p.n_clk: 1;
+
+TRANSITION op.m6.t.clk0_1_1
+CONSUME op.m6.p.clk: ff(), op.m6.p.pegel_1_1 : 1;
+PRODUCE op.m6.p.pegel_1_1 : 1, op.m6.p.n_clk: 1;
+
+TRANSITION op.m6.t.clk1_0_0
+CONSUME op.m6.p.clk: tt(), op.m6.p.pegel_0_0 : 1;
+PRODUCE op.m6.p.pegel_0_0 : 1, op.m6.p.n_clk: 1;
+
+TRANSITION op.m6.t.clk1_0_1
+CONSUME op.m6.p.clk: tt(), op.m6.p.pegel_0_1 : 1, pcg.p.n_STRETCH: 1;
+PRODUCE op.m6.p.pegel_0_0 : 1, pcg.p.STRETCH: ff(), op.m6.p.n_clk: 1;
+
+TRANSITION op.m6.t.clk1_1_1
+CONSUME op.m6.p.clk: tt(), op.m6.p.pegel_1_1 : 1;
+PRODUCE op.m6.p.pegel_1_1 : 1, op.m6.p.n_clk: 1;
+
+TRANSITION op.m6.t.set0_0_0
+CONSUME op.m6.p.set: ff(), op.m6.p.pegel_0_0 : 1;
+PRODUCE op.m6.p.pegel_0_0 : 1, op.m6.p.n_set: 1;
+
+TRANSITION op.m6.t.set0_0_1
+CONSUME op.m6.p.set: ff(), op.m6.p.pegel_0_1 : 1;
+PRODUCE op.m6.p.pegel_0_1 : 1, op.m6.p.n_set: 1;
+
+TRANSITION op.m6.t.set0_1_1
+CONSUME op.m6.p.set: ff(), op.m6.p.pegel_1_1 : 1;
+PRODUCE op.m6.p.pegel_0_1 : 1, op.m6.p.n_set: 1;
+
+TRANSITION op.m6.t.set1_0_0
+CONSUME op.m6.p.set: tt(), op.m6.p.pegel_0_0 : 1, pcg.p.n_STRETCH: 1;
+PRODUCE op.m6.p.pegel_1_1 : 1, pcg.p.STRETCH: tt(), op.m6.p.n_set: 1;
+
+TRANSITION op.m6.t.set1_0_1
+CONSUME op.m6.p.set: tt(), op.m6.p.pegel_0_1 : 1;
+PRODUCE op.m6.p.pegel_1_1 : 1, op.m6.p.n_set: 1;
+
+TRANSITION op.m6.t.set1_1_1
+CONSUME op.m6.p.set: tt(), op.m6.p.pegel_1_1 : 1;
+PRODUCE op.m6.p.pegel_1_1 : 1, op.m6.p.n_set: 1;
+
+
+
+{Locally Synchronous Module (lsm)}
+
+TRANSITION lsm.datav_in
+VAR d, x: BOOLEAN;
+CONSUME lsm.p.DATAV_IN: d, lsm.p.datav_pegel: x, lsm.p.n_datav_pegel: 1;
+PRODUCE lsm.p.datav_pegel: d, lsm.p.n_DATAV_IN: 1, lsm.p.n_datav_pegel: 1;
+
+TRANSITION lsm.clk_0
+CONSUME lsm.p.INT_CLK: ff();
+PRODUCE lsm.p.n_INT_CLK: 1;
+
+TRANSITION lsm.clk_1
+VAR d: BOOLEAN;
+CONSUME lsm.p.INT_CLK: tt(), lsm.p.datav_pegel: d, op.p.n_DATAV_OUT: 1, lsm.p.n_datav_pegel: 1;
+PRODUCE op.p.DATAV_OUT: d, lsm.p.datav_pegel: d, lsm.p.n_INT_CLK: 1, lsm.p.n_datav_pegel: 1;
+
+
+{Anbindung an Aussenwelt}
+TRANSITION t.req_a
+VAR x: BOOLEAN;
+CONSUME p.ACK_A: x, p.n_REQ_A: 1;
+PRODUCE p.REQ_A: neg(x), p.n_ACK_A: 1;
+
+
+TRANSITION t.ack_b
+VAR x: BOOLEAN;
+CONSUME p.REQ_B: x, p.n_ACK_B: 1;
+PRODUCE p.ACK_B: x, p.n_REQ_B: 1;
+
+
+TRANSITION t.dle
+VAR x: BOOLEAN;
+CONSUME p.DLE: x;
+PRODUCE p.n_DLE: 1;
+
+{ vim: set ft=lola noet: }

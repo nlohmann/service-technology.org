@@ -1,0 +1,28 @@
+PLACE
+  INTERNAL
+    p1, p2, p3, p4;
+
+  INPUT
+    food;
+
+  OUTPUT
+    order, money;
+
+INITIALMARKING
+  p1;
+
+FINALCONDITION
+  ((p4 = 1) AND ALL_OTHER_PLACES_EMPTY);
+
+
+TRANSITION place
+  CONSUME p1;
+  PRODUCE p2, order;
+
+TRANSITION eat
+  CONSUME p2, food;
+  PRODUCE p3;
+
+TRANSITION pay
+  CONSUME p3;
+  PRODUCE p4, money;

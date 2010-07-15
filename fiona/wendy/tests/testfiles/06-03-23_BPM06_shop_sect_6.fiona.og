@@ -1,0 +1,61 @@
+INTERFACE
+  INPUT
+    out.client.onlineshop.confirm,
+    out.client.onlineshop.deliver,
+    out.client.onlineshop.invoice;
+  OUTPUT
+    in.client.onlineshop.abort,
+    in.client.onlineshop.login,
+    in.client.onlineshop.order,
+    in.client.onlineshop.paymentMethod,
+    in.client.onlineshop.present;
+
+NODES
+  0 : (!in.client.onlineshop.abort + !in.client.onlineshop.login + !in.client.onlineshop.order) : blue,
+  97 : !in.client.onlineshop.login : blue,
+  98 : ?out.client.onlineshop.confirm : blue,
+  99 : !in.client.onlineshop.abort : blue,
+  106 : final : blue : finalnode,
+  107 : true : blue,
+  110 : !in.client.onlineshop.order : blue,
+  112 : final : blue : finalnode;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 97 : !in.client.onlineshop.order,
+  0 -> 110 : !in.client.onlineshop.login,
+  0 -> 112 : !in.client.onlineshop.abort,
+  0 -> 107 : ?out.client.onlineshop.invoice,
+  0 -> 107 : ?out.client.onlineshop.deliver,
+  0 -> 107 : ?out.client.onlineshop.confirm,
+  97 -> 98 : !in.client.onlineshop.login,
+  97 -> 107 : ?out.client.onlineshop.invoice,
+  97 -> 107 : ?out.client.onlineshop.deliver,
+  97 -> 107 : ?out.client.onlineshop.confirm,
+  98 -> 99 : ?out.client.onlineshop.confirm,
+  98 -> 107 : ?out.client.onlineshop.invoice,
+  98 -> 107 : ?out.client.onlineshop.deliver,
+  99 -> 106 : !in.client.onlineshop.abort,
+  99 -> 107 : ?out.client.onlineshop.invoice,
+  99 -> 107 : ?out.client.onlineshop.deliver,
+  99 -> 107 : ?out.client.onlineshop.confirm,
+  106 -> 107 : ?out.client.onlineshop.invoice,
+  106 -> 107 : ?out.client.onlineshop.deliver,
+  106 -> 107 : ?out.client.onlineshop.confirm,
+  107 -> 107 : ?out.client.onlineshop.invoice,
+  107 -> 107 : ?out.client.onlineshop.deliver,
+  107 -> 107 : ?out.client.onlineshop.confirm,
+  107 -> 107 : !in.client.onlineshop.present,
+  107 -> 107 : !in.client.onlineshop.paymentMethod,
+  107 -> 107 : !in.client.onlineshop.order,
+  107 -> 107 : !in.client.onlineshop.login,
+  107 -> 107 : !in.client.onlineshop.abort,
+  110 -> 98 : !in.client.onlineshop.order,
+  110 -> 107 : ?out.client.onlineshop.invoice,
+  110 -> 107 : ?out.client.onlineshop.deliver,
+  110 -> 107 : ?out.client.onlineshop.confirm,
+  112 -> 107 : ?out.client.onlineshop.invoice,
+  112 -> 107 : ?out.client.onlineshop.deliver,
+  112 -> 107 : ?out.client.onlineshop.confirm;

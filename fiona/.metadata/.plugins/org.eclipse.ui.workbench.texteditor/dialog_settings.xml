@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="354" key="DIALOG_WIDTH"/>
+		<item value="116" key="DIALOG_Y_ORIGIN"/>
+		<item value="540" key="DIALOG_HEIGHT"/>
+		<item value="247" key="DIALOG_X_ORIGIN"/>
+		<item value="1|Sans|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="wrap"/>
+		<item value="false" key="isRegEx"/>
+		<item value="true" key="casesensitive"/>
+		<item value="false" key="incremental"/>
+		<item value="false" key="wholeword"/>
+		<item value="sourceNode" key="selection"/>
+		<list key="findhistory">
+			<item value="sourceNode"/>
+			<item value="~DNF"/>
+			<item value="sorry"/>
+			<item value="maximize("/>
+			<item value="maximize"/>
+			<item value="write_output"/>
+			<item value="numberOfNodes"/>
+			<item value="addAnInternalChoice"/>
+		</list>
+		<list key="replacehistory">
+			<item value="number_of_nodes"/>
+			<item value="add_an_internal_choice"/>
+			<item value="add_literal_node"/>
+			<item value="add_disjunction_node"/>
+			<item value="add_conjunction_node"/>
+			<item value="evaluate_parameters"/>
+			<item value="parse_OG"/>
+			<item value="write_output_SA"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.GotoLineAction$GotoLineDialog_dialogBounds">
+		<item value="292" key="DIALOG_Y_ORIGIN"/>
+		<item value="446" key="DIALOG_X_ORIGIN"/>
+	</section>
+</section>

@@ -1,0 +1,46 @@
+Safira 2.0
+
+Safira: Set Algebra for Service Behavior.
+
+Usage: safira [OPTIONS]... [FILE]...
+
+About Safira:
+
+  -h, --help               Print help and exit
+      --detailed-help      Print help, including all details and hidden 
+                             options, and exit
+      --full-help          Print help, including hidden options, and exit
+  -V, --version            Print version and exit
+  -v, --verbose            Show verbose output  (default=off)
+      --clean              Any temporary files created by Safira are deleted 
+                             once they are not used any more.  (default=off)
+      --noClean            Do not delete temporary files.  (default=off)
+
+ Group: operations
+  Choose the default strategy of the configuration interface. Either, 
+  transitions are configured to 'allow' and a configuration only lists the 
+  transitions that need to be blocked, or transitions are configured to 'block' 
+  and a configuration only lists the transitions that need to be allowed.
+
+  -c, --complement[=MODE]  Complements a given extended annotated service 
+                             automaton
+                             0 - unreduced result
+                             1 - simple reduction algorithm (slow)
+                             2 - efficient reduction algorithm (fast)  
+                             (possible values="0", "1", "2" default=`2')
+  -i, --intersection       Calculates the intersection for two given extended 
+                             annotated service automata. Both automato must 
+                             have the same interface!
+  -u, --union              Calculates the union for two given extended 
+                             annotated service automata
+
+Input/Output:
+  When called without an input file, Safira reads from the standard input 
+  stream.  If 'eaa' doesn't selected as output format Safira will pipe the 
+  result to the standard output stream. The input filename's suffix (e.g. 
+  '.og') is replaced by the name of the respective option (e.g., '.eaa').
+
+  -o, --output=FORMAT      Select the output file format(s)  (possible 
+                             values="eaa", "dot", "png", "pdf", 
+                             "eps", "none")
+  -t, --time               Mesures the time

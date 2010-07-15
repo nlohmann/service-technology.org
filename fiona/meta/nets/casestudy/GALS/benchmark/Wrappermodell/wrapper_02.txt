@@ -1,0 +1,1633 @@
+{Zweiter Wrapper}
+
+{01: konkret; alle Gatter einzeln}
+{02: alle Komponenten zusammengefasst bzw. abstrahiert.}
+{    Hazards nur noch im Input Port erkennbar (an zusammengefassten Gattern)}
+{    eingebaute Komponenten:}
+{       clock_control_03, input_port_02, output_port_04,}
+{       pausable_clock_generator_02, timeout_generator_02, lsm_02, and-or_02}
+
+PLACE
+    {Timeout Generator}
+
+    tog.p.STOPH,  {Input-Flanken}
+    tog.p.n_STOPH,
+    tog.p.REQ_A,
+    tog.p.n_REQ_A,
+    tog.p.LCLK,
+    tog.p.n_LCLK,
+    tog.p.RST,
+    tog.p.n_RST,
+    {tog.p.STOP => ip.ic.p.STOP}  {Output-Flanken}
+    {tog.p.REQ_A1 => ip.ic.p.REQ_A1}
+    {tog.p.ST => ip.ic.p.ST, ip.andandor.p.ST, andor.p.ST, cc.p.ST}
+    tog.p.pegel_STOPH_0,
+    tog.p.pegel_STOPH_1,
+    tog.p.pegel_REQ_A_0,
+    tog.p.pegel_REQ_A_1,
+    tog.p.pegel_LCLK_0,
+    tog.p.pegel_LCLK_1,
+    tog.p.pegel_RST_0,
+    tog.p.pegel_RST_1,
+    tog.p.pegel_STOP_0,
+    tog.p.pegel_STOP_1,
+    tog.p.pegel_REQ_A1_0,
+    tog.p.pegel_REQ_A1_1,
+    tog.p.pegel_ST_0,
+    tog.p.pegel_ST_1,
+    tog.p.pegel_mutex2_b_in_0,
+    tog.p.pegel_mutex2_b_in_1,
+    tog.p.pegel_mutex2_b_out_0,
+    tog.p.pegel_mutex2_b_out_1,
+    tog.p.pegel_mutex3_b_in_0,
+    tog.p.pegel_mutex3_b_in_1,
+    tog.p.pegel_ff2_clk_0,
+    tog.p.pegel_ff2_clk_1,
+
+    {Input Port}
+
+    {Input Controller im IP}
+    ip.ic.p.0,  {Zustände des Input Controllers}
+    ip.ic.p.1,
+    ip.ic.p.2,
+    ip.ic.p.3,
+    ip.ic.p.4,
+    ip.ic.p.5,
+    ip.ic.p.6,
+    ip.ic.p.7,
+    ip.ic.p.8,
+    ip.ic.p.REQ_A1,    {Eingabesignale als Flanken}
+    ip.ic.p.n_REQ_A1,
+    ip.ic.p.ST,
+    ip.ic.p.n_ST,
+    ip.ic.p.STOP,
+    ip.ic.p.n_STOP,
+    ip.ic.p.ACKC,
+    ip.ic.p.n_ACKC,
+    ip.ic.p.ACKI1,
+    ip.ic.p.n_ACKI1,
+    {ip.ic.p.ACK_A => ip.and3andor.p.ACK_A, tog.p.REQ_A}  {Ausgabesignale}
+    {ip.ic.p.RST => tog.p.RST, cc.p.RST}
+    {ip.ic.p.ACKEN => ip.and3andor.p.ACKEN, ip.andandor.p.ACKEN}
+    {ip.ic.p.REQ_INT => cc.p.REQ_INT , andor.p.REQ_INT}
+    {ip.ic.p.REQI1 => pcg.p.REQI1}
+
+    {AND-D0-FF; D-FF mit D=0, Set und AND vor clk}
+    ip.andff.p.LCLKM,   {Input-Flanke}
+    ip.andff.p.n_LCLKM,
+    ip.andff.p.INT_CLK,
+    ip.andff.p.n_INT_CLK,
+    ip.andff.p.set,
+    ip.andff.p.n_set,
+    {ip.andff.p.DATAV_IN => lsm.p.DATAV_IN}     {Output-Flanke}
+    ip.andff.p.pegel_LCLKM_0,
+    ip.andff.p.pegel_LCLKM_1,
+    ip.andff.p.pegel_INT_CLK_0,
+    ip.andff.p.pegel_INT_CLK_1,
+    ip.andff.p.pegel_set_0,
+    ip.andff.p.pegel_set_1,
+    ip.andff.p.pegel_DATAV_IN_0,
+    ip.andff.p.pegel_DATAV_IN_1,
+
+    {AND3-AND-OR; AND mit 3 Eingängen, AND und OR zusammengefasst}
+    ip.and3andor.p.ACK_A,  {Input-Flanken}
+    ip.and3andor.p.n_ACK_A,
+    ip.and3andor.p.INT_CLK,
+    ip.and3andor.p.n_INT_CLK,
+    ip.and3andor.p.ACKC,
+    ip.and3andor.p.n_ACKC,
+    ip.and3andor.p.ACKEN,
+    ip.and3andor.p.n_ACKEN,
+    {ip.and3andor.p.out => ip.p.andff.set}  {Output-Flanke}
+    ip.and3andor.p.pegel_ACK_A_0,
+    ip.and3andor.p.pegel_ACK_A_1,
+    ip.and3andor.p.pegel_INT_CLK_0,
+    ip.and3andor.p.pegel_INT_CLK_1,
+    ip.and3andor.p.pegel_ACKC_0,
+    ip.and3andor.p.pegel_ACKC_1,
+    ip.and3andor.p.pegel_ACKEN_0,
+    ip.and3andor.p.pegel_ACKEN_1,
+
+    {AND-AND-OR; wo ACK_INT in beide ANDs geht}
+    ip.andandor.p.ACKEN,    {Input-Flanken}
+    ip.andandor.p.n_ACKEN,
+    ip.andandor.p.ACK_INT,
+    ip.andandor.p.n_ACK_INT,
+    ip.andandor.p.ST,
+    ip.andandor.p.n_ST,
+    {ip.andandor.p.out => ip.ic.p.ACKC, ip.and3andor.p.ACKC}  {Output-Flanke}
+    ip.andandor.p.pegel_ACKEN_0,
+    ip.andandor.p.pegel_ACKEN_1,
+    ip.andandor.p.pegel_ACK_INT_0,
+    ip.andandor.p.pegel_ACK_INT_1,
+    ip.andandor.p.pegel_ST_0,
+    ip.andandor.p.pegel_ST_1,
+
+
+    {Clock Control}
+
+    cc.p.ST,  {Input-Flanken}
+    cc.p.n_ST,
+    cc.p.ACK_INT,
+    cc.p.n_ACK_INT,
+    cc.p.RST,
+    cc.p.n_RST,
+    cc.p.REQ_INT,
+    cc.p.n_REQ_INT,
+    {cc.p.STOPH => tog.p.STOPH}  {Output-Flanken}
+    {cc.p.STOPI => pcg.p.STOPI}
+    cc.p.pegel_ST_0,
+    cc.p.pegel_ST_1,
+    cc.p.pegel_ACK_INT_0,
+    cc.p.pegel_ACK_INT_1,
+    cc.p.pegel_RST_0,
+    cc.p.pegel_RST_1,
+    cc.p.pegel_REQ_INT_0,
+    cc.p.pegel_REQ_INT_1,
+    cc.p.pegel_STOPH_0,
+    cc.p.pegel_STOPH_1,
+    cc.p.pegel_STOPI_0,
+    cc.p.pegel_STOPI_1,
+
+
+    {Pausable Clock Generator}
+
+    pcg.p.STOPI,
+    pcg.p.n_STOPI,
+    pcg.p.REQI1,
+    pcg.p.n_REQI1,
+    pcg.p.STRETCH,
+    pcg.p.n_STRETCH,
+    {pcg.p.ACKI1 => ip.ic.p.ACKI1}
+    {pcg.p.LCLK => pcg.p.LCLK_intern, andor.p.LCLK, tog.p.LCLK}
+    pcg.p.LCLK_intern,
+    pcg.p.n_LCLK_intern,
+    pcg.p.pegel_STOPI_0,
+    pcg.p.pegel_STOPI_1,
+    pcg.p.pegel_REQI1_0,
+    pcg.p.pegel_REQI1_1,
+    pcg.p.pegel_STRETCH_0,
+    pcg.p.pegel_STRETCH_1,
+    pcg.p.pegel_LCLK_0,
+    pcg.p.pegel_LCLK_1,
+
+    {Output Port}
+
+    {Zusammengefasst: AND und beide D-FFs}
+    op.and2ff.p.INT_CLK,
+    op.and2ff.p.n_INT_CLK,
+    op.and2ff.p.ACK_B,
+    op.and2ff.p.n_ACK_B,
+    op.and2ff.p.DATAV_OUT,
+    op.and2ff.p.n_DATAV_OUT,
+    {op.and2ff.p.DOV => op.oc.p.DOV}
+    {op.and2ff.p.DONV => op.oc.p.DONV}
+    op.and2ff.p.pegel_INT_CLK_0,
+    op.and2ff.p.pegel_INT_CLK_1,
+    op.and2ff.p.pegel_ACK_B_0,
+    op.and2ff.p.pegel_ACK_B_1,
+    op.and2ff.p.pegel_DATAV_OUT_0,
+    op.and2ff.p.pegel_DATAV_OUT_1,
+    op.and2ff.p.pegel_DOV_0,
+    op.and2ff.p.pegel_DOV_1,
+    op.and2ff.p.pegel_DONV_0,
+    op.and2ff.p.pegel_DONV_1,
+
+    {Output Controller im OP}
+    op.oc.p.0,  {Zustände des Output Controllers}
+    op.oc.p.1,
+    op.oc.p.2,
+    op.oc.p.3,
+    op.oc.p.DOV,
+    op.oc.p.n_DOV,
+    op.oc.p.DONV,
+    op.oc.p.n_DONV,
+    op.oc.p.ACK_B,
+    op.oc.p.n_ACK_B,
+    {op.oc.p.REQ_B => op.oc.p.ACK_B, op.and2ff.p.ACK_B} {sofortige Antwort}
+    {op.oc.p.STRETCH => pcg.p.STRETCH}
+    {op.oc.p.ACK_INT => ip.andandor.p.ACK_INT, cc.p.ACK_INT}
+
+    {AND-OR im Wrapper}
+    andor.p.ST,                  {Input-Flanken}
+    andor.p.n_ST,
+    andor.p.LCLK,
+    andor.p.n_LCLK,
+    andor.p.REQ_INT,
+    andor.p.n_REQ_INT,
+    {andor.p.or_out => ip.andff.p.INT_CLK, ip.and3andor.p.INT_CLK, lsm.p.INT_CLK, op.and2ff.p.INT_CLK}
+    {andor.p.and_out => ip.andff.p.LCLKM}
+    andor.p.pegel_0_0_0,               {alte Pegel: (ST, LCLK, REQ_INT)}
+    andor.p.pegel_0_0_1,
+    andor.p.pegel_0_1_0,
+    andor.p.pegel_1_0_0,
+    andor.p.pegel_1_1_0,
+    andor.p.pegel_1_0_1,
+    andor.p.pegel_0_1_1,
+    andor.p.pegel_1_1_1,
+
+
+    {Locally Synchronous Module}
+
+    lsm.p.INT_CLK,  {clk}  {Input-Flanke}
+    lsm.p.n_INT_CLK,
+    lsm.p.DATAV_IN,  {d}
+    lsm.p.n_DATAV_IN,
+    {lsm.p.DATAV_OUT => op.and2ff.p.DATAV_OUT}  {q}
+    lsm.p.pegel_INT_CLK_0,
+    lsm.p.pegel_INT_CLK_1,
+    lsm.p.pegel_DATAV_IN_0,
+    lsm.p.pegel_DATAV_IN_1,
+    lsm.p.pegel_DATAV_OUT_0,
+    lsm.p.pegel_DATAV_OUT_1;
+
+
+
+MARKING
+    tog.p.n_STOPH: 1,
+    tog.p.REQ_A: 1,  {Es gibt eine Anfrage vom Vorgängerwrapper}
+    tog.p.n_LCLK: 1,
+    tog.p.n_RST: 1,
+    tog.p.pegel_STOPH_0: 1,
+    tog.p.pegel_REQ_A_0: 1,
+    tog.p.pegel_LCLK_0: 1,
+    tog.p.pegel_RST_0: 1,
+    tog.p.pegel_STOP_0: 1,
+    tog.p.pegel_REQ_A1_0: 1,
+    tog.p.pegel_ST_0: 1,
+    tog.p.pegel_mutex2_b_in_0: 1,
+    tog.p.pegel_mutex2_b_out_0: 1,
+    tog.p.pegel_mutex3_b_in_0: 1,
+    tog.p.pegel_ff2_clk_0: 1,
+
+    ip.ic.p.0: 1,
+    ip.ic.p.n_REQ_A1: 1,
+    ip.ic.p.n_ST: 1,
+    ip.ic.p.n_STOP: 1,
+    ip.ic.p.n_ACKC: 1,
+    ip.ic.p.n_ACKI1: 1,
+
+    ip.andff.p.n_LCLKM: 1,
+    ip.andff.p.n_INT_CLK: 1,
+    ip.andff.p.n_set: 1,
+    ip.andff.p.pegel_LCLKM_0: 1,
+    ip.andff.p.pegel_INT_CLK_0: 1,
+    ip.andff.p.pegel_set_0: 1,
+    ip.andff.p.pegel_DATAV_IN_0: 1,
+
+    ip.and3andor.p.n_ACK_A: 1,
+    ip.and3andor.p.n_INT_CLK: 1,
+    ip.and3andor.p.n_ACKC: 1,
+    ip.and3andor.p.n_ACKEN: 1,
+    ip.and3andor.p.pegel_ACK_A_0: 1,
+    ip.and3andor.p.pegel_INT_CLK_0: 1,
+    ip.and3andor.p.pegel_ACKC_0: 1,
+    ip.and3andor.p.pegel_ACKEN_0: 1,
+
+    ip.andandor.p.n_ACKEN: 1,
+    ip.andandor.p.n_ACK_INT: 1,
+    ip.andandor.p.n_ST: 1,
+    ip.andandor.p.pegel_ACKEN_0: 1,
+    ip.andandor.p.pegel_ACK_INT_0: 1,
+    ip.andandor.p.pegel_ST_0: 1,
+
+    cc.p.n_ST: 1,
+    cc.p.n_ACK_INT: 1,
+    cc.p.n_RST: 1,
+    cc.p.n_REQ_INT: 1,
+    cc.p.pegel_ST_0: 1,
+    cc.p.pegel_ACK_INT_0: 1,
+    cc.p.pegel_RST_0: 1,
+    cc.p.pegel_REQ_INT_0: 1,
+    cc.p.pegel_STOPH_0: 1,
+    cc.p.pegel_STOPI_1: 1, {STOPI mit 1 initialisiert}
+
+    pcg.p.n_STOPI: 1,
+    pcg.p.n_REQI1: 1,
+    pcg.p.n_STRETCH: 1,
+    pcg.p.n_LCLK_intern: 1,
+    pcg.p.pegel_STOPI_1: 1, {STOPI initial 1}
+    pcg.p.pegel_REQI1_0: 1,
+    pcg.p.pegel_STRETCH_0: 1,
+    pcg.p.pegel_LCLK_0: 1,
+
+    op.and2ff.p.n_INT_CLK: 1,
+    op.and2ff.p.n_ACK_B: 1,
+    op.and2ff.p.n_DATAV_OUT: 1,
+    op.and2ff.p.pegel_INT_CLK_0: 1,
+    op.and2ff.p.pegel_ACK_B_0: 1,
+    op.and2ff.p.pegel_DATAV_OUT_0: 1,
+    op.and2ff.p.pegel_DOV_0: 1,
+    op.and2ff.p.pegel_DONV_0: 1,
+
+    op.oc.p.0: 1,
+    op.oc.p.n_DOV: 1,
+    op.oc.p.n_DONV: 1,
+    op.oc.p.n_ACK_B: 1,
+
+    andor.p.n_ST: 1,
+    andor.p.n_LCLK: 1,
+    andor.p.n_REQ_INT: 1,
+    andor.p.pegel_0_0_0: 1,
+
+    lsm.p.n_INT_CLK: 1,
+    lsm.p.n_DATAV_IN: 1,
+    lsm.p.pegel_INT_CLK_0: 1,
+    lsm.p.pegel_DATAV_IN_0: 1,
+    lsm.p.pegel_DATAV_OUT_0: 1;
+
+
+{Tabelle für STOPH-Flanke}
+
+{Pegelkodierung: STOPH  mutex3.b_in  STOP  REQ_A1}
+{Tabelle: alter Zustand -> neuer Zustand (Änderung) Flanke}
+
+{0000 -> 1010 (1-1-) STOP+}
+{0001 entfällt}
+{0010 entfällt}
+{0011 entfällt}
+{0100 entfällt}
+{0101 -> 1101 (1---)}
+{0110 entfällt}
+{0111 entfällt}
+{1000 entfällt}
+{1001 entfällt}
+{1010 -> 0000 (0-0-) STOP-}
+{1011 entfällt}
+{1100 entfällt}
+{1101 -> 0101 (0---)}
+{1110 -> 0101 (0-01) STOP-, REQ_A1+}
+{1111 entfällt}
+
+
+TRANSITION tog.t.STOPH_1_pegel_01xx
+CONSUME tog.p.STOPH: 1, tog.p.pegel_STOPH_0: 1, tog.p.pegel_mutex3_b_in_1: 1;
+PRODUCE tog.p.n_STOPH: 1, tog.p.pegel_STOPH_1: 1, tog.p.pegel_mutex3_b_in_1: 1;
+
+TRANSITION tog.t.STOPH_1_pegel_000x
+CONSUME tog.p.STOPH: 1, tog.p.pegel_STOPH_0: 1, tog.p.pegel_mutex3_b_in_0: 1,
+        ip.ic.p.n_STOP: 1, tog.p.pegel_STOP_0: 1;
+PRODUCE tog.p.n_STOPH: 1, tog.p.pegel_STOPH_1: 1, tog.p.pegel_mutex3_b_in_0: 1,
+        ip.ic.p.STOP: 1, tog.p.pegel_STOP_1: 1;
+
+TRANSITION tog.t.STOPH_0_pegel_1xx1
+CONSUME tog.p.STOPH: 1, tog.p.pegel_STOPH_1: 1, tog.p.pegel_REQ_A1_1: 1;
+PRODUCE tog.p.n_STOPH: 1, tog.p.pegel_STOPH_0: 1, tog.p.pegel_REQ_A1_1: 1;
+
+TRANSITION tog.t.STOPH_0_pegel_1010
+CONSUME tog.p.STOPH: 1, tog.p.pegel_STOPH_1: 1, tog.p.pegel_REQ_A1_0: 1,
+        tog.p.pegel_mutex3_b_in_0: 1, ip.ic.p.n_STOP: 1, tog.p.pegel_STOP_1: 1;
+PRODUCE tog.p.n_STOPH: 1, tog.p.pegel_STOPH_0: 1, tog.p.pegel_REQ_A1_0: 1,
+        tog.p.pegel_mutex3_b_in_0: 1, ip.ic.p.STOP: 1, tog.p.pegel_STOP_0: 1;
+
+TRANSITION tog.t.STOPH_0_pegel_1110
+CONSUME tog.p.STOPH: 1, tog.p.pegel_STOPH_1: 1, tog.p.pegel_REQ_A1_0: 1,
+        tog.p.pegel_mutex3_b_in_1: 1, ip.ic.p.n_STOP: 1, ip.ic.p.n_REQ_A1: 1,
+        tog.p.pegel_STOP_1: 1;
+PRODUCE tog.p.n_STOPH: 1, tog.p.pegel_STOPH_0: 1, tog.p.pegel_REQ_A1_1: 1,
+        tog.p.pegel_mutex3_b_in_1: 1, ip.ic.p.STOP: 1, ip.ic.p.REQ_A1: 1,
+        tog.p.pegel_STOP_0: 1;
+
+
+{REQ_A-Flanke}
+{abhängig von:}
+{REQ_A mutex2_b_in mutex3_b_in mutex_2_b_out STOPH STOP REQ_A1 RST ST}
+
+{REQ_A=0, mutex2_b_in=1 -> keine Flanke}
+TRANSITION tog.t.REQ_A_1_pegel_01xxxxxxx
+CONSUME tog.p.REQ_A: 1, tog.p.pegel_REQ_A_0: 1, tog.p.pegel_mutex2_b_in_1: 1;
+PRODUCE tog.p.n_REQ_A: 1, tog.p.pegel_REQ_A_1: 1, tog.p.pegel_mutex2_b_in_1: 1;
+
+{REQ_A=0, mutex2_b_in=0, STOPH=1 (impliziert mutex3_b_in=0) -> mutex3_b_in=1}
+TRANSITION tog.t.REQ_A_1_pegel_00xx1xxxx
+CONSUME tog.p.REQ_A: 1, tog.p.pegel_REQ_A_0: 1, tog.p.pegel_mutex2_b_in_0: 1,
+        tog.p.pegel_STOPH_1: 1, tog.p.pegel_mutex3_b_in_0: 1;
+PRODUCE tog.p.n_REQ_A: 1, tog.p.pegel_REQ_A_1: 1, tog.p.pegel_mutex2_b_in_0: 1,
+        tog.p.pegel_STOPH_1: 1, tog.p.pegel_mutex3_b_in_1: 1;
+
+{REQ_A=0, mutex2_b_in=0, STOPH=0 (impliziert mutex3_b_in=0, REQ_A1=0)}
+{    -> mutex3_b_in=1, REQ_A1+ (REQ_A1=1)}
+TRANSITION tog.t.REQ_A_1_pegel_00xx0xxxx
+CONSUME tog.p.REQ_A: 1, tog.p.pegel_REQ_A_0: 1, tog.p.pegel_mutex2_b_in_0: 1,
+        tog.p.pegel_STOPH_0: 1, tog.p.pegel_mutex3_b_in_0: 1,
+        tog.p.pegel_REQ_A1_0: 1, ip.ic.p.n_REQ_A1: 1;
+PRODUCE tog.p.n_REQ_A: 1, tog.p.pegel_REQ_A_1: 1, tog.p.pegel_mutex2_b_in_0: 1,
+        tog.p.pegel_STOPH_0: 1, tog.p.pegel_mutex3_b_in_1: 1,
+        tog.p.pegel_REQ_A1_1: 1, ip.ic.p.REQ_A1: 1;
+
+{REQ_A=1, mutex2_b_out=1 -> keine Flanke}
+TRANSITION tog.t.REQ_A_0_pegel_1xx1xxxxx
+CONSUME tog.p.REQ_A: 1, tog.p.pegel_REQ_A_1: 1, tog.p.pegel_mutex2_b_out_1: 1;
+PRODUCE tog.p.n_REQ_A: 1, tog.p.pegel_REQ_A_0: 1, tog.p.pegel_mutex2_b_out_1: 1;
+
+{REQ_A=1, mutex2_b_out=0, mutex2_b_in=0, STOP=1 (impliziert mutex3_b_in=1)}
+{    -> mutex3_b_in=0}
+TRANSITION tog.t.REQ_A_0_pegel_10x0x1xxx
+CONSUME tog.p.REQ_A: 1, tog.p.pegel_REQ_A_1: 1, tog.p.pegel_mutex2_b_out_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_mutex3_b_in_1: 1,
+        tog.p.pegel_STOP_1: 1;
+PRODUCE tog.p.n_REQ_A: 1, tog.p.pegel_REQ_A_0: 1, tog.p.pegel_mutex2_b_out_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_mutex3_b_in_0: 1,
+        tog.p.pegel_STOP_1: 1;
+
+{REQ_A=1, mutex2_b_out=0, mutex2_b_in=0, STOP=0, STOPH=0}
+{(impliziert mutex3_b_in=1, REQ_A1=1)}
+{    -> mutex3_b_in=0, REQ_A1-, (REQ_A1=0)}
+TRANSITION tog.t.REQ_A_0_pegel_10x000xxx
+CONSUME tog.p.REQ_A: 1, tog.p.pegel_REQ_A_1: 1, tog.p.pegel_mutex2_b_out_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_mutex3_b_in_1: 1,
+        tog.p.pegel_STOP_0: 1, tog.p.pegel_STOPH_0: 1, tog.p.pegel_REQ_A1_1: 1,
+        ip.ic.p.n_REQ_A1: 1;
+PRODUCE tog.p.n_REQ_A: 1, tog.p.pegel_REQ_A_0: 1, tog.p.pegel_mutex2_b_out_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_mutex3_b_in_0: 1,
+        tog.p.pegel_STOP_0: 1, tog.p.pegel_STOPH_0: 1, tog.p.pegel_REQ_A1_0: 1,
+        ip.ic.p.REQ_A1: 1;
+
+{REQ_A=1, mutex2_b_out=0, mutex2_b_in=0, STOP=0, STOPH=1}
+{(impliziert mutex3_b_in=1, REQ_A1=1)}
+{   -> mutex3_b_in=0, REQ_A1-, (REQ_A1=0), STOP+, (STOP=1)}
+TRANSITION tog.t.REQ_A_0_pegel_10x010xxx
+CONSUME tog.p.REQ_A: 1, tog.p.pegel_REQ_A_1: 1, tog.p.pegel_mutex2_b_out_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_mutex3_b_in_1: 1,
+        tog.p.pegel_STOP_0: 1, tog.p.pegel_STOPH_1: 1, tog.p.pegel_REQ_A1_1: 1,
+        ip.ic.p.n_REQ_A1: 1, ip.ic.p.n_STOP: 1;
+PRODUCE tog.p.n_REQ_A: 1, tog.p.pegel_REQ_A_0: 1, tog.p.pegel_mutex2_b_out_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_mutex3_b_in_0: 1,
+        tog.p.pegel_STOP_0: 1, tog.p.pegel_STOPH_1: 1, tog.p.pegel_REQ_A1_0: 1,
+        ip.ic.p.REQ_A1: 1, ip.ic.p.STOP: 1;
+
+{REQ_A=1, mutex2_b_out=0, mutex2_b_in=1, STOP=1}
+{(impliziert RST=0, ST=0, mutex3_b_in=1)}
+{    -> mutex3_b_in=0, mutex2_b_in=0, ST+, (ST=1), (mutex2_b_out=1 nur temporär}
+TRANSITION tog.t.REQ_A_0_pegel_11x0x1xxx
+CONSUME tog.p.REQ_A: 1, tog.p.pegel_REQ_A_1: 1, tog.p.pegel_mutex2_b_out_0: 1,
+        tog.p.pegel_mutex2_b_in_1: 1, tog.p.pegel_mutex3_b_in_1: 1,
+        tog.p.pegel_STOP_1: 1, tog.p.pegel_ST_0: 1, ip.ic.p.n_ST: 1,
+        ip.andandor.p.n_ST: 1, andor.p.n_ST: 1, cc.p.n_ST: 1;
+PRODUCE tog.p.n_REQ_A: 1, tog.p.pegel_REQ_A_0: 1, tog.p.pegel_mutex2_b_out_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_mutex3_b_in_0: 1,
+        tog.p.pegel_STOP_1: 1, tog.p.pegel_ST_1: 1, ip.ic.p.ST: 1,
+        ip.andandor.p.ST: 1, andor.p.ST: 1, cc.p.ST: 1;
+
+{REQ_A=1, mutex2_b_out=0, mutex2_b_in=1, STOP=0, STOPH=0}
+{(impliziert RST=0, ST=0, mutex3_b_in=1, REQ_A1=0)}
+{    -> mutex3_b_in=0, mutex2_b_in=0, ST+, (ST=1), REQ_A1-, (REQ_A1=0),}
+{       (mutex2_b_out=1 nur temporär}
+TRANSITION tog.t.REQ_A_0_pegel_11x000xxx
+CONSUME tog.p.REQ_A: 1, tog.p.pegel_REQ_A_1: 1, tog.p.pegel_mutex2_b_out_0: 1,
+        tog.p.pegel_mutex2_b_in_1: 1, tog.p.pegel_mutex3_b_in_1: 1,
+        tog.p.pegel_STOP_0: 1, tog.p.pegel_STOPH_0: 1, tog.p.pegel_ST_0: 1,
+        ip.ic.p.n_ST: 1, ip.andandor.p.n_ST: 1, andor.p.n_ST: 1, cc.p.n_ST: 1,
+        tog.p.pegel_REQ_A1_1: 1, ip.ic.p.n_REQ_A1: 1;
+PRODUCE tog.p.n_REQ_A: 1, tog.p.pegel_REQ_A_0: 1, tog.p.pegel_mutex2_b_out_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_mutex3_b_in_0: 1,
+        tog.p.pegel_STOP_0: 1, tog.p.pegel_STOPH_0: 1, tog.p.pegel_ST_1: 1,
+        ip.ic.p.ST: 1, ip.andandor.p.ST: 1, andor.p.ST: 1, cc.p.ST: 1,
+        tog.p.pegel_REQ_A1_0: 1, ip.ic.p.REQ_A1: 1;
+
+{REQ_A=1, mutex2_b_out=0, mutex2_b_in=1, STOP=0, STOPH=1}
+{(impliziert RST=0, ST=0, mutex3_b_in=1, REQ_A1=0)}
+{    -> mutex3_b_in=0, mutex2_b_in=0, ST+, (ST=1), REQ_A1-, (REQ_A1=0),}
+{       STOP+, (STOP=1), (mutex2_b_out=1 nur temporär)}
+TRANSITION tog.t.REQ_A_0_pegel_11x010xxx
+CONSUME tog.p.REQ_A: 1, tog.p.pegel_REQ_A_1: 1, tog.p.pegel_mutex2_b_out_0: 1,
+        tog.p.pegel_mutex2_b_in_1: 1, tog.p.pegel_mutex3_b_in_1: 1,
+        tog.p.pegel_STOP_0: 1, tog.p.pegel_STOPH_1: 1, tog.p.pegel_ST_0: 1,
+        ip.ic.p.n_ST: 1, ip.andandor.p.n_ST: 1, andor.p.n_ST: 1, cc.p.n_ST: 1,
+        tog.p.pegel_REQ_A1_1: 1, ip.ic.p.n_REQ_A1: 1, ip.ic.p.n_STOP: 1;
+PRODUCE tog.p.n_REQ_A: 1, tog.p.pegel_REQ_A_0: 1, tog.p.pegel_mutex2_b_out_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_mutex3_b_in_0: 1,
+        tog.p.pegel_STOP_1: 1, tog.p.pegel_STOPH_1: 1, tog.p.pegel_ST_1: 1,
+        ip.ic.p.ST: 1, ip.andandor.p.ST: 1, andor.p.ST: 1, cc.p.ST: 1,
+        tog.p.pegel_REQ_A1_0: 1, ip.ic.p.REQ_A1: 1, ip.ic.p.STOP: 1;
+
+
+{LCLK-Flanke}
+{abhängig von LCLK, RST, ff2_clk, ST, mutex2_b_in, mutex3_b_in}
+
+{LCLK=0 -> keine Flanke}
+TRANSITION tog.t.LCLK_1_pegel_0xxxxx
+CONSUME tog.p.LCLK: 1, tog.p.pegel_LCLK_0: 1;
+PRODUCE tog.p.n_LCLK: 1, tog.p.pegel_LCLK_1: 1;
+
+{LCLK=1, RST=1 -> keine Flanke}
+TRANSITION tog.t.LCLK_0_pegel_11xxxx
+CONSUME tog.p.LCLK: 1, tog.p.pegel_LCLK_1: 1, tog.p.pegel_RST_1: 1;
+PRODUCE tog.p.n_LCLK: 1, tog.p.pegel_LCLK_0: 1, tog.p.pegel_RST_1: 1;
+
+{LCLK=1, RST=0, ff2_clk=1 -> keine Flanke}
+TRANSITION tog.t.LCLK_0_pegel_101xxx
+CONSUME tog.p.LCLK: 1, tog.p.pegel_LCLK_1: 1, tog.p.pegel_RST_0: 1,
+        tog.p.pegel_ff2_clk_1: 1;
+PRODUCE tog.p.n_LCLK: 1, tog.p.pegel_LCLK_0: 1, tog.p.pegel_RST_0: 1,
+        tog.p.pegel_ff2_clk_1: 1;
+
+{LCLK=1, RST=0, ff2_clk=0, ST=1 -> ff2_clk=1}
+TRANSITION tog.t.LCLK_0_pegel_1001xx
+CONSUME tog.p.LCLK: 1, tog.p.pegel_LCLK_1: 1, tog.p.pegel_RST_0: 1,
+        tog.p.pegel_ff2_clk_0: 1, tog.p.pegel_ST_1: 1;
+PRODUCE tog.p.n_LCLK: 1, tog.p.pegel_LCLK_0: 1, tog.p.pegel_RST_0: 1,
+        tog.p.pegel_ff2_clk_1: 1, tog.p.pegel_ST_1: 1;
+
+{LCLK=1, RST=0, ff2_clk=0, ST=0, mutex2_b_in=1 -> ff2_clk=1}
+TRANSITION tog.t.LCLK_0_pegel_10001x
+CONSUME tog.p.LCLK: 1, tog.p.pegel_LCLK_1: 1, tog.p.pegel_RST_0: 1,
+        tog.p.pegel_ff2_clk_0: 1, tog.p.pegel_ST_0: 1,
+        tog.p.pegel_mutex2_b_in_1: 1;
+PRODUCE tog.p.n_LCLK: 1, tog.p.pegel_LCLK_0: 1, tog.p.pegel_RST_0: 1,
+        tog.p.pegel_ff2_clk_1: 1, tog.p.pegel_ST_0: 1,
+        tog.p.pegel_mutex2_b_in_1: 1;
+
+{LCLK=1, RST=0, ff2_clk=0, ST=0, mutex2_b_in=0, mutex3_b_in=1}
+{   -> ff2_clk=1, mutex2_b_in=1}
+TRANSITION tog.t.LCLK_0_pegel_100001
+CONSUME tog.p.LCLK: 1, tog.p.pegel_LCLK_1: 1, tog.p.pegel_RST_0: 1,
+        tog.p.pegel_ff2_clk_0: 1, tog.p.pegel_ST_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_mutex3_b_in_1: 1;
+PRODUCE tog.p.n_LCLK: 1, tog.p.pegel_LCLK_0: 1, tog.p.pegel_RST_0: 1,
+        tog.p.pegel_ff2_clk_1: 1, tog.p.pegel_ST_0: 1,
+        tog.p.pegel_mutex2_b_in_1: 1, tog.p.pegel_mutex3_b_in_1: 1;
+
+{LCLK=1, RST=0, ff2_clk=0, ST=0, mutex2_b_in=0, mutex3_b_in=0}
+{   -> (mutex2_b_out+ temporär), ST+, mutex2_b_in=0, mutex2_b_out=0}
+TRANSITION tog.t.LCLK_0_pegel_100000
+CONSUME tog.p.LCLK: 1, tog.p.pegel_LCLK_1: 1, tog.p.pegel_RST_0: 1,
+        tog.p.pegel_ff2_clk_0: 1, tog.p.pegel_ST_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_mutex3_b_in_0: 1,
+        ip.ic.p.n_ST: 1, ip.andandor.p.n_ST: 1, andor.p.n_ST: 1, cc.p.n_ST: 1;
+PRODUCE tog.p.n_LCLK: 1, tog.p.pegel_LCLK_0: 1, tog.p.pegel_RST_0: 1,
+        tog.p.pegel_ff2_clk_1: 1, tog.p.pegel_ST_1: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_mutex3_b_in_0: 1,
+        ip.ic.p.ST: 1, ip.andandor.p.ST: 1, andor.p.ST: 1, cc.p.ST: 1;
+
+
+{RST-Flanke}
+{abhängig von RST, ff2_clk, mutex2_b_in, ST, mutex2_b_out, REQ_A, STOP}
+
+{RST=1 -> keine Flanke}
+TRANSITION tog.t.RST_0_pegel_1xxxxxx
+CONSUME tog.p.RST: 1, tog.p.pegel_RST_1: 1;
+PRODUCE tog.p.n_RST: 1, tog.p.pegel_RST_0: 1;
+
+{RST=0 (für ff2_clk, mutex2_b_in, ST bleiben nur die Fälle: 000, 100, 101, 110)}
+
+{RST=0, ff2_clk=0, mutex2_b_in=0, ST=0 -> keine Flanke}
+TRANSITION tog.t.RST_1_pegel_0000xxx
+CONSUME tog.p.RST: 1, tog.p.pegel_RST_0: 1, tog.p.pegel_ff2_clk_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_ST_0: 1; 
+PRODUCE tog.p.n_RST: 1, tog.p.pegel_RST_1: 1, tog.p.pegel_ff2_clk_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_ST_0: 1;
+
+{RST=0, ff2_clk=1, mutex2_b_in=0, ST=0 -> ff2_clk=0}
+TRANSITION tog.t.RST_1_pegel_0100xxx
+CONSUME tog.p.RST: 1, tog.p.pegel_RST_0: 1, tog.p.pegel_ff2_clk_1: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_ST_0: 1; 
+PRODUCE tog.p.n_RST: 1, tog.p.pegel_RST_1: 1, tog.p.pegel_ff2_clk_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_ST_0: 1;
+
+{RST=0, ff2_clk=1, mutex2_b_in=0, ST=1 -> ff2_clk=0, ST-, ST=0}
+TRANSITION tog.t.RST_1_pegel_0101xxx
+CONSUME tog.p.RST: 1, tog.p.pegel_RST_0: 1, tog.p.pegel_ff2_clk_1: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_ST_1: 1, ip.ic.p.n_ST: 1,
+        ip.andandor.p.n_ST: 1, andor.p.n_ST: 1, cc.p.n_ST: 1; 
+PRODUCE tog.p.n_RST: 1, tog.p.pegel_RST_1: 1, tog.p.pegel_ff2_clk_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_ST_0: 1, ip.ic.p.ST: 1,
+        ip.andandor.p.ST: 1, andor.p.ST: 1, cc.p.ST: 1;
+
+{RST=0, ff2_clk=1, mutex2_b_in=1, ST=0, mutex2_b_out=0}
+{   -> ff2_clk=0, mutex2_b_in=0}
+TRANSITION tog.t.RST_1_pegel_01100xx
+CONSUME tog.p.RST: 1, tog.p.pegel_RST_0: 1, tog.p.pegel_ff2_clk_1: 1,
+        tog.p.pegel_mutex2_b_in_1: 1, tog.p.pegel_ST_0: 1,
+        tog.p.pegel_mutex2_b_out_0: 1; 
+PRODUCE tog.p.n_RST: 1, tog.p.pegel_RST_1: 1, tog.p.pegel_ff2_clk_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_ST_0: 1,
+        tog.p.pegel_mutex2_b_out_0: 1;
+
+{RST=0, ff2_clk=1, mutex2_b_in=1, ST=0, mutex2_b_out=1, REQ_A=0}
+{   -> ff2_clk=0, mutex2_b_in=0, mutex2_b_out=0}
+TRANSITION tog.t.RST_1_pegel_011010x
+CONSUME tog.p.RST: 1, tog.p.pegel_RST_0: 1, tog.p.pegel_ff2_clk_1: 1,
+        tog.p.pegel_mutex2_b_in_1: 1, tog.p.pegel_ST_0: 1,
+        tog.p.pegel_mutex2_b_out_1: 1, tog.p.pegel_REQ_A_0: 1; 
+PRODUCE tog.p.n_RST: 1, tog.p.pegel_RST_1: 1, tog.p.pegel_ff2_clk_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_ST_0: 1,
+        tog.p.pegel_mutex2_b_out_0: 1, tog.p.pegel_REQ_A_0: 1;
+
+{RST=0, ff2_clk=1, mutex2_b_in=1, ST=0, mutex2_b_out=1, REQ_A=1, STOP=1}
+{(impliziert: mutex3_b_in=0)}
+{   -> ff2_clk=0,  mutex2_b_in=0, mutex2_b_out=0, mutex3_b_in=1}
+TRANSITION tog.t.RST_1_pegel_0110111
+CONSUME tog.p.RST: 1, tog.p.pegel_RST_0: 1, tog.p.pegel_ff2_clk_1: 1,
+        tog.p.pegel_mutex2_b_in_1: 1, tog.p.pegel_ST_0: 1,
+        tog.p.pegel_mutex2_b_out_1: 1, tog.p.pegel_REQ_A_1: 1,
+        tog.p.pegel_STOP_1: 1, tog.p.pegel_mutex3_b_in_0: 1; 
+PRODUCE tog.p.n_RST: 1, tog.p.pegel_RST_1: 1, tog.p.pegel_ff2_clk_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_ST_0: 1,
+        tog.p.pegel_mutex2_b_out_0: 1, tog.p.pegel_REQ_A_1: 1,
+        tog.p.pegel_STOP_1: 1, tog.p.pegel_mutex3_b_in_1: 1;
+
+{RST=0, ff2_clk=1, mutex2_b_in=1, ST=0, mutex2_b_out=1, REQ_A=1, STOP=0}
+{(impliziert: mutex3_b_in=0, REQ_A1=0)}
+{   -> ff2_clk=0,  mutex2_b_in=0, mutex2_b_out=0, mutex3_b_in=1, REQ_A1+}
+TRANSITION tog.t.RST_1_pegel_0110110
+CONSUME tog.p.RST: 1, tog.p.pegel_RST_0: 1, tog.p.pegel_ff2_clk_1: 1,
+        tog.p.pegel_mutex2_b_in_1: 1, tog.p.pegel_ST_0: 1,
+        tog.p.pegel_mutex2_b_out_1: 1, tog.p.pegel_REQ_A_1: 1,
+        tog.p.pegel_STOP_0: 1, tog.p.pegel_mutex3_b_in_0: 1,
+        tog.p.pegel_REQ_A1_0: 1, ip.ic.p.n_REQ_A1: 1; 
+PRODUCE tog.p.n_RST: 1, tog.p.pegel_RST_1: 1, tog.p.pegel_ff2_clk_0: 1,
+        tog.p.pegel_mutex2_b_in_0: 1, tog.p.pegel_ST_0: 1,
+        tog.p.pegel_mutex2_b_out_0: 1, tog.p.pegel_REQ_A_1: 1,
+        tog.p.pegel_STOP_0: 1, tog.p.pegel_mutex3_b_in_1: 1,
+        tog.p.pegel_REQ_A1_1: 1, ip.ic.p.REQ_A1: 1; 
+
+
+
+{Input Controller im IP}
+
+TRANSITION ip.ic.t.01
+CONSUME ip.ic.p.0: 1, ip.ic.p.REQ_A1: 1, cc.p.n_REQ_INT: 1,
+        andor.p.n_REQ_INT: 1, tog.p.n_RST: 1, cc.p.n_RST: 1, tog.p.n_REQ_A: 1,
+        ip.and3andor.p.n_ACK_A: 1;
+PRODUCE ip.ic.p.1: 1, ip.ic.p.n_REQ_A1: 1, cc.p.REQ_INT: 1, andor.p.REQ_INT: 1,
+        tog.p.RST: 1, cc.p.RST: 1, tog.p.REQ_A: 1, ip.and3andor.p.ACK_A: 1;
+
+TRANSITION ip.ic.t.12
+CONSUME ip.ic.p.1: 1, ip.ic.p.ACKC: 1, ip.ic.p.REQ_A1: 1, cc.p.n_REQ_INT: 1,
+        andor.p.n_REQ_INT: 1, tog.p.n_RST: 1, cc.p.n_RST: 1, tog.p.n_REQ_A: 1,
+        ip.and3andor.p.n_ACK_A: 1;
+PRODUCE ip.ic.p.2: 1, ip.ic.p.n_ACKC: 1, ip.ic.p.n_REQ_A1: 1, cc.p.REQ_INT: 1,
+        andor.p.REQ_INT: 1, tog.p.RST: 1, cc.p.RST: 1, tog.p.REQ_A: 1,
+        ip.and3andor.p.ACK_A: 1;
+
+TRANSITION ip.ic.t.21
+CONSUME ip.ic.p.2: 1, ip.ic.p.ACKC: 1, ip.ic.p.REQ_A1: 1, cc.p.n_REQ_INT: 1,
+        andor.p.n_REQ_INT: 1, tog.p.n_RST: 1, cc.p.n_RST: 1, tog.p.n_REQ_A: 1,
+        ip.and3andor.p.n_ACK_A: 1;
+PRODUCE ip.ic.p.1: 1, ip.ic.p.n_ACKC: 1, ip.ic.p.n_REQ_A1: 1, cc.p.REQ_INT: 1,
+        andor.p.REQ_INT: 1, tog.p.RST: 1, cc.p.RST: 1, tog.p.REQ_A: 1,
+        ip.and3andor.p.ACK_A: 1;
+
+TRANSITION ip.ic.t.23
+CONSUME ip.ic.p.2: 1, ip.ic.p.ACKC: 1, ip.ic.p.ST: 1;
+PRODUCE ip.ic.p.3: 1, ip.ic.p.n_ACKC: 1, ip.ic.p.n_ST: 1;
+
+TRANSITION ip.ic.t.34
+CONSUME ip.ic.p.3: 1, ip.ic.p.STOP: 1, tog.p.n_RST: 1, cc.p.n_RST: 1;
+PRODUCE ip.ic.p.4: 1, ip.ic.p.n_STOP: 1, tog.p.RST: 1, cc.p.RST: 1;
+
+TRANSITION ip.ic.t.40
+CONSUME ip.ic.p.4: 1, ip.ic.p.STOP: 1, ip.ic.p.ST: 1, tog.p.n_RST: 1,
+        cc.p.n_RST: 1;
+PRODUCE ip.ic.p.0: 1, ip.ic.p.n_STOP: 1, ip.ic.p.n_ST: 1, tog.p.RST: 1,
+        cc.p.RST: 1;
+
+TRANSITION ip.ic.t.35
+CONSUME ip.ic.p.3: 1, ip.ic.p.REQ_A1: 1, pcg.p.n_REQI1: 1;
+PRODUCE ip.ic.p.5: 1, ip.ic.p.n_REQ_A1: 1, pcg.p.REQI1: 1;
+
+TRANSITION ip.ic.t.56
+CONSUME ip.ic.p.5: 1, ip.ic.p.ACKI1: 1, ip.and3andor.p.n_ACKEN: 1,
+        ip.andandor.p.n_ACKEN: 1, pcg.p.n_REQI1: 1;
+PRODUCE ip.ic.p.6: 1, ip.ic.p.n_ACKI1: 1, ip.and3andor.p.ACKEN: 1,
+        ip.andandor.p.ACKEN: 1, pcg.p.REQI1: 1;
+
+TRANSITION ip.ic.t.67
+CONSUME ip.ic.p.6: 1, ip.ic.p.ACKI1: 1, ip.ic.p.ACKC: 1;
+PRODUCE ip.ic.p.7: 1, ip.ic.p.n_ACKI1: 1, ip.ic.p.n_ACKC: 1;
+
+TRANSITION ip.ic.t.78
+CONSUME ip.ic.p.7: 1, ip.ic.p.ACKC: 1, tog.p.n_REQ_A: 1,
+        ip.and3andor.p.n_ACK_A: 1, tog.p.n_RST: 1, cc.p.n_RST: 1;
+PRODUCE ip.ic.p.8: 1, ip.ic.p.n_ACKC: 1, tog.p.REQ_A: 1,
+        ip.and3andor.p.ACK_A: 1, tog.p.RST: 1, cc.p.RST: 1;
+
+TRANSITION ip.ic.t.80
+CONSUME ip.ic.p.8: 1, ip.ic.p.REQ_A1: 1, ip.ic.p.ST: 1, tog.p.n_REQ_A: 1,
+        ip.and3andor.p.n_ACK_A: 1, tog.p.n_RST: 1, cc.p.n_RST: 1,
+        ip.and3andor.p.n_ACKEN: 1, ip.andandor.p.n_ACKEN: 1;
+PRODUCE ip.ic.p.0: 1, ip.ic.p.n_REQ_A1: 1, ip.ic.p.n_ST: 1, tog.p.REQ_A: 1,
+        ip.and3andor.p.ACK_A: 1, tog.p.RST: 1, cc.p.RST: 1,
+        ip.and3andor.p.ACKEN: 1, ip.andandor.p.ACKEN: 1;
+
+
+{AND-D0-FF; D-FF mit D=0, Set und AND vor clk}
+
+{Pegelkodierung: LCLKM, INT_CLK, set, DATAV_IN}
+TRANSITION ip.andff.t.a0_1_x_x_x
+CONSUME ip.andff.p.LCLKM: 1, ip.andff.p.pegel_LCLKM_1: 1;
+PRODUCE ip.andff.p.n_LCLKM: 1, ip.andff.p.pegel_LCLKM_0: 1;
+
+TRANSITION ip.andff.t.a1_0_0_x_x
+CONSUME ip.andff.p.LCLKM: 1, ip.andff.p.pegel_LCLKM_0: 1,
+        ip.andff.p.pegel_INT_CLK_0: 1;
+PRODUCE ip.andff.p.n_LCLKM: 1, ip.andff.p.pegel_LCLKM_1: 1,
+        ip.andff.p.pegel_INT_CLK_0: 1;
+
+TRANSITION ip.andff.t.a1_0_1_1_x
+CONSUME ip.andff.p.LCLKM: 1, ip.andff.p.pegel_LCLKM_0: 1,
+        ip.andff.p.pegel_INT_CLK_1: 1, ip.andff.p.pegel_set_1: 1;
+PRODUCE ip.andff.p.n_LCLKM: 1, ip.andff.p.pegel_LCLKM_1: 1,
+        ip.andff.p.pegel_INT_CLK_1: 1, ip.andff.p.pegel_set_1: 1;
+
+TRANSITION ip.andff.t.a1_0_1_0_0
+CONSUME ip.andff.p.LCLKM: 1, ip.andff.p.pegel_LCLKM_0: 1,
+        ip.andff.p.pegel_INT_CLK_1: 1, ip.andff.p.pegel_set_0: 1,
+        ip.andff.p.pegel_DATAV_IN_0: 1;
+PRODUCE ip.andff.p.n_LCLKM: 1, ip.andff.p.pegel_LCLKM_1: 1,
+        ip.andff.p.pegel_INT_CLK_1: 1, ip.andff.p.pegel_set_0: 1,
+        ip.andff.p.pegel_DATAV_IN_0: 1;
+
+TRANSITION ip.andff.t.a1_0_1_0_1
+CONSUME ip.andff.p.LCLKM: 1, ip.andff.p.pegel_LCLKM_0: 1,
+        ip.andff.p.pegel_INT_CLK_1: 1, ip.andff.p.pegel_set_0: 1,
+        ip.andff.p.pegel_DATAV_IN_1: 1, lsm.p.n_DATAV_IN: 1;
+PRODUCE ip.andff.p.n_LCLKM: 1, ip.andff.p.pegel_LCLKM_1: 1,
+        ip.andff.p.pegel_INT_CLK_1: 1, ip.andff.p.pegel_set_0: 1,
+        ip.andff.p.pegel_DATAV_IN_0: 1, lsm.p.DATAV_IN: 1;
+
+
+TRANSITION ip.andff.t.b0_x_1_x_x
+CONSUME ip.andff.p.INT_CLK: 1, ip.andff.p.pegel_INT_CLK_1: 1;
+PRODUCE ip.andff.p.n_INT_CLK: 1, ip.andff.p.pegel_INT_CLK_0: 1;
+
+TRANSITION ip.andff.t.b1_0_0_x_x
+CONSUME ip.andff.p.INT_CLK: 1, ip.andff.p.pegel_INT_CLK_0: 1,
+        ip.andff.p.pegel_LCLKM_0: 1;
+PRODUCE ip.andff.p.n_INT_CLK: 1, ip.andff.p.pegel_INT_CLK_1: 1,
+        ip.andff.p.pegel_LCLKM_0: 1;
+
+TRANSITION ip.andff.t.b1_1_0_1_x
+CONSUME ip.andff.p.INT_CLK: 1, ip.andff.p.pegel_INT_CLK_0: 1,
+        ip.andff.p.pegel_LCLKM_1: 1, ip.andff.p.pegel_set_1: 1;
+PRODUCE ip.andff.p.n_INT_CLK: 1, ip.andff.p.pegel_INT_CLK_1: 1,
+        ip.andff.p.pegel_LCLKM_1: 1, ip.andff.p.pegel_set_1: 1;
+
+TRANSITION ip.andff.t.b1_1_0_0_0
+CONSUME ip.andff.p.INT_CLK: 1, ip.andff.p.pegel_INT_CLK_0: 1,
+        ip.andff.p.pegel_LCLKM_1: 1, ip.andff.p.pegel_set_0: 1,
+        ip.andff.p.pegel_DATAV_IN_0: 1;
+PRODUCE ip.andff.p.n_INT_CLK: 1, ip.andff.p.pegel_INT_CLK_1: 1,
+        ip.andff.p.pegel_LCLKM_1: 1, ip.andff.p.pegel_set_0: 1,
+        ip.andff.p.pegel_DATAV_IN_0: 1;
+
+TRANSITION ip.andff.t.b1_1_0_0_1
+CONSUME ip.andff.p.INT_CLK: 1, ip.andff.p.pegel_INT_CLK_0: 1,
+        ip.andff.p.pegel_LCLKM_1: 1, ip.andff.p.pegel_set_0: 1,
+        ip.andff.p.pegel_DATAV_IN_1: 1, lsm.p.n_DATAV_IN: 1;
+PRODUCE ip.andff.p.n_INT_CLK: 1, ip.andff.p.pegel_INT_CLK_1: 1,
+        ip.andff.p.pegel_LCLKM_1: 1, ip.andff.p.pegel_set_0: 1,
+        ip.andff.p.pegel_DATAV_IN_0: 1, lsm.p.DATAV_IN: 1;
+
+
+TRANSITION ip.andff.t.set0_x_x_1_x
+CONSUME ip.andff.p.set: 1, ip.andff.p.pegel_set_1: 1;
+PRODUCE ip.andff.p.n_set: 1, ip.andff.p.pegel_set_0: 1;
+
+TRANSITION ip.andff.t.set1_x_x_0_1
+CONSUME ip.andff.p.set: 1, ip.andff.p.pegel_set_0: 1,
+        ip.andff.p.pegel_DATAV_IN_1: 1;
+PRODUCE ip.andff.p.n_set: 1, ip.andff.p.pegel_set_1: 1,
+        ip.andff.p.pegel_DATAV_IN_1: 1;
+
+TRANSITION ip.andff.t.set1_x_x_0_0
+CONSUME ip.andff.p.set: 1, ip.andff.p.pegel_set_0: 1,
+        ip.andff.p.pegel_DATAV_IN_0: 1, lsm.p.n_DATAV_IN: 1;
+PRODUCE ip.andff.p.n_set: 1, ip.andff.p.pegel_set_1: 1,
+        ip.andff.p.pegel_DATAV_IN_1: 1, lsm.p.DATAV_IN: 1;
+
+
+
+{AND3-AND-OR; AND mit 3 Eingängen, AND und OR zusammengefasst}
+
+{Pegelkodierung in Transitionsnamen: ACK_A, INT_CLK, ACKC, ACKEN}
+
+TRANSITION ip.and3andor.t.ACK_A_1_pegel_0_0_x_x
+CONSUME ip.and3andor.p.ACK_A: 1, ip.and3andor.p.pegel_ACK_A_0: 1,
+        ip.and3andor.p.pegel_INT_CLK_0: 1;
+PRODUCE ip.and3andor.p.n_ACK_A: 1, ip.and3andor.p.pegel_ACK_A_1: 1,
+        ip.and3andor.p.pegel_INT_CLK_0: 1;
+
+TRANSITION ip.and3andor.t.ACK_A_1_pegel_0_1_x_1
+CONSUME ip.and3andor.p.ACK_A: 1, ip.and3andor.p.pegel_ACK_A_0: 1,
+        ip.and3andor.p.pegel_INT_CLK_1: 1, ip.and3andor.p.pegel_ACKEN_1: 1;
+PRODUCE ip.and3andor.p.n_ACK_A: 1, ip.and3andor.p.pegel_ACK_A_1: 1,
+        ip.and3andor.p.pegel_INT_CLK_1: 1, ip.and3andor.p.pegel_ACKEN_1: 1;
+
+TRANSITION ip.and3andor.t.ACK_A_1_pegel_0_1_x_0
+CONSUME ip.and3andor.p.ACK_A: 1, ip.and3andor.p.pegel_ACK_A_0: 1,
+        ip.and3andor.p.pegel_INT_CLK_1: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.andff.p.n_set: 1;
+PRODUCE ip.and3andor.p.n_ACK_A: 1, ip.and3andor.p.pegel_ACK_A_1: 1,
+        ip.and3andor.p.pegel_INT_CLK_1: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.andff.p.set: 1;
+
+TRANSITION ip.and3andor.t.ACK_A_0_pegel_1_0_x_x
+CONSUME ip.and3andor.p.ACK_A: 1, ip.and3andor.p.pegel_ACK_A_1: 1,
+        ip.and3andor.p.pegel_INT_CLK_0: 1;
+PRODUCE ip.and3andor.p.n_ACK_A: 1, ip.and3andor.p.pegel_ACK_A_0: 1,
+        ip.and3andor.p.pegel_INT_CLK_0: 1;
+
+TRANSITION ip.and3andor.t.ACK_A_0_pegel_1_1_x_1
+CONSUME ip.and3andor.p.ACK_A: 1, ip.and3andor.p.pegel_ACK_A_1: 1,
+        ip.and3andor.p.pegel_INT_CLK_1: 1, ip.and3andor.p.pegel_ACKEN_1: 1;
+PRODUCE ip.and3andor.p.n_ACK_A: 1, ip.and3andor.p.pegel_ACK_A_0: 1,
+        ip.and3andor.p.pegel_INT_CLK_1: 1, ip.and3andor.p.pegel_ACKEN_1: 1;
+
+TRANSITION ip.and3andor.t.ACK_A_0_pegel_1_1_x_0
+CONSUME ip.and3andor.p.ACK_A: 1, ip.and3andor.p.pegel_ACK_A_1: 1,
+        ip.and3andor.p.pegel_INT_CLK_1: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.andff.p.n_set: 1;
+PRODUCE ip.and3andor.p.n_ACK_A: 1, ip.and3andor.p.pegel_ACK_A_0: 1,
+        ip.and3andor.p.pegel_INT_CLK_1: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.andff.p.set: 1;
+
+
+TRANSITION ip.and3andor.t.INT_CLK_1_pegel_0_0_x_x
+CONSUME ip.and3andor.p.INT_CLK: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACK_A_0: 1;
+PRODUCE ip.and3andor.p.n_INT_CLK: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACK_A_0: 1;
+
+TRANSITION ip.and3andor.t.INT_CLK_1_pegel_1_0_x_1
+CONSUME ip.and3andor.p.INT_CLK: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_ACKEN_1: 1;
+PRODUCE ip.and3andor.p.n_INT_CLK: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_ACKEN_1: 1;
+
+TRANSITION ip.and3andor.t.INT_CLK_1_pegel_1_0_x_0
+CONSUME ip.and3andor.p.INT_CLK: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.andff.p.n_set: 1;
+PRODUCE ip.and3andor.p.n_INT_CLK: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.andff.p.set: 1;
+
+TRANSITION ip.and3andor.t.INT_CLK_0_pegel_0_1_x_x
+CONSUME ip.and3andor.p.INT_CLK: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACK_A_0: 1;
+PRODUCE ip.and3andor.p.n_INT_CLK: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACK_A_0: 1;
+
+TRANSITION ip.and3andor.t.INT_CLK_0_pegel_1_1_x_1
+CONSUME ip.and3andor.p.INT_CLK: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_ACKEN_1: 1;
+PRODUCE ip.and3andor.p.n_INT_CLK: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_ACKEN_1: 1;
+
+TRANSITION ip.and3andor.t.INT_CLK_0_pegel_1_1_x_0
+CONSUME ip.and3andor.p.INT_CLK: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.andff.p.n_set: 1;
+PRODUCE ip.and3andor.p.n_INT_CLK: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.andff.p.set: 1;
+
+
+TRANSITION ip.and3andor.t.ACKC_1_pegel_x_x_0_0
+CONSUME ip.and3andor.p.ACKC: 1, ip.and3andor.p.pegel_ACKC_0: 1,
+        ip.and3andor.p.pegel_ACKEN_0: 1;
+PRODUCE ip.and3andor.p.n_ACKC: 1, ip.and3andor.p.pegel_ACKC_1: 1,
+        ip.and3andor.p.pegel_ACKEN_0: 1;
+
+TRANSITION ip.and3andor.t.ACKC_1_pegel_x_x_0_1
+CONSUME ip.and3andor.p.ACKC: 1, ip.and3andor.p.pegel_ACKC_0: 1,
+        ip.and3andor.p.pegel_ACKEN_1: 1, ip.andff.p.n_set: 1;
+PRODUCE ip.and3andor.p.n_ACKC: 1, ip.and3andor.p.pegel_ACKC_1: 1,
+        ip.and3andor.p.pegel_ACKEN_1: 1, ip.andff.p.set: 1;
+
+
+TRANSITION ip.and3andor.t.ACKEN_1_pegel_0_x_0_0
+CONSUME ip.and3andor.p.ACKEN: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.and3andor.p.pegel_ACK_A_0: 1, ip.and3andor.p.pegel_ACKC_0: 1;
+PRODUCE ip.and3andor.p.n_ACKEN: 1, ip.and3andor.p.pegel_ACKEN_1: 1,
+        ip.and3andor.p.pegel_ACK_A_0: 1, ip.and3andor.p.pegel_ACKC_0: 1;
+
+TRANSITION ip.and3andor.t.ACKEN_1_pegel_1_0_0_0
+CONSUME ip.and3andor.p.ACKEN: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACKC_0: 1;
+PRODUCE ip.and3andor.p.n_ACKEN: 1, ip.and3andor.p.pegel_ACKEN_1: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACKC_0: 1;
+
+TRANSITION ip.and3andor.t.ACKEN_1_pegel_1_1_0_0
+CONSUME ip.and3andor.p.ACKEN: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACKC_0: 1, ip.andff.p.n_set: 1;
+PRODUCE ip.and3andor.p.n_ACKEN: 1, ip.and3andor.p.pegel_ACKEN_1: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACKC_0: 1, ip.andff.p.set: 1;
+
+TRANSITION ip.and3andor.t.ACKEN_1_pegel_0_x_1_0
+CONSUME ip.and3andor.p.ACKEN: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.and3andor.p.pegel_ACK_A_0: 1, ip.and3andor.p.pegel_ACKC_1: 1,
+        ip.andff.p.n_set: 1;
+PRODUCE ip.and3andor.p.n_ACKEN: 1, ip.and3andor.p.pegel_ACKEN_1: 1,
+        ip.and3andor.p.pegel_ACK_A_0: 1, ip.and3andor.p.pegel_ACKC_1: 1,
+        ip.andff.p.set: 1;
+
+TRANSITION ip.and3andor.t.ACKEN_1_pegel_1_0_1_0
+CONSUME ip.and3andor.p.ACKEN: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACKC_1: 1, ip.andff.p.n_set: 1;
+PRODUCE ip.and3andor.p.n_ACKEN: 1, ip.and3andor.p.pegel_ACKEN_1: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACKC_1: 1, ip.andff.p.set: 1;
+
+TRANSITION ip.and3andor.t.ACKEN_1_pegel_1_1_1_0
+CONSUME ip.and3andor.p.ACKEN: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACKC_1: 1;
+PRODUCE ip.and3andor.p.n_ACKEN: 1, ip.and3andor.p.pegel_ACKEN_1: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACKC_1: 1;
+
+TRANSITION ip.and3andor.t.ACKEN_0_pegel_0_x_0_1
+CONSUME ip.and3andor.p.ACKEN: 1, ip.and3andor.p.pegel_ACKEN_1: 1,
+        ip.and3andor.p.pegel_ACK_A_0: 1, ip.and3andor.p.pegel_ACKC_0: 1;
+PRODUCE ip.and3andor.p.n_ACKEN: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.and3andor.p.pegel_ACK_A_0: 1, ip.and3andor.p.pegel_ACKC_0: 1;
+
+TRANSITION ip.and3andor.t.ACKEN_0_pegel_1_0_0_1
+CONSUME ip.and3andor.p.ACKEN: 1, ip.and3andor.p.pegel_ACKEN_1: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACKC_0: 1;
+PRODUCE ip.and3andor.p.n_ACKEN: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACKC_0: 1;
+
+TRANSITION ip.and3andor.t.ACKEN_0_pegel_1_1_0_1
+CONSUME ip.and3andor.p.ACKEN: 1, ip.and3andor.p.pegel_ACKEN_1: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACKC_0: 1, ip.andff.p.n_set: 1;
+PRODUCE ip.and3andor.p.n_ACKEN: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACKC_0: 1, ip.andff.p.set: 1;
+
+TRANSITION ip.and3andor.t.ACKEN_0_pegel_0_x_1_1
+CONSUME ip.and3andor.p.ACKEN: 1, ip.and3andor.p.pegel_ACKEN_1: 1,
+        ip.and3andor.p.pegel_ACK_A_0: 1, ip.and3andor.p.pegel_ACKC_1: 1,
+        ip.andff.p.n_set: 1;
+PRODUCE ip.and3andor.p.n_ACKEN: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.and3andor.p.pegel_ACK_A_0: 1, ip.and3andor.p.pegel_ACKC_1: 1,
+        ip.andff.p.set: 1;
+
+TRANSITION ip.and3andor.t.ACKEN_0_pegel_1_0_1_1
+CONSUME ip.and3andor.p.ACKEN: 1, ip.and3andor.p.pegel_ACKEN_1: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACKC_1: 1, ip.andff.p.n_set: 1;
+PRODUCE ip.and3andor.p.n_ACKEN: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_0: 1,
+        ip.and3andor.p.pegel_ACKC_1: 1, ip.andff.p.set: 1;
+
+TRANSITION ip.and3andor.t.ACKEN_0_pegel_1_1_1_1
+CONSUME ip.and3andor.p.ACKEN: 1, ip.and3andor.p.pegel_ACKEN_1: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACKC_1: 1;
+PRODUCE ip.and3andor.p.n_ACKEN: 1, ip.and3andor.p.pegel_ACKEN_0: 1,
+        ip.and3andor.p.pegel_ACK_A_1: 1, ip.and3andor.p.pegel_INT_CLK_1: 1,
+        ip.and3andor.p.pegel_ACKC_1: 1;
+
+
+
+{AND-AND-OR; wo ACK_INT in beide ANDs geht}
+
+TRANSITION ip.andandor.t.ACKEN_1_pegel_0_0_x
+CONSUME ip.andandor.p.ACKEN: 1, ip.andandor.p.pegel_ACKEN_0: 1,
+        ip.andandor.p.pegel_ACK_INT_0: 1;
+PRODUCE ip.andandor.p.n_ACKEN: 1, ip.andandor.p.pegel_ACKEN_1: 1,
+        ip.andandor.p.pegel_ACK_INT_0: 1;
+
+TRANSITION ip.andandor.t.ACKEN_1_pegel_0_1_0
+CONSUME ip.andandor.p.ACKEN: 1, ip.andandor.p.pegel_ACKEN_0: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ST_0: 1;
+PRODUCE ip.andandor.p.n_ACKEN: 1, ip.andandor.p.pegel_ACKEN_1: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ST_0: 1;
+
+TRANSITION ip.andandor.t.ACKEN_1_pegel_0_1_1
+CONSUME ip.andandor.p.ACKEN: 1, ip.andandor.p.pegel_ACKEN_0: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ST_1: 1,
+        ip.ic.p.n_ACKC: 1, ip.and3andor.p.n_ACKC: 1;
+PRODUCE ip.andandor.p.n_ACKEN: 1, ip.andandor.p.pegel_ACKEN_1: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ST_1: 1,
+        ip.ic.p.ACKC: 1, ip.and3andor.p.ACKC: 1;
+
+TRANSITION ip.andandor.t.ACKEN_0_pegel_1_0_x
+CONSUME ip.andandor.p.ACKEN: 1, ip.andandor.p.pegel_ACKEN_1: 1,
+        ip.andandor.p.pegel_ACK_INT_0: 1;
+PRODUCE ip.andandor.p.n_ACKEN: 1, ip.andandor.p.pegel_ACKEN_0: 1,
+        ip.andandor.p.pegel_ACK_INT_0: 1;
+
+TRANSITION ip.andandor.t.ACKEN_0_pegel_1_1_0
+CONSUME ip.andandor.p.ACKEN: 1, ip.andandor.p.pegel_ACKEN_1: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ST_0: 1;
+PRODUCE ip.andandor.p.n_ACKEN: 1, ip.andandor.p.pegel_ACKEN_0: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ST_0: 1;
+
+TRANSITION ip.andandor.t.ACKEN_0_pegel_1_1_1
+CONSUME ip.andandor.p.ACKEN: 1, ip.andandor.p.pegel_ACKEN_1: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ST_1: 1,
+        ip.ic.p.n_ACKC: 1, ip.and3andor.p.n_ACKC: 1;
+PRODUCE ip.andandor.p.n_ACKEN: 1, ip.andandor.p.pegel_ACKEN_0: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ST_1: 1,
+        ip.ic.p.ACKC: 1, ip.and3andor.p.ACKC: 1;
+
+
+TRANSITION ip.andandor.t.ACK_INT_1_pegel_0_0_1
+CONSUME ip.andandor.p.ACK_INT: 1, ip.andandor.p.pegel_ACK_INT_0: 1,
+        ip.andandor.p.pegel_ACKEN_0: 1, ip.andandor.p.pegel_ST_1: 1;
+PRODUCE ip.andandor.p.n_ACK_INT: 1, ip.andandor.p.pegel_ACK_INT_1: 1,
+        ip.andandor.p.pegel_ACKEN_0: 1, ip.andandor.p.pegel_ST_1: 1;
+
+TRANSITION ip.andandor.t.ACK_INT_1_pegel_1_0_x
+CONSUME ip.andandor.p.ACK_INT: 1, ip.andandor.p.pegel_ACK_INT_0: 1,
+        ip.andandor.p.pegel_ACKEN_0: 1, ip.ic.p.n_ACKC: 1,
+        ip.and3andor.p.n_ACKC: 1;
+PRODUCE ip.andandor.p.n_ACK_INT: 1, ip.andandor.p.pegel_ACK_INT_1: 1,
+        ip.andandor.p.pegel_ACKEN_0: 1, ip.ic.p.ACKC: 1, ip.and3andor.p.ACKC: 1;
+
+TRANSITION ip.andandor.t.ACK_INT_1_pegel_0_0_0
+CONSUME ip.andandor.p.ACK_INT: 1, ip.andandor.p.pegel_ACK_INT_0: 1,
+        ip.andandor.p.pegel_ACKEN_0: 1, ip.andandor.p.pegel_ST_0: 1,
+        ip.ic.p.n_ACKC: 1, ip.and3andor.p.n_ACKC: 1;
+PRODUCE ip.andandor.p.n_ACK_INT: 1, ip.andandor.p.pegel_ACK_INT_1: 1,
+        ip.andandor.p.pegel_ACKEN_0: 1, ip.andandor.p.pegel_ST_0: 1,
+        ip.ic.p.ACKC: 1, ip.and3andor.p.ACKC: 1;
+
+TRANSITION ip.andandor.t.ACK_INT_0_pegel_0_1_1
+CONSUME ip.andandor.p.ACK_INT: 1, ip.andandor.p.pegel_ACK_INT_1: 1,
+        ip.andandor.p.pegel_ACKEN_0: 1, ip.andandor.p.pegel_ST_1: 1;
+PRODUCE ip.andandor.p.n_ACK_INT: 1, ip.andandor.p.pegel_ACK_INT_0: 1,
+        ip.andandor.p.pegel_ACKEN_0: 1, ip.andandor.p.pegel_ST_1: 1;
+
+TRANSITION ip.andandor.t.ACK_INT_0_pegel_1_1_x
+CONSUME ip.andandor.p.ACK_INT: 1, ip.andandor.p.pegel_ACK_INT_1: 1,
+        ip.andandor.p.pegel_ACKEN_0: 1, ip.ic.p.n_ACKC: 1,
+        ip.and3andor.p.n_ACKC: 1;
+PRODUCE ip.andandor.p.n_ACK_INT: 1, ip.andandor.p.pegel_ACK_INT_0: 1,
+        ip.andandor.p.pegel_ACKEN_0: 1, ip.ic.p.ACKC: 1, ip.and3andor.p.ACKC: 1;
+
+TRANSITION ip.andandor.t.ACK_INT_0_pegel_0_1_0
+CONSUME ip.andandor.p.ACK_INT: 1, ip.andandor.p.pegel_ACK_INT_1: 1,
+        ip.andandor.p.pegel_ACKEN_0: 1, ip.andandor.p.pegel_ST_0: 1,
+        ip.ic.p.n_ACKC: 1, ip.and3andor.p.n_ACKC: 1;
+PRODUCE ip.andandor.p.n_ACK_INT: 1, ip.andandor.p.pegel_ACK_INT_0: 1,
+        ip.andandor.p.pegel_ACKEN_0: 1, ip.andandor.p.pegel_ST_0: 1,
+        ip.ic.p.ACKC: 1, ip.and3andor.p.ACKC: 1;
+
+
+TRANSITION ip.andandor.t.ST_0_pegel_x_0_1
+CONSUME ip.andandor.p.ST: 1, ip.andandor.p.pegel_ST_1: 1,
+        ip.andandor.p.pegel_ACK_INT_0: 1;
+PRODUCE ip.andandor.p.n_ST: 1, ip.andandor.p.pegel_ST_0: 1,
+        ip.andandor.p.pegel_ACK_INT_0: 1;
+
+TRANSITION ip.andandor.t.ST_0_pegel_1_1_1
+CONSUME ip.andandor.p.ST: 1, ip.andandor.p.pegel_ST_1: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ACKEN_1: 1;
+PRODUCE ip.andandor.p.n_ST: 1, ip.andandor.p.pegel_ST_0: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ACKEN_1: 1;
+
+TRANSITION ip.andandor.t.ST_0_pegel_0_1_1
+CONSUME ip.andandor.p.ST: 1, ip.andandor.p.pegel_ST_1: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ACKEN_0: 1,
+        ip.ic.p.n_ACKC: 1, ip.and3andor.p.n_ACKC: 1;
+PRODUCE ip.andandor.p.n_ST: 1, ip.andandor.p.pegel_ST_0: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ACKEN_0: 1,
+        ip.ic.p.ACKC: 1, ip.and3andor.p.ACKC: 1;
+
+TRANSITION ip.andandor.t.ST_1_pegel_x_0_0
+CONSUME ip.andandor.p.ST: 1, ip.andandor.p.pegel_ST_0: 1,
+        ip.andandor.p.pegel_ACK_INT_0: 1;
+PRODUCE ip.andandor.p.n_ST: 1, ip.andandor.p.pegel_ST_1: 1,
+        ip.andandor.p.pegel_ACK_INT_0: 1;
+
+TRANSITION ip.andandor.t.ST_1_pegel_1_1_0
+CONSUME ip.andandor.p.ST: 1, ip.andandor.p.pegel_ST_0: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ACKEN_1: 1;
+PRODUCE ip.andandor.p.n_ST: 1, ip.andandor.p.pegel_ST_1: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ACKEN_1: 1;
+
+TRANSITION ip.andandor.t.ST_1_pegel_0_1_0
+CONSUME ip.andandor.p.ST: 1, ip.andandor.p.pegel_ST_0: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ACKEN_0: 1,
+        ip.ic.p.n_ACKC: 1, ip.and3andor.p.n_ACKC: 1;
+PRODUCE ip.andandor.p.n_ST: 1, ip.andandor.p.pegel_ST_1: 1,
+        ip.andandor.p.pegel_ACK_INT_1: 1, ip.andandor.p.pegel_ACKEN_0: 1,
+        ip.ic.p.ACKC: 1, ip.and3andor.p.ACKC: 1;
+
+
+
+{Clock Control}
+
+
+TRANSITION cc.t.ST_pegel_0_x_x_x_x_x
+CONSUME cc.p.ST: 1, cc.p.pegel_ST_0: 1;
+PRODUCE cc.p.n_ST: 1, cc.p.pegel_ST_1: 1; 
+
+TRANSITION cc.t.ST_pegel_1_0_x_x_x_x
+CONSUME cc.p.ST: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_0: 1;
+PRODUCE cc.p.n_ST: 1, cc.p.pegel_ST_0: 1, cc.p.pegel_ACK_INT_0: 1; 
+
+TRANSITION cc.t.ST_pegel_1_1_1_x_x_x
+CONSUME cc.p.ST: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_1: 1;
+PRODUCE cc.p.n_ST: 1, cc.p.pegel_ST_0: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_1: 1; 
+
+TRANSITION cc.t.ST_pegel_1_1_0_x_1_x
+CONSUME cc.p.ST: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_STOPH_1: 1;
+PRODUCE cc.p.n_ST: 1, cc.p.pegel_ST_0: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_STOPH_1: 1; 
+
+TRANSITION cc.t.ST_pegel_1_1_0_0_0_0
+CONSUME cc.p.ST: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_REQ_INT_0: 1, cc.p.pegel_STOPH_0: 1,
+        cc.p.pegel_STOPI_0: 1, tog.p.n_STOPH: 1, pcg.p.n_STOPI: 1;
+PRODUCE cc.p.n_ST: 1, cc.p.pegel_ST_0: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_REQ_INT_0: 1, cc.p.pegel_STOPH_1: 1,
+        cc.p.pegel_STOPI_1: 1, tog.p.STOPH: 1, pcg.p.STOPI: 1; 
+
+TRANSITION cc.t.ST_pegel_1_1_0_0_0_1
+CONSUME cc.p.ST: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_REQ_INT_0: 1, cc.p.pegel_STOPH_0: 1,
+        cc.p.pegel_STOPI_1: 1, tog.p.n_STOPH: 1;
+PRODUCE cc.p.n_ST: 1, cc.p.pegel_ST_0: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_REQ_INT_0: 1, cc.p.pegel_STOPH_1: 1,
+        cc.p.pegel_STOPI_1: 1, tog.p.STOPH: 1; 
+
+TRANSITION cc.t.ST_pegel_1_1_0_1_0_0
+CONSUME cc.p.ST: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_REQ_INT_1: 1, cc.p.pegel_STOPH_0: 1,
+        cc.p.pegel_STOPI_0: 1, tog.p.n_STOPH: 1;
+PRODUCE cc.p.n_ST: 1, cc.p.pegel_ST_0: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_REQ_INT_1: 1, cc.p.pegel_STOPH_1: 1,
+        cc.p.pegel_STOPI_0: 1, tog.p.STOPH: 1; 
+
+
+TRANSITION cc.t.ACK_INT_pegel_x_0_x_x_x_x
+CONSUME cc.p.ACK_INT: 1, cc.p.pegel_ACK_INT_0: 1;
+PRODUCE cc.p.n_ACK_INT: 1, cc.p.pegel_ACK_INT_1: 1; 
+
+TRANSITION cc.t.ACK_INT_pegel_0_1_x_x_x_x
+CONSUME cc.p.ACK_INT: 1, cc.p.pegel_ST_0: 1, cc.p.pegel_ACK_INT_1: 1;
+PRODUCE cc.p.n_ACK_INT: 1, cc.p.pegel_ST_0: 1, cc.p.pegel_ACK_INT_0: 1; 
+
+TRANSITION cc.t.ACK_INT_pegel_1_1_1_x_x_x
+CONSUME cc.p.ACK_INT: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_1: 1;
+PRODUCE cc.p.n_ACK_INT: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_0: 1,
+        cc.p.pegel_RST_1: 1; 
+
+TRANSITION cc.t.ACK_INT_pegel_1_1_0_x_1_x
+CONSUME cc.p.ACK_INT: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_STOPH_1: 1;
+PRODUCE cc.p.n_ACK_INT: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_0: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_STOPH_1: 1; 
+
+TRANSITION cc.t.ACK_INT_pegel_1_1_0_0_0_0
+CONSUME cc.p.ACK_INT: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_REQ_INT_0: 1, cc.p.pegel_STOPH_0: 1,
+        cc.p.pegel_STOPI_0: 1, tog.p.n_STOPH: 1, pcg.p.n_STOPI: 1;
+PRODUCE cc.p.n_ACK_INT: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_0: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_REQ_INT_0: 1, cc.p.pegel_STOPH_1: 1,
+        cc.p.pegel_STOPI_1: 1, tog.p.STOPH: 1, pcg.p.STOPI: 1; 
+
+TRANSITION cc.t.ACK_INT_pegel_1_1_0_0_0_1
+CONSUME cc.p.ACK_INT: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_REQ_INT_0: 1, cc.p.pegel_STOPH_0: 1,
+        cc.p.pegel_STOPI_1: 1, tog.p.n_STOPH: 1;
+PRODUCE cc.p.n_ACK_INT: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_0: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_REQ_INT_0: 1, cc.p.pegel_STOPH_1: 1,
+        cc.p.pegel_STOPI_1: 1, tog.p.STOPH: 1; 
+
+TRANSITION cc.t.ACK_INT_pegel_1_1_0_1_0_0
+CONSUME cc.p.ACK_INT: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_1: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_REQ_INT_1: 1, cc.p.pegel_STOPH_0: 1,
+        cc.p.pegel_STOPI_0: 1, tog.p.n_STOPH: 1;
+PRODUCE cc.p.n_ACK_INT: 1, cc.p.pegel_ST_1: 1, cc.p.pegel_ACK_INT_0: 1,
+        cc.p.pegel_RST_0: 1, cc.p.pegel_REQ_INT_1: 1, cc.p.pegel_STOPH_1: 1,
+        cc.p.pegel_STOPI_0: 1, tog.p.STOPH: 1; 
+
+
+TRANSITION cc.t.RST_pegel_x_x_1_x_x_x
+CONSUME cc.p.RST: 1, cc.p.pegel_RST_1: 1;
+PRODUCE cc.p.n_RST: 1, cc.p.pegel_RST_0: 1; 
+
+TRANSITION cc.t.RST_pegel_x_x_0_x_0_x
+CONSUME cc.p.RST: 1, cc.p.pegel_RST_0: 1, cc.p.pegel_STOPH_0: 1;
+PRODUCE cc.p.n_RST: 1, cc.p.pegel_RST_1: 1, cc.p.pegel_STOPH_0: 1; 
+
+TRANSITION cc.t.RST_pegel_x_x_0_x_1_x
+CONSUME cc.p.RST: 1, cc.p.pegel_RST_0: 1, cc.p.pegel_STOPH_1: 1,
+        tog.p.n_STOPH: 1;
+PRODUCE cc.p.n_RST: 1, cc.p.pegel_RST_1: 1, cc.p.pegel_STOPH_0: 1,
+        tog.p.STOPH: 1; 
+
+
+TRANSITION cc.t.REQ_INT_pegel_x_x_x_1_x_x
+CONSUME cc.p.REQ_INT: 1, cc.p.pegel_REQ_INT_1: 1;
+PRODUCE cc.p.n_REQ_INT: 1, cc.p.pegel_REQ_INT_0: 1; 
+
+TRANSITION cc.t.REQ_INT_pegel_x_x_x_0_x_0
+CONSUME cc.p.REQ_INT: 1, cc.p.pegel_REQ_INT_0: 1, cc.p.pegel_STOPI_0: 1;
+PRODUCE cc.p.n_REQ_INT: 1, cc.p.pegel_REQ_INT_1: 1, cc.p.pegel_STOPI_0: 1; 
+
+TRANSITION cc.t.REQ_INT_pegel_x_x_x_0_x_1
+CONSUME cc.p.REQ_INT: 1, cc.p.pegel_REQ_INT_0: 1, cc.p.pegel_STOPI_1: 1,
+        pcg.p.n_STOPI: 1;
+PRODUCE cc.p.n_REQ_INT: 1, cc.p.pegel_REQ_INT_1: 1, cc.p.pegel_STOPI_0: 1,
+        pcg.p.STOPI: 1; 
+
+
+
+{Pausable Clock Generator}
+
+{STOPI-Flanke}
+
+{STOPI- startet Generierung von LCLK-Flanken falls nicht verhindert durch}
+{REQI1=1 oder STRETCH=1}
+TRANSITION pcg.t.STOPI-
+CONSUME pcg.p.STOPI: 1, pcg.p.pegel_STOPI_1: 1,pcg.p.pegel_LCLK_0: 1,
+        pcg.p.pegel_REQI1_0: 1, pcg.p.pegel_STRETCH_0: 1, andor.p.n_LCLK: 1,
+        tog.p.n_LCLK: 1, pcg.p.n_LCLK_intern: 1;
+PRODUCE pcg.p.n_STOPI: 1, pcg.p.pegel_STOPI_0: 1, pcg.p.pegel_LCLK_1: 1,
+        pcg.p.pegel_REQI1_0: 1, pcg.p.pegel_STRETCH_0: 1, andor.p.LCLK: 1,
+        tog.p.LCLK: 1, pcg.p.LCLK_intern: 1;
+
+{STOPI+ stoppt Generierung von LCLK-Flanken; entfernt Flankenmarke von}
+{internem LCLK-Flankenplatz}
+TRANSITION pcg.t.STOPI+
+CONSUME pcg.p.STOPI: 1, pcg.p.pegel_STOPI_0: 1, pcg.p.pegel_LCLK_0: 1,
+        pcg.p.LCLK_intern: 1;
+PRODUCE pcg.p.n_STOPI: 1, pcg.p.pegel_STOPI_1: 1, pcg.p.pegel_LCLK_0: 1,
+        pcg.p.n_LCLK_intern: 1;
+
+
+{LCLK_intern-Flanke}
+
+{LCLK+ wird erzeugt, wenn weder STOPI=1 noch REQI1=1 noch STRETCH=1 das}
+{verhindern}
+TRANSITION pcg.t.LCLK+
+CONSUME pcg.p.LCLK_intern: 1, pcg.p.pegel_LCLK_0: 1, pcg.p.pegel_STOPI_0: 1,
+        pcg.p.pegel_REQI1_0: 1, pcg.p.pegel_STRETCH_0: 1, andor.p.n_LCLK: 1,
+        tog.p.n_LCLK: 1;
+PRODUCE pcg.p.LCLK_intern: 1, pcg.p.pegel_LCLK_1: 1, pcg.p.pegel_STOPI_0: 1,
+        pcg.p.pegel_REQI1_0: 1, pcg.p.pegel_STRETCH_0: 1, andor.p.LCLK: 1,
+        tog.p.LCLK: 1;
+
+{LCLK- wird erzeugt, wenn STOPI=1 das nicht verhindert}
+TRANSITION pcg.t.LCLK-
+CONSUME pcg.p.LCLK_intern: 1, pcg.p.pegel_LCLK_1: 1, pcg.p.pegel_STOPI_0: 1,
+        andor.p.n_LCLK: 1, tog.p.n_LCLK: 1;
+PRODUCE pcg.p.LCLK_intern: 1, pcg.p.pegel_LCLK_0: 1, pcg.p.pegel_STOPI_0: 1,
+        andor.p.LCLK: 1, tog.p.LCLK: 1;
+
+
+{REQI1-Flanke}
+
+{ACKI1+ wird erzeugt, wenn LCLK=1 das nicht verhindert}
+TRANSITION pcg.t.REQI1+
+CONSUME pcg.p.REQI1: 1, pcg.p.pegel_REQI1_0: 1, pcg.p.pegel_LCLK_0: 1,
+        ip.ic.p.n_ACKI1: 1;
+PRODUCE pcg.p.n_REQI1: 1, pcg.p.pegel_REQI1_1: 1, pcg.p.pegel_LCLK_0: 1,
+        ip.ic.p.ACKI1: 1;
+
+TRANSITION pcg.t.REQI1-
+CONSUME pcg.p.REQI1: 1, pcg.p.pegel_REQI1_1: 1, ip.ic.p.n_ACKI1: 1;
+PRODUCE pcg.p.n_REQI1: 1, pcg.p.pegel_REQI1_0: 1, ip.ic.p.ACKI1: 1;
+
+
+{STRETCH-Flanke}
+
+{STRETCH analog zu REQI1}
+TRANSITION pcg.t.STRETCH+
+CONSUME pcg.p.STRETCH: 1, pcg.p.pegel_STRETCH_0: 1, pcg.p.pegel_LCLK_0: 1;
+PRODUCE pcg.p.n_STRETCH: 1, pcg.p.pegel_STRETCH_1: 1, pcg.p.pegel_LCLK_0: 1;
+
+TRANSITION pcg.t.STRETCH-
+CONSUME pcg.p.STRETCH: 1, pcg.p.pegel_STRETCH_1: 1;
+PRODUCE pcg.p.n_STRETCH: 1, pcg.p.pegel_STRETCH_0: 1;
+
+
+{Output Port}
+
+{Zusammengefasst: AND und beide D-FFs}
+
+{Pegelkodierung: (INT_CLK, ACK_B, DATAV_OUT, DOV, DONV)}
+TRANSITION op.and2ff.t.INT_CLK_pegel_1_x_x_0_1
+CONSUME op.and2ff.p.INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_1: 1,
+        op.and2ff.p.pegel_DOV_0: 1, op.and2ff.p.pegel_DONV_1: 1,
+        op.oc.p.n_DONV: 1;
+PRODUCE op.and2ff.p.n_INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_0: 1,
+        op.and2ff.p.pegel_DOV_0: 1, op.and2ff.p.pegel_DONV_0: 1,
+        op.oc.p.DONV: 1;
+
+TRANSITION op.and2ff.t.INT_CLK_pegel_1_0_x_1_0
+CONSUME op.and2ff.p.INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_1: 1,
+        op.and2ff.p.pegel_ACK_B_0: 1, op.and2ff.p.pegel_DOV_1: 1,
+        op.and2ff.p.pegel_DONV_0: 1;
+PRODUCE op.and2ff.p.n_INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_0: 1,
+        op.and2ff.p.pegel_ACK_B_0: 1, op.and2ff.p.pegel_DOV_1: 1,
+        op.and2ff.p.pegel_DONV_0: 1;
+
+TRANSITION op.and2ff.t.INT_CLK_pegel_1_1_x_1_0
+CONSUME op.and2ff.p.INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_1: 1,
+        op.and2ff.p.pegel_ACK_B_1: 1, op.and2ff.p.pegel_DOV_1: 1,
+        op.and2ff.p.pegel_DONV_0: 1, op.oc.p.n_DOV: 1;
+PRODUCE op.and2ff.p.n_INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_0: 1,
+        op.and2ff.p.pegel_ACK_B_1: 1, op.and2ff.p.pegel_DOV_0: 1,
+        op.and2ff.p.pegel_DONV_0: 1, op.oc.p.DOV: 1;
+
+TRANSITION op.and2ff.t.INT_CLK_pegel_0_x_0_0_0
+CONSUME op.and2ff.p.INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_0: 1,
+        op.and2ff.p.pegel_DATAV_OUT_0: 1, op.and2ff.p.pegel_DOV_0: 1,
+        op.and2ff.p.pegel_DONV_0: 1, op.oc.p.n_DONV: 1;
+PRODUCE op.and2ff.p.n_INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_1: 1,
+        op.and2ff.p.pegel_DATAV_OUT_0: 1, op.and2ff.p.pegel_DOV_0: 1,
+        op.and2ff.p.pegel_DONV_1: 1, op.oc.p.DONV: 1;
+
+TRANSITION op.and2ff.t.INT_CLK_pegel_0_x_0_1_0
+CONSUME op.and2ff.p.INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_0: 1,
+        op.and2ff.p.pegel_DATAV_OUT_0: 1, op.and2ff.p.pegel_DOV_1: 1,
+        op.and2ff.p.pegel_DONV_0: 1, op.oc.p.n_DOV: 1, op.oc.p.n_DONV: 1;
+PRODUCE op.and2ff.p.n_INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_1: 1,
+        op.and2ff.p.pegel_DATAV_OUT_0: 1, op.and2ff.p.pegel_DOV_0: 1,
+        op.and2ff.p.pegel_DONV_1: 1, op.oc.p.DOV: 1, op.oc.p.DONV: 1;
+
+TRANSITION op.and2ff.t.INT_CLK_pegel_0_x_1_0_0
+CONSUME op.and2ff.p.INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_0: 1,
+        op.and2ff.p.pegel_DATAV_OUT_1: 1, op.and2ff.p.pegel_DOV_0: 1,
+        op.and2ff.p.pegel_DONV_0: 1, op.oc.p.n_DOV: 1;
+PRODUCE op.and2ff.p.n_INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_1: 1,
+        op.and2ff.p.pegel_DATAV_OUT_1: 1, op.and2ff.p.pegel_DOV_1: 1,
+        op.and2ff.p.pegel_DONV_0: 1, op.oc.p.DOV: 1;
+
+TRANSITION op.and2ff.t.INT_CLK_pegel_0_x_1_1_0
+CONSUME op.and2ff.p.INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_0: 1,
+        op.and2ff.p.pegel_DATAV_OUT_1: 1, op.and2ff.p.pegel_DOV_1: 1,
+        op.and2ff.p.pegel_DONV_0: 1;
+PRODUCE op.and2ff.p.n_INT_CLK: 1, op.and2ff.p.pegel_INT_CLK_1: 1,
+        op.and2ff.p.pegel_DATAV_OUT_1: 1, op.and2ff.p.pegel_DOV_1: 1,
+        op.and2ff.p.pegel_DONV_0: 1;
+
+
+TRANSITION op.and2ff.t.ACK_B_pegel_x_1_x_x_x
+CONSUME op.and2ff.p.ACK_B: 1, op.and2ff.p.pegel_ACK_B_1: 1;
+PRODUCE op.and2ff.p.n_ACK_B: 1, op.and2ff.p.pegel_ACK_B_0: 1;
+
+TRANSITION op.and2ff.t.ACK_B_pegel_1_0_x_x_x
+CONSUME op.and2ff.p.ACK_B: 1, op.and2ff.p.pegel_INT_CLK_1: 1,
+        op.and2ff.p.pegel_ACK_B_0: 1;
+PRODUCE op.and2ff.p.n_ACK_B: 1, op.and2ff.p.pegel_INT_CLK_1: 1,
+        op.and2ff.p.pegel_ACK_B_1: 1;
+
+TRANSITION op.and2ff.t.ACK_B_pegel_0_0_x_0_x
+CONSUME op.and2ff.p.ACK_B: 1, op.and2ff.p.pegel_INT_CLK_0: 1,
+        op.and2ff.p.pegel_ACK_B_0: 1, op.and2ff.p.pegel_DOV_0: 1;
+PRODUCE op.and2ff.p.n_ACK_B: 1, op.and2ff.p.pegel_INT_CLK_0: 1,
+        op.and2ff.p.pegel_ACK_B_1: 1, op.and2ff.p.pegel_DOV_0: 1;
+
+TRANSITION op.and2ff.t.ACK_B_pegel_0_0_x_1_x
+CONSUME op.and2ff.p.ACK_B: 1, op.and2ff.p.pegel_INT_CLK_0: 1,
+        op.and2ff.p.pegel_ACK_B_0: 1, op.and2ff.p.pegel_DOV_1: 1,
+        op.oc.p.n_DOV: 1;
+PRODUCE op.and2ff.p.n_ACK_B: 1, op.and2ff.p.pegel_INT_CLK_0: 1,
+        op.and2ff.p.pegel_ACK_B_1: 1, op.and2ff.p.pegel_DOV_0: 1,
+        op.oc.p.DOV: 1;
+
+
+TRANSITION op.and2ff.t.DATAV_OUT_pegel_x_x_0_x_x
+CONSUME op.and2ff.p.DATAV_OUT: 1, op.and2ff.p.pegel_DATAV_OUT_0: 1;
+PRODUCE op.and2ff.p.n_DATAV_OUT: 1, op.and2ff.p.pegel_DATAV_OUT_1: 1;
+
+TRANSITION op.and2ff.t.DATAV_OUT_pegel_x_x_1_x_x
+CONSUME op.and2ff.p.DATAV_OUT: 1, op.and2ff.p.pegel_DATAV_OUT_1: 1;
+PRODUCE op.and2ff.p.n_DATAV_OUT: 1, op.and2ff.p.pegel_DATAV_OUT_0: 1;
+
+
+
+{Output Controller im OP}
+
+TRANSITION op.oc.t.01
+CONSUME op.oc.p.0: 1, op.oc.p.DOV: 1, op.oc.p.n_ACK_B: 1,
+        op.and2ff.p.n_ACK_B: 1, pcg.p.n_STRETCH: 1, ip.andandor.p.n_ACK_INT: 1,
+        cc.p.n_ACK_INT: 1;
+PRODUCE op.oc.p.1: 1, op.oc.p.ACK_B: 1, op.and2ff.p.ACK_B: 1, pcg.p.STRETCH: 1,
+        ip.andandor.p.ACK_INT: 1, cc.p.ACK_INT: 1, op.oc.p.n_DOV: 1;
+
+TRANSITION op.oc.t.03
+CONSUME op.oc.p.0: 1, op.oc.p.DONV: 1, ip.andandor.p.n_ACK_INT: 1,
+        cc.p.n_ACK_INT: 1;
+PRODUCE op.oc.p.3: 1, ip.andandor.p.ACK_INT: 1, cc.p.ACK_INT: 1,
+        op.oc.p.n_DONV: 1;
+
+TRANSITION op.oc.t.12
+CONSUME op.oc.p.1: 1, op.oc.p.ACK_B: 1, op.oc.p.DOV: 1, op.and2ff.p.n_ACK_B: 1,
+        pcg.p.n_STRETCH: 1, ip.andandor.p.n_ACK_INT: 1, cc.p.n_ACK_INT: 1;
+PRODUCE op.oc.p.2: 1, op.oc.p.ACK_B: 1, op.and2ff.p.ACK_B: 1,
+        ip.andandor.p.ACK_INT: 1, cc.p.ACK_INT: 1, pcg.p.STRETCH: 1,
+        op.oc.p.n_DOV: 1;
+
+TRANSITION op.oc.t.21
+CONSUME op.oc.p.2: 1, op.oc.p.ACK_B: 1, op.oc.p.DOV: 1, op.and2ff.p.n_ACK_B: 1,
+        pcg.p.n_STRETCH: 1, ip.andandor.p.n_ACK_INT: 1, cc.p.n_ACK_INT: 1;
+PRODUCE op.oc.p.1: 1, op.oc.p.ACK_B: 1, op.and2ff.p.ACK_B: 1,
+        ip.andandor.p.ACK_INT: 1, cc.p.ACK_INT: 1, pcg.p.STRETCH: 1,
+        op.oc.p.n_DOV: 1;
+
+TRANSITION op.oc.t.23
+CONSUME op.oc.p.2: 1, op.oc.p.ACK_B: 1, op.oc.p.DONV: 1,
+        ip.andandor.p.n_ACK_INT: 1, cc.p.n_ACK_INT: 1;
+PRODUCE op.oc.p.3: 1, ip.andandor.p.ACK_INT: 1, cc.p.ACK_INT: 1,
+        op.oc.p.n_ACK_B: 1, op.oc.p.n_DONV: 1;
+
+TRANSITION op.oc.t.30
+CONSUME op.oc.p.3: 1, op.oc.p.DONV: 1, ip.andandor.p.n_ACK_INT: 1,
+        cc.p.n_ACK_INT: 1;
+PRODUCE op.oc.p.0: 1, ip.andandor.p.ACK_INT: 1, cc.p.ACK_INT: 1,
+        op.oc.p.n_DONV: 1;
+
+
+{AND-OR im Wrapper}
+
+TRANSITION andor.t.a1_pegel_0_0_0
+CONSUME andor.p.ST: 1, andor.p.pegel_0_0_0: 1;
+PRODUCE andor.p.n_ST: 1, andor.p.pegel_1_0_0: 1;
+
+TRANSITION andor.t.a1_pegel_0_0_1
+CONSUME andor.p.ST: 1, andor.p.pegel_0_0_1: 1;
+PRODUCE andor.p.n_ST: 1, andor.p.pegel_1_0_1: 1;
+
+TRANSITION andor.t.a1_pegel_0_1_0
+CONSUME andor.p.ST: 1, andor.p.pegel_0_1_0: 1, ip.andff.p.n_LCLKM: 1,
+        ip.andff.p.n_INT_CLK: 1, ip.and3andor.p.n_INT_CLK: 1,
+        lsm.p.n_INT_CLK: 1, op.and2ff.p.n_INT_CLK: 1;
+PRODUCE andor.p.n_ST: 1, andor.p.pegel_1_1_0: 1, ip.andff.p.LCLKM: 1,
+        ip.andff.p.INT_CLK: 1, ip.and3andor.p.INT_CLK: 1, lsm.p.INT_CLK: 1,
+        op.and2ff.p.INT_CLK: 1;
+
+TRANSITION andor.t.a0_pegel_1_0_0
+CONSUME andor.p.ST: 1, andor.p.pegel_1_0_0: 1;
+PRODUCE andor.p.n_ST: 1, andor.p.pegel_0_0_0: 1;
+
+TRANSITION andor.t.a0_pegel_1_1_0
+CONSUME andor.p.ST: 1, andor.p.pegel_1_1_0: 1, ip.andff.p.n_LCLKM: 1,
+        ip.andff.p.n_INT_CLK: 1, ip.and3andor.p.n_INT_CLK: 1,
+        lsm.p.n_INT_CLK: 1, op.and2ff.p.n_INT_CLK: 1;
+PRODUCE andor.p.n_ST: 1, andor.p.pegel_0_1_0: 1, ip.andff.p.LCLKM: 1,
+        ip.andff.p.INT_CLK: 1, ip.and3andor.p.INT_CLK: 1, lsm.p.INT_CLK: 1,
+        op.and2ff.p.INT_CLK: 1;
+
+TRANSITION andor.t.a0_pegel_1_0_1
+CONSUME andor.p.ST: 1, andor.p.pegel_1_0_1: 1;
+PRODUCE andor.p.n_ST: 1, andor.p.pegel_0_0_1: 1;
+
+TRANSITION andor.t.a1_pegel_0_1_1
+CONSUME andor.p.ST: 1, andor.p.pegel_0_1_1: 1, ip.andff.p.n_LCLKM: 1;
+PRODUCE andor.p.n_ST: 1, andor.p.pegel_1_1_1: 1, ip.andff.p.LCLKM: 1;
+
+TRANSITION andor.t.a0_pegel_1_1_1
+CONSUME andor.p.ST: 1, andor.p.pegel_1_1_1: 1, ip.andff.p.n_LCLKM: 1;
+PRODUCE andor.p.n_ST: 1, andor.p.pegel_0_1_1: 1, ip.andff.p.LCLKM: 1;
+
+
+TRANSITION andor.t.b1_pegel_0_0_0
+CONSUME andor.p.LCLK: 1, andor.p.pegel_0_0_0: 1;
+PRODUCE andor.p.n_LCLK: 1, andor.p.pegel_0_1_0: 1;
+
+TRANSITION andor.t.b1_pegel_0_0_1
+CONSUME andor.p.LCLK: 1, andor.p.pegel_0_0_1: 1;
+PRODUCE andor.p.n_LCLK: 1, andor.p.pegel_0_1_1: 1;
+
+TRANSITION andor.t.b0_pegel_0_1_0
+CONSUME andor.p.LCLK: 1, andor.p.pegel_0_1_0: 1;
+PRODUCE andor.p.n_LCLK: 1, andor.p.pegel_0_0_0: 1;
+
+TRANSITION andor.t.b1_pegel_1_0_0
+CONSUME andor.p.LCLK: 1, andor.p.pegel_1_0_0: 1, ip.andff.p.n_LCLKM: 1,
+        ip.andff.p.n_INT_CLK: 1, ip.and3andor.p.n_INT_CLK: 1,
+        lsm.p.n_INT_CLK: 1, op.and2ff.p.n_INT_CLK: 1;
+PRODUCE andor.p.n_LCLK: 1, andor.p.pegel_1_1_0: 1, ip.andff.p.LCLKM: 1,
+        ip.andff.p.INT_CLK: 1, ip.and3andor.p.INT_CLK: 1, lsm.p.INT_CLK: 1,
+        op.and2ff.p.INT_CLK: 1;
+
+TRANSITION andor.t.b0_pegel_1_1_0
+CONSUME andor.p.LCLK: 1, andor.p.pegel_1_1_0: 1, ip.andff.p.n_LCLKM: 1,
+        ip.andff.p.n_INT_CLK: 1, ip.and3andor.p.n_INT_CLK: 1,
+        lsm.p.n_INT_CLK: 1, op.and2ff.p.n_INT_CLK: 1;
+PRODUCE andor.p.n_LCLK: 1, andor.p.pegel_1_0_0: 1, ip.andff.p.LCLKM: 1,
+        ip.andff.p.INT_CLK: 1, ip.and3andor.p.INT_CLK: 1, lsm.p.INT_CLK: 1,
+        op.and2ff.p.INT_CLK: 1;
+
+TRANSITION andor.t.b1_pegel_1_0_1
+CONSUME andor.p.LCLK: 1, andor.p.pegel_1_0_1: 1, ip.andff.p.n_LCLKM: 1;
+PRODUCE andor.p.n_LCLK: 1, andor.p.pegel_1_1_1: 1, ip.andff.p.LCLKM: 1;
+
+TRANSITION andor.t.b0_pegel_0_1_1
+CONSUME andor.p.LCLK: 1, andor.p.pegel_0_1_1: 1;
+PRODUCE andor.p.n_LCLK: 1, andor.p.pegel_0_0_1: 1;
+
+TRANSITION andor.t.b0_pegel_1_1_1
+CONSUME andor.p.LCLK: 1, andor.p.pegel_1_1_1: 1, ip.andff.p.n_LCLKM: 1;
+PRODUCE andor.p.n_LCLK: 1, andor.p.pegel_1_0_1: 1, ip.andff.p.LCLKM: 1;
+
+
+TRANSITION andor.t.c1_pegel_0_0_0
+CONSUME andor.p.REQ_INT: 1, andor.p.pegel_0_0_0: 1, ip.andff.p.n_INT_CLK: 1,
+        ip.and3andor.p.n_INT_CLK: 1, lsm.p.n_INT_CLK: 1,
+        op.and2ff.p.n_INT_CLK: 1;
+PRODUCE andor.p.n_REQ_INT: 1, andor.p.pegel_0_0_1: 1, ip.andff.p.INT_CLK: 1,
+        ip.and3andor.p.INT_CLK: 1, lsm.p.INT_CLK: 1, op.and2ff.p.INT_CLK: 1;
+
+TRANSITION andor.t.c0_pegel_0_0_1
+CONSUME andor.p.REQ_INT: 1, andor.p.pegel_0_0_1: 1, ip.andff.p.n_INT_CLK: 1,
+        ip.and3andor.p.n_INT_CLK: 1, lsm.p.n_INT_CLK: 1,
+        op.and2ff.p.n_INT_CLK: 1;
+PRODUCE andor.p.n_REQ_INT: 1, andor.p.pegel_0_0_0: 1, ip.andff.p.INT_CLK: 1,
+        ip.and3andor.p.INT_CLK: 1, lsm.p.INT_CLK: 1, op.and2ff.p.INT_CLK: 1;
+
+TRANSITION andor.t.c1_pegel_0_1_0
+CONSUME andor.p.REQ_INT: 1, andor.p.pegel_0_1_0: 1, ip.andff.p.n_INT_CLK: 1,
+        ip.and3andor.p.n_INT_CLK: 1, lsm.p.n_INT_CLK: 1,
+        op.and2ff.p.n_INT_CLK: 1;
+PRODUCE andor.p.n_REQ_INT: 1, andor.p.pegel_0_1_1: 1, ip.andff.p.INT_CLK: 1,
+        ip.and3andor.p.INT_CLK: 1, lsm.p.INT_CLK: 1, op.and2ff.p.INT_CLK: 1;
+
+TRANSITION andor.t.c1_pegel_1_0_0
+CONSUME andor.p.REQ_INT: 1, andor.p.pegel_1_0_0: 1, ip.andff.p.n_INT_CLK: 1,
+        ip.and3andor.p.n_INT_CLK: 1, lsm.p.n_INT_CLK: 1,
+        op.and2ff.p.n_INT_CLK: 1;
+PRODUCE andor.p.n_REQ_INT: 1, andor.p.pegel_1_0_1: 1, ip.andff.p.INT_CLK: 1,
+        ip.and3andor.p.INT_CLK: 1, lsm.p.INT_CLK: 1, op.and2ff.p.INT_CLK: 1;
+
+TRANSITION andor.t.c1_pegel_1_1_0
+CONSUME andor.p.REQ_INT: 1, andor.p.pegel_1_1_0: 1;
+PRODUCE andor.p.n_REQ_INT: 1, andor.p.pegel_1_1_1: 1;
+
+TRANSITION andor.t.c0_pegel_1_0_1
+CONSUME andor.p.REQ_INT: 1, andor.p.pegel_1_0_1: 1, ip.andff.p.n_INT_CLK: 1,
+        ip.and3andor.p.n_INT_CLK: 1, lsm.p.n_INT_CLK: 1,
+        op.and2ff.p.n_INT_CLK: 1;
+PRODUCE andor.p.n_REQ_INT: 1, andor.p.pegel_1_0_0: 1, ip.andff.p.INT_CLK: 1,
+        ip.and3andor.p.INT_CLK: 1, lsm.p.INT_CLK: 1, op.and2ff.p.INT_CLK: 1;
+
+TRANSITION andor.t.c0_pegel_0_1_1
+CONSUME andor.p.REQ_INT: 1, andor.p.pegel_0_1_1: 1, ip.andff.p.n_INT_CLK: 1,
+        ip.and3andor.p.n_INT_CLK: 1, lsm.p.n_INT_CLK: 1,
+        op.and2ff.p.n_INT_CLK: 1;
+PRODUCE andor.p.n_REQ_INT: 1, andor.p.pegel_0_1_0: 1, ip.andff.p.INT_CLK: 1,
+        ip.and3andor.p.INT_CLK: 1, lsm.p.INT_CLK: 1, op.and2ff.p.INT_CLK: 1;
+
+TRANSITION andor.t.c0_pegel_1_1_1
+CONSUME andor.p.REQ_INT: 1, andor.p.pegel_1_1_1: 1;
+PRODUCE andor.p.n_REQ_INT: 1, andor.p.pegel_1_1_0: 1;
+
+
+{Locally Synchronous Module}
+
+{Pegelkodierung: INT_CLK, DATAV_IN, DATAV_OUT}
+
+TRANSITION lsm.t.d1_pegel_x_0_x
+CONSUME lsm.p.DATAV_IN: 1, lsm.p.pegel_DATAV_IN_0: 1;
+PRODUCE lsm.p.n_DATAV_IN: 1, lsm.p.pegel_DATAV_IN_1: 1;
+
+TRANSITION lsm.t.d0_pegel_x_1_x
+CONSUME lsm.p.DATAV_IN: 1, lsm.p.pegel_DATAV_IN_1: 1;
+PRODUCE lsm.p.n_DATAV_IN: 1, lsm.p.pegel_DATAV_IN_0: 1;
+
+
+TRANSITION lsm.t.clk0_pegel_1_x_x
+CONSUME lsm.p.INT_CLK: 1, lsm.p.pegel_INT_CLK_1: 1;
+PRODUCE lsm.p.n_INT_CLK: 1, lsm.p.pegel_INT_CLK_0: 1;
+
+TRANSITION lsm.t.clk1_pegel_0_0_0
+CONSUME lsm.p.INT_CLK: 1, lsm.p.pegel_INT_CLK_0: 1, lsm.p.pegel_DATAV_IN_0: 1,
+        lsm.p.pegel_DATAV_OUT_0: 1;
+PRODUCE lsm.p.n_INT_CLK: 1, lsm.p.pegel_INT_CLK_1: 1, lsm.p.pegel_DATAV_IN_0: 1,
+        lsm.p.pegel_DATAV_OUT_0: 1;
+
+TRANSITION lsm.t.clk1_pegel_0_0_1
+CONSUME lsm.p.INT_CLK: 1, lsm.p.pegel_INT_CLK_0: 1, lsm.p.pegel_DATAV_IN_0: 1,
+        lsm.p.pegel_DATAV_OUT_1: 1, op.and2ff.p.n_DATAV_OUT: 1;
+PRODUCE lsm.p.n_INT_CLK: 1, lsm.p.pegel_INT_CLK_1: 1, lsm.p.pegel_DATAV_IN_0: 1,
+        lsm.p.pegel_DATAV_OUT_0: 1, op.and2ff.p.DATAV_OUT: 1;
+
+TRANSITION lsm.t.clk1_pegel_0_1_0
+CONSUME lsm.p.INT_CLK: 1, lsm.p.pegel_INT_CLK_0: 1, lsm.p.pegel_DATAV_IN_1: 1,
+        lsm.p.pegel_DATAV_OUT_0: 1, op.and2ff.p.n_DATAV_OUT: 1;
+PRODUCE lsm.p.n_INT_CLK: 1, lsm.p.pegel_INT_CLK_1: 1, lsm.p.pegel_DATAV_IN_1: 1,
+        lsm.p.pegel_DATAV_OUT_1: 1, op.and2ff.p.DATAV_OUT: 1;
+
+TRANSITION lsm.t.clk1_pegel_0_1_1
+CONSUME lsm.p.INT_CLK: 1, lsm.p.pegel_INT_CLK_0: 1, lsm.p.pegel_DATAV_IN_1: 1,
+        lsm.p.pegel_DATAV_OUT_1: 1;
+PRODUCE lsm.p.n_INT_CLK: 1, lsm.p.pegel_INT_CLK_1: 1, lsm.p.pegel_DATAV_IN_1: 1,
+        lsm.p.pegel_DATAV_OUT_1: 1;
+
+
+
+{ vim: set ft=lola: }

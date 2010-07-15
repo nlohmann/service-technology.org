@@ -1,0 +1,13 @@
+PLACE INTERNAL p, q1, q2;       
+
+INPUT ;       
+
+OUTPUT ; 
+
+INITIALMARKING p:1; 
+
+FINALCONDITION ; 
+
+TRANSITION t
+CONSUME q1:1, p:1;
+PRODUCE p:1, q2:1;

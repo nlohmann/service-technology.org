@@ -1,0 +1,92 @@
+petri 4.02-unreleased
+
+A command-line frontend for the Petri Net API
+
+Usage: petri [OPTIONS]... [FILES]...
+
+  -h, --help                Print help and exit
+      --detailed-help       Print help, including all details and hidden 
+                              options, and exit
+      --full-help           Print help, including hidden options, and exit
+  -V, --version             Print version and exit
+
+Input and Output:
+  -i, --input=FORMAT        Select the input file format  (possible 
+                              values="owfn", "lola", "pnml", "sa", 
+                              "tpn" default=`owfn')
+  -o, --output=FORMAT       Select the output file format(s)  (possible 
+                              values="owfn", "lola", "pnml", "sa", 
+                              "tpn", "dot", "png", "pdf", "eps", 
+                              "svg")
+      --canonicalNames      Renames nodes in Woflan nets to avoid problems with 
+                              conversion to other formats  (default=off)
+  -f, --formula             Places a final condition at the end of LoLA files. 
+                              Has no effect to other output formats.  
+                              (default=off)
+      --guessFormula        Derive the final condition from the structure 
+                              (i.e., the sink place) of the net.  (default=off)
+
+ Group: Automaton Converter
+  Defining a program, to convert Service Automata to Petri Nets
+      --genet[=FILENAME]    Use Genet; specify the path  (default=`genet')
+      --petrify[=FILENAME]  Use Petrify; specify the path  (default=`petrify')
+
+Composition and Product:
+      --compose=NET         Compose each net given in the input section with 
+                              this net.
+      --produce=CONSTRAINT  Calculate the product.
+
+Check for Structural Properties:
+      --isFreeChoice        Check if the Petri net is free choice, i.e. if 
+                              conflicting transitions share all pre-places.  
+                              (default=off)
+      --isNormal            Check if the Petri net is normal, i.e. every 
+                              transition is connect to at most one interface 
+                              place.  (default=off)
+      --isWorkflow          Check if the Petri net has workflow structure, i.e. 
+                              it (i) has a distinct source place, (ii) has a 
+                              district sink place, and (iii) every node lays on 
+                              a path between the source place and the sink 
+                              place.  (default=off)
+  -c, --check=PROPERTY      Check a structural property of the Petri net, see 
+                              `isFreeChoice', `isNormal', and `isWorkflow' for 
+                              details.  (possible values="freechoice", 
+                              "normal", "workflow")
+
+Modifications:
+  -r, --reduce=RULES        Apply structural reduction rules, i.e. reduce the 
+                              structure of the net while preserving liveness 
+                              and boundedness.  (possible values="0", "1", 
+                              "2", "3", "4", "5", "6", "starke", 
+                              "pillat", "dead_nodes", "identical_places", 
+                              "identical_transitions", "series_places", 
+                              "series_transitions", "self_loop_places", 
+                              "self_loop_transitions", "equal_places", 
+                              "starke3p", "starke3t", "starke4", 
+                              "starke5", "starke6", "starke7", 
+                              "starke8", "starke9", "once", 
+                              "k_boundedness", "boundedness", "liveness")
+  -n, --normalize           Normalize the Petri net, i.e. change to structure 
+                              such that every transition is connected to at 
+                              most one interface place.  (default=off)
+  -N, --negate              Negate the final condition of the net, i.e. every 
+                              specified final marking is now non-final. The 
+                              result is the 'anti open net'.  (default=off)
+  -M, --mirror              Mirror the interface, i.e. change the direction of 
+                              communication  (default=off)
+      --dnf                 Convert final condition to disjunctive normal form  
+                              (default=off)
+
+Configuration:
+      --config=FILE         Read configuration from file.
+      --dot=FILENAME        Set the path an binary of dot.  (default=`dot')
+      --tmpfile=FILENAME    Set the path and name of temporary files  
+                              (default=`/tmp/petri-XXXXXX')
+      --noClean             Do not delete temporary files.  (default=off)
+
+Debugging:
+  -v, --verbose             Show verbose output  (default=off)
+      --suffix_owfn=SUFFIX  Suffix for open net files
+      --suffix_sa=SUFFIX    Suffix for service automaton files
+      --stats               Display time and memory consumption on termination. 
+                               (default=off)

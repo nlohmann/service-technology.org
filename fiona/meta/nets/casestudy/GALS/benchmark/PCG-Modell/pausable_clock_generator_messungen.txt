@@ -1,0 +1,26 @@
+Pausable Clock Generator für zweiten Wrapper
+
+{01: konkret, unreduziert}
+{02: alle Komponenten zu einem Modul zusammengefasst; abstrahiert:}
+{      * STOPI- löst anfangs LCLK+}
+{      * danach werden durch Marke auf internem LCLK-Flankenplatz LCLK-Flanken}
+{        erzeugt}
+{      * STOPI+ bei LCLK=0 konsumiert interne LCLK-Flankenmarke und stoppt so}
+{        weitere Produktion von LCLK-Flanke}
+{      * Mutex-Verhalten durch herkömmliches Lesen von Pegeln realisiert}
+{03: weiter abstrahiert (Christian):}
+{      * STOPI-Flanke aktualisiert nur STOPI-Pegel}
+{      * LCLK+ erzeugen, wenn Pegel von STOPI, REQI1 und STRETCH das erlauben}
+{      * Nach LCLK+ immer LCLK- produzieren}
+{      * Mutex zwischen LCLK und REQI1, STRETCH durch Konsumieren von}
+{        Pegelmarken gelöst.}
+
+               places  transitions  states   edges
+01 STUB          48         53        4540    7060
+01 STUB SWEEP    48         53        2176
+
+02 STUB          20         13          38      49
+02 STUB SWEEP    20         13          12
+
+03 STUB          18         13          19      22
+03 STUB SWEEP    18         13           8

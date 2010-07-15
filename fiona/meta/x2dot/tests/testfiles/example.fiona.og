@@ -1,0 +1,22 @@
+{ this is a comment }
+
+INTERFACE
+  INPUT a, b;
+  OUTPUT c;
+
+NODES
+  0 : true : blue,
+  1 : false : blue,
+  2 : final : blue,
+  3 : finalnode,
+  4 : (~(a + b) * (c + false) * true) : red,
+  5,
+  6 : true,
+  7 : (a * c) : finalnode;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  4 -> 4 : a
+;

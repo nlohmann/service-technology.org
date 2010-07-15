@@ -1,0 +1,16 @@
+FORMULA {EXPATH EVENTUALLY} 
+
+
+{op.m4.p.donv.FALSE > 0 }  
+{AND op.m4.p.clk.FALSE > 0 AND ip.m66.p.n_a > 0 AND ip.m67.p.n_b > 0}   
+op.m3.p.d.TRUE > 0
+
+
+
+   
+
+
+
+{ip.m66.p.b.FALE > 0 AND ip.m66.p.pegel_1_1 > 0 AND ip.m68.p.n_b > 0} 
+
+

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pnml>
+  <net type="http://www.yasper.org/specs/epnml-1.1" id="dc1">
+    <name>
+      <text>The dual of the Petri net of Figure 2.4.</text>
+    </name>
+    <transition id="tr5">
+      <name>
+        <text>t1</text>
+      </name>
+      <graphics>
+        <position x="16" y="82" />
+        <dimension x="32" y="32" />
+      </graphics>
+    </transition>
+    <transition id="tr6">
+      <name>
+        <text>t5</text>
+      </name>
+      <graphics>
+        <position x="148" y="82" />
+        <dimension x="32" y="32" />
+      </graphics>
+    </transition>
+    <transition id="tr7">
+      <name>
+        <text>t2</text>
+      </name>
+      <graphics>
+        <position x="247" y="16" />
+        <dimension x="32" y="32" />
+      </graphics>
+    </transition>
+    <transition id="tr8">
+      <name>
+        <text>t3</text>
+      </name>
+      <graphics>
+        <position x="247" y="148" />
+        <dimension x="32" y="32" />
+      </graphics>
+    </transition>
+    <transition id="tr9">
+      <name>
+        <text>t4</text>
+      </name>
+      <graphics>
+        <position x="379" y="82" />
+        <dimension x="32" y="32" />
+      </graphics>
+    </transition>
+    <place id="pl6">
+      <name>
+        <text>p1</text>
+      </name>
+      <graphics>
+        <position x="82" y="82" />
+        <dimension x="20" y="20" />
+      </graphics>
+    </place>
+    <place id="pl7">
+      <name>
+        <text>p2</text>
+      </name>
+      <graphics>
+        <position x="214" y="82" />
+        <dimension x="20" y="20" />
+      </graphics>
+    </place>
+    <place id="pl8">
+      <name>
+        <text>p3</text>
+      </name>
+      <graphics>
+        <position x="313" y="148" />
+        <dimension x="20" y="20" />
+      </graphics>
+    </place>
+    <place id="pl9">
+      <name>
+        <text>p4</text>
+      </name>
+      <graphics>
+        <position x="313" y="82" />
+        <dimension x="20" y="20" />
+      </graphics>
+    </place>
+    <arc id="a4" source="tr5" target="pl6" />
+    <arc id="a14" source="pl6" target="tr6" />
+    <arc id="a15" source="pl7" target="tr6" />
+    <arc id="a16" source="tr6" target="pl7" />
+    <arc id="a17" source="tr7" target="pl7" />
+    <arc id="a18" source="pl6" target="tr7" />
+    <arc id="a19" source="pl6" target="tr8" />
+    <arc id="a20" source="tr8" target="pl7" />
+    <arc id="a21" source="tr8" target="pl8" />
+    <arc id="a22" source="pl8" target="tr9" />
+    <arc id="a23" source="tr9" target="pl9" />
+    <arc id="a24" source="pl9" target="tr8" />
+    <arc id="a25" source="pl9" target="tr7" />
+  </net>
+</pnml>

@@ -1,0 +1,99 @@
+\input texinfo
+@setfilename formats.info
+@include version.texi
+@afourpaper
+@finalout
+@settitle File Format Manual
+
+@c --------------------------------------------------------------------------
+
+@copying
+
+@b{About this document:}
+
+This manual describes the file formats used in the tools of service-technology.org, last updated @value{UPDATED}.
+
+Copyright @copyright{} 2010 Niels Lohmann
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify this GNU Manual. Buying copies from GNU Press supports the FSF in developing GNU and promoting software freedom.''
+@end quotation
+@end copying
+
+
+
+@c --------------------------------------------------------------------------
+
+@titlepage
+
+@title File Formats
+
+@subtitle the file formats of the tools of @url{http://service-technology.org}
+@vskip 0.5em
+@subtitle last updated @value{UPDATED}
+
+@author Niels Lohmann
+@page
+
+
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c --------------------------------------------------------------------------
+
+@ifnottex
+@node Top
+@top File Formats
+@insertcopying
+@end ifnottex
+
+@c --------------------------------------------------------------------------
+
+@menu
+* Overview::How to set up and install Wendy.
+* LoLA Petri Nets:: LoLA Petri Net file format
+* PNML Petri Nets:: PNML Petri Net file format
+* Open Nets:: Open Net file format
+* Operating Guidelines:: Operating Guidelines file format
+* Results:: Results file format
+* Index:: Index
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@contents
+@paragraphindent none
+
+@c --------------------------------------------------------------------------
+
+@node Overview
+@chapter Overview
+
+
+
+
+@include lola.texi
+
+@include pnml.texi
+
+@include owfn.texi
+
+@include og.texi
+
+@include results.texi
+
+
+
+
+
+@c --------------------------------------------------------------------------
+@node Index
+@chapter Index
+@printindex cp
+@c --------------------------------------------------------------------------
+
+
+@bye

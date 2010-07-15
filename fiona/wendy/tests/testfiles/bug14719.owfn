@@ -1,0 +1,111 @@
+{ n=4, k }
+
+PLACE
+INTERNAL
+  p1I, p2I, p3I, p4I,     {idle phils}
+  p11, p21, p31, p41,     {intermediate state 1}
+  p12, p22, p32, p42,     {intermediate state 2}
+  p1E, p2E, p3E, p4E,     {eating phils}
+  f12A, f12U,   {fork between 1 and 2}
+  f23A, f23U,   {fork between 2 and 3}
+  f34A, f34U,   {form between 3 and 4}
+  f41A, f41U    {form between 4 and 1}
+;
+OUTPUT
+  tookleft2, tookleft4;
+SYNCHRONOUS
+  takeleft1, takeleft3,
+  internal1, internal2, internal3, internal4,
+  takeright1, takeright2, takeright3, takeright4,
+  return1, return2, return3, return4;
+
+INITIALMARKING
+  p1I, p2I, p3I, p4I,
+  f12A, f23A, f34A, f41A
+;
+
+FINALMARKING
+p1I, p2I, p3I, p4I,
+f12A, f23A, f34A, f41A
+;
+
+TRANSITION 1Fl
+CONSUME p1I, f41A;
+PRODUCE p11:2, f41U;
+SYNCHRONIZE takeleft1;
+
+TRANSITION 1t1
+CONSUME p11;
+PRODUCE p12;
+SYNCHRONIZE internal1;
+
+TRANSITION 1fr
+CONSUME p12:2, f12A;
+PRODUCE p1E, f12U;
+SYNCHRONIZE takeright1;
+
+TRANSITION 1f
+CONSUME p1E, f12U, f41U;
+PRODUCE p1I, f12A, f41A;
+SYNCHRONIZE return1;
+
+
+TRANSITION 2Fl
+CONSUME p2I, f12A;
+PRODUCE p21:2, f12U, tookleft2;
+
+TRANSITION 2t1
+CONSUME p21;
+PRODUCE p22;
+SYNCHRONIZE internal2;
+
+TRANSITION 2fr
+CONSUME p22:2, f23A;
+PRODUCE p2E, f23U;
+SYNCHRONIZE takeright2;
+
+TRANSITION 2f
+CONSUME p2E, f12U, f23U;
+PRODUCE p2I, f12A, f23A;
+SYNCHRONIZE return2;
+
+
+TRANSITION 3Fl
+CONSUME p3I, f23A;
+PRODUCE p31:2, f23U;
+SYNCHRONIZE takeleft3;
+
+TRANSITION 3t1
+CONSUME p31;
+PRODUCE p32;
+SYNCHRONIZE internal3;
+
+TRANSITION 3fr
+CONSUME p32:2, f34A;
+PRODUCE p3E, f34U;
+SYNCHRONIZE takeright3;
+
+TRANSITION 3f
+CONSUME p3E, f23U, f34U;
+PRODUCE p3I, f23A, f34A;
+SYNCHRONIZE return3;
+
+
+TRANSITION 4Fl
+CONSUME p4I, f34A;
+PRODUCE p41:2, f34U, tookleft4;
+
+TRANSITION 4t1
+CONSUME p41;
+PRODUCE p42;
+SYNCHRONIZE internal4;
+
+TRANSITION 4fr
+CONSUME p42:2, f41A;
+PRODUCE p4E, f41U;
+SYNCHRONIZE takeright4;
+
+TRANSITION 4f
+CONSUME p4E, f41U, f34U;
+PRODUCE p4I, f41A, f34A;
+SYNCHRONIZE return2;

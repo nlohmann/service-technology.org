@@ -1,0 +1,48 @@
+{ Open Workflow Net des SMTP 2.0 }
+
+{ Plätze}
+PLACE INTERNAL p0, p1, p2, p3, p4, p5, p6, v, counter;
+
+INPUT con, ehlo, helo, mail, rcpt, data, maildata, quit, noop, help, vrfy, expn, rset;
+
+OUTPUT m220, m250, m221, m354;
+
+INITIALMARKING counter: 1, p0;
+
+FINALMARKING p6;
+
+{ Workflow }
+TRANSITION t1	CONSUME con, p0;		PRODUCE p1, v, m220;
+TRANSITION t2	CONSUME ehlo, p1;		PRODUCE p2, m250;
+TRANSITION t3	CONSUME helo, p1;		PRODUCE p2, m250;
+TRANSITION t4	CONSUME mail, p2, counter;	PRODUCE p3, m250;
+TRANSITION t5	CONSUME rcpt, p3;		PRODUCE p4, m250;
+TRANSITION t6	CONSUME rcpt, p4, counter;	PRODUCE p4, m250;
+TRANSITION t7	CONSUME data, p4;		PRODUCE p5, m354;
+TRANSITION t8	CONSUME maildata, p5;		PRODUCE p2, m250;
+
+{ Quit }
+TRANSITION t23	CONSUME quit, p1, v;		PRODUCE p6, m221;
+TRANSITION t9	CONSUME quit, p2, v;		PRODUCE p6, m221;
+TRANSITION t24	CONSUME quit, p3, v;		PRODUCE p6, m221;
+TRANSITION t25	CONSUME quit, p4, v;		PRODUCE p6, m221;
+
+{ Noop, Help }
+TRANSITION t10	CONSUME noop, counter, v;	PRODUCE v, m250;
+TRANSITION t11	CONSUME help, counter, v;	PRODUCE v, m250;
+
+{ Verify, Expand }
+TRANSITION t12	CONSUME vrfy, counter, v;	PRODUCE v, m250;
+TRANSITION t13	CONSUME expn, counter, v;	PRODUCE v, m250;
+
+{ Reset }
+TRANSITION t14	CONSUME rset, p2, counter;	PRODUCE p2, m250;
+TRANSITION t15	CONSUME rset, p3, counter;	PRODUCE p2, m250;
+TRANSITION t16	CONSUME rset, p4, counter;	PRODUCE p2, m250;
+TRANSITION t17	CONSUME helo, p2, counter;	PRODUCE p2, m250;
+TRANSITION t18	CONSUME helo, p3, counter;	PRODUCE p2, m250;
+TRANSITION t19	CONSUME helo, p4, counter;	PRODUCE p2, m250;
+TRANSITION t20	CONSUME ehlo, p2, counter;	PRODUCE p2, m250;
+TRANSITION t21	CONSUME ehlo, p3, counter;	PRODUCE p2, m250;
+TRANSITION t22	CONSUME ehlo, p4, counter;	PRODUCE p2, m250;
+

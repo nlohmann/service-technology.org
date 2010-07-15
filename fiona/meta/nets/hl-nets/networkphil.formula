@@ -1,0 +1,1 @@
+FORMULA ALL x : agent : ALLPATH ALWAYS ( pend1 . ( x ) = 0 OR EXPATH EVENTUALLY  critical . ( x )  >  0 )

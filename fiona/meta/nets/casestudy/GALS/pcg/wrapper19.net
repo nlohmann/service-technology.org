@@ -1,0 +1,2363 @@
+{ Annahmen: }
+{- Flanken können sich nicht überholen}
+{- zu Beginn alle Pegel auf 0, bis auf Pegel, denen Negator vorgeschaltet ist}
+{- im clock generator Ausgang von NOR-Gatter auf 1}
+
+{DONE:}
+{  12->13:}
+{     * Verzweigungstransitionen entfernt}
+{     * Negationstransitionen entfernt}
+{     * Platz p.DLE entfernt}
+{  13->14:}
+{     * Komplementaerplatz lsm.p.n_datav_pegel entfernt}
+{  14->15:}
+{     * Beide Counter durch det. bis 0 zaehlende Counter ersetzt, die}
+{       Output-Pegel beachten, um zu bestimmen, ob Output-Flanke zu erzeugen}
+{       ist. Insbesondere erzeugen sie zum Beispiel keine fallende}
+{       Output-Flanke, wenn am Output ein Low-Pegel anliegt.}
+{  15->16:}
+{     * Ein- und Ausgangsplaetze von OR, AND, NOR, D-FF, Mutex und MCE}
+{       zu Low-Level-Plaetzen gemacht}
+{  16->17:}
+{     * Eingangsplaetze des Input und Output Ports zu Low-Level-Plaetzen}
+{       gemacht}
+{  17->18:}
+{     * Fehler behoben}
+{  18->19:}
+{     * ersetze ip.m66 - ip.m68 durch ein Muster}
+
+PLACE
+	p.REQ_A,
+	p.n_REQ_A,
+	p.ACK_A,
+	p.n_ACK_A,
+	p.REQ_B,
+	p.n_REQ_B,
+	{p.ACK_B = op.m4.p.ACK_B, op.m5.p.b}
+
+
+	{Timeout-Generator (tog)}
+
+	{tog.p.REQ_A = p.REQ_A}
+	{tog.p.LCLK = neg(tog.m20.p.clk)}
+	{tog.p.RST = tog.m21.p.clk, tog.m27.p.rst}
+	{tog.p.REQ_A1 = ip.p.REQ_A1}
+	{tog.p.ST = ip.p.ST, and.p.a}
+
+	{m20: D-FF mit D=1 und RST}
+	tog.m20.p.clk,                    {Input-Flanke}
+	tog.m20.p.n_clk,
+	tog.m20.p.rst,
+	tog.m20.p.n_rst,
+	{tog.m20.p.q = tog.m22.p.a_in}    {Output-Flanke}
+	tog.m20.p.pegel_0_0_0,            {Pegel: (clk, rst, q)}
+	tog.m20.p.pegel_0_0_1,
+	tog.m20.p.pegel_0_1_0,
+	tog.m20.p.pegel_1_0_0,
+	tog.m20.p.pegel_1_0_1,
+	tog.m20.p.pegel_1_1_0,
+
+	{m21: D-FF mit D=1 und RST}
+	tog.m21.p.clk,                    {Input-Flanke}
+	tog.m21.p.n_clk,
+	tog.m21.p.rst,
+	tog.m21.p.n_rst,
+	{tog.m21.p.q = tog.m22.p.b_in}    {Output-Flanke}
+	tog.m21.p.pegel_0_0_0,            {Pegel: (clk, rst, q)}
+	tog.m21.p.pegel_0_0_1,
+	tog.m21.p.pegel_0_1_0,
+	tog.m21.p.pegel_1_0_0,
+	tog.m21.p.pegel_1_0_1,
+	tog.m21.p.pegel_1_1_0,
+
+	{m22: Mutex}
+	tog.m22.p.a_in,                                     {Input: Flanke}
+	tog.m22.p.n_a_in,
+	tog.m22.p.b_in,
+	tog.m22.p.n_b_in,
+	{tog.m22.p.a_out = tog.m20.p.rst, tog.m23.p.clk}    {Output: Flanke}
+	{tog.m22.p.b_out = tog.m21.p.rst, tog.m23.p.rst, tog.m25.p.a}
+	tog.m22.p.pegel_0_0_0_0,    {zu speichernde Pegel}
+	tog.m22.p.pegel_0_1_0_1,
+	tog.m22.p.pegel_1_0_1_0,    {Pegel: (a_alt, b_alt, a_out, b_out)}
+	tog.m22.p.pegel_1_1_0_1,
+	tog.m22.p.pegel_1_1_1_0,
+
+	{m23: Counter}
+	tog.m23.p.clk,                     {Input-Flanke}
+	tog.m23.p.n_clk,
+	tog.m23.p.rst,
+	tog.m23.p.n_rst,
+	{tog.m23.p.out = tog.m24.p.clk}    {Output-Flanke}
+	tog.m23.p.pegel_0_0_0,    {Pegel: (clk, rst, out)}
+	tog.m23.p.pegel_0_0_1,    {Pegel (0,1,1) und (1,1,1) existieren nicht, weil}
+	tog.m23.p.pegel_0_1_0,    {rst=1 immer out=0 setzt}
+	tog.m23.p.pegel_1_0_0,
+	tog.m23.p.pegel_1_0_1,
+	tog.m23.p.pegel_1_1_0,
+
+	{m24: D-FF mit D=1 und RST}
+	tog.m24.p.clk,                    {Input-Flanke}
+	tog.m24.p.n_clk,
+	tog.m24.p.rst,
+	tog.m24.p.n_rst,
+	{tog.m24.p.q = tog.m26.p.b_in}    {Output-Flanke}
+	tog.m24.p.pegel_0_0_0,            {Pegel: (clk, rst, q)}
+	tog.m24.p.pegel_0_0_1,
+	tog.m24.p.pegel_0_1_0,
+	tog.m24.p.pegel_1_0_0,
+	tog.m24.p.pegel_1_0_1,
+	tog.m24.p.pegel_1_1_0,
+
+	{m25: OR}
+	tog.m25.p.a,                       {Input-Flanken}
+	tog.m25.p.n_a,
+	tog.m25.p.b,
+	tog.m25.p.n_b,
+	{tog.m25.p.out = tog.m24.p.rst}    {Output-Flanke}
+	tog.m25.p.pegel_0_0,               {alte Pegel}
+	tog.m25.p.pegel_0_1,
+	tog.m25.p.pegel_1_0,
+	tog.m25.p.pegel_1_1,
+
+	{m26: Mutex}
+	{tog.m26.p.a_in = p.REQ_A}            {Input: Flanke}
+	tog.m26.p.b_in,
+	tog.m26.p.n_b_in,
+	{tog.m26.p.a_out = ip.m69.p.REQ_A1}   {Output: Flanke}
+	{tog.m26.p.b_out = tog.m27.p.clk}
+	tog.m26.p.pegel_0_0_0_0,              {zu speichernde Pegel}
+	tog.m26.p.pegel_0_1_0_1,
+	tog.m26.p.pegel_1_0_1_0,              {Pegel: (a_alt, b_alt, a_out, b_out)}
+	tog.m26.p.pegel_1_1_0_1,
+	tog.m26.p.pegel_1_1_1_0,
+
+	{m27: D-FF mit D=1 und RST}
+	tog.m27.p.clk,               {Input-Flanke}
+	tog.m27.p.n_clk,
+	tog.m27.p.rst,
+	tog.m27.p.n_rst,
+	{tog.m27.p.q = tog.m25.p.b, ip.m69.p.ST, neg(ip.m66.p.b), and.p.a}
+	tog.m27.p.pegel_0_0_0,       {Pegel: (clk, rst, q)}
+	tog.m27.p.pegel_0_0_1,
+	tog.m27.p.pegel_0_1_0,
+	tog.m27.p.pegel_1_0_0,
+	tog.m27.p.pegel_1_0_1,
+	tog.m27.p.pegel_1_1_0,
+
+
+	{Input Port (ip)}
+	{ip.p.LCLKM = ip.m61.p.a}
+	{ip.p.INT_CLK = ip.m61.p.b, ip.m63.p.b}
+	{ip.p.DLE entfaellt}
+	{ip.p.REQ_A1 = ip.m69.p.REQ_A1}
+	{ip.p.ACK_A = p.ACK_A}
+	{ip.p.STOP = ip.m69.p.STOP}
+	{ip.p.REQI1 = pcg.m2.p.a_in}
+	{ip.p.ACKI1 = ip.m69.p.ACKI1}
+	{ip.p.RST = tog.m21.p.clk, tog.m27.p.rst, cc.m10.p.rst}
+	{ip.p.ST = neg(ip.m66.p.b), ip.m69.p.ST}
+	{ip.p.ACK_INT = ip.m66.p.a, ip.m67.p.b}
+	{ip.p.REQ_INT = cc.m11.p.rst, or.p.a, op.m1.p.b}
+	{ip.p.DATAV_IN = lsm.p.DATAV_IN}
+
+	{m61: AND}
+	ip.m61.p.a,                      {Input-Flanken}
+	ip.m61.p.n_a,
+	ip.m61.p.b,
+	ip.m61.p.n_b,
+	{ip.m61.p.out = ip.m62.p.clk}    {Output-Flanke}
+	ip.m61.p.pegel_0_0,              {alte Pegel}
+	ip.m61.p.pegel_0_1,
+	ip.m61.p.pegel_1_0,
+	ip.m61.p.pegel_1_1,
+
+	{m62: D-FF mit D=0 und SET}
+	ip.m62.p.clk,                    {Input-Flanke}
+	ip.m62.p.n_clk,
+	ip.m62.p.set,
+	ip.m62.p.n_set,
+	{ip.m62.p.q = lsm.p.DATAV_IN}    {Output-Flanke}
+	ip.m62.p.pegel_1_0_0,            {Pegel: (clk, set, q)}
+	ip.m62.p.pegel_1_0_1,
+	ip.m62.p.pegel_1_1_1,
+	ip.m62.p.pegel_0_0_0,
+	ip.m62.p.pegel_0_0_1,
+	ip.m62.p.pegel_0_1_1,
+
+	{m63: AND}
+	ip.m63.p.a,                    {Input-Flanken}
+	ip.m63.p.n_a,
+	ip.m63.p.b,
+	ip.m63.p.n_b,
+	{ip.m63.p.out = ip.m65.p.a}    {Output-Flanke}
+	ip.m63.p.pegel_0_0,            {alte Pegel}
+	ip.m63.p.pegel_0_1,
+	ip.m63.p.pegel_1_0,
+	ip.m63.p.pegel_1_1,
+
+	{m64: AND}
+	ip.m64.p.a,                    {Input-Flanken}
+	ip.m64.p.n_a,
+	ip.m64.p.b,
+	ip.m64.p.n_b,
+	{ip.m64.p.out = ip.m65.p.b}    {Output-Flanke}
+	ip.m64.p.pegel_0_0,            {alte Pegel}
+	ip.m64.p.pegel_0_1,
+	ip.m64.p.pegel_1_0,
+	ip.m64.p.pegel_1_1,
+
+	{m65: OR}
+	ip.m65.p.a,                      {Input-Flanken}
+	ip.m65.p.n_a,
+	ip.m65.p.b,
+	ip.m65.p.n_b,
+	{ip.m65.p.out = ip.m62.p.set}    {Output-Flanke}
+	ip.m65.p.pegel_0_0,              {alte Pegel}
+	ip.m65.p.pegel_0_1,
+	ip.m65.p.pegel_1_0,
+	ip.m65.p.pegel_1_1,
+
+	{m66: AND-AND-OR}
+	ip.m66.p.a,      				{Input-Flanken}
+	ip.m66.p.b,
+	ip.m66.p.c,
+	ip.m66.p.n_a,      				{Komplementärplätze}
+	ip.m66.p.n_b,
+	ip.m66.p.n_c,
+	ip.m66.p.pegel_0_0_0,       			{alte Pegel}
+	ip.m66.p.pegel_0_0_1,
+	ip.m66.p.pegel_0_1_0,
+	ip.m66.p.pegel_1_0_0,
+	ip.m66.p.pegel_1_1_0,
+	ip.m66.p.pegel_1_0_1,
+	ip.m66.p.pegel_0_1_1,
+	ip.m66.p.pegel_1_1_1,
+
+	{m69: Input Controller}
+	ip.m69.p.0,     {Zustände des Input Controllers}
+	ip.m69.p.1,
+	ip.m69.p.2,
+	ip.m69.p.3,
+	ip.m69.p.4,
+	ip.m69.p.5,
+	ip.m69.p.6,
+	ip.m69.p.7,
+	ip.m69.p.8,
+	ip.m69.p.REQ_A1,    {Eingabesignale als Flanken}
+	ip.m69.p.n_REQ_A1,
+	ip.m69.p.ST,
+	ip.m69.p.n_ST,
+	ip.m69.p.STOP,
+	ip.m69.p.n_STOP,
+	ip.m69.p.ACKC,
+	ip.m69.p.n_ACKC,
+	ip.m69.p.ACKI1,
+	ip.m69.p.n_ACKI1,
+	{ip.m69.p.ACK_A = ip.m63.p.a, p.ACK_A} {Ausgabesignale als Flanken}
+	{ip.m69.p.RST = tog.m21.p.clk, tog.m27.p.rst, cc.m10.p.rst}
+	{ip.m69.p.ACKEN = ip.m64.p.b, ip.m66.p.c}
+	{ip.m69.p.REQ_INT = cc.m11.p.rst, or.p.a, op.m1.p.b}
+	{ip.m69.p.REQI1 = pcg.m2.p.a_in}
+
+
+	{Clock Control (cc)}
+
+	{cc.p.LCLKM = neg(cc.m10.p.clk)}
+	{cc.p.RST = cc.m10.p.rst}
+	{cc.p.REQ_INT = cc.m11.p.rst}
+	{cc.p.STOP = ip.m69.p.STOP}
+	{cc.p.STOPI = pcg.m1.p.b}
+
+	{m10: Counter}
+	cc.m10.p.clk,             {Input-Flanke}
+	cc.m10.p.n_clk,
+	cc.m10.p.rst,
+	cc.m10.p.n_rst,
+	{cc.m10.p.out = cc.m11.p.clk, ip.m69.p.STOP}    {Output-Flanke}
+	cc.m10.p.pegel_0_0_0,     {Pegel: (clk, rst, out)}
+	cc.m10.p.pegel_0_0_1,     {Pegel (0,1,1) und (1,1,1) existieren nicht, weil}
+	cc.m10.p.pegel_0_1_0,     {rst=1 immer out=0 setzt}
+	cc.m10.p.pegel_1_0_0,
+	cc.m10.p.pegel_1_0_1,
+	cc.m10.p.pegel_1_1_0,
+
+	{m11: D-FF mit D=1 und RST}
+	cc.m11.p.clk,                {Input-Flanke}
+	cc.m11.p.n_clk,
+	cc.m11.p.rst,
+	cc.m11.p.n_rst,
+	{cc.m11.p.q = pcg.m1.p.b}    {Output-Flanke}
+	cc.m11.p.pegel_0_0_0,        {Pegel: (clk, rst, q)}
+	cc.m11.p.pegel_0_0_1,
+	cc.m11.p.pegel_0_1_0,
+	cc.m11.p.pegel_1_0_0,
+	cc.m11.p.pegel_1_0_1,
+	cc.m11.p.pegel_1_1_0,
+
+
+
+	{Pausable Clock Generator (pcg)}
+
+	{pcg.p.REQI1 = pcg.m2.p.a_in}
+	{pcg.p.STRETCH = pcg.m3.p.a_in}
+	{pcg.p.STOPI = pcg.m1.p.b}
+	{pcg.p.LCLK = neg(tog.m20.p.clk), and.p.b}
+	{pcg.p.ACKI1 = ip.m69.p.ACKI1}
+
+	{m1: NOR}
+	pcg.m1.p.a,            {Input-Flanken}
+	pcg.m1.p.n_a,
+	pcg.m1.p.b,
+	pcg.m1.p.n_b,
+	{pcg.m1.p.out = pcg.m5.p.b, pcg.m2.p.b_in, pcg.m3.p.b_in}   {Output-Flanke}
+	pcg.m1.p.pegel_0_0,    {alte Pegel}
+	pcg.m1.p.pegel_0_1,
+	pcg.m1.p.pegel_1_0,
+	pcg.m1.p.pegel_1_1,
+
+	{m2: Mutex}
+	pcg.m2.p.a_in,             {Input: Flanke}
+	pcg.m2.p.n_a_in,
+	pcg.m2.p.b_in,
+	pcg.m2.p.n_b_in,
+	{pcg.m2.p.a_out = ip.m69.p.ACKI1}    {Output: Flanke}
+	{pcg.m2.p.b_out = pcg.m4.p.b}
+	pcg.m2.p.pegel_0_0_0_0,    {zu speichernde Pegel}
+	pcg.m2.p.pegel_0_1_0_1,
+	pcg.m2.p.pegel_1_0_1_0,    {Pegel: (a_alt, b_alt, a_out, b_out)}
+	pcg.m2.p.pegel_1_1_0_1,
+	pcg.m2.p.pegel_1_1_1_0,
+
+	{m3: Mutex}
+	pcg.m3.p.a_in,             {Input: Flanke}
+	pcg.m3.p.n_a_in,
+	pcg.m3.p.b_in,
+	pcg.m3.p.n_b_in,
+	{pcg.m3.p.a_out entfaellt} {Output: Flanke}
+	{pcg.m3.p.b_out = pcg.m4.p.a}
+	pcg.m3.p.pegel_0_0_0_0,    {zu speichernde Pegel}
+	pcg.m3.p.pegel_0_1_0_1,
+	pcg.m3.p.pegel_1_0_1_0,    {Pegel: (a_alt, b_alt, a_out, b_out)}
+	pcg.m3.p.pegel_1_1_0_1,
+	pcg.m3.p.pegel_1_1_1_0,
+
+	{m4: AND}
+	pcg.m4.p.a,                    {Input-Flanken}
+	pcg.m4.p.n_a,
+	pcg.m4.p.b,
+	pcg.m4.p.n_b,
+	{pcg.m4.p.out = pcg.m5.p.a}    {Output-Flanke}
+	pcg.m4.p.pegel_0_0,            {alte Pegel}
+	pcg.m4.p.pegel_0_1,
+	pcg.m4.p.pegel_1_0,
+	pcg.m4.p.pegel_1_1,
+
+	{m5: MCE}
+	pcg.m5.p.a,
+	pcg.m5.p.n_a,
+	pcg.m5.p.b,              {Input-Flanke}
+	pcg.m5.p.n_b,
+	{pcg.m5.p.out = pcg.m1.p.a, neg(tog.m20.p.clk), and.p.b}   {Output-Flanke}
+	pcg.m5.p.pegel_0_0_0,
+	pcg.m5.p.pegel_0_1_0,    {alte Pegel (a_b_c)}
+	pcg.m5.p.pegel_1_0_0,    {p.pegel_0_0_1, p.pegel_1_1_0 existieren nicht}
+	pcg.m5.p.pegel_0_1_1,
+	pcg.m5.p.pegel_1_0_1,
+	pcg.m5.p.pegel_1_1_1,
+
+	{AND (and)}
+	and.p.a,              {Input-Flanken}
+	and.p.n_a,
+	and.p.b,
+	and.p.n_b,
+	{and.p.out = ip.m61.p.a, or.p.b, op.m1.p.a, neg(cc.m10.p.clk)} {Output-Flanke}
+	and.p.pegel_0_0,      {alte Pegel}
+	and.p.pegel_0_1,
+	and.p.pegel_1_0,
+	and.p.pegel_1_1,
+
+	{OR (or)}
+	or.p.a,            {Input-Flanken}
+	or.p.n_a,
+	or.p.b,
+	or.p.n_b,
+	{or.p.out = ip.m61.p.b, ip.m63.p.b, lsm.p.INT_CLK, op.m2.p.clk, op.m3.p.clk}
+	or.p.pegel_0_0,    {alte Pegel}
+	or.p.pegel_0_1,
+	or.p.pegel_1_0,
+	or.p.pegel_1_1,
+
+
+	{Output Port (op)}
+	{op.p.LCLKM = op.m1.p.a}
+	{op.p.REQ_INT = op.m1.p.b}
+	{op.p.DATAV_OUT = neg(op.m2.p.d), op.m3.p.d}
+	{op.p.INT_CLK = op.m2.p.clk, op.m3.p.clk}
+	{op.p.ACK_B = op.m4.p.ACK_B, op.m5.p.b}
+	{op.p.ACK_INT = ip.m66.p.a, ip.67.p.b}
+	{op.p.REQ_B = p.REQ_B}
+	{op.p.STRETCH = pcg.m3.p.a_in}
+
+	{m1: OR}
+	op.m1.p.a,            {Input-Flanken}
+	op.m1.p.n_a,
+	op.m1.p.b,
+	op.m1.p.n_b,
+	{op.m1.p.out = neg(op.m2.p.rst), neg(op.m3.p.rst), op.m4.p.CLK}
+	op.m1.p.pegel_0_0,    {alte Pegel}
+	op.m1.p.pegel_0_1,
+	op.m1.p.pegel_1_0,
+	op.m1.p.pegel_1_1,
+
+	{m2: D-FF mit D beliebig und RST}
+	op.m2.p.clk,                {Input-Flanke}
+	op.m2.p.n_clk,
+	op.m2.p.d,
+	op.m2.p.n_d,
+	op.m2.p.rst,
+	op.m2.p.n_rst,
+	{op.m2.p.q = op.m4.p.DONV}  {Output-Flanke}
+	op.m2.p.pegel_0_0_0_0,      {Pegel: (clk, d, rst, q)}
+	op.m2.p.pegel_0_0_0_1,
+	op.m2.p.pegel_0_0_1_0,
+	op.m2.p.pegel_0_1_0_0,
+	op.m2.p.pegel_0_1_0_1,
+	op.m2.p.pegel_0_1_1_0,
+	op.m2.p.pegel_1_0_0_0,
+	op.m2.p.pegel_1_0_0_1,
+	op.m2.p.pegel_1_0_1_0,
+	op.m2.p.pegel_1_1_0_0,
+	op.m2.p.pegel_1_1_0_1,
+	op.m2.p.pegel_1_1_1_0,
+
+	{m3: D-FF mit D beliebig und RST}
+	op.m3.p.clk,                 {Input-Flanke}
+	op.m3.p.n_clk,
+	op.m3.p.d,
+	op.m3.p.n_d,
+	op.m3.p.rst,
+	op.m3.p.n_rst,
+	{op.m3.p.q = op.m4.p.DOV}    {Output-Flanke}
+	op.m3.p.pegel_0_0_0_0,       {Pegel: (clk, d, rst, q)}
+	op.m3.p.pegel_0_0_0_1,
+	op.m3.p.pegel_0_0_1_0,
+	op.m3.p.pegel_0_1_0_0,
+	op.m3.p.pegel_0_1_0_1,
+	op.m3.p.pegel_0_1_1_0,
+	op.m3.p.pegel_1_0_0_0,
+	op.m3.p.pegel_1_0_0_1,
+	op.m3.p.pegel_1_0_1_0,
+	op.m3.p.pegel_1_1_0_0,
+	op.m3.p.pegel_1_1_0_1,
+	op.m3.p.pegel_1_1_1_0,
+
+	{m4: Output Controller}
+	op.m4.p.0,               {Zustände des Output Controllers}
+	op.m4.p.1,
+	op.m4.p.2,
+	op.m4.p.3,
+	op.m4.p.CLK,      {Eingabesignale als Flanken}
+	op.m4.p.n_CLK,
+	op.m4.p.DOV,
+	op.m4.p.n_DOV,
+	op.m4.p.DONV,
+	op.m4.p.n_DONV,
+	op.m4.p.ACK_B,
+	op.m4.p.n_ACK_B,
+	{op.m4.p.REQ_B = op.m6.p.set, op.m5.p.a, p.REQ_B}
+	{op.m4.p.ACK_INT = ip.m66.p.a, ip.m66.p.b}
+
+	{m5: OR}
+	op.m5.p.a,                          {Input-Flanken}
+	op.m5.p.n_a,
+	op.m5.p.b,
+	op.m5.p.n_b,
+	{op.m5.p.out = neg(op.m6.p.clk)}    {Output-Flanke}
+	op.m5.p.pegel_0_0,                  {alte Pegel}
+	op.m5.p.pegel_0_1,
+	op.m5.p.pegel_1_0,
+	op.m5.p.pegel_1_1,
+
+	{m6: D-FF mit D=0 und SET}
+	op.m6.p.clk,                   {Input-Flanke}
+	op.m6.p.n_clk,
+	op.m6.p.set,
+	op.m6.p.n_set,
+	{op.m6.p.q = pcg.m3.p.a_in}    {Output-Flanke}
+	op.m6.p.pegel_1_0_0,           {Pegel: (clk, set, q)}
+	op.m6.p.pegel_1_0_1,
+	op.m6.p.pegel_1_1_1,
+	op.m6.p.pegel_0_0_0,
+	op.m6.p.pegel_0_0_1,
+	op.m6.p.pegel_0_1_1,
+
+
+	{Locally Synchronous Module (lsm)}
+
+	lsm.p.DATAV_IN,
+	lsm.p.n_DATAV_IN,
+	lsm.p.INT_CLK,
+	lsm.p.n_INT_CLK,
+	lsm.p.pegel_d_in_gleich_d_out,
+	lsm.p.pegel_d_in_ungleich_d_out,
+	lsm.p.INT_CLK_pegel_0,
+	lsm.p.INT_CLK_pegel_1;
+	{lsm.p.DATAV_OUT = neg(op.m2.p.d), op.m3.p.d}
+
+MARKING
+	p.REQ_A: 1,
+	p.n_ACK_A: 1,
+	p.n_REQ_B: 1,
+
+	tog.m20.p.n_clk: 1,
+	tog.m20.p.n_rst: 1,
+	tog.m20.p.pegel_1_0_0: 1, {clk-Eingang ist negiert}
+	tog.m21.p.n_clk: 1,
+	tog.m21.p.n_rst: 1,
+	tog.m21.p.pegel_0_0_0: 1,
+	tog.m22.p.n_a_in: 1,
+	tog.m22.p.n_b_in: 1,
+	tog.m22.p.pegel_0_0_0_0: 1,
+	tog.m23.p.n_clk: 1,
+	tog.m23.p.n_rst: 1,
+	tog.m23.p.pegel_0_0_0: 1,
+	tog.m24.p.n_clk: 1,
+	tog.m24.p.n_rst: 1,
+	tog.m24.p.pegel_0_0_0: 1,
+	tog.m25.p.n_a: 1,
+	tog.m25.p.n_b: 1,
+	tog.m25.p.pegel_0_0: 1,
+	tog.m26.p.n_b_in: 1,
+	tog.m26.p.pegel_0_0_0_0: 1,
+	tog.m27.p.n_clk: 1,
+	tog.m27.p.n_rst: 1,
+	tog.m27.p.pegel_0_0_0: 1,
+
+	ip.m61.p.n_a: 1,
+	ip.m61.p.n_b: 1,
+	ip.m61.p.pegel_0_0: 1,
+	ip.m62.p.n_clk: 1,
+	ip.m62.p.n_set: 1,
+	ip.m62.p.pegel_0_0_0: 1,
+	ip.m63.p.n_a: 1,
+	ip.m63.p.n_b: 1,
+	ip.m63.p.pegel_0_0: 1,
+	ip.m64.p.n_a: 1,
+	ip.m64.p.n_b: 1,
+	ip.m64.p.pegel_0_0: 1,
+	ip.m65.p.n_a: 1,
+	ip.m65.p.n_b: 1,
+	ip.m65.p.pegel_0_0: 1,
+	ip.m66.p.pegel_1_0_0: 1,
+	ip.m66.p.n_a: 1,
+	ip.m66.p.n_b: 1,
+	ip.m66.p.n_c: 1,
+	ip.m69.p.n_REQ_A1: 1,
+	ip.m69.p.n_ST: 1,
+	ip.m69.p.n_STOP: 1,
+	ip.m69.p.n_ACKC: 1,
+	ip.m69.p.n_ACKI1: 1,
+	ip.m69.p.0: 1,
+
+	cc.m10.p.n_clk: 1,
+	cc.m10.p.n_rst: 1,
+	cc.m10.p.pegel_0_0_0: 1,
+	cc.m11.p.n_clk: 1,
+	cc.m11.p.n_rst: 1,
+	cc.m11.p.pegel_0_0_0: 1,
+
+	pcg.m1.p.n_a: 1,
+	pcg.m1.p.n_b: 1,
+	pcg.m1.p.pegel_0_0: 1,
+	pcg.m2.p.n_a_in: 1,
+	pcg.m2.p.b_in: 1,          {Flanke vom davorliegenden NOR}
+	pcg.m2.p.pegel_0_0_0_0: 1,
+	pcg.m3.p.n_a_in: 1,
+	pcg.m3.p.b_in: 1,          {Flanke vom davorliegenden NOR}
+	pcg.m3.p.pegel_0_0_0_0: 1,
+	pcg.m4.p.n_a: 1,
+	pcg.m4.p.n_b: 1,
+	pcg.m4.p.pegel_0_0: 1,
+	pcg.m5.p.n_a: 1,
+	pcg.m5.p.b: 1,             {Flanke vom davorliegenden NOR}
+	pcg.m5.p.pegel_0_0_0: 1,
+
+	and.p.n_a: 1,
+	and.p.n_b: 1,
+	and.p.pegel_0_0: 1,
+
+	or.p.n_a: 1,
+	or.p.n_b: 1,
+	or.p.pegel_0_0: 1,
+
+	op.m1.p.n_a: 1,
+	op.m1.p.n_b: 1,
+	op.m1.p.pegel_0_0: 1,
+	op.m2.p.n_clk: 1,
+	op.m2.p.n_d: 1,
+	op.m2.p.n_rst: 1,
+	op.m2.p.pegel_0_1_1_0: 1, {d- und rst-Eingaenge haben Negator davor}
+	op.m3.p.n_clk: 1,
+	op.m3.p.n_d: 1,
+	op.m3.p.n_rst: 1,
+	op.m3.p.pegel_0_0_1_0: 1, {rst-Eingang hat Negator davor}
+	op.m4.p.n_CLK: 1,
+	op.m4.p.n_DOV: 1,
+	op.m4.p.n_DONV: 1,
+	op.m4.p.n_ACK_B: 1,
+	op.m4.p.0: 1,
+	op.m5.p.n_a: 1,
+	op.m5.p.n_b: 1,
+	op.m5.p.pegel_0_0: 1,
+	op.m6.p.n_clk: 1,
+	op.m6.p.n_set: 1,
+	op.m6.p.pegel_1_0_0: 1, {clk-Eingang ist negiert}
+
+	lsm.p.n_DATAV_IN: 1,
+	lsm.p.n_INT_CLK:  1,
+	lsm.p.pegel_d_in_gleich_d_out: 1, {beide 0}
+	lsm.p.INT_CLK_pegel_0: 1;
+
+
+
+{ Timeout-Generator (tog)}
+
+
+{m20: D-FF mit D=1 und RST}
+
+TRANSITION tog.m20.t.clk0_1_0_0
+CONSUME tog.m20.p.clk: 1, tog.m20.p.pegel_1_0_0: 1;
+PRODUCE tog.m20.p.pegel_0_0_0: 1, tog.m20.p.n_clk: 1;
+
+TRANSITION tog.m20.t.clk0_1_0_1
+CONSUME tog.m20.p.clk: 1, tog.m20.p.pegel_1_0_1: 1;
+PRODUCE tog.m20.p.pegel_0_0_1: 1, tog.m20.p.n_clk: 1;
+
+TRANSITION tog.m20.t.clk0_1_1_0
+CONSUME tog.m20.p.clk: 1, tog.m20.p.pegel_1_1_0: 1;
+PRODUCE tog.m20.p.pegel_0_1_0: 1, tog.m20.p.n_clk: 1;
+
+TRANSITION tog.m20.t.clk1_0_0_0
+CONSUME tog.m20.p.clk: 1, tog.m20.p.pegel_0_0_0: 1, tog.m22.p.n_a_in: 1;
+PRODUCE tog.m20.p.pegel_1_0_1: 1, tog.m22.p.a_in: 1, tog.m20.p.n_clk: 1;
+
+TRANSITION tog.m20.t.clk1_0_0_1
+CONSUME tog.m20.p.clk: 1, tog.m20.p.pegel_0_0_1: 1;
+PRODUCE tog.m20.p.pegel_1_0_1: 1, tog.m20.p.n_clk: 1;
+
+TRANSITION tog.m20.t.clk1_0_1_0
+CONSUME tog.m20.p.clk: 1, tog.m20.p.pegel_0_1_0: 1;
+PRODUCE tog.m20.p.pegel_1_1_0: 1, tog.m20.p.n_clk: 1;
+
+
+TRANSITION tog.m20.t.rst0_0_1_0
+CONSUME tog.m20.p.rst: 1, tog.m20.p.pegel_0_1_0: 1;
+PRODUCE tog.m20.p.pegel_0_0_0: 1, tog.m20.p.n_rst: 1;
+
+TRANSITION tog.m20.t.rst0_1_1_0
+CONSUME tog.m20.p.rst: 1, tog.m20.p.pegel_1_1_0: 1;
+PRODUCE tog.m20.p.pegel_1_0_0: 1, tog.m20.p.n_rst: 1;
+
+TRANSITION tog.m20.t.rst1_1_0_0
+CONSUME tog.m20.p.rst: 1, tog.m20.p.pegel_1_0_0: 1;
+PRODUCE tog.m20.p.pegel_1_1_0: 1, tog.m20.p.n_rst: 1;
+
+TRANSITION tog.m20.t.rst1_1_0_1
+CONSUME tog.m20.p.rst: 1, tog.m20.p.pegel_1_0_1: 1, tog.m22.p.n_a_in: 1;
+PRODUCE tog.m20.p.pegel_1_1_0: 1, tog.m22.p.a_in: 1, tog.m20.p.n_rst: 1;
+
+TRANSITION tog.m20.t.rst1_0_0_0
+CONSUME tog.m20.p.rst: 1, tog.m20.p.pegel_0_0_0: 1;
+PRODUCE tog.m20.p.pegel_0_1_0: 1, tog.m20.p.n_rst: 1;
+
+TRANSITION tog.m20.t.rst1_0_0_1
+CONSUME tog.m20.p.rst: 1, tog.m20.p.pegel_0_0_1: 1, tog.m22.p.n_a_in: 1;
+PRODUCE tog.m20.p.pegel_0_1_0: 1, tog.m22.p.a_in: 1, tog.m20.p.n_rst: 1;
+
+
+{m21: D-FF mit D=1 und RST}
+
+TRANSITION tog.m21.t.clk0_1_0_0
+CONSUME tog.m21.p.clk: 1, tog.m21.p.pegel_1_0_0: 1;
+PRODUCE tog.m21.p.pegel_0_0_0: 1, tog.m21.p.n_clk: 1;
+
+TRANSITION tog.m21.t.clk0_1_0_1
+CONSUME tog.m21.p.clk: 1, tog.m21.p.pegel_1_0_1: 1;
+PRODUCE tog.m21.p.pegel_0_0_1: 1, tog.m21.p.n_clk: 1;
+
+TRANSITION tog.m21.t.clk0_1_1_0
+CONSUME tog.m21.p.clk: 1, tog.m21.p.pegel_1_1_0: 1;
+PRODUCE tog.m21.p.pegel_0_1_0: 1, tog.m21.p.n_clk: 1;
+
+TRANSITION tog.m21.t.clk1_0_0_0
+CONSUME tog.m21.p.clk: 1, tog.m21.p.pegel_0_0_0: 1, tog.m22.p.n_b_in: 1;
+PRODUCE tog.m21.p.pegel_1_0_1: 1, tog.m22.p.b_in: 1, tog.m21.p.n_clk: 1;
+
+TRANSITION tog.m21.t.clk1_0_0_1
+CONSUME tog.m21.p.clk: 1, tog.m21.p.pegel_0_0_1: 1;
+PRODUCE tog.m21.p.pegel_1_0_1: 1, tog.m21.p.n_clk: 1;
+
+TRANSITION tog.m21.t.clk1_0_1_0
+CONSUME tog.m21.p.clk: 1, tog.m21.p.pegel_0_1_0: 1;
+PRODUCE tog.m21.p.pegel_1_1_0: 1, tog.m21.p.n_clk: 1;
+
+
+TRANSITION tog.m21.t.rst0_0_1_0
+CONSUME tog.m21.p.rst: 1, tog.m21.p.pegel_0_1_0: 1;
+PRODUCE tog.m21.p.pegel_0_0_0: 1, tog.m21.p.n_rst: 1;
+
+TRANSITION tog.m21.t.rst0_1_1_0
+CONSUME tog.m21.p.rst: 1, tog.m21.p.pegel_1_1_0: 1;
+PRODUCE tog.m21.p.pegel_1_0_0: 1, tog.m21.p.n_rst: 1;
+
+TRANSITION tog.m21.t.rst1_1_0_0
+CONSUME tog.m21.p.rst: 1, tog.m21.p.pegel_1_0_0: 1;
+PRODUCE tog.m21.p.pegel_1_1_0: 1, tog.m21.p.n_rst: 1;
+
+TRANSITION tog.m21.t.rst1_1_0_1
+CONSUME tog.m21.p.rst: 1, tog.m21.p.pegel_1_0_1: 1, tog.m22.p.n_b_in: 1;
+PRODUCE tog.m21.p.pegel_1_1_0: 1, tog.m22.p.b_in: 1, tog.m21.p.n_rst: 1;
+
+TRANSITION tog.m21.t.rst1_0_0_0
+CONSUME tog.m21.p.rst: 1, tog.m21.p.pegel_0_0_0: 1;
+PRODUCE tog.m21.p.pegel_0_1_0: 1, tog.m21.p.n_rst: 1;
+
+TRANSITION tog.m21.t.rst1_0_0_1
+CONSUME tog.m21.p.rst: 1, tog.m21.p.pegel_0_0_1: 1, tog.m22.p.n_b_in: 1;
+PRODUCE tog.m21.p.pegel_0_1_0: 1, tog.m22.p.b_in: 1, tog.m21.p.n_rst: 1;
+
+
+{m22: Mutex}
+
+TRANSITION tog.m22.t.a1_pegel_0_0_0_0
+CONSUME tog.m22.p.a_in: 1, tog.m22.p.pegel_0_0_0_0: 1, tog.m20.p.n_rst: 1,
+        tog.m23.p.n_clk: 1;
+PRODUCE tog.m22.p.pegel_1_0_1_0: 1, tog.m20.p.rst: 1, tog.m23.p.clk: 1,
+        tog.m22.p.n_a_in: 1;
+
+TRANSITION tog.m22.t.a1_pegel_0_1_0_1
+CONSUME tog.m22.p.a_in: 1, tog.m22.p.pegel_0_1_0_1: 1;
+PRODUCE tog.m22.p.pegel_1_1_0_1: 1, tog.m22.p.n_a_in: 1;
+
+TRANSITION tog.m22.t.a0_pegel_1_0_1_0
+CONSUME tog.m22.p.a_in: 1, tog.m22.p.pegel_1_0_1_0: 1, tog.m20.p.n_rst: 1,
+        tog.m23.p.n_clk: 1;
+PRODUCE tog.m22.p.pegel_0_0_0_0: 1, tog.m20.p.rst: 1, tog.m23.p.clk: 1,
+        tog.m22.p.n_a_in: 1;
+
+TRANSITION tog.m22.t.a0_pegel_1_1_0_1
+CONSUME tog.m22.p.a_in: 1, tog.m22.p.pegel_1_1_0_1: 1;
+PRODUCE tog.m22.p.pegel_0_1_0_1: 1, tog.m22.p.n_a_in: 1;
+
+TRANSITION tog.m22.t.a0_pegel_1_1_1_0
+CONSUME tog.m22.p.a_in: 1, tog.m22.p.pegel_1_1_1_0: 1, tog.m20.p.n_rst: 1,
+        tog.m23.p.n_clk: 1, tog.m21.p.n_rst: 1, tog.m23.p.n_rst: 1,
+        tog.m25.p.n_a: 1;
+PRODUCE tog.m22.p.pegel_0_1_0_1: 1, tog.m20.p.rst: 1, tog.m23.p.clk: 1,
+        tog.m21.p.rst: 1, tog.m23.p.rst: 1, tog.m25.p.a: 1, tog.m22.p.n_a_in: 1;
+
+
+TRANSITION tog.m22.t.b1_pegel_0_0_0_0
+CONSUME tog.m22.p.b_in: 1, tog.m22.p.pegel_0_0_0_0: 1, tog.m21.p.n_rst: 1,
+        tog.m25.p.n_a: 1, tog.m23.p.n_rst: 1;
+PRODUCE tog.m22.p.pegel_0_1_0_1: 1, tog.m21.p.rst: 1, tog.m23.p.rst: 1,
+        tog.m25.p.a: 1, tog.m22.p.n_b_in: 1;
+
+TRANSITION tog.m22.t.b0_pegel_0_1_0_1
+CONSUME tog.m22.p.b_in: 1, tog.m22.p.pegel_0_1_0_1: 1, tog.m21.p.n_rst: 1,
+        tog.m25.p.n_a: 1, tog.m23.p.n_rst: 1;
+PRODUCE tog.m22.p.pegel_0_0_0_0: 1, tog.m21.p.rst: 1, tog.m23.p.rst: 1,
+        tog.m25.p.a: 1, tog.m22.p.n_b_in: 1;
+
+TRANSITION tog.m22.t.b1_pegel_1_0_1_0
+CONSUME tog.m22.p.b_in: 1, tog.m22.p.pegel_1_0_1_0: 1;
+PRODUCE tog.m22.p.pegel_1_1_1_0: 1, tog.m22.p.n_b_in: 1;
+
+TRANSITION tog.m22.t.b0_pegel_1_1_0_1
+CONSUME tog.m22.p.b_in: 1, tog.m22.p.pegel_1_1_0_1: 1, tog.m20.p.n_rst: 1,
+        tog.m23.p.n_clk: 1, tog.m21.p.n_rst: 1, tog.m23.p.n_rst: 1,
+        tog.m25.p.n_a: 1;
+PRODUCE tog.m22.p.pegel_1_0_1_0: 1, tog.m20.p.rst: 1, tog.m23.p.clk: 1,
+        tog.m21.p.rst: 1, tog.m23.p.rst: 1, tog.m25.p.a: 1, tog.m22.p.n_b_in: 1;
+
+TRANSITION tog.m22.t.b0_pegel_1_1_1_0
+CONSUME tog.m22.p.b_in: 1, tog.m22.p.pegel_1_1_1_0: 1;
+PRODUCE tog.m22.p.pegel_1_0_1_0: 1, tog.m22.p.n_b_in: 1;
+
+
+
+{m23: Counter}
+
+TRANSITION tog.m23.t.clk1_pegel_0_0_0
+CONSUME tog.m23.p.clk: 1, tog.m23.p.pegel_0_0_0: 1, tog.m24.p.n_clk: 1;
+PRODUCE tog.m23.p.pegel_1_0_1: 1, tog.m24.p.clk: 1, tog.m23.p.n_clk: 1;
+
+TRANSITION tog.m23.t.clk1_pegel_0_0_1
+CONSUME tog.m23.p.clk: 1, tog.m23.p.pegel_0_0_1: 1;
+PRODUCE tog.m23.p.pegel_1_0_1: 1, tog.m23.p.n_clk: 1;
+
+TRANSITION tog.m23.t.clk1_pegel_0_1_0
+CONSUME tog.m23.p.clk: 1, tog.m23.p.pegel_0_1_0: 1;
+PRODUCE tog.m23.p.pegel_1_1_0: 1, tog.m23.p.n_clk: 1;
+
+TRANSITION tog.m23.t.clk0_pegel_1_0_0
+CONSUME tog.m23.p.clk: 1, tog.m23.p.pegel_1_0_0: 1;
+PRODUCE tog.m23.p.pegel_0_0_0: 1, tog.m23.p.n_clk: 1;
+
+TRANSITION tog.m23.t.clk0_pegel_1_0_1
+CONSUME tog.m23.p.clk: 1, tog.m23.p.pegel_1_0_1: 1;
+PRODUCE tog.m23.p.pegel_0_0_1: 1, tog.m23.p.n_clk: 1;
+
+TRANSITION tog.m23.t.clk0_pegel_1_1_0
+CONSUME tog.m23.p.clk: 1, tog.m23.p.pegel_1_1_0: 1;
+PRODUCE tog.m23.p.pegel_0_1_0: 1, tog.m23.p.n_clk: 1;
+
+
+TRANSITION tog.m23.t.rst1_pegel_0_0_0
+CONSUME tog.m23.p.rst: 1, tog.m23.p.pegel_0_0_0: 1;
+PRODUCE tog.m23.p.pegel_0_1_0: 1, tog.m23.p.n_rst: 1;
+
+TRANSITION tog.m23.t.rst1_pegel_0_0_1
+CONSUME tog.m23.p.rst: 1, tog.m23.p.pegel_0_0_1: 1, tog.m24.p.n_clk: 1;
+PRODUCE tog.m23.p.pegel_0_1_0: 1, tog.m24.p.clk: 1, tog.m23.p.n_rst: 1;
+
+TRANSITION tog.m23.t.rst0_pegel_0_1_0
+CONSUME tog.m23.p.rst: 1, tog.m23.p.pegel_0_1_0: 1;
+PRODUCE tog.m23.p.pegel_0_0_0: 1, tog.m23.p.n_rst: 1;
+
+TRANSITION tog.m23.t.rst1_pegel_1_0_0
+CONSUME tog.m23.p.rst: 1, tog.m23.p.pegel_1_0_0: 1;
+PRODUCE tog.m23.p.pegel_1_1_0: 1, tog.m23.p.n_rst: 1;
+
+TRANSITION tog.m23.t.rst1_pegel_1_0_1
+CONSUME tog.m23.p.rst: 1, tog.m23.p.pegel_1_0_1: 1, tog.m24.p.n_clk: 1;
+PRODUCE tog.m23.p.pegel_1_1_0: 1, tog.m24.p.clk: 1, tog.m23.p.n_rst: 1;
+
+TRANSITION tog.m23.t.rst0_pegel_1_1_0
+CONSUME tog.m23.p.rst: 1, tog.m23.p.pegel_1_1_0: 1;
+PRODUCE tog.m23.p.pegel_1_0_0: 1, tog.m23.p.n_rst: 1;
+
+
+{m24: D-FF mit D=1 und RST}
+
+TRANSITION tog.m24.t.clk0_1_0_0
+CONSUME tog.m24.p.clk: 1, tog.m24.p.pegel_1_0_0: 1;
+PRODUCE tog.m24.p.pegel_0_0_0: 1, tog.m24.p.n_clk: 1;
+
+TRANSITION tog.m24.t.clk0_1_0_1
+CONSUME tog.m24.p.clk: 1, tog.m24.p.pegel_1_0_1: 1;
+PRODUCE tog.m24.p.pegel_0_0_1: 1, tog.m24.p.n_clk: 1;
+
+TRANSITION tog.m24.t.clk0_1_1_0
+CONSUME tog.m24.p.clk: 1, tog.m24.p.pegel_1_1_0: 1;
+PRODUCE tog.m24.p.pegel_0_1_0: 1, tog.m24.p.n_clk: 1;
+
+TRANSITION tog.m24.t.clk1_0_0_0
+CONSUME tog.m24.p.clk: 1, tog.m24.p.pegel_0_0_0: 1, tog.m26.p.n_b_in: 1;
+PRODUCE tog.m24.p.pegel_1_0_1: 1, tog.m26.p.b_in: 1, tog.m24.p.n_clk: 1;
+
+TRANSITION tog.m24.t.clk1_0_0_1
+CONSUME tog.m24.p.clk: 1, tog.m24.p.pegel_0_0_1: 1;
+PRODUCE tog.m24.p.pegel_1_0_1: 1, tog.m24.p.n_clk: 1;
+
+TRANSITION tog.m24.t.clk1_0_1_0
+CONSUME tog.m24.p.clk: 1, tog.m24.p.pegel_0_1_0: 1;
+PRODUCE tog.m24.p.pegel_1_1_0: 1, tog.m24.p.n_clk: 1;
+
+
+TRANSITION tog.m24.t.rst0_0_1_0
+CONSUME tog.m24.p.rst: 1, tog.m24.p.pegel_0_1_0: 1;
+PRODUCE tog.m24.p.pegel_0_0_0: 1, tog.m24.p.n_rst: 1;
+
+TRANSITION tog.m24.t.rst0_1_1_0
+CONSUME tog.m24.p.rst: 1, tog.m24.p.pegel_1_1_0: 1;
+PRODUCE tog.m24.p.pegel_1_0_0: 1, tog.m24.p.n_rst: 1;
+
+TRANSITION tog.m24.t.rst1_1_0_0
+CONSUME tog.m24.p.rst: 1, tog.m24.p.pegel_1_0_0: 1;
+PRODUCE tog.m24.p.pegel_1_1_0: 1, tog.m24.p.n_rst: 1;
+
+TRANSITION tog.m24.t.rst1_1_0_1
+CONSUME tog.m24.p.rst: 1, tog.m24.p.pegel_1_0_1: 1, tog.m26.p.n_b_in: 1;
+PRODUCE tog.m24.p.pegel_1_1_0: 1, tog.m26.p.b_in: 1, tog.m24.p.n_rst: 1;
+
+TRANSITION tog.m24.t.rst1_0_0_0
+CONSUME tog.m24.p.rst: 1, tog.m24.p.pegel_0_0_0: 1;
+PRODUCE tog.m24.p.pegel_0_1_0: 1, tog.m24.p.n_rst: 1;
+
+TRANSITION tog.m24.t.rst1_0_0_1
+CONSUME tog.m24.p.rst: 1, tog.m24.p.pegel_0_0_1: 1, tog.m26.p.n_b_in: 1;
+PRODUCE tog.m24.p.pegel_0_1_0: 1, tog.m26.p.b_in: 1, tog.m24.p.n_rst: 1;
+
+
+{m25: OR}
+
+TRANSITION tog.m25.t.a1_pegel_0_0
+CONSUME tog.m25.p.a: 1, tog.m25.p.pegel_0_0: 1, tog.m24.p.n_rst: 1;
+PRODUCE tog.m25.p.pegel_1_0: 1, tog.m24.p.rst: 1, tog.m25.p.n_a: 1;
+
+TRANSITION tog.m25.t.a1_pegel_0_1
+CONSUME tog.m25.p.a: 1, tog.m25.p.pegel_0_1: 1;
+PRODUCE tog.m25.p.pegel_1_1: 1, tog.m25.p.n_a: 1;
+
+TRANSITION tog.m25.t.a0_pegel_1_0
+CONSUME tog.m25.p.a: 1, tog.m25.p.pegel_1_0: 1, tog.m24.p.n_rst: 1;
+PRODUCE tog.m25.p.pegel_0_0: 1, tog.m24.p.rst: 1, tog.m25.p.n_a: 1;
+
+TRANSITION tog.m25.t.a0_pegel_1_1
+CONSUME tog.m25.p.a: 1, tog.m25.p.pegel_1_1: 1;
+PRODUCE tog.m25.p.pegel_0_1: 1, tog.m25.p.n_a: 1;
+
+
+TRANSITION tog.m25.t.b1_pegel_0_0
+CONSUME tog.m25.p.b: 1, tog.m25.p.pegel_0_0: 1, tog.m24.p.n_rst: 1;
+PRODUCE tog.m25.p.pegel_0_1: 1, tog.m24.p.rst: 1, tog.m25.p.n_b: 1;
+
+TRANSITION tog.m25.t.b0_pegel_0_1
+CONSUME tog.m25.p.b: 1, tog.m25.p.pegel_0_1: 1, tog.m24.p.n_rst: 1;
+PRODUCE tog.m25.p.pegel_0_0: 1, tog.m24.p.rst: 1, tog.m25.p.n_b: 1;
+
+TRANSITION tog.m25.t.b1_pegel_1_0
+CONSUME tog.m25.p.b: 1, tog.m25.p.pegel_1_0: 1;
+PRODUCE tog.m25.p.pegel_1_1: 1, tog.m25.p.n_b: 1;
+
+TRANSITION tog.m25.t.b0_pegel_1_1
+CONSUME tog.m25.p.b: 1, tog.m25.p.pegel_1_1: 1;
+PRODUCE tog.m25.p.pegel_1_0: 1, tog.m25.p.n_b: 1;
+
+
+{m26: Mutex}
+
+TRANSITION tog.m26.t.a1_pegel_0_0_0_0
+CONSUME p.REQ_A: 1, tog.m26.p.pegel_0_0_0_0: 1, ip.m69.p.n_REQ_A1: 1;
+PRODUCE tog.m26.p.pegel_1_0_1_0: 1, ip.m69.p.REQ_A1: 1, p.n_REQ_A: 1;
+
+TRANSITION tog.m26.t.a1_pegel_0_1_0_1
+CONSUME p.REQ_A: 1, tog.m26.p.pegel_0_1_0_1: 1;
+PRODUCE tog.m26.p.pegel_1_1_0_1: 1, p.n_REQ_A: 1;
+
+TRANSITION tog.m26.t.a0_pegel_1_0_1_0
+CONSUME p.REQ_A: 1, tog.m26.p.pegel_1_0_1_0: 1, ip.m69.p.n_REQ_A1: 1;
+PRODUCE tog.m26.p.pegel_0_0_0_0: 1, ip.m69.p.REQ_A1: 1, p.n_REQ_A: 1;
+
+TRANSITION tog.m26.t.a0_pegel_1_1_0_1
+CONSUME p.REQ_A: 1, tog.m26.p.pegel_1_1_0_1: 1;
+PRODUCE tog.m26.p.pegel_0_1_0_1: 1, p.n_REQ_A: 1;
+
+TRANSITION tog.m26.t.a0_pegel_1_1_1_0
+CONSUME p.REQ_A: 1, tog.m26.p.pegel_1_1_1_0: 1, ip.m69.p.n_REQ_A1: 1,
+        tog.m27.p.n_clk: 1;
+PRODUCE tog.m26.p.pegel_0_1_0_1: 1, ip.m69.p.REQ_A1: 1, tog.m27.p.clk: 1,
+        p.n_REQ_A: 1;
+
+
+TRANSITION tog.m26.t.b1_pegel_0_0_0_0
+CONSUME tog.m26.p.b_in: 1, tog.m26.p.pegel_0_0_0_0: 1, tog.m27.p.n_clk: 1;
+PRODUCE tog.m26.p.pegel_0_1_0_1: 1, tog.m27.p.clk: 1, tog.m26.p.n_b_in: 1;
+
+TRANSITION tog.m26.t.b0_pegel_0_1_0_1
+CONSUME tog.m26.p.b_in: 1, tog.m26.p.pegel_0_1_0_1: 1, tog.m27.p.n_clk: 1;
+PRODUCE tog.m26.p.pegel_0_0_0_0: 1, tog.m27.p.clk: 1, tog.m26.p.n_b_in: 1;
+
+TRANSITION tog.m26.t.b1_pegel_1_0_1_0
+CONSUME tog.m26.p.b_in: 1, tog.m26.p.pegel_1_0_1_0: 1;
+PRODUCE tog.m26.p.pegel_1_1_1_0: 1, tog.m26.p.n_b_in: 1;
+
+TRANSITION tog.m26.t.b0_pegel_1_1_0_1
+CONSUME tog.m26.p.b_in: 1, tog.m26.p.pegel_1_1_0_1: 1, ip.m69.p.n_REQ_A1: 1,
+        tog.m27.p.n_clk: 1;
+PRODUCE tog.m26.p.pegel_1_0_1_0: 1, ip.m69.p.REQ_A1: 1, tog.m27.p.clk: 1,
+        tog.m26.p.n_b_in: 1;
+
+TRANSITION tog.m26.t.b0_pegel_1_1_1_0
+CONSUME tog.m26.p.b_in: 1, tog.m26.p.pegel_1_1_1_0: 1;
+PRODUCE tog.m26.p.pegel_1_0_1_0: 1, tog.m26.p.n_b_in: 1;
+
+
+{m27: D-FF mit D=1 und RST}
+
+TRANSITION tog.m27.t.clk0_1_0_0
+CONSUME tog.m27.p.clk: 1, tog.m27.p.pegel_1_0_0: 1;
+PRODUCE tog.m27.p.pegel_0_0_0: 1, tog.m27.p.n_clk: 1;
+
+TRANSITION tog.m27.t.clk0_1_0_1
+CONSUME tog.m27.p.clk: 1, tog.m27.p.pegel_1_0_1: 1;
+PRODUCE tog.m27.p.pegel_0_0_1: 1, tog.m27.p.n_clk: 1;
+
+TRANSITION tog.m27.t.clk0_1_1_0
+CONSUME tog.m27.p.clk: 1, tog.m27.p.pegel_1_1_0: 1;
+PRODUCE tog.m27.p.pegel_0_1_0: 1, tog.m27.p.n_clk: 1;
+
+TRANSITION tog.m27.t.clk1_0_0_0
+CONSUME tog.m27.p.clk: 1, tog.m27.p.pegel_0_0_0: 1, tog.m25.p.n_b: 1,
+        ip.m69.p.n_ST: 1, ip.m66.p.n_a: 1, and.p.n_a: 1;
+PRODUCE tog.m27.p.pegel_1_0_1: 1, tog.m25.p.b: 1, ip.m69.p.ST: 1,
+        ip.m66.p.a: 1, and.p.a: 1, tog.m27.p.n_clk: 1;
+
+TRANSITION tog.m27.t.clk1_0_0_1
+CONSUME tog.m27.p.clk: 1, tog.m27.p.pegel_0_0_1: 1;
+PRODUCE tog.m27.p.pegel_1_0_1: 1, tog.m27.p.n_clk: 1;
+
+TRANSITION tog.m27.t.clk1_0_1_0
+CONSUME tog.m27.p.clk: 1, tog.m27.p.pegel_0_1_0: 1;
+PRODUCE tog.m27.p.pegel_1_1_0: 1, tog.m27.p.n_clk: 1;
+
+
+TRANSITION tog.m27.t.rst0_0_1_0
+CONSUME tog.m27.p.rst: 1, tog.m27.p.pegel_0_1_0: 1;
+PRODUCE tog.m27.p.pegel_0_0_0: 1, tog.m27.p.n_rst: 1;
+
+TRANSITION tog.m27.t.rst0_1_1_0
+CONSUME tog.m27.p.rst: 1, tog.m27.p.pegel_1_1_0: 1;
+PRODUCE tog.m27.p.pegel_1_0_0: 1, tog.m27.p.n_rst: 1;
+
+TRANSITION tog.m27.t.rst1_1_0_0
+CONSUME tog.m27.p.rst: 1, tog.m27.p.pegel_1_0_0: 1;
+PRODUCE tog.m27.p.pegel_1_1_0: 1, tog.m27.p.n_rst: 1;
+
+TRANSITION tog.m27.t.rst1_1_0_1
+CONSUME tog.m27.p.rst: 1, tog.m27.p.pegel_1_0_1: 1, tog.m25.p.n_b: 1,
+        ip.m69.p.n_ST: 1, ip.m66.p.n_a: 1, and.p.n_a: 1;
+PRODUCE tog.m27.p.pegel_1_1_0: 1, tog.m25.p.b: 1, ip.m69.p.ST: 1,
+        ip.m66.p.a: 1, and.p.a: 1, tog.m27.p.n_rst: 1;
+
+TRANSITION tog.m27.t.rst1_0_0_0
+CONSUME tog.m27.p.rst: 1, tog.m27.p.pegel_0_0_0: 1;
+PRODUCE tog.m27.p.pegel_0_1_0: 1, tog.m27.p.n_rst: 1;
+
+TRANSITION tog.m27.t.rst1_0_0_1
+CONSUME tog.m27.p.rst: 1, tog.m27.p.pegel_0_0_1: 1, tog.m25.p.n_b: 1,
+        ip.m69.p.n_ST: 1, ip.m66.p.n_a: 1, and.p.n_a: 1;
+PRODUCE tog.m27.p.pegel_0_1_0: 1, tog.m25.p.b: 1, ip.m69.p.ST: 1,
+        ip.m66.p.a: 1, and.p.a: 1, tog.m27.p.n_rst: 1;
+
+
+
+{Input Port (ip)}
+
+{m61: AND}
+
+TRANSITION ip.m61.t.a1_pegel_0_0
+CONSUME ip.m61.p.a: 1, ip.m61.p.pegel_0_0: 1;
+PRODUCE ip.m61.p.pegel_1_0: 1, ip.m61.p.n_a: 1;
+
+TRANSITION ip.m61.t.a1_pegel_0_1
+CONSUME ip.m61.p.a: 1, ip.m61.p.pegel_0_1: 1, ip.m62.p.n_clk: 1;
+PRODUCE ip.m61.p.pegel_1_1: 1, ip.m62.p.clk: 1, ip.m61.p.n_a: 1;
+
+TRANSITION ip.m61.t.a0_pegel_1_0
+CONSUME ip.m61.p.a: 1, ip.m61.p.pegel_1_0: 1;
+PRODUCE ip.m61.p.pegel_0_0: 1, ip.m61.p.n_a: 1;
+
+TRANSITION ip.m61.t.a0_pegel_1_1
+CONSUME ip.m61.p.a: 1, ip.m61.p.pegel_1_1: 1, ip.m62.p.n_clk: 1;
+PRODUCE ip.m61.p.pegel_0_1: 1, ip.m62.p.clk: 1, ip.m61.p.n_a: 1;
+
+
+TRANSITION ip.m61.t.b1_pegel_0_0
+CONSUME ip.m61.p.b: 1, ip.m61.p.pegel_0_0: 1;
+PRODUCE ip.m61.p.pegel_0_1: 1, ip.m61.p.n_b: 1;
+
+TRANSITION ip.m61.t.b0_pegel_0_1
+CONSUME ip.m61.p.b: 1, ip.m61.p.pegel_0_1: 1;
+PRODUCE ip.m61.p.pegel_0_0: 1, ip.m61.p.n_b: 1;
+
+TRANSITION ip.m61.t.b1_pegel_1_0
+CONSUME ip.m61.p.b: 1, ip.m61.p.pegel_1_0: 1, ip.m62.p.n_clk: 1;
+PRODUCE ip.m61.p.pegel_1_1: 1, ip.m62.p.clk: 1, ip.m61.p.n_b: 1;
+
+TRANSITION ip.m61.t.b0_pegel_1_1
+CONSUME ip.m61.p.b: 1, ip.m61.p.pegel_1_1: 1, ip.m62.p.n_clk: 1;
+PRODUCE ip.m61.p.pegel_1_0: 1, ip.m62.p.clk: 1, ip.m61.p.n_b: 1;
+
+
+{m62: D-FF mit D=0 und SET}
+
+TRANSITION ip.m62.t.clk0_1_0_0
+CONSUME ip.m62.p.clk: 1, ip.m62.p.pegel_1_0_0: 1;
+PRODUCE ip.m62.p.pegel_0_0_0: 1, ip.m62.p.n_clk: 1;
+
+TRANSITION ip.m62.t.clk0_1_0_1
+CONSUME ip.m62.p.clk: 1, ip.m62.p.pegel_1_0_1: 1;
+PRODUCE ip.m62.p.pegel_0_0_1: 1, ip.m62.p.n_clk: 1;
+
+TRANSITION ip.m62.t.clk0_1_1_1
+CONSUME ip.m62.p.clk: 1, ip.m62.p.pegel_1_1_1: 1;
+PRODUCE ip.m62.p.pegel_0_1_1: 1, ip.m62.p.n_clk: 1;
+
+TRANSITION ip.m62.t.clk1_0_0_0
+CONSUME ip.m62.p.clk: 1, ip.m62.p.pegel_0_0_0: 1;
+PRODUCE ip.m62.p.pegel_1_0_0: 1, ip.m62.p.n_clk: 1;
+
+TRANSITION ip.m62.t.clk1_0_0_1
+CONSUME ip.m62.p.clk: 1, ip.m62.p.pegel_0_0_1: 1, lsm.p.n_DATAV_IN: 1;
+PRODUCE ip.m62.p.pegel_1_0_0: 1, lsm.p.DATAV_IN: 1, ip.m62.p.n_clk: 1;
+
+TRANSITION ip.m62.t.clk1_0_1_1
+CONSUME ip.m62.p.clk: 1, ip.m62.p.pegel_0_1_1: 1;
+PRODUCE ip.m62.p.pegel_1_1_1: 1, ip.m62.p.n_clk: 1;
+
+
+TRANSITION ip.m62.t.set1_0_0_0
+CONSUME ip.m62.p.set: 1, ip.m62.p.pegel_0_0_0: 1, lsm.p.n_DATAV_IN: 1;
+PRODUCE ip.m62.p.pegel_0_1_1: 1, lsm.p.DATAV_IN: 1, ip.m62.p.n_set: 1;
+
+TRANSITION ip.m62.t.set1_0_0_1
+CONSUME ip.m62.p.set: 1, ip.m62.p.pegel_0_0_1: 1;
+PRODUCE ip.m62.p.pegel_0_1_1: 1, ip.m62.p.n_set: 1;
+
+TRANSITION ip.m62.t.set0_0_1_1
+CONSUME ip.m62.p.set: 1, ip.m62.p.pegel_0_1_1: 1;
+PRODUCE ip.m62.p.pegel_0_0_1: 1, ip.m62.p.n_set: 1;
+
+TRANSITION ip.m62.t.set1_1_0_0
+CONSUME ip.m62.p.set: 1, ip.m62.p.pegel_1_0_0: 1, lsm.p.n_DATAV_IN: 1;
+PRODUCE ip.m62.p.pegel_1_1_1: 1, lsm.p.DATAV_IN: 1, ip.m62.p.n_set: 1;
+
+TRANSITION ip.m62.t.set1_1_0_1
+CONSUME ip.m62.p.set: 1, ip.m62.p.pegel_1_0_1: 1;
+PRODUCE ip.m62.p.pegel_1_1_1: 1, ip.m62.p.n_set: 1;
+
+TRANSITION ip.m62.t.set0_1_1_1
+CONSUME ip.m62.p.set: 1, ip.m62.p.pegel_1_1_1: 1;
+PRODUCE ip.m62.p.pegel_1_0_1: 1, ip.m62.p.n_set: 1;
+
+
+{m63: AND}
+
+TRANSITION ip.m63.t.a1_pegel_0_0
+CONSUME ip.m63.p.a: 1, ip.m63.p.pegel_0_0: 1;
+PRODUCE ip.m63.p.pegel_1_0: 1, ip.m63.p.n_a: 1;
+
+TRANSITION ip.m63.t.a1_pegel_0_1
+CONSUME ip.m63.p.a: 1, ip.m63.p.pegel_0_1: 1, ip.m65.p.n_a: 1;
+PRODUCE ip.m63.p.pegel_1_1: 1, ip.m65.p.a: 1, ip.m63.p.n_a: 1;
+
+TRANSITION ip.m63.t.a0_pegel_1_0
+CONSUME ip.m63.p.a: 1, ip.m63.p.pegel_1_0: 1;
+PRODUCE ip.m63.p.pegel_0_0: 1, ip.m63.p.n_a: 1;
+
+TRANSITION ip.m63.t.a0_pegel_1_1
+CONSUME ip.m63.p.a: 1, ip.m63.p.pegel_1_1: 1, ip.m65.p.n_a: 1;
+PRODUCE ip.m63.p.pegel_0_1: 1, ip.m65.p.a: 1, ip.m63.p.n_a: 1;
+
+
+TRANSITION ip.m63.t.b1_pegel_0_0
+CONSUME ip.m63.p.b: 1, ip.m63.p.pegel_0_0: 1;
+PRODUCE ip.m63.p.pegel_0_1: 1, ip.m63.p.n_b: 1;
+
+TRANSITION ip.m63.t.b0_pegel_0_1
+CONSUME ip.m63.p.b: 1, ip.m63.p.pegel_0_1: 1;
+PRODUCE ip.m63.p.pegel_0_0: 1, ip.m63.p.n_b: 1;
+
+TRANSITION ip.m63.t.b1_pegel_1_0
+CONSUME ip.m63.p.b: 1, ip.m63.p.pegel_1_0: 1, ip.m65.p.n_a: 1;
+PRODUCE ip.m63.p.pegel_1_1: 1, ip.m65.p.a: 1, ip.m63.p.n_b: 1;
+
+TRANSITION ip.m63.t.b0_pegel_1_1
+CONSUME ip.m63.p.b: 1, ip.m63.p.pegel_1_1: 1, ip.m65.p.n_a: 1;
+PRODUCE ip.m63.p.pegel_1_0: 1, ip.m65.p.a: 1, ip.m63.p.n_b: 1;
+
+
+{m64: AND}
+
+TRANSITION ip.m64.t.a1_pegel_0_0
+CONSUME ip.m64.p.a: 1, ip.m64.p.pegel_0_0: 1;
+PRODUCE ip.m64.p.pegel_1_0: 1, ip.m64.p.n_a: 1;
+
+TRANSITION ip.m64.t.a1_pegel_0_1
+CONSUME ip.m64.p.a: 1, ip.m64.p.pegel_0_1: 1, ip.m65.p.n_b: 1;
+PRODUCE ip.m64.p.pegel_1_1: 1, ip.m65.p.b: 1, ip.m64.p.n_a: 1;
+
+TRANSITION ip.m64.t.a0_pegel_1_0
+CONSUME ip.m64.p.a: 1, ip.m64.p.pegel_1_0: 1;
+PRODUCE ip.m64.p.pegel_0_0: 1, ip.m64.p.n_a: 1;
+
+TRANSITION ip.m64.t.a0_pegel_1_1
+CONSUME ip.m64.p.a: 1, ip.m64.p.pegel_1_1: 1, ip.m65.p.n_b: 1;
+PRODUCE ip.m64.p.pegel_0_1: 1, ip.m65.p.b: 1, ip.m64.p.n_a: 1;
+
+
+TRANSITION ip.m64.t.b1_pegel_0_0
+CONSUME ip.m64.p.b: 1, ip.m64.p.pegel_0_0: 1;
+PRODUCE ip.m64.p.pegel_0_1: 1, ip.m64.p.n_b: 1;
+
+TRANSITION ip.m64.t.b0_pegel_0_1
+CONSUME ip.m64.p.b: 1, ip.m64.p.pegel_0_1: 1;
+PRODUCE ip.m64.p.pegel_0_0: 1, ip.m64.p.n_b: 1;
+
+TRANSITION ip.m64.t.b1_pegel_1_0
+CONSUME ip.m64.p.b: 1, ip.m64.p.pegel_1_0: 1, ip.m65.p.n_b: 1;
+PRODUCE ip.m64.p.pegel_1_1: 1, ip.m65.p.b: 1, ip.m64.p.n_b: 1;
+
+TRANSITION ip.m64.t.b0_pegel_1_1
+CONSUME ip.m64.p.b: 1, ip.m64.p.pegel_1_1: 1, ip.m65.p.n_b: 1;
+PRODUCE ip.m64.p.pegel_1_0: 1, ip.m65.p.b: 1, ip.m64.p.n_b: 1;
+
+
+{m65: OR}
+
+TRANSITION ip.m65.t.a1_pegel_0_0
+CONSUME ip.m65.p.a: 1, ip.m65.p.pegel_0_0: 1, ip.m62.p.n_set: 1;
+PRODUCE ip.m65.p.pegel_1_0: 1, ip.m62.p.set: 1, ip.m65.p.n_a: 1;
+
+TRANSITION ip.m65.t.a1_pegel_0_1
+CONSUME ip.m65.p.a: 1, ip.m65.p.pegel_0_1: 1;
+PRODUCE ip.m65.p.pegel_1_1: 1, ip.m65.p.n_a: 1;
+
+TRANSITION ip.m65.t.a0_pegel_1_0
+CONSUME ip.m65.p.a: 1, ip.m65.p.pegel_1_0: 1, ip.m62.p.n_set: 1;
+PRODUCE ip.m65.p.pegel_0_0: 1, ip.m62.p.set: 1, ip.m65.p.n_a: 1;
+
+TRANSITION ip.m65.t.a0_pegel_1_1
+CONSUME ip.m65.p.a: 1, ip.m65.p.pegel_1_1: 1;
+PRODUCE ip.m65.p.pegel_0_1: 1, ip.m65.p.n_a: 1;
+
+
+TRANSITION ip.m65.t.b1_pegel_0_0
+CONSUME ip.m65.p.b: 1, ip.m65.p.pegel_0_0: 1, ip.m62.p.n_set: 1;
+PRODUCE ip.m65.p.pegel_0_1: 1, ip.m62.p.set: 1, ip.m65.p.n_b: 1;
+
+TRANSITION ip.m65.t.b0_pegel_0_1
+CONSUME ip.m65.p.b: 1, ip.m65.p.pegel_0_1: 1, ip.m62.p.n_set: 1;
+PRODUCE ip.m65.p.pegel_0_0: 1, ip.m62.p.set: 1, ip.m65.p.n_b: 1;
+
+TRANSITION ip.m65.t.b1_pegel_1_0
+CONSUME ip.m65.p.b: 1, ip.m65.p.pegel_1_0: 1;
+PRODUCE ip.m65.p.pegel_1_1: 1, ip.m65.p.n_b: 1;
+
+TRANSITION ip.m65.t.b0_pegel_1_1
+CONSUME ip.m65.p.b: 1, ip.m65.p.pegel_1_1: 1;
+PRODUCE ip.m65.p.pegel_1_0: 1, ip.m65.p.n_b: 1;
+
+
+{m66-m68: AND-AND-OR}
+
+
+TRANSITION ip.m66.t.a1_pegel_0_0_0
+CONSUME ip.m66.p.a: 1, ip.m66.p.pegel_0_0_0: 1;
+PRODUCE ip.m66.p.pegel_1_0_0: 1, ip.m66.p.n_a: 1;
+
+TRANSITION ip.m66.t.a1_pegel_0_0_1
+CONSUME ip.m66.p.a: 1, ip.m66.p.pegel_0_0_1: 1;
+PRODUCE ip.m66.p.pegel_1_0_1: 1, ip.m66.p.n_a: 1;
+
+TRANSITION ip.m66.t.a1_pegel_0_1_0
+CONSUME ip.m66.p.a: 1, ip.m66.p.pegel_0_1_0: 1, ip.m69.p.n_ACKC: 1, ip.m64.p.n_a: 1;
+PRODUCE ip.m66.p.pegel_1_1_0: 1, ip.m66.p.n_a: 1, ip.m69.p.ACKC: 1, ip.m64.p.a: 1;
+
+TRANSITION ip.m66.t.a0_pegel_1_0_0
+CONSUME ip.m66.p.a: 1, ip.m66.p.pegel_1_0_0: 1;
+PRODUCE ip.m66.p.pegel_0_0_0: 1, ip.m66.p.n_a: 1;
+
+TRANSITION ip.m66.t.a0_pegel_1_1_0
+CONSUME ip.m66.p.a: 1, ip.m66.p.pegel_1_1_0: 1, ip.m69.p.n_ACKC: 1, ip.m64.p.n_a: 1;
+PRODUCE ip.m66.p.pegel_0_1_0: 1, ip.m66.p.n_a: 1, ip.m69.p.ACKC: 1, ip.m64.p.a: 1;
+
+TRANSITION ip.m66.t.a0_pegel_1_0_1
+CONSUME ip.m66.p.a: 1, ip.m66.p.pegel_1_0_1: 1;
+PRODUCE ip.m66.p.pegel_0_0_1: 1, ip.m66.p.n_a: 1;
+
+TRANSITION ip.m66.t.a1_pegel_0_1_1
+CONSUME ip.m66.p.a: 1, ip.m66.p.pegel_0_1_1: 1;
+PRODUCE ip.m66.p.pegel_1_1_1: 1, ip.m66.p.n_a: 1;
+
+TRANSITION ip.m66.t.a0_pegel_1_1_1
+CONSUME ip.m66.p.a: 1, ip.m66.p.pegel_1_1_1: 1;
+PRODUCE ip.m66.p.pegel_0_1_1: 1, ip.m66.p.n_a: 1;
+
+
+TRANSITION ip.m66.t.b1_pegel_0_0_0
+CONSUME ip.m66.p.b: 1, ip.m66.p.pegel_0_0_0: 1;
+PRODUCE ip.m66.p.pegel_0_1_0: 1, ip.m66.p.n_b: 1;
+
+TRANSITION ip.m66.t.b1_pegel_0_0_1
+CONSUME ip.m66.p.b: 1, ip.m66.p.pegel_0_0_1: 1, ip.m69.p.n_ACKC: 1, ip.m64.p.n_a: 1;
+PRODUCE ip.m66.p.pegel_0_1_1: 1, ip.m66.p.n_b: 1, ip.m69.p.ACKC: 1, ip.m64.p.a: 1;
+
+TRANSITION ip.m66.t.b0_pegel_0_1_0
+CONSUME ip.m66.p.b: 1, ip.m66.p.pegel_0_1_0: 1;
+PRODUCE ip.m66.p.pegel_0_0_0: 1, ip.m66.p.n_b: 1;
+
+TRANSITION ip.m66.t.b1_pegel_1_0_0
+CONSUME ip.m66.p.b: 1, ip.m66.p.pegel_1_0_0: 1, ip.m69.p.n_ACKC: 1, ip.m64.p.n_a: 1;
+PRODUCE ip.m66.p.pegel_1_1_0: 1, ip.m66.p.n_b: 1, ip.m69.p.ACKC: 1, ip.m64.p.a: 1;
+
+TRANSITION ip.m66.t.b0_pegel_1_1_0
+CONSUME ip.m66.p.b: 1, ip.m66.p.pegel_1_1_0: 1, ip.m69.p.n_ACKC: 1, ip.m64.p.n_a: 1;
+PRODUCE ip.m66.p.pegel_1_0_0: 1, ip.m66.p.n_b: 1, ip.m69.p.ACKC: 1, ip.m64.p.a: 1;
+
+TRANSITION ip.m66.t.b1_pegel_1_0_1
+CONSUME ip.m66.p.b: 1, ip.m66.p.pegel_1_0_1: 1, ip.m69.p.n_ACKC: 1, ip.m64.p.n_a: 1;
+PRODUCE ip.m66.p.pegel_1_1_1: 1, ip.m66.p.n_b: 1, ip.m69.p.ACKC: 1, ip.m64.p.a: 1;
+
+TRANSITION ip.m66.t.b0_pegel_0_1_1
+CONSUME ip.m66.p.b: 1, ip.m66.p.pegel_0_1_1: 1, ip.m69.p.n_ACKC: 1, ip.m64.p.n_a: 1;
+PRODUCE ip.m66.p.pegel_0_0_1: 1, ip.m66.p.n_b: 1, ip.m69.p.ACKC: 1, ip.m64.p.a: 1;
+
+TRANSITION ip.m66.t.b0_pegel_1_1_1
+CONSUME ip.m66.p.b: 1, ip.m66.p.pegel_1_1_1: 1, ip.m69.p.n_ACKC: 1, ip.m64.p.n_a: 1;
+PRODUCE ip.m66.p.pegel_1_0_1: 1, ip.m66.p.n_b: 1, ip.m69.p.ACKC: 1, ip.m64.p.a: 1;
+
+
+TRANSITION ip.m66.t.c1_pegel_0_0_0
+CONSUME ip.m66.p.c: 1, ip.m66.p.pegel_0_0_0: 1;
+PRODUCE ip.m66.p.pegel_0_0_1: 1, ip.m66.p.n_c: 1;
+
+TRANSITION ip.m66.t.c0_pegel_0_0_1
+CONSUME ip.m66.p.c: 1, ip.m66.p.pegel_0_0_1: 1;
+PRODUCE ip.m66.p.pegel_0_0_0: 1, ip.m66.p.n_c: 1;
+
+TRANSITION ip.m66.t.c1_pegel_0_1_0
+CONSUME ip.m66.p.c: 1, ip.m66.p.pegel_0_1_0: 1, ip.m69.p.n_ACKC: 1, ip.m64.p.n_a: 1;
+PRODUCE ip.m66.p.pegel_0_1_1: 1, ip.m66.p.n_c: 1, ip.m69.p.ACKC: 1, ip.m64.p.a: 1;
+
+TRANSITION ip.m66.t.c1_pegel_1_0_0
+CONSUME ip.m66.p.c: 1, ip.m66.p.pegel_1_0_0: 1;
+PRODUCE ip.m66.p.pegel_1_0_1: 1, ip.m66.p.n_c: 1;
+
+TRANSITION ip.m66.t.c1_pegel_1_1_0
+CONSUME ip.m66.p.c: 1, ip.m66.p.pegel_1_1_0: 1;
+PRODUCE ip.m66.p.pegel_1_1_1: 1, ip.m66.p.n_c: 1;
+
+TRANSITION ip.m66.t.c0_pegel_1_0_1
+CONSUME ip.m66.p.c: 1, ip.m66.p.pegel_1_0_1: 1;
+PRODUCE ip.m66.p.pegel_1_0_0: 1, ip.m66.p.n_c: 1;
+
+TRANSITION ip.m66.t.c0_pegel_0_1_1
+CONSUME ip.m66.p.c: 1, ip.m66.p.pegel_0_1_1: 1, ip.m69.p.n_ACKC: 1, ip.m64.p.n_a: 1;
+PRODUCE ip.m66.p.pegel_0_1_0: 1, ip.m66.p.n_c: 1, ip.m69.p.ACKC: 1, ip.m64.p.a: 1;
+
+TRANSITION ip.m66.t.c0_pegel_1_1_1
+CONSUME ip.m66.p.c: 1, ip.m66.p.pegel_1_1_1: 1;
+PRODUCE ip.m66.p.pegel_1_1_0: 1, ip.m66.p.n_c: 1;
+
+
+
+{m69: Input Controller}
+
+TRANSITION ip.m69.t.40
+CONSUME ip.m69.p.0: 1, ip.m69.p.REQ_A1: 1, cc.m11.p.n_rst: 1, or.p.n_a: 1,
+        op.m1.p.n_b: 1, tog.m21.p.n_clk: 1, tog.m27.p.n_rst: 1,
+        cc.m10.p.n_rst: 1, ip.m63.p.n_a: 1, p.n_ACK_A: 1;
+PRODUCE ip.m69.p.1: 1, cc.m11.p.rst: 1, or.p.a: 1, op.m1.p.b: 1,
+        tog.m21.p.clk: 1, tog.m27.p.rst: 1, cc.m10.p.rst: 1, ip.m63.p.a: 1,
+        p.ACK_A: 1, ip.m69.p.n_REQ_A1: 1;
+
+TRANSITION ip.m69.t.41
+CONSUME ip.m69.p.1: 1, ip.m69.p.ACKC: 1, ip.m69.p.REQ_A1: 1,
+        cc.m11.p.n_rst: 1, or.p.n_a: 1, op.m1.p.n_b: 1, tog.m21.p.n_clk: 1,
+        tog.m27.p.n_rst: 1, cc.m10.p.n_rst: 1, ip.m63.p.n_a: 1, p.n_ACK_A: 1;
+PRODUCE ip.m69.p.2: 1, cc.m11.p.rst: 1, or.p.a: 1, op.m1.p.b: 1,
+        tog.m21.p.clk: 1, tog.m27.p.rst: 1, cc.m10.p.rst: 1, ip.m63.p.a: 1,
+        p.ACK_A: 1, ip.m69.p.n_ACKC: 1, ip.m69.p.n_REQ_A1: 1;
+
+TRANSITION ip.m69.t.42
+CONSUME ip.m69.p.2: 1, ip.m69.p.ACKC: 1, ip.m69.p.REQ_A1: 1,
+        tog.m21.p.n_clk: 1, tog.m27.p.n_rst: 1, cc.m10.p.n_rst: 1,
+        cc.m11.p.n_rst: 1, or.p.n_a: 1, op.m1.p.n_b: 1, ip.m63.p.n_a: 1, p.n_ACK_A: 1;
+PRODUCE ip.m69.p.1: 1, tog.m21.p.clk: 1, tog.m27.p.rst: 1, cc.m10.p.rst: 1,
+        cc.m11.p.rst: 1, or.p.a: 1, op.m1.p.b: 1, ip.m63.p.a: 1, 
+	p.ACK_A: 1, ip.m69.p.n_ACKC: 1, ip.m69.p.n_REQ_A1: 1;
+
+TRANSITION ip.m69.t.43
+CONSUME ip.m69.p.2: 1, ip.m69.p.ACKC: 1, ip.m69.p.ST: 1;
+PRODUCE ip.m69.p.3: 1, ip.m69.p.n_ACKC: 1, ip.m69.p.n_ST: 1;
+
+TRANSITION ip.m69.t.44
+CONSUME ip.m69.p.3: 1, ip.m69.p.STOP: 1, tog.m21.p.n_clk: 1,
+        tog.m27.p.n_rst: 1, cc.m10.p.n_rst: 1;
+PRODUCE ip.m69.p.4: 1, tog.m21.p.clk: 1, tog.m27.p.rst: 1, cc.m10.p.rst: 1,
+        ip.m69.p.n_STOP: 1;
+
+TRANSITION ip.m69.t.45
+CONSUME ip.m69.p.4: 1, ip.m69.p.STOP: 1, ip.m69.p.ST: 1,
+        tog.m21.p.n_clk: 1, tog.m27.p.n_rst: 1, cc.m10.p.n_rst: 1;
+PRODUCE ip.m69.p.0: 1, tog.m21.p.clk: 1, tog.m27.p.rst: 1, cc.m10.p.rst: 1,
+        ip.m69.p.n_STOP: 1, ip.m69.p.n_ST: 1;
+
+TRANSITION ip.m69.t.46
+CONSUME ip.m69.p.3: 1, ip.m69.p.REQ_A1: 1, pcg.m2.p.n_a_in: 1;
+PRODUCE ip.m69.p.5: 1, pcg.m2.p.a_in: 1, ip.m69.p.n_REQ_A1: 1;
+
+TRANSITION ip.m69.t.47
+CONSUME ip.m69.p.5: 1, ip.m69.p.ACKI1: 1, ip.m64.p.n_b: 1, ip.m66.p.n_c: 1,
+        pcg.m2.p.n_a_in: 1;
+PRODUCE ip.m69.p.6: 1, ip.m64.p.b: 1, ip.m66.p.c: 1, pcg.m2.p.a_in: 1,
+        ip.m69.p.n_ACKI1: 1;
+
+TRANSITION ip.m69.t.48
+CONSUME ip.m69.p.6: 1, ip.m69.p.ACKI1: 1, ip.m69.p.ACKC: 1;
+PRODUCE ip.m69.p.7: 1, ip.m69.p.n_ACKI1: 1, ip.m69.p.n_ACKC: 1;
+
+TRANSITION ip.m69.t.49
+CONSUME ip.m69.p.7: 1, ip.m69.p.ACKC: 1, ip.m63.p.n_a: 1, p.n_ACK_A: 1,
+        tog.m21.p.n_clk: 1, tog.m27.p.n_rst: 1, cc.m10.p.n_rst: 1;
+PRODUCE ip.m69.p.8: 1, ip.m63.p.a: 1, p.ACK_A: 1, tog.m21.p.clk: 1,
+        tog.m27.p.rst: 1, cc.m10.p.rst: 1, ip.m69.p.n_ACKC: 1;
+
+TRANSITION ip.m69.t.50
+CONSUME ip.m69.p.8: 1, ip.m69.p.REQ_A1: 1, ip.m69.p.ST: 1,
+        ip.m63.p.n_a: 1, p.n_ACK_A: 1, tog.m21.p.n_clk: 1, tog.m27.p.n_rst: 1,
+        cc.m10.p.n_rst: 1, ip.m64.p.n_b: 1, ip.m66.p.n_c: 1;
+PRODUCE ip.m69.p.0: 1, ip.m63.p.a: 1, p.ACK_A: 1, tog.m21.p.clk: 1,
+        tog.m27.p.rst: 1, cc.m10.p.rst: 1, ip.m64.p.b: 1, ip.m66.p.c: 1,
+        ip.m69.p.n_REQ_A1: 1, ip.m69.p.n_ST: 1;
+
+
+
+{Clock Control (cc)}
+
+{m10: Counter}
+
+TRANSITION cc.m10.t.clk1_pegel_0_0_0
+CONSUME cc.m10.p.clk: 1, cc.m10.p.pegel_0_0_0: 1, cc.m11.p.n_clk: 1,
+        ip.m69.p.n_STOP: 1;
+PRODUCE cc.m10.p.pegel_1_0_1: 1, cc.m11.p.clk: 1, ip.m69.p.STOP: 1,
+        cc.m10.p.n_clk: 1;
+
+TRANSITION cc.m10.t.clk1_pegel_0_0_1
+CONSUME cc.m10.p.clk: 1, cc.m10.p.pegel_0_0_1: 1;
+PRODUCE cc.m10.p.pegel_1_0_1: 1, cc.m10.p.n_clk: 1;
+
+TRANSITION cc.m10.t.clk1_pegel_0_1_0
+CONSUME cc.m10.p.clk: 1, cc.m10.p.pegel_0_1_0: 1;
+PRODUCE cc.m10.p.pegel_1_1_0: 1, cc.m10.p.n_clk: 1;
+
+TRANSITION cc.m10.t.clk0_pegel_1_0_0
+CONSUME cc.m10.p.clk: 1, cc.m10.p.pegel_1_0_0: 1;
+PRODUCE cc.m10.p.pegel_0_0_0: 1, cc.m10.p.n_clk: 1;
+
+TRANSITION cc.m10.t.clk0_pegel_1_0_1
+CONSUME cc.m10.p.clk: 1, cc.m10.p.pegel_1_0_1: 1;
+PRODUCE cc.m10.p.pegel_0_0_1: 1, cc.m10.p.n_clk: 1;
+
+TRANSITION cc.m10.t.clk0_pegel_1_1_0
+CONSUME cc.m10.p.clk: 1, cc.m10.p.pegel_1_1_0: 1;
+PRODUCE cc.m10.p.pegel_0_1_0: 1, cc.m10.p.n_clk: 1;
+
+
+TRANSITION cc.m10.t.rst1_pegel_0_0_0
+CONSUME cc.m10.p.rst: 1, cc.m10.p.pegel_0_0_0: 1;
+PRODUCE cc.m10.p.pegel_0_1_0: 1, cc.m10.p.n_rst: 1;
+
+TRANSITION cc.m10.t.rst1_pegel_0_0_1
+CONSUME cc.m10.p.rst: 1, cc.m10.p.pegel_0_0_1: 1, cc.m11.p.n_clk: 1,
+        ip.m69.p.n_STOP: 1;
+PRODUCE cc.m10.p.pegel_0_1_0: 1, cc.m11.p.clk: 1, ip.m69.p.STOP: 1,
+        cc.m10.p.n_rst: 1;
+
+TRANSITION cc.m10.t.rst0_pegel_0_1_0
+CONSUME cc.m10.p.rst: 1, cc.m10.p.pegel_0_1_0: 1;
+PRODUCE cc.m10.p.pegel_0_0_0: 1, cc.m10.p.n_rst: 1;
+
+TRANSITION cc.m10.t.rst1_pegel_1_0_0
+CONSUME cc.m10.p.rst: 1, cc.m10.p.pegel_1_0_0: 1;
+PRODUCE cc.m10.p.pegel_1_1_0: 1, cc.m10.p.n_rst: 1;
+
+TRANSITION cc.m10.t.rst1_pegel_1_0_1
+CONSUME cc.m10.p.rst: 1, cc.m10.p.pegel_1_0_1: 1, cc.m11.p.n_clk: 1,
+        ip.m69.p.n_STOP: 1;
+PRODUCE cc.m10.p.pegel_1_1_0: 1, cc.m11.p.clk: 1, ip.m69.p.STOP: 1,
+        cc.m10.p.n_rst: 1;
+
+TRANSITION cc.m10.t.rst0_pegel_1_1_0
+CONSUME cc.m10.p.rst: 1, cc.m10.p.pegel_1_1_0: 1;
+PRODUCE cc.m10.p.pegel_1_0_0: 1, cc.m10.p.n_rst: 1;
+
+
+{m11: D-FF mit D=1 und RST}
+
+TRANSITION cc.m11.t.clk0_1_0_0
+CONSUME cc.m11.p.clk: 1, cc.m11.p.pegel_1_0_0: 1;
+PRODUCE cc.m11.p.pegel_0_0_0: 1, cc.m11.p.n_clk: 1;
+
+TRANSITION cc.m11.t.clk0_1_0_1
+CONSUME cc.m11.p.clk: 1, cc.m11.p.pegel_1_0_1: 1;
+PRODUCE cc.m11.p.pegel_0_0_1: 1, cc.m11.p.n_clk: 1;
+
+TRANSITION cc.m11.t.clk0_1_1_0
+CONSUME cc.m11.p.clk: 1, cc.m11.p.pegel_1_1_0: 1;
+PRODUCE cc.m11.p.pegel_0_1_0: 1, cc.m11.p.n_clk: 1;
+
+TRANSITION cc.m11.t.clk1_0_0_0
+CONSUME cc.m11.p.clk: 1, cc.m11.p.pegel_0_0_0: 1, pcg.m1.p.n_b: 1;
+PRODUCE cc.m11.p.pegel_1_0_1: 1, pcg.m1.p.b: 1, cc.m11.p.n_clk: 1;
+
+TRANSITION cc.m11.t.clk1_0_0_1
+CONSUME cc.m11.p.clk: 1, cc.m11.p.pegel_0_0_1: 1;
+PRODUCE cc.m11.p.pegel_1_0_1: 1, cc.m11.p.n_clk: 1;
+
+TRANSITION cc.m11.t.clk1_0_1_0
+CONSUME cc.m11.p.clk: 1, cc.m11.p.pegel_0_1_0: 1;
+PRODUCE cc.m11.p.pegel_1_1_0: 1, cc.m11.p.n_clk: 1;
+
+
+TRANSITION cc.m11.t.rst0_0_1_0
+CONSUME cc.m11.p.rst: 1, cc.m11.p.pegel_0_1_0: 1;
+PRODUCE cc.m11.p.pegel_0_0_0: 1, cc.m11.p.n_rst: 1;
+
+TRANSITION cc.m11.t.rst0_1_1_0
+CONSUME cc.m11.p.rst: 1, cc.m11.p.pegel_1_1_0: 1;
+PRODUCE cc.m11.p.pegel_1_0_0: 1, cc.m11.p.n_rst: 1;
+
+TRANSITION cc.m11.t.rst1_1_0_0
+CONSUME cc.m11.p.rst: 1, cc.m11.p.pegel_1_0_0: 1;
+PRODUCE cc.m11.p.pegel_1_1_0: 1, cc.m11.p.n_rst: 1;
+
+TRANSITION cc.m11.t.rst1_1_0_1
+CONSUME cc.m11.p.rst: 1, cc.m11.p.pegel_1_0_1: 1, pcg.m1.p.n_b: 1;
+PRODUCE cc.m11.p.pegel_1_1_0: 1, pcg.m1.p.b: 1, cc.m11.p.n_rst: 1;
+
+TRANSITION cc.m11.t.rst1_0_0_0
+CONSUME cc.m11.p.rst: 1, cc.m11.p.pegel_0_0_0: 1;
+PRODUCE cc.m11.p.pegel_0_1_0: 1, cc.m11.p.n_rst: 1;
+
+TRANSITION cc.m11.t.rst1_0_0_1
+CONSUME cc.m11.p.rst: 1, cc.m11.p.pegel_0_0_1: 1, pcg.m1.p.n_b: 1;
+PRODUCE cc.m11.p.pegel_0_1_0: 1, pcg.m1.p.b: 1, cc.m11.p.n_rst: 1;
+
+
+
+
+{Pausable Clock Generator (pcg)}
+
+{m1: NOR}
+
+TRANSITION pcg.m1.t.a1_pegel_0_0
+CONSUME pcg.m1.p.a: 1, pcg.m1.p.pegel_0_0: 1, pcg.m5.p.n_b: 1,
+        pcg.m2.p.n_b_in: 1, pcg.m3.p.n_b_in: 1;
+PRODUCE pcg.m1.p.pegel_1_0: 1, pcg.m5.p.b: 1, pcg.m2.p.b_in: 1,
+        pcg.m3.p.b_in: 1, pcg.m1.p.n_a: 1;
+
+TRANSITION pcg.m1.t.a1_pegel_0_1
+CONSUME pcg.m1.p.a: 1, pcg.m1.p.pegel_0_1: 1;
+PRODUCE pcg.m1.p.pegel_1_1: 1, pcg.m1.p.n_a: 1;
+
+TRANSITION pcg.m1.t.a0_pegel_1_0
+CONSUME pcg.m1.p.a: 1, pcg.m1.p.pegel_1_0: 1, pcg.m5.p.n_b: 1,
+        pcg.m2.p.n_b_in: 1, pcg.m3.p.n_b_in: 1;
+PRODUCE pcg.m1.p.pegel_0_0: 1, pcg.m5.p.b: 1, pcg.m2.p.b_in: 1,
+        pcg.m3.p.b_in: 1, pcg.m1.p.n_a: 1;
+
+TRANSITION pcg.m1.t.a0_pegel_1_1
+CONSUME pcg.m1.p.a: 1, pcg.m1.p.pegel_1_1: 1;
+PRODUCE pcg.m1.p.pegel_0_1: 1, pcg.m1.p.n_a: 1;
+
+
+TRANSITION pcg.m1.t.b1_pegel_0_0
+CONSUME pcg.m1.p.b: 1, pcg.m1.p.pegel_0_0: 1, pcg.m5.p.n_b: 1,
+        pcg.m2.p.n_b_in: 1, pcg.m3.p.n_b_in: 1;
+PRODUCE pcg.m1.p.pegel_0_1: 1, pcg.m5.p.b: 1, pcg.m2.p.b_in: 1,
+        pcg.m3.p.b_in: 1, pcg.m1.p.n_b: 1;
+
+TRANSITION pcg.m1.t.b0_pegel_0_1
+CONSUME pcg.m1.p.b: 1, pcg.m1.p.pegel_0_1: 1, pcg.m5.p.n_b: 1,
+        pcg.m2.p.n_b_in: 1, pcg.m3.p.n_b_in: 1;
+PRODUCE pcg.m1.p.pegel_0_0: 1, pcg.m5.p.b: 1, pcg.m2.p.b_in: 1,
+        pcg.m3.p.b_in: 1, pcg.m1.p.n_b: 1;
+
+TRANSITION pcg.m1.t.b1_pegel_1_0
+CONSUME pcg.m1.p.b: 1, pcg.m1.p.pegel_1_0: 1;
+PRODUCE pcg.m1.p.pegel_1_1: 1, pcg.m1.p.n_b: 1;
+
+TRANSITION pcg.m1.t.b0_pegel_1_1
+CONSUME pcg.m1.p.b: 1, pcg.m1.p.pegel_1_1: 1;
+PRODUCE pcg.m1.p.pegel_1_0: 1, pcg.m1.p.n_b: 1;
+
+
+{m2: Mutex}
+
+TRANSITION pcg.m2.t.a1_pegel_0_0_0_0
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_0_0_0_0: 1, ip.m69.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0: 1, ip.m69.p.ACKI1: 1, pcg.m2.p.n_a_in: 1;
+
+TRANSITION pcg.m2.t.a1_pegel_0_1_0_1
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_0_1_0_1: 1;
+PRODUCE pcg.m2.p.pegel_1_1_0_1: 1, pcg.m2.p.n_a_in: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_1_0_1_0
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_1_0_1_0: 1, ip.m69.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_0_0_0_0: 1, ip.m69.p.ACKI1: 1, pcg.m2.p.n_a_in: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_1_1_0_1
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_1_1_0_1: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, pcg.m2.p.n_a_in: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_1_1_1_0
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_1_1_1_0: 1, ip.m69.p.n_ACKI1: 1,
+        pcg.m4.p.n_b: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, ip.m69.p.ACKI1: 1, pcg.m4.p.b: 1,
+        pcg.m2.p.n_a_in: 1;
+
+
+TRANSITION pcg.m2.t.b1_pegel_0_0_0_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_0_0_0_0: 1, pcg.m4.p.n_b: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, pcg.m4.p.b: 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_0_1_0_1
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.m4.p.n_b: 1;
+PRODUCE pcg.m2.p.pegel_0_0_0_0: 1, pcg.m4.p.b: 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b1_pegel_1_0_1_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_1_0_1_0: 1;
+PRODUCE pcg.m2.p.pegel_1_1_1_0: 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_1_1_0_1
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_1_1_0_1: 1, ip.m69.p.n_ACKI1: 1,
+        pcg.m4.p.n_b: 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0: 1, ip.m69.p.ACKI1: 1, pcg.m4.p.b: 1,
+        pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_1_1_1_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_1_1_1_0: 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0: 1, pcg.m2.p.n_b_in: 1;
+
+
+{m3: Mutex}
+
+TRANSITION pcg.m3.t.a1_pegel_0_0_0_0
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_0_0_0_0: 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0: 1, pcg.m3.p.n_a_in: 1;
+
+TRANSITION pcg.m3.t.a1_pegel_0_1_0_1
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_0_1_0_1: 1;
+PRODUCE pcg.m3.p.pegel_1_1_0_1: 1, pcg.m3.p.n_a_in: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_1_0_1_0
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_1_0_1_0: 1;
+PRODUCE pcg.m3.p.pegel_0_0_0_0: 1, pcg.m3.p.n_a_in: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_1_1_0_1
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_1_1_0_1: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m3.p.n_a_in: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_1_1_1_0
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_1_1_1_0: 1, pcg.m4.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m4.p.a: 1,
+        pcg.m3.p.n_a_in: 1;
+
+
+TRANSITION pcg.m3.t.b1_pegel_0_0_0_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_0_0_0_0: 1, pcg.m4.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m4.p.a: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_0_1_0_1
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.m4.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_0_0_0_0: 1, pcg.m4.p.a: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b1_pegel_1_0_1_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_1_0_1_0: 1;
+PRODUCE pcg.m3.p.pegel_1_1_1_0: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_1_1_0_1
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.m4.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0: 1, pcg.m4.p.a: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_1_1_1_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_1_1_1_0: 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0: 1, pcg.m3.p.n_b_in: 1;
+
+
+{m4: AND}
+
+TRANSITION pcg.m4.t.a1_pegel_0_0
+CONSUME pcg.m4.p.a: 1, pcg.m4.p.pegel_0_0: 1;
+PRODUCE pcg.m4.p.pegel_1_0: 1, pcg.m4.p.n_a: 1;
+
+TRANSITION pcg.m4.t.a1_pegel_0_1
+CONSUME pcg.m4.p.a: 1, pcg.m4.p.pegel_0_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m4.p.pegel_1_1: 1, pcg.m5.p.a: 1, pcg.m4.p.n_a: 1;
+
+TRANSITION pcg.m4.t.a0_pegel_1_0
+CONSUME pcg.m4.p.a: 1, pcg.m4.p.pegel_1_0: 1;
+PRODUCE pcg.m4.p.pegel_0_0: 1, pcg.m4.p.n_a: 1;
+
+TRANSITION pcg.m4.t.a0_pegel_1_1
+CONSUME pcg.m4.p.a: 1, pcg.m4.p.pegel_1_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m4.p.pegel_0_1: 1, pcg.m5.p.a: 1, pcg.m4.p.n_a: 1;
+
+
+TRANSITION pcg.m4.t.b1_pegel_0_0
+CONSUME pcg.m4.p.b: 1, pcg.m4.p.pegel_0_0: 1;
+PRODUCE pcg.m4.p.pegel_0_1: 1, pcg.m4.p.n_b: 1;
+
+TRANSITION pcg.m4.t.b0_pegel_0_1
+CONSUME pcg.m4.p.b: 1, pcg.m4.p.pegel_0_1: 1;
+PRODUCE pcg.m4.p.pegel_0_0: 1, pcg.m4.p.n_b: 1;
+
+TRANSITION pcg.m4.t.b1_pegel_1_0
+CONSUME pcg.m4.p.b: 1, pcg.m4.p.pegel_1_0: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m4.p.pegel_1_1: 1, pcg.m5.p.a: 1, pcg.m4.p.n_b: 1;
+
+TRANSITION pcg.m4.t.b0_pegel_1_1
+CONSUME pcg.m4.p.b: 1, pcg.m4.p.pegel_1_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m4.p.pegel_1_0: 1, pcg.m5.p.a: 1, pcg.m4.p.n_b: 1;
+
+
+{m5: MCE}
+
+TRANSITION pcg.m5.t.a1_pegel_0_0_0
+CONSUME pcg.m5.p.a: 1, pcg.m5.p.pegel_0_0_0: 1;
+PRODUCE pcg.m5.p.pegel_1_0_0: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a1_pegel_0_1_0
+CONSUME pcg.m5.p.a: 1, pcg.m5.p.pegel_0_1_0: 1, pcg.m1.p.n_a: 1,
+        tog.m20.p.n_clk: 1, and.p.n_b: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m1.p.a: 1, tog.m20.p.clk: 1, and.p.b: 1,
+        pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a0_pegel_1_0_0
+CONSUME pcg.m5.p.a: 1, pcg.m5.p.pegel_1_0_0: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a0_pegel_1_0_1
+CONSUME pcg.m5.p.a: 1, pcg.m5.p.pegel_1_0_1: 1, pcg.m1.p.n_a: 1,
+        tog.m20.p.n_clk: 1, and.p.n_b: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m1.p.a: 1, tog.m20.p.clk: 1, and.p.b: 1,
+        pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a1_pegel_0_1_1
+CONSUME pcg.m5.p.a: 1, pcg.m5.p.pegel_0_1_1: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a0_pegel_1_1_1
+CONSUME pcg.m5.p.a: 1, pcg.m5.p.pegel_1_1_1: 1;
+PRODUCE pcg.m5.p.pegel_0_1_1: 1, pcg.m5.p.n_a: 1;
+
+
+TRANSITION pcg.m5.t.b1_pegel_0_0_0
+CONSUME pcg.m5.p.b: 1, pcg.m5.p.pegel_0_0_0: 1;
+PRODUCE pcg.m5.p.pegel_0_1_0: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b0_pegel_0_1_0
+CONSUME pcg.m5.p.b: 1, pcg.m5.p.pegel_0_1_0: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b1_pegel_1_0_0
+CONSUME pcg.m5.p.b: 1, pcg.m5.p.pegel_1_0_0: 1, pcg.m1.p.n_a: 1,
+        tog.m20.p.n_clk: 1, and.p.n_b: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m1.p.a: 1, tog.m20.p.clk: 1, and.p.b: 1,
+        pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b1_pegel_1_0_1
+CONSUME pcg.m5.p.b: 1, pcg.m5.p.pegel_1_0_1: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b0_pegel_0_1_1
+CONSUME pcg.m5.p.b: 1, pcg.m5.p.pegel_0_1_1: 1, pcg.m1.p.n_a: 1,
+        tog.m20.p.n_clk: 1, and.p.n_b: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m1.p.a: 1, tog.m20.p.clk: 1, and.p.b: 1,
+        pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b0_pegel_1_1_1
+CONSUME pcg.m5.p.b: 1, pcg.m5.p.pegel_1_1_1: 1;
+PRODUCE pcg.m5.p.pegel_1_0_1: 1, pcg.m5.p.n_b: 1;
+
+
+
+{AND}
+
+TRANSITION and.t.a1_pegel_0_0
+CONSUME and.p.a: 1, and.p.pegel_0_0: 1;
+PRODUCE and.p.pegel_1_0: 1, and.p.n_a: 1;
+
+TRANSITION and.t.a1_pegel_0_1
+CONSUME and.p.a: 1, and.p.pegel_0_1: 1, ip.m61.p.n_a: 1, or.p.n_b: 1,
+        op.m1.p.n_a: 1, cc.m10.p.n_clk: 1;
+PRODUCE and.p.pegel_1_1: 1, ip.m61.p.a: 1, or.p.b: 1, op.m1.p.a: 1,
+        cc.m10.p.clk: 1, and.p.n_a: 1;
+
+TRANSITION and.t.a0_pegel_1_0
+CONSUME and.p.a: 1, and.p.pegel_1_0: 1;
+PRODUCE and.p.pegel_0_0: 1, and.p.n_a: 1;
+
+TRANSITION and.t.a0_pegel_1_1
+CONSUME and.p.a: 1, and.p.pegel_1_1: 1, ip.m61.p.n_a: 1, or.p.n_b: 1,
+        op.m1.p.n_a: 1, cc.m10.p.n_clk: 1;
+PRODUCE and.p.pegel_0_1: 1, ip.m61.p.a: 1, or.p.b: 1, op.m1.p.a: 1,
+        cc.m10.p.clk: 1, and.p.n_a: 1;
+
+
+TRANSITION and.t.b1_pegel_0_0
+CONSUME and.p.b: 1, and.p.pegel_0_0: 1;
+PRODUCE and.p.pegel_0_1: 1, and.p.n_b: 1;
+
+TRANSITION and.t.b0_pegel_0_1
+CONSUME and.p.b: 1, and.p.pegel_0_1: 1;
+PRODUCE and.p.pegel_0_0: 1, and.p.n_b: 1;
+
+TRANSITION and.t.b1_pegel_1_0
+CONSUME and.p.b: 1, and.p.pegel_1_0: 1, ip.m61.p.n_a: 1, or.p.n_b: 1,
+        op.m1.p.n_a: 1, cc.m10.p.n_clk: 1;
+PRODUCE and.p.pegel_1_1: 1, ip.m61.p.a: 1, or.p.b: 1, op.m1.p.a: 1,
+        cc.m10.p.clk: 1, and.p.n_b: 1;
+
+TRANSITION and.t.b0_pegel_1_1
+CONSUME and.p.b: 1, and.p.pegel_1_1: 1, ip.m61.p.n_a: 1, or.p.n_b: 1,
+        op.m1.p.n_a: 1, cc.m10.p.n_clk: 1;
+PRODUCE and.p.pegel_1_0: 1, ip.m61.p.a: 1, or.p.b: 1, op.m1.p.a: 1,
+        cc.m10.p.clk: 1, and.p.n_b: 1;
+
+
+
+{OR}
+
+TRANSITION or.t.a1_pegel_0_0
+CONSUME or.p.a: 1, or.p.pegel_0_0: 1, ip.m61.p.n_b: 1, ip.m63.p.n_b: 1,
+        lsm.p.n_INT_CLK: 1, op.m2.p.n_clk: 1, op.m3.p.n_clk: 1;
+PRODUCE or.p.pegel_1_0: 1, ip.m61.p.b: 1, ip.m63.p.b: 1, lsm.p.INT_CLK: 1,
+        op.m2.p.clk: 1, op.m3.p.clk: 1, or.p.n_a: 1;
+
+TRANSITION or.t.a1_pegel_0_1
+CONSUME or.p.a: 1, or.p.pegel_0_1: 1;
+PRODUCE or.p.pegel_1_1: 1, or.p.n_a: 1;
+
+TRANSITION or.t.a0_pegel_1_0
+CONSUME or.p.a: 1, or.p.pegel_1_0: 1, ip.m61.p.n_b: 1, ip.m63.p.n_b: 1,
+        lsm.p.n_INT_CLK: 1, op.m2.p.n_clk: 1, op.m3.p.n_clk: 1;
+PRODUCE or.p.pegel_0_0: 1, ip.m61.p.b: 1, ip.m63.p.b: 1, lsm.p.INT_CLK: 1,
+        op.m2.p.clk: 1, op.m3.p.clk: 1, or.p.n_a: 1;
+
+TRANSITION or.t.a0_pegel_1_1
+CONSUME or.p.a: 1, or.p.pegel_1_1: 1;
+PRODUCE or.p.pegel_0_1: 1, or.p.n_a: 1;
+
+
+TRANSITION or.t.b1_pegel_0_0
+CONSUME or.p.b: 1, or.p.pegel_0_0: 1, ip.m61.p.n_b: 1, ip.m63.p.n_b: 1,
+        lsm.p.n_INT_CLK: 1, op.m2.p.n_clk: 1, op.m3.p.n_clk: 1;
+PRODUCE or.p.pegel_0_1: 1, ip.m61.p.b: 1, ip.m63.p.b: 1, lsm.p.INT_CLK: 1,
+        op.m2.p.clk: 1, op.m3.p.clk: 1, or.p.n_b: 1;
+
+TRANSITION or.t.b0_pegel_0_1
+CONSUME or.p.b: 1, or.p.pegel_0_1: 1, ip.m61.p.n_b: 1, ip.m63.p.n_b: 1,
+        lsm.p.n_INT_CLK: 1, op.m2.p.n_clk: 1, op.m3.p.n_clk: 1;
+PRODUCE or.p.pegel_0_0: 1, ip.m61.p.b: 1, ip.m63.p.b: 1, lsm.p.INT_CLK: 1,
+        op.m2.p.clk: 1, op.m3.p.clk: 1, or.p.n_b: 1;
+
+TRANSITION or.t.b1_pegel_1_0
+CONSUME or.p.b: 1, or.p.pegel_1_0: 1;
+PRODUCE or.p.pegel_1_1: 1, or.p.n_b: 1;
+
+TRANSITION or.t.b0_pegel_1_1
+CONSUME or.p.b: 1, or.p.pegel_1_1: 1;
+PRODUCE or.p.pegel_1_0: 1, or.p.n_b: 1;
+
+
+
+{Output Port (op)}
+
+{m1: OR}
+
+TRANSITION op.m1.t.a1_pegel_0_0
+CONSUME op.m1.p.a: 1, op.m1.p.pegel_0_0: 1, op.m2.p.n_rst: 1, op.m3.p.n_rst: 1,
+        op.m4.p.n_CLK: 1;
+PRODUCE op.m1.p.pegel_1_0: 1, op.m2.p.rst: 1, op.m3.p.rst: 1, op.m4.p.CLK: 1,
+        op.m1.p.n_a: 1;
+
+TRANSITION op.m1.t.a1_pegel_0_1
+CONSUME op.m1.p.a: 1, op.m1.p.pegel_0_1: 1;
+PRODUCE op.m1.p.pegel_1_1: 1, op.m1.p.n_a: 1;
+
+TRANSITION op.m1.t.a0_pegel_1_0
+CONSUME op.m1.p.a: 1, op.m1.p.pegel_1_0: 1, op.m2.p.n_rst: 1, op.m3.p.n_rst: 1,
+        op.m4.p.n_CLK: 1;
+PRODUCE op.m1.p.pegel_0_0: 1, op.m2.p.rst: 1, op.m3.p.rst: 1, op.m4.p.CLK: 1,
+        op.m1.p.n_a: 1;
+
+TRANSITION op.m1.t.a0_pegel_1_1
+CONSUME op.m1.p.a: 1, op.m1.p.pegel_1_1: 1;
+PRODUCE op.m1.p.pegel_0_1: 1, op.m1.p.n_a: 1;
+
+
+TRANSITION op.m1.t.b1_pegel_0_0
+CONSUME op.m1.p.b: 1, op.m1.p.pegel_0_0: 1, op.m2.p.n_rst: 1, op.m3.p.n_rst: 1,
+        op.m4.p.n_CLK: 1;
+PRODUCE op.m1.p.pegel_0_1: 1, op.m2.p.rst: 1, op.m3.p.rst: 1, op.m4.p.CLK: 1,
+        op.m1.p.n_b: 1;
+
+TRANSITION op.m1.t.b0_pegel_0_1
+CONSUME op.m1.p.b: 1, op.m1.p.pegel_0_1: 1, op.m2.p.n_rst: 1, op.m3.p.n_rst: 1,
+        op.m4.p.n_CLK: 1;
+PRODUCE op.m1.p.pegel_0_0: 1, op.m2.p.rst: 1, op.m3.p.rst: 1, op.m4.p.CLK: 1,
+        op.m1.p.n_b: 1;
+
+TRANSITION op.m1.t.b1_pegel_1_0
+CONSUME op.m1.p.b: 1, op.m1.p.pegel_1_0: 1;
+PRODUCE op.m1.p.pegel_1_1: 1, op.m1.p.n_b: 1;
+
+TRANSITION op.m1.t.b0_pegel_1_1
+CONSUME op.m1.p.b: 1, op.m1.p.pegel_1_1: 1;
+PRODUCE op.m1.p.pegel_1_0: 1, op.m1.p.n_b: 1;
+
+
+{m2: D-FF mit D beliebig und RST}
+
+TRANSITION op.m2.t.d0_0_1_0_0
+CONSUME op.m2.p.d: 1, op.m2.p.pegel_0_1_0_0: 1;
+PRODUCE op.m2.p.pegel_0_0_0_0: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d0_0_1_0_1
+CONSUME op.m2.p.d: 1, op.m2.p.pegel_0_1_0_1: 1;
+PRODUCE op.m2.p.pegel_0_0_0_1: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d0_0_1_1_0
+CONSUME op.m2.p.d: 1, op.m2.p.pegel_0_1_1_0: 1;
+PRODUCE op.m2.p.pegel_0_0_1_0: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d1_0_0_0_0
+CONSUME op.m2.p.d: 1, op.m2.p.pegel_0_0_0_0: 1;
+PRODUCE op.m2.p.pegel_0_1_0_0: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d1_0_0_0_1
+CONSUME op.m2.p.d: 1, op.m2.p.pegel_0_0_0_1: 1;
+PRODUCE op.m2.p.pegel_0_1_0_1: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d1_0_0_1_0
+CONSUME op.m2.p.d: 1, op.m2.p.pegel_0_0_1_0: 1;
+PRODUCE op.m2.p.pegel_0_1_1_0: 1, op.m2.p.n_d: 1;
+
+
+TRANSITION op.m2.t.d0_1_1_0_0
+CONSUME op.m2.p.d: 1, op.m2.p.pegel_1_1_0_0: 1;
+PRODUCE op.m2.p.pegel_1_0_0_0: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d0_1_1_0_1
+CONSUME op.m2.p.d: 1, op.m2.p.pegel_1_1_0_1: 1;
+PRODUCE op.m2.p.pegel_1_0_0_1: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d0_1_1_1_0
+CONSUME op.m2.p.d: 1, op.m2.p.pegel_1_1_1_0: 1;
+PRODUCE op.m2.p.pegel_1_0_1_0: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d1_1_0_0_0
+CONSUME op.m2.p.d: 1, op.m2.p.pegel_1_0_0_0: 1;
+PRODUCE op.m2.p.pegel_1_1_0_0: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d1_1_0_0_1
+CONSUME op.m2.p.d: 1, op.m2.p.pegel_1_0_0_1: 1;
+PRODUCE op.m2.p.pegel_1_1_0_1: 1, op.m2.p.n_d: 1;
+
+TRANSITION op.m2.t.d1_1_0_1_0
+CONSUME op.m2.p.d: 1, op.m2.p.pegel_1_0_1_0: 1;
+PRODUCE op.m2.p.pegel_1_1_1_0: 1, op.m2.p.n_d: 1;
+
+
+TRANSITION op.m2.t.clk0_1_0_0_0
+CONSUME op.m2.p.clk: 1, op.m2.p.pegel_1_0_0_0: 1;
+PRODUCE op.m2.p.pegel_0_0_0_0: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk0_1_0_0_1
+CONSUME op.m2.p.clk: 1, op.m2.p.pegel_1_0_0_1: 1;
+PRODUCE op.m2.p.pegel_0_0_0_1: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk0_1_0_1_0
+CONSUME op.m2.p.clk: 1, op.m2.p.pegel_1_0_1_0: 1;
+PRODUCE op.m2.p.pegel_0_0_1_0: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk0_1_1_0_0
+CONSUME op.m2.p.clk: 1, op.m2.p.pegel_1_1_0_0: 1;
+PRODUCE op.m2.p.pegel_0_1_0_0: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk0_1_1_0_1
+CONSUME op.m2.p.clk: 1, op.m2.p.pegel_1_1_0_1: 1;
+PRODUCE op.m2.p.pegel_0_1_0_1: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk0_1_1_1_0
+CONSUME op.m2.p.clk: 1, op.m2.p.pegel_1_1_1_0: 1;
+PRODUCE op.m2.p.pegel_0_1_1_0: 1, op.m2.p.n_clk: 1;
+
+
+TRANSITION op.m2.t.clk1_0_0_0_0
+CONSUME op.m2.p.clk: 1, op.m2.p.pegel_0_0_0_0: 1;
+PRODUCE op.m2.p.pegel_1_0_0_0: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk1_0_0_0_1
+CONSUME op.m2.p.clk: 1, op.m2.p.pegel_0_0_0_1: 1, op.m4.p.n_DONV: 1;
+PRODUCE op.m2.p.pegel_1_0_0_0: 1, op.m4.p.DONV: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk1_0_0_1_0
+CONSUME op.m2.p.clk: 1, op.m2.p.pegel_0_0_1_0: 1;
+PRODUCE op.m2.p.pegel_1_0_1_0: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk1_0_1_0_0
+CONSUME op.m2.p.clk: 1, op.m2.p.pegel_0_1_0_0: 1, op.m4.p.n_DONV: 1;
+PRODUCE op.m2.p.pegel_1_1_0_1: 1, op.m4.p.DONV: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk1_0_1_0_1
+CONSUME op.m2.p.clk: 1, op.m2.p.pegel_0_1_0_1: 1;
+PRODUCE op.m2.p.pegel_1_1_0_1: 1, op.m2.p.n_clk: 1;
+
+TRANSITION op.m2.t.clk1_0_1_1_0
+CONSUME op.m2.p.clk: 1, op.m2.p.pegel_0_1_1_0: 1;
+PRODUCE op.m2.p.pegel_1_1_1_0: 1, op.m2.p.n_clk: 1;
+
+
+TRANSITION op.m2.t.rst0_0_0_1_0
+CONSUME op.m2.p.rst: 1, op.m2.p.pegel_0_0_1_0: 1;
+PRODUCE op.m2.p.pegel_0_0_0_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst0_0_1_1_0
+CONSUME op.m2.p.rst: 1, op.m2.p.pegel_0_1_1_0: 1;
+PRODUCE op.m2.p.pegel_0_1_0_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_0_0_0_0
+CONSUME op.m2.p.rst: 1, op.m2.p.pegel_0_0_0_0: 1;
+PRODUCE op.m2.p.pegel_0_0_1_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_0_0_0_1
+CONSUME op.m2.p.rst: 1, op.m2.p.pegel_0_0_0_1: 1, op.m4.p.n_DONV: 1;
+PRODUCE op.m2.p.pegel_0_0_1_0: 1, op.m4.p.DONV: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_0_1_0_0
+CONSUME op.m2.p.rst: 1, op.m2.p.pegel_0_1_0_0: 1;
+PRODUCE op.m2.p.pegel_0_1_1_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_0_1_0_1
+CONSUME op.m2.p.rst: 1, op.m2.p.pegel_0_1_0_1: 1, op.m4.p.n_DONV: 1;
+PRODUCE op.m2.p.pegel_0_1_1_0: 1, op.m4.p.DONV: 1, op.m2.p.n_rst: 1;
+
+
+TRANSITION op.m2.t.rst0_1_0_1_0
+CONSUME op.m2.p.rst: 1, op.m2.p.pegel_1_0_1_0: 1;
+PRODUCE op.m2.p.pegel_1_0_0_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst0_1_1_1_0
+CONSUME op.m2.p.rst: 1, op.m2.p.pegel_1_1_1_0: 1;
+PRODUCE op.m2.p.pegel_1_1_0_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_1_0_0_0
+CONSUME op.m2.p.rst: 1, op.m2.p.pegel_1_0_0_0: 1;
+PRODUCE op.m2.p.pegel_1_0_1_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_1_0_0_1
+CONSUME op.m2.p.rst: 1, op.m2.p.pegel_1_0_0_1: 1, op.m4.p.n_DONV: 1;
+PRODUCE op.m2.p.pegel_1_0_1_0: 1, op.m4.p.DONV: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_1_1_0_0
+CONSUME op.m2.p.rst: 1, op.m2.p.pegel_1_1_0_0: 1;
+PRODUCE op.m2.p.pegel_1_1_1_0: 1, op.m2.p.n_rst: 1;
+
+TRANSITION op.m2.t.rst1_1_1_0_1
+CONSUME op.m2.p.rst: 1, op.m2.p.pegel_1_1_0_1: 1, op.m4.p.n_DONV: 1;
+PRODUCE op.m2.p.pegel_1_1_1_0: 1, op.m4.p.DONV: 1, op.m2.p.n_rst: 1;
+
+
+{m3: D-FF mit D beliebig und RST}
+
+TRANSITION op.m3.t.d0_0_1_0_0
+CONSUME op.m3.p.d: 1, op.m3.p.pegel_0_1_0_0: 1;
+PRODUCE op.m3.p.pegel_0_0_0_0: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d0_0_1_0_1
+CONSUME op.m3.p.d: 1, op.m3.p.pegel_0_1_0_1: 1;
+PRODUCE op.m3.p.pegel_0_0_0_1: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d0_0_1_1_0
+CONSUME op.m3.p.d: 1, op.m3.p.pegel_0_1_1_0: 1;
+PRODUCE op.m3.p.pegel_0_0_1_0: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d1_0_0_0_0
+CONSUME op.m3.p.d: 1, op.m3.p.pegel_0_0_0_0: 1;
+PRODUCE op.m3.p.pegel_0_1_0_0: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d1_0_0_0_1
+CONSUME op.m3.p.d: 1, op.m3.p.pegel_0_0_0_1: 1;
+PRODUCE op.m3.p.pegel_0_1_0_1: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d1_0_0_1_0
+CONSUME op.m3.p.d: 1, op.m3.p.pegel_0_0_1_0: 1;
+PRODUCE op.m3.p.pegel_0_1_1_0: 1, op.m3.p.n_d: 1;
+
+
+TRANSITION op.m3.t.d0_1_1_0_0
+CONSUME op.m3.p.d: 1, op.m3.p.pegel_1_1_0_0: 1;
+PRODUCE op.m3.p.pegel_1_0_0_0: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d0_1_1_0_1
+CONSUME op.m3.p.d: 1, op.m3.p.pegel_1_1_0_1: 1;
+PRODUCE op.m3.p.pegel_1_0_0_1: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d0_1_1_1_0
+CONSUME op.m3.p.d: 1, op.m3.p.pegel_1_1_1_0: 1;
+PRODUCE op.m3.p.pegel_1_0_1_0: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d1_1_0_0_0
+CONSUME op.m3.p.d: 1, op.m3.p.pegel_1_0_0_0: 1;
+PRODUCE op.m3.p.pegel_1_1_0_0: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d1_1_0_0_1
+CONSUME op.m3.p.d: 1, op.m3.p.pegel_1_0_0_1: 1;
+PRODUCE op.m3.p.pegel_1_1_0_1: 1, op.m3.p.n_d: 1;
+
+TRANSITION op.m3.t.d1_1_0_1_0
+CONSUME op.m3.p.d: 1, op.m3.p.pegel_1_0_1_0: 1;
+PRODUCE op.m3.p.pegel_1_1_1_0: 1, op.m3.p.n_d: 1;
+
+
+TRANSITION op.m3.t.clk0_1_0_0_0
+CONSUME op.m3.p.clk: 1, op.m3.p.pegel_1_0_0_0: 1;
+PRODUCE op.m3.p.pegel_0_0_0_0: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk0_1_0_0_1
+CONSUME op.m3.p.clk: 1, op.m3.p.pegel_1_0_0_1: 1;
+PRODUCE op.m3.p.pegel_0_0_0_1: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk0_1_0_1_0
+CONSUME op.m3.p.clk: 1, op.m3.p.pegel_1_0_1_0: 1;
+PRODUCE op.m3.p.pegel_0_0_1_0: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk0_1_1_0_0
+CONSUME op.m3.p.clk: 1, op.m3.p.pegel_1_1_0_0: 1;
+PRODUCE op.m3.p.pegel_0_1_0_0: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk0_1_1_0_1
+CONSUME op.m3.p.clk: 1, op.m3.p.pegel_1_1_0_1: 1;
+PRODUCE op.m3.p.pegel_0_1_0_1: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk0_1_1_1_0
+CONSUME op.m3.p.clk: 1, op.m3.p.pegel_1_1_1_0: 1;
+PRODUCE op.m3.p.pegel_0_1_1_0: 1, op.m3.p.n_clk: 1;
+
+
+TRANSITION op.m3.t.clk1_0_0_0_0
+CONSUME op.m3.p.clk: 1, op.m3.p.pegel_0_0_0_0: 1;
+PRODUCE op.m3.p.pegel_1_0_0_0: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk1_0_0_0_1
+CONSUME op.m3.p.clk: 1, op.m3.p.pegel_0_0_0_1: 1, op.m4.p.n_DOV: 1;
+PRODUCE op.m3.p.pegel_1_0_0_0: 1, op.m4.p.DOV: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk1_0_0_1_0
+CONSUME op.m3.p.clk: 1, op.m3.p.pegel_0_0_1_0: 1;
+PRODUCE op.m3.p.pegel_1_0_1_0: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk1_0_1_0_0
+CONSUME op.m3.p.clk: 1, op.m3.p.pegel_0_1_0_0: 1, op.m4.p.n_DOV: 1;
+PRODUCE op.m3.p.pegel_1_1_0_1: 1, op.m4.p.DOV: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk1_0_1_0_1
+CONSUME op.m3.p.clk: 1, op.m3.p.pegel_0_1_0_1: 1;
+PRODUCE op.m3.p.pegel_1_1_0_1: 1, op.m3.p.n_clk: 1;
+
+TRANSITION op.m3.t.clk1_0_1_1_0
+CONSUME op.m3.p.clk: 1, op.m3.p.pegel_0_1_1_0: 1;
+PRODUCE op.m3.p.pegel_1_1_1_0: 1, op.m3.p.n_clk: 1;
+
+
+TRANSITION op.m3.t.rst0_0_0_1_0
+CONSUME op.m3.p.rst: 1, op.m3.p.pegel_0_0_1_0: 1;
+PRODUCE op.m3.p.pegel_0_0_0_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst0_0_1_1_0
+CONSUME op.m3.p.rst: 1, op.m3.p.pegel_0_1_1_0: 1;
+PRODUCE op.m3.p.pegel_0_1_0_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_0_0_0_0
+CONSUME op.m3.p.rst: 1, op.m3.p.pegel_0_0_0_0: 1;
+PRODUCE op.m3.p.pegel_0_0_1_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_0_0_0_1
+CONSUME op.m3.p.rst: 1, op.m3.p.pegel_0_0_0_1: 1, op.m4.p.n_DOV: 1;
+PRODUCE op.m3.p.pegel_0_0_1_0: 1, op.m4.p.DOV: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_0_1_0_0
+CONSUME op.m3.p.rst: 1, op.m3.p.pegel_0_1_0_0: 1;
+PRODUCE op.m3.p.pegel_0_1_1_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_0_1_0_1
+CONSUME op.m3.p.rst: 1, op.m3.p.pegel_0_1_0_1: 1, op.m4.p.n_DOV: 1;
+PRODUCE op.m3.p.pegel_0_1_1_0: 1, op.m4.p.DOV: 1, op.m3.p.n_rst: 1;
+
+
+TRANSITION op.m3.t.rst0_1_0_1_0
+CONSUME op.m3.p.rst: 1, op.m3.p.pegel_1_0_1_0: 1;
+PRODUCE op.m3.p.pegel_1_0_0_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst0_1_1_1_0
+CONSUME op.m3.p.rst: 1, op.m3.p.pegel_1_1_1_0: 1;
+PRODUCE op.m3.p.pegel_1_1_0_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_1_0_0_0
+CONSUME op.m3.p.rst: 1, op.m3.p.pegel_1_0_0_0: 1;
+PRODUCE op.m3.p.pegel_1_0_1_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_1_0_0_1
+CONSUME op.m3.p.rst: 1, op.m3.p.pegel_1_0_0_1: 1, op.m4.p.n_DOV: 1;
+PRODUCE op.m3.p.pegel_1_0_1_0: 1, op.m4.p.DOV: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_1_1_0_0
+CONSUME op.m3.p.rst: 1, op.m3.p.pegel_1_1_0_0: 1;
+PRODUCE op.m3.p.pegel_1_1_1_0: 1, op.m3.p.n_rst: 1;
+
+TRANSITION op.m3.t.rst1_1_1_0_1
+CONSUME op.m3.p.rst: 1, op.m3.p.pegel_1_1_0_1: 1, op.m4.p.n_DOV: 1;
+PRODUCE op.m3.p.pegel_1_1_1_0: 1, op.m4.p.DOV: 1, op.m3.p.n_rst: 1;
+
+
+{m4: Output Controller}
+
+TRANSITION op.m4.t.01
+CONSUME op.m4.p.0: 1, op.m4.p.CLK: 1, op.m4.p.DOV: 1, op.m6.p.n_set: 1,
+        op.m5.p.n_a: 1, p.n_REQ_B: 1, ip.m66.p.n_b: 1;
+PRODUCE op.m4.p.1: 1, op.m6.p.set: 1, op.m5.p.a: 1, p.REQ_B: 1,
+        ip.m66.p.b: 1, op.m4.p.n_CLK: 1, op.m4.p.n_DOV: 1;
+
+TRANSITION op.m4.t.03
+CONSUME op.m4.p.0: 1, op.m4.p.CLK: 1, op.m4.p.DONV: 1, ip.m66.p.n_b: 1;
+PRODUCE op.m4.p.3: 1, ip.m66.p.b: 1, op.m4.p.n_CLK: 1, op.m4.p.n_DONV: 1;
+
+TRANSITION op.m4.t.12
+CONSUME op.m4.p.1: 1, op.m4.p.ACK_B: 1, op.m4.p.CLK: 1, op.m4.p.DOV: 1,
+        op.m6.p.n_set: 1, op.m5.p.n_a: 1, p.n_REQ_B: 1, ip.m66.p.n_b: 1;
+PRODUCE op.m4.p.2: 1, op.m6.p.set: 1, op.m5.p.a: 1, p.REQ_B: 1, ip.m66.p.b: 1, 
+	op.m4.p.n_ACK_B: 1, op.m4.p.n_CLK: 1, op.m4.p.n_DOV: 1;
+
+TRANSITION op.m4.t.21
+CONSUME op.m4.p.2: 1, op.m4.p.ACK_B: 1, op.m4.p.CLK: 1, op.m4.p.DOV: 1,
+        op.m6.p.n_set: 1, op.m5.p.n_a: 1, p.n_REQ_B: 1, ip.m66.p.n_b: 1;
+PRODUCE op.m4.p.1: 1, op.m6.p.set: 1, op.m5.p.a: 1, p.REQ_B: 1, ip.m66.p.b: 1, 
+	op.m4.p.n_ACK_B: 1, op.m4.p.n_CLK: 1, op.m4.p.n_DOV: 1;
+
+TRANSITION op.m4.t.23
+CONSUME op.m4.p.2: 1, op.m4.p.CLK: 1, op.m4.p.ACK_B: 1,
+        op.m4.p.DONV: 1, ip.m66.p.n_b: 1;
+PRODUCE op.m4.p.3: 1, ip.m66.p.b: 1, op.m4.p.n_CLK: 1,
+        op.m4.p.n_ACK_B: 1, op.m4.p.n_DONV: 1;
+
+TRANSITION op.m4.t.30
+CONSUME op.m4.p.3: 1, op.m4.p.CLK: 1, op.m4.p.DONV: 1, ip.m66.p.n_b: 1;
+PRODUCE op.m4.p.0: 1, ip.m66.p.b: 1, op.m4.p.n_CLK: 1, op.m4.p.n_DONV: 1;
+
+
+{m5: OR}
+
+TRANSITION op.m5.t.a1_pegel_0_0
+CONSUME op.m5.p.a: 1, op.m5.p.pegel_0_0: 1, op.m6.p.n_clk: 1;
+PRODUCE op.m5.p.pegel_1_0: 1, op.m6.p.clk: 1, op.m5.p.n_a: 1;
+
+TRANSITION op.m5.t.a1_pegel_0_1
+CONSUME op.m5.p.a: 1, op.m5.p.pegel_0_1: 1;
+PRODUCE op.m5.p.pegel_1_1: 1, op.m5.p.n_a: 1;
+
+TRANSITION op.m5.t.a0_pegel_1_0
+CONSUME op.m5.p.a: 1, op.m5.p.pegel_1_0: 1, op.m6.p.n_clk: 1;
+PRODUCE op.m5.p.pegel_0_0: 1, op.m6.p.clk: 1, op.m5.p.n_a: 1;
+
+TRANSITION op.m5.t.a0_pegel_1_1
+CONSUME op.m5.p.a: 1, op.m5.p.pegel_1_1: 1;
+PRODUCE op.m5.p.pegel_0_1: 1, op.m5.p.n_a: 1;
+
+
+TRANSITION op.m5.t.b1_pegel_0_0
+CONSUME op.m5.p.b: 1, op.m5.p.pegel_0_0: 1, op.m6.p.n_clk: 1;
+PRODUCE op.m5.p.pegel_0_1: 1, op.m6.p.clk: 1, op.m5.p.n_b: 1;
+
+TRANSITION op.m5.t.b0_pegel_0_1
+CONSUME op.m5.p.b: 1, op.m5.p.pegel_0_1: 1, op.m6.p.n_clk: 1;
+PRODUCE op.m5.p.pegel_0_0: 1, op.m6.p.clk: 1, op.m5.p.n_b: 1;
+
+TRANSITION op.m5.t.b1_pegel_1_0
+CONSUME op.m5.p.b: 1, op.m5.p.pegel_1_0: 1;
+PRODUCE op.m5.p.pegel_1_1: 1, op.m5.p.n_b: 1;
+
+TRANSITION op.m5.t.b0_pegel_1_1
+CONSUME op.m5.p.b: 1, op.m5.p.pegel_1_1: 1;
+PRODUCE op.m5.p.pegel_1_0: 1, op.m5.p.n_b: 1;
+
+
+{m6: D-FF mit D=0 und SET}
+
+TRANSITION op.m6.t.clk0_1_0_0
+CONSUME op.m6.p.clk: 1, op.m6.p.pegel_1_0_0: 1;
+PRODUCE op.m6.p.pegel_0_0_0: 1, op.m6.p.n_clk: 1;
+
+TRANSITION op.m6.t.clk0_1_0_1
+CONSUME op.m6.p.clk: 1, op.m6.p.pegel_1_0_1: 1;
+PRODUCE op.m6.p.pegel_0_0_1: 1, op.m6.p.n_clk: 1;
+
+TRANSITION op.m6.t.clk0_1_1_1
+CONSUME op.m6.p.clk: 1, op.m6.p.pegel_1_1_1: 1;
+PRODUCE op.m6.p.pegel_0_1_1: 1, op.m6.p.n_clk: 1;
+
+TRANSITION op.m6.t.clk1_0_0_0
+CONSUME op.m6.p.clk: 1, op.m6.p.pegel_0_0_0: 1;
+PRODUCE op.m6.p.pegel_1_0_0: 1, op.m6.p.n_clk: 1;
+
+TRANSITION op.m6.t.clk1_0_0_1
+CONSUME op.m6.p.clk: 1, op.m6.p.pegel_0_0_1: 1, pcg.m3.p.n_a_in: 1;
+PRODUCE op.m6.p.pegel_1_0_0: 1, pcg.m3.p.a_in: 1, op.m6.p.n_clk: 1;
+
+TRANSITION op.m6.t.clk1_0_1_1
+CONSUME op.m6.p.clk: 1, op.m6.p.pegel_0_1_1: 1;
+PRODUCE op.m6.p.pegel_1_1_1: 1, op.m6.p.n_clk: 1;
+
+
+TRANSITION op.m6.t.set1_0_0_0
+CONSUME op.m6.p.set: 1, op.m6.p.pegel_0_0_0: 1, pcg.m3.p.n_a_in: 1;
+PRODUCE op.m6.p.pegel_0_1_1: 1, pcg.m3.p.a_in: 1, op.m6.p.n_set: 1;
+
+TRANSITION op.m6.t.set1_0_0_1
+CONSUME op.m6.p.set: 1, op.m6.p.pegel_0_0_1: 1;
+PRODUCE op.m6.p.pegel_0_1_1: 1, op.m6.p.n_set: 1;
+
+TRANSITION op.m6.t.set0_0_1_1
+CONSUME op.m6.p.set: 1, op.m6.p.pegel_0_1_1: 1;
+PRODUCE op.m6.p.pegel_0_0_1: 1, op.m6.p.n_set: 1;
+
+TRANSITION op.m6.t.set1_1_0_0
+CONSUME op.m6.p.set: 1, op.m6.p.pegel_1_0_0: 1, pcg.m3.p.n_a_in: 1;
+PRODUCE op.m6.p.pegel_1_1_1: 1, pcg.m3.p.a_in: 1, op.m6.p.n_set: 1;
+
+TRANSITION op.m6.t.set1_1_0_1
+CONSUME op.m6.p.set: 1, op.m6.p.pegel_1_0_1: 1;
+PRODUCE op.m6.p.pegel_1_1_1: 1, op.m6.p.n_set: 1;
+
+TRANSITION op.m6.t.set0_1_1_1
+CONSUME op.m6.p.set: 1, op.m6.p.pegel_1_1_1: 1;
+PRODUCE op.m6.p.pegel_1_0_1: 1, op.m6.p.n_set: 1;
+
+
+
+
+{Locally Synchronous Module (lsm)}
+
+TRANSITION lsm.t.d_in_macht_in_out_ungleich
+CONSUME lsm.p.DATAV_IN: 1, lsm.p.pegel_d_in_gleich_d_out: 1;
+PRODUCE lsm.p.n_DATAV_IN: 1, lsm.p.pegel_d_in_ungleich_d_out: 1;
+
+TRANSITION lsm.t.d_in_macht_in_out_gleich
+CONSUME lsm.p.DATAV_IN: 1, lsm.p.pegel_d_in_ungleich_d_out: 1;
+PRODUCE lsm.p.n_DATAV_IN: 1, lsm.p.pegel_d_in_gleich_d_out: 1;
+
+TRANSITION lsm.t.clk0
+CONSUME lsm.p.INT_CLK: 1, lsm.p.INT_CLK_pegel_1: 1;
+PRODUCE lsm.p.n_INT_CLK: 1, lsm.p.INT_CLK_pegel_0: 1;
+
+TRANSITION lsm.t.clk1_erzeugt_out_flanke
+CONSUME lsm.p.INT_CLK: 1, lsm.p.INT_CLK_pegel_0: 1,
+        lsm.p.pegel_d_in_ungleich_d_out: 1, op.m2.p.n_d: 1, op.m3.p.n_d: 1;
+PRODUCE lsm.p.n_INT_CLK: 1, lsm.p.INT_CLK_pegel_1: 1,
+        lsm.p.pegel_d_in_gleich_d_out: 1, op.m2.p.d: 1, op.m3.p.d: 1;
+
+TRANSITION lsm.t.clk1_keine_out_flanke
+CONSUME lsm.p.INT_CLK: 1, lsm.p.INT_CLK_pegel_0: 1,
+        lsm.p.pegel_d_in_gleich_d_out: 1;
+PRODUCE lsm.p.n_INT_CLK: 1, lsm.p.INT_CLK_pegel_1: 1,
+        lsm.p.pegel_d_in_gleich_d_out: 1;
+
+
+{Anbindung an Aussenwelt}
+
+TRANSITION t.req_a
+CONSUME p.ACK_A: 1, p.n_REQ_A: 1;
+PRODUCE p.REQ_A: 1, p.n_ACK_A: 1;
+
+TRANSITION t.req_b
+CONSUME p.REQ_B: 1, op.m4.p.n_ACK_B: 1, op.m5.p.n_b: 1;
+PRODUCE p.n_REQ_B: 1, op.m4.p.ACK_B: 1, op.m5.p.b: 1;
+
+
+{ vim: set ft=lola noet: }

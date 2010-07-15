@@ -1,0 +1,153 @@
+{ An algorithm that grants mutual exclusion between neighbours in a connected network }
+
+SORT agent = ARRAY [ 1 , 2 ] OF [ 1 , 2 ] ;
+     message = RECORD 
+		receiver : agent ;
+		sender : agent ;
+	       END ;
+
+FUNCTION 
+isconnected ( x : agent ; y : agent ) : BOOLEAN
+
+VAR i : [ 1 , 2 ] ;
+    diff: BOOLEAN ;
+
+BEGIN
+	diff = FALSE ;
+	FOR ALL i DO
+		IF x [ i ] # y [ i ] THEN
+			IF diff THEN		
+				RETURN FALSE ; EXIT
+			ELSE
+			  	diff = TRUE ;
+				IF ( x [ i ] # y [ i ] + 1) AND (x [ i ] # y [ i ] - 1) THEN
+					RETURN FALSE ; EXIT
+				END
+			END
+		END
+	END ;
+	RETURN diff
+END
+
+FUNCTION letter ( x : agent ; y : agent ) : message
+VAR m : message;
+BEGIN
+	m . receiver = x ; m . sender = y ;
+	RETURN m 
+END
+
+FUNCTION N ( x : agent) : agent
+VAR y : agent;
+BEGIN
+	FOR ALL y DO
+		IF isconnected ( x , y ) THEN RETURN y END
+	END
+END
+
+FUNCTION U () : agent
+VAR x : agent ;
+BEGIN
+	FOR ALL x DO RETURN x END 
+END
+
+FUNCTION P () : message
+VAR x : agent ; y : agent ;
+    i : [ 1 , 2 ];
+
+BEGIN
+	FOR ALL x DO
+		FOR ALL y DO
+			IF isconnected ( x , y ) THEN
+			i = 1 ;
+			WHILE x [ i ] = y [ i ] DO i = i + 1 END ;
+			IF x [ i ] < y [ i ] THEN
+
+				RETURN letter ( x , y )
+			END
+			END
+		END
+	END
+END
+
+FUNCTION Q () : message
+VAR x : agent ; y : agent ;
+    i : [ 1 , 2 ];
+
+BEGIN
+	FOR ALL x DO
+		FOR ALL y DO
+			IF isconnected ( x , y ) THEN
+			i = 1 ;
+			WHILE x [ i ] = y [ i ] DO i = i + 1 END ;
+			IF x [ i ] > y [ i ] THEN
+
+				RETURN letter ( x , y )
+			END
+			END
+		END
+	END
+END
+
+PLACE
+quiet : agent , pend1 : agent , pend2 : agent , critical : agent ,
+available : message , mailbox : message , missing : message ,
+demanded : message, repeated : message , firsttime : message ,
+ready : message , afteruse : message ;
+
+MARKING
+	quiet : U() , available : P() , repeated : P() ,
+	ready : P() + Q() , missing : Q() ;
+
+TRANSITION gethungry
+VAR x : agent ;
+CONSUME quiet : x ;
+PRODUCE pend1 : x ;
+
+TRANSITION orderforks
+VAR x : agent ;
+CONSUME pend1 : x , ready : letter ( x , N ( x ) );
+PRODUCE pend2 : x , demanded : letter ( x , N( x ) ) ;
+
+TRANSITION entercritical
+VAR x : agent ;
+CONSUME pend2 : x , available : letter ( x , N ( x ) ) ;
+PRODUCE critical : x ;
+
+TRANSITION leavecritical
+VAR x : agent ;
+CONSUME critical : x ;
+PRODUCE quiet : x , afteruse : letter ( x , N ( x ) ) ;
+
+TRANSITION requestmissingfork
+VAR x : agent ; y : agent ;
+GUARD isconnected ( x , y ) 
+CONSUME demanded : letter ( x , y ) , missing : letter ( x , y ) ;
+PRODUCE mailbox : letter ( y , x ) , firsttime : letter ( x , y ) ;
+
+TRANSITION takeusedfork
+VAR x : agent ; y : agent ;
+GUARD isconnected ( x, y)
+CONSUME demanded : letter ( x , y ) , afteruse : letter ( x , y ) ; 
+PRODUCE available : letter ( x , y ) , ready : letter ( x , y ) ;
+
+
+TRANSITION takefreshfork
+VAR x : agent ; y : agent ;
+GUARD isconnected ( x, y )
+CONSUME firsttime : letter ( x , y ) , afteruse : letter ( x ,  y )  ;
+PRODUCE ready : letter ( x , y ) , repeated : letter ( x , y ) , available : letter ( x , y );
+
+TRANSITION handover
+VAR x : agent ; y : agent ;
+GUARD isconnected ( x , y )
+CONSUME mailbox : letter ( x , y ) , available : letter ( x , y ) ,
+ 	repeated : letter ( x , y ) ;
+PRODUCE available : letter ( y , x ) , missing : letter ( x , y) ;
+
+
+
+
+		
+		
+
+

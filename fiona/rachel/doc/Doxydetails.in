@@ -1,0 +1,20 @@
+/*!
+\mainpage @PACKAGE_NAME@
+
+\li \ref rm
+\li \ref au
+\li \ref ack
+\li \ref lic
+
+\section rm About @PACKAGE_NAME@
+\verbinclude @abs_top_srcdir@/README
+
+\section au Authors/Maintainers
+\verbinclude @abs_top_srcdir@/AUTHORS
+
+\section ack Acknowledgements
+\verbinclude @abs_top_srcdir@/THANKS
+
+\section lic License
+\verbinclude @abs_top_srcdir@/COPYING
+*/

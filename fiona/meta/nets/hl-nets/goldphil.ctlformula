@@ -1,0 +1,8 @@
+FORMULA 
+ALLPATH ALWAYS EXPATH EVENTUALLY
+{ mutex }
+{ ( eatingbothwood.1 > 0 OR eatingrightgold.1 > 0 OR eatingleftgold.1 > 0 ) AND }
+{ (eatingbothwood.2 > 0 OR eatingleftgold.2 > 0  OR eatingrightgold.2 > 0  ) }
+
+{ stick can move to opposite corner }
+goldforks.3 > 0 

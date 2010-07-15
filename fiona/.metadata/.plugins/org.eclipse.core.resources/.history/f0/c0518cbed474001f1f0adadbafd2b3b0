@@ -1,0 +1,290 @@
+/*****************************************************************************\
+ Maxis -- Construct maximal services
+
+ Copyright (C) 2010  Jarungjit Parnjai <parnjai@informatik.hu-berlin.de>
+
+ Maxis is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ Maxis is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Maxis.  If not, see <http://www.gnu.org/licenses/>.
+\*****************************************************************************/
+
+#include <string>
+#include <set>
+#include <vector>
+#include <stack>
+#include <iostream>
+
+#include "dnf.h"
+#include "util.h"
+
+using std::string;
+using std::set;
+using std::stack;
+using std::vector;
+using std::cerr;
+using std::endl;
+
+/*!
+ * \brief constructor
+ *
+ * \note  if left or right child is also a conjunction,
+ *        it will be merged with this node.
+ */
+PartialOrder::PartialOrder(Formula * f, set<string> & cl, int d) :
+		aFormula(f), clause(cl), depth(d) {
+	/* ... TODO ... */
+	//clause = cl;
+}
+/*!
+ * \brief destructor
+ *
+ * \note  children will also be deleted.
+ */
+PartialOrder::~PartialOrder() {
+	  for(set<PartialOrder *>::iterator it=poset.begin(); it != poset.end(); ++it) {
+		 /* ...TODO : check if poset is not empty, then iteratively delete child ... */
+	     delete (*it);
+	  }
+}
+
+set<string> PartialOrder::get_conjunctive_string() const { return clause; }
+
+set<PartialOrder *> PartialOrder::get_poset() const { return poset; }
+
+void PartialOrder::insert_poset(PartialOrder *p) { poset.insert(p); }
+
+void PartialOrder::remove_poset(PartialOrder *p) {
+	/* ...TODO... */
+}
+
+std::ostream & PartialOrder::out(std::ostream & os) {
+  os << "@(";
+
+  for(set<string>::iterator it=clause.begin(); it!=clause.end(); ++it) {
+	  os << it->data() << ", ";
+  }
+  os << ") ";
+  return os;
+}
+
+bool DNF::lookup(const PartialOrder * search_element, const PartialOrder * found_element) const {
+
+	stack<PartialOrder *> searchStack;
+	searchStack.push(po);
+
+	bool found = false;
+	found_element = po;
+
+	PartialOrder * temp_po;
+	set<string> temp_string = po->get_conjunctive_string();
+
+	int temp_depth = 0;
+	set<string> search_string = search_element->get_conjunctive_string();
+	int search_depth = search_string.size();
+
+	while (!searchStack.empty()) {
+		temp_po = searchStack.top();
+		searchStack.pop();
+		temp_string = temp_po->get_conjunctive_string();
+		temp_depth = temp_string.size();
+
+		if (temp_depth < search_depth) {
+			/* search for */
+
+		} else {
+			if (temp_depth = search_depth) {
+				set<string> tmpset = util::setDifference( temp_string, search_string );
+				if (tmpset.empty()) {
+					found = true;
+					break;
+				}
+			}
+/*
+				set<PartialOrder *> neighbors = temp_po->get_poset();
+				set<PartialOrder *>::iterator nit=neighbors.begin();
+				temp_po = *nit;
+				while (nit!=neighbors.end()) {
+					searchStack.push(*nit);
+					++nit;
+				}
+			} else { // traverse too deep, need a backtrack
+			set<PartialOrder *> neighbors = temp->get_poset();
+			for (set<PartialOrder *>::iterator nit=neighbours.begin(); nit!=neighbours.end(); ++nit) {
+				searchStack.push(nit);
+			}
+			*/
+		}
+	}
+
+	return found;
+}
+//		vector<set<string> > string_sets;
+//	    string_sets.push_back( child_clause );
+//	    string_sets.push_back( topstring );
+//		set<string> tmpset = util::intersection(string_sets);
+
+
+// constructor
+DNF::DNF(Formula * f, set<string> & literals) :
+		minimal(false), maximal(false), aFormula(f), all_literals(literals), po(NULL)  {
+
+	PartialOrder * current_po;
+
+	// root or partial order structure is always Literal "false"
+	string str = "false";
+	Literal * l = new Literal(& str);
+	set<string> l_clause;
+	l_clause.insert(str);
+	po = new PartialOrder(static_cast<Formula *> (l), l_clause, 0);
+
+	current_po = po;
+
+	// get all children elements of aFormula
+	set<string> child_clause;
+	Conjunction * c = dynamic_cast<Conjunction *> (aFormula);
+	if (c != NULL) {
+		// assert : aFormula contains only 1 clause of Conjunction
+		child_clause = conjunction_string_literals(c);
+
+		PartialOrder * child = new PartialOrder(f, child_clause, child_clause.size());
+		if (!lookup(child, current_po))
+			current_po->insert_poset( child );
+
+	} else {
+		set<Formula *> children = aFormula->getElements();
+		for(set<Formula *>::iterator it=children.begin(); it!=children.end(); ++it) {
+
+			// assert : each children is either Literal or Conjunction
+			Formula * f = * it;
+			Literal * l = dynamic_cast<Literal *> (f);
+			if (l != NULL) {
+				child_clause.insert( l->getString() );
+			} else {
+				c = dynamic_cast<Conjunction *> (f);
+				if (c != NULL) {
+					child_clause = conjunction_string_literals(c);
+				}
+			}
+			if (!child_clause.empty()) {
+				PartialOrder * child = new PartialOrder(f, child_clause, child_clause.size());
+				if (!lookup(child, current_po))
+					current_po->insert_poset( child );
+			}
+			child_clause.clear();
+		}  /* end iterator */
+	}
+
+}
+
+// destructor
+DNF::~DNF(){
+	/* ...TODO... */
+	set<PartialOrder *> children = po->get_poset();
+	for(set<PartialOrder *>::iterator it=children.begin(); it!=children.end(); ++it) {
+		delete(* it);
+	}
+	delete(po);
+}
+
+set<string> DNF::conjunction_string_literals(const Conjunction * c) const {
+	set<string> clause;
+
+	set<Formula *> children = c->getElements();
+	for(set<Formula *>::iterator it=children.begin(); it!=children.end(); ++it)  {
+		Literal * l = dynamic_cast<Literal *> (* it);
+		if (l != NULL)
+			clause.insert(l->getString());
+	}
+	return clause;
+}
+
+/// construct a minimal DNF
+void DNF::minimize() {
+	/* ...TODO... */
+	/* (*) a * false = a
+	 * (*) a * true = true
+	 * (*) disjunction of all literals = true
+	 */
+}
+
+/// construct a complete DNF
+void DNF::maximize() { /* ...TODO... */ }
+
+/// does DNF cover a given conjunction
+bool DNF::iscovered(const Conjunction &) const { return false; }
+
+/// is the partial order set of DNF minimal
+bool DNF::ismaximal() const {  return maximal; }
+
+// is the partial order set of DNF maximal
+bool DNF::isminimal() const { return minimal;  }
+
+/*
+public void DFS(String URL, int depth) {
+	if (depth >= 0 && !visited.containsKey(URL)) {
+		Vector<String> visit = new Vector<String>();
+		Website site = new Website(URL);
+		visited.put(site.getURL(),site.getURL());
+		visit.addAll(linkSelector(site));
+		for(int index = 0; index < visit.size(); index++){
+			DFS(visit.elementAt(index), depth-1);
+		}
+	}
+return;
+}
+*/
+
+/*!
+ * \brief write to stream
+ */
+std::ostream & DNF::out(std::ostream & os) {
+
+  po->out(os);
+
+  os << "[" ;
+  string delim = "";
+
+//  std::stack<PartialOrder *> temp_stack;
+// temp_stack.push(po);
+//  PartialOrder * temp_po;
+//  set<PartialOrder *> child = po->get_poset();
+/*
+  Stack<PartialOrder *> nextStack;
+  Stack<PartialOrder *> traversed;
+
+  nextStack.push(po);
+
+  while (!nextStack.empty()) {
+	PartialOrder * temp = nextStack.pop();
+	traversed.push(temp);
+
+	set<PartialOrder *> neighbors = temp->get_poset();
+	for (set<ParitialOrder *>::iterator nit=neighbours.begin(); nit!=neighbours.end(); ++nit) {
+		nextStack.push(nit);
+	}
+  }
+*/
+
+  set<PartialOrder *> child = po->get_poset();
+  for(set<PartialOrder *>::iterator it=child.begin(); it!=child.end(); ++it) {
+	  //os << delim;
+	  (* it)->out(os) ;
+       //delim = ", ";
+  }
+  os << "]" << endl;
+
+  return os;
+}
+
+
+
+

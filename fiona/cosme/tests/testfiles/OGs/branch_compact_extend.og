@@ -1,0 +1,18 @@
+INTERFACE
+  INPUT
+    a, b, c;
+  
+NODES
+  0
+		a -> 1
+		b -> 1
+		c -> 1
+	1
+		a -> 2
+		b -> 2
+		c -> 2
+	2 :: F
+		a -> 3
+		b -> 3
+		c -> 3
+	3 :: F

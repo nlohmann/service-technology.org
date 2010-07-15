@@ -1,0 +1,39 @@
+                          ____            _          _ 
+                         |  _ \ __ _  ___| |__   ___| |
+                         | |_) / _` |/ __| '_ \ / _ \ |
+                         |  _ < (_| | (__| | | |  __/ |
+                         |_| \_\__,_|\___|_| |_|\___|_|
+                      http://service-technology.org/rachel
+
+
+Version 1.14 (18 January 2010)
+==============================
+
+* updated maintainer scripts
+
+* added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
+  to determine test case coverage (use `make cover' in `tests' directory)
+
+* added scripts to use ZCOV (`http://minormatter.com/zcov') to determine test
+  branch case coverage (use `make cover-branch' in `tests' directory)
+
+* cleaned code:
+     * removed support for aspects - not used any more
+
+     * removed BPMN output - this does not belong here
+
+     * removed 2-bit annotation - Wendy can do this
+
+* implemented Wendy's new IG/OG formats
+
+* added target for benchmarks (execute `make bench -C tests')
+
+* implemented parameter `--stats' to display information on runtime and
+  memory consumption (the latter uses `ps' and does not work under Cygwin)
+
+* colored status messages
+
+
+See file ChangeLog <http://service-technology.org/files/rachel/ChangeLog> for
+complete version history.
+

@@ -1,0 +1,54 @@
+{ 
+DESCRIPTION: Das komponierte oWFN T+G
+}
+
+PLACE
+  INTERNAL
+    r0,r1,r2,r3,s0,s1,s2,s3,Euro,T,Euro',B;
+  INPUT
+    C;
+  OUTPUT
+    ;
+  
+INITIALMARKING
+  r0,s0;
+
+FINALCONDITION
+  (r3=1 AND s3=1 AND ALL_OTHER_PLACES_EMPTY);
+
+TRANSITION getEuro
+  CONSUME Euro,s0;
+  PRODUCE s1;
+
+TRANSITION getTeaButton
+  CONSUME s1,T;
+  PRODUCE s2;
+
+TRANSITION getCoffeeButton
+  CONSUME s1,C;
+  PRODUCE s2;
+
+TRANSITION sendBeverage
+  CONSUME s2;
+  PRODUCE B,s3;
+
+TRANSITION sendEuro'
+  CONSUME s2;
+  PRODUCE Euro',s3;
+
+TRANSITION sendEuro
+  CONSUME r0;
+  PRODUCE Euro,r1;
+
+TRANSITION sendTeaButton
+  CONSUME r1;
+  PRODUCE T,r2;
+
+TRANSITION getEuro'
+  CONSUME r2,Euro';
+  PRODUCE r3;
+
+TRANSITION getBeverage
+  CONSUME r2,B;
+  PRODUCE r3;
+

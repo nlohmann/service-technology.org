@@ -1,0 +1,215 @@
+SORT dimensions = [ 1 , 3 ]; 
+	    row = [ 1 , 3 ]; 
+
+	 agent = ARRAY dimensions OF row ; 
+
+	 message = RECORD
+				  adr : agent;
+				  abs : agent;
+				  ses : agent;
+			   END;
+	 session = RECORD
+				  ad : agent;
+				  ab : agent;
+			   END;
+
+FUNCTION X (a:agent;b:agent):session
+
+	VAR m : session;
+
+BEGIN
+	m . ad = a;
+	m . ab = b;
+	RETURN m 
+END
+
+FUNCTION XX (a:agent;b:agent;s:agent):message
+
+	VAR m : message;
+
+BEGIN
+	m . adr = a;
+	m . abs = b;
+	m . ses = s;
+	RETURN m 
+END
+
+FUNCTION U(): agent
+{ returns the (multi-)set of all agents}
+
+	VAR x: agent;
+BEGIN
+	FOR ALL x DO
+		RETURN x { Note that this statement does not terminate U()! }
+	END
+END
+
+FUNCTION UU(a:agent): agent
+{ returns the (multi-)set of all agents except a}
+
+	VAR x: agent;
+BEGIN
+	FOR ALL x DO
+		IF x <> a THEN RETURN x  END
+	END
+END
+
+FUNCTION N(z:agent):agent
+{ Returns all neighbours of z; this function actually codes the network. }
+{ An agent is a neighbour of z, if it equals z in all but one dimensions }
+{ while their difference is 1 in the remaining dimension.                }
+
+VAR l : dimensions;
+    low : row;
+	high : row;
+
+BEGIN
+	low = 1;
+	high = low - 1; { see comment in function i() }
+	FOR ALL l DO
+		IF z [ l ] > 1 THEN 
+			z [ l ] = z [ l ] - 1;
+			RETURN z;
+			z [ l ] = z [ l ] + 1
+		END;
+		IF z [ l ] < high THEN 
+			z [ l ] = z [ l ] + 1;
+			RETURN z;
+			z [ l ] = z [ l ] - 1
+		END
+	END
+END
+
+FUNCTION isneighbour(x:agent;z:agent) : BOOLEAN
+{ This is a boolean version of the neighbourhood relation, used in transition guards }
+
+VAR l : dimensions ;
+    high : row;
+	low : row;
+    state : [ 1 , 2 ] ; { state 1: no differing dimension found yet  }
+     					{ state 2: differing dimension already found }
+
+BEGIN
+	state = 1; 
+	low = 1;
+	high = low - 1; { see comment in function i() }
+	FOR ALL l DO
+		IF state = 2 THEN
+			IF z [ l ] # x [ l ]  THEN RETURN FALSE; EXIT END { Neighbours must not }
+															  { differ in more than }
+															  { one dimension       }
+		END;
+		IF state = 1 THEN 
+			IF z [ l ] < high  AND x [ l ] = z [ l ] + 1 THEN state = 2 END;
+			IF z [ l ] > 1  AND x [ l ] = z [ l ] - 1 THEN state = 2 END
+		END;
+		IF state = 1 AND z [ l ] # x [  l ] THEN RETURN FALSE; EXIT END { difference }
+																		{ > 1        }
+	END;
+	IF state = 1 THEN RETURN FALSE ELSE RETURN TRUE END { no difference -- no neighbour }
+		
+END
+
+FUNCTION N1(z : agent ; z2 : agent):agent
+{ returns all neighbours of z, except z2. This function specifies the recipients of }
+{ messages that are sent by a non-initiator. Except the test for z2, this function  }
+{ resembles N                                                                       }
+
+VAR m : dimensions;
+    high : row;
+	low : row;
+	
+BEGIN
+	low = 1;
+	high = low - 1; 
+	FOR ALL m DO
+		IF z [ m ] > 1 THEN 
+			z [ m ] = z [ m ] - 1;
+			IF z # z2 THEN 
+				RETURN z 
+			END;
+			z [ m ] = z [ m ] + 1
+		END;
+		IF z [ m ] < high THEN 
+			z [ m ] = z [ m ]  + 1;
+			IF z # z2 THEN 
+				RETURN z 
+			END;
+			z [ m ]  = z [ m ] - 1
+		END
+	END
+END
+
+{---------------------- High level net for ECHO ------------------------------}
+
+PLACE	quiet      : agent,    { carries initiators before start of protocol }
+	    waiting    : agent,    { initiator during running protocol }
+		terminated : agent,    { initiator after terminated protocol }
+	    uninformed : session,    { other agent befor having read any message }
+		pending    : message,  { other agent while waiting for acknowledgements; }
+						       { we need a second component to store the sender  }
+						       { of the message it received first                }
+		accepted   : session,    { other agent after having sent all acknowledgments }
+		mailbox    : message;  { pending messages }
+
+	
+MARKING quiet      : U(), { initial state of initiator }
+		     uninformed : X(U(),U()); { initial states of all other agents }
+
+TRANSITION t1
+{ starts the protocol by letting the initiator send messages to all neighbours }
+
+	VAR x: agent;
+
+	CONSUME	quiet   : x;
+	PRODUCE	waiting : x,
+			mailbox : XX(N(x),x,x); { first component: recipient, second: sender, third: session key }
+	
+TRANSITION t2 
+{ terminates the protocol on receipt of acknowledgments from all neighbours of }
+{ the initiator                                                                }
+
+	VAR x: agent;
+
+	CONSUME	waiting	  : x,
+			mailbox   : XX(x,N(x),x);
+	PRODUCE terminated:	x;
+	
+TRANSITION t3 
+{ other agent forwards first message to all other neighbours and stores sender of }
+{ first message                                                                   }
+		
+	VAR x,s,z: agent;
+	GUARD  (isneighbour( x, z ) AND x <> s) { This guard is not essential for correctness, but  }
+	CONSUME         uninformed : X(x,s),
+			mailbox    : XX(x,z,s);
+	PRODUCE         mailbox    : XX(N1(x,z),x,s),
+			pending    : XX(x,z,s);
+
+TRANSITION t4
+{ on receipt of acknowledgments to all its own messages, other agents reply to }
+{ their first message                                                          }
+
+	VAR x,z,s: agent;
+	GUARD (isneighbour(x,z)  AND x <> s) { see comment for t3 }
+
+	CONSUME         pending  : XX(x,z,s),
+			mailbox  : XX(x,N1(x,z),s);
+	PRODUCE         accepted : X(x,s),
+			mailbox  : XX(z,x,s);
+
+TRANSITION t5
+{ resets initiator }
+
+VAR x : agent;
+CONSUME terminated : x ;
+PRODUCE quiet : x;
+
+TRANSITION t6
+{resets others}
+VAR x : agent;
+
+CONSUME accepted : X(UU(x),x);
+PRODUCE uninformed : X(UU(x),x);
+
+

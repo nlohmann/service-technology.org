@@ -1,0 +1,51 @@
+# Signature of the current package.
+m4_define([AT_PACKAGE_NAME],      [@PACKAGE_NAME@])
+m4_define([AT_PACKAGE_TARNAME],   [@PACKAGE_TARNAME@])
+m4_define([AT_PACKAGE_VERSION],   [@PACKAGE_VERSION@])
+m4_define([AT_PACKAGE_STRING],    [@PACKAGE_STRING@])
+m4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])
+
+# testfile directory
+m4_define([TESTFILES],            [@abs_srcdir@/testfiles])
+
+# customer tool test script
+m4_define([AT_CHECK_CUSTOMER],    [@abs_builddir@/check_customer.sh])
+
+# wrap tools called by the testscript
+m4_define([GREP],                 [@GREP@])
+m4_define([FIONA],                [wrap-tool.sh @FIONA@])
+m4_define([VALGRIND],             [wrap-tool.sh @VALGRIND@ --leak-check=full --show-reachable=yes])
+
+# pass tool paths to tests below
+m4_define([DOT],                  [@DOT@])
+m4_define([GENET],                [@GENET@])
+m4_define([LOLA],                 [@LOLA@])
+m4_define([PETRIFY],              [@PETRIFY@])
+m4_define([WGET],                 [@WGET@])
+
+# check if several tools were found by the configure script
+m4_define(AT_CHECK_DOT, [AT_CHECK([if test "DOT" == "not found"; then exit 77; fi])])
+m4_define(AT_CHECK_GENET, [AT_CHECK([if test "GENET" == "not found"; then exit 77; fi])])
+m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
+m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == "not found"; then exit 77; fi])])
+m4_define(AT_CHECK_WGET, [AT_CHECK([if test "WGET" == "not found"; then exit 77; fi])])
+
+# tools to be tested
+m4_define([CDNF],                 [AT_CHECK_LOLA
+                                   cover.sh @abs_top_builddir@/utils/cdnf])
+m4_define([CONFIGURATOR],         [cover.sh @abs_top_builddir@/utils/configurator])
+m4_define([GENERATOR],            [cover.sh @abs_top_builddir@/utils/generator])
+m4_define([PETRI],                [cover.sh @abs_top_builddir@/utils/petri])
+m4_define([UNFOLDER],             [cover.sh @abs_top_builddir@/utils/unfolder/unfolder])
+
+# makro used in testsuite
+m4_define([TEST_CDNF], [AT_CHECK([cp TESTFILES/NET.owfn .])
+                        AT_CHECK([CDNF NET.owfn])
+                        AT_CHECK([FIONA -t equivalence NET.owfn NET.cdnf.owfn], 0, ignore, ignore)
+                        AT_KEYWORDS(cdnf)])
+
+m4_define([TEST_LEAK], [AT_CHECK([cp TESTFILES/NET .])
+                        AT_CHECK([VALGRIND @abs_top_builddir@/utils/petri PARAMS NET], 0, ignore, stderr)
+                        AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+                        AT_KEYWORDS(leak)])
+

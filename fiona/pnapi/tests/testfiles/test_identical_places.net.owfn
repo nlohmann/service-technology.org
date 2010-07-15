@@ -1,0 +1,33 @@
+PLACE INTERNAL p, q, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10;       
+
+INPUT ;       
+
+OUTPUT ; 
+
+INITIALMARKING ; 
+
+FINALCONDITION ; 
+
+TRANSITION t1
+CONSUME r1: 1;
+PRODUCE r4: 1, p: 1, q: 1;
+
+TRANSITION t2
+CONSUME r2: 1;
+PRODUCE p: 1, q: 1;
+
+TRANSITION t3
+CONSUME r3: 1;
+PRODUCE p: 1, q: 1, r5: 1;
+
+TRANSITION t4
+CONSUME r6: 1, p: 1, q: 1;
+PRODUCE r8: 1;
+
+TRANSITION t5
+CONSUME p: 1, q: 1;
+PRODUCE r9: 1;
+
+TRANSITION t6
+CONSUME p: 1, q: 1, r7: 1;
+PRODUCE r10: 1;

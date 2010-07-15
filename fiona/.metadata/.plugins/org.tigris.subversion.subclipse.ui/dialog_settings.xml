@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item value="500" key="CommitDialog.weights.0"/>
+	<item value="453" key="ExportRemoteFolderDialog.location.x"/>
+	<item value="500" key="CommitDialog.weights.1"/>
+	<item value="348" key="DifferencesDialog.location.x"/>
+	<item value="619" key="passwordStores.size.y"/>
+	<item value="1440" key="passwordStores.size.x"/>
+	<item value="268" key="ExportRemoteFolderDialog.location.y"/>
+	<item value="94" key="HistoryTableProvider.SVNHistoryPage.Author"/>
+	<item value="28" key="CommitDialog.location.y"/>
+	<item value="395" key="CommitDialog.location.x"/>
+	<item value="40" key="passwordStores.location.y"/>
+	<item value="277" key="ExportRemoteFolderDialog.size.y"/>
+	<item value="0" key="passwordStores.location.x"/>
+	<item value="536" key="ExportRemoteFolderDialog.size.x"/>
+	<item value="117" key="HistoryTableProvider.SVNHistoryPage.Date"/>
+	<item value="430" key="DifferencesDialog.size.y"/>
+	<item value="652" key="CommitDialog.size.x"/>
+	<item value="233" key="HistoryTableProvider.SVNHistoryPage.Comment"/>
+	<item value="636" key="CommitDialog.size.y"/>
+	<item value="127" key="TreeConflictsView.col.Resource"/>
+	<item value="747" key="DifferencesDialog.size.x"/>
+	<item value="47" key="HistoryTableProvider.SVNHistoryPage.Revision"/>
+	<item value="166" key="DifferencesDialog.location.y"/>
+	<item value="761" key="TreeConflictsView.col.Description"/>
+	<section name="CommitWizard">
+		<item value="false" key="ShowCompare"/>
+		<item value="500" key="VWeight2"/>
+		<item value="500" key="VWeight1"/>
+	</section>
+	<section name="NewLocationWizard">
+		<list key="ConfigurationWizardMainPage.STORE_URL_ID">
+			<item value="svn+ssh://parnjai@svn.gna.org/svn/service-tech/trunk"/>
+			<item value="svn+ssh://&lt;membername&gt;@svn.gna.org/svn/service-tech/trunk"/>
+			<item value="svn+ssh://parnjai@svn.gna.org/svn/service-tech/trunk service-tech"/>
+		</list>
+	</section>
+</section>

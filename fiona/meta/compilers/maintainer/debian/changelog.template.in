@@ -1,0 +1,7 @@
+@PACKAGE_TARNAME@ (@PACKAGE_VERSION@-1) hardy; urgency=low
+
+  * Maintainer package release. See file ChangeLog
+    <http://service-technology.org/files/@PACKAGE_TARNAME@/ChangeLog>
+    for a detailed change log.
+
+ -- Niels Lohmann <niels.lohmann@uni-rostock.de>  XXXXXXXX

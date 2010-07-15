@@ -1,0 +1,6 @@
+lola 279
+variants universal portdir science/lola description LoLA homepage http://service-technology.org/lola epoch 0 platforms darwin name lola long_description {LoLA is a Low-Level Petri Net Analyzer.} maintainers niels.lohmann@uni-rostock.de categories science version 1.14 revision 0
+pnapi 326
+variants universal portdir science/pnapi description {Petri Net API} homepage http://service-technology.org/pnapi epoch 0 platforms darwin name pnapi long_description {The Petri Net API encapsulates Petri net-related functions in a C++ API.} maintainers niels.lohmann@uni-rostock.de categories science version 4.00 revision 0
+wendy 317
+variants universal portdir science/wendy description Wendy homepage http://service-technology.org/wendy epoch 0 platforms darwin name wendy depends_lib port:lola long_description {Wendy is a tool to synthesize partners for services.} maintainers niels.lohmann@uni-rostock.de categories science version 2.7 revision 0

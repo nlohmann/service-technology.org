@@ -1,0 +1,20 @@
+INTERFACE
+  INPUT
+    accept,
+    reject;
+  OUTPUT
+    a;
+
+NODES
+  0 : final : blue : finalnode,
+  2 : true : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 2 : ?reject,
+  0 -> 2 : ?accept,
+  2 -> 2 : ?reject,
+  2 -> 2 : ?accept,
+  2 -> 2 : !a;

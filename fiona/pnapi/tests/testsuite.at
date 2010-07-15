@@ -1,0 +1,1261 @@
+AT_INIT
+
+############################################################################
+AT_BANNER([Frontend Tool "petri" Standard Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([PETRI --help],0,ignore)
+AT_KEYWORDS([frontend])
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([PETRI --version],0,ignore)
+AT_KEYWORDS([frontend])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Input])
+############################################################################
+
+AT_SETUP([Reading open net from file])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 132  |P_in|= 2  |P_out|= 9  |T|= 88  |F|= 314" stderr])
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading open net from pipe])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI --verbose < NET],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 132  |P_in|= 2  |P_out|= 9  |T|= 88  |F|= 314" stderr])
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading LoLA net from file])
+m4_define([NET], [test_input.lola])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=lola],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 50  |P_in|= 0  |P_out|= 0  |T|= 40  |F|= 120" stderr])
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading LoLA net from pipe])
+m4_define([NET], [test_input.lola])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI --verbose --input=lola < NET],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 50  |P_in|= 0  |P_out|= 0  |T|= 40  |F|= 120" stderr])
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading PNML net from file])
+m4_define([NET], [cyclicFullCoffee.pnml])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=pnml],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 7  |P_in|= 1  |P_out|= 1  |T|= 6  |F|= 15" stderr])
+AT_KEYWORDS([frontend input pnml])
+AT_CLEANUP
+
+AT_SETUP([Reading PNML net from pipe])
+m4_define([NET], [testnet.pnml])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI --verbose --input=pnml < NET],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 8  |P_in|= 0  |P_out|= 0  |T|= 7  |F|= 17" stderr])
+AT_KEYWORDS([frontend input pnml])
+AT_CLEANUP
+
+AT_SETUP([Reading Woflan net from file])
+m4_define([NET], [woflan6.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 150  |P_in|= 0  |P_out|= 0  |T|= 144  |F|= 342" stderr])
+AT_KEYWORDS([frontend input pnml])
+AT_CLEANUP
+
+AT_SETUP([Reading Woflan net from pipe])
+m4_define([NET], [woflan1.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI --verbose --input=tpn < NET],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 61  |P_in|= 0  |P_out|= 0  |T|= 60  |F|= 140" stderr])
+AT_KEYWORDS([frontend input pnml])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Output])
+############################################################################
+
+AT_SETUP([Writing open net (from open net)])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=owfn],0)
+AT_CHECK([test -f NET.owfn])
+AT_CHECK([PETRI NET.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 132  |P_in|= 2  |P_out|= 9  |T|= 88  |F|= 314" stderr])
+AT_KEYWORDS([frontend output])
+AT_CLEANUP
+
+AT_SETUP([Writing LoLA net (from open net)])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=lola],0)
+AT_CHECK([test -f NET.lola])
+AT_CHECK([PETRI NET.lola --input=lola --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 121  |P_in|= 0  |P_out|= 0  |T|= 88  |F|= 303" stderr])
+AT_KEYWORDS([frontend output])
+AT_CLEANUP
+
+AT_SETUP([Writing service automaton (from open net)])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=sa],0)
+AT_CHECK([test -f NET.sa])
+# the generated service automaton is expected to have 71332 edges
+AT_CHECK([GREP "\->" NET.sa | wc -l | GREP -q 71332],0)
+AT_KEYWORDS([frontend output slow])
+AT_CLEANUP
+
+AT_SETUP([Writing Graphviz dot file (from open net)])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --dot=DOT --output=dot],0)
+AT_CHECK([test -f NET.dot])
+# the generated service automaton is expected to have 534 edges
+AT_CHECK([GREP "\->" NET.dot | wc -l | GREP -q 534],0)
+AT_KEYWORDS([frontend output])
+AT_CLEANUP
+
+AT_SETUP([Writing PNG file (from open net)])
+AT_CHECK_DOT
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=png],0,ignore,ignore)
+AT_CHECK([test -f NET.png])
+AT_KEYWORDS([frontend output slow])
+AT_CLEANUP
+
+AT_SETUP([Writing PNML net (from open net)])
+m4_define([NET], [myCoffee.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=pnml],0)
+AT_CHECK([test -f NET.pnml])
+AT_KEYWORDS([frontend output pnml])
+AT_CLEANUP
+
+AT_SETUP([Writing Woflan net (from open net)])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=tpn],0)
+AT_CHECK([test -f NET.tpn])
+AT_CHECK([PETRI NET.tpn --input=tpn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 121  |P_in|= 0  |P_out|= 0  |T|= 88  |F|= 303" stderr])
+AT_KEYWORDS([frontend output])
+AT_CLEANUP
+
+AT_SETUP([Writing open net with roles])
+m4_define([NET], [test_input_roles.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --output=owfn],0)
+AT_CHECK([test -f NET.owfn])
+AT_CHECK([PETRI NET.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "a, b;" NET.owfn])
+AT_KEYWORDS([frontend output roles])
+AT_CLEANUP
+
+AT_SETUP([Writing normalized open net with roles])
+m4_define([NET], [test_input_roles.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --normalize --output=owfn],0)
+AT_CHECK([test -f NET.normalized.owfn])
+AT_CHECK([GREP -q "a, b;" NET.normalized.owfn])
+AT_KEYWORDS([frontend output roles])
+AT_CLEANUP
+
+AT_SETUP([Writing mirrored open net with roles])
+m4_define([NET], [test_input_roles.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --mirror --output=owfn],0)
+AT_CHECK([test -f NET.mirrored.owfn])
+AT_CHECK([GREP -q "a, b;" NET.mirrored.owfn])
+AT_KEYWORDS([frontend output roles])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([oWFN Syntax])
+############################################################################
+
+AT_SETUP([Syntax Example 1])
+m4_define([NET], [syntax_example.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([syntax])
+AT_CLEANUP
+
+AT_SETUP([Syntax Example 2])
+m4_define([NET], [syntax_example_new.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([syntax])
+AT_CLEANUP
+
+AT_SETUP([Syntax Example 3])
+m4_define([NET], [syntax_example_new_short.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([syntax])
+AT_CLEANUP
+
+AT_SETUP([Syntax Formula])
+m4_define([NET], [syntax_formula.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([syntax])
+AT_CLEANUP
+
+AT_SETUP([Syntax Maximum Occurrence])
+m4_define([NET], [syntax_max_occurrence.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([syntax])
+AT_CLEANUP
+
+AT_SETUP([Reading open net (parser/lexer test)])
+m4_define([NET], [syntax_example1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading open net (parser/lexer test)])
+m4_define([NET], [syntax_example2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading open net (parser/lexer test)])
+m4_define([NET], [syntax_example3.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading open net (parser/lexer test)])
+m4_define([NET], [syntax_example4.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading oWFN with roles])
+m4_define([NET], [test_input_roles.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([oWFN roles])
+AT_CLEANUP
+
+AT_SETUP([oWFN with unspecified role (error expected)])
+m4_define([NET], [test_input_roles_error.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],1,ignore,stderr)
+AT_CHECK([GREP -q "role has not been specified" stderr])
+AT_KEYWORDS([oWFN roles])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([PNML])
+############################################################################
+
+AT_SETUP([Translation PNML -> oWFN: Open Net PNML])
+m4_define([NET], [cyclicFullCoffee.pnml])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --input=pnml --output=owfn],0)
+AT_CHECK([test -f NET.owfn])
+AT_CHECK([PETRI NET --input=pnml --verbose],0,ignore,stderr)
+AT_CHECK([cat stderr | sed 's/pnapi: NET//' > tmp])
+AT_CHECK([PETRI NET.owfn --input=owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "`cat tmp`" stderr],0)
+AT_KEYWORDS([frontend output pnml])
+AT_CLEANUP
+
+AT_SETUP([Translation oWFN -> PNML: Open Net PNML])
+m4_define([NET], [cyclicFullCoffee.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --input=owfn --output=pnml],0)
+AT_CHECK([test -f NET.pnml])
+AT_CHECK([PETRI NET --input=owfn --verbose],0,ignore,stderr)
+AT_CHECK([cat stderr | sed 's/pnapi: NET//' > tmp])
+AT_CHECK([PETRI NET.pnml --input=pnml --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "`cat tmp`" stderr],0)
+AT_KEYWORDS([frontend output pnml])
+AT_CLEANUP
+
+AT_SETUP([Translation PNML -> oWFN: Oryx])
+m4_define([NET], [cyclicFullCoffee.pnml])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --input=pnml --output=owfn],0)
+AT_CHECK([test -f NET.owfn])
+AT_CHECK([PETRI NET --input=pnml --verbose],0,ignore,stderr)
+AT_CHECK([cat stderr | sed 's/pnapi: NET//' > tmp])
+AT_CHECK([PETRI NET.owfn --input=owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "`cat tmp`" stderr],0)
+AT_KEYWORDS([frontend output pnml])
+AT_CLEANUP
+
+AT_SETUP([Translation oWFN -> PNML: Oryx])
+m4_define([NET], [test_input.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --input=owfn --output=pnml],0)
+AT_CHECK([test -f NET.pnml])
+AT_CHECK([PETRI NET --input=owfn --verbose],0,ignore,stderr)
+AT_CHECK([cat stderr | sed 's/pnapi: NET//' > tmp])
+AT_CHECK([PETRI NET.pnml --input=pnml --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "`cat tmp`" stderr],0)
+AT_KEYWORDS([frontend output pnml])
+AT_CLEANUP
+
+AT_SETUP([Translation PNML -> LoLA: LoLA's PNML format])
+m4_define([NET], [phils.pnml])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --input=pnml --output=owfn],0)
+AT_CHECK([test -f NET.owfn])
+AT_CHECK([PETRI NET --input=pnml --verbose],0,ignore,stderr)
+AT_CHECK([cat stderr | sed 's/pnapi: NET//' > tmp])
+AT_CHECK([PETRI NET.owfn --input=owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "`cat tmp`" stderr],0)
+AT_KEYWORDS([frontend output pnml])
+AT_CLEANUP
+
+AT_SETUP([Translation LoLA -> PNML: LoLA's PNML format])
+m4_define([NET], [phils.lola])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --input=lola --output=pnml],0)
+AT_CHECK([test -f NET.pnml])
+AT_CHECK([PETRI NET --input=lola --verbose],0,ignore,stderr)
+AT_CHECK([cat stderr | sed 's/pnapi: NET//' > tmp])
+AT_CHECK([PETRI NET.pnml --input=pnml --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "`cat tmp`" stderr],0)
+AT_KEYWORDS([frontend output pnml])
+AT_CLEANUP
+
+AT_SETUP([ProM PNML Test Suite])
+AT_CHECK([cp TESTFILES/prom-*.pnml .])
+AT_CHECK([PETRI prom-* --input=pnml --verbose],0,[],ignore)
+AT_KEYWORDS([frontend pnml])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Woflan parser tests])
+############################################################################
+
+AT_SETUP([Example 1])
+m4_define([NET], [woflan3.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 22  |P_in|= 0  |P_out|= 0  |T|= 22  |F|= 46" stderr])
+AT_KEYWORDS([woflan parser])
+AT_CLEANUP
+
+AT_SETUP([Example 2])
+m4_define([NET], [woflan2.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 38  |P_in|= 0  |P_out|= 0  |T|= 39  |F|= 83" stderr])
+AT_KEYWORDS([woflan parser])
+AT_CLEANUP
+
+AT_SETUP([Example 3])
+m4_define([NET], [woflan4.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 27  |P_in|= 0  |P_out|= 0  |T|= 27  |F|= 59" stderr])
+AT_KEYWORDS([woflan parser])
+AT_CLEANUP
+
+AT_SETUP([Example 4])
+m4_define([NET], [woflan5.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 79  |P_in|= 0  |P_out|= 0  |T|= 76  |F|= 176" stderr])
+AT_KEYWORDS([woflan parser])
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Composition and Product])
+############################################################################
+
+AT_SETUP([Product with constraint net])
+AT_CHECK([cp TESTFILES/test_produce.onlineshop.constraint.owfn TESTFILES/test_produce.onlineshop.owfn .])
+AT_CHECK([PETRI test_produce.onlineshop.owfn --produce=test_produce.onlineshop.constraint.owfn --output=owfn],0)
+AT_CHECK([GREP -q "|P|= 20  |P_in|= 3  |P_out|= 5  |T|= 11  |F|= 43" test_produce.onlineshop.owfn.owfn])
+AT_CHECK([FIONA -t simulation test_produce.onlineshop.owfn test_produce.onlineshop.owfn.owfn -sempty],0,ignore,ignore)
+AT_KEYWORDS([composition])
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Regression Tests])
+############################################################################
+
+AT_SETUP([Bug 13579 (https://gna.org/bugs/?13579)])
+m4_define([NET], [bug13579.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET],0,ignore,stderr)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968) [[Statemachine]] ])
+m4_define([NET], [bug13968.sa])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -isa -oowfn NET], 0, ignore, stderr)
+AT_CHECK([GREP -q "SYNCHRONOUS" NET.owfn])
+AT_CHECK([GREP -q "sync_rule_1;" NET.owfn])
+AT_CHECK([GREP -q "sync_rule_7;" NET.owfn])
+AT_CHECK([GREP -q "myUnknownLabel" NET.owfn])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968) [[Petrify]] ])
+m4_define([NET], [bug13968.sa])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -isa -oowfn --petrify=PETRIFY NET], 0, ignore, stderr)
+AT_CHECK([GREP -q "SYNCHRONOUS" NET.owfn])
+AT_CHECK([GREP -q "sync_rule_1;" NET.owfn])
+AT_CHECK([GREP -q "sync_rule_7;" NET.owfn])
+AT_CHECK([GREP -q "myUnknownLabel" NET.owfn])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 13990 (https://gna.org/bugs/?13990)])
+m4_define([NET1], [bug13990.1.owfn])
+m4_define([NET2], [bug13990.2.owfn])
+m4_define([NET3], [bug13990.3.owfn])
+AT_CHECK([cp TESTFILES/NET1 .])
+AT_CHECK([cp TESTFILES/NET2 .])
+AT_CHECK([cp TESTFILES/NET3 .])
+AT_CHECK([PETRI -iowfn -oowfn --compose=NET2 NET1], 0, ignore, stderr)
+AT_CHECK([PETRI -iowfn -oowfn --compose=NET3 NET1.composed.owfn], 0, ignore, stderr)
+AT_CHECK([PETRI -v -iowfn NET1.composed.owfn.composed.owfn], 0, ignore, stderr)
+AT_CHECK([GREP -q "|P|= 6  |P_in|= 0  |P_out|= 0  |T|= 4" stderr])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14064 (https://gna.org/bugs/?14064)])
+m4_define([NET], [bug14064.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -iowfn -rdead_nodes NET -oowfn],0,ignore,stderr)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P_in|= 3  |P_out|= 3" stderr])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14116 (https://gna.org/bugs/?14116)])
+m4_define([NET], [bug14116.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI --isNormal --verbose NET],0,stdout,stderr)
+AT_CHECK([GREP -q "pnapi: bug14116.owfn: 0" stderr],0)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14117 (https://gna.org/bugs/?14117)])
+m4_define([SA], [bug14117.sa])
+AT_CHECK([cp TESTFILES/SA .])
+AT_CHECK([PETRI --input=sa --output=owfn SA], 0, stdout, stderr)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14119 (https://gna.org/bugs/?14119) [[1]]])
+m4_define([NET], [bug14119.1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -n NET -oowfn], 0, ignore, ignore)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14119 (https://gna.org/bugs/?14119) [[2]]])
+m4_define([NET], [bug14119.2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
+AT_CHECK([PETRI -n NET -osa], 0, ignore, ignore)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14127 (https://gna.org/bugs/?14127)])
+m4_define([NET],[bug14127.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -iowfn -v NET], 1, ignore, stderr)
+AT_CHECK([GREP -q "unknown label" stderr])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14128 (https://gna.org/bugs/?14128)])
+m4_define([NET1],[bug14128.1.owfn])
+m4_define([NET2],[bug14128.2.owfn])
+AT_CHECK([cp TESTFILES/NET1 .])
+AT_CHECK([cp TESTFILES/NET2 .])
+AT_CHECK([PETRI -iowfn -oowfn --compose=NET2 NET1], 0, ignore, stderr)
+AT_CHECK([GREP -q -e "z, v;" -e "v, z;" NET1.composed.owfn])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14206 (https://gna.org/bugs/?14206)])
+m4_define([NET],[bug14206.lola])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -ilola -olola NET])
+AT_CHECK([GREP -q "p:2" NET.lola])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14208 (https://gna.org/bugs/?14208)])
+m4_define([NET1],[bug14208.1.owfn])
+m4_define([NET2],[bug14208.2.owfn])
+AT_CHECK([cp TESTFILES/NET1 .])
+AT_CHECK([cp TESTFILES/NET2 .])
+AT_CHECK([PETRI -iowfn -oowfn NET1 --compose=NET2])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14335 (https://gna.org/bugs/?14335)])
+m4_define([NET],[bug14335.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -iowfn -osa NET])
+AT_CHECK([GREP -q "x;" NET.sa])
+AT_CHECK([GREP -q "x ->" NET.sa])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14411 (https://gna.org/bugs/?14411)])
+m4_define([NET1],[bug14411.owfn])
+m4_define([NET2],[bug14411-constraint.owfn])
+AT_CHECK([cp TESTFILES/NET1 TESTFILES/NET2 .])
+AT_CHECK([PETRI NET1 --compose=NET2])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14417 (https://gna.org/bugs/?14417)])
+m4_define([NET1],[bug14417.1.owfn])
+m4_define([NET2],[bug14417.2.owfn])
+AT_CHECK([cp TESTFILES/NET1 TESTFILES/NET2 .])
+AT_CHECK([PETRI NET1 --compose=NET2 -oowfn])
+AT_CHECK([GREP -q "COST 2;" NET1.composed.owfn])
+AT_CHECK([GREP -q "COST 3;" NET1.composed.owfn])
+AT_CHECK([GREP -q "COST 42;" NET1.composed.owfn])
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
+AT_SETUP([Bug 14856 (https://gna.org/bugs/?14856)])
+m4_define([NET],[bug14856.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --reduce=starke -oowfn])
+AT_CHECK([PETRI --verbose NET.reduced.owfn], 0, ignore, stderr)
+AT_CHECK([GREP -q "|P|= 3" stderr])
+AT_KEYWORDS([bug reduction])
+AT_CLEANUP
+
+AT_SETUP([Bug 15415 (https://gna.org/bugs/?15415)])
+m4_define([NET],[bug15415.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI --reduce=4 NET])
+AT_CLEANUP
+
+AT_SETUP([Bug 15794 (https://gna.org/bugs/?15794)])
+m4_define([NET], [woflan5.xml.tpn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=tpn],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 79  |P_in|= 0  |P_out|= 0  |T|= 76  |F|= 176" stderr])
+AT_CHECK([PETRI NET --verbose --input=tpn --output=lola --canonicalNames],0,ignore,stderr)
+m4_define([NET2], [woflan5.xml.tpn.lola])
+AT_CHECK([PETRI NET2 --verbose --input=lola],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 79  |P_in|= 0  |P_out|= 0  |T|= 76  |F|= 176" stderr])
+AT_KEYWORDS([woflan parser])
+AT_CLEANUP
+
+AT_SETUP([Bug 15820 (https://gna.org/bugs/?15820) [[1]]])
+m4_define([NET],[bug_15820_sp.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --reduce=series_places -oowfn])
+AT_CHECK([PETRI --verbose NET.reduced.owfn], 0, ignore, stderr)
+AT_CHECK([GREP -q "|P|= 11  |P_in|= 2  |P_out|= 2  |T|= 6  |F|= 16" stderr])
+AT_KEYWORDS([bug reduction])
+AT_CLEANUP
+
+AT_SETUP([Bug 15820 (https://gna.org/bugs/?15820) [[2]]])
+m4_define([NET],[bug_15820_sp.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --reduce=series_transitions -oowfn])
+AT_CHECK([PETRI --verbose NET.reduced.owfn], 0, ignore, stderr)
+AT_CHECK([GREP -q "|P|= 9  |P_in|= 2  |P_out|= 2  |T|= 4  |F|= 12" stderr])
+AT_KEYWORDS([bug reduction])
+AT_CLEANUP
+
+AT_SETUP([Bug 15820 (https://gna.org/bugs/?15820) [[3]]])
+m4_define([NET],[bug_15820_sp_2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --reduce=series_places -oowfn])
+AT_CHECK([PETRI --verbose NET.reduced.owfn], 0, ignore, stderr)
+AT_CHECK([GREP -q "|P|= 10  |P_in|= 2  |P_out|= 2  |T|= 5  |F|= 13" stderr])
+AT_KEYWORDS([bug reduction])
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Murata Reduction Rules])
+############################################################################
+
+AT_SETUP([Removal of dead nodes])
+m4_define([NET], [test_dead_nodes.net.owfn])
+m4_define([RED], [dead_nodes])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 3  |P_in|= 0  |P_out|= 0  |T|= 3  |F|= 6" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 2  |P_in|= 0  |P_out|= 0  |T|= 2  |F|= 4" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+AT_SETUP([Removal of identical places])
+m4_define([NET], [test_identical_places.net.owfn])
+m4_define([RED], [identical_places])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 12  |P_in|= 0  |P_out|= 0  |T|= 6  |F|= 22" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 11  |P_in|= 0  |P_out|= 0  |T|= 6  |F|= 16" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+AT_SETUP([Removal of identical transitions])
+m4_define([NET], [test_identical_transitions.net.owfn])
+m4_define([RED], [identical_transitions])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 6  |P_in|= 0  |P_out|= 0  |T|= 8  |F|= 18" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 6  |P_in|= 0  |P_out|= 0  |T|= 7  |F|= 12" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+AT_SETUP([Removal of self-loop places])
+m4_define([NET], [test_self_loop_places.net.owfn])
+m4_define([RED], [self_loop_places])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 3  |P_in|= 0  |P_out|= 0  |T|= 1  |F|= 4" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 2  |P_in|= 0  |P_out|= 0  |T|= 1  |F|= 2" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+AT_SETUP([Removal of self-loop transitions])
+m4_define([NET], [test_self_loop_transitions.net.owfn])
+m4_define([RED], [self_loop_transitions])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 1  |P_in|= 0  |P_out|= 0  |T|= 3  |F|= 4" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 1  |P_in|= 0  |P_out|= 0  |T|= 2  |F|= 2" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+AT_SETUP([Removal of serial places])
+m4_define([NET], [test_series_places.net.owfn])
+m4_define([RED], [series_places])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 5  |P_in|= 0  |P_out|= 0  |T|= 7  |F|= 11" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 4  |P_in|= 0  |P_out|= 0  |T|= 6  |F|= 9" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+AT_SETUP([Removal of serial transitions])
+m4_define([NET], [test_series_transitions.net.owfn])
+m4_define([RED], [series_transitions])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 5  |P_in|= 0  |P_out|= 0  |T|= 2  |F|= 6" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 4  |P_in|= 0  |P_out|= 0  |T|= 1  |F|= 4" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Starke Reduction Rules])
+############################################################################
+
+AT_SETUP([Starke rule 3 (places)])
+m4_define([NET], [test_starke_3p.net.owfn])
+m4_define([RED], [starke3p])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 2  |P_in|= 0  |P_out|= 0  |T|= 3  |F|= 6" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 1  |P_in|= 0  |P_out|= 0  |T|= 3  |F|= 3" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+AT_SETUP([Starke rule 3 (transitions)])
+m4_define([NET], [test_starke_3t.net.owfn])
+m4_define([RED], [starke3t])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 5  |P_in|= 0  |P_out|= 0  |T|= 2  |F|= 10" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 5  |P_in|= 0  |P_out|= 0  |T|= 1  |F|= 5" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+AT_SETUP([Starke rule 4])
+m4_define([NET], [test_starke_4.net.owfn])
+m4_define([RED], [starke4])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 4  |P_in|= 0  |P_out|= 0  |T|= 4  |F|= 8" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 3  |P_in|= 0  |P_out|= 0  |T|= 3  |F|= 6" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+AT_SETUP([Starke rule 5])
+m4_define([NET], [test_starke_5.net.owfn])
+m4_define([RED], [starke5])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 4  |P_in|= 0  |P_out|= 0  |T|= 4  |F|= 9" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 3  |P_in|= 0  |P_out|= 0  |T|= 3  |F|= 7" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+AT_SETUP([Starke rule 6])
+m4_define([NET], [test_starke_6.net.owfn])
+m4_define([RED], [starke6])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 5  |P_in|= 0  |P_out|= 0  |T|= 5  |F|= 12" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 4  |P_in|= 0  |P_out|= 0  |T|= 4  |F|= 10" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+AT_SETUP([Starke rule 7])
+m4_define([NET], [test_starke_7.net.owfn])
+m4_define([RED], [starke7])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 3  |P_in|= 0  |P_out|= 0  |T|= 2  |F|= 6" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 2  |P_in|= 0  |P_out|= 0  |T|= 2  |F|= 2" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+AT_SETUP([Starke rule 8])
+m4_define([NET], [test_starke_8.net.owfn])
+m4_define([RED], [starke8])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 4  |P_in|= 0  |P_out|= 0  |T|= 2  |F|= 10" stderr])
+AT_CHECK([PETRI NET --reduce=RED --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 4  |P_in|= 0  |P_out|= 0  |T|= 1  |F|= 4" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+AT_SETUP([Starke rule 9])
+m4_define([NET], [test_starke_9.net.owfn])
+m4_define([RED], [starke9])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 5  |P_in|= 0  |P_out|= 0  |T|= 5  |F|= 13" stderr])
+AT_CHECK([PETRI NET --reduce=RED,once --output=owfn],0,ignore,ignore)
+AT_CHECK([PETRI NET.reduced.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 4  |P_in|= 0  |P_out|= 0  |T|= 4  |F|= 10" stderr])
+AT_KEYWORDS([frontend reduction])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Structural Criteria])
+############################################################################
+
+AT_SETUP([Workflow net])
+m4_define([NET], [test_criteria.workflownet.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --isWorkflow],0,ignore,stderr)
+AT_CHECK([GREP -q "pnapi: NET: 1" stderr])
+AT_KEYWORDS([frontend criteria])
+AT_CLEANUP
+
+AT_SETUP([No workflow net])
+m4_define([NET], [test_criteria.noworkflownet.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --isWorkflow],0,ignore,stderr)
+AT_CHECK([GREP -q "pnapi: NET: 0" stderr])
+AT_KEYWORDS([frontend criteria])
+AT_CLEANUP
+
+AT_SETUP([Free choice net])
+m4_define([NET], [test_criteria.freechoice.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --isFreeChoice],0,ignore,stderr)
+AT_CHECK([GREP -q "pnapi: NET: 1" stderr])
+AT_KEYWORDS([frontend criteria])
+AT_CLEANUP
+
+AT_SETUP([No free choice net])
+m4_define([NET], [test_criteria.nofreechoice.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --isFreeChoice],0,ignore,stderr)
+AT_CHECK([GREP -q "pnapi: NET: 0" stderr])
+AT_KEYWORDS([frontend criteria])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Normalize])
+############################################################################
+
+AT_SETUP([Fiona: Abnormal Input])
+m4_define([NET], [fiona_abnormal_input])
+m4_define([EXPECTED], [NET.normalized.expected.owfn])
+AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
+AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
+AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
+AT_KEYWORDS([normalize fiona])
+AT_CLEANUP
+
+AT_SETUP([Fiona: Abnormal Output])
+m4_define([NET], [fiona_abnormal_output])
+m4_define([EXPECTED], [NET.normalized.expected.owfn])
+AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
+AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
+AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
+AT_KEYWORDS([normalize fiona])
+AT_CLEANUP
+
+AT_SETUP([Fiona: Abnormal Input and Output])
+m4_define([NET], [fiona_abnormal_both])
+m4_define([EXPECTED], [NET.normalized.expected.owfn])
+AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
+AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
+AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
+AT_KEYWORDS([normalize fiona])
+AT_CLEANUP
+
+AT_SETUP([Fiona: Abnormal Input and Output])
+m4_define([NET], [fiona_abnormal_both2])
+m4_define([EXPECTED], [NET.normalized.expected.owfn])
+AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
+AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
+AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
+AT_KEYWORDS([normalize fiona])
+AT_CLEANUP
+
+AT_SETUP([Fiona: Coffee Automaton])
+m4_define([NET], [fiona_coffee])
+m4_define([EXPECTED], [NET.normalized.expected.owfn])
+AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
+AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
+AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
+AT_KEYWORDS([normalize fiona])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Service Automata])
+############################################################################
+
+AT_SETUP([Automaton generation from normal open net])
+m4_define([NET], [test_construction.sequence_normal.net.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET -osa],0,ignore,ignore)
+AT_KEYWORDS([automaton])
+AT_CLEANUP
+
+AT_SETUP([Automaton generation from arbitrary open net])
+m4_define([NET], [test_construction.sequence_unnormal.net.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET -osa],0,ignore,ignore)
+AT_KEYWORDS([automaton])
+AT_CLEANUP
+
+AT_SETUP([Automaton generation from arbitrary open net])
+m4_define([NET], [test_construction.strange_net.net.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET -osa],0,ignore,ignore)
+AT_KEYWORDS([automaton])
+AT_CLEANUP
+
+AT_SETUP([Behavior preservation (asynchronous, petrify)])
+m4_define([NET], [test_automaton_behavior_async.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
+AT_CHECK([PETRI -isa -oowfn --petrify=PETRIFY NET.sa], 0, ignore, ignore)
+AT_CHECK([FIONA -t equivalence NET NET.sa.owfn], 0, ignore, ignore)
+AT_KEYWORDS([automaton synthesis])
+AT_CLEANUP
+
+AT_SETUP([Behavior preservation (asynchronous, statemachine)])
+m4_define([NET], [test_automaton_behavior_async.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
+AT_CHECK([PETRI -isa -oowfn NET.sa], 0, ignore, ignore)
+AT_CHECK([FIONA -t equivalence NET NET.sa.owfn], 0, ignore, ignore)
+AT_KEYWORDS([automaton synthesis])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Memory Leaks])
+############################################################################
+
+AT_SETUP([Testing parser (lola)])
+m4_define([NET], [test_input.lola])
+m4_define([PARAMS], [--input=lola --verbose])
+TEST_LEAK
+AT_CLEANUP
+
+AT_SETUP([Testing parser (owfn)])
+m4_define([NET], [test_input.owfn])
+m4_define([PARAMS], [--input=owfn --verbose])
+TEST_LEAK
+AT_CLEANUP
+
+AT_SETUP([Testing parser (pn/sa)])
+m4_define([NET], [test_myCoffee.sa])
+m4_define([PARAMS], [--input=sa --verbose])
+TEST_LEAK
+AT_CLEANUP
+
+AT_SETUP([Testing parser (pnml)])
+m4_define([NET], [test_input.pnml])
+m4_define([PARAMS], [--input=pnml --verbose])
+TEST_LEAK
+AT_CLEANUP
+
+AT_SETUP([Testing parser (woflan)])
+m4_define([NET], [woflan1.xml.tpn])
+m4_define([PARAMS], [--input=tpn --verbose])
+TEST_LEAK
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Open Net Generator])
+############################################################################
+
+AT_SETUP([Generation of 10 nets with at most 20 places])
+AT_CHECK([GENERATOR 10 20],0,ignore,stderr)
+AT_CHECK([wc -l stderr],0,stdout)
+AT_CHECK([GREP -q "20" stdout])
+AT_KEYWORDS([generator])
+AT_CLEANUP
+
+AT_SETUP([Generation of 20 nets with at most 10 places])
+AT_CHECK([GENERATOR 20 10],0,ignore,stderr)
+AT_CHECK([wc -l stderr],0,stdout)
+AT_CHECK([GREP -q "10" stdout])
+AT_KEYWORDS([generator])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Configurator])
+############################################################################
+
+AT_SETUP([Allow by default, without roles])
+m4_define([NET], [N0.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow],0,ignore,ignore)
+AT_CHECK([PETRI NET-allow -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 9  |P_in|= 0  |P_out|= 0  |T|= 9  |F|= 30" stderr])
+m4_define([NET], [N1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow],0,ignore,ignore)
+AT_CHECK([PETRI NET-allow -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 12  |P_in|= 0  |P_out|= 0  |T|= 11  |F|= 41" stderr])
+m4_define([NET], [N2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow],0,ignore,ignore)
+AT_CHECK([PETRI NET-allow -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 12  |P_in|= 0  |P_out|= 0  |T|= 11  |F|= 41" stderr])
+m4_define([NET], [N3.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow],0,ignore,ignore)
+AT_CHECK([PETRI NET-allow -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 12  |P_in|= 0  |P_out|= 0  |T|= 11  |F|= 41" stderr])
+m4_define([NET], [travel.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow],0,ignore,ignore)
+AT_CHECK([PETRI NET-allow -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 18  |P_in|= 0  |P_out|= 0  |T|= 19  |F|= 70" stderr])
+m4_define([NET], [travel2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow],0,ignore,ignore)
+AT_CHECK([PETRI NET-allow -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 22  |P_in|= 0  |P_out|= 0  |T|= 25  |F|= 89" stderr])
+AT_KEYWORDS([configurator])
+AT_CLEANUP
+
+AT_SETUP([Block by default, without roles])
+m4_define([NET], [N0.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block],0,ignore,ignore)
+AT_CHECK([PETRI NET-block -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 13  |P_in|= 0  |P_out|= 0  |T|= 9  |F|= 34" stderr])
+m4_define([NET], [N1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block],0,ignore,ignore)
+AT_CHECK([PETRI NET-block -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 17  |P_in|= 0  |P_out|= 0  |T|= 11  |F|= 46" stderr])
+m4_define([NET], [N2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block],0,ignore,ignore)
+AT_CHECK([PETRI NET-block -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 17  |P_in|= 0  |P_out|= 0  |T|= 11  |F|= 46" stderr])
+m4_define([NET], [N3.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block],0,ignore,ignore)
+AT_CHECK([PETRI NET-block -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 17  |P_in|= 0  |P_out|= 0  |T|= 11  |F|= 46" stderr])
+m4_define([NET], [travel.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block],0,ignore,ignore)
+AT_CHECK([PETRI NET-block -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 27  |P_in|= 0  |P_out|= 0  |T|= 19  |F|= 79" stderr])
+m4_define([NET], [travel2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block],0,ignore,ignore)
+AT_CHECK([PETRI NET-block -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 34  |P_in|= 0  |P_out|= 0  |T|= 25  |F|= 101" stderr])
+AT_KEYWORDS([configurator])
+AT_CLEANUP
+
+AT_SETUP([Allow by default, with roles])
+m4_define([NET], [N0.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow --roles],0,ignore,ignore)
+AT_CHECK([PETRI NET-allow -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 8  |P_in|= 0  |P_out|= 0  |T|= 7  |F|= 23" stderr])
+m4_define([NET], [N1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow --roles],0,ignore,ignore)
+AT_CHECK([PETRI NET-allow -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 12  |P_in|= 0  |P_out|= 0  |T|= 11  |F|= 41" stderr])
+m4_define([NET], [N2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow --roles],0,ignore,ignore)
+AT_CHECK([PETRI NET-allow -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 11  |P_in|= 0  |P_out|= 0  |T|= 8  |F|= 32" stderr])
+m4_define([NET], [N3.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow --roles],0,ignore,ignore)
+AT_CHECK([PETRI NET-allow -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 11  |P_in|= 0  |P_out|= 0  |T|= 8  |F|= 32" stderr])
+m4_define([NET], [travel.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow --roles],1,ignore,ignore)
+m4_define([NET], [travel2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --allowByDefault --output=NET-allow --roles],1,ignore,ignore)
+AT_KEYWORDS([configurator])
+AT_CLEANUP
+
+AT_SETUP([Block by default, with roles])
+m4_define([NET], [N0.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block --roles],0,ignore,ignore)
+AT_CHECK([PETRI NET-block -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 10  |P_in|= 0  |P_out|= 0  |T|= 7  |F|= 25" stderr])
+m4_define([NET], [N1.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block --roles],0,ignore,ignore)
+AT_CHECK([PETRI NET-block -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 17  |P_in|= 0  |P_out|= 0  |T|= 11  |F|= 46" stderr])
+m4_define([NET], [N2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block --roles],0,ignore,ignore)
+AT_CHECK([PETRI NET-block -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 13  |P_in|= 0  |P_out|= 0  |T|= 8  |F|= 34" stderr])
+m4_define([NET], [N3.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block --roles],0,ignore,ignore)
+AT_CHECK([PETRI NET-block -v],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 13  |P_in|= 0  |P_out|= 0  |T|= 8  |F|= 34" stderr])
+m4_define([NET], [travel.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block --roles],1,ignore,ignore)
+m4_define([NET], [travel2.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([CONFIGURATOR NET --blockByDefault --output=NET-block --roles],1,ignore,ignore)
+AT_KEYWORDS([configurator])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Net Synthesis])
+############################################################################
+
+AT_SETUP([Synthesis using state machine transition])
+m4_define([AUTOMATON], [test_myCoffee.sa])
+AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-syn.owfn .])
+AT_CHECK([PETRI -isa -oowfn AUTOMATON],0,ignore,ignore)
+AT_CHECK([test -f AUTOMATON.owfn])
+AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 11  |P_in|= 1  |P_out|= 3  |T|= 9  |F|= 27" stderr])
+AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-syn.owfn],0,ignore,ignore)
+AT_KEYWORDS([synthesis])
+AT_CLEANUP
+
+AT_SETUP([Synthesis using Petrify])
+m4_define([AUTOMATON], [test_myCoffee.sa])
+AT_CHECK([cp TESTFILES/AUTOMATON TESTFILES/test_myCoffee-sm.owfn .])
+AT_CHECK_PETRIFY
+AT_CHECK([PETRI -isa -oowfn --petrify=PETRIFY AUTOMATON],0,ignore,ignore)
+AT_CHECK([test -f AUTOMATON.owfn])
+AT_CHECK([PETRI AUTOMATON.owfn --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 9  |P_in|= 1  |P_out|= 3  |T|= 4  |F|= 13" stderr])
+AT_CHECK([FIONA -t equivalence AUTOMATON.owfn test_myCoffee-sm.owfn],0,ignore,ignore)
+AT_KEYWORDS([synthesis])
+AT_CLEANUP
+
+AT_SETUP([Synthesis using Genet])
+m4_define([AUTOMATON], [test_myCoffee.sa])
+AT_CHECK([cp TESTFILES/AUTOMATON .])
+AT_CHECK_GENET
+AT_CHECK([PETRI -isa -oowfn --genet=GENET AUTOMATON],0,ignore,ignore)
+AT_CHECK([test -f AUTOMATON.owfn])
+AT_KEYWORDS([synthesis])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Formulae])
+############################################################################
+
+AT_SETUP([Disjunctive Normal Form])
+m4_define([NET], [test_dnf.owfn])
+m4_define([NET2], [NET.dnf.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI -iowfn --dnf -oowfn NET], 0)
+AT_CHECK([GREP -q "NOT" NET2], 1)
+AT_CHECK([GREP -q "<>" NET2], 1)
+AT_CHECK([GREP -q -e "((p . . AND p . .) OR (p . . AND p . .) OR (p . . AND p . .) OR (p . . AND p . .));" NET2], 0)
+AT_KEYWORDS([formulae dnf])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Unfolder])
+############################################################################
+
+AT_SETUP([Unfolding high-level oWFN 1])
+m4_define([NET], [phils.hlowfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([cat NET | UNFOLDER], 0, stdout, ignore)
+AT_CHECK([GREP -q "INTERNAL" stdout])
+AT_CHECK([GREP -q "INITIALMARKING" stdout])
+AT_CHECK([GREP -q "FINALMARKING" stdout])
+AT_KEYWORDS([unfold hlowfn])
+AT_CLEANUP
+
+AT_SETUP([Unfolding high-level oWFN 2])
+m4_define([NET], [data.hlowfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([cat NET | UNFOLDER], 0, stdout, ignore)
+AT_CHECK([GREP -q "INPUT" stdout])
+AT_CHECK([GREP -q "OUTPUT" stdout])
+AT_CHECK([GREP -q "INITIALMARKING" stdout])
+AT_CHECK([GREP -q "FINALMARKING" stdout])
+AT_KEYWORDS([unfold hlowfn])
+AT_CLEANUP
+
+AT_SETUP([Unfolding high-level oWFN 3])
+m4_define([NET], [eisen.hlowfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([cat NET | UNFOLDER], 0, stdout, ignore)
+AT_CHECK([GREP -q "INTERNAL" stdout])
+AT_CHECK([GREP -q "OUTPUT" stdout])
+AT_CHECK([GREP -q "INITIALMARKING" stdout])
+AT_CHECK([GREP -q "FINALMARKING" stdout])
+AT_KEYWORDS([unfold hlowfn])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Canonical DNF])
+############################################################################
+
+AT_SETUP([Syntax Check])
+m4_define([NET], [test_cdnf])
+TEST_CDNF
+AT_CHECK([GREP -q "AND" NET.cdnf.owfn])
+AT_CHECK([GREP -q "OR" NET.cdnf.owfn])
+AT_CHECK([GREP -q "pf = 2" NET.cdnf.owfn])
+AT_CHECK([GREP -q "pf = 1" NET.cdnf.owfn])
+AT_CHECK([GREP -q "p2 = 1" NET.cdnf.owfn])
+AT_CHECK([GREP -q "p3 = 1" NET.cdnf.owfn])
+AT_CLEANUP
+
+AT_SETUP([Equivalence Check (Coffee)])
+m4_define([NET], [myCoffee])
+TEST_CDNF
+AT_CLEANUP
+
+AT_SETUP([Equivalence Check (Zeus)])
+m4_define([NET], [zeus])
+TEST_CDNF
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Customer Tools])
+############################################################################
+
+#AT_SETUP([Wendy])
+#AT_CHECK_WGET
+#AT_CHECK([AT_CHECK_CUSTOMER wendy], 0, ignore, ignore)
+#AT_KEYWORDS([customer])
+#AT_CLEANUP
+
+#AT_SETUP([Mia])
+#AT_CHECK_WGET
+#AT_CHECK([AT_CHECK_CUSTOMER mia], 0, ignore, ignore)
+#AT_KEYWORDS([customer])
+#AT_CLEANUP
+
+#AT_SETUP([Marlene])
+#AT_CHECK_WGET
+#AT_CHECK([AT_CHECK_CUSTOMER marlene], 0, ignore, ignore)
+#AT_KEYWORDS([customer])
+#AT_CLEANUP
+
+#AT_SETUP([Yasmina])
+#AT_CHECK_WGET
+#AT_CHECK([AT_CHECK_CUSTOMER yasmina], 0, ignore, ignore)
+#AT_KEYWORDS([customer])
+#AT_CLEANUP
+
+#AT_SETUP([Diane])
+#AT_CHECK_WGET
+#AT_CHECK([AT_CHECK_CUSTOMER diane], 0, ignore, ignore)
+#AT_KEYWORDS([customer])
+#AT_CLEANUP
+

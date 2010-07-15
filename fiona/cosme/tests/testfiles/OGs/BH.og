@@ -1,0 +1,678 @@
+{
+  generator:    Wendy 2.3-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy ../cosme/tests/simulation/BH.owfn --og --formula=2bit --lola=../lola-statespace 
+  events:       2 send, 5 receive, 0 synchronous
+  statistics:   96 nodes
+}
+
+INTERFACE
+  INPUT
+    outBestellung_Hauslieferung_BoteBestellung_liefern, outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen, outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren, outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung, outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen;
+  OUTPUT
+    inBestellung_Hauslieferung_BoteBestellung_liefern, inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen;
+
+NODES
+  136980896
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136736056
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137421960
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137819304
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137898664
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137906688
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 138392240
+  136668104
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136695864
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137055352
+  136668600
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136674848
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136786552
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 136789136
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137060888
+  136674848
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136678256
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 136692144
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136716912
+  136678256 :: S
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 136679824
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136695864
+  136679824 :: S
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136694584
+  136689744
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136679824
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137055352
+  136691320
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136679824
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136792560
+  136692144
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136679824
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136715392
+  136694584 :: F
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  136695864 :: S
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 136694584
+  136707104
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136678256
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 136689744
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136668104
+  136709856
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136674848
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136707104
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 136788008
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137056192
+  136715392
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136694584
+  136716912
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136695864
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 136715392
+  136717688
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136786552
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136707104
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 136718304
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137089256
+  136718304
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136691320
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136689744
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137086040
+  136736056
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136772456
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136810200
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137263912
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137395656
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137419648
+  136757592
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136692144
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137299640
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137427312
+  136758360
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136678256
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137299640
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137103208
+  136769400
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136707104
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137158208
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137239864
+  136772456
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136668600
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136709856
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136717688
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137080872
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137134248
+  136783688
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136674848
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136758360
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 136757592
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137606216
+  136786552
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136678256
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 136691320
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136795328
+  136788008
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136692144
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136689744
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136813296
+  136789136
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136692144
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136691320
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137051968
+  136792560
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136694584
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  136795328
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136695864
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 136792560
+  136810200
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136668600
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137106480
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137156352
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137104304
+  136813296
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136715392
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137055352
+  137051968
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136715392
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136792560
+  137055352
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136694584
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  137056192
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136716912
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136668104
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 136813296
+  137060888
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136716912
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136795328
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137051968
+  137080872
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136789136
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136788008
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136718304
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137128128
+  137086040
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136792560
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137055352
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  137089256
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136795328
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136668104
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137086040
+  137103208
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136695864
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137104264
+  137104264
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136694584
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  137104304
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136789136
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137196280
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137267344
+  137106480
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136674848
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137158208
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137196280
+  137110856
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136718304
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137267344
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137239864
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  137111408
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136788008
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137196280
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137239864
+  137128128
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137051968
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136813296
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137086040
+  137134248
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137060888
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137056192
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137089256
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137128128
+  137156352
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136786552
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137158208
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137267344
+  137158208 :: S
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136678256
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137175832
+  137175832 :: F
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136679824
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  137196280
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136692144
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137175832
+  137239864
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136689744
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137175832
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  137263912
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136709856
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137106480
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 136769400
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137111408
+  137267344
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136691320
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137175832
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  137299640
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136679824
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137104264
+  137394000
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136668600
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136783688
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137546392
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137686296
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137621744
+  137395656
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136717688
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137156352
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136769400
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137110856
+  137419648
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137080872
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137104304
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137111408
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137110856
+  137421960
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136772456
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137394000
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137684472
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137662064
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137804568
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137870104
+  137427312
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136715392
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137104264
+  137519072
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136691320
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137299640
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137626832
+  137519840
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136788008
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136757592
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137528448
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137661624
+  137524816
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136668104
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137103208
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137756128
+  137528448
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136689744
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137299640
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137756128
+  137545296
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136795328
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137103208
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137626832
+  137546392
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136786552
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136758360
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137519072
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137545296
+  137606216
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136716912
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137103208
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137427312
+  137621744
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137060888
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137606216
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137545296
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137740408
+  137626832
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136792560
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137104264
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  137661624
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136813296
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137427312
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137756128
+  137662064
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136717688
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137546392
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137680568
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137671328
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137672408
+  137669832
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137056192
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137606216
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137524816
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137661624
+  137671328
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136718304
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137519072
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137528448
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137794592
+  137672408
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137089256
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137545296
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137524816
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137794592
+  137680568
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136707104
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136758360
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137528448
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137524816
+  137684472
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136709856
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 136783688
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137680568
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137519840
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137669832
+  137686296
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136789136
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 136757592
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137519072
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137740408
+  137740408
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137051968
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137427312
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137626832
+  137756128
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137055352
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137104264
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  137794592
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137086040
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137626832
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137756128
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  137804568
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137080872
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137686296
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137519840
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137671328
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137854032
+  137819304
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136810200
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137394000
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137916024
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 138087552
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 138124480
+  137854032
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137128128
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137740408
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137661624
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137794592
+  137870104
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137134248
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137621744
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137669832
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137672408
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137854032
+  137898664
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137263912
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137684472
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137916024
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 138059488
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 138262632
+  137906688
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137395656
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137662064
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 138087552
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 138059488
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 138233896
+  137916024
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137106480
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136783688
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137940384
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137989512
+  137940384
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137158208
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136758360
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 137965776
+  137965776
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137175832
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137299640
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  137989512
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137196280
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 136757592
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 137965776
+  138052440
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137267344
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137519072
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137965776
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  138059488
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 136769400
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137680568
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137940384
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 138335928
+  138087552
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137156352
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137546392
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137940384
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 138052440
+  138124480
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137104304
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137686296
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 137989512
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 138052440
+  138233896
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137110856
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137671328
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 138052440
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 138335928
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  138262632
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137111408
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137519840
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137989512
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 138335928
+  138335928
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137239864
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137528448
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 137965776
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+  138392240
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 137419648
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 137804568
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 138124480
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 138262632
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 138233896
+  0
+    outBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_registrieren -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonEntschuldigung_und_Rückerstattung -> 0
+    outBestellung_Hauslieferung_Verkäufer_per_TelefonKunden_benachrichtigen -> 0
+    inBestellung_Hauslieferung_BoteBestellung_liefern -> 0
+    inBestellung_Hauslieferung_Verkäufer_per_TelefonBestellung_im_voraus_ausführen -> 0

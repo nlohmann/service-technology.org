@@ -1,0 +1,17 @@
+             ____      _        _   _   _      _        _    ____ ___ 
+            |  _ \ ___| |_ _ __(_) | \ | | ___| |_     / \  |  _ \_ _|
+            | |_) / _ \ __| '__| | |  \| |/ _ \ __|   / _ \ | |_) | | 
+            |  __/  __/ |_| |  | | | |\  |  __/ |_   / ___ \|  __/| | 
+            |_|   \___|\__|_|  |_| |_| \_|\___|\__| /_/   \_\_|  |___|
+              encapsulating Petri net-related functions in a C++ API
+                        http://service-technology.org/pnapi
+
+
+Version 4.02-unreleased
+=======================
+
+* made petri configurable (paths to external tools, configuration file)
+
+* removed sa2sm and sa2owfn
+
+\nSee file ChangeLog <http://service-technology.org/files/pnapi/ChangeLog> for\ncomplete version history.\n

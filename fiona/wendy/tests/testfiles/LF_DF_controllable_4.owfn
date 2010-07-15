@@ -1,0 +1,62 @@
+
+PLACE
+INTERNAL
+  p1,
+  p11,
+  p2,
+  p3,
+  p4;
+
+INPUT
+  a,
+  b;
+
+OUTPUT
+  ;
+
+SYNCHRONOUS
+  c,
+  d;
+
+INITIALMARKING
+  p1:	1
+ ;
+
+FINALCONDITION
+  p2=1 AND ALL_OTHER_PLACES_EMPTY
+ ;
+
+TRANSITION t1	 { ?a }
+CONSUME
+  p1, a;
+PRODUCE
+  p2;
+
+TRANSITION t11   { ?b }
+CONSUME
+  p1,
+  b;
+PRODUCE
+  p11;
+
+TRANSITION t2	 { #c }
+CONSUME
+  p11;
+PRODUCE
+  p3;
+SYNCHRONIZE
+  c;
+
+TRANSITION t3	 { ?b }
+CONSUME
+  p3, b;
+PRODUCE
+  p4;
+
+TRANSITION t4	 { #d }
+CONSUME
+  p4;
+PRODUCE
+  p11;
+SYNCHRONIZE
+  d;

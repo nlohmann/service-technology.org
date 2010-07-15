@@ -1,0 +1,11 @@
+PLACE
+  p, q;
+MARKING
+  p: 2;
+TRANSITION 1
+  CONSUME
+    p : 1,
+    p : 1;
+  PRODUCE
+    q : 1;
+

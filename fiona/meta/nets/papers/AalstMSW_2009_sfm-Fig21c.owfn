@@ -1,0 +1,32 @@
+PLACE
+  INTERNAL
+    p1, p2, p3, p4;
+
+  INPUT
+    corder, cmoney;
+
+  OUTPUT
+    cfood;
+
+INITIALMARKING
+  p1;
+
+FINALCONDITION
+  ((p4 = 1) AND ALL_OTHER_PLACES_EMPTY);
+
+
+TRANSITION t1
+  CONSUME p1, corder;
+  PRODUCE p2;
+
+TRANSITION t2
+  CONSUME p2;
+  PRODUCE p3, cfood;
+
+TRANSITION t3
+  CONSUME p3, cmoney;
+  PRODUCE p4;
+
+TRANSITION t4
+  CONSUME p2, cmoney;
+  PRODUCE p4;

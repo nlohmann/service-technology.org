@@ -1,0 +1,6 @@
+PLACES
+  photo,
+  creditCard;   
+
+TRANSITIONS
+;

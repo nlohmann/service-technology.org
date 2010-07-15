@@ -1,0 +1,563 @@
+#include <iostream>
+#include <fstream>
+#include <cstdio>
+#include <cstdlib>
+#include <map>
+#include <set>
+#include <vector>
+#include <string>
+#include <queue>
+
+#include <config.h>
+#include "cmdline.h"
+#include "util.h"
+#include "formula.h"
+#include "dnf.h"
+
+using std::cerr;
+using std::cout;
+using std::endl;
+using std::ofstream;
+using std::map;
+using std::multimap;
+using std::pair;
+using std::vector;
+using std::string;
+using std::set;
+using std::queue;
+using std::ostream;
+
+/// the command line parameters
+gengetopt_args_info args_info;
+
+
+/// lexer and parser
+extern int yyparse();
+extern int yylex_destroy();
+extern FILE* yyin;
+
+/// output stream
+std::ostream* myOut = &cout;
+
+/****************************
+ * Variables used by parser *
+ ***************************/
+/// non deterministic successor list of recent OG
+map<unsigned int, multimap<string, unsigned int> > succ;
+/// annotations of recent OG
+map<unsigned int, Formula *> formulae;
+/// input labels of recent OG
+set<string> inputs;
+/// output labels of recent OG
+set<string> outputs;
+/// synchronous labels of recent OG
+set<string> synchronous;
+/// present labels of recent OG
+map<unsigned int, set<string> > presentLabels;
+/// initial node ID of recent OG
+unsigned int * initialID = NULL;
+
+/*********************************
+ * Variables used by M generator *
+ *********************************/
+/// mapping from ID to state
+map<unsigned int, vector<unsigned int> > ID2state;
+
+/// final states
+set<unsigned int> finalIDs;
+
+/// global temporary buffer for each state
+multimap<string, unsigned int> removeArcs;
+
+/// number of nodes/states
+unsigned int numberOfNodes = 0;
+
+
+/****************************************
+ * evaluate the command line parameters *
+ ****************************************/
+void evaluateParameters(int argc, char** argv) 
+{
+  // initialize the parameters structure
+  struct cmdline_parser_params *params = cmdline_parser_params_create();
+
+  // call the cmdline parser
+  cmdline_parser(argc, argv, &args_info);
+
+  free(params);
+}
+
+/*
+/// zero vector needed by stateID()
+vector<unsigned int> * zeroVector = NULL;
+	   ;
+
+
+/// maps a vector of states to state ID
+// may be removed later...
+unsigned int stateID(const vector<unsigned int> & state)
+{
+  static unsigned int newID = 1;
+  static map<vector<unsigned int>, unsigned int> IDs;
+  
+  // initialize zero vector
+  if(zeroVector == NULL)
+  {
+    zeroVector = new vector<unsigned int>();
+    for(unsigned int i = 0; i < state.size(); ++i)
+    {
+      zeroVector->push_back(0);
+    }
+  }
+  
+  // the empty node of all OGs will be the empty node of the product OG
+  if(state == *zeroVector)
+    return 0;
+  
+  return ((IDs[state] == 0) ? (IDs[state] = newID++) : IDs[state]);
+}
+*/
+
+void dump() {
+
+	// check parsed output
+    cout << PACKAGE << " : succ " << endl;
+    for( map<unsigned int, multimap<string, unsigned int> >::iterator it=succ.begin(); it!=succ.end(); ++it) {
+	    cout << it->first << "::" << endl;
+	    multimap<string, unsigned int> element = it->second;
+        for( multimap<string, unsigned int>::iterator sit=element.begin(); sit!=element.end(); ++sit) {
+ 	       cout << it->first << ": " << sit->second << ", ";
+        }
+        cout << endl;
+ 	 }
+
+    cout << PACKAGE << " : formula " << endl;
+    for( map<unsigned int,Formula * >::iterator it=formulae.begin(); it!=formulae.end(); ++it) {
+ 	       cout << it->first << ": " << it->second << endl;
+ 	 }
+
+    cout << PACKAGE << " : inputs " << endl;
+    for (set<string>::iterator it=inputs.begin();  it!= inputs.end(); ++it) {
+      cout << it->data() << ",";
+    }
+    cout << endl;
+
+    cout << PACKAGE << " : outputs " << endl;
+    for (set<string>::iterator it=outputs.begin();  it!= outputs.end(); ++it) {
+      cout << it->data() << ",";
+    }
+    cout << endl;
+
+    cout << PACKAGE << " : synchronous " << endl;
+    for (set<string>::iterator it=synchronous.begin();  it!= synchronous.end(); ++it) {
+      cout << it->data() << ",";
+    }
+    cout << endl;
+
+    cout << PACKAGE << " : presentLabels " << endl;
+    for( map<unsigned int, set<string> >::iterator it=presentLabels.begin(); it!=presentLabels.end(); ++it) {
+	    cout << it->first << "::" << endl;
+	    set<string> element = it->second;
+	    for (set<string>::iterator sit=element.begin();  sit!= element.end(); ++sit) {
+ 	       cout << sit->data() << ", ";
+        }
+        cout << endl;
+ 	 }
+    /// initial node ID of recent OG
+//    unsigned int * initialID = NULL;
+    cout << PACKAGE << " : initialID " << (*initialID) << endl;
+
+}
+
+// convert each formulae to DNF
+void convertFormulaToDNF() {
+
+	for( map<unsigned int,Formula * >::iterator it=formulae.begin(); it!=formulae.end(); ++it) {
+		Formula * f = it->second;
+        Formula * formula = f->clone();
+        Formula * formula_ = formula->dnf();
+        delete f;
+        delete formula;
+
+        formulae[it->first] = formula_;
+//        cout <<  "org formula : " << f << endl;
+//        cout <<  "dnf formula : " << formula_ << endl;
+	 }
+}
+
+/// generic routine to add an internal tau choice
+// for each formula, add an internal tau choice of all outgoing arcs described by the formulas
+void addAnInternalChoice(set<Formula *> childrenFormula, unsigned int sourceNode, multimap<string, unsigned int> * arcMap) {
+
+	multimap<string, unsigned int> oldArcs;
+
+	// there are possibly too many literals described in  arcMap
+	// get only arc that describe by all literals in the formula
+	for( set<Formula *>::iterator it=childrenFormula.begin(); it!=childrenFormula.end(); ++it) {
+    	Formula * f = *it;
+    	Literal * literal = dynamic_cast<Literal *> (f);
+		if (literal != NULL) {
+//	cout << "#" << literal->getString();
+
+			if (literal->getString() == "final") {
+				finalIDs.insert(numberOfNodes);
+			}
+			else {
+				string label = literal->getString();
+	 		    pair< multimap<string, unsigned int>::iterator, multimap<string, unsigned int>::iterator> range
+						= arcMap->equal_range(label);
+	 		    for (multimap<string, unsigned int>::iterator mit=range.first; mit!=range.second; ++mit) {
+					oldArcs.insert(multimap<string, unsigned int>::value_type(mit->first, mit->second));
+					removeArcs.insert(multimap<string, unsigned int>::value_type(mit->first, mit->second));
+	 		    }
+ 		    }
+		}
+		// else it is not literal
+	}
+
+	// create a newNode;
+    succ[numberOfNodes] = oldArcs;
+
+	// add a TAU arc from a sourceNode to a newNode
+   	arcMap->insert( multimap<string, unsigned int>::value_type("TAU", numberOfNodes) );
+
+   	numberOfNodes++;
+}
+
+void addLiteralNode(unsigned int sourceNode, Literal * literal) {
+
+	literal->out(cout) << "[Literal],";
+
+	// read all outgoing arc label from a source node;
+	multimap<string, unsigned int> arcMap = succ[sourceNode];
+
+	//	if literal string is "true"
+	if (literal->operator==("true")) {
+
+		for( multimap<string, unsigned int>::iterator it=arcMap.begin(); it!=arcMap.end(); ++it) {
+			//cout << "@:" << it-> first << ", ";
+			Literal aLiteral(it->first);
+			set<Formula *> childrenFormula;
+			childrenFormula.insert(& aLiteral);
+			addAnInternalChoice(childrenFormula, sourceNode, & succ[sourceNode]);
+		}
+	} else {
+		//	if literal string is not "false"
+		if (!literal->operator==("false")) {
+			//cout << "\n  @::" << literal->getString() << " ";
+			set<Formula *> childrenFormula;
+			childrenFormula.insert(dynamic_cast<Formula *> (literal));
+			addAnInternalChoice(childrenFormula, sourceNode, & succ[sourceNode]);
+		}
+	}
+	// in case literal string is "false", do nothing
+}
+
+void addConjunctionNode(unsigned int sourceNode, Formula * formula) {
+
+	// add an transition
+	addAnInternalChoice(formula->getElements(), sourceNode, & succ[sourceNode]);
+
+}
+
+
+void addDisjunctionNode(unsigned int sourceNode, Formula * formula) {
+	// assume formula is dnf; a disjunction of either literal or conjunction
+	set<Formula *> dnfElements = formula->getElements();
+
+	for (set<Formula *>::iterator it=dnfElements.begin(); it!=dnfElements.end(); ++it)	{
+    	Literal * l = dynamic_cast<Literal *> (formula);
+    	if (l != NULL)
+    		addLiteralNode(sourceNode, l);
+    	else
+    		addConjunctionNode(sourceNode, *it);
+	}
+}
+
+
+// construct a maximal partner from OGs
+void constructMaximalPartner() {
+	numberOfNodes = succ.size();
+
+    for( map<unsigned int, Formula *>::iterator it=formulae.begin(); it!=formulae.end(); ++it) {
+    	unsigned int node = it->first;
+	    cout << node << " :: ";
+	    Formula * f = formulae[node];
+        Formula * dnf = f->dnf();
+        delete f;
+
+        formulae[node] = dnf;
+        cout << formulae[node];
+
+        cout << " :: ";
+
+	    set<Formula *> fwrapper = dnf->getElements();
+	    for( set<Formula *>::iterator fwit=fwrapper.begin(); fwit!=fwrapper.end(); ++fwit) {
+
+	    	// add internal tau choices
+	    	Formula * formula = *fwit;
+	    	Literal * l = dynamic_cast<Literal *> (formula);
+	    	if (l != NULL)  {
+	    		addLiteralNode(node, l);
+	    	} else {
+	    		// formula must be an operator
+	    		if ( dynamic_cast<Conjunction *> (formula) != NULL)
+	    			addConjunctionNode(node, formula);
+	    		else
+	    			addDisjunctionNode(node, formula);
+	    	}
+
+	    }
+
+        cout << endl;
+
+        multimap<string, unsigned int> element = succ[node];
+        for( multimap<string, unsigned int>::iterator sit=element.begin(); sit!=element.end(); ++sit) {
+	       cout << sit->first << ": " << sit->second << ", ";
+        }
+        cout << endl;
+
+		cout << "removing arcs..." << endl;
+
+		// remove all arcs from the list of destination node of sourceNode
+    	// i.e., remove all outgoing arc with labels described in the removeArcs
+		multimap<string, unsigned int> * arcMap = & succ[node];
+		multimap<string, unsigned int>::iterator foundit;
+    	for ( multimap<string, unsigned int>::iterator rit=removeArcs.begin(); rit!=removeArcs.end(); ++rit) {
+    		string label = rit->first;
+			foundit = arcMap->find(label);
+			if (foundit != arcMap->end()) {
+				cout << "(" << rit->first << "," << rit->second << ") " ;
+				cout << "delete " << rit->first << endl ;
+			    arcMap->erase( arcMap->lower_bound(rit->first), arcMap->upper_bound(rit->first) );
+			}
+ 		}
+
+        removeArcs.clear();
+		cout << "newArcs/removeArcs clear!" << endl;
+
+		element = succ[node];
+        for( multimap<string, unsigned int>::iterator sit=element.begin(); sit!=element.end(); ++sit) {
+	       cout << sit->first << ": " << sit->second << ", ";
+        }
+        cout << endl;
+ 	 }
+}
+
+/// write output as a service automaton
+void writeOutputSA() {
+	bool initialState = false;
+
+	  (*myOut) << "INTERFACE\n";
+	  if(!inputs.empty()) {
+	    (*myOut) << "  INPUT\n    " << *inputs.begin();
+	    for(set<string>::iterator it = ++(inputs.begin()); it != inputs.end(); ++it) {
+	      (*myOut) << ", " << *it;
+	    }
+	    (*myOut) << ";\n";
+	  }
+
+	  if(!outputs.empty()) {
+	    (*myOut) << "  OUTPUT\n    " << *outputs.begin();
+	    for(set<string>::iterator it = ++(outputs.begin()); it != outputs.end(); ++it) {
+	      (*myOut) << ", " << *it;
+	    }
+	    (*myOut) << ";\n";
+	  }
+
+	  if(!synchronous.empty()) {
+	    (*myOut) << "  SYNCHRONOUS\n    " << *synchronous.begin();
+	    for(set<string>::iterator it = ++(synchronous.begin()); it != synchronous.end(); ++it) {
+	      (*myOut) << ", " << *it;
+	    }
+	    (*myOut) << ";\n";
+	  }
+
+	  (*myOut) << "\nNODES\n";
+
+	  for( map<unsigned int, multimap<string, unsigned int> >::iterator it=succ.begin(); it!=succ.end(); ++it)  {
+
+//	    if(args_info.show_states_given)
+//	    {
+//	      (*myOut) << "  { ";
+//	      for(unsigned int j = 0; j < ID2state[i->first].size(); ++j)
+//	      {
+//	        (*myOut) << ID2state[i->first][j] << " ";
+//	      }
+//	      (*myOut) << "}\n";
+//	    }
+
+	    (*myOut) << "  " << it->first << " : "; //it->second << "\n";
+
+	    // read a node, write corresponding node
+	    if ((*initialID) == (it->first)) {
+	      (*myOut) << "INITIAL";
+	      initialState = true;
+	    }
+
+
+	    set<unsigned int>::iterator finalFound = finalIDs.find(it->first);
+	    if (finalFound != finalIDs.end()) {
+	    	if ((*initialID) == (it->first))
+	    		(*myOut) << ", ";
+
+	    	(*myOut) << "FINAL";
+	    }
+
+
+	    (*myOut) << "\n";
+
+	    for(multimap<string, unsigned int>::iterator sit = succ[it->first].begin(); sit != succ[it->first].end(); ++sit) {
+	    	(*myOut) << "    " << sit->first << " -> " << sit->second << "\n";
+	    }
+	  }
+
+	  (*myOut) << endl << std::flush;
+}
+
+
+void generateDNFStructure() {
+   for( map<unsigned int, Formula *>::iterator it=formulae.begin(); it!=formulae.end(); ++it) {
+	   unsigned int node = it->first;
+	   Formula * f = it->second;
+	   cout << node << " :: ";
+	   f->out(cout) << endl;
+
+	   set<string> tmpset = util::setUnion(inputs, outputs);
+
+	   DNF * aDNF = new DNF( formulae[node], tmpset );
+
+	    cout << PACKAGE << " : traversing ng DNF structure..." << endl;
+	    aDNF->out(cout) << endl;
+
+//	   delete(aDNF);
+   }
+}
+
+void parseCommandLineParameters() {
+
+}
+
+
+/// main function
+int main(int argc, char** argv)
+{
+  /*--------------------------------------.
+  | 0. parse the command line parameters  |
+  `--------------------------------------*/
+  // stream for file output
+  ofstream ofs;
+  
+  // parse commandline
+  evaluateParameters(argc, argv);
+  
+  // store invocation in a std::string for meta information in file output
+    for (int idx = 0; idx < argc; ++idx) {
+    	cout << PACKAGE << " : arg[" << idx << "] is " << std::string(argv[idx]).data() << endl;
+//        invocation += std::string(argv[i]) + " ";
+    }
+
+  /*---------------------------.
+  | 1. set output destination  |
+  `---------------------------*/
+  if(args_info.output_given) // if user set an output file
+  {
+    ofs.open(args_info.output_arg, std::ios_base::trunc); // open file
+    if(!ofs) // if an error occurred on opening the file
+    {
+      cerr << PACKAGE << ": ERROR: failed to open output file '"
+           << args_info.output_arg << "'" << endl;
+      exit(EXIT_FAILURE);
+    }
+    
+    // else link output stream to file stream
+    myOut = &ofs;
+  }
+  
+  /*--------------.
+  | 2. parse OGs  |
+  `--------------*/
+  if(args_info.inputs_num < 1) // if none of OG is given
+  {
+    cerr << PACKAGE << ": ERROR: at least an OG must be given" << endl;
+    exit(EXIT_FAILURE);
+  }
+  
+  for(unsigned int i = 0; i < args_info.inputs_num; ++i)
+  {
+    // open file and link input file pointer
+    yyin = fopen(args_info.inputs[i], "r");
+    if(!yyin) // if an error occurred
+    {
+      cerr << PACKAGE << ": ERROR: failed to open input file '"
+           << args_info.inputs[i] << "'" << endl;
+      exit(EXIT_FAILURE);
+    }
+    
+    /// actual parsing
+    yyparse();
+
+    // dump all parsed variables to stdout
+//    dump();
+
+    unsigned int numberOfNodes = succ.size();
+
+    // construct a maximal partner
+	cout << PACKAGE << " : constructing a maximal partner... " << endl;
+    constructMaximalPartner();
+
+    // write output
+    cout << PACKAGE << " : start writing output..." << endl;
+    writeOutputSA();
+
+    // generate complete DNF structure
+    cout << PACKAGE << " : start generating DNF structure..." << endl;
+    generateDNFStructure();
+
+    if(initialID != NULL)
+    {
+        cout << PACKAGE << " : initialID = " << (*initialID) << endl;
+        cout << PACKAGE << " : number of nodes before = " << numberOfNodes << endl;
+        cout << PACKAGE << " : number of nodes after  = " << succ.size() << endl;
+        cout << PACKAGE << " : " ;
+        if (finalIDs.empty())
+        	cout << "there is no final states." << endl;
+        else {
+        	cout << "final states are ";
+        	for (set<unsigned int>::iterator it=finalIDs.begin(); it!=finalIDs.end(); ++it)
+        		cout  << *it << ", ";
+        	cout << endl;
+        }
+    }
+//    else
+//    {
+//      cerr << PACKAGE << ": ERROR: producing with empty OG '"
+//           << args_info.inputs[i] << "' results in empty product OG" << endl;
+//      exit(EXIT_FAILURE);
+//    }
+      
+    
+    /// clear maps
+    succ.clear();
+    formulae.clear();
+    inputs.clear();
+    outputs.clear();
+    synchronous.clear();
+    presentLabels.clear();
+    removeArcs.clear();
+    finalIDs.clear();
+    delete initialID;
+    initialID = NULL;
+    
+    /// close input
+    fclose(yyin);
+  }
+  
+
+  /// clean lexer memory
+  yylex_destroy();
+
+  cout << PACKAGE << " : exit..." << endl;
+  exit(EXIT_SUCCESS); // finished parsing
+}
+

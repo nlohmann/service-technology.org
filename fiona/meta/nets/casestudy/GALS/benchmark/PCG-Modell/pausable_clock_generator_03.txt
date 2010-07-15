@@ -1,0 +1,139 @@
+{Pausable Clock Generator des zweiten Wrappers (unver‰ndert zu dem im ersten)}
+
+{01: konkret, unreduziert}
+{02: alle Komponenten zu einem Modul zusammengefasst; abstrahiert:}
+{      * STOPI- lˆst anfangs LCLK+}
+{      * danach werden durch Marke auf internem LCLK-Flankenplatz LCLK-Flanken}
+{        erzeugt}
+{      * STOPI+ bei LCLK=0 konsumiert interne LCLK-Flankenmarke und stoppt so}
+{        weitere Produktion von LCLK-Flanke}
+{      * Mutex-Verhalten durch herkˆmmliches Lesen von Pegeln realisiert}
+{03: weiter abstrahiert (Christian):}
+{      * STOPI-Flanke aktualisiert nur STOPI-Pegel}
+{      * LCLK+ erzeugen, wenn Pegel von STOPI, REQI1 und STRETCH das erlauben}
+{      * Nach LCLK+ immer LCLK- produzieren}
+{      * Mutex zwischen LCLK und REQI1, STRETCH durch Konsumieren von}
+{        Pegelmarken gelˆst.}
+
+PLACE
+    pcg.p.STOPI,
+    pcg.p.n_STOPI,
+    pcg.p.REQI1,
+    pcg.p.n_REQI1,
+    pcg.p.STRETCH,
+    pcg.p.n_STRETCH,
+    pcg.p.ACKI1,
+    pcg.p.n_ACKI1,
+    pcg.p.LCLK,
+    pcg.p.n_LCLK,
+    pcg.p.pegel_STOPI_0,
+    pcg.p.pegel_STOPI_1,
+    pcg.p.pegel_REQI1_0,
+    pcg.p.pegel_REQI1_1,
+    pcg.p.pegel_STRETCH_0,
+    pcg.p.pegel_STRETCH_1,
+    pcg.p.pegel_LCLK_0,
+    pcg.p.pegel_LCLK_1;
+    
+
+MARKING
+    pcg.p.n_STOPI: 1,
+    pcg.p.n_REQI1: 1,
+    pcg.p.n_STRETCH: 1,
+    pcg.p.n_ACKI1: 1,
+    pcg.p.n_LCLK: 1,
+    pcg.p.pegel_STOPI_1: 1, {STOPI initial 1}
+    pcg.p.pegel_REQI1_0: 1,
+    pcg.p.pegel_STRETCH_0: 1,
+    pcg.p.pegel_LCLK_0: 1;
+
+
+{STOPI-Flanke aktualisiert Pegel}
+
+TRANSITION pcg.t.STOPI-
+CONSUME pcg.p.STOPI: 1, pcg.p.pegel_STOPI_1: 1;
+PRODUCE pcg.p.n_STOPI: 1, pcg.p.pegel_STOPI_0: 1;
+
+TRANSITION pcg.t.STOPI+
+CONSUME pcg.p.STOPI: 1, pcg.p.pegel_STOPI_0: 1;
+PRODUCE pcg.p.n_STOPI: 1, pcg.p.pegel_STOPI_1: 1;
+
+
+
+{LCLK+ kann erzeugt werden, wenn STOPI=REQI1=STRETCH=LCLK=0}
+{Dabei werden Pegelmarken von REQI1 und STRETCH konsumiert und erst bei}
+{Erzeugung von LCLK- wieder produziert. Dadurch werden Flanken an REQI1 und}
+{STRETCH erst wieder nach LCLK- verarbeitet (also: Mutex-Verhalten).}
+TRANSITION pcg.t.LCLK+
+CONSUME pcg.p.pegel_LCLK_0: 1, pcg.p.pegel_STOPI_0: 1, pcg.p.pegel_REQI1_0: 1,
+        pcg.p.pegel_STRETCH_0: 1, pcg.p.n_LCLK: 1;
+PRODUCE pcg.p.pegel_LCLK_1: 1, pcg.p.pegel_STOPI_0: 1, pcg.p.LCLK: 1;
+
+{LCLK- kann immer erzeugt werden, wenn LCLK=1}
+{Pegelmarken f¸r REQI1 und STRETCH (beide =0), die pcg.t.LCLK+ konsumiert hat,}
+{m¸ssen wieder produziert werden. Erkl‰rung siehe dort.}
+TRANSITION pcg.t.LCLK-
+CONSUME pcg.p.pegel_LCLK_1: 1, pcg.p.n_LCLK: 1;
+PRODUCE pcg.p.pegel_LCLK_0: 1, pcg.p.pegel_REQI1_0: 1, pcg.p.pegel_STRETCH_0: 1,
+        pcg.p.LCLK: 1;
+
+
+
+{REQI1-Flanke}
+
+{REQI1+ => ACKI1+ (Mutex-Verhalten wird erreicht durch Transition pcg.t.LCLK+,}
+{die Marken von pcg.p.pegel_REQI1_0 entfernt)}
+TRANSITION pcg.t.REQI1+
+CONSUME pcg.p.REQI1: 1, pcg.p.pegel_REQI1_0: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.p.n_REQI1: 1, pcg.p.pegel_REQI1_1: 1, pcg.p.ACKI1: 1;
+
+{REQI1- => ACKI1-}
+TRANSITION pcg.t.REQI1-
+CONSUME pcg.p.REQI1: 1, pcg.p.pegel_REQI1_1: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.p.n_REQI1: 1, pcg.p.pegel_REQI1_0: 1, pcg.p.ACKI1: 1;
+
+
+{STRETCH-Flanke}
+
+{STRETCH analog zu REQI1 (nur ohne Flankenausgang)}
+TRANSITION pcg.t.STRETCH+
+CONSUME pcg.p.STRETCH: 1, pcg.p.pegel_STRETCH_0: 1;
+PRODUCE pcg.p.n_STRETCH: 1, pcg.p.pegel_STRETCH_1: 1;
+
+TRANSITION pcg.t.STRETCH-
+CONSUME pcg.p.STRETCH: 1, pcg.p.pegel_STRETCH_1: 1;
+PRODUCE pcg.p.n_STRETCH: 1, pcg.p.pegel_STRETCH_0: 1;
+
+
+
+
+{Anbindung an die Auﬂenwelt}
+
+{STOPI produzieren}
+TRANSITION pcg.t.STOPI
+CONSUME pcg.p.n_STOPI: 1;
+PRODUCE pcg.p.STOPI: 1;
+
+{REQI1 produzieren}
+TRANSITION pcg.t.REQI1
+CONSUME pcg.p.n_REQI1: 1;
+PRODUCE pcg.p.REQI1: 1;
+
+{STRETCH produzieren}
+TRANSITION pcg.t.STRETCH
+CONSUME pcg.p.n_STRETCH: 1;
+PRODUCE pcg.p.STRETCH: 1;
+
+{ACKI1 abr‰umen}
+TRANSITION pcg.t.ACKI1
+CONSUME pcg.p.ACKI1: 1;
+PRODUCE pcg.p.n_ACKI1: 1;
+
+{LCLK abr‰umen}
+TRANSITION pcg.t.LCLK
+CONSUME pcg.p.LCLK: 1;
+PRODUCE pcg.p.n_LCLK: 1;
+
+
+
+{ vim: set ft=lola: }

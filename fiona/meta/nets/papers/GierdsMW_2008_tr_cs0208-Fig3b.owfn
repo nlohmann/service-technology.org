@@ -1,0 +1,65 @@
+{ 
+DESCRIPTION: Services synthesized for the running example
+              (a) Partial adapter E
+}
+
+PLACE
+  INTERNAL
+    p1,p2,p3,p4,p5,p6,p7;
+  INPUT
+    PCom3,PCom4,PCom5,Rule1_i,Rule2_i,Rule3_i,Rule4_i,RCom1,DEuro,
+    MServedTea,MServedCoffee;
+  OUTPUT
+    PCom1,PCom2,Rule1_o,Rule2_o,Rule3_o,Rule4_o,RCom2,MEuro,MTeaButton,
+    MCoffeeButton,DServedCoffee;
+  
+INITIALMARKING
+  ;
+
+FINALCONDITION
+  ;
+
+TRANSITION t1
+  CONSUME p1,PCom5;
+  PRODUCE MEuro;
+
+TRANSITION t2
+  CONSUME p2,Rule4_i;
+  PRODUCE Rule4_o,p1;
+
+TRANSITION t3
+  CONSUME DEuro;
+  PRODUCE RCom2,p2;
+
+TRANSITION t4
+  CONSUME p3,PCom4;
+  PRODUCE MTeaButton;
+
+TRANSITION t5
+  CONSUME Rule3_i;
+  PRODUCE Rule3_o,p3;
+
+TRANSITION t6
+  CONSUME p4,PCom3;
+  PRODUCE MCoffeeButton;
+
+TRANSITION t7
+  CONSUME Rule2_i;
+  PRODUCE Rule2_o,p4;
+
+TRANSITION t8
+  CONSUME MServedTea;
+  PRODUCE p5,PCom2;
+
+TRANSITION t9
+  CONSUME MServedCoffee;
+  PRODUCE PCom1,p6;
+
+TRANSITION t10
+  CONSUME p6,Rule1_i;
+  PRODUCE p7,Rule1_o;
+
+TRANSITION t11
+  CONSUME p7,RCom1;
+  PRODUCE DServedCoffee;
+

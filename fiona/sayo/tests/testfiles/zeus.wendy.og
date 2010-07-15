@@ -1,0 +1,35 @@
+INTERFACE
+  INPUT
+    accept, reject;
+  OUTPUT
+    invoice, offer;
+
+NODES
+  675312256 :: S
+    accept -> 0
+    reject -> 0
+    invoice -> 675312448
+    offer -> 675312512
+  675312448
+    accept -> 0
+    reject -> 0
+    offer -> 675312576
+  675312512
+    accept -> 675312832
+    reject -> 675312256
+    invoice -> 675312576
+  675312576
+    accept -> 675312896
+    reject -> 675312448
+  675312832 :: S
+    accept -> 0
+    reject -> 0
+    invoice -> 675312896
+  675312896 :: F
+    accept -> 0
+    reject -> 0
+  0
+    accept -> 0
+    reject -> 0
+    invoice -> 0
+    offer -> 0

@@ -1,0 +1,126 @@
+{test2 op1}
+
+PLACE
+INTERNAL
+  p0,
+  p0_tau,
+  p1,
+  p2,
+  p3,
+  p4,
+  p5,
+  p6,
+  p7,
+  p8,
+  p9;
+
+INPUT
+  d;
+
+OUTPUT
+  a, b, c;
+
+INITIALMARKING
+  p0:   1;
+
+FINALCONDITION
+  (p9 = 1) AND ALL_OTHER_PLACES_EMPTY;
+
+TRANSITION t1
+CONSUME
+  p0:   1;
+PRODUCE
+  p0_tau:   1;
+
+TRANSITION t2
+CONSUME
+  p0:   1;
+PRODUCE
+  a:    1,
+  p1:   1;
+
+TRANSITION t3
+CONSUME
+  p0:   1;
+PRODUCE
+  b:    1,
+  p2:   1;
+
+TRANSITION t4
+CONSUME
+  p0:   1;
+PRODUCE
+  c:    1,
+  p3:   1;
+
+TRANSITION t5
+CONSUME
+  p0_tau:   1;
+PRODUCE
+  a:    1,
+  p1:   1;
+
+TRANSITION t6
+CONSUME
+  p0_tau:   1;
+PRODUCE
+  b:    1,
+  p2:   1;
+
+TRANSITION t7
+CONSUME
+  p1:   1;
+PRODUCE
+  b:    1,
+  p4:   1;
+
+TRANSITION t8
+CONSUME
+  p2:   1;
+PRODUCE
+  a:    1,
+  p5:   1;
+
+TRANSITION t9
+CONSUME
+  p4:   1;
+PRODUCE
+  c:    1,
+  p8:   1;
+
+TRANSITION t10
+CONSUME
+  p5:   1;
+PRODUCE
+  c:    1,
+  p8:   1;
+
+TRANSITION t11
+CONSUME
+  d:    1,
+  p8:   1;
+PRODUCE
+  p9:   1;
+
+TRANSITION t12
+CONSUME
+  d:    1,
+  p3:   1;
+PRODUCE
+  p6:   1;
+
+TRANSITION t13
+CONSUME
+  p6:   1;
+PRODUCE
+  b:    1,
+  p7:   1;
+
+TRANSITION t14
+CONSUME
+  p7:   1;
+PRODUCE
+  a:    1,
+  p9:   1;
+
+{ END OF FILE }

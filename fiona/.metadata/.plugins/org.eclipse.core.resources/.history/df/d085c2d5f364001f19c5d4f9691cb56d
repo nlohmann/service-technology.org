@@ -1,0 +1,75 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+# Add inputs and outputs from these tool invocations to the build variables 
+CC_SRCS += \
+../src/AnnotationLivelockOG.cc \
+../src/Clause.cc \
+../src/CompositeMarking.cc \
+../src/Cover.cc \
+../src/Diagnosis.cc \
+../src/InnerMarking.cc \
+../src/InterfaceMarking.cc \
+../src/Knowledge.cc \
+../src/Label.cc \
+../src/LivelockOperatingGuideline.cc \
+../src/Output.cc \
+../src/PossibleSendEvents.cc \
+../src/Queue.cc \
+../src/Results.cc \
+../src/SCSHandler.cc \
+../src/StoredKnowledge.cc \
+../src/main.cc \
+../src/verbose.cc 
+
+OBJS += \
+./src/AnnotationLivelockOG.o \
+./src/Clause.o \
+./src/CompositeMarking.o \
+./src/Cover.o \
+./src/Diagnosis.o \
+./src/InnerMarking.o \
+./src/InterfaceMarking.o \
+./src/Knowledge.o \
+./src/Label.o \
+./src/LivelockOperatingGuideline.o \
+./src/Output.o \
+./src/PossibleSendEvents.o \
+./src/Queue.o \
+./src/Results.o \
+./src/SCSHandler.o \
+./src/StoredKnowledge.o \
+./src/main.o \
+./src/verbose.o 
+
+CC_DEPS += \
+./src/AnnotationLivelockOG.d \
+./src/Clause.d \
+./src/CompositeMarking.d \
+./src/Cover.d \
+./src/Diagnosis.d \
+./src/InnerMarking.d \
+./src/InterfaceMarking.d \
+./src/Knowledge.d \
+./src/Label.d \
+./src/LivelockOperatingGuideline.d \
+./src/Output.d \
+./src/PossibleSendEvents.d \
+./src/Queue.d \
+./src/Results.d \
+./src/SCSHandler.d \
+./src/StoredKnowledge.d \
+./src/main.d \
+./src/verbose.d 
+
+
+# Each subdirectory must supply rules for building sources it contributes
+src/%.o: ../src/%.cc
+	@echo 'Building file: $<'
+	@echo 'Invoking: GCC C++ Compiler'
+	g++ -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	@echo 'Finished building: $<'
+	@echo ' '
+
+

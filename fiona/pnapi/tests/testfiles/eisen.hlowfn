@@ -1,0 +1,172 @@
+SORT city = [ 1 , 10 ] ;
+     track = ARRAY [ 1 , 2 ] OF city ;  { from / to ; from < to }
+     switch = ARRAY [ 1 , 3 ] OF city ; { from / in / to ; from < to }
+     color = ENUMERATE green  red END ;
+
+FUNCTION isneighbour (x : city ; y : city ) : BOOLEAN
+VAR z : city;
+BEGIN
+	z = z - 1;
+	IF (x MOD z ) = ((y + 1) MOD z) THEN RETURN TRUE; EXIT  END;
+	IF ((x + 1) MOD z ) = (y MOD z) THEN RETURN TRUE; EXIT  END;
+	RETURN FALSE; 
+	EXIT
+END
+
+FUNCTION istrain(x : city ; y : city ) : BOOLEAN
+BEGIN
+	IF (x MOD 5 = 2) AND y = x + 1 THEN RETURN TRUE ; EXIT END; 
+	RETURN FALSE
+END
+
+FUNCTION sometrains() : track
+VAR x : city ; y : city;
+
+BEGIN
+	FOR ALL x DO
+		FOR ALL y DO
+			IF istrain ( x , y ) THEN 
+				RETURN [ x | y ] 
+			END
+		END
+	END
+END
+	
+FUNCTION remainingsemaphores() : track
+VAR x , y : city ;
+
+BEGIN
+	FOR ALL x DO
+		FOR ALL y DO
+			IF  x < y AND isneighbour ( x , y ) AND NOT istrain ( x , y ) THEN RETURN [ x | y ] END
+		END
+	END
+END
+	
+FUNCTION allsignals() : track
+VAR x , y : city ;
+
+BEGIN
+	FOR ALL x DO
+		FOR ALL y DO
+			IF  isneighbour( x , y ) THEN RETURN [ x | y ] END
+		END
+	END
+END
+
+{ We make tracks bidirectional. That is, only pairs [x,y] with x < y are considered feasible tracks }
+FUNCTION min(x : city ; y : city) : city
+BEGIN
+	IF x < y THEN RETURN x ELSE RETURN y END
+END
+
+ 
+FUNCTION max(x : city ; y : city) : city
+BEGIN
+	IF x > y THEN RETURN x ELSE RETURN y END
+END
+ 
+FUNCTION initialswitch() : switch
+VAR x : city ;
+    z : city ;
+    t : city ;
+BEGIN
+	z = z - 1;
+	t = (x + 2) MOD z;
+	z = (x + 1) MOD z;
+	FOR ALL x DO
+		RETURN [ min ( x , t ) | z | max ( x , t ) ] 
+	END
+END
+	
+FUNCTION maketrack(from : city ; to : city ) : track
+BEGIN
+	RETURN [ from | to ] 
+END
+
+FUNCTION makeswitch(f : city ; v : city ; t : city) : switch
+VAR s : switch;
+BEGIN
+	s [ 1 ] = min ( f , t );
+	s [ 2 ] = v;
+	s [ 3 ] = max ( f , t );
+RETURN s
+END
+
+FUNCTION allsigspointingto( x : city ) : track
+VAR y : city ;
+BEGIN
+	FOR ALL y DO
+		IF isneighbour(x,y) THEN
+			RETURN [ y | x ] 
+		END
+	END
+END
+
+PLACE 	
+
+INTERNAL
+        tracks : track,
+        redsignals : track;
+OUTPUT
+	greensignals : track,
+	switches : switch,
+	semaphores : track;
+
+INITIALMARKING
+	tracks : sometrains(),
+	semaphores : remainingsemaphores(),
+	redsignals : allsignals(),
+	switches : initialswitch();
+
+FINALMARKING
+	switches : initialswitch();
+
+TRANSITION go
+VAR from : city; via : city ; to : city;
+GUARD isneighbour(from, via) AND isneighbour(via,to) AND from <> to
+CONSUME 
+	tracks : maketrack(  min ( from , via ) , max ( from , via ) ) ,
+	switches : makeswitch ( from , via , to ) ,
+	greensignals : maketrack ( from , via ) ;
+PRODUCE tracks : maketrack ( min ( via , to ) , max ( via , to ) ) ,
+	semaphores : maketrack ( min ( from , via ) , max ( from , via ) ) ,
+	switches : makeswitch ( from , via , to ) ,
+	redsignals : maketrack ( from , via ) ;
+
+TRANSITION siggreen
+VAR from : city; via : city ; to : city;
+GUARD isneighbour(from,via) AND isneighbour(via,to) AND from <> to
+CONSUME
+	semaphores : maketrack ( min (via , to ) , max ( via , to )) ,
+	switches : makeswitch ( from , via , to ) ,
+	redsignals : maketrack ( from, via) ;
+PRODUCE
+	switches : makeswitch ( from , via , to ) ,
+	greensignals : maketrack ( from , via ) ;
+	
+TRANSITION sigred
+VAR from : city; via : city ; to : city;
+GUARD isneighbour(from,via) AND isneighbour(via,to) AND from <> to
+CONSUME
+	switches : makeswitch ( from , via , to ) ,
+	greensignals : maketrack ( from , via ) ;
+PRODUCE
+	semaphores : maketrack ( min (via , to ) , max ( via , to )) ,
+	switches : makeswitch ( from , via , to ) ,
+	redsignals : maketrack ( from, via) ;
+	
+TRANSITION changeswitch
+VAR oldfrom : city; newfrom : city ; via : city ; oldto : city ; newto : city;
+GUARD isneighbour(oldfrom,via) AND isneighbour(via, oldto) AND isneighbour(newfrom,via) AND
+      isneighbour(newto,via) AND oldfrom <> oldto AND newfrom <> newto AND (oldfrom <> newfrom OR oldto <> newto)
+CONSUME
+	switches : makeswitch(oldfrom,via, oldto),
+	redsignals : allsigspointingto( via) ;
+PRODUCE	
+	switches : makeswitch(newfrom,via, newto),
+	redsignals : allsigspointingto( via) ;
+	
+	
+
+	

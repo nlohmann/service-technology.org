@@ -1,0 +1,427 @@
+{ Pausable Clock Generator }
+
+
+
+PLACE
+	{pcg.p.REQI1 = pcg.m2.p.a_in}
+	{pcg.p.STRETCH = pcg.m3.p.a_in}
+	{pcg.p.STOPI = pcg.m1.p.b}
+	{pcg.p.LCLK = neg(tog.m20.p.clk), and.p.b}
+	{pcg.p.ACKI1 = ip.m69.p.ACKI1}
+
+	pcg.p.ACKI1,
+	pcg.p.n_ACKI1,
+
+	{m1: NOR}
+	pcg.m1.p.a,            {Input-Flanken}
+	pcg.m1.p.n_a,
+	pcg.m1.p.b,
+	pcg.m1.p.n_b,
+	{pcg.m1.p.out = pcg.m5.p.b, pcg.m2.p.b_in, pcg.m3.p.b_in}   {Output-Flanke}
+	pcg.m1.p.pegel_0_0,    {alte Pegel}
+	pcg.m1.p.pegel_0_1,
+	pcg.m1.p.pegel_1_0,
+	pcg.m1.p.pegel_1_1,
+
+	{m2: Mutex}
+	pcg.m2.p.a_in,             {Input: Flanke}
+	pcg.m2.p.n_a_in,
+	pcg.m2.p.b_in,
+	pcg.m2.p.n_b_in,
+	{pcg.m2.p.a_out = pcg.p.ACKI1}    {Output: Flanke}
+	{pcg.m2.p.b_out = pcg.m4.p.b}
+	pcg.m2.p.pegel_0_0_0_0,    {zu speichernde Pegel}
+	pcg.m2.p.pegel_0_1_0_1,
+	pcg.m2.p.pegel_1_0_1_0,    {Pegel: (a_alt, b_alt, a_out, b_out)}
+	pcg.m2.p.pegel_1_1_0_1,
+	pcg.m2.p.pegel_1_1_1_0,
+
+	{m3: Mutex}
+	pcg.m3.p.a_in,             {Input: Flanke}
+	pcg.m3.p.n_a_in,
+	pcg.m3.p.b_in,
+	pcg.m3.p.n_b_in,
+	{pcg.m3.p.a_out entfaellt} {Output: Flanke}
+	{pcg.m3.p.b_out = pcg.m4.p.a}
+	pcg.m3.p.pegel_0_0_0_0,    {zu speichernde Pegel}
+	pcg.m3.p.pegel_0_1_0_1,
+	pcg.m3.p.pegel_1_0_1_0,    {Pegel: (a_alt, b_alt, a_out, b_out)}
+	pcg.m3.p.pegel_1_1_0_1,
+	pcg.m3.p.pegel_1_1_1_0,
+
+	{m5: MCE}
+	pcg.m5.p.a,
+	pcg.m5.p.n_a,
+	pcg.m5.p.b,              {Input-Flanke}
+	pcg.m5.p.n_b,
+	{pcg.m5.p.out = pcg.m1.p.a, neg(tog.m20.p.clk), and.p.b}   {Output-Flanke}
+	pcg.m5.p.pegel_0_0_0,
+	pcg.m5.p.pegel_0_1_0,    {alte Pegel (a_b_c)}
+	pcg.m5.p.pegel_1_0_0,    {p.pegel_0_0_1, p.pegel_1_1_0 existieren nicht}
+	pcg.m5.p.pegel_0_1_1,
+	pcg.m5.p.pegel_1_0_1,
+	pcg.m5.p.pegel_1_1_1;
+
+	
+	
+
+MARKING
+	
+	pcg.m1.p.n_a: 1,
+	pcg.m1.p.n_b: 1,
+	pcg.m1.p.pegel_0_0: 1,
+	pcg.m2.p.a_in: 1,
+	pcg.m2.p.b_in: 1,          {Flanke vom davorliegenden NOR}
+	pcg.m2.p.pegel_0_0_0_0: 1,
+	pcg.m3.p.a_in: 1,
+	pcg.m3.p.b_in: 1,          {Flanke vom davorliegenden NOR}
+	pcg.m3.p.pegel_0_0_0_0: 1,
+	pcg.m5.p.n_a: 1,
+	pcg.m5.p.b: 1,             {Flanke vom davorliegenden NOR}
+	pcg.m5.p.pegel_0_0_0: 1;
+
+
+
+{m1: NOR}
+
+TRANSITION pcg.m1.t.a1_pegel_0_0
+CONSUME pcg.m1.p.a: 1, pcg.m1.p.pegel_0_0: 1, pcg.m5.p.n_b: 1,
+        pcg.m2.p.n_b_in: 1, pcg.m3.p.n_b_in: 1;
+PRODUCE pcg.m1.p.pegel_1_0: 1, pcg.m5.p.b: 1, pcg.m2.p.b_in: 1,
+        pcg.m3.p.b_in: 1, pcg.m1.p.n_a: 1;
+
+TRANSITION pcg.m1.t.a1_pegel_0_1
+CONSUME pcg.m1.p.a: 1, pcg.m1.p.pegel_0_1: 1;
+PRODUCE pcg.m1.p.pegel_1_1: 1, pcg.m1.p.n_a: 1;
+
+TRANSITION pcg.m1.t.a0_pegel_1_0
+CONSUME pcg.m1.p.a: 1, pcg.m1.p.pegel_1_0: 1, pcg.m5.p.n_b: 1,
+        pcg.m2.p.n_b_in: 1, pcg.m3.p.n_b_in: 1;
+PRODUCE pcg.m1.p.pegel_0_0: 1, pcg.m5.p.b: 1, pcg.m2.p.b_in: 1,
+        pcg.m3.p.b_in: 1, pcg.m1.p.n_a: 1;
+
+TRANSITION pcg.m1.t.a0_pegel_1_1
+CONSUME pcg.m1.p.a: 1, pcg.m1.p.pegel_1_1: 1;
+PRODUCE pcg.m1.p.pegel_0_1: 1, pcg.m1.p.n_a: 1;
+
+
+TRANSITION pcg.m1.t.b1_pegel_0_0
+CONSUME pcg.m1.p.b: 1, pcg.m1.p.pegel_0_0: 1, pcg.m5.p.n_b: 1,
+        pcg.m2.p.n_b_in: 1, pcg.m3.p.n_b_in: 1;
+PRODUCE pcg.m1.p.pegel_0_1: 1, pcg.m5.p.b: 1, pcg.m2.p.b_in: 1,
+        pcg.m3.p.b_in: 1, pcg.m1.p.n_b: 1;
+
+TRANSITION pcg.m1.t.b0_pegel_0_1
+CONSUME pcg.m1.p.b: 1, pcg.m1.p.pegel_0_1: 1, pcg.m5.p.n_b: 1,
+        pcg.m2.p.n_b_in: 1, pcg.m3.p.n_b_in: 1;
+PRODUCE pcg.m1.p.pegel_0_0: 1, pcg.m5.p.b: 1, pcg.m2.p.b_in: 1,
+        pcg.m3.p.b_in: 1, pcg.m1.p.n_b: 1;
+
+TRANSITION pcg.m1.t.b1_pegel_1_0
+CONSUME pcg.m1.p.b: 1, pcg.m1.p.pegel_1_0: 1;
+PRODUCE pcg.m1.p.pegel_1_1: 1, pcg.m1.p.n_b: 1;
+
+TRANSITION pcg.m1.t.b0_pegel_1_1
+CONSUME pcg.m1.p.b: 1, pcg.m1.p.pegel_1_1: 1;
+PRODUCE pcg.m1.p.pegel_1_0: 1, pcg.m1.p.n_b: 1;
+
+
+{m2: Mutex}
+
+TRANSITION pcg.m2.t.a1_pegel_0_0_0_0
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_0_0_0_0: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0: 1, pcg.p.ACKI1: 1, pcg.m2.p.n_a_in: 1;
+
+TRANSITION pcg.m2.t.a1_pegel_0_1_0_1
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_0_1_0_1: 1;
+PRODUCE pcg.m2.p.pegel_1_1_0_1: 1, pcg.m2.p.n_a_in: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_1_0_1_0
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_1_0_1_0: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_0_0_0_0: 1, pcg.p.ACKI1: 1, pcg.m2.p.n_a_in: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_1_1_0_1
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_1_1_0_1: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, pcg.m2.p.n_a_in: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_1_1_1_0_and_0_0_0_0
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_1_1_1_0: 1, pcg.m3.p.pegel_0_0_0_0: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_0_0_0_0: 1, pcg.p.ACKI1: 1,
+        pcg.m2.p.n_a_in: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_1_1_1_0_and_0_1_0_1
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_1_1_1_0: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.p.n_ACKI1: 1,
+        pcg.m5.p.n_a: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.p.ACKI1: 1, pcg.m5.p.a: 1,
+        pcg.m2.p.n_a_in: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_1_1_1_0_and_1_0_1_0
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_1_1_1_0: 1, pcg.m3.p.pegel_1_0_1_0: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_1_0_1_0: 1, pcg.p.ACKI1: 1,
+        pcg.m2.p.n_a_in: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_1_1_1_0_and_1_1_0_1
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_1_1_1_0: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.p.n_ACKI1: 1,
+	pcg.m5.p.n_a: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.p.ACKI1: 1, pcg.m5.p.a: 1,
+        pcg.m2.p.n_a_in: 1;
+
+TRANSITION pcg.m2.t.a0_pegel_1_1_1_0_and_1_1_1_0
+CONSUME pcg.m2.p.a_in: 1, pcg.m2.p.pegel_1_1_1_0: 1, pcg.m3.p.pegel_1_1_1_0: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_1_1_1_0: 1, pcg.p.ACKI1: 1,
+        pcg.m2.p.n_a_in: 1;
+
+
+TRANSITION pcg.m2.t.b1_pegel_0_0_0_0_and_0_0_0_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.pegel_0_0_0_0: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_0_0_0_0: 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b1_pegel_0_0_0_0_and_0_1_0_1
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.m5.p.a: 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b1_pegel_0_0_0_0_and_1_0_1_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.pegel_1_0_1_0: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_1_0_1_0: 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b1_pegel_0_0_0_0_and_1_1_0_1
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.m5.p.a: 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b1_pegel_0_0_0_0_and_1_1_1_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.pegel_1_1_1_0: 1;
+PRODUCE pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_1_1_1_0: 1, pcg.m2.p.n_b_in: 1;
+
+
+TRANSITION pcg.m2.t.b0_pegel_0_1_0_1_and_0_0_0_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_0_0_0_0: 1;
+PRODUCE pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.pegel_0_0_0_0: 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_0_1_0_1_and_0_1_0_1
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.m5.p.a: 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_0_1_0_1_and_1_0_1_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_1_0_1_0: 1;
+PRODUCE pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.pegel_1_0_1_0: 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_0_1_0_1_and_1_1_0_1
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.m5.p.a: 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_0_1_0_1_and_1_1_1_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.m3.p.pegel_1_1_1_0: 1;
+PRODUCE pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.pegel_1_1_1_0: 1, pcg.m2.p.n_b_in: 1;
+
+
+TRANSITION pcg.m2.t.b1_pegel_1_0_1_0_and_0_0_0_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_1_0_1_0: 1;
+PRODUCE pcg.m2.p.pegel_1_1_1_0: 1, pcg.m2.p.n_b_in: 1;
+
+
+TRANSITION pcg.m2.t.b0_pegel_1_1_0_1_and_0_0_0_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_1_1_0_1: 1, pcg.m3.p.pegel_0_0_0_0: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0: 1, pcg.m3.p.pegel_0_0_0_0: 1, pcg.p.ACKI1: 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_1_1_0_1_and_0_1_0_1
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_1_1_0_1: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.p.n_ACKI1: 1,
+        pcg.m5.p.n_a: 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.p.ACKI1: 1, pcg.m5.p.a: 1,
+        pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_1_1_0_1_and_1_0_1_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_1_1_0_1: 1, pcg.m3.p.pegel_1_0_1_0: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0: 1, pcg.m3.p.pegel_1_0_1_0: 1, pcg.p.ACKI1: 1, pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_1_1_0_1_and_1_1_0_1
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_1_1_0_1: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.p.n_ACKI1: 1,
+        pcg.m5.p.n_a: 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.p.ACKI1: 1, pcg.m5.p.a: 1,
+        pcg.m2.p.n_b_in: 1;
+
+TRANSITION pcg.m2.t.b0_pegel_1_1_0_1_and_1_1_1_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_1_1_0_1: 1, pcg.m3.p.pegel_1_1_1_0: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0: 1, pcg.m3.p.pegel_1_1_1_0: 1, pcg.p.ACKI1: 1, pcg.m2.p.n_b_in: 1;
+
+
+TRANSITION pcg.m2.t.b0_pegel_1_1_1_0
+CONSUME pcg.m2.p.b_in: 1, pcg.m2.p.pegel_1_1_1_0: 1;
+PRODUCE pcg.m2.p.pegel_1_0_1_0: 1, pcg.m2.p.n_b_in: 1;
+
+
+{m3: Mutex}
+
+TRANSITION pcg.m3.t.a1_pegel_0_0_0_0
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_0_0_0_0: 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0: 1, pcg.m3.p.n_a_in: 1;
+
+TRANSITION pcg.m3.t.a1_pegel_0_1_0_1
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_0_1_0_1: 1;
+PRODUCE pcg.m3.p.pegel_1_1_0_1: 1, pcg.m3.p.n_a_in: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_1_0_1_0
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_1_0_1_0: 1;
+PRODUCE pcg.m3.p.pegel_0_0_0_0: 1, pcg.m3.p.n_a_in: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_1_1_0_1
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_1_1_0_1: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m3.p.n_a_in: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_1_1_1_0_and_0_0_0_0
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_1_1_1_0: 1, pcg.m2.p.pegel_0_0_0_0: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.n_a_in: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_1_1_1_0_and_0_1_0_1
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_1_1_1_0: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.m5.p.a: 1,
+        pcg.m3.p.n_a_in: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_1_1_1_0_and_1_0_1_0
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_1_1_1_0: 1, pcg.m2.p.pegel_1_0_1_0: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_1_0_1_0: 1, pcg.m3.p.n_a_in: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_1_1_1_0_and_1_1_0_1
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_1_1_1_0: 1, pcg.m2.p.pegel_1_1_0_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_1_1_0_1: 1, pcg.m5.p.a: 1,
+        pcg.m3.p.n_a_in: 1;
+
+TRANSITION pcg.m3.t.a0_pegel_1_1_1_0_and_1_1_1_0
+CONSUME pcg.m3.p.a_in: 1, pcg.m3.p.pegel_1_1_1_0: 1, pcg.m2.p.pegel_0_0_0_0: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.n_a_in: 1;
+
+
+TRANSITION pcg.m3.t.b1_pegel_0_0_0_0_and_0_0_0_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_0_0_0_0: 1, pcg.m2.p.pegel_0_0_0_0: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b1_pegel_0_0_0_0_and_0_1_0_1
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_0_0_0_0: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.m5.p.a: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b1_pegel_0_0_0_0_and_1_0_1_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_0_0_0_0: 1, pcg.m2.p.pegel_1_0_1_0: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_1_0_1_0: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b1_pegel_0_0_0_0_and_1_1_0_1
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_0_0_0_0: 1, pcg.m2.p.pegel_1_1_0_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_1_1_0_1: 1, pcg.m5.p.a: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b1_pegel_0_0_0_0_and_1_1_1_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_0_0_0_0: 1, pcg.m2.p.pegel_1_1_1_0: 1;
+PRODUCE pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_1_1_1_0: 1, pcg.m3.p.n_b_in: 1;
+
+
+TRANSITION pcg.m3.t.b0_pegel_0_1_0_1_and_0_0_0_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_0_0_0_0: 1;
+PRODUCE pcg.m3.p.pegel_0_0_0_0: 1, pcg.m2.p.pegel_0_0_0_0: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_0_1_0_1_and_0_1_0_1
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_0_0_0_0: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.m5.p.a: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_0_1_0_1_and_1_0_1_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_1_0_1_0: 1;
+PRODUCE pcg.m3.p.pegel_0_0_0_0: 1, pcg.m2.p.pegel_1_0_1_0: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_0_1_0_1_and_1_1_0_1
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_1_1_0_1: 1, pcg.m5.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_0_0_0_0: 1, pcg.m2.p.pegel_1_1_0_1: 1, pcg.m5.p.a: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_0_1_0_1_and_1_1_1_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_0_1_0_1: 1, pcg.m2.p.pegel_1_1_1_0: 1;
+PRODUCE pcg.m3.p.pegel_0_0_0_0: 1, pcg.m2.p.pegel_1_1_1_0: 1, pcg.m3.p.n_b_in: 1;
+
+
+TRANSITION pcg.m3.t.b1_pegel_1_0_1_0_and_0_0_0_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_1_0_1_0: 1;
+PRODUCE pcg.m3.p.pegel_1_1_1_0: 1, pcg.m3.p.n_b_in: 1;
+
+
+TRANSITION pcg.m3.t.b0_pegel_1_1_0_1_and_0_0_0_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.m2.p.pegel_0_0_0_0: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0: 1, pcg.m2.p.pegel_0_0_0_0: 1, pcg.p.ACKI1: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_1_1_0_1_and_0_1_0_1
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.p.n_ACKI1: 1,
+        pcg.m5.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0: 1, pcg.m2.p.pegel_0_1_0_1: 1, pcg.p.ACKI1: 1, pcg.m5.p.a: 1,
+        pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_1_1_0_1_and_1_0_1_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.m2.p.pegel_1_0_1_0: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0: 1, pcg.m2.p.pegel_1_0_1_0: 1, pcg.p.ACKI1: 1, pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_1_1_0_1_and_1_1_0_1
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.m2.p.pegel_1_1_0_1: 1, pcg.p.n_ACKI1: 1,
+        pcg.m5.p.n_a: 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0: 1, pcg.m2.p.pegel_1_1_0_1: 1, pcg.p.ACKI1: 1, pcg.m5.p.a: 1,
+        pcg.m3.p.n_b_in: 1;
+
+TRANSITION pcg.m3.t.b0_pegel_1_1_0_1_and_1_1_1_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_1_1_0_1: 1, pcg.m2.p.pegel_1_1_1_0: 1, pcg.p.n_ACKI1: 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0: 1, pcg.m2.p.pegel_1_1_1_0: 1, pcg.p.ACKI1: 1, pcg.m3.p.n_b_in: 1;
+
+
+TRANSITION pcg.m3.t.b0_pegel_1_1_1_0
+CONSUME pcg.m3.p.b_in: 1, pcg.m3.p.pegel_1_1_1_0: 1;
+PRODUCE pcg.m3.p.pegel_1_0_1_0: 1, pcg.m3.p.n_b_in: 1;
+
+
+
+
+{m5: MCE}
+
+TRANSITION pcg.m5.t.a1_pegel_0_0_0
+CONSUME pcg.m5.p.a: 1, pcg.m5.p.pegel_0_0_0: 1;
+PRODUCE pcg.m5.p.pegel_1_0_0: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a1_pegel_0_1_0
+CONSUME pcg.m5.p.a: 1, pcg.m5.p.pegel_0_1_0: 1, pcg.m1.p.n_a: 1, pcg.m3.p.n_a_in: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m1.p.a: 1, pcg.m3.p.a_in: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a0_pegel_1_0_0
+CONSUME pcg.m5.p.a: 1, pcg.m5.p.pegel_1_0_0: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a0_pegel_1_0_1
+CONSUME pcg.m5.p.a: 1, pcg.m5.p.pegel_1_0_1: 1, pcg.m1.p.n_a: 1, pcg.m3.p.n_a_in: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m1.p.a: 1, pcg.m3.p.a_in: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a1_pegel_0_1_1
+CONSUME pcg.m5.p.a: 1, pcg.m5.p.pegel_0_1_1: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m5.p.n_a: 1;
+
+TRANSITION pcg.m5.t.a0_pegel_1_1_1
+CONSUME pcg.m5.p.a: 1, pcg.m5.p.pegel_1_1_1: 1;
+PRODUCE pcg.m5.p.pegel_0_1_1: 1, pcg.m5.p.n_a: 1;
+
+
+TRANSITION pcg.m5.t.b1_pegel_0_0_0
+CONSUME pcg.m5.p.b: 1, pcg.m5.p.pegel_0_0_0: 1;
+PRODUCE pcg.m5.p.pegel_0_1_0: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b0_pegel_0_1_0
+CONSUME pcg.m5.p.b: 1, pcg.m5.p.pegel_0_1_0: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b1_pegel_1_0_0
+CONSUME pcg.m5.p.b: 1, pcg.m5.p.pegel_1_0_0: 1, pcg.m1.p.n_a: 1, pcg.m3.p.n_a_in: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m1.p.a: 1, pcg.m3.p.a_in: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b1_pegel_1_0_1
+CONSUME pcg.m5.p.b: 1, pcg.m5.p.pegel_1_0_1: 1;
+PRODUCE pcg.m5.p.pegel_1_1_1: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b0_pegel_0_1_1
+CONSUME pcg.m5.p.b: 1, pcg.m5.p.pegel_0_1_1: 1, pcg.m1.p.n_a: 1, pcg.m3.p.n_a_in: 1;
+PRODUCE pcg.m5.p.pegel_0_0_0: 1, pcg.m1.p.a: 1, pcg.m3.p.a_in: 1, pcg.m5.p.n_b: 1;
+
+TRANSITION pcg.m5.t.b0_pegel_1_1_1
+CONSUME pcg.m5.p.b: 1, pcg.m5.p.pegel_1_1_1: 1;
+PRODUCE pcg.m5.p.pegel_1_0_1: 1, pcg.m5.p.n_b: 1;
+
+
+
+TRANSITION schleife
+CONSUME pcg.p.ACKI1: 1, pcg.m2.p.n_a_in: 1;
+PRODUCE pcg.p.n_ACKI1: 1, pcg.m2.p.a_in: 1;

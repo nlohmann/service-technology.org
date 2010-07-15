@@ -1,0 +1,24 @@
+{
+  generator:    Wendy 1.4-unreleased (i386-unknown-freebsd7.0)
+  invocation:   wendy --og --formula=2bits NonFinalTauNode2not.owfn 
+  events:       0 send, 3 receive, 0 synchronous
+  statistics:   2 nodes
+}
+
+INTERFACE
+  INPUT
+    a, b, c;
+
+NODES
+  675312000
+    a -> 675312192
+    b -> 675312192
+    c -> 675312192
+  675312192 :: F
+    a -> 0
+    b -> 0
+    c -> 0
+  0
+    a -> 0
+    b -> 0
+    c -> 0

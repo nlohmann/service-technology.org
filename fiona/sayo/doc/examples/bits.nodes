@@ -1,0 +1,15 @@
+NODES
+  0
+  1: INITIAL
+    b -> 2
+    TAU -> 3
+  3
+    b -> 2
+  2
+    a -> 4
+    b -> 0
+  4
+    b -> 0
+    TAU -> 5
+  5 : FINAL
+    b -> 0

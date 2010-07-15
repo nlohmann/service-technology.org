@@ -1,0 +1,195 @@
+PLACE
+    INTERNAL
+        semaphore, not_semaphore, train_in_segment, red_R, green_R, await_answer_R, await_answer_L, green_L, red_L, train_left, train_right, segment_free, p_received_req_L, p_can_receive_L, p_received_req_R, p_can_receive_R;
+    INPUT
+        get_req_semaphore_R,
+        train_arrive_R,
+        denied_semaphore_R,
+        granted_semaphore_R,
+        returned_semaphore_R,
+        get_req_semaphore_L,
+        returned_semaphore_L,
+        train_arrive_L,
+        granted_semaphore_L,
+        denied_semaphore_L;
+    OUTPUT
+        req_semaphore_R,
+        train_leave_R,
+        reject_semaphore_R,
+        grant_semaphore_R,
+        grant_semaphore_L,
+        reject_semaphore_L,
+        train_leave_L,
+        req_semaphore_L,
+        return_semaphore_L,
+        return_semaphore_R;
+
+INITIALMARKING
+    semaphore:1, red_R:1, red_L:1, segment_free:1, p_can_receive_L:1, p_can_receive_R:1;
+FINALMARKING
+semaphore:1, red_R:1, red_L:1, segment_free:1, p_can_receive_L:1, p_can_receive_R:1;
+
+TRANSITION t_grant_req_R
+CONSUME
+    semaphore:1,
+    p_received_req_R:1;
+PRODUCE
+    grant_semaphore_R:1,
+    not_semaphore:1,
+    p_can_receive_R:1;
+
+TRANSITION t_deny_req_R
+CONSUME
+    p_received_req_R:1,
+    not_semaphore:1;
+PRODUCE
+    reject_semaphore_R:1,
+    not_semaphore:1,
+    p_can_receive_R:1;
+
+TRANSITION t_returned_sem_R
+CONSUME
+    returned_semaphore_R:1,
+    not_semaphore:1;
+PRODUCE
+    semaphore:1;
+
+TRANSITION t_train_arrive_R
+CONSUME
+    train_arrive_R:1,
+    segment_free:1;
+PRODUCE
+    train_in_segment:1;
+
+TRANSITION t_want_R
+CONSUME
+    train_in_segment:1,
+    red_R:1;
+PRODUCE
+    red_R:1,
+    req_semaphore_R:1,
+    await_answer_R:1;
+
+TRANSITION t_train_leave_R
+CONSUME
+    green_R:1,
+    not_semaphore:1,
+    train_right:1;
+PRODUCE
+    train_leave_R:1,
+    red_R:1,
+    semaphore:1,
+    segment_free:1;
+
+TRANSITION t_granted_R
+CONSUME
+    granted_semaphore_R:1,
+    red_R:1,
+    await_answer_R:1;
+PRODUCE
+    green_R:1,
+    train_right:1;
+
+TRANSITION t_denied_R
+CONSUME
+    denied_semaphore_R:1,
+    await_answer_R:1;
+PRODUCE
+    train_in_segment:1;
+
+TRANSITION t_grant_req_L
+CONSUME
+    semaphore:1,
+    p_received_req_L:1;
+PRODUCE
+    not_semaphore:1,
+    grant_semaphore_L:1,
+    p_can_receive_L:1;
+
+TRANSITION t_reject_req_L
+CONSUME
+    p_received_req_L:1,
+    not_semaphore:1;
+PRODUCE
+    reject_semaphore_L:1,
+    not_semaphore:1,
+    p_can_receive_L:1;
+
+TRANSITION t_returned_sem_L
+CONSUME
+    returned_semaphore_L:1,
+    not_semaphore:1;
+PRODUCE
+    semaphore:1;
+
+TRANSITION t_train_arrive_L
+CONSUME
+    train_arrive_L:1,
+    segment_free:1;
+PRODUCE
+    train_in_segment:1;
+
+TRANSITION t_train_leave_L
+CONSUME
+    green_L:1,
+    not_semaphore:1,
+    train_left:1;
+PRODUCE
+    train_leave_L:1,
+    red_L:1,
+    semaphore:1,
+    segment_free:1;
+
+TRANSITION t_want_L
+CONSUME
+    train_in_segment:1,
+    red_L:1;
+PRODUCE
+    await_answer_L:1,
+    req_semaphore_L:1,
+    red_L:1;
+
+TRANSITION t_granted_L
+CONSUME
+    granted_semaphore_L:1,
+    red_L:1,
+    await_answer_L:1;
+PRODUCE
+    green_L:1,
+    train_left:1;
+
+TRANSITION t_denied_L
+CONSUME
+    denied_semaphore_L:1,
+    await_answer_L:1;
+PRODUCE
+    train_in_segment:1;
+
+TRANSITION t_train_stay_L
+CONSUME
+    train_left:1;
+PRODUCE
+    return_semaphore_L:1,
+    train_in_segment:1;
+
+TRANSITION t_train_stay_R
+CONSUME
+    train_right:1;
+PRODUCE
+    train_in_segment:1,
+    return_semaphore_R:1;
+
+TRANSITION t_receive_req_L
+CONSUME
+    get_req_semaphore_L:1,
+    p_can_receive_L:1;
+PRODUCE
+    p_received_req_L:1;
+
+TRANSITION t_receive_req_R
+CONSUME
+    get_req_semaphore_R:1,
+    p_can_receive_R:1;
+PRODUCE
+    p_received_req_R:1;
+

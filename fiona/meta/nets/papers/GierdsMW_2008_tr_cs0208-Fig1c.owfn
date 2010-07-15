@@ -1,0 +1,27 @@
+{ 
+DESCRIPTION: Example: beverage vending machine
+              (c) Coffee drinker
+}
+
+PLACE
+  INTERNAL 
+    p1,p2,p3;
+  INPUT 
+    DServedCoffee;
+  OUTPUT 
+    DEuro;
+  
+INITIALMARKING
+  p1;
+
+FINALCONDITION
+  (p3=1 AND ALL_OTHER_PLACES_EMPTY);
+
+TRANSITION t1
+  CONSUME p1;
+  PRODUCE DEuro,p2;
+
+TRANSITION t2
+  CONSUME p2,DServedCoffee;
+  PRODUCE p3;
+

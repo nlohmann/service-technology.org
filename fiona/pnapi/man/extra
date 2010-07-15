@@ -1,0 +1,31 @@
+[EXIT STATUS]
+Petri exits with 0 on success, and with >0 if an error occurs.
+
+[EXAMPLES]
+To translate an open net `service.owfn' into a LoLA net and apply structural reductions, execute
+.IP
+petri service.owfn -olola -r6
+.PP
+The LoLA net will be written to the file `service.lola'.
+.PP
+To create a PNG from an open net `service.owfn' using Graphviz Dot, execute
+.IP
+petri service.owfn -opng
+.PP
+The graphics will be written to the file `service.png'.
+
+[BUGS]
+Petri neither contains cats nor pigs.
+.PP
+See https://gna.org/bugs/?group=service-tech for open bugs.
+
+[AUTHOR]
+The Petri Net API was written by Stephan Mennicke, Christian Sura, and Robert Waltemath. It bases on code from GNU BPEL2oWFN written by Niels Lohmann and Christian Gierds. The Petri Net API Frontend was written by Niels Lohmann.
+
+[COPYRIGHT]
+Copyright (c) 2008-2009 Stephan Mennicke, Christian Sura, Robert Waltemath, and Niels Lohmann
+.PP
+Copyright (c) 2005-2007 Niels Lohmann and Christian Gierds
+
+[SEE ALSO]
+lola(1), mia(1), wendy(1)

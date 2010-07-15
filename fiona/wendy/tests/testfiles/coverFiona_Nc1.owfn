@@ -1,0 +1,107 @@
+{ N_c }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,
+  p2,
+  p3,
+  p4,
+  p5,
+  p6,
+  p7;
+INPUT
+  req_c,
+  cc_y,
+  cc_n;
+
+OUTPUT
+  r_low,
+  r_high,
+  rej,
+  acc;
+
+INITIALMARKING
+  p0:   1;
+
+FINALMARKING
+  p7:   1;
+
+TRANSITION t1    { ?req_c }
+CONSUME
+  req_c:   1,
+  p0:   1;
+PRODUCE
+  p1:   1;
+
+TRANSITION t2    { !r_high }
+CONSUME
+  p1:   1;
+PRODUCE
+  r_high:   1,
+  p2:   1;
+
+TRANSITION t3    { !r_low }
+CONSUME
+  p1:   1;
+PRODUCE
+  r_low:   1,
+  p3:   1;
+
+TRANSITION t4    { ?cc_n }
+CONSUME
+  cc_n:   1,
+  p2:   1;
+PRODUCE
+  p4:   1;
+
+TRANSITION t5    { ?cc_y }
+CONSUME
+  cc_y:   1,
+  p2:   1;
+PRODUCE
+  p5:   1;
+
+TRANSITION t6    { ?cc_n }
+CONSUME
+  cc_n:   1,
+  p3:   1;
+PRODUCE
+  p5:   1;
+
+TRANSITION t7    { ?cc_y }
+CONSUME
+  cc_y:  1,
+  p3:   1;
+PRODUCE
+  p6:   1;
+
+TRANSITION t8    { !rej }
+CONSUME
+  p4:   1;
+PRODUCE
+  rej:    1,
+  p7:   1;
+
+TRANSITION t9    { !rej }
+CONSUME
+  p5:   1;
+PRODUCE
+  rej:    1,
+  p7 : 1;
+
+TRANSITION t10    { !acc }
+CONSUME
+  p5:   1;
+PRODUCE
+  acc:    1,
+  p7 : 1;
+
+TRANSITION t11    { !acc }
+CONSUME
+  p6:   1;
+PRODUCE
+  acc:    1,
+  p7 : 1;
+
+{ END OF FILE }

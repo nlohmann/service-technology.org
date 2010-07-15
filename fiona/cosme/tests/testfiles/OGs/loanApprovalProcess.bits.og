@@ -1,0 +1,120 @@
+{
+  generator:    Wendy 3.0-unreleased (i686-pc-linux-gnu)
+  invocation:   wendy loanApprovalProcess.owfn --og
+  events:       3 send, 3 receive, 0 synchronous
+  statistics:   20 nodes
+}
+
+INTERFACE
+  INPUT
+    out.approver.approve, out.assessor.check, out.customer.request;
+  OUTPUT
+    in.approver.approve, in.assessor.check, in.customer.request;
+
+NODES
+  157759816 :: S
+    out.approver.approve -> 0
+    out.assessor.check -> 0
+    out.customer.request -> 0
+    in.approver.approve -> 157759208
+    in.assessor.check -> 157805640
+    in.customer.request -> 157727216
+  157727216
+    out.approver.approve -> 0
+    out.assessor.check -> 157753600
+    out.customer.request -> 0
+    in.approver.approve -> 157778352
+    in.assessor.check -> 157805192
+  157753600 :: S
+    out.approver.approve -> 0
+    out.assessor.check -> 0
+    out.customer.request -> 0
+    in.approver.approve -> 157809184
+    in.assessor.check -> 157774184
+  157759208 :: S
+    out.approver.approve -> 0
+    out.assessor.check -> 0
+    out.customer.request -> 0
+    in.assessor.check -> 157759568
+    in.customer.request -> 157778352
+  157759568 :: S
+    out.approver.approve -> 0
+    out.assessor.check -> 0
+    out.customer.request -> 0
+    in.customer.request -> 157770912
+  157760768 :: F
+    out.approver.approve -> 0
+    out.assessor.check -> 0
+    out.customer.request -> 0
+  157761320
+    out.approver.approve -> 157763528
+    out.assessor.check -> 0
+    out.customer.request -> 157778272
+  157762648
+    out.approver.approve -> 157777280
+    out.assessor.check -> 157778272
+    out.customer.request -> 0
+  157763528
+    out.approver.approve -> 0
+    out.assessor.check -> 0
+    out.customer.request -> 157760768
+  157766784
+    out.approver.approve -> 0
+    out.assessor.check -> 157774216
+    out.customer.request -> 0
+    in.approver.approve -> 157774480
+  157770912
+    out.approver.approve -> 157774480
+    out.assessor.check -> 157761320
+    out.customer.request -> 157762648
+  157774184
+    out.approver.approve -> 157774216
+    out.assessor.check -> 0
+    out.customer.request -> 0
+    in.approver.approve -> 157761320
+  157774216 :: S
+    out.approver.approve -> 0
+    out.assessor.check -> 0
+    out.customer.request -> 0
+    in.approver.approve -> 157763528
+  157774480
+    out.approver.approve -> 0
+    out.assessor.check -> 157763528
+    out.customer.request -> 157777280
+  157777280
+    out.approver.approve -> 0
+    out.assessor.check -> 157760768
+    out.customer.request -> 0
+  157778272
+    out.approver.approve -> 157760768
+    out.assessor.check -> 0
+    out.customer.request -> 0
+  157778352
+    out.approver.approve -> 0
+    out.assessor.check -> 157809184
+    out.customer.request -> 0
+    in.assessor.check -> 157770912
+  157805192
+    out.approver.approve -> 157766784
+    out.assessor.check -> 157774184
+    out.customer.request -> 0
+    in.approver.approve -> 157770912
+  157805640 :: S
+    out.approver.approve -> 0
+    out.assessor.check -> 0
+    out.customer.request -> 0
+    in.approver.approve -> 157759568
+    in.customer.request -> 157805192
+  157809184 :: S
+    out.approver.approve -> 0
+    out.assessor.check -> 0
+    out.customer.request -> 0
+    in.assessor.check -> 157761320
+  0 :: T
+    out.approver.approve -> 0
+    out.assessor.check -> 0
+    out.customer.request -> 0
+    in.approver.approve -> 0
+    in.assessor.check -> 0
+    in.customer.request -> 0
+

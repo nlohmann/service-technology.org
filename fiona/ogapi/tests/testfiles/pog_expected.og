@@ -1,0 +1,27 @@
+INTERFACE
+  INPUT
+    p, r, d, e, s;
+  OUTPUT
+    o, cc, cod;
+
+NODES
+  1 : o
+    o -> 2
+  2 : p * r
+    p -> 4
+    r -> 3
+  3 : cod
+    cod -> 5
+  4 : cc
+    cc -> 6
+  5 : (s + d) * final
+    d -> 8
+    s -> 7
+  6 : d * final
+    d -> 9
+  7 : d * final
+    d -> 9
+  8 : s * final
+    s -> 9
+  9 : final
+

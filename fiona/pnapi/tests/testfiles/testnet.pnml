@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml>
+  <net id="Net-One" type="Petri net">
+    <place id="oryx_27351BCD-038A-4C9A-BB3A-C48124833B5C">
+      <initialMarking>
+        <text>1</text>
+      </initialMarking>
+    </place>
+    <place id="oryx_89E91E0A-F8FA-4647-B2C4-960959924D75"/>
+    <place id="oryx_A86DF5B8-6078-470A-A173-787D6FF2C0D2"/>
+    <place id="oryx_F939DC34-BB08-4E8F-8C37-6CE434BFA591"/>
+    <place id="oryx_1D37DC35-A76E-4C7C-9030-CFDCC26A2FC4"/>
+    <place id="oryx_D9847382-1975-4B1D-BEB5-A2F2B44A555B"/>
+    <place id="oryx_0233DD0D-3761-4F0E-B71D-9549B14E7098"/>
+    <place id="oryx_A6A99932-1A85-448C-96D9-684DB156C978"/>
+    <transition id="oryx_AA40B0B3-494C-4F00-A7F4-AF878DB5F8BF">
+      <name>
+        <value/>
+        <text/>
+      </name>
+    </transition>
+    <transition id="oryx_6D7385E4-1E98-404A-BF69-5A3B668439C4">
+      <name>
+        <value/>
+        <text/>
+      </name>
+    </transition>
+    <transition id="oryx_36B26F13-35D1-45FC-B0A9-DFEE780B581C">
+      <name>
+        <value/>
+        <text/>
+      </name>
+    </transition>
+    <transition id="oryx_633FA3FA-BABB-4DE8-8AFF-FE4DEDA5FFCA">
+      <name>
+        <value/>
+        <text/>
+      </name>
+    </transition>
+    <transition id="oryx_16849636-2295-40A9-8FC2-8D26A7BAAE64">
+      <name>
+        <value/>
+        <text/>
+      </name>
+    </transition>
+    <transition id="oryx_76F60F20-31DA-4A2D-930E-93BDBC9470F0">
+      <name>
+        <value/>
+        <text/>
+      </name>
+    </transition>
+    <transition id="oryx_5A2D1825-0B09-4338-88E4-F39DEB7A0203">
+      <name>
+        <value/>
+        <text/>
+      </name>
+    </transition>
+    <arc id="from_oryx_27351BCD-038A-4C9A-BB3A-C48124833B5C_to_oryx_AA40B0B3-494C-4F00-A7F4-AF878DB5F8BF" source="oryx_27351BCD-038A-4C9A-BB3A-C48124833B5C" target="oryx_AA40B0B3-494C-4F00-A7F4-AF878DB5F8BF">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_AA40B0B3-494C-4F00-A7F4-AF878DB5F8BF_to_oryx_89E91E0A-F8FA-4647-B2C4-960959924D75" source="oryx_AA40B0B3-494C-4F00-A7F4-AF878DB5F8BF" target="oryx_89E91E0A-F8FA-4647-B2C4-960959924D75">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_AA40B0B3-494C-4F00-A7F4-AF878DB5F8BF_to_oryx_A86DF5B8-6078-470A-A173-787D6FF2C0D2" source="oryx_AA40B0B3-494C-4F00-A7F4-AF878DB5F8BF" target="oryx_A86DF5B8-6078-470A-A173-787D6FF2C0D2">
+      <inscription>
+        <value>1</value>
+        <text>2</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_89E91E0A-F8FA-4647-B2C4-960959924D75_to_oryx_6D7385E4-1E98-404A-BF69-5A3B668439C4" source="oryx_89E91E0A-F8FA-4647-B2C4-960959924D75" target="oryx_6D7385E4-1E98-404A-BF69-5A3B668439C4">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_6D7385E4-1E98-404A-BF69-5A3B668439C4_to_oryx_F939DC34-BB08-4E8F-8C37-6CE434BFA591" source="oryx_6D7385E4-1E98-404A-BF69-5A3B668439C4" target="oryx_F939DC34-BB08-4E8F-8C37-6CE434BFA591">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_A86DF5B8-6078-470A-A173-787D6FF2C0D2_to_oryx_36B26F13-35D1-45FC-B0A9-DFEE780B581C" source="oryx_A86DF5B8-6078-470A-A173-787D6FF2C0D2" target="oryx_36B26F13-35D1-45FC-B0A9-DFEE780B581C">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_36B26F13-35D1-45FC-B0A9-DFEE780B581C_to_oryx_1D37DC35-A76E-4C7C-9030-CFDCC26A2FC4" source="oryx_36B26F13-35D1-45FC-B0A9-DFEE780B581C" target="oryx_1D37DC35-A76E-4C7C-9030-CFDCC26A2FC4">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_89E91E0A-F8FA-4647-B2C4-960959924D75_to_oryx_633FA3FA-BABB-4DE8-8AFF-FE4DEDA5FFCA" source="oryx_89E91E0A-F8FA-4647-B2C4-960959924D75" target="oryx_633FA3FA-BABB-4DE8-8AFF-FE4DEDA5FFCA">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_633FA3FA-BABB-4DE8-8AFF-FE4DEDA5FFCA_to_oryx_D9847382-1975-4B1D-BEB5-A2F2B44A555B" source="oryx_633FA3FA-BABB-4DE8-8AFF-FE4DEDA5FFCA" target="oryx_D9847382-1975-4B1D-BEB5-A2F2B44A555B">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_1D37DC35-A76E-4C7C-9030-CFDCC26A2FC4_to_oryx_16849636-2295-40A9-8FC2-8D26A7BAAE64" source="oryx_1D37DC35-A76E-4C7C-9030-CFDCC26A2FC4" target="oryx_16849636-2295-40A9-8FC2-8D26A7BAAE64">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_16849636-2295-40A9-8FC2-8D26A7BAAE64_to_oryx_0233DD0D-3761-4F0E-B71D-9549B14E7098" source="oryx_16849636-2295-40A9-8FC2-8D26A7BAAE64" target="oryx_0233DD0D-3761-4F0E-B71D-9549B14E7098">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_F939DC34-BB08-4E8F-8C37-6CE434BFA591_to_oryx_76F60F20-31DA-4A2D-930E-93BDBC9470F0" source="oryx_F939DC34-BB08-4E8F-8C37-6CE434BFA591" target="oryx_76F60F20-31DA-4A2D-930E-93BDBC9470F0">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_0233DD0D-3761-4F0E-B71D-9549B14E7098_to_oryx_76F60F20-31DA-4A2D-930E-93BDBC9470F0" source="oryx_0233DD0D-3761-4F0E-B71D-9549B14E7098" target="oryx_76F60F20-31DA-4A2D-930E-93BDBC9470F0">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_D9847382-1975-4B1D-BEB5-A2F2B44A555B_to_oryx_5A2D1825-0B09-4338-88E4-F39DEB7A0203" source="oryx_D9847382-1975-4B1D-BEB5-A2F2B44A555B" target="oryx_5A2D1825-0B09-4338-88E4-F39DEB7A0203">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_0233DD0D-3761-4F0E-B71D-9549B14E7098_to_oryx_5A2D1825-0B09-4338-88E4-F39DEB7A0203" source="oryx_0233DD0D-3761-4F0E-B71D-9549B14E7098" target="oryx_5A2D1825-0B09-4338-88E4-F39DEB7A0203">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_5A2D1825-0B09-4338-88E4-F39DEB7A0203_to_oryx_A6A99932-1A85-448C-96D9-684DB156C978" source="oryx_5A2D1825-0B09-4338-88E4-F39DEB7A0203" target="oryx_A6A99932-1A85-448C-96D9-684DB156C978">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+    <arc id="from_oryx_76F60F20-31DA-4A2D-930E-93BDBC9470F0_to_oryx_A6A99932-1A85-448C-96D9-684DB156C978" source="oryx_76F60F20-31DA-4A2D-930E-93BDBC9470F0" target="oryx_A6A99932-1A85-448C-96D9-684DB156C978">
+      <inscription>
+        <value>1</value>
+        <text>1</text>
+      </inscription>
+    </arc>
+  </net>
+</pnml>

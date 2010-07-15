@@ -1,0 +1,92 @@
+{ n=3, k=1 }
+
+PLACE
+INTERNAL
+  phil0_id, phil0_i1, phil0_i2, phil0_ea, phil0_i0,
+  phil1_id, phil1_i1, phil1_i2, phil1_ea, 
+  phil2_id, phil2_i1, phil2_i2, phil2_ea, phil2_i0,
+  fork_0, fork_1, fork_2;
+SYNCHRONOUS
+  tl_0, in_0, tr_0, rn_0,
+  tl_1, in_1, tr_1, rn_1,
+  tl_2, in_2, tr_2, rn_2;
+
+INITIALMARKING
+  phil0_id, phil1_id, phil2_id, 
+  fork_0, fork_1, fork_2;
+
+FINALMARKING
+  phil0_id, phil1_id, phil2_id, 
+  fork_0, fork_1, fork_2;
+
+{ philosopher #0 }
+TRANSITION phil0_takeleft_silent
+CONSUME phil0_id, fork_0;
+PRODUCE phil0_i0;
+
+TRANSITION phil0_takeleft
+CONSUME phil0_i0;
+PRODUCE phil0_i1:1;
+SYNCHRONIZE tl_0;
+
+TRANSITION phil0_internal
+CONSUME phil0_i1;
+PRODUCE phil0_i2;
+SYNCHRONIZE in_0;
+
+TRANSITION phil0_takeright
+CONSUME phil0_i2:1, fork_1;
+PRODUCE phil0_ea;
+SYNCHRONIZE tr_0;
+
+TRANSITION phil0_return
+CONSUME phil0_ea;
+PRODUCE phil0_id, fork_0, fork_1;
+SYNCHRONIZE rn_0;
+
+{ philosopher #1 }
+TRANSITION phil1_takeleft
+CONSUME phil1_id, fork_1;
+PRODUCE phil1_i1:1;
+SYNCHRONIZE tl_1;
+
+TRANSITION phil1_internal
+CONSUME phil1_i1;
+PRODUCE phil1_i2;
+SYNCHRONIZE in_1;
+
+TRANSITION phil1_takeright
+CONSUME phil1_i2:1, fork_2;
+PRODUCE phil1_ea;
+SYNCHRONIZE tr_1;
+
+TRANSITION phil1_return
+CONSUME phil1_ea;
+PRODUCE phil1_id, fork_1, fork_2;
+SYNCHRONIZE rn_1;
+
+{ philosopher #2 }
+TRANSITION phil2_takeleft_silent
+CONSUME phil2_id, fork_2;
+PRODUCE phil2_i0;
+
+TRANSITION phil2_takeleft
+CONSUME phil2_i0;
+PRODUCE phil2_i1:1;
+SYNCHRONIZE tl_2;
+
+TRANSITION phil2_internal
+CONSUME phil2_i1;
+PRODUCE phil2_i2;
+SYNCHRONIZE in_2;
+
+TRANSITION phil2_takeright
+CONSUME phil2_i2:1, fork_0;
+PRODUCE phil2_ea;
+SYNCHRONIZE tr_2;
+
+TRANSITION phil2_return
+CONSUME phil2_ea;
+PRODUCE phil2_id, fork_2, fork_0;
+SYNCHRONIZE rn_2;
+

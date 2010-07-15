@@ -1,0 +1,408 @@
+place "i" init 1;
+place "o";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:InputCondition";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Split_and (6n1j)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Join_and (6n1j)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Split_and (6n2h)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Join_and (6n2h)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Split_xor (6n44)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Join_xor (6n44)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_and (6n2h)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_and (6n2h)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_xor (6mzc)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_xor (6mzc)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_and (6myl)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_and (6myl)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_or (6mzu)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_or (6mzu)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_xor (6mzl)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_xor (6mzl)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:OutputCondition";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n1j)*and (6n1j)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n2h)*and (6n2h)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_xor (6n44)*xor (6n44)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n1j)*Goods Receipt (6n08)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Goods Receipt (6n08)*and (6n2o)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2o)*xor (6n26)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2o)*Billing (6n3j)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n26)*and (6n2h)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2h)*Join_Yes_and (6n2h)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2h)*Invoice Verification (6n18)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n44)*Sales Order (6n3x)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Sales Order (6n3x)*xor (6mzc)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc)*Join_Yes_xor (6mzc)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc)*and (6myl)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc)*Risk/ Credit Management (6mz5)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6myl)*Join_Yes_and (6myl)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6myl)*Purchasing (6n1z)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Purchasing (6n1z)*xor (6n0u)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u)*and (6n1j)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u)*xor (6n26)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Billing (6n3j)*or (6mzu)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:or (6mzu)*Join_Yes_or (6mzu)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Risk/ Credit Management (6mz5)*xor (6mzl)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzl)*Join_Yes_xor (6mzl)";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split:busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n1j):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n1j):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n2h):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n2h):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_xor (6n44):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_xor (6n44):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Skip:busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n1j):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Goods Receipt (6n08):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2o):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n26):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2h):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Invoice Verification (6n18):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n44):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Sales Order (6n3x):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6myl):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Purchasing (6n1z):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Billing (6n3j):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:or (6mzu):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Risk/ Credit Management (6mz5):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzl):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6n2h):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6n2h):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzc):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzc):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6myl):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6myl):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_or (6mzu):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_or (6mzu):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzl):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzl):busy";
+place "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Output:busy";
+trans "*:Model.6mxu--0-----u--:Model.6mxu--0-----u--:start"~"*:Model.6mxu--0-----u--:Model.6mxu--0-----u--:start"
+    in "i"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:InputCondition"
+;
+trans "*:Model.6mxu--0-----u--:Model.6mxu--0-----u--:end"~"*:Model.6mxu--0-----u--:Model.6mxu--0-----u--:end"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:OutputCondition"
+   out "o"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split:join:InputCondition"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split:join:InputCondition"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:InputCondition"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split:busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split:split:Split_Split_and (6n1j):Split_Split_and (6n2h):Split_Split_xor (6n44)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split:split:Split_Split_and (6n1j):Split_Split_and (6n2h):Split_Split_xor (6n44)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split:busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Split_and (6n1j)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Split_and (6n2h)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Split_xor (6n44)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n1j):join:Split_Split_and (6n1j)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n1j):join:Split_Split_and (6n1j)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Split_and (6n1j)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n1j):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n1j):split:Split_Join_and (6n1j)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n1j):split:Split_Join_and (6n1j)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n1j):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Join_and (6n1j)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n1j):join:Split_Split_and (6n1j)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n1j):join:Split_Split_and (6n1j)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Split_and (6n1j)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n1j):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n1j):split:Split_Join_and (6n1j):Split_Yes_and (6n1j)*and (6n1j)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n1j):split:Split_Join_and (6n1j):Split_Yes_and (6n1j)*and (6n1j)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n1j):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Join_and (6n1j)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n1j)*and (6n1j)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n2h):join:Split_Split_and (6n2h)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n2h):join:Split_Split_and (6n2h)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Split_and (6n2h)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n2h):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n2h):split:Split_Join_and (6n2h)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n2h):split:Split_Join_and (6n2h)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_and (6n2h):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Join_and (6n2h)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n2h):join:Split_Split_and (6n2h)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n2h):join:Split_Split_and (6n2h)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Split_and (6n2h)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n2h):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n2h):split:Split_Join_and (6n2h):Split_Yes_and (6n2h)*and (6n2h)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n2h):split:Split_Join_and (6n2h):Split_Yes_and (6n2h)*and (6n2h)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n2h):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Join_and (6n2h)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n2h)*and (6n2h)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_xor (6n44):join:Split_Split_xor (6n44)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_xor (6n44):join:Split_Split_xor (6n44)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Split_xor (6n44)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_xor (6n44):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_xor (6n44):split:Split_Join_xor (6n44)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_xor (6n44):split:Split_Join_xor (6n44)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_No_xor (6n44):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Join_xor (6n44)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_xor (6n44):join:Split_Split_xor (6n44)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_xor (6n44):join:Split_Split_xor (6n44)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Split_xor (6n44)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_xor (6n44):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_xor (6n44):split:Split_Join_xor (6n44):Split_Yes_xor (6n44)*xor (6n44)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_xor (6n44):split:Split_Join_xor (6n44):Split_Yes_xor (6n44)*xor (6n44)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_xor (6n44):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Join_xor (6n44)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_xor (6n44)*xor (6n44)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Skip:join:Split_Join_and (6n1j):Split_Join_and (6n2h):Split_Join_xor (6n44)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Skip:join:Split_Join_and (6n1j):Split_Join_and (6n2h):Split_Join_xor (6n44)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Join_and (6n1j)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Join_and (6n2h)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Join_xor (6n44)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Skip:busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Skip:split:Join_Split_and (6n2h):Join_Split_xor (6mzc):Join_Split_and (6myl):Join_Split_or (6mzu):Join_Split_xor (6mzl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Skip:split:Join_Split_and (6n2h):Join_Split_xor (6mzc):Join_Split_and (6myl):Join_Split_or (6mzu):Join_Split_xor (6mzl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Skip:busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_and (6n2h)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_xor (6mzc)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_and (6myl)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_or (6mzu)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_xor (6mzl)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n1j):join:Split_Yes_and (6n1j)*and (6n1j):xor (6n0u)*and (6n1j)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n1j):join:Split_Yes_and (6n1j)*and (6n1j):xor (6n0u)*and (6n1j)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n1j)*and (6n1j)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u)*and (6n1j)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n1j):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n1j):split:and (6n1j)*Goods Receipt (6n08)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n1j):split:and (6n1j)*Goods Receipt (6n08)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n1j):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n1j)*Goods Receipt (6n08)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Goods Receipt (6n08):join:and (6n1j)*Goods Receipt (6n08)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Goods Receipt (6n08):join:and (6n1j)*Goods Receipt (6n08)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n1j)*Goods Receipt (6n08)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Goods Receipt (6n08):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Goods Receipt (6n08):split:Goods Receipt (6n08)*and (6n2o)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Goods Receipt (6n08):split:Goods Receipt (6n08)*and (6n2o)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Goods Receipt (6n08):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Goods Receipt (6n08)*and (6n2o)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2o):join:Goods Receipt (6n08)*and (6n2o)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2o):join:Goods Receipt (6n08)*and (6n2o)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Goods Receipt (6n08)*and (6n2o)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2o):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2o):split:and (6n2o)*xor (6n26):and (6n2o)*Billing (6n3j)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2o):split:and (6n2o)*xor (6n26):and (6n2o)*Billing (6n3j)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2o):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2o)*xor (6n26)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2o)*Billing (6n3j)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n26):join:and (6n2o)*xor (6n26)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n26):join:and (6n2o)*xor (6n26)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2o)*xor (6n26)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n26):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n26):join:xor (6n0u)*xor (6n26)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n26):join:xor (6n0u)*xor (6n26)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u)*xor (6n26)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n26):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n26):split:xor (6n26)*and (6n2h)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n26):split:xor (6n26)*and (6n2h)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n26):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n26)*and (6n2h)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2h):join:Split_Yes_and (6n2h)*and (6n2h):xor (6n26)*and (6n2h)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2h):join:Split_Yes_and (6n2h)*and (6n2h):xor (6n26)*and (6n2h)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_and (6n2h)*and (6n2h)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n26)*and (6n2h)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2h):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2h):split:and (6n2h)*Join_Yes_and (6n2h):and (6n2h)*Invoice Verification (6n18)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2h):split:and (6n2h)*Join_Yes_and (6n2h):and (6n2h)*Invoice Verification (6n18)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2h):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2h)*Join_Yes_and (6n2h)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2h)*Invoice Verification (6n18)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Invoice Verification (6n18):join:and (6n2h)*Invoice Verification (6n18)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Invoice Verification (6n18):join:and (6n2h)*Invoice Verification (6n18)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2h)*Invoice Verification (6n18)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Invoice Verification (6n18):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Invoice Verification (6n18):split"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Invoice Verification (6n18):split"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Invoice Verification (6n18):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n44):join:Split_Yes_xor (6n44)*xor (6n44)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n44):join:Split_Yes_xor (6n44)*xor (6n44)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Split_Yes_xor (6n44)*xor (6n44)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n44):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n44):split:xor (6n44)*Sales Order (6n3x)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n44):split:xor (6n44)*Sales Order (6n3x)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n44):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n44)*Sales Order (6n3x)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Sales Order (6n3x):join:xor (6n44)*Sales Order (6n3x)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Sales Order (6n3x):join:xor (6n44)*Sales Order (6n3x)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n44)*Sales Order (6n3x)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Sales Order (6n3x):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Sales Order (6n3x):split:Sales Order (6n3x)*xor (6mzc)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Sales Order (6n3x):split:Sales Order (6n3x)*xor (6mzc)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Sales Order (6n3x):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Sales Order (6n3x)*xor (6mzc)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc):join:Sales Order (6n3x)*xor (6mzc)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc):join:Sales Order (6n3x)*xor (6mzc)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Sales Order (6n3x)*xor (6mzc)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc):split:xor (6mzc)*Join_Yes_xor (6mzc)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc):split:xor (6mzc)*Join_Yes_xor (6mzc)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc)*Join_Yes_xor (6mzc)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc):split:xor (6mzc)*and (6myl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc):split:xor (6mzc)*and (6myl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc)*and (6myl)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc):split:xor (6mzc)*Risk/ Credit Management (6mz5)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc):split:xor (6mzc)*Risk/ Credit Management (6mz5)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc)*Risk/ Credit Management (6mz5)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6myl):join:xor (6mzc)*and (6myl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6myl):join:xor (6mzc)*and (6myl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc)*and (6myl)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6myl):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6myl):split:and (6myl)*Join_Yes_and (6myl):and (6myl)*Purchasing (6n1z)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6myl):split:and (6myl)*Join_Yes_and (6myl):and (6myl)*Purchasing (6n1z)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6myl):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6myl)*Join_Yes_and (6myl)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6myl)*Purchasing (6n1z)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Purchasing (6n1z):join:and (6myl)*Purchasing (6n1z)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Purchasing (6n1z):join:and (6myl)*Purchasing (6n1z)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6myl)*Purchasing (6n1z)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Purchasing (6n1z):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Purchasing (6n1z):split:Purchasing (6n1z)*xor (6n0u)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Purchasing (6n1z):split:Purchasing (6n1z)*xor (6n0u)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Purchasing (6n1z):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Purchasing (6n1z)*xor (6n0u)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u):join:Purchasing (6n1z)*xor (6n0u)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u):join:Purchasing (6n1z)*xor (6n0u)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Purchasing (6n1z)*xor (6n0u)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u):split:xor (6n0u)*and (6n1j)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u):split:xor (6n0u)*and (6n1j)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u)*and (6n1j)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u):split:xor (6n0u)*xor (6n26)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u):split:xor (6n0u)*xor (6n26)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6n0u)*xor (6n26)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Billing (6n3j):join:and (6n2o)*Billing (6n3j)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Billing (6n3j):join:and (6n2o)*Billing (6n3j)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2o)*Billing (6n3j)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Billing (6n3j):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Billing (6n3j):split:Billing (6n3j)*or (6mzu)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Billing (6n3j):split:Billing (6n3j)*or (6mzu)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Billing (6n3j):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Billing (6n3j)*or (6mzu)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:or (6mzu):join:Billing (6n3j)*or (6mzu)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:or (6mzu):join:Billing (6n3j)*or (6mzu)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Billing (6n3j)*or (6mzu)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:or (6mzu):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:or (6mzu):split:or (6mzu)*Join_Yes_or (6mzu)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:or (6mzu):split:or (6mzu)*Join_Yes_or (6mzu)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:or (6mzu):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:or (6mzu)*Join_Yes_or (6mzu)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Risk/ Credit Management (6mz5):join:xor (6mzc)*Risk/ Credit Management (6mz5)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Risk/ Credit Management (6mz5):join:xor (6mzc)*Risk/ Credit Management (6mz5)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc)*Risk/ Credit Management (6mz5)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Risk/ Credit Management (6mz5):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Risk/ Credit Management (6mz5):split:Risk/ Credit Management (6mz5)*xor (6mzl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Risk/ Credit Management (6mz5):split:Risk/ Credit Management (6mz5)*xor (6mzl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Risk/ Credit Management (6mz5):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Risk/ Credit Management (6mz5)*xor (6mzl)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzl):join:Risk/ Credit Management (6mz5)*xor (6mzl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzl):join:Risk/ Credit Management (6mz5)*xor (6mzl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Risk/ Credit Management (6mz5)*xor (6mzl)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzl):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzl):split:xor (6mzl)*Join_Yes_xor (6mzl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzl):split:xor (6mzl)*Join_Yes_xor (6mzl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzl):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzl)*Join_Yes_xor (6mzl)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6n2h):join:Join_Split_and (6n2h)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6n2h):join:Join_Split_and (6n2h)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_and (6n2h)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6n2h):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6n2h):split:Join_Join_and (6n2h)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6n2h):split:Join_Join_and (6n2h)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6n2h):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_and (6n2h)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6n2h):join:and (6n2h)*Join_Yes_and (6n2h):Join_Split_and (6n2h)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6n2h):join:and (6n2h)*Join_Yes_and (6n2h):Join_Split_and (6n2h)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6n2h)*Join_Yes_and (6n2h)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_and (6n2h)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6n2h):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6n2h):split:Join_Join_and (6n2h)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6n2h):split:Join_Join_and (6n2h)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6n2h):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_and (6n2h)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzc):join:Join_Split_xor (6mzc)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzc):join:Join_Split_xor (6mzc)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_xor (6mzc)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzc):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzc):split:Join_Join_xor (6mzc)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzc):split:Join_Join_xor (6mzc)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzc):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_xor (6mzc)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzc):join:xor (6mzc)*Join_Yes_xor (6mzc):Join_Split_xor (6mzc)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzc):join:xor (6mzc)*Join_Yes_xor (6mzc):Join_Split_xor (6mzc)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzc)*Join_Yes_xor (6mzc)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_xor (6mzc)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzc):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzc):split:Join_Join_xor (6mzc)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzc):split:Join_Join_xor (6mzc)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzc):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_xor (6mzc)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6myl):join:Join_Split_and (6myl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6myl):join:Join_Split_and (6myl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_and (6myl)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6myl):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6myl):split:Join_Join_and (6myl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6myl):split:Join_Join_and (6myl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_and (6myl):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_and (6myl)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6myl):join:and (6myl)*Join_Yes_and (6myl):Join_Split_and (6myl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6myl):join:and (6myl)*Join_Yes_and (6myl):Join_Split_and (6myl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:and (6myl)*Join_Yes_and (6myl)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_and (6myl)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6myl):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6myl):split:Join_Join_and (6myl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6myl):split:Join_Join_and (6myl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_and (6myl):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_and (6myl)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_or (6mzu):join:Join_Split_or (6mzu)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_or (6mzu):join:Join_Split_or (6mzu)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_or (6mzu)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_or (6mzu):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_or (6mzu):split:Join_Join_or (6mzu)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_or (6mzu):split:Join_Join_or (6mzu)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_or (6mzu):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_or (6mzu)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_or (6mzu):join:or (6mzu)*Join_Yes_or (6mzu):Join_Split_or (6mzu)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_or (6mzu):join:or (6mzu)*Join_Yes_or (6mzu):Join_Split_or (6mzu)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:or (6mzu)*Join_Yes_or (6mzu)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_or (6mzu)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_or (6mzu):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_or (6mzu):split:Join_Join_or (6mzu)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_or (6mzu):split:Join_Join_or (6mzu)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_or (6mzu):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_or (6mzu)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzl):join:Join_Split_xor (6mzl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzl):join:Join_Split_xor (6mzl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_xor (6mzl)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzl):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzl):split:Join_Join_xor (6mzl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzl):split:Join_Join_xor (6mzl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_No_xor (6mzl):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_xor (6mzl)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzl):join:xor (6mzl)*Join_Yes_xor (6mzl):Join_Split_xor (6mzl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzl):join:xor (6mzl)*Join_Yes_xor (6mzl):Join_Split_xor (6mzl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:xor (6mzl)*Join_Yes_xor (6mzl)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Split_xor (6mzl)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzl):busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzl):split:Join_Join_xor (6mzl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzl):split:Join_Join_xor (6mzl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Yes_xor (6mzl):busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_xor (6mzl)"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Output:join:Join_Join_and (6n2h):Join_Join_xor (6mzc):Join_Join_and (6myl):Join_Join_or (6mzu):Join_Join_xor (6mzl)"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Output:join:Join_Join_and (6n2h):Join_Join_xor (6mzc):Join_Join_and (6myl):Join_Join_or (6mzu):Join_Join_xor (6mzl)"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_and (6n2h)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_xor (6mzc)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_and (6myl)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_or (6mzu)"
+       "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Join_Join_xor (6mzl)"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Output:busy"
+;
+trans "t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Output:split:OutputCondition"~"t:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Output:split:OutputCondition"
+    in "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:Output:busy"
+   out "p:Model.6mxu--0-----u--:Model.6mxu--0-----u--:OutputCondition"
+;
+

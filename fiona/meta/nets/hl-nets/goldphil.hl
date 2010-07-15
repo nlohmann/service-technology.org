@@ -1,0 +1,139 @@
+{ the deadlock-free golden chopstick version of dining phil/s }
+
+SORT phil = [ 1 , 3 ] ;
+     fork = phil;
+
+FUNCTION L( x : phil ) : fork
+BEGIN
+	RETURN x
+END
+
+FUNCTION R( x : phil ) : fork
+VAR y : fork ;
+BEGIN
+	y = x + 1;
+	RETURN y
+END
+
+FUNCTION all() : phil
+VAR i : phil ;
+BEGIN
+	FOR ALL i DO
+		RETURN i 
+	END
+END
+
+FUNCTION allbutfirst() : phil
+VAR i : phil ;
+BEGIN
+	FOR ALL i DO
+		IF i # 1 THEN RETURN i END
+	END
+END
+
+FUNCTION first () : phil
+BEGIN
+	RETURN 1
+END
+
+
+PLACE 	think : phil,
+	hasrightwood : phil,
+	hasrightgold : phil,
+	droppedright : phil,
+	hasleftwood : phil,
+	hasleftgold : phil,
+	eatingleftgold : phil,
+	eatingrightgold : phil,
+	eatingbothwood : phil,
+	remainsrightgold : phil,
+	remainsrightwood : phil,
+	woodforks : fork,
+	goldforks: fork;
+
+MARKING 
+	think: all(),
+	woodforks : L(allbutfirst()),
+	goldforks : L(first());
+
+TRANSITION takewoodenright
+VAR x : phil;
+CONSUME think : x, 
+woodforks : R(x) ;
+
+PRODUCE 
+
+hasrightwood : x ;
+
+TRANSITION takegoldenright
+VAR x : phil;
+CONSUME think : x, goldforks : R(x);
+PRODUCE hasrightgold : x;
+
+TRANSITION dropright
+VAR x : phil;
+CONSUME hasrightgold : x;
+PRODUCE droppedright : x , goldforks : R(x);
+
+TRANSITION takegoldenleft
+VAR x : phil;
+CONSUME droppedright : x , goldforks : L(x);
+PRODUCE hasleftgold : x;
+
+TRANSITION takewoodenleft
+VAR x : phil;
+CONSUME droppedright : x, woodforks : L(x);
+PRODUCE hasleftwood : x;
+
+TRANSITION takesecondleftgold
+VAR x : phil;
+CONSUME hasrightwood : x, goldforks : L(x);
+PRODUCE eatingleftgold : x;
+
+TRANSITION takesecondleftwood
+VAR x : phil;
+CONSUME hasrightwood : x, woodforks : L(x);
+PRODUCE eatingbothwood : x;
+
+
+TRANSITION takesecondrightwood
+VAR x : phil;
+CONSUME hasleftwood : x , woodforks : R(x);
+PRODUCE eatingbothwood : x;
+
+TRANSITION takesecondrightgold
+VAR x : phil;
+CONSUME hasleftwood : x, goldforks : R(x);
+PRODUCE eatingrightgold : x;
+
+TRANSITION dropsecondleftgold
+VAR x : phil;
+CONSUME eatingleftgold : x;
+PRODUCE remainsrightwood : x, goldforks : R(x);
+
+TRANSITION dropsecondleftwoodw
+VAR x : phil;
+CONSUME eatingbothwood : x;
+PRODUCE remainsrightwood : x, woodforks : R(x);
+
+TRANSITION dropsecondleftwoodg
+VAR x : phil;
+CONSUME eatingrightgold : x;
+PRODUCE remainsrightgold : x, woodforks : R(x);
+
+TRANSITION droprightgold 
+VAR x : phil;
+CONSUME remainsrightgold : x;
+PRODUCE think : x , goldforks : L(x);
+
+TRANSITION droprightwood
+VAR x : phil;
+CONSUME remainsrightwood : x;
+PRODUCE think : x , woodforks : L(x);
+
+TRANSITION startover
+VAR x : phil;
+CONSUME hasleftgold : x;
+PRODUCE think : x, goldforks : L(x);
+
+

@@ -1,0 +1,1244 @@
+\input texinfo
+@setfilename pnapi.info
+@include version.texi
+@afourpaper
+@finalout
+@settitle Petri Net API User's Manual
+
+@c --------------------------------------------------------------------------
+
+@copying
+
+@b{About this document:}
+
+This manual is for the Petri Net API, version @value{VERSION}, encapsulating Petri net-related functions in a C++ API, last updated @value{UPDATED}.
+
+Copyright @copyright{} 2009, 2010 Niels Lohmann
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify this GNU Manual. Buying copies from GNU Press supports the FSF in developing GNU and promoting software freedom.''
+@end quotation
+@end copying
+
+@dircategory service-technology.org
+@direntry
+* Petri Net API: (pnapi).       encapsulating Petri net-related functions in a C++ API.
+@end direntry
+
+
+@c --------------------------------------------------------------------------
+
+@titlepage
+
+@title Petri Net API
+
+@subtitle Encapsulating Petri Net-Related Functions in a C++ API
+@subtitle @url{http://service-technology.org/pnapi}
+@vskip 0.5em
+@subtitle Version @value{VERSION}, @value{UPDATED}
+
+@author Niels Lohmann
+@page
+
+
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c --------------------------------------------------------------------------
+
+@ifnottex
+@node Top
+@top PNAPI
+@insertcopying
+@end ifnottex
+
+@c --------------------------------------------------------------------------
+
+@menu
+* First Steps::How to set up and install the Petri Net API.
+* Upgrading::How to adjust your tool when updating the Petri Net API.
+* Usage::How to use the API in other programs.
+* Open Net File Format::Open Net File Format.
+* Developing the API::Guidelines and conventions within the API.
+* Theory::The theory implemented in the Petri Net API.
+* Command Line Options::How to run the Petri Net API frontend "Petri".
+* Error Codes::What the error codes of the frontend "Petri" mean.
+* ChangeLog::Version history.
+* GNU Free Documentation License::The license of this manual.
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@contents
+@paragraphindent none
+
+@c --------------------------------------------------------------------------
+
+@node First Steps
+@chapter First Steps
+
+@section Setup and Installation
+
+@enumerate
+@item Go to @url{http://service-technology.org/files/pnapi} and download the latest release version of the Petri Net API, say @file{pnapi-@value{VERSION}.tar.gz}. To setup and compile the Petri Net API, change into your download directory and type
+
+@cartouche
+@smallexample
+tar xfz pnapi-@value{VERSION}.tar.gz
+cd pnapi-@value{VERSION}
+./configure
+make
+@end smallexample
+@end cartouche
+
+After compilation, a library @samp{src/libpnapi.a} and a frontend tool @samp{utils/petri} are generated.@footnote{On Microsoft Windows, the file will be called @file{petri.exe}.} If you experience any compiler warnings, don't panic: the Petri Net API contains some generated or third party code that we cannot influence.
+
+@item To test whether everything went fine, type
+
+@cartouche
+@smallexample
+make check
+@end smallexample
+@end cartouche
+
+to execute the testcases located in @file{tests}. If everything went fine, you should see something like:@footnote{Some tests use external tools (Fiona, Wendy, Petrify, Genet) to check whether the calculated results are correct. If a needed tool was not found by the configure script, theses tests are skipped.}
+
+@smallexample
+## ------------- ##
+## Test results. ##
+## ------------- ##
+
+All 104 tests were successful.
+@end smallexample
+
+If an error occurs, please send the output to @email{pnapi@@service-technology.org}.
+
+@item To install the library, the frontend binary, the manpage, and the documentation, type
+
+@cartouche
+@smallexample
+make install
+@end smallexample
+@end cartouche
+
+You might need superuser permissions to do so.
+@end enumerate
+
+If you need any further information, see file @file{INSTALL} for detailed instructions.
+
+
+@section Contents of the Distribution
+
+The distribution contains several directories:
+
+@table @file
+@item doc
+The Texinfo documentation of PNAPI. The documentation can be created using @samp{make pdf}. Note you need to have PNAPI properly installed before (see installation description above).
+
+@item man
+The manpage of PNAPI which can be displayed using @samp{man pnapi} after having PNAPI installed (see installation description above).
+
+@item src
+The source code of PNAPI.
+
+@item tests
+Testcases for PNAPI which check the generated library by using the frontend. Some test scripts use external tools (e.g. Fiona or Wendy) to check whether the calculated operating guidelines are correct. If a needed tool was not found by the configure script, theses tests are skipped.
+@end table
+
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@section Requirements
+@anchor{Requirements}
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+In order to run, compile, and develop PNAPI, several tools are required.
+
+@subsection Runtime
+@itemize
+@item Petrify (@url{http://www.lsi.upc.edu/~jordicf/petrify/}) to convert service automata in petri nets (used by default if found).
+@item Genet (@url{http://genet.sourceforge.net/}) to convert service automata in petri nets 
+(used by default, if Petrify was not found but Genet was).
+@end itemize
+
+The configure script will search for them an set the default paths.
+
+
+@subsection Compilation
+To compile the source code from a source distribution, the following tools are required.
+
+@itemize
+@item GCC (@url{http://gcc.gnu.org/})
+@item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/})
+@item Libtool (@url{http://www.gnu.org/software/libtool/})
+@end itemize
+
+
+@subsection Development
+In case you want to make changes to the source code, the following tools are required to reconfigure and compile PNAPI.
+
+@itemize
+@item Autoconf, @url{http://www.gnu.org/software/autoconf/}
+@item Automake, @url{http://www.gnu.org/software/automake/}
+@item Bison, @url{http://www.gnu.org/software/bison/}
+@item flex, @url{http://flex.sourceforge.net/}
+@item Gengetopt, @url{http://www.gnu.org/software/gengetopt/}
+@item help2man, @url{http://www.gnu.org/software/help2man/}
+@item Texinfo, @url{http://www.gnu.org/software/texinfo/}
+@end itemize
+
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Please check our nightly build server at @url{http://service-technology.org/nightly} for the versions we use during development.
+
+
+
+
+@c --------------------------------------------------------------------------
+
+@node Upgrading
+@chapter How to adjust your tool when updating the Petri Net API.
+
+When changes in the interface of the Petri Net API have been made, a tool updating its version of the API need to be adjusted.
+Below will be a short guide written as FAQ which changes are necessary.
+If you still have problems, updating your tool, please report to @email{pnapi@@service-technology.org}.
+
+@section Upgrading vom 3.00 to 4.00
+
+@subsection Some functions I used to use are missing, now.
+
+Please check the functions' names. Some functions have been renamed, according to a uniformly naming scheme.
+If you miss a getter like e.g. @code{PetriNet::finalCondition()}, it most likely will now begin with "get": @code{PetriNet::getFinalCondition()}.
+Appropriately, if you miss a function changing its object, it propably now starts with a "set".
+Below is a list of functions, that have been renamed (most likely incomplete):
+
+@itemize
+@item @code{PetriNet::finalCondition()} => @code{PetriNet::getFinalCondition()}
+@end itemize
+
+@subsection What happened to PetriNet::getInternalPlaces() and PetriNet::getInterfacePaces()?
+
+Since Petri Net API version 4.00 interface places have become labels organized in an interface class, so these functions are no longer needed.
+If you needed @code{PetriNet::getInternalPlaces()} you now can use @code{PetriNet::getPlaces()}; if you needed @code{PetriNet::getInterfacePlaces()} you now have to get the net's interface by @code{PetriNet::getInterface()} and to get the former interface places seperately by @code{Interface::getInputLabels()} and @code{Interface::getOutputLabels()}, or in one set by using @code{Interface::getAsynchronousLabels()}.
+Note, that these sets will be generated by each call, so you shoud use a cache for better performance when e.g. iterating through all labels.
+
+@subsection What about place types or node types?
+
+Since there are now only internal places in a net, nodes and places no longer have types. The enum @code{Node::Type} determining a node's type has been moved to @code{Transition::Type}.
+
+@subsection What about searching places?
+
+If you earlier got a place name and searched for the appropriate place by @code{PetriNet::findPlace()} you now should perform a search for the appropriate label, if the place search failed by using @code{Interface::findLabel()}.
+
+@subsection I used to catch pnapi::io::InputError when parsing a net.
+
+Then you have to catch @code{pnapi::exception::InputError} now.
+
+@subsection How do I get the preset of a former output place or the postset of a former input place, appropriately?
+
+By @code{Label::getTransitions()} you will get a set of transitions connected to this label. In case of an input or output label these transition previously where consuming from or producing to the former place.
+
+@c --------------------------------------------------------------------------
+
+@node Usage
+@chapter How to use the API in other programs
+
+The Petri Net API provides structures for working with Petri nets.
+
+For using it, simply include the header file @file{pnapi.h} in your code:
+@cartouche
+@smallexample
+#include "pnapi.h"
+@end smallexample
+@end cartouche
+
+Everything you will use can be found in the following namespaces:
+@itemize
+@item @code{pnapi}
+@item @code{pnapi::exception}
+@item @code{pnapi::formula}
+@item @code{pnapi::io}
+@item @code{pnapi::verbose}
+@end itemize
+
+The classes @samp{pnapi::PetriNet} and @samp{pnapi::Automaton} provide the main 
+functionality and can serve as an entry point for getting an overview of the API's functionality. For more information, please go to the online API documentation reachable at @url{http://esla.informatik.uni-rostock.de:8080/job/pnapi/doclinks/1/}.
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@chapter Error Handling
+
+Whenever an error occurs within the API, an exception will be thrown. Here is a list of existing exceptions an when they will be thrown.
+
+@section Error
+Parent class of all exceptions containing a message, what happened. Catch this to catch everything the API ever will throw.
+
+@section InputError
+Exception thrown by parsing a Petri Net or a Service Automaton, containing filename, line and token, where the error occured, as well as the error kind, whether it was a syntactic error, violating the grammar below or a semantic error e.g. by giving two nodes the same name.
+
+@section NotImplementedError
+Thrown when use cases happend we not thought about, yet. If you ever catch such an exception, please report to @email{pnapi@@service-technology.org} which feature is missing.
+
+@section AssertionFailedError
+There are several sanity checks within the API e.g. to ensure that there a no conflicts with node names (i.e. there are no two places with the same name). When such a check failes, the API should not cause the program to fail but give it the chance to decide how to handle this error. Hence an exception is thrown instead of using the C @samp{assert} makro.
+
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@chapter Verbose Output
+
+Sometimes verbose output about processes within the API are desired, like
+
+@cartouche
+@smallexample
+TOOL: parsing Service Automaton from file 'myAutomaton.sa'
+TOOL: writing Service Automaton to temporary file '/tmp/temp-004200'
+TOOL: calling petrify
+TOOL: parsing petrify output
+TOOL: generating Petri Net from petrify output
+@end smallexample
+@end cartouche
+
+For this purpose there exists the function pointer@samp{pnapi::verbose::status}, by default pointing at @samp{pnapi::verbose::quiet}. If you wish to print verbose output you only have to provide an own output function and set @samp{pnapi::verbose::status} to it.
+
+Your output function must have the signature
+
+@cartouche
+@smallexample
+void myStatusFunction(const char *, ...);
+@end smallexample
+@end cartouche
+
+beeing a variadic function to be used like @samp{printf}.
+
+If you prefer to let the API write the output by itself, set the pointer to @samp{pnapi::verbose::defaultStatus}. This way all messages will be written like
+
+@cartouche
+@smallexample
+PNAPI: writing net to file 'result.lola'
+@end smallexample
+@end cartouche
+
+to standard error.
+
+Verbose output will be written at these situations:
+@itemize
+@item opening a temporary file
+@item closing a temporary file
+@end itemize
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@chapter Some Examples
+
+Creating a small Petrinet
+@cartouche
+@smallexample
+PetriNet net;
+Place & p1 = net.createPlace();
+p1.mark();
+Place & p2 = net.createPlace();
+Transition & t = net.createTransition();
+net.createArc(p1,t);
+net.createArc(t,p2);
+@end smallexample
+@end cartouche
+
+Assigning a final condition
+@cartouche
+@smallexample
+// net from the previous example is recycled here
+net.getFinalCondition() = ((p1 == 0) && (p2 == 1));
+Place & p3 = net.createPlace();
+net.getFinalCondition() = (net.getFinalCondition().getFormula() && (p3 == 0));
+@end smallexample
+@end cartouche
+
+Reading from stream and aborting if an error occurs
+@cartouche
+@smallexample
+istream is;
+try
+@{
+  is >> io::owfn >> net;
+@}
+catch (pnapi::exception::InputError error)
+@{
+  std::cerr << error;
+  exit(EXIT_FAILURE);
+@}
+@end smallexample
+@end cartouche
+
+Writing to a stream
+@cartouche
+@smallexample
+ostream os;
+// LoLA without formulae
+os << io::lola << net;
+// LoLA with formulae
+os << io::lola << io::formula << net;
+@end smallexample
+@end cartouche
+
+Reducing by applying some rules
+@cartouche
+@smallexample
+net.reduce(PetriNet::SET_STARKE | PetriNet::KEEP_NORMAL);
+@end smallexample
+@end cartouche
+
+Creating a service automaton
+@cartouche
+@smallexample
+Automaton sa(net);
+@end smallexample
+@end cartouche
+
+Query structural information
+@cartouche
+@smallexample
+net.isNormal();
+net.isWorkflow();
+@end smallexample
+@end cartouche
+
+Getting verbose output only when normalizing
+@cartouche
+@smallexample
+pnapi::verbose::status = myStatusFunction;
+net.normalize();
+pnapi::verbose::status = pnapi::verbose::quiet;
+@end smallexample
+@end cartouche
+
+@chapter Wildcards in Formulae
+
+Since Version 3.00 the formula classes have been refactored. I.e. from now on they 
+only concern internal places and only two wildcards are left: @samp{ALL_OTHER_PLACES_EMPTY} and 
+@samp{ALL_PLACES_EMPTY}@footnote{Other wildcards are left due to compatibility reasons.}.
+
+When parsing a net, the wildcard will be unfolded by using 
+@cartouche
+@smallexample
+net.getFinalCondition().allOtherPlacesEmpty(net);
+@end smallexample
+@end cartouche
+
+A wildcard must be given top level, i.e. the final condition must have the form
+@cartouche
+@smallexample
+(...) AND ALL_OTHER_PLACES_EMPTY;
+@end smallexample
+@end cartouche
+or
+@cartouche
+@smallexample
+ALL_PLACES_EMPTY;
+@end smallexample
+@end cartouche
+
+Furthermore a wildcard can be transformed in disjunctive normal form by using 
+@cartouche
+@smallexample
+net.getFinalCondition().dnf();
+@end smallexample
+@end cartouche
+
+
+
+
+@c --------------------------------------------------------------------------
+
+@node Open Net File Format
+@chapter Open Net File Format
+
+Below is the EBNF grammar for open net files. Comments are not part
+of the grammar, and hence are not included here.
+
+@sp 1
+@example
+petrinet = interface
+           "INITIALMARKING" marking_list ";" finalcondition
+           @{ transition @}
+         ;
+
+interface = "INTERFACE" interface_ports "PLACE" places ";" roles
+          | "PLACE" typed_places roles ports
+          ;
+
+interface_ports = input_places output_places synchronous
+                | "PORT" identifier input_places output_places synchronous
+                  @{ "PORT" identifier input_places output_places synchronous @}
+                ;
+
+places = [ "SAFE" [ number ] ":" ] place_list @{ ";" [ "SAFE" [ number ] ":" ] place_list @} ;
+
+roles = [ "ROLES" identifier @{ "," identifier @} ";" ] ;
+
+
+typed_places = internal_places input_places output_places synchronous
+             | places ";"
+             ;
+
+internal_places = [ "INTERNAL" places ";" ] ;
+
+input_places = [ "INPUT" places ";" ] ;
+
+output_places = [ "OUTPUT" places ";" ] ;
+
+synchronous = [ "SYNCHRONOUS" identifier @{ "," identifier @} ";" ] ;
+
+place_list = [ identifier [ "@{$" commands "$@}" ] ] @{ "," identifier [ "@{$" commands "$@}" ] @} ;
+
+identifier = id
+           | number
+           ;
+
+commands = @{ "MAX_UNIQUE_EVENTS" "=" number 
+            | "ON_LOOP" "=" ( "TRUE" | "FALSE" )
+            | "MAX_OCCURRENCES" "=" ( number | negative_number ) @}
+            ;
+
+ports = [ "PORTS" identifier ":" identifier @{ "," identifier @} ";" @{ identifier ":" identifier @{ "," identifier @} ";" @} ] ;
+
+
+transition = "TRANSITION" identifier
+             [ "COST" number ";" ]
+             [ "ROLES" identifier @{ "," itentifier @} ";" ]
+             "CONSUME" [ identifier [ ":" number ] ] @{ "," identifier [ ":" number ] @} ";"
+             "PRODUCE" [ identifier [ ":" number ] ] @{ "," identifier [ ":" number ] @} ";"
+             [ "SYNCHRONIZE" identifier @{ "," identifier @} ";" ]
+             [ "CONSTRAIN" identifier @{ "," identifier @} ";" ]
+           ;
+
+
+marking_list = [ identifier [ ":" number ] ] @{ "," identifier [ ":" number ] @} ;
+
+finalcondition = "FINALMARKING" marking_list ";" @{ marking_list ";" @}
+               | "NOFINALMARKING"
+               | "FINALCONDITION" [ formula ] ";"
+               ;
+
+formula = "(" formula ")"
+        | "TRUE"
+        | "FALSE"
+        | "ALL_PLACES_EMPTY"
+        | "NOT" formula
+        | formula ( "AND" | "OR" ) formula
+        | formula "AND" "ALL_OTHER_PLACES_EMPTY"
+        | identifier ( "=" | "#" | "<>" | "<" | "<=" | ">" | ">=" ) number 
+        ;
+@end example
+
+@sp 2
+Terminals are defined below as regular expressions:
+@sp 1
+
+@multitable @columnfractions .2 .8
+@item @code{id} @tab
+@code{[A-Za-z._=\-\[\]]+}
+@item @code{number} @tab
+@code{[0-9]+}
+@item @code{negative_number} @tab
+@code{-[0-9]+}
+@end multitable
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Developing the API
+@chapter Developing the API
+
+The guidelines below will be useful when developing the API.
+
+@section How to add a new parser?
+For each file below there is a sample file in the templates folder taken from the lola parser, that can be used as template.
+Just replace "FORMAT" by the actual format name and change these files to your desires.
+
+When introducing a new parser to the API, you have to create a new namespace within the namespace @samp{pnapi::parser},
+named to your new format. Whithin this namespace there will be created a lexer class, a parser class from Bison and an
+encapsulation of everything ready to be used by IO framework. Everything generated by Bison or Flex will be generated
+in the namespace "yy". So after all we will have at least the following classes:
+
+@itemize
+@item @samp{pnapi::parser::FORMAT::Parser} - the encapsulation
+@item @samp{pnapi::parser::FORMAT::yy::BisonParser} - the parser generated by Bison
+@item @samp{pnapi::parser::FORMAT::yy::Lexer} - the lexer class from Flex
+@end itemize
+
+@subsection The lexer file
+The API lexers use the FlexLexer class provided by Flex (@url{http://flex.sourceforge.net/}) at version 2.5.35.
+To specify a new lexer you can use the file @file{parser-FORMAT-lexer.ll} as template.
+
+The lexer file is divided in three parts.
+
+The first part sets some options for Flex. Most options are equal in every lexer; the only options you have to set
+individually are "yyclass", specifying the class the method "yylex" will be generated in, and "prefix", specifying
+how to rename the base class.
+
+In the header @file{FlexLexer.h} there are defined an abstract class named "FlexLexer" and a class named "yyFlexLexer"
+deriving from FlexLexer. When defining a prefix, the prefix yy from yyFlexLexer will be replaced by the defined prefix
+to "FORMATFlexLexer". Since we have to extend these lexers by some Methods, we will not use these lexers directly, but
+derive a third class from FORMATFlexLexer, storing it in the namespace @samp{pnapi::parser::FORMAT::yy}.
+So we have to tell Flex our final class using the option "yyclass".
+
+The second part of the lexer file includes the wrapper header @file{parser-FORMAT-wrapper.h} providing the parser class.
+When called by the parser, the lexer has to return values defined in the parser class. Since the namespace path
+@samp{pnapi::parser::FORMAT::yy::BisonParser::token} is rather long, we define an alias "tt" (shot for "token type").
+
+The third part defines lexer states (%s), regular expressions defining the token classes, and their respective actions.
+Note that there should be called @samp{LexerError()} when an error occurs (e.g. an unexpected character).
+When the parser defines semantic values for tokens, there will be provided a pointer named "yylval" to a union storing these values.
+So you can pass a value by accessing e.g.
+@cartouche
+@smallexample
+yylval->str = strdup(yytext);
+@end smallexample
+@end cartouche
+
+@subsection The parser file
+The actual parser will be generated by Bison (@url{http://www.gnu.org/software/bison/}) at version 2.4.2.
+To specify a new parser you can use the file @file{parser-FORMAT.yy} as template.
+
+The parser is divided in four parts.
+
+The first part sets some settings for Bison. Most options are equal in every parser; the only definition you have to set
+individually is "namespace", specifying the namespace the parser class will be generated in.
+
+The second part forward declares the encapsulating parser class and includes the header @file{parser-FORMAT-wrapper.h}
+such as other headers needed by the rules below.
+
+The third part defines the tokens the lexer has to return, semantic types and the types of some tokens and rules.
+
+The last part contains the actual grammar and the code to be executed when matching a rule.
+Note that every variable or funktion used in such a code block will be stored in the encapsulating parser class.
+There is a reference to the corresponding class called "parser_", so if you have to access them you do it like
+@cartouche
+@smallexample
+$$ = parser_.foo(parser.bar, $1);
+@end smallexample
+@end cartouche
+
+DO NOT DEFINE ANY VARIABLES OR HELPING FUNCTIONS IN THIS FILE!
+
+@subsection The wrapper framework
+Since the headers "parser-FORMAT.h" generated by Bison always start with the same "#ifdef", only one Bison generated header
+can be included at once. So for each parser we have to do the following:
+@itemize
+@item In the header @file{parser.h} within the appropriate namespace we have to provide a function named "parse",
+      taking an input stream and returning a PetriNet.
+@item In the header @file{parser-FORMAT-wrapper.h} we first have to include the header @file{FlexLexer.h}. Note that
+      this wrappuing header will be included both from files already including @file{FlexLexer.h} and from those ones
+      that do not. So we have to make sure we only include this header once. And remember that we defined a prefix in the
+      file @file{parser-FORMAT-lexer.ll}, so we have to do so here, too, by defining @samp{#define yyFlexLexer FORMATFlexLexer}.
+
+      Next, canonical to all parsers, the following classes and functions are defined:
+@itemize
+@item @samp{yy::yylex} the function called by BisonParser and calling @samp{yy::Lexer::yylex}
+@item @samp{yy::Lexer} the class Flex will generate its yylex in. Note that this class will derive from an abstract
+                       lexer class, passing its own base class as third template argument.
+@item @samp{Parser} the encapsulating parser class. Each variable or helping function needed by the actual parser will
+                    be defined here.
+@end itemize
+@item In the file @file{parser-FORMAT-wrapper.cc} the following functions have to be implemented:
+@itemize
+@item @samp{pnapi::parser::FORMAT::parse}
+@item @samp{pnapi::parser::FORMAT::yy::yylex}
+@item @samp{pnapi::parser::FORMAT::yy::Lexer::Lexer}
+@item @samp{pnapi::parser::FORMAT::yy::BisonParser::error}
+@item @samp{pnapi::parser::FORMAT::Parser::Parser} - initializing all variables
+@end itemize
+@item In the header @file{myio.h} add an appropriate value to the enum "Format" and a stream manipulator
+      (i.e. a function taking and returning an ios_base reference) with an appropriate name.
+@item In the file @file{myio.cc} add this value to the switch in @samp{operator>>} according to the existing parsers.
+@item In the file @file{io-format.cc} implement the manipulator defined in @file{myio.h}
+      (see the other format manipulators for samples).
+@end itemize
+
+Finally add this new input format to the frontend "Petri".
+
+
+@section How to add a new output format?
+@subsection Changes in the header @file{myio.h}
+To add a new output format first add a new value to the "Format" enum. After doing so, create a new namespace named "__FORMAT" within
+the "io" namespace. Here, for each Petri Net component to be written out, you have to add a function named "output" returning an output
+stream reference and taking such a reference and the appropriate component.
+
+@subsection Changes in the file @file{myio.cc}
+For each @samp{operator<<}, i.e. for each component you want to be written out, add a case for the new format to the appropriate
+switches calling the appropriate output method. You do not have to provide a case for every component in the Petri Net, i.e. if you e.g.
+do not need to print the Final Condition or communication labels you can leave them out.
+
+@subsection Changes in the file @file{io-format.cc}
+Here you have to implement the various output functions. Note that since you overloaded the @samp{operator<<} and provided
+output functions for every component to be written, you now can easily use them and delegate printing of subcomponents
+to their respective output function.
+
+@subsection Changes in the file @file{petrinet.h}
+Add the output function to print a Petri Net as a frient to the PetriNet class, so you can even print components
+that are not ment to be accessed by others than the PetriNet itself.
+
+@subsection Printing sets of pointers
+Most components of a Petri Net are stored in sets storing pointers to the actual objects, such as @samp{places_},
+@samp{transitions_} or @samp{arcs_}. To write out such sets you do not have to iterate through them by yourself,
+just pass the whole set to the output stream. This will call the appropriate output function for each element of the set.
+By using the stream mainpulator @samp{delim} you can specify a delimiter to be printed between two elements of the set.
+
+An example:
+@cartouche
+@smallexample
+std::ostream & output(std::ostream & os, const PetriNet & net)
+@{
+  os << "PLACES\n  " << delim(", ") << net.places_ << ";\n";
+  return os;
+@}
+@end smallexample
+@end cartouche
+
+This will print all places, as specified in the output function for places, in a comma separated list finishing the list
+by a semicolon. Note that changing the delimiter within the output functions of the elements of the set does not affect
+the delimiter of the set itself. So you can write a set of transitions as linebreak seperated list and within a transition
+its pre- and postset as comma seperated list.
+
+This does not only work for sets but also for vectors and multimaps.
+
+@subsection Output modes
+Sometimes you have to write a certain component more than once, e.g. a place in the oWFN format will be named both in the PLACES
+section, to declare there is a place with this name in the net, and in the pre- or postset of each transition connected with
+this place. And sometimes you have to print a component differently, depending on the context it will be written in.
+That is why there is a enum named "Mode" defined in the header @file{myio.h}.
+
+Before passing a component (or a set of components, see above) to the output stream you can set the mode by using the
+stream manipulator @samp{mode}.
+@cartouche
+@smallexample
+os << mode(io::util::INNER) << net.places_;
+@end smallexample
+@end cartouche
+
+So in the output function of a component that will be printed in various modes you first have to get the recent mode and then
+do the appropriate output. For example:
+@cartouche
+@smallexample
+switch(ModeData::data(os))
+@{
+case io::util::PLACE @{ ... @}; break;
+case io::util::INNER @{ ... @}; break;
+default: /* do nothing */ ;
+@}
+@end smallexample
+@end cartouche
+
+
+@section How to add a new stream manipulator?
+Sometimes one wants to pass additional information to the output functions, e.g. whether to print the Final Condition or whether
+to remove role information. These information do not belong to the net itself but to the output stream, so you have to provide
+a manipulator for telling the stream, what to do.
+
+@subsection A manipulator setting binary information
+First you have to create a manipulator in the header @file{myio.h} to write this data to the stream. Simply add a function
+taking and returning an @samp{std::ostream} reference above the definition of the "Format" enum.
+
+Then you have to create a new type for the stream data itself. Even if you just want to store a basic
+type you have to create a new one or it would interfere with others; a simple typedef does not suffice. Below the various output
+function some structs are already defined, so you can define your struct (i.e. the data type) here, too.
+By providing a constructor to your struct you can define a default value.
+
+Next you create the stream meta data out of your recently created data type by defining a shotcut. Search for "TYPE NAME SHORTCUTS"
+to find the appropriate position and some samples. Now your data has a place in the stream to be stored and you can access
+your struct whith something like @samp{util::FooData::data(myOutputStream)}.
+
+Now you only have to implement the manipulator in the file @file{io-format.cc}. Simply set the information e.g. like
+@cartouche
+@smallexample
+std::ostream & foo(std::ostream & os)
+@{
+  util::FooData::data(os).value = true;
+  return os;
+@}
+@end smallexample
+@end cartouche
+
+@subsection A manipulator setting more than binary information
+If you do not only want to set a flag, "do this" or "do not do this", you have to pass some information to your manipulator.
+I.e. instead of calling something like
+@cartouche
+@smallexample
+myOutputStream << foo << net;
+@end smallexample
+@end cartouche
+you have to call something like
+@cartouche
+@smallexample
+myOutputStream << bar(42) << net;
+@end smallexample
+@end cartouche
+
+Creating such a manipulator is pretty much the same, but instead of adding a function taking and returning an
+output stream reference you now have to create a function taking the information and returning an appropriate instanciation
+of the Manipulator template class. This is done below the StreamMetaData typedefs; see @samp{mode} or @samp{delim} for samples.
+
+This function will be implemented in the file @file{myio.cc}, below the implementation of most operators.
+Also see @samp{mode} or @samp{delim} for samples here.
+
+
+@section What to do after introducing new classes?
+After introducing a new class that has to be written out, first open the header @file{myio.h} and add an output function for
+each format printing this new class. Afterwards add a new @samp{operator<<} to the list of output operators.
+If you want to print sets of this class, you also have to provide a @samp{compareContainerElements} function for pointers
+to objects of this class, above the operator list.
+
+Now you only have to open the file @file{myio.cc}, implement the operator and the comparison function and you are ready to fit
+the various output function in the file @file{io-format.cc} to the new class.
+
+
+@section Coding style
+The API has a relative consistent coding style and should keep this uniform look for a long time. So if you are developing the
+API, please follow the policies below.
+
+@subsection Indentation
+Everytime a new block of code is entered (i.e. after each opening brace) the code will be indented
+by two spaces more than the line above.
+
+Exception: Within a switch statement or within a namespace will not be indented.
+
+@cartouche
+@smallexample
+foo = 42;
+@{
+  int bar = 23 + foo;
+@}
+
+namespace foo
+@{
+class Bar;
+@}
+
+switch(foo)
+@{
+case 23: break;
+case 42: break;
+default: /* do nothing */ ;
+@}
+@end smallexample
+@end cartouche
+
+@subsection Operators and commas
+There should be a single space before and after each operator, especially before and after each "*" or "&" when defining
+a pointer or a reference. 
+
+Exception: The is no space between the unary operators ! (negation), * (dereferring) and & (getting the adress of a variable)
+and their appropriate operand. There is also no space between a comma (or semicolon) and the value before.
+
+Always use logical operators (&&, ||, !) instead of mnemonics (AND, OR, NOT).
+
+@cartouche
+@smallexample
+int i = foo(42, 23);
+int * p = &i;
+i = foo(i + 42, *p);
+bool b = ((bar(i) && bar(*p)) || (!baz(i)));
+@end smallexample
+@end cartouche
+
+@subsection Braces
+An opening brace is @emph{always} below the first character of the respective keyword or the return value, one line below
+the keyword or the function head. The closing brace ist in the same column as well.
+
+@cartouche
+@smallexample
+int foo()
+@{
+@}
+
+if(b)
+@{
+@}
+else
+@{
+@}
+
+Bar::Bar() :
+  Baz()
+@{
+@}
+@end smallexample
+@end cartouche
+
+@subsection Parameters and return values
+Basic types, such as @samp{int}, @samp{char} or pointers can always be called by value. Everything else should be passed as
+const reference to a function, if it is not to be changed within it.
+
+If the function returns a member, the result should be passed as a copy (call by value) or as a const reference as well,
+unless the member is allowed to be changed by others. In this case return a reference.
+
+If a function creates a new object without storing a pointer to it (e.g. the @samp{parser::FORMAT::parse} functions)
+generate the object on the stack and return a copy instead of creating it on the heap an returning a reference.
+
+In the header files belongs only the signature of a function, so spare the parameter names there. If a function has a
+parameter not needed by the implementation, you can spare the name there, too.
+
+IMPORTANT: When implementing a function always use the same type spelling as in the declaration, even if you areusing
+a "using" statement. I.e. if you have defined a function taking an @samp{std::set} and your source file begins with
+@cartouche
+@smallexample
+using std::set;
+@end smallexample
+@end cartouche
+anyway use the spelling @samp{std::set} instead of only @samp{set} in the function head. Otherwise doxygen will not be able
+to match function declaration and implementation.
+
+@cartouche
+@smallexample
+int foo(int, int &, int *);
+@end smallexample
+@end cartouche
+
+@subsection Comments and class description
+When introducing new variables, functions or types, @emph{immediately} add a short description about what you just did, or even better,
+about what you are about to do. In headers, a full description of a type or an introduced namespace and a short discription
+of each member whould be nice. The full description of a function, at least using the "brief" keyword, belongs above its
+implementation. If the behaviour of a function is more complicated than a few simple lines, please add a more verbose
+description below the brief one. Also, if the parameters are not explained enough by their names, comment them by
+using the "param" keyword.
+
+When defining a class, group its members in the following order: types, static constants, static variables, constants, variables,
+static methods, methods; each of them in the order public, protected, private.
+
+If such a group (e.g. public methods) holds too much members, group them by common properties, like e.g. constructors/destructors,
+getters or object changing methods.
+
+@cartouche
+@smallexample
+/*!
+ * \brief A sample class
+ */
+class Foo
+@{
+private: /* private variables */
+  /// a member variable
+  int bar_;
+
+public: /* public methods */
+  /*!
+   * \name constructors/destructors
+   */
+  //@@@{
+  /// constructor
+  Foo();
+  /// copy constructor
+  Foo(const Foo &);
+  /// destructor
+  ~Foo();
+  //@@@}
+
+  /*!
+   * \name getters
+   */
+  //@@@{
+  /// get bar
+  int getBar() const;
+  //@@@}
+@};
+
+
+/*!
+ * \brief get bar
+ */
+int Foo::getBar() const
+@{
+  return bar_;
+@}
+@end smallexample
+@end cartouche
+
+@subsection Naming
+Since the API is to be used by other tools, the global namespace should be kept as clean as possible.
+So everything defined within the API should be defined in the namespace "pnapi" or a subnamespace.
+However, preprocessor makros can only be defined at a global scope, so use them as rare as possible.
+
+@itemize
+@item namespaces: Lower case, singular, if possible only one word, like "pnapi", "parser" or "formula".
+@item types: Upper camel case, singular, like "PetriNet", "AbstractParser" or "StreamMetaData".
+@item member variables/constants: Lower camel case, ending with an underscore if private, like "places_", "pathToPetrify_" or "nodesByName_".
+@item functions or not-member variables/constants: Lower camel case, like "getPlaces", "isNormal" or "printToSTG".
+@item enum values: Upper case, like "OWFN", "LOLA" or "WOFLAN".
+@item makros: Upper case with underscores, beginning with "PNAPI", like "PNAPI_FOREACH" or "PNAPI_PARSER_LOLA_WRAPPER_H".
+@item files: Lower case, seperated by a dash, like "petrinet.h" or "parser-lola-wrapper.h".
+@end itemize
+
+@subsection Constructors
+Sometimes you have to initialize member variables or call the constructor of a parent class within
+a constructor. If you have to, write the function head, a single space, a colon and one line below,
+indented by 2 spaces, first the parental constructor call and then the member initializations.
+
+Note that the order members are initialized depends on the order they are declared in the class description,
+not on the order you name them here.
+
+@cartouche
+@smallexample
+Foo::Foo(int i, int j) :
+  ParentClass(i), bar_(j),
+  baz_(42)
+@{
+@}
+@end smallexample
+@end cartouche
+
+@subsection Long lines
+Sometimes, when calculating complicated boolean expressions or when using long access paths, a line can become too long.
+If so, you can add a linebreak after each comma or @emph{after} each logical operator. The next line will be indented
+as much as necessary, so that the first character of the following line is below the first character of
+the first argument or subexpression.
+
+Another candidate for too long lines is the for statement. To shorten such a line, please use the @samp{PNAPI_FOREACH}
+makro defined in the header @file{util.h} or break after the first semicolon and indent the second line by
+one space more than descriped above.
+
+@cartouche
+@smallexample
+bool b = (very.very.long->path->to.aValue() &&
+          anotehr.very->long.pathTo->a.value());
+
+for(std::set<Place *>::iterator p = places_.begin();
+     p != places_.end(); ++p)
+@{
+@}
+
+PNAPI_FOREACH(p, places_) // this does the same as the for statement above
+@{
+@}
+@end smallexample
+@end cartouche
+
+@subsection Error handling
+Since the API will be included by other programs, it is not the job of the API to terminate the program.
+So if an error occurs, do not call @samp{exit(EXIT_FAILURE);} but throw an exception, so actual program
+can catch it and decide by itself, how to handle this error.
+
+This also applies to assertions. If something you want to make sure within the API went wrong, do not
+terminate the whole program by using asserts but inform the program by using appropriate exceptions.
+
+There exists two macros that can be used like @samp{assert(expr)}. The first one is @samp{PNAPI_ASSERT(expr)}.
+It evaluates the given expression and throws an @samp{AssertionFailedError} containing the file and line of the
+assertion, when evaluation to false. Like assert, this macro can be disabled by declaring the symbol NDEBUG.
+
+Some errors, however, depend on the user input. These errors should still be reportet when usual assertions
+are disabled. For this purpose you can use the macros @samp{PNAPI_ASSERT_USER(expr)},
+@samp{PNAPI_ASSERT_USER(expr, msg)} or @samp{PNAPI_ASSERT_USER(expr, msg, type)}, optionally specifying
+a proper error message and an error type (for a better handling in a catch block).
+Default message will be the expression itself and the default type will be @samp{UE_NONE}.
+
+Note that, since these kind of errors are to be caused by the user, no debugging in the API itself is expected,
+so there will be no further information (file, line), where the error occurred.
+
+@subsection Inclusion and "using"
+Within a source file (*.cc) you can do as you wish, but keep the headers as clean as possible.
+I.e. only include an other header if necessary and if forward declaration does not suffice.
+Also @emph{never} use a "using" statement in a header file; allways use the full path instead.
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Theory
+@chapter Theory
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+The Petri Net API implements several algorithms and result published in several scientific articles.
+
+@section Open Nets
+
+@subsubheading Basic Definitions
+
+@quotation
+Karsten Wolf. @b{Does my service have partners?}. @i{LNCS ToPNoC}, 5460(II):152-171, March 2009. Special Issue on Concurrency in Process-Aware Information Systems.
+@end quotation
+
+
+@subsubheading Structural Reduction Rules
+
+@quotation
+Tadao Murata. @b{Petri nets: Properties, analysis and applications}. @i{Proceedings of the IEEE}, 77(4):541--580, 1989.
+@end quotation
+
+@quotation
+Peter H. Starke. @b{Analyse von Petri-Netz-Modellen}. Teubner Verlag (1990).
+@end quotation
+
+@quotation
+Thomas Pillat. @b{Gegen@"uberstellung struktureller Reduktionstechniken f@"ur Petrinetze}. Diplomarbeit, Humboldt-Universit@"at zu Berlin, March 2008.
+@end quotation
+
+
+@subsubheading Normalization
+
+@quotation
+Niels Lohmann, Peter Massuthe, and Karsten Wolf. @b{Operating guidelines for finite-state services}. In Jetty Kleijn and Alex Yakovlev, editors, @i{28th International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, ICATPN 2007, Siedlce, Poland, June 25--29, 2007, Proceedings}, volume 4546 of Lecture Notes in Computer Science, pages 321--341. Springer-Verlag, June 2007.
+@end quotation
+
+
+@subsubheading Constraints (product operation)
+
+@quotation
+Niels Lohmann, Peter Massuthe, and Karsten Wolf. @b{Behavioral constraints for services}. In Gustavo Alonso, Peter Dadam, and Michael Rosemann, editors, @i{Business Process Management, 5th International Conference, BPM 2007, Brisbane, Australia, September 24--28, 2007, Proceedings}, volume 4714 of Lecture Notes in Computer Science, pages 271--287. Springer-Verlag, September 2007.
+@end quotation
+
+
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+See @url{http://service-technology.org/publications} for more information.
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Command Line Options
+@chapter How to run PNAPI frontend "Petri"
+
+Petri is a command line tool and does not come with a fancy @acronym{GUI}. However, Petri can be easily scripted and combined with other tools.
+
+@section Command Line Options
+
+For an overview of the command line options, type @samp{petri -h} to see the following help screen:
+
+@smallexample
+@verbatiminclude cmdline.out
+@end smallexample
+
+
+@c --------------------------------------------------------------------------
+
+@node Error Codes
+@chapter Error Codes
+
+In case any error occurs, Petri aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
+
+@table @asis
+@item #01
+A wrong command-line parameter was given or there was a problem with the combination of command-line parameters. This message is usually accompanied by another message describing the exact problem. Run @samp{petri --help} for an overview of the valid command-line parameters.
+
+@smallexample
+@cartouche
+pnapi: unrecognized option `--foo'
+pnapi: invalid command-line parameter(s) -- aborting [#01]
+@end cartouche
+@end smallexample
+
+@item #02
+An error occurred while parsing the net.
+The message will give further information.
+
+@smallexample
+@cartouche
+pnapi: Input Error: stdin:1: error: syntax error, unexpected $end, expecting KEY_INTERFACE or KEY_PLACE -- aborting [#02]
+@end cartouche
+@end smallexample
+
+@item #03
+Could not open input file.
+
+@smallexample
+@cartouche
+pnapi: could not read from file 'foo' -- aborting [#03]
+@end cartouche
+@end smallexample
+
+@item #04
+Too many nets used with @samp{--produce} parameter.
+
+@smallexample
+@cartouche
+pnapi: at most one net can be used with '--produce' parameter -- aborting [#04]
+@end cartouche
+@end smallexample
+
+@item #05
+Graphviz dot was not found by configure script; see README.
+Necessary for option @samp{--output=FORMAT} where FORMAT is 'png', 'eps', 'pdf' or 'svg'.
+
+@smallexample
+@cartouche
+pnapi: Graphviz dot was not found by configure script -- aborting [#05]
+@end cartouche
+@end smallexample
+
+@item #06
+Cannot open UNIX pipe to Graphviz dot.
+Create dot file with @samp{--output=dot} and call Graphviz dot manually.
+
+@smallexample
+@cartouche
+pnapi: cannot open UNIX pipe to Graphviz dot -- aborting [#06]
+@end cartouche
+@end smallexample
+
+@item #11
+Error opening a file to write. Usually, this error occurs in case Petri is called in a directory without writing permissions or the output file is already present, but write protected. Output files can be the target files of the @option{--output} parameter.
+
+@smallexample
+@cartouche
+pnapi: could not write to file `foo.owfn' -- aborting [#11]
+@end cartouche
+@end smallexample
+
+@item #13
+Petri cannot create a temporary file @file{/tmp/petri-XXXXXX}, where @samp{XXXXXX} is replaced by a unique name. If this error occurs, check whether the @file{/tmp} folder exists and you have the rights to write there. One reason for this error can be that you are running Petri under Windows (outside Cygwin), where UNIX-style path names are not recognized. In that case, try using the @option{--tmpfile} parameter.
+
+@smallexample
+@cartouche
+pnapi: could not create a temporary file `/tmp/petri-k4CS4x' -- aborting [#13]
+@end cartouche
+@end smallexample
+
+
+@end table
+
+@c --------------------------------------------------------------------------
+
+
+@node ChangeLog
+@chapter Version History
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+PNAPI is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+
+@include ChangeLog.texi
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+The most recent change log is available at PNAPI's website at @url{http://service-technology.org/files/pnapi/ChangeLog}.
+
+
+
+@c --------------------------------------------------------------------------
+
+@node GNU Free Documentation License
+@appendix The GNU Free Documentation License
+
+@include fdl.texi
+
+@bye

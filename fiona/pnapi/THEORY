@@ -1,0 +1,58 @@
+             ____      _        _   _   _      _        _    ____ ___ 
+            |  _ \ ___| |_ _ __(_) | \ | | ___| |_     / \  |  _ \_ _|
+            | |_) / _ \ __| '__| | |  \| |/ _ \ __|   / _ \ | |_) | | 
+            |  __/  __/ |_| |  | | | |\  |  __/ |_   / ___ \|  __/| | 
+            |_|   \___|\__|_|  |_| |_| \_|\___|\__| /_/   \_\_|  |___|
+              encapsulating Petri net-related functions in a C++ API
+                        http://service-technology.org/pnapi
+
+
+The Petri Net API implements several algorithms and result published in
+several scientific articles.
+
+Open Nets
+=========
+
+Basic Definitions
+.................
+
+     Karsten Wolf. Does my service have partners?. LNCS ToPNoC,
+     5460(II):152-171, March 2009. Special Issue on Concurrency in
+     Process-Aware Information Systems.
+
+Structural Reduction Rules
+..........................
+
+     Tadao Murata. Petri nets: Properties, analysis and applications.
+     Proceedings of the IEEE, 77(4):541-580, 1989.
+
+     Peter H. Starke. Analyse von Petri-Netz-Modellen. Teubner Verlag (1990).
+
+     Thomas Pillat. Gegenu"berstellung struktureller Reduktionstechniken fu"r
+     Petrinetze. Diplomarbeit, Humboldt-Universita"t zu Berlin, March 2008.
+
+Normalization
+.............
+
+     Niels Lohmann, Peter Massuthe, and Karsten Wolf. Operating guidelines for
+     finite-state services. In Jetty Kleijn and Alex Yakovlev, editors, 28th
+     International Conference on Applications and Theory of Petri Nets and
+     Other Models of Concurrency, ICATPN 2007, Siedlce, Poland, June 25-29,
+     2007, Proceedings, volume 4546 of Lecture Notes in Computer Science,
+     pages 321-341. Springer-Verlag, June 2007.
+
+Constraints (product operation)
+...............................
+
+     Niels Lohmann, Peter Massuthe, and Karsten Wolf. Behavioral constraints
+     for services. In Gustavo Alonso, Peter Dadam, and Michael Rosemann,
+     editors, Business Process Management, 5th International Conference, BPM
+     2007, Brisbane, Australia, September 24-28, 2007, Proceedings, volume
+     4714 of Lecture Notes in Computer Science, pages 271-287.
+     Springer-Verlag, September 2007.
+
+
+
+
+See `http://service-technology.org/publications' for more information.
+

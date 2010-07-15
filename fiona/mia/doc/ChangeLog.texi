@@ -1,0 +1,42 @@
+@heading Version 1.2-unreleased
+@itemize
+@item update Petri Net API
+
+@item canonized Makefiles
+
+@item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
+
+@item added target for benchmarks (execute @samp{make bench -C tests})
+
+@item implemented parameter @option{--stats} to display information on runtime and memory consumption (the latter uses @code{ps} and does not work under Cygwin)
+
+@item colored status messages
+@end itemize
+
+
+@heading Version 1.1
+@itemize
+@item moved verbose output functions to @file{verbose.*}
+
+@item added @acronym{GNU} Affero @acronym{GPL} headers
+
+@item added parameters @option{--lola-full}, @option{--lola-full1}, and @option{--wendy} to manually provide the paths of the required binaries
+
+@item Mia can be configured with a configuration file, provided by parameter @option{--config} (see @url{http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files} for more information). A standard configuration is created by the configure script and written to @file{src/mia.conf}. When Mia is executed, it checks for the file @file{mia.conf} in the sysconfig folder (usually @file{/usr/local/etc}) and in the current directory. If neither file was found, Mia tries to rely on standard options.
+
+@item added generic Makefile target (@samp{bin} in @file{maintainer}) to create a binary release for the running platform (using @samp{uname})
+
+@item added improved Petri Net API files (faster parsing and composition)
+
+@item added output of runtimes of invoked tools and complex operations
+
+@item added @option{--bug} option to create debug output
+@end itemize
+
+
+@heading Version 1.0
+@itemize
+@item initial release
+@item Mia can calculate the jumper transitions to migrate instances
+@item depends on Wendy 1.4+ and LoLA (compiled with @samp{FULL} option)
+@end itemize

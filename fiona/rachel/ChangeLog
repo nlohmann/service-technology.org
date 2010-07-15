@@ -1,0 +1,598 @@
+                          ____            _          _ 
+                         |  _ \ __ _  ___| |__   ___| |
+                         | |_) / _` |/ __| '_ \ / _ \ |
+                         |  _ < (_| | (__| | | |  __/ |
+                         |_| \_\__,_|\___|_| |_|\___|_|
+                      http://service-technology.org/rachel
+
+
+Version 1.14 (18 January 2010)
+==============================
+
+* updated maintainer scripts
+
+* added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
+  to determine test case coverage (use `make cover' in `tests' directory)
+
+* added scripts to use ZCOV (`http://minormatter.com/zcov') to determine test
+  branch case coverage (use `make cover-branch' in `tests' directory)
+
+* cleaned code:
+     * removed support for aspects - not used any more
+
+     * removed BPMN output - this does not belong here
+
+     * removed 2-bit annotation - Wendy can do this
+
+* implemented Wendy's new IG/OG formats
+
+* added target for benchmarks (execute `make bench -C tests')
+
+* implemented parameter `--stats' to display information on runtime and
+  memory consumption (the latter uses `ps' and does not work under Cygwin)
+
+* colored status messages
+
+Version 1.13 (6 June 2009)
+==========================
+
+* the bit annotations are now written inside the nodes of the Graphviz dot
+  annotation
+
+* service automata can be drawn as Graphviz dot graphs using mode `sa'
+  combined with `--dot' (`-d')
+
+* removed `--noop' flag
+
+* reorganized and cleaned up Dot output; in case of calculating an edit
+  distance, only the result is printed; use mode `og' or `sa' to create a
+  graphic for the input files
+
+* moved command line parameters for GNU Gengetopt from Makefile to file
+  `cmdline.ggo'
+
+* adapted maintainer scripts for binary distributions to match the filenames
+  used in Fiona
+
+* Rachel can be translated using the LLVM-frontend for GCC (see
+  `http://llvm.org/')
+
+* updated `Doxyfile' and moved in into the `doc' directory; the documentation
+  can be created using `make doxygen' which creates the directory
+  `doc/doxygen'
+
+* made adaptions to the Makefile options to be able to create Mac Universal
+  binaries for 64 bit architectures (XCode 3.0 with SDK `MacOSX10.5.sdk' is
+  needed)
+
+* if Graphviz dot has not been found by the configure script, the dependent
+  tests are skipped instead of throwing an error
+
+* tests are now organized by GNU Autotest
+
+Version 1.12 (17 January 2009)
+==============================
+
+* implemented methods to calculate a compact representation of the formulae
+  annotated to the operating guideline's states according to the paper
+  submitted to ACSD 2009; the new method can be triggered with the new mode
+  `-m annotation'
+
+* in mode `-m annotation', the `--dot' (`-d') parameter creates a version of
+  the input operating guidelines in which the explicit formulae are replaced
+  by different colors representing the bit representation
+
+* File input options `--og' (`-o') and `--automaton' (`-a') are now optional
+  for Gengetopt, but are checked in the `main.cc' file. This was necessary,
+  because the `-m annotation' mode did not need to parse a service automaton.
+
+* implemented a mode `-m bpmn' to create a rudimentary BPMN (Business Process
+  Modeling Notation) output in Graphviz dot format of a service automaton
+  (given by `--automaton'); the path of the used stencils can be changed with
+  `--shapedir'
+
+* when using the `--dot' (`-d') parameter, a PNG (Portable Network Graphics)
+  file is now only created if the parameter `--png' is given
+
+* overworked and beautified Graphviz dot output for operating guidelines:
+  annotated formulae now use mathematical symbols for conjunctions and
+  disjunctions, and the initial state is marked
+
+Version 1.11 (2 November 2008)
+==============================
+
+* implemented Fiona's modified OG file format (an OG file now also consists
+  of an interface definition) and adjusted the respective test cases -- note
+  that Rachel's parser is backwards compatible and still accepts OG files
+  without interface definition
+
+* renamed configure script parameter `--enable-use64bit' to `--enable-64bit'
+  to achieve parameter compatibility with Fiona
+
+* explicitly handling the disabling of assertions (with parameter
+  `--disable-assert') similar to Fiona's configure script
+
+* canonized names of constants generated for file `src/config.h' and adjusted
+  the output of the `--bug' parameter
+
+* removed unnecessary files `src/getopt.c', `src/getopt1.c', and
+  `src/getopt.h'
+
+* used option `gnits' for Automake, see
+  `http://www.gnu.org/software/automake/manual/automake.html#Gnits'
+
+* moved acknowledgements from file `AUTHOR' to file `THANKS' to meet the
+  strict Gnits requirements
+
+* updated documentation
+
+* the configure script now takes care about the compilation flags; for
+  example `./configure --enable-64bit' sets the flags necessary to build a 64
+  bit executable with `make'
+
+* adapted code to avoid warnings of GCC 4.2 (mostly deprecation warnings)
+
+* overworked test scripts: creation of output files is checked now
+
+* simplified header inclusion: all typedefs are now made in `types.h'
+
+* added a command line parameter `--threshold'/`-t' to set a threshold to
+  control the matching algorithm: whenever a formula's assignment reaches
+  this value, it is immediately returned instead of the optimum; this results
+  in faster, yet sub-optimal results
+
+Version 1.10 (20 August 2008)
+=============================
+
+* Rachel does not need to be installed to execute `make experiments'
+
+* added configure script parameter `--enable-universal' to set flags to build
+  a Mac universal binary (`http://www.apple.com/universal')
+
+* added configure script parameter `--enable-win32' to set flags to build a
+  Windows binary which uses the MinGW framework (`http://www.mingw.org') to
+  be independent of the `cygwin1.dll' provided by Cygwin
+  (`http://www.cygwin.com')
+
+* added configure script parameter `--enable-use64bit' to set flags to build
+  a 64 bit binary (e.g. for x86_64, ppc64, or 64-Bit SPARC)
+
+* chosen configure script parameters are printed when using `--bug' command
+  line parameter
+
+* made the configure script option `--disable-aspects' standard
+
+* added a command line parameter `--noop' to exit after parsing the input
+  files - mostly for debug information, e.g. if you want to count the
+  services characterized by an OG (combined with `--verbose')
+
+* fixed a bug: the requirements to calculate matching-based edit distance
+  (final states are sink states) led to incorrect formula evaluation (see
+  `https://gna.org/bugs/?11944') when calculating the number of characterized
+  services
+
+* removed orphaned code for linear programming
+
+* added more test cases (also expected failures)
+
+* added code coverage checks using LTP LCOV
+  (`http://ltp.sourceforge.net/coverage/lcov.php'); checks can be invoked in
+  directory `tests' with `make prepare-cover cover'
+
+Version 1.09 (7 August 2008)
+============================
+
+* fixed bug #12153 (`https://gna.org/bugs/?12153'): the patch for the
+  aspected sources now works on x86_64 machines
+
+* fixed a bug in test script `tests/test4': the wrong return value was
+  returned to `make check'
+
+* improved portability of Makefiles by using more built-in variables such as
+  `$(MAKE) $(AM_MAKEFLAGS)' or `$(SED)'
+
+* added file `doc/cmdline.out' to the distribution to avoid complete
+  compilation just to execute `make doc'
+
+* code complies to ISO C++
+
+* listing the tools required to re-generated code (Flex, Bison, Gengetopt,
+  and Kimwitu++) in the `README' file
+
+* completed task #6131 (`https://gna.org/task/?6131'): whether or not the
+  aspects of AspectC++ are used during compilation can be controlled by
+  parameters of the configure script:
+
+     * `./configure': use aspects
+
+     * `./configure --enable-aspects': use aspects
+
+     * `./configure --enable-aspects=true': use aspects
+
+     * `./configure --disable-aspects': do not use aspects
+
+     * `./configure --enable-aspects=false': do not used aspects
+
+  If aspects are disabled, the files `src/xxxx.cc' are directly copied to
+  `src/aspected-xxxx.cc', and the AspectC++ tools are not at all invoked.
+
+* MAINTAINER: overworked the Makefile target `deb' in the directory
+  `maintainer' to create a Debian source package
+
+  Note that `make deb' can only be executed on a machine where the tools
+  `dpkg-buildpackage' and `date -R' are present. To upload the source package
+  to a Launchpad PPA (it is currently uploaded to
+  `https://launchpad.net/~niels-lohmann/+archive'), the tool `dput' is
+  needed. Furthermore, the tools  `fakeroot' and `alien' are needed to create
+  an RPM binary package from the Debian binary package.
+
+Version 1.08 (3 August 2008)
+============================
+
+* MAINTAINER: added a directory `maintainer/debian' containing files to
+  create Debian and Redhat packages
+
+* MAINTAINER: moved maintenance Makefile targets (`upload') to `maintainer'
+  directory
+
+* the file `NEWS' is now extracted from file `doc/ChangeLog.texi'
+
+Version 1.07 (29 July 2008)
+===========================
+
+* fixed bug #12112 (`https://gna.org/bugs/?12112'): allow to compile Rachel
+  using GCC 4.3.1
+
+* some changes in the way the change log is created
+
+* minor changes to avoid compiler warnings
+
+Version 1.06 (16 July 2008)
+===========================
+
+* added a Makefile target `make bindist' to create a zipped archive with a
+  binary and a documentation
+
+* added an undocumented command line option `--bug' to display debugging
+  information that is meant to be emailed to the bugreport address in case a
+  bug is found; looks like:
+
+       Please email the following information to <rachel@service-technology.org>:
+       - tool:              Rachel
+       - version:           1.06
+       - compilation date:  Jul 16 2008
+       - compiler version:  4.0.1 (Apple Inc. build 5484)
+       - platform:          i386-apple-darwin9.4.0
+
+* minor changes in Makefiles and configure script
+
+* updated `src/Doxyfile.in' template for `doxygen' version 1.5.5
+
+Version 1.05 (8 July 2008)
+==========================
+
+* fixed a memory leak in the OG lexer
+
+* fixed a memory leak in the command line parser
+
+Version 1.04 (30 June 2008)
+===========================
+
+* added the experiments (file `exp/bpm2008.tgz') from the paper
+
+  Niels Lohmann. Correcting Deadlocking Service Choreographies Using a
+  Simulation-Based Graph Edit Distance. In Marlon Dumas, Manfred Reichert,
+  and Ming-Chien Shan, editors, Business Process Management, 6th
+  International Conference, BPM 2008, Milan, Italy, September 1-4, 2008,
+  Proceedings, volume 5240 of Lecture Notes in Computer Science, pages
+  132-147. Springer-Verlag, September 2008.
+
+* experiments can be invoked using `make experiments'
+
+* added PDF document (file `doc/background.pdf') containing the paper
+
+  Niels Lohmann. Fixing Deadlocking Service Choreographies Using a
+  Simulation-based Graph Edit Distance. In Monika Solanki, Barry Norton, and
+  Stephan Reiff-Marganiec, editors, 3rd Young Researchers Workshop on Service
+  Oriented Computing, YR-SOC 2008, London, UK, 12-13 June 2008, Proceedings,
+  pages 13-20, June 2008.
+
+* overworked the documentation
+
+Version 1.03 (22 June 2008)
+===========================
+
+* some adjustments to improve the compatibility between AspectC++
+  (`http://www.aspectc.org') and Cygwin
+
+Version 1.02 (14 May 2008)
+==========================
+
+* added more files to the deletion list of Makefile target `cvs-clean'
+
+* acknowledged `service-technology.org' where possible (e.g., in the bug
+  address <rachel@service-technology.org>)
+
+* adjusted the parser to cope with Fiona's new OG file format; Rachel's
+  parser stays backward compatible
+
+* the parser now aborts the program in case of an error to avoid subsequent
+  crashes caused by parse errors
+
+* the lexer was overworked to be backward compatible with older Flex versions
+
+Version 1.01 (6 May 2008)
+=========================
+
+* adding copyright notices to comply to the GNU GPL
+
+* added comments
+
+* overworked documentation
+
+Version 1.00 (6 May 2008)
+=========================
+
+* tool is now called Rachel = "Repairing Automata for Choreographies by
+  Editing Labels"
+
+* adjusted the parameters: changing is now preferred over deletion and
+  insertion
+
+* the service counting function `Graph::countServices' now uses `long double'
+  to count up to 10^4932
+
+* added a function to calculate the average size of satisfying assignments of
+  the OG's nodes (called with `verbose' parameter)
+
+* added a preprocessing function to calculate values for node deletion in
+  advance
+
+Version 0.20
+============
+
+* the check for acyclicity is done right after parsing and not during
+  matching or simulation calculation
+
+* added a function to re-enumerate the graphs' nodes to allow the usage of
+  C-style arrays
+
+* finally, using C-style multidimensional arrays to cache simulation values
+  in `Simulation' and `Matching' classes
+
+* re-organized `Simulation' and `Matching' classes: both now inherit from a
+  new class `EditDistance' to avoid replication of code
+
+Version 0.19
+============
+
+* the aspected sources are automatically patched such that `size_t' is used
+  instead of `unsigned long' in the generated `new'-operator
+
+* `lp_solve' is currently not integrated for unsolved compatibility problems
+  -- an archive `lp-solve.tar.gz' is still in the `src' folder
+
+* documented usage of configuration files and added a sample configuration
+  file
+
+* `matching' is now the standard for the `--mode' parameter
+
+* added a preprocessing function to calculate values for node insertion in
+  advance
+
+* added a function to count the deterministic acyclic services characterized
+  by the OG (called with `verbose' parameter)
+
+* the ChangeLog is automatically generated from the Texinfo sources
+
+Version 0.18
+============
+
+* overworked Makefiles
+
+* manpage now shows result for `--detailed-help'
+
+* added a `--debug' mode to trace all function calls of classes Matching and
+  Simulation
+
+* added a `--verbose' mode to display intermediate progress output
+
+* using AspectC++ (`http://www.aspectc.org') to add aspects like the trace
+  calls
+
+* added a great optimization in function `Matching::permuteEdges' by avoiding
+  subsequent deletion and insertion of the same edge
+
+* the ChangeLog is automatically integrated into documentation using a sed
+  script
+
+Version 0.17
+============
+
+* overworked documentation
+
+* caches are cleared after simulation/matching has been calculated
+
+* more comments
+
+Version 0.16
+============
+
+* cleaned and commented code
+
+* tidied Makefiles
+
+* added a testscript for linear programming translatation
+
+* commented linear programming translation
+
+* linear programming translation is by `lp_solve' library
+
+* dramatically improved performance of `Matching::perms()' function
+
+Version 0.15
+============
+
+* added a linear programming calculation for simulation (`--mode=lpsim')
+
+* the translation to linear programming bases on the algorithm presented in
+  the paper "Simulation-based graph similarity" by Oleg Sokolsky et al.
+  (TACAS 2006)
+
+* added `lp_solve' (`http://lpsolve.sourceforge.net/5.5') to the distributed
+  and linked it as static library (see `src/lp_solve/README.txt' for more
+  information)
+
+* the `--mode' parameter is now passed as enumeration from getopt
+
+Version 0.14
+============
+
+* added testscripts for `make check'
+
+* cache for simulation is again handled by an STL map
+
+Version 0.13
+============
+
+* Tool is now called "WS-Fix"
+
+* first release at `http://www.informatik.uni-rostock.de/~nl/tools'
+
+* added cycle detection
+
+Version 0.12
+============
+
+* Dot and PNG (Portable Network Graphics) file is created when `--dot'
+  parameter is used
+
+* extension and path is cropped from filenames to avoid errors from Dot
+
+* reorganized files: helper functions moved to `helper.cc/h'
+
+* fixed header inclusion to allow compilation on Unix machines
+
+* added a Texinfo documentation
+
+* using C-style multidimensional arrays to cache simulation values
+
+* some statistical output in the main function
+
+* the cost functions are declared as inline functions
+
+Version 0.11
+============
+
+* removed Gnulib again and replaced it by `getopt1.c', `getopt.c', and
+  `getopt.h'
+
+* usage line is now generated by GNU Gengetopt
+
+* a manpage is created using `help2man'
+
+* values of the algorithm can be configured using the command line or a
+  configuration file
+
+Version 0.10
+============
+
+* GNU Gengetopt is not needed to configure/make
+
+* Automake's missing script is found
+
+* included headers for `assert' macro
+
+* tidied configure script
+
+* using Gnulib - The GNU Portability Library
+  (`http://www.gnu.org/software/gnulib') to provide `getopt.h'
+
+Version 0.9
+===========
+
+* using GNU Gengetopt (`http://www.gnu.org/software/gengetopt') to parse
+  command line parameters
+
+* added parameter `-h' for help
+
+* added parameter `-V' for version information
+
+* added parameter `-a' for automaton file
+
+* added parameter `-o' for OG file
+
+* added parameter `-m' to select mode (standard: `simulation')
+
+Version 0.8
+===========
+
+* the edit actions are annotated to a graph and can be dotted
+
+Version 0.7
+===========
+
+* new nodes are rather added than inserted
+
+* nodes are only insered once
+
+* nodes are rather deleted than merged
+
+* newly added nodes are not considered in function `successor()' or
+  `outEdges()'
+
+* newly added nodes are dotted as dashed nodes
+
+Version 0.6
+===========
+
+* implemented `isFinal()' check to test whether final satisfies a formula of
+  the OG
+
+* the root node is now read from file instead of being assumed to be `1'
+
+* nodes are explicitly stored to allow future operations such as adding nodes
+
+Version 0.5
+===========
+
+* matching now returns the action edit actions and outputs them
+
+* added Doxygen configuration file
+
+* reorgaized headers again (added headers for simulation)
+
+Version 0.4
+===========
+
+* parsed annotations are now used for simulation and matching
+
+* reorganized headers (split omnipresent `main.h')
+
+Version 0.3
+===========
+
+* annotations are parsed, but not used for calculation
+
+* Dot output for graphs implemented
+
+Version 0.2
+===========
+
+* added parser for OG files (taken and adapted from Fiona
+  (`http://www.informatik.hu-berlin.de/top/tools4bpel/fiona'))
+
+* currently ignores the annotations, but already works for service automata
+  (simulation checking)
+
+Version 0.1
+===========
+
+* simulation implemented
+
+* matching rudimentarily implemented
+
+* using GNU autotools
+
+
+

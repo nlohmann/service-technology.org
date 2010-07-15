@@ -1,0 +1,54 @@
+args "--unamed-opts=FILES --include-getopt --show-required --no-handle-error"
+
+package "configurator"
+purpose "A tool that adds a configuration interface to a Petri net."
+
+defgroup "Configuration default strategy" groupdesc="Choose the default strategy of the configuration interface. Either, transitions are configured to 'allow' and a configuration only lists the transitions that need to be blocked, or transitions are configured to 'block' and a configuration only lists the transitions that need to be allowed.\n" required
+
+groupoption "allowByDefault" a
+  "allow by default -- choose transitions to block"
+  group="Configuration default strategy"
+
+groupoption "blockByDefault" b
+  "block by default -- choose transitions to allow"
+  group="Configuration default strategy"
+
+option "roles" r
+  "use role annotations for configuration"
+  flag off
+
+
+section "Input/Output"
+sectiondesc="When called without an input file, it is read from the standard input stream. When called without an output parameter, no output file is created, but the tool exits after configuration. If no filename is given, the input filename's suffix (`.owfn') is replaced by the name of the respective option (e.g., `-allow.owfn'). If the filename `-' is given, the output will be piped to the standard output stream.\n"
+
+option "output" o
+  "output filename"
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
+
+section "Configuration"
+
+option "tmpfile" -
+  "Set the path and name of temporary files"
+  details="The filename CDNF should use to create temporary files. The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/configurator-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by CDNF is kept after CDNF terminates.\n"
+  flag off
+  hidden
+
+
+section "Debugging"
+
+option "verbose" v
+  "Show verbose output"
+  flag off

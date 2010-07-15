@@ -1,0 +1,20 @@
+INTERFACE
+  INPUT
+    out;
+  OUTPUT
+    in;
+
+NODES
+  0 : !in : blue,
+  1 : ?out : blue,
+  2 : true : blue;
+
+INITIALNODE
+  0;
+
+TRANSITIONS
+  0 -> 1 : !in,
+  0 -> 2 : ?out,
+  1 -> 0 : ?out,
+  2 -> 2 : ?out,
+  2 -> 2 : !in;

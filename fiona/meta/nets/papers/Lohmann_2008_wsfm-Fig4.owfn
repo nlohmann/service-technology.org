@@ -1,0 +1,55 @@
+PLACE
+INTERNAL alpha, beta, gamma, delta, epsilon, zeta, eta, theta, iota, kappa, lambda, mu, nu, omega;
+INPUT gift_choice, terms_of_payment, order;
+OUTPUT invoice, confirmation;
+
+INITIALMARKING alpha;
+FINALMARKING omega;
+
+TRANSITION t1
+CONSUME alpha;
+PRODUCE beta, gamma;
+
+TRANSITION t2
+CONSUME alpha;
+PRODUCE delta, epsilon;
+
+TRANSITION t3
+CONSUME beta, gift_choice;
+PRODUCE zeta;
+
+TRANSITION t4
+CONSUME gamma, order;
+PRODUCE eta;
+
+TRANSITION t5
+CONSUME delta, terms_of_payment;
+PRODUCE theta;
+
+TRANSITION t6
+CONSUME epsilon, order;
+PRODUCE iota;
+
+TRANSITION t7
+CONSUME zeta;
+PRODUCE kappa, invoice;
+
+TRANSITION t8
+CONSUME eta;
+PRODUCE lambda, confirmation;
+
+TRANSITION t9
+CONSUME theta;
+PRODUCE mu, invoice;
+
+TRANSITION t10
+CONSUME iota;
+PRODUCE nu, confirmation;
+
+TRANSITION t11
+CONSUME kappa, lambda;
+PRODUCE omega;
+
+TRANSITION t12
+CONSUME mu, nu;
+PRODUCE omega;

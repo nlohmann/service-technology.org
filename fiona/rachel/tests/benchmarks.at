@@ -1,0 +1,25 @@
+AT_INIT
+
+############################################################################
+AT_BANNER([Benchmark Set 1])
+############################################################################
+
+AT_SETUP([Purchase Order])
+m4_define([TESTCASE], [purchase_order])
+AT_CHECK([cp TESTFILES/TESTCASE.sa TESTFILES/TESTCASE.og .])
+AT_CHECK([RACHEL -o TESTCASE.og -a TESTCASE.sa --stats -m matching],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+AT_SETUP([Internal Order])
+m4_define([TESTCASE], [internal_order])
+AT_CHECK([cp TESTFILES/TESTCASE.sa TESTFILES/TESTCASE.og .])
+AT_CHECK([RACHEL -o TESTCASE.og -a TESTCASE.sa --stats -m matching],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP

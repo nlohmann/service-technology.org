@@ -1,0 +1,20 @@
+# $Id$
+
+PortSystem          1.0
+
+name                lola
+version             1.14
+categories          science
+maintainers         niels.lohmann@uni-rostock.de
+description         LoLA
+long_description    LoLA is a Low-Level Petri Net Analyzer.
+homepage            http://service-technology.org/lola
+platforms           darwin
+master_sites        http://service-technology.org/files/lola/
+
+checksums           md5 9986689afafdcce2521173afa69c245a \
+                    sha1 81017ad63f65d3488be0fe7bba26f564a991cea2 \
+                    rmd160 1272584ef82a5048334d81266630530efe0d88b5
+
+build.target        all-configs
+use_parallel_build  no

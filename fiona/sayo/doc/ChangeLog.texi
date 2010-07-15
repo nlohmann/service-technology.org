@@ -1,0 +1,25 @@
+@heading Version 1.2-unreleased
+@itemize
+@item updated wrapper script @samp{publicview.sh}
+@end itemize
+
+@heading Version 1.1 (2009-11-10)
+@itemize
+@item implemented T-Bit support
+@item fixed bug #13712 (https://gna.org/bugs/?13712)
+@item implemented --stats
+@item simplified testsuite by using wrapper script
+@item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
+@end itemize
+
+@heading Version 1.0
+@itemize
+@item initial release
+@item now ignoring "empty" node
+@item added testcases
+@item added documentation
+@item added manpage
+@item added maintainer scripts
+@item added documentation
+@item made Sayo Gnits compatible
+@end itemize

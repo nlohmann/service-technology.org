@@ -1,0 +1,170 @@
+Last login: Mon Feb 11 17:15:05 on ttys000
+MacBook-Niels:~ niels$ cd Desktop/Papers/
+MacBook-Niels:Papers niels$ fiona *.owfn -t OG -s empty
+
+=================================================================
+processing net BPM2006_shop_sect_3.owfn
+    places: 61 (including 4 input places, 3 output places)
+    transitions: 58
+    ports: 0
+
+finalcondition used
+
+interface message bound set to: 1
+
+building the operating guideline...
+    progress (in %): 0  6  11  17  23  31  37  42 
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+ 48  56  62  68  73  81  87  93  100 
+building the operating guideline finished.
+    1 s consumed for building graph
+
+net is controllable: YES
+
+OG statistics:
+    number of nodes: 117
+    number of edges: 312
+    number of deleted nodes: 196
+    number of blue nodes: 13
+    number of blue edges: 50
+    number of states calculated: 4066
+    number of states stored in nodes: 4530
+
+creating the dot file of the graph...
+dot -Tpng "BPM2006_shop_sect_3.owfn.OG.out" -o "BPM2006_shop_sect_3.owfn.OG.png"
+=================================================================
+
+=================================================================
+processing net BPM2006_shop_sect_6.owfn
+    places: 72 (including 5 input places, 3 output places)
+    transitions: 69
+    ports: 0
+
+finalcondition used
+
+interface message bound set to: 1
+
+building the operating guideline...
+    progress (in %): 0  5  10  15  20  28  33  38  44  52  57  64  72  77  84  92  100 
+building the operating guideline finished.
+    1 s consumed for building graph
+
+net is controllable: YES
+
+OG statistics:
+    number of nodes: 113
+    number of edges: 315
+    number of deleted nodes: 203
+    number of blue nodes: 8
+    number of blue edges: 35
+    number of states calculated: 7932
+    number of states stored in nodes: 6932
+
+creating the dot file of the graph...
+dot -Tpng "BPM2006_shop_sect_6.owfn.OG.out" -o "BPM2006_shop_sect_6.owfn.OG.png"
+=================================================================
+
+=================================================================
+processing net DKE08_shop_sect_3.owfn
+    places: 106 (including 8 input places, 8 output places)
+    transitions: 124
+    ports: 0
+
+finalcondition used
+
+interface message bound set to: 1
+
+building the operating guideline...
+    progress (in %): 0  5  10  15  20  25  30  35  40  45 
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+
+	 WARNING: found a finalstate which activates a transition
+	          you shouldn't do this!
+ 50  56  61  67  72  78  84  89  95  100 
+building the operating guideline finished.
+    113 s consumed for building graph
+
+net is controllable: YES
+
+OG statistics:
+    number of nodes: 8285
+    number of edges: 35777
+    number of deleted nodes: 27493
+    number of blue nodes: 154
+    number of blue edges: 1104
+    number of states calculated: 293243
+    number of states stored in nodes: 264272
+
+creating the dot file of the graph...
+dot -Tpng "DKE08_shop_sect_3.owfn.OG.out" -o "DKE08_shop_sect_3.owfn.OG.png"
+=================================================================
+
+=================================================================
+processing net DKE08_shop_sect_6.owfn
+    places: 108 (including 9 input places, 7 output places)
+    transitions: 128
+    ports: 0
+
+finalcondition used
+
+interface message bound set to: 1
+
+building the operating guideline...
+    progress (in %): 0  5  10  15  20  25  30  35  40  45  50  55  60  65  70  75  80  85  90  95 
+building the operating guideline finished.
+    64 s consumed for building graph
+
+net is controllable: YES
+
+OG statistics:
+    number of nodes: 3041
+    number of edges: 12071
+    number of deleted nodes: 9031
+    number of blue nodes: 6
+    number of blue edges: 53
+    number of states calculated: 192409
+    number of states stored in nodes: 151408
+
+creating the dot file of the graph...
+dot -Tpng "DKE08_shop_sect_6.owfn.OG.out" -o "DKE08_shop_sect_6.owfn.OG.png"
+=================================================================
+
+MacBook-Niels:Papers niels$ 

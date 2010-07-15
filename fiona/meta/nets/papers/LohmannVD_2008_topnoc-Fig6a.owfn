@@ -1,0 +1,52 @@
+PLACE
+  INTERNAL
+    p1, p2, p3, p4, p5, p6, p7, p8, p9;
+
+  INPUT
+    image, results;
+
+  OUTPUT
+    create_thumbnail, finish_image, link, edited_image;
+
+INITIALMARKING
+  p1;
+
+FINALCONDITION
+  ((p9=1) AND ALL_OTHER_PLACES_EMPTY);
+
+
+TRANSITION t1
+  CONSUME p1, image;
+  PRODUCE p2;
+
+TRANSITION t2
+  CONSUME p2;
+  PRODUCE p3, p4;
+
+TRANSITION t3
+  CONSUME p3;
+  PRODUCE p5, finish_image;
+
+TRANSITION t4
+  CONSUME p4;
+  PRODUCE p6, create_thumbnail;
+
+TRANSITION t5
+  CONSUME p5, p6, results;
+  PRODUCE p7;
+
+TRANSITION t6
+  CONSUME p7;
+  PRODUCE p2;
+
+TRANSITION t7
+  CONSUME p7;
+  PRODUCE p8;
+
+TRANSITION t8
+  CONSUME p8;
+  PRODUCE p9, link;
+
+TRANSITION t9
+  CONSUME p8;
+  PRODUCE p9, edited_image;

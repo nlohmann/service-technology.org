@@ -1,0 +1,1865 @@
+{ Netz für den Wrapper }
+
+{ Annahmen: }
+{- Flanken können sich nicht überholen}
+{- zu Beginn alle Pegel auf 0, bis auf Pegel, denen Negator vorgeschaltet ist}
+{- im clock generator Ausgang von NOR-Gatter auf 1}
+
+SORT Anzahl =  [ 0 , 2 ];
+
+FUNCTION inc(x: Anzahl): Anzahl
+BEGIN
+	RETURN x + 1
+END
+
+FUNCTION reset(x: Anzahl): Anzahl
+BEGIN
+	RETURN 0
+END
+
+FUNCTION zero(): Anzahl
+BEGIN
+	RETURN 0
+END
+
+
+FUNCTION tt(): BOOLEAN
+BEGIN
+	RETURN TRUE
+END
+
+
+FUNCTION ff(): BOOLEAN
+BEGIN
+	RETURN FALSE
+END
+
+
+FUNCTION und(x : BOOLEAN; y : BOOLEAN): BOOLEAN
+BEGIN
+	RETURN x AND y
+END
+
+
+FUNCTION oder(x : BOOLEAN; y : BOOLEAN): BOOLEAN
+BEGIN
+	RETURN x OR y
+END
+
+
+FUNCTION neg(x : BOOLEAN): BOOLEAN
+BEGIN
+    RETURN NOT x
+END
+
+
+
+PLACE
+	p.REQ_A: BOOLEAN,
+
+	p.STRETCH: BOOLEAN,
+	p.LCLK_nor: BOOLEAN,
+	p.LCLK_tog: BOOLEAN, 
+	p.LCLK_and: BOOLEAN,
+	p.LCLKM_cc: BOOLEAN,
+	p.LCLKM_ip   : BOOLEAN,  					
+	p.LCLKM_op   : BOOLEAN, 
+	p.LCLKM_or: BOOLEAN, 					
+	{p.CLK_INT: m61.p.b, m66.p.a}
+	p.REQ_A1  : BOOLEAN,
+	p.STOP    : BOOLEAN,
+	p.ACKI1   : BOOLEAN,
+	{p.ST: m68.p.ST, m72.p.a, p.ST_and}
+	{p.ACK_INT: m72.p.b, m73.p.a}
+	p.DATAV_IN: BOOLEAN,  					
+	p.REQ_INT_op : BOOLEAN,
+	p.REQ_INT_or : BOOLEAN,
+	p.REQ_INT_cc : BOOLEAN,
+	p.RST_tog: BOOLEAN,
+	p.RST_cc_clk: BOOLEAN,
+	p.RST_cc_rst: BOOLEAN,
+	p.REQI1   : BOOLEAN,
+	p.ACK_A   : BOOLEAN,
+	p.DLE     : BOOLEAN,
+	{p.INT_CLK: m81.p.clk, m82.p.clk}  			
+	{p.DATAV_OUT: m81.p.d:, m82.p.d}
+	{p.ACK_B: m84.p.ACK_B, m85.p.b}
+	p.REQ_B    : BOOLEAN,
+	p.STOPI    : BOOLEAN,
+	p.CLOCK    : BOOLEAN,
+	p.ST_and: BOOLEAN,
+
+	p.n_STRETCH,
+	p.n_DATAV_IN,
+	p.n_STOP,
+	p.n_DLE,
+	p.n_STOPI,
+	p.n_RST_tog,
+	p.n_RST_cc_rst,
+	p.n_RST_cc_clk,
+	p.n_LCLK_tog,
+	p.n_CLOCK,
+	p.n_LCLK_and,
+	p.n_LCLKM_cc,
+	p.n_LCLKM_ip,
+
+	
+
+	{Pausable Clock Generator}
+
+	{p.LCLK_nor: BOOLEAN, p.STOPI: BOOLEAN,}			{Input-Flanken}
+	{p.RCLK1, p.RCLK2, p.RCLK3,}					{Output-Flanke}
+	m1.p.a_alt: BOOLEAN, m1.p.b_alt: BOOLEAN,			{alte Pegel}
+
+	{p.REQI1, p.RCLK1}						{Input-Flanken}
+	{p.ACKI1,} 			 			 	{Output: Flanke}
+	m2.p.b_out: BOOLEAN,
+	m2.p.n_b_out,
+	m2.p.a_save: BOOLEAN, m2.p.b_save: BOOLEAN,			{zu speichernde Pegel}
+	m2.p.a_wait, m2.p.a_n_wait, 					{warten auf Pegeländerung}
+	m2.p.b_wait, m2.p.b_n_wait,
+
+	p.RCLK1: BOOLEAN, p.RCLK2: BOOLEAN, p.RCLK3: BOOLEAN,
+	p.n_RCLK1, p.n_RCLK2,
+
+	{p.STRETCH, p.RCLK2}						{Input-Flanken}
+	m3.p.b_out: BOOLEAN,			 			{Output: Flanke}
+	m3.p.n_b_out,
+	m3.p.a_save: BOOLEAN, m3.p.b_save: BOOLEAN,			{zu speichernde Pegel}
+	m3.p.a_wait, m3.p.a_n_wait, 					{warten auf Pegeländerung}
+	m3.p.b_wait, m3.p.b_n_wait,
+
+	{m3.p.b_out, m2.p.b_out}					{Input-Flanken}
+	m4.p.out: BOOLEAN,						{Output-Flanke}
+	m4.p.n_out,
+	m4.p.a_alt: BOOLEAN, m4.p.b_alt: BOOLEAN,			{alte Pegel}
+
+	{m4.p.out,} 		 					{Input-Flanke}
+	m5.p.b: BOOLEAN,
+	{p.LCLK_nor, p.LCLK_tog, p.LCLK_and}				{Output-Flanke}
+	m5.p.c_save: BOOLEAN,						{Rückkopplung}
+	m5.p.a_save: BOOLEAN, m5.p.b_save: BOOLEAN,			{Pegel der Eingangsflanken}
+
+
+	{Clock Controll}
+
+	
+	{p.LCLKM_cc, p.RST_tog}		 				{Input-Flanke}	
+	{m11.p.clk, p.STOP}						{Output-Flanke}
+	m10.p.active, m10.p.deactive,					{Status des counter}
+	m10.p.value : Anzahl,						{counter-Wert}
+	
+	{p.REQ_INT_cc} 			  				{Input-Flanke}
+	m11.p.clk: BOOLEAN, 
+	m11.p.rst_alt: BOOLEAN, m11.p.q_alt: BOOLEAN,   		{alte Pegel}
+	{p.STOPI} 		                           		{Output-Flanke}
+	{p.n_STOPI}							{Komplementärplatz}
+
+
+	{Time-out generator}
+	
+	m20.p.rst: BOOLEAN, {p.LCLK_tog}	   			{Input-Flanke}
+	m20.p.rst_alt: BOOLEAN, m20.p.q_alt: BOOLEAN,   		{alte Pegel}
+	m20.p.q: BOOLEAN,                           			{Output-Flanke}
+	m20.p.n_q,							{Komplementärplatz}
+
+	m21.p.rst: BOOLEAN, {p.RST_cc_clk}   				{Input-Flanke}
+	m21.p.rst_alt: BOOLEAN, m21.p.q_alt: BOOLEAN,   		{alte Pegel}
+	m21.p.q: BOOLEAN,                           			{Output-Flanke}
+	m21.p.n_q,
+
+	{m22.p.a_out: m20.p.rst, m23.p.clk,} 	 			{Output: Flanke}
+	{m22.p.b_out: m21.p.rst: b, m25.p.a: b, m23.p.rst: b}
+	m22.p.a_save: BOOLEAN, m22.p.b_save: BOOLEAN,			{zu speichernde Pegel}
+	m22.p.a_wait, m22.p.a_n_wait, 					{warten auf Pegeländerung}
+	m22.p.b_wait, m22.p.b_n_wait,
+
+	m23.p.clk: BOOLEAN, m23.p.rst: BOOLEAN, 			{Input-Flanke}	
+	m23.p.out: BOOLEAN,						{Output-Flanke}
+	m23.p.active, m23.p.deactive,					{Status des counter}
+	m23.p.value : Anzahl,						{counter-Wert}
+	m23.p.n_rst, m23.p.n_out, m23.p.n_clk,
+
+	{m23.p.out} 			 	   			{Input-Flanke}
+	m24.p.rst: BOOLEAN,
+	m24.p.rst_alt: BOOLEAN, m24.p.q_alt: BOOLEAN,   		{alte Pegel}
+	m24.p.q: BOOLEAN,                           			{Output-Flanke}
+	m24.p.n_q, m24.p.n_rst,						{Komplementärplatz}
+
+	m25.p.a: BOOLEAN, m25.p.b: BOOLEAN,				{Input-Flanken}
+	{m24.p.rst}	                           			{Output-Flanke}
+	m25.p.a_alt: BOOLEAN, m25.p.b_alt: BOOLEAN,			{alte Pegel}
+	m25.p.n_a,
+
+	m26.p.b_out: BOOLEAN,						{Output-Flanke}
+	m26.p.a_save: BOOLEAN, m26.p.b_save: BOOLEAN,			{zu speichernde Pegel}
+	m26.p.a_wait, m26.p.a_n_wait, 					{warten auf Pegeländerung}
+	m26.p.b_wait, m26.p.b_n_wait,
+
+	{m26.p.b_out, m27.p.rst}				   	{Input-Flanke}
+	m27.p.rst_alt: BOOLEAN, m27.p.q_alt: BOOLEAN,   		{alte Pegel}
+	{m27.p.q: BOOLEAN: m25.p.b, m68.p.ST, m72.p.a, p.ST_and} 	{Output-Flanke}
+	
+	
+
+	{Input-Port}
+
+	{m61: AND}
+	{m61.p.a = p.LCLKM}  		         		{Input-Flanken}
+	m61.p.b: BOOLEAN,
+	m61.p.out: BOOLEAN,                         		{Output-Flanke}
+	m61.p.a_alt: BOOLEAN, m61.p.b_alt: BOOLEAN, 		{alte Pegel}
+
+	{m62: D-FF mit D=0 und SET}
+	{m62.p.clk = m61.p.out}                       		{Input-Flanke}
+	m62.p.set : BOOLEAN,
+	m62.p.set_alt: BOOLEAN, m62.p.q_alt: BOOLEAN, 		{alte Pegel}
+	{m62.p.q = p.DATAV_IN}                        		{Output-Flanke}
+	m62.p.n_set,
+
+	{m64: OR}
+	{m64.p.a = m66.p.out}                         		{Input-Flanken}
+	{m64.p.b = m65.p.out}	
+	{m64.p.out: m62.p.set, p.DLE}                  		{Output-Flanke}
+	m64.p.a_alt: BOOLEAN, m64.p.b_alt: BOOLEAN,   		{alte Pegel}
+
+	{m65: AND}
+	m65.p.a: BOOLEAN, m65.p.b: BOOLEAN,           		{Input-Flanken}
+	m65.p.out: BOOLEAN,                           		{Output-Flanke}
+	m65.p.a_alt: BOOLEAN, m65.p.b_alt: BOOLEAN,   		{alte Pegel}
+	m65.p.n_b,
+
+	{m66: AND}
+	m66.p.a: BOOLEAN, m66.p.b: BOOLEAN,           		{Input-Flanken}
+	m66.p.out: BOOLEAN,                           		{Output-Flanke}
+	m66.p.a_alt: BOOLEAN, m66.p.b_alt: BOOLEAN,   		{alte Pegel}
+	m66.p.n_b, m66.p.n_out,
+
+	{m68: Input Controller}
+	m68.p.0, m68.p.1, m68.p.2,     				{Zustände des Input Controllers}
+	m68.p.3, m68.p.4, m68.p.5,
+	m68.p.6, m68.p.7, m68.p.8,
+	m68.p.ST     : BOOLEAN,
+	{m68.p.ACK_A: p.ACK_A, m66.p.b}
+	{m68.p.ACKEN: m65.p.a, m73.p.b}
+	{m68.p.REQ_INT: p.REQ_INT_cc, p.REQ_INT, p.REQ_INT_or}
+	m68.p.ACKC   : BOOLEAN,
+	
+	{m72: AND}
+	m72.p.a: BOOLEAN, m72.p.b: BOOLEAN,           		{Input-Flanken}
+	m72.p.out: BOOLEAN,                           		{Output-Flanke}
+	m72.p.a_alt: BOOLEAN, m72.p.b_alt: BOOLEAN,   		{alte Pegel}
+
+	{m73: AND}
+	m73.p.a: BOOLEAN, m73.p.b: BOOLEAN,           		{Input-Flanken}
+	m73.p.out: BOOLEAN,                           		{Output-Flanke}
+	m73.p.a_alt: BOOLEAN, m73.p.b_alt: BOOLEAN,   		{alte Pegel}
+
+	{m74: OR}
+	{m74.p.a = m72.p.out}                         		{Input-Flanken}
+	{m74.p.b = m73.p.out}
+	{m74.p.out: m68.p.ACKC, m65.p.b}               		{Output-Flanke}
+	m74.p.a_alt: BOOLEAN, m74.p.b_alt: BOOLEAN;   		{alte Pegel}
+
+
+	{Output-Port}
+
+	{m81: D-FF mit D beliebig und RST}
+	m81.p.d        : BOOLEAN,  {Input-Flanken}
+	m81.p.rst      : BOOLEAN,
+	m81.p.clk      : BOOLEAN,
+	{m81.p.q = m84.p.donv}      {Output-Flanke}	
+	m81.p.d_pegel  : BOOLEAN,  {alte Pegel}
+	m81.p.rst_pegel: BOOLEAN,
+	m81.p.q_pegel  : BOOLEAN,
+	m81.p.n_rst,
+
+	{m82: D-FF mit D beliebig und RST}
+	m82.p.d        : BOOLEAN,  {Input-Flanken}
+	m82.p.rst      : BOOLEAN,
+	m82.p.clk      : BOOLEAN,
+	{m82.p.q = m84.p.dov}       {Output-Flanke}
+	m82.p.d_pegel  : BOOLEAN,  {alte Pegel}
+	m82.p.rst_pegel: BOOLEAN,
+	m82.p.q_pegel  : BOOLEAN,
+	m82.p.n_rst,
+
+	{m83: OR}
+	{m83.p.a = p.LCLKM}                          {Input-Flanken}
+	{m83.p.b = p.REQ_INT_op}
+	{m83.p.out: m82.p.rst, m81.p.rst, m84.p.clk}  {Output-Flanke}
+	m83.p.a_alt: BOOLEAN, m83.p.b_alt: BOOLEAN;   {alte Pegel}
+
+	{m84: Output Controller}
+	m84.p.0, m84.p.1, m84.p.2, m84.p.3,    {Zustände des Output Controllers}
+	m84.p.clk    : BOOLEAN,    {Ein- und Ausgabesignale als Flanken}
+	m84.p.dov    : BOOLEAN,
+	m84.p.donv   : BOOLEAN,
+	m84.p.ACK_B  : BOOLEAN,
+	{m84.p.REQ_B: p.REQ_B, m85.p.a, m86.p.set}
+	m84.p.n_dov,
+	m84.p.n_donv,
+	{m84.p.ACK_INT = m72.p.b, m73.p.a}
+	m84.p.n_ACK_B,
+
+	{m85: OR}
+	m85.p.a: BOOLEAN, m85.p.b: BOOLEAN,           {Input-Flanken}
+	{m85.p.out: m86.p.clk}                        {Output-Flanke}
+	m85.p.a_alt: BOOLEAN, m85.p.b_alt: BOOLEAN,   {alte Pegel}
+	m85.p.n_b,
+
+	{m86: D-FF mit D=0 und SET}
+	m86.p.set    : BOOLEAN, m86.p.clk  : BOOLEAN,   {Input-Flanke}
+	m86.p.set_alt: BOOLEAN, m86.p.q_alt: BOOLEAN,   {alte Pegel}
+	{m86.p.q = p.STRETCH}                           {Output-Flanke}
+	m86.p.n_clk,
+
+
+	{Wrapper}
+
+	{p.ST_and: BOOLEAN, p.LCLK_and: BOOLEAN,}			{Input-Flanken}
+	{m90.p.out: p.LCLKM_ip, p.LCLKM_cc, p.LCLKM_op, p.LCLKM_or}	{Output-Flanke}
+	m90.p.a_alt: BOOLEAN, m90.p.b_alt: BOOLEAN,			{alte Pegel}
+	
+	{p.REQ_INT_or, p.LCLKM_or}					{Input-Flanken}
+	{m61.p.b, m66.p.a, m81.p.clk, m82.p.clk, p.CLOCK}		{Output-Flanke}
+	m91.p.a_alt: BOOLEAN, m91.p.b_alt: BOOLEAN,			{alte Pegel}
+
+	p.help_ackb,
+	p.help_n_ackb,
+	p.help_reqa,
+	p.help_n_reqa;
+	
+	
+
+
+
+MARKING
+        p.REQ_A: tt(),
+	{p.ACK_B: tt()} m84.p.ACK_B: tt(), m85.p.b: tt(),
+
+	p.n_STOP: 1,
+	p.n_DLE: 1,
+	p.n_RST_cc_clk: 1,
+	p.n_LCLK_tog: 1,
+	p.n_CLOCK: 1,
+	p.n_LCLK_and: 1,
+	p.n_LCLKM_cc: 1,
+	p.n_LCLKM_ip: 1,
+
+	{Pausable Clock Generator}
+
+	m1.p.a_alt: ff(), 
+	m1.p.b_alt: ff(), 
+
+	m2.p.a_n_wait: 1, m2.p.b_n_wait: 1,
+	m2.p.a_save: ff(), m2.p.b_save: ff(),
+	m2.p.n_b_out: 1,
+
+	p.RCLK1: tt(), p.RCLK2: tt(), p.RCLK3: tt(),
+
+	m3.p.a_n_wait: 1, m3.p.b_n_wait: 1,
+	m3.p.a_save: ff(), m3.p.b_save: ff(),
+	m3.p.n_b_out: 1,
+
+	m4.p.n_out: 1,
+	m4.p.a_alt: ff(), 
+	m4.p.b_alt: ff(),
+
+	m5.p.c_save: ff(), m5.p.a_save: ff(), 
+	m5.p.b_save: ff(),
+
+
+	{Clock Controll}
+
+	m10.p.active: 1, m10.p.value: zero(),
+	p.n_RST_tog: 1,
+	
+        m11.p.rst_alt: ff(), m11.p.q_alt: ff(),
+	p.n_STOPI: 1,
+	
+
+	{Timeout generator}
+
+	m20.p.rst_alt: ff(), m20.p.q_alt: ff(),
+	m20.p.n_q: 1,
+
+	m21.p.rst_alt: ff(), m21.p.q_alt: ff(),
+	m21.p.n_q: 1,	
+
+	m22.p.a_n_wait: 1, m22.p.b_n_wait: 1,
+	m22.p.a_save: ff(), m22.p.b_save: ff(),
+	
+	m23.p.active: 1, m23.p.value: zero(),
+	m23.p.n_rst: 1, m23.p.n_out: 1, m23.p.n_clk: 1,
+
+	m24.p.rst_alt: ff(), m24.p.q_alt: ff(),
+	m24.p.n_q: 1, m24.p.n_rst: 1,
+
+	m25.p.a_alt: ff(), m25.p.b_alt: ff(),
+	m25.p.n_a: 1,
+
+	m26.p.a_n_wait: 1, m26.p.b_n_wait: 1,
+	m26.p.a_save: ff(), m26.p.b_save: ff(),
+
+	m27.p.rst_alt: ff(), m27.p.q_alt: ff(),
+	p.n_RST_cc_rst: 1,
+	
+
+	{Input-Port}
+
+	p.n_DATAV_IN: 1,
+
+	m61.p.a_alt: ff(), 
+	m61.p.b_alt: ff(),
+
+	m62.p.set_alt: ff(),
+	m62.p.q_alt: ff(),
+	m62.p.n_set: 1,
+
+	m64.p.a_alt: ff(),
+	m64.p.b_alt: ff(),
+
+	m65.p.a_alt: ff(), 
+	m65.p.b_alt: ff(),
+	m65.p.n_b: 1,
+
+	m66.p.a_alt: ff(), 
+	m66.p.b_alt: ff(),
+	m66.p.n_b: 1,
+	m66.p.n_out: 1,
+
+	m68.p.0: 1, {Input Controller startet im Zustand 0.}
+
+	m72.p.a_alt: tt(), 
+	m72.p.b_alt: ff(),
+
+	m73.p.a_alt: ff(), 
+	m73.p.b_alt: ff(),
+
+	m74.p.a_alt: ff(),
+	m74.p.b_alt: ff(),
+
+
+	{Output-Port}
+
+
+	m81.p.rst_pegel: ff(), m81.p.q_pegel: ff(), m81.p.d_pegel: tt(), m81.p.n_rst: 1,
+
+	m82.p.rst_pegel: ff(), m82.p.q_pegel: ff(), m82.p.d_pegel: ff(), m82.p.n_rst: 1,
+
+	m83.p.a_alt: ff(),
+	m83.p.b_alt: ff(),
+
+	m84.p.0: 1,
+	m84.p.n_dov: 1,
+	m84.p.n_donv: 1,
+	
+	m85.p.a_alt: ff(),
+	m85.p.b_alt: ff(),
+
+	m86.p.set_alt: ff(), m86.p.q_alt: ff(),
+	m86.p.n_clk: 1,
+
+	p.n_STRETCH: 1,
+
+
+	{Wrapper}
+	
+	m90.p.a_alt: ff(), 
+	m90.p.b_alt: ff(),
+	
+	m91.p.a_alt: ff(), 
+	m91.p.b_alt: ff(),
+
+	p.help_ackb: 1,
+	p.help_n_ackb: 1,
+	p.help_reqa: 1,
+	p.help_n_reqa: 1;
+
+
+
+
+{Pausable Clock Generator}
+
+
+{m1: NOR-Gatter}
+
+TRANSITION m1.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt) AND (a_alt <> a)
+CONSUME p.LCLK_nor: a, m1.p.a_alt: a_alt, m1.p.b_alt: b_alt, p.n_RCLK1: 1, p.n_RCLK2: 1;
+PRODUCE p.RCLK1: neg(a), p.RCLK2: neg(a), p.RCLK3: neg(a), m1.p.a_alt: a, m1.p.b_alt: b_alt;
+
+TRANSITION m1.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(neg(b_alt) AND (a_alt <> a))
+CONSUME p.LCLK_nor: a, m1.p.a_alt: a_alt, m1.p.b_alt: b_alt;
+PRODUCE m1.p.a_alt: a, m1.p.b_alt: b_alt;
+
+TRANSITION m1.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME p.LCLK_nor: a, m1.p.a_alt: a_alt, p.STOPI: b, m1.p.b_alt: b_alt;
+PRODUCE m1.p.a_alt: a, m1.p.b_alt: b;
+
+TRANSITION m1.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt) AND (b_alt <> b)
+CONSUME p.STOPI: b, m1.p.b_alt: b_alt, m1.p.a_alt: a_alt, p.n_RCLK1: 1, p.n_RCLK2: 1;
+PRODUCE p.RCLK1: neg(b), p.RCLK2: neg(b), p.RCLK3: neg(b), m1.p.b_alt: b, m1.p.a_alt: a_alt;
+
+TRANSITION m1.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(neg(a_alt) AND (b_alt <> b))
+CONSUME p.STOPI: b, m1.p.b_alt: b_alt, m1.p.a_alt: a_alt;
+PRODUCE m1.p.b_alt: b, m1.p.a_alt: a_alt;
+
+
+{m2: Mutex}
+
+TRANSITION m2.t.a_no_edge1
+VAR a, a_alt: BOOLEAN;
+GUARD a = a_alt
+CONSUME p.REQI1: a, m2.p.a_save: a_alt;
+PRODUCE m2.p.a_save: a_alt;
+
+TRANSITION m2.t.a_no_edge2
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD a AND neg(a_alt) AND b_alt
+CONSUME p.REQI1: a, m2.p.a_save: a_alt, m2.p.b_save: b_alt, m2.p.a_n_wait: 1;
+PRODUCE m2.p.a_save: a, m2.p.b_save: b_alt, m2.p.a_wait: 1;
+
+TRANSITION m2.t.a_no_edge3
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD neg(a) AND a_alt AND b_alt
+CONSUME p.REQI1: a, m2.p.a_save: a_alt, m2.p.b_save: b_alt, m2.p.a_wait: 1;
+PRODUCE m2.p.a_save: a, m2.p.b_save: b_alt, m2.p.a_n_wait: 1;
+
+TRANSITION m2.t.a_edge1
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD neg(b_alt) AND (a <> a_alt)
+CONSUME p.REQI1: a, m2.p.a_save: a_alt, m2.p.b_save: b_alt;
+PRODUCE p.ACKI1: a, m2.p.a_save: a, m2.p.b_save: b_alt;
+
+TRANSITION m2.t.a_edge2
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD neg(a) AND a_alt AND b_alt
+CONSUME p.REQI1: a, m2.p.a_save: a_alt, m2.p.b_save: b_alt, m2.p.b_wait: 1, m2.p.n_b_out: 1;
+PRODUCE p.ACKI1: a, m2.p.a_save: a, m2.p.b_save: b_alt, m2.p.b_out: b_alt, m2.p.b_n_wait: 1;
+
+TRANSITION m2.t.b_no_edge1
+VAR b, b_alt: BOOLEAN;
+GUARD b = b_alt
+CONSUME p.RCLK1: b, m2.p.b_save: b_alt;
+PRODUCE m2.p.b_save: b_alt, p.n_RCLK1: 1;
+
+TRANSITION m2.t.b_no_edge2
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD b AND neg(b_alt) AND a_alt
+CONSUME p.RCLK1: b, m2.p.b_save: b_alt, m2.p.a_save: a_alt, m2.p.b_n_wait: 1;
+PRODUCE m2.p.b_save: b, m2.p.a_save: a_alt, m2.p.b_wait: 1, p.n_RCLK1: 1;
+
+TRANSITION m2.t.b_no_edge3
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD neg(b) AND b_alt AND a_alt
+CONSUME p.RCLK1: b, m2.p.b_save: b_alt, m2.p.a_save: a_alt, m2.p.b_wait: 1;
+PRODUCE m2.p.b_save: b, m2.p.a_save: a_alt, m2.p.b_n_wait: 1, p.n_RCLK1: 1;
+
+TRANSITION m2.t.b_edge1
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD neg(a_alt) AND (b <> b_alt)
+CONSUME p.RCLK1: b, m2.p.b_save: b_alt, m2.p.a_save: a_alt, m2.p.n_b_out: 1;
+PRODUCE m2.p.b_out: b, m2.p.b_save: b, m2.p.a_save: a_alt, p.n_RCLK1: 1;
+
+TRANSITION m2.t.b_edge2
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD neg(b) AND b_alt AND a_alt
+CONSUME p.RCLK1: b, m2.p.b_save: b_alt, m2.p.a_save: a_alt, m2.p.a_wait: 1, m2.p.n_b_out: 1;
+PRODUCE m2.p.b_out: b, m2.p.b_save: b, m2.p.a_save: a_alt, p.ACKI1: a_alt, m2.p.a_n_wait: 1, 
+	p.n_RCLK1: 1;
+
+
+{m3: Mutex}
+
+TRANSITION m3.t.a_no_edge1
+VAR a, a_alt: BOOLEAN;
+GUARD a = a_alt
+CONSUME p.STRETCH: a, m3.p.a_save: a_alt;
+PRODUCE m3.p.a_save: a_alt;
+
+TRANSITION m3.t.a_no_edge2
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD a AND neg(a_alt) AND b_alt
+CONSUME p.STRETCH: a, m3.p.a_save: a_alt, m3.p.b_save: b_alt, m3.p.a_n_wait: 1;
+PRODUCE m3.p.a_save: a, m3.p.b_save: b_alt, m3.p.a_wait: 1;
+
+TRANSITION m3.t.a_no_edge3
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD neg(a) AND a_alt AND b_alt
+CONSUME p.STRETCH: a, m3.p.a_save: a_alt, m3.p.b_save: b_alt, m3.p.a_wait: 1;
+PRODUCE m3.p.a_save: a, m3.p.b_save: b_alt, m3.p.a_n_wait: 1;
+
+TRANSITION m3.t.a_edge1
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD neg(b_alt) AND (a <> a_alt)
+CONSUME p.STRETCH: a, m3.p.a_save: a_alt, m3.p.b_save: b_alt;
+PRODUCE m3.p.a_save: a, m3.p.b_save: b_alt;
+
+TRANSITION m3.t.a_edge2
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD neg(a) AND a_alt AND b_alt
+CONSUME p.STRETCH: a, m3.p.a_save: a_alt, m3.p.b_save: b_alt, m3.p.b_wait: 1, m3.p.n_b_out: 1;
+PRODUCE m3.p.a_save: a,	m3.p.b_save: b_alt, m3.p.b_out: b_alt, m3.p.b_n_wait: 1;
+
+TRANSITION m3.t.b_no_edge1
+VAR b, b_alt: BOOLEAN;
+GUARD b = b_alt
+CONSUME p.RCLK2: b, m3.p.b_save: b_alt;
+PRODUCE m3.p.b_save: b_alt, p.n_RCLK2: 1;
+
+TRANSITION m3.t.b_no_edge2
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD b AND neg(b_alt) AND a_alt
+CONSUME p.RCLK2: b, m3.p.b_save: b_alt, m3.p.a_save: a_alt, m3.p.b_n_wait: 1;
+PRODUCE m3.p.b_save: b, m3.p.a_save: a_alt, m3.p.b_wait: 1, p.n_RCLK2: 1;
+
+TRANSITION m3.t.b_no_edge3
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD neg(b) AND b_alt AND a_alt
+CONSUME p.RCLK2: b, m3.p.b_save: b_alt, m3.p.a_save: a_alt, m3.p.b_wait: 1;
+PRODUCE m3.p.b_save: b, m3.p.a_save: a_alt, m3.p.b_n_wait: 1, p.n_RCLK2: 1;
+
+TRANSITION m3.t.b_edge1
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD neg(a_alt) AND (b <> b_alt)
+CONSUME p.RCLK2: b, m3.p.b_save: b_alt, m3.p.a_save: a_alt, m3.p.n_b_out: 1;
+PRODUCE m3.p.b_out: b, m3.p.b_save: b,  m3.p.a_save: a_alt, p.n_RCLK2: 1;
+
+TRANSITION m3.t.b_edge2
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD neg(b) AND b_alt AND a_alt
+CONSUME p.RCLK2: b, m3.p.b_save: b_alt, m3.p.a_save: a_alt, m3.p.a_wait: 1, m3.p.n_b_out: 1;
+PRODUCE m3.p.b_out: b, m3.p.b_save: b, m3.p.a_save: a_alt, m3.p.a_n_wait: 1, p.n_RCLK2: 1;
+
+
+{m4: AND-Muster}
+
+TRANSITION m4.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD b_alt AND (a_alt <> a)
+CONSUME m3.p.b_out: a, m4.p.a_alt: a_alt, m4.p.b_alt: b_alt, m4.p.n_out: 1;
+PRODUCE m4.p.out: a, m4.p.a_alt: a, m4.p.b_alt: b_alt, m3.p.n_b_out: 1;
+
+TRANSITION m4.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt AND (a_alt <> a))
+CONSUME m3.p.b_out: a, m4.p.a_alt: a_alt, m4.p.b_alt: b_alt;
+PRODUCE m4.p.a_alt: a, m4.p.b_alt: b_alt, m3.p.n_b_out: 1;
+
+TRANSITION m4.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME m3.p.b_out: a, m4.p.a_alt: a_alt, m2.p.b_out: b, m4.p.b_alt: b_alt;
+PRODUCE m4.p.a_alt: a, m4.p.b_alt: b, m2.p.n_b_out: 1, m3.p.n_b_out: 1;
+
+TRANSITION m4.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD a_alt AND (b_alt <> b)
+CONSUME m2.p.b_out: b, m4.p.b_alt: b_alt, m4.p.a_alt: a_alt, m4.p.n_out: 1;
+PRODUCE m4.p.out: b, m4.p.b_alt: b, m4.p.a_alt: a_alt, m2.p.n_b_out: 1;
+
+TRANSITION m4.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt AND (b_alt <> b))
+CONSUME m2.p.b_out: b, m4.p.b_alt: b_alt, m4.p.a_alt: a_alt;
+PRODUCE m4.p.b_alt: b, m4.p.a_alt: a_alt, m2.p.n_b_out: 1;
+
+
+TRANSITION t.delayline
+VAR a: BOOLEAN;
+CONSUME p.RCLK3: a;
+PRODUCE m5.p.b: a;
+
+
+{m5: MCE}
+
+TRANSITION m5.t.a_nothing
+VAR a, a_alt: BOOLEAN;
+GUARD a = a_alt
+CONSUME m4.p.out: a, m5.p.a_save: a_alt;
+PRODUCE m5.p.a_save: a_alt, m4.p.n_out: 1;
+
+TRANSITION m5.t.a_flanke
+VAR a, a_alt, b_alt, c_alt: BOOLEAN;
+GUARD (a = b_alt) AND (a_alt = c_alt) AND (a <> a_alt)
+CONSUME m4.p.out: a, m5.p.a_save: a_alt, m5.p.b_save: b_alt, m5.p.c_save: c_alt, p.n_LCLK_tog: 1,
+	p.n_LCLK_and: 1;
+PRODUCE p.LCLK_nor: a, p.LCLK_tog: neg(a), p.LCLK_and: a, m5.p.c_save: a, m5.p.a_save: a, 
+	m5.p.b_save: b_alt, m4.p.n_out: 1;
+
+TRANSITION m5.t.a_pegel
+VAR a, a_alt, b_alt, c_alt: BOOLEAN;
+GUARD neg((a = b_alt) AND (a_alt = c_alt) AND (a <> a_alt)) AND neg(a = a_alt)
+CONSUME m4.p.out: a, m5.p.a_save: a_alt, m5.p.b_save: b_alt, m5.p.c_save: c_alt;
+PRODUCE m5.p.a_save: a, m5.p.b_save: b_alt, m5.p.c_save: c_alt, m4.p.n_out: 1;
+
+TRANSITION m5.t.b_nothing
+VAR b, b_alt: BOOLEAN;
+GUARD b = b_alt
+CONSUME m5.p.b: b, m5.p.b_save: b_alt;
+PRODUCE m5.p.b_save: b_alt;
+
+TRANSITION m5.t.b_flanke
+VAR b, b_alt, a_alt, c_alt: BOOLEAN;
+GUARD (b = a_alt) AND (b_alt = c_alt) AND (b <> b_alt)
+CONSUME m5.p.b: b, m5.p.b_save: b_alt, m5.p.a_save: a_alt, m5.p.c_save: c_alt, p.n_LCLK_tog: 1,
+	p.n_LCLK_and: 1;
+PRODUCE p.LCLK_nor: b, p.LCLK_tog: neg(b), p.LCLK_and: b, m5.p.c_save: b, m5.p.b_save: b, 
+	m5.p.a_save: a_alt;
+
+TRANSITION m5.t.b_pegel
+VAR b, b_alt, a_alt, c_alt: BOOLEAN;
+GUARD neg((b = a_alt) AND (b_alt = c_alt) AND (b <> b_alt)) AND neg(b = b_alt)
+CONSUME m5.p.b: b, m5.p.b_save: b_alt, m5.p.a_save: a_alt, m5.p.c_save: c_alt;
+PRODUCE m5.p.b_save: b, m5.p.a_save: a_alt, m5.p.c_save: c_alt;
+
+
+
+{Clock Controll}
+
+
+{m10: Counter}
+
+TRANSITION m10.t.max
+VAR clk: BOOLEAN; n: Anzahl;
+GUARD clk AND (n = 0)						{n=max}
+CONSUME p.LCLKM_cc: clk, m10.p.value: n, m10.p.active: 1, p.n_STOP: 1;
+PRODUCE m11.p.clk: tt(), p.STOP: tt(), m10.p.active: 1, m10.p.value: n, p.n_LCLKM_cc: 1;
+
+TRANSITION m10.t.count
+VAR clk: BOOLEAN; n: Anzahl;
+GUARD clk AND (n <> 0)
+CONSUME p.LCLKM_cc: clk, m10.p.value: n, m10.p.active: 1;
+PRODUCE m10.p.active: 1, m10.p.value: inc(n), p.n_LCLKM_cc: 1;
+
+TRANSITION m10.t.not_count1
+VAR clk: BOOLEAN;
+GUARD (NOT clk)
+CONSUME p.LCLKM_cc: clk, m10.p.active: 1;
+PRODUCE m10.p.active: 1, p.n_LCLKM_cc: 1;
+
+TRANSITION m10.t.not_count2
+VAR clk: BOOLEAN;
+GUARD (NOT clk)
+CONSUME p.LCLKM_cc: clk, m10.p.deactive: 1;
+PRODUCE m10.p.deactive: 1, p.n_LCLKM_cc: 1;
+
+TRANSITION m10.t.hazard
+VAR clk, rst: BOOLEAN;
+CONSUME p.LCLKM_cc: clk, p.RST_tog: rst, m10.p.active: 1;
+PRODUCE m10.p.active: 1, p.n_RST_tog: 1, p.n_LCLKM_cc: 1;
+
+TRANSITION m10.t.rst0
+VAR rst: BOOLEAN;
+GUARD (NOT rst)
+CONSUME p.RST_tog: rst, m10.p.deactive: 1;
+PRODUCE m10.p.active: 1, p.n_RST_tog: 1;
+
+TRANSITION m10.t.rst1
+VAR rst: BOOLEAN; n: Anzahl;
+GUARD rst
+CONSUME p.RST_tog: rst, m10.p.active: 1, m10.p.value: n, p.n_STOP: 1; 
+PRODUCE m10.p.deactive: 1, m10.p.value: reset(n), m11.p.clk: ff(), p.STOP: ff(), p.n_RST_tog: 1;
+
+
+
+{m11: D-FF mit D=1}
+
+TRANSITION m11.t.clk_edge
+CONSUME m11.p.clk: tt(), m11.p.rst_alt: ff(), m11.p.q_alt: ff(), p.n_STOPI: 1;
+PRODUCE p.STOPI: tt(), m11.p.q_alt: tt(), m11.p.rst_alt: ff();
+
+TRANSITION m11.t.clk_no_edge
+VAR clk, q_alt, rst_alt: BOOLEAN;
+GUARD (neg(clk)) OR (clk AND rst_alt) OR (clk AND neg(rst_alt) AND q_alt)
+CONSUME m11.p.clk: clk, m11.p.q_alt: q_alt, m11.p.rst_alt: rst_alt;
+PRODUCE m11.p.q_alt: q_alt, m11.p.rst_alt: rst_alt;
+
+TRANSITION m11.t.hazard_edge
+VAR rst_alt: BOOLEAN;
+CONSUME m11.p.clk: tt(), p.REQ_INT_cc: tt(), m11.p.q_alt: tt(), m11.p.rst_alt: rst_alt, p.n_STOPI: 1;
+PRODUCE p.STOPI: ff(), m11.p.q_alt: ff(), m11.p.rst_alt: tt();
+
+TRANSITION m11.t.hazard_no_edge
+VAR rst_alt: BOOLEAN;
+CONSUME m11.p.clk: tt(), p.REQ_INT_cc: tt(), m11.p.q_alt: ff(), m11.p.rst_alt: rst_alt;
+PRODUCE m11.p.q_alt: ff(), m11.p.rst_alt: tt();
+
+TRANSITION m11.t.rst_no_edge
+VAR rst, rst_alt, q_alt: BOOLEAN;
+GUARD (neg(rst)) OR (rst AND neg(q_alt))
+CONSUME p.REQ_INT_cc: rst, m11.p.rst_alt: rst_alt, m11.p.q_alt: q_alt;
+PRODUCE m11.p.rst_alt: rst, m11.p.q_alt: q_alt;
+
+TRANSITION m11.t.rst_edge
+VAR rst_alt: BOOLEAN;
+CONSUME p.REQ_INT_cc: tt(), m11.p.rst_alt: rst_alt, m11.p.q_alt: tt(), p.n_STOPI: 1;
+PRODUCE p.STOPI: ff(), m11.p.q_alt: ff(), m11.p.rst_alt: tt();
+
+
+
+
+{Timeout generator}
+
+
+{m20: D-FF}
+
+TRANSITION m20.t.clk_edge
+CONSUME p.LCLK_tog: tt(), m20.p.rst_alt: ff(), m20.p.q_alt: ff(), m20.p.n_q: 1;
+PRODUCE m20.p.q: tt(), m20.p.q_alt: tt(), m20.p.rst_alt: ff(), p.n_LCLK_tog: 1;
+
+TRANSITION m20.t.clk_no_edge
+VAR clk, q_alt, rst_alt: BOOLEAN;
+GUARD (neg(clk)) OR (clk AND rst_alt) OR (clk AND neg(rst_alt) AND q_alt)
+CONSUME p.LCLK_tog: clk, m20.p.q_alt: q_alt, m20.p.rst_alt: rst_alt;
+PRODUCE m20.p.q_alt: q_alt, m20.p.rst_alt: rst_alt, p.n_LCLK_tog: 1;
+
+TRANSITION m20.t.hazard_edge
+VAR rst_alt: BOOLEAN;
+CONSUME p.LCLK_tog: tt(), m20.p.rst: tt(), m20.p.q_alt: tt(), m20.p.rst_alt: rst_alt, m20.p.n_q: 1;
+PRODUCE m20.p.q: ff(), m20.p.q_alt: ff(), m20.p.rst_alt: tt(), p.n_LCLK_tog: 1;
+
+TRANSITION m20.t.hazard_no_edge
+VAR rst_alt: BOOLEAN;
+CONSUME p.LCLK_tog: tt(), m20.p.rst: tt(), m20.p.q_alt: ff(), m20.p.rst_alt: rst_alt;
+PRODUCE m20.p.q_alt: ff(), m20.p.rst_alt: tt(), p.n_LCLK_tog: 1;
+
+TRANSITION m20.t.rst_no_edge
+VAR rst, rst_alt, q_alt: BOOLEAN;
+GUARD (neg(rst)) OR (rst AND neg(q_alt))
+CONSUME m20.p.rst: rst, m20.p.rst_alt: rst_alt, m20.p.q_alt: q_alt;
+PRODUCE m20.p.rst_alt: rst, m20.p.q_alt: q_alt;
+
+TRANSITION m20.t.rst_edge
+VAR rst_alt: BOOLEAN;
+CONSUME m20.p.rst: tt(), m20.p.rst_alt: rst_alt, m20.p.q_alt: tt(), m20.p.n_q: 1;
+PRODUCE m20.p.q: ff(), m20.p.q_alt: ff(), m20.p.rst_alt: tt();
+
+
+{m21: D-FF}
+
+TRANSITION m21.t.clk_edge
+CONSUME p.RST_cc_clk: tt(), m21.p.rst_alt: ff(), m21.p.q_alt: ff(), m21.p.n_q: 1;
+PRODUCE m21.p.q: tt(), m21.p.q_alt: tt(), m21.p.rst_alt: ff(), p.n_RST_cc_clk: 1;
+
+TRANSITION m21.t.clk_no_edge
+VAR clk, q_alt, rst_alt: BOOLEAN;
+GUARD (neg(clk)) OR (clk AND rst_alt) OR (clk AND neg(rst_alt) AND q_alt)
+CONSUME p.RST_cc_clk: clk, m21.p.q_alt: q_alt, m21.p.rst_alt: rst_alt;
+PRODUCE m21.p.q_alt: q_alt, m21.p.rst_alt: rst_alt, p.n_RST_cc_clk: 1;
+
+TRANSITION m21.t.hazard_edge
+VAR rst_alt: BOOLEAN;
+CONSUME p.RST_cc_clk: tt(), m21.p.rst: tt(), m21.p.q_alt: tt(), m21.p.rst_alt: rst_alt, 
+	m21.p.n_q: 1;
+PRODUCE m21.p.q: ff(), m21.p.q_alt: ff(), m21.p.rst_alt: tt(), p.n_RST_cc_clk: 1;
+
+TRANSITION m21.t.hazard_no_edge
+VAR rst_alt: BOOLEAN;
+CONSUME p.RST_cc_clk: tt(), m21.p.rst: tt(), m21.p.q_alt: ff(), m21.p.rst_alt: rst_alt;
+PRODUCE m21.p.q_alt: ff(), m21.p.rst_alt: tt(), p.n_RST_cc_clk: 1;
+
+TRANSITION m21.t.rst_no_edge
+VAR rst, rst_alt, q_alt: BOOLEAN;
+GUARD (neg(rst)) OR (rst AND neg(q_alt))
+CONSUME m21.p.rst: rst, m21.p.rst_alt: rst_alt, m21.p.q_alt: q_alt;
+PRODUCE m21.p.rst_alt: rst, m21.p.q_alt: q_alt;
+
+TRANSITION m21.t.rst_edge
+VAR rst_alt: BOOLEAN;
+CONSUME m21.p.rst: tt(), m21.p.rst_alt: rst_alt, m21.p.q_alt: tt(), m21.p.n_q: 1;
+PRODUCE m21.p.q: ff(), m21.p.q_alt: ff(), m21.p.rst_alt: tt();
+
+
+{m22: MUTEX}
+
+TRANSITION m22.t.a_no_edge1
+VAR a, a_alt: BOOLEAN;
+GUARD a = a_alt
+CONSUME m20.p.q: a, m22.p.a_save: a_alt;
+PRODUCE m22.p.a_save: a_alt, m20.p.n_q: 1;
+
+TRANSITION m22.t.a_no_edge2
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD a AND neg(a_alt) AND b_alt
+CONSUME m20.p.q: a, m22.p.a_save: a_alt, m22.p.b_save: b_alt, m22.p.a_n_wait: 1;
+PRODUCE m22.p.a_save: a, m22.p.b_save: b_alt, m22.p.a_wait: 1, m20.p.n_q: 1;
+
+TRANSITION m22.t.a_no_edge3
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD neg(a) AND a_alt AND b_alt
+CONSUME m20.p.q: a, m22.p.a_save: a_alt, m22.p.b_save: b_alt, m22.p.a_wait: 1;
+PRODUCE m22.p.a_save: a, m22.p.b_save: b_alt, m22.p.a_n_wait: 1, m20.p.n_q: 1;
+
+TRANSITION m22.t.a_edge1
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD neg(b_alt) AND (a <> a_alt)
+CONSUME m20.p.q: a, m22.p.a_save: a_alt, m22.p.b_save: b_alt, m23.p.n_clk: 1;
+PRODUCE m20.p.rst: a, m23.p.clk: a, m22.p.a_save: a, m22.p.b_save: b_alt, m20.p.n_q: 1;
+
+TRANSITION m22.t.a_edge2
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD neg(a) AND a_alt AND b_alt
+CONSUME m20.p.q: a, m22.p.a_save: a_alt, m22.p.b_save: b_alt, m22.p.b_wait: 1, m23.p.n_rst: 1, 
+	m25.p.n_a: 1, m23.p.n_clk: 1;
+PRODUCE m20.p.rst: a, m23.p.clk: a, m22.p.a_save: a, m22.p.b_save: b_alt, m21.p.rst: b_alt, 
+	m25.p.a: b_alt, m23.p.rst: b_alt, m22.p.b_n_wait: 1, m20.p.n_q: 1;
+
+TRANSITION m22.t.b_no_edge1
+VAR b, b_alt: BOOLEAN;
+GUARD b = b_alt
+CONSUME m21.p.q: b, m22.p.b_save: b_alt;
+PRODUCE m22.p.b_save: b_alt, m21.p.n_q: 1;
+
+TRANSITION m22.t.b_no_edge2
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD b AND neg(b_alt) AND a_alt
+CONSUME m21.p.q: b, m22.p.b_save: b_alt, m22.p.a_save: a_alt, m22.p.b_n_wait: 1;
+PRODUCE m22.p.b_save: b, m22.p.a_save: a_alt, m22.p.b_wait: 1, m21.p.n_q: 1;
+
+TRANSITION m22.t.b_no_edge3
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD neg(b) AND b_alt AND a_alt
+CONSUME m21.p.q: b, m22.p.b_save: b_alt, m22.p.a_save: a_alt, m22.p.b_wait: 1;
+PRODUCE m22.p.b_save: b, m22.p.a_save: a_alt, m22.p.b_n_wait: 1, m21.p.n_q: 1;
+
+TRANSITION m22.t.b_edge1
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD neg(a_alt) AND (b <> b_alt)
+CONSUME m21.p.q: b, m22.p.b_save: b_alt, m22.p.a_save: a_alt, m23.p.n_rst: 1, m25.p.n_a: 1;
+PRODUCE m21.p.rst: b, m25.p.a: b, m23.p.rst: b, m22.p.b_save: b, m22.p.a_save: a_alt, m21.p.n_q: 1;
+
+TRANSITION m22.t.b_edge2
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD neg(b) AND b_alt AND a_alt
+CONSUME m21.p.q: b, m22.p.b_save: b_alt, m22.p.a_save: a_alt, m22.p.a_wait: 1, m23.p.n_rst: 1, 
+	m25.p.n_a: 1, m23.p.n_clk: 1;
+PRODUCE m21.p.rst: b, m25.p.a: b, m23.p.rst: b, m22.p.b_save: b, m22.p.a_save: a_alt, 
+	m20.p.rst: a_alt, m23.p.clk: a_alt, m22.p.a_n_wait: 1, m21.p.n_q: 1;
+
+
+{m23: Counter}
+
+TRANSITION m23.t.max
+VAR clk: BOOLEAN; n: Anzahl;
+GUARD clk AND (n = 0)						{n=max}
+CONSUME m23.p.clk: clk, m23.p.value: n, m23.p.active: 1, m23.p.n_out: 1;
+PRODUCE m23.p.out: tt(), m23.p.active: 1, m23.p.value: n, m23.p.n_clk: 1;
+
+TRANSITION m23.t.count
+VAR clk: BOOLEAN; n: Anzahl;
+GUARD clk AND (n <> 0)
+CONSUME m23.p.clk: clk, m23.p.value: n, m23.p.active: 1;
+PRODUCE m23.p.active: 1, m23.p.value: inc(n), m23.p.n_clk: 1;
+
+TRANSITION m23.t.not_count1
+VAR clk: BOOLEAN;
+GUARD (NOT clk)
+CONSUME m23.p.clk: clk, m23.p.active: 1;
+PRODUCE m23.p.active: 1, m23.p.n_clk: 1;
+
+TRANSITION m23.t.not_count2
+VAR clk: BOOLEAN;
+GUARD (NOT clk)
+CONSUME m23.p.clk: clk, m23.p.deactive: 1;
+PRODUCE m23.p.deactive: 1, m23.p.n_clk: 1;
+
+TRANSITION m23.t.hazard
+VAR clk, rst: BOOLEAN;
+CONSUME m23.p.clk: clk, m23.p.rst: rst, m23.p.active: 1;
+PRODUCE m23.p.active: 1, m23.p.n_rst: 1, m23.p.n_clk: 1;
+
+TRANSITION m23.t.rst0
+VAR rst: BOOLEAN;
+GUARD (NOT rst)
+CONSUME m23.p.rst: rst, m23.p.deactive: 1;
+PRODUCE m23.p.active: 1, m23.p.n_rst: 1;
+
+TRANSITION m23.t.rst1
+VAR rst: BOOLEAN; n: Anzahl;
+GUARD rst
+CONSUME m23.p.rst: rst, m23.p.active: 1, m23.p.value: n, m23.p.n_out: 1; 
+PRODUCE m23.p.deactive: 1, m23.p.value: reset(n), m23.p.out: ff(), m23.p.n_rst: 1;
+
+
+{m24: D-FF}
+
+TRANSITION m24.t.clk_edge
+CONSUME m23.p.out: tt(), m24.p.rst_alt: ff(), m24.p.q_alt: ff(), m24.p.n_q: 1;
+PRODUCE m24.p.q: tt(), m24.p.q_alt: tt(), m24.p.rst_alt: ff(), m23.p.n_out: 1;
+
+TRANSITION m24.t.clk_no_edge
+VAR clk, q_alt, rst_alt: BOOLEAN;
+GUARD (neg(clk)) OR (clk AND rst_alt) OR (clk AND neg(rst_alt) AND q_alt)
+CONSUME m23.p.out: clk, m24.p.q_alt: q_alt, m24.p.rst_alt: rst_alt;
+PRODUCE m24.p.q_alt: q_alt, m24.p.rst_alt: rst_alt, m23.p.n_out: 1;
+
+TRANSITION m24.t.hazard_edge
+VAR rst_alt: BOOLEAN;
+CONSUME m23.p.out: tt(), m24.p.rst: tt(), m24.p.q_alt: tt(), m24.p.rst_alt: rst_alt, m24.p.n_q: 1;
+PRODUCE m24.p.q: ff(), m24.p.q_alt: ff(), m24.p.rst_alt: tt(), m24.p.n_rst: 1, m23.p.n_out: 1;
+
+TRANSITION m24.t.hazard_no_edge
+VAR rst_alt: BOOLEAN;
+CONSUME m23.p.out: tt(), m24.p.rst: tt(), m24.p.q_alt: ff(), m24.p.rst_alt: rst_alt;
+PRODUCE m24.p.q_alt: ff(), m24.p.rst_alt: tt(), m24.p.n_rst: 1, m23.p.n_out: 1;
+
+TRANSITION m24.t.rst_no_edge
+VAR rst, rst_alt, q_alt: BOOLEAN;
+GUARD (neg(rst)) OR (rst AND neg(q_alt))
+CONSUME m24.p.rst: rst, m24.p.rst_alt: rst_alt, m24.p.q_alt: q_alt;
+PRODUCE m24.p.rst_alt: rst, m24.p.q_alt: q_alt, m24.p.n_rst: 1;
+
+TRANSITION m24.t.rst_edge
+VAR rst_alt: BOOLEAN;
+CONSUME m24.p.rst: tt(), m24.p.rst_alt: rst_alt, m24.p.q_alt: tt(), m24.p.n_q: 1;
+PRODUCE m24.p.q: ff(), m24.p.q_alt: ff(), m24.p.rst_alt: tt(), m24.p.n_rst: 1;
+
+
+{m25: OR-Gatter}
+
+TRANSITION m25.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt) AND (a_alt <> a)
+CONSUME m25.p.a: a, m25.p.a_alt: a_alt,	m25.p.b_alt: b_alt, m24.p.n_rst: 1;
+PRODUCE m24.p.rst: a, m25.p.a_alt: a, m25.p.b_alt: b_alt, m25.p.n_a: 1;
+
+TRANSITION m25.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(neg(b_alt) AND (a_alt <> a))
+CONSUME m25.p.a: a, m25.p.a_alt: a_alt, m25.p.b_alt: b_alt;
+PRODUCE m25.p.a_alt: a, m25.p.b_alt: b_alt, m25.p.n_a: 1;
+
+TRANSITION m25.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME m25.p.a: a, m25.p.a_alt: a_alt,	m25.p.b: b, m25.p.b_alt: b_alt;
+PRODUCE m25.p.a_alt: a, m25.p.b_alt: b, m25.p.n_a: 1;
+
+TRANSITION m25.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt) AND (b_alt <> b)
+CONSUME m25.p.b: b, m25.p.b_alt: b_alt,	m25.p.a_alt: a_alt, m24.p.n_rst: 1;
+PRODUCE m24.p.rst: b, m25.p.b_alt: b, m25.p.a_alt: a_alt;
+
+TRANSITION m25.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(neg(a_alt) AND (b_alt <> b))
+CONSUME m25.p.b: b, m25.p.b_alt: b_alt,	m25.p.a_alt: a_alt;
+PRODUCE m25.p.b_alt: b, m25.p.a_alt: a_alt;
+	
+
+{m26: MUTEX}
+
+TRANSITION m26.t.a_no_edge1
+VAR a, a_alt: BOOLEAN;
+GUARD a = a_alt
+CONSUME p.REQ_A: a, m26.p.a_save: a_alt;
+PRODUCE m26.p.a_save: a_alt;
+
+TRANSITION m26.t.a_no_edge2
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD a AND neg(a_alt) AND b_alt
+CONSUME p.REQ_A: a, m26.p.a_save: a_alt, m26.p.b_save: b_alt, m26.p.a_n_wait: 1;
+PRODUCE m26.p.a_save: a, m26.p.b_save: b_alt, m26.p.a_wait: 1;
+
+TRANSITION m26.t.a_no_edge3
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD neg(a) AND a_alt AND b_alt
+CONSUME p.REQ_A: a, m26.p.a_save: a_alt, m26.p.b_save: b_alt, m26.p.a_wait: 1;
+PRODUCE m26.p.a_save: a, m26.p.b_save: b_alt, m26.p.a_n_wait: 1;
+
+TRANSITION m26.t.a_edge1
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD neg(b_alt) AND (a <> a_alt)
+CONSUME p.REQ_A: a, m26.p.a_save: a_alt, m26.p.b_save: b_alt;
+PRODUCE p.REQ_A1: a, m26.p.a_save: a, m26.p.b_save: b_alt;
+
+TRANSITION m26.t.a_edge2
+VAR a, a_alt, b_alt: BOOLEAN;
+GUARD neg(a) AND a_alt AND b_alt
+CONSUME p.REQ_A: a, m26.p.a_save: a_alt, m26.p.b_save: b_alt, m26.p.b_wait: 1;
+PRODUCE p.REQ_A1: a, m26.p.a_save: a, m26.p.b_save: b_alt, m26.p.b_out: b_alt, m26.p.b_n_wait: 1;
+
+TRANSITION m26.t.b_no_edge1
+VAR b, b_alt: BOOLEAN;
+GUARD b = b_alt
+CONSUME m24.p.q: b, m26.p.b_save: b_alt;
+PRODUCE m26.p.b_save: b_alt, m24.p.n_q: 1;
+
+TRANSITION m26.t.b_no_edge2
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD b AND neg(b_alt) AND a_alt
+CONSUME m24.p.q: b, m26.p.b_save: b_alt, m26.p.a_save: a_alt, m26.p.b_n_wait: 1;
+PRODUCE m26.p.b_save: b, m26.p.a_save: a_alt, m26.p.b_wait: 1, m24.p.n_q: 1;
+
+TRANSITION m26.t.b_no_edge3
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD neg(b) AND b_alt AND a_alt
+CONSUME m24.p.q: b, m26.p.b_save: b_alt, m26.p.a_save: a_alt, m26.p.b_wait: 1;
+PRODUCE m26.p.b_save: b, m26.p.a_save: a_alt, m26.p.b_n_wait: 1, m24.p.n_q: 1;
+
+TRANSITION m26.t.b_edge1
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD neg(a_alt) AND (b <> b_alt)
+CONSUME m24.p.q: b, m26.p.b_save: b_alt, m26.p.a_save: a_alt;
+PRODUCE m26.p.b_out: b, m26.p.b_save: b, m26.p.a_save: a_alt, m24.p.n_q: 1;
+
+TRANSITION m26.t.b_edge2
+VAR b, b_alt, a_alt: BOOLEAN;
+GUARD neg(b) AND b_alt AND a_alt
+CONSUME m24.p.q: b, m26.p.b_save: b_alt, m26.p.a_save: a_alt, m26.p.a_wait: 1;
+PRODUCE m26.p.b_out: b, m26.p.b_save: b, m26.p.a_save: a_alt, p.REQ_A1: a_alt, m26.p.a_n_wait: 1, 	m24.p.n_q: 1;
+
+
+{m27: D-FF}
+
+TRANSITION m27.t.clk_edge
+CONSUME m26.p.b_out: tt(), m27.p.rst_alt: ff(), m27.p.q_alt: ff();
+PRODUCE m25.p.b: tt(), m68.p.ST: tt(), m72.p.a: ff(), p.ST_and: tt(), m27.p.q_alt: tt(), 
+	m27.p.rst_alt: ff();
+
+TRANSITION m27.t.clk_no_edge
+VAR clk, q_alt, rst_alt: BOOLEAN;
+GUARD (neg(clk)) OR (clk AND rst_alt) OR (clk AND neg(rst_alt) AND q_alt)
+CONSUME m26.p.b_out: clk, m27.p.q_alt: q_alt, m27.p.rst_alt: rst_alt;
+PRODUCE m27.p.q_alt: q_alt, m27.p.rst_alt: rst_alt;
+
+TRANSITION m27.t.hazard_edge
+VAR rst_alt: BOOLEAN;
+CONSUME m26.p.b_out: tt(), p.RST_cc_rst: tt(), m27.p.q_alt: tt(), m27.p.rst_alt: rst_alt;
+PRODUCE m25.p.b: ff(), m68.p.ST: ff(), m72.p.a: tt(), p.ST_and: ff(), m27.p.q_alt: ff(), 
+	m27.p.rst_alt: tt(), p.n_RST_cc_rst: 1;
+
+TRANSITION m27.t.hazard_no_edge
+VAR rst_alt: BOOLEAN;
+CONSUME m26.p.b_out: tt(), p.RST_cc_rst: tt(), m27.p.q_alt: ff(), m27.p.rst_alt: rst_alt;
+PRODUCE m27.p.q_alt: ff(), m27.p.rst_alt: tt(), p.n_RST_cc_rst: 1;
+
+TRANSITION m27.t.rst_no_edge
+VAR rst, rst_alt, q_alt: BOOLEAN;
+GUARD (neg(rst)) OR (rst AND neg(q_alt))
+CONSUME p.RST_cc_rst: rst, m27.p.rst_alt: rst_alt, m27.p.q_alt: q_alt;
+PRODUCE m27.p.rst_alt: rst, m27.p.q_alt: q_alt, p.n_RST_cc_rst: 1;
+
+TRANSITION m27.t.rst_edge
+VAR rst_alt: BOOLEAN;
+CONSUME p.RST_cc_rst: tt(), m27.p.rst_alt: rst_alt, m27.p.q_alt: tt();
+PRODUCE m25.p.b: ff(), m68.p.ST: ff(), m72.p.a: tt(), p.ST_and: ff(), m27.p.q_alt: ff(), 
+	m27.p.rst_alt: tt(), p.n_RST_cc_rst: 1;
+
+
+
+{Input-Port}
+
+
+{m61: AND}
+
+TRANSITION m61.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD b_alt AND (a_alt <> a)
+CONSUME p.LCLKM_ip: a, m61.p.a_alt: a_alt, m61.p.b_alt: b_alt;
+PRODUCE m61.p.out: a, m61.p.a_alt: a, m61.p.b_alt: b_alt, p.n_LCLKM_ip: 1;
+
+TRANSITION m61.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt AND (a_alt <> a))
+CONSUME p.LCLKM_ip: a, m61.p.a_alt: a_alt, m61.p.b_alt: b_alt;
+PRODUCE m61.p.a_alt: a, m61.p.b_alt: b_alt, p.n_LCLKM_ip: 1;
+
+TRANSITION m61.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME p.LCLKM_ip: a, m61.p.a_alt: a_alt, m61.p.b: b, m61.p.b_alt: b_alt;
+PRODUCE m61.p.a_alt: a, m61.p.b_alt: b, p.n_LCLKM_ip: 1;
+
+TRANSITION m61.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD a_alt AND (b_alt <> b)
+CONSUME m61.p.b: b, m61.p.b_alt: b_alt, m61.p.a_alt: a_alt;
+PRODUCE m61.p.out: b, m61.p.b_alt: b, m61.p.a_alt: a_alt;
+
+TRANSITION m61.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt AND (b_alt <> b))
+CONSUME m61.p.b: b, m61.p.b_alt: b_alt, m61.p.a_alt: a_alt;
+PRODUCE m61.p.b_alt: b, m61.p.a_alt: a_alt;
+
+
+{m62: D-FF mit D=0 und SET}
+
+TRANSITION m62.t.clk_edge
+CONSUME m61.p.out: tt(), m62.p.set_alt: ff(), m62.p.q_alt: tt(), p.n_DATAV_IN: 1;
+PRODUCE p.DATAV_IN: ff(), m62.p.q_alt: ff(), m62.p.set_alt: ff();
+
+TRANSITION m62.t.clk_no_edge
+VAR clk, q_alt, set_alt: BOOLEAN;
+GUARD (neg(clk)) OR (clk AND set_alt) OR (clk AND neg(set_alt) AND neg(q_alt))
+CONSUME m61.p.out: clk, m62.p.q_alt: q_alt, m62.p.set_alt: set_alt;
+PRODUCE m62.p.q_alt: q_alt, m62.p.set_alt: set_alt;
+
+TRANSITION m62.t.hazard_edge
+VAR set_alt: BOOLEAN;
+CONSUME m61.p.out: tt(), m62.p.set: tt(), m62.p.q_alt: ff(), m62.p.set_alt: set_alt, p.n_DATAV_IN: 1;
+PRODUCE p.DATAV_IN: tt(), m62.p.q_alt: tt(), m62.p.set_alt: tt(), m62.p.n_set: 1;
+
+TRANSITION m62.t.hazard_no_edge
+VAR set_alt: BOOLEAN;
+CONSUME m61.p.out: tt(), m62.p.set: tt(), m62.p.q_alt: tt(), m62.p.set_alt: set_alt;
+PRODUCE m62.p.q_alt: tt(), m62.p.set_alt: tt(), m62.p.n_set: 1;
+
+TRANSITION m62.t.set_no_edge
+VAR set, set_alt, q_alt: BOOLEAN;
+GUARD (neg(set)) OR (set AND q_alt)
+CONSUME m62.p.set: set, m62.p.set_alt: set_alt, m62.p.q_alt: q_alt;
+PRODUCE m62.p.set_alt: set, m62.p.q_alt: q_alt, m62.p.n_set: 1;
+
+TRANSITION m62.t.set_edge
+VAR set_alt: BOOLEAN;
+CONSUME m62.p.set: tt(), m62.p.set_alt: set_alt, m62.p.q_alt: ff(), p.n_DATAV_IN: 1;
+PRODUCE p.DATAV_IN: tt(), m62.p.q_alt: tt(), m62.p.set_alt: tt(), m62.p.n_set: 1;
+
+
+{m64: OR}
+
+TRANSITION m64.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt) AND (a_alt <> a)
+CONSUME m66.p.out: a, m64.p.a_alt: a_alt, m64.p.b_alt: b_alt, p.n_DLE: 1, m62.p.n_set: 1;
+PRODUCE m62.p.set: a, p.DLE: a, m64.p.a_alt: a, m64.p.b_alt: b_alt, m66.p.n_out: 1;
+
+TRANSITION m64.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(neg(b_alt) AND (a_alt <> a))
+CONSUME m66.p.out: a, m64.p.a_alt: a_alt, m64.p.b_alt: b_alt;
+PRODUCE m64.p.a_alt: a, m64.p.b_alt: b_alt, m66.p.n_out: 1;
+
+TRANSITION m64.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME m66.p.out: a, m64.p.a_alt: a_alt, m65.p.out: b, m64.p.b_alt: b_alt;
+PRODUCE m64.p.a_alt: a, m64.p.b_alt: b, m66.p.n_out: 1;
+
+TRANSITION m64.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt) AND (b_alt <> b)
+CONSUME m65.p.out: b, m64.p.b_alt: b_alt, m64.p.a_alt: a_alt, p.n_DLE: 1, m62.p.n_set: 1;
+PRODUCE m62.p.set: b, p.DLE: b, m64.p.b_alt: b, m64.p.a_alt: a_alt;
+
+TRANSITION m64.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(neg(a_alt) AND (b_alt <> b))
+CONSUME m65.p.out: b, m64.p.b_alt: b_alt, m64.p.a_alt: a_alt;
+PRODUCE m64.p.b_alt: b, m64.p.a_alt: a_alt;
+
+
+{m65: AND}
+
+TRANSITION m65.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD b_alt AND (a_alt <> a)
+CONSUME m65.p.a: a, m65.p.a_alt: a_alt, m65.p.b_alt: b_alt;
+PRODUCE m65.p.out: a, m65.p.a_alt: a, m65.p.b_alt: b_alt;
+
+TRANSITION m65.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt AND (a_alt <> a))
+CONSUME m65.p.a: a, m65.p.a_alt: a_alt, m65.p.b_alt: b_alt;
+PRODUCE m65.p.a_alt: a, m65.p.b_alt: b_alt;
+
+TRANSITION m65.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME m65.p.a: a, m65.p.a_alt: a_alt, m65.p.b: b, m65.p.b_alt: b_alt;
+PRODUCE m65.p.a_alt: a, m65.p.b_alt: b, m65.p.n_b: 1;
+
+TRANSITION m65.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD a_alt AND (b_alt <> b)
+CONSUME m65.p.b: b, m65.p.b_alt: b_alt, m65.p.a_alt: a_alt;
+PRODUCE m65.p.out: b, m65.p.b_alt: b, m65.p.a_alt: a_alt, m65.p.n_b: 1;
+
+TRANSITION m65.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt AND (b_alt <> b))
+CONSUME m65.p.b: b, m65.p.b_alt: b_alt, m65.p.a_alt: a_alt;
+PRODUCE m65.p.b_alt: b, m65.p.a_alt: a_alt, m65.p.n_b: 1;
+
+
+{m66: AND}
+
+TRANSITION m66.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD b_alt AND (a_alt <> a)
+CONSUME m66.p.a: a, m66.p.a_alt: a_alt, m66.p.b_alt: b_alt, m66.p.n_out: 1;
+PRODUCE m66.p.out: a, m66.p.a_alt: a, m66.p.b_alt: b_alt;
+
+TRANSITION m66.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt AND (a_alt <> a))
+CONSUME m66.p.a: a, m66.p.a_alt: a_alt, m66.p.b_alt: b_alt;
+PRODUCE m66.p.a_alt: a, m66.p.b_alt: b_alt;
+
+TRANSITION m66.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME m66.p.a: a, m66.p.a_alt: a_alt, m66.p.b: b, m66.p.b_alt: b_alt;
+PRODUCE m66.p.a_alt: a, m66.p.b_alt: b, m66.p.n_b: 1;
+
+TRANSITION m66.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD a_alt AND (b_alt <> b)
+CONSUME m66.p.b: b, m66.p.b_alt: b_alt, m66.p.a_alt: a_alt, m66.p.n_out: 1;
+PRODUCE m66.p.out: b, m66.p.b_alt: b, m66.p.a_alt: a_alt, m66.p.n_b: 1;
+
+TRANSITION m66.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt AND (b_alt <> b))
+CONSUME m66.p.b: b, m66.p.b_alt: b_alt, m66.p.a_alt: a_alt;
+PRODUCE m66.p.b_alt: b, m66.p.a_alt: a_alt, m66.p.n_b: 1;
+
+
+{m68: Input Constroller}
+
+TRANSITION m68.t40
+VAR req_a1 : BOOLEAN;
+GUARD req_a1
+CONSUME m68.p.0: 1, p.REQ_A1: req_a1, p.n_RST_tog: 1, m66.p.n_b: 1, p.n_RST_cc_rst: 1, 	p.n_RST_cc_clk: 1;
+PRODUCE m68.p.1: 1, p.REQ_INT_cc: tt(), p.REQ_INT_op: tt(), p.REQ_INT_or: tt(), p.RST_cc_clk: tt(), 
+	p.RST_cc_rst: tt(), p.RST_tog: tt(), p.ACK_A: tt(), m66.p.b: tt();
+
+TRANSITION m68.t41
+VAR ackc, req_a1: BOOLEAN;
+GUARD ackc AND (NOT req_a1)
+CONSUME m68.p.1: 1, m68.p.ACKC: ackc, p.REQ_A1: req_a1, p.n_RST_tog: 1, m66.p.n_b: 1, 	p.n_RST_cc_rst: 1, p.n_RST_cc_clk: 1;
+PRODUCE m68.p.2: 1, p.REQ_INT_cc: ff(), p.REQ_INT_op: ff(), p.REQ_INT_or: ff(), p.RST_cc_clk: ff(), 
+	p.RST_cc_rst: ff(), p.RST_tog: ff(), p.ACK_A: ff(), m66.p.b: ff();
+
+TRANSITION m68.t42
+VAR ackc, req_a1: BOOLEAN;
+GUARD neg(ackc) AND req_a1
+CONSUME m68.p.2: 1, m68.p.ACKC: ackc, p.REQ_A1: req_a1, p.n_RST_tog: 1, m66.p.n_b: 1, 	p.n_RST_cc_rst: 1, p.n_RST_cc_clk: 1;
+PRODUCE m68.p.1: 1, p.RST_cc_clk: tt(), p.RST_cc_rst: tt(), p.RST_tog: tt(), p.ACK_A: tt(), m66.p.b: tt();
+
+TRANSITION m68.t43
+VAR ackc, st: BOOLEAN;
+GUARD neg(ackc) AND st
+CONSUME m68.p.2: 1, m68.p.ACKC: ackc, m68.p.ST: st;
+PRODUCE m68.p.3: 1;
+
+TRANSITION m68.t44
+VAR stop: BOOLEAN;
+GUARD stop
+CONSUME m68.p.3: 1, p.STOP: stop, p.n_RST_tog: 1, p.n_RST_cc_rst: 1, p.n_RST_cc_clk: 1;
+PRODUCE m68.p.4: 1, p.RST_cc_clk: tt(), p.RST_cc_rst: tt(), p.RST_tog: tt(), p.n_STOP: 1;
+
+TRANSITION m68.t45
+VAR stop, st: BOOLEAN;
+GUARD neg(stop) AND neg(st)
+CONSUME m68.p.4: 1, p.STOP: stop, m68.p.ST: st, p.n_RST_tog: 1, p.n_RST_cc_rst: 1, 
+	p.n_RST_cc_clk: 1;
+PRODUCE m68.p.0: 1, p.RST_cc_clk: ff(), p.RST_cc_rst: ff(), p.RST_tog: ff(), p.n_STOP: 1;
+
+TRANSITION m68.t46
+VAR req_a1: BOOLEAN;
+GUARD req_a1
+CONSUME m68.p.3: 1, p.REQ_A1: req_a1;
+PRODUCE m68.p.5: 1, p.REQI1: tt();
+
+TRANSITION m68.t47
+VAR acki1: BOOLEAN;
+GUARD acki1
+CONSUME m68.p.5: 1, p.ACKI1: acki1;
+PRODUCE m68.p.6: 1, m65.p.a: tt(), m73.p.b: tt(), p.REQI1: ff();
+
+TRANSITION m68.t48
+VAR acki1, ackc: BOOLEAN;
+GUARD neg(acki1) AND ackc
+CONSUME m68.p.6: 1, p.ACKI1: acki1, m68.p.ACKC: ackc;
+PRODUCE m68.p.7: 1;
+
+TRANSITION m68.t49
+VAR ackc: BOOLEAN;
+GUARD neg(ackc)
+CONSUME m68.p.7: 1, m68.p.ACKC: ackc, p.n_RST_tog: 1, m66.p.n_b: 1, p.n_RST_cc_rst: 1, 	p.n_RST_cc_clk: 1;
+PRODUCE m68.p.8: 1, p.ACK_A: tt(), m66.p.b: tt(), p.RST_cc_clk: tt(), p.RST_cc_rst: tt(), 
+	p.RST_tog: tt();
+
+TRANSITION m68.t50
+VAR req_a1, st: BOOLEAN;
+GUARD neg(req_a1) AND neg(st)
+CONSUME m68.p.8: 1, p.REQ_A1: req_a1, m68.p.ST: st, p.n_RST_tog: 1, m66.p.n_b: 1, p.n_RST_cc_rst: 1, 	p.n_RST_cc_clk: 1;
+PRODUCE m68.p.0: 1, p.ACK_A: ff(), m66.p.b: ff(), p.RST_cc_clk: ff(), p.RST_cc_rst: ff(), 
+	p.RST_tog: ff(), m65.p.a: ff(), m73.p.b: ff();
+
+
+{m72: AND}
+
+TRANSITION m72.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD b_alt AND (a_alt <> a)
+CONSUME m72.p.a: a, m72.p.a_alt: a_alt, m72.p.b_alt: b_alt;
+PRODUCE m72.p.out: a, m72.p.a_alt: a, m72.p.b_alt: b_alt;
+
+TRANSITION m72.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt AND (a_alt <> a))
+CONSUME m72.p.a: a, m72.p.a_alt: a_alt, m72.p.b_alt: b_alt;
+PRODUCE m72.p.a_alt: a, m72.p.b_alt: b_alt;
+
+TRANSITION m72.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME m72.p.a: a, m72.p.a_alt: a_alt, m72.p.b: b, m72.p.b_alt: b_alt;
+PRODUCE m72.p.a_alt: a, m72.p.b_alt: b;
+
+TRANSITION m72.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD a_alt AND (b_alt <> b)
+CONSUME m72.p.b: b, m72.p.b_alt: b_alt, m72.p.a_alt: a_alt;
+PRODUCE m72.p.out: b, m72.p.b_alt: b, m72.p.a_alt: a_alt;
+
+TRANSITION m72.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt AND (b_alt <> b))
+CONSUME m72.p.b: b, m72.p.b_alt: b_alt, m72.p.a_alt: a_alt;
+PRODUCE m72.p.b_alt: b, m72.p.a_alt: a_alt;
+
+
+{m73: AND}
+
+TRANSITION m73.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD b_alt AND (a_alt <> a)
+CONSUME m73.p.a: a, m73.p.a_alt: a_alt, m73.p.b_alt: b_alt;
+PRODUCE m73.p.out: a, m73.p.a_alt: a, m73.p.b_alt: b_alt;
+
+TRANSITION m73.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt AND (a_alt <> a))
+CONSUME m73.p.a: a, m73.p.a_alt: a_alt, m73.p.b_alt: b_alt;
+PRODUCE m73.p.a_alt: a, m73.p.b_alt: b_alt;
+
+TRANSITION m73.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME m73.p.a: a, m73.p.a_alt: a_alt, m73.p.b: b, m73.p.b_alt: b_alt;
+PRODUCE m73.p.a_alt: a, m73.p.b_alt: b;
+
+TRANSITION m73.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD a_alt AND (b_alt <> b)
+CONSUME m73.p.b: b, m73.p.b_alt: b_alt, m73.p.a_alt: a_alt;
+PRODUCE m73.p.out: b, m73.p.b_alt: b, m73.p.a_alt: a_alt;
+
+TRANSITION m73.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt AND (b_alt <> b))
+CONSUME m73.p.b: b, m73.p.b_alt: b_alt, m73.p.a_alt: a_alt;
+PRODUCE m73.p.b_alt: b, m73.p.a_alt: a_alt;
+
+
+{m74: OR}
+
+TRANSITION m74.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt) AND (a_alt <> a)
+CONSUME m72.p.out: a, m74.p.a_alt: a_alt, m74.p.b_alt: b_alt, m65.p.n_b: 1;
+PRODUCE m68.p.ACKC: a, m65.p.b: a, m74.p.a_alt: a, m74.p.b_alt: b_alt;
+
+TRANSITION m74.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(neg(b_alt) AND (a_alt <> a))
+CONSUME m72.p.out: a, m74.p.a_alt: a_alt, m74.p.b_alt: b_alt;
+PRODUCE m74.p.a_alt: a, m74.p.b_alt: b_alt;
+
+TRANSITION m74.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME m72.p.out: a, m74.p.a_alt: a_alt, m73.p.out: b, m74.p.b_alt: b_alt;
+PRODUCE m74.p.a_alt: a, m74.p.b_alt: b;
+
+TRANSITION m74.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt) AND (b_alt <> b)
+CONSUME m73.p.out: b, m74.p.b_alt: b_alt, m74.p.a_alt: a_alt, m65.p.n_b: 1;
+PRODUCE m68.p.ACKC: b, m65.p.b: b, m74.p.b_alt: b, m74.p.a_alt: a_alt;
+
+TRANSITION m74.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(neg(a_alt) AND (b_alt <> b))
+CONSUME m73.p.out: b, m74.p.b_alt: b_alt, m74.p.a_alt: a_alt;
+PRODUCE m74.p.b_alt: b, m74.p.a_alt: a_alt;
+
+
+
+{Output-Port}
+
+
+{m81: D-FF mit D beliebig und RST}
+
+TRANSITION m81.t.read_d
+VAR d, d_pegel: BOOLEAN;
+CONSUME m81.p.d: d, m81.p.d_pegel: d_pegel;
+PRODUCE m81.p.d_pegel: d;
+
+TRANSITION m81.t.clk_edge
+VAR d_pegel, q_pegel: BOOLEAN;
+GUARD d_pegel <> q_pegel
+CONSUME m81.p.clk: tt(), m81.p.rst_pegel: ff(),
+        m81.p.d_pegel: d_pegel, m81.p.q_pegel: q_pegel, m84.p.n_donv: 1;
+PRODUCE m84.p.donv: d_pegel, m81.p.d_pegel: d_pegel, m81.p.q_pegel: d_pegel,
+        m81.p.rst_pegel: ff();
+
+TRANSITION m81.t.clk_no_edge
+VAR clk, d_pegel, q_pegel, rst_pegel: BOOLEAN;
+GUARD (neg(clk)) OR (clk AND rst_pegel) OR (clk AND (d_pegel = q_pegel))
+CONSUME m81.p.clk: clk, m81.p.d_pegel: d_pegel, m81.p.q_pegel: q_pegel,
+        m81.p.rst_pegel: rst_pegel;
+PRODUCE m81.p.d_pegel: d_pegel, m81.p.q_pegel: q_pegel, m81.p.rst_pegel: rst_pegel;
+
+TRANSITION m81.t.hazard_edge
+VAR rst_pegel: BOOLEAN;
+CONSUME m81.p.clk: tt(), m81.p.rst: tt(), m81.p.q_pegel: tt(), 
+	m81.p.rst_pegel: rst_pegel, m84.p.n_donv: 1;
+PRODUCE m84.p.donv: ff(), m81.p.q_pegel: ff(), m81.p.rst_pegel: tt(), m81.p.n_rst: 1;
+
+TRANSITION m81.t.hazard_no_edge
+VAR rst_pegel: BOOLEAN;
+CONSUME m81.p.clk: tt(), m81.p.rst: tt(), m81.p.q_pegel: ff(), m81.p.rst_pegel: rst_pegel;
+PRODUCE m81.p.q_pegel: ff(), m81.p.rst_pegel: tt(), m81.p.n_rst: 1;
+
+TRANSITION m81.t.rst_no_edge
+VAR rst, rst_pegel, q_pegel: BOOLEAN;
+GUARD (neg(rst)) OR (rst AND neg(q_pegel))
+CONSUME m81.p.rst: rst, m81.p.rst_pegel: rst_pegel, m81.p.q_pegel: q_pegel;
+PRODUCE m81.p.rst_pegel: rst, m81.p.q_pegel: q_pegel, m81.p.n_rst: 1;
+
+TRANSITION m81.t.rst_edge
+VAR rst_pegel: BOOLEAN;
+CONSUME m81.p.rst: tt(), m81.p.rst_pegel: rst_pegel, 
+	m81.p.q_pegel: tt(), m84.p.n_donv: 1;
+PRODUCE m84.p.donv: ff(), m81.p.q_pegel: ff(), m81.p.rst_pegel: tt(), m81.p.n_rst: 1;
+
+
+{m82: D-FF mit D beliebig und RST}
+
+TRANSITION m82.t.read_d
+VAR d, d_pegel: BOOLEAN;
+CONSUME m82.p.d: d, m82.p.d_pegel: d_pegel;
+PRODUCE m82.p.d_pegel: d;
+
+TRANSITION m82.t.clk_edge
+VAR d_pegel, q_pegel: BOOLEAN;
+GUARD d_pegel <> q_pegel
+CONSUME m82.p.clk: tt(), m82.p.rst_pegel: ff(),
+        m82.p.d_pegel: d_pegel, m82.p.q_pegel: q_pegel,
+	m84.p.n_dov: 1;
+PRODUCE m84.p.dov: d_pegel, m82.p.d_pegel: d_pegel, m82.p.q_pegel: d_pegel,
+        m82.p.rst_pegel: ff();
+
+TRANSITION m82.t.clk_no_edge
+VAR clk, d_pegel, q_pegel, rst_pegel: BOOLEAN;
+GUARD (neg(clk)) OR (clk AND rst_pegel) OR (clk AND (d_pegel = q_pegel))
+CONSUME m82.p.clk: clk, m82.p.d_pegel: d_pegel, m82.p.q_pegel: q_pegel,
+        m82.p.rst_pegel: rst_pegel;
+PRODUCE m82.p.d_pegel: d_pegel, m82.p.q_pegel: q_pegel, m82.p.rst_pegel: rst_pegel;
+
+TRANSITION m82.t.hazard_edge
+VAR rst_pegel: BOOLEAN;
+CONSUME m82.p.clk: tt(), m82.p.rst: tt(), m82.p.q_pegel: tt(), 
+	m82.p.rst_pegel: rst_pegel, m84.p.n_dov: 1;
+PRODUCE m84.p.dov: ff(), m82.p.q_pegel: ff(), m82.p.rst_pegel: tt(), m82.p.n_rst: 1;
+
+TRANSITION m82.t.hazard_no_edge
+VAR rst_pegel: BOOLEAN;
+CONSUME m82.p.clk: tt(), m82.p.rst: tt(), m82.p.q_pegel: ff(), m82.p.rst_pegel: rst_pegel;
+PRODUCE m82.p.q_pegel: ff(), m82.p.rst_pegel: tt(), m82.p.n_rst: 1;
+
+TRANSITION m82.t.rst_no_edge
+VAR rst, rst_pegel, q_pegel: BOOLEAN;
+GUARD (neg(rst)) OR (rst AND neg(q_pegel))
+CONSUME m82.p.rst: rst, m82.p.rst_pegel: rst_pegel, m82.p.q_pegel: q_pegel;
+PRODUCE m82.p.rst_pegel: rst, m82.p.q_pegel: q_pegel, m82.p.n_rst: 1;
+
+TRANSITION m82.t.rst_edge
+VAR rst_pegel: BOOLEAN;
+CONSUME m82.p.rst: tt(), m82.p.rst_pegel: rst_pegel, 
+	m82.p.q_pegel: tt(), m84.p.n_dov: 1;
+PRODUCE m84.p.dov: ff(), m82.p.q_pegel: ff(), m82.p.rst_pegel: tt(), m82.p.n_rst: 1;
+
+
+{m83: OR}
+
+TRANSITION m83.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt) AND (a_alt <> a)
+CONSUME p.LCLKM_op: a, m83.p.a_alt: a_alt, m83.p.b_alt: b_alt, m82.p.n_rst: 1, m81.p.n_rst: 1;
+PRODUCE m82.p.rst: neg(a), m81.p.rst: neg(a), m84.p.clk: a, 
+	m83.p.a_alt: a, m83.p.b_alt: b_alt;
+
+TRANSITION m83.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(neg(b_alt) AND (a_alt <> a))
+CONSUME p.LCLKM_op: a, m83.p.a_alt: a_alt, m83.p.b_alt: b_alt;
+PRODUCE m83.p.a_alt: a, m83.p.b_alt: b_alt;
+
+TRANSITION m83.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME p.LCLKM_op: a, m83.p.a_alt: a_alt, p.REQ_INT_op: b, m83.p.b_alt: b_alt;
+PRODUCE m83.p.a_alt: a, m83.p.b_alt: b;
+
+TRANSITION m83.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt) AND (b_alt <> b)
+CONSUME p.REQ_INT_op: b, m83.p.b_alt: b_alt, m83.p.a_alt: a_alt, m82.p.n_rst: 1, m81.p.n_rst: 1;
+PRODUCE m82.p.rst: neg(b), m81.p.rst: neg(b), m84.p.clk: b, 
+	m83.p.b_alt: b, m83.p.a_alt: a_alt;
+
+TRANSITION m83.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(neg(a_alt) AND (b_alt <> b))
+CONSUME p.REQ_INT_op: b, m83.p.b_alt: b_alt, m83.p.a_alt: a_alt;
+PRODUCE m83.p.b_alt: b, m83.p.a_alt: a_alt;
+
+
+
+{m84: Output Controller}
+
+TRANSITION m84.t.01
+CONSUME m84.p.0: 1, m84.p.clk: tt(), m84.p.dov: tt();
+PRODUCE m84.p.1: 1, p.REQ_B: tt(), m85.p.a: tt(), m86.p.set: tt(), 
+	m72.p.b: tt(), m73.p.a: tt(), m84.p.n_dov: 1;
+
+TRANSITION m84.t.03
+CONSUME m84.p.0: 1, m84.p.clk: tt(), m84.p.donv: tt();
+PRODUCE m84.p.3: 1, m72.p.b: tt(), m73.p.a: tt(), m84.p.n_donv: 1;
+
+TRANSITION m84.t.12
+CONSUME m84.p.1: 1, m84.p.ACK_B: tt(), m84.p.clk: ff(), m84.p.dov: ff();
+PRODUCE m84.p.2: 1, p.REQ_B: ff(), m85.p.a: ff(), m86.p.set: ff(), 
+	m72.p.b: ff(), m73.p.a: ff(), m84.p.n_dov: 1, m84.p.n_ACK_B: 1;
+
+TRANSITION m84.t.21
+CONSUME m84.p.2: 1, m84.p.ACK_B: ff(), m84.p.clk: tt(), m84.p.dov: tt();
+PRODUCE m84.p.1: 1, p.REQ_B: tt(), m85.p.a: tt(), m86.p.set: tt(), 
+	m72.p.b: tt(), m73.p.a: tt(), m84.p.n_dov: 1, m84.p.n_ACK_B: 1;
+
+TRANSITION m84.t.23
+CONSUME m84.p.2: 1, m84.p.clk: tt(), m84.p.ACK_B: ff(), m84.p.donv: tt();
+PRODUCE m84.p.3: 1, m72.p.b: tt(), m73.p.a: tt(), m84.p.n_donv: 1, m84.p.n_ACK_B: 1;
+
+TRANSITION m84.t.30
+CONSUME m84.p.3: 1, m84.p.clk: ff(), m84.p.donv: ff();
+PRODUCE m84.p.0: 1, m72.p.b: ff(), m73.p.a: ff(), m84.p.n_donv: 1;
+
+
+{m85: OR}
+
+TRANSITION m85.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt) AND (a_alt <> a)
+CONSUME m85.p.a: a, m85.p.a_alt: a_alt, m85.p.b_alt: b_alt, m86.p.n_clk: 1;
+PRODUCE m86.p.clk: neg(a), m85.p.a_alt: a, m85.p.b_alt: b_alt;
+
+TRANSITION m85.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(neg(b_alt) AND (a_alt <> a))
+CONSUME m85.p.a: a, m85.p.a_alt: a_alt, m85.p.b_alt: b_alt;
+PRODUCE m85.p.a_alt: a, m85.p.b_alt: b_alt;
+
+TRANSITION m85.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME m85.p.a: a, m85.p.a_alt: a_alt, m85.p.b: b, m85.p.b_alt: b_alt;
+PRODUCE m85.p.a_alt: a, m85.p.b_alt: b, m85.p.n_b: 1;
+
+TRANSITION m85.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt) AND (b_alt <> b)
+CONSUME m85.p.b: b, m85.p.b_alt: b_alt, m85.p.a_alt: a_alt, m86.p.n_clk: 1;
+PRODUCE m86.p.clk: neg(b), m85.p.b_alt: b, m85.p.a_alt: a_alt, m85.p.n_b: 1;
+
+TRANSITION m85.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(neg(a_alt) AND (b_alt <> b))
+CONSUME m85.p.b: b, m85.p.b_alt: b_alt, m85.p.a_alt: a_alt;
+PRODUCE m85.p.b_alt: b, m85.p.a_alt: a_alt, m85.p.n_b: 1;
+
+
+{m86: D-FF mit D=0 und SET}
+
+TRANSITION m86.t.clk_edge
+CONSUME m86.p.clk: tt(), m86.p.set_alt: ff(), m86.p.q_alt: tt(), p.n_STRETCH: 1;
+PRODUCE p.STRETCH: ff(), m86.p.q_alt: ff(), m86.p.set_alt: ff(), m86.p.n_clk: 1;
+
+TRANSITION m86.t.clk_no_edge
+VAR clk, q_alt, set_alt: BOOLEAN;
+GUARD (neg(clk)) OR (clk AND set_alt) OR (clk AND neg(set_alt) AND neg(q_alt))
+CONSUME m86.p.clk: clk, m86.p.q_alt: q_alt, m86.p.set_alt: set_alt;
+PRODUCE m86.p.q_alt: q_alt, m86.p.set_alt: set_alt, m86.p.n_clk: 1;
+
+TRANSITION m86.t.hazard_edge
+VAR set_alt: BOOLEAN;
+CONSUME m86.p.clk: tt(), m86.p.set: tt(), m86.p.q_alt: ff(), 
+	m86.p.set_alt: set_alt, p.n_STRETCH: 1;
+PRODUCE p.STRETCH: tt(), m86.p.q_alt: tt(), m86.p.set_alt: tt(), m86.p.n_clk: 1;
+
+TRANSITION m86.t.hazard_no_edge
+VAR set_alt: BOOLEAN;
+CONSUME m86.p.clk: tt(), m86.p.set: tt(), m86.p.q_alt: tt(), m86.p.set_alt: set_alt;
+PRODUCE m86.p.q_alt: tt(), m86.p.set_alt: tt(), m86.p.n_clk: 1;
+
+TRANSITION m86.t.set_no_edge
+VAR set, set_alt, q_alt: BOOLEAN;
+GUARD (neg(set)) OR (set AND q_alt)
+CONSUME m86.p.set: set, m86.p.set_alt: set_alt, m86.p.q_alt: q_alt;
+PRODUCE m86.p.set_alt: set, m86.p.q_alt: q_alt;
+
+TRANSITION m86.t.set_edge
+VAR set_alt: BOOLEAN;
+CONSUME m86.p.set: tt(), m86.p.set_alt: set_alt, 
+	m86.p.q_alt: ff(), p.n_STRETCH: 1;
+PRODUCE p.STRETCH: tt(), m86.p.q_alt: tt(), m86.p.set_alt: tt();
+
+
+
+{Wrapper}
+
+
+{m90: AND}
+
+TRANSITION m90.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD b_alt AND (a_alt <> a)
+CONSUME p.ST_and: a, m90.p.a_alt: a_alt, m90.p.b_alt: b_alt, p.n_LCLKM_cc: 1, p.n_LCLKM_ip: 1;
+PRODUCE p.LCLKM_ip: a, p.LCLKM_cc: neg(a), p.LCLKM_op: a, 
+	p.LCLKM_or: a, m90.p.a_alt: a, m90.p.b_alt: b_alt;
+
+TRANSITION m90.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt AND (a_alt <> a))
+CONSUME p.ST_and: a, m90.p.a_alt: a_alt, m90.p.b_alt: b_alt;
+PRODUCE m90.p.a_alt: a, m90.p.b_alt: b_alt;
+
+TRANSITION m90.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME p.ST_and: a, m90.p.a_alt: a_alt, p.LCLK_and: b, m90.p.b_alt: b_alt;
+PRODUCE m90.p.a_alt: a, m90.p.b_alt: b, p.n_LCLK_and: 1;
+
+TRANSITION m90.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD a_alt AND (b_alt <> b)
+CONSUME p.LCLK_and: b, m90.p.b_alt: b_alt, m90.p.a_alt: a_alt, p.n_LCLKM_cc: 1, p.n_LCLKM_ip: 1;
+PRODUCE p.LCLKM_ip: b, p.LCLKM_cc: neg(b), p.LCLKM_op: b, p.LCLKM_or: b, m90.p.b_alt: b, 
+	m90.p.a_alt: a_alt, p.n_LCLK_and: 1;
+
+TRANSITION m90.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt AND (b_alt <> b))
+CONSUME p.LCLK_and: b, m90.p.b_alt: b_alt, m90.p.a_alt: a_alt;
+PRODUCE m90.p.b_alt: b, m90.p.a_alt: a_alt, p.n_LCLK_and: 1;
+
+
+{m91: OR}
+
+TRANSITION m91.t.a_alone_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(b_alt) AND (a_alt <> a)
+CONSUME p.REQ_INT_or: a, m91.p.a_alt: a_alt, m91.p.b_alt: b_alt, p.n_CLOCK: 1;
+PRODUCE m61.p.b: a, m66.p.a: a, m81.p.clk: a, m82.p.clk: a, p.CLOCK: a, 
+	m91.p.a_alt: a, m91.p.b_alt: b_alt;
+
+TRANSITION m91.t.a_alone_no_edge
+VAR a, a_alt, b_alt : BOOLEAN;
+GUARD neg(neg(b_alt) AND (a_alt <> a))
+CONSUME p.REQ_INT_or: a, m91.p.a_alt: a_alt, m91.p.b_alt: b_alt;
+PRODUCE m91.p.a_alt: a, m91.p.b_alt: b_alt;
+
+TRANSITION m91.t.hazard
+VAR a, b, a_alt, b_alt : BOOLEAN;
+GUARD (neg(a_alt) AND     a  AND     b_alt  AND neg(b)) OR
+      (    a_alt  AND neg(a) AND neg(b_alt) AND     b )
+CONSUME p.REQ_INT_or: a, m91.p.a_alt: a_alt,	p.LCLKM_or: b, m91.p.b_alt: b_alt;
+PRODUCE m91.p.a_alt: a, m91.p.b_alt: b;
+
+TRANSITION m91.t.b_alone_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(a_alt) AND (b_alt <> b)
+CONSUME p.LCLKM_or: b, m91.p.b_alt: b_alt, m91.p.a_alt: a_alt, p.n_CLOCK: 1;
+PRODUCE m61.p.b: b, m66.p.a: b, m81.p.clk: b, m82.p.clk: b, p.CLOCK: b, 
+	m91.p.b_alt: b, m91.p.a_alt: a_alt;
+
+TRANSITION m91.t.b_alone_no_edge
+VAR b, b_alt, a_alt : BOOLEAN;
+GUARD neg(neg(a_alt) AND (b_alt <> b))
+CONSUME p.LCLKM_or: b, m91.p.b_alt: b_alt, m91.p.a_alt: a_alt;
+PRODUCE m91.p.b_alt: b, m91.p.a_alt: a_alt;
+
+
+{Anbindung an synchrone Komponente}
+
+TRANSITION t95
+VAR ack: BOOLEAN;
+GUARD (NOT ack)
+CONSUME p.help_reqa: 1, p.ACK_A: ack;
+PRODUCE p.REQ_A: neg(ack);
+
+TRANSITION t95_1
+VAR ack: BOOLEAN;
+GUARD ack
+CONSUME p.help_n_reqa: 1, p.ACK_A: ack;
+PRODUCE p.REQ_A: neg(ack);
+
+
+TRANSITION t96
+VAR req: BOOLEAN;
+GUARD (NOT req)
+CONSUME p.help_n_ackb: 1, p.REQ_B: req, m84.p.n_ACK_B: 1, m85.p.n_b: 1;
+PRODUCE m84.p.ACK_B: req, m85.p.b: req;
+
+TRANSITION t96_1
+VAR req: BOOLEAN;
+GUARD req
+CONSUME p.help_ackb: 1, p.REQ_B: req, m84.p.n_ACK_B: 1, m85.p.n_b: 1;
+PRODUCE m84.p.ACK_B: req, m85.p.b: req;
+
+
+TRANSITION t97
+VAR clk, d: BOOLEAN;
+GUARD d = clk
+CONSUME p.DATAV_IN: d, p.CLOCK: clk;
+PRODUCE m81.p.d: neg(d), m82.p.d: d, p.n_CLOCK: 1;
+
+
+TRANSITION t98
+VAR a: BOOLEAN;
+CONSUME p.DLE: a;
+PRODUCE p.n_DLE: 1;
+

@@ -1,0 +1,11 @@
+FORMULA 
+op.m4.p.2 > 0 AND
+p.REQ_B.FALSE > 0 AND
+op.m5.p.a.FALSE > 0 AND
+op.m6.p.set.FALSE > 0 AND
+ip.m66.p.a.FALSE > 0 AND
+ip.m67.p.b.FALSE > 0 AND
+op.m4.p.n_clk > 0 AND
+op.m4.p.n_dov > 0 AND
+op.m4.p.n_ack_b > 0
+

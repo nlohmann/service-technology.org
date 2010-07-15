@@ -1,0 +1,781 @@
+place "i" init 1;
+place "o";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:InputCondition";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_and (7c50)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_and (7c50)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_xor (7c7j)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_xor (7c7j)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_and (7c97)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_and (7c97)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_xor (7ccd)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_xor (7ccd)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_and (7cdb)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_and (7cdb)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_xor (7cdp)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_xor (7cdp)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7ce3)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7ce3)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_and (7c2a)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_and (7c2a)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7cau)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7cau)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_and (7cdw)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_and (7cdw)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c7u)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c7u)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c67)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c67)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_Transport (7c88)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_Transport (7c88)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c3b)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c3b)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c2j)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c2j)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_or (7c57)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_or (7c57)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_and (7c9m)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_and (7c9m)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:OutputCondition";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c50)*and (7c50)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7c7j)*xor (7c7j)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c97)*and (7c97)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7ccd)*xor (7ccd)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7cdb)*and (7cdb)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7cdp)*xor (7cdp)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c50)*xor (7cdp)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp)*Sales order (7cd4)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Sales order (7cd4)*xor (7ce3)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3)*Join_Yes_xor (7ce3)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3)*and (7c2a)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3)*Risk/ Credit Management (7c3p)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3)*xor (7c5w)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c2a)*Join_Yes_and (7c2a)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c2a)*xor (7c2w)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2w)*Shipping (7ca5)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Shipping (7ca5)*and (7cac)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac)*xor (7cau)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac)*Billing (7cba)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac)*xor (7ccd)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau)*Join_Yes_xor (7cau)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau)*xor (7cdi)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdi)*Warehouse management (7c4t)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Warehouse management (7c4t)*and (7cdw)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdw)*Join_Yes_and (7cdw)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7j)*Customer Outline Agreement (7c8m)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Customer Outline Agreement (7c8m)*xor (7c7u)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u)*Join_Yes_xor (7c7u)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u)*and (7c50)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u)*and (7c9m)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c97)*Backorder Processing (7c90)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Backorder Processing (7c90)*xor (7c67)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c67)*Join_Yes_xor (7c67)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ccd)*Transport (7c88)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Transport (7c88)*Join_Yes_Transport (7c88)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdb)*xor (7cdp)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Risk/ Credit Management (7c3p)*xor (7c3b)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c3b)*Join_Yes_xor (7c3b)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c5w)*Costing (7c5p)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Costing (7c5p)*xor (7c2j)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2j)*Join_Yes_xor (7c2j)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Billing (7cba)*or (7c57)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:or (7c57)*Join_Yes_or (7c57)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m)*Join_Yes_and (7c9m)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m)*xor (7c2w)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m)*and (7cdb)";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split:busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c50):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c50):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7c7j):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7c7j):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c97):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c97):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7ccd):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7ccd):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7cdb):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7cdb):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7cdp):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7cdp):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Skip:busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c50):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Sales order (7cd4):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c2a):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2w):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Shipping (7ca5):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdi):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Warehouse management (7c4t):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdw):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7j):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Customer Outline Agreement (7c8m):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c97):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Backorder Processing (7c90):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c67):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ccd):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Transport (7c88):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdb):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Risk/ Credit Management (7c3p):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c3b):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c5w):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Costing (7c5p):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2j):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Billing (7cba):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:or (7c57):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7ce3):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7ce3):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c2a):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c2a):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7cau):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7cau):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7cdw):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7cdw):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c7u):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c7u):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c67):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c67):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_Transport (7c88):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_Transport (7c88):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c3b):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c3b):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c2j):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c2j):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_or (7c57):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_or (7c57):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c9m):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c9m):busy";
+place "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Output:busy";
+trans "*:Model.7c1w--0-----u--:Model.7c1w--0-----u--:start"~"*:Model.7c1w--0-----u--:Model.7c1w--0-----u--:start"
+    in "i"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:InputCondition"
+;
+trans "*:Model.7c1w--0-----u--:Model.7c1w--0-----u--:end"~"*:Model.7c1w--0-----u--:Model.7c1w--0-----u--:end"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:OutputCondition"
+   out "o"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split:join:InputCondition"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split:join:InputCondition"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:InputCondition"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split:busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split:split:Split_Split_and (7c50):Split_Split_xor (7c7j):Split_Split_and (7c97):Split_Split_xor (7ccd):Split_Split_and (7cdb):Split_Split_xor (7cdp)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split:split:Split_Split_and (7c50):Split_Split_xor (7c7j):Split_Split_and (7c97):Split_Split_xor (7ccd):Split_Split_and (7cdb):Split_Split_xor (7cdp)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split:busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_and (7c50)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_xor (7c7j)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_and (7c97)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_xor (7ccd)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_and (7cdb)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_xor (7cdp)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c50):join:Split_Split_and (7c50)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c50):join:Split_Split_and (7c50)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_and (7c50)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c50):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c50):split:Split_Join_and (7c50)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c50):split:Split_Join_and (7c50)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c50):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_and (7c50)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c50):join:Split_Split_and (7c50)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c50):join:Split_Split_and (7c50)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_and (7c50)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c50):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c50):split:Split_Join_and (7c50):Split_Yes_and (7c50)*and (7c50)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c50):split:Split_Join_and (7c50):Split_Yes_and (7c50)*and (7c50)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c50):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_and (7c50)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c50)*and (7c50)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7c7j):join:Split_Split_xor (7c7j)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7c7j):join:Split_Split_xor (7c7j)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_xor (7c7j)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7c7j):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7c7j):split:Split_Join_xor (7c7j)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7c7j):split:Split_Join_xor (7c7j)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7c7j):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_xor (7c7j)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7c7j):join:Split_Split_xor (7c7j)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7c7j):join:Split_Split_xor (7c7j)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_xor (7c7j)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7c7j):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7c7j):split:Split_Join_xor (7c7j):Split_Yes_xor (7c7j)*xor (7c7j)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7c7j):split:Split_Join_xor (7c7j):Split_Yes_xor (7c7j)*xor (7c7j)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7c7j):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_xor (7c7j)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7c7j)*xor (7c7j)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c97):join:Split_Split_and (7c97)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c97):join:Split_Split_and (7c97)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_and (7c97)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c97):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c97):split:Split_Join_and (7c97)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c97):split:Split_Join_and (7c97)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7c97):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_and (7c97)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c97):join:Split_Split_and (7c97)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c97):join:Split_Split_and (7c97)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_and (7c97)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c97):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c97):split:Split_Join_and (7c97):Split_Yes_and (7c97)*and (7c97)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c97):split:Split_Join_and (7c97):Split_Yes_and (7c97)*and (7c97)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c97):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_and (7c97)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c97)*and (7c97)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7ccd):join:Split_Split_xor (7ccd)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7ccd):join:Split_Split_xor (7ccd)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_xor (7ccd)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7ccd):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7ccd):split:Split_Join_xor (7ccd)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7ccd):split:Split_Join_xor (7ccd)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7ccd):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_xor (7ccd)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7ccd):join:Split_Split_xor (7ccd)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7ccd):join:Split_Split_xor (7ccd)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_xor (7ccd)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7ccd):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7ccd):split:Split_Join_xor (7ccd):Split_Yes_xor (7ccd)*xor (7ccd)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7ccd):split:Split_Join_xor (7ccd):Split_Yes_xor (7ccd)*xor (7ccd)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7ccd):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_xor (7ccd)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7ccd)*xor (7ccd)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7cdb):join:Split_Split_and (7cdb)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7cdb):join:Split_Split_and (7cdb)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_and (7cdb)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7cdb):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7cdb):split:Split_Join_and (7cdb)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7cdb):split:Split_Join_and (7cdb)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_and (7cdb):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_and (7cdb)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7cdb):join:Split_Split_and (7cdb)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7cdb):join:Split_Split_and (7cdb)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_and (7cdb)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7cdb):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7cdb):split:Split_Join_and (7cdb):Split_Yes_and (7cdb)*and (7cdb)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7cdb):split:Split_Join_and (7cdb):Split_Yes_and (7cdb)*and (7cdb)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7cdb):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_and (7cdb)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7cdb)*and (7cdb)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7cdp):join:Split_Split_xor (7cdp)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7cdp):join:Split_Split_xor (7cdp)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_xor (7cdp)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7cdp):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7cdp):split:Split_Join_xor (7cdp)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7cdp):split:Split_Join_xor (7cdp)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_No_xor (7cdp):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_xor (7cdp)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7cdp):join:Split_Split_xor (7cdp)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7cdp):join:Split_Split_xor (7cdp)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Split_xor (7cdp)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7cdp):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7cdp):split:Split_Join_xor (7cdp):Split_Yes_xor (7cdp)*xor (7cdp)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7cdp):split:Split_Join_xor (7cdp):Split_Yes_xor (7cdp)*xor (7cdp)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7cdp):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_xor (7cdp)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7cdp)*xor (7cdp)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Skip:join:Split_Join_and (7c50):Split_Join_xor (7c7j):Split_Join_and (7c97):Split_Join_xor (7ccd):Split_Join_and (7cdb):Split_Join_xor (7cdp)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Skip:join:Split_Join_and (7c50):Split_Join_xor (7c7j):Split_Join_and (7c97):Split_Join_xor (7ccd):Split_Join_and (7cdb):Split_Join_xor (7cdp)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_and (7c50)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_xor (7c7j)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_and (7c97)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_xor (7ccd)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_and (7cdb)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Join_xor (7cdp)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Skip:busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Skip:split:Join_Split_xor (7ce3):Join_Split_and (7c2a):Join_Split_xor (7cau):Join_Split_and (7cdw):Join_Split_xor (7c7u):Join_Split_xor (7c67):Join_Split_Transport (7c88):Join_Split_xor (7c3b):Join_Split_xor (7c2j):Join_Split_or (7c57):Join_Split_and (7c9m)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Skip:split:Join_Split_xor (7ce3):Join_Split_and (7c2a):Join_Split_xor (7cau):Join_Split_and (7cdw):Join_Split_xor (7c7u):Join_Split_xor (7c67):Join_Split_Transport (7c88):Join_Split_xor (7c3b):Join_Split_xor (7c2j):Join_Split_or (7c57):Join_Split_and (7c9m)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Skip:busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7ce3)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_and (7c2a)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7cau)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_and (7cdw)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c7u)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c67)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_Transport (7c88)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c3b)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c2j)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_or (7c57)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_and (7c9m)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c50):join:Split_Yes_and (7c50)*and (7c50):xor (7c7u)*and (7c50)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c50):join:Split_Yes_and (7c50)*and (7c50):xor (7c7u)*and (7c50)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c50)*and (7c50)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u)*and (7c50)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c50):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c50):split:and (7c50)*xor (7cdp)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c50):split:and (7c50)*xor (7cdp)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c50):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c50)*xor (7cdp)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp):join:Split_Yes_xor (7cdp)*xor (7cdp)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp):join:Split_Yes_xor (7cdp)*xor (7cdp)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7cdp)*xor (7cdp)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp):join:and (7c50)*xor (7cdp)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp):join:and (7c50)*xor (7cdp)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c50)*xor (7cdp)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp):join:and (7cdb)*xor (7cdp)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp):join:and (7cdb)*xor (7cdp)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdb)*xor (7cdp)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp):split:xor (7cdp)*Sales order (7cd4)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp):split:xor (7cdp)*Sales order (7cd4)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp)*Sales order (7cd4)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Sales order (7cd4):join:xor (7cdp)*Sales order (7cd4)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Sales order (7cd4):join:xor (7cdp)*Sales order (7cd4)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdp)*Sales order (7cd4)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Sales order (7cd4):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Sales order (7cd4):split:Sales order (7cd4)*xor (7ce3)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Sales order (7cd4):split:Sales order (7cd4)*xor (7ce3)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Sales order (7cd4):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Sales order (7cd4)*xor (7ce3)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):join:Sales order (7cd4)*xor (7ce3)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):join:Sales order (7cd4)*xor (7ce3)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Sales order (7cd4)*xor (7ce3)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):split:xor (7ce3)*Join_Yes_xor (7ce3)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):split:xor (7ce3)*Join_Yes_xor (7ce3)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3)*Join_Yes_xor (7ce3)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):split:xor (7ce3)*and (7c2a)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):split:xor (7ce3)*and (7c2a)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3)*and (7c2a)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):split:xor (7ce3)*Risk/ Credit Management (7c3p)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):split:xor (7ce3)*Risk/ Credit Management (7c3p)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3)*Risk/ Credit Management (7c3p)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):split:xor (7ce3)*xor (7c5w)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):split:xor (7ce3)*xor (7c5w)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3)*xor (7c5w)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c2a):join:xor (7ce3)*and (7c2a)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c2a):join:xor (7ce3)*and (7c2a)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3)*and (7c2a)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c2a):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c2a):split:and (7c2a)*Join_Yes_and (7c2a):and (7c2a)*xor (7c2w)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c2a):split:and (7c2a)*Join_Yes_and (7c2a):and (7c2a)*xor (7c2w)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c2a):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c2a)*Join_Yes_and (7c2a)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c2a)*xor (7c2w)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2w):join:and (7c2a)*xor (7c2w)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2w):join:and (7c2a)*xor (7c2w)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c2a)*xor (7c2w)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2w):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2w):join:and (7c9m)*xor (7c2w)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2w):join:and (7c9m)*xor (7c2w)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m)*xor (7c2w)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2w):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2w):split:xor (7c2w)*Shipping (7ca5)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2w):split:xor (7c2w)*Shipping (7ca5)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2w):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2w)*Shipping (7ca5)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Shipping (7ca5):join:xor (7c2w)*Shipping (7ca5)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Shipping (7ca5):join:xor (7c2w)*Shipping (7ca5)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2w)*Shipping (7ca5)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Shipping (7ca5):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Shipping (7ca5):split:Shipping (7ca5)*and (7cac)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Shipping (7ca5):split:Shipping (7ca5)*and (7cac)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Shipping (7ca5):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Shipping (7ca5)*and (7cac)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac):join:Shipping (7ca5)*and (7cac)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac):join:Shipping (7ca5)*and (7cac)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Shipping (7ca5)*and (7cac)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac):split:and (7cac)*xor (7cau):and (7cac)*Billing (7cba):and (7cac)*xor (7ccd)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac):split:and (7cac)*xor (7cau):and (7cac)*Billing (7cba):and (7cac)*xor (7ccd)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac)*xor (7cau)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac)*Billing (7cba)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac)*xor (7ccd)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau):join:and (7cac)*xor (7cau)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau):join:and (7cac)*xor (7cau)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac)*xor (7cau)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau):split:xor (7cau)*Join_Yes_xor (7cau)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau):split:xor (7cau)*Join_Yes_xor (7cau)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau)*Join_Yes_xor (7cau)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau):split:xor (7cau)*xor (7cdi)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau):split:xor (7cau)*xor (7cdi)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau)*xor (7cdi)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdi):join:xor (7cau)*xor (7cdi)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdi):join:xor (7cau)*xor (7cdi)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau)*xor (7cdi)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdi):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdi):split:xor (7cdi)*Warehouse management (7c4t)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdi):split:xor (7cdi)*Warehouse management (7c4t)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdi):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdi)*Warehouse management (7c4t)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Warehouse management (7c4t):join:xor (7cdi)*Warehouse management (7c4t)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Warehouse management (7c4t):join:xor (7cdi)*Warehouse management (7c4t)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cdi)*Warehouse management (7c4t)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Warehouse management (7c4t):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Warehouse management (7c4t):split:Warehouse management (7c4t)*and (7cdw)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Warehouse management (7c4t):split:Warehouse management (7c4t)*and (7cdw)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Warehouse management (7c4t):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Warehouse management (7c4t)*and (7cdw)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdw):join:Warehouse management (7c4t)*and (7cdw)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdw):join:Warehouse management (7c4t)*and (7cdw)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Warehouse management (7c4t)*and (7cdw)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdw):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdw):split:and (7cdw)*Join_Yes_and (7cdw)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdw):split:and (7cdw)*Join_Yes_and (7cdw)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdw):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdw)*Join_Yes_and (7cdw)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7j):join:Split_Yes_xor (7c7j)*xor (7c7j)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7j):join:Split_Yes_xor (7c7j)*xor (7c7j)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7c7j)*xor (7c7j)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7j):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7j):split:xor (7c7j)*Customer Outline Agreement (7c8m)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7j):split:xor (7c7j)*Customer Outline Agreement (7c8m)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7j):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7j)*Customer Outline Agreement (7c8m)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Customer Outline Agreement (7c8m):join:xor (7c7j)*Customer Outline Agreement (7c8m)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Customer Outline Agreement (7c8m):join:xor (7c7j)*Customer Outline Agreement (7c8m)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7j)*Customer Outline Agreement (7c8m)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Customer Outline Agreement (7c8m):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Customer Outline Agreement (7c8m):split:Customer Outline Agreement (7c8m)*xor (7c7u)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Customer Outline Agreement (7c8m):split:Customer Outline Agreement (7c8m)*xor (7c7u)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Customer Outline Agreement (7c8m):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Customer Outline Agreement (7c8m)*xor (7c7u)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u):join:Customer Outline Agreement (7c8m)*xor (7c7u)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u):join:Customer Outline Agreement (7c8m)*xor (7c7u)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Customer Outline Agreement (7c8m)*xor (7c7u)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u):split:xor (7c7u)*Join_Yes_xor (7c7u)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u):split:xor (7c7u)*Join_Yes_xor (7c7u)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u)*Join_Yes_xor (7c7u)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u):split:xor (7c7u)*and (7c50)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u):split:xor (7c7u)*and (7c50)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u)*and (7c50)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u):split:xor (7c7u)*and (7c9m)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u):split:xor (7c7u)*and (7c9m)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u)*and (7c9m)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c97):join:Split_Yes_and (7c97)*and (7c97)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c97):join:Split_Yes_and (7c97)*and (7c97)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7c97)*and (7c97)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c97):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c97):split:and (7c97)*Backorder Processing (7c90)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c97):split:and (7c97)*Backorder Processing (7c90)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c97):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c97)*Backorder Processing (7c90)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Backorder Processing (7c90):join:and (7c97)*Backorder Processing (7c90)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Backorder Processing (7c90):join:and (7c97)*Backorder Processing (7c90)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c97)*Backorder Processing (7c90)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Backorder Processing (7c90):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Backorder Processing (7c90):split:Backorder Processing (7c90)*xor (7c67)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Backorder Processing (7c90):split:Backorder Processing (7c90)*xor (7c67)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Backorder Processing (7c90):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Backorder Processing (7c90)*xor (7c67)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c67):join:Backorder Processing (7c90)*xor (7c67)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c67):join:Backorder Processing (7c90)*xor (7c67)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Backorder Processing (7c90)*xor (7c67)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c67):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c67):split:xor (7c67)*Join_Yes_xor (7c67)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c67):split:xor (7c67)*Join_Yes_xor (7c67)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c67):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c67)*Join_Yes_xor (7c67)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ccd):join:Split_Yes_xor (7ccd)*xor (7ccd)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ccd):join:Split_Yes_xor (7ccd)*xor (7ccd)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_xor (7ccd)*xor (7ccd)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ccd):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ccd):join:and (7cac)*xor (7ccd)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ccd):join:and (7cac)*xor (7ccd)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac)*xor (7ccd)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ccd):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ccd):split:xor (7ccd)*Transport (7c88)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ccd):split:xor (7ccd)*Transport (7c88)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ccd):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ccd)*Transport (7c88)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Transport (7c88):join:xor (7ccd)*Transport (7c88)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Transport (7c88):join:xor (7ccd)*Transport (7c88)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ccd)*Transport (7c88)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Transport (7c88):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Transport (7c88):split:Transport (7c88)*Join_Yes_Transport (7c88)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Transport (7c88):split:Transport (7c88)*Join_Yes_Transport (7c88)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Transport (7c88):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Transport (7c88)*Join_Yes_Transport (7c88)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdb):join:Split_Yes_and (7cdb)*and (7cdb):and (7c9m)*and (7cdb)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdb):join:Split_Yes_and (7cdb)*and (7cdb):and (7c9m)*and (7cdb)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Split_Yes_and (7cdb)*and (7cdb)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m)*and (7cdb)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdb):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdb):split:and (7cdb)*xor (7cdp)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdb):split:and (7cdb)*xor (7cdp)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdb):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdb)*xor (7cdp)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Risk/ Credit Management (7c3p):join:xor (7ce3)*Risk/ Credit Management (7c3p)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Risk/ Credit Management (7c3p):join:xor (7ce3)*Risk/ Credit Management (7c3p)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3)*Risk/ Credit Management (7c3p)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Risk/ Credit Management (7c3p):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Risk/ Credit Management (7c3p):split:Risk/ Credit Management (7c3p)*xor (7c3b)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Risk/ Credit Management (7c3p):split:Risk/ Credit Management (7c3p)*xor (7c3b)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Risk/ Credit Management (7c3p):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Risk/ Credit Management (7c3p)*xor (7c3b)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c3b):join:Risk/ Credit Management (7c3p)*xor (7c3b)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c3b):join:Risk/ Credit Management (7c3p)*xor (7c3b)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Risk/ Credit Management (7c3p)*xor (7c3b)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c3b):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c3b):split:xor (7c3b)*Join_Yes_xor (7c3b)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c3b):split:xor (7c3b)*Join_Yes_xor (7c3b)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c3b):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c3b)*Join_Yes_xor (7c3b)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c5w):join:xor (7ce3)*xor (7c5w)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c5w):join:xor (7ce3)*xor (7c5w)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3)*xor (7c5w)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c5w):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c5w):split:xor (7c5w)*Costing (7c5p)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c5w):split:xor (7c5w)*Costing (7c5p)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c5w):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c5w)*Costing (7c5p)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Costing (7c5p):join:xor (7c5w)*Costing (7c5p)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Costing (7c5p):join:xor (7c5w)*Costing (7c5p)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c5w)*Costing (7c5p)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Costing (7c5p):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Costing (7c5p):split:Costing (7c5p)*xor (7c2j)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Costing (7c5p):split:Costing (7c5p)*xor (7c2j)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Costing (7c5p):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Costing (7c5p)*xor (7c2j)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2j):join:Costing (7c5p)*xor (7c2j)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2j):join:Costing (7c5p)*xor (7c2j)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Costing (7c5p)*xor (7c2j)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2j):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2j):split:xor (7c2j)*Join_Yes_xor (7c2j)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2j):split:xor (7c2j)*Join_Yes_xor (7c2j)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2j):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2j)*Join_Yes_xor (7c2j)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Billing (7cba):join:and (7cac)*Billing (7cba)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Billing (7cba):join:and (7cac)*Billing (7cba)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cac)*Billing (7cba)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Billing (7cba):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Billing (7cba):split:Billing (7cba)*or (7c57)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Billing (7cba):split:Billing (7cba)*or (7c57)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Billing (7cba):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Billing (7cba)*or (7c57)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:or (7c57):join:Billing (7cba)*or (7c57)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:or (7c57):join:Billing (7cba)*or (7c57)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Billing (7cba)*or (7c57)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:or (7c57):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:or (7c57):split:or (7c57)*Join_Yes_or (7c57)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:or (7c57):split:or (7c57)*Join_Yes_or (7c57)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:or (7c57):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:or (7c57)*Join_Yes_or (7c57)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m):join:xor (7c7u)*and (7c9m)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m):join:xor (7c7u)*and (7c9m)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u)*and (7c9m)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m):split:and (7c9m)*Join_Yes_and (7c9m):and (7c9m)*xor (7c2w):and (7c9m)*and (7cdb)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m):split:and (7c9m)*Join_Yes_and (7c9m):and (7c9m)*xor (7c2w):and (7c9m)*and (7cdb)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m)*Join_Yes_and (7c9m)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m)*xor (7c2w)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m)*and (7cdb)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7ce3):join:Join_Split_xor (7ce3)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7ce3):join:Join_Split_xor (7ce3)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7ce3)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7ce3):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7ce3):split:Join_Join_xor (7ce3)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7ce3):split:Join_Join_xor (7ce3)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7ce3):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7ce3)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7ce3):join:xor (7ce3)*Join_Yes_xor (7ce3):Join_Split_xor (7ce3)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7ce3):join:xor (7ce3)*Join_Yes_xor (7ce3):Join_Split_xor (7ce3)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7ce3)*Join_Yes_xor (7ce3)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7ce3)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7ce3):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7ce3):split:Join_Join_xor (7ce3)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7ce3):split:Join_Join_xor (7ce3)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7ce3):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7ce3)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c2a):join:Join_Split_and (7c2a)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c2a):join:Join_Split_and (7c2a)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_and (7c2a)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c2a):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c2a):split:Join_Join_and (7c2a)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c2a):split:Join_Join_and (7c2a)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c2a):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_and (7c2a)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c2a):join:and (7c2a)*Join_Yes_and (7c2a):Join_Split_and (7c2a)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c2a):join:and (7c2a)*Join_Yes_and (7c2a):Join_Split_and (7c2a)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c2a)*Join_Yes_and (7c2a)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_and (7c2a)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c2a):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c2a):split:Join_Join_and (7c2a)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c2a):split:Join_Join_and (7c2a)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c2a):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_and (7c2a)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7cau):join:Join_Split_xor (7cau)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7cau):join:Join_Split_xor (7cau)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7cau)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7cau):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7cau):split:Join_Join_xor (7cau)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7cau):split:Join_Join_xor (7cau)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7cau):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7cau)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7cau):join:xor (7cau)*Join_Yes_xor (7cau):Join_Split_xor (7cau)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7cau):join:xor (7cau)*Join_Yes_xor (7cau):Join_Split_xor (7cau)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7cau)*Join_Yes_xor (7cau)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7cau)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7cau):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7cau):split:Join_Join_xor (7cau)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7cau):split:Join_Join_xor (7cau)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7cau):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7cau)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7cdw):join:Join_Split_and (7cdw)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7cdw):join:Join_Split_and (7cdw)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_and (7cdw)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7cdw):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7cdw):split:Join_Join_and (7cdw)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7cdw):split:Join_Join_and (7cdw)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7cdw):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_and (7cdw)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7cdw):join:and (7cdw)*Join_Yes_and (7cdw):Join_Split_and (7cdw)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7cdw):join:and (7cdw)*Join_Yes_and (7cdw):Join_Split_and (7cdw)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7cdw)*Join_Yes_and (7cdw)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_and (7cdw)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7cdw):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7cdw):split:Join_Join_and (7cdw)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7cdw):split:Join_Join_and (7cdw)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7cdw):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_and (7cdw)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c7u):join:Join_Split_xor (7c7u)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c7u):join:Join_Split_xor (7c7u)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c7u)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c7u):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c7u):split:Join_Join_xor (7c7u)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c7u):split:Join_Join_xor (7c7u)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c7u):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c7u)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c7u):join:xor (7c7u)*Join_Yes_xor (7c7u):Join_Split_xor (7c7u)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c7u):join:xor (7c7u)*Join_Yes_xor (7c7u):Join_Split_xor (7c7u)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c7u)*Join_Yes_xor (7c7u)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c7u)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c7u):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c7u):split:Join_Join_xor (7c7u)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c7u):split:Join_Join_xor (7c7u)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c7u):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c7u)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c67):join:Join_Split_xor (7c67)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c67):join:Join_Split_xor (7c67)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c67)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c67):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c67):split:Join_Join_xor (7c67)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c67):split:Join_Join_xor (7c67)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c67):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c67)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c67):join:xor (7c67)*Join_Yes_xor (7c67):Join_Split_xor (7c67)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c67):join:xor (7c67)*Join_Yes_xor (7c67):Join_Split_xor (7c67)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c67)*Join_Yes_xor (7c67)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c67)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c67):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c67):split:Join_Join_xor (7c67)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c67):split:Join_Join_xor (7c67)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c67):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c67)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_Transport (7c88):join:Join_Split_Transport (7c88)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_Transport (7c88):join:Join_Split_Transport (7c88)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_Transport (7c88)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_Transport (7c88):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_Transport (7c88):split:Join_Join_Transport (7c88)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_Transport (7c88):split:Join_Join_Transport (7c88)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_Transport (7c88):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_Transport (7c88)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_Transport (7c88):join:Transport (7c88)*Join_Yes_Transport (7c88):Join_Split_Transport (7c88)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_Transport (7c88):join:Transport (7c88)*Join_Yes_Transport (7c88):Join_Split_Transport (7c88)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Transport (7c88)*Join_Yes_Transport (7c88)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_Transport (7c88)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_Transport (7c88):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_Transport (7c88):split:Join_Join_Transport (7c88)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_Transport (7c88):split:Join_Join_Transport (7c88)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_Transport (7c88):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_Transport (7c88)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c3b):join:Join_Split_xor (7c3b)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c3b):join:Join_Split_xor (7c3b)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c3b)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c3b):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c3b):split:Join_Join_xor (7c3b)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c3b):split:Join_Join_xor (7c3b)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c3b):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c3b)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c3b):join:xor (7c3b)*Join_Yes_xor (7c3b):Join_Split_xor (7c3b)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c3b):join:xor (7c3b)*Join_Yes_xor (7c3b):Join_Split_xor (7c3b)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c3b)*Join_Yes_xor (7c3b)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c3b)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c3b):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c3b):split:Join_Join_xor (7c3b)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c3b):split:Join_Join_xor (7c3b)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c3b):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c3b)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c2j):join:Join_Split_xor (7c2j)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c2j):join:Join_Split_xor (7c2j)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c2j)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c2j):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c2j):split:Join_Join_xor (7c2j)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c2j):split:Join_Join_xor (7c2j)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_xor (7c2j):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c2j)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c2j):join:xor (7c2j)*Join_Yes_xor (7c2j):Join_Split_xor (7c2j)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c2j):join:xor (7c2j)*Join_Yes_xor (7c2j):Join_Split_xor (7c2j)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:xor (7c2j)*Join_Yes_xor (7c2j)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_xor (7c2j)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c2j):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c2j):split:Join_Join_xor (7c2j)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c2j):split:Join_Join_xor (7c2j)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_xor (7c2j):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c2j)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_or (7c57):join:Join_Split_or (7c57)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_or (7c57):join:Join_Split_or (7c57)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_or (7c57)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_or (7c57):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_or (7c57):split:Join_Join_or (7c57)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_or (7c57):split:Join_Join_or (7c57)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_or (7c57):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_or (7c57)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_or (7c57):join:or (7c57)*Join_Yes_or (7c57):Join_Split_or (7c57)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_or (7c57):join:or (7c57)*Join_Yes_or (7c57):Join_Split_or (7c57)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:or (7c57)*Join_Yes_or (7c57)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_or (7c57)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_or (7c57):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_or (7c57):split:Join_Join_or (7c57)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_or (7c57):split:Join_Join_or (7c57)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_or (7c57):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_or (7c57)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c9m):join:Join_Split_and (7c9m)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c9m):join:Join_Split_and (7c9m)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_and (7c9m)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c9m):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c9m):split:Join_Join_and (7c9m)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c9m):split:Join_Join_and (7c9m)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_No_and (7c9m):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_and (7c9m)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c9m):join:and (7c9m)*Join_Yes_and (7c9m):Join_Split_and (7c9m)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c9m):join:and (7c9m)*Join_Yes_and (7c9m):Join_Split_and (7c9m)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:and (7c9m)*Join_Yes_and (7c9m)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Split_and (7c9m)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c9m):busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c9m):split:Join_Join_and (7c9m)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c9m):split:Join_Join_and (7c9m)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Yes_and (7c9m):busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_and (7c9m)"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Output:join:Join_Join_xor (7ce3):Join_Join_and (7c2a):Join_Join_xor (7cau):Join_Join_and (7cdw):Join_Join_xor (7c7u):Join_Join_xor (7c67):Join_Join_Transport (7c88):Join_Join_xor (7c3b):Join_Join_xor (7c2j):Join_Join_or (7c57):Join_Join_and (7c9m)"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Output:join:Join_Join_xor (7ce3):Join_Join_and (7c2a):Join_Join_xor (7cau):Join_Join_and (7cdw):Join_Join_xor (7c7u):Join_Join_xor (7c67):Join_Join_Transport (7c88):Join_Join_xor (7c3b):Join_Join_xor (7c2j):Join_Join_or (7c57):Join_Join_and (7c9m)"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7ce3)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_and (7c2a)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7cau)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_and (7cdw)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c7u)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c67)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_Transport (7c88)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c3b)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_xor (7c2j)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_or (7c57)"
+       "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Join_Join_and (7c9m)"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Output:busy"
+;
+trans "t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Output:split:OutputCondition"~"t:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Output:split:OutputCondition"
+    in "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:Output:busy"
+   out "p:Model.7c1w--0-----u--:Model.7c1w--0-----u--:OutputCondition"
+;
+

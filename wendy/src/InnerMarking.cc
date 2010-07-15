@@ -65,9 +65,9 @@ void InnerMarking::initialize() {
     for (InnerMarking_ID i = 0; i < stats.markings; ++i) {
         inner_markings[i] = markingMap[i];
         inner_markings[i]->is_bad = (inner_markings[i]->is_bad or
-                                        (finalMarkingReachableMap.find(i) != finalMarkingReachableMap.end()
-                                                and finalMarkingReachableMap[i] == false
-                                                and not args_info.noDeadlockDetection_flag));
+                                     (finalMarkingReachableMap.find(i) != finalMarkingReachableMap.end()
+                                      and finalMarkingReachableMap[i] == false
+                                      and not args_info.noDeadlockDetection_flag));
 
         // register markings that may become activated by sending a message
         // to them or by synchronization
@@ -189,7 +189,7 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
 
     // when only deadlocks are considered, we don't care about final markings
     finalMarkingReachableMap[myId] = (args_info.correctness_arg == correctness_arg_livelock and
-                                          not args_info.noDeadlockDetection_flag) ? is_final : true;
+                                      not args_info.noDeadlockDetection_flag) ? is_final : true;
 
     // variable to detect whether this marking has only deadlocking successors
     // standard: "true", otherwise evaluate noDeadlockDetection flag
@@ -211,7 +211,7 @@ void InnerMarking::determineType(const InnerMarking_ID& myId) {
                 not args_info.noDeadlockDetection_flag) {
             if (markingMap[successors[i]] != NULL and
                     (finalMarkingReachableMap.find(successors[i]) != finalMarkingReachableMap.end() and
-                            finalMarkingReachableMap[successors[i]] == true)) {
+                     finalMarkingReachableMap[successors[i]] == true)) {
 
                 finalMarkingReachableMap[myId] = true;
             }

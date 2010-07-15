@@ -214,7 +214,8 @@ bool Marking::operator==(const Marking & m) const
 Marking & Marking::operator=(const Marking & m)
 {
   PNAPI_ASSERT(this != &m);
-
+  
+  m_ = std::map<const Place *, unsigned int>(); // fixing cppcheck error
   this->~Marking();
   return *new (this) Marking(m);
 }

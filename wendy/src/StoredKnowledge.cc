@@ -1104,6 +1104,10 @@ void StoredKnowledge::output_results(Results& r) {
     r.add("statistics.scc_nontrivial", stats.numberOfNonTrivialSCCs);
     r.add("statistics.scc_maximal_size", stats.maxSCCSize);
 
+    // SA/OG output does not make sense together with --diagnose
+    if (args_info.diagnose_given) {
+        return;
+    }
 
     // create OG or SA output
     if (args_info.og_given or args_info.sa_given) {

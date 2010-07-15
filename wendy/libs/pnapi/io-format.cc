@@ -120,6 +120,48 @@ namespace __dot
 std::ostream & output(std::ostream & os, const PetriNet & net)
 {
   string filename = net.getMetaInformation(os, io::INPUTFILE);
+  
+  // initialize node name cache
+  unsigned int dotID = 0;
+  set<Place *> places = net.getPlaces();
+  PNAPI_FOREACH(it, places)
+  {
+    stringstream ss; ss << "p" << (++dotID);
+    util::DotNameData::data(os).names[(*it)->getName()] = ss.str();
+  }
+
+  dotID = 0;
+  set<Transition *> transitions = net.getTransitions();
+  PNAPI_FOREACH(it, transitions)
+  {
+    stringstream ss; ss << "t" << ++dotID;
+    util::DotNameData::data(os).names[(*it)->getName()] = ss.str();
+  }
+  
+  dotID = 0;
+  set<Label *> input = net.getInterface().getInputLabels();
+  PNAPI_FOREACH(it, input)
+  {
+    stringstream ss; ss << "i" << (++dotID);
+    util::DotNameData::data(os).names[(*it)->getName()] = ss.str();
+  }
+
+  dotID = 0;
+  set<Label *> output = net.getInterface().getOutputLabels();
+  PNAPI_FOREACH(it, output)
+  {
+    stringstream ss; ss << "o" << (++dotID);
+    util::DotNameData::data(os).names[(*it)->getName()] = ss.str();
+  }
+  
+  dotID = 0;
+  set<Label *> synchronous = net.getInterface().getSynchronousLabels();
+  PNAPI_FOREACH(it, synchronous)
+  {
+    stringstream ss; ss << "s" << (++dotID);
+    util::DotNameData::data(os).names[(*it)->getName()] = ss.str();
+  }
+
 
   os  //< output everything to this stream
 
@@ -130,7 +172,8 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   << " graph [fontname=\"Helvetica\" nodesep=0.25 ranksep=\"0.25\""
   << " remincross=true label=\""
   << "Petri net"
-  << (filename.empty() ? "" : " generated from " + filename) << "\"]\n"
+  << (filename.empty() ? "" : " generated from " + filename) << "\\n"
+  << "&Omega;=" << net.getFinalCondition() << "\"]\n"
   
   << " node [fontname=\"Helvetica\" fixedsize width=\".3\""
   << " height=\".3\" label=\"\" style=filled]\n"
@@ -168,6 +211,8 @@ std::ostream & output(std::ostream & os, const PetriNet & net)
   << net.transitions_ // interface arcs
 
   << "\n}\n";
+  
+  return os;
 }
 
 /*!
@@ -224,13 +269,13 @@ std::ostream & output(std::ostream & os, const Transition & t)
       case Label::SYNCHRONOUS:
         attr << " arrowhead=none";
       case Label::INPUT:
-        left = getLabelName(*l->first);
-        right = getNodeName(t);
+        left = getLabelName(os, *l->first);
+        right = getNodeName(os, t);
         attr << "]\n";
         break;
       case Label::OUTPUT:
-        left = getNodeName(t);
-        right = getLabelName(*l->first);
+        left = getNodeName(os, t);
+        right = getLabelName(os, *l->first);
         attr << "]\n";
         break;
       default: PNAPI_ASSERT(false);
@@ -300,22 +345,20 @@ std::ostream & output(std::ostream & os, const Interface & interface)
   
   map<string, Port *> ports = interface.getPorts();
   
-  if(ports.size() > 1)
+  if(util::PortData::data(os).remove)
   {
-    PNAPI_FOREACH(port, ports)
-    {
-      if(port->first != "")
-      {
-        os << (*port->second) << endl;
-      }
-    }
+    os << delim("\n")
+       << "/// input\n node [shape=circle fillcolor=orange]\n"<< interface.getInputLabels()
+       << "\n/// output\n node [shape=circle fillcolor=yellow]\n" << interface.getOutputLabels()
+       << "\n/// synchronous\n node [shape=box fillcolor=black]\n" << interface.getSynchronousLabels()
+       << endl;
   }
   else
   {
-    os << "/// input\n node [shape=circle fillcolor=orange]\n"<< interface.getPort()->getInputLabels()
-       << "\n/// output\n node [shape=circle fillcolor=yellow]\n" << interface.getPort()->getOutputLabels()
-       << "\n/// synchronous\n node [shape=box fillcolor=black]\n" << interface.getPort()->getSynchronousLabels()
-       << endl;
+    PNAPI_FOREACH(port, ports)
+    {
+      os << (*port->second) << endl;
+    }
   }
   
   return (os << endl);
@@ -361,8 +404,8 @@ std::ostream & output(std::ostream & os, const Label & label)
   {
   case util::NORMAL:
   {
-    string labelName =  getLabelName(label);
-    string labelName_l = getLabelName(label, true);
+    string labelName =  getLabelName(os, label);
+    string labelName_l = getLabelName(os, label, true);
     
     os << labelName
        << ((label.getType() == Label::SYNCHRONOUS) ? "\t[width=.1]\n  " : "\n  ")
@@ -374,7 +417,7 @@ std::ostream & output(std::ostream & os, const Label & label)
   }
   case util::INNER:
   {
-    os << getLabelName(label) << " " << getLabelName(label, true);
+    os << getLabelName(os, label) << " " << getLabelName(os, label, true);
     break;
   }
     
@@ -388,8 +431,8 @@ std::ostream & output(std::ostream & os, const Label & label)
  */
 std::ostream & output(std::ostream & os, const Node & n, const std::string & attr)
 {
-  string dotName   = getNodeName(n);
-  string dotName_l = getNodeName(n, true);
+  string dotName   = getNodeName(os, n);
+  string dotName_l = getNodeName(os, n, true);
 
   os << dotName;
 
@@ -421,34 +464,9 @@ std::ostream & output(std::ostream & os, const Node & n, const std::string & att
  * 
  * \pre all nodes and labels have distinct names
  */
-std::string getNodeName(const Node & n, bool withSuffix)
+std::string getNodeName(std::ostream & os, const Node & n, bool withSuffix)
 {
-  static PetriNet * net = NULL;
-  static map<string, string> names;
-
-  if (net != &n.getPetriNet())
-  {
-    net = &n.getPetriNet();
-    names.clear();
-
-    int i = 0;
-    set<Place *> places = net->getPlaces();
-    PNAPI_FOREACH(it, places)
-    {
-      stringstream ss; ss << "p" << (++i);
-      names[(*it)->getName()] = ss.str();
-    }
-
-    i = 0;
-    set<Transition *> transitions = net->getTransitions();
-    PNAPI_FOREACH(it, transitions)
-    {
-      stringstream ss; ss << "t" << ++i;
-      names[(*it)->getName()] = ss.str();
-    }
-  }
-
-  return names[n.getName()] + string(withSuffix ? "_l" : "");
+  return util::DotNameData::data(os).names[n.getName()] + string(withSuffix ? "_l" : "");
 }
 
 /*!
@@ -456,42 +474,9 @@ std::string getNodeName(const Node & n, bool withSuffix)
  * 
  * \pre all nodes and labels have distinct names
  */
-std::string getLabelName(const Label & l, bool withSuffix)
+std::string getLabelName(std::ostream & os, const Label & l, bool withSuffix)
 {
-  static PetriNet * net = NULL;
-  static map<string, string> names;
-
-  if (net != &l.getPetriNet())
-  {
-    net = &l.getPetriNet();
-    names.clear();
-
-    int i = 0;
-    set<Label *> input = net->getInterface().getInputLabels();
-    PNAPI_FOREACH(it, input)
-    {
-      stringstream ss; ss << "i" << (++i);
-      names[(*it)->getName()] = ss.str();
-    }
-
-    i = 0;
-    set<Label *> output = net->getInterface().getOutputLabels();
-    PNAPI_FOREACH(it, output)
-    {
-      stringstream ss; ss << "o" << (++i);
-      names[(*it)->getName()] = ss.str();
-    }
-    
-    i = 0;
-    set<Label *> synchronous = net->getInterface().getSynchronousLabels();
-    PNAPI_FOREACH(it, synchronous)
-    {
-      stringstream ss; ss << "s" << (++i);
-      names[(*it)->getName()] = ss.str();
-    }
-  }
-
-  return names[l.getName()] + string(withSuffix ? "_l" : "");
+  return util::DotNameData::data(os).names[l.getName()] + string(withSuffix ? "_l" : "");
 }
 
 /*!
@@ -523,6 +508,94 @@ std::ostream & output(std::ostream & os, const Automaton & sa)
   }
   
   return (os << "}\n}\n");
+}
+
+/*!
+ * \brief negation output
+ */
+std::ostream & output(std::ostream & os, const formula::Negation & f)
+{
+  return (os << "&not;" << (*f.getChildren().begin())); 
+}
+
+/*!
+ * \brief conjunction output
+ */
+std::ostream & output(std::ostream & os, const formula::Conjunction & f)
+{
+  return (os << "(" << delim(" &and; ") << f.getChildren() << ")");
+}
+
+/*!
+ * \brief disjunction output
+ */
+std::ostream & output(std::ostream & os, const formula::Disjunction & f)
+{
+  return (os << "(" << delim(" &or; ") << f.getChildren() << ")");
+}
+
+/*!
+ * \brief FormulaTrue output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaTrue &)
+{
+  return (os << "True");
+}
+
+/*!
+ * \brief FormulaFalse output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaFalse &)
+{
+  return (os << "False");
+}
+
+/*!
+ * \brief FormulaEqual output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaEqual & f)
+{
+  return (os << "(" << f.getPlace().getName() << "=" << f.getTokens() << ")");
+}
+
+/*!
+ * \brief FormulaNotEqual output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaNotEqual & f)
+{
+  return (os << "(" << f.getPlace().getName() << "&ne;" << f.getTokens() << ")");
+}
+
+/*!
+ * \brief FormulaLess output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaLess & f)
+{
+  return (os << "(" << f.getPlace().getName() << "&lt;" << f.getTokens() << ")");
+}
+
+/*!
+ * \brief FormulaLessEqual output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaLessEqual & f)
+{
+  return (os << "(" << f.getPlace().getName() << "&le;" << f.getTokens() << ")");
+}
+
+/*!
+ * \brief FormulaGreater output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaGreater & f)
+{
+  return (os << "(" << f.getPlace().getName() << "&gt;" << f.getTokens() << ")");
+}
+
+/*!
+ * \brief FormulaGreaterEqual output
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaGreaterEqual & f)
+{
+  return (os << "(" << f.getPlace().getName() << "&ge;" << f.getTokens() << ")");
 }
 
 
@@ -899,22 +972,10 @@ std::ostream & output(std::ostream & os, const Interface & interface)
 {
   os << "    <ports>\n";
   
-  if(interface.getPorts().size() > 1)
+  PNAPI_FOREACH(port, interface.getPorts())
   {
-    PNAPI_FOREACH(port, interface.getPorts())
-    {
-      if(port->first != "")
-      {
-        os << "      <port id=\"" << port->first << "\">\n"
-           << (*port->second)
-           << "      </port>\n";
-      }
-    }
-  }
-  else
-  {
-    os << "      <port id=\"portId1\">\n"
-       << (*interface.getPort())
+    os << "      <port id=\"" << port->first << "\">\n"
+       << (*port->second)
        << "      </port>\n";
   }
     
@@ -1075,6 +1136,15 @@ std::ios_base & owfn(std::ios_base & ios)
 std::ostream & noRoles(std::ostream & os)
 {
   util::RoleData::data(os).role = true;
+  return os;
+}
+
+/*!
+ * \brief remove all ports
+ */
+std::ostream & removePorts(std::ostream & os)
+{
+  util::PortData::data(os).remove = true;
   return os;
 }
 
@@ -1250,29 +1320,26 @@ std::ostream & output(std::ostream & os, const Interface & interface)
 {
   os << "INTERFACE\n" << delim(", ");
   
-  if(interface.getPorts().size() > 1)
+  if(util::PortData::data(os).remove)
   {
-    PNAPI_FOREACH(port, interface.getPorts())
+    if(!interface.getInputLabels().empty())
     {
-      if(port->first != "")
-      {
-        os << (*port->second);
-      }
+      os << "  INPUT\n    " << interface.getInputLabels() << ";\n"; 
+    }
+    if(!interface.getOutputLabels().empty())
+    {
+      os << "  OUTPUT\n    " << interface.getOutputLabels() << ";\n"; 
+    }
+    if(!interface.getSynchronousLabels().empty())
+    {
+      os << "  SYNCHRONOUS\n    " << interface.getSynchronousLabels() << ";\n"; 
     }
   }
   else
   {
-    if(!interface.getPort()->getInputLabels().empty())
+    PNAPI_FOREACH(port, interface.getPorts())
     {
-      os << "  INPUT\n    " << interface.getPort()->getInputLabels() << ";\n"; 
-    }
-    if(!interface.getPort()->getOutputLabels().empty())
-    {
-      os << "  OUTPUT\n    " << interface.getPort()->getOutputLabels() << ";\n"; 
-    }
-    if(!interface.getPort()->getSynchronousLabels().empty())
-    {
-      os << "  SYNCHRONOUS\n    " << interface.getPort()->getSynchronousLabels() << ";\n"; 
+      os << (*port->second);  
     }
   }
   

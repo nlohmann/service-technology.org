@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: stephan $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-06-04 00:32:44 +0200 (Fri, 04 Jun 2010) $
+ * \date    $Date: 2010-07-13 19:15:35 +0200 (Tue, 13 Jul 2010) $
  *
- * \version $Revision: 5800 $
+ * \version $Revision: 5917 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -30,14 +30,6 @@
 
 #include <inttypes.h>
 
-#ifndef CONFIG_PETRIFY
-#define CONFIG_PETRIFY "not found"
-#endif
-
-#ifndef CONFIG_GENET
-#define CONFIG_GENET "not found"
-#endif
-
 #ifdef HAVE_STDINT_H
 // #include <stdint.h>
 #endif
@@ -47,12 +39,6 @@ namespace pnapi
 
 // forward declarations
 class PetriNet;
-namespace io
-{
-std::ostream & operator<<(std::ostream &, const PetriNet &);
-std::istream & operator>>(std::istream &, PetriNet &) throw (exception::InputError);
-}
-
 
 namespace util
 {
@@ -274,7 +260,6 @@ private: /* private variables */
   
   /*!
    * \name (overlapping) sets for net structure
-   * \todo Vielleicht auch sendTransitions_ ?
    */
   //@{
   /// set of all nodes
@@ -295,7 +280,7 @@ private: /* private variables */
   
   /*! 
    * \name general properties
-     \todo Vielleicht Rollen symmetrisch zu Kosten organisieren.
+   * \todo Vielleicht Rollen symmetrisch zu Kosten organisieren.
    */
   //@{
   /// meta information
@@ -375,6 +360,8 @@ public: /* public methods */
   Arc * findArc(const Node &, const Node &) const;
   /// get the interface
   Interface & getInterface();
+  /// get the interface
+  const Interface & getInterface() const;
   /// get all nodes
   const std::set<Node *> & getNodes() const;
   /// get places
@@ -393,6 +380,10 @@ public: /* public methods */
   const Condition & getFinalCondition() const;
   /// guess a place relation
   std::map<const Place *, const Place *> guessPlaceRelation(const PetriNet &) const;
+  /// returns one node's conflict cluster
+  std::set<Node *> getConflictCluster(const Node &) const;
+  /// returns net's conflict clusters
+  std::vector<std::set<Node *> > getConflictClusters() const;
   //@}
   
   
@@ -436,7 +427,7 @@ public: /* public methods */
   void deleteArc(Arc &);
 
   /// renames nodes
-  void canonicalNames();
+  std::map<std::string, std::string> canonicalNames();
   //@}
 
 
@@ -447,7 +438,7 @@ public: /* public methods */
    */
   //@{
   /// checks the Petri net for workflow criteria
-  bool isWorkflow();
+  bool isWorkflow() const;
   /// checks the Petri net for free choice criterion
   bool isFreeChoice() const;
   /// checks the Petri net for being normalized

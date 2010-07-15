@@ -8,13 +8,30 @@
                       http://service-technology.org/wendy
 
 
-Version 3.1-unreleased
-======================
+Version 3.1 (15 July 2010)
+==========================
 
 * implemented parameter `--noDeadlockDetection' to switch off early
   deadlock detection for more detailed diagnosis information
 
 * implemented result-file output for the diagnosis mode
+
+* reimplemented diagnosis and included treatment of livelocks
+
+* fixed bug #16258 (see `https://gna.org/bugs/?16258'): nets without final
+  markings are now treated correctly
+
+* updated the Petri Net API 4.02-unreleased (revision r5932)
+
+* updated tool paper (see `doc/toolpaper.pdf') to published version of
+
+       Niels Lohmann and Daniela Weinberg. Wendy: A tool to synthesize
+       partners for services. In Johan Lilius and Wojciech Penczek,
+       editors, 31st International Conference on Applications and Theory of
+       Petri Nets and Other Models of Concurrency, PETRI NETS 2010, Braga,
+       Portugal, June 21-25, 2010, Proceedings, volume 6128 of Lecture
+       Notes in Computer Science, pages 297-307, June 2010. Springer-Verlag
+
 
 Version 3.0 (2 April 2010)
 ==========================

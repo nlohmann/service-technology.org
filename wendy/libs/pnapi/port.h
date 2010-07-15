@@ -43,9 +43,9 @@ public: /* public types */
   /// communication type
   enum Type
   {
-    INPUT,
-    OUTPUT,
-    SYNCHRONOUS
+    INPUT = 1,
+    OUTPUT = 3,
+    SYNCHRONOUS = 2
   };
 
 private: /* private variables */

@@ -27,10 +27,7 @@ namespace pnapi
 /*!
  * \brief   Generic Parser Framework
  *
- * Provides C++ classes encapsulating flex/bison parsers. Documentation is
- * available under <https://ikaria/trac/mesu/wiki/ParserFramework>.
- * 
- * \todo check documentation availability; may move to API documentation
+ * Provides C++ classes encapsulating flex/bison parsers.
  */
 namespace parser
 {
@@ -62,7 +59,7 @@ public: /* public methods */
   /// parses stream contents with the associated parser
   const PetriNet & parse(std::istream &);
   /// rethrow a caught exception as InputError
-  void rethrow(const exception::Error &);
+  void rethrow(const exception::Error &) __attribute__((noreturn));
   
 protected: /* protected methods */
   /// make this class abstract

@@ -12,9 +12,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2010-05-29 23:35:16 +0200 (Sat, 29 May 2010) $
+ * \date    $Date: 2010-07-05 13:50:04 +0200 (Mon, 05 Jul 2010) $
  *
- * \version $Revision: 5779 $
+ * \version $Revision: 5879 $
  */
 
 #include "config.h"
@@ -22,9 +22,11 @@
 #include "pnapi-assert.h"
 
 #include "interface.h"
+#include "petrinet.h"
 #include "util.h"
 
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 using std::cerr;
@@ -42,9 +44,8 @@ namespace pnapi
  * \brief constructor
  */
 Interface::Interface(PetriNet & net) :
-  net_(net)
+  net_(net), nextID_(0)
 {
-  ports_[""] = new Port(net_, "");
 }
 
 /*!
@@ -68,12 +69,20 @@ Interface::Interface(PetriNet & net) :
 Interface::Interface(PetriNet & net, const Interface & interface1, const Interface & interface2,
                      std::map<Label *, Label *> & label2label, std::map<Label *, Place *> & label2place,
                      std::set<Label *> & commonLabels) :
-  net_(net)
+  net_(net), nextID_(0)
 {
+  // seen ports of interface2
+  set<Port *> seenPorts;
+                       
   // copy or compose ports of interface1
   PNAPI_FOREACH(port, interface1.ports_)
   {
-    if(interface2.ports_.find(port->first) == interface2.ports_.end()) // no matching port
+    Label * l1 = *(port->second->getAllLabels().begin());
+    PNAPI_ASSERT_USER(l1 != NULL, string("port '") + port->first + "' is empty"); 
+    
+    Label * l2 = interface2.findLabel(l1->getName());
+    
+    if(l2 == NULL) // no matching port
     {
       // copy port
       Port * p = new Port(net_, port->first);
@@ -86,24 +95,43 @@ Interface::Interface(PetriNet & net, const Interface & interface1, const Interfa
     }
     else
     {
-      // compose ports
-      Port * p = new Port(net_, *port->second, *interface2.ports_.find(port->first)->second,
-                          label2label, label2place, commonLabels);
-      if(p->getAllLabels().empty()) // if port is empty after composition
+      Port * p2 = &(l2->getPort());
+      // compliance check with composition
+      PNAPI_ASSERT_USER((port->second->getAllLabels().size() == p2->getAllLabels().size()),
+                        string("ports '") + port->first + "' and '" + p2->getName() + "' share a label but do not fit",
+                        exception::UserCausedError::UE_COMPOSE_ERROR);
+                        
+      PNAPI_FOREACH(l1, port->second->getAllLabels())
       {
-        delete p;
+        Label * l2 = p2->findLabel((*l1)->getName());
+        PNAPI_ASSERT_USER(l2 != NULL,
+                          string("ports '") + port->first + "' and '" + p2->getName() + "' only fit partially",
+                          exception::UserCausedError::UE_COMPOSE_ERROR);
+        PNAPI_ASSERT_USER((*l1)->getType() + l2->getType() == 4,
+                          string("labels '") + l2->getName() + "' do not fit by type",
+                          exception::UserCausedError::UE_COMPOSE_ERROR);
+        
+        if(l2->getType() == Label::SYNCHRONOUS)
+        {
+          commonLabels.insert(*l1);
+          commonLabels.insert(l2);
+        }
+        else
+        {
+          // replace label by a place
+          Place * p = &(net_.createPlace(l2->getName()));
+          label2place[*l1] = p;
+          label2place[l2] = p;
+        }
       }
-      else
-      {
-        ports_[port->first] = p;
-      }
+      seenPorts.insert(p2);
     }
   }
   
   // copy remaining ports of interface2
   PNAPI_FOREACH(port, interface2.ports_)
   {
-    if(interface1.ports_.find(port->first) == interface1.ports_.end()) // no matching port
+    if(seenPorts.find(port->second) == seenPorts.end()) // no matching port
     {
       // copy port
       Port * p = new Port(net_, port->first);
@@ -124,7 +152,6 @@ Interface::Interface(PetriNet & net, const Interface & interface1, const Interfa
 Interface::~Interface()
 {
   clear();
-  delete (ports_[""]);
 }
 
 /*!
@@ -139,7 +166,7 @@ void Interface::clear()
     delete (port->second);
   }
   ports_.clear();
-  ports_[""] = new Port(net_, "");
+  nextID_ = 0;
 }
 
 /*!
@@ -147,11 +174,28 @@ void Interface::clear()
  */
 Port & Interface::addPort(const std::string & name)
 {
-  PNAPI_ASSERT(ports_[name] == NULL);
+  PNAPI_ASSERT_USER(ports_[name] == NULL, string("port '") + name + "' already exists");
 
   Port * p = new Port(net_, name);
   ports_[name] = p;
   return *p;
+}
+
+/*!
+ * \brief adding a label
+ */
+Label & Interface::addLabel(const std::string & name, Label::Type type, const std::string & port)
+{
+  Label * result = NULL;
+  switch(type)
+  {
+  case Label::INPUT: result = &addInputLabel(name, port); break;
+  case Label::OUTPUT: result = &addOutputLabel(name, port); break;
+  case Label::SYNCHRONOUS: result = &addSynchronousLabel(name, port); break;
+  default: PNAPI_ASSERT(false);
+  }
+  
+  return *result;
 }
 
 /*!
@@ -167,7 +211,12 @@ Label & Interface::addInputLabel(const std::string & label, Port & port)
  */
 Label & Interface::addInputLabel(const std::string & label, const std::string & port)
 {
-  PNAPI_ASSERT(ports_[port] != NULL);
+  if(port == "")
+  {
+    Port & p = addPort(generatePortName());
+    return p.addInputLabel(label);
+  }
+  PNAPI_ASSERT_USER(ports_[port] != NULL, string("unknown port '") + port + "'");
   return ports_[port]->addInputLabel(label);
 }
 
@@ -184,7 +233,12 @@ Label & Interface::addOutputLabel(const std::string & label, Port & port)
  */
 Label & Interface::addOutputLabel(const std::string & label, const std::string & port)
 {
-  PNAPI_ASSERT(ports_[port] != NULL);
+  if(port == "")
+  {
+    Port & p = addPort(generatePortName());
+    return p.addOutputLabel(label);
+  }
+  PNAPI_ASSERT_USER(ports_[port] != NULL, string("unknown port '") + port + "'");
   return ports_[port]->addOutputLabel(label);
 }
 
@@ -201,7 +255,12 @@ Label & Interface::addSynchronousLabel(const std::string & label, Port & port)
  */
 Label & Interface::addSynchronousLabel(const std::string & label, const std::string & port)
 {
-  PNAPI_ASSERT(ports_[port] != NULL);
+  if(port == "")
+  {
+    Port & p = addPort(generatePortName());
+    return p.addSynchronousLabel(label);
+  }
+  PNAPI_ASSERT_USER(ports_[port] != NULL, string("unknown port '") + port + "'");
   return ports_[port]->addSynchronousLabel(label);
 }
 
@@ -381,13 +440,26 @@ PetriNet & Interface::getPetriNet() const
  */
 bool Interface::isEmpty() const
 {
-  if( (ports_.size() > 1) || // a port has been defined
-      (!(ports_.begin()->second->getAllLabels().empty())) ) // a label has been defined
+  return ports_.empty();
+}
+
+/*!
+ * \brief generate unused port name
+ */
+std::string Interface::generatePortName()
+{
+  string result;
+  while(true)
   {
-    return false;
+    std::stringstream ss;
+    ss << "port" << (nextID_++);
+    if(ports_.find(ss.str()) == ports_.end())
+    {
+      result = ss.str();
+      break;
+    }
   }
-  
-  return true;
+  return result;
 }
 
 } /* namespace pnapi */

@@ -5,6 +5,8 @@
 #ifndef PNAPI_STATE_H
 #define PNAPI_STATE_H
 
+#include "myio.h"
+
 #include <iostream>
 #include <set>
 #include <map>
@@ -26,13 +28,6 @@ namespace sa
 int parse();
 } /* namespace sa */
 } /* namespace parser */
-namespace io
-{
-namespace __sa
-{
-std::ostream & output(std::ostream &, const State &);
-} /* namespace __sa */
-} /* namespace io */
 
 
 /*!

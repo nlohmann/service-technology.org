@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: stephan $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2010-06-04 00:32:44 +0200 (Fri, 04 Jun 2010) $
+ * \date    $Date: 2010-07-13 19:15:35 +0200 (Tue, 13 Jul 2010) $
  *
- * \version $Revision: 5800 $
+ * \version $Revision: 5917 $
  */
 
 #include "config.h"
@@ -100,8 +100,10 @@ void ComponentObserver::updateNodeNameHistory(Node & node,
 void ComponentObserver::initializeNodeNameHistory(Node & node)
 {
   string name = node.getName();
-  PNAPI_ASSERT( (net_.nodesByName_.find(name) == net_.nodesByName_.end()) ||
-                     ((net_.nodesByName_.find(name))->second == &node) );
+  PNAPI_ASSERT_USER(((net_.nodesByName_.find(name) == net_.nodesByName_.end()) ||
+                     ((net_.nodesByName_.find(name))->second == &node)),
+                    string("node '") + name + "' already exists",
+                    exception::UserCausedError::UE_NODE_NAME_CONFLICT);
 
   net_.nodesByName_[name] = &node;
 }
@@ -358,7 +360,7 @@ PetriNet::copyStructure(const PetriNet & net, const std::string & prefix)
   map<Label *, Label *> labelMap;
   PNAPI_FOREACH(port, net.interface_.getPorts())
   {
-    Port & p = ((port->first == "") ? (*interface_.getPort()) : interface_.addPort(port->first));
+    Port & p = interface_.addPort(port->first);
     PNAPI_FOREACH(label, port->second->getAllLabels())
     {
       Label * l = new Label(*this, p, (*label)->getName(), (*label)->getType());
@@ -1057,6 +1059,12 @@ Interface & PetriNet::getInterface()
   return interface_;
 }
 
+/// get the interface
+const Interface & PetriNet::getInterface() const
+{
+  return interface_;
+}
+
 /*!
  * \brief get all nodes
  */
@@ -1485,85 +1493,62 @@ void PetriNet::createArcs(Transition & trans, Transition & otherTrans,
  *
  * \return  true iff (1), (2) and (3) are fulfilled
  * \return  false in any other case
- * 
- * \todo    Erkennung der SZK ohne Hinzufuegen der Transition
- *          Daniela nach Alorithmus fragen; Funktion const machen;
- *          anschlieﬂend methode const machen
  */
-bool PetriNet::isWorkflow()
+bool PetriNet::isWorkflow() const
 {
   Place * first = NULL;
   Place * last  = NULL;
 
+  // each 2 nodes \f$x,y \in P \cup T\f$ are in a directed cycle
+  // (strongly connected net using tarjan's algorithm)
+  unsigned int index = 0; ///< count index
+  map<Node *, int> indices; ///< index property for nodes
+  map<Node *, unsigned int> lowlink; ///< lowlink property for nodes
+  set<Node *> stacked; ///< the stack indication for nodes
+  
   // finding places described in condition (1) & (2)
   PNAPI_FOREACH(p, places_)
   {
-    if ((*p)->getPreset().empty())
+    // set all places' index values to ``undefined''
+    indices[*p] = (-1);
+    
+    if((*p)->getPreset().empty())
     {
-      if (first == NULL)
+      if(first == NULL)
+      {
         first = *p;
+      }
       else
+      {
         return false;
+      }
     }
-    if ((*p)->getPostset().empty())
+    if((*p)->getPostset().empty())
     {
-      if (last == NULL)
+      if(last == NULL)
+      {
         last = *p;
+      }
       else
+      {
         return false;
+      }
     }
   }
   
   if((first == NULL) || (last == NULL))
-    return false;
-
-  // insert new transition which consumes from last and produces on first to form a cycle
-  Transition & tarjan = createTransition("tarjan");
-  createArc(*last, tarjan);
-  createArc(tarjan, *first);
-
-  // each 2 nodes \f$x,y \in P \cup T\f$ are in a directed cycle
-  // (strongly connected net using tarjan's algorithm)
-  unsigned int i = 0; ///< count index
-  map<Node *, int> index; ///< index property for nodes
-  map<Node *, unsigned int> lowlink; ///< lowlink property for nodes
-  set<Node *> stacked; ///< the stack indication for nodes
-  stack<Node *> S; ///< stack used by Tarjan's algorithm
-
-  // set all nodes' index values to ``undefined''
-  PNAPI_FOREACH(p, places_)
   {
-    index[*p] = (-1);
+    return false;
   }
+
+  // set all transitions' index values to ``undefined''
   PNAPI_FOREACH(t, transitions_)
   {
-    index[*t] = (-1);
+    indices[*t] = (-1);
   }
 
   // getting the number of strongly connected components reachable from first
-  unsigned int sscCount = util::dfsTarjan<Node *>(first, S, stacked, i, index, lowlink);
-
-  deleteTransition(tarjan);
-
-  // check set $P \cup T$
-  set<Node *> nodeSet;
-  PNAPI_FOREACH(p, places_)
-  {
-    nodeSet.insert(*p);
-  }
-  PNAPI_FOREACH(t, transitions_)
-  {
-    nodeSet.insert(*t);
-  }
-
-  /*
-   * true iff only one strongly connected component found from first and all nodes
-   * of $\mathcal{N}$ are members of this component
-   */
-  if((sscCount == 1) && (util::setDifference(nodeSet, stacked).empty()))
-    return true;
-  else
-    return false;
+  return util::dfsTarjan<Node *>(first, last, stacked, index, indices, lowlink, nodes_.size());
 }
 
 
@@ -1827,20 +1812,21 @@ void PetriNet::normalize_classical()
   }
 }
 
-void PetriNet::canonicalNames()
+std::map<std::string, std::string> PetriNet::canonicalNames()
 {
-  int i = 1;
+  map<string, string> result;
+  int i = 0;
   stringstream name;
   PNAPI_FOREACH(n, nodes_)
   {
-    name << "p" << i;
-    i++;
+    name << "p" << (++i);
+    result[name.str()] = (*n)->getName();
     (**n).setName(name.str());
     name.str("");
     name.clear(); 
-
   }
 
+  return result;
 }
 
 
@@ -1857,6 +1843,95 @@ void PetriNet::normalize_rules()
 {
   normalize_classical();
 }
+
+
+/*!
+ * \brief returns one node's conflict cluster
+ * 
+ * Let n be a node in a Petri net. Then n is in n's
+ * conflict cluster [n]. For each place p in [n] the
+ * postset of p is also in [n]. For each transition t
+ * in [n] t's preset is also in [n].
+ *
+ * \return n's conflict cluster
+ */
+set<Node *> PetriNet::getConflictCluster(const Node & n) const
+{
+  set<Node *> result;
+  bool change = true;
+  map<Node *, bool> seen;
+
+  // 1. Inserting canonical node
+  result.insert(const_cast<Node *>(&n));
+
+  // 2. Inserting cluster nodes
+  while(change)
+  {
+    // do the magic
+    change = false;
+    PNAPI_FOREACH(r, result)
+    {
+      // 1. if r is a place r* is in [r]
+      if(dynamic_cast<Place *>(*r) != NULL)
+      {
+        PNAPI_FOREACH(t, (*r)->getPostset())
+        {
+          if(!result.count(*t))
+          {
+            result.insert(*t);
+            change = true;
+          }
+        }
+      }
+
+      // 2. if r is a transition *r is in [r]
+      if(dynamic_cast<Transition *>(*r) != NULL)
+      {
+        PNAPI_FOREACH(p, (*r)->getPreset())
+        {
+          if(!result.count(*p))
+          {
+            result.insert(*p);
+            change = true;
+          }
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+
+/*!
+ * \brief returns the net's conflict clusters
+ *
+ * Uses the method PetriNet::getConflictluster(Node & n)
+ * on each node.
+ *
+ * \return all conflict clusters of the net
+ */
+vector<set<Node *> > PetriNet::getConflictClusters() const
+{
+  vector<set<Node *> > result;
+  set<Node *> seen;
+
+  PNAPI_FOREACH(n, nodes_)
+  {
+    if (!seen.count(*n))
+    {
+      set<Node *> tmp = getConflictCluster(**n);
+      PNAPI_FOREACH(t, tmp)
+      {
+        tmp.insert(*t);
+      }
+      result.push_back(tmp);
+    }
+  }
+
+  return result;
+}
+
 
 } /* namespace pnapi */
 

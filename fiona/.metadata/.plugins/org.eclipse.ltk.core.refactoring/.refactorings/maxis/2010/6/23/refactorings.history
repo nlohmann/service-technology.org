@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename resource &apos;maxis/src/dnf-partial-order.h&apos; to &apos;dnf.h&apos;" description="Rename resource &apos;dnf-partial-order.h&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/dnf-partial-order.h" name="dnf.h" stamp="1275665776584" updateReferences="true"/>
-</session>

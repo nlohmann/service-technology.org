@@ -7,6 +7,7 @@ AC_DEFUN([AC_ST_VERBOSE],[
     AC_DEFINE([USE_SYSLOG], 1, [whether to use syslog]))
 
   # check for required functions and die if they are not found
+  AC_LANG([C++])
   AC_CHECK_FUNCS([mktemp vfprintf],,AC_MSG_ERROR([cannot use required functions]))
 
 ])

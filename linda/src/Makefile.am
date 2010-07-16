@@ -29,8 +29,7 @@ BUILT_SOURCES = cmdline.c syntax_et.cc syntax_et.h lexer_et.cc lexer_etc.cc synt
 
 EXTRA_DIST = syntax_et.h syntax_etc.h cmdline.ggo syntax_profile.h syntax_request.h
 
-MAINTAINERCLEANFILES = cmdline.c cmdline.h syntax_et.cc syntax_et.h lexer_et.cc
-
+MAINTAINERCLEANFILES = cmdline.c cmdline.h syntax_et.cc syntax_et.h lexer_et.cc syntax_request.h syntax_profile.h
 
 ################################################################
 # use GNU gengetopt to create command line parser

@@ -1,5 +1,7 @@
 <?php
-  putenv("PATH=/usr/local/bin:/opt/local/bin:/opt/local/sbin:/usr/bin");
+  require 'resource/php/session.php';
+
+  // putenv("PATH=/usr/local/bin:/opt/local/bin:/opt/local/sbin:/usr/bin");
 
 
   // set output filename

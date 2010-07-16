@@ -1,6 +1,6 @@
 <?php
 
-putenv("PATH=/usr/local/bin:/opt/local/bin:/opt/local/sbin");
+// putenv("PATH=/usr/local/bin:/opt/local/bin:/opt/local/sbin:/var/www/live/local/bin");
 
 $console_counter = 0;
 

@@ -2,10 +2,11 @@
   if (empty($_REQUEST))
     header('Location:index.html#wendy');
 
+  require 'resource/php/session.php';
   include 'resource/php/console.php';
   include 'resource/php/dotimg.php';
 
-  putenv("PATH=/var/www/service-tech/live/local/bin:$PATH");
+  // putenv("PATH=/var/www/service-tech/live/local/bin:$PATH");
 
   // case: service was chosen from drop down menu
   if (!strcmp($_REQUEST['input'], 'given')) {

@@ -1,5 +1,5 @@
 <?php
-  putenv("PATH=/usr/local/bin:/opt/local/bin:/opt/local/sbin:/usr/bin");
+  // putenv("PATH=/usr/local/bin:/opt/local/bin:/opt/local/sbin:/usr/bin");
 
   $dotimg_counter = 0;
 

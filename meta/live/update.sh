@@ -5,8 +5,8 @@ chmod a+x local/bin
 
 cd local
 
-PATH=/var/www/service-tech/live/local/bin:$PATH
-DIR=/var/www/service-tech/live/local
+PATH=`pwd`/bin:$PATH
+DIR=`pwd`
 
 # Genet
 cp `which genet` bin

@@ -1,0 +1,82 @@
+                            ____                 
+                           / ___| ___  _ __ __ _ 
+                          | |    / _ \| '__/ _` |
+                          | |___| (_) | | | (_| |
+                           \____|\___/|_|  \__,_|
+                COverability graphs for Reachability Analysis
+                     http://service-technology.org/cora
+
+
+PURPOSE
+Cora implements several algorithms and result published in several scientific
+articles.  Cora constructs a portion of a coverability graph to decide
+reachability, find a firable sequence to a node of the coverability graph, or
+print the full coverability graph.
+
+The Coverability Graph
+======================
+
+Coverability Graph and Coverability Tree go back a long way.
+
+     R.M. Karp, R.E. Miller. Parallel Program Schemata. Journal of Computer
+     and System Sciences 3, pp.147-195, 1969.
+
+Coverability Graphs are not unique and may vary in size (for the same net)
+depending on the construction algorithm. While there is a minimal one, other
+variants may be faster to implement and/or have faster runtimes.
+
+     A. Finkel. The Minimal Coverability Graph for Petri Nets. Lecture Notes
+     in Computer Science 674, pp.210-243, 1993.
+
+Cora uses a simple algorithm here as the main computing power goes into a
+splitting algorithm for the coverability graph's nodes while the construction
+of nodes is minimized using partial order reduction.
+
+The Reachability Problem
+========================
+
+The Reachability problem is known to be decidable since the early 1980's,
+which was shown independently by two researchers.
+
+     E. Mayr. An Algorithm for the General Petri Net Reachability Problem.
+     SIAM Journal of Computing 13:3, pp.441-460, 1984.
+
+     S.R. Kosaraju. Decidability of Reachability in Vector Addition Systems.
+     Proceedings of the 14th Annual ACM STOC, pp.267-281, 1982.
+
+Later, a different (possibly better) presentation of the topic was given.
+
+     J.L. Lambert. A Structure to Decide Reachability in Petri Nets.
+     Theoretical Computer Science 99, pp.79-104, 1992.
+
+For those firm in the German language, a version with additional explanation
+and a running example can also be found in the book
+
+     H.Wimmel. Entscheidbarkeit bei Petri Netzen. Springer, ISBN
+     978-3-540-85470-8, 2008.
+
+Stubborn Sets
+=============
+
+Since the coverability graph has no upper limit on its size in relation to its
+Petri net, it is a good idea to use optimisations to reduce redundancy with
+respect to the goal. If that goal is testing reachability, partial order
+reductions are a good approach. Cora implements a stubborn set method.
+
+     D.A. Peled. All from One, One for All: Model Checking Using
+     Representatives. Proceedings of CAV'93, Lecture Notes in Computer Science
+     697, pp.409-423, Springer, 1993.
+
+     P. Godefroid. Partial-Order Methods for the Verification of Concurrent
+     Systems - An Approach to the State-Explosion Problem. Lecture Notes in
+     Computer Science 1032, Springer, 1996.
+
+     L.M. Kristensen, K. Schmidt, A. Valmari. Question-guided Stubborn Set
+     Methods for State Properties. Formal Methods in System Design 29:3,
+     pp.215-251, Springer, 2006.
+
+
+
+
+See `http://service-technology.org/publications' for more information.
+

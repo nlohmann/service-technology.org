@@ -1,6 +1,6 @@
 <?php
 
-  require(__DIR__.'/../../conf/live.conf');
+  require(dirname(__FILE__).'/../../conf/live.conf');
 
   ini_set("display_errors", "On");
   ini_set("session.use_trans_sid", "0");

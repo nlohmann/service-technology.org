@@ -16,6 +16,16 @@ ST_PNAPI_OLDLIBS=${LIBS}
 # check whether PNAPI is present and we can link against it
 AC_LANG([C++])
 AC_CHECK_LIB(pnapi, libpnapi_is_present)
+
+# query version of installed PNAPI using pkg-config
+AC_MSG_CHECKING([version of installed Petri Net API])
+AC_PATH_PROGS_FEATURE_CHECK(PKGCONFIG, [pkg-config], [pnapi_version=`pkg-config --modversion libpnapi 2> /dev/null`])
+if test -n "$pnapi_version"; then
+  AC_MSG_RESULT([$pnapi_version])
+else
+  AC_MSG_RESULT([unknown])
+fi
+
 AC_MSG_CHECKING([whether to use installed Petri Net API])
 
 if test "x$with_pnapi" != xno -a "${ac_cv_lib_pnapi_libpnapi_is_present}" = "yes"; then

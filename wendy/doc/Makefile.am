@@ -92,3 +92,15 @@ man-pdf: $(man_MANS:.1=)-man.pdf
 
 %-man.pdf: %.1
 	$(AM_V_GEN)groff -Tps -mandoc -c $< | ps2pdf - $(@:.1=)
+
+
+#-------------------------------------------------------------------#
+# run the "gendocs.sh" script to create a manual in several formats
+#-------------------------------------------------------------------#
+EXTRA_DIST += gendocs.sh gendocs_template
+
+manual: $(info_TEXINFOS)
+	./gendocs.sh $(PACKAGE) "$(PACKAGE_NAME)"
+	-cp -R figs manual
+	-cp -R figs manual/html_node
+	./gendocs.sh $(PACKAGE) "$(PACKAGE_NAME)"

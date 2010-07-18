@@ -8,6 +8,13 @@
                       http://service-technology.org/wendy
 
 
+Version 3.2-unreleased
+======================
+
+* test scripts now use the `petri' utility to convert automata to open nets
+
+* added target to create complete manual (execute `make manual -C tests')
+
 Version 3.1 (15 July 2010)
 ==========================
 

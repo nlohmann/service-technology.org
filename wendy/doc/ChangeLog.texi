@@ -1,3 +1,10 @@
+@heading Version 3.2-unreleased
+@itemize
+@item test scripts now use the @code{petri} utility to convert automata to open nets
+@item added target to create complete manual (execute @samp{make manual -C tests})
+@end itemize
+
+
 @heading Version 3.1 (15 July 2010)
 @itemize
 @item implemented parameter @option{--noDeadlockDetection} to switch off early deadlock detection for more detailed diagnosis information

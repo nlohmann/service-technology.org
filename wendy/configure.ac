@@ -1,4 +1,4 @@
-AC_INIT([Wendy], 3.1, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
+AC_INIT([Wendy], 3.2-unreleased, wendy@service-technology.org, wendy, http://service-technology.org/wendy)
 
 AC_MSG_NOTICE([__        __             _       ])
 AC_MSG_NOTICE([\ \      / /__ _ __   __| |_   _ ])
@@ -36,7 +36,7 @@ AC_PATH_PROG(CNF2BITS,    [wendyFormula2bits], not found)
 AC_PATH_PROG(FIONA,       [fiona], not found)
 AC_PATH_PROG(MARLENE,     [marlene], not found)
 AC_PATH_PROG(MIA,         [mia], not found)
-AC_PATH_PROG(SA2SM,       [sa2sm], not found)
+AC_PATH_PROG(PETRI,       [petri], not found)
 AC_PATH_PROG(VALGRIND,    [valgrind], not found)
 AC_PATH_PROG(WENDY2FIONA, [wendy2fiona], not found)
 

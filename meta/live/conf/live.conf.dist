@@ -1,0 +1,18 @@
+<?php
+
+// path to the `root' of the live installation
+define("LIVEROOT", "/var/www/live/");
+
+// web path to the live installation (http://<server><LIVEBASE>)
+define("LIVEBASE", "/live/");
+
+// where to store temp files
+define("WORKDIR", "/tmp/live/");
+
+// default version of the tools
+define("DEFAULTVERSION", "bin/common");
+
+// additional path options
+define("ADDITIONALPATH", "/usr/local/bin:/usr/bin");
+
+?>

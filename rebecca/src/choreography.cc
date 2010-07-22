@@ -77,7 +77,8 @@ void Choreography::deleteState(int q) {
     if (q == initialState_) {
         initialState_ = INT_MIN;
     }
-    for (set<Edge*>::iterator e = edges_.begin(); e != edges_.end(); ++e)
+    set<Edge *> edges = edges_;
+    for (set<Edge*>::iterator e = edges.begin(); e != edges.end(); ++e)
         if ((*e)->destination == q || (*e)->source == q) {
             deleteEdge(*e);
         }

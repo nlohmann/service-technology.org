@@ -133,6 +133,8 @@ public: /* public constants */
 public: /* public methods */
   /// constructor
   UserCausedError(UE_Type, const std::string &);
+  /// output method
+  virtual std::ostream & output(std::ostream &) const;
 };
 
 

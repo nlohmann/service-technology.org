@@ -140,6 +140,22 @@ UserCausedError::UserCausedError(UE_Type type_, const std::string & msg) :
 {
 }
 
+/*!
+ * \brief output method
+ */
+std::ostream & UserCausedError::output(std::ostream & os) const
+{
+  switch(type)
+  {
+  case UE_NODE_NAME_CONFLICT: os << "node name conflict: "; break;
+  case UE_LABEL_NAME_CONFLICT: os << "label name conflict: "; break;
+  case UE_ARC_CONFLICT: os << "arc conflict: "; break;
+  case UE_COMPOSE_ERROR: os << "compose error: "; break;
+  default: /* do nothing */;
+  }
+  
+  return (os << message);
+}
 
 } /* namespace exception */
 

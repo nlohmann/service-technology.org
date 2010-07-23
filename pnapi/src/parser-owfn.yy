@@ -468,9 +468,9 @@ port_list2:
 port_participants: 
   node_name 
   {
+    parser_.label_ = parser_.net_.getInterface().findLabel(parser_.nodeName_.str());
     parser_.check(parser_.label_ == NULL,
-                  ((parser_.label_ = parser_.net_.getInterface().findLabel(parser_.nodeName_.str())) ?
-                   ("interface label already assigned to port '" + parser_.label_->getPort().getName() +"'") : ""));
+                  ((parser_.label_) ? ("interface label already assigned to port '" + parser_.label_->getPort().getName() +"'") : ""));
     parser_.check(parser_.labelTypes_.find(parser_.nodeName_.str()) != parser_.labelTypes_.end(),
                   std::string("unknown label '") + parser_.nodeName_.str() + "'");
 
@@ -485,9 +485,9 @@ port_participants:
   }
 | port_participants COMMA node_name
   {
+    parser_.label_ = parser_.net_.getInterface().findLabel(parser_.nodeName_.str());
     parser_.check(parser_.label_ == NULL,
-                  ((parser_.label_ = parser_.net_.getInterface().findLabel(parser_.nodeName_.str())) ?
-                   ("interface label already assigned to port '" + parser_.label_->getPort().getName() +"'") : ""));
+                  (parser_.label_) ? ("interface label already assigned to port '" + parser_.label_->getPort().getName() +"'") : "");
     parser_.check(parser_.labelTypes_.find(parser_.nodeName_.str()) != parser_.labelTypes_.end(),
                   std::string("unknown label '") + parser_.nodeName_.str() + "'");
 

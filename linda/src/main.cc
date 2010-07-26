@@ -58,8 +58,6 @@ std::vector<EventTermConstraint*>* constraint_vec = 0;
 bool stop_interaction = false;
 
 extern int etc_yylineno;
-extern int etc_yydebug;
-extern int etc_yy_flex_debug;
 extern FILE* etc_yyin;
 extern int etc_yyerror();
 extern int etc_yyparse();
@@ -485,8 +483,6 @@ int main(int argc, char** argv) {
 
 			// Initialize parser
 			etc_yylineno = 1;
-			etc_yydebug = 0;
-			etc_yy_flex_debug = 0;
 
 			etc_yyin = fopen(args_info.constraint_file_arg, "r");
 

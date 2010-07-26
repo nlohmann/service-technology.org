@@ -144,7 +144,7 @@ private:
 			return insertR(node,true,node->left,k,v,update);
 		} else if (k > node->key) {
 			return insertR(node,false,node->right,k,v,update);
-		} else if (update = true && node->key == k) {
+		} else if (update == true && node->key == k) {
 			node->value = v;
 			return true;
 		}

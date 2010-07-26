@@ -5,8 +5,8 @@
  * Epilogue: Syntax and usage of the epilogue.  */
 
 // options for Bison
-#define YYDEBUG 1
-#define YYERROR_VERBOSE 0  // for verbose error messages
+#define YYDEBUG 0 
+#define YYERROR_VERBOSE 1  // for verbose error messages
 
 // to avoid the message "parser stack overflow"
 #define YYMAXDEPTH 1000000

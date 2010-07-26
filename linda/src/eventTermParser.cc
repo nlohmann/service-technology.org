@@ -17,8 +17,6 @@ extern int et_yylex_destroy();
 /// Convenience function to initialize the parser for event term files.
 void initialize_et_parser() {
 	et_yylineno = 1;
-	et_yydebug = 0;
-	et_yy_flex_debug = 0;
 }
 
 bool EventTermParser::initialize() {

@@ -90,7 +90,17 @@ void ComponentObserver::updateNodeNameHistory(Node & node,
   // remove access to nodes by their former names
   net_.nodesByName_.erase(*oldHistory.begin());
   
-  initializeNodeNameHistory(node);
+  try
+  {
+    initializeNodeNameHistory(node);
+  }
+  catch (exception::Error & e)
+  {
+    // undo change
+    net_.nodesByName_[*oldHistory.begin()] = &node;
+    
+    throw e;
+  }
 }
 
 
@@ -1815,15 +1825,47 @@ void PetriNet::normalize_classical()
 std::map<std::string, std::string> PetriNet::canonicalNames()
 {
   map<string, string> result;
+  map<Node *, string> tmp;
   int i = 0;
+  int j = 0;
   stringstream name;
+  
   PNAPI_FOREACH(n, nodes_)
   {
     name << "p" << (++i);
     result[name.str()] = (*n)->getName();
-    (**n).setName(name.str());
+    
+    try
+    {
+      (**n).setName(name.str());
+    }
+    catch(exception::Error & e)
+    {
+      // name conflict
+      tmp[*n] = name.str();
+      bool rename = true;
+      while(rename)
+      {
+        name.str("");
+        name.clear();
+        name << "_" << (++j);
+        
+        try
+        {
+          (**n).setName(name.str());
+          rename = false;
+        }
+        catch(exception::Error & e) { /* retry */ }
+      }
+    }
+    
     name.str("");
     name.clear(); 
+  }
+  
+  PNAPI_FOREACH(n, tmp)
+  {
+    n->first->setName(n->second);
   }
 
   return result;

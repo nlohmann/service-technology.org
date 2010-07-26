@@ -610,6 +610,13 @@ AT_CHECK([GREP -q "|P|= 10  |P_in|= 2  |P_out|= 2  |T|= 5  |F|= 13" stderr])
 AT_KEYWORDS([bug reduction])
 AT_CLEANUP
 
+AT_SETUP([Bug 16302 (https://gna.org/bugs/?16302)])
+m4_define([NET],[bug16302.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET -opng --dot=DOT])
+AT_KEYWORDS([bug dot output])
+AT_CLEANUP
+
 
 ############################################################################
 AT_BANNER([Error Cases])
@@ -1122,6 +1129,18 @@ AT_CHECK([cp TESTFILES/NET.owfn TESTFILES/EXPECTED .])
 AT_CHECK([PETRI -n NET.owfn -oowfn], 0, ignore, ignore)
 AT_CHECK([FIONA -t equivalence NET.owfn.normalized.owfn EXPECTED], 0, ignore, ignore)
 AT_KEYWORDS([normalize fiona])
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Others])
+############################################################################
+
+AT_SETUP([Canonical names with name conflicts])
+m4_define([NET], [zeus.owfn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --canonicalNames])
+AT_KEYWORDS([canonical_names])
 AT_CLEANUP
 
 

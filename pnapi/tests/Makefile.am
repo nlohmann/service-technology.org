@@ -15,7 +15,7 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
             bug14128.1.owfn bug14128.2.owfn bug14206.lola bug14208.1.owfn \
             bug14208.2.owfn bug14335.owfn bug14411.owfn \
             bug14411-constraint.owfn bug14417.1.owfn bug14417.2.owfn \
-            bug14856.owfn bug15415.owfn \
+            bug14856.owfn bug15415.owfn bug16302.owfn \
 	    bug_15820_sp.owfn bug_15820_sp_2.owfn \
             data.hlowfn eisen.hlowfn myCoffee.owfn phils.hlowfn \
 	    error_parser_lola_01.lola error_parser_lola_02.lola \

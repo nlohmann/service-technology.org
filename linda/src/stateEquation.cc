@@ -211,7 +211,7 @@ bool ExtendedStateEquation::constructLP() {
 EventTermBound* ExtendedStateEquation::evaluate(EventTerm* e) {
 	// Create a mapping from the term
 	int* map = EventTerm::termToMap(e);
-	evaluate(map);
+	return evaluate(map);
 }
 
 EventTermBound* ExtendedStateEquation::evaluate(int* e) {

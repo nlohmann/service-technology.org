@@ -20,7 +20,7 @@ public:
 	static bool initialize(pnapi::PetriNet* net, bool keepHistory=false);
 
 	/// add all final markings from the final condition
-	static bool addFinalMarkingsFromFinalCondition(uint8_t bound);
+	static void addFinalMarkingsFromFinalCondition(uint8_t bound);
 
 	static std::pair<BinaryTree<pnapi::Place*,std::pair<int,int> >**,int> translateFinalCondition(pnapi::PetriNet* net);
 

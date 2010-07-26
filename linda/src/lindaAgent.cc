@@ -245,7 +245,7 @@ std::pair<BinaryTree<pnapi::Place*,std::pair<int,int> >**,int> LindaAgent::trans
 }
 
 
-bool LindaAgent::addFinalMarkingsFromFinalCondition(uint8_t bound) {
+void LindaAgent::addFinalMarkingsFromFinalCondition(uint8_t bound) {
 	// Calculate the final markings from the final condition
 
 	status("Computing final markings...");

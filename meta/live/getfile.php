@@ -25,8 +25,8 @@
         $ct = "text/plain";
     }
 
-     header('Content-type: '.$ct);
-    // header('Content-Disposition: attachment; filename="'.$file.'"');
+    header('Content-type: '.$ct);
+    header('Content-Disposition: inline; filename="'.$file.'"');
     readfile($getfile);
   }
   else

@@ -1,21 +1,11 @@
 # tell aclocal about the macros in the "m4" folder
 ACLOCAL_AMFLAGS = -I m4 --install
 
-
 SUBDIRS = src utils man doc tests
 
-##############################################################################
-# remove everything that can be rebuilt
-##############################################################################
 svn-clean: maintainer-clean
-	rm -fr configure Makefile.in depcomp compile config.guess config.sub \
-	  INSTALL missing aclocal.m4 install-sh ylwrap utils/Makefile.in \
-	  tests/Makefile.in doc/Makefile.in doc/mdate-sh src/Makefile.in \
-	  src/config.h.in src/readnet-syntax.h man/Makefile.in build-aux
-	@echo "-----------------------------------------------------"
-	@echo "To recreate installation status enter"
-	@echo "  autoreconf -i"
-	@echo
+	rm -fr configure INSTALL aclocal.m4 src/config.h.in doc/mdate-sh src/config-log.h build-aux
+	for DIR in $(DIST_SUBDIRS) .; do rm -f $$DIR/Makefile.in; done
 
 
 ##############################################################################

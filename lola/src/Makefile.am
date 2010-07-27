@@ -1,12 +1,7 @@
-.SUFFIXES = .ggo
-
-# not bin_PROGRAMS as installation is handled manually
+# the main program - not bin_PROGRAMS as installation is handled manually
 noinst_PROGRAMS = lola
 
-#######################
-# the list of sources #
-#######################
-
+# the plain sources you need to compile (no generated code)
 lola_SOURCES = readnet-syntax.yy \
                readnet-lexic.ll \
                cmdline.c cmdline.h \
@@ -27,36 +22,36 @@ lola_SOURCES = readnet-syntax.yy \
                structure.H \
                userconfig.H 
 
+# additional source code
 lola_EXTRASOURCES = ltl.H ltl.cc
 
-EXTRA_DIST = readnet-syntax.h cmdline.ggo \
-             configs/userconfig.H.boundednet \
-             configs/userconfig.H.boundedplace \
-             configs/userconfig.H.deadlock \
-             configs/userconfig.H.deadtransition \
-             configs/userconfig.H.findpath \
-             configs/userconfig.H.full \
-             configs/userconfig.H.full1 \
-             configs/userconfig.H.fullcover \
-             configs/userconfig.H.fulllimited \
-             configs/userconfig.H.liveprop \
-             configs/userconfig.H.liveprop1 \
-             configs/userconfig.H.modelchecking \
-             configs/userconfig.H.none \
-             configs/userconfig.H.prom-boundednet \
-             configs/userconfig.H.prom-deadlock \
-             configs/userconfig.H.prom-home \
-             configs/userconfig.H.prom-reversibility \
-             configs/userconfig.H.statepredicate \
-             configs/userconfig.H.statepredicate1 \
-             configs/userconfig.H.statespace \
-             configs/userconfig.H.statespace1
+## include a generic Makefile template to organize cleaning etc.
+## must be included after the source listing and before any definition of
+## BUILT_SOURCES, EXTRA_DIST, MAINTAINERCLEANFILES, or DISTCLEANFILES.
+include $(top_srcdir)/m4/Makefile.src
 
-################################################################
-# use GNU gengetopt to create command line parser
-################################################################
-.ggo.c:
-	$(AM_V_GEN)$(GENGETOPT) --input=$< -F $(@:.c=)
+# user configs
+EXTRA_DIST += configs/userconfig.H.boundednet \
+              configs/userconfig.H.boundedplace \
+              configs/userconfig.H.deadlock \
+              configs/userconfig.H.deadtransition \
+              configs/userconfig.H.findpath \
+              configs/userconfig.H.full \
+              configs/userconfig.H.full1 \
+              configs/userconfig.H.fullcover \
+              configs/userconfig.H.fulllimited \
+              configs/userconfig.H.liveprop \
+              configs/userconfig.H.liveprop1 \
+              configs/userconfig.H.modelchecking \
+              configs/userconfig.H.none \
+              configs/userconfig.H.prom-boundednet \
+              configs/userconfig.H.prom-deadlock \
+              configs/userconfig.H.prom-home \
+              configs/userconfig.H.prom-reversibility \
+              configs/userconfig.H.statepredicate \
+              configs/userconfig.H.statepredicate1 \
+              configs/userconfig.H.statespace \
+              configs/userconfig.H.statespace1
 
 
 #############################################################################
@@ -77,8 +72,8 @@ $(CONFIGS): $@
 	$(AM_V_at)chmod u+w $(builddir)/userconfig.H~
 	$(AM_V_at)rm $(builddir)/userconfig.H~
 
-MAINTAINERCLEANFILES = $(CONFIGS) cmdline.c cmdline.h
-DISTCLEANFILES = $(CONFIGS)$(EXEEXT)
+MAINTAINERCLEANFILES += $(CONFIGS) cmdline.c cmdline.h
+DISTCLEANFILES += $(CONFIGS)$(EXEEXT)
 
 
 #############################################################################

@@ -10,14 +10,6 @@ AC_MSG_NOTICE([http://service-technology.org/lola])
 AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
 AC_MSG_NOTICE()
 
-#############################################################################
-# check for prerequisites, programms, headers, and libraries
-#############################################################################
-
-# prerequisites for Autoconf and Automake
-AC_PREREQ(2.60)
-
-# where to look for source code and how the config header should be called
 AC_CONFIG_SRCDIR(src/net.cc)
 AC_CONFIG_HEADER(src/config.h)
 AC_CONFIG_AUX_DIR([build-aux])
@@ -25,22 +17,22 @@ AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-# check for generic programs
+# check for standard programs needed to compile
 AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
-AC_PROG_INSTALL
 
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_AUTOTEST
 
+# use drand48 if possible and fall back to rand otherwise
+AC_CHECK_FUNCS([drand48])
+
 # check for libconfig++
 AC_CHECK_LIB(config++, main)
 AM_CONDITIONAL(USE_LIBCONFIG, [test ${ac_cv_lib_configpp_main} = "yes"])
-
-AC_CHECK_FUNCS([drand48])
 
 
 #############################################################################
@@ -68,14 +60,11 @@ if test "$enable_mpi" = "yes"; then
 fi
 
 
-#############################################################################
-# create output files
-#############################################################################
-
-# Set files to generate.
-AC_CONFIG_FILES([Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile  tests/Makefile tests/package.m4 utils/Makefile])
+# write files
+AC_CONFIG_FILES([
+	Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile
+	tests/Makefile tests/package.m4 utils/Makefile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
-
 AC_OUTPUT
 
 echo

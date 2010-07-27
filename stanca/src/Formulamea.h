@@ -59,7 +59,7 @@ class MConjunction : public MFormula {
 public:	
 	const MFormula *left;
 	const MFormula *right;
-	string ft;
+	//string ft;
 	
 	MConjunction(const MFormula *lleft, const MFormula *rright) : left(lleft), right (rright){
 		
@@ -68,10 +68,12 @@ public:
 	}
 	MConjunction(const MConjunction *conj) : MFormula(*conj), left(conj->left),right(conj->right){}
 	~MConjunction(){
-		
+		//delete left;
+		//delete right;		
 	}	
 	const MFormula* computeEFF() const{
-		return new MConjunction(left->computeEFF(), right->computeEFF());
+		const MFormula *x=new MConjunction(left->computeEFF(), right->computeEFF());
+		return x;
 	}
 	
 	const MFormula* computeIFF() const{
@@ -93,12 +95,12 @@ class MDisjunction : public MFormula {
 public:	
 	const MFormula *left;
 	const MFormula *right;
-	std::string ft;
+	//std::string ft;
 	//public:	
 	MDisjunction(const MFormula *lleft, const MFormula *rright) : left(lleft), right (rright){
 		assert(lleft);
 		assert(rright);
-		ft = "OR";
+		//ft = "OR";
 	}	
 	MDisjunction(const MDisjunction *dis) :  left(dis->left),right(dis->right){}
 	~MDisjunction(){
@@ -127,11 +129,11 @@ public:
 	const int number; /// id of the place literal
 	const string namep;// name of the place
 	const int itr;//iteration number
-	std::string ft;
+	//std::string ft;
 	/// there may be more literals for a place this is determined at runtime
 	//public:
 	PlLit(const int n,const string np,const int it) : number(n), namep(np), itr(it){
-	ft = "LIT";
+	//ft = "LIT";
 	}
 	PlLit(const PlLit &formula): MFormula(formula), number(formula.number),namep(formula.namep), itr(formula.itr){}
 	~PlLit(){}
@@ -169,7 +171,7 @@ public:
 	MNegation(const MNegation *neg) : MFormula(*neg), subf(neg->subf){assert(neg);
 	}
 	~MNegation(){
-		delete subf;
+		//delete subf;
 	}
 	const MFormula* computeEFF() const{
 		return new MNegation(subf->computeEFF());
@@ -190,14 +192,15 @@ public:
 										 return res;
 										 }
 										 else if((typeid(*subf) == typeid(MDisjunction))) {
-											 const MDisjunction *cj=dynamic_cast<const MDisjunction *>(subf);
-											 const MNegation *nleft=new MNegation(cj->left); const MNegation *nright=new MNegation(cj->right);
+											 const MDisjunction *dj=dynamic_cast<const MDisjunction *>(subf);
+											 const MNegation *nleft=new MNegation(dj->left); const MNegation *nright=new MNegation(dj->right);
 											 MConjunction *res=new MConjunction(nleft->computeNFF(),nright->computeNFF());//dynamic_cast<const MNegation *>(cj->left),dynamic_cast<const MNegation *>(cj->right));
 											 return res;			
 										 }
 										 else if(typeid(*subf) == typeid(PlLit)) {
 											 return this;
 										 }
+		return this;
 	}
 
 	string toString() const{
@@ -236,7 +239,7 @@ public:
 		return new MDisjunction(new MNegation(left->computeIFF()), right->computeIFF());
 	}
 	const MFormula* computeNFF() const{
-		//do nothing 
+		return this;//do nothing 
 	}
 	
 	string toString() const{
@@ -260,8 +263,8 @@ public:
 		//delete right;
 	}
 	const MFormula* computeEFF() const{
-		MConjunction mc= new MConjunction(new MImplication(left->computeEFF(), right->computeEFF()), 
-					 new MImplication(right->computeEFF(), left->computeEFF()));
+		//MConjunction *mc= new MConjunction(new MImplication(left->computeEFF(), right->computeEFF()), 
+		//			 new MImplication(right->computeEFF(), left->computeEFF()));
 		return new MConjunction(new MImplication(left->computeEFF(), right->computeEFF()), 
 						   new MImplication(right->computeEFF(), left->computeEFF()));
 	}
@@ -309,6 +312,7 @@ vector<vector<int> > CNF2MSF(const MFormula *fcnf);
 int isSatisfiable(const MFormula *f);
 //extern  int minisat(vector<vector<int> > &);
 extern vector<bool>*  minisat(vector<vector<int> > &);
+extern vector<bool>*  minisat2(vector<vector<int> > &);
 //map<string, vector<int> > mp;
 
 #endif

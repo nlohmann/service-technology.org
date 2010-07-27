@@ -48,7 +48,7 @@ using pnapi::io::lola;
 using pnapi::io::dot;
 using pnapi::io::meta;
 using pnapi::io::nets;
-using pnapi::io::InputError;
+//using pnapi::io::InputError;
 using pnapi::io::CREATOR;
 using pnapi::io::INPUTFILE;
 using pnapi::io::OUTPUTFILE;
@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
 	
 	pnapi::PetriNet net;
 	
-    try {
+    //try {
         // parse either from standard input or from a given file
         if (args_info.inputs_num == 0) {
         	// parse the open net from standard input
@@ -167,11 +167,11 @@ int main(int argc, char **argv) {
             s << pnapi::io::stat << net;
             status("read net: %s", s.str().c_str());
         }
-    } catch(pnapi::io::InputError error) {
-        std::ostringstream s;
-        s << error;
-        abort(2, "\b%s", s.str().c_str());
-    }
+    //} catch(pnapi::io::InputError error) {
+     //   std::ostringstream s;
+      //  s << error;
+       // abort(2, "\b%s", s.str().c_str());
+    //}
 	//some statistics no of places and max id
 	
 	start_time=clock();
@@ -192,9 +192,9 @@ int main(int argc, char **argv) {
 		iv.push_back(++id);//cout<<id;
 	}
 	iv.push_back(++id);//cout<<id;
+	
 	mp.insert(pair<string,vector<int> >((*net.getPlaces().begin())->getName(), iv));
 	set<Place *>::iterator next=++net.getPlaces().begin();
-	
 /*	for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
 		cout << (*it)->getName()<< " ";
 		for(int k=0; k<mp.find((*it)->getName())->second.size(); ++k)
@@ -204,8 +204,12 @@ int main(int argc, char **argv) {
 	cout << mp.size()<<endl;*/
 	
 	MFormula *previousl, *previous;
-	//here we do two things at a time the first formula plus initialize all copies of the vaiables with ids
+	//here we do two things at a time the first formula plus initialize all copies of the variables with ids
 	//int iter=0;
+	if (net.getPlaces().size()==1) {
+		previousl=f;
+	}
+	else {
 	for (set<Place *>::iterator it=next; it!= net.getPlaces().end(); ++it) {
 		///prepare previous formula
 		vector<int> iv;
@@ -217,7 +221,6 @@ int main(int argc, char **argv) {
 		iv.push_back(++id);
 		//cout << iv.size();
 		mp.insert(pair<string,vector<int> >((*it)->getName(), iv));
-		
 		if (it==next) {
 			MDisjunction *d = new MDisjunction(f,f1);
 			previousl=d;
@@ -226,8 +229,8 @@ int main(int argc, char **argv) {
 			MDisjunction *d=new MDisjunction(previousl,f1);
 			previousl=d;
 		}
-	}
-	
+	}}
+	int maxid=id;
 	cout << "Number of places "<<net.getPlaces().size() << "max id" <<id<<endl;
 	
 	/*for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
@@ -237,10 +240,63 @@ int main(int argc, char **argv) {
 		cout << endl;
 	}
 	cout << mp.size()<<endl;*/
-	/// at least one place e clara ///
-	cout << "First "  <<endl;//<<previousl->toString()<<endl;
-
-	
+	/// at least one place ///
+	if ( args_info.trap_flag ){cout << "First "  <<previousl->toString()<<endl;}
+	if ( args_info.trap_flag ){
+		cout << "trap"<<endl;
+		for (set<Transition*>::iterator tit=net.getTransitions().begin(); tit!=net.getTransitions().end(); ++tit) {
+			//cout << (*tit)->getName()<<" : ";
+			///build current net.findTransition((*tit)->getName())
+			MFormula  *inprev;  pnapi::Transition &t=*net.findTransition((*tit)->getName());//const std::string s=t->getName();std::set<Node *> sn;//
+			//sn=net.findTransition((*tit)->getName())->getPostset();
+			for (std::set<pnapi::Node *>::iterator nit=t.getPreset().begin(); nit!=t.getPreset().end(); ++nit){
+				MFormula *currin;Place * pl = dynamic_cast<Place *> ((*nit));
+				/// here find the corresponding place in the mapping  and build an Implication 
+				//cout << pl->getName();
+				//cout << " ";
+				int pid=mp[pl->getName()][0];// the first id for the place; we have to create more
+				MFormula *pvs;/// disjunction of pre-places
+				///here build a disjunction
+				for (std::set<pnapi::Node *>::iterator nnit=net.findTransition((*tit)->getName())->getPostset().begin(); nnit!=net.findTransition((*tit)->getName())->getPostset().end(); ++nnit){
+					Place * pli = dynamic_cast<Place *> (*nnit); 
+					int ppid=mp[pli->getName()][0];
+					PlLit* fp = new PlLit(ppid,pli->getName(),0);
+					if (nnit==net.findTransition((*tit)->getName())->getPostset().begin()) {
+						pvs=fp;
+					}
+					else {
+						pvs=new MDisjunction(pvs,fp);
+						//if(pvs!=NULL) else pvs=fp;
+					}
+					
+					//cout << pli->getName();
+				}
+				///implication or nothing
+				MFormula *pinp;
+				if(!net.findTransition((*tit)->getName())->getPostset().empty())
+				pinp = new MImplication(new PlLit(pid,pl->getName(),0), pvs);
+				else {pinp =new MNegation(new PlLit(pid,pl->getName(),0));}
+				/// make a conjunction with the previous set  watch out it might not exist
+				if (nit==net.findTransition((*tit)->getName())->getPreset().begin()) {
+					inprev=pinp;
+				}
+				else {
+					inprev=new MConjunction(inprev,pinp);
+				}
+				
+				//cout << endl;
+			}
+			if (tit==net.getTransitions().begin()) {
+				previous=inprev;
+			}
+			else {////build  the conjunction
+				previous = new MConjunction(previous,inprev);
+				
+			}
+			
+		}
+	}
+	else{
 	for (set<Transition*>::iterator tit=net.getTransitions().begin(); tit!=net.getTransitions().end(); ++tit) {
 		//cout << (*tit)->getName()<<" : ";
 		///build current net.findTransition((*tit)->getName())
@@ -287,15 +343,203 @@ int main(int argc, char **argv) {
 			
 		}
 		
+		}
 	}
-	MConjunction *ersteit=new MConjunction(previousl, previous);
+		MConjunction *ersteit=new MConjunction(previousl, previous);
+	
 	
 	//
-/*	cout << "First formula " << ersteit->toString()<<endl;
-	const MFormula *nef=ersteit->computeIFF();
+	if(args_info.verbose_flag) cout << "First formula " << ersteit->toString()<<endl;
+/*	const MFormula *nef=ersteit->computeIFF();
 	cout <<endl<<" IFF "<< nef->toString();
 	const MFormula *negf=nif->computeNFF();
 */
+	MFormula *fffinal=NULL;
+	if (args_info.siphon_flag && args_info.trap_flag ){
+	  // find a trap inside a siphon means that we have to check first that there are traps at all
+		//and then uses some impleications adding the siphon check
+		fffinal=ersteit;
+		const MFormula *cnf=NULL; //cnf=computeCNF(ersteit);//
+		cnf=computeCNF(fffinal);
+		cout<<"AfterCNF";
+		if(cnf!=NULL) {if(args_info.verbose_flag) cout<<endl<<cnf->toString()<<endl;}
+		else {
+			cout << "NULL";exit(0);
+		}
+		vector<vector<int> > inms=CNF2MSF(cnf);
+		vector<bool>* rs=minisat(inms);
+		
+		if (rs==NULL){ cout << "No marked trap inside a siphon. Reason: the net does not contain any trap"<<endl; exit(0);}
+		else {
+			//add the marked property to the actual trap formula
+			cout << "The net contains a trap"<<endl;
+			//cout << rs->size()<<endl;
+			bool marked=false;
+			for (unsigned int k=0; k<rs->size(); ++k) {
+				if(rs->at(k)){ //cout << "rs["<<k<<"] = "<<rs->at(k)<<endl;
+					for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
+						// cout << (*it)->getName()<< " ";
+						for(unsigned int kk=0; kk<mp.find((*it)->getName())->second.size(); ++kk)
+							if(mp.find((*it)->getName())->second[kk]==k+1){
+								cout << (*it)->getName()<<" ";//<<"^"<<kk;
+									if ((*it)->getTokenCount()) {
+										marked=true; 
+									}
+							}
+					}
+					//cout << mp.size()<<endl;
+					//cout <<" "<< rs->at(k)<<endl;
+				}
+			}
+			cout << endl;
+			if (marked==false){ cout << "No marked trap inside a siphon. Reason: the net does not contain any marked trap"<<endl; exit(0);
+			}
+			//check for siphons with different variables and add corresponding implication (inclusion)
+			MFormula *previouss;
+			for (set<Transition*>::iterator tit=net.getTransitions().begin(); tit!=net.getTransitions().end(); ++tit) {
+				//cout << (*tit)->getName()<<" : ";
+				///build current net.findTransition((*tit)->getName())
+				MFormula  *inprev;  pnapi::Transition &t=*net.findTransition((*tit)->getName());//const std::string s=t->getName();std::set<Node *> sn;//
+				//sn=net.findTransition((*tit)->getName())->getPostset();
+				for (std::set<pnapi::Node *>::iterator nit=t.getPostset().begin(); nit!=t.getPostset().end(); ++nit){
+					MFormula *currin;Place * pl = dynamic_cast<Place *> ((*nit));
+					/// here find the corresponding place in the mapping  and build an Implication 
+					//cout << pl->getName();
+					//cout << " ";
+					int pid=mp[pl->getName()][1];// the first id for the place; we have to create more
+					MFormula *pvs;/// disjunction of pre-places
+					///here build a disjunction
+					for (std::set<pnapi::Node *>::iterator nnit=net.findTransition((*tit)->getName())->getPreset().begin(); nnit!=net.findTransition((*tit)->getName())->getPreset().end(); ++nnit){
+						Place * pli = dynamic_cast<Place *> (*nnit); 
+						int ppid=mp[pli->getName()][1];
+						PlLit* fp = new PlLit(ppid,pli->getName(),1);
+						if (nnit==net.findTransition((*tit)->getName())->getPreset().begin()) {
+							pvs=fp;
+						}
+						else {
+							pvs=new MDisjunction(pvs,fp);
+						}
+						
+						//cout << pli->getName();
+					}
+					///implication
+					MImplication *pinp=new MImplication(new PlLit(pid,pl->getName(),1), pvs);
+					/// make a conjunction with the previous set  watch out it might not exist
+					if (nit==net.findTransition((*tit)->getName())->getPostset().begin()) {
+						inprev=pinp;
+					}
+					else {
+						inprev=new MConjunction(inprev,pinp);
+					}
+					
+					//cout << endl;
+				}
+				if (tit==net.getTransitions().begin()) {
+					previouss=inprev;
+				}
+				else {////build  the conjunction
+					previouss = new MConjunction(previouss,inprev);
+					
+				}
+				
+			}
+			MFormula *conjf=new MConjunction(ersteit,previouss);
+			//for all places add an implication
+			for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
+				int ppidtrap=mp[(*it)->getName()][0];int ppidsiphon=mp[(*it)->getName()][1];
+				PlLit* fptrap = new PlLit(ppidtrap,(*it)->getName(),0);PlLit* fpsiphon = new PlLit(ppidsiphon,(*it)->getName(),1);
+				conjf=new MConjunction(conjf,new MDisjunction(new MConjunction(fptrap,fpsiphon),new MConjunction(new MNegation(fptrap),fpsiphon)));
+			}
+			const MFormula *cnfst=NULL; //cnf=computeCNF(ersteit);//
+			cnfst=computeCNF(conjf);
+			cout<<"AfterCNF";
+			if(cnfst!=NULL) {if(args_info.verbose_flag) cout<<endl<<cnfst->toString()<<endl;}
+			else {
+				cout << "NULL";exit(0);
+			}
+			vector<vector<int> > inmsst=CNF2MSF(cnf);
+			vector<bool>* rsst=minisat(inmsst);
+			if (rs!=NULL) {
+			    cout << "The net contains a siphon with a marked trap inside: ";
+				//print out the solution
+				for (unsigned int k=0; k<rsst->size(); ++k) {
+					if(rsst->at(k)){ //cout << "rsst["<<k<<"] = "<<rsst->at(k)<<endl;
+						for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
+							// cout << (*it)->getName()<< " ";
+							for(unsigned int kk=0; kk<2; ++kk)//mp.find((*it)->getName())->second.size()
+								if(mp.find((*it)->getName())->second[kk]==k+1)
+									cout << (*it)->getName()<<" ";//<<"^"<<kk;
+							
+						}
+						//cout << mp.size()<<endl;
+						//cout <<" "<< rs->at(k)<<endl;
+					}
+				}
+				cout << endl;
+				exit(0);
+			}
+			else {
+				cout << "The net contains no marked trap inside a siphon"<<endl;exit(0);
+			}
+
+		}
+	}
+	if ( args_info.siphon_flag || args_info.trap_flag ){
+		if(args_info.verbose_flag) cout << "First formula " << ersteit->toString()<<endl;
+		//call minisat and exit
+		fffinal=ersteit;
+		const MFormula *cnf=NULL; //cnf=computeCNF(ersteit);//
+		cnf=computeCNF(fffinal);
+		cout<<"AfterCNF";
+		if(cnf!=NULL) {if(args_info.verbose_flag) cout<<endl<<cnf->toString()<<endl;}
+		else {
+			cout << "NULL";exit(0);
+		}
+		
+		///compute minisat form
+		//vector<vector<int> > inms=CNF2MSF(cnf); //
+		vector<vector<int> > inms=CNF2MSF(cnf); ///input for minisat
+		/*cout <<endl <<"CNF2MSF size "<< inms.size()<<endl;
+		for (int r=0; r<inms.size(); ++r) {
+			vector<int> vin=inms.at(r);
+			for (int q=0; q<vin.size(); ++q) {
+				cout << vin.at(q)<<" ";
+			}
+			cout << endl;
+		}
+		*/
+		vector<bool>* rs=minisat(inms);
+		
+		if (rs!=NULL) {
+			
+			if( args_info.siphon_flag) cout << "The net contains a siphon"<<endl;
+			else  cout << "The net contains a trap"<<endl;
+			//cout << rs->size()<<endl;
+			for (unsigned int k=0; k<rs->size(); ++k) {
+				if(rs->at(k)){ //cout << "rs["<<k<<"] = "<<rs->at(k)<<endl;
+				for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
+					// cout << (*it)->getName()<< " ";
+					for(unsigned int kk=0; kk<mp.find((*it)->getName())->second.size(); ++kk)
+						if(mp.find((*it)->getName())->second[kk]==k+1)
+							cout << (*it)->getName()<<" ";//<<"^"<<kk;
+					 
+				}
+				//cout << mp.size()<<endl;
+				//cout <<" "<< rs->at(k)<<endl;
+				}
+			}
+			cout << endl;exit(0);
+			//rs contains an assignement; we have to map it back to the original places (the formaula does not hold)
+		}
+		else{
+			
+			if( args_info.siphon_flag) 
+			{cout << "The net does not contain any siphon"<<endl;exit(0);}
+			if( args_info.trap_flag) { cout << "The net does not contain any trap"<<endl; exit(0);}
+		}
+		exit(0);
+	}
+	
 	///first iteration over
 	const int n=net.getPlaces().size();
     
@@ -392,11 +636,69 @@ int main(int argc, char **argv) {
 		//cout << pit->toString()<<endl;cout << "iteration"<<i<<"finished"<<endl;
 		
 	}
-	cout <<endl << "Second formula finished" <<endl;
+	//cout <<endl << "Second formula finished" <<endl;
 	//cout << pit->toString()<<endl;
 	
 	
-
+		//display the trap inside the siphon computed iteratively
+		
+/*		cout << "Second formula " << pit->toString()<<endl;
+		//call minisat and exit
+		const MFormula *ffffinal=pit;
+		const MFormula *cnff=NULL; //cnf=computeCNF(ersteit);//
+		cnff=computeCNF(ffffinal);
+		cout<<"AfterCNF";
+		if(cnff!=NULL) cout<<endl<<cnff->toString()<<endl;
+		else {
+			cout << "NULL";exit(0);
+		}
+		
+		///compute minisat form
+		vector<vector<int> > inmss=CNF2MSF(cnff); ///input for minisat
+		//cout <<endl <<"CNF2MSF size "<< inms.size()<<endl;
+		// for (int r=0; r<inms.size(); ++r) {
+		// vector<int> vin=inms.at(r);
+		// for (int q=0; q<vin.size(); ++q) {
+		// cout << vin.at(q)<<" ";
+		// }
+		// cout << endl;
+		// }
+		
+		vector<bool>* rss=minisat(inmss);
+		bool emptytrap=true;
+		if (rss!=NULL) {
+			
+			///cout << rs->size()<<endl;
+			for (unsigned int k=0; k<rss->size(); ++k) {
+				//cout << "rs["<<k<<"] = "<<rs->at(k)<<endl;
+				
+				if(rss->at(k)){ //cout << "rs["<<k<<"] = "<<rs->at(k)<<endl;
+					cout << "The net contains a trap"<<endl;
+					emptytrap=false;
+					for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
+						// cout << (*it)->getName()<< " ";
+						for(unsigned int kk=0; kk<mp.find((*it)->getName())->second.size(); ++kk)
+							if(mp.find((*it)->getName())->second[kk]==k+1)
+								cout << (*it)->getName()<<" ";//<<"^"<<kk;
+						
+					}
+					//cout << mp.size()<<endl;
+					//cout <<" "<< rs->at(k)<<endl;
+				}
+			}
+			cout << endl;
+			//rs contains an assignement; we have to map it back to the original places (the formaula does not hold)
+			if (emptytrap) {cout << "The formula is not satisfiable. "<<endl;
+			     cout<<"The net does not contain any trap and has a false satisfying assignment."<<endl;
+				exit(0);
+			}
+		}
+		else{
+			cout << "The net does not contain any trap (no satisfying assignment)"<<endl;exit(0);
+			
+		}
+		
+*/
 	//const MFormula *negf=nif->computeNFF();
 	///last part
 	MFormula * unmarked=NULL;
@@ -420,22 +722,33 @@ int main(int argc, char **argv) {
 		}
 	}
 	if (unmarked==NULL) {
-		cout << "something is wrong";
+		cout << "unmarked: empty formula";
 	}
 //	else {
 //		cout<<unmarked->toString();
 //	}
 
-	cout << "Third formula " <<endl;//
+	/*cout << "Third formula " <<endl;
+	cout << "Fourth formula"<< endl;//
+	MFormula *forth;
+	for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
+	for (int x=0; x<n+2; ++x) {
+		PlLit * hh=new PlLit(mp.find((*it)->getName())->second[x],(*it)->getName(),x);
+		forth=new MConjunction(forth, hh);
+	}
+	
+	}&*/
+	//
 	//cout << unmarked->toString()<<endl;
 	//cout << "Final formula "<<endl;
 	MFormula *ffinal=NULL;
-	if ( args_info.siphon_flag ){
+	/*if ( args_info.siphon_flag ){
 		cout << "First formula " <<ersteit->ft<< ersteit->toString()<<endl;
 		//call minisat
 		ffinal=ersteit;
 	}
-	else {MConjunction *mc1=new MConjunction(ersteit,pit);
+	else {*/
+	 MConjunction *mc1=new MConjunction(ersteit,pit);
 	
 	if (unmarked!=NULL) {
 		ffinal=new MConjunction(mc1,unmarked);
@@ -445,7 +758,7 @@ int main(int argc, char **argv) {
 	}
 
 	if (ffinal==NULL) {
-		cout << "something is wrong";
+		cout << "final formula: something is wrong";
 	}
 	else{	
 		if (args_info.verbose_flag) {
@@ -454,7 +767,7 @@ int main(int argc, char **argv) {
 	}
 	
 	}
-	}
+	//}
 	const MFormula *cnf=NULL; //cnf=computeCNF(ersteit);//
 	cnf=computeCNF(ffinal);
 	cout<<"AfterCNF";
@@ -485,26 +798,92 @@ int main(int argc, char **argv) {
 	cout <<endl << "Start SAT"<<endl;
 	std::cerr << endl << "Minisat time : runtime: " << ((double(clock()) - double(start_time)) / CLOCKS_PER_SEC) << " sec\n";
 	vector<bool>* rs=minisat(inms);
-	
+	bool snmt=false;
 	if (rs!=NULL) {
-		cout << "the formula is satisfiable"<<endl;
+		//if (args_info.verbose_flag ) {
 		cout << rs->size()<<endl;
+		
+		bool snt=false;
+		int maxkk=0;
+		
+		cout << "Siphon ";
 		for (unsigned int k=0; k<rs->size(); ++k) {
-			for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
-			// cout << (*it)->getName()<< " ";
-			 for(unsigned int kk=0; kk<mp.find((*it)->getName())->second.size(); ++kk)
-			 if(mp.find((*it)->getName())->second[kk]==k)
-			 cout << (*it)->getName()<<"^"<<kk;
-			 }
-			 //cout << mp.size()<<endl;
-			cout <<" "<< rs->at(k)<<endl;
+			if(rs->at(k)){ //cout << "rs["<<k<<"] = "<<rs->at(k)<<endl;
+				snmt=true;
+				for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
+					// cout << (*it)->getName()<< " ";
+					for(unsigned int kk=0; kk<mp.find((*it)->getName())->second.size(); ++kk)
+						if(mp.find((*it)->getName())->second[kk]==k+1){
+							//cout << (*it)->getName()<<"^"<<kk<<" ";
+							if (kk==0) cout << (*it)->getName()<<" ";
+							//if (kk>maxkk) maxkk=kk;
+						}
+				}
+				//cout << mp.size()<<endl;
+				//cout <<" "<< rs->at(k)<<endl;
+			}
+			// if there is no trap and the maximal k has been reached warn about it
+			else {
+				//get minimal kk 
+			}
 		}
+		if (snmt) {cout << "with no trap inside it.";
 		cout << endl;
+		}//}
+		if (!snmt) {// there is a false assignment solution; try to find another one
+			//cout << "the formula is satisfiable with empty assignment"<<endl;
+			//first add a clause with 1 assignments
+			//vector<int> vi;
+			//for (int i=0; i<=maxid; ++i) {
+			//	vi.push_back(i);
+			//}
+			//inms.push_back(vi);
+			vector<bool>* rsin=minisat2(inms);
+			bool snmt=false;
+			if (rsin!=NULL) {
+				for (unsigned int k=0; k<rsin->size(); ++k) {
+					if(rsin->at(k)){ //cout << "rs["<<k<<"] = "<<rs->at(k)<<endl;
+						snmt=true;
+						for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
+							// cout << (*it)->getName()<< " ";
+							for(unsigned int kk=0; kk<mp.find((*it)->getName())->second.size(); ++kk)
+								if(mp.find((*it)->getName())->second[kk]==k+1){
+									//cout << (*it)->getName()<<"^"<<kk<<" ";
+									if (kk==0) cout << (*it)->getName()<<" ";
+									else if (k==1) cout << "trap " << (*it)->getName()<<" ";
+									else cout << "unmarked " << (*it)->getName()<<" ";
+									//if (kk>maxkk) maxkk=kk;
+								}
+						}
+						//cout << mp.size()<<endl;
+						//cout <<" "<< rs->at(k)<<endl;
+					}
+					// ? if there is no trap and the maximal k has been reached warn about it
+				}
+				cout <<endl<< "the formula is satisfiable"<<endl;exit(0);
+			}
+			else{
+				cout <<endl<< "the formula is not satisfiable"<<endl;exit(0);
+			}
+			
+		}
+		else {cout <<endl << "the formula is satisfiable"<<endl;exit(0);
+		}
+		//for (unsigned int k=0; k<rs->size(); ++k) {
+		//	for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
+			// cout << (*it)->getName()<< " ";
+		//	 for(unsigned int kk=0; kk<mp.find((*it)->getName())->second.size(); ++kk)
+		//	 if(mp.find((*it)->getName())->second[kk]==k)
+		//	 cout << (*it)->getName()<<"^"<<kk;
+		//	 }
+			 //cout << mp.size()<<endl;
+		//	cout <<" "<< rs->at(k)<<endl;
+		//}
 		//r contains an assignement; we have to map it back to the original places (the formaula does not hold)
 	}
 	else{
-		cout << "the formula is not satisfiable"<<endl;
-		
+		cout << "the formula is not satisfiable"<<endl;exit(0);
+		//if(emptytrap) cout<<": no siphon contains a trap. The siphon-trap property does not hold."<<endl;
 	}
 /*	for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
 		cout << (*it)->getName()<< " ";
@@ -518,5 +897,6 @@ int main(int argc, char **argv) {
 	std::cerr << endl << "Stanca : runtime: " << ((double(clock()) - double(start_time)) / CLOCKS_PER_SEC) << " sec\n";
 	//printf("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_time)) / CLOCKS_PER_SEC);
 	cout << endl;
+	exit(0);
 }
 

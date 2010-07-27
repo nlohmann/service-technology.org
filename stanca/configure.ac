@@ -1,4 +1,4 @@
-AC_INIT(Stanca, 1.0, stanca@service-technology.org, stanca, http://service-technology.org/stanca)
+AC_INIT(Stanca, 1.1-unreleased, stanca@service-technology.org, stanca, http://service-technology.org/stanca)
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])

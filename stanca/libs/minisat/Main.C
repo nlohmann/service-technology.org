@@ -302,6 +302,74 @@ vector<bool>*  minisat(vector< vector< int > > & in)
 	//return result;
 }
 
+//get a second solution which is different than the first
+//solve 2 times
+vector<bool>*  minisat2(vector< vector< int > > & in)
+{
+	//assert(in);
+	
+    Solver      S;
+    S.verbosity = 1;
+	
+	
+#if defined(__linux__)
+    fpu_control_t oldcw, newcw;
+    _FPU_GETCW(oldcw); newcw = (oldcw & ~_FPU_EXTENDED) | _FPU_DOUBLE; _FPU_SETCW(newcw);
+    reportf("WARNING: for repeatability, setting FPU to use double precision\n");
+#endif
+    double cpu_time = cpuTime();
+	
+    solver = &S;
+    signal(SIGINT,SIGINT_handler);
+    signal(SIGHUP,SIGINT_handler);
+	
+    parse_DIMACS_main(in, S);
+    //gzclose(in);
+	
+    if (!S.simplify()){
+        return NULL;//(0); // UNSAT
+    }
+	
+    int result=S.solve(); // result of SOLVE
+	vec<Lit> cl;
+	cl.clear();
+	vec<lbool> cc;
+	int mt;
+	Lit ml;
+	S.model.copyTo(cc);
+	for (int r=0; r<cc.size(); ++r) {
+		mt=cc[r].toInt();
+		ml=cc[r]==l_True ?~Lit(r): Lit(r); 
+		cl.push(ml);
+	}
+	S.addClause(cl);
+	result = S.solve();
+	//vec<lbool> mod=S.model;
+	//printf(" %d ", S.nVars());
+	if(result){
+		vector<bool> *vb=new vector<bool> (S.model.size());
+		for (int k=0; k<S.model.size(); ++k) {
+			vb->at(k)=bool(S.model[k].toInt()+1);
+			//lbool val=S.model[k].;
+			//printf(" %s", val);
+		}
+		return vb;
+	}
+	else {
+		return NULL;
+	}
+	
+	
+	//printf(" \n");
+	/*for (int k=0; k<S.model.size(); ++k) {
+	 lbool val=S.model[k];
+	 printf("%d %d\n",k+1,val.toInt());
+	 }*/
+	//printing the clauses
+	//return result;
+}
+
+
 /*int  minisat(vector< vector< int > > & in)
 {
 	//assert(in);

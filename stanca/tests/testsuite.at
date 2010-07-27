@@ -18,7 +18,7 @@ AT_KEYWORDS(basic)
 AT_CLEANUP
 
 ############################################################################
-AT_BANNER([Small examples])
+AT_BANNER([Standard examples (using the standard formula)])
 ############################################################################
 
 AT_SETUP([Siphon-Trap Property holds.])
@@ -34,3 +34,94 @@ AT_CHECK([STANCA phils5.llnet.owfn],0,stdout,stderr)
 AT_CHECK([GREP -q "the formula is satisfiable" stdout])
 AT_KEYWORDS(basic)
 AT_CLEANUP
+
+#AT_SETUP([Siphon-Trap Property does not hold.])
+#AT_CHECK([cp TESTFILES/assy.owfn .])
+#AT_CHECK([STANCA assy.owfn],0,stdout,stderr)
+#AT_CHECK([GREP -q "the formula is not satisfiable" stdout])
+#AT_KEYWORDS(basic)
+#AT_CLEANUP
+
+AT_SETUP([Siphon-Trap Property does not hold.])
+AT_CHECK([cp TESTFILES/hms.owfn .])
+AT_CHECK([STANCA hms.owfn],0,stdout,stderr)
+AT_CHECK([GREP -q "the formula is satisfiable" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Siphon-Trap Property does not hold.])
+AT_CHECK([cp TESTFILES/st.owfn .])
+AT_CHECK([STANCA st.owfn],0,stdout,stderr)
+AT_CHECK([GREP -q "the formula is satisfiable" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Smallest example for the ST property.])
+AT_CHECK([cp TESTFILES/sm.owfn .])
+AT_CHECK([STANCA sm.owfn],0,stdout,stderr)
+AT_CHECK([GREP -q "the formula is not satisfiable" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Extracting siphons and traps (partial results)])
+############################################################################
+
+
+AT_SETUP([Smallest example for the ST property.])
+AT_CHECK([cp TESTFILES/su.owfn .])
+AT_CHECK([STANCA --verbose su.owfn],0,stdout,stderr)
+AT_CHECK([GREP -q "the formula is satisfiable" stdout])
+AT_CHECK([GREP -q "Siphon p trap p unmarked p" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+#AT_SETUP([Extract a siphon.])
+#AT_CHECK([cp TESTFILES/assy.owfn .])
+#AT_CHECK([STANCA --siphon assy.owfn],0,stdout,stderr)
+#AT_CHECK([GREP -q "p0 p1 p2" stdout])
+#AT_KEYWORDS(basic)
+#AT_CLEANUP
+
+AT_SETUP([No traps.])
+AT_CHECK([cp TESTFILES/assy.owfn .])
+AT_CHECK([STANCA --trap assy.owfn],0,stdout,stderr)
+AT_CHECK([GREP -q "The net does not contain any trap" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+#AT_SETUP([A marked trap inside a siphon.])
+#AT_CHECK([cp TESTFILES/e2.owfn .])
+#AT_CHECK([STANCA --siphon --trap e2.owfn],0,stdout,stderr)
+#AT_CHECK([GREP -q "The net contains a siphon with a marked trap inside: p0_2 p1_1" stdout])
+#AT_KEYWORDS(basic)
+#AT_CLEANUP
+
+
+#AT_SETUP([Siphon with no trap inside it (using ST formula).])
+#AT_CHECK([cp TESTFILES/hms.owfn .])
+#AT_CHECK([STANCA --verbose hms.owfn ],0,stdout,stderr)
+#AT_CHECK([GREP -q "Siphon p1 p6 p3 with no trap inside it." stdout])
+#AT_KEYWORDS(basic)
+#AT_CLEANUP
+
+#AT_SETUP([Siphon with no trap inside it (using ST formula).])
+#AT_CHECK([cp TESTFILES/st.owfn .])
+#AT_CHECK([STANCA --verbose st.owfn ],0,stdout,stderr)
+#AT_CHECK([GREP -q "Siphon p1 p6 p7 p5 with no trap inside it." stdout])
+#AT_KEYWORDS(basic)
+#AT_CLEANUP
+
+AT_SETUP([A marked trap inside a siphon.])
+AT_CHECK([cp TESTFILES/st.owfn .])
+AT_CHECK([STANCA --siphon --trap st.owfn],0,stdout,stderr)
+AT_CHECK([GREP -q "The net contains a siphon with a marked trap inside: p2 p3" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Extracting basis of siphons and traps.])
+############################################################################
+

@@ -60,30 +60,33 @@ const MFormula* distr(const MFormula * f1, const MFormula * f2){
 ///translation to cnf form from nff
 const MFormula* NFF2CNF(const MFormula *f){ 
 	//cout<<endl<<"start nff2cnf "<<f->toString()<<endl;
-	const MFormula* rr;
+	//const MFormula* rr;
 //if ((typeid(f)==typeid((MConjunction)) cout<<"strange";
 	//if literal or negation e ok
 	if (typeid(*f)==typeid(PlLit)){
-		rr=f;
+		//rr=f;
+		return f;
 		//const PlLit pl=PlLit(dynamic_cast<const PlLit &> (*f));
 		//return new PlLit(pl);
 	}
 	if (typeid(*f)==typeid(MNegation)){
 		//const MNegation mn=MNegation(dynamic_cast<const MNegation &> (*f));
 		//if(typeid(*mn.subf)==typeid(PlLit))
-			rr=f;
+		return f;//	rr=f;
 	}
 	if (typeid(*f)==typeid(MConjunction)){
 		const MConjunction conj=MConjunction(dynamic_cast<const MConjunction &> (*f));
-		rr= new MConjunction(NFF2CNF(conj.left), NFF2CNF(conj.right));
+		//rr= 
+		return new MConjunction(NFF2CNF(conj.left), NFF2CNF(conj.right));
 	}
 	if (typeid(*f)==typeid(MDisjunction)){
 
 		const MDisjunction conj=MDisjunction(dynamic_cast<const MDisjunction &> (*f));
-		rr=distr(NFF2CNF(conj.left), NFF2CNF(conj.right));
+		//rr=
+		return distr(NFF2CNF(conj.left), NFF2CNF(conj.right));
 	}
 	//if(rr!=NULL) cout<<endl <<"return cnf"<< rr->toString()<<endl;
-	return rr;
+	return NULL;
 }
 
 /// compute cnf form
@@ -111,6 +114,7 @@ const MFormula * computeCNF(const MFormula *inf){
 vector<vector<int> > CNF2MSF(const MFormula *fcnf){
 	//build a conjunction of disjunctions
 	vector<vector<int> > msf;
+	if (!fcnf) return msf;
 	set<const MFormula *> vc;
 	cout <<endl<< "enter"<<endl;
 	
@@ -224,23 +228,23 @@ vector<vector<int> > CNF2MSF(const MFormula *fcnf){
 			list<const MDisjunction*> sd; sd.push_back(cj);
 			while (!sd.empty()) {
 				const MDisjunction *pk=sd.back();sd.pop_back();
-				if (typeid(*pk->left)==typeid(MDisjunction)) {//cout<<"Disj";
+				if (strstr(typeid(*(pk->left)).name() ,"MDisjunction")!=NULL){//typeid(*pk->left)==typeid(MDisjunction)) {//cout<<"Disj";
 					const MDisjunction *cj = new MDisjunction(dynamic_cast<const MDisjunction&>(*pk->left));
 					sd.push_back(cj);
 				}
-				if (typeid(*pk->right)==typeid(MDisjunction)) {//cout<<"Disj";
+				if (strstr(typeid(*(pk->right)).name() ,"MDisjunction")!=NULL){//if (typeid(*pk->right)==typeid(MDisjunction)) {//cout<<"Disj";
 					const MDisjunction *cj = new MDisjunction(dynamic_cast<const MDisjunction&>(*pk->right));
 					sd.push_back(cj);
 				}
 				if (typeid(*pk->left)==typeid(PlLit)) {//cout<<"lit";
 					const PlLit *xpl = new PlLit(dynamic_cast<const PlLit&> (*pk->left));
 					vi.push_back(xpl->number);
-					delete xpl;
+					//delete xpl;
 				}
 				if (typeid(*pk->right)==typeid(PlLit)) {//cout<<"lit";
 					const PlLit *xpl = new PlLit(dynamic_cast<const PlLit&> (*pk->right));
 					vi.push_back(xpl->number);
-					delete xpl;
+					//delete xpl;
 				}
 				if (typeid(*pk->left)==typeid(MNegation)) {//cout<<"lit";
 					//const MNegation *xplnr = new MNegation(dynamic_cast<const MNegation&> (*pk->left));
@@ -251,15 +255,16 @@ vector<vector<int> > CNF2MSF(const MFormula *fcnf){
 					const PlLit *xpl = new PlLit(static_cast<const PlLit&> (*xplnr->subf));
 					vi.push_back(-xpl->number);//cout<<-xpl->number;
 					//delete xplnr;
-					delete xpl;//}
+					//delete xpl;//}
 					//cout << xplnr->toString();
 					//delete xplnr;
 				}
 				if (typeid(*pk->right)==typeid(MNegation)) {//cout<<"lit";
-					const MNegation *xplnr = new MNegation(dynamic_cast<const MNegation&> (*pk->right));
+					//const MNegation *xplnr = new MNegation(dynamic_cast<const MNegation&> (*pk->right));
+					const MNegation *xplnr = static_cast<const MNegation *> (pk->right);
 					const PlLit *xpr = new PlLit(dynamic_cast<const PlLit&> (*xplnr->subf));
 					vi.push_back(-xpr->number);
-					delete xplnr;delete xpr;
+					//delete xplnr;delete xpr;
 				}
 				
 			}
@@ -271,7 +276,7 @@ vector<vector<int> > CNF2MSF(const MFormula *fcnf){
 				//cout << endl<<xpl->toString()<<endl;
 				vi.push_back(xpl->number);
 				//vi.insert((*it)->number);
-			    delete xpl;
+			    //delete xpl;
 			}
 			else if(typeid(**it)==typeid(MNegation)) {
 				//cout << endl<<cj-toString()<<<endl;
@@ -279,7 +284,7 @@ vector<vector<int> > CNF2MSF(const MFormula *fcnf){
 				//cout << endl<<xplnr->toString()<<endl;
 				const PlLit *xpr = new PlLit(dynamic_cast<const PlLit&> (*xplnr->subf));				
 				vi.push_back(-xpr->number);
-				delete xpr;delete xplnr;
+				//delete xpr;delete xplnr;
 				//vi.insert((*it)->number);
 			} 
 		msf.push_back(vi);++itt;

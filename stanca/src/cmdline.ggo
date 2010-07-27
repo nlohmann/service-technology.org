@@ -10,11 +10,11 @@
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
 description "About Stanca:"
-purpose "Stanca.\n This program checks the siphon trap property on an open net using MiniSAT.\n\n  Report bugs to stanca@service-technology.org.\n "
+purpose "Stanca.\n This program checks the siphon trap property for a Petri net using MiniSAT.\n\n  Report bugs to stanca@service-technology.org.\n "
 
 
 section "Input/Output"
-sectiondesc="When called without an input file, Stanca reads from the standard input stream. When called without an output parameter, Hello writes to the standard output stream. If no filename is given for the output option Hello creates a file with a temporary name.\n"
+#sectiondesc="When called without an input file, Stanca reads from the standard input stream. When called without an output parameter, Hello writes to the standard output stream. If no filename is given for the output option Hello creates a file with a temporary name.\n"
 
 option "output" o
   "Stanca's output."
@@ -27,6 +27,11 @@ option "output" o
 option "siphon" s
   "Print out a siphon."
   details="Prints out a siphon assignment.\n"
+  flag off
+  
+option "trap" t
+  "Print out a non-empty trap."
+  details="Prints out a non-empty trap assignment.\n"
   flag off
 
 section "Configuration"

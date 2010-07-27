@@ -1,0 +1,49 @@
+{ ordinary net where there is a siphon containing no  trap }
+
+PLACE
+INTERNAL
+  p1,  { initial }
+  p2,		
+  p3,
+  p4,
+  p5,
+  p6;
+INPUT
+  ;
+OUTPUT
+  ;
+
+INITIALMARKING
+  p1:	2,
+  p4:   1
+ ;
+
+FINALMARKING
+ 
+ ;
+
+TRANSITION t1	 
+CONSUME
+  p1:	1,p4:  1;	 
+PRODUCE
+  p5:	1, p2:  1;
+
+TRANSITION t2	 
+CONSUME
+  p1: 1, p5: 1;
+PRODUCE
+  p3:	1, p4:  1;
+
+TRANSITION t3	 
+CONSUME
+  p2:	1,p3:	1;
+PRODUCE
+  p6:  1, p1:  1 ;
+
+TRANSITION t4	
+CONSUME
+  p6:	1;
+PRODUCE
+  p1 : 1;
+ 
+{ END OF FILE }

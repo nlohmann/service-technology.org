@@ -1,16 +1,12 @@
-                       
+                        ____  _                        
+                       / ___|| |_ __ _ _ __   ___ __ _ 
+                       \___ \| __/ _` | '_ \ / __/ _` |
+                        ___) | || (_| | | | | (_| (_| |
+                       |____/ \__\__,_|_| |_|\___\__,_|
                      http://service-technology.org/stanca
 
 
-PURPOSE
-    Stanca checks the siphon-trap property using MINISAT.
+Version 1.1-unreleased
+======================
 
-Version 1.0 (18 June 2010)
-==========================
-
-* Siphon-trap check using MINISAT
-
-* Siphon output
-
-
-
+\nSee file ChangeLog <http://service-technology.org/files/stanca/ChangeLog> for\ncomplete version history.\n

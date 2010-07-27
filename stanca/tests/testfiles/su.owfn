@@ -1,0 +1,22 @@
+{ simplest }
+
+PLACE
+INTERNAL
+  p;  
+INPUT
+  ;
+OUTPUT
+  ;
+
+INITIALMARKING
+ ;
+
+FINALMARKING
+ 
+ ;
+
+TRANSITION t1	 
+CONSUME
+  p:	1;	 
+PRODUCE
+  p:	1;

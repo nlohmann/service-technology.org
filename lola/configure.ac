@@ -16,51 +16,31 @@ AC_MSG_NOTICE()
 
 # prerequisites for Autoconf and Automake
 AC_PREREQ(2.60)
-AM_INIT_AUTOMAKE(gnits)
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # where to look for source code and how the config header should be called
 AC_CONFIG_SRCDIR(src/net.cc)
 AC_CONFIG_HEADER(src/config.h)
+AC_CONFIG_AUX_DIR([build-aux])
+
+AM_INIT_AUTOMAKE(gnits)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # check for generic programs
 AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_PROG_LEX
 AC_PROG_YACC
-AC_PROG_SED
-AC_PROG_AWK
-AC_PROG_GREP
 AC_PROG_INSTALL
+
+# use the service-technology.org macros
+AC_ST_BASIC
+AC_ST_AUTOTEST
 
 # check for libconfig++
 AC_CHECK_LIB(config++, main)
 AM_CONDITIONAL(USE_LIBCONFIG, [test ${ac_cv_lib_configpp_main} = "yes"])
 
-# check for additional programs
-AM_MISSING_PROG(GENGETOPT, gengetopt)
-AM_MISSING_PROG(HELP2MAN, help2man)
-
 AC_CHECK_FUNCS([drand48])
-
-# set up autotest
-AM_MISSING_PROG(AUTOM4TE, autom4te)
-AC_CONFIG_TESTDIR(tests)
-
-# store the SVN revision number
-AC_DEFINE_UNQUOTED(VERSION_SVN, "`svnversion -n 2> /dev/null`", [The SVN revision.])
-
-# allow the configure script to control assertions (just include config.h)
-AC_HEADER_ASSERT
-AH_BOTTOM([#ifdef __cplusplus
-#include <cassert>
-#else
-#include <assert.h>
-#endif])
-
-# look up canonical build name and write it to config.h
-AC_CANONICAL_BUILD
-AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
 
 
 #############################################################################
@@ -94,6 +74,7 @@ fi
 
 # Set files to generate.
 AC_CONFIG_FILES([Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile  tests/Makefile tests/package.m4 utils/Makefile])
+AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 
 AC_OUTPUT
 

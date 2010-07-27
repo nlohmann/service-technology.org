@@ -362,7 +362,7 @@ int main(int argc, char** argv) {
         printf("- version:              %s\n", PACKAGE_VERSION);
         printf("- compilation date:     %s\n", __DATE__);
         printf("- compiler version:     %s\n", __VERSION__);
-        printf("- platform:             %s\n", BUILDSYSTEM);
+        printf("- platform:             %s\n", CONFIG_BUILDSYSTEM);
         printf("- config MPI:           %s\n", CONFIG_ENABLEMPI);
 #ifdef STANDARDCONFIG
         printf("- chosen userconfig.H:  predefined\n");

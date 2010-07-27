@@ -30,16 +30,18 @@ class summand {
         Node* var;
         long int value;
         summand* next;
+
         summand(Node*, long int);
 };
 
 class equation {
     public:
         summand* sum;
+        equation* next;
+
         void apply();
         void applyunit(); // applies equations where unit matrix is appended
         equation(Node*);
-        equation* next;
 };
 
 class invariant {
@@ -49,11 +51,12 @@ class invariant {
 
 void tsolve();
 void psolve();
-void progress_measure();
-#endif
 
 extern int ProgressSpan;
 extern int ZeroProgress;
 extern int MonotoneProgress;
+
+void progress_measure();
+#endif
 
 #endif

@@ -24,10 +24,6 @@
 #include "distribute.h"
 #endif
 
-int ProgressSpan;
-int ZeroProgress;
-int MonotoneProgress;
-
 #if defined(PREDUCTION) || defined(CYCLE) || defined(STRUCT) || defined(SWEEP)
 unsigned int NrOfEquations;
 
@@ -50,17 +46,20 @@ void printeq(equation* e) {
     }
 }
 
+//! \todo initialize next with NULL?
 summand::summand(Node* t, long int k) : var(t), value(k) {}
 
-equation::equation(Node* p) {
+equation::equation(Node* p) : sum(NULL) {
     summand** anchor;
 
-    sum = NULL;
+    // traverse incoming arcs (preset of p)
     for (unsigned int i = 0; i < p->NrOfArriving; ++i) {
         Node* t = p->ArrivingArcs[i]->Source;
         long int k = p->ArrivingArcs[i]->Multiplicity;
         summand* s = new summand(t, k);
-        for (anchor = & sum; * anchor ; anchor = & ((*anchor)->next)) {
+
+        // find position to add new summand to list
+        for (anchor = &sum; *anchor; anchor = &((*anchor)->next)) {
             if ((*anchor)->var->nr > t->nr) {
                 break;
             }
@@ -68,10 +67,13 @@ equation::equation(Node* p) {
         s->next = *anchor;
         *anchor = s;
     }
+
+    // traverse leaving arcs (postset of p)
     for (unsigned int i = 0; i < p->NrOfLeaving; ++i) {
         Node* t = p->LeavingArcs[i]->Destination;
         long int k = p->LeavingArcs[i]->Multiplicity;
-        for (anchor = & sum; * anchor ; anchor = & ((*anchor)->next)) {
+
+        for (anchor = &sum; *anchor; anchor = &((*anchor)->next)) {
             if ((*anchor)->var->nr >= t->nr) {
                 break;
             }
@@ -80,7 +82,7 @@ equation::equation(Node* p) {
             (*anchor)->value -= k;
             if ((*anchor)->value == 0) {
                 summand* tmp;
-                tmp = * anchor;
+                tmp = *anchor;
                 *anchor = tmp->next;
                 delete tmp;
             }
@@ -90,9 +92,11 @@ equation::equation(Node* p) {
             *anchor = s;
         }
     }
+
     if (!sum) {
         return;
     }
+
 #ifndef SWEEP
     long int k = sum->value;
     for (summand* s = sum->next; s; s = s->next) {
@@ -104,6 +108,7 @@ equation::equation(Node* p) {
         }
     }
 #endif
+
     ++NrOfEquations;
 }
 
@@ -128,9 +133,8 @@ void equation::apply() {
 
     summand** anchor = &(next->sum);
     while (s && *anchor) {
-        summand* ss;
         if (s->var->nr < (*anchor)->var->nr) {
-            ss = new summand(s->var, - fthis * s->value);
+            summand* ss = new summand(s->var, -fthis * s->value);
             ss->next = *anchor;
             *anchor = ss;
             anchor = &(ss->next);
@@ -143,7 +147,7 @@ void equation::apply() {
                 (*anchor)->value *= fnext;
                 (*anchor)->value -= fthis * s->value;
                 if (!((*anchor)->value)) {
-                    ss = *anchor;
+                    summand* ss = *anchor;
                     *anchor = ss->next;
                     delete ss;
                 } else {
@@ -357,8 +361,7 @@ void psolve() {
         if (esystem[i]) {
             Places[i]->significant = true;
             while (esystem[i]->sum) {
-                summand* s;
-                s = esystem[i]->sum;
+                summand* s = esystem[i]->sum;
                 esystem[i]->sum = esystem[i]->sum->next;
                 delete s;
             }
@@ -370,6 +373,10 @@ void psolve() {
 #endif
 
 #ifdef SWEEP
+int ProgressSpan;
+int ZeroProgress;
+int MonotoneProgress;
+
 void progress_measure() {
     int i;
     summand* s;

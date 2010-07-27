@@ -1,28 +1,28 @@
-bintargets = lola-deadlock lola-fulllimited lola-modelchecking lola-statepredicate1 lola-liveprop lola-boundednet lola-statespace
-
-binaries:
-	for B in $(bintargets); do \
-	  $(MAKE) $$B --directory=$(top_builddir)/src; \
-	done
+#--------------#
+# GNU autotest #
+#--------------#
 
 TESTSUITE = $(builddir)/testsuite
-EXTRA_DIST = testsuite.at wrap.sh \
-		testfiles
-
+EXTRA_DIST = testsuite.at wrap.sh $(addprefix testfiles/,$(TESTFILES))
 DISTCLEANFILES = atconfig package.m4 $(TESTSUITE)
 
-# check-local should build the binaries
-check-local: atconfig $(TESTSUITE) binaries
-	$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS)
+# run the test suite when calling "make check"
+check-local: atconfig $(TESTSUITE)
+	$(AM_V_at)$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS)
 
+# clean the test results on "make clean"
 clean-local:
 	test ! -f '$(TESTSUITE)' || $(SHELL) '$(TESTSUITE)' --clean
 
-$(TESTSUITE): $(srcdir)/testsuite.at
-	$(AUTOM4TE) --language=autotest -I '$(srcdir)' -o $@.tmp $@.at
-	mv $@.tmp $@
+# call a specific test set by keyword (e.g. "make check-basic")
+check-%: atconfig $(TESTSUITE)
+	$(AM_V_at)$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) --keywords=$*
 
-NO_COVER_FILES = */readnet-lexic.cc */readnet-syntax.cc */cmdline.*
+# create the testsuite using autom4te
+$(TESTSUITE): $(srcdir)/testsuite.at package.m4
+	$(AM_V_GEN)$(AUTOM4TE) --language=autotest -I '$(srcdir)' -o $@.tmp $@.at
+	$(AM_V_at)mv $@.tmp $@
+
 
 #---------------#
 # test coverage #
@@ -36,13 +36,10 @@ EXTRA_DIST += lcov/README lcov/gendesc lcov/genhtml lcov/geninfo lcov/genpng \
 
 # compile the code for code coverage
 cover-prepare:
-	for B in $(bintargets); do \
-	  rm -f $(top_srcdir)/src/$$B; \
-	  $(MAKE) $$B --directory=$(top_builddir)/src \
-	    CXXFLAGS+="-fprofile-arcs -ftest-coverage" \
-	    CFLAGS+="-fprofile-arcs -ftest-coverage" \
-	    LDFLAGS+="-lgcov"; \
-	done
+	$(MAKE) --directory=$(top_srcdir) clean all \
+	  CXXFLAGS+="-fprofile-arcs -ftest-coverage" \
+	  CFLAGS+="-fprofile-arcs -ftest-coverage" \
+	  LDFLAGS+="-lgcov"
 
 # get descriptions from the testsuite
 descriptions: $(TESTSUITE)
@@ -97,3 +94,19 @@ maintainer-clean-local:
 	find $(top_builddir) -name *.gcno -exec rm {} \;
 	find $(top_builddir) -name *.gcda -exec rm {} \;
 
+
+#------------#
+# benchmarks #
+#------------#
+
+EXTRA_DIST += benchmarks.at
+
+# create the benchmark script using autom4te
+benchmarks: $(srcdir)/benchmarks.at
+	$(AUTOM4TE) --language=autotest -I '$(srcdir)' -o $@.tmp $@.at
+	mv $@.tmp $@
+
+bench: atconfig benchmarks
+	test ! -d benchmarks-results || rm -fr benchmarks-results
+	$(MKDIR_P) benchmarks-results
+	$(SHELL) 'benchmarks' $(TESTSUITEFLAGS)

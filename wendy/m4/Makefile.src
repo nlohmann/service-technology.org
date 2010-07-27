@@ -5,7 +5,7 @@
 BUILT_SOURCES =
 EXTRA_DIST =
 MAINTAINERCLEANFILES =
-DISTCLEANFILES = 
+DISTCLEANFILES =
 
 
 #--------------------------------------------------------------#
@@ -43,3 +43,11 @@ GENGETOPT_FILES = cmdline.ggo
 BUILT_SOURCES += $(GENGETOPT_FILES:.ggo=.c)
 EXTRA_DIST += $(GENGETOPT_FILES)
 MAINTAINERCLEANFILES += $(GENGETOPT_FILES:.ggo=.c) $(GENGETOPT_FILES:.ggo=.h)
+
+
+#---------------------------------------------#
+# GENERIC: clean up .dSYM files and directory #
+#---------------------------------------------#
+
+clean-local:
+	-for binary in $(bin_PROGRAMS); do rm -rf $$binary.dSYM; done

@@ -27,43 +27,43 @@
 
 class SymmImage {
     public:
-        Node* value;
-        unsigned int* vector;
+        Node* value;             // Knoten (**)
+        unsigned int* vector;   // Eine Symmetrie, die Knoten (*) auf Knoten (**) abb.
 };
 
 class SymmStore {
     public:
-        Node* arg;
-        unsigned int argnr, length, card, current;
+        Node* arg;              // Knoten (*) ; alles drüber ist id
+        unsigned int argnr, length, card, current; // Nr von (*), Länge von Image, Anz der benutzten Einträge, zum Iterieren
         unsigned int* reference;
-        SymmImage* image;
+        SymmImage* image;  // Alle möglichen Bilder für Knoten (*)
 };
 
-
+    // union-find Datenstruktur
 class Partition {
     public:
-        unsigned int nextorcard;
-        bool top;
+        unsigned int nextorcard;  // top + --> nr des Parent im Baum
+        bool top;                 // top - --> is root und Anzahl der Elemente im Baum
 };
 
 extern Partition* part;
 
-extern SymmStore* Store;
-extern unsigned int CardStore;
+extern SymmStore* Store;                     // Das Erzeugendensystem
+extern unsigned int CardStore;               // Länge des Vektors Store
 
-void canonize_on_the_fly();
-void ComputePartition(void);
-void ComputeSymmetries(void);
-void FirstSymm(void);
-unsigned int NextSymm(unsigned int);
+void canonize_on_the_fly();                 // Kan. Rep ausrechnen ohne Erz System
+void ComputePartition(void);                //Aeq Klassen ausrechnen
+void ComputeSymmetries(void);               // Erz System ausrechnen
+void FirstSymm(void);                      // Iterator Initialisierung
+unsigned int NextSymm(unsigned int);       // Weiterschalten, so dass mind. bei <arg> neuer Funktionswert entsteht
 
 extern unsigned int* CurrentSymm;
 
-extern unsigned int* kanrep;
+extern unsigned int* kanrep;  // Kanonischer Repräsentant
 extern unsigned int* kanrep1;
 
-extern unsigned int DeadBranches;
-extern unsigned int CardGenerators;
+extern unsigned int DeadBranches; // tote Zweige im REFINE/DEFINE Suchbaum
+extern unsigned int CardGenerators; // Anzahl der Erzeugenden für alle Symms
 extern unsigned int kanhash; // hash value of canonical representitive
 
 void AllSyms();

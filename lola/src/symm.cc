@@ -25,11 +25,11 @@
 #include <cstdlib>
 
 #define NodeType int
-#define PL 0
-#define TR 1
+#define PL 0  /* place */
+#define TR 1  /* transition */
 #define DomType int
-#define DO 0
-#define CO 1
+#define DO 0 /* domain */
+#define CO 1 /* codomain */
 
 using std::ofstream;
 
@@ -58,16 +58,16 @@ Reaktoreintrag::Reaktoreintrag() {
     Node* node;  // unused?
 }
 
-Reaktoreintrag* Reaktor[2][2];
+Reaktoreintrag* Reaktor[2][2]; // Speichert Klassen. Zunächst Alle Plätze auf alle Plätze, alle Trans auf alle Trans
 
 class ToDo { // stores constraints that need to be used for class splitting
     public:
-        unsigned int constraint;
+        unsigned int constraint;  // Ein Paar (domain, codomain) von Klassen der Partition, als Index in Specification
         ToDo* next;
         ToDo(NodeType, unsigned int);
 };
 
-ToDo* ToDoList[2];
+ToDo* ToDoList[2];  // Eine für Platzklassen, eine für Transitionsklassen
 
 ToDo::ToDo(NodeType TY, unsigned int co) {
     next = ToDoList[TY];
@@ -77,13 +77,13 @@ ToDo::ToDo(NodeType TY, unsigned int co) {
 
 class Constraint {
     public:
-        unsigned int first;
-        unsigned int last;
-        ToDo* changed;
-        unsigned int parent;
+        unsigned int first; // Start des Bereichs im Place/Transition Array, wo Knoten dieser Klasse stehen
+        unsigned int last;  // Ende -"-
+        ToDo* changed;      // Eine ToDoEintrag für mich
+        unsigned int parent; // Klasse, von der ich abgespalten wurde
 };
 
-unsigned int CardSpecification[2];
+unsigned int CardSpecification[2];  // Alle Constraints (eine für PL , ene für TR)
 Constraint* Specification[2];
 
 inline void reportprogress() {
@@ -445,7 +445,7 @@ unsigned int CardStore;
 
 Partition* part;
 
-void UnifyClasses(unsigned int e1, unsigned int e2) {
+void UnifyClasses(unsigned int e1, unsigned int e2) { // union von union-find
     unsigned int c1, c2, c, e;
 
     for (c1 = e1; !(part[c1].top); c1 = part[c1].nextorcard);

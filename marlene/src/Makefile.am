@@ -1,7 +1,3 @@
-#if FROMSVN
-#.PHONY : subversion.h
-#endif
-
 bin_PROGRAMS = marlene
 
 marlene_SOURCES = parser_adapt_rules.yy lexer_adapt_rules.ll \
@@ -31,44 +27,5 @@ endif
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW
 #############################################################################
 
-#---------------------------------------------------#
-# GENERIC: initialization for other generic targets #
-#---------------------------------------------------#
-BUILT_SOURCES =
-EXTRA_DIST = CMakeLists.txt
-MAINTAINERCLEANFILES =
-DISTCLEANFILES = 
-
-#--------------------------------------------------------------#
-# GENERIC: organize distribution and cleaning of Bison sources #
-#--------------------------------------------------------------#
-BISON_FILES = $(filter %.yy,$(marlene_SOURCES))
-BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
-EXTRA_DIST += $(BISON_FILES:.yy=.h)
-MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
-
-#----------------------------------------------------------------#
-# GENERIC: copy the content of the config.log file to a C header #
-#----------------------------------------------------------------#
-config-log.h: $(top_builddir)/config.log
-	echo "#define CONFIG_LOG \\" > $@
-	$(SED) -e 's/\\/\\\\/g' $< | $(SED) -e 's/"/\\"/g' | $(AWK) '{print "\""$$0"\\n\"\\"}' >> $@
-	echo '""' >> $@
-	echo "" >> $@
-BUILT_SOURCES += config-log.h
-DISTCLEANFILES += config-log.h
-
-#----------------------------------------------------------#
-# GENERIC: use GNU gengetopt to create command line parser #
-#----------------------------------------------------------#
-.ggo.c:
-	$(GENGETOPT) --input=$<
-GENGETOPT_FILES = cmdline.ggo
-BUILT_SOURCES += $(GENGETOPT_FILES:.ggo=.c)
-EXTRA_DIST += $(GENGETOPT_FILES)
-MAINTAINERCLEANFILES += $(GENGETOPT_FILES:.ggo=.c) $(GENGETOPT_FILES:.ggo=.h)
-
-doxygen:
-	cd ../doc ; doxygen
-
+include $(top_srcdir)/m4/Makefile.src
 

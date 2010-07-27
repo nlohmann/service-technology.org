@@ -56,6 +56,26 @@ Port::~Port()
 }
 
 /*!
+ * \brief setting the name
+ */
+void Port::setName(const std::string & name)
+{
+  try
+  {
+    net_.getInterface().renamePort(*this, name);
+  }
+  catch(exception::Error & e)
+  {
+    if(net_.getInterface().getPort(name) != this)
+    {
+      throw e;
+    }
+  }
+  
+  name_ = name;
+}
+
+/*!
  * \brief adding a label
  */
 Label & Port::addLabel(Label & label)

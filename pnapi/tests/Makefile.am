@@ -35,6 +35,7 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
 	    error_parser_woflan_05.tpn error_parser_woflan_06.tpn \
             woflan1.xml.tpn woflan2.xml.tpn woflan3.xml.tpn \
 	    woflan4.xml.tpn woflan5.xml.tpn woflan6.xml.tpn \
+            test_compose_ports_1.owfn test_compose_ports_2.owfn \
             test_cdnf.owfn test_input.lola test_dead_nodes.net.owfn \
             test_dnf.owfn test_identical_places.net.owfn \
             test_identical_transitions.net.owfn test_input_roles.owfn \

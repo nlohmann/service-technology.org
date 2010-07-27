@@ -407,6 +407,15 @@ AT_CHECK([FIONA -t simulation test_produce.onlineshop.owfn test_produce.onlinesh
 AT_KEYWORDS([composition])
 AT_CLEANUP
 
+AT_SETUP([Composition with ports])
+m4_define([NET1], [test_compose_ports_1.owfn])
+m4_define([NET2], [test_compose_ports_2.owfn])
+AT_CHECK([cp TESTFILES/NET1 TESTFILES/NET2 .])
+AT_CHECK([PETRI -oowfn --compose=NET2 NET1])
+AT_CHECK([GREP -q "|P|= 28  |P_in|= 4  |P_out|= 4  |T|= 18  |F|= 52" NET1.composed.owfn])
+AT_KEYWORDS([composition ports])
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Regression Tests])
 ############################################################################
@@ -1219,6 +1228,14 @@ AT_CLEANUP
 AT_SETUP([Testing parser (woflan)])
 m4_define([NET], [woflan1.xml.tpn])
 m4_define([PARAMS], [--input=tpn --verbose])
+TEST_LEAK
+AT_CLEANUP
+
+AT_SETUP([Composition with ports])
+m4_define([NET], [test_compose_ports_1.owfn])
+m4_define([NET2], [test_compose_ports_2.owfn])
+m4_define([PARAMS], [--compose=NET2])
+AT_CHECK([cp TESTFILES/NET2 .])
 TEST_LEAK
 AT_CLEANUP
 

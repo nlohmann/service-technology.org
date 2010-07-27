@@ -1830,19 +1830,19 @@ std::map<std::string, std::string> PetriNet::canonicalNames()
   int j = 0;
   stringstream name;
   
-  PNAPI_FOREACH(n, nodes_)
+  PNAPI_FOREACH(p, places_)
   {
     name << "p" << (++i);
-    result[name.str()] = (*n)->getName();
+    result[name.str()] = (*p)->getName();
     
     try
     {
-      (**n).setName(name.str());
+      (**p).setName(name.str());
     }
     catch(exception::Error & e)
     {
       // name conflict
-      tmp[*n] = name.str();
+      tmp[*p] = name.str();
       bool rename = true;
       while(rename)
       {
@@ -1852,7 +1852,42 @@ std::map<std::string, std::string> PetriNet::canonicalNames()
         
         try
         {
-          (**n).setName(name.str());
+          (**p).setName(name.str());
+          rename = false;
+        }
+        catch(exception::Error & e) { /* retry */ }
+      }
+    }
+    
+    name.str("");
+    name.clear(); 
+  }
+  
+  i = 0;
+  
+  PNAPI_FOREACH(t, transitions_)
+  {
+    name << "t" << (++i);
+    result[name.str()] = (*t)->getName();
+    
+    try
+    {
+      (**t).setName(name.str());
+    }
+    catch(exception::Error & e)
+    {
+      // name conflict
+      tmp[*t] = name.str();
+      bool rename = true;
+      while(rename)
+      {
+        name.str("");
+        name.clear();
+        name << "_" << (++j);
+        
+        try
+        {
+          (**t).setName(name.str());
           rename = false;
         }
         catch(exception::Error & e) { /* retry */ }

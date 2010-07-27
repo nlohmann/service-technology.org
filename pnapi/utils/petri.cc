@@ -209,6 +209,7 @@ int main(int argc, char** argv) {
             ss << io::stat << *(current.net);
     
             status("<stdin>: %s", ss.str().c_str());
+            current.net->getInterface().setName("<stdin>");
     
             // store object
             objects.push_back(current);
@@ -296,6 +297,7 @@ int main(int argc, char** argv) {
                 std::stringstream ss;
                 ss << io::stat << *(current.net);
                 status("%s: %s", args_info.inputs[i], ss.str().c_str());
+                current.net->getInterface().setName(args_info.inputs[i]);
     
                 // store object
                 objects.push_back(current);
@@ -320,6 +322,8 @@ int main(int argc, char** argv) {
             infile >> meta(io::INPUTFILE, secondNetName)
                    >> meta(io::CREATOR, PACKAGE_STRING)
                    >> meta(io::INVOCATION, invocation) >> io::owfn >> secondNet;
+            
+            secondNet.getInterface().setName(secondNetName);
     
             // compose nets
             for (size_t i = 0; i < objects.size(); ++i) {

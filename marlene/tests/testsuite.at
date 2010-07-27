@@ -12,9 +12,6 @@ m4_define(AT_CHECK_PETRIFY, [AT_CHECK([if test "PETRIFY" == ""; then exit 77; fi
 m4_define(AT_CHECK_CYGWIN, [AT_CHECK([if test "PLATFORM" == "cygwin"; then exit 77; fi])])
 m4_define(AT_CHECK_LIBCONFIG, [AT_CHECK(if test "LIBCONFIGPRESENT" != "1"; then exit 77; fi)])
 
-AT_TESTED(versions.sh)
-
-
 ############################################################################
 AT_BANNER([Standard Options])
 ############################################################################

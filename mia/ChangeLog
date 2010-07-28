@@ -9,8 +9,6 @@
 Version 1.2-unreleased
 ======================
 
-* update Petri Net API
-
 * canonized Makefiles
 
 * added scripts to use LCOV
@@ -23,6 +21,8 @@ Version 1.2-unreleased
   memory consumption (the latter uses `ps' and does not work under Cygwin)
 
 * colored status messages
+
+* updated Petri Net API to version 4.02
 
 Version 1.1
 ===========

@@ -262,7 +262,7 @@ int main(int argc, char** argv) {
     | 6. transform most-permissive partner to open net |
     `-------------------------------------------------*/
     time(&start_time);
-    pnapi::PetriNet* mpp = new pnapi::PetriNet(mpp_sa->stateMachine());
+    pnapi::PetriNet* mpp = new pnapi::PetriNet(mpp_sa->toStateMachine());
     time(&end_time);
     if (args_info.verbose_flag) {
         std::ostringstream s;

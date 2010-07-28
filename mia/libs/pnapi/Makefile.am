@@ -1,40 +1,42 @@
+##################################
+# This file has been generated   #
+# automaticall by compiling      #
+# Petri Net API 4.02 #
+#                                #
+# You MUST NOT change this file. #
+##################################
+
 noinst_LIBRARIES = libpnapi.a
 
+# [CUSTOMER_B_SRC] this line is needed to build a customer Makefile. Do not remove!
 libpnapi_a_SOURCES = \
-		parser-owfn.yy    parser-owfn-lexer.ll \
-		parser-petrify.yy parser-petrify-lexer.ll \
-		parser-onwd.yy    parser-onwd-lexer.ll \
-		parser-lola.yy    parser-lola-lexer.ll \
-		parser-sa.yy	  parser-sa-lexer.ll \
-		pnapi.h \
-		link.h link.cc \
-		component.h component.cc \
-		petrinet.h petrinet.cc \
-		parser.h parser.cc \
-		util.h util.cc \
-		formula.h formula.cc \
-		condition.h condition.cc \
-		petrinet-reduction.cc \
-		petrinet-petrify.h petrinet-petrify.cc \
-		automaton.h automaton.cc\
-		state.h state.cc \
-		marking.h marking.cc \
-		myio.h myio.cc io-format.cc \
-		Output.cc Output.h \
-		errorhandling.cc
+    parser-lola.h parser-lola.cc parser-lola-location.h parser-lola-position.h parser-lola-stack.h parser-lola-lexer.cc parser-lola-wrapper.h parser-lola-wrapper.cc \
+    parser-owfn.h parser-owfn.cc parser-owfn-location.h parser-owfn-position.h parser-owfn-stack.h parser-owfn-lexer.cc parser-owfn-wrapper.h parser-owfn-wrapper.cc \
+    parser-pn.h parser-pn.cc parser-pn-location.h parser-pn-position.h parser-pn-stack.h parser-pn-lexer.cc parser-pn-wrapper.h parser-pn-wrapper.cc \
+    parser-pnml.h parser-pnml.cc parser-pnml-location.h parser-pnml-position.h parser-pnml-stack.h parser-pnml-lexer.cc parser-pnml-wrapper.h parser-pnml-wrapper.cc \
+    parser-sa.h parser-sa.cc parser-sa-location.h parser-sa-position.h parser-sa-stack.h parser-sa-lexer.cc parser-sa-wrapper.h parser-sa-wrapper.cc \
+    parser-woflan.h parser-woflan.cc parser-woflan-location.h parser-woflan-position.h parser-woflan-stack.h parser-woflan-lexer.cc parser-woflan-wrapper.h parser-woflan-wrapper.cc \
+    FlexLexer.h \
+    pnapi.h pnapi.cc pnapi-assert.h \
+    automaton.h automaton.cc\
+    component.h component.cc \
+    condition.h condition.cc \
+    exception.h exception.cc \
+    formula.h formula.cc \
+    interface.h interface.cc \
+    marking.h marking.cc \
+    myio.h myio.cc io-format.cc \
+    Output.h Output.cc \
+    parser.h parser.cc \
+    petrinet-pn.cc \
+    petrinet-reduction.cc \
+    petrinet.h petrinet.cc \
+    port.h port.cc \
+    state.h state.cc \
+    util.h \
+    verbose.h verbose.cc
+# [CUSTOMER_E_SRC] this line is needed to build a customer Makefile. Do not remove!
 
-BUILT_SOURCES = parser-owfn.cc parser-petrify.cc parser-onwd.cc parser-lola.cc \
-		parser-sa.cc
-
-EXTRA_DIST = parser-owfn.h parser-petrify.h parser-onwd.h parser-lola.h \
-	     parser-sa.h
-
-# to find Wendy's config.h header
+# to find customer's config.h header
 libpnapi_a_CPPFLAGS = -I$(top_srcdir)/src
 
-# clean additional (generated) files
-DISTCLEANFILES = parser-owfn.h parser-owfn.cc parser-owfn-lexer.cc \
-		 parser-onwd.h parser-onwd.cc parser-onwd-lexer.cc \
-		 parser-petrify.h parser-petrify.cc parser-petrify-lexer.cc \
-		 parser-lola.h parser-lola.cc parser-lola-lexer.cc \
-		 parser-sa.h parser-sa.cc parser-sa-lexer.cc

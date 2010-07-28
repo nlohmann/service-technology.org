@@ -1,6 +1,5 @@
 @heading Version 1.2-unreleased
 @itemize
-@item update Petri Net API
 
 @item canonized Makefiles
 
@@ -11,6 +10,8 @@
 @item implemented parameter @option{--stats} to display information on runtime and memory consumption (the latter uses @code{ps} and does not work under Cygwin)
 
 @item colored status messages
+
+@item updated Petri Net API to version 4.02
 @end itemize
 
 

@@ -48,6 +48,10 @@ private: /* private variables */
   std::map<std::string, Port *> ports_;
   /// the net the interface belongs to
   PetriNet & net_;
+  /// name of the net
+  std::string name_;
+  /// next free port number
+  unsigned int nextID_;
   
 public: /* public methods */
   /*!
@@ -67,8 +71,16 @@ public: /* public methods */
    * \name structural changes
    */
   //@{
+  /// set the net's name
+  void setName(const std::string &);
   /// adding a single port
   Port & addPort(const std::string &);
+  /// rename a port
+  void renamePort(Port &, const std::string &);
+  /// merge two ports
+  Port & mergePorts(Port &, Port &, const std::string & = "");
+  /// adding a label
+  Label & addLabel(const std::string &, Label::Type, const std::string & = "");
   /// adding an input label
   Label & addInputLabel(const std::string &, Port &);
   /// adding an input label
@@ -91,6 +103,8 @@ public: /* public methods */
    * \name getter
    */
   //@{
+  /// get the net's name
+  const std::string & getName() const;
   /// returning the port that belongs to the given name
   Port * getPort(const std::string & = "") const;
   /// returning ports map
@@ -122,6 +136,8 @@ public: /* public methods */
 private: /* private methods */
   /// no copying allowed
   Interface(const Interface &);
+  /// generate unused port name
+  std::string generatePortName();
 };
 
 } /* namespace pnapi */

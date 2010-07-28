@@ -22,7 +22,7 @@
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2010-05-11 16:58:12 +0200 (Tue, 11 May 2010) $
+ * \date    \$Date: 2010-06-06 14:46:01 +0200 (Sun, 06 Jun 2010) $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
@@ -38,10 +38,10 @@
  *          but no k-boundedness.
  *          Section 3 contains rules from "Thomas Pillat - 
  *          Gegenüberstellung struktureller Reduktionstechniken
- *          für Petrinetze" ([Pil08])". These rules preserve lifeness and
- *          k-boundedness.         
+ *          für Petrinetze" ([Pil08]). These rules preserve lifeness and
+ *          k-boundedness.
  * 
- * \version \$Revision: 5732 $
+ * \version \$Revision: 5813 $
  *
  * \ingroup petrinet
  * 

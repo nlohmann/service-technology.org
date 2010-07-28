@@ -194,3 +194,4 @@ std::vector< std::string > Marking::getRequiredMessages(pnapi::PetriNet & net, s
     FUNCOUT
     return result;
 }
+

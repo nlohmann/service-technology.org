@@ -451,17 +451,37 @@ const pnapi::PetriNet * Adapter::buildController()
     if (not args_info.diagnosis_flag)
     {
         // CG workaround
+        
         status("Port work-around: adding all labels to port `controller'.");
 
         pnapi::Port & controllerport = _controller->createPort("controller");
+        // CG Workaround
+        while(_controller->getInterface().getPorts().size() > 1)
+        {
+            std::map< std::string, Port * >::const_iterator p = _controller->getInterface().getPorts().begin();
+            pnapi::Port * port1 = p->second;
+            ++p;
+            pnapi::Port * port2 = p->second;
+
+            _controller->getInterface().mergePorts(*port1, *port2, "controller");
+        }
+
+        /*
         pnapi::Port & oldport = *(_controller->getInterface().getPort());
         const std::set<Label *> netIf = oldport.getAllLabels();
+        std::set<std::pair<std::string, pnapi::Label::Type> > labelNames;
         for (std::set<Label *>::const_iterator label = netIf.begin(); label
                 != netIf.end(); ++label)
         {
-            pnapi::Label::Type labeltype = (*label)->getType();
-            const std::string labelname((*label)->getName());
+            labelNames.insert(make_pair((*label)->getName(),(*label)->getType()));
+        }
+        for (std::set<std::pair<std::string, pnapi::Label::Type> >::const_iterator label = labelNames.begin(); label
+                != labelNames.end(); ++label)
+        {
+            pnapi::Label::Type labeltype = label->second;
+            const std::string labelname (label->first);
             {
+                oldport.removeLabel(labelname);
                 // CG Workaround:
                 pnapi::Label & labelcopy = controllerport.addLabel(labelname,
                                            labeltype);
@@ -472,9 +492,10 @@ const pnapi::PetriNet * Adapter::buildController()
                 {
                     (*trans)->addLabel(labelcopy);
                 }
-                oldport.removeLabel(labelname);
             }
         }
+        */
+        
     }
 
     time(&end_time);
@@ -512,7 +533,15 @@ void Adapter::createEngineInterface()
 
         // CG Workaround
         pnapi::Port & partnerport = _nets[netindex]->createPort(portname);
-        pnapi::Port & oldport = *(_nets[netindex]->getInterface().getPort());
+        while(_nets[netindex]->getInterface().getPorts().size() > 1)
+        {
+            std::map< std::string, Port * >::const_iterator p = _nets[netindex]->getInterface().getPorts().begin();
+            pnapi::Port * port1 = p->second;
+            ++p;
+            pnapi::Port * port2 = p->second;
+
+            _nets[netindex]->getInterface().mergePorts(*port1, *port2, portname);
+        }
 
         const std::set< Label * > netIf = _nets[netindex]->getInterface().getAsynchronousLabels();
         for (std::set< Label *>::const_iterator place = netIf.begin(); place
@@ -520,16 +549,6 @@ void Adapter::createEngineInterface()
         {
             pnapi::Label::Type labeltype = (*place)->getType();
             const std::string labelname ((*place)->getName());
-            {
-                // CG Workaround:
-                pnapi::Label & labelcopy = partnerport.addLabel(labelname, labeltype);
-                const std::set< Transition  * > & transen = (*place)->getTransitions();
-                for (std::set< Transition * >::const_iterator trans = transen.begin(); trans != transen.end(); ++trans)
-                {
-                    (*trans)->addLabel(labelcopy);
-                }
-                oldport.removeLabel(labelname);
-            }
 
             // get interface name
             //const std::string & ifname = (*place)->getName();
@@ -614,6 +633,7 @@ void Adapter::createEngineInterface()
             netport.addSynchronousLabel(labelname);
 
             // CG Workaround:
+            /*
             pnapi::Label & labelcopy = partnerport.addLabel(labelname,
                                        pnapi::Label::SYNCHRONOUS);
             const std::set<Transition *> & transen = (*iter)->getTransitions();
@@ -623,6 +643,7 @@ void Adapter::createEngineInterface()
                 (*trans)->addLabel(labelcopy);
             }
             oldport.removeLabel(labelname);
+            */
         }
 
     }

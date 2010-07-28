@@ -4,6 +4,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "condition.h"
 #include "formula.h"
 #include "marking.h"
@@ -103,7 +105,7 @@ bool Condition::isSatisfied(const Marking & m) const
  */
 Condition & Condition::operator=(const formula::Formula & f)
 {
-  assert(formula_ != &f);
+  PNAPI_ASSERT(formula_ != &f);
 
   delete formula_;
   formula_ = f.clone();

@@ -67,6 +67,7 @@ void terminationHandler()
 
 int main(int argc, char* argv[])
 {
+    try {
     argv[0]=basename(argv[0]);
 
     // set the function to call on normal termination
@@ -248,7 +249,7 @@ int main(int argc, char* argv[])
 
     if (not args_info.diagnosis_flag)
     {
-        engine.compose(*controller, "engine.", "controller.");
+        engine.compose(*controller, "engine.");
 
         engine.reduce(pnapi::PetriNet::LEVEL_5 | pnapi::PetriNet::SET_PILLAT); //
         {
@@ -269,6 +270,13 @@ int main(int argc, char* argv[])
     }
     nets.clear();
 
+    }
+    catch (pnapi::exception::UserCausedError ex)
+    {
+        message("Unexpected error, please report this bug to %s.", PACKAGE_BUGREPORT);
+        std::cerr << ex << std::endl;
+        exit(1);
+    }
     cmdline_parser_free(&args_info);
 
     return 0;

@@ -152,7 +152,8 @@ void terminationHandler() {
     if (args_info.stats_flag) {
         message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
         fprintf(stderr, "%s: memory consumption: ", PACKAGE);
-        system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+        int doNotCare = system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+        doNotCare = doNotCare; // get rid of compiler warning
     }
 }
 
@@ -199,7 +200,10 @@ int main(int argc, char** argv) {
     wendy_command += ((args_info.verbose_flag) ? " --verbose" : " 2> /dev/null");
     time(&start_time);
     status("executing '%s'", wendy_command.c_str());
-    system(wendy_command.c_str());
+    {
+        int doNotCare = system(wendy_command.c_str());
+        doNotCare = doNotCare; // get rid of compiler warning
+    }
     time(&end_time);
     status("Wendy done [%.0f sec]", difftime(end_time, start_time));
 

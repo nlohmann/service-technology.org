@@ -8,7 +8,7 @@
 
 # Petri needs Graphviz dot to generate pictures of Petri Nets.
 
-dot = "@DOT@"
+dot = '"@DOT@"'
 
 # PNAPI needs to create a temporary file to pass it to Petrify. The filename
 # PNAPI should use can be specified below. The filename should end with

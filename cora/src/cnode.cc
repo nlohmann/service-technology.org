@@ -176,7 +176,7 @@ void CNode::setSuccessor(Transition& t, CNode* cnode) {
 	Omegas are introduced accordingly into the extended marking (which is changed).
 	@param extm The extended marking of the new node, being changed by the method.
 	@return If this node is a root node and omegas have been introduced.
-*/
+
 bool CNode::addOmega(ExtMarking& extm) {
 	if (root) return false; // for root nodes only
 	bool added(false); // if we have added an omega
@@ -199,6 +199,45 @@ bool CNode::addOmega(ExtMarking& extm) {
 	if (added) addOmega(extm); // check (again) if further omegas can be introduced (smaller graph, not necessary)
 	return added;
 }
+*/
+bool CNode::addOmega(ExtMarking& extm, vector<deque<Transition*> >& pumppaths, vector<set<Place*> >& pumpplaces, Transition& t) {
+	if (root) return false; // for root nodes only
+	bool added(false); // if we have added an omega
+	set<CNode*> done,todo; // which nodes we have already checked and which ones are still to do
+	map<CNode*,deque<Transition*> > path;
+	path[this].push_front(&t);
+	todo.insert(this); // we begin with this node
+	while (!todo.empty()) // if we still have something to do ...
+	{
+		CNode* active(*(todo.begin())); // get the first node on our todo list
+		if (extm.isCovering(active->em)) // if we cover that node's marking
+		{ 
+			set<Place*> ps(extm.setOmega(active->em)); // set the covered places (as in "larger") to omega
+			if (!ps.empty()) 
+			{
+				added=true; // and remember if we did something
+				pumppaths.push_back(path[active]); // also remember the path to pump up the place set ps
+				pumpplaces.push_back(ps); // and the set ps itself
+			}
+		}
+		todo.erase(todo.begin()); // we are done with this node
+		done.insert(active); // remember that so we don't come back here later
+		set<CNode*>::iterator pit; // now go through all of this node's predecessors
+		for(pit=active->pred.begin(); pit!=active->pred.end(); ++pit)
+			if (done.find(*pit)==done.end()) 
+			{	
+				todo.insert(*pit); // and add them to todo unless we have already done them
+				map<Transition*,CNode*>::iterator mit;
+				for(mit=(*pit)->succ.begin(); mit!=(*pit)->succ.end(); ++mit)
+					if (mit->second==active) break; // we need the label(transition) of the edge
+				path[*pit] = path[active]; // the predecessor node gets the same path ...
+				path[*pit].push_front(mit->first); // plus the edge label at the front
+			}
+	}
+	if (added) addOmega(extm,pumppaths,pumpplaces,t); // check (again) if further omegas can be introduced (smaller graph, not necessary)
+	return added;
+}
+
 
 /** Check if work has to be done for transition t or if all edges with label t emerging from
 	this node have already been created.

@@ -16,6 +16,7 @@
 
 #include <deque>
 #include "pnapi/pnapi.h"
+#include "cmdline.h"
 #include "covergraph.h"
 #include "rnode.h"
 #include "cnode.h"
@@ -28,6 +29,9 @@ using std::deque;
 using std::vector;
 using std::cout;
 using std::endl;
+
+/// the command line parameters
+extern gengetopt_args_info args_info;
 
 	/*************************************
 	* Implementation of class CoverGraph *
@@ -83,9 +87,12 @@ bool CoverGraph::createSuccessor(CNode& cn, Transition& t) {
 	ExtMarking em(cn.getMarking()); // extract the active extmarking
 	if (em.isDisabled(t,imat)) return false; // check if t can fire at all, if not, no successor
 	em.successor(t,true,imat); // obtain the t-successor's extmarking
-	cn.addOmega(em); // and check if we need to set some numbers to omega (and do so)
+	vector<deque<Transition*> > pumppaths;
+	vector<set<Place*> > pumpplaces;
+	cn.addOmega(em,pumppaths,pumpplaces,t); // and check if we need to set some numbers to omega (and do so)
 	CNode* c(new CNode(em)); // create a new node from the extmarking
 	RNode r(*c); // and also contain it in a root list entry to check if we already created it
+	r.setPumpInfo(pumppaths,pumpplaces);
 	if (nodes.find(r)==nodes.end()) // if the extmarking does not exists in the coverability graph ...
 	{
 		if (sb) // check if we use stubborn sets, if so ...
@@ -134,9 +141,32 @@ void CoverGraph::printGraph(vector<Place*>& porder, bool rootonly) {
 	for(rit=nodes.begin(); rit!=nodes.end(); ++rit) 
 	{ // go through all the global nodes (with regular ExtMarkings)
 		(*rit).cnode->getMarking().show(cout,porder); // print the marking
+		if (args_info.fullgraph_given) {
+			vector<deque<Transition*> > pumppaths;
+			vector<set<Place*> > pumpsets;
+			(*rit).getPumpInfo(pumppaths,pumpsets);
+			for(int i=0; i<pumppaths.size(); ++i) {
+				cout << endl << " [pump {";
+				set<Place*>::iterator tpit;
+				bool comma(false);
+				for(tpit=pumpsets[i].begin(); tpit!=pumpsets[i].end(); ++tpit)
+				{
+					if (comma) cout << ","; else comma=true;
+					cout << (*tpit)->getName();
+				}
+				cout << "} with \"";
+				comma = false;
+				for(int j=0; j<pumppaths[i].size(); ++j)
+				{
+					if (comma) cout << " "; else comma=true; 	
+					cout << pumppaths[i][j]->getName();
+				}
+				cout << "\"]";
+			}
+		}
 		set<CNode*> subnodes((*rit).cnode->getSubNodes(0)); // get the partition this ExtMarking was split into
 		if (!rootonly && subnodes.size()!=1) // if this node was split and we should show subnodes
-			cout << " has been split into:" << endl;
+			cout << endl << " node has been split into:" << endl;
 		else cout << endl;
 		map<Transition*,CNode*> smap((*rit).cnode->getSuccessors()); // edges to the global successors
 		map<Transition*,CNode*>::iterator sit;

@@ -275,6 +275,14 @@ marking of @math{(0,\omega,\omega,\omega,\omega)} where the initial place @samp{
 zero tokens while all the other places may contain any number. From this node, there are four
 edges, all leading back to this same node.
 
+Between the node defining line and its edges there may be additional lines of the form
+@samp{[pump @{...@} with "..."]}. These lines present firing sequences (in quotation marks)
+that can be used at this node to increase the number of tokens on the places shown in
+braces. All places that are marked with an omega but do not appear in this set are required
+to contain an unlimited number of tokens. If this is not the case, an earlier node on the path
+from the initial node to this node may be sought that has a path to pump up the required
+places with tokens.
+
 The last line of the output contains the initial node to the coverability graph,
 representing the initial marking of the Petri net. In this case, this marking is @samp{s}
 (which can also be written as @samp{s:1}).

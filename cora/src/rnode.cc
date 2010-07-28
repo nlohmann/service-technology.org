@@ -43,3 +43,15 @@ bool RNode::operator==(const RNode& right) const {
 	return (cnode->getMarking()==right.cnode->getMarking());
 }
 
+void RNode::setPumpInfo(vector<deque<Transition*> >& pumppaths, vector<set<Place*> >& pumpsets) {
+	paths = pumppaths;
+	places = pumpsets;
+}
+
+void RNode::getPumpInfo(vector<deque<Transition*> >& pumppaths, vector<set<Place*> >& pumpsets) const {
+	pumppaths.clear();
+	pumppaths = paths;
+	pumpsets.clear();
+	pumpsets = places;
+}
+

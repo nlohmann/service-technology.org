@@ -20,6 +20,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <deque>
 #include <string>
 #include <iostream>
 #include "pnapi/pnapi.h"
@@ -31,6 +32,7 @@ using std::map;
 using std::string;
 using std::set;
 using std::vector;
+using std::deque;
 using std::ostream;
 using pnapi::Place;
 using pnapi::Transition;
@@ -106,7 +108,7 @@ public:
 	void setSuccessor(Transition& t, CNode* cnode);
 
 	/// check if the marking covers an earlier root node and introduce omegas accordingly
-	bool addOmega(ExtMarking& extm);
+	bool addOmega(ExtMarking& extm, vector<deque<Transition*> >& pumppaths, vector<set<Place*> >& pumpplaces, Transition& t);
 
 	/// check if a transition still has to be worked on (possibly obtaining new edges emerging from here)
 	bool needsWork(Transition& t);

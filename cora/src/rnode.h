@@ -17,7 +17,14 @@
 #ifndef RNODE_H
 #define RNODE_H
 
+#include <set>
+#include <vector>
+#include <deque>
 #include "cnode.h"
+
+using std::set;
+using std::vector;
+using std::deque;
 
 /*! \brief Wrapped Nodes of the coverability graph that allow a total ordering by the markings. */
 class RNode {
@@ -36,6 +43,14 @@ public:
 
 	/// Equality of nodes
 	bool operator==(const RNode& right) const;
+
+	void setPumpInfo(vector<deque<Transition*> >& pumppaths, vector<set<Place*> >& pumpsets);
+
+	void getPumpInfo(vector<deque<Transition*> >& pumppaths, vector<set<Place*> >& pumpsets) const;
+
+private:
+	vector<deque<Transition*> > paths;
+	vector<set<Place*> > places;
 };
 
 #endif

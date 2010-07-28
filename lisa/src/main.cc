@@ -132,7 +132,6 @@ int main(int argc, char** argv) {
     Output::setTempfileTemplate(args_info.tmpfile_arg);
     Output::setKeepTempfiles(args_info.noClean_flag);
 
-
     /*----------------------.
     | 1. parse the open net |
     `----------------------*/

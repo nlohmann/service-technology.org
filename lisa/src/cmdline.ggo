@@ -6,15 +6,7 @@ description "About Lisa:"
 purpose "Lisa - LInear programming based Structural Analysis.\n This program implements basic structural analysis methods for petri nets."
 
 section "Input/Output"
-sectiondesc="When called without an input file, lisa reads from the standard input stream. When called without an output parameter, lisa writes to the standard output stream. If no filename is given for the output option lisa creates a file with a temporary name.\n"
-
-option "output" o
-  "lisa' output."
-  details="This option is used when lisa's output should be stored to a file.\n"
-  string
-  typestr="FILENAME"
-  argoptional
-  optional
+sectiondesc="When called without an input file, lisa reads from the standard input stream.\n"
 
 section "Analysis"
 

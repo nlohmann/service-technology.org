@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
     | 3. parse policies |
     `------------------*/
     for (unsigned int i = 0; i < args_info.policies_given; ++i) {
-        inputfiles += std::string(args_info.policies_arg[i]) + " ";        
+        inputfiles += std::string(args_info.policies_arg[i]) + " ";
         PetriNet policy;
         std::ifstream policy_file(args_info.policies_arg[i], std::ifstream::in);
         policy_file >> io::owfn >> policy;

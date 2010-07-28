@@ -427,7 +427,7 @@ AT_CHECK([PETRI NET],0,ignore,stderr)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
-AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968) [[Statemachine]] ])
+AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968), SM])
 m4_define([NET], [bug13968.sa])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI -isa -oowfn NET], 0, ignore, stderr)
@@ -438,7 +438,7 @@ AT_CHECK([GREP -q "myUnknownLabel" NET.owfn])
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
-AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968) [[Petrify]] ])
+AT_SETUP([Bug 13968 (https://gna.org/bugs/?13968), Petrify])
 m4_define([NET], [bug13968.sa])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI -isa -oowfn --petrify=PETRIFY NET], 0, ignore, stderr)
@@ -655,7 +655,7 @@ AT_CHECK([GREP -q "'p4': unknown place" stderr])
 AT_KEYWORDS([error parser lola])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #01])
+AT_SETUP([oWFN parser #01])
 m4_define([NET], [error_parser_owfn_01.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -663,7 +663,7 @@ AT_CHECK([GREP -q "net already contains a node named 'p2'" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #02])
+AT_SETUP([oWFN parser #02])
 m4_define([NET], [error_parser_owfn_02.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -671,7 +671,7 @@ AT_CHECK([GREP -q "label name 'i' already used" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #03])
+AT_SETUP([oWFN parser #03])
 m4_define([NET], [error_parser_owfn_03.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -679,7 +679,7 @@ AT_CHECK([GREP -q "node name 'p1' already used" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #04])
+AT_SETUP([oWFN parser #04])
 m4_define([NET], [error_parser_owfn_04.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -687,7 +687,7 @@ AT_CHECK([GREP -q "interface label already assigned to port 'foo'" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #05])
+AT_SETUP([oWFN parser #05])
 m4_define([NET], [error_parser_owfn_05.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -695,7 +695,7 @@ AT_CHECK([GREP -q "unknown label 'x'" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #06])
+AT_SETUP([oWFN parser #06])
 m4_define([NET], [error_parser_owfn_06.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -703,7 +703,7 @@ AT_CHECK([GREP -q "unknown label 'p1'" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #07])
+AT_SETUP([oWFN parser #07])
 m4_define([NET], [error_parser_owfn_07.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -711,7 +711,7 @@ AT_CHECK([GREP -q "'p23': unknown place" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #08])
+AT_SETUP([oWFN parser #08])
 m4_define([NET], [error_parser_owfn_08.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -719,7 +719,7 @@ AT_CHECK([GREP -q "'i': unknown place" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #09])
+AT_SETUP([oWFN parser #09])
 m4_define([NET], [error_parser_owfn_09.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -727,7 +727,7 @@ AT_CHECK([GREP -q "net already contains a node named 'p1'" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #10])
+AT_SETUP([oWFN parser #10])
 m4_define([NET], [error_parser_owfn_10.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -735,7 +735,7 @@ AT_CHECK([GREP -q "net already contains a node named 't1'" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #11])
+AT_SETUP([oWFN parser #11])
 m4_define([NET], [error_parser_owfn_11.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -743,7 +743,7 @@ AT_CHECK([GREP -q "net already contains a label named 'i'" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #12])
+AT_SETUP([oWFN parser #12])
 m4_define([NET], [error_parser_owfn_12.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -751,7 +751,7 @@ AT_CHECK([GREP -q "'p3': unknown place" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #13])
+AT_SETUP([oWFN parser #13])
 m4_define([NET], [error_parser_owfn_13.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -759,7 +759,7 @@ AT_CHECK([GREP -q "'i': unknown place" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #14])
+AT_SETUP([oWFN parser #14])
 m4_define([NET], [error_parser_owfn_14.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -767,7 +767,7 @@ AT_CHECK([GREP -q "'o': can only consume from places and input labels" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #15])
+AT_SETUP([oWFN parser #15])
 m4_define([NET], [error_parser_owfn_15.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -775,7 +775,7 @@ AT_CHECK([GREP -q "'i': can only produce to places and output labels" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #16])
+AT_SETUP([oWFN parser #16])
 m4_define([NET], [error_parser_owfn_16.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -783,7 +783,7 @@ AT_CHECK([GREP -q "'i': place already in preset" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #17])
+AT_SETUP([oWFN parser #17])
 m4_define([NET], [error_parser_owfn_17.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -791,7 +791,7 @@ AT_CHECK([GREP -q "'o': place already in postset" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #18])
+AT_SETUP([oWFN parser #18])
 m4_define([NET], [error_parser_owfn_18.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -799,7 +799,7 @@ AT_CHECK([GREP -q "'x': unknown label" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #19])
+AT_SETUP([oWFN parser #19])
 m4_define([NET], [error_parser_owfn_19.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -807,7 +807,7 @@ AT_CHECK([GREP -q "'p1': unknown label" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([OWFN parser #20])
+AT_SETUP([oWFN parser #20])
 m4_define([NET], [error_parser_owfn_20.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET], 1, ignore, stderr)
@@ -815,7 +815,7 @@ AT_CHECK([GREP -q "'i': can only synchronize with synchronous labels" stderr])
 AT_KEYWORDS([error parser owfn])
 AT_CLEANUP
 
-AT_SETUP([WOFLAN parser #1])
+AT_SETUP([Woflan parser #1])
 m4_define([NET], [error_parser_woflan_01.tpn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI -itpn NET], 1, ignore, stderr)
@@ -823,7 +823,7 @@ AT_CHECK([GREP -q "net already contains a node named 'o'" stderr])
 AT_KEYWORDS([error parser woflan tpn])
 AT_CLEANUP
 
-AT_SETUP([WOFLAN parser #2])
+AT_SETUP([Woflan parser #2])
 m4_define([NET], [error_parser_woflan_02.tpn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI -itpn NET], 1, ignore, stderr)
@@ -831,7 +831,7 @@ AT_CHECK([GREP -q "net already contains a node named 't'" stderr])
 AT_KEYWORDS([error parser woflan tpn])
 AT_CLEANUP
 
-AT_SETUP([WOFLAN parser #3])
+AT_SETUP([Woflan parser #3])
 m4_define([NET], [error_parser_woflan_03.tpn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI -itpn NET], 1, ignore, stderr)
@@ -839,7 +839,7 @@ AT_CHECK([GREP -q "net already contains a node named 'i'" stderr])
 AT_KEYWORDS([error parser woflan tpn])
 AT_CLEANUP
 
-AT_SETUP([WOFLAN parser #4])
+AT_SETUP([Woflan parser #4])
 m4_define([NET], [error_parser_woflan_04.tpn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI -itpn NET], 1, ignore, stderr)
@@ -847,7 +847,7 @@ AT_CHECK([GREP -q "net already contains a node named 't'" stderr])
 AT_KEYWORDS([error parser woflan tpn])
 AT_CLEANUP
 
-AT_SETUP([WOFLAN parser #5])
+AT_SETUP([Woflan parser #5])
 m4_define([NET], [error_parser_woflan_05.tpn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI -itpn NET], 1, ignore, stderr)
@@ -855,7 +855,7 @@ AT_CHECK([GREP -q "transition must be labeled" stderr])
 AT_KEYWORDS([error parser woflan tpn])
 AT_CLEANUP
 
-AT_SETUP([WOFLAN parser #6])
+AT_SETUP([Woflan parser #6])
 m4_define([NET], [error_parser_woflan_06.tpn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI -itpn NET], 1, ignore, stderr)
@@ -1178,7 +1178,7 @@ AT_CHECK([PETRI NET -osa],0,ignore,ignore)
 AT_KEYWORDS([automaton])
 AT_CLEANUP
 
-AT_SETUP([Behavior preservation (asynchronous, petrify)])
+AT_SETUP([Behavior preservation (asynchronous, Petrify)])
 m4_define([NET], [test_automaton_behavior_async.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET -osa], 0, ignore, ignore)
@@ -1187,7 +1187,7 @@ AT_CHECK([FIONA -t equivalence NET NET.sa.owfn], 0, ignore, ignore)
 AT_KEYWORDS([automaton synthesis])
 AT_CLEANUP
 
-AT_SETUP([Behavior preservation (asynchronous, statemachine)])
+AT_SETUP([Behavior preservation (asynchronous, SM)])
 m4_define([NET], [test_automaton_behavior_async.owfn])
 AT_CHECK([cp TESTFILES/NET .])
 AT_CHECK([PETRI NET -osa], 0, ignore, ignore)

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
     unsigned int i, n, k;
 
     if (argc == 2 && !strcmp(argv[1], "--version")) {
@@ -42,15 +42,15 @@ int main(int argc, char **argv) {
         printf("\n");
     }
     printf("  ");
-    for (i = 0; i < n-1; ++i) {
+    for (i = 0; i < n - 1; ++i) {
         printf("fork_%d, ", i);
     }
-    printf("fork_%d;\n", n-1);
+    printf("fork_%d;\n", n - 1);
     printf("SYNCHRONOUS\n");
-    for (i = 0; i < n-1; ++i) {
+    for (i = 0; i < n - 1; ++i) {
         printf("  tl_%d, in_%d, tr_%d, rn_%d,\n", i, i, i, i);
     }
-    printf("  tl_%d, in_%d, tr_%d, rn_%d;\n", n-1, n-1, n-1, n-1);
+    printf("  tl_%d, in_%d, tr_%d, rn_%d;\n", n - 1, n - 1, n - 1, n - 1);
 
 
     printf("\n");
@@ -60,20 +60,20 @@ int main(int argc, char **argv) {
         printf("phil%d_id, ", i);
     }
     printf("\n  ");
-    for (i = 0; i < n-1; ++i) {
+    for (i = 0; i < n - 1; ++i) {
         printf("fork_%d, ", i);
     }
-    printf("fork_%d;\n\n", n-1);
+    printf("fork_%d;\n\n", n - 1);
 
     printf("FINALMARKING\n  ");
     for (i = 0; i < n; ++i) {
         printf("phil%d_id, ", i);
     }
     printf("\n  ");
-    for (i = 0; i < n-1; ++i) {
+    for (i = 0; i < n - 1; ++i) {
         printf("fork_%d, ", i);
     }
-    printf("fork_%d;\n\n", n-1);
+    printf("fork_%d;\n\n", n - 1);
 
     for (i = 0; i < n; ++i) {
         printf("{ philosopher #%d }\n", i);
@@ -99,13 +99,13 @@ int main(int argc, char **argv) {
         printf("SYNCHRONIZE in_%d;\n\n", i);
 
         printf("TRANSITION phil%d_takeright\n", i);
-        printf("CONSUME phil%d_i2:%d, fork_%d;\n", i, k, (i+1)%n);
+        printf("CONSUME phil%d_i2:%d, fork_%d;\n", i, k, (i + 1) % n);
         printf("PRODUCE phil%d_ea;\n", i);
         printf("SYNCHRONIZE tr_%d;\n\n", i);
 
         printf("TRANSITION phil%d_return\n", i);
         printf("CONSUME phil%d_ea;\n", i);
-        printf("PRODUCE phil%d_id, fork_%d, fork_%d;\n", i, i, (i+1)%n);
+        printf("PRODUCE phil%d_id, fork_%d, fork_%d;\n", i, i, (i + 1) % n);
         printf("SYNCHRONIZE rn_%d;\n\n", i);
     }
 

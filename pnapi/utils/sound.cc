@@ -8,8 +8,8 @@ using pnapi::io::util::operator<<; // to output final conditions
 
 int main(int argc, char** argv) {
     PetriNet net;
-    
-    if(argc < 2) {
+
+    if (argc < 2) {
         fprintf(stderr, "no input given\n");
         exit(EXIT_FAILURE);
     }
@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
     std::cout << "boundednessnet.result:\n";
     std::cout << "\t-@lola-boundednet $(net) > $@ ; echo \"RESULT: $$?\" >> $@\n\n";
 
-    // relaxed soundness 
+    // relaxed soundness
     std::cout << "\n##############################################################################\n";
     std::cout << "# check relaxed soundness by checking special reachability problem\n";
     std::cout << "##############################################################################\n";

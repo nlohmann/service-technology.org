@@ -1,5 +1,3 @@
-SUBDIRS = unfolder
-
 bin_PROGRAMS = petri cdnf generator cphils configurator artifact
 dist_noinst_SCRIPTS = process.sh make_customer.sh
 

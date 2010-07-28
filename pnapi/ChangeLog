@@ -7,8 +7,8 @@
                         http://service-technology.org/pnapi
 
 
-Version 4.02-unreleased
-=======================
+Version 4.02 (2010-07-28)
+=========================
 
 * made petri configurable (paths to external tools, configuration file)
 

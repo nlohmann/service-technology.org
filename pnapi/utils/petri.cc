@@ -96,7 +96,7 @@ void evaluateParameters(int argc, char** argv) {
             status("not using a configuration file");
         }
     }
-    
+
     free(params);
 }
 
@@ -128,21 +128,21 @@ int main(int argc, char** argv) {
     }
 
     try {
-        
+
         // set configured tools
         PetriNet::setGenet(args_info.genet_arg);
         PetriNet::setPetrify(args_info.petrify_arg);
-        
+
         PetriNet::AutomatonConverter aConverter = (args_info.petrify_given ? PetriNet::PETRIFY :
                                                    (args_info.genet_given ? PetriNet::GENET : PetriNet::STATEMACHINE));
-    
+
         /********
         * INPUT *
         ********/
         if (!args_info.inputs_num) {
             // read from stdin
             FileObject current("stdin");
-    
+
             // try to parse net
             switch (args_info.input_arg) {
                 case(input_arg_owfn): {
@@ -194,23 +194,23 @@ int main(int argc, char** argv) {
             }
             if (args_info.canonicalNames_given) {
                 map<string, string> names = current.net->canonicalNames();
-                
-                if(args_info.canonicalNames_arg != NULL) {
+
+                if (args_info.canonicalNames_arg != NULL) {
                     // try to open file to write
                     Output outfile(args_info.canonicalNames_arg, "names output");
-                    
+
                     PNAPI_FOREACH(n, names) {
                         outfile.stream() << (n->first) << ": " << (n->second) << std::endl;
                     }
                 }
             }
-    
+
             std::stringstream ss;
             ss << io::stat << *(current.net);
-    
+
             status("<stdin>: %s", ss.str().c_str());
             current.net->getInterface().setName("<stdin>");
-    
+
             // store object
             objects.push_back(current);
         } else {
@@ -218,13 +218,13 @@ int main(int argc, char** argv) {
             for (unsigned int i = 0; i < args_info.inputs_num; ++i) {
                 // prepare a new object
                 FileObject current(args_info.inputs[i]);
-    
+
                 // try to open file
                 ifstream infile(args_info.inputs[i], ifstream::in);
                 if (!infile.is_open()) {
                     abort(3, "could not read from file '%s'", args_info.inputs[i]);
                 }
-    
+
                 // try to parse net
                 try {
                     switch (args_info.input_arg) {
@@ -233,7 +233,7 @@ int main(int argc, char** argv) {
                             infile >> meta(io::INPUTFILE, current.filename)
                                    >> meta(io::CREATOR, PACKAGE_STRING)
                                    >> meta(io::INVOCATION, invocation) >> io::owfn >> *(current.net);
-    
+
                             current.type = TYPE_OPENNET;
                             break;
                         }
@@ -242,7 +242,7 @@ int main(int argc, char** argv) {
                             infile >> meta(io::INPUTFILE, current.filename)
                                    >> meta(io::CREATOR, PACKAGE_STRING)
                                    >> meta(io::INVOCATION, invocation) >> io::pnml >> *(current.net);
-    
+
                             current.type = TYPE_OPENNET;
                             break;
                         }
@@ -251,7 +251,7 @@ int main(int argc, char** argv) {
                             infile >> meta(io::INPUTFILE, current.filename)
                                    >> meta(io::CREATOR, PACKAGE_STRING)
                                    >> meta(io::INVOCATION, invocation) >> io::lola >> *(current.net);
-    
+
                             current.type = TYPE_LOLANET;
                             break;
                         }
@@ -261,7 +261,7 @@ int main(int argc, char** argv) {
                                    >> meta(io::CREATOR, PACKAGE_STRING)
                                    >> meta(io::INVOCATION, invocation) >> io::sa >> sa;
                             current.net = new PetriNet(sa, aConverter);
-    
+
                             current.type = TYPE_OPENNET;
                             break;
                         }
@@ -270,41 +270,41 @@ int main(int argc, char** argv) {
                             infile >> meta(io::INPUTFILE, current.filename)
                                    >> meta(io::CREATOR, PACKAGE_STRING)
                                    >> meta(io::INVOCATION, invocation) >> io::woflan >> *(current.net);
-    
+
                             current.type = TYPE_WOFLANNET;
                             break;
                         }
                     }
                     if (args_info.canonicalNames_given) {
                         map<string, string> names = current.net->canonicalNames();
-                        
-                        if(args_info.canonicalNames_arg != NULL) {
+
+                        if (args_info.canonicalNames_arg != NULL) {
                             // try to open file to write
                             Output outfile(args_info.canonicalNames_arg, "names output");
-                            
+
                             PNAPI_FOREACH(n, names) {
                                 outfile.stream() << (n->first) << ": " << (n->second) << std::endl;
                             }
                         }
                     }//TODO
-                } catch (exception::InputError & error) {
+                } catch (exception::InputError& error) {
                     infile.close();
                     throw error;
                 }
-    
+
                 infile.close();
-    
+
                 std::stringstream ss;
                 ss << io::stat << *(current.net);
                 status("%s: %s", args_info.inputs[i], ss.str().c_str());
                 current.net->getInterface().setName(args_info.inputs[i]);
-    
+
                 // store object
                 objects.push_back(current);
             }
         }
-    
-    
+
+
         /***************
          * COMPOSITION *
          ***************/
@@ -314,25 +314,25 @@ int main(int argc, char** argv) {
             if (!infile.is_open()) {
                 abort(3, "could not read from file '%s'", args_info.compose_arg);
             }
-    
+
             PetriNet secondNet; // to store composition "partner"
             string secondNetName = args_info.compose_arg;
-    
+
             // read net
             infile >> meta(io::INPUTFILE, secondNetName)
                    >> meta(io::CREATOR, PACKAGE_STRING)
                    >> meta(io::INVOCATION, invocation) >> io::owfn >> secondNet;
-            
+
             secondNet.getInterface().setName(secondNetName);
-    
+
             // compose nets
             for (size_t i = 0; i < objects.size(); ++i) {
                 objects[i].net->compose(secondNet, objects[i].filename, secondNetName);
                 objects[i].filename += ".composed";
             }
         }
-    
-    
+
+
         /***********
          * PRODUCT *
          ***********/
@@ -340,25 +340,25 @@ int main(int argc, char** argv) {
             if (args_info.inputs_num > 1) {
                 abort(4, "at most one net can be used with '--produce' parameter");
             }
-    
+
             // try to open file
             ifstream infile(args_info.produce_arg, ifstream::in);
             if (!infile.is_open()) {
                 abort(3, "could not read from file '%s'", args_info.produce_arg);
             }
-    
+
             PetriNet constraintNet; // to store constraint
-    
+
             // read net
             infile >> meta(io::INPUTFILE, args_info.produce_arg)
                    >> meta(io::CREATOR, PACKAGE_STRING)
                    >> meta(io::INVOCATION, invocation) >> io::owfn >> constraintNet;
-    
+
             // produce nets
             objects[0].net->produce(constraintNet);
         }
-    
-    
+
+
         /****************
         * MODIFICATIONS *
         *****************/
@@ -366,41 +366,41 @@ int main(int argc, char** argv) {
             suffix += ".normalized";
             for (unsigned int i = 0; i < objects.size(); ++i) {
                 status("normalizing reducing Petri net '%s'...", objects[i].filename.c_str());
-    
+
                 objects[i].net->normalize();
             }
         }
-    
+
         if (args_info.negate_given) {
             suffix += ".negated";
             for (unsigned int i = 0; i < objects.size(); ++i) {
                 status("negating the final condition of net '%s'...", objects[i].filename.c_str());
-    
+
                 objects[i].net->getFinalCondition().negate();
             }
         }
-    
+
         if (args_info.mirror_given) {
             suffix += ".mirrored";
             for (unsigned int i = 0; i < objects.size(); ++i) {
                 status("mirroring the net '%s'...", objects[i].filename.c_str());
-    
+
                 objects[i].net->mirror();
             }
         }
-    
+
         if (args_info.dnf_given) {
             suffix += ".dnf";
             for (unsigned int i = 0; i < objects.size(); ++i) {
                 status("calculation dnf of final condition of net '%s'...", objects[i].filename.c_str());
-    
+
                 objects[i].net->getFinalCondition().dnf();
             }
         }
-    
+
         if (args_info.guessFormula_given) {
             for (unsigned int i = 0; i < objects.size(); ++i) {
-                Place *sink = NULL;
+                Place* sink = NULL;
                 PNAPI_FOREACH(p, objects[i].net->getPlaces()) {
                     if ((*p)->getPostset().empty()) {
                         if (sink != NULL) {
@@ -409,18 +409,18 @@ int main(int argc, char** argv) {
                         sink = *p;
                     }
                 }
-    
+
                 if (sink == NULL) {
                     abort(7, "did not find a sink place");
                 }
-    
+
                 status("sink place is '%s'", sink->getName().c_str());
                 objects[i].net->getFinalCondition() = (*sink == 1);
                 objects[i].net->getFinalCondition().allOtherPlacesEmpty(*objects[i].net);
             }
         }
-    
-    
+
+
         /***********************
         * STRUCTURAL REDUCTION *
         ***********************/
@@ -428,11 +428,11 @@ int main(int argc, char** argv) {
             suffix += ".reduced";
             for (unsigned int i = 0; i < objects.size(); ++i) {
                 PetriNet::ReductionLevel level = PetriNet::NONE;
-    
+
                 // collect the chosen reduction rules
                 for (unsigned int j = 0; j < args_info.reduce_given; ++j) {
                     PetriNet::ReductionLevel newLevel = PetriNet::NONE;
-    
+
                     switch (args_info.reduce_arg[j]) {
                         case(reduce_arg_1):
                             newLevel = PetriNet::LEVEL_1;
@@ -521,17 +521,17 @@ int main(int argc, char** argv) {
                         default: /* do nothing */
                             break;
                     }
-    
+
                     level = (PetriNet::ReductionLevel)(level | newLevel);
                 }
-    
+
                 status("structurally reducing Petri net '%s'...", objects[i].filename.c_str());
-    
+
                 objects[i].net->reduce(level);
             }
         }
-    
-    
+
+
         /************************
         * STRUCTURAL PROPERTIES *
         ************************/
@@ -541,27 +541,27 @@ int main(int argc, char** argv) {
                 args_info.isWorkflow_given) {
             for (unsigned int i = 0; i < objects.size(); ++i) {
                 std::stringstream ss;
-    
+
                 // check for free choice
                 if (args_info.check_arg == check_arg_freechoice or args_info.isFreeChoice_given) {
                     ss << objects[i].net->isFreeChoice() << std::endl;
                 }
-    
+
                 // check for normality
                 if (args_info.check_arg == check_arg_normal or args_info.isNormal_given) {
                     ss << objects[i].net->isNormal() << std::endl;
                 }
-    
+
                 // check for workflow structure
                 if (args_info.check_arg == check_arg_workflow or args_info.isWorkflow_given) {
                     ss << objects[i].net->isWorkflow() << std::endl;
                 }
-    
+
                 message("%s: %s", objects[i].filename.c_str(), ss.str().c_str());
             }
         }
-    
-    
+
+
         /*********
         * OUTPUT *
         *********/
@@ -571,22 +571,22 @@ int main(int argc, char** argv) {
                     // try to open file to write
                     string outname = objects[i].filename + suffix + "." + args_info.output_orig[j];
                     Output outfile(outname, std::string(args_info.output_orig[j]) +  " output");
-    
+
                     outfile.stream() << meta(io::CREATOR, std::string(PACKAGE_STRING) + " Frontend (" + CONFIG_BUILDSYSTEM + ")");
                     outfile.stream() << meta(io::OUTPUTFILE, outname);
-                    
-                    if(args_info.removePorts_flag) {
-                      outfile.stream() << io::removePorts;
+
+                    if (args_info.removePorts_flag) {
+                        outfile.stream() << io::removePorts;
                     }
-    
+
                     switch (args_info.output_arg[j]) {
-    
-                        // create oWFN output
+
+                            // create oWFN output
                         case(output_arg_owfn): {
                             outfile.stream() << io::owfn << *(objects[i].net);
                             break;
                         }
-    
+
                         // create LoLA output
                         case(output_arg_lola): {
                             if (args_info.formula_flag) {
@@ -596,43 +596,43 @@ int main(int argc, char** argv) {
                             }
                             break;
                         }
-    
+
                         // create PNML output
                         case(output_arg_pnml): {
                             outfile.stream() << io::pnml << *(objects[i].net);
                             break;
                         }
-    
+
                         // create automaton output
                         case(output_arg_sa): {
                             Automaton sauto(*(objects[i].net));
                             outfile.stream() << io::sa << sauto;
                             break;
                         }
-    
+
                         // create Woflan output
                         case(output_arg_tpn): {
                             outfile.stream() << io::woflan << *(objects[i].net);
                             break;
                         }
-    
+
                         // create dot output
                         case(output_arg_dot): {
                             outfile.stream() << io::dot << *(objects[i].net);
                             break;
                         }
-    
+
                         // create output using Graphviz dot
                         case(output_arg_png):
                         case(output_arg_eps):
                         case(output_arg_pdf):
                         case(output_arg_svg): {
-    #if !defined(HAVE_POPEN) or !defined(HAVE_PCLOSE)
+#if !defined(HAVE_POPEN) or !defined(HAVE_PCLOSE)
                             abort(6, "petri: cannot open UNIX pipe to Graphviz dot");
-    #endif
+#endif
                             ostringstream d;
-                            if(args_info.removePorts_flag) {
-                              d << io::removePorts;
+                            if (args_info.removePorts_flag) {
+                                d << io::removePorts;
                             }
                             d << io::dot << *(objects[i].net);
                             string call = string(args_info.dot_arg) + " -T" + args_info.output_orig[j] + " -q -o " + outname;
@@ -647,14 +647,14 @@ int main(int argc, char** argv) {
                 }
             }
         }
-    } catch (exception::InputError & error) {
-          std::stringstream ss;
-          ss << error;
-          abort(2, "Input Error: %s", ss.str().c_str());
-    } catch (exception::Error & error) {
-          std::stringstream ss;
-          ss << error;
-          abort(7, "Exception caught: %s", ss.str().c_str());
+    } catch (exception::InputError& error) {
+        std::stringstream ss;
+        ss << error;
+        abort(2, "Input Error: %s", ss.str().c_str());
+    } catch (exception::Error& error) {
+        std::stringstream ss;
+        ss << error;
+        abort(7, "Exception caught: %s", ss.str().c_str());
     }
 
     /**********

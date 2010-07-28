@@ -1,4 +1,4 @@
-@heading Version 4.02-unreleased
+@heading Version 4.02 (2010-07-28)
 @itemize
 @item made petri configurable (paths to external tools, configuration file)
 @item removed sa2sm and sa2owfn

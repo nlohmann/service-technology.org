@@ -510,10 +510,11 @@ bool ExtMarking::isOpen(Place& p) {
 /** Check whether a given marking is contained in this extmarking. If not, find a place
 	proving that.
 	@param m The marking that could be contained.
+	@param cover If containment of a marking covering m is sufficient.
 	@return NULL if the marking is contained, a place where the marking can be distinguished
 		from this extmarking otherwise.
 */
-Place* ExtMarking::distinguish(Marking& m) {
+Place* ExtMarking::distinguish(Marking& m, bool cover) {
 	map<const Place*,unsigned int>::const_iterator mit;
 	for(mit=m.begin(); mit!=m.end(); ++mit) // visit every place where the marking is not zero (perhaps even some zeros)
 	{
@@ -522,19 +523,23 @@ Place* ExtMarking::distinguish(Marking& m) {
 		{
 			if (lb.find(p)==lb.end()) { if (mit->second==0) continue; } // check if both markings are zero here, if so, look for another place
 			else if (mit->second == (unsigned int)(lb[p])) continue; // otherwise check if they have the same value, then look for another place
+			else if (cover && mit->second < (unsigned int)(lb[p])) continue; // if covering m is sufficient
 		} 
 		else if (type[p]) // in case this has an open interval
 		{
+			if (cover) continue; // m and this are both open interval type, so they intersect
 			if (lb.find(p)==lb.end()) continue; // if it begins at zero, m might be contained
 			else if (mit->second >= (unsigned int)(lb[p])) continue; // if m has more tokens than the lower bound, it may be contained
 		}
 		else // finally check for closed intervals of this, if m(p) lies within the interval
 		{
+			if (cover && mit->second<=(unsigned int)(ub[p])) continue; // if m should be covered and is at most the upper limit, the markings intersect here
 			if (lb.find(p)==lb.end()) { if (mit->second<=(unsigned int)(ub[p])) continue; } // it's in [0,ub[p]]
 			else if (mit->second>=(unsigned int)(lb[p]) && mit->second<=(unsigned int)(ub[p])) continue; // it's in [lb[p],ub[p]]
 		}
 		return p; // m could be distinguished from this at place p, so return it
 	}
+	if (cover) return NULL; // no need to check zero entries in m if m should be covered
 	map<Place*,int>::iterator lbit; // we still need to check those places p that did not appear in
 	for(lbit=lb.begin(); lbit!=lb.end(); ++lbit) // m (m[p]=0), but where the lower bound of this is >0
 	{
@@ -555,7 +560,7 @@ bool ExtMarking::lessThanOn(Marking& m, Place& p) {
 		if (lb.find(&p)==lb.end()) { if (m[p]>0) return true; } // and it is zero, just check m[p]>0
 		else if (m[p]>(unsigned int)(lb[&p])) return true; // otherwise check if the value is lower than m[p]
 	} else if (!type[&p] && m[p]>(unsigned int)(ub[&p])) return true; // for closed intervals, check the upper bound
-	return false; // this isn't smaller (happen especially if this has an open interval for p)
+	return false; // this isn't smaller (happens especially if this has an open interval for p)
 }
 
 /** Compute the distance from this extmarking's t-successor to a given marking.

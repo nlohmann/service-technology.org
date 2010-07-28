@@ -132,7 +132,7 @@ public:
 	bool isOpen(Place& p);
 
 	/// find a place where the marking m does not conform with this extmarking
-	Place* distinguish(Marking& m);
+	Place* distinguish(Marking& m, bool cover);
 
 	/// compare the token number on a place to a marking, return true if it's lower
 	bool lessThanOn(Marking& m, Place& p);

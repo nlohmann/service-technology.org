@@ -175,30 +175,14 @@ void CNode::setSuccessor(Transition& t, CNode* cnode) {
 	marking on a path from the initial marking in the coverability graph to this node. 
 	Omegas are introduced accordingly into the extended marking (which is changed).
 	@param extm The extended marking of the new node, being changed by the method.
+	@param pumppaths Return value: for each set of places in pumpplaces this variable contains
+		a sequence of transitions that pumps up the set of places. This vector has the same
+		size as pumpplaces, entries with the same index belong to each other. In the outermost
+		call of this method, this variable should be an empty vector.
+	@param pumpplaces Return value: A vector of sets of places that are set to omega by this
+		method. The vector is filled during the call of this method and should be empty initially.
+	@param t The label of the edge that leads to the node to be created. Remains unchanged.
 	@return If this node is a root node and omegas have been introduced.
-
-bool CNode::addOmega(ExtMarking& extm) {
-	if (root) return false; // for root nodes only
-	bool added(false); // if we have added an omega
-	set<CNode*> done,todo; // which nodes we have already checked and which ones are still to do
-	todo.insert(this); // we begin with this node
-	while (!todo.empty()) // if we still have something to do ...
-	{
-		CNode* active(*(todo.begin())); // get the first node on our todo list
-		if (extm.isCovering(active->em)) // if we cover that node's marking
-		{ 
-			set<Place*> ps(extm.setOmega(active->em)); // set the covered places (as in "larger") to omega
-			if (!ps.empty()) added=true; // and remember if we did something
-		}
-		todo.erase(todo.begin()); // we are done with this node
-		done.insert(active); // remember that so we don't come back here later
-		set<CNode*>::iterator pit; // now go through all of this node's predecessors
-		for(pit=active->pred.begin(); pit!=active->pred.end(); ++pit)
-			if (done.find(*pit)==done.end()) todo.insert(*pit); // and add them to todo unless we have already done them
-	}
-	if (added) addOmega(extm); // check (again) if further omegas can be introduced (smaller graph, not necessary)
-	return added;
-}
 */
 bool CNode::addOmega(ExtMarking& extm, vector<deque<Transition*> >& pumppaths, vector<set<Place*> >& pumpplaces, Transition& t) {
 	if (root) return false; // for root nodes only

@@ -145,7 +145,7 @@ void CoverGraph::printGraph(vector<Place*>& porder, bool rootonly) {
 			vector<deque<Transition*> > pumppaths;
 			vector<set<Place*> > pumpsets;
 			(*rit).getPumpInfo(pumppaths,pumpsets);
-			for(int i=0; i<pumppaths.size(); ++i) {
+			for(unsigned int i=0; i<pumppaths.size(); ++i) {
 				cout << endl << " [pump {";
 				set<Place*>::iterator tpit;
 				bool comma(false);
@@ -156,7 +156,7 @@ void CoverGraph::printGraph(vector<Place*>& porder, bool rootonly) {
 				}
 				cout << "} with \"";
 				comma = false;
-				for(int j=0; j<pumppaths[i].size(); ++j)
+				for(unsigned int j=0; j<pumppaths[i].size(); ++j)
 				{
 					if (comma) cout << " "; else comma=true; 	
 					cout << pumppaths[i][j]->getName();
@@ -411,7 +411,7 @@ bool CoverGraph::splitPath(deque<Transition*>& path) {
 	if (i==path.size()) // next we need to check whether a final marking was reached
 	{ // all transitions on the path were firable, so we reached the goal node, but did we also reach the goal marking?
 		if (!sb) return true; // if we have no final marking (just a node), we are done
-		p = m.distinguish(sb->getGoal()); // check if reached and goal marking are identical
+		p = m.distinguish(sb->getGoal(),false); // check if reached and goal marking are identical
 		if (!p) return true; // if the path was fully firable and the goal is reached, no split is necessary
 		token = sb->getGoal()[*p]; // we cut the node below the goal token number ...
 		if (!m.lessThanOn(sb->getGoal(),*p)) ++token; // unless the reached marking is higher, then cut above it

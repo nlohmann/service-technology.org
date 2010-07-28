@@ -47,7 +47,7 @@ class StubbornSet {
 
 public:
 	/// Constructor with ordered list of all transitions tlist, goal marking goal, and incidence matrix im
-	StubbornSet(vector<Transition*> tlist, Marking& goal, IMatrix& im);
+	StubbornSet(vector<Transition*> tlist, Marking& goal, IMatrix& im, bool cov);
 
 	/// Destructor.
 	~StubbornSet();
@@ -98,6 +98,9 @@ private:
 
 	/// The incidence matrix of the Petri net
 	IMatrix& im;
+
+	/// Coverability or Reachability?
+	bool cover;
 
 	/// Calculate the conflicts and dependencies for a given set of transitions
 	void conflictTable(Transition* tstart);

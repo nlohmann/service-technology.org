@@ -148,7 +148,7 @@ if (args_info.input_given || args_info.pipe_given) {
 
 	Marking tmp(pnl.getFinalMarking()); // now get the final marking altogether
 	ExtMarking tmp2(tmp); // and extend it
-	StubbornSet stubset(pnl.getTOrder(),tmp,im); // obtain the stubborn set methods for reachability
+	StubbornSet stubset(pnl.getTOrder(),tmp,im,false); // obtain the stubborn set methods for reachability
 	CoverGraph cg(*pn,im,m1,(args_info.marking_given?&stubset:NULL)); // create the coverability graph with one (initial) node
 	CNode* c(cg.getInitial()); // get the initial node
 	CNode* aim(c);

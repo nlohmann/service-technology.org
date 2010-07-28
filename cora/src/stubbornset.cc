@@ -65,8 +65,9 @@ void StubbornSet::Node::reset() { index=-2; low=-1; instack=false; nodes.clear()
 	@param tlist An ordering of all transitions of the Petri net.
 	@param goal The marking the stubborn set methods are aiming at for reachability testing.
 	@param imx The incidence matrix created by the constructor call to IMatrix for the Petri net.
+	@param cov Whether the stubborn sets are built for coverability (true) or reachability (false).
 */
-StubbornSet::StubbornSet(vector<Transition*> tlist, Marking& goal, IMatrix& imx) : aim(goal),tord(tlist),im(imx) {
+StubbornSet::StubbornSet(vector<Transition*> tlist, Marking& goal, IMatrix& imx, bool cov) : aim(goal),tord(tlist),im(imx),cover(cov) {
 	for(unsigned int i=0; i<tord.size(); ++i)
 	{
 		tton.push_back(new Node());
@@ -97,7 +98,7 @@ vector<Transition*> StubbornSet::compute(ExtMarking& m) {
 //cout << endl;
 
 	// select a place where m0 differs from the aim, use this as starting point for the stubborn set method
-	Place* pstart(m0.distinguish(aim));
+	Place* pstart(m0.distinguish(aim,false));
 	if (!pstart) // we are at a goal node, all activated transitions must be tested
 	{
 		set<Transition*> tset(m0.firableTransitions(aim.getPetriNet(),im));

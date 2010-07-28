@@ -2,6 +2,7 @@
 @itemize
 @item test scripts now use the @code{petri} utility to convert automata to open nets
 @item added target to create complete manual (execute @samp{make manual -C tests})
+@item updated the Petri Net API 4.02 (revision r5970)
 @end itemize
 
 

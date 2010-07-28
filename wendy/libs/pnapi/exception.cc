@@ -8,9 +8,9 @@
  *
  * \since   2009-08-04
  *
- * \date    $Date: 2010-07-05 01:12:42 +0200 (Mon, 05 Jul 2010) $
+ * \date    $Date: 2010-07-23 14:38:42 +0200 (Fri, 23 Jul 2010) $
  *
- * \version $Revision: 5874 $
+ * \version $Revision: 5949 $
  */
 
 #include "config.h"
@@ -140,6 +140,22 @@ UserCausedError::UserCausedError(UE_Type type_, const std::string & msg) :
 {
 }
 
+/*!
+ * \brief output method
+ */
+std::ostream & UserCausedError::output(std::ostream & os) const
+{
+  switch(type)
+  {
+  case UE_NODE_NAME_CONFLICT: os << "node name conflict: "; break;
+  case UE_LABEL_NAME_CONFLICT: os << "label name conflict: "; break;
+  case UE_ARC_CONFLICT: os << "arc conflict: "; break;
+  case UE_COMPOSE_ERROR: os << "compose error: "; break;
+  default: /* do nothing */;
+  }
+  
+  return (os << message);
+}
 
 } /* namespace exception */
 

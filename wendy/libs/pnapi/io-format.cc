@@ -341,14 +341,13 @@ std::ostream & output(std::ostream & os, const Arc & arc)
  */
 std::ostream & output(std::ostream & os, const Interface & interface)
 {
-  os << "// interface\n";
+  os << "// interface\n" << delim("\n");
   
   map<string, Port *> ports = interface.getPorts();
   
   if(util::PortData::data(os).remove)
   {
-    os << delim("\n")
-       << "/// input\n node [shape=circle fillcolor=orange]\n"<< interface.getInputLabels()
+    os << "/// input\n node [shape=circle fillcolor=orange]\n"<< interface.getInputLabels()
        << "\n/// output\n node [shape=circle fillcolor=yellow]\n" << interface.getOutputLabels()
        << "\n/// synchronous\n node [shape=box fillcolor=black]\n" << interface.getSynchronousLabels()
        << endl;

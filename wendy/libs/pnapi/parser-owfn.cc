@@ -794,9 +794,9 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 /* Line 677 of lalr1.cc  */
 #line 470 "parser-owfn.yy"
     {
+    parser_.label_ = parser_.net_.getInterface().findLabel(parser_.nodeName_.str());
     parser_.check(parser_.label_ == NULL,
-                  ((parser_.label_ = parser_.net_.getInterface().findLabel(parser_.nodeName_.str())) ?
-                   ("interface label already assigned to port '" + parser_.label_->getPort().getName() +"'") : ""));
+                  ((parser_.label_) ? ("interface label already assigned to port '" + parser_.label_->getPort().getName() +"'") : ""));
     parser_.check(parser_.labelTypes_.find(parser_.nodeName_.str()) != parser_.labelTypes_.end(),
                   std::string("unknown label '") + parser_.nodeName_.str() + "'");
 
@@ -816,9 +816,9 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 /* Line 677 of lalr1.cc  */
 #line 487 "parser-owfn.yy"
     {
+    parser_.label_ = parser_.net_.getInterface().findLabel(parser_.nodeName_.str());
     parser_.check(parser_.label_ == NULL,
-                  ((parser_.label_ = parser_.net_.getInterface().findLabel(parser_.nodeName_.str())) ?
-                   ("interface label already assigned to port '" + parser_.label_->getPort().getName() +"'") : ""));
+                  (parser_.label_) ? ("interface label already assigned to port '" + parser_.label_->getPort().getName() +"'") : "");
     parser_.check(parser_.labelTypes_.find(parser_.nodeName_.str()) != parser_.labelTypes_.end(),
                   std::string("unknown label '") + parser_.nodeName_.str() + "'");
 

@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: cas $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-07-13 19:15:35 +0200 (Tue, 13 Jul 2010) $
+ * \date    $Date: 2010-07-23 14:38:42 +0200 (Fri, 23 Jul 2010) $
  *
- * \version $Revision: 5917 $
+ * \version $Revision: 5949 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -159,8 +159,7 @@ public: /* public types */
                   SERIES_TRANSITIONS | SELF_LOOP_PLACES |
                   SELF_LOOP_TRANSITIONS | EQUAL_PLACES),
     SET_STARKE = (STARKE_RULE_3_PLACES | STARKE_RULE_3_TRANSITIONS |
-                  STARKE_RULE_4 | STARKE_RULE_5 | STARKE_RULE_6 |
-                  STARKE_RULE_7 | STARKE_RULE_8 | STARKE_RULE_9),
+                  STARKE_RULE_4 | STARKE_RULE_7 | STARKE_RULE_8),
     K_BOUNDEDNESS = SET_PILLAT,
     BOUNDEDNESS = (SET_PILLAT | SET_STARKE),
     LIVENESS = (SET_PILLAT | SET_STARKE)

@@ -300,7 +300,7 @@ void statistics(PetriNet& net, vector<PetriNet*> &nets) {
             if (nets[j] == NULL) {
                 continue;
             }
-            if (nets[j]->getNodes().size() > _statistics.largestNodes_) {
+            if ((int) nets[j]->getNodes().size() > _statistics.largestNodes_) {
                 _statistics.largestNodes_ = nets[j]->getNodes().size() + nets[j]->getInterface().getAsynchronousLabels().size();
                 _statistics.largestP_ = nets[j]->getPlaces().size() + nets[j]->getInterface().getAsynchronousLabels().size();
                 _statistics.largestT_ = nets[j]->getTransitions().size();

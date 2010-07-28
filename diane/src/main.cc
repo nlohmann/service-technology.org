@@ -142,7 +142,7 @@ int main(int argc, char* argv[]) {
                 break;
         }
         inputfile.close();
-    } catch (pnapi::io::InputError e) {
+    } catch (pnapi::exception::InputError e) {
         abort(2, "could not parse file '%s': %s", args_info.inputs[0], e.message.c_str());
     }
     status("reading file '%s'", args_info.inputs[0]);
@@ -290,7 +290,7 @@ void statistics(PetriNet& net, vector<PetriNet*> &nets) {
         /*
          * 1. Net Statistics
          */
-        _statistics.netP_ = (int) net.getPlaces().size();
+        _statistics.netP_ = (int) net.getPlaces().size() + net.getInterface().getAsynchronousLabels().size();
         _statistics.netT_ = (int) net.getTransitions().size();
         _statistics.netF_ = (int) net.getArcs().size();
         /*
@@ -301,21 +301,21 @@ void statistics(PetriNet& net, vector<PetriNet*> &nets) {
                 continue;
             }
             if (nets[j]->getNodes().size() > _statistics.largestNodes_) {
-                _statistics.largestNodes_ = nets[j]->getNodes().size();
-                _statistics.largestP_ = nets[j]->getPlaces().size();
+                _statistics.largestNodes_ = nets[j]->getNodes().size() + nets[j]->getInterface().getAsynchronousLabels().size();
+                _statistics.largestP_ = nets[j]->getPlaces().size() + nets[j]->getInterface().getAsynchronousLabels().size();
                 _statistics.largestT_ = nets[j]->getTransitions().size();
                 _statistics.largestF_ = nets[j]->getArcs().size();
-                _statistics.largestPi_ = nets[j]->getInputPlaces().size();
-                _statistics.largestPo_ = nets[j]->getOutputPlaces().size();
+                _statistics.largestPi_ = nets[j]->getInterface().getInputLabels().size();
+                _statistics.largestPo_ = nets[j]->getInterface().getOutputLabels().size();
             }
 
-            if (nets[j]->getNodes().size() - nets[j]->getInterfacePlaces().size() == 1) {
+            if (nets[j]->getNodes().size() == 1) {
                 _statistics.trivialFragments_++;
             }
 
-            _statistics.averageP_ += nets[j]->getPlaces().size();
-            _statistics.averagePi_ += nets[j]->getInputPlaces().size();
-            _statistics.averagePo_ += nets[j]->getOutputPlaces().size();
+            _statistics.averageP_ += nets[j]->getPlaces().size() + nets[j]->getInterface().getAsynchronousLabels().size();
+            _statistics.averagePi_ += nets[j]->getInterface().getInputLabels().size();
+            _statistics.averagePo_ += nets[j]->getInterface().getOutputLabels().size();
             _statistics.averageT_ += nets[j]->getTransitions().size();
             _statistics.averageF_ += nets[j]->getArcs().size();
         }
@@ -328,7 +328,7 @@ void statistics(PetriNet& net, vector<PetriNet*> &nets) {
             cout << "* Statistics:" << endl;
             cout << "*******************************************************" << endl;
             cout << "* Petri net Statistics:" << endl;
-            cout << "*   |P|= " << net.getPlaces().size()
+            cout << "*   |P|= " << (net.getPlaces().size() + net.getInterface().getAsynchronousLabels().size())
                  << " |T|= " << net.getTransitions().size()
                  << " |F|= " << net.getArcs().size() << endl;
             cout << "*******************************************************" << endl;
@@ -363,7 +363,7 @@ void statistics(PetriNet& net, vector<PetriNet*> &nets) {
              * where lf = largest fragment, af = average fragment
              */
             cout << args_info.inputs[0] << ","
-                 << net.getPlaces().size() << ","
+                 << (net.getPlaces().size() + net.getInterface().getAsynchronousLabels().size()) << ","
                  << net.getTransitions().size() << ","
                  << net.getArcs().size() << ","
                  << _statistics.fragments_ << ","

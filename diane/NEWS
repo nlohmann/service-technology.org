@@ -15,7 +15,6 @@ Version 1.1-unreleased
   (`http://ltp.sourceforge.net/coverage/lcov.php') to determine test case
   coverage (use `make cover' in `tests' directory)
 
+* updated pnapi to version 4.02
 
-See file ChangeLog <http://service-technology.org/files/diane/ChangeLog> for
-complete version history.
-
+\nSee file ChangeLog <http://service-technology.org/files/diane/ChangeLog> for\ncomplete version history.\n

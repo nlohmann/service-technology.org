@@ -1,185 +1,188 @@
+/*!
+ * \file  condition.cc
+ */
+
 #include "config.h"
-#include <cassert>
+
+#include "pnapi-assert.h"
+
+#include "condition.h"
+#include "formula.h"
+#include "marking.h"
+#include "petrinet.h"
+#include "util.h"
 
 #ifndef NDEBUG
 #include <iostream>
-#include "myio.h"
+
 using std::cout;
 using std::endl;
 using pnapi::io::util::operator<<;
-#endif
-
-#include "marking.h"
-#include "condition.h"
-#include "petrinet.h"
-#include "util.h"
+#endif /* NDEBUG */
 
 using std::string;
 using std::map;
 using std::set;
 
-using pnapi::formula::Formula;
-using pnapi::formula::Proposition;
-using pnapi::formula::FormulaTrue;
-using pnapi::formula::FormulaFalse;
-using pnapi::formula::FormulaEqual;
-using pnapi::formula::FormulaNotEqual;
-using pnapi::formula::FormulaGreater;
-using pnapi::formula::FormulaGreaterEqual;
-using pnapi::formula::FormulaLess;
-using pnapi::formula::FormulaLessEqual;
-using pnapi::formula::Conjunction;
-using pnapi::formula::Disjunction;
-using pnapi::formula::Negation;
+
 
 namespace pnapi
 {
 
-/**************************************************************************
- ***** Overloaded operators for formulas
- *************************************************************************/
-
-FormulaEqual operator==(const Place & p, unsigned int k)
-{
-  return FormulaEqual(p, k);
-}
-
-FormulaNotEqual operator!=(const Place & p, unsigned int k)
-{
-  return FormulaNotEqual(p, k);
-}
-
-FormulaGreater operator>(const Place & p, unsigned int k)
-{
-  return FormulaGreater(p, k);
-}
-
-FormulaGreaterEqual operator>=(const Place & p, unsigned int k)
-{
-  return FormulaGreaterEqual(p, k);
-}
-
-FormulaLess operator<(const Place & p, unsigned int k)
-{
-  return FormulaLess(p, k);
-}
-
-FormulaLessEqual operator<=(const Place & p, unsigned int k)
-{
-  return FormulaLessEqual(p, k);
-}
-
-Conjunction operator&&(const Formula & f1, const Formula & f2)
-{
-  return Conjunction(f1, f2);
-}
-
-Disjunction operator||(const Formula & f1, const Formula & f2)
-{
-  return Disjunction(f1, f2);
-}
-
-Negation operator!(const Formula & f)
-{
-  return Negation(f);
-}
-
+using formula::Formula;
+using formula::Proposition;
+using formula::FormulaTrue;
+using formula::FormulaFalse;
+using formula::FormulaEqual;
+using formula::FormulaNotEqual;
+using formula::FormulaGreater;
+using formula::FormulaGreaterEqual;
+using formula::FormulaLess;
+using formula::FormulaLessEqual;
+using formula::Conjunction;
+using formula::Disjunction;
+using formula::Negation;
 
 
 /**************************************************************************
  ***** Condition implementation
  *************************************************************************/
 
+/*!
+ * \brief constructor
+ */
 Condition::Condition() :
   formula_(new FormulaTrue())
-  {
-  }
-
-Condition::Condition(const Condition & c,
-                     const map<const Place *, const Place *> & places) :
-  formula_(c.formula().clone(&places))
 {
 }
 
+/*!
+ * \brief copy constructor
+ */
+Condition::Condition(const Condition & c,
+                     const std::map<const Place *, const Place *> & places) :
+  formula_(c.getFormula().clone(&places))
+{
+}
+
+/*!
+ * \brief destructor
+ */                     
 Condition::~Condition()
 {
   delete formula_;
 }
 
-const Formula & Condition::formula() const
+/*!
+ * \brief returns the formula
+ */
+const Formula & Condition::getFormula() const
 {
   return *formula_;
 }
 
-void Condition::merge(const Condition & c,
-    const map<const Place *, const Place *> & placeMapping)
+/*!
+ * \brief conjuncts two conditions
+ */
+void Condition::conjunct(const Condition & c,
+                         const std::map<const Place *, const Place *> & placeMapping)
 {
-  Formula * f = c.formula().clone(&placeMapping);
-  *this = formula() && *f;
+  Formula * f = c.getFormula().clone(&placeMapping);
+  *this = ((*formula_) && (*f));
   delete f;
 }
 
+/*!
+ * \brief checks whether the formula is satisfied under a given marking
+ */
 bool Condition::isSatisfied(const Marking & m) const
 {
-  bool interfaceEmpty = true;
-  for(set<Place*>::iterator p = m.getPetriNet().getInterfacePlaces().begin();
-       p != m.getPetriNet().getInterfacePlaces().end(); ++p)
-  {
-    interfaceEmpty = interfaceEmpty && (m[**p] == 0);
-  }
-  
-  return (interfaceEmpty && formula_->isSatisfied(m));
-}
-
-Condition & Condition::operator=(const Formula & f)
-{
-  assert(formula_ != &f);
-
-  delete formula_;
-  formula_ = f.clone();
-  return *this;
-}
-
-Condition & Condition::operator=(bool formulaTrue)
-{
-  delete formula_;
-  formula_ = formulaTrue ? reinterpret_cast<Formula*>(new FormulaTrue)
-      : reinterpret_cast<Formula*>(new FormulaFalse);
-      return *this;
-}
-
-void Condition::addProposition(const Proposition & p, bool conjunct)
-{
-  if (conjunct)
-    *this = formula() && p;
-  else
-    *this = formula() || p;
-}
-
-void Condition::addMarking(const Marking & m)
-{
-  set<const Formula *> propositions;
-  for (map<const Place *, unsigned int>::const_iterator it = m.begin();
-        it != m.end(); ++it)
-    propositions.insert(new FormulaEqual(*it->first, it->second));
-
-  if (dynamic_cast<FormulaTrue *>(formula_) != NULL)
-    *this = Conjunction(propositions, NULL);
-  else
-    *this = formula() || Conjunction(propositions, NULL);
-
-  for (set<const Formula *>::iterator it = propositions.begin();
-        it != propositions.end(); ++it)
-    delete *it;
-}
-
-std::set<const Place *> Condition::concerningPlaces() const
-{
-  return formula_->places();
+  return formula_->isSatisfied(m);
 }
 
 /*!
- * \breif removes a place recursively
+ * \brief standard assignment operator
+ */
+Condition & Condition::operator=(const formula::Formula & f)
+{
+  PNAPI_ASSERT(formula_ != &f);
+
+  delete formula_;
+  formula_ = f.clone();
+  
+  return *this;
+}
+
+/*!
+ * \brief standard assignment operator for boolean values
+ */
+Condition & Condition::operator=(bool formulaTrue)
+{
+  delete formula_;
+  formula_ = (formulaTrue ?
+              static_cast<Formula *>(new FormulaTrue) :
+              static_cast<Formula *>(new FormulaFalse));
+  
+  return *this;
+}
+
+/*!
+ * \brief adds a proposition
+ * 
+ * \param p the proposition
+ * \param conjunct if true, the proposition is added by conjunction (default),
+ *                 else the proposition is added by discunction
+ */
+void Condition::addProposition(const formula::Proposition & p, bool conjunct)
+{
+  if (conjunct)
+  {
+    (*this) = ((*formula_) && p);
+  }
+  else
+  {
+    (*this) = ((*formula_) || p);
+  }
+}
+
+/*!
+ * \brief creates a condition for the given marking and adds it
+ */
+void Condition::addMarking(const Marking & m)
+{
+  set<const Formula *> propositions;
+  set<Place *> places = m.getPetriNet().getPlaces();
+  
+  PNAPI_FOREACH(p, places)
+  {
+    propositions.insert(new FormulaEqual(**p, m[**p]));
+  }
+
+  if (dynamic_cast<FormulaTrue *>(formula_) != NULL)
+  {
+    (*this) = Conjunction(propositions, NULL);
+  }
+  else
+  {
+    (*this) = ((*formula_) || Conjunction(propositions, NULL));
+  }
+
+  PNAPI_FOREACH(it, propositions)
+  {
+    delete *it;
+  }
+}
+
+/*!
+ * \brief returns a set of places, which don't have to be empty
+ */
+std::set<const Place *> Condition::concerningPlaces() const
+{
+  return formula_->getPlaces();
+}
+
+/*!
+ * \brief removes a place recursively
  */
 void Condition::removePlace(const Place & p)
 {
@@ -190,27 +193,29 @@ void Condition::removePlace(const Place & p)
   }
 }
 
+/*!
+ * \brief negates the formula
+ */
 void Condition::negate()
 {
-  *this = !formula();
+  (*this) = !getFormula();
 }
 
 /*!
- * \brief forces all places not concerned by the formula to be empty
+ * \brief forces all places not mentioned by the formula to be empty
  */
 void Condition::allOtherPlacesEmpty(PetriNet & net)
 {
-  set<const Place*> coveredPlaces = formula_->places();
-  set<const Place*> allPlaces;
-  for(set<Place*>::iterator p = net.getInternalPlaces().begin();
-       p != net.getInternalPlaces().end(); ++p)
+  set<const Place *> coveredPlaces = formula_->getPlaces();
+  set<const Place *> allPlaces;
+  PNAPI_FOREACH(p, net.getPlaces())
   {
     allPlaces.insert(*p);
   }
-  set<const Place*> remainingPlaces = util::setDifference(allPlaces, coveredPlaces);
   
-  for(set<const Place*>::iterator p = remainingPlaces.begin();
-       p != remainingPlaces.end(); ++p)
+  set<const Place *> remainingPlaces = util::setDifference(allPlaces, coveredPlaces);
+  
+  PNAPI_FOREACH(p, remainingPlaces)
   {
     (*this) = (*formula_ && (**p == 0));
   }
@@ -237,4 +242,47 @@ void Condition::dnf()
   formula_ = tmp;
 }
 
+/*!
+ * \brief get valid interval of a place
+ */
+formula::Interval Condition::getPlaceInterval(const Place & p) const
+{
+  return formula_->getPlaceInterval(p);
 }
+
+/*!
+ * \brief evaluates the formula partially and replaces propositions by constants
+ * 
+ * I.e. if a place fullfills a proposotion with its recent marking, the proposition
+ * will be replaced by FormulaTrue, otherwise by FormulaFalse.
+ */
+void Condition::evaluatePlace(const Place & p)
+{
+  Formula * tmp = formula_->evaluatePlace(p);
+  delete formula_;
+  formula_ = tmp;
+}
+
+/*!
+ * \brief replace place references
+ */
+void Condition::replacePlace(const Place & p1, const Place & p2)
+{
+  Formula * tmp = formula_->replacePlace(p1, p2);
+  delete formula_;
+  formula_ = tmp;
+}
+
+/*!
+ * \brief compares formula with a boolean
+ * 
+ * \return true iff
+ *         a) b is true and the formula is just a FormulaTrue or
+ *         b) b is false and the formula is just a FormulaFalse.
+ */
+bool Condition::operator==(bool b) const
+{
+  return (b ? (formula_->getType() == formula::Formula::F_TRUE) : (formula_->getType() == formula::Formula::F_FALSE));
+}
+
+} /* namespace pnapi */

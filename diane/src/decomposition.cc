@@ -86,20 +86,20 @@ int decomposition::computeComponentsByUnionFind(PetriNet& net, int* tree, int si
 
     if (args_info.service_flag) {
 
-        net.finalCondition().dnf();
-        const pnapi::formula::Formula* f = dynamic_cast<const pnapi::formula::Formula*>(&net.finalCondition().formula());
+        net.getFinalCondition().dnf();
+        const pnapi::formula::Formula* f = dynamic_cast<const pnapi::formula::Formula*>(&net.getFinalCondition().getFormula());
 
         std::set<std::string> ss;//set of marked places final markings
         if (typeid(*f) == typeid(pnapi::formula::Disjunction)) {
             const pnapi::formula::Disjunction* fd = dynamic_cast<const pnapi::formula::Disjunction*>(f);
-            for (std::set<const pnapi::formula::Formula*>::iterator cIt = fd->children().begin(); cIt != fd->children().end(); ++cIt) {
+            for (std::set<const pnapi::formula::Formula*>::iterator cIt = fd->getChildren().begin(); cIt != fd->getChildren().end(); ++cIt) {
                 if (((*cIt)->getType() == pnapi::formula::Formula::F_CONJUNCTION)) { //typeid(*cIt)==typeid(pnapi::formula::Conjunction)){
                     const pnapi::formula::Conjunction* fc = dynamic_cast<const pnapi::formula::Conjunction*>(*cIt);
-                    for (std::set<const pnapi::formula::Formula*>::iterator ccIt = fc->children().begin(); ccIt != fc->children().end(); ++ccIt) {
+                    for (std::set<const pnapi::formula::Formula*>::iterator ccIt = fc->getChildren().begin(); ccIt != fc->getChildren().end(); ++ccIt) {
                         const pnapi::formula::Proposition* fp = dynamic_cast<const pnapi::formula::Proposition*>(*ccIt);
                         //const Place *pp=new Place(fp->place());
-                        if (fp->tokens() > 0) { //insert only if it is non-zero
-                            ss.insert(fp->place().getName());
+                        if (fp->getTokens() > 0) { //insert only if it is non-zero
+                            ss.insert(fp->getPlace().getName());
                         }
                     }
                 }
@@ -108,18 +108,18 @@ int decomposition::computeComponentsByUnionFind(PetriNet& net, int* tree, int si
         }
         if (typeid(*f) == typeid(pnapi::formula::Conjunction)) {
             const pnapi::formula::Conjunction* fc = dynamic_cast<const pnapi::formula::Conjunction*>(f);
-            for (std::set<const pnapi::formula::Formula*>::iterator cIt = fc->children().begin(); cIt != fc->children().end(); ++cIt) {
+            for (std::set<const pnapi::formula::Formula*>::iterator cIt = fc->getChildren().begin(); cIt != fc->getChildren().end(); ++cIt) {
                 const pnapi::formula::Proposition* fp = dynamic_cast<const pnapi::formula::Proposition*>(*cIt);
                 //const Place *pp=new Place(fp->place());
-                if (fp->tokens() > 0) {
-                    ss.insert(fp->place().getName());
+                if (fp->getTokens() > 0) {
+                    ss.insert(fp->getPlace().getName());
                 }
             }
         }
 
 
         //std::set<const Place * > cp=net.finalCondition().concerningPlaces(); doesn't work :(
-        for (set< Place*>::iterator it = net.getInternalPlaces().begin(); it != net.getInternalPlaces().end(); ++it) {
+        for (set< Place*>::iterator it = net.getPlaces().begin(); it != net.getPlaces().end(); ++it) {
             const std::string sp = (*it)->getName();
             if ((*it)->getTokenCount() || (ss.find(sp) != ss.end())) {
                 for (set<Node*>::iterator t = (*it)->getPreset().begin(); t != (*it)->getPreset().end(); ++t) {
@@ -203,7 +203,7 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
             nets[x] = new PetriNet();
         }
         Place* p = static_cast<Place*>(reremap[i]);
-        nets[x]->createPlace(p->getName(), Node::INTERNAL, p->getTokenCount());
+        nets[x]->createPlace(p->getName(), p->getTokenCount());
     }
 
     for (int i = psize; i < size; ++i) {
@@ -216,21 +216,24 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
         set<Arc*> preset = reremap[i]->getPresetArcs();
         for (set<Arc*>::iterator f = preset.begin(); f != preset.end(); ++f) {
             Place* place = &(*f)->getPlace();
-            Place* netPlace;
-            netPlace = nets[x]->findPlace(place->getName());
+            Place* netPlace = nets[x]->findPlace(place->getName());
             if (netPlace == NULL) {
-                netPlace = &nets[x]->createPlace(place->getName(), Node::INPUT);
+                pnapi::Label& netLabel = nets[x]->getInterface().addInputLabel(place->getName());
+                t->addLabel(netLabel, (*f)->getWeight());
+            } else {
+              nets[x]->createArc(*netPlace, *t, (*f)->getWeight());
             }
-            nets[x]->createArc(*netPlace, *t, (*f)->getWeight());
         }
         set<Arc*> postset = reremap[i]->getPostsetArcs();
         for (set<Arc*>::iterator f = postset.begin(); f != postset.end(); ++f) {
             Place* place = &(*f)->getPlace();
             Place* netPlace = nets[x]->findPlace(place->getName());
             if (netPlace == NULL) {
-                netPlace = &nets[x]->createPlace(place->getName(), Node::OUTPUT);
+              pnapi::Label& netLabel = nets[x]->getInterface().addOutputLabel(place->getName());
+              t->addLabel(netLabel, (*f)->getWeight());
+            } else {
+              nets[x]->createArc(*t, *netPlace, (*f)->getWeight());
             }
-            nets[x]->createArc(*t, *netPlace, (*f)->getWeight());
         }
     }
 }

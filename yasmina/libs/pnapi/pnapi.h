@@ -7,20 +7,22 @@
  *
  * \since   2008/12/09
  *
- * \date    $Date: 2010-02-05 07:28:54 +0100 (Fri, 05 Feb 2010) $
+ * \date    $Date: 2010-03-14 13:44:15 +0100 (Sun, 14 Mar 2010) $
  *
- * \version $Revision: 5365 $
+ * \version $Revision: 5513 $
  */
 
 #ifndef PNAPI_PNAPI_H
 #define PNAPI_PNAPI_H
 
-#include "myio.h"
-#include "condition.h"
-#include "petrinet.h"
+#include "config.h"
+
 #include "automaton.h"
-#include "state.h"
-#include <string>
+#include "condition.h"
+#include "exception.h"
+#include "marking.h"
+#include "myio.h"
+#include "petrinet.h"
 
 // overloaded operators should be available globally
 using pnapi::io::operator<<;
@@ -43,7 +45,7 @@ using pnapi::operator&&;
  *
  * For using it, simply include the header file pnapi.h in your code:
  * \code
- * #include "pnapi.h"
+ * // #include "pnapi.h"
  * \endcode
  *
  * Everything you will use can be found in the following namespaces:
@@ -116,6 +118,7 @@ using pnapi::operator&&;
  */
 namespace pnapi
 {
+/// Petri Net API's version string
 std::string version();
 }
 
@@ -135,5 +138,4 @@ extern "C" {
   char libpnapi_is_present();
 }
 
-#endif
-
+#endif /* PNAPI_PNAPI_H */

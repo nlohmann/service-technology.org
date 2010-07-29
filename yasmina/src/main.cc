@@ -1,32 +1,30 @@
-#include "config.h" 
+#include "config.h"
+
 #include <cassert>
+#include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
+#include <iostream>
+#include <limits.h>
+#include <list>
+#include <map>
+#include <set>
 #include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <typeinfo>
+#include <utility>
+
 #include "cmdline.h"
 #include "pnapi.h"
 #include "lp_lib.h"
-#include <sstream>
-#include <iostream>
-#include <fstream>
-#include <set>
-#include <typeinfo>
-#include "verbose.h" 
-#include <utility>
-#include <map>
-#include <stdio.h>
-#include <stdlib.h>
-#include <cmath>
-#include <limits.h>
+#include "verbose.h"
 #include "eventTerm.h"
 #include "Output.h"
-
 #include "adapternumerge.h"
 //#include "ppl.hh"
 
-
-using std::cout;
-using std::endl;
 
 using pnapi::PetriNet;
 using pnapi::Place;
@@ -36,21 +34,6 @@ using pnapi::Node;
 
 
 using namespace std;
-using std::set;
-using std::map;
-using std::deque;
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::set;
-using std::vector;
-using std::map;
-using std::string;
-using std::ofstream;
-using std::ifstream;
-using std::stringstream;
-using std::ostringstream;
-using std::exception;
 
 
 using pnapi::io::owfn;
@@ -59,7 +42,6 @@ using pnapi::io::formula;
 using pnapi::io::dot;
 using pnapi::io::meta;
 using pnapi::io::nets;
-using pnapi::io::InputError;
 using pnapi::io::CREATOR;
 using pnapi::io::INPUTFILE;
 using pnapi::io::OUTPUTFILE;
@@ -326,11 +308,11 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 		
 		const pnapi::formula::Conjunction *f=dynamic_cast<const pnapi::formula::Conjunction *>(form);
 		//cout<<endl<<"flag "<<f->flag_<<endl;
-		for(std::set<const pnapi::formula::Formula *>::iterator cIt=f->children().begin();cIt!=f->children().end();++cIt){	
+		for(std::set<const pnapi::formula::Formula *>::iterator cIt=f->getChildren().begin();cIt!=f->getChildren().end();++cIt){	
 			//(*cIt)->output(std::cout);
 			//cout<<endl;
 			retlpset.clear();
-			if(cIt==f->children().begin()||previous.empty()){
+			if(cIt==f->getChildren().begin()||previous.empty()){
 				//cout<<"primul"<<endl;
 				previous=transform(net1,(*cIt));
 				//cout<<"prev size "<<previous.size()<<endl;
@@ -402,7 +384,7 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 		//std::cout<<"Disjunction"<<endl;//make disjunction two by two
 		const pnapi::formula::Disjunction *f=dynamic_cast<const pnapi::formula::Disjunction *>(form);
 		std::set<lprec *> set2;		
-		for(std::set<const pnapi::formula::Formula *>::iterator cIt=f->children().begin();cIt!=f->children().end();++cIt){	
+		for(std::set<const pnapi::formula::Formula *>::iterator cIt=f->getChildren().begin();cIt!=f->getChildren().end();++cIt){	
 			//(*cIt)->output(std::cout);
 			//cout<<endl;
 			//			if(cIt==f->children().begin()){
@@ -425,7 +407,7 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 		//cout<<endl<<"New formula ";form->output(std::cout);cout<<endl;
 		const pnapi::formula::FormulaEqual *ff=dynamic_cast<const pnapi::formula::FormulaEqual *>(form);
 		//std::cout<<"Equal "<<ff->tokens()<<endl;
-		if(ff->tokens()==0) return retlpset;
+		if(ff->getTokens()==0) return retlpset;
 		//cout<<endl<<ff->place().getName()<<"="<<ff->tokens()<<endl;
 		
 		int Ncol=net1.getPlaces().size(), *colno = NULL, j;
@@ -452,19 +434,19 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 		//for(int k=0;k<1+ net1.getPlaces().size();k++) rowpl[k]=0;
 		//rowpl[it-vp.begin()]=1;colno[0]=it-vp.begin();sparse[0]=1;
 		//rowe[1]=1;colno[0]=it-vp.begin();//sparse[0]=1;
-		j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE); /* first column */
+		j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE); /* first column */
 		
 		rowe[j++] = 1; //cout<<colno[0]<<" "<<rowe[0]<<endl;
 		
 		//cout<<ff->tokens()<<"#";
 		//add_constraint(lppl,rowpl, EQ, ff->tokens());		/* add the row to lpsolve */ if(!add_constraintex(lp, j, rowe, colno, LE, 75))
 		//cout<<"before add "<<get_Nrows(lppl);
-		if(!add_constraintex(lppl,j,rowe,colno, EQ, ff->tokens()))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
+		if(!add_constraintex(lppl,j,rowe,colno, EQ, ff->getTokens()))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
 		//set_add_rowmode(lppl, FALSE);
-		set_row_name(lppl,1,const_cast<char *>(ff->place().getName().c_str()));
+		set_row_name(lppl,1,const_cast<char *>(ff->getPlace().getName().c_str()));
 		//cout<<"row name "<<get_row_name(lppl,1)<<endl;
 		
-		set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE),1);
+		set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE),1);
 		//cout<<"this doesn't work "<<get_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE)+1);
 		//if((colno == NULL) || (rowe == NULL)) cout<<"hehe";
 		//cout<<"ultim "<<get_Nrows(lppl);//<<get_Nrows(lppl)<<get_mat(lppl,get_Nrows(lppl), get_Ncolumns(lppl)-1);
@@ -489,14 +471,14 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 		set_add_rowmode(lppl, TRUE);
 		
 		//cout<<get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE)<<endl;
-		j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE); /* first column */
+		j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE); /* first column */
 		rowe[j++] = 1; //cout<<colno[0]<<" "<<rowe[0]<<endl;
-		if(!add_constraintex(lppl,j,rowe,colno, GE, ff->tokens()+1))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
+		if(!add_constraintex(lppl,j,rowe,colno, GE, ff->getTokens()+1))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
 		set_add_rowmode(lppl, FALSE);
-		set_row_name(lppl,1,const_cast<char *>(ff->place().getName().c_str()));
+		set_row_name(lppl,1,const_cast<char *>(ff->getPlace().getName().c_str()));
 		//cout<<"row name "<<get_row_name(lppl,1)<<endl;
 		
-		set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE),1);
+		set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE),1);
 		retlpset.insert(lppl);
 		//cout<<"ultim "<<get_Nrows(lppl)<<retlpset.size();
 		//write_LP(lppl,stdout);
@@ -516,14 +498,14 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 		set_add_rowmode(lppl, TRUE);
 		
 		//cout<<get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE)<<endl;
-		j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE); /* first column */
+		j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE); /* first column */
 		rowe[j++] = 1; //cout<<colno[0]<<" "<<rowe[0]<<endl;
-		if(!add_constraintex(lppl,j,rowe,colno, GE, ff->tokens())) cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
+		if(!add_constraintex(lppl,j,rowe,colno, GE, ff->getTokens())) cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
 		set_add_rowmode(lppl, FALSE);
-		set_row_name(lppl,1,const_cast<char *>(ff->place().getName().c_str()));
+		set_row_name(lppl,1,const_cast<char *>(ff->getPlace().getName().c_str()));
 		//cout<<"row name "<<get_row_name(lppl,1)<<endl;
 		
-		set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE),1);
+		set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE),1);
 		retlpset.insert(lppl);
 		//cout<<"ultim "<<get_Nrows(lppl)<<retlpset.size();
 		//write_LP(lppl,stdout);
@@ -543,14 +525,14 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 		set_add_rowmode(lppl, TRUE);
 		
 		//cout<<get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE)<<endl;
-		j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE); /* first column */
+		j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE); /* first column */
 		rowe[j++] = 1; //cout<<colno[0]<<" "<<rowe[0]<<endl;
-		if(!add_constraintex(lppl,j,rowe,colno, LE, ff->tokens()))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
+		if(!add_constraintex(lppl,j,rowe,colno, LE, ff->getTokens()))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
 		set_add_rowmode(lppl, FALSE);
-		set_row_name(lppl,1,const_cast<char *>(ff->place().getName().c_str()));
+		set_row_name(lppl,1,const_cast<char *>(ff->getPlace().getName().c_str()));
 		//cout<<"row name "<<get_row_name(lppl,1)<<endl;
 		
-		set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE),1);
+		set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE),1);
 		retlpset.insert(lppl);
 		//cout<<"ultim "<<get_Nrows(lppl)<<retlpset.size();
 		//write_LP(lppl,stdout);
@@ -561,7 +543,7 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 		set_add_rowmode(lppl, TRUE);
 		const pnapi::formula::FormulaLess *ff=dynamic_cast<const pnapi::formula::FormulaLess *>(form);
 		//cout<<ff->place().getName()<<"<"<<ff->tokens()<<endl;
-		if(ff->tokens()>0){
+		if(ff->getTokens()>0){
 			int Ncol=net1.getPlaces().size(), *colno = NULL, j;
 			REAL *rowe = NULL;
 			
@@ -571,14 +553,14 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 			set_add_rowmode(lppl, TRUE);
 			
 			//cout<<get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE)<<endl;
-			j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE); /* first column */
+			j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE); /* first column */
 			rowe[j++] = 1; //cout<<colno[0]<<" "<<rowe[0]<<endl;
-			if(!add_constraintex(lppl,j,rowe,colno, LE, ff->tokens()-1))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
+			if(!add_constraintex(lppl,j,rowe,colno, LE, ff->getTokens()-1))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
 			set_add_rowmode(lppl, FALSE);
-			set_row_name(lppl,1,const_cast<char *>(ff->place().getName().c_str()));
+			set_row_name(lppl,1,const_cast<char *>(ff->getPlace().getName().c_str()));
 			//cout<<"row name "<<get_row_name(lppl,1)<<endl;
 			
-			set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE),1);
+			set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE),1);
 			retlpset.insert(lppl);
 			//cout<<"ultim "<<get_Nrows(lppl)<<retlpset.size();
 			write_LP(lppl,stdout);
@@ -597,7 +579,7 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 		
 		set_add_rowmode(lppl, TRUE);set_add_rowmode(lpcopy, TRUE);
 		const pnapi::formula::FormulaNotEqual *ff=dynamic_cast<const pnapi::formula::FormulaNotEqual *>(form);
-		//cout<<ff->place().getName()<<"<>"<<ff->tokens()<<endl;
+		//cout<<ff->getPlace().getName()<<"<>"<<ff->tokens()<<endl;
 		int Ncol=net1.getPlaces().size(), *colno = NULL, j;
 		REAL *rowe = NULL;
 		
@@ -608,18 +590,18 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 		//cout<<get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE)<<endl;
 		//cout<<get_nameindex(lpcopy,const_cast<char *>(ff->place().getName().c_str()),FALSE)<<endl;
 		
-		j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE); /* first column */
+		j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE); /* first column */
 		rowe[j++] = 1; //cout<<colno[0]<<" "<<rowe[0]<<endl;
-		if(!add_constraintex(lppl,j,rowe,colno, LE, ff->tokens()-1))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
-		if(!add_constraintex(lpcopy,j,rowe,colno, GE, ff->tokens()+1))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
+		if(!add_constraintex(lppl,j,rowe,colno, LE, ff->getTokens()-1))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
+		if(!add_constraintex(lpcopy,j,rowe,colno, GE, ff->getTokens()+1))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
 		
 		set_add_rowmode(lppl, FALSE);
-		set_row_name(lppl,1,const_cast<char *>(ff->place().getName().c_str()));
-		set_row_name(lpcopy,1,const_cast<char *>(ff->place().getName().c_str()));
+		set_row_name(lppl,1,const_cast<char *>(ff->getPlace().getName().c_str()));
+		set_row_name(lpcopy,1,const_cast<char *>(ff->getPlace().getName().c_str()));
 		//cout<<"row name "<<get_row_name(lppl,1)<<endl;
 		
-		set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE),1);
-		set_mat(lpcopy,1,get_nameindex(lpcopy,const_cast<char *>(ff->place().getName().c_str()),FALSE),1);
+		set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE),1);
+		set_mat(lpcopy,1,get_nameindex(lpcopy,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE),1);
 		retlpset.insert(lppl);retlpset.insert(lpcopy);
 		//cout<<"ultim "<<get_Nrows(lppl)<<retlpset.size();
 		write_LP(lppl,stdout);write_LP(lpcopy,stdout);
@@ -632,7 +614,7 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 		//form->output(std::cout);
 		const pnapi::formula::Negation *ff=dynamic_cast<const pnapi::formula::Negation *>(form);
 		//for sake of stupidity I have to treat  not equal here because it is not recognized elsewhere; idiot students
-		const pnapi::formula::Formula* child=*ff->children().begin();
+		const pnapi::formula::Formula* child=*ff->getChildren().begin();
 		//child->output(std::cout);
 		if(typeid(*child)==typeid(pnapi::formula::FormulaEqual)){
 			//cout<<"on the safe side";
@@ -653,7 +635,7 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 			
 			set_add_rowmode(lppl, TRUE);set_add_rowmode(lpcopy, TRUE);
 			const pnapi::formula::FormulaEqual *ff=dynamic_cast<const pnapi::formula::FormulaEqual *>(child);
-			cout<<ff->place().getName()<<"<>"<<ff->tokens()<<endl;
+			cout<<ff->getPlace().getName()<<"<>"<<ff->getTokens()<<endl;
 			int Ncol=net1.getPlaces().size(), *colno = NULL, j;
 			REAL *rowe = NULL;
 			
@@ -661,10 +643,10 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 			colno = (int *) malloc(Ncol * sizeof(*colno));
 			rowe = (REAL *) malloc(Ncol * sizeof(*rowe));
 			
-			//cout<<get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE)<<endl;
-			cout<<get_nameindex(lpcopy,const_cast<char *>(ff->place().getName().c_str()),FALSE)<<endl;
+			//cout<<get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE)<<endl;
+			cout<<get_nameindex(lpcopy,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE)<<endl;
 			
-			j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE); /* first column */
+			j = 0;colno[j] = get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE); /* first column */
 			rowe[j++] = 1; cout<<colno[0]<<" "<<rowe[0]<<endl;
 			/*				if(ff->tokens()-1<0){ // process just the copy
 			 if(!add_constraintex(lpcopy,j,rowe,colno, LE, ff->tokens()+1))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
@@ -676,18 +658,18 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 			 cout<<"ultim "<<get_Nrows(lpcopy)<<retlpset.size();
 			 }*/
 			//else{//process both
-			if(ff->tokens()==0){cout<<"reduce"<<endl;}
-			else{	if(!add_constraintex(lppl,j,rowe,colno, LE, ff->tokens()-1))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
+			if(ff->getTokens()==0){cout<<"reduce"<<endl;}
+			else{	if(!add_constraintex(lppl,j,rowe,colno, LE, ff->getTokens()-1))cout<<"nu merge"<<endl;//set_add_rowmode(lppl, FALSE);
 				set_add_rowmode(lppl, FALSE);
-				set_row_name(lppl,1,const_cast<char *>(ff->place().getName().c_str()));
+				set_row_name(lppl,1,const_cast<char *>(ff->getPlace().getName().c_str()));
 				cout<<"row name "<<get_row_name(lppl,1)<<endl;
-				set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->place().getName().c_str()),FALSE),1);
+				set_mat(lppl,1,get_nameindex(lppl,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE),1);
 				retlpset.insert(lppl);
 			}
-			if(!add_constraintex(lpcopy,j,rowe,colno, GE, ff->tokens()+1))cout<<"hh"<<endl;//set_add_rowmode(lppl, FALSE);
+			if(!add_constraintex(lpcopy,j,rowe,colno, GE, ff->getTokens()+1))cout<<"hh"<<endl;//set_add_rowmode(lppl, FALSE);
 			set_add_rowmode(lpcopy, FALSE);
-			set_row_name(lpcopy,1,const_cast<char *>(ff->place().getName().c_str()));
-			set_mat(lpcopy,1,get_nameindex(lpcopy,const_cast<char *>(ff->place().getName().c_str()),FALSE),1);retlpset.insert(lpcopy);
+			set_row_name(lpcopy,1,const_cast<char *>(ff->getPlace().getName().c_str()));
+			set_mat(lpcopy,1,get_nameindex(lpcopy,const_cast<char *>(ff->getPlace().getName().c_str()),FALSE),1);retlpset.insert(lpcopy);
 			cout<<"ultim "<<get_Nrows(lppl)<<" "<<get_Nrows(lpcopy)<<retlpset.size();
 			//}
 			//write_LP(lppl,stdout);
@@ -699,7 +681,7 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 			set_add_rowmode(lppl, TRUE);
 			//const pnapi::formula::Negation *ff=dynamic_cast<const pnapi::formula::Negation *>(form);
 			//first reduce negations
-			cout<<(ff->children().size()==1)<<endl;
+			cout<<(ff->getChildren().size()==1)<<endl;
 			retlpset=transform(net1, transformNegFormula(net1, form));
 			/*			std::vector<std::string>::const_iterator it(std::find(vp.begin(), vp.end(),ff->place().getName()));
 			 cout<<it-vp.begin()<<endl;
@@ -791,6 +773,10 @@ std::set<lprec *>  transform(const pnapi::PetriNet &net1, const pnapi::formula::
 
 int main(int argc, char** argv) {
 	
+  //TODO: remove me!
+  /*
+  try{ //*/
+  
 	//time_t start_time, end_time;
 	clock_t start_clock;// = clock();
 	evaluateParameters(argc, argv);
@@ -910,7 +896,7 @@ int main(int argc, char** argv) {
 				ifstream ifs1(args_info.inputs[i]);
 				inputStream.open(args_info.inputs[i]);
 				try { ifs1 >> owfn >> net1;}
-				catch (InputError e) { std::cerr <<"net " <<i<<" failed" << endl << e << endl; assert(false); }
+				catch (pnapi::exception::InputError & e) { std::cerr <<"net " <<i<<" failed" << endl << e << endl; assert(false); }
 				ifs1.close();
 				
 				//const int zero=0; now check whether these are real transitions
@@ -937,28 +923,35 @@ int main(int argc, char** argv) {
 				std::string s2; s2=s.str()+"@";//"net"+s.str();
 				ifstream ifs2(args_info.inputs[i]);
 				try { ifs2 >> owfn >> net2;}
-				catch (InputError e) { std::cerr <<"net " <<i<<" failed"<< std::endl << e << endl; assert(false); }
+				catch (pnapi::exception::InputError & e) { std::cerr <<"net " <<i<<" failed"<< std::endl << e << endl; assert(false); }
 				ifs2.close();
 				//	//here check whether syntactically whether the composition can take place: use sets of labels
 				//option "composable" c
 				//"The composed net is printed to standard output"
 				//flag off
 				//pnapi::Interface& i1=net1.getInterface();pnapi::Interface i2=net2.getInterface();
-				bool syntb=false;set<string> inputplaces1,inputplaces2,outputplaces1,outputplaces2;
-				for (std::set<Place *>::iterator ssit=net1.getInputPlaces().begin(); ssit!=net1.getInputPlaces().end(); ++ssit) {
+				bool syntb=false;
+				set<string> inputplaces1,inputplaces2,outputplaces1,outputplaces2;
+				
+				set<pnapi::Label *> labels = net1.getInterface().getInputLabels();
+				for (std::set<pnapi::Label *>::iterator ssit=labels.begin(); ssit!=labels.end(); ++ssit) {
 					inputplaces1.insert((*ssit)->getName());
 				}
-				for (std::set<Place *>::iterator ssit=net1.getOutputPlaces().begin(); ssit!=net1.getOutputPlaces().end(); ++ssit) {
+				labels = net1.getInterface().getOutputLabels();
+				for (std::set<pnapi::Label *>::iterator ssit=labels.begin(); ssit!=labels.end(); ++ssit) {
 					outputplaces1.insert((*ssit)->getName());
 				}
-				for (std::set<Place *>::iterator ssit=net2.getInputPlaces().begin(); ssit!=net2.getInputPlaces().end(); ++ssit) {
+				labels = net2.getInterface().getInputLabels();
+				for (std::set<pnapi::Label *>::iterator ssit=labels.begin(); ssit!=labels.end(); ++ssit) {
 					inputplaces2.insert((*ssit)->getName());
 				}
-				for (std::set<Place *>::iterator ssit=net2.getOutputPlaces().begin(); ssit!=net2.getOutputPlaces().end(); ++ssit) {
+				labels = net2.getInterface().getOutputLabels();
+				for (std::set<pnapi::Label *>::iterator ssit=labels.begin(); ssit!=labels.end(); ++ssit) {
 					outputplaces2.insert((*ssit)->getName());
 				}
 				
-				for (std::set<Place *>::iterator ssit=net1.getInterfacePlaces().begin(); ssit!=net1.getInterfacePlaces().end(); ++ssit) {
+				labels = net1.getInterface().getAsynchronousLabels();
+				for (std::set<pnapi::Label *>::iterator ssit=labels.begin(); ssit!=labels.end(); ++ssit) {
 					//see whether it is an input place 
 					string ps=(*ssit)->getName();
 					if ((inputplaces1.find(ps)!=inputplaces1.end())&&(outputplaces2.find(ps)!=outputplaces2.end())) {
@@ -973,17 +966,20 @@ int main(int argc, char** argv) {
 					
 				}
 						//const std::set<std::string> & getSynchronousLabels() const;
+				// \bug this loop does nothing
+				/*
 				for(std::set<std::string>::iterator cit=net1.getSynchronousLabels().begin();cit!=net1.getSynchronousLabels().end();++cit){
 					if (net1.getSynchronousLabels().find(*cit)==net1.getSynchronousLabels().end()) {syntb=true;break;//not sync
 					}
 				}
+				*/
 				if (!syntb) {
 					std::cout<<endl<<"not syntactically compatible"<<endl; exit(0);
 				}
 				else if (args_info.composable_flag) {
 					net1.compose(net2, "1", "2");string folder="./composed/";
 					set<string> itwas;
-					for (std::set<Place *>::iterator ssit=net1.getInternalPlaces().begin(); ssit!=net1.getInternalPlaces().end(); ++ssit) {
+					for (std::set<Place *>::iterator ssit=net1.getPlaces().begin(); ssit!=net1.getPlaces().end(); ++ssit) {
 						itwas.insert((*ssit)->getName());
 					}
 					for (set<string>::iterator ssit=inputplaces1.begin(); ssit!=inputplaces1.end(); ++ssit) {
@@ -997,10 +993,10 @@ int main(int argc, char** argv) {
 							//if ( php != NULL) cout<<"naspa";
 							if ( place == NULL )
 							{
-								Place *pc = &net1.createPlace(p->getName()+"_compl", Node::INTERNAL, 1,1);
+								Place *pc = &net1.createPlace(p->getName()+"_compl", 1,1);
 								
 								pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*pc,1));
-								net1.finalCondition().addProposition(prop);//nets[x]->finalCondition().formula().output(std::cout);
+								net1.getFinalCondition().addProposition(prop);//nets[x]->finalCondition().formula().output(std::cout);
 								//cout<<php->getPresetArcs().size()
 								set<pnapi::Arc *> preset = p->getPresetArcs();
 								for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
@@ -1037,10 +1033,10 @@ int main(int argc, char** argv) {
 							//if ( php != NULL) cout<<"naspa";&& itwas.find(*ssit)!= itwas.end()
 							if ( place == NULL && itwas.find(*ssit)!=itwas.end())
 							{ //cout<<"itwas"<<*ssit<<endl;
-								Place *pc = &net1.createPlace(p->getName()+"_compl", Node::INTERNAL, 1,1);
+								Place *pc = &net1.createPlace(p->getName()+"_compl", 1,1);
 								cout << "built interface"<<endl;
 								pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*pc,1));
-								net1.finalCondition().addProposition(prop);//nets[x]->finalCondition().formula().output(std::cout);
+								net1.getFinalCondition().addProposition(prop);//nets[x]->finalCondition().formula().output(std::cout);
 								//cout<<php->getPresetArcs().size()
 								set<pnapi::Arc *> preset = p->getPresetArcs();
 								for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
@@ -1115,18 +1111,24 @@ int main(int argc, char** argv) {
 		}
 		//find free-choice sending clusters
 		if (args_info.enforceFC_given){// detect all sending FC cluster for the transitions
+		  
+		  // \bug: this is an infinite loop
+		  /*
+		  
 			std::set<std::set<std::string> > fcc;//iterate all transitions to find free choice clusters
 			std::set<pnapi::Transition *> fct=net1.getTransitions();
 			do{
-				pnapi::Transition *t=*fct.begin();std::string s=t->getName();//=args_info.enforceFC_args[0];
+				pnapi::Transition *t=*fct.begin();
+				std::string s=t->getName();//=args_info.enforceFC_args[0];
 				//std::string st=s.substr(0,s.find("@"));stringstream ss;ss<<st;
 				//int net; ss>>net;;
 				//if(net1.findTransition(s)){
 				std::set<Node *> past, curr;
 				bool init=true;//initial set of post-transitions	
-				for (std::set<Node *>::iterator nit=net1.findTransition(s)->getPreset().begin(); nit!=net1.findTransition(s)->getPreset().end(); ++nit) {
+				for (std::set<Node *>::iterator nit = t->getPreset().begin(); nit!=t->getPreset().end(); ++nit) {
 					if (init) {
-						curr=(*nit)->getPostset();init=false;
+						curr=(*nit)->getPostset();
+						init=false;
 						for (std::set<Node *>::iterator sendit=curr.begin(); sendit!=curr.end(); ++sendit) {
 							const std::set<Node *> sending=(*sendit)->getPostset();
 							for (std::set<Node *>::iterator on=sending.begin(); on!=sending.end(); ++on) {
@@ -1141,6 +1143,8 @@ int main(int argc, char** argv) {
 				}
 			}
 			while(!fct.empty());
+			*/
+			
 			/*	}
 			 else{
 			 abort(2,"The free-choice sending cluster does not exist");
@@ -1803,31 +1807,32 @@ int main(int argc, char** argv) {
 	if(args_info.inputs_num>0){//args_info.adapterrules_given){//args_info.messageProfiles_given>0
 		status("State equation involved");
 		//nPlaces = (int) net1.getPlaces().size();
-		cout << "No of places "<< net1.getInternalPlaces().size() << endl;
+		cout << "No of places "<< net1.getPlaces().size() << endl;
 		
 		int nTransitions = (int) net1.getTransitions().size();
 		pnapi::Marking m(net1);
-		net1.finalCondition().dnf(); 
-		const pnapi::formula::Formula * f=dynamic_cast<const pnapi::formula::Formula *>(&net1.finalCondition().formula());
+		net1.getFinalCondition().dnf(); 
+		const pnapi::formula::Formula * f=dynamic_cast<const pnapi::formula::Formula *>(&net1.getFinalCondition().getFormula());
 		
 		
 		
 		set< map<std::string const, unsigned int> > fmset;//set of final markings (set of maps)
-		if(typeid(*f)==typeid(pnapi::formula::Disjunction)){ 
+		if(typeid(*f)==typeid(pnapi::formula::Disjunction)){
 			//std::cout<<"Disjunction"<<endl;//make disjunction two by two
-			const pnapi::formula::Disjunction *fd=dynamic_cast<const pnapi::formula::Disjunction *>(f);			
-			for(std::set<const pnapi::formula::Formula *>::iterator cIt=fd->children().begin();cIt!=fd->children().end();++cIt){
+			const pnapi::formula::Disjunction *fd=dynamic_cast<const pnapi::formula::Disjunction *>(f);
+			for(std::set<const pnapi::formula::Formula *>::iterator cIt=fd->getChildren().begin();cIt!=fd->getChildren().end();++cIt){
 				//here we should have a conjunction; but philosophers do not agree with it :(
 				//const pnapi::formula::Conjunction *fc=dynamic_cast<const pnapi::formula::Disjunction *>(*cIt);
 				//(*cIt)->output(cout);cout<<endl;
 				if(((*cIt)->getType()==pnapi::formula::Formula::F_CONJUNCTION)){//typeid(*cIt)==typeid(pnapi::formula::Conjunction)){ 
 					const pnapi::formula::Conjunction *fc=dynamic_cast<const pnapi::formula::Conjunction *>(*cIt);
 					map<std::string const, unsigned int>  cfm;//build a marking
-					for(std::set<const pnapi::formula::Formula *>::iterator ccIt=fc->children().begin();ccIt!=fc->children().end();++ccIt){
+					for(std::set<const pnapi::formula::Formula *>::iterator ccIt=fc->getChildren().begin();ccIt!=fc->getChildren().end();++ccIt){
 						const pnapi::formula::Proposition *fp=dynamic_cast<const pnapi::formula::Proposition *>(*ccIt);
 						//const Place *pp=new Place(fp->place());
-						if(fp->tokens()>0)//insert only if it is non-zero
-							cfm.insert( std::pair<std::string const, unsigned int>(fp->place().getName(),fp->tokens()) );
+						if(fp->getTokens()>0){//insert only if it is non-zero
+							cfm[fp->getPlace().getName()] = fp->getTokens();
+						}
 					}
 					fmset.insert(cfm);
 				}
@@ -1837,11 +1842,12 @@ int main(int argc, char** argv) {
 		if(typeid(*f)==typeid(pnapi::formula::Conjunction)){ 
 			map<std::string const, unsigned int>  cfm;//build a marking
 			const pnapi::formula::Conjunction *fc=dynamic_cast<const pnapi::formula::Conjunction *>(f);
-			for(std::set<const pnapi::formula::Formula *>::iterator cIt=fc->children().begin();cIt!=fc->children().end();++cIt){
+			for(std::set<const pnapi::formula::Formula *>::iterator cIt=fc->getChildren().begin();cIt!=fc->getChildren().end();++cIt){
 				const pnapi::formula::Proposition *fp=dynamic_cast<const pnapi::formula::Proposition *>(*cIt);
 				//const Place *pp=new Place(fp->place());
-				if(fp->tokens()>0)
-					cfm.insert( std::pair<std::string const, unsigned int>(fp->place().getName(),fp->tokens()) );
+				if(fp->getTokens()>0){
+					cfm[fp->getPlace().getName()] = fp->getTokens();
+				}
 			}
 			fmset.insert(cfm);
 		}
@@ -1943,7 +1949,7 @@ int main(int argc, char** argv) {
 		}
 		map<std::string const, unsigned int> inmk;
 		//for(set<const pnapi::Place *>::iterator p=sfm->begin();p!=sfm->end();++p){
-		for(std::set<Place *>::const_iterator p = net1.getPlaces().begin();p!=net1.getPlaces().end();p++){
+		for(std::set<Place *>::const_iterator p = net1.getPlaces().begin();p!=net1.getPlaces().end();++p){
 			//add the constraint's left side
 			//cout<<(*p)->getName()<<"="<<(*p)->getTokenCount()<<std::endl;
 			//int j=1;
@@ -1952,7 +1958,7 @@ int main(int argc, char** argv) {
 			
 			//compute the initial marking
 			if((*p)->getTokenCount()>0){
-				inmk.insert(std::pair<std::string const, unsigned int>((*p)->getName(),(*p)->getTokenCount()));
+				inmk[(*p)->getName()] = (*p)->getTokenCount();
 			}
 			
 			bool de=((*p)->getName().find("_int") != std::string::npos)&& ((*p)->getPresetArcs().empty()||(*p)->getPostsetArcs().empty());
@@ -1970,7 +1976,6 @@ int main(int argc, char** argv) {
 				continue;
 			}
 			
-			if((args_info.inputs_num==1)&&(l.getType()!=pnapi::Node::INTERNAL)) continue;
 			REAL * roww=new REAL[l.getPresetArcs().size() + l.getPostsetArcs().size()]();
 			unsigned int k=0;
 			int * colno=new int[l.getPresetArcs().size() + l.getPostsetArcs().size()]();
@@ -2363,7 +2368,7 @@ int main(int argc, char** argv) {
 			else{
 				//here solve the SE/SE and SE/FP system
 				if (args_info.verbose_flag) {
-					cout << "Number of interface places: "<< net2.getInterfacePlaces().size()<<endl;
+					cout << "Number of interface places: "<< net2.getInterface().getAsynchronousLabels().size()<<endl;
 					cout << "Number of variables (transitions): "<< net1.getTransitions().size()<<endl;
 					cout<<"Number of constraints (places): "<<get_Nrows(lp)<<"; Number of variables:"<<get_Ncolumns(lp)<<endl;
 				}
@@ -2432,4 +2437,12 @@ int main(int argc, char** argv) {
 	std::cerr << PACKAGE << ": memory consumption: "; system((std::string("ps | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
 	return 0;
 	
+	//TODO: remove me!
+	/*
+  }
+  catch(pnapi::exception::Error & e)
+  {
+    cerr << e << endl;
+    exit(EXIT_FAILURE);
+  } //*/
 }

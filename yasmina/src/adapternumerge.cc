@@ -19,9 +19,10 @@
 
 #include <config.h>
 
-#include <iostream>
-#include <fstream>
 #include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <list>
 #include <sstream>
 #include <sys/types.h>
 #if defined(HAVE_SYS_WAIT_H) && ! defined(__MINGW32__)
@@ -95,7 +96,7 @@ const pnapi::PetriNet * Adapter::buildEngine()
     _engine->reduce(pnapi::PetriNet::LEVEL_4);
  */  
     // set final condition
-    pnapi::Condition & finalCond = _engine->finalCondition();
+    pnapi::Condition & finalCond = _engine->getFinalCondition();
     pnapi::Marking finalMarking (*_engine);
     finalCond.addMarking(finalMarking);
 	//cout<<
@@ -405,19 +406,26 @@ void Adapter::createEngineInterface()
     
     assert(_engine != NULL);
     
+    _engine->getInterface().addPort("controller");
+    
     for (unsigned int netindex = 0; netindex < _nets.size(); netindex++)
     {
         using namespace pnapi;
         // renaming the net is done when merging the nets
         
         std::string portname = "net" + toString(netindex);
+        Port * port = _engine->getInterface().getPort(portname);
+        if(port == NULL)
+        {
+          port = &(_engine->getInterface().addPort(portname));
+        }
 
-        const std::set< Place * > & netIf = _nets[netindex]->getInterfacePlaces();
-        for (std::set< Place *>::const_iterator place = netIf.begin(); place
-                        != netIf.end(); place++)
+        const std::set< Label * > netIf = _nets[netindex]->getInterface().getAsynchronousLabels();
+        for (std::set< Label *>::const_iterator label = netIf.begin();
+             label != netIf.end(); ++label)
         {
             // get interface name
-            const std::string & ifname = (*place)->getName();
+            const std::string & ifname = (*label)->getName();
             // internal name
             std::string internalname;
             //if (args_info.withprefix_flag)
@@ -426,24 +434,23 @@ void Adapter::createEngineInterface()
             //}
             //else
             //{
-                internalname  = ((*place)->getName() + "_int");
+                internalname  = ((*label)->getName() + "_int");
             ///}
             
             // create interface place for a service's interface place
-            Place & ifplace = _engine->createPlace(ifname, 
-                            ((*place)->getType() == Node::INPUT) ? Node::OUTPUT
-                            : Node::INPUT, 0, _messageBound, portname);
+            Label & iflabel = port->addLabel(ifname,
+                                             (((*label)->getType() == Label::INPUT) ?
+                                              Label::OUTPUT : Label::INPUT));
             
             Place * intplace = _engine->findPlace(internalname);
             if (intplace == NULL)
             {
                 //! the internal place which is a copy of the interface place
-                intplace = &_engine->createPlace(internalname,
-                                Node::INTERNAL, 0, _messageBound);
+                intplace = &_engine->createPlace(internalname, 0, _messageBound);
                 
             }
             //! name of sending/receiving transition
-            std::string inttransname(( ((*place)->getType() == Node::INPUT ) ? "t_send_"
+            std::string inttransname(( ((*label)->getType() == Label::INPUT ) ? "t_send_"
                             : "t_receive_") + ifname);
             
             //! transition which moves the token between the interface place and its copy
@@ -451,59 +458,36 @@ void Adapter::createEngineInterface()
             
             // create arcs between the internal place, the transition 
             // and the interface place
-            if ((*place)->getType() == Node::INPUT)
+            if ((*label)->getType() == Label::INPUT)
             {
                 _engine->createArc(*intplace, inttrans);
-                _engine->createArc(inttrans, ifplace);
+                inttrans.addLabel(iflabel);
             }
             else
             {
-                _engine->createArc(ifplace, inttrans);
+                inttrans.addLabel(iflabel);
                 _engine->createArc(inttrans, *intplace);
             }
             
             // if we have a synchronous interface, create label for transition
             if (_contType == SYNCHRONOUS)
             {
-                std::set< std::string> syncLabel;
-                syncLabel.insert("sync_" + inttransname);
-                inttrans.setSynchronizeLabels(syncLabel);
-
-                // workaround for bug #14416 <https://gna.org/bugs/?14416>
-                // \TODO: remove!
-                std::set< std::string > labels (_engine->getSynchronousLabels());
-                labels.insert("sync_" + inttransname);
-                _engine->setSynchronousLabels(labels);
+                Label & label = _engine->getInterface().addSynchronousLabel("sync_" + inttransname, "controller");
+                inttrans.addLabel(label);
 
                // cost_file_content += "sync_" + inttransname + " 0;\n";
-                
             }
             // else create interface place to the controller
             else
             {
-                std::string contplacename = (((*place)->getType() == Node::INPUT) ? "send_"
-                    : "receive_") + ifname;
-                Place & contplace =
-                                _engine->createPlace(contplacename, ((*place)->getType()
-                                                == Node::INPUT) ? Node::INPUT
-                                    : Node::OUTPUT, 0, _messageBound, "controller");
-                if ((*place)->getType() == Node::INPUT)
-                {
-                    _engine->createArc(contplace, inttrans);
-                } else
-                {
-                    _engine->createArc(inttrans, contplace);
-                }
+                std::string contlabelname = (((*label)->getType() == Label::INPUT) ? "send_" : "receive_") + ifname;
+                Label & contlabel = _engine->getInterface().addLabel(contlabelname,
+                                                                     (*label)->getType(), "controller");
+                
+                inttrans.addLabel(contlabel);
             }
         }
-        
-        std::set< std::string > ifLabels(_nets[netindex]->getSynchronousLabels());
-        std::set< std::string > engineLabels(_engine->getSynchronousLabels());
-        engineLabels.insert(ifLabels.begin(), ifLabels.end());
-        _engine->setSynchronousLabels(engineLabels);
-        
     }
-    
 }
 
 void Adapter::createRuleTransitions()
@@ -556,7 +540,7 @@ void Adapter::createRuleTransitions()
             // nope, create it
             if ( place == NULL )
             {
-                place = &_engine->createPlace(placeName, Node::INTERNAL, 0, _messageBound);
+                place = &_engine->createPlace(placeName, 0, _messageBound);
             }
             
             // create arc between this place and rule transition
@@ -578,7 +562,7 @@ void Adapter::createRuleTransitions()
             // nope, create it
             if ( place == NULL )
             {
-                place = &_engine->createPlace(placeName, Node::INTERNAL, 0, _messageBound);
+                place = &_engine->createPlace(placeName, 0, _messageBound);
             }
             
             // create arc between this place and rule transition
@@ -604,15 +588,22 @@ void Adapter::createRuleTransitions()
         if (_contType == SYNCHRONOUS)
         {
             syncLabel.insert("sync_" + transName);
-            trans->setSynchronizeLabels(syncLabel);
             
-            // workaround for bug #14416 <https://gna.org/bugs/?14416>
-            // \TODO: remove!
-            std::set< std::string > labels (_engine->getSynchronousLabels());
-            labels.insert("sync_" + transName);
-            _engine->setSynchronousLabels(labels);
+            for(std::set<std::string>::iterator l = syncLabel.begin();
+                l != syncLabel.end(); ++l)
+            {
+              pnapi::Label * label = _engine->getInterface().findLabel(*l);
+              
+              if(label == NULL)
+              {
+                // TODO: assign a port to these labels?
+                label = &(_engine->getInterface().addSynchronousLabel(*l));
+              }
+              
+              trans->addLabel(*label);
+            }
             
-            status("known labels: %d", _engine->getSynchronousLabels().size());
+            status("known labels: %d", _engine->getInterface().getSynchronousLabels().size());
         }
         // else create interface place to the controller
         else
@@ -623,15 +614,15 @@ void Adapter::createRuleTransitions()
             if (rule.getMode() == RuleSet::AdapterRule::AR_NORMAL 
                             || rule.getMode() == RuleSet::AdapterRule::AR_CONTROLLABLE)
             {
-                Place & controlplace = _engine->createPlace( controlplacename, Node::INPUT, 0, _messageBound, "controller");
-                _engine->createArc(controlplace, *trans);
+                pnapi::Label & controllabel = _engine->getInterface().addInputLabel( controlplacename, "controller");
+                trans->addLabel(controllabel);
             }
             
             if (rule.getMode() == RuleSet::AdapterRule::AR_NORMAL 
                             || rule.getMode() == RuleSet::AdapterRule::AR_OBSERVABLE)
             {
-                Place & observeplace = _engine->createPlace( observeplacename, Node::OUTPUT, 0, _messageBound, "controller");
-                _engine->createArc(*trans, observeplace);
+                pnapi::Label & observelabel = _engine->getInterface().addOutputLabel( observeplacename, "controller");
+                trans->addLabel(observelabel);
             }
 
         }
@@ -649,17 +640,17 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
     
     using namespace pnapi;
     
-    std::set< Place * > intPlaces = net.getInternalPlaces();
+    std::set< Place * > intPlaces = net.getPlaces();
     std::set< Place * >::iterator placeIter = intPlaces.begin();
     
     while ( placeIter != intPlaces.end() )
     {
         Place & place = **placeIter;
         Place & compPlace = net.createPlace("comp_" + place.getName(),
-            Node::INTERNAL, place.getCapacity(), place.getCapacity());
+                            place.getCapacity(), place.getCapacity());
         
         // update final condition
-        Condition & finalCond = net.finalCondition();
+        Condition & finalCond = net.getFinalCondition();
 
         formula::FormulaEqual prop (formula::FormulaEqual(compPlace, place.getCapacity()));
         finalCond.addProposition(prop);
@@ -693,7 +684,7 @@ void Adapter::removeUnnecessaryRules()
 
     using namespace pnapi;
 
-    std::set<Place *> possibleDeadPlaces = _engine->getInternalPlaces();
+    std::set<Place *> possibleDeadPlaces = _engine->getPlaces();
 
     while ( !possibleDeadPlaces.empty() )
     {
@@ -759,11 +750,7 @@ void Adapter::removeUnnecessaryRules()
                 
                 while ( cand != deadCandidates.end() )
                 {
-                    // only internal places are appropriate for removal
-                    if ( (*cand)->getType() == Node::INTERNAL )
-                    {
-                        possibleDeadPlaces.insert( dynamic_cast<Place*>(*cand) );
-                    }
+                    possibleDeadPlaces.insert( dynamic_cast<Place*>(*cand) );
                     cand++;
                 }
                 

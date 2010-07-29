@@ -3,6 +3,7 @@
 @item improved data load time for state eq, fg
 @item made cover all compatible with changes
 @item made output (including path witnisses) uniform
+@item updated pnapi to version 4.02
 @end itemize
 
 @heading Version 1.0 (18 January 2009)

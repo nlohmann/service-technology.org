@@ -15,6 +15,6 @@ Version 1.1-unreleased
 
 * made output (including path witnisses) uniform
 
-* integrated with adapter rules
+* updated pnapi to version 4.02
 
 \nSee file ChangeLog <http://service-technology.org/files/yasmina/ChangeLog> for\ncomplete version history.\n

@@ -1,25 +1,52 @@
-#include <config.h>
-#include <libgen.h>
-#include <unistd.h>
-#include <fstream>
-#include <cstdio>
-#include <cstdlib>
-#include "verbose.h"
+/*****************************************************************************\
+ Wendy -- Synthesizing Partners for Services
+
+ Copyright (c) 2009 Niels Lohmann, Christian Sura, and Daniela Weinberg
+
+ Wendy is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
+\*****************************************************************************/
+
+/*!
+ * \file Output.cc
+ */
+
+#include "config.h"
+
+#include "exception.h"
 #include "Output.h"
+#include "verbose.h"
 
-#ifdef HAVE_CONFIG
-#include <config.h>
-#endif
+#include <libgen.h>
+#include <iostream>
+#include <fstream>
+#include <unistd.h>
+#include <cstdlib>
+#include <cstring>
 
+using std::string;
+
+namespace pnapi
+{
+
+using verbose::status;
+
+namespace util
+{
 
 /******************
  * STATIC MEMBERS *
  ******************/
-
-namespace pnapi
-{
-namespace util
-{
 
 #ifdef HAVE_CONFIG
 std::string Output::tempfileTemplate = std::string("/tmp/") + PACKAGE_TARNAME + "-XXXXXX";
@@ -27,10 +54,7 @@ std::string Output::tempfileTemplate = std::string("/tmp/") + PACKAGE_TARNAME + 
 std::string Output::tempfileTemplate = "/tmp/temp-XXXXXX";
 #endif
 bool Output::keepTempfiles = true;
-}
-}
 
-using namespace pnapi::util;
 
 /***************
  * CONSTRUCTOR *
@@ -41,9 +65,9 @@ using namespace pnapi::util;
 */
 Output::Output() :
     os(*(new std::ofstream(createTmp(), std::ofstream::out | std::ofstream::trunc))),
-    filename(temp), temp(temp), kind("")
+    filename(temp), kind("")
 {
-    status("writing to temporary file '%s'", _cfilename_(filename));
+    status("writing to temporary file '%s'", filename.c_str());
 }
 
 /*!
@@ -58,13 +82,13 @@ Output::Output(const std::string& str, const std::string& kind) :
     filename(str), temp(NULL), kind(kind)
 {
     if (not os.good()) {
-        abort(11, "could not write to file '%s'", _cfilename_(filename));
+      throw exception::Error("could not write to file '" + filename + "'");
     }
 
     if (str.compare("-")) {
-        status("writing %s to file '%s'", _coutput_(kind), _cfilename_(filename));
+        status("writing %s to file '%s'", kind.c_str(), filename.c_str());
     } else {
-        status("writing %s to standard output", _coutput_(kind));
+        status("writing %s to standard output", kind.c_str());
     }
 }
 
@@ -82,17 +106,17 @@ Output::~Output() {
     if (&os != &std::cout) {
         delete(&os);
         if (temp == NULL) {
-            status("closed file '%s'", _cfilename_(filename));
+            status("closed file '%s'", filename.c_str());
         } else {
             if (keepTempfiles) {
-                status("closed temporary file '%s'", _cfilename_(filename));
+                status("closed temporary file '%s'", filename.c_str());
             } else {
                 if (remove(filename.c_str()) == 0) {
-                    status("closed and deleted temporary file '%s'", _cfilename_(filename));
+                    status("closed and deleted temporary file '%s'", filename.c_str());
                 } else {
                     // this should never happen, because mkstemp creates temp
                     // files in mode 0600.
-                    status("closed, but could not delete temporary file '%s'", _cfilename_(filename));
+                    status("closed, but could not delete temporary file '%s'", filename.c_str());
                 }
             }
             free(temp);
@@ -140,12 +164,12 @@ char* Output::createTmp() {
 #ifdef __MINGW32__
     temp = basename(const_cast<char*>(tempfileTemplate.c_str()));
     if (mktemp(temp) == NULL) {
-        abort(13, "could not create to temporary file '%s'", basename(const_cast<char*>(tempfileTemplate.c_str())));
+        throw exception::Error("could not create to temporary file '" + std::string(temp) + "'");
     };
 #else
     temp = strdup(tempfileTemplate.c_str());
     if (mkstemp(temp) == -1) {
-        abort(13, "could not create to temporary file '%s'", temp);
+        throw exception::Error(string("could not create to temporary file '") + temp + "'");
     };
 #endif
     return temp;
@@ -163,3 +187,7 @@ void Output::setTempfileTemplate(std::string s) {
 void Output::setKeepTempfiles(bool b) {
     keepTempfiles = b;
 }
+
+} /* namespace util */
+
+} /* namespace pnapi */

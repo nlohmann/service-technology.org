@@ -5,7 +5,7 @@ info_TEXINFOS = mia.texi
 EXTRA_DIST =
 
 # the height of the README's ASCII art + URL + 2 spaces
-BANNERHEIGHT = 8
+BANNERHEIGHT = 9
 
 # the help option that should be used in the manual
 HELPOPTION = --full-help

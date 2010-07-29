@@ -1,10 +1,14 @@
-SUBDIRS = libs/pnapi src man tests doc
-
 # tell aclocal about the macros in the "m4" folder
 ACLOCAL_AMFLAGS = -I m4 --install
 
+# process "libs/pnapi" directory only if the Petri Net API needs to be compiled
+if COMPILE_PNAPI
+SUBDIRS = libs/pnapi src doc man tests
+else
+SUBDIRS = src doc man tests
+endif
+
 svn-clean: maintainer-clean
-	rm -fr configure Makefile.in depcomp compile INSTALL missing \
-	aclocal.m4 install-sh ylwrap src/Makefile.in src/config.h.in \
-	libs/pnapi/Makefile.in tests/Makefile.in \
-	doc/Makefile.in doc/mdate-sh man/Makefile.in src/config-log.h build-aux
+	rm -fr configure INSTALL aclocal.m4 src/config.h.in doc/mdate-sh src/config-log.h build-aux
+	for DIR in $(DIST_SUBDIRS) .; do rm -f $$DIR/Makefile.in; done
+

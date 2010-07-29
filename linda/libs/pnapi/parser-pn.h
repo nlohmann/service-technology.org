@@ -129,7 +129,7 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
     {
 
 /* Line 34 of lalr1.cc  */
-#line 85 "parser-pn.yy"
+#line 86 "parser-pn.yy"
 
   char * yt_str;
   unsigned int yt_uInt;
@@ -163,7 +163,8 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
      OPENBRACE = 269,
      CLOSEBRACE = 270,
      LPAR = 271,
-     RPAR = 272
+     RPAR = 272,
+     EQUALS = 273
    };
 
     };
@@ -260,7 +261,7 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
     static const unsigned char yytable_[];
     static const signed char yytable_ninf_;
 
-    static const unsigned char yycheck_[];
+    static const signed char yycheck_[];
 
     /// For a state, its accessing symbol.
     static const unsigned char yystos_[];
@@ -339,7 +340,7 @@ namespace pnapi { namespace parser { namespace pn { namespace yy {
 } } } } // pnapi::parser::pn::yy
 
 /* Line 34 of lalr1.cc  */
-#line 343 "parser-pn.h"
+#line 344 "parser-pn.h"
 
 
 

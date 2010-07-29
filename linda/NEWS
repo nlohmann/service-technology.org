@@ -5,7 +5,7 @@
                           |_____|_|_| |_|\__,_|\__,_|
                        http://service-technology.org/linda
 
-
+                 computes communication fingerprints for a service
 
 Version 0.6-unreleased
 ======================
@@ -23,5 +23,7 @@ Version 0.6-unreleased
   to determine test case coverage (use `make cover' in `tests' directory)
 
 * Added test cases.
+
+* Updated PNAPI to version 4.02.
 
 \nSee file ChangeLog <http://service-technology.org/files/linda/ChangeLog> for\ncomplete version history.\n

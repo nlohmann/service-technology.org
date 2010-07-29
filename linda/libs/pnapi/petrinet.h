@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: georgstraube $
+ *          last changes of: $Author: cas $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-04-07 18:06:20 +0200 (Wed, 07 Apr 2010) $
+ * \date    $Date: 2010-07-23 14:38:42 +0200 (Fri, 23 Jul 2010) $
  *
- * \version $Revision: 5601 $
+ * \version $Revision: 5949 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -30,14 +30,6 @@
 
 #include <inttypes.h>
 
-#ifndef CONFIG_PETRIFY
-#define CONFIG_PETRIFY "not found"
-#endif
-
-#ifndef CONFIG_GENET
-#define CONFIG_GENET "not found"
-#endif
-
 #ifdef HAVE_STDINT_H
 // #include <stdint.h>
 #endif
@@ -47,12 +39,6 @@ namespace pnapi
 
 // forward declarations
 class PetriNet;
-namespace io
-{
-std::ostream & operator<<(std::ostream &, const PetriNet &);
-std::istream & operator>>(std::istream &, PetriNet &) throw (exception::InputError);
-}
-
 
 namespace util
 {
@@ -159,8 +145,7 @@ public: /* public types */
     SELF_LOOP_PLACES = (1 << 16),
     SELF_LOOP_TRANSITIONS = (1 << 17),
     EQUAL_PLACES = (1 << 18),
-    KEEP_NORMAL = (1 << 19),
-    ONCE = (1 << 20),
+    ONCE = (1 << 19),
     LEVEL_1 = DEAD_NODES,
     LEVEL_2 = (LEVEL_1 | UNUSED_STATUS_PLACES | SUSPICIOUS_TRANSITIONS),
     LEVEL_3 = (LEVEL_2 | IDENTICAL_PLACES | IDENTICAL_TRANSITIONS),
@@ -174,8 +159,7 @@ public: /* public types */
                   SERIES_TRANSITIONS | SELF_LOOP_PLACES |
                   SELF_LOOP_TRANSITIONS | EQUAL_PLACES),
     SET_STARKE = (STARKE_RULE_3_PLACES | STARKE_RULE_3_TRANSITIONS |
-                  STARKE_RULE_4 | STARKE_RULE_5 | STARKE_RULE_6 |
-                  STARKE_RULE_7 | STARKE_RULE_8 | STARKE_RULE_9),
+                  STARKE_RULE_4 | STARKE_RULE_7 | STARKE_RULE_8),
     K_BOUNDEDNESS = SET_PILLAT,
     BOUNDEDNESS = (SET_PILLAT | SET_STARKE),
     LIVENESS = (SET_PILLAT | SET_STARKE)
@@ -205,15 +189,60 @@ public: /* public types */
     W_INTERFACE_PLACE_IN_FINAL_CONDITION = 1
   };
   
+private: /* private types */
+  /*!
+   * \brief Cache for reductions 
+   */
+  struct ReductionCache
+  {
+    /// constructor
+    ReductionCache(PetriNet &);
+    
+    /// reference to own net
+    PetriNet & net_;
+    
+    /// add a place to the cache
+    void addPlace(Place &);
+    /// add a transition to the cache
+    void addTransition(Transition &);
+    /// remove a place from the cache
+    void removePlace(Place &);
+    /// remove a transition from the cache
+    void removeTransition(Transition &);
+    
+    /// places with empty preset
+    std::set<Place *> emptyPresetP_;
+    /// transitions with empty preset
+    std::set<Transition *> emptyPresetT_;
+    /// places with empty postset
+    std::set<Place *> emptyPostsetP_;
+    /// transitions with empty postset
+    std::set<Transition *> emptyPostsetT_;
+    
+    /// places with singleton preset
+    std::set<Place *> singletonPresetP_;
+    /// transitions with singleton preset
+    std::set<Transition *> singletonPresetT_;
+    /// places with singleton postset
+    std::set<Place *> singletonPostsetP_;
+    /// transitions with singleton postset
+    std::set<Transition *> singletonPostsetT_;
+    
+    /// interval of valid final place markings
+    std::map<Place *, formula::Interval> intervals_;
+  };
+  
+  
 private: /* private static variables */
-  /// path to petrify
-  static std::string pathToPetrify_;
+  /*!
+   * \name paths to external tools
+   */
+  //@{
   /// path to genet
   static std::string pathToGenet_;
-  /// capacity for genet
-  static uint8_t genetCapacity_;
-  /// converter Automaton => PetriNet
-  static AutomatonConverter automatonConverter_;
+  /// path to petrify
+  static std::string pathToPetrify_;
+  //@}
   
 private: /* private variables */
   /*!
@@ -230,7 +259,6 @@ private: /* private variables */
   
   /*!
    * \name (overlapping) sets for net structure
-   * \todo Vielleicht auch sendTransitions_ ?
    */
   //@{
   /// set of all nodes
@@ -251,7 +279,7 @@ private: /* private variables */
   
   /*! 
    * \name general properties
-     \todo Vielleicht Rollen symmetrisch zu Kosten organisieren.
+   * \todo Vielleicht Rollen symmetrisch zu Kosten organisieren.
    */
   //@{
   /// meta information
@@ -261,7 +289,11 @@ private: /* private variables */
   /// warning flags
   unsigned int warnings_;
   /// cache for reduction
-  std::set<const Place *> * reducablePlaces_;
+  ReductionCache * reductionCache_;
+  /// capacity for genet
+  uint8_t genetCapacity_;
+  /// converter Automaton => PetriNet
+  AutomatonConverter automatonConverter_;
   //@}
   
   /*!
@@ -279,12 +311,15 @@ private: /* private variables */
   //@}
   
 public: /* public static methods */
-  /// setting path to Petrify
-  static void setPetrify(const std::string & = CONFIG_PETRIFY);
+  /*!
+   * \name path setting methods
+   */
+  //@{
   /// setting path to Genet
-  static void setGenet(const std::string & = CONFIG_GENET, uint8_t = 2);
-  /// setting automaton converter
-  static void setAutomatonConverter(AutomatonConverter = PETRIFY);
+  static void setGenet(const std::string &);
+  /// setting path to Petrify
+  static void setPetrify(const std::string &);
+  //@}
 
 public: /* public methods */
   /*!
@@ -294,7 +329,7 @@ public: /* public methods */
   /// standard constructor
   PetriNet();
   /// constructor Automaton => Petri net
-  PetriNet(const Automaton &);
+  PetriNet(const Automaton &, AutomatonConverter = STATEMACHINE, uint8_t = 2);
   /// copy constructor
   PetriNet(const PetriNet &);
   /// destructor
@@ -324,6 +359,8 @@ public: /* public methods */
   Arc * findArc(const Node &, const Node &) const;
   /// get the interface
   Interface & getInterface();
+  /// get the interface
+  const Interface & getInterface() const;
   /// get all nodes
   const std::set<Node *> & getNodes() const;
   /// get places
@@ -340,6 +377,12 @@ public: /* public methods */
   Condition & getFinalCondition();
   /// get the final condition
   const Condition & getFinalCondition() const;
+  /// guess a place relation
+  std::map<const Place *, const Place *> guessPlaceRelation(const PetriNet &) const;
+  /// returns one node's conflict cluster
+  std::set<Node *> getConflictCluster(const Node &) const;
+  /// returns net's conflict clusters
+  std::vector<std::set<Node *> > getConflictClusters() const;
   //@}
   
   
@@ -383,7 +426,7 @@ public: /* public methods */
   void deleteArc(Arc &);
 
   /// renames nodes
-  void canonicalNames();
+  std::map<std::string, std::string> canonicalNames();
   //@}
 
 
@@ -394,7 +437,7 @@ public: /* public methods */
    */
   //@{
   /// checks the Petri net for workflow criteria
-  bool isWorkflow();
+  bool isWorkflow() const;
   /// checks the Petri net for free choice criterion
   bool isFreeChoice() const;
   /// checks the Petri net for being normalized
@@ -412,6 +455,10 @@ public: /* public methods */
   /// product with Constraint oWFN
   void produce(const PetriNet &, const std::string & = "net",
                const std::string & = "constraint") throw (exception::InputError);
+  /// adds a prefix to all labels and nodes
+  PetriNet & prefixNames(const std::string &);
+  /// adds a prefix to all labels
+  PetriNet & prefixLabelNames(const std::string &);
   /// adds a given prefix to all nodes
   PetriNet & prefixNodeNames(const std::string &);
   /// swaps input and output labels
@@ -504,15 +551,15 @@ private: /* private methods */
   /// check if the preset of a set stores only one item
   bool reduce_singletonPreset(const std::set<Node *> &);
   /// fusion of pre- with posttransition (m to n)
-  unsigned int reduce_rule_5(bool);
+  unsigned int reduce_rule_5();
   /// fusion of pre- with posttransition (1 to n)
-  unsigned int reduce_rule_6(bool);
+  unsigned int reduce_rule_6();
   /// elimination of self-loop places
   unsigned int reduce_rule_7();
   /// elimination of self-loop transitions
   unsigned int reduce_rule_8();
   /// fusion of pre- with postplaces
-  unsigned int reduce_rule_9(bool);
+  unsigned int reduce_rule_9();
   /// elimination of identical places
   unsigned int reduce_identical_places();
   /// elimination of identical transitions
@@ -520,7 +567,7 @@ private: /* private methods */
   /// fusion of series places
   unsigned int reduce_series_places();
   /// fusion of series transitions
-  unsigned int reduce_series_transitions(bool);
+  unsigned int reduce_series_transitions();
   /// elimination of self-loop places
   unsigned int reduce_self_loop_places();
   /// elimination of self-loop transitions

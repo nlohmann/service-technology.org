@@ -9,6 +9,8 @@
 
 #include "config.h"
 
+#include "pnapi-assert.h"
+
 #include "automaton.h"
 #include "Output.h"
 #include "parser-pn-wrapper.h"
@@ -16,6 +18,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <utility>
 
 using std::cerr;
 using std::endl;
@@ -23,6 +26,7 @@ using std::istringstream;
 using std::ifstream;
 using std::map;
 using std::pair;
+using std::make_pair;
 using std::set;
 using std::string;
 using std::vector;
@@ -32,55 +36,22 @@ namespace pnapi
 {
 
 /*!
- * \brief setting path to Petrify
- */
-void PetriNet::setPetrify(const std::string & petrify)
-{ 
-  pathToPetrify_ = petrify; 
-}
-
-/*!
- * \brief setting path to Genet
- */
-void PetriNet::setGenet(const std::string & genet, uint8_t capacity)
-{
-  pathToGenet_ = genet;
-  genetCapacity_ = capacity;
-}
-
-/*!
- * \brief setting automaton converter
- */
-void PetriNet::setAutomatonConverter(PetriNet::AutomatonConverter converter)
-{
-  automatonConverter_ = converter;
-}
-
-/*!
  * The constructor transforming an automaton to a Petri net.
+ * 
+ * \param sa automaton to be converted
+ * \param ac automaton converter to be used
+ * \param capacity to be passed to Genet when using genet
  */
-PetriNet::PetriNet(const Automaton & sa) :
-  observer_(*this), interface_(*this),
-  warnings_(0), reducablePlaces_(NULL)
+PetriNet::PetriNet(const Automaton & sa, AutomatonConverter ac, uint8_t capacity) :
+  observer_(*this), warnings_(0), reductionCache_(NULL),
+  genetCapacity_(capacity), automatonConverter_(ac), interface_(*this)
 {
-  if( (automatonConverter_ == PETRIFY) &&
-      (pathToPetrify_ == "not found") )
-  {
-    automatonConverter_ = GENET;
-  }
-
-  if( (automatonConverter_ == GENET) &&
-      (pathToGenet_ == "not found") )
-  {
-    automatonConverter_ = STATEMACHINE;
-  }  
-
   if(automatonConverter_ == STATEMACHINE)
   {
     (*this) = sa.toStateMachine();
     return;
   }
-
+  
   util::Output out;
 
   std::vector<std::string> edgeLabels;
@@ -116,7 +87,7 @@ void Automaton::printToTransitionGraph(std::vector<std::string> & edgeLabels,
   {
   case PetriNet::PETRIFY :
   case PetriNet::GENET : break;
-  default : assert(false); // do not call with other converters
+  default : PNAPI_ASSERT(false); // do not call with other converters
   }
 
   // create and fill stringstream for buffering graph information
@@ -152,16 +123,21 @@ void Automaton::printToTransitionGraph(std::vector<std::string> & edgeLabels,
   }
 
   // mark final states
+  bool fsfound = false; // final state found ?
+  int foundPosition = 0;
   for(unsigned int i = 0; i < states_.size(); ++i)
   {
     if (states_[i]->isFinal())
     {
-      // each label is mapped to his position in edgeLabes
-      std::string currentLabel = "FINAL";
-      currentLabel += states_[i]->getName();
-      int foundPosition = (int)edgeLabels.size();
-      edgeLabels.push_back(currentLabel);
-      TGStringStream << "p" << states_[i]->getName() << " t" << foundPosition << " p00\n";
+      if (! fsfound)
+      {
+        // There is exactly one FINAL label, everything else confuses Genet
+        std::string currentLabel = "FINAL";
+        foundPosition = (int)edgeLabels.size();
+        edgeLabels.push_back(currentLabel);
+        fsfound = true;
+      }
+      TGStringStream << "p" << states_[i]->getName() << " t" << foundPosition << " p00\n"; //" << states_[i]->getName() << "
     }
   }
 
@@ -257,15 +233,15 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
     systemcall = pathToGenet_ + " -k " + ss.str() + " " + fileName + " > " + pnFileName;
   }
 
-  //int result = system(systemcall.c_str());
-  system(systemcall.c_str());
+  int doNotCare_JustFixWarning = system(systemcall.c_str());
+  doNotCare_JustFixWarning = doNotCare_JustFixWarning; // get rid of compilerwarning
 
   /// does not work for Genet, there seems to be a bug in Cudd
-  //assert(result == 0);
+  //PNAPI_ASSERT(result == 0);
 
   // parse generated file
   ifstream ifs(pnFileName.c_str(), ifstream::in);
-  assert(ifs.good());
+  PNAPI_ASSERT(ifs.good());
 
   parser::pn::Parser myParser;
   myParser.parse(ifs);
@@ -284,7 +260,7 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
 
     if(remapped.substr(0,5) != "FINAL")
     {
-      assert(remapped.find('/') == remapped.npos); // petrify should not rename/create dummy transitions
+      PNAPI_ASSERT(remapped.find('/') == remapped.npos); // petrify should not rename/create dummy transitions
 
       if(inputLabels.count(remapped) > 0)
       {
@@ -322,10 +298,10 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
     if(remapped.substr(0, 5) != "FINAL")
     {
       // create transition if necessary
-      Transition * transition = findTransition("t" + remapped);
+      Transition * transition = findTransition("t" + *t);
       if(transition == NULL)
       {
-        transition = &createTransition("t" + remapped);
+        transition = &createTransition("t" + *t);
         
         // link transition to corresponding label
         string labelName = remapped.substr( 0, remapped.find('/') );      // remove possible /
@@ -363,30 +339,37 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
       map<string, unsigned int> & tmpPlaceNameMap = myParser.arcs_[*t];
       PNAPI_FOREACH(p, tmpPlaceNameMap)
       {
-        createArc(*transition, *findPlace(p->first), p->second);
-      }      
+        pnapi::Arc * arc = findArc(*transition, *findNode(p->first));
+        if ( arc )
+        {
+            arc->setWeight(arc->getWeight() + p->second);
+        }
+        else
+        {
+            createArc(*transition, *findNode(p->first), p->second);
+        }
+      }
     }
   }
 
-  // create arcs p->t
+    // create arcs p->t
 
   // Create a map of string sets for final condition creation.
-  map<string, set<string> > finalCondMap;
-
+  map<string, set< pair < string, unsigned int> > > finalCondMap;
   PNAPI_FOREACH(p, myParser.places_)
   {
     PNAPI_FOREACH(t, myParser.arcs_[*p])
     {
-      string transitionName = remap(t->first, edgeLabels);
+      string transitionName = t->first; //remap(t->first, edgeLabels);
 
-      if (transitionName.substr(0,5) != "FINAL")
+      if (remap(t->first, edgeLabels).substr(0,5) != "FINAL")
       {
-        createArc(*findPlace(*p), *findTransition("t" + transitionName), t->second);
+          createArc(*findPlace(*p), *findTransition("t" + transitionName), t->second);
       }
       else
       {
         // This place is the result of a final node
-        finalCondMap[transitionName].insert(*p);
+        finalCondMap[transitionName].insert(make_pair(*p,t->second));
       }
     }
   }
@@ -421,13 +404,13 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
   PNAPI_FOREACH(transIt, finalCondMap)
   {
     // Create a set for the places having this transition in their post set.
-    set<Place *> nextTrans;
+    set< pair< Place *, unsigned int> > nextTrans;
 
     // For each place in the preset...
     PNAPI_FOREACH(placesIt, transIt->second)
     {
       // Insert this place in the preset.
-      nextTrans.insert(findPlace(*placesIt));
+      nextTrans.insert(make_pair(findPlace(placesIt->first), placesIt->second));
     }
 
     pnapi::formula::Conjunction * fd = NULL;
@@ -439,11 +422,11 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
       {
         if (store == NULL)
         {
-          store = new pnapi::formula::FormulaEqual(**p, 1);
+          store = new pnapi::formula::FormulaEqual(*(p->first), p->second);
         }
         else
         {
-          pnapi::formula::FormulaEqual * tmpF = new pnapi::formula::FormulaEqual(**p, 1);
+          pnapi::formula::FormulaEqual * tmpF = new pnapi::formula::FormulaEqual(*(p->first), p->second);
           fd = new pnapi::formula::Conjunction(*store, *tmpF);
           delete tmpF;
           delete store;
@@ -452,7 +435,7 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
       }
       else
       {
-        pnapi::formula::FormulaEqual * tmpF1 = new pnapi::formula::FormulaEqual(**p, 1);
+        pnapi::formula::FormulaEqual * tmpF1 = new pnapi::formula::FormulaEqual(*(p->first), p->second);
         pnapi::formula::Conjunction * tmpF2 = new pnapi::formula::Conjunction(*fd, *tmpF1);
         delete fd;
         delete tmpF1;

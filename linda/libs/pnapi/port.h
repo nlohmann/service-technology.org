@@ -43,9 +43,9 @@ public: /* public types */
   /// communication type
   enum Type
   {
-    INPUT,
-    OUTPUT,
-    SYNCHRONOUS
+    INPUT = 1,
+    OUTPUT = 3,
+    SYNCHRONOUS = 2
   };
 
 private: /* private variables */
@@ -72,6 +72,8 @@ public: /* public methods */
   void removeTransition(const Transition &);
   /// swaps input and output labels
   void mirror();
+  /// prefix this label
+  void prefix(const std::string &);
   
   /// returning the label's name
   const std::string & getName() const;
@@ -82,7 +84,7 @@ public: /* public methods */
   /// get the underlying petri net
   PetriNet & getPetriNet() const;
   /// get the assigned port
-  Port & getPort() const; 
+  Port & getPort() const;
 
 private: /* private methods */
   /// no copying allowed
@@ -127,6 +129,8 @@ public: /* public methods */
    * \name structural changes
    */
   //@{
+  /// setting the name
+  void setName(const std::string &);
   /// adding a label
   Label & addLabel(Label &);
   /// adding a label with a given type
@@ -141,10 +145,12 @@ public: /* public methods */
   void removeLabel(const std::string &);
   /// swaps input and output labels
   void mirror();
+  /// prefix all labels
+  void prefixLabels(const std::string &);
   //@}
 
   /*!
-   * \brief getter
+   * \name getter
    */
   //@{
   /// return the name of the port

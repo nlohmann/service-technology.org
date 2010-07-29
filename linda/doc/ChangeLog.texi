@@ -6,6 +6,7 @@
 @item Code refactoring towards more efficient data structures.
 @item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)
 @item Added test cases.
+@item Updated PNAPI to version 4.02.
 @end itemize
 
 @heading Version 0.5

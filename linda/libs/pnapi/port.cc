@@ -17,7 +17,11 @@
  * \version $Revision:$
  */
 
+#include <iostream>
+
 #include "config.h"
+
+#include "pnapi-assert.h"
 
 #include "port.h"
 #include "petrinet.h"
@@ -37,119 +41,7 @@ namespace pnapi
 Port::Port(PetriNet & net, const std::string & name) :
   net_(net), name_(name)
 {
-}
-
-/*!
- * \brief compose constructor
- */
-Port::Port(PetriNet & net, const Port & port1, const Port & port2,
-           std::map<Label *, Label *> & label2label, std::map<Label *, Place *> & label2place,
-           std::set<Label *> & commonLabels) :
-  net_(net), name_(port1.name_)
-{
-  // copy port1's input labels or compose them
-  PNAPI_FOREACH(l1, port1.input_)
-  {
-    Label * l2 = port2.findLabel((*l1)->getName());
-    if((l2 == NULL) || (l2->getType() != Label::OUTPUT)) // no matching label
-    {
-      // copy label
-      Label * l = new Label(net_, *this, (*l1)->getName(), Label::INPUT);
-      input_.insert(l);
-      allLabels_.insert(l);
-      label2label[*l1] = l;
-    }
-    else
-    {
-      // labels will be replaced by place
-      Place * p = &(net_.createPlace(l2->getName()));
-      label2place[*l1] = p;
-      label2place[l2] = p;
-    }
-  }
-  
-  // copy port1's output labels or compose them
-  PNAPI_FOREACH(l1, port1.output_)
-  {
-    Label * l2 = port2.findLabel((*l1)->getName());
-    if((l2 == NULL) || (l2->getType() != Label::INPUT)) // no matching label
-    {
-      // copy label
-      Label * l = new Label(net_, *this, (*l1)->getName(), Label::OUTPUT);
-      input_.insert(l);
-      allLabels_.insert(l);
-      label2label[*l1] = l;
-    }
-    else
-    {
-      // labels will be replaced by place
-      Place * p = &(net_.createPlace(l2->getName()));
-      label2place[*l1] = p;
-      label2place[l2] = p;
-    }
-  }
-  
-  // copy port2's input labels or compose them
-  PNAPI_FOREACH(l1, port2.input_)
-  {
-    Label * l2 = port1.findLabel((*l1)->getName());
-    if((l2 == NULL) || (l2->getType() != Label::OUTPUT)) // no matching label
-    {
-      // copy label
-      Label * l = new Label(net_, *this, (*l1)->getName(), Label::INPUT);
-      input_.insert(l);
-      allLabels_.insert(l);
-      label2label[*l1] = l;
-    }
-    // else already copied above
-  }
-  
-  // copy port2's output labels or compose them
-  PNAPI_FOREACH(l1, port2.output_)
-  {
-    Label * l2 = port1.findLabel((*l1)->getName());
-    if((l2 == NULL) || (l2->getType() != Label::INPUT)) // no matching label
-    {
-      // copy label
-      Label * l = new Label(net_, *this, (*l1)->getName(), Label::OUTPUT);
-      input_.insert(l);
-      allLabels_.insert(l);
-      label2label[*l1] = l;
-    }
-    // else already copied above
-  }
-  
-  // check synchronous labels
-  PNAPI_FOREACH(l1, port1.synchronous_)
-  {
-    Label * l2 = port2.findLabel((*l1)->getName());
-    if((l2 == NULL) || (l2->getType() != Label::SYNCHRONOUS)) // no matching label
-    {
-      // copy label
-      Label * l = new Label(net_, *this, (*l1)->getName(), Label::SYNCHRONOUS);
-      input_.insert(l);
-      allLabels_.insert(l);
-      label2label[*l1] = l;
-    }
-    else
-    {
-      commonLabels.insert(*l1);
-      commonLabels.insert(l2);
-    }
-  }
-  PNAPI_FOREACH(l1, port2.synchronous_)
-  {
-    Label * l2 = port1.findLabel((*l1)->getName());
-    if((l2 == NULL) || (l2->getType() != Label::SYNCHRONOUS)) // no matching label
-    {
-      // copy label
-      Label * l = new Label(net_, *this, (*l1)->getName(), Label::SYNCHRONOUS);
-      input_.insert(l);
-      allLabels_.insert(l);
-      label2label[*l1] = l;
-    }
-    // else already done
-  }
+  PNAPI_ASSERT_USER(name != "", "created a port without a name");
 }
 
 /*!
@@ -161,6 +53,26 @@ Port::~Port()
   {
     delete (*l);
   }
+}
+
+/*!
+ * \brief setting the name
+ */
+void Port::setName(const std::string & name)
+{
+  try
+  {
+    net_.getInterface().renamePort(*this, name);
+  }
+  catch(exception::Error & e)
+  {
+    if(net_.getInterface().getPort(name) != this)
+    {
+      throw e;
+    }
+  }
+  
+  name_ = name;
 }
 
 /*!
@@ -192,6 +104,13 @@ Label & Port::addLabel(Label & label)
  */
 Label & Port::addLabel(const std::string & label, Label::Type type)
 {
+  PNAPI_ASSERT_USER(net_.findNode(label) == NULL,
+                    string("net already contains a node named '") + label + "'", 
+                    exception::UserCausedError::UE_NODE_NAME_CONFLICT);
+  PNAPI_ASSERT_USER(net_.getInterface().findLabel(label) == NULL,
+                    string("net already contains a label named '") + label + "'", 
+                    exception::UserCausedError::UE_LABEL_NAME_CONFLICT);
+  
   Label * l = new Label(net_, *this, label, type);
   return addLabel(*l);
 }
@@ -243,7 +162,7 @@ void Port::removeLabel(const std::string & label)
     case Label::INPUT: input_.erase(l); break;
     case Label::OUTPUT: output_.erase(l); break;
     case Label::SYNCHRONOUS: synchronous_.erase(l); break;
-    default: assert(false);
+    default: PNAPI_ASSERT(false);
     }
     
     delete l;
@@ -267,6 +186,17 @@ void Port::mirror()
   PNAPI_FOREACH(label, output_)
   {
     (*label)->mirror();
+  }
+}
+
+/*!
+ * \brief prefix all labels
+ */
+void Port::prefixLabels(const std::string & prefix)
+{
+  PNAPI_FOREACH(label, allLabels_)
+  {
+    (*label)->prefix(prefix);
   }
 }
 
@@ -354,7 +284,6 @@ Label::Label(PetriNet & net, Port & port, const std::string & name, Type type) :
 {
 }
 
-
 /*!
  * \brief destructor
  */
@@ -377,8 +306,16 @@ void Label::mirror()
   {
   case INPUT: type_ = OUTPUT; break;
   case OUTPUT: type_ = INPUT; break;
-  default: assert(false); // should not happen
+  default: PNAPI_ASSERT(false); // should not happen
   }
+}
+
+/*!
+ * \brief prefix this label
+ */
+void Label::prefix(const std::string & prefix)
+{
+  name_ = prefix + name_;
 }
 
 /*!

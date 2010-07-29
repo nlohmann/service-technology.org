@@ -67,6 +67,10 @@ public: /* public methods */
   void dnf();
   /// forces all places not mentioned by the formula to be empty
   void allOtherPlacesEmpty(PetriNet&);
+  /// evaluates the formula partially and replaces propositions by constants
+  void evaluatePlace(const Place &);
+  /// replace place references
+  void replacePlace(const Place &, const Place &);
   //@}
   
   /*!
@@ -79,6 +83,10 @@ public: /* public methods */
   bool isSatisfied(const Marking &) const;
   /// returns a set of places, which don't have to be empty
   std::set<const Place *> concerningPlaces() const;
+  /// get valid interval of a place
+  formula::Interval getPlaceInterval(const Place &) const;
+  /// compares formula with a boolean
+  bool operator==(bool) const;
   //@}
 
 private: /* private methods */

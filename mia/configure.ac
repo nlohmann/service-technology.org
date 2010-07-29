@@ -1,4 +1,4 @@
-AC_INIT(Mia, 1.2-unreleased, mia@service-technology.org, mia, http://service-technology.org/mia)
+AC_INIT(Mia, 1.2, mia@service-technology.org, mia, http://service-technology.org/mia)
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])

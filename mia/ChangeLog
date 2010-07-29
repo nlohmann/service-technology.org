@@ -6,8 +6,8 @@
                       http://service-technology.org/mia
 
 
-Version 1.2-unreleased
-======================
+Version 1.2
+===========
 
 * canonized Makefiles
 
@@ -22,7 +22,7 @@ Version 1.2-unreleased
 
 * colored status messages
 
-* updated Petri Net API to version 4.02
+* updated the Petri Net API 4.02 (revision r5970)
 
 Version 1.1
 ===========

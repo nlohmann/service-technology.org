@@ -241,7 +241,7 @@ int main(int argc, char **argv) {
 	}
 	cout << mp.size()<<endl;*/
 	/// at least one place ///
-	if ( args_info.trap_flag ){cout << "First "  <<previousl->toString()<<endl;}
+	if ( args_info.verbose_flag ){cout << "First "  <<previousl->toString()<<endl;}
 	if ( args_info.trap_flag ){
 		cout << "trap"<<endl;
 		for (set<Transition*>::iterator tit=net.getTransitions().begin(); tit!=net.getTransitions().end(); ++tit) {
@@ -280,7 +280,7 @@ int main(int argc, char **argv) {
 				if (nit==net.findTransition((*tit)->getName())->getPreset().begin()) {
 					inprev=pinp;
 				}
-				else {
+				else if (pinp != NULL) {
 					inprev=new MConjunction(inprev,pinp);
 				}
 				
@@ -289,7 +289,7 @@ int main(int argc, char **argv) {
 			if (tit==net.getTransitions().begin()) {
 				previous=inprev;
 			}
-			else {////build  the conjunction
+			else if (inprev!= NULL) {////build  the conjunction
 				previous = new MConjunction(previous,inprev);
 				
 			}
@@ -329,7 +329,7 @@ int main(int argc, char **argv) {
 			if (nit==net.findTransition((*tit)->getName())->getPostset().begin()) {
 				inprev=pinp;
 			}
-			else {
+			else if (pinp !=NULL){
 				inprev=new MConjunction(inprev,pinp);
 			}
 			
@@ -338,15 +338,16 @@ int main(int argc, char **argv) {
 		if (tit==net.getTransitions().begin()) {
 			previous=inprev;
 		}
-		else {////build  the conjunction
+		else if (inprev!=NULL){////build  the conjunction
 			previous = new MConjunction(previous,inprev);
 			
 		}
 		
 		}
 	}
-		MConjunction *ersteit=new MConjunction(previousl, previous);
-	
+	MFormula *ersteit;
+	if(previous!=NULL)	ersteit=new MConjunction(previousl, previous);
+	else ersteit=previousl;
 	
 	//
 	if(args_info.verbose_flag) cout << "First formula " << ersteit->toString()<<endl;
@@ -428,7 +429,7 @@ int main(int argc, char **argv) {
 					if (nit==net.findTransition((*tit)->getName())->getPostset().begin()) {
 						inprev=pinp;
 					}
-					else {
+					else if (pinp!=NULL){
 						inprev=new MConjunction(inprev,pinp);
 					}
 					
@@ -437,13 +438,14 @@ int main(int argc, char **argv) {
 				if (tit==net.getTransitions().begin()) {
 					previouss=inprev;
 				}
-				else {////build  the conjunction
+				else if(inprev!=NULL){////build  the conjunction
 					previouss = new MConjunction(previouss,inprev);
 					
 				}
 				
 			}
-			MFormula *conjf=new MConjunction(ersteit,previouss);
+			MFormula *conjf;
+			if (previouss!=NULL) conjf=new MConjunction(ersteit,previouss);
 			//for all places add an implication
 			for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
 				int ppidtrap=mp[(*it)->getName()][0];int ppidsiphon=mp[(*it)->getName()][1];
@@ -586,7 +588,7 @@ int main(int argc, char **argv) {
 				if (previousc==NULL) {
 					previousc=pvs;//new MImplication(fp,pvs);
 				}
-				else {////build  the conjunction 
+				else if (pvs!=NULL){////build  the conjunction 
 					previousc = new MConjunction(previousc,pvs);//,new MImplication(fp,pvs));
 					//cout<<previousc->toString()<<endl;}
 				}
@@ -621,7 +623,7 @@ int main(int argc, char **argv) {
 			if(schwartzepit==NULL){
 				schwartzepit=ppit; //cout <<schwartzepit->toString()<<"schwartze"<<endl;
 			}
-			else {
+			else if (ppit!=NULL){
 				//cout <<schwartzepit->toString()<<"kein schwartze"<<endl;
 					schwartzepit=new MConjunction(schwartzepit,ppit);
 			}

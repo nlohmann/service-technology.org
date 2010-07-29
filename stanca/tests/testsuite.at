@@ -35,12 +35,12 @@ AT_CHECK([GREP -q "the formula is satisfiable" stdout])
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
-#AT_SETUP([Siphon-Trap Property does not hold.])
-#AT_CHECK([cp TESTFILES/assy.owfn .])
-#AT_CHECK([STANCA assy.owfn],0,stdout,stderr)
-#AT_CHECK([GREP -q "the formula is not satisfiable" stdout])
-#AT_KEYWORDS(basic)
-#AT_CLEANUP
+AT_SETUP([Siphon-Trap Property does not hold.])
+AT_CHECK([cp TESTFILES/assy.owfn .])
+AT_CHECK([STANCA assy.owfn],0,stdout,stderr)
+AT_CHECK([GREP -q "the formula is not satisfiable" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
 
 AT_SETUP([Siphon-Trap Property does not hold.])
 AT_CHECK([cp TESTFILES/hms.owfn .])
@@ -78,12 +78,12 @@ AT_KEYWORDS(basic)
 AT_CLEANUP
 
 
-#AT_SETUP([Extract a siphon.])
-#AT_CHECK([cp TESTFILES/assy.owfn .])
-#AT_CHECK([STANCA --siphon assy.owfn],0,stdout,stderr)
-#AT_CHECK([GREP -q "p0 p1 p2" stdout])
-#AT_KEYWORDS(basic)
-#AT_CLEANUP
+AT_SETUP([Extract a siphon.])
+AT_CHECK([cp TESTFILES/assy.owfn .])
+AT_CHECK([STANCA --siphon assy.owfn],0,stdout,stderr)
+AT_CHECK([GREP -q "p0" stdout && GREP -q "p1" stdout && GREP -q "p2" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
 
 AT_SETUP([No traps.])
 AT_CHECK([cp TESTFILES/assy.owfn .])
@@ -92,32 +92,39 @@ AT_CHECK([GREP -q "The net does not contain any trap" stdout])
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
-#AT_SETUP([A marked trap inside a siphon.])
-#AT_CHECK([cp TESTFILES/e2.owfn .])
-#AT_CHECK([STANCA --siphon --trap e2.owfn],0,stdout,stderr)
-#AT_CHECK([GREP -q "The net contains a siphon with a marked trap inside: p0_2 p1_1" stdout])
-#AT_KEYWORDS(basic)
-#AT_CLEANUP
+AT_SETUP([A marked trap inside a siphon.])
+AT_CHECK([cp TESTFILES/e2.owfn .])
+AT_CHECK([STANCA --siphon --trap e2.owfn],0,stdout,stderr)
+AT_CHECK([GREP -q "The net contains a siphon with a marked trap inside:" stdout])
+AT_CHECK([GREP -q "p0_2" stdout || GREP  -q "p0_1" stdout])
+AT_CHECK([GREP -q "p1_1" stdout || GREP  -q "p1_2" stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
 
 
-#AT_SETUP([Siphon with no trap inside it (using ST formula).])
-#AT_CHECK([cp TESTFILES/hms.owfn .])
-#AT_CHECK([STANCA --verbose hms.owfn ],0,stdout,stderr)
-#AT_CHECK([GREP -q "Siphon p1 p6 p3 with no trap inside it." stdout])
-#AT_KEYWORDS(basic)
-#AT_CLEANUP
+AT_SETUP([Siphon with no trap inside it (using ST formula).])
+AT_CHECK([cp TESTFILES/hms.owfn .])
+AT_CHECK([STANCA  hms.owfn ],0,stdout,stderr)
+AT_CHECK([GREP -q "p1" stdout])
+AT_CHECK([GREP -q "p6" stdout])
+AT_CHECK([GREP -q -w p3 stdout || GREP -q -w p2 stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
 
-#AT_SETUP([Siphon with no trap inside it (using ST formula).])
-#AT_CHECK([cp TESTFILES/st.owfn .])
-#AT_CHECK([STANCA --verbose st.owfn ],0,stdout,stderr)
-#AT_CHECK([GREP -q "Siphon p1 p6 p7 p5 with no trap inside it." stdout])
-#AT_KEYWORDS(basic)
-#AT_CLEANUP
+AT_SETUP([Siphon with no trap inside it (using ST formula).])
+AT_CHECK([cp TESTFILES/st.owfn .])
+AT_CHECK([STANCA  st.owfn ],0,stdout,stderr)
+AT_CHECK([GREP -q "p1" stdout && (GREP -q "p5" stdout || GREP -q "p4" stdout)  && GREP -q "p6" stdout && GREP -q "p7" stdout])
+AT_CHECK([GREP -q "no trap inside it." stdout])
+AT_KEYWORDS(basic)
+AT_CLEANUP
 
 AT_SETUP([A marked trap inside a siphon.])
 AT_CHECK([cp TESTFILES/st.owfn .])
 AT_CHECK([STANCA --siphon --trap st.owfn],0,stdout,stderr)
-AT_CHECK([GREP -q "The net contains a siphon with a marked trap inside: p2 p3" stdout])
+AT_CHECK([GREP -q "The net contains a siphon with a marked trap inside:" stdout])
+AT_CHECK([ ( GREP -q "p2" stdout && GREP -q "p3" stdout ) ||
+( GREP -q "p1" stdout && GREP -q "p4" stdout && GREP -q "p5" stdout && GREP -q "p7" stdout ) ])
 AT_KEYWORDS(basic)
 AT_CLEANUP
 

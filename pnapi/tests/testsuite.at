@@ -1512,33 +1512,57 @@ AT_CLEANUP
 AT_BANNER([Customer Tools])
 ############################################################################
 
+AT_SETUP([Cora])
+AT_CHECK_WGET
+AT_CHECK([AT_CHECK_CUSTOMER cora], 0, ignore, ignore)
+AT_KEYWORDS([customer cora])
+AT_CLEANUP
+
 AT_SETUP([Diane])
 AT_CHECK_WGET
 AT_CHECK([AT_CHECK_CUSTOMER diane], 0, ignore, ignore)
-AT_KEYWORDS([customer])
+AT_KEYWORDS([customer diane])
+AT_CLEANUP
+
+AT_SETUP([Linda])
+AT_CHECK_WGET
+AT_CHECK([AT_CHECK_CUSTOMER linda], 0, ignore, ignore)
+AT_KEYWORDS([customer linda])
 AT_CLEANUP
 
 AT_SETUP([Marlene])
 AT_CHECK_WGET
 AT_CHECK([AT_CHECK_CUSTOMER marlene], 0, ignore, ignore)
-AT_KEYWORDS([customer])
+AT_KEYWORDS([customer marlene])
 AT_CLEANUP
 
 AT_SETUP([Mia])
 AT_CHECK_WGET
 AT_CHECK([AT_CHECK_CUSTOMER mia], 0, ignore, ignore)
-AT_KEYWORDS([customer])
+AT_KEYWORDS([customer mia])
+AT_CLEANUP
+
+AT_SETUP([Sara])
+AT_CHECK_WGET
+AT_CHECK([AT_CHECK_CUSTOMER sara], 0, ignore, ignore)
+AT_KEYWORDS([customer sara])
+AT_CLEANUP
+
+AT_SETUP([Stanca])
+AT_CHECK_WGET
+AT_CHECK([AT_CHECK_CUSTOMER stanca], 0, ignore, ignore)
+AT_KEYWORDS([customer stanca])
 AT_CLEANUP
 
 AT_SETUP([Wendy])
 AT_CHECK_WGET
 AT_CHECK([AT_CHECK_CUSTOMER wendy], 0, ignore, ignore)
-AT_KEYWORDS([customer])
+AT_KEYWORDS([customer wendy])
 AT_CLEANUP
 
 AT_SETUP([Yasmina])
 AT_CHECK_WGET
 AT_CHECK([AT_CHECK_CUSTOMER yasmina], 0, ignore, ignore)
-AT_KEYWORDS([customer])
+AT_KEYWORDS([customer yasmina])
 AT_CLEANUP
 

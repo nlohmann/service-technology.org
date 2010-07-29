@@ -43,11 +43,22 @@ bool RNode::operator==(const RNode& right) const {
 	return (cnode->getMarking()==right.cnode->getMarking());
 }
 
+/** Set up the info on how to pump up the newly introduced omega places in this node.
+	@param pumppaths A vector of paths that can pump up certain sets of places.
+	@param pumpsets A vector of sets of places that can be pumped up. Sets and paths
+		belonging to each other have the same index in both parameters.
+*/ 
 void RNode::setPumpInfo(vector<deque<Transition*> >& pumppaths, vector<set<Place*> >& pumpsets) {
 	paths = pumppaths;
 	places = pumpsets;
 }
 
+/** Get the info on how to pump up the omega places introduced in this node.
+	@param pumppaths Return value: A vector of paths that can pump up certain sets of places.
+		Upon calling the vector may be empty.
+	@param pumpsets Return value: A vector of sets of places that can be pumped up. Sets and paths
+		belonging to each other have the same index in both parameters. Should be empty upon calling.
+*/ 
 void RNode::getPumpInfo(vector<deque<Transition*> >& pumppaths, vector<set<Place*> >& pumpsets) const {
 	pumppaths.clear();
 	pumppaths = paths;

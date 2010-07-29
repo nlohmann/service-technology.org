@@ -34,11 +34,16 @@ option "sequence" s
   optional
 
 option "marking" m
-  "Define a marking that should be reached. Do not use with -s."
+  "Define a marking that should be reached. Do not use with -s/-c."
   typestr="string"
   string
   optional
 
+option "cover" c
+  "Define a marking that should be covered. Do not use with -s/-m."
+  typestr="string"
+  string
+  optional
 
 section "Output"
 sectiondesc="Output goes to stdout/stderr by default."

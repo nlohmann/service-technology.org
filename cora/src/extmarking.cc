@@ -101,6 +101,15 @@ bool ExtMarking::setUnlimited(Place* p) {
 	return true;
 }
 
+/** Removes the upper bound for the number of tokens on a set of places.
+	@return If this worked.
+*/
+void ExtMarking::setUnlimited(set<Place*> pset) {
+	set<Place*>::iterator pit;
+	for(pit=pset.begin(); pit!=pset.end(); ++pit)
+		setUnlimited(*pit);
+}
+
 /** Sets the token number on a place to an interval.
 	@param p The place.
 	@param low The lower bound of the interval.
@@ -505,6 +514,17 @@ bool ExtMarking::isOmega(Place& p) {
 bool ExtMarking::isOpen(Place& p) {
 	if (type.find(&p)==type.end()) return false;
 	return type[&p];
+}
+
+/** Get all places having an open interval.
+	@return The set of places that can have an unlimited number of tokens.
+*/
+set<Place*> ExtMarking::getOpenPlaces() {
+	set<Place*> result;
+	map<Place*,bool>::iterator tpit;
+	for(tpit=type.begin(); tpit!=type.end(); ++tpit)
+		if (tpit->second) result.insert(tpit->first);
+	return result;
 }
 
 /** Check whether a given marking is contained in this extmarking. If not, find a place

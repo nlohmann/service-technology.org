@@ -411,7 +411,7 @@ bool CoverGraph::splitPath(deque<Transition*>& path) {
 	if (i==path.size()) // next we need to check whether a final marking was reached
 	{ // all transitions on the path were firable, so we reached the goal node, but did we also reach the goal marking?
 		if (!sb) return true; // if we have no final marking (just a node), we are done
-		p = m.distinguish(sb->getGoal(),false); // check if reached and goal marking are identical
+		p = m.distinguish(sb->getGoal(),args_info.cover_given); // check if reached and goal marking are identical
 		if (!p) return true; // if the path was fully firable and the goal is reached, no split is necessary
 		token = sb->getGoal()[*p]; // we cut the node below the goal token number ...
 		if (!m.lessThanOn(sb->getGoal(),*p)) ++token; // unless the reached marking is higher, then cut above it
@@ -490,4 +490,110 @@ void CoverGraph::pushToDo(CNode* cn) {
 		NULL to disable the stubborn set methods.
 */
 void CoverGraph::useStubbornSetMethod(StubbornSet* stubset) { sb=stubset; }
+
+/** Pump up a path in the (root) coverability graph so it becomes firable.
+	@param m0 The initial marking of the Petri net.
+	@param path The path in the coverability graph.
+	@param mf The marking that the path should cover at the end.
+	@return A modified (pumped up) path that is firable and leads from m0 to some marking
+		covering mf.
+*/
+deque<Transition*> CoverGraph::pumpPath(Marking m0, deque<Transition*> path, Marking mf) {
+	CNode* act(init); // initial node
+	deque<CNode*> cpath; // a path of nodes to the goal
+	cpath.push_back(act); // beginning at the initial node
+	for(unsigned int i=0; i<path.size(); ++i)
+	{
+		act = act->getSuccessor(*(path[i])); // next node on the path
+		cpath.push_back(act); // remember the node
+	}
+	map<Place*,int> marking,cover; // declare markings (with ints) for the omega places
+	set<Place*> op(act->getMarking().getOpenPlaces()); // get the omega places
+	set<Place*>::iterator opit;
+	for(opit=op.begin(); opit!=op.end(); ++opit) // calc the necessary tokens for the path
+		marking[*opit] = (int)(m0[**opit])-(int)(mf[**opit]); // just difference between initial node and goal at first
+	for(unsigned int i=0; i<path.size(); ++i) // then go through all transitions of the path
+	{
+		map<Place*,int>& change(imat.getColumn(*(path[i]))); // the token effect of firing the edge
+		for(opit=op.begin(); opit!=op.end(); ++opit)
+			if (change.find(*opit)!=change.end())
+				marking[*opit] += change[*opit]; // add the token change at that node, even if it goes below zero
+	}
+	for(opit=op.begin(); opit!=op.end(); ++opit)
+		cover[*opit] = marking[*opit]; 
+	// cover is the maximal token need for pumpable places at the active node or after it
+	// marking is the difference of the active node to the goal
+
+	deque<Transition*> result; // container for the resulting firing sequence
+	while (!path.empty()) // we now move backwards through the path, i.e. from future to past, until before the initial node
+	{
+		act = cpath.back(); // begin with the last node
+		RNode r(*act); 
+		r = *(nodes.find(r)); // get the container node having the pump info
+		vector<deque<Transition*> > pumppaths;
+		vector<set<Place*> > pumpsets;
+		r.getPumpInfo(pumppaths,pumpsets); // get the pump info for the active node
+		if (pumpsets.size()>0) { // there is actual pump info, so we pump ...
+			for(unsigned int i=pumpsets.size(); i>0; --i) // the last set must be pumped first
+			{
+				set<Place*>::iterator ppit;
+				for(ppit=pumpsets[i-1].begin(); ppit!=pumpsets[i-1].end(); ++ppit) // check all pumpable places
+					if (op.find(*ppit)!=op.end()) // if this place has not been pumped yet
+					{
+						while (cover[*ppit]<0) // and we need extra tokens on this place
+						{
+							for(unsigned int j=0; j<pumppaths[i-1].size(); ++j)
+							{ // change marking and cover according to the extra transitions in the pump path
+								map<Place*,int>& change(imat.getColumn(*(pumppaths[i-1][j]))); // the token effect of firing one transition
+								for(opit=op.begin(); opit!=op.end(); ++opit) // only for the remaining omega places
+									if (change.find(*opit)!=change.end()) // and if there is a change
+									{
+										marking[*opit] += change[*opit]; // add the token change
+										cover[*opit] += change[*opit]; // add the token change
+									}
+							}
+							for(unsigned int j=pumppaths[i-1].size(); j>0; --j) // now transfer the pumping sequence into the future
+							{
+								Transition* t(pumppaths[i-1][j-1]); // the last transition first
+								for(opit=op.begin(); opit!=op.end(); ++opit) // reverse the transition's effects
+									if (pumpsets[i-1].find(*opit)==pumpsets[i-1].end()) // on all places but those in the pumpset
+									{ // which are reverted from omega to a natural number at this point
+										int loop(imat.getLoops(*t,**opit));
+										int val(imat.getEntry(*t,**opit));
+										int mop(marking[*opit]);	
+										if (val>0) mop -= val+loop; else mop -= loop; // unfire postset of t
+//										if (mop<cover[*opit]) cover[*opit]=mop; // check if the token need increases
+										if (val>0) mop += loop; else mop += loop-val; // unfire preset of t			
+										if (mop<cover[*opit]) cover[*opit]=mop; // check if the token need increases
+										marking[*opit] = mop; // remember the actual token need
+										if (val>0 && val+loop+cover[*opit]>0) cover[*opit]=-val-loop; // check if loops increase the token need
+										else if (val<=0 && loop+cover[*opit]>0) cover[*opit]=-loop;
+									}
+								result.push_front(t); // the present transition is now prepended to the future
+							}
+						}
+						op.erase(*ppit); // this place has been pumped enough (forever!)
+					}
+			}
+		}
+		cpath.pop_back(); // we are done with this node, so turn to
+		Transition* t(path.back()); // the transition leading to that node
+		for(opit=op.begin(); opit!=op.end(); ++opit) // and reverse its effects
+		{
+			int loop(imat.getLoops(*t,**opit));
+			int val(imat.getEntry(*t,**opit));
+			int mop(marking[*opit]);
+			if (val>0) mop -= val+loop; else mop -= loop; // unfire postset of t
+//			if (mop<cover[*opit]) cover[*opit]=mop; // check if the token need increases
+			if (val>0) mop += loop; else mop += loop-val; // unfire preset of t			
+			if (mop<cover[*opit]) cover[*opit]=mop; // check if the token need increases
+			marking[*opit] = mop; // remember the actual token need
+			if (val>0 && val+loop+cover[*opit]>0) cover[*opit]=-val-loop; // check if loops require extra tokens
+			else if (val<=0 && loop+cover[*opit]>0) cover[*opit]=-loop;
+		}
+		result.push_front(t); // the present transition is now moved to the future
+		path.pop_back(); // and removed from the past
+	}
+	return result;	
+}
 

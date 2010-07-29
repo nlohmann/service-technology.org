@@ -366,7 +366,7 @@ For any given problem Cora may tell the user (via stderr) that the place or
 transition ordering of the Petri net is nondeterministic. This is nothing to
 worry about, Cora just tries to order the places and transition in a nice way,
 using only the structure of the net (and not the names of the places and transitions).
-With nondeterminism in the net you might get slightly differently solutions
+With nondeterminism in the net you might get slightly different solutions
 if you call Cora more than once with the same arguments.
 
 @section Finding a firable sequence to a given node
@@ -424,6 +424,30 @@ the name of the place followed by a colon and the number. In any term @samp{p:1}
 the colon followed by the number one may be omitted. Different places are separated
 by commas, semicolons, or blanks, but again beware of the shell's interpretation of
 blanks and use shell's escape mechanism, e.g. quotation marks.
+
+@section Testing if a marking is coverable
+
+To test if a marking can be covered is much easier than trying for reachability.
+We just have to find a node covering, i.e. containing, the given marking.
+Finding a firing sequence that leads to such a marking is not that trivial as
+any path from initial node to goal node may be not firable. This happens when an
+edge leading from a node with less omegas to one with more omegas lies on the path.
+At such a point the firing sequence has to be pumped up with another sequence
+that increases the token count on the newly introduced omega places to a level
+such that the remaining path beyond this point becomes firable. Cora will calculate
+such a firing sequence for coverability if the option @option{-m} for reachability
+is replaced by @option{-c}. An example call looks like this:
+
+@cartouche
+@smallexample
+cora -i test.owfn -c p1:3,p2:3
+@end smallexample
+@end cartouche
+
+The output produced looks very much like that for testing reachability, though
+even if the marking is reached exactly the firing sequence may differ. This is
+due to the totally different approach at making a path firable, i.e. pumping up
+the sequence instead of splitting away unwanted portions of nodes.
 
 @c --------------------------------------------------------------------------
 

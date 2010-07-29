@@ -98,6 +98,9 @@ public:
 	/// Switch stubborn set method on/off
 	void useStubbornSetMethod(StubbornSet* stubset);
 
+	/// Pump up a covering path so it becomes firable
+	deque<Transition*> pumpPath(Marking m0, deque<Transition*> path, Marking mf);
+
 private:
 	/// The Petri net of this coverability graph
 	PetriNet& net;

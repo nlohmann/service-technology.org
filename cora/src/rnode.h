@@ -44,12 +44,17 @@ public:
 	/// Equality of nodes
 	bool operator==(const RNode& right) const;
 
+	/// Set info on how to pump omegas
 	void setPumpInfo(vector<deque<Transition*> >& pumppaths, vector<set<Place*> >& pumpsets);
 
+	/// Get info on how to pump omegas
 	void getPumpInfo(vector<deque<Transition*> >& pumppaths, vector<set<Place*> >& pumpsets) const;
 
 private:
+	/// Paths needed for pumping unlimited places
 	vector<deque<Transition*> > paths;
+
+	/// Sets of places that can be pumped at this node
 	vector<set<Place*> > places;
 };
 

@@ -68,6 +68,9 @@ public:
 	/// Remove the upper bound of a token number on a place
 	bool setUnlimited(Place* p);
 
+	/// Remove the upper bound of a token number on a set of places
+	void setUnlimited(set<Place*> pset);
+
 	/// Set the token number on a place to an interval.
 	bool setInterval(Place* p, int low, int high);
 
@@ -130,6 +133,9 @@ public:
 
 	/// Check if the number of tokens on a place is set to an open interval
 	bool isOpen(Place& p);
+
+	/// Check if the number of tokens on a place is set to an open interval
+	set<Place*> getOpenPlaces();
 
 	/// find a place where the marking m does not conform with this extmarking
 	Place* distinguish(Marking& m, bool cover);

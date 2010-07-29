@@ -128,9 +128,9 @@ if (args_info.input_given || args_info.pipe_given) {
 	Marking m1(pnl.getInitialMarking()); // get the initial marking
 	IMatrix im(*pn); // and incidence matrix of the net
 
-	if (args_info.marking_given) // if a final marking has been given
+	if (args_info.marking_given || args_info.cover_given) // if a final marking has been given
 	{
-		char* seq(args_info.marking_arg); // get the string containing it
+		char* seq((args_info.marking_given ? args_info.marking_arg : args_info.cover_arg)); // get the string containing it
 		vector<char*> subargs; // and split it, one string for each place
 		char* tok = strtok(seq," ,;.");
 		while (tok!=NULL) { subargs.push_back(tok); tok = strtok(NULL," ,;."); }
@@ -148,8 +148,9 @@ if (args_info.input_given || args_info.pipe_given) {
 
 	Marking tmp(pnl.getFinalMarking()); // now get the final marking altogether
 	ExtMarking tmp2(tmp); // and extend it
-	StubbornSet stubset(pnl.getTOrder(),tmp,im,false); // obtain the stubborn set methods for reachability
-	CoverGraph cg(*pn,im,m1,(args_info.marking_given?&stubset:NULL)); // create the coverability graph with one (initial) node
+	if (args_info.cover_given) tmp2.setUnlimited(pn->getPlaces()); // make all places unlimited for coverability problems
+	StubbornSet stubset(pnl.getTOrder(),tmp,im,args_info.cover_given); // obtain the stubborn set methods for reachability
+	CoverGraph cg(*pn,im,m1,((args_info.marking_given||args_info.cover_given)?&stubset:NULL)); // create the coverability graph with one (initial) node
 	CNode* c(cg.getInitial()); // get the initial node
 	CNode* aim(c);
 
@@ -178,7 +179,7 @@ if (args_info.input_given || args_info.pipe_given) {
 	bool done(false); // if we are done, i.e. the path is firable
 	int loops = 0; // just for counting
 	while (!done) {
-		if (args_info.marking_given) path = cg.findPath(tmp2); // find a shortest path to our final marking
+		if (args_info.marking_given || args_info.cover_given) path = cg.findPath(tmp2); // find a shortest path to our final marking
 		else path = cg.findPath(*aim); // or find a shortest path to our goal node
 		if (args_info.debug_given) { // print the graph as it looks now
 			cout << "Graph Structure ";
@@ -201,11 +202,13 @@ if (args_info.input_given || args_info.pipe_given) {
 			if (args_info.debug_given) cout << "ADDING NEW SUCCESSORS" << endl;
 			if (!cg.completeOneNode()) break; // stop if there is no new node, we have failed to find a solution
 		}
+		else if (args_info.cover_given) done=true; // if we just want to cover, we already found our basic path, so we quit here
 		else done = cg.splitPath(path); // there is a path, so split the nodes along the chosen path
 		// either the path becomes/is firable or it is destructed and cannot be found again
 		++loops;
 	}
-	if (args_info.verbose_given) { // print the final coverability graph including the node splitting
+	if (args_info.cover_given) path = cg.pumpPath(m1,path,tmp); // pump up the path so it becomes firable
+	if (args_info.verbose_given && !args_info.cover_given) { // print the final coverability graph including the node splitting
 		cout << "Partial Coverability Graph with Split Nodes:" << endl;
 		cg.printGraph(pord,false);
 		cout << "Initial Node: ";
@@ -246,9 +249,13 @@ if (args_info.input_given || args_info.pipe_given) {
 	else cout << "NO SOLUTION" << endl; // no solution was found
 	if (args_info.verbose_given) // with -v print the number of tries (paths) we searched
 	{
-		cout << loops << " paths to the ";
-		if (args_info.marking_given) { cout << "marking "; tmp2.show(cout,pord); }
-		else { cout << "node "; aim->getMarking().show(cout,pord); }
+		cout << loops << " paths to ";
+		if (args_info.marking_given || args_info.cover_given) 
+		{ 
+			cout << (args_info.cover_given?"a ":"the ") << "marking " << (args_info.cover_given?"in ":""); 
+			tmp2.show(cout,pord); 
+		}
+		else { cout << "the node "; aim->getMarking().show(cout,pord); }
 		cout << " were investigated." << endl;
 	}
 	clock_t endtime = clock();

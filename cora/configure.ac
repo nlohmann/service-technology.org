@@ -1,4 +1,4 @@
-AC_INIT(Cora, 0.2, cora@service-technology.org, cora, http://service-technology.org/cora)
+AC_INIT(Cora, 0.3, cora@service-technology.org, cora, http://service-technology.org/cora)
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])

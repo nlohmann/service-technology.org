@@ -33,7 +33,7 @@
 
 #include "diagnosis.h"
 
-Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned int messageBound) : dgraph(new DGraph), mi(pmi), superfluous(false)
+Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned int) : dgraph(new DGraph), mi(pmi), superfluous(false) //  messageBound
 {
 
     libconfig::Config diagInfo;

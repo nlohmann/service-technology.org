@@ -454,7 +454,7 @@ const pnapi::PetriNet * Adapter::buildController()
         
         status("Port work-around: adding all labels to port `controller'.");
 
-        pnapi::Port & controllerport = _controller->createPort("controller");
+        _controller->createPort("controller");
         // CG Workaround
         while(_controller->getInterface().getPorts().size() > 1)
         {
@@ -465,37 +465,7 @@ const pnapi::PetriNet * Adapter::buildController()
 
             _controller->getInterface().mergePorts(*port1, *port2, "controller");
         }
-
-        /*
-        pnapi::Port & oldport = *(_controller->getInterface().getPort());
-        const std::set<Label *> netIf = oldport.getAllLabels();
-        std::set<std::pair<std::string, pnapi::Label::Type> > labelNames;
-        for (std::set<Label *>::const_iterator label = netIf.begin(); label
-                != netIf.end(); ++label)
-        {
-            labelNames.insert(make_pair((*label)->getName(),(*label)->getType()));
-        }
-        for (std::set<std::pair<std::string, pnapi::Label::Type> >::const_iterator label = labelNames.begin(); label
-                != labelNames.end(); ++label)
-        {
-            pnapi::Label::Type labeltype = label->second;
-            const std::string labelname (label->first);
-            {
-                oldport.removeLabel(labelname);
-                // CG Workaround:
-                pnapi::Label & labelcopy = controllerport.addLabel(labelname,
-                                           labeltype);
-                const std::set<Transition *> & transen =
-                    (*label)->getTransitions();
-                for (std::set<Transition *>::const_iterator trans =
-                            transen.begin(); trans != transen.end(); ++trans)
-                {
-                    (*trans)->addLabel(labelcopy);
-                }
-            }
-        }
-        */
-        
+       
     }
 
     time(&end_time);
@@ -532,7 +502,7 @@ void Adapter::createEngineInterface()
         pnapi::Port & netport = _engine->createPort(portname);
 
         // CG Workaround
-        pnapi::Port & partnerport = _nets[netindex]->createPort(portname);
+        _nets[netindex]->createPort(portname);
         while(_nets[netindex]->getInterface().getPorts().size() > 1)
         {
             std::map< std::string, Port * >::const_iterator p = _nets[netindex]->getInterface().getPorts().begin();
@@ -631,19 +601,6 @@ void Adapter::createEngineInterface()
         {
             const std::string labelname ((*iter)->getName());
             netport.addSynchronousLabel(labelname);
-
-            // CG Workaround:
-            /*
-            pnapi::Label & labelcopy = partnerport.addLabel(labelname,
-                                       pnapi::Label::SYNCHRONOUS);
-            const std::set<Transition *> & transen = (*iter)->getTransitions();
-            for (std::set<Transition *>::const_iterator trans = transen.begin(); trans
-                    != transen.end(); ++trans)
-            {
-                (*trans)->addLabel(labelcopy);
-            }
-            oldport.removeLabel(labelname);
-            */
         }
 
     }

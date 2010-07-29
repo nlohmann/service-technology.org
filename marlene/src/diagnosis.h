@@ -102,7 +102,7 @@ class DNode {
     public:
         DNode(Initializer & init);
 
-        unsigned int getID() { return id; }
+        unsigned int getID() const { return id; }
 
         std::vector< std::pair< unsigned int, unsigned int > > successors;
         std::vector< unsigned int > deadlockMarkings;

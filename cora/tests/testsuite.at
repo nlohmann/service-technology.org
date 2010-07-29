@@ -43,6 +43,32 @@ AT_KEYWORDS(marking)
 AT_CLEANUP
 
 ############################################################################
+AT_BANNER([Finding a covering path])
+############################################################################
+
+AT_SETUP([Coverability 1])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([CORA -i test.owfn -c"p1:3,p2:3"],0,stdout,stderr)
+AT_CHECK([GREP -q "SOLUTION(26)" stdout])
+AT_KEYWORDS(marking)
+AT_CLEANUP
+
+AT_SETUP([Coverability 2])
+AT_CHECK([cp TESTFILES/test2.owfn .])
+AT_CHECK([CORA -i test2.owfn -c"s4:2"],0,stdout,stderr)
+AT_CHECK([GREP -q "SOLUTION(6): t5 t1 t2 t. t. t3" stdout])
+AT_KEYWORDS(marking)
+AT_CLEANUP
+
+AT_SETUP([Noncoverability])
+AT_SKIP_IF(true)
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([CORA -i test.owfn -c"s:2"],0,stdout,stderr)
+AT_CHECK([GREP -q "NO SOLUTION" stdout])
+AT_KEYWORDS(marking)
+AT_CLEANUP
+
+############################################################################
 AT_BANNER([Finding a firable sequence])
 ############################################################################
 

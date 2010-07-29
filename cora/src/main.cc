@@ -238,7 +238,7 @@ if (args_info.input_given || args_info.pipe_given) {
 	}
 
 	if (done) { // a solution was found, so we print it
-		if (args_info.marking_given || args_info.sequence_given || args_info.verbose_given)
+		if (args_info.marking_given || args_info.cover_given || args_info.sequence_given || args_info.verbose_given)
 		{
 			cout << "SOLUTION(" << path.size() << "): ";
 			for(unsigned int x=0; x<path.size(); ++x)

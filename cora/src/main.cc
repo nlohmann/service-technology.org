@@ -207,7 +207,7 @@ if (args_info.input_given || args_info.pipe_given) {
 		// either the path becomes/is firable or it is destructed and cannot be found again
 		++loops;
 	}
-	if (args_info.cover_given) path = cg.pumpPath(m1,path,tmp); // pump up the path so it becomes firable
+	if (done && args_info.cover_given) path = cg.pumpPath(m1,path,tmp); // pump up the path so it becomes firable
 	if (args_info.verbose_given && !args_info.cover_given) { // print the final coverability graph including the node splitting
 		cout << "Partial Coverability Graph with Split Nodes:" << endl;
 		cg.printGraph(pord,false);

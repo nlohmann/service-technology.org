@@ -61,7 +61,6 @@ AT_KEYWORDS(marking)
 AT_CLEANUP
 
 AT_SETUP([Noncoverability])
-AT_SKIP_IF(true)
 AT_CHECK([cp TESTFILES/test.owfn .])
 AT_CHECK([CORA -i test.owfn -c"s:2"],0,stdout,stderr)
 AT_CHECK([GREP -q "NO SOLUTION" stdout])
@@ -138,6 +137,15 @@ AT_CLEANUP
 AT_SETUP([Wrong Options])
 AT_CHECK([CORA --whatisthis],1,stdout,stderr)
 AT_CHECK([GREP -q "unrecognized option" stderr])
+AT_KEYWORDS(options)
+AT_CLEANUP
+
+AT_SETUP([Debug Info])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([CORA -i test.owfn -c"p1:3,p2:3" -d],0,stdout,stderr)
+AT_CHECK([GREP -q "Path to Aim: NULL" stdout])
+AT_CHECK([GREP -q "ADDING NEW SUCCESSORS" stdout])
+AT_CHECK([GREP -q "Path to Aim: t" stdout])
 AT_KEYWORDS(options)
 AT_CLEANUP
 

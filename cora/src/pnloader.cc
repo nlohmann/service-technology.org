@@ -9,9 +9,9 @@
  *
  * \since   2009/10/21
  *
- * \date    $Date: 2009-10-21 12:00:00 +0200 (Mi, 21. Okt 2009) $
+ * \date    $Date: 2010-07-30 12:00:00 +0200 (Fr, 30. Jul 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 0.3 $
  */
 
 #include <cstdio>
@@ -169,7 +169,7 @@ Marking PNLoader::getFinalMarking() {
 
 /** Get the modes of all places for the final marking of a problem.
 	@return A map from places to modes (EQ,GE,LE).
-*/
+
 map<Place*,int> PNLoader::getCoverRequirement() {
 	if (pn==NULL) getPetriNet();
 	map<Place*,int> result;
@@ -189,10 +189,11 @@ map<Place*,int> PNLoader::getCoverRequirement() {
 	}
 	return result;
 }
+*/
 
 /** Get the transition vector to realize for this problem.
 	@return The vector.
-*/
+
 map<Transition*,int> PNLoader::getVectorToRealize() {
 	if (pn==NULL) getPetriNet();
 	map<Transition*,int> result;
@@ -204,6 +205,7 @@ map<Transition*,int> PNLoader::getVectorToRealize() {
 	}
 	return result;
 }
+*/
 
 /** Get the Petri net of a problem and calculate the global ordering of transitions and places.
 	@return The Petri net.
@@ -404,19 +406,20 @@ bool PNLoader::calcPTOrder() {
 	@param lhs The weighted sum of places and transitions, mapped by place/transition names.
 	@param comp The comparison operator as in lp_solve: GE, EQ, or LE.
 	@param rhs The right hand side of the comparison.
-*/
+
 void PNLoader::addConstraint(map<string,int> lhs, int comp, int rhs) {
 	clhs.push_back(lhs);
 	ccomp.push_back(comp);
 	crhs.push_back(rhs);
 }
+*/
 
 /** Get an external constraint. The constraint is translated into an (in)equation over transitions.
 	@param pos The number of the constraint.
 	@param lhs The left hand side of the constraint for use with lp_solve.
 	@param comp The comparator of the constraint for use with lp_solve.
 	@param rhs The right hand side of the constraint for use with lp_solve.
-*/
+
 void PNLoader::getConstraint(unsigned int pos, map<Transition*,int>& lhs, int& comp, int& rhs) {
 	if (pn==NULL) getPetriNet();
 	lhs.clear();
@@ -451,22 +454,25 @@ void PNLoader::getConstraint(unsigned int pos, map<Transition*,int>& lhs, int& c
 	}
 	return;
 }
+*/
 
 /** Get the overall number of constraints available.
 	@return The number of constraints.
-*/
+
 unsigned int PNLoader::getNumberOfConstraints() {
 	return clhs.size();
 }
+*/
 
-/** Print the transition vector to be realized. */
+/** Print the transition vector to be realized. 
 void PNLoader::showTVector() {
 	for(unsigned int i=0; i<transitionorder.size(); ++i)
 		if (required.find(transitionorder[i]->getName())!=required.end())
 			cout << transitionorder[i]->getName() << ":" << required[transitionorder[i]->getName()] << " ";
 }
+*/
 
-/** Print the initial marking. */
+/** Print the initial marking. 
 void PNLoader::showInitial() {
 	for(unsigned int i=0; i<placeorder.size(); ++i)
 		if (initial.find(placeorder[i]->getName())!=initial.end())
@@ -477,8 +483,9 @@ void PNLoader::showInitial() {
 			cout << " ";
 		}
 }
+*/
 
-/** Print the final marking. */
+/** Print the final marking. 
 void PNLoader::showFinal() {
 	for(unsigned int i=0; i<placeorder.size(); ++i)
 		if (required.find(placeorder[i]->getName())!=required.end())
@@ -500,8 +507,9 @@ void PNLoader::showFinal() {
 		}
 	if (generalcover) cout << endl << "sara: - Unmentioned places may have any number of tokens in the final marking";
 }
+*/
 
-/** Print the global constraints. */
+/** Print the global constraints. 
 void PNLoader::showConstraints() {
 	for(unsigned int i=0; i<clhs.size(); ++i)
 	{
@@ -522,6 +530,7 @@ void PNLoader::showConstraints() {
 		cout << rhs << " ";
 	}
 }
+*/
 
 const vector<Transition*>& PNLoader::getTOrder() { return transitionorder; }
 

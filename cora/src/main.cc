@@ -15,6 +15,7 @@
 #ifndef PNAPI_PNAPI_H
 #include "pnapi/pnapi.h"
 #endif
+#include "cora.h"
 #include "pnloader.h"
 #include "imatrix.h"
 #include "cmdline.h"
@@ -127,6 +128,8 @@ if (args_info.input_given || args_info.pipe_given) {
 	po = pord;
 	Marking m1(pnl.getInitialMarking()); // get the initial marking
 	IMatrix im(*pn); // and incidence matrix of the net
+	Cora cora(*pn,m1,pnl.getPOrder(),pnl.getTOrder()); // obtain a solver unit
+	cora.setDebug(args_info.debug_given); // set the debug mode
 
 	if (args_info.marking_given || args_info.cover_given) // if a final marking has been given
 	{
@@ -147,13 +150,7 @@ if (args_info.input_given || args_info.pipe_given) {
 	}
 
 	Marking tmp(pnl.getFinalMarking()); // now get the final marking altogether
-	ExtMarking tmp2(tmp); // and extend it
-	if (args_info.cover_given) tmp2.setUnlimited(pn->getPlaces()); // make all places unlimited for coverability problems
-	StubbornSet stubset(pnl.getTOrder(),tmp,im,args_info.cover_given); // obtain the stubborn set methods for reachability
-	CoverGraph cg(*pn,im,m1,((args_info.marking_given||args_info.cover_given)?&stubset:NULL)); // create the coverability graph with one (initial) node
-	CNode* c(cg.getInitial()); // get the initial node
-	CNode* aim(c);
-
+	deque<Transition*> path; // for storing a path in the coverability graph
 	if (args_info.sequence_given) // if a sequence leading to a node (instead of a final marking) is given
 	{
 		char* seq(args_info.sequence_arg); // get the sequence of interest in the coverability graph
@@ -165,79 +162,27 @@ if (args_info.input_given || args_info.pipe_given) {
 			tvec.push_back(t);
 			tok = strtok(NULL," :,;");
 		}
-		if (!cg.createPath(tvec)) { // create the path formed by the given sequence in the coverability graph
-			cout << "UNSOLVABLE: The given path does not exist in the coverability graph." << endl; 
-			exit(EXIT_SUCCESS); 
-		}
-	
-		// Since the path exists, we can now obtain the last node on this path, which is our aim
-		for(unsigned int i=0; i<tvec.size(); ++i)
-			aim = aim->getSuccessor(*(tvec[i]));
+		path = cora.findPath(tvec); // and finally look for a firable path to the same node, uses node splitting
 	}
+	else if (args_info.marking_given) path = cora.findReach(tmp); // try to reach a marking, uses node splitting
+	else if (args_info.cover_given) path = cora.findCover(tmp); // try to cover a marking, uses path pumping
 
-	deque<Transition*> path; // for storing a path in the coverability graph
-	bool done(false); // if we are done, i.e. the path is firable
-	int loops = 0; // just for counting
-	while (!done) {
-		if (args_info.marking_given || args_info.cover_given) path = cg.findPath(tmp2); // find a shortest path to our final marking
-		else path = cg.findPath(*aim); // or find a shortest path to our goal node
-		if (args_info.debug_given) { // print the graph as it looks now
-			cout << "Graph Structure ";
-			if (loops==0) cout << "BEFORE "; else cout << "AFTER ";
-			cout << "split:" << endl;
-			cg.printGraph(pord,false);
-			cout << endl;
-			cout << "Path to Aim: "; // print the path chosen
-			for(unsigned int i=0; i<path.size(); ++i)
-				if (path[i]) cout << path[i]->getName() << " "; else cout << "NULL ";
-			cout << endl;
-		}
-//cout << "Path to Aim: "; // print the path chosen
-//for(unsigned int i=0; i<path.size(); ++i)
-//	if (path[i]) cout << path[i]->getName() << " "; else cout << "NULL ";
-//cout << endl;
-		if (path.size()==0) done = cg.splitPath(path); // just check for the final marking if it is within the initial node
-		else if (path.at(0)==NULL) // no path was found, we need to add new nodes/edges
-		{
-			if (args_info.debug_given) cout << "ADDING NEW SUCCESSORS" << endl;
-			if (!cg.completeOneNode()) break; // stop if there is no new node, we have failed to find a solution
-		}
-		else if (args_info.cover_given) done=true; // if we just want to cover, we already found our basic path, so we quit here
-		else done = cg.splitPath(path); // there is a path, so split the nodes along the chosen path
-		// either the path becomes/is firable or it is destructed and cannot be found again
-		++loops;
-	}
-	if (done && args_info.cover_given) path = cg.pumpPath(m1,path,tmp); // pump up the path so it becomes firable
-	if (args_info.verbose_given && !args_info.cover_given) { // print the final coverability graph including the node splitting
+	if (args_info.verbose_given && !args_info.cover_given) 
+	{ // print the final coverability graph including the node splitting
 		cout << "Partial Coverability Graph with Split Nodes:" << endl;
-		cg.printGraph(pord,false);
-		cout << "Initial Node: ";
-		c->getMarking().show(cout,pord);
-		cout << endl;
+		cora.printGraph(false);
 	}
-	if (args_info.verbose_given || args_info.fullgraph_given) { // print the coverability graph without the node splitting
+	if (args_info.verbose_given || args_info.fullgraph_given) 
+	{ // print the coverability graph without the node splitting
 		cout << endl << "Original "; // now print the "normal" coverability graph
 		if (!args_info.fullgraph_given) cout << "Partial "; // but only those portions we have built
 		cout << "Coverability Graph:" << endl;
-		if (args_info.fullgraph_given) // if the user wants the full graph, we first have to complete it
-		{
-			cg.useStubbornSetMethod(NULL); // we need all successors everywhere
-			set<RNode>& allnodes(cg.getAllNodes());
-			set<RNode>::iterator rit;
-			for(rit=allnodes.begin(); rit!=allnodes.end(); ++rit)
-			{
-				cg.pushToDo((*rit).cnode); // put out an order to revisit all nodes
-				(*rit).cnode->computeFirables(*pn,im); // and all edges from there
-			}
-			cg.completeGraph(); // now complete the graph
-		}
-		cg.printGraph(pord,true);
-		cout << "Initial Node: ";
-		c->getMarking().show(cout,pord);
-		cout << endl << endl;
+		if (args_info.fullgraph_given) cora.buildFullGraph(); // if the user wants the full graph, we first have to complete it
+		cora.printGraph(true);
+		cout << endl;
 	}
 
-	if (done) { // a solution was found, so we print it
+	if (path.empty() || path.at(0)!=NULL) { // a solution was found, so print it
 		if (args_info.marking_given || args_info.cover_given || args_info.sequence_given || args_info.verbose_given)
 		{
 			cout << "SOLUTION(" << path.size() << "): ";
@@ -246,18 +191,16 @@ if (args_info.input_given || args_info.pipe_given) {
 			cout << endl;
 		}
 	}
+	else if (path.size()>1) cout << "UNSOLVABLE: The given path does not exists in the coverability graph." << endl;
 	else cout << "NO SOLUTION" << endl; // no solution was found
+
 	if (args_info.verbose_given) // with -v print the number of tries (paths) we searched
 	{
-		cout << loops << " paths to ";
-		if (args_info.marking_given || args_info.cover_given) 
-		{ 
-			cout << (args_info.cover_given?"a ":"the ") << "marking " << (args_info.cover_given?"in ":""); 
-			tmp2.show(cout,pord); 
-		}
-		else { cout << "the node "; aim->getMarking().show(cout,pord); }
-		cout << " were investigated." << endl;
+		if (args_info.marking_given) cora.printStatus(Cora::REACH);
+		else if (args_info.cover_given) cora.printStatus(Cora::COVER);
+		else if (args_info.sequence_given) cora.printStatus(Cora::PATH);
 	}
+
 	clock_t endtime = clock();
 	if (args_info.time_given) // print time use if --time was specified
 		cout << "cora: Used " << (float)(endtime-starttime)/CLOCKS_PER_SEC << " seconds overall." << endl;

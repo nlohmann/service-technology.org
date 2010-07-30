@@ -9,9 +9,9 @@
  *
  * \since   2010/06/01
  *
- * \date    $Date: 2010-06-01 14:47:01 +0200 (Di, 1. Jun 2010) $
+ * \date    $Date: 2010-07-30 14:47:01 +0200 (Fr, 30. Jul 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 0.3 $
  */
 
 #ifndef STUBBORNSET_H
@@ -51,6 +51,12 @@ public:
 
 	/// Destructor.
 	~StubbornSet();
+
+	/// Set the goal marking
+	void setGoalMarking(Marking& goal);
+
+	/// Set if the goal marking should be covered
+	void setCover(bool cov);
 
 	/// The algorithm to compute a stubborn set
 	vector<Transition*> compute(ExtMarking& m);
@@ -115,7 +121,7 @@ private:
 	set<Transition*> getSZK();
 
 	/// Implementation of Tarjans algorithm for the conflict graph (with some optimization)
-	bool doTarjan(Node*, set<Transition*>&, int&);
+//	bool doTarjan(Node*, set<Transition*>&, int&);
 
 	/// Obtain the starting set of transitions for the stubborn set method
 	set<Transition*> changesMarkingOn(Place* p, bool lower);

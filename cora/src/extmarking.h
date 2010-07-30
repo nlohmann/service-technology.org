@@ -9,9 +9,9 @@
  *
  * \since   2010/05/14
  *
- * \date    $Date: 2010-05-14 12:00:00 +0200 (Fr, 14. Mai 2010) $
+ * \date    $Date: 2010-07-30 12:00:00 +0200 (Fr, 30. Jul 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 0.3 $
  */
 
 #ifndef EXTMARKING_H
@@ -90,10 +90,10 @@ public:
 	void successor(Transition& t, bool reg, IMatrix& im);
 
 	/// Calculate the predecessor extended marking (possibly regular) before firing a transition t
-	void predecessor(Transition& t, bool reg, IMatrix& im);
+//	void predecessor(Transition& t, bool reg, IMatrix& im);
 
 	/// Check whether a transition is enabled under all contained markings
-	bool isEnabled(Transition& t, IMatrix& im);
+//	bool isEnabled(Transition& t, IMatrix& im);
 
 	/// Check whether a transition is disabled under all contained markings
 	bool isDisabled(Transition& t, IMatrix& im);
@@ -129,7 +129,7 @@ public:
 	int getUpperBound(Place& p);
 
 	/// Check if a place is set to omega
-	bool isOmega(Place& p);
+//	bool isOmega(Place& p);
 
 	/// Check if the number of tokens on a place is set to an open interval
 	bool isOpen(Place& p);

@@ -9,9 +9,9 @@
  *
  * \since   2010/06/01
  *
- * \date    $Date: 2010-06-01 12:00:00 +0200 (Di, 1. Jun 2010) $
+ * \date    $Date: 2010-07-30 12:00:00 +0200 (Fr, 30. Jul 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 0.3 $
  */
 
 #ifndef PNAPI_PNAPI_H
@@ -83,6 +83,16 @@ StubbornSet::~StubbornSet() {
 	for(unsigned int i=0; i<tton.size(); ++i)
 		delete tton[i];
 }
+
+/** Set the goal marking for the stubborn set method.
+	@param m The final marking.
+*/
+void StubbornSet::setGoalMarking(Marking& goal) { aim = goal; }
+
+/** Set if the goal marking for the stubborn set method should be covered or reached.
+	@param cover If the goal marking should be covered.
+*/
+void StubbornSet::setCover(bool cov) { cover = cov; }
 
 /** Compute a stubborn set for a given extended marking.
 	@param m The extended marking (i.e. a set of markings) for which a small set of necessary
@@ -342,7 +352,7 @@ set<Transition*> StubbornSet::requiredTransitions(Place& p) {
 		constituting some strongly connected components.
 	@param maxdfs Recursive parameter for the depth in the depth-first-search, should be zero initially.
 	@return Whether a suitable set of strongly connected components has been found.
-*/
+
 bool StubbornSet::doTarjan(Node* start, set<Transition*>& result, int& maxdfs) {
 	start->index = maxdfs;
 	start->low = maxdfs;
@@ -379,6 +389,7 @@ bool StubbornSet::doTarjan(Node* start, set<Transition*>& result, int& maxdfs) {
 	}
 	return false;
 }
+*/
 
 /** Outer loop for Tarjans algorithm, calls the inner algorithm for each
 	connected component.

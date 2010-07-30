@@ -9,9 +9,9 @@
  *
  * \since   2009/14/07
  *
- * \date    $Date: 2009-10-16 12:00:00 +0200 (Fr, 16. Okt 2009) $
+ * \date    $Date: 2010-07-30 12:00:00 +0200 (Fr, 30. Jul 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 0.3 $
  */
 
 #ifndef IMATRIX_H
@@ -48,7 +48,7 @@ public:
 	map<Place*,int>& getColumn(Transition& t);
 
 	/// Get the postset (with weights) of a transition t
-	map<Place*,int> getPostset(Transition& t);
+//	map<Place*,int> getPostset(Transition& t);
 
 	/// Get the preset (with weights) of a transition t
 	map<Place*,int> getPreset(Transition& t);
@@ -63,19 +63,19 @@ public:
 	map<Place*,int>& getLoopColumn(Transition& t);
 
 	/// Calculate the predecessor marking (before t has been fired).
-	void predecessor(Marking& m, Transition& t);
+//	void predecessor(Marking& m, Transition& t);
 
 	/// Calculate the successor marking (after firing t).
-	void successor(Marking& m, Transition& t);
+//	void successor(Marking& m, Transition& t);
 
 	/// Compare the net result of two transitions and deliver all places where the first transition yields less tokens than the second.
-	set<Place*> compareOutput(Transition& t1, Transition& t2);
+//	set<Place*> compareOutput(Transition& t1, Transition& t2);
 
 	/// Check if a transition vector can fire under a marking regarding a certain set of places only.
-	bool checkRestrictedActivation(Marking& m, vector<Transition*>& tv, set<Place*>& restriction);
+//	bool checkRestrictedActivation(Marking& m, vector<Transition*>& tv, set<Place*>& restriction);
 
 	/// Calculates the token change induced by firing a transition vector
-	map<Place*,int> getChange(map<Transition*,int>& fv);
+//	map<Place*,int> getChange(map<Transition*,int>& fv);
 
 	/// Verbosity level.
 	int verbose;

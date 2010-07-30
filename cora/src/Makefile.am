@@ -2,7 +2,7 @@
 bin_PROGRAMS = cora
 
 # the plain sources you need to compile (no generated code)
-cora_SOURCES = main.cc pnloader.cc pnloader.h imatrix.cc imatrix.h cmdline.c cmdline.h verbose.cc verbose.h extmarking.cc extmarking.h cnode.cc cnode.h rnode.cc rnode.h covergraph.cc covergraph.h stubbornset.cc stubbornset.h
+cora_SOURCES = main.cc cora.cc cora.h pnloader.cc pnloader.h imatrix.cc imatrix.h cmdline.c cmdline.h verbose.cc verbose.h extmarking.cc extmarking.h cnode.cc cnode.h rnode.cc rnode.h covergraph.cc covergraph.h stubbornset.cc stubbornset.h
 
 cora_CPPFLAGS = -I$(top_srcdir)/libs
 

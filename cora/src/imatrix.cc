@@ -9,9 +9,9 @@
  *
  * \since   2009/14/07
  *
- * \date    $Date: 2009-10-16 12:00:00 +0200 (Fr, 16. Okt 2009) $
+ * \date    $Date: 2010-07-30 12:00:00 +0200 (Fr, 30. Jul 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 0.3 $
  */
 
 #include <set>
@@ -64,6 +64,7 @@ map<Place*,int>& IMatrix::getColumn(Transition& t) {
 		mat[&t][p] -= preweight; // calculate the change the transition produces
 	}
 	if (verbose>1) {
+/*
 		map<Place*,int>::iterator pit;
 		cerr << "IMatrix Column " << t.getName() << " ";
 		for(pit=mat[&t].begin(); pit!=mat[&t].end(); ++pit)
@@ -74,6 +75,7 @@ map<Place*,int>& IMatrix::getColumn(Transition& t) {
 			cerr << " ";
 		}
 		cerr << endl;
+*/
 	}
 	return mat[&t];
 }
@@ -81,7 +83,7 @@ map<Place*,int>& IMatrix::getColumn(Transition& t) {
 /** Get the postset of a transition as a map. Places not contained in the postset will not appear in the map.
 	@param t The transition.
 	@return The map from places to arc weights.
-*/
+
 map<Place*,int> IMatrix::getPostset(Transition& t) {
 	map<Place*,int>& col(getColumn(t)); // get the change of the transition
 	map<Place*,int>& loop(getLoopColumn(t)); // and its loops
@@ -93,6 +95,7 @@ map<Place*,int> IMatrix::getPostset(Transition& t) {
 		if (it->second>0) result[it->first] += it->second; // and add the loops
 	return result;
 }
+*/
 
 /** Get the preset of a transition as a map. Places not in the preset will not appear in the map.
 	@param t The transition.
@@ -143,7 +146,7 @@ map<Place*,int>& IMatrix::getLoopColumn(Transition&t) {
 	@param m The marking. The method changes this marking by reverse-firing t. No checks
 		are done if this reverse firing is possible, i.e. the resulting marking may be invalid.
 	@param t The transition whose effects should be reversed.
-*/
+
 void IMatrix::predecessor(Marking& m, Transition &t)
 {
 	map<Place*,int>& pmap(getColumn(t)); // get the change
@@ -153,12 +156,13 @@ void IMatrix::predecessor(Marking& m, Transition &t)
 	// note: there may be zero entries in a marking afterwards. Comparison of two
 	// markings has to reflect this possibility.
 }
+*/
 
 /** Calculate the successor of marking after firing a transition.
 	@param m The marking. The method changes this marking by firing t, even if t is not enabled.
 		In this case, the marking may become invalid.
 	@param t The transition to be fired.
-*/
+
 void IMatrix::successor(Marking& m, Transition &t)
 {
 	map<Place*,int>& pmap(getColumn(t)); // get the change
@@ -168,6 +172,7 @@ void IMatrix::successor(Marking& m, Transition &t)
 	// note: there may be zero entries in a marking afterwards. Comparison of two
 	// markings has to reflect this possibility.
 }
+*/
 
 /** Compares the effect of two Transitions t1 and t2; if fired under
 	the same marking the result on some place p is lower for t1
@@ -175,7 +180,7 @@ void IMatrix::successor(Marking& m, Transition &t)
 	@param t1 Anchor transition.
 	@param t2 The transition to compare t1 to.
 	@return The set of places that is marked lower by t1 than by t2.
-*/
+
 set<Place*> IMatrix::compareOutput(Transition& t1, Transition& t2)
 {
 	// the resulting set of places, to be built
@@ -212,6 +217,7 @@ set<Place*> IMatrix::compareOutput(Transition& t1, Transition& t2)
 	}
 	return result;
 }
+*/
 
 /** Checks whether a firing sequence is activated under a marking m
 	disregarding all places not in a given restriction set. On places outside the set
@@ -222,7 +228,7 @@ set<Place*> IMatrix::compareOutput(Transition& t1, Transition& t2)
 	@param restriction The set of places which should be tested for undermarking.
 		All other places are regarded as having an arbitrary high number of tokens available.
 	@return Whether the firing sequence is firable under m regarding the restriction set.
-*/
+
 bool IMatrix::checkRestrictedActivation(Marking& m, vector<Transition*>& tv, set<Place*>& restriction)
 {
 	set<Place*>::iterator pit;
@@ -253,12 +259,13 @@ bool IMatrix::checkRestrictedActivation(Marking& m, vector<Transition*>& tv, set
 	}
 	return true;	
 }
+*/
 
 /** Calculate the change in the marking a multiset of transitions will bring upon firing.
 	No check for realizability of the multiset is performed.
 	@param fv The multiset of transitions.
 	@return The token change.
-*/
+
 map<Place*,int> IMatrix::getChange(map<Transition*,int>& fv) {
 	map<Place*,int> result; // this will be the resulting map, it may contain zero entries
 	result.clear();
@@ -272,4 +279,4 @@ map<Place*,int> IMatrix::getChange(map<Transition*,int>& fv) {
 	}
 	return result;
 }
-
+*/

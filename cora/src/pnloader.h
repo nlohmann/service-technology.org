@@ -9,9 +9,9 @@
  *
  * \since   2009/10/21
  *
- * \date    $Date: 2009-10-21 12:00:00 +0200 (Mi, 21. Okt 2009) $
+ * \date    $Date: 2010-07-30 12:00:00 +0200 (Fr, 30. Jul 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 0.3 $
  */
 
 #ifndef PNLOADER_H
@@ -80,10 +80,10 @@ public:
 	Marking getFinalMarking();
 
 	/// Get the cover/bound/reach requirements for all places
-	map<Place*,int> getCoverRequirement();
+//	map<Place*,int> getCoverRequirement();
 
 	/// Get the transition vector to realize
-	map<Transition*,int> getVectorToRealize();
+//	map<Transition*,int> getVectorToRealize();
 
 	/// Get the Petri net
 	PetriNet* getPetriNet();
@@ -101,25 +101,25 @@ public:
 	bool calcPTOrder();
 
 	/// Add an external constraint
-	void addConstraint(map<string,int> lhs, int comp, int rhs);
+//	void addConstraint(map<string,int> lhs, int comp, int rhs);
 
 	/// Get an external constraint
-	void getConstraint(unsigned int pos, map<Transition*,int>& lhs, int& comp, int& rhs);
+//	void getConstraint(unsigned int pos, map<Transition*,int>& lhs, int& comp, int& rhs);
 
 	/// Get the number of external constraints
-	unsigned int getNumberOfConstraints();
+//	unsigned int getNumberOfConstraints();
 
 	/// Print the vector of transitions to realize
-	void showTVector();
+//	void showTVector();
 
 	/// Print the initial marking
-	void showInitial();
+//	void showInitial();
 
 	/// Print the extended final marking
-	void showFinal();
+//	void showFinal();
 
 	/// Print the global constraints
-	void showConstraints();
+//	void showConstraints();
 
 	/// Obtain the transition ordering
 	const vector<Transition*>& getTOrder();

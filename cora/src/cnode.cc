@@ -548,14 +548,7 @@ CNode* CNode::getSubNode(int index) { return ((root||index<0||index>pos) ? NULL 
 /** Set the stubborn set to a given vector of transitions (ordered by priority).
 	@param stubset The vector of stubborn set transitions.
 */
-void CNode::setStubbornSet(vector<Transition*> stubset) { stubbornset=stubset; 
-//cout << "SB: ";
-//getMarking().show(cout,po);
-//cout << ": ";
-//for(unsigned int i=0; i<stubbornset.size(); ++i)
-//	cout << stubbornset[i]->getName() << ",";
-//cout << endl;
-}
+void CNode::setStubbornSet(vector<Transition*> stubset) { stubbornset=stubset; }
 
 /** Get/Compute the stubborn set for this node.
 	@param stubset The Stubborn Set structure needed for computing stubborn sets.
@@ -567,12 +560,6 @@ void CNode::setStubbornSet(vector<Transition*> stubset) { stubbornset=stubset;
 vector<Transition*> CNode::getStubbornSet(StubbornSet& stubset, bool compute) {
 	if (!compute && !stubbornset.empty()) return stubbornset;
 	stubbornset = stubset.compute(em);
-//cout << "SB: ";
-//getMarking().show(cout,po);
-//cout << ": ";
-//for(unsigned int i=0; i<stubbornset.size(); ++i)
-//	cout << stubbornset[i]->getName() << ",";
-//cout << endl;
 	return stubbornset;
 }
 

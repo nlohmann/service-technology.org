@@ -9,9 +9,9 @@
  *
  * \since   2010/05/14
  *
- * \date    $Date: 2010-05-14 14:47:01 +0200 (Fr, 16. Mai 2010) $
+ * \date    $Date: 2010-07-30 14:47:01 +0200 (Fr, 30. Jul 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 0.3 $
  */
 
 #include <map>
@@ -224,7 +224,7 @@ void ExtMarking::successor(Transition& t, bool reg, IMatrix& im) {
 	@param t The transition to be reverse fired.
 	@param reg If the extended marking should remain regular, i.e. 0+ (omega) is the only range allowed.
 	@param im The incidence matrix of the Petri net.
-*/
+
 void ExtMarking::predecessor(Transition& t, bool reg, IMatrix& im) {
 	map<Place*,int>& change(im.getColumn(t)); // get the effect of firing t
 	map<Place*,int>::iterator mit;
@@ -241,12 +241,13 @@ void ExtMarking::predecessor(Transition& t, bool reg, IMatrix& im) {
 		}
 	}
 }
+*/
 
 /** Check whether a transition is enabled under all markings contained in an extended marking.
 	@param t The transition.
 	@param im The incidence matrix of the Petri net.
 	@return If t is enabled under all contained markings.
-*/
+
 bool ExtMarking::isEnabled(Transition& t, IMatrix& im) {
 	map<Place*,int> pre(im.getPreset(t)); // obtain the weighted preset of t
 	map<Place*,int>::iterator mit;
@@ -257,6 +258,7 @@ bool ExtMarking::isEnabled(Transition& t, IMatrix& im) {
 	}
 	return true; // all places checked, t can fire
 }
+*/
 
 /** Check whether a transition is disabled under all markings contained in an extended marking.
 	@param t The transition.
@@ -500,12 +502,13 @@ int ExtMarking::getUpperBound(Place& p) {
 /** Check if the given extended marking is omega for the place p.
 	@param p The place to check for omega.
 	@return If the place p is marked omega.
-*/
+
 bool ExtMarking::isOmega(Place& p) {
 	if (lb.find(&p)!=lb.end()) return false;
 	if (type.find(&p)==type.end()) return false;
 	return type[&p];
 }
+*/
 
 /** Check if the given extended marking has an open interval for the place p.
 	@param p The place to check for unlimited tokens.

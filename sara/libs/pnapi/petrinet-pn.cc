@@ -18,6 +18,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <utility>
 
 using std::cerr;
 using std::endl;
@@ -25,6 +26,7 @@ using std::istringstream;
 using std::ifstream;
 using std::map;
 using std::pair;
+using std::make_pair;
 using std::set;
 using std::string;
 using std::vector;
@@ -121,16 +123,21 @@ void Automaton::printToTransitionGraph(std::vector<std::string> & edgeLabels,
   }
 
   // mark final states
+  bool fsfound = false; // final state found ?
+  int foundPosition = 0;
   for(unsigned int i = 0; i < states_.size(); ++i)
   {
     if (states_[i]->isFinal())
     {
-      // each label is mapped to his position in edgeLabes
-      std::string currentLabel = "FINAL";
-      currentLabel += states_[i]->getName();
-      int foundPosition = (int)edgeLabels.size();
-      edgeLabels.push_back(currentLabel);
-      TGStringStream << "p" << states_[i]->getName() << " t" << foundPosition << " p00\n";
+      if (! fsfound)
+      {
+        // There is exactly one FINAL label, everything else confuses Genet
+        std::string currentLabel = "FINAL";
+        foundPosition = (int)edgeLabels.size();
+        edgeLabels.push_back(currentLabel);
+        fsfound = true;
+      }
+      TGStringStream << "p" << states_[i]->getName() << " t" << foundPosition << " p00\n"; //" << states_[i]->getName() << "
     }
   }
 
@@ -226,7 +233,6 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
     systemcall = pathToGenet_ + " -k " + ss.str() + " " + fileName + " > " + pnFileName;
   }
 
-  //int result = system(systemcall.c_str());
   int doNotCare_JustFixWarning = system(systemcall.c_str());
   doNotCare_JustFixWarning = doNotCare_JustFixWarning; // get rid of compilerwarning
 
@@ -349,7 +355,7 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
     // create arcs p->t
 
   // Create a map of string sets for final condition creation.
-  map<string, set<string> > finalCondMap;
+  map<string, set< pair < string, unsigned int> > > finalCondMap;
   PNAPI_FOREACH(p, myParser.places_)
   {
     PNAPI_FOREACH(t, myParser.arcs_[*p])
@@ -363,7 +369,7 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
       else
       {
         // This place is the result of a final node
-        finalCondMap[transitionName].insert(*p);
+        finalCondMap[transitionName].insert(make_pair(*p,t->second));
       }
     }
   }
@@ -398,13 +404,13 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
   PNAPI_FOREACH(transIt, finalCondMap)
   {
     // Create a set for the places having this transition in their post set.
-    set<Place *> nextTrans;
+    set< pair< Place *, unsigned int> > nextTrans;
 
     // For each place in the preset...
     PNAPI_FOREACH(placesIt, transIt->second)
     {
       // Insert this place in the preset.
-      nextTrans.insert(findPlace(*placesIt));
+      nextTrans.insert(make_pair(findPlace(placesIt->first), placesIt->second));
     }
 
     pnapi::formula::Conjunction * fd = NULL;
@@ -416,11 +422,11 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
       {
         if (store == NULL)
         {
-          store = new pnapi::formula::FormulaEqual(**p, 1);
+          store = new pnapi::formula::FormulaEqual(*(p->first), p->second);
         }
         else
         {
-          pnapi::formula::FormulaEqual * tmpF = new pnapi::formula::FormulaEqual(**p, 1);
+          pnapi::formula::FormulaEqual * tmpF = new pnapi::formula::FormulaEqual(*(p->first), p->second);
           fd = new pnapi::formula::Conjunction(*store, *tmpF);
           delete tmpF;
           delete store;
@@ -429,7 +435,7 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
       }
       else
       {
-        pnapi::formula::FormulaEqual * tmpF1 = new pnapi::formula::FormulaEqual(**p, 1);
+        pnapi::formula::FormulaEqual * tmpF1 = new pnapi::formula::FormulaEqual(*(p->first), p->second);
         pnapi::formula::Conjunction * tmpF2 = new pnapi::formula::Conjunction(*fd, *tmpF1);
         delete fd;
         delete tmpF1;

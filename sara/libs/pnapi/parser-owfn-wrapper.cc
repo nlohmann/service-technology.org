@@ -77,7 +77,7 @@ void BisonParser::error(const location_type &, const std::string & msg)
 Parser::Parser() :
   AbstractParser<yy::BisonParser, yy::Lexer, Parser>(),
   transition_(NULL), place_(NULL), target_(NULL), source_(NULL),
-  port_(net_.getInterface().getPort()), label_(NULL), capacity_(0),
+  port_(NULL), label_(NULL), capacity_(0),
   markInitial_(false), finalMarking_(NULL), placeSetType_(false), wildcardGiven_(false)
 {
 }

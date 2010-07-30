@@ -27,10 +27,7 @@ namespace pnapi
 /*!
  * \brief   Generic Parser Framework
  *
- * Provides C++ classes encapsulating flex/bison parsers. Documentation is
- * available under <https://ikaria/trac/mesu/wiki/ParserFramework>.
- * 
- * \todo check documentation availability; may move to API documentation
+ * Provides C++ classes encapsulating flex/bison parsers.
  */
 namespace parser
 {

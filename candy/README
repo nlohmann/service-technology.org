@@ -4,12 +4,12 @@
                         | |___| (_| | | | | (_| | |_| |
                          \____|\__,_|_| |_|\__,_|\__, |
                                                  |___/ 
-                      synthesizing cost efficient partners for services
+              synthesizing cost-efficient controllers for services
                       http://service-technology.org/candy
 
 
 PURPOSE
-    Candy is a tool to synthesize cost efficient partners for services.
+    Candy is a tool to synthesize cost-efficient controllers for services.
 
 
 COPYRIGHT

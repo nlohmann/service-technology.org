@@ -1,4 +1,3 @@
-# initial data for autoconf
 AC_INIT([Candy], [1.0-unreleased], [candy@service-technology.org], candy,
 http://service-technology.org/candy)
 
@@ -9,19 +8,15 @@ AC_MSG_NOTICE([| |___| (_| | | | | (_| | |_| |])
 AC_MSG_NOTICE([ \____|\__,_|_| |_|\__,_|\__, |])
 AC_MSG_NOTICE([                         |___/ ])
 AC_MSG_NOTICE([synthesizing cost efficient partners for services])
-AC_MSG_NOTICE([http://service-technology.org/candy])
+AC_MSG_NOTICE([${PACKAGE_URL}])
 AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
 AC_MSG_NOTICE()
 
-# check for autoconf 2.59, specific files and write test results as defines into
-# header file
-AC_PREREQ(2.59)
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 
-# initialize automake without full verbose messages
-AM_INIT_AUTOMAKE #(gnits)
+AM_INIT_AUTOMAKE(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # check for standard programs needed to compile

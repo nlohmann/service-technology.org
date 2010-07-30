@@ -41,6 +41,7 @@ using std::map;
 using std::set;
 using std::stack;
 using std::string;
+using std::istream;
 using std::ifstream;
 using std::ofstream;
 using std::ostringstream;
@@ -213,39 +214,14 @@ map<Transition*,int> PNLoader::getVectorToRealize() {
 PetriNet* PNLoader::getPetriNet() {
 	if (pn) return pn;
 
-	if (filename=="stdin")
+	bool src(filename=="stdin");
+	ifstream* infile(NULL);
+	if (!src)
 	{
-		pn = new PetriNet();
-
-		// try to parse net
-		try {
-		    switch (nettype) {
-		        case(OWFN): {
-					cin >> pnapi::io::owfn >> (*pn);
-		            break;
-		        }
-		        case(LOLA): {
-					cin >> pnapi::io::lola >> (*pn);
-		            break;
-		        }
-		        case(PNML): {
-					cin >> pnapi::io::pnml >> (*pn);
-		            break;
-		        }
-		    }
-		} catch (pnapi::exception::InputError error) {
-			cerr << "cora: error: " << error << endl;
-			abort(5,"error while reading Petri net from stdin");
-		}
-
-		deinit = true;
-		if (!calcPTOrder() && args_info.verbose_given) status("place or transition ordering is non-deterministic");
-		return pn;
+		// try to open file
+		infile = new ifstream(filename.c_str(), ifstream::in);
+		if (!infile->is_open()) abort(1,"error: could not read from Petri net file '%s'",filename.c_str());
 	}
-
-	// try to open file
-	ifstream infile(filename.c_str(), ifstream::in);
-	if (!infile.is_open()) abort(1,"error: could not read from Petri net file '%s'",filename.c_str());
 
 	pn = new PetriNet();
 
@@ -253,25 +229,26 @@ PetriNet* PNLoader::getPetriNet() {
 	try {
 	    switch (nettype) {
 	        case(OWFN): {
-				infile >> pnapi::io::owfn >> (*pn);
+				(src?cin:(*((istream*)infile))) >> pnapi::io::owfn >> (*pn);
 	            break;
 	        }
 	        case(LOLA): {
-				infile >> pnapi::io::lola >> (*pn);
+				(src?cin:(*((istream*)infile))) >> pnapi::io::lola >> (*pn);
 	            break;
 	        }
 	        case(PNML): {
-				infile >> pnapi::io::pnml >> (*pn);
+				(src?cin:(*((istream*)infile))) >> pnapi::io::pnml >> (*pn);
 	            break;
 	        }
 	    }
 	} catch (pnapi::exception::InputError error) {
-	    infile.close();
+	    if (!src) infile->close();
 		cerr << "cora: error: " << error << endl;
-		abort(4,"error while reading Petri net from file");
+		if (src) abort(5,"error while reading Petri net from stdin");
+		else abort(4,"error while reading Petri net from file");
 	}
 
-	infile.close();
+	if (!src) infile->close();
 	deinit = true;
 	if (!calcPTOrder() && args_info.verbose_given) status("place or transition ordering is non-deterministic");
 	return pn;

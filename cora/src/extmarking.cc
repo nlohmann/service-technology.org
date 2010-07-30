@@ -394,16 +394,17 @@ bool ExtMarking::operator<(const ExtMarking& right) const {
 	return false; // both extmarkings were identical
 }
 
-/** Comparison operator for regular extended markings in set comparisons.
+/* Comparison operator for regular extended markings in set comparisons.
 	@param right Right hand side of the expression.
 	@return If both extended markings are equal.
-*/
+
 bool ExtMarking::operator==(const ExtMarking& right) const {
 	if (type!=right.type) return false; // just check if every parameter is the same ...
 	if (lb!=right.lb) return false;
 	if (ub!=right.ub) return false;
 	return true;
 }
+*/
 
 /** Check if there are markings in this extended marking where a place p can have less
 	than a given number of tokens as well as at least as many.

@@ -111,7 +111,7 @@ public:
 	bool operator<(const ExtMarking& right) const;
 
 	/// Equality of extended markings 
-	bool operator==(const ExtMarking& right) const;
+//	bool operator==(const ExtMarking& right) const;
 
 	/// Check if the extended marking can be split at place p with a given token number
 	bool splitExists(Place& p, int token);

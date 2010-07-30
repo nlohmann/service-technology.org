@@ -7,7 +7,6 @@
                      http://service-technology.org/cora
 
 
-PURPOSE
 Cora implements several algorithms and result published in several scientific
 articles.  Cora constructs a portion of a coverability graph to decide
 reachability, find a firable sequence to a node of the coverability graph, or

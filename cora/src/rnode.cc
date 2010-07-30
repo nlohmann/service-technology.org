@@ -9,9 +9,9 @@
  *
  * \since   2010/05/14
  *
- * \date    $Date: 2010-05-14 14:47:01 +0200 (Fr, 16. Mai 2010) $
+ * \date    $Date: 2010-07-30 14:47:01 +0200 (Fr, 30. Jul 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 0.3 $
  */
 
 #include "rnode.h"
@@ -35,13 +35,14 @@ bool RNode::operator<(const RNode& right) const {
 	return (cnode->getMarking()<right.cnode->getMarking());
 }
 
-/** Comparison operator for nodes in set comparisons.
+/* Comparison operator for nodes in set comparisons.
 	@param right Right hand side of the expression.
 	@return If the markings of both nodes are equal.
-*/
+
 bool RNode::operator==(const RNode& right) const {
 	return (cnode->getMarking()==right.cnode->getMarking());
 }
+*/
 
 /** Set up the info on how to pump up the newly introduced omega places in this node.
 	@param pumppaths A vector of paths that can pump up certain sets of places.

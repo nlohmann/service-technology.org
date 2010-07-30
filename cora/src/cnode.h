@@ -9,9 +9,9 @@
  *
  * \since   2010/05/12
  *
- * \date    $Date: 2010-05-12 12:00:00 +0200 (Mi, 12. Mai 2010) $
+ * \date    $Date: 2010-07-30 12:00:00 +0200 (Fr, 30. Jul 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 0.3 $
  */
 
 #ifndef CNODE_H
@@ -123,7 +123,7 @@ public:
 	bool hasSuccessor(Transition& t, CNode& cnode);
 
 	/// get the subnode successors of this node with edges labelled with transition t
-	set<CNode*> getSuccessors(Transition& t);
+//	set<CNode*> getSuccessors(Transition& t);
 
 	/// get the successor map of this (sub)node
 	map<Transition*,CNode*> getSuccessors();
@@ -153,10 +153,10 @@ public:
 	bool preSplit(Transition& t, CNode& cn, IMatrix& im, StubbornSet* sb);
 	
 	/// print a root node including subtree and leaves
-	void show(ostream& o, vector<Place*>& pord);
+//	void show(ostream& o, vector<Place*>& pord);
 
 	/// get the default subnode successor (right son in case of a choice)
-	CNode* getDefaultSubSuccessor(Transition& t);
+//	CNode* getDefaultSubSuccessor(Transition& t);
 
 	/// get the index (position) of this subnode in its root node tree
 	int getPos();

@@ -449,6 +449,40 @@ even if the marking is reached exactly the firing sequence may differ. This is
 due to the totally different approach at making a path firable, i.e. pumping up
 the sequence instead of splitting away unwanted portions of nodes.
 
+@section Using the source code of Cora
+
+Besides the features of the executable, Cora also allows for easy access to the
+functionality through a @acronym{C++} class which is also called Cora. This class supports
+all the main functionality, i.e. testing reachability or coverability or finding
+a path including the computation of the resulting firing sequence as well as
+construction of the full coverability graph and printing capabilities.
+For using this interface of Cora the Petri Net @acronym{API} is needed.
+The following methods can be used:
+
+@cartouche
+@smallexample
+Cora(PetriNet, Marking, vector<Place*>, vector<Transition*>) -- to obtain an instance of Cora
+deque<Transition*> findReach(Marking) -- to test if a marking is reachable
+deque<Transition*> findCover(Marking) -- to test if a marking is coverable
+deque<Transition*> findPath(vector<Transition*>) -- to obtain a firable path to some node
+void buildFullGraph() -- to build the complete coverability graph
+void printGraph(bool) -- to print a coverability graph
+void printStatus(int) -- to print additional info about a search
+@end smallexample
+@end cartouche
+
+The vectors in the constructor above can be arbitrary orderings of the places and
+transitions of the net. The returned deque of the find methods contains the
+resulting firing sequence (or a NULL pointer if it does not exist).
+The bool and int variables for printing determine whether
+the normal (true) or the advanced (false) coverability graph is printed and
+if the search was for a path (Cora::PATH), a reachable marking (Cora::REACH),
+or a covering (Cora::COVER).
+
+Of course, Cora's @acronym{API} can also be used when Cora is compiled into a
+library. For access to the built coverability graph a deeper knowledge of Cora
+is necessary.
+
 @c --------------------------------------------------------------------------
 
 

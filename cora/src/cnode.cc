@@ -9,9 +9,9 @@
  *
  * \since   2010/05/14
  *
- * \date    $Date: 2010-05-14 14:47:01 +0200 (Fr, 16. Mai 2010) $
+ * \date    $Date: 2010-07-30 14:47:01 +0200 (Fr, 30. Jul 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 0.3 $
  */
 
 #include <map>
@@ -259,11 +259,11 @@ bool CNode::hasSuccessor(Transition& t, CNode& cnode) {
 	return false;
 }
 
-/** Get the set of successors from this subnode (non-inherited edges) with an edge labelled by a transition t.
+/* Get the set of successors from this subnode (non-inherited edges) with an edge labelled by a transition t.
 	There may be more than one edge as the successor node may have been split while this subnode has not.
 	@param t The transition.
 	@return The set of successors if the subnode explicitly defines the edge.
-*/
+
 set<CNode*> CNode::getSuccessors(Transition& t) {
 	set<CNode*> result; // the set of successors, empty at first
 	if (succ.find(&t)==succ.end()) return result; // if the subnode does not define a t-edge (the root may still do)
@@ -281,6 +281,7 @@ set<CNode*> CNode::getSuccessors(Transition& t) {
 	result.erase(NULL); // forget about those NULL pointers
 	return result; // we have colleted all those leaf pointers
 }
+*/
 
 /** Get the successor map of this node.
 	@return The map of successors.
@@ -465,10 +466,10 @@ bool CNode::preSplit(Transition& t, CNode& cn, IMatrix& im, StubbornSet* sb) {
 	return changed;
 }
 
-/** Print all subnodes of this node's root.
+/* Print all subnodes of this node's root.
 	@param o The stream to print on.
 	@param pord The ordering by which the places in a marking are sorted.
-*/ 
+ 
 void CNode::show(ostream& o, vector<Place*>& pord) {
 	CNode* src(getRoot()); // get the root of this node
 	for(unsigned int i=0; i<(unsigned int)(src->pos); ++i) // go through all subnodes
@@ -484,11 +485,12 @@ void CNode::show(ostream& o, vector<Place*>& pord) {
 		cout << endl; 
 	}
 }
+*/
 
-/** Get one leaf node that can be reached from this node via a t-edge.
+/* Get one leaf node that can be reached from this node via a t-edge.
 	@param t The transition labeling the edge.
 	@return A pointer to a leaf.
-*/
+
 CNode* CNode::getDefaultSubSuccessor(Transition& t) {
 	CNode* src(this); // the node from which we start
 	if (succ.find(&t)==succ.end()) // if we have no t-successor
@@ -507,6 +509,7 @@ CNode* CNode::getDefaultSubSuccessor(Transition& t) {
 	}
 	return (aim->leaf[subnode]); // now we are at a leaf and return it
 }
+*/
 
 /** Get the index of this node inside its root node.
 	@return The index.

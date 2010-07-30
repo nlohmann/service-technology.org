@@ -9,9 +9,9 @@
  *
  * \since   2010/05/12
  *
- * \date    $Date: 2010-05-12 12:00:00 +0200 (Mi, 12. Mai 2010) $
+ * \date    $Date: 2010-07-30 12:00:00 +0200 (Fr, 30. Jul 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 0.3 $
  */
 
 #ifndef RNODE_H
@@ -42,7 +42,7 @@ public:
 	bool operator<(const RNode& right) const;
 
 	/// Equality of nodes
-	bool operator==(const RNode& right) const;
+//	bool operator==(const RNode& right) const;
 
 	/// Set info on how to pump omegas
 	void setPumpInfo(vector<deque<Transition*> >& pumppaths, vector<set<Place*> >& pumpsets);

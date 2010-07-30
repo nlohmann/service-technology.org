@@ -8,9 +8,9 @@ AC_MSG_NOTICE([ | || || ( ( | | |   | ( (/ /| | | ( (/ /  ])
 AC_MSG_NOTICE([ |_||_||_|\_||_|_|   |_|\____)_| |_|\____) ])
 AC_MSG_NOTICE()
 #AC_MSG_NOTICE([ Generating behavioral adapters ])
-AC_MSG_NOTICE([ Making adapters behave ])
-AC_MSG_NOTICE([ http://service-technology.org/tools/marlene ])
-AC_MSG_NOTICE([ version ${PACKAGE_VERSION} ])
+AC_MSG_NOTICE([Making adapters behave ])
+AC_MSG_NOTICE([${PACKAGE_URL}])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION} ])
 AC_MSG_NOTICE()
 
 AC_CONFIG_SRCDIR([src/marlene.cc])
@@ -29,7 +29,7 @@ AC_PROG_YACC
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_AUTOTEST
-AC_ST_PNAPI
+AC_ST_PNAPI([4.02])
 AC_ST_VERBOSE
 
 # search for optional tools needed by "make check"

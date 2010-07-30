@@ -7,7 +7,7 @@ AC_MSG_NOTICE([  \ V  V /  __/ | | | (_| | |_| |])
 AC_MSG_NOTICE([   \_/\_/ \___|_| |_|\__,_|\__, |])
 AC_MSG_NOTICE([                           |___/ ])
 AC_MSG_NOTICE([synthesizing partners for services])
-AC_MSG_NOTICE([http://service-technology.org/wendy])
+AC_MSG_NOTICE([${PACKAGE_URL}])
 AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
 AC_MSG_NOTICE()
 

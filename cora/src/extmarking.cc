@@ -219,7 +219,7 @@ void ExtMarking::successor(Transition& t, bool reg, IMatrix& im) {
 	}
 }
 
-/** Compute the result of reverse firing a transition. No check is done,
+/* Compute the result of reverse firing a transition. No check is done,
 	but negative token numbers will be replaced by zero if they occur.
 	@param t The transition to be reverse fired.
 	@param reg If the extended marking should remain regular, i.e. 0+ (omega) is the only range allowed.
@@ -243,7 +243,7 @@ void ExtMarking::predecessor(Transition& t, bool reg, IMatrix& im) {
 }
 */
 
-/** Check whether a transition is enabled under all markings contained in an extended marking.
+/* Check whether a transition is enabled under all markings contained in an extended marking.
 	@param t The transition.
 	@param im The incidence matrix of the Petri net.
 	@return If t is enabled under all contained markings.
@@ -499,7 +499,7 @@ int ExtMarking::getUpperBound(Place& p) {
 	return ub[&p];
 }
 
-/** Check if the given extended marking is omega for the place p.
+/* Check if the given extended marking is omega for the place p.
 	@param p The place to check for omega.
 	@return If the place p is marked omega.
 

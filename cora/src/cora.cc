@@ -27,6 +27,9 @@ Cora::Cora(PetriNet& net, Marking& m0, const vector<Place*>& porder, const vecto
 	final2 = NULL;
 	stubset = NULL;
 	cg = NULL;
+	loops = 0;
+	aim = NULL;
+	final = NULL;
 }
 
 /** Destructor. */

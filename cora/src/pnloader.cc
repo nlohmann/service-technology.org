@@ -167,7 +167,7 @@ Marking PNLoader::getFinalMarking() {
 	return Marking(result,pn);
 }
 
-/** Get the modes of all places for the final marking of a problem.
+/* Get the modes of all places for the final marking of a problem.
 	@return A map from places to modes (EQ,GE,LE).
 
 map<Place*,int> PNLoader::getCoverRequirement() {
@@ -191,7 +191,7 @@ map<Place*,int> PNLoader::getCoverRequirement() {
 }
 */
 
-/** Get the transition vector to realize for this problem.
+/* Get the transition vector to realize for this problem.
 	@return The vector.
 
 map<Transition*,int> PNLoader::getVectorToRealize() {
@@ -401,7 +401,7 @@ bool PNLoader::calcPTOrder() {
 	return deterministic;
 }
 
-/** Add an external (complex) constraint. This constraint is a weighted sum of places and transitions
+/* Add an external (complex) constraint. This constraint is a weighted sum of places and transitions
 	compared to a number.
 	@param lhs The weighted sum of places and transitions, mapped by place/transition names.
 	@param comp The comparison operator as in lp_solve: GE, EQ, or LE.
@@ -414,7 +414,7 @@ void PNLoader::addConstraint(map<string,int> lhs, int comp, int rhs) {
 }
 */
 
-/** Get an external constraint. The constraint is translated into an (in)equation over transitions.
+/* Get an external constraint. The constraint is translated into an (in)equation over transitions.
 	@param pos The number of the constraint.
 	@param lhs The left hand side of the constraint for use with lp_solve.
 	@param comp The comparator of the constraint for use with lp_solve.
@@ -456,7 +456,7 @@ void PNLoader::getConstraint(unsigned int pos, map<Transition*,int>& lhs, int& c
 }
 */
 
-/** Get the overall number of constraints available.
+/* Get the overall number of constraints available.
 	@return The number of constraints.
 
 unsigned int PNLoader::getNumberOfConstraints() {
@@ -464,7 +464,7 @@ unsigned int PNLoader::getNumberOfConstraints() {
 }
 */
 
-/** Print the transition vector to be realized. 
+/* Print the transition vector to be realized. 
 void PNLoader::showTVector() {
 	for(unsigned int i=0; i<transitionorder.size(); ++i)
 		if (required.find(transitionorder[i]->getName())!=required.end())
@@ -472,7 +472,7 @@ void PNLoader::showTVector() {
 }
 */
 
-/** Print the initial marking. 
+/* Print the initial marking. 
 void PNLoader::showInitial() {
 	for(unsigned int i=0; i<placeorder.size(); ++i)
 		if (initial.find(placeorder[i]->getName())!=initial.end())
@@ -485,7 +485,7 @@ void PNLoader::showInitial() {
 }
 */
 
-/** Print the final marking. 
+/* Print the final marking. 
 void PNLoader::showFinal() {
 	for(unsigned int i=0; i<placeorder.size(); ++i)
 		if (required.find(placeorder[i]->getName())!=required.end())
@@ -509,7 +509,7 @@ void PNLoader::showFinal() {
 }
 */
 
-/** Print the global constraints. 
+/* Print the global constraints. 
 void PNLoader::showConstraints() {
 	for(unsigned int i=0; i<clhs.size(); ++i)
 	{

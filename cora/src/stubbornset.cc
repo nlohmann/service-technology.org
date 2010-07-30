@@ -85,12 +85,12 @@ StubbornSet::~StubbornSet() {
 }
 
 /** Set the goal marking for the stubborn set method.
-	@param m The final marking.
+	@param goal The final marking.
 */
 void StubbornSet::setGoalMarking(Marking& goal) { aim = goal; }
 
 /** Set if the goal marking for the stubborn set method should be covered or reached.
-	@param cover If the goal marking should be covered.
+	@param cov If the goal marking should be covered.
 */
 void StubbornSet::setCover(bool cov) { cover = cov; }
 
@@ -103,9 +103,6 @@ void StubbornSet::setCover(bool cov) { cover = cov; }
 vector<Transition*> StubbornSet::compute(ExtMarking& m) {
 	// memorize the marking while we are computing (avoiding passing it to other methods :-()
 	m0 = m;
-//cout << "SBC: ";
-//m.show(cout,po);
-//cout << endl;
 
 	// select a place where m0 differs from the aim, use this as starting point for the stubborn set method
 	Place* pstart(m0.distinguish(aim,false));
@@ -344,7 +341,7 @@ set<Transition*> StubbornSet::requiredTransitions(Place& p) {
 	return tset;
 }
 
-/** Modification of Tarjans algorithm for finding strongly connected components.
+/* Modification of Tarjans algorithm for finding strongly connected components.
 	We look for strongly connected components containing at least one activated 
 	transition. Only activated transitions are returned.
 	@param start The root of the graph.
@@ -394,7 +391,8 @@ bool StubbornSet::doTarjan(Node* start, set<Transition*>& result, int& maxdfs) {
 /** Outer loop for Tarjans algorithm, calls the inner algorithm for each
 	connected component.
 	@return Contains the activated transitions in the suitable strongly connected component(s).
-
+*/
+/*
 set<Transition*> StubbornSet::getSZK() {
 	int maxdfs = 0;
 	// empty the stack for Tarjan

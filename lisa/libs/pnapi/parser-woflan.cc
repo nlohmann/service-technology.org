@@ -421,7 +421,7 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
     {
       parser_.places_[(yysemantic_stack_[(2) - (2)].yt_str)] = parser_.place_ = &(parser_.net_.createPlace((yysemantic_stack_[(2) - (2)].yt_str), 0, 0));
     }
-    catch(exception::Error e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }
@@ -455,7 +455,7 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
     {
       parser_.transition_ = &(parser_.net_.createTransition((yysemantic_stack_[(1) - (1)].yt_str)));
     }
-    catch(exception::Error e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }
@@ -482,7 +482,7 @@ namespace pnapi { namespace parser { namespace woflan { namespace yy {
     {
       parser_.transition_->setName((yysemantic_stack_[(2) - (2)].yt_str));
     }
-    catch(exception::Error e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }

@@ -1,7 +1,18 @@
-AC_INIT(Lisa, 1.0-unreleased, lisa@service-technology.org, lisa, http://service-technology.org/lisa)
+AC_INIT([Lisa], 1.0-unreleased, lisa@service-technology.org, lisa, http://service-technology.org/lisa)
+
+AC_MSG_NOTICE([ _     _           ])
+AC_MSG_NOTICE([| |   (_)___  __ _ ])
+AC_MSG_NOTICE([| |   | / __|/ _` |])
+AC_MSG_NOTICE([| |___| \__ \ (_| |])
+AC_MSG_NOTICE([|_____|_|___/\__,_|])
+AC_MSG_NOTICE([Linear programming based structural analysis])
+AC_MSG_NOTICE([${PACKAGE_URL}])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
+AC_MSG_NOTICE()
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_AUX_DIR([build-aux])
 
 AM_INIT_AUTOMAKE(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -15,7 +26,7 @@ AC_PROG_YACC
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_AUTOTEST
-AC_ST_PNAPI
+AC_ST_PNAPI([4.02])
 AC_ST_VERBOSE
 
 # search for optional tools

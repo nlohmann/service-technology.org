@@ -132,7 +132,7 @@ bool Parser::is_whitelisted(char * s)
         file_part = i - 1;
         break;
       case T_MARKING:
-        currentMarking = new Marking(net_);
+        currentMarking = new Marking(net_, true);
         break;
       }
       

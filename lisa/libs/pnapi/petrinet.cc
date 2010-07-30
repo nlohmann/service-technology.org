@@ -13,9 +13,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2010-06-14 15:16:25 +0200 (Mon, 14 Jun 2010) $
+ * \date    $Date: 2010-07-27 18:53:14 +0200 (Tue, 27 Jul 2010) $
  *
- * \version $Revision: 5832 $
+ * \version $Revision: 5964 $
  */
 
 #include "config.h"
@@ -90,7 +90,17 @@ void ComponentObserver::updateNodeNameHistory(Node & node,
   // remove access to nodes by their former names
   net_.nodesByName_.erase(*oldHistory.begin());
   
-  initializeNodeNameHistory(node);
+  try
+  {
+    initializeNodeNameHistory(node);
+  }
+  catch (exception::Error & e)
+  {
+    // undo change
+    net_.nodesByName_[*oldHistory.begin()] = &node;
+    
+    throw e;
+  }
 }
 
 
@@ -100,8 +110,10 @@ void ComponentObserver::updateNodeNameHistory(Node & node,
 void ComponentObserver::initializeNodeNameHistory(Node & node)
 {
   string name = node.getName();
-  PNAPI_ASSERT( (net_.nodesByName_.find(name) == net_.nodesByName_.end()) ||
-                     ((net_.nodesByName_.find(name))->second == &node) );
+  PNAPI_ASSERT_USER(((net_.nodesByName_.find(name) == net_.nodesByName_.end()) ||
+                     ((net_.nodesByName_.find(name))->second == &node)),
+                    string("node '") + name + "' already exists",
+                    exception::UserCausedError::UE_NODE_NAME_CONFLICT);
 
   net_.nodesByName_[name] = &node;
 }
@@ -358,7 +370,7 @@ PetriNet::copyStructure(const PetriNet & net, const std::string & prefix)
   map<Label *, Label *> labelMap;
   PNAPI_FOREACH(port, net.interface_.getPorts())
   {
-    Port & p = ((port->first == "") ? (*interface_.getPort()) : interface_.addPort(port->first));
+    Port & p = interface_.addPort(port->first);
     PNAPI_FOREACH(label, port->second->getAllLabels())
     {
       Label * l = new Label(*this, p, (*label)->getName(), (*label)->getType());
@@ -1053,6 +1065,12 @@ Arc * PetriNet::findArc(const Node & source, const Node & target) const
 
 /// get the interface
 Interface & PetriNet::getInterface()
+{
+  return interface_;
+}
+
+/// get the interface
+const Interface & PetriNet::getInterface() const
 {
   return interface_;
 }
@@ -1804,20 +1822,88 @@ void PetriNet::normalize_classical()
   }
 }
 
-void PetriNet::canonicalNames()
+std::map<std::string, std::string> PetriNet::canonicalNames()
 {
-  int i = 1;
+  map<string, string> result;
+  map<Node *, string> tmp;
+  int i = 0;
+  int j = 0;
   stringstream name;
-  PNAPI_FOREACH(n, nodes_)
+  
+  PNAPI_FOREACH(p, places_)
   {
-    name << "p" << i;
-    i++;
-    (**n).setName(name.str());
+    name << "p" << (++i);
+    result[name.str()] = (*p)->getName();
+    
+    try
+    {
+      (**p).setName(name.str());
+    }
+    catch(exception::Error & e)
+    {
+      // name conflict
+      tmp[*p] = name.str();
+      bool rename = true;
+      while(rename)
+      {
+        name.str("");
+        name.clear();
+        name << "_" << (++j);
+        
+        try
+        {
+          (**p).setName(name.str());
+          rename = false;
+        }
+        catch(exception::Error & e) { /* retry */ }
+      }
+    }
+    
     name.str("");
     name.clear(); 
-
+  }
+  
+  i = 0;
+  
+  PNAPI_FOREACH(t, transitions_)
+  {
+    name << "t" << (++i);
+    result[name.str()] = (*t)->getName();
+    
+    try
+    {
+      (**t).setName(name.str());
+    }
+    catch(exception::Error & e)
+    {
+      // name conflict
+      tmp[*t] = name.str();
+      bool rename = true;
+      while(rename)
+      {
+        name.str("");
+        name.clear();
+        name << "_" << (++j);
+        
+        try
+        {
+          (**t).setName(name.str());
+          rename = false;
+        }
+        catch(exception::Error & e) { /* retry */ }
+      }
+    }
+    
+    name.str("");
+    name.clear(); 
+  }
+  
+  PNAPI_FOREACH(n, tmp)
+  {
+    n->first->setName(n->second);
   }
 
+  return result;
 }
 
 
@@ -1834,6 +1920,95 @@ void PetriNet::normalize_rules()
 {
   normalize_classical();
 }
+
+
+/*!
+ * \brief returns one node's conflict cluster
+ * 
+ * Let n be a node in a Petri net. Then n is in n's
+ * conflict cluster [n]. For each place p in [n] the
+ * postset of p is also in [n]. For each transition t
+ * in [n] t's preset is also in [n].
+ *
+ * \return n's conflict cluster
+ */
+set<Node *> PetriNet::getConflictCluster(const Node & n) const
+{
+  set<Node *> result;
+  bool change = true;
+  map<Node *, bool> seen;
+
+  // 1. Inserting canonical node
+  result.insert(const_cast<Node *>(&n));
+
+  // 2. Inserting cluster nodes
+  while(change)
+  {
+    // do the magic
+    change = false;
+    PNAPI_FOREACH(r, result)
+    {
+      // 1. if r is a place r* is in [r]
+      if(dynamic_cast<Place *>(*r) != NULL)
+      {
+        PNAPI_FOREACH(t, (*r)->getPostset())
+        {
+          if(!result.count(*t))
+          {
+            result.insert(*t);
+            change = true;
+          }
+        }
+      }
+
+      // 2. if r is a transition *r is in [r]
+      if(dynamic_cast<Transition *>(*r) != NULL)
+      {
+        PNAPI_FOREACH(p, (*r)->getPreset())
+        {
+          if(!result.count(*p))
+          {
+            result.insert(*p);
+            change = true;
+          }
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+
+/*!
+ * \brief returns the net's conflict clusters
+ *
+ * Uses the method PetriNet::getConflictluster(Node & n)
+ * on each node.
+ *
+ * \return all conflict clusters of the net
+ */
+vector<set<Node *> > PetriNet::getConflictClusters() const
+{
+  vector<set<Node *> > result;
+  set<Node *> seen;
+
+  PNAPI_FOREACH(n, nodes_)
+  {
+    if (!seen.count(*n))
+    {
+      set<Node *> tmp = getConflictCluster(**n);
+      PNAPI_FOREACH(t, tmp)
+      {
+        tmp.insert(*t);
+      }
+      result.push_back(tmp);
+    }
+  }
+
+  return result;
+}
+
 
 } /* namespace pnapi */
 

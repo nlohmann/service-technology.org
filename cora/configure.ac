@@ -1,8 +1,18 @@
-AC_INIT(Cora, 0.3, cora@service-technology.org, cora, http://service-technology.org/cora)
+AC_INIT([Cora], 0.3-unreleased, cora@service-technology.org, cora, http://service-technology.org/cora)
+
+AC_MSG_NOTICE([  ____                ])
+AC_MSG_NOTICE([ / ___|___  _ __ __ _ ])
+AC_MSG_NOTICE([| |   / _ \| '__/ _` |])
+AC_MSG_NOTICE([| |__| (_) | | | (_| |])
+AC_MSG_NOTICE([ \____\___/|_|  \__,_|])
+AC_MSG_NOTICE([COverability graphs for Reachability Analysis])
+AC_MSG_NOTICE([${PACKAGE_URL}])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
+AC_MSG_NOTICE()
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
-#AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_AUX_DIR([build-aux])
 
 AM_INIT_AUTOMAKE#(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -16,15 +26,8 @@ AC_PROG_YACC
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_AUTOTEST
-AC_ST_PNAPI
+AC_ST_PNAPI([4.02])
 AC_ST_VERBOSE
-
-# search for optional tools
-AC_PROG_LIBTOOL
-
-# check for dlopen/ftime (required by lp_solve)
-AC_SEARCH_LIBS([dlopen], [dl zrldsrl])
-AC_SEARCH_LIBS([ftime], [compat])
 
 # check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use pipes -- expect bad performance]))

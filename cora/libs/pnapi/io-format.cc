@@ -341,7 +341,7 @@ std::ostream & output(std::ostream & os, const Arc & arc)
  */
 std::ostream & output(std::ostream & os, const Interface & interface)
 {
-  os << "// interface\n";
+  os << "// interface\n" << delim("\n");
   
   map<string, Port *> ports = interface.getPorts();
   

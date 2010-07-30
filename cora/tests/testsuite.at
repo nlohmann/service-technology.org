@@ -5,13 +5,11 @@ AT_BANNER([Basic Options])
 ############################################################################
 
 AT_SETUP([Help output])
-AT_SKIP_IF(true)
 AT_CHECK([CORA --help],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
 AT_SETUP([Version output])
-AT_SKIP_IF(true)
 AT_CHECK([CORA --version],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP

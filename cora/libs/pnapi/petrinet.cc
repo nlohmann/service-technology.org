@@ -13,9 +13,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2010-07-11 17:42:11 +0200 (Sun, 11 Jul 2010) $
+ * \date    $Date: 2010-07-27 18:53:14 +0200 (Tue, 27 Jul 2010) $
  *
- * \version $Revision: 5894 $
+ * \version $Revision: 5964 $
  */
 
 #include "config.h"
@@ -90,7 +90,17 @@ void ComponentObserver::updateNodeNameHistory(Node & node,
   // remove access to nodes by their former names
   net_.nodesByName_.erase(*oldHistory.begin());
   
-  initializeNodeNameHistory(node);
+  try
+  {
+    initializeNodeNameHistory(node);
+  }
+  catch (exception::Error & e)
+  {
+    // undo change
+    net_.nodesByName_[*oldHistory.begin()] = &node;
+    
+    throw e;
+  }
 }
 
 
@@ -1815,15 +1825,82 @@ void PetriNet::normalize_classical()
 std::map<std::string, std::string> PetriNet::canonicalNames()
 {
   map<string, string> result;
+  map<Node *, string> tmp;
   int i = 0;
+  int j = 0;
   stringstream name;
-  PNAPI_FOREACH(n, nodes_)
+  
+  PNAPI_FOREACH(p, places_)
   {
     name << "p" << (++i);
-    result[name.str()] = (*n)->getName();
-    (**n).setName(name.str());
+    result[name.str()] = (*p)->getName();
+    
+    try
+    {
+      (**p).setName(name.str());
+    }
+    catch(exception::Error & e)
+    {
+      // name conflict
+      tmp[*p] = name.str();
+      bool rename = true;
+      while(rename)
+      {
+        name.str("");
+        name.clear();
+        name << "_" << (++j);
+        
+        try
+        {
+          (**p).setName(name.str());
+          rename = false;
+        }
+        catch(exception::Error & e) { /* retry */ }
+      }
+    }
+    
     name.str("");
     name.clear(); 
+  }
+  
+  i = 0;
+  
+  PNAPI_FOREACH(t, transitions_)
+  {
+    name << "t" << (++i);
+    result[name.str()] = (*t)->getName();
+    
+    try
+    {
+      (**t).setName(name.str());
+    }
+    catch(exception::Error & e)
+    {
+      // name conflict
+      tmp[*t] = name.str();
+      bool rename = true;
+      while(rename)
+      {
+        name.str("");
+        name.clear();
+        name << "_" << (++j);
+        
+        try
+        {
+          (**t).setName(name.str());
+          rename = false;
+        }
+        catch(exception::Error & e) { /* retry */ }
+      }
+    }
+    
+    name.str("");
+    name.clear(); 
+  }
+  
+  PNAPI_FOREACH(n, tmp)
+  {
+    n->first->setName(n->second);
   }
 
   return result;
@@ -1846,59 +1923,90 @@ void PetriNet::normalize_rules()
 
 
 /*!
- * \brief returns one node's free-choice cluster
+ * \brief returns one node's conflict cluster
  * 
- * The node's n cluster [n] follows the
- * definition in [].
+ * Let n be a node in a Petri net. Then n is in n's
+ * conflict cluster [n]. For each place p in [n] the
+ * postset of p is also in [n]. For each transition t
+ * in [n] t's preset is also in [n].
  *
- * \return ...
- * \todo fulfill doxygen's documentation part
+ * \return n's conflict cluster
  */
-set<Node *> PetriNet::getCluster(const Node & n) const
+set<Node *> PetriNet::getConflictCluster(const Node & n) const
 {
-	set<Node *> result;
-	bool change = true;
-	map<Node *, bool> seen;
-	
-	// 1. Inserting canonical node
-	result.insert(const_cast<Node *>(&n));
-	
-	// 2. Inserting cluster nodes
-	while(change)
-	{
-		// do the magic
-		change = false;
-		PNAPI_FOREACH(r, result)
-		{
-			// 1. if r is a place r* is in [r]
-			if(dynamic_cast<Place *>(*r) != NULL)
-			{
-				PNAPI_FOREACH(t, (*r)->getPostset())
-				{
-					if(!result.count(*t))
-					{
-						result.insert(*t);
-						change = true;
-					}
-				}
-			}
-			
-			// 2. if r is a transition *r is in [r]
-			if(dynamic_cast<Transition *>(*r) != NULL)
-			{
-				PNAPI_FOREACH(p, (*r)->getPreset())
-				{
-					if(!result.count(*p))
-					{
-						result.insert(*p);
-						change = true;
-					}
-				}
-			}
-		}
-	}
+  set<Node *> result;
+  bool change = true;
+  map<Node *, bool> seen;
 
-	return result;
+  // 1. Inserting canonical node
+  result.insert(const_cast<Node *>(&n));
+
+  // 2. Inserting cluster nodes
+  while(change)
+  {
+    // do the magic
+    change = false;
+    PNAPI_FOREACH(r, result)
+    {
+      // 1. if r is a place r* is in [r]
+      if(dynamic_cast<Place *>(*r) != NULL)
+      {
+        PNAPI_FOREACH(t, (*r)->getPostset())
+        {
+          if(!result.count(*t))
+          {
+            result.insert(*t);
+            change = true;
+          }
+        }
+      }
+
+      // 2. if r is a transition *r is in [r]
+      if(dynamic_cast<Transition *>(*r) != NULL)
+      {
+        PNAPI_FOREACH(p, (*r)->getPreset())
+        {
+          if(!result.count(*p))
+          {
+            result.insert(*p);
+            change = true;
+          }
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+
+/*!
+ * \brief returns the net's conflict clusters
+ *
+ * Uses the method PetriNet::getConflictluster(Node & n)
+ * on each node.
+ *
+ * \return all conflict clusters of the net
+ */
+vector<set<Node *> > PetriNet::getConflictClusters() const
+{
+  vector<set<Node *> > result;
+  set<Node *> seen;
+
+  PNAPI_FOREACH(n, nodes_)
+  {
+    if (!seen.count(*n))
+    {
+      set<Node *> tmp = getConflictCluster(**n);
+      PNAPI_FOREACH(t, tmp)
+      {
+        tmp.insert(*t);
+      }
+      result.push_back(tmp);
+    }
+  }
+
+  return result;
 }
 
 

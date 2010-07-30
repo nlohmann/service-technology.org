@@ -129,6 +129,8 @@ public: /* public methods */
    * \name structural changes
    */
   //@{
+  /// setting the name
+  void setName(const std::string &);
   /// adding a label
   Label & addLabel(Label &);
   /// adding a label with a given type
@@ -148,7 +150,7 @@ public: /* public methods */
   //@}
 
   /*!
-   * \brief getter
+   * \name getter
    */
   //@{
   /// return the name of the port

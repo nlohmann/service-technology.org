@@ -7,10 +7,12 @@
                      http://service-technology.org/cora
 
 
-PURPOSE
-Version 0.2-unreleased (13 Jul 2010)
-====================================
+Version 0.3-unreleased
+======================
 
-* added partial documentation
+* updated the Petri Net API 4.02 (revision r5970)
 
-\nSee file ChangeLog <http://service-technology.org/files/cora/ChangeLog> for\ncomplete version history.\n
+
+See file ChangeLog <http://service-technology.org/files/cora/ChangeLog> for
+complete version history.
+

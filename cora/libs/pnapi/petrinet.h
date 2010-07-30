@@ -13,9 +13,9 @@
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-07-11 17:35:31 +0200 (Sun, 11 Jul 2010) $
+ * \date    $Date: 2010-07-23 14:38:42 +0200 (Fri, 23 Jul 2010) $
  *
- * \version $Revision: 5893 $
+ * \version $Revision: 5949 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -159,8 +159,7 @@ public: /* public types */
                   SERIES_TRANSITIONS | SELF_LOOP_PLACES |
                   SELF_LOOP_TRANSITIONS | EQUAL_PLACES),
     SET_STARKE = (STARKE_RULE_3_PLACES | STARKE_RULE_3_TRANSITIONS |
-                  STARKE_RULE_4 | STARKE_RULE_5 | STARKE_RULE_6 |
-                  STARKE_RULE_7 | STARKE_RULE_8 | STARKE_RULE_9),
+                  STARKE_RULE_4 | STARKE_RULE_7 | STARKE_RULE_8),
     K_BOUNDEDNESS = SET_PILLAT,
     BOUNDEDNESS = (SET_PILLAT | SET_STARKE),
     LIVENESS = (SET_PILLAT | SET_STARKE)
@@ -380,8 +379,10 @@ public: /* public methods */
   const Condition & getFinalCondition() const;
   /// guess a place relation
   std::map<const Place *, const Place *> guessPlaceRelation(const PetriNet &) const;
-  /// returns one node's free-choice cluster
-  std::set<Node *> getCluster(const Node &) const;
+  /// returns one node's conflict cluster
+  std::set<Node *> getConflictCluster(const Node &) const;
+  /// returns net's conflict clusters
+  std::vector<std::set<Node *> > getConflictClusters() const;
   //@}
   
   

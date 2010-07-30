@@ -17,34 +17,32 @@ ST_PNAPI_OLDLIBS=${LIBS}
 AC_LANG([C++])
 AC_CHECK_LIB(pnapi, libpnapi_is_present)
 
-# query version of installed PNAPI using pkg-config
-AC_MSG_CHECKING([version of installed Petri Net API])
-AC_PATH_PROGS_FEATURE_CHECK(PKGCONFIG, [pkg-config], [pnapi_version=`pkg-config --modversion libpnapi 2> /dev/null`])
-if test -n "$pnapi_version"; then
-  AC_MSG_RESULT([$pnapi_version])
-else
-  AC_MSG_RESULT([unknown])
-fi
-
+# check whether we can use an installed Petri Net API
 AC_MSG_CHECKING([whether to use installed Petri Net API])
-
-if test "x$with_pnapi" != xno -a "${ac_cv_lib_pnapi_libpnapi_is_present}" = "yes"; then
-  AC_MSG_RESULT([yes])
-  AM_CONDITIONAL(COMPILE_PNAPI, [false])
+if test "x$with_pnapi" = xno; then
+  # NO: user gave '--without-pnapi' parameter
+  AC_MSG_RESULT([no (--without-pnapi)])
+  AM_CONDITIONAL(COMPILE_PNAPI, [true])
+  LIBS=${ST_PNAPI_OLDLIBS}
 else
-  if test "x$with_pnapi" != xno; then
-    AC_MSG_RESULT([no (library not found or not usable)])
+  if test "${ac_cv_lib_pnapi_libpnapi_is_present}" = "no"; then
+    # NO: we cannot link agains the installed Petri Net API
+    AC_MSG_RESULT([no (not present)])
     AM_CONDITIONAL(COMPILE_PNAPI, [true])
-  else
-    AC_MSG_RESULT([no])
-    AM_CONDITIONAL(COMPILE_PNAPI, [true])
-
-    # reset LIBS variable to previous value
     LIBS=${ST_PNAPI_OLDLIBS}
+  else
+    AC_PATH_PROGS_FEATURE_CHECK(PKGCONFIG, [pkg-config], [pnapi_version=`pkg-config --modversion libpnapi 2> /dev/null`])
+    if test "`echo $pnapi_version | ${AWK} '{if (@S|@1 >= $1) print 0; else print 1}'`" = 1; then
+      # NO: installed Petri Net API is too old
+      AC_MSG_RESULT([no (version $pnapi_version too old)])
+      AM_CONDITIONAL(COMPILE_PNAPI, [true])
+      LIBS=${ST_PNAPI_OLDLIBS}
+    else
+      # YES: everything is fine
+      AC_MSG_RESULT([yes (version $pnapi_version)])
+      AM_CONDITIONAL(COMPILE_PNAPI, [false])
+    fi
   fi
-  # these tools are needed to compile the Petri Net API
-  AC_PROG_LEX
-  AC_PROG_YACC
 fi
 
 ])

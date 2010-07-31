@@ -70,10 +70,6 @@ rm -rf pnapi.tar.gz
 # tell user we have finished
 echo
 echo "  Finished installing PNAPI"
-if [ "$1" == "--most-recent" ]; then
-  echo "  Please check, whether all files are versioned properly in your tool."
-else
-  echo "  Please check, whether all files are versioned properly in your tool"
-  echo "  and update the 'ST_PNAPI' macro in your 'configure.ac' file if present."
-fi
+echo "  Please check, whether all files are versioned properly in your tool"
+echo "  and update the 'ST_PNAPI' macro in your 'configure.ac' file if present."
 

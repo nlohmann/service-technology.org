@@ -21,12 +21,17 @@
 #include <cstdlib>
 #include <vector>
 #include <deque>
-#include "pnapi/pnapi.h"
+#include <pnapi/pnapi.h>
 #include "cnode.h"
 #include "covergraph.h"
-#include "stubbornset.h"
-#include "imatrix.h"
 #include "extmarking.h"
+#include "imatrix.h"
+#include "pnloader.h"
+#include "rnode.h"
+#include "stubbornset.h"
+
+#include "cmdline.h"
+#include "verbose.h"
 
 using std::cerr;
 using std::cout;

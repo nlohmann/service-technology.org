@@ -13,17 +13,10 @@
 
 
 #ifndef PNAPI_PNAPI_H
-#include "pnapi/pnapi.h"
+#include <pnapi/pnapi.h>
 #endif
-#include "cora.h"
-#include "pnloader.h"
-#include "imatrix.h"
+#include <cora/cora.h>
 #include "cmdline.h"
-#include "extmarking.h"
-#include "cnode.h"
-#include "rnode.h"
-#include "covergraph.h"
-#include "stubbornset.h"
 #include "verbose.h"
 
 using std::cerr;

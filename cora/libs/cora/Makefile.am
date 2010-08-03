@@ -5,7 +5,7 @@ libcora_a_SOURCES = cora.cc cora.h pnloader.cc pnloader.h imatrix.cc imatrix.h  
 BUILT_SOURCES = $(top_srcdir)/src/cmdline.h
 
 # to find customer's config.h header
-libpnapi_a_CPPFLAGS = -I$(top_srcdir)/src
+libcora_a_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/libs
 
 $(top_srcdir)/src/cmdline.h:
 	$(MAKE) cmdline.c -C$(top_srcdir)/src

@@ -19,7 +19,6 @@
 #endif
 #include "stubbornset.h"
 #include "imatrix.h"
-#include "cmdline.h"
 #include "verbose.h"
 
 #include <vector>
@@ -40,8 +39,6 @@ using std::string;
 using std::cerr;
 using std::cout;
 using std::endl;
-
-extern gengetopt_args_info args_info;
 
 extern vector<Place*> po;
 
@@ -93,6 +90,11 @@ void StubbornSet::setGoalMarking(Marking& goal) { aim = goal; }
 	@param cov If the goal marking should be covered.
 */
 void StubbornSet::setCover(bool cov) { cover = cov; }
+
+/** Check if the goal marking for the stubborn set method should be covered or reached.
+	@return If the goal marking should be covered.
+*/
+bool StubbornSet::isCover() { return cover; }
 
 /** Compute a stubborn set for a given extended marking.
 	@param m The extended marking (i.e. a set of markings) for which a small set of necessary

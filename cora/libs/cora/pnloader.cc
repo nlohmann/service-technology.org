@@ -30,7 +30,6 @@
 #include "pnapi/pnapi.h"
 #endif
 #include "pnloader.h"
-#include "cmdline.h"
 
 using std::cerr;
 using std::cout;
@@ -47,15 +46,13 @@ using std::ofstream;
 using std::ostringstream;
 using std::setw;
 
-extern gengetopt_args_info args_info;
-
 	/**************************************
 	* Implementation of the class Problem *
 	**************************************/
 
 /** Standard constructor.
 */
-PNLoader::PNLoader() : deinit(false),generalcover(false),type(NOTYPE),nettype(LOLA),pn(NULL) {}
+PNLoader::PNLoader() : deinit(false),generalcover(false),type(NOTYPE),nettype(LOLA),pn(NULL),nondet(false) {}
 
 /** Destructor.
 */
@@ -209,6 +206,7 @@ map<Transition*,int> PNLoader::getVectorToRealize() {
 */
 
 /** Get the Petri net of a problem and calculate the global ordering of transitions and places.
+	@param nondet Returns true if the place or transition ordering of the Petri net is nondeterministic.
 	@return The Petri net.
 */
 PetriNet* PNLoader::getPetriNet() {
@@ -250,9 +248,14 @@ PetriNet* PNLoader::getPetriNet() {
 
 	if (!src) infile->close();
 	deinit = true;
-	if (!calcPTOrder() && args_info.verbose_given) status("place or transition ordering is non-deterministic");
+	nondet = !calcPTOrder();
 	return pn;
 }
+
+/** Checks if the loaded Petri net is nondeterministic.
+	@return true if it is nondeterministic.
+*/
+bool PNLoader::isNonDeterministic() { return nondet; }
 
 /** Get the goal of a problem.
 	@return REACHABILITY or REALIZABILITY.

@@ -57,7 +57,7 @@ public:
 	bool createSuccessors(CNode& cn);
 
 	/// Print the coverability graph (with or without subnodes)
-	void printGraph(vector<Place*>& porder, bool rootonly);
+	void printGraph(vector<Place*>& porder, bool rootonly, bool pumpinfo);
 
 	/// Complete the coverability graph with root nodes.
 	void completeGraph();

@@ -30,6 +30,7 @@ Cora::Cora(PetriNet& net, Marking& m0, const vector<Place*>& porder, const vecto
 	loops = 0;
 	aim = NULL;
 	final = NULL;
+	full = false;
 }
 
 /** Destructor. */
@@ -118,7 +119,7 @@ deque<Transition*> Cora::solve(int mode) {
 			cout << "cora: Graph Structure ";
 			if (loops==0) cout << "BEFORE "; else cout << "AFTER ";
 			cout << "split:" << endl;
-			cg->printGraph(pord,false);
+			cg->printGraph(pord,false,true);
 			cout << endl;
 			cout << "Path to Aim: "; // print the path chosen
 			for(unsigned int i=0; i<path.size(); ++i)
@@ -144,7 +145,7 @@ deque<Transition*> Cora::solve(int mode) {
 	@param root If only the root nodes should be printed (false = also subnodes are printed).
 */
 void Cora::printGraph(bool root) {
-	cg->printGraph(pord,root);
+	cg->printGraph(pord,root,root&&full);
 	cout << "Initial Node: ";
 	cg->getInitial()->getMarking().show(cout,pord);
 	cout << endl;
@@ -162,6 +163,7 @@ void Cora::buildFullGraph() {
 		(*rit).cnode->computeFirables(*pn,im); // and all edges from there
 	}
 	cg->completeGraph(); // now complete the graph
+	full = true;
 }
 
 /** Prints info on how many paths in the coverability graph were tested until a solution

@@ -58,6 +58,9 @@ public:
 	/// Set if the goal marking should be covered
 	void setCover(bool cov);
 
+	/// Check if the goal marking should be covered
+	bool isCover();
+
 	/// The algorithm to compute a stubborn set
 	vector<Transition*> compute(ExtMarking& m);
 

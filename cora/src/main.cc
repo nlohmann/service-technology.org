@@ -117,6 +117,8 @@ if (args_info.input_given || args_info.pipe_given) {
 	else if (args_info.lola_given) pnl.setNetType(PNLoader::LOLA);
 	else if (args_info.pnml_given) pnl.setNetType(PNLoader::PNML);
 	PetriNet* pn(pnl.getPetriNet()); // obtain the Petri net
+	if (pnl.isNonDeterministic() && args_info.verbose_given) 
+		status("place or transition ordering is non-deterministic");
 	vector<Place*> pord(pnl.getPOrder()); // and its place ordering
 	po = pord;
 	Marking m1(pnl.getInitialMarking()); // get the initial marking

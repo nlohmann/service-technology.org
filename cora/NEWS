@@ -7,12 +7,16 @@
                      http://service-technology.org/cora
 
 
-Version 0.3-unreleased
-======================
+Version 0.3-unreleased (30 Jul 2010)
+====================================
 
 * updated the Petri Net API 4.02 (revision r5970)
 
+* added algorithm for pumping unfirable sequences to firables ones, to
+  check coverability
 
-See file ChangeLog <http://service-technology.org/files/cora/ChangeLog> for
-complete version history.
+* added documentation
 
+* separated input/output from functionality
+
+\nSee file ChangeLog <http://service-technology.org/files/cora/ChangeLog> for\ncomplete version history.\n

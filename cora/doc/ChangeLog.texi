@@ -1,15 +1,18 @@
 @c <<-- CHANGE START (version information) -->>
-@heading Version 0.3-unreleased
+@heading Version 0.3-unreleased (30 Jul 2010)
 @itemize
 @item updated the Petri Net API 4.02 (revision r5970)
+@item added algorithm for pumping unfirable sequences to firables ones, to check coverability
+@item added documentation
+@item separated input/output from functionality
 @end itemize
 
-@heading Version 0.2 (13 Jul 2010)
+@heading Version 0.2-unreleased (13 Jul 2010)
 @itemize
 @item added partial documentation
 @end itemize
 
-@heading Version 0.1 (13 Jul 2010)
+@heading Version 0.1-unreleased (13 Jul 2010)
 @itemize
 @item first version of Cora
 @item tests reachability based on the coverability graph by splitting nodes

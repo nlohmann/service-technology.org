@@ -88,6 +88,9 @@ public:
 	/// Get the Petri net
 	PetriNet* getPetriNet();
 
+	/// Get info on if the Petri net is nondeterministic
+	bool isNonDeterministic();
+
 	/// Get the problem goal
 	int getGoal();
 
@@ -203,6 +206,9 @@ private:
 
 	/// inverse place ordering
 	map<Place*,int> revporder;
+
+	/// if the Petri Netis nondeterministic
+	bool nondet;
 };
 
 #endif

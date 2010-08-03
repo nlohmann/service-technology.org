@@ -16,7 +16,6 @@
 
 #include <deque>
 #include "pnapi/pnapi.h"
-#include "cmdline.h"
 #include "covergraph.h"
 #include "rnode.h"
 #include "cnode.h"
@@ -29,9 +28,6 @@ using std::deque;
 using std::vector;
 using std::cout;
 using std::endl;
-
-/// the command line parameters
-extern gengetopt_args_info args_info;
 
 	/*************************************
 	* Implementation of class CoverGraph *
@@ -135,13 +131,14 @@ bool CoverGraph::createSuccessors(CNode& cn) {
 /** Print the coverability graph.
 	@param porder Ordering of the places for printing markings.
 	@param rootonly Only print the original graph without node splitting.
+	@param pumpinfo If the pumppaths at the nodes should be printed.
 */
-void CoverGraph::printGraph(vector<Place*>& porder, bool rootonly) {
+void CoverGraph::printGraph(vector<Place*>& porder, bool rootonly, bool pumpinfo) {
 	set<RNode>::iterator rit;
 	for(rit=nodes.begin(); rit!=nodes.end(); ++rit) 
 	{ // go through all the global nodes (with regular ExtMarkings)
 		(*rit).cnode->getMarking().show(cout,porder); // print the marking
-		if (args_info.fullgraph_given) {
+		if (pumpinfo) {
 			vector<deque<Transition*> > pumppaths;
 			vector<set<Place*> > pumpsets;
 			(*rit).getPumpInfo(pumppaths,pumpsets);
@@ -411,7 +408,7 @@ bool CoverGraph::splitPath(deque<Transition*>& path) {
 	if (i==path.size()) // next we need to check whether a final marking was reached
 	{ // all transitions on the path were firable, so we reached the goal node, but did we also reach the goal marking?
 		if (!sb) return true; // if we have no final marking (just a node), we are done
-		p = m.distinguish(sb->getGoal(),args_info.cover_given); // check if reached and goal marking are identical
+		p = m.distinguish(sb->getGoal(),sb->isCover()); // check if reached and goal marking are identical
 		if (!p) return true; // if the path was fully firable and the goal is reached, no split is necessary
 		token = sb->getGoal()[*p]; // we cut the node below the goal token number ...
 		if (!m.lessThanOn(sb->getGoal(),*p)) ++token; // unless the reached marking is higher, then cut above it

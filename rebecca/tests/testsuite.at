@@ -99,3 +99,79 @@ AT_CHECK([GREP -q "distributedly realizable: NO" stderr],0)
 AT_CHECK([GREP -q "partially realizable:     YES" stderr],0)
 AT_KEYWORDS(realizability)
 AT_CLEANUP
+
+############################################################################
+AT_BANNER([Realizability Tests (Decker)])
+############################################################################
+
+AT_SETUP([Decker Phd Fig. 5-32 (a)])
+AT_CHECK([cp TESTFILES/Decker_2009_phd-Fig5-32a.chor .])
+AT_CHECK([REBECCA < Decker_2009_phd-Fig5-32a.chor -q],0,ignore,stderr)
+AT_CHECK([GREP -q "completely realizable:    NO" stderr],0)
+AT_CHECK([GREP -q "distributedly realizable: NO" stderr],0)
+AT_CHECK([GREP -q "partially realizable:     NO" stderr],0)
+AT_KEYWORDS(realizability)
+AT_CLEANUP
+
+AT_SETUP([Decker Phd Fig. 5-32 (b)])
+AT_CHECK([cp TESTFILES/Decker_2009_phd-Fig5-32b.chor .])
+AT_CHECK([REBECCA < Decker_2009_phd-Fig5-32b.chor -q],0,ignore,stderr)
+AT_CHECK([GREP -q "completely realizable:    NO" stderr],0)
+AT_CHECK([GREP -q "distributedly realizable: YES" stderr],0)
+AT_CHECK([GREP -q "partially realizable:     YES" stderr],0)
+AT_KEYWORDS(realizability)
+AT_CLEANUP
+
+AT_SETUP([Decker Phd Fig. 5-33 (a)])
+AT_CHECK([cp TESTFILES/Decker_2009_phd-Fig5-33a.chor .])
+AT_CHECK([REBECCA < Decker_2009_phd-Fig5-33a.chor -q],0,ignore,stderr)
+AT_CHECK([GREP -q "completely realizable:    NO" stderr],0)
+AT_CHECK([GREP -q "distributedly realizable: NO" stderr],0)
+AT_CHECK([GREP -q "partially realizable:     YES" stderr],0)
+AT_KEYWORDS(realizability)
+AT_CLEANUP
+
+#AT_SETUP([Decker Phd Fig. 5-33 (b)])
+#AT_CHECK([cp TESTFILES/Decker_2009_phd-Fig5-33b.chor .])
+#AT_CHECK([REBECCA < Decker_2009_phd-Fig5-33b.chor -q],0,ignore,stderr)
+#AT_CHECK([GREP -q "completely realizable:    NO" stderr],0)
+#AT_CHECK([GREP -q "distributedly realizable: NO" stderr],0)
+#AT_CHECK([GREP -q "partially realizable:     NO" stderr],0)
+#AT_KEYWORDS(realizability)
+#AT_CLEANUP
+
+#AT_SETUP([Decker Phd Fig. 5-34 (a)])
+#AT_CHECK([cp TESTFILES/Decker_2009_phd-Fig5-34a.chor .])
+#AT_CHECK([REBECCA < Decker_2009_phd-Fig5-34a.chor -q],0,ignore,stderr)
+#AT_CHECK([GREP -q "completely realizable:    NO" stderr],0)
+#AT_CHECK([GREP -q "distributedly realizable: NO" stderr],0)
+#AT_CHECK([GREP -q "partially realizable:     YES" stderr],0)
+#AT_KEYWORDS(realizability)
+#AT_CLEANUP
+
+AT_SETUP([Decker Phd Fig. 5-34 (b)])
+AT_CHECK([cp TESTFILES/Decker_2009_phd-Fig5-34b.chor .])
+AT_CHECK([REBECCA < Decker_2009_phd-Fig5-34b.chor -q],0,ignore,stderr)
+AT_CHECK([GREP -q "completely realizable:    YES" stderr],0)
+AT_CHECK([GREP -q "distributedly realizable: YES" stderr],0)
+AT_CHECK([GREP -q "partially realizable:     YES" stderr],0)
+AT_KEYWORDS(realizability)
+AT_CLEANUP
+
+AT_SETUP([Decker Phd Fig. 5-35])
+AT_CHECK([cp TESTFILES/Decker_2009_phd-Fig5-35.chor .])
+AT_CHECK([REBECCA < Decker_2009_phd-Fig5-35.chor -q],0,ignore,stderr)
+AT_CHECK([GREP -q "completely realizable:    YES" stderr],0)
+AT_CHECK([GREP -q "distributedly realizable: YES" stderr],0)
+AT_CHECK([GREP -q "partially realizable:     YES" stderr],0)
+AT_KEYWORDS(realizability)
+AT_CLEANUP
+
+#AT_SETUP([Decker Phd Fig. 5-42])
+#AT_CHECK([cp TESTFILES/Decker_2009_phd-Fig5-42.chor .])
+#AT_CHECK([REBECCA < Decker_2009_phd-Fig5-42.chor -q],0,ignore,stderr)
+#AT_CHECK([GREP -q "completely realizable:    NO" stderr],0)
+#AT_CHECK([GREP -q "distributedly realizable: NO" stderr],0)
+#AT_CHECK([GREP -q "partially realizable:     YES" stderr],0)
+#AT_KEYWORDS(realizability)
+#AT_CLEANUP

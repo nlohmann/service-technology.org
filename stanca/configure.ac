@@ -17,7 +17,7 @@ AC_PROG_YACC
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_AUTOTEST
-AC_ST_PNAPI
+AC_ST_PNAPI([4.02])
 AC_ST_VERBOSE
 
 # search for optional tools

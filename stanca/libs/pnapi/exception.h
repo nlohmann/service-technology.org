@@ -11,9 +11,9 @@
  *
  * \since   2005/11/11
  *
- * \date    $Date: 2010-07-05 01:12:42 +0200 (Mon, 05 Jul 2010) $
+ * \date    $Date: 2010-07-23 14:38:42 +0200 (Fri, 23 Jul 2010) $
  *
- * \version $Revision: 5874 $
+ * \version $Revision: 5949 $
  */
 
 #ifndef PNAPI_EXCEPTION_H
@@ -133,6 +133,8 @@ public: /* public constants */
 public: /* public methods */
   /// constructor
   UserCausedError(UE_Type, const std::string &);
+  /// output method
+  virtual std::ostream & output(std::ostream &) const;
 };
 
 

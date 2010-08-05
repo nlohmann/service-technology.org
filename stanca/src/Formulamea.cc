@@ -133,7 +133,7 @@ vector<vector<int> > CNF2MSF(const MFormula *fcnf){
 		//	cout <<endl<<conj->toString()<<endl;
 		//}
 		list<const MConjunction*> sd;
-		sd.push_front(conj);int i=0;
+		sd.push_front(conj);
 		while (!sd.empty()) {
 			const MConjunction *cconj=sd.front();
 			//cout << endl<<sd.size()<<endl;++i;
@@ -298,19 +298,19 @@ vector<vector<int> > CNF2MSF(const MFormula *fcnf){
 	return msf;
 }
 
-int isSatisfiable(const MFormula *f){
-	bool sat=false;
+//int isSatisfiable(const MFormula *f){
+//	bool sat=false;
 	/// compute cnf
 	
-	return sat;
-}
+//	return sat;
+//}
 
 string toPl(map<string, vector<int> > mp, int id){
 	pair<string, int> help;
 	cout << mp.size()<<"size";
 	//const map<string, vector<int> >::iterator it;
 	for (map<string, vector<int> >::iterator it=mp.begin() ; it != mp.end(); it++ ){
-		for (int i=0; i<=(*it).second.size(); ++i) {
+		for (unsigned int i=0; i<=(*it).second.size(); ++i) {
 			if ((*it).second[i]==id) {
 				//pair<(*it).first,(*it).second> pp;
 				//cout <<"hey"<< (*it).first<<i+1;

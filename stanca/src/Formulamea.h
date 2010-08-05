@@ -20,8 +20,8 @@
 
 using namespace std;
 
-extern map<string, vector<int> > mp;
-string toPl(map<string, vector<int> > mp, int id);
+extern map<string, vector<unsigned int> > mp;
+string toPl(map<string, vector<unsigned int> > mp, int id);
 
 
 
@@ -39,7 +39,7 @@ public:
 	///basic constructor
 	MFormula(){}
 	//copy constructorFormula (const Formula & formula);
-	MFormula(const MFormula *f){}
+	//MFormula(const MFormula *f){}
 
 	/// compute implication-free form
 	virtual const MFormula* computeEFF() const =  0;

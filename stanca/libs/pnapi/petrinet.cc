@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: stephan $
+ *          last changes of: $Author: cas $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2010-07-13 19:15:35 +0200 (Tue, 13 Jul 2010) $
+ * \date    $Date: 2010-07-27 18:53:14 +0200 (Tue, 27 Jul 2010) $
  *
- * \version $Revision: 5917 $
+ * \version $Revision: 5964 $
  */
 
 #include "config.h"
@@ -90,7 +90,17 @@ void ComponentObserver::updateNodeNameHistory(Node & node,
   // remove access to nodes by their former names
   net_.nodesByName_.erase(*oldHistory.begin());
   
-  initializeNodeNameHistory(node);
+  try
+  {
+    initializeNodeNameHistory(node);
+  }
+  catch (exception::Error & e)
+  {
+    // undo change
+    net_.nodesByName_[*oldHistory.begin()] = &node;
+    
+    throw e;
+  }
 }
 
 
@@ -1815,15 +1825,82 @@ void PetriNet::normalize_classical()
 std::map<std::string, std::string> PetriNet::canonicalNames()
 {
   map<string, string> result;
+  map<Node *, string> tmp;
   int i = 0;
+  int j = 0;
   stringstream name;
-  PNAPI_FOREACH(n, nodes_)
+  
+  PNAPI_FOREACH(p, places_)
   {
     name << "p" << (++i);
-    result[name.str()] = (*n)->getName();
-    (**n).setName(name.str());
+    result[name.str()] = (*p)->getName();
+    
+    try
+    {
+      (**p).setName(name.str());
+    }
+    catch(exception::Error & e)
+    {
+      // name conflict
+      tmp[*p] = name.str();
+      bool rename = true;
+      while(rename)
+      {
+        name.str("");
+        name.clear();
+        name << "_" << (++j);
+        
+        try
+        {
+          (**p).setName(name.str());
+          rename = false;
+        }
+        catch(exception::Error & e) { /* retry */ }
+      }
+    }
+    
     name.str("");
     name.clear(); 
+  }
+  
+  i = 0;
+  
+  PNAPI_FOREACH(t, transitions_)
+  {
+    name << "t" << (++i);
+    result[name.str()] = (*t)->getName();
+    
+    try
+    {
+      (**t).setName(name.str());
+    }
+    catch(exception::Error & e)
+    {
+      // name conflict
+      tmp[*t] = name.str();
+      bool rename = true;
+      while(rename)
+      {
+        name.str("");
+        name.clear();
+        name << "_" << (++j);
+        
+        try
+        {
+          (**t).setName(name.str());
+          rename = false;
+        }
+        catch(exception::Error & e) { /* retry */ }
+      }
+    }
+    
+    name.str("");
+    name.clear(); 
+  }
+  
+  PNAPI_FOREACH(n, tmp)
+  {
+    n->first->setName(n->second);
   }
 
   return result;

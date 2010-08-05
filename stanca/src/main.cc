@@ -65,7 +65,7 @@ string invocation;
 
 string toPl(int id);
 
-extern map<string, vector<int> > mp;///m(p)(1) is the id of a place
+extern map<string, vector<unsigned int> > mp;///m(p)(1) is the id of a place
 
 void initGlobalVariables();
 //void evaluateParameters(int argc, char** argv);
@@ -123,7 +123,7 @@ void terminationHandler() {
 
 
 int main(int argc, char **argv) {
-	time_t start_time, end_time;
+	time_t start_time;
 	
     // set the function to call on normal termination
     atexit(terminationHandler);
@@ -175,7 +175,7 @@ int main(int argc, char **argv) {
 	//some statistics no of places and max id
 	
 	start_time=clock();
-	map<string, vector<int> > mp;///m(p)(1) is the id of a place
+	map<string, vector<unsigned int> > mp;///m(p)(1) is the id of a place
 	// id are generated in the order of appearance
     // build formula
 	
@@ -184,7 +184,7 @@ int main(int argc, char **argv) {
 	// first initialize variables of order 0
 	//int iteration=0;//iterations give the size of the vector
 	int id=0;///initial identifier 1
-	vector<int> iv;
+	vector<unsigned int> iv;
 	iv.push_back(++id);//this is for the id 0
 	//cout <<id;
 	PlLit* f = new PlLit(+id,(*net.getPlaces().begin())->getName(),0);// the first id must be used
@@ -193,7 +193,7 @@ int main(int argc, char **argv) {
 	}
 	iv.push_back(++id);//cout<<id;
 	
-	mp.insert(pair<string,vector<int> >((*net.getPlaces().begin())->getName(), iv));
+	mp.insert(pair<string,vector<unsigned int> >((*net.getPlaces().begin())->getName(), iv));
 	set<Place *>::iterator next=++net.getPlaces().begin();
 /*	for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
 		cout << (*it)->getName()<< " ";
@@ -203,7 +203,7 @@ int main(int argc, char **argv) {
 	}
 	cout << mp.size()<<endl;*/
 	
-	MFormula *previousl, *previous;
+	MFormula *previousl=NULL, *previous=NULL;
 	//here we do two things at a time the first formula plus initialize all copies of the variables with ids
 	//int iter=0;
 	if (net.getPlaces().size()==1) {
@@ -212,7 +212,7 @@ int main(int argc, char **argv) {
 	else {
 	for (set<Place *>::iterator it=next; it!= net.getPlaces().end(); ++it) {
 		///prepare previous formula
-		vector<int> iv;
+		vector<unsigned int> iv;
 		iv.push_back(++id);//this is for the id 0
 		PlLit* f1 = new PlLit(id,(*it)->getName(),0);//this one must be used
 		for (set<Place *>::iterator itn=net.getPlaces().begin(); itn!= net.getPlaces().end(); ++itn) {
@@ -220,7 +220,7 @@ int main(int argc, char **argv) {
 		}
 		iv.push_back(++id);
 		//cout << iv.size();
-		mp.insert(pair<string,vector<int> >((*it)->getName(), iv));
+		mp.insert(pair<string,vector<unsigned int> >((*it)->getName(), iv));
 		if (it==next) {
 			MDisjunction *d = new MDisjunction(f,f1);
 			previousl=d;
@@ -230,7 +230,7 @@ int main(int argc, char **argv) {
 			previousl=d;
 		}
 	}}
-	int maxid=id;
+	
 	cout << "Number of places "<<net.getPlaces().size() << "max id" <<id<<endl;
 	
 	/*for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
@@ -247,15 +247,15 @@ int main(int argc, char **argv) {
 		for (set<Transition*>::iterator tit=net.getTransitions().begin(); tit!=net.getTransitions().end(); ++tit) {
 			//cout << (*tit)->getName()<<" : ";
 			///build current net.findTransition((*tit)->getName())
-			MFormula  *inprev;  pnapi::Transition &t=*net.findTransition((*tit)->getName());//const std::string s=t->getName();std::set<Node *> sn;//
+			MFormula  *inprev=NULL;  pnapi::Transition &t=*net.findTransition((*tit)->getName());//const std::string s=t->getName();std::set<Node *> sn;//
 			//sn=net.findTransition((*tit)->getName())->getPostset();
 			for (std::set<pnapi::Node *>::iterator nit=t.getPreset().begin(); nit!=t.getPreset().end(); ++nit){
-				MFormula *currin;Place * pl = dynamic_cast<Place *> ((*nit));
+				MFormula *currin=NULL;Place * pl = dynamic_cast<Place *> ((*nit));
 				/// here find the corresponding place in the mapping  and build an Implication 
 				//cout << pl->getName();
 				//cout << " ";
 				int pid=mp[pl->getName()][0];// the first id for the place; we have to create more
-				MFormula *pvs;/// disjunction of pre-places
+				MFormula *pvs=NULL;/// disjunction of pre-places
 				///here build a disjunction
 				for (std::set<pnapi::Node *>::iterator nnit=net.findTransition((*tit)->getName())->getPostset().begin(); nnit!=net.findTransition((*tit)->getName())->getPostset().end(); ++nnit){
 					Place * pli = dynamic_cast<Place *> (*nnit); 
@@ -300,15 +300,15 @@ int main(int argc, char **argv) {
 	for (set<Transition*>::iterator tit=net.getTransitions().begin(); tit!=net.getTransitions().end(); ++tit) {
 		//cout << (*tit)->getName()<<" : ";
 		///build current net.findTransition((*tit)->getName())
-		MFormula  *inprev;  pnapi::Transition &t=*net.findTransition((*tit)->getName());//const std::string s=t->getName();std::set<Node *> sn;//
+		MFormula  *inprev=NULL;  pnapi::Transition &t=*net.findTransition((*tit)->getName());//const std::string s=t->getName();std::set<Node *> sn;//
 		//sn=net.findTransition((*tit)->getName())->getPostset();
 		for (std::set<pnapi::Node *>::iterator nit=t.getPostset().begin(); nit!=t.getPostset().end(); ++nit){
-			MFormula *currin;Place * pl = dynamic_cast<Place *> ((*nit));
+			MFormula *currin=NULL;Place * pl = dynamic_cast<Place *> ((*nit));
 			/// here find the corresponding place in the mapping  and build an Implication 
 			//cout << pl->getName();
 			//cout << " ";
 			int pid=mp[pl->getName()][0];// the first id for the place; we have to create more
-			MFormula *pvs;/// disjunction of pre-places
+			MFormula *pvs=NULL;/// disjunction of pre-places
 			///here build a disjunction
 			for (std::set<pnapi::Node *>::iterator nnit=net.findTransition((*tit)->getName())->getPreset().begin(); nnit!=net.findTransition((*tit)->getName())->getPreset().end(); ++nnit){
 				Place * pli = dynamic_cast<Place *> (*nnit); 
@@ -400,15 +400,15 @@ int main(int argc, char **argv) {
 			for (set<Transition*>::iterator tit=net.getTransitions().begin(); tit!=net.getTransitions().end(); ++tit) {
 				//cout << (*tit)->getName()<<" : ";
 				///build current net.findTransition((*tit)->getName())
-				MFormula  *inprev;  pnapi::Transition &t=*net.findTransition((*tit)->getName());//const std::string s=t->getName();std::set<Node *> sn;//
+				MFormula  *inprev=NULL;  pnapi::Transition &t=*net.findTransition((*tit)->getName());//const std::string s=t->getName();std::set<Node *> sn;//
 				//sn=net.findTransition((*tit)->getName())->getPostset();
 				for (std::set<pnapi::Node *>::iterator nit=t.getPostset().begin(); nit!=t.getPostset().end(); ++nit){
-					MFormula *currin;Place * pl = dynamic_cast<Place *> ((*nit));
+					MFormula *currin=NULL;Place * pl = dynamic_cast<Place *> ((*nit));
 					/// here find the corresponding place in the mapping  and build an Implication 
 					//cout << pl->getName();
 					//cout << " ";
 					int pid=mp[pl->getName()][1];// the first id for the place; we have to create more
-					MFormula *pvs;/// disjunction of pre-places
+					MFormula *pvs=NULL;/// disjunction of pre-places
 					///here build a disjunction
 					for (std::set<pnapi::Node *>::iterator nnit=net.findTransition((*tit)->getName())->getPreset().begin(); nnit!=net.findTransition((*tit)->getName())->getPreset().end(); ++nnit){
 						Place * pli = dynamic_cast<Place *> (*nnit); 
@@ -444,7 +444,7 @@ int main(int argc, char **argv) {
 				}
 				
 			}
-			MFormula *conjf;
+			MFormula *conjf=NULL;
 			if (previouss!=NULL) conjf=new MConjunction(ersteit,previouss);
 			//for all places add an implication
 			for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {
@@ -805,8 +805,6 @@ int main(int argc, char **argv) {
 		//if (args_info.verbose_flag ) {
 		cout << rs->size()<<endl;
 		
-		bool snt=false;
-		int maxkk=0;
 		
 		cout << "Siphon ";
 		for (unsigned int k=0; k<rs->size(); ++k) {

@@ -14,7 +14,34 @@ option "mode" m
 	
 option "service" -
 	"Makes the result interpretable as services."
+	details="Takes into account the initial and final markings of a service."
 	flag off
+	
+option "complementary" -
+	"Complements the internal places of the service (makes processes safe)."
+flag off
+
+option "complement" -
+	"Complements services with respect to the initial process."
+flag off
+
+
+option "threshold" t
+    "Set the threshold for recomposition."
+   details="Having the original decomposition, set up the number of times recomposition should be attempted (works in combination with the interface places)."
+   int 
+   default="3"
+   optional
+
+option "interface" i
+    "Set preferred interface place"
+	details="Having the original decomposition, set up preferred interface places (works in combination with the threshold)."
+	   string
+	   flag off
+
+option "compose" c
+		"Recompose components into two medium sized services."
+		  flag off
 
 section "Input and Output"
 

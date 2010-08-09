@@ -24,6 +24,9 @@
 #include "graph.H"
 #include <cstdlib>
 
+// for testing purposes only
+#define SYMMPROD
+
 #define NodeType int
 #define PL 0  /* place */
 #define TR 1  /* transition */
@@ -768,12 +771,65 @@ void ReUnify(unsigned int plpegel, unsigned int trpegel) {
 #endif
 }
 
+#if defined(SYMMPROD)
+unsigned int gcd(unsigned int n,unsigned int m){ return m==0?n:gcd(m,n%m); }
+
+void MinimizeCarrier(unsigned int pos) {
+	unsigned int orbit(Store[CurrentStore].image[pos].value->nr); // number of the orbit
+	unsigned int level(Store[CurrentStore].argnr); // offset for permutation vector
+	unsigned int ocyclen(1); // length of the orbit cycle (containing the orbit number)
+	unsigned int* ovec(Store[CurrentStore].image[pos].vector); // permutation vector
+	bool* visited = new bool[Places[0]->cnt-level+1]; // to mark visited cycles
+	unsigned int* cycle = new unsigned int[Places[0]->cnt-level+1]; // temporary memory for a cycle
+	for(unsigned int j=0; j<Places[0]->cnt-level; ++j) visited[j]=false;
+	unsigned int i(orbit);
+	visited[i-level]=true;
+
+	while ((i=ovec[i-level])!=orbit) { 
+		++ocyclen; 
+		visited[i-level]=true; 
+	} // calculate the orbit cycle length
+
+	for(unsigned int element=0; element<Places[0]->cnt-level; ++element) // go through the possible elements of non-trivial cycles
+	{
+		if (visited[element]) continue; // don't do this element again
+		unsigned int ecyclen(1); // length of the element's cycle
+		visited[element] = true;
+		cycle[0] = i = element+level; // start saving this cycle
+		while ((i=ovec[i-level])!=element+level) { 
+			cycle[ecyclen++] = i; 
+			visited[i-level] = true; 
+		} // calculate the element's cycle length and save the cycle
+		if (ecyclen==1) continue; // an identity; nothing to do
+		unsigned int ecycles(ecyclen); // the number of cycles the element's cycle will be split into
+		while ((i=gcd(ecycles,ocyclen))>1) ecycles /= i; // remove prime factors of ocyclen from ecycles
+		if (ecycles>1) // the ecycle can be split
+			for(i=0; i<ecyclen; ++i) // now store the replacement cycles
+				ovec[cycle[i]-level] = cycle[(i+ecycles)%ecyclen];
+	}
+
+	delete[] visited;
+	delete[] cycle;
+}
+#endif
+
 void StoreSymmetry(unsigned int pos) {
     unsigned int offset, c, *v;
     // unused: unsigned int i;
 
     offset = Store[CurrentStore].arg->nr;
     v = Store[CurrentStore].image[pos].vector = new unsigned int [Places[0]->cnt - offset];
+#if defined(SYMMPROD)
+    for (c = 0; c < CardSpecification[PL]; ++c) {
+        if (Reaktor[PL][DO][Specification[PL][c].first].node->nr >= offset) {
+            v[Reaktor[PL][DO][Specification[PL][c].first].node->nr - offset] =
+                Reaktor[PL][CO][Specification[PL][c].first].node->nr;
+        }
+    }
+	MinimizeCarrier(pos);
+    for (c = 0; c < Places[0]->cnt-offset; ++c)
+            UnifyClasses(c+offset,v[c]);
+#else
     for (c = 0; c < CardSpecification[PL]; c++) {
         if (Reaktor[PL][DO][Specification[PL][c].first].node->nr >= offset) {
             v[Reaktor[PL][DO][Specification[PL][c].first].node->nr - offset] =
@@ -781,6 +837,7 @@ void StoreSymmetry(unsigned int pos) {
             UnifyClasses(Reaktor[PL][DO][Specification[PL][c].first].node->nr, Reaktor[PL][CO][Specification[PL][c].first].node->nr);
         }
     }
+#endif
 }
 
 void WriteSymms() {
@@ -842,7 +899,6 @@ void WriteSymms() {
 
 
 
-
 void DefineToOther(unsigned int imagepos) {
     Node** possibleImages;
     unsigned int cntriv, i, j;
@@ -899,6 +955,7 @@ void DefineToOther(unsigned int imagepos) {
     }
     delete possibleImages;
 }
+
 
 bool found;
 
@@ -1078,6 +1135,90 @@ void OnlineCanonize() {
     ReUnify(MyCardSpecification[PL] - 1, MyCardSpecification[TR]);
 }
 
+
+#if defined(SYMMPROD)
+void BuildInconsistencies(unsigned int orbit, bool* inconsistent) {
+    if (!Store[CurrentStore].image[orbit].vector) {
+		unsigned int k,l;
+		inconsistent[orbit] = true;
+		for(l=Store[CurrentStore].image[orbit].value->nr; !(part[l].top); l=part[l].nextorcard);
+		for (unsigned int i=orbit+1; i<Store[CurrentStore].length; ++i)
+		{
+			for(k=Store[CurrentStore].image[i].value->nr; !(part[k].top); k=part[k].nextorcard);
+			if (k==l) inconsistent[i]=true;
+		}
+	}
+}
+#endif
+
+#if defined(SYMMPROD)
+void BuildProducts(unsigned int orbit, bool* inconsistent) {
+	unsigned int StorePos(CurrentStore);
+	if (!Store[StorePos].image[orbit].vector) return; // empty orbit, nothing to do
+
+	unsigned int j;
+	unsigned int bpstore, bporbit, bpnext, bpval, bplevel, k, bpnull(0);
+	unsigned int* bpcomp; // a permutation to compose the orbit's permutation(representative) with
+	unsigned int* bpnxvc; // the result of this composition
+	unsigned int level(Store[StorePos].argnr); // virtual offset of this orbit's vector
+
+	for(j=0; j<Store[StorePos].length; ++j) // count the number of still missing orbits
+		if (!(Store[StorePos].image[j].vector || inconsistent[j])) ++bpnull;
+	if (!bpnull) return; // all orbits are there, nothing to do
+	unsigned int* bplist(new unsigned int[bpnull + 1]); // a list of all orbits to work on
+	bplist[0] = orbit; // initially only the one given as parameter of this function
+	unsigned int bplength(0); // length minus one of the bplist
+
+    for(unsigned int bp = 0; bp <= bplength; ++bp)
+	{
+		orbit = bplist[bp]; // the orbit to compose now
+	    compose = Store[StorePos].image[orbit].vector; // the representative of the orbit
+		for(bpstore = CardStore; bpstore > StorePos; --bpstore) // go through all earlier built representatives (other groups and orbits)
+			for(bporbit = 0; bporbit < Store[bpstore-1].length; ++bporbit)
+			{
+				bpcomp = Store[bpstore-1].image[bporbit].vector; // get a previously produced vector(permutation)
+				if (!bpcomp) continue; // and check if it exists, if not: no composition is possible
+				bplevel = Store[bpstore-1].argnr; // offset (the virtual beginning of the vector bpcomp)
+				if (Store[StorePos].image[orbit].value->nr < bplevel) continue; // this permutation leads into same orbit, nothing new
+				bpval = bpcomp[Store[StorePos].image[orbit].value->nr - bplevel]; // get the new composed orbit number
+				if (bpval <= level) continue; // we ran into the symmetry group; no new orbit
+				for(bpnext = 0; Store[StorePos].image[bpnext].value->nr != bpval; ++bpnext); // find bpval's position in the store (the orbit number)
+				if (Store[StorePos].image[bpnext].vector) continue; // if a representative already exists for this orbit do nothing
+				bplist[bplength++] = bpnext; // a new orbit is found, we have to build products for it later
+				bpnxvc = Store[StorePos].image[bpnext].vector = new unsigned int[Places[0]->cnt - level + 1];
+	            for (k = 0 ; k < Places[0]->cnt - level; ++k) // now build the product vector bpcomp[compose[]] as new representative
+					bpnxvc[k] = (compose[k]<bplevel ? compose[k] : bpcomp[compose[k] - bplevel]); 
+				MinimizeCarrier(bpnext); // remove cycles if possible (by building powers)
+				if (--bpnull==0) { delete[] bplist; return; } // if this was the last missing orbit: stop immediately
+			}
+	}
+	delete[] bplist;
+}
+#else
+void BuildProducts(unsigned int orbit) {
+	unsigned int StorePos(CurrentStore);
+	unsigned int val, composed, k;
+
+    if (Store[StorePos].image[orbit].vector) {
+        compose = Store[StorePos].image[orbit].vector;
+        while (1) {
+            val = compose[Store[StorePos].image[orbit].value->nr - Store[StorePos].argnr];
+            if (val == Store[StorePos].argnr) break;
+            for (composed = 0; Store[StorePos].image[composed].value->nr != val; ++composed);
+            for (k = 0; k < Places[0]->cnt - Store[StorePos].argnr; k++)
+                reservecompose[k] = Store[StorePos].image[orbit].vector[compose[k] - Store[StorePos].argnr];
+            if ((Store[StorePos].image[composed].vector)) compose=reservecompose;
+            else {
+                Store[StorePos].image[composed].vector = new unsigned int [Places[0]->cnt - Store[StorePos].argnr + 1];
+                for (k = 0; k < Places[0]->cnt - Store[StorePos].argnr; k++)
+                    Store[StorePos].image[composed].vector[k] = reservecompose[k];
+                compose = Store[StorePos].image[composed].vector;
+            }
+        }
+    }
+}
+#endif
+
 void DefineToId(void) {
 
     unsigned int cntriv, nrmin, intriv, c, i, j, k, MyCardSpecification[2], MyStorePosition, composed, val, oldstorenr;
@@ -1132,7 +1273,7 @@ void DefineToId(void) {
         Store[CurrentStore].image[j].vector = NULL;
         Store[CurrentStore].image[j].value = Reaktor[PL][CO][j + Specification[PL][cntriv].first].node;
     }
-    MyStorePosition = CurrentStore;
+//    MyStorePosition = CurrentStore; // always the same!!
     if (!RefineUntilNothingChanges(PL)) {
         cout << " magic error\n";
     }
@@ -1140,9 +1281,18 @@ void DefineToId(void) {
         DefineToId();
     }
     ReUnify(MyCardSpecification[PL], MyCardSpecification[TR]);
+#if defined(SYMMPROD)
+	bool* inconsistent = new bool[Store[CurrentStore].length];
+	for (j = 0; j < Store[CurrentStore].length; ++j) inconsistent[j]=false;
+#endif
     for (j = 0; j < Store[CurrentStore].length; j++) {
         sigma = Store[CurrentStore].image + j;
-        if (!(sigma->vector)) {
+#if defined(SYMMPROD)
+        if (!(sigma->vector || inconsistent[j])) // only try to find a new representative if the orbit is empty and consistent so far
+#else
+        if (!(sigma->vector)) // try to find a new representative if the orbit is empty so far
+#endif
+		{
             for (i = Specification[PL][cntriv].first; Reaktor[PL][CO][i].node != sigma -> value; i++);
             Reaktor[PL][CO][i].node->pos[CO] = Specification[PL][CardSpecification[PL] - 1].first;
             Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first].node ->pos[CO] = i;
@@ -1151,44 +1301,28 @@ void DefineToId(void) {
             Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first] = swap;
             Specification[PL][cntriv].changed = new ToDo(PL, cntriv);
             Specification[PL][MyCardSpecification[PL] - 1].changed = new ToDo(PL, MyCardSpecification[PL] - 1);
-            if (RefineUntilNothingChanges(PL)) {
-                if (CardSpecification[PL] == Places[0]->cnt) {
-                    StoreSymmetry(j);
+            if (RefineUntilNothingChanges(PL)) { // no inconsistency so far
+                if (CardSpecification[PL] == Places[0]->cnt) { // found a representative = full permutation
+                    StoreSymmetry(j); // so store it away
                 } else {
-                    DefineToOther(j);
+                    DefineToOther(j); // try to complete the current abstract permutation to a full one
                 }
-                if (Store[MyStorePosition].image[j].vector) {
-                    compose = Store[MyStorePosition].image[j].vector;
-                    while (1) {
-                        val = compose[Store[MyStorePosition].image[j].value->nr - Store[MyStorePosition].argnr];
-                        if (val == Store[MyStorePosition].argnr) {
-                            break;
-                        }
-                        for (composed = 0; Store[MyStorePosition].image[composed].value->nr != val; composed++);
-                        if (!(Store[MyStorePosition].image[composed].vector)) {
-                            Store[MyStorePosition].image[composed].vector = new unsigned int [Places[0]->cnt -
-                                                                                              Store[MyStorePosition].argnr + 1];
-                            for (k = 0; k < Places[0]->cnt - Store[MyStorePosition].argnr; k++) {
-                                Store[MyStorePosition].image[composed].vector[k] =
-                                    Store[MyStorePosition].image[j].vector[compose[k] -
-                                                                           Store[MyStorePosition].argnr];
-                            }
-                            compose = Store[MyStorePosition].image[composed].vector;
-                        } else {
-                            for (k = 0; k < Places[0]->cnt - Store[MyStorePosition].argnr; k++) {
-                                reservecompose[k] =
-                                    Store[MyStorePosition].image[j].vector[compose[k] -
-                                                                           Store[MyStorePosition].argnr];
-                            }
-                            compose = reservecompose;
-                        }
-                    }
-                }
+#if defined(SYMMPROD)
+				BuildProducts(j,inconsistent);
+#else
+				BuildProducts(j); // we build products with earlier found generators and/or this generator itself here
+#endif
             }
+#if defined(SYMMPROD)
+			BuildInconsistencies(j,inconsistent); // check if orbit is inconsistent; it may lead to more inconsistent orbits
+#endif
             ReUnify(MyCardSpecification[PL], MyCardSpecification[TR]);
         }
     }
     CurrentStore = oldstorenr;
+#if defined(SYMMPROD)
+	delete[] inconsistent;
+#endif
 }
 
 unsigned int* CurrentSymm;

@@ -1173,7 +1173,8 @@ void BuildProducts(unsigned int orbit, bool* inconsistent) {
 	{
 		orbit = bplist[bp]; // the orbit to compose now
 	    compose = Store[StorePos].image[orbit].vector; // the representative of the orbit
-		for(bpstore = CardStore; bpstore > StorePos; --bpstore) // go through all earlier built representatives (other groups and orbits)
+		for(bpstore = CardStore; Store[bpstore-1].argnr>Store[StorePos].image[orbit].value->nr ; --bpstore);
+		for(; bpstore > StorePos; --bpstore) // go through all earlier built representatives (other groups and orbits)
 			for(bporbit = 0; bporbit < Store[bpstore-1].length; ++bporbit)
 			{
 				bpcomp = Store[bpstore-1].image[bporbit].vector; // get a previously produced vector(permutation)
@@ -1184,7 +1185,7 @@ void BuildProducts(unsigned int orbit, bool* inconsistent) {
 				if (bpval <= level) continue; // we ran into the symmetry group; no new orbit
 				for(bpnext = 0; Store[StorePos].image[bpnext].value->nr != bpval; ++bpnext); // find bpval's position in the store (the orbit number)
 				if (Store[StorePos].image[bpnext].vector) continue; // if a representative already exists for this orbit do nothing
-				bplist[bplength++] = bpnext; // a new orbit is found, we have to build products for it later
+				bplist[++bplength] = bpnext; // a new orbit is found, we have to build products for it later
 				bpnxvc = Store[StorePos].image[bpnext].vector = new unsigned int[Places[0]->cnt - level + 1];
 	            for (k = 0 ; k < Places[0]->cnt - level; ++k) // now build the product vector bpcomp[compose[]] as new representative
 					bpnxvc[k] = (compose[k]<bplevel ? compose[k] : bpcomp[compose[k] - bplevel]); 

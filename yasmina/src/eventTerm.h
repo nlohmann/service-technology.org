@@ -3,7 +3,7 @@
 #ifndef EVENTTERM_H_
 #define EVENTTERM_H_
 
-#include <pnapi.h>
+#include <pnapi/pnapi.h>
 #include "config.h"
 //#include "helpers.h"
 #include <cstdlib>

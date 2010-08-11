@@ -31,7 +31,7 @@
 
 #include <vector>
 #include <iostream>
-#include "pnapi.h"
+#include <pnapi/pnapi.h>
 
 
 

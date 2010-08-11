@@ -17,7 +17,7 @@
 #include <utility>
 
 #include "cmdline.h"
-#include "pnapi.h"
+#include <pnapi/pnapi.h>
 #include "lp_lib.h"
 #include "verbose.h"
 #include "eventTerm.h"

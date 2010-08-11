@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# avoid infinite loop
+rm configure.ac
+
 DIRS=`find ../../ | grep "configure.ac" | grep -v ".svn" | sed -e 's/configure.ac//g;s/\/\//\//'`
 
 mkdir build
@@ -27,7 +30,7 @@ echo "		configure install-sh missing configure.ac Makefile.am" >> Makefile.am
 autoreconf -is -Wnone
 ./configure --prefix=`pwd`/build --docdir=`pwd`/build/doc sysconfdir=`pwd`/build/bin
 
-make all
+make
 make -k install
 make -k install-html install-pdf AM_MAKEINFOHTMLFLAGS="--no-split"
 

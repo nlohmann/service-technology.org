@@ -461,7 +461,7 @@
   #define COVER
 #endif
 
-#if !defined(FULL) && !defined(BOUNDEDPLACE) && !defined(DEADTRANSITION) && !defined(BOUNDEDNET)
+#if !defined(FULL) && !defined(BOUNDEDPLACE) && !defined(DEADTRANSITION) && !defined(BOUNDEDNET) && !defined(STATEPREDICATE)
 #undef COVER
 #endif
 

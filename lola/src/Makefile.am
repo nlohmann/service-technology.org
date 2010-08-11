@@ -33,6 +33,7 @@ include $(top_srcdir)/m4/Makefile.src
 # user configs
 EXTRA_DIST += configs/userconfig.H.boundednet \
               configs/userconfig.H.boundedplace \
+              configs/userconfig.H.coverstatepredicate \
               configs/userconfig.H.deadlock \
               configs/userconfig.H.deadtransition \
               configs/userconfig.H.findpath \

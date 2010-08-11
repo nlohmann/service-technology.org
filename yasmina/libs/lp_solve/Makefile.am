@@ -1,4 +1,4 @@
-lib_LIBRARIES = liblpsolve55.a
+noinst_LTLIBRARIES = liblpsolve55.a
 
 #INCLUDES = -I. -I./shared -I./bfp -I./bfp/bfp_LUSOL -I./bfp/bfp_LUSOL/LUSOL -I./colamd
 

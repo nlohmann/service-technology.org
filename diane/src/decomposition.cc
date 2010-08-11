@@ -483,13 +483,15 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 		//to change later
 	//}
 	// add pattern before composing
-	if (args_info.compose_flag) { 
+	if (args_info.compose_flag) { }
+		status("adding pattern");
 		for (int j = 0; j < (int) nets.size(); j++)
 		{ 
 		if (nets[j] == NULL)
 			continue;
 		//++x;
 		// add to structure?
+			
 		Place *pa=&nets[j]->createPlace("a", 1);
 		//Place *pac=&nets[j]->createPlace("a$compl", Node::INTERNAL, 0);
 		Place *pb=&nets[j]->createPlace("b", 0);
@@ -513,20 +515,34 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 		nets[j]->getFinalCondition().addProposition(propa);
 		// for each interface label, get interface transitions and add arcs to a  and c
 		// to do add labels to 
-		for (set<pnapi::Label *>::iterator pp = nets[j]->getInterface().getInputLabels().begin(); pp != nets[j]->getInterface().getInputLabels().end(); ++pp){
-			const set<Transition *> stt= (*pp)->getTransitions();
-			for (set<Transition *>::iterator t = stt.begin(); t != stt.end(); ++t){
-				if(nets[j]->findArc(*pa,**t)==NULL) nets[j]->createArc(*pa,**t, 1);
-				if(nets[j]->findArc(**t,*pc)==NULL) nets[j]->createArc(**t,*pc, 1);
+			cout<<nets[j]->getInterface().getInputLabels().size()<<std::endl;
+		//if(nets[j]->getInterface().getInputLabels().size()!=0){
+			
+			set<pnapi::Label *> inputl=nets[j]->getInterface().getInputLabels();
+			for (set<pnapi::Label *>::iterator ppp = inputl.begin(); ppp != inputl.end(); ppp++){
+				if(*ppp!=NULL){
+					//cout <<i<< "Label "<<(*ppp)->getName()<<std::endl;
+					const set<Transition *> stt= (*ppp)->getTransitions();
+					//cout << stt.size()<<std::endl;
+					for (set<Transition *>::iterator t = stt.begin(); t != stt.end(); ++t){
+						if(nets[j]->findArc(*pa,**t)==NULL) 
+							nets[j]->createArc(*pa,**t, 1);
+						if(nets[j]->findArc(**t,*pc)==NULL) nets[j]->createArc(**t,*pc, 1);
+					}
+					//status("finished getting transitions ....");	++i;
+					//if (i==nets[j]->getInterface().getInputLabels().size()) break;
+					//cout <<i<< "Label "<<(*ppp)->getName()<<std::endl;
+				}
+			}//}
+			set<pnapi::Label *> outputl=nets[j]->getInterface().getOutputLabels();		
+			for (set<pnapi::Label *>::iterator pp = outputl.begin(); pp != outputl.end(); ++pp){
+				const set<Transition *> stt= (*pp)->getTransitions();
+				for (set<Transition *>::iterator t = stt.begin(); t != stt.end(); ++t){
+					if(nets[j]->findArc(*pa,**t)==NULL) nets[j]->createArc(*pa,**t, 1);
+					if(nets[j]->findArc(**t,*pc)==NULL) nets[j]->createArc(**t,*pc, 1);
+				}
 			}
-		}
-		for (set<pnapi::Label *>::iterator pp = nets[j]->getInterface().getOutputLabels().begin(); pp != nets[j]->getInterface().getOutputLabels().end(); ++pp){
-			const set<Transition *> stt= (*pp)->getTransitions();
-			for (set<Transition *>::iterator t = stt.begin(); t != stt.end(); ++t){
-				if(nets[j]->findArc(*pa,**t)==NULL) nets[j]->createArc(*pa,**t, 1);
-				if(nets[j]->findArc(**t,*pc)==NULL) nets[j]->createArc(**t,*pc, 1);
-			}
-		}
+		}	
 		/*for (set<Place *>::iterator p = nets[j]->getInterfacePlaces().begin(); p != nets[j]->getInterfacePlaces().end(); ++p){
 			//if((*p)->getType()==Node::INPUT){
 			const std::set<Arc*> postset=(*p)->getPostsetArcs();
@@ -555,6 +571,7 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 			
 			//}
 		}*/
-	}
-	}
+	//}
+	
+	//}
 }

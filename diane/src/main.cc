@@ -185,15 +185,16 @@ PetriNet addPattern(PetriNet nnn){
 		//}
 	}*/
 	
-	
-	for (set<Label *>::iterator pp = diff.getInterface().getInputLabels().begin(); pp != diff.getInterface().getInputLabels().end(); ++pp){
+	set<Label *> inputpp=diff.getInterface().getInputLabels();
+	for (set<Label *>::iterator pp = inputpp.begin(); pp != inputpp.end(); ++pp){
 		const set<Transition *> *stt= &(*pp)->getTransitions();
 		for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
 			if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
 			if(diff.findArc(**t,*pc)==NULL) diff.createArc(**t,*pc, 1);
 		}
 	}
-	for (set<Label *>::iterator p = diff.getInterface().getOutputLabels().begin(); p != diff.getInterface().getOutputLabels().end(); ++p){
+	set<Label *> outputpp=diff.getInterface().getOutputLabels();
+	for (set<Label *>::iterator p = outputpp.begin(); p != outputpp.end(); ++p){
 		const set<Transition *> *stt= &(*p)->getTransitions();
 		for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
 			if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
@@ -255,7 +256,7 @@ PetriNet addinterfcompl(PetriNet nnn,set<string> inputplaces1, set<string> outpu
 	for (set<string>::iterator ssit=outputplaces1.begin(); ssit!=outputplaces1.end(); ++ssit) {
 		Place *p=nn.findPlace(*ssit);//cout<<"was interface"<<p->wasInterface()<<" "<<p->getName()<<endl;
 		//create place
-		Place * place;
+		Place *place=NULL;
 		if(p!=NULL)
 			place = nn.findPlace(p->getName()+"$compl");//cout<<*ssit<<endl;
 		//cout<<endl<<"not found"<<itwas.size()<<endl;//cout<<"input"<<*ssit<<endl;
@@ -313,7 +314,7 @@ PetriNet complementnet(PetriNet diffc, PetriNet part){
 	for (std::set<pnapi::Place *>::iterator p = part.getPlaces().begin(); p != part.getPlaces().end(); ++p){
 		if (diff.findPlace((*p)->getName())) {
 			//cout<<"deleting "<<(*p)->getName()<<endl;
-			Place *pp=diff.findPlace((*p)->getName());//diff
+			//Place *pp=diff.findPlace((*p)->getName());//diff
 			diff.deletePlace(*diff.findPlace((*p)->getName()));
 		}
 	}	
@@ -333,7 +334,8 @@ PetriNet complementnet(PetriNet diffc, PetriNet part){
 	//build global port
 	pnapi::Port globalp(diff, "global");
 	// add interface labels to transitions which are opposite to  the initial
-	for (std::set<pnapi::Label *>::iterator p = part.getInterface().getAsynchronousLabels().begin(); p != part.getInterface().getAsynchronousLabels().end(); ++p){
+	std::set<pnapi::Label *> async=part.getInterface().getAsynchronousLabels();
+	for (std::set<pnapi::Label *>::iterator p = async.begin(); p != async.end(); ++p){
 		if((*p)->getType()==Label::INPUT)
 			if (diff.findPlace((*p)->getName())) {
 				Place *pp=diff.findPlace((*p)->getName());
@@ -361,7 +363,7 @@ PetriNet complementnet(PetriNet diffc, PetriNet part){
 				//Place *pp=diff.findPlace((*p)->getName());pp->setType(Node::INPUT);
 				diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
 			}
-		diff.deletePlace(*diff.findPlace((*p)->getName()));
+		if(diff.findPlace((*p)->getName())!=NULL) diff.deletePlace(*diff.findPlace((*p)->getName()));
 	}
 	
 	/*for (std::set<pnapi::Place *>::iterator p = part.getInterfacePlaces().begin(); p != part.getInterfacePlaces().end(); ++p){
@@ -435,15 +437,16 @@ PetriNet complementnet(PetriNet diffc, PetriNet part){
 		
 		//}
 	}*/
-	
-	for (set<pnapi::Label *>::iterator p = diff.getInterface().getInputLabels().begin(); p != diff.getInterface().getInputLabels().end(); ++p){
+	set<pnapi::Label *> inputl=diff.getInterface().getInputLabels();
+	for (set<pnapi::Label *>::iterator p = inputl.begin(); p != inputl.end(); ++p){
 		const set<Transition *> *stt= &(*p)->getTransitions();
 		for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
 			if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
 			if(diff.findArc(**t,*pc)==NULL) diff.createArc(**t,*pc, 1);
 		}
 	}
-	for (set<Label *>::iterator p = diff.getInterface().getOutputLabels().begin(); p != diff.getInterface().getOutputLabels().end(); ++p){
+	set<pnapi::Label *> outputl=diff.getInterface().getOutputLabels();
+	for (set<Label *>::iterator p = outputl.begin(); p != outputl.end(); ++p){
 		const set<Transition *> *stt= &(*p)->getTransitions();
 		for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
 			if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
@@ -552,7 +555,7 @@ int main(int argc, char* argv[]) {
     status("created net fragments of '%s'", args_info.inputs[0]);
 
 	//composes components until a medium sized component is reached, then computes its complement
-	if(args_info.compose_flag){
+	if(args_info.compose_flag){status("composes components until a medium sized component is reached, then computes its complement");
 		string fileprefix;
 		string filepostfix = ".owfn";
 		if (args_info.prefix_given)
@@ -564,7 +567,7 @@ int main(int argc, char* argv[]) {
         /// leading zeros
 		//build a bitset
 		//vector<bool> in(args_info.inputs_num), com(args_info.inputs_num);
-		//status("created net fragments of '%s'", args_info.inputs[0]);
+		status("created net fragments of '%s'", args_info.inputs[0]);
 		//std::bitset<16> *in;//in->reset(); //com.reset();
 		
 		std::vector<pnapi::PetriNet  > parts; //vector of pn2
@@ -624,12 +627,12 @@ int main(int argc, char* argv[]) {
 		}	
 		std::ofstream ocompl;
 		//ox << pnapi::io::owfn << diff;
-		
+		status("creating complement  net fragments of '%s'", args_info.inputs[0]);
 		ocompl.open((std::string(fileprefix+"."+filepostfix + ".complement.owfn").c_str()), std::ios_base::trunc);
 		//PetriNet net2;
 		ocompl << pnapi::io::owfn << cmplfordiff;
 		//cout << pnapi::io::owfn << cmplfordiff;
-		int maxi=0,nc=0;
+		unsigned int maxi=0,nc=0;
 		
 		for (int j = 0; j < (int) nets.size(); j++)
 			if (nets[j] == NULL)
@@ -647,7 +650,7 @@ int main(int argc, char* argv[]) {
 		map<vector<bool>, PetriNet> small;//stores all smaller composition from previous iterations
 		//map<vector<bool>, PetriNet> alln;//stores all balanced components without duplicates  
 		
-		//since averagedoes not relate to the size of the whole process, we consider medium sizes (fraction) of the original process
+		//since average does not relate to the size of the whole process, we consider medium sizes (fraction) of the original process
 		for (int i = 0; i < (int) parts.size(); ++i){			
 			//if the component is medium compute the complement and if it si not that big keepit
 			/*	if(parts.at(i).getInternalPlaces().size()<=maxi/2){
@@ -726,12 +729,19 @@ int main(int argc, char* argv[]) {
 				}*/
 				//build global port
 				pnapi::Port globalp(diff, "global");
+				status("before");
 				// add interface labels to transitions which are opposite to  the initial
-				for (std::set<pnapi::Label *>::iterator p = parts.at(i).getInterface().getAsynchronousLabels().begin(); p != parts.at(i).getInterface().getAsynchronousLabels().end(); ++p){
-					if((*p)->getType()==Label::INPUT)
-						if (diff.findPlace((*p)->getName())) {
+				std::set<pnapi::Label *> asyncl=parts.at(i).getInterface().getAsynchronousLabels();
+				for (std::set<pnapi::Label *>::iterator p = asyncl.begin(); p != asyncl.end(); ++p){
+					if((*p)->getType()==Label::INPUT){
+						if (diff.findPlace((*p)->getName())) {status("in");
 							Place *pp=diff.findPlace((*p)->getName());
+							if (pp==NULL) {
+								status("inin");
+							}
+							else status("outout"); 
 							set<pnapi::Arc *> preset = pp->getPostsetArcs();
+							
 							for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
 							{
 								Label *l=new Label(diff,globalp,(*p)->getName(),(*p)->getType());l->mirror();
@@ -742,8 +752,9 @@ int main(int argc, char* argv[]) {
 							}	
 							//add interface labels to all transitions in diff in the postset of pp (pp->setType(Node::OUTPUT);)
 							diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
-						}
-					if((*p)->getType()==Label::OUTPUT)
+							//status("after delete");
+						}}
+					else if((*p)->getType()==Label::OUTPUT)
 						if (diff.findPlace((*p)->getName())) {
 							Place *pp=diff.findPlace((*p)->getName());
 							set<pnapi::Arc *> preset = pp->getPresetArcs();
@@ -755,10 +766,10 @@ int main(int argc, char* argv[]) {
 							//Place *pp=diff.findPlace((*p)->getName());pp->setType(Node::INPUT);
 							diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
 						}
-					diff.deletePlace(*diff.findPlace((*p)->getName()));
+					if(diff.findPlace((*p)->getName())!=NULL) diff.deletePlace(*diff.findPlace((*p)->getName()));
+					//status("after delete");
 				}
-				
-				
+				status("after delete");
 				for (std::set<pnapi::Transition *>::iterator t = cmplfordiff.getTransitions().begin(); t != cmplfordiff.getTransitions().end(); ++t){
 					
 					if (parts.at(i).findTransition((*t)->getName())!=NULL) {
@@ -794,14 +805,16 @@ int main(int argc, char* argv[]) {
 				pnapi::formula::FormulaEqual propa(pnapi::formula::FormulaEqual(*pa,1));
 				diff.getFinalCondition().addProposition(propa);
 				// for each interface place, get interface transitions and add arcs to a  and c
-				for (set<Label *>::iterator p = diff.getInterface().getInputLabels().begin(); p != diff.getInterface().getInputLabels().end(); ++p){
+				set<Label *> inputl=diff.getInterface().getInputLabels();
+				for (set<Label *>::iterator p = inputl.begin(); p != inputl.end(); ++p){
 					const set<Transition *> *stt= &(*p)->getTransitions();
 					for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
 						if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
 						if(diff.findArc(**t,*pc)==NULL) diff.createArc(**t,*pc, 1);
 					}
 				}
-				for (set<Label *>::iterator lp = diff.getInterface().getOutputLabels().begin(); lp != diff.getInterface().getOutputLabels().end(); ++lp){
+				set<Label *> outputl=diff.getInterface().getOutputLabels();
+				for (set<Label *>::iterator lp = outputl.begin(); lp != outputl.end(); ++lp){
 					const set<Transition *> *stt= &(*lp)->getTransitions();
 					for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
 						if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
@@ -854,16 +867,25 @@ int main(int argc, char* argv[]) {
 				oc.open((std::string(fileprefix+"_"+num+filepostfix + ".composed.owfn").c_str()), std::ios_base::trunc);
 				PetriNet net2=parts.at(i);
 				set<string> inputplaces1,outputplaces1;
-				for (std::set<Label *>::iterator ssit=parts.at(i).getInterface().getInputLabels().begin(); ssit!=parts.at(i).getInterface().getInputLabels().end(); ++ssit) {
+				std::set<Label *> inputlr=parts.at(i).getInterface().getInputLabels();
+				for (std::set<Label *>::iterator ssit=inputlr.begin(); ssit!=inputlr.end(); ++ssit) {
 					inputplaces1.insert((*ssit)->getName());
 				}
-				for (std::set<Label *>::iterator ssit=parts.at(i).getInterface().getOutputLabels().begin(); ssit!=parts.at(i).getInterface().getOutputLabels().end(); ++ssit) {
+				std::set<Label *> outputlr=parts.at(i).getInterface().getOutputLabels();
+				for (std::set<Label *>::iterator ssit=outputlr.begin(); ssit!=outputlr.end(); ++ssit) {
 					outputplaces1.insert((*ssit)->getName());
 				}
 				//cout << pnapi::io::owfn<<net2;
 				//cout << pnapi::io::owfn<<diff;
 				//PetriNet net2=addPattern(net1);
-				net2.compose(diff, "1", "2");
+				try{
+					net2.compose(diff, "1", "2");
+				}
+				catch (pnapi::exception::UserCausedError e) {
+					e.output(cout);
+				}
+				
+				
 				//inputplaces1, outputplaces1 for the original net2
 				//cout<<"not done"<<endl;
 				PetriNet net3=addinterfcompl(net2,inputplaces1,outputplaces1);
@@ -887,20 +909,27 @@ int main(int argc, char* argv[]) {
 					//check if ij are composable (code from yasmina)
 					//cout <<i<< "compose with"<<j;
 					bool syntb=false;set<string> inputplaces1,inputplaces2,outputplaces1,outputplaces2;
-					for (std::set<Label *>::iterator ssit=parts.at(i).getInterface().getInputLabels().begin(); ssit!=parts.at(i).getInterface().getInputLabels().end(); ++ssit) {
-						inputplaces1.insert((*ssit)->getName());
+					std::set<Label *> inlabels=parts.at(i).getInterface().getInputLabels();
+					for (std::set<Label *>::iterator ssit=inlabels.begin(); ssit!=inlabels.end(); ++ssit) {
+						string sl;
+						if ((*ssit)!=NULL) {sl=(*ssit)->getName();
+							inputplaces1.insert(sl);}
 					}
-					for (std::set<Label *>::iterator ssit=parts.at(i).getInterface().getOutputLabels().begin(); ssit!=parts.at(i).getInterface().getOutputLabels().end(); ++ssit) {
+					std::set<Label *> outlabels=parts.at(i).getInterface().getOutputLabels();
+					for (std::set<Label *>::iterator ssit=outlabels.begin(); ssit!=outlabels.end(); ++ssit) {
 						outputplaces1.insert((*ssit)->getName());
 					}
-					for (std::set<Label *>::iterator ssit=parts.at(j).getInterface().getInputLabels().begin(); ssit!=parts.at(j).getInterface().getInputLabels().end(); ++ssit) {
+					std::set<Label *> inlabelsp=parts.at(j).getInterface().getInputLabels();
+					for (std::set<Label *>::iterator ssit=inlabelsp.begin(); ssit!=inlabelsp.end(); ++ssit) {
 						inputplaces2.insert((*ssit)->getName());
 					}
-					for (std::set<Label *>::iterator ssit=parts.at(j).getInterface().getOutputLabels().begin(); ssit!=parts.at(j).getInterface().getOutputLabels().end(); ++ssit) {
+					std::set<Label *> outlabelsp=parts.at(j).getInterface().getOutputLabels();
+					for (std::set<Label *>::iterator ssit=outlabelsp.begin(); ssit!=outlabelsp.end(); ++ssit) {
 						outputplaces2.insert((*ssit)->getName());
 					}
 					
-					for (std::set<Label *>::iterator ssit=parts.at(i).getInterface().getAsynchronousLabels().begin(); ssit!=parts.at(i).getInterface().getAsynchronousLabels().end(); ++ssit) {
+					std::set<Label *> asyncl=parts.at(i).getInterface().getAsynchronousLabels();
+					for (std::set<Label *>::iterator ssit=asyncl.begin(); ssit!=asyncl.end(); ++ssit) {
 						//see whether it is an input place 
 						string ps=(*ssit)->getName();
 						if ((inputplaces1.find(ps)!=inputplaces1.end())&&(outputplaces2.find(ps)!=outputplaces2.end())) {
@@ -914,11 +943,14 @@ int main(int argc, char* argv[]) {
 						
 						
 					}
+					
 					//const std::set<std::string> & getSynchronousLabels() const;
-					for(std::set<pnapi::Label *>::iterator cit=parts.at(i).getInterface().getSynchronousLabels().begin();cit!=parts.at(i).getInterface().getSynchronousLabels().end();++cit){
+					std::set<Label *> synclabels=parts.at(i).getInterface().getSynchronousLabels();
+					for(std::set<pnapi::Label *>::iterator cit=synclabels.begin();cit!=synclabels.end();++cit){
 						if (parts.at(j).getInterface().findLabel((*cit)->getName())==NULL) {syntb=true;break;//not sync
 						}
 					}
+					
 					if (!syntb) {
 						std::cout<<endl<<"not syntactically compatible"<<endl; 
 					}
@@ -935,17 +967,26 @@ int main(int argc, char* argv[]) {
 						//compose them (adding complementary places for former interface places
 						PetriNet nnb=deletePattern(parts.at(i));
 						set<string> inputplaces1,outputplaces1;
-						for (std::set<Label *>::iterator ssit=parts.at(i).getInterface().getInputLabels().begin(); ssit!=parts.at(i).getInterface().getInputLabels().end(); ++ssit) {
+						std::set<Label *>  inputl=parts.at(i).getInterface().getInputLabels();
+						for (std::set<Label *>::iterator ssit=inputl.begin(); ssit!=inputl.end(); ++ssit) {
 							inputplaces1.insert((*ssit)->getName());
 						}
-						for (std::set<Label *>::iterator ssit=parts.at(i).getInterface().getOutputLabels().begin(); ssit!=parts.at(i).getInterface().getOutputLabels().end(); ++ssit) {
+						std::set<Label *>  outputl=parts.at(i).getInterface().getOutputLabels();
+						for (std::set<Label *>::iterator ssit=outputl.begin(); ssit!=outputl.end(); ++ssit) {
 							outputplaces1.insert((*ssit)->getName());
 						}
 						//first delete the enforcing patterns in both nets
 						
 						PetriNet nnj=parts.at(j);
 						PetriNet dnnj=deletePattern(nnj);
-						nnb.compose(dnnj,"","");
+						try {
+							nnb.compose(dnnj);
+						}
+						catch (pnapi::exception::UserCausedError e) {
+							cout << "error"<<endl;
+							e.output(cout);
+						}
+						
 						//cout << pnapi::io::owfn << nnb;
 						PetriNet nn=addinterfcompl(nnb, inputplaces1,outputplaces1);
 						
@@ -1022,13 +1063,22 @@ int main(int argc, char* argv[]) {
 						cout<<fileprefix+"_"+num+filepostfix + ".composed.owfn"<<endl;
 						//PetriNet net2;//whole system again and again
 						set<string> inputplaces2,outputplaces2;
-						for (std::set<Label *>::iterator ssit=nn.getInterface().getInputLabels().begin(); ssit!=nn.getInterface().getInputLabels().end(); ++ssit) {
+						std::set<Label *> inputlnn=nn.getInterface().getInputLabels();
+						for (std::set<Label *>::iterator ssit=inputlnn.begin(); ssit!=inputlnn.end(); ++ssit) {
 							inputplaces2.insert((*ssit)->getName());
 						}
-						for (std::set<Label *>::iterator ssit=nn.getInterface().getOutputLabels().begin(); ssit!=nn.getInterface().getOutputLabels().end(); ++ssit) {
+						std::set<Label *> outputlnn=nn.getInterface().getOutputLabels();
+						for (std::set<Label *>::iterator ssit=outputlnn.begin(); ssit!=outputlnn.end(); ++ssit) {
 							outputplaces2.insert((*ssit)->getName());
 						}
-						nnp.compose(diff, "1", "2");//compose net wit pattern (not whatever is stored)
+						try{
+							nnp.compose(diff, "1", "2");
+						}
+						catch (pnapi::exception::UserCausedError e) {
+							e.output(cout);
+						}
+						
+						//nnp.compose(diff, "1", "2");//compose net wit pattern (not whatever is stored)
 						PetriNet xn=addinterfcompl(nnp, inputplaces2,outputplaces2);
 						
 						oc << pnapi::io::owfn << xn;
@@ -1090,20 +1140,24 @@ int main(int argc, char* argv[]) {
 							//}else ss<<0; 
 						}cout <<endl;
 						bool syntb=false;set<string> inputplaces1,inputplaces2,outputplaces1,outputplaces2;
-						for (std::set<Label *>::iterator ssit=parts.at(i).getInterface().getInputLabels().begin(); ssit!=parts.at(i).getInterface().getInputLabels().end(); ++ssit) {
+						std::set<Label *> inputl=parts.at(i).getInterface().getInputLabels();
+						for (std::set<Label *>::iterator ssit=inputl.begin(); ssit!=inputl.end(); ++ssit) {
 							inputplaces1.insert((*ssit)->getName());
 						}
-						for (std::set<Label *>::iterator ssit=parts.at(i).getInterface().getOutputLabels().begin(); ssit!=parts.at(i).getInterface().getOutputLabels().end(); ++ssit) {
+						std::set<Label *> outputl=parts.at(i).getInterface().getOutputLabels();
+						for (std::set<Label *>::iterator ssit=outputl.begin(); ssit!=outputl.end(); ++ssit) {
 							outputplaces1.insert((*ssit)->getName());
 						}
-						for (std::set<Label *>::iterator ssit=pp.getInterface().getInputLabels().begin(); ssit!=pp.getInterface().getInputLabels().end(); ++ssit) {
+						std::set<Label *> inputlpp=pp.getInterface().getInputLabels();
+						for (std::set<Label *>::iterator ssit=inputlpp.begin(); ssit!=inputlpp.end(); ++ssit) {
 							inputplaces2.insert((*ssit)->getName());
 						}
-						for (std::set<Label *>::iterator ssit=pp.getInterface().getOutputLabels().begin(); ssit!=pp.getInterface().getOutputLabels().end(); ++ssit) {
+						std::set<Label *> outputlpp=pp.getInterface().getOutputLabels();
+						for (std::set<Label *>::iterator ssit=outputlpp.begin(); ssit!=outputlpp.end(); ++ssit) {
 							outputplaces2.insert((*ssit)->getName());
 						}
-						
-						for (std::set<Label *>::iterator ssit=parts.at(i).getInterface().getAsynchronousLabels().begin(); ssit!=parts.at(i).getInterface().getAsynchronousLabels().end(); ++ssit) {
+						std::set<Label *> asyncl=parts.at(i).getInterface().getAsynchronousLabels();
+						for (std::set<Label *>::iterator ssit=asyncl.begin(); ssit!=asyncl.end(); ++ssit) {
 							//see whether it is an input place 
 							string ps=(*ssit)->getName();
 							if ((inputplaces1.find(ps)!=inputplaces1.end())&&(outputplaces2.find(ps)!=outputplaces2.end())) {
@@ -1119,8 +1173,8 @@ int main(int argc, char* argv[]) {
 						//for(std::set<pnapi::Label *>::iterator cit=parts.at(i).getInterface().getSynchronousLabels().begin();cit!=parts.at(i).getInterface().getSynchronousLabels().end();++cit){
 						//	if (parts.at(j).getInterface().findLabel((*cit)->getName())==NULL) {syntb=true;break;//not sync
 						//	}
-							
-						for(std::set<pnapi::Label *>::iterator cit=parts.at(i).getInterface().getSynchronousLabels().begin();cit!=parts.at(i).getInterface().getSynchronousLabels().end();++cit){
+						std::set<pnapi::Label *> sync=parts.at(i).getInterface().getSynchronousLabels();
+						for(std::set<pnapi::Label *>::iterator cit=sync.begin();cit!=sync.end();++cit){
 							if (pp.getInterface().findLabel((*cit)->getName())==NULL) {syntb=true;break;//not sync
 							}
 						}
@@ -1139,13 +1193,22 @@ int main(int argc, char* argv[]) {
 							//compose them (adding complementary places for former interface places
 							PetriNet nnn=deletePattern(parts.at(i));
 							set<string> inputplaces1,outputplaces1;
-							for (std::set<Label *>::iterator ssit=parts.at(i).getInterface().getInputLabels().begin(); ssit!=parts.at(i).getInterface().getInputLabels().end(); ++ssit) {
+							
+							std::set<Label *> inputl=parts.at(i).getInterface().getInputLabels();
+							for (std::set<Label *>::iterator ssit=inputl.begin(); ssit!=inputl.end(); ++ssit) {
 								inputplaces1.insert((*ssit)->getName());
 							}
-							for (std::set<Label *>::iterator ssit=parts.at(i).getInterface().getOutputLabels().begin(); ssit!=parts.at(i).getInterface().getOutputLabels().end(); ++ssit) {
+							std::set<Label *> outputl=parts.at(i).getInterface().getOutputLabels();
+							for (std::set<Label *>::iterator ssit=outputl.begin(); ssit!=outputl.end(); ++ssit) {
 								outputplaces1.insert((*ssit)->getName());
 							}
-							nnn.compose(pp,"","");
+							try{
+								nnn.compose(pp, "1", "2");
+							}
+							catch (pnapi::exception::UserCausedError e) {
+								e.output(cout);
+							}
+							//nnn.compose(pp,"","");
 							PetriNet nn=addinterfcompl(nnn, inputplaces1,outputplaces1);
 							
 							//after composition one needs to add complement places for the former interface places
@@ -1200,10 +1263,12 @@ int main(int argc, char* argv[]) {
 								oc.open((std::string(fileprefix+"_"+num+filepostfix + ".composed.owfn").c_str()), std::ios_base::trunc);
 								//PetriNet net2;//whole system again and again
 								set<string> inputplaces2,outputplaces2;
-								for (std::set<Label *>::iterator ssit=nn.getInterface().getInputLabels().begin(); ssit!=nn.getInterface().getInputLabels().end(); ++ssit) {
+								std::set<Label *> inputl=nn.getInterface().getInputLabels();
+								for (std::set<Label *>::iterator ssit=inputl.begin(); ssit!=inputl.end(); ++ssit) {
 									inputplaces2.insert((*ssit)->getName());
 								}
-								for (std::set<Label *>::iterator ssit=nn.getInterface().getOutputLabels().begin(); ssit!=nn.getInterface().getOutputLabels().end(); ++ssit) {
+								std::set<Label *> outputl=nn.getInterface().getOutputLabels();
+								for (std::set<Label *>::iterator ssit=outputl.begin(); ssit!=outputl.end(); ++ssit) {
 									outputplaces2.insert((*ssit)->getName());
 								}
 								nnp.compose(diff, "1", "2");

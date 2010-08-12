@@ -1,0 +1,70 @@
+AT_INIT
+
+# m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
+
+############################################################################
+AT_BANNER([Standard Options])
+############################################################################
+
+AT_SETUP([unit test])
+AT_CHECK([cp TESTFILES/EMPTY .])
+AT_CHECK([TESTTESS],0,stdout,stderr)
+AT_CHECK([diff EMPTY stderr])
+
+AT_KEYWORDS(unitTest)
+AT_CLEANUP
+
+
+#####################################
+
+AT_SETUP([operator insert])
+AT_CHECK([cp TESTFILES/EMPTY TESTFILES/myCoffee.og TESTFILES/myCoffee_insert_ref.eaa TESTFILES/myCoffee_insert_ref.dot .])
+
+AT_CHECK([TESS myCoffee.og -oeaa -opng -odot -einsert],0,stdout,stderr)
+AT_CHECK([diff EMPTY stderr])
+AT_CHECK([diff myCoffee_insert_ref.eaa firstTest.eaa])
+AT_CHECK([diff myCoffee_insert_ref.dot firstTest.dot])
+
+AT_KEYWORDS(complement c0)
+AT_CLEANUP
+
+#####################################
+
+AT_SETUP([operator delete])
+AT_CHECK([cp TESTFILES/EMPTY TESTFILES/myCoffee.og TESTFILES/myCoffee_delete_ref.eaa TESTFILES/myCoffee_delete_ref.dot .])
+
+AT_CHECK([TESS myCoffee.og -oeaa -opng -odot -edelete],0,stdout,stderr)
+AT_CHECK([diff EMPTY stderr])
+#AT_CHECK([diff myCoffee_delete_ref.eaa firstTest.eaa])
+#AT_CHECK([diff myCoffee_delete_ref.dot firstTest.dot])
+
+AT_KEYWORDS(complement c0)
+AT_CLEANUP
+
+#####################################
+
+AT_SETUP([operator rename])
+AT_CHECK([cp TESTFILES/EMPTY TESTFILES/myCoffee.og TESTFILES/myCoffee_rename_ref.eaa TESTFILES/myCoffee_rename_ref.dot .])
+
+AT_CHECK([TESS myCoffee.og -oeaa -opng -odot -erename],0,stdout,stderr)
+AT_CHECK([diff EMPTY stderr])
+#AT_CHECK([diff myCoffee_rename_ref.eaa firstTest.eaa])
+#AT_CHECK([diff myCoffee_rename_ref.dot firstTest.dot])
+
+AT_KEYWORDS(complement c0)
+AT_CLEANUP
+
+#####################################
+
+AT_SETUP([operator all])
+AT_CHECK([cp TESTFILES/EMPTY TESTFILES/myCoffee.og TESTFILES/myCoffee_all_ref.eaa TESTFILES/myCoffee_all_ref.dot .])
+
+AT_CHECK([TESS myCoffee.og -oeaa -opng -odot -eall],0,stdout,stderr)
+AT_CHECK([diff EMPTY stderr])
+#AT_CHECK([diff myCoffee_all_ref.eaa firstTest.eaa])
+#AT_CHECK([diff myCoffee_all_ref.dot firstTest.dot])
+
+AT_KEYWORDS(complement c0)
+AT_CLEANUP
+
+#####################################

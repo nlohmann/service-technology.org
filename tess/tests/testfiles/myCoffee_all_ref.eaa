@@ -1,0 +1,74 @@
+
+INTERFACE
+  INPUT
+    B, R;
+  OUTPUT
+    E, C, T;
+
+INITIALNODES  0;
+
+GLOBALFORMULA true;
+
+NODES
+  0: (((C + E) + T) + tau)
+    tau -> 6
+    E -> 2
+    C -> 1
+    T -> 1
+
+  1: (E + tau)
+    tau -> 7
+    E -> 3
+
+  2: ((C + T) + tau)
+    tau -> 8
+    C -> 3
+    T -> 3
+
+  3: ((B + R) + tau)
+    tau -> 9
+    B -> 5
+    R -> 5
+
+  5: (final + tau)
+    tau -> 10
+
+  6: (((tau + E) + C) + T)
+    tau -> 1
+    tau -> 2
+    E -> 0
+    E -> 1
+    C -> 0
+    C -> 2
+    T -> 0
+    T -> 2
+
+  7: (((tau + E) + C) + T)
+    tau -> 3
+    E -> 1
+    C -> 1
+    C -> 3
+    T -> 1
+    T -> 3
+
+  8: (((tau + E) + C) + T)
+    tau -> 3
+    E -> 2
+    E -> 3
+    C -> 2
+    T -> 2
+
+  9: (((tau + E) + C) + T)
+    tau -> 5
+    E -> 3
+    E -> 5
+    C -> 3
+    C -> 5
+    T -> 3
+    T -> 5
+
+  10: ((E + C) + T)
+    E -> 5
+    C -> 5
+    T -> 5
+

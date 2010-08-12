@@ -1,0 +1,55 @@
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+
+description "About TeToo:"
+purpose "TeToo: selects partners for testing a service."
+
+option "editOperator" e
+  "Select the edit operator(s) for generating the test operating guidelines."
+  typestr="FORMAT"
+  values="insert","delete","rename","all" enum
+  optional
+  multiple
+
+option "editDistance" d
+  "Determines the maximal edit distance for the test cases."
+  int
+  default="1"
+  optional  
+
+section "Input/Output"
+sectiondesc="The input filename's suffix (e.g. '.og') is replaced by the name of the respective option (e.g., '.eaa').\n"
+
+option "output" o
+  "Select the output file format(s)"
+  typestr="FORMAT"
+  values="eaa","dot","png","pdf","eps","none" enum
+  optional
+  multiple
+
+option "time" t
+  "Mesures the time"
+  optional
+  
+ 
+option "verbose" v
+  "Show verbose output"
+  flag off
+  
+option "clean" -
+  "Any temporary files created by ToToo are deleted once they are not used any more."
+  flag off 
+  
+option "tmpfile" -
+  "Set the path and name of temporary files"
+  details="The filename TeToo should use to create temporary files. The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/tetoo-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created by TeToo is kept after TeToo terminates.\n"
+  flag off  
+      

@@ -1,0 +1,25 @@
+INTERFACE
+  INPUT
+    B,R;
+  OUTPUT
+    E, C, T;
+
+NODES
+  0 : (C + E + T)
+    T -> 1
+    C -> 1
+    E -> 2
+
+  1 : E
+    E -> 3
+
+  2 : (C + T)
+    T -> 3
+    C -> 3
+
+  3 : (B * R)
+    B -> 5
+    R -> 5
+
+  5 : final
+

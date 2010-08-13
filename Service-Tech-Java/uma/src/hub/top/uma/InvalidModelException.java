@@ -30,6 +30,7 @@ public class InvalidModelException extends Exception {
   private static final long serialVersionUID = 8091384676313192979L;
 
   public static final int EMPTY_PRESET = 1;
+  public static final int EMPTY_POSTSET = 2;
   
   private Object cause;
   private int reason;

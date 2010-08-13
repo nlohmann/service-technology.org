@@ -256,6 +256,32 @@ public class PetriNet {
   }
   
   /**
+   * Makes each name in the net unique by appending an index number to 
+   * a node's name
+   */
+  public void turnIntoUnlabeledNet () {
+    HashMap<String, Integer> nameMap = new HashMap<String, Integer>();
+    
+    for (Place p : getPlaces()) {
+      String oldName = p.getName();
+      
+      if (!nameMap.containsKey(oldName)) nameMap.put(oldName, 0);
+      
+      p.setName(oldName+"_"+nameMap.get(oldName));
+      nameMap.put(oldName, nameMap.get(oldName)+1);
+    }
+    
+    for (Transition t : getTransitions()) {
+      String oldName = t.getName();
+      
+      if (!nameMap.containsKey(oldName)) nameMap.put(oldName, 0);
+      
+      t.setName(oldName+"_"+nameMap.get(oldName));
+      nameMap.put(oldName, nameMap.get(oldName)+1);
+    }
+  }
+  
+  /**
    * replace all names of places and transitions with identifiers pNUM and tNUM, respectively
    */
   public void anonymizeNet() {
@@ -542,6 +568,34 @@ public class PetriNet {
     return parallelTransitions(t1, t2, null);
   }
   
+  /**
+   * @param t1
+   * @param t2
+   * @return
+   *    true iff transitions t1 and t2 have the same label and the same
+   *             pre-set but different post-sets.
+   */
+  public boolean nondeterministicTransitions(Transition t1, Transition t2) {
+    if (t1 == t2) return false;
+    if (!t1.getName().equals(t2.getName())) return false;
+    if (t1.getPreSet().size() != t2.getPreSet().size()) return true;
+    
+    for (Place p : t1.getPreSet()) {
+      if (!t2.getPreSet().contains(p)) return false;
+    }
+    // each pre-place of t1 is a pre-place of t2 (and vice versa because both have
+    // pre-sets of equal size)
+
+    if (t1.getPostSet().size() != t2.getPostSet().size()) return true;
+    
+    for (Place p : t1.getPostSet()) {
+      if (!t2.getPostSet().contains(p)) return true;
+    }
+    // eace post-place of t1 is also a post-place of t2
+    return false;
+  }
+  
+  
   public void removeParallelTransitions() {
     Transition[] trans = getTransitions().toArray(new Transition[getTransitions().size()]);
     for (int i=0; i<trans.length-1; i++) {
@@ -628,7 +682,8 @@ public class PetriNet {
     }
     LinkedList<Place> p_remove = new LinkedList<Place>();
     for (Place p : places) {
-      if (p.getPreSet().size() == 0 && p.getPostSet().size() == 0) {
+      if (p.getPreSet().size() == 0 && p.getPostSet().size() == 0
+          && p.getTokens() == 0) {
         p_remove.add(p);
       }
     }

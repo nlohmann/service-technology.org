@@ -530,6 +530,33 @@ public class PetriNet {
   }
   
   /**
+   * @param t1
+   * @param t2
+   * @return
+   *    true iff transitions t1 and t2 have the same label and the same
+   *             pre-set but different post-sets.
+   */
+  public boolean nondeterministicTransitions(Transition t1, Transition t2) {
+    if (t1 == t2) return false;
+    if (!t1.getName().equals(t2.getName())) return false;
+    if (t1.getPreSet().size() != t2.getPreSet().size()) return true;
+    
+    for (Place p : t1.getPreSet()) {
+      if (!t2.getPreSet().contains(p)) return false;
+    }
+    // each pre-place of t1 is a pre-place of t2 (and vice versa because both have
+    // pre-sets of equal size)
+
+    if (t1.getPostSet().size() != t2.getPostSet().size()) return true;
+    
+    for (Place p : t1.getPostSet()) {
+      if (!t2.getPostSet().contains(p)) return true;
+    }
+    // eace post-place of t1 is also a post-place of t2
+    return false;
+  }
+  
+  /**
    * Check whether transitions t1 and t2 are parallel. Two transitions are
    * parallel if their pre- and post-sets are identical.
    * 
@@ -628,7 +655,8 @@ public class PetriNet {
     }
     LinkedList<Place> p_remove = new LinkedList<Place>();
     for (Place p : places) {
-      if (p.getPreSet().size() == 0 && p.getPostSet().size() == 0) {
+      if (p.getPreSet().size() == 0 && p.getPostSet().size() == 0
+          && p.getTokens() == 0) {
         p_remove.add(p);
       }
     }

@@ -142,6 +142,6 @@ public class Unfolder_PetriNet {
    * @return the unfolding in GraphViz dot format
    */
   public String getUnfoldingAsDot() {
-    return bp.getBranchingProcess().toDot();
+    return bp.getBranchingProcess().toDot(sys.properNames);
   }
 }

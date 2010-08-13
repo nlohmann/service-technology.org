@@ -36,6 +36,7 @@
 package hub.top.greta.synthesis;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -49,6 +50,14 @@ import hub.top.greta.verification.BuildBP;
 import hub.top.greta.verification.IOUtil;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
+import hub.top.petrinet.unfold.DNodeSys_PetriNet;
+import hub.top.uma.DNode;
+import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeSet;
+import hub.top.uma.DNodeSys;
+import hub.top.uma.DNodeSys_PtNet;
+import hub.top.uma.InvalidModelException;
+import hub.top.uma.synthesis.NetSynthesis.Diagnostic_Implements;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -116,7 +125,7 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
     if (adaptiveSystem == null)
       return;
       
-    final BuildBP build = new BuildBP(BuildBP.initSynthesis(adaptiveSystem), selectedFile);
+    final BuildBP build = new BuildBP(BuildBP.init(adaptiveSystem), selectedFile);
     
     Job bpBuildJob = new Job("Synthesizing Labeled Net") 
     {
@@ -135,7 +144,6 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
         System.out.println(build.getBranchingProcess().getStatistics());
         
         if (!interrupted && selectedFile != null) {
-          monitor.subTask("generating labeled net");
 
           /*
           PtNet net = NetSynthesis.foldToNet_labeled(build.getBranchingProcess());
@@ -148,13 +156,28 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
           TransactionalEditingDomain editing = GMFEditingDomainFactory.INSTANCE.createEditingDomain();
           FileIOHelper.writeEObjectToResource(net, editing, targetPath);
           */
-
+          
           try {
+            monitor.subTask("generating labeled net");
+
             hub.top.petrinet.PetriNet net2 = hub.top.uma.synthesis.NetSynthesis.foldToNet_labeled(build.getBranchingProcess());
-            
             hub.top.petrinet.PetriNetIO_out.writeToFile(net2, selectedFile.getRawLocation().removeFileExtension().toString(), hub.top.petrinet.PetriNetIO_out.FORMAT_LOLA, 0);
 
+            try {
+             monitor.subTask("comparing synthesized net and specification");
+             DNodeBP dbp = build.getBranchingProcess();
+             Diagnostic_Implements diagnostics = hub.top.uma.synthesis.NetSynthesis.doesImplement(net2, dbp);
+              
+             if (diagnostics.result != hub.top.uma.synthesis.NetSynthesis.COMPARE_EQUAL) {
+               IOUtil.writeDotFile(diagnostics.dbp_oclets, selectedFile, "_syn_covered1");
+               IOUtil.writeDotFile(diagnostics.dbp_net, selectedFile, "_syn_covered2");
+             }
+              
+            } catch (InvalidModelException e) {
+              Activator.getPluginHelper().logError("Failed to compare net and specification.", e);
+            }
             
+            /*
             hub.top.petrinet.PetriNet net_controller = new hub.top.petrinet.PetriNet(net2);
             String[] keep = new String[] { "controller" };
             removeAllNodesNotIn(net_controller, keep);
@@ -196,7 +219,8 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
             net_user.removeParallelTransitions();
             net_user.removeIsolatedNodes();
             hub.top.petrinet.PetriNetIO_out.writeToFile(net_user, selectedFile.getRawLocation().removeFileExtension().toString()+"_user", hub.top.petrinet.PetriNetIO_out.FORMAT_LOLA, 0);
-          
+          */
+            
           } catch (IOException e) {
             Activator.getPluginHelper().logError("Could not write Petri net plain text file", e);
           }

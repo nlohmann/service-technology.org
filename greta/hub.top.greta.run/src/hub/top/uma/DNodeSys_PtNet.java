@@ -257,7 +257,7 @@ public class DNodeSys_PtNet extends DNodeSys {
 			// create new DNode d for Node n
 			DNode d = new DNode(nameToID.get(n.getName()), pre);
 			d.isEvent = true;
-			fireableEvents = fireableEvents.add(d);
+			fireableEvents.add(d);
 			
 			// create pre-/post-set for successor/predecessor nodes of d
 			DNode[] dPostPre = new DNode[1]; dPostPre[0] = d;
@@ -280,7 +280,10 @@ public class DNodeSys_PtNet extends DNodeSys {
 				DNode.sortIDs(d.post);
 			} else {
 			  // has no successors, but initialize post set
-			  d.post = new DNode[0];
+			  //d.post = new DNode[0];
+			  
+			  throw new InvalidModelException(InvalidModelException.EMPTY_POSTSET,
+	            n, "Node "+n.getName()+" has an empty post-set.");
 			}
 			
 			nodeEncoding.put(n, d);		// store new pair

@@ -41,9 +41,12 @@ import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.Oclet;
 import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
+import hub.top.greta.run.Activator;
 import hub.top.greta.run.actions.ActionHelper;
 import hub.top.greta.verification.BuildBP;
 import hub.top.greta.verification.IOUtil;
+import hub.top.uma.DNodeBP;
+import hub.top.uma.InvalidModelException;
 import hub.top.uma.view.ViewGeneration;
 
 import org.eclipse.core.resources.IFile;
@@ -78,8 +81,6 @@ public class GenerateLogTraces implements IWorkbenchWindowActionDelegate {
   
   private IWorkbenchWindow workbenchWindow;
 
-  private AdaptiveSystem adaptiveSystem;
-  
   // fields for tracking the selection in the explorer 
   private IFile   selectedFile = null;
   private URI   selectedURI = null;
@@ -92,29 +93,48 @@ public class GenerateLogTraces implements IWorkbenchWindowActionDelegate {
   public void init(IWorkbenchWindow window) {
     workbenchWindow = window;
   }
+  
+  private void checkAndSetFileFromEditor(IEditorPart editor) {
+    // if this editor has an input file, remember it
+    if (editor.getEditorInput() != null
+      && editor.getEditorInput() instanceof IFileEditorInput)
+    {
+      selectedFile = ((IFileEditorInput)editor.getEditorInput()).getFile();
+    }
+  }
+  
+  private DNodeBP getBPconstructor() {
+    // seek system to check from a given URI
+    AdaptiveSystem adaptiveSystem = ActionHelper.getAdaptiveSystem(selectedURI);
+    
+    // if there was no system at the given URI, check the current editor
+    if (adaptiveSystem == null && workbenchWindow != null) {
+      IEditorPart editor = workbenchWindow.getActivePage().getActiveEditor();
+      adaptiveSystem = ActionHelper.getAdaptiveSystem(editor);
+      checkAndSetFileFromEditor(editor);
+    }
+    
+    if (adaptiveSystem != null) {
+      return BuildBP.initSynthesis(adaptiveSystem);
+    }
+    
+    PtNet net = ActionHelper.getPtNet(selectedURI);
+    if (net != null) {
+      try {
+        return BuildBP.init(net);
+      } catch (InvalidModelException e) {
+        Activator.getPluginHelper().logError("Could not generate traces from "+selectedURI);
+      }
+    }
+    return null;
+  }
 
   public void run(IAction action) {
     if (!action.getId().equals(ID))
       return;
     
-    // seek system to check from a given URI
-    adaptiveSystem = ActionHelper.getAdaptiveSystem(selectedURI);
-    
-    // if there was no system at the given URI, check the current editor
-    if (adaptiveSystem == null) {
-      IEditorPart editor = workbenchWindow.getActivePage().getActiveEditor();
-      adaptiveSystem = ActionHelper.getAdaptiveSystem(editor);
-      
-      // if this editor has input file, remember it
-      if (editor.getEditorInput() != null
-        && editor.getEditorInput() instanceof IFileEditorInput)
-      {
-        selectedFile = ((IFileEditorInput)editor.getEditorInput()).getFile();
-      }
-    }
-    
-    if (adaptiveSystem == null)
-      return;
+    DNodeBP bpConstructor = getBPconstructor();
+    final BuildBP build = new BuildBP(bpConstructor, selectedFile);
     
     IInputValidator intValidator = new IInputValidator() {
       
@@ -136,8 +156,7 @@ public class GenerateLogTraces implements IWorkbenchWindowActionDelegate {
         "How many traces shall be generated?", "10", intValidator);
     if (traceNumDiag.open() == InputDialog.CANCEL)
       return;
-      
-    final BuildBP build = new BuildBP(BuildBP.initSynthesis(adaptiveSystem), selectedFile);
+    
     final int traceNum = Integer.parseInt(traceNumDiag.getValue());
     
     Job bpBuildJob = new Job("Generating Log Traces") 

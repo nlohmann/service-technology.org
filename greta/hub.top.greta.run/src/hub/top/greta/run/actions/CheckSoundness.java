@@ -226,6 +226,7 @@ public class CheckSoundness implements IWorkbenchWindowActionDelegate {
 	        
 	      } else if (o instanceof EditPart) {
 	        EObject e = (EObject)((EditPart)o).getModel();
+	        if (e.eResource() == null) return;
 	        selectedURI = e.eResource().getURI();
           selectedFile = ResourceHelper.uriToFile(selectedURI);
           

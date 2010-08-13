@@ -254,9 +254,9 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 				d.isEvent = true;
 				// remember all events of a DoNet: these will be fired if enabled
 				if (n.eContainer() instanceof DoNet)
-					fireableEvents = fireableEvents.add(d);
+					fireableEvents.add(d);
 				else if (n.eContainer() instanceof PreNet)
-					preConEvents = preConEvents.add(d);
+					preConEvents.add(d);
 			}
 			d.isAnti = isAnti;
 			d.isHot = (n.getTemp() == Temp.HOT); 
@@ -367,6 +367,14 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	public Node getOriginalNode(DNode d) {
 	  return nodeOrigin.get(d);
 	}
+	
+  /**
+   * @param d
+   * @return the node that represents {@link Node} 'n' in this system
+   */
+  public DNode getResultNode(Node n) {
+    return nodeEncoding.get(n);
+  }
 	
 	@Override
 	public String getInfo() {

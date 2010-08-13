@@ -67,7 +67,7 @@ public class TransitiveDependencies {
   public TransitiveDependencies(DNodeSys sys) {
     system = sys;
     
-    eventNum = sys.fireableEvents.length() + sys.preConEvents.length();
+    eventNum = sys.fireableEvents.size() + sys.preConEvents.size();
     events = new DNode[eventNum];
     
     int i=0;

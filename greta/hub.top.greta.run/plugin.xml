@@ -303,6 +303,25 @@
             </separator>
          </menu>
       </objectContribution>
+      <objectContribution
+            id="hub.top.GRETA.run.menu.EventNode"
+            objectClass="hub.top.adaptiveSystem.diagram.edit.parts.EventDoNetEditPart">
+         <menu
+               id="hub.top.GRETA.run.eventMenu"
+               label="Analysis"
+               path="additions">
+            <separator
+                  name="analysis">
+            </separator>
+         </menu>
+         <action
+               class="hub.top.greta.run.actions.CheckExecutableEvent"
+               enablesFor="1"
+               id="hub.top.GRETA.run.newAction"
+               label="Check for Executability"
+               menubarPath="hub.top.GRETA.run.eventMenu/analysis">
+         </action>
+      </objectContribution>
    </extension>
    
    <extension
@@ -318,6 +337,9 @@
                path="additions">
             <separator
                   name="analysis">
+            </separator>
+            <separator
+                  name="synthesis">
             </separator>
          </menu>
          
@@ -335,6 +357,15 @@
                id="hub.top.GRETA.run.compareBranchingProcess_ptnet"
                label="compare branching processes"
                menubarPath="hub.top.GRETA.run.menu.ptnet/analysis">
+         </action>
+         
+         <!-- generate traces for process mining -->
+         <action
+               class="hub.top.greta.synthesis.GenerateLogTraces"
+               enablesFor="1"
+               id="hub.top.GRETA.run.GenerateLogTraces"
+               label="generate log traces"
+               menubarPath="hub.top.GRETA.run.menu.ptnet/synthesis">
          </action>
      </objectContribution>
    </extension>

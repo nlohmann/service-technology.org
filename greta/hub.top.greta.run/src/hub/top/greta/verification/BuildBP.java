@@ -211,7 +211,7 @@ public class BuildBP {
   
   public boolean minimize(IProgressMonitor monitor, PrintStream out) {
     try {
-      bp.minimize();
+      bp.minimizeFoldingRelation();
     } catch (NullPointerException e) {
       
     }
@@ -257,7 +257,7 @@ public class BuildBP {
     DNodeBP bp = new DNodeBP_Scenario(system);
     bp.configure_buildOnly();
     bp.configure_Scenarios();
-    bp.configure_stopIfUnSafe();
+    //bp.configure_stopIfUnSafe();
     return bp;
   }
   

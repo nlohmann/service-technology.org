@@ -294,6 +294,14 @@ public class DNode {
 		return "'"+translationTable.properNames[this.id]+"' ("+this.id+")["+this.globalId+"]" + (isAnti ? "-" : ""); 
 	}
 
+	 /*
+   * (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
+  public String toString(DNodeSys translationTable) {
+    return "'"+translationTable.properNames[this.id]+"' ("+this.id+")["+this.globalId+"]" + (isAnti ? "-" : ""); 
+  }
+
 	
 	/* =======================================================================
 

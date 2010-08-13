@@ -85,8 +85,6 @@ public class DNodeSys_PetriNet extends DNodeSys {
 	 * @param net
 	 */
 	private void buildNameTable(PetriNet net) {
-		short currentNameID = 0;
-		nameToID = new HashMap<String, Short>();
 		
 		nodeNum = 0;
 		

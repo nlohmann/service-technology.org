@@ -392,6 +392,30 @@ public class DNodeSet {
 	 * @return an array with the new post-conditions
 	 */
 	public DNode[] fire(DNode ocletEvent, DNode[] fireLocation) {
+	  
+	  // FIXME: DNodeBP causes multiple occurrences of the same event
+	  HashSet<DNode> postFire = new HashSet<DNode>();
+	  for (DNode b : fireLocation) {
+	    if (b.post != null) {
+	      for (DNode e : b.post) {
+	        if (e.id == ocletEvent.id) postFire.add(e);
+	      }
+	    }
+	  }
+	  for (DNode e : postFire) {
+	    boolean containsAllPre = true;
+	    for (DNode b : fireLocation) {
+	      boolean found = false;
+	      for (DNode b2 : e.pre) {
+	        if (b2 == b) { found = true; break; }
+	      }
+	      if (!found) { containsAllPre = false; break; }
+	    }
+	    if (containsAllPre) {
+	      System.err.println("trying to fire existing event "+ocletEvent+" at "+DNode.toString(fireLocation));
+	      //return null;
+	    }
+	  }
 
 		// instantiate the oclet event
 		DNode newEvent = new DNode(ocletEvent.id, fireLocation);
@@ -439,6 +463,31 @@ public class DNodeSet {
 	 * @return an array with the new post-conditions
 	 */
 	public DNode[] fire(DNode[] ocletEvents, DNode[] fireLocation) {
+	   
+    // FIXME: DNodeBP causes multiple occurrences of the same event
+    HashSet<DNode> postFire = new HashSet<DNode>();
+    for (DNode b : fireLocation) {
+      if (b.post != null) {
+        for (DNode e : b.post) {
+          if (e.id == ocletEvents[0].id) postFire.add(e);
+        }
+      }
+    }
+    for (DNode e : postFire) {
+      boolean containsAllPre = true;
+      for (DNode b : fireLocation) {
+        boolean found = false;
+        for (DNode b2 : e.pre) {
+          if (b2 == b) { found = true; break; }
+        }
+        if (!found) { containsAllPre = false; break; }
+      }
+      if (containsAllPre) {
+        System.err.println("trying to fire existing events "+DNode.toString(ocletEvents)+" at "+DNode.toString(fireLocation));
+        //return null;
+      }
+    }
+	  
 		// instantiate the oclet event
 		DNode newEvent = new DNode(ocletEvents[0].id, fireLocation);
 		newEvent.isEvent = true;
@@ -593,7 +642,7 @@ public class DNodeSet {
 	 * 
 	 * @return 
 	 */
-	public String toDot () {
+	public String toDot (String properNames[]) {
 		StringBuilder b = new StringBuilder();
 		b.append("digraph BP {\n");
 		
@@ -628,9 +677,11 @@ public class DNodeSet {
 				b.append("  c"+n.globalId+" []\n");
 			
 			String auxLabel = "";
+      String antiLabel = n.isAnti ? "--" : "";
+      String nodeLabel = "'"+properNames[n.id]+"'"+antiLabel+"'("+n.id+")["+n.globalId+"]";
 				
 			b.append("  c"+n.globalId+"_l [shape=none];\n");
-			b.append("  c"+n.globalId+"_l -> c"+n.globalId+" [headlabel=\""+n+" "+auxLabel+"\"]\n");
+			b.append("  c"+n.globalId+"_l -> c"+n.globalId+" [headlabel=\""+nodeLabel+" "+auxLabel+"\"]\n");
 		}
 
     // then print all events
@@ -654,9 +705,11 @@ public class DNodeSet {
 				b.append("  e"+n.globalId+" []\n");
 			
       String auxLabel = "";
-      
+      String antiLabel = n.isAnti ? "--" : "";
+      String nodeLabel = "'"+properNames[n.id]+"'"+antiLabel+"'("+n.id+")["+n.globalId+"]";
+
 			b.append("  e"+n.globalId+"_l [shape=none];\n");
-			b.append("  e"+n.globalId+"_l -> e"+n.globalId+" [headlabel=\""+n+" "+auxLabel+"\"]\n");
+			b.append("  e"+n.globalId+"_l -> e"+n.globalId+" [headlabel=\""+nodeLabel+" "+auxLabel+"\"]\n");
 		}
 		
 		/*

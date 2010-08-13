@@ -36,6 +36,11 @@ AC_PATH_PROG(VALGRIND,    [valgrind], not found)
 # check for required functions and die if they are not found
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_ERROR([cannot use required functions]))
 
+# check and set exact unsigned types
+AC_TYPE_UINT8_T
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
+
 # write files
 AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])

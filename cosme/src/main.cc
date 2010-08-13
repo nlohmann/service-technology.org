@@ -113,7 +113,7 @@ inline void parseService_LabelHelper() {
 
     const std::set<pnapi::Label*> outputLabels(tmpNet.getInterface().getOutputLabels());
     FOREACH(l, outputLabels) {
-    	// save current !-event
+        // save current !-event
         string tmpStr("!");
         tmpStr += (*l)->getName();
         curLabel = GlobalLabels.mapLabel(tmpStr);
@@ -128,8 +128,8 @@ inline void parseService_LabelHelper() {
     }
 
     const std::set<pnapi::Label*> inputLabels(tmpNet.getInterface().getInputLabels());
-    FOREACH(l, inputLabels) { 
-	// save current ?-event
+    FOREACH(l, inputLabels) {
+        // save current ?-event
         string tmpStr("?");
         tmpStr += (*l)->getName();
         curLabel = GlobalLabels.mapLabel(tmpStr);
@@ -238,7 +238,7 @@ int main(int argc, char** argv) {
         C->calculateBitSets(GlobalLabels);
         A->calculateBitSets(GlobalLabels);
 
-	ret = A->isMatching(*C);	
+        ret = A->isMatching(*C);
 
         if (ret) {
             message("%s: %s", _cimportant_("Matching"), _cgood_("completed"));
@@ -269,14 +269,14 @@ int main(int argc, char** argv) {
         status("Operating guideline B contains %d markings", B->size());
 
         if (args_info.simulation_flag) {
-	    ret = A->isSimulation(*B);
+            ret = A->isSimulation(*B);
             if (ret) {
                 message("%s: %s", _cimportant_("Simulation"), _cgood_("completed"));
             } else {
                 message("%s: %s", _cimportant_("Simulation"), _cbad_("failed"));
             }
         } else {
-	    ret = A->isEquivalent(*B);
+            ret = A->isEquivalent(*B);
             if (ret) {
                 message("%s: %s", _cimportant_("Equivalence"), _cgood_("completed"));
             } else {
@@ -301,7 +301,7 @@ int main(int argc, char** argv) {
 
     // results output
     if (args_info.resultFile_given) {
-	std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : filename + ".results";
+        std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : filename + ".results";
         Results results(results_filename);
 
         results.add("meta.package_name", (char*)PACKAGE_NAME);
@@ -309,13 +309,13 @@ int main(int argc, char** argv) {
         results.add("meta.svn_version", (char*)VERSION_SVN);
         results.add("meta.invocation", invocation);
 
-	if (args_info.matching_flag) {
-	    results.add("matching.result", ret);
-	} else if (args_info.simulation_flag) {
-	    results.add("simulation.result", ret);	
-	} else if (args_info.equivalence_flag) {
+        if (args_info.matching_flag) {
+            results.add("matching.result", ret);
+        } else if (args_info.simulation_flag) {
+            results.add("simulation.result", ret);
+        } else if (args_info.equivalence_flag) {
             results.add("equivalence.result", ret);
-	}
+        }
 
     }
 

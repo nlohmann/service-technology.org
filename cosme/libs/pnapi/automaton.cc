@@ -47,6 +47,8 @@ Automaton::Automaton() :
  * Third, the marking is gained from the net to create the initial state.
  * At last the DEPTH-FIRST-SEARCH is started and results in a fully
  * built automaton from a Petri Net.
+ * 
+ * \bug What about unnormal nets?
  */
 Automaton::Automaton(PetriNet & net) :
   stateCounter_(0)
@@ -93,7 +95,7 @@ Automaton::Automaton(PetriNet & net) :
     case Transition::OUTPUT:
       (*edgeTypes_)[*t] = Edge::OUTPUT;
       break;
-    default: /* do nothing */ break;  // \todo: report error?
+    default: /* PNAPI_ASSERT(false); */ break;
     }
   }
   

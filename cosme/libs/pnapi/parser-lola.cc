@@ -477,7 +477,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
     {
       parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
     }
-    catch(exception::UserCausedError e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }
@@ -494,7 +494,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
     {
       parser_.places_[parser_.nodeName_.str()] = &(parser_.net_.createPlace(parser_.nodeName_.str(), 0, parser_.capacity_));
     }
-    catch(exception::UserCausedError e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);
     }
@@ -530,7 +530,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
     {
       parser_.transition_ = &(parser_.net_.createTransition(parser_.nodeName_.str()));
     }
-    catch(exception::UserCausedError e)
+    catch(exception::Error & e)
     {
       parser_.rethrow(e);      
     }

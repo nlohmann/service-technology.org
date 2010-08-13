@@ -26,8 +26,6 @@ class Place;
 
 /*!
  * \brief   Final Condition Formulae
- * 
- * \todo go through all constructors and check whether they are still needed
  */
 namespace formula
 {

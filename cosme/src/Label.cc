@@ -35,7 +35,7 @@ std::string Label::toString() const {
     tmpStr << std::endl << "Interface:" << std::endl;
     //for (map<label_id_t, string>::const_iterator it = this->mID2Name.begin(); it != this->mID2Name.end(); ++it) {
     FOREACH(it, this->mID2Name) {
-	tmpStr << " " << static_cast<unsigned int>(it->first) << ": " << it->second << std::endl;
+        tmpStr << " " << static_cast<unsigned int>(it->first) << ": " << it->second << std::endl;
     }
 
     return tmpStr.str();

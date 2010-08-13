@@ -31,28 +31,40 @@ lola_EXTRASOURCES = ltl.H ltl.cc
 include $(top_srcdir)/m4/Makefile.src
 
 # user configs
-EXTRA_DIST += configs/userconfig.H.boundednet \
-              configs/userconfig.H.boundedplace \
-              configs/userconfig.H.coverstatepredicate \
-              configs/userconfig.H.deadlock \
-              configs/userconfig.H.deadtransition \
-              configs/userconfig.H.findpath \
-              configs/userconfig.H.full \
-              configs/userconfig.H.full1 \
-              configs/userconfig.H.fullcover \
-              configs/userconfig.H.fulllimited \
-              configs/userconfig.H.liveprop \
-              configs/userconfig.H.liveprop1 \
-              configs/userconfig.H.modelchecking \
-              configs/userconfig.H.none \
-              configs/userconfig.H.prom-boundednet \
-              configs/userconfig.H.prom-deadlock \
-              configs/userconfig.H.prom-home \
-              configs/userconfig.H.prom-reversibility \
-              configs/userconfig.H.statepredicate \
-              configs/userconfig.H.statepredicate1 \
-              configs/userconfig.H.statespace \
-              configs/userconfig.H.statespace1
+EXTRA_DIST += configs/boundednet/userconfig.H                    \
+              configs/boundednetsymm/userconfig.H                \
+              configs/boundedplace/userconfig.H                  \
+              configs/bpm-liveprop/userconfig.H                  \
+              configs/bpm-liveprop1/userconfig.H                 \
+              configs/bpm-modelchecking/userconfig.H             \
+              configs/bpm-modelchecking-naiv/userconfig.H        \
+              configs/bpm-modelchecking1/userconfig.H            \
+              configs/bpm-modelchecking1-naiv/userconfig.H       \
+              configs/bpm-statepredicate/userconfig.H            \
+              configs/bpm-statepredicate-naiv/userconfig.H       \
+              configs/bpm-statepredicate1/userconfig.H           \
+              configs/bpm-statepredicate1-naiv/userconfig.H      \
+              configs/coverstatepredicate/userconfig.H           \
+              configs/deadlock/userconfig.H                      \
+              configs/deadlock1/userconfig.H                     \
+              configs/deadtransition/userconfig.H                \
+              configs/findpath/userconfig.H                      \
+              configs/full/userconfig.H                          \
+              configs/full1/userconfig.H                         \
+              configs/fullcover/userconfig.H                     \
+              configs/fulllimited/userconfig.H                   \
+              configs/liveprop/userconfig.H                      \
+              configs/liveprop1/userconfig.H                     \
+              configs/modelchecking/userconfig.H                 \
+              configs/none/userconfig.H                          \
+              configs/prom-boundednet/userconfig.H               \
+              configs/prom-deadlock/userconfig.H                 \
+              configs/prom-home/userconfig.H                     \
+              configs/prom-reversibility/userconfig.H            \
+              configs/statepredicate/userconfig.H                \
+              configs/statepredicate1/userconfig.H               \
+              configs/statespace/userconfig.H                    \
+              configs/statespace1/userconfig.H
 
 
 #############################################################################
@@ -60,21 +72,27 @@ EXTRA_DIST += configs/userconfig.H.boundednet \
 # "configs" directory. The created binaries are cleaned with "make clean".
 #############################################################################
 
-CONFIGS = $(patsubst $(srcdir)/configs/userconfig.H.%,lola-%,$(wildcard $(srcdir)/configs/userconfig.H.*))
+CONFIGS = $(patsubst $(srcdir)/configs/%/userconfig.H,lola-%,$(wildcard $(srcdir)/configs/*/userconfig.H))
 
 $(CONFIGS): $@
 	$(AM_V_at)$(MAKE) -s clean-am
-	$(AM_V_at)chmod u+w $(srcdir)/userconfig.H
-	$(AM_V_at)cp $(srcdir)/userconfig.H $(builddir)/userconfig.H~
-	$(AM_V_at)cp $(srcdir)/configs/userconfig.H.$(patsubst lola-%,%,$@) $(srcdir)/userconfig.H
-	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) CPPFLAGS=-DSTANDARDCONFIG all-am
+	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/$(patsubst lola-%,%,$@) $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG all-am
 	$(AM_V_GEN)mv $(builddir)/lola$(EXEEXT) $(builddir)/$@$(EXEEXT)
-	$(AM_V_at)cp $(builddir)/userconfig.H~ $(srcdir)/userconfig.H
-	$(AM_V_at)chmod u+w $(builddir)/userconfig.H~
-	$(AM_V_at)rm $(builddir)/userconfig.H~
 
 MAINTAINERCLEANFILES += $(CONFIGS) cmdline.c cmdline.h
 DISTCLEANFILES += $(CONFIGS)$(EXEEXT)
+
+
+#############################################################################
+# generate these binaries for later checks
+#############################################################################
+
+check_binaries = lola-deadlock lola-fulllimited lola-modelchecking \
+                 lola-statepredicate1 lola-liveprop lola-boundednet \
+                 lola-statespace
+
+check-local:
+	$(MAKE) $(AM_MAKEFLAGS) $(check_binaries)
 
 
 #############################################################################

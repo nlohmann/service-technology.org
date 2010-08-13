@@ -24,7 +24,7 @@
 #ifndef DIMENSIONS_H
 #define DIMENSIONS_H
 
-#include "userconfig.H"
+#include <userconfig.H>
 #include <iostream>
 #include <climits>
 

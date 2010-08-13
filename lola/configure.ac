@@ -31,8 +31,8 @@ AC_ST_AUTOTEST
 AC_CHECK_FUNCS([drand48])
 
 # check for libconfig++
-AC_CHECK_LIB(config++, main)
-AM_CONDITIONAL(USE_LIBCONFIG, [test ${ac_cv_lib_configpp_main} = "yes"])
+#AC_CHECK_LIB(config++, main)
+#AM_CONDITIONAL(USE_LIBCONFIG, [test ${ac_cv_lib_configpp_main} = "yes"])
 
 
 #############################################################################
@@ -74,7 +74,7 @@ echo " according to your needs. Then, run 'make' to compile LoLA."
 echo
 echo " Alternatively, you can compile a preconfigured version of LoLA using a"
 echo " configuration from directory 'src/configs'. To use, for example, the"
-echo " configuration 'src/configs/userconfig.H.deadlock', run 'make lola-deadlock'."
+echo " configuration 'src/configs/deadlock/userconfig.H', run 'make lola-deadlock'."
 echo " To compile all preconfigured versions, run 'make all-configs'."
 echo "------------------------------------------------------------------------------"
 echo

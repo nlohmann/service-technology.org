@@ -11,9 +11,9 @@ svn-clean: maintainer-clean
 ##############################################################################
 # redirect calls to make preconfigured LoLAs (e.g. lola-deadlock)
 ##############################################################################
-CONFIGS = $(patsubst $(top_srcdir)/src/configs/userconfig.H.%,lola-%,$(wildcard $(top_srcdir)/src/configs/userconfig.H.*))
+CONFIGS = $(patsubst $(top_srcdir)/src/configs/%/userconfig.H,lola-%,$(wildcard $(top_srcdir)/src/configs/*/userconfig.H))
 
 all-configs: $(CONFIGS)
 
 $(CONFIGS):
-	$(MAKE) -C $(top_builddir)/src $(AM_MAKEFLAGS) $@
+	$(AM_V_GEN)$(MAKE) $(AM_MAKEFLAGS) $@ --directory=$(top_builddir)/src

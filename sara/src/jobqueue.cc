@@ -9,9 +9,9 @@
  *
  * \since   2010/02/26
  *
- * \date    $Date: 2010-02-26 12:00:00 +0100 (Fr, 26. Feb 2010) $
+ * \date    $Date: 2010-08-13 12:00:00 +0100 (Fr, 13. Aug 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 1.01 $
  */
 
 #include "jobqueue.h"
@@ -244,37 +244,58 @@ void JobQueue::push_fail(PartialSolution* job) {
 	set<Constraint>::iterator cit;
 	if (!found) // no equivalent entry found, create a new one
 	{
-		set<Constraint> cv;
+		bool done(false); // if there is either at least one "real" constraint or none at all
+		set<Constraint> cv; // a copy of the necessary "real" (= place) constraints
 		ctmp = job->getConstraints();
+		if (ctmp.empty()) done=true; // none at all case
 		for(cit=ctmp.begin(); cit!=ctmp.end(); ++cit)
-			if (cit->isRecent()) if (cit->cleanConstraintSet(cv)) cv.insert(*cit);
+			if (cit->isRecent() && !cit->getPlaces().empty()) // check for new "real" constraints 
+				if (cit->cleanConstraintSet(cv)) { cv.insert(*cit); done=true; }
 		ctmp = job->getFailureConstraints();
 		for(cit=ctmp.begin(); cit!=ctmp.end(); ++cit)
-			if (cit->isRecent()) if (cit->cleanConstraintSet(cv)) cv.insert(*cit);
-		job->setConstraints(cv);
-		map<Transition*,int> parikh(job->calcParikh());
-		queue[priority(job)].push_back(job); 
-		++cnt;
-		if (cleanFailure(parikh)) job->setSolved(); // if job is obsolete
+			if (cit->isRecent() && !cit->getPlaces().empty()) // also in the failure queue
+				if (cit->cleanConstraintSet(cv)) { cv.insert(*cit); done=true; }
+		if (done) { // we should save this job as a failure ...
+			job->setConstraints(cv);
+			map<Transition*,int> parikh(job->calcParikh());
+			queue[priority(job)].push_back(job); 
+			++cnt;
+			if (cleanFailure(parikh)) job->setSolved(); // check if job is obsolete
+		} else delete job; // ... or delete it
 		return;
 	}
-	// add our failed constraints into the list
+	// we found an earlier version
+	// check if the job has "real" constraints and a shorter firing sequence than the old one
 	ctmp = job->getConstraints();
 	for(cit=ctmp.begin(); cit!=ctmp.end(); ++cit)
-		if (cit->isRecent()) 
-			if (cit->cleanConstraintSet(jit->second[i]->getConstraints())) 
-				jit->second[i]->setConstraint(*cit);
-	ctmp = job->getFailureConstraints();
-	for(cit=ctmp.begin(); cit!=ctmp.end(); ++cit)
-		if (cit->isRecent()) 
-			if (cit->cleanConstraintSet(jit->second[i]->getConstraints())) 
-				jit->second[i]->setConstraint(*cit);
-	// update status of the failed job
-	jit->second[i]->setFeasibility(true);
-	map<Transition*,int> parikh(job->calcParikh());
-	if (job->getSequence().size()<jit->second[i]->getSequence().size()) jit->second[i]->setSequence(job->getSequence());
-	jit->second[i]->addParikh(parikh);
-	if (cleanFailure(parikh)) jit->second[i]->setSolved();
+		if (cit->isRecent() && !cit->getPlaces().empty()) break;
+	if (cit==ctmp.end()) {
+		ctmp = job->getFailureConstraints();
+		for(cit=ctmp.begin(); cit!=ctmp.end(); ++cit)
+			if (cit->isRecent() && !cit->getPlaces().empty()) break;
+	}
+	if (cit!=ctmp.end() && job->getSequence().size()<jit->second[i]->getSequence().size()) {
+		// if so, copy the necessary constraints
+		jit->second[i]->clearConstraints();
+		ctmp = job->getConstraints();
+		for(cit=ctmp.begin(); cit!=ctmp.end(); ++cit)
+			if (cit->isRecent() && !cit->getPlaces().empty()) 
+				if (cit->cleanConstraintSet(jit->second[i]->getConstraints())) 
+					jit->second[i]->setConstraint(*cit);
+		ctmp = job->getFailureConstraints();
+		for(cit=ctmp.begin(); cit!=ctmp.end(); ++cit)
+			if (cit->isRecent() && !cit->getPlaces().empty()) 
+				if (cit->cleanConstraintSet(jit->second[i]->getConstraints())) 
+					jit->second[i]->setConstraint(*cit);
+		// update the status of the failed job
+		jit->second[i]->setFeasibility(true);
+		map<Transition*,int> parikh(job->calcParikh());
+//		if (job->getSequence().size()<jit->second[i]->getSequence().size()) 
+		// and update the firing sequence
+		jit->second[i]->setSequence(job->getSequence());
+		jit->second[i]->addParikh(parikh);
+		if (cleanFailure(parikh)) jit->second[i]->setSolved();
+	}
 	delete job;
 }
 
@@ -543,6 +564,7 @@ void JobQueue::show(bool past) {
 	{
 		cerr << "+++++ Priority " << jit->first << endl;
 		for(unsigned int i=0; i<jit->second.size(); ++i)
+		if (jit->second[i])
 		{
 			if (jit->second[i]->isSolved() && !past) cerr << "++ Next job is obsolete:" << endl;
 			else cerr << "++ Next job:" << endl;
@@ -551,3 +573,30 @@ void JobQueue::show(bool past) {
 		}	
 	}
 }
+
+/** Delete all jobs that have an lp_solve solution less or equal to vec.
+	JobQueues using this method may not use any find operations,  as these
+	cannot handle the potential null pointers. push_back() is allowed and
+	the queue can be shifted to a failure queue via append().
+	@param vec The vector to compare the jobs in this JobQueue to.
+*/
+void JobQueue::deleteCovered(map<Transition*,int>& vec) {
+	map<int,deque<PartialSolution*> >::iterator jit;
+	for(jit=queue.begin(); jit!=queue.end(); ++jit) // walk all queues
+		for(unsigned int i=0; i<jit->second.size(); ++i) // and entries in the queues
+			if (jit->second[i]) // if an entry exists
+				if (jit->second[i]->compareVector(vec)) // and is less than vec
+				{ delete jit->second[i]; jit->second[i]=NULL; } // delete it
+}
+
+/** Appends the queue jbg to a failure queue, sieving out null pointers.
+	@param jbq The queue to append to this one.
+*/
+void JobQueue::append(JobQueue& jbq) {
+	map<int,deque<PartialSolution*> >::iterator jit;
+	for(jit=jbq.queue.begin(); jit!=jbq.queue.end(); ++jit) // walk all internal queues
+		for(unsigned int i=0; i<jit->second.size(); ++i) // and their entries
+			if (jit->second[i]) push_fail(new PartialSolution(*(jit->second[i])));
+			// and copy them to a failure queue
+}
+

@@ -9,9 +9,9 @@
  *
  * \since   2009/10/12
  *
- * \date    $Date: 2009-10-12 12:00:00 +0200 (Mo, 12. Okt 2009) $
+ * \date    $Date: 2010-08-13 12:00:00 +0200 (Fr, 13. Aug 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 1.01 $
  */
 
 #ifndef PARTIALSOLUTION_H
@@ -96,6 +96,9 @@ public:
 	/// Get all failure constraints
 	set<Constraint>& getFailureConstraints();
 
+	/// Get all constraints
+	void clearConstraints();
+
 	/// Set flag about feasibility of the constrained marking equation
 	void setFeasibility(bool);
 
@@ -134,6 +137,9 @@ public:
 
 	/// Get all parikh images of firing sequences for this failure
 	vector<map<Transition*,int> >& getParikh();
+
+	/// Check if the stored parikh image is less or equal to the given one.
+	bool compareVector(map<Transition*,int>& vec);
 
 	/// Get the first jump constraint in the todo list
 	Transition* getNextJC(int& val);

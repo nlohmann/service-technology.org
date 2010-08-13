@@ -9,9 +9,9 @@
  *
  * \since   2009/10/14
  *
- * \date    $Date: 2010-03-01 12:00:00 +0200 (Mo, 1. Mar 2010) $
+ * \date    $Date: 2010-08-13 12:00:00 +0200 (Fr, 13. Aug 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 1.01 $
  */
 
 #ifndef PNAPI_PNAPI_H
@@ -142,7 +142,8 @@ bool PathFinder::recurse() {
 		PartialSolution newps(fseq,m0,rec_tv);
 		newps.setConstraints(tps.first()->getConstraints());
 		newps.setFullVector(fulltvector);
-		if (!tps.findPast(&newps) && tps.find(&newps)>=0) { // job isn't already in the queue or past
+//		if (!tps.findPast(&newps) && tps.find(&newps)>=0) { // job isn't already in the queue or past
+		{
 			if (passedon && !isSmaller(fulltvector,torealize))
 				failure.push_fail(new PartialSolution(*(tps.first()))); // going beyond maximal sequence
 			else if (terminate) 
@@ -152,10 +153,15 @@ bool PathFinder::recurse() {
 			} else {
 				if (tps.first()->compareSequence(fseq) && !tps.first()->getRemains().empty()) 
 					failure.push_fail(new PartialSolution(newps)); // sequence was not extended
-				else tps.push_back(new PartialSolution(newps)); // put the job into the queue
+				else if (!tps.findPast(&newps) && tps.find(&newps)>=0) // if it's not already in queue or past ...
+					tps.push_back(new PartialSolution(newps)); // put the job into the queue
+				else if (verbose>1) cerr << "sara: CheckAgainstQueue-Hit" << endl;
 			}
 			// try to add this partial solution to the lookup table
-			if (shortcutmax<0 || (int)(shortcut.size())<shortcutmax) shortcut[fulltvector].push_back(newps);
+			if (shortcutmax<0 || (int)(shortcut.size())<shortcutmax) 
+			{
+				if (!tps.findPast(&newps) && tps.find(&newps)>=0) shortcut[fulltvector].push_back(newps);
+			}
 			else if (args_info.verbose_given && (int)(shortcut.size())==shortcutmax) 
 			{ 
 				cerr << "\r";
@@ -167,11 +173,11 @@ bool PathFinder::recurse() {
 				else if (terminate) cerr << "Full Solution found:" << endl; 
 				else if (tps.first()->compareSequence(fseq) && !tps.first()->getRemains().empty()) 
 					cerr << "Failure:" << endl;
-				else cerr << "New Partial Solution:" << endl;
+				else cerr << "Partial Solution:" << endl;
 				newps.show();
 				cerr << "*** PF ***" << endl;
 			}
-		} else if (verbose>1) cerr << "sara: CheckAgainstQueue-Hit" << endl;
+		} //else if (verbose>1) cerr << "sara: CheckAgainstQueue-Hit" << endl;
 		// go up one level in the recursion, if there were nonfirable transitions left over,
 		// but terminate the recursion altogether if this partial solution is a full solution.
 		return (args_info.continue_given?false:terminate); // surpress termination if -C flag is given

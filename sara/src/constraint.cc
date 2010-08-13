@@ -11,7 +11,7 @@
  *
  * \date    $Date: 2010-05-05 09:30:00 +0200 (Mi, 5. Mai 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 1.00 $
  */
 
 #include <map>

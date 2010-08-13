@@ -9,9 +9,9 @@
  *
  * \since   2009/10/12
  *
- * \date    $Date: 2010-03-01 12:00:00 +0200 (Mo, 1. Mar 2010) $
+ * \date    $Date: 2010-08-13 12:00:00 +0200 (Fr, 13. Aug 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 1.01 $
  */
 
 #include <vector>
@@ -151,6 +151,10 @@ set<Constraint>& PartialSolution::getConstraints() { return constraints; }
 	@return The constraints.
 */
 set<Constraint>& PartialSolution::getFailureConstraints() { return failure; }
+
+/** Remove all constraints from the partial solution.
+*/
+void PartialSolution::clearConstraints() { constraints.clear(); }
 
 /** Sets the flag for feasibility of the marking equation. The flag is not set automatically!
 	@param mef True, if the marking equation is feasible. 
@@ -487,6 +491,30 @@ void PartialSolution::addParikh(map<Transition*,int>& p) { parikh.clear(); parik
 	@return A vector of parikh images.
 */
 vector<map<Transition*,int> >& PartialSolution::getParikh() { return parikh; }
+
+/** Compare the lp_solve solution stored with the given vector.
+	@param vec The vector to compare with.
+	@return If the stored vector is less or equal to the given one.
+*/
+bool PartialSolution::compareVector(map<Transition*,int>& vec) { 
+	map<Transition*,int>::iterator pit,pit2;
+	for(pit=fulltv.begin(); pit!=fulltv.end(); ++pit)
+	{ // check if this solution is greater in some component
+		pit2 = vec.find(pit->first);
+		if (pit2==vec.end()) return false;
+		if (pit->second>pit2->second) return false;
+	}
+	// fulltv <= vec
+	for (pit2=vec.begin(); pit2!=vec.end(); ++pit2)
+	{ // check if vec is greater
+		if (pit2->second==0) continue;
+		pit = fulltv.find(pit2->first);
+		if (pit==fulltv.end()) return true;
+		if (pit->second<pit2->second) return true;
+	}
+	// fulltv == vec
+	return false; 
+}
 
 /** Get the next jump in the list of precalculated jumps.
 	@param val On return: the right hand side n of the jump constraint.

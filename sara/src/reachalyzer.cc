@@ -9,9 +9,9 @@
  *
  * \since   2009/10/21
  *
- * \date    $Date: 2010-03-01 12:00:00 +0200 (Mo, 1. Mar 2010) $
+ * \date    $Date: 2010-08-13 12:00:00 +0200 (Fr, 13. Aug 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 1.01 $
  */
 
 #include <vector>
@@ -100,6 +100,7 @@ void Reachalyzer::start() {
 	solved = false; // not solved yet
 	errors = false; // no errors yet
 	int loops = 0; // counter for number of loops (jobs)
+	JobQueue unknown; // if it is unknown at present whether a job can become part of a counterexample 
 	if (stateinfo && out) cout << "JOBS(done/open):";
 	while (!solved && !tps.empty()) { // go through the job list as long as there are jobs in it and we have no solution
 		// if --continue is specified, solved will never be set
@@ -151,6 +152,8 @@ void Reachalyzer::start() {
 		tps.first()->touchConstraints(true); // mark all jump constraints so far as old
 		// calculate what the new constraints changed in the solution of lp_solve
 		map<Transition*,int> fullvector(lpwrap.getTVector(net));
+		// delete all "unknown" jobs covered by this job if we are interested in a counterexample
+		if (args_info.verbose_given) unknown.deleteCovered(fullvector); 
 		map<Transition*,int> diff; // this contains changes from the old to the new solution
 		map<Transition*,int>::iterator vit;
 		for(vit=fullvector.begin(); vit!=fullvector.end(); ++vit)
@@ -181,6 +184,14 @@ void Reachalyzer::start() {
 				if (verbose>1) cerr << endl;
 				++loops; // count the job
 				continue; // do not try to find a realization
+			} else if (args_info.verbose_given) { // only if looking for counterexamples
+				bool ngeq(false); // if the new solution is not greater or equal to the old one
+				for(vit=oldvector.begin(); vit!=oldvector.end(); ++vit)
+					if (vit->second>fullvector[vit->first]) ngeq=true;
+				if (ngeq) { // unclear if the old solution can be pumped up or just "pumped" sideways
+					PartialSolution* ups(new PartialSolution(*(tps.first())));
+					unknown.push_back(ups); 
+				}
 			}
 		}
 		tps.first()->transformJumps(fullvector); // change jump constraints to normal ones
@@ -198,7 +209,7 @@ void Reachalyzer::start() {
 		if (!solutionSeen(fullvector)) // adapt known solutions (from an earlier loop) for the new constraints
 		{ // no solutions known so far, calculate them by trying to realize a firing sequence
 				PathFinder pf(m1,fullvector,cols,tps,solutions,failure,im,shortcut);
-				pf.verbose = ((breakafter>0 && breakafter<=loops+2)?3:verbose);
+				pf.verbose = ((breakafter>0 && breakafter<=loops+2)?verbose+1:verbose);
 				pf.setMinimize(); // do not allow repeating markings in firing sequences
 				pf.passedon = passedon;
 				if (passedon) pf.torealize = torealize;
@@ -208,6 +219,8 @@ void Reachalyzer::start() {
 		if (verbose>0) cerr << endl;
 		++loops; // count the job
 	}
+	if (args_info.verbose_given)
+		failure.append(unknown); // the unknown are known now: they belong to the counterexample
 	if (stateinfo && out) cout << "\r"; // if on screen
 	if (args_info.break_given && stateinfo) // debug output if option --break was used
 	{ 

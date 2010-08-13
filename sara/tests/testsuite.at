@@ -128,6 +128,19 @@ AT_CHECK([GREP -q "UNSOLVED" stdout])
 AT_KEYWORDS(solver)
 AT_CLEANUP
 
+AT_SETUP([Immanent Deadlock])
+AT_CHECK([cp TESTFILES/test16.sara TESTFILES/test16.owfn .])
+AT_CHECK([SARA -i test16.sara -v],0,stdout,stderr)
+AT_CHECK([GREP -q "47 jobs done" stdout])
+AT_CHECK([GREP -q "INFEASIBLE: unable to borrow enough tokens via T-invariants" stdout])
+AT_CHECK([GREP -q "6 failures" stdout])
+AT_CHECK([GREP -q "e1 e1 e1" stdout])
+AT_CHECK([GREP -q "e2 e2 e2" stdout])
+AT_CHECK([GREP -q "x1" stdout])
+AT_CHECK([GREP -q "x2" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Realizability])
 ############################################################################

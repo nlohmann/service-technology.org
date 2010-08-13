@@ -1,0 +1,6 @@
+PROBLEM deadlock:
+	GOAL REACHABILITY;
+	FILE test16.owfn TYPE OWFN;
+	INITIAL s:3;
+	FINAL f:3; 
+

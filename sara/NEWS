@@ -8,9 +8,10 @@
 
 
 PURPOSE
-Version 1.0 (12 Jul 2010)
-=========================
+Version 1.01 (13 Aug 2010)
+==========================
 
-* first release of Sara
+* fixed bug in counterexample generation where information from different
+  sources (jobs) could not be coordinated and eventually got lost.
 
 \nSee file ChangeLog <http://service-technology.org/files/sara/ChangeLog> for\ncomplete version history.\n

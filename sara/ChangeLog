@@ -8,6 +8,12 @@
 
 
 PURPOSE
+Version 1.01 (13 Aug 2010)
+==========================
+
+* fixed bug in counterexample generation where information from different
+  sources (jobs) could not be coordinated and eventually got lost.
+
 Version 1.0 (12 Jul 2010)
 =========================
 

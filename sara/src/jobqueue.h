@@ -9,9 +9,9 @@
  *
  * \since   2010/02/26
  *
- * \date    $Date: 2010-03-02 12:00:00 +0100 (Di, 2. Mar 2010) $
+ * \date    $Date: 2010-08-13 12:00:00 +0100 (Fr, 13. Aug 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 1.01 $
  */
 
 #ifndef JOBQUEUE_H
@@ -96,6 +96,12 @@ public:
 
 	/// Print a Jobqueue to stderr (possibly including past and active job)
 	void show(bool past);
+
+	/// Delete solutions covered by vec from the queue
+	void deleteCovered(map<Transition*,int>& vec);
+
+	/// Append the elements of one queue to another
+	void append(JobQueue& jbq);
 
 private:
 	/// Job, solution, or failure queue (maps from priority to sublist)

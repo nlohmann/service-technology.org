@@ -7,6 +7,11 @@
                         http://service-technology.org/pnapi
 
 
+Version 4.03-unreleased
+=======================
+
+* added methods to set node color in dot output
+
 Version 4.02 (2010-07-28)
 =========================
 

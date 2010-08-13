@@ -1560,9 +1560,9 @@ AT_CHECK([AT_CHECK_CUSTOMER wendy], 0, ignore, ignore)
 AT_KEYWORDS([customer wendy])
 AT_CLEANUP
 
-AT_SETUP([Yasmina])
-AT_CHECK_WGET
-AT_CHECK([AT_CHECK_CUSTOMER yasmina], 0, ignore, ignore)
-AT_KEYWORDS([customer yasmina])
-AT_CLEANUP
+#AT_SETUP([Yasmina])
+#AT_CHECK_WGET
+#AT_CHECK([AT_CHECK_CUSTOMER yasmina], 0, ignore, ignore)
+#AT_KEYWORDS([customer yasmina])
+#AT_CLEANUP
 

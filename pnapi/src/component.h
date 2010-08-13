@@ -72,6 +72,8 @@ private: /* private variables */
   std::set<Node *> postset_;
   /// the arcs to the postset of this node
   std::set<Arc *> postsetArcs_;
+  /// node color (dot output)
+  std::string color_;
   
 public: /* public methods */
   /*!
@@ -92,6 +94,8 @@ public: /* public methods */
   //@{
   /// set new name of the node
   void setName(const std::string &);
+  /// set node color (dot output)
+  void setColor(const std::string & = "");
   /// adds a prefix to all names
   void prefixNameHistory(const std::string &);
   /// merges the histories of two nodes
@@ -108,6 +112,8 @@ public: /* public methods */
   bool isParallel(const Node &) const;
   /// returns the name of the node
   std::string getName() const;
+  /// returns the node's color (dot output)
+  const std::string & getColor() const;
   /// returns the name history
   std::deque<std::string> getNameHistory() const;
   /// returns the node's preset

@@ -1,3 +1,8 @@
+@heading Version 4.03-unreleased
+@itemize
+@item added methods to set node color in dot output
+@end itemize
+
 @heading Version 4.02 (2010-07-28)
 @itemize
 @item made petri configurable (paths to external tools, configuration file)

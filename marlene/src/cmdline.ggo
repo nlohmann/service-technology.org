@@ -158,6 +158,14 @@ option "tmpfile" -
   optional
   hidden
 
+option "live" -
+  "Output file for live."
+  string
+  typestr="FILE"
+  default="live.txt"
+  optional
+  hidden
+
 option "config" c
   "Read configuration from file. If no file is given, Marlene first tries to parse file 'marlene.conf' from the sysconf directory (usually '/usr/local/etc'; written in case Marlene was installed) and then from the current working directory. If neither file was found, the standard value for 'wendy' is assumed."
   string

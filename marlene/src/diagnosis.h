@@ -28,12 +28,14 @@
 // forward declarations
 class DGraph;
 class DNode;
+class Output;
 
 class Diagnosis {
 
     private:
         DGraph * dgraph;
         MarkingInformation & mi;
+        Output live;
 
     public:
         bool superfluous;

@@ -30,10 +30,11 @@
 #include "verbose.h"
 #include "helper.h"
 #include "macros.h"
+#include "Output.h"
 
 #include "diagnosis.h"
 
-Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned int) : dgraph(new DGraph), mi(pmi), superfluous(false) //  messageBound
+Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned int) : dgraph(new DGraph), mi(pmi), live(args_info.live_arg, "Info file for live"), superfluous(false) //  messageBound
 {
 
     libconfig::Config diagInfo;
@@ -197,15 +198,31 @@ void Diagnosis::evaluateDeadlocks(std::vector< pnapi::PetriNet *> & nets, pnapi:
         }
         if ( not seen )
         {
+            std::string livedeadlock = "DL;";
+            std::string livepending = "";
+            std::string livefinal = "";
+            std::string liverequired = "";
             message("Deadlock %d (node %d)", i + 1, node->getID());
             for ( unsigned int j = 0; j < node->deadlockMarkings.size(); ++j)
             {
                 Marking & m = *(mi.markings[node->deadlockMarkings[j]]);
                 std::vector< std::string > pending = m.getPendingMessages(engine, prefix);
+                bool first = true;
                 for ( unsigned int p = 0; p < pending.size(); ++p )
                 {
                     message("Message %s is pending", pending[p].c_str());
+                    if ( first )
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        livepending += std::string(",");
+                    }
+                    livepending += pending[p];
                 }
+                first = true;
+                bool first2 = true;
                 for ( unsigned int net = 0; net < nets.size(); ++net )
                 {
                     std::string prefix = "net" + toString(net + 1) + ".";
@@ -213,12 +230,31 @@ void Diagnosis::evaluateDeadlocks(std::vector< pnapi::PetriNet *> & nets, pnapi:
                     if (required[required.size()-1] == "yes")
                     {
                         message("Net %s is already in a final state", prefix.c_str());
+                        if ( first )
+                        {
+                            first = false;
+                        }
+                        else
+                        {
+                            livefinal += ",";
+                        }
+                        livefinal += prefix;
                     }
                     for ( unsigned int p = 0; p < required.size() - 1; ++p )
                     {
                         message("Message %s is required", required[p].c_str());
+                        if ( first2 )
+                        {
+                            first2 = false;
+                        }
+                        else
+                        {
+                            liverequired += ",";
+                        }
+                        liverequired += required[p];
                     }
                 }
+                livedeadlock += livefinal + ";" + livepending + ";" + liverequired + ";";
                 message("The following rules where previously applied:");
                 if ( node->rulesApplied.empty() )
                 {
@@ -233,14 +269,18 @@ void Diagnosis::evaluateDeadlocks(std::vector< pnapi::PetriNet *> & nets, pnapi:
                         {
                             std::cerr << "      " << *rule;
                             first = false;
+                            livedeadlock += *rule;
                         }
                         else
                         {
                             std::cerr << ", " << *rule;
+                            livedeadlock += "," + *rule;
+                            
                         }
                     }
                     std::cerr << std::endl;
                 }
+                live.stream() << livedeadlock << std::endl;
             }
         }
     }
@@ -275,15 +315,31 @@ void Diagnosis::evaluateLivelocks(std::vector< pnapi::PetriNet *> & nets, pnapi:
         }
         if ( not seen )
         {
+            std::string livelivelock = "LL;";
+            std::string livepending = "";
+            std::string livefinal = "";
+            std::string liverequired = "";
             message("Livelock %d (node %d)", i + 1, node->getID());
             for ( unsigned int j = 0; j < node->livelockMarkings.size(); ++j)
             {
                 Marking & m = *(mi.markings[node->livelockMarkings[j]]);
                 std::vector< std::string > pending = m.getPendingMessages(engine, prefix);
+                bool first = true;
                 for ( unsigned int p = 0; p < pending.size(); ++p )
                 {
                     message("Message %s is pending", pending[p].c_str());
+                    if ( first )
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        livepending += std::string(",");
+                    }
+                    livepending += pending[p];
                 }
+                first = true;
+                bool first2 = true;
                 for ( unsigned int net = 0; net < nets.size(); ++net )
                 {
                     std::string prefix = "net" + toString(net + 1) + ".";
@@ -291,13 +347,32 @@ void Diagnosis::evaluateLivelocks(std::vector< pnapi::PetriNet *> & nets, pnapi:
                     if (required[required.size()-1] == "yes")
                     {
                         message("Net %s is already in a final state", prefix.c_str());
+                        if ( first )
+                        {
+                            first = false;
+                        }
+                        else
+                        {
+                            livefinal += ",";
+                        }
+                        livefinal += prefix;
                     }
                     for ( unsigned int p = 0; p < required.size() - 1; ++p )
                     {
                         message("Message %s is required", required[p].c_str());
+                        if ( first2 )
+                        {
+                            first2 = false;
+                        }
+                        else
+                        {
+                            liverequired += ",";
+                        }
+                        liverequired += required[p];
                     }
                 }
             }
+            livelivelock += livefinal + ";" + livepending + ";" + liverequired + ";";
             message("The following rules where previously applied:");
             if ( node->rulesApplied.empty() )
             {
@@ -311,15 +386,18 @@ void Diagnosis::evaluateLivelocks(std::vector< pnapi::PetriNet *> & nets, pnapi:
                     if ( first )
                     {
                         std::cerr << "      " << *rule;
+                        livelivelock += *rule;
                         first = false;
                     }
                     else
                     {
                         std::cerr << ", " << *rule;
+                        livelivelock += "," + *rule;
                     }
                 }
                 std::cerr << std::endl;
             }
+            live.stream() << livelivelock << std::endl;
         }
     }
 

@@ -181,12 +181,14 @@ print<<<END
 END;
     echo "<div id=\"more$index\" style=\"display:none\">";
     echo "<h3>Additional information</h3>";
+    if ( strcmp(rtrim($finals), "") )
+    {
     $finals = explode(",", $finals);
     foreach ( $finals as $net )
     {
       // print_r($services);
       reset($services);
-      if ( ! strcmp($net,"net0") )
+      if ( ! strcmp($net,"net1.") )
       {
         $serv = current($services);
         echo "<p>Net <i>".$serv["basename"]."</i> is already in a final state.</p>";
@@ -196,6 +198,7 @@ END;
         $serv = next($services);
         echo "<p>Net <i>".$serv["basename"]."</i> is already in a final state.</p>";
       }
+    }
     }
     // $rules, $finals
     echo "<h4>Previously applied rules</h4>";

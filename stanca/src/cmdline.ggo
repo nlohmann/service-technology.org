@@ -10,7 +10,7 @@
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
 description "About Stanca:"
-purpose "Stanca.\n This program checks the siphon trap property for a Petri net using MiniSAT.\n\n  Report bugs to stanca@service-technology.org.\n "
+purpose "Stanca.\n This software checks the siphon-trap property for a Petri net using MiniSAT.\n\n  Report bugs to stanca@service-technology.org.\n "
 
 
 section "Input/Output"
@@ -33,6 +33,23 @@ option "trap" t
   "Print out a non-empty trap."
   details="Prints out a non-empty trap assignment.\n"
   flag off
+
+option "semitrap" -
+  "Print out a non-empty semi-trap."
+  details="Prints out a non-empty semi-trap assignment containing the given set of places.\n"
+  string multiple
+  optional
+
+option "semisiphon" - 
+  "Print out a non-empty semi-siphon."
+  details="Prints out a non-empty semi-siphon assignment.\n"
+  string multiple
+  optional
+
+option "all" - 
+  "Print out all."
+  details="I prints out all possible entities (e.g. siphons, traps).\n"
+  flag off 
 
 section "Configuration"
 sectiondesc="Stanca relies on several other tools. These options configure Stanca to find these tools.\n"

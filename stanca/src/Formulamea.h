@@ -16,9 +16,15 @@
 #include <typeinfo>
 #include <utility>
 //#include <types.h>
-
+#include "System.h"
+#include "ParseUtils.h"
+#include "Options.h"
+#include "Dimacs.h"
+#include "Solver.h"
+#include "SimpSolver.h"
 
 using namespace std;
+using namespace Minisat;
 
 extern map<string, vector<unsigned int> > mp;
 string toPl(map<string, vector<unsigned int> > mp, int id);
@@ -310,9 +316,13 @@ const MFormula* NFF2CNF(const MFormula * f);
 const MFormula * computeCNF(const MFormula *inf);
 vector<vector<int> > CNF2MSF(const MFormula *fcnf);
 int isSatisfiable(const MFormula *f);
-//extern  int minisat(vector<vector<int> > &);
-extern vector<bool>*  minisat(vector<vector<int> > &);
-extern vector<bool>*  minisat2(vector<vector<int> > &);
+//extern  int minisat(vector<vector<int> > &);vector<bool>*
+extern bool  minisat(vector<vector<int> > &, vector<bool> &, vector<int> &);//returns one solution - the initial procedure or a clause which represnts the conflict
+//this is called in case the formula 
+//extern vector<bool>*  minisatconflict(vector<vector<int> > &);
+extern vector<bool>*  minisat2(vector<vector<int> > &);//returns a non-empty solution (at most two calls)
+extern vector<vector<bool> *>*  minisatall(vector<vector<int> > &);// iterates all solutions
+extern vector<vector <bool>* >*  minisatsimp(vector< vector< int > > & in); //calls the solver for minimal assignments
 //map<string, vector<int> > mp;
 
 #endif

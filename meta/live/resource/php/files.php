@@ -19,6 +19,24 @@ function prepareFiles($fileArray)
   return $result;
 }
 
+function createFile($file)
+{
+  $result = array();
+  
+  // returns "basename", "extension", "dirname", and "filename"
+  $info = pathinfo($file);
+    
+  $result[$file] = $info;
+  $result[$file]["residence"] = $_SESSION["dir"]."/".$info["basename"];
+  $result[$file]["link"] = getLink($info["basename"]);
+   
+  $handle = fopen($result[$file]["residence"], "w+");
+  fwrite($handle, "");
+  fclose($handle);
+
+  return $result;
+}
+
 function getLink($file)
 {
   return LIVEBASE."getfile.php?file=".urlencode(basename($file))."&amp;id=".urlencode($_SESSION["uid"]);

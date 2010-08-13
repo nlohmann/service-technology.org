@@ -1,0 +1,44 @@
+PLACE
+  INTERNAL
+    a1, a2, p1, p2, w1, w2;
+  INPUT
+    rep, pos, neg;
+  OUTPUT
+    login, req;
+
+INITIALMARKING
+  a1, a2;
+
+FINALMARKING
+  w1, w2;
+
+TRANSITION t1   { !login }
+ CONSUME
+  a1;
+ PRODUCE
+  w1, login;
+
+TRANSITION t2   { !req }
+ CONSUME
+  a2;
+ PRODUCE
+  p1, req;
+
+TRANSITION t3   { ?rep }
+ CONSUME
+  p1, rep;
+ PRODUCE
+  a2;
+
+TRANSITION t4   { ?neg }
+ CONSUME
+  p1, neg;
+ PRODUCE
+  p2;
+
+TRANSITION t5   { ?pos }
+ CONSUME
+  p1, pos;
+ PRODUCE
+  w2;
+

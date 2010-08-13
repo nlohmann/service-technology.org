@@ -5,6 +5,7 @@
   if ( ! isset($_REQUEST) && ! isset($_SESSION["marlene"]))
   {
     header('Location: index.html#marlene');
+    exit;
   }
   else
   {
@@ -12,6 +13,11 @@
     {
       if ( isset($_REQUEST["example"]) )
       {
+        if (!strcmp($_REQUEST["example"], "iRules"))
+        {
+          header('Location: marlene_interactive.php');
+          exit;
+        }
         $_SESSION["marlene"] = $_REQUEST["example"];
         unset($_REQUEST);
         header("Location: ".$_SERVER["PHP_SELF"]);
@@ -117,7 +123,7 @@
       <h2>Synthesized Adapter</h2>
 
       <?php
-        $call_result = console($fakecall, 'cd marlene; env; '.$realcall.' ');
+        $call_result = console($fakecall, 'cd marlene; '.$realcall.' ');
       ?>
 
       <?php drawImage($fakeresult); ?>

@@ -1700,4 +1700,30 @@ staticformula::staticformula(UExpression* e) {
 
 
 
+int initialize_statepredicate() // return: value if formula constant
+{
+//initialize state predicate, if present
+#ifdef WITHFORMULA
+  int res;
 
+  if(!F) {
+    fprintf(stderr, "lola: specify predicate in analysis task file!\n");
+    _exit(4);
+  }
+
+  F = F -> reduce(&res);
+  if(res<2) return res;
+  F = F -> posate(); // eliminate negations
+  F -> tempcard = 0;
+  F -> setstatic();
+  if(F ->  tempcard)
+  {
+    fprintf(stderr, "lola: temporal operators are not allowed in state predicates\n");
+    exit(3);
+  }
+  cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
+  F -> parent = NULL;
+  F -> initatomic();
+	return -1;
+#endif
+}

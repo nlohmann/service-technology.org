@@ -18,6 +18,7 @@ lola_SOURCES = readnet-syntax.yy \
                path.cc path.H \
                printnet.cc printnet.H \
                tinv.cc tinv.H \
+		reports.cc reports.H \
                sweep.cc sweep.H \
                structure.H \
                userconfig.H 

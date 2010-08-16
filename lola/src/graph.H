@@ -865,6 +865,7 @@ inline State* canonical_representitive() {
 
 void RemoveGraph();
 unsigned int depth_first();
+unsigned int simple_depth_first();
 unsigned int breadth_first();
 
 Transition** firelist();

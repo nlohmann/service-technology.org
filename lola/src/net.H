@@ -752,10 +752,10 @@ inline void Transition::backfire() {
 extern unsigned int* Ancestor;
 
 /// proceed to predeccessor marking in Ancestor vector
-inline void Transition::traceback() {
-    unsigned int* p;
-    Transition** t;
-    unsigned int* i;
+inline void Transition::traceback()
+{
+  unsigned int * p;
+  unsigned int * i;
 
     for (p = IncrPlaces, i = Incr; *p < UINT_MAX; p++, i++) {
         if (Places[(*p)]->bounded) {

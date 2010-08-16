@@ -380,4 +380,5 @@ extern bool* DeadStatePathRestriction;
 void update_formula(Transition*);
 extern unsigned int xoperators;
 
+int initialize_statepredicate();
 #endif

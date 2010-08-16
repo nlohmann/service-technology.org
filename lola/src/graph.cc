@@ -24,6 +24,7 @@
 #include "graph.H"
 #include "stubborn.H"
 #include "dimensions.H"
+#include "reports.H"
 
 #ifdef DISTRIBUTE
 #include "distribute.h"
@@ -62,7 +63,7 @@ binDecision* fromdec, * todec, *vectordec;
 State* TarStack;
 #endif
 
-int Persistents;
+int Persistents = 0;
 
 #ifdef COVER
 unsigned int* Ancestor;
@@ -361,10 +362,6 @@ void printincompletestates(State* s, ostream* graphstream, int level = 1) {
         }
     }
 }
-
-
-
-
 
 #ifdef COVER
 /*!
@@ -740,7 +737,6 @@ aftercheck:
          Examples: no deadlock found, no dead transition found, etc.
 */
 unsigned int depth_first() {
-    Persistents = 0;
 #ifdef DEPTH_FIRST
     ostream* graphstream = NULL;
     unsigned int i;
@@ -1875,6 +1871,384 @@ afterdownsearch:
 #endif
 }
 
+// specify property specific initialization routines
+
+int initialize_none() {return -1;}
+int initialize_place()
+{
+   if(!CheckPlace) {
+      fprintf(stderr, "lola: specify place to be checked in analysis task file\n");
+      fprintf(stderr, "      mandatory for task BOUNDEDPLACE\n");
+      _exit(4);
+   }
+	return -1;
+}
+int initialize_transition()
+{
+   if(!CheckTransition) {
+      fprintf(stderr, "lola: specify transition to be checked in analysis task file\n");
+      fprintf(stderr, "      mandatory for task DEADTRANSITION\n");
+      _exit(4);
+   }
+return -1;
+}
+
+// select property specific initialization procedure
+
+#ifdef STATEPREDICATE
+#define INITIALIZE_PROPERTY initialize_statepredicate
+#define CHECK_EARLY_ABORTION (F -> value)
+#define EARLY_ABORT_MESSAGE "state found!"
+#define LATE_ABORT_MESSAGE "state not found!"
+#define RESULT_NAME "statepredicate"
+#endif
+
+#ifdef DEADLOCK
+#define INITIALIZE_PROPERTY initialize_none
+#define CHECK_EARLY_ABORTION (!CurrentState -> firelist || !(CurrentState -> firelist[0]))
+#define EARLY_ABORT_MESSAGE "dead state found!"
+#define LATE_ABORT_MESSAGE "no dead state exists!"
+#define RESULT_NAME "deadlock"
+#endif
+
+#ifdef BOUNDEDPLACE
+#define INITIALIZE_PROPERTY initialize_place
+#define CHECK_EARLY_ABPRTION (!CheckPlace->bounded)
+#define EARLY_ABORT_MESSAGE "place "<< CheckPlace -> name << " is unbounded!"
+#define LATE_ABORT_MESSAGE "place "<< CheckPlace -> name << " is bounded!"
+#define RESULT_NAME "unbounded place"
+#endif
+
+#ifdef DEADTRANSITION
+#define INITIALIZE_PROPERTY initialize_transition;
+#define CHECK_EARLY_ABORTION (CheckTransition -> enabled)
+#define EARLY_ABORT_MESSAGE "transition " << CheckTransition -> name << " is not dead\n"
+#define LATE_ABORT_MESSAGE "transition " << CheckTransition -> name << " is dead\n"
+#define RESULT_NAME "not dead"
+#endif
+
+/*!
+ 	\brief compares current and target marking, used in search procedures
+	\return 0 markings different
+	\return 1 markings different
+*/
+int compare_markings()
+{
+   for(int i=0; i<Places[0]->cnt; ++i) {
+     if(CurrentMarking[i] != Places[i]->target_marking)
+       return 0;
+   }
+	return 1;
+}
+
+#ifdef REACHABILITY
+#define INITIALIZE_PROPERTY initialize_none
+#ifdef STUBBORN
+#define CHECK_EARLY_ABORTION (!CurrentState -> firelist)
+#else
+#define CHECK_EARLY_ABORTION (compare_markings())
+#endif
+#define EARLY_ABORT_MESSAGE "state found"
+#define LATE_ABORT_MESSAGE "state is unreachable"
+#define RESULT_NAME "reachable"
+#endif
+
+#ifdef BOUNDEDNET
+#define INITIALIZE_PROPERTY initialize_none
+#define CHECK_EARLY_ABORTION (NewOmegas)
+#define EARLY_ABORT_MESSAGE "net is unbounded"
+#define EARLY_ABORT_MESSAGE "net is bounded"
+#define RESULT_NAME "unbounded"
+#endif
+
+/*!
+ \brief plain depth first search, no scc, no tscc, no fairness
+ 
+ \return 1 if we found what we were looking for; that is, the search is aborted
+         Examples: deadlock found, state found, unbounded net found, etc.
+ 
+ \return 0 if we did not found what we were looking for; that is, complete search
+         Examples: no deadlock found, no dead transition found, etc.
+*/
+unsigned int simple_depth_first() {
+
+  State * NewState; ///< state most recently generated during search
+
+
+  // initialize hash table
+  for(int i = 0; i < HASHSIZE; ++i) {
+#ifdef BITHASH
+    BitHashTable[i] = 0;
+#else
+    binHashTable[i] = NULL;
+#endif
+  }
+
+#if defined(SYMMETRY) && SYMMINTEGRATION==1
+  // this data structure is used for skipping symmetries in the
+  //    "for all symmetries sigma lookup sigma(m)" loop
+  Trace = new SearchTrace [Places[0]->cnt];
+#endif
+
+
+// Insert initial state (already in CurrentMarking) 
+// into data stucture. The preceding SEARCHPROC
+// sets static variables needed by INSERTPROC.
+  if(SEARCHPROC()) cerr << "Sollte eigentlich nicht vorkommen";
+  CurrentState = INSERTPROC();
+  CurrentState -> parent = NULL; // parent in search tree
+  CurrentState -> firelist = FIRELIST(); // the transitions to be fired
+  CurrentState -> current = 0; // index of current transition to be fired in firelist
+
+	// report initial state to graph output
+	TheGraphReport -> tell();
+
+// Initialize statistical information
+  NrOfStates = 1;
+  Edges = 0;
+
+// initialize property
+// return value > 0 signals that result for this property is
+// determined structurally
+// instances of this macros have shape int initialize_*();
+
+int result;
+	if((result = (INITIALIZE_PROPERTY()))>=0)
+	{
+		return result;
+   }
+
+#ifdef COVER
+   // a marking that is used to search backwards for covered states
+   Ancestor = new unsigned int[Places[0]->cnt + 1];
+  CurrentState->NewOmega = NULL; // a vector that records where new
+                                 // omegas have been inserted
+                                 // while producung this state, used for
+                                 // backtracking
+  Place ** NewOmegas = NULL;     // holds CurrentState->NewOmega when
+                                 // processing it (saves derefencings)
+   
+#endif
+
+#ifndef FULL
+	if(CHECK_EARLY_ABORTION)  // this is property dependent
+	{
+		cout << "\n" << EARLY_ABORT_MESSAGE << "\n";
+      if (resultfile) {
+        fprintf(resultfile, RESULT_NAME);
+        fprintf(resultfile, ": {\n  result = true;\n  ");
+      }
+
+      printstate("",CurrentMarking);  // print witness state
+      print_path(CurrentState);     // print witness path
+
+      if (resultfile) {
+        fprintf(resultfile, "};\n");
+        fprintf(resultfile, "statespace: {\n  complete = false;\n  states = ( ");
+      }
+
+
+      if (resultfile) {
+        fprintf(resultfile, "\n  );\n};\n");
+      }
+
+      statistics(NrOfStates,Edges,NonEmptyHash);
+
+      return 1;
+	}
+#endif
+
+  // process marking until returning from initial state
+  while(CurrentState)   // NULL after having backtracked from initial state
+   {
+  if(CurrentState -> firelist[CurrentState->current]) {
+    // there is a next state that needs to be explored
+    ++Edges;
+    if(!(Edges % REPORTFREQUENCY)) {
+      cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
+    }
+    CurrentState -> firelist[CurrentState -> current] -> fire();
+
+#ifdef COVER
+   //In coverability graphs, we need to check for new w
+   // 1. Search backwards until last w-Intro for smaller state
+  unsigned int NrCovered;
+  State * smallerstate;
+
+  NewOmegas = NULL;
+   // for all ancestor states do ...
+  for(int i=0; i<Places[0]->cnt; ++i) {
+    Ancestor[i]= CurrentMarking[i];
+  }
+  for(smallerstate = CurrentState; smallerstate; smallerstate = smallerstate->parent) {
+    smallerstate -> firelist[smallerstate ->  current] -> traceback();
+    NrCovered = 0;
+    for(int i=0; i<Places[0]->cnt; ++i) {
+      // case 1: smaller state[i] > current state [i]
+      // ---> continue with previous state
+      if(Ancestor[i] > CurrentMarking[i]) {
+        goto nextstate;
+      }
+
+      // case 2: smaller state < current state
+      // count w-Intro
+      if(Ancestor[i] < CurrentMarking[i]) {
+        NrCovered++;
+      }
+      // case 3: smaller state = current state --> do nothing
+    }
+
+    // if arrived here, it holds smaller <= current
+    // covering is proper iff NrCovered > 0
+    // If covering is not proper, (smaller state = current state)
+    // current marking is not new, ancestors of smaller marking cannot
+    // be smaller than current marking, since they would be smaller than
+    // this smaller marking --> leave w-Intro procedure
+    if(!NrCovered) {
+      smallerstate = NULL;
+      goto endomegaproc;
+    }
+
+    // Here, smallerstate IS less than current state.
+    NewOmegas = new Place*[NrCovered+1];
+    
+    // for all fragements of state vector do ...
+    NrCovered = 0;
+    for(int i=0; i<Places[0]->cnt; ++i) {
+      if(Ancestor[i] < CurrentMarking[i]) {
+        // Here we have a place that deserves a new Omega
+        // 1. set old value in place record
+        Places[i] -> lastfinite = CurrentMarking[i];
+        Places[i] -> set_cmarking(VERYLARGE);
+        Places[i] -> bounded = false;
+        NewOmegas[NrCovered++] = Places[i];
+      }
+    }
+    NewOmegas[NrCovered] = NULL;
+    goto endomegaproc;
+    if(smallerstate -> smaller) { // smallerstate is a omega-introducing state
+      break;
+    }
+
+    nextstate: ;
+  }
+
+  endomegaproc:
+  if(!NewOmegas) smallerstate = NULL;
+#endif
+
+     /// I really mean = and not ==
+     if((NewState = SEARCHPROC()))
+       {
+       // State exists! --> backtracking to previous state
+
+#ifdef COVER
+	 // revert omega introduction
+         if(NewOmegas) {
+           // Replace new omegas by their old values
+           for(int i=0; NewOmegas[i]; ++i) {
+             NewOmegas[i]->set_cmarking(NewOmegas[i]->lastfinite);
+             NewOmegas[i]->bounded = true;
+           }
+           delete[] NewOmegas;
+         }
+#endif
+         CurrentState -> firelist[CurrentState -> current] -> backfire();
+         ++(CurrentState -> current);
+       } else {
+	// State does not exist! --> check property, insert, go ahead
+
+  NewState = INSERTPROC();
+  NewState -> firelist = FIRELIST();
+  ++NrOfStates;
+  TheGraphReport -> tell();
+#ifdef MAXIMALSTATES
+  checkMaximalStates(NrOfStates); ///// LINE ADDED BY NIELS
+#endif
+  NewState -> current = 0;
+  NewState -> parent = CurrentState;
+#ifdef COVER
+  NewState -> smaller = smallerstate;
+  NewState -> NewOmega = NewOmegas;
+#endif
+#ifdef WITHFORMULA
+         update_formula(CurrentState -> firelist[CurrentState -> current]);
+#endif
+  CurrentState = NewState;
+#ifndef FULL
+	if(CHECK_EARLY_ABORTION)
+	{
+		cout << "\n" << EARLY_ABORT_MESSAGE << "\n";
+      if (resultfile) {
+        fprintf(resultfile, RESULT_NAME);
+        fprintf(resultfile, ": {\n  result = true;\n  ");
+      }
+
+      printstate("",CurrentMarking);
+      print_path(CurrentState);
+
+      if (resultfile) {
+        fprintf(resultfile, "};\n");
+        fprintf(resultfile, "statespace: {\n  complete = false;\n  states = ( ");
+      }
+
+
+      if (resultfile) {
+        fprintf(resultfile, "\n  );\n};\n");
+      }
+
+      statistics(NrOfStates,Edges,NonEmptyHash);
+
+      return 1;
+	}
+#endif
+} // end else branch for "if state exists"
+} else {
+  // firing list completed --> close state and return to previous state
+#ifdef COVER
+        if(CurrentState -> NewOmega) {
+          // Replace new omegas by their old values
+          for(int i=0; CurrentState ->NewOmega[i]; ++i) {
+            CurrentState ->NewOmega[i]->set_cmarking(CurrentState ->NewOmega[i]->lastfinite);
+            CurrentState ->NewOmega[i]->bounded = true;
+          }
+          delete [] CurrentState ->NewOmega;
+        }
+#endif
+
+        CurrentState = CurrentState -> parent;
+        if(CurrentState) {
+          CurrentState -> firelist[CurrentState -> current] -> backfire();
+#ifdef WITHFORMULA
+          update_formula(CurrentState -> firelist[CurrentState -> current]);
+#endif
+          ++(CurrentState -> current);
+        }
+      }
+    }
+// search finished
+#ifdef BITHASH
+  cout << "\nno conclusive result!\n";
+#else
+#ifdef FULL
+  if (resultfile) {
+    fprintf(resultfile, "\n  );\n};\n");
+  }
+#else
+  cout << "\n" << LATE_ABORT_MESSAGE << "\n";
+  if (resultfile) {
+    fprintf(resultfile, RESULT_NAME);
+    fprintf(resultfile, ": {\n  result = false;\n};\n");
+  }
+#endif
+#endif
+  statistics(NrOfStates,Edges,NonEmptyHash);
+
+
+  // return 0: we did not find what we were looking for
+  return 0;
+}
+
 
 
 
@@ -2089,54 +2463,54 @@ unsigned int breadth_first() {
                 State* smallerstate;
                 Place** NewOmegas;
 
-                for (i = 0; i < Places[0]->cnt; ++i) {
-                    Ancestor[i] = CurrentMarking[i];
-                }
-                NewOmegas = NULL;
-                // for all ancestor states do ...
-                for (smallerstate = CurrentState; smallerstate; smallerstate = smallerstate -> parent) {
-                    CurrentState -> firelist[CurrentState -> current] -> traceback();
-                    NrCovered = 0;
-                    for (i = 0; i < Places[0]->cnt; ++i) {
-                        // case 1: smaller state[i] > current state [i]
-                        // ---> continue with previous state
-                        if (Ancestor[i] > CurrentMarking[i]) {
-                            goto nextstate;
-                        }
-                        // case 2: smaller state < current state
-                        // count w-Intro
-                        if (Ancestor[i] < CurrentMarking[i]) {
-                            ++NrCovered;
-                        }
-                        // case 3: smaller state = current state --> do nothing
-                    }
-                    // if arrived here, it holds smaller <= current
-                    // covering is proper iff NrCovered > 0
-                    // If covering is not proper, (smaller state = current state)
-                    // current marking is not new, ancestors of smaller marking cannot
-                    // be smaller than current marking, since they would be smaller than
-                    // this smaller marking --> leave w-Intro procedure
-                    if (!NrCovered) {
-                        smallerstate = NULL;
-                        goto endomegaproc;
-                    }
-                    // Here, smallerstate IS less than current state.
-                    isbounded = 0;
-                    NewOmegas = new Place * [NrCovered+1];
-                    // for all fragements of state vector do ...
-                    NrCovered = 0;
-                    for (i = 0; i < Places[0]->cnt; ++i) {
-                        if (Ancestor[i] < CurrentMarking[i]) {
-                            // Here we have a place that deserves a new Omega
-                            // 1. set old value in place record
-                            Places[i] -> lastfinite = CurrentMarking[i];
-                            Places[i] -> set_cmarking(VERYLARGE);
-                            Places[i] -> bounded = false;
-                            NewOmegas[NrCovered++] = Places[i];
-                        }
-                    }
-                    NewOmegas[NrCovered] = NULL;
-                    goto endomegaproc;
+        for(i=0; i<Places[0]->cnt; ++i) {
+          Ancestor[i] = CurrentMarking[i];
+        }
+        NewOmegas = NULL;
+        // for all ancestor states do ...
+        for(smallerstate = CurrentState; smallerstate; smallerstate = smallerstate -> parent) {
+          smallerstate -> firelist[smallerstate -> current] -> traceback();
+          NrCovered = 0;
+          for(i=0; i<Places[0]->cnt; ++i) {
+            // case 1: smaller state[i] > current state [i]
+            // ---> continue with previous state
+            if(Ancestor[i] > CurrentMarking[i]) {
+              goto nextstate;
+            }
+            // case 2: smaller state < current state
+            // count w-Intro
+            if(Ancestor[i] < CurrentMarking[i]) {
+              ++NrCovered;
+            }
+            // case 3: smaller state = current state --> do nothing
+          }
+          // if arrived here, it holds smaller <= current
+          // covering is proper iff NrCovered > 0
+          // If covering is not proper, (smaller state = current state)
+          // current marking is not new, ancestors of smaller marking cannot
+          // be smaller than current marking, since they would be smaller than
+          // this smaller marking --> leave w-Intro procedure
+          if(!NrCovered) {
+            smallerstate = NULL;
+            goto endomegaproc;
+          }
+          // Here, smallerstate IS less than current state.
+          isbounded = 0;
+          NewOmegas = new Place * [NrCovered+1];
+          // for all fragements of state vector do ...
+          NrCovered = 0;
+          for(i=0; i<Places[0]->cnt; ++i) {
+            if(Ancestor[i] < CurrentMarking[i]) {
+              // Here we have a place that deserves a new Omega
+              // 1. set old value in place record
+              Places[i] -> lastfinite = CurrentMarking[i];
+              Places[i] -> set_cmarking(VERYLARGE);
+              Places[i] -> bounded = false;
+              NewOmegas[NrCovered++] = Places[i];
+            }
+          }
+          NewOmegas[NrCovered] = NULL;
+          goto endomegaproc;
 
 nextstate:
                     if (smallerstate -> smaller) { // smallerstate is a omega-introducing state
@@ -2423,13 +2797,6 @@ endomegaproc:
 
     }
 
-#ifdef DISTRIBUTE
-    master_done();
-    if (TargetState) {
-        printstate("", TargetState);
-        return 1;
-    }
-#endif
 #ifdef REACHABILITY
     cout << "\n state is not reachable!\n";
 #endif

@@ -197,17 +197,6 @@
 #undef LT
 
 
-#ifdef DISTRIBUTE
-  #define BREADTH_FIRST
-  #define DEPTH_FIRST
-  #define TARJAN
-  #undef RELAXED
-  #undef SWEEP
-  #undef BITHASH
-  #undef CYCLE
-  #define GRAPH depth_first
-  #undef COVER
-#else
   #ifdef BREADTH_FIRST
     #define GRAPH breadth_first
     #define TARJAN
@@ -227,7 +216,6 @@
       #define GRAPH depth_first
     #endif
   #endif
-#endif
 
 /* TWOPHASE ergibt nur bei LIVEPROP oder HOME Sinn, sonst nicht */
 #ifdef TWOPHASE
@@ -433,7 +421,6 @@
   #elif SYMMINTEGRATION == 3
     #define SEARCHPROC canonical_representitive
     #define INSERTPROC binInsert
-    //#define INSERTPROC insert_marking
   #else
     #define SEARCHPROC canonical_representitive_on_the_fly
     #define INSERTPROC insert_marking
@@ -455,10 +442,18 @@
 
 #ifdef BOUNDEDPLACE
   #define COVER
+#ifdef DEPTH_FIRST
+#undef GRAPH
+#define GRAPH simple_depth_first
+#endif
 #endif
 
 #ifdef BOUNDEDNET
   #define COVER
+#ifdef DEPTH_FIRST
+#undef GRAPH
+#define GRAPH simple_depth_first
+#endif
 #endif
 
 #if !defined(FULL) && !defined(BOUNDEDPLACE) && !defined(DEADTRANSITION) && !defined(BOUNDEDNET) && !defined(STATEPREDICATE)
@@ -467,7 +462,6 @@
 
 #ifdef COVER
   // tscc are not important for cover, but succ is used for path generation
-  #define TARJAN
   #undef CAPACITY
   #undef CYCLE
   #undef BITHASH
@@ -560,6 +554,10 @@
   #else
     #define FIRELIST firelist
   #endif
+#ifdef DEPTH_FIRST
+#undef GRAPH
+#define GRAPH simple_depth_first
+#endif
 #endif
 
 #ifdef BOUNDEDPLACE
@@ -584,6 +582,10 @@
   #else
     #define FIRELIST firelist
   #endif
+#if defined(DEPTH_FIRST) && !defined(RELAXED)
+#undef GRAPH
+#define GRAPH simple_depth_first
+#endif
 #endif
 
 #ifdef MODELCHECKING
@@ -604,7 +606,11 @@
     #define FIRELIST tsccstubbornlist
   #else
     #define FIRELIST firelist
-  #endif
+  #endif 
+#ifdef DEPTH_FIRST
+#undef GRAPH
+#define GRAPH simple_depth_first
+#endif
 #endif
 
 #ifdef STATEPREDICATE
@@ -630,6 +636,10 @@
   #else
     #define FIRELIST firelist
   #endif
+#if defined(DEPTH_FIRST) && !defined(RELAXED)
+#undef GRAPH
+#define GRAPH simple_depth_first
+#endif
 #endif
 
 
@@ -638,10 +648,18 @@
     #ifdef STRUCT
       #define FIRELIST structstubbornset
     #else
-      #define FIRELIST tsccstubbornlist
+      #define FIRELIST tsccstubbornlist 
+#ifdef DEPTH_FIRST
+#undef GRAPH
+#define GRAPH simple_depth_first
+#endif
     #endif
   #else
     #define FIRELIST firelist
+#ifdef DEPTH_FIRST
+#undef GRAPH
+#define GRAPH simple_depth_first
+#endif
   #endif
 #endif
 

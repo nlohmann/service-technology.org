@@ -34,6 +34,7 @@
 #include "path.H"
 #include "sweep.H"
 #include "cmdline.h"
+#include "reports.H"
 
 #include <fstream>
 #include <iostream>
@@ -315,6 +316,7 @@ void processCommandLine(int argc, char** argv) {
         }
     }
 
+
     // set output filename for "-g"/"-m" option
     if (args_info.graph_given || args_info.marking_given) {
         if (args_info.graph_arg) {
@@ -333,6 +335,24 @@ void processCommandLine(int argc, char** argv) {
             }
         }
     }
+  // Initialize reports object for graph output
+
+  if (args_info.graph_given || args_info.marking_given) {
+	TheGraphReport = new graphreport_yes(graphfile);
+	}
+	else
+	{
+	  if (args_info.Graph_given || args_info.Marking_given) {
+	TheGraphReport = new graphreport_yes();
+	}
+	else
+	{
+	TheGraphReport = new graphreport_no();
+	}
+}
+	
+	
+	
 
     // set output filename for "-r" option
     if (args_info.resultFile_given) {
@@ -392,12 +412,6 @@ int main(int argc, char** argv) {
         // 2. Initialisierung
         NonEmptyHash = 0;
         try {
-#ifdef DISTRIBUTE
-            if (!init_communication()) {
-                _exit(6);
-            }
-            rapport("initializing");
-#else
 #ifdef BITHASH
             BitHashTable = new unsigned int [ HASHSIZE];
 #else
@@ -405,15 +419,10 @@ int main(int argc, char** argv) {
             binHashTable = new binDecision * [HASHSIZE];
 #endif
 #endif
-#endif
         } catch (overflow) {
             fprintf(stderr, "lola: hash table too large\n");
-#ifdef DISTRIBUTE
-            end_communication();
-#endif
             _exit(2);
         }
-#ifndef DISTRIBUTE
         for (i = 0; i < HASHSIZE; i++) {
 #ifdef BITHASH
             BitHashTable[i] = 0;
@@ -423,23 +432,16 @@ int main(int argc, char** argv) {
 #endif
 #endif
         }
-#endif
         try {
             PlaceTable = new SymbolTab(65536);
             TransitionTable = new SymbolTab(65536);
         } catch (overflow) {
             //write(2,mess,sizeof(mess));
             fprintf(stderr, "lola: not enough space to read net\n");
-#ifdef DISTRIBUTE
-            end_communication();
-#endif
             _exit(2);
         }
         try {
 
-#ifdef DISTRIBUTE
-            rapport("reading net");
-#endif
 
             // read the Petri net
             readnet();
@@ -447,15 +449,8 @@ int main(int argc, char** argv) {
             // remove isolated nodes from the net
             removeisolated();
 
-#ifdef DISTRIBUTE
-            StateLength = Places[0]->cnt;
-            MaxComponentValue = CAPACITY;
-#endif
         } catch (overflow) {
             fprintf(stderr, "lola: not enough space to store net\n");
-#ifdef DISTRIBUTE
-            end_communication();
-#endif
             _exit(2);
         }
 
@@ -476,14 +471,8 @@ int main(int argc, char** argv) {
 #ifdef SYMMETRY
         try {
             if (SYMMINTEGRATION == 1 || SYMMINTEGRATION == 3) {
-#ifdef DISTRIBUTE
-                rapport("computing symmetries");
-#endif
                 ComputeSymmetries();
             } else {
-#ifdef DISTRIBUTE
-                rapport("computing partition w.r.t. symmetries");
-#endif
                 ComputePartition();
             }
 
@@ -514,9 +503,6 @@ int main(int argc, char** argv) {
             }
 
 #ifdef PREDUCTION
-#ifdef DISTRIBUTE
-            rapport("investigating place invariants");
-#endif
             psolve();
 
             // close significant bit upwards, since we cannot permute places after
@@ -546,16 +532,10 @@ int main(int argc, char** argv) {
         } catch (overflow) {
             fprintf(stderr, "lola: not enough space to store generating set for symmetries!\n");
             fprintf(stderr, "      try again without use of symmetries!\n");
-#ifdef DISTRIBUTE
-            end_communication();
-#endif
             _exit(2);
         }
 #else
 #ifdef PREDUCTION
-#ifdef DISTRIBUTE
-        rapport("investigating place invariants");
-#endif
         psolve();
         // sort places according to significance. This must not happen in the presence of
         // symmetry reduction since places have been sorted by discretion of the symmetry
@@ -677,7 +657,6 @@ int main(int argc, char** argv) {
 
 
         try {
-//siphontrapproperty();
 
 #ifdef NONE
             return EXIT_SUCCESS;
@@ -716,25 +695,6 @@ int main(int argc, char** argv) {
             return 0;
 #endif
 
-#ifdef DISTRIBUTE
-            int vvv;
-            switch (MyRole) {
-                case masterT:
-                    rapport("starting breadth first search");
-                    vvv = breadth_first();
-                    end_communication();
-                    return 1 - vvv;
-                case clientT:
-                    rapport("starting depth first search");
-                    vvv = depth_first();
-                    end_communication();
-                    return 1 - vvv;
-                case monitorT:
-                    return 0;
-                case dispatcherT:
-                    return 0;
-            }
-#endif
 
 #ifndef MODELCHECKING
             return 1 - GRAPH();

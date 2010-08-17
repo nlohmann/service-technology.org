@@ -242,7 +242,7 @@ AT_CLEANUP
 #AT_CHECK([LOLA_BOUNDEDNET choreography.lola],1,stdout)
 #AT_CHECK([GREP -q "net is bounded!" stdout],0)
 #AT_KEYWORDS(boundednet)
-A#T_CLEANUP
+#AT_CLEANUP
 
 AT_SETUP([Data])
 AT_CHECK([cp TESTFILES/data.lola .])

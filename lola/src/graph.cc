@@ -1907,7 +1907,7 @@ return -1;
 #define INITIALIZE_PROPERTY initialize_none
 #define CHECK_EARLY_ABORTION (!CurrentState -> firelist || !(CurrentState -> firelist[0]))
 #define EARLY_ABORT_MESSAGE "dead state found!"
-#define LATE_ABORT_MESSAGE "no dead state exists!"
+#define LATE_ABORT_MESSAGE "net does not have deadlocks!"
 #define RESULT_NAME "deadlock"
 #endif
 
@@ -1956,8 +1956,8 @@ int compare_markings()
 #ifdef BOUNDEDNET
 #define INITIALIZE_PROPERTY initialize_none
 #define CHECK_EARLY_ABORTION (NewOmegas)
-#define EARLY_ABORT_MESSAGE "net is unbounded"
-#define EARLY_ABORT_MESSAGE "net is bounded"
+#define EARLY_ABORT_MESSAGE "net is unbounded!"
+#define LATE_ABORT_MESSAGE "net is bounded!"
 #define RESULT_NAME "unbounded"
 #endif
 

@@ -18,7 +18,7 @@ lola_SOURCES = readnet-syntax.yy \
                path.cc path.H \
                printnet.cc printnet.H \
                tinv.cc tinv.H \
-		reports.cc reports.H \
+               reports.cc reports.H \
                sweep.cc sweep.H \
                structure.H \
                userconfig.H 
@@ -92,8 +92,10 @@ check_binaries = lola-deadlock lola-fulllimited lola-modelchecking \
                  lola-statepredicate1 lola-liveprop lola-boundednet \
                  lola-statespace
 
-check-local:
+check-local: $(lola_SOURCES)
+	-rm -f $(builddir)/$(check_binaries)
 	$(MAKE) $(AM_MAKEFLAGS) $(check_binaries)
+	$(MAKE) $(AM_MAKEFLAGS) clean
 
 
 #############################################################################

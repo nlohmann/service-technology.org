@@ -1147,8 +1147,7 @@ endomegaproc:
                 if (!search_and_insert(CurrentMarking))
 #endif
 #else
-                /// \todo: Check this line: = or == ?
-                if (NewState = SEARCHPROC())
+                if ((NewState = SEARCHPROC()))
 #endif
                 {
                     // State exists! (or, at least, I am not responsible for it (in the moment))
@@ -2051,8 +2050,7 @@ int result;
 	{
 		cout << "\n" << EARLY_ABORT_MESSAGE << "\n";
       if (resultfile) {
-        fprintf(resultfile, RESULT_NAME);
-        fprintf(resultfile, ": {\n  result = true;\n  ");
+        fprintf(resultfile, "%s : {\n  result = true;\n  ", RESULT_NAME);
       }
 
       printstate("",CurrentMarking);  // print witness state
@@ -2196,8 +2194,7 @@ int result;
 	{
 		cout << "\n" << EARLY_ABORT_MESSAGE << "\n";
       if (resultfile) {
-        fprintf(resultfile, RESULT_NAME);
-        fprintf(resultfile, ": {\n  result = true;\n  ");
+        fprintf(resultfile, "%s: {\n  result = true;\n  ", RESULT_NAME);
       }
 
       printstate("",CurrentMarking);
@@ -2253,8 +2250,7 @@ int result;
 #else
   cout << "\n" << LATE_ABORT_MESSAGE << "\n";
   if (resultfile) {
-    fprintf(resultfile, RESULT_NAME);
-    fprintf(resultfile, ": {\n  result = false;\n};\n");
+    fprintf(resultfile, "%s: {\n  result = false;\n};\n", RESULT_NAME);
   }
 #endif
 #endif
@@ -2905,7 +2901,7 @@ bool mutual_reach() {
                 cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
             }
             CurrentState -> firelist[CurrentState -> current] -> fire();
-            if (NewState = SEARCHPROC()) {
+            if ((NewState = SEARCHPROC())) {
                 // State exists!
                 CurrentState -> firelist[CurrentState -> current] -> backfire();
                 CurrentState -> succ[CurrentState -> current] = NewState;
@@ -3000,7 +2996,7 @@ bool target_reach() {
                 cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
             }
             CurrentState -> firelist[CurrentState -> current] -> fire();
-            if (NewState = SEARCHPROC()) {
+            if ((NewState = SEARCHPROC())) {
                 // State exists!
                 CurrentState -> firelist[CurrentState -> current] -> backfire();
 #ifdef TARJAN
@@ -3358,7 +3354,7 @@ unsigned int compute_scc() {
                 cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
             }
             CurrentState -> firelist[CurrentState -> current] -> fire();
-            if (NewState = SEARCHPROC()) {
+            if ((NewState = SEARCHPROC())) {
                 // State exists! (or, at least, I am not responsible for it (in the moment))
                 CurrentState -> firelist[CurrentState -> current] -> backfire();
                 CurrentState -> succ[CurrentState -> current] = NewState;

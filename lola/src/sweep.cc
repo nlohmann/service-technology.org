@@ -326,9 +326,10 @@ int sweep() {
 
             //print_sweep("New Round");
             // fill top level state of tree into current marking
-            unsigned int pm, p, pb, t, k, byte, s;
+            unsigned int pm, p, pb, t, byte, s;
+            // unused: unsigned int k;
             unsigned  char* v;
-            bool spl;
+            // unused: bool spl;
             p = Places[0] -> cnt - 1;
             v = CurrentSweep[CurrentSection * ProgressSpan + ProgressValueLow]->vector;
             t = BitVectorSize / 8;

@@ -843,7 +843,7 @@ void check(State* s, formula* f) {
 void searchEF(State* s, unarytemporalformula* f) {
     State* tarjanroot;
     bool found;
-    unsigned int i;
+    // unused: unsigned int i;
     unsigned int cardstates;
     State* CurrentState, * NewState;
 
@@ -1155,7 +1155,7 @@ void searchEX(State* s, unarytemporalformula* f) {
 void searchAG(State* s, unarytemporalformula* f) {
     State* tarjanroot;
     bool found;
-    unsigned int i;
+    // unused: unsigned int i;
     unsigned int cardstates;
     State* CurrentState, * NewState;
 
@@ -1355,7 +1355,7 @@ extern unsigned int currentdfsnum;
 void searchEU(State* s, untilformula* f) {
     unsigned int MinBookmark;
     State* tarjanroot;
-    unsigned int i;
+    // unused: unsigned int i;
     State* CurrentState, * NewState;
     bool found;
 
@@ -2034,7 +2034,7 @@ void futuresearchAU(State* s, untilformula* f) {
 
 
 void searchAU(State* s, untilformula* f) {
-    unsigned int i;
+    // unused: unsigned int i;
     State* CurrentState, * NewState;
     bool found;
 
@@ -2207,7 +2207,7 @@ void searchAU(State* s, untilformula* f) {
 
 
 void searchAF(State* s, unarytemporalformula* f) {
-    unsigned int i;
+    // unused: unsigned int i;
     State* CurrentState, * NewState;
     bool found;
 
@@ -2346,7 +2346,7 @@ void searchAF(State* s, unarytemporalformula* f) {
 
 
 void searchEG(State* s, unarytemporalformula* f) {
-    unsigned int i;
+    // unused: unsigned int i;
     State* CurrentState, * NewState;
     bool found;
 
@@ -2486,7 +2486,7 @@ void searchEG(State* s, unarytemporalformula* f) {
 
 
 void futuresearchAF(State* s, unarytemporalformula* f) {
-    unsigned int i;
+    // unused: unsigned int i;
     State* CurrentState, * NewState;
     bool found;
 
@@ -2663,7 +2663,7 @@ void futuresearchAF(State* s, unarytemporalformula* f) {
 
 
 void futuresearchEG(State* s, unarytemporalformula* f) {
-    unsigned int i;
+    // unused: unsigned int i;
     State* CurrentState, * NewState;
     bool found;
 

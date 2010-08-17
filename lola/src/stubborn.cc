@@ -441,7 +441,7 @@ void insert_down(State* s, formula* f) {
 
 
 void insert_global_down(formula* f) {
-    State* ss;
+    // unused: State* ss;
     unsigned int i;
 
     switch (f -> type) {
@@ -858,7 +858,7 @@ Transition** structreachstubbornset() { // used: relaxed reachability, cycle det
 #if defined(WITHFORMULA) && ! defined(MODELCHECKING) && defined(STRUCT)
     Transition** firstattempt;
     unsigned int i;
-    unsigned int down;
+    // unused: unsigned int down;
     Transition** result;
     Transition* t;
 

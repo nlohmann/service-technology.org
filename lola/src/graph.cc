@@ -483,7 +483,7 @@ void print_reg_path(State* s, State* startofrepeatingseq, ostream* pathstream = 
         }
     } else {
         if (s->parent) {
-            int i;
+            // unused: int i;
             print_reg_path(s->parent, s->smaller, pathstream);
             if (s->smaller) {
                 if (Pflg || pflg) {

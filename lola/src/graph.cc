@@ -2229,9 +2229,7 @@ int result;
         }
 #endif
 
-	State * tmp = CurrentState;
         CurrentState = CurrentState -> parent;
-	delete tmp;
         if(CurrentState) {
           CurrentState -> firelist[CurrentState -> current] -> backfire();
 #ifdef WITHFORMULA

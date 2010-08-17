@@ -707,7 +707,9 @@ void CountSort(NodeType n, DomType d, unsigned int from, unsigned int to) {
     }
 }
 
-///////////////////////////////// Stand Mo 16.8.
+
+// Sortiert den Vektor der moeglichen Bilder fuer einen Knoten,
+// wird in OnlineCanonize benutzt
 
 void ImageSort(Node** vector, unsigned int from, unsigned int to) {
     unsigned int less, current, greater;
@@ -740,17 +742,26 @@ void ImageSort(Node** vector, unsigned int from, unsigned int to) {
     }
 }
 
+// Nachdem fuer ein Constraint und eine Vielfachheit die eingehenden 
+// oder ausgehenden Boegen zu allen anderen Constraints gezaehlt sind, 
+// muessen die anderen Constraints in kleinere zerlegt werden
+// n: PL oder TR, c: Index des zu splittenden Constraints in Specification[n]
+
 bool Split(NodeType n, unsigned int c) {
     unsigned int i, firstc, lastc, oldc, newc;
 
     oldc = c;
     firstc = Specification[n][c].first;
     lastc = Specification[n][c].last;
+    // Precondition: Die Reaktoreintraege sind bzgl count sortiert
     while ((Reaktor[n][DO][firstc].count != Reaktor[n][DO][lastc].count)
             ||
             (Reaktor[n][CO][firstc].count != Reaktor[n][CO][lastc].count)) {
         for (i = firstc + 1; (Reaktor[n][DO][firstc].count == Reaktor[n][DO][i].count)
                 && (Reaktor[n][CO][firstc].count == Reaktor[n][CO][i].count); i++);
+	// Wenn fuer ein  entstehendes Constraint [A,B] |A| != |B| ist,
+ 	// koennen keine Symms konsistent sein. Hier: entweder |A| = 0 
+	// oder |B| = 0.
         if (Reaktor[n][DO][firstc].count != Reaktor[n][CO][firstc].count) {
             DeadBranches++;
             return false;
@@ -760,12 +771,14 @@ bool Split(NodeType n, unsigned int c) {
 #ifdef DISTRIBUTE
         progress();
 #endif
+	//Zerschneiden des Constraints in zwei Teile
         Specification[n][oldc].last = i - 1;
         Specification[n][newc].first = i;
         Specification[n][newc].last = lastc;
         Specification[n][newc].parent = c;
         firstc = i;
         oldc = newc;
+	// Fuer Schnittprodukte sollte Refine nochmals probiert werden
         Specification[n][newc].changed = new ToDo(n, newc);
     }
     if (oldc != c) {
@@ -779,6 +792,7 @@ bool Split(NodeType n, unsigned int c) {
     return true;
 }
 
+// Testausgabe der Spec
 void PrintSpec() {
     unsigned int n, c, i;
 
@@ -809,17 +823,28 @@ void PrintSpec() {
 }
 
 
+// Verfeinere Abstrakte Symmetrie asgehend von Constraint ref
+
 bool Refine(NodeType n, unsigned int ref) {
     unsigned int m1, m2, i, j, arcdir, otherarcdir, currentcardarc, dir, othern, c, cmax;
     Reaktoreintrag* r;
     // unused: Arc * a,* aa;
 
+	// das andere Ende eines Bogens hat immer den dualen Knotentyp
     othern = n ? PL : TR;
-    for (arcdir = DO; arcdir < 2; arcdir++) {
+     // splitte sowohl mit eingehenden als auch ausgehenden Kanten
+    for (arcdir = 0; arcdir < 2; arcdir++) {
         otherarcdir = 1 - arcdir;
+	// Anzahl der Kanten (wegen Praepozessing gleich fuer alle Knoten im
+	// Constraint)
         currentcardarc = arcdir ? Reaktor[n][DO][Specification[n][ref].first].node->NrOfArriving
                          : Reaktor[n][DO][Specification[n][ref].first].node->NrOfLeaving;
+	// Pro Durchlauf wird jeweils der (wg Praeprozessing zusammenhaengende)
+	// Block von Kanten gleicher Vielfachheit abgearbeitet
+	// Deshalb Reinitialisierung ausserhalb des Schleifenkopfes
         for (j = 0; j < currentcardarc;) {
+	    // Neue Zaehlrunde. Damit werden alle Reaktor.count-Werte 
+            // ungueltig
             NewStamp();
             do {
                 for (i = Specification[n][ref].first; i <= Specification[n][ref].last; i++) {
@@ -836,6 +861,10 @@ bool Refine(NodeType n, unsigned int ref) {
                         }
                     }
                 }
+	 	// Nachgeholte Reinitialisierung: Teste auf Ende eines
+		// zusammenhaengenden Bereiches gleicher Vielfachheit in
+		// Bogenliste (wg Praeprozessing fuer alle Knoten in einem
+		// Constraint einheitlich)
                 m1 =  arcdir ?
                       Reaktor[n][DO][Specification[n][ref].first].node->ArrivingArcs[j]-> Multiplicity
                       :
@@ -850,7 +879,10 @@ bool Refine(NodeType n, unsigned int ref) {
                     m2 = m1 + 1;
                 }
             } while (m1 == m2);
+	    // cmax: Alle Constraints in Specification mit index < cmax
+	  // gab es schon vor dem Splitten Neue bekommen indizes >= cmax
             cmax = CardSpecification[othern];
+	    // Das Separieren von Constraints auf der Basis der Zaehlergebnisse
             for (c = 0; c < cmax; c++) {
                 CountSort(othern, DO, Specification[othern][c].first, Specification[othern][c].last);
                 CountSort(othern, CO, Specification[othern][c].first, Specification[othern][c].last);
@@ -863,6 +895,8 @@ bool Refine(NodeType n, unsigned int ref) {
     return true;
 }
 
+
+// Wiederholt Refine solnge bis alle ToDo abgearbeitet sind
 bool RefineUntilNothingChanges(NodeType n) {
     ToDo* tmp;
 
@@ -888,6 +922,19 @@ bool RefineUntilNothingChanges(NodeType n) {
     } while (ToDoList[n]);
     return true;
 }
+
+// Beim Backtracking von einem Split muessen Constraints wieder 
+// zusammengefuegt werden. Wir verlassen uns darauf, dass die Teilcpnstraints
+// in ihrem Reaktor noch die gleichen Index-Bereiche einnehmen. Das ist so,
+// weil Splitten im Reaktor nur am Ort sortiert, 
+// d.h. ggf. INNERHALB des Indexbereiches
+// Knoten permutiert
+// Also reicht es, first und last zuaktualisieren und den Constraint-Eintrag
+// des abgeforkten Constraints zu loeschen. Dieser in der letzte in
+// Specification, da Specification sich stack-artig enwickelt
+
+// plpegel, trpegel: alle Constraints > = pegel werden mit ihren Eltern
+// wiedervereinigt
 
 void ReUnify(unsigned int plpegel, unsigned int trpegel) {
     unsigned int c;
@@ -963,10 +1010,14 @@ void MinimizeCarrier(unsigned int pos) {
 }
 #endif
 
+// Eintragen einer gefundenen Symmetrie in den Speicher fuer das
+// Erzeugendensystem
+
 void StoreSymmetry(unsigned int pos) {
     unsigned int offset, c, *v;
     // unused: unsigned int i;
-
+    // offset: Wir speichern nur den Teil der Symm, von dem nicht klar ist dass
+    // dass er per Konstruktion sowieso id sein muss
     offset = Store[CurrentStore].arg->nr;
     v = Store[CurrentStore].image[pos].vector = new unsigned int [Places[0]->cnt - offset];
 #if defined(SYMMPROD)
@@ -981,19 +1032,25 @@ void StoreSymmetry(unsigned int pos) {
             UnifyClasses(c+offset,v[c]);
 #else
     for (c = 0; c < CardSpecification[PL]; c++) {
+	// Vektor eintragen
         if (Reaktor[PL][DO][Specification[PL][c].first].node->nr >= offset) {
             v[Reaktor[PL][DO][Specification[PL][c].first].node->nr - offset] =
                 Reaktor[PL][CO][Specification[PL][c].first].node->nr;
+	// Klassen der Knotenpartition aktualisieren
             UnifyClasses(Reaktor[PL][DO][Specification[PL][c].first].node->nr, Reaktor[PL][CO][Specification[PL][c].first].node->nr);
         }
     }
 #endif
 }
 
+// Alle Syms in Zyklenschreibweise ausgeben
 void WriteSymms() {
     if (Yflg) {
         unsigned int etage, raum, x, y;
+	// aufsteigende Etagen = aufsteigend erzwungene id (Struktur des
+	// Erzeugendensystems)
         for (etage = 0; etage < CardStore; etage++) {
+	     // Raum: Ein Generator der aktuellen Etage
             for (raum = 0; raum < Store[etage].card; raum++) {
                 cout << "GENERATOR # " << etage + 1 << "." << raum + 1 << "\n";
                 for (x = Store[etage].argnr; x < Places[0]->cnt; x++) {
@@ -1048,8 +1105,22 @@ void WriteSymms() {
 }
 
 
+// Define = mutwilliges Spalten von [A,B] in [{x},{y}] und [A\{x},B\{y}].
+// Fuer ein gegebenes x aus A werden dabei alle y aus B durchprobiert.
+// Wir unterscheiden den Fall A=B und x=y (--> DefineToId) von allen
+// anderen Faellen (--> DefineToOther) wegen unterschiedlichem
+// Backtrackingverhalten. Aus DefineToOther kann sofort komplett
+// ausgestiegen werden sobald eine Symm gefunden wurde. In DefineToId
+// muss backgetrackt werden, um fehlende Slots des Erzeugendensystems
+// zu fuellen
+// Define findet grundsaetzlich auf Place-Constraints statt, weil eine
+// konsistente, auf den Plaetzen einelementige abstrakte Symm sich immer
+// auch auf den Transitionen fortsetzen laesst
 
+
+// imagepos: die Stelle wo ggf eine gefundene Symm in Store einzutragen ist
 void DefineToOther(unsigned int imagepos) {
+    // possibleImages: die in Frage kommenden y, also alle Elemente aus B
     Node** possibleImages;
     unsigned int cntriv, i, j;
     // unused: unused int intriv, k;
@@ -1058,12 +1129,16 @@ void DefineToOther(unsigned int imagepos) {
     // unused: DomType dir;
     unsigned int MyCardSpecification[2];
 
+	// suche mehrelementiges Platzconstraint, Index -> cntriv
     for (cntriv = 0; Specification[PL][cntriv].first == Specification[PL][cntriv].last; cntriv++);
+	// speichere B in possibleImages
     possibleImages = new Node * [Specification[PL][cntriv].last - Specification[PL][cntriv].first + 2];
     for (i = Specification[PL][cntriv].first; i <= Specification[PL][cntriv].last; i++) {
         possibleImages[i-Specification[PL][cntriv].first] = Reaktor[PL][CO][i].node;
     }
     possibleImages[i-Specification[PL][cntriv].first] = NULL;
+
+    // Spalte [{x},{y}] fuer ertes y
     Specification[PL][CardSpecification[PL]].first = Specification[PL][CardSpecification[PL]].last
                                                      = Specification[PL][cntriv].first;
     Specification[PL][CardSpecification[PL]].parent = cntriv;
@@ -1075,8 +1150,10 @@ void DefineToOther(unsigned int imagepos) {
 #endif
     Specification[PL][cntriv].first++;
     Specification[PL][cntriv].changed = new ToDo(PL, cntriv);
+    // Pegelstand in Specification merken wegen spaeterem Backtracking
     MyCardSpecification[PL] = CardSpecification[PL];
     MyCardSpecification[TR] = CardSpecification[TR];
+    // probiere alle y aus B (erstes ist schon geladen)
     for (j = 0; possibleImages[j]; j++) {
         if (RefineUntilNothingChanges(PL)) {
             if (CardSpecification[PL] == Places[0]->cnt) {
@@ -1089,6 +1166,9 @@ void DefineToOther(unsigned int imagepos) {
                 }
             }
         }
+	// Reinitialisierung dadurch, dass im Constraint [{x},{y}] das
+	// alte y einfach gegen den naechsten Wert aus possibleImages
+	// getauscht wird
         if (possibleImages[j+1]) {
             ReUnify(MyCardSpecification[PL], MyCardSpecification[TR]);
             i = possibleImages[j+1]->pos[CO];
@@ -1108,6 +1188,11 @@ void DefineToOther(unsigned int imagepos) {
 
 
 bool found;
+
+// Ein defineToOther fuer den Fall, dass kein Erzeugendensystem berechnet wird
+// sondern bei der State-Space-Exploration Symmetrien direkt berechnet werden
+// Einziger Unterschied: kein Eintragen einer gefundenen Symm, alos auch kein
+// imagepos: Stattdessen Setzen von found
 
 void OnlineDefineToOther() {
     Node** possibleImages;
@@ -1165,6 +1250,11 @@ void OnlineDefineToOther() {
     delete possibleImages;
 }
 
+// Approximative Berechnung eines kanonischn Repraesentanten einer
+// Markierung ohne vorherige Berechnung eines Erzeugendensystems
+
+// Anzahl der Versuche: Gross = Viel Laufzeit, akkurateres Ergebnis
+// Kann exponentiell gross werden, deshalb Beschraenkung in userconfig setzbar
 unsigned int Attempt;
 
 void OnlineCanonize() {
@@ -1370,6 +1460,9 @@ void BuildProducts(unsigned int orbit) {
 }
 #endif
 
+
+// Define in einem Setting, wo noch alle Constraints die Form [A,A] haben
+
 void DefineToId(void) {
 
     unsigned int cntriv, nrmin, intriv, c, i, j, k, MyCardSpecification[2], MyStorePosition, composed, val, oldstorenr;
@@ -1380,6 +1473,8 @@ void DefineToId(void) {
     SymmImage* sigma;
     // unused: SymmImage * svec;
 
+	// suche dasjenige mehrelementige Constraint, das den kleinsten
+	// Knoten enthält
     cntriv = CardSpecification[PL] - 1;
     nrmin = UINT_MAX;
     for (c = 0; c < CardSpecification[PL]; c++) {
@@ -1393,6 +1488,7 @@ void DefineToId(void) {
             }
         }
     }
+	// bereite Symmetriespeicher auf die neuen Elemente vor
     CardStore++;
     Store[CardStore-1].image = new SymmImage [Specification[PL][cntriv].last - Specification[PL][cntriv].first + 1];
     oldstorenr = CurrentStore;
@@ -1476,8 +1572,12 @@ void DefineToId(void) {
 #endif
 }
 
+
+// Die aktuelle Symm bei Iteration mittels FirstSymm() und NextSymm()
 unsigned int* CurrentSymm;
 
+
+// Berechnung des Erzeugendensystems
 void ComputeSymmetries(void) {
     unsigned int i, j;
     unsigned long int CardSymm;
@@ -1490,6 +1590,8 @@ void ComputeSymmetries(void) {
     Stamp = 1;
     InitialConstraint();
     FuelleReaktor();
+	// Refine kann hier nicht fehlschlagen, weil id auf jeden Fall
+	// konsistent sein muss
     if (!RefineUntilNothingChanges(PL)) {
         cout << " Was komisches ist passiert";
     }
@@ -1499,19 +1601,23 @@ void ComputeSymmetries(void) {
         CurrentMarking[i] = Places[i]->initial_marking;
 
     }
+	// Lege Aeq-Klassen an
     part = new Partition [Places[0]-> cnt];
     for (i = 0; i < Places[0]->cnt; i++) {
         part[i].nextorcard = 1;
         part[i].top = true;
     }
+	// Lege Speicher fuer Generatoren an
     Store = new SymmStore [Places[0]->cnt];
     CardStore = 0;
     plp = CardSpecification[PL];
     trp = CardSpecification[TR];
+	// Starte Suche nach Generatoren
     if (CardSpecification[PL] != Places[0]->cnt) {
         DefineToId();
     }
     ReUnify(plp, trp);
+	// Berechne Generatoren- und Symmetriezahl
     CardGenerators = 0;
     CardSymm = 1;
     for (i = 0; i < CardStore; i++) {
@@ -1560,7 +1666,8 @@ void ComputeSymmetries(void) {
     if (ToDoList[PL]) {
         RefineUntilNothingChanges(PL);
     }
-    // Hashfaktoren eintragen
+    // Hashfaktoren eintragen: aeq. Plaetze bekommen gleichen Hashwert,
+    // damit nur in einem Bucker gesucht werden muss
 #if SYMMINTEGRATION < 3
     for (i = 0; i < Places[i]->cnt; i++) {
         if (part[i].top) {

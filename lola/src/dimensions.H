@@ -639,6 +639,7 @@
 #if defined(DEPTH_FIRST) && !defined(RELAXED)
 #undef GRAPH
 #define GRAPH simple_depth_first
+#undef TARJAN
 #endif
 #endif
 

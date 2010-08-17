@@ -1947,8 +1947,8 @@ int compare_markings()
 #else
 #define CHECK_EARLY_ABORTION (compare_markings())
 #endif
-#define EARLY_ABORT_MESSAGE "state found"
-#define LATE_ABORT_MESSAGE "state is unreachable"
+#define EARLY_ABORT_MESSAGE "state found!"
+#define LATE_ABORT_MESSAGE "state is unreachable!"
 #define RESULT_NAME "reachable"
 #endif
 
@@ -2005,6 +2005,18 @@ unsigned int simple_depth_first() {
   Trace = new SearchTrace [Places[0]->cnt];
 #endif
 
+  cout << "hello" << endl;
+// initialize property
+// return value > 0 signals that result for this property is
+// determined structurally
+// instances of this macros have shape int initialize_*();
+
+int result;
+	if((result = (INITIALIZE_PROPERTY()))>=0)
+	{
+		return result;
+   }
+
 
 // Insert initial state (already in CurrentMarking) 
 // into data stucture. The preceding SEARCHPROC
@@ -2021,17 +2033,6 @@ unsigned int simple_depth_first() {
 // Initialize statistical information
   NrOfStates = 1;
   Edges = 0;
-
-// initialize property
-// return value > 0 signals that result for this property is
-// determined structurally
-// instances of this macros have shape int initialize_*();
-
-int result;
-	if((result = (INITIALIZE_PROPERTY()))>=0)
-	{
-		return result;
-   }
 
 #ifdef COVER
    // a marking that is used to search backwards for covered states
@@ -2173,6 +2174,9 @@ int result;
 	// State does not exist! --> check property, insert, go ahead
 
   NewState = INSERTPROC();
+#ifdef WITHFORMULA
+         update_formula(CurrentState -> firelist[CurrentState -> current]);
+#endif
   NewState -> firelist = FIRELIST();
   ++NrOfStates;
   TheGraphReport -> tell();
@@ -2184,9 +2188,6 @@ int result;
 #ifdef COVER
   NewState -> smaller = smallerstate;
   NewState -> NewOmega = NewOmegas;
-#endif
-#ifdef WITHFORMULA
-         update_formula(CurrentState -> firelist[CurrentState -> current]);
 #endif
   CurrentState = NewState;
 #ifndef FULL
@@ -2229,7 +2230,9 @@ int result;
         }
 #endif
 
+	State * tmp = CurrentState;
         CurrentState = CurrentState -> parent;
+	delete tmp;
         if(CurrentState) {
           CurrentState -> firelist[CurrentState -> current] -> backfire();
 #ifdef WITHFORMULA

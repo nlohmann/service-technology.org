@@ -47,30 +47,72 @@ unsigned int* compose, * reservecompose;
 unsigned int kanhash;
 
 void check();
+
+// Begriffe:
+// Symmetrie: Bijektion auf Plaetzen und Transitionen, also Menge
+// von geordneten Paaren von Knoten
+// Abstrakte Symmetrie: Menge von geordneten Paaren von Knotenmengen derart,
+// dass linke Seiten und rechte Seiten jeweils Partition der Knotenmenge
+// bilden. Mengen enthalten immer entweder nur Plaetze oder nur Transitionen
+// Constraint: Ein geordnetes Paar einer abstrakten Symmetrie
+// Symmetrie sigma passt zu abstrakter Symm, falls fuear alle Constraints
+// [A,B]: sigma(A) = B
+
+// Algorithmische Idee:
+// Start: eine Abstrakte Symmetrie
+// Ziel: passende Symmetrien = abstrakte Symm mit einelementigen Mengen
+// Weg: 
+// 1. Refine = Schlussfolgerungen aus gegebener abstrakter Symmetrie
+// Mehr dazu weiter unten
+// 2. Define = systematisches Probieren einer weiteren Verfeinerung
+// der gegebenen abstrakten Symm
+// mehr dazu unter Define*
+
+
+// Grundprinzip von Refine: 
+// - nimm zwei Constraints [A1,B1] und [A2,B2], eine Bogenrichtung und eine
+//   Vielfacheit
+// - zaehle fuer jeden Knoten in A1 und B1, wieviele solche Boegen er von/zu 
+//   einem Knoten in A2 bzw B2 hat.
+// - fuer jedes i: neues Constraint [A1i,B1i], wobei A1i,B1i die Mengen der
+//   Knoten aus A1,B1 mit i Hits
+
+// Ein Reaktoreintrag dient dem Zaehlen der Hits fuer einen Knoten:
+
 class Reaktoreintrag {
     public:
-        Node* node;
-        unsigned int count; // counts number of hits through arcs, for constraint splitting
-        unsigned int stamp; // round of last hit, to avoid reset after every round
+        Node* node; //Knoten, fuer den gezaehlt wird
+        unsigned int count; // Anzahl der Hits
+        unsigned int stamp; // Rundennummer - zeigt an, ob Hitzahl in aktueller Runde erzielt wurde (spart resets fuer count)
         Reaktoreintrag();
 };
+
 
 Reaktoreintrag::Reaktoreintrag() {
     stamp = 0;
     count = 0;
-    Node* node;  // unused?
+    // Feld "node" wird in "FuelleReaktor" initialisiert
 }
 
-Reaktoreintrag* Reaktor[2][2]; // Speichert Klassen. Zunächst Alle Plätze auf alle Plätze, alle Trans auf alle Trans
+// Pro Knotentyp (1. Index) je ein Zaehlarray fuer 
+// die Ai ("DO") und die Bi ("CO") (2. Index).
 
-class ToDo { // stores constraints that need to be used for class splitting
+Reaktoreintrag* Reaktor[2][2]; 
+
+
+// ToDo ist ein Element in der Liste derjenigen Constraints, mit denen
+// noch nicht alle Refines ausprobiert wurden
+
+class ToDo { 
     public:
-        unsigned int constraint;  // Ein Paar (domain, codomain) von Klassen der Partition, als Index in Specification
-        ToDo* next;
-        ToDo(NodeType, unsigned int);
+        unsigned int constraint; // Die Nr des fraglichen Constraints im
+                                 // Array aller Constraints (= Specification) 
+        ToDo* next;              // Listenpointer
+        ToDo(NodeType, unsigned int); // kreiert neuen Eintrag und sortiert
+                                      // ihn am Listenanfang ein
 };
 
-ToDo* ToDoList[2];  // Eine für Platzklassen, eine für Transitionsklassen
+ToDo* ToDoList[2];  // Eine für Platzconstraints, eine für Transitionsconstraints
 
 ToDo::ToDo(NodeType TY, unsigned int co) {
     next = ToDoList[TY];
@@ -78,16 +120,25 @@ ToDo::ToDo(NodeType TY, unsigned int co) {
     ToDoList[TY] = this;
 }
 
+// Durch permanentes Umsortieren der Reaktor-Arrays wird
+// sichergestellt, dass die Elemente eines Constraints immer einen
+// zusammenhaengenden Bereich bilden
+
 class Constraint {
     public:
-        unsigned int first; // Start des Bereichs im Place/Transition Array, wo Knoten dieser Klasse stehen
+        unsigned int first; // Start des Bereichs im Reaktor-Array, wo Knoten dieser Klasse stehen
         unsigned int last;  // Ende -"-
-        ToDo* changed;      // Eine ToDoEintrag für mich
-        unsigned int parent; // Klasse, von der ich abgespalten wurde
+        ToDo* changed;      // Ein ToDoEintrag für mich
+        unsigned int parent; // Constraint, von dem ich abgespalten wurde
 };
 
-unsigned int CardSpecification[2];  // Alle Constraints (eine für PL , ene für TR)
-Constraint* Specification[2];
+unsigned int CardSpecification[2];  // Anzahl der Constraints (für PL / für TR)
+
+Constraint* Specification[2]; // Arrays fuer die Constraints (PL/TR)
+
+
+// Hin und wieder Lebenszeichen geben, damit Nutzer dei Ctrl-C-Taste wieder
+// loslasesst
 
 inline void reportprogress() {
     if (!((CardSpecification[PL] + CardSpecification[TR]) % REPORTFREQUENCY)) {
@@ -96,12 +147,18 @@ inline void reportprogress() {
     }
 }
 
-unsigned int DeadBranches;
-unsigned int CardGenerators;
+unsigned int DeadBranches; // zaehlt rekursive Abstiege, die nicht zu einem
+                           // Element des Ezeugendensystems fuehren
+                           // (einzige Quelle fuer Exponentialitaet)
+unsigned int CardGenerators; // Anzahl der berechneten Erzeugenden
+
+
+// Fuer jeden Knoten werden die Arrays der eingehenden und ausgehenden 
+// Boegen nach Vielfacheit sortiert. So stehen z.B. spaeter die Boegen
+// gleicher Vielfachheit als zusammenhaengende Bereiche zur Verfuegung
+// Alle Sortierroutinen in symm.cc sind Quicksort.
 
 void ArcSort(Arc** list, unsigned int from, unsigned int to) {
-    // sort lists of arriving and leaving arcs according to multiplicity
-    // (descending order) ; use quicksort
     unsigned int less, current, greater;
     Arc* swap;
 
@@ -132,21 +189,29 @@ void ArcSort(Arc** list, unsigned int from, unsigned int to) {
     }
 }
 
+
+// Initialisierung der Symm-Berechnungs-Datenstrukturen
+
 void init_syms() {
     // int i;
 
-    ToDoList[PL] = ToDoList[TR] = NULL;
-    CardSpecification[PL] = CardSpecification[TR] = 1;
+    ToDoList[PL] = ToDoList[TR] = NULL; // Zunaechst mal nix zu tun
+
+    // wir starten mit den Constraints [P,P] und [T,T]
     Specification[PL] = new Constraint [Places[0] -> cnt];
     Specification[TR] = new Constraint[Transitions[0] -> cnt];
     Specification[PL][0].first = Specification[TR][0].first = Specification[PL][0].parent
                                                               = Specification[TR][0].parent = 0;
     Specification[PL][0].last = Places[0]-> cnt - 1;
     Specification[TR][0].last = Transitions[0]-> cnt - 1;
+
+    // Anlegen der Zaehlarrays
     Reaktor[PL][DO] = new Reaktoreintrag [Places[0]->cnt];
     Reaktor[PL][CO] = new Reaktoreintrag [Places[0]->cnt];
     Reaktor[TR][DO] = new Reaktoreintrag [Transitions[0]->cnt];
     Reaktor[TR][CO] = new Reaktoreintrag [Transitions[0]->cnt];
+
+    // Alle Bogenlisten sortieren
     for (unsigned i = 0; i < Places[0]->cnt; i++) {
         if (Places[i]->NrOfLeaving) {
             ArcSort(Places[i]->LeavingArcs, 0, Places[i]->NrOfLeaving - 1);
@@ -166,24 +231,48 @@ void init_syms() {
     DeadBranches = CardGenerators = 0;
 }
 
-// the next few functions serve as parameters to a general sort procedure
-// on nodes.
+// Wir sortieren Knotenmengen nach den folgenden ca 1000 verschiedenen
+// Sortierkriterien. Das Sortieren dient der Separierung von Knoten-
+// mengen. Wir wollen nur solche Symmetrien berechnen, die Knoten
+// auf Knoten mit gleichem Wert bzgl der verwendeten Kriterien abbilden
+// Diese Constraintseparierung beinhaltet Sortieren, so dass die
+// Teilconstraints wiederum zusammenhaengende Bereiche bilden.
+// Diese Schritte passieren zu einem Zeitpunkt, wo klar ist, dass
+// fuer jeden Constraint [A,B] gilt: A=B. Daher wird noch nicht die
+// Datenstruktur Reaktor genutzt, die auf A!=B gemuenzt ist. Statt dessen
+// rechnen wir noch auf den Arrays Places unf Transitions selbst und
+// kopieren spaeter in den Reaktor (Funktion "FuelleReaktor").
+
+// Ist ein zu analysierender Platz p gegeben, soll [{p},{p}] ein
+// Constraint bilden. So bildet jede berechnete Symm p auf p ab und
+// die p betreffenden Resultate bleiben akkurat.
+// Sortieren bewegt diesen Platz ans Ende des
+// Platzarrays
 
 unsigned int get_target_place(Node* node) {
     return ((Place*) node) == CheckPlace ? 1 : 0;
 }
 
+// Dito fuer den Fall, dass eine zu analysierende Transition gegeben ist
+
 unsigned int get_target_transition(Node* node) {
     return ((Transition*) node) == CheckTransition ? 1 : 0;
 }
+
+// Ist eine zu erreichende Zielmarkierung gegeben, soll jede Symm diese
+// auf sich selbst abbilden
 
 unsigned int get_target_marking(Node* node) {
     return ((Place*) node) -> target_marking;
 }
 
+// Die Anfangsmarkierung soll auf sich selbst abgebildet werden
 unsigned int get_marking(Node* node) {
     return ((Place*) node) -> initial_marking;
 }
+
+// Symmetrien koennen sowieso nur Knoten mit gleichem In- und Out-Grad
+// aufeinander abbilden. Das kann man gleich praeprozessen
 
 unsigned int get_card_arcs_in(Node* node) {
     return node ->  NrOfArriving;
@@ -193,13 +282,27 @@ unsigned int get_card_arcs_out(Node* node) {
     return node -> NrOfLeaving;
 }
 
+// Zwei Variablen zur Uebergabe von Parametern an die darauffolgenden
+// Sortierroutinen, die anderweitig nicht in die einheitliche Signatur 
+// der Sortierroutinen passen wuerden
+
 unsigned int this_arc_nr;
 unsigned int this_direction;
+
+
+// Symmetrien koennen eh nur Knoten aufeinander abbilden, die, fuer eine
+// gegebene Vielfachheit, gleich viele ausgehende bzw eingehende Boegen
+// mit dieser Vielfachheit haben. Setzt man soertierte Bogenlisten und
+// vorangeganges Sortieren nach Bogengesamtzahl voraus, reicht es nun,
+// jeweils anhand der Vielfachheiten der jeweils i-ten Boegen zu
+// sortieren und danach zu separieren
 
 unsigned int get_arc_mult(Node* node) {
     return ((this_direction ? node -> ArrivingArcs : node -> LeavingArcs)[this_arc_nr] -> Multiplicity);
 }
 
+
+// Dies ist die generische Sortierroutine fuer Plaetze
 void PlaceSort(unsigned int from, unsigned int to, unsigned int attribute(Node*)) {
     unsigned int less, current, greater, sw;
     Place* swap;
@@ -237,6 +340,7 @@ void PlaceSort(unsigned int from, unsigned int to, unsigned int attribute(Node*)
     }
 }
 
+// dito fuer Transitionen
 
 void TransitionSort(unsigned int from, unsigned int to, unsigned int attribute(Node*)) {
     unsigned int less, current, greater;
@@ -269,32 +373,56 @@ void TransitionSort(unsigned int from, unsigned int to, unsigned int attribute(N
     }
 }
 
+// Das Splitten von Constraints nach einem mitgegebenen Kriterium
+// beinhaltet das Sortieren nach diesem Kriterium, gefolgt vom
+// Zusammenfassen der nun zusammenhaengenden Bereiche im Platzarray mit
+// jweilse gleichem Kriteriumswert
+// SplitInVorReaktor differenziert noch nicht nach linken und rechten Seiten
+// der geordneten Paare, weil zum Zeitpunkt der Anwendung noch linke und
+// rechte Seiten aller geordneten Paare gleich sind.
+
+// c: zu splittendes Constraint, attribute: Splitkriterium in Form einer
+// der obigen Routinen
+
 void SplitPlacesInVorReaktor(unsigned int c, unsigned int attribute(Node*)) {
     unsigned int i, firstc, lastc, oldc, newc;
 
+
     PlaceSort(Specification[PL][c].first, Specification[PL][c].last, attribute);
+    // Nun bilden die zukünftigen Teilconstraints zusammenhaengende Bereiche im
+    // Originalconstraint
     oldc = c;
     firstc = Specification[PL][c].first;
     lastc = Specification[PL][c].last;
+
+    // Solange noch verschiedene Werte im verbleibenden Constraint...
     while (attribute((Node*) Places[firstc]) != attribute((Node*) Places[lastc])) {
+	// Suche erste Stelle, wo Nachbarknoten unterschiedliche Werte liefern
+        // (dort wird Constraint geteilt)
         for (i = firstc + 1; attribute((Node*) Places[firstc]) == attribute((Node*) Places[i]); i++);
-        newc = CardSpecification[PL];
+        newc = CardSpecification[PL]; // naechste freie Constraintnummer
+        // Teilen: wir haben ja sortiert...
         Specification[PL][oldc].last = i - 1;
         Specification[PL][newc].first = i;
         Specification[PL][newc].last = lastc;
-        Specification[PL][newc].changed = NULL;
-        Specification[PL][newc].parent = 0;
+        Specification[PL][newc].changed = NULL; // um ToDo kuemmern wir uns
+                                                // spaeter
+        Specification[PL][newc].parent = 0;    // keine der hier
+                                               // vorgenommenen Separierungen
+                                               // wird je zurueckgenommen,
+                                              // also brauchen wir kein parent
         CardSpecification[PL]++;
         reportprogress();
 #ifdef DISTRIBUTE
         progress();
 #endif
-        firstc = i;
+        firstc = i;  // ... Der Rest muss ggf weiter geteilt werden
         oldc = newc;
     }
 }
 
 
+// Kopie der vorigen Routine, aber fuer Transitionen
 
 void SplitTransitionsInVorReaktor(unsigned int c, unsigned int attribute(Node*)) {
     unsigned int i, firstc, lastc, oldc, newc;
@@ -321,11 +449,14 @@ void SplitTransitionsInVorReaktor(unsigned int c, unsigned int attribute(Node*))
     }
 }
 
+
+// Berechnung der initialen abstrakten Symmetrie
+
 void InitialConstraint() {
     unsigned int c, b, bmax, cmax;
     // unused: unsigned int i;
 
-    // split acc. to nr of arriving arcs
+    // Separierung nach Zahl der eingehenden/ausgehenden Boegen - ist nie falsch
     SplitPlacesInVorReaktor(0, get_card_arcs_in);
     SplitTransitionsInVorReaktor(0, get_card_arcs_in);
     cmax = CardSpecification[PL];
@@ -336,7 +467,7 @@ void InitialConstraint() {
     for (c = 0; c < cmax; c++) {
         SplitTransitionsInVorReaktor(c, get_card_arcs_out);
     }
-    // split according to mult of b-th arc
+    // Separierung nach Vielfachheiten der i-ten Kanten - nie falsch
     this_direction = DO;
     bmax = Places[Places[0]->cnt - 1]->NrOfLeaving;
     for (b = 0; b < bmax; b++) {
@@ -382,7 +513,8 @@ void InitialConstraint() {
             }
         }
     }
-    // split acc. to initial marking
+    // Separierung nach Markenzahl der Anfangsmarkierung - so bildet m0
+    // eigene Symmetrieklasse - notwendig fuer akkurate Analyse
     cmax = CardSpecification[PL];
     for (c = 0; c < cmax; c++) {
         SplitPlacesInVorReaktor(c, get_marking);
@@ -418,6 +550,9 @@ void InitialConstraint() {
 #endif
 }
 
+// Kopiere Resultat von InitialConstraint in Reaktor, da ab jetzt linke
+// und rechte Seiten der geordneten Paare abweichen koennen.
+
 void FuelleReaktor() {
     unsigned int i, c;
 
@@ -441,19 +576,25 @@ void FuelleReaktor() {
     }
 }
 
-
+// Aufbewahrung der berechneten Generatoren
 SymmStore* Store;
 unsigned int  CurrentStore;
 unsigned int CardStore;
 
+// On-the-fly-recording der Aequivalenzklassen von Knoten
 Partition* part;
 
+// Die Aeq-Klassen werden mit dem Union/Find-Alg von Tarjan verwaltet.
 void UnifyClasses(unsigned int e1, unsigned int e2) { // union von union-find
     unsigned int c1, c2, c, e;
 
+     // Bestimme Klasse c1 von Element e1
     for (c1 = e1; !(part[c1].top); c1 = part[c1].nextorcard);
+    // Bestimme Klasse c2 von Element e2
     for (c2 = e2; !(part[c2].top); c2 = part[c2].nextorcard);
+    // Falls Klassen noch verschieden...
     if (c1 != c2) {
+	// haenge kleinere an groessere
         if (part[c1].nextorcard > part[c2].nextorcard) {
             part[c1].nextorcard += part[c2].nextorcard;
             part[c2].nextorcard = c1;
@@ -468,6 +609,7 @@ void UnifyClasses(unsigned int e1, unsigned int e2) { // union von union-find
     } else {
         c = c1;
     }
+     // Pfadkomprimierung, um Komplexitaet nlog*n zu erreichen
     while (e1 != c) {
         e = part[e1].nextorcard;
         part[e1].nextorcard = c;
@@ -479,6 +621,9 @@ void UnifyClasses(unsigned int e1, unsigned int e2) { // union von union-find
         e2 = e;
     }
 }
+
+// Verwaltung des Rundenstempels, der fortwaehrendes Ruecksetzen der
+// Zaehlergebnisse im Reaktor erspart
 
 unsigned int Stamp;
 
@@ -494,6 +639,9 @@ void NewStamp() {
         Stamp++;
     }
 }
+
+// Sortieren von Reaktoreintraegen nach Zaehlergebnissen = erster Schritt
+// zur Separierung von Constraints waehrend Refine
 
 void CountSort(NodeType n, DomType d, unsigned int from, unsigned int to) {
     unsigned int less, current, greater;
@@ -558,6 +706,8 @@ void CountSort(NodeType n, DomType d, unsigned int from, unsigned int to) {
         CountSort(n, d, greater + 1, to);
     }
 }
+
+///////////////////////////////// Stand Mo 16.8.
 
 void ImageSort(Node** vector, unsigned int from, unsigned int to) {
     unsigned int less, current, greater;

@@ -76,13 +76,9 @@
 
 //#define COVER
 #define STUBBORN
-//#define SYMMETRY
-//#define CYCLE
+#define SYMMETRY
 #define PREDUCTION
-#define SMALLSTATE
-//#define BITHASH
-//#define DISTRIBUTE
-//#define SWEEP
+#define SYMMINTEGRATION 3
 
 //#define NONBRANCHINGONLY
 //#define MAXUNSAVED 5
@@ -120,51 +116,5 @@
 #define DEPTH_FIRST
 //#define BREADTH_FIRST
 
-
-// The following list contains all available analysis tasks. Please,
-// define exactly one of the following values.
-// REACHABILITY searches for a given state
-// REVERSIBILITY verifies reversibility of the net
-// HOME checks for home states
-// BOUNDEDNET decides boundedness of the net
-// BOUNDEDPLACE decides boundedness of a given place
-// DEADTRANSITION verifies whether a given transition is dead
-// MODELCHECKING verifies a given temporal logic formula
-// FINDPATH performs a memoryless search for a state that satisfies a
-// given state predicate
-// FULL just computes a graph without verifying any property
-// DEADLOCK verifies whether a dead state is reachable
-// STATEPREDICATE searches for a state satisfying a given predicate
-// FAIPROP verifies if a given predicate is true infinitely often on
-// each fair path of the system
-// EVENTUALLYPORP verifies if a given predicate holds evntully on each
-// fair path of the system
-// NONE does not verify anything. Use this if you only want to get the
-// generating set of the symmetries or the LL net.
-
-//#define REACHABILITY
-//#define MODELCHECKING
-//#define BOUNDEDPLACE
-//#define BOUNDEDNET
-//#define DEADTRANSITION
-//#define REVERSIBILITY
-//#define HOME
-//#define FINDPATH
-#define FULL
-//#define DEADLOCK
-//#define NONE
-//#define STATEPREDICATE
-//#define LIVEPROP
-//#define FAIRPROP
-//#define STABLEPROP
-//#define EVENTUALLYPROP
-//#define STATESPACE
-
-// EXTENDEDCTL enables the use of transition formulae for restricting the scope of
-// path quantifiers in CTL formulae. If disabled, transition formulae may appear in
-// formulae but are ignored. Only relevant in combination with MODELCHECKING
-
-//#define EXTENDEDCTL
-
-//#define TWOPHASE
-//#define STRUCT
+// VERIFICATION PROBLEM
+#define NONE

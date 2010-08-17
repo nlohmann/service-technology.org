@@ -1961,6 +1961,22 @@ int compare_markings()
 #define RESULT_NAME "unbounded"
 #endif
 
+#ifndef INITIALIZE_PROPERTY
+#define INITIALIZE_PROPERTY initialize_none
+#endif
+#ifndef CHECK_EARLY_ABORTION
+#define CHECK_EARLY_ABORTION (1)
+#endif
+#ifndef EARLY_ABORT_MESSAGE
+#define EARLY_ABORT_MESSAGE ""
+#endif
+#ifndef LATE_ABORT_MESSAGE
+#define LATE_ABORT_MESSAGE ""
+#endif
+#ifndef RESULT_NAME
+#define RESULT_NAME ""
+#endif
+
 /*!
  \brief plain depth first search, no scc, no tscc, no fairness
  

@@ -826,7 +826,7 @@ void PrintSpec() {
 // Verfeinere Abstrakte Symmetrie asgehend von Constraint ref
 
 bool Refine(NodeType n, unsigned int ref) {
-    unsigned int m1, m2, i, j, arcdir, otherarcdir, currentcardarc, dir, othern, c, cmax;
+    unsigned int m1, m2, i, j, arcdir, currentcardarc, dir, othern, c, cmax;
     Reaktoreintrag* r;
     // unused: Arc * a,* aa;
 
@@ -834,7 +834,7 @@ bool Refine(NodeType n, unsigned int ref) {
     othern = n ? PL : TR;
      // splitte sowohl mit eingehenden als auch ausgehenden Kanten
     for (arcdir = 0; arcdir < 2; arcdir++) {
-        otherarcdir = 1 - arcdir;
+        unsigned int otherarcdir = 1 - arcdir;
 	// Anzahl der Kanten (wegen Praepozessing gleich fuer alle Knoten im
 	// Constraint)
         currentcardarc = arcdir ? Reaktor[n][DO][Specification[n][ref].first].node->NrOfArriving
@@ -1465,7 +1465,11 @@ void BuildProducts(unsigned int orbit) {
 
 void DefineToId(void) {
 
-    unsigned int cntriv, nrmin, intriv, c, i, j, k, MyCardSpecification[2], MyStorePosition, composed, val, oldstorenr;
+    unsigned int cntriv, nrmin, intriv, c, i, j, MyCardSpecification[2], oldstorenr;
+    // unused: unsigned int k;
+    // unused: unsigned int MyStorePosition;
+    // unused: unsigned int val;
+    // unused: unsigned int composed;
     // unused: unsigned int current;
     // unused: NodeType type;
     Reaktoreintrag swap;

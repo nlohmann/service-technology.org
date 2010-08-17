@@ -425,7 +425,7 @@ void print_reg_path(State* s, State* startofrepeatingseq, ostream* pathstream = 
     if (startofrepeatingseq) {
         if (s == startofrepeatingseq) {
             if (s->parent) {
-                int i;
+                // unused: int i;
                 print_reg_path(s->parent, s->smaller, pathstream);
                 if (s->smaller) {
                     if (Pflg || pflg) {
@@ -462,7 +462,7 @@ void print_reg_path(State* s, State* startofrepeatingseq, ostream* pathstream = 
             }
         } else {
             if (s->parent) {
-                int i;
+                // unused: int i;
                 print_reg_path(s->parent, startofrepeatingseq, pathstream);
                 if (Pflg || pflg) {
                     (*pathstream)  << " " << s->parent->firelist[s->parent->current]->name;
@@ -2866,7 +2866,7 @@ void RemoveGraph() {
 #ifdef STUBBORN
 bool mutual_reach() {
 #ifdef TARJAN
-    unsigned int i;
+    // unused: unsigned int i;
     State* NewState;
     // init initial marking and hash table
 #ifdef SYMMETRY
@@ -2947,7 +2947,7 @@ bool mutual_reach() {
 #ifdef STUBBORN
 #ifdef WITHFORMULA
 bool target_reach() {
-    unsigned int i;
+    // unused: unsigned int i;
     unsigned int NrOfStates;
     State* NewState;
     // init initial marking and hash table
@@ -3401,7 +3401,7 @@ unsigned int compute_scc() {
 
                 // print out SCC
                 for (s = CurrentState ; s -> nexttar != CurrentState; s = s -> nexttar) {
-                    if (not nonTrivialSCC) {
+                    if (! nonTrivialSCC) {
                         if (gmflg || GMflg) {
                             (*graphstream) << " SCC:";
                         }

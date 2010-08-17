@@ -78,7 +78,7 @@
 #define STUBBORN
 //#define SYMMETRY
 //#define CYCLE
-//#define PREDUCTION
+#define PREDUCTION
 #define SMALLSTATE
 //#define BITHASH
 //#define DISTRIBUTE
@@ -150,10 +150,10 @@
 //#define REVERSIBILITY
 //#define HOME
 //#define FINDPATH
-//#define FULL
+#define FULL
 //#define DEADLOCK
 //#define NONE
-#define STATEPREDICATE
+//#define STATEPREDICATE
 //#define LIVEPROP
 //#define FAIRPROP
 //#define STABLEPROP

@@ -2005,7 +2005,6 @@ unsigned int simple_depth_first() {
   Trace = new SearchTrace [Places[0]->cnt];
 #endif
 
-  cout << "hello" << endl;
 // initialize property
 // return value > 0 signals that result for this property is
 // determined structurally

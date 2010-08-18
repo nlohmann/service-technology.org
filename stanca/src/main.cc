@@ -67,6 +67,50 @@ string invocation;
 
 string toPl(int id);
 
+typedef struct SP{
+	vector<bool> set;
+	map<unsigned int, string> st;
+	//PetriNet pn;
+	bool operator == (SP sp) const {
+		for (unsigned i=0; i<set.size(); ++i) {
+			if (set.at(i)!=sp.set.at(i)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	bool operator != (SP sp) const {
+		for (unsigned i=0; i<set.size(); ++i) {
+			if (set.at(i)==sp.set.at(i)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	bool operator < (SP sp) const {
+		for (unsigned i=0; i<set.size(); ++i) {
+			if (set.at(i)==sp.set.at(i)) {
+				continue;
+			}
+			else if(!set.at(i)&& sp.set.at(i)) continue;
+			else return false;
+		}
+		return true;
+	}
+};
+
+inline  string toString(SP sp){
+	string out="";
+	for (unsigned i=0; i<sp.set.size(); ++i) {
+		if(sp.set.at(i)) {
+			out=out+sp.st[i]+" ";
+		}
+	}
+	return out;
+}
+
+typedef SP Siphon;
+typedef SP Trap;
 
 void initGlobalVariables();
 //void evaluateParameters(int argc, char** argv);
@@ -142,7 +186,7 @@ int main(int argc, char **argv) {
 	
 	pnapi::PetriNet net;
 	
-    //try {
+    try {
         // parse either from standard input or from a given file
         if (args_info.inputs_num == 0) {
         	// parse the open net from standard input
@@ -166,14 +210,19 @@ int main(int argc, char **argv) {
         if (args_info.verbose_flag) {
             std::ostringstream s;
             s << pnapi::io::stat << net;
-            status("read net: %s", s.str().c_str());
+           // status("read net: %s", s.str().c_str());
         }
+	} catch (pnapi::exception::InputError e) {
+        abort(2, "could not parse file '%s': %s", args_info.inputs[0], e.message.c_str());
+    }
+	status("reading file '%s'", args_info.inputs[0]);
     //} catch(pnapi::io::InputError error) {
      //   std::ostringstream s;
       //  s << error;
        // abort(2, "\b%s", s.str().c_str());
     //}
-		set<std::string> setsiphon;	
+	
+	set<std::string> setsiphon;	
 	if (args_info.semisiphon_arg){
 		// set of strings involved
 		
@@ -916,7 +965,12 @@ int main(int argc, char **argv) {
 		//r contains an assignement; we have to map it back to the original places (the formaula does not hold)
 	}
 	else{
-		cout << "the formula is not satisfiable"<<endl;exit(0);
+		cout << "the formula is not satisfiable"<<endl;
+		if (net.isFreeChoice()) {
+			cout << "The siphon-trap property holds. The net is free-choice, therefore it is live."<<endl;
+		}
+		
+		exit(0);
 		//if(emptytrap) cout<<": no siphon contains a trap. The siphon-trap property does not hold."<<endl;
 	}
 /*	for (set<Place *>::iterator it=net.getPlaces().begin(); it!= net.getPlaces().end(); ++it) {

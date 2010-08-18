@@ -213,11 +213,7 @@ bool minisat(vector< vector< int > > & in, vector<bool>& vb, vector<int>& confli
 		
 		
 		
-#if defined(__linux__)
-		fpu_control_t oldcw, newcw;
-		_FPU_GETCW(oldcw); newcw = (oldcw & ~_FPU_EXTENDED) | _FPU_DOUBLE; _FPU_SETCW(newcw);
-		reportf("WARNING: for repeatability, setting FPU to use double precision\n");
-#endif
+
 		double cpu_time = cpuTime();
 		
 		solver = &S;
@@ -368,11 +364,7 @@ vector<bool>*  minisat2(vector< vector< int > > & in)
     S.verbosity = 1;
 	
 	
-#if defined(__linux__)
-    fpu_control_t oldcw, newcw;
-    _FPU_GETCW(oldcw); newcw = (oldcw & ~_FPU_EXTENDED) | _FPU_DOUBLE; _FPU_SETCW(newcw);
-    reportf("WARNING: for repeatability, setting FPU to use double precision\n");
-#endif
+
     double cpu_time = cpuTime();
 	
     solver = &S;
@@ -425,11 +417,6 @@ vector<vector<bool>*>*  minisatsimp(vector< vector< int > > & in)
     S.verbosity = 1;
 	
 	
-#if defined(__linux__)
-    fpu_control_t oldcw, newcw;
-    _FPU_GETCW(oldcw); newcw = (oldcw & ~_FPU_EXTENDED) | _FPU_DOUBLE; _FPU_SETCW(newcw);
-    reportf("WARNING: for repeatability, setting FPU to use double precision\n");
-#endif
     double cpu_time = cpuTime();
 	
     solver = &S;
@@ -530,11 +517,7 @@ vector<vector<bool> *>*  minisatall(vector< vector< int > > & in)
     S.verbosity = 1;
 	
 	
-#if defined(__linux__)
-    fpu_control_t oldcw, newcw;
-    _FPU_GETCW(oldcw); newcw = (oldcw & ~_FPU_EXTENDED) | _FPU_DOUBLE; _FPU_SETCW(newcw);
-    reportf("WARNING: for repeatability, setting FPU to use double precision\n");
-#endif
+
     double cpu_time = cpuTime();
 	
     solver = &S;

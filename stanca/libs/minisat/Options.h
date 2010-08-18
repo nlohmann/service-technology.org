@@ -20,15 +20,37 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #ifndef Minisat_Options_h
 #define Minisat_Options_h
 
+ 
+//#include <cstdint>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
 
+
 #include "IntTypes.h"
 #include "Vec.h"
 #include "ParseUtils.h"
 
+#ifndef INT32_MAX
+#define INT32_MAX (2147483647)
+#endif
+
+#ifndef INT32_MIN
+#define INT32_MIN (-2147483647-1)
+#endif
+
+#ifndef UINT32_MAX
+#define UINT32_MAX (4294967295U)
+#endif
+
+#ifndef UINT64_MIN
+# define INT64_MIN  (-9223372036854775807-1)
+#endif
+
+#ifndef UINT64_MAX
+# define INT64_MAX  (9223372036854775807)
+#endif
 namespace Minisat {
 
 //==================================================================================================

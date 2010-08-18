@@ -75,10 +75,9 @@ EXTRA_DIST += configs/boundednet/userconfig.H                    \
 
 CONFIGS = $(patsubst $(srcdir)/configs/%/userconfig.H,lola-%,$(wildcard $(srcdir)/configs/*/userconfig.H))
 
-$(CONFIGS): $@
-	$(AM_V_at)$(MAKE) -s clean-am
-	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/$(patsubst lola-%,%,$@) $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG all-am
-	$(AM_V_GEN)mv $(builddir)/lola$(EXEEXT) $(builddir)/$@$(EXEEXT)
+# Include a file with directives to create a binary "lola-foo" for each
+# configuration file "configs/foo/userconfig.H".
+include Makefile.configs
 
 MAINTAINERCLEANFILES += $(CONFIGS) cmdline.c cmdline.h
 DISTCLEANFILES += $(CONFIGS)$(EXEEXT)

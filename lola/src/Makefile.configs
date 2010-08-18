@@ -1,0 +1,206 @@
+EXTRA_PROGRAMS = bin-lola-boundednet bin-lola-boundednetsymm bin-lola-boundedplace bin-lola-bpm-liveprop bin-lola-bpm-liveprop1 bin-lola-bpm-modelchecking bin-lola-bpm-modelchecking-naiv bin-lola-bpm-modelchecking1 bin-lola-bpm-modelchecking1-naiv bin-lola-bpm-statepredicate bin-lola-bpm-statepredicate-naiv bin-lola-bpm-statepredicate1 bin-lola-bpm-statepredicate1-naiv bin-lola-coverstatepredicate bin-lola-deadlock bin-lola-deadlock1 bin-lola-deadtransition bin-lola-findpath bin-lola-full bin-lola-full1 bin-lola-fullcover bin-lola-fulllimited bin-lola-liveprop bin-lola-liveprop1 bin-lola-modelchecking bin-lola-none bin-lola-prom-boundednet bin-lola-prom-deadlock bin-lola-prom-home bin-lola-prom-reversibility bin-lola-statepredicate bin-lola-statepredicate1 bin-lola-statespace bin-lola-statespace1 
+
+bin_lola_boundednet_SOURCES = $(lola_SOURCES)
+bin_lola_boundednet_CPPFLAGS = $(AM_CPPFLAGS)
+lola-boundednet:
+	$(AM_V_at)$(MAKE) bin-lola-boundednet $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/boundednet $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-boundednet $(builddir)/lola-boundednet
+
+bin_lola_boundednetsymm_SOURCES = $(lola_SOURCES)
+bin_lola_boundednetsymm_CPPFLAGS = $(AM_CPPFLAGS)
+lola-boundednetsymm:
+	$(AM_V_at)$(MAKE) bin-lola-boundednetsymm $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/boundednetsymm $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-boundednetsymm $(builddir)/lola-boundednetsymm
+
+bin_lola_boundedplace_SOURCES = $(lola_SOURCES)
+bin_lola_boundedplace_CPPFLAGS = $(AM_CPPFLAGS)
+lola-boundedplace:
+	$(AM_V_at)$(MAKE) bin-lola-boundedplace $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/boundedplace $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-boundedplace $(builddir)/lola-boundedplace
+
+bin_lola_bpm_liveprop_SOURCES = $(lola_SOURCES)
+bin_lola_bpm_liveprop_CPPFLAGS = $(AM_CPPFLAGS)
+lola-bpm-liveprop:
+	$(AM_V_at)$(MAKE) bin-lola-bpm-liveprop $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/bpm-liveprop $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-bpm-liveprop $(builddir)/lola-bpm-liveprop
+
+bin_lola_bpm_liveprop1_SOURCES = $(lola_SOURCES)
+bin_lola_bpm_liveprop1_CPPFLAGS = $(AM_CPPFLAGS)
+lola-bpm-liveprop1:
+	$(AM_V_at)$(MAKE) bin-lola-bpm-liveprop1 $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/bpm-liveprop1 $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-bpm-liveprop1 $(builddir)/lola-bpm-liveprop1
+
+bin_lola_bpm_modelchecking_SOURCES = $(lola_SOURCES)
+bin_lola_bpm_modelchecking_CPPFLAGS = $(AM_CPPFLAGS)
+lola-bpm-modelchecking:
+	$(AM_V_at)$(MAKE) bin-lola-bpm-modelchecking $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/bpm-modelchecking $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-bpm-modelchecking $(builddir)/lola-bpm-modelchecking
+
+bin_lola_bpm_modelchecking_naiv_SOURCES = $(lola_SOURCES)
+bin_lola_bpm_modelchecking_naiv_CPPFLAGS = $(AM_CPPFLAGS)
+lola-bpm-modelchecking-naiv:
+	$(AM_V_at)$(MAKE) bin-lola-bpm-modelchecking-naiv $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/bpm-modelchecking-naiv $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-bpm-modelchecking-naiv $(builddir)/lola-bpm-modelchecking-naiv
+
+bin_lola_bpm_modelchecking1_SOURCES = $(lola_SOURCES)
+bin_lola_bpm_modelchecking1_CPPFLAGS = $(AM_CPPFLAGS)
+lola-bpm-modelchecking1:
+	$(AM_V_at)$(MAKE) bin-lola-bpm-modelchecking1 $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/bpm-modelchecking1 $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-bpm-modelchecking1 $(builddir)/lola-bpm-modelchecking1
+
+bin_lola_bpm_modelchecking1_naiv_SOURCES = $(lola_SOURCES)
+bin_lola_bpm_modelchecking1_naiv_CPPFLAGS = $(AM_CPPFLAGS)
+lola-bpm-modelchecking1-naiv:
+	$(AM_V_at)$(MAKE) bin-lola-bpm-modelchecking1-naiv $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/bpm-modelchecking1-naiv $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-bpm-modelchecking1-naiv $(builddir)/lola-bpm-modelchecking1-naiv
+
+bin_lola_bpm_statepredicate_SOURCES = $(lola_SOURCES)
+bin_lola_bpm_statepredicate_CPPFLAGS = $(AM_CPPFLAGS)
+lola-bpm-statepredicate:
+	$(AM_V_at)$(MAKE) bin-lola-bpm-statepredicate $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/bpm-statepredicate $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-bpm-statepredicate $(builddir)/lola-bpm-statepredicate
+
+bin_lola_bpm_statepredicate_naiv_SOURCES = $(lola_SOURCES)
+bin_lola_bpm_statepredicate_naiv_CPPFLAGS = $(AM_CPPFLAGS)
+lola-bpm-statepredicate-naiv:
+	$(AM_V_at)$(MAKE) bin-lola-bpm-statepredicate-naiv $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/bpm-statepredicate-naiv $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-bpm-statepredicate-naiv $(builddir)/lola-bpm-statepredicate-naiv
+
+bin_lola_bpm_statepredicate1_SOURCES = $(lola_SOURCES)
+bin_lola_bpm_statepredicate1_CPPFLAGS = $(AM_CPPFLAGS)
+lola-bpm-statepredicate1:
+	$(AM_V_at)$(MAKE) bin-lola-bpm-statepredicate1 $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/bpm-statepredicate1 $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-bpm-statepredicate1 $(builddir)/lola-bpm-statepredicate1
+
+bin_lola_bpm_statepredicate1_naiv_SOURCES = $(lola_SOURCES)
+bin_lola_bpm_statepredicate1_naiv_CPPFLAGS = $(AM_CPPFLAGS)
+lola-bpm-statepredicate1-naiv:
+	$(AM_V_at)$(MAKE) bin-lola-bpm-statepredicate1-naiv $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/bpm-statepredicate1-naiv $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-bpm-statepredicate1-naiv $(builddir)/lola-bpm-statepredicate1-naiv
+
+bin_lola_coverstatepredicate_SOURCES = $(lola_SOURCES)
+bin_lola_coverstatepredicate_CPPFLAGS = $(AM_CPPFLAGS)
+lola-coverstatepredicate:
+	$(AM_V_at)$(MAKE) bin-lola-coverstatepredicate $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/coverstatepredicate $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-coverstatepredicate $(builddir)/lola-coverstatepredicate
+
+bin_lola_deadlock_SOURCES = $(lola_SOURCES)
+bin_lola_deadlock_CPPFLAGS = $(AM_CPPFLAGS)
+lola-deadlock:
+	$(AM_V_at)$(MAKE) bin-lola-deadlock $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/deadlock $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-deadlock $(builddir)/lola-deadlock
+
+bin_lola_deadlock1_SOURCES = $(lola_SOURCES)
+bin_lola_deadlock1_CPPFLAGS = $(AM_CPPFLAGS)
+lola-deadlock1:
+	$(AM_V_at)$(MAKE) bin-lola-deadlock1 $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/deadlock1 $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-deadlock1 $(builddir)/lola-deadlock1
+
+bin_lola_deadtransition_SOURCES = $(lola_SOURCES)
+bin_lola_deadtransition_CPPFLAGS = $(AM_CPPFLAGS)
+lola-deadtransition:
+	$(AM_V_at)$(MAKE) bin-lola-deadtransition $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/deadtransition $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-deadtransition $(builddir)/lola-deadtransition
+
+bin_lola_findpath_SOURCES = $(lola_SOURCES)
+bin_lola_findpath_CPPFLAGS = $(AM_CPPFLAGS)
+lola-findpath:
+	$(AM_V_at)$(MAKE) bin-lola-findpath $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/findpath $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-findpath $(builddir)/lola-findpath
+
+bin_lola_full_SOURCES = $(lola_SOURCES)
+bin_lola_full_CPPFLAGS = $(AM_CPPFLAGS)
+lola-full:
+	$(AM_V_at)$(MAKE) bin-lola-full $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/full $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-full $(builddir)/lola-full
+
+bin_lola_full1_SOURCES = $(lola_SOURCES)
+bin_lola_full1_CPPFLAGS = $(AM_CPPFLAGS)
+lola-full1:
+	$(AM_V_at)$(MAKE) bin-lola-full1 $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/full1 $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-full1 $(builddir)/lola-full1
+
+bin_lola_fullcover_SOURCES = $(lola_SOURCES)
+bin_lola_fullcover_CPPFLAGS = $(AM_CPPFLAGS)
+lola-fullcover:
+	$(AM_V_at)$(MAKE) bin-lola-fullcover $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/fullcover $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-fullcover $(builddir)/lola-fullcover
+
+bin_lola_fulllimited_SOURCES = $(lola_SOURCES)
+bin_lola_fulllimited_CPPFLAGS = $(AM_CPPFLAGS)
+lola-fulllimited:
+	$(AM_V_at)$(MAKE) bin-lola-fulllimited $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/fulllimited $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-fulllimited $(builddir)/lola-fulllimited
+
+bin_lola_liveprop_SOURCES = $(lola_SOURCES)
+bin_lola_liveprop_CPPFLAGS = $(AM_CPPFLAGS)
+lola-liveprop:
+	$(AM_V_at)$(MAKE) bin-lola-liveprop $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/liveprop $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-liveprop $(builddir)/lola-liveprop
+
+bin_lola_liveprop1_SOURCES = $(lola_SOURCES)
+bin_lola_liveprop1_CPPFLAGS = $(AM_CPPFLAGS)
+lola-liveprop1:
+	$(AM_V_at)$(MAKE) bin-lola-liveprop1 $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/liveprop1 $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-liveprop1 $(builddir)/lola-liveprop1
+
+bin_lola_modelchecking_SOURCES = $(lola_SOURCES)
+bin_lola_modelchecking_CPPFLAGS = $(AM_CPPFLAGS)
+lola-modelchecking:
+	$(AM_V_at)$(MAKE) bin-lola-modelchecking $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/modelchecking $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-modelchecking $(builddir)/lola-modelchecking
+
+bin_lola_none_SOURCES = $(lola_SOURCES)
+bin_lola_none_CPPFLAGS = $(AM_CPPFLAGS)
+lola-none:
+	$(AM_V_at)$(MAKE) bin-lola-none $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/none $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-none $(builddir)/lola-none
+
+bin_lola_prom_boundednet_SOURCES = $(lola_SOURCES)
+bin_lola_prom_boundednet_CPPFLAGS = $(AM_CPPFLAGS)
+lola-prom-boundednet:
+	$(AM_V_at)$(MAKE) bin-lola-prom-boundednet $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/prom-boundednet $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-prom-boundednet $(builddir)/lola-prom-boundednet
+
+bin_lola_prom_deadlock_SOURCES = $(lola_SOURCES)
+bin_lola_prom_deadlock_CPPFLAGS = $(AM_CPPFLAGS)
+lola-prom-deadlock:
+	$(AM_V_at)$(MAKE) bin-lola-prom-deadlock $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/prom-deadlock $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-prom-deadlock $(builddir)/lola-prom-deadlock
+
+bin_lola_prom_home_SOURCES = $(lola_SOURCES)
+bin_lola_prom_home_CPPFLAGS = $(AM_CPPFLAGS)
+lola-prom-home:
+	$(AM_V_at)$(MAKE) bin-lola-prom-home $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/prom-home $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-prom-home $(builddir)/lola-prom-home
+
+bin_lola_prom_reversibility_SOURCES = $(lola_SOURCES)
+bin_lola_prom_reversibility_CPPFLAGS = $(AM_CPPFLAGS)
+lola-prom-reversibility:
+	$(AM_V_at)$(MAKE) bin-lola-prom-reversibility $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/prom-reversibility $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-prom-reversibility $(builddir)/lola-prom-reversibility
+
+bin_lola_statepredicate_SOURCES = $(lola_SOURCES)
+bin_lola_statepredicate_CPPFLAGS = $(AM_CPPFLAGS)
+lola-statepredicate:
+	$(AM_V_at)$(MAKE) bin-lola-statepredicate $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/statepredicate $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-statepredicate $(builddir)/lola-statepredicate
+
+bin_lola_statepredicate1_SOURCES = $(lola_SOURCES)
+bin_lola_statepredicate1_CPPFLAGS = $(AM_CPPFLAGS)
+lola-statepredicate1:
+	$(AM_V_at)$(MAKE) bin-lola-statepredicate1 $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/statepredicate1 $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-statepredicate1 $(builddir)/lola-statepredicate1
+
+bin_lola_statespace_SOURCES = $(lola_SOURCES)
+bin_lola_statespace_CPPFLAGS = $(AM_CPPFLAGS)
+lola-statespace:
+	$(AM_V_at)$(MAKE) bin-lola-statespace $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/statespace $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-statespace $(builddir)/lola-statespace
+
+bin_lola_statespace1_SOURCES = $(lola_SOURCES)
+bin_lola_statespace1_CPPFLAGS = $(AM_CPPFLAGS)
+lola-statespace1:
+	$(AM_V_at)$(MAKE) bin-lola-statespace1 $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/statespace1 $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-statespace1 $(builddir)/lola-statespace1
+

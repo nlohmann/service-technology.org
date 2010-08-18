@@ -31,6 +31,7 @@ testtess_SOURCES = testmain.cc config.h \
                    verbose.h verbose.cc \
                    Output.h Output.cc
 
+testtess_CPPFLAGS = $(AM_CPPFLAGS)
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW

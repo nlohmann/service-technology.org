@@ -97,7 +97,11 @@ vector<TestCase*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 	cout << endl << endl;
 	cout << "start dfs for " << q->id << endl;
 
-	map<Node*, vector<TestCase*> > allPartialTestCases [label2id.size()]; // for each label l there is a map which contains the partial test cases for the successor nodes reaching by l
+  // for each label l there is a map which contains the partial test cases for the successor nodes reaching by l
+  map<Node*, vector<TestCase*> >* allPartialTestCases = new map<Node*, vector<TestCase*> >[label2id.size()]; // changed vector definition to constructor call
+
+  // used to be (unportable): map<Node*, vector<TestCase*> > allPartialTestCases [label2id.size()];
+
 	map<Node*, vector<TestCase*> > partialTestCasesMap; //contains the partial test cases of the successor nodes
 
 	// if the original operating guideline contains cycles

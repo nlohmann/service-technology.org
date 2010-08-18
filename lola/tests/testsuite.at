@@ -6,60 +6,20 @@ AT_BANNER([Standard Options])
 
 AT_SETUP([Help output])
 AT_CHECK([LOLA_BOUNDEDNET --help],0,ignore)
-AT_KEYWORDS(basic)
-AT_CLEANUP
-
-AT_SETUP([Help output])
 AT_CHECK([LOLA_DEADLOCK --help],0,ignore)
-AT_KEYWORDS(basic)
-AT_CLEANUP
-
-AT_SETUP([Help output])
 AT_CHECK([LOLA_FULLLIMITED --help],0,ignore)
-AT_KEYWORDS(basic)
-AT_CLEANUP
-
-AT_SETUP([Help output])
 AT_CHECK([LOLA_LIVEPROP --help],0,ignore)
-AT_KEYWORDS(basic)
-AT_CLEANUP
-
-AT_SETUP([Help output])
 AT_CHECK([LOLA_MODELCHECKING --help],0,ignore)
-AT_KEYWORDS(basic)
-AT_CLEANUP
-
-AT_SETUP([Help output])
 AT_CHECK([LOLA_STATEPREDICATE1 --help],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
 AT_SETUP([Version output])
 AT_CHECK([LOLA_BOUNDEDNET --version],0,ignore)
-AT_KEYWORDS(basic)
-AT_CLEANUP
-
-AT_SETUP([Version output])
 AT_CHECK([LOLA_DEADLOCK --version],0,ignore)
-AT_KEYWORDS(basic)
-AT_CLEANUP
-
-AT_SETUP([Version output])
 AT_CHECK([LOLA_FULLLIMITED --version],0,ignore)
-AT_KEYWORDS(basic)
-AT_CLEANUP
-
-AT_SETUP([Version output])
 AT_CHECK([LOLA_LIVEPROP --version],0,ignore)
-AT_KEYWORDS(basic)
-AT_CLEANUP
-
-AT_SETUP([Version output])
 AT_CHECK([LOLA_MODELCHECKING --version],0,ignore)
-AT_KEYWORDS(basic)
-AT_CLEANUP
-
-AT_SETUP([Version output])
 AT_CHECK([LOLA_STATEPREDICATE1 --version],0,ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
@@ -70,38 +30,18 @@ AT_BANNER([Debug Options])
 ############################################################################
 
 AT_SETUP([Offspring generation])
-AT_CHECK([LOLA_BOUNDEDNET --offspring],0,ignore,ignore)
-AT_CHECK([test -f userconfig.H.offspring])
-AT_KEYWORDS(debug)
-AT_CLEANUP
-
-AT_SETUP([Offspring generation])
-AT_CHECK([LOLA_DEADLOCK --offspring],0,ignore,ignore)
-AT_CHECK([test -f userconfig.H.offspring])
-AT_KEYWORDS(debug)
-AT_CLEANUP
-
-AT_SETUP([Offspring generation])
-AT_CHECK([LOLA_FULLLIMITED --offspring],0,ignore,ignore)
-AT_CHECK([test -f userconfig.H.offspring])
-AT_KEYWORDS(debug)
-AT_CLEANUP
-
-AT_SETUP([Offspring generation])
-AT_CHECK([LOLA_LIVEPROP --offspring],0,ignore,ignore)
-AT_CHECK([test -f userconfig.H.offspring])
-AT_KEYWORDS(debug)
-AT_CLEANUP
-
-AT_SETUP([Offspring generation])
-AT_CHECK([LOLA_MODELCHECKING --offspring],0,ignore,ignore)
-AT_CHECK([test -f userconfig.H.offspring])
-AT_KEYWORDS(debug)
-AT_CLEANUP
-
-AT_SETUP([Offspring generation])
-AT_CHECK([LOLA_STATEPREDICATE1 --offspring],0,ignore,ignore)
-AT_CHECK([test -f userconfig.H.offspring])
+AT_CHECK([LOLA_BOUNDEDNET --offspring=boundednet],0,ignore,ignore)
+AT_CHECK([LOLA_DEADLOCK --offspring=deadlock],0,ignore,ignore)
+AT_CHECK([LOLA_FULLLIMITED --offspring=fulllimited],0,ignore,ignore)
+AT_CHECK([LOLA_LIVEPROP --offspring=liveprop],0,ignore,ignore)
+AT_CHECK([LOLA_MODELCHECKING --offspring=modelchecking],0,ignore,ignore)
+AT_CHECK([LOLA_STATEPREDICATE1 --offspring=statepredicate1],0,ignore,ignore)
+AT_CHECK([test -f userconfig.H.boundednet])
+AT_CHECK([test -f userconfig.H.deadlock])
+AT_CHECK([test -f userconfig.H.fulllimited])
+AT_CHECK([test -f userconfig.H.liveprop])
+AT_CHECK([test -f userconfig.H.modelchecking])
+AT_CHECK([test -f userconfig.H.statepredicate1])
 AT_KEYWORDS(debug)
 AT_CLEANUP
 
@@ -350,6 +290,3 @@ AT_CHECK([LOLA_STATESPACE bug15282.lola -M],0,stdout)
 AT_CHECK([GREP -q "STATE 2 Lowlink: 2" stdout],0)
 AT_KEYWORDS(bugs)
 AT_CLEANUP
-
-
-

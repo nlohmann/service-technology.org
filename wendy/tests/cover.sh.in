@@ -11,11 +11,7 @@
 #    Test project (http://ltp.sourceforge.net/coverage/lcov.php) is used to
 #    collect test case coverage results for the given executable
 #
-# 2. if the environment variable COVER is set to ZCOV, zcov is used to
-#    collect test case coverage results for the given executable; see
-#    http://minormatter.com/zcov/ for more information
-#
-# 3. otherwise, the given executable is called without code coverage tool
+# 2. otherwise, the given executable is called without code coverage tool
 
 
 # evaluate COVER variable
@@ -43,27 +39,6 @@ case $COVER in
 
     # remove profile information on C++ sources and headers
     $LCOV --extract $INFOFILE "@abs_top_builddir@/*" -o $INFOFILE
-
-    # exit with executable's exit code
-    exit $result  
-  ;;
-
-  "ZCOV")
-    # set ZCOV variable
-    ZCOV="@abs_builddir@/zcov/zcov-scan"
-
-    # derive test name from current directory (assuming GNU Autotest); the
-    # info filename is suffixed with a random number to allow for multiple
-    # invokations of this script for the same test
-    dir=`pwd`
-    TESTNAME=`basename $dir`
-
-    # execute executable and remember exit code
-    $*
-    result=$?
-
-    # scan directory
-    $ZCOV @abs_builddir@/cover/$TESTNAME.zcov @abs_top_builddir@ &> /dev/null
 
     # exit with executable's exit code
     exit $result  

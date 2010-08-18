@@ -1,8 +1,9 @@
 @heading Version 3.2-unreleased
 @itemize
 @item test scripts now use the @code{petri} utility to convert automata to open nets
-@item added target to create complete manual (execute @samp{make manual -C tests})
+@item added target to create complete manual (execute @samp{make manual -C doc})
 @item updated the Petri Net API 4.02 (revision r5970)
+@item updated LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to 1.9 and removed ZCOV, because LCOV can do branch coverage as well
 @end itemize
 
 

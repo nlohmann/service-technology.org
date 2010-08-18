@@ -13,9 +13,12 @@ Version 3.2-unreleased
 
 * test scripts now use the `petri' utility to convert automata to open nets
 
-* added target to create complete manual (execute `make manual -C tests')
+* added target to create complete manual (execute `make manual -C doc')
 
 * updated the Petri Net API 4.02 (revision r5970)
+
+* updated LCOV (`http://ltp.sourceforge.net/coverage/lcov.php') to 1.9 and
+  removed ZCOV, because LCOV can do branch coverage as well
 
 Version 3.1 (15 July 2010)
 ==========================

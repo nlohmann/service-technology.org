@@ -24,6 +24,7 @@
 #include <map>
 #include <vector>
 #include "pnapi/petrinet.h"
+#include "recompose.h"
 
 using pnapi::Node;
 using pnapi::PetriNet;

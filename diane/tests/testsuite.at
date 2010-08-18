@@ -89,12 +89,12 @@ AT_CHECK([GREP -q "number of components: 1" stdout],0)
 AT_KEYWORDS(service)
 AT_CLEANUP
 
-#AT_SETUP([Open net input (with final marking)])
-#AT_CHECK([cp TESTFILES/zeus.owfn .])
-#AT_CHECK([DIANE zeus.owfn -q --service],0,stdout)
-#AT_CHECK([GREP -q "number of components: 2" stdout],0)
-#AT_KEYWORDS(service)
-#AT_CLEANUP
+AT_SETUP([Open net input (with final marking)])
+AT_CHECK([cp TESTFILES/zeus.owfn .])
+AT_CHECK([DIANE zeus.owfn -q --service],0,stdout)
+AT_CHECK([GREP -q "number of components: 2" stdout],0)
+AT_KEYWORDS(service)
+AT_CLEANUP
 
 ############################################################################
 #AT_BANNER([De- and Recomposition])

@@ -32,6 +32,7 @@
 #include "decomposition.h"
 #include "pnapi/pnapi.h"
 #include "verbose.h"
+#include "recompose.h"
 
 using std::cerr;
 using std::cin;
@@ -105,357 +106,8 @@ void evaluateParameters(int, char**);
 /// statistical output
 void statistics(PetriNet&, vector<PetriNet*> &);
 
-PetriNet deletePattern(PetriNet nnn){
-	PetriNet nn=nnn;
-	if (nn.findPlace("a")) {
-		nn.deletePlace(*nn.findPlace("a"));
-	}
-	if (nn.findPlace("b")) {
-		nn.deletePlace(*nn.findPlace("b"));
-	}
-	if (nn.findPlace("c")) {
-		nn.deletePlace(*nn.findPlace("c"));
-	}
-	if (nn.findPlace("d")) {
-		nn.deletePlace(*nn.findPlace("d"));
-	}
-	if (nn.findPlace("e")) {
-		nn.deletePlace(*nn.findPlace("e"));
-	}
-	if (nn.findTransition("f")) {
-		nn.deleteTransition(*nn.findTransition("f"));
-	}
-	if (nn.findTransition("g")) {
-		nn.deleteTransition(*nn.findTransition("g"));
-	}
-	return nn;
-}
-
-PetriNet addPattern(PetriNet nnn){
-	PetriNet diff=nnn;
-	//cout << pnapi::io::owfn<<diff;
-	Place *pa=&diff.createPlace("a", 1);
-	//Place *pac=&diff.createPlace("a$compl", Node::INTERNAL, 0);
-	Place *pb=&diff.createPlace("b",  0);
-	//Place *pbc=&diff.createPlace("b$compl", Node::INTERNAL, 1);
-	Place *pc=&diff.createPlace("c",  0);
-	//Place *pcc=&diff.createPlace("c$compl", Node::INTERNAL, 1);
-	Place *pd=&diff.createPlace("d",  1);
-	Place *pe=&diff.createPlace("e",  0);
-	Transition *tf = &diff.createTransition("f");
-	Transition *tg = &diff.createTransition("g");
-	diff.createArc(*pc,*tf, 1);diff.createArc(*tf,*pa, 1);
-	diff.createArc(*pb,*tf, 1);diff.createArc(*tf,*pb, 1);
-	diff.createArc(*pc,*tg, 1);
-	diff.createArc(*tg,*pb, 1);diff.createArc(*tg,*pe, 1);diff.createArc(*pd,*tg, 1);diff.createArc(*tg,*pa, 1);
-	
-	pnapi::formula::FormulaEqual propb(pnapi::formula::FormulaEqual(*pe,1));
-	diff.getFinalCondition().addProposition(propb);
-	pnapi::formula::FormulaEqual prope(pnapi::formula::FormulaEqual(*pb,1));
-	diff.getFinalCondition().addProposition(prope);
-	pnapi::formula::FormulaEqual propa(pnapi::formula::FormulaEqual(*pa,1));
-	diff.getFinalCondition().addProposition(propa);
-	/*// for each interface place, get interface transitions and add arcs to a  and c
-	for (set<Place *>::iterator p = diff.getInterfacePlaces().begin(); p != diff.getInterfacePlaces().end(); ++p){
-		//if((*p)->getType()==Node::INPUT){
-		const std::set<pnapi::Arc*> postset=(*p)->getPostsetArcs();
-		for (set<pnapi::Arc *>::iterator f = postset.begin(); f != postset.end(); ++f)
-		{
-			Transition *t = &(*f)->getTransition();
-			//cout << t->getName()<<endl;
-			if(diff.findArc(*pa,*t)==NULL) diff.createArc(*pa,*t, 1);
-			if(diff.findArc(*t,*pc)==NULL) diff.createArc(*t,*pc, 1);
-			//if();
-			//cout << "arc created"<<endl;
-			//else cout << "not created"<<endl;
-		}
-		//get transitions
-		
-		//}//cout<<"not done"<<endl;
-		//if((*p)->getType()==Node::OUTPUT){
-		//get transition
-		const std::set<pnapi::Arc*> preset=(*p)->getPresetArcs();
-		for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-		{
-			Transition *t = &(*f)->getTransition();	//diff.createArc(*t,*pc, 1);
-			if(diff.findArc(*pa,*t)==NULL) diff.createArc(*pa,*t, 1);
-			if(diff.findArc(*t,*pc)==NULL) diff.createArc(*t,*pc, 1);
-		}
-		
-		//}
-	}*/
-	
-	set<Label *> inputpp=diff.getInterface().getInputLabels();
-	for (set<Label *>::iterator pp = inputpp.begin(); pp != inputpp.end(); ++pp){
-		const set<Transition *> *stt= &(*pp)->getTransitions();
-		for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
-			if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
-			if(diff.findArc(**t,*pc)==NULL) diff.createArc(**t,*pc, 1);
-		}
-	}
-	set<Label *> outputpp=diff.getInterface().getOutputLabels();
-	for (set<Label *>::iterator p = outputpp.begin(); p != outputpp.end(); ++p){
-		const set<Transition *> *stt= &(*p)->getTransitions();
-		for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
-			if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
-			if(diff.findArc(**t,*pc)==NULL) diff.createArc(**t,*pc, 1);
-		}
-	}
-	
-	
-	return diff;
-}
-
-PetriNet addinterfcompl(PetriNet nnn,set<string> inputplaces1, set<string> outputplaces1){
-	// adds complement places to a net that has just been composed
-	set<string> itwas;
-	PetriNet nn=nnn;
-	for (std::set<Place *>::iterator ssit=nn.getPlaces().begin(); ssit!=nn.getPlaces().end(); ++ssit) {
-		itwas.insert((*ssit)->getName());
-	}
-	for (set<string>::iterator ssit=inputplaces1.begin(); ssit!=inputplaces1.end(); ++ssit) {
-		//cout<<"itwas"<<(*ssit)->getName()<<endl;
-		Place *p=nn.findPlace(*ssit); //cout<<"was interface"<<p->wasInterface()<<" "<<p->getName()<<endl;
-		//cout<<endl<<"found"<<*itwas.find(*ssit)<<endl; && itwas.find(*ssit)!= itwas.end()
-		if(p!=NULL  && itwas.find(*ssit)!=itwas.end()){ //create complementary
-			//create place
-			Place * place = nn.findPlace(p->getName()+"$compl");
-			
-			//if ( php != NULL) cout<<"naspa";
-			if ( place == NULL )
-			{
-				Place *pc = &nn.createPlace(p->getName()+"$compl",1,1);
-				
-				pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*pc,1));
-				nn.getFinalCondition().addProposition(prop);//nets[x]->getFinalCondition().formula().output(std::cout);
-				//cout<<php->getPresetArcs().size()
-				set<pnapi::Arc *> preset = p->getPresetArcs();
-				for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-				{//create a post rtansition for the complementary
-					//it is internal, create an arc for the complementary
-					//cout << "gasit"; initially marked
-					nn.createArc( *nn.findPlace(p->getName()+"$compl"),(*f)->getTransition(), (*f)->getWeight());
-					//	net1.createArc((*f)->getTransition(), *net1->findPlace(p->getName()+"_compl"), (*f)->getWeight());
-					//nets[x]->createArc(*netPlace, *t, (*f)->getWeight());
-				}
-				set<pnapi::Arc *> postset = p->getPostsetArcs();
-				for (set<pnapi::Arc *>::iterator f = postset.begin(); f != postset.end(); ++f)
-				{
-					//it is internal, create an arc for the complementary
-					//if (net1.findPlace(place->getName()+"_compl")!=NULL) {
-					//cout << "gasit";
-					//if(place->getTokenCount()||place->getName()==sfp) nets[x]->createArc( *t, *nets[x]->findPlace(place->getName()+"_compl"),(*f)->getWeight());
-					nn.createArc( (*f)->getTransition(), *pc,(*f)->getWeight());
-					//}
-				}
-				
-			}
-			
-		}
-	}
-	for (set<string>::iterator ssit=outputplaces1.begin(); ssit!=outputplaces1.end(); ++ssit) {
-		Place *p=nn.findPlace(*ssit);//cout<<"was interface"<<p->wasInterface()<<" "<<p->getName()<<endl;
-		//create place
-		Place *place=NULL;
-		if(p!=NULL)
-			place = nn.findPlace(p->getName()+"$compl");//cout<<*ssit<<endl;
-		//cout<<endl<<"not found"<<itwas.size()<<endl;//cout<<"input"<<*ssit<<endl;
-		//if(itwas.find(*ssit)!= itwas.end()) cout<<endl<<"help " <<endl;
-		//set<string>::iterator it=itwas.find(*ssit);
-		//if (it==itwas.end())cout<<endl<<"not found"<<itwas.size()<<endl;else cout<<"found"<<endl;
-		//if ( php != NULL) cout<<"naspa";&& itwas.find(*ssit)!= itwas.end()
-		if ( place == NULL && itwas.find(*ssit)!=itwas.end())
-		{ //cout<<"itwas"<<*ssit<<endl;
-			Place *pc = &nn.createPlace(p->getName()+"$compl",  1,1);
-			//cout << "built interface"<<endl;
-			pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*pc,1));
-			nn.getFinalCondition().addProposition(prop);//nets[x]->getFinalCondition().formula().output(std::cout);
-			//cout<<php->getPresetArcs().size()
-			set<pnapi::Arc *> preset = p->getPresetArcs();
-			for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-			{//create a post rtansition for the complementary
-				//it is internal, create an arc for the complementary
-				//cout << "gasit"; initially marked
-				nn.createArc( *nn.findPlace(p->getName()+"$compl"),(*f)->getTransition(), (*f)->getWeight());
-				//	net1.createArc((*f)->getTransition(), *net1->findPlace(p->getName()+"_compl"), (*f)->getWeight());
-				//nets[x]->createArc(*netPlace, *t, (*f)->getWeight());
-			}
-			set<pnapi::Arc *> postset = p->getPostsetArcs();
-			for (set<pnapi::Arc *>::iterator f = postset.begin(); f != postset.end(); ++f)
-			{
-				//it is internal, create an arc for the complementary
-				//if (net1.findPlace(place->getName()+"_compl")!=NULL) {
-				//cout << "gasit";
-				//if(place->getTokenCount()||place->getName()==sfp) nets[x]->createArc( *t, *nets[x]->findPlace(place->getName()+"_compl"),(*f)->getWeight());
-				nn.createArc(  (*f)->getTransition(),*pc,(*f)->getWeight());
-				//}
-			}
-			
-		}
-		
-	}
-	return nn;
-}
 
 
-PetriNet complementnet(PetriNet diffc, PetriNet part){
-	//given a net (with complementary places) and a component part compute the complement wrt net and add the extra places t 
-	
-	//call 
-	PetriNet diff=diffc;
-	
-	for (std::set<pnapi::Transition *>::iterator t = diffc.getTransitions().begin(); t != diffc.getTransitions().end(); ++t){
-		
-		if (part.findTransition((*t)->getName())!=NULL) {
-			Transition *tt=diff.findTransition((*t)->getName());//cout<<(*t)->getName();
-			diff.deleteTransition(*tt);//cout<<(tt)->getName()<<endl;
-		}
-	}	
-	for (std::set<pnapi::Place *>::iterator p = part.getPlaces().begin(); p != part.getPlaces().end(); ++p){
-		if (diff.findPlace((*p)->getName())) {
-			//cout<<"deleting "<<(*p)->getName()<<endl;
-			//Place *pp=diff.findPlace((*p)->getName());//diff
-			diff.deletePlace(*diff.findPlace((*p)->getName()));
-		}
-	}	
-	/*//make the rest interface places
-	for (set<Label *>::iterator p = part.getInputLabels().begin(); p != part.getInputLabels().end(); ++p){
-		Place *pp=diff.findPlace((*p)->getName());
-		//create new output label
-		//delete complement
-	}
-	for (set<Label *>::iterator p = part.getOutputLabels().begin(); p != part.getOutputLabels().end(); ++p){
-		for (const set<Transition *>::iterator f = (*p)->getTransitions(); f != (*p)->getTransitions(); ++f){
-			if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
-			if(diff.findArc(**t,*pc)==NULL) diff.createArc(**t,*pc, 1);
-		}
-	}*/
-	
-	//build global port
-	pnapi::Port globalp(diff, "global");
-	// add interface labels to transitions which are opposite to  the initial
-	std::set<pnapi::Label *> async=part.getInterface().getAsynchronousLabels();
-	for (std::set<pnapi::Label *>::iterator p = async.begin(); p != async.end(); ++p){
-		if((*p)->getType()==Label::INPUT)
-			if (diff.findPlace((*p)->getName())) {
-				Place *pp=diff.findPlace((*p)->getName());
-				set<pnapi::Arc *> preset = pp->getPostsetArcs();
-				for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-				{
-					Label *l=new Label(diff,globalp,(*p)->getName(),(*p)->getType());l->mirror();
-					Transition *t = &(*f)->getTransition();t->addLabel(*l);
-					//nets[j]->createArc(**p ,*t, (*f)->getWeight());
-					//if(net.findArc(*nplace,*t)==NULL) net.createArc( *net.findPlace(nplace->getName()), *t,(*f)->getWeight());
-					//cout << "created arc from "<<nplace->getName()+"$compl"<<" to "<<t->getName()<<endl;
-				}	
-				//add interface labels to all transitions in diff in the postset of pp (pp->setType(Node::OUTPUT);)
-				diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
-			}
-		if((*p)->getType()==Label::OUTPUT)
-			if (diff.findPlace((*p)->getName())) {
-				Place *pp=diff.findPlace((*p)->getName());
-				set<pnapi::Arc *> preset = pp->getPresetArcs();
-				for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-				{
-					Label *l=new Label(diff,globalp,(*p)->getName(),(*p)->getType());l->mirror();
-					Transition *t = &(*f)->getTransition();t->addLabel(*l);
-				}	
-				//Place *pp=diff.findPlace((*p)->getName());pp->setType(Node::INPUT);
-				diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
-			}
-		if(diff.findPlace((*p)->getName())!=NULL) diff.deletePlace(*diff.findPlace((*p)->getName()));
-	}
-	
-	/*for (std::set<pnapi::Place *>::iterator p = part.getInterfacePlaces().begin(); p != part.getInterfacePlaces().end(); ++p){
-		//cout <<(*p)->getName()<< endl;
-		
-		if((*p)->getType()==Node::INPUT)
-			if (diff.findPlace((*p)->getName())) {
-				Place *pp=diff.findPlace((*p)->getName());pp->setType(Node::OUTPUT);
-				diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
-				//cout << "deleted complement"<< endl;
-			}
-		if((*p)->getType()==Node::OUTPUT)
-			if (diff.findPlace((*p)->getName())) {
-				Place *pp=diff.findPlace((*p)->getName());pp->setType(Node::INPUT);
-				diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
-				//cout << "deleted complement"<<endl;
-			}
-	}*/	
-	
-	
-	
-	
-	//cout << pnapi::io::owfn<<diff;
-	Place *pa=&diff.createPlace("a", 1);
-	//Place *pac=&diff.createPlace("a$compl", Node::INTERNAL, 0);
-	Place *pb=&diff.createPlace("b",  0);
-	//Place *pbc=&diff.createPlace("b$compl", Node::INTERNAL, 1);
-	Place *pc=&diff.createPlace("c",  0);
-	//Place *pcc=&diff.createPlace("c$compl", Node::INTERNAL, 1);
-	Place *pd=&diff.createPlace("d",  1);
-	Place *pe=&diff.createPlace("e",  0);
-	Transition *tf = &diff.createTransition("f");
-	Transition *tg = &diff.createTransition("g");
-	diff.createArc(*pc,*tf, 1);diff.createArc(*tf,*pa, 1);
-	diff.createArc(*pb,*tf, 1);diff.createArc(*tf,*pb, 1);
-	diff.createArc(*pc,*tg, 1);
-	diff.createArc(*tg,*pb, 1);diff.createArc(*tg,*pe, 1);diff.createArc(*pd,*tg, 1);diff.createArc(*tg,*pa, 1);
-	
-	pnapi::formula::FormulaEqual propb(pnapi::formula::FormulaEqual(*pe,1));
-	diff.getFinalCondition().addProposition(propb);
-	pnapi::formula::FormulaEqual prope(pnapi::formula::FormulaEqual(*pb,1));
-	diff.getFinalCondition().addProposition(prope);
-	pnapi::formula::FormulaEqual propa(pnapi::formula::FormulaEqual(*pa,1));
-	diff.getFinalCondition().addProposition(propa);
-	// for each interface place, get interface transitions and add arcs to a  and c
-	/*for (set<Place *>::iterator p = diff.getInterfacePlaces().begin(); p != diff.getInterfacePlaces().end(); ++p){
-		//if((*p)->getType()==Node::INPUT){
-		const std::set<pnapi::Arc*> postset=(*p)->getPostsetArcs();
-		for (set<pnapi::Arc *>::iterator f = postset.begin(); f != postset.end(); ++f)
-		{
-			Transition *t = &(*f)->getTransition();
-			//cout << t->getName()<<endl;
-			if(diff.findArc(*pa,*t)==NULL) diff.createArc(*pa,*t, 1);
-			if(diff.findArc(*t,*pc)==NULL) diff.createArc(*t,*pc, 1);
-			//if();
-			//cout << "arc created"<<endl;
-			//else cout << "not created"<<endl;
-		}
-		//get transitions
-		
-		//}//cout<<"not done"<<endl;
-		//if((*p)->getType()==Node::OUTPUT){
-		//get transition
-		const std::set<pnapi::Arc*> preset=(*p)->getPresetArcs();
-		for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-		{
-			Transition *t = &(*f)->getTransition();	//diff.createArc(*t,*pc, 1);
-			if(diff.findArc(*pa,*t)==NULL) diff.createArc(*pa,*t, 1);
-			if(diff.findArc(*t,*pc)==NULL) diff.createArc(*t,*pc, 1);
-		}
-		
-		//}
-	}*/
-	set<pnapi::Label *> inputl=diff.getInterface().getInputLabels();
-	for (set<pnapi::Label *>::iterator p = inputl.begin(); p != inputl.end(); ++p){
-		const set<Transition *> *stt= &(*p)->getTransitions();
-		for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
-			if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
-			if(diff.findArc(**t,*pc)==NULL) diff.createArc(**t,*pc, 1);
-		}
-	}
-	set<pnapi::Label *> outputl=diff.getInterface().getOutputLabels();
-	for (set<Label *>::iterator p = outputl.begin(); p != outputl.end(); ++p){
-		const set<Transition *> *stt= &(*p)->getTransitions();
-		for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
-			if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
-			if(diff.findArc(**t,*pc)==NULL) diff.createArc(**t,*pc, 1);
-		}
-	}
-	
-	return diff;
-}
 
 
 
@@ -555,7 +207,9 @@ int main(int argc, char* argv[]) {
     status("created net fragments of '%s'", args_info.inputs[0]);
 
 	//composes components until a medium sized component is reached, then computes its complement
-	if(args_info.compose_flag){status("composes components until a medium sized component is reached, then computes its complement");
+	if(args_info.compose_flag){
+		
+		status("compose %d components until a medium sized component is reached, then computes its complement",  _statistics.fragments_);
 		string fileprefix;
 		string filepostfix = ".owfn";
 		if (args_info.prefix_given)
@@ -645,7 +299,9 @@ int main(int argc, char* argv[]) {
 				//	cout<<nets[j]->getInternalPlaces().size()<<endl;
 				//}
 			}
-		std::vector<bool> in(nc,false),com(nc,false);in.flip();std::set< std::vector<bool> >all,allc;
+		status("%d components", nc);
+		std::vector<bool> in(nc,false),com(nc,false);in.flip();
+		std::set< std::vector<bool> >all;//stores component compositions (without complement duplicates)
 		int averp=maxi/nc; cout<<maxi<<"/"<<nc<<nets.size()<<"="<<averp<<endl;
 		map<vector<bool>, PetriNet> small;//stores all smaller composition from previous iterations
 		//map<vector<bool>, PetriNet> alln;//stores all balanced components without duplicates  
@@ -706,152 +362,7 @@ int main(int argc, char* argv[]) {
 				//cout << num<<" "<<filepostfix <<endl;
 				///o.open((std::string(fileprefix+num+filepostfix + ".compl.owfn").c_str()), std::ios_base::trunc);
 				//PetriNet net2;
-				//PetriNet diff=complementnet(cmplfordiff, parts.at(i));
-				PetriNet diff=cmplfordiff;
-				for (std::set<pnapi::Place *>::iterator p = parts.at(i).getPlaces().begin(); p != parts.at(i).getPlaces().end(); ++p){
-					if (diff.findPlace((*p)->getName())) {
-						diff.deletePlace(*diff.findPlace((*p)->getName()));
-					}
-				}	
-				/*//make the rest interface places
-				
-				for (std::set<pnapi::Place *>::iterator p = parts.at(i).getInterfacePlaces().begin(); p != parts.at(i).getInterfacePlaces().end(); ++p){
-					if((*p)->getType()==Node::INPUT)
-						if (diff.findPlace((*p)->getName())) {
-							Place *pp=diff.findPlace((*p)->getName());pp->setType(Node::OUTPUT);
-							diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
-						}
-					if((*p)->getType()==Node::OUTPUT)
-						if (diff.findPlace((*p)->getName())) {
-							Place *pp=diff.findPlace((*p)->getName());pp->setType(Node::INPUT);
-							diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
-						}
-				}*/
-				//build global port
-				pnapi::Port globalp(diff, "global");
-				status("before");
-				// add interface labels to transitions which are opposite to  the initial
-				std::set<pnapi::Label *> asyncl=parts.at(i).getInterface().getAsynchronousLabels();
-				for (std::set<pnapi::Label *>::iterator p = asyncl.begin(); p != asyncl.end(); ++p){
-					if((*p)->getType()==Label::INPUT){
-						if (diff.findPlace((*p)->getName())) {status("in");
-							Place *pp=diff.findPlace((*p)->getName());
-							if (pp==NULL) {
-								status("inin");
-							}
-							else status("outout"); 
-							set<pnapi::Arc *> preset = pp->getPostsetArcs();
-							
-							for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-							{
-								Label *l=new Label(diff,globalp,(*p)->getName(),(*p)->getType());l->mirror();
-								Transition *t = &(*f)->getTransition();t->addLabel(*l);
-								//nets[j]->createArc(**p ,*t, (*f)->getWeight());
-								//if(net.findArc(*nplace,*t)==NULL) net.createArc( *net.findPlace(nplace->getName()), *t,(*f)->getWeight());
-								//cout << "created arc from "<<nplace->getName()+"$compl"<<" to "<<t->getName()<<endl;
-							}	
-							//add interface labels to all transitions in diff in the postset of pp (pp->setType(Node::OUTPUT);)
-							diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
-							//status("after delete");
-						}}
-					else if((*p)->getType()==Label::OUTPUT)
-						if (diff.findPlace((*p)->getName())) {
-							Place *pp=diff.findPlace((*p)->getName());
-							set<pnapi::Arc *> preset = pp->getPresetArcs();
-							for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-							{
-								Label *l=new Label(diff,globalp,(*p)->getName(),(*p)->getType());l->mirror();
-								Transition *t = &(*f)->getTransition();t->addLabel(*l);
-							}	
-							//Place *pp=diff.findPlace((*p)->getName());pp->setType(Node::INPUT);
-							diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
-						}
-					if(diff.findPlace((*p)->getName())!=NULL) diff.deletePlace(*diff.findPlace((*p)->getName()));
-					//status("after delete");
-				}
-				status("after delete");
-				for (std::set<pnapi::Transition *>::iterator t = cmplfordiff.getTransitions().begin(); t != cmplfordiff.getTransitions().end(); ++t){
-					
-					if (parts.at(i).findTransition((*t)->getName())!=NULL) {
-						//Transition *t = &(*f)->getTransition();
-						Transition *tt=diff.findTransition((*t)->getName());//
-						//cout<<(tt)->getName()<<endl; //diff.deleteTransition(*tt);//
-						//cout<<(*t)->getName()<<endl;
-						
-						diff.deleteTransition(*diff.findTransition((*t)->getName()));
-						//cout<<"deleted"<<endl;
-					}
-				}//cout<<"here"<<endl;		
-				Place *pa=&diff.createPlace("a",  1);
-				//Place *pac=&diff.createPlace("a$compl", Node::INTERNAL, 0);
-				Place *pb=&diff.createPlace("b",  0);
-				//Place *pbc=&diff.createPlace("b$compl", Node::INTERNAL, 1);
-				Place *pc=&diff.createPlace("c",  0);
-				//Place *pcc=&diff.createPlace("c$compl", Node::INTERNAL, 1);
-				Place *pd=&diff.createPlace("d", 1);
-				Place *pe=&diff.createPlace("e", 0);
-				Transition *tf = &diff.createTransition("f");
-				Transition *tg = &diff.createTransition("g");
-				diff.createArc(*pc,*tf, 1);diff.createArc(*tf,*pa, 1);
-				diff.createArc(*pb,*tf, 1);diff.createArc(*tf,*pb, 1);
-				diff.createArc(*pc,*tg, 1);
-				diff.createArc(*tg,*pb, 1);diff.createArc(*tg,*pe, 1);diff.createArc(*pd,*tg, 1);
-				diff.createArc(*tg,*pa, 1);
-				
-				pnapi::formula::FormulaEqual propb(pnapi::formula::FormulaEqual(*pe,1));
-				diff.getFinalCondition().addProposition(propb);
-				pnapi::formula::FormulaEqual prope(pnapi::formula::FormulaEqual(*pb,1));
-				diff.getFinalCondition().addProposition(prope);
-				pnapi::formula::FormulaEqual propa(pnapi::formula::FormulaEqual(*pa,1));
-				diff.getFinalCondition().addProposition(propa);
-				// for each interface place, get interface transitions and add arcs to a  and c
-				set<Label *> inputl=diff.getInterface().getInputLabels();
-				for (set<Label *>::iterator p = inputl.begin(); p != inputl.end(); ++p){
-					const set<Transition *> *stt= &(*p)->getTransitions();
-					for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
-						if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
-						if(diff.findArc(**t,*pc)==NULL) diff.createArc(**t,*pc, 1);
-					}
-				}
-				set<Label *> outputl=diff.getInterface().getOutputLabels();
-				for (set<Label *>::iterator lp = outputl.begin(); lp != outputl.end(); ++lp){
-					const set<Transition *> *stt= &(*lp)->getTransitions();
-					for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
-						if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
-						if(diff.findArc(**t,*pc)==NULL) diff.createArc(**t,*pc, 1);
-					}
-				}
-				/*for (set<Place *>::iterator p = diff.getInterface().getAsynchr().begin(); p != diff.getInterface().getInterfacePlaces().end(); ++p){
-					//if((*p)->getType()==Node::INPUT){
-					const std::set<pnapi::Arc*> postset=(*p)->getPostsetArcs();
-					for (set<pnapi::Arc *>::iterator f = postset.begin(); f != postset.end(); ++f)
-					{
-						Transition *t = &(*f)->getTransition();
-						//cout << t->getName()<<endl;
-						if(diff.findArc(*pa,*t)==NULL) diff.createArc(*pa,*t, 1);
-						if(diff.findArc(*t,*pc)==NULL) diff.createArc(*t,*pc, 1);
-						//if();
-						//cout << "arc created"<<endl;
-						//else cout << "not created"<<endl;
-					}
-					//get transitions
-					
-					//}//cout<<"not done"<<endl;
-					//if((*p)->getType()==Node::OUTPUT){
-					//get transition
-					const std::set<pnapi::Arc*> preset=(*p)->getPresetArcs();
-					for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-					{
-						Transition *t = &(*f)->getTransition();	//diff.createArc(*t,*pc, 1);
-						if(diff.findArc(*pa,*t)==NULL) diff.createArc(*pa,*t, 1);
-						if(diff.findArc(*t,*pc)==NULL) diff.createArc(*t,*pc, 1);
-					}
-					
-					//}
-				}*/
-				
-				
-				
+				PetriNet diff=complementnet(cmplfordiff, parts.at(i));
 				
 				
 				
@@ -879,6 +390,7 @@ int main(int argc, char* argv[]) {
 				//cout << pnapi::io::owfn<<diff;
 				//PetriNet net2=addPattern(net1);
 				try{
+					status("net2+diff");
 					net2.compose(diff, "1", "2");
 				}
 				catch (pnapi::exception::UserCausedError e) {
@@ -908,50 +420,9 @@ int main(int argc, char* argv[]) {
 				for(unsigned int j=i+1; j<(int) parts.size();++j){
 					//check if ij are composable (code from yasmina)
 					//cout <<i<< "compose with"<<j;
-					bool syntb=false;set<string> inputplaces1,inputplaces2,outputplaces1,outputplaces2;
-					std::set<Label *> inlabels=parts.at(i).getInterface().getInputLabels();
-					for (std::set<Label *>::iterator ssit=inlabels.begin(); ssit!=inlabels.end(); ++ssit) {
-						string sl;
-						if ((*ssit)!=NULL) {sl=(*ssit)->getName();
-							inputplaces1.insert(sl);}
-					}
-					std::set<Label *> outlabels=parts.at(i).getInterface().getOutputLabels();
-					for (std::set<Label *>::iterator ssit=outlabels.begin(); ssit!=outlabels.end(); ++ssit) {
-						outputplaces1.insert((*ssit)->getName());
-					}
-					std::set<Label *> inlabelsp=parts.at(j).getInterface().getInputLabels();
-					for (std::set<Label *>::iterator ssit=inlabelsp.begin(); ssit!=inlabelsp.end(); ++ssit) {
-						inputplaces2.insert((*ssit)->getName());
-					}
-					std::set<Label *> outlabelsp=parts.at(j).getInterface().getOutputLabels();
-					for (std::set<Label *>::iterator ssit=outlabelsp.begin(); ssit!=outlabelsp.end(); ++ssit) {
-						outputplaces2.insert((*ssit)->getName());
-					}
 					
-					std::set<Label *> asyncl=parts.at(i).getInterface().getAsynchronousLabels();
-					for (std::set<Label *>::iterator ssit=asyncl.begin(); ssit!=asyncl.end(); ++ssit) {
-						//see whether it is an input place 
-						string ps=(*ssit)->getName();
-						if ((inputplaces1.find(ps)!=inputplaces1.end())&&(outputplaces2.find(ps)!=outputplaces2.end())) {
-							//if ((net1.getInputPlaces().find(*ssit)!=net1.getInputPlaces().end())&&(net2.getOutputPlaces().find(*ssit)!=net2.getOutputPlaces().end())) {
-							//cout << "we consider only simple composition; we are considering instance composition for next versions of the tool";
-							//	syntb=true;break;
-						}
-						else if ((inputplaces2.find(ps)!=inputplaces2.end())&&(outputplaces1.find(ps)!=outputplaces1.end()))
-						{ syntb=true;break;//matching
-						}
-						
-						
-					}
 					
-					//const std::set<std::string> & getSynchronousLabels() const;
-					std::set<Label *> synclabels=parts.at(i).getInterface().getSynchronousLabels();
-					for(std::set<pnapi::Label *>::iterator cit=synclabels.begin();cit!=synclabels.end();++cit){
-						if (parts.at(j).getInterface().findLabel((*cit)->getName())==NULL) {syntb=true;break;//not sync
-						}
-					}
-					
-					if (!syntb) {
+					if(!areComposable(parts.at(i),parts.at(j))){	
 						std::cout<<endl<<"not syntactically compatible"<<endl; 
 					}
 					else if(parts.at(i).getPlaces().size()+parts.at(j).getPlaces().size()>maxi*2/3){
@@ -975,19 +446,27 @@ int main(int argc, char* argv[]) {
 						for (std::set<Label *>::iterator ssit=outputl.begin(); ssit!=outputl.end(); ++ssit) {
 							outputplaces1.insert((*ssit)->getName());
 						}
+						
 						//first delete the enforcing patterns in both nets
 						
 						PetriNet nnj=parts.at(j);
 						PetriNet dnnj=deletePattern(nnj);
+						cout << pnapi::io::owfn << nnb;
+						cout << pnapi::io::owfn << dnnj;
 						try {
-							nnb.compose(dnnj);
+							//nnb.compose(dnnj);
+							dnnj=deleteEmptyPorts(dnnj);
+							nnb=deleteEmptyPorts(nnb);
+							status("dnnj+nnb");
+							dnnj.compose(nnb, "1", "2");
+							cout << "hello"<<endl;
 						}
 						catch (pnapi::exception::UserCausedError e) {
 							cout << "error"<<endl;
 							e.output(cout);
 						}
 						
-						//cout << pnapi::io::owfn << nnb;
+						//cout << pnapi::io::owfn << nnb;dnnj
 						PetriNet nn=addinterfcompl(nnb, inputplaces1,outputplaces1);
 						
 						vector<bool> in(nc,false);
@@ -1013,7 +492,7 @@ int main(int argc, char* argv[]) {
 						}
 						ss >> num;
 						// check
-						vector<bool> inc(nc,false);
+						vector<bool> inc(nc,false);//complement
 						in[i]=true;inc[i]=true;in[j]=true;inc[j]=true;inc.flip();
 						if((all.find(in)==all.end()) && (all.find(inc)==all.end()))
 							all.insert(in);
@@ -1026,13 +505,16 @@ int main(int argc, char* argv[]) {
 						ss >> num; //cout<<"stupid number "<<num<<endl;
 						//cout << num<<" "<<filepostfix <<endl;
 						std::ofstream o;
+						
+						//status("add pattern");
 						PetriNet nnp=addPattern(nn);
+						//status("finished adding pattern");
 						o.open((std::string(fileprefix+"_"+num+filepostfix).c_str()), std::ios_base::trunc);
 						o << pnapi::io::owfn << nnp;//output component with pattern (composition ij)
 						
 						cout<<fileprefix+"_"+num+filepostfix<<endl;
 						
-						//compute complement
+						//compute complement 
 						PetriNet diff=complementnet(cmplfordiff, nn);
 						PetriNet xdiff=diff;
 						/*for (std::set<pnapi::Place *>::iterator t = diff.getPlaces().begin(); t != diff.getPlaces().end(); ++t){
@@ -1072,13 +554,13 @@ int main(int argc, char* argv[]) {
 							outputplaces2.insert((*ssit)->getName());
 						}
 						try{
-							nnp.compose(diff, "1", "2");
+							status("nnp+diff");
+							nnp.compose(diff, "1", "2");//nnp.compose(diff, "1", "2");
 						}
 						catch (pnapi::exception::UserCausedError e) {
 							e.output(cout);
 						}
-						
-						//nnp.compose(diff, "1", "2");//compose net wit pattern (not whatever is stored)
+						//compose net with pattern 
 						PetriNet xn=addinterfcompl(nnp, inputplaces2,outputplaces2);
 						
 						oc << pnapi::io::owfn << xn;
@@ -1139,46 +621,8 @@ int main(int argc, char* argv[]) {
 							cout<<(*it).first[z];
 							//}else ss<<0; 
 						}cout <<endl;
-						bool syntb=false;set<string> inputplaces1,inputplaces2,outputplaces1,outputplaces2;
-						std::set<Label *> inputl=parts.at(i).getInterface().getInputLabels();
-						for (std::set<Label *>::iterator ssit=inputl.begin(); ssit!=inputl.end(); ++ssit) {
-							inputplaces1.insert((*ssit)->getName());
-						}
-						std::set<Label *> outputl=parts.at(i).getInterface().getOutputLabels();
-						for (std::set<Label *>::iterator ssit=outputl.begin(); ssit!=outputl.end(); ++ssit) {
-							outputplaces1.insert((*ssit)->getName());
-						}
-						std::set<Label *> inputlpp=pp.getInterface().getInputLabels();
-						for (std::set<Label *>::iterator ssit=inputlpp.begin(); ssit!=inputlpp.end(); ++ssit) {
-							inputplaces2.insert((*ssit)->getName());
-						}
-						std::set<Label *> outputlpp=pp.getInterface().getOutputLabels();
-						for (std::set<Label *>::iterator ssit=outputlpp.begin(); ssit!=outputlpp.end(); ++ssit) {
-							outputplaces2.insert((*ssit)->getName());
-						}
-						std::set<Label *> asyncl=parts.at(i).getInterface().getAsynchronousLabels();
-						for (std::set<Label *>::iterator ssit=asyncl.begin(); ssit!=asyncl.end(); ++ssit) {
-							//see whether it is an input place 
-							string ps=(*ssit)->getName();
-							if ((inputplaces1.find(ps)!=inputplaces1.end())&&(outputplaces2.find(ps)!=outputplaces2.end())) {
-								syntb=true;break;
-							}
-							else if ((inputplaces2.find(ps)!=inputplaces2.end())&&(outputplaces1.find(ps)!=outputplaces1.end()))
-							{ syntb=true;break;//matching
-							}
-							
-							
-						}
-						//const std::set<std::string> & getSynchronousLabels() const;
-						//for(std::set<pnapi::Label *>::iterator cit=parts.at(i).getInterface().getSynchronousLabels().begin();cit!=parts.at(i).getInterface().getSynchronousLabels().end();++cit){
-						//	if (parts.at(j).getInterface().findLabel((*cit)->getName())==NULL) {syntb=true;break;//not sync
-						//	}
-						std::set<pnapi::Label *> sync=parts.at(i).getInterface().getSynchronousLabels();
-						for(std::set<pnapi::Label *>::iterator cit=sync.begin();cit!=sync.end();++cit){
-							if (pp.getInterface().findLabel((*cit)->getName())==NULL) {syntb=true;break;//not sync
-							}
-						}
-						if (!syntb) {
+						
+						if (!areComposable(parts.at(i),pp)){
 							std::cout<<endl<<"not syntactically compatible"<<endl; 
 						}
 						else if(parts.at(i).getPlaces().size()+pp.getPlaces().size()>maxi*2/3){
@@ -1203,10 +647,14 @@ int main(int argc, char* argv[]) {
 								outputplaces1.insert((*ssit)->getName());
 							}
 							try{
+								nnn=deleteEmptyPorts(nnn);
+								pp=deleteEmptyPorts(pp);
+								status("nnn+pp");
 								nnn.compose(pp, "1", "2");
+								nnn=deleteEmptyPorts(nnn);
 							}
 							catch (pnapi::exception::UserCausedError e) {
-								e.output(cout);
+								//e.output(cout);
 							}
 							//nnn.compose(pp,"","");
 							PetriNet nn=addinterfcompl(nnn, inputplaces1,outputplaces1);
@@ -1271,11 +719,18 @@ int main(int argc, char* argv[]) {
 								for (std::set<Label *>::iterator ssit=outputl.begin(); ssit!=outputl.end(); ++ssit) {
 									outputplaces2.insert((*ssit)->getName());
 								}
-								nnp.compose(diff, "1", "2");
+								try{
+									status("nnp+diff");
+									nnp.compose(diff, "1", "2");
+								}
+								catch (pnapi::exception::UserCausedError e) {
+									e.output(cout);
+								}
+								//nnp.compose(diff, "1", "2");
 								PetriNet nnnn=addinterfcompl(nnp, inputplaces2,outputplaces2);
-								
-								oc << pnapi::io::owfn << nnnn;
 								cout <<endl << "all size="<<all.size()<<endl;
+								oc << pnapi::io::owfn << nnnn;
+								
 								cout<<"adding... "<<fileprefix+"_"+num+filepostfix<<endl;
 							}
 							else {
@@ -1353,7 +808,7 @@ int main(int argc, char* argv[]) {
 						//cout << (*p)->getName()<<endl;
 						Place * place = net.findPlace((*p)->getName()+"$compl");
 						//Place * php= net.findPlace(p->getName());
-						//if ( php != NULL) cout<<"naspa";
+						
 						if ( (place == NULL && (*p)->getTokenCount()==0))//initial place
 						{	
 							if ((!(*p)->getPresetArcs().empty())&&(!(*p)->getPostsetArcs().empty())) {
@@ -1399,140 +854,15 @@ int main(int argc, char* argv[]) {
 					//ofstream outputfile((std::string(argv[0]) + "compl.owfn").c_str());
 					//compute the difference for  each place / transition of the bign net delete the one from the second net
 					PetriNet diff=net;//delete internal places
-					for (std::set<pnapi::Place *>::iterator p = (nets[j])->getPlaces().begin(); p != (nets[j])->getPlaces().end(); ++p){
-						if (diff.findPlace((*p)->getName())) {
-							diff.deletePlace(*diff.findPlace((*p)->getName()));
-						}
-					}	
-					//delete the interface places as well
-					for (std::set<pnapi::Label *>::iterator p = (nets[j])->getInterface().getAsynchronousLabels().begin(); p != (nets[j])->getInterface().getAsynchronousLabels().end(); ++p){
-						if (diff.findPlace((*p)->getName())) {
-							diff.deletePlace(*diff.findPlace((*p)->getName()));
-						}
-					}	
 					
-					//make the rest interface places
-					/*for (std::set<pnapi::Place *>::iterator p = (nets[j])->getInterfacePlaces().begin(); p != (nets[j])->getInterfacePlaces().end(); ++p){
-						if((*p)->getType()==Node::INPUT)
-							if (diff.findPlace((*p)->getName())) {
-								Place *pp=diff.findPlace((*p)->getName());pp->setType(Node::OUTPUT);
-								diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
-							}
-						if((*p)->getType()==Node::OUTPUT)
-							if (diff.findPlace((*p)->getName())) {
-								Place *pp=diff.findPlace((*p)->getName());pp->setType(Node::INPUT);
-								diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
-							}
-					}*/	
-					//build global port
-					pnapi::Port globalp(diff, "global");
-					// add interface labels to transitions which are opposite to  the initial
-					for (std::set<pnapi::Label *>::iterator p = (nets[j])->getInterface().getAsynchronousLabels().begin(); p != (nets[j])->getInterface().getAsynchronousLabels().end(); ++p){
-						if((*p)->getType()==Label::INPUT)
-							if (diff.findPlace((*p)->getName())) {
-								Place *pp=diff.findPlace((*p)->getName());
-								set<pnapi::Arc *> preset = pp->getPostsetArcs();
-								for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-								{
-									Label *l=new Label(diff,globalp,(*p)->getName(),(*p)->getType());l->mirror();
-									Transition *t = &(*f)->getTransition();t->addLabel(*l);
-									//nets[j]->createArc(**p ,*t, (*f)->getWeight());
-									//if(net.findArc(*nplace,*t)==NULL) net.createArc( *net.findPlace(nplace->getName()), *t,(*f)->getWeight());
-									//cout << "created arc from "<<nplace->getName()+"$compl"<<" to "<<t->getName()<<endl;
-								}	
-								//add interface labels to all transitions in diff in the postset of pp (pp->setType(Node::OUTPUT);)
-								diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
-							}
-						if((*p)->getType()==Label::OUTPUT)
-							if (diff.findPlace((*p)->getName())) {
-								Place *pp=diff.findPlace((*p)->getName());
-								set<pnapi::Arc *> preset = pp->getPresetArcs();
-								for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-								{
-									Label *l=new Label(diff,globalp,(*p)->getName(),(*p)->getType());l->mirror();
-									Transition *t = &(*f)->getTransition();t->addLabel(*l);
-									}	
-								//Place *pp=diff.findPlace((*p)->getName());pp->setType(Node::INPUT);
-								diff.deletePlace(*diff.findPlace((*p)->getName()+"$compl"));
-							}
-						diff.deletePlace(*diff.findPlace((*p)->getName()));
-					}
+					PetriNet rest=complementnet(diff, *nets[j]);
+
 					
-					for (std::set<pnapi::Transition *>::iterator t = net.getTransitions().begin(); t != net.getTransitions().end(); ++t){
-						if ((nets[j])->findTransition((*t)->getName())) {
-							diff.deleteTransition(*diff.findTransition((*t)->getName()));
-						}
-					}	
-					Place *pa=&diff.createPlace("a",  1);
-					//Place *pac=&diff.createPlace("a$compl", Node::INTERNAL, 0);
-					Place *pb=&diff.createPlace("b",  0);
-					//Place *pbc=&diff.createPlace("b$compl", Node::INTERNAL, 1);
-					Place *pc=&diff.createPlace("c",  0);
-					//Place *pcc=&diff.createPlace("c$compl", Node::INTERNAL, 1);
-					Place *pd=&diff.createPlace("d",  1);
-					Place *pe=&diff.createPlace("e",  0);
-					Transition *tf = &diff.createTransition("f");
-					Transition *tg = &diff.createTransition("g");
-					diff.createArc(*pc,*tf, 1);diff.createArc(*tf,*pa, 1);
-					diff.createArc(*pb,*tf, 1);diff.createArc(*tf,*pb, 1);
-					diff.createArc(*pc,*tg, 1);
-					diff.createArc(*tg,*pb, 1);diff.createArc(*tg,*pe, 1);diff.createArc(*pd,*tg, 1);diff.createArc(*tg,*pa, 1);
-					
-					pnapi::formula::FormulaEqual propb(pnapi::formula::FormulaEqual(*pe,1));
-					diff.getFinalCondition().addProposition(propb);
-					pnapi::formula::FormulaEqual prope(pnapi::formula::FormulaEqual(*pb,1));
-					diff.getFinalCondition().addProposition(prope);
-					pnapi::formula::FormulaEqual propa(pnapi::formula::FormulaEqual(*pa,1));
-					diff.getFinalCondition().addProposition(propa);
-					// for each interface place, get interface transitions and add arcs to a  and c
-					
-					for (set<Label *>::iterator p = diff.getInterface().getInputLabels().begin(); p != diff.getInterface().getInputLabels().end(); ++p){
-						const set<Transition *> *stt= &(*p)->getTransitions();
-						for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
-							if(nets[j]->findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
-							if(nets[j]->findArc(**t,*pc)==NULL) diff.createArc(**t,*pc, 1);
-						}
-					}
-					for (set<Label *>::iterator lp = diff.getInterface().getOutputLabels().begin(); lp != diff.getInterface().getOutputLabels().end(); ++lp){
-						const set<Transition *> *stt= &(*lp)->getTransitions();
-						for (set<Transition *>::iterator t = stt->begin(); t != stt->end(); ++t){
-							if(diff.findArc(*pa,**t)==NULL) diff.createArc(*pa,**t, 1);
-							if(diff.findArc(**t,*pc)==NULL) diff.createArc(**t,*pc, 1);
-						}
-					}
-					/*for (set<Place *>::iterator p = diff.getInterfacePlaces().begin(); p != diff.getInterfacePlaces().end(); ++p){
-						//if((*p)->getType()==Node::INPUT){
-						const std::set<pnapi::Arc*> postset=(*p)->getPostsetArcs();
-						for (set<pnapi::Arc *>::iterator f = postset.begin(); f != postset.end(); ++f)
-						{
-							Transition *t = &(*f)->getTransition();
-							//cout << t->getName()<<endl;
-							if(diff.findArc(*pa,*t)==NULL) diff.createArc(*pa,*t, 1);
-							if(diff.findArc(*t,*pc)==NULL) diff.createArc(*t,*pc, 1);
-							//if();
-							//cout << "arc created"<<endl;
-							//else cout << "not created"<<endl;
-						}
-						//get transitions
-						
-						//}//cout<<"not done"<<endl;
-						//if((*p)->getType()==Node::OUTPUT){
-						//get transition
-						const std::set<pnapi::Arc*> preset=(*p)->getPresetArcs();
-						for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-						{
-							Transition *t = &(*f)->getTransition();	//diff.createArc(*t,*pc, 1);
-							if(diff.findArc(*pa,*t)==NULL) diff.createArc(*pa,*t, 1);
-							if(diff.findArc(*t,*pc)==NULL) diff.createArc(*t,*pc, 1);
-						}
-						
-						//}
-					}*/
-					
+					 
 					std::ofstream o;
 					o.open((std::string(fileprefix+num+filepostfix + ".compl.owfn").c_str()), std::ios_base::trunc);
 					//PetriNet net2;
-					o << pnapi::io::owfn << diff;
+					o << pnapi::io::owfn << rest;
 					//cout <<pnapi::io::owfn << net<<endl;
 					
 					//exit(EXIT_SUCCESS);

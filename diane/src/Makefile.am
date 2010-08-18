@@ -2,6 +2,7 @@ bin_PROGRAMS = diane
 
 diane_SOURCES =  main.cc \
                  decomposition.cc decomposition.h \
+				 recompose.h recompose.cc \
                  verbose.cc verbose.h \
                  cmdline.c cmdline.h
 

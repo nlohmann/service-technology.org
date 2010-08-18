@@ -176,7 +176,8 @@ int decomposition::computeComponentsByUnionFind(PetriNet& net, int* tree, int si
 		//}
 		//else{cout << args_info.threshold_arg<< endl;}
 		//threshold: it may be given by the user or we may make it net dependent
-		int k=0;unsigned int threshold=3;//net.getInternalPlaces().size()/5;
+		unsigned int k=0;
+		unsigned int threshold=3;//net.getInternalPlaces().size()/5;
 		if (args_info.threshold_given) {
 			threshold=args_info.threshold_arg;
 		}		
@@ -303,7 +304,7 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 			//add complement places -- //make it safe
 			if (args_info.threshold_given){
 				Place * place = nets[x]->findPlace(p->getName()+"$compl");
-				Place * php= net.findPlace(p->getName());
+				//Place * php= net.findPlace(p->getName());
 				//if ( php != NULL) cout<<"naspa";
 				if ( (place == NULL && p->getTokenCount()==0))
 				{

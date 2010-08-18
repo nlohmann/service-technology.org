@@ -32,7 +32,7 @@
 #include "decomposition.h"
 #include "pnapi/pnapi.h"
 #include "verbose.h"
-#include "recompose.h"
+//#include "recompose.h"
 
 using std::cerr;
 using std::cin;

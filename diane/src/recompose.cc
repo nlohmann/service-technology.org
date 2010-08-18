@@ -7,12 +7,12 @@
  *
  */
 
-#include "opennet.h"
+#include "recompose.h"
 
-PetriNet deletePattern(PetriNet nnn){
+pnapi::PetriNet deletePattern(pnapi::PetriNet nnn){
 	
 	status("deleting pattern");
-	PetriNet nn=nnn;
+	pnapi::PetriNet nn=nnn;
 	if (nn.findPlace("a")) {
 		nn.deletePlace(*nn.findPlace("a"));
 	}
@@ -38,9 +38,9 @@ PetriNet deletePattern(PetriNet nnn){
 	return nn;
 }
 
-PetriNet addPattern(PetriNet nnn){
+pnapi::PetriNet addPattern(pnapi::PetriNet nnn){
 	status("adding pattern");
-	PetriNet diff=nnn;
+	pnapi::PetriNet diff=nnn;
 	//cout << pnapi::io::owfn<<diff;
 	
 	Place *pa=&diff.createPlace("a", 1);
@@ -254,7 +254,7 @@ PetriNet complementnet(PetriNet diffc, PetriNet part){
 	return diff;
 }
 
-bool areComposable(PetriNet net1, PetriNet net2){
+bool areComposable(pnapi::PetriNet net1, pnapi::PetriNet net2){
 	status("are composable");
 	bool syntb=false;
 	set<string> inputplaces1,inputplaces2,outputplaces1,outputplaces2;
@@ -342,7 +342,7 @@ bool noInterfaceLabel(set<string> sset, string place){
 	return false;
 }
 
-PetriNet separatePorts(PetriNet net){
+pnapi::PetriNet separatePorts(pnapi::PetriNet net){
 	
 	/*string sn;// new label to be added
 	net.createPort(sn);//create a port with the same name

@@ -85,8 +85,8 @@ void Graph::generateTestCases(){
 
 	testCases = dfs(initialNode,0);
 
-	Output stdout("-", "");
-	toEaa_TestCases(stdout);
+	Output mystdout("-", "");
+	toEaa_TestCases(mystdout);
 
 	//matching fehlt noch!!!
 

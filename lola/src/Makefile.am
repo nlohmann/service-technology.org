@@ -79,7 +79,7 @@ CONFIGS = $(patsubst $(srcdir)/configs/%/userconfig.H,lola-%,$(wildcard $(srcdir
 # configuration file "configs/foo/userconfig.H".
 include Makefile.configs
 
-MAINTAINERCLEANFILES += $(CONFIGS) cmdline.c cmdline.h
+MAINTAINERCLEANFILES += $(CONFIGS)
 DISTCLEANFILES += $(CONFIGS)$(EXEEXT)
 
 
@@ -91,10 +91,9 @@ check_binaries = lola-deadlock lola-fulllimited lola-modelchecking \
                  lola-statepredicate1 lola-liveprop lola-boundednet \
                  lola-statespace
 
-check-local: $(lola_SOURCES)
-	-rm -f $(builddir)/$(check_binaries)
-	$(MAKE) $(AM_MAKEFLAGS) $(check_binaries)
-	$(MAKE) $(AM_MAKEFLAGS) clean
+check-local: $(check_binaries)
+
+CLEANFILES = $(check_binaries)
 
 
 #############################################################################

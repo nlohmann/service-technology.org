@@ -5,7 +5,7 @@
 #define HASHSIZE 65536
 
 // REDUCTION TECHNIQUES
-// #define PREDUCTION  // has to be turned off until bug 12922 has been fixed
+#define PREDUCTION
 
 // GRAPH EXPLORATION STRATEGY
 #define DEPTH_FIRST

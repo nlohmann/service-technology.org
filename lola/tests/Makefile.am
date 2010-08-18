@@ -20,6 +20,7 @@
 # 3. Add these files (without path) to the `TESTFILES' list.
 # 4. Add the file to the SVN repository.
 TESTFILES = bug15282.lola \
+            bug12922.lola \
             choreography.lola \
             choreography.tar.gz \
             data.lola \

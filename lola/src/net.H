@@ -43,8 +43,8 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
-#define true 1
-#define false 0
+// these are keywords in c++: #define true 1
+// these are keywords in c++: #define false 0
 
 /// file names for input and output
 
@@ -752,10 +752,9 @@ inline void Transition::backfire() {
 extern unsigned int* Ancestor;
 
 /// proceed to predeccessor marking in Ancestor vector
-inline void Transition::traceback()
-{
-  unsigned int * p;
-  unsigned int * i;
+inline void Transition::traceback() {
+    unsigned int* p;
+    unsigned int* i;
 
     for (p = IncrPlaces, i = Incr; *p < UINT_MAX; p++, i++) {
         if (Places[(*p)]->bounded) {
@@ -836,22 +835,3 @@ extern unsigned int BitVectorSize; ///< nr of bits for storing a single marking
 void readnet(); ///< parse a net(+verification task parameters)
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

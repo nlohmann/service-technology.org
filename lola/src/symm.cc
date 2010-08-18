@@ -834,7 +834,7 @@ bool Refine(NodeType n, unsigned int ref) {
     othern = n ? PL : TR;
      // splitte sowohl mit eingehenden als auch ausgehenden Kanten
     for (arcdir = 0; arcdir < 2; arcdir++) {
-        unsigned int otherarcdir = 1 - arcdir;
+        // unused: unsigned int otherarcdir = 1 - arcdir;
 	// Anzahl der Kanten (wegen Praepozessing gleich fuer alle Knoten im
 	// Constraint)
         currentcardarc = arcdir ? Reaktor[n][DO][Specification[n][ref].first].node->NrOfArriving

@@ -1767,7 +1767,7 @@ UValue* UArrayExpression::evaluate() {
     UArrValue* a;
     UArrType* t;
     UNumType* it;
-    UType* ct;
+    //unused: UType* ct;
     UValue** c;
     unsigned int i;
 
@@ -1776,7 +1776,7 @@ UValue* UArrayExpression::evaluate() {
     for (i = 0; i < card; i++) {
         c[i] = cont[i] -> evaluate();
     }
-    ct = c[0]->type;
+    //unused: ct = c[0]->type;
     t = new UArrType(it, c[0] -> type);
     a = (UArrValue*)(t -> make());
     for (i = 0; i < card; i++) {

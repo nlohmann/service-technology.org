@@ -635,10 +635,8 @@ unsigned int depth_first() {
 
 
 void RemoveGraph() {
-    int i;
-
 #ifndef BITHASH
-    for (i = 0; i < HASHSIZE; i++) {
+    for (int i = 0; i < HASHSIZE; ++i) {
         if (binHashTable[i]) {
             delete binHashTable[i];
         }

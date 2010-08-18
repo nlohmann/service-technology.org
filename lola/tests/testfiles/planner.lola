@@ -673,7 +673,7 @@ GUARD
   equalDisplay( d , NEC-MT1065 )
 CONSUME
   Pointing      : toCanvasDisplayBool(Surface_1,d,true()),
-  BeamerUsed : 0;
+  BeamerUsed : 1;
 PRODUCE
   Pointing      : toCanvasDisplayBool(Surface_1,d,false()),
   BeamerNotUsed : 1;

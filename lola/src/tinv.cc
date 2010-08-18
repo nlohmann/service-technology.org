@@ -335,7 +335,6 @@ void psolve() {
     }
 
     for (int i = 0; i < Transitions[0]->cnt; ++i) {
-	cout << Transitions[i]-> name;
         equation* e = new equation(Transitions[i]);
         if (!e->sum) {
             delete e;

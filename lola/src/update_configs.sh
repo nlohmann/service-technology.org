@@ -1,15 +1,19 @@
-#!/bin/bash
+#!/bin/sh
+
+# This script creates a file "Makefile.configs" which contains targets to
+# build a preconfigured LoLA for each userconfig.H in the subdirectories of
+# configs. Make sure that, once called, you commit the changed
+# file "Makefile.configs".
 
 FILELIST=`ls configs`
 
-echo -n "EXTRA_PROGRAMS = " > Makefile.configs
+printf "EXTRA_PROGRAMS = " > Makefile.configs
 for FILE in $FILELIST
 do
-  echo -n "bin-lola-$FILE " >> Makefile.configs
+  printf "bin-lola-$FILE " >> Makefile.configs
 done
 
-echo >> Makefile.configs
-echo >> Makefile.configs
+printf "\n\n" >> Makefile.configs
 
 for FILE in $FILELIST
 do

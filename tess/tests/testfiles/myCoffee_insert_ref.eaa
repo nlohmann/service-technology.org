@@ -7,8 +7,6 @@ INTERFACE
 
 INITIALNODES  0;
 
-GLOBALFORMULA true;
-
 NODES
   0: (C + E + T + tau)
     tau -> 6

@@ -26,6 +26,7 @@ testtess_SOURCES = testmain.cc config.h \
                    helpers.h helpers.cc \
                    types.h \
                    testFormula.h testFormula.cc \
+                   testTestCase.h testTestCase.cc \
                    cmdline.c cmdline.h \
                    verbose.h verbose.cc \
                    Output.h Output.cc

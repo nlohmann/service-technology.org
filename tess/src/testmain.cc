@@ -25,6 +25,7 @@
 #include "verbose.h"
 
 #include "testFormula.h"
+#include "testTestCase.h"
 //#include "testNode.h"
 //#include "testGraph.h"
 #include "types.h"
@@ -42,8 +43,8 @@ gengetopt_args_info args_info;
 int main() {
 
 	testFormulaClass();
-	//testNodeClass();
-	//testGraphClass();
+	testTestCaseClass();
+
 	cout << "tests finished" << endl << endl;
 	exit(0);
 }

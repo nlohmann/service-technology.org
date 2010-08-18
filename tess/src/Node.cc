@@ -135,13 +135,11 @@ void Node::applyChangeFuture(Node* shadowNode){
 	assert(false);
 }
 
+int TNode::maxId = 0;
 
 /// constructor
-TNode::TNode(int _id) : id(_id) {
-//	if (maxId < id){
-//		maxId = id;
-//	}
-//	assert(id <= maxId);
+TNode::TNode(int _idOg) : idOg(_idOg) {
+	idTestOg = maxId++;
 	outEdges = new set<TNode*>[label2id.size()];
 }
 
@@ -159,8 +157,12 @@ void TNode::addEdge(int label, TNode *target) {
 	outEdges[label].insert(target);
 }
 
-/// reset the maxId
+// reset the maxId
 //void TestNode::init(){
-//	maxId = -1;
+//	maxId = 0;
 //}
+
+int TNode::getMaxId(){
+	return maxId;
+}
 

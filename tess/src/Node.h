@@ -74,11 +74,12 @@ class Node {
 class TNode {
 
     public:
-        int id; 		        /// an identifier as given by the .og file
+        int idOg; 		        /// the identifier of the corresponding node in the given operating guideline
+        int idTestOg;		    /// the identifier of the TestOG
         set<TNode*> *outEdges; 	/// outgoing edges
 
     private:
-    //	static int maxId;		/// maximal id of all node objects
+    	static int maxId;		/// maximal id of all node objects
 
 
     public:
@@ -90,6 +91,8 @@ class TNode {
 
         /// add an outoing edge to the node
         void addEdge(int label, TNode *target);
+
+        static int getMaxId();
 
         /// reset the maxId
 //        static void init();

@@ -1,0 +1,104 @@
+digraph D {
+graph [fontname="Helvetica", label="tests/testfiles/small_TestCases"];
+node [fontname="Helvetica" fontsize=10];
+edge [fontname="Helvetica" fontsize=10];
+  q_25036 [label="" height="0.01" width="0.01" style="invis"];
+  q_25036 -> 25036 [minlen="0.5"];
+  25022 [label="5 (25022)"]
+  25032 [label="5 (25032)"]
+  25036 [label="3 (25036)"]
+  25036 -> 25022 [label="!C"]
+  25036 -> 25032 [label="!T"]
+  q_26037 [label="" height="0.01" width="0.01" style="invis"];
+  q_26037 -> 26037 [minlen="0.5"];
+  26016 [label="5 (26016)"]
+  26019 [label="7 (26019)"]
+  26019 -> 26016 [label="!E"]
+  26023 [label="5 (26023)"]
+  26023 -> 26019 [label=" tau"]
+  26026 [label="5 (26026)"]
+  26029 [label="7 (26029)"]
+  26029 -> 26026 [label="!E"]
+  26033 [label="5 (26033)"]
+  26033 -> 26029 [label=" tau"]
+  26037 [label="3 (26037)"]
+  26037 -> 26023 [label="!C"]
+  26037 -> 26033 [label="!T"]
+  q_27038 [label="" height="0.01" width="0.01" style="invis"];
+  q_27038 -> 27038 [minlen="0.5"];
+  27017 [label="5 (27017)"]
+  27020 [label="7 (27020)"]
+  27020 -> 27017 [label="!C"]
+  27024 [label="5 (27024)"]
+  27024 -> 27020 [label=" tau"]
+  27027 [label="5 (27027)"]
+  27030 [label="7 (27030)"]
+  27030 -> 27027 [label="!C"]
+  27034 [label="5 (27034)"]
+  27034 -> 27030 [label=" tau"]
+  27038 [label="3 (27038)"]
+  27038 -> 27024 [label="!C"]
+  27038 -> 27034 [label="!T"]
+  q_28039 [label="" height="0.01" width="0.01" style="invis"];
+  q_28039 -> 28039 [minlen="0.5"];
+  28018 [label="5 (28018)"]
+  28021 [label="7 (28021)"]
+  28021 -> 28018 [label="!T"]
+  28025 [label="5 (28025)"]
+  28025 -> 28021 [label=" tau"]
+  28028 [label="5 (28028)"]
+  28031 [label="7 (28031)"]
+  28031 -> 28028 [label="!T"]
+  28035 [label="5 (28035)"]
+  28035 -> 28031 [label=" tau"]
+  28039 [label="3 (28039)"]
+  28039 -> 28025 [label="!C"]
+  28039 -> 28035 [label="!T"]
+  q_29040 [label="" height="0.01" width="0.01" style="invis"];
+  q_29040 -> 29040 [minlen="0.5"];
+  29000 [label="5 (29000)"]
+  29011 [label="6 (29011)"]
+  29011 -> 29000 [label=" tau"]
+  29040 [label="3 (29040)"]
+  29040 -> 29011 [label=" tau"]
+  q_30041 [label="" height="0.01" width="0.01" style="invis"];
+  q_30041 -> 30041 [minlen="0.5"];
+  30001 [label="5 (30001)"]
+  30002 [label="5 (30002)"]
+  30003 [label="3 (30003)"]
+  30003 -> 30001 [label="!C"]
+  30003 -> 30002 [label="!T"]
+  30012 [label="6 (30012)"]
+  30012 -> 30003 [label="!E"]
+  30041 [label="3 (30041)"]
+  30041 -> 30012 [label=" tau"]
+  q_31042 [label="" height="0.01" width="0.01" style="invis"];
+  q_31042 -> 31042 [minlen="0.5"];
+  31004 [label="5 (31004)"]
+  31013 [label="6 (31013)"]
+  31013 -> 31004 [label="!E"]
+  31042 [label="3 (31042)"]
+  31042 -> 31013 [label=" tau"]
+  q_32043 [label="" height="0.01" width="0.01" style="invis"];
+  q_32043 -> 32043 [minlen="0.5"];
+  32005 [label="5 (32005)"]
+  32006 [label="5 (32006)"]
+  32007 [label="3 (32007)"]
+  32007 -> 32005 [label="!C"]
+  32007 -> 32006 [label="!T"]
+  32014 [label="6 (32014)"]
+  32014 -> 32007 [label="!C"]
+  32043 [label="3 (32043)"]
+  32043 -> 32014 [label=" tau"]
+  q_33044 [label="" height="0.01" width="0.01" style="invis"];
+  q_33044 -> 33044 [minlen="0.5"];
+  33008 [label="5 (33008)"]
+  33009 [label="5 (33009)"]
+  33010 [label="3 (33010)"]
+  33010 -> 33008 [label="!C"]
+  33010 -> 33009 [label="!T"]
+  33015 [label="6 (33015)"]
+  33015 -> 33010 [label="!T"]
+  33044 [label="3 (33044)"]
+  33044 -> 33015 [label=" tau"]
+}

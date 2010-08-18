@@ -31,29 +31,42 @@ using namespace std;
 
 class TestCase {
 	protected:
+		int id;
+		static int maxId;		/// maximal id of all TestCase objects
+
 //		void toDot_Header(FILE* out, string title) const;
 //		void toDot_Nodes(FILE* out) const;
 //
 //		void printInitialNodes(ostream& o) const;
 //		void printNodes(ostream& o) const;
 
-		int maximalEditDistance;
+//		int maximalEditDistance;
+
+
 
 
     public:
-		Node* initialNode;
-		map<int, Node*> nodes; // the nodes indexed by an identifier
+		bool isFullTestCase;
+		TNode* root;
+		map<int, TNode*> nodes; // the nodes indexed by an identifier
 
     	/// constructor
-    	TestCase();
+    	TestCase(int rootId);
 
     	/// destructor
     	~TestCase();
 
+    	int getId();
+    	void addNewRoot(int id, int label);
+    	void appendPartialTestCase(int label, TestCase* partialTestCase);
+
 //    	/// Graphviz dot output
-//        void toDot(FILE* out, string title = "") const;
+        void toDot(FILE* out, string title = "") const;
+		void toDot_Header(FILE* out, string title = "") const;
+		void toDot_Nodes(FILE* out) const;
 //
 //        /// Graph output
+		void printNodes(ostream& o) const;
 //        void toEaa(ostream& o) const;
 
 

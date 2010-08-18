@@ -27,6 +27,7 @@
 #include <map>
 #include <algorithm>
 #include "cmdline.h"
+#include "Output.h"
 
 /// the command line parameters
 extern gengetopt_args_info args_info;
@@ -208,23 +209,38 @@ list< set<int> > putIdIntoList(int id){
 	return list;
 }
 
-void printAllPartialTestCases(map<Node*, vector<TNode*> >* allPartialTestCases){
-	for (int i = 0; i < label2id.size(); ++i){
-		map<Node*, vector<TNode*> > currentMap = allPartialTestCases[i];
-
-		for(map<Node*, vector<TNode*> >::const_iterator iter1 = currentMap.begin(); iter1 != currentMap.end(); ++iter1){
-			vector<TNode*> currentVector = iter1->second;
-			cout << "number of partial test cases for edge: --" << id2label[i] << "->" << iter1->first->id << ": " << currentVector.size() << endl;
-//			if (currentVector.size() == 0){
-//				cout << "empty List" << endl;
-//			}
-//			else {
-//				for (vector<TNode*>::const_iterator iter2 = currentVector.begin(); iter2 != currentVector.end(); ++iter2){
+//void printAllPartialTestCases(ostream& o, map<Node*, vector<TestCase*> >* allPartialTestCases){
+//	for (int i = 0; i < label2id.size(); ++i){
+//		map<Node*, vector<TestCase*> > currentMap = allPartialTestCases[i];
 //
-//				}
-//			}
+//		for(map<Node*, vector<TestCase*> >::const_iterator iter1 = currentMap.begin(); iter1 != currentMap.end(); ++iter1){
+//			vector<TestCase*> currentVector = iter1->second;
+//			cout << "number of partial test cases for edge: --" << id2label[i] << "->" << iter1->first->id << ": " << currentVector.size() << endl;
+//			printTestCases(currentVector, o);
+//
+//		}
+//	}
+//}
+
+//void printTestCases(vector<TestCase*> testCases, ostream& o){
+//	//Output stdout("-", "");
+//
+//	for(vector<TestCase*>::const_iterator i = testCases.begin(); i != testCases.end(); ++i){
+//		TestCase* currentTestCase = *i;
+//		currentTestCase->printNodes(o);
+//	}
+//	cout << endl;
+//}
+
+// returns true if the assignments contain the proposition final
+bool finalInDnf(const list<set<int> > assignments){
+	for(list<set <int> >::const_iterator i = assignments.begin(); i != assignments.end(); ++i){
+		set<int> currentAssignment = *i;
+		if(currentAssignment.find(label2id[Final]) != currentAssignment.end()){
+			assert(currentAssignment.size() == 1);
+			return true;
 		}
 	}
-
+	return false;
 }
 

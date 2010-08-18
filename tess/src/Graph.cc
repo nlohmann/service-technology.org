@@ -20,6 +20,9 @@
 #include <config.h>
 #include <cassert>
 #include <cstdio>
+#include <sstream>
+#include <cstdio>
+#include <cstring>
 #include <string>
 #include <map>
 #include <vector>
@@ -32,6 +35,7 @@
 #include "cmdline.h"
 #include <list>
 #include <set>
+#include "Output.h"
 
 using std::map;
 using std::string;
@@ -48,9 +52,8 @@ extern gengetopt_args_info args_info;
 
 using namespace std;
 
-
 ///constructor
-Graph::Graph() : globalFormula(NULL){
+Graph::Graph() {
 
 }
 
@@ -60,15 +63,14 @@ Graph::~Graph(){
 	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
 		delete n->second;
 	}
-
-	delete globalFormula;
 }
 
 
-/// add a node to the graph
+/// add an initial node to the graph
 void Graph::addInitialNode(int id){
 	initialNodes.push_back(id);
 }
+
 
 void Graph::generateTestCases(){
 	assert(initialNodes.size()==1);
@@ -79,33 +81,35 @@ void Graph::generateTestCases(){
 
 	toTestOg();
 
-	//TNode::init();
+	assert(TNode::getMaxId() == 0);
 
 	testCases = dfs(initialNode,0);
+
+	Output stdout("-", "");
+	toEaa_TestCases(stdout);
 
 	//matching fehlt noch!!!
 
 }
 
-vector<TNode*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
+
+vector<TestCase*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 	cout << endl << endl;
 	cout << "start dfs for " << q->id << endl;
 
-//	if(fromShadowNode){
-//		cout << "fromShadowNode == true" << endl;
-//	}
-//	else{
-//		cout << "fromShadowNode == false" << endl;
-//	}
-	//if(q->visited){cout << "visited" << endl;}
+	map<Node*, vector<TestCase*> > allPartialTestCases [label2id.size()]; // for each label l there is a map which contains the partial test cases for the successor nodes reaching by l
+	map<Node*, vector<TestCase*> > partialTestCasesMap; //contains the partial test cases of the successor nodes
 
-	map<Node*, vector<TNode*> > allPartialTestCases [label2id.size()]; // = new map<Node*, vector<TNode*> >[label2id.size()];
-	map<Node*, vector<TNode*> > partialTestCasesMap; //contains the partial test cases of the successor nodes
-
+	// if the original operating guideline contains cycles
 	if (q->visited && !fromShadowNode){
-		vector<TNode*> partialTestCases;
-		cout << "start backtracking" << endl;
-		return partialTestCases; //empty list
+		assert(false);
+		//TODO: es muss sichergestellt werden, dass im Testfall der Kreis auch existiert (ist zur Zeit nicht der Fall!)
+		TestCase* tc = new TestCase (q->id);
+		vector<TestCase*> partialTestCases;
+		partialTestCases.push_back(tc);
+		cout << "\n   visited: start backtracking - return only one test case containing node " << tc->root->idTestOg << "(" << tc->root->idOg << ")" <<  endl;
+
+		return partialTestCases;
 	}
 
 	if (shadowNodes.find(q->id) == shadowNodes.end()){	//if q is not a shadow node
@@ -115,34 +119,31 @@ vector<TNode*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 	list<set<int> > assignments = q->formula->toMinimalDnf();
 
 	bool finish = true;
-	int numberOfSuccessors = 0;
 
 	if(shadowNodes.find(q->id) != shadowNodes.end()){  //if q is a shadow node
-//		cout << q->id << " is a shadowNode" << endl;
 		fromShadowNode = true;
 	}
 	else {
-//		cout << q->id << " is NOT a shadowNode" << endl;
 		fromShadowNode = false;
 	}
 
-	//for all successor nodes ...
-	for (int i = firstLabelId; i < id2label.size(); ++i){
-		int label = i;
-		cout << "   " << q->id << ": " << id2label[i];
-		for (set<Node*>::const_iterator s = q->outEdges[i].begin(); s != q->outEdges[i].end(); ++s){
+	//start dfs for all successor nodes of q
+	for (int label = firstLabelId; label < id2label.size(); ++label){
+
+		cout << "   " << q->id << ": " << id2label[label];
+
+		for (set<Node*>::const_iterator s = q->outEdges[label].begin(); s != q->outEdges[label].end(); ++s){
 
 			Node* successorNode = *s;
-			++numberOfSuccessors;
-			//cout << "successor id: " << successorNode->id << endl;
 
 			if(shadowNodes.find(successorNode->id) == shadowNodes.end()){  //if successorNode is not a shadow node
 
 				finish = false;
 				allPartialTestCases[label][successorNode] = dfs(successorNode, ed, fromShadowNode);
+
 				cout << "\n   " << q->id << ": number of partial test cases for " << id2label[label] << ": " << allPartialTestCases[label][successorNode].size() << endl;
+				//printTestCases(allPartialTestCases[label][successorNode]);
 				cout << "   " << q->id << ": continue dfs for " << q->id << endl;
-				//partialTestCasesMap[successorNode] = dfs(successorNode, ed);
 			}
 
 			else {
@@ -153,13 +154,12 @@ vector<TNode*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 					assert(ed+1 <= maximalEditDistance);
 					finish = false;
 					allPartialTestCases[label][successorNode] = dfs(successorNode, ed+1);
-					//partialTestCasesMap[successorNode] = dfs(successorNode, ed+1);
+
 				}
 				else{
 					//since the shadow node of q is not used for the test cases
-					//remove the assignment Tau from the list of q's DNF (assignments)
+					//remove the assignment Tau from q's DNF (assignments)
 
-					//cout << "id: " << q->id << "  minimal DNF (before deletion): " << dnfToString(assignments) << endl;
 					bool found = false;
 					for(list<set<int> >::iterator iter = assignments.begin(); iter != assignments.end(); ++iter){
 						set<int> currentSet = *iter;
@@ -170,7 +170,6 @@ vector<TNode*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 							break;
 						}
 					}
-					//cout << "id: " << q->id << "  minimal DNF (after deletion): " << dnfToString(assignments) << endl << endl;
 					assert(found);
 				}
 			}
@@ -183,28 +182,36 @@ vector<TNode*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 	 */
 	if (finish){
 		q->visited = false;
-		TNode* root = new TNode (q->id);
-		vector<TNode*> partialTestCases;
-		partialTestCases.push_back(root);
-		cout << "   start backtracking: return only one test case containing node " << root->id <<  endl;
-		return partialTestCases; //empty list
+		TestCase* tc = new TestCase(q->id);
+		vector<TestCase*> partialTestCases;
+		partialTestCases.push_back(tc);
+
+
+		cout << "\n   finish: start backtracking - return only one test case containing node " << tc->root->idTestOg << "(" << tc->root->idOg << ")" <<  endl;
+		assert(q->id == tc->root->idOg);
+		assert(finalInDnf(assignments));
+		return partialTestCases;
 	}
 
-	vector<TNode*> partialTestCases = combine(allPartialTestCases, assignments, q);
+	vector<TestCase*> partialTestCases = combine(allPartialTestCases, assignments, q);
+
 	cout << "number of test cases in " << q->id << ": " << partialTestCases.size() << endl;
+//	Output stdout("-", "");
+//	toEaa_TestCases(stdout,partialTestCases);
+
 	q->visited = false;
 	return partialTestCases; //all partial test cases starting in q
 
 }
 
 //allPartialTestCases: partial test cases of the successor nodes
-vector<TNode*> Graph::combine(map<Node*, vector<TNode*> >* allPartialTestCases, list< set<int> > assignments, Node* q){
+vector<TestCase*> Graph::combine(map<Node*, vector<TestCase*> >* allPartialTestCases, list< set<int> > assignments, Node* q){
 
 	cout << endl << q->id << ": start combine\n";
 	cout << "DNF: " << dnfToString(assignments) << endl;
-	printAllPartialTestCases(allPartialTestCases);
 
-	vector<TNode*> partialTestCases; //all partial test cases starting in the current node q
+	//printAllPartialTestCases(allPartialTestCases);
+	vector<TestCase*> partialTestCases; //all partial test cases starting in the current node q
 
 	// for all assignments do ...
 	for(list<set<int> >::const_iterator iter1 = assignments.begin(); iter1 != assignments.end(); ++iter1){
@@ -215,13 +222,13 @@ vector<TNode*> Graph::combine(map<Node*, vector<TNode*> >* allPartialTestCases, 
 			assert(currentAssignment.size() == 1);
 			int label = *(currentAssignment.begin());
 
-			vector<TNode*> result = combineForShadowNode(allPartialTestCases, label, q);
+			vector<TestCase*> result = combineForShadowNode(allPartialTestCases, label, q);
 			partialTestCases.insert(partialTestCases.end(), result.begin(), result.end());
 		}
 
 		else { //q is not a shadow node
 
-			int max = 1;
+			int max = 1;	//maximal number of partial test cases of the affected nodes
 			map<int,Node*> affectedNodes;
 
 			/* determine all affected nodes for the current assignment and
@@ -230,14 +237,14 @@ vector<TNode*> Graph::combine(map<Node*, vector<TNode*> >* allPartialTestCases, 
 
 				int label = *iter2;
 
-				// there is no edges labled with final
+				// there is no edges labeled with final
 				if (label != label2id[Final]){
 					assert(q->outEdges[label].size() == 1);
 
 					Node* affectedNode = *(q->outEdges[label].begin()); //since q is not a shadow node, there is only one outgoing edge with the current label
 					affectedNodes[label] = affectedNode;
 
-					int size = allPartialTestCases[label][affectedNode].size();
+					int size = allPartialTestCases[label][affectedNode].size(); //number of partial test cases in the affected node
 
 					if(size > max){
 						max = size;
@@ -246,7 +253,7 @@ vector<TNode*> Graph::combine(map<Node*, vector<TNode*> >* allPartialTestCases, 
 			}
 
 			//combine the test cases of the affected nodes
-			vector<TNode*> result = combineForNormalNode(allPartialTestCases, affectedNodes, max, q);
+			vector<TestCase*> result = combineForNormalNode(allPartialTestCases, affectedNodes, max, q);
 			partialTestCases.insert(partialTestCases.end(), result.begin(), result.end());
 		}
 	}
@@ -256,22 +263,23 @@ vector<TNode*> Graph::combine(map<Node*, vector<TNode*> >* allPartialTestCases, 
 
 
 
-vector<TNode*> Graph::combineForShadowNode(map<Node*, vector<TNode*> >* allPartialTestCases, int label, Node* q){
+vector<TestCase*> Graph::combineForShadowNode(map<Node*, vector<TestCase*> >* allPartialTestCases, int label, Node* q){
 
-	cout << q->id << ": start combineForShadowNode" << endl;
+	cout << "   " << q->id << ": start combineForShadowNode" << endl;
 	assert(label < label2id.size());
+	assert(id2label[label] != Final);
 
-	vector<TNode*> partialTestCases;
+	vector<TestCase*> partialTestCases;
 
 	//for each x-labeled edge
-	cout << "label: " << label;
+	cout << "      label: " << id2label[label] << endl;
 
 	for (set<Node*>::iterator s = q->outEdges[label].begin(); s != q->outEdges[label].end(); ++s){
 
 		Node* successorNode = *s;
 
 		assert(allPartialTestCases[label].find(successorNode) != allPartialTestCases[label].end());
-		vector<TNode*> tc_list = allPartialTestCases[label][successorNode]; //vector of the partial test cases in the successor node
+		vector<TestCase*> tc_list = allPartialTestCases[label][successorNode]; //vector of the partial test cases in the successor node
 
 		TNode* oldRoot;
 		TNode* newRoot;
@@ -287,39 +295,45 @@ vector<TNode*> Graph::combineForShadowNode(map<Node*, vector<TNode*> >* allParti
 //
 //		else {
 			//for each partial test case of the successor node
-			for (vector<TNode*>::const_iterator t = tc_list.begin(); t != tc_list.end(); ++t){
-				oldRoot = *t;  //TODO:the successor node?
-				newRoot = new TNode(q->id);
-				partialTestCases.push_back(newRoot);
-				newRoot->addEdge(label, oldRoot);
+			for (vector<TestCase*>::const_iterator t = tc_list.begin(); t != tc_list.end(); ++t){
+				TestCase* currentTestCase = *t;
+				currentTestCase->addNewRoot(q->id,label);
+				partialTestCases.push_back(currentTestCase);
+//				oldRoot = *t;  //TODO:the successor node?
+//				newRoot = new TNode(q->id);
+//				partialTestCases.push_back(newRoot);
+//				newRoot->addEdge(label, oldRoot);
 			}
 //		}
 	}
 
-	cout << "end: combineForShadowNode" << endl;
+	cout << "      end combineForShadowNode" << endl;
 	return partialTestCases;
 
 }
 
 //combine the test cases of the affected nodes
-vector<TNode*> Graph::combineForNormalNode(map<Node*, vector<TNode*> >* allPartialTestCases, map<int, Node*> affectedNodes, int maxSize, Node* q){
+vector<TestCase*> Graph::combineForNormalNode(map<Node*, vector<TestCase*> >* allPartialTestCases, map<int, Node*> affectedNodes, int maxSize, Node* q){
 
-	cout << "start: combineForNormalNode" << endl;
+	cout << "   " << q->id <<  ": start combineForNormalNode" << endl;
 
-	vector<TNode*> partialTestCases;
+	vector<TestCase*> partialTestCases;
 
 	for(int i = 0; i < maxSize; ++i){
 
-		TNode *newRoot = new TNode(q->id);
-		partialTestCases.push_back(newRoot);
+//		TNode *newRoot = new TNode(q->id);
+//		partialTestCases.push_back(newRoot);
+
+		TestCase* currentTestCase = new TestCase(q->id);
+		partialTestCases.push_back(currentTestCase);
 
 		for(map<int, Node*>::const_iterator iter = affectedNodes.begin(); iter != affectedNodes.end(); ++iter){
 			Node* affectedNode = iter->second;
 			int label = iter->first;
 			assert(label < label2id.size() && (label >= firstLabelId || label == label2id[Final]));
 
-			TNode* oldRoot;
-			vector<TNode*> affectedTestCases;
+			TestCase* testCase;
+			vector<TestCase*> affectedTestCases;
 
 			if (label != label2id[Final]){
 				affectedTestCases = allPartialTestCases[label][affectedNode];
@@ -331,24 +345,22 @@ vector<TNode*> Graph::combineForNormalNode(map<Node*, vector<TNode*> >* allParti
 				assert(affectedTestCases.size() == 0);
 			}
 
-//			if (affectedTestCases.size() == 0){
-//				oldRoot = new TNode(affectedNode->id);
-//			}
-//
-//			else {
-				if (i < affectedTestCases.size()){
-					oldRoot = affectedTestCases[i];
-				}
-				else {
-					oldRoot = affectedTestCases[1];
-//			}
+			if (i < affectedTestCases.size()){
+				testCase = affectedTestCases[i];
+			}
+			else {
+				testCase = affectedTestCases[1];
 			}
 
-			newRoot->addEdge(label, oldRoot);
+			currentTestCase->appendPartialTestCase(label,testCase);
 		}
 	}
 
-	//cout << "end: combineForNormalNode" << endl;
+	cout << "      end combineForNormalNode" << endl;
+
+//	Output stdout("-", "");
+//	toEaa_TestCases(stdout, partialTestCases);
+
 	return partialTestCases;
 }
 
@@ -443,6 +455,7 @@ void Graph::toTestOg(){
 	}
 }
 
+//print the interface of the TestOG
 void Graph::printInterface(ostream& o) const {
 	o << "\nINTERFACE\n";
 	o << "  INPUT\n";
@@ -483,7 +496,7 @@ void Graph::printInterface(ostream& o) const {
 	o << ";\n";
 }
 
-
+//print the initial nodes of the TestOG
 void Graph::printInitialNodes(ostream& o) const{
 	o << "\nINITIALNODES ";
 	for (list<int>::const_iterator n = initialNodes.begin(); n!= initialNodes.end(); ++n){
@@ -494,17 +507,10 @@ void Graph::printInitialNodes(ostream& o) const{
 			o << ", " << *n;
 		}
 	}
+	o << ";\n";
 }
 
-
-void Graph::printGlobalFormula(ostream& o) const{
-
-	//o << ";\n\nGLOBALFORMULA " << globalFormulaAsString << ";\n";
-	o << ";\n\nGLOBALFORMULA " << globalFormula->toString() << ";\n";
-
-}
-
-
+//print the nodes of the testOG
 void Graph::printNodes(ostream& o) const{
 	o << "\nNODES\n";
 
@@ -534,34 +540,46 @@ void Graph::printNodes(ostream& o) const{
 }
 
 
-/// prints the graph
+//! \brief prints the graph in the eaa format
 void Graph::toEaa(ostream& o) const{
 
 	printInterface(o);
 	printInitialNodes(o);
-	printGlobalFormula(o);
 	printNodes(o);
 }
 
-//! \brief creates dot files for given test cases
-//! \param out: prefix of the output files
-//! \param title: a string containing the title for the graph to be shown in the image (optional)
-//! \param testCases: vector of test cases
-//void Graph::ToDot_TestCases(FILE* out, string title, vector<TNode*> testCases) const {
-//
-//	toDot_Header(out, title);
-//	toDot_TNodes(out);
-//	fprintf(out, "}\n");
-//}
+
+//! \brief prints the test cases of the graph in a text format
+//! \param o:
+void Graph::toEaa_TestCases(ostream& o) const{
+	toEaa_TestCases(o, testCases);
+}
+
+
+//! \brief prints the given test cases in a text format
+//! \param o:
+//! \param testCases: vector of test cases to be printed
+void Graph::toEaa_TestCases(ostream& o, vector<TestCase*> testCases) const{
+	//Output stdout("-", "");
+
+	for(vector<TestCase*>::const_iterator i = testCases.begin(); i != testCases.end(); ++i){
+		TestCase* currentTestCase = *i;
+		currentTestCase->printNodes(o);
+	}
+	cout << endl;
+}
 
 //! \brief creates a dot output of the graph
 //! \param out: output file
 //! \param title: a string containing the title for the graph to be shown in the image (optional)
 void Graph::toDot(FILE* out, string title ) const {
+	assert(out);
 
 	toDot_Header(out, title);
 	toDot_Nodes(out);
 	fprintf(out, "}\n");
+
+	assert(!ferror(out));
 }
 
 //! \brief creates the header for the dot output
@@ -578,11 +596,6 @@ void Graph::toDot_Header(FILE* out, string title) const {
 
 }
 
-//! \brief creates the nodes of a tests case for the dot output
-//! \param out: output file
-//void Graph::toDot_TNodes(FILE* out, TNode root) const{
-//
-//}
 
 //! \brief creates the nodes for the dot output
 //! \param out: output file
@@ -614,4 +627,32 @@ void Graph::toDot_Nodes(FILE* out) const{
 			}
 		}
 	}
+}
+
+
+//! \brief creates dot files for given test cases
+//! \param out: output file
+//! \param testCases: vector of test cases
+//! \param title: a string containing the title for the graph to be shown in the image (optional)
+void Graph::testCasesToDot(FILE* out, string title) const{
+
+	assert(out);
+
+	if(testCases.size() <= 999){
+
+		TestCase* tc = *(testCases.begin());
+		tc->toDot_Header(out, title);
+
+		for(vector<TestCase*>::const_iterator i = testCases.begin(); i != testCases.end(); ++i){
+			TestCase* currentTestCase = *i;
+			currentTestCase->toDot_Nodes(out);
+		}
+
+		fprintf(out, "}\n");
+	}
+	else {
+		fprintf(out, "too many test cases");
+	}
+
+	assert(!ferror(out));
 }

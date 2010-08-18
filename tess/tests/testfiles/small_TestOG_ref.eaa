@@ -1,0 +1,30 @@
+
+INTERFACE
+  INPUT
+    B, R;
+  OUTPUT
+    E, C, T;
+
+INITIALNODES  3;
+
+NODES
+  3: ((C * T) + tau)
+    tau -> 6
+    C -> 5
+    T -> 5
+
+  5: (final + tau)
+    tau -> 7
+
+  6: (tau + E + C + T)
+    tau -> 5
+    E -> 3
+    E -> 5
+    C -> 3
+    T -> 3
+
+  7: (E + C + T)
+    E -> 5
+    C -> 5
+    T -> 5
+

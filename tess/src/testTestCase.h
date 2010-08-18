@@ -17,34 +17,12 @@
  along with Safira.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef HELPERS_H_
-#define HELPERS_H_
+#ifndef TESTTESTCASE_H_
+#define TESTTESTCASE_H_
 
-#include <vector>
-#include <string>
-#include <list>
-#include <set>
-#include <map>
-#include <vector>
-#include "Node.h"
-#include "TestCase.h"
-//#include "types.h"
-//#include "Formula.h"
+//#include "TestCase.h"
+
+void testTestCaseClass();
 
 
-using namespace std;
-
-void addLabel(string label, char io);
-
-string intToString(int i);
-string dnfToString(list< set<int> >);
-list< set<int> > putIdIntoList(int id);
-void initGlobalVariables();
-list< set<int> > minimizeDnf(list< set<int> > originalDnf);
-string setToString(set<int> myset);
-void printAllPartialTestCases(map<Node*, vector<TestCase*> >* allPartialTestCases, ostream& o);
-void printTestCases(vector<TestCase*> testCases, ostream& o);
-
-bool finalInDnf(const list<set<int> > assignments);
-
-#endif
+#endif /* TESTTESTCASE_H_ */

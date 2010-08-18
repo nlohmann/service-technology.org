@@ -1,0 +1,23 @@
+digraph D {
+graph [fontname="Helvetica", label="tests/testfiles/small_TestOG"];
+node [fontname="Helvetica" fontsize=10];
+edge [fontname="Helvetica" fontsize=10];
+  q_3 [label="" height="0.01" width="0.01" style="invis"];
+  q_3 -> 3 [minlen="0.5"];
+  3 [label="3\n ((C * T) + tau)"]
+  3 -> 6 [label=" tau"]
+  3 -> 5 [label="!C"]
+  3 -> 5 [label="!T"]
+  5 [label="5\n (final + tau)"]
+  5 -> 7 [label=" tau"]
+  6 [label="6\n (tau + E + C + T)"]
+  6 -> 5 [label=" tau"]
+  6 -> 3 [label="!E"]
+  6 -> 5 [label="!E"]
+  6 -> 3 [label="!C"]
+  6 -> 3 [label="!T"]
+  7 [label="7\n (E + C + T)"]
+  7 -> 5 [label="!E"]
+  7 -> 5 [label="!C"]
+  7 -> 5 [label="!T"]
+}

@@ -1,5 +1,5 @@
 digraph D {
-graph [fontname="Helvetica", label="title"];
+graph [fontname="Helvetica", label="myCoffee_TestOG"];
 node [fontname="Helvetica" fontsize=10];
 edge [fontname="Helvetica" fontsize=10];
   q_0 [label="" height="0.01" width="0.01" style="invis"];

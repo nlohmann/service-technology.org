@@ -76,7 +76,6 @@ bool initialNodesDecl = false;
 %type <value> NUMBER
 %type <str>   IDENT
 %type <f>     formula
-%type <f>     gformula
 %type <f>	  annotation
 
 
@@ -92,7 +91,6 @@ og:
   input
   output
   initialnodes 
-  globalformula 
   KEY_NODES nodes
 ;
  
@@ -110,10 +108,6 @@ initialnodes:
   /* empty */ {initialNodesDecl = false;}
 | KEY_INITIALNODES initialnodelist SEMICOLON {initialNodesDecl = true;}
 ;  
-
-globalformula:
-   /*empty*/  {graph->globalFormula = new FormulaTrue();}
-| KEY_GLOBALFORMULA gformula SEMICOLON {graph->globalFormula = $2; }
 
 initialnodelist:
   NUMBER {graph->addInitialNode($1);}
@@ -166,24 +160,6 @@ node:
 
 
 annotation: COLON formula {$$=$2;}
-;
-
-
-gformula:
-  LPAR gformula RPAR
-  	{ $$ = $2; }
-| gformula OP_AND gformula
-	{ $$ = new FormulaAND($1, $3); }
-| gformula OP_OR gformula
-	{ $$ = new FormulaOR($1, $3); }
-| KEY_FINAL
-	{ $$ = new FormulaFinal(); }
-| KEY_TRUE
-	{ $$ = new FormulaTrue();}
-| NUMBER
-	{ $$ = new FormulaNUM($1);
-	
-	}
 ;
 
 

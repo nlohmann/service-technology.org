@@ -25,23 +25,22 @@
 #include <map>
 #include <set>
 #include <algorithm>
+#include <time.h>
+#include "cmdline.h"
+#include "config-log.h"
+#include "verbose.h"
+#include "Output.h"
+#include "helpers.h"
+#include "Formula.h"
 #include "Node.h"
 #include "Graph.h"
-#include "helpers.h"
-#include "cmdline.h"
-#include "verbose.h"
-#include "config-log.h"
-#include "time.h"
-#include "Output.h"
-#include "Node.h"
 
-#include "Formula.h"
+
+using namespace std;
 
 /// the command line parameters
 gengetopt_args_info args_info;
 string invocation;
-
-using namespace std;
 
 // lexer and parser
 extern int og_yyparse();
@@ -56,15 +55,15 @@ map<int, char> inout;
 
 void evaluateParameters(int argc, char** argv);
 void initGlobalVariables();
-void parseFile(int filenumber);
-void out(Graph * g, string filename, string title);
+void parseFile(int filenumber = 0);
 void printUsedMemory();
-
+void out(Graph * g, string filename);
 
 
 int main(int argc, char **argv) {
 
 	evaluateParameters(argc, argv);
+	//TODO: muss das hier stehen?
 	//Output::setTempfileTemplate(args_info.tmpfile_arg);
 	//Output::setKeepTempfiles(args_info.noClean_flag);
 
@@ -75,7 +74,7 @@ int main(int argc, char **argv) {
 
 	time_t parsingTime_start = time(NULL);
 
-	parseFile(0);
+	parseFile();
 
 	if(args_info.time_given){
 		time_t parsingTime_end = time(NULL);
@@ -85,15 +84,17 @@ int main(int argc, char **argv) {
 
 	g->generateTestCases();
 
-	out(g,"firstTest", "title");
+	string filename = args_info.inputs[0];
+	filename = filename.substr(0,filename.find_last_of(".og")-2);
+
+	out(g,filename);
 	//delete g;
 
 	//cmdline_parser_free(&args_info);
-    cout << "Erfolgreich\n";
+    cout << "successful\n";
 
     return EXIT_SUCCESS;
 }
-
 
 
 void parseFile(int filenumber){
@@ -114,7 +115,7 @@ void parseFile(int filenumber){
 }
 
 
-void out(Graph * g, string filename, string title){
+void out(Graph * g, string filename){
 	bool printToStdout = true;
 
 	for (unsigned int j = 0; j<args_info.output_given; ++j){
@@ -131,32 +132,50 @@ void out(Graph * g, string filename, string title){
 				exit(EXIT_FAILURE);
 			}
 
-			string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + filename + "." + args_info.output_orig[j];
+			//TODO: fopen oder popen
+			/*print the TestOG of the graph*/
+			string call = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + filename + "_TestOG" + "." + args_info.output_orig[j];
 			FILE *s = popen(call.c_str(), "w");
-			//FILE *s = fopen((filename+".dot").c_str(), "w");
-			assert(s);
-
-			g->toDot(s, title);
-			assert(!ferror(s));
-
+			g->toDot(s, filename + "_TestOG");
 			pclose(s);
+
+			/*print the test cases of the graph*/
+			string call_tc = string(CONFIG_DOT) + " -T" + args_info.output_orig[j] + " -q -o " + filename + "_TestCases" + "." + args_info.output_orig[j];
+			FILE *out = popen(call_tc.c_str(), "w");
+			g->testCasesToDot(out, filename + "_TestCases");
+			pclose(out);
+
 			break;
 		}
 		case (output_arg_dot): {
 			printToStdout = false;
-			FILE *s = fopen((filename+".dot").c_str(), "w");
-			stringstream o;
 
-			g->toDot(s, title);
+			//TODO: fopen oder popen
+			/*print the TestOG of the graph*/
+			FILE *s = fopen((filename + "_TestOG" + ".dot").c_str(), "w");
+			g->toDot(s, filename + "_TestOG");
 			assert(!ferror(s));
 			fclose(s);
+
+			/*print the test cases of the graph*/
+			FILE *s_tc = fopen((filename + "_TestCases" + ".dot").c_str(), "w");
+			g->testCasesToDot(s_tc, filename + "_TestCases");
+			fclose(s_tc);
+
 			break;
 		}
 
 		case (output_arg_eaa): {
 			printToStdout = false;
-			Output o(filename+".eaa", "");
+
+			/*print the TestOG of the graph*/
+			Output o(filename + "_TestOG" +".eaa", "");
 			g->toEaa(o);
+
+			/*print the test cases of the graph*/
+			Output o_tc(filename + "_TestCases" + ".eaa", "");
+			g->toEaa_TestCases(o_tc);
+
 			break;
 		}
 		case (output_arg_none): {
@@ -169,6 +188,7 @@ void out(Graph * g, string filename, string title){
 	if(printToStdout){
 		Output o("-", "");
 		g->toEaa(o);
+		g->toEaa_TestCases(o);
 	}
 }
 

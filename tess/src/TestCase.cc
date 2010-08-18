@@ -35,6 +35,8 @@ using std::map;
 using std::string;
 using std::vector;
 
+int TestCase::maxId = 0;
+
 extern map<string, int> label2id;
 extern map<int, string> id2label;
 extern map<int, char> inout;
@@ -48,61 +50,68 @@ using namespace std;
 
 
 ///constructor
-TestCase::TestCase() {
+TestCase::TestCase(int rootId) {
+	id = maxId++;
+	isFullTestCase = false;
 
+	root = new TNode(rootId);
+	nodes[root->idTestOg] = root;
 }
 
 ///destructor
 TestCase::~TestCase(){
 
-	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
-		delete n->second;
+	if (isFullTestCase){
+		for (map<int, TNode*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
+			delete n->second;
+		}
 	}
+}
+
+int TestCase::getId(){
+	return id;
+}
+
+///id: id of the correspondig node in the OG
+///label: label to the old root node
+void TestCase::addNewRoot(int idOg, int label){
+
+	//assert(nodes.find(root->idTestOg) != nodes.end());
+
+	TNode* newRoot = new TNode(idOg);
+	newRoot->addEdge(label, root);
+	nodes[newRoot->idTestOg] = newRoot;
+	root = newRoot;
+}
+
+void TestCase::appendPartialTestCase(int label, TestCase* partialTestCase){
+	root->addEdge(label, partialTestCase->root);
+	nodes.insert(partialTestCase->nodes.begin(), partialTestCase->nodes.end());
 }
 
 
 
+void TestCase::printNodes(ostream& o) const{
+	o << "TEST CASE " << id << endl;
+	//o << "-----------------" << endl;
 
-//void TestCase::printInitialNodes(ostream& o) const{
-//	o << "\nINITIALNODES ";
-//	for (list<int>::const_iterator n = initialNodes.begin(); n!= initialNodes.end(); ++n){
-//		if (n == initialNodes.begin()){
-//			o << " " << *n;
-//		}
-//		else {
-//			o << ", " << *n;
-//		}
-//	}
-//}
+    //print all nodes
+	for (map<int, TNode*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n){
 
+		assert (n->first == n->second->idTestOg);
+		o << "  " << n->first << ": " << n->second->idOg << endl;
 
-//void TestCase::printNodes(ostream& o) const{
-//	o << "\nNODES\n";
-//
-//    //print all nodes
-//	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n){
-//		o << "  " << n->first << ": " << n->second->formula->toString() << endl;
-//		for (unsigned int i = firstLabelId; i < id2label.size(); ++i){
-//			for (set<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
-//				assert(id2label.find(i) != id2label.end());
-//				o << "    " << id2label[i] << " -> " << (*s)->id << endl;
-//			}
-//		}
-//		o << endl;
-//	}
-//
-//    //print all shadow nodes
-//	for (map<int, Node*>::const_iterator n = shadowNodes.begin(); n != shadowNodes.end(); ++n){
-//		o << "  " << n->first << ": " << n->second->formula->toString() << endl;
-//		for (unsigned int i = firstLabelId; i < id2label.size(); ++i){
-//			for (set<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
-//				assert(id2label.find(i) != id2label.end());
-//				o << "    " << id2label[i] << " -> " << (*s)->id << endl;
-//			}
-//		}
-//		o << endl;
-//	}
-//}
+		for (unsigned int i = firstLabelId; i < id2label.size(); ++i){
+			for (set<TNode*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
+				assert(id2label.find(i) != id2label.end());
+				o << "    " << id2label[i] << " -> " << (*s)->idTestOg << endl;
+			}
+		}
+	}
+
+	o << "====================" << endl;
+
+}
 
 
 /// prints the graph
@@ -118,55 +127,55 @@ TestCase::~TestCase(){
 //! \brief creates a dot output of the graph
 //! \param out: output file
 //! \param title: a string containing the title for the graph to be shown in the image (optional)
-//void TestCase::toDot(FILE* out, string title) const {
-//
-//	toDot_Header(out, title);
-//	toDot_Nodes(out);
-//	fprintf(out, "}\n");
-//}
+void TestCase::toDot(FILE* out, string title) const {
+
+	toDot_Header(out, title);
+	toDot_Nodes(out);
+	fprintf(out, "}\n");
+}
 
 //! \brief creates the header for the dot output
 //! \param out: output file
 //! \param title: a string containing the title for the graph to be shown in the image (optional)
-//void TestCase::toDot_Header(FILE* out, string title) const {
-//
-//	fprintf(out, "digraph D {\n");
-//	fprintf(out, "graph [fontname=\"Helvetica\", label=\"");
-//	fprintf(out, "%s", title.c_str());
-//	fprintf(out, "\"];\n");
-//	fprintf(out, "node [fontname=\"Helvetica\" fontsize=10];\n");
-//	fprintf(out, "edge [fontname=\"Helvetica\" fontsize=10];\n");
-//
-//}
+void TestCase::toDot_Header(FILE* out, string title) const {
+
+	fprintf(out, "digraph D {\n");
+	fprintf(out, "graph [fontname=\"Helvetica\", label=\"");
+	fprintf(out, "%s", title.c_str());
+	fprintf(out, "\"];\n");
+	fprintf(out, "node [fontname=\"Helvetica\" fontsize=10];\n");
+	fprintf(out, "edge [fontname=\"Helvetica\" fontsize=10];\n");
+
+}
 
 //! \brief creates the nodes for the dot output
 //! \param out: output file
-//void TestCase::toDot_Nodes(FILE* out) const{
-//	for (list<int>::const_iterator n = initialNodes.begin(); n!= initialNodes.end(); ++n){
-//		// an arrow indicating the initial state
-//		fprintf(out, "  q_%d [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"];\n", *n);
-//		fprintf(out, "  q_%d -> %d [minlen=\"0.5\"];\n", *n, *n);
-//	}
+void TestCase::toDot_Nodes(FILE* out) const{
+
+	fprintf(out, "  q_%d [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"];\n", (root->idTestOg)+1000*id);
+	fprintf(out, "  q_%d -> %d [minlen=\"0.5\"];\n", (root->idTestOg)+1000*id, (root->idTestOg)+1000*id);
+
+	for (map<int, TNode*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
+		fprintf(out, "  %d [label=\"%d (%d)\"]\n", (n->second->idTestOg)+1000*id, (n->second->idOg), (n->second->idTestOg)+1000*id);
+
+		for (unsigned int i = firstLabelId; i < id2label.size(); ++i){
+			for (set<TNode*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
+				fprintf(out, "  %d -> %d [label=\"%c%s\"]\n", (n->second->idTestOg)+1000*id, ((*s)->idTestOg)+1000*id, inout[i] ,id2label[i].c_str());
+			}
+		}
+	}
+
+//	fprintf(out, "  q_%d [label=\"\" height=\"0.01\" width=\"0.01\" style=\"invis\"];\n", (root->id)+100*id);
+//	fprintf(out, "  q_%d -> %d [minlen=\"0.5\"];\n", (root->id)+100*id, (root->id)+100*id);
 //
-//	for (map<int, Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
-//		fprintf(out, "  %d [label=\"%d\\n %s\"]\n", n->second->id, n->second->id, n->second->formula->toString().c_str());
+//	for (map<int, TNode*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
+//		fprintf(out, "  %d [label=\"%d\"]\n", (n->second->id)+100*id, (n->second->id)+100*id);
 //
 //		for (unsigned int i = firstLabelId; i < id2label.size(); ++i){
-//			for (set<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
-//				//fprintf(out, "  %d -> %d [label=\"%s\"]\n", n->second->id, (*s)->id, id2label[i].c_str());
-//				fprintf(out, "  %d -> %d [label=\"%c%s\"]\n", n->second->id, (*s)->id, inout[i] ,id2label[i].c_str());
+//			for (set<TNode*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
+//				fprintf(out, "  %d -> %d [label=\"%c%s\"]\n", (n->second->id)+100*id, ((*s)->id)+100*id, inout[i] ,id2label[i].c_str());
 //			}
 //		}
 //	}
-//
-//	for (map<int, Node*>::const_iterator n = shadowNodes.begin(); n != shadowNodes.end(); ++n) {
-//		fprintf(out, "  %d [label=\"%d\\n %s\"]\n", n->second->id, n->second->id, n->second->formula->toString().c_str());
-//
-//		for (unsigned int i = firstLabelId; i < id2label.size(); ++i){
-//			for (set<Node*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
-//				//fprintf(out, "  %d -> %d [label=\"%s\"]\n", n->second->id, (*s)->id, id2label[i].c_str());
-//				fprintf(out, "  %d -> %d [label=\"%c%s\"]\n", n->second->id, (*s)->id, inout[i] ,id2label[i].c_str());
-//			}
-//		}
-//	}
-//}
+
+}

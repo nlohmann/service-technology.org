@@ -25,7 +25,7 @@
 #include <cstdlib>
 
 // for testing purposes only
-#define SYMMPROD
+//#define SYMMPROD
 
 #define NodeType int
 #define PL 0  /* place */
@@ -33,6 +33,8 @@
 #define DomType int
 #define DO 0 /* domain */
 #define CO 1 /* codomain */
+
+void PrintStore();
 
 using std::ofstream;
 
@@ -204,6 +206,7 @@ void init_syms() {
                                                               = Specification[TR][0].parent = 0;
     Specification[PL][0].last = Places[0]-> cnt - 1;
     Specification[TR][0].last = Transitions[0]-> cnt - 1;
+   CardSpecification[PL] = CardSpecification[TR] = 1;
 
     // Anlegen der Zaehlarrays
     Reaktor[PL][DO] = new Reaktoreintrag [Places[0]->cnt];
@@ -793,26 +796,27 @@ bool Split(NodeType n, unsigned int c) {
 }
 
 // Testausgabe der Spec
-void PrintSpec() {
+void PrintSpec(char * mess) {
     unsigned int n, c, i;
 
+	cout << "***** " << mess << " *****" << endl;
     for (n = 0; n < 2; n++) {
-        cout << (n ? "Transitions\n" : "Places\n") << Stamp;
+        cout << (n ? "Transitions\n" : "Places\n");
         for (c = 0; c < CardSpecification[n]; c++) {
             cout << c << "(" << Specification[n][c].first << "-" << Specification[n][c].last << ": {";
             for (i = Specification[n][c].first; i <= Specification[n][c].last; i++) {
                 cout << Reaktor[n][DO][i].node->name;
-                cout << "%";
-                cout << Reaktor[n][DO][i].count ;
-                cout << "&" << Reaktor[n][DO][i].stamp ;
+                //cout << "%";
+                //cout << Reaktor[n][DO][i].count ;
+                //cout << "&" << Reaktor[n][DO][i].stamp ;
                 cout << "," ;
             }
             cout << "} --> {";
             for (i = Specification[n][c].first; i <= Specification[n][c].last; i++) {
                 cout << Reaktor[n][CO][i].node->name;
-                cout << "/";
-                cout << Reaktor[n][CO][i].count;
-                cout << "&" << Reaktor[n][CO][i].stamp;
+                //cout << "/";
+                //cout << Reaktor[n][CO][i].count;
+                //cout << "&" << Reaktor[n][CO][i].stamp;
                 cout << "," ;
             }
             cout << "}\n";
@@ -1138,7 +1142,7 @@ void DefineToOther(unsigned int imagepos) {
     }
     possibleImages[i-Specification[PL][cntriv].first] = NULL;
 
-    // Spalte [{x},{y}] fuer ertes y
+    // Spalte [{x},{y}] fuer erstes y
     Specification[PL][CardSpecification[PL]].first = Specification[PL][CardSpecification[PL]].last
                                                      = Specification[PL][cntriv].first;
     Specification[PL][CardSpecification[PL]].parent = cntriv;
@@ -1178,7 +1182,7 @@ void DefineToOther(unsigned int imagepos) {
             swap = Reaktor[PL][CO][i];
             Reaktor[PL][CO][i] = Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first];
             Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first] = swap;
-            Specification[PL][CardSpecification[PL] - 1].changed = new ToDo(PL, CardSpecification[PL]);
+            Specification[PL][CardSpecification[PL] - 1].changed = new ToDo(PL, CardSpecification[PL]-1);
             Specification[PL][cntriv].changed = new ToDo(PL, cntriv);
 
         }
@@ -1465,8 +1469,10 @@ void BuildProducts(unsigned int orbit) {
 
 void DefineToId(void) {
 
-    unsigned int cntriv, nrmin, intriv, c, i, j, MyCardSpecification[2], oldstorenr;
-    // unused: unsigned int k;
+    unsigned int cntriv, // ein nichttriviales Constraint
+nrmin, // Nr des kleinsten Knotens eines nichttrivialen Constraints
+intriv, // dessen Pos im Reaktor
+c, i, j,k, MyCardSpecification[2], oldstorenr;
     // unused: unsigned int MyStorePosition;
     // unused: unsigned int val;
     // unused: unsigned int composed;
@@ -1479,10 +1485,11 @@ void DefineToId(void) {
 
 	// suche dasjenige mehrelementige Constraint, das den kleinsten
 	// Knoten enthält
-    cntriv = CardSpecification[PL] - 1;
-    nrmin = UINT_MAX;
+    nrmin = UINT_MAX; // groesser als jeder korrekte Wert
     for (c = 0; c < CardSpecification[PL]; c++) {
-        if (Specification[PL][c].first != Specification[PL][c].last) {
+        if (Specification[PL][c].first != Specification[PL][c].last) 
+	{
+		// bin in mehrelementigem Constraint
             for (i = Specification[PL][c].first; i <= Specification[PL][c].last; i++) {
                 if (Reaktor[PL][DO][i].node->nr < nrmin) {
                     nrmin = Reaktor[PL][DO][i].node->nr;
@@ -1493,12 +1500,30 @@ void DefineToId(void) {
         }
     }
 	// bereite Symmetriespeicher auf die neuen Elemente vor
+     // Speichere potentielle Images in Store
     CardStore++;
-    Store[CardStore-1].image = new SymmImage [Specification[PL][cntriv].last - Specification[PL][cntriv].first + 1];
     oldstorenr = CurrentStore;
     CurrentStore = CardStore - 1;
+    Store[CurrentStore].arg = Reaktor[PL][DO][intriv].node;
+    Store[CurrentStore].argnr = nrmin;
+    Store[CardStore-1].image = new SymmImage [Specification[PL][cntriv].last - Specification[PL][cntriv].first + 1];
     Store[CurrentStore].length = Specification[PL][cntriv].last - Specification[PL][cntriv].first;
-    for (dir = DO; dir < 2; dir++) {
+    for (j = 0, k = 0;j <= Store[CurrentStore].length; j++,k++) {
+	if(j+Specification[PL][cntriv].first == intriv)
+	{
+		// skip arg as image
+		k--;
+	}
+	else
+	{
+        Store[CurrentStore].image[k].vector = NULL;
+        Store[CurrentStore].image[k].value = Reaktor[PL][CO][j + Specification[PL][cntriv].first].node;
+	}
+
+    }
+
+// separiere Knoten nrmin innerhalb Constraint cntriv
+    for (dir = 0; dir < 2; dir++) {
         Reaktor[PL][dir][Specification[PL][cntriv].first].node->pos[dir] = intriv;
         Reaktor[PL][dir][intriv].node->pos[dir] = Specification[PL][cntriv].first;
         swap = Reaktor[PL][dir][Specification[PL][cntriv].first];
@@ -1510,20 +1535,14 @@ void DefineToId(void) {
     Specification[PL][CardSpecification[PL]].changed = new ToDo(PL, CardSpecification[PL]);
     Specification[PL][CardSpecification[PL]].parent = cntriv;
     CardSpecification[PL]++;
-    reportprogress();
-#ifdef DISTRIBUTE
-    progress();
-#endif
-    Store[CurrentStore].arg = Reaktor[PL][DO][Specification[PL][cntriv].first].node;
-    Store[CurrentStore].argnr = Reaktor[PL][DO][Specification[PL][cntriv].first].node->nr;
     (Specification[PL][cntriv].first)++;
     Specification[PL][cntriv].changed = new ToDo(PL, cntriv);
     MyCardSpecification[PL] = CardSpecification[PL];
     MyCardSpecification[TR] = CardSpecification[TR];
-    for (j = 0; j < Store[CurrentStore].length; j++) {
-        Store[CurrentStore].image[j].vector = NULL;
-        Store[CurrentStore].image[j].value = Reaktor[PL][CO][j + Specification[PL][cntriv].first].node;
-    }
+    reportprogress();
+#ifdef DISTRIBUTE
+    progress();
+#endif
 //    MyStorePosition = CurrentStore; // always the same!!
     if (!RefineUntilNothingChanges(PL)) {
         cout << " magic error\n";
@@ -1544,7 +1563,7 @@ void DefineToId(void) {
         if (!(sigma->vector)) // try to find a new representative if the orbit is empty so far
 #endif
 		{
-            for (i = Specification[PL][cntriv].first; Reaktor[PL][CO][i].node != sigma -> value; i++);
+	    i = sigma->value->pos[CO];
             Reaktor[PL][CO][i].node->pos[CO] = Specification[PL][CardSpecification[PL] - 1].first;
             Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first].node ->pos[CO] = i;
             swap = Reaktor[PL][CO][i];
@@ -1653,6 +1672,7 @@ void ComputeSymmetries(void) {
     cout << "\n" << CardGenerators << " generators in " << CardStore << " groups for " << CardSymm << " symmetries found.\n";
     cout << DeadBranches << " dead branches entered during calculation.\n";
 
+#if SYMMINTEGRATION == 2
     // Reaktoren auf Markierungsabb.suche vorbereiten, indem Aeq.klassen
     // zu Constraints werden. Countsort wird misbraucht.
     NewStamp();
@@ -1670,6 +1690,7 @@ void ComputeSymmetries(void) {
     if (ToDoList[PL]) {
         RefineUntilNothingChanges(PL);
     }
+#endif
     // Hashfaktoren eintragen: aeq. Plaetze bekommen gleichen Hashwert,
     // damit nur in einem Bucker gesucht werden muss
 #if SYMMINTEGRATION < 3
@@ -2246,3 +2267,12 @@ State* canonical_representitive_on_the_fly() {
     return binSearch();
 }
 
+void PrintStore()
+{
+	int etage, raum;
+
+	for(etage=0;etage<CardStore;etage++)
+	{
+		cout << "Etage " << etage << "; arg=" << Store[etage].arg->name << " card=" << Store[etage].card << endl;
+	}
+}

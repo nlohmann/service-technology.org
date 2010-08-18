@@ -420,7 +420,7 @@ void createUserconfigFile(char* suffix) {
     fprintf(userconfig, "#define SYMMETRY\n");
 #ifdef SYMMINTEGRATION
     fprintf(userconfig, "#define SYMMINTEGRATION %u\n", SYMMINTEGRATION);
-#ifdef define(MAXATTEMPT) && SYMMINTEGRATION == 4
+#if defined(MAXATTEMPT) && SYMMINTEGRATION == 4
     fprintf(userconfig, "#define MAXATTEMPT %u\n", MAXATTEMPT);
 #endif
 #endif

@@ -1645,6 +1645,8 @@ transition: key_transition tname transitionvariables guard key_consume arclist s
     {
 	  /* Bogen ist nur HL-Bogen */
 	  if(current -> place -> sort) continue;
+	  /* Vielfachheit 0 */
+	  if(current -> nu == 0) continue;
       /* gibt es Bogen schon? */
 
       for(i = 0; i < T->NrOfArriving;i++)
@@ -1709,6 +1711,8 @@ transition: key_transition tname transitionvariables guard key_consume arclist s
     {
 	  /* Bogen ist nur HL-Bogen */
 	  if(current -> place -> sort) continue;
+	  /* Vielfachheit 0 */
+	  if(current -> nu == 0) continue;
       /* gibt es Bogen schon? */
 
       for(i = 0; i < T->NrOfLeaving;i++)

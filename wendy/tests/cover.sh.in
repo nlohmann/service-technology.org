@@ -17,9 +17,6 @@
 # evaluate COVER variable
 case $COVER in
   "LCOV")
-    # LCOV should always be quiet
-    LCOV="@abs_builddir@/lcov/lcov --quiet"
-
     # derive test name from current directory (assuming GNU Autotest); the
     # info filename is suffixed with a random number to allow for multiple
     # invokations of this script for the same test
@@ -28,17 +25,17 @@ case $COVER in
     INFOFILE=@abs_builddir@/cover/$TESTNAME-$RANDOM.info
 
     # reset counters for LCOV
-    $LCOV --zerocounters -directory @abs_top_builddir@
+    @LCOV@ --quiet --zerocounters -directory @abs_top_builddir@
 
     # execute executable and remember exit code
     $*
     result=$?
 
     # evaluate coverage result of LCOV
-    $LCOV --capture --directory @abs_top_builddir@ --output-file $INFOFILE --test-name $TESTNAME >/dev/null 2>&1
+    @LCOV@ --quiet --capture --directory @abs_top_builddir@ --output-file $INFOFILE --derive-func-data -test-name $TESTNAME >/dev/null 2>&1
 
     # remove profile information on C++ sources and headers
-    $LCOV --extract $INFOFILE "@abs_top_builddir@/*" -o $INFOFILE
+    @LCOV@ --quiet --extract $INFOFILE "@abs_top_builddir@/*" -o $INFOFILE
 
     # exit with executable's exit code
     exit $result  

@@ -28,12 +28,9 @@ $(TESTSUITE): $(srcdir)/testsuite.at package.m4
 # test coverage #
 #---------------#
 
-# distribute the LGOV scripts
-EXTRA_DIST += lcov/README lcov/gendesc lcov/genhtml lcov/geninfo lcov/genpng \
-              lcov/lcov
-
 # compile the code for code coverage
 cover-prepare:
+	$(LCOV) -v >/dev/null
 	$(MAKE) --directory=$(top_srcdir) clean all \
 	  CXXFLAGS+="-fprofile-arcs -ftest-coverage" \
 	  CFLAGS+="-fprofile-arcs -ftest-coverage" \
@@ -45,7 +42,7 @@ descriptions: $(TESTSUITE)
 	$(SED) -i '1,5d;n;d;' descriptions.txt
 	$(SED) -i 's/:[ \t]*testsuite.at:[0-9]*[ \t]*/ /;s/^[ \t]*//' descriptions.txt
 	$(SED) -i 's/ /\n\t/' descriptions.txt
-	lcov/gendesc descriptions.txt -o descriptions1
+	$(LCOV_GENDESC) descriptions.txt -o descriptions1
 	cp descriptions1 descriptions10
 	cp descriptions1 descriptions100
 	$(SED) -i 's/^TN: \([1-9]\)$$/TN: 0\1/' descriptions10
@@ -60,42 +57,22 @@ cover-check: cover-prepare $(TESTSUITE)
 	$(MKDIR_P) cover
 	-$(SHELL) '$(TESTSUITE)' $(TESTSUITEFLAGS) COVER=LCOV
 
-# exclude generated code using the wildcards specified in NO_COVER_FILES
-cover.info:
-	cat cover/*.info > cover.info
-	lcov/lcov --remove cover.info $(addprefix ",$(addsuffix ", $(NO_COVER_FILES))) -o cover.info
-
 # create a HTML table with results from LCOV
-cover-html: descriptions cover.info
-	lcov/genhtml cover.info \
+cover-html: descriptions
+	find cover -size 0 -exec rm {} \;
+	for FILE in `ls cover/*.info`; do $(LCOV) --quiet --remove $$FILE $(addprefix ",$(addsuffix ", $(NO_COVER_FILES))) > $$FILE.filtered; done
+	$(LCOV_GENHTML) cover/*.info.filtered \
 	   --output-directory cover-html --title "$(PACKAGE_STRING)" \
 	   --show-details --legend --description-file descriptions --sort \
-	   --no-function-coverage --prefix $(abs_top_builddir)
+	   --demangle-cpp --prefix $(abs_top_builddir)
 	@echo see `pwd`/cover-html/index.html for a coverage report
 
 cover: cover-check cover-html
 
 # clean also the temp files in the src directory
 CLEANFILES = -fr cover descriptions 
-MAINTAINERCLEANFILES = -fr cover-html cover.info
+MAINTAINERCLEANFILES = -fr cover-html
 maintainer-clean-local:
 	find $(top_builddir) -name *.gcov -exec rm {} \;
 	find $(top_builddir) -name *.gcno -exec rm {} \;
 	find $(top_builddir) -name *.gcda -exec rm {} \;
-
-
-#------------#
-# benchmarks #
-#------------#
-
-EXTRA_DIST += benchmarks.at
-
-# create the benchmark script using autom4te
-benchmarks: $(srcdir)/benchmarks.at
-	$(AUTOM4TE) --language=autotest -I '$(srcdir)' -o $@.tmp $@.at
-	mv $@.tmp $@
-
-bench: atconfig benchmarks
-	test ! -d benchmarks-results || rm -fr benchmarks-results
-	$(MKDIR_P) benchmarks-results
-	$(SHELL) 'benchmarks' $(TESTSUITEFLAGS)

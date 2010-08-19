@@ -126,8 +126,8 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sources called 'cmdline.c'.
-NO_COVER_FILES = */readnet-lexic.cc */readnet-syntax.cc */cmdline.*
-NO_COVER_FILES = */cmdline.c */parser-*.cc
+# NO_COVER_FILES = */readnet-lexic.cc */readnet-syntax.cc */cmdline.*
+NO_COVER_FILES = */cmdline.* */*-cmdline.* */parser-*.cc */parser-*.h */FlexLexer.h
 
 
 #--------------------------------------------------------#

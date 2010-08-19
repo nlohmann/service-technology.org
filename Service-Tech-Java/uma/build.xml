@@ -193,10 +193,8 @@
 		</ant>
 		
 		<!-- clean up -->
-		<!--
 		<delete dir="${dir.distcheckdir}" failonerror="false" includeemptydirs="true"/>
 		<delete dir="${dir.distdir}" failonerror="false" includeemptydirs="true"/>
-		-->
 	</target>
 	
 	<!-- clean all files that have been generated -->

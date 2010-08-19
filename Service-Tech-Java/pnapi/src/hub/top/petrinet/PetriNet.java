@@ -256,6 +256,32 @@ public class PetriNet {
   }
   
   /**
+   * Makes each name in the net unique by appending an index number to 
+   * a node's name
+   */
+  public void turnIntoUnlabeledNet () {
+    HashMap<String, Integer> nameMap = new HashMap<String, Integer>();
+    
+    for (Place p : getPlaces()) {
+      String oldName = p.getName();
+      
+      if (!nameMap.containsKey(oldName)) nameMap.put(oldName, 0);
+      
+      p.setName(oldName+"_"+nameMap.get(oldName));
+      nameMap.put(oldName, nameMap.get(oldName)+1);
+    }
+    
+    for (Transition t : getTransitions()) {
+      String oldName = t.getName();
+      
+      if (!nameMap.containsKey(oldName)) nameMap.put(oldName, 0);
+      
+      t.setName(oldName+"_"+nameMap.get(oldName));
+      nameMap.put(oldName, nameMap.get(oldName)+1);
+    }
+  }
+  
+  /**
    * replace all names of places and transitions with identifiers pNUM and tNUM, respectively
    */
   public void anonymizeNet() {
@@ -373,6 +399,20 @@ public class PetriNet {
         for (String role : t.getRoles()) p.addRole(role);
       for (Transition t : p.getPostSet())
         for (String role : t.getRoles()) p.addRole(role);
+    }
+  }
+  
+  /**
+   * Let each place of the net acquire the roles of its
+   * pre- and post-transitions.
+   */
+  public void spreadRolesToTransitions_union() {
+    
+    for (Transition t : transitions) {
+      for (Place p : t.getPreSet())
+        for (String role : p.getRoles()) t.addRole(role);
+      for (Place p : t.getPostSet())
+        for (String role : p.getRoles()) t.addRole(role);
     }
   }
   
@@ -530,6 +570,19 @@ public class PetriNet {
   }
   
   /**
+   * Check whether transitions t1 and t2 are parallel. Two transitions are
+   * parallel if their pre- and post-sets are identical.
+   * 
+   * @param t1
+   * @param t2
+   * @return
+   *    true iff transitions t1 and t2 are parallel
+   */
+  public boolean parallelTransitions(Transition t1, Transition t2) {
+    return parallelTransitions(t1, t2, null);
+  }
+  
+  /**
    * @param t1
    * @param t2
    * @return
@@ -556,18 +609,6 @@ public class PetriNet {
     return false;
   }
   
-  /**
-   * Check whether transitions t1 and t2 are parallel. Two transitions are
-   * parallel if their pre- and post-sets are identical.
-   * 
-   * @param t1
-   * @param t2
-   * @return
-   *    true iff transitions t1 and t2 are parallel
-   */
-  public boolean parallelTransitions(Transition t1, Transition t2) {
-    return parallelTransitions(t1, t2, null);
-  }
   
   public void removeParallelTransitions() {
     Transition[] trans = getTransitions().toArray(new Transition[getTransitions().size()]);

@@ -1,25 +1,19 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-basename="${1##*/}"       # strip trailing path
-dirname="${basename%.*}"  # strip extension
+#============================================================================#
+# AUTOTEST WRAPPER SCRIPT FOR EXTERNAL TOOLS                                 #
+# written by Niels Lohmann <niels.lohmann@uni-rostock.de>                    #
+#============================================================================#
 
-oldumask=`umask`
+# This script is used to call executables in optional tests of the testsuite.
+# In case the executable is not found, the test is skipped. This is realized
+# by exiting with code 77 which is interpreted by Autotest, see
+# http://www.gnu.org/software/autoconf/manual/autoconf.html#Writing-Testsuites.
+# If the executable is found, it is executed with all given parameters and its
+# exit code is passed to the caller of this script.
 
-umask 022
 
-#echo -n "TEST: $basename"
-
-# copy the files for the test to the temp dir
-mkdir -p $testdir/$dirname
-cp $testroot/$dirname.*.* $testdir/$dirname 2>/dev/null
-
-# change to the temp dir and execute script
-cd $testdir/$dirname
-$testroot/$1
-result=$?
-
-umask $oldumask
-
-#echo ""
-
-exit $result
+if test -f $1
+  then eval $*
+  else exit 77
+fi

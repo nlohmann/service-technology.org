@@ -14,15 +14,6 @@ AC_CONFIG_SRCDIR(src/petrinet.cc)
 AC_CONFIG_HEADERS(src/config.h)
 AC_CONFIG_AUX_DIR([build-aux])
 
-AM_INIT_AUTOMAKE(gnits)
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
-
-# check for standard programs needed to compile
-AC_PROG_CXX
-AM_PROG_CC_C_O
-AC_PROG_LEX
-AC_PROG_YACC
-
 # using YACC doesn't work, need to call bison this way
 AC_PATH_PROG(BISON, [bison], not found)
 

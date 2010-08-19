@@ -13,8 +13,8 @@ m4_define([AT_CHECK_CUSTOMER],    [@abs_builddir@/check_customer.sh])
 
 # wrap tools called by the testscript
 m4_define([GREP],                 [@GREP@])
-m4_define([FIONA],                [wrap-tool.sh @FIONA@])
-m4_define([VALGRIND],             [wrap-tool.sh @VALGRIND@ --leak-check=full --show-reachable=yes])
+m4_define([FIONA],                [wrap.sh @FIONA@])
+m4_define([VALGRIND],             [wrap.sh @VALGRIND@ --leak-check=full --show-reachable=yes])
 
 # pass tool paths to tests below
 m4_define([DOT],                  [@DOT@])

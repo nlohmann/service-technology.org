@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="tests/src-test"/>
+	<classpathentry kind="lib" path="/hub.top.pnapi/libs-external/antlr-runtime-3.2.jar" sourcepath="/hub.top.pnapi/hub.top.pnapisrc.zip"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/hub.top.pnapi"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

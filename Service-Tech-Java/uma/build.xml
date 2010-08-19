@@ -123,6 +123,7 @@
 		<!-- include the standard files of the distribution -->
 		<copy todir="${dir.distdir}">
 			<fileset dir="${home}">
+				<include name="META-INF/MANIFEST.MF"/>
 				<include name="AUTHORS"/>
 				<include name="ChangeLog"/>
 				<include name="LICENSE"/>

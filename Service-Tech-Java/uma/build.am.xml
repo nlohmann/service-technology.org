@@ -4,9 +4,52 @@
 	     carried out before executing the project build task -->
 	
 	<target name="pre-build">
+		<antcall target="wget-PNAPI-src"></antcall>
 	</target>
 	
 	<target name="pre-svn-clean">
+		<!-- delete all files from the temp directory -->
+		<delete dir="${home}/${pnapi.tmpdir}/" includeemptydirs="true" failonerror="false"/>
+		<!-- delete the externally obtained PNAPI/Java -->
+		<delete failonerror="false">
+			<fileset dir="${home}/libs-external/">
+				<include name="pnapi-java.jar"/>
+				<include name="antlr-runtime-3.2.jar"/>
+			</fileset>
+		</delete>
+	</target>
+	
+	<target name="wget-PNAPI" description="Download the most recent stable build of PNAPI/Java and extract it to 'libs-external'">
+		<mkdir dir="${home}/${pnapi.tmpdir}/" />
+		<get
+			src="${pnapi.binurl}"
+			dest="${home}/${pnapi.tmpdir}/${pnapi.bin}.zip" 
+			usetimestamp="true"
+		/>
+		<mkdir dir="${home}/${pnapi.tmpdir}/${pnapi.bin}/" />
+		<unzip dest="${home}/${pnapi.tmpdir}/${pnapi.bin}/" src="./${pnapi.tmpdir}/${pnapi.bin}.zip" />
+		<move file="${home}/${pnapi.tmpdir}/${pnapi.bin}/libs/pnapi-java.jar" todir="${home}/libs-external/" overwrite="true" />
+		<move file="${home}/${pnapi.tmpdir}/${pnapi.bin}/libs-external/antlr-runtime-3.2.jar" todir="${home}/libs-external/" overwrite="true" />
+		<delete dir="${home}/${pnapi.tmpdir}/${pnapi.bin}/" failonerror="false" includeemptydirs="true"/>
+	</target>
+	
+	<target name="wget-PNAPI-src" description="Download the most recent stable build of PNAPI/Java and extract it to 'libs-external'">
+		<mkdir dir="${home}/${pnapi.tmpdir}/" />
+		<get
+			src="${pnapi.srcurl}"
+			dest="${home}/${pnapi.tmpdir}/${pnapi.src}.zip" 
+			usetimestamp="true"
+		/>
+		<mkdir dir="${home}/${pnapi.tmpdir}/${pnapi.src}/" />
+		<unzip dest="${home}/${pnapi.tmpdir}/${pnapi.src}/" src="./${pnapi.tmpdir}/${pnapi.src}.zip" />
+
+		<ant antfile="build.xml" target="jar" dir="${home}/${pnapi.tmpdir}/${pnapi.src}/" inheritall="false" inheritrefs="false"/>
+		
+		<move file="${home}/${pnapi.tmpdir}/${pnapi.src}/build/pnapi-java.jar" todir="${home}/libs-external/" overwrite="true" />
+		<move file="${home}/${pnapi.tmpdir}/${pnapi.src}/libs-external/antlr-runtime-3.2.jar" todir="${home}/libs-external/" overwrite="true" />
+		
+		<delete dir="${home}/${pnapi.tmpdir}/${pnapi.src}/" failonerror="false" includeemptydirs="true"/>
+
 	</target>
 	
 	<fileset dir="${home}" id="distfiles.includes">

@@ -1,4 +1,5 @@
 AT_INIT
+AT_COLOR_TESTS
 
 m4_define(AT_CHECK_DOT, [AT_CHECK([if test "DOT" == ""; then exit 77; fi])])
 

@@ -1,4 +1,5 @@
-AT_INIT
+AT_INIT([Benchmarks])
+AT_COLOR_TESTS
 
 ############################################################################
 AT_BANNER([Benchmark Set 1])

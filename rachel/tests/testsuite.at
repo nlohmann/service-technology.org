@@ -1,4 +1,5 @@
 AT_INIT
+AT_COLOR_TESTS
 
 # define a macro to skip a test if Dot was not found by configure
 m4_define(AT_CHECK_DOT, [AT_CHECK([if test "DOT" == "not found"; then exit 77; fi])])

@@ -1,4 +1,5 @@
-AT_INIT([standard tests])
+AT_INIT
+AT_COLOR_TESTS
 
 #AT_TESTED(versions.sh)
 

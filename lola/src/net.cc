@@ -646,14 +646,14 @@ int main(int argc, char** argv) {
             BitVectorSize += Places[j]->nrbits;
         }
 
-#ifdef WITHFORMULA
-        if (F) {
-            checkstart = new unsigned int[F->card+5];
-            for (i = 0; i < F->card; ++i) {
-                checkstart[i] = 0;
-            }
-        }
-#endif
+//#ifdef WITHFORMULA
+//        if (F) {
+//            checkstart = new unsigned int[F->card+5];
+//            for (i = 0; i < F->card; ++i) {
+//                checkstart[i] = 0;
+//            }
+//        }
+//#endif
 
 
         try {

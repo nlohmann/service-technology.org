@@ -416,15 +416,6 @@ void print_check_path(State* ini, formula* form, ofstream& out) {
 
 
 int modelcheck() {
-    if (!F) {
-        fprintf(stderr, "lola: specify formula in analysis task file\n");
-        fprintf(stderr, "      mandatory for task MODELCHECKING\n");
-        _exit(4);
-    }
-    checkstart = new unsigned int [ F -> card ];
-    for (unsigned int i = 0; i < F->card; i++) {
-        checkstart[i] = 0;
-    }
     currentdfsnum = 1;
     for (unsigned int i = 0; i < Transitions[0]->cnt; i++) {
 #ifdef EXTENDED
@@ -434,8 +425,13 @@ int modelcheck() {
         }
 #endif
         Transitions[i]->pathrestriction = new bool [F -> tempcard];
+    for(int j = 0; j < F->tempcard;j++)
+	Transitions[i]->pathrestriction[j] = false;
     }
     DeadStatePathRestriction = new bool [F -> tempcard];
+    for(int j = 0; j < F->tempcard;j++)
+	DeadStatePathRestriction[j] = true;
+	
 
 #ifdef WITHFORMULA
     for (unsigned int i = 0; i < Places[0]->cnt; i++) {
@@ -455,6 +451,11 @@ int modelcheck() {
     cout << "\nFormula with \n" << F -> card << " subformulas\nand " << F -> tempcard << " temporal operators.\n";
     initial = binInsert();
     F -> evaluateatomic(initial);
+    checkstart = new unsigned int [ F -> card ];
+    for (unsigned int i = 0; i < F->card; i++) {
+        checkstart[i] = 0;
+    }
+    F -> print();
     check(initial, F);
     cout << "\nresult: " << (initial -> value[F -> index] ? "true" : "false") << "\n";
     statistics(NrStates + 1, Edges, NonEmptyHash);
@@ -882,7 +883,7 @@ void searchEF(State* s, unarytemporalformula* f) {
                 if (NewState -> known[f->index]) {
                     if (NewState -> value[f->index]) {
                         // Value of new state known, true
-                        //Whitness for EF phi found!
+                        //Witness for EF phi found!
                         found = true;
                         CurrentState -> value[f->index] = CurrentState -> known[f->index] = true;
                         CurrentState -> witness[f->tempindex] = NewState;
@@ -2229,8 +2230,8 @@ void searchAF(State* s, unarytemporalformula* f) {
         CurrentState -> value[f->index] = false;
         CurrentState -> known[f->index] = true;
 
-        if (CurrentState -> checkfirelist[f->tempindex][CurrentState ->
-                                                        checkcurrent[f->tempindex]]) {
+	if(CurrentState->checkfirelist[f->tempindex][CurrentState->checkcurrent[f->tempindex]])
+	{
             // explore next state
             CurrentState -> checkfirelist[f->tempindex][CurrentState ->
                                                         checkcurrent[f->tempindex]] -> fire();
@@ -2238,11 +2239,11 @@ void searchAF(State* s, unarytemporalformula* f) {
             if (!(Edges % REPORTFREQUENCY))
                 cout << "st: " << NrStates << "    edg: " << Edges
                      << "\n";
-            if (NewState = binSearch()) {
-                // state exists
-                if (NewState -> known[f->index]) {
+            if (NewState = binSearch())
+	    {
+	     if (NewState -> known[f->index]) {
                     // state exists, value known
-                    if (!NewState -> value[f->index]) {
+                     if (!NewState -> value[f->index]) {
                         // state exists, value f --> counterex found!
                         // state either on stack or does not model A phi U psi
                         found = true;
@@ -2260,8 +2261,8 @@ void searchAF(State* s, unarytemporalformula* f) {
                         [CurrentState -> checkcurrent[f->tempindex]]
                         -> backfire();
                         CurrentState -> checkcurrent[f->tempindex]++;
-                    }
-                } else {
+ 			 }
+                }   else {
                     // state exists, value unknown
                     check(NewState, f->element);
                     if (NewState->value[f->element->index]) {
@@ -2322,6 +2323,23 @@ void searchAF(State* s, unarytemporalformula* f) {
         } else {
             // return to previous state
             CurrentState -> value[f->index] = true;
+	    CurrentState -> known[f->index] = true;
+    if (!(CurrentState -> checkfirelist[f->tempindex][0])) {
+        if (Transitions[0]->NrEnabled) {
+            // no tau-successors, but state not dead
+        }
+        // dead state: this state counts as successor state
+        if (DeadStatePathRestriction[f -> tempindex]) {
+            check(CurrentState, f -> element);
+            if (!(CurrentState->value[f->element->index])) {
+                CurrentState -> value[f->index] = false;
+                CurrentState -> witness[f->tempindex] = NULL;
+                CurrentState -> witnesstransition[f->tempindex] = NULL;
+		found = true;
+		break;
+            }
+        }
+    }
             if (NewState = CurrentState -> checkparent[f->tempindex]) {
                 NewState -> checkfirelist[f->tempindex]
                 [NewState -> checkcurrent[f->tempindex]]->backfire();
@@ -2462,6 +2480,23 @@ void searchEG(State* s, unarytemporalformula* f) {
         } else {
             // return to previous state
             CurrentState -> value[f->index] = false;
+            CurrentState -> known[f->index] = false;
+    if (!(CurrentState -> checkfirelist[f->tempindex][0])) {
+        if (Transitions[0]->NrEnabled) {
+            // no tau-successors, but state not dead
+        }
+        // dead state: this state counts as successor state
+        if (DeadStatePathRestriction[f -> tempindex]) {
+            check(CurrentState, f -> element);
+            if ((CurrentState->value[f->element->index])) {
+                CurrentState -> value[f->index] = true;
+                CurrentState -> witness[f->tempindex] = NULL;
+                CurrentState -> witnesstransition[f->tempindex] = NULL;
+		found = true;
+		break;
+            }
+        }
+    }
             if (NewState = CurrentState -> checkparent[f->tempindex]) {
                 NewState -> checkfirelist[f->tempindex]
                 [NewState -> checkcurrent[f->tempindex]]->backfire();

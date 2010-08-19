@@ -291,6 +291,20 @@ AT_CHECK([LOLA_BOUNDEDNET bug12922.lola],0,stdout)
 AT_KEYWORDS(bugs)
 AT_CLEANUP
 
+AT_SETUP([Bug 13988 (https://gna.org/bugs/?13988), AF])
+AT_CHECK([cp TESTFILES/bug13988.lola TESTFILES/bug13988-1.task .])
+AT_CHECK([LOLA_MODELCHECKING bug13988.lola -abug13988-1.task],1,stdout)
+AT_CHECK([GREP -q "result: false" stdout],0)
+AT_KEYWORDS(bugs)
+AT_CLEANUP
+
+AT_SETUP([Bug 13988 (https://gna.org/bugs/?13988), EF])
+AT_CHECK([cp TESTFILES/bug13988.lola TESTFILES/bug13988-2.task .])
+AT_CHECK([LOLA_MODELCHECKING bug13988.lola -abug13988-2.task],1,stdout)
+AT_CHECK([GREP -q "result: false" stdout],0)
+AT_KEYWORDS(bugs)
+AT_CLEANUP
+
 AT_SETUP([Bug 15282 (https://gna.org/bugs/?15282)])
 AT_CHECK([cp TESTFILES/bug15282.lola .])
 AT_CHECK([LOLA_STATESPACE bug15282.lola -M],0,stdout)

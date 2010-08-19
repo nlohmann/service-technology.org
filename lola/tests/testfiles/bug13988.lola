@@ -1,0 +1,37 @@
+PLACE
+	InitialNode1,
+	ActivityFinalNode1,
+	p1,
+	p2
+;
+
+
+MARKING
+	InitialNode1	:	1
+;
+
+
+TRANSITION t1
+CONSUME
+	InitialNode1:	1;
+PRODUCE
+	p1:	1;
+
+
+
+TRANSITION t2
+CONSUME
+	p1:	1;
+PRODUCE
+	p2:	1;
+
+
+
+TRANSITION t3
+CONSUME
+	p2:	1;
+PRODUCE
+	ActivityFinalNode1:	1;
+
+
+

@@ -21,6 +21,7 @@
 # 4. Add the file to the SVN repository.
 TESTFILES = bug15282.lola \
             bug12922.lola \
+            bug13988.lola bug13988-1.task bug13988-2.task \
             choreography.lola \
             choreography.tar.gz \
             data.lola \

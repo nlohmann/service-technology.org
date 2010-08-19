@@ -1,0 +1,27 @@
+PLACE     p2, p1, p4, p5, p3, p6;
+MARKING
+   p2:1, p1:1;
+   
+TRANSITION v
+  CONSUME p1:1;
+  PRODUCE p3:1;
+  
+TRANSITION x
+  CONSUME p4:1, p3:1;
+  PRODUCE p5:1, p6:1;
+  
+TRANSITION z
+  CONSUME p6:1;
+  PRODUCE p2:1;
+  
+TRANSITION u
+  CONSUME p1:1;
+  PRODUCE p3:1;
+  
+TRANSITION y
+  CONSUME p5:1;
+  PRODUCE p1:1;
+  
+TRANSITION w
+  CONSUME p2:1;
+  PRODUCE p4:1;

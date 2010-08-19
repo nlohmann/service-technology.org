@@ -1,6 +1,9 @@
 package hub.top.uma;
 
+import java.io.IOException;
+
 import hub.top.petrinet.PetriNet;
+import hub.top.petrinet.PetriNetIO;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 import hub.top.petrinet.unfold.DNodeSys_PetriNet;
@@ -43,6 +46,7 @@ public class UmaTest {
 
   public static void main(String[] args) {
     UmaTest t = new UmaTest("Uma unfolding");
+    //System.out.println(System.getProperty("user.dir"));
     t.run();
   }
   
@@ -50,39 +54,9 @@ public class UmaTest {
     
     lastTest = "Construct prefix of Petri net with lexicographic order";
     
-    PetriNet net = new PetriNet();
-    net.addPlace("p1"); net.setTokens("p1", 1);
-    net.addPlace("p2"); net.setTokens("p2", 1);
-    net.addPlace("p3");
-    net.addPlace("p4");
-    net.addPlace("p5");
-    net.addPlace("p6");
-    
-    net.addTransition("u");
-      net.addArc("p1", "u");
-      net.addArc("u", "p3");
-      
-    net.addTransition("v");
-      net.addArc("p1", "v");
-      net.addArc("v", "p3");
-      
-    net.addTransition("w");
-      net.addArc("p2", "w");
-      net.addArc("w", "p4");
-      
-    net.addTransition("x");
-      net.addArc("p3", "x"); net.addArc("p4", "x");
-      net.addArc("x", "p5"); net.addArc("x", "p6");
-      
-    net.addTransition("y");
-      net.addArc("p5", "y");
-      net.addArc("y", "p1");
-      
-    net.addTransition("z");
-      net.addArc("p6", "z");
-      net.addArc("z", "p2");
-      
     try {
+      PetriNet net = PetriNetIO.readNetFromFile("./testfiles/net_lexik.lola");
+      
       DNodeSys_PetriNet sys = new DNodeSys_PetriNet(net);
       DNodeBP build = new DNodeBP(sys);
       build.configure_buildOnly();
@@ -101,44 +75,18 @@ public class UmaTest {
       
     } catch (InvalidModelException e) {
       assertTrue(false);
+    } catch (IOException e) {
+      System.err.println("Couldn't read test file: "+e);
+      assertTrue(false);
     }
-  }
-  
-  private PetriNet getNet2Bounded () {
-    PetriNet net = new PetriNet();
-    net.addPlace("a"); net.setTokens("a", 2);
-    net.addPlace("b"); net.setTokens("b", 1);
-    net.addPlace("c"); net.setTokens("c", 1);
-    net.addPlace("d");
-    net.addPlace("e");
-    net.addPlace("f");
-    
-    net.addTransition("x");
-      net.addArc("a", "x"); net.addArc("b", "x");
-      net.addArc("x", "a"); net.addArc("x", "d"); net.addArc("x", "e");
-      
-    net.addTransition("y");
-      net.addArc("a", "y"); net.addArc("c", "y");
-      net.addArc("y", "a"); net.addArc("y", "d"); net.addArc("y", "f");
-      
-    net.addTransition("u");
-      net.addArc("d", "u"); net.addArc("e", "u");
-      net.addArc("u", "b");
-      
-    net.addTransition("v");
-      net.addArc("d", "v"); net.addArc("f", "v");
-      net.addArc("v", "c");
-
-    return net;
   }
   
   public void testPetrinet2Bounded () {
     
     lastTest = "Construct prefix of 2-bounded Petri net";
     
-    PetriNet net = getNet2Bounded();
-      
     try {
+      PetriNet net = PetriNetIO.readNetFromFile("./testfiles/net_2bounded.lola");
       DNodeSys_PetriNet sys = new DNodeSys_PetriNet(net);
       DNodeBP build = new DNodeBP(sys);
       build.configure_buildOnly();
@@ -157,6 +105,9 @@ public class UmaTest {
       
     } catch (InvalidModelException e) {
       assertTrue(false);
+    } catch (IOException e) {
+      System.err.println("Couldn't read test file: "+e);
+      assertTrue(false);
     }
   }
 
@@ -164,9 +115,8 @@ public class UmaTest {
     
     lastTest = "Violate 1-bound during construction";
     
-    PetriNet net = getNet2Bounded();
-      
     try {
+      PetriNet net = PetriNetIO.readNetFromFile("./testfiles/net_2bounded.lola");
       DNodeSys_PetriNet sys = new DNodeSys_PetriNet(net);
       DNodeBP build = new DNodeBP(sys);
       build.configure_buildOnly();
@@ -180,7 +130,11 @@ public class UmaTest {
       
     } catch (InvalidModelException e) {
       assertTrue(false);
+    } catch (IOException e) {
+      System.err.println("Couldn't read test file: "+e);
+      assertTrue(false);
     }
+
   }
   
   private OcletSpecification getOcletSpec() {

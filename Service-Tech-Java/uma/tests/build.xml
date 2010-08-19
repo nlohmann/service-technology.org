@@ -31,12 +31,19 @@
 	</target>
 	
 	<target name="check" depends="build-test">
-		<echo message="Running tests in ${test.basedir}" />
-		<java classname="hub.top.scenario.OcletTest">
+		<echo message="Running code tests in ${test.basedir}" />
+		<java classname="hub.top.scenario.OcletTest" dir="${test.basedir}" fork="true">
 			<classpath refid="run.classpath" />
 		</java>
-		<java classname="hub.top.uma.UmaTest">
+		<java classname="hub.top.uma.UmaTest" dir="${test.basedir}" fork="true">
 			<classpath refid="run.classpath" />
+		</java>
+		
+		<echo message="Running binary tests in ${test.basedir}" />
+		<java classname="hub.top.uma.Uma" dir="${test.basedir}" fork="true">
+			<classpath refid="run.classpath" />
+			<arg value="-i"/>
+			<arg file="${testfiles}/net_lexik.lola" />
 		</java>
 		
 		<antcall target="clean" />

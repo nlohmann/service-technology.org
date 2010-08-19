@@ -71,7 +71,7 @@ m4_define([SED],                  [@SED@])
 m4_define([TESS],                 [cover.sh @abs_top_builddir@/src/tess])
 
 # the main executable, directly called to allow for analysis
-m4_define([TESS],                 [@abs_top_builddir@/src/tess])
+m4_define([TESS_RAW],             [@abs_top_builddir@/src/tess])
 
 
 #---------------------------------------------#

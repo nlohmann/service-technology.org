@@ -37,7 +37,7 @@ TESTFILES = EMPTY myCoffee.og \
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sources called 'cmdline.c'.
-NO_COVER_FILES = */minisat/* */test* */og_lexer.cc */og_syntax.cc */cmdline.* */verbose.*
+NO_COVER_FILES = */minisat/* */test* */og_lexer.cc */og_syntax.cc */cmdline.* */verbose.* */Output.*
 
 
 #--------------------------------------------------------#

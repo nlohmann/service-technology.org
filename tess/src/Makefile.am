@@ -14,6 +14,8 @@ tess_SOURCES = og_syntax.yy og_lexer.ll \
                verbose.h verbose.cc \
                Output.h Output.cc
 
+tess_CPPFLAGS = $(AM_CPPFLAGS)
+
 check_PROGRAMS = testtess
 
 testtess_SOURCES = testmain.cc config.h \

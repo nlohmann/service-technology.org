@@ -455,7 +455,6 @@ int modelcheck() {
     for (unsigned int i = 0; i < F->card; i++) {
         checkstart[i] = 0;
     }
-    F -> print();
     check(initial, F);
     cout << "\nresult: " << (initial -> value[F -> index] ? "true" : "false") << "\n";
     statistics(NrStates + 1, Edges, NonEmptyHash);

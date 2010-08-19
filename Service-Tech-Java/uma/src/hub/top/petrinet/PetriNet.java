@@ -403,6 +403,20 @@ public class PetriNet {
   }
   
   /**
+   * Let each place of the net acquire the roles of its
+   * pre- and post-transitions.
+   */
+  public void spreadRolesToTransitions_union() {
+    
+    for (Transition t : transitions) {
+      for (Place p : t.getPreSet())
+        for (String role : p.getRoles()) t.addRole(role);
+      for (Place p : t.getPostSet())
+        for (String role : p.getRoles()) t.addRole(role);
+    }
+  }
+  
+  /**
    * Give each transition that has no role the explicit role "unassigned"
    */
   public void setRoles_unassigned() {

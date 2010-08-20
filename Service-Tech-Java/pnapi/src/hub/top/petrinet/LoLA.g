@@ -161,7 +161,7 @@ arcs:
 ;
 
 arc: 
-  node_name COLON NUMBER 
+  node_name (COLON NUMBER)?
   {
 	// FIXME: add arc weight if arc is already present
     Place p = net.findPlace($node_name.text);

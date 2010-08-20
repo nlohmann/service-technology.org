@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\LoLA.g 2010-04-19 23:10:13
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\LoLA.g 2010-08-20 16:39:50
 
 /*****************************************************************************\
 
@@ -696,22 +696,39 @@ public class LoLAParser extends Parser {
 
 
     // $ANTLR start "arc"
-    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\LoLA.g:163:1: arc : node_name COLON NUMBER ;
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\LoLA.g:163:1: arc : node_name ( COLON NUMBER )? ;
     public final void arc() throws RecognitionException {
         String node_name6 = null;
 
 
         try {
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\LoLA.g:163:4: ( node_name COLON NUMBER )
-            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\LoLA.g:164:3: node_name COLON NUMBER
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\LoLA.g:163:4: ( node_name ( COLON NUMBER )? )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\LoLA.g:164:3: node_name ( COLON NUMBER )?
             {
             pushFollow(FOLLOW_node_name_in_arc370);
             node_name6=node_name();
 
             state._fsp--;
 
-            match(input,COLON,FOLLOW_COLON_in_arc372); 
-            match(input,NUMBER,FOLLOW_NUMBER_in_arc374); 
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\LoLA.g:164:13: ( COLON NUMBER )?
+            int alt10=2;
+            int LA10_0 = input.LA(1);
+
+            if ( (LA10_0==COLON) ) {
+                alt10=1;
+            }
+            switch (alt10) {
+                case 1 :
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\LoLA.g:164:14: COLON NUMBER
+                    {
+                    match(input,COLON,FOLLOW_COLON_in_arc373); 
+                    match(input,NUMBER,FOLLOW_NUMBER_in_arc375); 
+
+                    }
+                    break;
+
+            }
+
 
             	// FIXME: add arc weight if arc is already present
                 Place p = net.findPlace(node_name6);
@@ -778,8 +795,8 @@ public class LoLAParser extends Parser {
     public static final BitSet FOLLOW_COMMA_in_arcs350 = new BitSet(new long[]{0x00000000000002C0L});
     public static final BitSet FOLLOW_arc_in_arcs352 = new BitSet(new long[]{0x0000000000000900L});
     public static final BitSet FOLLOW_SEMICOLON_in_arcs359 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_node_name_in_arc370 = new BitSet(new long[]{0x0000000000000400L});
-    public static final BitSet FOLLOW_COLON_in_arc372 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_NUMBER_in_arc374 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_node_name_in_arc370 = new BitSet(new long[]{0x0000000000000402L});
+    public static final BitSet FOLLOW_COLON_in_arc373 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_NUMBER_in_arc375 = new BitSet(new long[]{0x0000000000000002L});
 
 }

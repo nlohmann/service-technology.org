@@ -1,4 +1,9 @@
 @c <<-- CHANGE START (version information) -->>
+@heading Version 1.02 (20 Aug 2010)
+@itemize
+@item added option --show for dot output of solutions and counterexamples
+@end itemize
+
 @heading Version 1.01 (13 Aug 2010)
 @itemize
 @item fixed bug in counterexample generation where information from different

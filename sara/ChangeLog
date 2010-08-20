@@ -8,6 +8,11 @@
 
 
 PURPOSE
+Version 1.02 (20 Aug 2010)
+==========================
+
+* added option -show for dot output of solutions and counterexamples
+
 Version 1.01 (13 Aug 2010)
 ==========================
 

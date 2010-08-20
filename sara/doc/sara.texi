@@ -805,6 +805,15 @@ sara: error while parsing the sara problem file -- aborting [#05]
 @end cartouche
 @end smallexample
 
+@item #06
+Permission to write a .dot file to disk was denied. Check permissions.
+
+@smallexample
+@cartouche
+sara: error while writing Petri net to file '[filename]' -- aborting [#06]
+@end cartouche
+@end smallexample
+
 @item #11
 Internal error. A set of places was empty where it should not be. This is a bug and should never occur.
 

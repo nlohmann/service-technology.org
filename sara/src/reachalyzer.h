@@ -9,9 +9,9 @@
  *
  * \since   2009/10/21
  *
- * \date    $Date: 2010-03-01 12:00:00 +0200 (Mo, 1. Mar 2010) $
+ * \date    $Date: 2010-08-20 12:00:00 +0200 (Fr, 20. Aug 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 1.02 $
  */
 
 #ifndef REACHALYZER_H
@@ -143,6 +143,9 @@ private:
 
 	/// If the problem was passed on, torealize contains the transition multiset to realize
 	map<Transition*,int> torealize;
+
+	/// The problem instance to solve
+	Problem& problem;
 };
 
 #endif

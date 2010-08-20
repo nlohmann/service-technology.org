@@ -322,7 +322,7 @@ if (args_info.input_given || args_info.pipe_given) {
 				pf.recurse();
 				if (!solutions.almostEmpty()) // solve the problem and print a possible solution
 				{ 
-					int mtl = solutions.printSolutions(avetracelen); // get the solution length for this problem
+					int mtl = solutions.printSolutions(avetracelen,pbls.at(x)); // get the solution length for this problem
 					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
 					solcnt+=solutions.size();
 				}

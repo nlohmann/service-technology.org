@@ -9,9 +9,9 @@
  *
  * \since   2009/10/21
  *
- * \date    $Date: 2010-08-13 12:00:00 +0200 (Fr, 13. Aug 2010) $
+ * \date    $Date: 2010-08-20 12:00:00 +0200 (Fr, 20. Aug 2010) $
  *
- * \version $Revision: 1.01 $
+ * \version $Revision: 1.02 $
  */
 
 #include <vector>
@@ -63,7 +63,7 @@ extern gengetopt_args_info args_info;
 	\param passedon If the problem was passed on from an earlier run of the PathFinder.
 */
 Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, Problem& pb, bool verbose, int debug, bool out, int brk, bool passedon) 
-	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols),im(pn),breakafter(brk) {
+	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols),im(pn),breakafter(brk),problem(pb) {
 	// inherit verbosity/debug level
 	this->verbose = debug;
 	this->out = out;
@@ -153,7 +153,7 @@ void Reachalyzer::start() {
 		// calculate what the new constraints changed in the solution of lp_solve
 		map<Transition*,int> fullvector(lpwrap.getTVector(net));
 		// delete all "unknown" jobs covered by this job if we are interested in a counterexample
-		if (args_info.verbose_given) unknown.deleteCovered(fullvector); 
+		if (args_info.verbose_given || args_info.show_given) unknown.deleteCovered(fullvector); 
 		map<Transition*,int> diff; // this contains changes from the old to the new solution
 		map<Transition*,int>::iterator vit;
 		for(vit=fullvector.begin(); vit!=fullvector.end(); ++vit)
@@ -184,7 +184,7 @@ void Reachalyzer::start() {
 				if (verbose>1) cerr << endl;
 				++loops; // count the job
 				continue; // do not try to find a realization
-			} else if (args_info.verbose_given) { // only if looking for counterexamples
+			} else if (args_info.verbose_given || args_info.show_given) { // only if looking for counterexamples
 				bool ngeq(false); // if the new solution is not greater or equal to the old one
 				for(vit=oldvector.begin(); vit!=oldvector.end(); ++vit)
 					if (vit->second>fullvector[vit->first]) ngeq=true;
@@ -219,7 +219,7 @@ void Reachalyzer::start() {
 		if (verbose>0) cerr << endl;
 		++loops; // count the job
 	}
-	if (args_info.verbose_given)
+	if (args_info.verbose_given || args_info.show_given)
 		failure.append(unknown); // the unknown are known now: they belong to the counterexample
 	if (stateinfo && out) cout << "\r"; // if on screen
 	if (args_info.break_given && stateinfo) // debug output if option --break was used
@@ -247,7 +247,7 @@ void Reachalyzer::printResult() {
 	if (!solutions.almostEmpty()) 
 	{
 		if (passedon) cout << "sara: A shorter realizable firing sequence with the same token effect would be:" << endl;
-		maxsollen = solutions.printSolutions(sumsollen);
+		maxsollen = solutions.printSolutions(sumsollen,problem);
 	}
 	else if (errors) cout << "sara: UNSOLVED: Result is indecisive due to failure of lp_solve." << endl;
 	else if (args_info.treemaxjob_given) cout << "sara: UNSOLVED: solution may have been cut off due to command line switch -T" << endl;
@@ -269,7 +269,7 @@ void Reachalyzer::printResult() {
 					if (stateinfo) cout << "There are firing sequences that could not be extended towards the final marking." << endl;
 				} else if (passedon && stateinfo) cout << "sara: at the following points the algorithm could not continue:" << endl;
 				else if (stateinfo) cout << "sara: at the following points the algorithm needed to backtrack:" << endl;
-				if (stateinfo) failure.printFailure(im); // then print the counterexample; the following shouldn't happen:
+				if (stateinfo || args_info.show_given) failure.printFailure(im,problem); // then print the counterexample; the following shouldn't happen:
 			} else if (solutions.almostEmpty())
 				cout << "sara: UNSOLVED: Result is indecisive" << (args_info.break_given?" due to a break.":", no counterexamples found.") << endl;
 	}

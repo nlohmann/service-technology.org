@@ -9,9 +9,9 @@
  *
  * \since   2010/02/26
  *
- * \date    $Date: 2010-08-13 12:00:00 +0100 (Fr, 13. Aug 2010) $
+ * \date    $Date: 2010-08-20 12:00:00 +0100 (Fr, 20. Aug 2010) $
  *
- * \version $Revision: 1.01 $
+ * \version $Revision: 1.02 $
  */
 
 #ifndef JOBQUEUE_H
@@ -83,7 +83,7 @@ public:
 	bool cleanFailure(map<Transition*,int>& p);
 
 	/// Print a failure queue
-	void printFailure(IMatrix& im);
+	void printFailure(IMatrix& im, Problem& pb);
 
 	/// Get the true size of a failure queue (excluding obsolete entries)
 	int trueSize();
@@ -92,7 +92,7 @@ public:
 	bool push_solved(PartialSolution* job);
 
 	/// Print all solutions and return the maximal and sum trace length
-	int printSolutions(int& sum);
+	int printSolutions(int& sum, Problem& pb);
 
 	/// Print a Jobqueue to stderr (possibly including past and active job)
 	void show(bool past);
@@ -102,6 +102,21 @@ public:
 
 	/// Append the elements of one queue to another
 	void append(JobQueue& jbq);
+
+	/// Colors the firing sequence given by tvec in the net
+	void colorSequence(vector<Transition*>& tvec);
+
+	/// Colors a given set of transitions
+	void colorTransitions(set<Transition*>& tset);
+
+	/// Colors a given set of places (key-values of pmap)
+	void colorPlaces(map<Place*,int>& pmap);
+
+	/// Removes all color from the net
+	void resetColors(PetriNet& pn);
+
+	/// Saves the colored net as number nr to a file
+	void saveColoredNet(Problem& pb, int nr);
 
 private:
 	/// Job, solution, or failure queue (maps from priority to sublist)

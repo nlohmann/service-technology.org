@@ -274,6 +274,13 @@ AT_CHECK([GREP -q "3 solutions" stdout])
 AT_KEYWORDS(options)
 AT_CLEANUP
 
+AT_SETUP([Create .dot Output])
+AT_CHECK([cp TESTFILES/test16.sara TESTFILES/test16.owfn .])
+AT_CHECK([SARA -i test16.sara -s],0,stdout,stderr)
+AT_CHECK([GREP -q "Petri net" test16_solution_6.dot])
+AT_KEYWORDS(options)
+AT_CLEANUP
+
 AT_SETUP([Missing Options])
 AT_CHECK([SARA],0,stdout,stderr)
 AT_CHECK([GREP -q "Use options" stderr])

@@ -47,4 +47,9 @@ void printTestCases(vector<TestCase*> testCases, ostream& o);
 
 bool finalInDnf(const list<set<int> > assignments);
 
+struct MatchingNodes{
+	Node* ogNode;
+	TNode* testNode;
+};
+
 #endif

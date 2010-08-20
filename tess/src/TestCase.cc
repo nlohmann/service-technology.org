@@ -58,9 +58,16 @@ TestCase::TestCase(int rootId) {
 	nodes[root->idTestOg] = root;
 }
 
+///copy constructor
+TestCase::TestCase(const TestCase& tc){
+	id = tc.id;
+	isFullTestCase = tc.isFullTestCase;
+	root = tc.root;
+	nodes.insert(tc.nodes.begin(), tc.nodes.end());
+}
+
 ///destructor
 TestCase::~TestCase(){
-
 	if (isFullTestCase){
 		for (map<int, TNode*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
 			delete n->second;
@@ -75,8 +82,9 @@ int TestCase::getId(){
 ///id: id of the correspondig node in the OG
 ///label: label to the old root node
 void TestCase::addNewRoot(int idOg, int label){
-
-	//assert(nodes.find(root->idTestOg) != nodes.end());
+	assert(label < label2id.size());
+	assert(firstLabelId <= label);
+	assert(id2label.find(label) != id2label.end());
 
 	TNode* newRoot = new TNode(idOg);
 	newRoot->addEdge(label, root);
@@ -85,6 +93,10 @@ void TestCase::addNewRoot(int idOg, int label){
 }
 
 void TestCase::appendPartialTestCase(int label, TestCase* partialTestCase){
+	assert(label < label2id.size());
+	assert(firstLabelId <= label);
+	assert(id2label.find(label) != id2label.end());
+
 	root->addEdge(label, partialTestCase->root);
 	nodes.insert(partialTestCase->nodes.begin(), partialTestCase->nodes.end());
 }

@@ -64,6 +64,7 @@ Node::~Node() {
 void Node::addEdge(int label, Node *target) {
 	assert(target);
 	assert(label < label2id.size());
+	assert(firstLabelId <= label);
 	assert(id2label.find(label) != id2label.end());
 
 	outEdges[label].insert(target);
@@ -141,6 +142,7 @@ int TNode::maxId = 0;
 TNode::TNode(int _idOg) : idOg(_idOg) {
 	idTestOg = maxId++;
 	outEdges = new set<TNode*>[label2id.size()];
+	final = false; //as default a node is not a final node
 }
 
 /// destructor
@@ -152,11 +154,20 @@ TNode::~TNode() {
 void TNode::addEdge(int label, TNode *target) {
 	assert(target);
 	assert(label < label2id.size());
+	assert(firstLabelId <= label);
 	assert(id2label.find(label) != id2label.end());
 
 	outEdges[label].insert(target);
 }
 
+
+void TNode::setAsFinalNode(){
+	final = true;
+}
+
+bool TNode::isFinalNode(){
+	return final;
+}
 // reset the maxId
 //void TestNode::init(){
 //	maxId = 0;

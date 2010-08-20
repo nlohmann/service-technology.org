@@ -84,6 +84,15 @@ int main(int argc, char **argv) {
 
 	g->generateTestCases();
 
+	cout << "Anzahl der Testfälle: " << g->testCases.size() << endl;
+	vector<TestCase*>::const_iterator i = g->testCases.begin();
+	vector<TestCase*>::const_iterator vorgaenger = i;
+	cout << "firstID: " << (*i)->getId() << endl;
+	for(vector<TestCase*>::const_iterator iter = ++i; iter != g->testCases.end(); ++iter){
+		assert(((*iter)->getId() - (*vorgaenger)->getId()) == 1);
+		vorgaenger = iter;
+	}
+
 	string filename = args_info.inputs[0];
 	filename = filename.substr(0,filename.find_last_of(".og")-2);
 

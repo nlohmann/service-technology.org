@@ -42,9 +42,6 @@ class TestCase {
 
 //		int maximalEditDistance;
 
-
-
-
     public:
 		bool isFullTestCase;
 		TNode* root;
@@ -54,18 +51,21 @@ class TestCase {
     	TestCase(int rootId);
 
     	/// destructor
+    	TestCase(const TestCase&);
+
+    	/// destructor
     	~TestCase();
 
     	int getId();
     	void addNewRoot(int id, int label);
     	void appendPartialTestCase(int label, TestCase* partialTestCase);
 
-//    	/// Graphviz dot output
+    	/// Graphviz dot output
         void toDot(FILE* out, string title = "") const;
 		void toDot_Header(FILE* out, string title = "") const;
 		void toDot_Nodes(FILE* out) const;
-//
-//        /// Graph output
+
+        /// Graph output
 		void printNodes(ostream& o) const;
 //        void toEaa(ostream& o) const;
 

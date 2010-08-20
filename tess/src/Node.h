@@ -80,6 +80,7 @@ class TNode {
 
     private:
     	static int maxId;		/// maximal id of all node objects
+    	bool final;
 
 
     public:
@@ -93,6 +94,9 @@ class TNode {
         void addEdge(int label, TNode *target);
 
         static int getMaxId();
+
+        void setAsFinalNode();
+        bool isFinalNode();
 
         /// reset the maxId
 //        static void init();

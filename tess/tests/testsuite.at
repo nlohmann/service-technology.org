@@ -7,12 +7,12 @@ AT_COLOR_TESTS
 AT_BANNER([Standard Options])
 ############################################################################
 
-#AT_SETUP([file not found])
-#AT_CHECK([cp TESTFILES/EMPTY .])
-#AT_CHECK([TESS myCoffee.og -oeaa -opng -odot -einsert],1,stdout,stderr)
-#AT_CHECK([diff EMPTY stderr],2)
-#AT_KEYWORDS(complement c0)
-#AT_CLEANUP
+AT_SETUP([file not found])
+AT_CHECK([cp TESTFILES/EMPTY .])
+AT_CHECK([TESS myCoffee.og -oeaa -opng -odot -einsert],1,stdout,stderr)
+AT_CHECK([grep -q "tess: File myCoffee.og not found -- aborting \[[#01\]]" stderr],0)
+AT_KEYWORDS(complement c0)
+AT_CLEANUP
 
 AT_SETUP([unit test])
 AT_CHECK([cp TESTFILES/EMPTY .])

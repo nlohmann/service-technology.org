@@ -95,12 +95,12 @@ og:
 ;
  
 input:
-  /* empty */
+  /* empty */ {firstInputId = label2id.size(); lastInputId = label2id.size()-1;}
 | KEY_INPUT {firstInputId = label2id.size();} identlist_in {lastInputId = label2id.size()-1;} SEMICOLON 
 ;
 
 output:
-  /* empty */
+  /* empty */ {firstOutputId = label2id.size(); lastOutputId = label2id.size()-1;}
 | KEY_OUTPUT {firstOutputId = label2id.size();} identlist_out {lastOutputId = label2id.size()-1;} SEMICOLON
 ;
 

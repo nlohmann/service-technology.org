@@ -1,0 +1,24 @@
+PLACE
+	init#a, init#b;
+	o1_hist#a_1, o1_hist#b_2, o1#a_3, o1#b_4;
+	o2_hist#a_1, o2_hist#b_2, o2#a_3, o2#b_4;
+	o3_hist#b_0, o3_hist#a_1, o3_hist#b_2, o3#a_3, o3#b_4;
+    	
+MARKING
+	init#a:1, init#b:1;
+    
+TRANSITION o1#X
+	CONSUME o1_hist#a_1, o1_hist#b_2;
+	PRODUCE o1#a_3, o1#b_4;
+	
+TRANSITION o2#Y
+	CONSUME o2_hist#a_1, o2_hist#b_2;
+	PRODUCE o2#a_3, o2#b_4;
+      
+TRANSITION o3_hist#X
+	CONSUME o3_hist#b_0;
+	PRODUCE o3_hist#b_2;
+	
+TRANSITION !o3#Y
+	CONSUME o3_hist#a_1, o3_hist#b_2;
+	PRODUCE o3#a_3, o3#b_4;

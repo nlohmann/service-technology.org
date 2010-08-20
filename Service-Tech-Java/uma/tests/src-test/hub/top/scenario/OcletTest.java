@@ -41,7 +41,7 @@ public class OcletTest {
     
     lastTest = "Detect wrong prefix in oclet";
     
-    Oclet o = new Oclet(false);
+    Oclet o = new Oclet("o", false);
     o.addPlace("p1a", true); o.addPlace("p1b", true); o.addPlace("p1c", true);
     o.addPlace("p2a", true); o.addPlace("p2b", true); o.addPlace("p2c", true);
     
@@ -74,7 +74,7 @@ public class OcletTest {
     
     lastTest = "Detect cycle in oclet";
     
-    Oclet o = new Oclet(false);
+    Oclet o = new Oclet("o", false);
     o.addPlace("p1a", true); o.addPlace("p1b", true); o.addPlace("p1c", true);
     o.addPlace("p2a", true); o.addPlace("p2b", true); o.addPlace("p2c", true);
     
@@ -107,7 +107,7 @@ public class OcletTest {
     
     lastTest = "Check valid oclet";
     
-    Oclet o = new Oclet(false);
+    Oclet o = new Oclet("o", false);
     o.addPlace("p1a", true); o.addPlace("p1b", true); o.addPlace("p1c", true);
     o.addPlace("p2a", true); o.addPlace("p2b", true); o.addPlace("p2c", true);
     

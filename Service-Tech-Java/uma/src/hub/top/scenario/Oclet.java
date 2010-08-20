@@ -37,13 +37,19 @@ public class Oclet extends hub.top.petrinet.PetriNet {
   public boolean isAnti;
   
   /**
+   * the name of the oclet
+   */
+  public String name;
+  
+  /**
    * @param anti
    */
-  public Oclet(boolean anti) {
+  public Oclet(String name, boolean anti) {
     super();
     history = new HashSet<Node>();
     isAnti = anti;
     hotNodes = new HashSet<Node>();
+    this.name = name;
   }
   
   /**
@@ -58,8 +64,8 @@ public class Oclet extends hub.top.petrinet.PetriNet {
    *  an entry <code>a</code> in <code>arcs</code> has length 2 and
    *  describes an arc from <code>a[0]</code> to <code>a[1]</code>.
    */
-  public Oclet(boolean anti, LinkedList<String> conditions_hist, LinkedList<String> events_hist, LinkedList<String> conditions_con, LinkedList<String> events_con, LinkedList<String[]> arcs) {
-    this(anti);
+  public Oclet(String name, boolean anti, LinkedList<String> conditions_hist, LinkedList<String> events_hist, LinkedList<String> conditions_con, LinkedList<String> events_con, LinkedList<String[]> arcs) {
+    this(name, anti);
     
     for (String b : conditions_hist) {
       addPlace(b, true);

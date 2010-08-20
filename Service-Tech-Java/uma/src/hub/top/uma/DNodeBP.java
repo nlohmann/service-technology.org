@@ -872,100 +872,61 @@ public class DNodeBP {
   			if ( i == e.pre.length ) {
   				// all precondition of event i have been found in max BP
   			  
+  			  //System.out.println(e+" is enabled at "+DNode.toString(cutNodes));
   	      //_debug_log.append(e+" is enabled at "+DNode.toString(cutNodes)+"\n");
   				
   				assert loc[e.pre.length-1] != null : "Error, adding invalid enabling location";
-  			
-  				//System.out.println("  event is enabled");
-  				if (lastEnabledID != e.id && !e.isAnti) {
-  
-            // skip to fire any anti-event that occurs as first event at that location, i.e.
-            // the anti-event would not block any other event
-            if (!e.isAnti) {
-    					// this is the first event with "name"
-    					lastEnabledID = e.id;
-    					info.enablingLocation.addLast(loc);
-    					info.enabledEvents.addLast(e);
-    
-    					info.synchronizedEvents.addLast(null);
-    					
-    					// remember first entry of events with this name
-    					beginIDs = info.enabledEvents.size()-1;
-            } else {
-              System.out.println("  skipping anti-event");
-            }
-            
-  				} else {
-  				  
-  				  // we have multiple events with the same id that are enabled
-  				  // synchronize them properly
-  				  
-            // search for an event with the same ID to synchronize with
-            int syncEntry = -1;
-  				  
-  				  if (!e.isAnti) {
-  				    // history-based synchronization: two enabled events synchronize
-  				    // iff they have the same ID and occur at the same enabling location
-  				    // if they synchronize, their synchronized occurrence results in one event
-  				    // if they don't synchronize, each occurs as a separate event
-  				    
-    					for (int j=beginIDs; j<info.enablingLocation.size(); j++) {
-    						if (Arrays.equals(loc, info.enablingLocation.get(j))) {
-    							syncEntry = j;
-    							break;
-    						}
-    					}
-            } else {
-              // history-contained synchronization: two enabled events synchronize
-              // iff they have the same ID and one enabling location is contained in
-              // the other enabling location
-              
-              for (int j=beginIDs; j<info.enablingLocation.size(); j++) {
-                DNode[] otherLoc = info.enablingLocation.get(j);
-                if (DNode.containedIn(loc, otherLoc)) {
-                  syncEntry = j;
-                  break;
-                }
-              }
-            }
-  				  
-            // if there is a synchronizing event synchronize, their synchronized occurrence
-  				  // results in one event; if they don't synchronize, each occurs as a separate event
-  					if (syncEntry == -1) {
-              // this is the first event with "name" at this location
 
-              // skip to fire any anti-event that occurs as first event at that location, i.e.
-  					  // the anti-event would not block any other event
-  					  if (!e.isAnti) {
-    						info.enablingLocation.addLast(loc);
-    						info.enabledEvents.addLast(e);
-    
-    						info.synchronizedEvents.addLast(null);
-  					  } else {
-  					    System.out.println("  not adding first anti-event");
-  					  }
-  						
-  					} else {
-              //System.out.println("  synchronizing");
-  					  
-  					  
-  						// this is the second/n-th event with "name" at the same
-  						// firing location
-  						// we have to synchronize these events upon firing,
-  						// prepare corresponding list
-  						LinkedList<DNode> sync = info.synchronizedEvents.get(syncEntry);
-  						if (sync == null) {
-  							sync = new LinkedList<DNode>();
-  							sync.addLast(info.enabledEvents.get(syncEntry));
-  	
-  							// set list of events for synchronization at the
-  							// corresponding entry in the lists 
-  							info.synchronizedEvents.set(syncEntry, sync);
-  						}
-  						// insert current event into list of synchronization events
-  						sync.addLast(e);
-  					}
-  				}
+  				// search all known enabled events whether there is already an event with
+  				// the same ID at the same location. If so: synchronize both events.
+  				
+  				// TODO: introduce proper data structure for faster finding synchronizing events
+				  int syncEntry = 0;
+				  for (; syncEntry < info.enablingLocation.size(); syncEntry++) {
+				    if (   info.enabledEvents.get(syncEntry).id == e.id
+				        && Arrays.equals(loc, info.enablingLocation.get(syncEntry)))
+				    {
+				      break;
+				    }
+				  }
+				  
+          // if there is a synchronizing event synchronize, their synchronized occurrence
+				  // results in one event; if they don't synchronize, each occurs as a separate event
+					if (syncEntry == info.enablingLocation.size()) {
+            // this is the first event with "name" at this location
+
+            // skip to fire any anti-event that occurs as first event at that location, i.e.
+					  // the anti-event would not block any other event
+					  if (!e.isAnti) {
+  						info.enablingLocation.addLast(loc);
+  						info.enabledEvents.addLast(e);
+  
+  						info.synchronizedEvents.addLast(null);
+					  } else {
+					    System.out.println("  not adding first anti-event");
+					  }
+						
+					} else {
+            //System.out.println("  synchronizing with "+info.enabledEvents.get(syncEntry));
+					  
+					  
+						// this is the second/n-th event with "name" at the same
+						// firing location
+						// we have to synchronize these events upon firing,
+						// prepare corresponding list
+						LinkedList<DNode> sync = info.synchronizedEvents.get(syncEntry);
+						if (sync == null) {
+							sync = new LinkedList<DNode>();
+							sync.addLast(info.enabledEvents.get(syncEntry));
+	
+							// set list of events for synchronization at the
+							// corresponding entry in the lists 
+							info.synchronizedEvents.set(syncEntry, sync);
+						}
+						// insert current event into list of synchronization events
+						sync.addLast(e);
+					}
+
   			} else {
   			  //System.out.println("  incomplete match");
   			}
@@ -1043,7 +1004,7 @@ public class DNodeBP {
 				if (e.isAnti) {
 					// remember that this event was an anti-event
 					setAnti = true;
-					System.out.println("not firing "+e+" (is anti)");
+					//System.out.println("not firing "+e+" (is anti)");
 				}
 				if (e.isHot) {
 				  setHot = true;
@@ -1059,8 +1020,8 @@ public class DNodeBP {
 				for (int j=0;j<events.length;j++) {
 					if (events[j].isAnti) {
 	          // remember that the fired event does not occur in the final result
-						System.out.println("not firing anti-event "+events[j]);
 					  setAnti = true;
+            //System.out.println("not firing anti-event "+events[j]);
 						// break;
 					}
 					if (events[j].isHot) {

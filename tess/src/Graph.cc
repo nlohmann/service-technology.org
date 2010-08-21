@@ -55,7 +55,7 @@ using namespace std;
 
 ///constructor
 Graph::Graph() {
-
+	maximalEditDistance = 1;
 }
 
 ///destructor
@@ -78,7 +78,6 @@ void Graph::generateTestCases(){
 
 	int initId = *(initialNodes.begin());
 	Node* initialNode = nodes[initId];
-	maximalEditDistance = 1;
 
 	toTestOg();
 

@@ -4,6 +4,45 @@ AT_COLOR_TESTS
 # m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
 
 ############################################################################
+AT_BANNER([elementary tests])
+############################################################################
+
+
+AT_SETUP([small.og])
+
+AT_CHECK([cp TESTFILES/EMPTY TESTFILES/small.og TESTFILES/small_TestCases_ref.eaa TESTFILES/small_TestCases_ref.dot TESTFILES/small_TestOG_ref.eaa TESTFILES/small_TestOG_ref.dot .])
+
+AT_CHECK([TESS small.og -oeaa -opng -odot],0,stdout,stderr)
+AT_CHECK([diff EMPTY stderr])
+AT_CHECK([diff small_TestOG_ref.eaa small_TestOG.eaa])
+AT_CHECK([diff small_TestOG_ref.dot small_TestOG.dot])
+AT_CHECK([diff small_TestCases_ref.eaa small_TestCases.eaa])
+AT_CHECK([diff small_TestCases_ref.dot small_TestCases.dot])
+
+AT_KEYWORDS(elementar)
+AT_CLEANUP
+
+#####################################
+
+AT_SETUP([final.og])
+
+AT_CHECK([cp TESTFILES/EMPTY TESTFILES/final.og TESTFILES/final_TestCases_ref.eaa TESTFILES/final_TestCases_ref.dot TESTFILES/final_TestOG_ref.eaa TESTFILES/final_TestOG_ref.dot .])
+
+AT_CHECK([TESS final.og -oeaa -opng -odot],0,stdout,stderr)
+AT_CHECK([diff EMPTY stderr])
+AT_CHECK([diff final_TestOG_ref.eaa final_TestOG.eaa])
+AT_CHECK([diff final_TestOG_ref.dot final_TestOG.dot])
+AT_CHECK([diff final_TestCases_ref.eaa final_TestCases.eaa])
+AT_CHECK([diff final_TestCases_ref.dot final_TestCases.dot])
+
+AT_KEYWORDS(elementar)
+AT_CLEANUP
+
+#####################################
+
+
+
+############################################################################
 AT_BANNER([Standard Options])
 ############################################################################
 
@@ -33,7 +72,7 @@ AT_CHECK([diff EMPTY stderr])
 AT_CHECK([diff myCoffee_insert_ref.eaa myCoffee_TestOG.eaa])
 AT_CHECK([diff myCoffee_insert_ref.dot myCoffee_TestOG.dot])
 
-AT_KEYWORDS(complement c0)
+AT_KEYWORDS(operator)
 AT_CLEANUP
 
 #####################################
@@ -46,7 +85,7 @@ AT_CHECK([diff EMPTY stderr])
 AT_CHECK([diff myCoffee_delete_ref.eaa myCoffee_TestOG.eaa])
 AT_CHECK([diff myCoffee_delete_ref.dot myCoffee_TestOG.dot])
 
-AT_KEYWORDS(complement c0)
+AT_KEYWORDS(operator)
 AT_CLEANUP
 
 #####################################
@@ -59,7 +98,7 @@ AT_CHECK([diff EMPTY stderr])
 AT_CHECK([diff myCoffee_rename_ref.eaa myCoffee_TestOG.eaa])
 AT_CHECK([diff myCoffee_rename_ref.dot myCoffee_TestOG.dot])
 
-AT_KEYWORDS(complement c0)
+AT_KEYWORDS(operator)
 AT_CLEANUP
 
 #####################################
@@ -72,7 +111,8 @@ AT_CHECK([diff EMPTY stderr])
 AT_CHECK([diff myCoffee_all_ref.eaa myCoffee_TestOG.eaa])
 AT_CHECK([diff myCoffee_all_ref.dot myCoffee_TestOG.dot])
 
-AT_KEYWORDS(complement c0)
+AT_KEYWORDS(operator)
 AT_CLEANUP
 
 #####################################
+

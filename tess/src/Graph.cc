@@ -202,6 +202,7 @@ vector<TestCase*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 	if (finish){
 		q->visited = false;
 		TestCase* tc = new TestCase(q->id);
+		tc->root->setAsFinalNode();
 		vector<TestCase*> partialTestCases;
 		partialTestCases.push_back(tc);
 
@@ -215,8 +216,8 @@ vector<TestCase*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 	vector<TestCase*> partialTestCases = combine(partialTestCasesMap, sucNodes, assignments, q);
 
 	cout << "number of test cases in " << q->id << ": " << partialTestCases.size() << endl;
-//	Output stdout("-", "");
-//	toEaa_TestCases(stdout,partialTestCases);
+	Output mystdout("-", "");
+	toEaa_TestCases(mystdout,partialTestCases);
 
 	q->visited = false;
 	return partialTestCases; //all partial test cases starting in q
@@ -379,12 +380,17 @@ vector<TestCase*> Graph::combineForNormalNode(map<Node*, vector<TestCase*> > par
 		TestCase* currentTestCase = new TestCase(q->id);
 		partialTestCases.push_back(currentTestCase);
 
-		if(affectedNodes.size() == 0){
-			assert(isFinal); //assignment only contains final
-
-			//TODO: return one test case only containing q (as final node)
-			//TODO: scheint im Beispiel schon zu funktionieren. Warum?
+		if(isFinal){
+			currentTestCase->root->setAsFinalNode();
 		}
+
+
+//		if(affectedNodes.size() == 0){
+//			assert(isFinal); //assignment only contains final
+//
+//			//TODO: return one test case only containing q (as final node)
+//			//TODO: scheint im Beispiel schon zu funktionieren. Warum?
+//		}
 
 		for(map<int, Node*>::const_iterator iter = affectedNodes.begin(); iter != affectedNodes.end(); ++iter){
 

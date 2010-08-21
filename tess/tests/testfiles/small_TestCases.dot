@@ -2,136 +2,84 @@ digraph D {
 graph [fontname="Helvetica", label="tests/testfiles/small_TestCases"];
 node [fontname="Helvetica" fontsize=10];
 edge [fontname="Helvetica" fontsize=10];
-  q_9020 [label="" height="0.01" width="0.01" style="invis"];
-  q_9020 -> 9020 [minlen="0.5"];
-  9004 [label="5 (9004)"]
-  9020 [label="3 (9020)"]
-  9020 -> 9004 [label="!C"]
-  q_10021 [label="" height="0.01" width="0.01" style="invis"];
-  q_10021 -> 10021 [minlen="0.5"];
-  10000 [label="5 (10000)"]
-  10001 [label="7 (10001)"]
-  10001 -> 10000 [label="!E"]
-  10005 [label="5 (10005)"]
-  10005 -> 10001 [label=" tau"]
-  10021 [label="3 (10021)"]
-  10021 -> 10005 [label="!C"]
-  q_11022 [label="" height="0.01" width="0.01" style="invis"];
-  q_11022 -> 11022 [minlen="0.5"];
-  11000 [label="5 (11000)"]
-  11002 [label="7 (11002)"]
-  11002 -> 11000 [label="!C"]
-  11006 [label="5 (11006)"]
-  11006 -> 11002 [label=" tau"]
-  11022 [label="3 (11022)"]
-  11022 -> 11006 [label="!C"]
-  q_12023 [label="" height="0.01" width="0.01" style="invis"];
-  q_12023 -> 12023 [minlen="0.5"];
-  12000 [label="5 (12000)"]
-  12003 [label="7 (12003)"]
-  12003 -> 12000 [label="!T"]
-  12007 [label="5 (12007)"]
-  12007 -> 12003 [label=" tau"]
-  12023 [label="3 (12023)"]
-  12023 -> 12007 [label="!C"]
-  q_13024 [label="" height="0.01" width="0.01" style="invis"];
-  q_13024 -> 13024 [minlen="0.5"];
-  13004 [label="5 (13004)"]
-  13024 [label="3 (13024)"]
-  13024 -> 13004 [label="!T"]
-  q_14025 [label="" height="0.01" width="0.01" style="invis"];
-  q_14025 -> 14025 [minlen="0.5"];
-  14000 [label="5 (14000)"]
-  14001 [label="7 (14001)"]
-  14001 -> 14000 [label="!E"]
-  14005 [label="5 (14005)"]
-  14005 -> 14001 [label=" tau"]
-  14025 [label="3 (14025)"]
-  14025 -> 14005 [label="!T"]
-  q_15026 [label="" height="0.01" width="0.01" style="invis"];
-  q_15026 -> 15026 [minlen="0.5"];
-  15000 [label="5 (15000)"]
-  15002 [label="7 (15002)"]
-  15002 -> 15000 [label="!C"]
-  15006 [label="5 (15006)"]
-  15006 -> 15002 [label=" tau"]
-  15026 [label="3 (15026)"]
-  15026 -> 15006 [label="!T"]
-  q_16027 [label="" height="0.01" width="0.01" style="invis"];
-  q_16027 -> 16027 [minlen="0.5"];
-  16000 [label="5 (16000)"]
-  16003 [label="7 (16003)"]
-  16003 -> 16000 [label="!T"]
-  16007 [label="5 (16007)"]
-  16007 -> 16003 [label=" tau"]
-  16027 [label="3 (16027)"]
-  16027 -> 16007 [label="!T"]
-  q_17028 [label="" height="0.01" width="0.01" style="invis"];
-  q_17028 -> 17028 [minlen="0.5"];
-  17011 [label="5 (17011)"]
-  17012 [label="6 (17012)"]
-  17012 -> 17011 [label=" tau"]
-  17028 [label="3 (17028)"]
-  17028 -> 17012 [label=" tau"]
-  q_18029 [label="" height="0.01" width="0.01" style="invis"];
-  q_18029 -> 18029 [minlen="0.5"];
-  18008 [label="5 (18008)"]
-  18009 [label="3 (18009)"]
-  18009 -> 18008 [label="!C"]
-  18013 [label="6 (18013)"]
-  18013 -> 18009 [label="!E"]
-  18029 [label="3 (18029)"]
-  18029 -> 18013 [label=" tau"]
-  q_19030 [label="" height="0.01" width="0.01" style="invis"];
-  q_19030 -> 19030 [minlen="0.5"];
-  19008 [label="5 (19008)"]
-  19010 [label="3 (19010)"]
-  19010 -> 19008 [label="!T"]
-  19014 [label="6 (19014)"]
-  19014 -> 19010 [label="!E"]
-  19030 [label="3 (19030)"]
-  19030 -> 19014 [label=" tau"]
-  q_20031 [label="" height="0.01" width="0.01" style="invis"];
-  q_20031 -> 20031 [minlen="0.5"];
-  20011 [label="5 (20011)"]
-  20015 [label="6 (20015)"]
-  20015 -> 20011 [label="!E"]
-  20031 [label="3 (20031)"]
-  20031 -> 20015 [label=" tau"]
-  q_21032 [label="" height="0.01" width="0.01" style="invis"];
-  q_21032 -> 21032 [minlen="0.5"];
-  21008 [label="5 (21008)"]
-  21009 [label="3 (21009)"]
-  21009 -> 21008 [label="!C"]
-  21016 [label="6 (21016)"]
-  21016 -> 21009 [label="!C"]
-  21032 [label="3 (21032)"]
-  21032 -> 21016 [label=" tau"]
-  q_22033 [label="" height="0.01" width="0.01" style="invis"];
-  q_22033 -> 22033 [minlen="0.5"];
-  22008 [label="5 (22008)"]
-  22010 [label="3 (22010)"]
-  22010 -> 22008 [label="!T"]
-  22017 [label="6 (22017)"]
-  22017 -> 22010 [label="!C"]
-  22033 [label="3 (22033)"]
-  22033 -> 22017 [label=" tau"]
-  q_23034 [label="" height="0.01" width="0.01" style="invis"];
-  q_23034 -> 23034 [minlen="0.5"];
-  23008 [label="5 (23008)"]
-  23009 [label="3 (23009)"]
-  23009 -> 23008 [label="!C"]
-  23018 [label="6 (23018)"]
-  23018 -> 23009 [label="!T"]
-  23034 [label="3 (23034)"]
-  23034 -> 23018 [label=" tau"]
-  q_24035 [label="" height="0.01" width="0.01" style="invis"];
-  q_24035 -> 24035 [minlen="0.5"];
-  24008 [label="5 (24008)"]
-  24010 [label="3 (24010)"]
-  24010 -> 24008 [label="!T"]
-  24019 [label="6 (24019)"]
-  24019 -> 24010 [label="!T"]
-  24035 [label="3 (24035)"]
-  24035 -> 24019 [label=" tau"]
+  q_8016 [label="" height="0.01" width="0.01" style="invis"];
+  q_8016 -> 8016 [minlen="0.5"];
+  8004 [label="5 (8004)", peripheries=2]
+  8016 [label="3 (8016)"]
+  8016 -> 8004 [label="!C"]
+  8016 -> 8004 [label="!T"]
+  q_9017 [label="" height="0.01" width="0.01" style="invis"];
+  q_9017 -> 9017 [minlen="0.5"];
+  9000 [label="5 (9000)", peripheries=2]
+  9001 [label="7 (9001)"]
+  9001 -> 9000 [label="!E"]
+  9005 [label="5 (9005)"]
+  9005 -> 9001 [label=" tau"]
+  9017 [label="3 (9017)"]
+  9017 -> 9005 [label="!C"]
+  9017 -> 9005 [label="!T"]
+  q_10018 [label="" height="0.01" width="0.01" style="invis"];
+  q_10018 -> 10018 [minlen="0.5"];
+  10000 [label="5 (10000)", peripheries=2]
+  10002 [label="7 (10002)"]
+  10002 -> 10000 [label="!C"]
+  10006 [label="5 (10006)"]
+  10006 -> 10002 [label=" tau"]
+  10018 [label="3 (10018)"]
+  10018 -> 10006 [label="!C"]
+  10018 -> 10006 [label="!T"]
+  q_11019 [label="" height="0.01" width="0.01" style="invis"];
+  q_11019 -> 11019 [minlen="0.5"];
+  11000 [label="5 (11000)", peripheries=2]
+  11003 [label="7 (11003)"]
+  11003 -> 11000 [label="!T"]
+  11007 [label="5 (11007)"]
+  11007 -> 11003 [label=" tau"]
+  11019 [label="3 (11019)"]
+  11019 -> 11007 [label="!C"]
+  11019 -> 11007 [label="!T"]
+  q_12020 [label="" height="0.01" width="0.01" style="invis"];
+  q_12020 -> 12020 [minlen="0.5"];
+  12010 [label="5 (12010)", peripheries=2]
+  12011 [label="6 (12011)"]
+  12011 -> 12010 [label=" tau"]
+  12020 [label="3 (12020)"]
+  12020 -> 12011 [label=" tau"]
+  q_13021 [label="" height="0.01" width="0.01" style="invis"];
+  q_13021 -> 13021 [minlen="0.5"];
+  13008 [label="5 (13008)", peripheries=2]
+  13009 [label="3 (13009)"]
+  13009 -> 13008 [label="!C"]
+  13009 -> 13008 [label="!T"]
+  13012 [label="6 (13012)"]
+  13012 -> 13009 [label="!E"]
+  13021 [label="3 (13021)"]
+  13021 -> 13012 [label=" tau"]
+  q_14022 [label="" height="0.01" width="0.01" style="invis"];
+  q_14022 -> 14022 [minlen="0.5"];
+  14010 [label="5 (14010)", peripheries=2]
+  14013 [label="6 (14013)"]
+  14013 -> 14010 [label="!E"]
+  14022 [label="3 (14022)"]
+  14022 -> 14013 [label=" tau"]
+  q_15023 [label="" height="0.01" width="0.01" style="invis"];
+  q_15023 -> 15023 [minlen="0.5"];
+  15008 [label="5 (15008)", peripheries=2]
+  15009 [label="3 (15009)"]
+  15009 -> 15008 [label="!C"]
+  15009 -> 15008 [label="!T"]
+  15014 [label="6 (15014)"]
+  15014 -> 15009 [label="!C"]
+  15023 [label="3 (15023)"]
+  15023 -> 15014 [label=" tau"]
+  q_16024 [label="" height="0.01" width="0.01" style="invis"];
+  q_16024 -> 16024 [minlen="0.5"];
+  16008 [label="5 (16008)", peripheries=2]
+  16009 [label="3 (16009)"]
+  16009 -> 16008 [label="!C"]
+  16009 -> 16008 [label="!T"]
+  16015 [label="6 (16015)"]
+  16015 -> 16009 [label="!T"]
+  16024 [label="3 (16024)"]
+  16024 -> 16015 [label=" tau"]
 }

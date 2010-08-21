@@ -1,0 +1,487 @@
+digraph D {
+graph [fontname="Helvetica", label="tests/testfiles/final_TestCases"];
+node [fontname="Helvetica" fontsize=10];
+edge [fontname="Helvetica" fontsize=10];
+  q_51092 [label="" height="0.01" width="0.01" style="invis"];
+  q_51092 -> 51092 [minlen="0.5"];
+  51040 [label="1 (51040)", peripheries=2]
+  51092 [label="0 (51092)", peripheries=2]
+  51092 -> 51040 [label="?A"]
+  51092 -> 51040 [label="?B"]
+  q_52093 [label="" height="0.01" width="0.01" style="invis"];
+  q_52093 -> 52093 [minlen="0.5"];
+  52036 [label="1 (52036)", peripheries=2]
+  52037 [label="4 (52037)"]
+  52037 -> 52036 [label="!D"]
+  52041 [label="1 (52041)"]
+  52041 -> 52037 [label=" tau"]
+  52093 [label="0 (52093)", peripheries=2]
+  52093 -> 52041 [label="?A"]
+  52093 -> 52041 [label="?B"]
+  q_53094 [label="" height="0.01" width="0.01" style="invis"];
+  q_53094 -> 53094 [minlen="0.5"];
+  53036 [label="1 (53036)", peripheries=2]
+  53038 [label="4 (53038)"]
+  53038 -> 53036 [label="!E"]
+  53042 [label="1 (53042)"]
+  53042 -> 53038 [label=" tau"]
+  53094 [label="0 (53094)", peripheries=2]
+  53094 -> 53042 [label="?A"]
+  53094 -> 53042 [label="?B"]
+  q_54095 [label="" height="0.01" width="0.01" style="invis"];
+  q_54095 -> 54095 [minlen="0.5"];
+  54036 [label="1 (54036)", peripheries=2]
+  54039 [label="4 (54039)"]
+  54039 -> 54036 [label="!F"]
+  54043 [label="1 (54043)"]
+  54043 -> 54039 [label=" tau"]
+  54095 [label="0 (54095)", peripheries=2]
+  54095 -> 54043 [label="?A"]
+  54095 -> 54043 [label="?B"]
+  q_55096 [label="" height="0.01" width="0.01" style="invis"];
+  q_55096 -> 55096 [minlen="0.5"];
+  55070 [label="2 (55070)", peripheries=2]
+  55096 [label="0 (55096)"]
+  55096 -> 55070 [label="!D"]
+  55096 -> 55070 [label="!E"]
+  q_56097 [label="" height="0.01" width="0.01" style="invis"];
+  q_56097 -> 56097 [minlen="0.5"];
+  56066 [label="1 (56066)", peripheries=2]
+  56071 [label="2 (56071)"]
+  56071 -> 56066 [label="?A"]
+  56097 [label="0 (56097)"]
+  56097 -> 56071 [label="!D"]
+  56097 -> 56071 [label="!E"]
+  q_57098 [label="" height="0.01" width="0.01" style="invis"];
+  q_57098 -> 57098 [minlen="0.5"];
+  57062 [label="1 (57062)", peripheries=2]
+  57063 [label="4 (57063)"]
+  57063 -> 57062 [label="!D"]
+  57067 [label="1 (57067)"]
+  57067 -> 57063 [label=" tau"]
+  57072 [label="2 (57072)"]
+  57072 -> 57067 [label="?A"]
+  57098 [label="0 (57098)"]
+  57098 -> 57072 [label="!D"]
+  57098 -> 57072 [label="!E"]
+  q_58099 [label="" height="0.01" width="0.01" style="invis"];
+  q_58099 -> 58099 [minlen="0.5"];
+  58062 [label="1 (58062)", peripheries=2]
+  58064 [label="4 (58064)"]
+  58064 -> 58062 [label="!E"]
+  58068 [label="1 (58068)"]
+  58068 -> 58064 [label=" tau"]
+  58073 [label="2 (58073)"]
+  58073 -> 58068 [label="?A"]
+  58099 [label="0 (58099)"]
+  58099 -> 58073 [label="!D"]
+  58099 -> 58073 [label="!E"]
+  q_59100 [label="" height="0.01" width="0.01" style="invis"];
+  q_59100 -> 59100 [minlen="0.5"];
+  59062 [label="1 (59062)", peripheries=2]
+  59065 [label="4 (59065)"]
+  59065 -> 59062 [label="!F"]
+  59069 [label="1 (59069)"]
+  59069 -> 59065 [label=" tau"]
+  59074 [label="2 (59074)"]
+  59074 -> 59069 [label="?A"]
+  59100 [label="0 (59100)"]
+  59100 -> 59074 [label="!D"]
+  59100 -> 59074 [label="!E"]
+  q_60101 [label="" height="0.01" width="0.01" style="invis"];
+  q_60101 -> 60101 [minlen="0.5"];
+  60066 [label="1 (60066)", peripheries=2]
+  60075 [label="2 (60075)"]
+  60075 -> 60066 [label="?C"]
+  60101 [label="0 (60101)"]
+  60101 -> 60075 [label="!D"]
+  60101 -> 60075 [label="!E"]
+  q_61102 [label="" height="0.01" width="0.01" style="invis"];
+  q_61102 -> 61102 [minlen="0.5"];
+  61062 [label="1 (61062)", peripheries=2]
+  61063 [label="4 (61063)"]
+  61063 -> 61062 [label="!D"]
+  61067 [label="1 (61067)"]
+  61067 -> 61063 [label=" tau"]
+  61076 [label="2 (61076)"]
+  61076 -> 61067 [label="?C"]
+  61102 [label="0 (61102)"]
+  61102 -> 61076 [label="!D"]
+  61102 -> 61076 [label="!E"]
+  q_62103 [label="" height="0.01" width="0.01" style="invis"];
+  q_62103 -> 62103 [minlen="0.5"];
+  62062 [label="1 (62062)", peripheries=2]
+  62064 [label="4 (62064)"]
+  62064 -> 62062 [label="!E"]
+  62068 [label="1 (62068)"]
+  62068 -> 62064 [label=" tau"]
+  62077 [label="2 (62077)"]
+  62077 -> 62068 [label="?C"]
+  62103 [label="0 (62103)"]
+  62103 -> 62077 [label="!D"]
+  62103 -> 62077 [label="!E"]
+  q_63104 [label="" height="0.01" width="0.01" style="invis"];
+  q_63104 -> 63104 [minlen="0.5"];
+  63062 [label="1 (63062)", peripheries=2]
+  63065 [label="4 (63065)"]
+  63065 -> 63062 [label="!F"]
+  63069 [label="1 (63069)"]
+  63069 -> 63065 [label=" tau"]
+  63078 [label="2 (63078)"]
+  63078 -> 63069 [label="?C"]
+  63104 [label="0 (63104)"]
+  63104 -> 63078 [label="!D"]
+  63104 -> 63078 [label="!E"]
+  q_64105 [label="" height="0.01" width="0.01" style="invis"];
+  q_64105 -> 64105 [minlen="0.5"];
+  64044 [label="1 (64044)", peripheries=2]
+  64049 [label="5 (64049)"]
+  64049 -> 64044 [label=" tau"]
+  64079 [label="2 (64079)"]
+  64079 -> 64049 [label=" tau"]
+  64105 [label="0 (64105)"]
+  64105 -> 64079 [label="!D"]
+  64105 -> 64079 [label="!E"]
+  q_65106 [label="" height="0.01" width="0.01" style="invis"];
+  q_65106 -> 65106 [minlen="0.5"];
+  65044 [label="1 (65044)", peripheries=2]
+  65050 [label="5 (65050)"]
+  65050 -> 65044 [label="!D"]
+  65080 [label="2 (65080)"]
+  65080 -> 65050 [label=" tau"]
+  65106 [label="0 (65106)"]
+  65106 -> 65080 [label="!D"]
+  65106 -> 65080 [label="!E"]
+  q_66107 [label="" height="0.01" width="0.01" style="invis"];
+  q_66107 -> 66107 [minlen="0.5"];
+  66046 [label="2 (66046)", peripheries=2]
+  66051 [label="5 (66051)"]
+  66051 -> 66046 [label="!D"]
+  66081 [label="2 (66081)"]
+  66081 -> 66051 [label=" tau"]
+  66107 [label="0 (66107)"]
+  66107 -> 66081 [label="!D"]
+  66107 -> 66081 [label="!E"]
+  q_67108 [label="" height="0.01" width="0.01" style="invis"];
+  q_67108 -> 67108 [minlen="0.5"];
+  67045 [label="1 (67045)", peripheries=2]
+  67047 [label="2 (67047)"]
+  67047 -> 67045 [label="?A"]
+  67052 [label="5 (67052)"]
+  67052 -> 67047 [label="!D"]
+  67082 [label="2 (67082)"]
+  67082 -> 67052 [label=" tau"]
+  67108 [label="0 (67108)"]
+  67108 -> 67082 [label="!D"]
+  67108 -> 67082 [label="!E"]
+  q_68109 [label="" height="0.01" width="0.01" style="invis"];
+  q_68109 -> 68109 [minlen="0.5"];
+  68045 [label="1 (68045)", peripheries=2]
+  68048 [label="2 (68048)"]
+  68048 -> 68045 [label="?C"]
+  68053 [label="5 (68053)"]
+  68053 -> 68048 [label="!D"]
+  68083 [label="2 (68083)"]
+  68083 -> 68053 [label=" tau"]
+  68109 [label="0 (68109)"]
+  68109 -> 68083 [label="!D"]
+  68109 -> 68083 [label="!E"]
+  q_69110 [label="" height="0.01" width="0.01" style="invis"];
+  q_69110 -> 69110 [minlen="0.5"];
+  69044 [label="1 (69044)", peripheries=2]
+  69054 [label="5 (69054)"]
+  69054 -> 69044 [label="!E"]
+  69084 [label="2 (69084)"]
+  69084 -> 69054 [label=" tau"]
+  69110 [label="0 (69110)"]
+  69110 -> 69084 [label="!D"]
+  69110 -> 69084 [label="!E"]
+  q_70111 [label="" height="0.01" width="0.01" style="invis"];
+  q_70111 -> 70111 [minlen="0.5"];
+  70046 [label="2 (70046)", peripheries=2]
+  70055 [label="5 (70055)"]
+  70055 -> 70046 [label="!E"]
+  70085 [label="2 (70085)"]
+  70085 -> 70055 [label=" tau"]
+  70111 [label="0 (70111)"]
+  70111 -> 70085 [label="!D"]
+  70111 -> 70085 [label="!E"]
+  q_71112 [label="" height="0.01" width="0.01" style="invis"];
+  q_71112 -> 71112 [minlen="0.5"];
+  71045 [label="1 (71045)", peripheries=2]
+  71047 [label="2 (71047)"]
+  71047 -> 71045 [label="?A"]
+  71056 [label="5 (71056)"]
+  71056 -> 71047 [label="!E"]
+  71086 [label="2 (71086)"]
+  71086 -> 71056 [label=" tau"]
+  71112 [label="0 (71112)"]
+  71112 -> 71086 [label="!D"]
+  71112 -> 71086 [label="!E"]
+  q_72113 [label="" height="0.01" width="0.01" style="invis"];
+  q_72113 -> 72113 [minlen="0.5"];
+  72045 [label="1 (72045)", peripheries=2]
+  72048 [label="2 (72048)"]
+  72048 -> 72045 [label="?C"]
+  72057 [label="5 (72057)"]
+  72057 -> 72048 [label="!E"]
+  72087 [label="2 (72087)"]
+  72087 -> 72057 [label=" tau"]
+  72113 [label="0 (72113)"]
+  72113 -> 72087 [label="!D"]
+  72113 -> 72087 [label="!E"]
+  q_73114 [label="" height="0.01" width="0.01" style="invis"];
+  q_73114 -> 73114 [minlen="0.5"];
+  73044 [label="1 (73044)", peripheries=2]
+  73058 [label="5 (73058)"]
+  73058 -> 73044 [label="!F"]
+  73088 [label="2 (73088)"]
+  73088 -> 73058 [label=" tau"]
+  73114 [label="0 (73114)"]
+  73114 -> 73088 [label="!D"]
+  73114 -> 73088 [label="!E"]
+  q_74115 [label="" height="0.01" width="0.01" style="invis"];
+  q_74115 -> 74115 [minlen="0.5"];
+  74046 [label="2 (74046)", peripheries=2]
+  74059 [label="5 (74059)"]
+  74059 -> 74046 [label="!F"]
+  74089 [label="2 (74089)"]
+  74089 -> 74059 [label=" tau"]
+  74115 [label="0 (74115)"]
+  74115 -> 74089 [label="!D"]
+  74115 -> 74089 [label="!E"]
+  q_75116 [label="" height="0.01" width="0.01" style="invis"];
+  q_75116 -> 75116 [minlen="0.5"];
+  75045 [label="1 (75045)", peripheries=2]
+  75047 [label="2 (75047)"]
+  75047 -> 75045 [label="?A"]
+  75060 [label="5 (75060)"]
+  75060 -> 75047 [label="!F"]
+  75090 [label="2 (75090)"]
+  75090 -> 75060 [label=" tau"]
+  75116 [label="0 (75116)"]
+  75116 -> 75090 [label="!D"]
+  75116 -> 75090 [label="!E"]
+  q_76117 [label="" height="0.01" width="0.01" style="invis"];
+  q_76117 -> 76117 [minlen="0.5"];
+  76045 [label="1 (76045)", peripheries=2]
+  76048 [label="2 (76048)"]
+  76048 -> 76045 [label="?C"]
+  76061 [label="5 (76061)"]
+  76061 -> 76048 [label="!F"]
+  76091 [label="2 (76091)"]
+  76091 -> 76061 [label=" tau"]
+  76117 [label="0 (76117)"]
+  76117 -> 76091 [label="!D"]
+  76117 -> 76091 [label="!E"]
+  q_77118 [label="" height="0.01" width="0.01" style="invis"];
+  q_77118 -> 77118 [minlen="0.5"];
+  77009 [label="1 (77009)", peripheries=2]
+  77014 [label="3 (77014)"]
+  77014 -> 77009 [label=" tau"]
+  77118 [label="0 (77118)"]
+  77118 -> 77014 [label=" tau"]
+  q_78119 [label="" height="0.01" width="0.01" style="invis"];
+  q_78119 -> 78119 [minlen="0.5"];
+  78011 [label="2 (78011)", peripheries=2]
+  78015 [label="3 (78015)"]
+  78015 -> 78011 [label=" tau"]
+  78119 [label="0 (78119)"]
+  78119 -> 78015 [label=" tau"]
+  q_79120 [label="" height="0.01" width="0.01" style="invis"];
+  q_79120 -> 79120 [minlen="0.5"];
+  79010 [label="1 (79010)", peripheries=2]
+  79012 [label="2 (79012)"]
+  79012 -> 79010 [label="?A"]
+  79016 [label="3 (79016)"]
+  79016 -> 79012 [label=" tau"]
+  79120 [label="0 (79120)"]
+  79120 -> 79016 [label=" tau"]
+  q_80121 [label="" height="0.01" width="0.01" style="invis"];
+  q_80121 -> 80121 [minlen="0.5"];
+  80010 [label="1 (80010)", peripheries=2]
+  80013 [label="2 (80013)"]
+  80013 -> 80010 [label="?C"]
+  80017 [label="3 (80017)"]
+  80017 -> 80013 [label=" tau"]
+  80121 [label="0 (80121)"]
+  80121 -> 80017 [label=" tau"]
+  q_81122 [label="" height="0.01" width="0.01" style="invis"];
+  q_81122 -> 81122 [minlen="0.5"];
+  81000 [label="1 (81000)", peripheries=2]
+  81005 [label="0 (81005)", peripheries=2]
+  81005 -> 81000 [label="?A"]
+  81005 -> 81000 [label="?B"]
+  81018 [label="3 (81018)"]
+  81018 -> 81005 [label="!D"]
+  81122 [label="0 (81122)"]
+  81122 -> 81018 [label=" tau"]
+  q_82123 [label="" height="0.01" width="0.01" style="invis"];
+  q_82123 -> 82123 [minlen="0.5"];
+  82002 [label="2 (82002)", peripheries=2]
+  82006 [label="0 (82006)"]
+  82006 -> 82002 [label="!D"]
+  82006 -> 82002 [label="!E"]
+  82019 [label="3 (82019)"]
+  82019 -> 82006 [label="!D"]
+  82123 [label="0 (82123)"]
+  82123 -> 82019 [label=" tau"]
+  q_83124 [label="" height="0.01" width="0.01" style="invis"];
+  q_83124 -> 83124 [minlen="0.5"];
+  83001 [label="1 (83001)", peripheries=2]
+  83003 [label="2 (83003)"]
+  83003 -> 83001 [label="?A"]
+  83007 [label="0 (83007)"]
+  83007 -> 83003 [label="!D"]
+  83007 -> 83003 [label="!E"]
+  83020 [label="3 (83020)"]
+  83020 -> 83007 [label="!D"]
+  83124 [label="0 (83124)"]
+  83124 -> 83020 [label=" tau"]
+  q_84125 [label="" height="0.01" width="0.01" style="invis"];
+  q_84125 -> 84125 [minlen="0.5"];
+  84001 [label="1 (84001)", peripheries=2]
+  84004 [label="2 (84004)"]
+  84004 -> 84001 [label="?C"]
+  84008 [label="0 (84008)"]
+  84008 -> 84004 [label="!D"]
+  84008 -> 84004 [label="!E"]
+  84021 [label="3 (84021)"]
+  84021 -> 84008 [label="!D"]
+  84125 [label="0 (84125)"]
+  84125 -> 84021 [label=" tau"]
+  q_85126 [label="" height="0.01" width="0.01" style="invis"];
+  q_85126 -> 85126 [minlen="0.5"];
+  85009 [label="1 (85009)", peripheries=2]
+  85022 [label="3 (85022)"]
+  85022 -> 85009 [label="!D"]
+  85126 [label="0 (85126)"]
+  85126 -> 85022 [label=" tau"]
+  q_86127 [label="" height="0.01" width="0.01" style="invis"];
+  q_86127 -> 86127 [minlen="0.5"];
+  86000 [label="1 (86000)", peripheries=2]
+  86005 [label="0 (86005)", peripheries=2]
+  86005 -> 86000 [label="?A"]
+  86005 -> 86000 [label="?B"]
+  86023 [label="3 (86023)"]
+  86023 -> 86005 [label="!E"]
+  86127 [label="0 (86127)"]
+  86127 -> 86023 [label=" tau"]
+  q_87128 [label="" height="0.01" width="0.01" style="invis"];
+  q_87128 -> 87128 [minlen="0.5"];
+  87002 [label="2 (87002)", peripheries=2]
+  87006 [label="0 (87006)"]
+  87006 -> 87002 [label="!D"]
+  87006 -> 87002 [label="!E"]
+  87024 [label="3 (87024)"]
+  87024 -> 87006 [label="!E"]
+  87128 [label="0 (87128)"]
+  87128 -> 87024 [label=" tau"]
+  q_88129 [label="" height="0.01" width="0.01" style="invis"];
+  q_88129 -> 88129 [minlen="0.5"];
+  88001 [label="1 (88001)", peripheries=2]
+  88003 [label="2 (88003)"]
+  88003 -> 88001 [label="?A"]
+  88007 [label="0 (88007)"]
+  88007 -> 88003 [label="!D"]
+  88007 -> 88003 [label="!E"]
+  88025 [label="3 (88025)"]
+  88025 -> 88007 [label="!E"]
+  88129 [label="0 (88129)"]
+  88129 -> 88025 [label=" tau"]
+  q_89130 [label="" height="0.01" width="0.01" style="invis"];
+  q_89130 -> 89130 [minlen="0.5"];
+  89001 [label="1 (89001)", peripheries=2]
+  89004 [label="2 (89004)"]
+  89004 -> 89001 [label="?C"]
+  89008 [label="0 (89008)"]
+  89008 -> 89004 [label="!D"]
+  89008 -> 89004 [label="!E"]
+  89026 [label="3 (89026)"]
+  89026 -> 89008 [label="!E"]
+  89130 [label="0 (89130)"]
+  89130 -> 89026 [label=" tau"]
+  q_90131 [label="" height="0.01" width="0.01" style="invis"];
+  q_90131 -> 90131 [minlen="0.5"];
+  90009 [label="1 (90009)", peripheries=2]
+  90027 [label="3 (90027)"]
+  90027 -> 90009 [label="!E"]
+  90131 [label="0 (90131)"]
+  90131 -> 90027 [label=" tau"]
+  q_91132 [label="" height="0.01" width="0.01" style="invis"];
+  q_91132 -> 91132 [minlen="0.5"];
+  91000 [label="1 (91000)", peripheries=2]
+  91005 [label="0 (91005)", peripheries=2]
+  91005 -> 91000 [label="?A"]
+  91005 -> 91000 [label="?B"]
+  91028 [label="3 (91028)"]
+  91028 -> 91005 [label="!F"]
+  91132 [label="0 (91132)"]
+  91132 -> 91028 [label=" tau"]
+  q_92133 [label="" height="0.01" width="0.01" style="invis"];
+  q_92133 -> 92133 [minlen="0.5"];
+  92002 [label="2 (92002)", peripheries=2]
+  92006 [label="0 (92006)"]
+  92006 -> 92002 [label="!D"]
+  92006 -> 92002 [label="!E"]
+  92029 [label="3 (92029)"]
+  92029 -> 92006 [label="!F"]
+  92133 [label="0 (92133)"]
+  92133 -> 92029 [label=" tau"]
+  q_93134 [label="" height="0.01" width="0.01" style="invis"];
+  q_93134 -> 93134 [minlen="0.5"];
+  93001 [label="1 (93001)", peripheries=2]
+  93003 [label="2 (93003)"]
+  93003 -> 93001 [label="?A"]
+  93007 [label="0 (93007)"]
+  93007 -> 93003 [label="!D"]
+  93007 -> 93003 [label="!E"]
+  93030 [label="3 (93030)"]
+  93030 -> 93007 [label="!F"]
+  93134 [label="0 (93134)"]
+  93134 -> 93030 [label=" tau"]
+  q_94135 [label="" height="0.01" width="0.01" style="invis"];
+  q_94135 -> 94135 [minlen="0.5"];
+  94001 [label="1 (94001)", peripheries=2]
+  94004 [label="2 (94004)"]
+  94004 -> 94001 [label="?C"]
+  94008 [label="0 (94008)"]
+  94008 -> 94004 [label="!D"]
+  94008 -> 94004 [label="!E"]
+  94031 [label="3 (94031)"]
+  94031 -> 94008 [label="!F"]
+  94135 [label="0 (94135)"]
+  94135 -> 94031 [label=" tau"]
+  q_95136 [label="" height="0.01" width="0.01" style="invis"];
+  q_95136 -> 95136 [minlen="0.5"];
+  95009 [label="1 (95009)", peripheries=2]
+  95032 [label="3 (95032)"]
+  95032 -> 95009 [label="!F"]
+  95136 [label="0 (95136)"]
+  95136 -> 95032 [label=" tau"]
+  q_96137 [label="" height="0.01" width="0.01" style="invis"];
+  q_96137 -> 96137 [minlen="0.5"];
+  96011 [label="2 (96011)", peripheries=2]
+  96033 [label="3 (96033)"]
+  96033 -> 96011 [label="!F"]
+  96137 [label="0 (96137)"]
+  96137 -> 96033 [label=" tau"]
+  q_97138 [label="" height="0.01" width="0.01" style="invis"];
+  q_97138 -> 97138 [minlen="0.5"];
+  97010 [label="1 (97010)", peripheries=2]
+  97012 [label="2 (97012)"]
+  97012 -> 97010 [label="?A"]
+  97034 [label="3 (97034)"]
+  97034 -> 97012 [label="!F"]
+  97138 [label="0 (97138)"]
+  97138 -> 97034 [label=" tau"]
+  q_98139 [label="" height="0.01" width="0.01" style="invis"];
+  q_98139 -> 98139 [minlen="0.5"];
+  98010 [label="1 (98010)", peripheries=2]
+  98013 [label="2 (98013)"]
+  98013 -> 98010 [label="?C"]
+  98035 [label="3 (98035)"]
+  98035 -> 98013 [label="!F"]
+  98139 [label="0 (98139)"]
+  98139 -> 98035 [label=" tau"]
+}

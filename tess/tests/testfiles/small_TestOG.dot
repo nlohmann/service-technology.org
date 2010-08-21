@@ -4,7 +4,7 @@ node [fontname="Helvetica" fontsize=10];
 edge [fontname="Helvetica" fontsize=10];
   q_3 [label="" height="0.01" width="0.01" style="invis"];
   q_3 -> 3 [minlen="0.5"];
-  3 [label="3\n (C + T + tau)"]
+  3 [label="3\n ((C * T) + tau)"]
   3 -> 6 [label=" tau"]
   3 -> 5 [label="!C"]
   3 -> 5 [label="!T"]

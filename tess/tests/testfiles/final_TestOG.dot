@@ -1,0 +1,41 @@
+digraph D {
+graph [fontname="Helvetica", label="tests/testfiles/final_TestOG"];
+node [fontname="Helvetica" fontsize=10];
+edge [fontname="Helvetica" fontsize=10];
+  q_0 [label="" height="0.01" width="0.01" style="invis"];
+  q_0 -> 0 [minlen="0.5"];
+  0 [label="0\n ((A * B * final) + (D * E) + tau)"]
+  0 -> 3 [label=" tau"]
+  0 -> 1 [label="?A"]
+  0 -> 1 [label="?B"]
+  0 -> 2 [label="!D"]
+  0 -> 2 [label="!E"]
+  1 [label="1\n (final + tau)"]
+  1 -> 4 [label=" tau"]
+  2 [label="2\n (final + A + C + tau)"]
+  2 -> 5 [label=" tau"]
+  2 -> 1 [label="?A"]
+  2 -> 1 [label="?C"]
+  3 [label="3\n (tau + D + E + F)"]
+  3 -> 1 [label=" tau"]
+  3 -> 2 [label=" tau"]
+  3 -> 0 [label="!D"]
+  3 -> 1 [label="!D"]
+  3 -> 0 [label="!E"]
+  3 -> 1 [label="!E"]
+  3 -> 0 [label="!F"]
+  3 -> 1 [label="!F"]
+  3 -> 2 [label="!F"]
+  4 [label="4\n (D + E + F)"]
+  4 -> 1 [label="!D"]
+  4 -> 1 [label="!E"]
+  4 -> 1 [label="!F"]
+  5 [label="5\n (tau + D + E + F)"]
+  5 -> 1 [label=" tau"]
+  5 -> 1 [label="!D"]
+  5 -> 2 [label="!D"]
+  5 -> 1 [label="!E"]
+  5 -> 2 [label="!E"]
+  5 -> 1 [label="!F"]
+  5 -> 2 [label="!F"]
+}

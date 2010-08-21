@@ -105,13 +105,17 @@ void TestCase::appendPartialTestCase(int label, TestCase* partialTestCase){
 
 void TestCase::printNodes(ostream& o) const{
 	o << "TEST CASE " << id << endl;
-	//o << "-----------------" << endl;
 
     //print all nodes
 	for (map<int, TNode*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n){
 
 		assert (n->first == n->second->idTestOg);
-		o << "  " << n->first << ": " << n->second->idOg << endl;
+		o << "  " << n->first << ": " << n->second->idOg;
+
+		if(n->second->isFinalNode()){
+			o << " (final)";
+		}
+		o << endl;
 
 		for (unsigned int i = firstLabelId; i < id2label.size(); ++i){
 			for (set<TNode*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
@@ -168,8 +172,13 @@ void TestCase::toDot_Nodes(FILE* out) const{
 	fprintf(out, "  q_%d -> %d [minlen=\"0.5\"];\n", (root->idTestOg)+1000*id, (root->idTestOg)+1000*id);
 
 	for (map<int, TNode*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
-		fprintf(out, "  %d [label=\"%d (%d)\"]\n", (n->second->idTestOg)+1000*id, (n->second->idOg), (n->second->idTestOg)+1000*id);
 
+		if(n->second->isFinalNode()){
+			fprintf(out, "  %d [label=\"%d (%d)\", peripheries=2]\n", (n->second->idTestOg)+1000*id, (n->second->idOg), (n->second->idTestOg)+1000*id);
+		}
+		else{
+			fprintf(out, "  %d [label=\"%d (%d)\"]\n", (n->second->idTestOg)+1000*id, (n->second->idOg), (n->second->idTestOg)+1000*id);
+		}
 		for (unsigned int i = firstLabelId; i < id2label.size(); ++i){
 			for (set<TNode*>::iterator s = n->second->outEdges[i].begin(); s != n->second->outEdges[i].end(); ++s){
 				fprintf(out, "  %d -> %d [label=\"%c%s\"]\n", (n->second->idTestOg)+1000*id, ((*s)->idTestOg)+1000*id, inout[i] ,id2label[i].c_str());

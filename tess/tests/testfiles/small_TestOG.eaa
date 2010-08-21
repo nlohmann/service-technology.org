@@ -8,7 +8,7 @@ INTERFACE
 INITIALNODES  3;
 
 NODES
-  3: (C + T + tau)
+  3: ((C * T) + tau)
     tau -> 6
     C -> 5
     T -> 5

@@ -1,0 +1,31 @@
+digraph D {
+graph [fontname="Helvetica", label="true_TestOG"];
+node [fontname="Helvetica" fontsize=10];
+edge [fontname="Helvetica" fontsize=10];
+  q_0 [label="" height="0.01" width="0.01" style="invis"];
+  q_0 -> 0 [minlen="0.5"];
+  0 [label="0\n ((A) + tau)"]
+  0 -> 3 [label=" tau"]
+  0 -> 1 [label="?A"]
+  1 [label="1\n (true + tau)"]
+  1 -> 4 [label=" tau"]
+  1 -> 2 [label="?A"]
+  1 -> 2 [label="?B"]
+  1 -> 2 [label="!D"]
+  2 [label="2\n (final + tau)"]
+  2 -> 5 [label=" tau"]
+  3 [label="3\n (tau + D + E)"]
+  3 -> 1 [label=" tau"]
+  3 -> 0 [label="!D"]
+  3 -> 1 [label="!D"]
+  3 -> 0 [label="!E"]
+  3 -> 1 [label="!E"]
+  4 [label="4\n (tau + D + E)"]
+  4 -> 2 [label=" tau"]
+  4 -> 1 [label="!D"]
+  4 -> 1 [label="!E"]
+  4 -> 2 [label="!E"]
+  5 [label="5\n (D + E)"]
+  5 -> 2 [label="!D"]
+  5 -> 2 [label="!E"]
+}

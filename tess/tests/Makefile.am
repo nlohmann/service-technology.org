@@ -25,7 +25,8 @@ TESTFILES = EMPTY myCoffee.og \
             myCoffee_rename_ref.dot myCoffee_rename_ref.eaa \
             myCoffee_all_ref.dot myCoffee_all_ref.eaa \
             small.og small_TestOG_ref.dot small_TestOG_ref.eaa small_TestCases_ref.dot small_TestCases_ref.eaa   \
-            final.og final_TestOG_ref.dot final_TestOG_ref.eaa final_TestCases_ref.dot final_TestCases_ref.eaa  
+            final.og final_TestOG_ref.dot final_TestOG_ref.eaa final_TestCases_ref.dot final_TestCases_ref.eaa  \
+            true.og  true_TestOG_ref.dot  true_TestOG_ref.eaa  true_TestCases_ref.dot  true_TestCases_ref.eaa 
 
 
 #-----------------------------------------#

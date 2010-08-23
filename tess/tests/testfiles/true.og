@@ -1,0 +1,17 @@
+INTERFACE
+  INPUT
+    A,B,C;
+  OUTPUT
+    D, E;
+
+NODES
+
+  0 : true * A
+    A -> 1
+
+  1 : true 
+    A -> 2
+    B -> 2
+    D -> 2
+
+  2 : final

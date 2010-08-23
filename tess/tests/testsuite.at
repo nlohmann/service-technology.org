@@ -40,6 +40,22 @@ AT_CLEANUP
 
 #####################################
 
+AT_SETUP([true.og])
+
+AT_CHECK([cp TESTFILES/EMPTY TESTFILES/true.og TESTFILES/true_TestCases_ref.eaa TESTFILES/true_TestCases_ref.dot TESTFILES/true_TestOG_ref.eaa TESTFILES/true_TestOG_ref.dot .])
+
+AT_CHECK([TESS true.og -oeaa -opng -odot],0,stdout,stderr)
+AT_CHECK([diff EMPTY stderr])
+AT_CHECK([diff true_TestOG_ref.eaa true_TestOG.eaa])
+AT_CHECK([diff true_TestOG_ref.dot true_TestOG.dot])
+AT_CHECK([diff true_TestCases_ref.eaa true_TestCases.eaa])
+AT_CHECK([diff true_TestCases_ref.dot true_TestCases.dot])
+
+AT_KEYWORDS(elementar)
+AT_CLEANUP
+
+#####################################
+
 
 
 ############################################################################

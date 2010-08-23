@@ -1,0 +1,25 @@
+PLACE
+  o_hist#p2b_5, o_hist#p1b_2, o#p3a_7, o#p3c_9, o_hist#p1a_1, o_hist#p1c_3, o_hist#p2c_6, o#p3b_8, o_hist#p2a_4, o#p4_10;
+
+MARKING
+  ;
+
+TRANSITION o_hist#e1a_11
+  CONSUME o_hist#p1a_1:1, o_hist#p1b_2:1;
+  PRODUCE o_hist#p2a_4:1;
+
+TRANSITION o#e3_15
+  CONSUME o#p3a_7:1;
+  PRODUCE o#p4_10:1;
+
+TRANSITION o#e2b_14
+  CONSUME o_hist#p2c_6:1;
+  PRODUCE o#p3c_9:1, o#p3b_8:1;
+
+TRANSITION o#e2a_13
+  CONSUME o_hist#p2a_4:1, o_hist#p2b_5:1;
+  PRODUCE o#p3a_7:1;
+
+TRANSITION o_hist#e1b_12
+  CONSUME o_hist#p1c_3:1;
+  PRODUCE o_hist#p2c_6:1, o_hist#p2b_5:1;

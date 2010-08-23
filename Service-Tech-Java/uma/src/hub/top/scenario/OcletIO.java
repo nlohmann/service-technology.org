@@ -194,7 +194,8 @@ public class OcletIO extends PetriNetIO {
 
     b.append("PLACE\n");
     
-    toLoLA_appendPlaces(b, os.getInitialRun());
+    if (os.getInitialRun() != null)
+      toLoLA_appendPlaces(b, os.getInitialRun());
     for (Oclet o : os.getOclets())
       toLoLA_appendPlaces(b, o);
     b.append("\n");
@@ -202,18 +203,21 @@ public class OcletIO extends PetriNetIO {
     b.append("MARKING\n");
     {
       b.append("  ");
-      boolean first = true;
-      for (Place p : os.getInitialRun().getPlaces()) {
-        if (!first) b.append(", ");
-        if (p.getTokens() > 0)
-          b.append(ocletNodeToLoLA(os.getInitialRun(), p)+":"+p.getTokens());
-        first = false;
+      if (os.getInitialRun() != null) {
+        boolean first = true;
+        for (Place p : os.getInitialRun().getPlaces()) {
+          if (!first) b.append(", ");
+          if (p.getTokens() > 0)
+            b.append(ocletNodeToLoLA(os.getInitialRun(), p)+":"+p.getTokens());
+          first = false;
+        }
       }
       b.append(";\n");
     }
     b.append("\n");
-    
-    toLoLA_appendTransitions(b, os.getInitialRun());
+
+    if (os.getInitialRun() != null)
+      toLoLA_appendTransitions(b, os.getInitialRun());
     for (Oclet o : os.getOclets())
       toLoLA_appendTransitions(b, o);
     

@@ -11,6 +11,7 @@ import hub.top.scenario.DNodeSys_OcletSpecification;
 import hub.top.scenario.Oclet;
 import hub.top.scenario.OcletIO;
 import hub.top.scenario.OcletSpecification;
+import hub.top.uma.synthesis.NetSynthesis;
 
 public class UmaTest {
   public String lastTest = "";
@@ -63,8 +64,12 @@ public class UmaTest {
     testOcletPrefix_executable1();
     testOcletPrefix_executable2();
     testOcletPrefix_executable3();
-    
+  
+    testOcletPrefix_standardExample_EMS();
     testOcletPrefix_standardExample_flood();
+    
+    testOcletSynthesis_standardExample_EMS();
+    testOcletSynthesis_standardExample_flood();
   }
 
   public static void main(String[] args) {
@@ -327,9 +332,38 @@ public class UmaTest {
     }
   }
 
+  public void testOcletPrefix_standardExample_EMS() {
+    
+    lastTest = "Construct prefix of oclet specification (EMS)";
+
+    try {
+      PetriNet net = OcletIO.readNetFromFile("./testfiles/EMS.oclets");
+      OcletSpecification os = new OcletSpecification(net);
+      
+      DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
+      DNodeBP build = new DNodeBP(sys);
+      build.configure_buildOnly();
+      build.configure_Scenarios();
+      build.configure_stopIfUnSafe();
+      
+      while (build.step() > 0) {
+      }
+      
+      build.getStatistics();
+      
+      assertTrue(build.statistic_eventNum == 21
+          && build.statistic_condNum == 35
+          && build.statistic_cutOffNum == 3
+          && build.statistic_arcNum == 64);
+      
+    } catch (Exception e) {
+      assertTrue(false);
+    }
+  }
+  
   public void testOcletPrefix_standardExample_flood() {
     
-    lastTest = "Construct prefix of oclet specification (flood alert)";
+    lastTest = "Construct prefix of oclet specification with anti-oclets (flood alert)";
 
     try {
       PetriNet net = OcletIO.readNetFromFile("./testfiles/flood.oclets");
@@ -358,6 +392,70 @@ public class UmaTest {
       assertEquals(antiNodes, 2);
       
     } catch (Exception e) {
+      assertTrue(false);
+    }
+  }
+  
+  public void testOcletSynthesis_standardExample_EMS() {
+
+    lastTest = "Synthesize Petri net from oclets (EMS)";
+
+    try {
+    
+      PetriNet net = OcletIO.readNetFromFile("./testfiles/EMS.oclets");
+      OcletSpecification os = new OcletSpecification(net);
+      
+      DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
+      DNodeBP build = new DNodeBP(sys);
+      build.configure_buildOnly();
+      build.configure_Scenarios();
+      build.configure_stopIfUnSafe();
+      
+      while (build.step() > 0) {
+      }
+      
+      PetriNet net2 = hub.top.uma.synthesis.NetSynthesis.foldToNet_labeled(build);
+      NetSynthesis.Diagnostic_Implements diag =
+        NetSynthesis.doesImplement(net2, build);
+      
+      assertEquals(diag.result, NetSynthesis.COMPARE_EQUAL);
+      
+    } catch (IOException e) {
+      System.err.println("Couldn't read test file: "+e);
+      assertTrue(false);
+    } catch (InvalidModelException e) {
+      assertTrue(false);
+    }
+  }
+  
+  public void testOcletSynthesis_standardExample_flood() {
+
+    lastTest = "Synthesize Petri net with anti-oclets (flood alert)";
+
+    try {
+    
+      PetriNet net = OcletIO.readNetFromFile("./testfiles/flood.oclets");
+      OcletSpecification os = new OcletSpecification(net);
+      
+      DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
+      DNodeBP build = new DNodeBP(sys);
+      build.configure_buildOnly();
+      build.configure_Scenarios();
+      build.configure_stopIfUnSafe();
+      
+      while (build.step() > 0) {
+      }
+      
+      PetriNet net2 = hub.top.uma.synthesis.NetSynthesis.foldToNet_labeled(build);
+      NetSynthesis.Diagnostic_Implements diag =
+        NetSynthesis.doesImplement(net2, build);
+      
+      assertEquals(diag.result, NetSynthesis.COMPARE_EQUAL);
+      
+    } catch (IOException e) {
+      System.err.println("Couldn't read test file: "+e);
+      assertTrue(false);
+    } catch (InvalidModelException e) {
       assertTrue(false);
     }
   }

@@ -1,0 +1,111 @@
+PLACE
+  init#EMS_ready__2, init#medic_ready__1, init#hospital_3;
+  M1#medic_7, M1_hist#avail_1, M1#location_5, M1_hist#EMS_3, M1_hist#medic_2, M1#EMS_6, M1#EMS_4;
+  M2_hist#avail_1, M2_hist#medic_2, M2#EMS_4, M2#none_5, M2#medic_ready__7, M2#EMS_ready__6, M2_hist#EMS_3;
+  M3#hospital_11, M3_hist#medic_6, M3#EMS_8, M3_hist#EMS_3, M3_hist#medic_2, M3_hist#hospital_1, M3#confirm_7, M3_hist#location_4, M3_hist#EMS_5, M3#medic_10, M3#medic_ready__9;
+  M4#notify_10, M4_hist#EMS_5, M4#ack_14, M4_hist#medic_6, M4#hospital_13, M4#hospital_notified__11, M4#EMS_9, M4_hist#EMS_8, M4_hist#confirm_7, M4_hist#medic_2, M4_hist#location_4, M4_hist#EMS_3, M4_hist#hospital_1, M4#EMS_ready__12;
+  M5#EMS_5, M5_hist#medic_ready__1, M5#medic_4, M5#avail_3, M5_hist#EMS_ready__2;
+
+MARKING
+  init#EMS_ready__2:1, init#medic_ready__1:1, init#hospital_3:1;
+
+TRANSITION M1#?location_10
+  CONSUME M1#location_5:1, M1_hist#medic_2:1;
+  PRODUCE M1#medic_7:1;
+
+TRANSITION M1_hist#!avail_8
+  CONSUME ;
+  PRODUCE M1_hist#avail_1:1, M1_hist#medic_2:1;
+
+TRANSITION M1#check_11
+  CONSUME M1_hist#EMS_3:1;
+  PRODUCE M1#EMS_4:1;
+
+TRANSITION M1_hist#?avail_9
+  CONSUME M1_hist#avail_1:1;
+  PRODUCE M1_hist#EMS_3:1;
+
+TRANSITION M1#!location_12
+  CONSUME M1#EMS_4:1;
+  PRODUCE M1#location_5:1, M1#EMS_6:1;
+
+TRANSITION M2#!none_12
+  CONSUME M2#EMS_4:1;
+  PRODUCE M2#none_5:1, M2#EMS_ready__6:1;
+
+TRANSITION M2#check_11
+  CONSUME M2_hist#EMS_3:1;
+  PRODUCE M2#EMS_4:1;
+
+TRANSITION M2_hist#?avail_9
+  CONSUME M2_hist#avail_1:1;
+  PRODUCE M2_hist#EMS_3:1;
+
+TRANSITION M2_hist#!avail_8
+  CONSUME ;
+  PRODUCE M2_hist#avail_1:1, M2_hist#medic_2:1;
+
+TRANSITION M2#?none_10
+  CONSUME M2_hist#medic_2:1, M2#none_5:1;
+  PRODUCE M2#medic_ready__7:1;
+
+TRANSITION M3#patient_to_hospital_16
+  CONSUME M3#medic_10:1, M3_hist#hospital_1:1;
+  PRODUCE M3#hospital_11:1, M3#medic_ready__9:1;
+
+TRANSITION M3#confirm_15
+  CONSUME M3_hist#medic_6:1;
+  PRODUCE M3#medic_10:1, M3#confirm_7:1;
+
+TRANSITION M3_hist#?location_13
+  CONSUME M3_hist#location_4:1, M3_hist#medic_2:1;
+  PRODUCE M3_hist#medic_6:1;
+
+TRANSITION M3_hist#!location_12
+  CONSUME M3_hist#EMS_3:1;
+  PRODUCE M3_hist#EMS_5:1, M3_hist#location_4:1;
+
+TRANSITION M3#?confirm_14
+  CONSUME M3#confirm_7:1, M3_hist#EMS_5:1;
+  PRODUCE M3#EMS_8:1;
+
+TRANSITION M4#!notify_19
+  CONSUME M4_hist#EMS_8:1;
+  PRODUCE M4#notify_10:1, M4#EMS_9:1;
+
+TRANSITION M4_hist#confirm_18
+  CONSUME M4_hist#medic_6:1;
+  PRODUCE M4_hist#confirm_7:1;
+
+TRANSITION M4_hist#?confirm_17
+  CONSUME M4_hist#EMS_5:1, M4_hist#confirm_7:1;
+  PRODUCE M4_hist#EMS_8:1;
+
+TRANSITION M4_hist#?location_16
+  CONSUME M4_hist#location_4:1, M4_hist#medic_2:1;
+  PRODUCE M4_hist#medic_6:1;
+
+TRANSITION M4#?ack_22
+  CONSUME M4#EMS_9:1, M4#ack_14:1;
+  PRODUCE M4#EMS_ready__12:1;
+
+TRANSITION M4#!ack_21
+  CONSUME M4#hospital_notified__11:1;
+  PRODUCE M4#hospital_13:1, M4#ack_14:1;
+
+TRANSITION M4#?notify_20
+  CONSUME M4#notify_10:1, M4_hist#hospital_1:1;
+  PRODUCE M4#hospital_notified__11:1;
+
+TRANSITION M4_hist#!location_15
+  CONSUME M4_hist#EMS_3:1;
+  PRODUCE M4_hist#EMS_5:1, M4_hist#location_4:1;
+
+TRANSITION M5#!avail_6
+  CONSUME M5_hist#medic_ready__1:1;
+  PRODUCE M5#medic_4:1, M5#avail_3:1;
+
+TRANSITION M5#?avail_7
+  CONSUME M5#avail_3:1, M5_hist#EMS_ready__2:1;
+  PRODUCE M5#EMS_5:1;
+

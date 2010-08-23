@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import hub.top.petrinet.Node;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
+import hub.top.uma.InvalidModelException;
 
 public class Oclet extends hub.top.petrinet.PetriNet {
 
@@ -296,11 +297,15 @@ public class Oclet extends hub.top.petrinet.PetriNet {
    * @return <code>true</code> iff the net satisfies all structural
    * constraints of an oclet: a labeled causal net where the history
    * is a prefix
+   * 
+   * @throws InvalidModelException if net is not an oclet
    */
-  public boolean isValidOclet() {
+  public boolean isValidOclet() throws InvalidModelException {
 
-    if (!isCausalNet()) return false;
-    if (!historyIsPrefix()) return false;
+    if (!isCausalNet())
+      throw new InvalidModelException(InvalidModelException.OCLET_NO_CAUSALNET, this);
+    if (!historyIsPrefix())
+      throw new InvalidModelException(InvalidModelException.OCLET_HISTORY_NOT_PREFIX, this);
     
     // each event in the history of an oclet has also all post-conditions
     // in the history
@@ -308,7 +313,7 @@ public class Oclet extends hub.top.petrinet.PetriNet {
       if (isInHistory(t)) {
         for (Place p : t.getPostSet()) {
           if (!isInHistory(p)) {
-            return false;
+            throw new InvalidModelException(InvalidModelException.OCLET_HISTORY_INCOMPLETE_PREFIX, this);
           }
         }
       }

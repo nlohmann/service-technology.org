@@ -31,12 +31,21 @@ public class InvalidModelException extends Exception {
 
   public static final int EMPTY_PRESET = 1;
   public static final int EMPTY_POSTSET = 2;
+  public static final int OCLET_NO_CAUSALNET = 3;
+  public static final int OCLET_HISTORY_NOT_PREFIX = 4;
+  public static final int OCLET_HISTORY_INCOMPLETE_PREFIX = 5;
   
   private Object cause;
   private int reason;
   
   public InvalidModelException(int reason, Object e, String text) {
     super(text);
+    this.reason = reason;
+    this.cause = e;
+  }
+  
+  public InvalidModelException(int reason, Object e) {
+    super(printReason(reason));
     this.reason = reason;
     this.cause = e;
   }
@@ -48,4 +57,16 @@ public class InvalidModelException extends Exception {
   public int getReason() {
     return reason;
   }
+  
+  public static String printReason(int reason) {
+    switch (reason) {
+    case EMPTY_PRESET: return "Found transition with empty pre-set";
+    case EMPTY_POSTSET: return "Found transition with empty post-set";
+    case OCLET_NO_CAUSALNET: return "Oclet is not a causal net";
+    case OCLET_HISTORY_NOT_PREFIX: return "Prefix of oclet is not a history";
+    case OCLET_HISTORY_INCOMPLETE_PREFIX: return "Prefix of oclet is incomplete";
+    }
+    return "";
+  }
+  
 }

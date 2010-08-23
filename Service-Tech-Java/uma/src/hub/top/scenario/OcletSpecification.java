@@ -18,13 +18,12 @@
 
 package hub.top.scenario;
 
-import hub.top.petrinet.Node;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
+import hub.top.uma.InvalidModelException;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 
 public class OcletSpecification {
@@ -32,28 +31,55 @@ public class OcletSpecification {
   private Oclet initialRun;
   private LinkedList<Oclet> oclets;
   
+  /**
+   * create an empty oclet specification
+   */
   public OcletSpecification() {
     initialRun = null;
     oclets = new LinkedList<Oclet>();
   }
   
+  /**
+   * Read a Petri net of which the nodes are labeled to distinguish
+   * oclets, histories, and anti-oclets according to {@link OcletIdentifier},
+   * and split this Petri net into the described {@link Oclet}s.
+   * 
+   * @param net
+   * 
+   * @throws InvalidModelException if 'net' does not decompose into proper oclets
+   */
   public OcletSpecification(PetriNet net) {
     this();
     splitNetIntoOclets(net);
   }
   
+  /**
+   * Add an oclet to the specification.
+   * 
+   * @param o
+   */
   public void addOclet(Oclet o) {
     oclets.add(o);
   }
   
+  /**
+   * @return all oclet of the specification
+   */
   public LinkedList<Oclet> getOclets() {
     return oclets;
   }
   
+  /**
+   * set the initial run of the specification
+   * @param o
+   */
   public void setInitialRun(Oclet o) {
     initialRun = o;
   }
   
+  /**
+   * @return the initial run of the specification
+   */
   public Oclet getInitialRun() {
     return initialRun;
   }
@@ -116,7 +142,26 @@ public class OcletSpecification {
       if (hasHistory) addOclet(o);
       else setInitialRun(o);
     }
+  }
+  
+  /**
+   * @return <code>true</code> iff each oclet of this specification satisfies
+   * all structural constraints of an oclet ({@link Oclet#isValidOclet()}).
+   * 
+   * @throws InvalidModelException if an oclet violates a constraint
+   */
+  public boolean isValidSpecification() throws InvalidModelException {
+    if (initialRun != null) {
+      if (!initialRun.isCausalNet())
+        throw new InvalidModelException(InvalidModelException.OCLET_NO_CAUSALNET, initialRun);
+    }
     
+    for (Oclet o : oclets) {
+      // check whether oclet is valid, and re-throw exception if invalid
+      o.isValidOclet();
+    }
+    
+    return true;
   }
   
   /**

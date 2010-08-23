@@ -18,7 +18,6 @@
 \*****************************************************************************/
 
 #include <config.h>
-//#include <cstdio>
 #include "Node.h"
 #include "map"
 #include <iostream>
@@ -71,23 +70,9 @@ void Node::addEdge(int label, Node *target) {
 }
 
 /// reset the maxId
-void Node::init(){
-	maxId = -1;
-}
-
-
-/// adds the shadow node for the current node
-Node* Node::addShadowNode(){
-	Node* shadowNode = new Node(NULL, true);
-	assert(shadowNode->formula == NULL);
-	addEdge(label2id[Tau], shadowNode); // q -tau-> q'
-
-	Formula *f = new FormulaOR(formula, new FormulaLit(label2id[Tau]));
-	formula = f;
-
-	return shadowNode;
-}
-
+//void Node::init(){
+//	maxId = -1;
+//}
 
 /// implements the edit operator insertion
 void Node::applyInsertion(Node* shadowNode){
@@ -131,10 +116,10 @@ void Node::applyRenaming(Node* shadowNode){
 }
 
 /// implements the edit operator "change future"
-void Node::applyChangeFuture(Node* shadowNode){
-	assert(shadowNode->isShadowNode == true);
-	assert(false);
-}
+//void Node::applyChangeFuture(Node* shadowNode){
+//	assert(shadowNode->isShadowNode == true);
+//	assert(false);
+//}
 
 int TNode::maxId = 0;
 

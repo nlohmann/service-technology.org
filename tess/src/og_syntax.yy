@@ -62,7 +62,7 @@ bool initialNodesDecl = false;
 %defines
 
 %token KEY_NODES 
-%token KEY_INTERFACE KEY_INPUT KEY_OUTPUT KEY_INITIALNODES KEY_GLOBALFORMULA KEY_TAULOOPS
+%token KEY_INTERFACE KEY_INPUT KEY_OUTPUT
 %token COMMA COLON SEMICOLON IDENT ARROW NUMBER
 %token KEY_TRUE KEY_FINAL BIT_F BIT_S
 %token LPAR RPAR
@@ -89,9 +89,8 @@ bool initialNodesDecl = false;
 og:
   KEY_INTERFACE 
   input
-  output
-  initialnodes 
-  KEY_NODES nodes
+  output 
+  KEY_NODES {initialNodesDecl = false;} nodes
 ;
  
 input:
@@ -103,15 +102,6 @@ output:
   /* empty */ {firstOutputId = label2id.size(); lastOutputId = label2id.size()-1;}
 | KEY_OUTPUT {firstOutputId = label2id.size();} identlist_out {lastOutputId = label2id.size()-1;} SEMICOLON
 ;
-
-initialnodes:
-  /* empty */ {initialNodesDecl = false;}
-| KEY_INITIALNODES initialnodelist SEMICOLON {initialNodesDecl = true;}
-;  
-
-initialnodelist:
-  NUMBER {graph->addInitialNode($1);}
-| initialnodelist COMMA NUMBER {graph->addInitialNode($3);}
 		
 identlist_in:
   /* empty */

@@ -484,10 +484,8 @@ void Graph::toTestOg(){
 //	if (rename_selected){ cout << "rename is activated" << endl;}
 //	if (all_selected){ cout << "all is activated" << endl;}
 
-
 	for (map<int, Node*>::iterator n = nodes.begin(); n != nodes.end(); ++n){
 		Node* currentNode = n->second;
-
 
 		Node* shadowNode = new Node(NULL, true);
 		assert(shadowNode->formula == NULL);
@@ -527,8 +525,6 @@ void Graph::toTestOg(){
 		if (shadowNode->formula == NULL){
 			// since no outgoing edges are created the shadow node is not needed
 			delete shadowNode;
-
-
 		}
 		else{ //connect currentNode with its shadow node
 			currentNode->addEdge(label2id[Tau], shadowNode); // q -tau-> q'

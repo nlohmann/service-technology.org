@@ -1,3 +1,5 @@
+{tests true in the annotation}
+
 INTERFACE
   INPUT
     A,B,C;

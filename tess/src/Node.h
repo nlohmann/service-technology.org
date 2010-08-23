@@ -52,9 +52,6 @@ class Node {
         /// add an outoing edge to the node
         void addEdge(int label, Node *target);
 
-        /// adds the shadow node for the current node
-        Node* addShadowNode();
-
         /// implements the edit operator insertion
         void applyInsertion(Node* shadowNode);
 
@@ -65,10 +62,10 @@ class Node {
         void applyRenaming(Node* shadowNode);
 
         /// implements the edit operator "change future"
-        void applyChangeFuture(Node* shadowNode);
+//        void applyChangeFuture(Node* shadowNode);
 
         /// reset the maxId
-        static void init();
+//        static void init();
 };
 
 class TNode {

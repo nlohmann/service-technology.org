@@ -52,9 +52,6 @@ number         [0-9]+
 "INTERFACE"                             { return KEY_INTERFACE;        }
 "INPUT"                                 { return KEY_INPUT;            }
 "OUTPUT"                                { return KEY_OUTPUT;           }
-"INITIALNODES"                          { return KEY_INITIALNODES;     }
-"GLOBALFORMULA"                         { return KEY_GLOBALFORMULA;    }
-"EXPLICITE_TAULOOPS"					{ return KEY_TAULOOPS;		   }
 
 (?i:true)                               { return KEY_TRUE;             }
 (?i:final)                              { return KEY_FINAL;            }

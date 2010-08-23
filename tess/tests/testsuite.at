@@ -18,7 +18,8 @@ AT_CHECK([diff small_TestOG_ref.eaa small_TestOG.eaa])
 AT_CHECK([diff small_TestOG_ref.dot small_TestOG.dot])
 AT_CHECK([diff small_TestCases_ref.eaa small_TestCases.eaa])
 AT_CHECK([diff small_TestCases_ref.dot small_TestCases.dot])
-
+AT_CHECK([TESS small.og -t],0,stdout,stderr) #option -t is choosen but no output option
+AT_CHECK([diff EMPTY stderr])
 AT_KEYWORDS(elementar)
 AT_CLEANUP
 
@@ -62,12 +63,16 @@ AT_CLEANUP
 AT_BANNER([Standard Options])
 ############################################################################
 
-AT_SETUP([file not found])
+AT_SETUP([error messages])
 AT_CHECK([cp TESTFILES/EMPTY .])
 AT_CHECK([TESS myCoffee.og -oeaa -opng -odot -einsert],1,stdout,stderr)
 AT_CHECK([grep -q "tess: File myCoffee.og not found -- aborting \[[#01\]]" stderr],0)
-AT_KEYWORDS(complement c0)
+AT_CHECK([TESS myCoffee.og -k],1,stdout,stderr)
+AT_CHECK([grep -q "tess: invalid command-line parameter(s) -- aborting \[[#07\]]" stderr],0)
+AT_KEYWORDS(error)
 AT_CLEANUP
+
+#####################################
 
 AT_SETUP([unit test])
 AT_CHECK([cp TESTFILES/EMPTY .])

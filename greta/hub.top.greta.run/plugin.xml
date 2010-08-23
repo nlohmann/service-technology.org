@@ -440,4 +440,22 @@
       </objectContribution>
    </extension>
    -->
+   
+   <extension
+         point="org.eclipse.ui.exportWizards">
+    <category
+          id="hub.top.GRETA.exportWizards.category"
+          name="Scenario-based Models">
+    </category>
+
+    <wizard
+            category="hub.top.GRETA.exportWizards.category"
+            class="hub.top.greta.eclipseWizards.OcletExportWizard"
+            id="hub.top.GRETA.exportWizards.OcletsExportWizard"
+            name="Export to Oclet Specification (.oclets)">
+         <description>
+            Export the selection to an '.oclets' model file.
+         </description>
+      </wizard>
+   </extension>
 </plugin>

@@ -17,13 +17,33 @@ public class OcletTest {
   private static final String RESULT_OK = "[ok]";
   
   public void assertTrue(boolean result) {
-    System.out.println(lastTest+": "+result+", expected: true "+(result ? RESULT_OK : RESULT_FAIL));
-    if (!result) testFail++;
+    assertEquals(result, true);
   }
   
   public void assertFalse(boolean result) {
-    System.out.println(lastTest+": "+result+", expected: false "+(!result ? RESULT_OK : RESULT_FAIL));
-    if (result) testFail++;
+    assertEquals(result, false);
+  }
+  
+  public void assertEquals(Object result, Object expected) {
+    String testMessage = lastTest;
+    String resultMessage = result+", expected: "+expected;
+    boolean resultMatch = result.equals(expected);
+    String resultString = (resultMatch ? RESULT_OK : RESULT_FAIL);
+    
+    int fill = 77 - (testMessage.length() + resultMessage.length() + resultString.length());
+    String fillString1 = "";
+    String fillString2 = "";
+    if (fill >= 1) {
+      fillString1 = ": ";
+      for (int i=0; i < fill; i++) fillString2 += " ";
+    } else {
+      fillString1 += ":\n  ";
+      fill = 77 - (resultMessage.length() + resultString.length());
+      for (int i=0; i < fill; i++) fillString2 += " ";
+    }
+    System.out.println(testMessage+fillString1+resultMessage+fillString2+resultString);
+    
+    if (!resultMatch) testFail++;
   }
   
   public void run () {

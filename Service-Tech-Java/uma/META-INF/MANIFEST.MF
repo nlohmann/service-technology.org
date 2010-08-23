@@ -4,6 +4,7 @@ Bundle-Name: UMA - an Unfolding-based Model Analyzer
 Bundle-SymbolicName: hub.top.uma
 Bundle-Version: 1.2.1
 Export-Package: hub.top.petrinet.unfold,
+ hub.top.scenario,
  hub.top.uma,
  hub.top.uma.synthesis,
  hub.top.uma.view

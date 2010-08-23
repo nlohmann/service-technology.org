@@ -74,6 +74,7 @@ public class Uma {
     }
 
     if (options_outputFormat == PetriNetIO.FORMAT_DOT) {
+      System.out.println("writing to "+options_inFile+".bp.dot");
       FileWriter fstream = new FileWriter(options_inFile+".bp.dot");
       BufferedWriter out = new BufferedWriter(fstream);
       out.write(build.toDot());

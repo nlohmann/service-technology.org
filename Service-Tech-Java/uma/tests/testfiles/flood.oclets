@@ -1,0 +1,68 @@
+PLACE
+  init#idle_1;
+  o1#sand_avail_3, o1_hist#idle_1, o1#need_sand_2;
+  o2#missing_quantity_4, o2#need_bags_2, o2_hist#idle_1, o2#bags_avail_3;
+  o3_hist#bags_avail_2, o3_hist#sand_avail_1, o3#finished_4, o3#sandbags_placed_3;
+  o4_hist#need_bags_1, o4#bags_avail_3, o4_hist#missing_quantity_2;
+  o5_hist#sand_avail_3, o5#sand_avail_7, o5_hist#bags_avail_2, o5#bags_avail_9, o5#missing_quantity_8, o5#sandbags_placed_5, o5_hist#missing_quantity_4, o5_hist#need_bags_1, o5#need_bags_6;
+  !o6_hist#sand_avail_3, !o6_hist#bags_avail_2, !o6#finished_6, !o6_hist#sandbags_placed_4, !o6_hist#missing_quantity_5, !o6_hist#need_bags_1;
+
+MARKING
+  init#idle_1:1;
+
+TRANSITION o1#alert_4
+  CONSUME o1_hist#idle_1:1;
+  PRODUCE o1#need_sand_2:1;
+
+TRANSITION o1#get_sand_5
+  CONSUME o1#need_sand_2:1;
+  PRODUCE o1#sand_avail_3:1;
+
+TRANSITION o2#get_bags_6
+  CONSUME o2#need_bags_2:1, o2#missing_quantity_4:1;
+  PRODUCE o2#bags_avail_3:1;
+
+TRANSITION o2#alert_5
+  CONSUME o2_hist#idle_1:1;
+  PRODUCE o2#missing_quantity_4:1, o2#need_bags_2:1;
+
+TRANSITION o3#fill_&_place_5
+  CONSUME o3_hist#sand_avail_1:1, o3_hist#bags_avail_2:1;
+  PRODUCE o3#sandbags_placed_3:1;
+
+TRANSITION o3#leave_site_6
+  CONSUME o3#sandbags_placed_3:1;
+  PRODUCE o3#finished_4:1;
+
+TRANSITION o4#get_some_bags_4
+  CONSUME o4_hist#need_bags_1:1, o4_hist#missing_quantity_2:1;
+  PRODUCE o4#bags_avail_3:1;
+
+TRANSITION o5#fill_&_place_11
+  CONSUME o5_hist#bags_avail_2:1, o5_hist#sand_avail_3:1;
+  PRODUCE o5#missing_quantity_8:1, o5#sandbags_placed_5:1;
+
+TRANSITION o5#get_bags_13
+  CONSUME o5#missing_quantity_8:1, o5#need_bags_6:1;
+  PRODUCE o5#bags_avail_9:1;
+
+TRANSITION o5#notify_team_12
+  CONSUME o5#sandbags_placed_5:1;
+  PRODUCE o5#need_bags_6:1, o5#sand_avail_7:1;
+
+TRANSITION o5_hist#get_some_bags_10
+  CONSUME o5_hist#need_bags_1:1, o5_hist#missing_quantity_4:1;
+  PRODUCE o5_hist#bags_avail_2:1;
+
+TRANSITION !o6_hist#fill_&_place_8
+  CONSUME !o6_hist#bags_avail_2:1, !o6_hist#sand_avail_3:1;
+  PRODUCE !o6_hist#sandbags_placed_4:1;
+
+TRANSITION !o6_hist#get_some_bags_7
+  CONSUME !o6_hist#missing_quantity_5:1, !o6_hist#need_bags_1:1;
+  PRODUCE !o6_hist#bags_avail_2:1;
+
+TRANSITION !o6#leave_site_9
+  CONSUME !o6_hist#sandbags_placed_4:1;
+  PRODUCE !o6#finished_6:1;
+

@@ -25,13 +25,33 @@ public class UmaTest {
   private static final String RESULT_OK = "[ok]";
   
   public void assertTrue(boolean result) {
-    System.out.println(lastTest+": "+result+", expected: true "+(result ? RESULT_OK : RESULT_FAIL));
-    if (!result) testFail++;
+    assertEquals(result, true);
   }
   
   public void assertFalse(boolean result) {
-    System.out.println(lastTest+": "+result+", expected: false "+(!result ? RESULT_OK : RESULT_FAIL));
-    if (result) testFail++;
+    assertEquals(result, false);
+  }
+  
+  public void assertEquals(Object result, Object expected) {
+    String testMessage = lastTest;
+    String resultMessage = result+", expected: "+expected;
+    boolean resultMatch = result.equals(expected);
+    String resultString = (resultMatch ? RESULT_OK : RESULT_FAIL);
+    
+    int fill = 77 - (testMessage.length() + resultMessage.length() + resultString.length());
+    String fillString1 = "";
+    String fillString2 = "";
+    if (fill >= 1) {
+      fillString1 = ": ";
+      for (int i=0; i < fill; i++) fillString2 += " ";
+    } else {
+      fillString1 += ":\n  ";
+      fill = 77 - (resultMessage.length() + resultString.length());
+      for (int i=0; i < fill; i++) fillString2 += " ";
+    }
+    System.out.println(testMessage+fillString1+resultMessage+fillString2+resultString);
+    
+    if (!resultMatch) testFail++;
   }
   
   public void run () {
@@ -43,6 +63,8 @@ public class UmaTest {
     testOcletPrefix_executable1();
     testOcletPrefix_executable2();
     testOcletPrefix_executable3();
+    
+    testOcletPrefix_standardExample_flood();
   }
 
   public static void main(String[] args) {
@@ -305,4 +327,38 @@ public class UmaTest {
     }
   }
 
+  public void testOcletPrefix_standardExample_flood() {
+    
+    lastTest = "Construct prefix of oclet specification (flood alert)";
+
+    try {
+      PetriNet net = OcletIO.readNetFromFile("./testfiles/flood.oclets");
+      OcletSpecification os = new OcletSpecification(net);
+      
+      DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
+      DNodeBP build = new DNodeBP(sys);
+      build.configure_buildOnly();
+      build.configure_Scenarios();
+      build.configure_stopIfUnSafe();
+      
+      while (build.step() > 0) {
+      }
+      
+      build.getStatistics();
+      
+      assertTrue(build.statistic_eventNum == 13
+          && build.statistic_condNum == 19
+          && build.statistic_cutOffNum == 2
+          && build.statistic_arcNum == 39);
+      
+      int antiNodes = 0;
+      for (DNode d : build.getBranchingProcess().getAllNodes()) {
+        if (d.isAnti) antiNodes++;
+      }
+      assertEquals(antiNodes, 2);
+      
+    } catch (Exception e) {
+      assertTrue(false);
+    }
+  }
 }

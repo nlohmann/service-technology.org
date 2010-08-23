@@ -161,7 +161,25 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
             monitor.subTask("generating labeled net");
 
             hub.top.petrinet.PetriNet net2 = hub.top.uma.synthesis.NetSynthesis.foldToNet_labeled(build.getBranchingProcess());
-            hub.top.petrinet.PetriNetIO_out.writeToFile(net2, selectedFile.getRawLocation().removeFileExtension().toString(), hub.top.petrinet.PetriNetIO_out.FORMAT_LOLA, 0);
+            hub.top.petrinet.PetriNetIO.writeToFile(net2, selectedFile.getRawLocation().removeFileExtension().toString(), hub.top.petrinet.PetriNetIO.FORMAT_LOLA, 0);
+            
+            for (Place p : net2.getPlaces()) {
+              if (p.getName().startsWith("controller"))
+                p.addRole("controller");
+              if (p.getName().startsWith("Floor1Btn"))
+                p.addRole("Floor1Btn");
+              if (p.getName().startsWith("Floor2Btn"))
+                p.addRole("Floor2Btn");
+              if (p.getName().startsWith("Floor3Btn"))
+                p.addRole("Floor3Btn");
+              if (p.getName().startsWith("e.floor") || p.getName().startsWith("e.doors"))
+                p.addRole("elevator");
+              if (p.getName().startsWith("user"))
+                p.addRole("user");
+            }
+            net2.spreadRolesToTransitions_union();
+            net2.setRoles_unassigned();
+            hub.top.petrinet.PetriNetIO.writeToFile(net2, selectedFile.getRawLocation().removeFileExtension().toString(), hub.top.petrinet.PetriNetIO.FORMAT_DOT, hub.top.petrinet.PetriNetIO.PARAM_SWIMLANE);
 
             try {
              monitor.subTask("comparing synthesized net and specification");

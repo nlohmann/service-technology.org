@@ -865,6 +865,20 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
   // here be dragons
   result.finalCondition_.conjunct(finalCondition_, placeMap);
   result.finalCondition_.conjunct(net.finalCondition_, placeMap);
+  
+  set<Place *> formerInterface;
+  PNAPI_FOREACH(p, label2place)
+  {
+    if(p->second != NULL)
+    {
+      formerInterface.insert(p->second); // removing duplicates
+    }
+  }
+  PNAPI_FOREACH(p, formerInterface)
+  { 
+    // former interface places have to be empty
+    result.finalCondition_.addProposition(formula::FormulaEqual(**p, 0));
+  }
 
   // overwrite this net with the resulting net
   *this = result;

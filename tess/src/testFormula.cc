@@ -92,9 +92,9 @@ void testMinimizeDnf(){
 
 	list<set<int> > dnf;
 
-	int ints1[]= {0,1,2,3};
+	int ints1[]= {0,2,3};
 	set<int> set1;
-	set1.insert (ints1, ints1 + 4);
+	set1.insert (ints1, ints1 + 3);
 	dnf.push_back(set1);
 
 	int ints2[]= {2,3};
@@ -112,7 +112,7 @@ void testMinimizeDnf(){
 	set4.insert (ints4, ints4 + 2);
 	dnf.push_back(set4);
 
-	int ints5[]= {4,1,2};
+	int ints5[]= {4,0,2};
 	set<int> set5;
 	set5.insert (ints5, ints5 + 3);
 	dnf.push_back(set5);
@@ -122,7 +122,7 @@ void testMinimizeDnf(){
 	set6.insert (ints6, ints6 + 2);
 	dnf.push_back(set4);
 
-	assert(dnfToString(dnf) == "(final * true * tau * A) + (tau * A) + (A * R) + (tau * R) + (true * tau * R) + (tau * R)");
+	assert(dnfToString(dnf) == "(final * tau * A) + (tau * A) + (A * R) + (tau * R) + (final * tau * R) + (tau * R)");
 	list<set<int> > minimal = minimizeDnf(dnf);
 	assert(dnfToString(minimal) == "(tau * A) + (A * R) + (tau * R)");
 
@@ -138,12 +138,79 @@ void testTRUE(){
 	 * f = TRUE
 	 ****************/
 	Formula* f = new FormulaTrue();
-	assert (f->toString() == "true");
-	list <set<int> > dnf_f = f->toDnf();
-
 	assert (f->formulaType == TRUE);
-	assert (dnfToString(dnf_f) == "(true)");
+	assert (f->toString() == "true");
+//	assert (dnfToString(f->toDnf()) == "(true)");
+	assert (dnfToString(f->toMinimalDnf()) == "(true)");
 
+	delete f;
+
+	/****************
+	 * f = TRUE * A
+	 ****************/
+	f = new FormulaAND(new FormulaTrue(), new FormulaLit(label2id["A"]));
+	assert (f->toString() == "(true * A)");
+//	assert(dnfToString(f->toDnf()) == "(A)");
+	assert(dnfToString(f->toMinimalDnf()) == "(A)");
+	delete f;
+
+	/***************************
+	 * f = (R * (true * A))
+	 ***************************/
+	f = new FormulaAND(new FormulaLit(label2id["R"]), new FormulaAND(new FormulaTrue(), new FormulaLit(label2id["A"])) );
+	assert (f->toString() == "(R * (true * A))");
+//	assert(dnfToString(f->toDnf()) == "(A * R)");
+	assert(dnfToString(f->toMinimalDnf()) == "(A * R)");
+	assert(f->toString() == "(R * A)");
+	delete f;
+
+	/********************************
+	 * (R * (true * A)) + (true * I)
+	 ********************************/
+	Formula* g = new FormulaAND(new FormulaLit(label2id["R"]), new FormulaAND(new FormulaTrue(), new FormulaLit(label2id["A"])) );
+	Formula* h = new FormulaAND(new FormulaTrue(), new FormulaLit(label2id["I"]));
+	f = new FormulaOR(g, h);
+	assert (f->toString() == "((R * (true * A)) + (true * I))");
+	assert (dnfToString(f->toMinimalDnf()) == "(A * R) + (I)");
+	delete f;
+
+	/***************
+	 * (true + A)
+	 ***************/
+	f = new FormulaOR(new FormulaTrue(), new FormulaLit(label2id["A"]));
+	assert (f->toString() == "(true + A)");
+	assert(dnfToString(f->toMinimalDnf()) == "(true)");
+	delete f;
+
+	/*********************************
+	 * (R * (true * A)) + (true * R)
+	 *********************************/
+	g = new FormulaAND(new FormulaLit(label2id["R"]), new FormulaAND(new FormulaTrue(), new FormulaLit(label2id["A"])) );
+	h = new FormulaAND(new FormulaTrue(), new FormulaLit(label2id["R"]));
+	f = new FormulaOR(g, h);
+	assert (f->toString() == "((R * (true * A)) + (true * R))");
+	assert (dnfToString(f->toMinimalDnf()) == "(R)");
+	delete f;
+
+	/**************************************
+	 * (R * (A * true)) + (true) + (O * I)
+	 ***************************************/
+	g = new FormulaAND(new FormulaLit(label2id["R"]), new FormulaAND(new FormulaLit(label2id["A"]), new FormulaTrue()) ); //(R * (A * true))
+	h = new FormulaAND(new FormulaLit(label2id["O"]), new FormulaLit(label2id["I"])); //(O * I)
+	Formula* k = new FormulaOR(g, new FormulaTrue); //(R * (A * true)) + (true)
+	f = new FormulaOR(k, h);
+	assert (f->toString() == "(((R * (A * true)) + true) + (O * I))");
+	assert (dnfToString(f->toMinimalDnf()) == "(true)");
+	delete f;
+
+	/*************************************
+	 * ((R * (A * true)) + (true + I))
+	 ************************************/
+	g = new FormulaAND(new FormulaLit(label2id["R"]), new FormulaAND(new FormulaLit(label2id["A"]), new FormulaTrue()) ); //(R * (A * true))
+	h = new FormulaOR(new FormulaTrue(), new FormulaLit(label2id["I"])); //(true + I)
+	f = new FormulaOR(g, h);
+	assert (f->toString() == "((R * (A * true)) + (true + I))");
+	assert (dnfToString(f->toMinimalDnf()) == "(true)");
 	delete f;
 
 	cout << "\t passed." << endl;
@@ -162,7 +229,7 @@ void testFINAL(){
 	assert (f->toString() == "final");
 
 	assert (f->formulaType == FINAL);
-	assert (dnfToString(f->toDnf()) == "(final)");
+//	assert (dnfToString(f->toDnf()) == "(final)");
 	assert (dnfToString(f->toMinimalDnf()) == "(final)");
 
 	delete f;
@@ -191,7 +258,7 @@ void testLIT(){
 	assert (f->formulaType == LIT);
 	assert (f->toString() == "I");
 
-	assert (dnfToString(f->toDnf()) == "(I)");
+//	assert (dnfToString(f->toDnf()) == "(I)");
 	assert (dnfToString(f->toMinimalDnf()) == "(I)");
 
 	delete f;
@@ -200,7 +267,7 @@ void testLIT(){
 	assert (g->formulaType == LIT);
 	assert (g->toString() == "A");
 
-	assert (dnfToString(g->toDnf()) == "(A)");
+//	assert (dnfToString(g->toDnf()) == "(A)");
 	assert (dnfToString(g->toMinimalDnf()) == "(A)");
 
 	delete g;
@@ -222,7 +289,7 @@ void testAND(){
 	assert (c->formulaType == AND);
 	assert (c->toString() == "(I * R)");
 
-	assert (dnfToString(c->toDnf()) == "(R * I)");
+//	assert (dnfToString(c->toDnf()) == "(R * I)");
 	assert (dnfToString(c->toMinimalDnf()) == "(R * I)");
 
 	delete c;
@@ -240,7 +307,7 @@ void testAND(){
 	assert (e->formulaType == AND);
 	assert (e->toString() == "(O * (I * R))");
 
-	assert(dnfToString(e->toDnf()) == "(R * I * O)");
+//	assert(dnfToString(e->toDnf()) == "(R * I * O)");
 	assert(dnfToString(e->toMinimalDnf()) == "(R * I * O)");
 
 	delete e;
@@ -258,7 +325,7 @@ void testAND(){
 	assert (e->formulaType == AND);
 	assert (e->toString() == "((I * R) * A)");
 
-	assert(dnfToString(e->toDnf()) == "(A * R * I)");
+//	assert(dnfToString(e->toDnf()) == "(A * R * I)");
 	assert(dnfToString(e->toMinimalDnf()) == "(A * R * I)");
 
 	delete e;
@@ -279,7 +346,7 @@ void testAND(){
 	assert (h->formulaType == AND);
 	assert (h->toString() == "((O * A) * (I * R))");
 
-    assert(dnfToString(h->toDnf()) == "(A * R * I * O)");
+//    assert(dnfToString(h->toDnf()) == "(A * R * I * O)");
     assert(dnfToString(h->toMinimalDnf()) == "(A * R * I * O)");
 
 	delete h;
@@ -296,7 +363,7 @@ void testAND(){
 	assert (e->formulaType == AND);
 	assert (e->toString() == "(O * (A * (I * R)))");
 
-	assert(dnfToString(e->toDnf()) == "(A * R * I * O)");
+//	assert(dnfToString(e->toDnf()) == "(A * R * I * O)");
 	assert(dnfToString(e->toMinimalDnf()) == "(A * R * I * O)");
 
 	delete e;
@@ -314,7 +381,7 @@ void testAND(){
 	assert (e->toString() == "(O * (O * (I * O)))");
 
 
-	assert(dnfToString(e->toDnf()) == "(I * O)");
+//	assert(dnfToString(e->toDnf()) == "(I * O)");
 	assert(dnfToString(e->toMinimalDnf()) == "(I * O)");
 
 	delete e;
@@ -333,7 +400,7 @@ void testAND(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "(final * (I * R))");
 
-	assert(dnfToString(f->toDnf()) == "(final * R * I)");
+//	assert(dnfToString(f->toDnf()) == "(final * R * I)");
 	assert(dnfToString(f->toMinimalDnf()) == "(final * R * I)");
 
 	delete f;
@@ -359,7 +426,7 @@ void testAND(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "(((A * I) * (I * R)) * ((O * R) * (O * I)))");
 
-	assert(dnfToString(f->toDnf()) == "(A * R * I * O)");
+//	assert(dnfToString(f->toDnf()) == "(A * R * I * O)");
 	assert(dnfToString(f->toMinimalDnf()) == "(A * R * I * O)");
 
 	delete f;
@@ -383,7 +450,7 @@ void testOR(){
 	assert (c->formulaType == OR);
 	assert (c->toString() == "(I + R)");
 
-	assert (dnfToString(c->toDnf()) == "(I) + (R)");
+//	assert (dnfToString(c->toDnf()) == "(I) + (R)");
 	assert (dnfToString(c->toMinimalDnf()) == "(I) + (R)");
 
 	delete c;
@@ -401,7 +468,7 @@ void testOR(){
 	assert (e->formulaType == OR);
 	assert (e->toString() == "(O + (I + R))");
 
-	assert(dnfToString(e->toDnf()) == "(O) + (I) + (R)");
+//	assert(dnfToString(e->toDnf()) == "(O) + (I) + (R)");
 	assert(dnfToString(e->toMinimalDnf()) == "(O) + (I) + (R)");
 
 	delete e;
@@ -419,7 +486,7 @@ void testOR(){
 	assert (e->formulaType == OR);
 	assert (e->toString() == "((I + R) + A)");
 
-	assert(dnfToString(e->toDnf()) == "(I) + (R) + (A)");
+//	assert(dnfToString(e->toDnf()) == "(I) + (R) + (A)");
 	assert(dnfToString(e->toMinimalDnf()) == "(I) + (R) + (A)");
 
 	delete e;
@@ -440,7 +507,7 @@ void testOR(){
 	assert (h->formulaType == OR);
 	assert (h->toString() == "((O + A) + (I + R))");
 
-    assert(dnfToString(h->toDnf()) == "(O) + (A) + (I) + (R)");
+//    assert(dnfToString(h->toDnf()) == "(O) + (A) + (I) + (R)");
     assert(dnfToString(h->toMinimalDnf()) == "(O) + (A) + (I) + (R)");
 
 	delete h;
@@ -457,7 +524,7 @@ void testOR(){
 	assert (e->formulaType == OR);
 	assert (e->toString() == "(O + (A + (I + R)))");
 
-	assert(dnfToString(e->toDnf()) == "(O) + (A) + (I) + (R)");
+//	assert(dnfToString(e->toDnf()) == "(O) + (A) + (I) + (R)");
 	assert(dnfToString(e->toMinimalDnf()) == "(O) + (A) + (I) + (R)");
 
 	delete e;
@@ -474,7 +541,7 @@ void testOR(){
 	assert (e->formulaType == OR);
 	assert (e->toString() == "(O + (O + (I + O)))");
 
-	assert(dnfToString(e->toDnf()) == "(O) + (O) + (I) + (O)");
+//	assert(dnfToString(e->toDnf()) == "(O) + (O) + (I) + (O)");
 	assert(dnfToString(e->toMinimalDnf()) == "(I) + (O)");
 
 	delete e;
@@ -492,7 +559,7 @@ void testOR(){
 	assert (f->formulaType == OR);
 	assert (f->toString() == "(final + (I + R))");
 
-	assert(dnfToString(f->toDnf()) == "(final) + (I) + (R)");
+//	assert(dnfToString(f->toDnf()) == "(final) + (I) + (R)");
 	assert(dnfToString(f->toMinimalDnf()) == "(final) + (I) + (R)");
 
 	delete f;
@@ -518,7 +585,7 @@ void testOR(){
 	assert (f->formulaType == OR);
 	assert (f->toString() == "(((A + I) + (I + R)) + ((O + R) + (O + I)))");
 
-	assert(dnfToString(f->toDnf()) == "(A) + (I) + (I) + (R) + (O) + (R) + (O) + (I)");
+//	assert(dnfToString(f->toDnf()) == "(A) + (I) + (I) + (R) + (O) + (R) + (O) + (I)");
 	assert(dnfToString(f->toMinimalDnf()) == "(A) + (R) + (O) + (I)");
 
 	delete f;
@@ -550,12 +617,10 @@ void testAND_OR(){
 	assert (f->formulaType == AND);
 	assert (f->toString() == "(((A + I) * (I + R)) * ((O + R) * (O * I)))");
 
-	assert(dnfToString(f->toDnf()) == "(A * I * O) + (A * R * I * O) + (I * O) + (R * I * O) + (A * R * I * O) + (A * R * I * O) + (R * I * O) + (R * I * O)");
+//	assert(dnfToString(f->toDnf()) == "(A * I * O) + (A * R * I * O) + (I * O) + (R * I * O) + (A * R * I * O) + (A * R * I * O) + (R * I * O) + (R * I * O)");
 	assert(dnfToString(f->toMinimalDnf()) == "(I * O)");
 
 	delete f;
 
 	cout << "\t passed." << endl;
 }
-
-

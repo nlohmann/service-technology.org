@@ -39,7 +39,9 @@ void FormulaAND::merge() {
 			newChildren.splice(newChildren.end(), n->formulas);
 		}
 		else {
-			newChildren.push_back(n);
+			if (n->formulaType != TRUE){
+				newChildren.push_back(n);
+			}
 		}
 	}
 	formulas.clear();
@@ -63,11 +65,13 @@ void FormulaOR::merge() {
 	for (list<Formula*>::const_iterator iter = formulas.begin(); iter!= formulas.end(); ++iter){
 		Formula* n = *iter;
 		n->merge();
+
+
 		if (n->formulaType == OR) {
 			newChildren.splice(newChildren.end(), n->formulas);
 		}
 		else {
-			newChildren.push_back(n);
+				newChildren.push_back(n);
 		}
 	}
 	formulas.clear();

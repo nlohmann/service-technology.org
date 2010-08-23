@@ -96,8 +96,8 @@ void Graph::generateTestCases(){
 vector<TestCase*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 	cout << "start dfs for " << q->id << endl;
 
-	// for each label l there is a map which contains the partial test cases for the successor nodes reaching by l
-	map<Node*, vector<TestCase*> >* allPartialTestCases = new map<Node*, vector<TestCase*> >[label2id.size()];
+
+
 	map<Node*, vector<TestCase*> > partialTestCasesMap; //contains the partial test cases of the successor nodes
 
 	map<Node*, list<int> > sucNodes; //maps each successor node to the labels by which it can be reached from q.
@@ -119,6 +119,27 @@ vector<TestCase*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 	}
 
 	list<set<int> > assignments = q->formula->toMinimalDnf();
+	/* if formula is equal to true:
+	 * generate a new formula f and use that instead
+	 * f is a disjunction of the outgoing edges and final
+	 */
+	set<int> firstAssignment = *(assignments.begin());
+	if ((*(firstAssignment.begin())) == label2id[True]){
+		assert(firstAssignment.size() == 1);
+		assert(assignments.size() == 1);
+		assert(q->outEdges[label2id[True]].size() == 0);
+		assignments.clear();
+
+		Formula* f = new FormulaFinal();
+		for  (int label = firstLabelId; label < id2label.size(); ++label){
+			if (q->outEdges[label].size() > 0){
+				Formula* g = new FormulaOR(f, new FormulaLit(label));
+				f = g;
+			}
+		}
+		assignments = f->toMinimalDnf();
+	}
+
 	bool finish = true;
 
 	if(shadowNodes.find(q->id) != shadowNodes.end()){  //if q is a shadow node
@@ -180,6 +201,7 @@ vector<TestCase*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 				//remove the assignment Tau from q's DNF (assignments)
 
 				bool found = false;
+				cout << dnfToString(assignments) << endl;
 				for(list<set<int> >::iterator iter = assignments.begin(); iter != assignments.end(); ++iter){
 					set<int> currentSet = *iter;
 					if (currentSet.find(label2id[Tau]) != currentSet.end()){ //label tau in the set
@@ -189,7 +211,10 @@ vector<TestCase*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 						break;
 					}
 				}
-				assert(found);
+				assert(found || (assignments.size() == 1  //if true is an element of assignment then there is no tau in the assignments
+						         && (*(assignments.begin())).size() == 1
+						         && (*(*(assignments.begin())).begin()) == label2id[True]
+						        ));
 			}
 		}
 	}
@@ -212,7 +237,7 @@ vector<TestCase*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 		return partialTestCases;
 	}
 
-	vector<TestCase*> partialTestCases = combine(partialTestCasesMap, sucNodes, assignments, q);
+	vector<TestCase*> partialTestCases = combine(partialTestCasesMap, assignments, q);
 
 	cout << "number of test cases in " << q->id << ": " << partialTestCases.size() << endl;
 	Output mystdout("-", "");
@@ -223,14 +248,10 @@ vector<TestCase*> Graph::dfs(Node* q, int ed, bool fromShadowNode){
 
 }
 
-//
-int collectPartialTestCases(map<Node*, vector<TestCase*> >* allPartialTestCases, map<int,Node*>* affectedNodes, int label){
-
-}
 
 //Todo: partialTestCasesMap und sucNodes in einer gemeinsamen datenstruktur zusammenfassen
 //allPartialTestCases: partial test cases of the successor nodes
-vector<TestCase*> Graph::combine(map<Node*, vector<TestCase*> > partialTestCasesMap, map<Node*, list<int> > sucNodes, list< set<int> > assignments, Node* q){
+vector<TestCase*> Graph::combine(map<Node*, vector<TestCase*> > partialTestCasesMap, list< set<int> > assignments, Node* q){
 
 	cout << endl << q->id << ": start combine\n";
 	cout << "DNF: " << dnfToString(assignments) << endl;
@@ -257,69 +278,79 @@ vector<TestCase*> Graph::combine(map<Node*, vector<TestCase*> > partialTestCases
 
 		else { //q is not a shadow node
 
-			int max = 1;	//maximal number of partial test cases of the affected nodes
+			unsigned int max = 1;	//maximal number of partial test cases of the affected nodes
 			bool isFinal = false;
 			map<int,Node*> affectedNodes; //the the  affected successor node for the current assignment
 
-			/* determine all affected nodes for the current assignment and
-			 * the maximal number of test cases of the affected nodes */
-			for(set<int>::const_iterator iter2 = currentAssignment.begin(); iter2 != currentAssignment.end(); ++iter2){
+			/* if the annotation is equal to true,
+			 * generate for each outgoing edge a partial test case and
+			 * generate a new partial test that stops in q (to "simulate" label final)
+			 */
+//			if ((*(currentAssignment.begin())) == label2id[True]){
+//				assert(currentAssignment.size() == 1);
+//				assert(assignments.size() == 1);
+//				assert(q->outEdges[label2id[True]].size() == 0);
+//
+//				//concern all successors nodes of q
+//				for (int l = firstInputId; l < label2id.size(); ++l){
+//					assert(q->outEdges[l].size() <= 1);
+//
+//					if(q->outEdges[l].size() == 1){ //if there is an outgoing edge labeled with l
+//						Node* affectedNode = *(q->outEdges[l].begin()); //since q is not a shadow node, there is only one outgoing edge with the current label
+//						affectedNodes[l] = affectedNode;
+//
+//						max = partialTestCasesMap[affectedNode].size(); //number of partial test cases in the affected node
+//
+//						//combine the test cases of the affected nodes
+//						vector<TestCase*> result = combineForNormalNode(partialTestCasesMap, affectedNodes, max, false, q);
+//						partialTestCases.insert(partialTestCases.end(), result.begin(), result.end());
+//						affectedNodes.clear();
+//					}
+//				}
+//				//for final
+//				assert(affectedNodes.size() == 0);
+//				vector<TestCase*> result = combineForNormalNode(partialTestCasesMap, affectedNodes, 0, true, q);
+//				partialTestCases.insert(partialTestCases.end(), result.begin(), result.end());
+//
+//			}
+//
+//			else{
+				/* determine all affected nodes for the current assignment and
+				 * the maximal number of test cases of the affected nodes */
+				for(set<int>::const_iterator iter2 = currentAssignment.begin(); iter2 != currentAssignment.end(); ++iter2){
 
-				int label = *iter2;
+					int label = *iter2;
 
-				// there is no edges labeled with final or true
-				if (label >= firstLabelId){
-					assert(q->outEdges[label].size() == 1);
+					// there is no edges labeled with final or true
+					if (label >= firstLabelId){
+						assert(q->outEdges[label].size() == 1);
 
-					//int size = collectPartialTestCases(allPartialTestCases, label);
+						//int size = collectPartialTestCases(allPartialTestCases, label);
 
-					Node* affectedNode = *(q->outEdges[label].begin()); //since q is not a shadow node, there is only one outgoing edge with the current label
-					affectedNodes[label] = affectedNode;
+						Node* affectedNode = *(q->outEdges[label].begin()); //since q is not a shadow node, there is only one outgoing edge with the current label
+						affectedNodes[label] = affectedNode;
 
-					int size = partialTestCasesMap[affectedNode].size(); //number of partial test cases in the affected node reached by the label
+						unsigned int size = partialTestCasesMap[affectedNode].size(); //number of partial test cases in the affected node reached by the label
 
-					if(size > max){
-						max = size;
-					}
-				}
-				else{
-					assert(label == label2id[True] || label == label2id[Final]);
-
-					if (label == label2id[True]){
-						assert(currentAssignment.size() == 1);
-						assert(assignments.size() == 1);
-						assert(q->outEdges[label2id[Tau]].size() == 0);
-
-						//concern all successors nodes of q
-						for (int l = firstInputId; l < label2id.size(); ++l){
-							assert(q->outEdges[l].size() <= 1);
-
-							if(q->outEdges[l].size() == 1){ //if there is an outgoing edge labeled with l
-								Node* affectedNode = *(q->outEdges[l].begin()); //since q is not a shadow node, there is only one outgoing edge with the current label
-								affectedNodes[l] = affectedNode;
-
-								int size = partialTestCasesMap[affectedNode].size(); //number of partial test cases in the affected node
-
-								if(size > max){
-									max = size;
-								}
-							}
-
+						if(size > max){
+							max = size;
 						}
 					}
+					else{
+						assert(label == label2id[Final]);
 
-					if (label == label2id[Final]){
-						isFinal = true;
+						if (label == label2id[Final]){
+							isFinal = true;
+						}
+
 					}
-
-					//assert(false);
 				}
-			}
 
-			//combine the test cases of the affected nodes
-			vector<TestCase*> result = combineForNormalNode(partialTestCasesMap, affectedNodes, max, isFinal, q);
-			partialTestCases.insert(partialTestCases.end(), result.begin(), result.end());
-		}
+				//combine the test cases of the affected nodes
+				vector<TestCase*> result = combineForNormalNode(partialTestCasesMap, affectedNodes, max, isFinal, q);
+				partialTestCases.insert(partialTestCases.end(), result.begin(), result.end());
+			}
+//		}
 	}
 	cout << "end combine\n";
 	return partialTestCases;
@@ -368,13 +399,14 @@ vector<TestCase*> Graph::combineForShadowNode(map<Node*, vector<TestCase*> > par
 //combine the test cases of the affected nodes
 //partialTestCasesMap: the partial test cases of the affected nodes
 //affectedNodes: the affected successor nodes of the current assignment
-vector<TestCase*> Graph::combineForNormalNode(map<Node*, vector<TestCase*> > partialTestCasesMap, map<int, Node*> affectedNodes, int maxSize, bool isFinal, Node* q){
+vector<TestCase*> Graph::combineForNormalNode(map<Node*, vector<TestCase*> > partialTestCasesMap, map<int, Node*> affectedNodes, unsigned int maxSize, bool isFinal, Node* q){
 
 	cout << "   " << q->id <<  ": start combineForNormalNode" << endl;
 
 	vector<TestCase*> partialTestCases;
 
-	for(int i = 0; i < maxSize; ++i){
+
+	for(unsigned int i = 0; i < maxSize; ++i){
 
 		TestCase* currentTestCase = new TestCase(q->id);
 		partialTestCases.push_back(currentTestCase);
@@ -382,14 +414,6 @@ vector<TestCase*> Graph::combineForNormalNode(map<Node*, vector<TestCase*> > par
 		if(isFinal){
 			currentTestCase->root->setAsFinalNode();
 		}
-
-
-//		if(affectedNodes.size() == 0){
-//			assert(isFinal); //assignment only contains final
-//
-//			//TODO: return one test case only containing q (as final node)
-//			//TODO: scheint im Beispiel schon zu funktionieren. Warum?
-//		}
 
 		for(map<int, Node*>::const_iterator iter = affectedNodes.begin(); iter != affectedNodes.end(); ++iter){
 
@@ -692,7 +716,6 @@ void Graph::toDot_Nodes(FILE* out) const{
 
 //! \brief creates dot files for given test cases
 //! \param out: output file
-//! \param testCases: vector of test cases
 //! \param title: a string containing the title for the graph to be shown in the image (optional)
 void Graph::testCasesToDot(FILE* out, string title) const{
 

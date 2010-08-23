@@ -103,22 +103,3 @@ FormulaOR::~FormulaOR(){
 //		}
 //	}
 }
-
-
-///// deletes Tau from the formula
-//void Formula::deleteTauChild(){
-//
-//}
-//
-///// deletes Tau from the formula
-//void FormulaAND::deleteTauChild(){
-//
-//}
-//
-///// deletes Tau from the formula
-//void FormulaOR::deleteTauChild(){
-//	assert(right->formulaType == LIT);
-//	assert(right->toString() == Tau);
-//	this = left;
-//}
-

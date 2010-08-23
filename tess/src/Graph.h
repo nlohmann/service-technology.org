@@ -48,9 +48,9 @@ class Graph {
 		void toTestOg();
 
 		vector<TestCase*> dfs(Node* q, int ed, bool fromShadowNode = false);
-		vector<TestCase*> combine(map<Node*, vector<TestCase*> > partialTestCasesMap, map<Node*, list<int> > sucNodes, list< set<int> > assignments, Node* q);
+		vector<TestCase*> combine(map<Node*, vector<TestCase*> > partialTestCasesMap, list< set<int> > assignments, Node* q);
 		vector<TestCase*> combineForShadowNode(map<Node*, vector<TestCase*> > partialTestCasesMap, int label, Node* q);
-		vector<TestCase*> combineForNormalNode(map<Node*, vector<TestCase*> > partialTestCasesMap, map<int, Node*> affectedNodes, int maxSize, bool isFinal, Node* q);
+		vector<TestCase*> combineForNormalNode(map<Node*, vector<TestCase*> > partialTestCasesMap, map<int, Node*> affectedNodes, unsigned int maxSize, bool isFinal, Node* q);
 
     public:
 		list<int> initialNodes;

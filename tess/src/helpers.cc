@@ -97,6 +97,15 @@ list< set<int> > minimizeDnf(list< set<int> > dnf){
 
 	for (list< set<int> >::const_iterator list_iter1 = dnf.begin(); list_iter1 != dnf.end(); ++list_iter1){
 			set<int> currentSet = *list_iter1;
+
+			//if a monom of the DNF is equal to true then the whole DNF is equal to true
+			if (*(currentSet.begin()) == label2id[True]){
+				assert(currentSet.size() == 1);
+				modifiedDnf.clear();
+				modifiedDnf.push_back(currentSet);
+				return (modifiedDnf); //True
+			}
+
 			hasDuplicate = false;
 
 			list< set<int> >::const_iterator currentPos = list_iter1;

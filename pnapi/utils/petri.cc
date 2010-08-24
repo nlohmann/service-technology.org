@@ -458,6 +458,9 @@ int main(int argc, char** argv) {
                         case(reduce_arg_pillat):
                             newLevel = PetriNet::SET_PILLAT;
                             break;
+                        case(reduce_arg_murata):
+                            newLevel = PetriNet::SET_MURATA;
+                            break;
                         case(reduce_arg_dead_nodes):
                             newLevel = PetriNet::DEAD_NODES;
                             break;

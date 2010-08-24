@@ -15,6 +15,9 @@ Version 4.03-unreleased
 * fixed final condition generation in net composition (see
   `https://gna.org/task/?6766')
 
+* added reduction option SET_MURATA and front end parameter option
+  -reduce=murata
+
 Version 4.02 (2010-07-28)
 =========================
 

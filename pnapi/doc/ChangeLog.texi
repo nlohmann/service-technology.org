@@ -2,6 +2,7 @@
 @itemize
 @item added methods to set node color in dot output
 @item fixed final condition generation in net composition (see @url{https://gna.org/task/?6766})
+@item added reduction option SET_MURATA and front end parameter option --reduce=murata
 @end itemize
 
 @heading Version 4.02 (2010-07-28)

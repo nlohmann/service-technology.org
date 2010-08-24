@@ -68,5 +68,4 @@ public class InvalidModelException extends Exception {
     }
     return "";
   }
-  
 }

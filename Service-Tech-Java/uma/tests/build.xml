@@ -34,9 +34,11 @@
 		<echo message="Running code tests in ${test.basedir}" />
 		<java classname="hub.top.scenario.OcletTest" dir="${test.basedir}" fork="true">
 			<classpath refid="run.classpath" />
+			<arg path="${testfiles}" />
 		</java>
 		<java classname="hub.top.uma.UmaTest" dir="${test.basedir}" fork="true">
 			<classpath refid="run.classpath" />
+			<arg path="${testfiles}" />
 		</java>
 		
 		<echo message="Running binary tests in ${test.basedir}" />
@@ -46,7 +48,40 @@
 			<arg file="${testfiles}/net_lexik.lola" />
 		</java>
 		
+		<antcall target="view-generation-binary" />
+		
 		<antcall target="clean" />
+	</target>
+	
+	<target name="view-generation-binary">
+		<echo message="Checking view generation." />
+		<property name="_dir" location="${testfiles}/viewgeneration" />
+		<mkdir dir="${_dir}" />
+		
+		<copy file="${testfiles}/EMS.oclets" todir="${_dir}"/>
+		<java classname="hub.top.uma.view.ViewGeneration2" output="${_dir}/viewgeneration.log">
+			<classpath refid="run.classpath" />
+			<arg value="-gen"/>
+			<arg value="${_dir}/EMS.oclets"/>
+			<arg value="100"/>
+			<arg value="30"/>
+			<arg value="${_dir}/EMS_traces.txt"/>
+		</java>
+		<java classname="hub.top.uma.view.ViewGeneration2" output="${_dir}/viewgeneration2.log">
+			<classpath refid="run.classpath" />
+			<arg value="-replay"/>
+			<arg value="${_dir}/EMS.oclets"/>
+			<arg value="${_dir}/EMS_traces.txt"/>
+		</java>
+		<fail> <!-- fail if the result file does not exist -->
+		    <condition> <not> <resourcecount count="1">
+                <fileset id="fs" dir="${_dir}" includes="EMS.oclets.traces.dot"/>
+		    </resourcecount> </not> </condition>
+		</fail>
+
+		<delete dir="${_dir}" includeemptydirs="true" />
+
+
 	</target>
 	
 	<target name="clean">

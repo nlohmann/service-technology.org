@@ -5,48 +5,10 @@ import hub.top.uma.InvalidModelException;
 
 import java.io.IOException;
 
-public class OcletTest {
-  
-  public String lastTest = "";
-  public int testNum = 0;
-  public int testFail = 0;
+public class OcletTest extends hub.top.test.Test {
   
   public OcletTest(String name) {
-    super();
-  }
-  
-
-  private static final String RESULT_FAIL = "[failed]";
-  private static final String RESULT_OK = "[ok]";
-  
-  public void assertTrue(boolean result) {
-    assertEquals(result, true);
-  }
-  
-  public void assertFalse(boolean result) {
-    assertEquals(result, false);
-  }
-  
-  public void assertEquals(Object result, Object expected) {
-    String testMessage = lastTest;
-    String resultMessage = result+", expected: "+expected;
-    boolean resultMatch = result.equals(expected);
-    String resultString = (resultMatch ? RESULT_OK : RESULT_FAIL);
-    
-    int fill = 77 - (testMessage.length() + resultMessage.length() + resultString.length());
-    String fillString1 = "";
-    String fillString2 = "";
-    if (fill >= 1) {
-      fillString1 = ": ";
-      for (int i=0; i < fill; i++) fillString2 += " ";
-    } else {
-      fillString1 += ":\n  ";
-      fill = 77 - (resultMessage.length() + resultString.length());
-      for (int i=0; i < fill; i++) fillString2 += " ";
-    }
-    System.out.println(testMessage+fillString1+resultMessage+fillString2+resultString);
-    
-    if (!resultMatch) testFail++;
+    super(name);
   }
   
   public void run () {
@@ -57,7 +19,8 @@ public class OcletTest {
 
   public static void main(String[] args) {
     OcletTest t = new OcletTest("Oclets");
-    t.run();
+    t.setParameters(args);
+    t.executeTests();
   }
   
   public void testOcletPrefix_fail () {
@@ -65,7 +28,7 @@ public class OcletTest {
     lastTest = "Detect wrong prefix in oclet";
 
     try {
-      PetriNet net = OcletIO.readNetFromFile("./testfiles/oclet_syntax_1.oclets");
+      PetriNet net = OcletIO.readNetFromFile(testFileRoot+"/oclet_syntax_1.oclets");
       OcletSpecification os = new OcletSpecification(net);
       Oclet o = os.getOclets().getFirst();
     
@@ -90,7 +53,7 @@ public class OcletTest {
     lastTest = "Detect cycle in oclet";
     
     try {
-      PetriNet net = OcletIO.readNetFromFile("./testfiles/oclet_syntax_2.oclets");
+      PetriNet net = OcletIO.readNetFromFile(testFileRoot+"/oclet_syntax_2.oclets");
       OcletSpecification os = new OcletSpecification(net);
       Oclet o = os.getOclets().getFirst();
     
@@ -115,7 +78,7 @@ public class OcletTest {
     lastTest = "Check valid oclet";
     
     try {
-      PetriNet net = OcletIO.readNetFromFile("./testfiles/oclet_syntax_3.oclets");
+      PetriNet net = OcletIO.readNetFromFile(testFileRoot+"/oclet_syntax_3.oclets");
       OcletSpecification os = new OcletSpecification(net);
       Oclet o = os.getOclets().getFirst();
     

@@ -13,48 +13,12 @@ import hub.top.scenario.OcletIO;
 import hub.top.scenario.OcletSpecification;
 import hub.top.uma.synthesis.NetSynthesis;
 
-public class UmaTest {
-  public String lastTest = "";
-  public int testNum = 0;
-  public int testFail = 0;
+public class UmaTest extends hub.top.test.Test {
   
   public UmaTest(String name) {
-    super();
+    super(name);
   }
  
-  private static final String RESULT_FAIL = "[failed]";
-  private static final String RESULT_OK = "[ok]";
-  
-  public void assertTrue(boolean result) {
-    assertEquals(result, true);
-  }
-  
-  public void assertFalse(boolean result) {
-    assertEquals(result, false);
-  }
-  
-  public void assertEquals(Object result, Object expected) {
-    String testMessage = lastTest;
-    String resultMessage = result+", expected: "+expected;
-    boolean resultMatch = result.equals(expected);
-    String resultString = (resultMatch ? RESULT_OK : RESULT_FAIL);
-    
-    int fill = 77 - (testMessage.length() + resultMessage.length() + resultString.length());
-    String fillString1 = "";
-    String fillString2 = "";
-    if (fill >= 1) {
-      fillString1 = ": ";
-      for (int i=0; i < fill; i++) fillString2 += " ";
-    } else {
-      fillString1 += ":\n  ";
-      fill = 77 - (resultMessage.length() + resultString.length());
-      for (int i=0; i < fill; i++) fillString2 += " ";
-    }
-    System.out.println(testMessage+fillString1+resultMessage+fillString2+resultString);
-    
-    if (!resultMatch) testFail++;
-  }
-  
   public void run () {
     testPetrinetPrefix_lexic();
     testPetrinet2Bounded();
@@ -74,8 +38,8 @@ public class UmaTest {
 
   public static void main(String[] args) {
     UmaTest t = new UmaTest("Uma unfolding");
-    //System.out.println(System.getProperty("user.dir"));
-    t.run();
+    t.setParameters(args);
+    t.executeTests();
   }
   
   public void testPetrinetPrefix_lexic () {
@@ -83,7 +47,7 @@ public class UmaTest {
     lastTest = "Construct prefix of Petri net with lexicographic order";
     
     try {
-      PetriNet net = PetriNetIO.readNetFromFile("./testfiles/net_lexik.lola");
+      PetriNet net = PetriNetIO.readNetFromFile(testFileRoot+"/net_lexik.lola");
       
       DNodeSys_PetriNet sys = new DNodeSys_PetriNet(net);
       DNodeBP build = new DNodeBP(sys);
@@ -114,7 +78,7 @@ public class UmaTest {
     lastTest = "Construct prefix of 2-bounded Petri net";
     
     try {
-      PetriNet net = PetriNetIO.readNetFromFile("./testfiles/net_2bounded.lola");
+      PetriNet net = PetriNetIO.readNetFromFile(testFileRoot+"/net_2bounded.lola");
       DNodeSys_PetriNet sys = new DNodeSys_PetriNet(net);
       DNodeBP build = new DNodeBP(sys);
       build.configure_buildOnly();
@@ -144,7 +108,7 @@ public class UmaTest {
     lastTest = "Violate 1-bound during construction";
     
     try {
-      PetriNet net = PetriNetIO.readNetFromFile("./testfiles/net_2bounded.lola");
+      PetriNet net = PetriNetIO.readNetFromFile(testFileRoot+"/net_2bounded.lola");
       DNodeSys_PetriNet sys = new DNodeSys_PetriNet(net);
       DNodeBP build = new DNodeBP(sys);
       build.configure_buildOnly();
@@ -170,7 +134,7 @@ public class UmaTest {
     lastTest = "Construct prefix of oclet specification";
 
     try {
-      PetriNet net = OcletIO.readNetFromFile("./testfiles/spec1.oclets");
+      PetriNet net = OcletIO.readNetFromFile(testFileRoot+"/spec1.oclets");
       OcletSpecification os = new OcletSpecification(net);
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
@@ -199,7 +163,7 @@ public class UmaTest {
     lastTest = "Test for executability of events of an oclet specification 1";
 
     try {
-      PetriNet net = OcletIO.readNetFromFile("./testfiles/spec1.oclets");
+      PetriNet net = OcletIO.readNetFromFile(testFileRoot+"/spec1.oclets");
       OcletSpecification os = new OcletSpecification(net);
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
@@ -230,7 +194,7 @@ public class UmaTest {
     lastTest = "Test for executability of events of an oclet specification 2";
 
     try {
-      PetriNet net = OcletIO.readNetFromFile("./testfiles/spec2.oclets");
+      PetriNet net = OcletIO.readNetFromFile(testFileRoot+"/spec2.oclets");
       OcletSpecification os = new OcletSpecification(net);
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
@@ -262,7 +226,7 @@ public class UmaTest {
     
     try {
 
-      PetriNet net = OcletIO.readNetFromFile("./testfiles/spec1.oclets");
+      PetriNet net = OcletIO.readNetFromFile(testFileRoot+"/spec1.oclets");
       OcletSpecification os = new OcletSpecification(net);
       
       Oclet o4 = new Oclet("o5", false);
@@ -337,7 +301,7 @@ public class UmaTest {
     lastTest = "Construct prefix of oclet specification (EMS)";
 
     try {
-      PetriNet net = OcletIO.readNetFromFile("./testfiles/EMS.oclets");
+      PetriNet net = OcletIO.readNetFromFile(testFileRoot+"/EMS.oclets");
       OcletSpecification os = new OcletSpecification(net);
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
@@ -366,7 +330,7 @@ public class UmaTest {
     lastTest = "Construct prefix of oclet specification with anti-oclets (flood alert)";
 
     try {
-      PetriNet net = OcletIO.readNetFromFile("./testfiles/flood.oclets");
+      PetriNet net = OcletIO.readNetFromFile(testFileRoot+"/flood.oclets");
       OcletSpecification os = new OcletSpecification(net);
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
@@ -402,7 +366,7 @@ public class UmaTest {
 
     try {
     
-      PetriNet net = OcletIO.readNetFromFile("./testfiles/EMS.oclets");
+      PetriNet net = OcletIO.readNetFromFile(testFileRoot+"/EMS.oclets");
       OcletSpecification os = new OcletSpecification(net);
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
@@ -434,7 +398,7 @@ public class UmaTest {
 
     try {
     
-      PetriNet net = OcletIO.readNetFromFile("./testfiles/flood.oclets");
+      PetriNet net = OcletIO.readNetFromFile(testFileRoot+"/flood.oclets");
       OcletSpecification os = new OcletSpecification(net);
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);

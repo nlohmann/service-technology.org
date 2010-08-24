@@ -2474,7 +2474,7 @@ public class DNodeBP {
 	 * @return <code>true</code> iff d1 and d2 belong to the same equivalence class
 	 * of the folding relation
 	 */
-	private boolean areFoldingEquivalent(DNode d1, DNode d2) {
+	public boolean areFoldingEquivalent(DNode d1, DNode d2) {
 	  return elementary_ccPair.get(d1) == elementary_ccPair.get(d2);
 	}
 	

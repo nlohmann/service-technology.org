@@ -1,6 +1,7 @@
 package hub.top.uma;
 
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -49,29 +50,50 @@ public class Uma {
     }
   }
   
-  private static void computePrefix() throws Exception {
-    PetriNet net = OcletIO.readNetFromFile(options_inFile);
+  public static DNodeSys readSystemFromFile(String fileName) throws IOException, InvalidModelException {
+    String ext = fileName.substring(fileName.lastIndexOf('.')+1);
+    PetriNet net = OcletIO.readNetFromFile(fileName);
     
     if (net == null) {
-      System.err.println("Parsed empty net from "+options_inFile);
-      return;
+      System.err.println("Parsed empty net from "+fileName);
+      return null;
     }
     
     DNodeSys sys = null;
     
-    if ("oclets".equals(options_inFile_Ext)) {
+    if ("oclets".equals(ext)) {
       OcletSpecification os = new OcletSpecification(net);
       sys = new DNodeSys_OcletSpecification(os); 
     } else {
       sys = new DNodeSys_PetriNet(net);
     }
+    return sys;
+  }
+  
+  public static DNodeBP initBuildPrefix(DNodeSys sys) {
     DNodeBP build = new DNodeBP(sys);
     build.configure_buildOnly();
-    build.configure_PetriNet();
     build.configure_stopIfUnSafe();
     
+    if (sys instanceof DNodeSys_PetriNet) build.configure_PetriNet();
+    else build.configure_Scenarios();
+    
+    return build;
+  }
+  
+  public static DNodeBP buildPrefix(DNodeSys sys) {
+    
+    DNodeBP build = initBuildPrefix(sys);
     while (build.step() > 0) {
     }
+    
+    return build;
+  }
+  
+  private static void computePrefix() throws IOException, InvalidModelException {
+    
+    DNodeSys sys = readSystemFromFile(options_inFile);
+    DNodeBP build = buildPrefix(sys);
 
     if (options_outputFormat == PetriNetIO.FORMAT_DOT) {
       System.out.println("writing to "+options_inFile+".bp.dot");

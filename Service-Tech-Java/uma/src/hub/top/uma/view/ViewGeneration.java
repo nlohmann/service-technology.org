@@ -46,7 +46,7 @@ public class ViewGeneration {
   
   /**
    * Standard constructor for view generation. The argument takes a branching
-   * process construction object @link{DNodeBP} after the branching process has
+   * process construction object {@link DNodeBP} after the branching process has
    * been constructed.
    *  
    * @param build
@@ -62,7 +62,7 @@ public class ViewGeneration {
   
   /**
    * Check whether the given trace can be executed and accumulate the
-   * number of actions in @link{ViewGeneration#eventOccurrences}.
+   * number of actions in {@link ViewGeneration#eventOccurrences}.
    * 
    * @param trace
    * @return <code>true</code> if the branching process contains a partially
@@ -151,7 +151,7 @@ public class ViewGeneration {
    * Extend the branching process by the partially ordered run of the given
    * trace. The names in the trace must correspond to names of actions in the
    * system that generated the branching process. Also accumulate the
-   * number of actions in @link{ViewGenerationeventOccurrences}.
+   * number of actions in {@link ViewGeneration#eventOccurrences}.
    *  
    * @param trace
    * @return <code>true</code> if the branching process could be extended by
@@ -468,7 +468,7 @@ public class ViewGeneration {
    * @param min
    * @return a list of sets of maximal events of the branching process where for
    * each set of events the sum of the number of
-   * @link{ViewGeneration#eventOccurrences} amounts to at least <code>min</code>
+   * {@link ViewGeneration#eventOccurrences} amounts to at least <code>min</code>
    *  
    */
   public LinkedList< HashSet<DNode> > getViewConfigurations(float min) {
@@ -587,7 +587,7 @@ public class ViewGeneration {
     
   /**
    * Remove all events that are not part of a run occurrence less than
-   * the given percentage according to @link{ViewGeneration#eventOccurrences}.
+   * the given percentage according to {@link ViewGeneration#eventOccurrences}.
    * 
    * @param percentage
    */

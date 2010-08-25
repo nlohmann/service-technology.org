@@ -1,0 +1,41 @@
+-- Petri net created by UML2oWFN 2.00 reading b1.xml.s00000025##s00000805
+
+place "callToTask.s00000808.output.s00000785";
+place "startNode.s00000775.output.default";
+place "omega";
+place "alpha" init 1;
+place "startNode.s00000774.output.default";
+place "callToTask.s00000806.inputCriterion.s00000772.used";
+place "callToTask.s00000808.inputCriterion.s00000772.used";
+place "callToTask.s00000806.output.s00000788";
+
+trans "finalANDjoin"~"t1"
+    in "callToTask.s00000806.output.s00000788"
+    out "omega"
+;
+
+trans "process.s00000025##s00000805.inputCriterion.s00000772"~"t2"
+    in "alpha"
+    out "startNode.s00000775.output.default" "startNode.s00000774.output.default"
+;
+
+trans "callToTask.s00000806.inputCriterion.s00000772"~"t3"
+    in "callToTask.s00000808.output.s00000785"
+    out "callToTask.s00000806.inputCriterion.s00000772.used"
+;
+
+trans "callToTask.s00000806.outputCriterion.s00000773"~"t4"
+    in "callToTask.s00000806.inputCriterion.s00000772.used"
+    out "callToTask.s00000806.output.s00000788"
+;
+
+trans "callToTask.s00000808.inputCriterion.s00000772"~"t5"
+    in "startNode.s00000775.output.default" "startNode.s00000774.output.default"
+    out "callToTask.s00000808.inputCriterion.s00000772.used"
+;
+
+trans "callToTask.s00000808.outputCriterion.s00000773"
+    in "callToTask.s00000808.inputCriterion.s00000772.used"
+    out "callToTask.s00000808.output.s00000785"
+;
+

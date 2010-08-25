@@ -18,6 +18,7 @@
 package hub.top.petrinet;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
@@ -27,6 +28,7 @@ import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.EarlyExitException;
 import org.antlr.runtime.MismatchedTokenException;
+import org.antlr.runtime.Parser;
 import org.antlr.runtime.RecognitionException;
 
 /**
@@ -46,9 +48,12 @@ public class PetriNetIO {
    */
   public static PetriNet readNetFromFile(String fileName) throws IOException {
     
-    String ext = fileName.substring(fileName.lastIndexOf('.')+1);
+    System.err.println("Reading "+fileName);
     
-    if ("lola".equals(ext)) {
+    String ext = fileName.substring(fileName.lastIndexOf('.')+1);
+    int format = getFormatForFileExtension(ext);
+    
+    if (format == FORMAT_LOLA) {
     
       LoLALexer lex = new LoLALexer(new ANTLRFileStream(fileName));
       CommonTokenStream tokens = new CommonTokenStream(lex);
@@ -60,18 +65,11 @@ public class PetriNetIO {
         return result;
           
       } catch (RecognitionException e)  {
-        if (e instanceof EarlyExitException) {
-          EarlyExitException e2 = (EarlyExitException)e;
-          System.err.println("failed parsing "+fileName);
-          System.err.println("found unexpected '"+e2.token.getText()+"' in "
-              +"line "+e2.line+ " at column "+e2.charPositionInLine);
-          System.exit(1);
-        } else {
-          e.printStackTrace();
-        }
+        handleParsingException(e, fileName);
       }
+
       
-    } else if ("owfn".equals(ext)) {
+    } else if (format == FORMAT_OWFN) {
 
       OWFNLexer lex = new OWFNLexer(new ANTLRFileStream(fileName));
       CommonTokenStream tokens = new CommonTokenStream(lex);
@@ -83,29 +81,55 @@ public class PetriNetIO {
         return result;
           
       } catch (RecognitionException e)  {
-          if (e instanceof EarlyExitException) {
-            EarlyExitException e2 = (EarlyExitException)e;
-            System.err.println("failed parsing "+fileName);
-            System.err.println("found unexpected '"+e2.token.getText()+"' in "
-                +"line "+e2.line+ " at column "+(e2.charPositionInLine+1));
-            System.exit(1);
-          } else if (e instanceof MismatchedTokenException) {
-            MismatchedTokenException e2 = (MismatchedTokenException)e;
-            System.err.println("failed parsing "+fileName);
-            System.err.println("line "+e2.line+":"+(e2.charPositionInLine+1)+" found unexpected "+e2.token.getText());
-            System.exit(1);
-          } else {
-            e.printStackTrace();
-          }
+        handleParsingException(e, fileName);
+      }
+
+      
+    } else if (format == FORMAT_WOFLAN) {
+
+      TPNLexer lex = new TPNLexer(new ANTLRFileStream(fileName));
+      CommonTokenStream tokens = new CommonTokenStream(lex);
+  
+      TPNParser parser = new TPNParser(tokens);
+  
+      try {
+        PetriNet result = parser.net();
+        return result;
+          
+      } catch (RecognitionException e)  {
+        handleParsingException(e, fileName);
       }
     }
     
     return null;
   }
   
+  /**
+   * Print diagnostic information in case an exception occurred during parsing.
+   * Called by {@link #readNetFromFile(String)}.
+   * 
+   * @param e
+   * @param fileName
+   */
+  private static void handleParsingException(RecognitionException e, String fileName) {
+    if (e instanceof EarlyExitException) {
+      EarlyExitException e2 = (EarlyExitException)e;
+      System.err.println("failed parsing "+fileName);
+      System.err.println("found unexpected '"+e2.token.getText()+"' in "
+          +"line "+e2.line+ " at column "+(e2.charPositionInLine+1));
+    } else if (e instanceof MismatchedTokenException) {
+      MismatchedTokenException e2 = (MismatchedTokenException)e;
+      System.err.println("failed parsing "+fileName);
+      System.err.println("line "+e2.line+":"+(e2.charPositionInLine+1)+" found unexpected "+e2.token.getText());
+    } else {
+      e.printStackTrace();
+    }
+  }
+  
   public static final int FORMAT_DOT = 1;
   public static final int FORMAT_LOLA = 2;
   public static final int FORMAT_OWFN = 3;
+  public static final int FORMAT_WOFLAN = 4;
   
   public static String toLoLA(String ident) {
     String result = ident.replace(' ', '_');
@@ -114,6 +138,7 @@ public class PetriNetIO {
     result = result.replace('[', '_');
     result = result.replace(']', '_');
     result = result.replace('=', '_');
+    result = result.replace(':', '_');
     return result;
   }
   
@@ -287,8 +312,35 @@ public class PetriNetIO {
     case FORMAT_DOT: return "dot";
     case FORMAT_LOLA: return "lola";
     case FORMAT_OWFN: return "owfn";
+    case FORMAT_WOFLAN: return "tpn";
     }
     return "unknown";
+  }
+  
+  /**
+   * @param format
+   * @return standard file extension for given file format
+   */
+  public static int getFormatForFileExtension(String ext) {
+    if ("dot".equals(ext)) return FORMAT_DOT;
+    else if ("lola".equals(ext)) return FORMAT_LOLA;
+    else if ("owfn".equals(ext)) return FORMAT_OWFN;
+    else if ("tpn".equals(ext)) return FORMAT_WOFLAN;
+    else return 0;
+  }
+  
+  /**
+   * @param fileName
+   * @return <code>true</code> iff we have a parser that can read the
+   * file contents (decision is based on the file extension)
+   */
+  public static boolean isParseableFileType(String fileName) {
+    String ext = fileName.substring(fileName.lastIndexOf('.')+1);
+    int type = getFormatForFileExtension(ext);
+    if (type == FORMAT_LOLA || type == FORMAT_OWFN || type == FORMAT_WOFLAN)
+      return true;
+    else
+      return false;
   }
   
   public static final int PARAM_SWIMLANE = 1;
@@ -335,6 +387,48 @@ public class PetriNetIO {
       }
     }
   }
+  
+  /**
+   * Process a single input file according to the set input parameters,
+   * see {@link #parseCommandLine(String[])}.
+   * 
+   * @param dirName
+   */
+  private static void processFile(String fileName) throws IOException {
+    if (options_inFile == null) return;
+    
+    PetriNet net = readNetFromFile(fileName);
+    //net.anonymizeNet();
+    if (net == null) return;
+    
+    writeToFile(net, fileName, options_outputFormat, 0);
+  }
+  
+  /**
+   * Process all files in the given directory according to the set input parameters,
+   * see {@link #parseCommandLine(String[])}.
+   * 
+   * @param dirName
+   */
+  private static void processDirectory(String dirName) {
+    File dir = new File(dirName);
+    if (dir.isDirectory()) {
+      for (String child : dir.list()) {
+        File childFile = new File(dir, child);
+        if (childFile.isFile()) {
+          if (isParseableFileType(childFile.getPath())) {
+            
+            try {
+              processFile(childFile.getPath());
+            } catch (IOException e) {
+              System.err.println(e);
+            }
+            
+          }
+        }
+      }
+    }
+  }
 
   /**
    * Read Petri net from a text-file and write a GraphViz Dot representation
@@ -347,15 +441,11 @@ public class PetriNetIO {
     
     parseCommandLine(args);
     
-    if (options_inFile == null) return;
-    
-    PetriNet net = readNetFromFile(options_inFile);
-    net.anonymizeNet();
-    if (net == null) System.exit(1);
-    
     if (options_outputFormat == 0)
       options_outputFormat = FORMAT_DOT;
     
-    writeToFile(net, options_inFile, options_outputFormat, 0);
+    if (isParseableFileType(options_inFile)) processFile(options_inFile);
+    else processDirectory(options_inFile);
+
   }
 }

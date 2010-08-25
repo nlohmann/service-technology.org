@@ -62,6 +62,15 @@
 			<arg value="-f"/>
 			<arg value="owfn"/>
 		</java>
+		
+		<copy file="${testfiles}/process.tpn" todir="${_dir}"/>
+		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/process.tpn.log">
+			<classpath refid="run.classpath" />
+			<arg value="-i"/>
+			<arg value="${_dir}/process.tpn"/>
+			<arg value="-f"/>
+			<arg value="lola"/>
+		</java>
 
 		<delete dir="${_dir}" includeemptydirs="true" />
 	</target>

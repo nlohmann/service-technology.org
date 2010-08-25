@@ -3,7 +3,7 @@
 	<!-- the pre-build hook, add here all dependencies and steps to be
 	     carried out before executing the project build task -->
 	
-	<target name="pre-build" depends="parser_lola,parser_owfn">
+	<target name="pre-build" depends="parser_lola,parser_owfn,parser_tpn">
 	</target>
 	
 	<target name="pre-svn-clean" depends="parser_clean">
@@ -12,6 +12,7 @@
 	<fileset dir="${home}" id="distfiles.includes">
 	    <include name="src/hub/top/petrinet/LoLA.g"/>
 		<include name="src/hub/top/petrinet/OWFN.g"/>
+		<include name="src/hub/top/petrinet/TPN.g"/>
 	</fileset>
 
 	<!-- generate LoLA parser files -->
@@ -55,6 +56,28 @@
 		<echo message="Generating parser sources in ${make.basedir}..." />
 		<java classpath="libs-build/antlr-3.2.jar" classname="org.antlr.Tool">
 			<arg path="./src/hub/top/petrinet/OWFN.g"/>
+		</java>
+	</target>
+	
+	<!-- generate TPN parser files -->
+	<target name="parser_tpn.dependencies" 
+			description="Check dependencies for generating Java class files from ANTLR parser description.">
+	    <condition property="updateParser_tpn.notRequired">
+	        <and>
+	    		<uptodate
+	    			targetfile="./src/hub/top/petrinet/TPNLexer.java"
+	    			srcfile="./src/hub/top/petrinet/TPN.g" />
+	    		<uptodate
+	    			targetfile="./src/hub/top/petrinet/TPNParser.java"
+	    			srcfile="./src/hub/top/petrinet/TPN.g" />
+	        </and>
+	    </condition>
+	</target>
+	<target name="parser_tpn" depends="parser_tpn.dependencies" unless="updateParser_tpn.notRequired"
+			description="Generate Java class files from ANTLR parser description.">
+		<echo message="Generating parser sources in ${make.basedir}..." />
+		<java classpath="libs-build/antlr-3.2.jar" classname="org.antlr.Tool">
+			<arg path="./src/hub/top/petrinet/TPN.g"/>
 		</java>
 	</target>
 	

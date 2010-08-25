@@ -73,6 +73,15 @@ AT_CHECK([GREP -q "partially realizable:     NO" stderr],0)
 AT_KEYWORDS([bug])
 AT_CLEANUP
 
+AT_SETUP([Bug 15551 (https://gna.org/bugs/?15551)])
+AT_CHECK([cp TESTFILES/fig4d.chor .])
+AT_CHECK([REBECCA < fig4d.chor -q],0,ignore,stderr)
+AT_CHECK([GREP -q "completely realizable:    NO" stderr],0)
+AT_CHECK([GREP -q "distributedly realizable: NO" stderr],0)
+AT_CHECK([GREP -q "partially realizable:     YES" stderr],0)
+AT_KEYWORDS([bug])
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Realizability Tests])
 ############################################################################

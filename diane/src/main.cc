@@ -52,6 +52,7 @@ using pnapi::Place;
 using pnapi::Label;
 using pnapi::Transition;
 
+string  filename;
 
 /// statistics structure
 struct Statistics {
@@ -106,9 +107,8 @@ void evaluateParameters(int, char**);
 /// statistical output
 void statistics(PetriNet&, vector<PetriNet*> &);
 
-
-
-
+//prints components, their complements and their composition (the structure is computed)
+void printComponent(Component c);
 
 
 int main(int argc, char* argv[]) {
@@ -216,8 +216,9 @@ int main(int argc, char* argv[]) {
 			fileprefix += args_info.prefix_arg;
 		fileprefix += args_info.inputs[0];
 		fileprefix += ".part";
+		filename=fileprefix;
 		
-		unsigned int ksmall=0;
+		//unsigned int ksmall=0;
         /// leading zeros
 		//build a bitset
 		//vector<bool> in(args_info.inputs_num), com(args_info.inputs_num);
@@ -226,59 +227,8 @@ int main(int argc, char* argv[]) {
 		
 		std::vector<pnapi::PetriNet  > parts; //vector of pn2
 		
-		PetriNet cmplfordiff=net;//this 
-		
-		for (std::set<pnapi::Place *>::iterator p = cmplfordiff.getPlaces().begin(); p != cmplfordiff.getPlaces().end(); ++p){
-			//PNAPI_FOREACH(p, net.getInternalPlaces()) {
-			//Place &p1=net.findPlace((*p)->getName());
-			//net2.deletePlace(p1);
-			//cout << (*p)->getName()<<endl;
-			Place * place = cmplfordiff.findPlace((*p)->getName()+"$compl");
-			//Place * php= net.findPlace(p->getName());
-			//if ( php != NULL) cout<<"naspa";
-			if ( (place == NULL && (*p)->getTokenCount()==0))//initial place
-			{	
-				if ((!(*p)->getPresetArcs().empty())&&(!(*p)->getPostsetArcs().empty())) {
-					
-					
-					Place * nplace = &cmplfordiff.createPlace((*p)->getName()+"$compl", 1,1);
-					pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*nplace,1));
-					cmplfordiff.getFinalCondition().addProposition(prop);//nets[x]->getFinalCondition().formula().output(std::cout);
-					//if(p->getName()=="omega") {pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*place,0));nets[x]->getFinalCondition().addProposition(prop);}
-					//else {pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*place,1));nets[x]->getFinalCondition().addProposition(prop);}
-					//nets[x]->getFinalCondition().formula().output(std::cout);
-					//cout<<php->getPresetArcs().size();
-					
-					if (cmplfordiff.findPlace((*p)->getName()+"$compl")!=NULL) {
-						
-						
-						//if(place->getTokenCount()||place->getName()==sfp) nets[x]->createArc( *t, *nets[x]->findPlace(place->getName()+"_compl"),(*f)->getWeight());
-						set<pnapi::Arc *> preset = (*p)->getPresetArcs();
-						for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-						{
-							
-							Transition *t = &(*f)->getTransition();
-							//nets[j]->createArc(**p ,*t, (*f)->getWeight());
-							if(cmplfordiff.findArc(*nplace,*t)==NULL) {cmplfordiff.createArc( *nplace, *t,(*f)->getWeight());
-								//cout<<"noyesno"<<endl;
-							}
-							//else cout<<"nonono"<<endl;
-							//if(cmplfordiff.findArc(*nplace,*t)==NULL) cout << "created arc from "<<nplace->getName()+"$compl"<<" to "<<t->getName()<<endl;
-						}	
-						preset = (*p)->getPostsetArcs();
-						for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-						{
-							Transition *t = &(*f)->getTransition();
-							//nets[j]->createArc(**p ,*t, (*f)->getWeight());
-							if(cmplfordiff.findArc( *t,*nplace)==NULL) cmplfordiff.createArc( *t,*nplace, (*f)->getWeight());
-							//cout << "created arc from "<<place->getName()+"$compl"<<" to "<<t->getName()<<endl;
-						}			
-						
-					}}
-				
-			}
-			
-		}	
+		//PetriNet cmplfordiff=net;//add complementary places for internal places
+		PetriNet cmplfordiff=addComplementaryPlaces(net);
 		std::ofstream ocompl;
 		//ox << pnapi::io::owfn << diff;
 		status("creating complement  net fragments of '%s'", args_info.inputs[0]);
@@ -303,11 +253,11 @@ int main(int argc, char* argv[]) {
 		std::vector<bool> in(nc,false),com(nc,false);in.flip();
 		std::set< std::vector<bool> >all;//stores component compositions (without complement duplicates)
 		int averp=maxi/nc; cout<<maxi<<"/"<<nc<<nets.size()<<"="<<averp<<endl;
-		map<vector<bool>, PetriNet> small;//stores all smaller composition from previous iterations
+		map<vector<bool>, Component> small;//stores all smaller composition from previous iterations
 		//map<vector<bool>, PetriNet> alln;//stores all balanced components without duplicates  
 		
 		//since average does not relate to the size of the whole process, we consider medium sizes (fraction) of the original process
-		for (int i = 0; i < (int) parts.size(); ++i){			
+		for (unsigned int i = 0; i < parts.size(); ++i){			
 			//if the component is medium compute the complement and if it si not that big keepit
 			/*	if(parts.at(i).getInternalPlaces().size()<=maxi/2){
 			 //it is still small store it for future compositions
@@ -316,7 +266,25 @@ int main(int argc, char* argv[]) {
 			 all.insert(in);
 			 //add complement
 			 }*/
+			Component c;
 			
+			stringstream ss;
+			string num;
+			//ss<<i;
+			for (unsigned int z=0;z<nc;++z ) {
+				if ((z==i)){//in[z]) {
+					ss<<1;
+				}else ss<<0; 
+			}
+			vector<bool> in(nc,false),inc(nc,false);
+			in[i]=true;inc[i]=true;inc.flip();
+			if((all.find(in)==all.end()) && (all.find(inc)==all.end()))
+				all.insert(in);
+			else {
+				cout <<endl << "red allert "<<all.size()<<endl;continue;
+			}
+			std::pair<vector<bool>, PetriNet> p;p.first=in;p.second=parts.at(i);
+			c=makeComponent(p, net);
 			// if it is medium sized compute the complement
 			if((maxi/3<=parts.at(i).getPlaces().size())&&(parts.at(i).getPlaces().size()<=2*maxi/3)){
 				//compose
@@ -324,86 +292,8 @@ int main(int argc, char* argv[]) {
 				//int digits=parts.size();
 				//int z = digits-num.length();
 				//ss << setfill('0') << setw(z) << i;
-				stringstream ss;
-				string num;
-				//ss<<i;
-				for (int z=0;z<nc;++z ) {
-					if ((z==i)){//in[z]) {
-						ss<<1;
-					}else ss<<0; 
-				}
-				vector<bool> in(nc,false),inc(nc,false);
-				in[i]=true;inc[i]=true;inc.flip();
-				if((all.find(in)==all.end()) && (all.find(inc)==all.end()))
-					all.insert(in);
-				else {
-					cout <<endl << "red allert "<<all.size()<<endl;continue;
-				}
-				
-				
-				ss >> num; //cout<<"stupid number "<<num<<endl;
-				//cout << num<<" "<<filepostfix <<endl;
-				std::ofstream o;
-				o.open((std::string(fileprefix+"_"+num+filepostfix).c_str()), std::ios_base::trunc);
-				o << pnapi::io::owfn << parts.at(i);
-				
-				//output the net and its complement and the composition first complement interface places
-				//PetriNet net=parts.at(i);
-				
-				//Output output((std::string(argv[0]) + "compl.owfn").c_str(), "open net");
-				//output.stream() << pnapi::io::owfn << net; exit(0);
-				//ofstream outputfile((std::string(argv[0]) + "compl.owfn").c_str());
-				//compute the difference for  each place / transition of the bign net delete the one from the second net
-				
-				//int z = digits-num.length();
-				//ss << setfill('0') << setw(z) << i;
-				//ss >> num;
-				
-				//cout << num<<" "<<filepostfix <<endl;
-				///o.open((std::string(fileprefix+num+filepostfix + ".compl.owfn").c_str()), std::ios_base::trunc);
-				//PetriNet net2;
-				PetriNet diff=complementnet(cmplfordiff, parts.at(i));
-				
-				
-				
-				std::ofstream ox;
-				//ox << pnapi::io::owfn << diff;
-				
-				ox.open((std::string(fileprefix+"_"+num+filepostfix + ".compl.owfn").c_str()), std::ios_base::trunc);
-				//PetriNet net2;
-				ox << pnapi::io::owfn << diff;
-				//cout<<fileprefix+"_"+num+filepostfix<<endl;
-				std::ofstream oc;
-				//ox << pnapi::io::owfn << diff;
-				oc.open((std::string(fileprefix+"_"+num+filepostfix + ".composed.owfn").c_str()), std::ios_base::trunc);
-				PetriNet net2=parts.at(i);
-				set<string> inputplaces1,outputplaces1;
-				std::set<Label *> inputlr=parts.at(i).getInterface().getInputLabels();
-				for (std::set<Label *>::iterator ssit=inputlr.begin(); ssit!=inputlr.end(); ++ssit) {
-					inputplaces1.insert((*ssit)->getName());
-				}
-				std::set<Label *> outputlr=parts.at(i).getInterface().getOutputLabels();
-				for (std::set<Label *>::iterator ssit=outputlr.begin(); ssit!=outputlr.end(); ++ssit) {
-					outputplaces1.insert((*ssit)->getName());
-				}
-				//cout << pnapi::io::owfn<<net2;
-				//cout << pnapi::io::owfn<<diff;
-				//PetriNet net2=addPattern(net1);
-				try{
-					status("net2+diff");
-					net2.compose(diff, "1", "2");
-				}
-				catch (pnapi::exception::UserCausedError e) {
-					e.output(cout);
-				}
-				
-				
-				//inputplaces1, outputplaces1 for the original net2
-				//cout<<"not done"<<endl;
-				PetriNet net3=addinterfcompl(net2,inputplaces1,outputplaces1);
-				
-				oc << pnapi::io::owfn << net3;
-				
+	
+				printComponent(c);
 				//compute complement
 				//in->reset();
 				//in[i]=1;com=in; com.flip();
@@ -413,11 +303,12 @@ int main(int argc, char* argv[]) {
 				//}
 				//com.reset(i);//
 			}
+			//medium or small compose
 			if (maxi/3>parts.at(i).getPlaces().size()||((maxi/3<=parts.at(i).getPlaces().size())&&(parts.at(i).getPlaces().size()<=2*maxi/3))){
 				//cout<<maxi/3<<">"<<parts.at(i).getInternalPlaces().size()<<endl;
 				//cout <<i<< "compose with"<<i<<endl;
 				//it is small, compose it  // we do not need to store it in the smaller set as we are already taking care of it 
-				for(unsigned int j=i+1; j<(int) parts.size();++j){
+				for(unsigned int j=i+1; j< parts.size();++j){
 					//check if ij are composable (code from yasmina)
 					//cout <<i<< "compose with"<<j;
 					
@@ -430,12 +321,16 @@ int main(int argc, char* argv[]) {
 					}
 					else { std::cout<<endl<<2*maxi/3<<"> "<<parts.at(i).getPlaces().size()+parts.at(j).getPlaces().size()<<endl;
 						//store the small ones
+
 						
 						
 						//if (maxi/2>=parts.at(i).getInternalPlaces().size()+parts.at(j).getInternalPlaces().size()) {
 						//	
 						//}
 						//compose them (adding complementary places for former interface places
+						//
+						
+						
 						PetriNet nnb=deletePattern(parts.at(i));
 						set<string> inputplaces1,outputplaces1;
 						std::set<Label *>  inputl=parts.at(i).getInterface().getInputLabels();
@@ -448,49 +343,34 @@ int main(int argc, char* argv[]) {
 						}
 						
 						//first delete the enforcing patterns in both nets
-						
-						PetriNet nnj=parts.at(j);
-						PetriNet dnnj=deletePattern(nnj);
-						cout << pnapi::io::owfn << nnb;
-						cout << pnapi::io::owfn << dnnj;
-						try {
-							//nnb.compose(dnnj);
-							dnnj=deleteEmptyPorts(dnnj);
-							nnb=deleteEmptyPorts(nnb);
-							status("dnnj+nnb");
-							dnnj.compose(nnb, "1", "2");
-							cout << "hello"<<endl;
-						}
-						catch (pnapi::exception::UserCausedError e) {
-							cout << "error"<<endl;
-							e.output(cout);
-						}
-						
-						//cout << pnapi::io::owfn << nnb;dnnj
-						PetriNet nn=addinterfcompl(nnb, inputplaces1,outputplaces1);
-						
+						//stringstream ss;
 						vector<bool> in(nc,false);
 						in[i]=true;in[j]=true;
 						//all.insert(in);
-						small[in]=nn;////store it for the future also the composition
+						
 						cout<<"small="<<small.size()<<endl;
+						std::pair<vector<bool>, PetriNet> p;p.first=in;p.second=parts.at(j);
+						Component cj=makeComponent(p, net);
+						Component cc=asyncCompose(c,cj);
+						small[in]=cc;//nn;////store it for the future also the composition
 						
 						if(maxi/3>=parts.at(i).getPlaces().size()+parts.at(j).getPlaces().size()){
 							std::cout<<endl<<"unbalanced composition (too small)"<<endl;
 							continue;
 							
 						}
-						
+						cout <<"SIzep "<< cc.process.getPlaces().size()<<endl;
 						//after composition one needs to add complement places for the former interface places
-						
+						printComponent(cc);
+						/*
 						stringstream ss;
 						string num;
-						for (int z=0;z<nc;++z ) {
+						for (unsigned int z=0;z<nc;++z ) {
 							if ((z==i)||(z==j)){//in[z]) {
 								ss<<in[z];
 							}else ss<<0; 
 						}
-						ss >> num;
+						ss >> num;*/
 						// check
 						vector<bool> inc(nc,false);//complement
 						in[i]=true;inc[i]=true;in[j]=true;inc[j]=true;inc.flip();
@@ -499,105 +379,16 @@ int main(int argc, char* argv[]) {
 						else {
 							cout <<endl << "red allert"<<endl;
 						}
-						
-						//output the net , complement and composition
-						
-						ss >> num; //cout<<"stupid number "<<num<<endl;
-						//cout << num<<" "<<filepostfix <<endl;
-						std::ofstream o;
-						
-						//status("add pattern");
-						PetriNet nnp=addPattern(nn);
-						//status("finished adding pattern");
-						o.open((std::string(fileprefix+"_"+num+filepostfix).c_str()), std::ios_base::trunc);
-						o << pnapi::io::owfn << nnp;//output component with pattern (composition ij)
-						
-						cout<<fileprefix+"_"+num+filepostfix<<endl;
-						
-						//compute complement 
-						PetriNet diff=complementnet(cmplfordiff, nn);
-						PetriNet xdiff=diff;
-						/*for (std::set<pnapi::Place *>::iterator t = diff.getPlaces().begin(); t != diff.getPlaces().end(); ++t){
-						 
-						 if ((*t)->getPostsetArcs().empty() && (*t)->getPresetArcs().empty()) {
-						 cout<<"throw out "<<(*t)->getName()<<endl;
-						 Place *pp=xdiff.findPlace((*t)->getName());
-						 if(pp!=NULL)xdiff.deletePlace(*pp);//
-						 
-						 }
-						 }*/
-						//delete some extra accumulated complement places from former interfaces
-						for (std::set<pnapi::Place *>::iterator p = diff.getPlaces().begin(); p != diff.getPlaces().end(); ++p){
-							if (nn.findPlace((*p)->getName())!=NULL) {
-								cout << "help"<<endl;
-							}
-							if ((*p)->getPresetArcs().empty() && (*p)->getPostsetArcs().empty()) {
-								cout << "help"<<endl;
-							}
-						}	
-						std::ofstream ox;
-						ox.open((std::string(fileprefix+"_"+num+filepostfix + ".compl.owfn").c_str()), std::ios_base::trunc);
-						cout<<fileprefix+"_"+num+filepostfix + ".compl.owfn"<<endl;
-						ox << pnapi::io::owfn << xdiff;//its complement
-						std::ofstream oc;
-						//ox << pnapi::io::owfn << diff;
-						oc.open((std::string(fileprefix+"_"+num+filepostfix + ".composed.owfn").c_str()), std::ios_base::trunc);
-						cout<<fileprefix+"_"+num+filepostfix + ".composed.owfn"<<endl;
-						//PetriNet net2;//whole system again and again
-						set<string> inputplaces2,outputplaces2;
-						std::set<Label *> inputlnn=nn.getInterface().getInputLabels();
-						for (std::set<Label *>::iterator ssit=inputlnn.begin(); ssit!=inputlnn.end(); ++ssit) {
-							inputplaces2.insert((*ssit)->getName());
-						}
-						std::set<Label *> outputlnn=nn.getInterface().getOutputLabels();
-						for (std::set<Label *>::iterator ssit=outputlnn.begin(); ssit!=outputlnn.end(); ++ssit) {
-							outputplaces2.insert((*ssit)->getName());
-						}
-						try{
-							status("nnp+diff");
-							nnp.compose(diff, "1", "2");//nnp.compose(diff, "1", "2");
-						}
-						catch (pnapi::exception::UserCausedError e) {
-							e.output(cout);
-						}
-						//compose net with pattern 
-						PetriNet xn=addinterfcompl(nnp, inputplaces2,outputplaces2);
-						
-						oc << pnapi::io::owfn << xn;
-						
-						
-						//this is already done should not be here
-						//if(2*maxi/3>parts.at(i).getInternalPlaces().size()+parts.at(j).getInternalPlaces().size()){
-						//	std::cout<<endl<<"unbalanced composition store for future use"<<endl;
-						//	vector<bool> in(nc,false);
-						//	in[i]=true;in[j]=true;small[in]=nn;
-						//map<bitset
-						
-						//	all.insert(in);// all contains the set of combinations that will be used in the future to obtain  boolsets  with 3 bit set
-						//store it for the future
-						//all other with less than 2 bits set will be deleted (they are not needed)
-						//}
-						//}
+
 					}
 					
-					
-					
-					//if(nets.at(j)->getInternalPlaces().size()>=averp){
-					//compute complement
-					//in->reset();in->set(i);in->set(j);//com=in.flip();
-					//all.insert(in); //all.insert(com);
-					//for(unsigned int i=args_info.inputs_num;i<16;i++){
-					//	com.reset(i);
-					//}
-					//com.reset(i);//
-					//}
-					//else ;//COMPOSE IJ
-					//}
-				}
+					}
 			}			
 			
 		}
-		map<vector<bool>,PetriNet> smallp;
+		
+		//map<vector<bool>, Petrinet> small;
+		map<vector<bool>,Component> smallp;//compute new components from small
 		
 		unsigned int d=nc/2-2;
 		cout <<"n components "<<nc<<" small comp of size 2 " << small.size()<<" no of iterations"<< d <<endl;
@@ -606,7 +397,7 @@ int main(int argc, char* argv[]) {
 			for (int i=0;i < (int) parts.size(); i++) {
 				//for all members in the map
 				
-				map<vector<bool>,PetriNet>::iterator it;
+				map<vector<bool>,Component>::iterator it;
 				for ( it=small.begin() ; it != small.end(); ++it ){
 					cout << i <<"composed with "; 
 					
@@ -615,67 +406,49 @@ int main(int argc, char* argv[]) {
 						//cannot combine anything
 						//do the same checks with (*it).second and parts.at(i);
 						//modify smallp the previous then small
-						PetriNet pp=(*it).second;
-						for (int z=0;z<nc;++z ) {
+						Component pp=(*it).second;
+						vector<bool> vi(nc,false);vi[i]=true;
+						std::pair<vector<bool>, PetriNet> pi; 
+						pi.first=vi; pi.second=parts.at(i);
+						Component c=makeComponent(pi,net);
+//						for (int z=0;z<nc;++z ) {
 							//if ((*it).first(z==i)||(z==j)){//in[z]) {
-							cout<<(*it).first[z];
+//							cout<<(*it).first[z];
 							//}else ss<<0; 
-						}cout <<endl;
+//						}cout <<endl;
 						
-						if (!areComposable(parts.at(i),pp)){
+						if (!areAsyncComposable(c,pp)){
 							std::cout<<endl<<"not syntactically compatible"<<endl; 
 						}
-						else if(parts.at(i).getPlaces().size()+pp.getPlaces().size()>maxi*2/3){
+						else if(parts.at(i).getPlaces().size()+pp.sizep>maxi*2/3){
 							std::cout<<endl<<"unbalanced composition skipped (greater)"<<endl;
 						}
 						else {
-							std::cout<<endl<<2*maxi/3<<"> "<<parts.at(i).getPlaces().size()+pp.getPlaces().size()<<endl;
+							std::cout<<endl<<2*maxi/3<<"> "<<parts.at(i).getPlaces().size()+pp.sizep<<endl;
 							//store the small ones
 							//if (maxi/2>=parts.at(i).getInternalPlaces().size()+parts.at(j).getInternalPlaces().size()) {
 							//	
 							//}
 							//compose them (adding complementary places for former interface places
-							PetriNet nnn=deletePattern(parts.at(i));
-							set<string> inputplaces1,outputplaces1;
+							Component cc=asyncCompose(c,pp);
+							//small[in]=cc;
 							
-							std::set<Label *> inputl=parts.at(i).getInterface().getInputLabels();
-							for (std::set<Label *>::iterator ssit=inputl.begin(); ssit!=inputl.end(); ++ssit) {
-								inputplaces1.insert((*ssit)->getName());
-							}
-							std::set<Label *> outputl=parts.at(i).getInterface().getOutputLabels();
-							for (std::set<Label *>::iterator ssit=outputl.begin(); ssit!=outputl.end(); ++ssit) {
-								outputplaces1.insert((*ssit)->getName());
-							}
-							try{
-								nnn=deleteEmptyPorts(nnn);
-								pp=deleteEmptyPorts(pp);
-								status("nnn+pp");
-								nnn.compose(pp, "1", "2");
-								nnn=deleteEmptyPorts(nnn);
-							}
-							catch (pnapi::exception::UserCausedError e) {
-								//e.output(cout);
-							}
-							//nnn.compose(pp,"","");
-							PetriNet nn=addinterfcompl(nnn, inputplaces1,outputplaces1);
-							
-							//after composition one needs to add complement places for the former interface places
-							///here it may not be right because we do not need to add all enforcing conditions (write a special procedure for that)
+		
 							vector<bool> in(nc,false);
 							//in[i]=true;in[j]=true;
 							in=(*it).first;in[i]=true;
 							//all.insert(in);do not insert here it, not yet compared
-							smallp[in]=nn;////store it for the future also the composition
+							smallp[in]=cc;//nn;////store it for the future also the composition
 							cout<<"smallp size ="<<smallp.size()<<endl;
 							
-							if(maxi/3>=parts.at(i).getPlaces().size()+pp.getPlaces().size()){
+							if(maxi/3>=parts.at(i).getPlaces().size()+pp.sizep){
 								std::cout<<endl<<"unbalanced composition (too small)"<<endl;
 								continue;
 								
 							}						
 							stringstream ss;
 							string num;
-							for (int z=0;z<nc;++z ) {
+							for (unsigned int z=0;z<nc;++z ) {
 								if (in[z]) {
 									ss<<in[z];
 								}else ss<<0;
@@ -685,52 +458,17 @@ int main(int argc, char* argv[]) {
 							
 							
 							vector<bool> inc=in;
-							inc.flip();
+							inc.flip();//insert complement as well
 							if((all.find(in)==all.end()) && (all.find(inc)==all.end()))
 							{	all.insert(in);
 								cout <<endl << "increase "<<all.size()<<endl;
 								cout<<"output"<<fileprefix+"_"+num+filepostfix<<endl;
 								
 								//cout << num<<" "<<filepostfix <<endl;
-								std::ofstream o;
-								PetriNet nnp=addPattern(nn);
-								o.open((std::string(fileprefix+"_"+num+filepostfix).c_str()), std::ios_base::trunc);
-								o << pnapi::io::owfn << nnp;//composition
+								printComponent(cc);
 								
-								PetriNet diff=complementnet(cmplfordiff, nn);
-								PetriNet xdiff=diff;
-								
-								//compute complement
-								//PetriNet diff=complementnet(cmplfordiff, nn);
-								
-								std::ofstream ox;
-								ox.open((std::string(fileprefix+"_"+num+filepostfix + ".compl.owfn").c_str()), std::ios_base::trunc);
-								ox << pnapi::io::owfn << xdiff;//its complement
-								std::ofstream oc;
-								//ox << pnapi::io::owfn << diff;
-								oc.open((std::string(fileprefix+"_"+num+filepostfix + ".composed.owfn").c_str()), std::ios_base::trunc);
-								//PetriNet net2;//whole system again and again
-								set<string> inputplaces2,outputplaces2;
-								std::set<Label *> inputl=nn.getInterface().getInputLabels();
-								for (std::set<Label *>::iterator ssit=inputl.begin(); ssit!=inputl.end(); ++ssit) {
-									inputplaces2.insert((*ssit)->getName());
-								}
-								std::set<Label *> outputl=nn.getInterface().getOutputLabels();
-								for (std::set<Label *>::iterator ssit=outputl.begin(); ssit!=outputl.end(); ++ssit) {
-									outputplaces2.insert((*ssit)->getName());
-								}
-								try{
-									status("nnp+diff");
-									nnp.compose(diff, "1", "2");
-								}
-								catch (pnapi::exception::UserCausedError e) {
-									e.output(cout);
-								}
-								//nnp.compose(diff, "1", "2");
-								PetriNet nnnn=addinterfcompl(nnp, inputplaces2,outputplaces2);
+
 								cout <<endl << "all size="<<all.size()<<endl;
-								oc << pnapi::io::owfn << nnnn;
-								
 								cout<<"adding... "<<fileprefix+"_"+num+filepostfix<<endl;
 							}
 							else {
@@ -800,74 +538,24 @@ int main(int argc, char* argv[]) {
 				//respective complement then complement the difference and add the construction
 				if (args_info.complement_flag)
 				{
-					//for each internal place create a complement
-					for (std::set<pnapi::Place *>::iterator p = net.getPlaces().begin(); p != net.getPlaces().end(); ++p){
-						//PNAPI_FOREACH(p, net.getInternalPlaces()) {
-						//Place &p1=net.findPlace((*p)->getName());
-						//net2.deletePlace(p1);
-						//cout << (*p)->getName()<<endl;
-						Place * place = net.findPlace((*p)->getName()+"$compl");
-						//Place * php= net.findPlace(p->getName());
-						
-						if ( (place == NULL && (*p)->getTokenCount()==0))//initial place
-						{	
-							if ((!(*p)->getPresetArcs().empty())&&(!(*p)->getPostsetArcs().empty())) {
-								
-								
-								Place * nplace = &net.createPlace((*p)->getName()+"$compl", 1,1);
-								pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*nplace,1));
-								net.getFinalCondition().addProposition(prop);//nets[x]->getFinalCondition().formula().output(std::cout);
-								//if(p->getName()=="omega") {pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*place,0));nets[x]->getFinalCondition().addProposition(prop);}
-								//else {pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*place,1));nets[x]->getFinalCondition().addProposition(prop);}
-								//nets[x]->getFinalCondition().formula().output(std::cout);
-								//cout<<php->getPresetArcs().size();
-								
-								if (net.findPlace((*p)->getName()+"$compl")!=NULL) {
-									//cout << "gasit";
-									
-									//if(place->getTokenCount()||place->getName()==sfp) nets[x]->createArc( *t, *nets[x]->findPlace(place->getName()+"_compl"),(*f)->getWeight());
-									set<pnapi::Arc *> preset = (*p)->getPresetArcs();
-									for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-									{
-										
-										Transition *t = &(*f)->getTransition();
-										//nets[j]->createArc(**p ,*t, (*f)->getWeight());
-										if(net.findArc(*nplace,*t)==NULL) net.createArc( *net.findPlace(nplace->getName()), *t,(*f)->getWeight());
-										//cout << "created arc from "<<nplace->getName()+"$compl"<<" to "<<t->getName()<<endl;
-									}	
-									preset = (*p)->getPostsetArcs();
-									for (set<pnapi::Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-									{
-										Transition *t = &(*f)->getTransition();
-										//nets[j]->createArc(**p ,*t, (*f)->getWeight());
-										if(net.findArc( *t,*nplace)==NULL) net.createArc( *t,*net.findPlace(nplace->getName()), (*f)->getWeight());
-										//cout << "created arc from "<<place->getName()+"$compl"<<" to "<<t->getName()<<endl;
-									}			
-									
-								}}
-							
-						}
-						
-					}		
+					net=addComplementaryPlaces(net);//add complementary places to the origina net
+				
 					//Output output((std::string(argv[0]) + "compl.owfn").c_str(), "open net");
 					//output.stream() << pnapi::io::owfn << net; exit(0);
 					//ofstream outputfile((std::string(argv[0]) + "compl.owfn").c_str());
 					//compute the difference for  each place / transition of the bign net delete the one from the second net
 					PetriNet diff=net;//delete internal places
-					
+					//build the complement 
 					PetriNet rest=complementnet(diff, *nets[j]);
-
-					
-					 
 					std::ofstream o;
 					o.open((std::string(fileprefix+num+filepostfix + ".compl.owfn").c_str()), std::ios_base::trunc);
 					//PetriNet net2;
 					o << pnapi::io::owfn << rest;
 					//cout <<pnapi::io::owfn << net<<endl;
-					
+					//compose it with the complement
 					//exit(EXIT_SUCCESS);
 				}
-				//compose it with the complement
+				
             }
     }
 
@@ -1020,4 +708,38 @@ void statistics(PetriNet& net, vector<PetriNet*> &nets) {
              << " - number of components: " << _statistics.fragments_
              << endl;
     }
+}
+
+//prints components, their complements and their composition
+void printComponent(Component c){
+	status("Printing component:");
+	PetriNet cn=makeComponentNet(c);//get the component net first
+	//compute its complement and also the composition and print them as well to the output
+	std::ofstream oss;
+	PetriNet cwithcompl=addComplementaryPlaces(cn);
+	PetriNet nnp=addPattern(cwithcompl);
+	oss.open((std::string(filename+"_"+c.cname+".owfn").c_str()), std::ios_base::trunc);
+	oss << pnapi::io::owfn << nnp;//print it
+	//nnp
+	//compute complement; cmplfordiff
+	PetriNet proccompl=addComplementaryPlaces(c.process);
+	PetriNet diff=complementnet(proccompl, cwithcompl);
+	//PetriNet xdiff=diff;
+	std::ofstream ox;
+	ox.open((std::string(filename+"_"+c.cname+".compl.owfn").c_str()), std::ios_base::trunc);
+	//ox << pnapi::io::owfn << xdiff;//its complement
+	ox << pnapi::io::owfn << diff;
+	std::ofstream oc;
+	oc.open((std::string(filename+"_"+c.cname + ".composed.owfn").c_str()), std::ios_base::trunc);
+	cout<<"adding... "<<filename+"_"+c.cname+".owfn"<<endl;
+	//PetriNet netcompl=cn
+	nnp.compose(diff, "1", "2");
+	//addinterfcompl adds complementary places to the process to all but interface places
+	//and adds patterns  correspondingly
+	PetriNet nnnn=addinterfcompl(nnp, c.inputl,c.outputl);
+	//cout <<endl << "all size="<<all.size()<<endl;
+	oc << pnapi::io::owfn << nnnn;//print the composition
+	
+	
+	//cout<<"component "<<c.fileprefix+" "+c.cname+" of size "<<c.sizep<<endl;
 }

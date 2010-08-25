@@ -26,7 +26,7 @@
 #include <typeinfo>
 #include "verbose.h"
 #include "cmdline.h"
-#include "recompose.h"
+//#include "recompose.h"
 
 
 using pnapi::Arc;
@@ -380,9 +380,11 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 				}
 				//make an input label
                 if(!islabel) {
+					if(nets[x]->getInterface().findLabel(place->getName())==NULL){
 					pnapi::Label& netLabel = nets[x]->getInterface().addInputLabel(place->getName());
 					t->addLabel(netLabel, (*f)->getWeight());
 					//cout << "input"<<netLabel.getName()<<std::endl;
+					}
 				}
             } else {
 				//it is an internal place create its complement
@@ -453,8 +455,9 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 				}
 				}
 				if (!islabel){ //make it an output label
+					if(nets[x]->getInterface().findLabel(place->getName())==NULL){
 					pnapi::Label& netLabel = nets[x]->getInterface().addOutputLabel(place->getName());
-					t->addLabel(netLabel, (*f)->getWeight());
+						t->addLabel(netLabel, (*f)->getWeight());}
 					//cout <<"output"<< netLabel.getName()<<std::endl;
 				}
             } 

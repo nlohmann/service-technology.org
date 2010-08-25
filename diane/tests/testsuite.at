@@ -90,7 +90,7 @@ AT_CHECK([GREP -q "number of components: 1" stdout],0)
 AT_KEYWORDS(service)
 AT_CLEANUP
 
-AT_SETUP([Open net input (with final marking)])
+AT_SETUP([Number of Service Components (with final marking)])
 AT_CHECK([cp TESTFILES/zeus.owfn .])
 AT_CHECK([DIANE zeus.owfn -q --service],0,stdout)
 AT_CHECK([GREP -q "number of components: 2" stdout],0)
@@ -100,3 +100,33 @@ AT_CLEANUP
 ############################################################################
 #AT_BANNER([De- and Recomposition])
 ############################################################################
+
+AT_SETUP([Number of Service Components obtained by recomposing with threshold])
+AT_CHECK([cp TESTFILES/B1s633s4784.lola.owfn .])
+AT_CHECK([DIANE B1s633s4784.lola.owfn --threshold=3 --service],0,stdout)
+AT_CHECK([GREP -q "number of components: 8" stdout],0)
+AT_KEYWORDS(service)
+AT_CLEANUP
+
+AT_SETUP([Number of Service Components obtained by recomposing with threshold and interface label given])
+AT_CHECK([cp TESTFILES/B1s633s4784.lola.owfn .])
+AT_CHECK([DIANE B1s633s4784.lola.owfn --threshold=3 --interface="Data" --service],0,stdout)
+AT_CHECK([GREP -q "number of components: 9" stdout],1)
+AT_KEYWORDS(service)
+AT_CLEANUP
+
+AT_SETUP([Printing nets and their complement with respect to the initial process])
+AT_CHECK([cp TESTFILES/B1s633s4784.lola.owfn .])
+AT_CHECK([DIANE B1s633s4784.lola.owfn --threshold=3 --complement --interface="Data" --service],0,stdout)
+AT_CHECK([GREP -q "number of components: 8" stdout])
+AT_CHECK([test -f B1s633s4784.lola.owfn.part8.owfn.compl.owfn],1)
+AT_KEYWORDS(service)
+AT_CLEANUP
+
+AT_SETUP([Printing nets and their complement with respect to the initial process])
+AT_CHECK([cp TESTFILES/B1s633s4784.lola.owfn .])
+AT_CHECK([DIANE B1s633s4784.lola.owfn --threshold=3 --complement --interface="Data" --service],0,stdout)
+AT_CHECK([GREP -q "number of components: 8" stdout])
+AT_CHECK([test -f B1s633s4784.lola.owfn.part8.owfn.compl.owfn],1)
+AT_KEYWORDS(service)
+AT_CLEANUP

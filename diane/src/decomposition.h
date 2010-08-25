@@ -31,6 +31,7 @@ using pnapi::PetriNet;
 using std::map;
 using std::vector;
 
+//using namespace recompose;
 
 namespace decomposition {
 

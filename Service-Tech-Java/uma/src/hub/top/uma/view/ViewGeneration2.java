@@ -142,8 +142,7 @@ public class ViewGeneration2 {
             if (!endsWith_b) { isEnabled = false; break; }
           }
           if (isEnabled) {
-            enablingInfo.enabledEvents.addLast(e);
-            enablingInfo.enablingLocation.addLast(loc);
+            enablingInfo.putEnabledEvent(e, loc);
           }
         }
 
@@ -152,6 +151,7 @@ public class ViewGeneration2 {
           if (enablingInfo.enabledEvents.size() > 1) {
             // we have several enabled events, issue a warning if there are
             // two events that could occur at different locations
+            /*
             DNode[] loc = enablingInfo.enablingLocation.get(0);
             for (int j = 1; j<enablingInfo.enabledEvents.size(); j++) {
               if (!Arrays.equals(loc, enablingInfo.enablingLocation.get(j))) {
@@ -162,9 +162,14 @@ public class ViewGeneration2 {
 
               }
             } // end of warning
+            */
           }
           
-          DNode[] postConditions = bp.fire(enablingInfo.enabledEvents.get(0), enablingInfo.enablingLocation.get(0));
+          Short eventId = enablingInfo.enabledEvents.keySet().iterator().next();
+          DNode[] events = enablingInfo.enabledEvents.get(eventId)[0];
+          DNode[] loc = enablingInfo.enablingLocation.get(eventId)[0];
+          
+          DNode[] postConditions = bp.fire(events, loc);
           if (postConditions != null && postConditions.length > 0) {
             DNode newEvent = postConditions[0].pre[0];            
 
@@ -336,6 +341,26 @@ public class ViewGeneration2 {
   }
   
   /**
+   * @param traces
+   * @return a representation of the traces in ProM's simple log format
+   */
+  public static StringBuilder generateSimpleLog(LinkedList<String[]> traces) {
+    StringBuilder simpleLog = new StringBuilder();
+    
+    int traceNum = 0;
+    for (String[] trace : traces) {
+      
+      simpleLog.append("1x case"+traceNum);
+      for (String activity : trace) {
+        simpleLog.append(" "+activity.replace(' ', '_'));
+      }
+      simpleLog.append("\n");
+      traceNum++;
+    }
+    return simpleLog;
+  }
+  
+  /**
    * Write a set of traces ProM's simple log format to the given file.
    * 
    * @param fileName
@@ -345,20 +370,7 @@ public class ViewGeneration2 {
   public static void writeTraces(String fileName, LinkedList<String[]> traces) throws IOException {
     Writer out = new OutputStreamWriter(new FileOutputStream(fileName));
     try {
-      StringBuilder simpleLog = new StringBuilder();
-      
-      int traceNum = 0;
-      for (String[] trace : traces) {
-        
-        simpleLog.append("1x case"+traceNum);
-        for (String activity : trace) {
-          simpleLog.append(" "+activity.replace(' ', '_'));
-        }
-        simpleLog.append("\n");
-        traceNum++;
-      }
-      
-      out.append(simpleLog);
+      out.append(generateSimpleLog(traces));
     }
     finally {
       out.close();
@@ -431,7 +443,7 @@ public class ViewGeneration2 {
        try {
          
          DNodeSys sys = Uma.readSystemFromFile(fromFile);
-         DNodeBP build = Uma.buildPrefix(sys);
+         DNodeBP build = Uma.buildPrefix(sys, 1);
          
          build.buildFoldingEquivalence();
          build.relaxFoldingEquivalence();
@@ -455,7 +467,7 @@ public class ViewGeneration2 {
        try {
          
          DNodeSys sys = Uma.readSystemFromFile(systemFile);
-         DNodeBP build = Uma.initBuildPrefix(sys);
+         DNodeBP build = Uma.initBuildPrefix(sys, 1);
          
          LinkedList<String[]> traces = readTraces(traceFile);
 

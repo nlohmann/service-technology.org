@@ -228,8 +228,7 @@ public class ViewGeneration {
             if (!endsWith_b) { isEnabled = false; break; }
           }
           if (isEnabled) {
-            enablingInfo.enabledEvents.addLast(e);
-            enablingInfo.enablingLocation.addLast(loc);
+            enablingInfo.putEnabledEvent(e, loc);
           }
         }
 
@@ -238,7 +237,11 @@ public class ViewGeneration {
             System.out.print("multitple ");
           }
           
-          DNode[] postConditions = bp.fire(enablingInfo.enabledEvents.get(0), enablingInfo.enablingLocation.get(0));
+          Short eventId = enablingInfo.enabledEvents.keySet().iterator().next();
+          DNode[] events = enablingInfo.enabledEvents.get(eventId)[0];
+          DNode[] loc = enablingInfo.enablingLocation.get(eventId)[0];
+          
+          DNode[] postConditions = bp.fire(events, loc);
           if (postConditions != null && postConditions.length > 0) {
             DNode newEvent = postConditions[0].pre[0];            
 

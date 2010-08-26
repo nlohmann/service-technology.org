@@ -70,10 +70,10 @@ public class Uma {
     return sys;
   }
   
-  public static DNodeBP initBuildPrefix(DNodeSys sys) {
+  public static DNodeBP initBuildPrefix(DNodeSys sys, int bound) {
     DNodeBP build = new DNodeBP(sys);
     build.configure_buildOnly();
-    build.configure_stopIfUnSafe();
+    build.configure_setBound(bound);
     
     if (sys instanceof DNodeSys_PetriNet) build.configure_PetriNet();
     else build.configure_Scenarios();
@@ -81,10 +81,14 @@ public class Uma {
     return build;
   }
   
-  public static DNodeBP buildPrefix(DNodeSys sys) {
+  public static DNodeBP buildPrefix(DNodeSys sys, int bound) {
     
-    DNodeBP build = initBuildPrefix(sys);
-    while (build.step() > 0) {
+    DNodeBP build = initBuildPrefix(sys, bound);
+    int fired, totalFired = 0, step = 0;
+    while ((fired = build.step()) > 0) {
+      totalFired += fired;
+      System.out.print(totalFired+".. ");
+      if (++step % 10 == 0) System.out.print("\n");
     }
     
     return build;
@@ -93,7 +97,7 @@ public class Uma {
   private static void computePrefix() throws IOException, InvalidModelException {
     
     DNodeSys sys = readSystemFromFile(options_inFile);
-    DNodeBP build = buildPrefix(sys);
+    DNodeBP build = buildPrefix(sys, 1);
 
     if (options_outputFormat == PetriNetIO.FORMAT_DOT) {
       System.out.println("writing to "+options_inFile+".bp.dot");

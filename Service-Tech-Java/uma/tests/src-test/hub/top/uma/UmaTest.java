@@ -58,7 +58,7 @@ public class UmaTest extends hub.top.test.Test {
       while (build.step() > 0) {
       }
       
-      build.getStatistics();
+      System.out.println(build.getStatistics());
       
       assertTrue(build.statistic_eventNum == 10
           && build.statistic_condNum == 14

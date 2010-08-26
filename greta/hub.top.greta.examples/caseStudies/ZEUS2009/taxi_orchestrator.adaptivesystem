@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adaptiveSystem:AdaptiveSystem xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:adaptiveSystem="adaptiveSystem" xmi:id="_rOT30BMDEd64uobmeqSQjw">
+  <oclets xmi:id="_0WSwJhMDEd64uobmeqSQjw" name="TS">
+    <preNet xmi:id="_0WSwJxMDEd64uobmeqSQjw" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_0WSwKBMDEd64uobmeqSQjw" name="taxi data" temp="" postEvents="_0WSwKxMDEd64uobmeqSQjw" token="1" outgoing="_0WSwKRMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_0WSwKRMDEd64uobmeqSQjw" source="_0WSwKBMDEd64uobmeqSQjw" destination="_0WSwKxMDEd64uobmeqSQjw"/>
+    </preNet>
+    <doNet xmi:id="_0WSwKhMDEd64uobmeqSQjw" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_0WSwKxMDEd64uobmeqSQjw" name="pick avail. pass" preConditions="_0WSwKBMDEd64uobmeqSQjw" postConditions="_0WSwLBMDEd64uobmeqSQjw" incoming="_0WSwKRMDEd64uobmeqSQjw" outgoing="_0WSwLhMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_0WSwLBMDEd64uobmeqSQjw" name="trip data" preEvents="_0WSwKxMDEd64uobmeqSQjw" postEvents="_0WSwLRMDEd64uobmeqSQjw" incoming="_0WSwLhMDEd64uobmeqSQjw" outgoing="_0WSwLxMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_0WSwLRMDEd64uobmeqSQjw" name="send trip details" preConditions="_0WSwLBMDEd64uobmeqSQjw" incoming="_0WSwLxMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_0WSwLhMDEd64uobmeqSQjw" source="_0WSwKxMDEd64uobmeqSQjw" destination="_0WSwLBMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_0WSwLxMDEd64uobmeqSQjw" source="_0WSwLBMDEd64uobmeqSQjw" destination="_0WSwLRMDEd64uobmeqSQjw"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_0WSwMBMDEd64uobmeqSQjw" name="TR">
+    <preNet xmi:id="_0WSwMRMDEd64uobmeqSQjw" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_0WSwMhMDEd64uobmeqSQjw" name="await taxi" temp="" postEvents="_0WSwNRMDEd64uobmeqSQjw" token="1" outgoing="_0WSwMxMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_0WSwMxMDEd64uobmeqSQjw" source="_0WSwMhMDEd64uobmeqSQjw" destination="_0WSwNRMDEd64uobmeqSQjw"/>
+    </preNet>
+    <doNet xmi:id="_0WSwNBMDEd64uobmeqSQjw" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_0WSwNRMDEd64uobmeqSQjw" name="get &quot;taxi avail&quot;" preConditions="_0WSwMhMDEd64uobmeqSQjw" postConditions="_0WSwNxMDEd64uobmeqSQjw _0WSwNhMDEd64uobmeqSQjw" incoming="_0WSwMxMDEd64uobmeqSQjw" outgoing="_0WSwOBMDEd64uobmeqSQjw _0WSwORMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_0WSwNhMDEd64uobmeqSQjw" name="await taxi" preEvents="_0WSwNRMDEd64uobmeqSQjw" incoming="_0WSwORMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_0WSwNxMDEd64uobmeqSQjw" name="taxi data" preEvents="_0WSwNRMDEd64uobmeqSQjw" incoming="_0WSwOBMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_0WSwOBMDEd64uobmeqSQjw" source="_0WSwNRMDEd64uobmeqSQjw" destination="_0WSwNxMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_0WSwORMDEd64uobmeqSQjw" source="_0WSwNRMDEd64uobmeqSQjw" destination="_0WSwNhMDEd64uobmeqSQjw"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_26Wo5hMDEd64uobmeqSQjw" name="PS">
+    <preNet xmi:id="_26Wo5xMDEd64uobmeqSQjw" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_26Wo6BMDEd64uobmeqSQjw" name="await pass." temp="" postEvents="_26Wo6xMDEd64uobmeqSQjw" token="1" outgoing="_26Wo6RMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_26Wo6RMDEd64uobmeqSQjw" source="_26Wo6BMDEd64uobmeqSQjw" destination="_26Wo6xMDEd64uobmeqSQjw"/>
+    </preNet>
+    <doNet xmi:id="_26Wo6hMDEd64uobmeqSQjw" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_26Wo6xMDEd64uobmeqSQjw" name="get taxi request" preConditions="_26Wo6BMDEd64uobmeqSQjw" postConditions="_26Wo7BMDEd64uobmeqSQjw _26Wo8RMDEd64uobmeqSQjw" incoming="_26Wo6RMDEd64uobmeqSQjw" outgoing="_26Wo8hMDEd64uobmeqSQjw _26Wo9xMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_26Wo7BMDEd64uobmeqSQjw" name="trip req." preEvents="_26Wo6xMDEd64uobmeqSQjw" postEvents="_26Wo7RMDEd64uobmeqSQjw" incoming="_26Wo8hMDEd64uobmeqSQjw" outgoing="_26Wo8xMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_26Wo7RMDEd64uobmeqSQjw" name="pick avail. taxi" preConditions="_26Wo7BMDEd64uobmeqSQjw" postConditions="_26Wo7hMDEd64uobmeqSQjw" incoming="_26Wo8xMDEd64uobmeqSQjw" outgoing="_26Wo9BMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_26Wo7hMDEd64uobmeqSQjw" name="taxi no." preEvents="_26Wo7RMDEd64uobmeqSQjw" postEvents="_26Wo7xMDEd64uobmeqSQjw" incoming="_26Wo9BMDEd64uobmeqSQjw" outgoing="_26Wo9RMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_26Wo7xMDEd64uobmeqSQjw" name="send taxi no." preConditions="_26Wo7hMDEd64uobmeqSQjw _26Wo8RMDEd64uobmeqSQjw" postConditions="_26Wo8BMDEd64uobmeqSQjw" incoming="_26Wo9RMDEd64uobmeqSQjw _26Wo-BMDEd64uobmeqSQjw" outgoing="_26Wo9hMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_26Wo8BMDEd64uobmeqSQjw" name="await pass." preEvents="_26Wo7xMDEd64uobmeqSQjw" incoming="_26Wo9hMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_26Wo8RMDEd64uobmeqSQjw" name="pass. data" preEvents="_26Wo6xMDEd64uobmeqSQjw" postEvents="_26Wo7xMDEd64uobmeqSQjw" incoming="_26Wo9xMDEd64uobmeqSQjw" outgoing="_26Wo-BMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_26Wo8hMDEd64uobmeqSQjw" source="_26Wo6xMDEd64uobmeqSQjw" destination="_26Wo7BMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_26Wo8xMDEd64uobmeqSQjw" source="_26Wo7BMDEd64uobmeqSQjw" destination="_26Wo7RMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_26Wo9BMDEd64uobmeqSQjw" source="_26Wo7RMDEd64uobmeqSQjw" destination="_26Wo7hMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_26Wo9RMDEd64uobmeqSQjw" source="_26Wo7hMDEd64uobmeqSQjw" destination="_26Wo7xMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_26Wo9hMDEd64uobmeqSQjw" source="_26Wo7xMDEd64uobmeqSQjw" destination="_26Wo8BMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_26Wo9xMDEd64uobmeqSQjw" source="_26Wo6xMDEd64uobmeqSQjw" destination="_26Wo8RMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_26Wo-BMDEd64uobmeqSQjw" source="_26Wo8RMDEd64uobmeqSQjw" destination="_26Wo7xMDEd64uobmeqSQjw"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_26Wo-RMDEd64uobmeqSQjw" name="PC">
+    <preNet xmi:id="_26Wo-hMDEd64uobmeqSQjw" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_26Wo-xMDEd64uobmeqSQjw" name="pass. data" temp="" postEvents="_26Wo_hMDEd64uobmeqSQjw" token="1" outgoing="_26Wo_BMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_26Wo_BMDEd64uobmeqSQjw" source="_26Wo-xMDEd64uobmeqSQjw" destination="_26Wo_hMDEd64uobmeqSQjw"/>
+    </preNet>
+    <doNet xmi:id="_26Wo_RMDEd64uobmeqSQjw" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_26Wo_hMDEd64uobmeqSQjw" name="get cancel req." preConditions="_26Wo-xMDEd64uobmeqSQjw" postConditions="_26Wo_xMDEd64uobmeqSQjw" incoming="_26Wo_BMDEd64uobmeqSQjw" outgoing="_26WpABMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_26Wo_xMDEd64uobmeqSQjw" name="canceled" preEvents="_26Wo_hMDEd64uobmeqSQjw" incoming="_26WpABMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_26WpABMDEd64uobmeqSQjw" source="_26Wo_hMDEd64uobmeqSQjw" destination="_26Wo_xMDEd64uobmeqSQjw"/>
+    </doNet>
+  </oclets>
+  <oclets xmi:id="_26WpARMDEd64uobmeqSQjw" name="PR">
+    <preNet xmi:id="_26WpAhMDEd64uobmeqSQjw" name="pre">
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_26WpAxMDEd64uobmeqSQjw" name="trip req." temp="" postEvents="_26WpCBMDEd64uobmeqSQjw" token="1" outgoing="_26WpBRMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_26WpBBMDEd64uobmeqSQjw" name="canceled" temp="" postEvents="_26WpCRMDEd64uobmeqSQjw" token="1" outgoing="_26WpBhMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_26WpBRMDEd64uobmeqSQjw" source="_26WpAxMDEd64uobmeqSQjw" destination="_26WpCBMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_26WpBhMDEd64uobmeqSQjw" source="_26WpBBMDEd64uobmeqSQjw" destination="_26WpCRMDEd64uobmeqSQjw"/>
+    </preNet>
+    <doNet xmi:id="_26WpBxMDEd64uobmeqSQjw" name="do">
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_26WpCBMDEd64uobmeqSQjw" name="pick avail. taxi" preConditions="_26WpAxMDEd64uobmeqSQjw" postConditions="_26WpChMDEd64uobmeqSQjw" incoming="_26WpBRMDEd64uobmeqSQjw" outgoing="_26WpDBMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Event" xmi:id="_26WpCRMDEd64uobmeqSQjw" name="reset" preConditions="_26WpBBMDEd64uobmeqSQjw _26WpChMDEd64uobmeqSQjw" postConditions="_26WpCxMDEd64uobmeqSQjw" incoming="_26WpBhMDEd64uobmeqSQjw _26WpDRMDEd64uobmeqSQjw" outgoing="_26WpDhMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_26WpChMDEd64uobmeqSQjw" name="taxi no." preEvents="_26WpCBMDEd64uobmeqSQjw" postEvents="_26WpCRMDEd64uobmeqSQjw" incoming="_26WpDBMDEd64uobmeqSQjw" outgoing="_26WpDRMDEd64uobmeqSQjw"/>
+      <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_26WpCxMDEd64uobmeqSQjw" name="await pass." preEvents="_26WpCRMDEd64uobmeqSQjw" incoming="_26WpDhMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_26WpDBMDEd64uobmeqSQjw" source="_26WpCBMDEd64uobmeqSQjw" destination="_26WpChMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToEvent" xmi:id="_26WpDRMDEd64uobmeqSQjw" source="_26WpChMDEd64uobmeqSQjw" destination="_26WpCRMDEd64uobmeqSQjw"/>
+      <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_26WpDhMDEd64uobmeqSQjw" source="_26WpCRMDEd64uobmeqSQjw" destination="_26WpCxMDEd64uobmeqSQjw"/>
+    </doNet>
+  </oclets>
+  <adaptiveProcess xmi:id="_szo24BMDEd64uobmeqSQjw" name="ap">
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_Hc7psBMEEd64uobmeqSQjw" name="await pass." token="1"/>
+    <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_INp8ABMEEd64uobmeqSQjw" name="await taxi" token="1"/>
+  </adaptiveProcess>
+</adaptiveSystem:AdaptiveSystem>

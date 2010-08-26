@@ -118,7 +118,7 @@
       <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_7iJCEH8bEd2wTtbEicrJ6g" source="_GqEPQFJaEd2P9dGrxtNONw" destination="_IQR_IFJaEd2P9dGrxtNONw"/>
     </doNet>
   </oclets>
-  <adaptiveProcess xmi:id="_RhNMgFDcEd2y3M5ZhOiktg">
+  <adaptiveProcess xmi:id="_RhNMgFDcEd2y3M5ZhOiktg" name="ap">
     <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_rlJ90FJhEd2hQ5pvfYSnzQ" name="idle" token="1"/>
   </adaptiveProcess>
 </adaptiveSystem:AdaptiveSystem>

@@ -314,6 +314,10 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
       if (!ds.allConditions.contains(d))
         ds.add(d);
     }
+    
+    if (o.getOrientation() == Orientation.ANTI) {
+      hasDynamicSynchronization = true;
+    }
 		
 		return ds;
 	}

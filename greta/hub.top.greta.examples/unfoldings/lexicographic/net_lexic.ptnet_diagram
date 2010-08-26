@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.1/notation" xmlns:ptnetLoLA="http://www.informatik.hu-berlin.de/top/tools/editors/petrinets" xmi:id="_-49v4WNxEd-6R-inMVvKgw" type="PtnetLoLA" name="net_lexic.ptnet_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_AUmncGNyEd-6R-inMVvKgw" type="2002">
+    <children xmi:type="notation:Node" xmi:id="_AVNEYGNyEd-6R-inMVvKgw" type="5002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_AVNEYWNyEd-6R-inMVvKgw" y="5"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_AV8rQGNyEd-6R-inMVvKgw" type="5003"/>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_AUmncWNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:Place" href="net_lexic.ptnet#//@places.0"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_AUmncmNyEd-6R-inMVvKgw" x="125" y="45"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_Bz0-gGNyEd-6R-inMVvKgw" type="2002">
+    <children xmi:type="notation:Node" xmi:id="_Bz0-g2NyEd-6R-inMVvKgw" type="5002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_Bz0-hGNyEd-6R-inMVvKgw" y="5"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_Bz0-hWNyEd-6R-inMVvKgw" type="5003"/>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_Bz0-gWNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:Place" href="net_lexic.ptnet#//@places.1"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Bz0-gmNyEd-6R-inMVvKgw" x="218" y="46"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_DJ9D8GNyEd-6R-inMVvKgw" type="2001">
+    <children xmi:type="notation:Node" xmi:id="_DKZv4GNyEd-6R-inMVvKgw" type="5001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_DKZv4WNyEd-6R-inMVvKgw" y="5"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_DJ9D8WNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:Transition" href="net_lexic.ptnet#//@transitions.0"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_DJ9D8mNyEd-6R-inMVvKgw" x="90" y="125"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_EIr9EGNyEd-6R-inMVvKgw" type="2001">
+    <children xmi:type="notation:Node" xmi:id="_EIr9E2NyEd-6R-inMVvKgw" type="5001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_EIr9FGNyEd-6R-inMVvKgw" y="5"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_EIr9EWNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:Transition" href="net_lexic.ptnet#//@transitions.1"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_EIr9EmNyEd-6R-inMVvKgw" x="167" y="123"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_EhRcMGNyEd-6R-inMVvKgw" type="2001">
+    <children xmi:type="notation:Node" xmi:id="_EhbNMGNyEd-6R-inMVvKgw" type="5001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_EhbNMWNyEd-6R-inMVvKgw" y="5"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_EhRcMWNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:Transition" href="net_lexic.ptnet#//@transitions.2"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_EhRcMmNyEd-6R-inMVvKgw" x="223" y="121"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_GkG2oGNyEd-6R-inMVvKgw" type="2002">
+    <children xmi:type="notation:Node" xmi:id="_GkG2o2NyEd-6R-inMVvKgw" type="5002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_GkG2pGNyEd-6R-inMVvKgw" y="5"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_GkG2pWNyEd-6R-inMVvKgw" type="5003"/>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_GkG2oWNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:Place" href="net_lexic.ptnet#//@places.2"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_GkG2omNyEd-6R-inMVvKgw" x="123" y="201"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_HCzk0GNyEd-6R-inMVvKgw" type="2002">
+    <children xmi:type="notation:Node" xmi:id="_HCzk02NyEd-6R-inMVvKgw" type="5002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_HCzk1GNyEd-6R-inMVvKgw" y="5"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_HCzk1WNyEd-6R-inMVvKgw" type="5003"/>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_HCzk0WNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:Place" href="net_lexic.ptnet#//@places.3"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HCzk0mNyEd-6R-inMVvKgw" x="223" y="201"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_JGO1IGNyEd-6R-inMVvKgw" type="2001">
+    <children xmi:type="notation:Node" xmi:id="_JGO1I2NyEd-6R-inMVvKgw" type="5001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_JGO1JGNyEd-6R-inMVvKgw" y="5"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_JGO1IWNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:Transition" href="net_lexic.ptnet#//@transitions.3"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_JGO1ImNyEd-6R-inMVvKgw" x="173" y="276"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_Kat70GNyEd-6R-inMVvKgw" type="2001">
+    <children xmi:type="notation:Node" xmi:id="_Kat702NyEd-6R-inMVvKgw" type="5001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_Kat71GNyEd-6R-inMVvKgw" y="5"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_Kat70WNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:Transition" href="net_lexic.ptnet#//@transitions.4"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Kat70mNyEd-6R-inMVvKgw" x="38" y="126"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_L8xkcGNyEd-6R-inMVvKgw" type="2001">
+    <children xmi:type="notation:Node" xmi:id="_L8xkc2NyEd-6R-inMVvKgw" type="5001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_L8xkdGNyEd-6R-inMVvKgw" y="5"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_L8xkcWNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:Transition" href="net_lexic.ptnet#//@transitions.5"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_L8xkcmNyEd-6R-inMVvKgw" x="312" y="131"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_MP2RcGNyEd-6R-inMVvKgw" type="2002">
+    <children xmi:type="notation:Node" xmi:id="_MP2Rc2NyEd-6R-inMVvKgw" type="5002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_MP2RdGNyEd-6R-inMVvKgw" y="5"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_MP_bYGNyEd-6R-inMVvKgw" type="5003"/>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_MP2RcWNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:Place" href="net_lexic.ptnet#//@places.4"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_MP2RcmNyEd-6R-inMVvKgw" x="128" y="356"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_MusJkGNyEd-6R-inMVvKgw" type="2002">
+    <children xmi:type="notation:Node" xmi:id="_MusJk2NyEd-6R-inMVvKgw" type="5002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_MusJlGNyEd-6R-inMVvKgw" y="5"/>
+    </children>
+    <children xmi:type="notation:Node" xmi:id="_MusJlWNyEd-6R-inMVvKgw" type="5003"/>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_MusJkWNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:Place" href="net_lexic.ptnet#//@places.5"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_MusJkmNyEd-6R-inMVvKgw" x="224" y="351"/>
+  </children>
+  <styles xmi:type="notation:DiagramStyle" xmi:id="_-49v4mNxEd-6R-inMVvKgw"/>
+  <element xmi:type="ptnetLoLA:PtNet" href="net_lexic.ptnet#/"/>
+  <edges xmi:type="notation:Edge" xmi:id="_FHtxIGNyEd-6R-inMVvKgw" type="4002" source="_AUmncGNyEd-6R-inMVvKgw" target="_DJ9D8GNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_FH3iIGNyEd-6R-inMVvKgw" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_FH3iIWNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_FHtxIWNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_FHtxImNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToTransition" href="net_lexic.ptnet#//@arcs.0"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_FHtxI2NyEd-6R-inMVvKgw" points="[-5, 12, 24, -60]$[-34, 66, -5, -6]"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_FKjCsGNyEd-6R-inMVvKgw" id="(0.32,0.24)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_Fb1nAGNyEd-6R-inMVvKgw" type="4002" source="_AUmncGNyEd-6R-inMVvKgw" target="_EIr9EGNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_Fb-w82NyEd-6R-inMVvKgw" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_Fb-w9GNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_Fb-w8GNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_Fb-w8WNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToTransition" href="net_lexic.ptnet#//@arcs.1"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Fb-w8mNyEd-6R-inMVvKgw" points="[6, 11, -36, -67]$[44, 91, 2, 13]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_GBYkEGNyEd-6R-inMVvKgw" type="4002" source="_Bz0-gGNyEd-6R-inMVvKgw" target="_EhRcMGNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_GBYkFGNyEd-6R-inMVvKgw" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_GBYkFWNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_GBYkEWNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_GBYkEmNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToTransition" href="net_lexic.ptnet#//@arcs.2"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_GBYkE2NyEd-6R-inMVvKgw" points="[4, 12, -27, -70]$[28, 77, -3, -5]"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_GBYkFmNyEd-6R-inMVvKgw" id="(0.36,0.2)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_Hir-wGNyEd-6R-inMVvKgw" type="4001" source="_DJ9D8GNyEd-6R-inMVvKgw" target="_GkG2oGNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_HjSbsGNyEd-6R-inMVvKgw" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_HjSbsWNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_Hir-wWNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_Hir-wmNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToPlace" href="net_lexic.ptnet#//@arcs.3"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Hir-w2NyEd-6R-inMVvKgw" points="[10, 18, -40, -64]$[38, 84, -12, 2]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Hk7acGNyEd-6R-inMVvKgw" id="(0.12,0.32)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_IS0bMGNyEd-6R-inMVvKgw" type="4001" source="_EIr9EGNyEd-6R-inMVvKgw" target="_GkG2oGNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_IS0bNGNyEd-6R-inMVvKgw" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_IS0bNWNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_IS0bMWNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_IS0bMmNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToPlace" href="net_lexic.ptnet#//@arcs.4"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_IS0bM2NyEd-6R-inMVvKgw" points="[-7, 13, 37, -65]$[-43, 66, 1, -12]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_IpU2sGNyEd-6R-inMVvKgw" type="4001" source="_EhRcMGNyEd-6R-inMVvKgw" target="_HCzk0GNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_IpU2tGNyEd-6R-inMVvKgw" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_IpU2tWNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_IpU2sWNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_IpU2smNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToPlace" href="net_lexic.ptnet#//@arcs.5"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_IpU2s2NyEd-6R-inMVvKgw" points="[1, 7, -19, -71]$[11, 69, -9, -9]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_IpeAoGNyEd-6R-inMVvKgw" id="(0.6,0.76)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_KJSNkGNyEd-6R-inMVvKgw" type="4002" source="_GkG2oGNyEd-6R-inMVvKgw" target="_JGO1IGNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_KJSNlGNyEd-6R-inMVvKgw" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_KJSNlWNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_KJSNkWNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_KJSNkmNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToTransition" href="net_lexic.ptnet#//@arcs.6"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_KJSNk2NyEd-6R-inMVvKgw" points="[-1, 12, -4, -65]$[-9, 76, -12, -1]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_LG0z4GNyEd-6R-inMVvKgw" type="4002" source="_HCzk0GNyEd-6R-inMVvKgw" target="_JGO1IGNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_LG0z5GNyEd-6R-inMVvKgw" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_LG0z5WNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_LG0z4WNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_LG0z4mNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToTransition" href="net_lexic.ptnet#//@arcs.7"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_LG0z42NyEd-6R-inMVvKgw" points="[-5, 4, 85, -75]$[-91, 92, -1, 13]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_LG0z5mNyEd-6R-inMVvKgw" id="(0.24,0.4)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_NQqOMGNyEd-6R-inMVvKgw" type="4001" source="_JGO1IGNyEd-6R-inMVvKgw" target="_MusJkGNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_NQqONGNyEd-6R-inMVvKgw" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_NQqONWNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_NQqOMWNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_NQqOMmNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToPlace" href="net_lexic.ptnet#//@arcs.8"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_NQqOM2NyEd-6R-inMVvKgw" points="[8, 13, -43, -62]$[39, 74, -12, -1]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_NpGjYGNyEd-6R-inMVvKgw" type="4001" source="_JGO1IGNyEd-6R-inMVvKgw" target="_MP2RcGNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_NpGjZGNyEd-6R-inMVvKgw" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_NpGjZWNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_NpGjYWNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_NpGjYmNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToPlace" href="net_lexic.ptnet#//@arcs.9"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_NpGjY2NyEd-6R-inMVvKgw" points="[-9, 13, 34, -48]$[-53, 69, -10, 8]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_OJIuUGNyEd-6R-inMVvKgw" type="4002" source="_MP2RcGNyEd-6R-inMVvKgw" target="_Kat70GNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_OJIuVGNyEd-6R-inMVvKgw" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_OJIuVWNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_OJIuUWNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_OJIuUmNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToTransition" href="net_lexic.ptnet#//@arcs.10"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_OJIuU2NyEd-6R-inMVvKgw" points="[-12, 0, 78, 230]$[-90, 0, 0, 230]$[-90, -217, 0, 13]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_OkGzEGNyEd-6R-inMVvKgw" type="4001" source="_Kat70GNyEd-6R-inMVvKgw" target="_AUmncGNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_OkQkEGNyEd-6R-inMVvKgw" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_OkQkEWNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_OkGzEWNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_OkGzEmNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToPlace" href="net_lexic.ptnet#//@arcs.11"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_OkGzE2NyEd-6R-inMVvKgw" points="[0, -20, -92, 69]$[0, -89, -92, 0]$[80, -89, -12, 0]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_OkQkEmNyEd-6R-inMVvKgw" id="(0.32,0.8)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_O8ZXQGNyEd-6R-inMVvKgw" type="4002" source="_MusJkGNyEd-6R-inMVvKgw" target="_L8xkcGNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_O8ZXRGNyEd-6R-inMVvKgw" type="6002">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_O8ZXRWNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_O8ZXQWNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_O8ZXQmNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToTransition" href="net_lexic.ptnet#//@arcs.12"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_O8ZXQ2NyEd-6R-inMVvKgw" points="[13, 0, -77, 213]$[90, 0, 0, 213]$[90, -200, 0, 13]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_O8ZXRmNyEd-6R-inMVvKgw" id="(0.44,0.24)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_PQqXEGNyEd-6R-inMVvKgw" type="4001" source="_L8xkcGNyEd-6R-inMVvKgw" target="_Bz0-gGNyEd-6R-inMVvKgw">
+    <children xmi:type="notation:Node" xmi:id="_PQqXFGNyEd-6R-inMVvKgw" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_PQqXFWNyEd-6R-inMVvKgw" x="5" y="5"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_PQqXEWNyEd-6R-inMVvKgw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_PQqXEmNyEd-6R-inMVvKgw"/>
+    <element xmi:type="ptnetLoLA:ArcToPlace" href="net_lexic.ptnet#//@arcs.13"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_PQqXE2NyEd-6R-inMVvKgw" points="[0, -12, 94, 73]$[0, -85, 94, 0]$[-81, -85, 13, 0]"/>
+  </edges>
+</notation:Diagram>

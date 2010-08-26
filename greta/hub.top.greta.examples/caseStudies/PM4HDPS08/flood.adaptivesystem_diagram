@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:adaptiveSystem="adaptiveSystem" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.1/notation" xmi:id="_KL-EUVDcEd2y3M5ZhOiktg" type="AdaptiveSystem" name="flood.adaptivesystem_diagram" measurementUnit="Pixel">
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:adaptiveSystem="adaptiveSystem" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_KL-EUVDcEd2y3M5ZhOiktg" type="AdaptiveSystem" name="flood.adaptivesystem_diagram" measurementUnit="Pixel">
   <children xmi:type="notation:Node" xmi:id="_RhNMgVDcEd2y3M5ZhOiktg" type="1001">
     <children xmi:type="notation:Node" xmi:id="_RhNMhFDcEd2y3M5ZhOiktg" type="5001">
       <children xmi:type="notation:Node" xmi:id="_rlJ90VJhEd2hQ5pvfYSnzQ" type="2001">
@@ -19,7 +19,7 @@
     </children>
     <styles xmi:type="notation:ShapeStyle" xmi:id="_RhNMglDcEd2y3M5ZhOiktg"/>
     <element xmi:type="adaptiveSystem:AdaptiveProcess" href="flood.adaptivesystem#_RhNMgFDcEd2y3M5ZhOiktg"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_RhNMg1DcEd2y3M5ZhOiktg" x="24" y="12" width="433" height="889"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_RhNMg1DcEd2y3M5ZhOiktg" x="24" y="12" width="433" height="433"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_UzKsgVDcEd2y3M5ZhOiktg" type="1002">
     <children xmi:type="notation:Node" xmi:id="_UzKshFDcEd2y3M5ZhOiktg" type="4016"/>

@@ -35,19 +35,17 @@
 
 package hub.top.greta.synthesis;
 
-import java.util.LinkedList;
-
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.Oclet;
-import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.greta.run.Activator;
 import hub.top.greta.run.actions.ActionHelper;
 import hub.top.greta.verification.BuildBP;
-import hub.top.greta.verification.IOUtil;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.InvalidModelException;
-import hub.top.uma.view.ViewGeneration;
+import hub.top.uma.view.ViewGeneration2;
+
+import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -57,9 +55,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.gmf.runtime.diagram.ui.actions.internal.ViewGridAction;
-import org.eclipse.gmf.runtime.emf.core.GMFEditingDomainFactory;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -172,22 +167,11 @@ public class GenerateLogTraces implements IWorkbenchWindowActionDelegate {
         if (!interrupted && selectedFile != null) {
           monitor.subTask("generating traces");
           
-          ViewGeneration viewGen = new ViewGeneration(build.getBranchingProcess());
-          
-          StringBuilder simpleLog = new StringBuilder();
-          
-          for (int i=0; i<traceNum; i++) {
-            LinkedList<String> trace = viewGen.generateRandomTrace(20);
-            
-            simpleLog.append("1x case"+i);
-            for (String activity : trace) {
-              simpleLog.append(" "+activity.replace(' ', '_'));
-            }
-            simpleLog.append("\n");
-          }
+          ViewGeneration2 viewGen = new ViewGeneration2(build.getBranchingProcess());
+          LinkedList<String[]> traces = viewGen.generateRandomTraces(traceNum, 20);
           
           IPath targetPath = new Path(selectedFile.getFullPath().toString()+".log.txt");
-          FileIOHelper.writeFile(targetPath, simpleLog.toString());
+          ActionHelper.writeFile(targetPath, ViewGeneration2.generateSimpleLog(traces).toString());
         }
         monitor.done();
         

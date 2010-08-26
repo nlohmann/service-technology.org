@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:adaptiveSystem="adaptiveSystem" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.1/notation" xmi:id="_Nqp6MMIFEd2bhqEfm1jXKA" type="AdaptiveSystem" name="metrik-eval4.adaptivesystem_diagram" measurementUnit="Pixel">
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:adaptiveSystem="adaptiveSystem" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_Nqp6MMIFEd2bhqEfm1jXKA" type="AdaptiveSystem" name="metrik-eval4.adaptivesystem_diagram" measurementUnit="Pixel">
   <children xmi:type="notation:Node" xmi:id="_U3sIoMIFEd2bhqEfm1jXKA" type="1002">
     <children xmi:type="notation:Node" xmi:id="_U315oMIFEd2bhqEfm1jXKA" type="4016"/>
     <children xmi:type="notation:Node" xmi:id="_U315ocIFEd2bhqEfm1jXKA" type="4017"/>
@@ -507,7 +507,7 @@
     </children>
     <styles xmi:type="notation:ShapeStyle" xmi:id="_IC0SgcIGEd2bhqEfm1jXKA"/>
     <element xmi:type="adaptiveSystem:AdaptiveProcess" href="metrik-eval4.adaptivesystem#_ICXmkMIGEd2bhqEfm1jXKA"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_IC0SgsIGEd2bhqEfm1jXKA" x="15" y="25" width="426" height="641"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_IC0SgsIGEd2bhqEfm1jXKA" x="15" y="25" width="426" height="426"/>
   </children>
   <styles xmi:type="notation:DiagramStyle" xmi:id="_Nqp6McIFEd2bhqEfm1jXKA"/>
   <element xmi:type="adaptiveSystem:AdaptiveSystem" href="metrik-eval4.adaptivesystem#_NpmxUMIFEd2bhqEfm1jXKA"/>

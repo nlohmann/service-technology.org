@@ -305,7 +305,7 @@
       <arcs xsi:type="adaptiveSystem:ArcToCondition" xmi:id="_7oukl83VEd2khJEOnjvwaA" source="_7ouklc3VEd2khJEOnjvwaA" destination="_7oukls3VEd2khJEOnjvwaA"/>
     </doNet>
   </oclets>
-  <adaptiveProcess xmi:id="_5YR-4M3FEd2mzJ5pcyHP7A">
+  <adaptiveProcess xmi:id="_5YR-4M3FEd2mzJ5pcyHP7A" name="ap">
     <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_A3PcEM3MEd2mzJ5pcyHP7A" name="fo_1" token="1"/>
     <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_BjzAEM3MEd2mzJ5pcyHP7A" name="th_1" token="1"/>
     <nodes xsi:type="adaptiveSystem:Condition" xmi:id="_CJfuIM3MEd2mzJ5pcyHP7A" name="fo_2" token="1"/>

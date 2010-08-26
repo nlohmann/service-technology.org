@@ -222,7 +222,7 @@
     </children>
     <styles xmi:type="notation:ShapeStyle" xmi:id="_s-BkksIHEd2bhqEfm1jXKA"/>
     <element xmi:type="adaptiveSystem:AdaptiveProcess" href="phil(i).adaptivesystem#_s-BkkMIHEd2bhqEfm1jXKA"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_s-Bkk8IHEd2bhqEfm1jXKA" x="20" y="470" width="726" height="466"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_s-Bkk8IHEd2bhqEfm1jXKA" x="20" y="470" width="726" height="726"/>
   </children>
   <styles xmi:type="notation:DiagramStyle" xmi:id="_mOTZssIGEd2bhqEfm1jXKA"/>
   <element xmi:type="adaptiveSystem:AdaptiveSystem" href="phil(i).adaptivesystem#_mOTZsMIGEd2bhqEfm1jXKA"/>

@@ -41,35 +41,20 @@ import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.adaptiveSystem.diagram.part.AdaptiveSystemDiagramEditor;
 import hub.top.adaptiveSystem.presentation.AdaptiveSystemEditor;
 import hub.top.editor.ptnetLoLA.PtNet;
-import hub.top.greta.run.Activator;
 import hub.top.uma.DNodeBP;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
-public class ActionHelper {
+public class ActionHelper extends hub.top.editor.eclipse.ActionHelper {
 
 	/**
 	 * Retrieve {@link AdaptiveSystem} object from the current editor,
@@ -196,88 +181,6 @@ public class ActionHelper {
     return net;
   }
   
-	
-	/**
-	 * Write <code>contents</code> to a resource of the Eclipse framework
-	 * at <code>uri</code>.
-	 * 
-	 * @param win
-	 * @param uri
-	 * @param contents
-	 */
-	public static void writeEcoreResourceToFile (IWorkbenchWindow win, final URI uri, final EObject contents) {
-		WorkspaceModifyOperation op = new WorkspaceModifyOperation () {
-			
-			@Override
-			protected void execute(IProgressMonitor monitor) throws CoreException,
-					InvocationTargetException, InterruptedException {
-				try {
-					ResourceSet resources = new ResourceSetImpl();
-					Resource resource = resources.createResource(uri);
-					resource.getContents().add(contents);
-
-					// Save the contents of the resource to the file system.
-					resource.save(ActionHelper.getSaveOptions());
-				} catch (Exception exception) {
-					ResourcesPlugin.getPlugin().getLog().log(
-						new Status(Status.ERROR, Activator.PLUGIN_ID, "Unable to write resource to "+uri+". "+exception.getCause(), exception));
-				}
-			}
-		};
-		try {
-			win.run(true, false, op);
-		} catch (InvocationTargetException e) {
-			ResourcesPlugin.getPlugin().getLog().log(
-					new Status(Status.ERROR, Activator.PLUGIN_ID, "Unable to store model in "+uri+". Could not invoke workspace operation: "+e.getCause(), e));
-		} catch (InterruptedException ex) {
-			ResourcesPlugin.getPlugin().getLog().log(
-					new Status(Status.ERROR, Activator.PLUGIN_ID, "Storing resource "+uri+" has been interrupted by "+ex.getCause(), ex));
-		}
-	}
-	
-	/**
-	 * @return standard UTF-8 encoding save options
-	 */
-	public static Map<String, String> getSaveOptions() {
-		// Save the contents of the resource to the file system.
-		Map<String, String> options = new HashMap<String, String>();
-		options.put(XMLResource.OPTION_ENCODING, "UTF-8");
-		return options;
-	}
-	
-	/**
-	 * Write <code>contents</code> into the file at the <code>targetPath</code>.
-	 * 
-	 * @param targetPath
-	 * @param contents
-	 */
-	public static void writeFile (IPath targetPath, InputStream contents) {
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IFile targetFile = root.getFile(targetPath);
-		try {
-			if (targetFile.exists())
-				targetFile.setContents(contents, true, true, null);
-			else
-				targetFile.create(contents, true, null);
-			
-		} catch (CoreException e) {
-			ResourcesPlugin.getPlugin().getLog().log(
-				new Status(Status.ERROR, Activator.PLUGIN_ID, "Could not save file "+targetPath+".", e));
-		}
-	}
-	
-	/**
-	 * Write <code>contents</code> into the file at the <code>targetPath</code>.
-	 * 
-	 * @param targetPath
-	 * @param contents
-	 */
-	public static void writeFile (IPath targetPath, String contents) {
-		ByteArrayInputStream cStream = new ByteArrayInputStream(contents.getBytes());
-		writeFile(targetPath, cStream);
-	}
-	
-
 	/**
 	 * Write given {@link DNodeBP} as dot graphics and write it at the given location.
 	 * @param bp

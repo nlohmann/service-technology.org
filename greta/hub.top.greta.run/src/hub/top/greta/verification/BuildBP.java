@@ -147,8 +147,8 @@ public class BuildBP {
       
       // console output
       if (out != null) {
-        out.print(steps+"... ");
-        if (num++ > 10) { System.out.print("\n"); num = 0; }
+        //out.print(steps+".. ");
+        //if (num++ > 10) { System.out.print("\n"); num = 0; }
       }
     } // end of BP construction loop
     long tEnd = System.currentTimeMillis();

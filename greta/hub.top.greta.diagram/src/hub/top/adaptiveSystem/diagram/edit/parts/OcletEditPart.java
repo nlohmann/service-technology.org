@@ -348,7 +348,7 @@ public class OcletEditPart extends ShapeNodeEditPart {
     // retrieve figure
     IFigure figure = getFigure();
     IFigure parentFigure = figure.getParent();
-
+/*
     parentFigure.addLayoutListener(new LayoutListener.Stub() {
       
       @Override
@@ -360,7 +360,7 @@ public class OcletEditPart extends ShapeNodeEditPart {
       }
     });
     layoutDirty = true;
-
+*/
     super.activate();
   }
 

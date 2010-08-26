@@ -1,0 +1,136 @@
+digraph BP {
+graph [fontname="Helvetica" nodesep=0.3 ranksep="0.2 equally" fontsize=10];
+node [fontname="Helvetica" fontsize=8 fixedsize width=".3" height=".3" label="" style=filled fillcolor=white];
+edge [fontname="Helvetica" fontsize=8 color=white arrowhead=none weight="20.0"];
+
+
+node [shape=circle];
+  c35 []
+  c35_l [shape=none];
+  c35_l -> c35 [headlabel="'p1' (6)[35] "]
+  c41 []
+  c41_l [shape=none];
+  c41_l -> c41 [headlabel="'p3' (8)[41] "]
+  c33 [fillcolor=gold]
+  c33_l [shape=none];
+  c33_l -> c33 [headlabel="'p6' (11)[33] "]
+  c49 [fillcolor=gold]
+  c49_l [shape=none];
+  c49_l -> c49 [headlabel="'p6' (11)[49] "]
+  c21 []
+  c21_l [shape=none];
+  c21_l -> c21 [headlabel="'p2' (7)[21] "]
+  c37 []
+  c37_l [shape=none];
+  c37_l -> c37 [headlabel="'p2' (7)[37] "]
+  c46 [fillcolor=gold]
+  c46_l [shape=none];
+  c46_l -> c46 [headlabel="'p6' (11)[46] "]
+  c25 []
+  c25_l [shape=none];
+  c25_l -> c25 [headlabel="'p3' (8)[25] "]
+  c32 [fillcolor=gold]
+  c32_l [shape=none];
+  c32_l -> c32 [headlabel="'p5' (10)[32] "]
+  c45 [fillcolor=gold]
+  c45_l [shape=none];
+  c45_l -> c45 [headlabel="'p5' (10)[45] "]
+  c48 [fillcolor=gold]
+  c48_l [shape=none];
+  c48_l -> c48 [headlabel="'p5' (10)[48] "]
+  c29 []
+  c29_l [shape=none];
+  c29_l -> c29 [headlabel="'p5' (10)[29] "]
+  c20 []
+  c20_l [shape=none];
+  c20_l -> c20 [headlabel="'p1' (6)[20] "]
+  c23 []
+  c23_l [shape=none];
+  c23_l -> c23 [headlabel="'p3' (8)[23] "]
+  c39 []
+  c39_l [shape=none];
+  c39_l -> c39 [headlabel="'p3' (8)[39] "]
+  c27 []
+  c27_l [shape=none];
+  c27_l -> c27 [headlabel="'p4' (9)[27] "]
+  c43 []
+  c43_l [shape=none];
+  c43_l -> c43 [headlabel="'p4' (9)[43] "]
+  c30 []
+  c30_l [shape=none];
+  c30_l -> c30 [headlabel="'p6' (11)[30] "]
+
+
+node [shape=box];
+  e28 []
+  e28_l [shape=none];
+  e28_l -> e28 [headlabel="'x' (3)[28] "]
+  e40 []
+  e40_l [shape=none];
+  e40_l -> e40 [headlabel="'v' (1)[40] "]
+  e44 [fillcolor=gold]
+  e44_l [shape=none];
+  e44_l -> e44 [headlabel="'x' (3)[44] "]
+  e42 []
+  e42_l [shape=none];
+  e42_l -> e42 [headlabel="'w' (2)[42] "]
+  e26 []
+  e26_l [shape=none];
+  e26_l -> e26 [headlabel="'w' (2)[26] "]
+  e34 []
+  e34_l [shape=none];
+  e34_l -> e34 [headlabel="'y' (4)[34] "]
+  e22 []
+  e22_l [shape=none];
+  e22_l -> e22 [headlabel="'u' (0)[22] "]
+  e24 []
+  e24_l [shape=none];
+  e24_l -> e24 [headlabel="'v' (1)[24] "]
+  e36 []
+  e36_l [shape=none];
+  e36_l -> e36 [headlabel="'z' (5)[36] "]
+  e31 [fillcolor=gold]
+  e31_l [shape=none];
+  e31_l -> e31 [headlabel="'x' (3)[31] "]
+  e47 [fillcolor=gold]
+  e47_l [shape=none];
+  e47_l -> e47 [headlabel="'x' (3)[47] "]
+  e38 []
+  e38_l [shape=none];
+  e38_l -> e38 [headlabel="'u' (0)[38] "]
+
+
+ edge [fontname="Helvetica" fontsize=8 arrowhead=normal color=black];
+  c23 -> e28 [weight=10000.0]
+  c27 -> e28 [weight=10000.0]
+  c35 -> e40 [weight=10000.0]
+  e34 -> c35 [weight=10000.0]
+  c39 -> e44 [weight=10000.0]
+  c43 -> e44 [weight=10000.0]
+  e40 -> c41 [weight=10000.0]
+  c37 -> e42 [weight=10000.0]
+  e31 -> c33 [weight=10000.0]
+  c21 -> e26 [weight=10000.0]
+  c29 -> e34 [weight=10000.0]
+  e47 -> c49 [weight=10000.0]
+  c20 -> e22 [weight=10000.0]
+  e36 -> c37 [weight=10000.0]
+  c20 -> e24 [weight=10000.0]
+  e44 -> c46 [weight=10000.0]
+  e24 -> c25 [weight=10000.0]
+  e31 -> c32 [weight=10000.0]
+  e44 -> c45 [weight=10000.0]
+  c30 -> e36 [weight=10000.0]
+  e47 -> c48 [weight=10000.0]
+  e28 -> c29 [weight=10000.0]
+  e22 -> c23 [weight=10000.0]
+  c25 -> e31 [weight=10000.0]
+  c27 -> e31 [weight=10000.0]
+  e38 -> c39 [weight=10000.0]
+  c41 -> e47 [weight=10000.0]
+  c43 -> e47 [weight=10000.0]
+  e26 -> c27 [weight=10000.0]
+  e42 -> c43 [weight=10000.0]
+  e28 -> c30 [weight=10000.0]
+  c35 -> e38 [weight=10000.0]
+}

@@ -85,6 +85,8 @@ public abstract class DNodeSys {
 	 */
 	public DNode[] 				preConditions;		// set of all preconditions of an event
 	
+	public boolean hasDynamicSynchronization = false;
+	
 	public class EventPreSet {
 	  public DNode[] conds;
 	  

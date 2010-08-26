@@ -62,6 +62,8 @@ public class NetSynthesis {
    */
   public static PetriNet foldToNet_labeled(DNodeBP bp, DNodeSetElement fromNodes) {
     
+    // bp.debugPrintCCpairs();
+    
     bp.buildFoldingEquivalence();
     bp.relaxFoldingEquivalence();
     //bp.debug_printFoldingEquivalence();
@@ -70,7 +72,7 @@ public class NetSynthesis {
     //bp.minimizeFoldingRelation();
     bp.relaxFoldingEquivalence();
     
-    //bp.debug_printFoldingEquivalence();
+    // bp.debug_printFoldingEquivalence();
     
     DNodeSys dAS = bp.getSystem();
     

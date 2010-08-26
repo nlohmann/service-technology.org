@@ -18,12 +18,15 @@
 
 package hub.top.uma.view;
 
+import hub.top.petrinet.PetriNet;
+import hub.top.petrinet.PetriNetIO;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
+import hub.top.uma.synthesis.NetSynthesis;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -146,9 +149,9 @@ public class ViewGeneration2 {
           }
         }
 
-        if (enablingInfo.enabledEvents.size() > 0)
+        if (enablingInfo.locations.size() > 0)
         {
-          if (enablingInfo.enabledEvents.size() > 1) {
+          if (enablingInfo.locations.size() > 1) {
             // we have several enabled events, issue a warning if there are
             // two events that could occur at different locations
             /*
@@ -165,9 +168,9 @@ public class ViewGeneration2 {
             */
           }
           
-          Short eventId = enablingInfo.enabledEvents.keySet().iterator().next();
-          DNode[] events = enablingInfo.enabledEvents.get(eventId)[0];
-          DNode[] loc = enablingInfo.enablingLocation.get(eventId)[0];
+          Short eventId = enablingInfo.locations.keySet().iterator().next();
+          DNode[] events = enablingInfo.locations.get(eventId)[0].events;
+          DNode[] loc = enablingInfo.locations.get(eventId)[0].loc;
           
           DNode[] postConditions = bp.fire(events, loc);
           if (postConditions != null && postConditions.length > 0) {
@@ -208,6 +211,35 @@ public class ViewGeneration2 {
     for (String[] trace : traces) {
       extendByTrace(trace); 
     }
+  }
+  
+  /**
+   * Recompute all cut-off events of the branching process and update the
+   * corresponding equivalence relation. This method needs to be called whenever
+   * an existing branching process is extended, for instance by
+   * 
+   */
+  private void identifyFoldingRelation() {
+    for (DNode e : bp.allEvents) {
+      // won't be considered in the following
+      if (e.isAnti && e.isHot) continue;  
+      
+      build.setCurrentPrimeConfig(e, false);
+      if (build.isCutOffEvent(e)) {
+        System.out.println(e+" is a cut-off event");
+        e.isCutOff = true;
+        if (e.post != null)
+          for (DNode b : e.post) {
+            b.isCutOff = true;
+          }
+      }
+    }
+  }
+  
+  public PetriNet foldView() {
+    identifyFoldingRelation();
+    PetriNet net = NetSynthesis.foldToNet_labeled(build);
+    return net;
   }
   
   /**
@@ -310,7 +342,10 @@ public class ViewGeneration2 {
     
     for (int i = 0; i<upperBound; i++) {
       HashSet<DNode> enabledEvents = getEnabledTransitions_equiv(marking);
-      if (enabledEvents.isEmpty()) break;
+      if (enabledEvents.isEmpty()) {
+        System.out.println("no more enabled events at "+trace);
+        break;
+      }
       
       DNode[] toChoose = new DNode[enabledEvents.size()];
       enabledEvents.toArray(toChoose);
@@ -443,7 +478,7 @@ public class ViewGeneration2 {
        try {
          
          DNodeSys sys = Uma.readSystemFromFile(fromFile);
-         DNodeBP build = Uma.buildPrefix(sys, 1);
+         DNodeBP build = Uma.buildPrefix(sys, 3);
          
          build.buildFoldingEquivalence();
          build.relaxFoldingEquivalence();
@@ -467,7 +502,7 @@ public class ViewGeneration2 {
        try {
          
          DNodeSys sys = Uma.readSystemFromFile(systemFile);
-         DNodeBP build = Uma.initBuildPrefix(sys, 1);
+         DNodeBP build = Uma.initBuildPrefix(sys, 3);
          
          LinkedList<String[]> traces = readTraces(traceFile);
 
@@ -478,6 +513,30 @@ public class ViewGeneration2 {
          BufferedWriter out = new BufferedWriter(fstream);
          out.write(build.toDot());
          out.close();
+         
+       } catch (IOException e) {
+         System.err.println(e);
+       } catch (InvalidModelException e) {
+         System.err.println(e);
+       }
+     }
+     
+     if ("-view".equals(args[0])) {
+       String systemFile = args[1];
+       String traceFile = args[2];
+       
+       try {
+         
+         DNodeSys sys = Uma.readSystemFromFile(systemFile);
+         DNodeBP build = Uma.initBuildPrefix(sys, 3);
+         
+         LinkedList<String[]> traces = readTraces(traceFile);
+
+         ViewGeneration2 viewGen = new ViewGeneration2(build);
+         viewGen.extendByTraces(traces);
+         
+         PetriNet net = viewGen.foldView();
+         PetriNetIO.writeToFile(net, systemFile+".view", PetriNetIO.FORMAT_DOT, 0);
          
        } catch (IOException e) {
          System.err.println(e);

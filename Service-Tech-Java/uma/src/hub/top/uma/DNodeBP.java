@@ -84,7 +84,6 @@ public class DNodeBP {
 	 */
 	protected HashMap<DNode, Set< Short>> coID = new HashMap<DNode, Set<Short> >();
 	
-
 	/**
 	 * Initialize branching process construction for an {@link AdaptiveSystem}.
 	 * This construction uses lexicographic search order and uses history of
@@ -241,7 +240,6 @@ public class DNodeBP {
 	  // for computing event firings
     _debug_executionTimeProfile.append(
         "time;"
-       +"sort events;"+"sorted events;"
        +"fire event;"+"s/m;"
        +"co;"+"co-checks;"
        +"primeConfig;"
@@ -752,6 +750,76 @@ public class DNodeBP {
 	}
   
 
+  public static class SyncInfo {
+    public DNode[] events = null;
+    public DNode[] loc = null;
+    
+    public SyncInfo(DNode e, DNode[] loc) {
+      events = new DNode[1];
+      events[0] = e;
+      this.loc = loc;
+    }
+    
+    public boolean synchronizesWith(DNode e, DNode[] loc) {
+      if (events[0].id != e.id) return false;
+      if (   ( e.isAnti && DNode.containedIn(loc, this.loc)
+          || (!e.isAnti && Arrays.equals(loc, this.loc))))
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+    
+    public void append(DNode e) {
+      // event e synchronizes with other events at an existing location, add e to 'events[]'
+      int freeLoc = events.length / 2;
+      boolean alreadyExists = false;
+      for (; freeLoc < events.length; freeLoc++) {
+        if (events[freeLoc] == null) break;
+        // event 'e' already synchronizes at this location. we are done
+        if (events[freeLoc] == e) {
+          alreadyExists = true; break;
+        }
+      }
+      
+      // skip to next location
+      if (alreadyExists) return;
+      
+      // event 'e' not yet synchronized here, put 'e' into events[otherLoc]
+      // extend array if too small
+      if (freeLoc == events.length) {
+        DNode[] newSyncEvents = new DNode[events.length*2];
+        for (int i=0;i<events.length;i++) {
+          newSyncEvents[i] = events[i];
+        }
+        events = newSyncEvents;
+      }
+      
+      // store event 'e'
+      events[freeLoc] = e;
+    }
+    
+    public void reduce() {
+      // cut off all null entries in the events array 
+      int trueSize = 0;
+      // find the first entry with null
+      for ( ; trueSize < this.events.length; trueSize++)
+        if (this.events[trueSize] == null) break;
+      // create an array of that size, and copy the events
+      DNode[] reduced = new DNode[trueSize];
+      for (int i=0; i<trueSize; i++)
+        reduced[i] = this.events[i];
+      events = reduced;
+    }
+    
+    @Override
+    public String toString() {
+      return DNode.toString(events)+" @ "+DNode.toString(loc);
+    }
+  }
 
 	/**
 	 * Collect the events that are enabled in the current construction step
@@ -762,60 +830,32 @@ public class DNodeBP {
 	 * location.  
 	 */
 	public static class EnablingInfo {
-		public HashMap< Short, DNode[][] > enabledEvents;
-		public HashMap< Short, DNode[][] > enablingLocation;
+		public HashMap< Short, SyncInfo[] > locations;
+
 		
 		public EnablingInfo() {
-		  enabledEvents = new HashMap<Short, DNode[][]>();
-		  enablingLocation = new HashMap<Short, DNode[][]>();
+		  locations = new HashMap<Short, SyncInfo[]>();
 		}
 		
 		public void putEnabledEvent(DNode e, DNode[] loc) {
 		  
 		  //System.out.println("put "+e+"@"+DNode.toString(loc));
 		  
-		  if (!enabledEvents.containsKey(e.id)) {
-		    enabledEvents.put(e.id, new DNode[1][]);
-		    enablingLocation.put(e.id, new DNode[1][]);
+		  if (!locations.containsKey(e.id)) {
+		    locations.put(e.id, new SyncInfo[1]);
 		  }
-		  DNode[][] events = enabledEvents.get(e.id);
-		  DNode[][] locs = enablingLocation.get(e.id);
+		  SyncInfo[] locs = locations.get(e.id);
 		  
 		  boolean addedEvent = false;
 		  for (int otherLoc = 0; otherLoc < locs.length; otherLoc++) {
 		    if (locs[otherLoc] == null) break;
-		    
-        if (   ( e.isAnti && DNode.containedIn(loc, locs[otherLoc])
-            || (!e.isAnti && Arrays.equals(loc, locs[otherLoc]))))
-        {
-          // event e synchronizes with other events at an existing location, add e to 'events[]'
-          int freeLoc = events[otherLoc].length / 2;
-          boolean alreadyExists = false;
-          for (; freeLoc < events[otherLoc].length; freeLoc++) {
-            if (events[otherLoc][freeLoc] == null) break;
-            // event 'e' already synchronizes at this location. we are done
-            if (events[otherLoc][freeLoc] == e) {
-              alreadyExists = true; break;
-            }
-          }
-          
-          // skip to next location
-          if (alreadyExists) continue;
-          
-          // event 'e' not yet synchronized here, put 'e' into events[otherLoc]
-          // extend array if too small
-          if (freeLoc == events[otherLoc].length) {
-            DNode[] newSyncEvents = new DNode[events[otherLoc].length*2];
-            for (int i=0;i<events[otherLoc].length;i++) {
-              newSyncEvents[i] = events[otherLoc][i];
-            }
-            events[otherLoc] = newSyncEvents;
-          }
-          
-          // store event 'e'
-          events[otherLoc][freeLoc] = e;
-          addedEvent = true;
-        } // event 'e' stored		    
+
+        // event e synchronizes with other events at an existing location,
+		    // add e to this location
+		    if (locs[otherLoc].synchronizesWith(e, loc)) {
+		      locs[otherLoc].append(e);
+		      addedEvent = true;
+		    } // event 'e' stored
 		  }
 		  
 		  if (addedEvent) return;
@@ -823,39 +863,32 @@ public class DNodeBP {
 		  // event not added, append its occurrence location to locs
 		  if (e.isAnti) {
 		    // a single anti-event must not occur (it's redundant)
-		    System.out.println("not adding first anti-event");
+		    //System.out.println("not adding first anti-event");
 		    return;
 		  }
 		  
 		  // find a free spot
-		  int freeLoc = events.length / 2;
-		  for (; freeLoc < events.length; freeLoc++) {
-		    if (events[freeLoc] == null) break;
+		  int freeLoc = locs.length / 2;
+		  for (; freeLoc < locs.length; freeLoc++) {
+		    if (locs[freeLoc] == null) break;
 		  }
 		  // no free spot, extend arrays
-		  if (freeLoc == events.length) {
-		    DNode[][] newEvents = new DNode[events.length*2][];
-		    DNode[][] newLocs = new DNode[events.length*2][];
-		    for (int i=0;i<events.length;i++) {
-		      newEvents[i] = events[i];
+		  if (freeLoc == locs.length) {
+		    SyncInfo[] newLocs = new SyncInfo[locs.length*2];
+		    for (int i=0;i<locs.length;i++) {
 		      newLocs[i] = locs[i];
 		    }
-        enabledEvents.put(e.id, newEvents);
-        enablingLocation.put(e.id, newLocs);
-		    events = newEvents;
+        locations.put(e.id, newLocs);
 		    locs = newLocs;
 		  }
-		  
-		  events[freeLoc] = new DNode[1];
-		  events[freeLoc][0] = e;
-		  locs[freeLoc] = loc;
+		  locs[freeLoc] = new SyncInfo(e, loc);
 		}
 		
 		@Override
 		public String toString() {
-		  short[] enabledIDs = new short[enabledEvents.size()];
+		  short[] enabledIDs = new short[locations.size()];
 		  int i = 0;
-		  for (Short s : enabledEvents.keySet()) {
+		  for (Short s : locations.keySet()) {
 		    enabledIDs[i++] = s;
 		  }
 		  Arrays.sort(enabledIDs);
@@ -863,24 +896,92 @@ public class DNodeBP {
 		  StringBuilder b = new StringBuilder();
 		  
 		  for (i = 0; i<enabledIDs.length; i++) {
-		    for (int j=0; j<enabledEvents.get(enabledIDs[i]).length; j++) {
-		      if (enabledEvents.get(enabledIDs[i])[j] == null) continue;
-		      DNode[] ee = enabledEvents.get(enabledIDs[i])[j];
-		      DNode[] loc = enablingLocation.get(enabledIDs[i])[j];
-		      b.append(DNode.toString(ee)+" enabled at "+DNode.toString(loc)+"\n");
+		    for (int j=0; j<locations.get(enabledIDs[i]).length; j++) {
+		      if (locations.get(enabledIDs[i])[j] == null) continue;
+		      b.append(locations.get(enabledIDs[i])[j]+"\n");
 		    }
 		  }
 		  return b.toString();
 		}
 	}
 	
+	public class EnablingQueue {
+	  
+	  public HashMap<Integer, LinkedList<SyncInfo> > queue;
+	  private int maxConfigSize;
+	  private int minConfigSize;
+	  
+	  private int queueSize = 0;
+	  
+	  public EnablingQueue () {
+	    queue = new HashMap<Integer, LinkedList<SyncInfo>>();
+	    maxConfigSize = 0;
+	    minConfigSize = Integer.MAX_VALUE;
+	  }
+	  
+	  public void insertAll(EnablingInfo info) {
+	    for (SyncInfo[] sInfos : info.locations.values()) {
+	      for (SyncInfo sInfo : sInfos) {
+	        if (sInfo != null)
+	          insert(sInfo);
+	      }
+	    }
+	  }
+	  
+	  public void insert(SyncInfo info) {
+      int configSize = bp.getConfigSize(info.loc);
+      minConfigSize = (minConfigSize < configSize ? minConfigSize : configSize);
+      maxConfigSize = (maxConfigSize > configSize ? maxConfigSize : configSize);
+      if (!queue.containsKey(configSize)) {
+        queue.put(configSize, new LinkedList<SyncInfo>() );
+      }
+      info.reduce();
+      queue.get(configSize).addLast(info);
+      queueSize++;
+	  }
+	  
+	  public SyncInfo removeFirst() {
+	    LinkedList<SyncInfo> minQueue = queue.get(minConfigSize);
+	    SyncInfo min = minQueue.removeFirst();
+	    if (minQueue.isEmpty()) {
+	      queue.remove(minConfigSize);
+	      minConfigSize = Integer.MAX_VALUE;
+	      for (Integer configSize : queue.keySet()) {
+	        if (configSize < minConfigSize) minConfigSize = configSize;
+	      }
+	    }
+	    queueSize--;
+	    return min;
+	  }
+	  
+	  public int size() {
+	    return queueSize;
+	  }
+	  
+	  @Override
+	  public String toString() {
+	    StringBuilder b = new StringBuilder();
+	    for (int i=0;i<=maxConfigSize;i++) {
+	      if (queue.containsKey(i)) {
+	        b.append(i+": "+queue.get(i)+"\n");
+	      }
+	    }
+	    return b.toString();
+	  }
+	}
+	
+	/**
+   * Priority queue containing all enabled events that have not been added to
+   * the branching process yet.
+   */
+  private EnablingQueue enablingQueue = new EnablingQueue();
+
+	
 	/**
 	 * Find all enabled events and their locations of enabling in the
-	 * current branching process.
-	 * 
-	 * @return
+	 * current branching process and them to the {@link #enablingQueue}.
 	 */
-	private EnablingInfo getAllEnabledEvents() {
+	private void getAllEnabledEvents() {
 		EnablingInfo info = new EnablingInfo();
 		
     //System.out.println(co);
@@ -984,7 +1085,7 @@ public class DNodeBP {
 
   				// search all known enabled events whether there is already an event with
   				// the same ID at the same location. If so: synchronize both events.
-  				info.putEnabledEvent(e, loc);
+				  info.putEnabledEvent(e, loc);
 
   			} else {
   			  //System.out.println("  incomplete match");
@@ -1000,62 +1101,46 @@ public class DNodeBP {
 		  b._isNew = false;
 		}
 		
-		return info;
+    enablingQueue.insertAll(info);
+	}
+
+	/**
+	 * Fire all enabled events from the queue.
+	 * @return number of events added to the branching process
+	 */
+	private int fireAllEnabledEvents() {
+	  
+	  int fired = 0;
+	  while (enablingQueue.size() > 0)
+	    fired += fireEnabledEvent(enablingQueue.removeFirst());
+	  return fired;
+	}
+
+	/**
+	 * Fire the least enabled event from the queue.
+	 * @return number of events added to the branching process
+	 */
+	private int fireLeastEnabledEvent() {
+    int fired = 0;
+    if (enablingQueue.size() > 0)
+      do {
+        fired = fireEnabledEvent(enablingQueue.removeFirst());
+      } while (enablingQueue.size() > 0 && fired == 0);
+    return fired;
 	}
 	
 	/**
-	 * Fire all events from the given {@link EnablingInfo}.
+	 * Fire an enabled event.
 	 * 
-	 * @param info
+	 * @param fireEvents
 	 * @return the number of created events in the branching process
 	 */
-	private int fireAllEnabledEvents(EnablingInfo info) {
+	private int fireEnabledEvent(SyncInfo fireEvents) {
 	  
-		if (info.enabledEvents.size() == 0)
-			return 0;
-		
-		long _debug_t1a = System.currentTimeMillis();
-		
-		HashMap<Integer, LinkedList<DNode[]> > priorityQueue_events = new HashMap<Integer, LinkedList<DNode[]> >();
-		HashMap<Integer, LinkedList<DNode[]> > priorityQueue_locs = new HashMap<Integer, LinkedList<DNode[]> >();
-		int maxSize = 0; 
-		int _debug_t1_numSortedEvents = 0;
-		for (short e_id : info.enablingLocation.keySet()) {
-  		for (int eventGroup=0; eventGroup<info.enablingLocation.get(e_id).length; eventGroup++) {
-  		  // reached end of filled array, next ID
-  		  if (info.enablingLocation.get(e_id)[eventGroup] == null) break;
-  		  
-  		  int configSize = bp.getConfigSize(info.enablingLocation.get(e_id)[eventGroup]);
-  		  maxSize = (maxSize > configSize ? maxSize : configSize);
-  		  if (!priorityQueue_events.containsKey(configSize)) {
-  		    priorityQueue_events.put(configSize, new LinkedList<DNode[]>() );
-  		    priorityQueue_locs.put(configSize, new LinkedList<DNode[]>() );
-  		  }
-  		  
-  		  int trueEventSize = 0;
-  		  for ( ; trueEventSize < info.enabledEvents.get(e_id)[eventGroup].length; trueEventSize++)
-  		    if (info.enabledEvents.get(e_id)[eventGroup][trueEventSize] == null) break;
-  		  DNode trueEvents[] = new DNode[trueEventSize];
-  		  for (int eventNum=0; eventNum<trueEventSize; eventNum++)
-  		    trueEvents[eventNum] = info.enabledEvents.get(e_id)[eventGroup][eventNum];
-  		  
-  		  priorityQueue_events.get(configSize).addLast(trueEvents);
-  		  priorityQueue_locs.get(configSize).addLast(info.enablingLocation.get(e_id)[eventGroup]);
-  		  _debug_t1_numSortedEvents++;
-  		}
-		}
-		
-		long _debug_t1b_sort_events = System.currentTimeMillis();
-		
 		int firedEvents = 0;
 		
 		//for (int fireIndex=0; fireIndex<info.enabledEvents.size(); fireIndex++) {
-		for (int i=0;i<=maxSize;i++)
-		{
-		 if (!priorityQueue_events.containsKey(i)) continue;
-		 // fire all events with priority i
-		 for (int fireIndex = 0; fireIndex < priorityQueue_events.get(i).size(); fireIndex++) {
-
+		   
 			// flag, set to true iff this event corresponds to an event of an anti-oclet,
 			// in this case the event will be added to the branching process (BP) but no
 			// subsequent event is fired. In the final result, such anti-events will
@@ -1072,11 +1157,11 @@ public class DNodeBP {
 		  long _debug_t2a = System.currentTimeMillis();
 		  boolean _debug_t2a_multi = false;
 			
-			if (priorityQueue_events.get(i).get(fireIndex).length == 1) {
+			if (fireEvents.events.length == 1) {
 
 				//System.out.println("fire "+info.enabledEvents.get(fireIndex)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex)));
 			  //_debug_log.append("fire "+info.enabledEvents.get(fireIndex)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex))+"\n");
-				DNode e = priorityQueue_events.get(i).get(fireIndex)[0];
+				DNode e = fireEvents.events[0];
 
 				if (e.isAnti) {
 					// remember that this event was an anti-event
@@ -1086,10 +1171,10 @@ public class DNodeBP {
 				if (e.isHot) {
 				  setHot = true;
 				}
-				postConditions = bp.fire(e, priorityQueue_locs.get(i).get(fireIndex));
+				postConditions = bp.fire(e, fireEvents.loc);
 
 			} else {
-				DNode events[] = priorityQueue_events.get(i).get(fireIndex);
+				DNode events[] = fireEvents.events;
 				
 				//System.out.println("fire "+DNode.toString(events)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex)));
 				//_debug_log.append("fire "+DNode.toString(events)+ " at "+DNode.toString(info.enablingLocation.get(fireIndex))+"\n");
@@ -1104,14 +1189,14 @@ public class DNodeBP {
 					  setHot = true;
 					}
 				}
-				postConditions = bp.fire(events, priorityQueue_locs.get(i).get(fireIndex));
+				postConditions = bp.fire(events, fireEvents.loc);
 				
 				_debug_t2a_multi = true;
 			}
 			
 			// we did not fire this event
 			if (postConditions == null)
-				continue;
+				return 0;
 			
       long _debug_t2b_t3a_fireEvent = System.currentTimeMillis();
 
@@ -1130,7 +1215,7 @@ public class DNodeBP {
         setCurrentPrimeConfig(newEvent, true);
         newEvent.isHot = setHot;   // remember temperature of event
   			
-  			_debug_log.append("created new event "+newEvent+" at "+DNode.toString(priorityQueue_locs.get(i).get(fireIndex))+"\n");
+  			_debug_log.append("created new event "+newEvent+" at "+DNode.toString(fireEvents.loc)+"\n");
   			_debug_log.append("having post-conditions "+DNode.toString(postConditions)+"\n");
   			_debug_log.append("from "+toString(newEvent.causedBy)+"\n");
   			
@@ -1186,14 +1271,11 @@ public class DNodeBP {
 			
 			_debug_executionTimeProfile.append(
 			    (_debug_t5b_cutOff-_debug_t0)+";"
-			   +(_debug_t1b_sort_events-_debug_t1a)+";"+_debug_t1_numSortedEvents+";"
 			   +(_debug_t2b_t3a_fireEvent-_debug_t2a)+";"+_debug_multi+";"
 			   +(_debug_t3b_t4a_co-_debug_t2b_t3a_fireEvent)+";"+_debug_coCheckCount+";"
          +(_debug_t4b_t5a_primeConfig-_debug_t3b_t4a_co)+";"
          +(_debug_cutOfftime)+"\n"
 			);
-		 }
-		}
 		return firedEvents;
 	}
 	
@@ -1426,9 +1508,9 @@ public class DNodeBP {
    *    0 if construction of the branching process is complete.
    */
   public int step() {
-    //System.out.println("----- next step -----");
-    EnablingInfo info = getAllEnabledEvents();
-    int fired = fireAllEnabledEvents(info);
+    // System.out.println("----- next step -----");
+    getAllEnabledEvents();
+    int fired = fireAllEnabledEvents();
     
     if (abort) return 0;
     
@@ -1437,8 +1519,6 @@ public class DNodeBP {
     else
       return 0; // abort if properties violated/abortion condition holds
   }
-
-
 	
 	/**
 	 * @param condition
@@ -1539,6 +1619,14 @@ public class DNodeBP {
         newConditions[i].isCutOff = true; // remember it
       }
     }
+  }
+  
+  public void debugPrintCCpairs() {
+    System.out.println("----- CC-pairs -----");
+    for (Entry<DNode, DNode> cc : elementary_ccPair.entrySet()) {
+      System.out.println(cc.getKey()+" --> "+cc.getValue());
+    }
+    System.out.println("---- /CC-pairs -----");
   }
   
   /* ==========================================================================
@@ -2535,7 +2623,7 @@ public class DNodeBP {
 	      // and take from all reachable nodes the node with the least id
 	      dOther = d;
 	      for (DNode d2 : equivSet) {
-	        if (d2.globalId < dOther.id) dOther = d2;
+	        if (d2.globalId < dOther.globalId) dOther = d2;
 	      }
 	      
 	      elementary_ccPair.put(d, dOther);

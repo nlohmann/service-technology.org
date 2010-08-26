@@ -21,6 +21,7 @@ public class Uma {
   private static String options_inFile_Ext = null;
   private static int options_outputFormat = 0;
   private static int options_mode = MODE_COMPUTE_PREFIX;
+  private static int options_bound = 1;
 
   
   private static void parseCommandLine(String args[]) {
@@ -46,6 +47,11 @@ public class Uma {
           options_mode = MODE_COMPUTE_PREFIX;
         else if ("system".equals(args[i]))
           options_mode = MODE_RENDER_SYSTEM;
+      }
+      
+      if ("-b".equals(args[i])) {
+        ++i;
+        options_bound = Integer.parseInt(args[i]);
       }
     }
   }
@@ -87,17 +93,18 @@ public class Uma {
     int fired, totalFired = 0, step = 0;
     while ((fired = build.step()) > 0) {
       totalFired += fired;
-      System.out.print(totalFired+".. ");
-      if (++step % 10 == 0) System.out.print("\n");
+       System.out.print(totalFired+".. ");
+      if (step > 10) { System.out.print("\n"); step = 0; }
     }
+    System.out.println();
     
     return build;
   }
   
-  private static void computePrefix() throws IOException, InvalidModelException {
+  private static void computePrefix(int bound) throws IOException, InvalidModelException {
     
     DNodeSys sys = readSystemFromFile(options_inFile);
-    DNodeBP build = buildPrefix(sys, 1);
+    DNodeBP build = buildPrefix(sys, bound);
 
     if (options_outputFormat == PetriNetIO.FORMAT_DOT) {
       System.out.println("writing to "+options_inFile+".bp.dot");
@@ -110,20 +117,25 @@ public class Uma {
     System.out.println(build.getStatistics());
   }
   
-  private static void renderSystem() throws Exception {
-    PetriNet net = OcletIO.readNetFromFile(options_inFile);
+  public static void renderSystem(String fileName, int outputFormat) throws Exception {
+    String ext = fileName.substring(fileName.lastIndexOf('.')+1);
+    PetriNet net = OcletIO.readNetFromFile(fileName);
     
     if (net == null) {
-      System.err.println("Parsed empty net from "+options_inFile);
+      System.err.println("Parsed empty net from "+fileName);
       return;
     }
     
-    if ("oclets".equals(options_inFile_Ext)) {
+    if ("oclets".equals(ext)) {
       OcletSpecification os = new OcletSpecification(net);
-      PetriNetIO.writeToFile(net, options_inFile, options_outputFormat, 0);
+      OcletIO.writeToFile(os, fileName, outputFormat, 0);
     } else {
-      PetriNetIO.writeToFile(net, options_inFile, options_outputFormat, 0);
+      PetriNetIO.writeToFile(net, fileName, outputFormat, 0);
     }
+  }
+  
+  private static void renderSystem() throws Exception {
+    renderSystem(options_inFile, options_outputFormat);
   }
 
   /**
@@ -135,7 +147,7 @@ public class Uma {
     if (options_inFile == null) return;
     
     if (options_mode == MODE_COMPUTE_PREFIX)
-      computePrefix();
+      computePrefix(options_bound);
     else if (options_mode == MODE_RENDER_SYSTEM)
       renderSystem();
 

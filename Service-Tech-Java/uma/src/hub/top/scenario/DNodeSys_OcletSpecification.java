@@ -261,6 +261,10 @@ public class DNodeSys_OcletSpecification extends DNodeSys {
 		for (DNode d : maxNodesOfO)
 			ds.add(d);
 		
+		if (o.isAntiOclet()) {
+		  hasDynamicSynchronization = true;
+		}
+		
 		return ds;
 	}
 	

@@ -1,5 +1,7 @@
 package hub.top.scenario;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,6 +56,22 @@ public class OcletIO extends PetriNetIO {
     }
     
     return PetriNetIO.readNetFromFile(fileName);
+  }
+  
+  public static void writeToFile(OcletSpecification os, String fileName, int format, int parameter) throws IOException {
+
+    // Create file 
+    FileWriter fstream = new FileWriter(fileName+"."+getFileExtension(format));
+    BufferedWriter out = new BufferedWriter(fstream);
+    
+    if (format == FORMAT_DOT) {
+        out.write(toDot(os));
+    } else if (format == FORMAT_LOLA) {
+      out.write(toLoLA(os));
+    }
+
+    //Close the output stream
+    out.close();
   }
   
   public static String toDot(Oclet o) {

@@ -232,14 +232,14 @@ public class ViewGeneration {
           }
         }
 
-        if (enablingInfo.enabledEvents.size() > 0) {
-          if (enablingInfo.enabledEvents.size() > 1) {
+        if (enablingInfo.locations.size() > 0) {
+          if (enablingInfo.locations.size() > 1) {
             System.out.print("multitple ");
           }
           
-          Short eventId = enablingInfo.enabledEvents.keySet().iterator().next();
-          DNode[] events = enablingInfo.enabledEvents.get(eventId)[0];
-          DNode[] loc = enablingInfo.enablingLocation.get(eventId)[0];
+          Short eventId = enablingInfo.locations.keySet().iterator().next();
+          DNode[] events = enablingInfo.locations.get(eventId)[0].events;
+          DNode[] loc = enablingInfo.locations.get(eventId)[0].loc;
           
           DNode[] postConditions = bp.fire(events, loc);
           if (postConditions != null && postConditions.length > 0) {

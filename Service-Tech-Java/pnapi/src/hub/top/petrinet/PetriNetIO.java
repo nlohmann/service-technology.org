@@ -22,13 +22,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.EarlyExitException;
 import org.antlr.runtime.MismatchedTokenException;
-import org.antlr.runtime.Parser;
 import org.antlr.runtime.RecognitionException;
 
 /**
@@ -47,8 +45,6 @@ public class PetriNetIO {
    * @throws IOException
    */
   public static PetriNet readNetFromFile(String fileName) throws IOException {
-    
-    System.err.println("Reading "+fileName);
     
     String ext = fileName.substring(fileName.lastIndexOf('.')+1);
     int format = getFormatForFileExtension(ext);
@@ -122,6 +118,7 @@ public class PetriNetIO {
       System.err.println("failed parsing "+fileName);
       System.err.println("line "+e2.line+":"+(e2.charPositionInLine+1)+" found unexpected "+e2.token.getText());
     } else {
+      System.err.println("Error parsing file "+fileName);
       e.printStackTrace();
     }
   }
@@ -364,16 +361,30 @@ public class PetriNetIO {
 
     //Close the output stream
     out.close();
-
   }
   
-  private static String options_inFile = null;
-  private static int options_outputFormat = 0;
+  private String options_inFile = null;
+  private int options_outputFormat = 0;
   
-  private static void parseCommandLine(String args[]) {
+  /**
+   * Set file or directory to read from.
+   * @param fileName
+   */
+  protected void setInputFile(String fileName) {
+    options_inFile = fileName;
+  }
+
+  /**
+   * @return name of file/directory read from
+   */
+  protected String getInputFile() {
+    return options_inFile;
+  }
+  
+  private void parseCommandLine(String args[]) {
     for (int i=0; i<args.length; i++) {
       if ("-i".equals(args[i])) {
-        options_inFile = args[++i];
+        setInputFile(args[++i]);
       }
       
       if ("-f".equals(args[i])) {
@@ -394,13 +405,13 @@ public class PetriNetIO {
    * 
    * @param dirName
    */
-  private static void processFile(String fileName) throws IOException {
-    if (options_inFile == null) return;
+  protected void processFile(String fileName) throws IOException {
+    if (fileName == null) return;
     
     PetriNet net = readNetFromFile(fileName);
-    //net.anonymizeNet();
     if (net == null) return;
-    
+
+    //net.anonymizeNet();
     writeToFile(net, fileName, options_outputFormat, 0);
   }
   
@@ -410,7 +421,7 @@ public class PetriNetIO {
    * 
    * @param dirName
    */
-  private static void processDirectory(String dirName) {
+  protected void processDirectory(String dirName) {
     File dir = new File(dirName);
     if (dir.isDirectory()) {
       for (String child : dir.list()) {
@@ -429,6 +440,24 @@ public class PetriNetIO {
       }
     }
   }
+  
+  /**
+   * Run this {@link PetriNetIO} object and convert files or
+   * compute values as set.
+   */
+  public void run() {
+    if (getInputFile() != null) {
+      if (isParseableFileType(getInputFile())) {
+        try {
+          processFile(getInputFile());
+        } catch (IOException e) {
+          System.err.println(e);
+        }
+      }
+      else
+        processDirectory(getInputFile());
+    }
+  }
 
   /**
    * Read Petri net from a text-file and write a GraphViz Dot representation
@@ -439,13 +468,12 @@ public class PetriNetIO {
    */
   public static void main(String args[]) throws Exception {
     
-    parseCommandLine(args);
+    PetriNetIO pn_process = new PetriNetIO();
+    pn_process.parseCommandLine(args);
     
-    if (options_outputFormat == 0)
-      options_outputFormat = FORMAT_DOT;
-    
-    if (isParseableFileType(options_inFile)) processFile(options_inFile);
-    else processDirectory(options_inFile);
+    if (pn_process.options_outputFormat == 0)
+      pn_process.options_outputFormat = FORMAT_DOT;
 
+    pn_process.run();
   }
 }

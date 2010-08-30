@@ -18,7 +18,7 @@ TOOL=lola
 #wget http://esla.informatik.uni-rostock.de:8080/job/$TOOL/lastSuccessfulBuild/artifact/$TOOL/$TOOL.tar.gz
 wget http://service-technology.org/files/lola/lola.tar.gz
 tar xfz $TOOL.tar.gz
-cd $TOOL
+cd $TOOL*
 ./configure --prefix=$DIR --sysconfdir=$DIR/bin
 make lola-statespace lola-statespace1
 make install

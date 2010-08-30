@@ -167,7 +167,13 @@ $("#more"+infoid).hide();
           </tr>
        </table>
 -->       
+       <table style="width: 80%; margin-left:auto; margin-right:auto; border-width: 2px; border-style: solid; border-color: black;">
 <?PHP
+    echo "<tr><th width=\"5%\">type</th>\n";
+    echo "<th width=\"43%\">pending messages</th>\n";
+    echo "<th width=\"4%\"></th>\n";
+    echo "<th width=\"43%\">required messages</th>\n";
+    echo "<th width=\"5%\"></th></tr>\n";
   $dll = file($diagfile["residence"]);
   foreach ($dll as $index => $line)
   {
@@ -175,14 +181,13 @@ $("#more"+infoid).hide();
     list($type, $finals, $pending, $required, $rules) = explode(";", $line);
 print<<<END
    
-       <table style="width: 80%; margin-left:auto; margin-right:auto; border-width: 2px; border-style: solid; border-color: black;">
           <tr>
 END;
-    echo "<td>$type</td>\n";
-    echo "<td>$pending</td>\n";
-    echo "<td>&rarr;</td>\n";
-    echo "<td>$required</td>\n";
-    echo "<td onClick='toggle($index)'>more</td>\n";
+    echo "<td width=\"5%\">$type</td>\n";
+    echo "<td width=\"43%\">$pending</td>\n";
+    echo "<td width=\"4%\">&rarr;</td>\n";
+    echo "<td width=\"43%\">$required</td>\n";
+    echo "<td width=\"5%\" onClick='toggle($index)'>more</td>\n";
 print<<<END
           </tr>
           <tr>
@@ -226,14 +231,14 @@ END;
       }
      
     }
-    echo "</div>\n";
+    echo "<hr /></div>\n";
 print<<<END
             </td>
           </tr>
-       </table>
 END;
   }
 ?>
+       </table>
      </div>
      
       <?php drawImage($fakeresult); ?>

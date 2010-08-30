@@ -23,7 +23,7 @@ cd $TOOL*
 make lola-statespace lola-statespace1
 make install
 cd ..
-rm -fr $TOOL $TOOL.tar.gz
+rm -fr $TOOL* $TOOL.tar.gz
 
 
 for TOOL in pnapi wendy marlene mia

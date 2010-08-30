@@ -13,12 +13,12 @@
     {
       if ( isset($_REQUEST["example"]) )
       {
-        if (!strcmp($_REQUEST["example"], "iRules"))
+        $_SESSION["marlene"] = $_REQUEST["example"];
+        if (!strcmp($_REQUEST["example"], "iRules") || !strcmp($_REQUEST["example"], "iCoffee"))
         {
           header('Location: marlene_interactive.php');
           exit;
         }
-        $_SESSION["marlene"] = $_REQUEST["example"];
         unset($_REQUEST);
         header("Location: ".$_SERVER["PHP_SELF"]);
       }

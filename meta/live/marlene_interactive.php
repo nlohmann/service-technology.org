@@ -26,12 +26,21 @@
   header("Content-Type: text/html");
   echo '<?xml version="1.0" encoding="utf-8" ?>';
 
-  $services = array("marlene/pro.owfn", "marlene/req.owfn");
-  //$rules = array("marlene/diag.ar");
+  if (!strcmp($_SESSION["marlene"], "iRules"))
+  {
+    $services = array("marlene/pro.owfn", "marlene/req.owfn");
+    $rules = createFile("diag_iRules.ar");
+  }
+  else if (!strcmp($_SESSION["marlene"], "iCoffee"))
+  {
+    $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");
+    $rules = createFile("diag_iCoffee.ar");
+  }
+
 
   
   $services = prepareFiles($services);
-  $rules = createFile("diag.ar");
+  // $rules = createFile("diag.ar");
   $diagfile = current(createFile("live.txt"));
   
   $rulefile = current($rules);
@@ -113,7 +122,7 @@
       <h2>Diagnosis</h2>
 
       <?php
-        $call_result = console($fakecall, 'cd marlene; '.$realcall.' ');
+        $call_result = console($fakecall, 'cd marlene; echo $PATH; which marlene; '.$realcall.' ');
       ?>
     <a name="rules"></a>
     <h3>Rules</h3>

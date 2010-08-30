@@ -122,7 +122,7 @@
       <h2>Diagnosis</h2>
 
       <?php
-        $call_result = console($fakecall, 'cd marlene; echo $PATH; which marlene; '.$realcall.' ');
+        $call_result = console($fakecall, 'cd marlene; echo $PATH; which marlene; echo $LD_LIBRARY_PATH; '.$realcall.' ');
       ?>
     <a name="rules"></a>
     <h3>Rules</h3>

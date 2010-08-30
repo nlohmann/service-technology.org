@@ -8,6 +8,7 @@
 
   putenv("PATH=".LIVEROOT.DEFAULTVERSION."/bin:".ADDITIONALPATH);
   putenv("SYSCONFDIR=".LIVEROOT.DEFAULTVERSION."/etc");
+  putenv("LD_LIBRARY_PATH=/usr/local/lib");
 
 function getDirName($uid)
 {

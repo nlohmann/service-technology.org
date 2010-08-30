@@ -1,9 +1,9 @@
 #!/bin/sh
 
-mkdir -p local/bin
-chmod a+x local/bin
+mkdir -p bin/common/bin
+chmod a+x bin/common
 
-cd local
+cd bin/common
 
 PATH=`pwd`/bin:$PATH
 DIR=`pwd`

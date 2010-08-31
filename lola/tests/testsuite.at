@@ -107,15 +107,17 @@ AT_BANNER([High-level Net Unfolding])
 
 AT_SETUP([Data])
 AT_CHECK([cp TESTFILES/data.lola .])
-AT_CHECK([LOLA_DEADLOCK data.lola -n],1,stdout)
+AT_CHECK([LOLA_DEADLOCK data.lola -n],1,stdout,stderr)
 AT_CHECK([test -f data.llnet])
 AT_CHECK([test -f data.pnml])
+AT_CHECK([GREP -q "20 significant places" stderr], 0)
 AT_KEYWORDS(unfolding)
 AT_CLEANUP
 
 AT_SETUP([Dining Philosophers])
 AT_CHECK([cp TESTFILES/phils.lola .])
-AT_CHECK([LOLA_DEADLOCK phils.lola -n],0,stdout)
+AT_CHECK([LOLA_DEADLOCK phils.lola -n],0,stdout,stderr)
+AT_CHECK([GREP -q "30 significant places" stderr], 0)
 AT_CHECK([test -f phils.llnet])
 AT_CHECK([test -f phils.pnml])
 AT_KEYWORDS(unfolding)
@@ -123,7 +125,8 @@ AT_CLEANUP
 
 AT_SETUP([Echo Algorithm])
 AT_CHECK([cp TESTFILES/echo.lola .])
-AT_CHECK([LOLA_DEADLOCK echo.lola -n],0,stdout)
+AT_CHECK([LOLA_DEADLOCK echo.lola -n],0,stdout,stderr)
+AT_CHECK([GREP -q "189 significant places" stderr], 0)
 AT_CHECK([test -f echo.llnet])
 AT_CHECK([test -f echo.pnml])
 AT_KEYWORDS(unfolding)
@@ -136,29 +139,33 @@ AT_BANNER([Deadlock Check (lola-deadlock)])
 
 AT_SETUP([Choreography])
 AT_CHECK([cp TESTFILES/choreography.lola .])
-AT_CHECK([LOLA_DEADLOCK choreography.lola],1,stdout)
+AT_CHECK([LOLA_DEADLOCK choreography.lola],1,stdout,stderr)
 AT_CHECK([GREP -q "net does not have deadlocks!" stdout],0)
+AT_CHECK([GREP -q "357 significant places" stderr], 0)
 AT_KEYWORDS(deadlock)
 AT_CLEANUP
 
 AT_SETUP([Data])
 AT_CHECK([cp TESTFILES/data.lola .])
-AT_CHECK([LOLA_DEADLOCK data.lola],1,stdout)
+AT_CHECK([LOLA_DEADLOCK data.lola],1,stdout,stderr)
 AT_CHECK([GREP -q "net does not have deadlocks!" stdout],0)
+AT_CHECK([GREP -q "20 significant places" stderr], 0)
 AT_KEYWORDS(deadlock)
 AT_CLEANUP
 
 AT_SETUP([Echo Algorithm])
 AT_CHECK([cp TESTFILES/echo.lola .])
-AT_CHECK([LOLA_DEADLOCK echo.lola],0,stdout)
+AT_CHECK([LOLA_DEADLOCK echo.lola],0,stdout,stderr)
 AT_CHECK([GREP -q "dead state found!" stdout],0)
+AT_CHECK([GREP -q "189 significant places" stderr], 0)
 AT_KEYWORDS(deadlock)
 AT_CLEANUP
 
 AT_SETUP([Dining Philosophers])
 AT_CHECK([cp TESTFILES/phils.lola .])
-AT_CHECK([LOLA_DEADLOCK phils.lola],0,stdout)
+AT_CHECK([LOLA_DEADLOCK phils.lola],0,stdout,stderr)
 AT_CHECK([GREP -q "dead state found!" stdout],0)
+AT_CHECK([GREP -q "30 significant places" stderr], 0)
 AT_KEYWORDS(deadlock)
 AT_CLEANUP
 
@@ -171,6 +178,7 @@ AT_SETUP([Echo Algorithm])
 AT_CHECK([cp TESTFILES/echo.lola .])
 AT_CHECK([LOLA_FULLLIMITED echo.lola],5,ignore,stderr)
 AT_CHECK([GREP -q "maximal number of states reached" stderr],0)
+AT_CHECK([GREP -q "189 significant places" stderr], 0)
 AT_KEYWORDS(fulllimited)
 AT_CLEANUP
 
@@ -178,6 +186,7 @@ AT_SETUP([Garavel's Challenge])
 AT_CHECK([cp TESTFILES/garavel.lola .])
 AT_CHECK([LOLA_FULLLIMITED garavel.lola],5,ignore,stderr)
 AT_CHECK([GREP -q "maximal number of states reached" stderr],0)
+AT_CHECK([GREP -q "419 significant places" stderr], 0)
 AT_KEYWORDS(fulllimited)
 AT_CLEANUP
 
@@ -185,6 +194,7 @@ AT_SETUP([Unbounded Net])
 AT_CHECK([cp TESTFILES/unbounded.lola .])
 AT_CHECK([LOLA_FULLLIMITED unbounded.lola],5,ignore,stderr)
 AT_CHECK([GREP -q "maximal number of states reached" stderr],0)
+AT_CHECK([GREP -q "4 significant places" stderr], 0)
 AT_KEYWORDS(fulllimited)
 AT_CLEANUP
 
@@ -196,8 +206,9 @@ AT_BANNER([State Predicate (lola-statepredicate1)])
 AT_SETUP([AI Planning Problem])
 AT_CHECK([cp TESTFILES/planner.lola .])
 AT_CHECK([cp TESTFILES/planner.task .])
-AT_CHECK([LOLA_STATEPREDICATE1 planner.lola -aplanner.task],0,stdout)
+AT_CHECK([LOLA_STATEPREDICATE1 planner.lola -aplanner.task],0,stdout,stderr)
 AT_CHECK([GREP -q "state found!" stdout],0)
+AT_CHECK([GREP -q "82 significant places" stderr], 0)
 AT_KEYWORDS(statepredicate1)
 AT_CLEANUP
 
@@ -209,7 +220,8 @@ AT_BANNER([CTL Model Checking (lola-modelchecking)])
 AT_SETUP([Business Process])
 AT_CHECK([cp TESTFILES/process.lola .])
 AT_CHECK([cp TESTFILES/process.task .])
-AT_CHECK([LOLA_MODELCHECKING process.lola -aprocess.task],1,stdout)
+AT_CHECK([LOLA_MODELCHECKING process.lola -aprocess.task],1,stdout,stderr)
+AT_CHECK([GREP -q "9 significant places" stderr], 0)
 AT_CHECK([GREP -q "result: false" stdout],0)
 AT_KEYWORDS(modelchecking)
 AT_CLEANUP
@@ -221,8 +233,9 @@ AT_BANNER([Liveprop (lola-liveprop)])
 
 AT_SETUP([UML Activity Diagram])
 AT_CHECK([cp TESTFILES/umlprocess.lola .])
-AT_CHECK([LOLA_LIVEPROP umlprocess.lola],1,stdout)
+AT_CHECK([LOLA_LIVEPROP umlprocess.lola],1,stdout,stderr)
 AT_CHECK([GREP -q "predicate not live: not satisfiable beyond reported state" stdout],0)
+AT_CHECK([GREP -q "9 significant places" stderr], 0)
 AT_KEYWORDS(liveprop)
 AT_CLEANUP
 
@@ -233,8 +246,9 @@ AT_BANNER([Boundedness Check (lola-boundednet)])
 
 AT_SETUP([Business Process])
 AT_CHECK([cp TESTFILES/process.lola .])
-AT_CHECK([LOLA_BOUNDEDNET process.lola],1,stdout)
+AT_CHECK([LOLA_BOUNDEDNET process.lola],1,stdout,stderr)
 AT_CHECK([GREP -q "net is bounded!" stdout],0)
+AT_CHECK([GREP -q "9 significant places" stderr], 0)
 AT_KEYWORDS(boundednet)
 AT_CLEANUP
 
@@ -247,8 +261,9 @@ AT_CLEANUP
 
 AT_SETUP([Data])
 AT_CHECK([cp TESTFILES/data.lola .])
-AT_CHECK([LOLA_BOUNDEDNET data.lola],1,stdout)
+AT_CHECK([LOLA_BOUNDEDNET data.lola],1,stdout,stderr)
 AT_CHECK([GREP -q "net is bounded!" stdout],0)
+AT_CHECK([GREP -q "20 significant places" stderr], 0)
 AT_KEYWORDS(boundednet)
 AT_CLEANUP
 
@@ -261,22 +276,25 @@ AT_CLEANUP
 
 AT_SETUP([Garavel's Challenge])
 AT_CHECK([cp TESTFILES/garavel.lola .])
-AT_CHECK([LOLA_BOUNDEDNET garavel.lola],1,stdout)
+AT_CHECK([LOLA_BOUNDEDNET garavel.lola],1,stdout,stderr)
 AT_CHECK([GREP -q "net is bounded!" stdout],0)
+AT_CHECK([GREP -q "419 significant places" stderr], 0)
 AT_KEYWORDS(boundednet)
 AT_CLEANUP
 
 AT_SETUP([UML Activity Diagram])
 AT_CHECK([cp TESTFILES/umlprocess.lola .])
-AT_CHECK([LOLA_BOUNDEDNET umlprocess.lola],1,stdout)
+AT_CHECK([LOLA_BOUNDEDNET umlprocess.lola],1,stdout,stderr)
 AT_CHECK([GREP -q "net is bounded!" stdout],0)
+AT_CHECK([GREP -q "9 significant places" stderr], 0)
 AT_KEYWORDS(boundednet)
 AT_CLEANUP
 
 AT_SETUP([Unbounded Net])
 AT_CHECK([cp TESTFILES/unbounded.lola .])
-AT_CHECK([LOLA_BOUNDEDNET unbounded.lola],0,stdout)
+AT_CHECK([LOLA_BOUNDEDNET unbounded.lola],0,stdout,stderr)
 AT_CHECK([GREP -q "net is unbounded!" stdout],0)
+AT_CHECK([GREP -q "4 significant places" stderr], 0)
 AT_KEYWORDS(boundednet)
 AT_CLEANUP
 
@@ -287,27 +305,30 @@ AT_BANNER([Regression Tests])
 
 AT_SETUP([Bug 12922 (https://gna.org/bugs/?12922)])
 AT_CHECK([cp TESTFILES/bug12922.lola .])
-AT_CHECK([LOLA_BOUNDEDNET bug12922.lola],0,stdout)
+AT_CHECK([LOLA_BOUNDEDNET bug12922.lola],0,stdout,stderr)
+AT_CHECK([GREP -q "83 significant places" stderr], 0)
 AT_KEYWORDS(bugs)
 AT_CLEANUP
 
 AT_SETUP([Bug 13988 (https://gna.org/bugs/?13988), AF])
 AT_CHECK([cp TESTFILES/bug13988.lola TESTFILES/bug13988-1.task .])
-AT_CHECK([LOLA_MODELCHECKING bug13988.lola -abug13988-1.task],1,stdout)
+AT_CHECK([LOLA_MODELCHECKING bug13988.lola -abug13988-1.task],1,stdout,stderr)
 AT_CHECK([GREP -q "result: false" stdout],0)
+AT_CHECK([GREP -q "3 significant places" stderr], 0)
 AT_KEYWORDS(bugs)
 AT_CLEANUP
 
 AT_SETUP([Bug 13988 (https://gna.org/bugs/?13988), EF])
 AT_CHECK([cp TESTFILES/bug13988.lola TESTFILES/bug13988-2.task .])
-AT_CHECK([LOLA_MODELCHECKING bug13988.lola -abug13988-2.task],1,stdout)
+AT_CHECK([LOLA_MODELCHECKING bug13988.lola -abug13988-2.task],1,stdout,stderr)
 AT_CHECK([GREP -q "result: false" stdout],0)
+AT_CHECK([GREP -q "3 significant places" stderr], 0)
 AT_KEYWORDS(bugs)
 AT_CLEANUP
 
 AT_SETUP([Bug 15282 (https://gna.org/bugs/?15282)])
 AT_CHECK([cp TESTFILES/bug15282.lola .])
-AT_CHECK([LOLA_STATESPACE bug15282.lola -M],0,stdout)
+AT_CHECK([LOLA_STATESPACE bug15282.lola -M],0,stdout,stderr)
 AT_CHECK([GREP -q "STATE 2 Lowlink: 2" stdout],0)
 AT_KEYWORDS(bugs)
 AT_CLEANUP

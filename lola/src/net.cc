@@ -527,7 +527,7 @@ int main(int argc, char** argv) {
             if (Places[0]->NrSignificant) {
                 Places[0]->NrSignificant = 1;
             }
-            cout << "\n" << Places[0]->NrSignificant << " significant places\n";
+            cerr << "\n" << Places[0]->NrSignificant << " significant places\n";
 #endif
         } catch (overflow) {
             fprintf(stderr, "lola: not enough space to store generating set for symmetries!\n");
@@ -562,7 +562,7 @@ int main(int argc, char** argv) {
             Places[i] = tmpPlace;
         }
         Places[0]->NrSignificant = i;
-        cout << "\n" << Places[0]->NrSignificant << " significant places\n";
+        cerr << "\n" << Places[0]->NrSignificant << " significant places\n";
 #endif
         for (j = 0; j < Places[0]->cnt; ++j) {
             Places[j]-> index = j;

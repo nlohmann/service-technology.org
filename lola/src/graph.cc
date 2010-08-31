@@ -1919,7 +1919,7 @@ return -1;
 #endif
 
 #ifdef DEADTRANSITION
-#define INITIALIZE_PROPERTY initialize_transition;
+#define INITIALIZE_PROPERTY initialize_transition
 #define CHECK_EARLY_ABORTION (CheckTransition -> enabled)
 #define EARLY_ABORT_MESSAGE "transition " << CheckTransition -> name << " is not dead\n"
 #define LATE_ABORT_MESSAGE "transition " << CheckTransition -> name << " is dead\n"

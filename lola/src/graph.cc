@@ -2010,11 +2010,11 @@ unsigned int simple_depth_first() {
 // determined structurally
 // instances of this macros have shape int initialize_*();
 
-int result;
-	if((result = (INITIALIZE_PROPERTY()))>=0)
-	{
-		return result;
-   }
+  int result = INITIALIZE_PROPERTY();
+  if(result >= 0)
+  {
+      return result;
+  }
 
 
 // Insert initial state (already in CurrentMarking) 

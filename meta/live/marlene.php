@@ -1,39 +1,55 @@
 <?php
 
+  // most important script! sets session information and PATH!
   require 'resource/php/session.php';
 
+  // do not call the page without POST request, or only if session is 
+  // already set to Marlene (all information about services available)
   if ( ! isset($_REQUEST) && ! isset($_SESSION["marlene"]))
   {
+    // direct call of this page -> return to main page
     header('Location: index.html#marlene');
     exit;
   }
   else
   {
+    // new request?
     if ( isset($_REQUEST) )
     {
+      // variable example set in request?
       if ( isset($_REQUEST["example"]) )
       {
+        // remember name of example in session
         $_SESSION["marlene"] = $_REQUEST["example"];
+        // interactive example?
         if (!strcmp($_REQUEST["example"], "iRules") || !strcmp($_REQUEST["example"], "iCoffee"))
         {
+          // redirect to interactive example
           header('Location: marlene_interactive.php');
           exit;
         }
         unset($_REQUEST);
+        // redirect to self, make back/forward buttons work without 
+        // resending the request
         header("Location: ".$_SERVER["PHP_SELF"]);
       }
     }
   }
 
+  // some functions for copying/creating files to/in temporary directory
+  // see files.php for further information
   require 'resource/php/files.php';
 
+  // copied from Wendy ;)
   include 'resource/php/console.php';
   include 'resource/php/dotimg.php';
   include 'resource/php/getnumber.php';
 
+  // output header
   header("Content-Type: text/html");
   echo '<?xml version="1.0" encoding="utf-8" ?>';
 
+  // prepare example
   if (!strcmp($_SESSION["marlene"], 'coffee1')) {
     $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");
     $rules = array("marlene/coffee.ar");
@@ -44,11 +60,12 @@
     $rules = array("marlene/coffee.ar");
   }
   
+  // copy files to temporary directory, see files.php for details
   $services = prepareFiles($services);
   $rules = prepareFiles($rules);
 
-
-  // fiona -t adapter myCoffee.owfn myCustomer.owfn -a coffee.ar
+  // prepare strings for system call (realcall) 
+  // and output on console (fakecall)
   $fakecall = "marlene";
   $realcall = "marlene";
   $fakeresult = "";
@@ -104,8 +121,6 @@
       <?php
       foreach($services as $file)
       {
-	// system("petri --removePorts -o dot ".$file["residence"]);
-        // dotimg("in=".urlencode($file["residence"]).".dot&amp;thumbnail_size=400&amp;label=".urlencode($file["basename"]));
         drawImage($file["basename"]);
       }
       ?>

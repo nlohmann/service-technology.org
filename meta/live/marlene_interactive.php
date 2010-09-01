@@ -98,27 +98,6 @@
     <div id="content">
       <h1>Adapter Synthesis</h1>
 
-      <h2>Input Service Models</h2>
-
-      <?php
-      foreach($services as $file)
-      {
-	// system("petri --removePorts -o dot ".$file["residence"]);
-        // dotimg("in=".urlencode($file["residence"]).".dot&amp;thumbnail_size=400&amp;label=".urlencode($file["basename"]));
-        drawImage($file["basename"]);
-      }
-      ?>
-
-
-      <ul>
-<?php
-  foreach($services as $info)
-  {
-    echo "<li><a href=".$info["link"].">".$info["basename"]."</a></li>";
-  }
-?>
-      </ul>
-
       <h2>Diagnosis</h2>
 
       <?php
@@ -169,6 +148,8 @@ $("#more"+infoid).hide();
 -->       
        <table style="width: 80%; margin-left:auto; margin-right:auto; border-width: 2px; border-style: solid; border-color: black;">
 <?PHP
+    $hasAdapter = true;
+
     echo "<tr><th width=\"5%\">type</th>\n";
     echo "<th width=\"43%\">pending messages</th>\n";
     echo "<th width=\"4%\"></th>\n";
@@ -177,17 +158,35 @@ $("#more"+infoid).hide();
   $dll = file($diagfile["residence"]);
   foreach ($dll as $index => $line)
   {
+    $hasAdapter = false;
     // echo $line;
     list($type, $finals, $pending, $required, $rules) = explode(";", $line);
 print<<<END
    
           <tr>
 END;
-    echo "<td width=\"5%\">$type</td>\n";
-    echo "<td width=\"43%\">$pending</td>\n";
-    echo "<td width=\"4%\">&rarr;</td>\n";
-    echo "<td width=\"43%\">$required</td>\n";
-    echo "<td width=\"5%\" onClick='toggle($index)'>more</td>\n";
+    if ( ! strcmp($type, "DL") )
+    {
+      $type = "deadlock";
+    }
+    else if ( ! strcmp($type, "LL") )
+    {
+      $type = "livelock";
+    }
+  
+    $more = LIVEBASE."/resource/images/more.png";
+    echo <<<END
+    <td width="5%">$type</td>
+    <td width="43%">$pending</td>
+    <td width="4%"><!--&rarr;--></td>
+    <td width="43%">$required</td>
+    <td width="5%" onClick='toggle($index)'><img src="$more" alt="toggle" title="More information"/></td>
+END;
+//    echo "<td width=\"5%\">$type</td>\n";
+//    echo "<td width=\"43%\">$pending</td>\n";
+//    echo "<td width=\"4%\"><!--&rarr;--></td>\n";
+//    echo "<td width=\"43%\">$required</td>\n";
+//    echo "<td width=\"5%\" onClick='toggle($index)'><img src=\"".LIVEBASE."/resource/images/more.png\" alt=\"toggle\" title=\"More information\"/></td>\n";
 print<<<END
           </tr>
           <tr>
@@ -240,13 +239,37 @@ END;
 ?>
        </table>
      </div>
-     
-      <?php drawImage($fakeresult); ?>
+
+      <h2>Input Service Models</h2>
+
+      <?php
+      foreach($services as $file)
+      {
+	// system("petri --removePorts -o dot ".$file["residence"]);
+        // dotimg("in=".urlencode($file["residence"]).".dot&amp;thumbnail_size=400&amp;label=".urlencode($file["basename"]));
+        drawImage($file["basename"]);
+      }
+      ?>
+
+
       <ul>
 <?php
-    echo "<li><a href=".getLink($fakeresult).">".basename($fakeresult)."</a></li>";
+  foreach($services as $info)
+  {
+    echo "<li><a href=".$info["link"].">".$info["basename"]."</a></li>";
+  }
 ?>
       </ul>
+     
+<?php
+  if ( $hasAdapter )
+  {
+    drawImage($fakeresult);
+    echo "<ul>";
+    echo "<li><a href=".getLink($fakeresult).">".basename($fakeresult)."</a></li>";
+    echo "</ul>\n";
+  }
+?>
 
       <p>
       	<a href="./#marlene" title="back to reality">Back to live</a>

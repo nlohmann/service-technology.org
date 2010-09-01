@@ -1,14 +1,21 @@
 <?php
 
+  // read configuration file including information on PATH for tools
   require(dirname(__FILE__).'/../../conf/live.conf');
 
+  // debugging, should be removed in later versions for security reasons
   ini_set("display_errors", "On");
   ini_set("session.use_trans_sid", "0");
   error_reporting($_SERVER["SERVER_NAME"] == "localhost" ? E_ALL : 0);
 
+  // set some environment variables
+  // set PATH vor system calls
   putenv("PATH=".LIVEROOT.DEFAULTVERSION."/bin:".ADDITIONALPATH);
+  // set sysconfdir (for .conf files) ?? any effect ??
   putenv("SYSCONFDIR=".LIVEROOT.DEFAULTVERSION."/etc");
+  // set library path, needed right now for Marlene and libconfig++
   putenv("LD_LIBRARY_PATH=/usr/local/lib");
+
 
 function getDirName($uid)
 {
@@ -28,6 +35,7 @@ function getDirName($uid)
   {
     $_SESSION["dir"] = getDirName($_SESSION["uid"]);
   }
+  // if dir does not exist, create it recursively
   if ( ! file_exists( $_SESSION["dir"] ) )
   {
     mkdir( $_SESSION["dir"], 0777, true );

@@ -77,7 +77,7 @@
   $fakecall .= " -r ".$rulefile["basename"];
   $realcall .= " -r ".$rulefile["residence"];
 
-  $realcall .= " --diagnosis --property=livelock --live=".$diagfile["residence"]." -v 2>&1";
+  $realcall .= " --diagnosis --property=livelock --live=".$diagfile["residence"]; //." -v 2>&1";
 
 ?>
 
@@ -101,7 +101,8 @@
       <h2>Diagnosis</h2>
 
       <?php
-        $call_result = console($fakecall, 'cd marlene; echo $PATH; which marlene; echo $LD_LIBRARY_PATH; '.$realcall.' ');
+        // $call_result = console($fakecall, 'cd marlene; echo $PATH; which marlene; echo $LD_LIBRARY_PATH; '.$realcall.' ');
+        $call_result = console($fakecall, 'cd marlene; '.$realcall.' ');
       ?>
     <a name="rules"></a>
     <h3>Rules</h3>
@@ -111,6 +112,9 @@
       <?php
         echo "<textarea style=\"text-align: center;\" name=\"rules\" cols=\"50\" rows=\"10\">".$_SESSION["rules"]."</textarea>";
       ?>
+        <p style="text-align: center"><b>Hint:</b> Rules must have the form:<br/> 
+          <code>message<sub>1</sub>, message<sub>2</sub>, ... -&gt; message<sub>3</sub>, message<sub>4</sub>, ... ;</code><br/>
+          (One side of the arrow may even be empty.)</p>
         <p><input type="submit" value=" Save Rules "><input type="reset" value=" Undo Changes "></p>
      </form>
      </div>

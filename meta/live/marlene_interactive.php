@@ -89,14 +89,14 @@
   <link rel="stylesheet" type="text/css" href="resource/css/console.css" />
   <link rel="shortcut icon" href="resource/favicon.ico" type="image/x-icon" />
   <link rel="icon" href="resource/favicon.ico" type="image/x-icon" />
-  <title>Adapter Synthesis <?php echo $_SESSION["uid"]; ?></title>
+  <title>Marlene - Interactive Retrieval of Transformation Rules <?php //echo $_SESSION["uid"]; ?></title>
   <script type="text/javascript" src="resource/js/jquery-1.2.6.pack.js"></script>
 </head>
 
 <body>
   <div id="container">
     <div id="content">
-      <h1>Adapter Synthesis</h1>
+      <h1>Interactive Retrieval of Transformation Rules</h1>
 
       <h2>Diagnosis</h2>
 

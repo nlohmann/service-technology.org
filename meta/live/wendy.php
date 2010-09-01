@@ -106,6 +106,10 @@
       }
     ?>
     
+    <?php
+    drawImage($inputfilename.'.dot');
+    ?>
+    
     <p><a href="wendy/<?=$output_file?>">result</a></p>
 
     </div>

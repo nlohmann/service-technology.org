@@ -1,5 +1,42 @@
 <?php
 
+/**
+ * Gets an array of file names, copies the files to the working
+ * directory and returns an structured array with information on the 
+ * files:
+ * 
+ *  $a = prepareFiles( array ("foo/file1.bla", "bar/file2.blob") );
+ * 
+ *  $a => (
+              [foo/file1] => Array
+                  (
+                      // original dirname
+                      [dirname] => foo
+                      // full filename
+                      [basename] => file1.bla
+                      // file extension
+                      [extension] => bla
+                      // filename without extension
+                      [filename] => file1
+                      // actual place in working directory (based on session id)
+                      [residence] => /tmp/live/12ea9bc4df7609ee32f88a07a2714220/file1.bla
+                      // link for downloading file
+                      [link] => /live/getfile.php?file=file1.bla&amp;id=12ea9bc4df7609ee32f88a07a2714220
+                  )
+
+              [bar/file2.blob] => Array
+                  (
+                      [dirname] => bar
+                      [basename] => file2.blob
+                      [extension] => blob
+                      [filename] => file2
+                      [residence] => /tmp/live/12ea9bc4df7609ee32f88a07a2714220/file2.blob
+                      [link] => /live/getfile.php?file=file2.blob&amp;id=12ea9bc4df7609ee32f88a07a2714220
+                  )
+
+          )
+ */
+ 
 function prepareFiles($fileArray)
 {
   $result = array();
@@ -18,7 +55,11 @@ function prepareFiles($fileArray)
 
   return $result;
 }
-
+ /**
+  * Similar to prepareFiles, but instead of copying an array of files,
+  * one single file is created.
+  * Return value as above.
+  */
 function createFile($file)
 {
   $result = array();
@@ -37,12 +78,14 @@ function createFile($file)
   return $result;
 }
 
+// create a string representing the URI for downloading a file
 function getLink($file)
 {
   return LIVEBASE."getfile.php?file=".urlencode(basename($file))."&amp;id=".urlencode($_SESSION["uid"]);
 }
 
-
+// function, which creates an image for a $file and actually writes some HTML code
+// rest of the funtionality inside getimage.php
 function drawImage($file)
 {
   static $imagecounter = 0;

@@ -96,6 +96,7 @@
   $realcall .= " -r ".$rulefile["residence"];
 
   $realcall .= " -v 2>&1";
+  // end of building call strings
 
 ?>
 
@@ -107,7 +108,7 @@
   <link rel="stylesheet" type="text/css" href="resource/css/console.css" />
   <link rel="shortcut icon" href="resource/favicon.ico" type="image/x-icon" />
   <link rel="icon" href="resource/favicon.ico" type="image/x-icon" />
-  <title>Adapter Synthesis <?php echo $_SESSION["uid"]; ?></title>
+  <title>Marlene - making adapters behave well <!--<?php echo $_SESSION["uid"]; ?>--></title>
   <script type="text/javascript" src="resource/js/jquery-1.2.6.pack.js"></script>
 </head>
 
@@ -118,6 +119,7 @@
 
       <h2>Input Service Models</h2>
 
+      <!-- draw images of services -->
       <?php
       foreach($services as $file)
       {
@@ -126,26 +128,31 @@
       ?>
 
 
+      <!-- provide links for downloading services -->
       <ul>
-<?php
-  foreach($services as $info)
-  {
-    echo "<li><a href=".$info["link"].">".$info["basename"]."</a></li>";
-  }
-?>
+      <?php
+        foreach($services as $info)
+        {
+          echo "<li><a href=".$info["link"].">".$info["basename"]."</a></li>";
+        }
+      ?>
       </ul>
 
       <h2>Synthesized Adapter</h2>
 
       <?php
+        // call console
         $call_result = console($fakecall, 'cd marlene; '.$realcall.' ');
       ?>
 
+      <!-- draw image of adapter -->
       <?php drawImage($fakeresult); ?>
+
+      <!-- provide link for downloading adapter -->
       <ul>
-<?php
-    echo "<li><a href=".getLink($fakeresult).">".basename($fakeresult)."</a></li>";
-?>
+      <?php
+          echo "<li><a href=".getLink($fakeresult).">".basename($fakeresult)."</a></li>";
+      ?>
       </ul>
 
       <p>
@@ -156,3 +163,4 @@
 </body>
 
 </html>
+

@@ -8,18 +8,23 @@
 			http://service-technology.org/hello
 
 
-Version 1.0-unreleased (32 October 2009)
-========================================
+Version 1.1-unreleased
+======================
+
+* updated PNAPI and ST-macros
+
+Version 1.0 (33 October 2009)
+=============================
 
 * first release of Hello
 
-* normalizes a net and pipes the result to Wendy.
+* <<- normalizes a net and pipes the result to Wendy. ->>
 
 * <<- CHANGES ->>
 
 
-Version 0.0-unreleased (32 October 2009)
-========================================
+Version 0.0 (32 October 2009)
+=============================
 
 
 

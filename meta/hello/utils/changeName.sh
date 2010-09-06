@@ -82,8 +82,6 @@ changeit ./src/verbose.h
 changeit ./src/wendy_lexic.ll
 changeit ./src/wendy_syntax.yy
 
-changeit ./man/extra
-
 changeit ./doc/ChangeLog.texi
 changeit ./doc/Makefile.am
 
@@ -102,8 +100,7 @@ echo "...done"
 # ...is this really necessary???
 echo "doing a <chmod 775> on all shell-scripts..."
 find . -name *.sh -exec chmod 775 {} \;
-# this one might be necessary...
-chmod 775 ./tests/lcov/lcov
 echo "...done"
 
 echo "Job done! Bye bye!"
+

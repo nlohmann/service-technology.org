@@ -1,10 +1,9 @@
 AT_INIT
+AT_COLOR_TESTS
 
 # <<-- CHANGE START (tests) -->>
 
 m4_define(AT_CHECK_WENDY, [AT_CHECK([if test "WENDY" == ""; then exit 77; fi])])
-
-AT_TESTED(versions.sh)
 
 ############################################################################
 AT_BANNER([Basic Options])

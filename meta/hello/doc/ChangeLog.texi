@@ -1,5 +1,10 @@
 @c <<-- CHANGE START (version information) -->>
-@heading Version 1.0-unreleased (33 October 2009)
+@heading Version 1.1-unreleased
+@itemize
+@item updated PNAPI and ST-macros
+@end itemize
+
+@heading Version 1.0 (33 October 2009)
 @itemize
 @item first release of Hello
 
@@ -9,5 +14,5 @@
 
 @end itemize
 
-@heading Version 0.0-unreleased (32 October 2009)
+@heading Version 0.0 (32 October 2009)
 @c <<-- CHANGE END -->>

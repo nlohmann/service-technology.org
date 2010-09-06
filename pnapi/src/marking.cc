@@ -24,16 +24,98 @@ using std::map;
 namespace pnapi
 {
 
+/*!
+ * \brief the value "omega"
+ */
+const UnsignedOmegaInt UnsignedOmegaInt::OMEGA(true);
+
+/*!
+ * \brief standard constructor
+ */
+UnsignedOmegaInt::UnsignedOmegaInt() :
+  isOmega_(false), value_(0)
+{
+}
+
+/*!
+ * \brief copy constructor
+ */
+UnsignedOmegaInt::UnsignedOmegaInt(const UnsignedOmegaInt & cc) :
+  isOmega_(cc.isOmega_), value_(cc.value_)
+{
+}
+
+/*!
+ * \brief construction from unsigned int
+ */
+UnsignedOmegaInt::UnsignedOmegaInt(unsigned int i) :
+  isOmega_(false), value_(i)
+{
+}
+
+/*!
+ * \brief omega contructor
+ */
+UnsignedOmegaInt::UnsignedOmegaInt(bool isOmega) :
+  isOmega_(isOmega), value_(0)
+{
+}
+
+/*!
+ * \brief assignement operator
+ */
+UnsignedOmegaInt & UnsignedOmegaInt::operator=(const UnsignedOmegaInt & cc)
+{
+  isOmega_ = cc.isOmega_;
+  value_ = cc.value_;
+  return *this;
+}
+
+/*!
+ * \brief assignement operator
+ */
+UnsignedOmegaInt & UnsignedOmegaInt::operator=(unsigned int i)
+{
+  isOmega_ = false;
+  value_ = i;
+  return *this;
+}
+
+/*!
+ * \brief comparison operator
+ */
+bool UnsignedOmegaInt::operator==(const UnsignedOmegaInt & other) const
+{
+  return ((isOmega_ == other.isOmega_) && (value_ == other.value_));
+}
+
+/*!
+ * \brief implicit cast to unsigned int
+ * 
+ * This cast allows application of all unsigned int arithmetics to this type.
+ * 
+ * \note If omega is to be casted, an exception will be thrown
+ */
+UnsignedOmegaInt::operator unsigned int() const
+{
+  PNAPI_ASSERT_USER((!isOmega_), "can not cast Omega to unsigned int", exception::UserCausedError::UE_OMEGA_CAST_ERROR);
+  return value_;
+}
+
 /****************************************************************************
  *** Class Marking Function Definitions
  ***************************************************************************/
+
+/// omega
+const UnsignedOmegaInt & OmegaMarking::OMEGA = UnsignedOmegaInt::OMEGA;
 
 /*!
  * \brief   Standard Constructor
  *
  * \note This constructor does not instantiate a Petri net object.
  */
-Marking::Marking() : net_(NULL)
+Marking::Marking() :
+  AbstractMarking<unsigned int>()
 {
 }
 
@@ -48,12 +130,8 @@ Marking::Marking() : net_(NULL)
  *               instead of reading marking from n
  */
 Marking::Marking(PetriNet & n, bool empty) :
-  net_(&n)
+  AbstractMarking<unsigned int>(n, empty)
 {
-  PNAPI_FOREACH(p, n.getPlaces())
-  {
-    m_[*p] = empty ? 0 : ((*p)->getTokenCount());
-  }
 }
 
 
@@ -63,7 +141,7 @@ Marking::Marking(PetriNet & n, bool empty) :
  * \param   m the other Marking
  */
 Marking::Marking(const Marking & m) :
-  m_(m.m_), net_(m.net_)
+  AbstractMarking<unsigned int>(m)
 {
 }
 
@@ -71,8 +149,8 @@ Marking::Marking(const Marking & m) :
 /*!
  * \brief   Another constructor.
  */
-Marking::Marking(std::map<const Place *, unsigned int> m, PetriNet * net) :
-  m_(m), net_(net)
+Marking::Marking(const std::map<const Place *, unsigned int> & m, PetriNet * net) :
+  AbstractMarking<unsigned int>(m, net)
 {
 }
 
@@ -80,49 +158,18 @@ Marking::Marking(std::map<const Place *, unsigned int> m, PetriNet * net) :
  * \brief constructor for cross-net-copying
  */
 Marking::Marking(const Marking & m, PetriNet * net, 
-                  std::map<const Place *, const Place *> & placeMap) :
-  net_(net)
+                 const std::map<const Place *, const Place *> & placeMap) :
+  AbstractMarking<unsigned int>(m, net, placeMap)
 {
-  PNAPI_FOREACH(it, m.m_)
-  {
-    m_[placeMap[it->first]] = it->second;
-  }
 }
-
-
+  
 /*!
- * \brief   Returns the map..
+ * \brief   overloaded assignment operator
  */
-const std::map<const Place *, unsigned int> & Marking::getMap() const
+Marking & Marking::operator=(const Marking & m)
 {
-  return m_;
-}
-
-
-/*!
- * \brief   Returns the Petri net laying under the marking
- */
-PetriNet & Marking::getPetriNet() const
-{
-  return *net_;
-}
-
-std::map<const Place *, unsigned int>::const_iterator Marking::begin() const
-{
-  return m_.begin();
-}
-
-std::map<const Place *, unsigned int>::const_iterator Marking::end() const
-{
-  return m_.end();
-}
-
-/*!
- * \brief   Returns the size of the Marking
- */
-unsigned int Marking::size() const
-{
-  return m_.size();
+  *static_cast<AbstractMarking<unsigned int> *>(this) = m;
+  return *this;
 }
 
 
@@ -181,53 +228,130 @@ Marking & Marking::getSuccessor(const Transition & t) const
 
 
 /*!
- * \brief   overloaded operator [] for Markings
+ * \brief   Standard Constructor
+ *
+ * \note This constructor does not instantiate a Petri net object.
  */
-unsigned int & Marking::operator [](const Place & offset)
+PlaceIndexVector::PlaceIndexVector() :
+  AbstractMarking<int>()
 {
-  return m_[&offset];
-}
-
-/*!
- * \brief   overloaded operator [] for Markings
- */
-unsigned int Marking::operator[](const Place & p) const
-{
-  map<const Place *, unsigned int>::const_iterator it = m_.find(&p); 
-
-  return ((it == m_.end()) ? 0 : it->second);
 }
 
 
 /*!
- * \brief   overloaded operator == for Markings
+ * \brief   Constructor for PlaceIndexVector class
+ *
+ * Reads marking from the Petri net.
+ *
+ * \param n underlying petri net      
+ * \param empty  if true, initialize PlaceIndexVector to empty PlaceIndexVector
+ *               instead of reading marking from n
  */
-bool Marking::operator==(const Marking & m) const
+PlaceIndexVector::PlaceIndexVector(PetriNet & n, bool empty) :
+  AbstractMarking<int>(n, empty)
 {
-  return (m_ == m.getMap());
 }
 
 
+/*!
+ * \brief   Copy-constructor for PlaceIndexVector class
+ *
+ * \param   m the other PlaceIndexVector
+ */
+PlaceIndexVector::PlaceIndexVector(const PlaceIndexVector & m) :
+  AbstractMarking<int>(m)
+{
+}
+
+
+/*!
+ * \brief   Another constructor.
+ */
+PlaceIndexVector::PlaceIndexVector(const std::map<const Place *, int> & m, PetriNet * net) :
+  AbstractMarking<int>(m, net)
+{
+}
+
+/*!
+ * \brief constructor for cross-net-copying
+ */
+PlaceIndexVector::PlaceIndexVector(const PlaceIndexVector & m, PetriNet * net, 
+                                   const std::map<const Place *, const Place *> & placeMap) :
+  AbstractMarking<int>(m, net, placeMap)
+{
+}
+  
 /*!
  * \brief   overloaded assignment operator
  */
-Marking & Marking::operator=(const Marking & m)
+  PlaceIndexVector & PlaceIndexVector::operator=(const PlaceIndexVector & m)
 {
-  PNAPI_ASSERT(this != &m);
-  
-  m_ = std::map<const Place *, unsigned int>(); // fixing cppcheck error
-  this->~Marking();
-  return *new (this) Marking(m);
+  *static_cast<AbstractMarking<int> *>(this) = m;
+  return *this;
 }
 
 
 /*!
- * \brief   clears the marking
+ * \brief   Standard Constructor
+ *
+ * \note This constructor does not instantiate a Petri net object.
  */
-void Marking::clear()
+OmegaMarking::OmegaMarking() :
+  AbstractMarking<UnsignedOmegaInt>()
 {
-  m_.clear();
 }
 
+
+/*!
+ * \brief   Constructor for Omega marking class
+ *
+ * Reads marking from the Petri net.
+ *
+ * \param n underlying petri net      
+ * \param empty  if true, initialize Omega marking to empty marking
+ *               instead of reading marking from n
+ */
+OmegaMarking::OmegaMarking(PetriNet & n, bool empty) :
+  AbstractMarking<UnsignedOmegaInt>(n, empty)
+{
+}
+
+
+/*!
+ * \brief   Copy-constructor for Omega marking class
+ *
+ * \param   m the other OmegaMarking
+ */
+OmegaMarking::OmegaMarking(const OmegaMarking & m) :
+  AbstractMarking<UnsignedOmegaInt>(m)
+{
+}
+
+
+/*!
+ * \brief   Another constructor.
+ */
+OmegaMarking::OmegaMarking(const std::map<const Place *, UnsignedOmegaInt> & m, PetriNet * net) :
+  AbstractMarking<UnsignedOmegaInt>(m, net)
+{
+}
+
+/*!
+ * \brief constructor for cross-net-copying
+ */
+OmegaMarking::OmegaMarking(const OmegaMarking & m, PetriNet * net, 
+                           const std::map<const Place *, const Place *> & placeMap) :
+  AbstractMarking<UnsignedOmegaInt>(m, net, placeMap)
+{
+}
+  
+/*!
+ * \brief   overloaded assignment operator
+ */
+OmegaMarking & OmegaMarking::operator=(const OmegaMarking & m)
+{
+  *static_cast<AbstractMarking<UnsignedOmegaInt> *>(this) = m;
+  return *this;
+}
 
 } /* namespace pnapi */

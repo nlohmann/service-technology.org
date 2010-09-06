@@ -18,6 +18,10 @@ Version 4.03-unreleased
 * added reduction option SET_MURATA and front end parameter option
   -reduce=murata
 
+* added arithmetic and comparison operators to Marking class
+
+* introduced classes PlaceIndexVector and OmegaMarking
+
 Version 4.02 (2010-07-28)
 =========================
 

@@ -2,7 +2,6 @@
 html, body {
 	margin:0;
 	padding:0;
-	height:100%; /* needed for container min-height */
 	background:gray;
 }
 
@@ -15,17 +14,14 @@ html, body {
 	height:100%; /* IE6: treaded as min-height*/
 	min-height:100%; /* real browsers */
 	
-  border-left-color: #000;
-  border-left-style: solid;
-  border-left-width: 1px;
-  border-right-color: #000;
-  border-right-style: solid;
-  border-right-width: 1px;
+  border-color: #000;
+  border-style: solid;
+  border-width: 1px;
 }
 
 #content {
   padding: 10px;
-  padding-bottom: 48px;
+  padding-bottom: 20px;
 }
 
 #footer {
@@ -48,8 +44,8 @@ ul {
 }
 
 body {
-  font-family: tahoma, sans-serif;
-  font-size: 10pt;
+  font-family: Tahoma, sans-serif;
+  font-size: 0.7em;
   color: #444;
 }
 
@@ -98,21 +94,6 @@ label:hover {
     color: #000;
 }
 
-div#tabs {
-  width: 800px;
-}
-
-div#bpel2owfn.ui-tabs-panel,
-div#fiona.ui-tabs-panel,
-div#wendy.ui-tabs-panel,
-div#migration.ui-tabs-panel,
-div#rachel.ui-tabs-panel,
-div#pnog.ui-tabs-panel,
-div#adapter.ui-tabs-panel {
-  background: #EEE;
-  width: 800px;
-}
-
 div#running {
   width: 250px;
   background: #EEE;
@@ -152,4 +133,8 @@ div#running img {
 
 .dotimg .label {
   padding-top: 10px;
+}
+
+div#tabs {
+  background: #efefef;
 }

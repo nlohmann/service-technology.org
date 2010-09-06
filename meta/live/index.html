@@ -3,168 +3,100 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-  <title>Service Technology as a Service</title>
+  <title>service-technology.org/live</title>
 
   <link rel="shortcut icon" href="resource/favicon.ico" type="image/x-icon" />
   <link rel="icon" href="resource/favicon.ico" type="image/x-icon" />
-
   <link rel="stylesheet" type="text/css" href="resource/css/format.css" />
-  <link rel="stylesheet" type="text/css" href="resource/css/layout_tabs.css" />
+  <link rel="stylesheet" type="text/css" href="resource/css/smoothness/jquery-ui-1.8.4.custom.css" />
 
-  <script type="text/javascript" src="resource/js/jquery-1.2.6.pack.js"></script>
-  <script type="text/javascript" src="resource/js/ui.core.js"></script>
-  <script type="text/javascript" src="resource/js/ui.tabs.js"></script>
-
+  <script type="text/javascript" src="resource/js/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="resource/js/jquery-ui-1.8.4.custom.min.js"></script>
   <script type="text/javascript">
-    $(document).ready(function(){
-      $("#tabs > ul").tabs();
-    });
+  $(function(){
+    $("#tabs").tabs();
+  });
   </script>
 </head>
 
 <body>
   <div id="container">
     <div id="content">
-      
-      <h1>Service Technology as a Service</h1>
+      <img src="resource/images/live.png" alt="service-technology.org/live" />
 
-      <div id="tabs" class="flora">
+      <div id="tabs">
         <ul>
-          <li><a href="#bpel2owfn"><span>BPEL2oWFN</span></a></li>
-          <li><a href="#fiona"><span>Fiona</span></a></li>
-          <li><a href="#wendy"><span>Wendy</span></a></li>
-          <li><a href="#rachel"><span>Rachel</span></a></li>
-          <!--<li><a href="#adapter"><span>Adapter Synthesis</span></a></li>-->
+          <li><a href="#bpel2owfn"><span>Service Formalization</span></a></li>
+          <li><a href="#wendy"><span>Partner Synthesis</span></a></li>
+          <li><a href="#rachel"><span>Service Correction</span></a></li>
           <li><a href="#marlene"><span>Adapter Synthesis</span></a></li>
           <li><a href="#pnog"><span>Petri Net OG</span></a></li>
           <li><a href="#migration"><span>Instance Migration</span></a></li>
+          <li><a href="#matching"><span>Service Matching</span></a></li>
+          <li><a href="#lola"><span>Petri Net Verification</span></a></li>
+          <li><a href="#soundness"><span>Business Process Soundness Check</span></a></li>
         </ul>
-      </div>
 
-      <div id="bpel2owfn">
-        <form action="bpel2owfn.php" method="post" enctype="multipart/form-data">
-          <fieldset>
-            <legend>Input BPEL Process</legend>
-            <input type="radio" name="input" value="given" checked="checked" id="bpel2owfn_given" /><label for="bpel2owfn_given"> Use a given BPEL process:</label>
-            <select name="input_service" size="1">
-              <optgroup label="WS-BPEL Specification">
-                <option value="auctionService">Auction Service</option>
-                <option value="loanApprovalProcess">Loan Approval Process</option>
-                <option value="OrderingServiceProcess">Ordering Service Process</option>
-                <option value="purchaseOrderProcess">Purchase Order Process</option>
-                <option value="shippingService">Shipping Service</option>
-              </optgroup>
-            </select><br />
-            <input type="radio" name="input" value="file" id="bpel2owfn_file" /><label for="bpel2owfn_file"> Use an uploaded BPEL process:</label><input name="input_file" type="file" accept="text/*" /><br/>
-            <input type="radio" name="input" value="url" id="bpel2owfn_url" /><label for="bpel2owfn_url"> Use a BPEL process from a URL:</label><input name="input_url" type="text" size="30" placeholder="enter URL of BPEL process" /><br />
-            <p>
-              Note that uploaded files or files given as URL will be stored on our server for at most 24 hours. They will, however, not be accessible by  other users.
-            </p>
-          </fieldset>
+        <div id="bpel2owfn">
+          <h1>Service Formalization</h1>
+          <p>To formally analyze a WS-BPEL process, it has to be translated into a formal model. For this, we use Petri nets. The tool <a href="http://service-technology.org/bpel2owfn">BPEL2oWFN</a> realizes this translation and implements a feature-complete Petri net semantics for WS-BPEL.</p>
+          <form action="bpel2owfn.php" method="post" enctype="multipart/form-data">
+            <fieldset>
+              <legend>Input WS-BPEL Process</legend>
+              <input type="radio" name="input_type" value="example" checked="checked" id="bpel2owfn_example" /><label for="bpel2owfn_example"> Use an example WS-BPEL process: 
+              <select name="input_example" size="1">
+                <optgroup label="WS-BPEL Specification">
+                  <option value="auctionService">Auction Service</option>
+                  <option value="loanApprovalProcess">Loan Approval Process</option>
+                  <option value="OrderingServiceProcess">Ordering Service Process</option>
+                  <option value="purchaseOrderProcess">Purchase Order Process</option>
+                  <option value="shippingService">Shipping Service</option>
+                </optgroup>
+              </select></label><br />
+              <input type="radio" name="input_type" value="uploaded" id="bpel2owfn_uploaded" /><label for="bpel2owfn_uploaded"> Use an uploaded WS-BPEL process: <input name="input_uploaded" type="file" accept="text/*" /></label><br/>
+              <input type="radio" name="input_type" value="url" id="bpel2owfn_url" /><label for="bpel2owfn_url"> Use a WS-BPEL process from a URL: <input name="input_url" type="text" size="30" placeholder="enter URL of WS-BPEL process" /></label><br />
+              <input type="radio" name="input_type" value="given" id="bpel2owfn_given" /><label for="bpel2owfn_given"> Use a given WS-BPEL process: <textarea name="input_given" type="text" cols="30" rows="1" placeholder="enter a WS-BPEL process"></textarea></label>
+            </fieldset>
 
-          <fieldset>
-            <legend>Petri Net Patterns</legend>
-            <input type="radio" name="patterns" value="small" checked="checked" id="bpel2owfn_patterns_small" /><label for="bpel2owfn_patterns_small"> Use small patterns (no fault or compensation handling)</label><br />
-            <input type="radio" name="patterns" value="standardfaults" id="bpel2owfn_patterns_standardfaults" /><label for="bpel2owfn_patterns_standardfaults"> Use complete patterns</label>
-          </fieldset>
+            <fieldset>
+              <legend>Petri Net Patterns</legend>
+              <input type="radio" name="patterns" value="small" checked="checked" id="bpel2owfn_patterns_small" /><label for="bpel2owfn_patterns_small"> Use small patterns (no fault, compensation, or termination handling)</label><br />
+              <input type="radio" name="patterns" value="standardfaults" id="bpel2owfn_patterns_standardfaults" /><label for="bpel2owfn_patterns_standardfaults"> Use complete patterns</label><br />
+              Apply structural reduction rules: 
+              <select name="reduce" size="1">
+                <option value="0">no rules</option>
+                <option value="1">remove structurally dead nodes</option>
+                <option value="2">remove unused status places</option>
+                <option value="3">remove identical nodes</option>
+                <option value="4">remove serial nodes</option>
+                <option value="5">remove self-loop nodes</option>
+              </select>
+            </fieldset>
 
-          <fieldset>
-            <legend>Output File Format</legend>
-            <input type="radio" name="format" value="owfn" checked="checked" /> Create a Fiona open net<br />
-            <input type="radio" name="format" value="lola" /> Create a LoLA Petri net
-          </fieldset>
+            <fieldset>
+              <legend>Output File Format</legend>
+              <input type="radio" name="format" value="owfn" checked="checked" id="bpel2owfn_format_owfn" /><label for="bpel2owfn_format_owfn"> Create an open net (with interface)</label><br />
+              <input type="radio" name="format" value="lola"  id="bpel2owfn_format_lola" /><label for="bpel2owfn_format_lola"> Create a LoLA Petri net (without interface)</label>
+            </fieldset>
 
-          <fieldset>
-            <legend>Translation Options</legend>
-            Apply structural reduction rules: 
-            <select name="reduce" size="1">
-              <option value="0">no rules</option>
-              <option value="1">remove structurally dead nodes</option>
-              <option value="2">remove unused status places</option>
-              <option value="3">remove identical nodes</option>
-              <option value="4">remove serial nodes</option>
-              <option value="5">remove self-loop nodes</option>
-            </select>
-          </fieldset>
+            <fieldset>
+              <legend>Output Presentation</legend>
+              <input type="radio" name="output" value="full" checked="checked" id="bpel2owfn_output_full" /><label for="bpel2owfn_output_full"> Display verbose output page</label><br />
+              <input type="radio" name="output" value="result" id="bpel2owfn_output_result" /><label for="bpel2owfn_output_result"> Display output file only</label><br />
+            </fieldset>
 
-          <fieldset>
-            <legend>Output</legend>
-            <input type="radio" name="output" value="full" checked="checked" /> Display full translation output (output file and graphics)<br />
-            <input type="radio" name="output" value="result" /> Display output file only<br />
-          </fieldset>
-
-          <p><input type="submit" value="run BPEL2oWFN" /></p>
-        </form>
-      </div>
-
-      <div id="fiona">
-        <form action="fiona.php" method="post" enctype="multipart/form-data">
-          <fieldset>
-            <legend>Input Open Net</legend>
-            <input type="radio" name="input" value="given" checked="checked" /> Use a given open net:
-            <select name="input_service" size="1">
-              <optgroup label="Examples">
-                <option value="06-03-23_BPM06_shop_sect_3">BPM 2006 Online Shop 1</option>
-                <option value="06-03-23_BPM06_shop_sect_6">BPM 2006 Online Shop 2</option>
-                <option value="dke07_shop_sect_3">DKE 2008 Online Shop 1</option>
-                <option value="dke07_shop_sect_6">DKE 2008 Online Shop 2</option>
-                <option value="myCoffee">Coffee Vending Machine</option>
-              </optgroup>
-              <optgroup label="Academic Examples">
-                <option>sequence3</option>
-                <option>sequence4</option>
-                <option>sequence5</option>
-                <option>sequence6</option>
-                <option>sequence7</option>
-                <option>sequence8</option>
-                <option>sequence9</option>
-                <option>sequence10</option>
-                <option>sequence11</option>
-                <option>sequence12</option>
-                <option>sequence13</option>
-                <option>sequence14</option>
-                <option>sequence15</option>
-                <option>sequence16</option>
-                <option>sequence17</option>
-                <option>sequence18</option>
-                <option>sequence19</option>
-                <option>sequence20</option>
-                <option value="phcontrol3.unf">phcontrol3</option>
-              </optgroup>
-            </select><br/>
-            <input type="radio" name="input" value="file" /> Use an uploaded open net: <input name="input_file" type="file" accept="text/*" /><br/>
-            <input type="radio" name="input" value="url" /> Use an open net from a URL: <input name="input_url" type="text" size="30" placeholder="enter URL of open net" /><br />
-            <p>Note that uploaded files or files given as URL will be stored on our server for at most 24 hours. They will, however, not be accessible by other users.</p>
-          </fieldset>
-
-          <fieldset>
-            <legend>Verification Goal</legend>
-            <input type="radio" name="mode" value="og" checked="checked" /> Calculate the operating guidelines<br />
-            <input type="radio" name="mode" value="ig" /> Calculate the interaction graph
-          </fieldset>
-
-          <fieldset>
-            <legend>Verification Options</legend>
-            <input type="checkbox" name="reduce" value="yes" /> Apply reduction techniques<br />
-            <input type="checkbox" name="responsive" value="yes" /> Create responsive partners
-          </fieldset>
-
-          <fieldset>
-            <legend>Output</legend>
-            <input type="radio" name="output" value="full" checked="checked" /> Display full verification output (output file and graphics)<br />
-            <input type="radio" name="output" value="result" /> Display output file only
-          </fieldset>
-
-          <p><input type="submit" value="run Fiona" /></p>
-        </form>
-      </div>
+            <p><input type="submit" value="submit" /> <input type="reset" value="reset"></p>
+          </form>
+        </div>
 
       <div id="wendy">
+        <h1>Partner Synthesis</h1>
+        <p>To make a statement about the correctness of a service, partner services are extremely helpful. They describe the communication protocol of possible customer. The tool <a href="http://service-technology.org/wendy">Wendy</a> synthesizes partners for services.</p>
         <form action="wendy.php" method="post" enctype="multipart/form-data">
           <fieldset>
             <legend>Input Open Net</legend>
-            <input type="radio" name="input" value="given" checked="checked" id="wendy_given" /><label for="wendy_given"> Use a given open net:
-            <select name="input_service" size="1">
+            <input type="radio" name="input_type" value="example" checked="checked" id="wendy_example" /><label for="wendy_example"> Use a given open net:
+            <select name="input_example" size="1">
               <optgroup label="Examples">
                 <option value="06-03-23_BPM06_shop_sect_3">BPM 2006 Online Shop 1</option>
                 <option value="06-03-23_BPM06_shop_sect_6">BPM 2006 Online Shop 2</option>
@@ -193,54 +125,44 @@
                 <option value="phcontrol3.unf">phcontrol3</option>
               </optgroup>
             </select></label><br/>
-            <input type="radio" name="input" value="file" id="wendy_file" />
-            <label for="wendy_file"> Use an uploaded open net: <input name="input_file" type="file" accept="text/*" /></label><br/>
-            <input type="radio" name="input" value="url" id="wendy_url" />
-            <label for="wendy_url"> Use an open net from a URL: <input name="input_url" type="text" size="30" placeholder="enter URL of open net" /></label>
-
-            <p>Note that uploaded files or files given as URL will be stored on our server for at most 24 hours. They will, however, not be accessible by other users.</p>
+            <input type="radio" name="input_type" value="uploaded" id="wendy_uploaded" /><label for="wendy_uploaded"> Use an uploaded open net: <input name="input_uploaded" type="file" accept="text/*" /></label><br/>
+            <input type="radio" name="input_type" value="url" id="wendy_url" /><label for="wendy_url"> Use an open net from a URL: <input name="input_url" type="text" size="30" placeholder="enter URL of open net" /></label><br />
+            <input type="radio" name="input_type" value="given" id="wendy_given" /><label for="wendy_given"> Use a given open net: <textarea name="input_given" type="text" cols="30" rows="1" placeholder="enter an open net"></textarea></label>
           </fieldset>
 
           <fieldset>
             <legend>Verification Goal</legend>
-            <input type="radio" name="mode" value="og" id="wendy_og" checked="checked" />
-            <label for="wendy_og"> Calculate the operating guidelines (characterization of all partners)</label><br />
-            <input type="radio" name="mode" value="ig" id="wendy_ig" />
-            <label for="wendy_ig"> Synthesize a partner (compatible by design)</label>
+            <input type="radio" name="mode" value="og" id="wendy_og" checked="checked" /><label for="wendy_og"> Calculate the operating guidelines (characterization of all partners)</label><br />
+            <input type="radio" name="mode" value="ig" id="wendy_ig" /><label for="wendy_ig"> Synthesize a partner (compatible by design)</label>
           </fieldset>
 
           <fieldset>
             <legend>Reduction Rules</legend>
-            <input type="checkbox" name="reduce_wait" value="yes" id="wendy_reduce_wait" />
-            <label for="wendy_reduce_wait"> Only consider waitstates when calculating successors</label><br />
-            <input type="checkbox" name="reduce_reic" value="yes" id="wendy_reduce_reic" />
-            <label for="wendy_reduce_reic"> Only send if receiving does not resolve all waitstates</label><br />
-            <input type="checkbox" name="reduce_sequ" value="yes" id="wendy_reduce_sequ" />
-            <label for="wendy_reduce_sequ"> Sequentialize receiving events</label><br />
-            <input type="checkbox" name="reduce_succ" value="yes" id="wendy_reduce_succ" />
-            <label for="wendy_reduce_succ"> One succeeding sending event is enough</label><br />
-            <input type="checkbox" name="reduce_quit" value="yes" id="wendy_reduce_quit" />
-            <label for="wendy_reduce_quit"> Once all waitstates of a knowledge are resolved, no more successor knowledges are calculated</label><br />
+            <input type="checkbox" name="reduce_wait" value="yes" id="wendy_reduce_wait" /><label for="wendy_reduce_wait"> Only consider waitstates when calculating successors</label><br />
+            <input type="checkbox" name="reduce_reic" value="yes" id="wendy_reduce_reic" /><label for="wendy_reduce_reic"> Only send if receiving does not resolve all waitstates</label><br />
+            <input type="checkbox" name="reduce_sequ" value="yes" id="wendy_reduce_sequ" /><label for="wendy_reduce_sequ"> Sequentialize receiving events</label><br />
+            <input type="checkbox" name="reduce_succ" value="yes" id="wendy_reduce_succ" /><label for="wendy_reduce_succ"> One succeeding sending event is enough</label><br />
+            <input type="checkbox" name="reduce_quit" value="yes" id="wendy_reduce_quit" /><label for="wendy_reduce_quit"> Once all waitstates of a knowledge are resolved, no more successor knowledges are calculated</label><br />
           </fieldset>
 
           <fieldset>
-            <legend>Output</legend>
-            <input type="radio" name="output" value="full" checked="checked" id="wendy_full" />
-            <label for="wendy_full"> Display full verification output (output file and graphics)</label><br />
-            <input type="radio" name="output" value="result" id="wendy_result" />
-            <label for="wendy_result"> Display output file only</label>
+            <legend>Output Presentation</legend>
+            <input type="radio" name="output" value="full" checked="checked" id="wendy_output_full" /><label for="wendy_output_full"> Display verbose output page</label><br />
+            <input type="radio" name="output" value="result" id="wendy_output_result" /><label for="wendy_output_result"> Display output file only</label><br />
           </fieldset>
 
-          <p><input type="submit" value="run Wendy" /></p>
+          <p><input type="submit" value="submit" /> <input type="reset" value="reset"></p>
         </form>
       </div>
 
       <div id="rachel">
+        <h1>Service Correction</h1>
+        <p>In case a service choreography deadlocks, it is sometimes possible to blame a single participant for this global error. Then, a local change to this service can resolve the deadlock. The tool <a href="http://service-technology.org/rachel">Rachel</a> can propose minimal correction steps of the faulty service.</p>
         <form action="rachel.php" method="post" enctype="multipart/form-data">
           <fieldset>
             <legend>Service Choreography</legend>
             Use a given choreography: 
-            <select name="chor" size="1">
+            <select name="input_example" size="1">
               <optgroup label="Case Study for BPM 2008">
                 <option value="running_example">Running Example (Traveler, Travel Agency, Airline)</option>
                 <option value="auction_service">Auction Service</option>
@@ -264,30 +186,13 @@
             <input type="radio" name="mode" value="simulation" /> Calculate simulation-based edit distance
           </fieldset>
 
-          <p><input type="submit" value="run Rachel" /></p>
+          <p><input type="submit" value="submit" /> <input type="reset" value="reset"></p>
         </form>
       </div>
-
-<!--
-      <div id="adapter">
-        <form action="adapter.php" method="post" enctype="multipart/form-data">
-          <fieldset>
-            <legend>Service model</legend>
-            Use a given service model: 
-            <select name="example" size="1">
-              <optgroup label="Simple Example Services">
-                <option value="coffee1">Coffee Vending Machine 1</option>
-                <option value="coffee2">Coffee Vending Machine 2</option>
-              </optgroup>
-            </select>
-          </fieldset>
-
-          <p><input type="submit" value="synthesize adapter" /></p>
-        </form>
-      </div>
--->
 
       <div id="marlene">
+        <h1>Adapter Synthesis</h1>
+        <p>The independent design of services may result in incompatibilities. These can be overcome by adapters. The tool <a href="http://service-technology.org/marlene">Marlene</a> can generate such adapters automatically.</p>
         <form action="marlene.php" method="post" enctype="multipart/form-data">
           <fieldset>
             <legend>Service model</legend>
@@ -304,7 +209,7 @@
             </select>
           </fieldset>
 
-          <p><input type="submit" value="synthesize adapter" /></p>
+          <p><input type="submit" value="submit" /> <input type="reset" value="reset"></p>
         </form>
       </div>
 
@@ -372,8 +277,24 @@
         </form>
 <!--        <p>Alternatively, <a href="examples.zip">a ZIP archive</a> containing all service models can be downloaded.</p> -->
       </div>
-    </div>
 
+      <div id="matching">
+          <h1>Service Matching</h1>
+          <p><a href="http://service-technology.org/cosme">Cosme</a>.
+      </div>
+
+      <div id="lola">
+        <h1>Petri Net Verification</h1>
+        <p><a href="http://service-technology.org/lola">LoLA</a>.
+      </div>
+
+      <div id="soundness">
+        <h1>Business Process Soundness Check</h1>
+        <p><a href="http://service-technology.org/uml2owfn">UML2oWFN</a> and <a href="http://service-technology.org/lola">LoLA</a>.
+      </div>
+
+    </div>
+</div>
   </div>
 </body>
 </html>

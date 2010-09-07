@@ -6,15 +6,33 @@
   {
     $_SESSION["rules"] = "";
   }
-  
+
+  // new request?
   if ( isset($_REQUEST) )
   {
-    if ( isset($_REQUEST["rules"]) )
+    // variable example set in request?
+    if ( isset($_REQUEST["example"]) )
+    {
+      // remember name of example in session
+      $_SESSION["marleneinteractive"] = $_REQUEST["example"];
+      // interactive example?
+      unset($_REQUEST);
+      // redirect to self, make back/forward buttons work without 
+      // resending the request
+      header("Location: ".$_SERVER["PHP_SELF"]);
+    }
+    else if ( isset($_REQUEST["rules"]) )
     {
       $_SESSION["rules"] = $_REQUEST["rules"];
       unset($_REQUEST);
       header("Location: ".$_SERVER["PHP_SELF"]."#rules");
     }
+  }
+  if ( ! isset($_SESSION["marleneinteractive"]))
+  {
+    // direct call of this page -> return to main page
+    header('Location: index.html#adapterdiagnosis');
+    exit;
   }
 
   require 'resource/php/files.php';
@@ -26,12 +44,12 @@
   header("Content-Type: text/html");
   echo '<?xml version="1.0" encoding="utf-8" ?>';
 
-  if (!strcmp($_SESSION["marlene"], "iRules"))
+  if (!strcmp($_SESSION["marleneinteractive"], "iRules"))
   {
     $services = array("marlene/pro.owfn", "marlene/req.owfn");
     $rules = createFile("diag_iRules.ar");
   }
-  else if (!strcmp($_SESSION["marlene"], "iCoffee"))
+  else if (!strcmp($_SESSION["marleneinteractive"], "iCoffee"))
   {
     $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");
     $rules = createFile("diag_iCoffee.ar");
@@ -276,7 +294,7 @@ END;
 ?>
 
       <p>
-      	<a href="./#marlene" title="back to reality">Back to live</a>
+      	<a href="./#adapterdiagnosis" title="back to reality">Back to live</a>
       </p>
     </div>
   </div>

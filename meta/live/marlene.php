@@ -21,19 +21,19 @@
       {
         // remember name of example in session
         $_SESSION["marlene"] = $_REQUEST["example"];
-        // interactive example?
-        if (!strcmp($_REQUEST["example"], "iRules") || !strcmp($_REQUEST["example"], "iCoffee"))
-        {
-          // redirect to interactive example
-          header('Location: marlene_interactive.php');
-          exit;
-        }
         unset($_REQUEST);
         // redirect to self, make back/forward buttons work without 
         // resending the request
         header("Location: ".$_SERVER["PHP_SELF"]);
       }
     }
+  }
+
+  if ( ! isset($_SESSION["marlene"]))
+  {
+    // direct call of this page -> return to main page
+    header('Location: index.html#marlene');
+    exit;
   }
 
   // some functions for copying/creating files to/in temporary directory

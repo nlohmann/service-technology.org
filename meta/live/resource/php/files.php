@@ -1,5 +1,7 @@
 <?php
 
+require 'session.php';
+
 /**
  * Gets an array of file names, copies the files to the working
  * directory and returns an structured array with information on the 
@@ -55,28 +57,6 @@ function prepareFiles($fileArray)
 
   return $result;
 }
- /**
-  * Similar to prepareFiles, but instead of copying an array of files,
-  * one single file is created.
-  * Return value as above.
-  */
-function createFile($file)
-{
-  $result = array();
-  
-  // returns "basename", "extension", "dirname", and "filename"
-  $info = pathinfo($file);
-    
-  $result[$file] = $info;
-  $result[$file]["residence"] = $_SESSION["dir"]."/".$info["basename"];
-  $result[$file]["link"] = getLink($info["basename"]);
-   
-  $handle = fopen($result[$file]["residence"], "w+");
-  fwrite($handle, "");
-  fclose($handle);
-
-  return $result;
-}
 
 // create a string representing the URI for downloading a file
 function getLink($file)
@@ -111,4 +91,118 @@ function drawImage($file)
   echo '</div>';
 
 }
+
+/*
+ * 
+ */
+function exampleFile($example, $basedir)
+{
+  $result = array();
+  $info = pathinfo($example);
+  
+  $result[$example] = $info;
+  $result[$example]["residence"] = $_SESSION["dir"]."/".$info["basename"];
+  $result[$example]["short"] = $_SESSION["dir"]."/".$info["filename"];
+  $result[$example]["link"] = getLink($info["basename"]);
+  
+  copy($basedir."/".$example, $result[$example]["residence"]);
+  
+  return $result;
+}
+
+/*
+ * Creating a file from a given URL. Return value as above.
+ */
+function createFileFromUrl($url)
+{
+  $result = array();
+  
+  $info = pathinfo($url);
+  
+  $result[$url] = $info;
+  $result[$url]["residence"] = $_SESSION["dir"]."/".$info["basename"];
+  $result[$url]["short"] = $_SESSION["dir"]."/".$info["filename"];
+  $result[$url]["link"] = $url;
+  
+  $download = $download = 'wget \''.$url.'\' -O '.$result[$url]["residence"];
+  system($download);
+  
+  return $result;
+}
+
+/*
+ * 
+ */
+function createFileFromUpload()
+{
+  $result = array();
+  
+  $upload = 'uploadedfile_'.rand().rand();
+  $info = pathinfo($upload);
+  
+  $result[$upload] = $info;
+  $result[$file]["residence"] = $_SESSION["dir"]."/".$info["basename"];
+  $result[$file]["short"] = $_SESSION["dir"]."/".$info["filename"];
+  $result[$file]["link"] = getLink($info["basename"]); // FIXME
+    
+  move_uploaded_file($_FILES['input_file']['tmp_name'], $result[$upload]["residence"]);
+  
+  return $result;
+}
+
+/**
+* Similar to prepareFiles, but instead of copying an array of files,
+* one single file is created.
+* Return value as above.
+*/
+function createFile($file, $content = "")
+{
+  $result = array();
+  
+  // returns "basename", "extension", "dirname", and "filename"
+  $info = pathinfo($file);
+    
+  $result[$file] = $info;
+  $result[$file]["residence"] = $_SESSION["dir"]."/".$info["basename"];
+  $result[$file]["short"] = $_SESSION["dir"]."/".$info["filename"];
+  $result[$file]["link"] = getLink($info["basename"]); // FIXME
+   
+  $handle = fopen($result[$file]["residence"], "w+");
+  fwrite($handle, $content);
+  fclose($handle);
+
+  return $result;
+}
+
+/*
+ * Main part: This file MUST be included into any tool script. We process the given request variable
+ * to set or create files respectively.
+ */
+
+$fileinfo = array();
+
+// in case an example file was chosen from drop-down
+if ($_REQUEST["input_type"] == 'example')
+{
+  $fileinfo = exampleFile($_REQUEST["input_example"].'.'.$_REQUEST["fileextension"], $_REQUEST["toolname"]);
+}
+
+// in case an URL was given
+if ($_REQUEST["input_type"] == 'url')
+{
+  $fileinfo = createFileFromUrl($_REQUEST["input_url"]);
+}
+
+// in case a file was uploaded
+if ($_REQUEST["input_type"] == 'uploaded')
+{
+  $fileinfo = createFileFromUpload($_REQUEST["input_uploaded"]);
+}
+
+// in case a file was given
+if ($_REQUEST["input_type"] == 'given')
+{
+  $fileinfo = createFile('givenfile_'.rand().rand(), $_REQUEST["input_given"]);
+}
+
 ?>

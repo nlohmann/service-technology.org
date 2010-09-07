@@ -85,7 +85,7 @@
               <input type="radio" name="output" value="result" id="bpel2owfn_output_result" /><label for="bpel2owfn_output_result"> Display output file only</label><br />
             </fieldset>
 
-            <p><input type="submit" value="submit" /> <input type="reset" value="reset"></p>
+            <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
           </form>
         </div>
 
@@ -151,7 +151,7 @@
             <input type="radio" name="output" value="result" id="wendy_output_result" /><label for="wendy_output_result"> Display output file only</label><br />
           </fieldset>
 
-          <p><input type="submit" value="submit" /> <input type="reset" value="reset"></p>
+          <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
         </form>
       </div>
 
@@ -186,7 +186,7 @@
             <input type="radio" name="mode" value="simulation" /> Calculate simulation-based edit distance
           </fieldset>
 
-          <p><input type="submit" value="submit" /> <input type="reset" value="reset"></p>
+          <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
         </form>
       </div>
 
@@ -209,7 +209,7 @@
             </select>
           </fieldset>
 
-          <p><input type="submit" value="submit" /> <input type="reset" value="reset"></p>
+          <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
         </form>
       </div>
 
@@ -280,17 +280,32 @@
 
       <div id="matching">
           <h1>Service Matching</h1>
-          <p><a href="http://service-technology.org/cosme">Cosme</a>.
+          <p><a href="http://service-technology.org/cosme">Cosme</a>.</p>
       </div>
 
       <div id="lola">
         <h1>Petri Net Verification</h1>
-        <p><a href="http://service-technology.org/lola">LoLA</a>.
+        <p><a href="http://service-technology.org/lola">LoLA</a>.</p>
       </div>
 
       <div id="soundness">
         <h1>Business Process Soundness Check</h1>
-        <p><a href="http://service-technology.org/uml2owfn">UML2oWFN</a> and <a href="http://service-technology.org/lola">LoLA</a>.
+        <p>Soundness is a central correctness notion for business process. To verify industrial business processes, we first translate them into Petri net model using the compiler <a href="http://service-technology.org/uml2owfn">UML2oWFN</a> and then verify soundness with the modelchecking tool <a href="http://service-technology.org/lola">LoLA</a>.</p>
+        <form action="uml2owfn.php" method="post" enctype="multipart/form-data">
+          <fieldset>
+            <legend>Business Process</legend>
+            Use a given business process: 
+            <select name="input_example" size="1">
+              <optgroup label="Case Study for BPM 2009">
+                <option value="s00002237">sound process</option>
+                <option value="s00003188">unsound process (deadlock)</option>
+                <option value="s00001986">unsound process (lack of synchronization)</option>
+              </optgroup>
+            </select>
+          </fieldset>
+
+          <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
+        </form>
       </div>
 
     </div>

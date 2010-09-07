@@ -14,23 +14,32 @@ html, body {
 	height:100%; /* IE6: treaded as min-height*/
 	min-height:100%; /* real browsers */
 	
+    margin-top: 10px;
   border-color: #000;
   border-style: solid;
   border-width: 1px;
 }
 
 #content {
-  padding: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
   padding-bottom: 20px;
 }
 
 #footer {
-	position:absolute;
+/*	position:absolute; */
 	text-align: center;
 	width:100%;
-	bottom:0; /* stick to bottom */
-	background:gray;
-	padding-top:10px;
+/*	bottom:0; */ /* stick to bottom */
+/*	background:gray; */
+    margin-top: -10px;
+    margin-bottom: 50px;
+	color:#111;
+}
+
+#footer a, #footer a:hover, #footer a:visited {
+	color:#111;
+    
 }
 
 #header {
@@ -87,6 +96,33 @@ td.module {
 th {
   padding-left: 0.5em;
   padding-right: 0.5em;
+}
+
+div.paper {
+  background: #ddd;
+
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#dddddd', endColorstr='#eeeeee'); /* for IE */
+  background: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#eee)); /* for webkit browsers */
+  background: -moz-linear-gradient(top,  #ddd,  #eee); /* for firefox 3.6+ */
+  
+  padding-left: 19px;
+  padding-right: 10px;
+  padding-bottom: 5px;
+  margin-left: -19px;
+  margin-right: -19px;
+  margin-bottom: -14px;
+}
+
+div.paper h2 {
+    padding-top: 10px;
+    margin-top: 20px;
+    margin-bottom: -10px;
+}
+
+div.paper li {
+    margin-left: -10px;
+    margin-bottom: 0.5em;
+    padding-left: 0px;
 }
 
 label:hover {

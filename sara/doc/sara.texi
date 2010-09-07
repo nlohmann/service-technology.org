@@ -643,6 +643,15 @@ the computation) and prints all the job lists from past, present, and future. Th
 detailed information is printed to stderr. Zero is the default value and deselects the
 additional debugging output. 
 
+@section Additional Utilities
+
+Additional utilities can be found in the utils directory. At this time there is
+only one tool: owfn2sara. Owfn2sara takes a list of Petri net files from stdin,
+computes a final marking for each net (containing each place with an empty postset)
+and creates a list of problems instances, one for each net, which are written to stdout. 
+This list can be piped to the main tool Sara to check the reachability of the final marking
+for each of the Petri nets.
+
 @c --------------------------------------------------------------------------
 
 

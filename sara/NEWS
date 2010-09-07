@@ -8,9 +8,12 @@
 
 
 PURPOSE
-Version 1.02 (20 Aug 2010)
+Version 1.02 (07 Sep 2010)
 ==========================
 
 * added option -show for dot output of solutions and counterexamples
+
+* added utility to detect final marking in owfn net and create a problem
+  instance
 
 \nSee file ChangeLog <http://service-technology.org/files/sara/ChangeLog> for\ncomplete version history.\n

@@ -3,9 +3,9 @@ ACLOCAL_AMFLAGS = -I m4 --install
 
 # process "libs" directory only if the Petri Net API needs to be compiled
 if COMPILE_PNAPI
-SUBDIRS = libs/pnapi libs/lp_solve src doc tests
+SUBDIRS = libs/pnapi libs/lp_solve src doc tests utils
 else
-SUBDIRS = libs/lp_solve src doc tests
+SUBDIRS = libs/lp_solve src doc tests utils
 endif
 
 svn-clean: maintainer-clean

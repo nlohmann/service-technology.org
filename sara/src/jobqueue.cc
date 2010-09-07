@@ -354,7 +354,7 @@ bool JobQueue::cleanFailure(map<Transition*,int>& p) {
 
 /** Print a failure queue.
 	@param im Incidence matrix of the Petri net
-	@param The problem instance (for saving a visually colored net).
+	@param pb The problem instance (for saving a visually colored net).
 */
 void JobQueue::printFailure(IMatrix& im, Problem& pb) {
 	int failcnt(0); // counting the failures for adapting filenames

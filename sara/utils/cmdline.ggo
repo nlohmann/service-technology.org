@@ -1,0 +1,15 @@
+args "--include-getopt --show-required --no-handle-error"
+
+purpose "Structures for Automated Reachability Analysis:
+Detect output places of a workflow net and create a problem instance
+to detect if all output places can be marked.
+
+Input (a list of Petri nets) and output (a list of problems) come
+through stdin and stdout."
+
+section "Miscellaneous"
+
+option "verbose" v
+  "Show verbose output."
+  flag off
+

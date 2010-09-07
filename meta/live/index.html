@@ -30,6 +30,7 @@
           <li><a href="#wendy"><span>Partner Synthesis</span></a></li>
           <li><a href="#rachel"><span>Service Correction</span></a></li>
           <li><a href="#marlene"><span>Adapter Synthesis</span></a></li>
+          <li><a href="#adapterdiagnosis"><span>Interactive Adapter Rule Design</span></a></li>
           <li><a href="#pnog"><span>Petri Net OG</span></a></li>
           <li><a href="#migration"><span>Instance Migration</span></a></li>
           <li><a href="#matching"><span>Service Matching</span></a></li>
@@ -219,14 +220,8 @@
             <legend>Service model</legend>
             Use a given service model: 
             <select name="example" size="1">
-              <optgroup label="Simple Example Services">
                 <option value="coffee1">Coffee Vending Machine 1</option>
                 <option value="coffee2">Coffee Vending Machine 2</option>
-              </optgroup>
-              <optgroup label="Interactive Retrieval of Transformation Rules">
-                <option value="iRules">Information Request</option>
-                <option value="iCoffee">Coffee Vending Machine</option>
-              </optgroup>
             </select>
           </fieldset>
 
@@ -239,6 +234,30 @@
              </ul>
            </div>
           </div>
+
+          <div id="adapterdiagnosis">
+            <h1>Interactive Adapter Rule Design</h1>
+            <p>Automatic adapter generation approaches usually rely on domain-specific message transformation rules. The tool <a href="http://service-technology.org/marlene">Marlene</a> provides an interactive GUI to support the design of such rules.</p>
+            <form action="adapterdiagnosis.php" method="post" enctype="multipart/form-data">
+              <fieldset>
+                <legend>Service model</legend>
+                Use a given service model: 
+                <select name="example" size="1">
+                    <option value="iRules">Information Request</option>
+                    <option value="iCoffee">Coffee Vending Machine</option>
+                </select>
+              </fieldset>
+
+              <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
+            </form>
+            <div class="paper">
+               <h2>References</h2>
+               <ul>
+                 <li>Christian Gierds and Niels Lohmann. <strong>A graphical user interface for service adaptation.</strong> In <em>17th German Workshop on Algorithms and Tools for Petri Nets, AWPN 2010, Cottbus, Germany, October 7-8, 2010, Proceedings, CEUR Workshop Proceedings, October 2010. CEUR-WS.org.</li>
+                 <li>Christian Gierds, Arjan J. Mooij, and Karsten Wolf. <strong>Reducing adapter synthesis to controller synthesis.</strong> <em>IEEE T. Services Computing</em>, 2010. (Accepted for publication in July 2010). [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/GierdsMW_2010_tcs.pdf">PDF</a>]</li>
+                 </ul>
+               </div>
+              </div>
 
       <div id="pnog">
         <p>This site demonstrates the results of a paper to be presented at the <a href="http://www.informatik.uni-augsburg.de/acsd/">ACSD 2009</a> conference. Select a service model and press the button to calculate the result in your browser.</p>

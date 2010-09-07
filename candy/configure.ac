@@ -1,4 +1,4 @@
-AC_INIT([Candy], [1.0-unreleased], [candy@service-technology.org], candy,
+AC_INIT([Candy], [1.0], [candy@service-technology.org], candy,
 http://service-technology.org/candy)
 
 AC_MSG_NOTICE([  ____                 _       ])
@@ -16,15 +16,6 @@ AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 
-AM_INIT_AUTOMAKE(gnits)
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
-
-# check for standard programs needed to compile
-AC_PROG_CXX
-AM_PROG_CC_C_O
-AC_PROG_LEX
-AC_PROG_YACC
-
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_AUTOTEST
@@ -32,6 +23,7 @@ AC_ST_VERBOSE
 
 # search for optional tools needed by "make check"
 AC_PATH_PROG(MARLENE,     [marlene], not found)
+AC_PATH_PROG(VALGRIND,    [valgrind], not found)
 AC_PATH_PROG(WENDY,       [wendy], not found)
 
 # check for required functions and die if they are not found

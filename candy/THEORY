@@ -4,19 +4,25 @@
                         | |___| (_| | | | | (_| | |_| |
                          \____|\__,_|_| |_|\__,_|\__, |
                                                  |___/ 
-                      synthesizing cost efficient partners for services
+                synthesizing cost efficient partners for services
                       http://service-technology.org/candy
 
 
-Candy implements an algorithm published in a preprint.
+Candy implements an algorithm published in volume 380 of CEUR Workshop
+Proceedings.
 
 Cost efficient operating guidelines
-========================================
+===================================
 
-     Christian Gierds and Arjan J. Mooij and Karsten Wolf. Specifying and
-     generating behavioral service adapter based on transformation rules.
-     In Preprint CS-02-08, Universit\"at Rostock, August 2008.
-     http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/GierdsMW_2008_tr_cs0208.pdf
+     Christian Gierds. Finding Cost-Efficient Adapters.
+     In Niels Lohmann and Karsten Wolf, editors, Proceedings of the 15th
+     German Workshop on Algorithms and Tools for Petri Nets, AWPN 2008,
+     Rostock, Germany, September 26--27, 2008, volume 380 of CEUR Workshop
+     Proceedings, pages 37-42, September 2008. CEUR-WS.org.
+
+     Christian Gierds, Arjan J. Mooij, and Karsten Wolf. Reducing adapter
+     synthesis to controller synthesis.
+     Transactions on Services Computing, (accepted for publication), 2010.
 
 See `http://service-technology.org/publications' for more information.
 

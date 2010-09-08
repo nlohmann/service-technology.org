@@ -106,6 +106,7 @@ function createFile($file, $content = "")
     
   $result[$file] = $info;
   $result[$file]["residence"] = $_SESSION["dir"]."/".$info["basename"];
+  $result[$file]["dirname"] = $_SESSION["dir"];
   $result[$file]["short"] = $_SESSION["dir"]."/".$info["filename"];
   $result[$file]["link"] = getLink($info["basename"]); // FIXME
    

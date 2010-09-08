@@ -20,11 +20,11 @@
   
   foreach ($fileinfo as $file)
   {
-    
-    echo $file["residence"];
 
+    system('cd '.$file["dirname"]);
+    
     if (!strcmp($_REQUEST['output'], 'result')) {
-      $call = 'bpel2owfn -i '.$file["residence"].' -m petrinet -p '.$_REQUEST['patterns'].' -f '.$_REQUEST['format'].' -r '.$_REQUEST['reduce'];
+      $call = 'bpel2owfn -i '.$file["basename"].' -m petrinet -p '.$_REQUEST['patterns'].' -f '.$_REQUEST['format'].' -r '.$_REQUEST['reduce'];
   //    $call = $call.((isset($_REQUEST['reduce']))?' -p reduce':'');
   
       header("Content-type: text/plain");
@@ -34,7 +34,7 @@
       header("Content-Type: text/html");
       echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
       
-      $call = 'bpel2owfn -i '.$file["residence"].' -m petrinet -p '.$_REQUEST['patterns'].' -f '.$_REQUEST['format'].' -r '.$_REQUEST['reduce'].' -f dot -o '.$file["short"].".dot";
+      $call = 'bpel2owfn -i '.$file["basename"].' -m petrinet -p '.$_REQUEST['patterns'].' -f '.$_REQUEST['format'].' -r '.$_REQUEST['reduce'].' -f dot -o '.$file["filename"].".dot";
   //    $call = $call.((isset($_REQUEST['reduce']))?' -p reduce':'');
     }
 ?>

@@ -8,6 +8,7 @@
   // see files.php for further information
   require_once 'resource/php/files.php';
 
+  print_r($_SESSION);
   // prepare example
   if (!strcmp($_SESSION["marlene"], 'marlene/coffee1.owfn')) {
     $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");
@@ -67,7 +68,7 @@
   <link rel="stylesheet" type="text/css" href="resource/css/console.css" />
   <link rel="shortcut icon" href="resource/favicon.ico" type="image/x-icon" />
   <link rel="icon" href="resource/favicon.ico" type="image/x-icon" />
-  <title>service-technology.org/live - Service Formalization</title>
+  <title>service-technology.org/live &ndash; Adapter Synthesis</title>
   <script type="text/javascript" src="resource/js/jquery-1.2.6.pack.js"></script>
 </head>
 

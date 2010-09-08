@@ -76,14 +76,15 @@
   <link rel="stylesheet" type="text/css" href="resource/css/console.css" />
   <link rel="shortcut icon" href="resource/favicon.ico" type="image/x-icon" />
   <link rel="icon" href="resource/favicon.ico" type="image/x-icon" />
-  <title>WAAS: Wendy as a Service</title>
+  <title>service-technology.org/live &ndash; Partner Synthesis</title>
   <script type="text/javascript" src="resource/js/jquery-1.2.6.pack.js"></script>
 </head>
 
 <body>
   <div id="container">
     <div id="content">
-      <h1>Wendy</h1>
+      <div style="float: right; top: -10px;"><img src="resource/images/live.png" alt="service-technology.org/live" /></div>
+      <h1>Partner Syntesis</h1>
 
       <h2>Parameters</h2>
       <ul>

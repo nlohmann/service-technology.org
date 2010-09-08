@@ -157,7 +157,8 @@ else
     
     if (isset($_REQUEST["input_type"]))
     {
-      $_SESSION["input_type"] = $_REQUEST["input_type"];
+     $_SESSION[$tool] = $_REQUEST;
+     $_SESSION["input_type"] = $_REQUEST["input_type"];
       
       if ( ! strcmp($_REQUEST["input_type"], 'example') )
       {

@@ -121,10 +121,10 @@
   $fakeresult .= ".owfn"; 
 //  $realresult = $_SESSION["dir"]."/".$fakeresult;
 
-//  $fakecall .= " -o ".$fakeresult;
-//  $realcall .= " -o ".$realresult;
+  $fakecall .= " -o ".$fakeresult;
+  $realcall .= " -o ".$realresult;
 
-  $realcall .= " 2>&1";
+//  $realcall .= " -v 2>&1";
   // end of building call strings
   
 ?>

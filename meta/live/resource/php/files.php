@@ -215,7 +215,7 @@ echo '<?xml version="1.0" encoding="utf-8" ?>';
 
 $process = $_SESSION["$tool"];
 
-if ( ! strcmp($_SESSION["input_type"], 'example') )
+if ( ! strcmp($_SESSION["input_type"], 'example') && ! strcmp($tool, "bpel2owfn") )
 {
   $process = prepareFile($process); 
 }

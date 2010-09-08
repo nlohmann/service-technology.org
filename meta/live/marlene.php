@@ -42,21 +42,21 @@
   require_once 'resource/php/files.php';
 
   // copied from Wendy ;)
-  include 'resource/php/console.php';
-  include 'resource/php/dotimg.php';
-  include 'resource/php/getnumber.php';
+  include_once 'resource/php/console.php';
+  include_once 'resource/php/dotimg.php';
+  include_once 'resource/php/getnumber.php';
 
   // output header
   header("Content-Type: text/html");
   echo '<?xml version="1.0" encoding="utf-8" ?>';
 
   // prepare example
-  if (!strcmp($_SESSION["marlene"], 'coffee1')) {
+  if (!strcmp($_SESSION["marlene"], 'coffee1.owfn')) {
     $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");
     $rules = array("marlene/coffee.ar");
   }
 
-  if (!strcmp($_SESSION["marlene"], 'coffee2')) {
+  if (!strcmp($_SESSION["marlene"], 'coffee2.owfn')) {
     $services = array("marlene/myCoffee-rep.owfn", "marlene/myCustomer-rep.owfn");
     $rules = array("marlene/coffee.ar");
   }

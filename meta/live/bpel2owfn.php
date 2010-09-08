@@ -74,7 +74,8 @@
 
       <?php drawImage($fakeresult.'.owfn'); ?>
       
-      <a href="<?php getLink($fakeresult);?>">Download output file</a>
+      <a href="<?php getLink($fakeresult);?>.owfn">Download output file</a><br/>
+      <a href="getfile.php?file=<?php echo $fakeresult; ?>.owfn">Download output file</a>
     </div>
   </div>
   <div id="footer">

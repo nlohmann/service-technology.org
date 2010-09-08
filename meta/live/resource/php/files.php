@@ -193,6 +193,7 @@ else
       // redirect to self, make back/forward buttons work without 
       // resending the request
       header("Location: ".$_SERVER["PHP_SELF"]);
+      exit;
     }
   }
 }

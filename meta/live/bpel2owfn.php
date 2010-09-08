@@ -14,7 +14,9 @@
   $realcall = "bpel2owfn";
   $fakeresult = "";
 
-  $fakecall .= " -i ".$process[$_SESSION["bpel2owfn"]]["basename"];
+  echo $_SESSION["bpel2owfn"];
+  $bla = $_SESSION["bpel2owfn"];
+  $fakecall .= " -i ".$process[$bla]["basename"];
   $realcall .= " ".$process[$_SESSION["bpel2owfn"]]["residence"];
   
   $fakecall .= " -m petrinet -p ".$_SESSION["patterns"]." -r ".$_SESSION["reduce"]." -f ".$_SESSION["format"];

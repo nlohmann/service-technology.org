@@ -76,7 +76,7 @@
   // write link and thumbnail to HTML output
   if ( file_exists($imagefile) )
   {
-    $result = '<a href="'.$link.'" target="_blank" title="$label"><img id="thumbnail" src="'.$thumblink.'" alt="'.$label.'" /></a>';
+    $result = '<a href="'.$link.'" target="_blank" title="'.$label.'"><img id="thumbnail" src="'.$thumblink.'" alt="'.$label.'" /></a>';
 
     echo $result;
     echo '<div class="label">'.$label.'</div>';

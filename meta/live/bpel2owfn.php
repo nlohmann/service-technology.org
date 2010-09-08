@@ -23,34 +23,42 @@
     // new request?
     if ( isset($_REQUEST) )
     {
-      // variable example set in request?
-      if ( isset($_REQUEST["input_example"]) )
+      $set = false;
+      
+      if ( ! strcmp($_REQUEST["input_type"], 'example') )
       {
         // remember name of example in session
-        $_SESSION["bpel2owfn"] = 'bpel2owfn/'.$_REQUEST["input_example"].'.bpel';
+        $_SESSION["bpel2owfn"] = $_REQUEST["input_example"];
+        $set = true;
       }
-      if ( isset($_REQUEST["input_uploaded"]) )
+      if ( ! strcmp($_REQUEST["input_type"], 'uploaded') )
       {
         $_SESSION["bpel2owfn"] = $_REQUEST["input_uploaded"];
+        $set = true;
       }
-      if ( isset($_REQUEST["input_url"]) )
+      if ( ! strcmp($_REQUEST["input_type"], 'url') )
       {
         $_SESSION["bpel2owfn"] = $_REQUEST["input_url"];
+        $set = true;
       }
-      if ( isset($_REQUEST["input_given"]) )
+      if ( ! strcmp($_REQUEST["input_type"], 'given') )
       {
         $_SESSION["bpel2owfn"] = $_REQUEST["input_given"];
+        $set = true;
       }
       
-      $_SESSION["input_type"] = $_REQUEST["input_type"];
-      $_SESSION["patterns"] = $_REQUEST["patterns"];
-      $_SESSION["format"] = $_REQUEST["format"];
-      $_SESSION["reduce"] = $_REQUEST["reduce"];
-      
-      unset($_REQUEST);
-      // redirect to self, make back/forward buttons work without 
-      // resending the request
-      header("Location: ".$_SERVER["PHP_SELF"]);
+      if ($set)
+      {
+        $_SESSION["input_type"] = $_REQUEST["input_type"];
+        $_SESSION["patterns"] = $_REQUEST["patterns"];
+        $_SESSION["format"] = $_REQUEST["format"];
+        $_SESSION["reduce"] = $_REQUEST["reduce"];
+        
+        unset($_REQUEST);
+        // redirect to self, make back/forward buttons work without 
+        // resending the request
+        header("Location: ".$_SERVER["PHP_SELF"]);
+      }
     }
   }
 
@@ -88,9 +96,12 @@
   // copy files to temporary directory, see files.php for details
 //  $services = prepareFiles($services);
 //  $rules = prepareFiles($rules);
+  
+  $process = $_SESSION["bpel2owfn"];
+  
   if ( ! strcmp($_SESSION["input_type"], 'input_example') )
   {
-    $process = prepareFile($_SESSION["bpel2owfn"]); 
+    $process = prepareFile('bpel2owfn/'.$process.'.bpel'); 
   }
   
 
@@ -156,7 +167,7 @@
   
   <h2>Result</h2>
   
-  <?php console($fakecall, $realcall); ?>
+  <?php console($fakecall, $realcall.' '); ?>
   
 <?php
   $thumbnailcall = 'convert -transparent "rgb(255,255,255)" -resize 200x200 '.$process["short"].'.png '.$process["short"].'.thumb.png';
@@ -201,12 +212,11 @@
     <a href="<?=$process["short"]?>.<?=$_SESSION['format']?>">result</a>
   </p>
   
+  <p>
+  	<a href="./#bpel2owfn" title="back to reality">Back to live</a>
+  </p>
+  
   </div>
   </div>
 </body>
 </html>
-<?php 
-
-  }
-
-?>

@@ -137,43 +137,43 @@ function createFile($file, $content = "")
  * to set or create files respectively.
  */
 
-$fileinfo = array();
-
-// in case an example file was chosen from drop-down
-if ($_REQUEST["input_type"] == 'example')
-{
-  $f = $_REQUEST["input_example"];
-  $fileinfo = createFile($f);
-  
-  copy($f, $fileinfo[$f]["residence"]);
-}
-
-// in case an URL was given
-if ($_REQUEST["input_type"] == 'url')
-{
-  $f = $_REQUEST["input_url"];
-  $fileinfo = createFile($f);
-  
-  $fileinfo[$f]["link"] = $f;
-  
-  $download = $download = 'wget \''.$url.'\' -O '.$fileinfo[$f]["residence"];
-  system($download);
-}
-
-// in case a file was uploaded
-if ($_REQUEST["input_type"] == 'uploaded')
-{
-  $f = $_REQUEST["input_uploaded"];
-  $fileinfo = createFile($f);
-  
-  move_uploaded_file($_FILES['input_file']['tmp_name'], $fileinfo[$f]["residence"]);
-}
-
-// in case a file was given
-if ($_REQUEST["input_type"] == 'given')
-{
-  $f = $_REQUEST["input_given"];
-  $fileinfo = createFile('given_'.rand().rand(), $f);
-}
+//$fileinfo = array();
+//
+//// in case an example file was chosen from drop-down
+//if ($_REQUEST["input_type"] == 'example')
+//{
+//  $f = $_REQUEST["input_example"];
+//  $fileinfo = createFile($f);
+//  
+//  copy($f, $fileinfo[$f]["residence"]);
+//}
+//
+//// in case an URL was given
+//if ($_REQUEST["input_type"] == 'url')
+//{
+//  $f = $_REQUEST["input_url"];
+//  $fileinfo = createFile($f);
+//  
+//  $fileinfo[$f]["link"] = $f;
+//  
+//  $download = $download = 'wget \''.$url.'\' -O '.$fileinfo[$f]["residence"];
+//  system($download);
+//}
+//
+//// in case a file was uploaded
+//if ($_REQUEST["input_type"] == 'uploaded')
+//{
+//  $f = $_REQUEST["input_uploaded"];
+//  $fileinfo = createFile($f);
+//  
+//  move_uploaded_file($_FILES['input_file']['tmp_name'], $fileinfo[$f]["residence"]);
+//}
+//
+//// in case a file was given
+//if ($_REQUEST["input_type"] == 'given')
+//{
+//  $f = $_REQUEST["input_given"];
+//  $fileinfo = createFile('given_'.rand().rand(), $f);
+//}
 
 ?>

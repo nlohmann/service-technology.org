@@ -1,11 +1,24 @@
 <?php
 
   require_once 'resource/php/session.php';
-  
+
+function deleteDirectory($dir) {
+    if (!file_exists($dir)) return true;
+    if (!is_dir($dir)) return unlink($dir);
+    foreach (scandir($dir) as $item) {
+        if ($item == '.' || $item == '..') continue;
+        if (!deleteDirectory($dir.DIRECTORY_SEPARATOR.$item)) return false;
+    }
+    return rmdir($dir);
+}
+      
 	// if ( isset( $_POST["logout"] ) )
 	{ 
 	  // cleaning up $_SESSION["dir"]
-	  // \todo: find a nice function to do this (see rmdir on php.net)
+	  if (!empty($_SESSION["dir"]))
+	  {
+	    deleteDirectory($_SESSION["dir"]);
+	  }
 	  // restart 
 		$_SESSION = array();
 			if (isset($_COOKIE[session_name()])) {

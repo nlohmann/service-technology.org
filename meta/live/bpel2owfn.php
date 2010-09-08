@@ -99,7 +99,7 @@
   
   $process = $_SESSION["bpel2owfn"];
   
-  if ( ! strcmp($_SESSION["input_type"], 'input_example') )
+  if ( ! strcmp($_SESSION["input_type"], 'example') )
   {
     $process = prepareFile('bpel2owfn/'.$process.'.bpel'); 
   }
@@ -124,7 +124,7 @@
 //  $fakecall .= " -o ".$fakeresult;
 //  $realcall .= " -o ".$realresult;
 
-  $realcall .= " -v 2>&1";
+  $realcall .= " 2>&1";
   // end of building call strings
   
 ?>

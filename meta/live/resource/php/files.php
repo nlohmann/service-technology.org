@@ -145,31 +145,46 @@ else
   {
     $set = false;
     
+    $_SESSION["input_type"] = $_REQUEST["input_type"];
+    
     if ( ! strcmp($_REQUEST["input_type"], 'example') )
     {
       // remember name of example in session
-      $_SESSION[$tool] = "$tool/".$_REQUEST["input_example"].'.bpel';
+      $_SESSION[$tool] = "$tool/".$_REQUEST["input_example"];
       $set = true;
     }
-    if ( ! strcmp($_REQUEST["input_type"], 'uploaded') )
+    else if ( ! strcmp($_REQUEST["input_type"], 'uploaded') )
     {
       $_SESSION[$tool] = $_REQUEST["input_uploaded"];
       $set = true;
     }
-    if ( ! strcmp($_REQUEST["input_type"], 'url') )
+    else if ( ! strcmp($_REQUEST["input_type"], 'url') )
     {
       $_SESSION[$tool] = $_REQUEST["input_url"];
       $set = true;
     }
-    if ( ! strcmp($_REQUEST["input_type"], 'given') )
+    else if ( ! strcmp($_REQUEST["input_type"], 'given') )
     {
-      $_SESSION[$tool] = $_REQUEST["input_given"];
+      $_SESSION[$tool] = "given_".md5(uniqid(mt_rand(), true));
       $set = true;
+    }
+    if (strcmp($_REQUEST["input_type"], 'uploaded'))
+    {
+      switch ($tool)
+      {
+        case "bpel2owfn":
+          $_SESSION[$tool] .= ".bpel";
+          break;
+        default:
+          $_SESSION[$tool] .= ".owfn";
+          break;
+      }
     }
     
     if ($set)
     {
       $_SESSION["input_type"] = $_REQUEST["input_type"];
+      $_SESSION["input_given"] = $_REQUEST["input_given"];
       $_SESSION["patterns"] = $_REQUEST["patterns"];
       $_SESSION["format"] = $_REQUEST["format"];
       $_SESSION["reduce"] = $_REQUEST["reduce"];
@@ -182,10 +197,10 @@ else
   }
 }
 
-if ( ! isset($_SESSION["bpel2owfn"]))
+if ( ! isset($_SESSION["$tool"]))
 {
   // direct call of this page -> return to main page
-  header('Location: index.html#bpel2owfn');
+  header('Location: index.html#'.$tool);
   exit;
 }
 
@@ -198,27 +213,26 @@ include_once 'resource/php/getnumber.php';
 header("Content-Type: text/html");
 echo '<?xml version="1.0" encoding="utf-8" ?>';
 
-$process = $_SESSION["bpel2owfn"];
+$process = $_SESSION["$tool"];
 
 if ( ! strcmp($_SESSION["input_type"], 'example') )
 {
   $process = prepareFile($process); 
 }
-if ( ! strcmp($_SESSION["input_type"], 'uploaded') )
+else if ( ! strcmp($_SESSION["input_type"], 'uploaded') )
 {
   $process = createFile($process);
-  move_uploaded_file($_FILES['input_file']['tmp_name'], $process[$_SESSION["bpel2owfn"]]["residence"]);
+  move_uploaded_file($_FILES['input_file']['tmp_name'], $process[$_SESSION["$tool"]]["residence"]);
 }
-if ( ! strcmp($_SESSION["input_type"], 'url') )
+else if ( ! strcmp($_SESSION["input_type"], 'url') )
 {
   $process = createFile($process);
-  $download = 'wget \''.$_SESSION["bpel2owfn"].'\' -O '.$process[$_SESSION["bpel2owfn"]]["residence"];
+  $download = 'wget \''.$_SESSION["$tool"].'\' -O '.$process[$_SESSION["$tool"]]["residence"];
   system($download);
 }
-if ( ! strcmp($_SESSION["input_type"], 'given') )
+else if ( ! strcmp($_SESSION["input_type"], 'given') )
 {
-  $_SESSION["bpel2owfn"] = 'given.bpel';
-  $process = createFile($_SESSION["bpel2owfn"], $process);
+  $process = createFile($process, $_SESSION["input_given"]);
 }
 
 /*

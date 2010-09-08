@@ -74,9 +74,9 @@
 
       <?php drawImage($fakeresult.'.owfn'); ?>
       
-      <a href="<?php getLink($realresult);?>.owfn">Download output file</a><br/>
-      <a href="getfile.php?file=<?php echo $realresult; ?>.owfn">Download output file</a>
-    </div>
+      <?php
+          echo "<li><a href=".getLink($fakeresult.'.owfn').">".basename($fakeresult)."</a></li>";
+      ?>    </div>
   </div>
   <div id="footer">
     <p><a href="http://service-technology.org">service-technology.org</a> is a cooperation between the <a  href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/">University of Rostock</a> and the <a  href="http://www2.informatik.hu-berlin.de/top/index.php">Humboldt-Universit&auml;t zu Berlin</a>.</p>

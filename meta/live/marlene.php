@@ -2,7 +2,8 @@
 
   // most important script! sets session information and PATH!
   require_once 'resource/php/session.php';
-
+  $tool = "marlene";
+  
   // do not call the page without POST request, or only if session is 
   // already set to Marlene (all information about services available)
   if ( ! isset($_REQUEST) && ! isset($_SESSION["marlene"]))

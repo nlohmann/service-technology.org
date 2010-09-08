@@ -14,15 +14,21 @@ Proceedings.
 Cost efficient operating guidelines for adapter synthesis
 =========================================================
 
-     Christian Gierds. Finding Cost-Efficient Adapters.
-     In Niels Lohmann and Karsten Wolf, editors, Proceedings of the 15th
-     German Workshop on Algorithms and Tools for Petri Nets, AWPN 2008,
-     Rostock, Germany, September 26--27, 2008, volume 380 of CEUR Workshop
-     Proceedings, pages 37-42, September 2008. CEUR-WS.org.
+General Algorithm
+.................
+
+     Christian Gierds. Finding Cost-Efficient Adapters. In Niels Lohmann and
+     Karsten Wolf, editors, Proceedings of the 15th German Workshop on
+     Algorithms and Tools for Petri Nets, AWPN 2008, Rostock, Germany,
+     September 26-27, 2008, volume 380 of CEUR Workshop Proceedings, pages
+     37-42, September 2008. CEUR-WS.org.
+
+Adapter Synthesis
+.................
 
      Christian Gierds, Arjan J. Mooij, and Karsten Wolf. Reducing adapter
-     synthesis to controller synthesis.
-     Transactions on Services Computing, (accepted for publication), 2010.
+     synthesis to controller synthesis. Transactions on Services Computing,
+     (accepted for publication), 2010.
 
 See `http://service-technology.org/publications' for more information.
 

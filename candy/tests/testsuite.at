@@ -1,20 +1,18 @@
 AT_INIT
 AT_COLOR_TESTS
 
-#AT_TESTED(versions.sh)
-
 
 
 ############################################################################
-AT_BANNER([Standard Options])
+AT_BANNER([Basic Options])
 ############################################################################
 
-AT_SETUP([help output])
+AT_SETUP([Help output])
 AT_CHECK([CANDY --help], 0, ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP
 
-AT_SETUP([version output])
+AT_SETUP([Version output])
 AT_CHECK([CANDY --version], 0, ignore)
 AT_KEYWORDS(basic)
 AT_CLEANUP

@@ -2,12 +2,12 @@
 Candy exits with 0 on success, and with 1 if an error occurs. See Texinfo manual for detailed information.
 
 [EXAMPLES]
-RICH TODO
-To calculate the operating guidelines of a service `service.owfn', execute
+To calculate cost efficient partners of an operating guideline `partners.og'
+with costs `costs.cf', execute
 .IP
-wendy service.owfn --og
+candy --input=partners.og --costfile=costs.cf
 .PP
-The operating guidelines will be written to the file `service.og'.
+The output will be written to the file `partners_efficient.og'.
 
 [FILES]
 Unless a configuration file is explicitly given using the

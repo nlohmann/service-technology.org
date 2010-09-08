@@ -2,13 +2,22 @@
   if (empty($_REQUEST))
     header('Location:index.html#bpel2owfn');
 
-  // TODO: Either given from hidden fields or hacked like this!
-  $_REQUEST["toolname"] = "bpel2owfn";
-  $_REQUEST["fileextension"] = "bpel";
-
-  require 'resource/php/files.php';
   include 'resource/php/console.php';
-
+  
+  // required because
+  if (!strcmp($_REQUEST["input_type"], 'example'))
+  {
+    $_REQUEST["input_example"] = 'bpel2owfn/'.$_REQUEST["input_example"].'.bpel';
+  }
+  require 'resource/php/files.php';
+  
+  // DEBUG:
+  echo '$_REQUEST:<br>';
+  print_r($_REQUEST);
+  echo '<br>';
+  echo '$_SESSION:<br>';
+  print_r($_SESSION);
+  
   foreach ($fileinfo as $file)
   {
     

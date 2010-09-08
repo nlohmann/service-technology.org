@@ -2,13 +2,6 @@
 
   // most important script! sets session information and PATH!
   require_once 'resource/php/session.php';
-  
-  // DEBUG:
-  echo '$_REQUEST:<br>';
-  print_r($_REQUEST);
-  echo '<br>';
-  echo '$_SESSION:<br>';
-  print_r($_SESSION);
 
   // do not call the page without POST request, or only if session is 
   // already set to Marlene (all information about services available)
@@ -167,50 +160,13 @@
   
   <h2>Result</h2>
   
-  <?php console($fakecall, $realcall.' '); ?>
+  <?php 
   
-<?php
-  $thumbnailcall = 'convert -transparent "rgb(255,255,255)" -resize 200x200 '.$process["short"].'.png '.$process["short"].'.thumb.png';
-  system($thumbnailcall);
-?>
+    console($fakecall, $realcall.' ');
 
-  <h2>Schema</h2>
-  <table> 
-  <?php
-    echo '<tr>';
     drawImage($fakeresult);
-//    echo '<td><img src="'.$process["short"].'.png" height="100" width="100"></td>';
-    echo '<td><img src="resource/images/arrow.png" height="96" width="96"></td>';
-    echo '<td><img src="resource/images/tool.png" height="100" width="100"></td>';
-    echo '<td><img src="resource/images/arrow.png" height="96residence" width="96"></td>';
-    echo '<td><img src="resource/images/doc.png" height="100" width="100" style="margin-left:-30px;"><img src="'.$process["short"].'.thumb.png" height="80" width="50" style="margin-bottom: 10px; margin-left: -80px;"></td>';
-    echo '</tr>';
-
-    echo '<tr>';
-    echo '<td style="width: 150px;">';
-    if (!strcmp($_SESSION['input_type'], 'url'))
-      echo '<a href="'.$process["link"].'">downloaded file</a>';
-    if (!strcmp($_SESSION['input_type'], 'given'))
-      echo '<a href="'.$process["residence"].'">BPEL process</a>';
-    if (!strcmp($_SESSION['input_type'], 'uploaded'))
-      echo '<a href="'.$process["residence"].'"/>'.$_FILES['input_file']['name'].'</a>';
-    echo '</td>';
-    echo '<td></td>';
-    echo '<td style="width: 150px;">BPEL2oWFN</td>';
-    echo '<td></td>';
-    echo '<td style="width: 150px;"><a href="'.$process["residence"].'.'.$_SESSION['format'].'"/>'.((!strcmp($_SESSION['format'], "owfn"))?'Fiona open net':'LoLA Petri net').'</a></td>';
-    echo '</tr>';
+  
   ?>
-  </table>
-  
-  
-  <h2>Output</h2>
-  <p>
-    <a href="<?=$process["short"]?>.png" target="_blank"><img src="<?=$process["short"]?>.thumb.png" />
-  </p>
-  <p>
-    <a href="<?=$process["short"]?>.<?=$_SESSION['format']?>">result</a>
-  </p>
   
   <p>
   	<a href="./#bpel2owfn" title="back to reality">Back to live</a>

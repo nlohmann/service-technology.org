@@ -54,10 +54,8 @@
         system('convert -trim '.$imagefile.' '.$imagefile.' &> /dev/null');
         break;
       case "og":
-        echo "og found!";
-        break;
       case "sa":
-        echo "sa found!";
+        system("cd ".$_SESSION["dir"]."; og2dot -opng --name=".basename($file)." &> /dev/null");
         break;
     }
   }

@@ -64,11 +64,11 @@ function prepareFile($file)
   // returns "basename", "extension", "dirname", and "filename"
   $info = pathinfo($file);
   
-  $result[$file] = $info;
-  $result[$file]["residence"] = $_SESSION["dir"]."/".$info["basename"];
-  $result[$file]["link"] = getLink($info["basename"]);
+  $result = $info;
+  $result["residence"] = $_SESSION["dir"]."/".$info["basename"];
+  $result["link"] = getLink($info["basename"]);
  
-  copy($file, $result[$file]["residence"]);
+  copy($file, $result["residence"]);
 
   return $result;
 }

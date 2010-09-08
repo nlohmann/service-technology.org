@@ -153,7 +153,7 @@ else
       $_SESSION[$tool][$key] = $value;
     }
     */
-    $_SESSION[$tool] = $_REQUEST;
+    // $_SESSION[$tool] = $_REQUEST;
     
     if (isset($_REQUEST["input_type"]))
     {

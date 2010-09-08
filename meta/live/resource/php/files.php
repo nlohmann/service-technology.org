@@ -213,11 +213,11 @@ else
   }
 }
 
-if ( ! isset($_SESSION[$tool]) || empty($_SESSION[$tool]))
+if ( (! isset($_SESSION[$tool]["process"])) || empty($_SESSION[$tool]))
 {
-  echo "bla";
-  print_r($_SESSION);
-  exit;
+  //echo "bla";
+  //print_r($_SESSION);
+  //exit;
 
   // direct call of this page -> return to main page
   header('Location: index.html#'.$tool);
@@ -232,7 +232,7 @@ include_once 'resource/php/getnumber.php';
 // output header
 header("Content-Type: text/html");
 echo '<?xml version="1.0" encoding="utf-8" ?>';
-  print_r($_SESSION);
+
 
 $process = $_SESSION[$tool]["process"];
 

@@ -32,6 +32,12 @@
   $realcall .= " -d2 2>&1";
   // end of building call strings
   
+  if (!strcmp($_SESSION['output'], 'result')) {
+    header("Content-type: text/plain");
+    system($realcall." > /dev/null");
+    system("cat ".$realresult.".owfn");
+    exit;
+  }
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -51,6 +57,8 @@
     <div id="content">
       <div style="float: right; top: -10px;"><img src="resource/images/live.png" alt="service-technology.org/live" /></div>
       <h1>Service Formalization</h1>
+
+
 
       <h2>Parameters</h2>
       <ul>
@@ -82,7 +90,7 @@
       <?php drawImage($fakeresult.'.owfn'); ?>
       
       <?php
-          echo "<li><a href=".getLink($fakeresult.'.owfn').">".basename($fakeresult)."</a></li>";
+          echo "<p><li><a href=".getLink($fakeresult.'.owfn').">".basename($fakeresult)."</a></li></p>";
       ?>
     </div>
   </div>

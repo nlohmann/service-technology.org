@@ -2,58 +2,11 @@
 
   // most important script! sets session information and PATH!
   require_once 'resource/php/session.php';
-
-  // do not call the page without POST request, or only if session is 
-  // already set to Marlene (all information about services available)
-  if ( ! isset($_REQUEST) && ! isset($_SESSION["bpel2owfn"]))
-  {
-    // direct call of this page -> return to main page
-    header('Location: index.html#bpel2owfn');
-    exit;
-  }
-  else
-  {
-    // new request?
-    if ( isset($_REQUEST) && ! empty($_REQUEST))
-    {
-      $set = false;
-      
-      if ( ! strcmp($_REQUEST["input_type"], 'example') )
-      {
-        // remember name of example in session
-        $_SESSION["bpel2owfn"] = 'bpel2owfn/'.$_REQUEST["input_example"].'.bpel';
-        $set = true;
-      }
-      if ( ! strcmp($_REQUEST["input_type"], 'uploaded') )
-      {
-        $_SESSION["bpel2owfn"] = $_REQUEST["input_uploaded"];
-        $set = true;
-      }
-      if ( ! strcmp($_REQUEST["input_type"], 'url') )
-      {
-        $_SESSION["bpel2owfn"] = $_REQUEST["input_url"];
-        $set = true;
-      }
-      if ( ! strcmp($_REQUEST["input_type"], 'given') )
-      {
-        $_SESSION["bpel2owfn"] = $_REQUEST["input_given"];
-        $set = true;
-      }
-      
-      if ($set)
-      {
-        $_SESSION["input_type"] = $_REQUEST["input_type"];
-        $_SESSION["patterns"] = $_REQUEST["patterns"];
-        $_SESSION["format"] = $_REQUEST["format"];
-        $_SESSION["reduce"] = $_REQUEST["reduce"];
-        
-        unset($_REQUEST);
-        // redirect to self, make back/forward buttons work without 
-        // resending the request
-        header("Location: ".$_SERVER["PHP_SELF"]);
-      }
-    }
-  }
+  
+  $tool = "bpel2owfn";
+  // some functions for copying/creating files to/in temporary directory
+  // see files.php for further information
+  require_once 'resource/php/files.php';
 
   if ( ! isset($_SESSION["bpel2owfn"]))
   {
@@ -61,10 +14,6 @@
     header('Location: index.html#bpel2owfn');
     exit;
   }
-
-  // some functions for copying/creating files to/in temporary directory
-  // see files.php for further information
-  require_once 'resource/php/files.php';
 
   // copied from Wendy ;)
   include_once 'resource/php/console.php';

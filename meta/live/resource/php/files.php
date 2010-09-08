@@ -59,9 +59,7 @@ function prepareFiles($fileArray)
 }
 
 function prepareFile($file)
-{
-  print_r($file);
-  
+{  
   $result = array();
   // returns "basename", "extension", "dirname", and "filename"
   $info = pathinfo($file);
@@ -126,10 +124,62 @@ function createFile($file, $content = "")
   $result[$file]["link"] = getLink($info["basename"]);
    
   $handle = fopen($result[$file]["residence"], "w+");
-  fwrite($handle, $content);
+  fwrite($handle, stripslashes($content));
   fclose($handle);
 
   return $result;
+}
+
+// do not call the page without POST request, or only if session is 
+// already set to Marlene (all information about services available)
+if ( ! isset($_REQUEST) && ! isset($_SESSION[$tool]))
+{
+  // direct call of this page -> return to main page
+  header("Location: index.html#$tool");
+  exit;
+}
+else
+{
+  // new request?
+  if ( isset($_REQUEST) && ! empty($_REQUEST))
+  {
+    $set = false;
+    
+    if ( ! strcmp($_REQUEST["input_type"], 'example') )
+    {
+      // remember name of example in session
+      $_SESSION[$tool] = "$tool/".$_REQUEST["input_example"].'.bpel';
+      $set = true;
+    }
+    if ( ! strcmp($_REQUEST["input_type"], 'uploaded') )
+    {
+      $_SESSION[$tool] = $_REQUEST["input_uploaded"];
+      $set = true;
+    }
+    if ( ! strcmp($_REQUEST["input_type"], 'url') )
+    {
+      $_SESSION[$tool] = $_REQUEST["input_url"];
+      $set = true;
+    }
+    if ( ! strcmp($_REQUEST["input_type"], 'given') )
+    {
+      $_SESSION[$tool] = $_REQUEST["input_given"];
+      $set = true;
+    }
+    
+    if ($set)
+    {
+      $_SESSION["input_type"] = $_REQUEST["input_type"];
+      $_SESSION["patterns"] = $_REQUEST["patterns"];
+      $_SESSION["format"] = $_REQUEST["format"];
+      $_SESSION["reduce"] = $_REQUEST["reduce"];
+      
+      unset($_REQUEST);
+      // redirect to self, make back/forward buttons work without 
+      // resending the request
+      header("Location: ".$_SERVER["PHP_SELF"]);
+    }
+  }
 }
 
 /*

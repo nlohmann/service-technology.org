@@ -219,7 +219,7 @@ echo '<?xml version="1.0" encoding="utf-8" ?>';
 
 $process = $_SESSION["$tool"];
 
-if ( ! strcmp($_SESSION["input_type"], 'example') && ! strcmp($tool, "bpel2owfn") )
+if ( ! strcmp($_SESSION["input_type"], 'example') )
 {
   $process = prepareFile($process); 
 }
@@ -242,7 +242,7 @@ else if ( ! strcmp($_SESSION["input_type"], 'given') )
 if ( !is_array ($process))
 {
 echo "process is not an array";
-exit;
+// exit;
 }
 
 /*

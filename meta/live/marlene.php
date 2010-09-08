@@ -8,58 +8,14 @@
   // see files.php for further information
   require_once 'resource/php/files.php';
 
-  /*
-  // do not call the page without POST request, or only if session is 
-  // already set to Marlene (all information about services available)
-  if ( ! isset($_REQUEST) && ! isset($_SESSION["marlene"]))
-  {
-    // direct call of this page -> return to main page
-    header('Location: index.html#marlene');
-    exit;
-  }
-  else
-  {
-    // new request?
-    if ( isset($_REQUEST) )
-    {
-      // variable example set in request?
-      if ( isset($_REQUEST["example"]) )
-      {
-        // remember name of example in session
-        $_SESSION["marlene"] = $_REQUEST["example"];
-        unset($_REQUEST);
-        // redirect to self, make back/forward buttons work without 
-        // resending the request
-        header("Location: ".$_SERVER["PHP_SELF"]);
-      }
-    }
-  }
-  */
-  /*
-  if ( ! isset($_SESSION["marlene"]))
-  {
-    // direct call of this page -> return to main page
-    header('Location: index.html#marlene');
-    exit;
-  }
-   */
-  /*
-  // copied from Wendy ;)
-  include_once 'resource/php/console.php';
-  include_once 'resource/php/dotimg.php';
-  include_once 'resource/php/getnumber.php';
-
-  // output header
-  header("Content-Type: text/html");
-  echo '<?xml version="1.0" encoding="utf-8" ?>';
-  */
+  print_r ($_SESSION);
   // prepare example
-  if (!strcmp($_SESSION["marlene"], 'coffee1.owfn')) {
+  if (!strcmp($_SESSION["marlene"], 'coffee1')) {
     $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");
     $rules = array("marlene/coffee.ar");
   }
 
-  if (!strcmp($_SESSION["marlene"], 'coffee2.owfn')) {
+  if (!strcmp($_SESSION["marlene"], 'coffee2')) {
     $services = array("marlene/myCoffee-rep.owfn", "marlene/myCustomer-rep.owfn");
     $rules = array("marlene/coffee.ar");
   }
@@ -104,7 +60,7 @@
 
 ?>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
@@ -112,14 +68,36 @@
   <link rel="stylesheet" type="text/css" href="resource/css/console.css" />
   <link rel="shortcut icon" href="resource/favicon.ico" type="image/x-icon" />
   <link rel="icon" href="resource/favicon.ico" type="image/x-icon" />
-  <title>Marlene - making adapters behave well <!--<?php echo $_SESSION["uid"]; ?>--></title>
+  <title>service-technology.org/live - Service Formalization</title>
   <script type="text/javascript" src="resource/js/jquery-1.2.6.pack.js"></script>
 </head>
 
 <body>
   <div id="container">
     <div id="content">
+      <div style="float: right; top: -10px;"><img src="resource/images/live.png" alt="service-technology.org/live" /></div>
       <h1>Adapter Synthesis</h1>
+
+      <h2>Parameters</h2>
+      <ul>
+        <li><strong>input file:</strong> 
+        <?php
+          foreach($services as $file)
+          {
+            echo $file["basename"]." ";
+          }
+          ?>
+          <?php
+          
+          switch($_SESSION['input_type']) {
+            case "example":   echo "example file(s)"; break;
+            case "uploaded":  echo "uploaded file(s)"; break;
+            case "url":       echo "downloaded file(s)"; break;
+            case "given":     echo "given file(s)"; break;
+          }
+          ?>
+        </li>
+      </ul>
 
       <h2>Input Service Models</h2>
 
@@ -142,12 +120,14 @@
       ?>
       </ul>
 
-      <h2>Synthesized Adapter</h2>
+      <h2>Call</h2>
 
       <?php
         // call console
         $call_result = console($fakecall, 'cd marlene; '.$realcall.' ');
       ?>
+
+      <h2>Synthesized Adapter</h2>
 
       <!-- draw image of adapter -->
       <?php drawImage($fakeresult); ?>

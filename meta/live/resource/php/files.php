@@ -60,15 +60,17 @@ function prepareFiles($fileArray)
 
 function prepareFile($file)
 {
+  print_r($file);
+  
   $result = array();
   // returns "basename", "extension", "dirname", and "filename"
   $info = pathinfo($file);
   
-  $result = $info;
-  $result["residence"] = $_SESSION["dir"]."/".$info["basename"];
-  $result["link"] = getLink($info["basename"]);
+  $result[$file] = $info;
+  $result[$file]["residence"] = $_SESSION["dir"]."/".$info["basename"];
+  $result[$file]["link"] = getLink($info["basename"]);
  
-  copy($file, $result["residence"]);
+  copy($file, $result[$file]["residence"]);
 
   return $result;
 }
@@ -121,8 +123,6 @@ function createFile($file, $content = "")
     
   $result[$file] = $info;
   $result[$file]["residence"] = $_SESSION["dir"]."/".$info["basename"];
-//  $result[$file]["dirname"] = $_SESSION["dir"];
-//  $result[$file]["short"] = $_SESSION["dir"]."/".$info["filename"];
   $result[$file]["link"] = getLink($info["basename"]);
    
   $handle = fopen($result[$file]["residence"], "w+");

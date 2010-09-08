@@ -14,14 +14,14 @@
   else
   {
     // new request?
-    if ( isset($_REQUEST) )
+    if ( isset($_REQUEST) && ! empty($_REQUEST))
     {
       $set = false;
       
       if ( ! strcmp($_REQUEST["input_type"], 'example') )
       {
         // remember name of example in session
-        $_SESSION["bpel2owfn"] = $_REQUEST["input_example"];
+        $_SESSION["bpel2owfn"] = 'bpel2owfn/'.$_REQUEST["input_example"].'.bpel';
         $set = true;
       }
       if ( ! strcmp($_REQUEST["input_type"], 'uploaded') )
@@ -74,29 +74,30 @@
   // output header
   header("Content-Type: text/html");
   echo '<?xml version="1.0" encoding="utf-8" ?>';
-
-  // prepare example
-//  if (!strcmp($_SESSION["marlene"], 'coffee1')) {
-//    $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");
-//    $rules = array("marlene/coffee.ar");
-//  }
-//
-//  if (!strcmp($_SESSION["marlene"], 'coffee2')) {
-//    $services = array("marlene/myCoffee-rep.owfn", "marlene/myCustomer-rep.owfn");
-//    $rules = array("marlene/coffee.ar");
-//  }
-  
-  // copy files to temporary directory, see files.php for details
-//  $services = prepareFiles($services);
-//  $rules = prepareFiles($rules);
   
   $process = $_SESSION["bpel2owfn"];
   
   if ( ! strcmp($_SESSION["input_type"], 'example') )
   {
-    $process = prepareFile('bpel2owfn/'.$process.'.bpel'); 
+    $process = prepareFile($process); 
   }
-  
+  if ( ! strcmp($_SESSION["input_type"], 'uploaded') )
+  {
+    $process = createFile($process);
+    move_uploaded_file($_FILES['input_file']['tmp_name'], $process[$_SESSION["bpel2owfn"]]["residence"]);
+  }
+  if ( ! strcmp($_SESSION["input_type"], 'url') )
+  {
+    $process = createFile($process);
+    $download = 'wget \''.$_SESSION["bpel2owfn"].'\' -O '.$process[$_SESSION["bpel2owfn"]]["residence"];
+    system($download);
+  }
+  if ( ! strcmp($_SESSION["input_type"], 'given') )
+  {
+    $_SESSION["bpel2owfn"] = 'given_'.rand().rand();
+    $_SESSION["bpel2owfn"] .= '.bpel';
+    $process = createFile($_SESSION["bpel2owfn"], $process);
+  }
 
   // prepare strings for system call (realcall) 
   // and output on console (fakecall)
@@ -104,15 +105,15 @@
   $realcall = "bpel2owfn";
   $fakeresult = "";
 
-  $fakecall .= " -i ".$process["basename"];
-  $realcall .= " ".$process["residence"];
+  $fakecall .= " -i ".$process[$_SESSION["bpel2owfn"]]["basename"];
+  $realcall .= " ".$process[$_SESSION["bpel2owfn"]]["residence"];
   
   $fakecall .= " -m petrinet -p ".$_SESSION["patterns"]." -r ".$_SESSION["reduce"]." -f ".$_SESSION["format"];
   $realcall .= " -m petrinet -p ".$_SESSION["patterns"]." -r ".$_SESSION["reduce"]." -f ".$_SESSION["format"];
 
-  $fakeresult .= $process["filename"];
+  $fakeresult .= $process[$_SESSION["bpel2owfn"]]["filename"];
   $fakeresult .= ".owfn"; 
-//  $realresult = $_SESSION["dir"]."/".$fakeresult;
+  $realresult = $_SESSION["dir"]."/".$fakeresult;
 
   $fakecall .= " -o ".$fakeresult;
   $realcall .= " -o ".$realresult;
@@ -143,12 +144,12 @@
   <h2>Parameters</h2>
 
   <ul>
-    <li><strong>input file:</strong> <?=$process["basename"]?>
+    <li><strong>input file:</strong> <?=$process[$_SESSION["bpel2owfn"]]["basename"]?>
       <?php
         if (!strcmp($_SESSION['input_type'], 'url'))
-          echo ' (downloaded from <a href="'.$process["link"].'">'.$process["link"].'</a>)';
+          echo ' (downloaded from <a href="'.$_SESSION["bpel2owfn"].'">'.$_SESSION["bpel2owfn"].'</a>)';
         if (!strcmp($_SESSION['input_type'], 'file'))
-          echo ' (uploaded from local file '.$process["basename"].')';
+          echo ' (uploaded from local file '.basename($_SESSION["bpel2owfn"]).')';
       ?>
     </li>
     <li><strong>patterns:</strong> <?=$_SESSION['patterns']?></li>

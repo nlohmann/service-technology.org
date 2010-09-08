@@ -197,7 +197,9 @@ else
     
     if ($set)
     {
+      if ( isset($_REQUEST["input_type"]) )
       $_SESSION["input_type"] = $_REQUEST["input_type"];
+      if ( isset($_REQUEST["input_given"]) )
       $_SESSION["input_given"] = $_REQUEST["input_given"];
       /*
       $_SESSION["patterns"] = $_REQUEST["patterns"];

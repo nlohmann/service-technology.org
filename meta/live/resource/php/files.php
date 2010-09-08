@@ -216,10 +216,11 @@ else
 
 if ( (! isset($_SESSION[$tool]["process"])) || empty($_SESSION[$tool]))
 {
+/*
   echo "bla";
   print_r($_SESSION);
   exit;
-
+*/
   // direct call of this page -> return to main page
   header('Location: index.html#'.$tool);
   exit;

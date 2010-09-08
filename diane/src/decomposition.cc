@@ -24,7 +24,7 @@
 #include "cmdline.h"
 #include "decomposition.h"
 #include <typeinfo>
-#include "verbose.h"
+//#include "verbose.h"
 #include "cmdline.h"
 //#include "recompose.h"
 
@@ -149,9 +149,12 @@ int decomposition::computeComponentsByUnionFind(PetriNet& net, int* tree, int si
                     for (std::set<const pnapi::formula::Formula*>::iterator ccIt = fc->getChildren().begin(); ccIt != fc->getChildren().end(); ++ccIt) {
                         const pnapi::formula::Proposition* fp = dynamic_cast<const pnapi::formula::Proposition*>(*ccIt);
                         //const Place *pp=new Place(fp->getPlace());
-                        if (fp->getTokens() > 0) { //insert only if it is non-zero
+                        if (fp->getTokens() > 0) { //insert only if it is non-zero or it is zero with strict greater sign
                             ss.insert(fp->getPlace().getName());
                         }
+			if(typeid(**cIt)==typeid(pnapi::formula::FormulaGreater)){
+				ss.insert(fp->getPlace().getName() );
+			}	
                     }
                 }
 				
@@ -165,17 +168,16 @@ int decomposition::computeComponentsByUnionFind(PetriNet& net, int* tree, int si
                 if (fp->getTokens() > 0) {
                     ss.insert(fp->getPlace().getName());
                 }
+		if(typeid(**cIt)==typeid(pnapi::formula::FormulaGreater)){
+			ss.insert(fp->getPlace().getName() );
+		}	
+
             }
         }
 		
 		
-        //std::set<const Place * > cp=net.finalCondition().concerningPlaces(); doesn't work :(
-		//threshold
-		//if (args_info.threshold_given) {
-		//	cout << args_info.threshold_arg<< endl;
-		//}
-		//else{cout << args_info.threshold_arg<< endl;}
-		//threshold: it may be given by the user or we may make it net dependent
+		//threshold: it may be given by the user or we may make it net dependent on the structure
+		//experiments showed that net dependent parameters are not worthwhile mentioneing
 		unsigned int k=0;
 		unsigned int threshold=3;//net.getInternalPlaces().size()/5;
 		if (args_info.threshold_given) {
@@ -186,34 +188,41 @@ int decomposition::computeComponentsByUnionFind(PetriNet& net, int* tree, int si
 			// set of strings involved
 			for (unsigned i = 0; i < args_info.interface_given; ++i){
 				std::string s=args_info.interface_arg[i];
+				cout<<s<<endl;
 	 			datas.insert(s);
 			}
 		}
+	//instead of going through the places arbitrarily as the new pnapi sets us up
+	//we may set up a particular ordering of the set of places
+	vector<string> sop=setPlaceOrder(net);	
+	for (int p = 0; p < sop.size(); ++p){
+		const std::string sp=sop.at(p);
 		
-        for (set< Place*>::iterator it = net.getPlaces().begin(); it != net.getPlaces().end(); ++it) {
-            const std::string sp = (*it)->getName();
+		Place *it=net.findPlace(sp);
+        //for (set< Place*>::iterator it = net.getPlaces().begin(); it != net.getPlaces().end(); ++it) {
+            //const std::string sp = (*it)->getName(); cout<<sp<<endl;
 			//if we hit an initially marked place or an finally marked place
-            if ((*it)->getTokenCount() || (ss.find(sp) != ss.end())) {
-                for (set<Node*>::iterator t = (*it)->getPreset().begin(); t != (*it)->getPreset().end(); ++t) {
-                    Union(remap[*it], remap[*t], tree);
+            if ((it)->getTokenCount() || (ss.find(sp) != ss.end())) {
+                for (set<Node*>::iterator t = (it)->getPreset().begin(); t != (it)->getPreset().end(); ++t) {
+                    Union(remap[it], remap[*t], tree);
                 }
-                for (set<Node*>::iterator t = (*it)->getPostset().begin(); t != (*it)->getPostset().end(); ++t) {
-                    Union(remap[*it], remap[*t], tree);
+                for (set<Node*>::iterator t = (it)->getPostset().begin(); t != (it)->getPostset().end(); ++t) {
+                    Union(remap[it], remap[*t], tree);
                 }
-            }//avoiding interface places and using threshold
-			else if(args_info.threshold_given && noInterfaceLabel(datas,sp))//(strstr(sp.c_str(),"Data")==NULL )
-					{//(strstr(sp.c_str(),"Control")!=NULL)&&
-						//status("threshold");
-						if((k!=threshold)) k++;
-						else {
-							k=0;continue;
-						}
-				for (set<Node *>::iterator t = (*it)->getPreset().begin(); t != (*it)->getPreset().end(); ++t)
-					Union(remap[*it], remap[*t], tree);
-				for (set<Node *>::iterator t = (*it)->getPostset().begin(); t != (*it)->getPostset().end(); ++t)
-					Union(remap[*it], remap[*t], tree);//}
+            }//if we don't hit interface labels, then the threshold comes into play before we do union
+			//first interface labels
+	   else if (args_info.threshold_given && noInterfaceLabel(datas,sp)){
+				if((k!=threshold)) k++;
+				else {
+					k=0;continue;
+				}
+				for (set<Node *>::iterator t = (it)->getPreset().begin(); t != (it)->getPreset().end(); ++t)
+					Union(remap[it], remap[*t], tree);
+				for (set<Node *>::iterator t = (it)->getPostset().begin(); t != (it)->getPostset().end(); ++t)
+					Union(remap[it], remap[*t], tree);
 					}
 			}
+
         }
     
 	
@@ -227,7 +236,8 @@ int decomposition::computeComponentsByUnionFind(PetriNet& net, int* tree, int si
         if (tree[i] < 0) {
             n++;
         }
-
+	status("number of components before creating them %d", n);
+	status("%d components", n);
     return n;
 }
 
@@ -248,8 +258,8 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 			const pnapi::formula::Conjunction *fc=dynamic_cast<const pnapi::formula::Conjunction *>(f);
 			for(std::set<const pnapi::formula::Formula *>::iterator cIt=fc->getChildren().begin();cIt!=fc->getChildren().end();++cIt){
 				fp=dynamic_cast<const pnapi::formula::Proposition *>(*cIt);
-				if(ep.find(&fp->getPlace())!=ep.end()) continue;//cout<<fp->getPlace().getName()<<endl;//continue;
-				sfp=fp->getPlace().getName();//fp->output(std::cout);cout<<"greater"<<endl;
+				if(ep.find(&fp->getPlace())!=ep.end()) continue;
+				sfp=fp->getPlace().getName();
 				//find out whether it is an equality or an inequality
 				if(typeid(**cIt)==typeid(pnapi::formula::FormulaEqual)){//cout<<"hallo"<<sfp<<endl;
 					fe=dynamic_cast<const pnapi::formula::FormulaEqual *>(*cIt);
@@ -293,7 +303,7 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 					//cout<<"hallo"<<sfp<<endl;//
 					//nets[x]->getFinalCondition().formula().output(std::cout);
 				}
-				else {cout<<"greater"<<std::endl;
+				else {//cout<<"greater"<<std::endl;
 					pnapi::formula::FormulaGreater prop(pnapi::formula::FormulaGreater(*pi,fge->getTokens()));
 					nets[x]->getFinalCondition().addProposition(prop);///fge->output(cout);
 					
@@ -352,7 +362,7 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 							netPlace=&nets[x]->createPlace(place->getName(),0);
 						}
 						catch (pnapi::exception::UserCausedError e) {
-							e.output(cout);cout<<"create"<<std::endl;
+							e.output(cout);//cout<<"create"<<std::endl;
 						}
 						if (nets[x]->findPlace(place->getName()+"$compl")==NULL) {
 							Place *placec = &nets[x]->createPlace(netPlace->getName()+"$compl", 1,1);
@@ -413,7 +423,7 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 				for (set<pnapi::Label *>::iterator oi=outputl.begin(); oi!=outputl.end(); ++oi) {
 					if ((*oi)->getName()==place->getName()) {
 						islabel=true;
-						//cout<<"is label"<<std::endl;
+						
 						std::map< std::string, pnapi::Port * >  xx=nets[x]->getInterface().getPorts();
 						for (std::map< std::string, pnapi::Port *>::iterator ti=xx.begin(); ti!=xx.end(); ++ti) {
 							pnapi::Port * p=(*ti).second;
@@ -432,7 +442,7 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 						netPlace=&nets[x]->createPlace(place->getName(),0);
 						}
 						catch (pnapi::exception::UserCausedError e) {
-							e.output(cout);cout<<"create down"<<std::endl;
+							e.output(cout);
 						}
 						if(netPlace!=NULL){if (nets[x]->findPlace(place->getName()+"$compl")==NULL) {
 							try{
@@ -446,10 +456,7 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 						}
 						nets[x]->createArc(*t, *netPlace, (*f)->getWeight());
 						if (nets[x]->findPlace(place->getName()+"$compl")!=NULL) {
-							//cout << "gasit";
-							//if(place->getTokenCount()||place->getName()==sfp) nets[x]->createArc( *t, *nets[x]->findPlace(place->getName()+"_compl"),(*f)->getWeight());
 							nets[x]->createArc( *nets[x]->findPlace(place->getName()+"$compl"), *t,(*f)->getWeight());
-							//cout << "created arc from "<<place->getName()+"$compl"<<" to "<<t->getName()<<endl;
 						}}
 					}
 				}
@@ -458,7 +465,6 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 					if(nets[x]->getInterface().findLabel(place->getName())==NULL){
 					pnapi::Label& netLabel = nets[x]->getInterface().addOutputLabel(place->getName());
 						t->addLabel(netLabel, (*f)->getWeight());}
-					//cout <<"output"<< netLabel.getName()<<std::endl;
 				}
             } 
 			else {//it is an internal place
@@ -476,96 +482,12 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 					}
 				
 					if (nets[x]->findPlace(place->getName()+"$compl")!=NULL) {
-					//cout << "gasit";
-					//if(place->getTokenCount()||place->getName()==sfp) nets[x]->createArc( *t, *nets[x]->findPlace(place->getName()+"_compl"),(*f)->getWeight());
+					
 						nets[x]->createArc( *nets[x]->findPlace(place->getName()+"$compl"), *t,(*f)->getWeight());
-					//cout << "created arc from "<<place->getName()+"$compl"<<" to "<<t->getName()<<endl;
 					}
 				}	
 			}
             }
         }
     
-	if (args_info.compose_flag){
-	unsigned int xx=0;
-	//create the rest of complement arcs
-	for (int j = 0; j < (int) nets.size(); j++)
-	{ 
-		if (nets[j] == NULL)
-			continue;
-		++xx;
-		Place *sink = NULL;
-		
-		for (set<Place *>::iterator p = nets[j]->getPlaces().begin(); p != nets[j]->getPlaces().end(); ++p){
-			//for(p, nets[j]->getPlaces()) {
-			sink = *p;
-			if ((*p)->getPostset().empty()&&((*p)->getName()!="omega")) {
-				status("component '%d' has more than one sink place: '%s'", xx, (*p)->getName().c_str());
-				// if (sink != NULL) {
-				//status("component '%d' has more than one sink place: '%s' and '%s'", j,sink->getName().c_str(), (*p)->getName().c_str());
-				if((*p)->getName().find("$")!=std::string::npos) {//st=s.substr(0,s.find("@"));
-					std::string st=(*p)->getName().substr(0,(*p)->getName().find("$"));
-					Place *netPlace = nets[j]->findPlace(st);
-					if (netPlace != NULL){//if(place->getName()=="Control_s00004783_3") cout<<place->getName()<<"postsetset"<<endl;
-						//for all pre transitions build arc from compl to tr
-						set<Arc *> preset = netPlace->getPresetArcs();
-						for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-						{
-							Transition *t = &(*f)->getTransition();
-							nets[j]->createArc(**p ,*t, (*f)->getWeight());
-							//cout << "created arc from "<<t->getName()<<" to "<<(*p)->getName()+"#compl"<<endl;
-							if(!(*p)->getPostset().empty()) status("component '%d' does not have more than one sink place: '%s' and '%s'", xx,sink->getName().c_str(), (*p)->getName().c_str());
-							else status("error");
-						}
-					}}
-				//}
-				
-				
-			}
-			sink=NULL;
-			
-			///	}
-			//	for (set<Place *>::iterator p = nets[j]->getPlaces().begin(); p != nets[j]->getPlaces().end(); ++p){
-			//for(p, nets[j]->getPlaces()) {
-			if ((*p)->getPreset().empty()&&((*p)->getName()!="alpha")) {
-				//if (sink != NULL) {
-				status("component '%d' has more than one start place: '%s'", xx, (*p)->getName().c_str());
-				sink = *p;//status("component '%d' has more than one start place: '%s' and '%s'", j,sink->getName().c_str(), (*p)->getName().c_str());
-				if((*p)->getName().find("$")!=std::string::npos) {//st=s.substr(0,s.find("@"));
-					std::string st=(*p)->getName().substr(0,(*p)->getName().find("$"));
-					//status("component '%d' has more than one start place: '%s'", x, (*p)->getName().c_str());//"Data_s00000003##s00000720_1#compl"
-					Place *netPlace = nets[j]->findPlace(st);status("%s",st.c_str());
-					if (netPlace != NULL){//if(place->getName()=="Control_s00004783_3") cout<<place->getName()<<"postsetset"<<endl;
-						//for all pre transitions build arc from compl to tr
-						set<Arc *> preset = netPlace->getPostsetArcs();
-						for (set<Arc *>::iterator f = preset.begin(); f != preset.end(); ++f)
-						{
-							Transition *t = &(*f)->getTransition();
-							nets[j]->createArc(*t,**p, (*f)->getWeight());
-							//cout << "created arc from "<<t->getName()<<" to "<<(*p)->getName()+"#compl"<<endl;
-							//if(!(*p)->getPreset().empty()) status("component '%d' does not have more than one start place: '%s' and '%s'", x,sink->getName().c_str(), (*p)->getName().c_str());
-							//else status("error");
-						}
-					}}
-				//}
-				
-			}
-		}
-	}	
-	}	
-		// add pattern before composing
-	if (args_info.compose_flag) { 
-		//for each net ensure fireability of transitions
-		
-		for (int j = 0; j < (int) nets.size(); j++)
-		{ 
-			if (nets[j] == NULL)
-				continue;
-		//++x;
-		// add to structure
-			nets[j]= new PetriNet(addPattern(*nets[j]));		
-
-	}
-	
-	}
 }

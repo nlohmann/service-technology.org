@@ -21,7 +21,7 @@
 
 pnapi::PetriNet deletePattern(pnapi::PetriNet nnn){
 	
-	status("deleting pattern");
+	//status("deleting pattern");
 	pnapi::PetriNet nn=nnn;
 	if (nn.findPlace("a")) {
 		nn.deletePlace(*nn.findPlace("a"));
@@ -44,12 +44,12 @@ pnapi::PetriNet deletePattern(pnapi::PetriNet nnn){
 	if (nn.findTransition("g")) {
 		nn.deleteTransition(*nn.findTransition("g"));
 	}
-	status("finished deleting pattern");
+	//status("finished deleting pattern");
 	return nn;
 }
 
 pnapi::PetriNet addPattern(pnapi::PetriNet nnn){
-	status("adding pattern");
+	//status("adding pattern");
 	pnapi::PetriNet diff=nnn;
 	//cout << pnapi::io::owfn<<diff;
 	
@@ -97,7 +97,7 @@ pnapi::PetriNet addPattern(pnapi::PetriNet nnn){
 
 PetriNet addinterfcompl(PetriNet nnn,set<string> inputplaces1, set<string> outputplaces1){
 	// adds complementary places for the new interface places to a net that has just been composed
-	status("add complement places to a composed net given the interface places");
+	//status("add complement places to a composed net given the interface places");
 	set<string> itwas;
 	PetriNet nn=nnn;
 	for (std::set<Place *>::iterator ssit=nn.getPlaces().begin(); ssit!=nn.getPlaces().end(); ++ssit) {
@@ -178,7 +178,7 @@ PetriNet addinterfcompl(PetriNet nnn,set<string> inputplaces1, set<string> outpu
 		}
 		
 	}
-		status("added complement places to a composed net given the interface places");
+		//status("added complement places to a composed net given the interface places");
 	return nn;
 }
 
@@ -236,7 +236,7 @@ PetriNet complementnet(PetriNet diffc, PetriNet part){
 	//given a net (with complementary places) and a component part compute the complement wrt net
 	//and add the pattern  
 
-	status("complement an open net with respect to a process from which it is derived and adds pattern");
+	//status("complement an open net with respect to a process from which it is derived and adds pattern");
 	//call 
 	PetriNet diff=diffc;
 	
@@ -256,10 +256,8 @@ PetriNet complementnet(PetriNet diffc, PetriNet part){
 			diff.deletePlace(*diff.findPlace((*p)->getName()));
 		}
 	}	
-	status("deleted places and transitions");
+	//status("deleted places and transitions");
 	
-	//build global port
-	//pnapi::Port globalp(diff, "global");
 	// add interface labels to transitions which are opposite to  the initial open net
 	// delete interface places and their complement places
 	std::set<pnapi::Label *> async=part.getInterface().getAsynchronousLabels();
@@ -319,7 +317,7 @@ PetriNet complementnet(PetriNet diffc, PetriNet part){
 }
 
 bool areComposable(pnapi::PetriNet net1, pnapi::PetriNet net2){
-	status("are composable");
+	//status("are composable");
 	bool syntb=false;
 	set<string> inputplaces1,inputplaces2,outputplaces1,outputplaces2;
 	std::set<Label *> inlabels=net1.getInterface().getInputLabels();
@@ -348,10 +346,11 @@ bool areComposable(pnapi::PetriNet net1, pnapi::PetriNet net2){
 		if ((inputplaces1.find(ps)!=inputplaces1.end())&&(outputplaces2.find(ps)!=outputplaces2.end())) {
 			//if ((net1.getInputPlaces().find(*ssit)!=net1.getInputPlaces().end())&&(net2.getOutputPlaces().find(*ssit)!=net2.getOutputPlaces().end())) {
 			//cout << "we consider only simple composition; we are considering instance composition for next versions of the tool";
+				//cout<<ps<<endl;
 				syntb=true;break;
 		}
 		else if ((inputplaces2.find(ps)!=inputplaces2.end())&&(outputplaces1.find(ps)!=outputplaces1.end()))
-		{ syntb=true;break;//matching
+		{ cout<<ps<<endl;syntb=true;break;//matching
 		}
 	}
 	std::set<Label *> synclabels=net1.getInterface().getSynchronousLabels();
@@ -380,7 +379,7 @@ bool noInterfaceLabel(set<string> sset, string place){
 // we only consider components with asynchronous interface
 bool areAsyncComposable(Component c1, Component c2)
 {
-	status("are composable");
+	//status("are composable");
 	bool syntb=false;
 	//all async labels
 	std::set<string> asyncl1;
@@ -413,7 +412,7 @@ Component asyncCompose(Component c1, Component c2){
 	//find common labels
 	Component result;
 	//set the process of the result
-	result.process=c1.process;status("%d places in compose", c2.process.getPlaces().size());
+	result.process=c1.process;//status("%d places in compose", c2.process.getPlaces().size());
 	std::set<string> asyncl1;
 	for (std::set<string>::iterator ssit=c1.inputl.begin(); ssit!=c1.inputl.end(); ++ssit) {
 		asyncl1.insert(*ssit);
@@ -473,7 +472,26 @@ Component asyncCompose(Component c1, Component c2){
 	return result;
 }
 
+vector<string> setPlaceOrder(PetriNet net){
+	//given a set of places, reorders it as in the files
+	//first Control and Data then ordinary places (notice lowercase) alphabetically
 
+	vector<string> sop, rest;
+	for (std::set<pnapi::Place *>::iterator p = net.getPlaces().begin(); p != net.getPlaces().end(); ++p){
+		if(strstr((*p)->getName().c_str(),"Control")!=NULL) sop.push_back((*p)->getName());
+	}
+	for (std::set<pnapi::Place *>::iterator p = net.getPlaces().begin(); p != net.getPlaces().end(); ++p){
+		if(strstr((*p)->getName().c_str(),"Data")!=NULL) sop.push_back((*p)->getName());
+	}
+	for (std::set<pnapi::Place *>::iterator p = net.getPlaces().begin(); p != net.getPlaces().end(); ++p){
+		if(strstr((*p)->getName().c_str(),"Control")==NULL && strstr((*p)->getName().c_str(),"Data")==NULL) rest.push_back((*p)->getName());
+	}	
+	std::sort(rest.begin(),rest.end());
+	for (int p = 0; p < rest.size(); ++p){
+		sop.push_back(rest.at(p));
+	}
+	return sop;
+}
 
 //creates a component given the representative combination, the Petri net component and the process itself
 Component makeComponent(std::pair<vector<bool>, PetriNet> c, PetriNet process){
@@ -484,7 +502,7 @@ Component makeComponent(std::pair<vector<bool>, PetriNet> c, PetriNet process){
 	for (std::set<Label *>::iterator ssit=inputl.begin(); ssit!=inputl.end(); ++ssit) {
 		result.inputl.insert((*ssit)->getName());
 	}
-	cout << inputl.size()<<endl;
+	//cout << inputl.size()<<endl;
 	std::set<Label *> outputl=c.second.getInterface().getOutputLabels();
 	for (std::set<Label *>::iterator ssit=outputl.begin(); ssit!=outputl.end(); ++ssit) {
 		result.outputl.insert((*ssit)->getName());
@@ -511,13 +529,13 @@ PetriNet makeComponentNet(Component c){
 	set<string> setn; //builds up the set of nodes of the new component
 	deque<string> sdq; //contains a set of nodes of the new component
 	// for each asynchronous label get the transitions and add respective label
-	std::set<string> asyncl1;cout<< c.inputl.size()<<endl;
+	std::set<string> asyncl1;//cout<< c.inputl.size()<<endl;
 	for (std::set<string>::iterator ssit=c.inputl.begin(); ssit!=c.inputl.end(); ++ssit) {
 		asyncl1.insert(*ssit);
 		Place *porig=c.process.findPlace(*ssit);
-		if (porig==NULL) {
-			status("%d input place %s not found", c.process.getPlaces().size(),ssit->c_str());
-		}
+		//if (porig==NULL) {
+			//status("%d input place %s not found", c.process.getPlaces().size(),ssit->c_str());
+		//}
 		//label might be there already
 		pnapi::Label *netLabel = cn.getInterface().findLabel(*ssit);
 		if(netLabel==NULL) netLabel = &cn.getInterface().addInputLabel(*ssit);
@@ -538,7 +556,7 @@ PetriNet makeComponentNet(Component c){
 	for (std::set<string>::iterator ssit=c.outputl.begin(); ssit!=c.outputl.end(); ++ssit) {
 		asyncl1.insert(*ssit);
 		Place *porig=c.process.findPlace(*ssit);
-		if (porig==NULL) {status("%d output place %s not found", c.process.getPlaces().size(),ssit->c_str());}
+		//if (porig==NULL) {status("%d output place %s not found", c.process.getPlaces().size(),ssit->c_str());}
 		set<pnapi::Arc *> preset = porig->getPresetArcs();
 		pnapi::Label *netLabel=cn.getInterface().findLabel(*ssit);
 		if(cn.getInterface().findLabel(*ssit)==NULL ){
@@ -601,7 +619,170 @@ PetriNet makeComponentNet(Component c){
 		//delete visited
 		
 	}
-	cout<<"size of the set of places"<<cn.getTransitions().size()<<endl;
+	//cout<<"size of the set of places"<<cn.getTransitions().size()<<endl;
 	return cn;
+}
+
+vector<Component> recompose(vector<PetriNet *> nets, PetriNet net){
+	vector<Component> vcp;
+	std::vector<pnapi::PetriNet  > parts; //vector of pn2
+	
+	unsigned int maxi=0,nc=0;
+	//compute medium size (taking into account the set of places of the net)
+	for (int j = 0; j < (int) nets.size(); j++)
+		if (nets[j] == NULL)
+			continue;
+		else
+		{		
+			++nc;parts.push_back(*nets.at(j));
+			//if (net->getInternalPlaces().size()>maxi) {
+			maxi+=nets[j]->getPlaces().size();
+			cout<<nets[j]->getPlaces().size()<<endl;
+			//}
+		}
+	status("%d components", nc);
+	std::vector<bool> in(nc,false),com(nc,false);in.flip();
+	std::set< std::vector<bool> >all;//stores component compositions (without complement duplicates)
+	int total=(maxi+5*nc);///nc; //
+	maxi=total;
+	//cout<<"Sum "<<maxi<<" ; "<<total<<" 2/3 "<<total*2/3<<" 1/3 "<<total*1/3<<endl;
+	//stores all smaller composition from previous iterations of size 2 or greater
+	//note that 
+	map<vector<bool>, Component> small;
+	//map<vector<bool>, PetriNet> alln;//stores all balanced components without duplicates  
+	
+	//since average does not relate to the size of the whole process, we consider medium sizes (fraction) of the original process
+	for (unsigned int i = 0; i < parts.size(); ++i){			
+		//if the component is medium compute the complement and if it si not that big keep it		
+		Component c;			
+		vector<bool> in(nc,false),inc(nc,false);
+		in[i]=true;inc[i]=true;inc.flip();
+		std::pair<vector<bool>, PetriNet> p;
+		p.first=in;
+		p.second=parts.at(i);
+		c=makeComponent(p, net);
+		// if it is medium sized we consider it a solution 
+		if((maxi/3<=parts.at(i).getPlaces().size()+5)&&(parts.at(i).getPlaces().size()+5<=2*maxi/3)){
+			//compose
+			if((all.find(in)==all.end()) && (all.find(inc)==all.end())){
+				all.insert(in);
+				vcp.push_back(c);cout<<"vcp 1 "<<vcp.size()<<endl;
+			}
+			
+		}
+		//medium or small compose maxi/3>parts.at(i).getPlaces().size()||((maxi/3<= (parts.at(i).getPlaces().size())
+		if (parts.at(i).getPlaces().size()+5<=2*maxi/3){
+			//small[in]=c;//nn;////store it for the future also the composition
+			//cout<<i<<" "<<maxi/3<<"?"<<parts.at(i).getPlaces().size()<<endl;
+			//it is small, compose it  // we do not need to store it in the smaller set as we are already taking care of it 
+			for(unsigned int j=i+1; j< parts.size();++j){
+				//check if ij are composable 			
+				if(areComposable(parts.at(i),parts.at(j))&& (parts.at(i).getPlaces().size()+parts.at(j).getPlaces().size()+10<maxi*2/3)){
+					//compose them (adding complementary places for former interface places)
+					//cout <<i<<" "<< parts.at(i).getPlaces().size()+5<< "compose with"<<j<<" Size "<< parts.at(j).getPlaces().size()+5 <<" total "<<parts.at(i).getPlaces().size()+parts.at(j).getPlaces().size()+10<<"?"<<maxi*2/3<<endl;
+					vector<bool> in(nc,false);
+					in[i]=true;in[j]=true;
+					//all.insert(in);
+					std::pair<vector<bool>, PetriNet> p;
+					p.first=in;
+					p.second=parts.at(j);
+					Component cj=makeComponent(p, net);
+					Component cc=asyncCompose(c,cj);
+					if(maxi/3>=10+parts.at(i).getPlaces().size()+parts.at(j).getPlaces().size()){
+						std::cout<<"unbalanced composition (too small)"<<endl;
+						continue;
+						
+					}
+					
+					cout<<"Two"<<i<<" "<<j<<endl;
+					vector<bool> inc(nc,false);//complement
+					in[i]=true;inc[i]=true;in[j]=true;inc[j]=true;inc.flip();
+					//check whether the component and its complement has been computed before
+					//all contains final components small partial components
+					if((all.find(in)==all.end()) && (all.find(inc)==all.end())){
+						all.insert(in);			
+						//store for printing 
+						vcp.push_back(cc);cout<<"vcp 2 "<<vcp.size()<<endl;
+						
+						//store it in the vector of small
+						small[in]=cc;
+						//cout<<"small="<<small.size()<<endl;
+					}
+					// check
+					
+				}
+				else cout<<"not syntactically compaible"<<endl;
+				
+			}
+		}			
+		
+	}
+	
+	//map<vector<bool>, Petrinet> small;
+	map<vector<bool>,Component> smallp;//=small;//compute new components from small
+	//cout<<"Total ="<<all.size()<<endl;
+	//cout << "Total number of medium decompositions "<< vcp.size()<<endl;
+	//cout << "number compositions of size 2 "<< small.size()<<endl;
+	
+	
+	unsigned int d=nc/2-2;//
+	cout <<"number of components "<<nc<<"; small comp of size 2 " << small.size()<<"; no of iterations"<< d <<endl;
+	while(d!=0){
+		--d;
+		for (int i=0;i < (int) parts.size(); i++) {
+			//for all members obtained in the previous round
+			map<vector<bool>,Component>::iterator it;
+			for ( it=small.begin() ; it != small.end(); ++it ){
+				
+				if (!(*it).first[i]) {// i+i is forbidden by default 
+					
+					//modify smallp the previous then small
+					Component pp=(*it).second;
+					vector<bool> vi(nc,false);vi[i]=true;
+					std::pair<vector<bool>, PetriNet> pi; 
+					pi.first=vi; pi.second=parts.at(i);
+					Component c=makeComponent(pi,net);
+					
+					
+					if (areAsyncComposable(c,pp)&&parts.at(i).getPlaces().size()+pp.sizep+10<=maxi*2/3){
+						//compose them (adding complementary places for former interface places
+						Component cc=asyncCompose(c,pp);
+						
+						vector<bool> in(nc,false);
+						
+						in=(*it).first;in[i]=true;
+						
+						if(maxi/3>=parts.at(i).getPlaces().size()+pp.sizep+10){
+							//std::cout<<endl<<"unbalanced composition (too small)"<<endl;
+							continue;
+							
+						}						
+						//output the net , complement and composition
+						//cout<<"composable and medium"<<parts.at(i).getPlaces().size()+pp.sizep+10<<endl;
+						vector<bool> inc=in;
+						inc.flip();//insert complement as well
+						if((all.find(in)==all.end()) && (all.find(inc)==all.end()))
+						{	
+							all.insert(in);
+							vcp.push_back(cc);//cout<<"vcp "<<vcp.size()<<endl;
+							smallp[in]=cc;//store it for the future also the composition
+							//cout<<"smallp size ="<<smallp.size()<<endl;
+						}							
+					}
+					
+				}
+			}
+			
+		}
+		small=smallp;
+	}
+	
+	//for components of size 1 and 2 we have obtained all combinations which are less than 1/3 of the average size
+	//and have stored them into a set of mappings
+	//cout<<"Total recompositions ="<<all.size()<<endl;
+	//cout << "Total number of recompositions (last round): "<< smallp.size()<<endl;
+	cout << "Total output compositions: "<< vcp.size()<<endl;
+	
+	return vcp;
 }
 

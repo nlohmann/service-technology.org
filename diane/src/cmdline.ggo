@@ -17,9 +17,9 @@ option "service" -
 	details="Takes into account the initial and final markings of a service."
 	flag off
 	
-option "complementary" -
-	"Complements the internal places of the service (makes processes safe)."
-flag off
+#option "complementary" -
+#	"Complements the internal places of the service (makes processes safe)."
+#flag off
 
 
 option "threshold" t

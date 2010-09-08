@@ -21,9 +21,10 @@
 #include <iomanip>
 #include <iostream>
 #include "cmdline.h"
-#include "verbose.h"
+//#include "verbose.h"
 #include "config.h"
 #include "config-log.h"
+#include "algorithm"
 
 
 using std::cerr;
@@ -67,9 +68,9 @@ Component asyncCompose(Component c1, Component c2);
 // builds a net from a Component structure 
 PetriNet makeComponentNet(Component c);
 
+//given a set of componentss  of a process recomposes them to medium sized components
+vector<Component> recompose(vector<PetriNet *> nets, PetriNet net);
 
-//prints components, their complements and their composition (the structure is computed)
-//void printComponent(Component c);
 
 //namespace recompose {
 
@@ -88,15 +89,11 @@ PetriNet complementnet(PetriNet diffc, PetriNet part);
 
 bool areComposable(PetriNet net1, PetriNet net2);
 
-PetriNet deleteEmptyPorts(PetriNet net1);
 
 bool noInterfaceLabel(set<string> sset, string sub);
 
+vector<string> setPlaceOrder(PetriNet net);
 
-
-//given a Petri net, separate its labels in different ports
-
-PetriNet separatePorts(PetriNet net);
 
 template <class T>
 std::set<T> setUnion(const std::set<T> & a, const std::set<T> & b)

@@ -32,7 +32,7 @@
   $realcall .= " -d2 2>&1";
   // end of building call strings
   
-  if (!strcmp($_SESSION['output'], 'result')) {
+  if (!strcmp($_SESSION["output"], "result")) {
     header("Content-type: text/plain");
     system($realcall." > /dev/null");
     system("cat ".$realresult.".owfn");

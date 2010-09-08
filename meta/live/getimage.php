@@ -49,7 +49,7 @@
     {
       // we know how to convert owfn files using petri
       case "owfn":
-        system("cd ".$_SESSION["dir"]."; petri -opng ".basename($file)." &> /dev/null");
+        system("cd ".$_SESSION["dir"]."; petri -opng --removePorts ".basename($file)." &> /dev/null");
         // remove white border
         system('convert -trim '.$imagefile.' '.$imagefile.' &> /dev/null');
         break;

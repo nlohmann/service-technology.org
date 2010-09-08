@@ -47,7 +47,7 @@
 <body>
   <div id="container">
     <div id="content">
-      <img src="resource/images/live.png" alt="service-technology.org/live" /><br/>
+      <div style="float: right;"><img src="resource/images/live.png" alt="service-technology.org/live" /></div>
       <h1>Service Formalization</h1>
 
       <h2>Parameters</h2>
@@ -70,12 +70,11 @@
 
       <h2>Result</h2>
 
-      <?php 
-        console($fakecall, $realcall.' ');
-        drawImage($fakeresult.'.owfn');
-      ?>
+      <?php  console($fakecall, $realcall.' '); ?>
+
+      <?php drawImage($fakeresult.'.owfn'); ?>
       
-      <a href="<?php echo $realresult;?>">Download output file</a>
+      <a href="<?php getLink($fakeresult);?>">Download output file</a>
     </div>
   </div>
   <div id="footer">

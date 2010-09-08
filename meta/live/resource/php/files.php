@@ -224,8 +224,9 @@ include_once 'resource/php/getnumber.php';
 // output header
 header("Content-Type: text/html");
 echo '<?xml version="1.0" encoding="utf-8" ?>';
+  print_r($_SESSION);
 
-$process = $_SESSION["$tool"]["process"];
+$process = $_SESSION[$tool]["process"];
 
 if ( ! strcmp($_SESSION[$tool]["input_type"], 'example') )
 {

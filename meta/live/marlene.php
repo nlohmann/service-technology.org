@@ -1,7 +1,7 @@
 <?php
 
   // most important script! sets session information and PATH!
-  require 'resource/php/session.php';
+  require_once 'resource/php/session.php';
 
   // do not call the page without POST request, or only if session is 
   // already set to Marlene (all information about services available)
@@ -38,7 +38,7 @@
 
   // some functions for copying/creating files to/in temporary directory
   // see files.php for further information
-  require 'resource/php/files.php';
+  require_once 'resource/php/files.php';
 
   // copied from Wendy ;)
   include 'resource/php/console.php';

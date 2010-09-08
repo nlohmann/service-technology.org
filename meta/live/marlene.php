@@ -4,6 +4,11 @@
   require_once 'resource/php/session.php';
   $tool = "marlene";
   
+  // some functions for copying/creating files to/in temporary directory
+  // see files.php for further information
+  require_once 'resource/php/files.php';
+
+  /*
   // do not call the page without POST request, or only if session is 
   // already set to Marlene (all information about services available)
   if ( ! isset($_REQUEST) && ! isset($_SESSION["marlene"]))
@@ -29,18 +34,16 @@
       }
     }
   }
-
+  */
+  /*
   if ( ! isset($_SESSION["marlene"]))
   {
     // direct call of this page -> return to main page
     header('Location: index.html#marlene');
     exit;
   }
-
-  // some functions for copying/creating files to/in temporary directory
-  // see files.php for further information
-  require_once 'resource/php/files.php';
-
+   */
+  /*
   // copied from Wendy ;)
   include_once 'resource/php/console.php';
   include_once 'resource/php/dotimg.php';
@@ -49,7 +52,7 @@
   // output header
   header("Content-Type: text/html");
   echo '<?xml version="1.0" encoding="utf-8" ?>';
-
+  */
   // prepare example
   if (!strcmp($_SESSION["marlene"], 'coffee1.owfn')) {
     $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");

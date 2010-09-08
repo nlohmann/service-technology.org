@@ -239,6 +239,12 @@ else if ( ! strcmp($_SESSION["input_type"], 'given') )
   $process = createFile($process, $_SESSION["input_given"]);
 }
 
+if ( !is_array ($process))
+{
+echo "process is not an array";
+exit;
+}
+
 /*
  * Main part: This file MUST be included into any tool script. We process the given request variable
  * to set or create files respectively.

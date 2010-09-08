@@ -145,39 +145,42 @@ else
   {
     $set = false;
     
-    $_SESSION["input_type"] = $_REQUEST["input_type"];
-    
-    if ( ! strcmp($_REQUEST["input_type"], 'example') )
+    if (isset($_REQUEST["input_type"]))
     {
-      // remember name of example in session
-      $_SESSION[$tool] = "$tool/".$_REQUEST["input_example"];
-      $set = true;
-    }
-    else if ( ! strcmp($_REQUEST["input_type"], 'uploaded') )
-    {
-      $_SESSION[$tool] = $_REQUEST["input_uploaded"];
-      $set = true;
-    }
-    else if ( ! strcmp($_REQUEST["input_type"], 'url') )
-    {
-      $_SESSION[$tool] = $_REQUEST["input_url"];
-      $set = true;
-    }
-    else if ( ! strcmp($_REQUEST["input_type"], 'given') )
-    {
-      $_SESSION[$tool] = "given_".md5(uniqid(mt_rand(), true));
-      $set = true;
-    }
-    if (strcmp($_REQUEST["input_type"], 'uploaded'))
-    {
-      switch ($tool)
+      $_SESSION["input_type"] = $_REQUEST["input_type"];
+      
+      if ( ! strcmp($_REQUEST["input_type"], 'example') )
       {
-        case "bpel2owfn":
-          $_SESSION[$tool] .= ".bpel";
-          break;
-        default:
-          $_SESSION[$tool] .= ".owfn";
-          break;
+        // remember name of example in session
+        $_SESSION[$tool] = "$tool/".$_REQUEST["input_example"];
+        $set = true;
+      }
+      else if ( ! strcmp($_REQUEST["input_type"], 'uploaded') )
+      {
+        $_SESSION[$tool] = $_REQUEST["input_uploaded"];
+        $set = true;
+      }
+      else if ( ! strcmp($_REQUEST["input_type"], 'url') )
+      {
+        $_SESSION[$tool] = $_REQUEST["input_url"];
+        $set = true;
+      }
+      else if ( ! strcmp($_REQUEST["input_type"], 'given') )
+      {
+        $_SESSION[$tool] = "given_".md5(uniqid(mt_rand(), true));
+        $set = true;
+      }
+      if (strcmp($_REQUEST["input_type"], 'uploaded'))
+      {
+        switch ($tool)
+        {
+          case "bpel2owfn":
+            $_SESSION[$tool] .= ".bpel";
+            break;
+          default:
+            $_SESSION[$tool] .= ".owfn";
+            break;
+        }
       }
     }
     

@@ -47,18 +47,23 @@
 <body>
   <div id="container">
     <div id="content">
-      <div style="float: right;"><img src="resource/images/live.png" alt="service-technology.org/live" /></div>
+      <div style="float: right; top: -10px;"><img src="resource/images/live.png" alt="service-technology.org/live" /></div>
       <h1>Service Formalization</h1>
 
       <h2>Parameters</h2>
-
       <ul>
         <li><strong>input file:</strong> <?=$process[$_SESSION["bpel2owfn"]]["basename"]?>
           <?php
-          if (!strcmp($_SESSION['input_type'], 'url'))
-            echo ' (downloaded from <a href="'.$_SESSION["bpel2owfn"].'">'.$_SESSION["bpel2owfn"].'</a>)';
-          if (!strcmp($_SESSION['input_type'], 'file'))
-            echo ' (uploaded from local file '.basename($_SESSION["bpel2owfn"]).')';
+          switch($_SESSION['input_type']) {
+            case "example":   echo "example file"; break;
+            case "uploaded":  echo "uploaded file"; break;
+            case "url":       echo "downloaded file"; break;
+            case "given":     echo "given file"; break;
+          }
+//          if (!strcmp($_SESSION['input_type'], 'url'))
+//            echo ' (downloaded from <a href="'.$_SESSION["bpel2owfn"].'">'.$_SESSION["bpel2owfn"].'</a>)';
+//          if (!strcmp($_SESSION['input_type'], 'example'))
+//            echo ' (uploaded from local file '.basename($_SESSION["bpel2owfn"]).')';
           ?>
         </li>
         <li><strong>patterns:</strong> <?=$_SESSION['patterns']?></li>
@@ -68,15 +73,16 @@
         <li><strong>structural reduction level:</strong> <?=$_SESSION['reduce']?></li>
       </ul>
 
-      <h2>Result</h2>
-
+      <h2>Call</h2>
       <?php  console($fakecall, $realcall.' '); ?>
 
+      <h2>Result</h2>
       <?php drawImage($fakeresult.'.owfn'); ?>
       
       <?php
           echo "<li><a href=".getLink($fakeresult.'.owfn').">".basename($fakeresult)."</a></li>";
-      ?>    </div>
+      ?>
+    </div>
   </div>
   <div id="footer">
     <p><a href="http://service-technology.org">service-technology.org</a> is a cooperation between the <a  href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/">University of Rostock</a> and the <a  href="http://www2.informatik.hu-berlin.de/top/index.php">Humboldt-Universit&auml;t zu Berlin</a>.</p>

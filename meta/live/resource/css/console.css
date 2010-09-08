@@ -2,6 +2,14 @@
   margin-left: auto;
   margin-right: auto;
   width: 558px; /* width of console.png */
+
+  -moz-box-shadow: 2px 2px 2px #333;
+  -webkit-box-shadow: 2px 2px 2px #333;
+  box-shadow: 2px 2px 2px #333;
+  /* For IE 8 */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#333333')";
+  /* For IE 5.5 - 7 */
+  filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#333333');
 }
 
 .console .title {

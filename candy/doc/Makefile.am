@@ -2,7 +2,7 @@
 info_TEXINFOS = candy.texi
 
 # any other files you need to add (images)
-EXTRA_DIST =
+EXTRA_DIST = extra_man
 
 # the height of the README's ASCII art + URL + 3 spaces
 BANNERHEIGHT = 10
@@ -62,8 +62,45 @@ $(top_srcdir)/REQUIREMENTS: $(PACKAGE).texi
 $(top_srcdir)/THEORY: $(PACKAGE).texi
 	$(AM_V_GEN)
 	$(AM_V_at)$(MAKEINFO) -o THEORY.txt --no-split --no-headers --no-number-sections --fill-column=79 $(srcdir)/$(PACKAGE).texi
-	$(AM_V_at)$(SED) -n '/$(PACKAGE_NAME) implements several algorithms/,/for more information./w THEORY2.txt' THEORY.txt
+	$(AM_V_at)$(SED) -n '/$(PACKAGE_NAME) implements an algorithm/,/for more information./w THEORY2.txt' THEORY.txt
 	$(AM_V_at)head -n$(BANNERHEIGHT) $(top_srcdir)/README > $(top_srcdir)/THEORY
 	$(AM_V_at)cat THEORY2.txt >> $(top_srcdir)/THEORY
 	$(AM_V_at)echo "" >> $(top_srcdir)/THEORY
 	$(AM_V_at)rm THEORY.txt THEORY2.txt
+
+
+#---------------------------------------#
+# GENERIC: run tool to create a manpage #
+#---------------------------------------#
+
+man_MANS = $(PACKAGE).1
+
+MAINTAINERCLEANFILES += $(man_MANS) $(man_MANS:.1=)-man.pdf
+EXTRA_DIST += $(man_MANS)
+
+$(PACKAGE).1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo extra_man
+	$(AM_V_GEN)$(HELP2MAN) \
+		$(top_builddir)/src/$(PACKAGE) \
+		--name="synthesizing cost efficient partners for services" \
+		--output=$@ \
+		--manual="service-technology.org" \
+		--source="service-technology.org" \
+		--help-option="$(HELPOPTION)" \
+		--opt-include=extra_man
+
+man-pdf: $(man_MANS:.1=)-man.pdf
+
+%-man.pdf: %.1
+	$(AM_V_GEN)groff -Tps -mandoc -c $< | ps2pdf - $(@:.1=)
+
+
+#-------------------------------------------------------------------#
+# run the "gendocs.sh" script to create a manual in several formats
+#-------------------------------------------------------------------#
+EXTRA_DIST += gendocs.sh gendocs_template
+
+manual: $(info_TEXINFOS)
+	./gendocs.sh --email $(PACKAGE_BUGREPORT) $(PACKAGE) "$(PACKAGE_NAME)"
+	-cp -R figs manual
+	-cp -R figs manual/html_node
+	./gendocs.sh $(PACKAGE) "$(PACKAGE_NAME)"

@@ -11,8 +11,8 @@
 Candy implements an algorithm published in volume 380 of CEUR Workshop
 Proceedings.
 
-Cost efficient operating guidelines
-===================================
+Cost efficient operating guidelines for adapter synthesis
+=========================================================
 
      Christian Gierds. Finding Cost-Efficient Adapters.
      In Niels Lohmann and Karsten Wolf, editors, Proceedings of the 15th

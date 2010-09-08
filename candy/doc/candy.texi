@@ -11,9 +11,9 @@
 
 @b{About this document:}
 
-This manual is for candy, version @value{VERSION}, a tool to synthesize cost efficient partners for services, last updated @value{UPDATED}.
+This manual is for Candy, version @value{VERSION}, a tool to synthesize cost efficient partners for services, last updated @value{UPDATED}.
 
-Copyright @copyright{} 2009 Richard Mueller
+Copyright @copyright{} 2010 Richard Mueller
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
@@ -24,7 +24,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @dircategory service-technology.org
 @direntry
-* candy: (candy).       synthesizing cost efficient partners for services.
+* Candy: (candy).       synthesizing cost efficient partners for services.
 @end direntry
 
 
@@ -51,7 +51,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @ifnottex
 @node Top
-@top candy
+@top Candy
 @insertcopying
 @end ifnottex
 
@@ -60,6 +60,8 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @menu
 * First Steps::How to set up and install Candy.
 * Command Line Options::How to run Candy.
+* Theory::The theory behind Candy.
+* Exit and Error Codes::What the error and exit codes of Candy mean.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
 @end menu
@@ -209,6 +211,98 @@ For an overview of the command line options, type @samp{candy -h} to see the fol
 @end smallexample
 
 
+@section Configuration Files
+
+The parameters can also be controlled using a configuration file that can be read using the @samp{config} option; for example:
+
+@cartouche
+@smallexample
+candy net.owfn --config=myconf.conf
+@end smallexample
+@end cartouche
+
+A configuration file consistes of @code{paramter = value} lines, each line setting the value of a parameter. Note: If not all parameters are defined, the standard values apply.
+
+The configure script creates a default configuration file @file{candy.conf}
+which located in the @file{src} folder. When installing Candy, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
+
+When Candy is executed, it evaluates parameters as follows:
+@enumerate
+@item When a configuration file is given via @option{--config}, it is used.
+@item Otherwise, the configuration file @file{candy.conf} in the local directory is used if present.
+@item Otherwise, the configuration file @file{candy.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
+@item Otherwise, no configuration file is used.
+@end enumerate
+Parameters given via command-line will overwrite parameters given via configuration files.
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Theory
+@chapter Theory
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Candy implements an algorithm published in volume 380 of CEUR Workshop Proceedings.
+
+@section Cost efficient operating guidelines for adapter synthesis
+
+@subsubheading General Algorithm
+
+@quotation
+Christian Gierds. @b{Finding Cost-Efficient Adapters}. In Niels Lohmann and Karsten Wolf, editors, @i{Proceedings of the 15th German Workshop on Algorithms and Tools for Petri Nets, AWPN 2008, Rostock, Germany, September 26--27, 2008}, volume 380 of CEUR Workshop Proceedings, pages 37-42, September 2008. CEUR-WS.org. 
+@end quotation
+
+@quotation
+Christian Gierds, Arjan J. Mooij, and Karsten Wolf. @b{Reducing adapter
+synthesis to controller synthesis}. @i{Transactions on Services Computing,
+(accepted for publication), 2010}.
+@end quotation
+
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+See @url{http://service-technology.org/publications} for more information.
+
+
+
+@c --------------------------------------------------------------------------
+
+
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Exit and Error Codes
+@chapter Exit and Error Codes
+
+
+@section Exit Codes
+
+Candy will exit with code @samp{0} in case everything went fine. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+
+
+@section Error Codes
+
+In case any error occurs, Candy aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
+
+@table @asis
+@item #01
+Error opening the input open net or input file not found.
+
+@smallexample
+@cartouche
+candy: could not open file `foo.owfn' -- aborting [#01]
+@end cartouche
+@end smallexample
+
+@end table
+
+
+
 @c --------------------------------------------------------------------------
 
 
@@ -216,7 +310,7 @@ For an overview of the command line options, type @samp{candy -h} to see the fol
 @chapter Version History
 
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
-Candy is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+Candy is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might not always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
 
 @include ChangeLog.texi
 

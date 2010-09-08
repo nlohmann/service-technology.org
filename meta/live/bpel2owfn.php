@@ -24,10 +24,10 @@
 //  $fakeresult .= ".owfn"; 
   $realresult = $_SESSION["dir"]."/".$fakeresult;
 
-  $fakecall .= " -o ".$fakeresult;
-  $realcall .= " -o ".$realresult;
+  $fakecall .= " --output=".$fakeresult;
+  $realcall .= " --output=".$realresult;
 
-//  $realcall .= " -v 2>&1";
+  $realcall .= " -d3 2>&1";
   // end of building call strings
   
 ?>

@@ -26,7 +26,7 @@ cd ..
 rm -fr $TOOL* $TOOL.tar.gz
 
 
-for TOOL in pnapi wendy marlene mia
+for TOOL in pnapi wendy marlene mia bpel2owfn rachel
 do
   wget http://esla.informatik.uni-rostock.de:8080/job/$TOOL/lastSuccessfulBuild/artifact/$TOOL/$TOOL.tar.gz
   tar xfz $TOOL.tar.gz

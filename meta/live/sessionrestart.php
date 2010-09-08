@@ -17,7 +17,8 @@ function deleteDirectory($dir) {
 	  // cleaning up $_SESSION["dir"]
 	  if (!empty($_SESSION["dir"]))
 	  {
-	    deleteDirectory($_SESSION["dir"]);
+	    // this will invalidate all file links !!!!
+	    //deleteDirectory($_SESSION["dir"]);
 	  }
 	  // restart 
 		$_SESSION = array();

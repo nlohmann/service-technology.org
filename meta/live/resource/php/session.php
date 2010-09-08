@@ -1,7 +1,7 @@
 <?php
 
   // read configuration file including information on PATH for tools
-  require(dirname(__FILE__).'/../../conf/live.conf');
+  require_once(dirname(__FILE__).'/../../conf/live.conf');
 
   // debugging, should be removed in later versions for security reasons
   ini_set("display_errors", "On");

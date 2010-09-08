@@ -1,6 +1,6 @@
 <?php
 
-require 'session.php';
+require_once 'session.php';
 
 /**
  * Gets an array of file names, copies the files to the working

@@ -1,6 +1,9 @@
 <?php
 
-  require 'resource/php/session.php';
+  require_once 'resource/php/session.php';
+
+  require_once 'resource/php/files.php';
+
 
   if ( ! isset($_SESSION["rules"]) )
   {
@@ -34,8 +37,6 @@
     header('Location: index.html#adapterdiagnosis');
     exit;
   }
-
-  require 'resource/php/files.php';
 
   include 'resource/php/console.php';
   include 'resource/php/dotimg.php';

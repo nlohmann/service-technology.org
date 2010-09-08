@@ -145,7 +145,10 @@ else
   {
     $set = false;
     
-    $_SESSION[$tool] = $_REQUEST;
+    foreach ($_REQUEST as $key => $value)
+    {
+      $_SESSION[$tool][$key] = $value;
+    }
     
     if (isset($_REQUEST["input_type"]))
     {

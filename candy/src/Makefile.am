@@ -15,6 +15,15 @@ candy_SOURCES = og-syntax.yy og-lexic.ll \
                 main.cc \
                 cmdline.c cmdline.h
 
+# the configuration files
+sysconf_DATA = candy.conf
+
+# pass the sysconfdir to Candy (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
+candy_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
+
+
+
+
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW

@@ -3,7 +3,7 @@
   /*** Create visualization for certain file types ***/
 
   // we need session information
-  require('resource/php/session.php');
+  require_once('resource/php/session.php');
 
   // we need the session id and filename, for locating the file in the
   // working directory
@@ -52,6 +52,12 @@
         system("cd ".$_SESSION["dir"]."; petri -opng --removePorts ".basename($file)." &> /dev/null");
         // remove white border
         system('convert -trim '.$imagefile.' '.$imagefile.' &> /dev/null');
+        break;
+      case "og":
+        echo "og found!";
+        break;
+      case "sa":
+        echo "sa found!";
         break;
     }
   }

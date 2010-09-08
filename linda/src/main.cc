@@ -122,7 +122,7 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 
 	first = true;
 
-	std::set<pnapi::Label *> outlabels = net->getInterface().getInputLabels();
+	std::set<pnapi::Label *> outlabels = net->getInterface().getOutputLabels();
 
 	for (std::set<pnapi::Label *>::iterator it = outlabels.begin(); it
 	!= outlabels.end(); ++it) {

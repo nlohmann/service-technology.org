@@ -31,7 +31,7 @@
           <li><a href="#wendy"><span>Partner Synthesis</span></a></li>
           <li><a href="#rachel"><span>Service Correction</span></a></li>
           <li><a href="#marlene"><span>Adapter Synthesis</span></a></li>
-          <li><a href="#adapterdiagnosis"><span>Interactive Adapter Rule Design</span></a></li>
+          <li><a href="#marlene_ia"><span>Interactive Adapter Rule Design</span></a></li>
           <li><a href="#pnog"><span>Petri Net OG</span></a></li>
           <li><a href="#migration"><span>Instance Migration</span></a></li>
           <li><a href="#matching"><span>Service Matching</span></a></li>
@@ -251,14 +251,15 @@
            </div>
           </div>
 
-          <div id="adapterdiagnosis">
+          <div id="marlene_ia">
             <h1>Interactive Adapter Rule Design</h1>
             <p>Automatic adapter generation approaches usually rely on domain-specific message transformation rules. The tool <a href="http://service-technology.org/marlene">Marlene</a> provides an interactive GUI to support the design of such rules.</p>
             <form action="marlene_interactive.php" method="post" enctype="multipart/form-data">
               <fieldset>
                 <legend>Service model</legend>
+                <input type="radio" name="input_type" value="example" checked="checked" id="marlene_ia_example" /><label for="marlene_ia_example"> 
                 Use a given service model: 
-                <select name="example" size="1">
+                <select name="input_example" size="1">
                     <option value="iRules">Information Request</option>
                     <option value="iCoffee">Coffee Vending Machine</option>
                 </select>

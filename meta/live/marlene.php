@@ -8,7 +8,6 @@
   // see files.php for further information
   require_once 'resource/php/files.php';
 
-  print_r($_SESSION);
   // prepare example
   if (!strcmp($_SESSION["marlene"]["process"], 'marlene/coffee1.owfn')) {
     $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");

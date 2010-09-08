@@ -147,12 +147,12 @@ else
     
     /*
     $_SESSION[$tool] = array();
-    
     foreach ($_REQUEST as $key => $value)
     {
       $_SESSION[$tool][$key] = $value;
     }
     */
+    
     // $_SESSION[$tool] = $_REQUEST;
     
     if (isset($_REQUEST["input_type"]))

@@ -10,12 +10,12 @@
 
   print_r($_SESSION);
   // prepare example
-  if (!strcmp($_SESSION["marlene"], 'marlene/coffee1.owfn')) {
+  if (!strcmp($_SESSION["marlene"]["process"], 'marlene/coffee1.owfn')) {
     $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");
     $rules = array("marlene/coffee.ar");
   }
 
-  else if (!strcmp($_SESSION["marlene"], 'marlene/coffee2.owfn')) {
+  else if (!strcmp($_SESSION["marlene"]["process"], 'marlene/coffee2.owfn')) {
     $services = array("marlene/myCoffee-rep.owfn", "marlene/myCustomer-rep.owfn");
     $rules = array("marlene/coffee.ar");
   }

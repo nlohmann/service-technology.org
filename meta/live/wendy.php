@@ -35,8 +35,8 @@
   $fakeresult .= $process[$_SESSION["wendy"]]["filename"];
   $realresult = $_SESSION["dir"]."/".$fakeresult;
 
-  $fakecall .= " --".$_SESSION['mode'].'='.$fakeresult;
-  $realcall .= " --".$_SESSION['mode'].'='.$realresult;
+  $fakecall .= " --".$_SESSION['mode'].'='.$fakeresult.".".$_SESSION['mode'];
+  $realcall .= " --".$_SESSION['mode'].'='.$realresult.".".$_SESSION['mode'];
 
   $realcall .= " -v 2>&1";
   // end of building call strings
@@ -88,7 +88,7 @@
 
       <h2>Parameters</h2>
       <ul>
-        <li><strong>input file:</strong> <?=$process[$_SESSION["bpel2owfn"]]["basename"]?>.owfn
+        <li><strong>input file:</strong> <?=$process[$_SESSION["wendy"]]["basename"]?>.owfn
           <?php
             switch($_SESSION['input_type']) {
               case "example":   echo "example file"; break;
@@ -118,18 +118,18 @@
     <h2>Output</h2>
     
     <?php
-      if (!strcmp($_REQUEST['mode'], 'ig')) {
-        drawImage(fakeresult.'.sa');
+      if (!strcmp($_SESSION['mode'], 'ig')) {
+        drawImage($fakeresult.'.sa');
 //        $thumbnailcall = 'convert -resize 200x200 wendy/'.$output_graphics.' wendy/'.$output_thumb;
 //        system($thumbnailcall);
 //        echo '<p><a href="wendy/'.$output_graphics.'"><img src="wendy/'.$output_thumb.'" /></p>';
       } else {
-        drawImage(fakeresult.'og');
+        drawImage($fakeresult.'og');
         //dotimg('in=wendy/'.$inputfilename.'.dot&label='.urlencode("operating guideline"));
       }
     ?>
     
-    <p><a href="<?=getLink($realresult)?>">result</a></p>
+    <p><a href="<?=getLink($realresult.".".$_SESSION['mode'])?>">result</a></p>
 
     </div>
   </div>

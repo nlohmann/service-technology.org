@@ -27,7 +27,7 @@
   $fakecall .= " --output=".$fakeresult;
   $realcall .= " --output=".$realresult;
 
-  $realcall .= " -d3 2>&1";
+  $realcall .= " -d2 2>&1";
   // end of building call strings
   
 ?>
@@ -40,49 +40,46 @@
   <link rel="stylesheet" type="text/css" href="resource/css/console.css" />
   <link rel="shortcut icon" href="resource/favicon.ico" type="image/x-icon" />
   <link rel="icon" href="resource/favicon.ico" type="image/x-icon" />
-  <title>BAAS: BPEL2oWFN as a Service</title>
+  <title>service-technology.org/live - Service Formalization</title>
   <script type="text/javascript" src="resource/js/jquery-1.2.6.pack.js"></script>
 </head>
 
 <body>
   <div id="container">
     <div id="content">
-  
-  <h1>BPEL2oWFN</h1>
+      <img src="resource/images/live.png" alt="service-technology.org/live" /><br/>
+      <h1>Service Formalization</h1>
 
-  <h2>Parameters</h2>
+      <h2>Parameters</h2>
 
-  <ul>
-    <li><strong>input file:</strong> <?=$process[$_SESSION["bpel2owfn"]]["basename"]?>
-      <?php
-        if (!strcmp($_SESSION['input_type'], 'url'))
-          echo ' (downloaded from <a href="'.$_SESSION["bpel2owfn"].'">'.$_SESSION["bpel2owfn"].'</a>)';
-        if (!strcmp($_SESSION['input_type'], 'file'))
-          echo ' (uploaded from local file '.basename($_SESSION["bpel2owfn"]).')';
+      <ul>
+        <li><strong>input file:</strong> <?=$process[$_SESSION["bpel2owfn"]]["basename"]?>
+          <?php
+          if (!strcmp($_SESSION['input_type'], 'url'))
+            echo ' (downloaded from <a href="'.$_SESSION["bpel2owfn"].'">'.$_SESSION["bpel2owfn"].'</a>)';
+          if (!strcmp($_SESSION['input_type'], 'file'))
+            echo ' (uploaded from local file '.basename($_SESSION["bpel2owfn"]).')';
+          ?>
+        </li>
+        <li><strong>patterns:</strong> <?=$_SESSION['patterns']?></li>
+        <li><strong>file format:</strong> 
+          <?php echo ((!strcmp($_SESSION['format'], "owfn"))?'Fiona open net':'LoLA Petri net'); ?>
+        </li>
+        <li><strong>structural reduction level:</strong> <?=$_SESSION['reduce']?></li>
+      </ul>
+
+      <h2>Result</h2>
+
+      <?php 
+        console($fakecall, $realcall.' ');
+        drawImage($fakeresult.'.owfn');
       ?>
-    </li>
-    <li><strong>patterns:</strong> <?=$_SESSION['patterns']?></li>
-    <li><strong>file format:</strong> 
-      <?php echo ((!strcmp($_SESSION['format'], "owfn"))?'Fiona open net':'LoLA Petri net'); ?>
-    </li>
-    <li><strong>structural reduction level:</strong> <?=$_SESSION['reduce']?></li>
-  </ul>
-  
-  <h2>Result</h2>
-  
-  <?php 
-  
-    console($fakecall, $realcall.' ');
-
-    drawImage($fakeresult.'.owfn');
-  
-  ?>
-  
-  <p>
-  	<a href="./#bpel2owfn" title="back to reality">Back to live</a>
-  </p>
-  
+      
+      <a href="<?php echo $realresult;?>">Download output file</a>
+    </div>
   </div>
+  <div id="footer">
+    <p><a href="http://service-technology.org">service-technology.org</a> is a cooperation between the <a  href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/">University of Rostock</a> and the <a  href="http://www2.informatik.hu-berlin.de/top/index.php">Humboldt-Universit&auml;t zu Berlin</a>.</p>
   </div>
 </body>
 </html>

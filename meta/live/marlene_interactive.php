@@ -4,17 +4,17 @@
   require_once 'resource/php/session.php';
   $tool = "marlene_ia";
   
-  // some functions for copying/creating files to/in temporary directory
-  // see files.php for further information
-  require_once 'resource/php/files.php';
-
   if ( isset($_REQUEST["rules"] ))
   {
     $_SESSION[$tool]["rules"] = $_REQUEST["rules"];
     header("Location: ".$_SERVER["PHP_SELF"]);
     exit;
   }
-    
+
+  // some functions for copying/creating files to/in temporary directory
+  // see files.php for further information
+  require_once 'resource/php/files.php';
+
   if ( ! isset($_SESSION[$tool]["rules"]) )
   {
     $_SESSION[$tool]["rules"] = "";

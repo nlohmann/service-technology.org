@@ -145,6 +145,8 @@ else
   {
     $set = false;
     
+    $_SESSION[$tool] = $_REQUEST;
+    
     if (isset($_REQUEST["input_type"]))
     {
       $_SESSION["input_type"] = $_REQUEST["input_type"];
@@ -152,22 +154,22 @@ else
       if ( ! strcmp($_REQUEST["input_type"], 'example') )
       {
         // remember name of example in session
-        $_SESSION[$tool] = "$tool/".$_REQUEST["input_example"];
+        $_SESSION[$tool]["process"] = "$tool/".$_REQUEST["input_example"];
         $set = true;
       }
       else if ( ! strcmp($_REQUEST["input_type"], 'uploaded') )
       {
-        $_SESSION[$tool] = $_REQUEST["input_uploaded"];
+        $_SESSION[$tool]["process"] = $_REQUEST["input_uploaded"];
         $set = true;
       }
       else if ( ! strcmp($_REQUEST["input_type"], 'url') )
       {
-        $_SESSION[$tool] = $_REQUEST["input_url"];
+        $_SESSION[$tool]["process"] = $_REQUEST["input_url"];
         $set = true;
       }
       else if ( ! strcmp($_REQUEST["input_type"], 'given') )
       {
-        $_SESSION[$tool] = "given_".md5(uniqid(mt_rand(), true));
+        $_SESSION[$tool]["process"] = "given_".md5(uniqid(mt_rand(), true));
         $set = true;
       }
       if (strcmp($_REQUEST["input_type"], 'uploaded'))
@@ -175,10 +177,10 @@ else
         switch ($tool)
         {
           case "bpel2owfn":
-            $_SESSION[$tool] .= ".bpel";
+            $_SESSION[$tool]["process"] .= ".bpel";
             break;
           default:
-            $_SESSION[$tool] .= ".owfn";
+            $_SESSION[$tool]["process"] .= ".owfn";
             break;
         }
       }
@@ -188,9 +190,11 @@ else
     {
       $_SESSION["input_type"] = $_REQUEST["input_type"];
       $_SESSION["input_given"] = $_REQUEST["input_given"];
+      /*
       $_SESSION["patterns"] = $_REQUEST["patterns"];
       $_SESSION["format"] = $_REQUEST["format"];
       $_SESSION["reduce"] = $_REQUEST["reduce"];
+      */
       
       unset($_REQUEST);
       // redirect to self, make back/forward buttons work without 
@@ -201,8 +205,12 @@ else
   }
 }
 
-if ( ! isset($_SESSION["$tool"]))
+if ( ! isset($_SESSION[$tool]) || empty($_SESSION[$tool]))
 {
+  echo "bla";
+  print_r($_SESSION);
+  exit;
+
   // direct call of this page -> return to main page
   header('Location: index.html#'.$tool);
   exit;
@@ -217,21 +225,21 @@ include_once 'resource/php/getnumber.php';
 header("Content-Type: text/html");
 echo '<?xml version="1.0" encoding="utf-8" ?>';
 
-$process = $_SESSION["$tool"];
+$process = $_SESSION["$tool"]["process"];
 
-if ( ! strcmp($_SESSION["input_type"], 'example') )
+if ( ! strcmp($_SESSION[$tool]["input_type"], 'example') )
 {
   $process = prepareFile($process); 
 }
-else if ( ! strcmp($_SESSION["input_type"], 'uploaded') )
+else if ( ! strcmp($_SESSION[$tool]["input_type"], 'uploaded') )
 {
   $process = createFile($process);
-  move_uploaded_file($_FILES['input_file']['tmp_name'], $process[$_SESSION["$tool"]]["residence"]);
+  move_uploaded_file($_FILES['input_file']['tmp_name'], $process[$_SESSION["$tool"]["process"]]["residence"]);
 }
 else if ( ! strcmp($_SESSION["input_type"], 'url') )
 {
   $process = createFile($process);
-  $download = 'wget \''.$_SESSION["$tool"].'\' -O '.$process[$_SESSION["$tool"]]["residence"];
+  $download = 'wget \''.$_SESSION["$tool"].'\' -O '.$process[$_SESSION["$tool"]["process"]]["residence"];
   system($download);
 }
 else if ( ! strcmp($_SESSION["input_type"], 'given') )

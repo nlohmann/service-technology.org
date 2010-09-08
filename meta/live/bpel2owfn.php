@@ -14,15 +14,15 @@
   $realcall = "bpel2owfn";
   $fakeresult = "";
 
-  $inputfile = $_SESSION["bpel2owfn"];
+  $inputfile = $_SESSION["bpel2owfn"]["process"];
   $file = $process[$inputfile];
   $fakecall .= " -i ".$file["basename"];
-  $realcall .= " ".$process[$_SESSION["bpel2owfn"]]["residence"];
+  $realcall .= " ".$process[$inputfile]["residence"];
   
-  $fakecall .= " -m petrinet -p ".$_SESSION["patterns"]." -r ".$_SESSION["reduce"]." -f ".$_SESSION["format"];
-  $realcall .= " -m petrinet -p ".$_SESSION["patterns"]." -r ".$_SESSION["reduce"]." -f ".$_SESSION["format"];
+  $fakecall .= " -m petrinet -p ".$_SESSION[$tool]["patterns"]." -r ".$_SESSION[$tool]["reduce"]." -f ".$_SESSION[$tool]["format"];
+  $realcall .= " -m petrinet -p ".$_SESSION[$tool]["patterns"]." -r ".$_SESSION[$tool]["reduce"]." -f ".$_SESSION[$tool]["format"];
 
-  $fakeresult .= $process[$_SESSION["bpel2owfn"]]["filename"];
+  $fakeresult .= $process[$inputfile]["filename"];
 //  $fakeresult .= ".owfn"; 
   $realresult = $_SESSION["dir"]."/".$fakeresult;
 
@@ -32,7 +32,7 @@
   $realcall .= " -d2 2>&1";
   // end of building call strings
   
-  if (!strcmp($_REQUEST["output"], "result")) {
+  if (!strcmp($_SESSION[$tool]["output"], "result")) {
     header("Content-type: text/plain");
     system($realcall." > /dev/null");
     system("cat ".$realresult.".owfn");
@@ -62,9 +62,9 @@
 
       <h2>Parameters</h2>
       <ul>
-        <li><strong>input file:</strong> <?=$process[$_SESSION["bpel2owfn"]]["basename"]?>
+        <li><strong>input file:</strong> <?=$process[$inputfile]["basename"]?>
           <?php
-          switch($_SESSION['input_type']) {
+          switch($_SESSION[$tool]['input_type']) {
             case "example":   echo "example file"; break;
             case "uploaded":  echo "uploaded file"; break;
             case "url":       echo "downloaded file"; break;
@@ -76,11 +76,11 @@
 //            echo ' (uploaded from local file '.basename($_SESSION["bpel2owfn"]).')';
           ?>
         </li>
-        <li><strong>patterns:</strong> <?=$_SESSION['patterns']?></li>
+        <li><strong>patterns:</strong> <?=$_SESSION[$tool]['patterns']?></li>
         <li><strong>file format:</strong> 
-          <?php echo ((!strcmp($_SESSION['format'], "owfn"))?'Fiona open net':'LoLA Petri net'); ?>
+          <?php echo ((!strcmp($_SESSION[$tool]['format'], "owfn"))?'Fiona open net':'LoLA Petri net'); ?>
         </li>
-        <li><strong>structural reduction level:</strong> <?=$_SESSION['reduce']?></li>
+        <li><strong>structural reduction level:</strong> <?=$_SESSION[$tool]['reduce']?></li>
       </ul>
 
       <h2>Call</h2>

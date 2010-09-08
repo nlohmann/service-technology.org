@@ -8,14 +8,13 @@
   // see files.php for further information
   require_once 'resource/php/files.php';
 
-  print_r ($_SESSION);
   // prepare example
-  if (!strcmp($_SESSION["marlene"], 'coffee1')) {
+  if (!strcmp($_SESSION["marlene"], 'marlene/coffee1.owfn')) {
     $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");
     $rules = array("marlene/coffee.ar");
   }
 
-  if (!strcmp($_SESSION["marlene"], 'coffee2')) {
+  else if (!strcmp($_SESSION["marlene"], 'marlene/coffee2.owfn')) {
     $services = array("marlene/myCoffee-rep.owfn", "marlene/myCustomer-rep.owfn");
     $rules = array("marlene/coffee.ar");
   }

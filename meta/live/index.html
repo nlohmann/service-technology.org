@@ -233,11 +233,12 @@
         <form action="marlene.php" method="post" enctype="multipart/form-data">
           <fieldset>
             <legend>Service model</legend>
+            <input type="radio" name="input_type" value="example" checked="checked" id="marlene_example" /><label for="marlene_example"> 
             Use a given service model: 
-            <select name="example" size="1">
+            <select name="input_example" size="1">
                 <option value="coffee1">Coffee Vending Machine 1</option>
                 <option value="coffee2">Coffee Vending Machine 2</option>
-            </select>
+              </select></label><br />
           </fieldset>
 
           <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>

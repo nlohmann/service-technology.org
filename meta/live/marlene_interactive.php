@@ -1,7 +1,11 @@
 <?php
 
+  // most important script! sets session information and PATH!
   require_once 'resource/php/session.php';
-
+  $tool = "marlene";
+  
+  // some functions for copying/creating files to/in temporary directory
+  // see files.php for further information
   require_once 'resource/php/files.php';
 
 

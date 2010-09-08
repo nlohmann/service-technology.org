@@ -6,7 +6,8 @@
   // debugging, should be removed in later versions for security reasons
   ini_set("display_errors", "On");
   ini_set("session.use_trans_sid", "0");
-  error_reporting($_SERVER["SERVER_NAME"] == "localhost" ? E_ALL : 0);
+  //error_reporting($_SERVER["SERVER_NAME"] == "localhost" ? E_ALL : 0);
+  error_reporting(E_ALL);
 
   // set some environment variables
   // set PATH vor system calls

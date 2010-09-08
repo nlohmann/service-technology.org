@@ -1,6 +1,6 @@
 <?php
 
-require_once 'session.php';
+  require_once 'session.php';
 
 /**
  * Gets an array of file names, copies the files to the working
@@ -58,6 +58,21 @@ function prepareFiles($fileArray)
   return $result;
 }
 
+function prepareFile($file)
+{
+  $result = array();
+  // returns "basename", "extension", "dirname", and "filename"
+  $info = pathinfo($file);
+  
+  $result[$file] = $info;
+  $result[$file]["residence"] = $_SESSION["dir"]."/".$info["basename"];
+  $result[$file]["link"] = getLink($info["basename"]);
+ 
+  copy($file, $result[$file]["residence"]);
+
+  return $result;
+}
+
 // create a string representing the URI for downloading a file
 function getLink($file)
 {
@@ -106,9 +121,9 @@ function createFile($file, $content = "")
     
   $result[$file] = $info;
   $result[$file]["residence"] = $_SESSION["dir"]."/".$info["basename"];
-  $result[$file]["dirname"] = $_SESSION["dir"];
-  $result[$file]["short"] = $_SESSION["dir"]."/".$info["filename"];
-  $result[$file]["link"] = getLink($info["basename"]); // FIXME
+//  $result[$file]["dirname"] = $_SESSION["dir"];
+//  $result[$file]["short"] = $_SESSION["dir"]."/".$info["filename"];
+  $result[$file]["link"] = getLink($info["basename"]);
    
   $handle = fopen($result[$file]["residence"], "w+");
   fwrite($handle, $content);

@@ -1,15 +1,7 @@
 <?php
-  if (empty($_REQUEST))
-    header('Location:index.html#bpel2owfn');
 
-  include 'resource/php/console.php';
-  
-  // required because
-  if (!strcmp($_REQUEST["input_type"], 'example'))
-  {
-    $_REQUEST["input_example"] = 'bpel2owfn/'.$_REQUEST["input_example"].'.bpel';
-  }
-  require 'resource/php/files.php';
+  // most important script! sets session information and PATH!
+  require_once 'resource/php/session.php';
   
   // DEBUG:
   echo '$_REQUEST:<br>';
@@ -17,26 +9,113 @@
   echo '<br>';
   echo '$_SESSION:<br>';
   print_r($_SESSION);
-  
-  foreach ($fileinfo as $file)
-  {
 
-    system('cd '.$file["dirname"]);
-    
-    if (!strcmp($_REQUEST['output'], 'result')) {
-      $call = 'bpel2owfn -i '.$file["basename"].' -m petrinet -p '.$_REQUEST['patterns'].' -f '.$_REQUEST['format'].' -r '.$_REQUEST['reduce'];
-  //    $call = $call.((isset($_REQUEST['reduce']))?' -p reduce':'');
-  
-      header("Content-type: text/plain");
-      system($call);
-      return;
-    } else {
-      header("Content-Type: text/html");
-      echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
+  // do not call the page without POST request, or only if session is 
+  // already set to Marlene (all information about services available)
+  if ( ! isset($_REQUEST) && ! isset($_SESSION["bpel2owfn"]))
+  {
+    // direct call of this page -> return to main page
+    header('Location: index.html#bpel2owfn');
+    exit;
+  }
+  else
+  {
+    // new request?
+    if ( isset($_REQUEST) )
+    {
+      // variable example set in request?
+      if ( isset($_REQUEST["input_example"]) )
+      {
+        // remember name of example in session
+        $_SESSION["bpel2owfn"] = 'bpel2owfn/'.$_REQUEST["input_example"].'.bpel';
+      }
+      if ( isset($_REQUEST["input_uploaded"]) )
+      {
+        $_SESSION["bpel2owfn"] = $_REQUEST["input_uploaded"];
+      }
+      if ( isset($_REQUEST["input_url"]) )
+      {
+        $_SESSION["bpel2owfn"] = $_REQUEST["input_url"];
+      }
+      if ( isset($_REQUEST["input_given"]) )
+      {
+        $_SESSION["bpel2owfn"] = $_REQUEST["input_given"];
+      }
       
-      $call = 'bpel2owfn -i '.$file["basename"].' -m petrinet -p '.$_REQUEST['patterns'].' -f '.$_REQUEST['format'].' -r '.$_REQUEST['reduce'].' -f dot -o '.$file["filename"].".dot";
-  //    $call = $call.((isset($_REQUEST['reduce']))?' -p reduce':'');
+      $_SESSION["input_type"] = $_REQUEST["input_type"];
+      $_SESSION["patterns"] = $_REQUEST["patterns"];
+      $_SESSION["format"] = $_REQUEST["format"];
+      $_SESSION["reduce"] = $_REQUEST["reduce"];
+      
+      unset($_REQUEST);
+      // redirect to self, make back/forward buttons work without 
+      // resending the request
+      header("Location: ".$_SERVER["PHP_SELF"]);
     }
+  }
+
+  if ( ! isset($_SESSION["bpel2owfn"]))
+  {
+    // direct call of this page -> return to main page
+    header('Location: index.html#bpel2owfn');
+    exit;
+  }
+
+  // some functions for copying/creating files to/in temporary directory
+  // see files.php for further information
+  require_once 'resource/php/files.php';
+
+  // copied from Wendy ;)
+  include_once 'resource/php/console.php';
+  include_once 'resource/php/dotimg.php';
+  include_once 'resource/php/getnumber.php';
+
+  // output header
+  header("Content-Type: text/html");
+  echo '<?xml version="1.0" encoding="utf-8" ?>';
+
+  // prepare example
+//  if (!strcmp($_SESSION["marlene"], 'coffee1')) {
+//    $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");
+//    $rules = array("marlene/coffee.ar");
+//  }
+//
+//  if (!strcmp($_SESSION["marlene"], 'coffee2')) {
+//    $services = array("marlene/myCoffee-rep.owfn", "marlene/myCustomer-rep.owfn");
+//    $rules = array("marlene/coffee.ar");
+//  }
+  
+  // copy files to temporary directory, see files.php for details
+//  $services = prepareFiles($services);
+//  $rules = prepareFiles($rules);
+  if ( ! strcmp($_SESSION["input_type"], 'input_example') )
+  {
+    $process = prepareFile($_SESSION["bpel2owfn"]); 
+  }
+  
+
+  // prepare strings for system call (realcall) 
+  // and output on console (fakecall)
+  $fakecall = "bpel2owfn";
+  $realcall = "bpel2owfn";
+  $fakeresult = "";
+
+  $fakecall .= " -i ".$process["basename"];
+  $realcall .= " ".$process["residence"];
+  
+  $fakecall .= " -m petrinet -p ".$_SESSION["patterns"]." -r ".$_SESSION["reduce"]." -f ".$_SESSION["format"];
+  $realcall .= " -m petrinet -p ".$_SESSION["patterns"]." -r ".$_SESSION["reduce"]." -f ".$_SESSION["format"];
+
+  $fakeresult .= $process["filename"];
+  $fakeresult .= ".owfn"; 
+//  $realresult = $_SESSION["dir"]."/".$fakeresult;
+
+//  $fakecall .= " -o ".$fakeresult;
+//  $realcall .= " -o ".$realresult;
+
+  $realcall .= " -v 2>&1";
+  // end of building call strings
+  
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -60,27 +139,27 @@
   <h2>Parameters</h2>
 
   <ul>
-    <li><strong>input file:</strong> <?=$file["basename"]?>
+    <li><strong>input file:</strong> <?=$process["basename"]?>
       <?php
-        if (!strcmp($_REQUEST['input_type'], 'url'))
-          echo ' (downloaded from <a href="'.$file["link"].'">'.$file["link"].'</a>)';
-        if (!strcmp($_REQUEST['input_type'], 'file'))
-          echo ' (uploaded from local file '.$file["basename"].')';
+        if (!strcmp($_SESSION['input_type'], 'url'))
+          echo ' (downloaded from <a href="'.$process["link"].'">'.$process["link"].'</a>)';
+        if (!strcmp($_SESSION['input_type'], 'file'))
+          echo ' (uploaded from local file '.$process["basename"].')';
       ?>
     </li>
-    <li><strong>patterns:</strong> <?=$_REQUEST['patterns']?></li>
+    <li><strong>patterns:</strong> <?=$_SESSION['patterns']?></li>
     <li><strong>file format:</strong> 
-      <?php echo ((!strcmp($_REQUEST['format'], "owfn"))?'Fiona open net':'LoLA Petri net'); ?>
+      <?php echo ((!strcmp($_SESSION['format'], "owfn"))?'Fiona open net':'LoLA Petri net'); ?>
     </li>
-    <li><strong>structural reduction level:</strong> <?=$_REQUEST['reduce']?></li>
+    <li><strong>structural reduction level:</strong> <?=$_SESSION['reduce']?></li>
   </ul>
   
   <h2>Result</h2>
   
-  <?php console($call, 'cd bpel2owfn; '.$call); ?>
+  <?php console($fakecall, $realcall); ?>
   
 <?php
-  $thumbnailcall = 'convert -transparent "rgb(255,255,255)" -resize 200x200 '.$file["short"].'.png '.$file["short"].'.thumb.png';
+  $thumbnailcall = 'convert -transparent "rgb(255,255,255)" -resize 200x200 '.$process["short"].'.png '.$process["short"].'.thumb.png';
   system($thumbnailcall);
 ?>
 
@@ -88,26 +167,27 @@
   <table> 
   <?php
     echo '<tr>';
-    echo '<td><img src="'.$file["short"].'.png" height="100" width="100"></td>';
+    drawImage($fakeresult);
+//    echo '<td><img src="'.$process["short"].'.png" height="100" width="100"></td>';
     echo '<td><img src="resource/images/arrow.png" height="96" width="96"></td>';
     echo '<td><img src="resource/images/tool.png" height="100" width="100"></td>';
     echo '<td><img src="resource/images/arrow.png" height="96residence" width="96"></td>';
-    echo '<td><img src="resource/images/doc.png" height="100" width="100" style="margin-left:-30px;"><img src="'.$file["short"].'.thumb.png" height="80" width="50" style="margin-bottom: 10px; margin-left: -80px;"></td>';
+    echo '<td><img src="resource/images/doc.png" height="100" width="100" style="margin-left:-30px;"><img src="'.$process["short"].'.thumb.png" height="80" width="50" style="margin-bottom: 10px; margin-left: -80px;"></td>';
     echo '</tr>';
 
     echo '<tr>';
     echo '<td style="width: 150px;">';
-    if (!strcmp($_REQUEST['input_type'], 'url'))
-      echo '<a href="'.$file["link"].'">downloaded file</a>';
-    if (!strcmp($_REQUEST['input_type'], 'given'))
-      echo '<a href="'.$file["residence"].'">BPEL process</a>';
-    if (!strcmp($_REQUEST['input_type'], 'uploaded'))
-      echo '<a href="'.$file["residence"].'"/>'.$_FILES['input_file']['name'].'</a>';
+    if (!strcmp($_SESSION['input_type'], 'url'))
+      echo '<a href="'.$process["link"].'">downloaded file</a>';
+    if (!strcmp($_SESSION['input_type'], 'given'))
+      echo '<a href="'.$process["residence"].'">BPEL process</a>';
+    if (!strcmp($_SESSION['input_type'], 'uploaded'))
+      echo '<a href="'.$process["residence"].'"/>'.$_FILES['input_file']['name'].'</a>';
     echo '</td>';
     echo '<td></td>';
     echo '<td style="width: 150px;">BPEL2oWFN</td>';
     echo '<td></td>';
-    echo '<td style="width: 150px;"><a href="'.$file["residence"].'.'.$_REQUEST['format'].'"/>'.((!strcmp($_REQUEST['format'], "owfn"))?'Fiona open net':'LoLA Petri net').'</a></td>';
+    echo '<td style="width: 150px;"><a href="'.$process["residence"].'.'.$_SESSION['format'].'"/>'.((!strcmp($_SESSION['format'], "owfn"))?'Fiona open net':'LoLA Petri net').'</a></td>';
     echo '</tr>';
   ?>
   </table>
@@ -115,10 +195,10 @@
   
   <h2>Output</h2>
   <p>
-    <a href="<?=$file["short"]?>.png" target="_blank"><img src="<?=$file["short"]?>.thumb.png" />
+    <a href="<?=$process["short"]?>.png" target="_blank"><img src="<?=$process["short"]?>.thumb.png" />
   </p>
   <p>
-    <a href="<?=$file["short"]?>.<?=$_REQUEST['format']?>">result</a>
+    <a href="<?=$process["short"]?>.<?=$_SESSION['format']?>">result</a>
   </p>
   
   </div>

@@ -2,41 +2,40 @@
 
   // most important script! sets session information and PATH!
   require_once 'resource/php/session.php';
-  
-  if (!empty($_REQUEST))
-  {
-    $_SESSION['mode'] = (!strcmp($_REQUEST['mode'], 'ig'))?'sa':'og';
-    if (isset($_REQUEST['reduction']))
-      $_SESSION['reduction'] = $_REQUEST['reduction'];
-    $_SESSION['reduce_wait'] = (isset($_REQUEST['reduce_wait']))?' --waitstatesOnly':'';
-    $_SESSION['reduce_reic'] = (isset($_REQUEST['reduce_reic']))?' --receivingBeforeSending':'';
-    $_SESSION['reduce_sequ'] = (isset($_REQUEST['reduce_sequ']))?' --seqReceivingEvents':'';
-    $_SESSION['reduce_succ'] = (isset($_REQUEST['reduce_succ']))?' --succeedingSendingEvent':'';
-    $_SESSION['reduce_quit'] = (isset($_REQUEST['reduce_quit']))?' --quitAsSoonAsPossible':'';
-  }
-  
   $tool = "wendy";
   // some functions for copying/creating files to/in temporary directory
   // see files.php for further information
   require_once 'resource/php/files.php';
 
+  
+  $_SESSION[$tool]['modus'] = (!strcmp($_SESSION[$tool]['mode'], 'ig'))?'sa':'og';
+  if (isset($_REQUEST['reduction']))
+    $_SESSION['reduction'] = $_REQUEST['reduction'];
+  $_SESSION[$tool]['reduce_wait'] = (! empty($_SESSION[$tool]['reduce_wait']))?' --waitstatesOnly':'';
+  $_SESSION[$tool]['reduce_reic'] = (! empty($_SESSION[$tool]['reduce_reic']))?' --receivingBeforeSending':'';
+  $_SESSION[$tool]['reduce_sequ'] = (! empty($_SESSION[$tool]['reduce_sequ']))?' --seqReceivingEvents':'';
+  $_SESSION[$tool]['reduce_succ'] = (! empty($_SESSION[$tool]['reduce_succ']))?' --succeedingSendingEvent':'';
+  $_SESSION[$tool]['reduce_quit'] = (! empty($_SESSION[$tool]['reduce_quit']))?' --quitAsSoonAsPossible':'';
+  
   // prepare strings for system call (realcall) 
   // and output on console (fakecall)
   $fakecall = "wendy ";
   $realcall = "wendy ";
   $fakeresult = "";
-
-  $fakecall .= $process[$_SESSION['wendy']]["basename"];
-  $realcall .= $process[$_SESSION['wendy']]["residence"];
   
-  $fakecall .= $_SESSION['reduce_wait'].$_SESSION['reduce_reic'].$_SESSION['reduce_sequ'].$_SESSION['reduce_succ'].$_SESSION['reduce_quit'];
-  $realcall .= $_SESSION['reduce_wait'].$_SESSION['reduce_reic'].$_SESSION['reduce_sequ'].$_SESSION['reduce_succ'].$_SESSION['reduce_quit'];
+  $inputfile = $_SESSION['wendy']["process"];
+  
+  $fakecall .= $process[$inputfile]["basename"];
+  $realcall .= $process[$inputfile]["residence"];
+  
+  $fakecall .= $_SESSION[$tool]['reduce_wait'].$_SESSION[$tool]['reduce_reic'].$_SESSION[$tool]['reduce_sequ'].$_SESSION[$tool]['reduce_succ'].$_SESSION[$tool]['reduce_quit'];
+  $realcall .= $_SESSION[$tool]['reduce_wait'].$_SESSION[$tool]['reduce_reic'].$_SESSION[$tool]['reduce_sequ'].$_SESSION[$tool]['reduce_succ'].$_SESSION[$tool]['reduce_quit'];
 
-  $fakeresult .= $process[$_SESSION["wendy"]]["filename"];
+  $fakeresult .= $process[$inputfile]["filename"];
   $realresult = $_SESSION["dir"]."/".$fakeresult;
 
-  $fakecall .= " --".$_SESSION['mode'].'='.$fakeresult.".".$_SESSION['mode'];
-  $realcall .= " --".$_SESSION['mode'].'='.$realresult.".".$_SESSION['mode'];
+  $fakecall .= " --".$_SESSION[$tool]['modus'].'='.$fakeresult.".".$_SESSION[$tool]['modus'];
+  $realcall .= " --".$_SESSION[$tool]['modus'].'='.$realresult.".".$_SESSION[$tool]['modus'];
 
   $realcall .= " -v 2>&1";
   // end of building call strings
@@ -88,7 +87,7 @@
 
       <h2>Parameters</h2>
       <ul>
-        <li><strong>input file:</strong> <?=$process[$_SESSION["wendy"]]["basename"]?>.owfn
+        <li><strong>input file:</strong> <?=$process[$inputfile]["basename"]?>
           <?php
             switch($_SESSION['input_type']) {
               case "example":   echo "example file"; break;
@@ -103,7 +102,7 @@
           ?>
         </li>
         <li><strong>verification goal:</strong> 
-          <?php echo ((!strcmp($_SESSION['mode'], 'ig'))?'interaction graph':'operating guidelines'); ?>
+          <?php echo ((!strcmp($_SESSION[$tool]['mode'], 'ig'))?'interaction graph':'operating guidelines'); ?>
         </li>
 <!--        <li><strong>apply reduction techniques:</strong> 
           <?php echo ((isset($_SESSION['reduction']))?'yes':'no'); ?>
@@ -118,18 +117,18 @@
     <h2>Output</h2>
     
     <?php
-      if (!strcmp($_SESSION['mode'], 'ig')) {
-        drawImage($fakeresult.'.sa');
+      drawImage($fakeresult.'.'.$_SESSION[$tool]['modus']);
+//      if (!strcmp($_SESSION[$tool]['mode'], 'ig')) {
 //        $thumbnailcall = 'convert -resize 200x200 wendy/'.$output_graphics.' wendy/'.$output_thumb;
 //        system($thumbnailcall);
 //        echo '<p><a href="wendy/'.$output_graphics.'"><img src="wendy/'.$output_thumb.'" /></p>';
-      } else {
-        drawImage($fakeresult.'og');
+//      } else {
+//        drawImage($fakeresult.'og');
         //dotimg('in=wendy/'.$inputfilename.'.dot&label='.urlencode("operating guideline"));
-      }
+//      }
     ?>
     
-    <p><a href="<?=getLink($realresult.".".$_SESSION['mode'])?>">result</a></p>
+    <p><a href="<?=getLink($realresult.".".$_SESSION[$tool]['modus'])?>">result</a></p>
 
     </div>
   </div>

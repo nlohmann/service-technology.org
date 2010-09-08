@@ -55,7 +55,7 @@
         break;
       case "og":
       case "sa":
-        system("cd ".$_SESSION["dir"]."; og2dot -opng --name=".basename($file)." &> /dev/null");
+        system("cd ".$_SESSION["dir"]."; og2dot -opng ".basename($file)." &> /dev/null");
         break;
     }
   }

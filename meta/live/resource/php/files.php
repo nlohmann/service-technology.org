@@ -182,48 +182,48 @@ else
   }
 }
 
+if ( ! isset($_SESSION["bpel2owfn"]))
+{
+  // direct call of this page -> return to main page
+  header('Location: index.html#bpel2owfn');
+  exit;
+}
+
+// copied from Wendy ;)
+include_once 'resource/php/console.php';
+include_once 'resource/php/dotimg.php';
+include_once 'resource/php/getnumber.php';
+
+// output header
+header("Content-Type: text/html");
+echo '<?xml version="1.0" encoding="utf-8" ?>';
+
+$process = $_SESSION["bpel2owfn"];
+
+if ( ! strcmp($_SESSION["input_type"], 'example') )
+{
+  $process = prepareFile($process); 
+}
+if ( ! strcmp($_SESSION["input_type"], 'uploaded') )
+{
+  $process = createFile($process);
+  move_uploaded_file($_FILES['input_file']['tmp_name'], $process[$_SESSION["bpel2owfn"]]["residence"]);
+}
+if ( ! strcmp($_SESSION["input_type"], 'url') )
+{
+  $process = createFile($process);
+  $download = 'wget \''.$_SESSION["bpel2owfn"].'\' -O '.$process[$_SESSION["bpel2owfn"]]["residence"];
+  system($download);
+}
+if ( ! strcmp($_SESSION["input_type"], 'given') )
+{
+  $_SESSION["bpel2owfn"] = 'given.bpel';
+  $process = createFile($_SESSION["bpel2owfn"], $process);
+}
+
 /*
  * Main part: This file MUST be included into any tool script. We process the given request variable
  * to set or create files respectively.
  */
-
-//$fileinfo = array();
-//
-//// in case an example file was chosen from drop-down
-//if ($_REQUEST["input_type"] == 'example')
-//{
-//  $f = $_REQUEST["input_example"];
-//  $fileinfo = createFile($f);
-//  
-//  copy($f, $fileinfo[$f]["residence"]);
-//}
-//
-//// in case an URL was given
-//if ($_REQUEST["input_type"] == 'url')
-//{
-//  $f = $_REQUEST["input_url"];
-//  $fileinfo = createFile($f);
-//  
-//  $fileinfo[$f]["link"] = $f;
-//  
-//  $download = $download = 'wget \''.$url.'\' -O '.$fileinfo[$f]["residence"];
-//  system($download);
-//}
-//
-//// in case a file was uploaded
-//if ($_REQUEST["input_type"] == 'uploaded')
-//{
-//  $f = $_REQUEST["input_uploaded"];
-//  $fileinfo = createFile($f);
-//  
-//  move_uploaded_file($_FILES['input_file']['tmp_name'], $fileinfo[$f]["residence"]);
-//}
-//
-//// in case a file was given
-//if ($_REQUEST["input_type"] == 'given')
-//{
-//  $f = $_REQUEST["input_given"];
-//  $fileinfo = createFile('given_'.rand().rand(), $f);
-//}
 
 ?>

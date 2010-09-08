@@ -8,46 +8,6 @@
   // see files.php for further information
   require_once 'resource/php/files.php';
 
-  if ( ! isset($_SESSION["bpel2owfn"]))
-  {
-    // direct call of this page -> return to main page
-    header('Location: index.html#bpel2owfn');
-    exit;
-  }
-
-  // copied from Wendy ;)
-  include_once 'resource/php/console.php';
-  include_once 'resource/php/dotimg.php';
-  include_once 'resource/php/getnumber.php';
-
-  // output header
-  header("Content-Type: text/html");
-  echo '<?xml version="1.0" encoding="utf-8" ?>';
-  
-  $process = $_SESSION["bpel2owfn"];
-  
-  if ( ! strcmp($_SESSION["input_type"], 'example') )
-  {
-    $process = prepareFile($process); 
-  }
-  if ( ! strcmp($_SESSION["input_type"], 'uploaded') )
-  {
-    $process = createFile($process);
-    move_uploaded_file($_FILES['input_file']['tmp_name'], $process[$_SESSION["bpel2owfn"]]["residence"]);
-  }
-  if ( ! strcmp($_SESSION["input_type"], 'url') )
-  {
-    $process = createFile($process);
-    $download = 'wget \''.$_SESSION["bpel2owfn"].'\' -O '.$process[$_SESSION["bpel2owfn"]]["residence"];
-    system($download);
-  }
-  if ( ! strcmp($_SESSION["input_type"], 'given') )
-  {
-    $_SESSION["bpel2owfn"] = 'given_'.rand().rand();
-    $_SESSION["bpel2owfn"] .= '.bpel';
-    $process = createFile($_SESSION["bpel2owfn"], $process);
-  }
-
   // prepare strings for system call (realcall) 
   // and output on console (fakecall)
   $fakecall = "bpel2owfn";
@@ -61,7 +21,7 @@
   $realcall .= " -m petrinet -p ".$_SESSION["patterns"]." -r ".$_SESSION["reduce"]." -f ".$_SESSION["format"];
 
   $fakeresult .= $process[$_SESSION["bpel2owfn"]]["filename"];
-  $fakeresult .= ".owfn"; 
+//  $fakeresult .= ".owfn"; 
   $realresult = $_SESSION["dir"]."/".$fakeresult;
 
   $fakecall .= " -o ".$fakeresult;
@@ -114,7 +74,7 @@
   
     console($fakecall, $realcall.' ');
 
-    drawImage($fakeresult);
+    drawImage($fakeresult.'.owfn');
   
   ?>
   

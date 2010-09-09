@@ -152,7 +152,7 @@
       <h2>Synthesized Adapter</h2>
 
       <!-- draw image of adapter -->
-      <?php drawImage($fakeresult, 300 , "Adapter"); ?>
+      <?php drawImage($fakeresult, 300 , (isset($_SESSION[$tool]["costopt"]) && $_SESSION[$tool]["costopt"] == "yes")?"Cost-optimized adapter":"Adapter"); ?>
 
       <!-- provide link for downloading adapter -->
       <ul>

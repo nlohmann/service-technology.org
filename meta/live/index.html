@@ -236,7 +236,7 @@
         <form action="marlene.php" method="post" enctype="multipart/form-data">
           <fieldset>
             <legend>Service model</legend>
-            <input type="radio" name="input_type" value="example" checked="checked" id="marlene_example" /><label for="marlene_example"> 
+            <input type="hidden" name="input_type" value="example" checked="checked" id="marlene_example" /><label for="marlene_example"> 
             Use a given service model: 
             <select name="input_example" size="1">
               <optgroup label="TSC examples">
@@ -271,7 +271,7 @@
             <form action="marlene_interactive.php" method="post" enctype="multipart/form-data">
               <fieldset>
                 <legend>Service model</legend>
-                <input type="radio" name="input_type" value="example" checked="checked" id="marlene_ia_example" /><label for="marlene_ia_example"> 
+                <input type="hidden" name="input_type" value="example" checked="checked" id="marlene_ia_example" /><label for="marlene_ia_example"> 
                 Use a given service model: 
                 <select name="input_example" size="1">
                     <option value="iRules">Information Request</option>
@@ -433,7 +433,7 @@
         <form action="lindayasmina.php" method="post" enctype="multipart/form-data">
           <fieldset>
             <legend>Input Open Nets</legend>
-		<input type="radio" name="input_type" value="example" checked="checked" id="lindayasmina_example" /><label for="lindayasmina_example"><i>Select two or more examples.</i><br />
+		<input type="hidden" name="input_type" value="example" checked="checked" id="lindayasmina_example" /><label for="lindayasmina_example"><i>Select two or more examples.</i><br />
 		<select name="input_example[]" size="5" multiple="multiple">
 			<option value="suggester">Suggester Service</option>
 			<option  value="decider">Decider Service</option>

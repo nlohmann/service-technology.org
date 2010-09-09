@@ -8,13 +8,4 @@
                       http://service-technology.org/sayo
 
 
-Version 1.2-unreleased
-======================
 
-* updated wrapper script `publicview.sh'
-
-* now using Petri instead of sa2sm
-
-* applied ST-macros
-
-\nSee file ChangeLog <http://service-technology.org/files/sayo/ChangeLog> for\ncomplete version history.\n

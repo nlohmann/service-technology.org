@@ -1,0 +1,22 @@
+[EXIT STATUS]
+Sayo exits with 0 on success, and with 1 if an error occurs. See Texinfo manual for detailed information.
+
+[EXAMPLES]
+To calculate the service automaton of a operating guideline `service.og', execute
+.IP
+sayo --input=service.og --output=service.sa
+.PP
+The service automaton will be written to the file `service.sa'.
+
+
+[REPORTING BUGS]
+If you experience a bug, please send a description of the problem to
+.B sayo@service-technology.org.
+At https://gna.org/bugs/?group=service-tech you can see a list of open bugs.
+
+[COPYRIGHT]
+Copyright (c) 2009, 2010 Niels Lohmann and Christian Sura
+
+[SEE ALSO]
+wendy(1), petri(1)
+

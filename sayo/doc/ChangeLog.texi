@@ -2,6 +2,7 @@
 @itemize
 @item updated wrapper script @samp{publicview.sh}
 @item now using Petri instead of sa2sm
+@item applied ST-macros
 @end itemize
 
 @heading Version 1.1 (2009-11-10)

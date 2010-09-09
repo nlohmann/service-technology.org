@@ -7,12 +7,15 @@
                       generating public view from bit-og
                       http://service-technology.org/sayo
 
+
 Version 1.2-unreleased
 ======================
 
 * updated wrapper script `publicview.sh'
 
 * now using Petri instead of sa2sm
+
+* applied ST-macros
 
 Version 1.1 (2009-11-10)
 ========================
@@ -25,8 +28,9 @@ Version 1.1 (2009-11-10)
 
 * simplified testsuite by using wrapper script
 
-* added scripts to use LCOV (`http://ltp.sourceforge.net/coverage/lcov.php')
-  to determine test case coverage (use `make cover' in `tests' directory)
+* added scripts to use LCOV
+  (`http://ltp.sourceforge.net/coverage/lcov.php') to determine test case
+  coverage (use `make cover' in `tests' directory)
 
 Version 1.0
 ===========

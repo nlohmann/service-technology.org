@@ -53,6 +53,10 @@ gengetopt_args_info args_info;
 void evaluateParameters(int argc, char** argv) {
 
 	// overwrite invocation for consistent error messages
+	// TODO: basename seems to allocated memory which is not freed afterwards,
+	// i.e., valgrind 3.6.0.SVN reports a memory leak
+	// a fix like "free(argv[0]);" after the call of the cmdline parser works an Mac OS 10.6.4
+	// but unfortunately seems to fail on linux
 	argv[0] = basename(argv[0]);
 
 	// store invocation in a std::string for meta information in file output
@@ -67,7 +71,6 @@ void evaluateParameters(int argc, char** argv) {
 	if (cmdline_parser(argc, argv, &args_info) != 0) {
 		abort(1, "invalid command-line parameter(s)");
 	}
-	free(argv[0]); // basename allocated memory
 
 	// debug option
 	if (args_info.bug_flag) {

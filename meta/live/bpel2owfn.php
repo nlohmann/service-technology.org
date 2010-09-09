@@ -32,15 +32,15 @@
   $realcall .= " -d2 2>&1";
   // end of building call strings
   
+  // if 'result' is set to 'output', only print the generated file and exit
   if (!strcmp($_SESSION[$tool]["output"], "result")) {
     header("Content-type: text/plain");
-    exec($realcall." > /dev/null");
+    exec($realcall);
     $lines = file($realresult.".owfn");
 
     foreach ($lines as $line_num => $line) {
-        echo $line . "\n";
+        echo $line;
     }
-
     exit;
   }
 ?>

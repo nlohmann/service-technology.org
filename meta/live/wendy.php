@@ -40,11 +40,15 @@
   $realcall .= " -v 2>&1";
   // end of building call strings
 
-
+    // if 'result' is set to 'output', only print the generated file and exit
     if (!strcmp($_SESSION[$tool]["output"], "result")) {
       header("Content-type: text/plain");
-      exec($realcall." > /dev/null");
-      system("cat ".$realresult.".".$_SESSION[$tool]['modus']);
+      exec($realcall);
+      $lines = file($realresult.".".$_SESSION[$tool]['modus']);
+
+      foreach ($lines as $line_num => $line) {
+          echo $line;
+      }
       exit;
     }
 

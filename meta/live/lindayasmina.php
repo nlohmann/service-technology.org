@@ -31,7 +31,7 @@
   $yasminaCall = "yasmina ";
   $yasminaFakeCall = "yasmina ";
   
- foreach( $_SESSION[$tool]["ly_inputs"] as $key => $value){
+ foreach( $_SESSION[$tool]["input_example"] as $key => $value){
 
    $opennetFiles[$key] = prepareFile("lindayasmina/${value}.owfn");
   	$fingerprintFiles[$key] = createFile("${value}.owfn.fp");
@@ -65,7 +65,7 @@
       <h1>Fingerprints</h1>
       
       <h2>Selected files</h2>
-    <?php  foreach( $_SESSION[$tool]["ly_inputs"] as $key => $value){
+    <?php  foreach( $_SESSION[$tool]["input_example"] as $key => $value){
       echo "$value.owfn <br />";
       if (isset( $_SESSION[$tool]["ly_output_nets"])) { 
         //drawImage($opennetFiles[$key]["lindayasmina/$value.owfn"]);
@@ -86,7 +86,7 @@
 <br><br>
  <?php  
 
-      foreach( $_SESSION[$tool]["ly_inputs"] as $key => $value){
+      foreach( $_SESSION[$tool]["input_example"] as $key => $value){
         echo "<br />$value.owfn.fp";
          if (isset( $_SESSION[$tool]["ly_output_linda_output"])) { 
           console($lindaFakeCalls[$key], $lindaCalls[$key]); 

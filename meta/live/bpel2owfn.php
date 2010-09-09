@@ -34,14 +34,7 @@
   
   // if 'result' is set to 'output', only print the generated file and exit
   if (!strcmp($_SESSION[$tool]["output"], "result")) {
-    header("Content-type: text/plain");
-    exec($realcall);
-    $lines = file($realresult.".owfn");
-
-    foreach ($lines as $line_num => $line) {
-        echo $line;
-    }
-    exit;
+    resultOnly($realcall, $realresult.".owfn");
   }
 ?>
 

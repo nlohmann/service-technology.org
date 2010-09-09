@@ -79,6 +79,21 @@ function getLink($file)
   return LIVEBASE."getfile.php?file=".urlencode(basename($file))."&amp;id=".urlencode($_SESSION["uid"]);
 }
 
+// display result file only
+function resultOnly($call, $file) {
+    header("Content-type: text/plain");
+    exec($call);
+    $lines = file($file);
+
+    foreach ($lines as $line_num => $line) {
+        echo $line;
+    }
+    exit;
+}
+  
+  
+}
+
 // function, which creates an image for a $file and actually writes some HTML code
 // rest of the funtionality inside getimage.php
 function drawImage($file, $thumbsize = 300)

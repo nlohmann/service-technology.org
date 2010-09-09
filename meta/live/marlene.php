@@ -19,6 +19,11 @@
     $rules = array("marlene/coffee.ar");
   }
   
+  else if (!strcmp($_SESSION["marlene"]["process"], 'marlene/coffee3.owfn')) {
+    $services = array("marlene/coffee_candy.owfn", "marlene/td_candy.owfn");
+    $rules = array("marlene/td_candy.ar");
+  }
+  
   // copy files to temporary directory, see files.php for details
   $services = prepareFiles($services);
   $rules = prepareFiles($rules);
@@ -27,6 +32,13 @@
   // and output on console (fakecall)
   $fakecall = "marlene";
   $realcall = "marlene";
+  
+  if (isset($_SESSION[$tool]["costopt"]) && $_SESSION[$tool]["costopt"] == "yes")
+  {
+    $fakecall .= " --costoptimized";
+    $realcall .= " --costoptimized";
+  }
+  
   $fakeresult = "";
   $first = true;
 
@@ -43,6 +55,10 @@
       $fakeresult .= "_";
     }
     $fakeresult .= $info["filename"];
+  }
+  if (isset($_SESSION[$tool]["costopt"]) && $_SESSION[$tool]["costopt"] == "yes")
+  {
+    $fakeresult .= "_costopt";
   }
   $fakeresult .= ".owfn"; 
   $realresult = $_SESSION["dir"]."/".$fakeresult;
@@ -74,9 +90,14 @@
 <body>
   <div id="container">
     <div id="content">
-      <div style="float: right; top: -10px;"><img src="resource/images/live.png" alt="service-technology.org/live" /></div>
+      <div style="float: right; top: -10px;"><a href="./"><img src="resource/images/live.png" alt="service-technology.org/live" /></a></div>
       <h1>Adapter Synthesis</h1>
 
+      <!--
+      <pre>
+      <?php // print_r($_SESSION); ?>
+      </pre>
+      -->
       <h2>Parameters</h2>
       <ul>
         <li><strong>input file:</strong> 
@@ -85,6 +106,7 @@
           {
             echo $file["basename"]." ";
           }
+          echo $rulefile["basename"]." ";
           ?>
           <?php
           
@@ -116,6 +138,7 @@
         {
           echo "<li><a href=".$info["link"].">".$info["basename"]."</a></li>";
         }
+        echo "<li><a href=".$rulefile["link"].">".$rulefile["basename"]."</a></li>";
       ?>
       </ul>
 
@@ -129,7 +152,7 @@
       <h2>Synthesized Adapter</h2>
 
       <!-- draw image of adapter -->
-      <?php drawImage($fakeresult); ?>
+      <?php drawImage($fakeresult, 300 , "Adapter"); ?>
 
       <!-- provide link for downloading adapter -->
       <ul>

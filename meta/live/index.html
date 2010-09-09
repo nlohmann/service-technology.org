@@ -238,9 +238,19 @@
             <input type="radio" name="input_type" value="example" checked="checked" id="marlene_example" /><label for="marlene_example"> 
             Use a given service model: 
             <select name="input_example" size="1">
+              <optgroup label="TSC examples">
                 <option value="coffee1">Coffee Vending Machine 1</option>
                 <option value="coffee2">Coffee Vending Machine 2</option>
+              </optgroup>
+              <optgroup label="AWPN 2008 example">
+                <option value="coffee3">Coffee Vending Machine (modified)</option>
+              </optgroup>
               </select></label><br />
+          </fieldset>
+
+          <fieldset>
+            <legend>Cost optimization</legend>
+            <input type="checkbox" name="costopt" value="yes" id="marlene_costopt" /><label for="marlene_costopt"> Cost optimization using <a href="http://service-technology.org/candy">Candy</a></label><br />
           </fieldset>
 
           <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
@@ -249,6 +259,7 @@
            <h2>References</h2>
            <ul>
              <li>Christian Gierds, Arjan J. Mooij, and Karsten Wolf. <strong>Reducing adapter synthesis to controller synthesis.</strong> <em>IEEE T. Services Computing</em>, 2010. (Accepted for publication in July 2010). [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/GierdsMW_2010_tcs.pdf">PDF</a>]</li>
+             <li>Christian Gierds. <strong>Finding Cost-Efficient Adapters.</strong> In Niels Lohmann and Karsten Wolf, editors, Proceedings of the <em>15th German Workshop on Algorithms and Tools for Petri Nets, AWPN 2008, Rostock, Germany, September 26--27, 2008, volume 380 of CEUR Workshop Proceedings</em>, pages 37-42, September 2008. CEUR-WS.org.
              </ul>
            </div>
           </div>

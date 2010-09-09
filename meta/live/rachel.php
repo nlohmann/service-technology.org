@@ -8,7 +8,7 @@
   require_once 'resource/php/files.php';
 
   // prepare example
-  switch () {
+  switch ($_SESSION['rachel']['input_example']) {
     case "rachel/running_example.owfn":
       $automata = array("rachel/running_example.sa");
       $og = array("rachel/running_example.og");

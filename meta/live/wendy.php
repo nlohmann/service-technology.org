@@ -46,32 +46,6 @@
     resultOnly($realcall, $realresult.".".$_SESSION[$tool]['modus']);
   }
 
-
-  // set variables for the system call
-//  $command_mode = '--'.((!strcmp($_REQUEST['mode'], 'ig'))?'sa':'og');
-//  $command_reduction = (isset($_REQUEST['reduce_wait'])?' --waitstatesOnly':'').(isset($_REQUEST['reduce_reic'])?' --receivingBeforeSending':'').(isset($_REQUEST['reduce_sequ'])?' --seqReceivingEvents':'').(isset($_REQUEST['reduce_succ'])?' --succeedingSendingEvent':'').(isset($_REQUEST['reduce_quit'])?' --quitAsSoonAsPossible':'');
-//  $command_service = $inputfilename.'.owfn';
-//  $output_file = $inputfilename.'.'.((!strcmp($_REQUEST['mode'], 'ig'))?'sa.':'').'og';
-//  $output_graphics = $inputfilename.'.dot.png';
-//  $output_bpmn = $inputfilename.'.owfn.'.$_REQUEST['mode'].'.bpmn.png';
-//  $output_thumb = $inputfilename.'.owfn.'.$_REQUEST['mode'].'.thumb.png';
-//  $output_bpmnthumb = $inputfilename.'.owfn.'.$_REQUEST['mode'].'.bpmn.thumb.png';
-  
-  // either only return the result or make a verbose call
-//  if (!strcmp($_REQUEST['output'], 'result')) {
-//    $call = 'wendy wendy/'.$command_service.' '.$command_mode.$command_reduction.' &> /dev/null';
-//    
-//    header("Content-type: text/plain");
-//    system($call);
-//    readfile('wendy/'.$output_file);
-//    flush();
-//    return;
-//  } else {
-//    header("Content-Type: text/html");
-/*    echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
-//    
-//    $call = 'wendy '.$command_service.' '.$command_mode.$command_reduction;
-//  }*/
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -125,14 +99,6 @@
     
     <?php
       drawImage($fakeresult.'.'.$_SESSION[$tool]['modus']);
-//      if (!strcmp($_SESSION[$tool]['mode'], 'ig')) {
-//        $thumbnailcall = 'convert -resize 200x200 wendy/'.$output_graphics.' wendy/'.$output_thumb;
-//        system($thumbnailcall);
-//        echo '<p><a href="wendy/'.$output_graphics.'"><img src="wendy/'.$output_thumb.'" /></p>';
-//      } else {
-//        drawImage($fakeresult.'og');
-        //dotimg('in=wendy/'.$inputfilename.'.dot&label='.urlencode("operating guideline"));
-//      }
     ?>
     
     <p><a href="<?=getLink($realresult.".".$_SESSION[$tool]['modus'])?>">result</a></p>

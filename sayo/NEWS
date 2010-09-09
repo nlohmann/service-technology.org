@@ -12,7 +12,6 @@ Version 1.2-unreleased
 
 * updated wrapper script `publicview.sh'
 
+* now using Petri instead of sa2sm
 
-See file ChangeLog <http://service-technology.org/files/sayo/ChangeLog> for
-complete version history.
-
+\nSee file ChangeLog <http://service-technology.org/files/sayo/ChangeLog> for\ncomplete version history.\n

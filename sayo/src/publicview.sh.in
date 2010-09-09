@@ -17,7 +17,7 @@ done
 
 NET=$1
 WENDY=wendy
-SA2SM=sa2sm
+PETRI=petri
 SAYO=sayo
 FORMULA2BITS=wendyFormula2bits
 
@@ -27,6 +27,9 @@ ${FORMULA2BITS} -i ${NET}.formula.og -o ${NET}.og
 
 ${SAYO} -i ${NET}.og -o ${NET}.sa
 
-${SA2SM} ${NET}.sa ${NET}.pv.owfn
+${PETRI} -isa -oowfn ${NET}.sa
+
+mv ${NET}.sa.owfn ${NET}.pv.owfn
 
 rm ${NET}.og ${NET}.sa ${NET}.formula.og
+

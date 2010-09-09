@@ -29,9 +29,10 @@ AH_BOTTOM([#ifdef __cplusplus
 
 # search for Fiona, sa2sm and Wendy (nice to have for "make check")
 AC_PATH_PROG(FIONA, [fiona], not found)
-AC_PATH_PROG(SA2SM, [sa2sm], not found)
+AC_PATH_PROG(PETRI, [petri], not found)
 AC_PATH_PROG(WENDY, [wendy], not found)
 AC_PATH_PROG(WENDY2FIONA, [wendy2fiona], not found)
+AC_PATH_PROG(WENDYFORMULA2BITS, [wendyFormula2bits], not found)
 
 # check for additional programs
 AM_MISSING_PROG(GENGETOPT, gengetopt)

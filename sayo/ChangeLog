@@ -12,6 +12,8 @@ Version 1.2-unreleased
 
 * updated wrapper script `publicview.sh'
 
+* now using Petri instead of sa2sm
+
 Version 1.1 (2009-11-10)
 ========================
 

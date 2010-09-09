@@ -84,7 +84,7 @@ char currentSection = ' ';
 %%
 
 og:
-   KEY_INTERFACE input output synchronous KEY_NODES nodes
+   interface_kw input output synchronous KEY_NODES nodes
 
   {
 	//Finished parsing, write output
@@ -189,7 +189,7 @@ og:
   }
 
 /*Syntax for old format*/
-| KEY_INTERFACE input output synchronous nodesOld
+| interface_kw input output synchronous nodesOld
 
   {
 	//Finished parsing, write output
@@ -227,6 +227,10 @@ og:
 
 ;
 
+interface_kw:
+  /* empty */
+| KEY_INTERFACE
+;
 
 
 input:

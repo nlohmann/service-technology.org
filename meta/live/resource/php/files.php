@@ -234,8 +234,10 @@ include_once 'resource/php/dotimg.php';
 include_once 'resource/php/getnumber.php';
 
 // output header
-header("Content-Type: text/html");
-echo '<?xml version="1.0" encoding="utf-8" ?>';
+if (strcmp($_SESSION[$tool]["output"], "result")) {
+  header("Content-Type: text/html");
+  echo '<?xml version="1.0" encoding="utf-8" ?>';
+}
 
 
 $process = $_SESSION[$tool]["process"];

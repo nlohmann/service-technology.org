@@ -98,14 +98,14 @@ function resultOnly($call, $file) {
 
 // function, which creates an image for a $file and actually writes some HTML code
 // rest of the funtionality inside getimage.php
-function drawImage($file, $thumbsize = 300)
+function drawImage($file, $thumbsize = 300, $label= "")
 {
   static $imagecounter = 0;
   $imagecounter++;
 
   $info = pathinfo($file);
 
-  $callstring = LIVEBASE."getimage.php?file=".urlencode($file)."&thumbnail_size=".$thumbsize."&id=".urlencode($_SESSION["uid"]);
+  $callstring = LIVEBASE."getimage.php?file=".urlencode($file)."&thumbnail_size=".$thumbsize."&label=".urlencode($label)."&id=".urlencode($_SESSION["uid"]);
   $thumblink = LIVEBASE."getfile.php?file=".urlencode("thumb_".$file.".png")."&amp;id=".urlencode($_SESSION["uid"]);
   $label = $info["filename"];
 

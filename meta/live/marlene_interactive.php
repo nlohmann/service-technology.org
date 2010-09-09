@@ -97,8 +97,9 @@
 
       <?php
         // $call_result = console($fakecall, 'cd marlene; echo $PATH; which marlene; echo $LD_LIBRARY_PATH; '.$realcall.' ');
-        $call_result = console($fakecall, 'cd marlene; '.$realcall.' ');
+        $call_result = console($fakecall, $realcall);
       ?>
+      
     <a name="rules"></a>
     <h3>Rules</h3>
     <div style="text-align:center;">

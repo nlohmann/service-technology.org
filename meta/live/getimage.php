@@ -9,6 +9,8 @@
   // working directory
   $id = $_GET["id"];
   $file = $_GET["file"];
+  $label = $_GET["label"];
+  
   // set size of thumbnails
   if ( ! isset($_GET['thumbnail_size']))
     $thumbnail_size = 300;
@@ -39,7 +41,10 @@
   // actual URI to image for HTML source
   $link = LIVEBASE."getfile.php?file=".urlencode($info["basename"].".png")."&amp;id=".urlencode($_SESSION["uid"]);
   // info for the title attribute
-  $label = $info["filename"];
+  if($label == "")
+  {
+    $label = $info["filename"];
+   }
 
   // caching, only create file, if it does not exist
   if ( ! file_exists( $imagefile ) )

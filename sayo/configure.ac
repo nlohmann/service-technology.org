@@ -1,4 +1,4 @@
-AC_INIT([Sayo], 1.2-unreleased, sayo@service-technology.org, sayo, http://service-technology.org/sayo)
+AC_INIT([Sayo], 1.2, sayo@service-technology.org, sayo, http://service-technology.org/sayo)
 
 AC_MSG_NOTICE([     ____                         ])
 AC_MSG_NOTICE([    / ___|  __ _ _   _  ___       ])

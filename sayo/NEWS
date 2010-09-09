@@ -8,8 +8,8 @@
                       http://service-technology.org/sayo
 
 
-Version 1.2-unreleased
-======================
+Version 1.2 (2010-09-09)
+========================
 
 * updated wrapper script `publicview.sh'
 
@@ -17,4 +17,7 @@ Version 1.2-unreleased
 
 * applied ST-macros
 
-\nSee file ChangeLog <http://service-technology.org/files/sayo/ChangeLog> for\ncomplete version history.\n
+
+See file ChangeLog <http://service-technology.org/files/sayo/ChangeLog> for
+complete version history.
+

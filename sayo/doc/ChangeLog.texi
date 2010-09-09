@@ -1,4 +1,4 @@
-@heading Version 1.2-unreleased
+@heading Version 1.2 (2010-09-09)
 @itemize
 @item updated wrapper script @samp{publicview.sh}
 @item now using Petri instead of sa2sm

@@ -65,6 +65,10 @@ option "quiet" q
 	flag off
 	hidden
 
+option "pretty" - 
+	"Outputs the fingerprint as a formula at the end of execution."
+	flag off
+
 section "Debug"
 
 option "verbose" v

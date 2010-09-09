@@ -38,7 +38,7 @@
     $lines = file($realresult.".owfn");
 
     foreach ($lines as $line_num => $line) {
-        echo $line) . "\n";
+        echo $line . "\n";
     }
 
     exit;

@@ -33,7 +33,7 @@
   // end of building call strings
   
   if (!strcmp($_SESSION[$tool]["output"], "result")) {
-    header("Content-type: text/plain");
+//    header("Content-type: text/plain");
     system($realcall." > /dev/null");
     system("cat ".$realresult.".owfn");
     exit;

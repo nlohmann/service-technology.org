@@ -41,6 +41,14 @@
   // end of building call strings
 
 
+    if (!strcmp($_SESSION[$tool]["output"], "result")) {
+  //    header("Content-type: text/plain");
+      system($realcall." > /dev/null");
+      system("cat ".$realresult.".".$_SESSION[$tool]['modus']);
+      exit;
+    }
+
+
   // set variables for the system call
 //  $command_mode = '--'.((!strcmp($_REQUEST['mode'], 'ig'))?'sa':'og');
 //  $command_reduction = (isset($_REQUEST['reduce_wait'])?' --waitstatesOnly':'').(isset($_REQUEST['reduce_reic'])?' --receivingBeforeSending':'').(isset($_REQUEST['reduce_sequ'])?' --seqReceivingEvents':'').(isset($_REQUEST['reduce_succ'])?' --succeedingSendingEvent':'').(isset($_REQUEST['reduce_quit'])?' --quitAsSoonAsPossible':'');

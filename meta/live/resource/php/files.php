@@ -91,8 +91,6 @@ function resultOnly($call, $file) {
     exit;
 }
   
-  
-}
 
 // function, which creates an image for a $file and actually writes some HTML code
 // rest of the funtionality inside getimage.php

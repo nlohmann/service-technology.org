@@ -34,9 +34,13 @@
   
   if (!strcmp($_SESSION[$tool]["output"], "result")) {
     header("Content-type: text/plain");
-    system($realcall." > /dev/null");
+    exec($realcall." > /dev/null");
     $lines = file($realresult.".owfn");
-    print_r($lines);
+
+    foreach ($lines as $line_num => $line) {
+        echo $line) . "\n";
+    }
+
     exit;
   }
 ?>

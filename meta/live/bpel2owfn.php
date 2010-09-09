@@ -1,8 +1,7 @@
 <?php
-
   // most important script! sets session information and PATH!
   require_once 'resource/php/session.php';
-  
+
   $tool = "bpel2owfn";
   // some functions for copying/creating files to/in temporary directory
   // see files.php for further information
@@ -23,7 +22,6 @@
   $realcall .= " -m petrinet -p ".$_SESSION[$tool]["patterns"]." -r ".$_SESSION[$tool]["reduce"]." -f ".$_SESSION[$tool]["format"];
 
   $fakeresult .= $process[$inputfile]["filename"];
-//  $fakeresult .= ".owfn"; 
   $realresult = $_SESSION["dir"]."/".$fakeresult;
 
   $fakecall .= " --output=".$fakeresult;
@@ -31,7 +29,7 @@
 
   $realcall .= " -d2 2>&1";
   // end of building call strings
-  
+
   // if 'result' is set to 'output', only print the generated file and exit
   if (!strcmp($_SESSION[$tool]["output"], "result")) {
     resultOnly($realcall, $realresult.".owfn");
@@ -53,10 +51,8 @@
 <body>
   <div id="container">
     <div id="content">
-      <div style="float: right; top: -10px;"><img src="resource/images/live.png" alt="service-technology.org/live" /></div>
+      <div style="float: right; top: -10px;"><a href="index.html"><img src="resource/images/live.png" alt="service-technology.org/live" /></a></div>
       <h1>Service Formalization</h1>
-
-
 
       <h2>Parameters</h2>
       <ul>
@@ -68,10 +64,6 @@
             case "url":       echo "downloaded file"; break;
             case "given":     echo "given file"; break;
           }
-//          if (!strcmp($_SESSION['input_type'], 'url'))
-//            echo ' (downloaded from <a href="'.$_SESSION["bpel2owfn"].'">'.$_SESSION["bpel2owfn"].'</a>)';
-//          if (!strcmp($_SESSION['input_type'], 'example'))
-//            echo ' (uploaded from local file '.basename($_SESSION["bpel2owfn"]).')';
           ?>
         </li>
         <li><strong>patterns:</strong> <?=$_SESSION[$tool]['patterns']?></li>
@@ -86,9 +78,9 @@
 
       <h2>Result</h2>
       <?php drawImage($fakeresult.'.owfn'); ?>
-      
+
       <?php
-          echo "<p><li><a href=".getLink($fakeresult.'.owfn').">".basename($fakeresult)."</a></li></p>";
+      echo "<p><li><a href=".getLink($fakeresult.'.owfn').">".basename($fakeresult)."</a></li></p>";
       ?>
     </div>
   </div>

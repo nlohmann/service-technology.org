@@ -1,13 +1,19 @@
 <?php
-
   // most important script! sets session information and PATH!
   require_once 'resource/php/session.php';
+
   $tool = "wendy";
   // some functions for copying/creating files to/in temporary directory
   // see files.php for further information
   require_once 'resource/php/files.php';
 
-  
+  // prepare strings for system call (realcall) 
+  // and output on console (fakecall)
+  $fakecall = "wendy ";
+  $realcall = "wendy ";
+  $fakeresult = "";
+
+  // collect parameters
   $_SESSION[$tool]['modus'] = (!strcmp($_SESSION[$tool]['mode'], 'ig'))?'sa':'og';
   if (isset($_REQUEST['reduction']))
     $_SESSION['reduction'] = $_REQUEST['reduction'];
@@ -16,12 +22,6 @@
   $_SESSION[$tool]['reduce_sequ'] = (! empty($_SESSION[$tool]['reduce_sequ']))?' --seqReceivingEvents':'';
   $_SESSION[$tool]['reduce_succ'] = (! empty($_SESSION[$tool]['reduce_succ']))?' --succeedingSendingEvent':'';
   $_SESSION[$tool]['reduce_quit'] = (! empty($_SESSION[$tool]['reduce_quit']))?' --quitAsSoonAsPossible':'';
-  
-  // prepare strings for system call (realcall) 
-  // and output on console (fakecall)
-  $fakecall = "wendy ";
-  $realcall = "wendy ";
-  $fakeresult = "";
   
   $inputfile = $_SESSION['wendy']["process"];
   
@@ -39,7 +39,6 @@
 
   $realcall .= " -v 2>&1";
   // end of building call strings
-
 
   // if 'result' is set to 'output', only print the generated file and exit
   if (!strcmp($_SESSION[$tool]["output"], "result")) {
@@ -63,47 +62,41 @@
 <body>
   <div id="container">
     <div id="content">
-      <div style="float: right; top: -10px;"><img src="resource/images/live.png" alt="service-technology.org/live" /></div>
-      <h1>Partner Syntesis</h1>
+      <div style="float: right; top: -10px;"><a href="index.html"><img src="resource/images/live.png" alt="service-technology.org/live" /></a></div>
+      <h1>Partner Synthesis</h1>
 
       <h2>Parameters</h2>
       <ul>
         <li><strong>input file:</strong> <?=$process[$inputfile]["basename"]?>
           <?php
-            switch($_SESSION['input_type']) {
-              case "example":   echo "example file"; break;
-              case "uploaded":  echo "uploaded file"; break;
-              case "url":       echo "downloaded file"; break;
-              case "given":     echo "given file"; break;
-            }
-//          if (!strcmp($_REQUEST['input'], 'url'))
-//            echo ' (downloaded from <a href="'.$_REQUEST['input_url'].'">'.$_REQUEST['input_url'].'</a>)';
-//          if (!strcmp($_REQUEST['input'], 'file'))
-//            echo ' (uploaded from local file '.$_FILES['input_file']['name'].')';
+          switch($_SESSION['input_type']) {
+            case "example":   echo "example file"; break;
+            case "uploaded":  echo "uploaded file"; break;
+            case "url":       echo "downloaded file"; break;
+            case "given":     echo "given file"; break;
+          }
           ?>
         </li>
         <li><strong>verification goal:</strong> 
           <?php echo ((!strcmp($_SESSION[$tool]['mode'], 'ig'))?'interaction graph':'operating guidelines'); ?>
         </li>
-<!--        <li><strong>apply reduction techniques:</strong> 
-          <?php echo ((isset($_SESSION['reduction']))?'yes':'no'); ?>
+        <!--        <li><strong>apply reduction techniques:</strong> 
+        <?php echo ((isset($_SESSION['reduction']))?'yes':'no'); ?>
         </li>-->
       </ul>
 
       <h2>Result</h2>
-
       <?php console($fakecall, $realcall)?>
 
+      <h2>Output</h2>
+      <?php drawImage($fakeresult.'.'.$_SESSION[$tool]['modus']); ?>
 
-    <h2>Output</h2>
-    
-    <?php
-      drawImage($fakeresult.'.'.$_SESSION[$tool]['modus']);
-    ?>
-    
-    <p><a href="<?=getLink($realresult.".".$_SESSION[$tool]['modus'])?>">result</a></p>
+      <p><a href="<?=getLink($realresult.".".$_SESSION[$tool]['modus'])?>">result</a></p>
 
     </div>
+  </div>
+  <div id="footer">
+    <p><a href="http://service-technology.org">service-technology.org</a> is a cooperation between the <a  href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/">University of Rostock</a> and the <a  href="http://www2.informatik.hu-berlin.de/top/index.php">Humboldt-Universit&auml;t zu Berlin</a>.</p>
   </div>
 </body>
 </html>

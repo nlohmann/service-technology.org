@@ -1,19 +1,37 @@
 <?php
-  if (empty($_REQUEST))
-    header('Location:index.html#rachel');
+  // most important script! sets session information and PATH!
+  require_once 'resource/php/session.php';
+  $tool = "rachel";
 
-  include 'resource/php/console.php';
-  include 'resource/php/dotimg.php';
+  // some functions for copying/creating files to/in temporary directory
+  // see files.php for further information
+  require_once 'resource/php/files.php';
 
-  header("Content-Type: text/html");
-  echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
+  // prepare example
+  switch () {
+    case "rachel/running_example.owfn":
+      $automata = array("rachel/running_example.sa");
+      $og = array("rachel/running_example.og");
+      break;
+  }
 
-  $choreography = $_REQUEST['chor'];
-  $editdistance = $_REQUEST['mode'];
+  // copy files to temporary directory, see files.php for details
+  $automata = prepareFiles($automata);
+  $og = prepareFiles($og);
 
+  // prepare strings for system call (realcall) 
+  // and output on console (fakecall)
+  $fakecall = "rachel --help";
+  $realcall = "rachel --help"
+
+//  $choreography = $_REQUEST['chor'];
+//  $editdistance = $_REQUEST['mode'];
+
+/*
   $call_1 = 'rachel -m og -o '.$choreography.'.og -d';  
   $call_2 = 'rachel -m sa -a '.$choreography.'.sa -d';  
   $call_3 = 'rachel -m '.$editdistance.' -a '.$choreography.'.sa -o '.$choreography.'.og -d';  
+*/
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -24,29 +42,37 @@
   <link rel="stylesheet" type="text/css" href="resource/css/console.css" />
   <link rel="shortcut icon" href="resource/favicon.ico" type="image/x-icon" />
   <link rel="icon" href="resource/favicon.ico" type="image/x-icon" />
-  <title>RAAS: Rachel as a Service</title>
+  <title>service-technology.org/live &ndash; Service Correction</title>
   <script type="text/javascript" src="resource/js/jquery-1.2.6.pack.js"></script>
 </head>
 
 <body>
   <div id="container">
     <div id="content">
-      <h1>Rachel</h1>
+      <div style="float: right; top: -10px;"><a href="index.html"><img src="resource/images/live.png" alt="service-technology.org/live" /></a></div>
+      <h1>Service Correction</h1>
 
       <h2>Input</h2>
 
-      <?php system('cd rachel; '.$call_1.' 2> /dev/null'); ?>
-      <?php dotimg('in=rachel/'.$choreography.'.sa.dot&label='.urlencode("service automaton")); ?>
-      <?php system('cd rachel; '.$call_2.' 2> /dev/null'); ?>
-      <?php dotimg('in=rachel/'.$choreography.'.og.dot&label='.urlencode("operating guideline")); ?>
+      <!-- draw images of services -->
+      <?php
+      foreach($automata as $file)
+      {
+        drawImage($file["basename"]);
+      }
+      foreach($og as $file)
+      {
+        drawImage($file["basename"]);
+      }
+      ?>
 
       <h2>Result</h2>
-      
-      <?php $call_result = console($call_3, 'cd rachel; '.$call_3); ?>
-      
-      <?php dotimg('in=rachel/'.$choreography.'.sa_'.$choreography.'.og_'.$editdistance.'.dot&label='.urlencode("edit distance")); ?>
-      
+      <?php console($fakecall, $realcall)?>
+            
     </div>
+  </div>
+  <div id="footer">
+    <p><a href="http://service-technology.org">service-technology.org</a> is a cooperation between the <a  href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/">University of Rostock</a> and the <a  href="http://www2.informatik.hu-berlin.de/top/index.php">Humboldt-Universit&auml;t zu Berlin</a>.</p>
   </div>
 </body>
 

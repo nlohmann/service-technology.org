@@ -36,6 +36,10 @@
     header("Content-type: text/plain");
 
     echo "cat ".$realresult.".owfn";
+    echo "system";
+    system('whoami');
+    system('pwd');
+    echo "exec";
     exec('whoami');
     exec('pwd');
 

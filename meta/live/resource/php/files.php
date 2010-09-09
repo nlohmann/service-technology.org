@@ -68,6 +68,10 @@ function prepareFile($file)
   $result[$file]["residence"] = $_SESSION["dir"]."/".$info["basename"];
   $result[$file]["link"] = getLink($info["basename"]);
  
+  // checking existence is only a workaround, since we have examples,
+  // where the example name does not correspond to exactly one file
+  // therefore $file may not exist (but normally it should
+  if(file_exists($file))
   copy($file, $result[$file]["residence"]);
 
   return $result;

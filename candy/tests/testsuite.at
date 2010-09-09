@@ -145,7 +145,7 @@ AT_SETUP([costfile with repetitions])
 AT_CHECK([cp TESTFILES/costOG2.og .])
 AT_CHECK([cp TESTFILES/error_repetitions.cf .])
 AT_CHECK([CANDY --input=costOG2.og --output=c.og --costfile=error_repetitions.cf], 1, ignore, stderr)
-AT_CHECK([GREP -q "given costfile includes events several times" stderr], 0, ignore)
+AT_CHECK([GREP -q "given costfile includes event serveral times" stderr], 0, ignore)
 AT_KEYWORDS(error)
 AT_CLEANUP
 

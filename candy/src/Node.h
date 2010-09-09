@@ -47,9 +47,13 @@ class Node {
         /// a boolean flag used to speed up some algorithms
         bool flag;
 
+        /// true if this node's formula has a negation, false otherwise
         bool negation;
 
+        /// true if we already computed this node's costs, false otherwise
         bool computedCost;
+
+        /// the computed costs of this node
         unsigned int cost;
 
         /*--------.

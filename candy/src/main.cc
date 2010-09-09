@@ -18,119 +18,201 @@
 \*****************************************************************************/
 
 
-// global headers and DEBUG INFO END macros
-#include "settings.h"
-#include "Graph.h"
-#include "Output.h"
-#include "verbose.h"
+// global headers
+#include "settings.h" // global settings
+#include <libgen.h>  // for basename()
+#include "config-log.h" //for CONFIG_LOG
+#include "Graph.h"  // Graph class
+#include "Output.h"  // handles output
+#include "verbose.h"  // status, debug, abort messages
 
 
-/// og lexer and parser
+// og, cf and nf lexer and parser
 extern int og_yyparse();
 extern FILE* og_yyin;
-
-/// cf lexer and parser
 extern int cf_yyparse();
 extern FILE* cf_yyin;
-
-/// nf lexer and parser
 extern int nf_yyparse();
 extern FILE* nf_yyin;
 
 
-
-/// global variable for above parsers
+// global variable for above parsers
 Graph* parsedOG;
-/// global variable for program invocation
+// global variable for program invocation
 std::string invocation;
-/// global variable for command line parameters
+// global variable for filename
+std::string filename;
+// global variable holding the time of the call
+clock_t start_clock = clock();
+// global variable for command line parameters
 gengetopt_args_info args_info;
 
+
+
+/// evaluate the command line parameters
+void evaluateParameters(int argc, char** argv) {
+
+	// overwrite invocation for consistent error messages
+	argv[0] = basename(argv[0]);
+
+	// store invocation in a std::string for meta information in file output
+	for (int i = 0; i < argc; ++i) {
+		invocation += (i == 0 ? "" : " ") + std::string(argv[i]);
+	}
+
+	// initialize the parameters structure
+	struct cmdline_parser_params* params = cmdline_parser_params_create();
+
+	// call the cmdline parser
+	if (cmdline_parser(argc, argv, &args_info) != 0) {
+		abort(1, "invalid command-line parameter(s)");
+	}
+	free(argv[0]); // basename allocated memory
+
+	// debug option
+	if (args_info.bug_flag) {
+		{
+			Output debug_output("bug.log", "configuration information");
+			debug_output.stream() << CONFIG_LOG;
+		}
+		message("Please send file '%s' to %s!", _cfilename_("bug.log"), _coutput_(PACKAGE_BUGREPORT));
+		exit(EXIT_SUCCESS);
+	}
+
+	/*
+	 // read a configuration file if necessary
+	if (args_info.config_given) {
+		// initialize the config file parser
+		params->initialize = 0;
+		params->override = 0;
+
+		// call the config file parser
+		if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
+			abort(14, "error reading configuration file '%s'", args_info.config_arg);
+		} else {
+			status("using configuration file '%s'", _cfilename_(args_info.config_arg));
+		}
+	} else {
+		// check for configuration files
+		std::string conf_generic_filename = std::string(PACKAGE) + ".conf";
+		std::string conf_filename = fileExists(conf_generic_filename) ? conf_generic_filename :
+									(fileExists(std::string(SYSCONFDIR) + "/" + conf_generic_filename) ?
+									 (std::string(SYSCONFDIR) + "/" + conf_generic_filename) : "");
+
+		if (conf_filename != "") {
+			// initialize the config file parser
+			params->initialize = 0;
+			params->override = 0;
+			if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
+				abort(14, "error reading configuration file '%s'", conf_filename.c_str());
+			} else {
+				status("using configuration file '%s'", _cfilename_(conf_filename));
+			}
+		} else {
+			status("not using a configuration file");
+		}
+	}
+	*/
+
+	// set input og source
+	filename = "";
+	if ( args_info.input_given ) {
+
+		// get ogfile prefix
+		status("og will be read from file");
+		filename = string(args_info.input_arg);
+		if ( filename.find(".") != string::npos ) {
+			filename = filename.erase( filename.find(".") );
+		}
+		debug("og file prefix is %s", filename.c_str());
+
+		// open filestream
+		og_yyin = fopen(args_info.input_arg, "r");
+		if ( !og_yyin ) {
+			abort( 2, "failed to open input file %s", args_info.input_arg);
+		}
+	} else {
+		// og_yyin reads from stdin per default
+		status("og will be read from stdin");
+	}
+
+
+	// set input cost source
+	if ( args_info.costfile_given ) {
+
+		// get costfile name
+		status("cost will be read from costfile");
+		string costfile = ( args_info.costfile_arg != NULL ? args_info.costfile_arg : filename + ".cf" );
+		assert(costfile != "");
+
+		// open filestream
+		cf_yyin = fopen( costfile.c_str(), "r");
+		if ( !cf_yyin ) {
+			abort( 3, "failed to open costfile %s", costfile.c_str());
+		}
+	//} else if ( args_info.netfile_given ) {
+
+	//    INFO "cost will be read from netfile" END
+
+	//    // get netfile name
+	//    string netfile = ( args_info.netfile_arg != NULL ? args_info.netfile_arg : inputPrefix + ".owfn" );
+	//    assert(netfile != "");
+
+	//    // open filestream
+	//    nf_yyin = fopen( netfile.c_str(), "r");
+	//    if ( !nf_yyin ) {
+	//        ERROR "failed to open netfile '" << netfile << "'" END
+	//        exit(EXIT_FAILURE);
+	//    }
+	} else {
+		abort( 4, "a costfile must be given");
+	}
+
+    free(params);
+}
+
+
+/// a function collecting calls to organize termination (close files, ...)
+void terminationHandler() {
+    // release memory (used to detect memory leaks)
+    if (args_info.finalize_flag) {
+        time_t start_time, end_time;
+        time(&start_time);
+
+        cmdline_parser_free(&args_info);
+        delete parsedOG;
+
+        time(&end_time);
+        status("released memory [%.0f sec]", difftime(end_time, start_time));
+    }
+
+    // print statistics
+    if (args_info.stats_flag) {
+        message("runtime: %s%.2f sec%s", _bold_, (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC, _c_);
+        std::string call = std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }'";
+        FILE* ps = popen(call.c_str(), "r");
+        unsigned int memory;
+        int res = fscanf(ps, "%u", &memory);
+        assert(res != EOF);
+        pclose(ps);
+        message("memory consumption: %s%u KB %s", _bold_, memory, _c_);
+    }
+}
 
 
 /// main method
 int main(int argc, char** argv) {
 
+	// set the function to call on normal termination
+	atexit(terminationHandler);
+
 	/*--------------------------------------.
 	| 0. parse the command line parameters  |
 	`--------------------------------------*/
 
-    // the command line parameters filled with default values
-	//cmdline_parser_init(&args_info);
-
-    // call the command line parser from gengetopt
-    // which will check for unused and unnamed paramters
-    // this will set the correct flags for the macros from settings.h
-    if (cmdline_parser(argc, argv, &args_info) != 0) {
-    	abort( 1, "invalid command-line parameter(s)" );
-    }
-
-    // store invocation in a string for meta information in file output
-    for (int i = 0; i < argc; ++i) {
-        invocation += string(argv[i]) + " ";
-    }
-
-
-
-    // set input og source
-    string inputPrefix = "";
-    if ( args_info.input_given ) {
-
-        status("og will be read from file");
-
-    	// get ogfile prefix
-        inputPrefix = string(args_info.input_arg);
-        if ( inputPrefix.find(".") != string::npos ) {
-            inputPrefix = inputPrefix.erase( inputPrefix.find(".") );
-        }
-        debug("og file prefix is %s", inputPrefix.c_str());
-
-        // open filestream
-        og_yyin = fopen(args_info.input_arg, "r");
-        if ( !og_yyin ) {
-            abort( 2, "failed to open input file %s", args_info.input_arg);
-        }
-    } else {
-    	// og_yyin reads from stdin per default
-        status("og will be read from stdin");
-    }
-
-
-
-    // set input cost source
-    if ( args_info.costfile_given ) {
-
-    	status("cost will be read from costfile");
-
-        // get costfile name
-        string costfile = ( args_info.costfile_arg != NULL ? args_info.costfile_arg : inputPrefix + ".cf" );
-        assert(costfile != "");
-
-        // open filestream
-        cf_yyin = fopen( costfile.c_str(), "r");
-        if ( !cf_yyin ) {
-            abort( 3, "failed to open costfile %s", costfile.c_str());
-        }
-    //} else if ( args_info.netfile_given ) {
-
-    //    INFO "cost will be read from netfile" END
-
-    //    // get netfile name
-    //    string netfile = ( args_info.netfile_arg != NULL ? args_info.netfile_arg : inputPrefix + ".owfn" );
-    //    assert(netfile != "");
-
-    //    // open filestream
-    //    nf_yyin = fopen( netfile.c_str(), "r");
-    //    if ( !nf_yyin ) {
-    //        ERROR "failed to open netfile '" << netfile << "'" END
-    //        exit(EXIT_FAILURE);
-    //    }
-    } else {
-    	abort( 4, "a costfile must be given");
-    }
+	evaluateParameters(argc, argv);
     Output::setTempfileTemplate(args_info.tmpfile_arg);
     Output::setKeepTempfiles(args_info.noClean_flag);
-
 
 
 
@@ -144,7 +226,7 @@ int main(int argc, char** argv) {
     fclose(og_yyin);
 
     debug("finished og parsing, parsed following data:\n\n");
-    if (args_info.debug_flag) parsedOG->outputDebug( cout);
+    if (args_info.debug_flag) parsedOG->outputDebug( cout );
 
 
 
@@ -200,7 +282,7 @@ int main(int argc, char** argv) {
     	// write to stdout per default or to file given with output parameter
     	std::string outputFilename = "-";
     	if ( args_info.output_given ) {
-    		outputFilename = ( args_info.output_arg != NULL ? args_info.output_arg : inputPrefix + "_efficient.og" );
+    		outputFilename = ( args_info.output_arg != NULL ? args_info.output_arg : filename + "_efficient.og" );
     	}
 
     	// output sa or og
@@ -216,20 +298,6 @@ int main(int argc, char** argv) {
     }
 
 
-
-	/*-----------------------.
-	| N. collect the garbage |
-	`-----------------------*/
-
     status("closing down program...");
-
-    // release from parser allocated memory
-    cmdline_parser_free(&args_info);
-
-    // release memory for parsed og
-    delete parsedOG;
-
-
-
     return EXIT_SUCCESS;
 }

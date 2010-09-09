@@ -28,6 +28,7 @@
 #include "config.h"
 // header for graph class
 #include "Graph.h"
+#include "verbose.h"
 
 using std::string;
 
@@ -36,7 +37,6 @@ using std::string;
 extern Graph* parsedOG;
 
 // from flex
-extern char* cf_yytext;
 extern int cf_yylex();
 extern int cf_yyerror(char const *msg);
 
@@ -53,10 +53,10 @@ map< string, bool > parsedEventsCF;
 
 %union {
     char *str;
-    unsigned int value;
+    unsigned int val;
 }
 
-%type <value> NUMBER
+%type <val> NUMBER
 %type <str>   IDENT
 
 %start costfile
@@ -67,12 +67,7 @@ map< string, bool > parsedEventsCF;
 costfile:
   eventcost
   {
-    // we ignore this because all non-mentioned events have cost of 0 due to
-    // the og parser
-    //if ( parsedEventsCF.size() != parsedOG->events.size() ) {
-    //    cf_yyerror("given costfile does not include all events from given OG");
-    //    exit(EXIT_FAILURE);
-    //}
+    // all non-mentioned events have cost of 0 due to the og parser
   }
 ;
 
@@ -88,14 +83,11 @@ eventcost:
             (iter->second)->setCost($3);
             parsedEventsCF[$2] = true;
         } else {
-            // we ignore them
-            //cf_yyerror("given costfile includes events which are not used in given OG");
-            //exit(EXIT_FAILURE);
+            // we ignore events which are not used in the given OG
         }
     } else {
-        // dont ignore multiple events
-        cf_yyerror("given costfile includes events several times");
-        exit(EXIT_FAILURE);
+        // dont ignore multiple event
+        abort(1, "given costfile includes event serveral times");
     }
 
     free($2);

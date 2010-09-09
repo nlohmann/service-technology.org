@@ -35,9 +35,13 @@ class Graph {
         | attributes |
         `-----------*/
 
+	    /// the root node
         Node* root;
 
+        /// all nodes of this graph
         map< unsigned int, Node* > nodes;
+
+        /// all events of this graph
         map< string, Event* > events;
 
 

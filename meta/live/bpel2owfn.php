@@ -35,7 +35,8 @@
   if (!strcmp($_SESSION[$tool]["output"], "result")) {
     header("Content-type: text/plain");
     system($realcall." > /dev/null");
-    system("cat ".$realresult.".owfn");
+    $lines = file($realresult.".owfn");
+    print_r($lines);
     exit;
   }
 ?>

@@ -35,6 +35,7 @@
           <li><a href="#pnog"><span>Petri Net OG</span></a></li>
           <li><a href="#migration"><span>Instance Migration</span></a></li>
           <li><a href="#matching"><span>Service Matching</span></a></li>
+          <li><a href="#lindayasmina"><span>Fingerprints</span></a></li>
           <li><a href="#lola"><span>Petri Net Verification</span></a></li>
           <li><a href="#soundness"><span>Business Process Soundness Check</span></a></li>
         </ul>
@@ -377,7 +378,113 @@
                </ul>
              </div>
       </div>
+      <div id="lindayasmina">
 
+	<script type="text/javascript">
+	function ly_toggle_fields_output_fingerprints() {
+		if (document.getElementById("ly_output_fingerprints_formula").disabled == true) {
+			document.getElementById("ly_output_fingerprints_formula").disabled = false;	
+		} else {
+			document.getElementById("ly_output_fingerprints_formula").disabled = true;
+		}
+
+		if (document.getElementById("ly_output_fingerprints_file").disabled == true) {
+			document.getElementById("ly_output_fingerprints_file").disabled = false;	
+		} else {
+			document.getElementById("ly_output_fingerprints_file").disabled = true;
+		}
+	}
+
+	function ly_toggle_fields_output_linda_output() {
+		if (document.getElementById("ly_output_linda_output_standard").disabled == true) {
+			document.getElementById("ly_output_linda_output_standard").disabled = false;	
+		} else {
+			document.getElementById("ly_output_linda_output_standard").disabled = true;
+		}
+
+		if (document.getElementById("ly_output_linda_output_verbose").disabled == true) {
+			document.getElementById("ly_output_linda_output_verbose").disabled = false;	
+		} else {
+			document.getElementById("ly_output_linda_output_verbose").disabled = true;
+		}
+	}
+
+	function ly_toggle_fields_output_yasmina_output() {
+		if (document.getElementById("ly_output_yasmina_output_standard").disabled == true) {
+			document.getElementById("ly_output_yasmina_output_standard").disabled = false;	
+		} else {
+			document.getElementById("ly_output_yasmina_output_standard").disabled = true;
+		}
+
+		if (document.getElementById("ly_output_yasmina_output_verbose").disabled == true) {
+			document.getElementById("ly_output_yasmina_output_verbose").disabled = false;	
+		} else {
+			document.getElementById("ly_output_yasmina_output_verbose").disabled = true;
+		}
+	}
+
+
+
+	</script>
+
+
+        <h1>Fingerprints</h1>
+        <p>A fingerprint is an abstract representation of interaction behavior as a boolean formula. Fingerprints can be used to semi-decide compatibility of two services. The tool <a href="http://service-technology.org/linda">Linda</a> computes a fingerprint for a given service model. The tool <a href="http://service-technology.org/yasmina">Yasmina</a> semi-decides compatibility based on given fingerprints. </p>
+        <form action="lindayasmina.php" method="post" enctype="multipart/form-data">
+          <fieldset>
+            <legend>Input Open Nets</legend>
+		<input type="radio" name="input_type" value="example" checked="checked" id="lindayasmina_example" /><label for="lindayasmina_example"><i>Select two or more examples.</i><br />
+		<select name="ly_inputs[]" size="5" multiple="multiple">
+			<option value="suggester">Suggester Service</option>
+			<option  value="decider">Decider Service</option>
+
+		</select>
+	</label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Term sets</legend>
+	    <i> Please select one or more of the following term sets. Rule of thumb: More terms increase the quality of the compatibility check.</i><br />
+            <input type="checkbox" name="ly_singleEvents" value="yes" id="ly_singleEvents" /><label for="ly_singleEvents"> Single events</label><br />
+            <input type="checkbox" name="ly_mutualExclusion" value="yes" id="ly_mutualExclusion" /><label for="ly_mutualExclusion"> Mutual exclusion</label><br />
+            <input type="checkbox" name="ly_octagon" value="yes" id="ly_octagon" /><label for="ly_octagon"> Octagon terms</label><br />
+            <input type="checkbox" name="ly_mdb" value="yes" id="ly_mdb" /><label for="ly_mdb"> MDB terms</label><br />
+          </fieldset>
+
+          <fieldset>
+            <legend>Output Presentation</legend>
+	    <i>Additionally to the plain result of the compatibility check, the following artifacts are available.</i><br />
+	    <input type="checkbox" name="ly_output_nets" value="yes" id="ly_output_nets" /><label for="ly_output_nets"> Display open nets</label><br />
+	    <input type="checkbox" name="ly_output_fingerprints" value="yes" id="ly_output_fingerprints" onchange="ly_toggle_fields_output_fingerprints()"/><label for="ly_output_fingerprints"> Display fingerprints</label><br />
+	    <ul>
+		<input type="radio" name="ly_output_fingerprints_option" value="formula" id="ly_output_fingerprints_formula" disabled="true"/><label for="ly_output_fingerprints_formula"> Formula</label><br />
+		<input type="radio" name="ly_output_fingerprints_option" value="file" id="ly_output_fingerprints_file" disabled="true"/><label for="ly_output_fingerprints_file"> Actual output file</label><br />
+            </ul>
+	    <input type="checkbox" name="ly_output_linda_output" value="yes" id="ly_output_linda_output" onchange="ly_toggle_fields_output_linda_output()"/><label for="ly_output_linda_output_"> Display Linda console output</label><br />
+	    <ul>
+		<input type="radio" name="ly_output_linda_output_option" value="standard" id="ly_output_linda_output_standard" disabled="true"/><label for="ly_output_linda_output_standard"> Standard</label><br />
+		<input type="radio" name="ly_output_linda_output_option" value="verbose" id="ly_output_linda_output_verbose" disabled="true"/><label for="ly_output_linda_output_verbose"> Verbose</label><br />
+            </ul>
+	    <input type="checkbox" name="ly_output_yasmina_output" value="yes" id="ly_output_yasmina_output" onchange="ly_toggle_fields_output_yasmina_output()"/><label for="ly_output_yasmina_output"> Display Yasmina console output</label><br />
+	    <ul>
+		<input type="radio" name="ly_output_yasmina_output_option" value="standard" id="ly_output_yasmina_output_standard" disabled="true"/><label for="ly_output_yasmina_output_standard"> Standard</label><br />
+		<input type="radio" name="ly_output_yasmina_output_option" value="verbose" id="ly_output_yasmina_output_verbose" disabled="true"/><label for="ly_output_yasmina_output_verbose"> Verbose</label><br />
+            </ul>
+
+          </fieldset>
+
+          <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
+        </form>
+         <div class="paper">
+           <!--  <h2>References</h2>
+           <ul>
+              <li>Niels Lohmann and Daniela Weinberg. <strong>Wendy: A tool to synthesize partners for services.</strong> In Johan Lilius and Wojciech Penczek, editors, <em>31st International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, PETRI NETS 2010, Braga, Portugal, June 21-25, 2010, Proceedings</em>, volume 6128 of Lecture Notes in Computer Science, pages 297-307, June 2010. Springer-Verlag. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/LohmannW_2010_atpn.pdf">PDF</a>]</li>
+              <li>Karsten Wolf. <strong>Does my service have partners?</strong>. <em>LNCS ToPNoC</em>, 5460(II):152-171, March 2009. Special Issue on Concurrency in Process-Aware Information Systems. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Wolf_2008_topnoc.pdf">PDF</a>]</li>
+              <li>Daniela Weinberg. <strong>Efficient Controllability Analysis of Open Nets.</strong> In Roberto Bruni and Karsten Wolf, editors, <em>Web Services and Formal Methods, Fifth International Workshop, WS-FM 2008, Milan, Italy, September 4-5, 2008, Proceedings</em>, Lecture Notes in Computer Science, September 2008. Springer-Verlag. [<a href="http://dx.doi.org/10.1007/978-3-642-01364-5_14">DOI</a>]</li>
+              </ul>-->
+            </div>
+            
+      </div>
       <div id="lola">
         <h1>Petri Net Verification</h1>
         <p><a href="http://service-technology.org/lola">LoLA</a>.</p>

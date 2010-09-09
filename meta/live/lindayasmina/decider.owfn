@@ -1,0 +1,34 @@
+PLACE
+  INTERNAL
+    waiting,processing,done;
+
+  INPUT
+    doc;
+
+  OUTPUT
+	fdb,
+	rej,
+	acc;
+
+
+INITIALMARKING
+  waiting:	1;
+
+FINALCONDITION
+	done = 1 AND ALL_OTHER_PLACES_EMPTY;
+
+TRANSITION d1
+  CONSUME waiting, doc;
+  PRODUCE processing;
+
+TRANSITION d2
+  CONSUME processing;
+  PRODUCE waiting, fdb;
+
+TRANSITION d3
+  CONSUME processing;
+  PRODUCE done, rej;
+
+TRANSITION d4
+  CONSUME processing;
+  PRODUCE done, acc;

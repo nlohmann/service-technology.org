@@ -89,6 +89,7 @@ void evaluateParameters(int argc, char** argv) {
     if (cmdline_parser(argc, argv, &args_info) != 0) {
         abort(7, "invalid command-line parameter(s)");
     }
+    free(argv[0]); // basename allocated memory
 
     // debug option
     if (args_info.bug_flag) {

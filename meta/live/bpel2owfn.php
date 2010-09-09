@@ -34,6 +34,11 @@
   
   if (!strcmp($_SESSION[$tool]["output"], "result")) {
     header("Content-type: text/plain");
+
+    echo "cat ".$realresult.".owfn";
+    exec('whoami');
+    exec('pwd');
+
     exec($realcall." > /dev/null");
     system("cat ".$realresult.".owfn");
     exit;

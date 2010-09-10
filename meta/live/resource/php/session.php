@@ -41,7 +41,7 @@ function getLink($file)
   }
   if ( ! isset( $_SESSION["subdir"] ) )
   {
-    $_SESSION["subdir"] = time();
+    $_SESSION["subdir"] = $_SERVER["REQUEST_TIME"];
   }
   //if ( ! isset( $_SESSION["dir"] ) )
   {

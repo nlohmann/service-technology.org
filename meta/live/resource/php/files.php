@@ -173,7 +173,7 @@ else
      $_SESSION["input_type"] = $_REQUEST["input_type"];
      
      // create new subdir vor request
-     $_SESSION["subdir"] = time();
+     $_SESSION["subdir"] = $_SERVER["REQUEST_TIME"];
       
       if ( ! strcmp($_REQUEST["input_type"], 'example') )
       {

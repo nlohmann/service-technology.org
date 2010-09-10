@@ -116,6 +116,10 @@ int main(int argc, char* argv[]) {
     // initial clearing
     _statistics.clear();
 
+    if (!args_info.inputs_num) {
+    	exit(EXIT_SUCCESS);
+    }
+
     string invocation;
     // store invocation in a string for meta information in file output
     for (int i = 0; i < argc; ++i) {

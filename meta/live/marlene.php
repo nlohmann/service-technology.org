@@ -56,10 +56,12 @@
     }
     $fakeresult .= $info["filename"];
   }
+  /*
   if (isset($_SESSION[$tool]["costopt"]) && $_SESSION[$tool]["costopt"] == "yes")
   {
     $fakeresult .= "_costopt";
   }
+  */
   $fakeresult .= ".owfn"; 
   $realresult = $_SESSION["dir"]."/".$fakeresult;
 

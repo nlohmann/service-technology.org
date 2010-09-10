@@ -21,7 +21,7 @@
   $fakecall .= " -m petrinet -p ".$_SESSION[$tool]["patterns"]." -r ".$_SESSION[$tool]["reduce"]." -f ".$_SESSION[$tool]["format"];
   $realcall .= " -m petrinet -p ".$_SESSION[$tool]["patterns"]." -r ".$_SESSION[$tool]["reduce"]." -f ".$_SESSION[$tool]["format"];
 
-  $fakeresult .= $process[$inputfile]["filename"]."_".$_SESSION[$tool]["patterns"].$_SESSION[$tool]["reduce"];
+  $fakeresult .= $process[$inputfile]["filename"]; //."_".$_SESSION[$tool]["patterns"].$_SESSION[$tool]["reduce"];
   $realresult = $_SESSION["dir"]."/".$fakeresult;
 
   $fakecall .= " --output=".$fakeresult;

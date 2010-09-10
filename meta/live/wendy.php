@@ -23,12 +23,14 @@
   $_SESSION[$tool]['reduce_succ'] = (! empty($_SESSION[$tool]['reduce_succ']))?' --succeedingSendingEvent':'';
   $_SESSION[$tool]['reduce_quit'] = (! empty($_SESSION[$tool]['reduce_quit']))?' --quitAsSoonAsPossible':'';
 
+  /*
   $fileadditive = "_";
   $fileadditive .= (! empty($_SESSION[$tool]['reduce_wait']))?'1':'0';
   $fileadditive .= (! empty($_SESSION[$tool]['reduce_reic']))?'1':'0';
   $fileadditive .= (! empty($_SESSION[$tool]['reduce_sequ']))?'1':'0';
   $fileadditive .= (! empty($_SESSION[$tool]['reduce_succ']))?'1':'0';
   $fileadditive .= (! empty($_SESSION[$tool]['reduce_quit']))?'1':'0';
+  */
   
   $inputfile = $_SESSION['wendy']["process"];
   
@@ -38,7 +40,7 @@
   $fakecall .= $_SESSION[$tool]['reduce_wait'].$_SESSION[$tool]['reduce_reic'].$_SESSION[$tool]['reduce_sequ'].$_SESSION[$tool]['reduce_succ'].$_SESSION[$tool]['reduce_quit'];
   $realcall .= $_SESSION[$tool]['reduce_wait'].$_SESSION[$tool]['reduce_reic'].$_SESSION[$tool]['reduce_sequ'].$_SESSION[$tool]['reduce_succ'].$_SESSION[$tool]['reduce_quit'];
 
-  $fakeresult .= $process[$inputfile]["filename"].$fileadditive;
+  $fakeresult .= $process[$inputfile]["filename"]; //.$fileadditive;
   $realresult = $_SESSION["dir"]."/".$fakeresult;
 
   $fakecall .= " --".$_SESSION[$tool]['modus'].'='.$fakeresult.".".$_SESSION[$tool]['modus'];

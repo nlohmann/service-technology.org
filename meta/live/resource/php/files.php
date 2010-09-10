@@ -77,12 +77,6 @@ function prepareFile($file)
   return $result;
 }
 
-// create a string representing the URI for downloading a file
-function getLink($file)
-{
-  return LIVEBASE."getfile.php?file=".urlencode(basename($file))."&amp;id=".urlencode($_SESSION["uid"]);
-}
-
 // display result file only
 function resultOnly($call, $file) {
     header("Content-type: text/plain");
@@ -105,8 +99,9 @@ function drawImage($file, $thumbsize = 300, $label= "")
 
   $info = pathinfo($file);
 
-  $callstring = LIVEBASE."getimage.php?file=".urlencode($file)."&thumbnail_size=".$thumbsize."&label=".urlencode($label)."&id=".urlencode($_SESSION["uid"]);
-  $thumblink = LIVEBASE."getfile.php?file=".urlencode("thumb_".$file.".png")."&amp;id=".urlencode($_SESSION["uid"]);
+  $callstring = LIVEBASE."getimage.php?file=".urlencode($file)."&thumbnail_size=".$thumbsize."&label=".urlencode($label)."&id=".urlencode($_SESSION["uid"])."&tc=".urlencode($_SESSION["subdir"]);
+  // $thumblink = getLink("thumb_".$file.".png");
+  //LIVEBASE."getfile.php?file=".urlencode("thumb_".$file.".png")."&amp;id=".urlencode($_SESSION["uid"]);
   $label = $info["filename"];
 
   echo '<script type="text/javascript">'."\n";
@@ -176,6 +171,9 @@ else
     {
      $_SESSION[$tool] = $_REQUEST;
      $_SESSION["input_type"] = $_REQUEST["input_type"];
+     
+     // create new subdir vor request
+     $_SESSION["subdir"] = time();
       
       if ( ! strcmp($_REQUEST["input_type"], 'example') )
       {

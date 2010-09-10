@@ -10,7 +10,8 @@
   $id = $_GET["id"];
   $file = $_GET["file"];
   $label = $_GET["label"];
-  
+  $subdir = $_GET["tc"];
+    
   // set size of thumbnails
   if ( ! isset($_GET['thumbnail_size']))
     $thumbnail_size = 300;
@@ -21,9 +22,10 @@
 
   $id = str_replace($slashes, "", urldecode($id));
   $file = str_replace($slashes, "", urldecode($file));
+  $subdir = str_replace($slashes, "", urldecode($subdir));
 
   // the file to visualize actually is:
-  $file = $_SESSION["dir"]."/".$file;
+  $file = getDirName($id)."/".$subdir."/".$file;
 
   // if file not found, then file not found
   if ( ! file_exists($file))
@@ -39,7 +41,8 @@
   // target name of image (for now png, maybe late dependend on file type)
   $imagefile = $file.".png";
   // actual URI to image for HTML source
-  $link = LIVEBASE."getfile.php?file=".urlencode($info["basename"].".png")."&amp;id=".urlencode($_SESSION["uid"]);
+  $link = getLink($info["basename"].".png");
+  //LIVEBASE."getfile.php?file=".urlencode($info["basename"].".png")."&amp;id=".urlencode($_SESSION["uid"]);
   // info for the title attribute
   if($label == "")
   {
@@ -72,7 +75,8 @@
 
   // filename and link for thumbnail
   $thumbnail = dirname($imagefile).'/thumb_'.basename($imagefile);
-  $thumblink = LIVEBASE."getfile.php?file=".urlencode(basename($thumbnail))."&amp;id=".urlencode($_SESSION["uid"]);
+  $thumblink = getLink(basename($thumbnail));
+  //LIVEBASE."getfile.php?file=".urlencode(basename($thumbnail))."&amp;id=".urlencode($_SESSION["uid"]);
 
   // create thumbnail, if it does not exists
   if (!file_exists($thumbnail)) {

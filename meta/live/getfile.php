@@ -7,14 +7,16 @@
   // get session id and filename
   $id = $_GET["id"];
   $file = $_GET["file"];
+  $subdir = $_GET["tc"];
 
   $slashes = array("/", "\\");
 
   $id = str_replace($slashes, "", urldecode($id));
   $file = str_replace($slashes, "", urldecode($file));
+  $subdir = str_replace($slashes, "", urldecode($subdir));
 
   // here should be the file:
-  $getfile = getDirName($id)."/".$file;
+  $getfile = getDirName($id)."/".$subdir."/".$file;
 
   if ( file_exists($getfile) )
   {

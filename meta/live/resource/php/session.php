@@ -23,6 +23,13 @@ function getDirName($uid)
   return WORKDIR."$uid";
 }
 
+// create a string representing the URI for downloading a file
+function getLink($file)
+{
+  return LIVEBASE."getfile.php?file=".urlencode(basename($file))."&amp;id=".urlencode($_SESSION["uid"])."&amp;tc=".urlencode($_SESSION["subdir"]);
+}
+
+
   session_start();
   if ( ! isset( $_SESSION ) )
   {
@@ -32,9 +39,13 @@ function getDirName($uid)
   {
     $_SESSION["uid"] = md5(uniqid(mt_rand(), true));
   }
-  if ( ! isset( $_SESSION["dir"] ) )
+  if ( ! isset( $_SESSION["subdir"] ) )
   {
-    $_SESSION["dir"] = getDirName($_SESSION["uid"]);
+    $_SESSION["subdir"] = time();
+  }
+  //if ( ! isset( $_SESSION["dir"] ) )
+  {
+    $_SESSION["dir"] = getDirName($_SESSION["uid"])."/".$_SESSION["subdir"];
   }
   // if dir does not exist, create it recursively
   if ( ! file_exists( $_SESSION["dir"] ) )

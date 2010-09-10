@@ -58,6 +58,11 @@
         // remove white border
         system('convert -trim '.$imagefile.' '.$imagefile.' &> /dev/null');
         break;
+      case "dot":
+        system("cd ".$_SESSION["dir"]."; dot -Tpng -o".$imagefile." ".basename($file)." &> /dev/null");
+        // remove white border
+        system('convert -trim '.$imagefile.' '.$imagefile.' &> /dev/null');
+        break;
       case "og":
       case "sa":
         system("cd ".$_SESSION["dir"]."; og2dot -opng ".basename($file)." &> /dev/null");

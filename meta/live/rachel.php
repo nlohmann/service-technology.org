@@ -92,14 +92,9 @@
 
       <!-- draw images of services -->
       <?php
-      foreach($automata as $file)
-      {
-        drawImage($file["basename"], "sa");
-      }
-      foreach($og as $file)
-      {
-        drawImage($file["basename"], "og");
-      }
+      drawImage($automata["basename"]);
+
+      drawImage($og["basename"]);
       ?>
 
       <h2>Result</h2>

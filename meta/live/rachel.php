@@ -63,7 +63,7 @@
 
   // prepare strings for system call (realcall) 
   // and output on console (fakecall)
-  $fakeresult .= "result.dot";
+  $fakeresult = "result.dot";
   $realresult = $_SESSION["dir"]."/".$fakeresult;
 
   $fakecall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["basename"]." -o ".$og["basename"]." -d ".$fakeresult;

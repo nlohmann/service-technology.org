@@ -183,20 +183,38 @@ else
       }
       else if ( ! strcmp($_REQUEST["input_type"], 'uploaded') )
       {
-        $_SESSION[$tool]["process"] = $_REQUEST["input_uploaded"];
+        $dir = getDirName($_SESSION["uid"]);
+        $target = $dir."/".$_FILES["input_uploaded"]["name"];
+        move_uploaded_file($_FILES["input_uploaded"]['tmp_name'], $target);
+        $_SESSION[$tool]["process"] = $target;
         $set = true;
       }
       else if ( ! strcmp($_REQUEST["input_type"], 'url') )
       {
-        $_SESSION[$tool]["process"] = $_REQUEST["input_url"];
+
+        $dir = getDirName($_SESSION["uid"]);
+        
+        $download = 'cd '.$dir.'; pwd; wget -N --content-disposition \''.$_REQUEST["input_url"].'\' 2>&1 | grep "Saving to" 2>&1 | gawk \'/Saving to:/ { print $3; } \''; // -O '.$process[$_SESSION["$tool"]["process"]]["residence"];
+        $output = array();
+        $name = exec($download, $output);
+        $marks = array("`", "'");
+        $name = str_replace($marks, "", $name);
+        /*
+        echo $download."\n";
+        print_r($output);
+        echo $name."\n";
+        */
+        $_SESSION[$tool]["process"] = $dir."/".$name;
+        echo $_SESSION[$tool]["process"];
+        //exit;
         $set = true;
       }
       else if ( ! strcmp($_REQUEST["input_type"], 'given') )
       {
-        $_SESSION[$tool]["process"] = "given_".md5(uniqid(mt_rand(), true));
+        $_SESSION[$tool]["process"] = "given";
         $set = true;
       }
-      if (strcmp($_REQUEST["input_type"], 'uploaded'))
+      if (strcmp($_REQUEST["input_type"], 'uploaded') && strcmp($_REQUEST["input_type"], 'url'))
       {
         switch ($tool)
         {
@@ -264,14 +282,11 @@ if ( ! strcmp($_SESSION[$tool]["input_type"], 'example') )
 }
 else if ( ! strcmp($_SESSION[$tool]["input_type"], 'uploaded') )
 {
-  $process = createFile($process);
-  move_uploaded_file($_FILES['input_file']['tmp_name'], $process[$_SESSION["$tool"]["process"]]["residence"]);
+  $process = prepareFile($process);
 }
 else if ( ! strcmp($_SESSION["input_type"], 'url') )
 {
-  $process = createFile($process);
-  $download = 'wget \''.$_SESSION["$tool"].'\' -O '.$process[$_SESSION["$tool"]["process"]]["residence"];
-  system($download);
+  $process = prepareFile($process);
 }
 else if ( ! strcmp($_SESSION["input_type"], 'given') )
 {

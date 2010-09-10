@@ -106,9 +106,9 @@
         <?php
           foreach($services as $file)
           {
-            echo $file["basename"]." ";
+            echo '<a href="'.$file["link"].'" target="_blank">'.$file["basename"]."</a> ";
           }
-          echo $rulefile["basename"]." ";
+          echo '<a href="'.$rulefile["link"].'" target="_blank">'.$rulefile["basename"]."</a> ";
           ?>
           <?php
           
@@ -134,6 +134,7 @@
 
 
       <!-- provide links for downloading services -->
+      <!--
       <ul>
       <?php
         foreach($services as $info)
@@ -143,6 +144,7 @@
         echo "<li><a href=".$rulefile["link"].">".$rulefile["basename"]."</a></li>";
       ?>
       </ul>
+      -->
 
       <h2>Call</h2>
 

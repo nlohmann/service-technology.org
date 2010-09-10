@@ -30,12 +30,12 @@
   
  foreach( $_SESSION[$tool]["input_example"] as $key => $value){
 
-   $opennetFiles[$key] = prepareFile("lindayasmina/${value}.owfn");
-  	$fingerprintFiles[$key] = createFile("${value}.owfn.fp");
+   $opennetFiles[$key] = current(prepareFile("lindayasmina/${value}.owfn"));
+  	$fingerprintFiles[$key] = current(createFile("${value}.owfn.fp"));
   
-   $lindaCalls[$key] = "linda $paramsL " . $opennetFiles[$key]["lindayasmina/$value.owfn"]["residence"] . " -o "  . $fingerprintFiles[$key]["$value.owfn.fp"]["residence"] . " 2>&1";
+   $lindaCalls[$key] = "linda $paramsL " . $opennetFiles[$key]["residence"] . " -o "  . $fingerprintFiles[$key]["residence"] . " 2>&1";
   $lindaFakeCalls[$key] = "linda $paramsL $value.owfn -o $value.owfn.fp";
-   $yasminaCall .= " -m " . $fingerprintFiles[$key][$value.".owfn.fp"]["residence"];
+   $yasminaCall .= " -m " . $fingerprintFiles[$key]["residence"];
    $yasminaFakeCall .= " -m $value.owfn.fp";   
   }
   if (isset( $_SESSION[$tool]["ly_output_yasmina_output"]) && $_SESSION[$tool]["ly_output_yasmina_output_option"] == "verbose") { $yasminaCall .= " -v"; $yasminaFakeCall .= " -v";}
@@ -62,11 +62,12 @@
       <h1>Communication Fingerprints</h1>
       
       <h2>Selected files</h2>
-    <?php  foreach( $_SESSION[$tool]["input_example"] as $key => $value){
-      echo "$value.owfn <br />";
+    <?php  
+      foreach( $opennetFiles as $value){
+      echo '<a href="'.$value["link"].'" target="_blank">'.$value["basename"].'</a><br />';
       if (isset( $_SESSION[$tool]["ly_output_nets"])) { 
         //drawImage($opennetFiles[$key]["lindayasmina/$value.owfn"]);
-        drawImage("$value.owfn");
+        drawImage($value["basename"]);
       }
     }
     

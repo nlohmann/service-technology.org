@@ -23,13 +23,6 @@ function getDirName($uid)
   return WORKDIR."$uid";
 }
 
-// create a string representing the URI for downloading a file
-function getLink($file)
-{
-  return LIVEBASE."getfile.php?file=".urlencode(basename($file))."&amp;id=".urlencode($_SESSION["uid"])."&amp;tc=".urlencode($_SESSION["subdir"]);
-}
-
-
   session_start();
   if ( ! isset( $_SESSION ) )
   {
@@ -53,4 +46,13 @@ function getLink($file)
     mkdir( $_SESSION["dir"], 0777, true );
   }
   // echo "<!-- Unique ID ".$_SESSION["uid"]."-->\n";
+  
+
+// create a string representing the URI for downloading a file
+function getLink($file)
+{
+  return LIVEBASE."getfile.php?file=".urlencode(basename($file))."&amp;id=".urlencode($_SESSION["uid"])."&amp;tc=".urlencode($_SESSION["subdir"]);
+}
+
+
 ?>

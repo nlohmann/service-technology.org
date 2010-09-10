@@ -299,8 +299,9 @@
           <form action="pnog.php" method="post" enctype="multipart/form-data">
             <fieldset>
               <legend>Service model</legend>
-              Use a given service model: 
-              <select name="service" size="1">
+              <input type="hidden" name="input_type" value="example" checked="checked" id="pnog_example" />
+              <label for="pnog_example">Use a given service model: 
+              <select name="input_example" size="1">
                 <optgroup label="Simple Example Services">
                   <option value="auctionService">Auction Service</option>
                   <option value="myCoffee">Coffee Vending Machine</option>
@@ -322,6 +323,7 @@
                   <option value="TR">Ticket Reservation</option>
                 </optgroup>
               </select>
+              </label>
             </fieldset>
 
             <p><input type="submit" value="create Petri Net OG" /></p>

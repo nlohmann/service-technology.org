@@ -71,12 +71,12 @@
 <body>
   <div id="container">
     <div id="content">
-      <div style="float: right; top: -10px;"><a href="index.html"><img src="resource/images/live.png" alt="service-technology.org/live" /></a></div>
+      <div style="float: right; top: -10px;"><a href="./#wendy"><img src="resource/images/live.png" alt="service-technology.org/live" /></a></div>
       <h1>Partner Synthesis</h1>
 
       <h2>Parameters</h2>
       <ul>
-        <li><strong>input file:</strong> <?=$process[$inputfile]["basename"]?>
+        <li><strong>input file:</strong> <a href="<?=$process[$inputfile]["link"]?>" target="_blank"><?=$process[$inputfile]["basename"]?></a>
           <?php
           switch($_SESSION['input_type']) {
             case "example":   echo "example file"; break;

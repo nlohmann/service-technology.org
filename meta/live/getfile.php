@@ -30,6 +30,11 @@
       // for owfn files we set the mime type manually
       case "owfn":
         $ct = "text/plain";
+        break;
+      // for bpel files we set the mime type manually
+      case "bpel":
+        $ct = "text/xml";
+        break;
     }
 
     // set mime type

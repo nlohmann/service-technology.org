@@ -13,6 +13,46 @@
       $automata = array("rachel/running_example.sa");
       $og = array("rachel/running_example.og");
       break;
+    case "rachel/auction_service.owfn":
+      $automata = array("rachel/auction_service.sa");
+      $og = array("rachel/auction_service.og");
+      break;
+    case "rachel/car_return.owfn":
+      $automata = array("rachel/car_return.sa");
+      $og = array("rachel/car_return.og");
+      break;
+    case "rachel/credit_preparation.owfn":
+      $automata = array("rachel/credit_preparation.sa");
+      $og = array("rachel/credit_preparation.og");
+      break;
+    case "rachel/customer_service.owfn":
+      $automata = array("rachel/customer_service.sa");
+      $og = array("rachel/customer_service.og");
+      break;
+    case "rachel/loan_approval.owfn":
+      $automata = array("rachel/loan_approval.sa");
+      $og = array("rachel/loan_approval.og");
+      break;
+    case "rachel/online_shop.owfn":
+      $automata = array("rachel/online_shop.sa");
+      $og = array("rachel/online_shop.og");
+      break;
+    case "rachel/order_process.owfn":
+      $automata = array("rachel/order_process.sa");
+      $og = array("rachel/order_process.og");
+      break;
+    case "rachel/purchase_order.owfn":
+      $automata = array("rachel/purchase_order.sa");
+      $og = array("rachel/purchase_order.og");
+      break;
+    case "rachel/register_request.owfn":
+      $automata = array("rachel/register_request.sa");
+      $og = array("rachel/register_request.og");
+      break;
+    case "rachel/supply_order.owfn":
+      $automata = array("rachel/supply_order.sa");
+      $og = array("rachel/supply_order.og");
+      break;
   }
 
   // copy files to temporary directory, see files.php for details
@@ -21,15 +61,9 @@
 
   // prepare strings for system call (realcall) 
   // and output on console (fakecall)
-  $fakecall = "rachel --help";
-  $realcall = "rachel --help"
-
-//  $choreography = $_REQUEST['chor'];
-//  $editdistance = $_REQUEST['mode'];
-
+  $fakecall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["basename"]." -o ".$og["basename"].;
+  $realcall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["residence"]." -o ".$og["residence"].;
 /*
-  $call_1 = 'rachel -m og -o '.$choreography.'.og -d';  
-  $call_2 = 'rachel -m sa -a '.$choreography.'.sa -d';  
   $call_3 = 'rachel -m '.$editdistance.' -a '.$choreography.'.sa -o '.$choreography.'.og -d';  
 */
 ?>
@@ -58,17 +92,16 @@
       <?php
       foreach($automata as $file)
       {
-        drawImage($file["basename"]);
+        drawImage($file["basename"], "sa");
       }
       foreach($og as $file)
       {
-        drawImage($file["basename"]);
+        drawImage($file["basename"], "og");
       }
       ?>
 
       <h2>Result</h2>
       <?php console($fakecall, $realcall)?>
-            
     </div>
   </div>
   <div id="footer">

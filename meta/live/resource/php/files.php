@@ -205,7 +205,7 @@ else
         echo $name."\n";
         */
         $_SESSION[$tool]["process"] = $dir."/".$name;
-        echo $_SESSION[$tool]["process"];
+        //echo $_SESSION[$tool]["process"];
         //exit;
         $set = true;
       }

@@ -66,7 +66,7 @@
   $fakeresult = "result.dot";
   $realresult = $_SESSION["dir"]."/".$fakeresult;
 
-  $fakecall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["basename"]." -o ".$og["basename"]." -d ".$fakeresult;
+  $fakecall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["basename"]." -o ".$og["basename"]." -d ".$realresult;
   $realcall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["residence"]." -o ".$og["residence"]." -d ".$realresult;
 
   $realcall .= " -v 2>&1";

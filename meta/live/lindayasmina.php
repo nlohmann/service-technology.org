@@ -1,7 +1,4 @@
 <?php
-  
-  
-
   // most important script! sets session information and PATH!
   require_once 'resource/php/session.php';
 
@@ -62,7 +59,7 @@
   <div id="container">
     <div id="content">
       <div style="float: right; top: -10px;"><img src="resource/images/live.png" alt="service-technology.org/live" /></div>
-      <h1>Fingerprints</h1>
+      <h1>Communication Fingerprints</h1>
       
       <h2>Selected files</h2>
     <?php  foreach( $_SESSION[$tool]["input_example"] as $key => $value){

@@ -161,10 +161,10 @@
       ?>
       </ul>
 
-      <p>
-      	<a href="./#marlene" title="back to reality">Back to live</a>
-      </p>
     </div>
+  </div>
+  <div id="footer">
+    <p><a href="http://service-technology.org">service-technology.org</a> is a cooperation between the <a  href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/">University of Rostock</a> and the <a  href="http://www2.informatik.hu-berlin.de/top/index.php">Humboldt-Universit&auml;t zu Berlin</a>.</p>
   </div>
 </body>
 

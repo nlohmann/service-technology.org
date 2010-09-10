@@ -26,7 +26,7 @@
 
       <div id="tabs">
         <ul>
-          <li><a href="#home"><span><img src="resource/images/home.png" /></span></a></li>
+          <li><a href="#home"><span><img src="resource/images/home.png" alt="Home" /></span></a></li>
           <li><a href="#bpel2owfn"><span>Service Formalization</span></a></li>
           <li><a href="#wendy"><span>Partner Synthesis</span></a></li>
           <li><a href="#rachel"><span>Service Correction</span></a></li>
@@ -42,17 +42,16 @@
 
         <div id="home">
           <h1>Welcome!</h1>
-          <p>This Web site offers the tools of the <a href="http://service-technology.org">service-technology.org</a> tool family as live preview in your Web browser. Here, you can try the tools, repeat experiments, and get a closer look at the tools functionality without the hassle of downloading and installing the tools.</p>
+          <p>This Web site hosts the tools of the <a href="http://service-technology.org">service-technology.org</a> tool family as live preview in your Web browser. Here, you can try the tools, repeat experiments, and get a closer look at the tools functionality without the hassle of downloading and installing the tools.</p>
           <p>The idea behind service-technology.org/live is to make experiments <strong>transparent</strong> and <strong>repeatable</strong>. At the same time, a Web-based framework allows to quickly get an impression of the tools.</p>
           <div class="paper">
             <h2>References</h2>
             <ul>
               <li>Niels Lohmann. <strong>service-technology.org/live - Replaying tool experiments in a Web browser.</strong> In Marcello La Rosa, editor, <em>Proceedings of the Business Process Management 2010 Demonstration Track (BPMDemos-2010), Hoboken, NJ, USA, September 14-16, 2010</em>, volume 615 of CEUR Workshop Proceedings, pages 64-68, 2010. CEUR-WS.org. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Lohmann_2010_bpmdemo.pdf">PDF</a>]</li>
               <li>Niels Lohmann and Karsten Wolf. <strong>How to Implement a Theory of Correctness in the Area of Business Processes and Services.</strong> In Rick Hull, Jan Mendling, and Stefan Tai, editors, <em>Business Process Management, 8th International Conference, BPM 2010, Hoboken, NJ, USA, September 14-16, 2010, Proceedings</em>, volume 6336 of Lecture Notes in Computer Science, pages 61-77, September 2010. Springer-Verlag. (in press). [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/LohmannW_2010_bpm.pdf">PDF</a>]</li>
-              </ul>
-            </div>
+            </ul>
+          </div>
         </div>
-
 
         <div id="bpel2owfn">
           <h1>Service Formalization</h1>
@@ -60,16 +59,18 @@
           <form action="bpel2owfn.php" method="post" enctype="multipart/form-data">
             <fieldset>
               <legend>Input WS-BPEL Process</legend>
-              <input type="radio" name="input_type" value="example" checked="checked" id="bpel2owfn_example" /><label for="bpel2owfn_example"> Use an example WS-BPEL process: 
-              <select name="input_example" size="1">
-                <optgroup label="WS-BPEL Specification">
-                  <option value="auctionService">Auction Service</option>
-                  <option value="loanApprovalProcess">Loan Approval Process</option>
-                  <option value="OrderingServiceProcess">Ordering Service Process</option>
-                  <option value="purchaseOrderProcess">Purchase Order Process</option>
-                  <option value="shippingService">Shipping Service</option>
-                </optgroup>
-              </select></label><br />
+              <input type="radio" name="input_type" value="example" checked="checked" id="bpel2owfn_example" />
+              <label for="bpel2owfn_example"> Use an example WS-BPEL process: 
+                <select name="input_example" size="1">
+                  <optgroup label="WS-BPEL Specification">
+                    <option value="auctionService">Auction Service</option>
+                    <option value="loanApprovalProcess">Loan Approval Process</option>
+                    <option value="OrderingServiceProcess">Ordering Service Process</option>
+                    <option value="purchaseOrderProcess">Purchase Order Process</option>
+                    <option value="shippingService">Shipping Service</option>
+                  </optgroup>
+                </select>
+              </label><br />
               <input type="radio" name="input_type" value="uploaded" id="bpel2owfn_uploaded" /><label for="bpel2owfn_uploaded"> Use an uploaded WS-BPEL process: <input name="input_uploaded" type="file" accept="text/*" /></label><br/>
               <input type="radio" name="input_type" value="url" id="bpel2owfn_url" /><label for="bpel2owfn_url"> Use a WS-BPEL process from a URL: <input name="input_url" type="text" size="30" placeholder="enter URL of WS-BPEL process" /></label><br />
               <input type="radio" name="input_type" value="given" id="bpel2owfn_given" /><label for="bpel2owfn_given"> Use a given WS-BPEL process: <textarea name="input_given" type="text" cols="30" rows="1" placeholder="enter a WS-BPEL process"></textarea></label>
@@ -109,427 +110,426 @@
             <ul>
               <li>Niels Lohmann. <strong>A Feature-Complete Petri Net Semantics for WS-BPEL 2.0.</strong> In Marlon Dumas and Reiko Heckel, editors, <em>Web Services and Formal Methods, Forth International Workshop, WS-FM 2007, Brisbane, Australia, September 28-29, 2007, Proceedings</em>, volume 4937 of Lecture Notes in Computer Science, pages 77-91, April 2008. Springer-Verlag. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Lohmann_2007_wsfm.pdf">PDF</a>]</li>
               <li>Niels Lohmann. <strong>A Feature-Complete Petri Net Semantics for WS-BPEL 2.0 and its Compiler BPEL2oWFN.</strong> Informatik-Berichte 212, Humboldt-Universit&auml;t zu Berlin, Berlin, Germany, August 2007. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Lohmann_2007_hubtr212.pdf">PDF</a>]</li>
-              </ul>
-            </div>
-            </div>
+            </ul>
+          </div>
+        </div>
 
-      <div id="wendy">
-        <h1>Partner Synthesis</h1>
-        <p>To make a statement about the correctness of a service, partner services are extremely helpful. They describe the communication protocol of possible customer. The tool <a href="http://service-technology.org/wendy">Wendy</a> synthesizes partners for services.</p>
-        <form action="wendy.php" method="post" enctype="multipart/form-data">
-          <fieldset>
-            <legend>Input Open Net</legend>
-            <input type="radio" name="input_type" value="example" checked="checked" id="wendy_example" /><label for="wendy_example"> Use a given open net:
-            <select name="input_example" size="1">
-              <optgroup label="Examples">
-                <option value="06-03-23_BPM06_shop_sect_3">BPM 2006 Online Shop 1</option>
-                <option value="06-03-23_BPM06_shop_sect_6">BPM 2006 Online Shop 2</option>
-                <option value="myCoffee">Coffee Vending Machine</option>
-                <option value="zeus">ZEUS Buyer Service</option>
-              </optgroup>
-              <optgroup label="Academic Examples">
-                <option>sequence3</option>
-                <option>sequence4</option>
-                <option>sequence5</option>
-                <option>sequence6</option>
-                <option>sequence7</option>
-                <option>sequence8</option>
-                <option>sequence9</option>
-                <option>sequence10</option>
-                <option>sequence11</option>
-                <option>sequence12</option>
-                <option>sequence13</option>
-                <option>sequence14</option>
-                <option>sequence15</option>
-                <option>sequence16</option>
-                <option>sequence17</option>
-                <option>sequence18</option>
-                <option>sequence19</option>
-                <option>sequence20</option>
-                <option value="phcontrol3.unf">phcontrol3</option>
-              </optgroup>
-            </select></label><br/>
-            <input type="radio" name="input_type" value="uploaded" id="wendy_uploaded" /><label for="wendy_uploaded"> Use an uploaded open net: <input name="input_uploaded" type="file" accept="text/*" /></label><br/>
-            <input type="radio" name="input_type" value="url" id="wendy_url" /><label for="wendy_url"> Use an open net from a URL: <input name="input_url" type="text" size="30" placeholder="enter URL of open net" /></label><br />
-            <input type="radio" name="input_type" value="given" id="wendy_given" /><label for="wendy_given"> Use a given open net: <textarea name="input_given" type="text" cols="30" rows="1" placeholder="enter an open net"></textarea></label>
-          </fieldset>
+        <div id="wendy">
+          <h1>Partner Synthesis</h1>
+          <p>To make a statement about the correctness of a service, partner services are extremely helpful. They describe the communication protocol of possible customer. The tool <a href="http://service-technology.org/wendy">Wendy</a> synthesizes partners for services.</p>
+          <form action="wendy.php" method="post" enctype="multipart/form-data">
+            <fieldset>
+              <legend>Input Open Net</legend>
+              <input type="radio" name="input_type" value="example" checked="checked" id="wendy_example" /><label for="wendy_example"> Use a given open net:
+                <select name="input_example" size="1">
+                  <optgroup label="Examples">
+                    <option value="06-03-23_BPM06_shop_sect_3">BPM 2006 Online Shop 1</option>
+                    <option value="06-03-23_BPM06_shop_sect_6">BPM 2006 Online Shop 2</option>
+                    <option value="myCoffee">Coffee Vending Machine</option>
+                    <option value="zeus">ZEUS Buyer Service</option>
+                  </optgroup>
+                  <optgroup label="Academic Examples">
+                    <option>sequence3</option>
+                    <option>sequence4</option>
+                    <option>sequence5</option>
+                    <option>sequence6</option>
+                    <option>sequence7</option>
+                    <option>sequence8</option>
+                    <option>sequence9</option>
+                    <option>sequence10</option>
+                    <option>sequence11</option>
+                    <option>sequence12</option>
+                    <option>sequence13</option>
+                    <option>sequence14</option>
+                    <option>sequence15</option>
+                    <option>sequence16</option>
+                    <option>sequence17</option>
+                    <option>sequence18</option>
+                    <option>sequence19</option>
+                    <option>sequence20</option>
+                    <option value="phcontrol3.unf">phcontrol3</option>
+                  </optgroup>
+                </select>
+              </label><br/>
+              <input type="radio" name="input_type" value="uploaded" id="wendy_uploaded" /><label for="wendy_uploaded"> Use an uploaded open net: <input name="input_uploaded" type="file" accept="text/*" /></label><br/>
+              <input type="radio" name="input_type" value="url" id="wendy_url" /><label for="wendy_url"> Use an open net from a URL: <input name="input_url" type="text" size="30" placeholder="enter URL of open net" /></label><br />
+              <input type="radio" name="input_type" value="given" id="wendy_given" /><label for="wendy_given"> Use a given open net: <textarea name="input_given" type="text" cols="30" rows="1" placeholder="enter an open net"></textarea></label>
+            </fieldset>
 
-          <fieldset>
-            <legend>Verification Goal</legend>
-            <input type="radio" name="mode" value="og" id="wendy_og" checked="checked" /><label for="wendy_og"> Calculate the operating guidelines (characterization of all partners)</label><br />
-            <input type="radio" name="mode" value="ig" id="wendy_ig" /><label for="wendy_ig"> Synthesize a partner (compatible by design)</label>
-          </fieldset>
+            <fieldset>
+              <legend>Verification Goal</legend>
+              <input type="radio" name="mode" value="og" id="wendy_og" checked="checked" /><label for="wendy_og"> Calculate the operating guidelines (characterization of all partners)</label><br />
+              <input type="radio" name="mode" value="ig" id="wendy_ig" /><label for="wendy_ig"> Synthesize a partner (compatible by design)</label>
+            </fieldset>
 
-          <fieldset>
-            <legend>Reduction Rules</legend>
-            <input type="checkbox" name="reduce_wait" value="yes" id="wendy_reduce_wait" /><label for="wendy_reduce_wait"> Only consider waitstates when calculating successors</label><br />
-            <input type="checkbox" name="reduce_reic" value="yes" id="wendy_reduce_reic" /><label for="wendy_reduce_reic"> Only send if receiving does not resolve all waitstates</label><br />
-            <input type="checkbox" name="reduce_sequ" value="yes" id="wendy_reduce_sequ" /><label for="wendy_reduce_sequ"> Sequentialize receiving events</label><br />
-            <input type="checkbox" name="reduce_succ" value="yes" id="wendy_reduce_succ" /><label for="wendy_reduce_succ"> One succeeding sending event is enough</label><br />
-            <input type="checkbox" name="reduce_quit" value="yes" id="wendy_reduce_quit" /><label for="wendy_reduce_quit"> Once all waitstates of a knowledge are resolved, no more successor knowledges are calculated</label><br />
-          </fieldset>
+            <fieldset>
+              <legend>Reduction Rules</legend>
+              <input type="checkbox" name="reduce_wait" value="yes" id="wendy_reduce_wait" /><label for="wendy_reduce_wait"> Only consider waitstates when calculating successors</label><br />
+              <input type="checkbox" name="reduce_reic" value="yes" id="wendy_reduce_reic" /><label for="wendy_reduce_reic"> Only send if receiving does not resolve all waitstates</label><br />
+              <input type="checkbox" name="reduce_sequ" value="yes" id="wendy_reduce_sequ" /><label for="wendy_reduce_sequ"> Sequentialize receiving events</label><br />
+              <input type="checkbox" name="reduce_succ" value="yes" id="wendy_reduce_succ" /><label for="wendy_reduce_succ"> One succeeding sending event is enough</label><br />
+              <input type="checkbox" name="reduce_quit" value="yes" id="wendy_reduce_quit" /><label for="wendy_reduce_quit"> Once all waitstates of a knowledge are resolved, no more successor knowledges are calculated</label><br />
+            </fieldset>
 
-          <fieldset>
-            <legend>Output Presentation</legend>
-            <input type="radio" name="output" value="full" checked="checked" id="wendy_output_full" /><label for="wendy_output_full"> Display verbose output page</label><br />
-            <input type="radio" name="output" value="result" id="wendy_output_result" /><label for="wendy_output_result"> Display output file only</label><br />
-          </fieldset>
+            <fieldset>
+              <legend>Output Presentation</legend>
+              <input type="radio" name="output" value="full" checked="checked" id="wendy_output_full" /><label for="wendy_output_full"> Display verbose output page</label><br />
+              <input type="radio" name="output" value="result" id="wendy_output_result" /><label for="wendy_output_result"> Display output file only</label><br />
+            </fieldset>
 
-          <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
-        </form>
-         <div class="paper">
+            <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
+          </form>
+          <div class="paper">
             <h2>References</h2>
             <ul>
               <li>Niels Lohmann and Daniela Weinberg. <strong>Wendy: A tool to synthesize partners for services.</strong> In Johan Lilius and Wojciech Penczek, editors, <em>31st International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, PETRI NETS 2010, Braga, Portugal, June 21-25, 2010, Proceedings</em>, volume 6128 of Lecture Notes in Computer Science, pages 297-307, June 2010. Springer-Verlag. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/LohmannW_2010_atpn.pdf">PDF</a>]</li>
               <li>Karsten Wolf. <strong>Does my service have partners?</strong>. <em>LNCS ToPNoC</em>, 5460(II):152-171, March 2009. Special Issue on Concurrency in Process-Aware Information Systems. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Wolf_2008_topnoc.pdf">PDF</a>]</li>
               <li>Daniela Weinberg. <strong>Efficient Controllability Analysis of Open Nets.</strong> In Roberto Bruni and Karsten Wolf, editors, <em>Web Services and Formal Methods, Fifth International Workshop, WS-FM 2008, Milan, Italy, September 4-5, 2008, Proceedings</em>, Lecture Notes in Computer Science, September 2008. Springer-Verlag. [<a href="http://dx.doi.org/10.1007/978-3-642-01364-5_14">DOI</a>]</li>
-              </ul>
-            </div>
-      </div>
-
-      <div id="rachel">
-        <h1>Service Correction</h1>
-        <p>In case a service choreography deadlocks, it is sometimes possible to blame a single participant for this global error. Then, a local change to this service can resolve the deadlock. The tool <a href="http://service-technology.org/rachel">Rachel</a> can propose minimal correction steps of the faulty service.</p>
-        <form action="rachel.php" method="post" enctype="multipart/form-data">
-          <fieldset>
-            <legend>Service Choreography</legend>
-            <input type="radio" name="input_type" value="example" checked="checked" id="rachel_example" /><label for="rachel_example">
-            Use a given choreography: 
-            <select name="input_example" size="1">
-              <optgroup label="Case Study for BPM 2008">
-                <option value="running_example">Running Example (Traveler, Travel Agency, Airline)</option>
-                <option value="auction_service">Auction Service</option>
-                <option value="car_return">Car Return</option>
-                <option value="credit_preparation">Credit Preparation</option>
-                <option value="customer_service">Customer Service</option>
-                <option value="internal_order">Internal Order</option>
-                <option value="loan_approval">Loan Approval</option>
-                <option value="online_shop">Online Shop</option>
-                <option value="order_process">Order Process</option>
-                <option value="purchase_order">Purchase Order</option>
-                <option value="register_request">Register Request</option>
-                <option value="supply_order">Supply Order</option>
-              </optgroup>
-            </select>
-            </label>
-          </fieldset>
-
-          <fieldset>
-            <legend>Goal</legend>
-            <input type="radio" name="mode" value="matching" id="rachel_mode_matching" checked="checked" /><label for="rachel_mode_matching"> Calculate matching-based edit distance</label><br />
-            <input type="radio" name="mode" value="simulation" id="rachel_mode_simulation" /><label for="rachel_mode_simulation"> Calculate simulation-based edit distance</label>
-          </fieldset>
-
-          <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
-        </form>
-        <div class="paper">
-           <h2>References</h2>
-           <ul>
-             <li>Niels Lohmann. <strong>Correcting Deadlocking Service Choreographies Using a Simulation-Based Graph Edit Distance.</strong> In Marlon Dumas, Manfred Reichert, and Ming-Chien Shan, editors, <em>Business Process Management, 6th International Conference, BPM 2008, Milan, Italy, September 1-4, 2008, Proceedings</em>, volume 5240 of Lecture Notes in Computer Science, pages 132-147, September 2008. Springer-Verlag. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Lohmann_2008_bpm.pdf">PDF</a>]</li>
-             </ul>
-           </div>
-      </div>
-
-      <div id="marlene">
-        <h1>Adapter Synthesis</h1>
-        <p>The independent design of services may result in incompatibilities. These can be overcome by adapters. The tool <a href="http://service-technology.org/marlene">Marlene</a> can generate such adapters automatically.</p>
-        <form action="marlene.php" method="post" enctype="multipart/form-data">
-          <fieldset>
-            <legend>Service model</legend>
-            <input type="hidden" name="input_type" value="example" checked="checked" id="marlene_example" /><label for="marlene_example"> 
-            Use a given service model: 
-            <select name="input_example" size="1">
-              <optgroup label="TSC examples">
-                <option value="coffee1">Coffee Vending Machine 1</option>
-                <option value="coffee2">Coffee Vending Machine 2</option>
-              </optgroup>
-              <optgroup label="AWPN 2008 example">
-                <option value="coffee3">Coffee Vending Machine (modified)</option>
-              </optgroup>
-              </select></label><br />
-          </fieldset>
-
-          <fieldset>
-            <legend>Cost optimization</legend>
-            <input type="checkbox" name="costopt" value="yes" id="marlene_costopt" /><label for="marlene_costopt"> Cost optimization using <a href="http://service-technology.org/candy">Candy</a></label><br />
-          </fieldset>
-
-          <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
-        </form>
-        <div class="paper">
-           <h2>References</h2>
-           <ul>
-             <li>Christian Gierds, Arjan J. Mooij, and Karsten Wolf. <strong>Reducing adapter synthesis to controller synthesis.</strong> <em>IEEE T. Services Computing</em>, 2010. (Accepted for publication in July 2010). [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/GierdsMW_2010_tcs.pdf">PDF</a>]</li>
-             <li>Christian Gierds. <strong>Finding Cost-Efficient Adapters.</strong> In Niels Lohmann and Karsten Wolf, editors, Proceedings of the <em>15th German Workshop on Algorithms and Tools for Petri Nets, AWPN 2008, Rostock, Germany, September 26--27, 2008, volume 380 of CEUR Workshop Proceedings</em>, pages 37-42, September 2008. CEUR-WS.org.
-             </ul>
-           </div>
-          </div>
-
-          <div id="marlene_ia">
-            <h1>Interactive Adapter Rule Design</h1>
-            <p>Automatic adapter generation approaches usually rely on domain-specific message transformation rules. The tool <a href="http://service-technology.org/marlene">Marlene</a> provides an interactive GUI to support the design of such rules.</p>
-            <form action="marlene_interactive.php" method="post" enctype="multipart/form-data">
-              <fieldset>
-                <legend>Service model</legend>
-                <input type="hidden" name="input_type" value="example" checked="checked" id="marlene_ia_example" /><label for="marlene_ia_example"> 
-                Use a given service model: 
-                <select name="input_example" size="1">
-                    <option value="iRules">Information Request</option>
-                    <option value="iCoffee">Coffee Vending Machine</option>
-                </select>
-              </fieldset>
-
-              <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
-            </form>
-            <div class="paper">
-               <h2>References</h2>
-               <ul>
-                 <li>Christian Gierds and Niels Lohmann. <strong>A graphical user interface for service adaptation.</strong> In <em>17th German Workshop on Algorithms and Tools for Petri Nets, AWPN 2010, Cottbus, Germany, October 7-8, 2010, Proceedings, CEUR Workshop Proceedings</em>, October 2010. CEUR-WS.org.</li>
-                 <li>Christian Gierds, Arjan J. Mooij, and Karsten Wolf. <strong>Reducing adapter synthesis to controller synthesis.</strong> <em>IEEE T. Services Computing</em>, 2010. (Accepted for publication in July 2010). [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/GierdsMW_2010_tcs.pdf">PDF</a>]</li>
-                 </ul>
-               </div>
-              </div>
-
-      <div id="pnog">
-        <p>This site demonstrates the results of a paper to be presented at the <a href="http://www.informatik.uni-augsburg.de/acsd/">ACSD 2009</a> conference. Select a service model and press the button to calculate the result in your browser.</p>
-        <form action="pnog.php" method="post" enctype="multipart/form-data">
-          <fieldset>
-            <legend>Service model</legend>
-            Use a given service model: 
-            <select name="service" size="1">
-              <optgroup label="Simple Example Services">
-                <option value="auctionService">Auction Service</option>
-                <option value="myCoffee">Coffee Vending Machine</option>
-                <option value="loanApprovalProcess">Loan Approval Process</option>
-                <option value="phcontrol3.unf">Dining Philosophers</option>
-              </optgroup>
-              <optgroup label="Case Study used in the ACSD 2009 paper">
-                <option selected="selected" value="RE">Running Example (Fig. 1)</option>
-                <option value="SD">Technical Example (Fig. 3)</option>
-                <option value="CN">Contract Negotiation</option>
-                <option value="DG">Deliver Finished Goods</option>
-                <option value="BH">Internal Order</option>
-                <option value="OS">Online Shop</option>
-                <option value="QR">Quotation Requisition</option>
-                <option value="AP">Passport Application</option>
-                <option value="PO">Purchase Order</option>
-                <option value="RS">Reservations</option>
-                <option value="T2">Travel Service</option>
-                <option value="TR">Ticket Reservation</option>
-              </optgroup>
-            </select>
-          </fieldset>
-
-          <p><input type="submit" value="create Petri Net OG" /></p>
-        </form>
-        <p>Alternatively, <a href="pnog/examples.zip">a ZIP archive</a> containing all service models can be downloaded.</p>
-        <div class="paper">
-           <h2>References</h2>
-           <ul>
-             <li>Niels Lohmann and Karsten Wolf. <strong>Compact Representations and Efficient Algorithms for Operating Guidelines.</strong> <em>Fundam. Inform.</em>, 2010. (Accepted for publication in January 2010).</li>
-             <li>Niels Lohmann and Karsten Wolf. <strong>Petrifying Operating Guidelines for Services.</strong> In <em>Ninth International Conference on Application of Concurrency to System Design (ACSD 2009), 1-3 July 2009, Augsburg, Germany</em>, pages 80-88, June 2009. IEEE Computer Society. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/LohmannW_2009_acsd.pdf">PDF</a>]</li>
-             </ul>
-           </div>
-      </div>
-
-      <div id="migration">
-        <p>This site demonstrates the results of a paper submitted to the <a href="http://icsoc.org/">ICSOC 2009</a> conference. Select a service model and press the button to calculate the result in your browser.</p>
-        <form action="migration.php" method="post" enctype="multipart/form-data">
-          <fieldset>
-            <legend>Service model</legend>
-            Use a given service model: 
-            <select name="service" size="1">
-              <optgroup label="Simple Example Services">
-                <option value="reg_old">Registration Service</option>
-              </optgroup>
-              <optgroup label="Case Study for ICSOC 2009 submission">
-                <option selected="selected" value="service-a">Running Example (Fig. 1-3)</option>
-                <option value="service-d">Technical Example (Fig. 4(a)-(c))</option>
-                <option value="service-f">Technical Example (Fig. 4(d)-(f))</option>
-                <option value="CN">Contract Negotiation</option>
-                <option value="DG">Deliver Finished Goods</option>
-                <option value="BH">Internal Order</option>
-                <option value="AP">Passport Application</option>
-                <option value="PO">Purchase Order</option>
-                <option value="T2">Travel Service</option>
-                <option value="TR">Ticket Reservation</option>
-              </optgroup>
-            </select>
-          </fieldset>
-
-          <p><input type="submit" value="calculate migration" /></p>
-        </form>
-        <div class="paper">
-          <h2>References</h2>
-          <ul>
-            <li>Nannette Liske, Niels Lohmann, Christian Stahl, and Karsten Wolf. <strong>Another Approach to Service Instance Migration.</strong> In Luciano Baresi, Chi-Hung Chi, and Jun Suzuki, editors, <em>Service-Oriented Computing - ICSOC 2009, 7th International Conference, Stockholm, Sweden, November 24-27, 2009. Proceedings</em>, volume 5900 of Lecture Notes in Computer Science, pages 607-621, November 2009. Springer-Verlag. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/LiskeLSW_2009_icsoc.pdf">PDF</a>]</li>
-            </ul>
-          </div>
-      </div>
-
-      <div id="matching">
-          <h1>Service Matching</h1>
-          <p><a href="http://service-technology.org/cosme">Cosme</a>.</p>
-          <div class="paper">
-             <h2>References</h2>
-             <ul>
-               <li>Andreas Lehmann. <strong>Effiziente Implementierung und Validierung der Basisalgorithmen f&uuml;r Bedienungsanleitungen mit impliziter Formelrepr&auml;sentation.</strong> Studienarbeit, Universit&auml;t Rostock, Rostock, Germany, March 2010. (in German) [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Lehmann_2010_sa.pdf">PDF</a>]</li>
-               <li>Niels Lohmann and Karsten Wolf. <strong>Compact Representations and Efficient Algorithms for Operating Guidelines.</strong> <em>Fundam. Inform.</em>, 2010. (Accepted for publication in January 2010).</li>
-               </ul>
-             </div>
-      </div>
-      <div id="lindayasmina">
-
-	<script type="text/javascript">
-	function ly_toggle_fields_output_fingerprints() {
-		if (document.getElementById("ly_output_fingerprints_formula").disabled == true) {
-			document.getElementById("ly_output_fingerprints_formula").disabled = false;	
-		} else {
-			document.getElementById("ly_output_fingerprints_formula").disabled = true;
-		}
-
-		if (document.getElementById("ly_output_fingerprints_file").disabled == true) {
-			document.getElementById("ly_output_fingerprints_file").disabled = false;	
-		} else {
-			document.getElementById("ly_output_fingerprints_file").disabled = true;
-		}
-	}
-
-	function ly_toggle_fields_output_linda_output() {
-		if (document.getElementById("ly_output_linda_output_standard").disabled == true) {
-			document.getElementById("ly_output_linda_output_standard").disabled = false;	
-		} else {
-			document.getElementById("ly_output_linda_output_standard").disabled = true;
-		}
-
-		if (document.getElementById("ly_output_linda_output_verbose").disabled == true) {
-			document.getElementById("ly_output_linda_output_verbose").disabled = false;	
-		} else {
-			document.getElementById("ly_output_linda_output_verbose").disabled = true;
-		}
-	}
-
-	function ly_toggle_fields_output_yasmina_output() {
-		if (document.getElementById("ly_output_yasmina_output_standard").disabled == true) {
-			document.getElementById("ly_output_yasmina_output_standard").disabled = false;	
-		} else {
-			document.getElementById("ly_output_yasmina_output_standard").disabled = true;
-		}
-
-		if (document.getElementById("ly_output_yasmina_output_verbose").disabled == true) {
-			document.getElementById("ly_output_yasmina_output_verbose").disabled = false;	
-		} else {
-			document.getElementById("ly_output_yasmina_output_verbose").disabled = true;
-		}
-	}
-
-
-
-	</script>
-
-
-        <h1>Fingerprints</h1>
-        <p>A fingerprint is an abstract representation of interaction behavior as a boolean formula. Fingerprints can be used to semi-decide compatibility of two services. The tool <a href="http://service-technology.org/linda">Linda</a> computes a fingerprint for a given service model. The tool <a href="http://service-technology.org/yasmina">Yasmina</a> semi-decides compatibility based on given fingerprints. </p>
-        <form action="lindayasmina.php" method="post" enctype="multipart/form-data">
-          <fieldset>
-            <legend>Input Open Nets</legend>
-		<input type="hidden" name="input_type" value="example" checked="checked" id="lindayasmina_example" /><label for="lindayasmina_example"><i>Select two or more examples.</i><br />
-		<select name="input_example[]" size="5" multiple="multiple">
-			<option value="suggester">Suggester Service</option>
-			<option  value="decider">Decider Service</option>
-
-		</select>
-	</label>
-          </fieldset>
-
-          <fieldset>
-            <legend>Term sets</legend>
-	    <i> Please select one or more of the following term sets. Rule of thumb: More terms increase the quality of the compatibility check.</i><br />
-            <input type="checkbox" name="ly_singleEvents" value="yes" id="ly_singleEvents" /><label for="ly_singleEvents"> Single events</label><br />
-            <input type="checkbox" name="ly_mutualExclusion" value="yes" id="ly_mutualExclusion" /><label for="ly_mutualExclusion"> Mutual exclusion</label><br />
-            <input type="checkbox" name="ly_octagon" value="yes" id="ly_octagon" /><label for="ly_octagon"> Octagon terms</label><br />
-            <input type="checkbox" name="ly_mdb" value="yes" id="ly_mdb" /><label for="ly_mdb"> MDB terms</label><br />
-          </fieldset>
-
-          <fieldset>
-            <legend>Output Presentation</legend>
-	    <i>Additionally to the plain result of the compatibility check, the following artifacts are available.</i><br />
-	    <input type="checkbox" name="ly_output_nets" value="yes" id="ly_output_nets" /><label for="ly_output_nets"> Display open nets</label><br />
-	    <input type="checkbox" name="ly_output_fingerprints" value="yes" id="ly_output_fingerprints" onchange="ly_toggle_fields_output_fingerprints()"/><label for="ly_output_fingerprints"> Display fingerprints</label><br />
-	    <ul>
-		<input type="radio" name="ly_output_fingerprints_option" value="formula" id="ly_output_fingerprints_formula" disabled="true"/><label for="ly_output_fingerprints_formula"> Formula</label><br />
-		<input type="radio" name="ly_output_fingerprints_option" value="file" id="ly_output_fingerprints_file" disabled="true"/><label for="ly_output_fingerprints_file"> Actual output file</label><br />
-            </ul>
-	    <input type="checkbox" name="ly_output_linda_output" value="yes" id="ly_output_linda_output" onchange="ly_toggle_fields_output_linda_output()"/><label for="ly_output_linda_output_"> Display Linda console output</label><br />
-	    <ul>
-		<input type="radio" name="ly_output_linda_output_option" value="standard" id="ly_output_linda_output_standard" disabled="true"/><label for="ly_output_linda_output_standard"> Standard</label><br />
-		<input type="radio" name="ly_output_linda_output_option" value="verbose" id="ly_output_linda_output_verbose" disabled="true"/><label for="ly_output_linda_output_verbose"> Verbose</label><br />
-            </ul>
-	    <input type="checkbox" name="ly_output_yasmina_output" value="yes" id="ly_output_yasmina_output" onchange="ly_toggle_fields_output_yasmina_output()"/><label for="ly_output_yasmina_output"> Display Yasmina console output</label><br />
-	    <ul>
-		<input type="radio" name="ly_output_yasmina_output_option" value="standard" id="ly_output_yasmina_output_standard" disabled="true"/><label for="ly_output_yasmina_output_standard"> Standard</label><br />
-		<input type="radio" name="ly_output_yasmina_output_option" value="verbose" id="ly_output_yasmina_output_verbose" disabled="true"/><label for="ly_output_yasmina_output_verbose"> Verbose</label><br />
-            </ul>
-
-          </fieldset>
-
-          <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
-        </form>
-         <div class="paper">
-           <!--  <h2>References</h2>
-           <ul>
-              <li>Niels Lohmann and Daniela Weinberg. <strong>Wendy: A tool to synthesize partners for services.</strong> In Johan Lilius and Wojciech Penczek, editors, <em>31st International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, PETRI NETS 2010, Braga, Portugal, June 21-25, 2010, Proceedings</em>, volume 6128 of Lecture Notes in Computer Science, pages 297-307, June 2010. Springer-Verlag. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/LohmannW_2010_atpn.pdf">PDF</a>]</li>
-              <li>Karsten Wolf. <strong>Does my service have partners?</strong>. <em>LNCS ToPNoC</em>, 5460(II):152-171, March 2009. Special Issue on Concurrency in Process-Aware Information Systems. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Wolf_2008_topnoc.pdf">PDF</a>]</li>
-              <li>Daniela Weinberg. <strong>Efficient Controllability Analysis of Open Nets.</strong> In Roberto Bruni and Karsten Wolf, editors, <em>Web Services and Formal Methods, Fifth International Workshop, WS-FM 2008, Milan, Italy, September 4-5, 2008, Proceedings</em>, Lecture Notes in Computer Science, September 2008. Springer-Verlag. [<a href="http://dx.doi.org/10.1007/978-3-642-01364-5_14">DOI</a>]</li>
-              </ul>-->
-            </div>
-            
-      </div>
-      <div id="lola">
-        <h1>Petri Net Verification</h1>
-        <p><a href="http://service-technology.org/lola">LoLA</a>.</p>
-
-        <div class="paper">
-          <h2>References</h2>
-          <ul>
-            <li>Karsten Wolf. <strong>Generating Petri Net State Spaces.</strong> In Jetty Kleijn and Alex Yakovlev, editors, <em>28th International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, ICATPN 2007, Siedlce, Poland, June 25-29, 2007, Proceedings</em>, volume 4546 of Lecture Notes in Computer Science, pages 29-42, June 2007. Springer-Verlag. Invited lecture. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Wolf_2007_atpn.pdf">PDF</a>]</li>
-            <li>Karsten Schmidt. <strong>LoLA: A Low Level Analyser.</strong> In Mogens Nielsen and Dan Simpson, editors, <em>Application and Theory of Petri Nets 2000: 21st International Conference, ICATPN 2000, Aarhus, Denmark, June 2000. Proceedings</em>, volume 1825 of Lecture Notes in Computer Science, pages 465-474, June 2000. Springer-Verlag. [<a href="http://dx.doi.org/10.1007/3-540-44988-4_27">DOI</a>]</li>
             </ul>
           </div>
         </div>
 
-      <div id="soundness">
-        <h1>Business Process Soundness Check</h1>
-        <p>Soundness is a central correctness notion for business process. To verify industrial business processes, we first translate them into Petri net model using the compiler <a href="http://service-technology.org/uml2owfn">UML2oWFN</a> and then verify soundness with the modelchecking tool <a href="http://service-technology.org/lola">LoLA</a>.</p>
-        <form action="uml2owfn.php" method="post" enctype="multipart/form-data">
-          <fieldset>
-            <legend>Business Process</legend>
-            Use a given business process: 
-            <select name="input_example" size="1">
-              <optgroup label="Case Study for BPM 2009">
-                <option value="s00002237">sound process</option>
-                <option value="s00003188">unsound process (deadlock)</option>
-                <option value="s00001986">unsound process (lack of synchronization)</option>
-              </optgroup>
-            </select>
-          </fieldset>
+        <div id="rachel">
+          <h1>Service Correction</h1>
+          <p>In case a service choreography deadlocks, it is sometimes possible to blame a single participant for this global error. Then, a local change to this service can resolve the deadlock. The tool <a href="http://service-technology.org/rachel">Rachel</a> can propose minimal correction steps of the faulty service.</p>
+          <form action="rachel.php" method="post" enctype="multipart/form-data">
+            <fieldset>
+              <legend>Service Choreography</legend>
+              <input type="radio" name="input_type" value="example" checked="checked" id="rachel_example" /><label for="rachel_example">
+                Use a given choreography: 
+                <select name="input_example" size="1">
+                  <optgroup label="Case Study for BPM 2008">
+                    <option value="running_example">Running Example (Traveler, Travel Agency, Airline)</option>
+                    <option value="auction_service">Auction Service</option>
+                    <option value="car_return">Car Return</option>
+                    <option value="credit_preparation">Credit Preparation</option>
+                    <option value="customer_service">Customer Service</option>
+                    <option value="internal_order">Internal Order</option>
+                    <option value="loan_approval">Loan Approval</option>
+                    <option value="online_shop">Online Shop</option>
+                    <option value="order_process">Order Process</option>
+                    <option value="purchase_order">Purchase Order</option>
+                    <option value="register_request">Register Request</option>
+                    <option value="supply_order">Supply Order</option>
+                  </optgroup>
+                </select>
+              </label>
+            </fieldset>
 
-          <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
-        </form>
-        <div class="paper">
-          <h2>References</h2>
-          <ul>
-            <li>Dirk Fahland, C&eacute;dric Favre, Barbara Jobstmann, Jana Koehler, Niels Lohmann, Hagen V&ouml;lzer, and Karsten Wolf. <strong>Instantaneous Soundness Checking of Industrial Business Process Models.</strong> In Umeshwar Dayal, Johann Eder, Jana Koehler, and Hajo A. Reijers, editors, <em>Business Process Management, 7th International Conference, BPM 2009, Ulm, Germany, September 8-10, 2009, Proceedings</em>, volume 5701 of Lecture Notes in Computer Science, pages 278-293, September 2009. Springer-Verlag. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/FahlandWJKLVW_2009_bpm.pdf">PDF</a>]</li>
-            <li>Dirk Fahland. <strong>Translating UML2 Activity Diagrams Petri Nets for analyzing IBM WebSphere Business Modeler process models.</strong> Informatik-Berichte 226, Humboldt-Universit&auml;t zu Berlin, 2008. [<a href="http://www.informatik.hu-berlin.de/top/download/publications/fahland08_umlpn_tr_226.pdf">PDF</a>]</li>
-            <li>Karsten Wolf. <strong>Generating Petri Net State Spaces.</strong> In Jetty Kleijn and Alex Yakovlev, editors, <em>28th International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, ICATPN 2007, Siedlce, Poland, June 25-29, 2007, Proceedings</em>, volume 4546 of Lecture Notes in Computer Science, pages 29-42, June 2007. Springer-Verlag. Invited lecture. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Wolf_2007_atpn.pdf">PDF</a>]</li>
+            <fieldset>
+              <legend>Goal</legend>
+              <input type="radio" name="mode" value="matching" id="rachel_mode_matching" checked="checked" /><label for="rachel_mode_matching"> Calculate matching-based edit distance</label><br />
+              <input type="radio" name="mode" value="simulation" id="rachel_mode_simulation" /><label for="rachel_mode_simulation"> Calculate simulation-based edit distance</label>
+            </fieldset>
+
+            <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
+          </form>
+          <div class="paper">
+            <h2>References</h2>
+            <ul>
+              <li>Niels Lohmann. <strong>Correcting Deadlocking Service Choreographies Using a Simulation-Based Graph Edit Distance.</strong> In Marlon Dumas, Manfred Reichert, and Ming-Chien Shan, editors, <em>Business Process Management, 6th International Conference, BPM 2008, Milan, Italy, September 1-4, 2008, Proceedings</em>, volume 5240 of Lecture Notes in Computer Science, pages 132-147, September 2008. Springer-Verlag. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Lohmann_2008_bpm.pdf">PDF</a>]</li>
             </ul>
           </div>
-      </div>
+        </div>
 
+        <div id="marlene">
+          <h1>Adapter Synthesis</h1>
+          <p>The independent design of services may result in incompatibilities. These can be overcome by adapters. The tool <a href="http://service-technology.org/marlene">Marlene</a> can generate such adapters automatically.</p>
+          <form action="marlene.php" method="post" enctype="multipart/form-data">
+            <fieldset>
+              <legend>Service model</legend>
+              <input type="hidden" name="input_type" value="example" checked="checked" id="marlene_example" /><label for="marlene_example"> 
+                Use a given service model: 
+                <select name="input_example" size="1">
+                  <optgroup label="TSC examples">
+                    <option value="coffee1">Coffee Vending Machine 1</option>
+                    <option value="coffee2">Coffee Vending Machine 2</option>
+                  </optgroup>
+                  <optgroup label="AWPN 2008 example">
+                    <option value="coffee3">Coffee Vending Machine (modified)</option>
+                  </optgroup>
+                </select>
+              </label><br />
+            </fieldset>
+
+            <fieldset>
+              <legend>Cost optimization</legend>
+              <input type="checkbox" name="costopt" value="yes" id="marlene_costopt" /><label for="marlene_costopt"> Cost optimization using <a href="http://service-technology.org/candy">Candy</a></label><br />
+            </fieldset>
+
+            <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
+          </form>
+          <div class="paper">
+            <h2>References</h2>
+            <ul>
+              <li>Christian Gierds, Arjan J. Mooij, and Karsten Wolf. <strong>Reducing adapter synthesis to controller synthesis.</strong> <em>IEEE T. Services Computing</em>, 2010. (Accepted for publication in July 2010). [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/GierdsMW_2010_tcs.pdf">PDF</a>]</li>
+              <li>Christian Gierds. <strong>Finding Cost-Efficient Adapters.</strong> In Niels Lohmann and Karsten Wolf, editors, Proceedings of the <em>15th German Workshop on Algorithms and Tools for Petri Nets, AWPN 2008, Rostock, Germany, September 26--27, 2008, volume 380 of CEUR Workshop Proceedings</em>, pages 37-42, September 2008. CEUR-WS.org.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="marlene_ia">
+          <h1>Interactive Adapter Rule Design</h1>
+          <p>Automatic adapter generation approaches usually rely on domain-specific message transformation rules. The tool <a href="http://service-technology.org/marlene">Marlene</a> provides an interactive GUI to support the design of such rules.</p>
+          <form action="marlene_interactive.php" method="post" enctype="multipart/form-data">
+            <fieldset>
+              <legend>Service model</legend>
+              <input type="hidden" name="input_type" value="example" checked="checked" id="marlene_ia_example" />
+              <label for="marlene_ia_example">Use a given service model: 
+                <select name="input_example" size="1">
+                  <option value="iRules">Information Request</option>
+                  <option value="iCoffee">Coffee Vending Machine</option>
+                </select>
+              </label>
+            </fieldset>
+
+            <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
+          </form>
+          <div class="paper">
+            <h2>References</h2>
+            <ul>
+              <li>Christian Gierds and Niels Lohmann. <strong>A graphical user interface for service adaptation.</strong> In <em>17th German Workshop on Algorithms and Tools for Petri Nets, AWPN 2010, Cottbus, Germany, October 7-8, 2010, Proceedings, CEUR Workshop Proceedings</em>, October 2010. CEUR-WS.org.</li>
+              <li>Christian Gierds, Arjan J. Mooij, and Karsten Wolf. <strong>Reducing adapter synthesis to controller synthesis.</strong> <em>IEEE T. Services Computing</em>, 2010. (Accepted for publication in July 2010). [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/GierdsMW_2010_tcs.pdf">PDF</a>]</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="pnog">
+          <p>This site demonstrates the results of a paper to be presented at the <a href="http://www.informatik.uni-augsburg.de/acsd/">ACSD 2009</a> conference. Select a service model and press the button to calculate the result in your browser.</p>
+          <form action="pnog.php" method="post" enctype="multipart/form-data">
+            <fieldset>
+              <legend>Service model</legend>
+              Use a given service model: 
+              <select name="service" size="1">
+                <optgroup label="Simple Example Services">
+                  <option value="auctionService">Auction Service</option>
+                  <option value="myCoffee">Coffee Vending Machine</option>
+                  <option value="loanApprovalProcess">Loan Approval Process</option>
+                  <option value="phcontrol3.unf">Dining Philosophers</option>
+                </optgroup>
+                <optgroup label="Case Study used in the ACSD 2009 paper">
+                  <option selected="selected" value="RE">Running Example (Fig. 1)</option>
+                  <option value="SD">Technical Example (Fig. 3)</option>
+                  <option value="CN">Contract Negotiation</option>
+                  <option value="DG">Deliver Finished Goods</option>
+                  <option value="BH">Internal Order</option>
+                  <option value="OS">Online Shop</option>
+                  <option value="QR">Quotation Requisition</option>
+                  <option value="AP">Passport Application</option>
+                  <option value="PO">Purchase Order</option>
+                  <option value="RS">Reservations</option>
+                  <option value="T2">Travel Service</option>
+                  <option value="TR">Ticket Reservation</option>
+                </optgroup>
+              </select>
+            </fieldset>
+
+            <p><input type="submit" value="create Petri Net OG" /></p>
+          </form>
+          <p>Alternatively, <a href="pnog/examples.zip">a ZIP archive</a> containing all service models can be downloaded.</p>
+          <div class="paper">
+            <h2>References</h2>
+            <ul>
+              <li>Niels Lohmann and Karsten Wolf. <strong>Compact Representations and Efficient Algorithms for Operating Guidelines.</strong> <em>Fundam. Inform.</em>, 2010. (Accepted for publication in January 2010).</li>
+              <li>Niels Lohmann and Karsten Wolf. <strong>Petrifying Operating Guidelines for Services.</strong> In <em>Ninth International Conference on Application of Concurrency to System Design (ACSD 2009), 1-3 July 2009, Augsburg, Germany</em>, pages 80-88, June 2009. IEEE Computer Society. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/LohmannW_2009_acsd.pdf">PDF</a>]</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="migration">
+          <p>This site demonstrates the results of a paper submitted to the <a href="http://icsoc.org/">ICSOC 2009</a> conference. Select a service model and press the button to calculate the result in your browser.</p>
+          <form action="migration.php" method="post" enctype="multipart/form-data">
+            <fieldset>
+              <legend>Service model</legend>
+              Use a given service model: 
+              <select name="service" size="1">
+                <optgroup label="Simple Example Services">
+                  <option value="reg_old">Registration Service</option>
+                </optgroup>
+                <optgroup label="Case Study for ICSOC 2009 submission">
+                  <option selected="selected" value="service-a">Running Example (Fig. 1-3)</option>
+                  <option value="service-d">Technical Example (Fig. 4(a)-(c))</option>
+                  <option value="service-f">Technical Example (Fig. 4(d)-(f))</option>
+                  <option value="CN">Contract Negotiation</option>
+                  <option value="DG">Deliver Finished Goods</option>
+                  <option value="BH">Internal Order</option>
+                  <option value="AP">Passport Application</option>
+                  <option value="PO">Purchase Order</option>
+                  <option value="T2">Travel Service</option>
+                  <option value="TR">Ticket Reservation</option>
+                </optgroup>
+              </select>
+            </fieldset>
+
+            <p><input type="submit" value="calculate migration" /></p>
+          </form>
+          <div class="paper">
+            <h2>References</h2>
+            <ul>
+              <li>Nannette Liske, Niels Lohmann, Christian Stahl, and Karsten Wolf. <strong>Another Approach to Service Instance Migration.</strong> In Luciano Baresi, Chi-Hung Chi, and Jun Suzuki, editors, <em>Service-Oriented Computing - ICSOC 2009, 7th International Conference, Stockholm, Sweden, November 24-27, 2009. Proceedings</em>, volume 5900 of Lecture Notes in Computer Science, pages 607-621, November 2009. Springer-Verlag. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/LiskeLSW_2009_icsoc.pdf">PDF</a>]</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="matching">
+          <h1>Service Matching</h1>
+          <p><a href="http://service-technology.org/cosme">Cosme</a>.</p>
+          <div class="paper">
+            <h2>References</h2>
+            <ul>
+              <li>Andreas Lehmann. <strong>Effiziente Implementierung und Validierung der Basisalgorithmen f&uuml;r Bedienungsanleitungen mit impliziter Formelrepr&auml;sentation.</strong> Studienarbeit, Universit&auml;t Rostock, Rostock, Germany, March 2010. (in German) [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Lehmann_2010_sa.pdf">PDF</a>]</li>
+              <li>Niels Lohmann and Karsten Wolf. <strong>Compact Representations and Efficient Algorithms for Operating Guidelines.</strong> <em>Fundam. Inform.</em>, 2010. (Accepted for publication in January 2010).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="lindayasmina">
+          <script type="text/javascript">
+            function ly_toggle_fields_output_fingerprints() {
+              if (document.getElementById("ly_output_fingerprints_formula").disabled == true) {
+                document.getElementById("ly_output_fingerprints_formula").disabled = false;	
+              } else {
+                document.getElementById("ly_output_fingerprints_formula").disabled = true;
+              }
+
+              if (document.getElementById("ly_output_fingerprints_file").disabled == true) {
+                document.getElementById("ly_output_fingerprints_file").disabled = false;	
+              } else {
+                document.getElementById("ly_output_fingerprints_file").disabled = true;
+              }
+            }
+
+            function ly_toggle_fields_output_linda_output() {
+              if (document.getElementById("ly_output_linda_output_standard").disabled == true) {
+                document.getElementById("ly_output_linda_output_standard").disabled = false;	
+              } else {
+                document.getElementById("ly_output_linda_output_standard").disabled = true;
+              }
+
+              if (document.getElementById("ly_output_linda_output_verbose").disabled == true) {
+                document.getElementById("ly_output_linda_output_verbose").disabled = false;	
+              } else {
+                document.getElementById("ly_output_linda_output_verbose").disabled = true;
+              }
+            }
+
+            function ly_toggle_fields_output_yasmina_output() {
+              if (document.getElementById("ly_output_yasmina_output_standard").disabled == true) {
+                document.getElementById("ly_output_yasmina_output_standard").disabled = false;	
+              } else {
+                document.getElementById("ly_output_yasmina_output_standard").disabled = true;
+              }
+
+              if (document.getElementById("ly_output_yasmina_output_verbose").disabled == true) {
+                document.getElementById("ly_output_yasmina_output_verbose").disabled = false;	
+              } else {
+                document.getElementById("ly_output_yasmina_output_verbose").disabled = true;
+              }
+            }
+          </script>
+
+          <h1>Fingerprints</h1>
+          <p>A fingerprint is an abstract representation of interaction behavior as a Boolean formula. Fingerprints can be used to semi-decide compatibility of two services. The tool <a href="http://service-technology.org/linda">Linda</a> computes a fingerprint for a given service model. The tool <a href="http://service-technology.org/yasmina">Yasmina</a> semi-decides compatibility based on given fingerprints.</p>
+          <form action="lindayasmina.php" method="post" enctype="multipart/form-data">
+            <fieldset>
+              <legend>Input Open Nets</legend>
+              <input type="hidden" name="input_type" value="example" checked="checked" id="lindayasmina_example" /><label for="lindayasmina_example"><i>Select two or more examples.</i><br />
+                <select name="input_example[]" size="5" multiple="multiple">
+                  <option value="suggester">Suggester Service</option>
+                  <option  value="decider">Decider Service</option>
+                </select>
+              </label>
+            </fieldset>
+
+            <fieldset>
+              <legend>Term sets</legend>
+              <i> Please select one or more of the following term sets. Rule of thumb: More terms increase the quality of the compatibility check.</i><br />
+              <input type="checkbox" name="ly_singleEvents" value="yes" id="ly_singleEvents" /><label for="ly_singleEvents"> Single events</label><br />
+              <input type="checkbox" name="ly_mutualExclusion" value="yes" id="ly_mutualExclusion" /><label for="ly_mutualExclusion"> Mutual exclusion</label><br />
+              <input type="checkbox" name="ly_octagon" value="yes" id="ly_octagon" /><label for="ly_octagon"> Octagon terms</label><br />
+              <input type="checkbox" name="ly_mdb" value="yes" id="ly_mdb" /><label for="ly_mdb"> MDB terms</label><br />
+            </fieldset>
+
+            <fieldset>
+              <legend>Output Presentation</legend>
+              <i>Additionally to the plain result of the compatibility check, the following artifacts are available.</i><br />
+              <input type="checkbox" name="ly_output_nets" value="yes" id="ly_output_nets" /><label for="ly_output_nets"> Display open nets</label><br />
+              <input type="checkbox" name="ly_output_fingerprints" value="yes" id="ly_output_fingerprints" onchange="ly_toggle_fields_output_fingerprints()"/><label for="ly_output_fingerprints"> Display fingerprints</label><br />
+              <ul>
+                <li><input type="radio" name="ly_output_fingerprints_option" value="formula" id="ly_output_fingerprints_formula" disabled="disabled"/><label for="ly_output_fingerprints_formula"> Formula</label></li>
+                <li><input type="radio" name="ly_output_fingerprints_option" value="file" id="ly_output_fingerprints_file" disabled="disabled"/><label for="ly_output_fingerprints_file"> Actual output file</label></li>
+              </ul>
+              <input type="checkbox" name="ly_output_linda_output" value="yes" id="ly_output_linda_output" onchange="ly_toggle_fields_output_linda_output()"/><label for="ly_output_linda_output"> Display Linda console output</label><br />
+              <ul>
+                <li><input type="radio" name="ly_output_linda_output_option" value="standard" id="ly_output_linda_output_standard" disabled="disabled"/><label for="ly_output_linda_output_standard"> Standard</label></li>
+                <li><input type="radio" name="ly_output_linda_output_option" value="verbose" id="ly_output_linda_output_verbose" disabled="disabled"/><label for="ly_output_linda_output_verbose"> Verbose</label></li>
+              </ul>
+              <input type="checkbox" name="ly_output_yasmina_output" value="yes" id="ly_output_yasmina_output" onchange="ly_toggle_fields_output_yasmina_output()"/><label for="ly_output_yasmina_output"> Display Yasmina console output</label><br />
+              <ul>
+                <li><input type="radio" name="ly_output_yasmina_output_option" value="standard" id="ly_output_yasmina_output_standard" disabled="disabled"/><label for="ly_output_yasmina_output_standard"> Standard</label></li>
+                <li><input type="radio" name="ly_output_yasmina_output_option" value="verbose" id="ly_output_yasmina_output_verbose" disabled="disabled"/><label for="ly_output_yasmina_output_verbose"> Verbose</label></li>
+              </ul>
+
+            </fieldset>
+
+            <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
+          </form>
+          <div class="paper">
+            <!--  <h2>References</h2>
+            <ul>
+            <li>Niels Lohmann and Daniela Weinberg. <strong>Wendy: A tool to synthesize partners for services.</strong> In Johan Lilius and Wojciech Penczek, editors, <em>31st International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, PETRI NETS 2010, Braga, Portugal, June 21-25, 2010, Proceedings</em>, volume 6128 of Lecture Notes in Computer Science, pages 297-307, June 2010. Springer-Verlag. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/LohmannW_2010_atpn.pdf">PDF</a>]</li>
+            <li>Karsten Wolf. <strong>Does my service have partners?</strong>. <em>LNCS ToPNoC</em>, 5460(II):152-171, March 2009. Special Issue on Concurrency in Process-Aware Information Systems. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Wolf_2008_topnoc.pdf">PDF</a>]</li>
+            <li>Daniela Weinberg. <strong>Efficient Controllability Analysis of Open Nets.</strong> In Roberto Bruni and Karsten Wolf, editors, <em>Web Services and Formal Methods, Fifth International Workshop, WS-FM 2008, Milan, Italy, September 4-5, 2008, Proceedings</em>, Lecture Notes in Computer Science, September 2008. Springer-Verlag. [<a href="http://dx.doi.org/10.1007/978-3-642-01364-5_14">DOI</a>]</li>
+            </ul>-->
+          </div>
+        </div>
+
+        <div id="lola">
+          <h1>Petri Net Verification</h1>
+          <p><a href="http://service-technology.org/lola">LoLA</a>.</p>
+
+          <div class="paper">
+            <h2>References</h2>
+            <ul>
+              <li>Karsten Wolf. <strong>Generating Petri Net State Spaces.</strong> In Jetty Kleijn and Alex Yakovlev, editors, <em>28th International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, ICATPN 2007, Siedlce, Poland, June 25-29, 2007, Proceedings</em>, volume 4546 of Lecture Notes in Computer Science, pages 29-42, June 2007. Springer-Verlag. Invited lecture. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Wolf_2007_atpn.pdf">PDF</a>]</li>
+              <li>Karsten Schmidt. <strong>LoLA: A Low Level Analyser.</strong> In Mogens Nielsen and Dan Simpson, editors, <em>Application and Theory of Petri Nets 2000: 21st International Conference, ICATPN 2000, Aarhus, Denmark, June 2000. Proceedings</em>, volume 1825 of Lecture Notes in Computer Science, pages 465-474, June 2000. Springer-Verlag. [<a href="http://dx.doi.org/10.1007/3-540-44988-4_27">DOI</a>]</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="soundness">
+          <h1>Business Process Soundness Check</h1>
+          <p>Soundness is a central correctness notion for business process. To verify industrial business processes, we first translate them into Petri net model using the compiler <a href="http://service-technology.org/uml2owfn">UML2oWFN</a> and then verify soundness with the modelchecking tool <a href="http://service-technology.org/lola">LoLA</a>.</p>
+          <form action="uml2owfn.php" method="post" enctype="multipart/form-data">
+            <fieldset>
+              <legend>Business Process</legend>
+              Use a given business process: 
+              <select name="input_example" size="1">
+                <optgroup label="Case Study for BPM 2009">
+                  <option value="s00002237">sound process</option>
+                  <option value="s00003188">unsound process (deadlock)</option>
+                  <option value="s00001986">unsound process (lack of synchronization)</option>
+                </optgroup>
+              </select>
+            </fieldset>
+
+            <p><input type="submit" value="submit" /> <input type="reset" value="reset" /></p>
+          </form>
+          <div class="paper">
+            <h2>References</h2>
+            <ul>
+              <li>Dirk Fahland, C&eacute;dric Favre, Barbara Jobstmann, Jana Koehler, Niels Lohmann, Hagen V&ouml;lzer, and Karsten Wolf. <strong>Instantaneous Soundness Checking of Industrial Business Process Models.</strong> In Umeshwar Dayal, Johann Eder, Jana Koehler, and Hajo A. Reijers, editors, <em>Business Process Management, 7th International Conference, BPM 2009, Ulm, Germany, September 8-10, 2009, Proceedings</em>, volume 5701 of Lecture Notes in Computer Science, pages 278-293, September 2009. Springer-Verlag. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/FahlandWJKLVW_2009_bpm.pdf">PDF</a>]</li>
+              <li>Dirk Fahland. <strong>Translating UML2 Activity Diagrams Petri Nets for analyzing IBM WebSphere Business Modeler process models.</strong> Informatik-Berichte 226, Humboldt-Universit&auml;t zu Berlin, 2008. [<a href="http://www.informatik.hu-berlin.de/top/download/publications/fahland08_umlpn_tr_226.pdf">PDF</a>]</li>
+              <li>Karsten Wolf. <strong>Generating Petri Net State Spaces.</strong> In Jetty Kleijn and Alex Yakovlev, editors, <em>28th International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, ICATPN 2007, Siedlce, Poland, June 25-29, 2007, Proceedings</em>, volume 4546 of Lecture Notes in Computer Science, pages 29-42, June 2007. Springer-Verlag. Invited lecture. [<a href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/publications/Wolf_2007_atpn.pdf">PDF</a>]</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
     </div>
+    <div id="footer">
+      <p><a href="http://service-technology.org">service-technology.org</a> is a cooperation between the <a  href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/">University of Rostock</a> and the <a  href="http://www2.informatik.hu-berlin.de/top/index.php">Humboldt-Universit&auml;t zu Berlin</a>.</p>
     </div>
   </div>
-  <div id="footer">
-  <p><a href="http://service-technology.org">service-technology.org</a> is a cooperation between the <a  href="http://wwwteo.informatik.uni-rostock.de/ls_tpp/">University of Rostock</a> and the <a  href="http://www2.informatik.hu-berlin.de/top/index.php">Humboldt-Universit&auml;t zu Berlin</a>.</p></div>
 </body>
 </html>

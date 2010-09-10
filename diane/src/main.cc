@@ -242,7 +242,7 @@ int main(int argc, char* argv[]) {
                 string num;
                 /// leading zeros
                 int z = digits - num.length();
-                ss << setfill('0') << setw(z) << netnumber;
+                ss /*<< setfill('0') << setw(z)*/ << netnumber;
                 ss >> num;
                 ofstream outputfile((fileprefix + num + filepostfix).c_str());
                 outputfile << pnapi::io::owfn

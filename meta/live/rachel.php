@@ -63,8 +63,11 @@
 
   // prepare strings for system call (realcall) 
   // and output on console (fakecall)
-  $fakecall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["basename"]." -o ".$og["basename"]." -d";
-  $realcall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["residence"]." -o ".$og["residence"]." -d";
+  $fakeresult .= "result.dot";
+  $realresult = $_SESSION["dir"]."/".$fakeresult;
+
+  $fakecall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["basename"]." -o ".$og["basename"]." -d ".$fakeresult;
+  $realcall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["residence"]." -o ".$og["residence"]." -d ".$realresult;
 
   $realcall .= " -v 2>&1";
 
@@ -102,6 +105,8 @@
 
       <h2>Result</h2>
       <?php console($fakecall, $realcall)?>
+
+      <?php drawImage($fakeresult); ?>
     </div>
   </div>
   <div id="footer">

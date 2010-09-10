@@ -63,8 +63,11 @@
 
   // prepare strings for system call (realcall) 
   // and output on console (fakecall)
-  $fakecall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["basename"]." -o ".$og["basename"];
-  $realcall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["residence"]." -o ".$og["residence"];
+  $fakecall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["basename"]." -o ".$og["basename"]." -v -d";
+  $realcall = "rachel -m ".$_SESSION['rachel']['mode']." -a ".$automata["residence"]." -o ".$og["residence"]." -v -d";
+
+  $realcall .= " -v 2>&1";
+
 /*
   $call_3 = 'rachel -m '.$editdistance.' -a '.$choreography.'.sa -o '.$choreography.'.og -d';  
 */

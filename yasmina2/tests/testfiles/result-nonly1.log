@@ -1,9 +1,0 @@
-MODELS
-    M1: jm1.owfn;
-    M2: jm2.owfn;
-    M3: jm3.owfn;
-RESULTS
-    M1 (+) M2: no;
-    M1 (+) M3: maybe;
-    M2 (+) M3: no;
-    M1 (+) M2 (+) M3: no;

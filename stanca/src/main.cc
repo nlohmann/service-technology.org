@@ -1,3 +1,22 @@
+/*****************************************************************************\
+ Stanca --  Siphon/Trap Analysis and siphon-trap property Checking using the sAtisfiability solver MINISAT
+ 
+ Copyright (c) 2010 Olivia Oanea
+ 
+ Stanca is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+ 
+ Stanca is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+ 
+ You should have received a copy of the GNU Affero General Public License
+ along with Stanca.  If not, see <http://www.gnu.org/licenses/>.
+ \*****************************************************************************/
+
 #include <config.h>
 #include <cassert>
 #include <iostream>
@@ -12,11 +31,9 @@
 #include "config.h"
 #include "pnapi.h"
 #include <fstream>
-#include <sstream>
 #include <string>
-
-
 #include "Output.h"
+#include "STFormula.h"
 
 
 
@@ -67,50 +84,8 @@ string invocation;
 
 string toPl(int id);
 
-typedef struct SP{
-	vector<bool> set;
-	map<unsigned int, string> st;
-	//PetriNet pn;
-	bool operator == (SP sp) const {
-		for (unsigned i=0; i<set.size(); ++i) {
-			if (set.at(i)!=sp.set.at(i)) {
-				return false;
-			}
-		}
-		return true;
-	}
-	bool operator != (SP sp) const {
-		for (unsigned i=0; i<set.size(); ++i) {
-			if (set.at(i)==sp.set.at(i)) {
-				return false;
-			}
-		}
-		return true;
-	}
-	bool operator < (SP sp) const {
-		for (unsigned i=0; i<set.size(); ++i) {
-			if (set.at(i)==sp.set.at(i)) {
-				continue;
-			}
-			else if(!set.at(i)&& sp.set.at(i)) continue;
-			else return false;
-		}
-		return true;
-	}
-};
 
-inline  string toString(SP sp){
-	string out="";
-	for (unsigned i=0; i<sp.set.size(); ++i) {
-		if(sp.set.at(i)) {
-			out=out+sp.st[i]+" ";
-		}
-	}
-	return out;
-}
 
-typedef SP Siphon;
-typedef SP Trap;
 
 void initGlobalVariables();
 //void evaluateParameters(int argc, char** argv);
@@ -332,7 +307,8 @@ int main(int argc, char **argv) {
 		for (set<Transition*>::iterator tit=net.getTransitions().begin(); tit!=net.getTransitions().end(); ++tit) {
 			//cout << (*tit)->getName()<<" : ";
 			///build current net.findTransition((*tit)->getName())
-			MFormula  *inprev=NULL;  pnapi::Transition &t=*net.findTransition((*tit)->getName());//const std::string s=t->getName();std::set<Node *> sn;//
+			MFormula  *inprev=NULL;  
+			pnapi::Transition &t=*net.findTransition((*tit)->getName());//const std::string s=t->getName();std::set<Node *> sn;//
 			//sn=net.findTransition((*tit)->getName())->getPostset();
 			for (std::set<pnapi::Node *>::iterator nit=t.getPreset().begin(); nit!=t.getPreset().end(); ++nit){
 				Place * pl = dynamic_cast<Place *> ((*nit));

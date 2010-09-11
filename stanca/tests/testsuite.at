@@ -129,7 +129,9 @@ AT_CHECK([cp TESTFILES/st.owfn .])
 AT_CHECK([STANCA --siphon --trap st.owfn],0,stdout,stderr)
 AT_CHECK([GREP -q "The net contains a siphon with a marked trap inside:" stdout])
 AT_CHECK([ ( GREP -q "p2" stdout && GREP -q "p3" stdout ) ||
-( GREP -q "p1" stdout && GREP -q "p4" stdout && GREP -q "p5" stdout && GREP -q "p7" stdout ) ])
+( GREP -q "p1" stdout && GREP -q "p4" stdout && GREP -q "p5" stdout && GREP -q "p7" stdout ) 
+( GREP -q "p1" stdout && GREP -q "p3" stdout && GREP -q "p5" stdout && GREP -q "p7" stdout ) 
+])
 AT_KEYWORDS(diagnosis)
 AT_CLEANUP
 

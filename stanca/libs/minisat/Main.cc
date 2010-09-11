@@ -211,6 +211,26 @@ bool minisat(vector< vector< int > > & in, vector<bool>& vb, vector<int>& confli
 		IntOption    cpu_lim("MAIN", "cpu-lim","Limit on CPU time allowed in seconds.\n", INT32_MAX, IntRange(0, INT32_MAX));
 		IntOption    mem_lim("MAIN", "mem-lim","Limit on memory usage in megabytes.\n", INT32_MAX, IntRange(0, INT32_MAX));
 		
+		// Set limit on CPU-time:
+        if (cpu_lim != INT32_MAX){
+            rlimit rl;
+            getrlimit(RLIMIT_CPU, &rl);
+            if (rl.rlim_max == RLIM_INFINITY || (rlim_t)cpu_lim < rl.rlim_max){
+                rl.rlim_cur = cpu_lim;
+                if (setrlimit(RLIMIT_CPU, &rl) == -1)
+                    printf("WARNING! Could not set resource limit: CPU-time.\n");
+            } }
+		
+        // Set limit on virtual memory:
+        if (mem_lim != INT32_MAX){
+            rlim_t new_mem_lim = (rlim_t)mem_lim * 1024*1024;
+            rlimit rl;
+            getrlimit(RLIMIT_AS, &rl);
+            if (rl.rlim_max == RLIM_INFINITY || new_mem_lim < rl.rlim_max){
+                rl.rlim_cur = new_mem_lim;
+                if (setrlimit(RLIMIT_AS, &rl) == -1)
+                    printf("WARNING! Could not set resource limit: Virtual memory.\n");
+            } }
 		
 		
 

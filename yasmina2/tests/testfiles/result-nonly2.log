@@ -1,0 +1,5 @@
+MODELS
+    M1: myCoffee.owfn;
+    M2: mycoffee-partner.owfn;
+RESULTS
+    M1 (+) M2: no;

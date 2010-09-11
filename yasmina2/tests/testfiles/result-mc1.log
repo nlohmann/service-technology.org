@@ -1,0 +1,25 @@
+MODELS
+    M1: myCoffee.output.check;
+    M2: myCoffeep.output.check;
+    M3: myCoffee.owfn;
+    M4: mycoffee-partner.owfn;
+    M5: jm1.owfn;
+    M6: jm2.owfn;
+    M7: jm3.owfn;
+RESULTS
+    M1 (+) M2: no;
+    M2 (+) M3: no;
+    M1 (+) M4: no;
+    M3 (+) M4: no;
+    M2 (+) M5: no;
+    M4 (+) M5: no;
+    M1 (+) M6: no;
+    M3 (+) M6: no;
+    M5 (+) M6: no;
+    M2 (+) M7: no;
+    M4 (+) M7: no;
+    M5 (+) M7: no;
+    M2 (+) M5 (+) M7: no;
+    M4 (+) M5 (+) M7: no;
+    M6 (+) M7: no;
+    M5 (+) M6 (+) M7: no;

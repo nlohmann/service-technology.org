@@ -16,7 +16,6 @@
   if (isset( $_SESSION[$tool]["ly_singleEvents"])) { $paramsL .= " -0"; }
   if (isset( $_SESSION[$tool]["ly_mutualExclusion"])) { $paramsL .= " -1"; }
   if (isset( $_SESSION[$tool]["ly_octagon"])) { $paramsL .= " --oct"; }
-  if (isset( $_SESSION[$tool]["ly_mdb"])) { $paramsL .= " --mdb"; }
 
   if (isset( $_SESSION[$tool]["ly_output_linda_output"]) && $_SESSION[$tool]["ly_output_linda_output_option"] == "verbose") { $paramsL .= " -v"; }
   if (isset( $_SESSION[$tool]["ly_output_fingerprints"]) && $_SESSION[$tool]["ly_output_fingerprints_option"] == "formula") { $paramsL .= " --pretty"; }
@@ -27,7 +26,7 @@
   $opennetFiles = array();
   $yasminaCall = "yasmina ";
   $yasminaFakeCall = "yasmina ";
-  
+    
  foreach( $_SESSION[$tool]["input_example"] as $key => $value){
 
    $opennetFiles[$key] = current(prepareFile("lindayasmina/${value}.owfn"));
@@ -38,7 +37,7 @@
    $yasminaCall .= " -m " . $fingerprintFiles[$key]["residence"];
    $yasminaFakeCall .= " -m $value.owfn.fp";   
   }
-  if (isset( $_SESSION[$tool]["ly_output_yasmina_output"]) && $_SESSION[$tool]["ly_output_yasmina_output_option"] == "verbose") { $yasminaCall .= " -v"; $yasminaFakeCall .= " -v";}
+  if (isset( $_SESSION[$tool]["ly_output_yasmina_output"]) && $_SESSION[$tool]["ly_output_yasmina_output_option"] == "verbose") { $yasminaFakeCall .= " -v";}
   $yasminaCall .=  " 2>&1";
 
   ?>
@@ -79,7 +78,6 @@
   if (isset( $_SESSION[$tool]["ly_singleEvents"])) { echo "single events; "; }
   if (isset( $_SESSION[$tool]["ly_mutualExclusion"])) { echo "mutual exclusion; "; }
   if (isset( $_SESSION[$tool]["ly_octagon"])) { echo "octagon terms; "; }
-  if (isset( $_SESSION[$tool]["ly_mdb"])) { echo "mdb terms; "; }
 ?>
 <br><br>
  <?php  

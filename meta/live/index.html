@@ -428,17 +428,28 @@
                 document.getElementById("ly_output_yasmina_output_verbose").disabled = true;
               }
             }
+            
+            function checkInput() {
+              count = 0;
+              for (i = 0; i < document.getElementById("lindayasmina_inputnets").length; ++i) {
+                if (document.getElementById("lindayasmina_inputnets").options[i].selected) ++count;
+              }
+              if (count < 2) {
+                alert("Please select at least two example files.");
+              }
+              return count >= 2;
+            }
           </script>
 
           <h1>Communication Fingerprints</h1>
           <p>A communication fingerprint is an abstract representation of interaction behavior as a Boolean formula. Fingerprints can be used to semi-decide compatibility of two services. The tool <a href="http://service-technology.org/linda">Linda</a> computes a fingerprint for a given service model. The tool <a href="http://service-technology.org/yasmina">Yasmina</a> semi-decides compatibility based on given fingerprints.</p>
-          <form action="lindayasmina.php" method="post" enctype="multipart/form-data">
+          <form action="lindayasmina.php" method="post" enctype="multipart/form-data" onSubmit="return checkInput()">
             <fieldset>
               <legend>Input Open Nets</legend>
               <input type="hidden" name="input_type" value="example" checked="checked" id="lindayasmina_example" /><label for="lindayasmina_example"><i>Select two or more examples.</i><br />
-                <select name="input_example[]" size="5" multiple="multiple">
-                  <option value="suggester">Suggester Service</option>
-                  <option  value="decider">Decider Service</option>
+                <select name="input_example[]" size="5" multiple="multiple" id="lindayasmina_inputnets">
+                  <option value="suggester" selected="selected">Suggester Service</option>
+                  <option  value="decider" selected="selected">Decider Service</option>
                 </select>
               </label>
             </fieldset>
@@ -449,17 +460,16 @@
               <input type="checkbox" name="ly_singleEvents" value="yes" id="ly_singleEvents" /><label for="ly_singleEvents"> Single events</label><br />
               <input type="checkbox" name="ly_mutualExclusion" value="yes" id="ly_mutualExclusion" /><label for="ly_mutualExclusion"> Mutual exclusion</label><br />
               <input type="checkbox" name="ly_octagon" value="yes" id="ly_octagon" /><label for="ly_octagon"> Octagon terms</label><br />
-              <input type="checkbox" name="ly_mdb" value="yes" id="ly_mdb" /><label for="ly_mdb"> MDB terms</label><br />
             </fieldset>
 
             <fieldset>
               <legend>Output Presentation</legend>
               <i>Additionally to the plain result of the compatibility check, the following artifacts are available.</i><br />
-              <input type="checkbox" name="ly_output_nets" value="yes" id="ly_output_nets" /><label for="ly_output_nets"> Display open nets</label><br />
-              <input type="checkbox" name="ly_output_fingerprints" value="yes" id="ly_output_fingerprints" onchange="ly_toggle_fields_output_fingerprints()"/><label for="ly_output_fingerprints"> Display fingerprints</label><br />
+              <input type="checkbox" name="ly_output_nets" value="yes" id="ly_output_nets" checked/><label for="ly_output_nets"> Display open nets</label><br />
+              <input type="checkbox" name="ly_output_fingerprints" value="yes" id="ly_output_fingerprints" onchange="ly_toggle_fields_output_fingerprints()" checked/><label for="ly_output_fingerprints"> Display fingerprints</label><br />
               <ul>
-                <li><input type="radio" name="ly_output_fingerprints_option" value="formula" id="ly_output_fingerprints_formula" disabled="disabled" checked/><label for="ly_output_fingerprints_formula"> Formula</label></li>
-                <li><input type="radio" name="ly_output_fingerprints_option" value="file" id="ly_output_fingerprints_file" disabled="disabled"/><label for="ly_output_fingerprints_file"> Actual output file</label></li>
+                <li><input type="radio" name="ly_output_fingerprints_option" value="formula" id="ly_output_fingerprints_formula" checked/><label for="ly_output_fingerprints_formula"> Formula</label></li>
+                <li><input type="radio" name="ly_output_fingerprints_option" value="file" id="ly_output_fingerprints_file" /><label for="ly_output_fingerprints_file"> Actual output file</label></li>
               </ul>
               <input type="checkbox" name="ly_output_linda_output" value="yes" id="ly_output_linda_output" onchange="ly_toggle_fields_output_linda_output()"/><label for="ly_output_linda_output"> Display Linda console output</label><br />
               <ul>

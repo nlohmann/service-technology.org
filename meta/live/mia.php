@@ -1,21 +1,19 @@
 <?php
-  if (empty($_REQUEST))
-    header('Location:index.html#migration');
 
-  include 'resource/php/console.php';
-  include 'resource/php/dotimg.php';
-  include 'resource/php/getnumber.php';
+  include 'resource/php/debug.php';
 
-  header("Content-Type: text/html");
-  echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
+  debug("before session import");
 
-  $inputfilename = $_REQUEST['service'];
-    
-  // give a verbose description of the services
-  $longname = "";
-  $description = 'a WS-BPEL process which has been translated into a Petri net model using the tool <a href="http://service-technology.org/bpel2owfn">BPEL2oWFN</a>.';
-  $target = $inputfilename.'-pv';
-  switch ($inputfilename) {
+  // most important script! sets session information and PATH!
+  require_once 'resource/php/session.php';
+  debug("after session import");
+  $tool = "mia";
+
+  // some functions for copying/creating files to/in temporary directory
+  // see files.php for further information
+  require_once 'resource/php/files.php';
+  
+  switch ($_SESSION['mia']['process']) {
     case "service-a":
       $longname="Running Example";
       $description="the running example used in the ICSOC submission (Fig. 1-3).";
@@ -44,14 +42,7 @@
     case "T2": $longname="Travel Service"; break;
     case "TR": $longname="Ticket Reservation"; break;
   }
-  
-  
-  $call_1 = 'mia '.$inputfilename.'.owfn '.$target.'.owfn -v -o '.$inputfilename.'.jt';
-  
-  // some services need a higher message bound
-  if (!strcmp($inputfilename, 'T2')) {
-    $call_1 = $call_1.' -m2';
-  }  
+    
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -71,7 +62,7 @@
     <div id="content">
       <h1>Another Approach to Service Instance Migration</h1>
 
-      <p>This page demonstrates the calculation of a migration relation as described in a paper submitted to the <a href="http://icsoc.org/">ICSOC 2009</a> conference.</p
+      <p>This page demonstrates the calculation of a migration relation as described in a paper submitted to the <a href="http://icsoc.org/">ICSOC 2009</a> conference.</p>
         <p>Note that for some examples, results may take a few minutes.</p>
 
 

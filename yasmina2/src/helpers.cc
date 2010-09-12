@@ -5,7 +5,8 @@ unsigned int getBit(unsigned int field, unsigned int position) {
 	  return ((mask & field) == mask);
 }
 
-std::vector<std::string> Universe::identifiers = std::vector<std::string>(1);
+// Static member storing all identifiers.
+std::map<std::string, int> Universe::identifiers = std::map<std::string, int>();
 
 CustomConstraint::CustomConstraint(std::vector<int>* aDomain, std::vector<int>* someValues, int op, int rhs) {
   domainsize = aDomain->size(); 

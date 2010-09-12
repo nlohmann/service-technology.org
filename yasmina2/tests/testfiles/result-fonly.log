@@ -1,0 +1,5 @@
+MODELS
+    M1: myCoffee.output.check;
+    M2: myCoffeep.output.check;
+RESULTS
+    M1 (+) M2: no;

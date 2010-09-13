@@ -90,7 +90,7 @@
 <body>
   <div id="container">
     <div id="content">
-      <div style="float: right; top: -10px;"><img src="resource/images/live.png" alt="service-technology.org/live" /></div>
+      <div style="float: right; top: -10px;"><a href="./#marlene_ia"><img src="resource/images/live.png" alt="service-technology.org/live" /></a></div>
       <h1>Interactive Adapter Rule Design</h1>
 
       <h2>Diagnosis</h2>

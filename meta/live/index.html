@@ -343,7 +343,8 @@
           <form action="mia.php" method="post" enctype="multipart/form-data">
             <fieldset>
               <legend>Service model</legend>
-              Use a given service model: 
+              <input type="hidden" name="input_type" value="example" checked="checked" id="mia_example" />
+              <label for="mia_example">Use a given service model: 
               <select name="input_example" size="1">
                 <optgroup label="Simple Example Services">
                   <option value="reg_old">Registration Service</option>
@@ -361,6 +362,7 @@
                   <option value="TR">Ticket Reservation</option>
                 </optgroup>
               </select>
+              </label>
             </fieldset>
 
             <p><input type="submit" value="calculate migration" /></p>

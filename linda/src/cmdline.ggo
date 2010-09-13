@@ -65,9 +65,10 @@ option "quiet" q
 	flag off
 	hidden
 
-option "pretty" - 
-	"Outputs the fingerprint as a formula at the end of execution."
-	flag off
+option "pretty" p 
+  "Pretty print fingerprint to file. Fingerprint can be output to standard out by providing - (a dash) as the path. "
+  string typestr="path"
+  optional
 
 section "Debug"
 

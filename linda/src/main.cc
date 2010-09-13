@@ -203,8 +203,7 @@ void output(std::ostream& file, ExtendedStateEquation** systems, pnapi::PetriNet
 
 
 /// Pretty output of a message profile.
-void prettyPrint(ExtendedStateEquation** systems, uint8_t nr) {
-	std::string res = "Fingerprint: ";
+void prettyPrint(std::ostream& file, ExtendedStateEquation** systems, uint8_t nr) {
 
 	bool firstSystem = true;
 
@@ -212,49 +211,50 @@ void prettyPrint(ExtendedStateEquation** systems, uint8_t nr) {
 	for (int syscount = 0; syscount < nr; ++syscount) {
 	bool firstTerm = true;
 		if (!firstSystem) {
-			res += " OR ";
+			file << std::endl << "    OR    " << std::endl;
 		} else {
 			firstSystem = false;
 		}
-	res += "(";	
+	file << "(";	
 	for (int termcount = 0; termcount < systems[syscount]->calculatedEventTerms.size(); ++termcount) {
 			if (!(systems[syscount]->calculatedBounds[termcount]->lowerBounded || systems[syscount]->calculatedBounds[termcount]->upperBounded)) {
 				continue;
 			}			
 
 			if (!firstTerm) {
-				res += " AND ";
+				file << " AND ";
 			} else {
 				firstTerm = false;
 			}
-			res += "(";
+			file << "(";
 			if (systems[syscount]->calculatedBounds[termcount]->lowerBounded) {
-				res += systems[syscount]->calculatedBounds[termcount]->getLowerBoundString() + " <= " ;
+				file << systems[syscount]->calculatedBounds[termcount]->getLowerBoundString() + " <= " ;
 			}
 			bool firstEvent = true;
 			for (int i = 0; i < LindaHelpers::NR_OF_EVENTS; ++i) {
 				if ((systems[syscount]->calculatedEventTerms[termcount])[i] == 0) {
 					continue;
 				}
-				if ((systems[syscount]->calculatedEventTerms[termcount])[i] > 0 && !firstEvent) {res += "+";}
+				if ((systems[syscount]->calculatedEventTerms[termcount])[i] > 0 && !firstEvent) {file << "+";}
 				if ((systems[syscount]->calculatedEventTerms[termcount])[i] == 1) {
-					res += LindaHelpers::EVENT_STRINGS[i];
+					file << LindaHelpers::EVENT_STRINGS[i];
 				} else if ((systems[syscount]->calculatedEventTerms[termcount])[i] == -1) {
-					res += "-" + LindaHelpers::EVENT_STRINGS[i];
+					file << "-" + LindaHelpers::EVENT_STRINGS[i];
 				} else {
-					res += LindaHelpers::intToStr((systems[syscount]->calculatedEventTerms[termcount])[i]) + "*" + LindaHelpers::EVENT_STRINGS[i];
+					file << LindaHelpers::intToStr((systems[syscount]->calculatedEventTerms[termcount])[i]) + "*" + LindaHelpers::EVENT_STRINGS[i];
 				}
 				firstEvent = false;
 			}
 			if (systems[syscount]->calculatedBounds[termcount]->upperBounded) {
-				res += " <= " + systems[syscount]->calculatedBounds[termcount]->getUpperBoundString() ;
+				file << " <= " + systems[syscount]->calculatedBounds[termcount]->getUpperBoundString() ;
 			}
-			res += ")";
+			file << ")";
 		
 		}
-	res += ")";
+	file << ")";
 	}
-	message(res.c_str());
+	
+	file << std::endl;
 }
 
 	
@@ -596,20 +596,16 @@ int main(int argc, char** argv) {
 			}
 		}
 
-		// PRETTY PRINT
-
-		if (args_info.pretty_given) {
-			prettyPrint(LindaAgent::getSystemsArray(), sysCounter);			
-		}
 
 		// OUTPUT FILE GENERATION
 
 		if (args_info.output_given) {
 
 			{
-				Output out( std::string(args_info.output_arg), "message profile" );
-				output(out, LindaAgent::getSystemsArray(), net, sysCounter);
-			}
+				Output out( std::string(args_info.output_arg), "fingerprint" );
+			  output(out, LindaAgent::getSystemsArray(), net, sysCounter);
+				}
+			
 
 			if (std::string(args_info.output_arg) != std::string("-")) {
 				// Creation complete.
@@ -619,7 +615,28 @@ int main(int argc, char** argv) {
 				message("Output written to standard out.");
 			}
 
-		} else {
+		} 
+		
+			if (args_info.pretty_given) {
+
+			{
+				Output out( std::string(args_info.pretty_arg), "pretty print fingerprint" );
+			  prettyPrint(out, LindaAgent::getSystemsArray(), sysCounter);
+				}
+			
+
+			if (std::string(args_info.pretty_arg) != std::string("-")) {
+				// Creation complete.
+				message("(Pretty) output file %s created.", args_info.pretty_arg);
+			} else {
+				// Output complete.
+				message("(Pretty) output written to standard out.");
+			}
+
+		} 
+		
+		
+		if (!(args_info.pretty_given || args_info.output_given)) {
 			message("Computation finished. No output produced, since no output target was given.");
 			message("To produce output to a file, use \"-o <path/to/file>\", to output to standard out, use \"-o-\". ");
 		}

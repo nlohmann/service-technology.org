@@ -104,7 +104,7 @@
         ?>
         <div align="center">
         <textarea cols="70" rows="10"><?php 
-      $lines = file($fingerprintFiles[$key]["$value.owfn.fp"]["residence"]);
+      $lines = file($fingerprintFiles[$key]["residence"]);
       foreach ($lines as $line_num => $line) {
         echo $line;
       }

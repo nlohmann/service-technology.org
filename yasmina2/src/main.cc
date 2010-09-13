@@ -245,7 +245,7 @@ for (int i = 0; i < args_info.net_given;	++i) {
       }
       
       if (incompatible == currentCompositeFinals.size()) { 
-        message("    Composite incompatible."); 
+        message("    Models incompatible: Composite is not weakly terminating."); 
         ++incompatibles; 
         YasminaLog::results.push_back(Result(currentComposite,1));
       } else { 
@@ -261,7 +261,7 @@ for (int i = 0; i < args_info.net_given;	++i) {
   } 
 
 	message("Overall statistics:");
-	message("    %i incompatible composites ", incompatibles);
+	message("    %i not weakly terminating composites ", incompatibles);
 	message("    %i inconclusive results ", inconclusives);
   if ((!args_info.verbose_given) && (undefineds != 0)) {
   	message("   [%i undefined composites (enable -v for details)]", undefineds);

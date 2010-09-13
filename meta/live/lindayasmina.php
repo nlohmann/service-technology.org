@@ -18,22 +18,36 @@
   if (isset( $_SESSION[$tool]["ly_octagon"])) { $paramsL .= " --oct"; }
 
   if (isset( $_SESSION[$tool]["ly_output_linda_output"]) && $_SESSION[$tool]["ly_output_linda_output_option"] == "verbose") { $paramsL .= " -v"; }
-  if (isset( $_SESSION[$tool]["ly_output_fingerprints"]) && $_SESSION[$tool]["ly_output_fingerprints_option"] == "formula") { $paramsL .= " --pretty"; }
 
   $lindaFakeCalls = array();
   $lindaCalls = array();
   $fingerprintFiles = array();
+  $formulaFiles = array();
   $opennetFiles = array();
-  $yasminaCall = "yasmina ";
-  $yasminaFakeCall = "yasmina ";
+  
+  $yasminaResult = current(createFile("yasmina.log"));
+  $yasminaCall = "yasmina -o " . $yasminaResult["residence"] . " ";
+  $yasminaFakeCall = "yasmina -o yasmina.log ";
     
  foreach( $_SESSION[$tool]["input_example"] as $key => $value){
 
    $opennetFiles[$key] = current(prepareFile("lindayasmina/${value}.owfn"));
   	$fingerprintFiles[$key] = current(createFile("${value}.owfn.fp"));
+  	$formulaFiles[$key] = current(createFile("${value}.owfn.formula"));
   
-   $lindaCalls[$key] = "linda $paramsL " . $opennetFiles[$key]["residence"] . " -o "  . $fingerprintFiles[$key]["residence"] . " 2>&1";
+   $lindaCalls[$key] = "linda $paramsL " . $opennetFiles[$key]["residence"] . " -o "  . $fingerprintFiles[$key]["residence"];
   $lindaFakeCalls[$key] = "linda $paramsL $value.owfn -o $value.owfn.fp";
+  if (isset( $_SESSION[$tool]["ly_output_fingerprints"]) && $_SESSION[$tool]["ly_output_fingerprints_option"] == "formula") { 
+    $lindaCalls[$key] .= " -p " . $formulaFiles[$key]["residence"]; 
+    $lindaFakeCalls[$key] .= " -p " . $value . ".owfn.formula";
+    }
+
+
+$lindaCalls[$key] .= " 2>&1";
+
+
+
+
    $yasminaCall .= " -f " . $fingerprintFiles[$key]["residence"];
    $yasminaFakeCall .= " -f $value.owfn.fp";   
   }
@@ -91,20 +105,18 @@
            exec($lindaCalls[$key]);
        
        }
-       if (isset( $_SESSION[$tool]["ly_output_fingerprints"]) && $_SESSION[$tool]["ly_output_fingerprints_option"] == "formula") { 
-?><div align="center">
-        <textarea cols="70" rows="2"><?php 
-
-       echo exec($lindaCalls[$key] . " | grep Fingerprint 2>&1 | sed 's/linda: Fingerprint: //g'");
-       ?>
-               </textarea></div>
-       <?php
- }
-       if (isset( $_SESSION[$tool]["ly_output_fingerprints"]) && $_SESSION[$tool]["ly_output_fingerprints_option"] == "file") { 
+       if (isset( $_SESSION[$tool]["ly_output_fingerprints"])) { 
         ?>
         <div align="center">
         <textarea cols="70" rows="10"><?php 
-      $lines = file($fingerprintFiles[$key]["residence"]);
+        
+        if ($_SESSION[$tool]["ly_output_fingerprints_option"] == "formula") {
+          $f = $formulaFiles[$key]["residence"]; 
+        } else {
+          $f = $fingerprintFiles[$key]["residence"];
+        }
+        
+      $lines = file($f);
       foreach ($lines as $line_num => $line) {
         echo $line;
       }
@@ -128,12 +140,11 @@
 
       <h2>Result</h2>
       <?php 
-      if (trim(exec("$yasminaCall | grep \"Models incompatible\"")) != "") {
-        echo "Models incompatible: Composite is not weakly terminating!";
-      } else {
-        echo "The check was inconclusive.";
+
+      $lines = file($yasminaResult["residence"]);
+      foreach ($lines as $line_num => $line) {
+        echo $line . "<br />";
       }
-      
       ?>
       
     </div>

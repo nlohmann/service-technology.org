@@ -59,114 +59,6 @@ bool checkComposite(std::vector<int>* composite) {
   return true;
 }
 
-ServiceModel* createModelFromOpenNet(pnapi::PetriNet* net) {
-  
-  ServiceModel* result = new ServiceModel();
-  
-  // Get interface 
-  std::set<pnapi::Label *> labels = net->getInterface().getAsynchronousLabels();
-  std::map<pnapi::Label*, int> labelMap;
-  for (std::set<pnapi::Label *>::iterator it =
-	    labels.begin(); it != labels.end(); ++it) {
-	    std::string* labelName = new std::string((*it)->getName());
-      int id = Universe::addIdentifier(labelName);
-      delete labelName;
-      labelMap[*it] = id;
-      if ((*it)->getType() == 1) {
-        result->inputs.push_back(id);
-      } else {
-        result->outputs.push_back(id);
-      }
-  }
-  // Add all transitions as identifiers and store their numIDs in a map.
-  std::map<pnapi::Transition*, int> transitionMap;
-  
-  for (std::set<pnapi::Transition*>::iterator it =
-				net->getTransitions().begin(); it
-				!= net->getTransitions().end(); ++it) {
-    transitionMap[(*it)] = Universe::addIdentifier(&(*it)->getName());
-  }
-
-  // Now we need final markings.
-
-  status("Computing final markings...");
-	std::pair<BinaryTree<pnapi::Place*,std::pair<int,int> >**,int> translated = translateFinalCondition(net);
-	
-	status("Computed %i final markings",translated.second);
-	
-	for (int i = 0; i < translated.second; ++i) {
-    
-    result->constraints.push_back(std::vector<Constraint*>());
-    int current = result->constraints.size()-1;
-    
-    // For each place, add the constraints. 
-  
-    for (std::set<pnapi::Place*>::iterator it =
-				  net->getPlaces().begin(); it
-				  != net->getPlaces().end(); ++it) {
-      
-      BinaryTreeNode<pnapi::Place*,std::pair<int,int> >* node = translated.first[i]->find((*it));
-
-      int op = node->value.first;
-			int value = node->value.second - (*it)->getTokenCount();
-
-      std::vector<int>* domain = new std::vector<int>();
-      std::vector<int>* values = new std::vector<int>();            
-      
-      for (std::set<pnapi::Arc *>::iterator pIt =
-					  (*it)->getPresetArcs().begin(); pIt
-					  != (*it)->getPresetArcs().end(); ++pIt) {
-            pnapi::Transition& t = (*pIt)->getTransition();
-            domain->push_back(transitionMap[&t]);
-            values->push_back((*pIt)->getWeight());
-      }
-      
-      for (std::set<pnapi::Arc *>::iterator pIt =
-					  (*it)->getPostsetArcs().begin(); pIt
-					  != (*it)->getPostsetArcs().end(); ++pIt) {
-            pnapi::Transition& t = (*pIt)->getTransition();
-            int id = transitionMap[&t];
-            bool set = false;
-            for (int x = 0; x < domain->size(); ++x) {
-              if (!set && (*domain)[x] == id) {
-                (*values)[x] -= (*pIt)->getWeight();
-              }
-            }
-            
-            if (!set) {
-              domain->push_back(transitionMap[&t]);
-              values->push_back(-1*(*pIt)->getWeight());
-            }
-      }
-      
-      CustomConstraint* newConstraint = new CustomConstraint(domain,values,op,value);
-      delete domain; delete values;
-      result->constraints[current].push_back(newConstraint);
-    }
-    
-    // for each label, add a constraint
-    for (std::set<pnapi::Label *>::iterator it =
-	    labels.begin(); it != labels.end(); ++it) {
-      std::vector<int>* domain = new std::vector<int>();
-      std::vector<int>* values = new std::vector<int>();            
-      int id = labelMap[(*it)];
-      domain->push_back(id);
-      values->push_back(-1);      
-      for (std::set<pnapi::Transition*>::iterator tIt = (*it)->getTransitions().begin(); tIt != (*it)->getTransitions().end(); ++tIt) {
-        domain->push_back(transitionMap[*tIt]);
-        values->push_back(1);
-      }
-      CustomConstraint* newConstraint = new CustomConstraint(domain,values,EQ,0);
-      result->constraints[current].push_back(newConstraint);
-    }
-    
-  }
-
-  return result;
-
-
-}
-
 
 
 ServiceModel* parsedModel;
@@ -181,7 +73,10 @@ int main(int argc, char** argv) {
 	* The Yasmina Workflow in short:
 	* ----------------------------
 	* Evaluate command line parameters
-
+  * Parse all fingerprints
+  * Parse all open nets
+  * Find all defined composites
+  * Check compatibility for each defined composite
 	*/
 
 	// Start the stopwatch
@@ -239,7 +134,7 @@ for (int i = 0; i < args_info.net_given;	++i) {
 			abort(3, "pnapi error %i", inputerror.str().c_str());
 		}	
 		
-		ServiceModel* netModel = createModelFromOpenNet(net);
+		ServiceModel* netModel = new StateEquation(net);
 		netModel->alias = YasminaLog::models.size()+1;
 		netModel->name = args_info.net_arg[i];
 		YasminaLog::models.push_back(netModel);
@@ -258,7 +153,7 @@ for (int i = 0; i < args_info.net_given;	++i) {
   message("Performing compatibility checks...");    
   int incompatibles = 0;
   int inconclusives = 0;
-  int syntacticallyIncompatibles = 0;
+  int undefineds = 0;
   int lpcounter = 0;
 
   unsigned int upper = (unsigned int) pow(2.0,(double) YasminaLog::models.size());
@@ -359,19 +254,19 @@ for (int i = 0; i < args_info.net_given;	++i) {
         YasminaLog::results.push_back(Result(currentComposite,0)); 
       }   
     } else {
-    status("Composite syntactically incompatible: %s", currentCompositeString.c_str());
+    status("Composite undefined: %s", currentCompositeString.c_str());
       YasminaLog::results.push_back(Result(currentComposite,-1));
-      ++syntacticallyIncompatibles;
+      ++undefineds;
     }	
   } 
 
 	message("Overall statistics:");
 	message("    %i incompatible composites ", incompatibles);
 	message("    %i inconclusive results ", inconclusives);
-  if ((!args_info.verbose_given) && (syntacticallyIncompatibles != 0)) {
-  	message("   [%i composites with incompatible interfaces (enable -v for details)]", syntacticallyIncompatibles);
+  if ((!args_info.verbose_given) && (undefineds != 0)) {
+  	message("   [%i undefined composites (enable -v for details)]", undefineds);
 	} else {
-		status("    %i composites with incompatible interfaces", syntacticallyIncompatibles);
+		status("    %i undefined composites", undefineds);
 	}	
 	message("    %i integer linear programs solved ", lpcounter);
   

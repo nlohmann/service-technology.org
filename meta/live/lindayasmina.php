@@ -34,10 +34,10 @@
   
    $lindaCalls[$key] = "linda $paramsL " . $opennetFiles[$key]["residence"] . " -o "  . $fingerprintFiles[$key]["residence"] . " 2>&1";
   $lindaFakeCalls[$key] = "linda $paramsL $value.owfn -o $value.owfn.fp";
-   $yasminaCall .= " -m " . $fingerprintFiles[$key]["residence"];
-   $yasminaFakeCall .= " -m $value.owfn.fp";   
+   $yasminaCall .= " -f " . $fingerprintFiles[$key]["residence"];
+   $yasminaFakeCall .= " -f $value.owfn.fp";   
   }
-  if (isset( $_SESSION[$tool]["ly_output_yasmina_output"]) && $_SESSION[$tool]["ly_output_yasmina_output_option"] == "verbose") { $yasminaFakeCall .= " -v";}
+  if (isset( $_SESSION[$tool]["ly_output_yasmina_output"]) && $_SESSION[$tool]["ly_output_yasmina_output_option"] == "verbose") { $yasminaCall .= " -v"; $yasminaFakeCall .= " -v";}
   $yasminaCall .=  " 2>&1";
 
   ?>
@@ -128,10 +128,10 @@
 
       <h2>Result</h2>
       <?php 
-      if (trim(exec("$yasminaCall | grep \"Not compatible\"")) != "") {
-        echo "Not compatible!";
+      if (trim(exec("$yasminaCall | grep \"Models incompatible\"")) != "") {
+        echo "Models incompatible: Composite is not weakly terminating!";
       } else {
-        echo "Inconclusive!";
+        echo "The check was inconclusive.";
       }
       
       ?>

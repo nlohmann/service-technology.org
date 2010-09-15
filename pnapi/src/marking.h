@@ -45,6 +45,10 @@ public: /* public methods */
   UnsignedOmegaInt & operator=(unsigned int);
   /// comparison operator
   bool operator==(const UnsignedOmegaInt &) const;
+  /// addition operator
+  UnsignedOmegaInt operator+(const UnsignedOmegaInt &) const;
+  /// addition operator
+  UnsignedOmegaInt operator+(unsigned int) const;
   /// implicit cast to unsigned int
   operator unsigned int() const;
   
@@ -106,13 +110,13 @@ public: /* public methods */
   bool operator>=(const AbstractMarking<T> &) const;
   
   /// adds the given marking and this one
-  AbstractMarking<T> operator+(const AbstractMarking<T> &) const;
+  template <typename U> AbstractMarking<T> operator+(const AbstractMarking<U> &) const;
   /// subtracts this marking and the given one
-  AbstractMarking<T> operator-(const AbstractMarking<T> &) const;
+  template <typename U> AbstractMarking<T> operator-(const AbstractMarking<U> &) const;
   /// adds the given marking to this one
-  AbstractMarking<T> & operator+=(const AbstractMarking<T> &);
+  template <typename U> AbstractMarking<T> & operator+=(const AbstractMarking<U> &);
   /// subtracts the given marking from this one
-  AbstractMarking<T> & operator-=(const AbstractMarking<T> &);
+  template <typename U> AbstractMarking<T> & operator-=(const AbstractMarking<U> &);
   //@}
   
   /*!
@@ -457,7 +461,7 @@ template <typename T> bool AbstractMarking<T>::operator>=(const AbstractMarking<
 /*!
  * \brief adds the given marking and this one
  */
-template <typename T> AbstractMarking<T> AbstractMarking<T>::operator+(const AbstractMarking<T> & m) const
+template <typename T> template <typename U> AbstractMarking<T> AbstractMarking<T>::operator+(const AbstractMarking<U> & m) const
 {
   AbstractMarking<T> result(*this);
   result += m;
@@ -467,7 +471,7 @@ template <typename T> AbstractMarking<T> AbstractMarking<T>::operator+(const Abs
 /*!
  * \brief subtracts this marking and the given one
  */
-template <typename T> AbstractMarking<T> AbstractMarking<T>::operator-(const AbstractMarking<T> & m) const
+template <typename T> template <typename U> AbstractMarking<T> AbstractMarking<T>::operator-(const AbstractMarking<U> & m) const
 {
   bool negativeFound = false;
   AbstractMarking<T> result(*this);
@@ -488,7 +492,7 @@ template <typename T> AbstractMarking<T> AbstractMarking<T>::operator-(const Abs
 /*!
  * \brief adds the given marking to this one
  */
-template <typename T> AbstractMarking<T> & AbstractMarking<T>::operator+=(const AbstractMarking<T> & m)
+template <typename T> template <typename U> AbstractMarking<T> & AbstractMarking<T>::operator+=(const AbstractMarking<U> & m)
 {
   PNAPI_FOREACH(p, m.m_)
   {
@@ -500,7 +504,7 @@ template <typename T> AbstractMarking<T> & AbstractMarking<T>::operator+=(const 
 /*!
  * \brief subtracts the given marking from this one
  */
-template <typename T> AbstractMarking<T> & AbstractMarking<T>::operator-=(const AbstractMarking<T> & m)
+template <typename T> template <typename U> AbstractMarking<T> & AbstractMarking<T>::operator-=(const AbstractMarking<U> & m)
 {
   (*this) = (*this) - m;
   return *this;

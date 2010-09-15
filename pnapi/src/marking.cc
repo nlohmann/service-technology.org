@@ -90,6 +90,19 @@ bool UnsignedOmegaInt::operator==(const UnsignedOmegaInt & other) const
 }
 
 /*!
+ * \brief addition operator
+ */
+UnsignedOmegaInt UnsignedOmegaInt::operator+(unsigned int i) const
+{
+  if(isOmega_)
+  {
+    return this;
+  }
+  
+  return UnsignedOmegaInt(value_ + i);
+}
+
+/*!
  * \brief implicit cast to unsigned int
  * 
  * This cast allows application of all unsigned int arithmetics to this type.

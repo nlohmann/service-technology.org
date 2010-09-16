@@ -7,6 +7,24 @@ to detect if all output places can be marked.
 Input (a list of Petri nets) and output (a list of problems) come
 through stdin and stdout."
 
+section "Problem Definitions"
+
+option "quasilive" q
+  "Checks for each net if all transitions can be activated."
+  flag off
+
+option "propercompletion" p
+  "Checks for each net if the only reachable marking covering the final marking is the final marking itself."
+  flag off
+
+option "lazysound" l
+  "Checks each net for lazy soundness."
+  flag off
+
+option "relaxedsound" r
+  "Checks each net for relaxed soundness."
+  flag off
+
 section "Miscellaneous"
 
 option "verbose" v

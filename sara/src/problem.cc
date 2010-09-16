@@ -7,11 +7,11 @@
  *
  * \author  Harro Wimmel <harro.wimmel@uni-rostock.de>
  *
- * \since   2009/10/21
+ * \since   2010/09/16
  *
- * \date    $Date: 2009-10-21 12:00:00 +0200 (Mi, 21. Okt 2009) $
+ * \date    $Date: 2010-09-16 12:00:00 +0200 (Do, 16. Sep 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 1.03 $
  */
 
 #include <cstdio>
@@ -487,7 +487,7 @@ void Problem::showConstraints() {
 		for(mit=lhs.begin(); mit!=lhs.end(); ++mit)
 		{
 			if (mit!=lhs.begin() && mit->second>0) cout << "+";
-			cout << mit->second << mit->first->getName();
+			if (mit->second!=0) cout << mit->second << mit->first->getName();
 		}
 		switch(comp) {
 			case LE: cout << "<="; break;
@@ -497,4 +497,31 @@ void Problem::showConstraints() {
 		cout << rhs << " ";
 	}
 }
+
+/** When a property needs to be checked by Sara, we can set this flag to tell whether all problem
+	instances belonging to the property to check must have a solution of fail to have one
+	for the property to hold.
+	@param neg False=All problems must have a solution, True=All problems must fail to
+		have a solution.
+*/
+void Problem::setNegateResult(bool neg) { negate = neg; }
+
+/** Set a name of a property to be checked.
+	@param res The name of the property.
+*/
+void Problem::setResultText(string res) { result = res; }
+
+/** When a property needs to be checked by Sara, this flag tells us whether all problem
+	instances belonging to the property to check must have a solution of fail to have one
+	for the property to hold.
+	@return False=All problems must have a solution, True=All problems must fail to
+		have a solution.
+*/
+bool Problem::isNegateResult() { return negate; }
+
+/** Get the name of the property to be checked.
+	@param res The name of the property.
+*/
+string Problem::getResultText() { return result; }
+
 

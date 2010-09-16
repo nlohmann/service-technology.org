@@ -88,10 +88,6 @@ while (cin >> in)
 	char* tok = strtok(seq," :,;"); 
 	while (tok!=NULL) {
 		char* filename(tok);
-/*
-		// print the filename
-		cout << filename << endl;
-*/
 
 		// load the Petri net
 		Problem pbl;
@@ -111,36 +107,174 @@ while (cin >> in)
 			if ((*cit)->getPostset().empty()) final[(*cit)] = 1;
 
 		// print the problem
-		cout << "PROBLEM " << "final_marking_in_" << pbl.getFilename() << ":" << endl;
-		cout << "GOAL REACHABILITY;" << endl;
-		cout << "FILE " << pbl.getFilename() << " TYPE ";
-		switch(nettype) {
-			case Problem::OWFN: cout << "OWFN"; break;
-			case Problem::LOLA: cout << "LOLA"; break;
-			case Problem::PNML: cout << "PNML"; break;
+		if (args_info.quasilive_given)
+		{
+			// get all transitions
+			set<Transition*> tset(pn->getTransitions());
+			if (tset.empty()) cerr << "sara: no transitions in Petri net " << filename << endl;
+			set<Transition*>::iterator it;
+			for(it=tset.begin(); it!=tset.end(); ++it)
+			{
+				char* tname = new char[strlen((*it)->getName().c_str())+1];
+				strcpy(tname,(*it)->getName().c_str());
+				for(int z=0; z<strlen(tname); ++z)
+					if (tname[z]==':') tname[z]='.'; 
+				cout << "PROBLEM enabling_of_" << tname << "_in_" << filename << ":" << endl;
+				delete tname;
+				cout << "GOAL REACHABILITY;" << endl;
+				cout << "FILE " << filename << " TYPE ";
+				switch(nettype) {
+					case Problem::OWFN: cout << "OWFN"; break;
+					case Problem::LOLA: cout << "LOLA"; break;
+					case Problem::PNML: cout << "PNML"; break;
+				}
+				cout << ";" << endl << "INITIAL ";
+				bool first = true;
+				map<const Place*,unsigned int>::const_iterator pit;
+				for(pit=m.begin(); pit!=m.end(); ++pit)
+					if (pit->second>0) {
+						if (!first) cout << ",";
+						cout << pit->first->getName() << ":" << pit->second;
+						first = false;
+					}
+				cout << ";" << endl;
+				cout << "FINAL COVER ";
+				set<pnapi::Arc*> arcs((*it)->getPresetArcs());
+				set<pnapi::Arc*>::iterator ait;
+				first = true;
+				for(ait=arcs.begin(); ait!=arcs.end(); ++ait) {
+					if (!first) cout << ",";
+					cout << (*ait)->getPlace().getName() << ">" << (*ait)->getWeight();
+					first = false;
+				}
+				cout << ";" << endl;
+				cout << "RESULT quasiliveness;" << endl;
+				cout << endl;
+			}
 		}
-		cout << ";" << endl << "INITIAL ";
-		bool first = true;
-		map<const Place*,unsigned int>::const_iterator pit;
-		for(pit=m.begin(); pit!=m.end(); ++pit)
-			if (pit->second>0) {
-				if (!first) cout << ",";
-				cout << pit->first->getName() << ":" << pit->second;
+		if (args_info.propercompletion_given)
+		{
+			cout << "PROBLEM " << "proper_completion_in_" << filename << ":" << endl;
+			cout << "GOAL REACHABILITY;" << endl;
+			cout << "FILE " << filename << " TYPE ";
+			switch(nettype) {
+				case Problem::OWFN: cout << "OWFN"; break;
+				case Problem::LOLA: cout << "LOLA"; break;
+				case Problem::PNML: cout << "PNML"; break;
+			}
+			cout << ";" << endl << "INITIAL ";
+			bool first = true;
+			map<const Place*,unsigned int>::const_iterator pit;
+			for(pit=m.begin(); pit!=m.end(); ++pit)
+				if (pit->second>0) {
+					if (!first) cout << ",";
+					cout << pit->first->getName() << ":" << pit->second;
+					first = false;
+				}
+			cout << ";" << endl;
+			cout << "FINAL COVER ";
+			first = true;
+			map<Place*,int>::iterator fit;
+			int fsum(1);
+			for(fit=final.begin(); fit!=final.end(); ++fit)
+				if (fit->second>0) {
+					if (!first) cout << ",";
+					cout << fit->first->getName() << ">" << fit->second;
+					fsum += fit->second;
+					first = false;
+				}
+			cout << ";" << endl;
+			cout << "CONSTRAINTS ";
+			first = true;
+			for(cit=places.begin(); cit!=places.end(); ++cit)
+			{
+				if (!first) cout << "+";
+				cout << (*cit)->getName();
 				first = false;
 			}
-		cout << ";" << endl;
-		cout << "FINAL ";
-		first = true;
-		map<Place*,int>::iterator fit;
-		for(fit=final.begin(); fit!=final.end(); ++fit)
-			if (fit->second>0) {
-				if (!first) cout << ",";
-				cout << fit->first->getName() << ":" << fit->second;
-				first = false;
+			cout << ">" << fsum << ";" << endl;
+			cout << "RESULT NEGATE proper_completion;" << endl;
+			cout << endl;
+		}
+		if (args_info.lazysound_given)
+		{
+			cout << "PROBLEM " << "lazy_soundness_in_" << filename << ":" << endl;
+			cout << "GOAL REACHABILITY;" << endl;
+			cout << "FILE " << filename << " TYPE ";
+			switch(nettype) {
+				case Problem::OWFN: cout << "OWFN"; break;
+				case Problem::LOLA: cout << "LOLA"; break;
+				case Problem::PNML: cout << "PNML"; break;
 			}
-		cout << ";" << endl;
-		cout << endl;
-
+			cout << ";" << endl << "INITIAL ";
+			bool first = true;
+			map<const Place*,unsigned int>::const_iterator pit;
+			for(pit=m.begin(); pit!=m.end(); ++pit)
+				if (pit->second>0) {
+					if (!first) cout << ",";
+					cout << pit->first->getName() << ":" << pit->second;
+					first = false;
+				}
+			cout << ";" << endl;
+			cout << "FINAL COVER ";
+			first = true;
+			map<Place*,int>::iterator fit;
+			for(fit=final.begin(); fit!=final.end(); ++fit)
+				if (fit->second>0) {
+					if (!first) cout << ",";
+					cout << fit->first->getName() << ":" << fit->second;
+					first = false;
+				}
+			cout << ";" << endl;
+			cout << "RESULT lazy_soundness;" << endl;
+			cout << endl;
+		}
+		if (args_info.relaxedsound_given)
+		{
+			// get all transitions
+			set<Transition*> tset(pn->getTransitions());
+			if (tset.empty()) cerr << "sara: no transitions in Petri net " << filename << endl;
+			set<Transition*>::iterator it;
+			for(it=tset.begin(); it!=tset.end(); ++it)
+			{
+				char* tname = new char[strlen((*it)->getName().c_str())+1];
+				strcpy(tname,(*it)->getName().c_str());
+				for(int z=0; z<strlen(tname); ++z)
+					if (tname[z]==':') tname[z]='.';
+				cout << "PROBLEM " << "relaxed_soundness_of_" << tname << "_in_" << filename << ":" << endl;
+				delete tname;
+				cout << "GOAL REACHABILITY;" << endl;
+				cout << "FILE " << filename << " TYPE ";
+				switch(nettype) {
+					case Problem::OWFN: cout << "OWFN"; break;
+					case Problem::LOLA: cout << "LOLA"; break;
+					case Problem::PNML: cout << "PNML"; break;
+				}
+				cout << ";" << endl << "INITIAL ";
+				bool first = true;
+				map<const Place*,unsigned int>::const_iterator pit;
+				for(pit=m.begin(); pit!=m.end(); ++pit)
+					if (pit->second>0) {
+						if (!first) cout << ",";
+						cout << pit->first->getName() << ":" << pit->second;
+						first = false;
+					}
+				cout << ";" << endl;
+				cout << "FINAL ";
+				first = true;
+				map<Place*,int>::iterator fit;
+				for(fit=final.begin(); fit!=final.end(); ++fit)
+					if (fit->second>0) {
+						if (!first) cout << ",";
+						cout << fit->first->getName() << ":" << fit->second;
+						first = false;
+					}
+				cout << ";" << endl;
+				cout << "CONSTRAINTS " << (*it)->getName() << ">1;" << endl;
+				cout << "RESULT relaxed_soundness;" << endl;
+				cout << endl;
+			}
+		}
 
 		// on to the next filename
 		tok = strtok(NULL," :,;");

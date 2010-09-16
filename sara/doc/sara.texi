@@ -648,9 +648,23 @@ additional debugging output.
 Additional utilities can be found in the utils directory. At this time there is
 only one tool: owfn2sara. Owfn2sara takes a list of Petri net files from stdin,
 computes a final marking for each net (containing each place with an empty postset)
-and creates a list of problems instances, one for each net, which are written to stdout. 
-This list can be piped to the main tool Sara to check the reachability of the final marking
-for each of the Petri nets.
+and creates a list of problem instances, at least one for each net, which are written to stdout. 
+This list can be piped to the main tool Sara to check if certain properties hold.
+
+The following options/properties are available:
+
+@cartouche
+@smallexample
+owfn2sara -q ... Quasiliveness: checks if each transition can be enabled.
+owfn2sara -p ... Proper Completion: check fails if the final marking can be truly covered.
+owfn2sara -l ... Lazy Soundness: checks if the places of the final marking can be marked 
+simultaneously.
+owfn2sara -r ... Relaxed Soundness: checks if each transition can be fired and in each case
+then the final marking is reachable.
+@end smallexample
+@end cartouche
+
+All options can be combined to check for all properties at once.
 
 @c --------------------------------------------------------------------------
 

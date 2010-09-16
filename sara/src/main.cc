@@ -56,6 +56,8 @@ vector<Place*> placeorder;
 map<Transition*,int> revtorder;
 /// inverted placeorder for back references
 map<Place*,int> revporder;
+/// for property checks via owfn2sara: if the properties hold so far
+map<string,bool> results;
 
 /*
 template <class T>
@@ -86,6 +88,7 @@ void evaluateParameters(int argc, char** argv) {
 
     free(params);
 }
+
 
 /*! Main method of Sara.
 	\param argc Number of arguments.
@@ -274,9 +277,10 @@ if (args_info.input_given || args_info.pipe_given) {
 	// walk through the problem list
 	for(unsigned int x=0; x<pbls.size(); ++x)
 	{
+		results[pbls.at(x).getResultText()] = true;
 		cout << "sara: Problem " << (++loops) << ": " << pbls.at(x).getName() << endl;
 		if (args_info.log_given) // print info also to log file if one has been given
-			cerr << "sara: Problem " << (++loops) << ": " << pbls.at(x).getName() << endl;
+			cerr << "sara: Problem " << (loops) << ": " << pbls.at(x).getName() << endl;
 		PetriNet* pn(pbls.at(x).getPetriNet()); // obtain the Petri net and its P/T-ordering
 		if (x+1<pbls.size()) pbls.at(x+1).checkForNetReference(pbls.at(x)); // possibly advance the net to the next problem (if it has the same net)
 		Marking m1(pbls.at(x).getInitialMarking()); // get the initial marking
@@ -325,8 +329,14 @@ if (args_info.input_given || args_info.pipe_given) {
 					int mtl = solutions.printSolutions(avetracelen,pbls.at(x)); // get the solution length for this problem
 					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
 					solcnt+=solutions.size();
+					if (pbls.at(x).isNegateResult())
+						results[pbls.at(x).getResultText()] = false;
 				}
-				else cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;
+				else { 
+					cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;
+					if (!pbls.at(x).isNegateResult())
+						results[pbls.at(x).getResultText()] = false;
+				}
 				if ((!solutions.almostEmpty() || !verbose) && !args_info.continue_given) break;
 				// if witnesses are sought and we have no solution, we pass the problem on
 				passedon = true;
@@ -343,7 +353,14 @@ if (args_info.input_given || args_info.pipe_given) {
 					reach.start(); // if everything is ok, solve the problem
 					clock_t mytime(reach.getTime()); // ... and measure the CPU time for that
 					// count the solutions
-					if (reach.getStatus()==Reachalyzer::SOLUTION_FOUND) solcnt+=reach.numberOfSolutions(); 
+					if (reach.getStatus()==Reachalyzer::SOLUTION_FOUND) {
+						solcnt+=reach.numberOfSolutions(); 
+						if (pbls.at(x).isNegateResult())
+							results[pbls.at(x).getResultText()] = false;
+					} else {
+						if (!pbls.at(x).isNegateResult())
+							results[pbls.at(x).getResultText()] = false;
+					}
 					reach.printResult(); // ... and print the result
 					int mtl = reach.getMaxTraceLength(); // get the maximal solution length for this problem
 					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
@@ -377,6 +394,14 @@ if (args_info.input_given || args_info.pipe_given) {
 			if (avetracelen!=maxtracelen*solcnt) cout << ", average is " << (avetracelen%solcnt==0?"":"about ") << avetracelen/solcnt+(avetracelen%solcnt>=solcnt/2?1:0);
 			cout << "." << endl;
 		}
+		map<string,bool>::iterator mbit;
+		for(mbit=results.begin(); mbit!=results.end(); ++mbit)
+			if (mbit->first!="")
+			{
+				cout << "sara: The property of " << mbit->first;
+				if (mbit->second) cout << " is fulfilled." << endl;
+				else cout << " does not hold." << endl;
+			}
 	}
 	if (args_info.time_given) // print time use if --time was specified
 		cout << "sara: Used " << (float)(endtime-starttime)/CLOCKS_PER_SEC << " seconds overall." << endl;

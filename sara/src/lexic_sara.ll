@@ -53,6 +53,8 @@ finalm FINAL
 cover COVER
 reach REACH
 constraints CONSTRAINTS
+result RESULT
+negate NEGATE
 
 %%
 
@@ -77,6 +79,8 @@ constraints CONSTRAINTS
 {cover} { return COVER; }
 {reach}	{ return REACH; }
 {constraints}	{ return CONSTRAINTS; }
+{result} { BEGIN(xname); return RESULT; }
+{negate} { return NEGATE; }
 {number}     { sara_lval.val = atoi(sara_text); return NUMBER; }
 
 <nname>{name}       { sara_NAME_token = sara_text; return NAME; }

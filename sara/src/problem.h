@@ -7,11 +7,11 @@
  *
  * \author  Harro Wimmel <harro.wimmel@uni-rostock.de>
  *
- * \since   2009/10/21
+ * \since   2010/09/16
  *
- * \date    $Date: 2009-10-21 12:00:00 +0200 (Mi, 21. Okt 2009) $
+ * \date    $Date: 2010-09-16 12:00:00 +0200 (Do, 16. Sep 2010) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 1.03 $
  */
 
 #ifndef PROBLEM_H
@@ -121,6 +121,18 @@ public:
 	/// Print the global constraints
 	void showConstraints();
 
+	/// Set whether the final result of a property check should be inverted
+	void setNegateResult(bool neg);
+
+	/// Set the name of the property to be checked by this problem instance
+	void setResultText(string res);
+
+	/// Whether the final result of a property check should be inverted
+	bool isNegateResult();
+
+	/// The name of the property to be checked by this problem instance
+	string getResultText();
+
 	/// Goals
 	enum Types {
 		REACHABLE = 0,
@@ -173,6 +185,12 @@ private:
 
 	/// complex constraints, right hand
 	vector<int> crhs;
+
+	/// Whether the property checked here has to be negated
+	bool negate;
+
+	/// The name a property to be checked
+	string result;
 };
 
 #endif

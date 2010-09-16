@@ -8,6 +8,15 @@
 
 
 PURPOSE
+Version 1.03 (16 Sep 2010)
+==========================
+
+* added property checks for quasiliveness, proper completion, lazy &
+  relaxed soundness to owfn2sara
+
+* extended problem specification so Sara can properly answer questions
+  about the above properties
+
 Version 1.02 (07 Sep 2010)
 ==========================
 

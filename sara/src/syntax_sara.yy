@@ -17,7 +17,7 @@
  along with Sara.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
 
-%token COLON COMMA ARROW NUMBER NAME ENAME SEMICOLON PROBLEM GOAL REACHABILITY REALIZABILITY NFILE NTYPE TYPEOWFN TYPELOLA TYPEPNML INITIALM FINALM COVER REACH MYLEQ MYGEQ CONSTRAINTS PLUS MINUS
+%token COLON COMMA ARROW NUMBER NAME ENAME RESULT NEGATE SEMICOLON PROBLEM GOAL REACHABILITY REALIZABILITY NFILE NTYPE TYPEOWFN TYPELOLA TYPEPNML INITIALM FINALM COVER REACH MYLEQ MYGEQ CONSTRAINTS PLUS MINUS
 
 %defines
 %name-prefix="sara_"
@@ -72,6 +72,7 @@ problem:
 	INITIALM inodes SEMICOLON
 	FINALM mode { pbl.setGeneralCover(cov); } fnodes SEMICOLON
 	constraints
+	showresult
 	{ pbls.push_back(pbl); pbl.clear(); }
 ;
  
@@ -156,4 +157,11 @@ comparator:
 |	MYGEQ { ccomp = GE; }
 |	MYLEQ { ccomp = LE; }
 ;
+
+showresult:
+	/* empty */
+|   RESULT ENAME SEMICOLON { pbl.setNegateResult(false); pbl.setResultText(sara_NAME_token); }
+|   RESULT NEGATE ENAME SEMICOLON { pbl.setNegateResult(true); pbl.setResultText(sara_NAME_token); }
+;
+
 

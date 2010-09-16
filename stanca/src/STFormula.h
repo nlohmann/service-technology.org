@@ -105,43 +105,60 @@ inline  string toString(STStructure sp){
 
 
 
-//typedef STStructure Siphon;
-//typedef STStructure Trap;
 
+/*! \brief Generic formula with literals as places for the 
+	computation of specific place subsets.
+ 
+ Class for formulas with places as literals of a Petri net.
+ There may be more literals for a place have unique identifiers. 
+  */
 
-//formula class specially built for MINISAT with places as literals
 class PFormula  {
 protected:
-	unsigned int maxid; // used for minisat 
-	unsigned int mit;//number of iterations for the place literals
-	pnapi::PetriNet *net;//underlying Petri net
-	vector<vector<int> > formula;//
-	vector<PlaceLit> pl;//replaced the old map with a struct allowing access to id names
-	//void addClause(vector<int> clause);//adds a clause to the formula not necessary any more
-	map<string, vector<unsigned int> > mp;//place mapping to ids and iterations
-	STStructure* assign;//satisfying assignment in case there is one
+	 /// maximal id for for minisat
+	unsigned int maxid;
+	///number of iterations for the place literals
+	unsigned int mit;
+	///underlying Petri net
+	pnapi::PetriNet *net;
+	///input for Minisat
+	vector<vector<int> > formula;
+	///replaced the old map with a struct allowing access to id names
+	vector<PlaceLit> pl;
+	///place mapping to ids and iterations
+	map<string, vector<unsigned int> > mp;
+	///satisfying assignment in case there is one
+	STStructure* assign;
 	virtual ~PFormula(){}
 public: 
 	PFormula(){}
 	//PFormula(pnapi::PetriNet *net1);
-	string toString();//get the internal representation as a string
+	//get the internal representation as a string
+	string toString();
+	
 	pnapi::PetriNet getNet();
 	void setNet(pnapi::PetriNet * net);
 	void setMap();//setting place literals
 	virtual void setFormula()=0;//construct the formula
 	//eventually minimize it using minisat
-	//virtual STStructure* getSatisfyingAssignment();//? just one assignment directly check that it is non-empty
+	/// print formula with minisat identifiers
 	void printFormula();
+	/// print formula with place literals
 	void printPlaceFormula();
 };
 
-//siphon formula is a special kind of formula with its own set function
-//and a siphon structure in it mit=1
+/*! \brief Siphon formula
+ 
+ */
 class SiphonFormula : public PFormula{
 public:
 	SiphonFormula(pnapi::PetriNet *net1);
 	void setFormula();//construct the formula from the net
 };
+
+/*! \brief Trap formula
+ 
+ */
 
 class TrapFormula : public PFormula{
 public:
@@ -149,12 +166,18 @@ public:
 	void setFormula();//construct the formula from the net
 };
 
-//siphon with trap inside
+/*! \brief Siphon with trap inside formula
+ 
+ */
 class SwTFormula : public PFormula{
 public:
 	SwTFormula(pnapi::PetriNet *net1);
 	void setFormula();//construct the formula from the net
 };
+
+/*! \brief Siphon-trap property formula
+ 
+ */
 
 class STFormula : public PFormula{
 public:

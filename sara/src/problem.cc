@@ -65,7 +65,7 @@ extern gengetopt_args_info args_info;
 
 /** Standard constructor.
 */
-Problem::Problem() : deinit(false),generalcover(false),type(REACHABLE),nettype(LOLA),pn(NULL) {}
+Problem::Problem() : deinit(false),generalcover(false),type(REACHABLE),nettype(LOLA),pn(NULL),negate(false) {}
 
 /** Destructor.
 */
@@ -517,11 +517,11 @@ void Problem::setResultText(string res) { result = res; }
 	@return False=All problems must have a solution, True=All problems must fail to
 		have a solution.
 */
-bool Problem::isNegateResult() { return negate; }
+bool Problem::isNegateResult() const { return negate; }
 
 /** Get the name of the property to be checked.
-	@param res The name of the property.
+	@return The name of the property.
 */
-string Problem::getResultText() { return result; }
+string Problem::getResultText() const { return result; }
 
 

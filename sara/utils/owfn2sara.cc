@@ -159,7 +159,7 @@ while (cin >> in)
 			{
 				char* tname = new char[strlen((*it)->getName().c_str())+1];
 				strcpy(tname,(*it)->getName().c_str());
-				for(int z=0; z<strlen(tname); ++z)
+				for(unsigned int z=0; z<strlen(tname); ++z)
 					if (tname[z]==':') tname[z]='.'; 
 				cout << "PROBLEM enabling_of_" << tname << "_in_" << filename << ":" << endl;
 				delete[] tname;
@@ -281,7 +281,7 @@ while (cin >> in)
 			{
 				char* tname = new char[strlen((*it)->getName().c_str())+1];
 				strcpy(tname,(*it)->getName().c_str());
-				for(int z=0; z<strlen(tname); ++z)
+				for(unsigned int z=0; z<strlen(tname); ++z)
 					if (tname[z]==':') tname[z]='.';
 				cout << "PROBLEM " << "relaxed_soundness_of_" << tname << "_in_" << filename << ":" << endl;
 				delete[] tname;

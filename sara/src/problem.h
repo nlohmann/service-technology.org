@@ -128,10 +128,10 @@ public:
 	void setResultText(string res);
 
 	/// Whether the final result of a property check should be inverted
-	bool isNegateResult();
+	bool isNegateResult() const;
 
 	/// The name of the property to be checked by this problem instance
-	string getResultText();
+	string getResultText() const;
 
 	/// Goals
 	enum Types {

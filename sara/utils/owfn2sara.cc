@@ -31,6 +31,7 @@ using std::ifstream;
 using std::ofstream;
 using std::ostringstream;
 using std::setw;
+using pnapi::Node;
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -76,9 +77,9 @@ int main(int argc, char** argv) {
     evaluateParameters(argc, argv);
 
 
-/***************************
-* CONSTRUCT SINGLE PROBLEM *
-***************************/
+/******************************
+* CONSTRUCT PROBLEM INSTANCES *
+******************************/
 
 string in;
 while (cin >> in) 
@@ -106,6 +107,47 @@ while (cin >> in)
 		for(cit=places.begin(); cit!=places.end(); ++cit)
 			if ((*cit)->getPostset().empty()) final[(*cit)] = 1;
 
+		// adapt the net if necessary
+		bool adapted(false);
+		if (args_info.adapt_given)
+		{
+			const set<Node*> nodes(pn->getNodes());
+			set<Node*>::const_iterator nit;
+			for(nit=nodes.begin(); nit!=nodes.end(); ++nit)
+			{
+				char* nname = new char[strlen((*nit)->getName().c_str())+1];
+				strcpy(nname,(*nit)->getName().c_str());
+				for(unsigned int z=0; nname[z]; ++z)
+				{
+					switch (nname[z])
+					{
+						case ':': nname[z]='.'; adapted=true; break;
+						case '+': nname[z]='P'; adapted=true; break;
+						case '-': nname[z]='M'; adapted=true; break;
+						case '<': nname[z]='('; adapted=true; break;
+						case '>': nname[z]=')'; adapted=true; break;
+						case ' ': nname[z]='_'; adapted=true; break;
+						case ',': nname[z]='´'; adapted=true; break;
+						case ';': nname[z]='|'; adapted=true; break;
+					}
+				}
+				string newname(nname);
+				try { (*nit)->setName(newname); }
+				catch (pnapi::exception::UserCausedError error) {
+					cerr << "sara: error: " << error << endl;
+					cerr << "sara: renaming the node " << (*nit)->getName();
+					cerr << " in the Petri net " << filename << " to ";
+					cerr << newname << " failed; probably the new name already exists." << endl;
+				}
+				delete[] nname;
+			}
+			if (adapted)
+			{
+				pbl.setFilename(pbl.getFilename()+".adapt");
+				pbl.savePetriNet();
+			}
+		}
+
 		// print the problem
 		if (args_info.quasilive_given)
 		{
@@ -120,9 +162,9 @@ while (cin >> in)
 				for(int z=0; z<strlen(tname); ++z)
 					if (tname[z]==':') tname[z]='.'; 
 				cout << "PROBLEM enabling_of_" << tname << "_in_" << filename << ":" << endl;
-				delete tname;
+				delete[] tname;
 				cout << "GOAL REACHABILITY;" << endl;
-				cout << "FILE " << filename << " TYPE ";
+				cout << "FILE " << filename << (adapted?".adapt":"") << " TYPE ";
 				switch(nettype) {
 					case Problem::OWFN: cout << "OWFN"; break;
 					case Problem::LOLA: cout << "LOLA"; break;
@@ -156,7 +198,7 @@ while (cin >> in)
 		{
 			cout << "PROBLEM " << "proper_completion_in_" << filename << ":" << endl;
 			cout << "GOAL REACHABILITY;" << endl;
-			cout << "FILE " << filename << " TYPE ";
+			cout << "FILE " << filename << (adapted?".adapt":"") << " TYPE ";
 			switch(nettype) {
 				case Problem::OWFN: cout << "OWFN"; break;
 				case Problem::LOLA: cout << "LOLA"; break;
@@ -200,7 +242,7 @@ while (cin >> in)
 		{
 			cout << "PROBLEM " << "lazy_soundness_in_" << filename << ":" << endl;
 			cout << "GOAL REACHABILITY;" << endl;
-			cout << "FILE " << filename << " TYPE ";
+			cout << "FILE " << filename << (adapted?".adapt":"") << " TYPE ";
 			switch(nettype) {
 				case Problem::OWFN: cout << "OWFN"; break;
 				case Problem::LOLA: cout << "LOLA"; break;
@@ -242,9 +284,9 @@ while (cin >> in)
 				for(int z=0; z<strlen(tname); ++z)
 					if (tname[z]==':') tname[z]='.';
 				cout << "PROBLEM " << "relaxed_soundness_of_" << tname << "_in_" << filename << ":" << endl;
-				delete tname;
+				delete[] tname;
 				cout << "GOAL REACHABILITY;" << endl;
-				cout << "FILE " << filename << " TYPE ";
+				cout << "FILE " << filename << (adapted?".adapt":"") << " TYPE ";
 				switch(nettype) {
 					case Problem::OWFN: cout << "OWFN"; break;
 					case Problem::LOLA: cout << "LOLA"; break;
@@ -275,11 +317,44 @@ while (cin >> in)
 				cout << endl;
 			}
 		}
+		if (args_info.finalmarking_given)
+		{
+			cout << "PROBLEM " << "final_marking_in_" << filename << ":" << endl;
+			cout << "GOAL REACHABILITY;" << endl;
+			cout << "FILE " << filename << (adapted?".adapt":"") << " TYPE ";
+			switch(nettype) {
+				case Problem::OWFN: cout << "OWFN"; break;
+				case Problem::LOLA: cout << "LOLA"; break;
+				case Problem::PNML: cout << "PNML"; break;
+			}
+			cout << ";" << endl << "INITIAL ";
+			bool first = true;
+			map<const Place*,unsigned int>::const_iterator pit;
+			for(pit=m.begin(); pit!=m.end(); ++pit)
+				if (pit->second>0) {
+					if (!first) cout << ",";
+					cout << pit->first->getName() << ":" << pit->second;
+					first = false;
+				}
+			cout << ";" << endl;
+			cout << "FINAL ";
+			first = true;
+			map<Place*,int>::iterator fit;
+			for(fit=final.begin(); fit!=final.end(); ++fit)
+				if (fit->second>0) {
+					if (!first) cout << ",";
+					cout << fit->first->getName() << ":" << fit->second;
+					first = false;
+				}
+			cout << ";" << endl;
+			cout << "RESULT reachability_of_the_final_marking;" << endl;
+			cout << endl;
+		}
 
 		// on to the next filename
 		tok = strtok(NULL," :,;");
 	}
-	delete seq;
+	delete[] seq;
 }
 
     return EXIT_SUCCESS;

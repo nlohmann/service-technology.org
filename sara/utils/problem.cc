@@ -242,6 +242,42 @@ PetriNet* Problem::getPetriNet() {
 	return pn;
 }
 
+/** Save the Petri net back to a file.
+*/
+void Problem::savePetriNet() {
+	if (!pn) return;
+
+	// try to open file
+	ofstream outfile(filename.c_str(), ofstream::out);
+	if (!outfile.is_open()) abort(7,"error: could not write to Petri net file '%s'",filename.c_str());
+
+	// try to parse net
+//	try {
+	    switch (nettype) {
+	        case(OWFN): {
+				outfile << pnapi::io::owfn << (*pn);
+	            break;
+	        }
+	        case(LOLA): {
+				outfile << pnapi::io::lola << (*pn);
+	            break;
+	        }
+	        case(PNML): {
+				outfile << pnapi::io::pnml << (*pn);
+	            break;
+	        }
+	    }
+/*
+	} catch (pnapi::exception::OutputError error) {
+	    outfile.close();
+		cerr << "sara: error: " << error << endl;
+		abort(8,"error while writing Petri net to file");
+	}
+*/
+	outfile.close();
+	return;
+}
+
 /** Get the goal of a problem.
 	@return REACHABILITY or REALIZABILITY.
 */

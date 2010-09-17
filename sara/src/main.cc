@@ -277,7 +277,10 @@ if (args_info.input_given || args_info.pipe_given) {
 	// walk through the problem list
 	for(unsigned int x=0; x<pbls.size(); ++x)
 	{
-		results[pbls.at(x).getResultText()] = true;
+		if (results.find(pbls.at(x).getResultText())==results.end())
+			results[pbls.at(x).getResultText()] = true;
+		else if (pbls.at(x).getResultText()!="")
+			if (!results[pbls.at(x).getResultText()]) continue;
 		cout << "sara: Problem " << (++loops) << ": " << pbls.at(x).getName() << endl;
 		if (args_info.log_given) // print info also to log file if one has been given
 			cerr << "sara: Problem " << (loops) << ": " << pbls.at(x).getName() << endl;
@@ -394,15 +397,15 @@ if (args_info.input_given || args_info.pipe_given) {
 			if (avetracelen!=maxtracelen*solcnt) cout << ", average is " << (avetracelen%solcnt==0?"":"about ") << avetracelen/solcnt+(avetracelen%solcnt>=solcnt/2?1:0);
 			cout << "." << endl;
 		}
-		map<string,bool>::iterator mbit;
-		for(mbit=results.begin(); mbit!=results.end(); ++mbit)
-			if (mbit->first!="")
-			{
-				cout << "sara: The property of " << mbit->first;
-				if (mbit->second) cout << " is fulfilled." << endl;
-				else cout << " does not hold." << endl;
-			}
 	}
+	map<string,bool>::iterator mbit;
+	for(mbit=results.begin(); mbit!=results.end(); ++mbit)
+		if (mbit->first!="")
+		{
+			cout << "sara: The property of " << mbit->first;
+			if (mbit->second) cout << " is fulfilled." << endl;
+			else cout << " does not hold in general." << endl;
+		}
 	if (args_info.time_given) // print time use if --time was specified
 		cout << "sara: Used " << (float)(endtime-starttime)/CLOCKS_PER_SEC << " seconds overall." << endl;
 }

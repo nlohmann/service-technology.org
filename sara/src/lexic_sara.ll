@@ -37,7 +37,7 @@ void sara_error(const char *);
 %s xname nname
 
 ename     [^,;:\t \n][^,;:\t \n]*
-name      [^,;:()\t \n\{\}<>+\-0-9][^,;:()\t \n\{\}<>+\-]*
+name      [^,;:\t \n\{\}<>+\-0-9][^,;:\t \n\{\}<>+\-]*
 number    "-"?[0-9][0-9]*
 problem PROBLEM
 goal GOAL

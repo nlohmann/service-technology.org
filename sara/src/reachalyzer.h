@@ -146,6 +146,9 @@ private:
 
 	/// The problem instance to solve
 	Problem& problem;
+
+	/// The number of jobs done so far
+	int loops;
 };
 
 #endif

@@ -63,7 +63,7 @@ extern gengetopt_args_info args_info;
 	\param passedon If the problem was passed on from an earlier run of the PathFinder.
 */
 Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, Problem& pb, bool verbose, int debug, bool out, int brk, bool passedon) 
-	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols),im(pn),breakafter(brk),problem(pb) {
+	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols),im(pn),breakafter(brk),problem(pb),loops(0) {
 	// inherit verbosity/debug level
 	this->verbose = debug;
 	this->out = out;
@@ -99,7 +99,7 @@ void Reachalyzer::start() {
 
 	solved = false; // not solved yet
 	errors = false; // no errors yet
-	int loops = 0; // counter for number of loops (jobs)
+	loops = 0; // counter for number of loops (jobs)
 	JobQueue unknown; // if it is unknown at present whether a job can become part of a counterexample 
 	if (stateinfo && out) cout << "JOBS(done/open):";
 	while (!solved && !tps.empty()) { // go through the job list as long as there are jobs in it and we have no solution
@@ -257,7 +257,7 @@ void Reachalyzer::printResult() {
 			{ // if there are witnesses and --break was not specified
 				if (solutions.almostEmpty() && !passedon) {
 					cout << "sara: INFEASIBLE: "; // check why there is no solution:
-					if (failure.checkMEInfeasible() && solutions.almostEmpty())
+					if (failure.checkMEInfeasible() && solutions.almostEmpty() && loops<=1)
 					{ // it might be that the initial marking equation has no solution
 						cout << "the marking equation is infeasible." << endl; 
 						if (stateinfo) if (!lpwrap.findNearest())

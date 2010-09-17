@@ -88,6 +88,9 @@ public:
 	/// Get the Petri net
 	PetriNet* getPetriNet();
 
+	/// Save the Petri net
+	void savePetriNet();
+
 	/// Get the problem goal
 	int getGoal() const;
 

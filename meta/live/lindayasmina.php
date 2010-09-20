@@ -136,17 +136,83 @@ $lindaCalls[$key] .= " 2>&1";
            exec($yasminaCall);
            echo "... done.";
        
-       }    ?>
+       }    
+       
+             $lines = file($yasminaResult["residence"]);
 
-      <h2>Result</h2>
+       
+       ?>
+
+      <h2>Results</h2>
+      
+      The results for this demo run are as follows, where <img src="lindayasmina/maybe.png" alt="maybe" title="maybe"> means <i>maybe</i> and <img src="lindayasmina/no.png" alt="no" title="no"> means <i>no</i>:
+<br /><br />
+      <style type="text/css">
+      <!--
+      .ly_result td {
+      text-align: left;
+      vertical-align: middle;
+      height: 20px;
+      }
+      .ly_result_odd {
+      background-color: #DDDDDD;
+      }
+      .ly_result_even {
+      background-color: #EFEFEF;
+      }
+      .ly_result_header {
+      background-color: #555555;
+      color: #FFFFFF;
+      }
+      .ly_result_footer {
+      background-color: #555555;
+      color: #FFFFFF;
+      }
+ 
+
+
+  -->
+    </style>
+
+
+      <table class="ly_result" border="0" cellpadding="0" cellspacing="0" align="center">
+
       <?php 
 
-      $lines = file($yasminaResult["residence"]);
+      $counter = 1;
       foreach ($lines as $line_num => $line) {
-        echo $line . "<br />";
+        if (strpos($line, "(+)") === FALSE) {
+         
+         $line2 = $line;
+          
+          $line2 = str_replace("MODELS", "<i>Given fingerprints:</i></td><td>", $line2);
+          $line2 = str_replace("RESULTS", "<i>Compatility check results:</i></td><td>", $line2);
+          $line2 = str_replace(";", "", $line2);
+          
+          if (strpos($line, "RESULTS") === FALSE) {
+         echo "<tr><td colspan=\"2\">" . $line2 . "</td></tr>";    
+          } else {
+         echo "<tr height=\"40\"><td colspan=\"2\"><br />" . $line2 . "<br /></td></tr>";
+         echo "<tr class=\"ly_result_header\"><td colspan=\"2\">" . "Composite" . "</td></tr>";
+          }
+         
+        } else {
+          if ($counter % 2 == 0) {$line2 = "<tr class=\"ly_result_even\"><td>";} else {$line2 = "<tr class=\"ly_result_odd\"><td>";}
+          ++$counter;
+          $line2 .= trim($line) . "</td></tr>\n";
+          $line2 = str_replace(":", "</td><td width=\"20\">", $line2);
+          $line2 = str_replace("no", "<img src=\"lindayasmina/no.png\" alt=\"no\" title=\"no\">", $line2);
+          $line2 = str_replace("maybe", "<img src=\"lindayasmina/maybe.png\" alt=\"maybe\" title=\"maybe\">", $line2);
+          $line2 = str_replace("(+)", "&oplus;", $line2);
+          $line2 = str_replace(";", "", $line2);
+
+          echo $line2;
+        }
       }
+      echo "<tr class=\"ly_result_footer\" ><td colspan=\"2\" style=\"height: 5px;\"></td></tr>";
       ?>
-      
+</table>
+
     </div>
   </div>
   <div id="footer">

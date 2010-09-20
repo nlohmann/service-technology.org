@@ -74,7 +74,7 @@ int currentFM, currentT;
 
 %%
 
-fingerprint :{parsedModel = new ServiceModel(); }  places KW_FINALMARKINGS finalmarkings KW_TERMS terms KW_BOUNDS bounds ;
+fingerprint :{parsedModel = new ServiceModel(); terms = std::vector<std::pair<std::vector<int>*,std::vector<int>* > >();}  places KW_FINALMARKINGS finalmarkings KW_TERMS terms KW_BOUNDS bounds ;
 places : KW_PLACE internals inputs    outputs ;
 internals : KW_INTERNAL internal_identifierlist ;
 inputs : {currentIDVector = &(parsedModel->inputs); } KW_INPUT  identifierlist ;
@@ -87,7 +87,7 @@ terms : TERM_IDENTIFIER COLON term terms
 bounds : FINALMARKING_IDENTIFIER COMMA TERM_IDENTIFIER COLON {currentFM = $1-1; currentT = $3-1;} bound SEMICOLON bounds ;
       | ;
 
-term : {currentTermDom = new std::vector<int>(); currentTermVals = new std::vector<int>();} valueidentifierlist {terms.push_back(std::pair<std::vector<int>*,std::vector<int>* >(currentTermDom,currentTermVals));  ++nr_of_terms;} ;
+term : {currentTermDom = new std::vector<int>; currentTermVals = new std::vector<int>;} valueidentifierlist {terms.push_back(std::pair<std::vector<int>*,std::vector<int>* >(currentTermDom,currentTermVals));  ++nr_of_terms;} ;
 
 bound : value COMMA value  {  parsedModel->constraints[currentFM].push_back(new BoundedConstraint(terms[currentT].first, terms[currentT].second, $1, $3)); } 
         | KW_UNBOUNDED COMMA value {  parsedModel->constraints[currentFM].push_back(new RightBoundedConstraint(terms[currentT].first, terms[currentT].second, $3)); } 
@@ -97,7 +97,13 @@ bound : value COMMA value  {  parsedModel->constraints[currentFM].push_back(new 
 valueidentifierlist : valueidentifierpair valueidentifierlist
                      |  SEMICOLON ;
                      
-valueidentifierpair : value TIMES IDENT {currentTermDom->push_back(Universe::getNumID($3)); currentTermVals->push_back($1);} | IDENT {currentTermDom->push_back(Universe::getNumID($1)); currentTermVals->push_back(1);};
+valueidentifierpair : value TIMES IDENT { 
+          currentTermDom->push_back(Universe::getNumID($3)); currentTermVals->push_back($1);} 
+          
+          
+          | IDENT {  
+          currentTermDom->push_back(Universe::getNumID($1)); 
+          currentTermVals->push_back(1);};
 value : PLUS VALUE {$$ = $2;} | MINUS VALUE {$$ = -1*$2;} | VALUE {$$ = $1;} ;
 
 identifierlist : IDENT { currentIDVector->push_back(Universe::addIdentifier($1)); } COMMA identifierlist |

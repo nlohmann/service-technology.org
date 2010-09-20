@@ -14,8 +14,8 @@ int Universe::addIdentifier (std::string* identifier) {
   } else {
     int val = identifiers.size();
     identifiers[*identifier] = val+1;
+    return val+1;
   }
-  return identifiers.size();
 }
 
 std::string Universe::getIdentifier (int numID) {
@@ -71,6 +71,7 @@ LeftBoundedConstraint::LeftBoundedConstraint(std::vector<int>* aDomain, std::vec
     domain[i] = (*aDomain)[i]; 
     values[i] = (REAL) (*someValues)[i]; 
   }
+
 }
 
 RightBoundedConstraint::RightBoundedConstraint(std::vector<int>* aDomain, std::vector<int>* someValues, int aBound) {
@@ -82,6 +83,7 @@ RightBoundedConstraint::RightBoundedConstraint(std::vector<int>* aDomain, std::v
     domain[i] = (*aDomain)[i]; 
     values[i] = (REAL) (*someValues)[i]; 
   }
+
 }
 
 BoundedConstraint::BoundedConstraint(std::vector<int>* aDomain, std::vector<int>* someValues, int aLeftBound, int aRightBound) {
@@ -95,6 +97,7 @@ BoundedConstraint::BoundedConstraint(std::vector<int>* aDomain, std::vector<int>
     domain[i] = (*aDomain)[i]; 
     values[i] = (REAL) (*someValues)[i]; 
   }
+
 }
 
 int CustomConstraint::addToLP(lprec* lp) {

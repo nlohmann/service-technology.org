@@ -227,7 +227,7 @@ for (int i = 0; i < args_info.net_given;	++i) {
       unsigned int incompatible = 0;
       for (int x = 0; x < currentCompositeFinals.size(); ++x) {
         ++lpcounter;
-        lprec* lp = make_lp(0,10);
+        lprec* lp = make_lp(0,Universe::getUniverseSize());
         set_verbose(lp, 0);
         set_add_rowmode(lp, TRUE);
         for (int y = 0; y < currentComposite->size(); ++y) {
@@ -237,7 +237,6 @@ for (int i = 0; i < args_info.net_given;	++i) {
           } 
         }
         set_add_rowmode(lp, FALSE);
-
         if (solve(lp) == INFEASIBLE) {
           ++incompatible;        
         }

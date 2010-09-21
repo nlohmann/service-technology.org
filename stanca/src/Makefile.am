@@ -1,7 +1,6 @@
 bin_PROGRAMS = stanca
 
 stanca_SOURCES = main.cc config.h \
-			 Formulamea.h Formulamea.cc  \
 			 STFormula.h STFormula.cc \
                  cmdline.c cmdline.h \
                  verbose.h verbose.cc \

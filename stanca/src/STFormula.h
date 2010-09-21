@@ -19,8 +19,17 @@
 
 #include "pnapi.h"
 #include <sstream>
+#include "System.h"
+#include "ParseUtils.h"
+#include "Options.h"
+#include "Dimacs.h"
+#include "Solver.h"
+#include "SimpSolver.h"
 
 using namespace std;
+using namespace Minisat;
+
+
 using std::set;
 using std::vector;
 
@@ -121,7 +130,7 @@ protected:
 	unsigned int mit;
 	///underlying Petri net
 	pnapi::PetriNet *net;
-	///input for Minisat
+	///input for Minisat conjuction of clauses (disjunction of literals or their negations)
 	vector<vector<int> > formula;
 	///replaced the old map with a struct allowing access to id names
 	vector<PlaceLit> pl;
@@ -135,11 +144,14 @@ public:
 	//PFormula(pnapi::PetriNet *net1);
 	//get the internal representation as a string
 	string toString();
-	
+	vector<vector<int> > getFormula(){return formula;}
+	map<string, vector<unsigned int> > getMapping(){return mp;}
 	pnapi::PetriNet getNet();
 	void setNet(pnapi::PetriNet * net);
-	void setMap();//setting place literals
+	//void setMap();//setting place literals
 	virtual void setFormula()=0;//construct the formula
+	//adding clauses for partial formulas (some places are known, e.g. siphons, traps) 
+	void addUnitClause(string plsrt);
 	//eventually minimize it using minisat
 	/// print formula with minisat identifiers
 	void printFormula();
@@ -184,3 +196,12 @@ public:
 	STFormula(pnapi::PetriNet *net1);
 	void setFormula();//construct the formula from the net
 };
+
+//extern  int minisat(vector<vector<int> > &);vector<bool>*
+extern bool  minisat(vector<vector<int> > &, vector<bool> &, vector<int> &);//returns one solution - the initial procedure or a clause which represnts the conflict
+//this is called in case the formula 
+//extern vector<bool>*  minisatconflict(vector<vector<int> > &);
+extern vector<bool>*  minisat2(vector<vector<int> > &);//returns a non-empty solution (at most two calls)
+extern vector<vector<bool> *>*  minisatall(vector<vector<int> > &);// iterates all solutions
+extern vector<vector <bool>* >*  minisatsimp(vector< vector< int > > & in); //calls the solver for minimal assignments
+//map<string, vector<int> > mp;

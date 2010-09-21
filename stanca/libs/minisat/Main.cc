@@ -211,7 +211,7 @@ bool minisat(vector< vector< int > > & in, vector<bool>& vb, vector<int>& confli
 		IntOption    cpu_lim("MAIN", "cpu-lim","Limit on CPU time allowed in seconds.\n", INT32_MAX, IntRange(0, INT32_MAX));
 		IntOption    mem_lim("MAIN", "mem-lim","Limit on memory usage in megabytes.\n", INT32_MAX, IntRange(0, INT32_MAX));
 		
-		// Set limit on CPU-time:
+/*		// Set limit on CPU-time:
         if (cpu_lim != INT32_MAX){
             rlimit rl;
             getrlimit(RLIMIT_CPU, &rl);
@@ -232,14 +232,15 @@ bool minisat(vector< vector< int > > & in, vector<bool>& vb, vector<int>& confli
                     printf("WARNING! Could not set resource limit: Virtual memory.\n");
             } }
 		
-		
+*/		
 
 		double cpu_time = cpuTime();
 		
 		solver = &S;
 		//signal(SIGINT,SIGINT_handler);
 		//signal(SIGHUP,SIGINT_handler);
-		
+//		fprintf(stdout,"No variables  %d\n",(int)in.size());//return vb;
+
 		parse_DIMACS_main(in, S);
 		//gzclose(in);
 		
@@ -269,7 +270,7 @@ bool minisat(vector< vector< int > > & in, vector<bool>& vb, vector<int>& confli
 		signal(SIGINT, SIGINT_exit);
 		signal(SIGXCPU,SIGINT_exit);
 		
-		// Set limit on CPU-time:
+/*		// Set limit on CPU-time:
 		if (cpu_lim != INT32_MAX){
 			rlimit rl;
 			getrlimit(RLIMIT_CPU, &rl);
@@ -291,11 +292,12 @@ bool minisat(vector< vector< int > > & in, vector<bool>& vb, vector<int>& confli
 			} }
 			
 		double parsed_time = cpuTime();
-		
+*/		
 		// Change to signal-handlers that will only notify the solver and allow it to terminate
 		// voluntarily:
 		signal(SIGINT, SIGINT_interrupt);
 		signal(SIGXCPU,SIGINT_interrupt);
+//		fprintf(stdout,"No variables  %d\n",S.nVars());//return vb;
 		
 		if (!S.simplify()){
 			//if (res != NULL) 
@@ -316,6 +318,7 @@ bool minisat(vector< vector< int > > & in, vector<bool>& vb, vector<int>& confli
 			fprintf(stdout,"\n"); }
 		printf(ret == l_True ? "SATISFIABLE\n" : ret == l_False ? "UNSATISFIABLE\n" : "INDETERMINATE\n");
 		//if (res != NULL){
+
 		if (ret == l_True){
 			//conflict=NULL;
 			fprintf(stdout,"SAT\n");//vector<bool> *
@@ -323,10 +326,9 @@ bool minisat(vector< vector< int > > & in, vector<bool>& vb, vector<int>& confli
 			for (int i = 0; i < S.nVars(); i++)
 				if (S.model[i] != l_Undef){
 					//fprintf(stdout, "%s%s%d", (i==0)?"":" ", (S.model[i]==l_True)?"":"-", i+1);
-					vb.at(i)=toInt(S.model[i])-1;//std::cout<< vb->at(i)<<std::endl;
+					vb.at(i)=toInt(S.model[i])-1;std::cout<< vb.at(i)<<std::endl;
 				}
 				else vb.at(i)=-1;
-			fprintf(stdout," 0\n");//return vb;
 			return true;
 		}
 		else if (ret == l_False){

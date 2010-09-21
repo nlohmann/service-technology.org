@@ -258,7 +258,7 @@ class IntOption : public Option
     }
 };
 
-
+/*
 // Leave this out for visual C++ until Microsoft implements C99 and gets support for strtoll.
 #ifndef _MSC_VER
 
@@ -316,10 +316,10 @@ class Int64Option : public Option
         if (verbose){
             fprintf(stderr, "\n        %s\n", description);
             fprintf(stderr, "\n");
-        }*/
+        }
     }
 };
-#endif
+#endif */
 
 //==================================================================================================
 // String option:

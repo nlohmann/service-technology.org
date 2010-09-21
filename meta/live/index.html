@@ -446,12 +446,11 @@
           <h1>Communication Fingerprints</h1>
           <p>A communication fingerprint is an abstract representation of interaction behavior as a Boolean formula. Fingerprints can be used to semi-decide compatibility of two services. The tool <a href="http://service-technology.org/linda">Linda</a> computes a fingerprint for a given service model. The tool <a href="http://service-technology.org/yasmina">Yasmina</a> semi-decides compatibility based on given fingerprints. While this check may be inconclusive, it is much faster than state space techniques. </p>
           <p>
-          For a given set of service models, we (1) compute a fingerprint of each service and then (2) check each possible composition for <i>weak termination</i>. We call a composite <i>weakly terminating</i> if from any reachable state, a final state is reachable. We call service models <i>compatible</i> if their composition is weakly terminating. </p>
+          For a given set of service models, we (1) compute a fingerprint of each service and then (2) check each well-defined composite of the given service models for <i>weak termination</i>. We call a composite <i>well-defined</i> if it is free of interface conflicts. We call a composite <i>weakly terminating</i> if from any reachable state, a final state is reachable. We call service models <i>compatible</i> if their composite is well-defined and weakly terminating. </p>
           
-          <p>The possible <i>results</i> of a demo run for checking one composite are: 
+          <p>The possible <i>results</i> of a demo run for checking a composite of service models are: 
           <ul>
-          <li><i>undefined</i>, if the composite is actually undefined due to syntactical incompatibilities,</li>
-          <li><i>maybe</i>, if the check was inconclusive and therefore service models may be compatible, and </li>
+          <li><i>maybe</i>, if the check was inconclusive and therefore service models may be compatible, </li>
           <li><i>no</i>, if the composite is not weakly terminating and therefore the service models are incompatible.</li>
           </ul> 
           </p>
@@ -477,9 +476,9 @@
             <fieldset>
               <legend>Term sets</legend>
               <i> Please select one or more of the following term sets. Rule of thumb: More terms increase the quality of the compatibility check. If you select no term set, the fingerprints will be empty.</i><br />
-              <input type="checkbox" name="ly_singleEvents" value="yes" id="ly_singleEvents" /><label for="ly_singleEvents"> Single events</label><br />
-              <input type="checkbox" name="ly_mutualExclusion" value="yes" id="ly_mutualExclusion" /><label for="ly_mutualExclusion"> Mutual exclusion</label><br />
-              <input type="checkbox" name="ly_octagon" value="yes" id="ly_octagon" /><label for="ly_octagon"> Octagon terms</label><br />
+              <input type="checkbox" name="ly_singleEvents" value="yes" id="ly_singleEvents"/><label for="ly_singleEvents"> Single events</label><br />
+              <input type="checkbox" name="ly_mutualExclusion" value="yes" id="ly_mutualExclusion"/><label for="ly_mutualExclusion"> Mutual exclusion</label><br />
+              <input type="checkbox" name="ly_octagon" value="yes" id="ly_octagon" checked/><label for="ly_octagon"> Octagon terms</label><br />
             </fieldset>
 
             <fieldset>

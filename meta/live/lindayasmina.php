@@ -145,7 +145,7 @@ $lindaCalls[$key] .= " 2>&1";
 
       <h2>Results</h2>
       
-      The results for this demo run are as follows, where <img src="lindayasmina/maybe.png" alt="maybe" title="maybe"> means <i>maybe</i> and <img src="lindayasmina/no.png" alt="no" title="no"> means <i>no</i>:
+      The results for this demo run are given below. First, each selected service model is given an identifier, e.g. M1. Second, we list the results of the compatibility check. M1 (+) M2 (+) M3 stands for the composite of the service models identified by M1, M2, and M3. The <img src="lindayasmina/maybe.png" alt="maybe" title="maybe">-icon stands for <i>maybe</i> and the <img src="lindayasmina/no.png" alt="no" title="no">-icon stands for <i>no</i>. To maintain clarity, we only list results for well-defined composites. 
 <br /><br />
       <style type="text/css">
       <!--
@@ -203,7 +203,7 @@ $lindaCalls[$key] .= " 2>&1";
           $line2 = str_replace(":", "</td><td width=\"20\">", $line2);
           $line2 = str_replace("no", "<img src=\"lindayasmina/no.png\" alt=\"no\" title=\"no\">", $line2);
           $line2 = str_replace("maybe", "<img src=\"lindayasmina/maybe.png\" alt=\"maybe\" title=\"maybe\">", $line2);
-          $line2 = str_replace("(+)", "&oplus;", $line2);
+          //$line2 = str_replace("(+)", "&oplus;", $line2);
           $line2 = str_replace(";", "", $line2);
 
           echo $line2;

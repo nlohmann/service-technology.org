@@ -382,6 +382,22 @@ The option @option{-f}
 does not represent a final marking here but a transition multiset; @samp{a1,a2,a3,...} are all transitions of the Petri net.
 If Sara is fed with these problems, the tool will search for a firing sequence in which every transition appears
 exactly as often as mentioned in the multiset.
+
+One additional line may be added after the last line of any problem:
+
+@cartouche
+@smallexample
+RESULT [NEGATE] <string>
+@end smallexample
+@end cartouche
+
+Sara will handle the <string> as the name of a property which is fulfilled if all problems
+in the problem file appended with this same line have a positive result, i.e. each time a
+firing sequence is found. The optional parameter NEGATE inverts this: all problems
+containing this line must fail for the property to hold. Sara will output if the property
+holds or not after checking all problems in the file. Different properties may be checked
+by using different strings in the same problem file. The string must not contain any of
+the following special symbols: +-<>:,; or blanks.
  
 @section Solving a Problem
 

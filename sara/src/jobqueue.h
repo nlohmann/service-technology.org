@@ -83,7 +83,7 @@ public:
 	bool cleanFailure(map<Transition*,int>& p);
 
 	/// Print a failure queue
-	void printFailure(IMatrix& im, Problem& pb);
+	void printFailure(IMatrix& im, Problem& pb, int pbnr);
 
 	/// Get the true size of a failure queue (excluding obsolete entries)
 	int trueSize();
@@ -92,7 +92,7 @@ public:
 	bool push_solved(PartialSolution* job);
 
 	/// Print all solutions and return the maximal and sum trace length
-	int printSolutions(int& sum, Problem& pb);
+	int printSolutions(int& sum, Problem& pb, int pbnr);
 
 	/// Print a Jobqueue to stderr (possibly including past and active job)
 	void show(bool past);
@@ -106,17 +106,17 @@ public:
 	/// Colors the firing sequence given by tvec in the net
 	void colorSequence(vector<Transition*>& tvec);
 
-	/// Colors a given set of transitions
-	void colorTransitions(set<Transition*>& tset);
+	/// Colors a given set of transitions red (or blue)
+	void colorTransitions(set<Transition*>& tset, bool blue);
 
 	/// Colors a given set of places (key-values of pmap)
-	void colorPlaces(map<Place*,int>& pmap);
+	void colorPlaces(map<Place*,int>& pmap, bool blue);
 
 	/// Removes all color from the net
 	void resetColors(PetriNet& pn);
 
 	/// Saves the colored net as number nr to a file
-	void saveColoredNet(Problem& pb, int nr);
+	void saveColoredNet(Problem& pb, int pbnr, int nr);
 
 private:
 	/// Job, solution, or failure queue (maps from priority to sublist)

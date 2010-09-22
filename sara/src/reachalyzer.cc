@@ -63,7 +63,7 @@ extern gengetopt_args_info args_info;
 	\param passedon If the problem was passed on from an earlier run of the PathFinder.
 */
 Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, Problem& pb, bool verbose, int debug, bool out, int brk, bool passedon) 
-	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols),im(pn),breakafter(brk),problem(pb),loops(0) {
+	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols),im(pn),breakafter(brk),problem(pb),loops(0),suboptimal(false) {
 	// inherit verbosity/debug level
 	this->verbose = debug;
 	this->out = out;
@@ -149,6 +149,7 @@ void Reachalyzer::start() {
 			++loops; // count it, but ...
 			continue; // do not try to realize a firing sequence or create child jobs as lp_solve gave no solution
 		}
+		if (ret==1) suboptimal=true; // solutions might be lost!!!
 		tps.first()->touchConstraints(true); // mark all jump constraints so far as old
 		// calculate what the new constraints changed in the solution of lp_solve
 		map<Transition*,int> fullvector(lpwrap.getTVector(net));
@@ -209,7 +210,7 @@ void Reachalyzer::start() {
 		if (!solutionSeen(fullvector)) // adapt known solutions (from an earlier loop) for the new constraints
 		{ // no solutions known so far, calculate them by trying to realize a firing sequence
 				PathFinder pf(m1,fullvector,cols,tps,solutions,failure,im,shortcut);
-				pf.verbose = ((breakafter>0 && breakafter<=loops+2)?verbose+1:verbose);
+				pf.verbose = verbose; //((breakafter>0 && breakafter<=loops+2)?verbose+1:verbose);
 				pf.setMinimize(); // do not allow repeating markings in firing sequences
 				pf.passedon = passedon;
 				if (passedon) pf.torealize = torealize;
@@ -241,21 +242,26 @@ void Reachalyzer::start() {
 	endtime = clock();
 }
 
-/*! Print the results of the reachability analysis. */
-void Reachalyzer::printResult() {
+/** Print the results of the reachability analysis. 
+	@param pbnr An identifying number for the problem instance for use in filenames
+*/
+void Reachalyzer::printResult(int pbnr) {
 	// print all solutions first and find the longest solution length
 	if (!solutions.almostEmpty()) 
 	{
 		if (passedon) cout << "sara: A shorter realizable firing sequence with the same token effect would be:" << endl;
-		maxsollen = solutions.printSolutions(sumsollen,problem);
+		maxsollen = solutions.printSolutions(sumsollen,problem,pbnr);
 	}
 	else if (errors) cout << "sara: UNSOLVED: Result is indecisive due to failure of lp_solve." << endl;
+	else if (suboptimal) cout << "sara: UNSOLVED: Result is indecisive due to non-minimal solutions by lp_solve." << endl;
 	else if (args_info.treemaxjob_given) cout << "sara: UNSOLVED: solution may have been cut off due to command line switch -T" << endl;
 	if (!errors && !args_info.treemaxjob_given && (args_info.witness_given || solutions.almostEmpty()))
 	{ // if we have no solution or witnesses are sought anyway
-			if (failure.trueSize()>0 && !args_info.break_given)
-			{ // if there are witnesses and --break was not specified
-				if (solutions.almostEmpty() && !passedon) {
+		if (suboptimal) cout << "sara: The following information might therefore not be relevant." << endl;
+		if (failure.trueSize()>0 && !args_info.break_given)
+		{ // if there are witnesses and --break was not specified
+			if (solutions.almostEmpty() && !passedon) {
+				if (!suboptimal) {
 					cout << "sara: INFEASIBLE: "; // check why there is no solution:
 					if (failure.checkMEInfeasible() && solutions.almostEmpty() && loops<=1)
 					{ // it might be that the initial marking equation has no solution
@@ -266,12 +272,13 @@ void Reachalyzer::printResult() {
 					}
 					// or the marking equation is feasible but still we cannot reach a solution 
 					cout << "unable to borrow enough tokens via T-invariants." << endl;
-					if (stateinfo) cout << "There are firing sequences that could not be extended towards the final marking." << endl;
-				} else if (passedon && stateinfo) cout << "sara: at the following points the algorithm could not continue:" << endl;
-				else if (stateinfo) cout << "sara: at the following points the algorithm needed to backtrack:" << endl;
-				if (stateinfo || args_info.show_given) failure.printFailure(im,problem); // then print the counterexample; the following shouldn't happen:
-			} else if (solutions.almostEmpty())
-				cout << "sara: UNSOLVED: Result is indecisive" << (args_info.break_given?" due to a break.":", no counterexamples found.") << endl;
+				}
+				if (stateinfo) cout << "There are firing sequences that could not be extended towards the final marking." << endl;
+			} else if (passedon && stateinfo) cout << "sara: at the following points the algorithm could not continue:" << endl;
+			else if (stateinfo) cout << "sara: at the following points the algorithm needed to backtrack:" << endl;
+			if (stateinfo || args_info.show_given) failure.printFailure(im,problem,pbnr); // then print the counterexample; the following shouldn't happen:
+		} else if (solutions.almostEmpty())
+			cout << "sara: UNSOLVED: Result is indecisive" << (args_info.break_given?" due to a break.":", no counterexamples found.") << endl;
 	}
 }
 
@@ -290,6 +297,7 @@ int Reachalyzer::getStatus() {
 	if (!solutions.almostEmpty()) return SOLUTION_FOUND;
 	if (error>0) return error;
 	if (errors) return LPSOLVE_RUNTIME_ERROR;
+	if (suboptimal) return SOLUTIONS_LOST;
 	if (!failure.almostEmpty()) return COUNTEREXAMPLE_FOUND;
 	return UNSOLVED;	
 }

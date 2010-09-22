@@ -116,10 +116,10 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 
 	//allow only nonnegative solutions
 	REAL r = 1;
-//	for(int y=1; y<=cols; ++y)
-//		set_lowbo(lp,y,0); // doesn't work, contradicting lp_solve manual
-	for(int y=1; y<=(int)(cols); ++y)
-		if (!add_constraintex(lp,1,&r,&y,GE,0)) { delete[] colpoint; delete[] mat; return -1; }
+	for(int y=1; y<=cols; ++y)
+		set_lowbo(lp,y,0); // doesn't work, contradicting lp_solve manual
+//	for(int y=1; y<=(int)(cols); ++y)
+//		if (!add_constraintex(lp,1,&r,&y,GE,0)) { delete[] colpoint; delete[] mat; return -1; }
 
 	// now add the global constraints from the problem file
 	unsigned int cnr(pb.getNumberOfConstraints());
@@ -138,11 +138,16 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	}
 
 	set_add_rowmode(lp,FALSE);	
+//	write_LP(lp,stdout);
 	if (verbose) write_LP(lp,stdout);
 	else set_verbose(lp,CRITICAL);
-	basicrows = placeorder.size()+cols+cnr;
+//	basicrows = placeorder.size()+cols+cnr;
+	basicrows = placeorder.size()+cnr;
 	delete[] colpoint;
 	delete[] mat;
+//	set_bb_depthlimit(lp,0);
+//	set_BFP(lp, "bfp_LUSOL");
+//	set_presolve(lp,PRESOLVE_ROWS|PRESOLVE_COLS|PRESOLVE_LINDEP,get_presolveloops(lp));
 	return (int)(basicrows);
 }
 
@@ -168,6 +173,7 @@ bool LPWrapper::addConstraint(REAL* row, int constr_type, REAL rhs) {
 	@return The result of solve(lp).
 */
 int LPWrapper::solveSystem() {
+//	write_LP(lp,stdout);
 	return solve(lp);
 }
 
@@ -194,8 +200,9 @@ unsigned char LPWrapper::getVariables(REAL* solution) {
 */
 bool LPWrapper::addConstraints(PartialSolution& ps) {
 	// clear the RHS of single transitions in the model
-	for(int i=1; i<=(int)(cols); ++i)
-		set_rh(lp,(int)(placeorder.size())+i,0);
+//	for(int i=1; i<=(int)(cols); ++i)
+//		set_rh(lp,(int)(placeorder.size())+i,0);
+	stripConstraints();
 	// add new constraints to lp model
 	REAL *constraint = new REAL[cols+1];
 	for(unsigned int i=0; i<=cols; ++i) constraint[i]=0;
@@ -216,8 +223,9 @@ bool LPWrapper::addConstraints(PartialSolution& ps) {
 		// add the constraint to the lp model, normal constraints with >=, jumps with <=
 		if (success && (jump || rhs>0)) {
 			Transition* t(cit->isSingle());
-			if (t) set_rh(lp,placeorder.size()+revtorder[t]+1,rhs);
-			else if (!addConstraint(constraint,(jump?LE:GE),rhs)) 
+//			if (t) set_rh(lp,placeorder.size()+revtorder[t]+1,rhs);
+//			else if (!addConstraint(constraint,(jump?LE:GE),rhs)) 
+			if (!addConstraint(constraint,(jump?LE:GE),rhs)) 
 			{ 
 			  delete[] constraint; 
 			  abort(13,"error: failed to add constraint to LP model");

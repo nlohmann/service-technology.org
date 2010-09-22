@@ -210,7 +210,28 @@ void PartialSolution::show() {
 	@param forbidden A set of transitions that is not allowed to deliver these tokens.
 	@return Whether the constraint is non-trivial and has thus been added.
 */
-bool PartialSolution::buildMultiConstraint(map<Place*,int>& pmap, int incr, set<Transition*>& forbidden) {
+bool PartialSolution::buildMultiConstraint(map<Place*,int>& pmap, int incr, set<Transition*>& forbidden, IMatrix& im) {
+/*
+	Constraint c,c2;
+	map<Place*,int>::iterator pit;
+	for(pit=pmap.begin(); pit!=pmap.end(); ++pit)
+		c2.addPlace(*(pit->first),pit->second);
+	set<Transition*>::iterator tit;
+	for(tit=forbidden.begin(); tit!=forbidden.end(); ++tit)
+		if (c2.checkSubTransition(**tit)) c2.addSubTransition(**tit);
+	map<Transition*,int>& cs2(c2.calcConstraint());
+	map<Transition*,int>::iterator rit;
+	for(pit=pmap.begin(); pit!=pmap.end(); ++pit)
+	{
+		bool produces(false);
+		if (cs2.empty()) produces=true;
+		else for(rit=cs2.begin(); rit!=cs2.end(); ++rit)
+			if (rit->second>0 && im.getEntry(*(rit->first),*(pit->first))>0) produces=true;
+		if (produces) c.addPlace(*(pit->first),pit->second);
+	}
+	for(tit=forbidden.begin(); tit!=forbidden.end(); ++tit)
+		if (c.checkSubTransition(**tit)) c.addSubTransition(**tit);
+*/
 	Constraint c;
 	map<Place*,int>::iterator pit;
 	for(pit=pmap.begin(); pit!=pmap.end(); ++pit)
@@ -218,6 +239,7 @@ bool PartialSolution::buildMultiConstraint(map<Place*,int>& pmap, int incr, set<
 	set<Transition*>::iterator tit;
 	for(tit=forbidden.begin(); tit!=forbidden.end(); ++tit)
 		if (c.checkSubTransition(**tit)) c.addSubTransition(**tit);
+
 	map<Transition*,int>& cs(c.calcConstraint());
 	int allprod = 0;
 	for(unsigned int i=0; i<tseq.size(); ++i)
@@ -408,7 +430,7 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 					incr = cons+postneed; // the overall minimum number of tokens needed in this component for the forbidden transitions 
 				}
 				// we now know a number of additional tokens needed, so we can build the constraint 
-				buildMultiConstraint(ptmp,incr,forbidden);
+				buildMultiConstraint(ptmp,incr,forbidden,im);
 			}
 		}
 }

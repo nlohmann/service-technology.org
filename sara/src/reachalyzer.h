@@ -43,7 +43,7 @@ public:
 	void start();
 
 	/// Print out the result on stdout
-	void printResult();
+	void printResult(int pbnr);
 
 	/// Get the CPU time used to solve the problem
 	clock_t getTime() const;
@@ -77,7 +77,8 @@ public:
 		LPSOLVE_INIT_ERROR = 3,
 		LPSOLVE_RESIZE_ERROR = 4,
 		LPSOLVE_UPDATE_ERROR = 5,
-		LPSOLVE_RUNTIME_ERROR = 6
+		LPSOLVE_RUNTIME_ERROR = 6,
+		SOLUTIONS_LOST = 7
 	};
 
 private:
@@ -149,6 +150,9 @@ private:
 
 	/// The number of jobs done so far
 	int loops;
+
+	/// if a solution of lp_solve was suboptimal which means solutions can be lost
+	bool suboptimal;
 };
 
 #endif

@@ -58,6 +58,8 @@ map<Transition*,int> revtorder;
 map<Place*,int> revporder;
 /// for property checks via owfn2sara: if the properties hold so far
 map<string,bool> results;
+/// for property checks via owfn2sara: if lp_solve fails the result can be indecisive
+map<string,bool> indecisive;
 
 /*
 template <class T>
@@ -329,7 +331,7 @@ if (args_info.input_given || args_info.pipe_given) {
 				pf.recurse();
 				if (!solutions.almostEmpty()) // solve the problem and print a possible solution
 				{ 
-					int mtl = solutions.printSolutions(avetracelen,pbls.at(x)); // get the solution length for this problem
+					int mtl = solutions.printSolutions(avetracelen,pbls.at(x),x); // get the solution length for this problem
 					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
 					solcnt+=solutions.size();
 					if (pbls.at(x).isNegateResult())
@@ -360,11 +362,13 @@ if (args_info.input_given || args_info.pipe_given) {
 						solcnt+=reach.numberOfSolutions(); 
 						if (pbls.at(x).isNegateResult())
 							results[pbls.at(x).getResultText()] = false;
+					} else if (reach.getStatus()==Reachalyzer::SOLUTIONS_LOST) {
+						indecisive[pbls.at(x).getResultText()] = true;
 					} else {
 						if (!pbls.at(x).isNegateResult())
 							results[pbls.at(x).getResultText()] = false;
 					}
-					reach.printResult(); // ... and print the result
+					reach.printResult(x+1); // ... and print the result
 					int mtl = reach.getMaxTraceLength(); // get the maximal solution length for this problem
 					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
 					avetracelen += reach.getSumTraceLength(); // sum up solution lengths for average calculation
@@ -403,8 +407,13 @@ if (args_info.input_given || args_info.pipe_given) {
 		if (mbit->first!="")
 		{
 			cout << "sara: The property of " << mbit->first;
-			if (mbit->second) cout << " is fulfilled." << endl;
-			else cout << " does not hold in general." << endl;
+			if (indecisive.find(mbit->first)==indecisive.end()) {
+				if (mbit->second) cout << " is fulfilled." << endl;
+				else cout << " does not hold in general." << endl;
+			} else {
+				if (mbit->second) cout << " could not be decided." << endl;
+				else cout << " does not hold in general." << endl;
+			}
 		}
 	if (args_info.time_given) // print time use if --time was specified
 		cout << "sara: Used " << (float)(endtime-starttime)/CLOCKS_PER_SEC << " seconds overall." << endl;

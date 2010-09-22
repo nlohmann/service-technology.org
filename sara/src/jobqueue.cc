@@ -355,8 +355,9 @@ bool JobQueue::cleanFailure(map<Transition*,int>& p) {
 /** Print a failure queue.
 	@param im Incidence matrix of the Petri net
 	@param pb The problem instance (for saving a visually colored net).
+	@param pbnr An identifying number for the problem instance (used for filename construction)
 */
-void JobQueue::printFailure(IMatrix& im, Problem& pb) {
+void JobQueue::printFailure(IMatrix& im, Problem& pb, int pbnr) {
 	int failcnt(0); // counting the failures for adapting filenames
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
@@ -379,6 +380,24 @@ void JobQueue::printFailure(IMatrix& im, Problem& pb) {
 			}
 			else cout << "<empty>";
 			cout << "\":" << endl;
+
+			// At this point color the remainder of transitions blue but do not print anything
+			map<Transition*,int> tmx(ps->getRemains());
+			set<Transition*> tmxset;
+			map<Transition*,int>::iterator tmxit;
+			map<Place*,int> ppmap; // for coloring the postset of the transitions
+			for(tmxit=tmx.begin(); tmxit!=tmx.end(); ++tmxit)
+				if (tmxit->second>0) { 
+					tmxset.insert(tmxit->first);
+					set<pnapi::Arc*> aset(tmxit->first->getPostsetArcs());
+					set<pnapi::Arc*>::iterator ait;
+					for(ait=aset.begin(); ait!=aset.end(); ++ait)
+						ppmap[&((*ait)->getPlace())]=1;
+				}
+			colorTransitions(tmxset,true);
+			colorPlaces(ppmap,true);
+
+			// Return to printing the counterexample
 			if (ps->getConstraints().empty()) cout << " - final marking reached, no more transitions to fire" << endl;
 			set<Constraint>::iterator cit;
 			for(cit=ps->getConstraints().begin(); cit!=ps->getConstraints().end(); ++cit)
@@ -412,7 +431,7 @@ void JobQueue::printFailure(IMatrix& im, Problem& pb) {
 					comma = true;
 					cout << mit->first->getName() << ":" << ps->getMarking()[*(mit->first)];
 				}
-				colorPlaces(pmap);
+				colorPlaces(pmap,false);
 				cout << (pmap.size()==1?"":"}") << " to fire ";
 				comma = false;
 				// if tset is empty, fall back to the transitions just relying on the SCC
@@ -433,10 +452,10 @@ void JobQueue::printFailure(IMatrix& im, Problem& pb) {
 					comma = true;
 					cout << (*tit)->getName();
 				}
-				colorTransitions(tset);
+				colorTransitions(tset,false);
 				cout << (tset.size()==1?"":"}") << endl;
 			}
-			saveColoredNet(pb,++failcnt);
+			saveColoredNet(pb,pbnr,++failcnt);
 		}
 }
 
@@ -523,9 +542,10 @@ bool JobQueue::push_solved(PartialSolution* job) {
 /** Print a solution queue.
 	@param sum On Return: The sum over all solution lengths.
 	@param pb The problem instance for saving a colored solution.
+	@param pbnr An identifying number for the problem instance (used for filename construction)
 	@return The maximal length of a solution.
 */
-int JobQueue::printSolutions(int& sum, Problem& pb) {
+int JobQueue::printSolutions(int& sum, Problem& pb, int pbnr) {
 	int sollength=0; // solution length
 	int colcnt(0); // counting the solutions for adapting filenames
 	if (args_info.forceprint_given) return -1; // solutions were printed earlier
@@ -544,7 +564,7 @@ int JobQueue::printSolutions(int& sum, Problem& pb) {
 			cout << endl;
 			resetColors(*(pb.getPetriNet()));
 			colorSequence(ps->getSequence());
-			saveColoredNet(pb,++colcnt);
+			saveColoredNet(pb,pbnr,++colcnt);
 		}
 	return sollength;
 }
@@ -641,8 +661,8 @@ void JobQueue::colorSequence(vector<Transition*>& tvec) {
 	{
 		stringstream sstr;
 		string scol, colname;
-		if (mode) color = 90 - (mit->second-1) / sz;
-		else color = 90 - (mit->second-1) * sz;
+		if (mode) color = 80 - (mit->second-1) / sz;
+		else color = 80 - (mit->second-1) * sz;
 		sstr << color;
 		sstr >> scol;
 		colname = "gray" + scol;
@@ -659,22 +679,24 @@ void JobQueue::colorSequence(vector<Transition*>& tvec) {
 
 /** Colors the transitions of a given set red. Used for dot output.
 	@param tset The set of transitions.
+	@param blue Use color blue instead of red.
 */
-void JobQueue::colorTransitions(set<Transition*>& tset) {
+void JobQueue::colorTransitions(set<Transition*>& tset, bool blue) {
 	if (!args_info.show_given) return;
 	set<Transition*>::iterator tit;
 	for(tit=tset.begin(); tit!=tset.end(); ++tit)
-		(*tit)->setColor("red");
+		(*tit)->setColor((blue?"blue":"red"));
 }
 
 /** Colors the places occurring in a given map red. Used for dot output.
 	@param pmap The map containing the places.
+	@param blue Use color blue instead of red.
 */
-void JobQueue::colorPlaces(map<Place*,int>& pmap) {
+void JobQueue::colorPlaces(map<Place*,int>& pmap, bool blue) {
 	if (!args_info.show_given) return;
 	map<Place*,int>::iterator pit;
 	for(pit=pmap.begin(); pit!=pmap.end(); ++pit)
-		pit->first->setColor("red");
+		pit->first->setColor((blue?"blue":"red"));
 }
 
 /** Removes all coloring from the net. Used for dot output.
@@ -694,20 +716,19 @@ void JobQueue::resetColors(PetriNet& pn) {
 
 /** Write the painted Petri net as dot output.
 	@param pb The problem instance containing the Petri net.
+	@param pbnr An identifying number for the problem instance (appears in the filename)
 	@param nr The number of this solution/counterexample (appears in the filename).
 */
-void JobQueue::saveColoredNet(Problem& pb, int nr) {
+void JobQueue::saveColoredNet(Problem& pb, int pbnr, int nr) {
 	if (!args_info.show_given) return;
 	string name(pb.getFilename());
-	size_t found = name.find('.');
+	size_t found = name.rfind('.');
 	if (found!=string::npos) name = name.substr(0,found);
-	name += "_solution_";
 	stringstream sstr;
 	string snr;
-	sstr << nr;
+	sstr << "_P" << pbnr << "S" << nr << ".dot";
 	sstr >> snr;
 	name += snr;
-	name += ".dot";
 	ofstream outfile(name.c_str());
 	if (!outfile.is_open()) abort(6,"error while writing Petri net to file '%s'",name.c_str());
 	outfile << pnapi::io::dot << *(pb.getPetriNet());

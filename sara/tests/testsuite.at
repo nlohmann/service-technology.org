@@ -277,7 +277,7 @@ AT_CLEANUP
 AT_SETUP([Create .dot Output])
 AT_CHECK([cp TESTFILES/test16.sara TESTFILES/test16.owfn .])
 AT_CHECK([SARA -i test16.sara -s],0,stdout,stderr)
-AT_CHECK([GREP -q "Petri net" test16_solution_6.dot])
+AT_CHECK([GREP -q "Petri net" test16_P1S6.dot])
 AT_KEYWORDS(options)
 AT_CLEANUP
 

@@ -14,6 +14,9 @@ AC_CONFIG_SRCDIR(src/petrinet.cc)
 AC_CONFIG_HEADERS(src/config.h)
 AC_CONFIG_AUX_DIR([build-aux])
 
+# check for standard programs needed to compile
+AC_PROG_CXX
+
 # using YACC doesn't work, need to call bison this way
 AC_PATH_PROG(BISON, [bison], not found)
 

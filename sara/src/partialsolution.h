@@ -109,7 +109,7 @@ public:
 	void show();
 
 	/// Calculate the concrete values in a constraint from given sets of places and transitions and add it to the constraint list
-	bool buildMultiConstraint(map<Place*,int>& pmap, int incr, set<Transition*>& forbidden, IMatrix& im);
+	bool buildMultiConstraint(map<Place*,int>& pmap, int incr, set<Transition*>& forbidden);
 
 	/// Calculate new constraints to enforce firability of so far unenabled transitions
 	void buildSimpleConstraints(IMatrix& im);

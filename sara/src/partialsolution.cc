@@ -210,7 +210,7 @@ void PartialSolution::show() {
 	@param forbidden A set of transitions that is not allowed to deliver these tokens.
 	@return Whether the constraint is non-trivial and has thus been added.
 */
-bool PartialSolution::buildMultiConstraint(map<Place*,int>& pmap, int incr, set<Transition*>& forbidden, IMatrix& im) {
+bool PartialSolution::buildMultiConstraint(map<Place*,int>& pmap, int incr, set<Transition*>& forbidden) {
 /*
 	Constraint c,c2;
 	map<Place*,int>::iterator pit;
@@ -430,7 +430,7 @@ void PartialSolution::buildSimpleConstraints(IMatrix& im) {
 					incr = cons+postneed; // the overall minimum number of tokens needed in this component for the forbidden transitions 
 				}
 				// we now know a number of additional tokens needed, so we can build the constraint 
-				buildMultiConstraint(ptmp,incr,forbidden,im);
+				buildMultiConstraint(ptmp,incr,forbidden);
 			}
 		}
 }

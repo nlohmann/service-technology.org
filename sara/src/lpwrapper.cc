@@ -115,8 +115,8 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 	}
 
 	//allow only nonnegative solutions
-	REAL r = 1;
-	for(int y=1; y<=cols; ++y)
+//	REAL r = 1;
+	for(int y=1; y<=(int)(cols); ++y)
 		set_lowbo(lp,y,0); // doesn't work, contradicting lp_solve manual
 //	for(int y=1; y<=(int)(cols); ++y)
 //		if (!add_constraintex(lp,1,&r,&y,GE,0)) { delete[] colpoint; delete[] mat; return -1; }
@@ -222,7 +222,7 @@ bool LPWrapper::addConstraints(PartialSolution& ps) {
 		}
 		// add the constraint to the lp model, normal constraints with >=, jumps with <=
 		if (success && (jump || rhs>0)) {
-			Transition* t(cit->isSingle());
+//			Transition* t(cit->isSingle());
 //			if (t) set_rh(lp,placeorder.size()+revtorder[t]+1,rhs);
 //			else if (!addConstraint(constraint,(jump?LE:GE),rhs)) 
 			if (!addConstraint(constraint,(jump?LE:GE),rhs)) 

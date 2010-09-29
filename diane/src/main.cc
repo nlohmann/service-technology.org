@@ -141,10 +141,16 @@ int main(int argc, char* argv[]) {
             case(mode_arg_standard): {
                 //find out whether it is a .lola or a .owfn (for the final marking)
                 std::string s = args_info.inputs[0];
-                if (s.find(".owfn") != string::npos) { //compare(s.size()-4,4, "owfn")==0)
-                    inputfile >> pnapi::io::owfn >> net;
-                } else {
-                    inputfile >> pnapi::io::lola >> net;
+                switch (args_info.format_arg)
+                {
+                case format_arg_lola:
+                	inputfile >> pnapi::io::lola >> net;
+                	break;
+                case format_arg_owfn:
+                	inputfile >> pnapi::io::owfn >> net;
+                	break;
+                default:
+                	abort(3, "input format '%s' unknown", args_info.format_orig);
                 }
                 break;
             }

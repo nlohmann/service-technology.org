@@ -262,6 +262,15 @@ diane: could not parse file `foo.lola' -- aborting [#02]
 @end cartouche
 @end smallexample
 
+@item #03
+Unknown input format given.
+
+@smallexample
+@cartouche
+diane: input format 'foo' unknown -- aborting [#03]
+@end cartouche
+@end smallexample
+
 @end table
 
 

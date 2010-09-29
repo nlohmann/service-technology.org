@@ -51,6 +51,14 @@ option "compose" c
 
 section "Input and Output"
 
+option "format" f
+    "Specifies the input file's format."
+    string
+    typestr="FORMAT"
+    values="owfn","lola" enum
+    default="lola"
+    optional
+
 option "prefix" p
 	"Specifies the output files' prefix. If not specified Diane will derive the output filenames from the input filename."
 	string

@@ -49,7 +49,7 @@ AC_TYPE_SIZE_T
 # write files
 AC_CONFIG_FILES([
 	Makefile libs/pnapi/Makefile src/Makefile src/domino.conf doc/Makefile
-	doc/Doxyfile tests/Makefile tests/package.m4])
+	doc/Doxyfile tests/Makefile tests/package.m4 doc/Doxydetails])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 

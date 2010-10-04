@@ -222,7 +222,7 @@ void Fragmentation::buildServices() {
 		    // call LoLA and open a pipe
 		    FILE* fp = popen(command_line.c_str(), "w");
 		    // send the net to LoLA
-		    fprintf(fp, ss.str().c_str());
+		    fprintf(fp, "%s", ss.str().c_str());
 		    // close the pipe
 		    pclose(fp);
 		    // set end time
@@ -549,7 +549,6 @@ void Fragmentation::buildRoleFragments() {
 
 
 void Fragmentation::setTransitionRoleID(const transition_t & Transition, const role_id_t RoleID, const bool Override) {
-	bool found;
 	transition2RoleID_t::iterator curRole;
 	roleID2Transitions_t::iterator curRoleTransition;
 	pair<roleID2Transitions_t::iterator, roleID2Transitions_t::iterator> roleTransitions;
@@ -559,7 +558,7 @@ void Fragmentation::setTransitionRoleID(const transition_t & Transition, const r
 		if (!Override) {
 			abort(2, "setTransitionRoleID(%s, %d) is called again", Transition.c_str(), RoleID);
 		}
-		found = false;
+		bool found = false;
 		
 		roleTransitions = this->mRoleID2Transitions.equal_range(curRole->second);
 		for (curRoleTransition=roleTransitions.first; curRoleTransition!=roleTransitions.second; ++curRoleTransition) {
@@ -593,7 +592,6 @@ role_id_t Fragmentation::getTransitionRoleID(const transition_t & Transition) {
 }
 
 void Fragmentation::setTransitionFragID(const transition_t & Transition, const frag_id_t FragID, const bool Override) {
-	bool found;
 	transition2FragID_t::iterator curTransition;
 	fragID2Transitions_t::iterator curFragTransition;
 	pair<fragID2Transitions_t::iterator, fragID2Transitions_t::iterator> curFragTransitions;
@@ -603,7 +601,7 @@ void Fragmentation::setTransitionFragID(const transition_t & Transition, const f
 		if (!Override) {
 			abort(2, "setTransitionFragID(%s, %d) is called again", Transition.c_str(), FragID);
 		}
-		found = false;
+		bool found = false;
 			
 		curFragTransitions = this->mFragID2Transitions.equal_range(curTransition->second);		
 		for (curFragTransition=curFragTransitions.first; curFragTransition!=curFragTransitions.second; ++curFragTransition) {
@@ -633,14 +631,13 @@ frag_id_t Fragmentation::getTransitionFragID(const transition_t & Transition) {
 }
 
 void Fragmentation::setPlaceMinFragID(const place_t & Place, const frag_id_t FragID) {
-	bool found;
 	place2MinFragID_t::iterator curMinFrag;
 	minFragID2Places_t::iterator curFragPlace;
 	pair<minFragID2Places_t::iterator, minFragID2Places_t::iterator> curFragPlaces;
 
 	curMinFrag = this->mPlace2MinFragID.find(Place);
 	if (curMinFrag != this->mPlace2MinFragID.end()) {
-		found = false;
+		bool found = false;
 		
 		curFragPlaces = this->mMinFragID2Places.equal_range(curMinFrag->second);
 		for (curFragPlace=curFragPlaces.first; curFragPlace!=curFragPlaces.second; ++curFragPlace) {	
@@ -1710,15 +1707,14 @@ void Fragmentation::setTransitionDianeID(const transition_t & Transition, const 
 	pair<dianeID2Transitions_t::iterator, dianeID2Transitions_t::iterator> curDianeTransitions;	
 	transition2DianeID_t::iterator curTransitionDiane;
 	dianeID2Transitions_t::iterator curDianeTransition;	
-	bool found;	
-
+	
 	curTransitionDiane = this->mTransition2DianeID.find(Transition);
 	if (curTransitionDiane != this->mTransition2DianeID.end()) {
 		
 		if (!Override) {
 			abort(2, "setTransitionDianeID(%s, %d) is called again", Transition.c_str(), DianeID);
 		}
-		found = false;
+		bool found = false;
 		
 		curDianeTransitions = this->mDianeID2Transitions.equal_range(curTransitionDiane->second);		
 		for (curDianeTransition=curDianeTransitions.first; curDianeTransition!=curDianeTransitions.second; ++curDianeTransition) {

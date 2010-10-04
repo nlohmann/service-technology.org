@@ -1,0 +1,109 @@
+AT_INIT
+AT_COLOR_TESTS
+
+m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
+m4_define(AT_CHECK_DIANE, [AT_CHECK([if test "DIANE" == ""; then exit 77; fi])])
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([DOMINO --help],0,ignore)
+AT_CHECK([DOMINO --detailed-help],0,ignore)
+AT_CHECK([DOMINO --full-help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([DOMINO --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Parameters])
+############################################################################
+AT_SETUP([Piping from stdin])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([cat IBM-B3-3029.owfn | DOMINO],0,ignore,stderr)
+AT_CHECK([GREP -q "domino: workflow decomposition successfull" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Dot output])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dot-serviceOverview],0,ignore,ignore)
+AT_CHECK([test -f IBM-B3-3029.owfn_Services.dot])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Using given output filenames])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --output=foo],0,ignore,ignore)
+AT_CHECK([test -f fooA.owfn])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Bug information output])
+AT_CHECK([DOMINO --bug],0,ignore,stderr)
+AT_CHECK([GREP -q "domino: please send file 'bug.log' to domino@service-technology.org!" stderr])
+AT_CHECK([test -f bug.log])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+#AT_SETUP([Cleaning vs. no cleaning of temporary files])
+#AT_CHECK_DIANE
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+#AT_CHECK([DOMINO IBM-B3-3029.owfn --tmpfile=domino-XXXXXX],0,ignore,ignore)
+#AT_CHECK([test -f domino-*],1)
+#AT_CHECK([DOMINO IBM-B3-3029.owfn --tmpfile=domino-XXXXXX --noClean],0,ignore,ignore)
+#AT_CHECK([test -f domino-*],0)
+#AT_KEYWORDS(infrastructure)
+#AT_CLEANUP
+
+#AT_SETUP([Using a given configuration file])
+#AT_CHECK_DIANE
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+#AT_DATA([my_domino.conf], [verbose])
+#AT_CHECK([DOMINO --config=my_domino.conf IBM-B3-3029.owfn],0,ignore,stderr)
+#AT_CHECK([GREP -q "using configuration file 'my_domino.conf'" stderr])
+#AT_KEYWORDS(infrastructure)
+#AT_CLEANUP
+
+#AT_SETUP([Using a present configuration file])
+#AT_CHECK_DIANE
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+#AT_DATA([domino.conf], [verbose])
+#AT_CHECK([DOMINO IBM-B3-3029.owfn],0,ignore,stderr)
+#AT_CHECK([GREP -q "using configuration file 'domino.conf'" stderr])
+#AT_KEYWORDS(infrastructure)
+#AT_CLEANUP
+
+AT_SETUP([Determining runtime and allocated memory])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --verbose --stats],0,ignore,stderr)
+AT_CHECK([GREP -q "runtime" stderr])
+AT_CHECK([GREP -q "memory consumption" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+#AT_SETUP([Checking for memory leaks with Valgrind])
+#AT_CHECK_DIANE
+#AT_CHECK_LOLA
+#AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+#AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW IBM-B3-3029.owfn],0,ignore,stderr)
+#AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+#AT_KEYWORDS(infrastructure)
+#AT_CLEANUP

@@ -29,16 +29,7 @@ AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
 AT_CHECK([cat IBM-B3-3029.owfn | DOMINO],0,ignore,stderr)
-AT_CHECK([GREP -q "domino: workflow decomposition successfull" stderr])
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
-
-AT_SETUP([Dot output])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
-AT_CHECK([DOMINO IBM-B3-3029.owfn --dot-serviceOverview],0,ignore,ignore)
-AT_CHECK([test -f IBM-B3-3029.owfn_Services.dot])
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -48,13 +39,69 @@ AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
 AT_CHECK([DOMINO IBM-B3-3029.owfn --output=foo],0,ignore,ignore)
 AT_CHECK([test -f fooA.owfn])
+AT_CHECK([test -f fooB.owfn])
+AT_CHECK([test -f fooC.owfn])
+AT_CHECK([test -f fooD.owfn])
+AT_CHECK([test -f fooE.owfn])
+AT_CHECK([test -f fooF.owfn])
+AT_CHECK([test -f fooG.owfn])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
 AT_SETUP([Bug information output])
 AT_CHECK([DOMINO --bug],0,ignore,stderr)
-AT_CHECK([GREP -q "domino: please send file 'bug.log' to domino@service-technology.org!" stderr])
+AT_CHECK([GREP -q "please send file 'bug.log' to domino@service-technology.org!" stderr])
 AT_CHECK([test -f bug.log])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Dot options dependency 1])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO --dot-roles IBM-B3-3029.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "no dot files will be generated (--dotInitial or --dotFragmented missing)" stderr])
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Dot options dependency 2])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO --dot-fragments IBM-B3-3029.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "no dot files will be generated (--dotInitial or --dotFragmented missing)" stderr])
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Dot options dependency 3])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO --dotInitial IBM-B3-3029.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "no dot files will be generated (--dot-roles or --dot-fragments missing)" stderr])
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Dot options dependency 4])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO --dotFragmented IBM-B3-3029.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "no dot files will be generated (--dot-roles or --dot-fragments missing)" stderr])
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Dot options dependency 5])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO --dotColorUnassigned IBM-B3-3029.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "no dot files will be generated (--dot-roles or --dot-fragments missing)" stderr])
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -107,3 +154,186 @@ AT_CLEANUP
 #AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 #AT_KEYWORDS(infrastructure)
 #AT_CLEANUP
+
+############################################################################
+AT_BANNER([Dot Output])
+############################################################################
+AT_SETUP([Service Overview])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dot-serviceOverview],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_CHECK([test -f IBM-B3-3029.owfn_Services.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Initial Roles])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dotInitial --dot-roles],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_CHECK([test -f IBM-B3-3029.owfn_Initial-Roles.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Fragmented Roles])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dotFragmented --dot-roles],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_CHECK([test -f IBM-B3-3029.owfn_Fragmented-Roles.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Initial Fragments])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dotInitial --dot-fragments],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_CHECK([test -f IBM-B3-3029.owfn_Initial-Fragments.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Fragmented Fragments])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dotFragmented --dot-fragments],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_CHECK([test -f IBM-B3-3029.owfn_Fragmented-Fragments.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Services])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --output --dotServices],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_CHECK([test -f IBM-B3-3029.owfn_Service-A.dot])
+AT_CHECK([test -f IBM-B3-3029.owfn_Service-B.dot])
+AT_CHECK([test -f IBM-B3-3029.owfn_Service-C.dot])
+AT_CHECK([test -f IBM-B3-3029.owfn_Service-D.dot])
+AT_CHECK([test -f IBM-B3-3029.owfn_Service-E.dot])
+AT_CHECK([test -f IBM-B3-3029.owfn_Service-F.dot])
+AT_CHECK([test -f IBM-B3-3029.owfn_Service-G.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Service Overview (user named)])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dot-serviceOverview=foo],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_CHECK([test -f foo.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Initial Roles])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dotInitial --dot-roles=bar],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_CHECK([test -f bar.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Fragmented Roles])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dotFragmented --dot-roles=gak],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_CHECK([test -f gak.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Initial Fragments])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dotInitial --dot-fragments=jap],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_CHECK([test -f jap.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Fragmented Fragments])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dotFragmented --dot-fragments=nop],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_CHECK([test -f nop.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Services])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --output=taz --dotServices],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_CHECK([test -f tazA.dot])
+AT_CHECK([test -f tazB.dot])
+AT_CHECK([test -f tazC.dot])
+AT_CHECK([test -f tazD.dot])
+AT_CHECK([test -f tazE.dot])
+AT_CHECK([test -f tazF.dot])
+AT_CHECK([test -f tazG.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Testfiles])
+############################################################################
+AT_SETUP([IBM-B3-3029])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn ],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([IBM-B3-4958])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-4958.owfn .])
+AT_CHECK([DOMINO IBM-B3-4958.owfn ],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([DA-Producer-Consumer])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/DA-Producer-Consumer.owfn .])
+AT_CHECK([DOMINO DA-Producer-Consumer.owfn ],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Loop-InsideRoles])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Loop-InsideRoles.owfn .])
+AT_CHECK([DOMINO Loop-InsideRoles.owfn ],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Loop-OverRoles])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Loop-OverRoles.owfn .])
+AT_CHECK([DOMINO Loop-OverRoles.owfn ],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP

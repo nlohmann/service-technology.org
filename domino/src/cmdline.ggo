@@ -72,6 +72,7 @@ option "dotServices" -
   details="This option is used when Domino should create an colored dot file for each created service. Requires output.\n"
   flag off
   hidden
+  dependon="output"
 
 section "Configuration"
 sectiondesc="<<-- Domino relies on several other tools. These options configure Domino to find these tools. -->>\n"

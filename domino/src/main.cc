@@ -129,9 +129,6 @@ void evaluateParameters(int argc, char** argv) {
 			message(_cwarning_("no dot files will be generated (%s %s %s %s"), _cparameter_("--dot-roles"), _cwarning_("or"), _cparameter_("--dot-fragments"), _cwarning_("missing)"));
 		}
 	}
-	if (args_info.dotServices_flag && !args_info.output_given) {
-		message(_cwarning_("dot files for services will not be generated, %s is missing"), _cparameter_("--output"));
-	}
 
     // check whether at most one file is given
     if (args_info.inputs_num > 1) {

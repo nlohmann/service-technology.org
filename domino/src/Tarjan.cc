@@ -128,7 +128,7 @@ void Tarjan::push(node_t & Node) {
 
 node_t Tarjan::pop() {
 	if (this->mStack.empty()) {
-		abort(2, "pop(): stack empty");
+		abort(2, "Tarjan::pop(): stack empty");
 	}
 	node_t curNode;
 
@@ -168,7 +168,7 @@ int Tarjan::getDFS(node_t & Node) {
 
 	curNode = this->mNodeDFS.find(Node);
 	if (curNode == this->mNodeDFS.end()) {
-		abort(2, "getDFS(%s) failed", Node.c_str());
+		abort(2, "Tarjan::getDFS(%s) failed", Node.c_str());
 	}
 
 	return curNode->second;
@@ -179,7 +179,7 @@ int Tarjan::getLowlink(node_t & Node) {
 
 	curNode = this->mNodeLowlink.find(Node);
 	if (curNode == this->mNodeLowlink.end()) {
-		abort(2, "getLowlink(%s) failed", Node.c_str());
+		abort(2, "Tarjan::getLowlink(%s) failed", Node.c_str());
 	}
 
 	return curNode->second;

@@ -21,7 +21,8 @@
 # 4. Add the file to the SVN repository.
 
 # <<-- CHANGE START (testfiles) -->>
-TESTFILES = IBM-B3-3029.owfn \
+TESTFILES = IBM-B3-2802.owfn \
+			IBM-B3-3029.owfn \
             IBM-B3-4958.owfn \
             Loop-InsideRoles.owfn \
 			Loop-OverRoles.owfn \

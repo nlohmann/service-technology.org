@@ -234,7 +234,7 @@ AT_CHECK([test -f foo.dot])
 AT_KEYWORDS(output)
 AT_CLEANUP
 
-AT_SETUP([Initial Roles])
+AT_SETUP([Initial Roles (user named)])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
@@ -244,7 +244,7 @@ AT_CHECK([test -f bar.dot])
 AT_KEYWORDS(output)
 AT_CLEANUP
 
-AT_SETUP([Fragmented Roles])
+AT_SETUP([Fragmented Roles (user named)])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
@@ -254,7 +254,7 @@ AT_CHECK([test -f gak.dot])
 AT_KEYWORDS(output)
 AT_CLEANUP
 
-AT_SETUP([Initial Fragments])
+AT_SETUP([Initial Fragments (user named)])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
@@ -264,7 +264,7 @@ AT_CHECK([test -f jap.dot])
 AT_KEYWORDS(output)
 AT_CLEANUP
 
-AT_SETUP([Fragmented Fragments])
+AT_SETUP([Fragmented Fragments (user named)])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
@@ -274,7 +274,7 @@ AT_CHECK([test -f nop.dot])
 AT_KEYWORDS(output)
 AT_CLEANUP
 
-AT_SETUP([Services])
+AT_SETUP([Services (user named)])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])

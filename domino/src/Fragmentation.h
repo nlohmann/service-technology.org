@@ -163,7 +163,6 @@ class Fragmentation {
 		void setTransitionDianeID(const transition_t &, const diane_id_t, const bool = true);
 		void addPlaceDianeID(const place_t &, const diane_id_t);
 		diane_id_t getTransitionDianeID(const transition_t &);
-		bool isTransitionInDianeID(const transition_t &, const diane_id_t);
 		pair<role_id_t, frag_id_t> getBestConnectionForDianeFragment(const diane_id_t, const bool);
 		void setDianeFragmentConnection(const diane_id_t, pair<role_id_t, frag_id_t>);
 		roles_t getTopRoleIDs(const map<role_id_t, size_t> & RoleMap) const;

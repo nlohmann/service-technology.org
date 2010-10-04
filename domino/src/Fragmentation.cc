@@ -432,7 +432,6 @@ void Fragmentation::buildRoleFragments() {
 	places_t placesToDo;
 	transitions_t placeTransitions;
 	pnapi::Transition *transition;
-	pnapi::Place *place;
 	pair<minFragID2Places_t::iterator, minFragID2Places_t::iterator> curPlaces;
 	
 
@@ -1280,8 +1279,6 @@ void Fragmentation::colorFragmentsByRoleID(const bool ColorUnassigned) {
 	size_t curColorID;
 	size_t unassignedNodes;
 	string curColorName;
-	pnapi::Place * place;
-	pnapi::Transition * transition;
 
 	this->eraseColors();
 
@@ -1750,10 +1747,6 @@ diane_id_t Fragmentation::getTransitionDianeID(const transition_t & Transition) 
 	return curTransitionDiane->second;
 }
 
-bool Fragmentation::isTransitionInDianeID(const transition_t & Transition, const diane_id_t DianeID) {
-	return (this->mTransition2DianeID.find(Transition) == this->mTransition2DianeID.end());
-}
-
 void Fragmentation::addPlaceDianeID(const place_t & Place, const diane_id_t DianeID) {
 	pair<place2DianeIDs_t::iterator, place2DianeIDs_t::iterator> curPlaceDianes;
 	pair<dianeID2Places_t::iterator, dianeID2Places_t::iterator> curDianePlaces;
@@ -1860,7 +1853,6 @@ pair<role_id_t, frag_id_t> Fragmentation::getBestConnectionForDianeFragment(cons
 	bool found;
 	pair<dianeID2Places_t::iterator, dianeID2Places_t::iterator> curDianePlaces;
 	pair<multimap<role_id_t, frag_id_t>::iterator, multimap<role_id_t, frag_id_t>::iterator> curRoleFragments;
-	pnapi::Transition *transition;
 	pair<role_id_t, frag_id_t> ret;
 
 	adjacentRoleIDs.clear();
@@ -2019,6 +2011,7 @@ pair<role_id_t, frag_id_t> Fragmentation::getBestConnectionForDianeFragment(cons
 		}
 	}
 
+	count = 0;
 	maxRoleFragments = 0;
 	maxRoleID = this->ROLE_UNASSIGNED;
 

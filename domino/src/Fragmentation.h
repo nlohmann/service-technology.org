@@ -60,7 +60,7 @@ class Fragmentation {
 
 	private:
 
-		static const role_id_t ROLE_UNASSIGNED = -1;
+		role_id_t ROLE_UNASSIGNED;
 		place_t PLACE_UNASSIGNED;
 		place_t GLOBALSTART_REACHED;
 		place_t SERVICE_PLACE_PREFIX;

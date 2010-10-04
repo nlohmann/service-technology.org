@@ -3,6 +3,7 @@
 Fragmentation::~Fragmentation() {}
 
 Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
+	this->ROLE_UNASSIGNED = -1;	
 	this->PLACE_UNASSIGNED = "";
 	this->GLOBALSTART_REACHED = "AL_1983_07_12";
 	this->SERVICE_PLACE_PREFIX = "sp_";

@@ -27,7 +27,7 @@ TESTFILES = IBM-B3-2802.owfn \
             Loop-InsideRoles.owfn \
 			Loop-OverRoles.owfn \
 			DA-Producer-Consumer.owfn \
-			fail_DA-Producer-Consumer
+			fail_DA-Producer-Consumer.owfn
 # <<-- CHANGE END -->>
 
 

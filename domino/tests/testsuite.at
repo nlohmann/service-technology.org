@@ -55,7 +55,7 @@ AT_CHECK([test -f bug.log])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Dot options dependency 1])
+AT_SETUP([Dot options dependency - 1])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
@@ -65,7 +65,7 @@ AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Dot options dependency 2])
+AT_SETUP([Dot options dependency - 2])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
@@ -75,7 +75,7 @@ AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Dot options dependency 3])
+AT_SETUP([Dot options dependency - 3])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
@@ -85,7 +85,7 @@ AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Dot options dependency 4])
+AT_SETUP([Dot options dependency - 4])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
@@ -95,7 +95,7 @@ AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Dot options dependency 5])
+AT_SETUP([Dot options dependency - 5])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
@@ -110,31 +110,33 @@ AT_CLEANUP
 #AT_CHECK_LOLA
 #AT_CHECK([cp TESTFILES/IBM-B3-2802.owfn .])
 #AT_CHECK([DOMINO IBM-B3-2802.owfn ],0,ignore,ignore)
-#AT_CHECK([test -f IBM-B3-2802.owfn_Frag*])
+#AT_CHECK([test -f IBM-B3-2802.owfn_Frag*],1)
 #AT_CHECK([DOMINO --noClean IBM-B3-2802.owfn ],0,ignore,ignore)
-#AT_CHECK([test -f IBM-B3-2802.owfn_Frag*])
+#AT_CHECK([test -f IBM-B3-2802.owfn_Frag*],0)
 #AT_KEYWORDS(infrastructure)
 #AT_CLEANUP
 
-#AT_SETUP([Using a given configuration file])
-#AT_CHECK_DIANE
-#AT_CHECK_LOLA
-#AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
-#AT_DATA([my_domino.conf], [verbose])
-#AT_CHECK([DOMINO --config=my_domino.conf IBM-B3-3029.owfn],0,ignore,stderr)
-#AT_CHECK([GREP -q "using configuration file 'my_domino.conf'" stderr])
-#AT_KEYWORDS(infrastructure)
-#AT_CLEANUP
+AT_SETUP([Using a given configuration file])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_DATA([my_domino.conf], [verbose
+])
+AT_CHECK([DOMINO --config=my_domino.conf IBM-B3-3029.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "using configuration file 'my_domino.conf'" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
 
-#AT_SETUP([Using a present configuration file])
-#AT_CHECK_DIANE
-#AT_CHECK_LOLA
-#AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
-#AT_DATA([domino.conf], [verbose])
-#AT_CHECK([DOMINO IBM-B3-3029.owfn],0,ignore,stderr)
-#AT_CHECK([GREP -q "using configuration file 'domino.conf'" stderr])
-#AT_KEYWORDS(infrastructure)
-#AT_CLEANUP
+AT_SETUP([Using a present configuration file])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_DATA([domino.conf], [verbose
+])
+AT_CHECK([DOMINO IBM-B3-3029.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "using configuration file 'domino.conf'" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
 
 AT_SETUP([Determining runtime and allocated memory])
 AT_CHECK_DIANE
@@ -146,14 +148,41 @@ AT_CHECK([GREP -q "memory consumption" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-#AT_SETUP([Checking for memory leaks with Valgrind])
-#AT_CHECK_DIANE
-#AT_CHECK_LOLA
-#AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
-#AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW IBM-B3-3029.owfn],0,ignore,stderr)
-#AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
-#AT_KEYWORDS(infrastructure)
-#AT_CLEANUP
+AT_SETUP([Checking for memory leaks with Valgrind - 1])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW IBM-B3-3029.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Checking for memory leaks with Valgrind - 2])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-4958.owfn .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW IBM-B3-4958.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Checking for memory leaks with Valgrind - 3])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Loop-InsideRoles.owfn .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW Loop-InsideRoles.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Checking for memory leaks with Valgrind - 4])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Loop-OverRoles.owfn .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW Loop-OverRoles.owfn],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
 
 ############################################################################
 AT_BANNER([Dot Output])
@@ -291,7 +320,7 @@ AT_KEYWORDS(output)
 AT_CLEANUP
 
 ############################################################################
-AT_BANNER([Testfiles])
+AT_BANNER([Coverage])
 ############################################################################
 AT_SETUP([IBM-B3-3029])
 AT_CHECK_DIANE

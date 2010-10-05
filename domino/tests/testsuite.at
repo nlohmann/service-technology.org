@@ -55,6 +55,36 @@ AT_CHECK([test -f bug.log])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
+AT_SETUP([Invalid parameter(s)])
+AT_CHECK([DOMINO --foo],1,ignore,stderr)
+AT_CHECK([GREP -q "unrecognized option" stderr])
+AT_CHECK([GREP -q "invalid command-line parameter(s)" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Multiple inputs])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([cp TESTFILES/IBM-B3-4958.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn IBM-B3-4958.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "at most one input file must be given" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Override protection])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --output=foo],0,ignore,ignore)
+AT_CHECK([DOMINO IBM-B3-3029.owfn --output=foo],1,ignore,stderr)
+AT_CHECK([GREP -q "file fooA.owfn already exists" stderr])
+AT_CHECK([test -f fooA.owfn])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
 AT_SETUP([Dot options dependency - 1])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
@@ -116,6 +146,19 @@ AT_CLEANUP
 #AT_KEYWORDS(infrastructure)
 #AT_CLEANUP
 
+AT_SETUP([Canonical vs. original names])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/DA-Producer-Consumer.owfn .])
+AT_CHECK([DOMINO -v DA-Producer-Consumer.owfn ],0,ignore,stderr)
+AT_CHECK([GREP -q "....BE" stderr])
+AT_CHECK([GREP -q "....CC" stderr])
+AT_CHECK([DOMINO --canonicalNames -v DA-Producer-Consumer.owfn ],0,ignore,stderr)
+AT_CHECK([GREP -q "....p1" stderr])
+AT_CHECK([GREP -q "....t1" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
 AT_SETUP([Using a given configuration file])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
@@ -148,40 +191,44 @@ AT_CHECK([GREP -q "memory consumption" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Checking for memory leaks with Valgrind - 1])
+############################################################################
+AT_BANNER([Valgrind])
+############################################################################
+
+AT_SETUP([Checking for memory leaks - 1])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
 AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW IBM-B3-3029.owfn],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
-AT_KEYWORDS(infrastructure)
+AT_KEYWORDS(valgrind)
 AT_CLEANUP
 
-AT_SETUP([Checking for memory leaks with Valgrind - 2])
+AT_SETUP([Checking for memory leaks - 2])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-4958.owfn .])
 AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW IBM-B3-4958.owfn],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
-AT_KEYWORDS(infrastructure)
+AT_KEYWORDS(valgrind)
 AT_CLEANUP
 
-AT_SETUP([Checking for memory leaks with Valgrind - 3])
+AT_SETUP([Checking for memory leaks - 3])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/Loop-InsideRoles.owfn .])
 AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW Loop-InsideRoles.owfn],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
-AT_KEYWORDS(infrastructure)
+AT_KEYWORDS(valgrind)
 AT_CLEANUP
 
-AT_SETUP([Checking for memory leaks with Valgrind - 4])
+AT_SETUP([Checking for memory leaks - 4])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/Loop-OverRoles.owfn .])
 AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW Loop-OverRoles.owfn],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
-AT_KEYWORDS(infrastructure)
+AT_KEYWORDS(valgrind)
 AT_CLEANUP
 
 ############################################################################
@@ -319,6 +366,17 @@ AT_CHECK([test -f tazG.dot])
 AT_KEYWORDS(output)
 AT_CLEANUP
 
+AT_SETUP([Override protection])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dot-serviceOverview],0,ignore,stderr)
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dot-serviceOverview],1,ignore,stderr)
+AT_CHECK([GREP -q "file IBM-B3-3029.owfn_Services.dot already exists" stderr])
+AT_CHECK([test -f IBM-B3-3029.owfn_Services.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Coverage])
 ############################################################################
@@ -346,6 +404,15 @@ AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/DA-Producer-Consumer.owfn .])
 AT_CHECK([DOMINO DA-Producer-Consumer.owfn ],0,ignore,stderr)
 AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([DA-Producer-Consumer (fail)])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/fail_DA-Producer-Consumer.owfn .])
+AT_CHECK([DOMINO fail_DA-Producer-Consumer.owfn ],1,ignore,stderr)
+AT_CHECK([GREP -q "worklfow demposition FAILED" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 

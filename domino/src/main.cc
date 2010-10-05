@@ -176,7 +176,7 @@ void createDotFile(const string & OutputFile, pnapi::PetriNet & Petrinet, const 
 }
 
 void createOWFNFile(const string & OutputFile, pnapi::PetriNet & Petrinet, const string InputFile) {
-	if (fileExists(string(OutputFile + ".dot"))) {
+	if (fileExists(string(OutputFile + ".owfn"))) {
 		abort(2, "file %s already exists", _cfilename_(OutputFile + ".owfn"));
 	}
 

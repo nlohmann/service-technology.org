@@ -8,29 +8,35 @@
 			http://service-technology.org/domino
 
 PURPOSE
-    <<-- PURPOSE -->>
-
-
-COPYRIGHT
-    Copyright (c) 2010 Andreas Lehmann
-In order to run, compile, and develop Hello, several tools are required.
+In order to run, compile, and develop Domino, several tools are required.
 
 Runtime
 -------
 
-   * Wendy (`http://service-technology.org/wendy'). A suitable Wendy binary
-     can be created as follows:
-       1. download `http://service-technology.org/files/wendy/wendy.tar.gz'
+   * LoLA (`http://service-technology.org/lola'). A suitable LoLA binary can
+     be created as follows:
+       1. download `http://service-technology.org/files/lola/lola.tar.gz'
 
-       2. untar `wendy.tar.gz', configure
+       2. untar `lola.tar.gz', configure
+
+       3. call `make lola-statespace'
+
+       4. copy the binary `src/lola' to a directory of your path (e.g.,
+          `/usr/local/bin') or call `make install'
+
+   * Diane (`http://service-technology.org/diane'). A suitable Diane binary
+     can be created as follows:
+       1. download `http://service-technology.org/files/diane/diane.tar.gz'
+
+       2. untar `diane.tar.gz', configure
 
        3. call `make'
 
-       4. copy the binary `src/wendy' to a directory of your path (e.g.,
+       4. copy the binary `src/diane' to a directory of your path (e.g.,
           `/usr/local/bin') or call `make install'
 
-Hello's configure script checks whether Wendy (with binary `wendy') is found
-in the path and adjusts the configuration file `src/hello.conf' accordingly.
+Domino's configure script checks whether Diane (with binary `diane') is found
+in the path and adjusts the configuration file `src/domino.conf' accordingly.
 
 Compilation
 -----------
@@ -46,7 +52,7 @@ Development
 -----------
 
 In case you want to make changes to the source code, the following tools are
-required to reconfigure and compile Hello.
+required to reconfigure and compile Domino.
 
    * Autoconf, `http://www.gnu.org/software/autoconf/'
 

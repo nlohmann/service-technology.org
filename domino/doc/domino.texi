@@ -25,7 +25,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @dircategory service-technology.org
 @direntry
-* Hello: (hello).       <<-- HELLO WORLD -->>.
+* Domino: (domino).       Decomposition of business workflows (into services).
 @end direntry
 
 
@@ -34,14 +34,14 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @titlepage
 
-@title Hello
+@title Domino
 
-@subtitle <<-- MISSION STATEMENT -->>
-@subtitle @url{http://service-technology.org/hello}
+@subtitle Decomposition of business workflows (into services)
+@subtitle @url{http://service-technology.org/domino}
 @vskip 0.5em
 @subtitle Version @value{VERSION}, @value{UPDATED}
 
-@author <<-- AUTHOR -->>
+@author Andreas Lehmann
 @page
 @vskip 0pt plus 1filll
 @insertcopying
@@ -53,7 +53,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 @ifnottex
 @node Top
-@top Hello
+@top Domino
 @insertcopying
 @end ifnottex
 
@@ -62,10 +62,10 @@ Permission is granted to copy, distribute and/or modify this document under the 
 
 
 @menu
-* First Steps::How to set up and install Hello.
-* Command Line Options::How to run Hello.
-* Theory::The theory behind Hello.
-* Exit and Error Codes::What the error and exit codes of Hello mean.
+* First Steps::How to set up and install Domino.
+* Command Line Options::How to run Domino.
+* Theory::The theory behind Domino.
+* Exit and Error Codes::What the error and exit codes of Domino mean.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
 @end menu
@@ -85,18 +85,18 @@ Permission is granted to copy, distribute and/or modify this document under the 
 @section Setup and Installation
 
 @enumerate
-@item Go to @url{http://service-technology.org/files/hello} and download the latest release version of Hello, say @file{hello-@value{VERSION}.tar.gz}. To setup and compile Hello, change into your download directory and type
+@item Go to @url{http://service-technology.org/files/domino} and download the latest release version of Domino, say @file{domino-@value{VERSION}.tar.gz}. To setup and compile Domino, change into your download directory and type
 
 @cartouche
 @smallexample
-tar xfz hello-@value{VERSION}.tar.gz
-cd hello-@value{VERSION}
+tar xfz domino-@value{VERSION}.tar.gz
+cd domino-@value{VERSION}
 ./configure
 make
 @end smallexample
 @end cartouche
 
-After compilation, a binary @samp{src/hello} is generated.@footnote{On Microsoft Windows, the file will be called @file{hello.exe}.} If you experience any compiler warnings, don't panic: Hello contains some generated or third party code that we cannot influence.
+After compilation, a binary @samp{src/domino} is generated.@footnote{On Microsoft Windows, the file will be called @file{domino.exe}.} If you experience any compiler warnings, don't panic: Domino contains some generated or third party code that we cannot influence.
 
 @item To test whether everything went fine, type
 
@@ -116,7 +116,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 All <<-- TESTNUM -->> tests were successful.
 @end smallexample
 
-If an error occurs, please send the output to @email{hello@@service-technology.org}.
+If an error occurs, please send the output to @email{domino@@service-technology.org}.
 
 @item To install the binary, the manpage, and the documentation, type
 
@@ -138,19 +138,19 @@ The distribution contains several directories:
 
 @table @file
 @item doc
-The Texinfo documentation of Hello. The documentation can be created using @samp{make pdf}. Note you need to have Hello properly installed before (see installation description above).
+The Texinfo documentation of Domino. The documentation can be created using @samp{make pdf}. Note you need to have Domino properly installed before (see installation description above).
 
 @item libs
-The Petri Net @acronym{API} used by Hello to parse and organize the open net.
+The Petri Net @acronym{API} used by Domino to parse and organize the open net.
 
 @item man
-The manpage of Hello which can be displayed using @samp{man hello} after having Hello installed (see installation description above).
+The manpage of Domino which can be displayed using @samp{man domino} after having Domino installed (see installation description above).
 
 @item src
-The source code of Hello.
+The source code of Domino.
 
 @item tests
-Testcases for Hello which check the generated binary.
+Testcases for Domino which check the generated binary.
 @end table
 
 
@@ -161,23 +161,31 @@ Testcases for Hello which check the generated binary.
 @anchor{Requirements}
 
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
-In order to run, compile, and develop Hello, several tools are required.
+In order to run, compile, and develop Domino, several tools are required.
 
 @c <<-- CHANGE START (tools required, etc.) -->>
 
 @subsection Runtime
 @itemize
-@item Wendy (@url{http://service-technology.org/wendy}). A suitable Wendy binary can be created as follows:
+@item LoLA (@url{http://service-technology.org/lola}). A suitable LoLA binary can be created as follows:
 @enumerate
-@item download @url{http://service-technology.org/files/wendy/wendy.tar.gz}
-@item untar @file{wendy.tar.gz}, configure
+@item download @url{http://service-technology.org/files/lola/lola.tar.gz}
+@item untar @file{lola.tar.gz}, configure
+@item call @samp{make lola-statespace}
+@item copy the binary @file{src/lola} to a directory of your path
+(e.g., @file{/usr/local/bin}) or call @samp{make install}
+@end enumerate
+@item Diane (@url{http://service-technology.org/diane}). A suitable Diane binary can be created as follows:
+@enumerate
+@item download @url{http://service-technology.org/files/diane/diane.tar.gz}
+@item untar @file{diane.tar.gz}, configure
 @item call @samp{make}
-@item copy the binary @file{src/wendy} to a directory of your path
+@item copy the binary @file{src/diane} to a directory of your path
 (e.g., @file{/usr/local/bin}) or call @samp{make install}
 @end enumerate
 @end itemize
 
-Hello's configure script checks whether Wendy (with binary @file{wendy}) is found in the path and adjusts the configuration file @file{src/hello.conf} accordingly.
+Domino's configure script checks whether Diane (with binary @file{diane}) is found in the path and adjusts the configuration file @file{src/domino.conf} accordingly.
 
 @c <<-- CHANGE END -->>
 
@@ -191,7 +199,7 @@ To compile the source code from a source distribution, the following tools are r
 
 
 @subsection Development
-In case you want to make changes to the source code, the following tools are required to reconfigure and compile Hello.
+In case you want to make changes to the source code, the following tools are required to reconfigure and compile Domino.
 
 @itemize
 @item Autoconf, @url{http://www.gnu.org/software/autoconf/}
@@ -213,13 +221,13 @@ Please check our nightly build server at @url{http://service-technology.org/nigh
 
 
 @node Command Line Options
-@chapter Invoking Hello
+@chapter Invoking Domino
 
-Hello is a command line tool and does not come with a fancy @acronym{GUI}. However, Hello can be easily scripted and combined with other tools.
+Domino is a command line tool and does not come with a fancy @acronym{GUI}. However, Domino can be easily scripted and combined with other tools.
 
 @section Command Line Options
 
-For an overview of the command line options, type @samp{hello -h} to see the following help screen:
+For an overview of the command line options, type @samp{domino -h} to see the following help screen:
 
 @smallexample
 @verbatiminclude cmdline.out
@@ -232,19 +240,19 @@ The parameters can also be controlled using a configuration file that can be rea
 
 @cartouche
 @smallexample
-hello net.owfn --config=myconf.conf
+domino net.owfn --config=myconf.conf
 @end smallexample
 @end cartouche
 
 A configuration file consistes of @code{paramter = value} lines, each line setting the value of a parameter. Note: If not all parameters are defined, the standard values apply.
 
-The configure script creates a default configuration file @file{hello.conf} which located in the @file{src} folder. When installing Hello, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
+The configure script creates a default configuration file @file{domino.conf} which located in the @file{src} folder. When installing Domino, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
 
-When Hello is executed, it evaluates parameters as follows:
+When Domino is executed, it evaluates parameters as follows:
 @enumerate
 @item When a configuration file is given via @option{--config}, it is used.
-@item Otherwise, the configuration file @file{hello.conf} in the local directory is used if present.
-@item Otherwise, the configuration file @file{hello.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
+@item Otherwise, the configuration file @file{domino.conf} in the local directory is used if present.
+@item Otherwise, the configuration file @file{domino.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
 @item Otherwise, no configuration file is used.
 @end enumerate
 Parameters given via command-line will overwrite parameters given via configuration files.
@@ -257,7 +265,7 @@ Parameters given via command-line will overwrite parameters given via configurat
 @chapter Theory
 
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
-Hello implements several algorithms and result published in several scientific articles.
+Domino implements several algorithms and result published in several scientific articles.
 
 @c <<-- CHANGE START (theory) -->>
 
@@ -284,11 +292,11 @@ See @url{http://service-technology.org/publications} for more information.
 @chapter Exit and Error Codes
 @section Exit Codes
 
-Hello will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input open net could be read, <<-- MORE ERRORS -->>. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+Domino will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input open net could be read, <<-- MORE ERRORS -->>. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
 
 @section Error Codes
 
-In case any error occurs, Hello aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
+In case any error occurs, Domino aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
 
 @table @asis
 
@@ -299,7 +307,7 @@ In case any error occurs, Hello aborts with exit code @samp{1} and prints a mess
 
 @smallexample
 @cartouche
-hello: <<-- ERROR MESSAGE -->> -- aborting [#01]
+domino: <<-- ERROR MESSAGE -->> -- aborting [#01]
 @end cartouche
 @end smallexample
 
@@ -315,13 +323,13 @@ hello: <<-- ERROR MESSAGE -->> -- aborting [#01]
 @chapter Version History
 
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
-Hello is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+Domino is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or a non-trivial changes have summed up, a new version is published. Though this releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
 
 @include ChangeLog.texi
 @sp 3
 
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
-The most recent change log is available at Hello's website at @url{http://service-technology.org/files/hello/ChangeLog}.
+The most recent change log is available at Domino's website at @url{http://service-technology.org/files/domino/ChangeLog}.
 
 
 @c --------------------------------------------------------------------------

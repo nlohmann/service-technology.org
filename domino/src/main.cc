@@ -384,12 +384,12 @@ int main(int argc, char** argv) {
 
 		results.add("result", (char*)"workflow decomposition successfull");
 		
-		results.add("stats.net.roles",  (int)net.getRoles().size());
-		results.add("stats.net.places",  (int)net.getPlaces().size());
-		results.add("stats.net.transitons",  (int)net.getTransitions().size());
+		results.add("stats.net.roles",  (unsigned int)net.getRoles().size());
+		results.add("stats.net.places",  (unsigned int)net.getPlaces().size());
+		results.add("stats.net.transitons",  (unsigned int)net.getTransitions().size());
 
-		results.add("stats.diane.forces",  (int)f.getDianeForces());
-		results.add("stats.diane.alternatives",  (int)f.getDianeAlternatives());
+		results.add("stats.diane.forces",  (unsigned int)f.getDianeForces());
+		results.add("stats.diane.alternatives",  (unsigned int)f.getDianeAlternatives());
 
     }
 	

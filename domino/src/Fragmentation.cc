@@ -1,3 +1,29 @@
+/*****************************************************************************\
+ 			 _____                  _             
+			|  __ \                (_)            
+			| |  | | ___  _ __ ___  _ _ __   ___  
+			| |  | |/ _ \| '_ ` _ \| | '_ \ / _ \ 
+			| |__| | (_) | | | | | | | | | | (_) |
+			|_____/ \___/|_| |_| |_|_|_| |_|\___/ 		                          
+			DecOMposition of busINess wOrkflows (into services)
+			http://service-technology.org/domino
+
+ Copyright (c) 2010 Andreas Lehmann
+
+ Domino is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ Domino is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Domino.  If not, see <http://www.gnu.org/licenses/>.
+\*****************************************************************************/
+
 #include "Fragmentation.h"
 
 Fragmentation::~Fragmentation() {}
@@ -9,6 +35,11 @@ Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
 	this->SERVICE_PLACE_PREFIX = "sp_";
 	this->SERVICE_TRANSITION_PREFIX = "st_";
 	
+	this->mCurrentDianeForces = 0;
+	this->mOverallDianeForces = 0;
+	this->mCurrentDianeAlternatives = 0;
+	this->mOverallDianeAlternatives = 0;
+
 	this->mFragmentNet = NULL;
 	this->mNet = &Petrinet;
 	this->mMaxFragID = this->mNet->getTransitions().size();
@@ -417,6 +448,11 @@ void Fragmentation::processUnassignedFragments() {
 
 	this->mUnassignedFragmentsProcessed = true;
 	
+	if (this->mOverallDianeForces != 0) {
+		status(_cimportant_("..%d forced decisions"), this->mOverallDianeForces);
+		status(_cimportant_("....with %d alternatives"), this->mOverallDianeAlternatives);
+	}
+
 	status("processUnassignedFragments() finished");
 }
 
@@ -1660,6 +1696,9 @@ void Fragmentation::processDianeFragmentation() {
 	pair<role_id_t, frag_id_t> bestConnection;
 	bool progress;
 
+	this->mCurrentDianeForces = 0;
+	this->mCurrentDianeAlternatives = 0;
+
 	for (diane_id_t d = 0; d < this->mDianeFragments; d++) {		
 		toDo.insert(d);
 	}
@@ -1700,6 +1739,14 @@ void Fragmentation::processDianeFragmentation() {
 			}
 		}
 		
+	}
+
+	this->mOverallDianeForces += this->mCurrentDianeForces;
+	this->mOverallDianeAlternatives += this->mCurrentDianeAlternatives;
+
+	if (this->mCurrentDianeForces != 0) {
+		status("......%d forced decisions", this->mCurrentDianeForces);
+		status("........%d alternatives", this->mCurrentDianeAlternatives);
 	}
 
 	this->connectFragments();
@@ -2081,6 +2128,8 @@ pair<role_id_t, frag_id_t> Fragmentation::getBestConnectionForDianeFragment(cons
 	if ((ret.first != this->ROLE_UNASSIGNED) && (ret.second != this->mMaxFragID)) {
 		if (Force) {
 			status("........Diane-Fragment %d is %s to connection (%d, %d)", DianeID, _cwarning_("FORCED"), ret.first, ret.second);
+			this->mCurrentDianeForces++;
+			this->mCurrentDianeAlternatives += knownCandidates.size();
 		}
 		else {
 			status("........Diane-Fragment %d becomes connection (%d, %d)", DianeID, ret.first, ret.second);
@@ -2301,4 +2350,20 @@ places_t Fragmentation::getTransitionPostset(pnapi::PetriNet & Petrinet, const t
 		ret.insert((*p)->getName());
 	}
 	return ret;
+}
+
+size_t Fragmentation::getDianeForces() {
+	if (!this->mUnassignedFragmentsProcessed) {
+		abort(2, "Fragmentation::getDianeForces(): processUnassignedFragments() is necessary");
+	}
+
+	return this->mOverallDianeForces;
+}
+
+size_t Fragmentation::getDianeAlternatives() {
+	if (!this->mUnassignedFragmentsProcessed) {
+		abort(2, "Fragmentation::getDianeAlternatives(): processUnassignedFragments() is necessary");
+	}
+
+	return this->mOverallDianeAlternatives;
 }

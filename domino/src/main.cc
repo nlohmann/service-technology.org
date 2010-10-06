@@ -24,7 +24,6 @@
  along with Domino.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-/* <<-- CHANGE START (main program) -->> */
 // include header files
 #include <config.h>
 #include <ctime>
@@ -374,5 +373,25 @@ int main(int argc, char** argv) {
 		}
 	}
 
+	if (args_info.resultFile_given) {
+        std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : fileName + ".results";
+        Results results(results_filename);
+
+        results.add("meta.package_name", (char*)PACKAGE_NAME);
+        results.add("meta.package_version", (char*)PACKAGE_VERSION);
+        results.add("meta.svn_version", (char*)VERSION_SVN);
+        results.add("meta.invocation", invocation);
+
+		results.add("result", (char*)"workflow decomposition successfull");
+		
+		results.add("stats.net.roles",  net.getRoles().size());
+		results.add("stats.net.places",  net.getPlaces().size());
+		results.add("stats.net.transitons",  net.getTransitions().size());
+
+		results.add("stats.diane.forces",  f.getDianeForces());
+		results.add("stats.diane.alternatives",  f.getDianeAlternatives());
+
+    }
+	
     return EXIT_SUCCESS;
 }

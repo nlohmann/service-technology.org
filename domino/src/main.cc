@@ -263,7 +263,6 @@ int main(int argc, char** argv) {
 
 	string fileName;
 	string outputFileName;
-	validStatus_e processStatus;
 	set<std::string> roles;
 	bool retOK;
 
@@ -348,7 +347,7 @@ int main(int argc, char** argv) {
 			createDotFile(outputFileName, net, fileName);
 		}
 
-		processStatus = f.isProcessValid(false);
+		validStatus_e processStatus = f.isProcessValid(false);
 		if (processStatus == VALID_BAD) {
 			message(_cbad_("worklfow demposition failed"));
 			retOK = false;

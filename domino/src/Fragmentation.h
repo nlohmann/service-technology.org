@@ -141,6 +141,9 @@ class Fragmentation {
 		bool mRoleFragmentsBuild;
 		bool mUnassignedFragmentsProcessed;
 		bool mServicesCreated;
+		size_t mLolaCalls;
+		bool mIsFreeChoice;
+		bool mHasCycles;
 		//ColorID -> ColorName
 		colorID2ColorName_t mColorID2ColorName;
 
@@ -152,6 +155,7 @@ class Fragmentation {
 		size_t mOverallDianeForces;
 		size_t mCurrentDianeAlternatives;
 		size_t mOverallDianeAlternatives;
+		size_t mDianeCalls;
 		frag_id_t mCurProcessingFragID;
 		//Transition -> DianeID
 		transition2DianeID_t mTransition2DianeID;
@@ -232,8 +236,12 @@ class Fragmentation {
 		void processUnassignedFragments();
 		void buildServices();
 
+		size_t getLolaCalls();
+		size_t getDianeCalls();
 		size_t getDianeForces();
 		size_t getDianeAlternatives();
+		bool hasCycles();
+		bool isFreeChoice();
 	
 		validStatus_e isProcessValid(const bool = false);
 

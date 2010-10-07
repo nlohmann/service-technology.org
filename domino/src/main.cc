@@ -162,14 +162,14 @@ void terminationHandler() {
 
 void createDotFile(const string & OutputFile, pnapi::PetriNet & Petrinet, const string InputFile) {
 	if (fileExists(string(OutputFile + ".dot"))) {
-		abort(2, "file %s already exists", _cfilename_(OutputFile + ".dot"));
+		abort(5, "file %s already exists", _cfilename_(OutputFile + ".dot"));
 	}
 
 	std::ofstream outStream;
 
 	outStream.open(string(OutputFile + ".dot").c_str(), std::ios_base::trunc);
 	if (outStream.fail()) {
-		abort(2, "file %s cannot be opened", _cfilename_(OutputFile + ".dot"));
+		abort(3, "file %s cannot be opened", _cfilename_(OutputFile + ".dot"));
 	}
 
 	outStream << pnapi::io::dot
@@ -183,14 +183,14 @@ void createDotFile(const string & OutputFile, pnapi::PetriNet & Petrinet, const 
 
 void createOWFNFile(const string & OutputFile, pnapi::PetriNet & Petrinet, const string InputFile) {
 	if (fileExists(string(OutputFile + ".owfn"))) {
-		abort(2, "file %s already exists", _cfilename_(OutputFile + ".owfn"));
+		abort(5, "file %s already exists", _cfilename_(OutputFile + ".owfn"));
 	}
 
 	std::ofstream outStream;
 
 	outStream.open(string(OutputFile + ".owfn").c_str(), std::ios_base::trunc);
 	if (outStream.fail()) {
-		abort(2, "file %s cannot be opened", _cfilename_(OutputFile + ".owfn"));
+		abort(3, "file %s cannot be opened", _cfilename_(OutputFile + ".owfn"));
 	}
 
 	outStream << pnapi::io::owfn
@@ -265,6 +265,9 @@ int main(int argc, char** argv) {
 	string outputFileName;
 	validStatus_e processStatus;
 	set<std::string> roles;
+	bool retOK;
+
+	retOK = true;
 
 	Fragmentation f(net);
 
@@ -326,55 +329,63 @@ int main(int argc, char** argv) {
 	}
 
 	if (f.isProcessValid(true) == VALID_BAD) {
-		message(_cbad_("worklfow demposition FAILED"));
-		return EXIT_FAILURE;
+		message(_cbad_("worklfow demposition failed"));
+		retOK = false;
 	}
 
-	f.buildServices();
+	if (retOK) {
 
-	if (args_info.dot_serviceOverview_given) {
-		f.colorFragmentsByRoleID();
-		if (args_info.dot_serviceOverview_arg != NULL) {
-			outputFileName = args_info.dot_serviceOverview_arg;
-		}
-		else {
-			outputFileName = string(fileName + "_Services");
-		}
-		createDotFile(outputFileName, net, fileName);
-	}
+		f.buildServices();
 
-	processStatus = f.isProcessValid(false);
-	if (processStatus == VALID_BAD) {
-		message(_cbad_("worklfow demposition FAILED"));
-		return EXIT_FAILURE;
-	}
-	else if (processStatus == VALID_TODO) {
-		message(_cbad_("workflow decomposition UNCOMPLETED"));
-		return EXIT_FAILURE;
-	}
-	else {
-		message(_cgood_("workflow decomposition successfull"));
-	}
-
-	if (args_info.output_given) {
-		roles = net.getRoles();
-		FOREACH(r, roles) {
-			pnapi::PetriNet roleNet = f.createPetrinetByRoleID(f.getRoleID((*r)));
-			if (args_info.output_arg != NULL) {
-				outputFileName = string(args_info.output_arg + (*r));
+		if (args_info.dot_serviceOverview_given) {
+			f.colorFragmentsByRoleID();
+			if (args_info.dot_serviceOverview_arg != NULL) {
+				outputFileName = args_info.dot_serviceOverview_arg;
 			}
 			else {
-				outputFileName = string(fileName + "_Service-" + (*r));
+				outputFileName = string(fileName + "_Services");
 			}
-			createOWFNFile(outputFileName, roleNet, fileName);
-			if (args_info.dotServices_flag) {
-				createDotFile(outputFileName, roleNet, fileName);
+			createDotFile(outputFileName, net, fileName);
+		}
+
+		processStatus = f.isProcessValid(false);
+		if (processStatus == VALID_BAD) {
+			message(_cbad_("worklfow demposition failed"));
+			retOK = false;
+		}
+		else if (processStatus == VALID_TODO) {
+			message(_cbad_("workflow decomposition uncompleted"));
+			retOK = false;
+		}
+		else {
+			message(_cgood_("workflow decomposition successfull"));
+		}
+
+		if (args_info.output_given && retOK) {
+			roles = net.getRoles();
+			FOREACH(r, roles) {
+				pnapi::PetriNet roleNet = f.createPetrinetByRoleID(f.getRoleID((*r)));
+				if (args_info.output_arg != NULL) {
+					outputFileName = string(args_info.output_arg + (*r));
+				}
+				else {
+					outputFileName = string(fileName + "_Service-" + (*r));
+				}
+				createOWFNFile(outputFileName, roleNet, fileName);
+				if (args_info.dotServices_flag) {
+					createDotFile(outputFileName, roleNet, fileName);
+				}
 			}
 		}
+
 	}
 
 	if (args_info.resultFile_given) {
         std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : fileName + ".results";
+		if (fileExists(results_filename)) {
+			abort(5, "file %s already exists", _cfilename_(results_filename));
+		}
+
         Results results(results_filename);
 
         results.add("meta.package_name", (char*)PACKAGE_NAME);
@@ -382,14 +393,19 @@ int main(int argc, char** argv) {
         results.add("meta.svn_version", (char*)VERSION_SVN);
         results.add("meta.invocation", invocation);
 
-		results.add("result", (char*)"workflow decomposition successfull");
+		results.add("result.success", retOK);
 		
-		results.add("stats.net.roles",  (unsigned int)net.getRoles().size());
-		results.add("stats.net.places",  (unsigned int)net.getPlaces().size());
-		results.add("stats.net.transitons",  (unsigned int)net.getTransitions().size());
+		results.add("workflow.isFreeChoice", f.isFreeChoice());
+		results.add("workflow.hasCycles", f.hasCycles());
+		results.add("workflow.roles",  (unsigned int)net.getRoles().size());
+		results.add("workflow.places",  (unsigned int)net.getPlaces().size());
+		results.add("workflow.transitons",  (unsigned int)net.getTransitions().size());
 
-		results.add("stats.diane.forces",  (unsigned int)f.getDianeForces());
-		results.add("stats.diane.alternatives",  (unsigned int)f.getDianeAlternatives());
+		results.add("diane.calls",  (unsigned int)f.getDianeCalls());
+		results.add("diane.forces",  (unsigned int)f.getDianeForces());
+		results.add("diane.alternatives",  (unsigned int)f.getDianeAlternatives());
+
+		results.add("lola.calls",  (unsigned int)f.getLolaCalls());
 
     }
 	

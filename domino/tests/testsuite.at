@@ -186,7 +186,7 @@ AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
 AT_CHECK([DOMINO IBM-B3-3029.owfn --resultFile=res.results],0,ignore,ignore)
-AT_CHECK([GREP -q "workflow decomposition successfull" res.results])
+AT_CHECK([GREP -q "success = true" res.results])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -420,8 +420,8 @@ AT_SETUP([DA-Producer-Consumer (fail)])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/fail_DA-Producer-Consumer.owfn .])
-AT_CHECK([DOMINO fail_DA-Producer-Consumer.owfn ],1,ignore,stderr)
-AT_CHECK([GREP -q "worklfow demposition FAILED" stderr])
+AT_CHECK([DOMINO fail_DA-Producer-Consumer.owfn ],0,ignore,stderr)
+AT_CHECK([GREP -q "worklfow demposition failed" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 

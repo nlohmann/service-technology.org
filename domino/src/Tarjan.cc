@@ -51,7 +51,7 @@ void Tarjan::init() {
 
 void Tarjan::calculateSCC() {
 	if (this->mSCCCalculated) {
-		abort(2, "Tarjan::calculateSCC(): already called");
+		abort(6, "Tarjan::calculateSCC(): already called");
 	}
 	
 	//status("Tarjan::calculateSCC() called...");
@@ -104,18 +104,18 @@ void Tarjan::tarjan(node_t Node) {
 
 bool Tarjan::hasNonTrivialSCC() {
 	if (!this->mSCCCalculated) {
-		abort(2, "Tarjan::hasNonTrivialSCC(): Tarjan::calculateSCC() is necessary");
+		abort(8, "Tarjan::hasNonTrivialSCC(): Tarjan::calculateSCC() is necessary");
 	}
 	return this->mHasNonTrivialSCC;
 }
 
 bool Tarjan::isNonTrivialSCC(int SCC) {
 	if (!this->mSCCCalculated) {
-		abort(2, "Tarjan::isNonTrivialSCC(%d): Tarjan::calculateSCC() is necessary", SCC);
+		abort(8, "Tarjan::isNonTrivialSCC(%d): Tarjan::calculateSCC() is necessary", SCC);
 	}
 
 	if (this->mSCC2Node.find(SCC) == this->mSCC2Node.end()) {
-		abort(2, "Tarjan::isNonTrivialSCC(%d) failed", SCC);
+		abort(9, "Tarjan::isNonTrivialSCC(%d) failed", SCC);
 	}
 	
 	return (this->mSCC2Node.count(SCC) > 1);
@@ -123,11 +123,11 @@ bool Tarjan::isNonTrivialSCC(int SCC) {
 
 int Tarjan::getNodeSCC(const node_t & Node) {
 	if (!this->mSCCCalculated) {
-		abort(2, "Tarjan::getNodeSCC(%s): Tarjan::calculateSCC() is necessary", Node.c_str());
+		abort(8, "Tarjan::getNodeSCC(%s): Tarjan::calculateSCC() is necessary", Node.c_str());
 	}
 
 	if (this->mNode2SCC.find(Node) == this->mNode2SCC.end()) {
-		abort(2, "Tarjan::getNodeSCC(%s) failed", Node.c_str());
+		abort(9, "Tarjan::getNodeSCC(%s) failed", Node.c_str());
 	}
 	
 	return this->mNode2SCC.find(Node)->second;
@@ -135,14 +135,14 @@ int Tarjan::getNodeSCC(const node_t & Node) {
 
 node_value_t Tarjan::getNode2SCC() const {
 	if (!this->mSCCCalculated) {
-		abort(2, "Tarjan::getNode2SCC(): Tarjan::calculateSCC() is necessary");
+		abort(8, "Tarjan::getNode2SCC(): Tarjan::calculateSCC() is necessary");
 	}
 	return this->mNode2SCC;
 }
 
 multimap<int, node_t> Tarjan::getSCC2Node() const {
 	if (!this->mSCCCalculated) {
-		abort(2, "Tarjan::getNode2SCC(): Tarjan::calculateSCC() is necessary");
+		abort(8, "Tarjan::getNode2SCC(): Tarjan::calculateSCC() is necessary");
 	}
 	return this->mSCC2Node;
 }
@@ -154,7 +154,7 @@ void Tarjan::push(node_t & Node) {
 
 node_t Tarjan::pop() {
 	if (this->mStack.empty()) {
-		abort(2, "Tarjan::pop(): stack empty");
+		abort(9, "Tarjan::pop(): stack empty");
 	}
 	node_t curNode;
 
@@ -194,7 +194,7 @@ int Tarjan::getDFS(node_t & Node) {
 
 	curNode = this->mNodeDFS.find(Node);
 	if (curNode == this->mNodeDFS.end()) {
-		abort(2, "Tarjan::getDFS(%s) failed", Node.c_str());
+		abort(9, "Tarjan::getDFS(%s) failed", Node.c_str());
 	}
 
 	return curNode->second;
@@ -205,7 +205,7 @@ int Tarjan::getLowlink(node_t & Node) {
 
 	curNode = this->mNodeLowlink.find(Node);
 	if (curNode == this->mNodeLowlink.end()) {
-		abort(2, "Tarjan::getLowlink(%s) failed", Node.c_str());
+		abort(9, "Tarjan::getLowlink(%s) failed", Node.c_str());
 	}
 
 	return curNode->second;

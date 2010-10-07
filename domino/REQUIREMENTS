@@ -13,7 +13,8 @@ In order to run, compile, and develop Domino, several tools are required.
 Runtime
 -------
 
-   * LoLA (`http://service-technology.org/lola'). A suitable LoLA binary can
+   * LoLA (`http://service-technology.org/lola'), compiled with the
+     `STATESPACE' option. A suitable LoLA (version 1.14 or above) binary can
      be created as follows:
        1. download `http://service-technology.org/files/lola/lola.tar.gz'
 
@@ -21,8 +22,8 @@ Runtime
 
        3. call `make lola-statespace'
 
-       4. copy the binary `src/lola' to a directory of your path (e.g.,
-          `/usr/local/bin') or call `make install'
+       4. copy the binary `src/lola-statespace' to a directory of your path
+          (e.g., `/usr/local/bin') or call `make install'
 
    * Diane (`http://service-technology.org/diane'). A suitable Diane binary
      can be created as follows:
@@ -35,8 +36,9 @@ Runtime
        4. copy the binary `src/diane' to a directory of your path (e.g.,
           `/usr/local/bin') or call `make install'
 
-Domino's configure script checks whether Diane (with binary `diane') is found
-in the path and adjusts the configuration file `src/domino.conf' accordingly.
+Domino's configure script checks whether LoLA (with binary `lola-statespace')
+and Diane (with binary `diane') are found in the path and adjusts the
+configuration file `src/domino.conf' accordingly.
 
 Compilation
 -----------

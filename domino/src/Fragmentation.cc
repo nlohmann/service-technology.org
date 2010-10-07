@@ -40,6 +40,12 @@ Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
 	this->mCurrentDianeAlternatives = 0;
 	this->mOverallDianeAlternatives = 0;
 
+	this->mLolaCalls = 0;
+	this->mDianeCalls = 0;
+	this->mIsFreeChoice = Petrinet.isFreeChoice();
+	this->mHasCycles = false;
+	
+
 	this->mFragmentNet = NULL;
 	this->mNet = &Petrinet;
 	this->mMaxFragID = this->mNet->getTransitions().size();
@@ -58,7 +64,7 @@ role_id_t Fragmentation::getRoleID(const string & Role) {
 
 	curRole = this->mRoleName2RoleID.find(Role);
 	if (curRole == this->mRoleName2RoleID.end()) {
-		abort(2, "Fragmentation::getRoleID(%s) failed", Role.c_str());
+		abort(9, "Fragmentation::getRoleID(%s) failed", Role.c_str());
 	}
 
 	return curRole->second;
@@ -92,12 +98,12 @@ void Fragmentation::init() {
 	PNAPI_FOREACH(p, places) {
 		status("....%s", (*p).c_str());
 		if (*p == GLOBALSTART_REACHED) {
-			abort(2, "Fragmentation::init(): place has predefined constant name");
+			abort(10, "Fragmentation::init(): place %s has predefined constant name", (*p).c_str());
 		}
 		if (this->getPlacePreset(*this->mNet, *p).size() == 0) {
 			status("......is global start place");
 			if (this->mGlobalStartPlace != PLACE_UNASSIGNED) {
-				abort(2, "Fragmentation::init(): another gloabl start place found");
+				abort(11, "Fragmentation::init(): another global start place found");
 			}
 			this->mGlobalStartPlace = *p;
 		}
@@ -107,7 +113,7 @@ void Fragmentation::init() {
 		this->mPlacePointer2PlaceName[place] = *p;
 	}
 	if (this->mGlobalStartPlace == PLACE_UNASSIGNED) {
-		abort(2, "Fragmentation::init(): no gloabl start place was found");
+		abort(11, "Fragmentation::init(): no global start place was found");
 	}
 	status("..places cached");
 
@@ -127,7 +133,11 @@ void Fragmentation::init() {
 
 void Fragmentation::buildServices() {
 	if (!this->mUnassignedFragmentsProcessed) {
-		abort(2, "buildServices(): processUnassignedFragments() is necessary");
+		abort(8, "buildServices(): processUnassignedFragments() is necessary");
+	}
+
+	if (mServicesCreated) {
+		abort(6, "buildServices(): already called");
 	}
 
 	status("buildServices() called...");
@@ -155,14 +165,13 @@ void Fragmentation::buildServices() {
 	size_t reactivatingCount;
 	unsigned int curPlaceTokens;
 	bool changed;
-	bool isFreeChoice;
 	Tarjan tarjan(*this->mNet);
 
 	tarjan.calculateSCC();
-	isFreeChoice = this->mNet->isFreeChoice();
+	this->mHasCycles = tarjan.hasNonTrivialSCC();
 
-	status(_cimportant_("..has non trivial SCC: %d"), tarjan.hasNonTrivialSCC());
-	status(_cimportant_("..is free choice: %d"), isFreeChoice);
+	status(_cimportant_("..has non trivial SCC: %d"), this->mHasCycles);
+	status(_cimportant_("..is free choice: %d"), this->mIsFreeChoice);
 
 	netTransitions = this->getTransitions(*this->mNet);
 	FOREACH(t, netTransitions) {
@@ -196,7 +205,7 @@ void Fragmentation::buildServices() {
 					reactivatingCount++;
 				}
 				else if (curPredecessor == *t) {
-					abort(2, "Fragmentation::buildServices(): curPredecessor == *t");
+					abort(9, "Fragmentation::buildServices(): curPredecessor == *t");
 				}
 				else {
 					this->addTransitionPredecessors(transitionsToDo, transitionsDone, curPredecessor);
@@ -205,13 +214,13 @@ void Fragmentation::buildServices() {
 			}
 
 			if ( (tarjan.isNonTrivialSCC(tarjan.getNodeSCC(*t))) && (reactivatingCount == 0) ) {
-				abort(2, "Fragmentation::buildServices(): no reactiviating transitions");
+				abort(9, "Fragmentation::buildServices(): no reactiviating transitions");
 			}
 
 		}
 	}
 
-	if ((restrictions.size() != 0) && !isFreeChoice) {
+	if ((restrictions.size() != 0) && !this->mIsFreeChoice) {
 		extern int graph_yyparse();
 		extern int graph_yylex_destroy();
 		extern FILE* graph_yyin;
@@ -241,6 +250,7 @@ void Fragmentation::buildServices() {
 
 		command_line += loutputParam;
 		// call LoLA
+		this->mLolaCalls++;
 		status("..creating a pipe to %s by calling '%s'", _ctool_("LoLA"), _cparameter_(command_line));
 
 		{
@@ -265,7 +275,7 @@ void Fragmentation::buildServices() {
         // open LoLA's output file and link output file pointer
         graph_yyin = fopen(lfileName.c_str(), "r");
         if (!graph_yyin) {
-			abort(2, "Fragmentation::buildServices(): failed to open file %s", _cfilename_(lfileName));
+			abort(3, "Fragmentation::buildServices(): failed to open file %s", _cfilename_(lfileName));
         }
 
         /// actual parsing
@@ -279,7 +289,7 @@ void Fragmentation::buildServices() {
 
 		if (!args_info.noClean_flag) {
 			if (remove(lfileName.c_str()) != 0) {
-				abort(2, "Fragmentation::buildServices(): file %s cannot be deleted", _cfilename_(lfileName));
+				abort(12, "Fragmentation::buildServices(): file %s cannot be deleted", _cfilename_(lfileName));
 			}
 		}
 
@@ -297,7 +307,7 @@ void Fragmentation::buildServices() {
 
 	if (restrictions.size() != 0) {
 		status("..restrictions:");
-		if (!isFreeChoice) {
+		if (!this->mIsFreeChoice) {
 			FOREACH(t, restrictions) {
 				newPlace = this->SERVICE_PLACE_PREFIX + *t;
 				status("....%s", newPlace.c_str());
@@ -315,7 +325,7 @@ void Fragmentation::buildServices() {
 				}
 
 				if (curPlaceTokens == 0) {
-					abort(2, "Fragmenation::buildServices(): no boundness found for %s", (*t).c_str());
+					abort(9, "Fragmenation::buildServices(): no boundness found for %s", (*t).c_str());
 				}
 
 				this->mPlaceName2PlacePointer[newPlace]->setTokenCount(curPlaceTokens);
@@ -433,7 +443,11 @@ void Fragmentation::addTransitionPredecessors(stack<transition_t> & ToDo, transi
 
 void Fragmentation::processUnassignedFragments() {
 	if (!this->mRoleFragmentsBuild) {
-		abort(2, "Fragmentation::processUnassignedFragments(): buildRoleFragments() is necessary");
+		abort(8, "Fragmentation::processUnassignedFragments(): buildRoleFragments() is necessary");
+	}
+
+	if (mUnassignedFragmentsProcessed) {
+		abort(6, "Fragmentation::processUnassignedFragments(): already called");
 	}
 
 	status("processUnassignedFragments() called...");
@@ -458,7 +472,7 @@ void Fragmentation::processUnassignedFragments() {
 
 void Fragmentation::buildRoleFragments() {
 	if (this->mRoleFragmentsBuild) {
-		abort(2, "Fragmentation::buildRoleFragments(): buildRoleFragments() already called");
+		abort(6, "Fragmentation::buildRoleFragments(): already called");
 	}
 	
 	status("buildRoleFragments() called...");
@@ -499,7 +513,7 @@ void Fragmentation::buildRoleFragments() {
 			status("......t has role %s [%d]", (*(transitionRoles.begin())).c_str(), curRoleID);
 		}
 		else {
-			abort(2, "Fragmentation::buildRoleFragments(): transition %s has more than one role", (*t).c_str());
+			abort(13, "Fragmentation::buildRoleFragments(): transition %s has more than one role", (*t).c_str());
 		}
 		this->setTransitionRoleID(*t, curRoleID, false);
 		status("......assigned RoleID %d to t", curRoleID);
@@ -597,7 +611,7 @@ void Fragmentation::setTransitionRoleID(const transition_t & Transition, const r
 	curRole = this->mTransition2RoleID.find(Transition);
 	if (curRole != this->mTransition2RoleID.end()) {
 		if (!Override) {
-			abort(2, "Fragmentation::setTransitionRoleID(%s, %d) is called again", Transition.c_str(), RoleID);
+			abort(6, "Fragmentation::setTransitionRoleID(%s, %d) is called again", Transition.c_str(), RoleID);
 		}
 		bool found = false;
 		
@@ -609,7 +623,7 @@ void Fragmentation::setTransitionRoleID(const transition_t & Transition, const r
 			}
 		}
 		if (!found) {
-			abort(2, "Fragmentation::setTransitionRoleID(%s, %d) failed", Transition.c_str(), RoleID);
+			abort(9, "Fragmentation::setTransitionRoleID(%s, %d) failed", Transition.c_str(), RoleID);
 		}
 		this->mRoleID2Transitions.erase(curRoleTransition);		
 		this->mTransition2RoleID.erase(curRole);
@@ -620,14 +634,14 @@ void Fragmentation::setTransitionRoleID(const transition_t & Transition, const r
 
 role_id_t Fragmentation::getTransitionRoleID(const transition_t & Transition) {
 	if (!this->mRoleFragmentsBuild) {
-		abort(2, "Fragmentation::getTransitionRoleID(): buildRoleFragments() is necessary");
+		abort(8, "Fragmentation::getTransitionRoleID(): buildRoleFragments() is necessary");
 	}
 	
 	transition2RoleID_t::iterator curRole;
 
 	curRole = this->mTransition2RoleID.find(Transition);
 	if (curRole == this->mTransition2RoleID.end()) {
-		abort(2, "Fragmentation::getTransitionRoleID(%s) failed", Transition.c_str());
+		abort(9, "Fragmentation::getTransitionRoleID(%s) failed", Transition.c_str());
 	}
 	return curRole->second;
 }
@@ -640,7 +654,7 @@ void Fragmentation::setTransitionFragID(const transition_t & Transition, const f
 	curTransition = this->mTransition2FragID.find(Transition);
 	if (curTransition != this->mTransition2FragID.end()) {
 		if (!Override) {
-			abort(2, "Fragmentation::setTransitionFragID(%s, %d) is called again", Transition.c_str(), FragID);
+			abort(6, "Fragmentation::setTransitionFragID(%s, %d) is called again", Transition.c_str(), FragID);
 		}
 		bool found = false;
 			
@@ -652,7 +666,7 @@ void Fragmentation::setTransitionFragID(const transition_t & Transition, const f
 			}
 		}
 		if (!found) {
-			abort(2, "Fragmentation::setTransitionFragID(%s, %d) failed", Transition.c_str(), FragID);
+			abort(9, "Fragmentation::setTransitionFragID(%s, %d) failed", Transition.c_str(), FragID);
 		}
 		this->mFragID2Transitions.erase(curFragTransition);		
 		this->mTransition2FragID.erase(curTransition);
@@ -666,7 +680,7 @@ frag_id_t Fragmentation::getTransitionFragID(const transition_t & Transition) {
 
 	curFrag = this->mTransition2FragID.find(Transition);
 	if (curFrag == this->mTransition2FragID.end()) {
-		abort(2, "Fragmentation::getTransitionFragID(%s) failed", Transition.c_str());
+		abort(9, "Fragmentation::getTransitionFragID(%s) failed", Transition.c_str());
 	}
 	return curFrag->second;
 }
@@ -688,7 +702,7 @@ void Fragmentation::setPlaceMinFragID(const place_t & Place, const frag_id_t Fra
 			}
 		}
 		if (!found) {
-			abort(2, "Fragmentation::setPlaceMinFragID(%s, %d) failed", Place.c_str(), FragID);
+			abort(9, "Fragmentation::setPlaceMinFragID(%s, %d) failed", Place.c_str(), FragID);
 		}	
 		this->mMinFragID2Places.erase(curFragPlace);
 		this->mPlace2MinFragID.erase(curMinFrag);
@@ -702,7 +716,7 @@ frag_id_t Fragmentation::getPlaceMinFragID(const place_t & Place) {
 
 	curMinFrag = this->mPlace2MinFragID.find(Place);
 	if (curMinFrag == this->mPlace2MinFragID.end()) {
-		abort(2, "Fragmentation::getPlaceMinFragID(%s) failed", Place.c_str());
+		abort(9, "Fragmentation::getPlaceMinFragID(%s) failed", Place.c_str());
 	}
 	return curMinFrag->second;
 }
@@ -736,10 +750,10 @@ void Fragmentation::addPlaceRoleID(const place_t & Place, const role_id_t RoleID
 		this->mRoleID2Places.insert( std::make_pair(RoleID, Place) );
 	}
 	else if (foundA && !foundB) {
-		abort(2, "Fragmentation::addPlaceRoleID(%s, %d) is in mPlace2RoleIDs but not in mRoleID2Places", Place.c_str(), RoleID);
+		abort(9, "Fragmentation::addPlaceRoleID(%s, %d) is in mPlace2RoleIDs but not in mRoleID2Places", Place.c_str(), RoleID);
 	}
 	else if (!foundA && foundB) {
-		abort(2, "Fragmentation::addPlaceRoleID(%s, %d) is in mRoleID2Places but not in mPlace2RoleIDs", Place.c_str(), RoleID);
+		abort(9, "Fragmentation::addPlaceRoleID(%s, %d) is in mRoleID2Places but not in mPlace2RoleIDs", Place.c_str(), RoleID);
 	}
 }
 
@@ -774,13 +788,13 @@ void Fragmentation::deletePlaceRoleID(const place_t & Place, const role_id_t Rol
 		this->mRoleID2Places.erase(curRolePlace);
 	}
 	else if (foundA && !foundB) {
-		abort(2, "Fragmentation::deletePlaceRoleID(%s, %d) is in mPlace2RoleIDs but not in mRoleID2Places", Place.c_str(), RoleID);
+		abort(9, "Fragmentation::deletePlaceRoleID(%s, %d) is in mPlace2RoleIDs but not in mRoleID2Places", Place.c_str(), RoleID);
 	}
 	else if (!foundA && foundB) {
-		abort(2, "Fragmentation::deletePlaceRoleID(%s, %d) is in mRoleID2Places but not in mPlace2RoleIDs", Place.c_str(), RoleID);
+		abort(9, "Fragmentation::deletePlaceRoleID(%s, %d) is in mRoleID2Places but not in mPlace2RoleIDs", Place.c_str(), RoleID);
 	}
 	else {
-		abort(2, "Fragmentation::deletePlaceRoleID(%s, %d) failed", Place.c_str(), RoleID);
+		abort(9, "Fragmentation::deletePlaceRoleID(%s, %d) failed", Place.c_str(), RoleID);
 	}
 }
 
@@ -812,10 +826,10 @@ void Fragmentation::addPlaceFragID(const place_t & Place, const frag_id_t FragID
 		this->mFragID2Places.insert( std::make_pair(FragID, Place) );
 	}
 	else if (foundA && !foundB) {
-		abort(2, "Fragmentation::addPlaceFragID(%s, %d) is in mPlace2FragIDs but not in mFragID2Places", Place.c_str(), FragID);
+		abort(9, "Fragmentation::addPlaceFragID(%s, %d) is in mPlace2FragIDs but not in mFragID2Places", Place.c_str(), FragID);
 	}
 	else if (!foundA && foundB) {
-		abort(2, "Fragmentation::addPlaceFragID(%s, %d) is in mFragID2Places but not in mPlace2FragIDs", Place.c_str(), FragID);
+		abort(9, "Fragmentation::addPlaceFragID(%s, %d) is in mFragID2Places but not in mPlace2FragIDs", Place.c_str(), FragID);
 	}
 }
 
@@ -850,13 +864,14 @@ void Fragmentation::deletePlaceFragID(const place_t & Place, const frag_id_t Fra
 		this->mFragID2Places.erase(curFragPlace);
 	}
 	else if (foundA && !foundB) {
-		abort(2, "Fragmentation::deletePlaceFragID(%s, %d) is in mPlace2FragIDs but not in mFragID2Places", Place.c_str(), FragID);
+		abort(9, "Fragmentation::deletePlaceFragID(%s, %d) is in mPlace2FragIDs but not in mFragID2Places", Place.c_str(), FragID);
 	}
 	else if (!foundA && foundB) {
-		abort(2, "Fragmentation::deletePlaceFragID(%s, %d) is in mFragID2Places but not in mPlace2FragIDs", Place.c_str(), FragID);
+		abort(9, "Fragmentation::deletePlaceFragID(%s, %d) is in mFragID2Places but not in mPlace2FragIDs", Place.c_str(), FragID);
 	}
 	else {
-		status("deletePlaceFragID(%s, %d) failed", Place.c_str(), FragID);
+		//status("deletePlaceFragID(%s, %d) failed", Place.c_str(), FragID);
+		abort(9, "deletePlaceFragID(%s, %d) failed", Place.c_str(), FragID);
 	}
 }
 
@@ -866,7 +881,7 @@ bool Fragmentation::isSharedPlace(const place_t & Place) {
 
 bool Fragmentation::isStartTransition(const transition_t & Transition) {
 	if (!this->mRoleFragmentsBuild) {
-		abort(2, "Fragmentation::isStartTransition(): buildRoleFragments() is necessary");
+		abort(8, "Fragmentation::isStartTransition(): buildRoleFragments() is necessary");
 	}
 	
 	places_t transitionPlaces;
@@ -926,7 +941,7 @@ void Fragmentation::replaceSharedStructure(const frag_id_t FragID, const place_t
 			arcsToDelete.insert(this->mNet->findArc(*this->mNet->findNode(Place), *this->mNet->findNode(*t)));
 		}
 		else {
-			abort(2, "Fragmentation::replaceSharedStructure(%d, %s): forbidden struture", FragID, Place.c_str());
+			abort(15, "Fragmentation::replaceSharedStructure(%d, %s): forbidden struture", FragID, Place.c_str());
 		}
 	}
 	
@@ -951,7 +966,7 @@ void Fragmentation::replaceSharedStructure(const frag_id_t FragID, const place_t
 
 	FOREACH(p, arcsToDelete) {
 		if (*p == NULL) {
-			abort(2, "Fragmentation::replaceSharedStructure(%d, %s): Nullpointer", FragID, Place.c_str());
+			abort(9, "Fragmentation::replaceSharedStructure(%d, %s): Nullpointer", FragID, Place.c_str());
 		}
 		this->mNet->deleteArc(**p);
 	}
@@ -963,7 +978,7 @@ validStatus_e Fragmentation::isSharedPlaceValidForFragment(const place_t & Place
 	status("....isSharedPlaceValidForFragment(%s, %d, %d) called...", Place.c_str(), FragID, Repair);
 
 	if (!isSharedPlace(Place)) {
-		abort(2, "Fragmentation::isSharedPlaceValid(%s, %d, %d) is no SP", Place.c_str(), FragID, Repair);
+		abort(9, "Fragmentation::isSharedPlaceValid(%s, %d, %d) is no SP", Place.c_str(), FragID, Repair);
 	}
 
 	frag_id_t FragmentRoleID;
@@ -1047,7 +1062,7 @@ validStatus_e Fragmentation::isFragmentValid(const frag_id_t FragID, const bool 
 
 validStatus_e Fragmentation::isProcessValid(const bool Repair) {
 	if (!this->mRoleFragmentsBuild) {
-		abort(2, "Fragmentation::isProcessValid(%d): buildRoleFragments() is necessary", Repair);
+		abort(8, "Fragmentation::isProcessValid(%d): buildRoleFragments() is necessary", Repair);
 	}
 	
 	status("isProcessValid(%d) called...", Repair);
@@ -1097,7 +1112,7 @@ bool Fragmentation::hasUnassignedTransitions(const place_t & Place) {
 	}
 
 	if (count == 0) {
-		abort(2, "Fragmentation::hasUnassignedTransitions(%s): place has no transitions", Place.c_str());
+		abort(9, "Fragmentation::hasUnassignedTransitions(%s): place has no transitions", Place.c_str());
 	}
 
 	return ret;
@@ -1113,13 +1128,13 @@ role_id_t Fragmentation::getFragmentRoleID(const frag_id_t FragID) {
 
 	curFragTransition = this->mFragID2Transitions.find(FragID);
 	if (curFragTransition == this->mFragID2Transitions.end()) {
-		abort(2, "Fragmentation::getFragmentRoleID(%d) is unknown", FragID);
+		abort(9, "Fragmentation::getFragmentRoleID(%d) is unknown", FragID);
 	}
 	
 	curTransitionRole = this->mTransition2RoleID.find(curFragTransition->second);
 	
 	if (curTransitionRole == this->mTransition2RoleID.end()) {
-		abort(2, "Fragmentation::getFragmentRoleID(%d): transition %s is unassigned", FragID, curFragTransition->second.c_str());
+		abort(9, "Fragmentation::getFragmentRoleID(%d): transition %s is unassigned", FragID, curFragTransition->second.c_str());
 	}
 	
 	return curTransitionRole->second;
@@ -1127,7 +1142,7 @@ role_id_t Fragmentation::getFragmentRoleID(const frag_id_t FragID) {
 
 string Fragmentation::getFragmentRoleName(const frag_id_t FragID) {
 	if (!this->mRoleFragmentsBuild) {
-		abort(2, "Fragmentation::getFragmentRoleName(): buildRoleFragments() is necessary");
+		abort(8, "Fragmentation::getFragmentRoleName(): buildRoleFragments() is necessary");
 	}
 	
 	role_id_t RoleID;
@@ -1141,7 +1156,7 @@ string Fragmentation::getFragmentRoleName(const frag_id_t FragID) {
 	else {
 		curRole = this->mRoleID2RoleName.find(RoleID);
 		if (curRole == this->mRoleID2RoleName.end()) {
-			abort(2, "Fragmentation::getFragmentRoleName(%d) failed", RoleID);
+			abort(9, "Fragmentation::getFragmentRoleName(%d) failed", RoleID);
 		}
 		ret = curRole->second;
 	}
@@ -1150,7 +1165,7 @@ string Fragmentation::getFragmentRoleName(const frag_id_t FragID) {
 
 void Fragmentation::replaceFragIDs(const frag_id_t FragOld, const frag_id_t FragNew) {
 	if (FragOld == FragNew) {
-		abort(2, "Fragmentation::replaceFragIDs(%d, %d): frags are identical", FragOld, FragNew);
+		abort(9, "Fragmentation::replaceFragIDs(%d, %d): frags are identical", FragOld, FragNew);
 	}
 	
 	pair<fragID2Places_t::iterator, fragID2Places_t::iterator> curFragPlaces;
@@ -1225,7 +1240,7 @@ void Fragmentation::connectFragments() {
 
 string Fragmentation::fragmentsToString() {
 	if (!this->mRoleFragmentsBuild) {
-		abort(2, "Fragmentation::fragmentsToString(): buildRoleFragments() is necessary");
+		abort(8, "Fragmentation::fragmentsToString(): buildRoleFragments() is necessary");
 	}
 
 	std::stringstream ret;
@@ -1269,7 +1284,7 @@ void Fragmentation::eraseColors() {
 
 void Fragmentation::colorFragmentsByFragID(const bool ColorUnassigned) {
 	if (!this->mRoleFragmentsBuild) {
-		abort(2, "Fragmentation::colorFragmentsByFragID(%d): buildRoleFragments() is necessary", ColorUnassigned);
+		abort(8, "Fragmentation::colorFragmentsByFragID(%d): buildRoleFragments() is necessary", ColorUnassigned);
 	}
 	
 	pair<fragID2Places_t::iterator, fragID2Places_t::iterator> curFragPlaces;
@@ -1285,7 +1300,7 @@ void Fragmentation::colorFragmentsByFragID(const bool ColorUnassigned) {
 
 			if ((this->getFragmentRoleID(FragID) != this->ROLE_UNASSIGNED) || ColorUnassigned) {
 				if (curColorID == this->mMaxColors) {
-					abort(2, "Fragmentation::colorFragmentsByFragID(%d): all %d colors used", ColorUnassigned, this->mMaxColors);
+					abort(16, "Fragmentation::colorFragmentsByFragID(%d): all %d colors used", ColorUnassigned, this->mMaxColors);
 				}
 				curColorName = this->getColorName(curColorID);
 
@@ -1309,7 +1324,7 @@ void Fragmentation::colorFragmentsByFragID(const bool ColorUnassigned) {
 
 void Fragmentation::colorFragmentsByRoleID(const bool ColorUnassigned) {
 	if (!this->mRoleFragmentsBuild) {
-		abort(2, "Fragmentation::colorFragmentsByRoleID(%d): buildRoleFragments() is necessary", ColorUnassigned);
+		abort(8, "Fragmentation::colorFragmentsByRoleID(%d): buildRoleFragments() is necessary", ColorUnassigned);
 	}
 	
 	pair<roleID2Places_t::iterator, roleID2Places_t::iterator> curRolePlaces;
@@ -1347,7 +1362,7 @@ void Fragmentation::colorFragmentsByRoleID(const bool ColorUnassigned) {
 
 	for (roleID2RoleName_t::iterator curRole=this->mRoleID2RoleName.begin(); curRole!=this->mRoleID2RoleName.end(); ++curRole) {
 		if (curColorID == this->mMaxColors) {
-			abort(2, "Fragmentation::colorFragmentsByRoleID(%d): all %d colors used", ColorUnassigned, this->mMaxColors);
+			abort(16, "Fragmentation::colorFragmentsByRoleID(%d): all %d colors used", ColorUnassigned, this->mMaxColors);
 		}
 		
 		curColorName = this->getColorName(curColorID);
@@ -1374,7 +1389,7 @@ string Fragmentation::getColorName(const size_t ColorID) {
 	
 	curColor = this->mColorID2ColorName.find(ColorID);
 	if (curColor == this->mColorID2ColorName.end()) {
-		abort(2, "Fragmentation::getColorName(%d) is unknown", ColorID);
+		abort(9, "Fragmentation::getColorName(%d) is unknown", ColorID);
 	}
 	return curColor->second;
 }
@@ -1416,7 +1431,7 @@ void Fragmentation::initColors() {
 
 void Fragmentation::createPetrinetByFragID(const frag_id_t FragID) {
 	if (this->isFragmentEmpty(FragID)) {
-		abort(2, "Fragmentation::createPetrinetByFragID(%d): fragment is empty", FragID);
+		abort(9, "Fragmentation::createPetrinetByFragID(%d): fragment is empty", FragID);
 	}
 
 	fragID2Transitions_t::iterator curFragTransition;
@@ -1455,7 +1470,7 @@ void Fragmentation::createPetrinetByFragID(const frag_id_t FragID) {
 
 pnapi::PetriNet Fragmentation::createPetrinetByRoleID(const role_id_t RoleID) {
 	if (!this->mServicesCreated) {
-		abort(2, "Fragmentation::createPetrinetByRoleID(%d): buildServices() is necessary", RoleID);
+		abort(8, "Fragmentation::createPetrinetByRoleID(%d): buildServices() is necessary", RoleID);
 	}
 	
 	status("createPetrinetByRoleID(%d) called...", RoleID);
@@ -1521,7 +1536,7 @@ pnapi::PetriNet Fragmentation::createPetrinetByRoleID(const role_id_t RoleID) {
 
 void Fragmentation::processUnassignedFragment(const frag_id_t FragID) {
 	if (this->getFragmentRoleID(FragID) != this->ROLE_UNASSIGNED) {
-		abort(2, "Fragmentation::processUnassignedFragment(%d): fragment is not unassigned", FragID);
+		abort(9, "Fragmentation::processUnassignedFragment(%d): fragment is not unassigned", FragID);
 	}
 
 	status("..processUnassignedFragment(%d) called...", FragID);
@@ -1554,12 +1569,12 @@ void Fragmentation::processUnassignedFragment(const frag_id_t FragID) {
 	fileName += "Frag[" + number.str() + "]2Diane";
 
 	if (fileExists(fileName)) {
-		abort(2, "Fragmentation::processUnassignedFragment(%d): file %s already exists", _cfilename_(fileName));
+		abort(5, "Fragmentation::processUnassignedFragment(%d): file %s already exists", _cfilename_(fileName));
 	}
 
 	DianeTemp.open(fileName.c_str());
 	if (DianeTemp.fail()) {
-    	abort(2, "Fragmentation::processUnassignedFragment(%d): file %s cannot be opened", FragID, _cfilename_(fileName));
+    	abort(3, "Fragmentation::processUnassignedFragment(%d): file %s cannot be opened", FragID, _cfilename_(fileName));
     }
 
 	// create petri net off given fragment
@@ -1581,6 +1596,7 @@ void Fragmentation::processUnassignedFragment(const frag_id_t FragID) {
     command_line += outputParam;
     // call Diane
     status("....calling %s: '%s'", _ctool_("Diane"), _cparameter_(command_line));
+	this->mDianeCalls++;
     {
         // set start time
         time(&start_time);
@@ -1597,7 +1613,7 @@ void Fragmentation::processUnassignedFragment(const frag_id_t FragID) {
 	
 	if (!args_info.noClean_flag) {
 		if (remove(fileName.c_str()) != 0) {
-			abort(2, "Fragmentation::processUnassignedFragment(%d): file %s cannot be deleted", FragID, _cfilename_(fileName));
+			abort(12, "Fragmentation::processUnassignedFragment(%d): file %s cannot be deleted", FragID, _cfilename_(fileName));
 		}
 	}
 
@@ -1623,7 +1639,7 @@ void Fragmentation::processUnassignedFragment(const frag_id_t FragID) {
 		this->readDianeOutputFile(curPartFileName);
 		if (!args_info.noClean_flag) {
 			if (remove(curPartFileName.c_str()) != 0) {
-				abort(2, "Fragmentation::processUnassignedFragment(%d): file %s cannot be deleted", FragID, _cfilename_(curPartFileName));
+				abort(12, "Fragmentation::processUnassignedFragment(%d): file %s cannot be deleted", FragID, _cfilename_(curPartFileName));
 			}
 		}
 		//try next file
@@ -1633,7 +1649,7 @@ void Fragmentation::processUnassignedFragment(const frag_id_t FragID) {
 	}
 
 	if (this->mFragmentUnprocessedNodes.size() != 0) {
-		abort(2, "Fragmentation::processUnassignedFragment(%d): %d nodes are unprocessed", FragID, this->mFragmentUnprocessedNodes.size());
+		abort(9, "Fragmentation::processUnassignedFragment(%d): %d nodes are unprocessed", FragID, this->mFragmentUnprocessedNodes.size());
 	}
 
 	this->processDianeFragmentation();
@@ -1654,7 +1670,7 @@ void Fragmentation::readDianeOutputFile(const string & FileName) {
 
 	DianeFragment.open(FileName.c_str());
 	if (DianeFragment.fail()) {
-    	abort(2, "Fragmentation::readDianeOutputFile(%s): file cannot be opened", _cfilename_(FileName));
+    	abort(3, "Fragmentation::readDianeOutputFile(%s): file cannot be opened", _cfilename_(FileName));
     }
 
 	DianeFragment >> pnapi::io::owfn >> net;
@@ -1735,7 +1751,7 @@ void Fragmentation::processDianeFragmentation() {
 				}
 			}
 			if (!progress) {
-				abort(2, "Fragmentation::processDianeFragmentation(): no progress, perhaps another role annotation could help!");
+				abort(17, "Fragmentation::processDianeFragmentation(): no progress");
 			}
 		}
 		
@@ -1763,7 +1779,7 @@ void Fragmentation::setTransitionDianeID(const transition_t & Transition, const 
 	if (curTransitionDiane != this->mTransition2DianeID.end()) {
 		
 		if (!Override) {
-			abort(2, "Fragmentation::setTransitionDianeID(%s, %d) is called again", Transition.c_str(), DianeID);
+			abort(6, "Fragmentation::setTransitionDianeID(%s, %d) is called again", Transition.c_str(), DianeID);
 		}
 		bool found = false;
 		
@@ -1775,7 +1791,7 @@ void Fragmentation::setTransitionDianeID(const transition_t & Transition, const 
 			}
 		}
 		if (!found) {
-			abort(2, "Fragmentation::setTransitionDianeID(%s, %d) failed", Transition.c_str(), DianeID);
+			abort(9, "Fragmentation::setTransitionDianeID(%s, %d) failed", Transition.c_str(), DianeID);
 		}
 		this->mDianeID2Transitions.erase(curDianeTransition);		
 		this->mTransition2DianeID.erase(curTransitionDiane);
@@ -1789,7 +1805,7 @@ diane_id_t Fragmentation::getTransitionDianeID(const transition_t & Transition) 
 
 	curTransitionDiane = this->mTransition2DianeID.find(Transition);
 	if (curTransitionDiane == this->mTransition2DianeID.end()) {
-		abort(2, "Fragmentation::getTransitionDianeID(%s) is unknown", Transition.c_str());
+		abort(9, "Fragmentation::getTransitionDianeID(%s) is unknown", Transition.c_str());
 	}
 	return curTransitionDiane->second;
 }
@@ -1822,10 +1838,10 @@ void Fragmentation::addPlaceDianeID(const place_t & Place, const diane_id_t Dian
 		this->mDianeID2Places.insert( std::make_pair(DianeID, Place) );
 	}
 	else if (foundA && !foundB) {
-		abort(2, "Fragmentation::addPlaceDianeID(%s, %d) is in mPlace2FragIDs but not in mDianeID2Places", Place.c_str(), DianeID);
+		abort(9, "Fragmentation::addPlaceDianeID(%s, %d) is in mPlace2FragIDs but not in mDianeID2Places", Place.c_str(), DianeID);
 	}
 	else if (!foundA && foundB) {
-		abort(2, "Fragmentation::addPlaceDianeID(%s, %d) is in mFragID2Places but not in mPlace2DianeIDs", Place.c_str(), DianeID);
+		abort(9, "Fragmentation::addPlaceDianeID(%s, %d) is in mFragID2Places but not in mPlace2DianeIDs", Place.c_str(), DianeID);
 	}
 }
 
@@ -2251,20 +2267,20 @@ void Fragmentation::createArc(const node_t & Source, const node_t & Target) {
 	target = this->mNet->findNode(Target);
 
 	if (source == NULL) {
-		abort(2, "Fragmentation::createArc(%s, %s): Source is unknown", Source.c_str(), Target.c_str());
+		abort(9, "Fragmentation::createArc(%s, %s): source is unknown", Source.c_str(), Target.c_str());
 	}
 	if (target == NULL) {
-		abort(2, "Fragmentation::createArc(%s, %s): Destination is unknown", Source.c_str(), Target.c_str());
+		abort(9, "Fragmentation::createArc(%s, %s): destination is unknown", Source.c_str(), Target.c_str());
 	}
 	if (this->mNet->findArc(*source, *target) != NULL) {
-		abort(2, "Fragmentation::createArc(%s, %s): Arc is already known", Source.c_str(), Target.c_str());
+		abort(9, "Fragmentation::createArc(%s, %s): arc is already known", Source.c_str(), Target.c_str());
 	}
 	this->mNet->createArc(*source, *target);
 }
 
 void Fragmentation::createPlace(const place_t & Place, const frag_id_t FragID, const role_id_t RoleID) {
 	if (this->mNet->findPlace(Place) != NULL) {
-		abort(2, "Fragmentation::createPlace(%s, %d, %d): place is already known", Place.c_str(), FragID, RoleID);
+		abort(9, "Fragmentation::createPlace(%s, %d, %d): place is already known", Place.c_str(), FragID, RoleID);
 	}
 
 	pnapi::Place * ret;
@@ -2278,7 +2294,7 @@ void Fragmentation::createPlace(const place_t & Place, const frag_id_t FragID, c
 
 void Fragmentation::createTransition(const transition_t & Transition, const frag_id_t FragID, const role_id_t RoleID) {
 	if (this->mNet->findTransition(Transition) != NULL) {
-		abort(2, "Fragmentation::createTransition(%s, %d, %d): transition is already known", Transition.c_str(), FragID, RoleID);
+		abort(9, "Fragmentation::createTransition(%s, %d, %d): transition is already known", Transition.c_str(), FragID, RoleID);
 	}
 
 	pnapi::Transition * ret;
@@ -2352,18 +2368,26 @@ places_t Fragmentation::getTransitionPostset(pnapi::PetriNet & Petrinet, const t
 	return ret;
 }
 
-size_t Fragmentation::getDianeForces() {
-	if (!this->mUnassignedFragmentsProcessed) {
-		abort(2, "Fragmentation::getDianeForces(): processUnassignedFragments() is necessary");
-	}
+bool Fragmentation::isFreeChoice() {
+	return this->mIsFreeChoice;
+}
 
+bool Fragmentation::hasCycles() {
+	return this->mHasCycles;
+}
+
+size_t Fragmentation::getLolaCalls() {
+	return this->mLolaCalls;
+}
+
+size_t Fragmentation::getDianeCalls() {
+	return this->mDianeCalls;
+}
+
+size_t Fragmentation::getDianeForces() {
 	return this->mOverallDianeForces;
 }
 
 size_t Fragmentation::getDianeAlternatives() {
-	if (!this->mUnassignedFragmentsProcessed) {
-		abort(2, "Fragmentation::getDianeAlternatives(): processUnassignedFragments() is necessary");
-	}
-
 	return this->mOverallDianeAlternatives;
 }

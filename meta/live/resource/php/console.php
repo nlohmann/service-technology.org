@@ -25,8 +25,16 @@ function console($public, $private) {
 //  ob_flush();
   $start = time();
   $resultfilename = tempnam("tmp", "console-".$console_counter);
-  system($private.' &> '.$resultfilename, $result);
+  // system('echo $SHELL; '.$private.' > '.$resultfilename, $result);
+  exec($private.' 2>&1 ', $output, $result);
+  $fh = fopen($resultfilename, 'a');
+  foreach ($output as $line)
+  {
+    fwrite($fh, $line."\n");
+  }
+  fclose($fh);
   readfile($resultfilename);
+  flush();
 
   echo '</div>';
   
@@ -45,6 +53,7 @@ function console($public, $private) {
 
   // write logging information to temp file
   $fh = fopen($resultfilename, 'a');
+  //fseek($fh, 0, SEEK_END);
   fwrite($fh, "\n\n\n");
   fwrite($fh, "ST_COMMAND:     ".$public."\n");
   fwrite($fh, "ST_EXIT-CODE:   ".$result."\n");
@@ -52,7 +61,7 @@ function console($public, $private) {
   fwrite($fh, "ST_URL:         ".$_SERVER['REQUEST_URI']."\n");
   fwrite($fh, "ST_CALLER:      ".$_SERVER['REMOTE_ADDR']."\n");
   fclose($fh);
-  
+
   // Javascript for console GUI
   echo '<script type="text/javascript">'."\n";
   echo '<!--'."\n";

@@ -72,7 +72,7 @@
   $fakecall .= " -r ".$rulefile["basename"];
   $realcall .= " -r ".$rulefile["residence"];
 
-  $realcall .= " -v 2>&1";
+  $realcall .= " -v";
   // end of building call strings
 
 ?>

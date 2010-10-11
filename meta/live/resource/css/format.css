@@ -61,7 +61,7 @@ ul {
 
 body {
   font-family: Tahoma, sans-serif;
-  font-size: 0.7em;
+  font-size: 0.9em;
   color: #444;
 }
 
@@ -180,4 +180,8 @@ div#running img {
 
 div#tabs {
   background: #efefef;
+}
+
+a img {
+  border: 0px;
 }

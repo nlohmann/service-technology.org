@@ -46,7 +46,7 @@
   $fakecall .= " --".$_SESSION[$tool]['modus'].'='.$fakeresult.".".$_SESSION[$tool]['modus'];
   $realcall .= " --".$_SESSION[$tool]['modus'].'='.$realresult.".".$_SESSION[$tool]['modus'];
 
-  $realcall .= " -v 2>&1";
+  $realcall .= " -v";
   // end of building call strings
 
   // if 'result' is set to 'output', only print the generated file and exit

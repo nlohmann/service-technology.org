@@ -58,7 +58,8 @@ void printStats(Solver& solver)
 }
 
 
-static Solver* solver;
+//static 
+Solver* solver;
 // Terminate by notifying the solver and back out gracefully. This is mainly to have a test-case
 // for this feature of the Solver as it may take longer than an immediate call to '_exit()'.
 static void SIGINT_interrupt(int signum) { solver->interrupt(); }
@@ -268,7 +269,7 @@ bool minisat(vector< vector< int > > & in, vector<bool>& vb, vector<int>& confli
 		// Use signal handlers that forcibly quit until the solver will be able to respond to
 		// interrupts:
 		signal(SIGINT, SIGINT_exit);
-		signal(SIGXCPU,SIGINT_exit);
+		//signal(SIGXCPU,SIGINT_exit);
 		
 /*		// Set limit on CPU-time:
 		if (cpu_lim != INT32_MAX){
@@ -296,7 +297,7 @@ bool minisat(vector< vector< int > > & in, vector<bool>& vb, vector<int>& confli
 		// Change to signal-handlers that will only notify the solver and allow it to terminate
 		// voluntarily:
 		signal(SIGINT, SIGINT_interrupt);
-		signal(SIGXCPU,SIGINT_interrupt);
+		//signal(SIGXCPU,SIGINT_interrupt);
 //		fprintf(stdout,"No variables  %d\n",S.nVars());//return vb;
 		
 		if (!S.simplify()){
@@ -307,7 +308,16 @@ bool minisat(vector< vector< int > > & in, vector<bool>& vb, vector<int>& confli
 				//fprintf(stdout,"Solved by unit propagation\n");
 				//printStats(S);
 				fprintf(stdout,"\n"); }
-			fprintf(stdout,"UNSATISFIABLE\n");
+			fprintf(stdout,"MINISAT: UNSATISFIABLE, %d\n",S.conflict.size());
+			conflict= vector<int>(S.conflict.size());
+			for (int i = 0; i < S.conflict.size(); i++)
+				//if (S.conflict[i] != l_Undef)
+			{
+				conflict.at(i)=toInt(S.conflict[i]);
+				//fprintf(stdout, "%s%s%d", (i==0)?"":" ", (S.model[i]==l_True)?"":"-", i+1);
+				//vb->at(i)=toInt(S.model[i])-1;
+				std::cout<< conflict.at(i)<<std::endl;
+			}
 			return false;//exit(20);
 		}
 		
@@ -316,7 +326,7 @@ bool minisat(vector< vector< int > > & in, vector<bool>& vb, vector<int>& confli
 		if (S.verbosity > 0){
 			printStats(S);
 			fprintf(stdout,"\n"); }
-		printf(ret == l_True ? "SATISFIABLE\n" : ret == l_False ? "UNSATISFIABLE\n" : "INDETERMINATE\n");
+		printf(ret == l_True ? "MINISAT: SATISFIABLE\n" : ret == l_False ? "MINISAT: UNSATISFIABLE\n" : "INDETERMINATE\n");
 		//if (res != NULL){
 
 		if (ret == l_True){
@@ -332,7 +342,7 @@ bool minisat(vector< vector< int > > & in, vector<bool>& vb, vector<int>& confli
 			return true;
 		}
 		else if (ret == l_False){
-			fprintf(stdout,"UNSAT\nConflicting clause");
+			fprintf(stdout,"MINISAT: UNSAT\nConflicting clause");
 			//vb=NULL;
 			conflict= vector<int>(S.conflict.size());
 			for (int i = 0; i < S.conflict.size(); i++)
@@ -399,8 +409,16 @@ vector<bool>*  minisat2(vector< vector< int > > & in)
     if (!S.simplify()){
         return NULL;//(0); // UNSAT
     }
-	
+	std::cout << "first solve"<<std::endl;
     int result=S.solve(); // result of SOLVE
+	vector<bool> *vb=new vector<bool> (S.model.size());
+	for (int i = 0; i < S.nVars(); i++)
+		if (S.model[i] != l_Undef){
+			//fprintf(stdout, "%s%s%d", (i==0)?"":" ", (S.model[i]==l_True)?"":"-", i+1);
+			vb->at(i)=toInt(S.model[i])-1;std::cout<< vb->at(i)<<std::endl;
+		}
+		else vb->at(i)=-1;
+	
 	vec<Lit> cl;
 	cl.clear();
 	vec<lbool> cc;
@@ -409,16 +427,18 @@ vector<bool>*  minisat2(vector< vector< int > > & in)
 	S.model.copyTo(cc);
 	for (int r=0; r<cc.size(); ++r) {
 		mt=toInt(cc[r]);
+		//negate solution
 		ml=cc[r]==l_True ?~mkLit(r): mkLit(r); 
 		cl.push(ml);
 	}
 	S.addClause(cl);
 	result = S.solve();
-	
+		std::cout << "second solve"<<std::endl;
 	if(result){
 		vector<bool> *vb=new vector<bool> (S.model.size());
 		for (int k=0; k<S.model.size(); ++k) {
-			vb->at(k)=bool(toInt(S.model[k])+1);
+			vb->at(k)=toInt(S.model[k])-1;std::cout<< vb->at(k)<<std::endl;
+			//vb->at(k)=bool(toInt(S.model[k])+1);
 			//lbool val=S.model[k].;
 			//printf(" %s", val);
 		}
@@ -460,7 +480,7 @@ vector<vector<bool>*>*  minisatsimp(vector< vector< int > > & in)
 	bool ret = S.solve(dummy);vector<vector<bool> *>* x=NULL;
 	int k=0;
 	while (ret == true && k < 10 ){
-		fprintf(stdout,"SAT\n");
+		fprintf(stdout,"MINISAT: SAT\n");
 		vector<bool> *vb=new vector<bool> (S.model.size());
 		vec<Lit> cl;
 		for (int i = 0; i < S.nVars(); i++)
@@ -481,7 +501,7 @@ vector<vector<bool>*>*  minisatsimp(vector< vector< int > > & in)
 		++k;
 	}
 	if (ret == false)
-	{fprintf(stdout,"UNSAT\n");return NULL;}
+	{fprintf(stdout,"MINISAT: UNSAT\n");return NULL;}
 	else return x;
 	
 	/* int result=S.solve(); // result of SOLVE

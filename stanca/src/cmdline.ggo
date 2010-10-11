@@ -10,11 +10,11 @@
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
 description "About Stanca:"
-purpose "Stanca.\n This software checks the siphon-trap property for a Petri net using MiniSAT.\n\n  Report bugs to stanca@service-technology.org.\n "
+purpose "Stanca.\n This software computes various siphon and checks the siphon-trap property for a Petri net using MiniSAT.\n\n  Report bugs to stanca@service-technology.org.\n "
 
 
 section "Input/Output"
-#sectiondesc="When called without an input file, Stanca reads from the standard input stream. When called without an output parameter, Hello writes to the standard output stream. If no filename is given for the output option Hello creates a file with a temporary name.\n"
+#sectiondesc="When called without an input file, Stanca reads from the standard input stream. When called without an output parameter, Stanca writes to the standard output stream. If no filename is given for the output option Stanca creates a file with a temporary name.\n"
 
 option "output" o
   "Stanca's output."
@@ -31,8 +31,24 @@ option "siphon" s
   
 option "trap" t
   "Print out a non-empty trap."
-  details="Prints out a non-empty trap assignment.\n"
+  details="Prints out a non-empty trap assignment. When used with --siphon, it computes a trap inside th siphon).\n"
   flag off
+
+option "markedtrap" -
+  "Print out a non-empty marked trap."
+  details="Prints out a non-empty marked trap assignment. When used with --trap, it computes a trap inside the siphon. \n"
+  flag off
+
+option "diagnosis" d
+  "Shows a solution when the siphon-trap formula is satisfiable."
+  details="\n"
+  flag off
+
+option "siphonbasis" -
+  "Computing a siphon basis for a given net"
+  details="\n"
+  flag off
+
 
 option "semitrap" -
   "Print out a non-empty semi-trap."
@@ -45,6 +61,21 @@ option "semisiphon" -
   details="Prints out a non-empty semi-siphon assignment.\n"
   string multiple
   optional
+
+option "maxtrap" -
+  "Print out a non-empty max-trap in a given set set of places."
+  details="Prints out a non-empty maxi-trap assignment contained in the given set of places (by default this set is the set of places of the net).\n"
+  flag off
+#  string multiple
+#  optional
+
+option "maxsiphon" - 
+  "Print out a non-empty max-siphon in a given set of places."
+  details="Prints out a non-empty maxi-trap assignment contained in the given set of places (by default this set is the set of places of the net).\n"
+  flag off
+# string multiple
+#  optional
+
 
 option "all" - 
   "Print out all."
@@ -68,7 +99,7 @@ option "tmpfile" -
   details="The filename Stanca should use to create temporary files (i.e., the output derived from Stanca). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
   string
   typestr="FILENAME"
-  default="/tmp/hello-XXXXXX"
+  default="/tmp/stanca-XXXXXX"
   optional
   hidden
 

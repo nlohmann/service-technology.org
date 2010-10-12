@@ -20,7 +20,7 @@ wget http://service-technology.org/files/lola/lola.tar.gz
 tar xfz $TOOL.tar.gz
 cd $TOOL*
 ./configure --prefix=$DIR --sysconfdir=$DIR/bin
-make lola-statespace lola-statespace1 lola-bpm-liveprop1 lola-deadtransition lola-findpath lola-bpm-statepredicate1 lola-liveprop lola-boundedplace lola-boundednet lola-statepredicate
+make lola-statespace lola-statespace1 lola-bpm-liveprop1 lola-deadtransition lola-findpath lola-bpm-statepredicate1 lola-liveprop lola-boundedplace lola-boundednet lola-statepredicate lola-full
 make install
 cd ..
 rm -fr $TOOL* $TOOL.tar.gz

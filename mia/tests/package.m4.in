@@ -20,7 +20,7 @@ m4_define([GREP],                 [@GREP@])
 m4_define([AWK],                  [@AWK@])
 m4_define([SED],                  [@SED@])
 
-m4_define([LOLA_FULL]             [@LOLA_FULL@])
+m4_define([LOLA_FULL]             [@LOLA_STATESPACE@])
 m4_define([WENDY]                 [@WENDY@])
 
 # Valgrind

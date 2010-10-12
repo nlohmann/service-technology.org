@@ -51,19 +51,19 @@ option "finalize" -
 section "Configuration"
 sectiondesc="Mia relies on several other tools. These options configure Mia to find these tools.\n"
 
-option "lola-full" -
+option "lola-statespace" -
   "Set the name of the LoLA binary used to build state spaces."
   string
   typestr="FILE"
-  default="lola-full"
+  default="lola-statespace"
   optional
   hidden
 
-option "lola-full1" -
+option "lola-statespace1" -
   "Set the name of the LoLA binary used to build state spaces (while assuming a safe net)."
   string
   typestr="FILE"
-  default="lola-full1"
+  default="lola-statespace1"
   optional
   hidden
 

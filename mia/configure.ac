@@ -30,8 +30,8 @@ AC_ST_PNAPI([4.02])
 AC_ST_VERBOSE
 
 # search for optional tools needed by "make check"
-AC_PATH_PROG(LOLA_FULL, [lola-statespace], [])
-AC_PATH_PROG(LOLA_FULL1, [lola-statespace1], [${LOLA_FULL}])
+AC_PATH_PROG(LOLA_STATESPACE, [lola-statespace], [])
+AC_PATH_PROG(LOLA_STATESPACE1, [lola-statespace1], [${LOLA_STATESPACE}])
 AC_PATH_PROG(WENDY, [wendy], [])
 AC_PATH_PROG(VALGRIND, [valgrind], not found)
 
@@ -49,7 +49,7 @@ AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 
 # display a warning in case a required tool has not been found
-if test "${LOLA_FULL}" = "" -o "${WENDY}" = ""; then
+if test "${LOLA_STATESPACE}" = "" -o "${WENDY}" = ""; then
   echo
   echo "WARNING: Not all required tools have been found. Please read file"
   echo "         REQUIREMENTS and edit the file src/mia.conf before"

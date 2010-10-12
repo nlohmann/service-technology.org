@@ -7,18 +7,18 @@
 # tool.
 
 # Mia needs a LoLA binary that builds complete unreduced state spaces. Such
-# a LoLA binary can be built by executing "make lola-full" using a recent
+# a LoLA binary can be built by executing "make lola-statespace" using a recent
 # LoLA distribution, available at http://service-technology.org/files/lola.
 
-lola-full = @LOLA_FULL@
+lola-statespace = @LOLA_STATESPACE@
 
 # Mia can exploit the fact that the state space of a composition is safe by
-# design. Such a LoLA binary can be built by executing "make lola-full" using
+# design. Such a LoLA binary can be built by executing "make lola-statespace1" using
 # a recent LoLA distribution, available at
-# http://service-technology.org/files/lola. You can also set 'lola-full1' to
-# the same value as 'lola-full'.
+# http://service-technology.org/files/lola. You can also set 'lola-statespace1' to
+# the same value as 'lola-statespace'.
 
-lola-full1 = @LOLA_FULL1@
+lola-statespace1 = @LOLA_STATESPACE1@
 
 # Mia needs a Wendy binary (version 1.4 and above). Recent distribtions can
 # are available at http://service-technology.org/files/wendy.

@@ -300,7 +300,7 @@ int main(int argc, char** argv) {
     }
     composition_lolafile << pnapi::io::lola << *mpp;
     composition_lolafile.close();
-    string lola_command = args_info.safe_flag ? args_info.lola_full1_arg : args_info.lola_full_arg;
+    string lola_command = args_info.safe_flag ? args_info.lola_statespace1_arg : args_info.lola_statespace_arg;
     lola_command += " " + lola_filename + " -M";
     if (!args_info.verbose_flag) {
         lola_command += " 2> /dev/null";

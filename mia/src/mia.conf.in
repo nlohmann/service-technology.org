@@ -24,3 +24,11 @@ lola-full1 = @LOLA_FULL1@
 # are available at http://service-technology.org/files/wendy.
 
 wendy = @WENDY@
+
+# Mia needs to create a temporary file to pass it to Wendy and LoLA. 
+# The filename Mia should use can be specified below. The filename should end 
+# with 'XXXXXX' which is replaced at runtime with a random string. In case 
+# you use MinGW, path names are ignored and the basename is used instead.
+
+tmpfile = /tmp/mia-XXXXXX
+

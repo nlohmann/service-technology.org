@@ -175,13 +175,14 @@ int main(int argc, char** argv) {
     status("migrating '%s' to '%s", args_info.inputs[0], args_info.inputs[1]);
 
     // create a unique temporary file name
-    char tmp[] = "/tmp/mia-XXXXXX";
+    
 #ifdef HAVE_MKSTEMP
-    if (mkstemp(tmp) == -1) {
-        abort(9, "could not create a temporary file '%s'", tmp);
-    }
+//    if (mkstemp(args_info.tmpfile_arg) == -1) {
+//        abort(9, "could not create a temporary file '%s'", tmp);
+//    }
 #endif
-    string tmpname(tmp);
+    Output tmp;
+    string tmpname(tmp.name());
     string im_filename = tmpname + ".im";
     string mi_filename = tmpname + ".mi";
     string mpp_filename = tmpname + ".sa";

@@ -17,7 +17,7 @@
  along with Mia.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
 
-%token KW_STATE KW_PROG COLON DOT COMMA ARROW NUMBER NAME TGT_NAME MPP_NAME
+%token KW_STATE KW_LOWLINK COLON DOT COMMA ARROW NUMBER NAME TGT_NAME MPP_NAME
 
 %defines
 %name-prefix="graph_"
@@ -71,7 +71,7 @@ states:
 ;
 
 state:
-  KW_STATE NUMBER prog
+  KW_STATE NUMBER KW_LOWLINK COLON NUMBER
     {
         statename = "";
         currentTuple = std::vector<unsigned int>(interfaceLength, 0);
@@ -83,11 +83,6 @@ state:
         }
         ++stat_stateCount;
     }
-;
-
-prog:
-  /* empty */
-| KW_PROG NUMBER
 ;
 
 markings:

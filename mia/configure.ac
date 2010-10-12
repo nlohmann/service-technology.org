@@ -30,8 +30,8 @@ AC_ST_PNAPI([4.02])
 AC_ST_VERBOSE
 
 # search for optional tools needed by "make check"
-AC_PATH_PROG(LOLA_FULL, [lola-full], [])
-AC_PATH_PROG(LOLA_FULL1, [lola-full1], [${LOLA_FULL}])
+AC_PATH_PROG(LOLA_FULL, [lola-statespace], [])
+AC_PATH_PROG(LOLA_FULL1, [lola-statespace1], [${LOLA_FULL}])
 AC_PATH_PROG(WENDY, [wendy], [])
 AC_PATH_PROG(VALGRIND, [valgrind], not found)
 

@@ -5,7 +5,7 @@ chmod a+x bin/common
 
 cd bin/common
 
-PATH=`pwd`/bin:$PATH
+PATH=`pwd`/bin:/usr/local/bin:/usr/bin:/bin:$PATH
 DIR=`pwd`
 
 # Genet

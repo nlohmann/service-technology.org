@@ -15,7 +15,7 @@
   
   $inputfile = $_SESSION["mia"]["process"];
   $description = "an example service";
-  $target = $process[$inputfile]["filename"];
+  $target = $process[$inputfile]["filename"]."-pv";
   switch ($process[$inputfile]["filename"]) {
     case "service-a":
       $longname="Running Example";

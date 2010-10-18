@@ -1,6 +1,11 @@
+@heading Version 1.3-unreleased
+@itemize
+@item fixed bug #16835 (see @url{https://gna.org/bugs/?16835}): invocation with non-normal net lead to a crash
+@end itemize
+
+
 @heading Version 1.2
 @itemize
-
 @item canonized Makefiles
 
 @item added scripts to use LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to determine test case coverage (use @samp{make cover} in @file{tests} directory)

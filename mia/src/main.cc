@@ -191,6 +191,22 @@ int main(int argc, char** argv) {
     /*---------------------------------------------------------------.
     | 1. calculate most permissive partner and migration information |
     `---------------------------------------------------------------*/
+
+    // Wendy only supports normal nets
+    {
+        ifstream input_file(args_info.inputs[0], ifstream::in);
+
+        pnapi::PetriNet* source = new pnapi::PetriNet();
+        input_file >> pnapi::io::owfn >> *source;
+        input_file.close();
+
+        // only normal nets are supported so far
+        if (not source->isNormal()) {
+            abort(14, "the input open net must be normal");
+        }
+        delete source;
+    }
+
     string wendy_command = string(args_info.wendy_arg) + " " + args_info.inputs[0]
                            + " --im=" + im_filename + " --sa=" + mpp_filename + " --mi=" + mi_filename;
     if (args_info.messagebound_given) {

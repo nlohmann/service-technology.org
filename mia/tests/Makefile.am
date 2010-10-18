@@ -13,7 +13,8 @@ TESTFILES = reg_old.owfn reg_new.owfn \
             PO.owfn PO-pv.owfn \
             AP.owfn AP-pv.owfn \
             CN.owfn CN-pv.owfn \
-            DG.owfn DG-pv.owfn
+            DG.owfn DG-pv.owfn \
+            bug16835_new.owfn bug16835_old.owfn
 
 
 # Below you can list all the files you do not want to have counted in the

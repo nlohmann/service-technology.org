@@ -94,5 +94,15 @@ AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_CLEANUP
 
 
+############################################################################
+AT_BANNER([Regression Tests])
+############################################################################
 
+AT_SETUP([Bug 16835 (https://gna.org/bugs/?16835)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/bug16835_old.owfn TESTFILES/bug16835_new.owfn .])
+AT_CHECK([MIA bug16835_old.owfn bug16835_new.owfn --verbose],1,stdout,stderr)
+AT_CHECK([GREP -q "mia: the input open net must be normal -- aborting \[[#14\]]" stderr])
+AT_KEYWORDS(bug)
+AT_CLEANUP
 

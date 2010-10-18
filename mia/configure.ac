@@ -1,4 +1,4 @@
-AC_INIT(Mia, 1.2, mia@service-technology.org, mia, http://service-technology.org/mia)
+AC_INIT(Mia, 1.3-unreleased, mia@service-technology.org, mia, http://service-technology.org/mia)
 
 AC_MSG_NOTICE([ __  __ _       ])
 AC_MSG_NOTICE([|  \/  (_) __ _ ])

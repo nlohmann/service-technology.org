@@ -18,7 +18,10 @@
 \*****************************************************************************/
 
 
+#ifdef HAVE_CONFIG
 #include <config.h>
+#endif
+
 #include <libgen.h>
 #include <unistd.h>
 #include <fstream>
@@ -26,10 +29,6 @@
 #include <cstdlib>
 #include "verbose.h"
 #include "Output.h"
-
-#ifdef HAVE_CONFIG
-#include <config.h>
-#endif
 
 
 /******************

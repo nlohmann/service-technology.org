@@ -18,6 +18,8 @@
 \*****************************************************************************/
 
 
+#include <algorithm>
+#include <vector>
 #include "AnnotationLivelockOG.h"
 
 

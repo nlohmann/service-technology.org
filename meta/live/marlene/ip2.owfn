@@ -1,0 +1,34 @@
+{ coffee }
+
+PLACE
+INTERNAL
+  i0,  { initial }
+  i1,
+  iw;
+INPUT
+  reqprime;
+
+OUTPUT
+  part1, part2;
+
+INITIALMARKING
+  i0;
+
+FINALCONDITION
+  (i0 = 1) OR (iw = 1);
+
+TRANSITION t1    { ?reqprime, !part1 }
+CONSUME
+  i0,
+  reqprime;
+PRODUCE
+  i1,
+  part1;
+
+TRANSITION t2    { !part2 }
+CONSUME
+  i1;
+PRODUCE
+  iw, part2;
+
+{ END OF FILE }

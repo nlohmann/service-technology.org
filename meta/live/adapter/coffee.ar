@@ -1,6 +1,0 @@
-DEuro -> MEuro;
--> MCoffeeButton;
--> MTeaButton;
-MServedCoffee -> DServedCoffee;
-
-

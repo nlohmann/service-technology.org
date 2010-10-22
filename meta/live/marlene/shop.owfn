@@ -1,0 +1,33 @@
+{ coffee }
+
+PLACE
+INTERNAL
+  s0,  { initial }
+  s1,
+  sw;
+INPUT
+  order;
+
+OUTPUT
+  sinvoice;
+
+INITIALMARKING
+  s0;
+
+FINALMARKING
+  sw;
+
+TRANSITION t1    { ?order }
+CONSUME
+  s0,
+  order;
+PRODUCE
+  s1;
+
+TRANSITION t2    { !sinvoice }
+CONSUME
+  s1;
+PRODUCE
+  sw, sinvoice;
+
+{ END OF FILE }

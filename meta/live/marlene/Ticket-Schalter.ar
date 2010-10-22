@@ -1,0 +1,7 @@
+Aout_Route_berechnen -> Ain_Route_berechnen;
+ARoute_anbieten -> BRoute_anbieten;
+Aout_Reservierung_senden -> Bout_Reservierung_senden;
+BAnfrage_erhalten -> AAnfrage_erhalten;
+BGewaehlten_Weg_bearbeiten -> AGewaehlten_Weg_bearbeiten;
+Bin_Reservierung_senden -> Ain_Reservierung_senden;
+

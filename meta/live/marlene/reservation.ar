@@ -1,0 +1,9 @@
+RCustomer_Welcome -> ;
+RCharge_Customer, RSelect_Payment_Type -> CInvoice;
+
+CRental_Request -> RRental_Request;
+CPayment -> RPayment;
+RRental_Reservation -> CRental_Reservation;
+RAsk_for_Rental_Dates_and_Locations -> CAsk_for_Rental_Dates_and_Locations;
+RNegociate_CarGroup -> CNegociate_CarGroup;
+

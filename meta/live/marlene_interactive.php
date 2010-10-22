@@ -25,12 +25,33 @@
     $services = array("marlene/pro.owfn", "marlene/req.owfn");
     $rules = createFile("diag_iRules.ar");
   }
+
   else if (!strcmp($_SESSION[$tool]["process"], "marlene_ia/iCoffee.owfn"))
   {
     $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");
     $rules = createFile("diag_iCoffee.ar");
   }
 
+  else if (!strcmp($_SESSION[$tool]["process"], 'marlene_ia/iCar.owfn')) {
+    $services = array("marlene/Reservations.owfn", "marlene/ReservationsCustomer.owfn");
+    $rules = createFile("diag_iCar.ar");
+  }
+  
+  else if (!strcmp($_SESSION[$tool]["process"], 'marlene_ia/iTicket.owfn')) {
+    $services = array("marlene/Ticket-Schalter.owfn", "marlene/Ticket-Schalter-partner.owfn");
+    $rules = createFile("diag_iTicket.ar");
+  }
+  
+  else if (!strcmp($_SESSION[$tool]["process"], 'marlene_ia/iCollapse.owfn')) {
+    $services = array("marlene/shop.owfn", "marlene/customer.owfn");
+    $rules = createFile("diag_iCollapse.ar");
+  }
+  
+  else if (!strcmp($_SESSION[$tool]["process"], 'marlene_ia/iReroute.owfn')) {
+    $services = array("marlene/ip.owfn", "marlene/ip2.owfn", "marlene/req.owfn");
+    $rules = createFile("diag_iReroute.ar");
+  }
+  
 
   
   $services = prepareFiles($services);
@@ -177,9 +198,43 @@ END;
     $more = LIVEBASE."/resource/images/more.png";
     echo <<<END
     <td width="5%">$type</td>
-    <td width="43%">$pending</td>
+    <td width="43%">
+END;
+    $first = true;
+    $pending = explode(",", $pending);
+    foreach($pending as $mes)
+    {
+      if ($first)
+      {
+        $first = false;
+      }
+      else
+      {
+        echo ", ";
+      }
+      echo " $mes";
+    }
+    echo <<<END
+    </td>
     <td width="4%"><!--&rarr;--></td>
-    <td width="43%">$required</td>
+    <td width="43%">
+END;
+    $required = explode(",", $required);
+    $first = true;
+    foreach($required as $mes)
+    {
+      if ($first)
+      {
+        $first = false;
+      }
+      else
+      {
+        echo ", ";
+      }
+      echo " $mes";
+    }
+    echo <<<END
+    </td>
     <td width="5%" onClick='toggle($index)'><img src="$more" alt="toggle" title="More information"/></td>
 END;
 //    echo "<td width=\"5%\">$type</td>\n";

@@ -1,0 +1,27 @@
+{ coffee }
+
+PLACE
+INTERNAL
+  i0,  { initial }
+  iw;
+INPUT
+  ireq;
+
+OUTPUT
+  iresp;
+
+INITIALMARKING
+  i0;
+
+FINALCONDITION
+  (i0 = 1) OR (iw = 1);
+
+TRANSITION t1    { ?ireq, !iresp }
+CONSUME
+  i0,
+  ireq;
+PRODUCE
+  iw,
+  iresp;
+
+{ END OF FILE }

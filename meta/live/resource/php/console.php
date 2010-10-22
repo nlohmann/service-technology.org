@@ -22,11 +22,11 @@ function console($public, $private) {
 
   // execute the command
   flush();
-//  ob_flush();
+  ob_flush();
   $start = time();
   $resultfilename = tempnam("tmp", "console-".$console_counter);
   // system('echo $SHELL; '.$private.' > '.$resultfilename, $result);
-  exec($private.' 2>&1 ', $output, $result);
+  exec($private.' 2>&1 ', $output, $result); //
   $fh = fopen($resultfilename, 'a');
   foreach ($output as $line)
   {

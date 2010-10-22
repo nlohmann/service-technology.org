@@ -1,0 +1,45 @@
+{ coffee }
+
+PLACE
+INTERNAL
+  c0,  { initial }
+  c1,
+  c2,
+  cw;
+INPUT
+  ack, invoice;
+
+OUTPUT
+  item, co;
+
+INITIALMARKING
+  c0;
+
+FINALMARKING
+  cw;
+
+TRANSITION t1    { !item }
+CONSUME
+  c0;
+PRODUCE
+  c1, item;
+
+TRANSITION t2    { ?ack }
+CONSUME
+  c1, ack;
+PRODUCE
+  c0;
+
+TRANSITION t3    { !co }
+CONSUME
+  c0;
+PRODUCE
+  c2, co;
+
+TRANSITION t4    { ?invoice }
+CONSUME
+  c2, invoice;
+PRODUCE
+  cw;
+
+{ END OF FILE }

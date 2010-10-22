@@ -24,6 +24,26 @@
     $rules = array("marlene/td_candy.ar");
   }
   
+  else if (!strcmp($_SESSION["marlene"]["process"], 'marlene/car.owfn')) {
+    $services = array("marlene/Reservations.owfn", "marlene/ReservationsCustomer.owfn");
+    $rules = array("marlene/reservation.ar");
+  }
+  
+  else if (!strcmp($_SESSION["marlene"]["process"], 'marlene/ticket.owfn')) {
+    $services = array("marlene/Ticket-Schalter.owfn", "marlene/Ticket-Schalter-partner.owfn");
+    $rules = array("marlene/Ticket-Schalter.ar");
+  }
+  
+  else if (!strcmp($_SESSION["marlene"]["process"], 'marlene/collapse.owfn')) {
+    $services = array("marlene/shop.owfn", "marlene/customer.owfn");
+    $rules = array("marlene/collapse.ar");
+  }
+  
+  else if (!strcmp($_SESSION["marlene"]["process"], 'marlene/reroute.owfn')) {
+    $services = array("marlene/ip.owfn", "marlene/ip2.owfn", "marlene/req.owfn");
+    $rules = array("marlene/rerouting.ar");
+  }
+  
   // copy files to temporary directory, see files.php for details
   $services = prepareFiles($services);
   $rules = prepareFiles($rules);
@@ -92,7 +112,7 @@
 <body>
   <div id="container">
     <div id="content">
-      <div style="float: right; top: -10px;"><a href="./"><img src="resource/images/live.png" alt="service-technology.org/live" /></a></div>
+      <div style="float: right; top: -10px;"><a href="./#marlene"><img src="resource/images/live.png" alt="service-technology.org/live" /></a></div>
       <h1>Adapter Synthesis</h1>
 
       <!--

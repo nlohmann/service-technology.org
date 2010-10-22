@@ -22,7 +22,6 @@ function console($public, $private) {
 
   // execute the command
   flush();
-  ob_flush();
   $start = time();
   $resultfilename = tempnam("tmp", "console-".$console_counter);
   // system('echo $SHELL; '.$private.' > '.$resultfilename, $result);

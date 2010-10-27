@@ -190,22 +190,19 @@ class Fragmentation {
 		void createTransition(const transition_t &, const frag_id_t, const role_id_t);
 		void createArc(const node_t &, const node_t &);
 
-		void processUnassignedFragment(const frag_id_t);
+		bool processUnassignedFragment(const frag_id_t);
 		void createPetrinetByFragID(const frag_id_t);
 		void readDianeOutputFile(const string &);
-		void processDianeFragmentation();
+		bool processDianeFragmentation();
 		void setTransitionDianeID(const transition_t &, const diane_id_t, const bool = true);
 		void addPlaceDianeID(const place_t &, const diane_id_t);
 		diane_id_t getTransitionDianeID(const transition_t &);
 		pair<role_id_t, frag_id_t> getBestConnectionForDianeFragment(const diane_id_t, const bool);
 		void setDianeFragmentConnection(const diane_id_t, pair<role_id_t, frag_id_t>);
 		roles_t getTopRoleIDs(const map<role_id_t, size_t> & RoleMap) const;
-		validStatus_e isSharedPlaceValidForFragment(const place_t &, const frag_id_t, const bool = false);
-		validStatus_e isFragmentValid(const frag_id_t, const bool = false);
 		void replaceSharedStructure(const frag_id_t, const place_t &);
 
 		bool willDianeAssignementValid(const diane_id_t, const role_id_t);
-		bool willPlaceValid(const place_t &, const role_id_t, const role_id_t);
 
 		void addTransitionPredecessors(stack<transition_t> &, transitions_t &, const transition_t &);
 
@@ -217,6 +214,9 @@ class Fragmentation {
 		places_t getTransitionPlaces(pnapi::PetriNet &, const transition_t &) const;
 		places_t getTransitionPreset(pnapi::PetriNet &, const transition_t &) const;
 		places_t getTransitionPostset(pnapi::PetriNet &, const transition_t &) const;
+
+
+		placeStatus_e getPlaceStatus(const place_t &, const bool, const role_id_t, const role_id_t);
 
 	public:
 		Fragmentation(pnapi::PetriNet &);
@@ -232,9 +232,9 @@ class Fragmentation {
 		bool isStartTransition(const transition_t &);
 		bool isFragmentEmpty(const frag_id_t);
 		
-		void buildRoleFragments();
-		void processUnassignedFragments();
-		void buildServices();
+		bool buildRoleFragments();
+		bool processUnassignedFragments();
+		bool buildServices();
 
 		size_t getLolaCalls();
 		size_t getDianeCalls();
@@ -243,7 +243,7 @@ class Fragmentation {
 		bool hasCycles();
 		bool isFreeChoice();
 	
-		validStatus_e isProcessValid(const bool = false);
+		validStatus_e isFragmentationValid(const bool = false);
 
 		string fragmentsToString();
 

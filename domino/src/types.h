@@ -8,11 +8,24 @@
 using std::set;
 using std::string;
 
+enum placeStatus_e {
+	PLACE_STATUS_UNASSIGNED,
+	PLACE_STATUS_START,
+	PLACE_STATUS_END,
+	PLACE_STATUS_INTERN,
+	PLACE_STATUS_SHARED,
+	PLACE_STATUS_NOTDISJUNCT,
+	PLACE_STATUS_NOTBILATERAL,
+	PLACE_STATUS_BAD
+};
+
+//ToDo: remove
 enum validStatus_e {
 	VALID_OK,
 	VALID_TODO,
 	VALID_BAD
 };
+
 
 typedef uint32_t frag_id_t;
 typedef uint32_t role_id_t;

@@ -265,12 +265,7 @@ int main(int argc, char** argv) {
 	string outputFileName;
 	set<std::string> roles;
 	bool retOK;
-
-	retOK = true;
-
-	Fragmentation f(net);
-
-	f.buildRoleFragments();
+	validStatus_e fragmentStatus;
 
 	if (args_info.inputs_num == 0) {
 		fileName = "STDIN";
@@ -278,7 +273,16 @@ int main(int argc, char** argv) {
 	else {
 		fileName = string(args_info.inputs[0]);
 	}
+	
+	retOK = true;
 
+	Fragmentation f(net);
+
+	if (!f.buildRoleFragments()) {
+		message(_cbad_("worklfow decomposition failed"));
+		retOK = false;
+	}
+	
 	if (args_info.dotInitial_flag) {
 		if (args_info.dot_roles_given) {
 			f.colorFragmentsByRoleID(args_info.dotColorUnassigned_flag);
@@ -301,40 +305,49 @@ int main(int argc, char** argv) {
 			createDotFile(outputFileName, net, fileName);
 		}
 	}
-
-	f.processUnassignedFragments();
-
-	if (args_info.dotFragmented_flag) {
-		if (args_info.dot_roles_given) {
-			f.colorFragmentsByRoleID(args_info.dotColorUnassigned_flag);
-			if (args_info.dot_roles_arg != NULL) {
-				outputFileName = args_info.dot_roles_arg;
+	
+	if (retOK) {
+		retOK = f.processUnassignedFragments();
+	
+		if (args_info.dotFragmented_flag) {
+			if (args_info.dot_roles_given) {
+				f.colorFragmentsByRoleID(args_info.dotColorUnassigned_flag);
+				if (args_info.dot_roles_arg != NULL) {
+					outputFileName = args_info.dot_roles_arg;
+				}
+				else {
+					outputFileName = string(fileName + "_Fragmented-Roles");
+				}
+				createDotFile(outputFileName, net, fileName);
 			}
-			else {
-				outputFileName = string(fileName + "_Fragmented-Roles");
+			if (args_info.dot_fragments_given) {
+				f.colorFragmentsByFragID(args_info.dotColorUnassigned_flag);
+				if (args_info.dot_fragments_arg != NULL) {
+					outputFileName = args_info.dot_fragments_arg;
+				}
+				else {
+					outputFileName = string(fileName + "_Fragmented-Fragments");
+				}
+				createDotFile(outputFileName, net, fileName);
 			}
-			createDotFile(outputFileName, net, fileName);
-		}
-		if (args_info.dot_fragments_given) {
-			f.colorFragmentsByFragID(args_info.dotColorUnassigned_flag);
-			if (args_info.dot_fragments_arg != NULL) {
-				outputFileName = args_info.dot_fragments_arg;
-			}
-			else {
-				outputFileName = string(fileName + "_Fragmented-Fragments");
-			}
-			createDotFile(outputFileName, net, fileName);
 		}
 	}
 
-	if (f.isProcessValid(true) == VALID_BAD) {
-		message(_cbad_("worklfow demposition failed"));
-		retOK = false;
+	if (retOK) {
+		fragmentStatus = f.isFragmentationValid(true);
+		if (fragmentStatus == VALID_BAD) {
+			message(_cbad_("worklfow decomposition failed"));
+			retOK = false;
+		}
+		else if (fragmentStatus == VALID_TODO) {
+			abort(9, "workflow decomposition uncompleted");
+			retOK = false;
+		}
 	}
 
 	if (retOK) {
 
-		f.buildServices();
+		retOK = f.buildServices();
 
 		if (args_info.dot_serviceOverview_given) {
 			f.colorFragmentsByRoleID();
@@ -347,13 +360,13 @@ int main(int argc, char** argv) {
 			createDotFile(outputFileName, net, fileName);
 		}
 
-		validStatus_e processStatus = f.isProcessValid(false);
-		if (processStatus == VALID_BAD) {
-			message(_cbad_("worklfow demposition failed"));
+		fragmentStatus = f.isFragmentationValid(false);
+		if (fragmentStatus == VALID_BAD) {
+			message(_cbad_("worklfow decomposition failed"));
 			retOK = false;
 		}
-		else if (processStatus == VALID_TODO) {
-			message(_cbad_("workflow decomposition uncompleted"));
+		else if (fragmentStatus == VALID_TODO) {
+			abort(9, "workflow decomposition uncompleted");
 			retOK = false;
 		}
 		else {
@@ -396,15 +409,15 @@ int main(int argc, char** argv) {
 		
 		results.add("workflow.isFreeChoice", f.isFreeChoice());
 		results.add("workflow.hasCycles", f.hasCycles());
-		results.add("workflow.roles",  (unsigned int)net.getRoles().size());
-		results.add("workflow.places",  (unsigned int)net.getPlaces().size());
-		results.add("workflow.transitons",  (unsigned int)net.getTransitions().size());
+		results.add("workflow.roles", (unsigned int)net.getRoles().size());
+		results.add("workflow.places", (unsigned int)net.getPlaces().size());
+		results.add("workflow.transitons", (unsigned int)net.getTransitions().size());
 
-		results.add("diane.calls",  (unsigned int)f.getDianeCalls());
-		results.add("diane.forces",  (unsigned int)f.getDianeForces());
-		results.add("diane.alternatives",  (unsigned int)f.getDianeAlternatives());
+		results.add("diane.calls", (unsigned int)f.getDianeCalls());
+		results.add("diane.forces", (unsigned int)f.getDianeForces());
+		results.add("diane.alternatives", (unsigned int)f.getDianeAlternatives());
 
-		results.add("lola.calls",  (unsigned int)f.getLolaCalls());
+		results.add("lola.calls", (unsigned int)f.getLolaCalls());
 
     }
 	

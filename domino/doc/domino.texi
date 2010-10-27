@@ -536,17 +536,6 @@ domino: Fragmentation::colorFragmentsByFragID(%d): all 30 colors used -- abortin
 @end cartouche
 @end smallexample
 
-@item #17
-Error processing the input open net. This error occurs in case unassigned fragments cannot be assigned to 'adjacent' roles without producing forbidden structure in shared places (see error 15). Domino has no chance to assign any role to that fragment which causes 'no progress'. This error can maybe be avoided by changing the initial role annotation. 
-
-@smallexample
-@cartouche
-domino: Fragmentation::processDianeFragmentation(): no progress -- aborting [#17]
-@end cartouche
-@end smallexample
-
-The parameter @option{--verbose} can give you additional information on the nature of the error.
-
 @end table
 
 

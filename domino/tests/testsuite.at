@@ -421,7 +421,7 @@ AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/fail_DA-Producer-Consumer.owfn .])
 AT_CHECK([DOMINO fail_DA-Producer-Consumer.owfn ],0,ignore,stderr)
-AT_CHECK([GREP -q "worklfow demposition failed" stderr])
+AT_CHECK([GREP -q "worklfow decomposition failed" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 

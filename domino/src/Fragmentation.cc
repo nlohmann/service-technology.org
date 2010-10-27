@@ -2117,6 +2117,8 @@ placeStatus_e Fragmentation::getPlaceStatus(const place_t & Place, const bool Re
 	
 	ret = PLACE_STATUS_BAD;
 
+	sucFragID = sucRoleID = -1;	
+
 	predecessors.insert(Predecessor);
 	successors.insert(Successor);
 	

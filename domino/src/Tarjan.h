@@ -33,6 +33,7 @@
 #include <string>
 
 #include <pnapi/pnapi.h>
+#include <config.h>
 #include "types.h"
 #include "verbose.h"
 
@@ -41,9 +42,6 @@ using std::multimap;
 using std::set;
 using std::stack;
 using std::string;
-
-typedef set<node_t> nodes_t;
-typedef map<node_t, int> node_value_t;
 
 class Tarjan {
 
@@ -63,27 +61,75 @@ class Tarjan {
 		void init();
 		void tarjan(node_t);
 
-		void push(node_t &);
-		node_t pop();
+		inline void push(node_t & Node) {
+			this->mStackContent.insert(Node);
+			this->mStack.push(Node);
+		}
+		inline node_t pop() {
+			assert(!this->mStack.empty());
+			node_t curNode = this->mStack.top();
+			this->mStackContent.erase(curNode);
+			this->mStack.pop();
+			return curNode;
+		}
 
-		void setDFS(node_t &, int);
-		void setLowlink(node_t &, int);
-		int getDFS(node_t &);
-		int getLowlink(node_t &);
+		inline void setDFS(node_t & Node, int DFS) {
+			node_value_t::iterator curNode = this->mNodeDFS.find(Node);
+			if (curNode != this->mNodeDFS.end()) {
+				this->mNodeDFS.erase(curNode);
+			}
+			this->mNodeDFS.insert( std::make_pair(Node, DFS) );
+		}
+		inline void setLowlink(node_t & Node, int Lowlink) {
+			node_value_t::iterator curNode = this->mNodeLowlink.find(Node);
+			if (curNode != this->mNodeLowlink.end()) {
+				this->mNodeLowlink.erase(curNode);
+			}
+			this->mNodeLowlink.insert( std::make_pair(Node, Lowlink) );
+		}
+		
+		inline int getDFS(node_t & Node) {
+			node_value_t::iterator curNode = this->mNodeDFS.find(Node);
+			assert(curNode != this->mNodeDFS.end());
+			return curNode->second;
+		}
+		inline int getLowlink(node_t & Node) {
+			node_value_t::iterator curNode = this->mNodeLowlink.find(Node);
+			assert(curNode != this->mNodeLowlink.end());
+			return curNode->second;
+		}
 
 	public:
-		Tarjan(pnapi::PetriNet &);
-		~Tarjan();
+		inline Tarjan(pnapi::PetriNet & Petrinet) {
+			this->mNet = &Petrinet;
+			this->init();
+		}
+		inline ~Tarjan() {};
 
 		void calculateSCC();
 
-		node_value_t getNode2SCC() const;
-		multimap<int, node_t> getSCC2Node() const;
-		
-		int getNodeSCC(const node_t &);
-
-		bool hasNonTrivialSCC();
-		bool isNonTrivialSCC(int);
+		inline node_value_t getNode2SCC() const {
+			assert(this->mSCCCalculated);
+			return this->mNode2SCC;
+		}
+		inline multimap<int, node_t> getSCC2Node() const {
+			assert(this->mSCCCalculated);
+			return this->mSCC2Node;
+		}
+		inline int getNodeSCC(const node_t & Node) {
+			assert(this->mSCCCalculated);
+			assert(this->mNode2SCC.find(Node) != this->mNode2SCC.end());
+			return this->mNode2SCC.find(Node)->second;
+		}
+		inline bool hasNonTrivialSCC() {
+			assert(this->mSCCCalculated);
+			return this->mHasNonTrivialSCC;
+		}
+		inline bool isNonTrivialSCC(const int SCC) {
+			assert(this->mSCCCalculated);
+			assert(this->mSCC2Node.find(SCC) != this->mSCC2Node.end());
+			return (this->mSCC2Node.count(SCC) > 1);
+		}
 
 		
 };

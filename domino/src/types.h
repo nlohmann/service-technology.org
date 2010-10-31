@@ -62,4 +62,7 @@ typedef map<transition_t, pnapi::Transition *> transitionName2TransitionPointer_
 typedef map<pnapi::Transition *, transition_t> transitionPointer2TransitionName_t;
 typedef map<size_t, string> colorID2ColorName_t;
 
+typedef set<node_t> nodes_t;
+typedef map<node_t, int> node_value_t;
+
 #endif //__TYPES_H

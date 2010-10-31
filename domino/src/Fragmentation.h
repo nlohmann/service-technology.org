@@ -39,6 +39,8 @@
 #include <string>
 
 #include <pnapi/pnapi.h>
+#include <config.h>
+
 #include "types.h"
 #include "util.h"
 #include "Output.h"
@@ -58,202 +60,589 @@ using std::string;
 using std::stack;
 using std::vector;
 
-
-typedef map<string, role_id_t> roleName2RoleID_t;
-typedef map<role_id_t, string> roleID2RoleName_t;
-typedef map<transition_t, frag_id_t> transition2FragID_t;
-typedef multimap<frag_id_t, transition_t> fragID2Transitions_t;
-typedef map<transition_t, role_id_t> transition2RoleID_t;
-typedef multimap<role_id_t, transition_t> roleID2Transitions_t;
-typedef map<place_t, frag_id_t> place2MinFragID_t;
-typedef multimap<frag_id_t, place_t> minFragID2Places_t;
-typedef multimap<place_t, frag_id_t> place2FragIDs_t;
-typedef multimap<frag_id_t, place_t> fragID2Places_t;
-typedef multimap<place_t, role_id_t> place2RoleIDs_t;
-typedef multimap<role_id_t, place_t> roleID2Places_t;
-typedef map<transition_t, diane_id_t> transition2DianeID_t;
-typedef multimap<diane_id_t, transition_t> dianeID2Transitions_t;
-typedef multimap<place_t, diane_id_t> place2DianeIDs_t;
-typedef multimap<diane_id_t, place_t> dianeID2Places_t;
-typedef map<place_t, pnapi::Place *> placeName2PlacePointer_t;
-typedef map<pnapi::Place *, place_t> placePointer2PlaceName_t;
-typedef map<transition_t, pnapi::Transition *> transitionName2TransitionPointer_t;
-typedef map<pnapi::Transition *, transition_t> transitionPointer2TransitionName_t;
-
-typedef map<size_t, string> colorID2ColorName_t;
-
 class Fragmentation {
 
 	private:
 
+		//constants
 		role_id_t ROLE_UNASSIGNED;
 		place_t PLACE_UNASSIGNED;
 		place_t GLOBALSTART_REACHED;
 		place_t SERVICE_PLACE_PREFIX;
 		transition_t SERVICE_TRANSITION_PREFIX;
 
-		//___roles___
-		//RoleName -> RoleID
-		roleName2RoleID_t mRoleName2RoleID;
-		//RoleID -> RoleName
-		roleID2RoleName_t mRoleID2RoleName;		
+		//members
+		//roles
+			//RoleName -> RoleID
+			roleName2RoleID_t mRoleName2RoleID;
+			//RoleID -> RoleName
+			roleID2RoleName_t mRoleID2RoleName;		
 		
-		//___transitions___
-		transitions_t mTransitions;
-		//Transition -> FragID
-		transition2FragID_t mTransition2FragID;
-		//FragID --> Transitions
-		fragID2Transitions_t mFragID2Transitions;
-		//Transition -> RoleID
-		transition2RoleID_t mTransition2RoleID;
-		//RoleID --> Transitions
-		roleID2Transitions_t mRoleID2Transitions;
-		//TransitionName -> TransitionPointer
-		transitionName2TransitionPointer_t mTransitionName2TransitionPointer;
-		//TransitionPointer -> TransitionName
-		transitionPointer2TransitionName_t mTransitionPointer2TransitionName;
+			//___transitions___
+			transitions_t mTransitions;
+			//Transition -> FragID
+			transition2FragID_t mTransition2FragID;
+			//FragID --> Transitions
+			fragID2Transitions_t mFragID2Transitions;
+			//Transition -> RoleID
+			transition2RoleID_t mTransition2RoleID;
+			//RoleID --> Transitions
+			roleID2Transitions_t mRoleID2Transitions;
+			//TransitionName -> TransitionPointer
+			transitionName2TransitionPointer_t mTransitionName2TransitionPointer;
+			//TransitionPointer -> TransitionName
+			transitionPointer2TransitionName_t mTransitionPointer2TransitionName;
+		//places
+			places_t mPlaces;
+			//Place -> MinFragID
+			place2MinFragID_t mPlace2MinFragID;
+			//MinFragID --> Places
+			minFragID2Places_t mMinFragID2Places;
+			//Place --> FragIDs
+			place2FragIDs_t mPlace2FragIDs;
+			//FragID --> Places
+			fragID2Places_t mFragID2Places;
+			//Place --> RoleIDs
+			place2RoleIDs_t mPlace2RoleIDs;
+			//RoleID --> Places
+			roleID2Places_t mRoleID2Places;
+			//PlaceName -> PlacePointer
+			placeName2PlacePointer_t mPlaceName2PlacePointer;
+			//PlacePointer -> PlaceName
+			placePointer2PlaceName_t mPlacePointer2PlaceName;
+		//colors
+			//ColorID -> ColorName
+			colorID2ColorName_t mColorID2ColorName;
+		//global
+			place_t mGlobalStartPlace;
+			pnapi::PetriNet *mNet;
+			size_t mMaxFragID;
+			size_t mMaxColors;
+			bool mIsFreeChoice;
+			bool mHasCycles;
+		//status
+			bool mRoleFragmentsBuild;
+			bool mUnassignedFragmentsProcessed;
+			bool mServicesCreated;
+		//statistic
+			size_t mInterfaceCorrections;
+			size_t mCommunicationCorrections;
+			size_t mFragmentConnections;
+			size_t mPlacesInsert;
+			size_t mTransitionsInsert;
+			size_t mArcsInsert;
+			size_t mPlacesDelete;
+			size_t mTransitionsDelete;
+			size_t mArcsDelete;
+		//lola
+			size_t mLolaCalls;
+		//diane
+			pnapi::PetriNet *mFragmentNet;
+			set<node_t> mFragmentUnprocessedNodes;
+			size_t mDianeFragments;
+			size_t mCurrentDianeForces;
+			size_t mOverallDianeForces;
+			size_t mCurrentDianeAlternatives;
+			size_t mOverallDianeAlternatives;
+			size_t mDianeCalls;
+			frag_id_t mCurProcessingFragID;
+			//Transition -> DianeID
+			transition2DianeID_t mTransition2DianeID;
+			//DianeID --> Transitions
+			dianeID2Transitions_t mDianeID2Transitions;
+			//Place --> FragIDs
+			place2DianeIDs_t mPlace2DianeIDs;
+			//FragID --> Places
+			dianeID2Places_t mDianeID2Places;
 
-		//__places___
-		places_t mPlaces;
-		//Place -> MinFragID
-		place2MinFragID_t mPlace2MinFragID;
-		//MinFragID --> Places
-		minFragID2Places_t mMinFragID2Places;
-		//Place --> FragIDs
-		place2FragIDs_t mPlace2FragIDs;
-		//FragID --> Places
-		fragID2Places_t mFragID2Places;
-		//Place --> RoleIDs
-		place2RoleIDs_t mPlace2RoleIDs;
-		//RoleID --> Places
-		roleID2Places_t mRoleID2Places;
-		//PlaceName -> PlacePointer
-		placeName2PlacePointer_t mPlaceName2PlacePointer;
-		//PlacePointer -> PlaceName
-		placePointer2PlaceName_t mPlacePointer2PlaceName;
-
-
-		//local
-		place_t mGlobalStartPlace;
-		pnapi::PetriNet *mNet;
-		size_t mMaxFragID;
-		size_t mMaxColors;
-		bool mRoleFragmentsBuild;
-		bool mUnassignedFragmentsProcessed;
-		bool mServicesCreated;
-		size_t mLolaCalls;
-		bool mIsFreeChoice;
-		bool mHasCycles;
-		//ColorID -> ColorName
-		colorID2ColorName_t mColorID2ColorName;
-
-		//for Diane fragmentation
-		pnapi::PetriNet *mFragmentNet;
-		set<node_t> mFragmentUnprocessedNodes;
-		size_t mDianeFragments;
-		size_t mCurrentDianeForces;
-		size_t mOverallDianeForces;
-		size_t mCurrentDianeAlternatives;
-		size_t mOverallDianeAlternatives;
-		size_t mDianeCalls;
-		frag_id_t mCurProcessingFragID;
-		//Transition -> DianeID
-		transition2DianeID_t mTransition2DianeID;
-		//DianeID --> Transitions
-		dianeID2Transitions_t mDianeID2Transitions;
-		//Place --> FragIDs
-		place2DianeIDs_t mPlace2DianeIDs;
-		//FragID --> Places
-		dianeID2Places_t mDianeID2Places;
-
-		void deletePlaceRoleID(const place_t &, const role_id_t);
-		void deletePlaceFragID(const place_t &, const frag_id_t);
-
-		void setPlaceMinFragID(const place_t &, const frag_id_t);
-		frag_id_t getPlaceMinFragID(const place_t &);
-
-		bool hasUnassignedTransitions(const place_t &);
-
-		void addPlaceRoleID(const place_t &, const role_id_t);
-		void addPlaceFragID(const place_t &, const frag_id_t);
-
-		void replaceFragIDs(const frag_id_t, const frag_id_t);
-		void connectFragments();	
-
-		void setTransitionRoleID(const transition_t &, const role_id_t, const bool = true);
-		void setTransitionFragID(const transition_t &, const frag_id_t, const bool = true);
-
-		void init();
-		void initColors();
-
-		void createPlace(const place_t &, const frag_id_t, const role_id_t);
-		void createTransition(const transition_t &, const frag_id_t, const role_id_t);
-		void createArc(const node_t &, const node_t &);
-
-		bool processUnassignedFragment(const frag_id_t);
-		void createPetrinetByFragID(const frag_id_t);
-		void readDianeOutputFile(const string &);
-		bool processDianeFragmentation();
-		void setTransitionDianeID(const transition_t &, const diane_id_t, const bool = true);
-		void addPlaceDianeID(const place_t &, const diane_id_t);
-		diane_id_t getTransitionDianeID(const transition_t &);
-		pair<role_id_t, frag_id_t> getBestConnectionForDianeFragment(const diane_id_t, const bool);
-		void setDianeFragmentConnection(const diane_id_t, pair<role_id_t, frag_id_t>);
-		roles_t getTopRoleIDs(const map<role_id_t, size_t> & RoleMap) const;
-		void replaceSharedStructure(const frag_id_t, const place_t &);
-
-		bool willDianeAssignementValid(const diane_id_t, const role_id_t);
-
-		void addTransitionPredecessors(stack<transition_t> &, transitions_t &, const transition_t &);
-
-		places_t getPlaces(pnapi::PetriNet &) const;
-		transitions_t getPlaceTransitions(pnapi::PetriNet &, const place_t &) const;
-		transitions_t getPlacePreset(pnapi::PetriNet &, const place_t &) const;
-		transitions_t getPlacePostset(pnapi::PetriNet &, const place_t &) const;
-		transitions_t getTransitions(pnapi::PetriNet &) const;
-		places_t getTransitionPlaces(pnapi::PetriNet &, const transition_t &) const;
-		places_t getTransitionPreset(pnapi::PetriNet &, const transition_t &) const;
-		places_t getTransitionPostset(pnapi::PetriNet &, const transition_t &) const;
-
-
-		placeStatus_e getPlaceStatus(const place_t &, const bool, const role_id_t, const role_id_t);
+		//methods
+			//global
+				void init();
+				void initColors();
+			//member support
+				//set/add
+					inline void addPlaceRoleID(const place_t & Place, const role_id_t RoleID) {
+						bool foundA = false;
+						pair<place2RoleIDs_t::iterator, place2RoleIDs_t::iterator> curPlaceRoles = this->mPlace2RoleIDs.equal_range(Place);
+						for (place2RoleIDs_t::iterator curPlaceRole=curPlaceRoles.first; curPlaceRole!=curPlaceRoles.second; ++curPlaceRole) {
+							if (curPlaceRole->second == RoleID) {
+								foundA = true;
+								break;
+							}
+						}
+						bool foundB = false;
+						pair<roleID2Places_t::iterator, roleID2Places_t::iterator> curRolePlaces = this->mRoleID2Places.equal_range(RoleID);
+						for (roleID2Places_t::iterator curRolePlace=curRolePlaces.first; curRolePlace!=curRolePlaces.second; ++curRolePlace) {
+							if (curRolePlace->second == Place) {
+								foundB = true;
+								break;
+							}
+						}
+						assert((foundA && foundB) == (foundA || foundB));
+						if (!foundA) {
+							this->mPlace2RoleIDs.insert( std::make_pair(Place, RoleID) );
+							this->mRoleID2Places.insert( std::make_pair(RoleID, Place) );
+						}
+					}
+					inline void addPlaceFragID(const place_t & Place, const frag_id_t FragID) {
+						bool foundA = false;
+						pair<place2FragIDs_t::iterator, place2FragIDs_t::iterator> curPlaceFrags = this->mPlace2FragIDs.equal_range(Place);
+						for (place2FragIDs_t::iterator curPlaceFrag=curPlaceFrags.first; curPlaceFrag!=curPlaceFrags.second; ++curPlaceFrag) {
+							if (curPlaceFrag->second == FragID) {
+								foundA = true;
+								break;
+							}
+						}
+						bool foundB = false;
+						pair<fragID2Places_t::iterator, fragID2Places_t::iterator> curFragPlaces = this->mFragID2Places.equal_range(FragID);
+						for (fragID2Places_t::iterator curFragPlace=curFragPlaces.first; curFragPlace!=curFragPlaces.second; ++curFragPlace) {
+							if (curFragPlace->second == Place) {
+								foundB = true;
+								break;
+							}
+						}
+						assert((foundA && foundB) == (foundA || foundB));
+						if (!foundA) {
+							this->mPlace2FragIDs.insert( std::make_pair(Place, FragID) );
+							this->mFragID2Places.insert( std::make_pair(FragID, Place) );
+						}
+					}
+					inline void addPlaceDianeID(const place_t & Place, const diane_id_t DianeID) {
+						bool foundA = false;
+						pair<place2DianeIDs_t::iterator, place2DianeIDs_t::iterator> curPlaceDianes = this->mPlace2DianeIDs.equal_range(Place);
+						for (place2DianeIDs_t::iterator curPlaceDiane=curPlaceDianes.first; curPlaceDiane!=curPlaceDianes.second; ++curPlaceDiane) {
+							if (curPlaceDiane->second == DianeID) {
+								foundA = true;
+								break;
+							}
+						}
+						bool foundB = false;
+						pair<dianeID2Places_t::iterator, dianeID2Places_t::iterator> curDianePlaces = this->mDianeID2Places.equal_range(DianeID);
+						for (dianeID2Places_t::iterator curDianePlace=curDianePlaces.first; curDianePlace!=curDianePlaces.second; ++curDianePlace) {
+							if (curDianePlace->second == Place) {
+								foundB = true;
+								break;
+							}
+						}
+						assert((foundA && foundB) == (foundA || foundB));
+						if (!foundA) {
+							this->mPlace2DianeIDs.insert( std::make_pair(Place, DianeID) );
+							this->mDianeID2Places.insert( std::make_pair(DianeID, Place) );
+						}
+					}
+					inline void setPlaceMinFragID(const place_t & Place, const frag_id_t FragID) {
+						minFragID2Places_t::iterator curFragPlace;
+						place2MinFragID_t::iterator curMinFrag = this->mPlace2MinFragID.find(Place);
+						if (curMinFrag != this->mPlace2MinFragID.end()) {
+							bool found = false;
+							pair<minFragID2Places_t::iterator, minFragID2Places_t::iterator> curFragPlaces = this->mMinFragID2Places.equal_range(curMinFrag->second);
+							for (curFragPlace=curFragPlaces.first; curFragPlace!=curFragPlaces.second; ++curFragPlace) {	
+								if (curFragPlace->second == Place) {
+									found = true;
+									break;
+								}
+							}
+							assert(found);
+							this->mMinFragID2Places.erase(curFragPlace);
+							this->mPlace2MinFragID.erase(curMinFrag);
+						}
+						this->mPlace2MinFragID.insert( std::make_pair(Place, FragID) );
+						this->mMinFragID2Places.insert( std::make_pair(FragID, Place) );
+					}
+					inline void setTransitionRoleID(const transition_t & Transition, const role_id_t RoleID, const bool Override = true) {
+						roleID2Transitions_t::iterator curRoleTransition;
+						transition2RoleID_t::iterator curRole = this->mTransition2RoleID.find(Transition);
+						if (curRole != this->mTransition2RoleID.end()) {
+							assert(Override);
+							bool found = false;
+							pair<roleID2Transitions_t::iterator, roleID2Transitions_t::iterator> roleTransitions = this->mRoleID2Transitions.equal_range(curRole->second);
+							for (curRoleTransition=roleTransitions.first; curRoleTransition!=roleTransitions.second; ++curRoleTransition) {
+								if (curRoleTransition->second == Transition) {
+									found = true;
+									break;
+								}
+							}
+							assert(found);
+							this->mRoleID2Transitions.erase(curRoleTransition);		
+							this->mTransition2RoleID.erase(curRole);
+						}
+						this->mTransition2RoleID.insert( std::make_pair(Transition, RoleID) );
+						this->mRoleID2Transitions.insert( std::make_pair(RoleID, Transition) );
+					}
+					inline void setTransitionFragID(const transition_t & Transition, const frag_id_t FragID, const bool Override = true) {
+						fragID2Transitions_t::iterator curFragTransition;
+						transition2FragID_t::iterator curTransition = this->mTransition2FragID.find(Transition);
+						if (curTransition != this->mTransition2FragID.end()) {
+							assert(Override);
+							bool found = false;
+							pair<fragID2Transitions_t::iterator, fragID2Transitions_t::iterator> curFragTransitions = this->mFragID2Transitions.equal_range(curTransition->second);		
+							for (curFragTransition=curFragTransitions.first; curFragTransition!=curFragTransitions.second; ++curFragTransition) {
+								if (curFragTransition->second == Transition) {
+									found = true;
+									break;
+								}
+							}
+							assert(found);
+							this->mFragID2Transitions.erase(curFragTransition);		
+							this->mTransition2FragID.erase(curTransition);
+						}
+						this->mTransition2FragID.insert( std::make_pair(Transition, FragID) );
+						this->mFragID2Transitions.insert( std::make_pair(FragID, Transition) );
+					}
+					inline void setTransitionDianeID(const transition_t & Transition, const diane_id_t DianeID, const bool Override = true) {
+						dianeID2Transitions_t::iterator curDianeTransition;
+						transition2DianeID_t::iterator curTransitionDiane = this->mTransition2DianeID.find(Transition);
+						if (curTransitionDiane != this->mTransition2DianeID.end()) {
+							assert(Override);
+							bool found = false;
+							pair<dianeID2Transitions_t::iterator, dianeID2Transitions_t::iterator> curDianeTransitions = this->mDianeID2Transitions.equal_range(curTransitionDiane->second);		
+							for (curDianeTransition=curDianeTransitions.first; curDianeTransition!=curDianeTransitions.second; ++curDianeTransition) {
+								if (curDianeTransition->second == Transition) {
+									found = true;
+									break;
+								}
+							}
+							assert(found);
+							this->mDianeID2Transitions.erase(curDianeTransition);		
+							this->mTransition2DianeID.erase(curTransitionDiane);
+						}
+						this->mTransition2DianeID.insert( std::make_pair(Transition, DianeID) );
+						this->mDianeID2Transitions.insert( std::make_pair(DianeID, Transition) );
+					}
+				//get
+					inline frag_id_t getPlaceMinFragID(const place_t & Place) {
+						place2MinFragID_t::iterator curMinFrag = this->mPlace2MinFragID.find(Place);
+						assert(curMinFrag != this->mPlace2MinFragID.end());
+						return curMinFrag->second;
+					}
+					inline diane_id_t getTransitionDianeID(const transition_t & Transition) {
+						transition2DianeID_t::iterator curTransitionDiane = this->mTransition2DianeID.find(Transition);
+						assert(curTransitionDiane != this->mTransition2DianeID.end());
+						return curTransitionDiane->second;
+					}
+				//delete
+					inline void deletePlaceRoleID(const place_t & Place, const role_id_t RoleID) {
+						place2RoleIDs_t::iterator curPlaceRole;
+						roleID2Places_t::iterator curRolePlace;
+						bool foundA = false;
+						pair<place2RoleIDs_t::iterator, place2RoleIDs_t::iterator> curPlaceRoles = this->mPlace2RoleIDs.equal_range(Place);
+						for (curPlaceRole=curPlaceRoles.first; curPlaceRole!=curPlaceRoles.second; ++curPlaceRole) {
+							if (curPlaceRole->second == RoleID) {
+								foundA = true;
+								break;
+							}
+						}
+						bool foundB = false;
+						pair<roleID2Places_t::iterator, roleID2Places_t::iterator> curRolePlaces = this->mRoleID2Places.equal_range(RoleID);
+						for (curRolePlace=curRolePlaces.first; curRolePlace!=curRolePlaces.second; ++curRolePlace) {
+							if (curRolePlace->second == Place) {
+								foundB = true;
+								break;
+							}
+						}
+						assert(foundA && foundB);
+						this->mPlace2RoleIDs.erase(curPlaceRole);
+						this->mRoleID2Places.erase(curRolePlace);
+					}
+					inline void deletePlaceFragID(const place_t & Place, const frag_id_t FragID) {
+						place2FragIDs_t::iterator curPlaceFrag;
+						fragID2Places_t::iterator curFragPlace;
+						bool foundA = false;
+						pair<place2FragIDs_t::iterator, place2FragIDs_t::iterator> curPlaceFrags = this->mPlace2FragIDs.equal_range(Place);
+						for (curPlaceFrag=curPlaceFrags.first; curPlaceFrag!=curPlaceFrags.second; ++curPlaceFrag) {
+							if (curPlaceFrag->second == FragID) {
+								foundA = true;
+								break;
+							}
+						}
+						bool foundB = false;
+						pair<fragID2Places_t::iterator, fragID2Places_t::iterator> curFragPlaces = this->mFragID2Places.equal_range(FragID);
+						for (curFragPlace=curFragPlaces.first; curFragPlace!=curFragPlaces.second; ++curFragPlace) {
+							if (curFragPlace->second == Place) {
+								foundB = true;
+								break;
+							}
+						}
+						assert(foundA && foundB);
+						this->mPlace2FragIDs.erase(curPlaceFrag);
+						this->mFragID2Places.erase(curFragPlace);
+					}
+			//petrinet
+				//create
+				inline void createPlace(const place_t & Place, const frag_id_t FragID, const role_id_t RoleID) {
+					assert(this->mNet->findPlace(Place) == NULL);
+					pnapi::Place *ret = &this->mNet->createPlace(Place);
+					this->mPlaceName2PlacePointer[Place] = ret;
+					this->mPlacePointer2PlaceName[ret] = Place;
+					this->addPlaceFragID(Place, FragID);
+					this->addPlaceRoleID(Place, RoleID);
+					this->mPlacesInsert++;
+				}
+				inline void createTransition(const transition_t & Transition, const frag_id_t FragID, const role_id_t RoleID) {
+					assert(this->mNet->findTransition(Transition) == NULL);
+					pnapi::Transition *ret = &this->mNet->createTransition(Transition);
+					this->mTransitionName2TransitionPointer[Transition] = ret;
+					this->mTransitionPointer2TransitionName[ret] = Transition;
+					this->setTransitionFragID(Transition, FragID);
+					this->setTransitionRoleID(Transition, RoleID);
+					this->mTransitionsInsert++;
+				}
+				inline void createArc(const node_t & Source, const node_t & Target) {
+					pnapi::Node *source = this->mNet->findNode(Source);
+					pnapi::Node *target = this->mNet->findNode(Target);
+					assert(source != NULL);
+					assert(target != NULL);
+					assert(this->mNet->findArc(*source, *target) == NULL);
+					this->mNet->createArc(*source, *target);
+					this->mArcsInsert++;
+				}
+				void createPetrinetByFragID(const frag_id_t);
+				//get
+					inline places_t getPlaces(pnapi::PetriNet & Petrinet) const {
+						places_t ret;
+						PNAPI_FOREACH(p, Petrinet.getPlaces()) {
+							ret.insert((*p)->getName());
+						}
+						return ret;
+					}
+					inline transitions_t getPlaceTransitions(pnapi::PetriNet & Petrinet, const place_t & Place) const {
+						return setUnion(this->getPlacePreset(Petrinet, Place), this->getPlacePostset(Petrinet, Place));
+					}
+					inline transitions_t getPlacePreset(pnapi::PetriNet & Petrinet, const place_t & Place) const {
+						transitions_t ret;
+						PNAPI_FOREACH(t, Petrinet.findPlace(Place)->getPreset()) {
+							ret.insert((*t)->getName());
+						}
+						return ret;
+					}
+					inline transitions_t getPlacePostset(pnapi::PetriNet & Petrinet, const place_t & Place) const {
+						transitions_t ret;
+						PNAPI_FOREACH(t, Petrinet.findPlace(Place)->getPostset()) {
+							ret.insert((*t)->getName());
+						}
+						return ret;
+					}
+					inline transitions_t getTransitions(pnapi::PetriNet & Petrinet) const {
+						transitions_t ret;
+						PNAPI_FOREACH(t, Petrinet.getTransitions()) {
+							ret.insert((*t)->getName());
+						}
+						return ret;
+					}
+					inline places_t getTransitionPlaces(pnapi::PetriNet & Petrinet, const transition_t & Transition) const {
+						return setUnion(this->getTransitionPreset(Petrinet, Transition), this->getTransitionPostset(Petrinet, Transition));
+					}
+					inline places_t getTransitionPreset(pnapi::PetriNet & Petrinet, const transition_t & Transition) const {
+						places_t ret;
+						PNAPI_FOREACH(p, Petrinet.findTransition(Transition)->getPreset()) {
+							ret.insert((*p)->getName());
+						}
+						return ret;
+					}
+					inline places_t getTransitionPostset(pnapi::PetriNet & Petrinet, const transition_t & Transition) const {
+						places_t ret;
+						PNAPI_FOREACH(p, Petrinet.findTransition(Transition)->getPostset()) {
+							ret.insert((*p)->getName());
+						}
+						return ret;
+					}
+			//diane
+				bool processUnassignedFragment(const frag_id_t);
+				void readDianeOutputFile(const string &);
+				bool processDianeFragmentation();
+				pair<role_id_t, frag_id_t> getBestConnectionForDianeFragment(const diane_id_t, const bool);
+				bool willDianeAssignementValid(const diane_id_t, const role_id_t);
+				void setDianeFragmentConnection(const diane_id_t, pair<role_id_t, frag_id_t>);				
+			//properties
+				inline bool hasUnassignedTransitions(const place_t & Place) {
+					transitions_t placeTransitions = this->getPlaceTransitions(*this->mNet, Place);	
+					assert(placeTransitions.size() != 0);
+					PNAPI_FOREACH(t, placeTransitions) {
+						if (this->getTransitionRoleID(*t) == this->ROLE_UNASSIGNED) {
+							return true;
+						}
+					}
+					return false;
+				}
+				placeStatus_e getPlaceStatus(const place_t &, const bool, const role_id_t, const role_id_t);
+				inline roles_t getTopRoleIDs(const map<role_id_t, size_t> & RoleMap) const {
+					roles_t ret;
+					size_t maxRoleSize = 0;
+					for (role_id_t r = 0; r < this->mRoleName2RoleID.size(); r++) {
+						if (RoleMap.find(r) != RoleMap.end()) {
+							if (RoleMap.find(r)->second > maxRoleSize) {
+								maxRoleSize = RoleMap.find(r)->second;
+							}
+						}
+					}
+					for (role_id_t r = 0; r < this->mRoleName2RoleID.size(); r++) {
+						if (RoleMap.find(r) != RoleMap.end()) {
+							if (RoleMap.find(r)->second == maxRoleSize) {
+								ret.insert(r);
+							}
+						}
+					}
+					return ret;
+				}
+			//helper
+				inline void addTransitionPredecessors(stack<transition_t> & ToDo, transitions_t & Done, const transition_t & Transition) {
+					transitions_t transitions;
+					places_t places = this->getTransitionPreset(*this->mNet, Transition);
+					FOREACH(p, places) {
+						if (*p == this->mGlobalStartPlace) {
+							if (Done.find(this->GLOBALSTART_REACHED) == Done.end()) {
+								ToDo.push(this->GLOBALSTART_REACHED);
+								Done.insert(this->GLOBALSTART_REACHED);
+							}
+						}
+						else {
+							transitions = this->getPlacePreset(*this->mNet, *p);
+							FOREACH(t, transitions) {
+								if (Done.find(*t) == Done.end()) {
+									ToDo.push(*t);
+									Done.insert(*t);
+								}
+							}
+						}
+					}
+				}
+				inline void replaceFragIDs(const frag_id_t FragOld, const frag_id_t FragNew) {
+					assert(FragOld != FragNew);
+					set< pair<place_t, frag_id_t> > toAdd;
+					set< pair<place_t, frag_id_t> > toDelete;
+					pair<fragID2Places_t::iterator, fragID2Places_t::iterator> curFragPlaces = this->mFragID2Places.equal_range(FragOld);
+					for (fragID2Places_t::iterator curFragPlace=curFragPlaces.first; curFragPlace!=curFragPlaces.second; ++curFragPlace) {
+						toAdd.insert( std::make_pair(curFragPlace->second, FragNew) );
+						toDelete.insert( std::make_pair(curFragPlace->second, FragOld) );
+					}
+					FOREACH(p, toAdd) {
+						this->addPlaceFragID(p->first, p->second);
+					}
+					FOREACH(p, toDelete) {
+						this->deletePlaceFragID(p->first, p->second);
+						transitions_t placeTransitions = this->getPlaceTransitions(*this->mNet, p->first);		
+						PNAPI_FOREACH(t, placeTransitions) {
+							if (this->getTransitionFragID(*t) == FragOld) {
+								this->setTransitionFragID(*t, FragNew);
+							}
+						}
+					}
+				}
+				inline void connectFragments() {
+					bool changed = true;
+					set< pair<frag_id_t, frag_id_t> > toConnect;
+					while (changed) {
+						changed = false;
+						toConnect.clear();
+						for (frag_id_t f_a = 0; f_a < this->mMaxFragID; f_a++) {
+							for (frag_id_t f_b = 0; f_b < this->mMaxFragID; f_b++) {
+								if ((f_a != f_b) && (!this->isFragmentEmpty(f_a) && !this->isFragmentEmpty(f_b)) && (this->getFragmentRoleID(f_a) == this->getFragmentRoleID(f_b))) {
+									pair<fragID2Places_t::iterator, fragID2Places_t::iterator> places_f_a = this->mFragID2Places.equal_range(f_a);
+									pair<fragID2Places_t::iterator, fragID2Places_t::iterator> places_f_b = this->mFragID2Places.equal_range(f_b);
+									bool pairProcessed = false;
+									for (fragID2Places_t::iterator place_f_a=places_f_a.first; place_f_a!=places_f_a.second; ++place_f_a) {
+										for (fragID2Places_t::iterator place_f_b=places_f_b.first; place_f_b!=places_f_b.second; ++place_f_b) {
+											if (place_f_a->second == place_f_b->second) {						
+												toConnect.insert( std::make_pair( std::max(f_a, f_b), std::min(f_a, f_b) ) );
+												pairProcessed = true;
+												break;
+											}
+										}
+										if (pairProcessed) break;
+									}
+								}
+							}
+						}
+						for (set< pair<frag_id_t, frag_id_t> >::reverse_iterator curPair=toConnect.rbegin(); curPair!=toConnect.rend(); ++curPair) {
+							this->replaceFragIDs(curPair->first, curPair->second);
+						}
+					}
+				}	
 
 	public:
-		Fragmentation(pnapi::PetriNet &);
-		~Fragmentation();
-		
-		role_id_t getTransitionRoleID(const transition_t &);
-		frag_id_t getTransitionFragID(const transition_t &);
-		role_id_t getFragmentRoleID(const frag_id_t);
-		string getFragmentRoleName(const frag_id_t);
-		role_id_t getRoleID(const string &);
+		//methods
+			//global
+				Fragmentation(pnapi::PetriNet &);
+				inline ~Fragmentation() {};
+			//member support
+				//set/add
+				//get
+					inline size_t getLolaCalls() {return this->mLolaCalls;}
+					inline size_t getDianeCalls() {return this->mDianeCalls;}
+					inline size_t getDianeForces() {return this->mOverallDianeForces;}
+					inline size_t getDianeAlternatives() {return this->mOverallDianeAlternatives;}
+					inline bool hasCycles() {return this->mHasCycles;}
+					inline bool isFreeChoice() {return this->mIsFreeChoice;}
+					inline size_t getInterfaceCorrections() {return this->mInterfaceCorrections;}
+					inline size_t getCommunicationCorrections() {return this->mCommunicationCorrections;}
+					inline size_t getFragmentConnections() {return this->mFragmentConnections;}
+					inline size_t getPlacesInsert() {return this->mPlacesInsert;}
+					inline size_t getTransitionsInsert() {return this->mTransitionsInsert;}
+					inline size_t getArcsInsert() {return this->mArcsInsert;}
+					inline size_t getPlacesDelete() {return this->mPlacesDelete;}
+					inline size_t getTransitionsDelete() {return this->mTransitionsDelete;}
+					inline size_t getArcsDelete() {return this->mArcsDelete;}
+					inline role_id_t getTransitionRoleID(const transition_t & Transition) {
+						transition2RoleID_t::iterator curRole = this->mTransition2RoleID.find(Transition);
+						assert(curRole != this->mTransition2RoleID.end());
+						return curRole->second;
+					}
+					inline frag_id_t getTransitionFragID(const transition_t & Transition) {
+						transition2FragID_t::iterator curFrag = this->mTransition2FragID.find(Transition);
+						assert(curFrag != this->mTransition2FragID.end());
+						return curFrag->second;
+					}
+					inline role_id_t getFragmentRoleID(const frag_id_t FragID) {
+						fragID2Transitions_t::const_iterator curFragTransition = this->mFragID2Transitions.find(FragID);
+						assert(curFragTransition != this->mFragID2Transitions.end());
+						transition2RoleID_t::const_iterator curTransitionRole = this->mTransition2RoleID.find(curFragTransition->second);
+						assert(curTransitionRole != this->mTransition2RoleID.end());
+						return curTransitionRole->second;
+					}
+					inline role_id_t getRoleID(const string & Role) {
+						roleName2RoleID_t::iterator curRole = this->mRoleName2RoleID.find(Role);
+						assert(curRole != this->mRoleName2RoleID.end());
+						return curRole->second;
+					}
 
-		bool isSharedPlace(const place_t &);
-		bool isStartTransition(const transition_t &);
-		bool isFragmentEmpty(const frag_id_t);
-		
-		bool buildRoleFragments();
-		bool processUnassignedFragments();
-		bool buildServices();
-
-		size_t getLolaCalls();
-		size_t getDianeCalls();
-		size_t getDianeForces();
-		size_t getDianeAlternatives();
-		bool hasCycles();
-		bool isFreeChoice();
+					inline string getColorName(const size_t ColorID) {
+						colorID2ColorName_t::const_iterator curColor = this->mColorID2ColorName.find(ColorID);
+						assert(curColor != this->mColorID2ColorName.end());
+						return curColor->second;
+					}
+				//delete		
+					inline void eraseColors() {
+						PNAPI_FOREACH(n, this->mNet->getNodes()) {
+							(*n)->setColor();
+						}
+					}
+			//petrinet
+				pnapi::PetriNet createPetrinetByRoleID(const role_id_t);
+			//color
+				void colorFragmentsByFragID(const bool = false);
+				void colorFragmentsByRoleID(const bool = false);
+			//properties
+				inline bool isSharedPlace(const place_t & Place) {return (this->mPlace2RoleIDs.count(Place) > 1);}
+				inline bool isFragmentEmpty(const frag_id_t FragID) {return (this->mFragID2Transitions.find(FragID) == this->mFragID2Transitions.end());}
+				inline bool isStartTransition(const transition_t & Transition) {
+					assert(this->mRoleFragmentsBuild);
+					frag_id_t transitionFragID = this->getTransitionFragID(Transition);
+					places_t transitionPlaces = this->getTransitionPreset(*this->mNet, Transition);
+					FOREACH(p, transitionPlaces) {
+						if (this->mPlace2FragIDs.count(*p) == 1) {
+							if (this->mPlace2FragIDs.find(*p)->second == transitionFragID) {
+								return false;
+							}
+						}
+					}
+					return true;
+				}
+				validStatus_e isFragmentationValid(const bool = false);
+			//main
+				bool buildRoleFragments();
+				bool processUnassignedFragments();
+				bool buildServices();
 	
-		validStatus_e isFragmentationValid(const bool = false);
-
-		string fragmentsToString();
-
-		pnapi::PetriNet createPetrinetByRoleID(const role_id_t);
-
-		void eraseColors();
-		void colorFragmentsByFragID(const bool = false);
-		void colorFragmentsByRoleID(const bool = false);
-		string getColorName(const size_t);
-
 };
 
 #endif //__FRAGMENTATION_H

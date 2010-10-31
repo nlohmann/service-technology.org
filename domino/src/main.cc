@@ -161,7 +161,7 @@ void terminationHandler() {
 }
 
 void createDotFile(const string & OutputFile, pnapi::PetriNet & Petrinet, const string InputFile) {
-	if (fileExists(string(OutputFile + ".dot"))) {
+	if (fileExists(string(OutputFile + ".dot")) && args_info.noOverride_flag) {
 		abort(5, "file %s already exists", _cfilename_(OutputFile + ".dot"));
 	}
 
@@ -182,7 +182,7 @@ void createDotFile(const string & OutputFile, pnapi::PetriNet & Petrinet, const 
 }
 
 void createOWFNFile(const string & OutputFile, pnapi::PetriNet & Petrinet, const string InputFile) {
-	if (fileExists(string(OutputFile + ".owfn"))) {
+	if (fileExists(string(OutputFile + ".owfn")) && args_info.noOverride_flag) {
 		abort(5, "file %s already exists", _cfilename_(OutputFile + ".owfn"));
 	}
 
@@ -394,30 +394,40 @@ int main(int argc, char** argv) {
 
 	if (args_info.resultFile_given) {
         std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : fileName + ".results";
-		if (fileExists(results_filename)) {
+		if (fileExists(results_filename)  && args_info.noOverride_flag) {
 			abort(5, "file %s already exists", _cfilename_(results_filename));
 		}
 
         Results results(results_filename);
 
-        results.add("meta.package_name", (char*)PACKAGE_NAME);
-        results.add("meta.package_version", (char*)PACKAGE_VERSION);
-        results.add("meta.svn_version", (char*)VERSION_SVN);
-        results.add("meta.invocation", invocation);
-
-		results.add("result.success", retOK);
-		
-		results.add("workflow.isFreeChoice", f.isFreeChoice());
-		results.add("workflow.hasCycles", f.hasCycles());
-		results.add("workflow.roles", (unsigned int)net.getRoles().size());
-		results.add("workflow.places", (unsigned int)net.getPlaces().size());
-		results.add("workflow.transitons", (unsigned int)net.getTransitions().size());
+		results.add("decomposition.success", retOK);
+		results.add("decomposition.interface_corrections", (unsigned int)f.getInterfaceCorrections());
+		results.add("decomposition.communication_corrections", (unsigned int)f.getCommunicationCorrections());
+		results.add("decomposition.fragment_connections", (unsigned int)f.getFragmentConnections());
+		results.add("decomposition.places_insert", (unsigned int)f.getPlacesInsert());
+		results.add("decomposition.transitions_insert", (unsigned int)f.getTransitionsInsert());
+		results.add("decomposition.arcs_insert", (unsigned int)f.getArcsInsert());
+		results.add("decomposition.places_delete", (unsigned int)f.getPlacesDelete());
+		results.add("decomposition.transitions_delete", (unsigned int)f.getTransitionsDelete());
+		results.add("decomposition.arcs_delete", (unsigned int)f.getArcsDelete());		
 
 		results.add("diane.calls", (unsigned int)f.getDianeCalls());
 		results.add("diane.forces", (unsigned int)f.getDianeForces());
 		results.add("diane.alternatives", (unsigned int)f.getDianeAlternatives());
 
 		results.add("lola.calls", (unsigned int)f.getLolaCalls());
+
+		results.add("meta.package_name", (char*)PACKAGE_NAME);
+        results.add("meta.package_version", (char*)PACKAGE_VERSION);
+        results.add("meta.svn_version", (char*)VERSION_SVN);
+        results.add("meta.invocation", invocation);
+
+		results.add("workflow.roles", (unsigned int)net.getRoles().size());
+		results.add("workflow.places", (unsigned int)(net.getPlaces().size() - f.getPlacesInsert() + f.getPlacesDelete()));
+		results.add("workflow.transitons", (unsigned int)(net.getTransitions().size() - f.getTransitionsInsert() + f.getTransitionsDelete()));
+		results.add("workflow.arcs", (unsigned int)(net.getArcs().size() - f.getArcsInsert() + f.getArcsDelete()));
+		results.add("workflow.isFreeChoice", f.isFreeChoice());
+		results.add("workflow.hasCycles", f.hasCycles());
 
     }
 	

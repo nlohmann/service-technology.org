@@ -278,6 +278,44 @@ See @url{http://service-technology.org/publications} for more information.
 @node Results
 @chapter Results
 
+@heading @code{decomposition}
+@findex decomposition
+
+This part lists information on the decomposition process.
+
+@ftable @code
+@item success
+True if decomposition of the input open net was successfull. [Boolean]
+
+@item interface_corrections
+The number of fixed not disjunct shared places. [Integer]
+
+@item communication_corrections
+The number of fixed not bilateral communicating shared places. [Integer]
+
+@item fragment_connections
+The number of forced connections of fragments (with pairwise identical roles). [Integer]
+
+@item places_insert
+The number of inserted places by necessary corrections. [Integer]
+
+@item transitions_insert
+The number of inserted transitions by necessary corrections. [Integer]
+
+@item arcs_insert
+The number of inserted arcs by necessary corrections. [Integer]
+
+@item places_delete
+The number of deleted places by necessary corrections. [Integer]
+
+@item transitions_delete
+The number of deleted transitions by necessary corrections. [Integer]
+
+@item arcs_delete
+The number of deleted arcs by necessary corrections. [Integer]
+
+@end ftable
+
 @heading @code{diane}
 @findex meta
 
@@ -320,17 +358,6 @@ The invocation string of the tool. [String]
 The name of the tool, its version, and (when applicable) the version of the SVN revision. [String]
 @end ftable
 
-@heading @code{result}
-@findex result
-
-This part lists information on the decomposition success.
-
-@ftable @code
-@item success
-True if decomposition of the input open net was successfull. [Boolean]
-@end ftable
-
-
 @heading @code{workflow}
 @findex workflow
 
@@ -351,6 +378,9 @@ The number of places of the input workflow. [Integer]
 
 @item transitions
 The number of transitions of the input workflow. [Integer]
+
+@item arcs
+The number of arcs of the input workflow. [Integer]
 @end ftable
 
 @c --------------------------------------------------------------------------
@@ -365,7 +395,7 @@ Note that Domino's exit code is @b{not} related to the result of the decompisiti
 
 @smallexample
 @cartouche
-domino: worklfow demposition successfull
+domino: worklfow decomposition successfull
 @end cartouche
 @end smallexample
 
@@ -373,7 +403,7 @@ and
 
 @smallexample
 @cartouche
-domino: worklfow demposition failed
+domino: worklfow decomposition failed
 @end cartouche
 @end smallexample
 
@@ -432,11 +462,12 @@ domino: file foo.bar already exists -- aborting [#05]
 @end smallexample
 
 @item #06
-Error calling a method. Some methods are supposed to be called only once. This error occurs in case any ot these methods are called at least twice.
+Error processing the input open net. This error occurs in case any transition in the input open net has more than one role assigned.
 
 @smallexample
 @cartouche
-domino: Fragmentation::buildRoleFragments(): already called -- aborting [#06]
+domino: Fragmentation::buildRoleFragments(): 
+        transition t1 has more than one role -- aborting [#6]
 @end cartouche
 @end smallexample
 
@@ -445,17 +476,18 @@ A wrong command-line parameter was given or there was a problem with the combina
 
 @smallexample
 @cartouche
-wendy: `--dotServices' option depends on option `output'
-wendy: invalid command-line parameter(s) -- aborting [#07]
+domino: `--dotServices' option depends on option `output'
+domino: invalid command-line parameter(s) -- aborting [#07]
 @end cartouche
 @end smallexample
 
 @item #08
-Error calling a method. Some methods depend on other methods. This error occurs in case any ot these methods are called before the methods it depends on.
+Error coloring a dot file. This error occurs in case all preset colors (actually 30) are used. To avoid these error you can switch off (by default) parameter @option{--dotColorUnassigned} (can save one color) or change the source. Maybe there will be an option (by parameter) to define own colors.
 
 @smallexample
 @cartouche
-domino: buildServices(): processUnassignedFragments() is necessary -- aborting [#08]
+domino: Fragmentation::colorFragmentsByFragID(1):
+        all 30 colors used -- aborting [#8]
 @end cartouche
 @end smallexample
 
@@ -475,7 +507,8 @@ A place in the input open net is named with a predefined name. Actually it is 'A
 
 @smallexample
 @cartouche
-domino: Fragmentation::init(): place AL_1983_07_12 has predefined constant name -- aborting [#10]
+domino: Fragmentation::init(): place AL_1983_07_12
+        has predefined constant name -- aborting [#10]
 @end cartouche
 @end smallexample
 
@@ -484,7 +517,8 @@ The input open net contains not exactly one global start place. Usually, this er
 
 @smallexample
 @cartouche
-domino: Fragmentation::init(): no global start place was found -- aborting [#11]
+domino: Fragmentation::init(): no global start place was found
+        -- aborting [#11]
 @end cartouche
 @end smallexample
 
@@ -493,16 +527,8 @@ Error deleting a file. Usually, this error occurs in case a file was deleted bef
 
 @smallexample
 @cartouche
-domino: Fragmentation::buildServices(): file foo.bar cannot be deleted -- aborting [#12]
-@end cartouche
-@end smallexample
-
-@item #13
-Error processing the input open net. This error occurs in case any transition in the input open net has more than one role assigned.
-
-@smallexample
-@cartouche
-domino: Fragmentation::buildRoleFragments(): transition t1 has more than one role -- aborting [#13]
+domino: Fragmentation::buildServices(): file foo.bar cannot be deleted
+        -- aborting [#12]
 @end cartouche
 @end smallexample
 
@@ -513,26 +539,6 @@ Domino cannot find the configuration file given by @file{--config} parameter or 
 @cartouche
 domino: Error opening configuration file `myconf.conf'
 domino: error reading configuration file `myconf.conf' -- aborting [#14]
-@end cartouche
-@end smallexample
-
-@item #15
-Error processing the input open net. This error occurs in case any shared place has precessors and successors in more than one role. In this case there is no chance to create services (with asynchron communication). This error can perhaps be avoided by changing the initial role annotation. 
-
-@smallexample
-@cartouche
-domino: Fragmentation::replaceSharedStructure(1, p1): forbidden struture -- aborting [#15]
-@end cartouche
-@end smallexample
-
-The parameter @option{--verbose} can give you additional information on the nature of the error.
-
-@item #16
-Error coloring a dot file. This error occurs in case all preset colors (actually 30) are used. To avoid these error you can switch off (by default) parameter @option{--dotColorUnassigned} (can save one color) or change the source. Maybe there will be an option (by parameter) to define own colors.
-
-@smallexample
-@cartouche
-domino: Fragmentation::colorFragmentsByFragID(%d): all 30 colors used -- aborting [#16]
 @end cartouche
 @end smallexample
 

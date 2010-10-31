@@ -149,6 +149,11 @@ option "noClean" -
   details="Any temporary files created will be kept after Domino terminates.\n"
   flag off
 
+option "noOverride" -
+  "Do not override any files."
+  details="Existing files will not overriden.\n"
+  flag off
+
 
 section "Debugging"
 sectiondesc="These options control how much debug output Domino creates.\n"

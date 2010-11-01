@@ -26,6 +26,8 @@ using std::set;
 using std::map;
 using std::deque;
 
+namespace sara {
+
 /*! \brief For queuing jobs (future and past), solutions, and failures
 
 	Class for future jobs, i.e. unsolved partial solutions. Fast finding and inserting is essential,
@@ -131,6 +133,8 @@ private:
 	/// The queue of past jobs for constraint comparisons
 	map<int,deque<PartialSolution*> > past;
 };
+
+}
 
 #endif
 

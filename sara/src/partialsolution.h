@@ -28,7 +28,11 @@
 #include "imatrix.h"
 #include "tarjan.h"
 
+namespace sara {
+
 class PartialSolution;
+
+}
 
 #include "constraint.h"
 
@@ -40,6 +44,8 @@ using std::deque;
 using std::map;
 using std::string;
 using std::set;
+
+namespace sara {
 
 /*! \brief For storing sets of constraints, partial firing sequences, and non-enabled remainders, forming a job
 
@@ -195,6 +201,8 @@ private:
 	/// Number of jump constraints we have gone through so far, for job ordering
 	int jumpsdone;
 };
+
+}
 
 #endif
 

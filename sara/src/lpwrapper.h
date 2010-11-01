@@ -31,6 +31,7 @@ using pnapi::Transition;
 using pnapi::PetriNet;
 using std::map;
 
+namespace sara {
 
 /*! \brief For wrapping the needed functionality of lp_solve
 
@@ -94,6 +95,8 @@ private:
 	/// Internal variables for the solution
 	map<Transition*,int> tvector;
 };
+
+}
 
 #endif
 

@@ -42,11 +42,15 @@ using std::cout;
 using std::endl;
 using std::setw;
 
-extern gengetopt_args_info args_info;
+//extern gengetopt_args_info args_info;
 
 	/******************************************
 	* Implementation of the class Reachalyzer *
 	******************************************/
+
+namespace sara {
+
+extern bool flag_verbose, flag_show, flag_break, flag_treemaxjob, flag_witness;
 
 /*! Constructor with a Petri net, an initial and a final marking to test whether
 	the final marking can be covered from the initial marking.
@@ -154,7 +158,7 @@ void Reachalyzer::start() {
 		// calculate what the new constraints changed in the solution of lp_solve
 		map<Transition*,int> fullvector(lpwrap.getTVector(net));
 		// delete all "unknown" jobs covered by this job if we are interested in a counterexample
-		if (args_info.verbose_given || args_info.show_given) unknown.deleteCovered(fullvector); 
+		if (flag_verbose || flag_show) unknown.deleteCovered(fullvector); 
 		map<Transition*,int> diff; // this contains changes from the old to the new solution
 		map<Transition*,int>::iterator vit;
 		for(vit=fullvector.begin(); vit!=fullvector.end(); ++vit)
@@ -185,7 +189,7 @@ void Reachalyzer::start() {
 				if (verbose>1) cerr << endl;
 				++loops; // count the job
 				continue; // do not try to find a realization
-			} else if (args_info.verbose_given || args_info.show_given) { // only if looking for counterexamples
+			} else if (flag_verbose || flag_show) { // only if looking for counterexamples
 				bool ngeq(false); // if the new solution is not greater or equal to the old one
 				for(vit=oldvector.begin(); vit!=oldvector.end(); ++vit)
 					if (vit->second>fullvector[vit->first]) ngeq=true;
@@ -220,10 +224,10 @@ void Reachalyzer::start() {
 		if (verbose>0) cerr << endl;
 		++loops; // count the job
 	}
-	if (args_info.verbose_given || args_info.show_given)
+	if (flag_verbose || flag_show)
 		failure.append(unknown); // the unknown are known now: they belong to the counterexample
 	if (stateinfo && out) cout << "\r"; // if on screen
-	if (args_info.break_given && stateinfo) // debug output if option --break was used
+	if (flag_break && stateinfo) // debug output if option --break was used
 	{ 
 		cerr << endl << endl << "****** JobQueue ******" << endl;
 		tps.show(true); 
@@ -254,11 +258,11 @@ void Reachalyzer::printResult(int pbnr) {
 	}
 	else if (errors) cout << "sara: UNSOLVED: Result is indecisive due to failure of lp_solve." << endl;
 	else if (suboptimal) cout << "sara: UNSOLVED: Result is indecisive due to non-minimal solutions by lp_solve." << endl;
-	else if (args_info.treemaxjob_given) cout << "sara: UNSOLVED: solution may have been cut off due to command line switch -T" << endl;
-	if (!errors && !args_info.treemaxjob_given && (args_info.witness_given || solutions.almostEmpty()))
+	else if (flag_treemaxjob) cout << "sara: UNSOLVED: solution may have been cut off due to command line switch -T" << endl;
+	if (!errors && !flag_treemaxjob && (flag_witness || solutions.almostEmpty()))
 	{ // if we have no solution or witnesses are sought anyway
 		if (suboptimal) cout << "sara: The following information might therefore not be relevant." << endl;
-		if (failure.trueSize()>0 && !args_info.break_given)
+		if (failure.trueSize()>0 && !flag_break)
 		{ // if there are witnesses and --break was not specified
 			if (solutions.almostEmpty() && !passedon) {
 				if (!suboptimal) {
@@ -276,9 +280,9 @@ void Reachalyzer::printResult(int pbnr) {
 				if (stateinfo) cout << "There are firing sequences that could not be extended towards the final marking." << endl;
 			} else if (passedon && stateinfo) cout << "sara: at the following points the algorithm could not continue:" << endl;
 			else if (stateinfo) cout << "sara: at the following points the algorithm needed to backtrack:" << endl;
-			if (stateinfo || args_info.show_given) failure.printFailure(im,problem,pbnr); // then print the counterexample; the following shouldn't happen:
+			if (stateinfo || flag_show) failure.printFailure(im,problem,pbnr); // then print the counterexample; the following shouldn't happen:
 		} else if (solutions.almostEmpty())
-			cout << "sara: UNSOLVED: Result is indecisive" << (args_info.break_given?" due to a break.":", no counterexamples found.") << endl;
+			cout << "sara: UNSOLVED: Result is indecisive" << (flag_break?" due to a break.":", no counterexamples found.") << endl;
 	}
 }
 
@@ -407,4 +411,5 @@ int Reachalyzer::getSumTraceLength() const { return sumsollen; }
 */
 int Reachalyzer::numberOfSolutions() { return solutions.size(); }
 
+} // end namespace sara
 

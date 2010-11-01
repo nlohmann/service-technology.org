@@ -8,6 +8,7 @@
 #include <string>
 #include <unistd.h>
 
+namespace sara {
 
 /// unconditionally print a message
 void message(const char* format, ...);
@@ -116,5 +117,7 @@ const bool _useColor = false;
 #define _cimportant_(s)  (std::string(_bold_) + s + _c_).c_str()
 /// color a command-line parameter
 #define _cparameter_(s)  (std::string(_cC_) + s + _c_).c_str()
+
+}
 
 #endif

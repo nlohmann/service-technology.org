@@ -38,6 +38,8 @@ using std::map;
 using std::set;
 using std::string;
 
+namespace sara {
+
 /** Shorthand types for conflict&dependency tables */
 typedef map<Transition*,set<Transition*> > Cft;
 typedef map<Transition*,set<Transition*> >::iterator Cftit;
@@ -172,6 +174,8 @@ private:
 	bool isSmaller(map<Transition*,int>& m1, map<Transition*,int>& m2);
 
 };
+
+}
 
 #endif
 

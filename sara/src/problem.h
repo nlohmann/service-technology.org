@@ -34,6 +34,8 @@ using pnapi::Transition;
 using pnapi::PetriNet;
 using pnapi::Marking;
 
+namespace sara {
+
 /*! \brief Objects of this class contain problems (e.g. reachability) that are to be solved. */
 class Problem {
 public:
@@ -192,6 +194,8 @@ private:
 	/// The name a property to be checked
 	string result;
 };
+
+}
 
 #endif
 

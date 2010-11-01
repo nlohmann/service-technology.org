@@ -23,7 +23,11 @@
 #include "pnapi/pnapi.h"
 #endif
 
+namespace sara {
+
 class Constraint;
+
+}
 
 #include "lpwrapper.h"
 #include "partialsolution.h"
@@ -33,6 +37,8 @@ using pnapi::Transition;
 using std::set;
 using std::map;
 using std::ostream;
+
+namespace sara {
 
 /*! \brief for computing and storing additional constraints to the marking equation
 
@@ -144,6 +150,8 @@ private:
 	/// Whether the constraint is new and may be the reason for a failure (not finding solutions)
 	bool recent;
 };
+
+}
 
 #endif
 

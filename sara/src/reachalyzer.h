@@ -30,6 +30,8 @@ using pnapi::PetriNet;
 using pnapi::Marking;
 using std::vector;
 
+namespace sara {
+
 /*! \brief This class can analyze reachability problems. */
 class Reachalyzer {
 public:
@@ -154,6 +156,8 @@ private:
 	/// if a solution of lp_solve was suboptimal which means solutions can be lost
 	bool suboptimal;
 };
+
+}
 
 #endif
 

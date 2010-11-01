@@ -34,11 +34,16 @@ using std::stringstream;
 using std::ofstream;
 using pnapi::Node;
 
-extern gengetopt_args_info args_info;
+//extern gengetopt_args_info args_info;
 
 	/******************************************************
 	* Implementation of the methods of the class JobQueue *
 	******************************************************/
+
+namespace sara {
+
+extern bool flag_droppast, flag_joborder, flag_verbose, flag_show, flag_forceprint;
+extern int val_droppast;
 
 /** Constructor for the empty queue.
 */
@@ -107,7 +112,7 @@ bool JobQueue::pop_front(bool kill) {
 		if (queue.begin()->second.empty())
 			queue.erase(queue.begin());
 	}
-	if (args_info.droppast_given && (unsigned int)(args_info.droppast_arg)<past.size()) // drop things that are too far in the past and will probably not come up again
+	if (flag_droppast && (unsigned int)(val_droppast)<past.size()) // drop things that are too far in the past and will probably not come up again
 	{
 		cerr << "\r";
 		status("warning: dropped all past jobs with priority %d",past.begin()->first);
@@ -186,7 +191,7 @@ bool JobQueue::findPast(PartialSolution* job) {
 */
 int JobQueue::priority(PartialSolution* job) const {
 	int priority(0);
-	if (args_info.joborder_given)
+	if (flag_joborder)
 	{
 		map<Transition*,int>::iterator it;
 		for(it=job->getFullVector().begin(); it!=job->getFullVector().end(); ++it)
@@ -219,7 +224,7 @@ bool JobQueue::checkMEInfeasible() {
 	@param job The job to be added to the failure queue.
 */
 void JobQueue::push_fail(PartialSolution* job) {
-	if (!args_info.verbose_given && !args_info.show_given && queue.size()>1) { delete job; return; } // user doesn't want to know about failure reasons
+	if (!flag_verbose && !flag_show && queue.size()>1) { delete job; return; } // user doesn't want to know about failure reasons
 	if (!almostEmpty()) job->setFeasibility(true); // first entry: marking equation may be infeasible
 	// check if there is an entry in the queue with an equivalent marking
 	bool found = false; // no equivalent entry so far
@@ -548,7 +553,7 @@ bool JobQueue::push_solved(PartialSolution* job) {
 int JobQueue::printSolutions(int& sum, Problem& pb, int pbnr) {
 	int sollength=0; // solution length
 	int colcnt(0); // counting the solutions for adapting filenames
-	if (args_info.forceprint_given) return -1; // solutions were printed earlier
+	if (flag_forceprint) return -1; // solutions were printed earlier
 	if (queue.empty()) abort(14,"error: solved, but no solution found -- this should not happen");
 	map<int,deque<PartialSolution*> >::iterator jit;
 	for(jit=queue.begin(); jit!=queue.end(); ++jit)
@@ -642,7 +647,7 @@ void JobQueue::append(JobQueue& jbq) {
 	@param tvec The firing sequence.
 */
 void JobQueue::colorSequence(vector<Transition*>& tvec) {
-	if (!args_info.show_given) return;
+	if (!flag_show) return;
 	map<Transition*,int> tmap;
 	for(unsigned int i=0; i<tvec.size(); ++i)
 		tmap[tvec[i]]++;
@@ -682,7 +687,7 @@ void JobQueue::colorSequence(vector<Transition*>& tvec) {
 	@param blue Use color blue instead of red.
 */
 void JobQueue::colorTransitions(set<Transition*>& tset, bool blue) {
-	if (!args_info.show_given) return;
+	if (!flag_show) return;
 	set<Transition*>::iterator tit;
 	for(tit=tset.begin(); tit!=tset.end(); ++tit)
 		(*tit)->setColor((blue?"blue":"red"));
@@ -693,7 +698,7 @@ void JobQueue::colorTransitions(set<Transition*>& tset, bool blue) {
 	@param blue Use color blue instead of red.
 */
 void JobQueue::colorPlaces(map<Place*,int>& pmap, bool blue) {
-	if (!args_info.show_given) return;
+	if (!flag_show) return;
 	map<Place*,int>::iterator pit;
 	for(pit=pmap.begin(); pit!=pmap.end(); ++pit)
 		pit->first->setColor((blue?"blue":"red"));
@@ -703,7 +708,7 @@ void JobQueue::colorPlaces(map<Place*,int>& pmap, bool blue) {
 	@param pn The Petri net to uncolor.
 */
 void JobQueue::resetColors(PetriNet& pn) {
-	if (!args_info.show_given) return;
+	if (!flag_show) return;
 	set<Place*> pset(pn.getPlaces());
 	set<Place*>::iterator pit;
 	for(pit=pset.begin(); pit!=pset.end(); ++pit)
@@ -720,7 +725,7 @@ void JobQueue::resetColors(PetriNet& pn) {
 	@param nr The number of this solution/counterexample (appears in the filename).
 */
 void JobQueue::saveColoredNet(Problem& pb, int pbnr, int nr) {
-	if (!args_info.show_given) return;
+	if (!flag_show) return;
 	string name(pb.getFilename());
 	size_t found = name.rfind('.');
 	if (found!=string::npos) name = name.substr(0,found);
@@ -735,3 +740,4 @@ void JobQueue::saveColoredNet(Problem& pb, int pbnr, int nr) {
 	outfile.close();
 }
 
+} // end namespace sara

@@ -48,20 +48,21 @@ using std::ifstream;
 using std::ofstream;
 using std::ostringstream;
 using std::setw;
-//using namespace pnapi;
 
-//extern pnapi::parser::owfn::Parser paowfn;
-//extern pnapi::parser::lola::Parser palola;
+namespace sara {
 extern vector<Transition*> transitionorder;
 extern vector<Place*> placeorder;
 extern map<Transition*,int> revtorder;
 extern map<Place*,int> revporder;
-
-extern gengetopt_args_info args_info;
+extern bool flag_verbose;
+}
+//extern gengetopt_args_info args_info;
 
 	/**************************************
 	* Implementation of the class Problem *
 	**************************************/
+
+namespace sara {
 
 /** Standard constructor.
 */
@@ -246,7 +247,7 @@ PetriNet* Problem::getPetriNet() {
 
 	infile.close();
 	deinit = true;
-	if (!calcPTOrder() && args_info.verbose_given) status("place or transition ordering is non-deterministic");
+	if (!calcPTOrder() && flag_verbose) status("place or transition ordering is non-deterministic");
 	return pn;
 }
 
@@ -524,4 +525,4 @@ bool Problem::isNegateResult() const { return negate; }
 */
 string Problem::getResultText() const { return result; }
 
-
+} // end namespace sara

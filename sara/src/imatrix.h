@@ -31,6 +31,8 @@ using std::set;
 using std::map;
 using std::vector;
 
+namespace sara {
+
 /*! \brief For dynamically computing and storing incidence and loop matrices of a Petri net
 	and handling the firing of transitions
 	
@@ -90,6 +92,8 @@ private:
 	/// The matrix containing the loops (all entries non-negative)
 	map<Transition*,map<Place*,int> > loop;
 };
+
+}
 
 #endif
 

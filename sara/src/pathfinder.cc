@@ -44,15 +44,21 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
-extern gengetopt_args_info args_info;
+//extern gengetopt_args_info args_info;
+namespace sara {
 extern vector<Transition*> transitionorder;
 extern map<Transition*,int> revtorder;
 extern map<Place*,int> revporder;
+extern bool flag_lookup, flag_verbose, flag_output, flag_treemaxjob, flag_forceprint, flag_continue, flag_scapegoat;
+extern int val_lookup, val_treemaxjob;
+}
 
 	/***************************************
 	* Implementation of inner class MyNode *
 	* myNodes are used for Tarjan's algor. *
 	***************************************/
+
+namespace sara {
 
 /** Constructor for transition nodes for stubborn set analysis. */
 PathFinder::myNode::myNode() : t(NULL),index(-2),low(-1),instack(false) {}
@@ -88,7 +94,7 @@ PathFinder::PathFinder(Marking& m, map<Transition*,int>& tv, int col, JobQueue& 
 	shortcutmax=-1;
 	minimize = false;
 	passedon = false;
-	if (args_info.lookup_given) shortcutmax=args_info.lookup_arg;
+	if (flag_lookup) shortcutmax=val_lookup;
 }
 
 /** Destructor. Also frees any myNode objects in use.
@@ -105,7 +111,7 @@ PathFinder::~PathFinder() {
 */
 bool PathFinder::recurse() {
 	// on screen progress indicator
-	if (args_info.verbose_given && !args_info.output_given)
+	if (flag_verbose && !flag_output)
 	{
 		switch (++recsteps&0x1FFF) {
 			case 0x0000: cerr << "|\b"; cerr.flush(); break;
@@ -117,7 +123,7 @@ bool PathFinder::recurse() {
 	{ // begin scope to reduce visibility of local variables
 	// if the user has specified a maximal number of new jobs to be created by a tree
 	// and the number is reached, stop the recursion
-	if (args_info.treemaxjob_given && (int)(fpool.size())>=args_info.treemaxjob_arg) return false;
+	if (flag_treemaxjob && (int)(fpool.size())>=val_treemaxjob) return false;
 
 	// obtain a first node/transition (one that is activated and must fire eventually)
 	map<Transition*,int>::iterator recit;
@@ -149,7 +155,7 @@ bool PathFinder::recurse() {
 			else if (terminate) 
 			{
 				if (solutions.push_solved(new PartialSolution(newps))) // no more transitions to fire, so we have a solution
-					if (args_info.forceprint_given) printSolution(&newps); // should we print it immediately?
+					if (flag_forceprint) printSolution(&newps); // should we print it immediately?
 			} else {
 				if (tps.first()->compareSequence(fseq) && !tps.first()->getRemains().empty()) 
 					failure.push_fail(new PartialSolution(newps)); // sequence was not extended
@@ -162,7 +168,7 @@ bool PathFinder::recurse() {
 			{
 				if (!tps.findPast(&newps) && tps.find(&newps)>=0) shortcut[fulltvector].push_back(newps);
 			}
-			else if (args_info.verbose_given && (int)(shortcut.size())==shortcutmax) 
+			else if (flag_verbose && (int)(shortcut.size())==shortcutmax) 
 			{ 
 				cerr << "\r";
 				status("warning: lookup table too large (%d)",shortcutmax); 
@@ -180,7 +186,7 @@ bool PathFinder::recurse() {
 		} //else if (verbose>1) cerr << "sara: CheckAgainstQueue-Hit" << endl;
 		// go up one level in the recursion, if there were nonfirable transitions left over,
 		// but terminate the recursion altogether if this partial solution is a full solution.
-		return (args_info.continue_given?false:terminate); // surpress termination if -C flag is given
+		return (flag_continue?false:terminate); // surpress termination if -C flag is given
 	}
 
 	// Initialise tton(entries for conflict graph) and todo-list with the first transition
@@ -415,7 +421,7 @@ Place* PathFinder::hinderingPlace(Transition& t) {
 	// catch error of missing scapegoat
 	if (pset.empty()) abort(11,"error: no scapegoat for stubborn set method");
 	// if the user opts for a random scapegoat, select one by time
-	if (args_info.scapegoat_given) 
+	if (flag_scapegoat) 
 	{
 		int rnd = clock()%(pset.size());
 		pit = pset.begin();
@@ -651,3 +657,4 @@ bool PathFinder::isSmaller(map<Transition*,int>& m1, map<Transition*,int>& m2) {
 	return (mit1==m1.end());
 }
 
+} // end namespace sara

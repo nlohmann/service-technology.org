@@ -7,8 +7,11 @@
 #include "cmdline.h"
 #include "verbose.h"
 
-extern gengetopt_args_info args_info;
+//extern gengetopt_args_info args_info;
 
+namespace sara {
+
+extern bool flag_verbose;
 
 /***************************************************************************\
  * syslog functionalities (to be enabled with "configure --enable-syslog") *
@@ -66,7 +69,7 @@ void message(const char* format, ...) {
  \param format  the status message formatted as printf string
 */
 void status(const char* format, ...) {
-    if (not args_info.verbose_flag) {
+    if (not flag_verbose) {
         return;
     }
 
@@ -137,3 +140,6 @@ void displayFileError(char* filename, int lineno, char* token) {
     }
     fprintf(stderr, "\n");
 }
+
+} // end namespace sara
+

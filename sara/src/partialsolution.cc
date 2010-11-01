@@ -36,12 +36,16 @@ using std::string;
 using std::cerr;
 using std::endl;
 
+namespace sara {
 extern vector<Transition*> transitionorder;
 extern map<Transition*,int> revtorder;
+}
 
 	/*************************************************************
 	* Implementation of the methods of the class PartialSolution *
 	*************************************************************/
+
+namespace sara {
 
 /** Constructor for the first partial solution (no output from lp_solve yet).
 	@param m1 The initial marking.
@@ -605,3 +609,4 @@ void PartialSolution::transformJumps(map<Transition*,int>& fullvector) {
 		}	
 }
 
+} // end namespace sara

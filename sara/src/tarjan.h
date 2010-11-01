@@ -33,6 +33,8 @@ using std::vector;
 using std::map;
 using std::set;
 
+namespace sara {
+
 /*! \brief Nodes for Tarjan's algorithm used to find new constraints
 */
 class myTPNode {
@@ -112,6 +114,8 @@ private:
 	/// A stack for Tarjans algorithm
 	vector<myTPNode*> st; 
 };
+
+}
 
 #endif
 

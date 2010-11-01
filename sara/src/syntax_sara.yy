@@ -36,11 +36,13 @@ using std::endl;
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1
 
+namespace sara {
 Problem pbl;
 std::vector<Problem> pbls;
-bool cov;
 std::map<string,int> clhs;
 int ccomp,crhs;
+bool cov;
+}
 
 /// the current NAME token as string
 extern std::string sara_NAME_token;
@@ -64,33 +66,33 @@ problems:
 ;
 
 problem:
-	PROBLEM { pbl.clear(); } 
-	ENAME { pbl.setName(sara_NAME_token); } COLON 
+	PROBLEM { sara::pbl.clear(); } 
+	ENAME { sara::pbl.setName(sara_NAME_token); } COLON 
 	GOAL gtype SEMICOLON
-	NFILE ENAME { pbl.setFilename(sara_NAME_token); } 
+	NFILE ENAME { sara::pbl.setFilename(sara_NAME_token); } 
 	NTYPE ntype SEMICOLON
 	INITIALM inodes SEMICOLON
-	FINALM mode { pbl.setGeneralCover(cov); } fnodes SEMICOLON
+	FINALM mode { sara::pbl.setGeneralCover(sara::cov); } fnodes SEMICOLON
 	constraints
 	showresult
-	{ pbls.push_back(pbl); pbl.clear(); }
+	{ sara::pbls.push_back(sara::pbl); sara::pbl.clear(); }
 ;
  
 gtype:
-	REACHABILITY { pbl.setGoal(Problem::REACHABLE); }
-|	REALIZABILITY { pbl.setGoal(Problem::REALIZABLE); }
+	REACHABILITY { sara::pbl.setGoal(sara::Problem::REACHABLE); }
+|	REALIZABILITY { sara::pbl.setGoal(sara::Problem::REALIZABLE); }
 ;
 
 ntype:
-	TYPEOWFN { pbl.setNetType(Problem::OWFN); }
-|	TYPELOLA { pbl.setNetType(Problem::LOLA); }
-|	TYPEPNML { pbl.setNetType(Problem::PNML); }
+	TYPEOWFN { sara::pbl.setNetType(sara::Problem::OWFN); }
+|	TYPELOLA { sara::pbl.setNetType(sara::Problem::LOLA); }
+|	TYPEPNML { sara::pbl.setNetType(sara::Problem::PNML); }
 ;
 
 mode:
-	/* empty */ { cov=false; }
-|	COVER { cov=true; }
-|	REACH { cov=false; }
+	/* empty */ { sara::cov=false; }
+|	COVER { sara::cov=true; }
+|	REACH { sara::cov=false; }
 ;
 
 inodes:
@@ -101,9 +103,9 @@ inodes:
 inode:
   /* empty */
 | NAME 
-	{ pbl.setInit(sara_NAME_token,1); }
+	{ sara::pbl.setInit(sara_NAME_token,1); }
 | NAME COLON NUMBER
-    { pbl.setInit(sara_NAME_token,$3); }
+    { sara::pbl.setInit(sara_NAME_token,$3); }
 ;
 
 fnodes:
@@ -114,13 +116,13 @@ fnodes:
 
 fnode:
   NAME
-	{ pbl.setFinal(sara_NAME_token,1); if (cov) pbl.setCover(sara_NAME_token,GE); }
+	{ sara::pbl.setFinal(sara_NAME_token,1); if (sara::cov) sara::pbl.setCover(sara_NAME_token,GE); }
 | NAME COLON NUMBER
-    { pbl.setFinal(sara_NAME_token,$3); }
+    { sara::pbl.setFinal(sara_NAME_token,$3); }
 | NAME MYGEQ NUMBER
-    { pbl.setFinal(sara_NAME_token,$3); pbl.setCover(sara_NAME_token,GE); }
+    { sara::pbl.setFinal(sara_NAME_token,$3); sara::pbl.setCover(sara_NAME_token,GE); }
 | NAME MYLEQ NUMBER
-    { pbl.setFinal(sara_NAME_token,$3); pbl.setCover(sara_NAME_token,LE); }
+    { sara::pbl.setFinal(sara_NAME_token,$3); sara::pbl.setCover(sara_NAME_token,LE); }
 ;
 
 constraints:
@@ -130,38 +132,38 @@ constraints:
 
 constr:
 | constraint
-	{ pbl.addConstraint(clhs,ccomp,crhs); clhs.clear(); }
+	{ sara::pbl.addConstraint(sara::clhs,sara::ccomp,sara::crhs); sara::clhs.clear(); }
 | constr COMMA constraint
-	{ pbl.addConstraint(clhs,ccomp,crhs); clhs.clear(); }
+	{ sara::pbl.addConstraint(sara::clhs,sara::ccomp,sara::crhs); sara::clhs.clear(); }
 ;
 
 constraint:
-	cnodes comparator NUMBER { crhs = $3; }
+	cnodes comparator NUMBER { sara::crhs = $3; }
 ;
 
 cnodes:
-	NAME { clhs[sara_NAME_token] = 1; }
-|	NUMBER NAME { clhs[sara_NAME_token] = $1; }
+	NAME { sara::clhs[sara_NAME_token] = 1; }
+|	NUMBER NAME { sara::clhs[sara_NAME_token] = $1; }
 |	cnodes cnode
 ;
 
 cnode:
-	PLUS NAME { clhs[sara_NAME_token] = 1; }
-|	MINUS NAME { clhs[sara_NAME_token] = -1; }
-|	PLUS NUMBER NAME { clhs[sara_NAME_token] = $2; }
-|	NUMBER NAME { clhs[sara_NAME_token] = $1; }
+	PLUS NAME { sara::clhs[sara_NAME_token] = 1; }
+|	MINUS NAME { sara::clhs[sara_NAME_token] = -1; }
+|	PLUS NUMBER NAME { sara::clhs[sara_NAME_token] = $2; }
+|	NUMBER NAME { sara::clhs[sara_NAME_token] = $1; }
 ;
 
 comparator:
-	COLON { ccomp = EQ; }
-|	MYGEQ { ccomp = GE; }
-|	MYLEQ { ccomp = LE; }
+	COLON { sara::ccomp = EQ; }
+|	MYGEQ { sara::ccomp = GE; }
+|	MYLEQ { sara::ccomp = LE; }
 ;
 
 showresult:
 	/* empty */
-|   RESULT ENAME SEMICOLON { pbl.setNegateResult(false); pbl.setResultText(sara_NAME_token); }
-|   RESULT NEGATE ENAME SEMICOLON { pbl.setNegateResult(true); pbl.setResultText(sara_NAME_token); }
+|   RESULT ENAME SEMICOLON { sara::pbl.setNegateResult(false); sara::pbl.setResultText(sara_NAME_token); }
+|   RESULT NEGATE ENAME SEMICOLON { sara::pbl.setNegateResult(true); sara::pbl.setResultText(sara_NAME_token); }
 ;
 
 

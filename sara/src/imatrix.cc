@@ -36,6 +36,8 @@ using std::endl;
 	* Implementation of the methods of the class IMatrix *
 	*****************************************************/
 
+namespace sara {
+
 /** Constructor
 	@param pn The Petri net for which the incidence matrix is to be built.
 */
@@ -273,3 +275,4 @@ map<Place*,int> IMatrix::getChange(map<Transition*,int>& fv) {
 	return result;
 }
 
+} // end namespace sara

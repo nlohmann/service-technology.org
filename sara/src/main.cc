@@ -34,19 +34,14 @@ using std::ifstream;
 using std::ofstream;
 using std::ostringstream;
 using std::setw;
-//using namespace pnapi;
 
-/// the command line parameters
-gengetopt_args_info args_info;
 
 /// parser supplement (sara) for problem files
 extern FILE *sara_in;
 extern int sara_parse();
-extern vector<Problem> pbls;
 
-/// parser for Petri nets
-//pnapi::parser::owfn::Parser paowfn;
-//pnapi::parser::lola::Parser palola;
+namespace sara {
+extern vector<Problem> pbls;
 
 /// Global ordering of transitions for lp_solve and the PathFinder
 vector<Transition*> transitionorder;
@@ -61,6 +56,24 @@ map<string,bool> results;
 /// for property checks via owfn2sara: if lp_solve fails the result can be indecisive
 map<string,bool> indecisive;
 
+bool flag_droppast(false);
+int val_droppast(0);
+bool flag_verbose(false);
+bool flag_show(false);
+bool flag_forceprint(false);
+bool flag_lookup(false);
+int val_lookup(0);
+bool flag_output(false);
+bool flag_treemaxjob(false);
+bool val_treemaxjob(0);
+bool flag_continue(false);
+bool flag_scapegoat(false);
+bool flag_break(false);
+bool flag_witness(false);
+bool flag_joborder(false);
+
+} // end namespace sara
+
 /*
 template <class T>
 inline std::string to_string (const T& t)
@@ -70,6 +83,12 @@ inline std::string to_string (const T& t)
 	return ss.str();
 }
 */
+
+#ifndef SARALIB
+namespace sara {
+
+/// the command line parameters
+gengetopt_args_info args_info;
 
 /*! Evaluate the command line parameters.
 	\param argc Number of arguments.
@@ -103,6 +122,21 @@ int main(int argc, char** argv) {
 
 	// evaluate command line
     evaluateParameters(argc, argv);
+	flag_droppast = args_info.droppast_given;
+	val_droppast = args_info.droppast_arg;
+	flag_verbose = args_info.verbose_given;
+	flag_show = args_info.show_given;
+	flag_forceprint = args_info.forceprint_given;
+	flag_lookup = args_info.lookup_given;
+	val_lookup = args_info.lookup_arg;
+	flag_output = args_info.output_given;
+	flag_treemaxjob = args_info.treemaxjob_given;
+	val_treemaxjob = args_info.treemaxjob_arg;
+	flag_continue = args_info.continue_given;
+	flag_scapegoat = args_info.scapegoat_given;
+	flag_break = args_info.break_given;
+	flag_witness = args_info.witness_given;
+	flag_joborder = args_info.joborder_given;
 
 /****************
 * NO ARGS GIVEN *
@@ -429,3 +463,13 @@ if (args_info.log_given) std::cerr.rdbuf(cerr_sbuf); // restore the original str
     return EXIT_SUCCESS;
 }
 
+} // end namespace sara
+
+/*! Main method of Sara (outside namespace sara).
+	\param argc Number of arguments.
+	\param argv Argument list.
+*/
+int main(int argc, char** argv) {
+	sara::main(argc,argv);
+}
+#endif

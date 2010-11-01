@@ -93,7 +93,7 @@ negate NEGATE
 %%
 
 __attribute__((noreturn)) void sara_error(const char *msg) {
-  status("%d: error near '%s': %s", sara_lineno, sara_text, msg);
-  abort(5, "error while parsing the sara problem file");
+  sara::status("%d: error near '%s': %s", sara_lineno, sara_text, msg);
+  sara::abort(5, "error while parsing the sara problem file");
 }
 

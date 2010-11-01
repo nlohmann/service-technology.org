@@ -41,6 +41,8 @@ using std::ostream;
 	* Implementation of the methods of the class Constraint *
 	********************************************************/
 
+namespace sara {
+
 /** Standard constructor for class Constraint.
 */
 Constraint::Constraint() : rhs(0),jump(false),recent(true) { posplace.clear(); subtrans.clear(); cs.clear(); }
@@ -419,3 +421,4 @@ Transition* Constraint::isSingle() const {
 	return cs.begin()->first;
 }
 
+} // end namespace sara

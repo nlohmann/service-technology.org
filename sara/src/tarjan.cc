@@ -37,6 +37,8 @@ using std::endl;
 	* Implementation of class myTPNode *
 	***********************************/
 
+namespace sara {
+
 /** Standard node constructor. Creates one node for Tarjan's algorithm. Used in constraint building.
 */
 myTPNode::myTPNode() : t(NULL),p(NULL),index(-2),low(-1),instack(false) {}
@@ -205,4 +207,6 @@ bool Tarjan::addArc(Place* pfrom, Place* pto) {
 	pton[pto]->index = -1;
 	return true;
 }
+
+} // end namespace sara
 

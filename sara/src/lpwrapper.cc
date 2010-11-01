@@ -33,13 +33,17 @@ using pnapi::Transition;
 //using pnapi::Arc;
 using pnapi::Marking;
 
+namespace sara {
 extern vector<Transition*> transitionorder;
 extern vector<Place*> placeorder;
 extern map<Transition*,int> revtorder;
+}
 
 	/*************************************
 	* Class LPWrapper method definitions *
 	*************************************/
+
+namespace sara {
 
 /** Constructor for systems with a given number of variables (transitions).
 	@param columns The number of transitions in the net (equals the numbers
@@ -328,3 +332,4 @@ bool LPWrapper::findNearest() {
 	} else return false;
 }
 
+} // end namespace sara

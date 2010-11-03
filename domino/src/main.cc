@@ -311,7 +311,18 @@ int main(int argc, char** argv) {
 	
 	if (retOK) {
 		retOK = f.processUnassignedFragments();
-	
+	}
+
+	if (retOK) {
+		fragmentStatus = f.isFragmentationValid(true);
+		assert(fragmentStatus != VALID_TODO);
+		if (fragmentStatus == VALID_BAD) {
+			message(_cbad_("worklfow decomposition failed"));
+			retOK = false;
+		}
+	}
+
+	if (retOK) {
 		if (args_info.dotFragmented_flag) {
 			if (args_info.dot_roles_given) {
 				f.colorFragmentsByRoleID(args_info.dotColorUnassigned_flag);
@@ -334,18 +345,6 @@ int main(int argc, char** argv) {
 				createDotFile(outputFileName, net, fileName);
 			}
 		}
-	}
-
-	if (retOK) {
-		fragmentStatus = f.isFragmentationValid(true);
-		assert(fragmentStatus != VALID_TODO);
-		if (fragmentStatus == VALID_BAD) {
-			message(_cbad_("worklfow decomposition failed"));
-			retOK = false;
-		}
-	}
-
-	if (retOK) {
 
 		retOK = f.buildServices();
 

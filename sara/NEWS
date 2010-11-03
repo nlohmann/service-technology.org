@@ -8,13 +8,11 @@
 
 
 PURPOSE
-Version 1.03 (16 Sep 2010)
+Version 1.04 (03 Nov 2010)
 ==========================
 
-* added property checks for quasiliveness, proper completion, lazy &
-  relaxed soundness to owfn2sara
+* wrapped Sara into the namespace sara
 
-* extended problem specification so Sara can properly answer questions
-  about the above properties
+* added entry point for using Sara as a library
 
 \nSee file ChangeLog <http://service-technology.org/files/sara/ChangeLog> for\ncomplete version history.\n

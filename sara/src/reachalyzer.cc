@@ -67,12 +67,13 @@ extern bool flag_verbose, flag_show, flag_break, flag_treemaxjob, flag_witness;
 	\param passedon If the problem was passed on from an earlier run of the PathFinder.
 */
 Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, Problem& pb, bool verbose, int debug, bool out, int brk, bool passedon) 
-	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols),im(pn),breakafter(brk),problem(pb),loops(0),suboptimal(false) {
+	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols),im(pn),breakafter(brk),problem(&pb),loops(0),suboptimal(false) {
 	// inherit verbosity/debug level
 	this->verbose = debug;
 	this->out = out;
 	im.verbose = debug;
 	stateinfo = verbose;
+	problemcreated = false;
 
 	this->passedon = passedon; // if a realizability problem was infeasible we are now looking for reasons etc.
 	if (passedon) torealize = pb.getVectorToRealize();
@@ -84,7 +85,7 @@ Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int>
 
 	//initialize lp_solve
 	lpwrap.verbose = debug;
-	if (lpwrap.createMEquation(m0,mf,cover,pb,FALSE)<0) { 
+	if (lpwrap.createMEquation(m0,mf,cover,&pb,FALSE)<0) { 
 		cerr << "sara: error: createMEquation (lpsolve-init) failed" << endl; 
 		error=LPSOLVE_INIT_ERROR; return;
 	}
@@ -93,8 +94,45 @@ Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int>
 	tps.push_back(init);
 }
 
+#ifdef SARALIB
+/*! Constructor for API-like purposes.
+	\param pn The Petri net.
+	\param m0 The initial marking.
+	\param mf The final marking.
+	\param cover The set of places where the final marking need only be covered (instead of
+			reached exactly).
+*/
+Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover)
+	: error(0),m1(m0),net(pn),cols(pn.getTransitions().size()),lpwrap(cols),im(pn),breakafter(0),loops(0),suboptimal(false) {
+	this->verbose = 0;
+	this->out = false;
+	im.verbose = 0;
+	stateinfo = false;
+	this->passedon = false;
+	solved = false;
+	errors = false;
+	maxsollen = 0;
+	sumsollen = 0;
+
+	//initialize lp_solve
+	lpwrap.verbose = 0;
+	if (lpwrap.createMEquation(m0,mf,cover,NULL,FALSE)<0) { 
+		cerr << "sara: error: createMEquation (lpsolve-init) failed" << endl; 
+		error=LPSOLVE_INIT_ERROR; return;
+	}
+	// prepare solving marking equation, initialize first partial solution and job list
+	PartialSolution* init(new PartialSolution(m0));
+	tps.push_back(init);
+
+	problemcreated = true;
+	problem = new Problem();
+	problem->setFilename("sara_inline");
+	problem->setPetriNet(pn);
+}
+#endif
+
 /*! Destructor. */
-Reachalyzer::~Reachalyzer() {}
+Reachalyzer::~Reachalyzer() { if (problemcreated) delete problem; }
 
 /*! This method is called to analyze the given reachability problem. */
 void Reachalyzer::start() {
@@ -254,7 +292,7 @@ void Reachalyzer::printResult(int pbnr) {
 	if (!solutions.almostEmpty()) 
 	{
 		if (passedon) cout << "sara: A shorter realizable firing sequence with the same token effect would be:" << endl;
-		maxsollen = solutions.printSolutions(sumsollen,problem,pbnr);
+		maxsollen = solutions.printSolutions(sumsollen,*problem,pbnr);
 	}
 	else if (errors) cout << "sara: UNSOLVED: Result is indecisive due to failure of lp_solve." << endl;
 	else if (suboptimal) cout << "sara: UNSOLVED: Result is indecisive due to non-minimal solutions by lp_solve." << endl;
@@ -280,11 +318,20 @@ void Reachalyzer::printResult(int pbnr) {
 				if (stateinfo) cout << "There are firing sequences that could not be extended towards the final marking." << endl;
 			} else if (passedon && stateinfo) cout << "sara: at the following points the algorithm could not continue:" << endl;
 			else if (stateinfo) cout << "sara: at the following points the algorithm needed to backtrack:" << endl;
-			if (stateinfo || flag_show) failure.printFailure(im,problem,pbnr); // then print the counterexample; the following shouldn't happen:
+			if (stateinfo || flag_show) failure.printFailure(im,*problem,pbnr); // then print the counterexample; the following shouldn't happen:
 		} else if (solutions.almostEmpty())
 			cout << "sara: UNSOLVED: Result is indecisive" << (flag_break?" due to a break.":", no counterexamples found.") << endl;
 	}
 }
+
+#ifdef SARALIB
+/** Get the solution of the reachability analysis.
+	@return A firing sequence. If none is found (no solution), a vector containing a single NULL pointer is returned. 
+*/
+vector<Transition*> Reachalyzer::getOneSolution() {
+	return solutions.getOneSolution();
+}
+#endif
 
 /*! Calculate the amount of CPU time used for solving the problem.
 	\return The CPU time used.

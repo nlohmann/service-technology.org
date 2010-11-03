@@ -682,6 +682,39 @@ then the final marking is reachable.
 
 All options can be combined to check for all properties at once.
 
+@section Using Sara as a library
+
+To build a library from Sara, you will need to change your makefile in the standard way
+(e.g. replacing @samp{bin_PROGRAMS = sara} by @samp{noinst_LIBRARIES = sara} etc.).
+Additionally, you have to call the compiler with the additional label @samp{SARALIB}
+defined (usually done with the @option{-D} option). Also, make sure that @samp{lp_solve}
+is linked with your program and its header file @samp{lp_lib.h} is included at the point where
+Sara needs to be called.
+
+At the moment, Sara's API only provides one entry:
+
+@cartouche
+@smallexample
+vector<Transition*> sara::ReachabilityTest(PetriNet& pn, Marking& m0, Marking& mf, 
+                                           map<Place*,int> cover);
+@end smallexample
+@end cartouche
+
+A call to this function will solve one instance of the reachability problem for a given Petri net @samp{pn},
+initial marking @samp{m0}, and final marking @samp{mf}. The additional @samp{cover} contains the information
+for which places the token number of the final marking has to be reached exactly, may be covered, or should
+be an upper bound. If a place @samp{p} should have at least as many tokens as mentioned in the final marking,
+set @samp{cover[p]=GE}, if it should have at most that many tokens, set @samp{cover[p]=LE}, for equality
+you may set @samp{cover[p]=EQ} can (but need not) be set. The constants @samp{LE}, @samp{EQ}, and @samp{GE}
+are defined within the @samp{lp_solve} library, so if something else than exact equality is desired,
+the header file @samp{lp_lib.h} needs to be included.
+
+The result of a call to the above function will be a vector of (pointers to) transitions (the @acronym{PNAPI}
+is needed for all Petri net related stuff). The vector either represents a firing sequence solving the given
+reachability problem, i.e. it leads from @samp{m0} to @samp{mf}, or it contains a single NULL pointer (when
+no solution exists) or it contains a sequence of two NULL pointers (when Sara could not find a conclusive
+result).
+
 @c --------------------------------------------------------------------------
 
 

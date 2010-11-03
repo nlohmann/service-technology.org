@@ -574,6 +574,17 @@ int JobQueue::printSolutions(int& sum, Problem& pb, int pbnr) {
 	return sollength;
 }
 
+#ifdef SARALIB
+/** Get a solution if one exists.
+	@return One solution (even if more were found), or a vector containing one NULL pointer if there is no solution.
+*/
+vector<Transition*> JobQueue::getOneSolution() {
+	vector<Transition*> noresult;
+	if (queue.empty()) { noresult.push_back(NULL); return noresult; }
+	return (queue.begin()->second[0]->getSequence());
+}
+#endif
+
 /** Print the queue including past, active, and future jobs for debug purposes.
 	@param past Whether the past jobs and the active job should be printed at all.
 		Choose false for solution and failure queues as these do not have past and

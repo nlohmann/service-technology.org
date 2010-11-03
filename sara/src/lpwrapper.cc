@@ -68,7 +68,7 @@ LPWrapper::~LPWrapper() {
 	@param verbose If TRUE prints information on cout.
 	@return The number of equations on success, -1 otherwise.
 */
-int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover, Problem& pb, bool verbose) {
+int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover, Problem* pb, bool verbose) {
 	tpos.clear(); // probably not necessary
 	tvector.clear();
 
@@ -125,20 +125,23 @@ int LPWrapper::createMEquation(Marking& m1, Marking& m2, map<Place*,int>& cover,
 //	for(int y=1; y<=(int)(cols); ++y)
 //		if (!add_constraintex(lp,1,&r,&y,GE,0)) { delete[] colpoint; delete[] mat; return -1; }
 
-	// now add the global constraints from the problem file
-	unsigned int cnr(pb.getNumberOfConstraints());
-	for(unsigned int i=0; i<cnr; ++i)
-	{
-		for(unsigned int y=0; y<cols; ++y) mat[y]=0;
-		map<Transition*,int> line;
-		int comp, rhs;
-		pb.getConstraint(i,line,comp,rhs);
-		map<Transition*,int>::iterator lit;
-		for(lit=line.begin(); lit!=line.end(); ++lit)
+	// now add the global constraints from the problem file, if a problem file is given
+	unsigned int cnr(0);
+	if (pb) {
+		cnr = pb->getNumberOfConstraints();
+		for(unsigned int i=0; i<cnr; ++i)
 		{
-			mat[tpos[lit->first]] = lit->second;	
+			for(unsigned int y=0; y<cols; ++y) mat[y]=0;
+			map<Transition*,int> line;
+			int comp, rhs;
+			pb->getConstraint(i,line,comp,rhs);
+			map<Transition*,int>::iterator lit;
+			for(lit=line.begin(); lit!=line.end(); ++lit)
+			{
+				mat[tpos[lit->first]] = lit->second;	
+			}
+			if (!add_constraintex(lp,cols,mat,colpoint,comp,rhs)) { delete[] colpoint; delete[] mat; return -1; }
 		}
-		if (!add_constraintex(lp,cols,mat,colpoint,comp,rhs)) { delete[] colpoint; delete[] mat; return -1; }
 	}
 
 	set_add_rowmode(lp,FALSE);	

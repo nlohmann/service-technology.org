@@ -95,7 +95,10 @@ public:
 
 	/// Print all solutions and return the maximal and sum trace length
 	int printSolutions(int& sum, Problem& pb, int pbnr);
-
+#ifdef SARALIB
+	/// Get one solution (or a vector containing NULL pointer).
+	vector<Transition*> getOneSolution();
+#endif
 	/// Print a Jobqueue to stderr (possibly including past and active job)
 	void show(bool past);
 

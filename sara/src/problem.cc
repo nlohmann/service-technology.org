@@ -251,6 +251,17 @@ PetriNet* Problem::getPetriNet() {
 	return pn;
 }
 
+#ifdef SARALIB
+/** Set the Petri net of a problem and calculate the global ordering of transitions and places.
+	@param The Petri net.
+*/
+void Problem::setPetriNet(PetriNet& net) { 
+	pn=&net;
+	deinit = false;
+	if (!calcPTOrder() && flag_verbose) status("place or transition ordering is non-deterministic");
+}
+#endif
+
 /** Get the goal of a problem.
 	@return REACHABILITY or REALIZABILITY.
 */

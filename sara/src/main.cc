@@ -85,6 +85,7 @@ inline std::string to_string (const T& t)
 */
 
 #ifndef SARALIB
+// this part will be compiled if sara is compiled into an executable file.
 namespace sara {
 
 /// the command line parameters
@@ -472,4 +473,33 @@ if (args_info.log_given) std::cerr.rdbuf(cerr_sbuf); // restore the original str
 int main(int argc, char** argv) {
 	sara::main(argc,argv);
 }
+
+#else
+// this part of Sara will be compiled when constructing a library
+namespace sara {
+
+// Use this method to call Sara in a library:
+vector<Transition*> ReachabilityTest(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int>& cover) {
+	Reachalyzer reach(pn,m0,mf,cover); // the net, initial and final marking, and cover info (if token numbers should be covered instead of reached exactly)
+	if (reach.getStatus()!=Reachalyzer::LPSOLVE_INIT_ERROR) {
+		reach.start(); // if everything is ok, solve the problem
+		if (reach.getStatus()==Reachalyzer::SOLUTION_FOUND) {
+			return reach.getOneSolution();
+		} else if (reach.getStatus()==Reachalyzer::SOLUTIONS_LOST) {
+			vector<Transition*> result(2);
+			result[0]=NULL; result[1]=NULL; // two null pointers == indecisive result
+			return result;
+		} else {
+			vector<Transition*> result(1);
+			result[0]=NULL; // one null pointer == no solution exists
+		}
+	} else {
+		vector<Transition*> result(2);
+		result[0]=NULL; result[1]=NULL;
+		return result;
+	}
+}
+
+} // end namespace sara
 #endif
+

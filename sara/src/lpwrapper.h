@@ -50,7 +50,7 @@ public:
 	~LPWrapper();
 
 	/// Create a linear system for the marking equation including cover/bound information
-	int createMEquation(Marking& m0, Marking& mf, map<Place*,int>& cover, Problem& pb, bool b);
+	int createMEquation(Marking& m0, Marking& mf, map<Place*,int>& cover, Problem* pb, bool b);
 
 	/// Remove all constraints not belonging to the marking equation
 	bool stripConstraints();

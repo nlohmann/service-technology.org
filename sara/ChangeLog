@@ -8,6 +8,13 @@
 
 
 PURPOSE
+Version 1.04 (03 Nov 2010)
+==========================
+
+* wrapped Sara into the namespace sara
+
+* added entry point for using Sara as a library
+
 Version 1.03 (16 Sep 2010)
 ==========================
 

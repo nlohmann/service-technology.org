@@ -87,9 +87,12 @@ public:
 	/// Get the transition vector to realize
 	map<Transition*,int> getVectorToRealize();
 
-	/// Get the Petri net
+	/// Get the Petri net (will load the net from a file if necessary)
 	PetriNet* getPetriNet();
-
+#ifdef SARALIB
+	/// Set the Petri net (for already loaded nets only)
+	void setPetriNet(PetriNet& net);
+#endif
 	/// Get the problem goal
 	int getGoal() const;
 

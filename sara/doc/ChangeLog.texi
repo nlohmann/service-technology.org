@@ -1,4 +1,10 @@
 @c <<-- CHANGE START (version information) -->>
+@heading Version 1.04 (03 Nov 2010)
+@itemize
+@item wrapped Sara into the namespace sara
+@item added entry point for using Sara as a library
+@end itemize
+
 @heading Version 1.03 (16 Sep 2010)
 @itemize
 @item added property checks for quasiliveness, proper completion, lazy & relaxed soundness to owfn2sara

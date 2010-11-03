@@ -37,7 +37,10 @@ class Reachalyzer {
 public:
 	/// Constructor
 	Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover, Problem& pb, bool verbose, int debug, bool out, int brk, bool passedon);
-
+#ifdef SARALIB
+	/// Constructor for use in a library
+	Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int> cover);
+#endif
 	/// Destructor
 	~Reachalyzer();
 
@@ -46,7 +49,10 @@ public:
 
 	/// Print out the result on stdout
 	void printResult(int pbnr);
-
+#ifdef SARALIB
+	/// Get one solution (or a vector containing one NULL pointer)
+	vector<Transition*> getOneSolution();
+#endif
 	/// Get the CPU time used to solve the problem
 	clock_t getTime() const;
 
@@ -148,7 +154,10 @@ private:
 	map<Transition*,int> torealize;
 
 	/// The problem instance to solve
-	Problem& problem;
+	Problem* problem;
+
+	/// If the problem instance was created inside this class
+	bool problemcreated;
 
 	/// The number of jobs done so far
 	int loops;

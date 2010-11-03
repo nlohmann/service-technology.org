@@ -177,8 +177,9 @@ void createDotFile(const string & OutputFile, pnapi::PetriNet & Petrinet, const 
                 << meta(pnapi::io::CREATOR, PACKAGE_STRING)
                 << meta(pnapi::io::INVOCATION, invocation)
 				<< Petrinet;
-	outStream.close();	
+	outStream.close();
 
+	status("file %s created", _cfilename_(OutputFile + ".dot"));
 }
 
 void createOWFNFile(const string & OutputFile, pnapi::PetriNet & Petrinet, const string InputFile) {
@@ -199,6 +200,8 @@ void createOWFNFile(const string & OutputFile, pnapi::PetriNet & Petrinet, const
                 << meta(pnapi::io::INVOCATION, invocation)
 				<< Petrinet;
 	outStream.close();
+
+	status("file %s created", _cfilename_(OutputFile + ".owfn"));
 }
 
 /// main-function
@@ -335,12 +338,9 @@ int main(int argc, char** argv) {
 
 	if (retOK) {
 		fragmentStatus = f.isFragmentationValid(true);
+		assert(fragmentStatus != VALID_TODO);
 		if (fragmentStatus == VALID_BAD) {
 			message(_cbad_("worklfow decomposition failed"));
-			retOK = false;
-		}
-		else if (fragmentStatus == VALID_TODO) {
-			abort(9, "workflow decomposition uncompleted");
 			retOK = false;
 		}
 	}

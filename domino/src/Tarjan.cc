@@ -72,7 +72,6 @@ void Tarjan::tarjan(node_t Node) {
 			this->setLowlink(Node, std::min(this->getLowlink(Node), this->getDFS(adjNode)));
 		}
 	}
-
 	if (this->getLowlink(Node) == this->getDFS(Node)) {
 		//status("..SZK found", Node.c_str());
 		do {

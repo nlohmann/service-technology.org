@@ -58,7 +58,9 @@ Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
 	
 	this->mFragmentNet = NULL;
 	this->mNet = &Petrinet;
-	this->mMaxFragID = this->mNet->getTransitions().size();
+	this->mSharedFragID = -1;
+	assert(this->mSharedFragID > 0);
+	this->mUsedFragIDs.clear();
 	this->mGlobalStartPlace = PLACE_UNASSIGNED;
 	
 	this->init();
@@ -83,7 +85,6 @@ void Fragmentation::init() {
 	size_t i;
 
 	this->initColors();
-	this->mMaxFragID = this->mNet->getTransitions().size();
 	
 	status("..caching roles");
 	roles = this->mNet->getRoles();
@@ -187,6 +188,7 @@ bool Fragmentation::buildRoleFragments() {
 	transitions_t placeTransitions;
 	pnapi::Transition *transition;
 	pair<minFragID2Places_t::iterator, minFragID2Places_t::iterator> curPlaces;
+	set < pair<frag_id_t, frag_id_t> > toReplace;
 	bool ret;
 	placeStatus_e placeStatus;
 	
@@ -194,12 +196,12 @@ bool Fragmentation::buildRoleFragments() {
 
 	status("..initiating places");
 	PNAPI_FOREACH(p, this->mPlaces) {
-		this->setPlaceMinFragID(*p, this->mMaxFragID);
+		this->setPlaceMinFragID(*p, this->mSharedFragID);
 	}
 	status("..places initiated");
 
 	status("..assigning roles to nodes");
-	curFragID = 0;
+	curFragID = getNextFragID();
 	PNAPI_FOREACH(t, this->mTransitions) {
 		status("....processing %s", (*t).c_str());		
 		transition = this->mTransitionName2TransitionPointer[*t];
@@ -230,7 +232,7 @@ bool Fragmentation::buildRoleFragments() {
 			this->addPlaceRoleID(*p, curRoleID);
 			if (this->isSharedPlace(*p)) {
 				status("........place %s is SP", (*p).c_str());
-				this->setPlaceMinFragID(*p, this->mMaxFragID);				
+				this->setPlaceMinFragID(*p, this->mSharedFragID);				
 			}
 			else {
 				curMinFragID = this->getPlaceMinFragID(*p);				
@@ -239,14 +241,15 @@ bool Fragmentation::buildRoleFragments() {
 		}
 		status("......places connected with t processed");
 		
-		curFragID++;
+		curFragID = getNextFragID();
 		status("....transition %s processed", (*t).c_str());
 	}
 	status("..roles assigned to nodes");
 
 	status("..refactoring fragments");
-	for (curFragID = 0; curFragID < this->mMaxFragID; curFragID++) {
+	for (curFragID = 0; curFragID < this->getMaxFragID(); curFragID++) {
 		status("....processing fragment %d", curFragID);
+		toReplace.clear();
 		minFragID = curFragID;
 		//for all places of curFragID
 		curPlaces = this->mMinFragID2Places.equal_range(curFragID);
@@ -273,13 +276,18 @@ bool Fragmentation::buildRoleFragments() {
 			PNAPI_FOREACH(t, placeTransitions) {
 				transitionFragID = this->getTransitionFragID(*t);			
 				if (transitionFragID < curFragID) {
-					this->replaceFragIDs(transitionFragID, curFragID);
+					toReplace.insert( std::make_pair(transitionFragID, curFragID) );
 				}
 				else {
 					this->setTransitionFragID(*t, minFragID);
 				}	
 			}
 		}
+		
+		FOREACH(P, toReplace) {
+			this->replaceFragIDs(P->first, P->second);
+		}
+
 		status("....fragment %d processed", curFragID);
 	}
 	status("..fragments refactored");
@@ -299,7 +307,7 @@ bool Fragmentation::buildRoleFragments() {
 	this->connectFragments();
 	status("..fragments connected");
 
-	status("..checking bad structure(s)");
+	status("..checking for bad structure(s)");
 	transitionPlaces = this->getPlaces(*this->mNet);
 	PNAPI_FOREACH(p, transitionPlaces) {
 		placeStatus = this->getPlaceStatus(*p, false, this->ROLE_UNASSIGNED, this->ROLE_UNASSIGNED);
@@ -334,14 +342,25 @@ bool Fragmentation::processUnassignedFragments() {
 	status("processUnassignedFragments() called...");
 
 	bool ret = true;
+	size_t unassignedFragments = 0;
 
-	for (frag_id_t FragID = 0; FragID <= this->mMaxFragID; FragID++) {
-		if (!this->isFragmentEmpty(FragID)) {
-			if (this->getFragmentRoleID(FragID) == this->ROLE_UNASSIGNED) {
-				if (!processUnassignedFragment(FragID)) {
-					ret = false;
-					break;	
+	FOREACH(fragID, this->mUsedFragIDs) {
+		assert(!this->isFragmentEmpty(*fragID));
+		if (this->getFragmentRoleID(*fragID) == this->ROLE_UNASSIGNED) {
+			unassignedFragments++;
+		}
+	}
+	status("..%d unassigned fragments", unassignedFragments);
+
+	while ((unassignedFragments > 0) && (ret == true)) {
+		FOREACH(fragID, this->mUsedFragIDs) {
+			assert(!this->isFragmentEmpty(*fragID));
+			if (this->getFragmentRoleID(*fragID) == this->ROLE_UNASSIGNED) {
+				unassignedFragments--;				
+				if (!processUnassignedFragment(*fragID)) {
+					ret = false;	
 				}
+				break;				
 			}
 		}
 	}
@@ -381,12 +400,14 @@ bool Fragmentation::buildServices() {
 	pair<frag_id_t, frag_id_t> curFragmentPair;
 	role_id_t transitionRoleID;
 	frag_id_t transitionFragID;
-	frag_id_t minimum;
-	frag_id_t maximum;
+	frag_id_t newFragID;
 	map<place_t, unsigned int>::const_iterator curPlaceMaxToken;
 	size_t reactivatingCount;
 	unsigned int curPlaceTokens;
 	bool changed;
+	multimap< role_id_t, frag_id_t > roleFragments;
+	pair<multimap< role_id_t, frag_id_t >::iterator, multimap< role_id_t, frag_id_t >::iterator> curRoleFragments;
+	pair<fragID2Transitions_t::iterator, fragID2Transitions_t::iterator> curFragTransitions;
 	Tarjan tarjan(*this->mNet);
 
 	ret = true;
@@ -394,8 +415,8 @@ bool Fragmentation::buildServices() {
 	tarjan.calculateSCC();
 	this->mHasCycles = tarjan.hasNonTrivialSCC();
 
-	status(_cimportant_("..has non trivial SCC: %d"), this->mHasCycles);
-	status(_cimportant_("..is free choice: %d"), this->mIsFreeChoice);
+	status(_cimportant_("..decomposition contains non trivial SCC: %d"), this->mHasCycles);
+	status(_cimportant_("..workflow is free choice: %d"), this->mIsFreeChoice);
 
 	netTransitions = this->getTransitions(*this->mNet);
 	FOREACH(t, netTransitions) {
@@ -418,7 +439,6 @@ bool Fragmentation::buildServices() {
 					status("......add to restrictions");
 					restrictions.insert(*t);
 				}
-				//else if ( (this->getTransitionRoleID(curPredecessor) == transitionRoleID) && (this->getTransitionFragID(curPredecessor) != transitionFragID) && (!tarjan.isNonTrivialSCC(tarjan.getNodeSCC(curPredecessor))) ) {
 				else if ( (this->getTransitionRoleID(curPredecessor) == transitionRoleID) && (!tarjan.isNonTrivialSCC(tarjan.getNodeSCC(curPredecessor))) ) {
 					status("......add to predecessors");
 					predecessors.insert( std::make_pair(*t, curPredecessor) );
@@ -436,11 +456,8 @@ bool Fragmentation::buildServices() {
 				}
 
 			}
-
-			if ( (tarjan.isNonTrivialSCC(tarjan.getNodeSCC(*t))) && (reactivatingCount == 0) ) {
-				abort(9, "Fragmentation::buildServices(): no reactiviating transitions");
-			}
-
+			//no reactiviating transitions
+			assert(!((tarjan.isNonTrivialSCC(tarjan.getNodeSCC(*t))) && (reactivatingCount == 0)));
 		}
 	}
 
@@ -540,14 +557,10 @@ bool Fragmentation::buildServices() {
 				transitionPlaces = this->getTransitionPreset(*this->mNet, *t);
 				FOREACH(p, transitionPlaces) {
 					curPlaceMaxToken = Place2MaxTokens.find(*p);
-					if (curPlaceMaxToken == Place2MaxTokens.end()) {
-						//abort(2, "Fragmenation::buildServices(): %s is unknown in Place2MaxTokens", (*p).c_str());
-					}
 					if (curPlaceMaxToken->second > curPlaceTokens) {
 						curPlaceTokens = curPlaceMaxToken->second;
 					}
 				}
-
 				assert(curPlaceTokens != 0);
 				this->mPlaceName2PlacePointer[newPlace]->setTokenCount(curPlaceTokens);
 			}
@@ -567,7 +580,6 @@ bool Fragmentation::buildServices() {
 			newPlace = this->SERVICE_PLACE_PREFIX + (*p).first;
 			status("....%s --> %s", (*p).second.c_str(), (*p).first.c_str());
 			this->createArc((*p).second, newPlace);
-			//this->createArc(newPlace, (*p).first);		already known...
 			this->addPlaceFragID(newPlace, this->getTransitionFragID((*p).second));
 		}
 	}
@@ -578,57 +590,69 @@ bool Fragmentation::buildServices() {
 			newPlace = this->SERVICE_PLACE_PREFIX + (*p).first;
 			status("....%s --> %s", (*p).second.c_str(), (*p).first.c_str());
 			this->createArc((*p).second, newPlace);
-			//this->createArc(newPlace, (*p).first);		already known...
 			this->addPlaceFragID(newPlace, this->getTransitionFragID((*p).second));
 		}
 	}
 
 	this->connectFragments();
 
-	changed = false;
 	status("..connecting unconnected fragments");
-	for (frag_id_t f_a = 0; f_a < this->mMaxFragID; f_a++) {
-		for (frag_id_t f_b = 0; f_b < this->mMaxFragID; f_b++) {
-			if ( (f_a != f_b) && (!this->isFragmentEmpty(f_a) && !this->isFragmentEmpty(f_b)) && (this->getFragmentRoleID(f_a) == this->getFragmentRoleID(f_b)) ) {
-				minimum = std::min(f_a, f_b);
-				maximum = std::max(f_a, f_b);
-				curFragmentPair = std::make_pair(minimum, maximum);
-				if (processedFragments.find(curFragmentPair) == processedFragments.end()) {
-					status(_cwarning_("....connection (%d,%d) necessary"), minimum, maximum);
+	changed = false;
+	FOREACH (f_b, this->mUsedFragIDs) {
+		assert(!this->isFragmentEmpty(*f_b));
+		roleFragments.insert( std::make_pair(this->getFragmentRoleID(*f_b), *f_b) );
+	}
+	for (roleID2RoleName_t::iterator curRole=this->mRoleID2RoleName.begin(); curRole!=this->mRoleID2RoleName.end(); ++curRole) {
+		assert(roleFragments.count(curRole->first) != 0);
+		
+		if (roleFragments.count(curRole->first) > 1) {
+			changed = true;
 
-					this->mFragmentConnections++;
-					changed = true;
-					minPlace = maxPlace = "";
+			status(_cimportant_("....role %s has %d fragments"), curRole->second.c_str(), roleFragments.count(curRole->first));
 
-					std::stringstream curMinimum;
-					std::stringstream curMaximum;
-					curMinimum << minimum;
-					curMaximum << maximum;
-					newTransition = this->SERVICE_TRANSITION_PREFIX + curMinimum.str() + "_" + curMaximum.str();
-					newPlace = "P_" + this->SERVICE_TRANSITION_PREFIX + curMinimum.str() + "_" + curMaximum.str();
+			newFragID = this->getNextFragID();
+			std::stringstream curRoleID;
+			curRoleID << curRole->first;
 
-					this->createTransition(newTransition, minimum, this->getFragmentRoleID(minimum));
-					this->createPlace(newPlace, minimum, this->getFragmentRoleID(minimum));
-					this->createArc(newPlace, newTransition);
+			newTransition = this->SERVICE_TRANSITION_PREFIX + curRoleID.str();
+			newPlace = "P_" + newTransition;
 
-					FOREACH(t, startTransitions) {
-						if ((this->getTransitionRoleID(*t) == this->getFragmentRoleID(minimum)) && (this->getTransitionFragID(*t) == minimum) && (restrictions.find(*t) != restrictions.end())) {
-							minPlace = this->SERVICE_PLACE_PREFIX + *t;
-						}
-						if ((this->getTransitionRoleID(*t) == this->getFragmentRoleID(maximum)) && (this->getTransitionFragID(*t) == maximum) && (restrictions.find(*t) != restrictions.end())) {
-							maxPlace = this->SERVICE_PLACE_PREFIX + *t;
-						}
+			this->createTransition(newTransition, newFragID, curRole->first);
+			this->createPlace(newPlace, newFragID, curRole->first);
+			this->createArc(newPlace, newTransition);
+
+			curRoleFragments = roleFragments.equal_range(curRole->first);
+			for (multimap< role_id_t, frag_id_t >::iterator curRoleFragment=curRoleFragments.first; curRoleFragment!=curRoleFragments.second; ++curRoleFragment) {
+				status("......handle fragment %d", curRoleFragment->second);
+				
+				place_t startplace = "";
+
+				curFragTransitions = this->mFragID2Transitions.equal_range(curRoleFragment->second);
+				for (fragID2Transitions_t::iterator curFragTransition=curFragTransitions.first; curFragTransition!=curFragTransitions.second; ++curFragTransition) {
+					if (restrictions.find(curFragTransition->second) != restrictions.end()) {
+						status("........use restricted place");
+						startplace = this->SERVICE_PLACE_PREFIX + curFragTransition->second;
+						break;
 					}
-
-					this->createArc(newTransition, minPlace);
-					this->createArc(newTransition, maxPlace);
-
-					this->addPlaceFragID(maxPlace, minimum);
-
-					processedFragments.insert(curFragmentPair);
+					else {
+						transitionPlaces = this->getTransitionPreset(*this->mNet, curFragTransition->second);
+						FOREACH(p, transitionPlaces) {
+							if (this->mPlaceName2PlacePointer[*p]->getTokenCount() != 0) {
+								status("........use bounded place");
+								startplace = *p;
+								break;
+							}
+						}
+						if (startplace != "") {break;}
+					}
 				}
+
+				assert(startplace != "");
+				this->createArc(newTransition, startplace);
+				this->addPlaceFragID(startplace, newFragID);
 			}
 		}
+
 	}
 
 	if (changed) {
@@ -665,7 +689,8 @@ pnapi::PetriNet Fragmentation::createPetrinetByRoleID(const role_id_t RoleID) {
 			ret.createPlace(curRolePlace->second).setTokenCount(this->mPlaceName2PlacePointer[curRolePlace->second]->getTokenCount());
 		}
 		else {
-			if (this->getTransitionRoleID(*this->getPlacePreset(*this->mNet, curRolePlace->second).begin()) != RoleID) {
+			assert(this->getPlacePostset(*this->mNet, curRolePlace->second).size() != 0);
+			if (this->getTransitionRoleID(*(this->getPlacePostset(*this->mNet, curRolePlace->second).begin())) == RoleID) {
 				ret.createInputLabel(curRolePlace->second);
 			}
 			else {
@@ -764,6 +789,8 @@ bool Fragmentation::processUnassignedFragment(const frag_id_t FragID) {
 	string curPartFileName;
 	std::stringstream number;
 	std::ofstream DianeTemp;
+	pair<fragID2Places_t::iterator, fragID2Places_t::iterator> curFragPlaces;
+	places_t placesToDo;
 
 	this->mCurProcessingFragID = FragID;
 	
@@ -817,9 +844,7 @@ bool Fragmentation::processUnassignedFragment(const frag_id_t FragID) {
     {
         // set start time
         time(&start_time);
-//ToDo: system call?! (statt Pipe)?
         // call Diane and open a pipe
-//ToDo: Variable auslagern
         FILE* fp = popen(command_line.c_str(), "r");
 		// close the pipe
         pclose(fp);
@@ -870,6 +895,10 @@ bool Fragmentation::processUnassignedFragment(const frag_id_t FragID) {
 	if (!this->processDianeFragmentation()) {
 		ret = false;
 	}
+	else {
+		assert(this->mFragID2Transitions.count(FragID) == 0);
+		assert(this->mFragID2Places.count(FragID) == 0);
+	}
 
 	status("..processUnassignedFragment(%d) finished", FragID);
 	return ret;
@@ -898,13 +927,17 @@ void Fragmentation::readDianeOutputFile(const string & FileName) {
     }
 	DianeFragment.close();
 	
+	status("......places:");
 	Places = this->getPlaces(net);
 	PNAPI_FOREACH(p, Places) {
+		status("........%s", (*p).c_str());
 		placesToDo.insert(*p);
 	}
 	//handle interface as places...
+	status("......interface:");
 	interface = net.getInterface().getAsynchronousLabels();
 	PNAPI_FOREACH(i, interface) {
+		status("........%s", (*i)->getName().c_str());
 		placesToDo.insert((*i)->getName());
 	}
 
@@ -913,8 +946,10 @@ void Fragmentation::readDianeOutputFile(const string & FileName) {
 		this->mFragmentUnprocessedNodes.erase(*p);
 	}
 
+	status("......transitions:");
 	Transitions = this->getTransitions(net);
 	PNAPI_FOREACH(t, Transitions) {
+		status("........%s", (*t).c_str());
 		this->setTransitionDianeID(*t, this->mDianeFragments, false);
 		this->mFragmentUnprocessedNodes.erase(*t);
 	}
@@ -926,8 +961,8 @@ bool Fragmentation::processDianeFragmentation() {
 	status("....processDianeFragmentation() called...");
 
 	set<diane_id_t> toDo;
-	set< pair<diane_id_t, pair<role_id_t, frag_id_t> > > toSet;
-	pair<role_id_t, frag_id_t> bestConnection;
+	set< pair<diane_id_t, role_id_t> > toSet;
+	role_id_t bestConnection;
 	bool progress;
 	bool ret;
 
@@ -946,7 +981,7 @@ bool Fragmentation::processDianeFragmentation() {
 		for (diane_id_t d = 0; d < this->mDianeFragments; d++) {
 			if (toDo.find(d) != toDo.end()) {
 				bestConnection = this->getBestConnectionForDianeFragment(d, false);
-				if (bestConnection.first != this->ROLE_UNASSIGNED) {
+				if (bestConnection != this->ROLE_UNASSIGNED) {
 					toSet.insert( std::make_pair(d, bestConnection) );
 				}
 			}
@@ -963,7 +998,7 @@ bool Fragmentation::processDianeFragmentation() {
 			for (diane_id_t d = 0; d < this->mDianeFragments; d++) {
 				if (toDo.find(d) != toDo.end()) {
 					bestConnection = this->getBestConnectionForDianeFragment(d, true);
-					if (bestConnection.first != this->ROLE_UNASSIGNED) {
+					if (bestConnection != this->ROLE_UNASSIGNED) {
 						this->setDianeFragmentConnection(d, bestConnection);
 						toDo.erase(d);
 						progress = true;
@@ -989,15 +1024,13 @@ bool Fragmentation::processDianeFragmentation() {
 			status("........%d alternatives", this->mCurrentDianeAlternatives);
 		}
 
-		this->connectFragments();
-
 	}
 
 	status("....processDianeFragmentation() finished");
 	return ret;
 }
 
-pair<role_id_t, frag_id_t> Fragmentation::getBestConnectionForDianeFragment(const diane_id_t DianeID, const bool Force) {
+role_id_t Fragmentation::getBestConnectionForDianeFragment(const diane_id_t DianeID, const bool Force) {
 	status("......getBestConnectionForDianeFragment(%d, %d) called...", DianeID, Force);
 
 	transitions_t transitionInputProcessed;
@@ -1025,7 +1058,7 @@ pair<role_id_t, frag_id_t> Fragmentation::getBestConnectionForDianeFragment(cons
 	bool found;
 	pair<dianeID2Places_t::iterator, dianeID2Places_t::iterator> curDianePlaces;
 	pair<multimap<role_id_t, frag_id_t>::iterator, multimap<role_id_t, frag_id_t>::iterator> curRoleFragments;
-	pair<role_id_t, frag_id_t> ret;
+	role_id_t ret;
 
 	adjacentRoleIDs.clear();
 	coveredRoleIDs.clear();
@@ -1162,7 +1195,7 @@ pair<role_id_t, frag_id_t> Fragmentation::getBestConnectionForDianeFragment(cons
 	}
 
 	//auswerten
-	ret = std::make_pair(this->ROLE_UNASSIGNED, this->mMaxFragID);
+	ret = this->ROLE_UNASSIGNED;
 
 	knownCandidates.clear();
 	candidates.clear();
@@ -1241,23 +1274,23 @@ pair<role_id_t, frag_id_t> Fragmentation::getBestConnectionForDianeFragment(cons
 		status("........Diane-Fragment %d has %d real candidates", DianeID, knownCandidates.size());
 		if ((knownCandidates.size() > 1) && (!Force)) {
 			status("........Diane-Fragment %d should not be decided -> skip fragment", DianeID);
-			ret = std::make_pair(this->ROLE_UNASSIGNED, this->mMaxFragID);
+			ret = this->ROLE_UNASSIGNED;
 		}
 		else if (knownCandidates.size() > 0) {
-			ret = std::make_pair(*candidates.begin(), roleFragments.find(*candidates.begin())->second);
+			ret = *candidates.begin();
 		}
 
 	}
 
 
-	if ((ret.first != this->ROLE_UNASSIGNED) && (ret.second != this->mMaxFragID)) {
+	if (ret != this->ROLE_UNASSIGNED) {
 		if (Force) {
-			status("........Diane-Fragment %d is %s to connection (%d, %d)", DianeID, _cwarning_("FORCED"), ret.first, ret.second);
+			status("........Diane-Fragment %d is %s to connection %d", DianeID, _cwarning_("FORCED"), ret);
 			this->mCurrentDianeForces++;
 			this->mCurrentDianeAlternatives += knownCandidates.size();
 		}
 		else {
-			status("........Diane-Fragment %d becomes connection (%d, %d)", DianeID, ret.first, ret.second);
+			status("........Diane-Fragment %d becomes connection %d", DianeID, ret);
 		}
 	}
 
@@ -1305,13 +1338,14 @@ bool Fragmentation::willDianeAssignementValid(const diane_id_t DianeID, const ro
 	return ret;
 }
 
-void Fragmentation::setDianeFragmentConnection(const diane_id_t DianeID, pair<role_id_t, frag_id_t> Connection) {
-	status("......setDianeFragmentConnection(%d, <%d, %d>) called...", DianeID, Connection.first, Connection.second);
+void Fragmentation::setDianeFragmentConnection(const diane_id_t DianeID, role_id_t Connection) {
+	status("......setDianeFragmentConnection(%d, %d) called...", DianeID, Connection);
 
 	pair<dianeID2Places_t::iterator, dianeID2Places_t::iterator> curDianePlaces;
 	pair<dianeID2Transitions_t::iterator, dianeID2Transitions_t::iterator> curDianeTransitions;
 	places_t placesToDo;
 	transitions_t transitionsToDo;
+	frag_id_t newFragID = this->getNextFragID();
 
 	placesToDo.clear();
 	transitionsToDo.clear();
@@ -1327,25 +1361,25 @@ void Fragmentation::setDianeFragmentConnection(const diane_id_t DianeID, pair<ro
 	}
 
 	FOREACH(t, transitionsToDo) {
-		this->setTransitionRoleID(*t, Connection.first);
-		this->setTransitionFragID(*t, Connection.second);
+		this->setTransitionRoleID(*t, Connection);
+		this->setTransitionFragID(*t, newFragID);
 	}
 
 	FOREACH(p, placesToDo) {
-		this->addPlaceRoleID(*p, Connection.first);
-		this->addPlaceFragID(*p, Connection.second);
+		this->addPlaceRoleID(*p, Connection);
+		this->addPlaceFragID(*p, newFragID);
+		this->deletePlaceFragID(*p, this->mCurProcessingFragID);
 	}
 
 	FOREACH(p, placesToDo) {
 		if (!this->hasUnassignedTransitions(*p)) {
 			this->deletePlaceRoleID(*p, this->ROLE_UNASSIGNED);
-			this->deletePlaceFragID(*p, this->mCurProcessingFragID);
 		}
 	}
 
 	this->connectFragments();
 
-	status("......setDianeFragmentConnection(%d, <%d, %d>) finished", DianeID, Connection.first, Connection.second);
+	status("......setDianeFragmentConnection(%d, %d) finished", DianeID, Connection);
 }
 
 /*----------------------------------------------------------------------------.
@@ -1474,6 +1508,7 @@ placeStatus_e Fragmentation::getPlaceStatus(const place_t & Place, const bool Re
 			FOREACH(t, placeTransitions) {
 				if (this->getTransitionRoleID(*t) == sucRoleID) {
 					this->createArc(*t, newPrecessor);
+					this->addPlaceFragID(newPrecessor, this->getTransitionFragID(*t));
 					arcsToDelete.insert(this->mNet->findArc(*this->mNet->findNode(*t), *this->mNet->findNode(Place)));
 				}
 			}
@@ -1482,6 +1517,7 @@ placeStatus_e Fragmentation::getPlaceStatus(const place_t & Place, const bool Re
 			FOREACH(t, placeTransitions) {
 				assert(this->getTransitionRoleID(*t) == sucRoleID);
 				this->createArc(newSuccessor, *t);
+				this->addPlaceFragID(newSuccessor, this->getTransitionFragID(*t));
 				arcsToDelete.insert(this->mNet->findArc(*this->mNet->findNode(Place), *this->mNet->findNode(*t)));
 			}
 			
@@ -1495,6 +1531,8 @@ placeStatus_e Fragmentation::getPlaceStatus(const place_t & Place, const bool Re
 			}
 
 			predecessors.erase(sucRoleID);
+
+			this->connectFragments();
 
 			ret = PLACE_STATUS_SHARED;
 		}
@@ -1526,7 +1564,7 @@ placeStatus_e Fragmentation::getPlaceStatus(const place_t & Place, const bool Re
 				curRoleIDString << curRoleID;
 
 				newPlace = Place + "_PART_" + curRoleIDString.str();
-				newTransition = "T_" + Place + "_PART_" + curRoleIDString.str();		
+				newTransition = "T_" + newPlace; //Place + "_PART_" + curRoleIDString.str();		
 				if (this->mNet->findPlace(newPlace) == NULL) {
 					this->createPlace(newPlace, curFragID, curRoleID);
 					this->addPlaceRoleID(newPlace, sucRoleID);
@@ -1549,7 +1587,7 @@ placeStatus_e Fragmentation::getPlaceStatus(const place_t & Place, const bool Re
 				curRoleIDString << curRoleID;
 
 				newPlace = Place + "_PART_" + curRoleIDString.str();
-				newTransition = "T_" + Place + "_PART_" + curRoleIDString.str();		
+				newTransition = "T_" + newPlace; //Place + "_PART_" + curRoleIDString.str();		
 				assert(this->mNet->findPlace(newPlace) != NULL);
 
 				arcsToCreate.insert( std::make_pair(sucPlace, *t) );
@@ -1565,8 +1603,7 @@ placeStatus_e Fragmentation::getPlaceStatus(const place_t & Place, const bool Re
 				this->mArcsDelete++;
 			}
 
-			this->mNet->deletePlace(*this->mNet->findPlace(Place));
-			this->mPlacesDelete++;
+			this->deletePlace(Place);
 
 			ret = PLACE_STATUS_SHARED;
 		}
@@ -1590,29 +1627,27 @@ void Fragmentation::colorFragmentsByFragID(const bool ColorUnassigned) {
 	this->eraseColors();
 	curColorID = 0;
 
-	for (frag_id_t FragID = 0; FragID <= this->mMaxFragID; FragID++) {
-		if (!this->isFragmentEmpty(FragID)) {
-
-			if ((this->getFragmentRoleID(FragID) != this->ROLE_UNASSIGNED) || ColorUnassigned) {
-				if (curColorID == this->mMaxColors) {
-					abort(8, "Fragmentation::colorFragmentsByFragID(%d): all %d colors used", ColorUnassigned, this->mMaxColors);
-				}
-				curColorName = this->getColorName(curColorID);
-
-				curFragPlaces = this->mFragID2Places.equal_range(FragID);	
-				for (fragID2Places_t::iterator curFragPlace=curFragPlaces.first; curFragPlace!=curFragPlaces.second; ++curFragPlace) {
-					if (!this->isSharedPlace(curFragPlace->second)) {				
-						this->mPlaceName2PlacePointer[curFragPlace->second]->setColor(curColorName);
-					}
-				}
-			
-				curFragTransitions = this->mFragID2Transitions.equal_range(FragID);
-				for (fragID2Transitions_t::iterator curFragTransition=curFragTransitions.first; curFragTransition!=curFragTransitions.second; ++curFragTransition) {
-					this->mTransitionName2TransitionPointer[curFragTransition->second]->setColor(curColorName);
-				}
-				
-				curColorID++;
+	FOREACH(fragID, this->mUsedFragIDs) {
+		assert(!this->isFragmentEmpty(*fragID));
+		if ((this->getFragmentRoleID(*fragID) != this->ROLE_UNASSIGNED) || ColorUnassigned) {
+			if (curColorID == this->mMaxColors) {
+				abort(8, "Fragmentation::colorFragmentsByFragID(%d): all %d colors used", ColorUnassigned, this->mMaxColors);
 			}
+			curColorName = this->getColorName(curColorID);
+
+			curFragPlaces = this->mFragID2Places.equal_range(*fragID);	
+			for (fragID2Places_t::iterator curFragPlace=curFragPlaces.first; curFragPlace!=curFragPlaces.second; ++curFragPlace) {
+				if (this->mPlace2FragIDs.count(curFragPlace->second) == 1) {				
+					this->mPlaceName2PlacePointer[curFragPlace->second]->setColor(curColorName);
+				}
+			}
+		
+			curFragTransitions = this->mFragID2Transitions.equal_range(*fragID);
+			for (fragID2Transitions_t::iterator curFragTransition=curFragTransitions.first; curFragTransition!=curFragTransitions.second; ++curFragTransition) {
+				this->mTransitionName2TransitionPointer[curFragTransition->second]->setColor(curColorName);
+			}
+			
+			curColorID++;
 		}
 	}
 }

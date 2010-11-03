@@ -116,7 +116,8 @@ class Fragmentation {
 		//global
 			place_t mGlobalStartPlace;
 			pnapi::PetriNet *mNet;
-			size_t mMaxFragID;
+			frag_id_t mSharedFragID;
+			set <frag_id_t> mUsedFragIDs;
 			size_t mMaxColors;
 			bool mIsFreeChoice;
 			bool mHasCycles;
@@ -159,6 +160,22 @@ class Fragmentation {
 			//global
 				void init();
 				void initColors();
+				inline frag_id_t getMaxFragID() {
+					assert(this->mUsedFragIDs.size() != 0);
+					return *this->mUsedFragIDs.rbegin();
+				}
+				inline frag_id_t getNextFragID() {
+					if (this->mUsedFragIDs.size() == 0) {
+						return 0;
+					}
+					for (frag_id_t i=0; i<this->getMaxFragID(); ++i) {
+						if (this->mUsedFragIDs.find(i) == this->mUsedFragIDs.end()) {
+							return i;
+						}
+					}
+					assert((this->getMaxFragID() + 1) > 0);
+					return (this->getMaxFragID() + 1);
+				}
 			//member support
 				//set/add
 					inline void addPlaceRoleID(const place_t & Place, const role_id_t RoleID) {
@@ -203,6 +220,7 @@ class Fragmentation {
 						}
 						assert((foundA && foundB) == (foundA || foundB));
 						if (!foundA) {
+							this->mUsedFragIDs.insert(FragID);
 							this->mPlace2FragIDs.insert( std::make_pair(Place, FragID) );
 							this->mFragID2Places.insert( std::make_pair(FragID, Place) );
 						}
@@ -275,17 +293,23 @@ class Fragmentation {
 						if (curTransition != this->mTransition2FragID.end()) {
 							assert(Override);
 							bool found = false;
+							frag_id_t deleteFragID = -1;
 							pair<fragID2Transitions_t::iterator, fragID2Transitions_t::iterator> curFragTransitions = this->mFragID2Transitions.equal_range(curTransition->second);		
 							for (curFragTransition=curFragTransitions.first; curFragTransition!=curFragTransitions.second; ++curFragTransition) {
 								if (curFragTransition->second == Transition) {
 									found = true;
+									deleteFragID = curFragTransition->first;
 									break;
 								}
 							}
 							assert(found);
 							this->mFragID2Transitions.erase(curFragTransition);		
 							this->mTransition2FragID.erase(curTransition);
+							if (this->mFragID2Places.count(deleteFragID) + this->mFragID2Transitions.count(deleteFragID) == 0) {
+								this->mUsedFragIDs.erase(deleteFragID);
+							}
 						}
+						this->mUsedFragIDs.insert(FragID);
 						this->mTransition2FragID.insert( std::make_pair(Transition, FragID) );
 						this->mFragID2Transitions.insert( std::make_pair(FragID, Transition) );
 					}
@@ -363,9 +387,14 @@ class Fragmentation {
 								break;
 							}
 						}
-						assert(foundA && foundB);
-						this->mPlace2FragIDs.erase(curPlaceFrag);
-						this->mFragID2Places.erase(curFragPlace);
+						assert((foundA && foundB) == (foundA || foundB));
+						if (foundA) {
+							this->mPlace2FragIDs.erase(curPlaceFrag);
+							this->mFragID2Places.erase(curFragPlace);
+							if (this->mFragID2Places.count(FragID) + this->mFragID2Transitions.count(FragID) == 0) {
+								this->mUsedFragIDs.erase(FragID);
+							}
+						}
 					}
 			//petrinet
 				//create
@@ -397,6 +426,65 @@ class Fragmentation {
 					this->mArcsInsert++;
 				}
 				void createPetrinetByFragID(const frag_id_t);
+				//delete
+    			inline void deletePlace(const place_t & Place) {
+					pnapi::Place * place = this->mNet->findPlace(Place);
+					assert(place != NULL);			
+					//MinFragID
+					minFragID2Places_t::iterator curMinFragPlace;
+					pair<minFragID2Places_t::iterator, minFragID2Places_t::iterator> curFragPlaces = this->mMinFragID2Places.equal_range(this->getPlaceMinFragID(Place));
+					for (curMinFragPlace=curFragPlaces.first; curMinFragPlace!=curFragPlaces.second; ++curMinFragPlace) {	
+						if (curMinFragPlace->second == Place) {
+							break;
+						}
+					}
+					assert(curMinFragPlace->second == Place);
+					this->mMinFragID2Places.erase(curMinFragPlace);	
+					this->mPlace2MinFragID.erase(Place);
+					//handle multimaps
+					//FragID
+					size_t totalElems = this->mPlace2FragIDs.count(Place);
+					size_t deleteElems = 0;
+					fragID2Places_t::iterator curFragPlace;
+					bool found = true;
+					while (found) {
+						found = false;
+						for (curFragPlace=this->mFragID2Places.begin(); curFragPlace!=this->mFragID2Places.end(); ++curFragPlace) {
+							if (curFragPlace->second == Place) {
+								deleteElems++;
+								found = true;
+								this->deletePlaceFragID(curFragPlace->second, curFragPlace->first);
+								break;
+							}
+						}
+					}
+					assert(deleteElems == totalElems);
+					//RoleID
+					totalElems = this->mPlace2RoleIDs.count(Place);
+					deleteElems = 0;
+					roleID2Places_t::iterator curRolePlace;
+					found = true;
+					while (found) {
+						found = false;
+						for (curRolePlace=this->mRoleID2Places.begin(); curRolePlace!=this->mRoleID2Places.end(); ++curRolePlace) {
+							if (curRolePlace->second == Place) {
+								this->mRoleID2Places.erase(curRolePlace);
+								deleteElems++;
+								found = true;
+								break;
+							}
+						}
+					}
+					assert(deleteElems == totalElems);
+					this->mPlace2RoleIDs.erase(Place);
+
+					this->mPlaceName2PlacePointer.erase(Place);
+					this->mPlacePointer2PlaceName.erase(place);
+					this->mPlaces.erase(Place);	
+
+					this->mNet->deletePlace(*this->mNet->findPlace(Place));
+					this->mPlacesDelete++;
+				}
 				//get
 					inline places_t getPlaces(pnapi::PetriNet & Petrinet) const {
 						places_t ret;
@@ -450,9 +538,9 @@ class Fragmentation {
 				bool processUnassignedFragment(const frag_id_t);
 				void readDianeOutputFile(const string &);
 				bool processDianeFragmentation();
-				pair<role_id_t, frag_id_t> getBestConnectionForDianeFragment(const diane_id_t, const bool);
+				role_id_t getBestConnectionForDianeFragment(const diane_id_t, const bool);
 				bool willDianeAssignementValid(const diane_id_t, const role_id_t);
-				void setDianeFragmentConnection(const diane_id_t, pair<role_id_t, frag_id_t>);				
+				void setDianeFragmentConnection(const diane_id_t, role_id_t);				
 			//properties
 				inline bool hasUnassignedTransitions(const place_t & Place) {
 					transitions_t placeTransitions = this->getPlaceTransitions(*this->mNet, Place);	
@@ -528,35 +616,55 @@ class Fragmentation {
 						}
 					}
 				}
-				inline void connectFragments() {
-					bool changed = true;
+				inline bool connectFragments() {
+					bool ret = false;
 					set< pair<frag_id_t, frag_id_t> > toConnect;
-					while (changed) {
-						changed = false;
-						toConnect.clear();
-						for (frag_id_t f_a = 0; f_a < this->mMaxFragID; f_a++) {
-							for (frag_id_t f_b = 0; f_b < this->mMaxFragID; f_b++) {
-								if ((f_a != f_b) && (!this->isFragmentEmpty(f_a) && !this->isFragmentEmpty(f_b)) && (this->getFragmentRoleID(f_a) == this->getFragmentRoleID(f_b))) {
-									pair<fragID2Places_t::iterator, fragID2Places_t::iterator> places_f_a = this->mFragID2Places.equal_range(f_a);
-									pair<fragID2Places_t::iterator, fragID2Places_t::iterator> places_f_b = this->mFragID2Places.equal_range(f_b);
-									bool pairProcessed = false;
-									for (fragID2Places_t::iterator place_f_a=places_f_a.first; place_f_a!=places_f_a.second; ++place_f_a) {
+					FOREACH (f_a, this->mUsedFragIDs) {
+						FOREACH (f_b, this->mUsedFragIDs) {
+							if ((*f_a != *f_b) && (this->getFragmentRoleID(*f_a) == this->getFragmentRoleID(*f_b))) {
+								pair<fragID2Places_t::iterator, fragID2Places_t::iterator> places_f_a = this->mFragID2Places.equal_range(*f_a);
+								pair<fragID2Places_t::iterator, fragID2Places_t::iterator> places_f_b = this->mFragID2Places.equal_range(*f_b);
+								bool pairProcessed = false;
+								for (fragID2Places_t::iterator place_f_a=places_f_a.first; place_f_a!=places_f_a.second; ++place_f_a) {
+									if (!this->isSharedPlace(place_f_a->second)) {
 										for (fragID2Places_t::iterator place_f_b=places_f_b.first; place_f_b!=places_f_b.second; ++place_f_b) {
-											if (place_f_a->second == place_f_b->second) {						
-												toConnect.insert( std::make_pair( std::max(f_a, f_b), std::min(f_a, f_b) ) );
+											if (place_f_a->second == place_f_b->second) {			
+												//status("....connect (%d, %d) by %s", *f_a, *f_b, place_f_a->second.c_str());			
+												toConnect.insert( std::make_pair( std::max(*f_a, *f_b), std::min(*f_a, *f_b) ) );
 												pairProcessed = true;
 												break;
 											}
 										}
-										if (pairProcessed) break;
+										if (pairProcessed) {break;}
 									}
 								}
 							}
 						}
-						for (set< pair<frag_id_t, frag_id_t> >::reverse_iterator curPair=toConnect.rbegin(); curPair!=toConnect.rend(); ++curPair) {
-							this->replaceFragIDs(curPair->first, curPair->second);
+					}
+					while (toConnect.size() != 0) {
+						ret = true;
+						set< pair<frag_id_t, frag_id_t> >::reverse_iterator curPair=toConnect.rbegin();
+						set< pair<frag_id_t, frag_id_t> > toInsert;
+						set< pair<frag_id_t, frag_id_t> > toDelete;
+						frag_id_t min_f = curPair->second;
+						frag_id_t max_f = curPair->first;
+						//status("....replace %d with %d", curPair->first, curPair->second);
+						this->replaceFragIDs(curPair->first, curPair->second);
+						toConnect.erase(toConnect.find( std::make_pair(curPair->first, curPair->second) ) );
+						FOREACH(p, toConnect) {
+							if (p->first == max_f) {
+								toInsert.insert( std::make_pair(min_f, p->second) );
+								toDelete.insert( std::make_pair(p->first, p->second) );
+							}
+						}
+						FOREACH(p, toInsert) {
+							toConnect.insert(*p);
+						}
+						FOREACH(p, toDelete) {
+							toConnect.erase(*p);
 						}
 					}
+					return ret;
 				}	
 
 	public:

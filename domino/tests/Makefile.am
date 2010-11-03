@@ -50,7 +50,7 @@ TESTFILES = IBM-B3-2802.owfn \
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sources called 'cmdline.c'.
-NO_COVER_FILES = */libs/* */*lexic.cc */*syntax.cc */cmdline.* */verbose.* */Output.* */Results.cc
+NO_COVER_FILES = */libs/* */*lexic.* */*syntax.* */cmdline.* */verbose.* */Output.* */Results.cc
 
 
 #--------------------------------------------------------#

@@ -313,23 +313,10 @@ class Fragmentation {
 						this->mTransition2FragID.insert( std::make_pair(Transition, FragID) );
 						this->mFragID2Transitions.insert( std::make_pair(FragID, Transition) );
 					}
-					inline void setTransitionDianeID(const transition_t & Transition, const diane_id_t DianeID, const bool Override = true) {
+					inline void setTransitionDianeID(const transition_t & Transition, const diane_id_t DianeID) {
 						dianeID2Transitions_t::iterator curDianeTransition;
 						transition2DianeID_t::iterator curTransitionDiane = this->mTransition2DianeID.find(Transition);
-						if (curTransitionDiane != this->mTransition2DianeID.end()) {
-							assert(Override);
-							bool found = false;
-							pair<dianeID2Transitions_t::iterator, dianeID2Transitions_t::iterator> curDianeTransitions = this->mDianeID2Transitions.equal_range(curTransitionDiane->second);		
-							for (curDianeTransition=curDianeTransitions.first; curDianeTransition!=curDianeTransitions.second; ++curDianeTransition) {
-								if (curDianeTransition->second == Transition) {
-									found = true;
-									break;
-								}
-							}
-							assert(found);
-							this->mDianeID2Transitions.erase(curDianeTransition);		
-							this->mTransition2DianeID.erase(curTransitionDiane);
-						}
+						assert(curTransitionDiane == this->mTransition2DianeID.end());
 						this->mTransition2DianeID.insert( std::make_pair(Transition, DianeID) );
 						this->mDianeID2Transitions.insert( std::make_pair(DianeID, Transition) );
 					}

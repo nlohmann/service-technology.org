@@ -1,0 +1,22 @@
+PLACE
+  ROLES A;
+  INTERNAL
+    i, o, AL_1983_07_12;
+
+  INPUT
+    ;
+
+  OUTPUT
+    ;
+
+INITIALMARKING
+  ;
+
+FINALCONDITION
+  TRUE;
+
+
+TRANSITION t1
+  ROLES A;
+  CONSUME i;
+  PRODUCE o;

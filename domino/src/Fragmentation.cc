@@ -950,7 +950,7 @@ void Fragmentation::readDianeOutputFile(const string & FileName) {
 	Transitions = this->getTransitions(net);
 	PNAPI_FOREACH(t, Transitions) {
 		status("........%s", (*t).c_str());
-		this->setTransitionDianeID(*t, this->mDianeFragments, false);
+		this->setTransitionDianeID(*t, this->mDianeFragments);
 		this->mFragmentUnprocessedNodes.erase(*t);
 	}
 	
@@ -1460,7 +1460,7 @@ placeStatus_e Fragmentation::getPlaceStatus(const place_t & Place, const bool Re
 	predecessors.erase(this->ROLE_UNASSIGNED);
 	successors.erase(this->ROLE_UNASSIGNED);
 
-	if (successors.size() > 1) {
+	if (successors.size() > 1)  {
 		ret = PLACE_STATUS_BAD;
 	}
 	else if ((predecessors.size() == 0) && (successors.size() == 0)) {

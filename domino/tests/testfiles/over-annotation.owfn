@@ -1,0 +1,22 @@
+PLACE
+  ROLES A, B;
+  INTERNAL
+    i, o;
+
+  INPUT
+    ;
+
+  OUTPUT
+    ;
+
+INITIALMARKING
+  ;
+
+FINALCONDITION
+  TRUE;
+
+
+TRANSITION t1
+  ROLES A, B;
+  CONSUME i;
+  PRODUCE o;

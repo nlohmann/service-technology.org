@@ -27,7 +27,14 @@ TESTFILES = IBM-B3-2802.owfn \
             Loop-InsideRoles.owfn \
 			Loop-OverRoles.owfn \
 			DA-Producer-Consumer.owfn \
-			fail_DA-Producer-Consumer.owfn
+			DA-Producer-Consumer-complete.owfn \
+			fail_DA-Producer-Consumer.owfn \
+			not-bilateral.owfn \
+			wrong-owfn.owfn \
+			no-startplace.owfn \
+			two-startplaces.owfn \
+			predefined-place.owfn \
+			over-annotation.owfn
 # <<-- CHANGE END -->>
 
 
@@ -43,7 +50,7 @@ TESTFILES = IBM-B3-2802.owfn \
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sources called 'cmdline.c'.
-NO_COVER_FILES = */libs/* */lexic_*.cc */syntax_*.cc */cmdline.* */verbose.* */Output.*
+NO_COVER_FILES = */libs/* */lexic*.cc */syntax*.cc */cmdline.* */verbose.* */Output.* */result.cc
 
 
 #--------------------------------------------------------#

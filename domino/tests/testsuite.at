@@ -72,6 +72,14 @@ AT_CHECK([GREP -q "at most one input file must be given" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
+AT_SETUP([Unknown file])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([DOMINO test.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "could not open file" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
 AT_SETUP([Override protection])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
@@ -208,7 +216,7 @@ AT_SETUP([Checking for memory leaks - 1])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW IBM-B3-3029.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices],0,ignore,stderr)
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW IBM-B3-3029.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP
@@ -393,7 +401,7 @@ AT_SETUP([IBM-B3-2802])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-2802.owfn .])
-AT_CHECK([DOMINO IBM-B3-2802.owfn ],0,ignore,stderr)
+AT_CHECK([DOMINO IBM-B3-2802.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
 AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
@@ -402,7 +410,7 @@ AT_SETUP([IBM-B3-3029])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
-AT_CHECK([DOMINO IBM-B3-3029.owfn ],0,ignore,stderr)
+AT_CHECK([DOMINO IBM-B3-3029.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
 AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
@@ -411,7 +419,7 @@ AT_SETUP([IBM-B3-4958])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-4958.owfn .])
-AT_CHECK([DOMINO IBM-B3-4958.owfn ],0,ignore,stderr)
+AT_CHECK([DOMINO IBM-B3-4958.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
 AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
@@ -420,7 +428,16 @@ AT_SETUP([DA-Producer-Consumer])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/DA-Producer-Consumer.owfn .])
-AT_CHECK([DOMINO DA-Producer-Consumer.owfn ],0,ignore,stderr)
+AT_CHECK([DOMINO DA-Producer-Consumer.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([DA-Producer-Consumer (complete annotated)])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/DA-Producer-Consumer-complete.owfn .])
+AT_CHECK([DOMINO DA-Producer-Consumer-complete.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
 AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
@@ -438,7 +455,7 @@ AT_SETUP([Loop-InsideRoles])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/Loop-InsideRoles.owfn .])
-AT_CHECK([DOMINO Loop-InsideRoles.owfn ],0,ignore,stderr)
+AT_CHECK([DOMINO Loop-InsideRoles.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
 AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
@@ -447,7 +464,61 @@ AT_SETUP([Loop-OverRoles])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/Loop-OverRoles.owfn .])
-AT_CHECK([DOMINO Loop-OverRoles.owfn ],0,ignore,stderr)
+AT_CHECK([DOMINO Loop-OverRoles.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
 AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([not bilateral])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/not-bilateral.owfn .])
+AT_CHECK([DOMINO not-bilateral.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Wrong oWFN-File])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/wrong-owfn.owfn .])
+AT_CHECK([DOMINO wrong-owfn.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "unknown place or interface label" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([No start place])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/no-startplace.owfn .])
+AT_CHECK([DOMINO no-startplace.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "no global start place was found" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Two start places])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/two-startplaces.owfn .])
+AT_CHECK([DOMINO two-startplaces.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "another global start place found" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Predefined place])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/predefined-place.owfn .])
+AT_CHECK([DOMINO predefined-place.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "place AL_1983_07_12 has predefined constant name" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Over annotation])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/over-annotation.owfn .])
+AT_CHECK([DOMINO over-annotation.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "transition t1 has more than one role" stderr])
+AT_KEYWORDS(infrastructure)
 AT_CLEANUP

@@ -34,6 +34,7 @@ TESTFILES = IBM-B3-2802.owfn \
 			no-startplace.owfn \
 			two-startplaces.owfn \
 			predefined-place.owfn \
+			self-reactivating-transitions.owfn \
 			over-annotation.owfn
 # <<-- CHANGE END -->>
 

@@ -114,6 +114,11 @@ Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int>
 	maxsollen = 0;
 	sumsollen = 0;
 
+	problemcreated = true;
+	problem = new Problem();
+	problem->setFilename("sara_inline");
+	problem->setPetriNet(pn);
+
 	//initialize lp_solve
 	lpwrap.verbose = 0;
 	if (lpwrap.createMEquation(m0,mf,cover,NULL,FALSE)<0) { 
@@ -123,11 +128,6 @@ Reachalyzer::Reachalyzer(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int>
 	// prepare solving marking equation, initialize first partial solution and job list
 	PartialSolution* init(new PartialSolution(m0));
 	tps.push_back(init);
-
-	problemcreated = true;
-	problem = new Problem();
-	problem->setFilename("sara_inline");
-	problem->setPetriNet(pn);
 }
 #endif
 

@@ -478,27 +478,57 @@ int main(int argc, char** argv) {
 // this part of Sara will be compiled when constructing a library
 namespace sara {
 
-// Use this method to call Sara in a library:
+// Use this method to call Sara's reachability test in a library:
 vector<Transition*> ReachabilityTest(PetriNet& pn, Marking& m0, Marking& mf, map<Place*,int>& cover) {
 	Reachalyzer reach(pn,m0,mf,cover); // the net, initial and final marking, and cover info (if token numbers should be covered instead of reached exactly)
 	if (reach.getStatus()!=Reachalyzer::LPSOLVE_INIT_ERROR) {
 		reach.start(); // if everything is ok, solve the problem
 		if (reach.getStatus()==Reachalyzer::SOLUTION_FOUND) {
+			status("called Sara, found a firing sequence");
 			return reach.getOneSolution();
 		} else if (reach.getStatus()==Reachalyzer::SOLUTIONS_LOST) {
+			status("called Sara, no firing sequence found -- result is indecisive");
 			vector<Transition*> result(2);
 			result[0]=NULL; result[1]=NULL; // two null pointers == indecisive result
 			return result;
 		} else {
+			status("called Sara, firing sequence does not exist");
 			vector<Transition*> result(1);
 			result[0]=NULL; // one null pointer == no solution exists
 		}
 	} else {
+		status("called Sara, lp_solve initialization failed");
 		vector<Transition*> result(2);
 		result[0]=NULL; result[1]=NULL;
 		return result;
 	}
 }
+
+// Use this method to call Sara's realizability test in a library:
+vector<Transition*> RealizabilityTest(PetriNet& pn, Marking& m0, map<Transition*,int>& parikh) {
+	IMatrix im(pn); // incidence matrix of the net
+	im.verbose = 0;
+	PartialSolution* ps(new PartialSolution(m0)); // create the initial job
+	JobQueue tps(ps); // create a job list
+	JobQueue solutions; // create a job list
+	JobQueue failure; // create a dummy job list
+	map<map<Transition*,int>,vector<PartialSolution> > dummy; // dummy, will be filled and immediately free'd
+	// create an instance of the realizability solver
+	PathFinder pf(m0,parikh,pn.getTransitions().size(),tps,solutions,failure,im,dummy);
+	pf.verbose = 0;
+	pf.recurse();
+	if (!solutions.almostEmpty()) // solve the problem and print a possible solution
+	{ 
+		status("called Sara, found a firing sequence");
+		return solutions.getOneSolution();
+	}
+	status("called Sara, firing sequence does not exist");
+	vector<Transition*> noresult;
+	noresult.push_back(NULL); // non-existence of a firing sequence is expressed by a single NULL pointer in a vector
+	return noresult;
+}
+
+void setVerbose() { flag_verbose = true; }
 
 } // end namespace sara
 #endif

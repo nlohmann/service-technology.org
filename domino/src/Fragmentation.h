@@ -526,7 +526,7 @@ class Fragmentation {
 				void readDianeOutputFile(const string &);
 				bool processDianeFragmentation();
 				role_id_t getBestConnectionForDianeFragment(const diane_id_t, const bool);
-				bool willDianeAssignementValid(const diane_id_t, const role_id_t);
+				validStatus_e getDianeAssignementValidStatus(const diane_id_t, const role_id_t);
 				void setDianeFragmentConnection(const diane_id_t, role_id_t);				
 			//properties
 				inline bool hasUnassignedTransitions(const place_t & Place) {

@@ -310,7 +310,10 @@ int main(int argc, char** argv) {
 	}
 	
 	if (retOK) {
-		retOK = f.processUnassignedFragments();
+		if (!f.processUnassignedFragments()) {
+			message(_cbad_("worklfow decomposition failed"));
+			retOK = false;
+		}		
 	}
 
 	if (retOK) {

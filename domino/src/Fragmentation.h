@@ -613,7 +613,7 @@ class Fragmentation {
 								pair<fragID2Places_t::iterator, fragID2Places_t::iterator> places_f_b = this->mFragID2Places.equal_range(*f_b);
 								bool pairProcessed = false;
 								for (fragID2Places_t::iterator place_f_a=places_f_a.first; place_f_a!=places_f_a.second; ++place_f_a) {
-									if (!this->isSharedPlace(place_f_a->second)) {
+									if ((!this->isSharedPlace(place_f_a->second)) || (this->getFragmentRoleID(*f_a) == this->ROLE_UNASSIGNED)) {
 										for (fragID2Places_t::iterator place_f_b=places_f_b.first; place_f_b!=places_f_b.second; ++place_f_b) {
 											if (place_f_a->second == place_f_b->second) {			
 												//status("....connect (%d, %d) by %s", *f_a, *f_b, place_f_a->second.c_str());			

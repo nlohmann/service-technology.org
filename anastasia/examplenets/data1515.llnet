@@ -1,0 +1,902 @@
+PLACE
+	nwri.15,
+	rea.1,
+	rea.2,
+	rea.3,
+	rea.4,
+	rea.5,
+	rea.6,
+	rea.7,
+	rea.8,
+	rea.9,
+	nwri.14,
+	nwri.13,
+	nwri.12,
+	sem.1,
+	nwri.11,
+	rea.11,
+	nwri.10,
+	rea.10,
+	nrea.15,
+	wri.8,
+	nrea.14,
+	wri.7,
+	nrea.13,
+	wri.6,
+	nrea.12,
+	wri.5,
+	wri.4,
+	wri.3,
+	wri.1,
+	wri.2,
+	sem.9,
+	sem.8,
+	sem.7,
+	sem.6,
+	sem.5,
+	sem.4,
+	wri.9,
+	sem.3,
+	sem.2,
+	rea.12,
+	rea.13,
+	rea.14,
+	rea.15,
+	nrea.11,
+	nrea.10,
+	nwri.9,
+	sem.10,
+	nwri.8,
+	sem.11,
+	nwri.7,
+	sem.12,
+	nwri.6,
+	sem.13,
+	sem.14,
+	sem.15,
+	wri.10,
+	wri.11,
+	wri.12,
+	wri.13,
+	wri.14,
+	wri.15,
+	nrea.1,
+	nrea.2,
+	nrea.3,
+	nrea.4,
+	nrea.5,
+	nrea.6,
+	nrea.7,
+	nrea.8,
+	nrea.9,
+	nwri.1,
+	nwri.2,
+	nwri.3,
+	nwri.4,
+	nwri.5;
+MARKING
+	nwri.15 : 1,
+	nwri.14 : 1,
+	nwri.13 : 1,
+	nwri.12 : 1,
+	sem.1 : 1,
+	nwri.11 : 1,
+	nwri.10 : 1,
+	nrea.15 : 1,
+	nrea.14 : 1,
+	nrea.13 : 1,
+	nrea.12 : 1,
+	sem.9 : 1,
+	sem.8 : 1,
+	sem.7 : 1,
+	sem.6 : 1,
+	sem.5 : 1,
+	sem.4 : 1,
+	sem.3 : 1,
+	sem.2 : 1,
+	nrea.11 : 1,
+	nrea.10 : 1,
+	nwri.9 : 1,
+	sem.10 : 1,
+	nwri.8 : 1,
+	sem.11 : 1,
+	nwri.7 : 1,
+	sem.12 : 1,
+	nwri.6 : 1,
+	sem.13 : 1,
+	sem.14 : 1,
+	sem.15 : 1,
+	nrea.1 : 1,
+	nrea.2 : 1,
+	nrea.3 : 1,
+	nrea.4 : 1,
+	nrea.5 : 1,
+	nrea.6 : 1,
+	nrea.7 : 1,
+	nrea.8 : 1,
+	nrea.9 : 1,
+	nwri.1 : 1,
+	nwri.2 : 1,
+	nwri.3 : 1,
+	nwri.4 : 1,
+	nwri.5 : 1;
+TRANSITION br.[x=1]
+	CONSUME
+		sem.1 : 1,
+		nrea.1 : 1;
+	PRODUCE
+		rea.1 : 1;
+TRANSITION br.[x=2]
+	CONSUME
+		sem.2 : 1,
+		nrea.2 : 1;
+	PRODUCE
+		rea.2 : 1;
+TRANSITION br.[x=3]
+	CONSUME
+		sem.3 : 1,
+		nrea.3 : 1;
+	PRODUCE
+		rea.3 : 1;
+TRANSITION er.[x=1]
+	CONSUME
+		rea.1 : 1;
+	PRODUCE
+		sem.1 : 1,
+		nrea.1 : 1;
+TRANSITION br.[x=4]
+	CONSUME
+		sem.4 : 1,
+		nrea.4 : 1;
+	PRODUCE
+		rea.4 : 1;
+TRANSITION er.[x=2]
+	CONSUME
+		rea.2 : 1;
+	PRODUCE
+		sem.2 : 1,
+		nrea.2 : 1;
+TRANSITION br.[x=5]
+	CONSUME
+		sem.5 : 1,
+		nrea.5 : 1;
+	PRODUCE
+		rea.5 : 1;
+TRANSITION er.[x=3]
+	CONSUME
+		rea.3 : 1;
+	PRODUCE
+		sem.3 : 1,
+		nrea.3 : 1;
+TRANSITION br.[x=6]
+	CONSUME
+		sem.6 : 1,
+		nrea.6 : 1;
+	PRODUCE
+		rea.6 : 1;
+TRANSITION bw.[y=1]
+	CONSUME
+		nwri.1 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.1 : 1;
+TRANSITION er.[x=4]
+	CONSUME
+		rea.4 : 1;
+	PRODUCE
+		sem.4 : 1,
+		nrea.4 : 1;
+TRANSITION br.[x=7]
+	CONSUME
+		sem.7 : 1,
+		nrea.7 : 1;
+	PRODUCE
+		rea.7 : 1;
+TRANSITION bw.[y=2]
+	CONSUME
+		nwri.2 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.2 : 1;
+TRANSITION er.[x=5]
+	CONSUME
+		rea.5 : 1;
+	PRODUCE
+		sem.5 : 1,
+		nrea.5 : 1;
+TRANSITION br.[x=8]
+	CONSUME
+		sem.8 : 1,
+		nrea.8 : 1;
+	PRODUCE
+		rea.8 : 1;
+TRANSITION bw.[y=3]
+	CONSUME
+		nwri.3 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.3 : 1;
+TRANSITION er.[x=6]
+	CONSUME
+		rea.6 : 1;
+	PRODUCE
+		sem.6 : 1,
+		nrea.6 : 1;
+TRANSITION br.[x=9]
+	CONSUME
+		sem.9 : 1,
+		nrea.9 : 1;
+	PRODUCE
+		rea.9 : 1;
+TRANSITION ew.[y=1]
+	CONSUME
+		wri.1 : 1;
+	PRODUCE
+		nwri.1 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION bw.[y=4]
+	CONSUME
+		nwri.4 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.4 : 1;
+TRANSITION er.[x=7]
+	CONSUME
+		rea.7 : 1;
+	PRODUCE
+		sem.7 : 1,
+		nrea.7 : 1;
+TRANSITION ew.[y=2]
+	CONSUME
+		wri.2 : 1;
+	PRODUCE
+		nwri.2 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION bw.[y=5]
+	CONSUME
+		nwri.5 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.5 : 1;
+TRANSITION er.[x=8]
+	CONSUME
+		rea.8 : 1;
+	PRODUCE
+		sem.8 : 1,
+		nrea.8 : 1;
+TRANSITION ew.[y=3]
+	CONSUME
+		wri.3 : 1;
+	PRODUCE
+		nwri.3 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION bw.[y=6]
+	CONSUME
+		nwri.6 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.6 : 1;
+TRANSITION er.[x=9]
+	CONSUME
+		rea.9 : 1;
+	PRODUCE
+		sem.9 : 1,
+		nrea.9 : 1;
+TRANSITION ew.[y=4]
+	CONSUME
+		wri.4 : 1;
+	PRODUCE
+		nwri.4 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION bw.[y=7]
+	CONSUME
+		nwri.7 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.7 : 1;
+TRANSITION ew.[y=5]
+	CONSUME
+		wri.5 : 1;
+	PRODUCE
+		nwri.5 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION bw.[y=8]
+	CONSUME
+		nwri.8 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.8 : 1;
+TRANSITION ew.[y=6]
+	CONSUME
+		wri.6 : 1;
+	PRODUCE
+		nwri.6 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION bw.[y=9]
+	CONSUME
+		nwri.9 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.9 : 1;
+TRANSITION ew.[y=7]
+	CONSUME
+		wri.7 : 1;
+	PRODUCE
+		nwri.7 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION ew.[y=8]
+	CONSUME
+		wri.8 : 1;
+	PRODUCE
+		nwri.8 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION ew.[y=9]
+	CONSUME
+		wri.9 : 1;
+	PRODUCE
+		nwri.9 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION br.[x=10]
+	CONSUME
+		sem.10 : 1,
+		nrea.10 : 1;
+	PRODUCE
+		rea.10 : 1;
+TRANSITION br.[x=11]
+	CONSUME
+		sem.11 : 1,
+		nrea.11 : 1;
+	PRODUCE
+		rea.11 : 1;
+TRANSITION br.[x=12]
+	CONSUME
+		sem.12 : 1,
+		nrea.12 : 1;
+	PRODUCE
+		rea.12 : 1;
+TRANSITION er.[x=10]
+	CONSUME
+		rea.10 : 1;
+	PRODUCE
+		sem.10 : 1,
+		nrea.10 : 1;
+TRANSITION br.[x=13]
+	CONSUME
+		sem.13 : 1,
+		nrea.13 : 1;
+	PRODUCE
+		rea.13 : 1;
+TRANSITION er.[x=11]
+	CONSUME
+		rea.11 : 1;
+	PRODUCE
+		sem.11 : 1,
+		nrea.11 : 1;
+TRANSITION br.[x=14]
+	CONSUME
+		sem.14 : 1,
+		nrea.14 : 1;
+	PRODUCE
+		rea.14 : 1;
+TRANSITION er.[x=12]
+	CONSUME
+		rea.12 : 1;
+	PRODUCE
+		sem.12 : 1,
+		nrea.12 : 1;
+TRANSITION br.[x=15]
+	CONSUME
+		sem.15 : 1,
+		nrea.15 : 1;
+	PRODUCE
+		rea.15 : 1;
+TRANSITION bw.[y=10]
+	CONSUME
+		nwri.10 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.10 : 1;
+TRANSITION er.[x=13]
+	CONSUME
+		rea.13 : 1;
+	PRODUCE
+		sem.13 : 1,
+		nrea.13 : 1;
+TRANSITION bw.[y=11]
+	CONSUME
+		nwri.11 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.11 : 1;
+TRANSITION er.[x=14]
+	CONSUME
+		rea.14 : 1;
+	PRODUCE
+		sem.14 : 1,
+		nrea.14 : 1;
+TRANSITION bw.[y=12]
+	CONSUME
+		nwri.12 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.12 : 1;
+TRANSITION er.[x=15]
+	CONSUME
+		rea.15 : 1;
+	PRODUCE
+		sem.15 : 1,
+		nrea.15 : 1;
+TRANSITION ew.[y=10]
+	CONSUME
+		wri.10 : 1;
+	PRODUCE
+		nwri.10 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION bw.[y=13]
+	CONSUME
+		nwri.13 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.13 : 1;
+TRANSITION ew.[y=11]
+	CONSUME
+		wri.11 : 1;
+	PRODUCE
+		nwri.11 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION bw.[y=14]
+	CONSUME
+		nwri.14 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.14 : 1;
+TRANSITION ew.[y=12]
+	CONSUME
+		wri.12 : 1;
+	PRODUCE
+		nwri.12 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION bw.[y=15]
+	CONSUME
+		nwri.15 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+	PRODUCE
+		wri.15 : 1;
+TRANSITION ew.[y=13]
+	CONSUME
+		wri.13 : 1;
+	PRODUCE
+		nwri.13 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION ew.[y=14]
+	CONSUME
+		wri.14 : 1;
+	PRODUCE
+		nwri.14 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;
+TRANSITION ew.[y=15]
+	CONSUME
+		wri.15 : 1;
+	PRODUCE
+		nwri.15 : 1,
+		sem.1 : 1,
+		sem.2 : 1,
+		sem.3 : 1,
+		sem.4 : 1,
+		sem.5 : 1,
+		sem.6 : 1,
+		sem.7 : 1,
+		sem.8 : 1,
+		sem.9 : 1,
+		sem.10 : 1,
+		sem.11 : 1,
+		sem.12 : 1,
+		sem.13 : 1,
+		sem.14 : 1,
+		sem.15 : 1;

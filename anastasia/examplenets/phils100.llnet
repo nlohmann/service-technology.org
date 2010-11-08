@@ -1,0 +1,3102 @@
+PLACE
+	ea.1,
+	ea.2,
+	ea.3,
+	ea.4,
+	ea.5,
+	ea.6,
+	ea.7,
+	ea.8,
+	ea.9,
+	hl.1,
+	fo.1,
+	hl.2,
+	fo.2,
+	hl.3,
+	fo.3,
+	hl.4,
+	fo.4,
+	hl.5,
+	fo.5,
+	hl.6,
+	fo.6,
+	hl.100,
+	hl.7,
+	fo.7,
+	ea.100,
+	hl.8,
+	fo.8,
+	hr.99,
+	hl.9,
+	fo.99,
+	fo.9,
+	hl.99,
+	fo.89,
+	fo.98,
+	hl.89,
+	hl.98,
+	fo.79,
+	fo.88,
+	fo.97,
+	hl.79,
+	hl.88,
+	hr.9,
+	hl.97,
+	fo.69,
+	fo.78,
+	ea.10,
+	ea.20,
+	ea.11,
+	ea.30,
+	ea.21,
+	ea.12,
+	ea.40,
+	ea.31,
+	ea.22,
+	ea.13,
+	ea.50,
+	ea.41,
+	ea.32,
+	ea.23,
+	ea.14,
+	ea.60,
+	ea.51,
+	ea.42,
+	ea.33,
+	ea.24,
+	ea.15,
+	ea.70,
+	ea.61,
+	ea.52,
+	ea.43,
+	ea.34,
+	ea.25,
+	ea.16,
+	ea.80,
+	ea.71,
+	ea.62,
+	ea.53,
+	ea.44,
+	ea.35,
+	ea.26,
+	ea.17,
+	ea.90,
+	ea.81,
+	ea.72,
+	ea.63,
+	ea.54,
+	ea.45,
+	ea.36,
+	ea.27,
+	ea.18,
+	ea.91,
+	ea.82,
+	ea.73,
+	ea.64,
+	ea.55,
+	ea.46,
+	ea.37,
+	ea.28,
+	ea.19,
+	ea.92,
+	ea.83,
+	ea.74,
+	ea.65,
+	ea.56,
+	ea.47,
+	ea.38,
+	ea.29,
+	ea.93,
+	ea.84,
+	ea.75,
+	ea.66,
+	ea.57,
+	ea.48,
+	ea.39,
+	ea.94,
+	ea.85,
+	ea.76,
+	ea.67,
+	ea.58,
+	ea.49,
+	ea.95,
+	ea.86,
+	ea.77,
+	ea.68,
+	ea.59,
+	ea.96,
+	ea.87,
+	ea.78,
+	ea.69,
+	hl.10,
+	fo.87,
+	ea.97,
+	ea.88,
+	ea.79,
+	hl.20,
+	hl.11,
+	fo.20,
+	fo.11,
+	ea.98,
+	ea.89,
+	hl.30,
+	hl.21,
+	hl.12,
+	fo.30,
+	fo.21,
+	fo.12,
+	ea.99,
+	hl.40,
+	hl.31,
+	hl.22,
+	hl.13,
+	fo.40,
+	fo.31,
+	fo.22,
+	fo.13,
+	hl.50,
+	hl.41,
+	hl.32,
+	hl.23,
+	hl.14,
+	fo.50,
+	fo.41,
+	fo.32,
+	fo.23,
+	fo.14,
+	hl.60,
+	hl.51,
+	hl.42,
+	hl.33,
+	hl.24,
+	hl.15,
+	fo.60,
+	fo.51,
+	fo.42,
+	fo.33,
+	fo.24,
+	fo.15,
+	fo.96,
+	hl.70,
+	hl.61,
+	hl.52,
+	hl.43,
+	hl.34,
+	hl.25,
+	hl.16,
+	fo.70,
+	fo.61,
+	fo.52,
+	fo.43,
+	fo.34,
+	fo.25,
+	fo.16,
+	hl.69,
+	hl.78,
+	hl.80,
+	hl.71,
+	hl.62,
+	hl.53,
+	hl.44,
+	hl.35,
+	hl.26,
+	hl.17,
+	fo.80,
+	fo.71,
+	fo.62,
+	fo.53,
+	fo.44,
+	fo.35,
+	fo.26,
+	fo.17,
+	hl.87,
+	hl.96,
+	fo.59,
+	hl.90,
+	hl.81,
+	hl.72,
+	hl.63,
+	hl.54,
+	hl.45,
+	hl.36,
+	hl.27,
+	hl.18,
+	fo.68,
+	fo.90,
+	fo.81,
+	fo.72,
+	fo.63,
+	fo.54,
+	fo.45,
+	fo.36,
+	fo.27,
+	fo.18,
+	fo.77,
+	fo.86,
+	fo.95,
+	hl.59,
+	hl.91,
+	hl.82,
+	hl.73,
+	hl.64,
+	hl.55,
+	hl.46,
+	hl.37,
+	hl.28,
+	hl.19,
+	hl.68,
+	hl.77,
+	fo.91,
+	fo.82,
+	fo.73,
+	fo.64,
+	fo.55,
+	fo.46,
+	fo.37,
+	fo.28,
+	fo.19,
+	hl.86,
+	hl.95,
+	fo.49,
+	fo.58,
+	fo.67,
+	hl.92,
+	hl.83,
+	hl.74,
+	hl.65,
+	hl.56,
+	hl.47,
+	hl.38,
+	hl.29,
+	fo.76,
+	fo.85,
+	fo.94,
+	fo.92,
+	fo.83,
+	fo.74,
+	fo.65,
+	fo.56,
+	fo.47,
+	fo.38,
+	fo.29,
+	hl.49,
+	hl.58,
+	hl.67,
+	hl.76,
+	hl.85,
+	hl.94,
+	hl.93,
+	hl.84,
+	hl.75,
+	hl.66,
+	hl.57,
+	hl.48,
+	hl.39,
+	fo.39,
+	fo.48,
+	fo.57,
+	fo.66,
+	fo.93,
+	fo.84,
+	fo.75,
+	th.13,
+	th.22,
+	th.31,
+	th.40,
+	hr.70,
+	hr.61,
+	hr.52,
+	hr.43,
+	hr.34,
+	hr.25,
+	hr.16,
+	hr.15,
+	hr.24,
+	hr.33,
+	hr.42,
+	hr.51,
+	hr.60,
+	th.50,
+	th.41,
+	th.32,
+	th.23,
+	th.14,
+	th.12,
+	th.21,
+	th.30,
+	hr.14,
+	hr.23,
+	hr.32,
+	hr.80,
+	hr.71,
+	hr.62,
+	hr.53,
+	hr.44,
+	hr.35,
+	hr.26,
+	hr.17,
+	hr.41,
+	hr.50,
+	th.11,
+	th.20,
+	hr.13,
+	th.60,
+	th.51,
+	th.42,
+	th.33,
+	th.24,
+	th.15,
+	hr.22,
+	hr.31,
+	hr.40,
+	th.10,
+	hr.12,
+	hr.90,
+	hr.81,
+	hr.72,
+	hr.63,
+	hr.54,
+	hr.45,
+	hr.36,
+	hr.27,
+	hr.18,
+	hr.21,
+	hr.30,
+	hr.11,
+	hr.20,
+	th.70,
+	th.61,
+	th.52,
+	th.43,
+	th.34,
+	th.25,
+	th.16,
+	hr.10,
+	fo.10,
+	th.9,
+	th.8,
+	hr.91,
+	hr.82,
+	hr.73,
+	hr.64,
+	hr.55,
+	hr.46,
+	hr.37,
+	hr.28,
+	hr.19,
+	th.7,
+	th.6,
+	hr.8,
+	th.80,
+	th.71,
+	th.62,
+	th.53,
+	th.44,
+	th.35,
+	th.26,
+	th.17,
+	th.5,
+	hr.7,
+	th.4,
+	hr.92,
+	hr.83,
+	hr.74,
+	hr.65,
+	hr.56,
+	hr.47,
+	hr.38,
+	hr.29,
+	hr.6,
+	th.3,
+	th.90,
+	th.81,
+	th.72,
+	th.63,
+	th.54,
+	th.45,
+	th.36,
+	th.27,
+	th.18,
+	hr.5,
+	th.2,
+	hr.93,
+	hr.84,
+	hr.75,
+	hr.66,
+	hr.57,
+	hr.48,
+	hr.39,
+	hr.4,
+	th.91,
+	th.82,
+	th.73,
+	th.64,
+	th.55,
+	th.46,
+	th.37,
+	th.28,
+	th.19,
+	th.1,
+	hr.94,
+	hr.85,
+	hr.76,
+	hr.67,
+	hr.58,
+	hr.49,
+	th.92,
+	th.83,
+	th.74,
+	th.65,
+	th.56,
+	th.47,
+	th.38,
+	th.29,
+	hr.95,
+	hr.86,
+	hr.77,
+	hr.68,
+	hr.59,
+	th.93,
+	th.84,
+	th.75,
+	th.66,
+	th.57,
+	th.48,
+	th.39,
+	hr.96,
+	hr.87,
+	hr.78,
+	hr.69,
+	th.94,
+	th.85,
+	th.76,
+	th.67,
+	th.58,
+	th.49,
+	hr.97,
+	hr.88,
+	hr.79,
+	th.95,
+	th.86,
+	th.77,
+	th.68,
+	th.59,
+	hr.98,
+	hr.89,
+	th.96,
+	th.87,
+	th.78,
+	th.69,
+	hr.3,
+	th.97,
+	th.88,
+	th.79,
+	th.98,
+	th.89,
+	th.99,
+	hr.2,
+	hr.1,
+	fo.100,
+	hr.100,
+	th.100;
+MARKING
+	fo.1 : 1,
+	fo.2 : 1,
+	fo.3 : 1,
+	fo.4 : 1,
+	fo.5 : 1,
+	fo.6 : 1,
+	fo.7 : 1,
+	fo.8 : 1,
+	fo.99 : 1,
+	fo.9 : 1,
+	fo.89 : 1,
+	fo.98 : 1,
+	fo.79 : 1,
+	fo.88 : 1,
+	fo.97 : 1,
+	fo.69 : 1,
+	fo.78 : 1,
+	fo.87 : 1,
+	fo.20 : 1,
+	fo.11 : 1,
+	fo.30 : 1,
+	fo.21 : 1,
+	fo.12 : 1,
+	fo.40 : 1,
+	fo.31 : 1,
+	fo.22 : 1,
+	fo.13 : 1,
+	fo.50 : 1,
+	fo.41 : 1,
+	fo.32 : 1,
+	fo.23 : 1,
+	fo.14 : 1,
+	fo.60 : 1,
+	fo.51 : 1,
+	fo.42 : 1,
+	fo.33 : 1,
+	fo.24 : 1,
+	fo.15 : 1,
+	fo.96 : 1,
+	fo.70 : 1,
+	fo.61 : 1,
+	fo.52 : 1,
+	fo.43 : 1,
+	fo.34 : 1,
+	fo.25 : 1,
+	fo.16 : 1,
+	fo.80 : 1,
+	fo.71 : 1,
+	fo.62 : 1,
+	fo.53 : 1,
+	fo.44 : 1,
+	fo.35 : 1,
+	fo.26 : 1,
+	fo.17 : 1,
+	fo.59 : 1,
+	fo.68 : 1,
+	fo.90 : 1,
+	fo.81 : 1,
+	fo.72 : 1,
+	fo.63 : 1,
+	fo.54 : 1,
+	fo.45 : 1,
+	fo.36 : 1,
+	fo.27 : 1,
+	fo.18 : 1,
+	fo.77 : 1,
+	fo.86 : 1,
+	fo.95 : 1,
+	fo.91 : 1,
+	fo.82 : 1,
+	fo.73 : 1,
+	fo.64 : 1,
+	fo.55 : 1,
+	fo.46 : 1,
+	fo.37 : 1,
+	fo.28 : 1,
+	fo.19 : 1,
+	fo.49 : 1,
+	fo.58 : 1,
+	fo.67 : 1,
+	fo.76 : 1,
+	fo.85 : 1,
+	fo.94 : 1,
+	fo.92 : 1,
+	fo.83 : 1,
+	fo.74 : 1,
+	fo.65 : 1,
+	fo.56 : 1,
+	fo.47 : 1,
+	fo.38 : 1,
+	fo.29 : 1,
+	fo.39 : 1,
+	fo.48 : 1,
+	fo.57 : 1,
+	fo.66 : 1,
+	fo.93 : 1,
+	fo.84 : 1,
+	fo.75 : 1,
+	th.13 : 1,
+	th.22 : 1,
+	th.31 : 1,
+	th.40 : 1,
+	th.50 : 1,
+	th.41 : 1,
+	th.32 : 1,
+	th.23 : 1,
+	th.14 : 1,
+	th.12 : 1,
+	th.21 : 1,
+	th.30 : 1,
+	th.11 : 1,
+	th.20 : 1,
+	th.60 : 1,
+	th.51 : 1,
+	th.42 : 1,
+	th.33 : 1,
+	th.24 : 1,
+	th.15 : 1,
+	th.10 : 1,
+	th.70 : 1,
+	th.61 : 1,
+	th.52 : 1,
+	th.43 : 1,
+	th.34 : 1,
+	th.25 : 1,
+	th.16 : 1,
+	fo.10 : 1,
+	th.9 : 1,
+	th.8 : 1,
+	th.7 : 1,
+	th.6 : 1,
+	th.80 : 1,
+	th.71 : 1,
+	th.62 : 1,
+	th.53 : 1,
+	th.44 : 1,
+	th.35 : 1,
+	th.26 : 1,
+	th.17 : 1,
+	th.5 : 1,
+	th.4 : 1,
+	th.3 : 1,
+	th.90 : 1,
+	th.81 : 1,
+	th.72 : 1,
+	th.63 : 1,
+	th.54 : 1,
+	th.45 : 1,
+	th.36 : 1,
+	th.27 : 1,
+	th.18 : 1,
+	th.2 : 1,
+	th.91 : 1,
+	th.82 : 1,
+	th.73 : 1,
+	th.64 : 1,
+	th.55 : 1,
+	th.46 : 1,
+	th.37 : 1,
+	th.28 : 1,
+	th.19 : 1,
+	th.1 : 1,
+	th.92 : 1,
+	th.83 : 1,
+	th.74 : 1,
+	th.65 : 1,
+	th.56 : 1,
+	th.47 : 1,
+	th.38 : 1,
+	th.29 : 1,
+	th.93 : 1,
+	th.84 : 1,
+	th.75 : 1,
+	th.66 : 1,
+	th.57 : 1,
+	th.48 : 1,
+	th.39 : 1,
+	th.94 : 1,
+	th.85 : 1,
+	th.76 : 1,
+	th.67 : 1,
+	th.58 : 1,
+	th.49 : 1,
+	th.95 : 1,
+	th.86 : 1,
+	th.77 : 1,
+	th.68 : 1,
+	th.59 : 1,
+	th.96 : 1,
+	th.87 : 1,
+	th.78 : 1,
+	th.69 : 1,
+	th.97 : 1,
+	th.88 : 1,
+	th.79 : 1,
+	th.98 : 1,
+	th.89 : 1,
+	th.99 : 1,
+	fo.100 : 1,
+	th.100 : 1;
+TRANSITION rl.[y=1]
+	CONSUME
+		ea.1 : 1;
+	PRODUCE
+		fo.1 : 1,
+		hr.1 : 1;
+TRANSITION rl.[y=2]
+	CONSUME
+		ea.2 : 1;
+	PRODUCE
+		fo.2 : 1,
+		hr.2 : 1;
+TRANSITION rl.[y=3]
+	CONSUME
+		ea.3 : 1;
+	PRODUCE
+		fo.3 : 1,
+		hr.3 : 1;
+TRANSITION tl.[y=1]
+	CONSUME
+		fo.1 : 1,
+		th.1 : 1;
+	PRODUCE
+		hl.1 : 1;
+TRANSITION rl.[y=4]
+	CONSUME
+		ea.4 : 1;
+	PRODUCE
+		fo.4 : 1,
+		hr.4 : 1;
+TRANSITION tl.[y=2]
+	CONSUME
+		fo.2 : 1,
+		th.2 : 1;
+	PRODUCE
+		hl.2 : 1;
+TRANSITION rl.[y=5]
+	CONSUME
+		ea.5 : 1;
+	PRODUCE
+		fo.5 : 1,
+		hr.5 : 1;
+TRANSITION tl.[y=3]
+	CONSUME
+		fo.3 : 1,
+		th.3 : 1;
+	PRODUCE
+		hl.3 : 1;
+TRANSITION rl.[y=6]
+	CONSUME
+		ea.6 : 1;
+	PRODUCE
+		fo.6 : 1,
+		hr.6 : 1;
+TRANSITION tl.[y=4]
+	CONSUME
+		fo.4 : 1,
+		th.4 : 1;
+	PRODUCE
+		hl.4 : 1;
+TRANSITION rr.[y=1]
+	CONSUME
+		hr.1 : 1;
+	PRODUCE
+		fo.2 : 1,
+		th.1 : 1;
+TRANSITION rl.[y=7]
+	CONSUME
+		ea.7 : 1;
+	PRODUCE
+		fo.7 : 1,
+		hr.7 : 1;
+TRANSITION tl.[y=5]
+	CONSUME
+		fo.5 : 1,
+		th.5 : 1;
+	PRODUCE
+		hl.5 : 1;
+TRANSITION rr.[y=2]
+	CONSUME
+		hr.2 : 1;
+	PRODUCE
+		fo.3 : 1,
+		th.2 : 1;
+TRANSITION rl.[y=8]
+	CONSUME
+		ea.8 : 1;
+	PRODUCE
+		fo.8 : 1,
+		hr.8 : 1;
+TRANSITION tl.[y=6]
+	CONSUME
+		fo.6 : 1,
+		th.6 : 1;
+	PRODUCE
+		hl.6 : 1;
+TRANSITION rr.[y=3]
+	CONSUME
+		hr.3 : 1;
+	PRODUCE
+		fo.4 : 1,
+		th.3 : 1;
+TRANSITION rl.[y=9]
+	CONSUME
+		ea.9 : 1;
+	PRODUCE
+		fo.9 : 1,
+		hr.9 : 1;
+TRANSITION tr.[y=1]
+	CONSUME
+		fo.2 : 1,
+		hl.1 : 1;
+	PRODUCE
+		ea.1 : 1;
+TRANSITION tl.[y=7]
+	CONSUME
+		fo.7 : 1,
+		th.7 : 1;
+	PRODUCE
+		hl.7 : 1;
+TRANSITION rr.[y=4]
+	CONSUME
+		hr.4 : 1;
+	PRODUCE
+		fo.5 : 1,
+		th.4 : 1;
+TRANSITION tr.[y=2]
+	CONSUME
+		fo.3 : 1,
+		hl.2 : 1;
+	PRODUCE
+		ea.2 : 1;
+TRANSITION tl.[y=8]
+	CONSUME
+		fo.8 : 1,
+		th.8 : 1;
+	PRODUCE
+		hl.8 : 1;
+TRANSITION rr.[y=5]
+	CONSUME
+		hr.5 : 1;
+	PRODUCE
+		fo.6 : 1,
+		th.5 : 1;
+TRANSITION tr.[y=3]
+	CONSUME
+		fo.4 : 1,
+		hl.3 : 1;
+	PRODUCE
+		ea.3 : 1;
+TRANSITION tl.[y=9]
+	CONSUME
+		fo.9 : 1,
+		th.9 : 1;
+	PRODUCE
+		hl.9 : 1;
+TRANSITION rr.[y=6]
+	CONSUME
+		hr.6 : 1;
+	PRODUCE
+		fo.7 : 1,
+		th.6 : 1;
+TRANSITION tr.[y=4]
+	CONSUME
+		fo.5 : 1,
+		hl.4 : 1;
+	PRODUCE
+		ea.4 : 1;
+TRANSITION rr.[y=7]
+	CONSUME
+		hr.7 : 1;
+	PRODUCE
+		fo.8 : 1,
+		th.7 : 1;
+TRANSITION tr.[y=5]
+	CONSUME
+		fo.6 : 1,
+		hl.5 : 1;
+	PRODUCE
+		ea.5 : 1;
+TRANSITION rr.[y=8]
+	CONSUME
+		hr.8 : 1;
+	PRODUCE
+		fo.9 : 1,
+		th.8 : 1;
+TRANSITION tr.[y=6]
+	CONSUME
+		fo.7 : 1,
+		hl.6 : 1;
+	PRODUCE
+		ea.6 : 1;
+TRANSITION rr.[y=9]
+	CONSUME
+		hr.9 : 1;
+	PRODUCE
+		fo.10 : 1,
+		th.9 : 1;
+TRANSITION tr.[y=7]
+	CONSUME
+		fo.8 : 1,
+		hl.7 : 1;
+	PRODUCE
+		ea.7 : 1;
+TRANSITION tr.[y=8]
+	CONSUME
+		fo.9 : 1,
+		hl.8 : 1;
+	PRODUCE
+		ea.8 : 1;
+TRANSITION tr.[y=9]
+	CONSUME
+		fo.10 : 1,
+		hl.9 : 1;
+	PRODUCE
+		ea.9 : 1;
+TRANSITION rl.[y=10]
+	CONSUME
+		ea.10 : 1;
+	PRODUCE
+		fo.10 : 1,
+		hr.10 : 1;
+TRANSITION rl.[y=20]
+	CONSUME
+		ea.20 : 1;
+	PRODUCE
+		fo.20 : 1,
+		hr.20 : 1;
+TRANSITION rl.[y=11]
+	CONSUME
+		ea.11 : 1;
+	PRODUCE
+		fo.11 : 1,
+		hr.11 : 1;
+TRANSITION rl.[y=30]
+	CONSUME
+		ea.30 : 1;
+	PRODUCE
+		fo.30 : 1,
+		hr.30 : 1;
+TRANSITION rl.[y=21]
+	CONSUME
+		ea.21 : 1;
+	PRODUCE
+		fo.21 : 1,
+		hr.21 : 1;
+TRANSITION rl.[y=12]
+	CONSUME
+		ea.12 : 1;
+	PRODUCE
+		fo.12 : 1,
+		hr.12 : 1;
+TRANSITION tl.[y=10]
+	CONSUME
+		fo.10 : 1,
+		th.10 : 1;
+	PRODUCE
+		hl.10 : 1;
+TRANSITION rl.[y=40]
+	CONSUME
+		ea.40 : 1;
+	PRODUCE
+		fo.40 : 1,
+		hr.40 : 1;
+TRANSITION rl.[y=31]
+	CONSUME
+		ea.31 : 1;
+	PRODUCE
+		fo.31 : 1,
+		hr.31 : 1;
+TRANSITION rl.[y=22]
+	CONSUME
+		ea.22 : 1;
+	PRODUCE
+		fo.22 : 1,
+		hr.22 : 1;
+TRANSITION rl.[y=13]
+	CONSUME
+		ea.13 : 1;
+	PRODUCE
+		fo.13 : 1,
+		hr.13 : 1;
+TRANSITION tl.[y=20]
+	CONSUME
+		fo.20 : 1,
+		th.20 : 1;
+	PRODUCE
+		hl.20 : 1;
+TRANSITION tl.[y=11]
+	CONSUME
+		fo.11 : 1,
+		th.11 : 1;
+	PRODUCE
+		hl.11 : 1;
+TRANSITION rl.[y=50]
+	CONSUME
+		ea.50 : 1;
+	PRODUCE
+		fo.50 : 1,
+		hr.50 : 1;
+TRANSITION rl.[y=41]
+	CONSUME
+		ea.41 : 1;
+	PRODUCE
+		fo.41 : 1,
+		hr.41 : 1;
+TRANSITION rl.[y=32]
+	CONSUME
+		ea.32 : 1;
+	PRODUCE
+		fo.32 : 1,
+		hr.32 : 1;
+TRANSITION rl.[y=23]
+	CONSUME
+		ea.23 : 1;
+	PRODUCE
+		fo.23 : 1,
+		hr.23 : 1;
+TRANSITION rl.[y=14]
+	CONSUME
+		ea.14 : 1;
+	PRODUCE
+		fo.14 : 1,
+		hr.14 : 1;
+TRANSITION tl.[y=30]
+	CONSUME
+		fo.30 : 1,
+		th.30 : 1;
+	PRODUCE
+		hl.30 : 1;
+TRANSITION tl.[y=21]
+	CONSUME
+		fo.21 : 1,
+		th.21 : 1;
+	PRODUCE
+		hl.21 : 1;
+TRANSITION tl.[y=12]
+	CONSUME
+		fo.12 : 1,
+		th.12 : 1;
+	PRODUCE
+		hl.12 : 1;
+TRANSITION rl.[y=60]
+	CONSUME
+		ea.60 : 1;
+	PRODUCE
+		fo.60 : 1,
+		hr.60 : 1;
+TRANSITION rl.[y=51]
+	CONSUME
+		ea.51 : 1;
+	PRODUCE
+		fo.51 : 1,
+		hr.51 : 1;
+TRANSITION rl.[y=42]
+	CONSUME
+		ea.42 : 1;
+	PRODUCE
+		fo.42 : 1,
+		hr.42 : 1;
+TRANSITION rl.[y=33]
+	CONSUME
+		ea.33 : 1;
+	PRODUCE
+		fo.33 : 1,
+		hr.33 : 1;
+TRANSITION rl.[y=24]
+	CONSUME
+		ea.24 : 1;
+	PRODUCE
+		fo.24 : 1,
+		hr.24 : 1;
+TRANSITION rl.[y=15]
+	CONSUME
+		ea.15 : 1;
+	PRODUCE
+		fo.15 : 1,
+		hr.15 : 1;
+TRANSITION tl.[y=40]
+	CONSUME
+		fo.40 : 1,
+		th.40 : 1;
+	PRODUCE
+		hl.40 : 1;
+TRANSITION tl.[y=31]
+	CONSUME
+		fo.31 : 1,
+		th.31 : 1;
+	PRODUCE
+		hl.31 : 1;
+TRANSITION tl.[y=22]
+	CONSUME
+		fo.22 : 1,
+		th.22 : 1;
+	PRODUCE
+		hl.22 : 1;
+TRANSITION tl.[y=13]
+	CONSUME
+		fo.13 : 1,
+		th.13 : 1;
+	PRODUCE
+		hl.13 : 1;
+TRANSITION rr.[y=10]
+	CONSUME
+		hr.10 : 1;
+	PRODUCE
+		fo.11 : 1,
+		th.10 : 1;
+TRANSITION rl.[y=70]
+	CONSUME
+		ea.70 : 1;
+	PRODUCE
+		fo.70 : 1,
+		hr.70 : 1;
+TRANSITION rl.[y=61]
+	CONSUME
+		ea.61 : 1;
+	PRODUCE
+		fo.61 : 1,
+		hr.61 : 1;
+TRANSITION rl.[y=52]
+	CONSUME
+		ea.52 : 1;
+	PRODUCE
+		fo.52 : 1,
+		hr.52 : 1;
+TRANSITION rl.[y=43]
+	CONSUME
+		ea.43 : 1;
+	PRODUCE
+		fo.43 : 1,
+		hr.43 : 1;
+TRANSITION rl.[y=34]
+	CONSUME
+		ea.34 : 1;
+	PRODUCE
+		fo.34 : 1,
+		hr.34 : 1;
+TRANSITION rl.[y=25]
+	CONSUME
+		ea.25 : 1;
+	PRODUCE
+		fo.25 : 1,
+		hr.25 : 1;
+TRANSITION rl.[y=16]
+	CONSUME
+		ea.16 : 1;
+	PRODUCE
+		fo.16 : 1,
+		hr.16 : 1;
+TRANSITION tl.[y=50]
+	CONSUME
+		fo.50 : 1,
+		th.50 : 1;
+	PRODUCE
+		hl.50 : 1;
+TRANSITION tl.[y=41]
+	CONSUME
+		fo.41 : 1,
+		th.41 : 1;
+	PRODUCE
+		hl.41 : 1;
+TRANSITION tl.[y=32]
+	CONSUME
+		fo.32 : 1,
+		th.32 : 1;
+	PRODUCE
+		hl.32 : 1;
+TRANSITION tl.[y=23]
+	CONSUME
+		fo.23 : 1,
+		th.23 : 1;
+	PRODUCE
+		hl.23 : 1;
+TRANSITION tl.[y=14]
+	CONSUME
+		fo.14 : 1,
+		th.14 : 1;
+	PRODUCE
+		hl.14 : 1;
+TRANSITION rr.[y=20]
+	CONSUME
+		hr.20 : 1;
+	PRODUCE
+		fo.21 : 1,
+		th.20 : 1;
+TRANSITION rr.[y=11]
+	CONSUME
+		hr.11 : 1;
+	PRODUCE
+		fo.12 : 1,
+		th.11 : 1;
+TRANSITION rl.[y=80]
+	CONSUME
+		ea.80 : 1;
+	PRODUCE
+		fo.80 : 1,
+		hr.80 : 1;
+TRANSITION rl.[y=71]
+	CONSUME
+		ea.71 : 1;
+	PRODUCE
+		fo.71 : 1,
+		hr.71 : 1;
+TRANSITION rl.[y=62]
+	CONSUME
+		ea.62 : 1;
+	PRODUCE
+		fo.62 : 1,
+		hr.62 : 1;
+TRANSITION rl.[y=53]
+	CONSUME
+		ea.53 : 1;
+	PRODUCE
+		fo.53 : 1,
+		hr.53 : 1;
+TRANSITION rl.[y=44]
+	CONSUME
+		ea.44 : 1;
+	PRODUCE
+		fo.44 : 1,
+		hr.44 : 1;
+TRANSITION rl.[y=35]
+	CONSUME
+		ea.35 : 1;
+	PRODUCE
+		fo.35 : 1,
+		hr.35 : 1;
+TRANSITION rl.[y=26]
+	CONSUME
+		ea.26 : 1;
+	PRODUCE
+		fo.26 : 1,
+		hr.26 : 1;
+TRANSITION rl.[y=17]
+	CONSUME
+		ea.17 : 1;
+	PRODUCE
+		fo.17 : 1,
+		hr.17 : 1;
+TRANSITION tl.[y=60]
+	CONSUME
+		fo.60 : 1,
+		th.60 : 1;
+	PRODUCE
+		hl.60 : 1;
+TRANSITION tl.[y=51]
+	CONSUME
+		fo.51 : 1,
+		th.51 : 1;
+	PRODUCE
+		hl.51 : 1;
+TRANSITION tl.[y=42]
+	CONSUME
+		fo.42 : 1,
+		th.42 : 1;
+	PRODUCE
+		hl.42 : 1;
+TRANSITION tl.[y=33]
+	CONSUME
+		fo.33 : 1,
+		th.33 : 1;
+	PRODUCE
+		hl.33 : 1;
+TRANSITION tl.[y=24]
+	CONSUME
+		fo.24 : 1,
+		th.24 : 1;
+	PRODUCE
+		hl.24 : 1;
+TRANSITION tl.[y=15]
+	CONSUME
+		fo.15 : 1,
+		th.15 : 1;
+	PRODUCE
+		hl.15 : 1;
+TRANSITION rr.[y=30]
+	CONSUME
+		hr.30 : 1;
+	PRODUCE
+		fo.31 : 1,
+		th.30 : 1;
+TRANSITION rr.[y=21]
+	CONSUME
+		hr.21 : 1;
+	PRODUCE
+		fo.22 : 1,
+		th.21 : 1;
+TRANSITION rr.[y=12]
+	CONSUME
+		hr.12 : 1;
+	PRODUCE
+		fo.13 : 1,
+		th.12 : 1;
+TRANSITION rl.[y=90]
+	CONSUME
+		ea.90 : 1;
+	PRODUCE
+		fo.90 : 1,
+		hr.90 : 1;
+TRANSITION rl.[y=81]
+	CONSUME
+		ea.81 : 1;
+	PRODUCE
+		fo.81 : 1,
+		hr.81 : 1;
+TRANSITION rl.[y=72]
+	CONSUME
+		ea.72 : 1;
+	PRODUCE
+		fo.72 : 1,
+		hr.72 : 1;
+TRANSITION rl.[y=63]
+	CONSUME
+		ea.63 : 1;
+	PRODUCE
+		fo.63 : 1,
+		hr.63 : 1;
+TRANSITION rl.[y=54]
+	CONSUME
+		ea.54 : 1;
+	PRODUCE
+		fo.54 : 1,
+		hr.54 : 1;
+TRANSITION rl.[y=45]
+	CONSUME
+		ea.45 : 1;
+	PRODUCE
+		fo.45 : 1,
+		hr.45 : 1;
+TRANSITION rl.[y=36]
+	CONSUME
+		ea.36 : 1;
+	PRODUCE
+		fo.36 : 1,
+		hr.36 : 1;
+TRANSITION rl.[y=27]
+	CONSUME
+		ea.27 : 1;
+	PRODUCE
+		fo.27 : 1,
+		hr.27 : 1;
+TRANSITION rl.[y=18]
+	CONSUME
+		ea.18 : 1;
+	PRODUCE
+		fo.18 : 1,
+		hr.18 : 1;
+TRANSITION tr.[y=10]
+	CONSUME
+		fo.11 : 1,
+		hl.10 : 1;
+	PRODUCE
+		ea.10 : 1;
+TRANSITION tl.[y=70]
+	CONSUME
+		fo.70 : 1,
+		th.70 : 1;
+	PRODUCE
+		hl.70 : 1;
+TRANSITION tl.[y=61]
+	CONSUME
+		fo.61 : 1,
+		th.61 : 1;
+	PRODUCE
+		hl.61 : 1;
+TRANSITION tl.[y=52]
+	CONSUME
+		fo.52 : 1,
+		th.52 : 1;
+	PRODUCE
+		hl.52 : 1;
+TRANSITION tl.[y=43]
+	CONSUME
+		fo.43 : 1,
+		th.43 : 1;
+	PRODUCE
+		hl.43 : 1;
+TRANSITION tl.[y=34]
+	CONSUME
+		fo.34 : 1,
+		th.34 : 1;
+	PRODUCE
+		hl.34 : 1;
+TRANSITION tl.[y=25]
+	CONSUME
+		fo.25 : 1,
+		th.25 : 1;
+	PRODUCE
+		hl.25 : 1;
+TRANSITION tl.[y=16]
+	CONSUME
+		fo.16 : 1,
+		th.16 : 1;
+	PRODUCE
+		hl.16 : 1;
+TRANSITION rr.[y=40]
+	CONSUME
+		hr.40 : 1;
+	PRODUCE
+		fo.41 : 1,
+		th.40 : 1;
+TRANSITION rr.[y=31]
+	CONSUME
+		hr.31 : 1;
+	PRODUCE
+		fo.32 : 1,
+		th.31 : 1;
+TRANSITION rr.[y=22]
+	CONSUME
+		hr.22 : 1;
+	PRODUCE
+		fo.23 : 1,
+		th.22 : 1;
+TRANSITION rr.[y=13]
+	CONSUME
+		hr.13 : 1;
+	PRODUCE
+		fo.14 : 1,
+		th.13 : 1;
+TRANSITION rl.[y=91]
+	CONSUME
+		ea.91 : 1;
+	PRODUCE
+		fo.91 : 1,
+		hr.91 : 1;
+TRANSITION rl.[y=82]
+	CONSUME
+		ea.82 : 1;
+	PRODUCE
+		fo.82 : 1,
+		hr.82 : 1;
+TRANSITION rl.[y=73]
+	CONSUME
+		ea.73 : 1;
+	PRODUCE
+		fo.73 : 1,
+		hr.73 : 1;
+TRANSITION rl.[y=64]
+	CONSUME
+		ea.64 : 1;
+	PRODUCE
+		fo.64 : 1,
+		hr.64 : 1;
+TRANSITION rl.[y=55]
+	CONSUME
+		ea.55 : 1;
+	PRODUCE
+		fo.55 : 1,
+		hr.55 : 1;
+TRANSITION rl.[y=46]
+	CONSUME
+		ea.46 : 1;
+	PRODUCE
+		fo.46 : 1,
+		hr.46 : 1;
+TRANSITION rl.[y=37]
+	CONSUME
+		ea.37 : 1;
+	PRODUCE
+		fo.37 : 1,
+		hr.37 : 1;
+TRANSITION rl.[y=28]
+	CONSUME
+		ea.28 : 1;
+	PRODUCE
+		fo.28 : 1,
+		hr.28 : 1;
+TRANSITION rl.[y=19]
+	CONSUME
+		ea.19 : 1;
+	PRODUCE
+		fo.19 : 1,
+		hr.19 : 1;
+TRANSITION tr.[y=20]
+	CONSUME
+		fo.21 : 1,
+		hl.20 : 1;
+	PRODUCE
+		ea.20 : 1;
+TRANSITION tr.[y=11]
+	CONSUME
+		fo.12 : 1,
+		hl.11 : 1;
+	PRODUCE
+		ea.11 : 1;
+TRANSITION tl.[y=80]
+	CONSUME
+		fo.80 : 1,
+		th.80 : 1;
+	PRODUCE
+		hl.80 : 1;
+TRANSITION tl.[y=71]
+	CONSUME
+		fo.71 : 1,
+		th.71 : 1;
+	PRODUCE
+		hl.71 : 1;
+TRANSITION tl.[y=62]
+	CONSUME
+		fo.62 : 1,
+		th.62 : 1;
+	PRODUCE
+		hl.62 : 1;
+TRANSITION tl.[y=53]
+	CONSUME
+		fo.53 : 1,
+		th.53 : 1;
+	PRODUCE
+		hl.53 : 1;
+TRANSITION tl.[y=44]
+	CONSUME
+		fo.44 : 1,
+		th.44 : 1;
+	PRODUCE
+		hl.44 : 1;
+TRANSITION tl.[y=35]
+	CONSUME
+		fo.35 : 1,
+		th.35 : 1;
+	PRODUCE
+		hl.35 : 1;
+TRANSITION tl.[y=26]
+	CONSUME
+		fo.26 : 1,
+		th.26 : 1;
+	PRODUCE
+		hl.26 : 1;
+TRANSITION tl.[y=17]
+	CONSUME
+		fo.17 : 1,
+		th.17 : 1;
+	PRODUCE
+		hl.17 : 1;
+TRANSITION rr.[y=50]
+	CONSUME
+		hr.50 : 1;
+	PRODUCE
+		fo.51 : 1,
+		th.50 : 1;
+TRANSITION rr.[y=41]
+	CONSUME
+		hr.41 : 1;
+	PRODUCE
+		fo.42 : 1,
+		th.41 : 1;
+TRANSITION rr.[y=32]
+	CONSUME
+		hr.32 : 1;
+	PRODUCE
+		fo.33 : 1,
+		th.32 : 1;
+TRANSITION rr.[y=23]
+	CONSUME
+		hr.23 : 1;
+	PRODUCE
+		fo.24 : 1,
+		th.23 : 1;
+TRANSITION rr.[y=14]
+	CONSUME
+		hr.14 : 1;
+	PRODUCE
+		fo.15 : 1,
+		th.14 : 1;
+TRANSITION rl.[y=92]
+	CONSUME
+		ea.92 : 1;
+	PRODUCE
+		fo.92 : 1,
+		hr.92 : 1;
+TRANSITION rl.[y=83]
+	CONSUME
+		ea.83 : 1;
+	PRODUCE
+		fo.83 : 1,
+		hr.83 : 1;
+TRANSITION rl.[y=74]
+	CONSUME
+		ea.74 : 1;
+	PRODUCE
+		fo.74 : 1,
+		hr.74 : 1;
+TRANSITION rl.[y=65]
+	CONSUME
+		ea.65 : 1;
+	PRODUCE
+		fo.65 : 1,
+		hr.65 : 1;
+TRANSITION rl.[y=56]
+	CONSUME
+		ea.56 : 1;
+	PRODUCE
+		fo.56 : 1,
+		hr.56 : 1;
+TRANSITION rl.[y=47]
+	CONSUME
+		ea.47 : 1;
+	PRODUCE
+		fo.47 : 1,
+		hr.47 : 1;
+TRANSITION rl.[y=38]
+	CONSUME
+		ea.38 : 1;
+	PRODUCE
+		fo.38 : 1,
+		hr.38 : 1;
+TRANSITION rl.[y=29]
+	CONSUME
+		ea.29 : 1;
+	PRODUCE
+		fo.29 : 1,
+		hr.29 : 1;
+TRANSITION tr.[y=30]
+	CONSUME
+		fo.31 : 1,
+		hl.30 : 1;
+	PRODUCE
+		ea.30 : 1;
+TRANSITION tr.[y=21]
+	CONSUME
+		fo.22 : 1,
+		hl.21 : 1;
+	PRODUCE
+		ea.21 : 1;
+TRANSITION tr.[y=12]
+	CONSUME
+		fo.13 : 1,
+		hl.12 : 1;
+	PRODUCE
+		ea.12 : 1;
+TRANSITION tl.[y=90]
+	CONSUME
+		fo.90 : 1,
+		th.90 : 1;
+	PRODUCE
+		hl.90 : 1;
+TRANSITION tl.[y=81]
+	CONSUME
+		fo.81 : 1,
+		th.81 : 1;
+	PRODUCE
+		hl.81 : 1;
+TRANSITION tl.[y=72]
+	CONSUME
+		fo.72 : 1,
+		th.72 : 1;
+	PRODUCE
+		hl.72 : 1;
+TRANSITION tl.[y=63]
+	CONSUME
+		fo.63 : 1,
+		th.63 : 1;
+	PRODUCE
+		hl.63 : 1;
+TRANSITION tl.[y=54]
+	CONSUME
+		fo.54 : 1,
+		th.54 : 1;
+	PRODUCE
+		hl.54 : 1;
+TRANSITION tl.[y=45]
+	CONSUME
+		fo.45 : 1,
+		th.45 : 1;
+	PRODUCE
+		hl.45 : 1;
+TRANSITION tl.[y=36]
+	CONSUME
+		fo.36 : 1,
+		th.36 : 1;
+	PRODUCE
+		hl.36 : 1;
+TRANSITION tl.[y=27]
+	CONSUME
+		fo.27 : 1,
+		th.27 : 1;
+	PRODUCE
+		hl.27 : 1;
+TRANSITION tl.[y=18]
+	CONSUME
+		fo.18 : 1,
+		th.18 : 1;
+	PRODUCE
+		hl.18 : 1;
+TRANSITION rr.[y=60]
+	CONSUME
+		hr.60 : 1;
+	PRODUCE
+		fo.61 : 1,
+		th.60 : 1;
+TRANSITION rr.[y=51]
+	CONSUME
+		hr.51 : 1;
+	PRODUCE
+		fo.52 : 1,
+		th.51 : 1;
+TRANSITION rr.[y=42]
+	CONSUME
+		hr.42 : 1;
+	PRODUCE
+		fo.43 : 1,
+		th.42 : 1;
+TRANSITION rr.[y=33]
+	CONSUME
+		hr.33 : 1;
+	PRODUCE
+		fo.34 : 1,
+		th.33 : 1;
+TRANSITION rr.[y=24]
+	CONSUME
+		hr.24 : 1;
+	PRODUCE
+		fo.25 : 1,
+		th.24 : 1;
+TRANSITION rr.[y=15]
+	CONSUME
+		hr.15 : 1;
+	PRODUCE
+		fo.16 : 1,
+		th.15 : 1;
+TRANSITION rl.[y=93]
+	CONSUME
+		ea.93 : 1;
+	PRODUCE
+		fo.93 : 1,
+		hr.93 : 1;
+TRANSITION rl.[y=84]
+	CONSUME
+		ea.84 : 1;
+	PRODUCE
+		fo.84 : 1,
+		hr.84 : 1;
+TRANSITION rl.[y=75]
+	CONSUME
+		ea.75 : 1;
+	PRODUCE
+		fo.75 : 1,
+		hr.75 : 1;
+TRANSITION rl.[y=66]
+	CONSUME
+		ea.66 : 1;
+	PRODUCE
+		fo.66 : 1,
+		hr.66 : 1;
+TRANSITION rl.[y=57]
+	CONSUME
+		ea.57 : 1;
+	PRODUCE
+		fo.57 : 1,
+		hr.57 : 1;
+TRANSITION rl.[y=48]
+	CONSUME
+		ea.48 : 1;
+	PRODUCE
+		fo.48 : 1,
+		hr.48 : 1;
+TRANSITION rl.[y=39]
+	CONSUME
+		ea.39 : 1;
+	PRODUCE
+		fo.39 : 1,
+		hr.39 : 1;
+TRANSITION tr.[y=40]
+	CONSUME
+		fo.41 : 1,
+		hl.40 : 1;
+	PRODUCE
+		ea.40 : 1;
+TRANSITION tr.[y=31]
+	CONSUME
+		fo.32 : 1,
+		hl.31 : 1;
+	PRODUCE
+		ea.31 : 1;
+TRANSITION tr.[y=22]
+	CONSUME
+		fo.23 : 1,
+		hl.22 : 1;
+	PRODUCE
+		ea.22 : 1;
+TRANSITION tr.[y=13]
+	CONSUME
+		fo.14 : 1,
+		hl.13 : 1;
+	PRODUCE
+		ea.13 : 1;
+TRANSITION tl.[y=91]
+	CONSUME
+		fo.91 : 1,
+		th.91 : 1;
+	PRODUCE
+		hl.91 : 1;
+TRANSITION tl.[y=82]
+	CONSUME
+		fo.82 : 1,
+		th.82 : 1;
+	PRODUCE
+		hl.82 : 1;
+TRANSITION tl.[y=73]
+	CONSUME
+		fo.73 : 1,
+		th.73 : 1;
+	PRODUCE
+		hl.73 : 1;
+TRANSITION tl.[y=64]
+	CONSUME
+		fo.64 : 1,
+		th.64 : 1;
+	PRODUCE
+		hl.64 : 1;
+TRANSITION tl.[y=55]
+	CONSUME
+		fo.55 : 1,
+		th.55 : 1;
+	PRODUCE
+		hl.55 : 1;
+TRANSITION tl.[y=46]
+	CONSUME
+		fo.46 : 1,
+		th.46 : 1;
+	PRODUCE
+		hl.46 : 1;
+TRANSITION tl.[y=37]
+	CONSUME
+		fo.37 : 1,
+		th.37 : 1;
+	PRODUCE
+		hl.37 : 1;
+TRANSITION tl.[y=28]
+	CONSUME
+		fo.28 : 1,
+		th.28 : 1;
+	PRODUCE
+		hl.28 : 1;
+TRANSITION tl.[y=19]
+	CONSUME
+		fo.19 : 1,
+		th.19 : 1;
+	PRODUCE
+		hl.19 : 1;
+TRANSITION rr.[y=70]
+	CONSUME
+		hr.70 : 1;
+	PRODUCE
+		fo.71 : 1,
+		th.70 : 1;
+TRANSITION rr.[y=61]
+	CONSUME
+		hr.61 : 1;
+	PRODUCE
+		fo.62 : 1,
+		th.61 : 1;
+TRANSITION rr.[y=52]
+	CONSUME
+		hr.52 : 1;
+	PRODUCE
+		fo.53 : 1,
+		th.52 : 1;
+TRANSITION rr.[y=43]
+	CONSUME
+		hr.43 : 1;
+	PRODUCE
+		fo.44 : 1,
+		th.43 : 1;
+TRANSITION rr.[y=34]
+	CONSUME
+		hr.34 : 1;
+	PRODUCE
+		fo.35 : 1,
+		th.34 : 1;
+TRANSITION rr.[y=25]
+	CONSUME
+		hr.25 : 1;
+	PRODUCE
+		fo.26 : 1,
+		th.25 : 1;
+TRANSITION rr.[y=16]
+	CONSUME
+		hr.16 : 1;
+	PRODUCE
+		fo.17 : 1,
+		th.16 : 1;
+TRANSITION rl.[y=94]
+	CONSUME
+		ea.94 : 1;
+	PRODUCE
+		fo.94 : 1,
+		hr.94 : 1;
+TRANSITION rl.[y=85]
+	CONSUME
+		ea.85 : 1;
+	PRODUCE
+		fo.85 : 1,
+		hr.85 : 1;
+TRANSITION rl.[y=76]
+	CONSUME
+		ea.76 : 1;
+	PRODUCE
+		fo.76 : 1,
+		hr.76 : 1;
+TRANSITION rl.[y=67]
+	CONSUME
+		ea.67 : 1;
+	PRODUCE
+		fo.67 : 1,
+		hr.67 : 1;
+TRANSITION rl.[y=58]
+	CONSUME
+		ea.58 : 1;
+	PRODUCE
+		fo.58 : 1,
+		hr.58 : 1;
+TRANSITION rl.[y=49]
+	CONSUME
+		ea.49 : 1;
+	PRODUCE
+		fo.49 : 1,
+		hr.49 : 1;
+TRANSITION tr.[y=50]
+	CONSUME
+		fo.51 : 1,
+		hl.50 : 1;
+	PRODUCE
+		ea.50 : 1;
+TRANSITION tr.[y=41]
+	CONSUME
+		fo.42 : 1,
+		hl.41 : 1;
+	PRODUCE
+		ea.41 : 1;
+TRANSITION tr.[y=32]
+	CONSUME
+		fo.33 : 1,
+		hl.32 : 1;
+	PRODUCE
+		ea.32 : 1;
+TRANSITION tr.[y=23]
+	CONSUME
+		fo.24 : 1,
+		hl.23 : 1;
+	PRODUCE
+		ea.23 : 1;
+TRANSITION tr.[y=14]
+	CONSUME
+		fo.15 : 1,
+		hl.14 : 1;
+	PRODUCE
+		ea.14 : 1;
+TRANSITION tl.[y=92]
+	CONSUME
+		fo.92 : 1,
+		th.92 : 1;
+	PRODUCE
+		hl.92 : 1;
+TRANSITION tl.[y=83]
+	CONSUME
+		fo.83 : 1,
+		th.83 : 1;
+	PRODUCE
+		hl.83 : 1;
+TRANSITION tl.[y=74]
+	CONSUME
+		fo.74 : 1,
+		th.74 : 1;
+	PRODUCE
+		hl.74 : 1;
+TRANSITION tl.[y=65]
+	CONSUME
+		fo.65 : 1,
+		th.65 : 1;
+	PRODUCE
+		hl.65 : 1;
+TRANSITION tl.[y=56]
+	CONSUME
+		fo.56 : 1,
+		th.56 : 1;
+	PRODUCE
+		hl.56 : 1;
+TRANSITION tl.[y=47]
+	CONSUME
+		fo.47 : 1,
+		th.47 : 1;
+	PRODUCE
+		hl.47 : 1;
+TRANSITION tl.[y=38]
+	CONSUME
+		fo.38 : 1,
+		th.38 : 1;
+	PRODUCE
+		hl.38 : 1;
+TRANSITION tl.[y=29]
+	CONSUME
+		fo.29 : 1,
+		th.29 : 1;
+	PRODUCE
+		hl.29 : 1;
+TRANSITION rr.[y=80]
+	CONSUME
+		hr.80 : 1;
+	PRODUCE
+		fo.81 : 1,
+		th.80 : 1;
+TRANSITION rr.[y=71]
+	CONSUME
+		hr.71 : 1;
+	PRODUCE
+		fo.72 : 1,
+		th.71 : 1;
+TRANSITION rr.[y=62]
+	CONSUME
+		hr.62 : 1;
+	PRODUCE
+		fo.63 : 1,
+		th.62 : 1;
+TRANSITION rr.[y=53]
+	CONSUME
+		hr.53 : 1;
+	PRODUCE
+		fo.54 : 1,
+		th.53 : 1;
+TRANSITION rr.[y=44]
+	CONSUME
+		hr.44 : 1;
+	PRODUCE
+		fo.45 : 1,
+		th.44 : 1;
+TRANSITION rr.[y=35]
+	CONSUME
+		hr.35 : 1;
+	PRODUCE
+		fo.36 : 1,
+		th.35 : 1;
+TRANSITION rr.[y=26]
+	CONSUME
+		hr.26 : 1;
+	PRODUCE
+		fo.27 : 1,
+		th.26 : 1;
+TRANSITION rr.[y=17]
+	CONSUME
+		hr.17 : 1;
+	PRODUCE
+		fo.18 : 1,
+		th.17 : 1;
+TRANSITION rl.[y=95]
+	CONSUME
+		ea.95 : 1;
+	PRODUCE
+		fo.95 : 1,
+		hr.95 : 1;
+TRANSITION rl.[y=86]
+	CONSUME
+		ea.86 : 1;
+	PRODUCE
+		fo.86 : 1,
+		hr.86 : 1;
+TRANSITION rl.[y=77]
+	CONSUME
+		ea.77 : 1;
+	PRODUCE
+		fo.77 : 1,
+		hr.77 : 1;
+TRANSITION rl.[y=68]
+	CONSUME
+		ea.68 : 1;
+	PRODUCE
+		fo.68 : 1,
+		hr.68 : 1;
+TRANSITION rl.[y=59]
+	CONSUME
+		ea.59 : 1;
+	PRODUCE
+		fo.59 : 1,
+		hr.59 : 1;
+TRANSITION tr.[y=60]
+	CONSUME
+		fo.61 : 1,
+		hl.60 : 1;
+	PRODUCE
+		ea.60 : 1;
+TRANSITION tr.[y=51]
+	CONSUME
+		fo.52 : 1,
+		hl.51 : 1;
+	PRODUCE
+		ea.51 : 1;
+TRANSITION tr.[y=42]
+	CONSUME
+		fo.43 : 1,
+		hl.42 : 1;
+	PRODUCE
+		ea.42 : 1;
+TRANSITION tr.[y=33]
+	CONSUME
+		fo.34 : 1,
+		hl.33 : 1;
+	PRODUCE
+		ea.33 : 1;
+TRANSITION tr.[y=24]
+	CONSUME
+		fo.25 : 1,
+		hl.24 : 1;
+	PRODUCE
+		ea.24 : 1;
+TRANSITION tr.[y=15]
+	CONSUME
+		fo.16 : 1,
+		hl.15 : 1;
+	PRODUCE
+		ea.15 : 1;
+TRANSITION tl.[y=93]
+	CONSUME
+		fo.93 : 1,
+		th.93 : 1;
+	PRODUCE
+		hl.93 : 1;
+TRANSITION tl.[y=84]
+	CONSUME
+		fo.84 : 1,
+		th.84 : 1;
+	PRODUCE
+		hl.84 : 1;
+TRANSITION tl.[y=75]
+	CONSUME
+		fo.75 : 1,
+		th.75 : 1;
+	PRODUCE
+		hl.75 : 1;
+TRANSITION tl.[y=66]
+	CONSUME
+		fo.66 : 1,
+		th.66 : 1;
+	PRODUCE
+		hl.66 : 1;
+TRANSITION tl.[y=57]
+	CONSUME
+		fo.57 : 1,
+		th.57 : 1;
+	PRODUCE
+		hl.57 : 1;
+TRANSITION tl.[y=48]
+	CONSUME
+		fo.48 : 1,
+		th.48 : 1;
+	PRODUCE
+		hl.48 : 1;
+TRANSITION tl.[y=39]
+	CONSUME
+		fo.39 : 1,
+		th.39 : 1;
+	PRODUCE
+		hl.39 : 1;
+TRANSITION rr.[y=90]
+	CONSUME
+		hr.90 : 1;
+	PRODUCE
+		fo.91 : 1,
+		th.90 : 1;
+TRANSITION rr.[y=81]
+	CONSUME
+		hr.81 : 1;
+	PRODUCE
+		fo.82 : 1,
+		th.81 : 1;
+TRANSITION rr.[y=72]
+	CONSUME
+		hr.72 : 1;
+	PRODUCE
+		fo.73 : 1,
+		th.72 : 1;
+TRANSITION rr.[y=63]
+	CONSUME
+		hr.63 : 1;
+	PRODUCE
+		fo.64 : 1,
+		th.63 : 1;
+TRANSITION rr.[y=54]
+	CONSUME
+		hr.54 : 1;
+	PRODUCE
+		fo.55 : 1,
+		th.54 : 1;
+TRANSITION rr.[y=45]
+	CONSUME
+		hr.45 : 1;
+	PRODUCE
+		fo.46 : 1,
+		th.45 : 1;
+TRANSITION rr.[y=36]
+	CONSUME
+		hr.36 : 1;
+	PRODUCE
+		fo.37 : 1,
+		th.36 : 1;
+TRANSITION rr.[y=27]
+	CONSUME
+		hr.27 : 1;
+	PRODUCE
+		fo.28 : 1,
+		th.27 : 1;
+TRANSITION rr.[y=18]
+	CONSUME
+		hr.18 : 1;
+	PRODUCE
+		fo.19 : 1,
+		th.18 : 1;
+TRANSITION rl.[y=96]
+	CONSUME
+		ea.96 : 1;
+	PRODUCE
+		fo.96 : 1,
+		hr.96 : 1;
+TRANSITION rl.[y=87]
+	CONSUME
+		ea.87 : 1;
+	PRODUCE
+		fo.87 : 1,
+		hr.87 : 1;
+TRANSITION rl.[y=78]
+	CONSUME
+		ea.78 : 1;
+	PRODUCE
+		fo.78 : 1,
+		hr.78 : 1;
+TRANSITION rl.[y=69]
+	CONSUME
+		ea.69 : 1;
+	PRODUCE
+		fo.69 : 1,
+		hr.69 : 1;
+TRANSITION tr.[y=70]
+	CONSUME
+		fo.71 : 1,
+		hl.70 : 1;
+	PRODUCE
+		ea.70 : 1;
+TRANSITION tr.[y=61]
+	CONSUME
+		fo.62 : 1,
+		hl.61 : 1;
+	PRODUCE
+		ea.61 : 1;
+TRANSITION tr.[y=52]
+	CONSUME
+		fo.53 : 1,
+		hl.52 : 1;
+	PRODUCE
+		ea.52 : 1;
+TRANSITION tr.[y=43]
+	CONSUME
+		fo.44 : 1,
+		hl.43 : 1;
+	PRODUCE
+		ea.43 : 1;
+TRANSITION tr.[y=34]
+	CONSUME
+		fo.35 : 1,
+		hl.34 : 1;
+	PRODUCE
+		ea.34 : 1;
+TRANSITION tr.[y=25]
+	CONSUME
+		fo.26 : 1,
+		hl.25 : 1;
+	PRODUCE
+		ea.25 : 1;
+TRANSITION tr.[y=16]
+	CONSUME
+		fo.17 : 1,
+		hl.16 : 1;
+	PRODUCE
+		ea.16 : 1;
+TRANSITION tl.[y=94]
+	CONSUME
+		fo.94 : 1,
+		th.94 : 1;
+	PRODUCE
+		hl.94 : 1;
+TRANSITION tl.[y=85]
+	CONSUME
+		fo.85 : 1,
+		th.85 : 1;
+	PRODUCE
+		hl.85 : 1;
+TRANSITION tl.[y=76]
+	CONSUME
+		fo.76 : 1,
+		th.76 : 1;
+	PRODUCE
+		hl.76 : 1;
+TRANSITION tl.[y=67]
+	CONSUME
+		fo.67 : 1,
+		th.67 : 1;
+	PRODUCE
+		hl.67 : 1;
+TRANSITION tl.[y=58]
+	CONSUME
+		fo.58 : 1,
+		th.58 : 1;
+	PRODUCE
+		hl.58 : 1;
+TRANSITION tl.[y=49]
+	CONSUME
+		fo.49 : 1,
+		th.49 : 1;
+	PRODUCE
+		hl.49 : 1;
+TRANSITION rr.[y=91]
+	CONSUME
+		hr.91 : 1;
+	PRODUCE
+		fo.92 : 1,
+		th.91 : 1;
+TRANSITION rr.[y=82]
+	CONSUME
+		hr.82 : 1;
+	PRODUCE
+		fo.83 : 1,
+		th.82 : 1;
+TRANSITION rr.[y=73]
+	CONSUME
+		hr.73 : 1;
+	PRODUCE
+		fo.74 : 1,
+		th.73 : 1;
+TRANSITION rr.[y=64]
+	CONSUME
+		hr.64 : 1;
+	PRODUCE
+		fo.65 : 1,
+		th.64 : 1;
+TRANSITION rr.[y=55]
+	CONSUME
+		hr.55 : 1;
+	PRODUCE
+		fo.56 : 1,
+		th.55 : 1;
+TRANSITION rr.[y=46]
+	CONSUME
+		hr.46 : 1;
+	PRODUCE
+		fo.47 : 1,
+		th.46 : 1;
+TRANSITION rr.[y=37]
+	CONSUME
+		hr.37 : 1;
+	PRODUCE
+		fo.38 : 1,
+		th.37 : 1;
+TRANSITION rr.[y=28]
+	CONSUME
+		hr.28 : 1;
+	PRODUCE
+		fo.29 : 1,
+		th.28 : 1;
+TRANSITION rr.[y=19]
+	CONSUME
+		hr.19 : 1;
+	PRODUCE
+		fo.20 : 1,
+		th.19 : 1;
+TRANSITION rl.[y=97]
+	CONSUME
+		ea.97 : 1;
+	PRODUCE
+		fo.97 : 1,
+		hr.97 : 1;
+TRANSITION rl.[y=88]
+	CONSUME
+		ea.88 : 1;
+	PRODUCE
+		fo.88 : 1,
+		hr.88 : 1;
+TRANSITION rl.[y=79]
+	CONSUME
+		ea.79 : 1;
+	PRODUCE
+		fo.79 : 1,
+		hr.79 : 1;
+TRANSITION tr.[y=80]
+	CONSUME
+		fo.81 : 1,
+		hl.80 : 1;
+	PRODUCE
+		ea.80 : 1;
+TRANSITION tr.[y=71]
+	CONSUME
+		fo.72 : 1,
+		hl.71 : 1;
+	PRODUCE
+		ea.71 : 1;
+TRANSITION tr.[y=62]
+	CONSUME
+		fo.63 : 1,
+		hl.62 : 1;
+	PRODUCE
+		ea.62 : 1;
+TRANSITION tr.[y=53]
+	CONSUME
+		fo.54 : 1,
+		hl.53 : 1;
+	PRODUCE
+		ea.53 : 1;
+TRANSITION tr.[y=44]
+	CONSUME
+		fo.45 : 1,
+		hl.44 : 1;
+	PRODUCE
+		ea.44 : 1;
+TRANSITION tr.[y=35]
+	CONSUME
+		fo.36 : 1,
+		hl.35 : 1;
+	PRODUCE
+		ea.35 : 1;
+TRANSITION tr.[y=26]
+	CONSUME
+		fo.27 : 1,
+		hl.26 : 1;
+	PRODUCE
+		ea.26 : 1;
+TRANSITION tr.[y=17]
+	CONSUME
+		fo.18 : 1,
+		hl.17 : 1;
+	PRODUCE
+		ea.17 : 1;
+TRANSITION tl.[y=95]
+	CONSUME
+		fo.95 : 1,
+		th.95 : 1;
+	PRODUCE
+		hl.95 : 1;
+TRANSITION tl.[y=86]
+	CONSUME
+		fo.86 : 1,
+		th.86 : 1;
+	PRODUCE
+		hl.86 : 1;
+TRANSITION tl.[y=77]
+	CONSUME
+		fo.77 : 1,
+		th.77 : 1;
+	PRODUCE
+		hl.77 : 1;
+TRANSITION tl.[y=68]
+	CONSUME
+		fo.68 : 1,
+		th.68 : 1;
+	PRODUCE
+		hl.68 : 1;
+TRANSITION tl.[y=59]
+	CONSUME
+		fo.59 : 1,
+		th.59 : 1;
+	PRODUCE
+		hl.59 : 1;
+TRANSITION rr.[y=92]
+	CONSUME
+		hr.92 : 1;
+	PRODUCE
+		fo.93 : 1,
+		th.92 : 1;
+TRANSITION rr.[y=83]
+	CONSUME
+		hr.83 : 1;
+	PRODUCE
+		fo.84 : 1,
+		th.83 : 1;
+TRANSITION rr.[y=74]
+	CONSUME
+		hr.74 : 1;
+	PRODUCE
+		fo.75 : 1,
+		th.74 : 1;
+TRANSITION rr.[y=65]
+	CONSUME
+		hr.65 : 1;
+	PRODUCE
+		fo.66 : 1,
+		th.65 : 1;
+TRANSITION rr.[y=56]
+	CONSUME
+		hr.56 : 1;
+	PRODUCE
+		fo.57 : 1,
+		th.56 : 1;
+TRANSITION rr.[y=47]
+	CONSUME
+		hr.47 : 1;
+	PRODUCE
+		fo.48 : 1,
+		th.47 : 1;
+TRANSITION rr.[y=38]
+	CONSUME
+		hr.38 : 1;
+	PRODUCE
+		fo.39 : 1,
+		th.38 : 1;
+TRANSITION rr.[y=29]
+	CONSUME
+		hr.29 : 1;
+	PRODUCE
+		fo.30 : 1,
+		th.29 : 1;
+TRANSITION rl.[y=98]
+	CONSUME
+		ea.98 : 1;
+	PRODUCE
+		fo.98 : 1,
+		hr.98 : 1;
+TRANSITION rl.[y=89]
+	CONSUME
+		ea.89 : 1;
+	PRODUCE
+		fo.89 : 1,
+		hr.89 : 1;
+TRANSITION tr.[y=90]
+	CONSUME
+		fo.91 : 1,
+		hl.90 : 1;
+	PRODUCE
+		ea.90 : 1;
+TRANSITION tr.[y=81]
+	CONSUME
+		fo.82 : 1,
+		hl.81 : 1;
+	PRODUCE
+		ea.81 : 1;
+TRANSITION tr.[y=72]
+	CONSUME
+		fo.73 : 1,
+		hl.72 : 1;
+	PRODUCE
+		ea.72 : 1;
+TRANSITION tr.[y=63]
+	CONSUME
+		fo.64 : 1,
+		hl.63 : 1;
+	PRODUCE
+		ea.63 : 1;
+TRANSITION tr.[y=54]
+	CONSUME
+		fo.55 : 1,
+		hl.54 : 1;
+	PRODUCE
+		ea.54 : 1;
+TRANSITION tr.[y=45]
+	CONSUME
+		fo.46 : 1,
+		hl.45 : 1;
+	PRODUCE
+		ea.45 : 1;
+TRANSITION tr.[y=36]
+	CONSUME
+		fo.37 : 1,
+		hl.36 : 1;
+	PRODUCE
+		ea.36 : 1;
+TRANSITION tr.[y=27]
+	CONSUME
+		fo.28 : 1,
+		hl.27 : 1;
+	PRODUCE
+		ea.27 : 1;
+TRANSITION tr.[y=18]
+	CONSUME
+		fo.19 : 1,
+		hl.18 : 1;
+	PRODUCE
+		ea.18 : 1;
+TRANSITION tl.[y=96]
+	CONSUME
+		fo.96 : 1,
+		th.96 : 1;
+	PRODUCE
+		hl.96 : 1;
+TRANSITION tl.[y=87]
+	CONSUME
+		fo.87 : 1,
+		th.87 : 1;
+	PRODUCE
+		hl.87 : 1;
+TRANSITION tl.[y=78]
+	CONSUME
+		fo.78 : 1,
+		th.78 : 1;
+	PRODUCE
+		hl.78 : 1;
+TRANSITION tl.[y=69]
+	CONSUME
+		fo.69 : 1,
+		th.69 : 1;
+	PRODUCE
+		hl.69 : 1;
+TRANSITION rr.[y=93]
+	CONSUME
+		hr.93 : 1;
+	PRODUCE
+		fo.94 : 1,
+		th.93 : 1;
+TRANSITION rr.[y=84]
+	CONSUME
+		hr.84 : 1;
+	PRODUCE
+		fo.85 : 1,
+		th.84 : 1;
+TRANSITION rr.[y=75]
+	CONSUME
+		hr.75 : 1;
+	PRODUCE
+		fo.76 : 1,
+		th.75 : 1;
+TRANSITION rr.[y=66]
+	CONSUME
+		hr.66 : 1;
+	PRODUCE
+		fo.67 : 1,
+		th.66 : 1;
+TRANSITION rr.[y=57]
+	CONSUME
+		hr.57 : 1;
+	PRODUCE
+		fo.58 : 1,
+		th.57 : 1;
+TRANSITION rr.[y=48]
+	CONSUME
+		hr.48 : 1;
+	PRODUCE
+		fo.49 : 1,
+		th.48 : 1;
+TRANSITION rr.[y=39]
+	CONSUME
+		hr.39 : 1;
+	PRODUCE
+		fo.40 : 1,
+		th.39 : 1;
+TRANSITION rl.[y=99]
+	CONSUME
+		ea.99 : 1;
+	PRODUCE
+		fo.99 : 1,
+		hr.99 : 1;
+TRANSITION tr.[y=91]
+	CONSUME
+		fo.92 : 1,
+		hl.91 : 1;
+	PRODUCE
+		ea.91 : 1;
+TRANSITION tr.[y=82]
+	CONSUME
+		fo.83 : 1,
+		hl.82 : 1;
+	PRODUCE
+		ea.82 : 1;
+TRANSITION tr.[y=73]
+	CONSUME
+		fo.74 : 1,
+		hl.73 : 1;
+	PRODUCE
+		ea.73 : 1;
+TRANSITION tr.[y=64]
+	CONSUME
+		fo.65 : 1,
+		hl.64 : 1;
+	PRODUCE
+		ea.64 : 1;
+TRANSITION tr.[y=55]
+	CONSUME
+		fo.56 : 1,
+		hl.55 : 1;
+	PRODUCE
+		ea.55 : 1;
+TRANSITION tr.[y=46]
+	CONSUME
+		fo.47 : 1,
+		hl.46 : 1;
+	PRODUCE
+		ea.46 : 1;
+TRANSITION tr.[y=37]
+	CONSUME
+		fo.38 : 1,
+		hl.37 : 1;
+	PRODUCE
+		ea.37 : 1;
+TRANSITION tr.[y=28]
+	CONSUME
+		fo.29 : 1,
+		hl.28 : 1;
+	PRODUCE
+		ea.28 : 1;
+TRANSITION tr.[y=19]
+	CONSUME
+		fo.20 : 1,
+		hl.19 : 1;
+	PRODUCE
+		ea.19 : 1;
+TRANSITION tl.[y=97]
+	CONSUME
+		fo.97 : 1,
+		th.97 : 1;
+	PRODUCE
+		hl.97 : 1;
+TRANSITION tl.[y=88]
+	CONSUME
+		fo.88 : 1,
+		th.88 : 1;
+	PRODUCE
+		hl.88 : 1;
+TRANSITION tl.[y=79]
+	CONSUME
+		fo.79 : 1,
+		th.79 : 1;
+	PRODUCE
+		hl.79 : 1;
+TRANSITION rr.[y=94]
+	CONSUME
+		hr.94 : 1;
+	PRODUCE
+		fo.95 : 1,
+		th.94 : 1;
+TRANSITION rr.[y=85]
+	CONSUME
+		hr.85 : 1;
+	PRODUCE
+		fo.86 : 1,
+		th.85 : 1;
+TRANSITION rr.[y=76]
+	CONSUME
+		hr.76 : 1;
+	PRODUCE
+		fo.77 : 1,
+		th.76 : 1;
+TRANSITION rr.[y=67]
+	CONSUME
+		hr.67 : 1;
+	PRODUCE
+		fo.68 : 1,
+		th.67 : 1;
+TRANSITION rr.[y=58]
+	CONSUME
+		hr.58 : 1;
+	PRODUCE
+		fo.59 : 1,
+		th.58 : 1;
+TRANSITION rr.[y=49]
+	CONSUME
+		hr.49 : 1;
+	PRODUCE
+		fo.50 : 1,
+		th.49 : 1;
+TRANSITION tr.[y=92]
+	CONSUME
+		fo.93 : 1,
+		hl.92 : 1;
+	PRODUCE
+		ea.92 : 1;
+TRANSITION tr.[y=83]
+	CONSUME
+		fo.84 : 1,
+		hl.83 : 1;
+	PRODUCE
+		ea.83 : 1;
+TRANSITION tr.[y=74]
+	CONSUME
+		fo.75 : 1,
+		hl.74 : 1;
+	PRODUCE
+		ea.74 : 1;
+TRANSITION tr.[y=65]
+	CONSUME
+		fo.66 : 1,
+		hl.65 : 1;
+	PRODUCE
+		ea.65 : 1;
+TRANSITION tr.[y=56]
+	CONSUME
+		fo.57 : 1,
+		hl.56 : 1;
+	PRODUCE
+		ea.56 : 1;
+TRANSITION tr.[y=47]
+	CONSUME
+		fo.48 : 1,
+		hl.47 : 1;
+	PRODUCE
+		ea.47 : 1;
+TRANSITION tr.[y=38]
+	CONSUME
+		fo.39 : 1,
+		hl.38 : 1;
+	PRODUCE
+		ea.38 : 1;
+TRANSITION tr.[y=29]
+	CONSUME
+		fo.30 : 1,
+		hl.29 : 1;
+	PRODUCE
+		ea.29 : 1;
+TRANSITION tl.[y=98]
+	CONSUME
+		fo.98 : 1,
+		th.98 : 1;
+	PRODUCE
+		hl.98 : 1;
+TRANSITION tl.[y=89]
+	CONSUME
+		fo.89 : 1,
+		th.89 : 1;
+	PRODUCE
+		hl.89 : 1;
+TRANSITION rr.[y=95]
+	CONSUME
+		hr.95 : 1;
+	PRODUCE
+		fo.96 : 1,
+		th.95 : 1;
+TRANSITION rr.[y=86]
+	CONSUME
+		hr.86 : 1;
+	PRODUCE
+		fo.87 : 1,
+		th.86 : 1;
+TRANSITION rr.[y=77]
+	CONSUME
+		hr.77 : 1;
+	PRODUCE
+		fo.78 : 1,
+		th.77 : 1;
+TRANSITION rr.[y=68]
+	CONSUME
+		hr.68 : 1;
+	PRODUCE
+		fo.69 : 1,
+		th.68 : 1;
+TRANSITION rr.[y=59]
+	CONSUME
+		hr.59 : 1;
+	PRODUCE
+		fo.60 : 1,
+		th.59 : 1;
+TRANSITION tr.[y=93]
+	CONSUME
+		fo.94 : 1,
+		hl.93 : 1;
+	PRODUCE
+		ea.93 : 1;
+TRANSITION tr.[y=84]
+	CONSUME
+		fo.85 : 1,
+		hl.84 : 1;
+	PRODUCE
+		ea.84 : 1;
+TRANSITION tr.[y=75]
+	CONSUME
+		fo.76 : 1,
+		hl.75 : 1;
+	PRODUCE
+		ea.75 : 1;
+TRANSITION tr.[y=66]
+	CONSUME
+		fo.67 : 1,
+		hl.66 : 1;
+	PRODUCE
+		ea.66 : 1;
+TRANSITION tr.[y=57]
+	CONSUME
+		fo.58 : 1,
+		hl.57 : 1;
+	PRODUCE
+		ea.57 : 1;
+TRANSITION tr.[y=48]
+	CONSUME
+		fo.49 : 1,
+		hl.48 : 1;
+	PRODUCE
+		ea.48 : 1;
+TRANSITION tr.[y=39]
+	CONSUME
+		fo.40 : 1,
+		hl.39 : 1;
+	PRODUCE
+		ea.39 : 1;
+TRANSITION tl.[y=99]
+	CONSUME
+		fo.99 : 1,
+		th.99 : 1;
+	PRODUCE
+		hl.99 : 1;
+TRANSITION rr.[y=96]
+	CONSUME
+		hr.96 : 1;
+	PRODUCE
+		fo.97 : 1,
+		th.96 : 1;
+TRANSITION rr.[y=87]
+	CONSUME
+		hr.87 : 1;
+	PRODUCE
+		fo.88 : 1,
+		th.87 : 1;
+TRANSITION rr.[y=78]
+	CONSUME
+		hr.78 : 1;
+	PRODUCE
+		fo.79 : 1,
+		th.78 : 1;
+TRANSITION rr.[y=69]
+	CONSUME
+		hr.69 : 1;
+	PRODUCE
+		fo.70 : 1,
+		th.69 : 1;
+TRANSITION tr.[y=94]
+	CONSUME
+		fo.95 : 1,
+		hl.94 : 1;
+	PRODUCE
+		ea.94 : 1;
+TRANSITION tr.[y=85]
+	CONSUME
+		fo.86 : 1,
+		hl.85 : 1;
+	PRODUCE
+		ea.85 : 1;
+TRANSITION tr.[y=76]
+	CONSUME
+		fo.77 : 1,
+		hl.76 : 1;
+	PRODUCE
+		ea.76 : 1;
+TRANSITION tr.[y=67]
+	CONSUME
+		fo.68 : 1,
+		hl.67 : 1;
+	PRODUCE
+		ea.67 : 1;
+TRANSITION tr.[y=58]
+	CONSUME
+		fo.59 : 1,
+		hl.58 : 1;
+	PRODUCE
+		ea.58 : 1;
+TRANSITION tr.[y=49]
+	CONSUME
+		fo.50 : 1,
+		hl.49 : 1;
+	PRODUCE
+		ea.49 : 1;
+TRANSITION rr.[y=97]
+	CONSUME
+		hr.97 : 1;
+	PRODUCE
+		fo.98 : 1,
+		th.97 : 1;
+TRANSITION rr.[y=88]
+	CONSUME
+		hr.88 : 1;
+	PRODUCE
+		fo.89 : 1,
+		th.88 : 1;
+TRANSITION rr.[y=79]
+	CONSUME
+		hr.79 : 1;
+	PRODUCE
+		fo.80 : 1,
+		th.79 : 1;
+TRANSITION tr.[y=95]
+	CONSUME
+		fo.96 : 1,
+		hl.95 : 1;
+	PRODUCE
+		ea.95 : 1;
+TRANSITION tr.[y=86]
+	CONSUME
+		fo.87 : 1,
+		hl.86 : 1;
+	PRODUCE
+		ea.86 : 1;
+TRANSITION tr.[y=77]
+	CONSUME
+		fo.78 : 1,
+		hl.77 : 1;
+	PRODUCE
+		ea.77 : 1;
+TRANSITION tr.[y=68]
+	CONSUME
+		fo.69 : 1,
+		hl.68 : 1;
+	PRODUCE
+		ea.68 : 1;
+TRANSITION tr.[y=59]
+	CONSUME
+		fo.60 : 1,
+		hl.59 : 1;
+	PRODUCE
+		ea.59 : 1;
+TRANSITION rr.[y=98]
+	CONSUME
+		hr.98 : 1;
+	PRODUCE
+		fo.99 : 1,
+		th.98 : 1;
+TRANSITION rr.[y=89]
+	CONSUME
+		hr.89 : 1;
+	PRODUCE
+		fo.90 : 1,
+		th.89 : 1;
+TRANSITION tr.[y=96]
+	CONSUME
+		fo.97 : 1,
+		hl.96 : 1;
+	PRODUCE
+		ea.96 : 1;
+TRANSITION tr.[y=87]
+	CONSUME
+		fo.88 : 1,
+		hl.87 : 1;
+	PRODUCE
+		ea.87 : 1;
+TRANSITION tr.[y=78]
+	CONSUME
+		fo.79 : 1,
+		hl.78 : 1;
+	PRODUCE
+		ea.78 : 1;
+TRANSITION tr.[y=69]
+	CONSUME
+		fo.70 : 1,
+		hl.69 : 1;
+	PRODUCE
+		ea.69 : 1;
+TRANSITION rr.[y=99]
+	CONSUME
+		hr.99 : 1;
+	PRODUCE
+		fo.100 : 1,
+		th.99 : 1;
+TRANSITION tr.[y=97]
+	CONSUME
+		fo.98 : 1,
+		hl.97 : 1;
+	PRODUCE
+		ea.97 : 1;
+TRANSITION tr.[y=88]
+	CONSUME
+		fo.89 : 1,
+		hl.88 : 1;
+	PRODUCE
+		ea.88 : 1;
+TRANSITION tr.[y=79]
+	CONSUME
+		fo.80 : 1,
+		hl.79 : 1;
+	PRODUCE
+		ea.79 : 1;
+TRANSITION tr.[y=98]
+	CONSUME
+		fo.99 : 1,
+		hl.98 : 1;
+	PRODUCE
+		ea.98 : 1;
+TRANSITION tr.[y=89]
+	CONSUME
+		fo.90 : 1,
+		hl.89 : 1;
+	PRODUCE
+		ea.89 : 1;
+TRANSITION tr.[y=99]
+	CONSUME
+		fo.100 : 1,
+		hl.99 : 1;
+	PRODUCE
+		ea.99 : 1;
+TRANSITION rl.[y=100]
+	CONSUME
+		ea.100 : 1;
+	PRODUCE
+		fo.100 : 1,
+		hr.100 : 1;
+TRANSITION tl.[y=100]
+	CONSUME
+		fo.100 : 1,
+		th.100 : 1;
+	PRODUCE
+		hl.100 : 1;
+TRANSITION rr.[y=100]
+	CONSUME
+		hr.100 : 1;
+	PRODUCE
+		fo.1 : 1,
+		th.100 : 1;
+TRANSITION tr.[y=100]
+	CONSUME
+		fo.1 : 1,
+		hl.100 : 1;
+	PRODUCE
+		ea.100 : 1;

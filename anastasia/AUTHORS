@@ -1,0 +1,35 @@
+			    ___                     _            _
+			   / _ \   _ __   __ _ ___ | |  __ _ ___(_) __ _
+			  / /_\ \ | '_ \ / _` / __|_ _|/ _` / __| |/ _` |
+			 / _____ \| | | | (_| \__ \| || (_| \__ \ | (_| |
+			/_/     \_|_| |_|\__,_|___/\__|\__,_|___/_|\__,_|
+		Anastasia -- ANAlyzer for Siphons and TrApS In Arbitrary nets
+		http://service-technology.org/anastasia
+
+
+COPYRIGHT
+    Copyright (c) 2010 Harro Wimmel
+
+
+AUTHORS
+    <<-- CHANGE START (authors) -->>
+    Harro Wimmel
+        implemented everything so far
+    <<-- CHANGE END -->>
+
+
+MAINTAINER
+    Anastasia is maintained by Harro Wimmel.
+
+
+CONTACT
+    <<-- CHANGE START (contact Information) -->>
+    Harro Wimmel
+    Institut fuer Informatik
+    Lehrstuhl Programmiersprachen & Programmierung
+    Universitaet Rostock
+    D-18057 Rostock
+
+    <<-- CHANGE END -->>
+    WWW:  http://service-technology.org/anastasia
+    E-Mail:  anastasia@service-technology.org

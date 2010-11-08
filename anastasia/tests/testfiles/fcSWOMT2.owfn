@@ -1,0 +1,66 @@
+
+PLACE
+  INTERNAL
+    psl1, psl2, psle, ptl1, ptl2, ptle, psr1, psr2, psre, ptr1, ptr2, ptre;
+
+INITIALMARKING
+    psl1:1, psr1:1, psle:1, psre:1;
+
+NOFINALMARKING
+
+TRANSITION tsl0
+	CONSUME psl1;
+	PRODUCE ;
+
+TRANSITION tsl1
+	CONSUME psl1;
+	PRODUCE psl2;
+
+TRANSITION tslt
+	CONSUME psl2;
+	PRODUCE psl1,ptl2;
+
+TRANSITION tsle
+	CONSUME psl2;
+	PRODUCE psl1,psle;
+
+TRANSITION ttl1
+	CONSUME ptl1;
+	PRODUCE ptl2,psl2;
+
+TRANSITION ttl2
+	CONSUME ptl2;
+	PRODUCE ptl1,ptle;
+
+TRANSITION tle
+	CONSUME psle,ptre;
+	PRODUCE psl1,ptre;
+
+TRANSITION tsr0
+	CONSUME psr1;
+	PRODUCE ;
+
+TRANSITION tsr1
+	CONSUME psr1;
+	PRODUCE psr2;
+
+TRANSITION tsrt
+	CONSUME psr2;
+	PRODUCE psr1,ptr2;
+
+TRANSITION tsre
+	CONSUME psr2;
+	PRODUCE psr1,psre;
+
+TRANSITION ttr1
+	CONSUME ptr1;
+	PRODUCE ptr2,psr2;
+
+TRANSITION ttr2
+	CONSUME ptr2;
+	PRODUCE ptr1,ptre;
+
+TRANSITION tre
+	CONSUME psre,ptle;
+	PRODUCE psr1,ptle;
+

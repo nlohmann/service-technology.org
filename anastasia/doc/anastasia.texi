@@ -1,0 +1,622 @@
+\input texinfo
+@setfilename anastasia.info
+@include version.texi
+@afourpaper
+@finalout
+@settitle Anastasia User's Manual
+
+
+@c --------------------------------------------------------------------------
+
+
+@copying
+@b{About this document:}
+
+This manual is for Anastasia, version @value{VERSION}, a tool for computing traps, siphons, and their combination, last updated @value{UPDATED}.
+
+Copyright @copyright{} 2010 Harro Wimmel
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify this GNU Manual. Buying copies from GNU Press supports the FSF in developing GNU and promoting software freedom.''
+@end quotation
+@end copying
+
+@dircategory service-technology.org
+@direntry
+* Anastasia: (anastasia).       A tool for computing traps, siphons, and their combination.
+@end direntry
+
+
+@c --------------------------------------------------------------------------
+
+
+@titlepage
+
+@title Anastasia
+
+@subtitle Computing Traps, Siphons, and more
+@subtitle @url{http://service-technology.org/anastasia}
+@vskip 0.5em
+@subtitle Version @value{VERSION}, @value{UPDATED}
+
+@author Harro Wimmel
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+
+@c --------------------------------------------------------------------------
+
+
+@ifnottex
+@node Top
+@top Anastasia
+@insertcopying
+@end ifnottex
+
+
+@c --------------------------------------------------------------------------
+
+
+@menu
+* First Steps::How to set up and install Anastasia.
+* Command Line Options::How to run Anastasia.
+* Theory::The theory behind Anastasia.
+* Exit and Error Codes::What the error and exit codes of Anastasia mean.
+* ChangeLog::Version history.
+* GNU Free Documentation License::The license of this manual.
+@end menu
+
+@c --------------------------------------------------------------------------
+
+
+@contents
+@paragraphindent none
+
+
+@c --------------------------------------------------------------------------
+
+
+@node First Steps
+@chapter First Steps
+@section Setup and Installation
+
+@enumerate
+@item Go to @url{http://service-technology.org/files/anastasia} and download the latest release version of Anastasia, say @file{anastasia-@value{VERSION}.tar.gz}. To setup and compile Anastasia, change into your download directory and type
+
+@cartouche
+@smallexample
+tar xfz anastasia-@value{VERSION}.tar.gz
+cd anastasia-@value{VERSION}
+./configure
+make
+@end smallexample
+@end cartouche
+
+After compilation, a binary @samp{src/anastasia} is generated.@footnote{On Microsoft Windows, the file will be called @file{anastasia.exe}.} If you experience any compiler warnings, don't panic: Anastasia contains some generated or third party code that we cannot influence.
+
+@item To test whether everything went fine, type
+
+@cartouche
+@smallexample
+make check
+@end smallexample
+@end cartouche
+
+to execute the testcases located in @file{tests}. If everything went fine, you should see something like:
+
+@smallexample
+## ------------- ##
+## Test results. ##
+## ------------- ##
+
+All 40 tests were successful.
+@end smallexample
+
+If an error occurs, please send the output to @email{anastasia@@service-technology.org}.
+
+@item To install the binary, the manpage, and the documentation, type
+
+@cartouche
+@smallexample
+make install
+@end smallexample
+@end cartouche
+
+You might need superuser permissions to do so.
+@end enumerate
+
+If you need any further information, see file @file{INSTALL} for detailed instructions.
+
+
+@section Contents of the Distribution
+
+The distribution contains several directories:
+
+@table @file
+@item doc
+The Texinfo documentation of Anastasia. The documentation can be created using @samp{make pdf}. Note you need to have Anastasia properly installed before (see installation description above).
+
+@item libs
+The Petri Net @acronym{API} used by Anastasia to parse and organize Petri nets.
+
+@item man
+The manpage of Anastasia which can be displayed using @samp{man anastasia} after having Anastasia installed (see installation description above).
+
+@item src
+The source code of Anastasia.
+
+@item tests
+Testcases for Anastasia which check the generated binary.
+@end table
+
+
+@c --------------------------------------------------------------------------
+
+
+@section Requirements
+@anchor{Requirements}
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+In order to run, compile, and develop Anastasia, several tools are required.
+
+@c <<-- CHANGE START (tools required, etc.) -->>
+
+@subsection Runtime
+@itemize
+@item At the moment, no other tools are required.
+@end itemize
+
+@c <<-- CHANGE END -->>
+
+@subsection Compilation
+To compile the source code from a source distribution, the following tools are required.
+
+@itemize
+@item GCC (@url{http://gcc.gnu.org/})
+@item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/})
+@end itemize
+
+
+@subsection Development
+In case you want to make changes to the source code, the following tools are required to reconfigure and compile Anastasia.
+
+@itemize
+@item Autoconf, @url{http://www.gnu.org/software/autoconf/}
+@item Automake, @url{http://www.gnu.org/software/automake/}
+@item Bison, @url{http://www.gnu.org/software/bison/}
+@item flex, @url{http://flex.sourceforge.net/}
+@item Gengetopt, @url{http://www.gnu.org/software/gengetopt/}
+@item help2man, @url{http://www.gnu.org/software/help2man/}
+@item Texinfo, @url{http://www.gnu.org/software/texinfo/}
+@end itemize
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Please check our nightly build server at @url{http://service-technology.org/nightly} for the versions we use during development.
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Command Line Options
+@chapter Invoking Anastasia
+
+Anastasia is a command line tool and does not come with a fancy @acronym{GUI}. However, Anastasia can be easily scripted and combined with other tools.
+
+@section Command Line Options
+
+For an overview of the command line options, type @samp{anastasia -h} to see the following help screen:
+
+@smallexample
+@verbatiminclude cmdline.out
+@end smallexample
+
+
+@section Configuration Files
+
+The parameters can also be controlled using a configuration file that can be read using the @samp{config} option; for example:
+
+@cartouche
+@smallexample
+anastasia net.owfn --config=myconf.conf
+@end smallexample
+@end cartouche
+
+A configuration file consists of @code{parameter = value} lines, each line setting the value of a parameter. Note: If not all parameters are defined, the standard values apply.
+
+The configure script creates a default configuration file @file{anastasia.conf} which located in the @file{src} folder. When installing Anastasia, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
+
+When Anastasia is executed, it evaluates parameters as follows:
+@enumerate
+@item When a configuration file is given via @option{--config}, it is used.
+@item Otherwise, the configuration file @file{anastasia.conf} in the local directory is used if present.
+@item Otherwise, the configuration file @file{anastasia.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
+@item Otherwise, no configuration file is used.
+@end enumerate
+Parameters given via command-line will overwrite parameters given via configuration files.
+
+@section Input
+
+Anastasia reads a Petri net from standard input unless a filename is given on the command-line.
+The Petri net may be in various formats, so Anastasia needs to know which format the Petri net is in.
+There are three possibilities at the moment:
+
+@cartouche
+@smallexample
+anastasia --owfn
+anastasia --lola
+anastasia --pnml
+@end smallexample
+@end cartouche
+
+The option @option{--owfn} assumes the Petri net to be in the open net format, the option @option{--lola}
+takes the Petri net to be in the low-level LoLA format, and @option{--pnml} uses the PNML format for input.
+By default, Petri nets are assumed to be in PNML format.
+
+@section Output
+
+By default, Anastasia prints out a set of places with a given property to standard output. The places are
+printed on a single line separated by blanks. The property is stated in a line above the places.
+Alternate formats will be implemented if necessary. At the moment, output can be formatted for the
+tool Snoopy by specifying the option @option{--snoopy}.
+
+There is no output to file at this time, use the shell redirection mechanism if file output is required.
+
+@section Checkable Properties
+
+The properties the set of places finally printed to standard output should have can be specified by the
+following options:
+
+@cartouche
+@smallexample
+anastasia --siphon 	  The set should be a non-empty siphon.
+anastasia --usiphon   The set should be a non-empty, unmarked siphon.
+anastasia --msiphon   The set should be a marked siphon.
+anastasia --trap      The set should be a non-empty trap.
+anastasia --usiphon   The set should be a non-empty, unmarked trap.
+anastasia --msiphon   The set should be a marked trap.
+anastasia --swot      The set should be a non-empty siphon not containing any trap.
+anastasia --swomt     The set should be a non-empty siphon not containing a marked trap.
+anastasia --formula   The resulting set will be derived from a user-defined formula.
+@end smallexample
+@end cartouche
+
+The option @option{--swomt} is the negation of the well-known Commoner-Hack property for liveness
+in free choice Petri nets. Only one property can (and must) be selected. Anastasia will output
+one set of places having that property, if such a set exists, or tell the user that such a set
+does not exist. Selecting a different output format may suppress some information.
+
+@section User-defined Properties
+
+The user may store formulae in files and ask Anastasia to read and use them with the option @option{--formula=FILENAME}.
+A valid formulation for a siphon not containing a marked trap would be
+
+@cartouche
+@smallexample
+This is the Commoner-Hack property (negated).
+FORMULA(X,Y):
+Siphon(X), Nonempty(X), MaxTrap(X,Y), Unmarked(Y);
+@end smallexample
+@end cartouche
+
+Everything before the keyword @samp{FORMULA} and after the first semicolon following @samp{FORMULA} is treated as comment.
+@samp{FORMULA} is followed by a list of set variable names (at least one set variable is required) that control
+the output of Anastasia. For all variables listed here, Anastasia will print the satisfying assignment (if one
+exists). Modifiers (see the following section) apply to the first variable only -- this is the main variable
+of the formula. Independently of this list, other set variables and even special boolean variables may appear
+in the body of the formula.
+
+The body of a formula consists of a comma separated list of clauses, all of which must be satisfied.
+Clauses are formulated with the help of two kinds of variables: set variables and boolean variables.
+Set variables range over the places of the Petri net, i.e. each place is annotated with a truth value,
+where the value true means that the place belongs to this variable.
+The first character of a set variable must be an uppercase letter, the first character of a boolean
+variable has to be a lowercase letter. Variable names should not contain @samp{,;()} or blanks. In the following
+examples the set variable names @samp{X} and @samp{Y}, the boolean variable name @samp{x}, and the boolean literals @samp{a}, @samp{b}, and @samp{c} will appear,
+but those can be exchanged by any other valid indentifier for such things. Boolean literals are either
+boolean variables or negated boolean variables, the latter denoted by a minus sign in front of the variable name.
+Clauses come in four flavors:
+
+@cartouche
+@smallexample
+ForcedSet: Siphon(X), Trap(X), MaxTrap(X,Y), Empty(X), Nonempty(X), Marked(X), Unmarked(X), 
+           Subset(X,Y)
+EquiSet: x<->Siphon(X), x<->Trap(X), x<->MaxTrap(X), x<->Empty(X), x<->Marked(X), x<->Subset(X)
+BoolExp: x<->a op b, x<->AND a b c, x<->OR a b c; with op being one of: and,or,->,<->
+Literal: x, -x.
+@end smallexample
+@end cartouche
+
+The clauses of the @samp{ForcedSet} demand that the mentioned set variables have the named properties, i.e.
+that @samp{X} is a siphon for @samp{Siphon(X)}, that @samp{Y} is the maximal trap in @samp{X} for @samp{MaxTrap(X,Y)}, or that @samp{X} is a
+subset (or equal to) @samp{Y} for @samp{Subset(X,Y)}. @samp{Nonempty(X)} and @samp{Empty(X)} means that @samp{X}
+should contain a place or not, @samp{Marked(X)} and @samp{Unmarked(X)} means that at least one place in @samp{X}
+should contain a token in the initial marking of the Petri net, or not.
+
+Clauses of the @samp{EquiSet} will declare a boolean variable that becomes true if and only if the named property is true.
+Boolean variables may not be declared twice, i.e. you need to use a different name for each boolean variable introduced
+this way. If you use a clause of @samp{EquiSet} you should make sure that the truth value of at least one side of the
+clause has a fixed truth value (at least by logical deduction), otherwise Anastasia might make a wild (and possibly wrong) guess.
+
+To combine the clauses of @samp{EquiSet}, the clauses of @samp{BoolExp} are used. Each of these clauses also defines a new 
+boolean variable that is equivalent to the expression on the right hand side of the @samp{<->} sign (standing for
+equivalence, of course. Other allowed operators are logical @samp{and}, @samp{or}, and the implication @samp{->}). The big variants
+@samp{AND} and @samp{OR} allow for more than two literals to be combined by the same clause, otherwise they do the same
+as the normal @samp{and} and @samp{or}.
+
+Finally, at some point, it can be necessary to fix the values of a boolean variable. This is done by putting
+such a variable alone into a clause, with a leading minus if the variable should be set to false.
+
+The Commoner-Hack property can therefore also be expressed as 
+@cartouche
+@smallexample
+This is the Commoner-Hack property (negated).
+FORMULA(X,Y):
+s<->Siphon(X), 
+n<->Nonempty(X), 
+m<->MaxTrap(X,Y), 
+u<->Unmarked(Y),
+x<->AND s n m u,
+x;
+@end smallexample
+@end cartouche
+Since the @samp{EquiSet} clauses are usually more involved than the @samp{ForcedSet} clauses, the latter usually have a better runtime
+and are to be preferred. If you need @samp{X} to be a non-siphon on the other hand, there is no way around @samp{EquiSet} at the moment.
+Note that replacing @samp{x} with its negation @samp{-x} in the last clause will not be the positive formulation of the
+Commoner-Hack property. Instead, it will allow Anastasia to choose, e.g., the empty set for @samp{X} independently of whether
+the Commoner-Hack property holds or not. This results from the fact that there is an implicit existential quantifier
+over @samp{X} and @samp{Y} in front of the formula.
+
+@section Modifiers for Properties
+
+Any property (even a user-defined one) can be modified in four ways:
+@enumerate
+@item By naming places that must or must not be in the final output.
+@item By minimizing or maximizing the final output (with the property still holding).
+@item By computing a covering set. For each place that may appear in a final output, one such output will be generated.
+@item By selecting the property as is. Nothing else will be done. (No modification)
+@end enumerate
+
+Places may be enforced by the option @option{--include} which can be used multiple times. Each place given with this option will appear in the final output. If the included places cannot be contained in a set having the desired property, Anastasia will state that such a set does not exist.
+Places may also be forbidden by the option @option{--exclude}. The same rules as for @option{--include} apply. If a place is specified with both options, no set can fulfill the given property.
+
+If minimizing or maximizing is selected by the option @option{--min} or @option{--max}, the resulting set of places is checked before it is printed.
+If places can be added to (when maximizing) or removed from (when minimizing) the result without violating the property, this is done. The result is
+printed when no more places can be added resp. removed, i.e. when the set is maximal or minimal.
+The options @option{--include} and @option{--exclude} are respected though, that is, an included place cannot be removed and an excluded place cannot be added.
+
+For computing a covering set of solutions containing all the places of the net (if possible), select the option @option{--cover}.
+While this option can be combined with any of the beforementioned options there is one that may destroy the covering set property.
+If one selects @option{--min}, any result will be minimized afterwards, potentially removing the place which should be covered
+by this result. As an alternative, the option @option{--pmin} will respect the place to be covered and put it into the include set
+before minimizing. The option @option{--pmin} is only meaningful when @option{--cover} is specified.
+When the covering set of results is printed, each result will be precluded by the set of places which are meant to be covered by this result.
+After all results have been shown, a list of all places that could not be covered is also given.
+
+Finally, by selecting none of the above modifiers, one can obtain a set of places satisfying the unmodified property.
+
+@section Finding a Witness against Liveness in Free-Choice nets
+
+Any single result obtained from Anastasia can be forwarded to a non-liveness checker by selecting the option @option{--nonlive}, but some
+conditions must be met for this to work:
+@enumerate
+@item The Petri net must be a free-choice net, i.e. transitions with a common preplace have to have the same preset.
+@item The result obtained so far must be a siphon without a marked trap. It does not matter if it was produced by the
+      option @option{--swomt} as long as it IS such a siphon. A user defined formula is ok as well.
+@item If the option @option{cover} was given, only the first result is taken.
+@end enumerate
+
+Anastasia will then try to find a siphon (possibly the given one, but maybe not) and a firing sequence after which
+the siphon has been emptied so far that no transition in the postset of the siphon can ever fire again. The siphon
+thus forms a partial deadlock since transitions not directly connected with the siphon might still be able to fire.
+
+@section Debugging
+
+Besides the option @option{--verbose} which will e.g. print out a message when a formula has been constructed and when it has been solved, including
+the elapsed time, it is also possible to print all the clauses of the constructed boolean CNF-formula. Though we have tried to give speaking names
+to the occurring variables, it is virtually impossible to understand the clauses without inside knowledge. Just note that there are set variables
+X, Y, and some others which are extended by place names to something like X:p representing a boolean variable for ``place p occurs in X''. Negation
+is expressed by a leading minus sign. Variables without a colon are simple boolean variables. The set variable X always represents the selected
+property, and, if Y is present, it often represents a maximal trap inside X (depending on the property, of course).
+If you would like to see the clauses, use the option @option{--clauses} and add the name of a file which the clauses should be printed to.
+
+@c --------------------------------------------------------------------------
+
+
+@node Theory
+@chapter Theory
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Anastasia implements several algorithms and result published in several scientific articles.
+
+@c <<-- CHANGE START (theory) -->>
+
+@section <<-- THEORY -->>
+
+@subsubheading <<-- THEORY -->>
+
+@quotation
+<<-- THEORY -->>
+@end quotation
+
+@c <<-- CHANGE END -->>
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+See @url{http://service-technology.org/publications} for more information.
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Exit and Error Codes
+@chapter Exit and Error Codes
+@section Exit Codes
+
+Anastasia will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input Petri net could be read. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+
+@section Error Codes
+
+In case any error occurs, Anastasia aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
+
+@table @asis
+
+@c <<-- CHANGE START (exit/error codes) -->>
+
+@item #01
+The given filename for the Petri net file is not accessible or does not exist.
+
+@smallexample
+@cartouche
+anastasia: could not open file 'PETRINET' -- aborting [#01]
+@end cartouche
+@end smallexample
+
+@item #02
+The given Petri net file could not be interpreted correctly. Check the format options.
+
+@smallexample
+@cartouche
+anastasia: <varying error message from the parser> -- aborting [#02]
+@end cartouche
+@end smallexample
+
+@item #04
+More than one input file appears on the command line.
+
+@smallexample
+@cartouche
+anastasia: at most one input file must be given -- aborting [#04]
+@end cartouche
+@end smallexample
+
+@item #05
+The given formula file could not be interpreted correctly. Check the file for a syntax error.
+
+@smallexample
+@cartouche
+anastasia: error while parsing the user-defined formula -- aborting [#05]
+@end cartouche
+@end smallexample
+
+@item #06
+The file given with the option @option{--clauses} is inaccessible.
+
+@smallexample
+@cartouche
+anastasia: error while writing clause to file 'FILENAME' -- aborting [#06]
+@end cartouche
+@end smallexample
+
+@item #07
+Some option given on the command line is not allowed.
+
+@smallexample
+@cartouche
+anastasia: invalid command-line parameter(s) -- aborting [#07]
+@end cartouche
+@end smallexample
+
+@item #08
+A boolean variable in the user-defined formula appears as RVALUE
+before it appears as LVALUE. The first occurrence of each boolean variable
+must be at the beginning of a clause (clauses are comma-separated texts).
+Clauses consisting of just one variable count as RVALUE.
+
+@smallexample
+@cartouche
+anastasia: boolean variable 'NAME' has not been declared -- aborting [#08]
+@end cartouche
+@end smallexample
+
+@item #09
+A boolean variable in the user-defined formula appears twice as LVALUE,
+i.e. as the leftmost entry in a clause (clauses consisting of just one
+variable do not count here).
+
+@smallexample
+@cartouche
+anastasia: boolean variable 'NAME' has been redeclared -- aborting [#09]
+@end cartouche
+@end smallexample
+
+@item #11
+This is a bug.
+
+@smallexample
+@cartouche
+anastasia: could not write to file 'FILENAME' -- aborting [#11]
+@end cartouche
+@end smallexample
+
+@item #13
+A temporary file could not be created. As temporary files are not used at the moment, this is a bug.
+
+@smallexample
+@cartouche
+anastasia: could not create to temporary file 'FILENAME' -- aborting [#13]
+@end cartouche
+@end smallexample
+
+@item #14
+The configuration file is missing or cannot be interpreted.
+
+@smallexample
+@cartouche
+anastasia: error reading configuration file 'FILENAME' -- aborting [#14]
+@end cartouche
+@end smallexample
+
+@item #20
+A check for non-liveness of a free-choice net failed because the net is not free-choice.
+
+@smallexample
+@cartouche
+anastasia: Petri net is not free-choice -- aborting [#20]
+@end cartouche
+@end smallexample
+
+@item #21
+A check for non-liveness of a free-choice net failed because the starting set is not a siphon with an unmarked maximal trap.
+
+@smallexample
+@cartouche
+anastasia: not a siphon without marked trap -- aborting [#21]
+@end cartouche
+@end smallexample
+
+@c <<-- CHANGE END -->>
+
+@end table
+
+
+@c --------------------------------------------------------------------------
+
+
+@node ChangeLog
+@chapter Version History
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Anastasia is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or non-trivial changes have summed up, a new version is published. Though these releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+
+@include ChangeLog.texi
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+The most recent change log is available at Anastasia's website at @url{http://service-technology.org/files/anastasia/ChangeLog}.
+
+
+@c --------------------------------------------------------------------------
+
+@node GNU Free Documentation License
+@appendix The GNU Free Documentation License
+
+@include fdl.texi
+
+@bye

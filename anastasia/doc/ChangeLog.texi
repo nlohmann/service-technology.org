@@ -1,0 +1,15 @@
+@c <<-- CHANGE START (version information) -->>
+
+@heading Version 1.0-unreleased (25 October 2010)
+@itemize
+@item First version of Anastasia
+
+@item Computes siphons, traps, and their combinations.
+
+@item Allows to enforce or forbid places and to minimize or maximize the result.
+
+@item Allows to compute a set of results covering all coverable places.
+@end itemize
+
+@heading Version 0.0-unreleased (25 October 2010)
+@c <<-- CHANGE END -->>

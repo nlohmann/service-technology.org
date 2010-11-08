@@ -1,0 +1,622 @@
+PLACE
+	ea.1,
+	ea.2,
+	ea.3,
+	ea.4,
+	ea.5,
+	ea.6,
+	ea.7,
+	ea.8,
+	ea.9,
+	hl.1,
+	fo.1,
+	hl.2,
+	fo.2,
+	hl.3,
+	fo.3,
+	hl.4,
+	fo.4,
+	hl.5,
+	fo.5,
+	hl.6,
+	fo.6,
+	fo.19,
+	hl.7,
+	fo.7,
+	hl.19,
+	hl.8,
+	fo.8,
+	fo.18,
+	hl.9,
+	hl.18,
+	fo.9,
+	fo.17,
+	hl.17,
+	fo.16,
+	hl.16,
+	fo.15,
+	hl.15,
+	fo.14,
+	hl.14,
+	fo.13,
+	hl.13,
+	hr.9,
+	fo.12,
+	hl.12,
+	fo.11,
+	ea.10,
+	ea.20,
+	ea.11,
+	ea.12,
+	ea.13,
+	ea.14,
+	ea.15,
+	ea.16,
+	ea.17,
+	ea.18,
+	ea.19,
+	hl.10,
+	fo.20,
+	hl.20,
+	hl.11,
+	fo.10,
+	th.9,
+	th.8,
+	th.7,
+	th.6,
+	hr.8,
+	th.5,
+	hr.7,
+	th.4,
+	hr.6,
+	hr.10,
+	th.3,
+	hr.5,
+	hr.20,
+	hr.11,
+	th.2,
+	hr.4,
+	hr.12,
+	th.1,
+	th.10,
+	hr.3,
+	hr.13,
+	hr.2,
+	th.20,
+	th.11,
+	hr.1,
+	hr.14,
+	th.12,
+	hr.15,
+	th.13,
+	hr.16,
+	th.14,
+	hr.17,
+	th.15,
+	hr.18,
+	th.16,
+	hr.19,
+	th.17,
+	th.18,
+	th.19;
+MARKING
+	fo.1 : 1,
+	fo.2 : 1,
+	fo.3 : 1,
+	fo.4 : 1,
+	fo.5 : 1,
+	fo.6 : 1,
+	fo.19 : 1,
+	fo.7 : 1,
+	fo.8 : 1,
+	fo.18 : 1,
+	fo.9 : 1,
+	fo.17 : 1,
+	fo.16 : 1,
+	fo.15 : 1,
+	fo.14 : 1,
+	fo.13 : 1,
+	fo.12 : 1,
+	fo.11 : 1,
+	fo.20 : 1,
+	fo.10 : 1,
+	th.9 : 1,
+	th.8 : 1,
+	th.7 : 1,
+	th.6 : 1,
+	th.5 : 1,
+	th.4 : 1,
+	th.3 : 1,
+	th.2 : 1,
+	th.1 : 1,
+	th.10 : 1,
+	th.20 : 1,
+	th.11 : 1,
+	th.12 : 1,
+	th.13 : 1,
+	th.14 : 1,
+	th.15 : 1,
+	th.16 : 1,
+	th.17 : 1,
+	th.18 : 1,
+	th.19 : 1;
+TRANSITION rl.[y=1]
+	CONSUME
+		ea.1 : 1;
+	PRODUCE
+		fo.1 : 1,
+		hr.1 : 1;
+TRANSITION rl.[y=2]
+	CONSUME
+		ea.2 : 1;
+	PRODUCE
+		fo.2 : 1,
+		hr.2 : 1;
+TRANSITION rl.[y=3]
+	CONSUME
+		ea.3 : 1;
+	PRODUCE
+		fo.3 : 1,
+		hr.3 : 1;
+TRANSITION tl.[y=1]
+	CONSUME
+		fo.1 : 1,
+		th.1 : 1;
+	PRODUCE
+		hl.1 : 1;
+TRANSITION rl.[y=4]
+	CONSUME
+		ea.4 : 1;
+	PRODUCE
+		fo.4 : 1,
+		hr.4 : 1;
+TRANSITION tl.[y=2]
+	CONSUME
+		fo.2 : 1,
+		th.2 : 1;
+	PRODUCE
+		hl.2 : 1;
+TRANSITION rl.[y=5]
+	CONSUME
+		ea.5 : 1;
+	PRODUCE
+		fo.5 : 1,
+		hr.5 : 1;
+TRANSITION tl.[y=3]
+	CONSUME
+		fo.3 : 1,
+		th.3 : 1;
+	PRODUCE
+		hl.3 : 1;
+TRANSITION rl.[y=6]
+	CONSUME
+		ea.6 : 1;
+	PRODUCE
+		fo.6 : 1,
+		hr.6 : 1;
+TRANSITION tl.[y=4]
+	CONSUME
+		fo.4 : 1,
+		th.4 : 1;
+	PRODUCE
+		hl.4 : 1;
+TRANSITION rr.[y=1]
+	CONSUME
+		hr.1 : 1;
+	PRODUCE
+		fo.2 : 1,
+		th.1 : 1;
+TRANSITION rl.[y=7]
+	CONSUME
+		ea.7 : 1;
+	PRODUCE
+		fo.7 : 1,
+		hr.7 : 1;
+TRANSITION tl.[y=5]
+	CONSUME
+		fo.5 : 1,
+		th.5 : 1;
+	PRODUCE
+		hl.5 : 1;
+TRANSITION rr.[y=2]
+	CONSUME
+		hr.2 : 1;
+	PRODUCE
+		fo.3 : 1,
+		th.2 : 1;
+TRANSITION rl.[y=8]
+	CONSUME
+		ea.8 : 1;
+	PRODUCE
+		fo.8 : 1,
+		hr.8 : 1;
+TRANSITION tl.[y=6]
+	CONSUME
+		fo.6 : 1,
+		th.6 : 1;
+	PRODUCE
+		hl.6 : 1;
+TRANSITION rr.[y=3]
+	CONSUME
+		hr.3 : 1;
+	PRODUCE
+		fo.4 : 1,
+		th.3 : 1;
+TRANSITION rl.[y=9]
+	CONSUME
+		ea.9 : 1;
+	PRODUCE
+		fo.9 : 1,
+		hr.9 : 1;
+TRANSITION tr.[y=1]
+	CONSUME
+		fo.2 : 1,
+		hl.1 : 1;
+	PRODUCE
+		ea.1 : 1;
+TRANSITION tl.[y=7]
+	CONSUME
+		fo.7 : 1,
+		th.7 : 1;
+	PRODUCE
+		hl.7 : 1;
+TRANSITION rr.[y=4]
+	CONSUME
+		hr.4 : 1;
+	PRODUCE
+		fo.5 : 1,
+		th.4 : 1;
+TRANSITION tr.[y=2]
+	CONSUME
+		fo.3 : 1,
+		hl.2 : 1;
+	PRODUCE
+		ea.2 : 1;
+TRANSITION tl.[y=8]
+	CONSUME
+		fo.8 : 1,
+		th.8 : 1;
+	PRODUCE
+		hl.8 : 1;
+TRANSITION rr.[y=5]
+	CONSUME
+		hr.5 : 1;
+	PRODUCE
+		fo.6 : 1,
+		th.5 : 1;
+TRANSITION tr.[y=3]
+	CONSUME
+		fo.4 : 1,
+		hl.3 : 1;
+	PRODUCE
+		ea.3 : 1;
+TRANSITION tl.[y=9]
+	CONSUME
+		fo.9 : 1,
+		th.9 : 1;
+	PRODUCE
+		hl.9 : 1;
+TRANSITION rr.[y=6]
+	CONSUME
+		hr.6 : 1;
+	PRODUCE
+		fo.7 : 1,
+		th.6 : 1;
+TRANSITION tr.[y=4]
+	CONSUME
+		fo.5 : 1,
+		hl.4 : 1;
+	PRODUCE
+		ea.4 : 1;
+TRANSITION rr.[y=7]
+	CONSUME
+		hr.7 : 1;
+	PRODUCE
+		fo.8 : 1,
+		th.7 : 1;
+TRANSITION tr.[y=5]
+	CONSUME
+		fo.6 : 1,
+		hl.5 : 1;
+	PRODUCE
+		ea.5 : 1;
+TRANSITION rr.[y=8]
+	CONSUME
+		hr.8 : 1;
+	PRODUCE
+		fo.9 : 1,
+		th.8 : 1;
+TRANSITION tr.[y=6]
+	CONSUME
+		fo.7 : 1,
+		hl.6 : 1;
+	PRODUCE
+		ea.6 : 1;
+TRANSITION rr.[y=9]
+	CONSUME
+		hr.9 : 1;
+	PRODUCE
+		fo.10 : 1,
+		th.9 : 1;
+TRANSITION tr.[y=7]
+	CONSUME
+		fo.8 : 1,
+		hl.7 : 1;
+	PRODUCE
+		ea.7 : 1;
+TRANSITION tr.[y=8]
+	CONSUME
+		fo.9 : 1,
+		hl.8 : 1;
+	PRODUCE
+		ea.8 : 1;
+TRANSITION tr.[y=9]
+	CONSUME
+		fo.10 : 1,
+		hl.9 : 1;
+	PRODUCE
+		ea.9 : 1;
+TRANSITION rl.[y=10]
+	CONSUME
+		ea.10 : 1;
+	PRODUCE
+		fo.10 : 1,
+		hr.10 : 1;
+TRANSITION rl.[y=20]
+	CONSUME
+		ea.20 : 1;
+	PRODUCE
+		fo.20 : 1,
+		hr.20 : 1;
+TRANSITION rl.[y=11]
+	CONSUME
+		ea.11 : 1;
+	PRODUCE
+		fo.11 : 1,
+		hr.11 : 1;
+TRANSITION rl.[y=12]
+	CONSUME
+		ea.12 : 1;
+	PRODUCE
+		fo.12 : 1,
+		hr.12 : 1;
+TRANSITION tl.[y=10]
+	CONSUME
+		fo.10 : 1,
+		th.10 : 1;
+	PRODUCE
+		hl.10 : 1;
+TRANSITION rl.[y=13]
+	CONSUME
+		ea.13 : 1;
+	PRODUCE
+		fo.13 : 1,
+		hr.13 : 1;
+TRANSITION tl.[y=20]
+	CONSUME
+		fo.20 : 1,
+		th.20 : 1;
+	PRODUCE
+		hl.20 : 1;
+TRANSITION tl.[y=11]
+	CONSUME
+		fo.11 : 1,
+		th.11 : 1;
+	PRODUCE
+		hl.11 : 1;
+TRANSITION rl.[y=14]
+	CONSUME
+		ea.14 : 1;
+	PRODUCE
+		fo.14 : 1,
+		hr.14 : 1;
+TRANSITION tl.[y=12]
+	CONSUME
+		fo.12 : 1,
+		th.12 : 1;
+	PRODUCE
+		hl.12 : 1;
+TRANSITION rl.[y=15]
+	CONSUME
+		ea.15 : 1;
+	PRODUCE
+		fo.15 : 1,
+		hr.15 : 1;
+TRANSITION tl.[y=13]
+	CONSUME
+		fo.13 : 1,
+		th.13 : 1;
+	PRODUCE
+		hl.13 : 1;
+TRANSITION rr.[y=10]
+	CONSUME
+		hr.10 : 1;
+	PRODUCE
+		fo.11 : 1,
+		th.10 : 1;
+TRANSITION rl.[y=16]
+	CONSUME
+		ea.16 : 1;
+	PRODUCE
+		fo.16 : 1,
+		hr.16 : 1;
+TRANSITION tl.[y=14]
+	CONSUME
+		fo.14 : 1,
+		th.14 : 1;
+	PRODUCE
+		hl.14 : 1;
+TRANSITION rr.[y=20]
+	CONSUME
+		hr.20 : 1;
+	PRODUCE
+		fo.1 : 1,
+		th.20 : 1;
+TRANSITION rr.[y=11]
+	CONSUME
+		hr.11 : 1;
+	PRODUCE
+		fo.12 : 1,
+		th.11 : 1;
+TRANSITION rl.[y=17]
+	CONSUME
+		ea.17 : 1;
+	PRODUCE
+		fo.17 : 1,
+		hr.17 : 1;
+TRANSITION tl.[y=15]
+	CONSUME
+		fo.15 : 1,
+		th.15 : 1;
+	PRODUCE
+		hl.15 : 1;
+TRANSITION rr.[y=12]
+	CONSUME
+		hr.12 : 1;
+	PRODUCE
+		fo.13 : 1,
+		th.12 : 1;
+TRANSITION rl.[y=18]
+	CONSUME
+		ea.18 : 1;
+	PRODUCE
+		fo.18 : 1,
+		hr.18 : 1;
+TRANSITION tr.[y=10]
+	CONSUME
+		fo.11 : 1,
+		hl.10 : 1;
+	PRODUCE
+		ea.10 : 1;
+TRANSITION tl.[y=16]
+	CONSUME
+		fo.16 : 1,
+		th.16 : 1;
+	PRODUCE
+		hl.16 : 1;
+TRANSITION rr.[y=13]
+	CONSUME
+		hr.13 : 1;
+	PRODUCE
+		fo.14 : 1,
+		th.13 : 1;
+TRANSITION rl.[y=19]
+	CONSUME
+		ea.19 : 1;
+	PRODUCE
+		fo.19 : 1,
+		hr.19 : 1;
+TRANSITION tr.[y=20]
+	CONSUME
+		fo.1 : 1,
+		hl.20 : 1;
+	PRODUCE
+		ea.20 : 1;
+TRANSITION tr.[y=11]
+	CONSUME
+		fo.12 : 1,
+		hl.11 : 1;
+	PRODUCE
+		ea.11 : 1;
+TRANSITION tl.[y=17]
+	CONSUME
+		fo.17 : 1,
+		th.17 : 1;
+	PRODUCE
+		hl.17 : 1;
+TRANSITION rr.[y=14]
+	CONSUME
+		hr.14 : 1;
+	PRODUCE
+		fo.15 : 1,
+		th.14 : 1;
+TRANSITION tr.[y=12]
+	CONSUME
+		fo.13 : 1,
+		hl.12 : 1;
+	PRODUCE
+		ea.12 : 1;
+TRANSITION tl.[y=18]
+	CONSUME
+		fo.18 : 1,
+		th.18 : 1;
+	PRODUCE
+		hl.18 : 1;
+TRANSITION rr.[y=15]
+	CONSUME
+		hr.15 : 1;
+	PRODUCE
+		fo.16 : 1,
+		th.15 : 1;
+TRANSITION tr.[y=13]
+	CONSUME
+		fo.14 : 1,
+		hl.13 : 1;
+	PRODUCE
+		ea.13 : 1;
+TRANSITION tl.[y=19]
+	CONSUME
+		fo.19 : 1,
+		th.19 : 1;
+	PRODUCE
+		hl.19 : 1;
+TRANSITION rr.[y=16]
+	CONSUME
+		hr.16 : 1;
+	PRODUCE
+		fo.17 : 1,
+		th.16 : 1;
+TRANSITION tr.[y=14]
+	CONSUME
+		fo.15 : 1,
+		hl.14 : 1;
+	PRODUCE
+		ea.14 : 1;
+TRANSITION rr.[y=17]
+	CONSUME
+		hr.17 : 1;
+	PRODUCE
+		fo.18 : 1,
+		th.17 : 1;
+TRANSITION tr.[y=15]
+	CONSUME
+		fo.16 : 1,
+		hl.15 : 1;
+	PRODUCE
+		ea.15 : 1;
+TRANSITION rr.[y=18]
+	CONSUME
+		hr.18 : 1;
+	PRODUCE
+		fo.19 : 1,
+		th.18 : 1;
+TRANSITION tr.[y=16]
+	CONSUME
+		fo.17 : 1,
+		hl.16 : 1;
+	PRODUCE
+		ea.16 : 1;
+TRANSITION rr.[y=19]
+	CONSUME
+		hr.19 : 1;
+	PRODUCE
+		fo.20 : 1,
+		th.19 : 1;
+TRANSITION tr.[y=17]
+	CONSUME
+		fo.18 : 1,
+		hl.17 : 1;
+	PRODUCE
+		ea.17 : 1;
+TRANSITION tr.[y=18]
+	CONSUME
+		fo.19 : 1,
+		hl.18 : 1;
+	PRODUCE
+		ea.18 : 1;
+TRANSITION tr.[y=19]
+	CONSUME
+		fo.20 : 1,
+		hl.19 : 1;
+	PRODUCE
+		ea.19 : 1;

@@ -55,44 +55,6 @@ AT_CHECK([test -f bug.log])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Invalid parameter(s)])
-AT_CHECK([DOMINO --foo],1,ignore,stderr)
-AT_CHECK([GREP -q "unrecognized option" stderr])
-AT_CHECK([GREP -q "invalid command-line parameter(s)" stderr])
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
-
-AT_SETUP([Multiple inputs])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
-AT_CHECK([cp TESTFILES/IBM-B3-4958.owfn .])
-AT_CHECK([DOMINO IBM-B3-3029.owfn IBM-B3-4958.owfn],1,ignore,stderr)
-AT_CHECK([GREP -q "at most one input file must be given" stderr])
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
-
-AT_SETUP([Unknown file])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([DOMINO test.owfn],1,ignore,stderr)
-AT_CHECK([GREP -q "could not open file" stderr])
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
-
-AT_SETUP([Override protection])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
-AT_CHECK([DOMINO IBM-B3-3029.owfn --output=foo],0,ignore,ignore)
-AT_CHECK([DOMINO IBM-B3-3029.owfn --output=foo --noOverride],1,ignore,stderr)
-AT_CHECK([GREP -q "file fooA.owfn already exists" stderr])
-AT_CHECK([test -f fooA.owfn])
-AT_KEYWORDS(output)
-AT_CLEANUP
-
 AT_SETUP([Dot options dependency - 1])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
@@ -206,6 +168,196 @@ AT_CHECK([DOMINO IBM-B3-3029.owfn --verbose --stats],0,ignore,stderr)
 AT_CHECK([GREP -q "runtime" stderr])
 AT_CHECK([GREP -q "memory consumption" stderr])
 AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Errors])
+############################################################################
+AT_SETUP([Invalid parameter(s)])
+AT_CHECK([DOMINO --foo],1,ignore,stderr)
+AT_CHECK([GREP -q "unrecognized option" stderr])
+AT_CHECK([GREP -q "invalid command-line parameter(s)" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Multiple inputs])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([cp TESTFILES/IBM-B3-4958.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn IBM-B3-4958.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "at most one input file must be given" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Unknown file])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([DOMINO test.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "could not open file" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Invalid given configuration file])
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_DATA([my_domino.conf], [invalid="PARAMETER"
+])
+AT_CHECK([DOMINO --config=my_domino.conf IBM-B3-3029.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Invalid present configuration file])
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_DATA([domino.conf], [invalid="PARAMETER"
+])
+AT_CHECK([DOMINO IBM-B3-3029.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Override protection])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --output=foo],0,ignore,ignore)
+AT_CHECK([DOMINO IBM-B3-3029.owfn --output=foo --noOverride],1,ignore,stderr)
+AT_CHECK([GREP -q "file fooA.owfn already exists" stderr])
+AT_CHECK([test -f fooA.owfn])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Cannot write to file (Service Overview)])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([touch IBM-B3-3029.owfn_Services.dot])
+AT_CHECK([chmod a-w IBM-B3-3029.owfn_Services.dot])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dot-serviceOverview],1,ignore,stderr)
+AT_CHECK([GREP -q "file IBM-B3-3029.owfn_Services.dot cannot be opened" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Cannot write to file (Initial Roles)])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([touch IBM-B3-3029.owfn_Initial-Roles.dot])
+AT_CHECK([chmod a-w IBM-B3-3029.owfn_Initial-Roles.dot])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dotInitial --dot-roles],1,ignore,stderr)
+AT_CHECK([GREP -q "file IBM-B3-3029.owfn_Initial-Roles.dot cannot be opened" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Cannot write to file (Fragmented Roles)])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([touch IBM-B3-3029.owfn_Fragmented-Roles.dot])
+AT_CHECK([chmod a-w IBM-B3-3029.owfn_Fragmented-Roles.dot])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dotFragmented --dot-roles],1,ignore,stderr)
+AT_CHECK([GREP -q "file IBM-B3-3029.owfn_Fragmented-Roles.dot cannot be opened" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Cannot write to file (Initial Fragments)])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([touch IBM-B3-3029.owfn_Initial-Fragments.dot])
+AT_CHECK([chmod a-w IBM-B3-3029.owfn_Initial-Fragments.dot])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dotInitial --dot-fragments],1,ignore,stderr)
+AT_CHECK([GREP -q "file IBM-B3-3029.owfn_Initial-Fragments.dot cannot be opened" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Cannot write to file (Fragmented Fragments)])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([touch IBM-B3-3029.owfn_Fragmented-Fragments.dot])
+AT_CHECK([chmod a-w IBM-B3-3029.owfn_Fragmented-Fragments.dot])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --dotFragmented --dot-fragments],1,ignore,stderr)
+AT_CHECK([GREP -q "file IBM-B3-3029.owfn_Fragmented-Fragments.dot cannot be opened" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Cannot write to file (Services.dot)])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([touch IBM-B3-3029.owfn_Service-A.dot])
+AT_CHECK([chmod a-w IBM-B3-3029.owfn_Service-A.dot])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --output --dotServices],1,ignore,stderr)
+AT_CHECK([GREP -q "file IBM-B3-3029.owfn_Service-A.dot cannot be opened" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Cannot write to file (Services.owfn)])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([touch IBM-B3-3029.owfn_Service-A.owfn])
+AT_CHECK([chmod a-w IBM-B3-3029.owfn_Service-A.owfn])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --output],1,ignore,stderr)
+AT_CHECK([GREP -q "file IBM-B3-3029.owfn_Service-A.owfn cannot be opened" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Cannot create tempfile])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/DA-Producer-Consumer.owfn .])
+AT_CHECK([touch foo])
+AT_CHECK([chmod a-w foo])
+AT_CHECK([DOMINO DA-Producer-Consumer.owfn --verbose --tmpfile=foo],1,ignore,stderr)
+AT_CHECK([GREP -q "failed to open file" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Wrong oWFN-File])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/wrong-owfn.owfn .])
+AT_CHECK([DOMINO wrong-owfn.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "unknown place or interface label" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([No start place])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/no-startplace.owfn .])
+AT_CHECK([DOMINO no-startplace.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "no global start place was found" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Two start places])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/two-startplaces.owfn .])
+AT_CHECK([DOMINO two-startplaces.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "another global start place found" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Predefined place])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/predefined-place.owfn .])
+AT_CHECK([DOMINO predefined-place.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "place AL_1983_07_12 has predefined constant name" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Over annotation])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/over-annotation.owfn .])
+AT_CHECK([DOMINO over-annotation.owfn],1,ignore,stderr)
+AT_CHECK([GREP -q "transition t1 has more than one role" stderr])
+AT_KEYWORDS(error)
 AT_CLEANUP
 
 ############################################################################
@@ -485,49 +637,4 @@ AT_CHECK([cp TESTFILES/self-reactivating-transitions.owfn .])
 AT_CHECK([DOMINO self-reactivating-transitions.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
 AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([Wrong oWFN-File])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/wrong-owfn.owfn .])
-AT_CHECK([DOMINO wrong-owfn.owfn],1,ignore,stderr)
-AT_CHECK([GREP -q "unknown place or interface label" stderr])
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
-
-AT_SETUP([No start place])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/no-startplace.owfn .])
-AT_CHECK([DOMINO no-startplace.owfn],1,ignore,stderr)
-AT_CHECK([GREP -q "no global start place was found" stderr])
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
-
-AT_SETUP([Two start places])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/two-startplaces.owfn .])
-AT_CHECK([DOMINO two-startplaces.owfn],1,ignore,stderr)
-AT_CHECK([GREP -q "another global start place found" stderr])
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
-
-AT_SETUP([Predefined place])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/predefined-place.owfn .])
-AT_CHECK([DOMINO predefined-place.owfn],1,ignore,stderr)
-AT_CHECK([GREP -q "place AL_1983_07_12 has predefined constant name" stderr])
-AT_KEYWORDS(infrastructure)
-AT_CLEANUP
-
-AT_SETUP([Over annotation])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/over-annotation.owfn .])
-AT_CHECK([DOMINO over-annotation.owfn],1,ignore,stderr)
-AT_CHECK([GREP -q "transition t1 has more than one role" stderr])
-AT_KEYWORDS(infrastructure)
 AT_CLEANUP

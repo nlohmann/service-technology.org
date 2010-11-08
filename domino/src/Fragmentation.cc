@@ -42,7 +42,6 @@ Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
 	this->mOverallDianeAlternatives = 0;
 
 	this->mInterfaceCorrections = 0;
-	this->mCommunicationCorrections = 0;
 	this->mFragmentConnections = 0;
 	this->mPlacesInsert = 0;
 	this->mTransitionsInsert = 0;
@@ -1448,7 +1447,7 @@ placeStatus_e Fragmentation::getPlaceStatus(const place_t & Place, const bool Re
 			ret = PLACE_STATUS_NOTBILATERAL;
 		}
 		else {
-			this->mCommunicationCorrections++;
+			this->mInterfaceCorrections++;
 			role_id_t curRoleID;
 			frag_id_t curFragID;	
 			place_t sucPlace;			

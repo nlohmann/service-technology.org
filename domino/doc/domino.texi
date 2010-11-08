@@ -288,10 +288,7 @@ This part lists information on the decomposition process.
 True if decomposition of the input open net was successfull. [Boolean]
 
 @item interface_corrections
-The number of fixed not disjunct shared places. [Integer]
-
-@item communication_corrections
-The number of fixed not bilateral communicating shared places. [Integer]
+The number of fixed not bilateral shared places. [Integer]
 
 @item fragment_connections
 The number of forced connections of fragments (with pairwise identical roles). [Integer]

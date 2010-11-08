@@ -363,12 +363,9 @@ int main(int argc, char** argv) {
 		}
 
 		fragmentStatus = f.isFragmentationValid(false);
+		assert(fragmentStatus != VALID_TODO);
 		if (fragmentStatus == VALID_BAD) {
 			message(_cbad_("worklfow decomposition failed"));
-			retOK = false;
-		}
-		else if (fragmentStatus == VALID_TODO) {
-			abort(9, "workflow decomposition uncompleted");
 			retOK = false;
 		}
 		else {
@@ -404,7 +401,6 @@ int main(int argc, char** argv) {
 
 		results.add("decomposition.success", retOK);
 		results.add("decomposition.interface_corrections", (unsigned int)f.getInterfaceCorrections());
-		results.add("decomposition.communication_corrections", (unsigned int)f.getCommunicationCorrections());
 		results.add("decomposition.fragment_connections", (unsigned int)f.getFragmentConnections());
 		results.add("decomposition.places_insert", (unsigned int)f.getPlacesInsert());
 		results.add("decomposition.transitions_insert", (unsigned int)f.getTransitionsInsert());

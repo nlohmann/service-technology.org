@@ -442,6 +442,7 @@ int Witness::adaptGraph(WNode& w, set<WNode*>& done) {
 				if (*(node[p]->siphon.begin())) break; // if there is a siphon, we need to check that node
 			}	
 		}
+		cout << endl;
 		if (pwtit==tpre.end()) { // all missing tokens can be produced, so we do it
 			vector<Transition*> saraseq(callSara(*wtit)); // find an enabling firing sequence
 			string tnames;
@@ -520,10 +521,8 @@ int Witness::adaptGraph(WNode& w, set<WNode*>& done) {
 */
 vector<Transition*> Witness::callSara(Transition* t) {
 	map<Place*,unsigned int>::iterator xit;
-	Marking m0(pn); // construct the initial marking of the problem
-	for(xit=am.begin(); xit!=am.end(); ++xit)
-		m0[*(xit->first)] = xit->second;
-	Marking mf(pn); // and the final marking
+	Marking m0(pn,false); // construct the initial marking of the problem
+	Marking mf(pn,true); // and the final marking
 	for(xit=pre[t].begin(); xit!=pre[t].end(); ++xit)
 		mf[*(xit->first)] = xit->second;
 	map<Place*,int> cover; // the latter one may be covered

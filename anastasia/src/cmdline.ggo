@@ -102,6 +102,10 @@ option "witness" w
   "If the result is a siphon without a marked trap in a free-choice net, a witness path (firing sequence) is computed showing that the net is not live."
   flag off
 
+option "loopnet" l
+  "The Petri net itself is modified. A new transition is created, its preset consists of all places so far having an empty postset, its postset of those having an empty preset. Useful for workflow nets."
+  flag off
+
 defgroup "MinMax" groupdesc="Use these options to minimize or maximize the result so that the property still holds:"
 
 groupoption "min" 0

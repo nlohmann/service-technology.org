@@ -258,6 +258,10 @@ The option @option{--owfn} assumes the Petri net to be in the open net format, t
 takes the Petri net to be in the low-level LoLA format, and @option{--pnml} uses the PNML format for input.
 By default, Petri nets are assumed to be in PNML format.
 
+If the Petri net has a workflow structure, i.e. input places with empty presets and output places with
+empty postsets, the option @option{--loopnet} will connect the output places to the input places by
+an additional transition. This can be useful when checking a free-choice net for partial deadlocks.
+
 @section Output
 
 By default, Anastasia prints out a set of places with a given property to standard output. The places are

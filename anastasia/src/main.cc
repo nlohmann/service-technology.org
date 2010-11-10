@@ -231,7 +231,22 @@ int main(int argc, char** argv) {
     }
 
     /*----------------------------------------.
-    | 2. Check the Property                   |
+    | 2. Make a loop (for workflow nets)      |
+    `----------------------------------------*/
+
+	if (args_info.loopnet_given) {
+		Transition& t(net.createTransition("#loop_out_to_in#"));
+		const set<Place*> pset(net.getPlaces());
+		set<Place*>::const_iterator pit;
+		for(pit=pset.begin(); pit!=pset.end(); ++pit)
+		{
+			if ((*pit)->getPreset().empty()) net.createArc(t,**pit);
+			if ((*pit)->getPostset().empty()) net.createArc(**pit,t);
+		}
+	}
+
+    /*----------------------------------------.
+    | 3. Check the Property                   |
     `----------------------------------------*/
 
 	// first some info for the option --cover going over all the places
@@ -487,6 +502,7 @@ int main(int argc, char** argv) {
 			cout << "} to a deadlock set." << endl;
 		}
 	}
+
 
     return EXIT_SUCCESS;
 }

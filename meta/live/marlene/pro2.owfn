@@ -1,0 +1,38 @@
+PLACE
+  INTERNAL
+    a1, a2, p1, p2, w1;
+  INPUT
+    user, pass, ask;
+  OUTPUT
+    answer;
+
+INITIALMARKING
+  a1, a2;
+
+FINALMARKING
+  w1, a2;
+
+TRANSITION t1   { ?user }
+ CONSUME
+  a1, user;
+ PRODUCE
+  p1;
+
+TRANSITION t2   { ?pass }
+ CONSUME
+  p1, pass;
+ PRODUCE
+  w1;
+
+TRANSITION t3   { ?ask }
+ CONSUME
+  a2, ask;
+ PRODUCE
+  p2;
+
+TRANSITION t4   { !answer }
+ CONSUME
+  w1, p2;
+ PRODUCE
+  w1, a2, answer;
+

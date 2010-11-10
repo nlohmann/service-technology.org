@@ -1,38 +1,50 @@
 PLACE
-  INTERNAL
-    a1, a2, p1, p2, w1;
-  INPUT
-    user, pass, ask;
-  OUTPUT
-    answer;
+ INTERNAL
+  p0,p1,p2,p3,p4,p5;
+ INPUT
+  Coin, yes, no;
+ OUTPUT
+  Sweeter, Sugar, Coffee;
 
 INITIALMARKING
-  a1, a2;
+  p0;
 
 FINALMARKING
-  w1, a2;
+  p5;
 
-TRANSITION t1   { ?user }
+TRANSITION t0 { ?Coin }
  CONSUME
-  a1, user;
+  p0, Coin;
  PRODUCE
   p1;
 
-TRANSITION t2   { ?pass }
+TRANSITION t1 { !Sweeter }
  CONSUME
-  p1, pass;
+  p1;
  PRODUCE
-  w1;
+  p2, Sweeter;
 
-TRANSITION t3   { ?ask }
+TRANSITION t2 { ?yes }
  CONSUME
-  a2, ask;
+  p2, yes;
  PRODUCE
-  p2;
+  p3;
 
-TRANSITION t4   { !answer }
+TRANSITION t3 { !Sugar }
  CONSUME
-  w1, p2;
+  p3;
  PRODUCE
-  w1, a2, answer;
+  p1, Sugar;
+
+TRANSITION t4 { ?no }
+ CONSUME
+  p2, no;
+ PRODUCE
+  p4;
+
+TRANSITION t5 { !Coffee }
+ CONSUME
+  p4;
+ PRODUCE
+  p5, Coffee;
 

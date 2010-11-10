@@ -22,7 +22,7 @@
 
   if (!strcmp($_SESSION[$tool]["process"], "marlene_ia/iRules.owfn"))
   {
-    $services = array("marlene/pro.owfn", "marlene/req.owfn");
+    $services = array("marlene/pro2.owfn", "marlene/req2.owfn");
     $rules = createFile("diag_iRules.ar");
   }
 
@@ -30,6 +30,12 @@
   {
     $services = array("marlene/myCoffee.owfn", "marlene/myCustomer.owfn");
     $rules = createFile("diag_iCoffee.ar");
+  }
+
+  else if (!strcmp($_SESSION[$tool]["process"], "marlene_ia/iCoffee2.owfn"))
+  {
+    $services = array("marlene/pro.owfn", "marlene/req.owfn");
+    $rules = createFile("diag_iCoffee2.ar");
   }
 
   else if (!strcmp($_SESSION[$tool]["process"], 'marlene_ia/iCar.owfn')) {
@@ -313,6 +319,8 @@ END;
   {
     echo "<li><a href=".$info["link"].">".$info["basename"]."</a></li>";
   }
+  // TODO: remove next line after debugging
+  echo "<li><a href=".getLink("live.txt").">live.txt</a></li>";
 ?>
       </ul>
      

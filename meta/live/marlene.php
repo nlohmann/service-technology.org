@@ -24,6 +24,11 @@
     $rules = array("marlene/td_candy.ar");
   }
   
+  else if (!strcmp($_SESSION["marlene"]["process"], 'marlene/coffee4.owfn')) {
+    $services = array("marlene/pro.owfn", "marlene/req.owfn");
+    $rules = array("marlene/proreq.ar");
+  }
+  
   else if (!strcmp($_SESSION["marlene"]["process"], 'marlene/car.owfn')) {
     $services = array("marlene/Reservations.owfn", "marlene/ReservationsCustomer.owfn");
     $rules = array("marlene/reservation.ar");

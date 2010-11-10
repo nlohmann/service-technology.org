@@ -1,34 +1,44 @@
-{ coffee }
-
 PLACE
-INTERNAL
-  r0,  { initial }
-  r1,
-  rw;
-INPUT
-  resp;
-
-OUTPUT
-  req;
+ INTERNAL
+  p0,p1,p2,p3;
+ INPUT
+  Sweet,Koffee,SweetedCoffee;
+ OUTPUT
+  Euro,NeedSugar;
 
 INITIALMARKING
-  r0;
+  p0;
 
 FINALMARKING
-  rw;
+  p3;
 
-TRANSITION t1    { !req }
-CONSUME
-  r0;
-PRODUCE
-  r1,
-  req;
+TRANSITION t0 { !Euro }
+ CONSUME
+  p0;
+ PRODUCE
+  p1,Euro;
 
-TRANSITION t2    { ?resp }
-CONSUME
-  r1,
-  resp;
-PRODUCE
-  rw;
+TRANSITION t1 { !NeedSugar }
+ CONSUME
+  p1;
+ PRODUCE
+  p2, NeedSugar;
 
-{ END OF FILE }
+TRANSITION t2 { ?Sweet }
+ CONSUME
+  p2, Sweet;
+ PRODUCE
+  p1;
+
+TRANSITION t3 { ?Koffee }
+ CONSUME
+  p2, Koffee;
+ PRODUCE
+  p3;
+
+TRANSITION t4 { ?SweetedCoffee }
+ CONSUME
+  p2, SweetedCoffee;
+ PRODUCE
+  ;
+

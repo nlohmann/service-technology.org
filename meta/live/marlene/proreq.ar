@@ -1,0 +1,9 @@
+Euro -> Coin;
+#NeedSugar, Sweeter -> yes;
+#NeedSugar, Sweeter -> no;
+NeedSugar ->;
+Sweeter -> yes;
+Sweeter -> no;
+Sugar -> Sweet;
+Coffee -> SweetedCoffee;
+Coffee -> Koffee;

@@ -371,6 +371,8 @@ const pnapi::PetriNet * Adapter::buildController()
             diag.evaluateLivelocks(_nets, *_engine);
         }
 
+        diag.outputLive();
+
         // diagnosis_superfluous = diag.superfluous;
         if (diag.superfluous)
         {
@@ -664,6 +666,7 @@ void Adapter::createRuleTransitions()
             }
 
             // create arc between this place and rule transition
+            // \TODO: Arc multiplicities
             _engine->createArc(*place, *trans);
 
             ++messageIter;

@@ -112,13 +112,14 @@ std::string & Marking::getPlaceForID( unsigned int id )
     return id2place[id];
 }
 
-std::vector< std::string > Marking::getPendingMessages(pnapi::PetriNet & net, std::string prefix)
+std::vector< std::string > Marking::getPendingMessages(pnapi::PetriNet & net, std::string prefix, unsigned int messageBound)
 {
     FUNCIN
     std::vector< std::string > result;
 
     for ( unsigned int k = 0; k < this->marking.size(); ++k )
     {
+        // get all pending messages on internal places starting with <prefix>
         std::string name = getPlaceForID(marking[k].first);
         if (name.find(prefix) == 0)
         {
@@ -128,7 +129,27 @@ std::vector< std::string > Marking::getPendingMessages(pnapi::PetriNet & net, st
             if ( place != NULL )
             {
                 name = name.substr(0,name.length() - 4);
-                result.push_back(name);
+                unsigned int token = count(result.begin(), result.end(), name);
+                // add the appropriate amount of messages
+                for ( int i = 1; i <= marking[k].second and i <= (messageBound - token); ++i)
+                {
+                    result.push_back(name);
+                }
+            }
+        }
+        else
+        {
+            // interface place?
+            pnapi::Label * label = net.getInterface().findLabel(name);
+
+            if ( label != NULL )
+            {
+                unsigned int token = count(result.begin(), result.end(), name);
+                // add the appropriate amount of messages
+                for ( int i = 1; i <= marking[k].second and i <= (messageBound - token); ++i)
+                {
+                    result.push_back(name);
+                }
             }
         }
     }
@@ -175,11 +196,12 @@ std::vector< std::string > Marking::getRequiredMessages(pnapi::PetriNet & net, s
         {
             if (marking.activates(**transition))
             {
+//                std::cerr << (*label)->getName() << " ";
                 result.push_back((*label)->getName());
             }
         }
     }
-
+//    std::cerr << std::endl;
     pnapi::Condition & cond = net.getFinalCondition();
 
     if ( cond.isSatisfied(marking) )

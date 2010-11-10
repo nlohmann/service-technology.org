@@ -33,9 +33,65 @@ class Output;
 class Diagnosis {
 
     private:
+        struct DiagnosisInformation
+        {
+            std::string type;
+            std::vector< std::string > pendingMessages;
+            std::vector< std::string > requiredMessages;
+            std::set< std::string > previouslyAppliedRules;
+            std::set< unsigned int > netsInFinalState;
+
+            std::string getLive() const;
+
+            bool operator==(const DiagnosisInformation & d1) const
+            {
+                if (d1.pendingMessages == pendingMessages)
+                {
+                    return true;
+                }
+                else if (d1.requiredMessages == requiredMessages)
+                {
+                    return true;
+                }
+                else if (d1.previouslyAppliedRules == previouslyAppliedRules)
+                {
+                    return true;
+                }
+                else if (d1.netsInFinalState == netsInFinalState)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            bool operator()(const DiagnosisInformation & d1, const DiagnosisInformation & d2) const
+            {
+                if (d1.pendingMessages < d2.pendingMessages)
+                {
+                    return true;
+                }
+                else if (d1.requiredMessages < d2.requiredMessages)
+                {
+                    return true;
+                }
+                else if (d1.previouslyAppliedRules < d2.previouslyAppliedRules)
+                {
+                    return true;
+                }
+                else if (d1.netsInFinalState < d2.netsInFinalState)
+                {
+                    return true;
+                }
+                return false;
+            }
+        };
+
         DGraph * dgraph;
         MarkingInformation & mi;
         Output live;
+        std::set< DiagnosisInformation, DiagnosisInformation > diagnosisInformation;
+
+        unsigned int messageBound;
 
     public:
         bool superfluous;
@@ -46,6 +102,7 @@ class Diagnosis {
 
         void evaluateDeadlocks(std::vector< pnapi::PetriNet *> & nets, pnapi::PetriNet & engine);
         void evaluateLivelocks(std::vector< pnapi::PetriNet *> & nets, pnapi::PetriNet & engine);
+        void outputLive() const;
 };
 
 class DGraph {

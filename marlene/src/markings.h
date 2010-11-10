@@ -60,7 +60,7 @@ class Marking
         unsigned int getIDForPlace( std::string & place );
         std::string & getPlaceForID( unsigned int id );
 
-        std::vector< std::string > getPendingMessages(pnapi::PetriNet & net, std::string prefix = "");
+        std::vector< std::string > getPendingMessages(pnapi::PetriNet & net, std::string prefix = "", unsigned int messageBound = 1);
         std::vector< std::string > getRequiredMessages(pnapi::PetriNet & net, std::string prefix = "");
 };
 

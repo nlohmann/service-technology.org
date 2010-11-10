@@ -22,6 +22,7 @@
 #if defined(HAVE_LIBCONFIG__) and HAVE_LIBCONFIG__ == 1
 
 #include <utility> // just for make_pair
+#include <algorithm> // for sort
 #include <list>
 #include <map>
 
@@ -34,10 +35,12 @@
 
 #include "diagnosis.h"
 
-Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned int) : dgraph(new DGraph), mi(pmi), live(args_info.live_arg, "Info file for live"), superfluous(false) //  messageBound
+Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned int messageBound) : dgraph(new DGraph), mi(pmi), live(args_info.live_arg, "Info file for live"), messageBound(messageBound), superfluous(false) //  messageBound
 {
 
+    // variable to store information from diagnosis file in LibConfig format
     libconfig::Config diagInfo;
+    // try to open file or print parse error
     try {
         diagInfo.readFile(filename.c_str());
     }
@@ -46,12 +49,14 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned in
         message("Parse error `%s' in diagnosis file `%s' in line %d.", pex.getError(), pex.getFile(), pex.getLine());
     }
 
+    // look up result and criterion of diagnosis
     bool result = false;
     std::string criterion;
 
     diagInfo.lookupValue("controllability.result", result);
     diagInfo.lookupValue("controllability.criterion", criterion);
 
+    // if result is true, then nets are adaptable and we do not need to do anything
     if (result)
     {
         superfluous = true;
@@ -59,6 +64,7 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned in
         return;
     }
 
+    // look up number of inner markings and nodes
     int innermarkings = 0;
     int nodes = 0;
 
@@ -77,25 +83,32 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned in
     {
         DNode::Initializer init;
 
+        // id of a node
         int id = 0;
         states[i].lookupValue("id", id);
 
         init.id = dgraph->getIDForName(id);
+        // does the node have deadlocks of livelocks?
         states[i].lookupValue("internalDeadlock", init.has_deadlock);
         states[i].lookupValue("internalLivelock", init.has_livelock);
 
         // status("Node %d has deadlock: %s", id, (init.has_deadlock?"yes":"no"));
 
+        // get all successors of the node
         try
         {
+            // iterate over all successors
             for ( int j = 0; j < states[i]["successors"].getLength(); ++j)
             {
+                // get label of transition
                 std::string labelName = states[i]["successors"][j][0];
                 unsigned int lid = dgraph->getIDForLabel(labelName);
+                // get successor ID
                 int nodeId = states[i]["successors"][j][1];
                 unsigned int nid = dgraph->getIDForName(nodeId);
 
                 //status("Successor: label = %d, node = %d", lid, nid);
+                // remember the successor for the current node
                 init.successors.push_back(std::make_pair( lid, nid));
 
                 // node nid has one more predecessor
@@ -113,6 +126,7 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned in
         DNode * node = new DNode(init);
         dgraph->nodeMap[init.id] = node;
         //if ( init.has_deadlock )
+        // look for all deadlocks inside the current node
         try
         {
             for(int j = 0; j < states[i]["internalDeadlocks"].getLength(); ++j)
@@ -133,6 +147,7 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned in
  //           status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
         }
 
+        // look for all livelocks inside the current node
         try
         {
             for(int j = 0; j < states[i]["internalLivelocks"].getLength(); ++j)
@@ -153,7 +168,7 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned in
         }
         catch (libconfig::SettingNotFoundException ex)
         {
-            status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
+            // status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
         }
 
         dgraph->nodes.push_back(node);
@@ -169,6 +184,11 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi, unsigned in
 Diagnosis::~Diagnosis()
 {
     delete dgraph;
+    //for (std::set< DiagnosisInformation >::iterator iter = diagnosisInformation.begin(); iter != diagnosisInformation.end(); ++iter)
+    {
+        //delete(&(*iter));
+    }
+    diagnosisInformation.clear();
 }
 
 void Diagnosis::evaluateDeadlocks(std::vector< pnapi::PetriNet *> & nets, pnapi::PetriNet & engine)
@@ -180,107 +200,43 @@ void Diagnosis::evaluateDeadlocks(std::vector< pnapi::PetriNet *> & nets, pnapi:
         return;
     }
 
+    // prefix of the engine
     std::string prefix = "engine.";
 
+    // iterate over all nodes containing deadlocks
     for ( unsigned int i = 0; i < dgraph->deadlockNodes.size(); ++i )
     {
         DNode * node = dgraph->deadlockNodes[i];
-        bool seen = false;
-        for ( unsigned int prev = 0; prev < i and not seen; ++prev)
         {
-            if ( node->deadlockMarkings == dgraph->deadlockNodes[prev]->deadlockMarkings )
-            {
-                if ( node->rulesApplied == dgraph->deadlockNodes[prev]->rulesApplied)
-                {
-                    seen = true;
-                }
-            }
-        }
-        if ( not seen )
-        {
-            std::string livedeadlock = "DL;";
-            std::string livepending = "";
-            std::string livefinal = "";
-            std::string liverequired = "";
+
             message("Deadlock %d (node %d)", i + 1, node->getID());
             for ( unsigned int j = 0; j < node->deadlockMarkings.size(); ++j)
             {
+                DiagnosisInformation * dI = new DiagnosisInformation;
+                dI->type = "DL";
+
                 Marking & m = *(mi.markings[node->deadlockMarkings[j]]);
-                std::vector< std::string > pending = m.getPendingMessages(engine, prefix);
-                bool first = true;
-                for ( unsigned int p = 0; p < pending.size(); ++p )
-                {
-                    message("Message %s is pending", pending[p].c_str());
-                    if ( first )
-                    {
-                        first = false;
-                    }
-                    else
-                    {
-                        livepending += std::string(",");
-                    }
-                    livepending += pending[p];
-                }
-                first = true;
-                bool first2 = true;
+                dI->pendingMessages = m.getPendingMessages(engine, prefix, messageBound);
+                sort(dI->pendingMessages.begin(), dI->pendingMessages.end());
+
                 for ( unsigned int net = 0; net < nets.size(); ++net )
                 {
                     std::string prefix = "net" + toString(net + 1) + ".";
                     std::vector< std::string > required = m.getRequiredMessages(*(nets[net]), prefix);
-                    if (required[required.size()-1] == "yes")
+                    std::string isFinal = required.back();
+                    required.pop_back();
+                    dI->requiredMessages.insert(dI->requiredMessages.end(), required.begin(), required.end() );
+
+                    if ("yes" == isFinal)
                     {
-                        message("Net %s is already in a final state", prefix.c_str());
-                        if ( first )
-                        {
-                            first = false;
-                        }
-                        else
-                        {
-                            livefinal += ",";
-                        }
-                        livefinal += prefix;
-                    }
-                    for ( unsigned int p = 0; p < required.size() - 1; ++p )
-                    {
-                        message("Message %s is required", required[p].c_str());
-                        if ( first2 )
-                        {
-                            first2 = false;
-                        }
-                        else
-                        {
-                            liverequired += ",";
-                        }
-                        liverequired += required[p];
+                        dI->netsInFinalState.insert(net+1);
                     }
                 }
-                livedeadlock += livefinal + ";" + livepending + ";" + liverequired + ";";
-                message("The following rules where previously applied:");
-                if ( node->rulesApplied.empty() )
-                {
-                    std::cerr << "      none." << std::endl;
-                }
-                else
-                {
-                    bool first = true;
-                    for ( std::set< std::string >::iterator rule = node->rulesApplied.begin(); rule != node->rulesApplied.end(); ++rule)
-                    {
-                        if ( first )
-                        {
-                            std::cerr << "      " << *rule;
-                            first = false;
-                            livedeadlock += *rule;
-                        }
-                        else
-                        {
-                            std::cerr << ", " << *rule;
-                            livedeadlock += "," + *rule;
-                            
-                        }
-                    }
-                    std::cerr << std::endl;
-                }
-                live.stream() << livedeadlock << std::endl;
+                sort(dI->requiredMessages.begin(), dI->requiredMessages.end());
+
+                dI->previouslyAppliedRules = node->rulesApplied;
+
+                diagnosisInformation.insert(*dI);
             }
         }
     }
@@ -299,109 +255,122 @@ void Diagnosis::evaluateLivelocks(std::vector< pnapi::PetriNet *> & nets, pnapi:
 
     std::string prefix = "engine.";
 
+    // iterate over all nodes containing livelocks
     for ( unsigned int i = 0; i < dgraph->livelockNodes.size(); ++i )
     {
         DNode * node = dgraph->livelockNodes[i];
-        bool seen = false;
-        for ( unsigned int prev = 0; prev < i and not seen; ++prev)
         {
-            if ( node->livelockMarkings == dgraph->livelockNodes[prev]->livelockMarkings )
-            {
-                if ( node->rulesApplied == dgraph->livelockNodes[prev]->rulesApplied)
-                {
-                    seen = true;
-                }
-            }
-        }
-        if ( not seen )
-        {
-            std::string livelivelock = "LL;";
-            std::string livepending = "";
-            std::string livefinal = "";
-            std::string liverequired = "";
-            message("Livelock %d (node %d)", i + 1, node->getID());
+
+            message("Livelock %d (node %d, %d)", i + 1, node->getID(), dgraph->getNameForID(node->getID()));
             for ( unsigned int j = 0; j < node->livelockMarkings.size(); ++j)
             {
+                DiagnosisInformation * dI = new DiagnosisInformation;
+                dI->type = "LL";
                 Marking & m = *(mi.markings[node->livelockMarkings[j]]);
-                std::vector< std::string > pending = m.getPendingMessages(engine, prefix);
-                bool first = true;
-                for ( unsigned int p = 0; p < pending.size(); ++p )
-                {
-                    message("Message %s is pending", pending[p].c_str());
-                    if ( first )
-                    {
-                        first = false;
-                    }
-                    else
-                    {
-                        livepending += std::string(",");
-                    }
-                    livepending += pending[p];
-                }
-                first = true;
-                bool first2 = true;
+                dI->pendingMessages = m.getPendingMessages(engine, prefix, messageBound);
+                sort(dI->pendingMessages.begin(), dI->pendingMessages.end());
+
                 for ( unsigned int net = 0; net < nets.size(); ++net )
                 {
                     std::string prefix = "net" + toString(net + 1) + ".";
                     std::vector< std::string > required = m.getRequiredMessages(*(nets[net]), prefix);
-                    if (required[required.size()-1] == "yes")
+                    std::string isFinal = required.back();
+                    required.pop_back();
+                    dI->requiredMessages.insert(dI->requiredMessages.end(), required.begin(), required.end() );
+//                    std::cerr << "size of required: " << dI->requiredMessages.size() << std::endl;
+
+                    if ("yes" == isFinal)
                     {
-                        message("Net %s is already in a final state", prefix.c_str());
-                        if ( first )
-                        {
-                            first = false;
-                        }
-                        else
-                        {
-                            livefinal += ",";
-                        }
-                        livefinal += prefix;
-                    }
-                    for ( unsigned int p = 0; p < required.size() - 1; ++p )
-                    {
-                        message("Message %s is required", required[p].c_str());
-                        if ( first2 )
-                        {
-                            first2 = false;
-                        }
-                        else
-                        {
-                            liverequired += ",";
-                        }
-                        liverequired += required[p];
+                        dI->netsInFinalState.insert(net+1);
                     }
                 }
+                sort(dI->requiredMessages.begin(), dI->requiredMessages.end());
+
+                dI->previouslyAppliedRules = node->rulesApplied;
+
+                diagnosisInformation.insert(*dI);
             }
-            livelivelock += livefinal + ";" + livepending + ";" + liverequired + ";";
-            message("The following rules where previously applied:");
-            if ( node->rulesApplied.empty() )
-            {
-                std::cerr << "      none." << std::endl;
-            }
-            else
-            {
-                bool first = true;
-                for ( std::set< std::string >::iterator rule = node->rulesApplied.begin(); rule != node->rulesApplied.end(); ++rule)
-                {
-                    if ( first )
-                    {
-                        std::cerr << "      " << *rule;
-                        livelivelock += *rule;
-                        first = false;
-                    }
-                    else
-                    {
-                        std::cerr << ", " << *rule;
-                        livelivelock += "," + *rule;
-                    }
-                }
-                std::cerr << std::endl;
-            }
-            live.stream() << livelivelock << std::endl;
         }
     }
 
     FUNCOUT
+}
+
+void Diagnosis::outputLive() const
+{
+    for ( std::set< DiagnosisInformation >::const_iterator di = diagnosisInformation.begin(); di != diagnosisInformation.end(); ++di)
+    {
+        live.stream() << di->getLive();
+    }
+}
+
+std::string Diagnosis::DiagnosisInformation::getLive() const
+{
+    std::string result = type + ";";
+    bool first = true;
+    for (std::set< unsigned int >::iterator net = netsInFinalState.begin(); net != netsInFinalState.end(); ++net)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            result += ",";
+        }
+        result += toString(*net);
+    }
+    result += ";";
+
+    first = true;
+    for (std::vector< std::string >::const_iterator message = pendingMessages.begin(); message != pendingMessages.end(); ++message)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            result += ",";
+        }
+        result += *message;
+    }
+    result += ";";
+
+    first = true;
+    for (std::vector< std::string >::const_iterator message = requiredMessages.begin(); message != requiredMessages.end(); ++message)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            result += ",";
+        }
+        result += *message;
+    }
+    result += ";";
+
+    first = true;
+    for (std::set< std::string >::iterator rule = previouslyAppliedRules.begin(); rule != previouslyAppliedRules.end(); ++rule)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            result += ",";
+        }
+        result += *rule;
+    }
+    result += ";";
+
+    result += "\n";
+
+    return result;
+
 }
 
 DGraph::DGraph() : nodeId(0), labelId(0)
@@ -507,33 +476,7 @@ void DGraph::collectRules()
                 queue.remove(node->successors[s].second);
                 queue.push_back(node->successors[s].second);
             }
-
-            //status("label %s leads to node %d", label.c_str(), node->successors[s].second);
         }
-        // message("The following rules where previously applied for node %d:", id);
-        /*
-        if ( node->rulesApplied.empty() )
-        {
-            std::cerr << "      none." << std::endl;
-        }
-        else
-        {
-            bool first = true;
-            for ( std::set< std::string >::iterator rule = node->rulesApplied.begin(); rule != node->rulesApplied.end(); ++rule)
-            {
-                if ( first )
-                {
-                    std::cerr << "      " << *rule;
-                    first = false;
-                }
-                else
-                {
-                    std::cerr << ", " << *rule;
-                }
-            }
-            std::cerr << std::endl;
-        }
-        */
 
     }
 }

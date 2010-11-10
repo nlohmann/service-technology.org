@@ -33,7 +33,6 @@
 #include "pathfinder.h"
 #include "reachalyzer.h"
 #include "problem.h"
-#include "cmdline.h"
 #include "lp_solve/lp_lib.h"
 
 using std::cerr;

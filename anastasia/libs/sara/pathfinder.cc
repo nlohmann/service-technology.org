@@ -21,7 +21,6 @@
 #include "partialsolution.h"
 #include "imatrix.h"
 #include "jobqueue.h"
-#include "cmdline.h"
 #include "verbose.h"
 
 #include <vector>
@@ -44,7 +43,6 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
-//extern gengetopt_args_info args_info;
 namespace sara {
 extern vector<Transition*> transitionorder;
 extern map<Transition*,int> revtorder;

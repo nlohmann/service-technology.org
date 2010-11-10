@@ -15,7 +15,6 @@
  */
 
 #include "jobqueue.h"
-#include "cmdline.h"
 #include "verbose.h"
 #include <iostream>
 #include <set>
@@ -34,7 +33,6 @@ using std::stringstream;
 using std::ofstream;
 using pnapi::Node;
 
-//extern gengetopt_args_info args_info;
 
 	/******************************************************
 	* Implementation of the methods of the class JobQueue *

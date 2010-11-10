@@ -49,12 +49,14 @@ class Tarjan {
 		bool mSCCCalculated;
 		bool mHasNonTrivialSCC;
 		int mMaxDFS;
+		
 		nodes_t mUnprocessedNodes;
 		nodes_t mStackContent;
 		stack<node_t> mStack;
 		node_value_t mNodeDFS;
 		node_value_t mNodeLowlink;
 		node_value_t mNode2SCC;
+		int mCurSCC;		
 		multimap<int, node_t> mSCC2Node;	
 		pnapi::PetriNet *mNet;
 		

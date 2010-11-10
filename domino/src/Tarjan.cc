@@ -31,6 +31,7 @@ void Tarjan::init() {
 	this->mMaxDFS = 0;
 	this->mSCCCalculated = false;
 	this->mHasNonTrivialSCC = false;
+	this->mCurSCC = 0;
 	
 	PNAPI_FOREACH(n, this->mNet->getNodes()) {
 		//status("..%s insert", (*n)->getName().c_str());
@@ -77,12 +78,13 @@ void Tarjan::tarjan(node_t Node) {
 		do {
 			stackNode = this->pop();
 			//status("....%s", stackNode.c_str());
-			this->mNode2SCC.insert( std::make_pair(stackNode, this->getLowlink(stackNode)) );
-			this->mSCC2Node.insert( std::make_pair(this->getLowlink(stackNode), stackNode) );
-			if (this->mSCC2Node.count(this->getLowlink(stackNode)) > 1) {
+			this->mNode2SCC.insert( std::make_pair(stackNode, this->mCurSCC) );
+			this->mSCC2Node.insert( std::make_pair(this->mCurSCC, stackNode) );
+			if (this->mSCC2Node.count(this->mCurSCC) > 1) {
 				this->mHasNonTrivialSCC = true;
 			}
 		} while (Node != stackNode); 
+		this->mCurSCC++;
 	}
 	//status("Tarjan::tarjan(%s) finished", Node.c_str());
 }

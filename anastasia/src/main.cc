@@ -511,8 +511,7 @@ int main(int argc, char** argv) {
 setVar generateFormula(Formula& f) {
 	// here we start generating the formula to be checked, according to the selected property	
 	if (args_info.clauses_given) f.verbose=1;
-	setVar X,Y;
-	boolVar x,e,y,m;
+	setVar X(0),Y(0);
 	if (args_info.formula_given) { // read a user-defined formula
 		pf = &f; // tell the parser where the formula has to go
 		anastasia_in = fopen(args_info.formula_arg,"r");

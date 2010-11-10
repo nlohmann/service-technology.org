@@ -21,7 +21,7 @@
 	**********************************/
 
 /** Standard constructor. */ 
-Formula::Formula(PetriNet& net) : verbose(0),nrofplaces(0),pn(net),ffv(1),ffsv(1),satisfied(false) {
+Formula::Formula(PetriNet& net) : verbose(0),pn(net),nrofplaces(0),ffv(1),ffsv(1),satisfied(false) {
 	// construct the place ordering
 	set<Place*> pset(pn.getPlaces());
 	set<Place*>::iterator pit;
@@ -199,6 +199,7 @@ bool Formula::printAssignment(ostream& out) {
 			else out << svname[svit->first] << ":" << id2p[j-svtov[svit->first]]->getName() << " ";
 		}
 	out << endl;
+	return true;
 }
 
 /** Print all the clauses in the formula, using variable names where available.
@@ -217,7 +218,7 @@ void Formula::printClauses(ostream& out) {
 			{ out << vname[num] << " "; continue; }
 			map<setVar,string>::iterator svit;
 			for(svit=svname.begin(); svit!=svname.end(); ++svit)
-				if (svtov[svit->first]<=num && svtov[svit->first]+nrofplaces>num) break;
+				if (svtov[svit->first]<=(unsigned int)num && svtov[svit->first]+nrofplaces>(unsigned int)num) break;
 			if (svit==svname.end()) out << num << " ";
 			else out << svname[svit->first] << ":" << id2p[num-svtov[svit->first]]->getName() << " ";
 		}
@@ -800,7 +801,6 @@ boolVar Formula::MaxTrap(setVar sv, setVar trap) {
 			for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
 			{
 				Transition* t(&(*ait)->getTransition());
-				const set<pnapi::Arc*>& tarcs(t->getPostsetArcs());
 				clause.push_back(xtj[t]);
 				cl2.clear(); // clauses in AND(t) (not yij or not zij or not xtj)
 				cl2.push_back(-i-yoff);

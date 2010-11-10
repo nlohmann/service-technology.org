@@ -19,7 +19,9 @@
 #include "pathfinder.h"
 #include "reachalyzer.h"
 #include "problem.h"
+#ifndef SARALIB
 #include "cmdline.h"
+#endif
 #include "verbose.h"
 
 using std::cerr;
@@ -495,6 +497,7 @@ vector<Transition*> ReachabilityTest(PetriNet& pn, Marking& m0, Marking& mf, map
 			status("called Sara, firing sequence does not exist");
 			vector<Transition*> result(1);
 			result[0]=NULL; // one null pointer == no solution exists
+			return result;
 		}
 	} else {
 		status("called Sara, lp_solve initialization failed");

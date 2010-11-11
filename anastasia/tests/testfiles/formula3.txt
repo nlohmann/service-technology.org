@@ -1,0 +1,9 @@
+
+FORMULA(X,Y):
+a <-> Siphon(X), 
+b <-> Empty(X),
+c <-> MaxTrap(X,Y), 
+d <-> Marked(Y),
+x <-> AND a -b c d,
+x;
+

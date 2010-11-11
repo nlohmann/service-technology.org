@@ -8,10 +8,11 @@
 
 # the files needed by the test cases (without `testfiles/' directory)
 # <<-- CHANGE START (testfiles) -->>
-TESTFILES = test.owfn test2.owfn \
+TESTFILES = test.owfn test.pnml test2.owfn \
 		philsfc.llnet phils10.llnet \
 		fcSWOMT1.owfn fcSWOMT2.owfn fcSWOMT3.owfn \
-		formula.txt defectiveformula.txt rvalformula.txt lvalformula.txt
+		formula.txt formula2.txt formula3.txt defectiveformula.txt rvalformula.txt lvalformula.txt \
+		anastasia.conf
 # <<-- CHANGE END -->>
 
 

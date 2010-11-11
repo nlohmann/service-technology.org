@@ -1,0 +1,13 @@
+FORMULA(X,Y,Z):
+b <-> Trap(Y),
+c <-> Subset(Z,Y),
+Subset(Y,X),
+f <-> b <-> c,
+g <-> f -> b,
+h <-> OR c f g,
+i <-> c or h,
+k <-> i and -c,
+k;
+
+
+

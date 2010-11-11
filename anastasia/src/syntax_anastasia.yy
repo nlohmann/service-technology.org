@@ -91,7 +91,7 @@ clause:
 |	varname OPEQU MARKED POPEN xsetname PCLOSE { Bvar = pf->Marked(Xvar); pf->setVarName(Bvar,Bname); vars[Bname]=Bvar; }
 |	varname OPEQU SUBSET POPEN xsetname COMMA ysetname PCLOSE { Bvar = pf->Subset(Xvar,Yvar); pf->setVarName(Bvar,Bname); vars[Bname]=Bvar; }
 |	varname OPEQU bformula
-|	literal
+|	literal { pf->SetTo((Lvar>0?Lvar:-Lvar),(Lvar>0)); }
 ;
 
 literal:

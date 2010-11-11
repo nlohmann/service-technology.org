@@ -72,14 +72,6 @@ extern vector<setVar> mainvars;
 vector<string> mainvarName;
 setVar generateFormula(Formula& f);
 
-/// to print a set of places
-void PrintPlaces(set<Place*> pset, ostream& out) {
-	set<Place*>::iterator pit;
-	for(pit=pset.begin(); pit!=pset.end(); ++pit)
-		out << (*pit)->getName() << " ";
-	out << endl;
-}
-
 /// check if a file exists and can be opened for reading
 inline bool fileExists(const std::string& filename) {
     std::ifstream tmp(filename.c_str(), std::ios_base::in);
@@ -452,7 +444,8 @@ int main(int argc, char** argv) {
 
 	// we may check for a witness path if the previous algorithm provided us with
 	// an fc-net and a siphon containing no marked trap
-	if (coverinfo.size()==0) status("no result to forward to witness finder");
+	if (args_info.witness_given && coverinfo.size()==0) 
+		status("no result to forward to witness finder");
 	if (args_info.witness_given && coverinfo.size()>0) {
 		if (!net.isFreeChoice()) abort(20,"Petri net is not free-choice");
 		if (args_info.cover_given) status("only the first found result is checked");

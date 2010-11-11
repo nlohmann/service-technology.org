@@ -28,9 +28,21 @@ AT_CLEANUP
 AT_BANNER([Parameters])
 ############################################################################
 
-AT_SETUP([Piping from stdin])
+AT_SETUP([Piping from stdin (OWFN)])
 AT_CHECK([cp TESTFILES/test2.owfn .])
 AT_CHECK([cat test2.owfn | ANASTASIA --owfn --mtrap],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Piping from stdin (LOLA)])
+AT_CHECK([cp TESTFILES/philsfc.llnet .])
+AT_CHECK([cat philsfc.llnet | ANASTASIA --lola --mtrap],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Piping from stdin (PNML)])
+AT_CHECK([cp TESTFILES/test.pnml .])
+AT_CHECK([cat test.pnml | ANASTASIA --pnml --mtrap],0,ignore, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -43,6 +55,12 @@ AT_CLEANUP
 AT_SETUP([Reading from LoLA file])
 AT_CHECK([cp TESTFILES/philsfc.llnet .])
 AT_CHECK([ANASTASIA --mtrap --lola philsfc.llnet],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Reading from PNML file])
+AT_CHECK([cp TESTFILES/test.pnml .])
+AT_CHECK([ANASTASIA --pnml --mtrap test.pnml],0,ignore, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -129,7 +147,7 @@ AT_CLEANUP
 
 AT_SETUP([No unmarked trap])
 AT_CHECK([cp TESTFILES/fcSWOMT1.owfn .])
-AT_CHECK([ANASTASIA fcSWOMT1.owfn --owfn --utrap], 0, stdout, ignore)
+AT_CHECK([ANASTASIA fcSWOMT1.owfn --owfn --utrap -v ], 0, stdout, ignore)
 AT_CHECK([GREP -q "No unmarked trap" stdout], 0, ignore)
 AT_KEYWORDS(properties)
 AT_CLEANUP
@@ -157,11 +175,26 @@ AT_CLEANUP
 AT_BANNER([User-defined formula])
 ############################################################################
 
-AT_SETUP([User-defined formula])
+AT_SETUP([Commoner-Hack using ForceSet])
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/formula.txt .])
 AT_CHECK([ANASTASIA test.owfn --owfn --formula=formula.txt], 0, stdout, ignore)
 AT_CHECK([GREP -q "assignment for Y" stdout], 0, ignore)
 AT_CHECK([GREP -q "<empty set>" stdout], 0, ignore)
+AT_KEYWORDS(userdefined)
+AT_CLEANUP
+
+AT_SETUP([Commoner-Hack using EquSet])
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/formula3.txt .])
+AT_CHECK([ANASTASIA test.owfn --owfn --formula=formula3.txt], 0, stdout, ignore)
+AT_CHECK([GREP -q "assignment for Y" stdout], 0, ignore)
+AT_CHECK([GREP -q "p. p. p. p. p. p." stdout], 0, ignore)
+AT_KEYWORDS(userdefined)
+AT_CLEANUP
+
+AT_SETUP([Syntax + build check])
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/formula2.txt .])
+AT_CHECK([ANASTASIA test.owfn --owfn --formula=formula2.txt], 0, stdout, ignore)
+AT_CHECK([GREP -q "assignment for Z" stdout], 0, ignore)
 AT_KEYWORDS(userdefined)
 AT_CLEANUP
 
@@ -197,7 +230,7 @@ AT_CLEANUP
 
 AT_SETUP([Minimize])
 AT_CHECK([cp TESTFILES/test2.owfn .])
-AT_CHECK([ANASTASIA test2.owfn --owfn --swot --min ], 0, stdout, ignore)
+AT_CHECK([ANASTASIA test2.owfn --owfn --swot --min -v ], 0, stdout, ignore)
 AT_CHECK([GREP -q "p1" stdout], 0, ignore)
 AT_CHECK([GREP -q "p2" stdout], 1, ignore)
 AT_CHECK([GREP -q "p3" stdout], 1, ignore)
@@ -233,6 +266,22 @@ AT_CHECK([GREP -q "Non-coverable places: p2" stdout], 0, ignore)
 AT_KEYWORDS(modifiers)
 AT_CLEANUP
 
+AT_SETUP([Minimal cover])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([ANASTASIA test.owfn --owfn --swomt --cover --min ], 0, stdout, ignore)
+AT_CHECK([GREP -q "Covering .p" stdout], 0, ignore)
+AT_CHECK([GREP -q "Non-coverable places: p2" stdout], 0, ignore)
+AT_KEYWORDS(modifiers)
+AT_CLEANUP
+
+AT_SETUP([Maximal cover])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([ANASTASIA test.owfn --owfn --swomt --cover --max ], 0, stdout, ignore)
+AT_CHECK([GREP -q "Covering .p" stdout], 0, ignore)
+AT_CHECK([GREP -q "Non-coverable places: p2" stdout], 0, ignore)
+AT_KEYWORDS(modifiers)
+AT_CLEANUP
+
 AT_SETUP([Witness path 1])
 AT_CHECK([cp TESTFILES/fcSWOMT1.owfn .])
 AT_CHECK([ANASTASIA fcSWOMT1.owfn --owfn --swomt --witness -v ], 0, stdout, stderr)
@@ -259,6 +308,25 @@ AT_CHECK([GREP -q "emptying path" stderr], 0, ignore)
 AT_KEYWORDS(modifiers)
 AT_CLEANUP
 
+AT_SETUP([Witness path 3 / Snoopy])
+AT_CHECK([cp TESTFILES/fcSWOMT3.owfn .])
+AT_CHECK([ANASTASIA fcSWOMT3.owfn --owfn --swomt --witness -v --snoopy ], 0, stdout, stderr)
+AT_CHECK([GREP -q "deadlocking siphons" stdout], 0, ignore)
+AT_CHECK([GREP -q "tsl0 tr1 tr2 tr3 tle tsl0" stdout], 0, ignore)
+AT_CHECK([GREP -q "called Sara" stderr], 0, ignore)
+AT_CHECK([GREP -q "emptying path" stderr], 0, ignore)
+AT_KEYWORDS(modifiers)
+AT_CLEANUP
+
+AT_SETUP([Make loop])
+AT_CHECK([cp TESTFILES/test2.owfn .])
+AT_CHECK([ANASTASIA test2.owfn --owfn --swomt --loopnet ], 0, stdout, ignore)
+AT_CHECK([GREP -q "p1" stdout], 1, ignore)
+AT_CHECK([GREP -q "p2" stdout], 0, ignore)
+AT_CHECK([GREP -q "p3" stdout], 1, ignore)
+AT_KEYWORDS(modifiers)
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Debugging])
 ############################################################################
@@ -279,6 +347,27 @@ AT_CHECK([cp TESTFILES/test.owfn .])
 AT_CHECK([ANASTASIA test.owfn --owfn --swomt --cover --pmin --nocopy ], 0, stdout, ignore)
 AT_CHECK([GREP -q "Covering .p" stdout], 0, ignore)
 AT_CHECK([GREP -q "Non-coverable places: p2" stdout], 0, ignore)
+AT_KEYWORDS(modifiers)
+AT_CLEANUP
+
+AT_SETUP([Bug flag])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([ANASTASIA test.owfn --owfn --swomt --bug ], 0, stdout, stderr)
+AT_CHECK([GREP -q "please send file" stderr], 0, ignore)
+AT_KEYWORDS(modifiers)
+AT_CLEANUP
+
+AT_SETUP([Config file])
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/anastasia.conf .])
+AT_CHECK([ANASTASIA test.owfn --owfn --swomt --config=anastasia.conf -v], 0, stdout, stderr)
+AT_CHECK([GREP -q "using configuration file" stderr], 0, ignore)
+AT_KEYWORDS(modifiers)
+AT_CLEANUP
+
+AT_SETUP([Status])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([ANASTASIA test.owfn --owfn --swomt --stats ], 0, stdout, stderr)
+AT_CHECK([GREP -q "runtime" stderr], 0, ignore)
 AT_KEYWORDS(modifiers)
 AT_CLEANUP
 

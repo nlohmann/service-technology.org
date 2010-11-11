@@ -87,9 +87,7 @@ bigor OR
 {formula} { BEGIN(stateformula); return FORMULA; }
 <<EOF>> { return EOF; }
 . {}
-
 %%
-
 __attribute__((noreturn)) void anastasia_error(const char *msg) {
   status("%d: error near '%s': %s", anastasia_lineno, anastasia_text, msg);
   abort(5, "error while parsing the user-defined formula");

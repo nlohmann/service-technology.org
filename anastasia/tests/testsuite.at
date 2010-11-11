@@ -177,7 +177,7 @@ AT_BANNER([User-defined formula])
 
 AT_SETUP([Commoner-Hack using ForceSet])
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/formula.txt .])
-AT_CHECK([ANASTASIA test.owfn --owfn --formula=formula.txt -v ], 0, stdout, ignore)
+AT_CHECK([ANASTASIA test.owfn --owfn --formula=formula.txt --clauses], 0, stdout, ignore)
 AT_CHECK([GREP -q "assignment for Y" stdout], 0, ignore)
 AT_CHECK([GREP -q "<empty set>" stdout], 0, ignore)
 AT_KEYWORDS(userdefined)
@@ -185,7 +185,7 @@ AT_CLEANUP
 
 AT_SETUP([Commoner-Hack using EquSet])
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/formula3.txt .])
-AT_CHECK([ANASTASIA test.owfn --owfn --formula=formula3.txt -v ], 0, stdout, ignore)
+AT_CHECK([ANASTASIA test.owfn --owfn --formula=formula3.txt --clauses], 0, stdout, ignore)
 AT_CHECK([GREP -q "assignment for Y" stdout], 0, ignore)
 AT_CHECK([GREP -q "p. p. p. p. p. p." stdout], 0, ignore)
 AT_KEYWORDS(userdefined)
@@ -193,7 +193,7 @@ AT_CLEANUP
 
 AT_SETUP([Syntax + build check])
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/formula2.txt .])
-AT_CHECK([ANASTASIA test.owfn --owfn --formula=formula2.txt -v ], 0, stdout, ignore)
+AT_CHECK([ANASTASIA test.owfn --owfn --formula=formula2.txt --clauses], 0, stdout, ignore)
 AT_CHECK([GREP -q "assignment for Z" stdout], 0, ignore)
 AT_KEYWORDS(userdefined)
 AT_CLEANUP

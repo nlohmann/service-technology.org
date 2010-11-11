@@ -22,6 +22,10 @@ AC_ST_VERBOSE
 # search for optional tools needed by "make check"
 AC_PROG_LIBTOOL
 
+# check for dlopen/ftime (required by lp_solve)
+AC_SEARCH_LIBS([dlopen], [dl zrldsrl])
+AC_SEARCH_LIBS([ftime], [compat])
+
 # check for required functions and die if they are not found
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_ERROR([cannot use pipes]))
 

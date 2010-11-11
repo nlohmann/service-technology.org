@@ -22,7 +22,7 @@ if COMPILE_PNAPI
 anastasia_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
-anastasia_LDFLAGS = -ldl
+#anastasia_LDFLAGS = -ldl
 
 
 #############################################################################

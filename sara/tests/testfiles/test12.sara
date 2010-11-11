@@ -3,4 +3,5 @@ PROBLEM test12:
 	FILE test3.owfn TYPE OWFN;
 	INITIAL p1:2;
 	FINAL p3:1,p2:3;
+	RESULT NEGATE is_unreachable;
 

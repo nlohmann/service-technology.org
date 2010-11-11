@@ -19,7 +19,7 @@ HELPOPTION = --detailed-help
 # GENERIC: add FDL and helper TeX file #
 #--------------------------------------#
 TEXINFO_TEX = texinfo.tex
-hello_TEXINFOS = fdl.texi
+anastasia_TEXINFOS = fdl.texi
 
 #-----------------------------------------------------------#
 # GENERIC: run tool to include help output in documentation #
@@ -28,13 +28,13 @@ cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
 	$(top_builddir)/src/$(PACKAGE) $(HELPOPTION) > cmdline.out
 EXTRA_DIST += cmdline.out 
 MAINTAINERCLEANFILES = cmdline.out
-hello_TEXINFOS += cmdline.out
+anastasia_TEXINFOS += cmdline.out
 
 #-----------------------------------------------------------#
 # GENERIC: create ASCII files out README and Texinfo manual #
 #-----------------------------------------------------------#
 all: $(top_srcdir)/ChangeLog $(top_srcdir)/REQUIREMENTS $(top_srcdir)/THEORY
-hello_TEXINFOS += ChangeLog.texi
+anastasia_TEXINFOS += ChangeLog.texi
 EXTRA_DIST += $(top_srcdir)/REQUIREMENTS $(top_srcdir)/THEORY
 
 $(top_srcdir)/ChangeLog: ChangeLog.texi

@@ -68,11 +68,11 @@ void Formula::setVarName(boolVar v, string name) {
 
 /** Get the name of a formerly created boolean variable.
 	@param v The identifier of the variable.
-	@param name The name of the variable (or the empty string if unset).
+	@return The name of the variable (or the empty string if unset).
 */
 string Formula::getVarName(boolVar v) {
-	string empty;
-	if (vname.find(v)==vname.end()) return empty;
+//	string empty;
+	if (vname.find(v)==vname.end()) { string empty; return empty; }
 	return vname[v];
 }
 
@@ -118,11 +118,11 @@ void Formula::setSetVarName(setVar sv, string name) {
 
 /** Get the name of a formerly created set variable.
 	@param sv The identifier of set the variable.
-	@param name The name of set the variable (or an empty string if unset).
+	@return The name of set the variable (or an empty string if unset).
 */
 string Formula::getSetVarName(setVar sv) {
-	string empty;
-	if (svname.find(sv)==svname.end()) return empty;
+//	string empty;
+	if (svname.find(sv)==svname.end()) { string empty; return empty; }
 	return svname[sv];
 }
 
@@ -148,7 +148,7 @@ boolVar Formula::getVar(setVar sv, Place& p) {
 
 /** After the formula has been solved, delivers the assignment for a set variable
 	by returning those places that are set to true by MiniSat.
-	@param The set variable identifier.
+	@param sv The set variable identifier.
 	@return The set of places set to true in this variable.
 */
 set<Place*> Formula::getAssignment(setVar sv) {
@@ -904,7 +904,7 @@ void Formula::XMaxTrap(setVar sv, setVar trap) {
 }
 
 /** Minimize or maximize the result given by MiniSAT.
-	@param The set variable to minimize or maximize.
+	@param sv The set variable to minimize or maximize.
 	@param maximize If the set variable should be maximized.
 	@param enforce A set of places that must remain in the result under all circumstances.
 	@param forbid A set of places that must not appear in the result under any circumstances.

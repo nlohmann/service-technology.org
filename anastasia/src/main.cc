@@ -165,13 +165,13 @@ void terminationHandler() {
     if (args_info.stats_flag) {
         message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
         fprintf(stderr, "%s: memory consumption: ", PACKAGE);
-        system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+        int i(system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str()));
     }
 }
 
 /// main-function
 int main(int argc, char** argv) {
-    time_t start_time, end_time;
+//    time_t start_time, end_time;
 
     // set the function to call on normal termination
     atexit(terminationHandler);
@@ -265,7 +265,7 @@ int main(int argc, char** argv) {
 	time_t mytime(clock()); // measure time for formula creation, evaluation, and minimaxing
 	// here we start generating the formula to be checked, according to the selected property	
 	Formula* gf(NULL); // general formula (for option --cover only)	
-	setVar X; // the main variable for which the user wants so see the satisfying assignment
+	setVar X(0); // the main variable for which the user wants so see the satisfying assignment
 	if (args_info.cover_given && !args_info.nocopy_given) // formula will be needed more than once and may be copied
 	{	
 		gf = new Formula(net);

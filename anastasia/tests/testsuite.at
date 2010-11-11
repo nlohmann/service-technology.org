@@ -235,7 +235,7 @@ AT_SETUP([Witness path 1])
 AT_CHECK([cp TESTFILES/fcSWOMT1.owfn .])
 AT_CHECK([ANASTASIA fcSWOMT1.owfn --owfn --swomt --witness -v ], 0, stdout, stderr)
 AT_CHECK([GREP -q "firing sequence .<empty>" stdout], 0, ignore)
-AT_CHECK([GREP -q "{p.,p.}" stdout], 0, ignore)
+AT_CHECK([GREP -q "{p.,p." stdout], 0, ignore)
 AT_CHECK([GREP -q "emptying path" stderr], 0, ignore)
 AT_KEYWORDS(modifiers)
 AT_CLEANUP

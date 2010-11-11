@@ -17,7 +17,7 @@
  along with Anastasia.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
 
-%token SIPHON TRAP MAXTRAP EMPTY NEMPTY MARKED UNMARKED SUBSET OPAND OPOR OPIMPL OPEQU BIGAND BIGOR NEGATION COMMA NUMBER SETNAME VARNAME POPEN PCLOSE FORMULA COLON
+%token SIPHON TRAP MAXTRAP EMPTY NEMPTY MARKED UNMARKED SUBSET OPAND OPOR OPIMPL OPEQU BIGAND BIGOR NEGATION COMMA SETNAME VARNAME POPEN PCLOSE FORMULA COLON
 
 %defines
 %name-prefix="anastasia_"
@@ -52,11 +52,6 @@ extern int anastasia_error(const char *);
 extern const char* anastasia_text;
 %}
 
-%union {
-  unsigned int val;
-}
-
-%type <val> NUMBER
 
 %%
 

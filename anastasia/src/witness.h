@@ -81,8 +81,8 @@ public:
 	/// checks whether a token is produced on the defining (set of) place(s)
 	bool producesDefiningToken(Transition& t);
 
-	/// Print a node
-	void show(ostream& out);
+	// Print a node
+	//void show(ostream& out);
 
 	/// The original place (NULL for initial node)
 	Place* P;
@@ -124,8 +124,8 @@ public:
 	/// Compute new minimal siphon and unmarked maxtrap
 	bool computeSWOMT(WNode& wn);
 
-	/// Print all nodes
-	void show(ostream& out);
+	// Print all nodes
+	//void show(ostream& out);
 
 	/// Check if a transition is activated under the current marking
 	bool isActivated(Transition* t);

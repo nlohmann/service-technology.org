@@ -38,7 +38,6 @@ void anastasia_error(const char *);
 
 setname	[A-Z][^,() \t\n]*
 varname	[a-z][^,;<\- \t\n]*
-number    "-"?[0-9][0-9]*
 formula FORMULA
 siphon Siphon
 trap Trap
@@ -78,8 +77,6 @@ bigor OR
 <stateformula>{opequ}		{ return OPEQU; }
 <stateformula>{bigand}	{ return BIGAND; }
 <stateformula>{bigor}		{ return BIGOR; }
-
-<stateformula>{number}     { anastasia_lval.val = atoi(anastasia_text); return NUMBER; }
 
 <stateformula>{setname}       { anastasia_NAME_token = anastasia_text; return SETNAME; }
 <stateformula>{varname}       { anastasia_NAME_token = anastasia_text; return VARNAME; }

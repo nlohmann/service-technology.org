@@ -99,8 +99,8 @@ public:
 	/// Solve a formula
 	bool solve();
 
-	/// Print the satisfying assignment in toto
-	bool printAssignment(ostream& out);
+	// Print the satisfying assignment in toto
+	//bool printAssignment(ostream& out);
 
 	/// Print all the clauses of the formula
 	void printClauses(ostream& out);

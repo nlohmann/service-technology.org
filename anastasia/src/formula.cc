@@ -178,10 +178,10 @@ bool Formula::solve() {
 	return satisfied;
 }
 
-/** Print the satisfying assignment in toto, using variable names where available.
+/* Print the satisfying assignment in toto, using variable names where available.
 	@param out The stream to print to.
 	@return Returns false if there is no satisfying assignment.
-*/
+
 bool Formula::printAssignment(ostream& out) {
 	if (!satisfied) return false;
 	for(boolVar j=1; j<mssolution.size(); ++j)
@@ -201,6 +201,7 @@ bool Formula::printAssignment(ostream& out) {
 	out << endl;
 	return true;
 }
+*/
 
 /** Print all the clauses in the formula, using variable names where available.
 	@param out The stream to print to.

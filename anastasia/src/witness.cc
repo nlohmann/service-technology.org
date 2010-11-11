@@ -174,9 +174,9 @@ bool WNode::producesDefiningToken(Transition& t) {
 	return result; // then return the result
 }
 
-/** Print the node.
+/* Print the node.
 	@param out The stream to print to.
-*/
+
 void WNode::show(ostream& out) {
 	if (!P) out << "Initial Node" << endl;
 	else out << "Node " << P->getName() << endl;
@@ -208,6 +208,7 @@ void WNode::show(ostream& out) {
 		out << endl;
 	}
 }
+*/
 
 	/**********************************
 	* Implementation of class Witness *
@@ -361,15 +362,16 @@ void Witness::fireTransition(Transition* t) {
 	fseq.push_back(t);
 }
 
-/** Print all nodes of the siphon dependency graph.
+/* Print all nodes of the siphon dependency graph.
 	@param out The stream to print to.
-*/
+
 void Witness::show(ostream& out) {
 	init.show(out);
 	map<Place*,WNode*>::iterator wit;
 	for(wit=node.begin(); wit!=node.end(); ++wit)
 		if (wit->second->P) wit->second->show(out);
 }
+*/
 
 /** Check a node of the siphon dependency graph for transitions that can fire or can be enabled, and fire them. This may influence
 	other nodes, which have to be rechecked afterwards.

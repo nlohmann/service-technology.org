@@ -419,13 +419,13 @@ bool Fragmentation::buildServices() {
 	frag_id_t newFragID;
 	map<place_t, size_t>::const_iterator curPlaceMaxToken;
 	size_t reactivatingCount;
-	size_t curPlaceTokens;
+	unsigned int curPlaceTokens;
 	bool changed;
 	multimap< role_id_t, frag_id_t > roleFragments;
 	pair<multimap< role_id_t, frag_id_t >::iterator, multimap< role_id_t, frag_id_t >::iterator> curRoleFragments;
 	pair<fragID2Transitions_t::iterator, fragID2Transitions_t::iterator> curFragTransitions;
-	map<transition_t, size_t> transitionBound;
-	map<transition_t, size_t>::const_iterator curTransitionBound;
+	map<transition_t, unsigned int> transitionBound;
+	map<transition_t, unsigned int>::const_iterator curTransitionBound;
 	Tarjan tarjan(*this->mNet);
 
 	ret = true;

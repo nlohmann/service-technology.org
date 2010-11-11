@@ -24,9 +24,9 @@ extern int graph_yylex();
 extern int graph_yyerror(const char *);
 
 place_t curPlaceName;
-size_t curPlaceTokens;
-extern map<place_t, size_t> Place2MaxTokens;
-map<place_t, size_t>::iterator curPlaceMaxToken;
+unsigned int curPlaceTokens;
+extern map<place_t, unsigned int> Place2MaxTokens;
+map<place_t, unsigned int>::iterator curPlaceMaxToken;
 
 %}
 

@@ -323,7 +323,6 @@ AT_CHECK([cp TESTFILES/test2.owfn .])
 AT_CHECK([ANASTASIA test2.owfn --owfn --swomt --loopnet ], 0, stdout, ignore)
 AT_CHECK([GREP -q "p1" stdout], 1, ignore)
 AT_CHECK([GREP -q "p2" stdout], 0, ignore)
-AT_CHECK([GREP -q "p3" stdout], 1, ignore)
 AT_KEYWORDS(modifiers)
 AT_CLEANUP
 

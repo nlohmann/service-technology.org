@@ -18,8 +18,10 @@
 #include "partialsolution.h"
 #include "pathfinder.h"
 #include "reachalyzer.h"
-#include "problem.h"
+#ifndef SARALIB
 #include "cmdline.h"
+#endif
+#include "problem.h"
 #include "verbose.h"
 
 using std::cerr;

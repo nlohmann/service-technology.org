@@ -4,10 +4,8 @@
 #include <cstring>
 #include <string>
 #include <fstream>
-#include "cmdline.h"
 #include "verbose.h"
 
-//extern gengetopt_args_info args_info;
 
 namespace sara {
 

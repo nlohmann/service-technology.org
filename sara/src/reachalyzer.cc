@@ -30,7 +30,6 @@
 #include "imatrix.h"
 #include "reachalyzer.h"
 #include "jobqueue.h"
-#include "cmdline.h"
 #include "verbose.h"
 
 using pnapi::PetriNet;
@@ -42,7 +41,6 @@ using std::cout;
 using std::endl;
 using std::setw;
 
-//extern gengetopt_args_info args_info;
 
 	/******************************************
 	* Implementation of the class Reachalyzer *

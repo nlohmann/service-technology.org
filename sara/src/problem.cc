@@ -33,7 +33,6 @@
 #include "pathfinder.h"
 #include "reachalyzer.h"
 #include "problem.h"
-#include "cmdline.h"
 #include "lp_solve/lp_lib.h"
 
 using std::cerr;
@@ -56,7 +55,6 @@ extern map<Transition*,int> revtorder;
 extern map<Place*,int> revporder;
 extern bool flag_verbose;
 }
-//extern gengetopt_args_info args_info;
 
 	/**************************************
 	* Implementation of the class Problem *

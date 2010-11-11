@@ -621,6 +621,15 @@ AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 
+AT_SETUP([Two-Circles])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Two-Circles.owfn .])
+AT_CHECK([DOMINO Two-Circles.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
 AT_SETUP([Not bilateral])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
@@ -637,4 +646,31 @@ AT_CHECK([cp TESTFILES/self-reactivating-transitions.owfn .])
 AT_CHECK([DOMINO self-reactivating-transitions.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
 AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Arcweight])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Arcweight.owfn .])
+AT_CHECK([DOMINO Arcweight.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Arcweight with circle])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Arcweight-circle.owfn .])
+AT_CHECK([DOMINO Arcweight-circle.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Over annotation])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/over-annotation.owfn .])
+AT_CHECK([DOMINO over-annotation.owfn --concatenateAnnotations],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(error)
 AT_CLEANUP

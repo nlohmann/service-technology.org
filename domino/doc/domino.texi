@@ -114,7 +114,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All 61 tests were successful.
+All 65 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{domino@@service-technology.org}.
@@ -459,11 +459,11 @@ domino: file foo.bar already exists -- aborting [#05]
 @end smallexample
 
 @item #06
-Error processing the input open net. This error occurs in case any transition in the input open net has more than one role assigned.
+Error processing the input open net. This error occurs in case any transition in the input open net has more than one role assigned. To avoid this error, reannotate the transitions in the input open net or use the parameter @option{--concatenateAnnotations}.
 
 @smallexample
 @cartouche
-domino: Fragmentation::buildRoleFragments(): 
+domino: Fragmentation::init(): 
         transition t1 has more than one role -- aborting [#6]
 @end cartouche
 @end smallexample

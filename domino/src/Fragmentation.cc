@@ -29,7 +29,7 @@
 /*----------------------------------------------------------------------------.
 | public global methods														  |
 `----------------------------------------------------------------------------*/
-Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
+Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet, bool ConcatenateAnnotations) {
 	this->ROLE_UNASSIGNED = -1;	
 	this->PLACE_UNASSIGNED = "";
 	this->GLOBALSTART_REACHED = "AL_1983_07_12";
@@ -41,8 +41,11 @@ Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
 	this->mCurrentDianeAlternatives = 0;
 	this->mOverallDianeAlternatives = 0;
 
+	this->mConcatenateAnnotations = ConcatenateAnnotations;
+
 	this->mInterfaceCorrections = 0;
 	this->mFragmentConnections = 0;
+	this->mArcweightCorrections = 0;
 	this->mPlacesInsert = 0;
 	this->mTransitionsInsert = 0;
 	this->mArcsInsert = 0;
@@ -81,17 +84,19 @@ void Fragmentation::init() {
 	transitions_t transitions;
 	pnapi::Place * place;
 	pnapi::Transition * transition;
-	size_t i;
+	size_t maxRoleID;
+	set<role_t> transitionRoles;
+	role_t curRole;
 
 	this->initColors();
 	
 	status("..caching roles");
 	roles = this->mNet->getRoles();
-	i = 0;
+	maxRoleID = 0;
 	FOREACH(r, roles) {
-		status("....%s -> %i", (*r).c_str(), i);
-		this->mRoleID2RoleName[i] = (*r);
-		this->mRoleName2RoleID[(*r)] = i++;
+		status("....%s -> %i", (*r).c_str(), maxRoleID);
+		this->mRoleID2RoleName[maxRoleID] = (*r);
+		this->mRoleName2RoleID[(*r)] = maxRoleID++;
 	}
 	status("..roles cached");
 
@@ -127,6 +132,18 @@ void Fragmentation::init() {
 		transition = this->mNet->findTransition(*t);
 		this->mTransitionName2TransitionPointer[*t] = transition;
 		this->mTransitionPointer2TransitionName[transition] = *t;
+		
+		transitionRoles = this->mTransitionName2TransitionPointer[*t]->getRoles();
+		if (transitionRoles.size() > 1) {
+			if (!this->mConcatenateAnnotations) {
+				abort(6, "Fragmentation::init(): transition %s has more than one role", (*t).c_str());
+			}
+			curRole = concatenateRoles(transitionRoles);
+			status("....concatenating annotation");
+			status("......%s -> %i", curRole.c_str(), maxRoleID);
+			this->mRoleID2RoleName[maxRoleID] = curRole;
+			this->mRoleName2RoleID[curRole] = maxRoleID++;
+		}
 	}
 	status("..transitions cached");
 
@@ -181,6 +198,7 @@ bool Fragmentation::buildRoleFragments() {
 	frag_id_t minFragID;
 	frag_id_t transitionFragID;
 	role_id_t curRoleID;
+	role_t curRole;
 	set<std::string> transitionRoles;
 	places_t transitionPlaces;
 	places_t placesToDo;
@@ -216,7 +234,9 @@ bool Fragmentation::buildRoleFragments() {
 			status("......t has role %s [%d]", (*(transitionRoles.begin())).c_str(), curRoleID);
 		}
 		else {
-			abort(6, "Fragmentation::buildRoleFragments(): transition %s has more than one role", (*t).c_str());
+			curRole = concatenateRoles(transition->getRoles());
+			curRoleID = this->mRoleName2RoleID.find(curRole)->second;
+			status("......t has role %s [%d]", curRole.c_str(), curRoleID);
 		}
 		this->setTransitionRoleID(*t, curRoleID, false);
 		status("......assigned RoleID %d to t", curRoleID);
@@ -397,13 +417,15 @@ bool Fragmentation::buildServices() {
 	role_id_t transitionRoleID;
 	frag_id_t transitionFragID;
 	frag_id_t newFragID;
-	map<place_t, unsigned int>::const_iterator curPlaceMaxToken;
+	map<place_t, size_t>::const_iterator curPlaceMaxToken;
 	size_t reactivatingCount;
-	unsigned int curPlaceTokens;
+	size_t curPlaceTokens;
 	bool changed;
 	multimap< role_id_t, frag_id_t > roleFragments;
 	pair<multimap< role_id_t, frag_id_t >::iterator, multimap< role_id_t, frag_id_t >::iterator> curRoleFragments;
 	pair<fragID2Transitions_t::iterator, fragID2Transitions_t::iterator> curFragTransitions;
+	map<transition_t, size_t> transitionBound;
+	map<transition_t, size_t>::const_iterator curTransitionBound;
 	Tarjan tarjan(*this->mNet);
 
 	ret = true;
@@ -457,7 +479,7 @@ bool Fragmentation::buildServices() {
 		}
 	}
 
-	if ((restrictions.size() != 0) && !this->mIsFreeChoice) {
+	if (!this->mIsFreeChoice) {
 		extern int graph_yyparse();
 		extern int graph_yylex_destroy();
 		extern FILE* graph_yyin;
@@ -517,7 +539,6 @@ bool Fragmentation::buildServices() {
 
         /// actual parsing
         graph_yyparse();
-
         // close input (output is closed by destructor)
         fclose(graph_yyin);
 
@@ -532,6 +553,25 @@ bool Fragmentation::buildServices() {
 
 	}
 
+	netTransitions = this->getTransitions(*this->mNet);
+	FOREACH(t, netTransitions) {
+		if (this->mIsFreeChoice) {
+			transitionBound.insert( std::make_pair(*t, 1) );
+		}
+		else {
+			curPlaceTokens = 0;
+			transitionPlaces = this->getTransitionPreset(*this->mNet, *t);
+			FOREACH(p, transitionPlaces) {
+				curPlaceMaxToken = Place2MaxTokens.find(*p);
+				if (curPlaceMaxToken->second > curPlaceTokens) {
+					curPlaceTokens = curPlaceMaxToken->second;
+				}
+			}
+			assert(curPlaceTokens != 0);
+			transitionBound.insert( std::make_pair(*t, curPlaceTokens) );
+		}
+	}
+
 	if (startTransitions.size() != 0) {
 		status("..create places:");
 		 FOREACH(t, startTransitions) {
@@ -544,29 +584,12 @@ bool Fragmentation::buildServices() {
 
 	if (restrictions.size() != 0) {
 		status("..restrictions:");
-		if (!this->mIsFreeChoice) {
-			FOREACH(t, restrictions) {
-				newPlace = this->SERVICE_PLACE_PREFIX + *t;
-				status("....%s", newPlace.c_str());
-
-				curPlaceTokens = 0;
-				transitionPlaces = this->getTransitionPreset(*this->mNet, *t);
-				FOREACH(p, transitionPlaces) {
-					curPlaceMaxToken = Place2MaxTokens.find(*p);
-					if (curPlaceMaxToken->second > curPlaceTokens) {
-						curPlaceTokens = curPlaceMaxToken->second;
-					}
-				}
-				assert(curPlaceTokens != 0);
-				this->mPlaceName2PlacePointer[newPlace]->setTokenCount(curPlaceTokens);
-			}
-		}
-		else {
-			FOREACH(t, restrictions) {
-				newPlace = this->SERVICE_PLACE_PREFIX + *t;
-				status("....%s", newPlace.c_str());
-				this->mPlaceName2PlacePointer[newPlace]->setTokenCount(1);
-			}
+		FOREACH(t, restrictions) {
+			newPlace = this->SERVICE_PLACE_PREFIX + *t;
+			status("....%s", newPlace.c_str());
+			curTransitionBound = transitionBound.find(*t);
+			assert(curTransitionBound != transitionBound.end());
+			this->mPlaceName2PlacePointer[newPlace]->setTokenCount(curTransitionBound->second);
 		}
 	}
 
@@ -574,8 +597,14 @@ bool Fragmentation::buildServices() {
 		status("..predecessors:");
 		FOREACH(p, predecessors) {
 			newPlace = this->SERVICE_PLACE_PREFIX + (*p).first;
+
+			curTransitionBound = transitionBound.find((*p).first);
+			assert(curTransitionBound != transitionBound.end());
+
+			if (curTransitionBound->second > 1) {this->mArcweightCorrections++;}
+
 			status("....%s --> %s", (*p).second.c_str(), (*p).first.c_str());
-			this->createArc((*p).second, newPlace);
+			this->createArc((*p).second, newPlace, curTransitionBound->second);
 			this->addPlaceFragID(newPlace, this->getTransitionFragID((*p).second));
 		}
 	}
@@ -584,8 +613,14 @@ bool Fragmentation::buildServices() {
 		status("..reactivatings:");
 		FOREACH(p, reactivatings) {
 			newPlace = this->SERVICE_PLACE_PREFIX + (*p).first;
+
+			curTransitionBound = transitionBound.find((*p).first);
+			assert(curTransitionBound != transitionBound.end());
+
+			if (curTransitionBound->second > 1) {this->mArcweightCorrections++;}
+
 			status("....%s --> %s", (*p).second.c_str(), (*p).first.c_str());
-			this->createArc((*p).second, newPlace);
+			this->createArc((*p).second, newPlace, curTransitionBound->second);
 			this->addPlaceFragID(newPlace, this->getTransitionFragID((*p).second));
 		}
 	}
@@ -614,7 +649,7 @@ bool Fragmentation::buildServices() {
 			newPlace = "P_" + newTransition;
 
 			this->createTransition(newTransition, newFragID, curRole->first);
-			this->createPlace(newPlace, newFragID, curRole->first);
+			this->createPlace(newPlace, newFragID, curRole->first, 1);
 			this->createArc(newPlace, newTransition);
 
 			curRoleFragments = roleFragments.equal_range(curRole->first);
@@ -644,7 +679,9 @@ bool Fragmentation::buildServices() {
 				}
 
 				assert(startplace != "");
-				this->createArc(newTransition, startplace);
+				assert(this->mPlaceName2PlacePointer.find(startplace) != this->mPlaceName2PlacePointer.end());
+				this->createArc(newTransition, startplace, this->mPlaceName2PlacePointer[startplace]->getTokenCount());
+				this->mPlaceName2PlacePointer[startplace]->setTokenCount(0);
 				this->addPlaceFragID(startplace, newFragID);
 			}
 		}
@@ -711,7 +748,7 @@ pnapi::PetriNet Fragmentation::createPetrinetByRoleID(const role_id_t RoleID) {
 					ret.findTransition(curRoleTransition->second)->addLabel(*ret.getInterface().findLabel(curRolePlace->second));
 				}
 				else {
-					ret.createArc(*ret.findPlace(curRolePlace->second), *ret.findTransition(curRoleTransition->second));
+					ret.createArc(*ret.findPlace(curRolePlace->second), *ret.findTransition(curRoleTransition->second), this->mNet->findArc(*place, *transition)->getWeight());
 				}
 			}
 			if (this->mNet->findArc(*transition, *place)) {
@@ -719,7 +756,7 @@ pnapi::PetriNet Fragmentation::createPetrinetByRoleID(const role_id_t RoleID) {
 					ret.findTransition(curRoleTransition->second)->addLabel(*ret.getInterface().findLabel(curRolePlace->second));
 				}
 				else {
-					ret.createArc(*ret.findTransition(curRoleTransition->second), *ret.findPlace(curRolePlace->second));
+					ret.createArc(*ret.findTransition(curRoleTransition->second), *ret.findPlace(curRolePlace->second), this->mNet->findArc(*transition, *place)->getWeight());
 				}
 			}
 		}	
@@ -746,7 +783,7 @@ void Fragmentation::createPetrinetByFragID(const frag_id_t FragID) {
 
 	curFragPlaces = this->mFragID2Places.equal_range(FragID);	
 	for (curFragPlace=curFragPlaces.first; curFragPlace!=curFragPlaces.second; ++curFragPlace) {
-		this->mFragmentNet->createPlace(curFragPlace->second);	
+		this->mFragmentNet->createPlace(curFragPlace->second).setTokenCount(this->mPlaceName2PlacePointer[curFragPlace->second]->getTokenCount());
 	}
 	
 	
@@ -760,10 +797,10 @@ void Fragmentation::createPetrinetByFragID(const frag_id_t FragID) {
 		for (curFragTransition=curFragTransitions.first; curFragTransition!=curFragTransitions.second; ++curFragTransition) {
 			transition = this->mTransitionName2TransitionPointer[curFragTransition->second];
 			if (this->mNet->findArc(*place, *transition)) {
-				this->mFragmentNet->createArc(*this->mFragmentNet->findPlace(curFragPlace->second), *this->mFragmentNet->findTransition(curFragTransition->second));	
+				this->mFragmentNet->createArc(*this->mFragmentNet->findPlace(curFragPlace->second), *this->mFragmentNet->findTransition(curFragTransition->second), this->mNet->findArc(*place, *transition)->getWeight());	
 			}
 			if (this->mNet->findArc(*transition, *place)) {
-				this->mFragmentNet->createArc(*this->mFragmentNet->findTransition(curFragTransition->second), *this->mFragmentNet->findPlace(curFragPlace->second));	
+				this->mFragmentNet->createArc(*this->mFragmentNet->findTransition(curFragTransition->second), *this->mFragmentNet->findPlace(curFragPlace->second), this->mNet->findArc(*transition, *place)->getWeight());	
 			}
 		}	
 	}

@@ -54,6 +54,11 @@ option "canonicalNames" -
   details="This option is used when Domino should replace original (long) names by (shorter) canonical ones.\n"
   flag off
 
+option "concatenateAnnotations" -
+  "Transitions annotated with more than one role will be annotated with a the concatenation of the annotated roles."
+  details="This option is used when Domino should concatenate multiple annotations.\n"
+  flag off
+
 option "resultFile" r
   "Results output."
   string
@@ -106,6 +111,13 @@ option "dotServices" -
   flag off
   hidden
   dependon="output"
+
+#option "noNormalization" -
+#  "Services created by Domino will not be normalized."
+#  details="This option is used when Domino should not normalize the created service. Requires output.\n"
+#  flag off
+#  hidden
+#  dependon="output"
 
 section "Configuration"
 sectiondesc="<<-- Domino relies on several other tools. These options configure Domino to find these tools. -->>\n"

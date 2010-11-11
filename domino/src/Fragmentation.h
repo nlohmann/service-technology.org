@@ -125,9 +125,11 @@ class Fragmentation {
 			bool mRoleFragmentsBuild;
 			bool mUnassignedFragmentsProcessed;
 			bool mServicesCreated;
+			bool mConcatenateAnnotations;
 		//statistic
 			size_t mInterfaceCorrections;
 			size_t mFragmentConnections;
+			size_t mArcweightCorrections;
 			size_t mPlacesInsert;
 			size_t mTransitionsInsert;
 			size_t mArcsInsert;
@@ -384,9 +386,9 @@ class Fragmentation {
 					}
 			//petrinet
 				//create
-				inline void createPlace(const place_t & Place, const frag_id_t FragID, const role_id_t RoleID) {
+				inline void createPlace(const place_t & Place, const frag_id_t FragID, const role_id_t RoleID, const size_t Tokens = 0) {
 					assert(this->mNet->findPlace(Place) == NULL);
-					pnapi::Place *ret = &this->mNet->createPlace(Place);
+					pnapi::Place *ret = &this->mNet->createPlace(Place, Tokens);
 					this->mPlaceName2PlacePointer[Place] = ret;
 					this->mPlacePointer2PlaceName[ret] = Place;
 					this->addPlaceFragID(Place, FragID);
@@ -402,13 +404,13 @@ class Fragmentation {
 					this->setTransitionRoleID(Transition, RoleID);
 					this->mTransitionsInsert++;
 				}
-				inline void createArc(const node_t & Source, const node_t & Target) {
+				inline void createArc(const node_t & Source, const node_t & Target, const size_t Weight = 1) {
 					pnapi::Node *source = this->mNet->findNode(Source);
 					pnapi::Node *target = this->mNet->findNode(Target);
 					assert(source != NULL);
 					assert(target != NULL);
 					assert(this->mNet->findArc(*source, *target) == NULL);
-					this->mNet->createArc(*source, *target);
+					this->mNet->createArc(*source, *target, Weight);
 					this->mArcsInsert++;
 				}
 				void createPetrinetByFragID(const frag_id_t);
@@ -651,12 +653,29 @@ class Fragmentation {
 						}
 					}
 					return ret;
-				}	
+				}
+				inline role_t concatenateRoles(const set<role_t> & Roles) {
+					size_t size = Roles.size();					
+					assert(size != 0);
+					if (size == 1) {return *Roles.begin();}
+					role_t ret = "";
+					size_t curRole = 0;
+					FOREACH(r, Roles) {
+						curRole++;
+						if (curRole != size) {
+							ret += *r + ", ";
+						}
+						else {
+							ret += *r;
+						}
+					}
+					return ret;
+				}
 
 	public:
 		//methods
 			//global
-				Fragmentation(pnapi::PetriNet &);
+				Fragmentation(pnapi::PetriNet &, bool);
 				inline ~Fragmentation() {};
 			//member support
 				//set/add
@@ -669,6 +688,7 @@ class Fragmentation {
 					inline bool isFreeChoice() {return this->mIsFreeChoice;}
 					inline size_t getInterfaceCorrections() {return this->mInterfaceCorrections;}
 					inline size_t getFragmentConnections() {return this->mFragmentConnections;}
+					inline size_t getArcweightCorrections() {return this->mArcweightCorrections;}
 					inline size_t getPlacesInsert() {return this->mPlacesInsert;}
 					inline size_t getTransitionsInsert() {return this->mTransitionsInsert;}
 					inline size_t getArcsInsert() {return this->mArcsInsert;}
@@ -697,11 +717,13 @@ class Fragmentation {
 						assert(curRole != this->mRoleName2RoleID.end());
 						return curRole->second;
 					}
-
 					inline string getColorName(const size_t ColorID) {
 						colorID2ColorName_t::const_iterator curColor = this->mColorID2ColorName.find(ColorID);
 						assert(curColor != this->mColorID2ColorName.end());
 						return curColor->second;
+					}
+					inline roleName2RoleID_t getRoles() const {
+						return this->mRoleName2RoleID;
 					}
 				//delete		
 					inline void eraseColors() {

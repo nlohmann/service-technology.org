@@ -34,6 +34,7 @@ typedef uint32_t diane_id_t;
 typedef string transition_t;
 typedef string place_t;
 typedef string node_t;
+typedef string role_t;
 
 typedef set<role_id_t> roles_t;
 typedef set<place_t> places_t;

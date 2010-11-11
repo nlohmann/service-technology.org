@@ -266,7 +266,7 @@ int main(int argc, char** argv) {
 
 	string fileName;
 	string outputFileName;
-	set<std::string> roles;
+	roleName2RoleID_t roles;
 	bool retOK;
 	validStatus_e fragmentStatus;
 
@@ -279,7 +279,7 @@ int main(int argc, char** argv) {
 	
 	retOK = true;
 
-	Fragmentation f(net);
+	Fragmentation f(net, args_info.concatenateAnnotations_flag);
 
 	if (!f.buildRoleFragments()) {
 		message(_cbad_("worklfow decomposition failed"));
@@ -373,14 +373,20 @@ int main(int argc, char** argv) {
 		}
 
 		if (args_info.output_given && retOK) {
-			roles = net.getRoles();
-			FOREACH(r, roles) {
-				pnapi::PetriNet roleNet = f.createPetrinetByRoleID(f.getRoleID((*r)));
+			roles = f.getRoles();
+			for (roleName2RoleID_t::const_iterator curRole=roles.begin(); curRole!=roles.end(); ++curRole) {
+				pnapi::PetriNet roleNet = f.createPetrinetByRoleID(curRole->second);
+				/*				
+				if (!args_info.noNormalization_flag) {
+					status("normalize service %s...", (*r).c_str());
+					roleNet.normalize();
+					status("...done");
+				}*/
 				if (args_info.output_arg != NULL) {
-					outputFileName = string(args_info.output_arg + (*r));
+					outputFileName = string(args_info.output_arg + curRole->first);
 				}
 				else {
-					outputFileName = string(fileName + "_Service-" + (*r));
+					outputFileName = string(fileName + "_Service-" + curRole->first);
 				}
 				createOWFNFile(outputFileName, roleNet, fileName);
 				if (args_info.dotServices_flag) {
@@ -402,6 +408,7 @@ int main(int argc, char** argv) {
 		results.add("decomposition.success", retOK);
 		results.add("decomposition.interface_corrections", (unsigned int)f.getInterfaceCorrections());
 		results.add("decomposition.fragment_connections", (unsigned int)f.getFragmentConnections());
+		results.add("decomposition.arcweight_correction", (unsigned int)f.getArcweightCorrections());
 		results.add("decomposition.places_insert", (unsigned int)f.getPlacesInsert());
 		results.add("decomposition.transitions_insert", (unsigned int)f.getTransitionsInsert());
 		results.add("decomposition.arcs_insert", (unsigned int)f.getArcsInsert());

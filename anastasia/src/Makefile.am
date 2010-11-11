@@ -23,6 +23,8 @@ anastasia_CPPFLAGS += -I$(top_srcdir)/libs
 anastasia_LDADD += $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
+anastasia_LDFLAGS = -ldl
+
 
 #############################################################################
 # EVERYTHING BELOW THIS LINE IS GENERIC - YOU MUST NOT CHANGE ANYTHING BELOW

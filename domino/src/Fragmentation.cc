@@ -417,7 +417,7 @@ bool Fragmentation::buildServices() {
 	role_id_t transitionRoleID;
 	frag_id_t transitionFragID;
 	frag_id_t newFragID;
-	map<place_t, size_t>::const_iterator curPlaceMaxToken;
+	map<place_t, unsigned int>::const_iterator curPlaceMaxToken;
 	size_t reactivatingCount;
 	unsigned int curPlaceTokens;
 	bool changed;

@@ -363,6 +363,49 @@ const pnapi::PetriNet * Adapter::buildController()
         status("Going into diagnosis mode ...");
 
 #if defined(HAVE_LIBCONFIG__) and HAVE_LIBCONFIG__ == 1
+
+        // we need the most-permissive partners of all nets, calculate them:
+        // maybe do it threaded?
+        /*
+        for (int i = 0; i < _nets.size(); ++i)
+        {
+            Output owfn_temp;
+                //        Output sa_temp;
+                //       Output og_temp;
+
+            std::string owfn_filename(owfn_temp.name());
+            std::string sa_filename = owfn_filename + ".sa";
+            std::string og_filename = owfn_filename + ".og";
+
+            std::string mpp_command = path2wendy;
+        }*/
+
+        // for now, expect mpp to be given:
+        for (unsigned i = 0; i < args_info.inputs_num; ++i)
+        {
+            std::string filename = std::string(args_info.inputs[i]);
+            std::string results_filename = filename + ".results";
+            std::string sa_filename = filename + ".sa";
+
+            std::ifstream rfile(results_filename.c_str());
+            if (! rfile)
+            {
+                std::string mpp_command = path2wendy
+                                + " --sa=" + sa_filename
+                                + " --result=" + results_filename
+                                + " " + filename;
+                status("Generating most-permissive partner for `%s' by executing", filename.c_str());
+                status("%s", mpp_command.c_str());
+                time(&start_time);
+                int result = system(mpp_command.c_str());
+                result = WEXITSTATUS(result);
+                time(&end_time);
+                status("Wendy done [%.0f sec]", difftime(end_time, start_time));
+                rfile.open(results_filename.c_str());
+            }
+            rfile.close();
+        }
+
         MarkingInformation mi(mi_filename);
         Diagnosis diag(diag_filename, mi);
         diag.evaluateDeadlocks(_nets, *_engine);
@@ -821,7 +864,7 @@ void Adapter::createComplementaryPlaces(pnapi::PetriNet & net)
             if (weight > 0)
             {
                 net.createArc(**nodeIter, compPlace, weight + 1);
-                net.createArc(compPlace, **nodeIter, weight);
+                net.createArc(compPlace, **nodeIter, 1);
             }
             ++nodeIter;
         }

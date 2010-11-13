@@ -1195,7 +1195,8 @@ std::string PetriNet::getUniqueNodeName(const std::string & base) const
     str << base << ++i;
     name = str.str();
   }
-  while(nodesByName_.find(name) != nodesByName_.end());
+  while((nodesByName_.find(name) != nodesByName_.end()) || // name used for a node
+        (interface_.findLabel(name) != NULL)); // name used for a label
 
   return name;
 }
@@ -1928,7 +1929,7 @@ std::map<std::string, std::string> PetriNet::canonicalNames()
  * communication. Then, it tries to normalize the net through
  * the rules from [Aalst07].
  *
- * \todo     The rules from [Aalst07] will follow soon!
+ * \todo     The rules from [Aalst07] will follow "soon"!
  */
 void PetriNet::normalize_rules()
 {

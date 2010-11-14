@@ -304,6 +304,17 @@ AT_CHECK([GREP -q "file IBM-B3-3029.owfn_Service-A.owfn cannot be opened" stderr
 AT_KEYWORDS(error)
 AT_CLEANUP
 
+AT_SETUP([Cannot write to result file])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([touch IBM-B3-3029.owfn.results])
+AT_CHECK([chmod a-w IBM-B3-3029.owfn.results])
+AT_CHECK([DOMINO IBM-B3-3029.owfn --result],1,ignore,stderr)
+AT_CHECK([GREP -q "could not write to file 'IBM-B3-3029.owfn.results'" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
 AT_SETUP([Cannot create tempfile])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
@@ -348,6 +359,24 @@ AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/over-annotation.owfn .])
 AT_CHECK([DOMINO over-annotation.owfn],1,ignore,stderr)
 AT_CHECK([GREP -q "transition t1 has more than one role" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Place exists])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/place-exists.owfn .])
+AT_CHECK([DOMINO place-exists.owfn -v --boundnessCorrection="X_"],1,ignore,stderr)
+AT_CHECK([GREP -q "createPlace(X_t2): already known" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Transition exists])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/transition-exists.owfn .])
+AT_CHECK([DOMINO transition-exists.owfn -v --connectionCorrection="T_"],1,ignore,stderr)
+AT_CHECK([GREP -q "createTransition(T_1): already known" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 

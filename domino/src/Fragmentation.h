@@ -383,7 +383,7 @@ class Fragmentation {
 			//petrinet
 				//create
 				inline void createPlace(const place_t & Place, const frag_id_t FragID, const role_id_t RoleID, const size_t Tokens = 0) {
-					if (this->mNet->findPlace(Place) != NULL) {
+					if (this->mNet->containsNode(Place)) {
 						abort(10, "Fragmentation::createPlace(%s): already known", Place.c_str());
 					}
 					pnapi::Place *ret = &this->mNet->createPlace(Place, Tokens);
@@ -394,7 +394,7 @@ class Fragmentation {
 					this->mPlacesInsert++;
 				}
 				inline void createTransition(const transition_t & Transition, const frag_id_t FragID, const role_id_t RoleID) {
-					if (this->mNet->findTransition(Transition) != NULL) {
+					if (this->mNet->containsNode(Transition)) {
 						abort(10, "Fragmentation::createTransition(%s): already known", Transition.c_str());
 					}
 					pnapi::Transition *ret = &this->mNet->createTransition(Transition);

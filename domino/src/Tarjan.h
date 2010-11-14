@@ -76,10 +76,7 @@ class Tarjan {
 		}
 
 		inline void setDFS(node_t & Node, int DFS) {
-			node_value_t::iterator curNode = this->mNodeDFS.find(Node);
-			if (curNode != this->mNodeDFS.end()) {
-				this->mNodeDFS.erase(curNode);
-			}
+			assert(this->mNodeDFS.find(Node) == this->mNodeDFS.end());
 			this->mNodeDFS.insert( std::make_pair(Node, DFS) );
 		}
 		inline void setLowlink(node_t & Node, int Lowlink) {

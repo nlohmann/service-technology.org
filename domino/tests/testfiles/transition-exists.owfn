@@ -1,0 +1,37 @@
+PLACE
+  ROLES A, B;
+  INTERNAL
+    i, o, p1, p2, p3, p4;
+
+  INPUT
+    ;
+
+  OUTPUT
+    ;
+
+INITIALMARKING
+  i;
+
+FINALCONDITION
+  TRUE;
+
+
+TRANSITION T_1
+  ROLES A;
+  CONSUME i;
+  PRODUCE p1, p2;
+
+TRANSITION t2
+  ROLES B;
+  CONSUME p1;
+  PRODUCE p3;
+
+TRANSITION t3
+  ROLES B;
+  CONSUME p2;
+  PRODUCE p4;
+
+TRANSITION t4
+  ROLES A;
+  CONSUME p3, p4;
+  PRODUCE o;

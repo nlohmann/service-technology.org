@@ -67,9 +67,6 @@ class Fragmentation {
 		//constants
 		role_id_t ROLE_UNASSIGNED;
 		place_t PLACE_UNASSIGNED;
-		place_t GLOBALSTART_REACHED;
-		place_t SERVICE_PLACE_PREFIX;
-		transition_t SERVICE_TRANSITION_PREFIX;
 
 		//members
 		//roles
@@ -125,7 +122,6 @@ class Fragmentation {
 			bool mRoleFragmentsBuild;
 			bool mUnassignedFragmentsProcessed;
 			bool mServicesCreated;
-			bool mConcatenateAnnotations;
 		//statistic
 			size_t mInterfaceCorrections;
 			size_t mFragmentConnections;
@@ -387,7 +383,9 @@ class Fragmentation {
 			//petrinet
 				//create
 				inline void createPlace(const place_t & Place, const frag_id_t FragID, const role_id_t RoleID, const size_t Tokens = 0) {
-					assert(this->mNet->findPlace(Place) == NULL);
+					if (this->mNet->findPlace(Place) != NULL) {
+						abort(10, "Fragmentation::createPlace(%s): already known", Place.c_str());
+					}
 					pnapi::Place *ret = &this->mNet->createPlace(Place, Tokens);
 					this->mPlaceName2PlacePointer[Place] = ret;
 					this->mPlacePointer2PlaceName[ret] = Place;
@@ -396,7 +394,9 @@ class Fragmentation {
 					this->mPlacesInsert++;
 				}
 				inline void createTransition(const transition_t & Transition, const frag_id_t FragID, const role_id_t RoleID) {
-					assert(this->mNet->findTransition(Transition) == NULL);
+					if (this->mNet->findTransition(Transition) != NULL) {
+						abort(10, "Fragmentation::createTransition(%s): already known", Transition.c_str());
+					}
 					pnapi::Transition *ret = &this->mNet->createTransition(Transition);
 					this->mTransitionName2TransitionPointer[Transition] = ret;
 					this->mTransitionPointer2TransitionName[ret] = Transition;
@@ -566,9 +566,9 @@ class Fragmentation {
 					places_t places = this->getTransitionPreset(*this->mNet, Transition);
 					FOREACH(p, places) {
 						if (*p == this->mGlobalStartPlace) {
-							if (Done.find(this->GLOBALSTART_REACHED) == Done.end()) {
-								ToDo.push(this->GLOBALSTART_REACHED);
-								Done.insert(this->GLOBALSTART_REACHED);
+							if (Done.find(this->mGlobalStartPlace) == Done.end()) {
+								ToDo.push(this->mGlobalStartPlace);
+								Done.insert(this->mGlobalStartPlace);
 							}
 						}
 						else {
@@ -675,7 +675,7 @@ class Fragmentation {
 	public:
 		//methods
 			//global
-				Fragmentation(pnapi::PetriNet &, bool);
+				Fragmentation(pnapi::PetriNet &);
 				inline ~Fragmentation() {};
 			//member support
 				//set/add
@@ -739,6 +739,7 @@ class Fragmentation {
 			//properties
 				inline bool isSharedPlace(const place_t & Place) {return (this->mPlace2RoleIDs.count(Place) > 1);}
 				inline bool isFragmentEmpty(const frag_id_t FragID) {return (this->mFragID2Transitions.find(FragID) == this->mFragID2Transitions.end());}
+				inline bool isRoleEmpty(const role_id_t RoleID) {return (this->mRoleID2Transitions.find(RoleID) == this->mRoleID2Transitions.end());}
 				inline bool isStartTransition(const transition_t & Transition) {
 					assert(this->mRoleFragmentsBuild);
 					frag_id_t transitionFragID = this->getTransitionFragID(Transition);

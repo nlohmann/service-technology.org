@@ -342,15 +342,6 @@ AT_CHECK([GREP -q "another global start place found" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
-AT_SETUP([Predefined place])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/predefined-place.owfn .])
-AT_CHECK([DOMINO predefined-place.owfn],1,ignore,stderr)
-AT_CHECK([GREP -q "place AL_1983_07_12 has predefined constant name" stderr])
-AT_KEYWORDS(error)
-AT_CLEANUP
-
 AT_SETUP([Over annotation])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
@@ -576,6 +567,15 @@ AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 
+AT_SETUP([IBM-B3-6879])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/IBM-B3-4958.owfn .])
+AT_CHECK([DOMINO IBM-B3-4958.owfn -v --concatenateAnnotation --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
 AT_SETUP([DA-Producer-Consumer])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
@@ -657,7 +657,7 @@ AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 
-AT_SETUP([Arcweight with circle])
+AT_SETUP([Arcweight-circle])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/Arcweight-circle.owfn .])
@@ -666,11 +666,21 @@ AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 
-AT_SETUP([Over annotation])
+AT_SETUP([Over-annotation])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/over-annotation.owfn .])
 AT_CHECK([DOMINO over-annotation.owfn --concatenateAnnotations],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Unassigned-role])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Unassigned-role.owfn .])
+AT_CHECK([DOMINO Unassigned-role.owfn -v -o],0,ignore,stderr)
+AT_CHECK([GREP -q "role C is empty" stderr])
 AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP

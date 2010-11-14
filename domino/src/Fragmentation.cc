@@ -29,19 +29,14 @@
 /*----------------------------------------------------------------------------.
 | public global methods														  |
 `----------------------------------------------------------------------------*/
-Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet, bool ConcatenateAnnotations) {
+Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
 	this->ROLE_UNASSIGNED = -1;	
 	this->PLACE_UNASSIGNED = "";
-	this->GLOBALSTART_REACHED = "AL_1983_07_12";
-	this->SERVICE_PLACE_PREFIX = "P_BOUND_";
-	this->SERVICE_TRANSITION_PREFIX = "T_CON_";
 
 	this->mCurrentDianeForces = 0;
 	this->mOverallDianeForces = 0;
 	this->mCurrentDianeAlternatives = 0;
 	this->mOverallDianeAlternatives = 0;
-
-	this->mConcatenateAnnotations = ConcatenateAnnotations;
 
 	this->mInterfaceCorrections = 0;
 	this->mFragmentConnections = 0;
@@ -104,9 +99,6 @@ void Fragmentation::init() {
 	places = this->getPlaces(*this->mNet);
 	PNAPI_FOREACH(p, places) {
 		status("....%s", (*p).c_str());
-		if (*p == GLOBALSTART_REACHED) {
-			abort(10, "Fragmentation::init(): place %s has predefined constant name", (*p).c_str());
-		}
 		if (this->getPlacePreset(*this->mNet, *p).size() == 0) {
 			status("......is global start place");
 			if (this->mGlobalStartPlace != PLACE_UNASSIGNED) {
@@ -135,7 +127,7 @@ void Fragmentation::init() {
 		
 		transitionRoles = this->mTransitionName2TransitionPointer[*t]->getRoles();
 		if (transitionRoles.size() > 1) {
-			if (!this->mConcatenateAnnotations) {
+			if (!args_info.concatenateAnnotations_flag) {
 				abort(6, "Fragmentation::init(): transition %s has more than one role", (*t).c_str());
 			}
 			curRole = concatenateRoles(transitionRoles);
@@ -453,7 +445,7 @@ bool Fragmentation::buildServices() {
 
 				status("....handle %s", curPredecessor.c_str());
 
-				if (curPredecessor == this->GLOBALSTART_REACHED) {
+				if (curPredecessor == this->mGlobalStartPlace) {
 					status("......add to restrictions");
 					restrictions.insert(*t);
 				}
@@ -575,7 +567,7 @@ bool Fragmentation::buildServices() {
 	if (startTransitions.size() != 0) {
 		status("..create places:");
 		 FOREACH(t, startTransitions) {
-			newPlace = this->SERVICE_PLACE_PREFIX + *t;
+			newPlace = args_info.boundnessCorrection_arg + *t;
 			status("....%s", newPlace.c_str());
 			this->createPlace(newPlace, this->getTransitionFragID(*t), this->getTransitionRoleID(*t));
 			this->createArc(newPlace, *t);
@@ -585,7 +577,7 @@ bool Fragmentation::buildServices() {
 	if (restrictions.size() != 0) {
 		status("..restrictions:");
 		FOREACH(t, restrictions) {
-			newPlace = this->SERVICE_PLACE_PREFIX + *t;
+			newPlace = args_info.boundnessCorrection_arg + *t;
 			status("....%s", newPlace.c_str());
 			curTransitionBound = transitionBound.find(*t);
 			assert(curTransitionBound != transitionBound.end());
@@ -596,7 +588,7 @@ bool Fragmentation::buildServices() {
 	if (predecessors.size() != 0) {
 		status("..predecessors:");
 		FOREACH(p, predecessors) {
-			newPlace = this->SERVICE_PLACE_PREFIX + (*p).first;
+			newPlace = args_info.boundnessCorrection_arg + (*p).first;
 
 			curTransitionBound = transitionBound.find((*p).first);
 			assert(curTransitionBound != transitionBound.end());
@@ -612,7 +604,7 @@ bool Fragmentation::buildServices() {
 	if (tarjan.hasNonTrivialSCC()) {
 		status("..reactivatings:");
 		FOREACH(p, reactivatings) {
-			newPlace = this->SERVICE_PLACE_PREFIX + (*p).first;
+			newPlace = args_info.boundnessCorrection_arg + (*p).first;
 
 			curTransitionBound = transitionBound.find((*p).first);
 			assert(curTransitionBound != transitionBound.end());
@@ -634,8 +626,6 @@ bool Fragmentation::buildServices() {
 		roleFragments.insert( std::make_pair(this->getFragmentRoleID(*f_b), *f_b) );
 	}
 	for (roleID2RoleName_t::iterator curRole=this->mRoleID2RoleName.begin(); curRole!=this->mRoleID2RoleName.end(); ++curRole) {
-		assert(roleFragments.count(curRole->first) != 0);
-		
 		if (roleFragments.count(curRole->first) > 1) {
 			changed = true;
 
@@ -645,7 +635,7 @@ bool Fragmentation::buildServices() {
 			std::stringstream curRoleID;
 			curRoleID << curRole->first;
 
-			newTransition = this->SERVICE_TRANSITION_PREFIX + curRoleID.str();
+			newTransition = args_info.connectionCorrection_arg + curRoleID.str();
 			newPlace = "P_" + newTransition;
 
 			this->createTransition(newTransition, newFragID, curRole->first);
@@ -662,7 +652,7 @@ bool Fragmentation::buildServices() {
 				for (fragID2Transitions_t::iterator curFragTransition=curFragTransitions.first; curFragTransition!=curFragTransitions.second; ++curFragTransition) {
 					if (restrictions.find(curFragTransition->second) != restrictions.end()) {
 						status("........use restricted place");
-						startplace = this->SERVICE_PLACE_PREFIX + curFragTransition->second;
+						startplace = args_info.boundnessCorrection_arg + curFragTransition->second;
 						break;
 					}
 					else {
@@ -685,7 +675,6 @@ bool Fragmentation::buildServices() {
 				this->addPlaceFragID(startplace, newFragID);
 			}
 		}
-
 	}
 
 	if (changed) {
@@ -703,6 +692,7 @@ bool Fragmentation::buildServices() {
 `----------------------------------------------------------------------------*/
 pnapi::PetriNet Fragmentation::createPetrinetByRoleID(const role_id_t RoleID) {
 	assert(this->mServicesCreated);
+	assert(!this->isRoleEmpty(RoleID));
 	
 	status("createPetrinetByRoleID(%d) called...", RoleID);
 
@@ -1494,7 +1484,7 @@ placeStatus_e Fragmentation::getPlaceStatus(const place_t & Place, const bool Re
 			arcsToCreate.clear();
 			arcsToDelete.clear();
 
-			sucPlace = Place + "_PART_" + sucRoleIDString.str();
+			sucPlace = Place + args_info.communicationCorrection_arg + sucRoleIDString.str();
 			this->createPlace(sucPlace, sucFragID, sucRoleID);
 
 			placeTransitions = this->getPlacePreset(*this->mNet, Place);
@@ -1509,7 +1499,7 @@ placeStatus_e Fragmentation::getPlaceStatus(const place_t & Place, const bool Re
 					newPlace = sucPlace;
 				}
 				else {
-					newPlace = Place + "_PART_" + curRoleIDString.str();
+					newPlace = Place + args_info.communicationCorrection_arg + curRoleIDString.str();
 					newTransition = "T_" + newPlace;
 					if (this->mNet->findPlace(newPlace) == NULL) {
 						this->createPlace(newPlace, curFragID, curRoleID);

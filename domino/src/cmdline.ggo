@@ -112,12 +112,39 @@ option "dotServices" -
   hidden
   dependon="output"
 
-#option "noNormalization" -
-#  "Services created by Domino will not be normalized."
-#  details="This option is used when Domino should not normalize the created service. Requires output.\n"
-#  flag off
-#  hidden
-#  dependon="output"
+option "noNormalization" -
+  "Services created by Domino will not be normalized."
+  details="This option is used when Domino should not normalize the created service. Requires output.\n"
+  flag off
+  hidden
+  dependon="output"
+
+option "communicationCorrection" -
+  "Set name pattern XYZ for places created to correct the communication."
+  details="Places created to correct the communication will named PLACE|XYZ|ROLE (without `|').\n"
+  string
+  typestr="PATTERN"
+  default="_P_"
+  optional
+  hidden
+
+option "boundnessCorrection" -
+  "Set name pattern XYZ for places created to ensure boundness."
+  details="Places created to ensure boundness will named XYZ|TRANSITION (without `|').\n"
+  string
+  typestr="PATTERN"
+  default="P_B_"
+  optional
+  hidden
+
+option "connectionCorrection" -
+  "Set name pattern XYZ for transitions created to ensure connection between fragments of the same role."
+  details="Transitions created to ensure ensure connection between fragments of the same role will named XYZ|ROLE (without `|').\n"
+  string
+  typestr="PATTERN"
+  default="T_C_"
+  optional
+  hidden
 
 section "Configuration"
 sectiondesc="<<-- Domino relies on several other tools. These options configure Domino to find these tools. -->>\n"

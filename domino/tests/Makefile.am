@@ -24,6 +24,7 @@
 TESTFILES = IBM-B3-2802.owfn \
 			IBM-B3-3029.owfn \
             IBM-B3-4958.owfn \
+			IBM-B3-6879.owfn \
             Loop-InsideRoles.owfn \
 			Loop-OverRoles.owfn \
 			DA-Producer-Consumer.owfn \
@@ -33,7 +34,7 @@ TESTFILES = IBM-B3-2802.owfn \
 			wrong-owfn.owfn \
 			no-startplace.owfn \
 			two-startplaces.owfn \
-			predefined-place.owfn \
+			Unassigned-role.owfn \
 			self-reactivating-transitions.owfn \
 			over-annotation.owfn \
 			Arcweight.owfn \

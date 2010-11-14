@@ -13,9 +13,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2010-08-24 01:17:06 +0200 (Tue, 24 Aug 2010) $
+ * \date    $Date: 2010-07-27 18:53:14 +0200 (Tue, 27 Jul 2010) $
  *
- * \version $Revision: 6088 $
+ * \version $Revision: 5964 $
  */
 
 #include "config.h"
@@ -865,20 +865,6 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
   // here be dragons
   result.finalCondition_.conjunct(finalCondition_, placeMap);
   result.finalCondition_.conjunct(net.finalCondition_, placeMap);
-  
-  set<Place *> formerInterface;
-  PNAPI_FOREACH(p, label2place)
-  {
-    if(p->second != NULL)
-    {
-      formerInterface.insert(p->second); // removing duplicates
-    }
-  }
-  PNAPI_FOREACH(p, formerInterface)
-  { 
-    // former interface places have to be empty
-    result.finalCondition_.addProposition(formula::FormulaEqual(**p, 0));
-  }
 
   // overwrite this net with the resulting net
   *this = result;

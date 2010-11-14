@@ -13,9 +13,9 @@
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-08-13 13:25:24 +0200 (Fri, 13 Aug 2010) $
+ * \date    $Date: 2010-03-12 06:22:18 +0100 (Fri, 12 Mar 2010) $
  *
- * \version $Revision: 6026 $
+ * \version $Revision: 5502 $
  */
 
 #ifndef PNAPI_COMPONENT_H
@@ -72,8 +72,6 @@ private: /* private variables */
   std::set<Node *> postset_;
   /// the arcs to the postset of this node
   std::set<Arc *> postsetArcs_;
-  /// node color (dot output)
-  std::string color_;
   
 public: /* public methods */
   /*!
@@ -94,8 +92,6 @@ public: /* public methods */
   //@{
   /// set new name of the node
   void setName(const std::string &);
-  /// set node color (dot output)
-  void setColor(const std::string & = "");
   /// adds a prefix to all names
   void prefixNameHistory(const std::string &);
   /// merges the histories of two nodes
@@ -112,8 +108,6 @@ public: /* public methods */
   bool isParallel(const Node &) const;
   /// returns the name of the node
   std::string getName() const;
-  /// returns the node's color (dot output)
-  const std::string & getColor() const;
   /// returns the name history
   std::deque<std::string> getNameHistory() const;
   /// returns the node's preset

@@ -11,9 +11,9 @@
  *
  * \since   2005/11/11
  *
- * \date    $Date: 2010-09-06 03:58:24 +0200 (Mon, 06 Sep 2010) $
+ * \date    $Date: 2010-07-23 14:38:42 +0200 (Fri, 23 Jul 2010) $
  *
- * \version $Revision: 6116 $
+ * \version $Revision: 5949 $
  */
 
 #ifndef PNAPI_EXCEPTION_H
@@ -123,9 +123,7 @@ public: /* public types */
     UE_NODE_NAME_CONFLICT,
     UE_LABEL_NAME_CONFLICT,
     UE_ARC_CONFLICT,
-    UE_COMPOSE_ERROR,
-    UE_MARKING_ERROR,
-    UE_OMEGA_CAST_ERROR
+    UE_COMPOSE_ERROR
   };
   
 public: /* public constants */
@@ -139,40 +137,6 @@ public: /* public methods */
   virtual std::ostream & output(std::ostream &) const;
 };
 
-template <class T>
-class MarkingArithmeticError : public UserCausedError
-{
-private: /* private variables */
-  /// faulty marking
-  T faultyMarking_;
-  
-public: /* public methods */
-  /// constructor
-  MarkingArithmeticError(const T &);
-  /// get faulty marking
-  T getMarking() const;
-};
-
-
-/****************************************************************************
- *** Template Implementation
- ***************************************************************************/
-
-/*!
- * \brief constructor
- */
-template <class T> MarkingArithmeticError<T>::MarkingArithmeticError(const T & m) :
-  UserCausedError(UE_MARKING_ERROR, "subtraction result negative"), faultyMarking_(m)
-{
-}
-
-/*!
- * \brief get faulty marking
- */
-template <class T> T MarkingArithmeticError<T>::getMarking() const
-{
-  return faultyMarking_;
-}
 
 } /* namespace exception */
 

@@ -114,7 +114,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All 65 tests were successful.
+All 66 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{domino@@service-technology.org}.
@@ -500,14 +500,15 @@ domino: Fragmentation::buildServices(): curPredecessor == *t -- aborting [#09]
 The parameter @option{--verbose} can give you additional information on the nature of the error.
 
 @item #10
-A place in the input open net is named with a predefined name. Actually it is 'AL_1983_07_12'. To avoid this error, rename the place in the input open net, use the parameter @option{--canonicalNames} or edit the source.
+The name of a new node is already present. To avoid this error, rename the place in the input open net or use the parameters @option{--communicationCorrection}, @option{--boundnessCorrection} and @option{--connectionCorrection}.
 
 @smallexample
 @cartouche
-domino: Fragmentation::init(): place AL_1983_07_12
-        has predefined constant name -- aborting [#10]
+domino: Fragmentation::createPlace(p1): already known -- aborting [#10]
 @end cartouche
 @end smallexample
+
+The parameter @option{--verbose} can give you additional information on the nature of the error.
 
 @item #11
 The input open net contains not exactly one global start place. Usually, this error occurs in case the input open net is no worklow.

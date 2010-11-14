@@ -279,7 +279,7 @@ int main(int argc, char** argv) {
 	
 	retOK = true;
 
-	Fragmentation f(net, args_info.concatenateAnnotations_flag);
+	Fragmentation f(net);
 
 	if (!f.buildRoleFragments()) {
 		message(_cbad_("worklfow decomposition failed"));
@@ -375,22 +375,26 @@ int main(int argc, char** argv) {
 		if (args_info.output_given && retOK) {
 			roles = f.getRoles();
 			for (roleName2RoleID_t::const_iterator curRole=roles.begin(); curRole!=roles.end(); ++curRole) {
-				pnapi::PetriNet roleNet = f.createPetrinetByRoleID(curRole->second);
-				/*				
-				if (!args_info.noNormalization_flag) {
-					status("normalize service %s...", (*r).c_str());
-					roleNet.normalize();
-					status("...done");
-				}*/
-				if (args_info.output_arg != NULL) {
-					outputFileName = string(args_info.output_arg + curRole->first);
+				if (f.isRoleEmpty(curRole->second)) {
+					status("%s %s %s", _cwarning_("role"), _cwarning_(curRole->first), _cwarning_("is empty"));
 				}
 				else {
-					outputFileName = string(fileName + "_Service-" + curRole->first);
-				}
-				createOWFNFile(outputFileName, roleNet, fileName);
-				if (args_info.dotServices_flag) {
-					createDotFile(outputFileName, roleNet, fileName);
+					pnapi::PetriNet roleNet = f.createPetrinetByRoleID(curRole->second);			
+					if (!args_info.noNormalization_flag) {
+						status("normalize service %s...", curRole->first.c_str());
+						roleNet.normalize();
+						status("..done");
+					}
+					if (args_info.output_arg != NULL) {
+						outputFileName = string(args_info.output_arg + curRole->first);
+					}
+					else {
+						outputFileName = string(fileName + "_Service-" + curRole->first);
+					}
+					createOWFNFile(outputFileName, roleNet, fileName);
+					if (args_info.dotServices_flag) {
+						createDotFile(outputFileName, roleNet, fileName);
+					}
 				}
 			}
 		}

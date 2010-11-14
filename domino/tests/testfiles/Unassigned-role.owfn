@@ -1,7 +1,7 @@
 PLACE
-  ROLES A;
+  ROLES A, B, C;
   INTERNAL
-    i, o, AL_1983_07_12;
+    i, o, p1;
 
   INPUT
     ;
@@ -10,7 +10,7 @@ PLACE
     ;
 
 INITIALMARKING
-  ;
+  i;
 
 FINALCONDITION
   TRUE;
@@ -19,4 +19,10 @@ FINALCONDITION
 TRANSITION t1
   ROLES A;
   CONSUME i;
+  PRODUCE p1;
+
+TRANSITION t2
+  ROLES B;
+  CONSUME p1;
   PRODUCE o;
+

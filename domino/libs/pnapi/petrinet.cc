@@ -13,9 +13,9 @@
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2010-07-27 18:53:14 +0200 (Tue, 27 Jul 2010) $
+ * \date    $Date: 2010-11-13 21:45:07 +0100 (Sat, 13 Nov 2010) $
  *
- * \version $Revision: 5964 $
+ * \version $Revision: 6375 $
  */
 
 #include "config.h"
@@ -865,6 +865,20 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
   // here be dragons
   result.finalCondition_.conjunct(finalCondition_, placeMap);
   result.finalCondition_.conjunct(net.finalCondition_, placeMap);
+  
+  set<Place *> formerInterface;
+  PNAPI_FOREACH(p, label2place)
+  {
+    if(p->second != NULL)
+    {
+      formerInterface.insert(p->second); // removing duplicates
+    }
+  }
+  PNAPI_FOREACH(p, formerInterface)
+  { 
+    // former interface places have to be empty
+    result.finalCondition_.addProposition(formula::FormulaEqual(**p, 0));
+  }
 
   // overwrite this net with the resulting net
   *this = result;
@@ -1181,7 +1195,8 @@ std::string PetriNet::getUniqueNodeName(const std::string & base) const
     str << base << ++i;
     name = str.str();
   }
-  while(nodesByName_.find(name) != nodesByName_.end());
+  while((nodesByName_.find(name) != nodesByName_.end()) || // name used for a node
+        (interface_.findLabel(name) != NULL)); // name used for a label
 
   return name;
 }
@@ -1914,7 +1929,7 @@ std::map<std::string, std::string> PetriNet::canonicalNames()
  * communication. Then, it tries to normalize the net through
  * the rules from [Aalst07].
  *
- * \todo     The rules from [Aalst07] will follow soon!
+ * \todo     The rules from [Aalst07] will follow "soon"!
  */
 void PetriNet::normalize_rules()
 {

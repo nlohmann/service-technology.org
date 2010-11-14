@@ -266,7 +266,6 @@ int main(int argc, char** argv) {
 
 	string fileName;
 	string outputFileName;
-	roleName2RoleID_t roles;
 	bool retOK;
 	validStatus_e fragmentStatus;
 
@@ -373,7 +372,7 @@ int main(int argc, char** argv) {
 		}
 
 		if (args_info.output_given && retOK) {
-			roles = f.getRoles();
+			roleName2RoleID_t  roles = f.getRoles();
 			for (roleName2RoleID_t::const_iterator curRole=roles.begin(); curRole!=roles.end(); ++curRole) {
 				if (f.isRoleEmpty(curRole->second)) {
 					status("%s %s %s", _cwarning_("role"), _cwarning_(curRole->first), _cwarning_("is empty"));

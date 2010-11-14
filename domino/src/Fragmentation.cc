@@ -1061,18 +1061,13 @@ role_id_t Fragmentation::getBestConnectionForDianeFragment(const diane_id_t Dian
 	transitions_t placeTransitions;
 	roles_t unpreferredCandidates;
 	roles_t knownCandidates;
-	roles_t toDelete;
 	multimap<role_id_t, frag_id_t> roleFragments;
-	size_t count;
-	size_t maxRoleFragments;
-	role_id_t maxRoleID;
 	role_id_t transitionRoleID;
 	frag_id_t transitionFragID;
 	bool found;
 	pair<dianeID2Places_t::iterator, dianeID2Places_t::iterator> curDianePlaces;
 	pair<multimap<role_id_t, frag_id_t>::iterator, multimap<role_id_t, frag_id_t>::iterator> curRoleFragments;
 	role_id_t ret;
-	validStatus_e assignmentStatus;
 
 	transitionProcessed.clear();
 
@@ -1116,9 +1111,10 @@ role_id_t Fragmentation::getBestConnectionForDianeFragment(const diane_id_t Dian
 	}
 	else {
 		status("........Diane-Fragment has %d possible candidates", knownCandidates.size());
+		roles_t toDelete;
 		toDelete.clear();
 		FOREACH(r, knownCandidates) {
-			assignmentStatus = this->getDianeAssignementValidStatus(DianeID, *r);
+			validStatus_e assignmentStatus = this->getDianeAssignementValidStatus(DianeID, *r);
 			if (assignmentStatus == VALID_BAD) {
 				status("..........check role %d: %s", *r, _cbad_("FAILED"));
 				toDelete.insert(*r);
@@ -1147,8 +1143,9 @@ role_id_t Fragmentation::getBestConnectionForDianeFragment(const diane_id_t Dian
 				ret = *knownCandidates.begin();
 			}
 			else {
-				count = maxRoleFragments = 0;
-				maxRoleID = this->ROLE_UNASSIGNED;
+				size_t count = 0;
+				size_t maxRoleFragments = 0;
+				role_id_t maxRoleID = this->ROLE_UNASSIGNED;
 			
 				FOREACH(r, knownCandidates) {
 					if (unpreferredCandidates.find(*r) == unpreferredCandidates.end()) {

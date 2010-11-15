@@ -4,7 +4,7 @@ PLACE
  INPUT
   Coin, yes, no;
  OUTPUT
-  Sweeter, Sugar, Coffee;
+  Sweeter, Sweetener, Coffee;
 
 INITIALMARKING
   p0;
@@ -30,11 +30,11 @@ TRANSITION t2 { ?yes }
  PRODUCE
   p3;
 
-TRANSITION t3 { !Sugar }
+TRANSITION t3 { !Sweetener }
  CONSUME
   p3;
  PRODUCE
-  p1, Sugar;
+  p1, Sweetener;
 
 TRANSITION t4 { ?no }
  CONSUME

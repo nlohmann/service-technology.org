@@ -2,9 +2,9 @@ PLACE
  INTERNAL
   p0,p1,p2,p3;
  INPUT
-  Sweet,Koffee,SweetedCoffee;
+  Sugar,Java,Jamoke;
  OUTPUT
-  Euro,NeedSugar;
+  Euro,needSugar;
 
 INITIALMARKING
   p0;
@@ -18,27 +18,27 @@ TRANSITION t0 { !Euro }
  PRODUCE
   p1,Euro;
 
-TRANSITION t1 { !NeedSugar }
+TRANSITION t1 { !needSugar }
  CONSUME
   p1;
  PRODUCE
-  p2, NeedSugar;
+  p2, needSugar;
 
-TRANSITION t2 { ?Sweet }
+TRANSITION t2 { ?Sugar }
  CONSUME
-  p2, Sweet;
+  p2, Sugar;
  PRODUCE
   p1;
 
-TRANSITION t3 { ?Koffee }
+TRANSITION t3 { ?Java }
  CONSUME
-  p2, Koffee;
+  p2, Java;
  PRODUCE
   p3;
 
-TRANSITION t4 { ?SweetedCoffee }
+TRANSITION t4 { ?Jamoke }
  CONSUME
-  p2, SweetedCoffee;
+  p2, Jamoke;
  PRODUCE
   ;
 

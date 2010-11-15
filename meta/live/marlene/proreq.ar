@@ -1,6 +1,6 @@
 Euro -> Coin;
-NeedSugar, Sweeter -> yes;
-NeedSugar, Sweeter -> no;
-Sugar -> Sweet;
-Coffee -> SweetedCoffee;
-Coffee -> Koffee;
+needSugar, Sweeter -> yes;
+needSugar, Sweeter -> no;
+Sweetener -> Sugar;
+Coffee -> Jamoke;
+Coffee -> Java;

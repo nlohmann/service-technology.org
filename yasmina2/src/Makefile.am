@@ -8,7 +8,7 @@ yasmina_SOURCES = main.cc \
 		lexer_fingerprint.ll syntax_fingerprint.yy
 	
 yasmina_LDADD = $(top_builddir)/libs/lp_solve/liblpsolve55.la
-yasmina_CPPFLAGS = -I$(top_srcdir)/libs/lp_solve
+yasmina_CPPFLAGS = -I$(top_srcdir)/libs
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI

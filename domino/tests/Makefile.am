@@ -25,6 +25,7 @@ TESTFILES = IBM-B3-2802.owfn \
 			IBM-B3-3029.owfn \
             IBM-B3-4958.owfn \
 			IBM-B3-6879.owfn \
+			IBM-C-596.owfn \
             Loop-InsideRoles.owfn \
 			Loop-OverRoles.owfn \
 			DA-Producer-Consumer.owfn \

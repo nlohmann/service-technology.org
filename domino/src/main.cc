@@ -260,6 +260,12 @@ int main(int argc, char** argv) {
 		net.canonicalNames();
 	}
 
+	if (net.getRoles().size() == 0) {
+		message(_cimportant_("workflow contains 0 roles"));
+		message(_cgood_("workflow decomposition successfull"));
+		return EXIT_SUCCESS;
+	}
+
     /*----------------------------------------.
     | 2. specific							  |
     `----------------------------------------*/

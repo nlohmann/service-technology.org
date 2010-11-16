@@ -87,6 +87,7 @@ void Fragmentation::init() {
 	
 	status("..caching roles");
 	roles = this->mNet->getRoles();
+	assert(roles.size() != 0);
 	maxRoleID = 0;
 	FOREACH(r, roles) {
 		status("....%s -> %i", (*r).c_str(), maxRoleID);

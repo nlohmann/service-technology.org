@@ -1,5 +1,5 @@
 PLACE
-  ROLES A;
+  ROLES A, B;
   INTERNAL
     i, o;
 

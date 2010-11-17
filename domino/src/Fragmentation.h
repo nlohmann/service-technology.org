@@ -605,8 +605,8 @@ class Fragmentation {
 							frag_id_t minFragID = *toConnect.begin();
 							toConnect.erase(minFragID);
 							FOREACH(r, toConnect) {
-								//status("....replace %d with %d", minFragID, *r);
-								this->replaceFragIDs(minFragID, *r);
+								//status("....replace %d with %d", *r, minFragID);
+								this->replaceFragIDs(*r, minFragID);
 							}
 						}
 						toConnect.clear();

@@ -136,11 +136,18 @@ public class PetriNetIO {
     result = result.replace(']', '_');
     result = result.replace('=', '_');
     result = result.replace(':', '_');
+    result = result.replace('{', '_');
+    result = result.replace('}', '_');
+    result = result.replace(',', '_');
+    result = result.replace(';', '_');
+
     return result;
   }
   
   public static String toLoLA(PetriNet net) {
     StringBuilder b = new StringBuilder();
+    
+    boolean labeled_net = !net.isUnlabeled();
     
     b.append("{\n");
     b.append("  input file:\n");
@@ -153,7 +160,9 @@ public class PetriNetIO {
       b.append("    ");
       Iterator<Place> place = net.getPlaces().iterator();
       while (place.hasNext()) {
-        b.append(" "+toLoLA(place.next().getUniqueIdentifier()));
+        Place p = place.next();
+        String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
+        b.append(" "+toLoLA(placeName));
         if (place.hasNext()) b.append(",");
       }
       b.append(";\n");
@@ -166,7 +175,8 @@ public class PetriNetIO {
     for (Place p : net.getPlaces()) {
       if (p.getTokens() > 0) {
         if (!firstPlace) b.append(",");
-        b.append(" "+toLoLA(p.getUniqueIdentifier())+":"+p.getTokens());
+        String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
+        b.append(" "+toLoLA(placeName)+":"+p.getTokens());
         firstPlace = false;
       }
     }
@@ -174,12 +184,15 @@ public class PetriNetIO {
     
     // ---------------------- transitions ------------------------
     for (Transition t : net.getTransitions()) {
-      b.append("TRANSITION "+toLoLA(t.getUniqueIdentifier())+"\n");
+      String transitionName = (labeled_net ? t.getUniqueIdentifier() : t.getName());
+      b.append("TRANSITION "+toLoLA(transitionName)+"\n");
         // pre-places of the transition
         b.append("  CONSUME");
         place = t.getPreSet().iterator();
         while (place.hasNext()) {
-          b.append(" "+toLoLA(place.next().getUniqueIdentifier())+":1");
+          Place p = place.next();
+          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
+          b.append(" "+toLoLA(placeName)+":1");
           if (place.hasNext()) b.append(",");
         }
         b.append(";\n");
@@ -187,7 +200,9 @@ public class PetriNetIO {
         b.append("  PRODUCE");
         place = t.getPostSet().iterator();
         while (place.hasNext()) {
-          b.append(" "+toLoLA(place.next().getUniqueIdentifier())+":1");
+          Place p = place.next();
+          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
+          b.append(" "+toLoLA(placeName)+":1");
           if (place.hasNext()) b.append(",");
         }
         b.append(";\n");
@@ -198,6 +213,8 @@ public class PetriNetIO {
   
   public static String toOWFN(PetriNet net) {
     StringBuilder b = new StringBuilder();
+    
+    boolean labeled_net = !net.isUnlabeled();
     
     b.append("{\n");
     b.append("  input file:\n");
@@ -222,7 +239,9 @@ public class PetriNetIO {
         b.append("    ");
         Iterator<Place> place = net.getPlaces().iterator();
         while (place.hasNext()) {
-          b.append(" "+toLoLA(place.next().getUniqueIdentifier()));
+          Place p = place.next();
+          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
+          b.append(" "+toLoLA(placeName));
           if (place.hasNext()) b.append(",");
         }
         b.append(";\n");
@@ -232,7 +251,9 @@ public class PetriNetIO {
         b.append("    "); /*
         place = net.getPlaces().iterator();
         while (place.hasNext()) {
-          b.append(" "+place.next());
+          Place p = place.next();
+          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
+          b.append(" "+toLoLA(placeName));
           if (place.hasNext()) b.append(",");
         } */
         b.append(";\n");
@@ -242,7 +263,9 @@ public class PetriNetIO {
         b.append("    "); /*
         place = net.getPlaces().iterator();
         while (place.hasNext()) {
-          b.append(" "+place.next());
+          Place p = place.next();
+          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
+          b.append(" "+toLoLA(placeName));
           if (place.hasNext()) b.append(",");
         } */
         b.append(";\n");
@@ -255,7 +278,8 @@ public class PetriNetIO {
     for (Place p : net.getPlaces()) {
       if (p.getTokens() > 0) {
         if (!firstPlace) b.append(",");
-        b.append(" "+toLoLA(p.getUniqueIdentifier())+":"+p.getTokens());
+        String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
+        b.append(" "+toLoLA(placeName)+":"+p.getTokens());
         firstPlace = false;
       }
     }
@@ -267,7 +291,8 @@ public class PetriNetIO {
     
     // ---------------------- transitions ------------------------
     for (Transition t : net.getTransitions()) {
-      b.append("TRANSITION "+toLoLA(t.getUniqueIdentifier())+"\n");
+      String transitionName = (labeled_net ? t.getUniqueIdentifier() : t.getName());
+      b.append("TRANSITION "+toLoLA(transitionName)+"\n");
         // print roles of the transition
         if (t.getRoles().size() > 0) {
           b.append("  ROLES");
@@ -282,7 +307,9 @@ public class PetriNetIO {
         b.append("  CONSUME");
         place = t.getPreSet().iterator();
         while (place.hasNext()) {
-          b.append(" "+toLoLA(place.next().getUniqueIdentifier())+":1");
+          Place p = place.next();
+          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
+          b.append(" "+toLoLA(placeName)+":1");
           if (place.hasNext()) b.append(",");
         }
         b.append(";\n");
@@ -290,7 +317,9 @@ public class PetriNetIO {
         b.append("  PRODUCE");
         place = t.getPostSet().iterator();
         while (place.hasNext()) {
-          b.append(" "+toLoLA(place.next().getUniqueIdentifier())+":1");
+          Place p = place.next();
+          String placeName = (labeled_net ? p.getUniqueIdentifier() : p.getName());
+          b.append(" "+toLoLA(placeName)+":1");
           if (place.hasNext()) b.append(",");
         }
         b.append(";\n");
@@ -344,8 +373,20 @@ public class PetriNetIO {
   
   public static void writeToFile(PetriNet net, String fileName, int format, int parameter) throws IOException {
 
+    String extendedFileName;
+    int extIndex = fileName.lastIndexOf('.');
+    if (extIndex >= 0) {
+      String ext = fileName.substring(extIndex+1);
+      if (!ext.equals(getFileExtension(format)))
+        extendedFileName = fileName+"."+getFileExtension(format);
+      else
+        extendedFileName = fileName;
+    } else {
+      extendedFileName = fileName+"."+getFileExtension(format);
+    }
+    
     // Create file 
-    FileWriter fstream = new FileWriter(fileName+"."+getFileExtension(format));
+    FileWriter fstream = new FileWriter(extendedFileName);
     BufferedWriter out = new BufferedWriter(fstream);
     
     if (format == FORMAT_DOT) {

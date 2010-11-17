@@ -30,7 +30,7 @@ import java.util.List;
  * 
  * @author Dirk Fahland
  */
-public class PetriNet {
+public class PetriNet implements ISystemModel {
   
   protected int nodeId;
 
@@ -282,6 +282,36 @@ public class PetriNet {
   }
   
   /**
+   * Try to turn the net into a labeled net by removing all technical
+   * prefixes of a node's name, i.e. "p784_name" becomes "name" for places
+   * and "t3531_name" becomes "name" for transitions. 
+   */
+  public void turnIntoLabeledNet () {
+    for (Place p : getPlaces()) {
+      String oldName = p.getName();
+      int index = oldName.indexOf('_');
+      if (index == -1) continue;
+      
+      String namePrefix = oldName.substring(0, index);
+      if (!namePrefix.matches("p[0-9]+")) continue;
+      
+      p.setName(oldName.substring(index+1));
+    }
+
+    for (Transition t : getTransitions()) {
+      String oldName = t.getName();
+      int index = oldName.indexOf('_');
+      if (index == -1) continue;
+      
+      String namePrefix = oldName.substring(0, index);
+      if (!namePrefix.matches("t[0-9]+")) continue;
+      
+      t.setName(oldName.substring(index+1));
+    }
+
+  }
+  
+  /**
    * replace all names of places and transitions with identifiers pNUM and tNUM, respectively
    */
   public void anonymizeNet() {
@@ -370,6 +400,22 @@ public class PetriNet {
       return;
     }
     n.setName(newName);
+  }
+  
+  /**
+   * @return <code>true</code> iff no two nodes of the net have the same name
+   */
+  public boolean isUnlabeled() {
+    HashSet<String> foundNames = new HashSet<String>();
+    for (Place p : getPlaces()) {
+      if (foundNames.contains(p.getName())) return false;
+      foundNames.add(p.getName());
+    }
+    for (Transition t : getTransitions()) {
+      if (foundNames.contains(t.getName())) return false;
+      foundNames.add(t.getName());
+    }
+    return true;
   }
 
   /**
@@ -488,6 +534,94 @@ public class PetriNet {
   }
   
   /**
+   * Remove transition t and merge t's post-set with t's pre-set.
+   * Requires that t has exactly one pre-place and exactly one 
+   * post-place.
+   * 
+   * @param t
+   */
+  public void contractTransition(Transition t) {
+    
+    if (t.getPreSet().size() > 1 || t.getPostSet().size() > 1) return;
+    
+    Place prePlace = t.getPreSet().get(0);
+    Place postPlace = t.getPostSet().get(0);
+    
+    for (Transition tPost : postPlace.getPostSet()) {
+      addArc(prePlace, tPost);
+    }
+    
+    setTokens(prePlace, prePlace.getTokens()+postPlace.getTokens());
+    
+    removeTransition(t);
+    removePlace(postPlace);
+    
+  }
+  
+  /**
+   * Remove transition t and replace it with a set of 
+   * concurrent places, i.e., build the cross-product
+   * of its pre- and post-set.
+   * 
+   * @param t
+   */
+  public void replaceTransitionStrongCo(Transition t) {
+    
+    List<Place> preSet = t.getPreSet();
+    List<Place> postSet = t.getPostSet();
+    
+    Place product[][] = new Place[preSet.size()][postSet.size()];
+    for (int i=0;i<preSet.size();i++) {
+      for (int j=0;j<postSet.size();j++) {
+        product[i][j] = addPlace("("+preSet.get(i).getName()+"x"+postSet.get(j).getName()+")");
+        setTokens(product[i][j], preSet.get(i).getTokens()+postSet.get(j).getTokens());
+        
+        for (Transition s : preSet.get(i).getPreSet()) {
+          addArc(s,product[i][j]);
+        }
+        for (Transition s : postSet.get(j).getPostSet()) {
+          addArc(product[i][j],s);
+        }
+      }
+    }
+    
+    for (Place p : t.getPreSet())
+      removePlace(p);
+    for (Place p : t.getPostSet())
+      removePlace(p);
+    removeTransition(t);
+    
+  }
+  
+  /**
+   * Remove place p and merge p's post-set with p's pre-set.
+   * Requires that p has exactly one pre-transition and exactly
+   * one post-transition. p must not be marked
+   * 
+   * @param p
+   */
+  public void contractPlace(Place p) {
+    
+    if (p.getPreSet().size() > 1 || p.getPostSet().size() > 1
+        || p.getTokens() > 0) return;
+    
+    Transition preTransition = p.getPreSet().get(0);
+    Transition postTransition = p.getPostSet().get(0);
+    
+    for (Place pPost : postTransition.getPostSet()) {
+      addArc(preTransition, pPost);
+    }
+    for (Place pPre : postTransition.getPreSet()) {
+      if (pPre == p) continue;
+      addArc(pPre, preTransition);
+    }
+    
+    removePlace(p);
+    removeTransition(postTransition);
+    
+  }
+
+  /**
    * Remove transition t from the net. Remove also all adjacent arcs.
    * 
    * @param t
@@ -535,6 +669,26 @@ public class PetriNet {
     Node tgt = a.getTarget();
     src.detachArc(a);
     tgt.detachArc(a);
+  }
+  
+  /**
+   * Ensures that each transition has at least one pre-place
+   * and at least one post-place. If a transition has an empty
+   * pre- or post-set, we add a self-loop to an initially marked place.
+   */
+  public void makeNormalNet() {
+    LinkedList<Transition> isolated = new LinkedList<Transition>();
+    for (Transition t : getTransitions()) {
+      if (t.getIncoming().isEmpty() || t.getOutgoing().isEmpty())
+        isolated.add(t);
+    }
+    
+    for (Transition t : isolated) {
+      Place p = addPlace(t.getName()+"_loop");
+      p.setTokens(1);
+      addArc(p, t);
+      addArc(t, p);
+    }
   }
 
   /**
@@ -592,7 +746,7 @@ public class PetriNet {
   public boolean nondeterministicTransitions(Transition t1, Transition t2) {
     if (t1 == t2) return false;
     if (!t1.getName().equals(t2.getName())) return false;
-    if (t1.getPreSet().size() != t2.getPreSet().size()) return true;
+    if (t1.getPreSet().size() != t2.getPreSet().size()) return false;
     
     for (Place p : t1.getPreSet()) {
       if (!t2.getPreSet().contains(p)) return false;
@@ -711,14 +865,25 @@ public class PetriNet {
    *   Output
    * 
    * ----------------------------------------------------------------------- */
-  
+
   /**
    * Write the Petri net in GraphViz dot format
    * 
-   * @param net
    * @return
    */
   public String toDot() {
+    return toDot(new HashMap<Object, String>());
+  }
+  
+  /**
+   * Write the Petri net in GraphViz dot format, if colorMap assigns
+   * an object of the net a special color of the Graphviz Coloring
+   * Scheme, then the object will be rendered in this color.
+   * 
+   * @param colorMap
+   * @return
+   */
+  public String toDot(HashMap<Object, String> colorMap) {
     StringBuilder b = new StringBuilder();
     b.append("digraph BP {\n");
     
@@ -739,10 +904,13 @@ public class PetriNet {
       nodeID++;
       nodeIDs.put(p, nodeID);
       
-      if (p.getTokens() > 0)
-        b.append("  p"+nodeID+" ["+tokenFillString+"]\n");
-      else
-        b.append("  p"+nodeID+" []\n");
+      String colorString = "";
+      if (p.getTokens() > 0 )
+        colorString = tokenFillString;
+      else if (colorMap.containsKey(p))
+        colorString = "fillcolor=\""+colorMap.get(p)+"\"";
+      
+      b.append("  p"+nodeID+" ["+colorString+"]\n");
       
       String auxLabel = ""; //"ROLES: "+toString(p.getRoles());
         
@@ -757,7 +925,11 @@ public class PetriNet {
       nodeID++;
       nodeIDs.put(t, nodeID);
 
-      b.append("  t"+nodeID+" []\n");
+      String colorString = "";
+      if (colorMap.containsKey(t))
+        colorString = "fillcolor=\""+colorMap.get(t)+"\"";
+      
+      b.append("  t"+nodeID+" ["+colorString+"]\n");
       
       String auxLabel  = "";  //"ROLES: "+toString(t.getRoles());
       
@@ -781,10 +953,15 @@ public class PetriNet {
     b.append("\n\n");
     b.append(" edge [fontname=\"Helvetica\" fontsize=8 arrowhead=normal color=black];\n");
     for (Arc arc : getArcs()) {
+      
+      String colorString = "";
+      if (colorMap.containsKey(arc))
+        colorString = "color=\""+colorMap.get(arc)+"\"";
+      
       if (arc.getSource() instanceof Transition)
-        b.append("  t"+nodeIDs.get(arc.getSource())+" -> p"+nodeIDs.get(arc.getTarget())+" [weight=10000.0]\n");
+        b.append("  t"+nodeIDs.get(arc.getSource())+" -> p"+nodeIDs.get(arc.getTarget())+" [weight=10000.0 "+colorString+"]\n");
       else
-        b.append("  p"+nodeIDs.get(arc.getSource())+" -> t"+nodeIDs.get(arc.getTarget())+" [weight=10000.0]\n");
+        b.append("  p"+nodeIDs.get(arc.getSource())+" -> t"+nodeIDs.get(arc.getTarget())+" [weight=10000.0 "+colorString+"]\n");
     }
     b.append("}");
     return b.toString();

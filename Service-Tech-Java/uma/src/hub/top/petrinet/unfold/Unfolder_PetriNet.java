@@ -28,6 +28,7 @@ import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.DNodeSet.DNodeSetElement;
+import hub.top.uma.Uma;
 
 public class Unfolder_PetriNet {
   
@@ -56,8 +57,8 @@ public class Unfolder_PetriNet {
       
     } catch (InvalidModelException e) {
       
-      System.err.println("Error! Invalid model.");
-      System.err.println(e);
+      Uma.err.println("Error! Invalid model.");
+      Uma.err.println(e);
       sys = null;
       bp = null;
     }
@@ -73,7 +74,7 @@ public class Unfolder_PetriNet {
     // extend unfolding until no more events can be added
     while ((current_steps = bp.step()) > 0) {
       total_steps += current_steps;
-      System.out.print(total_steps+"... ");
+      Uma.out.print(total_steps+"... ");
     }
   }
   

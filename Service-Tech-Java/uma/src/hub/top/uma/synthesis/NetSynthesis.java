@@ -31,7 +31,7 @@ import hub.top.uma.InvalidModelException;
 import hub.top.uma.DNodeSet.DNodeSetElement;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import com.google.gwt.dev.util.collect.HashSet;
 
 /**
  * Synthesize a (possibly labeled) Petri net by folding the branching process
@@ -40,48 +40,60 @@ import java.util.HashSet;
  * @author Dirk Fahland
  */
 public class NetSynthesis {
-
+  
+  private DNodeBP bp;
+  
   /**
-   * Fold the given branching process into a possibly labeled Petri net.
-   * 
-   * @param bp
-   * @return
+   *  map that assigns each DNode to its synthesize net counter-part
+   *  built up during net construction
    */
-  public static PetriNet foldToNet_labeled(DNodeBP bp) {
-    DNodeSetElement showNodes = getAllNodes_notHotAnti(bp);
-    return foldToNet_labeled(bp, showNodes);
+  public HashMap<DNode, Node> d2n;
+  
+  /**
+   * reverse of {@link #d2n}, mapping each node to the canonical
+   * representative of the original folding equivalence class of
+   * the net
+   */
+  public HashMap<Node, DNode> n2d;
+
+  public NetSynthesis(DNodeBP bp) {
+    this.bp = bp;
   }
   
   /**
    * Fold the given branching process into a possibly labeled Petri net.
    * 
    * @param bp
+   * @return
+   */
+  public PetriNet foldToNet_labeled() {
+    DNodeSetElement showNodes = getAllNodes_notHotAnti(bp);
+    return this.foldToNet_labeled(showNodes);
+  }
+  
+  /**
+   * Fold the given branching process into a possibly labeled Petri net.
+   * 
    * @param nodesToShow generate Petri net only from the nodes in this set 
    *                    if <code>null</code>, then all nodes will be used
    * @return
    */
-  public static PetriNet foldToNet_labeled(DNodeBP bp, DNodeSetElement fromNodes) {
-    
-    // bp.debugPrintCCpairs();
-    
-    bp.buildFoldingEquivalence();
-    bp.relaxFoldingEquivalence();
-    //bp.debug_printFoldingEquivalence();
-    bp.extendFoldingEquivalence_forward();
-
-    //bp.minimizeFoldingRelation();
-    bp.relaxFoldingEquivalence();
-    
-    // bp.debug_printFoldingEquivalence();
+  public PetriNet foldToNet_labeled(DNodeSetElement fromNodes) {
     
     DNodeSys dAS = bp.getSystem();
+
+    bp.equivalentNode();
+    
+    bp.extendFoldingEquivalence_maximal();
+    while (bp.extendFoldingEquivalence_backwards());
+    bp.relaxFoldingEquivalence();
     
     // maps each DNode to its least equivalent DNode (to itself it is the least)
-    HashMap<DNode, DNode> equiv = bp.getElementary_ccPair();
+    HashMap<DNode, DNode> equiv = bp.equivalentNode();
     // map that assigns each DNode to its synthesize net counter-part
     // built up during net construction
-    HashMap<DNode, Node> d2n = new HashMap<DNode, Node>();
-    HashMap<Node, DNode> n2d = new HashMap<Node, DNode>();
+    d2n = new HashMap<DNode, Node>();
+    n2d = new HashMap<Node, DNode>();
     
     PetriNet net = new PetriNet(); 
     
@@ -225,6 +237,96 @@ public class NetSynthesis {
   }
   
   /**
+   * Fold the given branching process into a possibly labeled Petri net.
+   * 
+   * @param bp
+   * @param nodesToShow generate Petri net only from the nodes in this set 
+   *                    if <code>null</code>, then all nodes will be used
+   * @return
+   */
+  public static PetriNet foldToNet_labeled(DNodeBP bp, DNodeSetElement fromNodes) {
+   NetSynthesis synth = new NetSynthesis(bp);
+   return synth.foldToNet_labeled(fromNodes);
+  }
+  
+  /**
+   * Fold the given branching process into a possibly labeled Petri net.
+   * 
+   * @param bp
+   * @return
+   */
+  public static PetriNet foldToNet_labeled(DNodeBP bp) {
+    DNodeSetElement showNodes = getAllNodes_notHotAnti(bp);
+    return foldToNet_labeled(bp, showNodes);
+  }
+  
+  public static PetriNet foldToNet_byLabel(DNodeBP bp) {
+    DNodeSetElement showNodes = getAllNodes_notHotAnti(bp);
+    return foldToNet_byLabel(bp, showNodes);
+  }
+
+  
+  public static PetriNet foldToNet_byLabel(DNodeBP bp, DNodeSetElement fromNodes) {
+
+    DNodeSys dAS = bp.getSystem();
+    
+    HashMap<Short, Node> d2n = new HashMap<Short, Node>();
+    
+    PetriNet net = new PetriNet(); 
+    
+    // first generate all places
+    for (DNode b: fromNodes) {
+      if (b.isEvent || b.isAnti) continue;  
+      // conditions only
+      
+      if (!d2n.containsKey(b.id)) {
+        Place p = net.addPlace(dAS.properNames[b.id]);
+        
+        if (b.pre == null || b.pre.length == 0) {
+          p.setTokens(1);
+        }
+        d2n.put(b.id, p);
+      }
+    }
+    
+    // then generate all transitions
+    for (DNode e : fromNodes) {
+      if (!e.isEvent) continue;  
+      // events only
+      
+      if (!d2n.containsKey(e.id)) {
+        Transition t = net.addTransition(dAS.properNames[e.id]);
+        d2n.put(e.id, t);
+      }
+      
+      Transition t = (Transition)d2n.get(e.id);
+      // create arcs
+      for (DNode b : e.pre) {
+        Place p = (Place)d2n.get(b.id);
+        if (p == null) {
+          System.out.println("transition "+t+" has no pre-place for "+b);
+          continue;
+        }
+        if (t.getPreSet().contains(p))
+          continue;
+        net.addArc(p, t);
+      }
+      for (DNode b : e.post) {
+        Place p = (Place)d2n.get(b.id);
+        if (p == null) {
+          System.out.println("transition "+t+" has no post-place for "+b);
+          continue;
+        }
+        if (t.getPostSet().contains(p))
+          continue;
+        net.addArc(t, p);
+      }
+    }
+    
+    return net;
+  }
+  
+  /**
    * @param bp
    * @return all nodes of <code>bp</code> that are not {@link DNode#isHot} and {@link DNode#isAnti}
    */
@@ -360,10 +462,8 @@ public class NetSynthesis {
     dbp2.configure_PetriNet();
     
     while ((dbp2.step() > 0));
-    
-    dbp2.buildFoldingEquivalence();
-    dbp2.relaxFoldingEquivalence();
-    dbp2.extendFoldingEquivalence_forward();
+
+    dbp2.foldingEquivalence();
 
     int result = hub.top.uma.synthesis.NetSynthesis.compareBehavior(dbp, dbp2);
     switch (result) {
@@ -490,7 +590,7 @@ public class NetSynthesis {
           // a matching node 'b' that matches 'b2' = d2Pre[i]
           DNode b = matchMap.get(d2Pre[i]);
           // and all nodes of 'sys' that are equivalent to 'b'
-          HashSet<DNode> dPre_i = dbp.foldingEquivalenceClass.get(dbp.getElementary_ccPair().get(b)); 
+          HashSet<DNode> dPre_i = dbp.foldingEquivalence().get(dbp.equivalentNode().get(b)); 
           
           // and collect all successors of 'b' (and its equivalent nodes,
           // these successors are possible nodes 'd' of 'sys' to match 'd2'
@@ -604,7 +704,7 @@ public class NetSynthesis {
         
         // 'd' was not matched, so check whether an equivalent node was matched
         boolean matched = false;
-        for (DNode dPrime : dbp.foldingEquivalenceClass.get(dbp.getElementary_ccPair().get(d))) {
+        for (DNode dPrime : dbp.foldingEquivalence().get(dbp.equivalentNode().get(d))) {
           if (matchMap.containsValue(dPrime)) {
             matched = true;
             break;

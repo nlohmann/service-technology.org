@@ -18,15 +18,17 @@
 
 package hub.top.scenario;
 
+import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 import hub.top.uma.InvalidModelException;
+import hub.top.uma.Uma;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 
-public class OcletSpecification {
+public class OcletSpecification implements ISystemModel {
 
   private Oclet initialRun;
   private LinkedList<Oclet> oclets;
@@ -95,8 +97,10 @@ public class OcletSpecification {
     HashMap<Place, Place> placeMap = new HashMap<Place, Place>();
     
     for (Place p : net.getPlaces()) {
+      Uma.out.println("place "+p.getName());
       OcletIdentifier oid = new OcletIdentifier(p.getName());
       if (!ocletMap.containsKey(oid.ocletName)) {
+        Uma.out.println("new oclet "+oid.ocletName);
         
         Oclet o = new Oclet(oid.ocletName, oid.isAnti);
         ocletMap.put(oid.ocletName, o);
@@ -106,12 +110,16 @@ public class OcletSpecification {
       Place pNew = o.addPlace(oid.nodeName, oid.isHist);
       placeMap.put(p, pNew);
       pNew.setTokens(p.getTokens());
+      
+      Uma.out.println("place "+oid.nodeName+" --> "+oid.ocletName);
     }
     
     for (Transition t : net.getTransitions()) {
+      Uma.out.println("transition "+t.getName());
       OcletIdentifier oid = new OcletIdentifier(t.getName());
       if (!ocletMap.containsKey(oid.ocletName)) {
-
+        Uma.out.println("new oclet "+oid.ocletName);
+        
         Oclet o = new Oclet(oid.ocletName, oid.isAnti);
         ocletMap.put(oid.ocletName, o);
       }
@@ -130,6 +138,7 @@ public class OcletSpecification {
         o.addArc(tNew, placeMap.get(p));
         if (oid.isAnti) o.makeHotNode(placeMap.get(p));
       }
+      Uma.out.println("transition "+oid.nodeName+" --> "+oid.ocletName);
     }
 
     for (Oclet o : ocletMap.values()) {
@@ -183,11 +192,11 @@ public class OcletSpecification {
       int ocletNameEnd = ocletPrefix.lastIndexOf('_');
       int ocletSuffixStart;
       
-      if (ocletNameEnd == -1) { 
+      if (ocletNameEnd != -1 && ocletPrefix.endsWith("_hist") ) {
+        ocletSuffixStart = ocletNameEnd+1;  
+      } else { 
         ocletNameEnd = ocletPrefix.length();
         ocletSuffixStart = ocletNameEnd;
-      } else {
-        ocletSuffixStart = ocletNameEnd+1;
       }
       
       ocletName = ocletPrefix.substring(0, ocletNameEnd);

@@ -18,9 +18,8 @@
 
 package hub.top.uma;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+import com.google.gwt.dev.util.collect.HashSet;
 import java.util.LinkedList;
 
 /**
@@ -142,7 +141,7 @@ public class DNodeSet {
 	 * @param newNode
 	 */
 	public void add(DNode newNode) {
-		
+//System.out.println("adding "+newNode+" "+DNode.toString(newNode.pre)+" to "+this);
 		assert newNode != null : "Error! Trying to insert null node into DNodeSet";
 		
 		// the predecessors of newNode are no longer maxNodes in this set
@@ -637,12 +636,16 @@ public class DNodeSet {
 	 */
 	public static boolean option_printAnti = true;
 	
+	public String toDot (String properNames[]) {
+	  return toDot(properNames, new HashMap<DNode, String>());
+	}
+	
 	/**
 	 * Create a GraphViz' dot representation of this branching process.
 	 * 
 	 * @return 
 	 */
-	public String toDot (String properNames[]) {
+	public String toDot (String properNames[], HashMap<DNode,String> coloring) {
 		StringBuilder b = new StringBuilder();
 		b.append("digraph BP {\n");
 		
@@ -669,7 +672,11 @@ public class DNodeSet {
 				b.append("  c"+n.localId+" ["+tokenFillString+"]\n");
 			else
 			*/
-			if (n.isAnti && n.isHot)
+			if (coloring.containsKey(n)) {
+			  String rgbColorFillString = "fillcolor="+coloring.get(n);
+			  b.append("  c"+n.globalId+" ["+rgbColorFillString+"]\n");
+			}
+			else if (n.isAnti && n.isHot)
 				b.append("  c"+n.globalId+" ["+antiFillString+"]\n");
       else if (n.isCutOff)
         b.append("  c"+n.globalId+" ["+cutOffFillString+"]\n");
@@ -693,7 +700,11 @@ public class DNodeSet {
 				continue;
 			
 			
-			if (n.isAnti && n.isHot)
+			if (coloring.containsKey(n)) {
+        String rgbColorFillString = "fillcolor="+coloring.get(n);
+        b.append("  e"+n.globalId+" ["+rgbColorFillString+"]\n");
+      }
+      else if (n.isAnti && n.isHot)
 				b.append("  e"+n.globalId+" ["+antiFillString+"]\n");
 			else if (n.isAnti && !n.isHot)
         b.append("  e"+n.globalId+" ["+hiddenFillString+"]\n");
@@ -733,10 +744,15 @@ public class DNodeSet {
 				if (n.pre[i] == null) continue;
 				if (!option_printAnti && n.isAnti) continue;
 				
+				String rgbColorString = "";
+	      if (coloring.containsKey(n)) {
+	        rgbColorString = "color="+coloring.get(n);
+	      }
+				
 				if (n.pre[i].isEvent)
-					b.append("  e"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0]\n");
+					b.append("  e"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0 "+rgbColorString+"]\n");
 				else
-					b.append("  c"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0]\n");
+					b.append("  c"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0 "+rgbColorString+"]\n");
 			}
 		}
     for (DNode n : allEvents) {
@@ -745,10 +761,15 @@ public class DNodeSet {
         if (n.pre[i] == null) continue;
         if (!option_printAnti && n.isAnti) continue;
         
+        String rgbColorString = "";
+        if (coloring.containsKey(n)) {
+          rgbColorString = "color="+coloring.get(n);
+        }
+        
         if (n.pre[i].isEvent)
-          b.append("  e"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0]\n");
+          b.append("  e"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0 "+rgbColorString+"]\n");
         else
-          b.append("  c"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0]\n");
+          b.append("  c"+n.pre[i].globalId+" -> "+prefix+n.globalId+" [weight=10000.0 "+rgbColorString+"]\n");
       }
     }
 

@@ -23,7 +23,7 @@ import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeSet;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import com.google.gwt.dev.util.collect.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Map.Entry;
@@ -127,7 +127,7 @@ public class ViewGeneration {
       run.add(fireEvent);
       
       if (fireEvent.isCutOff) {
-        DNode equivEvent = build.getElementary_ccPair().get(fireEvent);
+        DNode equivEvent = build.equivalentNode().get(fireEvent);
         System.out.println("shifting cut to "+equivEvent+".post");
         if (equivEvent.post != null)
           for (DNode b : equivEvent.post) {
@@ -437,7 +437,7 @@ public class ViewGeneration {
       if (fireEvent.post != null) {
         
         if (fireEvent.isCutOff) {
-          DNode cutOff = build.getElementary_ccPair().get(fireEvent);
+          DNode cutOff = build.equivalentNode().get(fireEvent);
           
           build.getBranchingProcess().getPrimeCut(fireEvent, true, true);
           HashSet<DNode> fireEvent_prime = build.getBranchingProcess().getPrimeConfiguration;
@@ -527,6 +527,8 @@ public class ViewGeneration {
   }
   
   public static String toString(boolean arr[]) {
+    if (arr == null) return "null";
+    
     String result = "[";
     for (int i=0;i<arr.length;i++) {
       if (i > 0) result+=", ";

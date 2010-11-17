@@ -2,6 +2,7 @@ package hub.top.uma;
 
 import java.io.IOException;
 
+import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
 import hub.top.petrinet.Place;
@@ -47,13 +48,10 @@ public class UmaTest extends hub.top.test.Test {
     lastTest = "Construct prefix of Petri net with lexicographic order";
     
     try {
-      PetriNet net = PetriNetIO.readNetFromFile(testFileRoot+"/net_lexik.lola");
-      
-      DNodeSys_PetriNet sys = new DNodeSys_PetriNet(net);
-      DNodeBP build = new DNodeBP(sys);
-      build.configure_buildOnly();
-      build.configure_PetriNet();
-      build.configure_stopIfUnSafe();
+
+      ISystemModel sysModel = Uma.readSystemFromFile(testFileRoot+"/net_lexik.lola");
+      DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
+      DNodeBP build = Uma.initBuildPrefix(sys, 1);
       
       while (build.step() > 0) {
       }
@@ -66,6 +64,7 @@ public class UmaTest extends hub.top.test.Test {
           && build.statistic_arcNum == 24);
       
     } catch (InvalidModelException e) {
+      System.err.println("Invalid model: "+e);
       assertTrue(false);
     } catch (IOException e) {
       System.err.println("Couldn't read test file: "+e);

@@ -18,11 +18,13 @@
 
 package hub.top.uma.view;
 
+import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeSet;
+import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
@@ -42,6 +44,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Map.Entry;
 
 public class ViewGeneration2 {
   
@@ -49,6 +52,7 @@ public class ViewGeneration2 {
   private DNodeSet  bp;
   
   public HashMap<DNode, Integer> eventOccurrences;
+  public HashMap<HashSet<DNode>, LinkedList<String[]>> equivalentTraces;
   
   /**
    * Standard constructor for view generation. The argument takes a branching
@@ -62,7 +66,10 @@ public class ViewGeneration2 {
     this.bp = build.getBranchingProcess();
     
     eventOccurrences = new HashMap<DNode, Integer>();
+    equivalentTraces = new HashMap<HashSet<DNode>, LinkedList<String[]>>();
   }
+  
+
   
   /**
    * Extend the branching process by the partially ordered run of the given
@@ -177,10 +184,10 @@ public class ViewGeneration2 {
             DNode newEvent = postConditions[0].pre[0];            
 
             // update co-relation for all new post-conditions
-            build.updateConcurrencyRelation(postConditions);
+            //build.updateConcurrencyRelation(postConditions);
             
             // and set fields for the event
-            build.setCurrentPrimeConfig(newEvent, true);
+            //build.setCurrentPrimeConfig(newEvent, true);
             
             for (DNode b : newEvent.pre) {
               runCut.remove(b);
@@ -203,8 +210,44 @@ public class ViewGeneration2 {
         }
       }
     } // for all events in the trace
+    
+    boolean newCut = true;
+    for (HashSet<DNode> cut : equivalentTraces.keySet()) {
+      if (cut.equals(runCut)) {
+        equivalentTraces.get(cut).add(trace);
+        newCut = false;
+        break;
+      }
+    }
+    if (newCut) {
+      equivalentTraces.put(runCut, new LinkedList<String[]>());
+      equivalentTraces.get(runCut).add(trace);
+    }
+    
 
     return true;
+  }
+  
+  public LinkedList<String[]>[] accumulateEquivalentTraces(int maxClasses) {
+    int totalTraces = 0;
+    for (LinkedList<String[]> traces : equivalentTraces.values())
+      totalTraces += traces.size();
+    
+    float accumulationFactor = (float)totalTraces/(float)maxClasses;
+    
+    LinkedList<String[]> accumulatedTraces[] = new LinkedList[maxClasses];
+    for (int i=0; i< accumulatedTraces.length; i++)
+      accumulatedTraces[i] = new LinkedList<String[]>();
+    
+    int count = 0;
+    for (LinkedList<String[]> traces : equivalentTraces.values()) {
+      int index = (int)((float)count/accumulationFactor);
+      if (index == maxClasses) index = maxClasses-1;
+      accumulatedTraces[index].addAll(traces);
+      count += traces.size();
+    }
+    
+    return accumulatedTraces;
   }
   
   public void extendByTraces(LinkedList<String[]> traces) {
@@ -219,14 +262,14 @@ public class ViewGeneration2 {
    * an existing branching process is extended, for instance by
    * 
    */
-  private void identifyFoldingRelation() {
+  public void identifyFoldingRelation() {
     for (DNode e : bp.allEvents) {
       // won't be considered in the following
       if (e.isAnti && e.isHot) continue;  
       
       build.setCurrentPrimeConfig(e, false);
       if (build.isCutOffEvent(e)) {
-        System.out.println(e+" is a cut-off event");
+        // System.out.println(e+" is a cut-off event");
         e.isCutOff = true;
         if (e.post != null)
           for (DNode b : e.post) {
@@ -240,6 +283,88 @@ public class ViewGeneration2 {
     identifyFoldingRelation();
     PetriNet net = NetSynthesis.foldToNet_labeled(build);
     return net;
+  }
+  
+  public HashMap<DNode, Float> calculateCovering(LinkedList<String[]> traces) {
+    HashMap<DNode, Integer> countMap = new HashMap<DNode, Integer>();
+
+    for (String[] trace : traces) {
+      DNode[] marking = getInitialMarkin_equiv();
+      
+      for (DNode b : marking) {
+        for (DNode bPrime : build.foldingEquivalence().get(build.equivalentNode().get(b))) {
+          if (!countMap.containsKey(bPrime))
+            countMap.put(bPrime, 0);
+          countMap.put(bPrime, countMap.get(bPrime)+1);
+        }
+      }
+      
+      for (int i = 0; i<trace.length; i++) {
+        HashSet<DNode> enabledEvents = getEnabledTransitions_equiv(marking);
+        if (enabledEvents.isEmpty()) {
+          System.out.println("no more enabled events at "+DNode.toString(marking));
+          break;
+        }
+
+        // get one enabled event and fire it
+        DNode fireEvent = null;
+        for (DNode e : enabledEvents) {
+          if (build.getSystem().nameToID.get(trace[i]) == e.id) {
+            fireEvent = e; break;
+          }
+        }
+        
+        if (fireEvent == null) {
+          System.out.println("action "+trace[i]+" not enabled at "+DNode.toString(marking));
+          break;
+        }
+        
+        marking = getSuccessorMarking_equiv(marking, fireEvent);
+        for (DNode b : marking) {
+          for (DNode bPrime : build.foldingEquivalence().get(build.equivalentNode().get(b))) {
+            if (!countMap.containsKey(bPrime))
+              countMap.put(bPrime, 0);
+            countMap.put(bPrime, countMap.get(bPrime)+1);
+          }
+        }
+        for (DNode ePrime : build.foldingEquivalence().get(build.equivalentNode().get(fireEvent))) {
+          if (!countMap.containsKey(ePrime))
+            countMap.put(ePrime, 0);
+          countMap.put(ePrime, countMap.get(ePrime)+1);
+        }
+      }
+    }
+    
+    int max = 0;
+    for (Integer count : countMap.values()) {
+      if (max < count) max = count;
+    }
+    
+    HashMap<DNode, Float> coverMap = new HashMap<DNode, Float>();
+    for (Entry<DNode, Integer> count : countMap.entrySet()) {
+      coverMap.put(count.getKey(), (float)count.getValue()/(float)max);
+    }
+    
+    return coverMap;
+  }
+  
+  public DNodeSetElement getNonBlockedNodes(LinkedList<String[]> traces, float threshold) {
+    build.foldingEquivalence();
+    
+    HashMap<DNode, Float> covering = calculateCovering(traces);
+    DNodeSetElement showNodes = new DNodeSetElement();
+    for (DNode d : covering.keySet()) {
+      if (d.isAnti && d.isHot) continue;
+      if (covering.get(d) >= threshold) {
+        showNodes.add(d);
+      }
+    }
+    return showNodes;
+  }
+  
+  public PetriNet generateViewBlocked(LinkedList<String[]> traces, float threshold) {
+    DNodeSetElement showNodes = getNonBlockedNodes(traces, threshold);
+    return NetSynthesis.foldToNet_labeled(build, showNodes);
   }
   
   /**
@@ -264,7 +389,7 @@ public class ViewGeneration2 {
     HashSet<DNode> possibleConditions = new HashSet<DNode>();
     for (DNode b : marking) {
       // retrieve all conditions equivalent to 'b'
-      for (DNode bPrime : build.foldingEquivalenceClass.get(build.getElementary_ccPair().get(b))) {
+      for (DNode bPrime : build.foldingEquivalence().get(build.equivalentNode().get(b))) {
         possibleConditions.add(bPrime);
         if (bPrime.post == null) continue;
         for (DNode e : bPrime.post)
@@ -285,7 +410,7 @@ public class ViewGeneration2 {
       }
       
       if (isEnabled) // story the equivalent representative of 'e'
-        enabledEvents.add(build.getElementary_ccPair().get(e));
+        enabledEvents.add(build.equivalentNode().get(e));
     }
     return enabledEvents;
   }
@@ -323,7 +448,7 @@ public class ViewGeneration2 {
     // now put a token on each post-place of 'transition'
     for (DNode p : transition.post) {
       // token on 'p' represented by the canonical representative of 'p' 
-      successorMarking[succ_i++] = build.getElementary_ccPair().get(p);
+      successorMarking[succ_i++] = build.equivalentNode().get(p);
     }
     return successorMarking;
   }
@@ -375,6 +500,17 @@ public class ViewGeneration2 {
     return traces;
   }
   
+  public static String toString(String arr[]) {
+    if (arr == null) return "null";
+    
+    String result = "[";
+    for (int i=0;i<arr.length;i++) {
+      if (i > 0) result+=", ";
+      result += arr[i];
+    }
+    return result+"]";
+  }
+  
   /**
    * @param traces
    * @return a representation of the traces in ProM's simple log format
@@ -410,6 +546,34 @@ public class ViewGeneration2 {
     finally {
       out.close();
     }
+  }
+  
+  /**
+   * Read a set of traces from a file in ProM's simple log format.
+   * 
+   * @param fileName
+   * @return
+   * @throws FileNotFoundException
+   */
+  public static LinkedList<String> readEvents(String fileName) throws FileNotFoundException
+  {
+    File fFile = new File(fileName);  
+    Scanner scanner = new Scanner(fFile);
+    scanner.useDelimiter(" ");
+    
+    LinkedList<String> events = new LinkedList<String>();
+    try {
+      // get each line and parse the line to extract the case information
+      while ( scanner.hasNext() ){
+        events.add(scanner.next());
+      }
+    }
+    finally {
+      //ensure the underlying stream is always closed
+      scanner.close();
+    }
+    
+    return events;
   }
   
   /**
@@ -465,6 +629,23 @@ public class ViewGeneration2 {
      return activities.toArray(new String[activities.size()]);
    }
    
+   public static PetriNet generateView(DNodeSys sys, int bound, LinkedList<String[]> traces) {
+     DNodeBP_View build = new DNodeBP_View(sys, bound);
+     
+     build.extendByTraces(traces);
+     ViewGeneration2 viewGen = new ViewGeneration2(build);
+     PetriNet net = viewGen.foldView();
+     
+     return net;
+   }
+   
+   public static PetriNet generateView(String systemFileName, int bound, String traceFileName) throws IOException, InvalidModelException {
+     ISystemModel sysModel = Uma.readSystemFromFile(systemFileName);
+     DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
+     LinkedList<String[]> traces = ViewGeneration2.readTraces(traceFileName);
+     return generateView(sys, bound, traces);
+   }
+   
    public static void main(String[] args) {
      
      if (args.length == 0) return;
@@ -477,12 +658,12 @@ public class ViewGeneration2 {
        
        try {
          
-         DNodeSys sys = Uma.readSystemFromFile(fromFile);
+         ISystemModel sysModel = Uma.readSystemFromFile(fromFile);
+         DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
+
          DNodeBP build = Uma.buildPrefix(sys, 3);
          
-         build.buildFoldingEquivalence();
-         build.relaxFoldingEquivalence();
-         build.extendFoldingEquivalence_forward();
+         build.foldingEquivalence();
          
          ViewGeneration2 viewGen = new ViewGeneration2(build);
          LinkedList<String[]> traces = viewGen.generateRandomTraces(numTraces, traceLength);
@@ -501,7 +682,9 @@ public class ViewGeneration2 {
        
        try {
          
-         DNodeSys sys = Uma.readSystemFromFile(systemFile);
+         ISystemModel sysModel = Uma.readSystemFromFile(systemFile);
+         DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
+
          DNodeBP build = Uma.initBuildPrefix(sys, 3);
          
          LinkedList<String[]> traces = readTraces(traceFile);
@@ -527,15 +710,7 @@ public class ViewGeneration2 {
        
        try {
          
-         DNodeSys sys = Uma.readSystemFromFile(systemFile);
-         DNodeBP build = Uma.initBuildPrefix(sys, 3);
-         
-         LinkedList<String[]> traces = readTraces(traceFile);
-
-         ViewGeneration2 viewGen = new ViewGeneration2(build);
-         viewGen.extendByTraces(traces);
-         
-         PetriNet net = viewGen.foldView();
+         PetriNet net = generateView(systemFile, 3, traceFile);
          PetriNetIO.writeToFile(net, systemFile+".view", PetriNetIO.FORMAT_DOT, 0);
          
        } catch (IOException e) {

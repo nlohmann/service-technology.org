@@ -1,16 +1,17 @@
 package hub.top.uma;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-
+import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
 import hub.top.petrinet.unfold.DNodeSys_PetriNet;
 import hub.top.scenario.DNodeSys_OcletSpecification;
 import hub.top.scenario.OcletIO;
 import hub.top.scenario.OcletSpecification;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
 
 public class Uma {
 
@@ -56,7 +57,7 @@ public class Uma {
     }
   }
   
-  public static DNodeSys readSystemFromFile(String fileName) throws IOException, InvalidModelException {
+  public static ISystemModel readSystemFromFile(String fileName) throws IOException {
     String ext = fileName.substring(fileName.lastIndexOf('.')+1);
     PetriNet net = OcletIO.readNetFromFile(fileName);
     
@@ -65,13 +66,21 @@ public class Uma {
       return null;
     }
     
-    DNodeSys sys = null;
-    
     if ("oclets".equals(ext)) {
       OcletSpecification os = new OcletSpecification(net);
-      sys = new DNodeSys_OcletSpecification(os); 
+      return os;
     } else {
-      sys = new DNodeSys_PetriNet(net);
+      return net;
+    }
+  }
+  
+  public static DNodeSys getBehavioralSystemModel(ISystemModel sysModel) throws InvalidModelException {
+    DNodeSys sys = null;
+
+    if (sysModel instanceof OcletSpecification) {
+      sys = new DNodeSys_OcletSpecification((OcletSpecification)sysModel); 
+    } else if (sysModel instanceof PetriNet) {
+      sys = new DNodeSys_PetriNet((PetriNet)sysModel);
     }
     return sys;
   }
@@ -103,7 +112,8 @@ public class Uma {
   
   private static void computePrefix(int bound) throws IOException, InvalidModelException {
     
-    DNodeSys sys = readSystemFromFile(options_inFile);
+    ISystemModel sysModel = readSystemFromFile(options_inFile);
+    DNodeSys sys = getBehavioralSystemModel(sysModel);
     DNodeBP build = buildPrefix(sys, bound);
 
     if (options_outputFormat == PetriNetIO.FORMAT_DOT) {
@@ -152,5 +162,8 @@ public class Uma {
       renderSystem();
 
   }
+  
+  public static PrintStream out = System.out;
+  public static PrintStream err = System.err;
 
 }

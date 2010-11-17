@@ -38,9 +38,9 @@ public class DNode {
 	public static int idGen = 0;
 
 	// the node's global ID, automatically assign latest ID upon construction
-	public int globalId = idGen++;
+	public final int globalId = idGen++;
 
-	public short	id;				      // id of this node (its name)
+	public final short	id;				      // id of this node (its name)
 	public DNode  pre[] = null;		// sorted: ids ascending
 	public DNode  post[] = null;	// sorted: ids ascending
 	
@@ -85,7 +85,7 @@ public class DNode {
 	 * @param pre
 	 */
 	public DNode (short id, DNode[] pre) {
-		//origin = n;
+//System.out.println("create "+id+" globaL "+globalId);
 		this.id = id;
 		this.pre = sortIDs(pre);
 	}
@@ -96,7 +96,7 @@ public class DNode {
 	 * @param preSize  number of predecessors of the new node
 	 */
 	public DNode (short id, int preSize) {
-		//origin = n;
+//System.out.println("create "+id+" globaL "+globalId);
 		this.id = id;
 		this.pre = new DNode[preSize];
 	}
@@ -294,7 +294,7 @@ public class DNode {
 		return "'"+translationTable.properNames[this.id]+"' ("+this.id+")["+this.globalId+"]" + (isAnti ? "-" : ""); 
 	}
 
-	 /*
+  /*
    * (non-Javadoc)
    * @see java.lang.Object#toString()
    */

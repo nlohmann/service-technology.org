@@ -132,6 +132,8 @@ class Fragmentation {
 			size_t mPlacesDelete;
 			size_t mTransitionsDelete;
 			size_t mArcsDelete;
+			size_t mRolesAnnotated;
+			bool mConcatenateAnnotationNecessary;
 		//lola
 			size_t mLolaCalls;
 		//diane
@@ -541,25 +543,6 @@ class Fragmentation {
 					return false;
 				}
 				placeStatus_e getPlaceStatus(const place_t &, const bool, const role_id_t, const role_id_t);
-				inline roles_t getTopRoleIDs(const map<role_id_t, size_t> & RoleMap) const {
-					roles_t ret;
-					size_t maxRoleSize = 0;
-					for (role_id_t r = 0; r < this->mRoleName2RoleID.size(); r++) {
-						if (RoleMap.find(r) != RoleMap.end()) {
-							if (RoleMap.find(r)->second > maxRoleSize) {
-								maxRoleSize = RoleMap.find(r)->second;
-							}
-						}
-					}
-					for (role_id_t r = 0; r < this->mRoleName2RoleID.size(); r++) {
-						if (RoleMap.find(r) != RoleMap.end()) {
-							if (RoleMap.find(r)->second == maxRoleSize) {
-								ret.insert(r);
-							}
-						}
-					}
-					return ret;
-				}
 			//helper
 				inline void addTransitionPredecessors(stack<transition_t> & ToDo, transitions_t & Done, const transition_t & Transition) {
 					transitions_t transitions;
@@ -606,51 +589,27 @@ class Fragmentation {
 				}
 				inline bool connectFragments() {
 					bool ret = false;
-					set< pair<frag_id_t, frag_id_t> > toConnect;
-					FOREACH (f_a, this->mUsedFragIDs) {
-						FOREACH (f_b, this->mUsedFragIDs) {
-							if ((*f_a != *f_b) && (this->getFragmentRoleID(*f_a) == this->getFragmentRoleID(*f_b))) {
-								pair<fragID2Places_t::iterator, fragID2Places_t::iterator> places_f_a = this->mFragID2Places.equal_range(*f_a);
-								pair<fragID2Places_t::iterator, fragID2Places_t::iterator> places_f_b = this->mFragID2Places.equal_range(*f_b);
-								bool pairProcessed = false;
-								for (fragID2Places_t::iterator place_f_a=places_f_a.first; place_f_a!=places_f_a.second; ++place_f_a) {
-									if ((!this->isSharedPlace(place_f_a->second)) || (this->getFragmentRoleID(*f_a) == this->ROLE_UNASSIGNED)) {
-										for (fragID2Places_t::iterator place_f_b=places_f_b.first; place_f_b!=places_f_b.second; ++place_f_b) {
-											if (place_f_a->second == place_f_b->second) {			
-												//status("....connect (%d, %d) by %s", *f_a, *f_b, place_f_a->second.c_str());			
-												toConnect.insert( std::make_pair( std::max(*f_a, *f_b), std::min(*f_a, *f_b) ) );
-												pairProcessed = true;
-												break;
-											}
-										}
-										if (pairProcessed) {break;}
-									}
-								}
+					set<frag_id_t> toConnect;
+					places_t netPlaces = this->getPlaces(*this->mNet);
+					FOREACH (p, netPlaces) {
+						pair<place2FragIDs_t::iterator, place2FragIDs_t::iterator> curPlaceFragIDs = this->mPlace2FragIDs.equal_range(*p);
+						bool isSharedPlace = this->isSharedPlace(*p);
+						for (place2FragIDs_t::iterator curPlaceFragID=curPlaceFragIDs.first; curPlaceFragID!=curPlaceFragIDs.second; ++curPlaceFragID) {
+							role_id_t fragmentRoleID = this->getFragmentRoleID(curPlaceFragID->second);
+							if ((!isSharedPlace) || (fragmentRoleID == this->ROLE_UNASSIGNED)) {
+								toConnect.insert(curPlaceFragID->second);
 							}
 						}
-					}
-					while (toConnect.size() != 0) {
-						ret = true;
-						set< pair<frag_id_t, frag_id_t> >::reverse_iterator curPair=toConnect.rbegin();
-						set< pair<frag_id_t, frag_id_t> > toInsert;
-						set< pair<frag_id_t, frag_id_t> > toDelete;
-						frag_id_t min_f = curPair->second;
-						frag_id_t max_f = curPair->first;
-						//status("....replace %d with %d", curPair->first, curPair->second);
-						this->replaceFragIDs(curPair->first, curPair->second);
-						toConnect.erase(toConnect.find( std::make_pair(curPair->first, curPair->second) ) );
-						FOREACH(p, toConnect) {
-							if (p->first == max_f) {
-								toInsert.insert( std::make_pair(min_f, p->second) );
-								toDelete.insert( std::make_pair(p->first, p->second) );
+						if (toConnect.size() > 1) {
+							ret = true;
+							frag_id_t minFragID = *toConnect.begin();
+							toConnect.erase(minFragID);
+							FOREACH(r, toConnect) {
+								//status("....replace %d with %d", minFragID, *r);
+								this->replaceFragIDs(minFragID, *r);
 							}
 						}
-						FOREACH(p, toInsert) {
-							toConnect.insert(*p);
-						}
-						FOREACH(p, toDelete) {
-							toConnect.erase(*p);
-						}
+						toConnect.clear();
 					}
 					return ret;
 				}
@@ -695,6 +654,8 @@ class Fragmentation {
 					inline size_t getPlacesDelete() {return this->mPlacesDelete;}
 					inline size_t getTransitionsDelete() {return this->mTransitionsDelete;}
 					inline size_t getArcsDelete() {return this->mArcsDelete;}
+					inline size_t getRolesAnnotated() {return this->mRolesAnnotated;}
+					inline bool getConcatenateAnnotationNecessary() {return this->mConcatenateAnnotationNecessary;}
 					inline role_id_t getTransitionRoleID(const transition_t & Transition) {
 						transition2RoleID_t::iterator curRole = this->mTransition2RoleID.find(Transition);
 						assert(curRole != this->mTransition2RoleID.end());

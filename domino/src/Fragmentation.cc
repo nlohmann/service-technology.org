@@ -47,6 +47,8 @@ Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
 	this->mPlacesDelete = 0;
 	this->mTransitionsDelete = 0;
 	this->mArcsDelete = 0;
+	this->mRolesAnnotated = 0;
+	this->mConcatenateAnnotationNecessary = false;
 
 	this->mLolaCalls = 0;
 	this->mDianeCalls = 0;
@@ -93,6 +95,7 @@ void Fragmentation::init() {
 		status("....%s -> %i", (*r).c_str(), maxRoleID);
 		this->mRoleID2RoleName[maxRoleID] = (*r);
 		this->mRoleName2RoleID[(*r)] = maxRoleID++;
+		this->mRolesAnnotated++;
 	}
 	status("..roles cached");
 
@@ -128,6 +131,7 @@ void Fragmentation::init() {
 		
 		transitionRoles = this->mTransitionName2TransitionPointer[*t]->getRoles();
 		if (transitionRoles.size() > 1) {
+			this->mConcatenateAnnotationNecessary = true;
 			if (!args_info.concatenateAnnotations_flag) {
 				abort(6, "Fragmentation::init(): transition %s has more than one role", (*t).c_str());
 			}
@@ -136,6 +140,7 @@ void Fragmentation::init() {
 			status("......%s -> %i", curRole.c_str(), maxRoleID);
 			this->mRoleID2RoleName[maxRoleID] = curRole;
 			this->mRoleName2RoleID[curRole] = maxRoleID++;
+			this->mRolesAnnotated++;
 		}
 	}
 	status("..transitions cached");

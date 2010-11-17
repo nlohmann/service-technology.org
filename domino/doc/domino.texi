@@ -311,6 +311,12 @@ The number of deleted transitions by necessary corrections. [Integer]
 @item arcs_delete
 The number of deleted arcs by necessary corrections. [Integer]
 
+@item roles_annotated
+The number of roles annotated. Annotated roles can be given or created by parameter @option{--concatenateAnnotations}. [Integer]
+
+@item concatenateAnnotation_Necessary
+True if parameter @option{--concatenateAnnotations} was necessary. [Boolean]
+
 @end ftable
 
 @heading @code{diane}

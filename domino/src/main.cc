@@ -423,7 +423,9 @@ int main(int argc, char** argv) {
 		results.add("decomposition.arcs_insert", (unsigned int)f.getArcsInsert());
 		results.add("decomposition.places_delete", (unsigned int)f.getPlacesDelete());
 		results.add("decomposition.transitions_delete", (unsigned int)f.getTransitionsDelete());
-		results.add("decomposition.arcs_delete", (unsigned int)f.getArcsDelete());		
+		results.add("decomposition.arcs_delete", (unsigned int)f.getArcsDelete());	
+		results.add("decomposition.roles_annotated", (unsigned int)f.getRolesAnnotated());
+		results.add("decomposition.concatenateAnnotation_necessary", f.getConcatenateAnnotationNecessary());	
 
 		results.add("diane.calls", (unsigned int)f.getDianeCalls());
 		results.add("diane.forces", (unsigned int)f.getDianeForces());

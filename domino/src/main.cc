@@ -416,8 +416,10 @@ int main(int argc, char** argv) {
 
 		results.add("decomposition.success", retOK);
 		results.add("decomposition.interface_corrections", (unsigned int)f.getInterfaceCorrections());
+		results.add("decomposition.boundness_corrections", (unsigned int)f.getBoundnessCorrections());
 		results.add("decomposition.fragment_connections", (unsigned int)f.getFragmentConnections());
 		results.add("decomposition.arcweight_correction", (unsigned int)f.getArcweightCorrections());
+		results.add("decomposition.initial_markings", (unsigned int)f.getInitialMarkings());
 		results.add("decomposition.places_insert", (unsigned int)f.getPlacesInsert());
 		results.add("decomposition.transitions_insert", (unsigned int)f.getTransitionsInsert());
 		results.add("decomposition.arcs_insert", (unsigned int)f.getArcsInsert());
@@ -440,7 +442,7 @@ int main(int argc, char** argv) {
 
 		results.add("workflow.roles", (unsigned int)net.getRoles().size());
 		results.add("workflow.places", (unsigned int)(net.getPlaces().size() - f.getPlacesInsert() + f.getPlacesDelete()));
-		results.add("workflow.transitons", (unsigned int)(net.getTransitions().size() - f.getTransitionsInsert() + f.getTransitionsDelete()));
+		results.add("workflow.transitions", (unsigned int)(net.getTransitions().size() - f.getTransitionsInsert() + f.getTransitionsDelete()));
 		results.add("workflow.arcs", (unsigned int)(net.getArcs().size() - f.getArcsInsert() + f.getArcsDelete()));
 		results.add("workflow.isFreeChoice", f.isFreeChoice());
 		results.add("workflow.hasCycles", f.hasCycles());

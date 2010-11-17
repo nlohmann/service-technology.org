@@ -287,6 +287,12 @@ This part lists information on the decomposition process.
 @item success
 True if decomposition of the input open net was successfull. [Boolean]
 
+@item boundness_corrections
+The number of inserted places to bound transitions. [Integer]
+
+@item initial_markings
+The number of initial marked places from 'boundness_corrections'. [Integer]
+
 @item interface_corrections
 The number of fixed not bilateral shared places. [Integer]
 

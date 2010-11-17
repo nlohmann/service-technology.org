@@ -124,8 +124,10 @@ class Fragmentation {
 			bool mServicesCreated;
 		//statistic
 			size_t mInterfaceCorrections;
+			size_t mBoundnessCorrections;
 			size_t mFragmentConnections;
 			size_t mArcweightCorrections;
+			size_t mInitialMarkings;
 			size_t mPlacesInsert;
 			size_t mTransitionsInsert;
 			size_t mArcsInsert;
@@ -646,8 +648,10 @@ class Fragmentation {
 					inline bool hasCycles() {return this->mHasCycles;}
 					inline bool isFreeChoice() {return this->mIsFreeChoice;}
 					inline size_t getInterfaceCorrections() {return this->mInterfaceCorrections;}
+					inline size_t getBoundnessCorrections() {return this->mBoundnessCorrections;}
 					inline size_t getFragmentConnections() {return this->mFragmentConnections;}
 					inline size_t getArcweightCorrections() {return this->mArcweightCorrections;}
+					inline size_t getInitialMarkings() {return this->mInitialMarkings;}
 					inline size_t getPlacesInsert() {return this->mPlacesInsert;}
 					inline size_t getTransitionsInsert() {return this->mTransitionsInsert;}
 					inline size_t getArcsInsert() {return this->mArcsInsert;}

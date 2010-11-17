@@ -39,8 +39,10 @@ Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
 	this->mOverallDianeAlternatives = 0;
 
 	this->mInterfaceCorrections = 0;
+	this->mBoundnessCorrections = 0;
 	this->mFragmentConnections = 0;
 	this->mArcweightCorrections = 0;
+	this->mInitialMarkings = 0;
 	this->mPlacesInsert = 0;
 	this->mTransitionsInsert = 0;
 	this->mArcsInsert = 0;
@@ -573,6 +575,7 @@ bool Fragmentation::buildServices() {
 	if (startTransitions.size() != 0) {
 		status("..create places:");
 		 FOREACH(t, startTransitions) {
+			this->mBoundnessCorrections++;
 			newPlace = args_info.boundnessCorrection_arg + *t;
 			status("....%s", newPlace.c_str());
 			this->createPlace(newPlace, this->getTransitionFragID(*t), this->getTransitionRoleID(*t));
@@ -583,6 +586,7 @@ bool Fragmentation::buildServices() {
 	if (restrictions.size() != 0) {
 		status("..restrictions:");
 		FOREACH(t, restrictions) {
+			this->mInitialMarkings++;
 			newPlace = args_info.boundnessCorrection_arg + *t;
 			status("....%s", newPlace.c_str());
 			curTransitionBound = transitionBound.find(*t);
@@ -634,6 +638,7 @@ bool Fragmentation::buildServices() {
 	for (roleID2RoleName_t::iterator curRole=this->mRoleID2RoleName.begin(); curRole!=this->mRoleID2RoleName.end(); ++curRole) {
 		if (roleFragments.count(curRole->first) > 1) {
 			changed = true;
+			this->mFragmentConnections++;
 
 			status(_cimportant_("....role %s has %d fragments"), curRole->second.c_str(), roleFragments.count(curRole->first));
 

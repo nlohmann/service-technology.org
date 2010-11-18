@@ -114,7 +114,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All 70 tests were successful.
+All 71 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{domino@@service-technology.org}.
@@ -292,6 +292,9 @@ The number of inserted places to bound transitions. [Integer]
 
 @item initial_markings
 The number of initial marked places from 'boundness_corrections'. [Integer]
+
+@item forced_selfreactivatings
+The number of forced selfreactivating transitions to ensure boundness. [Integer]
 
 @item interface_corrections
 The number of fixed not bilateral shared places. [Integer]

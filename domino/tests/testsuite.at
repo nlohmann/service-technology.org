@@ -687,6 +687,15 @@ AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 
+AT_SETUP([Forced selfreactivating transition])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/forced-selfreactivating.owfn .])
+AT_CHECK([DOMINO forced-selfreactivating.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
 AT_SETUP([Arcweight])
 AT_CHECK_DIANE
 AT_CHECK_LOLA

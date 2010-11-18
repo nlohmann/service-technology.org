@@ -43,6 +43,7 @@ Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
 	this->mFragmentConnections = 0;
 	this->mArcweightCorrections = 0;
 	this->mInitialMarkings = 0;
+	this->mForcedSelfreactivatings = 0;
 	this->mPlacesInsert = 0;
 	this->mTransitionsInsert = 0;
 	this->mArcsInsert = 0;
@@ -412,6 +413,9 @@ bool Fragmentation::buildServices() {
 	stack<transition_t> transitionsToDo;
 	set< pair<transition_t, transition_t> > predecessors;
 	set< pair<transition_t, transition_t> > reactivatings;
+	multimap<transition_t, transition_t> countReactivatings;
+	set<transition_t> processedReactivatings;
+	set<transition_t> processedPredecessors;
 	set< pair<frag_id_t, frag_id_t> > processedFragments;
 	pair<frag_id_t, frag_id_t> curFragmentPair;
 	role_id_t transitionRoleID;
@@ -608,22 +612,44 @@ bool Fragmentation::buildServices() {
 			status("....%s --> %s", (*p).second.c_str(), (*p).first.c_str());
 			this->createArc((*p).second, newPlace, curTransitionBound->second);
 			this->addPlaceFragID(newPlace, this->getTransitionFragID((*p).second));
+	
+			processedPredecessors.insert((*p).first);
 		}
 	}
 
 	if (tarjan.hasNonTrivialSCC()) {
 		status("..reactivatings:");
 		FOREACH(p, reactivatings) {
-			newPlace = args_info.boundnessCorrection_arg + (*p).first;
+			countReactivatings.insert(*p);
+		}
+		FOREACH(p, reactivatings) {
+			assert(countReactivatings.count((*p).first) != 0);
+			if (countReactivatings.count((*p).first) == 1) {
+				newPlace = args_info.boundnessCorrection_arg + (*p).first;
 
-			curTransitionBound = transitionBound.find((*p).first);
-			assert(curTransitionBound != transitionBound.end());
+				curTransitionBound = transitionBound.find((*p).first);
+				assert(curTransitionBound != transitionBound.end());
 
-			if (curTransitionBound->second > 1) {this->mArcweightCorrections++;}
+				if (curTransitionBound->second > 1) {this->mArcweightCorrections++;}
 
-			status("....%s --> %s", (*p).second.c_str(), (*p).first.c_str());
-			this->createArc((*p).second, newPlace, curTransitionBound->second);
-			this->addPlaceFragID(newPlace, this->getTransitionFragID((*p).second));
+				status("....%s --> %s", (*p).second.c_str(), (*p).first.c_str());
+				this->createArc((*p).second, newPlace, curTransitionBound->second);
+				this->addPlaceFragID(newPlace, this->getTransitionFragID((*p).second));
+			}
+			else {
+				if (processedReactivatings.find((*p).first) == processedReactivatings.end()) {
+					this->mForcedSelfreactivatings++;
+					newPlace = args_info.boundnessCorrection_arg + (*p).first;
+					status("....%s --> %s", (*p).first.c_str(), (*p).first.c_str());
+					this->createArc((*p).first, newPlace);
+					processedReactivatings.insert((*p).first);
+					if ((this->mPlaceName2PlacePointer[newPlace]->getTokenCount() == 0) && (processedPredecessors.find((*p).first) == processedPredecessors.end())) {
+						curTransitionBound = transitionBound.find((*p).first);
+						assert(curTransitionBound != transitionBound.end());
+						this->mPlaceName2PlacePointer[newPlace]->setTokenCount(curTransitionBound->second);
+					}
+				}
+			}
 		}
 	}
 

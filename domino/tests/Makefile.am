@@ -37,6 +37,7 @@ TESTFILES = IBM-B3-2802.owfn \
 			two-startplaces.owfn \
 			Unassigned-role.owfn \
 			self-reactivating-transitions.owfn \
+			forced-selfreactivating \
 			over-annotation.owfn \
 			Arcweight.owfn \
 			Arcweight-circle.owfn \

@@ -128,6 +128,7 @@ class Fragmentation {
 			size_t mFragmentConnections;
 			size_t mArcweightCorrections;
 			size_t mInitialMarkings;
+			size_t mForcedSelfreactivatings;
 			size_t mPlacesInsert;
 			size_t mTransitionsInsert;
 			size_t mArcsInsert;
@@ -652,6 +653,7 @@ class Fragmentation {
 					inline size_t getFragmentConnections() {return this->mFragmentConnections;}
 					inline size_t getArcweightCorrections() {return this->mArcweightCorrections;}
 					inline size_t getInitialMarkings() {return this->mInitialMarkings;}
+					inline size_t getForcedSelfreactivatings() {return this->mForcedSelfreactivatings;}
 					inline size_t getPlacesInsert() {return this->mPlacesInsert;}
 					inline size_t getTransitionsInsert() {return this->mTransitionsInsert;}
 					inline size_t getArcsInsert() {return this->mArcsInsert;}

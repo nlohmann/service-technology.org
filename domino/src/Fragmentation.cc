@@ -100,6 +100,15 @@ void Fragmentation::init() {
 		this->mRoleName2RoleID[(*r)] = maxRoleID++;
 		this->mRolesAnnotated++;
 	}
+	if (args_info.orchestrator_given) {
+		if (this->mRoleName2RoleID.find(args_info.orchestrator_arg) != this->mRoleName2RoleID.end()) {
+			abort(10, "Fragmentation::init: role %s is already known", args_info.orchestrator_arg);
+		}
+		status("....%s -> %i", args_info.orchestrator_arg, maxRoleID);
+		this->mRoleID2RoleName[maxRoleID] = args_info.orchestrator_arg;
+		this->mRoleName2RoleID[args_info.orchestrator_arg] = maxRoleID++;
+		this->mRolesAnnotated++;
+	}
 	status("..roles cached");
 
 	status("..caching places");
@@ -228,6 +237,10 @@ bool Fragmentation::buildRoleFragments() {
 		if (transition->getRoles().size() == 0) {
 			status("......t has no role(s) assigned");
 			curRoleID = this->ROLE_UNASSIGNED;
+			if (args_info.orchestrator_given) {
+				status("........use orchestrator %s", args_info.orchestrator_arg);
+				curRoleID = this->mRoleName2RoleID.find(args_info.orchestrator_arg)->second;
+			}
 		}
 		else if (transition->getRoles().size() == 1) {
 			transitionRoles = transition->getRoles();

@@ -55,6 +55,17 @@ AT_CHECK([test -f bug.log])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
+AT_SETUP([Orchestrator])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Komposition.owfn .])
+AT_CHECK([DOMINO --orchestrator="O" Komposition.owfn -v],0,ignore,stderr)
+AT_CHECK([GREP -q "O -> 2" stderr])
+AT_CHECK([GREP -q "use orchestrator O" stderr])
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
 AT_SETUP([Dot options dependency - 1])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
@@ -195,6 +206,15 @@ AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([DOMINO test.owfn],1,ignore,stderr)
 AT_CHECK([GREP -q "could not open file" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Orchestrator name exists])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Komposition.owfn .])
+AT_CHECK([DOMINO --orchestrator="C" Komposition.owfn -v],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 

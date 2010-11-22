@@ -1,0 +1,75 @@
+PLACE
+  ROLES C, M;
+  INTERNAL
+    i, o, K.i, A.i, K.o, A.o, m, t, k, g, K.p1, K.p2, A.p1, A.p2, A.p3;
+
+  INPUT
+    ;
+
+  OUTPUT
+    ;
+
+INITIALMARKING
+  i;
+
+FINALCONDITION
+  TRUE;
+
+TRANSITION N.t1
+  CONSUME i;
+  PRODUCE K.i, A.i;
+
+
+
+TRANSITION K.t1
+  ROLES C;
+  CONSUME K.i;
+  PRODUCE K.p1, m;
+
+TRANSITION K.t2
+  ROLES C;
+  CONSUME K.p1;
+  PRODUCE K.p2, t;
+
+TRANSITION K.t3
+  ROLES C;
+  CONSUME K.p1;
+  PRODUCE K.p2, k;
+
+TRANSITION K.t4
+  ROLES C;
+  CONSUME K.p2, g;
+  PRODUCE K.o;
+
+
+
+TRANSITION A.t1
+  ROLES M;
+  CONSUME A.i, m;
+  PRODUCE A.p1;
+
+TRANSITION A.t2
+  ROLES M;
+  CONSUME A.p1, t;
+  PRODUCE A.p2;
+
+TRANSITION A.t3
+  ROLES M;
+  CONSUME A.p1, k;
+  PRODUCE A.p3;
+
+TRANSITION A.t4
+  ROLES M;
+  CONSUME A.p2;
+  PRODUCE A.o, g;
+
+TRANSITION A.t5
+  ROLES M;
+  CONSUME A.p3;
+  PRODUCE A.o, g;
+
+
+
+TRANSITION N.t2
+  CONSUME K.o, A.o;
+  PRODUCE o;

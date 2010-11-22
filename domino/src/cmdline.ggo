@@ -59,6 +59,13 @@ option "concatenateAnnotations" -
   details="This option is used when Domino should concatenate multiple annotations.\n"
   flag off
 
+option "orchestrator" -
+  "Name of the orchestrator."
+  details="This option is used when Domino should annoate not annotated transitions with given role. The service for the given role will be an orchestrator.\n"
+  string
+  typestr="NAME"
+  optional
+
 option "resultFile" r
   "Results output."
   string

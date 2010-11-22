@@ -43,7 +43,8 @@ TESTFILES = IBM-B3-2802.owfn \
 			Arcweight-circle.owfn \
 			Two-Circles.owfn \
 			place-exists.owfn \
-			transition-exists.owfn
+			transition-exists.owfn \
+			Komposition.owfn
 # <<-- CHANGE END -->>
 
 

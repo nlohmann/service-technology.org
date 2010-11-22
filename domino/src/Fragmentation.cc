@@ -437,8 +437,8 @@ bool Fragmentation::buildServices() {
 	tarjan.calculateSCC();
 	this->mHasCycles = tarjan.hasNonTrivialSCC();
 
-	status(_cimportant_("..decomposition contains non trivial SCC: %d"), this->mHasCycles);
-	status(_cimportant_("..workflow is free choice: %d"), this->mIsFreeChoice);
+	status(_cimportant_("..workflow is acyclic: %d"), !this->mHasCycles);
+	status(_cimportant_("..workflow is free-choice: %d"), this->mIsFreeChoice);
 
 	netTransitions = this->getTransitions(*this->mNet);
 	FOREACH(t, netTransitions) {
@@ -1484,6 +1484,8 @@ placeStatus_e Fragmentation::getPlaceStatus(const place_t & Place, const bool Re
 void Fragmentation::colorFragmentsByFragID(const bool ColorUnassigned) {
 	assert(this->mRoleFragmentsBuild);
 	
+	status("colorFragmentsByFragID(%d) called...", ColorUnassigned);
+
 	pair<fragID2Places_t::iterator, fragID2Places_t::iterator> curFragPlaces;
 	pair<fragID2Transitions_t::iterator, fragID2Transitions_t::iterator> curFragTransitions;	
 	size_t curColorID;
@@ -1499,6 +1501,7 @@ void Fragmentation::colorFragmentsByFragID(const bool ColorUnassigned) {
 				abort(8, "Fragmentation::colorFragmentsByFragID(%d): all %d colors used", ColorUnassigned, this->mMaxColors);
 			}
 			curColorName = this->getColorName(curColorID);
+			status("..%d -> %s", *fragID, curColorName.c_str());
 
 			curFragPlaces = this->mFragID2Places.equal_range(*fragID);	
 			for (fragID2Places_t::iterator curFragPlace=curFragPlaces.first; curFragPlace!=curFragPlaces.second; ++curFragPlace) {
@@ -1515,11 +1518,15 @@ void Fragmentation::colorFragmentsByFragID(const bool ColorUnassigned) {
 			curColorID++;
 		}
 	}
+
+	status("colorFragmentsByFragID(%d) finished", ColorUnassigned);
 }
 
 void Fragmentation::colorFragmentsByRoleID(const bool ColorUnassigned) {
 	assert(this->mRoleFragmentsBuild);
 	
+	status("colorFragmentsByRoleID(%d) called...", ColorUnassigned);
+
 	pair<roleID2Places_t::iterator, roleID2Places_t::iterator> curRolePlaces;
 	pair<roleID2Transitions_t::iterator, roleID2Transitions_t::iterator> curRoleTransitions;
 	size_t curColorID;
@@ -1532,6 +1539,7 @@ void Fragmentation::colorFragmentsByRoleID(const bool ColorUnassigned) {
 	curColorName = this->getColorName(curColorID);
 	
 	if (ColorUnassigned) {
+		status("..'unassigned' -> %s", curColorName.c_str());
 		curRolePlaces = this->mRoleID2Places.equal_range(this->ROLE_UNASSIGNED);	
 		for (roleID2Places_t::const_iterator curRolePlace=curRolePlaces.first; curRolePlace!=curRolePlaces.second; ++curRolePlace) {
 			if (!this->isSharedPlace(curRolePlace->second)) {
@@ -1557,8 +1565,8 @@ void Fragmentation::colorFragmentsByRoleID(const bool ColorUnassigned) {
 		if (curColorID == this->mMaxColors) {
 			abort(8, "Fragmentation::colorFragmentsByRoleID(%d): all %d colors used", ColorUnassigned, this->mMaxColors);
 		}
-		
 		curColorName = this->getColorName(curColorID);
+		status("..%d -> %s", curRole->first, curColorName.c_str());
 
 		curRolePlaces = this->mRoleID2Places.equal_range(curRole->first);	
 		for (roleID2Places_t::const_iterator curRolePlace=curRolePlaces.first; curRolePlace!=curRolePlaces.second; ++curRolePlace) {
@@ -1574,4 +1582,6 @@ void Fragmentation::colorFragmentsByRoleID(const bool ColorUnassigned) {
 
 		curColorID++;
 	}
+
+	status("colorFragmentsByRoleID(%d) called...", ColorUnassigned);
 }

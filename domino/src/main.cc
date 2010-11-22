@@ -204,52 +204,6 @@ void createOWFNFile(const string & OutputFile, pnapi::PetriNet & Petrinet, const
 	status("file %s created", _cfilename_(OutputFile + ".owfn"));
 }
 
-void writeEmptyResults(pnapi::PetriNet & net, string fileName) {
-	if (args_info.resultFile_given) {
-        std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : fileName + ".results";
-		if (fileExists(results_filename)  && args_info.noOverride_flag) {
-			abort(5, "file %s already exists", _cfilename_(results_filename));
-		}
-
-        Results results(results_filename);
-
-		results.add("decomposition.success", true);
-		results.add("decomposition.interface_corrections", 0);
-		results.add("decomposition.boundness_corrections", 0);
-		results.add("decomposition.fragment_connections", 0);
-		results.add("decomposition.arcweight_correction", 0);
-		results.add("decomposition.initial_markings", 0);
-		results.add("decomposition.forced_selfreactivatings", 0);
-		results.add("decomposition.places_insert", 0);
-		results.add("decomposition.transitions_insert", 0);
-		results.add("decomposition.arcs_insert", 0);
-		results.add("decomposition.places_delete", 0);
-		results.add("decomposition.transitions_delete", 0);
-		results.add("decomposition.arcs_delete", 0);
-		results.add("decomposition.roles_annotated", 0);
-		results.add("decomposition.concatenateAnnotation_necessary", false);	
-
-		results.add("diane.calls", 0);
-		results.add("diane.forces", 0);
-		results.add("diane.alternatives", 0);
-
-		results.add("lola.calls", 0);
-
-		results.add("meta.package_name", (char*)PACKAGE_NAME);
-        results.add("meta.package_version", (char*)PACKAGE_VERSION);
-        results.add("meta.svn_version", (char*)VERSION_SVN);
-        results.add("meta.invocation", invocation);
-
-		results.add("workflow.roles", (unsigned int)net.getRoles().size());
-		results.add("workflow.places", (unsigned int)net.getPlaces().size());
-		results.add("workflow.transitions", (unsigned int)net.getTransitions().size());
-		results.add("workflow.arcs", (unsigned int)net.getArcs().size());
-		results.add("workflow.isFreeChoice", net.isFreeChoice());
-		//results.add("workflow.hasCycles", f.hasCycles());
-
-    }
-}
-
 /// main-function
 int main(int argc, char** argv) {
 
@@ -314,14 +268,12 @@ int main(int argc, char** argv) {
 	}
 
 	if (args_info.canonicalNames_flag) {
-		//ToDO: ggf. Mapping speichern
 		net.canonicalNames();
 	}
 
 	if (net.getRoles().size() < 2) {
 		message(_cimportant_("workflow contains less than 2 roles"));
 		message(_cgood_("workflow decomposition successfull"));
-		writeEmptyResults(net, fileName);
 		return EXIT_SUCCESS;
 	}
 	

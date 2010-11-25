@@ -425,8 +425,8 @@ AT_CLEANUP
 AT_SETUP([Checking for memory leaks - 3])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Loop-InsideRoles.owfn .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW Loop-InsideRoles.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices],0,ignore,stderr)
+AT_CHECK([cp TESTFILES/Arcweight-circle.owfn .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW Arcweight-circle.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP
@@ -434,8 +434,8 @@ AT_CLEANUP
 AT_SETUP([Checking for memory leaks - 4])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Loop-OverRoles.owfn .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW Loop-OverRoles.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices],0,ignore,stderr)
+AT_CHECK([cp TESTFILES/Arcweight-circle2.owfn .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW Arcweight-circle2.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP
@@ -730,6 +730,24 @@ AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/Arcweight-circle.owfn .])
 AT_CHECK([DOMINO Arcweight-circle.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Arcweight-circle 2])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Arcweight-circle2.owfn .])
+AT_CHECK([DOMINO Arcweight-circle2.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Arcweight-circle 3])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Arcweight-circle3.owfn .])
+AT_CHECK([DOMINO Arcweight-circle3.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
 AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP

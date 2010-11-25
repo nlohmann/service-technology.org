@@ -568,6 +568,60 @@ class Fragmentation {
 						}
 					}
 				}
+				inline transitions_t addTransitionPredecessorsSCC(const transition_t & Start, const transition_t & End, Tarjan & tarjan) {				
+					int curSCC = tarjan.getNodeSCC(Start);
+					assert(tarjan.getNodeSCC(End) == curSCC);
+					role_id_t startRoleID = this->getTransitionRoleID(Start);
+					assert(this->getTransitionRoleID(End) == startRoleID);
+					stack<transition_t> toDo;
+					transitions_t done;
+					transitions_t ret;
+
+					ret.insert(Start);
+					status("........adding %s", Start.c_str());
+					toDo.push(Start);
+					while (!toDo.empty()) {
+						places_t places = this->getTransitionPreset(*this->mNet, toDo.top());
+						done.insert(toDo.top());
+						toDo.pop();
+						FOREACH(p, places) {
+							transitions_t transitions = this->getPlacePreset(*this->mNet, *p);
+							FOREACH(t, transitions) {
+								if ((*t != End) && (done.find(*t) == done.end())) {
+									if ((this->getTransitionRoleID(*t) == startRoleID) && (tarjan.getNodeSCC(*t) == curSCC)) {
+										ret.insert(*t);
+										status("........adding %s", (*t).c_str());
+									}
+									toDo.push(*t);
+									done.insert(*t);
+								}
+							}
+						}
+					}
+					return ret;
+				}
+				inline transitions_t getTransitionNearestPredecessorsSCC(const transition_t & Start, Tarjan & tarjan) {				
+					int curSCC = tarjan.getNodeSCC(Start);
+					role_id_t startRoleID = this->getTransitionRoleID(Start);
+					stack<transition_t> toDo;
+					transitions_t done;
+					transitions_t ret;
+
+					toDo.push(Start);
+					while (!toDo.empty()) {
+						places_t places = this->getTransitionPreset(*this->mNet, toDo.top());
+						done.insert(toDo.top());
+						toDo.pop();
+						FOREACH(p, places) {
+							transitions_t transitions = this->getPlacePreset(*this->mNet, *p);
+							FOREACH(t, transitions) {
+								if ((this->getTransitionRoleID(*t) == startRoleID) && (tarjan.getNodeSCC(*t) == curSCC)) {ret.insert(*t);}
+								else {if (done.find(*t) == done.end()) {toDo.push(*t);}}
+							}
+						}
+					}
+					return ret;
+				}
 				inline void replaceFragIDs(const frag_id_t FragOld, const frag_id_t FragNew) {
 					assert(FragOld != FragNew);
 					set< pair<place_t, frag_id_t> > toAdd;

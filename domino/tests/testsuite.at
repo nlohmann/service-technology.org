@@ -752,6 +752,15 @@ AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 
+AT_SETUP([Arcweight-circle 4])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/Arcweight-circle4.owfn .])
+AT_CHECK([DOMINO Arcweight-circle4.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
 AT_SETUP([Over-annotation])
 AT_CHECK_DIANE
 AT_CHECK_LOLA

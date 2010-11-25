@@ -772,7 +772,14 @@ bool Fragmentation::buildServices() {
 				newFragID = this->getNextFragID();
 				transition_t newTransition = "T_" + newPlace;
 				this->createTransition(newTransition, newFragID, this->getTransitionRoleID(*t));
-				this->createArc(newTransition, newPlace);
+				curTransitionBound = transitionBoundMin.find((*t));
+				assert(curTransitionBound != transitionBoundMin.end());
+				if (curTransitionBound->second > 1) {
+					this->mArcweightCorrections++;
+					status("..........increased arcweight %d", curTransitionBound->second);
+					this->mArcweightCorrections++;
+				}
+				this->createArc(newTransition, newPlace, curTransitionBound->second);
 				this->addPlaceFragID(newPlace, newFragID);
 
 				curReactivatings = countReactivatings.equal_range((*t));

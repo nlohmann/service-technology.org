@@ -38,6 +38,8 @@ TESTFILES = IBM-B3-2802.owfn \
 			Unassigned-role.owfn \
 			self-reactivating-transitions.owfn \
 			Circle-with-choices.owfn \
+			Circle-with-choices-or.owfn \
+			Circle-with-choices-or2.owfn \
 			forced-selfreactivating.owfn \
 			over-annotation.owfn \
 			Arcweight.owfn \

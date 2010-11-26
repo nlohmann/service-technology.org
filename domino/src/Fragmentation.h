@@ -125,6 +125,8 @@ class Fragmentation {
 		//statistic
 			size_t mInterfaceCorrections;
 			size_t mBoundnessCorrections;
+			size_t mBoundnessOrConnections;
+			size_t mMergings;
 			size_t mFragmentConnections;
 			size_t mArcweightCorrections;
 			size_t mInitialMarkings;
@@ -397,6 +399,7 @@ class Fragmentation {
 					this->mPlacePointer2PlaceName[ret] = Place;
 					this->addPlaceFragID(Place, FragID);
 					this->addPlaceRoleID(Place, RoleID);
+					this->setPlaceMinFragID(Place, 0);
 					this->mPlacesInsert++;
 				}
 				inline void createTransition(const transition_t & Transition, const frag_id_t FragID, const role_id_t RoleID) {
@@ -418,6 +421,32 @@ class Fragmentation {
 					assert(this->mNet->findArc(*source, *target) == NULL);
 					this->mNet->createArc(*source, *target, Weight);
 					this->mArcsInsert++;
+				}
+				inline void mergePlaces(const place_t & Target, const place_t & Source) {
+					pnapi::Node *source = this->mNet->findNode(Source);
+					pnapi::Node *target = this->mNet->findNode(Target);
+					assert(source != NULL);
+					assert(target != NULL);
+					set<pnapi::Arc *> toDelete;
+					pnapi::Arc *curArc;
+					FOREACH(a, source->getPresetArcs()) {
+						curArc = this->mNet->findArc((*a)->getSourceNode(), *target);
+						if (curArc == NULL) {
+							this->createArc((*a)->getSourceNode().getName(), Target, (*a)->getWeight());
+						}
+						toDelete.insert((*a));
+					}
+					FOREACH(a, source->getPostsetArcs()) {
+						curArc = this->mNet->findArc(*target, (*a)->getTargetNode());
+						if (curArc == NULL) {
+							this->createArc(Target, (*a)->getTargetNode().getName(), (*a)->getWeight());
+						}
+						toDelete.insert((*a));
+					}
+					FOREACH(a, toDelete) {
+						this->mNet->deleteArc(**a);
+					}
+					this->deletePlace(Source);
 				}
 				void createPetrinetByFragID(const frag_id_t);
 				//delete
@@ -623,6 +652,31 @@ class Fragmentation {
 					}
 					return ret;
 				}
+				inline places_t getPossibleSplitPlaces(const transition_t & Start, const transition_t & End, Tarjan & tarjan) {				
+					int curSCC = tarjan.getNodeSCC(Start);
+					assert(tarjan.getNodeSCC(End) == curSCC);
+					assert(this->getTransitionRoleID(End) == this->getTransitionRoleID(Start));
+					stack<transition_t> toDo;
+					transitions_t done;
+					places_t ret;
+
+					toDo.push(Start);
+					while (!toDo.empty()) {
+						places_t places = this->getTransitionPostset(*this->mNet, toDo.top());
+						done.insert(toDo.top());
+						toDo.pop();
+						FOREACH(p, places) {
+							if (tarjan.getNodeSCC(*p) == curSCC) {
+								if (this->getPlacePreset(*this->mNet, *p).size() > 1) {ret.insert(*p);}
+								transitions_t transitions = this->getPlacePostset(*this->mNet, *p);
+								FOREACH(t, transitions) {
+									if ((*t != End) && (done.find(*t) == done.end()) && (tarjan.getNodeSCC(*t) == curSCC)) {toDo.push(*t);}
+								}
+							}
+						}
+					}
+					return ret;
+				}
 				inline void replaceFragIDs(const frag_id_t FragOld, const frag_id_t FragNew) {
 					assert(FragOld != FragNew);
 					set< pair<place_t, frag_id_t> > toAdd;
@@ -705,6 +759,8 @@ class Fragmentation {
 					inline bool isFreeChoice() {return this->mIsFreeChoice;}
 					inline size_t getInterfaceCorrections() {return this->mInterfaceCorrections;}
 					inline size_t getBoundnessCorrections() {return this->mBoundnessCorrections;}
+					inline size_t getBoundnessOrConnections() {return this->mBoundnessOrConnections;}
+					inline size_t getMergings() {return this->mMergings;}
 					inline size_t getFragmentConnections() {return this->mFragmentConnections;}
 					inline size_t getArcweightCorrections() {return this->mArcweightCorrections;}
 					inline size_t getInitialMarkings() {return this->mInitialMarkings;}

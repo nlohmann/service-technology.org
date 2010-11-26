@@ -416,6 +416,8 @@ int main(int argc, char** argv) {
 		results.add("decomposition.success", retOK);
 		results.add("decomposition.interface_corrected_places", (unsigned int)f.getInterfaceCorrections());
 		results.add("decomposition.bounded_transitions", (unsigned int)f.getBoundnessCorrections());
+		results.add("decomposition.or_bounded_transitions", (unsigned int)f.getBoundnessOrConnections());
+		results.add("decomposition.or_mergings", (unsigned int)f.getMergings());
 		results.add("decomposition.fragment_connections", (unsigned int)f.getFragmentConnections());
 		results.add("decomposition.arcweight_increased", (unsigned int)f.getArcweightCorrections());
 		results.add("decomposition.initial_marked_places", (unsigned int)f.getInitialMarkings());

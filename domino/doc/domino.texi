@@ -114,7 +114,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All 77 tests were successful.
+All 79 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{domino@@service-technology.org}.
@@ -289,6 +289,12 @@ True if decomposition of the input open net was successfull. [Boolean]
 
 @item bounded_transitions
 The number of unbounded transitions. [Integer]
+
+@item or_bounded_transitions
+The number of unbounded transitions with or-connected preset. [Integer]
+
+@item or_mergings
+The number of mergings caused by unbounded transitions with or-connected preset. [Integer]
 
 @item initial_marked_places
 The number of initial marked places from 'bounded_transitions'. [Integer]

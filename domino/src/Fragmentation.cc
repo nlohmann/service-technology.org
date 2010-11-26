@@ -679,8 +679,15 @@ bool Fragmentation::buildServices() {
 						else {
 							status("............choose nearest predecessors");
 							transitions_t nearestPredecessors = getTransitionNearestPredecessorsSCC((*p).first, tarjan);
-							nearestPredecessors = setIntersection(nearestPredecessors, intersectionPredecessors);
-							if (nearestPredecessors.size() == 0) {nearestPredecessors = getTransitionNearestPredecessorsSCC((*p).first, tarjan);}
+							transitions_t curNearestPredecessors = nearestPredecessors;
+							nearestPredecessors = setIntersection(nearestPredecessors, intersectionPredecessors);							
+							while (nearestPredecessors.size() == 0) {
+								FOREACH(t, curNearestPredecessors) {
+									nearestPredecessors = setUnion(nearestPredecessors, getTransitionNearestPredecessorsSCC((*t), tarjan));
+								}
+								curNearestPredecessors = nearestPredecessors;
+								nearestPredecessors = setIntersection(nearestPredecessors, intersectionPredecessors);
+							}
 							FOREACH(t, nearestPredecessors) {
 								status("..............%s", (*t).c_str());
 								reactivatingCandidates.insert( std::make_pair((*p).first, *t) );

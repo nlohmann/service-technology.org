@@ -128,7 +128,7 @@ class Fragmentation {
 			size_t mFragmentConnections;
 			size_t mArcweightCorrections;
 			size_t mInitialMarkings;
-			size_t mForcedSelfreactivatings;
+			size_t mSelfreactivatings;
 			size_t mPlacesInsert;
 			size_t mTransitionsInsert;
 			size_t mArcsInsert;
@@ -136,9 +136,10 @@ class Fragmentation {
 			size_t mTransitionsDelete;
 			size_t mArcsDelete;
 			size_t mRolesAnnotated;
+			size_t mNotAnnotatedTransitions;
 			bool mConcatenateAnnotationNecessary;
 		//lola
-			size_t mLolaCalls;
+			bool mLolaCalled;
 		//diane
 			pnapi::PetriNet *mFragmentNet;
 			set<node_t> mFragmentUnprocessedNodes;
@@ -696,7 +697,7 @@ class Fragmentation {
 			//member support
 				//set/add
 				//get
-					inline size_t getLolaCalls() {return this->mLolaCalls;}
+					inline bool getLolaCalled() {return this->mLolaCalled;}
 					inline size_t getDianeCalls() {return this->mDianeCalls;}
 					inline size_t getDianeForces() {return this->mOverallDianeForces;}
 					inline size_t getDianeAlternatives() {return this->mOverallDianeAlternatives;}
@@ -707,7 +708,7 @@ class Fragmentation {
 					inline size_t getFragmentConnections() {return this->mFragmentConnections;}
 					inline size_t getArcweightCorrections() {return this->mArcweightCorrections;}
 					inline size_t getInitialMarkings() {return this->mInitialMarkings;}
-					inline size_t getForcedSelfreactivatings() {return this->mForcedSelfreactivatings;}
+					inline size_t getSelfreactivatings() {return this->mSelfreactivatings;}
 					inline size_t getPlacesInsert() {return this->mPlacesInsert;}
 					inline size_t getTransitionsInsert() {return this->mTransitionsInsert;}
 					inline size_t getArcsInsert() {return this->mArcsInsert;}
@@ -715,6 +716,7 @@ class Fragmentation {
 					inline size_t getTransitionsDelete() {return this->mTransitionsDelete;}
 					inline size_t getArcsDelete() {return this->mArcsDelete;}
 					inline size_t getRolesAnnotated() {return this->mRolesAnnotated;}
+					inline size_t getNotAnnotatedTransitions() {return this->mNotAnnotatedTransitions;}
 					inline bool getConcatenateAnnotationNecessary() {return this->mConcatenateAnnotationNecessary;}
 					inline role_id_t getTransitionRoleID(const transition_t & Transition) {
 						transition2RoleID_t::iterator curRole = this->mTransition2RoleID.find(Transition);

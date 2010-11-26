@@ -414,26 +414,25 @@ int main(int argc, char** argv) {
         Results results(results_filename);
 
 		results.add("decomposition.success", retOK);
-		results.add("decomposition.interface_corrections", (unsigned int)f.getInterfaceCorrections());
-		results.add("decomposition.boundness_corrections", (unsigned int)f.getBoundnessCorrections());
+		results.add("decomposition.interface_corrected_places", (unsigned int)f.getInterfaceCorrections());
+		results.add("decomposition.bounded_transitions", (unsigned int)f.getBoundnessCorrections());
 		results.add("decomposition.fragment_connections", (unsigned int)f.getFragmentConnections());
-		results.add("decomposition.arcweight_correction", (unsigned int)f.getArcweightCorrections());
-		results.add("decomposition.initial_markings", (unsigned int)f.getInitialMarkings());
-		results.add("decomposition.forced_selfreactivatings", (unsigned int)f.getForcedSelfreactivatings());
-		results.add("decomposition.places_insert", (unsigned int)f.getPlacesInsert());
-		results.add("decomposition.transitions_insert", (unsigned int)f.getTransitionsInsert());
-		results.add("decomposition.arcs_insert", (unsigned int)f.getArcsInsert());
-		results.add("decomposition.places_delete", (unsigned int)f.getPlacesDelete());
-		results.add("decomposition.transitions_delete", (unsigned int)f.getTransitionsDelete());
-		results.add("decomposition.arcs_delete", (unsigned int)f.getArcsDelete());	
+		results.add("decomposition.arcweight_increased", (unsigned int)f.getArcweightCorrections());
+		results.add("decomposition.initial_marked_places", (unsigned int)f.getInitialMarkings());
+		results.add("decomposition.selfreactivating_transitions", (unsigned int)f.getSelfreactivatings());
+		results.add("decomposition.places_inserted", (unsigned int)f.getPlacesInsert());
+		results.add("decomposition.transitions_inserted", (unsigned int)f.getTransitionsInsert());
+		results.add("decomposition.arcs_inserted", (unsigned int)f.getArcsInsert());
+		results.add("decomposition.places_deleted", (unsigned int)f.getPlacesDelete());
+		results.add("decomposition.transitions_deleted", (unsigned int)f.getTransitionsDelete());
+		results.add("decomposition.arcs_deleted", (unsigned int)f.getArcsDelete());	
 		results.add("decomposition.roles_annotated", (unsigned int)f.getRolesAnnotated());
-		results.add("decomposition.concatenateAnnotation_necessary", f.getConcatenateAnnotationNecessary());	
-
-		results.add("diane.calls", (unsigned int)f.getDianeCalls());
-		results.add("diane.forces", (unsigned int)f.getDianeForces());
-		results.add("diane.alternatives", (unsigned int)f.getDianeAlternatives());
-
-		results.add("lola.calls", (unsigned int)f.getLolaCalls());
+		results.add("decomposition.concatenation_necessary", f.getConcatenateAnnotationNecessary());	
+		results.add("decomposition.diane_calls", (unsigned int)f.getDianeCalls());
+		results.add("decomposition.not_annotated_transitions", (unsigned int)f.getNotAnnotatedTransitions());
+		results.add("decomposition.annotations_forced", (unsigned int)f.getDianeForces());
+		results.add("decomposition.annotation_alternatives", (unsigned int)f.getDianeAlternatives());
+		results.add("decomposition.lola_called", f.getLolaCalled());
 
 		results.add("meta.package_name", (char*)PACKAGE_NAME);
         results.add("meta.package_version", (char*)PACKAGE_VERSION);

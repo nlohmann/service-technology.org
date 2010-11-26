@@ -43,7 +43,7 @@ Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
 	this->mFragmentConnections = 0;
 	this->mArcweightCorrections = 0;
 	this->mInitialMarkings = 0;
-	this->mForcedSelfreactivatings = 0;
+	this->mSelfreactivatings = 0;
 	this->mPlacesInsert = 0;
 	this->mTransitionsInsert = 0;
 	this->mArcsInsert = 0;
@@ -51,9 +51,10 @@ Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
 	this->mTransitionsDelete = 0;
 	this->mArcsDelete = 0;
 	this->mRolesAnnotated = 0;
+	this->mNotAnnotatedTransitions = 0;
 	this->mConcatenateAnnotationNecessary = false;
 
-	this->mLolaCalls = 0;
+	this->mLolaCalled = false;
 	this->mDianeCalls = 0;
 	this->mIsFreeChoice = Petrinet.isFreeChoice();
 	this->mHasCycles = false;
@@ -235,6 +236,7 @@ bool Fragmentation::buildRoleFragments() {
 
 		//assign role to t
 		if (transition->getRoles().size() == 0) {
+			this->mNotAnnotatedTransitions++;
 			status("......t has no role(s) assigned");
 			curRoleID = this->ROLE_UNASSIGNED;
 			if (args_info.orchestrator_given) {
@@ -532,7 +534,7 @@ bool Fragmentation::buildServices() {
 
 		command_line += loutputParam;
 		// call LoLA
-		this->mLolaCalls++;
+		this->mLolaCalled = true;
 		status("..creating a pipe to %s by calling '%s'", _ctool_("LoLA"), _cparameter_(command_line));
 
 		{
@@ -744,7 +746,6 @@ bool Fragmentation::buildServices() {
 				status("......all possible candidates have been deleted -> selfreactivating");
 				reactivatingCandidates.insert( std::make_pair(*t, *t) );
 				selfReactivatings.insert(*t);
-				this->mForcedSelfreactivatings++;
 			}
 			status("......%d candidate(s) left", reactivatingCandidates.count((*t)));
 			//create connections
@@ -765,6 +766,7 @@ bool Fragmentation::buildServices() {
 				}
 				else {
 					//check sanity for selfreactivating...
+					this->mSelfreactivatings++;
 					transitionPlaces = this->getTransitionPlaces(*this->mNet, *t);
 					FOREACH(p, transitionPlaces) {assert((*p == newPlace) || (this->isSharedPlace(*p)));}
 					this->createArc((*t), newPlace);

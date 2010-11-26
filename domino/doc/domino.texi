@@ -287,71 +287,60 @@ This part lists information on the decomposition process.
 @item success
 True if decomposition of the input open net was successfull. [Boolean]
 
-@item boundness_corrections
-The number of inserted places to bound transitions. [Integer]
+@item bounded_transitions
+The number of unbounded transitions. [Integer]
 
-@item initial_markings
-The number of initial marked places from 'boundness_corrections'. [Integer]
+@item initial_marked_places
+The number of initial marked places from 'bounded_transitions'. [Integer]
 
-@item forced_selfreactivatings
-The number of forced selfreactivating transitions to ensure boundness. [Integer]
+@item selfreactivating_transitions
+The number of selfreactivating transitions. [Integer]
 
-@item interface_corrections
-The number of fixed not bilateral shared places. [Integer]
+@item interface_corrected_places
+The number of not bilateral shared places. [Integer]
 
 @item fragment_connections
 The number of forced connections of fragments (with pairwise identical roles). [Integer]
 
-@item places_insert
+@item places_inserted
 The number of inserted places by necessary corrections. [Integer]
 
-@item transitions_insert
+@item transitions_inserted
 The number of inserted transitions by necessary corrections. [Integer]
-
-@item arcs_insert
+@item lola_called
+True, if LoLA was called. [Boolean]
+@item arcs_inserted
 The number of inserted arcs by necessary corrections. [Integer]
 
-@item places_delete
+@item places_deleted
 The number of deleted places by necessary corrections. [Integer]
 
-@item transitions_delete
+@item transitions_deleted
 The number of deleted transitions by necessary corrections. [Integer]
 
-@item arcs_delete
+@item arcs_deleted
 The number of deleted arcs by necessary corrections. [Integer]
 
 @item roles_annotated
 The number of roles annotated. Annotated roles can be given or created by parameter @option{--concatenateAnnotations}. [Integer]
 
-@item concatenateAnnotation_Necessary
+@item concatenation_necessary
 True if parameter @option{--concatenateAnnotations} was necessary. [Boolean]
 
-@end ftable
+@item lola_called
+True, if LoLA was called. [Boolean]
 
-@heading @code{diane}
-@findex meta
-
-This part lists information on the diane calls.
-
-@ftable @code
-@item calls
+@item diane_calls
 The number of times Diane was called. [Integer]
 
-@item forces
-The number of forced decisions during the role annotation to unsassigned fragments. Each time a decision is forced another decomposition was possible. See also alternatives. [Integer]
+@item not_annotated_transitions
+The number of not annotated transitions. [Integer]
 
-@item alternatives
+@item annotations_forced
+The number of forced decisions during the role annotation to unsassigned fragments. Each time a decision is forced another decomposition was possible. See also 'annotation_alternatives'. [Integer]
+
+@item annotation_alternatives
 The number of all possibilites during forced decisions. If an unassigned fragment is forced to a specific role there are at least two alternatives. These alternatives are count. This number just counts the alternatives for all forced decisions, you may note, that forcing one decision yields or blocks other (forced) decisions. [Integer]
-@end ftable
-
-@heading @code{lola}
-@findex lola
-
-This part lists information on the lola calls.
-
-@ftable @code
-@item calls
-The number of times LoLA was called. [Integer]
 
 @end ftable
 

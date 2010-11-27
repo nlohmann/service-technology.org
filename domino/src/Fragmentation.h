@@ -126,6 +126,7 @@ class Fragmentation {
 			size_t mInterfaceCorrections;
 			size_t mBoundnessCorrections;
 			size_t mBoundnessOrConnections;
+			size_t mBoundnessAndConnections;
 			size_t mMergings;
 			size_t mFragmentConnections;
 			size_t mArcweightCorrections;
@@ -446,6 +447,7 @@ class Fragmentation {
 					FOREACH(a, toDelete) {
 						this->mNet->deleteArc(**a);
 					}
+					this->mPlaceName2PlacePointer[Target]->setTokenCount(this->mPlaceName2PlacePointer[Target]->getTokenCount() + this->mPlaceName2PlacePointer[Source]->getTokenCount());
 					this->deletePlace(Source);
 				}
 				void createPetrinetByFragID(const frag_id_t);
@@ -607,8 +609,6 @@ class Fragmentation {
 					transitions_t done;
 					transitions_t ret;
 
-					ret.insert(Start);
-					status("........adding %s", Start.c_str());
 					toDo.push(Start);
 					while (!toDo.empty()) {
 						places_t places = this->getTransitionPreset(*this->mNet, toDo.top());
@@ -620,13 +620,17 @@ class Fragmentation {
 								if ((*t != End) && (done.find(*t) == done.end())) {
 									if ((this->getTransitionRoleID(*t) == startRoleID) && (tarjan.getNodeSCC(*t) == curSCC)) {
 										ret.insert(*t);
-										status("........adding %s", (*t).c_str());
+										status("............adding %s", (*t).c_str());
 									}
 									toDo.push(*t);
 									done.insert(*t);
 								}
 							}
 						}
+					}
+					if (ret.size() == 0) {
+						ret.insert(Start);
+						status("............adding %s", Start.c_str());
 					}
 					return ret;
 				}
@@ -652,7 +656,7 @@ class Fragmentation {
 					}
 					return ret;
 				}
-				inline places_t getPossibleSplitPlaces(const transition_t & Start, const transition_t & End, Tarjan & tarjan) {				
+				inline places_t getPossibleSplitPlaces(const transition_t & Start, const transition_t & End, Tarjan & tarjan) {		
 					int curSCC = tarjan.getNodeSCC(Start);
 					assert(tarjan.getNodeSCC(End) == curSCC);
 					assert(this->getTransitionRoleID(End) == this->getTransitionRoleID(Start));
@@ -760,6 +764,7 @@ class Fragmentation {
 					inline size_t getInterfaceCorrections() {return this->mInterfaceCorrections;}
 					inline size_t getBoundnessCorrections() {return this->mBoundnessCorrections;}
 					inline size_t getBoundnessOrConnections() {return this->mBoundnessOrConnections;}
+					inline size_t getBoundnessAndConnections() {return this->mBoundnessAndConnections;}
 					inline size_t getMergings() {return this->mMergings;}
 					inline size_t getFragmentConnections() {return this->mFragmentConnections;}
 					inline size_t getArcweightCorrections() {return this->mArcweightCorrections;}
@@ -821,11 +826,11 @@ class Fragmentation {
 				inline bool isRoleEmpty(const role_id_t RoleID) {return (this->mRoleID2Transitions.find(RoleID) == this->mRoleID2Transitions.end());}
 				inline bool isStartTransition(const transition_t & Transition) {
 					assert(this->mRoleFragmentsBuild);
-					frag_id_t transitionFragID = this->getTransitionFragID(Transition);
+					role_id_t transitionRoleID = this->getTransitionRoleID(Transition);
 					places_t transitionPlaces = this->getTransitionPreset(*this->mNet, Transition);
 					FOREACH(p, transitionPlaces) {
-						if (this->mPlace2FragIDs.count(*p) == 1) {
-							if (this->mPlace2FragIDs.find(*p)->second == transitionFragID) {
+						if (this->mPlace2RoleIDs.count(*p) == 1) {
+							if (this->mPlace2RoleIDs.find(*p)->second == transitionRoleID) {
 								return false;
 							}
 						}

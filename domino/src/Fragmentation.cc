@@ -41,6 +41,7 @@ Fragmentation::Fragmentation(pnapi::PetriNet &Petrinet) {
 	this->mInterfaceCorrections = 0;
 	this->mBoundnessCorrections = 0;
 	this->mBoundnessOrConnections = 0;
+	this->mBoundnessAndConnections = 0;
 	this->mMergings = 0;
 	this->mFragmentConnections = 0;
 	this->mArcweightCorrections = 0;
@@ -434,6 +435,7 @@ bool Fragmentation::buildServices() {
 	set< pair<transition_t, transition_t> > reactivatings;
 	multimap<transition_t, transition_t> countReactivatings;
 	multimap<transition_t, transition_t> reactivatingCandidates;
+	multimap<transition_t, transition_t> reactivatingSources;
 	set<transition_t> processedReactivatings;
 	set<transition_t> processedPredecessors;
 	set< pair<frag_id_t, frag_id_t> > processedFragments;
@@ -635,7 +637,9 @@ bool Fragmentation::buildServices() {
 		}
 	}
 
-	set<places_t> mergeBoundnessPlaces;
+	set< pair<place_t, place_t> > toBeMerged;
+	multimap<places_t, transition_t> reactivatingSets;
+	multimap<places_t, transition_t> reactivatingMustSets;
 	if (tarjan.hasNonTrivialSCC()) {
 		status("..reactivatings:");
 		transitions_t orConnected;
@@ -650,6 +654,7 @@ bool Fragmentation::buildServices() {
 				status("....handle %s", (*p).first.c_str());
 				transitionsDone.insert((*p).first);
 				if (countReactivatings.count((*p).first) == 1) {
+					status("......reactivated by %s", (*p).second.c_str());
 					reactivatingCandidates.insert( std::make_pair((*p).first, (*p).second) );
 					if ((*p).first == (*p).second) {selfReactivatings.insert((*p).first);}
 				}
@@ -657,89 +662,48 @@ bool Fragmentation::buildServices() {
 					status("......%s has %d reactivating transitions", (*p).first.c_str(), countReactivatings.count((*p).first));
 					bool selfReactivating = false;
 					curReactivatings = countReactivatings.equal_range((*p).first);
-					map<transition_t, transitions_t> reactivatingPredecessors;
 					for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
-						status("......calculating predecessors of %s", curReactivating->second.c_str());
-						if (curReactivating->second == (*p).first) {selfReactivating = true;}
-						if (selfReactivating) {break;}
-						reactivatingPredecessors.insert( std::make_pair(curReactivating->second, this->addTransitionPredecessorsSCC(curReactivating->second, curReactivating->first, tarjan)) );
+						status("........check %s for selfreactivating", curReactivating->second.c_str());
+						if (curReactivating->second == (*p).first) {
+							status("..........found");
+							selfReactivating = true;
+							break;
+						}
 					}
 					if (!selfReactivating) {
-						status("......building intersection over all predecessors");
-						transitions_t intersectionPredecessors = (*reactivatingPredecessors.begin()).second;
-						for (map<transition_t, transitions_t>::iterator curPredecessor=reactivatingPredecessors.begin(); curPredecessor!=reactivatingPredecessors.end(); ++curPredecessor) {
-							intersectionPredecessors = setIntersection(intersectionPredecessors, curPredecessor->second);
+						transitions_t toDelete;
+						status("........check for common predecessors");
+						curReactivatings = countReactivatings.equal_range((*p).first);
+						map<transition_t, transitions_t> reactivatingPredecessors;
+						for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
+							status("..........calculating nearest predecessors of %s", curReactivating->second.c_str());
+							reactivatingPredecessors.insert( std::make_pair(curReactivating->second, this->getTransitionNearestPredecessorsSCC(curReactivating->second, tarjan)) );
 						}
-						status("........intersection contains %d elements", intersectionPredecessors.size());
-						if (intersectionPredecessors.size() == 0) {
-							status(_cwarning_("..........all %d %s"), countReactivatings.count((*p).first), _cwarning_("reactivating transitions are necessary"));
-							map<transition_t, places_t> allSplitPlaces;
-							transitions_t neededTransitions;
+						for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
+							for (multimap<transition_t, transition_t>::iterator curReactivating2=curReactivatings.first; curReactivating2!=curReactivatings.second; ++curReactivating2) {
+								if ((curReactivating->second != curReactivating2->second) && (setIntersection(reactivatingPredecessors[curReactivating->second], reactivatingPredecessors[curReactivating2->second]) == reactivatingPredecessors[curReactivating->second]) && (reactivatingPredecessors[curReactivating->second] != reactivatingPredecessors[curReactivating2->second])) {
+									status("............%s is covered", curReactivating->second.c_str());
+									toDelete.insert(curReactivating->second);
+									reactivatingMustSets.insert( std::make_pair(reactivatingPredecessors[curReactivating2->second], (*p).first) );
+								}
+							}
+						}
+						if (toDelete.size() != 0) {
+							status("..........choose reduced predecessors");
 							curReactivatings = countReactivatings.equal_range((*p).first);
-							places_t splitPlaces = this->getPossibleSplitPlaces(curReactivatings.first->second, (*p).first, tarjan);
 							for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
-								allSplitPlaces.insert( std::make_pair(curReactivating->second, this->getPossibleSplitPlaces(curReactivating->second, (*p).first, tarjan)) );
-								splitPlaces = setIntersection(splitPlaces, allSplitPlaces[curReactivating->second]);
-								neededTransitions.insert(curReactivating->second);
-							}
-							if (splitPlaces.size() == 0) {
-								status(_cimportant_("............AND-connected (no possible split place)"));
-								curReactivatings = countReactivatings.equal_range((*p).first);
-								for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
+								if (toDelete.find(curReactivating->second) == toDelete.end()) {
+									status("............%s", curReactivating->second.c_str());
 									reactivatingCandidates.insert( std::make_pair((*p).first, curReactivating->second) );
 								}
 							}
-							else {
-								bool orConnection = false;
-								unsigned int curSCC = tarjan.getNodeSCC((*p).first);
-								size_t loopTransitions;
-								FOREACH(sp, splitPlaces) {
-									loopTransitions = 0;
-									if (this->mIsFreeChoice) {curPlaceTokens = 1;}
-									else {
-										curPlaceMaxToken = Place2MaxTokens.find(*sp);
-										assert(curPlaceMaxToken != Place2MaxTokens.end());
-									}
-									if (curPlaceTokens == 1) {
-										transitionPlaces = this->getPlacePreset(*this->mNet, *sp);
-										FOREACH(ts, transitionPlaces) {
-											if (tarjan.getNodeSCC(*sp) == curSCC) {loopTransitions++;}
-											
-										}
-										if (loopTransitions > 1) {
-											status(_cimportant_("............OR-connected (%s)"), (*sp).c_str());
-											orConnection = true;
-											orConnected.insert((*p).first);
-											break;
-										}
-									}
-								}
-								if (!orConnection) {status(_cimportant_("............AND-connected (no split place)"));}
-								curReactivatings = countReactivatings.equal_range((*p).first);
-								for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
-									reactivatingCandidates.insert( std::make_pair((*p).first, curReactivating->second) );
-								}
-							}
-						}
-						else if (intersectionPredecessors.size() == 1) {
-							status("..........reactivating transitions is %s", (*intersectionPredecessors.begin()).c_str());
-							reactivatingCandidates.insert( std::make_pair((*p).first, (*intersectionPredecessors.begin())) );
 						}
 						else {
-							status("............choose nearest predecessors");
-							transitions_t nearestPredecessors = getTransitionNearestPredecessorsSCC((*p).first, tarjan);
-							transitions_t curNearestPredecessors = nearestPredecessors;
-							nearestPredecessors = setIntersection(nearestPredecessors, intersectionPredecessors);							
-							while (nearestPredecessors.size() == 0) {
-								FOREACH(t, curNearestPredecessors) {
-									nearestPredecessors = setUnion(nearestPredecessors, getTransitionNearestPredecessorsSCC((*t), tarjan));
-								}
-								curNearestPredecessors = nearestPredecessors;
-								nearestPredecessors = setIntersection(nearestPredecessors, intersectionPredecessors);
-							}
-							FOREACH(t, nearestPredecessors) {
-								status("..............%s", (*t).c_str());
-								reactivatingCandidates.insert( std::make_pair((*p).first, *t) );
+							status("..........choose initial predecessors");
+							curReactivatings = countReactivatings.equal_range((*p).first);
+							for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
+								status("............%s", curReactivating->second.c_str());
+								reactivatingCandidates.insert( std::make_pair((*p).first, curReactivating->second) );
 							}
 						}
 					}
@@ -772,34 +736,68 @@ bool Fragmentation::buildServices() {
 						}
 					}
 				}
+				if (reactivatingCandidates.count((*t)) == 0) {
+					status("......all possible candidates have been deleted -> selfreactivating");
+					reactivatingCandidates.insert( std::make_pair(*t, *t) );
+					selfReactivatings.insert(*t);
+				}
 			}
 			else { //selfreactivating
-				status("......is selfreactivating -> delete all other transitions");
-				changed = true;
-				while (changed) {
-					changed = false;
-					curReactivatings = reactivatingCandidates.equal_range((*t));
-					for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
-						if (curReactivating->second != (*t)) {
-							reactivatingCandidates.erase(curReactivating);
-							changed = true;
-							break;
-						}
-					}
-				}
-
-			}
-			if (reactivatingCandidates.count((*t)) == 0) {
-				status("......all possible candidates have been deleted -> selfreactivating");
-				reactivatingCandidates.insert( std::make_pair(*t, *t) );
-				selfReactivatings.insert(*t);
+				status("......is selfreactivating");
+				assert(reactivatingCandidates.count((*t)) == 1);
 			}
 			status("......%d candidate(s) left", reactivatingCandidates.count((*t)));
+			if (reactivatingCandidates.count((*t)) > 1) {
+				status(_cimportant_("......check connection type"));
+				map<transition_t, places_t> allSplitPlaces;
+				transitions_t neededTransitions;
+				curReactivatings = reactivatingCandidates.equal_range(*t);
+				places_t splitPlaces = this->getPossibleSplitPlaces(curReactivatings.first->second, *t, tarjan);
+				for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
+					allSplitPlaces.insert( std::make_pair(curReactivating->second, this->getPossibleSplitPlaces(curReactivating->second, *t, tarjan)) );
+					splitPlaces = setIntersection(splitPlaces, allSplitPlaces[curReactivating->second]);
+					neededTransitions.insert(curReactivating->second);
+				}
+				if (splitPlaces.size() == 0) {
+					status(_cimportant_("........AND-connected (no possible split place)"));
+				}
+				else {
+					bool orConnection = false;
+					unsigned int curSCC = tarjan.getNodeSCC(*t);
+					size_t loopTransitions;
+					FOREACH(sp, splitPlaces) {
+						loopTransitions = 0;
+						if (this->mIsFreeChoice) {curPlaceTokens = 1;}
+						else {
+							curPlaceMaxToken = Place2MaxTokens.find(*sp);
+							assert(curPlaceMaxToken != Place2MaxTokens.end());
+							curPlaceTokens = curPlaceMaxToken->second;
+						}
+						if (curPlaceTokens == 1) {
+							transitionPlaces = this->getPlacePreset(*this->mNet, *sp);
+							FOREACH(ts, transitionPlaces) {
+								if (tarjan.getNodeSCC(*ts) == curSCC) {loopTransitions++;}
+								
+							}
+							if (loopTransitions > 1) {
+								status(_cimportant_("........OR-connected (%s)"), (*sp).c_str());
+								orConnected.insert(*t);
+								orConnection = true;
+								break;
+							}
+						}
+					}
+					if (!orConnection) {status(_cimportant_("........AND-connected (no split place)"));}
+				}
+			}
 		}
+		
+
 		status("....connecting");
 		FOREACH(t, needReactivating) {
 			//create connections
 			newPlace = args_info.boundnessCorrection_arg + (*t);
+			transitions_t curTransitions;
 			curReactivatings = reactivatingCandidates.equal_range(*t);
 			if (reactivatingCandidates.count((*t)) == 1) {
 				curReactivatings = reactivatingCandidates.equal_range((*t));
@@ -813,10 +811,12 @@ bool Fragmentation::buildServices() {
 					}
 					this->createArc((*curReactivatings.first).second, newPlace, curTransitionBound->second);
 					this->addPlaceFragID(newPlace, this->getTransitionFragID((*curReactivatings.first).second));
+					curTransitions.insert((*curReactivatings.first).second);
 				}
 				else {
 					//check sanity for selfreactivating...
 					this->mSelfreactivatings++;
+					curTransitions.insert(*t);
 					transitionPlaces = this->getTransitionPlaces(*this->mNet, *t);
 					FOREACH(p, transitionPlaces) {assert((*p == newPlace) || (this->isSharedPlace(*p)));}
 					this->createArc((*t), newPlace);
@@ -827,17 +827,17 @@ bool Fragmentation::buildServices() {
 			}
 			else { //>1
 				assert(selfReactivatings.find(*t) == selfReactivatings.end());
-	
+
 				if (orConnected.find(*t) != orConnected.end()) {
 					status(_cimportant_("......OR-connected"));
 					this->mBoundnessOrConnections++;
-					transitions_t curOrTransitions;
+						
 					curTransitionBound = transitionBoundMin.find((*t));
 					assert(curTransitionBound != transitionBoundMin.end());
 					curReactivatings = reactivatingCandidates.equal_range((*t));
 					for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
-						curOrTransitions.insert(curReactivating->second);
-						status("......%s --> %s", curReactivating->second.c_str(), (*t).c_str());
+						curTransitions.insert(curReactivating->second);
+						status("........%s --> %s", curReactivating->second.c_str(), (*t).c_str());
 						if (curTransitionBound->second > 1) {
 							this->mArcweightCorrections++;
 							status("........increased arcweight %d", curTransitionBound->second);
@@ -845,27 +845,10 @@ bool Fragmentation::buildServices() {
 						this->createArc(curReactivating->second, newPlace, curTransitionBound->second);
 						this->addPlaceFragID(newPlace, this->getTransitionFragID(curReactivating->second));
 					}
-					status("......check reactivating childs");
-					transitions_t curReactivatingChilds;
-					FOREACH(ct, needReactivating) {
-						curReactivatings = reactivatingCandidates.equal_range((*ct));
-						for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
-							if (curReactivating->second == *t) {curReactivatingChilds.insert(*ct);}
-						}
-					}
-					if (setIntersection(curReactivatingChilds, curOrTransitions).size() == 0) {
-						status(_cgood_("........no cross-references found"));
-					}
-					else if (setIntersection(curReactivatingChilds, curOrTransitions) == setUnion(curReactivatingChilds, curOrTransitions)) {
-						status(_cgood_("........all transitions covered"));
-						mergeBoundnessPlaces.insert(curReactivatingChilds);
-					}
-					else {
-						status(_cwarning_("........%d/%d transitions covered"), setIntersection(curReactivatingChilds, curOrTransitions).size(), curReactivatingChilds.size());
-						mergeBoundnessPlaces.insert(curReactivatingChilds);
-					}
 				}
 				else {
+					status(_cimportant_("......AND-connected"));
+					this->mBoundnessAndConnections++;
 					newFragID = this->getNextFragID();
 					transition_t newTransition = "T_" + newPlace;
 					this->createTransition(newTransition, newFragID, this->getTransitionRoleID(*t));
@@ -880,7 +863,8 @@ bool Fragmentation::buildServices() {
 
 					curReactivatings = reactivatingCandidates.equal_range((*t));
 					for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
-						status("......%s --> %s", curReactivating->second.c_str(), (*t).c_str());
+						curTransitions.insert(curReactivating->second);
+						status("........%s --> %s", curReactivating->second.c_str(), (*t).c_str());
 						place_t newTransitionPlace = newPlace + "_" + curReactivating->second;
 						this->createPlace(newTransitionPlace, this->getTransitionFragID(curReactivating->second), this->getTransitionRoleID(curReactivating->second));
 						this->createArc(curReactivating->second, newTransitionPlace);
@@ -889,6 +873,7 @@ bool Fragmentation::buildServices() {
 					}
 				}
 			}
+			reactivatingSets.insert( std::make_pair(curTransitions, *t) );
 		}
 	}
 
@@ -908,18 +893,49 @@ bool Fragmentation::buildServices() {
 		}
 	}
 
-	if (mergeBoundnessPlaces.size() != 0) {
-		status(_cwarning_("..merging necessary"));
-		FOREACH(s, mergeBoundnessPlaces) {
-			this->mMergings++;
-			places_t toMerge = (*s);
-			place_t firstElem = *(toMerge.begin());
-			FOREACH(p, toMerge) {
-				if (*p != firstElem) {
-					status("....merge %s with %s", string(args_info.boundnessCorrection_arg + firstElem).c_str(), string(args_info.boundnessCorrection_arg + *p).c_str());
-					this->mergePlaces(string(args_info.boundnessCorrection_arg + firstElem), string(args_info.boundnessCorrection_arg + *p));
+	if (reactivatingSets.size() != 0) {
+		changed = true;
+		while (changed) {
+			changed = false;
+			for (multimap<places_t, transition_t>::iterator curSet=reactivatingSets.begin(); curSet!=reactivatingSets.end(); ++curSet) {
+				if (reactivatingSets.count(curSet->first) < 2) {
+					reactivatingSets.erase(curSet->first);
+					changed = true;
+					break;
 				}
 			}
+		}
+		if (reactivatingSets.size() != 0) {
+			set<places_t> doneSets;
+			status(_cwarning_("..merging(s) necessary"));
+			pair< multimap<places_t, transition_t>::iterator, multimap<places_t, transition_t>::iterator > curPlaces;
+			for (multimap<places_t, transition_t>::iterator curSet=reactivatingSets.begin(); curSet!=reactivatingSets.end(); ++curSet) {
+				if (doneSets.find(curSet->first) == doneSets.end()) {
+					assert(reactivatingSets.count(curSet->first) > 1);
+					if (reactivatingMustSets.find(curSet->first) == reactivatingMustSets.end()) {
+						curPlaces = reactivatingSets.equal_range(curSet->first);
+						this->mMergings++;
+						transition_t firstElem = string(args_info.boundnessCorrection_arg + curPlaces.first->second);
+						for (multimap<places_t, transition_t>::iterator curTransition=curPlaces.first; curTransition!=curPlaces.second; ++curTransition) {
+							if (string(args_info.boundnessCorrection_arg + curTransition->second) != firstElem) {
+								status("....merge %s with %s", firstElem.c_str(), string(args_info.boundnessCorrection_arg + curTransition->second).c_str());
+								toBeMerged.insert( std::make_pair(firstElem, string(args_info.boundnessCorrection_arg + curTransition->second)));
+							}
+						}
+					}
+					else {
+						status(_cwarning_("....merge skipped"));
+					}
+					doneSets.insert(curSet->first);
+				}
+			}
+		}
+	}
+	if (toBeMerged.size() != 0) {
+		status("..merging");
+		FOREACH(p, toBeMerged) {
+			status("....merge %s with %s", (*p).first.c_str(), (*p).second.c_str());
+			this->mergePlaces((*p).first, (*p).second);
 		}
 	}
 

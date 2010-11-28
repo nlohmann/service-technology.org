@@ -625,7 +625,7 @@ class Fragmentation {
 					}
 					return ret;
 				}
-				inline places_t getPossibleSplitPlaces(const transition_t & Start, const transition_t & End, Tarjan & tarjan) {		
+				inline places_t getPossibleSplitPlacesCyclic(const transition_t & Start, const transition_t & End, Tarjan & tarjan) {		
 					int curSCC = tarjan.getNodeSCC(Start);
 					assert(tarjan.getNodeSCC(End) == curSCC);
 					assert(this->getTransitionRoleID(End) == this->getTransitionRoleID(Start));
@@ -647,6 +647,61 @@ class Fragmentation {
 								}
 							}
 						}
+					}
+					return ret;
+				}
+				inline places_t getPossibleSplitPlacesNonCyclic(const transition_t & Start, Tarjan & tarjan) {		
+					assert(!tarjan.isNonTrivialSCC(tarjan.getNodeSCC(Start)));
+					stack<transition_t> toDo;
+					transitions_t done;
+					places_t ret;
+
+					toDo.push(Start);
+					while (!toDo.empty()) {
+						places_t places = this->getTransitionPreset(*this->mNet, toDo.top());
+						done.insert(toDo.top());
+						toDo.pop();
+						FOREACH(p, places) {
+							if (this->getPlacePostset(*this->mNet, *p).size() > 1) {ret.insert(*p);}
+							transitions_t transitions = this->getPlacePreset(*this->mNet, *p);
+							FOREACH(t, transitions) {
+								if (!tarjan.isNonTrivialSCC(tarjan.getNodeSCC(*t))) {toDo.push(*t);}
+							}
+						}
+					}
+					return ret;
+				}
+				inline places_t getTransitionPredeccessorsNonCyclic(const transition_t & Start, Tarjan & tarjan, map<transition_t, unsigned int> & TransitionBound) {
+					assert(!tarjan.isNonTrivialSCC(tarjan.getNodeSCC(Start)));
+					role_id_t startRoleID = this->getTransitionRoleID(Start);
+					stack<transition_t> toDo;
+					transitions_t done;
+					transitions_t ret;
+					map<transition_t, unsigned int>::const_iterator curTransitionBound;
+
+					toDo.push(Start);
+					while (!toDo.empty()) {
+						places_t places = this->getTransitionPreset(*this->mNet, toDo.top());
+						done.insert(toDo.top());
+						toDo.pop();
+						FOREACH(p, places) {
+							transitions_t transitions = this->getPlacePreset(*this->mNet, *p);
+							FOREACH(t, transitions) {
+								if (!tarjan.isNonTrivialSCC(tarjan.getNodeSCC(*t))) {
+									if (this->getTransitionRoleID(*t) == startRoleID) {
+										curTransitionBound = TransitionBound.find(*t);
+										assert(curTransitionBound != TransitionBound.end());
+										if (curTransitionBound->second == 1) {ret.insert(*t); status("..........%s", (*t).c_str());}
+									}
+									if (done.find(*t) == done.end()) {toDo.push(*t);}
+								}
+							}
+						}
+					}
+					if (ret.size() == 0) {
+						curTransitionBound = TransitionBound.find(Start);
+						assert(curTransitionBound != TransitionBound.end());
+						if (curTransitionBound->second == 1) {ret.insert(Start); status("..........%s", Start.c_str());} 
 					}
 					return ret;
 				}

@@ -115,6 +115,7 @@ class Fragmentation {
 			pnapi::PetriNet *mNet;
 			frag_id_t mSharedFragID;
 			set <frag_id_t> mUsedFragIDs;
+			transitions_t mBilateralTransitions;
 			size_t mMaxColors;
 			bool mIsFreeChoice;
 			bool mHasCycles;
@@ -423,7 +424,7 @@ class Fragmentation {
 					this->mNet->createArc(*source, *target, Weight);
 					this->mArcsInsert++;
 				}
-				inline void mergePlaces(const place_t & Target, const place_t & Source) {
+				inline void mergePlaces(const place_t & Target, const place_t & Source, const bool SumMarkings) {
 					pnapi::Node *source = this->mNet->findNode(Source);
 					pnapi::Node *target = this->mNet->findNode(Target);
 					assert(source != NULL);
@@ -447,7 +448,7 @@ class Fragmentation {
 					FOREACH(a, toDelete) {
 						this->mNet->deleteArc(**a);
 					}
-					this->mPlaceName2PlacePointer[Target]->setTokenCount(this->mPlaceName2PlacePointer[Target]->getTokenCount() + this->mPlaceName2PlacePointer[Source]->getTokenCount());
+					if (SumMarkings) {this->mPlaceName2PlacePointer[Target]->setTokenCount(this->mPlaceName2PlacePointer[Target]->getTokenCount() + this->mPlaceName2PlacePointer[Source]->getTokenCount());}
 					this->deletePlace(Source);
 				}
 				void createPetrinetByFragID(const frag_id_t);
@@ -600,40 +601,6 @@ class Fragmentation {
 						}
 					}
 				}
-				inline transitions_t addTransitionPredecessorsSCC(const transition_t & Start, const transition_t & End, Tarjan & tarjan) {				
-					int curSCC = tarjan.getNodeSCC(Start);
-					assert(tarjan.getNodeSCC(End) == curSCC);
-					role_id_t startRoleID = this->getTransitionRoleID(Start);
-					assert(this->getTransitionRoleID(End) == startRoleID);
-					stack<transition_t> toDo;
-					transitions_t done;
-					transitions_t ret;
-
-					toDo.push(Start);
-					while (!toDo.empty()) {
-						places_t places = this->getTransitionPreset(*this->mNet, toDo.top());
-						done.insert(toDo.top());
-						toDo.pop();
-						FOREACH(p, places) {
-							transitions_t transitions = this->getPlacePreset(*this->mNet, *p);
-							FOREACH(t, transitions) {
-								if ((*t != End) && (done.find(*t) == done.end())) {
-									if ((this->getTransitionRoleID(*t) == startRoleID) && (tarjan.getNodeSCC(*t) == curSCC)) {
-										ret.insert(*t);
-										status("............adding %s", (*t).c_str());
-									}
-									toDo.push(*t);
-									done.insert(*t);
-								}
-							}
-						}
-					}
-					if (ret.size() == 0) {
-						ret.insert(Start);
-						status("............adding %s", Start.c_str());
-					}
-					return ret;
-				}
 				inline transitions_t getTransitionNearestPredecessorsSCC(const transition_t & Start, Tarjan & tarjan) {				
 					int curSCC = tarjan.getNodeSCC(Start);
 					role_id_t startRoleID = this->getTransitionRoleID(Start);
@@ -649,8 +616,10 @@ class Fragmentation {
 						FOREACH(p, places) {
 							transitions_t transitions = this->getPlacePreset(*this->mNet, *p);
 							FOREACH(t, transitions) {
-								if ((this->getTransitionRoleID(*t) == startRoleID) && (tarjan.getNodeSCC(*t) == curSCC)) {ret.insert(*t);}
-								else {if (done.find(*t) == done.end()) {toDo.push(*t);}}
+								if (!((this->mBilateralTransitions.find(*t) != this->mBilateralTransitions.end()) && (this->getTransitionRoleID(*t) == startRoleID))) {
+									if ((this->getTransitionRoleID(*t) == startRoleID) && (tarjan.getNodeSCC(*t) == curSCC)) {ret.insert(*t); status("............%s", (*t).c_str());}
+									else {if (done.find(*t) == done.end()) {toDo.push(*t);}}
+								}
 							}
 						}
 					}

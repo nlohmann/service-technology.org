@@ -724,77 +724,85 @@ bool Fragmentation::buildServices() {
 		}
 		//all reactivating informations completed
 		status("....main reactivating informations completed");
-		FOREACH(t, needReactivating) {
-			status("....handle %s", (*t).c_str());
-			if (selfReactivatings.find(*t) == selfReactivatings.end()) {
-				curReactivatings = reactivatingCandidates.equal_range(*t);
-				assert(reactivatingCandidates.count((*t)) != 0);
-				changed = true;
-				while (changed) {
-					changed = false;
-					curReactivatings = reactivatingCandidates.equal_range((*t));
-					for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
-						status("......handle candidate %s", curReactivating->second.c_str());
-						if (selfReactivatings.find(curReactivating->second) != selfReactivatings.end()) {
-							status("........is selfreactivating -> delete");
-							reactivatingCandidates.erase(curReactivating);
-							changed = true;
-							break;
-						}
-					}
-				}
-				if (reactivatingCandidates.count((*t)) == 0) {
-					status("......all possible candidates have been deleted -> selfreactivating");
-					reactivatingCandidates.insert( std::make_pair(*t, *t) );
-					selfReactivatings.insert(*t);
-				}
-			}
-			else { //selfreactivating
-				status("......is selfreactivating");
-				assert(reactivatingCandidates.count((*t)) == 1);
-			}
-			status("......%d candidate(s) left", reactivatingCandidates.count((*t)));
-			if (reactivatingCandidates.count((*t)) > 1) {
-				status(_cimportant_("......check connection type"));
-				map<transition_t, places_t> allSplitPlaces;
-				transitions_t neededTransitions;
-				curReactivatings = reactivatingCandidates.equal_range(*t);
-				places_t splitPlaces = this->getPossibleSplitPlaces(curReactivatings.first->second, *t, tarjan);
-				for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
-					allSplitPlaces.insert( std::make_pair(curReactivating->second, this->getPossibleSplitPlaces(curReactivating->second, *t, tarjan)) );
-					splitPlaces = setIntersection(splitPlaces, allSplitPlaces[curReactivating->second]);
-					neededTransitions.insert(curReactivating->second);
-				}
-				if (splitPlaces.size() == 0) {
-					status(_cimportant_("........AND-connected (no possible split place)"));
-				}
-				else {
-					bool orConnection = false;
-					unsigned int curSCC = tarjan.getNodeSCC(*t);
-					size_t loopTransitions;
-					FOREACH(sp, splitPlaces) {
-						loopTransitions = 0;
-						if (this->mIsFreeChoice) {curPlaceTokens = 1;}
-						else {
-							curPlaceMaxToken = Place2MaxTokens.find(*sp);
-							assert(curPlaceMaxToken != Place2MaxTokens.end());
-							curPlaceTokens = curPlaceMaxToken->second;
-						}
-						if (curPlaceTokens == 1) {
-							transitionPlaces = this->getPlacePreset(*this->mNet, *sp);
-							FOREACH(ts, transitionPlaces) {
-								if (tarjan.getNodeSCC(*ts) == curSCC) {loopTransitions++;}
-								
-							}
-							if (loopTransitions > 1) {
-								status(_cimportant_("........OR-connected (%s)"), (*sp).c_str());
-								orConnected.insert(*t);
-								orConnection = true;
+		status("....check for selfreactivatings");
+		bool newSelfreactivating = true;
+		while (newSelfreactivating) {
+			newSelfreactivating = false;
+			FOREACH(t, needReactivating) {
+				status("......handle %s", (*t).c_str());
+				if (selfReactivatings.find(*t) == selfReactivatings.end()) {
+					curReactivatings = reactivatingCandidates.equal_range(*t);
+					assert(reactivatingCandidates.count((*t)) != 0);
+					changed = true;
+					while (changed) {
+						changed = false;
+						curReactivatings = reactivatingCandidates.equal_range((*t));
+						for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
+							status("........handle candidate %s", curReactivating->second.c_str());
+							if (selfReactivatings.find(curReactivating->second) != selfReactivatings.end()) {
+								status("..........is selfreactivating -> delete");
+								reactivatingCandidates.erase(curReactivating);
+								changed = true;
 								break;
 							}
 						}
 					}
-					if (!orConnection) {status(_cimportant_("........AND-connected (no split place)"));}
+					if (reactivatingCandidates.count((*t)) == 0) {
+						status("........all possible candidates have been deleted -> selfreactivating");
+						reactivatingCandidates.insert( std::make_pair(*t, *t) );
+						selfReactivatings.insert(*t);
+						newSelfreactivating = true;
+					}
+				}
+			}
+		}
+		status("....process all not selfreactivating transitions");
+		FOREACH(t, needReactivating) {
+			if (selfReactivatings.find(*t) == selfReactivatings.end()) {
+				status("......handle %s", (*t).c_str());
+				status("........%d candidate(s) left", reactivatingCandidates.count((*t)));
+				if (reactivatingCandidates.count((*t)) > 1) {
+					status(_cimportant_("........check connection type"));
+					map<transition_t, places_t> allSplitPlaces;
+					transitions_t neededTransitions;
+					curReactivatings = reactivatingCandidates.equal_range(*t);
+					places_t splitPlaces = this->getPossibleSplitPlaces(curReactivatings.first->second, *t, tarjan);
+					for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
+						allSplitPlaces.insert( std::make_pair(curReactivating->second, this->getPossibleSplitPlaces(curReactivating->second, *t, tarjan)) );
+						splitPlaces = setIntersection(splitPlaces, allSplitPlaces[curReactivating->second]);
+						neededTransitions.insert(curReactivating->second);
+					}
+					if (splitPlaces.size() == 0) {
+						status(_cimportant_("..........AND-connected (no possible split place)"));
+					}
+					else {
+						bool orConnection = false;
+						unsigned int curSCC = tarjan.getNodeSCC(*t);
+						size_t loopTransitions;
+						FOREACH(sp, splitPlaces) {
+							loopTransitions = 0;
+							if (this->mIsFreeChoice) {curPlaceTokens = 1;}
+							else {
+								curPlaceMaxToken = Place2MaxTokens.find(*sp);
+								assert(curPlaceMaxToken != Place2MaxTokens.end());
+								curPlaceTokens = curPlaceMaxToken->second;
+							}
+							if (curPlaceTokens == 1) {
+								transitionPlaces = this->getPlacePreset(*this->mNet, *sp);
+								FOREACH(ts, transitionPlaces) {
+									if (tarjan.getNodeSCC(*ts) == curSCC) {loopTransitions++;}
+								
+								}
+								if (loopTransitions > 1) {
+									status(_cimportant_("..........OR-connected (%s)"), (*sp).c_str());
+									orConnected.insert(*t);
+									orConnection = true;
+									break;
+								}
+							}
+						}
+						if (!orConnection) {status(_cimportant_("..........AND-connected (no split place)"));}
+					}
 				}
 			}
 		}

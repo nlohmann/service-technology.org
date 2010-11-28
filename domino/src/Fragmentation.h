@@ -601,7 +601,11 @@ class Fragmentation {
 						}
 					}
 				}
-				inline transitions_t getTransitionNearestPredecessorsSCC(const transition_t & Start, Tarjan & tarjan) {				
+				inline transitions_t getTransitionNearestPredecessorsSCC(const transition_t & Start, Tarjan & tarjan, map<transition_t, unsigned int> & TransitionBound) {				
+					map<transition_t, unsigned int>::const_iterator curTransitionBound;
+					map<transition_t, unsigned int>::const_iterator curTransitionBound2;
+					curTransitionBound = TransitionBound.find(Start);
+					assert(curTransitionBound != TransitionBound.end());					
 					int curSCC = tarjan.getNodeSCC(Start);
 					role_id_t startRoleID = this->getTransitionRoleID(Start);
 					stack<transition_t> toDo;
@@ -617,7 +621,11 @@ class Fragmentation {
 							transitions_t transitions = this->getPlacePreset(*this->mNet, *p);
 							FOREACH(t, transitions) {
 								if (!((this->mBilateralTransitions.find(*t) != this->mBilateralTransitions.end()) && (this->getTransitionRoleID(*t) == startRoleID))) {
-									if ((this->getTransitionRoleID(*t) == startRoleID) && (tarjan.getNodeSCC(*t) == curSCC)) {ret.insert(*t); status("............%s", (*t).c_str());}
+									if ((this->getTransitionRoleID(*t) == startRoleID) && (tarjan.getNodeSCC(*t) == curSCC)) {
+										curTransitionBound2 = TransitionBound.find(*t);
+										assert(curTransitionBound2 != TransitionBound.end());
+										if ((curTransitionBound->second == 1) || (curTransitionBound->second == curTransitionBound2->second)) {ret.insert(*t); status("............%s", (*t).c_str());}
+									}
 									else {if (done.find(*t) == done.end()) {toDo.push(*t);}}
 								}
 							}

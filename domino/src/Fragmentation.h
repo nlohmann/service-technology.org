@@ -116,6 +116,7 @@ class Fragmentation {
 			frag_id_t mSharedFragID;
 			set <frag_id_t> mUsedFragIDs;
 			transitions_t mBilateralTransitions;
+			transitions_t mBilateralTransitionsSCC;
 			size_t mMaxColors;
 			bool mIsFreeChoice;
 			bool mHasCycles;
@@ -431,18 +432,29 @@ class Fragmentation {
 					assert(target != NULL);
 					set<pnapi::Arc *> toDelete;
 					pnapi::Arc *curArc;
+					set<frag_id_t> fragIDs;
+
+					pair<place2FragIDs_t::iterator, place2FragIDs_t::iterator> curFragIDs = this->mPlace2FragIDs.equal_range(Source);
+					for (place2FragIDs_t::iterator curPlaceFragID=curFragIDs.first; curPlaceFragID!=curFragIDs.second; ++curPlaceFragID) {
+						this->addPlaceFragID(Target, curPlaceFragID->second);
+					}
+
 					FOREACH(a, source->getPresetArcs()) {
 						curArc = this->mNet->findArc((*a)->getSourceNode(), *target);
 						if (curArc == NULL) {
 							this->createArc((*a)->getSourceNode().getName(), Target, (*a)->getWeight());
 						}
+						else {
+							if (SumMarkings) {
+								curArc->setWeight(curArc->getWeight() + (*a)->getWeight());
+							}
+						}
 						toDelete.insert((*a));
 					}
 					FOREACH(a, source->getPostsetArcs()) {
 						curArc = this->mNet->findArc(*target, (*a)->getTargetNode());
-						if (curArc == NULL) {
-							this->createArc(Target, (*a)->getTargetNode().getName(), (*a)->getWeight());
-						}
+						assert(curArc == NULL);
+						this->createArc(Target, (*a)->getTargetNode().getName(), (*a)->getWeight());
 						toDelete.insert((*a));
 					}
 					FOREACH(a, toDelete) {
@@ -601,32 +613,35 @@ class Fragmentation {
 						}
 					}
 				}
-				inline transitions_t getTransitionNearestPredecessorsSCC(const transition_t & Start, Tarjan & tarjan, map<transition_t, unsigned int> & TransitionBound) {				
-					map<transition_t, unsigned int>::const_iterator curTransitionBound;
-					map<transition_t, unsigned int>::const_iterator curTransitionBound2;
-					curTransitionBound = TransitionBound.find(Start);
-					assert(curTransitionBound != TransitionBound.end());					
+				inline transitions_t getTransitionPredecessorsSCC(const transition_t & Start, const transition_t & End, Tarjan & tarjan) {				
 					int curSCC = tarjan.getNodeSCC(Start);
+					assert(tarjan.getNodeSCC(End) == curSCC);
 					role_id_t startRoleID = this->getTransitionRoleID(Start);
+					assert(this->getTransitionRoleID(End) == startRoleID);
 					stack<transition_t> toDo;
 					transitions_t done;
 					transitions_t ret;
+					//bool isBilatertalTransition = (this->mBilateralTransitions.find(Start) != this->mBilateralTransitions.end());
 
 					toDo.push(Start);
 					while (!toDo.empty()) {
-						places_t places = this->getTransitionPreset(*this->mNet, toDo.top());
-						done.insert(toDo.top());
+						transition_t curElem = toDo.top();
+						places_t places = this->getTransitionPreset(*this->mNet, curElem);
 						toDo.pop();
 						FOREACH(p, places) {
 							transitions_t transitions = this->getPlacePreset(*this->mNet, *p);
 							FOREACH(t, transitions) {
-								if (!((this->mBilateralTransitions.find(*t) != this->mBilateralTransitions.end()) && (this->getTransitionRoleID(*t) == startRoleID))) {
-									if ((this->getTransitionRoleID(*t) == startRoleID) && (tarjan.getNodeSCC(*t) == curSCC)) {
-										curTransitionBound2 = TransitionBound.find(*t);
-										assert(curTransitionBound2 != TransitionBound.end());
-										if ((curTransitionBound->second == 1) || (curTransitionBound->second == curTransitionBound2->second)) {ret.insert(*t); status("............%s", (*t).c_str());}
+								if (tarjan.getNodeSCC(*t) == curSCC) {
+									if (done.find(*t) == done.end()) {
+										done.insert(*t);
+										if (this->mBilateralTransitionsSCC.find(*t) == this->mBilateralTransitionsSCC.end()) {
+											if ((this->getTransitionRoleID(*t) == startRoleID) && (tarjan.getNodeSCC(*t) == curSCC)) {ret.insert(*t); status("..............%s", (*t).c_str());}
+											if (*t != End) {
+												//if ((!isBilatertalTransition) || (this->mBilateralSources.find(Start)->second != *t)) {}
+												toDo.push(*t);
+											}
+										}
 									}
-									else {if (done.find(*t) == done.end()) {toDo.push(*t);}}
 								}
 							}
 						}
@@ -658,7 +673,7 @@ class Fragmentation {
 					}
 					return ret;
 				}
-				inline places_t getPossibleSplitPlacesNonCyclic(const transition_t & Start, Tarjan & tarjan) {		
+				inline places_t getPossibleSplitPlacesNonCyclic(const transition_t & Start, Tarjan & tarjan, map<transition_t, unsigned int> & TransitionBound) {	
 					assert(!tarjan.isNonTrivialSCC(tarjan.getNodeSCC(Start)));
 					stack<transition_t> toDo;
 					transitions_t done;
@@ -679,7 +694,7 @@ class Fragmentation {
 					}
 					return ret;
 				}
-				inline places_t getTransitionPredeccessorsNonCyclic(const transition_t & Start, Tarjan & tarjan, map<transition_t, unsigned int> & TransitionBound) {
+				inline places_t getTransitionPredeccessorsNonCyclic(const transition_t & Start, Tarjan & tarjan, map<transition_t, unsigned int> & TransitionBound, unsigned int EndBound) {
 					assert(!tarjan.isNonTrivialSCC(tarjan.getNodeSCC(Start)));
 					role_id_t startRoleID = this->getTransitionRoleID(Start);
 					stack<transition_t> toDo;
@@ -699,7 +714,7 @@ class Fragmentation {
 									if (this->getTransitionRoleID(*t) == startRoleID) {
 										curTransitionBound = TransitionBound.find(*t);
 										assert(curTransitionBound != TransitionBound.end());
-										if (curTransitionBound->second == 1) {ret.insert(*t); status("..........%s", (*t).c_str());}
+										if (((EndBound % curTransitionBound->second) == 0) && (curTransitionBound->second <= EndBound)) {ret.insert(*t); status("..........%s", (*t).c_str());}
 									}
 									if (done.find(*t) == done.end()) {toDo.push(*t);}
 								}
@@ -709,7 +724,7 @@ class Fragmentation {
 					if (ret.size() == 0) {
 						curTransitionBound = TransitionBound.find(Start);
 						assert(curTransitionBound != TransitionBound.end());
-						if (curTransitionBound->second == 1) {ret.insert(Start); status("..........%s", Start.c_str());} 
+						if (((EndBound % curTransitionBound->second) == 0) && (curTransitionBound->second <= EndBound)) {ret.insert(Start); status("..........%s", Start.c_str());} 
 					}
 					return ret;
 				}

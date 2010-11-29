@@ -716,6 +716,7 @@ bool Fragmentation::buildServices() {
 	
 	set< pair<place_t, place_t> > toBeMerged;
 	set< pair<place_t, place_t> > toBeSummed;
+	transitions_t noMerging;
 	transitions_t orConnected;
 	multimap<places_t, transition_t> reactivatingSets;
 	if (tarjan.hasNonTrivialSCC()) {
@@ -771,6 +772,7 @@ bool Fragmentation::buildServices() {
 					curReactivatings = reactivatingCandidates.equal_range(*t);
 					transitions_t equivalence = reactivatingPredecessors[curReactivatings.first->second];
 					bool equal = true;
+					bool reduced = false;
 					for (multimap<transition_t, transition_t>::iterator curReactivating=curReactivatings.first; curReactivating!=curReactivatings.second; ++curReactivating) {
 						status("..............compare with %s", curReactivating->second.c_str());
 						if (reactivatingPredecessors[curReactivating->second] != equivalence) {
@@ -787,9 +789,11 @@ bool Fragmentation::buildServices() {
 								if (reactivatingPredecessors[curReactivating2->second].find(curReactivating->second) != reactivatingPredecessors[curReactivating2->second].end()) {
 									status("...............yes -> delete %s", curReactivating2->second.c_str());
 									toDelete.insert(*curReactivating2);
+									reduced = true;
 								}
 							}
 						}
+						if (reduced) {noMerging.insert(*t);}
 					}
 				}
 			}
@@ -895,7 +899,7 @@ bool Fragmentation::buildServices() {
 		while (changed) {
 			changed = false;
 			FOREACH(t, needReactivating) {
-				if (transitionsDone.find(*t) == transitionsDone.end()) {
+				if ((transitionsDone.find(*t) == transitionsDone.end()) && (selfReactivatings.find(*t) == selfReactivatings.end())) {
 					if (reactivatingCandidates.count(*t) == 1) {
 						status("......handle %s", (*t).c_str());
 						curReactivatings = reactivatingCandidates.equal_range(*t);
@@ -975,7 +979,7 @@ bool Fragmentation::buildServices() {
 				this->mSelfreactivatings++;
 				curTransitions.insert(*t);
 				transitionPlaces = this->getTransitionPlaces(*this->mNet, *t);
-				FOREACH(p, transitionPlaces) {assert((*p == newPlace) || (this->isSharedPlace(*p)));}
+				FOREACH(p, transitionPlaces) {if((*p != newPlace) && (!this->isSharedPlace(*p))) {status(_cwarning_("..........%s"), (*p).c_str());}}
 				this->createArc((*t), newPlace);
 				if (processedPredecessors.find(*t) == processedPredecessors.end()) {
 					this->mPlaceName2PlacePointer[newPlace]->setTokenCount(1);
@@ -1055,7 +1059,7 @@ bool Fragmentation::buildServices() {
 				this->createArc(newTransition, newPlace, arcWeightX);
 			}
 		}
-		if (this->mBilateralTransitions.find(*t) == this->mBilateralTransitions.end()) {reactivatingSets.insert( std::make_pair(curTransitions, *t) );}
+		if ((this->mBilateralTransitions.find(*t) == this->mBilateralTransitions.end()) && (noMerging.find(*t) == noMerging.end())) {reactivatingSets.insert( std::make_pair(curTransitions, *t) );}
 	}
 
 	if (processedPredecessors.size() != 0) {
@@ -1142,18 +1146,20 @@ bool Fragmentation::buildServices() {
 		if (reactivatingSets.size() != 0) {
 			set<places_t> doneSets;
 			status(_cimportant_("..merging(s) necessary"));
-			pair< multimap<places_t, transition_t>::iterator, multimap<places_t, transition_t>::iterator > curPlaces;
-			for (multimap<places_t, transition_t>::iterator curSet=reactivatingSets.begin(); curSet!=reactivatingSets.end(); ++curSet) {
+			pair< multimap<transitions_t, transition_t>::iterator, multimap<transitions_t, transition_t>::iterator > curTransitions;
+			for (multimap<transitions_t, transition_t>::iterator curSet=reactivatingSets.begin(); curSet!=reactivatingSets.end(); ++curSet) {
 				if (doneSets.find(curSet->first) == doneSets.end()) {
 					assert(reactivatingSets.count(curSet->first) > 1);
-					curPlaces = reactivatingSets.equal_range(curSet->first);
+					curTransitions = reactivatingSets.equal_range(curSet->first);
 					this->mMergings++;
-					transition_t firstElem = string(args_info.boundnessCorrection_arg + curPlaces.first->second);
-					for (multimap<places_t, transition_t>::iterator curTransition=curPlaces.first; curTransition!=curPlaces.second; ++curTransition) {
+					transition_t firstElem = string(args_info.boundnessCorrection_arg + curTransitions.first->second);
+					for (multimap<places_t, transition_t>::iterator curTransition=curTransitions.first; curTransition!=curTransitions.second; ++curTransition) {
 						if (string(args_info.boundnessCorrection_arg + curTransition->second) != firstElem) {
 							bool sumMarkings = true;
-							places_t a = this->getTransitionPreset(*this->mNet, curPlaces.first->second);
-							places_t b = this->getTransitionPreset(*this->mNet, curTransition->second);
+							//places_t a = this->getTransitionPreset(*this->mNet, curTransitions.first->second);
+							//places_t b = this->getTransitionPreset(*this->mNet, curTransition->second);
+							places_t a = this->getPossibleSplitPlacesCyclic(curTransitions.first->second, curSet->first, tarjan);
+							places_t b = this->getPossibleSplitPlacesCyclic(curTransition->second, curSet->first, tarjan);
 							places_t i = setIntersection(a, b);
 							if ((i.size() != 0) && (this->mIsFreeChoice)) {sumMarkings = false;}
 							else {

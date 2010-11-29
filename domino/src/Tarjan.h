@@ -107,6 +107,11 @@ class Tarjan {
 
 		void calculateSCC();
 
+		inline bool isNodeKnown(const node_t & Node) {
+			assert(this->mSCCCalculated);
+			return (this->mNode2SCC.find(Node) != this->mNode2SCC.end());
+		}
+
 		inline node_value_t getNode2SCC() const {
 			assert(this->mSCCCalculated);
 			return this->mNode2SCC;

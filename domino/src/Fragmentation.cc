@@ -1158,8 +1158,11 @@ bool Fragmentation::buildServices() {
 							bool sumMarkings = true;
 							//places_t a = this->getTransitionPreset(*this->mNet, curTransitions.first->second);
 							//places_t b = this->getTransitionPreset(*this->mNet, curTransition->second);
-							places_t a = this->getPossibleSplitPlacesCyclic(curTransitions.first->second, curSet->first, tarjan);
-							places_t b = this->getPossibleSplitPlacesCyclic(curTransition->second, curSet->first, tarjan);
+							status("....check connection");
+							status("......calculate preset of %s", curTransitions.first->second.c_str());
+							places_t a = this->getPossibleSplitPlacesCyclicM(curTransitions.first->second, curSet->first, tarjan);
+							status("......calculate preset of %s", curTransition->second.c_str());
+							places_t b = this->getPossibleSplitPlacesCyclicM(curTransition->second, curSet->first, tarjan);
 							places_t i = setIntersection(a, b);
 							if ((i.size() != 0) && (this->mIsFreeChoice)) {sumMarkings = false;}
 							else {
@@ -1172,7 +1175,7 @@ bool Fragmentation::buildServices() {
 									}
 								}
 							}
-							status("....merge (%s, %s): %d", firstElem.c_str(), string(args_info.boundnessCorrection_arg + curTransition->second).c_str(), sumMarkings);
+							status("......merge (%s, %s): %d", firstElem.c_str(), string(args_info.boundnessCorrection_arg + curTransition->second).c_str(), sumMarkings);
 							toBeMerged.insert( std::make_pair(firstElem, string(args_info.boundnessCorrection_arg + curTransition->second)));
 							if (sumMarkings) {toBeSummed.insert( std::make_pair(firstElem, string(args_info.boundnessCorrection_arg + curTransition->second)));}
 						}

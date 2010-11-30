@@ -673,7 +673,7 @@ class Fragmentation {
 					}
 					return ret;
 				}
-				inline places_t getPossibleSplitPlacesCyclic(const transition_t & Start, const transitions_t & End, Tarjan & tarjan) {		
+				inline places_t getPossibleSplitPlacesCyclicM(const transition_t & Start, const transitions_t & End, Tarjan & tarjan) {		
 					int curSCC = tarjan.getNodeSCC(Start);
 					FOREACH(t, End) {
 						assert(tarjan.getNodeSCC(*t) == curSCC);
@@ -685,16 +685,25 @@ class Fragmentation {
 
 					toDo.push(Start);
 					while (!toDo.empty()) {
-						places_t places = this->getTransitionPostset(*this->mNet, toDo.top());
+						places_t places = this->getTransitionPreset(*this->mNet, toDo.top());
 						done.insert(toDo.top());
 						toDo.pop();
 						FOREACH(p, places) {
-							if ((!tarjan.isNodeKnown(*p)) || (tarjan.getNodeSCC(*p) == curSCC)) {
-								if (this->getPlacePreset(*this->mNet, *p).size() > 1) {ret.insert(*p);}
-								transitions_t transitions = this->getPlacePostset(*this->mNet, *p);
-								FOREACH(t, transitions) {
-									if ((End.find(*t) != End.end()) && (done.find(*t) == done.end())) {
-										if ((!tarjan.isNodeKnown(*t)) || (tarjan.getNodeSCC(*t) == curSCC)) {toDo.push(*t);}
+							if (tarjan.isNodeKnown(*p)) {
+								if (tarjan.getNodeSCC(*p) == curSCC) {
+									transitions_t placePostset = this->getPlacePostset(*this->mNet, *p);
+									if (placePostset.size() > 1) {
+										size_t loopTransitions = 0;
+										FOREACH(t, placePostset) {
+											if (tarjan.getNodeSCC(*t) == curSCC) {loopTransitions++;}
+										}
+										if (loopTransitions > 1) {ret.insert(*p); status("........%s", (*p).c_str());}
+									}
+									transitions_t transitions = this->getPlacePreset(*this->mNet, *p);
+									FOREACH(t, transitions) {
+										if ((End.find(*t) == End.end()) && (done.find(*t) == done.end())) {
+											if ((!tarjan.isNodeKnown(*t)) || (tarjan.getNodeSCC(*t) == curSCC)) {toDo.push(*t);}
+										}
 									}
 								}
 							}

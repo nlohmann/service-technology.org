@@ -259,7 +259,8 @@ int main(int argc, char** argv) {
     | 2. specific							  |
     `----------------------------------------*/
 	string fileName;	
-	
+	bool retOK;	
+
 	if (args_info.inputs_num == 0) {
 		fileName = "STDIN";
 	}
@@ -267,22 +268,28 @@ int main(int argc, char** argv) {
 		fileName = string(args_info.inputs[0]);
 	}
 
-	if (args_info.canonicalNames_flag) {
-		net.canonicalNames();
-	}
-
 	if (net.getRoles().size() < 2) {
 		message(_cimportant_("workflow contains less than 2 roles"));
 		message(_cgood_("workflow decomposition successfull"));
 		return EXIT_SUCCESS;
 	}
+
+	Tarjan tarjan(net);
+	tarjan.calculateSCC();
+	if (tarjan.hasNonTrivialSCC()) {
+		message(_cimportant_("workflow is not acyclic"));
+		message(_cbad_("workflow decomposition failed"));
+		return EXIT_SUCCESS;
+	}
+
+	if (args_info.canonicalNames_flag) {
+		net.canonicalNames();
+	}
 	
 	string outputFileName;
-	bool retOK;
 	validStatus_e fragmentStatus;
 	
 	retOK = true;
-
 	Fragmentation f(net);
 
 	if (!f.buildRoleFragments()) {
@@ -315,7 +322,7 @@ int main(int argc, char** argv) {
 	
 	if (retOK) {
 		if (!f.processUnassignedFragments()) {
-			message(_cbad_("worklfow decomposition failed"));
+			message(_cbad_("workflow decomposition failed"));
 			retOK = false;
 		}		
 	}
@@ -324,7 +331,7 @@ int main(int argc, char** argv) {
 		fragmentStatus = f.isFragmentationValid(true);
 		assert(fragmentStatus != VALID_TODO);
 		if (fragmentStatus == VALID_BAD) {
-			message(_cbad_("worklfow decomposition failed"));
+			message(_cbad_("workflow decomposition failed"));
 			retOK = false;
 		}
 	}
@@ -369,7 +376,7 @@ int main(int argc, char** argv) {
 		fragmentStatus = f.isFragmentationValid(false);
 		assert(fragmentStatus != VALID_TODO);
 		if (fragmentStatus == VALID_BAD) {
-			message(_cbad_("worklfow decomposition failed"));
+			message(_cbad_("workflow decomposition failed"));
 			retOK = false;
 		}
 		else {
@@ -416,13 +423,10 @@ int main(int argc, char** argv) {
 		results.add("decomposition.success", retOK);
 		results.add("decomposition.interface_corrected_places", (unsigned int)f.getInterfaceCorrections());
 		results.add("decomposition.bounded_transitions", (unsigned int)f.getBoundnessCorrections());
-		results.add("decomposition.or_bounded_transitions", (unsigned int)f.getBoundnessOrConnections());
-		results.add("decomposition.and_bounded_transitions", (unsigned int)f.getBoundnessAndConnections());
-		results.add("decomposition.mergings", (unsigned int)f.getMergings());
 		results.add("decomposition.fragment_connections", (unsigned int)f.getFragmentConnections());
 		results.add("decomposition.arcweight_increased", (unsigned int)f.getArcweightCorrections());
 		results.add("decomposition.initial_marked_places", (unsigned int)f.getInitialMarkings());
-		results.add("decomposition.selfreactivating_transitions", (unsigned int)f.getSelfreactivatings());
+		results.add("decomposition.multiple_predecessors", (unsigned int)f.getMultiplePredecessors());
 		results.add("decomposition.places_inserted", (unsigned int)f.getPlacesInsert());
 		results.add("decomposition.transitions_inserted", (unsigned int)f.getTransitionsInsert());
 		results.add("decomposition.arcs_inserted", (unsigned int)f.getArcsInsert());
@@ -447,7 +451,7 @@ int main(int argc, char** argv) {
 		results.add("workflow.transitions", (unsigned int)(net.getTransitions().size() - f.getTransitionsInsert() + f.getTransitionsDelete()));
 		results.add("workflow.arcs", (unsigned int)(net.getArcs().size() - f.getArcsInsert() + f.getArcsDelete()));
 		results.add("workflow.isFreeChoice", f.isFreeChoice());
-		results.add("workflow.hasCycles", f.hasCycles());
+		results.add("workflow.hasCycles", tarjan.hasNonTrivialSCC());
 
     }
 	

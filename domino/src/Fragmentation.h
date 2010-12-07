@@ -47,7 +47,7 @@
 #include "verbose.h"
 #include "cmdline.h"
 
-#include "Tarjan.h"
+//#include "Tarjan.h"
 
 extern gengetopt_args_info args_info;
 extern map<place_t, unsigned int> Place2MaxTokens;
@@ -115,11 +115,9 @@ class Fragmentation {
 			pnapi::PetriNet *mNet;
 			frag_id_t mSharedFragID;
 			set <frag_id_t> mUsedFragIDs;
-			transitions_t mBilateralTransitions;
-			transitions_t mBilateralTransitionsSCC;
 			size_t mMaxColors;
 			bool mIsFreeChoice;
-			bool mHasCycles;
+			//bool mHasCycles;
 		//status
 			bool mRoleFragmentsBuild;
 			bool mUnassignedFragmentsProcessed;
@@ -127,13 +125,10 @@ class Fragmentation {
 		//statistic
 			size_t mInterfaceCorrections;
 			size_t mBoundnessCorrections;
-			size_t mBoundnessOrConnections;
-			size_t mBoundnessAndConnections;
-			size_t mMergings;
 			size_t mFragmentConnections;
 			size_t mArcweightCorrections;
 			size_t mInitialMarkings;
-			size_t mSelfreactivatings;
+			size_t mMultiplePredecessors;
 			size_t mPlacesInsert;
 			size_t mTransitionsInsert;
 			size_t mArcsInsert;
@@ -425,44 +420,6 @@ class Fragmentation {
 					this->mNet->createArc(*source, *target, Weight);
 					this->mArcsInsert++;
 				}
-				inline void mergePlaces(const place_t & Target, const place_t & Source, const bool SumMarkings) {
-					pnapi::Node *source = this->mNet->findNode(Source);
-					pnapi::Node *target = this->mNet->findNode(Target);
-					assert(source != NULL);
-					assert(target != NULL);
-					set<pnapi::Arc *> toDelete;
-					pnapi::Arc *curArc;
-					set<frag_id_t> fragIDs;
-
-					pair<place2FragIDs_t::iterator, place2FragIDs_t::iterator> curFragIDs = this->mPlace2FragIDs.equal_range(Source);
-					for (place2FragIDs_t::iterator curPlaceFragID=curFragIDs.first; curPlaceFragID!=curFragIDs.second; ++curPlaceFragID) {
-						this->addPlaceFragID(Target, curPlaceFragID->second);
-					}
-
-					FOREACH(a, source->getPresetArcs()) {
-						curArc = this->mNet->findArc((*a)->getSourceNode(), *target);
-						if (curArc == NULL) {
-							this->createArc((*a)->getSourceNode().getName(), Target, (*a)->getWeight());
-						}
-						else {
-							if (SumMarkings) {
-								curArc->setWeight(curArc->getWeight() + (*a)->getWeight());
-							}
-						}
-						toDelete.insert((*a));
-					}
-					FOREACH(a, source->getPostsetArcs()) {
-						curArc = this->mNet->findArc(*target, (*a)->getTargetNode());
-						assert(curArc == NULL);
-						this->createArc(Target, (*a)->getTargetNode().getName(), (*a)->getWeight());
-						toDelete.insert((*a));
-					}
-					FOREACH(a, toDelete) {
-						this->mNet->deleteArc(**a);
-					}
-					if (SumMarkings) {this->mPlaceName2PlacePointer[Target]->setTokenCount(this->mPlaceName2PlacePointer[Target]->getTokenCount() + this->mPlaceName2PlacePointer[Source]->getTokenCount());}
-					this->deletePlace(Source);
-				}
 				void createPetrinetByFragID(const frag_id_t);
 				//delete
     			inline void deletePlace(const place_t & Place) {
@@ -613,132 +570,11 @@ class Fragmentation {
 						}
 					}
 				}
-				inline transitions_t getTransitionPredecessorsSCC(const transition_t & Start, const transition_t & End, Tarjan & tarjan) {				
-					int curSCC = tarjan.getNodeSCC(Start);
-					assert(tarjan.getNodeSCC(End) == curSCC);
-					role_id_t startRoleID = this->getTransitionRoleID(Start);
-					assert(this->getTransitionRoleID(End) == startRoleID);
-					stack<transition_t> toDo;
-					transitions_t done;
-					transitions_t ret;
-					//bool isBilatertalTransition = (this->mBilateralTransitions.find(Start) != this->mBilateralTransitions.end());
-
-					toDo.push(Start);
-					while (!toDo.empty()) {
-						transition_t curElem = toDo.top();
-						places_t places = this->getTransitionPreset(*this->mNet, curElem);
-						toDo.pop();
-						FOREACH(p, places) {
-							transitions_t transitions = this->getPlacePreset(*this->mNet, *p);
-							FOREACH(t, transitions) {
-								if (tarjan.getNodeSCC(*t) == curSCC) {
-									if (done.find(*t) == done.end()) {
-										done.insert(*t);
-										if (this->mBilateralTransitionsSCC.find(*t) == this->mBilateralTransitionsSCC.end()) {
-											if ((this->getTransitionRoleID(*t) == startRoleID) && (tarjan.getNodeSCC(*t) == curSCC)) {ret.insert(*t); status("..............%s", (*t).c_str());}
-											if (*t != End) {
-												//if ((!isBilatertalTransition) || (this->mBilateralSources.find(Start)->second != *t)) {}
-												toDo.push(*t);
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-					return ret;
-				}
-				inline places_t getPossibleSplitPlacesCyclic(const transition_t & Start, const transition_t & End, Tarjan & tarjan) {	
-					int curSCC = tarjan.getNodeSCC(Start);
-					assert(tarjan.getNodeSCC(End) == curSCC);
-					assert(this->getTransitionRoleID(End) == this->getTransitionRoleID(Start));
-					stack<transition_t> toDo;
-					transitions_t done;
-					places_t ret;
-
-					toDo.push(Start);
-					while (!toDo.empty()) {
-						places_t places = this->getTransitionPostset(*this->mNet, toDo.top());
-						done.insert(toDo.top());
-						toDo.pop();
-						FOREACH(p, places) {
-							if (tarjan.getNodeSCC(*p) == curSCC) {
-								if (this->getPlacePreset(*this->mNet, *p).size() > 1) {ret.insert(*p);}
-								transitions_t transitions = this->getPlacePostset(*this->mNet, *p);
-								FOREACH(t, transitions) {
-									if ((*t != End) && (done.find(*t) == done.end()) && (tarjan.getNodeSCC(*t) == curSCC)) {toDo.push(*t);}
-								}
-							}
-						}
-					}
-					return ret;
-				}
-				inline places_t getPossibleSplitPlacesCyclicM(const transition_t & Start, const transitions_t & End, Tarjan & tarjan) {		
-					int curSCC = tarjan.getNodeSCC(Start);
-					FOREACH(t, End) {
-						assert(tarjan.getNodeSCC(*t) == curSCC);
-						assert(this->getTransitionRoleID(*t) == this->getTransitionRoleID(Start));
-					}
-					stack<transition_t> toDo;
-					transitions_t done;
-					places_t ret;
-
-					toDo.push(Start);
-					while (!toDo.empty()) {
-						places_t places = this->getTransitionPreset(*this->mNet, toDo.top());
-						done.insert(toDo.top());
-						toDo.pop();
-						FOREACH(p, places) {
-							if (tarjan.isNodeKnown(*p)) {
-								if (tarjan.getNodeSCC(*p) == curSCC) {
-									transitions_t placePostset = this->getPlacePostset(*this->mNet, *p);
-									if (placePostset.size() > 1) {
-										size_t loopTransitions = 0;
-										FOREACH(t, placePostset) {
-											if (tarjan.getNodeSCC(*t) == curSCC) {loopTransitions++;}
-										}
-										if (loopTransitions > 1) {ret.insert(*p); status("........%s", (*p).c_str());}
-									}
-									transitions_t transitions = this->getPlacePreset(*this->mNet, *p);
-									FOREACH(t, transitions) {
-										if ((End.find(*t) == End.end()) && (done.find(*t) == done.end())) {
-											if ((!tarjan.isNodeKnown(*t)) || (tarjan.getNodeSCC(*t) == curSCC)) {toDo.push(*t);}
-										}
-									}
-								}
-							}
-						}
-					}
-					return ret;
-				}
-				inline places_t getPossibleSplitPlacesNonCyclic(const transition_t & Start, Tarjan & tarjan, map<transition_t, unsigned int> & TransitionBound) {	
-					assert(!tarjan.isNonTrivialSCC(tarjan.getNodeSCC(Start)));
-					stack<transition_t> toDo;
-					transitions_t done;
-					places_t ret;
-
-					toDo.push(Start);
-					while (!toDo.empty()) {
-						places_t places = this->getTransitionPreset(*this->mNet, toDo.top());
-						done.insert(toDo.top());
-						toDo.pop();
-						FOREACH(p, places) {
-							if (this->getPlacePostset(*this->mNet, *p).size() > 1) {ret.insert(*p);}
-							transitions_t transitions = this->getPlacePreset(*this->mNet, *p);
-							FOREACH(t, transitions) {
-								if (!tarjan.isNonTrivialSCC(tarjan.getNodeSCC(*t))) {toDo.push(*t);}
-							}
-						}
-					}
-					return ret;
-				}
-				inline places_t getTransitionPredeccessorsNonCyclic(const transition_t & Start, Tarjan & tarjan, map<transition_t, unsigned int> & TransitionBound, unsigned int EndBound) {
-					assert(!tarjan.isNonTrivialSCC(tarjan.getNodeSCC(Start)));
+				inline places_t getTransitionPredecessors(const transition_t & Start) {
 					role_id_t startRoleID = this->getTransitionRoleID(Start);
 					stack<transition_t> toDo;
 					transitions_t done;
 					transitions_t ret;
-					map<transition_t, unsigned int>::const_iterator curTransitionBound;
 
 					toDo.push(Start);
 					while (!toDo.empty()) {
@@ -748,21 +584,10 @@ class Fragmentation {
 						FOREACH(p, places) {
 							transitions_t transitions = this->getPlacePreset(*this->mNet, *p);
 							FOREACH(t, transitions) {
-								if (!tarjan.isNonTrivialSCC(tarjan.getNodeSCC(*t))) {
-									if (this->getTransitionRoleID(*t) == startRoleID) {
-										curTransitionBound = TransitionBound.find(*t);
-										assert(curTransitionBound != TransitionBound.end());
-										if (((EndBound % curTransitionBound->second) == 0) && (curTransitionBound->second <= EndBound)) {ret.insert(*t); status("..........%s", (*t).c_str());}
-									}
-									if (done.find(*t) == done.end()) {toDo.push(*t);}
-								}
+								if (this->getTransitionRoleID(*t) == startRoleID) {ret.insert(*t); status("............%s", (*t).c_str());}
+								if (done.find(*t) == done.end()) {toDo.push(*t);}
 							}
 						}
-					}
-					if (ret.size() == 0) {
-						curTransitionBound = TransitionBound.find(Start);
-						assert(curTransitionBound != TransitionBound.end());
-						if (((EndBound % curTransitionBound->second) == 0) && (curTransitionBound->second <= EndBound)) {ret.insert(Start); status("..........%s", Start.c_str());} 
 					}
 					return ret;
 				}
@@ -844,17 +669,13 @@ class Fragmentation {
 					inline size_t getDianeCalls() {return this->mDianeCalls;}
 					inline size_t getDianeForces() {return this->mOverallDianeForces;}
 					inline size_t getDianeAlternatives() {return this->mOverallDianeAlternatives;}
-					inline bool hasCycles() {return this->mHasCycles;}
 					inline bool isFreeChoice() {return this->mIsFreeChoice;}
 					inline size_t getInterfaceCorrections() {return this->mInterfaceCorrections;}
 					inline size_t getBoundnessCorrections() {return this->mBoundnessCorrections;}
-					inline size_t getBoundnessOrConnections() {return this->mBoundnessOrConnections;}
-					inline size_t getBoundnessAndConnections() {return this->mBoundnessAndConnections;}
-					inline size_t getMergings() {return this->mMergings;}
 					inline size_t getFragmentConnections() {return this->mFragmentConnections;}
 					inline size_t getArcweightCorrections() {return this->mArcweightCorrections;}
 					inline size_t getInitialMarkings() {return this->mInitialMarkings;}
-					inline size_t getSelfreactivatings() {return this->mSelfreactivatings;}
+					inline size_t getMultiplePredecessors() {return this->mMultiplePredecessors;}
 					inline size_t getPlacesInsert() {return this->mPlacesInsert;}
 					inline size_t getTransitionsInsert() {return this->mTransitionsInsert;}
 					inline size_t getArcsInsert() {return this->mArcsInsert;}

@@ -24,33 +24,16 @@
 TESTFILES = IBM-B3-2802.owfn \
 			IBM-B3-3029.owfn \
             IBM-B3-4958.owfn \
-			IBM-B3-6879.owfn \
 			IBM-C-596.owfn \
-            Loop-InsideRoles.owfn \
-			Loop-OverRoles.owfn \
-			DA-Producer-Consumer.owfn \
-			DA-Producer-Consumer-complete.owfn \
-			fail_DA-Producer-Consumer.owfn \
 			not-bilateral.owfn \
 			wrong-owfn.owfn \
 			no-startplace.owfn \
 			two-startplaces.owfn \
-			Unassigned-role.owfn \
-			self-reactivating-transitions.owfn \
-			Circle-with-choices.owfn \
-			Circle-with-choices-or.owfn \
-			Circle-with-choices-or2.owfn \
-			forced-selfreactivating.owfn \
 			over-annotation.owfn \
 			Arcweight.owfn \
-			Arcweight-circle.owfn \
-			Arcweight-circle2.owfn \
-			Arcweight-circle3.owfn \
-			Arcweight-circle4.owfn \
-			Arcweight-circle5.owfn \
-			Two-Circles.owfn \
 			place-exists.owfn \
 			transition-exists.owfn \
+			Unassigned-role.owfn \
 			Komposition.owfn
 # <<-- CHANGE END -->>
 

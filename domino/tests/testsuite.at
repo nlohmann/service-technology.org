@@ -119,24 +119,22 @@ AT_CLEANUP
 #AT_SETUP([Cleaning vs. no cleaning of temporary files])
 #AT_CHECK_DIANE
 #AT_CHECK_LOLA
-#AT_CHECK([cp TESTFILES/IBM-B3-2802.owfn .])
-#AT_CHECK([DOMINO IBM-B3-2802.owfn ],0,ignore,ignore)
-#AT_CHECK([test -f IBM-B3-2802.owfn_Frag*],1)
-#AT_CHECK([DOMINO --noClean IBM-B3-2802.owfn ],0,ignore,ignore)
-#AT_CHECK([test -f IBM-B3-2802.owfn_Frag*],0)
+#AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+#AT_CHECK([DOMINO IBM-B3-3029.owfn ],0,ignore,ignore)
+#AT_CHECK([test -f IBM-B3-3029.owfn_Frag*],1)
+#AT_CHECK([DOMINO --noClean IBM-B3-3029.owfn ],0,ignore,ignore)
+#AT_CHECK([test -f IBM-B3-3029.owfn_Frag*],0)
 #AT_KEYWORDS(infrastructure)
 #AT_CLEANUP
 
 AT_SETUP([Canonical vs. original names])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/DA-Producer-Consumer.owfn .])
-AT_CHECK([DOMINO -v DA-Producer-Consumer.owfn ],0,ignore,stderr)
-AT_CHECK([GREP -q "....BE" stderr])
-AT_CHECK([GREP -q "....CC" stderr])
-AT_CHECK([DOMINO --canonicalNames -v DA-Producer-Consumer.owfn ],0,ignore,stderr)
+AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
+AT_CHECK([DOMINO -v IBM-B3-3029.owfn ],0,ignore,stderr)
+AT_CHECK([GREP -q "....callToProcess.s00001419.inputCriterion.s00001053.used" stderr])
+AT_CHECK([DOMINO --canonicalNames -v IBM-B3-3029.owfn ],0,ignore,stderr)
 AT_CHECK([GREP -q "....p1" stderr])
-AT_CHECK([GREP -q "....t1" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -338,10 +336,10 @@ AT_CLEANUP
 AT_SETUP([Cannot create tempfile])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/DA-Producer-Consumer.owfn .])
+AT_CHECK([cp TESTFILES/Arcweight.owfn .])
 AT_CHECK([touch foo])
 AT_CHECK([chmod a-w foo])
-AT_CHECK([DOMINO DA-Producer-Consumer.owfn --verbose --tmpfile=foo],1,ignore,stderr)
+AT_CHECK([DOMINO Arcweight.owfn --verbose --tmpfile=foo],1,ignore,stderr)
 AT_CHECK([GREP -q "failed to open file" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
@@ -352,15 +350,6 @@ AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/wrong-owfn.owfn .])
 AT_CHECK([DOMINO wrong-owfn.owfn],1,ignore,stderr)
 AT_CHECK([GREP -q "unknown place or interface label" stderr])
-AT_KEYWORDS(error)
-AT_CLEANUP
-
-AT_SETUP([No start place])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/no-startplace.owfn .])
-AT_CHECK([DOMINO no-startplace.owfn],1,ignore,stderr)
-AT_CHECK([GREP -q "no global start place was found" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
@@ -404,38 +393,11 @@ AT_CLEANUP
 AT_BANNER([Valgrind])
 ############################################################################
 
-AT_SETUP([Checking for memory leaks - 1])
+AT_SETUP([Checking for memory leaks])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/IBM-B3-3029.owfn .])
 AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW IBM-B3-3029.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
-AT_KEYWORDS(valgrind)
-AT_CLEANUP
-
-AT_SETUP([Checking for memory leaks - 2])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/IBM-B3-4958.owfn .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW IBM-B3-4958.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices],0,ignore,stderr)
-AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
-AT_KEYWORDS(valgrind)
-AT_CLEANUP
-
-AT_SETUP([Checking for memory leaks - 3])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Arcweight-circle.owfn .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW Arcweight-circle.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices],0,ignore,stderr)
-AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
-AT_KEYWORDS(valgrind)
-AT_CLEANUP
-
-AT_SETUP([Checking for memory leaks - 4])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Arcweight-circle2.owfn .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes DOMINO_RAW Arcweight-circle2.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP
@@ -635,87 +597,6 @@ AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 
-AT_SETUP([DA-Producer-Consumer])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/DA-Producer-Consumer.owfn .])
-AT_CHECK([DOMINO DA-Producer-Consumer.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([DA-Producer-Consumer (complete annotated)])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/DA-Producer-Consumer-complete.owfn .])
-AT_CHECK([DOMINO DA-Producer-Consumer-complete.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([DA-Producer-Consumer (fail)])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/fail_DA-Producer-Consumer.owfn .])
-AT_CHECK([DOMINO fail_DA-Producer-Consumer.owfn ],0,ignore,stderr)
-AT_CHECK([GREP -q "worklfow decomposition failed" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([Loop-InsideRoles])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Loop-InsideRoles.owfn .])
-AT_CHECK([DOMINO Loop-InsideRoles.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([Loop-OverRoles])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Loop-OverRoles.owfn .])
-AT_CHECK([DOMINO Loop-OverRoles.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([Two-Circles])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Two-Circles.owfn .])
-AT_CHECK([DOMINO Two-Circles.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([Circle with choices])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Circle-with-choices.owfn .])
-AT_CHECK([DOMINO Circle-with-choices.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([Circle with choices (or-connected)])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Circle-with-choices-or.owfn .])
-AT_CHECK([DOMINO Circle-with-choices-or.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([Circle with choices (or-connected) 2])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Circle-with-choices-or2.owfn .])
-AT_CHECK([DOMINO Circle-with-choices-or2.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
 AT_SETUP([Not bilateral])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
@@ -725,74 +606,11 @@ AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 
-AT_SETUP([Self-reactivating transitions])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/self-reactivating-transitions.owfn .])
-AT_CHECK([DOMINO self-reactivating-transitions.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([Forced selfreactivating transition])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/forced-selfreactivating.owfn .])
-AT_CHECK([DOMINO forced-selfreactivating.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
 AT_SETUP([Arcweight])
 AT_CHECK_DIANE
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/Arcweight.owfn .])
 AT_CHECK([DOMINO Arcweight.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([Arcweight-circle])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Arcweight-circle.owfn .])
-AT_CHECK([DOMINO Arcweight-circle.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([Arcweight-circle 2])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Arcweight-circle2.owfn .])
-AT_CHECK([DOMINO Arcweight-circle2.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([Arcweight-circle 3])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Arcweight-circle3.owfn .])
-AT_CHECK([DOMINO Arcweight-circle3.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([Arcweight-circle 4])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Arcweight-circle4.owfn .])
-AT_CHECK([DOMINO Arcweight-circle4.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
-AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
-AT_KEYWORDS(tests)
-AT_CLEANUP
-
-AT_SETUP([Arcweight-circle 5])
-AT_CHECK_DIANE
-AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/Arcweight-circle5.owfn .])
-AT_CHECK([DOMINO Arcweight-circle5.owfn -v --dot-roles --dot-fragments --dotInitial --dotFragmented -o --dot-serviceOverview --dotServices --dotColorUnassigned],0,ignore,stderr)
 AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
@@ -813,5 +631,15 @@ AT_CHECK([cp TESTFILES/Unassigned-role.owfn .])
 AT_CHECK([DOMINO Unassigned-role.owfn -v -o],0,ignore,stderr)
 AT_CHECK([GREP -q "role C is empty" stderr])
 AT_CHECK([GREP -q "workflow decomposition successfull" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Cyclic])
+AT_CHECK_DIANE
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/no-startplace.owfn .])
+AT_CHECK([DOMINO no-startplace.owfn -v -o],0,ignore,stderr)
+AT_CHECK([GREP -q "workflow is not acyclic" stderr])
+AT_CHECK([GREP -q "workflow decomposition failed" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP

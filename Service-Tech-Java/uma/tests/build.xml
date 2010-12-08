@@ -13,8 +13,9 @@
 	
 	<property name="compiled.classes" location="${bin}" />
 	<property name="test.libs-external" location="${home}/libs-external/" />
-	
-	<path id="run.classpath">
+
+	<!-- include compiled classes, libraries, and test-case files -->
+	<path id="classpath.run">
 		<pathelement location="${compiled.classes}"/>
       	<fileset dir="${test.libs-external}">
         	<include name="**/*.jar"/>
@@ -22,28 +23,34 @@
 		<pathelement location="${dir.test-bin}"/>
 	</path>
 	
+	<!-- include JUnit to execute unit tests -->
+	<path id="classpath.test">
+	    <pathelement location="${test.basedir}/libs-external/junit-4.8.1.jar"/>
+		<path refid="classpath.run" />
+  	</path>
+	
 	<target name="build-test">
 		<mkdir dir="${dir.test-bin}" />
-		<javac classpathref="run.classpath"
+		<javac classpathref="classpath.test"
 			srcdir="${dir.test-src}"
          	destdir="${dir.test-bin}"
          	debug="on" />
 	</target>
 	
 	<target name="check" depends="build-test">
-		<echo message="Running code tests in ${test.basedir}" />
-		<java classname="hub.top.scenario.OcletTest" dir="${test.basedir}" fork="true">
-			<classpath refid="run.classpath" />
-			<arg path="${testfiles}" />
-		</java>
-		<java classname="hub.top.uma.UmaTest" dir="${test.basedir}" fork="true">
-			<classpath refid="run.classpath" />
-			<arg path="${testfiles}" />
-		</java>
+		<echo message="Running JUnit tests in ${test.basedir}" />
+	    <junit>
+	      <classpath refid="classpath.test"/>
+	      <formatter type="plain" usefile="false" />
+	    	
+    	  <sysproperty key="test.testFileRoot" path="${testfiles}"/>
+	      <test name="hub.top.scenario.OcletTest" />	
+	      <test name="hub.top.uma.UmaTest" />
+	    </junit>
 		
 		<echo message="Running binary tests in ${test.basedir}" />
 		<java classname="hub.top.uma.Uma" dir="${test.basedir}" fork="true">
-			<classpath refid="run.classpath" />
+			<classpath refid="classpath.run" />
 			<arg value="-i"/>
 			<arg file="${testfiles}/net_lexik.lola" />
 		</java>
@@ -60,7 +67,7 @@
 		
 		<copy file="${testfiles}/EMS.oclets" todir="${_dir}"/>
 		<java classname="hub.top.uma.view.ViewGeneration2" output="${_dir}/viewgeneration.log">
-			<classpath refid="run.classpath" />
+			<classpath refid="classpath.run" />
 			<arg value="-gen"/>
 			<arg value="${_dir}/EMS.oclets"/>
 			<arg value="100"/>
@@ -68,7 +75,7 @@
 			<arg value="${_dir}/EMS_traces.txt"/>
 		</java>
 		<java classname="hub.top.uma.view.ViewGeneration2" output="${_dir}/viewgeneration2.log">
-			<classpath refid="run.classpath" />
+			<classpath refid="classpath.run" />
 			<arg value="-replay"/>
 			<arg value="${_dir}/EMS.oclets"/>
 			<arg value="${_dir}/EMS_traces.txt"/>

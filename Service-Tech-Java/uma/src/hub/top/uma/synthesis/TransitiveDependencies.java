@@ -233,53 +233,68 @@ public class TransitiveDependencies {
   public HashSet<DNode> getImpliedConditions_solution() {
     HashSet<DNode> implied = new HashSet<DNode>();
     
-    // check for each condition 'b' of the DNodeSet
-    for (int i=0; i<nodes.length; i++) {
-      DNode b = nodes[i];
-      if (b.isEvent || b.pre == null || b.pre.length == 0
-          || b.post == null || b.post.length == 0) continue;
+    int maxID = build.getSystem().currentNameID;
+    
+    // find solution per ID, i.e. first consider all conditions with ID 0,
+    // then with ID 1, etc. this ensures that globally, conditions with the lowest
+    // ID are classified first as implied, which ensures that after removing
+    // implied places, the resulting net has a maximally consistent labeling
+    // wrt. pre- and post-places
+    //for (int id = 0; id < maxID; id++)
+    {
+      //Uma.out.print(id+"/"+maxID+": ");
       
-      if (i % 100 == 0) Uma.out.print(i+" ");
-      if (i % 1000 == 0) Uma.out.print("\n");
-      
-      // compute for all pre-events e and all post-events f of 'b'
-      boolean each_f_dependsOn_e_without_b = true;
-      DNode e = b.pre[0];
-      for (DNode f : b.post) {
-        // whether there exists an alternative path from 'e' to 'f'
-        // we find this path by looking for a path from 'e' to a
-        // pre-condition 'c' of 'f' that is not 'b'
-        boolean f_dependsOn_e_without_b = false;
-        for (DNode c : f.pre) {
-          
-          if (c == b) continue;
-          // find the path from 'e' to 'c'
-          // but skip all conditions 'c' that already have been identified as implied
-          // and all conditions 'cPrime' that are equivalent to 'c' (and would be
-          // folded to the same place as 'c'
-          boolean cEquivIsImplied = false;
-          for (DNode cPrime : build.foldingEquivalence().get(build.equivalentNode().get(c))) {
-            if (implied.contains(cPrime)) {
-              cEquivIsImplied = true;
+      // check for each condition 'b' of the DNodeSet
+      for (int i=0; i<nodes.length; i++) {
+        //if (nodes[i].id != id) continue;
+        
+        DNode b = nodes[i];
+        if (b.isEvent || b.pre == null || b.pre.length == 0
+            || b.post == null || b.post.length == 0) continue;
+        
+        if (i % 100 == 0) Uma.out.print(i+" ");
+        if (i % 1000 == 0) Uma.out.print("\n");
+        
+        // compute for all pre-events e and all post-events f of 'b'
+        boolean each_f_dependsOn_e_without_b = true;
+        DNode e = b.pre[0];
+        for (DNode f : b.post) {
+          // whether there exists an alternative path from 'e' to 'f'
+          // we find this path by looking for a path from 'e' to a
+          // pre-condition 'c' of 'f' that is not 'b'
+          boolean f_dependsOn_e_without_b = false;
+          for (DNode c : f.pre) {
+            
+            if (c == b) continue;
+            // find the path from 'e' to 'c'
+            // but skip all conditions 'c' that already have been identified as implied
+            // and all conditions 'cPrime' that are equivalent to 'c' (and would be
+            // folded to the same place as 'c'
+            boolean cEquivIsImplied = false;
+            for (DNode cPrime : build.foldingEquivalence().get(build.equivalentNode().get(c))) {
+              if (implied.contains(cPrime)) {
+                cEquivIsImplied = true;
+                break;
+              }
+            }
+            
+            if (cEquivIsImplied) continue;
+            
+            if ( dependsOn_compute(c, e) ) {
+              // found one, 'b' is implied
+              f_dependsOn_e_without_b = true;
               break;
             }
           }
-          
-          if (cEquivIsImplied) continue;
-          
-          if ( dependsOn_compute(c, e) ) {
-            // found one, 'b' is implied
-            f_dependsOn_e_without_b = true;
-            break;
-          }
+          // didn't find any, 'b' is not implied
+          if (!f_dependsOn_e_without_b)
+            each_f_dependsOn_e_without_b = false;
         }
-        // didn't find any, 'b' is not implied
-        if (!f_dependsOn_e_without_b)
-          each_f_dependsOn_e_without_b = false;
+        
+        if (each_f_dependsOn_e_without_b)
+          implied.add(b);
       }
-      
-      if (each_f_dependsOn_e_without_b)
-        implied.add(b);
+      //Uma.out.print("\n");
     }
     
     return implied;

@@ -1,31 +1,30 @@
 package hub.top.test;
 
-public class Test {
+public class TestCase extends junit.framework.TestCase{
   
-  public Test (String name) {
+  public TestCase (String name) {
     super();
-    testName = name;
+    setName(name);
   }
   
-  public String testFileRoot = "";
-  public String testName;
+  public static String testFileRoot = System.getProperty("test.testFileRoot", ".");;
   
-  public String lastTest = "";
+  public static String lastTest = "";
   public int testNum = 0;
   public int testFail = 0;
   
   private static final String RESULT_FAIL = "[failed]";
   private static final String RESULT_OK = "[ok]";
   
-  public void assertTrue(boolean result) {
-    assertEquals(result, true);
+  public void assertTrue2(boolean result) {
+    assertEquals2(result, true);
   }
   
-  public void assertFalse(boolean result) {
-    assertEquals(result, false);
+  public void assertFalse2(boolean result) {
+    assertEquals2(result, false);
   }
   
-  public void assertEquals(Object result, Object expected) {
+  public void assertEquals2(Object result, Object expected) {
     String testMessage = lastTest;
     String resultMessage = result+", expected: "+expected;
     boolean resultMatch = result.equals(expected);
@@ -49,8 +48,8 @@ public class Test {
   }
   
   public void printHeader() {
-    int fill = 79 - (5 + testName.length());
-    String header = "=== "+testName+" ";
+    int fill = 79 - (5 + getName().length());
+    String header = "=== "+getName()+" ";
     for (int i=0;i<fill;i++) header += "=";
     
     System.out.println(header);
@@ -62,18 +61,7 @@ public class Test {
     System.out.println("===============================================================================\n");
   }
   
-  public void setParameters(String args[]) {
+  public static void setParameters(String args[]) {
     if (args.length > 0) testFileRoot = args[0];
   }
-  
-  public void executeTests() {
-    printHeader();
-    run();
-    evaluateTests();
-  }
-  
-  public void run() {
-    
-  }
-
 }

@@ -1,3 +1,13 @@
+UMA v.1.2.2
+-----------
+
++ added methods for simplifying mined process models
+* improved view generation
+* worked on bug #16257 , now ensuring that events are checked for
+  cut-offs in the right order regardless of how the JVM orders them
+* moved test cases to the JUnit framework
+
+
 UMA v.1.2.1
 -----------
 

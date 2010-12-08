@@ -1250,11 +1250,7 @@ public class DNodeBP {
 
   			// remember cutOff on post-conditions as well
   			if (newEvent.isCutOff == true)
-  				for (DNode b : postConditions) {
-  				  //System.out.println("setting cut-off condition "+b+" because of "+newEvent);
-  					b.isCutOff = true;
-  					b.isAnti = newEvent.isAnti && newEvent.isHot;	// copy the anti-flag
-  				}
+  			  setCutOff(newEvent);
   			
         if (options.checkProperties)
           checkProperties(newEvent);
@@ -1502,6 +1498,102 @@ public class DNodeBP {
     
     return false;
   }
+  
+  /**
+   * Mark event e as cut-off event. Also sets {@link DNode#isCutOff} for
+   * the post-conditions of e
+   * 
+   * @param e
+   */
+  private void setCutOff(DNode e) {
+    e.isCutOff = true;
+    for (DNode b : e.post) {
+      //System.out.println("setting cut-off condition "+b+" because of "+newEvent);
+      b.isCutOff = true;
+      b.isAnti = e.isAnti && e.isHot; // copy the anti-flag
+    }
+  }
+
+  /**
+   * Guard to allow events that have already been added to the branching
+   * process to be checked again for being cut-off events. The field is
+   * controlled by {@link #balanceCutOffEvents()}.
+   * 
+   * ----------------------------------------------------------------
+   *  Balancing Cut-Off Events
+   *     
+   *  The correct computation of a minimal unfolding requires to pick
+   *  a least event from all enabled events wrt. the adequate order.
+   *  Here, the adequate order uses lexicographic comparison of
+   *  prime configurations of equal size. However, the
+   *  {@link DNodeBP#enablingQueue} sorts enabled events only by the
+   *  size of their prime configurations which may lead to wrong
+   *  ordering of enabled events with the same size. In consequence,
+   *  some cut-off events would not be detected: the smaller
+   *  event X2 is added after the larger event X1, so neither is
+   *  declared cut-off. If X2 was added first, then X1 could be
+   *  detected as cut-off.
+   *  
+   *  The following procedures efficiently implement detecting these
+   *  wrong orderings once they occurred and allows to re-check whether
+   *  an event is a cut-off event.
+   *  
+   *  We detect whether events were added in the wrong order in
+   *  {@link #findEquivalentCut_conditionHistory_signature_size(int, DNode, DNode[], Iterable)}
+   *  when comparing two events with prime configurations of the
+   *  same size. If the newly added event X2 has a smaller configuration
+   *  than the compared event X1, and X1 has just been added in the
+   *  same iteration (if {@link DNode#_isNew} is <code>true</code>),
+   *  then X1 and X2 should have been added in a different order. Thus,
+   *  we may check again for X1 whether it is a cut-off event.
+   *  
+   *  We do so by adding X1 to {@link #balanceCutOffEvents_list}. Each
+   *  event in this list is check at the end of the iteration for
+   *  being a cut-off event in {@link #balanceCutOffEvents()}.
+   *  
+   * ----------------------------------------------------------------
+   */
+  private boolean balanceCutOffEvents_allow = true;
+  
+  /**
+   * A guarded linked list collecting all events that shall be checked again
+   * for being cut-off events. The list only takes new events via <code>addLast</code>
+   * if {@link #balanceCutOffEvents()} is set to <code>true</code>. 
+   */
+  private LinkedList<DNode> balanceCutOffEvents_list = new LinkedList<DNode>() {
+
+    private static final long serialVersionUID = -2108724782357061697L;
+
+    /**
+     * Append a new event iff {@link DNodeBP#balanceCutOffEvents_allow} is
+     * <code>true</code>.
+     */
+    public void addLast(DNode o) {
+      if (balanceCutOffEvents_allow == false) return;
+      else super.addLast(o);
+    };
+  };
+  
+  /**
+   * Checks each event in {@link #balanceCutOffEvents()} again for being
+   * a cut-off event.
+   */
+  private void balanceCutOffEvents() {
+    // Do not add further events to balanceCutOffEvents_list because
+    // we already checked all events. The events we are checking now
+    // are the only candidates that still might become cut-offs.
+    balanceCutOffEvents_allow = false;
+    for (DNode e : balanceCutOffEvents_list) {
+      setCurrentPrimeConfig(e, false);
+      if (isCutOffEvent(e)) {
+        //System.out.println("post-hoc setting cut-off for "+e);
+        setCutOff(e);
+      }
+    }
+    balanceCutOffEvents_list.clear();
+    // Allow checking cut-off events again (for the ntext iteration)
+    balanceCutOffEvents_allow = true;
+  }
 
   /**
    * Main algorithm. One step for extending the current branching process.
@@ -1515,6 +1607,10 @@ public class DNodeBP {
     EnablingInfo info = getAllEnabledEvents(dNodeAS.fireableEvents);
     enablingQueue.insertAll(info);
     int fired = fireAllEnabledEvents();
+    
+    // some cut-off events may not have been detected because
+    // we are lazy when constructing the enablingQueue
+    balanceCutOffEvents();
     
     if (abort) return 0;
     
@@ -2203,8 +2299,16 @@ public class DNodeBP {
         if (!options.searchStrat_lexicographic) continue;
         // LEXIK: otherwise compare whether the old event's configuration is
         // lexicographically smaller than the new event's configuration
-        if (!isSmaller_lexicographic(primeConfigurationString.get(e), primeConfigurationString.get(newEvent)))
+        if (!isSmaller_lexicographic(primeConfigurationString.get(e), primeConfigurationString.get(newEvent))) {
+
+          // Check whether 'e' was just added. If this is the case, then 'e' and 'newEvent'
+          // were added in the wrong order and we check again whether 'e' is a cut-off event
+          if (e.post != null && e.post.length > 0 && e.post[0]._isNew) {
+            //System.out.println("smaller event added later, should switch cut-off");
+            balanceCutOffEvents_list.addLast(e);
+          }
           continue;
+        }
       }
       
       // The prime configuration of 'e' is either smaller or lexicographically
@@ -2370,6 +2474,8 @@ public class DNodeBP {
    * @return <code>true</code> iff oldConfig is smaller than newConfig
    */
   private boolean isSmaller_lexicographic(short[] oldConfigIDs, short[] newConfigIDs) {
+    //System.out.println(toString(oldConfigIDs)+" <? "+toString(newConfigIDs));
+    
     if (options.searchStrat_lexicographic == false) return false;
     if (oldConfigIDs.length != newConfigIDs.length) {
       System.err.println("Error: lexicographically comparing configurations of different size");
@@ -2602,7 +2708,8 @@ public class DNodeBP {
 	  if (!foldingEquivalenceCompleted) {
 	    buildFoldingEquivalence();
 	    relaxFoldingEquivalence();
-	    extendFoldingEquivalence_forward();
+	    // required for synthesis, check with simplification
+	    extendFoldingEquivalence_forward(); 
 	    
 	    //extendFoldingEquivalence_maximal();
 	    //extendFoldingEquivalence_backwards();
@@ -2804,11 +2911,21 @@ public class DNodeBP {
 	  }
 	}
 	
+	//public static float foldThreshold = .1f;
+	//public static boolean ignoreFoldThreshold = true;
+	
 	/**
 	 * Put all nodes with the same {@link DNode#id} that have no successor
 	 * into the same equivalence class.
 	 */
 	public void extendFoldingEquivalence_maximal() {
+	  
+	  int idFrequency[] = new int[dNodeAS.currentNameID];  //
+	  for (DNode d : bp.getAllNodes()) {                   //
+	    idFrequency[d.id]++;                               //
+	  }
+	  
+	  //float foldThreshold = 0.05f;                          //
 
 	  boolean changed = true;
 	  while (changed) {
@@ -2826,7 +2943,9 @@ public class DNodeBP {
 	        }
 	      }
 	      if (allMaximal) {
-	        maximalNodes.add(cl.getKey());
+	        
+	        //if (ignoreFoldThreshold || cl.getValue().size() < idFrequency[cl.getKey().id] * foldThreshold)  //
+	           maximalNodes.add(cl.getKey());
 	      }
 	    }
 	    
@@ -2835,9 +2954,16 @@ public class DNodeBP {
 	      LinkedList<DNode> dEquiv = new LinkedList<DNode>();
 	      
 	      dEquiv.add(d);
+	      int equivSize = foldingEquivalenceClasses.get(d).size();                   //
+	      
 	      for (int j=i+1; j<maximalNodes.size(); j++) {
 	        DNode e = maximalNodes.get(j);
-	        if (d.id == e.id) dEquiv.add(e);
+	        if (d.id == e.id) {
+	          dEquiv.add(e);
+	          
+	          equivSize += foldingEquivalenceClasses.get(e).size();                  //
+	          //if (!ignoreFoldThreshold && equivSize >= idFrequency[d.id] * foldThreshold) break;             //
+	        }
 	      }
 	      
 	      if (dEquiv.size() > 1) {
@@ -2852,6 +2978,12 @@ public class DNodeBP {
 	public boolean extendFoldingEquivalence_backwards() {
     boolean changed = false;
     
+    int idFrequency[] = new int[dNodeAS.currentNameID];  //
+    for (DNode d : bp.getAllNodes()) {                   //
+      idFrequency[d.id]++;                               //
+    }
+    //float foldThreshold = .1f;                          //
+    
     LinkedHashSet<DNode> top = new LinkedHashSet<DNode>();
     for (DNode d : bp.getAllNodes()) {
       if (d.isAnti) continue;
@@ -2863,7 +2995,9 @@ public class DNodeBP {
 
     LinkedList<DNode> to_join = new LinkedList<DNode>();
     HashSet<DNode> dSucc = new HashSet<DNode>();
-    //HashSet<DNode> d2Succ = new HashSet<DNode>();
+    HashSet<DNode> d2Succ = new HashSet<DNode>();
+    
+    //Uma.out.println("top: "+top);
     
     int print_count = 1;
     while (!top.isEmpty()) {
@@ -2874,14 +3008,18 @@ public class DNodeBP {
         print_count = 0;
       }
       
+      //Uma.out.println("top: "+top);
       DNode d = top.iterator().next();
       top.remove(d);
+      //Uma.out.println("removed "+d);
 
       to_join.clear();
       to_join.add(d);
 
       HashSet<DNode> dCl = foldingEquivalenceClasses.get(elementary_ccPair.get(d));
 
+      //if (!ignoreFoldThreshold && dCl.size() > idFrequency[d.id] * foldThreshold) continue;     //
+      
       // collect the for each successor 'e' of each node in the class of 'd',
       // the canonical representative of 'e'
       dSucc.clear();
@@ -2892,6 +3030,9 @@ public class DNodeBP {
           dSucc.add(elementary_ccPair.get(e));
         }
       }
+      //Uma.out.println("  has successors: "+dSucc);
+      
+      int joint_size = dCl.size();    //
       
       for (DNode d2 : foldingEquivalenceClasses.keySet()) {
 
@@ -2900,11 +3041,12 @@ public class DNodeBP {
         if (d.id != d2.id) continue;
         if (areFoldingEquivalent(d, d2)) continue;
         
+        //Uma.out.println("  comparing to "+d2);
+        
         HashSet<DNode> d2Cl = foldingEquivalenceClasses.get(elementary_ccPair.get(d2));
         
         // collect the for each successor 'e2' of each node in the class of 'd2',
         // the canonical representative of 'e2'
-        /*
         d2Succ.clear();
         for (DNode d2Prime : d2Cl) {
           if (d2Prime.post == null) continue;
@@ -2913,7 +3055,7 @@ public class DNodeBP {
             d2Succ.add(elementary_ccPair.get(e2));
           }
         }
-        */
+        //Uma.out.println("    has successors: "+d2Succ);
         
         // Check if we can join the classes of 'd' and 'd2': this is possible
         // if each successor of the class of 'd' has an equivalent successor of
@@ -2922,12 +3064,14 @@ public class DNodeBP {
         // successor of 'd2'.
         boolean all_dSucc_HaveEquivalent = true;
         for (DNode e : dSucc) {
-          /*
+          
           if (!d2Succ.contains(e)) {
             all_dSucc_HaveEquivalent = false;
+            //Uma.out.println("    -> "+e+" not in post "+d2);
             break;
           }
-          */
+          
+          /*
           boolean e_has_equivalent = false;
           for (DNode d2Prime : d2Cl) {
             if (d2Prime.post == null) continue;
@@ -2948,7 +3092,7 @@ public class DNodeBP {
           if (!e_has_equivalent) {
             all_dSucc_HaveEquivalent = false;
             break;
-          }
+          }*/
         }
         
         boolean all_d2Succ_HaveEquivalent = true;
@@ -2967,23 +3111,75 @@ public class DNodeBP {
           }
         }
         */
+        for (DNode e2 : d2Succ) {
+          
+          if (!dSucc.contains(e2)) {
+            all_dSucc_HaveEquivalent = false;
+            //Uma.out.println("    -> "+e2+" not in post "+d);
+            break;
+          }
+          
+          /*
+          boolean e2_has_equivalent = false;
+          for (DNode dPrime : dCl) {
+            if (dPrime.post == null) continue;
+            for (int i = 0; i<dPrime.post.length; i++) {
+              if (dPrime.post[i].isAnti) continue;
+              // post-sets are ordered by IDs, nothing to find beyond this point
+              if (dPrime.post[i].id > e2.id) break;     
+              // post-sets are ordered by IDs, nothing to find here
+              if (dPrime.post[i].id != e2.id) continue; 
+              // same ID, check for equivalence
+              if (elementary_ccPair.get(dPrime.post[i].id) == e2) {
+                e2_has_equivalent = true;
+                break;
+              }
+            }
+            if (e2_has_equivalent) break;
+          }
+          if (!e2_has_equivalent) {
+            all_d2Succ_HaveEquivalent = false;
+            break;
+          }*/
+        }
+        
+        
+        if (dSucc.isEmpty() && !d2Succ.isEmpty() || !dSucc.isEmpty() && d2Succ.isEmpty()) {
+          all_dSucc_HaveEquivalent = false;
+          all_d2Succ_HaveEquivalent = false;
+        }
         
         if (all_dSucc_HaveEquivalent && all_d2Succ_HaveEquivalent) {
           to_join.add(d2);
+          //Uma.out.println("  JOINING "+d+" and "+d2);
+          joint_size += d2Cl.size();    //
+        } else {
+          //Uma.out.println("  NOT joining "+d+" and "+d2);
         }
+        
+        //if (!ignoreFoldThreshold && joint_size > foldThreshold * idFrequency[d.id]) break;      //
       }
       
       if (to_join.size() > 1) {
         joinEquivalenceClasses(to_join);
         changed = true;
         
-        for (DNode d2 : to_join) {
-          if (d2.pre != null) {
-            for (DNode e : d2.pre) {
-              top.add(e);
+        // join the pre-set of all joined transitions
+        LinkedList<DNode> preJoin = new LinkedList<DNode>();
+        for (int i=0; i<d.pre.length; i++) {
+          preJoin.clear();
+          for (DNode d2 : to_join) {
+            preJoin.add(elementary_ccPair.get(d2.pre[i]));
+            // and add the predecessors of the joined pre-sets to the queue 
+            if (d2.pre[i].pre != null) {
+              for (DNode e : d2.pre[i].pre) {
+                top.add(e);
+              }
             }
           }
+          joinEquivalenceClasses(preJoin);
         }
+        
         top.removeAll(foldingEquivalenceClasses.get(elementary_ccPair.get(d)));
       }
     }
@@ -3341,7 +3537,8 @@ public class DNodeBP {
       
       statistic_arcNum += n.pre.length; 
     }
-    return "|B|="+statistic_condNum +" |E|="+statistic_eventNum+" |E_cutOff|="+statistic_cutOffNum+" |F|="+statistic_arcNum;
+    return "|B|= "+statistic_condNum +" |E|= "+statistic_eventNum+" |E_cutOff|= "+statistic_cutOffNum+" |F|= "+statistic_arcNum;
+    //return statistic_condNum +";"+statistic_eventNum+";"+statistic_arcNum;
   }
   
   /**

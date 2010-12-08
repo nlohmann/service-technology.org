@@ -1,7 +1,5 @@
 package hub.top.uma;
 
-import java.io.IOException;
-
 import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
@@ -14,33 +12,17 @@ import hub.top.scenario.OcletIO;
 import hub.top.scenario.OcletSpecification;
 import hub.top.uma.synthesis.NetSynthesis;
 
-public class UmaTest extends hub.top.test.Test {
-  
-  public UmaTest(String name) {
-    super(name);
+import java.io.IOException;
+
+public class UmaTest extends hub.top.test.TestCase {
+	
+  public UmaTest() {
+    super("UmaTest");
   }
  
-  public void run () {
-    testPetrinetPrefix_lexic();
-    testPetrinet2Bounded();
-    testPetrinet1Bounded_violated();
-    
-    testOcletPrefix_lexic();
-    testOcletPrefix_executable1();
-    testOcletPrefix_executable2();
-    testOcletPrefix_executable3();
-  
-    testOcletPrefix_standardExample_EMS();
-    testOcletPrefix_standardExample_flood();
-    
-    testOcletSynthesis_standardExample_EMS();
-    testOcletSynthesis_standardExample_flood();
-  }
-
   public static void main(String[] args) {
-    UmaTest t = new UmaTest("Uma unfolding");
-    t.setParameters(args);
-    t.executeTests();
+    setParameters(args);
+    junit.textui.TestRunner.run(UmaTest.class);
   }
   
   public void testPetrinetPrefix_lexic () {
@@ -57,20 +39,33 @@ public class UmaTest extends hub.top.test.Test {
       }
       
       System.out.println(build.getStatistics());
+
+      //String targetPath_dot = testFileRoot+"/net_lexik.bp.dot";
+      //writeFile(targetPath_dot, build.toDot());
       
-      assertTrue(build.statistic_eventNum == 10
+      assertTrue(lastTest+" "+build.getStatistics()+" == 10,14,3,24",
+          build.statistic_eventNum == 10
           && build.statistic_condNum == 14
           && build.statistic_cutOffNum == 3
           && build.statistic_arcNum == 24);
       
     } catch (InvalidModelException e) {
       System.err.println("Invalid model: "+e);
-      assertTrue(false);
+      assertTrue(lastTest, false);
     } catch (IOException e) {
       System.err.println("Couldn't read test file: "+e);
-      assertTrue(false);
+      assertTrue(lastTest, false);
     }
   }
+  
+  /*
+  private void writeFile(String fileName, String contents) throws IOException {
+    FileWriter fstream = new FileWriter(fileName);
+    BufferedWriter out = new BufferedWriter(fstream);
+    out.write(contents);
+    out.close();
+  }
+  */
   
   public void testPetrinet2Bounded () {
     
@@ -89,16 +84,17 @@ public class UmaTest extends hub.top.test.Test {
       
       build.getStatistics();
       
-      assertTrue(build.statistic_eventNum == 28
+      assertTrue(lastTest+" "+build.getStatistics()+" == 28,48,20,100",
+          build.statistic_eventNum == 28
           && build.statistic_condNum == 48
           && build.statistic_cutOffNum == 20
           && build.statistic_arcNum == 100);
       
     } catch (InvalidModelException e) {
-      assertTrue(false);
+      assertTrue(lastTest, false);
     } catch (IOException e) {
       System.err.println("Couldn't read test file: "+e);
-      assertTrue(false);
+      assertTrue(lastTest, false);
     }
   }
 
@@ -117,13 +113,13 @@ public class UmaTest extends hub.top.test.Test {
       while (build.step() > 0) {
       }
       
-      assertFalse( build.isGloballySafe() );
+      assertFalse(lastTest,  build.isGloballySafe() );
       
     } catch (InvalidModelException e) {
-      assertTrue(false);
+      assertTrue(lastTest, false);
     } catch (IOException e) {
       System.err.println("Couldn't read test file: "+e);
-      assertTrue(false);
+      assertTrue(lastTest, false);
     }
 
   }
@@ -147,13 +143,13 @@ public class UmaTest extends hub.top.test.Test {
       
       build.getStatistics();
       
-      assertTrue(build.statistic_eventNum == 4
+      assertTrue(lastTest, build.statistic_eventNum == 4
           && build.statistic_condNum == 10
           && build.statistic_cutOffNum == 2
           && build.statistic_arcNum == 16);
       
     } catch (Exception e) {
-      assertTrue(false);
+      assertTrue(lastTest, false);
     }
   }
   
@@ -177,14 +173,14 @@ public class UmaTest extends hub.top.test.Test {
       
       build.getStatistics();
       
-      assertTrue(build.statistic_eventNum == 2
+      assertTrue(lastTest, build.statistic_eventNum == 2
           && build.statistic_condNum == 6
           && build.statistic_cutOffNum == 1
           && build.statistic_arcNum == 8
           && build.canExecuteEvent());
       
     } catch (Exception e) {
-      assertTrue(false);
+      assertTrue(lastTest, false);
     }
   }
   
@@ -208,14 +204,14 @@ public class UmaTest extends hub.top.test.Test {
       
       build.getStatistics();
       
-      assertTrue(build.statistic_eventNum == 4
+      assertTrue(lastTest, build.statistic_eventNum == 4
           && build.statistic_condNum == 10
           && build.statistic_cutOffNum == 2
           && build.statistic_arcNum == 16);
-      assertFalse(build.canExecuteEvent());
+      assertFalse(lastTest, build.canExecuteEvent());
       
     } catch (Exception e) {
-      assertTrue(false);
+      assertTrue(lastTest, false);
     }
   }
   
@@ -262,11 +258,11 @@ public class UmaTest extends hub.top.test.Test {
       
       build.getStatistics();
       
-      assertTrue(build.statistic_eventNum == 4
+      assertTrue(lastTest, build.statistic_eventNum == 4
           && build.statistic_condNum == 10
           && build.statistic_cutOffNum == 2
           && build.statistic_arcNum == 16);
-      assertFalse(build.canExecuteEvent());
+      assertFalse(lastTest, build.canExecuteEvent());
   
       
       lastTest = "Test for executability of events of an oclet specification 4";
@@ -285,13 +281,13 @@ public class UmaTest extends hub.top.test.Test {
       
       build.getStatistics();
       
-      assertTrue(build.statistic_eventNum == 2
+      assertTrue(lastTest, build.statistic_eventNum == 2
           && build.statistic_condNum == 6
           && build.statistic_cutOffNum == 1
           && build.statistic_arcNum == 8
           && build.canExecuteEvent());
     } catch (Exception e) {
-      assertTrue(false);
+      assertTrue(lastTest, false);
     }
   }
 
@@ -314,13 +310,13 @@ public class UmaTest extends hub.top.test.Test {
       
       build.getStatistics();
       
-      assertTrue(build.statistic_eventNum == 21
+      assertTrue(lastTest, build.statistic_eventNum == 21
           && build.statistic_condNum == 35
           && build.statistic_cutOffNum == 3
           && build.statistic_arcNum == 64);
       
     } catch (Exception e) {
-      assertTrue(false);
+      assertTrue(lastTest, false);
     }
   }
   
@@ -343,7 +339,11 @@ public class UmaTest extends hub.top.test.Test {
       
       build.getStatistics();
       
-      assertTrue(build.statistic_eventNum == 13
+      //String targetPath_dot = testFileRoot+"/flood.bp.dot";
+      //writeFile(targetPath_dot, build.toDot());
+      
+      assertTrue(lastTest+" "+ build.getStatistics()+" == 13,19,2,39",
+          build.statistic_eventNum == 13
           && build.statistic_condNum == 19
           && build.statistic_cutOffNum == 2
           && build.statistic_arcNum == 39);
@@ -352,10 +352,10 @@ public class UmaTest extends hub.top.test.Test {
       for (DNode d : build.getBranchingProcess().getAllNodes()) {
         if (d.isAnti) antiNodes++;
       }
-      assertEquals(antiNodes, 2);
+      assertEquals(lastTest, antiNodes, 2);
       
     } catch (Exception e) {
-      assertTrue(false);
+      assertTrue(lastTest, false);
     }
   }
   
@@ -377,17 +377,17 @@ public class UmaTest extends hub.top.test.Test {
       while (build.step() > 0) {
       }
       
-      PetriNet net2 = hub.top.uma.synthesis.NetSynthesis.foldToNet_labeled(build);
+      PetriNet net2 = hub.top.uma.synthesis.NetSynthesis.foldToNet_labeled(build, true);
       NetSynthesis.Diagnostic_Implements diag =
         NetSynthesis.doesImplement(net2, build);
       
-      assertEquals(diag.result, NetSynthesis.COMPARE_EQUAL);
+      assertEquals(lastTest, diag.result, NetSynthesis.COMPARE_EQUAL);
       
     } catch (IOException e) {
       System.err.println("Couldn't read test file: "+e);
-      assertTrue(false);
+      assertTrue(lastTest, false);
     } catch (InvalidModelException e) {
-      assertTrue(false);
+      assertTrue(lastTest, false);
     }
   }
   
@@ -413,13 +413,13 @@ public class UmaTest extends hub.top.test.Test {
       NetSynthesis.Diagnostic_Implements diag =
         NetSynthesis.doesImplement(net2, build);
       
-      assertEquals(diag.result, NetSynthesis.COMPARE_EQUAL);
+      assertEquals(lastTest, diag.result, NetSynthesis.COMPARE_EQUAL);
       
     } catch (IOException e) {
       System.err.println("Couldn't read test file: "+e);
-      assertTrue(false);
+      assertTrue(lastTest, false);
     } catch (InvalidModelException e) {
-      assertTrue(false);
+      assertTrue(lastTest, false);
     }
   }
 }

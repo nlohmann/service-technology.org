@@ -5,22 +5,15 @@ import hub.top.uma.InvalidModelException;
 
 import java.io.IOException;
 
-public class OcletTest extends hub.top.test.Test {
+public class OcletTest extends hub.top.test.TestCase {
   
-  public OcletTest(String name) {
-    super(name);
+  public OcletTest() {
+    super("OcletTest");
   }
   
-  public void run () {
-    testOcletPrefix_fail();
-    testOcletCycle_fail();
-    testOcletAll_yes();
-  }
-
   public static void main(String[] args) {
-    OcletTest t = new OcletTest("Oclets");
-    t.setParameters(args);
-    t.executeTests();
+    setParameters(args);
+    junit.textui.TestRunner.run(OcletTest.class);
   }
   
   public void testOcletPrefix_fail () {

@@ -24,6 +24,7 @@ import hub.top.petrinet.PetriNetIO;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeSet;
+import hub.top.uma.DNodeBP.EnablingInfo;
 import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
@@ -176,6 +177,7 @@ public class ViewGeneration2 {
           }
           
           Short eventId = enablingInfo.locations.keySet().iterator().next();
+          enablingInfo.locations.get(eventId)[0].reduce();
           DNode[] events = enablingInfo.locations.get(eventId)[0].events;
           DNode[] loc = enablingInfo.locations.get(eventId)[0].loc;
           
@@ -281,7 +283,7 @@ public class ViewGeneration2 {
   
   public PetriNet foldView() {
     identifyFoldingRelation();
-    PetriNet net = NetSynthesis.foldToNet_labeled(build);
+    PetriNet net = NetSynthesis.foldToNet_labeled(build, true);
     return net;
   }
   
@@ -364,7 +366,7 @@ public class ViewGeneration2 {
   
   public PetriNet generateViewBlocked(LinkedList<String[]> traces, float threshold) {
     DNodeSetElement showNodes = getNonBlockedNodes(traces, threshold);
-    return NetSynthesis.foldToNet_labeled(build, showNodes);
+    return NetSynthesis.foldToNet_labeled(build, showNodes, true);
   }
   
   /**

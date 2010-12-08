@@ -62,13 +62,27 @@ public class NetSynthesis {
   
   /**
    * Fold the given branching process into a possibly labeled Petri net.
+   * Assumes the folding equivalence has not been computed yet and
+   * computes it on the fly.
    * 
-   * @param bp
    * @return
    */
   public PetriNet foldToNet_labeled() {
     DNodeSetElement showNodes = getAllNodes_notHotAnti(bp);
-    return this.foldToNet_labeled(showNodes);
+    return this.foldToNet_labeled(showNodes, true);
+  }
+  
+  /**
+   * Fold the given branching process into a possibly labeled Petri net.
+   * 
+   * @param computeFoldingEquivalence set to <code>true</code> if the
+   * folding equivalence still has to be computed
+   * 
+   * @return
+   */
+  public PetriNet foldToNet_labeled(boolean computeFoldingEquivalence) {
+    DNodeSetElement showNodes = getAllNodes_notHotAnti(bp);
+    return this.foldToNet_labeled(showNodes, computeFoldingEquivalence);
   }
   
   /**
@@ -76,17 +90,25 @@ public class NetSynthesis {
    * 
    * @param nodesToShow generate Petri net only from the nodes in this set 
    *                    if <code>null</code>, then all nodes will be used
+   * @param computeFoldingEquivalence set to <code>true</code> if the
+   *                    folding equivalence still has to be computed
    * @return
    */
-  public PetriNet foldToNet_labeled(DNodeSetElement fromNodes) {
+  public PetriNet foldToNet_labeled(DNodeSetElement fromNodes, boolean computeFoldingEquivalence) {
     
     DNodeSys dAS = bp.getSystem();
 
-    bp.equivalentNode();
-    
-    bp.extendFoldingEquivalence_maximal();
-    while (bp.extendFoldingEquivalence_backwards());
-    bp.relaxFoldingEquivalence();
+    if (computeFoldingEquivalence) {
+      // we still have to compute the folding equivalence for the synthesis
+      bp.equivalentNode();
+      bp.extendFoldingEquivalence_maximal();
+      while (bp.extendFoldingEquivalence_backwards());
+      //bp.debug_printFoldingEquivalence();
+      
+      bp.relaxFoldingEquivalence();
+      
+      //bp.debug_printFoldingEquivalence();
+    }
     
     // maps each DNode to its least equivalent DNode (to itself it is the least)
     HashMap<DNode, DNode> equiv = bp.equivalentNode();
@@ -242,22 +264,39 @@ public class NetSynthesis {
    * @param bp
    * @param nodesToShow generate Petri net only from the nodes in this set 
    *                    if <code>null</code>, then all nodes will be used
+   * @param computeFoldingEquivalence set to <code>true</code> if the
+   *                    folding equivalence still has to be computed
    * @return
    */
-  public static PetriNet foldToNet_labeled(DNodeBP bp, DNodeSetElement fromNodes) {
+  public static PetriNet foldToNet_labeled(DNodeBP bp, DNodeSetElement fromNodes, boolean computeFoldingEquivalence) {
    NetSynthesis synth = new NetSynthesis(bp);
-   return synth.foldToNet_labeled(fromNodes);
+   return synth.foldToNet_labeled(fromNodes, computeFoldingEquivalence);
   }
   
   /**
    * Fold the given branching process into a possibly labeled Petri net.
    * 
    * @param bp
+   * @param computeFoldingEquivalence set to <code>true</code> if the
+   *                    folding equivalence still has to be computed
+   * @return
+   */
+  public static PetriNet foldToNet_labeled(DNodeBP bp, boolean computeFoldingEquivalence) {
+    DNodeSetElement showNodes = getAllNodes_notHotAnti(bp);
+    return foldToNet_labeled(bp, showNodes, computeFoldingEquivalence);
+  }
+  
+  /**
+   * Fold the given branching process into a possibly labeled Petri net.
+   * Assumes the folding equivalence has not been computed yet and
+   * computes it on the fly.
+   * 
+   * @param bp
    * @return
    */
   public static PetriNet foldToNet_labeled(DNodeBP bp) {
     DNodeSetElement showNodes = getAllNodes_notHotAnti(bp);
-    return foldToNet_labeled(bp, showNodes);
+    return foldToNet_labeled(bp, showNodes, true);
   }
   
   public static PetriNet foldToNet_byLabel(DNodeBP bp) {

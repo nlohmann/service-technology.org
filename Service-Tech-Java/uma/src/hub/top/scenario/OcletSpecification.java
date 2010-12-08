@@ -96,11 +96,12 @@ public class OcletSpecification implements ISystemModel {
     HashMap<String, Oclet> ocletMap = new HashMap<String, Oclet>();
     HashMap<Place, Place> placeMap = new HashMap<Place, Place>();
     
+    //Uma.out.println("splitting Petri net into oclets");
     for (Place p : net.getPlaces()) {
-      Uma.out.println("place "+p.getName());
+      //Uma.out.println("place "+p.getName());
       OcletIdentifier oid = new OcletIdentifier(p.getName());
       if (!ocletMap.containsKey(oid.ocletName)) {
-        Uma.out.println("new oclet "+oid.ocletName);
+        //Uma.out.println("new oclet "+oid.ocletName);
         
         Oclet o = new Oclet(oid.ocletName, oid.isAnti);
         ocletMap.put(oid.ocletName, o);
@@ -111,14 +112,14 @@ public class OcletSpecification implements ISystemModel {
       placeMap.put(p, pNew);
       pNew.setTokens(p.getTokens());
       
-      Uma.out.println("place "+oid.nodeName+" --> "+oid.ocletName);
+      //Uma.out.println("place "+oid.nodeName+" --> "+oid.ocletName);
     }
     
     for (Transition t : net.getTransitions()) {
-      Uma.out.println("transition "+t.getName());
+      //Uma.out.println("transition "+t.getName());
       OcletIdentifier oid = new OcletIdentifier(t.getName());
       if (!ocletMap.containsKey(oid.ocletName)) {
-        Uma.out.println("new oclet "+oid.ocletName);
+        //Uma.out.println("new oclet "+oid.ocletName);
         
         Oclet o = new Oclet(oid.ocletName, oid.isAnti);
         ocletMap.put(oid.ocletName, o);
@@ -138,7 +139,7 @@ public class OcletSpecification implements ISystemModel {
         o.addArc(tNew, placeMap.get(p));
         if (oid.isAnti) o.makeHotNode(placeMap.get(p));
       }
-      Uma.out.println("transition "+oid.nodeName+" --> "+oid.ocletName);
+      //Uma.out.println("transition "+oid.nodeName+" --> "+oid.ocletName);
     }
 
     for (Oclet o : ocletMap.values()) {

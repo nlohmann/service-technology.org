@@ -5,9 +5,13 @@
 	
 	<property name="home" location=".." />
 	<property name="bin" location="${home}/bin" />
+	<property name="src" location="${home}/src" />
 	
 	<property name="dir.test-src" location="${test.basedir}/src-test" />
 	<property name="dir.test-bin" location="${test.basedir}/bin-test" />
+	<property name="dir.test-instrument" location="${test.basedir}/bin-test-instrument" />
+	
+	<property name="dir.coveragereport" location="${test.basedir}/cover-html" />
 	
 	<property name="testfiles" location="${test.basedir}/testfiles" />
 	
@@ -22,12 +26,22 @@
       	</fileset>
 		<pathelement location="${dir.test-bin}"/>
 	</path>
+
+	<path id="classpath.cobertura">
+		<pathelement location="${test.basedir}/libs-external/cobertura.jar" />
+		<pathelement location="${test.basedir}/libs-external/lib-cobertura/log4j-1.2.9.jar" />
+		<pathelement location="${test.basedir}/libs-external/lib-cobertura/asm-3.0.jar" />
+		<pathelement location="${test.basedir}/libs-external/lib-cobertura/asm-tree-3.0.jar" />
+		<pathelement location="${test.basedir}/libs-external/lib-cobertura/jakarta-oro-2.0.8.jar" />
+  	</path>
 	
 	<!-- include JUnit to execute unit tests -->
 	<path id="classpath.test">
-	    <pathelement location="${test.basedir}/libs-external/junit-4.8.1.jar"/>
+		<pathelement location="${test.basedir}/libs-external/junit-4.8.1.jar" />
 		<path refid="classpath.run" />
   	</path>
+	
+	<taskdef classpathref="classpath.cobertura" resource="tasks.properties"/>
 	
 	<target name="build-test">
 		<mkdir dir="${dir.test-bin}" />
@@ -37,16 +51,42 @@
          	debug="on" />
 	</target>
 	
-	<target name="check" depends="build-test">
+	<target name="prepare-cobertura">
+	    <property name="myclasspath" refid="classpath.cobertura"/>
+	    <echo message="classpath= ${myclasspath}"/>
+		
+		<cobertura-instrument todir="${dir.test-instrument}" classpathref="classpath.cobertura">
+			<ignore regex="org.apache.log4j.*" />
+			<ignore regex="gnu.trove.*" />
+
+		    <fileset dir="${compiled.classes}">
+		        <include name="hub/**/*.class"/>
+		    </fileset>
+		</cobertura-instrument>
+	</target>
+	
+	<target name="check" depends="build-test,prepare-cobertura">
 		<echo message="Running JUnit tests in ${test.basedir}" />
-	    <junit>
+	    <junit fork="yes">
+	      <!-- class path for code coverage by cobertura -->
+	      <classpath location="${dir.test-instrument}" />
+	      <classpath refid="classpath.cobertura"/>
+	    	
+	      <!-- class path of the code to test and the Junit framework -->
 	      <classpath refid="classpath.test"/>
+
+		  <!-- Cobertura: generate HTML coverage report -->
 	      <formatter type="plain" usefile="false" />
 	    	
+	      <!-- JUnit: test cases to run -->
     	  <sysproperty key="test.testFileRoot" path="${testfiles}"/>
 	      <test name="hub.top.scenario.OcletTest" />	
 	      <test name="hub.top.uma.UmaTest" />
 	    </junit>
+		
+		<!-- Cobertura: generate HTML coverage report -->
+		<cobertura-report srcdir="${src}" destdir="${dir.coveragereport}"/>
+		
 		
 		<echo message="Running binary tests in ${test.basedir}" />
 		<java classname="hub.top.uma.Uma" dir="${test.basedir}" fork="true">
@@ -93,6 +133,8 @@
 	
 	<target name="clean">
 		<delete dir="${dir.test-bin}" includeemptydirs="true" failonerror="false"/>
+		<delete dir="${dir.test-instrument}" includeemptydirs="true" failonerror="false"/>
+		<delete file="${test.basedir}/cobertura.ser" failonerror="false"/>
 	</target>
 	
 </project>

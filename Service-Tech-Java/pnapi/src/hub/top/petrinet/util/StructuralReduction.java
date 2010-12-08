@@ -137,12 +137,15 @@ public class StructuralReduction {
         Transition t1 = ts.get(i);
         Transition t2 = ts.get(j);
         if (net.parallelTransitions(t1, t2)) {
+          boolean removed = false;
           if (t1.tau) {
             net.removeTransition(t1);
+            removed = true;
           } else if (t2.tau) {
             net.removeTransition(t2);
+            removed = true;
           }
-          return true;
+          if (removed) return true;
         }
       }
     }

@@ -1,5 +1,5 @@
 <project name="uma.test" default="check">
-	
+
 	<!-- retrieve basedir of this check script -->
 	<dirname property="test.basedir" file="${ant.file.uma.test}" />
 	
@@ -11,7 +11,7 @@
 	<property name="compiled.classes" location="${bin}" />
 	<property name="test.libs-external" location="${home}/libs-external/" />
 	
-	<path id="run.classpath">
+	<path id="classpath.run">
 		<pathelement location="${compiled.classes}"/>
       	<fileset dir="${test.libs-external}">
         	<include name="**/*.jar"/>
@@ -23,13 +23,16 @@
 	</target>
 	
 	<target name="parser">
+
+
+		
 		<echo message="Checking parser." />
 		<property name="_dir" location="${testfiles}/parser" />
 		<mkdir dir="${_dir}" />
 
 		<copy file="${testfiles}/test_input.lola" todir="${_dir}"/>
 		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/test_input.lola.log" >
-			<classpath refid="run.classpath" />
+			<classpath refid="classpath.run" />
 			<arg value="-i"/>
 			<arg value="${_dir}/test_input.lola"/>
 			<arg value="-f"/>
@@ -38,7 +41,7 @@
 		
 		<copy file="${testfiles}/phils.lola" todir="${_dir}"/>
 		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/phils.lola.log">
-			<classpath refid="run.classpath" />
+			<classpath refid="classpath.run" />
 			<arg value="-i"/>
 			<arg value="${_dir}/phils.lola"/>
 			<arg value="-f"/>
@@ -47,7 +50,7 @@
 
 		<copy file="${testfiles}/coffeeMachine_sound.owfn" todir="${_dir}"/>
 		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/coffeeMachine_sound.owfn.log">
-			<classpath refid="run.classpath" />
+			<classpath refid="classpath.run" />
 			<arg value="-i"/>
 			<arg value="${_dir}/coffeeMachine_sound.owfn"/>
 			<arg value="-f"/>
@@ -56,7 +59,7 @@
 		
 		<copy file="${testfiles}/coffeeMachine_unsound.owfn" todir="${_dir}"/>
 		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/coffeeMachine_unsound.owfn.log">
-			<classpath refid="run.classpath" />
+			<classpath refid="classpath.run" />
 			<arg value="-i"/>
 			<arg value="${_dir}/coffeeMachine_unsound.owfn"/>
 			<arg value="-f"/>
@@ -65,7 +68,7 @@
 		
 		<copy file="${testfiles}/process.tpn" todir="${_dir}"/>
 		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/process.tpn.log">
-			<classpath refid="run.classpath" />
+			<classpath refid="classpath.run" />
 			<arg value="-i"/>
 			<arg value="${_dir}/process.tpn"/>
 			<arg value="-f"/>
@@ -82,14 +85,14 @@
 		
 		<copy file="${testfiles}/coffeeMachine_sound.owfn" todir="${_dir}"/>
 		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/coffeeMachine_sound.owfn.log">
-			<classpath refid="run.classpath" />
+			<classpath refid="classpath.run" />
 			<arg value="-i"/>
 			<arg value="${_dir}/coffeeMachine_sound.owfn"/>
 			<arg value="-f"/>
 			<arg value="owfn"/>
 		</java>
 		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/coffeeMachine_sound.owfn.owfn.log">
-			<classpath refid="run.classpath" />
+			<classpath refid="classpath.run" />
 			<arg value="-i"/>
 			<arg value="${_dir}/coffeeMachine_sound.owfn.owfn"/>
 			<arg value="-f"/>
@@ -98,14 +101,14 @@
 		
 		<copy file="${testfiles}/coffeeMachine_unsound.owfn" todir="${_dir}"/>
 		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/coffeeMachine_unsound.owfn.log">
-			<classpath refid="run.classpath" />
+			<classpath refid="classpath.run" />
 			<arg value="-i"/>
 			<arg value="${_dir}/coffeeMachine_unsound.owfn"/>
 			<arg value="-f"/>
 			<arg value="owfn"/>
 		</java>
 		<java classname="hub.top.petrinet.PetriNetIO" output="${_dir}/coffeeMachine_unsound.owfn.owfn.log">
-			<classpath refid="run.classpath" />
+			<classpath refid="classpath.run" />
 			<arg value="-i"/>
 			<arg value="${_dir}/coffeeMachine_unsound.owfn.owfn"/>
 			<arg value="-f"/>
@@ -123,7 +126,7 @@
 		<copy file="${testfiles}/coffeeMachine_sound.owfn" todir="${_dir}"/>
 		<copy file="${testfiles}/coffeeMachine_unsound.owfn" todir="${_dir}"/>
 		<java classname="hub.top.petrinet.util.Decompose" output="${_dir}/decompose.log">
-			<classpath refid="run.classpath" />
+			<classpath refid="classpath.run" />
 			<arg value="${_dir}"/>
 		</java>
 		

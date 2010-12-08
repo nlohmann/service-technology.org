@@ -23,7 +23,7 @@ import org.processmining.contexts.uitopia.annotations.UITopiaVariant;
 import org.processmining.framework.connections.ConnectionCannotBeObtained;
 import org.processmining.framework.plugin.annotations.Plugin;
 import org.processmining.framework.plugin.annotations.PluginVariant;
-import org.processmining.models.connections.petrinets.behavioral.MarkingNetConnection;
+import org.processmining.models.connections.petrinets.behavioral.InitialMarkingConnection;
 import org.processmining.models.connections.petrinets.behavioral.UnfoldingNetConnection;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
 import org.processmining.models.graphbased.directed.petrinet.elements.Place;
@@ -68,7 +68,7 @@ public class UnfoldPN {
 	@UITopiaVariant(affiliation="Humboldt-Universit&#228;t zu Berlin", author="D. Fahland", email="dirk.fahland@service-technology.org", website = "http://service-technology.org/uma")
 	@PluginVariant(variantLabel = "unfold Petri net to its complete finite prefix", requiredParameterLabels = { 0 })
 	public Petrinet unfoldPetrinet(UIPluginContext context, Petrinet net) throws ConnectionCannotBeObtained, Exception {
-		Marking initMarking = context.tryToFindOrConstructFirstObject(Marking.class, MarkingNetConnection.class, MarkingNetConnection.MARKING, net);
+		Marking initMarking = context.tryToFindOrConstructFirstObject(Marking.class, InitialMarkingConnection.class, InitialMarkingConnection.MARKING, net);
 		return work(context, net, initMarking);
 	}
 	
@@ -81,7 +81,7 @@ public class UnfoldPN {
 		
 	private Petrinet work(UIPluginContext context, Petrinet net, Marking initMarking) throws Exception {
 		// check connection 
-		context.getConnectionManager().getFirstConnection(MarkingNetConnection.class, context, net, initMarking);
+		context.getConnectionManager().getFirstConnection(InitialMarkingConnection.class, context, net, initMarking);
 		
 		// ask user what we should do
 		InteractionResult wish = getUserChoice(context);

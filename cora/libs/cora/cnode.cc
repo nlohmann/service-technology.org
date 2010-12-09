@@ -381,15 +381,28 @@ bool CNode::simpleSplit(Place& p, int token, IMatrix& im, StubbornSet* sb) {
 	CNode* c2(new CNode(m2,*getRoot(),getPos(),false)); // the new nodes becoming sons of the old one
 	c1->succ = succ; // copy the successors
 	c1->subsucc = subsucc; // and indices to the subnodes
-	if (sb) c1->stubbornset = stubbornset; // and copy the stubborn set if used
+	if (sb) {
+		if (m2.distinguish(sb->getGoal(),false))
+			c1->stubbornset = stubbornset; // copy the stubborn set if used and unchanged
+		else {
+			vector<Transition*> tvec(c1->getStubbornSet(*sb,true)); // compute the stubborn set
+			for(unsigned int i=0; i<tvec.size(); ++i) // check if the arcs for these transitions already exist
+				if (getRoot()->succ.find(tvec[i])==getRoot()->succ.end())
+					getRoot()->todo.insert(tvec[i]); // if not, put the transition into the todo list
+		}
+	}
 	c2->succ = succ; // the same for the second node
 	c2->subsucc = subsucc;
 	if (sb) // for the lower son a new stubborn set has to be computed
 	{ 
-		vector<Transition*> tvec(c2->getStubbornSet(*sb,true)); // compute the stubborn set
-		for(unsigned int i=0; i<tvec.size(); ++i) // check if the arcs for these transitions already exist
-			if (getRoot()->succ.find(tvec[i])==getRoot()->succ.end())
-				getRoot()->todo.insert(tvec[i]); // if not, put the transition into the todo list
+		if (m1.distinguish(sb->getGoal(),false) && m1.sameEnabling(p,token-1,im)) {
+			c2->stubbornset = stubbornset; // copy the stubborn set if used and unchanged
+		} else {
+			vector<Transition*> tvec(c2->getStubbornSet(*sb,true)); // compute the stubborn set
+			for(unsigned int i=0; i<tvec.size(); ++i) // check if the arcs for these transitions already exist
+				if (getRoot()->succ.find(tvec[i])==getRoot()->succ.end())
+					getRoot()->todo.insert(tvec[i]); // if not, put the transition into the todo list
+		}
 	}
 	map<Transition*,CNode*>::iterator cit; // forbid those edges in the lower/left son
 	for(cit=c2->getRoot()->succ.begin(); cit!=c2->getRoot()->succ.end(); ++cit) 

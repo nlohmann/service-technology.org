@@ -628,3 +628,22 @@ int ExtMarking::distanceTo(Marking& m) {
 	return result;
 }
 
+/** Check if an upper limit of token on place p disables any transition that can otherwise be enabled
+	in this extmarking.
+	@param p The place for which a token limit is set.
+	@param token The upper token limit for the place p.
+	@return If all transitions enabled at this extmarking remain
+		enabled when limiting the token number on p to token.
+*/
+bool ExtMarking::sameEnabling(Place& p, int token, IMatrix& im) {
+	PetriNet *pn(&(p.getPetriNet()));
+	set<Transition*> tset(firableTransitions(*pn,im));
+	set<Transition*>::iterator tit;
+	for(tit=tset.begin(); tit!=tset.end(); ++tit)
+	{
+		pnapi::Arc *a(pn->findArc(p,**tit));
+		if (a && a->getWeight()>token) return false;
+	}
+	return true;
+}
+

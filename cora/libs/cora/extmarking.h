@@ -149,6 +149,9 @@ public:
 	/// get the distance from this node to the given marking
 	int distanceTo(Marking& m);
 
+	/// Check if limiting the token number on p disables any transitions
+	bool sameEnabling(Place& p, int token, IMatrix& im);
+
 private:
 	/// If a place is unlimited (true), has a closed interval (false), or a single value (not set)
 	map<Place*,bool> type;

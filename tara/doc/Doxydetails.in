@@ -1,0 +1,28 @@
+/*!
+\mainpage @PACKAGE_NAME@
+
+\li \ref rm
+\li \ref au
+\li \ref ack
+\li \ref req
+\li \ref thy
+\li \ref lic
+
+\section rm About @PACKAGE_NAME@
+\verbinclude @abs_top_srcdir@/README
+
+\section au Authors/Maintainers
+\verbinclude @abs_top_srcdir@/AUTHORS
+
+\section ack Acknowledgements
+\verbinclude @abs_top_srcdir@/THANKS
+
+\section req Requirements for @PACKAGE_NAME@
+\verbinclude @abs_top_srcdir@/REQUIREMENTS
+
+\section thy Theory behind @PACKAGE_NAME@
+\verbinclude @abs_top_srcdir@/REQUIREMENTS
+
+\section lic License
+\verbinclude @abs_top_srcdir@/COPYING
+*/

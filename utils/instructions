@@ -1,0 +1,51 @@
+--- INSTRUCTIONS HOW TO EASILY GET A WORKING COPY OF 'HELLO' ---
+
+INFO: I tried to make things as easy as possible to get a working copy of 'Hello' without too much of an effort. The steps and the script used aren't necessarily the optimal way to do that, so feel free to give me some advice or to change some things yourself. Now for the instruction:
+
+**************************************************************
+
+1. Download 'Hello' via SVN.
+
+2. Go into the subdirectory 'hello/utils'.
+
+3. Run the shell-script './changeName.sh' with arguments like:
+
+        ./changeName progname ProgName PROGNAME
+
+    The aguments' meaning is as follows:
+        'progname' will be the name of the created directory and of most of the variables, etc. (e.g. 'lola')
+        'ProgName' will be the "real" name of your Program, like for example 'LoLa'
+        'PROGNAME' is the same as 'progname', only with capital letters, like in 'LOLA'
+
+4. The script has created a new directory in the same directory in which the directory 'hello' is located, go into that new directory
+
+5. Before running anything, you should think about checking in the new tool via SVN. All formerly used SVN-data in the directory is apparently useless and has been removed by the shell-script, so it may be a good idea to commit the new directory if it makes any sense.
+
+6. You are done! Now you may build your new program by typing
+
+	autoreconf -iv; ./configure; make
+
+**************************************************************
+
+NOTE: All things that need to be changed in order to add new features to your program, add testcases, write the manual, etc. have been marked in the program files:
+
+    Every important piece of code that has to be changed is surrounded like this:
+
+        <<-- CHANGE START (description) -->>
+        ...[code]...
+        <<-- CHANGE END -->>
+
+    Smaller lines that may or have to be changed are written in capital letters and encapsulated by
+
+        <<-- HERE_IS_A_DESCRIPTION -->>
+
+    To easily find those pieces of code in the program files, you may for example type
+
+        grep -r '<<-- CHANGE START' *
+    or
+        grep -r '<<--' *
+
+    to find all those lines in your files. After changing those lines to your preferences, you may delete the '<<--'. A good idea may be to get rid of all those '<<--' after some time so GREP won't deliver any results.
+
+
+FURTHER NOTE: To be able to run 'Hello', you need 'Wendy' to be installed.

@@ -1,4 +1,4 @@
-AC_INIT([Hello], 1.1-unreleased, hello@service-technology.org, hello, http://service-technology.org/hello)
+AC_INIT([Tara], 1.1-unreleased, tara@service-technology.org, tara, http://service-technology.org/tara)
 
 AC_MSG_NOTICE([ __    __   _______  __       __        ______  ])
 AC_MSG_NOTICE([|  |  |  | |   ____||  |     |  |      /  __  \ ])
@@ -6,7 +6,7 @@ AC_MSG_NOTICE([|  |__|  | |  |__   |  |     |  |     |  |  |  |])
 AC_MSG_NOTICE([|   __   | |   __|  |  |     |  |     |  |  |  |])
 AC_MSG_NOTICE([|  |  |  | |  |____ |  `----.|  `----.|  `--'  |])
 AC_MSG_NOTICE([|__|  |__| |_______||_______||_______| \______/ ])
-AC_MSG_NOTICE([<<-- Hello World (Short Mission Statement) -->> ])
+AC_MSG_NOTICE([<<-- Tackling non-functional properties for stateful services -->> ])
 AC_MSG_NOTICE([${PACKAGE_URL}])
 AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
 AC_MSG_NOTICE()
@@ -47,7 +47,7 @@ AC_PATH_PROG(WENDY,         [wendy], not found)
 
 # write files
 AC_CONFIG_FILES([
-	Makefile libs/pnapi/Makefile src/Makefile src/hello.conf doc/Makefile
+	Makefile libs/pnapi/Makefile src/Makefile src/tara.conf doc/Makefile
 	doc/Doxyfile tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

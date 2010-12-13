@@ -1,9 +1,9 @@
 # the main program
-bin_PROGRAMS = hello
+bin_PROGRAMS = tara 
 
 # the plain sources you need to compile (no generated code)
 # <<-- CHANGE START (the program's sources) -->>
-hello_SOURCES = wendy_syntax.yy wendy_lexic.ll \
+tara_SOURCES = wendy_syntax.yy wendy_lexic.ll \
 		main.cc \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h \
@@ -11,15 +11,15 @@ hello_SOURCES = wendy_syntax.yy wendy_lexic.ll \
 # <<-- CHANGE END -->>
 
 # the configuration files
-sysconf_DATA = hello.conf
+sysconf_DATA = tara.conf
 
 # pass the sysconfdir to Hello (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
-hello_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
+tara_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI
-hello_CPPFLAGS += -I$(top_srcdir)/libs
-hello_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
+tara_CPPFLAGS += -I$(top_srcdir)/libs
+tara_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
 
@@ -38,7 +38,7 @@ DISTCLEANFILES =
 #--------------------------------------------------------------#
 # GENERIC: organize distribution and cleaning of Bison sources #
 #--------------------------------------------------------------#
-BISON_FILES = $(filter %.yy,$(hello_SOURCES))
+BISON_FILES = $(filter %.yy,$(tara_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)

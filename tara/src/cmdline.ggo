@@ -9,8 +9,8 @@
 # --conf-parser: TODO
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
-description "About Hello:"
-purpose "<<-- Hello World -->.\n <-- This programm normalizes a given open net, pipes it to Wendy and parses Wendy's output. -->>\n\n  Report bugs to hello@service-technology.org.\n  Visit Hello's home page at http://service-technology.org/hello"
+description "About Tara:"
+purpose "<<-- Hello World -->.\n <-- This programm normalizes a given open net, pipes it to Wendy and parses Wendy's output. -->>\n\n  Report bugs to tara@service-technology.org.\n  Visit Hello's home page at http://service-technology.org/tara"
 
 # <<-- CHANGE START (parameters) -->>
 section "Input/Output"
@@ -30,7 +30,7 @@ sectiondesc="<<-- Hello relies on several other tools. These options configure H
 
 option "config" c
   "Read configuration from file."
-  details="If no file is given, Hello first tries to parse file `hello.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Hello was installed) and then from the current working directory. If neither file was found, the standard values are assumed.\n"
+  details="If no file is given, Hello first tries to parse file `tara.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Hello was installed) and then from the current working directory. If neither file was found, the standard values are assumed.\n"
   string
   typestr="FILE"
   optional
@@ -49,18 +49,18 @@ option "tmpfile" -
   details="The filename Hello should use to create temporary files (i.e., the output derived from Wendy). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
   string
   typestr="FILENAME"
-  default="/tmp/hello-XXXXXX"
+  default="/tmp/tara-XXXXXX"
   optional
   hidden
 
 option "noClean" -
   "Do not delete temporary files."
-  details="Any temporary files created will be kept after Hello terminates.\n"
+  details="Any temporary files created will be kept after Tara terminates.\n"
   flag off
 
 
 section "Debugging"
-sectiondesc="These options control how much debug output Hello creates.\n"
+sectiondesc="These options control how much debug output Tara creates.\n"
 
 option "verbose" v
   "Show verbose messages."
@@ -69,7 +69,7 @@ option "verbose" v
 
 option "bug" -
   "Write configuration information into a file `bug.log'."
-  details="This output file gives information on the machine Hello was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  details="This output file gives information on the machine Tara was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
   flag off
   hidden
 

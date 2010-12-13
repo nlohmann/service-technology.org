@@ -17,5 +17,5 @@ wendy = @WENDY@
 # Hello should use can be specified below. The filename should end with
 # 'XXXXXX' which is replaced at runtime with a random string.
 
-tmpfile = /tmp/hello-XXXXXX
+tmpfile = /tmp/tara-XXXXXX
 # <<-- CHANGE END -->>

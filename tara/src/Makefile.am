@@ -7,7 +7,9 @@ tara_SOURCES = wendy_syntax.yy wendy_lexic.ll \
 		main.cc \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h \
-                Output.cc Output.h
+                Output.cc Output.h \
+                rg-syntax.yy rg-lexic.ll \
+                ReachabilityGraph.h ReachabilityGraph.cc
 # <<-- CHANGE END -->>
 
 # the configuration files

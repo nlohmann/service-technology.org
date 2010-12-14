@@ -32,14 +32,33 @@
 #include "Output.h"
 #include "verbose.h"
 
+#include "ReachabilityGraph.h"
+
+using std::cerr;
+using std::cout;
+using std::endl;
+using std::map;
+using std::ofstream;
+
 /// the command line parameters
 gengetopt_args_info args_info;
 
 /// the invocation string
 std::string invocation;
 
-/// a file to store a mapping from marking ids to actual Petri net markings
-Output* markingoutput = NULL;
+// lexer and parser
+extern int rg_yyparse();
+extern int rg_yylex_destroy();
+extern FILE* rg_yyin;
+
+/// output stream
+std::stringstream outStream;
+
+/// Reachability graph coming from LoLA
+ReachabilityGraph rg;
+
+// Name for dot output file
+std::string filename;
 
 /// a variable holding the time of the call
 clock_t start_clock = clock();
@@ -157,140 +176,54 @@ int main(int argc, char** argv) {
     Output::setTempfileTemplate(args_info.tmpfile_arg);
     Output::setKeepTempfiles(args_info.noClean_flag);
 
-
-    /*----------------------.
-    | 1. parse the open net |
-    `----------------------*/
-    pnapi::PetriNet net;
-
-    try {
-        // parse either from standard input or from a given file
-        if (args_info.inputs_num == 0) {
-            // parse the open net from standard input
-            std::cin >> pnapi::io::owfn >> net;
-        } else {
-            // strip suffix from input filename (if necessary: uncomment next line for future use)
-            //inputFilename = std::string(args_info.inputs[0]).substr(0, std::string(args_info.inputs[0]).find_last_of("."));
-
-            // open input file as an input file stream
-            std::ifstream inputStream(args_info.inputs[0]);
-            // ... and abort, if an error occurs
-            if (!inputStream) {
-                abort(1, "could not open file '%s'", args_info.inputs[0]);
-            }
-
-            // parse the open net from the input file stream
-            inputStream >> meta(pnapi::io::INPUTFILE, args_info.inputs[0])
-                        >> pnapi::io::owfn >> net;
-        }
-        // additional output if verbose-flag is set
-        if (args_info.verbose_flag) {
-            std::ostringstream s;
-            s << pnapi::io::stat << net;
-            status("read net: %s", s.str().c_str());
-        }
-    } catch (pnapi::exception::InputError error) {
-        std::ostringstream s;
-        s << error;
-        abort(2, "\b%s", s.str().c_str());
-    }
-
-    /*---------------------------------.
-    | 2. normalize the net (via PNAPI) |
-    `---------------------------------*/
-
-    net.normalize();
-
-    /*----------------------------------------.
-    | 3. set some output parameters for Wendy |
-    `----------------------------------------*/
-
-    // define variables
-    std::string outputParam;
-    std::string fileName;
-
-    // if the verbose-flag is set, it is also given to Wendy
-    if (args_info.verbose_flag) {
-        outputParam += " -v ";
-    }
-    // for piping Wendy's output, we use " 2> " to read from std::cerr
-    outputParam += " 2> ";
-    if (args_info.output_given and args_info.output_arg) {
-        fileName = args_info.output_arg;
-    } else {
-        // create a temporary file
-#if defined(__MINGW32__)
-        fileName = mktemp(basename(args_info.tmpfile_arg));
-#else
-        fileName = mktemp(args_info.tmpfile_arg);
-#endif
-    }
-    // add the output filename
-    outputParam += fileName;
-
-
-    /*---------------------------------------------------.
-    | 4. call Wendy and pipe the normalized net to Wendy |
-    `---------------------------------------------------*/
-    // select Wendy binary and build Wendy command
-#if defined(__MINGW32__)
-    // MinGW does not understand pathnames with "/", so we use the basename
-    std::string command_line(basename(args_info.wendy_arg));
-#else
-    std::string command_line(args_info.wendy_arg);
-#endif
-
-    command_line += outputParam;
-    // call Wendy
-    message("creating a pipe to Wendy by calling '%s'", command_line.c_str());
-
+      
+  // set input source
+  if(args_info.inputs_num > 0) // if user set an input file
+  {
+    // open file and link input file pointer
+    rg_yyin = fopen(args_info.inputs[0], "r");
+    if(!rg_yyin) // if an error occurred
     {
-        // set start time
-        time(&start_time);
-        // create stringstream to store the open net
-        std::stringstream ss;
-        ss << pnapi::io::owfn << net << std::flush;
-        // call Wendy and open a pipe
-        FILE* fp = popen(command_line.c_str(), "w");
-        // send the net to Wendy
-        fprintf(fp, ss.str().c_str());
-        // close the pipe
-        pclose(fp);
-        // set end time
-        time(&end_time);
+      cerr << PACKAGE << ": ERROR: failed to open input file '"
+           << args_info.inputs[0] << "'" << endl;
+      exit(EXIT_FAILURE);
     }
+    filename = args_info.inputs[0];
+  }
+  else
+    filename = "stdin";
+ 
+  /// actual parsing
+  rg_yyparse();
+  
+  cout << "root: " << rg.root << endl;
+  rg.print();
 
-    // status message
-    status("Wendy is done [%.0f sec]", difftime(end_time, start_time));
+  // set output destination
+  if(args_info.output_given){
+     // if user set an output file
+     if(args_info.name_given){
+	//If user has specified a file name
+        filename = args_info.name_arg;
+     }
+     //Append format suffix to file name
+     filename = filename + "." + args_info.output_arg;
 
 
-    /*--------------------------------------------------------------.
-    | 5. parse Wendy's output and write out the result to the shell |
-    `--------------------------------------------------------------*/
 
-    // if no output file is given
-    if (not args_info.output_given) {
+  }
+  else
+    //	std::cout << outStream.str();
 
-        // open Wendy's output file and link output file pointer
-        wendy_yyin = fopen(fileName.c_str(), "r");
-        if (!wendy_yyin) {
-            std::cerr << PACKAGE << ": ERROR: failed to open file '"
-                      << args_info.output_arg << "'" << std::endl;
-            exit(EXIT_FAILURE);
-        }
 
-        /// actual parsing
-        wendy_yyparse();
+  // close input (output is closed by destructor)
+   fclose(rg_yyin);
 
-        // close input (output is closed by destructor)
-        fclose(wendy_yyin);
+  /// clean lexer memory
+   rg_yylex_destroy();    
 
-        /// clean lexer memory
-        wendy_yylex_destroy();
 
-        // write parsed result to stderr
-        message("parsed: %s", wendy_out.c_str());
-    }
+
 
     return EXIT_SUCCESS;
 }

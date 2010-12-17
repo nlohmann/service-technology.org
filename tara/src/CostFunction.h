@@ -25,6 +25,7 @@ class SimpleAtomicCondition : public AtomicCondition {
     int dfa;
     bool acc;
     bool satisfiedBy(std::vector<int>& dfaStates);
+    SimpleAtomicCondition(int dfa, bool acc); 
 };
 
 class StateBasedAtomicCondition : public AtomicCondition {
@@ -32,6 +33,7 @@ class StateBasedAtomicCondition : public AtomicCondition {
     int dfa;
     int state;
     bool satisfiedBy(std::vector<int>& dfaStates);
+    StateBasedAtomicCondition(int dfa, int state);
 };
 
 
@@ -51,11 +53,13 @@ public:
   std::set<int> automata;
   std::vector<Condition> cases;
   std::map<std::string, int> caseNames;
+  
+  // action -> case -> value
   std::map<int, std::map<int, int> > values;
   
   int next(int action, std::vector<int> dfaStates);
   
-  
+  StandardCostFunction(std::string filename);
 
 };
 

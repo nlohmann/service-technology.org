@@ -19,7 +19,10 @@ public:
   std::map<int, std::vector<int> > values;
   
   CostGraph(ReachabilityGraph& rg);
+  void print_r(int s, std::set<int> visited);
 
+  std::string stateString(int s);
+  std::string valueString(int s);
 
 };
 

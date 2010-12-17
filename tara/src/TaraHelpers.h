@@ -15,6 +15,8 @@ public:
   static std::map<std::string, int> automataNames;
   static std::vector<CostFunction*> costFunctions;
   static std::map<std::string, int> costFunctionNames;
+  static std::map<std::string, int> transitionNames;
+  static std::vector<std::string> transitions;
 
   static int insertDFA(DFA* dfa);
   static int getDFAID(std::string name);
@@ -26,7 +28,12 @@ public:
   static CostFunction* getCostFunctionByName(std::string name);
   static CostFunction* getCostFunctionByID(int i);
 
+  static int insertTransition(std::string name);
+  static int getTransitionID(std::string name);
+  static std::string getTransitionByID(int i);
 
 };
+
+std::string itoa(long n);
 
 #endif

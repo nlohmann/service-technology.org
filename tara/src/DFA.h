@@ -9,7 +9,7 @@
 class DFA {
 public:
   std::map<std::string, int> stateNames;
-  std::set<int> states;
+  std::vector<std::string> states;
   std::map<std::string, int> actions;
   int initialState;  
   std::set<int> finalStates;
@@ -20,6 +20,7 @@ public:
   
   bool isFinal(int state);
   bool accepts(std::vector<int> word);
+ 
   
   DFA(){}
   DFA(std::string filename);

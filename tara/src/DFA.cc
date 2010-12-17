@@ -42,11 +42,13 @@ DFA::DFA(std::string filename) {
   
   Setting& cStates = dfa.lookup("states");
   for (int i = 0; i < cStates.getLength(); ++i) {
-    stateNames[cStates[i]] = 0;
-    states.insert(i);     
+    stateNames[cStates[i]] = states.size();
+    states.push_back(cStates[i]);     
   }
   
   dfa.lookupValue("initial", name);
+
+  initialState = stateNames[name];
 
   Setting& cFinal = dfa.lookup("final");
   for (int i = 0; i < cFinal.getLength(); ++i) {
@@ -54,19 +56,22 @@ DFA::DFA(std::string filename) {
   }
 
 
-  Setting& cActions = dfa.lookup("actions");
+/*  Setting& cActions = dfa.lookup("actions");
   for (int i = 0; i < cActions.getLength(); ++i) {
       actions[cActions[i]] = i;
   }
- 
+*/
  
   Setting& cTransitions = dfa.lookup("transitions");
   for (int i = 0; i < cTransitions.getLength(); ++i) {
       std::string s1 = cTransitions[i][0];
       std::string a = cTransitions[i][1];
       std::string s2 = cTransitions[i][2];
-      (flow[stateNames[s1]])[actions[a]] = stateNames[s2];
+      (flow[stateNames[s1]])[TaraHelpers::insertTransition(a)] = stateNames[s2];
   }
   
     
 }
+
+
+

@@ -22,6 +22,7 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
   
   for (int i = 0; i < TaraHelpers::automata.size(); ++i) {
     currentDFAStates.push_back(TaraHelpers::getDFAByID(i)->initialState);
+    //std::cerr << "push: " << TaraHelpers::getDFAByID(i)->initialState << std::endl;
   }
 
   for (int i = 0; i < TaraHelpers::costFunctions.size(); ++i) {
@@ -36,7 +37,7 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
   referrerStack.push(-1);
   
   while (markingStack.size() != 0) {
-    // std::cerr << "A state to handle" << std::endl;
+    // //std::cerr << "A state to handle" << std::endl;
     
     bool found = false;
     
@@ -53,7 +54,7 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
         
         if (currentReferrer != -1) {
           (delta[currentReferrer])[currentAction] = i;
-          // std::cerr << "inserting edge to existing node: " << currentReferrer << "->" << i << std::endl;
+          // //std::cerr << "inserting edge to existing node: " << currentReferrer << "->" << i << std::endl;
         }
         
       }
@@ -65,11 +66,11 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
       dfaStates[currentState] = currentDFAStates;
       values[currentState] = currentValues;
       tokens[currentState] = currentMarking;    
-      // std::cerr << "inserting new state: " << currentState << " : " << markingString(currentState) << std::endl;
+      // //std::cerr << "inserting new state: " << currentState << " : " << markingString(currentState) << std::endl;
       if (currentReferrer != -1) {
         (delta[currentReferrer])[currentAction] = currentState;
-          // std::cerr << "delta has entries for " << delta.size() << " states. current: " << delta[currentReferrer].size() << std::endl;
-        // std::cerr << "inserting edge to new node: " << currentReferrer << "->" << currentState << std::endl;
+          // //std::cerr << "delta has entries for " << delta.size() << " states. current: " << delta[currentReferrer].size() << std::endl;
+        // //std::cerr << "inserting edge to new node: " << currentReferrer << "->" << currentState << std::endl;
       }
       
       ++currentState;
@@ -80,7 +81,7 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
         srcState = rg.root;
       } else {
         srcState = rg.yields(currentSrcReferrer, currentAction);
-        // std::cerr << "new src state: " << srcState << std::endl;
+        // //std::cerr << "new src state: " << srcState << std::endl;
       }
       
       std::set<int> enabled = rg.enabledTransitions(srcState);
@@ -99,7 +100,7 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
           currentDFAStatesN.push_back(TaraHelpers::getDFAByID(i)->getNewState(currentDFAStates[i], *it));
         } 
         
-        // std::cerr << "pushing: " << rg.markingString(rg.yields(srcState,*it)) << " ref: " << srcState <<  std::endl;        
+        // //std::cerr << "pushing: " << rg.markingString(rg.yields(srcState,*it)) << " ref: " << srcState <<  std::endl;        
                 
         referrerStack.push(currentState-1);
         srcReferrerStack.push(srcState);
@@ -111,12 +112,62 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
       }
     
     }
-    transitions = rg.transitions;
+
+       // //std::cerr << "root hat " << delta[root].size() << " eintraege" << std::endl;  
+  
+  }
+  
     places = rg.places;
-    // std::cerr << "root hat " << delta[root].size() << " eintraege" << std::endl;  
-  
-  }
-  
-    
+ 
     
   }
+  
+  
+  std::string CostGraph::stateString(int s) {
+    //std::cerr << "go1 " << s << std::endl;
+    std::string result = " ";
+    std::vector<int>& thestates = dfaStates[s];
+    for (int i = 0; i < thestates.size(); ++i) {
+      DFA* dfa = TaraHelpers::getDFAByID(i);
+      //std::cerr << "mittendrin1 " << s << std::endl;
+      
+      int x = thestates[i];
+      //std::cerr << "mittendrin1 " << s << std::endl;
+
+      result += dfa->name + ": "; 
+
+      //std::cerr << "mittendrin1 " << s << ", " << x << std::endl;
+      result += dfa->states[x] + "; ";
+      //std::cerr << "mittendrin1 " << s << std::endl;
+
+    }
+    //std::cerr << "gone1 " << s << std::endl;
+    return result;
+  }
+  
+  std::string CostGraph::valueString(int s) {
+    //std::cerr << "go2 " << s << std::endl;
+    std::string result = " ";
+    std::vector<int>& vals = values[s];
+    for (int i = 0; i < vals.size(); ++i) {
+      CostFunction* cf = TaraHelpers::getCostFunctionByID(i);
+      result += cf->name  + ": " + itoa(vals[i]) + "; ";
+    }
+    //std::cerr << "gone2 " << s << std::endl;
+    return result;
+  }
+  
+  
+  void CostGraph::print_r(int s, std::set<int> visited) {
+  // //std::cerr << "hallo" << std::endl;
+  if (visited.find(s) == visited.end()) {
+    visited.insert(s);
+    std::set<int> ens = enabledTransitions(s);
+    // //std::cerr << "nr of edges: " << ens.size()<< std::endl;
+    for (std::set<int>::iterator it = ens.begin(); it != ens.end(); ++it) {
+      std::cerr << s << " (" << markingString(s) << stateString(s) << valueString(s) << ")" << " | " << TaraHelpers::getTransitionByID(*it) << " > " << yields(s,*it) << " (" << markingString(yields(s,*it)) << stateString(yields(s,*it)) << valueString(yields(s,*it)) << ") " << std::endl;
+      print_r(yields(s,*it), visited);
+    }
+  }
+}
+  

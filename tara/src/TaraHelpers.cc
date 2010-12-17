@@ -1,3 +1,5 @@
+#include <sstream>
+#include <iostream>
 #include "TaraHelpers.h"
 #include "CostFunction.h"
 
@@ -65,8 +67,41 @@ CostFunction* TaraHelpers::getCostFunctionByID(int i) {
 }
 
 
+int TaraHelpers::insertTransition(std::string name) {
+  //std::cerr << "inserting transition: " << name << " at position: ";
+  int old = getTransitionID(name);
+  if (old == -1) {
+    int size = transitions.size();
+    transitions.push_back(name);
+    transitionNames[name] = size;
+    //std::cerr << size << std::endl;
+    return size;
+  }
+    //std::cerr << old << std::endl;
+ 
+  return old;
+}
+int TaraHelpers::getTransitionID(std::string name) {
+  if (transitionNames.find(name) != transitionNames.end()) {
+    return transitionNames[name];
+  } 
+  return -1;
+}
+
+std::string TaraHelpers::getTransitionByID(int i) {
+  return transitions[i];
+}
+
+std::string itoa(long n){
+	std::ostringstream stream;
+	stream <<n;
+	return stream.str();
+}
+
 std::vector<DFA*> TaraHelpers::automata;
 std::map<std::string, int> TaraHelpers::automataNames;
 std::vector<CostFunction*> TaraHelpers::costFunctions;
 std::map<std::string, int> TaraHelpers::costFunctionNames;
+std::map<std::string, int> TaraHelpers::transitionNames;
+std::vector<std::string> TaraHelpers::transitions;
 

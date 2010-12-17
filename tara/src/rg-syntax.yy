@@ -9,6 +9,7 @@
 
 #include "cmdline.h"
 #include "ReachabilityGraph.h"
+#include "TaraHelpers.h"
 
 //Result of lexical analyis
 extern char* rg_yytext;
@@ -134,7 +135,7 @@ transitions:
 transition:
   NAME ARROW NUMBER
   {
-    (rg.delta[currentState])[rg.insertTransition($1)] = $3;
+    (rg.delta[currentState])[TaraHelpers::insertTransition(std::string($1))] = $3;
     outStream << "  " << currentState << " -> " << $3 << " [label=\"" << $1 << "\"]" << std::endl;
   }
 ;

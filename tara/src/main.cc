@@ -220,6 +220,9 @@ int main(int argc, char** argv) {
     int last = TaraHelpers::insertDFA(new DFA(std::string(args_info.dfa_arg[i]))); 
   }
   
+  for (int i = 0; i < args_info.costfunction_given; ++i) {  
+    int last = TaraHelpers::insertCostFunction(new StandardCostFunction(std::string(args_info.costfunction_arg[i]))); 
+  }
   
    
   CostGraph cg = CostGraph(rg);

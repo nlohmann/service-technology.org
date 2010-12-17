@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include "ReachabilityGraph.h"
+#include "TaraHelpers.h"
 
 bool ReachabilityGraph::enables(int s, int t) {
   
@@ -30,7 +31,7 @@ int ReachabilityGraph::yields(int s, int t) {
 std::set<int> ReachabilityGraph::enabledTransitions(int s) {
   
   std::set<int> enabled; 
-  for (int i = 0; i < transitions.size(); ++i) {
+  for (int i = 0; i < TaraHelpers::transitions.size(); ++i) {
   
     if (enables(s,i)) {
       enabled.insert(i);
@@ -39,20 +40,6 @@ std::set<int> ReachabilityGraph::enabledTransitions(int s) {
   }
   return enabled;
   
-  
-}
-
-
-int ReachabilityGraph::insertTransition(char* t) {
-
-  if (transitions.size() == 0) root = 0;
-
-  for (int i = 0; i < transitions.size(); ++i) {
-    if (strcmp(t,transitions[i]) == 0) return i;
-  }
-  
-  transitions.push_back(t);
-  return transitions.size()-1;
   
 }
 
@@ -87,23 +74,19 @@ void ReachabilityGraph::print() {
 }
 
 void ReachabilityGraph::print_r(int s, std::set<int> visited) {
-  // std::cerr << "hallo" << std::endl;
+  // //std::cerr << "hallo" << std::endl;
   if (visited.find(s) == visited.end()) {
     visited.insert(s);
     std::set<int> ens = enabledTransitions(s);
-    // std::cerr << "nr of edges: " << ens.size()<< std::endl;
+    // //std::cerr << "nr of edges: " << ens.size()<< std::endl;
     for (std::set<int>::iterator it = ens.begin(); it != ens.end(); ++it) {
-      std::cerr << s << " (" << markingString(s) << ")" << " | " << transitions[(*it)] << " > " << yields(s,*it) << " (" << markingString(yields(s,*it)) << ") " << std::endl;
+      std::cerr << s << " (" << markingString(s) << ")" << " | " << TaraHelpers::getTransitionByID(*it) << " > " << yields(s,*it) << " (" << markingString(yields(s,*it)) << ") " << std::endl;
       print_r(yields(s,*it), visited);
     }
   }
 }
 
-std::string itoa(long n){
-	std::ostringstream stream;
-	stream <<n;
-	return stream.str();
-}
+
 
 std::string ReachabilityGraph::markingString(int s) {
   std::string st = " "; 
@@ -171,7 +154,7 @@ void ReachabilityGraph::removeIndifferents(MarkingCondition& condition) {
   for (std::set<int>::iterator it = states.begin(); it != states.end(); ++it) {
     if (!condition.satisfies(*it, *this)) {
       redNodes.insert(*it);
-      // std::cerr << "red node " << *it << std::endl;
+      // //std::cerr << "red node " << *it << std::endl;
     }  
   }  
 
@@ -179,7 +162,7 @@ void ReachabilityGraph::removeIndifferents(MarkingCondition& condition) {
     std::set<int> reachs = reachableNodes(*it);
     if (subset(reachs,redNodes)) {
       toRemove.insert(*it);
-      // std::cerr << "scheduling " << *it << std::endl;
+      // //std::cerr << "scheduling " << *it << std::endl;
     }  
   }  
   

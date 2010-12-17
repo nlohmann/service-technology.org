@@ -13,14 +13,12 @@ class ReachabilityGraph {
   public:
   int root;
   std::map<int, std::map<int, int> > delta;
-  std::vector<char*> transitions;
   std::map<int, std::map<int,int> > tokens;
   std::vector<char*> places;
   
   std::set<int> states;
   void removeNode(int s);
   
-  int insertTransition(char* t);
   int insertPlace(char* p);
   int getTokens(int state, int place);
     
@@ -29,7 +27,7 @@ class ReachabilityGraph {
   int yields(int s, int t);  
   
   void print();
-  void print_r(int s, std::set<int> visited);
+  virtual void print_r(int s, std::set<int> visited);
 
   std::string markingString(int s);
 

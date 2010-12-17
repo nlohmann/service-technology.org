@@ -32,6 +32,15 @@ option "dfa" d
   optional
   multiple
 
+option "costfunction" f
+  "A cost function file"
+  details="Use this option to provide a cost function.\n"
+  string
+  typestr="FILENAME"
+  optional
+  multiple
+
+
 section "Configuration"
 sectiondesc="<<-- Hello relies on several other tools. These options configure Hello to find these tools. -->>\n"
 

@@ -21,9 +21,7 @@
 # 4. Add the file to the SVN repository.
 
 # <<-- CHANGE START (testfiles) -->>
-TESTFILES = myCoffee.owfn \
-            uncontrollable.owfn \
-            unnormal.owfn
+TESTFILES = 
 # <<-- CHANGE END -->>
 
 

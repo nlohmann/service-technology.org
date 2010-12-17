@@ -67,10 +67,10 @@ m4_define([SED],                  [@SED@])
 #------------------------------------------#
 
 # the main executable, called through a shell script for code coverage
-m4_define([HELLO],                [cover.sh @abs_top_builddir@/src/hello])
+m4_define([TARA],                [cover.sh @abs_top_builddir@/src/tara])
 
 # the main executable, directly called to allow for analysis
-m4_define([HELLO_RAW],            [@abs_top_builddir@/src/hello])
+m4_define([TARA_RAW],            [@abs_top_builddir@/src/tara])
 
 
 #---------------------------------------------#

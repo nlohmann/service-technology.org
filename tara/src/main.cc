@@ -32,7 +32,12 @@
 #include "Output.h"
 #include "verbose.h"
 
+#include "TaraHelpers.h"
 #include "ReachabilityGraph.h"
+#include "Dimension.h"
+#include "Condition.h"
+#include "DFA.h"
+#include "CostGraph.h"
 
 using std::cerr;
 using std::cout;
@@ -69,14 +74,6 @@ inline bool fileExists(const std::string& filename) {
     std::ifstream tmp(filename.c_str(), std::ios_base::in);
     return tmp.good();
 }
-
-/// lexer and parser
-extern int wendy_yyparse();
-extern int wendy_yylex_destroy();
-extern FILE* wendy_yyin;
-
-/// a string used by the parser
-std::string wendy_out;
 
 
 /// evaluate the command line parameters
@@ -143,7 +140,7 @@ void evaluateParameters(int argc, char** argv) {
 
     // check whether at most one file is given
     if (args_info.inputs_num > 1) {
-        abort(4, "at most one input file must be given");
+        abort(4, "at most one reachability graph must be given");
     }
 
     free(params);
@@ -158,9 +155,10 @@ void terminationHandler() {
     if (args_info.stats_flag) {
         message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
         fprintf(stderr, "%s: memory consumption: ", PACKAGE);
-        system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+        int i = system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
     }
 }
+
 
 /// main-function
 int main(int argc, char** argv) {
@@ -176,6 +174,11 @@ int main(int argc, char** argv) {
     Output::setTempfileTemplate(args_info.tmpfile_arg);
     Output::setKeepTempfiles(args_info.noClean_flag);
 
+
+    /*--------------------------------------.
+    | 1. parse the reachability graph       |
+    `--------------------------------------*/
+
       
   // set input source
   if(args_info.inputs_num > 0) // if user set an input file
@@ -190,40 +193,48 @@ int main(int argc, char** argv) {
     }
     filename = args_info.inputs[0];
   }
-  else
+  else {
     filename = "stdin";
+  }
  
   /// actual parsing
   rg_yyparse();
   
-  cout << "root: " << rg.root << endl;
+  // close input (output is closed by destructor)
+  fclose(rg_yyin);
+
+  /// clean lexer memory
+  rg_yylex_destroy();    
+   
   rg.print();
+/*    
+  Condition c;
+  for (int i = rg.places.size()-3; i >= 0;--i)
+    c.constraints[i] = std::pair<int,int>(0,0);
+  cerr << rg.places[1] << c.satisfies(19,rg) << endl;
+  rg.removeIndifferents(c);
+  rg.print();
+*/
+  
+  for (int i = 0; i < args_info.dfa_given; ++i) {  
+    int last = TaraHelpers::insertDFA(new DFA(std::string(args_info.dfa_arg[i]))); 
+  }
+  
+  
+   
+  CostGraph cg = CostGraph(rg);
+  cg.print();
 
   // set output destination
   if(args_info.output_given){
-     // if user set an output file
-     if(args_info.name_given){
-	//If user has specified a file name
-        filename = args_info.name_arg;
-     }
      //Append format suffix to file name
      filename = filename + "." + args_info.output_arg;
 
-
-
+  } else {
+    
+    // todo: print to command line
+  
   }
-  else
-    //	std::cout << outStream.str();
-
-
-  // close input (output is closed by destructor)
-   fclose(rg_yyin);
-
-  /// clean lexer memory
-   rg_yylex_destroy();    
-
-
-
 
     return EXIT_SUCCESS;
 }

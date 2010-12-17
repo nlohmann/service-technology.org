@@ -71,6 +71,7 @@ state:
   {
     outStream << "  " << $2 << " [label=\"" << $2 << "\\n["; 
     currentState = $2;
+    rg.states.insert(currentState);
   }
    lowlink scc markings_or_transitions
 ;
@@ -119,13 +120,8 @@ markings:
 marking:
   NAME COLON NUMBER
   {
-    if ( $3 > 1 )
-    {
-      outStream << $1 << ":" << $3;
-    }
-    else
-    {
-      outStream << $1;
+    if ($3 > 0) {
+    (rg.tokens[currentState])[rg.insertPlace($1)] = $3;
     }
   }
 ;
@@ -138,7 +134,7 @@ transitions:
 transition:
   NAME ARROW NUMBER
   {
-    rg.delta[std::pair<int,int>(currentState,rg.insertTransition($1))] = $3;
+    (rg.delta[currentState])[rg.insertTransition($1)] = $3;
     outStream << "  " << currentState << " -> " << $3 << " [label=\"" << $1 << "\"]" << std::endl;
   }
 ;

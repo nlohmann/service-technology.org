@@ -17,13 +17,20 @@ section "Input/Output"
 sectiondesc="When called without an input file, Hello reads from the standard input stream. When called without an output parameter, Hello writes to the standard output stream. If no filename is given for the output option Hello creates a file with a temporary name.\n"
 
 option "output" o
-  "Wendy's output."
-  details="This option is used when Wendy's output should be stored to a file.\n"
+  "Tara's output."
+  details="This option is used when Tara's output should be stored to a file.\n"
   string
   typestr="FILENAME"
   argoptional
   optional
   
+option "dfa" d
+  "A DFA file"
+  details="Use this option to provide a deterministic finite automaton that can be used inside cost functions.\n"
+  string
+  typestr="FILENAME"
+  optional
+  multiple
 
 section "Configuration"
 sectiondesc="<<-- Hello relies on several other tools. These options configure Hello to find these tools. -->>\n"
@@ -35,18 +42,9 @@ option "config" c
   typestr="FILE"
   optional
 
-option "wendy" -
-  "Set the path and binary of Wendy."
-  details="The Wendy binary. Wendy can be downloaded from http://service-technology.org/wendy and compiled using `make wendy'.\n"
-  string
-  typestr="FILENAME"
-  default="wendy"
-  optional
-  hidden
-
 option "tmpfile" -
   "Set the path and name of temporary files."
-  details="The filename Hello should use to create temporary files (i.e., the output derived from Wendy). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  details="The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
   string
   typestr="FILENAME"
   default="/tmp/tara-XXXXXX"
@@ -79,10 +77,4 @@ option "stats" -
   flag off
   hidden
   
- option "name" n
-  "Defines a name for dot output file."
-  string
-  typestr="NAME"
-  dependon="output"
-  optional
 # <<-- CHANGE END -->>

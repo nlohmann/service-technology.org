@@ -45,6 +45,10 @@ AC_PATH_PROG(WENDY,         [wendy], not found)
 # AC_CHECK_SIZEOF([void*])
 
 
+# check for libconfig
+AC_LANG([C++])
+AC_CHECK_LIB(config++, config_init)
+
 # write files
 AC_CONFIG_FILES([
 	Makefile libs/pnapi/Makefile src/Makefile src/tara.conf doc/Makefile

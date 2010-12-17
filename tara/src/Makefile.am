@@ -3,13 +3,15 @@ bin_PROGRAMS = tara
 
 # the plain sources you need to compile (no generated code)
 # <<-- CHANGE START (the program's sources) -->>
-tara_SOURCES = wendy_syntax.yy wendy_lexic.ll \
-		main.cc \
+tara_SOURCES =  main.cc \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h \
                 Output.cc Output.h \
                 rg-syntax.yy rg-lexic.ll \
-                ReachabilityGraph.h ReachabilityGraph.cc
+                ReachabilityGraph.h ReachabilityGraph.cc \
+                Dimension.h Condition.h Condition.cc \
+                DFA.h DFA.cc CostGraph.h CostGraph.cc \
+                CostFunction.h TaraHelpers.h TaraHelpers.cc
 # <<-- CHANGE END -->>
 
 # the configuration files

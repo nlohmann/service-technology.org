@@ -57,7 +57,7 @@ public:
   // action -> case -> value
   std::map<int, std::map<int, int> > values;
   
-  int next(int action, std::vector<int> dfaStates);
+  int next(int action, std::vector<int>& dfaStates);
   
   StandardCostFunction(std::string filename);
 

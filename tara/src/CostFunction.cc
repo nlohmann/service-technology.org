@@ -35,7 +35,7 @@ bool Condition::satisfiedBy(std::vector<int>& dfaStates) {
   return true;
 }
 
-int StandardCostFunction::next(int action, std::vector<int> dfaStates) {
+int StandardCostFunction::next(int action, std::vector<int>& dfaStates) {
   if (values.find(action) != values.end()) {
     std::map<int, int>& mapping = values[action];
     for (int i = 0; i < cases.size(); ++i) {

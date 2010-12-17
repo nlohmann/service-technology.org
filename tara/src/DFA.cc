@@ -45,10 +45,10 @@ DFA::DFA(std::string filename) {
     stateNames[cStates[i]] = states.size();
     states.push_back(cStates[i]);     
   }
-  
-  dfa.lookupValue("initial", name);
+  std::string initialStateName;
+  dfa.lookupValue("initial", initialStateName);
 
-  initialState = stateNames[name];
+  initialState = stateNames[initialStateName];
 
   Setting& cFinal = dfa.lookup("final");
   for (int i = 0; i < cFinal.getLength(); ++i) {

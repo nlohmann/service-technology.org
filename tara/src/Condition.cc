@@ -1,7 +1,7 @@
 #include "Condition.h"
 #include "ReachabilityGraph.h"
 
-bool Condition::satisfies(int state, ReachabilityGraph& rg) {
+bool MarkingCondition::satisfies(int state, ReachabilityGraph& rg) {
   
   for (int i = 0; i < rg.places.size(); ++i) {
     

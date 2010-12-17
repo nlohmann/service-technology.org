@@ -6,7 +6,7 @@
 
 class ReachabilityGraph;
 
-class Condition {
+class MarkingCondition {
   
   
 public: 

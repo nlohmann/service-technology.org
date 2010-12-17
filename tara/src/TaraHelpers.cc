@@ -1,4 +1,5 @@
 #include "TaraHelpers.h"
+#include "CostFunction.h"
 
   static int insertDFA(std::string name, DFA* dfa);
   static int getDFAID(std::string name);

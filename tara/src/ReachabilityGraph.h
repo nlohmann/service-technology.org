@@ -7,7 +7,7 @@
 #include <string>
 #include "Condition.h"
 
-class Condition;
+class MarkingCondition;
 
 class ReachabilityGraph {
   public:
@@ -35,7 +35,7 @@ class ReachabilityGraph {
 
   std::set<int> reachableNodes(int state);
 
-  void removeIndifferents(Condition& condition);
+  void removeIndifferents(MarkingCondition& condition);
 };
 
 #endif

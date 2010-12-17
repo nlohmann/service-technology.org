@@ -11,7 +11,9 @@ tara_SOURCES =  main.cc \
                 ReachabilityGraph.h ReachabilityGraph.cc \
                 Dimension.h Condition.h Condition.cc \
                 DFA.h DFA.cc CostGraph.h CostGraph.cc \
-                CostFunction.h TaraHelpers.h TaraHelpers.cc
+                CostFunction.h CostFunction.cc \
+                TaraHelpers.h TaraHelpers.cc
+                
 # <<-- CHANGE END -->>
 
 # the configuration files

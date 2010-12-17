@@ -5,7 +5,8 @@
 #include <string>
 
 #include "DFA.h"
-#include "CostFunction.h"
+
+class CostFunction;
 
 class TaraHelpers {
 public:

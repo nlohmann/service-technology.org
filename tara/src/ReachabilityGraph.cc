@@ -165,7 +165,7 @@ std::set<int> ReachabilityGraph::reachableNodes(int state) {
 
 }
 
-void ReachabilityGraph::removeIndifferents(Condition& condition) {
+void ReachabilityGraph::removeIndifferents(MarkingCondition& condition) {
 
   std::set<int> redNodes, toRemove;
   for (std::set<int>::iterator it = states.begin(); it != states.end(); ++it) {

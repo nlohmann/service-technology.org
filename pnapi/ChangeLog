@@ -22,6 +22,10 @@ Version 4.03-unreleased
 
 * introduced classes PlaceIndexVector and OmegaMarking
 
+* disabled place-to-place arcs and transition-to-transition arcs
+
+* fixed transition types on interface "arc" removing
+
 Version 4.02 (2010-07-28)
 =========================
 

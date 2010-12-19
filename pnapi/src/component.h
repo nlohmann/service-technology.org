@@ -203,7 +203,7 @@ public: /* public methods */
   /// add an interface label
   void addLabel(Label & label, unsigned int = 1);
   /// remove an interface label
-  void removeLabel(const Label & label);
+  void removeLabel(Label & label);
   //@}
   
   /*!

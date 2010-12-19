@@ -5,6 +5,8 @@
 @item added reduction option SET_MURATA and front end parameter option --reduce=murata
 @item added arithmetic and comparison operators to Marking class
 @item introduced classes PlaceIndexVector and OmegaMarking
+@item disabled place-to-place arcs and transition-to-transition arcs
+@item fixed transition types on interface "arc" removing
 @end itemize
 
 @heading Version 4.02 (2010-07-28)

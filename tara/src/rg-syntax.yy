@@ -20,7 +20,6 @@ extern int rg_yyerror(char const *msg);
 extern gengetopt_args_info args_info;
 
 //Output stream defined and used in main.cc
-extern std::stringstream outStream;
 extern ReachabilityGraph rg;
 
 unsigned int currentState = 0;
@@ -46,20 +45,7 @@ unsigned int currentState = 0;
 
 
 rg:
-  {
-	//Finished parsing, write output
-   
-        //Write keyword to stream
-  	outStream << "digraph{\n\n";
-  	//Use Helvetica
-  	outStream << "edge [fontname=Helvetica fontsize=10]\n";
-  	outStream << "node [fontname=Helvetica fontsize=10]\n";  
-
-  }
   states
-  {
-  	outStream << "\n}";
-  }
 ;
 
 states:
@@ -70,7 +56,6 @@ states:
 state:
   KW_STATE NUMBER
   {
-    outStream << "  " << $2 << " [label=\"" << $2 << "\\n["; 
     currentState = $2;
     rg.states.insert(currentState);
   }
@@ -98,24 +83,15 @@ lowlink:
 
 markings_or_transitions:
   /* empty */
-  {
-    outStream << "]\"]" << std::endl;
-  }
 | markings
-  {
-    outStream << "]\"]" << std::endl;
-  }
 | transitions
 | markings 
-  {
-    outStream << "]\"]" << std::endl;
-  }
   transitions
 ;
 
 markings:
   marking
-| markings COMMA { outStream << ", "; } marking
+| markings COMMA marking
 ;
 
 marking:
@@ -136,7 +112,6 @@ transition:
   NAME ARROW NUMBER
   {
     (rg.delta[currentState])[TaraHelpers::insertTransition(std::string($1))] = $3;
-    outStream << "  " << currentState << " -> " << $3 << " [label=\"" << $1 << "\"]" << std::endl;
-  }
+     }
 ;
 

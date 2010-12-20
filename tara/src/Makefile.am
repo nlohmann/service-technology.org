@@ -12,7 +12,11 @@ tara_SOURCES =  main.cc \
                 Dimension.h Condition.h Condition.cc \
                 DFA.h DFA.cc CostGraph.h CostGraph.cc \
                 CostFunction.h CostFunction.cc \
-                TaraHelpers.h TaraHelpers.cc
+                TaraHelpers.h TaraHelpers.cc \
+                Multiset.h Multiset.cc \
+                KnowledgeGraph.h KnowledgeGraph.cc \
+                Situation.h Situation.cc \
+                Label.h 
                 
 # <<-- CHANGE END -->>
 

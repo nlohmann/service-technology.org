@@ -1,43 +1,43 @@
 #include <cstring>
 #include <iostream>
 #include <sstream>
+#include <cassert>
 #include "ReachabilityGraph.h"
 #include "TaraHelpers.h"
 
-bool ReachabilityGraph::enables(int s, int t) {
+bool ReachabilityGraph::enables(int s, int t) const{
   
-  if ((delta[s]).find(t) != (delta[s]).end()) {
-    
-    int succ = (delta[s])[t];
-    if (states.find(succ) != states.end()) {
-      return true;
-    } else {
-      (delta[s]).erase(t);
-      return false;      
-    }
+  if (delta.find(s) != delta.end()) {
   
+  const std::map<int, int>& deltaAtS = (delta.find(s)->second);
+  assert(deltaAtS.end() == delta.find(s)->second.end());
+  if (deltaAtS.find(t) != deltaAtS.end()) {
+    int succ = deltaAtS.find(t)->second;
+    return true;
+  }
   }
 
   return false;
 }
 
-int ReachabilityGraph::yields(int s, int t) {
+int ReachabilityGraph::yields(int s, int t) const{
   if (enables(s,t)) {
-      return (delta[s])[t];
+      return (delta.find(s)->second).find(t)->second;
   } 
   return -1;
 }
 
-std::set<int> ReachabilityGraph::enabledTransitions(int s) {
+std::set<int> ReachabilityGraph::enabledTransitions(int s) const{
   
   std::set<int> enabled; 
   for (int i = 0; i < TaraHelpers::transitions.size(); ++i) {
   
-    if (enables(s,i)) {
+  if (enables(s,i)) {
       enabled.insert(i);
     }
   
   }
+//  std::cerr << "returning set sized " << enabled.size() << std::endl;
   return enabled;
   
   
@@ -73,12 +73,12 @@ void ReachabilityGraph::print() {
   print_r(root,visited);
 }
 
-void ReachabilityGraph::print_r(int s, std::set<int> visited) {
+void ReachabilityGraph::print_r(int s, std::set<int>& visited) {
   // //std::cerr << "hallo" << std::endl;
   if (visited.find(s) == visited.end()) {
     visited.insert(s);
     std::set<int> ens = enabledTransitions(s);
-    // //std::cerr << "nr of edges: " << ens.size()<< std::endl;
+  //  std::cerr << "nr of edges: " << ens.size()<< std::endl;
     for (std::set<int>::iterator it = ens.begin(); it != ens.end(); ++it) {
       std::cerr << s << " (" << markingString(s) << ")" << " | " << TaraHelpers::getTransitionByID(*it) << " > " << yields(s,*it) << " (" << markingString(yields(s,*it)) << ") " << std::endl;
       print_r(yields(s,*it), visited);

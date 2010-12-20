@@ -38,6 +38,8 @@
 #include "Condition.h"
 #include "DFA.h"
 #include "CostGraph.h"
+#include "Multiset.h"
+#include "KnowledgeGraph.h"
 
 using std::cerr;
 using std::cout;
@@ -162,6 +164,9 @@ void terminationHandler() {
 
 /// main-function
 int main(int argc, char** argv) {
+    
+    TaraHelpers::insertLabel("?hallo");
+    
     time_t start_time, end_time;
 
     // set the function to call on normal termination
@@ -205,8 +210,10 @@ int main(int argc, char** argv) {
 
   /// clean lexer memory
   rg_yylex_destroy();    
-   
+      
   rg.print();
+  
+  
 /*    
   Condition c;
   for (int i = rg.places.size()-3; i >= 0;--i)
@@ -227,6 +234,9 @@ int main(int argc, char** argv) {
    
   CostGraph cg = CostGraph(rg);
   cg.print();
+  
+  KnowledgeGraph kg = KnowledgeGraph(&cg);
+  
 
   // set output destination
   if(args_info.output_given){

@@ -6,6 +6,8 @@
 #include <set>
 #include <string>
 #include "Condition.h"
+#include "Multiset.h"
+#include "Situation.h"
 
 class MarkingCondition;
 
@@ -22,12 +24,12 @@ class ReachabilityGraph {
   int insertPlace(char* p);
   int getTokens(int state, int place);
     
-  std::set<int> enabledTransitions(int s);
-  bool enables(int s, int t);
-  int yields(int s, int t);  
+  std::set<int> enabledTransitions(int s) const;
+  bool enables(int s, int t) const;
+  int yields(int s, int t) const;  
   
-  void print();
-  virtual void print_r(int s, std::set<int> visited);
+  virtual void print();
+  virtual void print_r(int s, std::set<int>& visited);
 
   std::string markingString(int s);
 

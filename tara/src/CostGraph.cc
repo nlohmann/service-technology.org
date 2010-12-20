@@ -4,7 +4,8 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
   
   int currentState = 0;
   root = 0;
-  
+    places = rg.places;
+   
   std::stack<std::vector<int> > dfaStatesStack;
   std::stack<std::vector<int> > valuesStack;
   std::stack<std::map<int, int> > markingStack;
@@ -22,7 +23,7 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
   
   for (int i = 0; i < TaraHelpers::automata.size(); ++i) {
     currentDFAStates.push_back(TaraHelpers::getDFAByID(i)->initialState);
-    //std::cerr << "push: " << TaraHelpers::getDFAByID(i)->initialState << std::endl;
+//    std::cerr << "push: " << TaraHelpers::getDFAByID(i)->initialState << std::endl;
   }
 
   for (int i = 0; i < TaraHelpers::costFunctions.size(); ++i) {
@@ -31,13 +32,14 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
 
   dfaStatesStack.push(currentDFAStates);
   valuesStack.push(currentValues);
-  markingStack.push(std::map<int,int>(rg.tokens[rg.root]));
+  markingStack.push(rg.tokens[rg.root]);
+ // std::cerr << rg.root << rg.markingString(rg.root) << std::endl;
   srcReferrerStack.push(-1);
   actionStack.push(-1);
   referrerStack.push(-1);
-  
+ 
   while (markingStack.size() != 0) {
-    // //std::cerr << "A state to handle" << std::endl;
+
     
     bool found = false;
     
@@ -54,7 +56,7 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
         
         if (currentReferrer != -1) {
           (delta[currentReferrer])[currentAction] = i;
-          // //std::cerr << "inserting edge to existing node: " << currentReferrer << "->" << i << std::endl;
+//          std::cerr << "inserting edge to existing node: " << currentReferrer << "->" << i << std::endl;
         }
         
       }
@@ -66,7 +68,13 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
       dfaStates[currentState] = currentDFAStates;
       values[currentState] = currentValues;
       tokens[currentState] = currentMarking;    
-      // //std::cerr << "inserting new state: " << currentState << " : " << markingString(currentState) << std::endl;
+  //    std::cerr << "nr of states: " << states.size() << std::endl;
+  //    std::cerr << "nr of places in marking: " << tokens[currentState].size() << std::endl;
+  //    for (std::map<int, int>::iterator it = tokens[currentState].begin(); it != tokens[currentState].end(); ++it) {
+  //      std::cerr << it->second << "; ";
+  //    }
+   //   std::cerr << std::endl;
+    //  std::cerr << "inserting new state: " << currentState << " : " << markingString(currentState) << "; " << stateString(currentState) << "; " << valueString(currentState) << std::endl;
       if (currentReferrer != -1) {
         (delta[currentReferrer])[currentAction] = currentState;
           // //std::cerr << "delta has entries for " << delta.size() << " states. current: " << delta[currentReferrer].size() << std::endl;
@@ -85,7 +93,7 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
       }
       
       std::set<int> enabled = rg.enabledTransitions(srcState);
-            
+      //std::cerr << enabled.size() << std::endl;      
       for (std::set<int>::iterator it = enabled.begin(); it != enabled.end(); ++it) {
         
         std::vector<int> currentValuesN;
@@ -117,14 +125,12 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
   
   }
   
-    places = rg.places;
- 
     
   }
   
   
   std::string CostGraph::stateString(int s) {
-    //std::cerr << "go1 " << s << std::endl;
+   // std::cerr << "go1 " << s << std::endl;
     std::string result = " ";
     std::vector<int>& thestates = dfaStates[s];
     for (int i = 0; i < thestates.size(); ++i) {
@@ -157,8 +163,13 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
     return result;
   }
   
+void CostGraph::print() {
+  std::set<int> visited;
+  print_r(root,visited);
+}
+
   
-  void CostGraph::print_r(int s, std::set<int> visited) {
+  void CostGraph::print_r(int s, std::set<int>& visited) {
   // //std::cerr << "hallo" << std::endl;
   if (visited.find(s) == visited.end()) {
     visited.insert(s);
@@ -170,4 +181,36 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
     }
   }
 }
+
+std::set<Situation> CostGraph::closure(std::set<Situation>& bubble) {
+  bool change = true;
+  std::set<Situation> result;
+  std::stack<Situation> sitStack;
   
+  for (std::set<Situation>::iterator it = result.begin(); it != result.end(); ++it) {
+    sitStack.push(*it);    
+  }
+  
+  while (sitStack.size() != 0) {
+  
+    Situation s = sitStack.top(); sitStack.pop();
+    bool found = result.find(s) != result.end();
+    if (!found) {
+      result.insert(s);
+      std::set<int> ens = sit_enabledTransitions(s);
+      
+      for (std::set<int>::iterator it = ens.begin(); it != ens.end(); ++it) {
+    
+        sitStack.push(sit_yields(s, *it));
+      
+      }
+    
+    }
+  
+  
+  }
+
+  return result;
+}
+
+

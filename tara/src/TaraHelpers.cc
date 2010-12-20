@@ -68,17 +68,13 @@ CostFunction* TaraHelpers::getCostFunctionByID(int i) {
 
 
 int TaraHelpers::insertTransition(std::string name) {
-  //std::cerr << "inserting transition: " << name << " at position: ";
   int old = getTransitionID(name);
   if (old == -1) {
     int size = transitions.size();
     transitions.push_back(name);
     transitionNames[name] = size;
-    //std::cerr << size << std::endl;
     return size;
   }
-    //std::cerr << old << std::endl;
- 
   return old;
 }
 int TaraHelpers::getTransitionID(std::string name) {
@@ -92,11 +88,49 @@ std::string TaraHelpers::getTransitionByID(int i) {
   return transitions[i];
 }
 
+int TaraHelpers::insertLabel(std::string name) {
+  int old = getLabelID(name);
+  if (old == -1) {
+    int size = labels.size();
+    Label l;
+    l.incoming = (name[0] == '?');
+    l.channel = name; 
+    labels.push_back(l);
+    labelNames[name] = size;
+    return size;
+  }
+  return old;
+}
+int TaraHelpers::getLabelID(std::string name) {
+  if (labelNames.find(name) != labelNames.end()) {
+    return labelNames[name];
+  } 
+  return -1;
+}
+
+Label& TaraHelpers::getLabelByID(int i) {
+  return labels[i];
+}
+
+
 std::string itoa(long n){
 	std::ostringstream stream;
 	stream <<n;
 	return stream.str();
 }
+
+void TaraHelpers::setLabel(int t, int l) {
+  lambda[t] = l;
+}
+
+int TaraHelpers::getLabel(int t) {
+  if (lambda.find(t) != lambda.end()) {
+    return lambda[t];
+  }
+  
+  return -1;
+} 
+
 
 std::vector<DFA*> TaraHelpers::automata;
 std::map<std::string, int> TaraHelpers::automataNames;
@@ -104,4 +138,6 @@ std::vector<CostFunction*> TaraHelpers::costFunctions;
 std::map<std::string, int> TaraHelpers::costFunctionNames;
 std::map<std::string, int> TaraHelpers::transitionNames;
 std::vector<std::string> TaraHelpers::transitions;
-
+std::map<std::string, int> TaraHelpers::labelNames;
+std::vector<Label> TaraHelpers::labels;
+std::map<int, int> TaraHelpers::lambda;

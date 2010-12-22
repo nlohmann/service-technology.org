@@ -293,7 +293,7 @@ int main(int argc, char** argv) {
   KnowledgeGraph kg = KnowledgeGraph(&cg);
   kg.print();
   kg.printToDot();
-
+/*
   // set output destination
   if(args_info.output_given){
      //Append format suffix to file name
@@ -304,7 +304,7 @@ int main(int argc, char** argv) {
     // todo: print to command line
   
   }
-
+*/
     return EXIT_SUCCESS;
 }
 /* <<-- CHANGE END -->> */

@@ -101,6 +101,8 @@ int TaraHelpers::insertLabel(std::string name) {
   }
   return old;
 }
+
+
 int TaraHelpers::getLabelID(std::string name) {
   if (labelNames.find(name) != labelNames.end()) {
     return labelNames[name];
@@ -119,6 +121,21 @@ std::string itoa(long n){
 	return stream.str();
 }
 
+bool subset(std::set<int>& left, std::set<int>& right) {
+
+  for (std::set<int>::iterator it = left.begin(); it != left.end(); ++it) {
+    
+    if (right.find(*it) == right.end()) {
+      return false;
+    }
+  
+  }  
+  
+  return true;
+
+}
+
+
 void TaraHelpers::setLabel(int t, int l) {
   lambda[t] = l;
 }
@@ -130,6 +147,21 @@ int TaraHelpers::getLabel(int t) {
   
   return -1;
 } 
+
+
+
+std::string revLabelString(std::string s) {
+
+  if (s[0] == '?') {
+    return "!" + s.substr(1);
+  } else {
+    return "?" + s.substr(1);
+  
+  }
+  
+  
+
+}
 
 
 std::vector<DFA*> TaraHelpers::automata;

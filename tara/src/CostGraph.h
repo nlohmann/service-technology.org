@@ -12,13 +12,15 @@
 #include "CostFunction.h"
 #include "TaraHelpers.h"
 
+class Policy;
+
 class CostGraph : public ReachabilityGraph {
 public:  
   
   std::map<int, std::vector<int> > dfaStates;
   std::map<int, std::vector<int> > values;
   
-  CostGraph(ReachabilityGraph& rg);
+  CostGraph(ReachabilityGraph& rg, std::vector<Policy*>& policies);
   void print_r(int s, std::set<int>& visited);
   void print();
 
@@ -42,7 +44,8 @@ public:
   
   bool sit_enables(Situation s, int t) {
     int l = TaraHelpers::getLabel(t);  
-    return (enables(s.state,t) && ((l == -1) || (!TaraHelpers::getLabelByID(l).incoming) || s.inputBuffer.occ(l) > 0)); 
+    //return (enables(s.state,t) && ((l == -1) || (!TaraHelpers::getLabelByID(l).incoming) || s.inputBuffer.occ(l) > 0)); 
+    return enables(s.state, t);
   }
   
   Situation sit_yields(Situation s, int t) {
@@ -61,6 +64,13 @@ public:
     }
     return sprime;
      
+  }
+  
+  std::string nodeString(int s) {
+     if (s == 0) {
+      return "BAD STATE";
+     }
+     return itoa(s) + " (" + markingString(s) + stateString(s) + valueString(s) + ")";
   }
   
   std::set<Situation> closure(std::set<Situation>& bubble);

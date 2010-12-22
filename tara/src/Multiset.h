@@ -3,13 +3,15 @@
 
 #include <map>
 #include <set>
+#include "TaraHelpers.h"
 
 template <class T>
 class Multiset {
+  public:
+
   std::set<T> mCarrier;
   unsigned int mSize;
   std::map<T, unsigned int> mMap;
-  public:
   unsigned int insert(T& element);
   void removeOnce(T& element);
   void removeAll(T& element);
@@ -28,7 +30,7 @@ template <class T>
 unsigned int Multiset<T>::insert(T& element) {
   
   if (mMap.find(element) != mMap.end()) {
-    ++mMap[element]; 
+    mMap[element] = mMap.find(element)->second + 1; 
   } else {
     mMap[element] = 1;
     mCarrier.insert(element);
@@ -89,7 +91,7 @@ bool Multiset<T>::operator == (const Multiset<T> & other) const {
 }
 
 template <class T>
-bool Multiset<T>::operator< (const Multiset<T> & other) const {
+bool Multiset<T>::operator< (const Multiset<T> & other) const {  
   return mMap < other.mMap;
 }
 

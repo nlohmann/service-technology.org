@@ -5,7 +5,6 @@
 #include <vector>
 #include <set>
 #include <string>
-#include "Condition.h"
 #include "Multiset.h"
 #include "Situation.h"
 
@@ -35,7 +34,7 @@ class ReachabilityGraph {
 
   std::set<int> reachableNodes(int state);
 
-  void removeIndifferents(MarkingCondition& condition);
+  //void removeIndifferents(MarkingCondition& condition);
 };
 
 #endif

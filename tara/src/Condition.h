@@ -2,17 +2,21 @@
 #define CONDITION_H
 
 #include <map>
-#include "ReachabilityGraph.h"
 
-class ReachabilityGraph;
+class CostGraph;
 
 class MarkingCondition {
   
   
 public: 
-  bool satisfies(int state, ReachabilityGraph& rg);
+  virtual bool satisfies(int state, CostGraph* cg);
   std::map<int, std::pair<int, int> > constraints;
 
 };
+
+class PermanentCondition : public MarkingCondition {
+  virtual bool satisfies(int state, CostGraph* cg) {return true;}
+};
+
 
 #endif

@@ -1,9 +1,9 @@
 #include "Condition.h"
-#include "ReachabilityGraph.h"
+#include "CostGraph.h"
 
-bool MarkingCondition::satisfies(int state, ReachabilityGraph& rg) {
+bool MarkingCondition::satisfies(int state, CostGraph* cg) {
   
-  for (int i = 0; i < rg.places.size(); ++i) {
+  for (int i = 0; i < cg->places.size(); ++i) {
     
     
     
@@ -11,7 +11,7 @@ bool MarkingCondition::satisfies(int state, ReachabilityGraph& rg) {
       int lower = constraints[i].first;
       int upper = constraints[i].second;
     
-      if (rg.getTokens(state,i) > upper || rg.getTokens(state,i) < lower) {return false;}
+      if (cg->getTokens(state,i) > upper || cg->getTokens(state,i) < lower) {return false;}
 
   }
   }

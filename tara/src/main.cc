@@ -40,6 +40,7 @@
 #include "CostGraph.h"
 #include "Multiset.h"
 #include "KnowledgeGraph.h"
+#include "Policy.h"
 
 using std::cerr;
 using std::cout;
@@ -165,8 +166,6 @@ void terminationHandler() {
 /// main-function
 int main(int argc, char** argv) {
     
-    TaraHelpers::insertLabel("?hallo");
-    
     time_t start_time, end_time;
 
     // set the function to call on normal termination
@@ -226,17 +225,74 @@ int main(int argc, char** argv) {
   for (int i = 0; i < args_info.dfa_given; ++i) {  
     int last = TaraHelpers::insertDFA(new DFA(std::string(args_info.dfa_arg[i]))); 
   }
+  std::vector<std::pair<int,int> > bounds;
   
   for (int i = 0; i < args_info.costfunction_given; ++i) {  
-    int last = TaraHelpers::insertCostFunction(new StandardCostFunction(std::string(args_info.costfunction_arg[i]))); 
+    int last = TaraHelpers::insertCostFunction(new StandardCostFunction(std::string(args_info.costfunction_arg[i])));
+    bounds.push_back(std::pair<int,int>(-60,60)); 
   }
   
+  
+  
+  
+  
+  
+  // Parsing the open net, using the PNAPI
+		status("Processing %s", args_info.net_arg[0]);
+		pnapi::PetriNet* net = new pnapi::PetriNet;
+
+		try {
+
+			// parse either from standard input or from a given file
+				
+				std::ifstream inputStream;
+				inputStream.open(args_info.net_arg);
+				inputStream >> pnapi::io::owfn >> *(net);
+				inputStream.close();
+
+			std::stringstream pnstats;
+			pnstats << pnapi::io::stat << *(net);
+
+			message("read net %s", pnstats.str().c_str());
+		} catch (pnapi::exception::InputError error) {
+			std::stringstream inputerror;
+			inputerror << error;
+			abort(3, "pnapi error %i", inputerror.str().c_str());
+		}	
+
    
-  CostGraph cg = CostGraph(rg);
+     
+  // Insert labels and assign them to transitions
+  for (std::set<pnapi::Transition*>::iterator it = net->getTransitions().begin(); it !=   net->getTransitions().end(); ++it) {
+  
+    int curTransition = TaraHelpers::insertTransition((*it)->getName());
+    std::set<pnapi::Label*> inLabels = (*it)->getInputLabels();
+    std::set<pnapi::Label*> outLabels = (*it)->getOutputLabels();
+    for (std::set<pnapi::Label*>::iterator it2 = inLabels.begin(); it2 != inLabels.end(); ++it2) {
+      int curLabel = TaraHelpers::insertLabel("?" + (*it2)->getName());
+      TaraHelpers::setLabel(curTransition, curLabel);
+    }
+    for (std::set<pnapi::Label*>::iterator it2 = outLabels.begin(); it2 != outLabels.end(); ++it2) {
+      int curLabel = TaraHelpers::insertLabel("!" + (*it2)->getName());
+      TaraHelpers::setLabel(curTransition, curLabel);
+    }
+  } 
+  
+  
+  
+  Policy* p = new PermanentPolicy(bounds); 
+  std::vector<Policy*> policies;
+  policies.push_back(p); 
+  CostGraph cg = CostGraph(rg, policies);
   cg.print();
-  
+  /*Situation s;
+  s.state = 0;
+  std::set<Situation> S;
+  S.insert(s);
+  cg.closure(S);*/
   KnowledgeGraph kg = KnowledgeGraph(&cg);
-  
+  kg.print();
+  kg.printToDot();
 
   // set output destination
   if(args_info.output_given){

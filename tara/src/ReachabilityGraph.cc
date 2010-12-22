@@ -104,19 +104,6 @@ void ReachabilityGraph::removeNode(int s) {
   }
 }
 
-bool subset(std::set<int>& left, std::set<int>& right) {
-
-  for (std::set<int>::iterator it = left.begin(); it != left.end(); ++it) {
-    
-    if (right.find(*it) == right.end()) {
-      return false;
-    }
-  
-  }  
-  
-  return true;
-
-}
 
 std::set<int> ReachabilityGraph::reachableNodes(int state) {
   
@@ -147,12 +134,12 @@ std::set<int> ReachabilityGraph::reachableNodes(int state) {
   return result;
 
 }
-
+/*
 void ReachabilityGraph::removeIndifferents(MarkingCondition& condition) {
 
   std::set<int> redNodes, toRemove;
   for (std::set<int>::iterator it = states.begin(); it != states.end(); ++it) {
-    if (!condition.satisfies(*it, *this)) {
+    if (!condition.satisfies(*it, this)) {
       redNodes.insert(*it);
       // //std::cerr << "red node " << *it << std::endl;
     }  
@@ -174,7 +161,7 @@ void ReachabilityGraph::removeIndifferents(MarkingCondition& condition) {
 
 }
 
-
+*/
 
 /*
 

@@ -17,6 +17,9 @@ public:
   // nodes -> labels -> nodes
   std::map<int, std::map<int, int> > delta;
 
+  // nodes -> T/F
+  std::map<int, bool> good;
+
   int getNode(std::set<Situation> situations);    
   
   // Nodes should only be inserted if they do not exist yet
@@ -24,6 +27,12 @@ public:
 
   // A knowledge graph is computed from a cost graph
   KnowledgeGraph(CostGraph* cg);
+  
+  void print_r(int s, std::set<int>& visited);
+  void print();
+  
+  void printToDot_r(int s, std::set<int>& visited);
+  void printToDot();
   
 };
 

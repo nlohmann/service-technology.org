@@ -1,10 +1,14 @@
+#include <iostream>
 #include "CostGraph.h"
+#include "Policy.h"
 
-CostGraph::CostGraph(ReachabilityGraph& rg) {
+CostGraph::CostGraph(ReachabilityGraph& rg, std::vector<Policy*>& policies) {
   
-  int currentState = 0;
-  root = 0;
-    places = rg.places;
+  states.insert(0); // bad state!
+  
+  int currentState = 1;
+  root = 1;
+  places = rg.places;
    
   std::stack<std::vector<int> > dfaStatesStack;
   std::stack<std::vector<int> > valuesStack;
@@ -64,60 +68,81 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
     }
   
     if (!found) {
+
       states.insert(currentState);
       dfaStates[currentState] = currentDFAStates;
       values[currentState] = currentValues;
       tokens[currentState] = currentMarking;    
-  //    std::cerr << "nr of states: " << states.size() << std::endl;
-  //    std::cerr << "nr of places in marking: " << tokens[currentState].size() << std::endl;
-  //    for (std::map<int, int>::iterator it = tokens[currentState].begin(); it != tokens[currentState].end(); ++it) {
-  //      std::cerr << it->second << "; ";
-  //    }
-   //   std::cerr << std::endl;
-    //  std::cerr << "inserting new state: " << currentState << " : " << markingString(currentState) << "; " << stateString(currentState) << "; " << valueString(currentState) << std::endl;
-      if (currentReferrer != -1) {
-        (delta[currentReferrer])[currentAction] = currentState;
-          // //std::cerr << "delta has entries for " << delta.size() << " states. current: " << delta[currentReferrer].size() << std::endl;
-        // //std::cerr << "inserting edge to new node: " << currentReferrer << "->" << currentState << std::endl;
-      }
       
-      ++currentState;
+      // determine if the state is good. if yes, keep it, otherwise, use bad state 0
+      bool good = true;
+      for (int pc = 0; pc < policies.size(); ++pc) {
       
-      int srcState; 
+        if (!policies[pc]->satisfies(this, currentState)) {
+          good = false; break;
+        }
       
-      if (currentSrcReferrer == -1) {
-        srcState = rg.root;
-      } else {
-        srcState = rg.yields(currentSrcReferrer, currentAction);
-        // //std::cerr << "new src state: " << srcState << std::endl;
-      }
+      } // end for
       
-      std::set<int> enabled = rg.enabledTransitions(srcState);
-      //std::cerr << enabled.size() << std::endl;      
-      for (std::set<int>::iterator it = enabled.begin(); it != enabled.end(); ++it) {
-        
-        std::vector<int> currentValuesN;
-        std::vector<int> currentDFAStatesN;
-        
-        
-        for (int i = 0; i < currentValues.size(); ++i) {
-          currentValuesN.push_back(currentValues[i] + TaraHelpers::getCostFunctionByID(i)->next(*it, currentDFAStates));
-        } 
+      if (good) {
 
-        for (int i = 0; i < currentDFAStates.size(); ++i) {
-          currentDFAStatesN.push_back(TaraHelpers::getDFAByID(i)->getNewState(currentDFAStates[i], *it));
-        } 
+        if (currentReferrer != -1) {
+          (delta[currentReferrer])[currentAction] = currentState;
+            // //std::cerr << "delta has entries for " << delta.size() << " states. current: " << delta[currentReferrer].size() << std::endl;
+          // //std::cerr << "inserting edge to new node: " << currentReferrer << "->" << currentState << std::endl;
+        } // end if
         
-        // //std::cerr << "pushing: " << rg.markingString(rg.yields(srcState,*it)) << " ref: " << srcState <<  std::endl;        
-                
-        referrerStack.push(currentState-1);
-        srcReferrerStack.push(srcState);
-        actionStack.push(*it);
-        dfaStatesStack.push(currentDFAStatesN);
-        valuesStack.push(currentValuesN);
-        markingStack.push(std::map<int,int>(rg.tokens[rg.yields(srcState,*it)]));
-              
+        ++currentState;
+        int srcState; 
+      
+        if (currentSrcReferrer == -1) {
+          srcState = rg.root;
+        } else {
+          srcState = rg.yields(currentSrcReferrer, currentAction);
+        // //std::cerr << "new src state: " << srcState << std::endl;
+        } // end if
+      
+        std::set<int> enabled = rg.enabledTransitions(srcState);
+        //std::cerr << enabled.size() << std::endl;      
+        for (std::set<int>::iterator it = enabled.begin(); it != enabled.end(); ++it) {
+        
+          std::vector<int> currentValuesN;
+          std::vector<int> currentDFAStatesN;
+        
+        
+          for (int i = 0; i < currentValues.size(); ++i) {
+              currentValuesN.push_back((int) currentValues[i] + (int) (TaraHelpers::getCostFunctionByID(i)->next(*it, currentDFAStates)));
+          } // end for
+
+          for (int i = 0; i < currentDFAStates.size(); ++i) {
+            currentDFAStatesN.push_back(TaraHelpers::getDFAByID(i)->getNewState(currentDFAStates[i], *it));
+          } // end for
+        
+          // //std::cerr << "pushing: " << rg.markingString(rg.yields(srcState,*it)) << " ref: " << srcState <<  std::endl;        
+                  
+          referrerStack.push(currentState-1);
+          srcReferrerStack.push(srcState);
+          actionStack.push(*it);
+          dfaStatesStack.push(currentDFAStatesN);
+          valuesStack.push(currentValuesN);
+          markingStack.push(std::map<int,int>(rg.tokens[rg.yields(srcState,*it)]));
+             } 
+      } else {
+      
+        if (currentReferrer != -1) {
+          (delta[currentReferrer])[currentAction] = 0;
+            // //std::cerr << "delta has entries for " << delta.size() << " states. current: " << delta[currentReferrer].size() << std::endl;
+          // //std::cerr << "inserting edge to new node: " << currentReferrer << "->" << currentState << std::endl;
+        }
+      
+      
       }
+
+
+      }
+    
+    
+      
     
     }
 
@@ -126,7 +151,7 @@ CostGraph::CostGraph(ReachabilityGraph& rg) {
   }
   
     
-  }
+  
   
   
   std::string CostGraph::stateString(int s) {
@@ -187,20 +212,23 @@ std::set<Situation> CostGraph::closure(std::set<Situation>& bubble) {
   std::set<Situation> result;
   std::stack<Situation> sitStack;
   
-  for (std::set<Situation>::iterator it = result.begin(); it != result.end(); ++it) {
+  for (std::set<Situation>::iterator it = bubble.begin(); it != bubble.end(); ++it) {
     sitStack.push(*it);    
+  //  std::cerr << "pushing " << it->state << std::endl;
   }
   
   while (sitStack.size() != 0) {
   
     Situation s = sitStack.top(); sitStack.pop();
-    bool found = result.find(s) != result.end();
+//    bool found = result.find(s) != result.end();
+    bool found = result.count(s) == 1;
+  //  std::cerr << "situation: " << s.state << " was found? " << found << std::endl;
     if (!found) {
       result.insert(s);
       std::set<int> ens = sit_enabledTransitions(s);
-      
+    //  std::cerr << "nr of enabled transitions: " << ens.size() << std::endl;
       for (std::set<int>::iterator it = ens.begin(); it != ens.end(); ++it) {
-    
+    //    std::cerr << "push " << sit_yields(s, *it).state << std::endl;
         sitStack.push(sit_yields(s, *it));
       
       }
@@ -209,7 +237,7 @@ std::set<Situation> CostGraph::closure(std::set<Situation>& bubble) {
   
   
   }
-
+  //std::cerr << "returning a closure of size " << result.size() << std::endl;
   return result;
 }
 

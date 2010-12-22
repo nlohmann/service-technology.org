@@ -16,7 +16,7 @@ tara_SOURCES =  main.cc \
                 Multiset.h Multiset.cc \
                 KnowledgeGraph.h KnowledgeGraph.cc \
                 Situation.h Situation.cc \
-                Label.h 
+                Label.h Policy.h Policy.cc
                 
 # <<-- CHANGE END -->>
 

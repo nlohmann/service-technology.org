@@ -43,6 +43,7 @@ public:
   static std::string getTransitionByID(int i);
 
   static int insertLabel(std::string name);
+  
   static int getLabelID(std::string name);
   static Label& getLabelByID(int i);
 
@@ -50,5 +51,7 @@ public:
 };
 
 std::string itoa(long n);
+bool subset(std::set<int>& left, std::set<int>& right);
+std::string revLabelString(std::string);
 
 #endif

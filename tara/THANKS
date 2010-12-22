@@ -1,12 +1,13 @@
-			 __    __   _______  __       __        ______   
-			|  |  |  | |   ____||  |     |  |      /  __  \  
-			|  |__|  | |  |__   |  |     |  |     |  |  |  | 
-			|   __   | |   __|  |  |     |  |     |  |  |  | 
-			|  |  |  | |  |____ |  `----.|  `----.|  `--'  | 
-			|__|  |__| |_______||_______||_______| \______/  
-			<<-- Hello World (Short Mission Statement) -->>
-			http://service-technology.org/hello
+                 _____
+                |_   _|_ _ _ __ __ _
+                  | |/ _` | '__/ _` |
+                  | | (_| | | | (_| |
+                  |_|\__,_|_|  \__,_|
+
+Tackling non-functional properties for stateful services
+          http://service-technology.org/tara
+
 
 
 ACKNOWLEDGEMENTS
-  <<-- * Thanks to ... -->>
+  Thanks to the BEST-guys for the enlightening hours at the whiteboard :)

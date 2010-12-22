@@ -1,11 +1,12 @@
-			 __    __   _______  __       __        ______   
-			|  |  |  | |   ____||  |     |  |      /  __  \  
-			|  |__|  | |  |__   |  |     |  |     |  |  |  | 
-			|   __   | |   __|  |  |     |  |     |  |  |  | 
-			|  |  |  | |  |____ |  `----.|  `----.|  `--'  | 
-			|__|  |__| |_______||_______||_______| \______/  
-			<<-- Hello World (Short Mission Statement) -->>
-			http://service-technology.org/hello
+                 _____
+                |_   _|_ _ _ __ __ _
+                  | |/ _` | '__/ _` |
+                  | | (_| | | | (_| |
+                  |_|\__,_|_|  \__,_|
+
+Tackling non-functional properties for stateful services
+          http://service-technology.org/tara
+
 
 
 In order to run, compile, and develop Tara, several tools are required.
@@ -13,19 +14,8 @@ In order to run, compile, and develop Tara, several tools are required.
 Runtime
 -------
 
-   * Wendy (`http://service-technology.org/wendy'). A suitable Wendy binary
-     can be created as follows:
-       1. download `http://service-technology.org/files/wendy/wendy.tar.gz'
-
-       2. untar `wendy.tar.gz', configure
-
-       3. call `make'
-
-       4. copy the binary `src/wendy' to a directory of your path (e.g.,
-          `/usr/local/bin') or call `make install'
-
-Tara's configure script checks whether Wendy (with binary `wendy') is found in
-the path and adjusts the configuration file `src/tara.conf' accordingly.
+   * At this point, Tara does not utilize other tools. 
+   * Tara's main output is dot.
 
 Compilation
 -----------
@@ -56,8 +46,6 @@ required to reconfigure and compile Tara.
    * help2man, `http://www.gnu.org/software/help2man/'
 
    * Texinfo, `http://www.gnu.org/software/texinfo/'
-
-
 
 
 Please check our nightly build server at

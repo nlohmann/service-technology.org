@@ -1,41 +1,33 @@
-			 __    __   _______  __       __        ______   
-			|  |  |  | |   ____||  |     |  |      /  __  \  
-			|  |__|  | |  |__   |  |     |  |     |  |  |  | 
-			|   __   | |   __|  |  |     |  |     |  |  |  | 
-			|  |  |  | |  |____ |  `----.|  `----.|  `--'  | 
-			|__|  |__| |_______||_______||_______| \______/  
-			<<-- Hello World (Short Mission Statement) -->>
-			http://service-technology.org/hello
+                 _____
+                |_   _|_ _ _ __ __ _
+                  | |/ _` | '__/ _` |
+                  | | (_| | | | (_| |
+                  |_|\__,_|_|  \__,_|
+
+Tackling non-functional properties for stateful services
+          http://service-technology.org/tara
 
 
 COPYRIGHT
-    Copyright (c) <<-- 20XX AUTHOR1, AUTHOR2, ... -->>
+    Copyright (c) 2010 Jan Suermeli
 
 
 AUTHORS
-    <<-- CHANGE START (authors) -->>
-    AUTHOR1
-        implemented ...
-    AUTHOR2
-        implemented ...
-    ... 
-    <<-- CHANGE END -->>
+    Jan Suermeli
 
 
 MAINTAINER
-    Hello is maintained by <<-- MAINTAINER -->>.
+    Tara is maintained by Jan Suermeli.
 
 
 CONTACT
-    <<-- CHANGE START (contact Information) -->>
-    SOMEBODY
+    Jan Suermeli
     Institut fuer Informatik
-    Lehrstuhl ...
-    Universitaet ...
-    PLZ, ORT
+    Lehrstuhl Reisig
+    Humboldt-Universitaet zu Berlin
+    10999 Berlin
 
-    (Phone:  ... )
-    (Skype:  ... )
-    <<-- CHANGE END -->>
-    WWW:  http://service-technology.org/hello
-    E-Mail:  hello@service-technology.org
+    (Phone:  +49 30 2093 3070 )
+    (Skype:  blinkbear )
+    WWW:  http://service-technology.org/tara
+    E-Mail:  tara@service-technology.org

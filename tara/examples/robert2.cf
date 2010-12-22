@@ -1,0 +1,31 @@
+name = "g";
+
+automata = ["robert"];
+
+cases = (
+    { name = "robert_feels_rather_good";
+      condition = (["robert", "_ACCEPT_"]); 
+    }
+    ,  
+    { name = "robert_feels_rather_bad";
+      condition = (["robert", "_REJECT_"]); 
+    }
+
+
+);
+
+actions = ["work"]; 
+
+values = (
+  {
+  action = "work";
+  case = "robert_feels_rather_good"; 
+  value = 10;
+  }
+  ,
+  {
+  action = "work";
+  case = "robert_feels_rather_bad"; 
+  value = 50;
+  }
+);

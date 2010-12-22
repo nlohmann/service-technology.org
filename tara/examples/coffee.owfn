@@ -1,0 +1,28 @@
+PLACE
+  INTERNAL
+    waiting,brewing;
+
+  INPUT
+    coffee, tea;
+
+  OUTPUT
+    beverage;
+
+
+INITIALMARKING
+  waiting:	1;
+
+NOFINALMARKING
+
+TRANSITION c
+  CONSUME waiting, coffee;
+  PRODUCE brewing;
+
+TRANSITION t
+  CONSUME waiting, tea;
+  PRODUCE brewing;
+
+TRANSITION o
+  CONSUME brewing;
+  PRODUCE waiting, beverage;
+  

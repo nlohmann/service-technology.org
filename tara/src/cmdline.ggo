@@ -39,6 +39,11 @@ option "costfunction" f
   typestr="FILENAME"
   optional
   multiple
+  
+option "net" n 
+  "Open net file explaining the interface."
+  string
+  typestr="FILENAME"
 
 
 section "Configuration"

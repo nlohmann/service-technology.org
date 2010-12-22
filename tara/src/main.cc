@@ -238,7 +238,7 @@ int main(int argc, char** argv) {
   
   
   // Parsing the open net, using the PNAPI
-		status("Processing %s", args_info.net_arg[0]);
+		status("Processing %s", args_info.net_arg);
 		pnapi::PetriNet* net = new pnapi::PetriNet;
 
 		try {

@@ -163,6 +163,13 @@ void KnowledgeGraph::printToDot() {
   // //std::cerr << "hallo" << std::endl;
   if (visited.find(s) == visited.end()) {
     visited.insert(s);
+    if (s > 1) {
+      std::string myLabel;
+      for (std::set<Situation>::iterator it = bubbles[s].begin(); it != bubbles[s].end(); ++it) {
+        myLabel += cg->valueString(it->state);
+      }
+      std::cout << s << "[label=\"" << myLabel << "\"]" << std::endl;
+    }
 
     if (delta.find(s) != delta.end()) {
     

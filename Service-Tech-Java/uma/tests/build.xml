@@ -11,7 +11,9 @@
 	<property name="dir.test-bin" location="${test.basedir}/bin-test" />
 	<property name="dir.test-instrument" location="${test.basedir}/bin-test-instrument" />
 	
-	<property name="dir.coveragereport" location="${test.basedir}/cover-html" />
+	<property name="dir.coveragereport.html" location="${test.basedir}/cover-html" />
+	<property name="dir.coveragereport.xml" location="${test.basedir}/cover-xml" />
+	<property name="src.coveragereport" location="${src}" />
 	
 	<property name="testfiles" location="${test.basedir}/testfiles" />
 	
@@ -75,8 +77,9 @@
 	      <!-- class path of the code to test and the Junit framework -->
 	      <classpath refid="classpath.test"/>
 
-		  <!-- Cobertura: generate HTML coverage report -->
-	      <formatter type="plain" usefile="false" />
+		  <!-- JUnit: set output format -->
+	      <formatter type="xml" />
+    	  <formatter type="plain" />
 	    	
 	      <!-- JUnit: test cases to run -->
     	  <sysproperty key="test.testFileRoot" path="${testfiles}"/>
@@ -85,7 +88,10 @@
 	    </junit>
 		
 		<!-- Cobertura: generate HTML coverage report -->
-		<cobertura-report srcdir="${src}" destdir="${dir.coveragereport}"/>
+		<cobertura-report destdir="${dir.coveragereport.html}" format="html" srcdir="${src.coveragereport}">
+		</cobertura-report>
+		<cobertura-report destdir="${dir.coveragereport.xml}" format="xml" srcdir="${src.coveragereport}">
+		</cobertura-report>		
 		
 		
 		<echo message="Running binary tests in ${test.basedir}" />
@@ -128,13 +134,24 @@
 
 		<delete dir="${_dir}" includeemptydirs="true" />
 
-
 	</target>
 	
 	<target name="clean">
 		<delete dir="${dir.test-bin}" includeemptydirs="true" failonerror="false"/>
 		<delete dir="${dir.test-instrument}" includeemptydirs="true" failonerror="false"/>
 		<delete file="${test.basedir}/cobertura.ser" failonerror="false"/>
+	</target>
+	
+	<target name="svn-clean" depends="clean">
+		<delete dir="${dir.coveragereport.html}" includeemptydirs="true" failonerror="false"/>
+		<delete dir="${dir.coveragereport.xml}" includeemptydirs="true" failonerror="false"/>
+		<!-- test reports -->
+		<delete failonerror="false">
+			<fileset dir="${test.basedir}">
+				<include name="TEST-*.xml"/>
+				<include name="TEST-*.txt"/>
+			</fileset>
+		</delete>
 	</target>
 	
 </project>

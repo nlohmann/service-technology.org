@@ -7,7 +7,7 @@ public class TestCase extends junit.framework.TestCase{
     setName(name);
   }
   
-  public static String testFileRoot = System.getProperty("test.testFileRoot", ".");;
+  public static String testFileRoot = System.getProperty("test.testFileRoot", ".");
   
   public static String lastTest = "";
   public int testNum = 0;

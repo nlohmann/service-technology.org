@@ -1,0 +1,29 @@
+name = "f";
+
+automata = ["last_selection"];
+
+cases = (
+    { name = "last_selection_was_coffee";
+      condition = (["last_selection", "coffee"]); 
+    }
+    ,  
+    { name = "last_selection_was_tea";
+      condition = (["last_selection", "tea"]); 
+    }
+);
+
+actions = ["bs"]; 
+
+values = (
+  {
+  action = "bs";
+  case = "last_selection_was_coffee"; 
+  value = -3;
+  }
+  ,
+  {
+  action = "bs";
+  case = "last_selection_was_tea"; 
+  value = -5;
+  }
+);

@@ -1,0 +1,14 @@
+name = "c";
+
+condition = (
+    { place = "D";
+      bounds = [1, 1]; 
+    }
+);
+
+require = (
+  {
+  function = "f";
+  bounds = [-1000,-4];
+  }
+);

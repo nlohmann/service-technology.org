@@ -26,12 +26,20 @@ option "dfa" d
 
 option "costfunction" f
   "A cost function file"
-  details="Use this option to provide a cost function. You can provide more than one cost function, e.g. -d foo.cf -d bar.cf .\n"
+  details="Use this option to provide a cost function. You can provide more than one cost function, e.g. -f foo.cf -f bar.cf .\n"
   string
   typestr="FILENAME"
   optional
   multiple
-  
+
+option "pol" p
+  "A policy file"
+  details="Use this option to provide a policy. You can provide more than one policy, e.g. -p foo.pol -p bar.pol .\n"
+  string
+  typestr="FILENAME"
+  optional
+  multiple
+
 option "net" n 
   "Please provide an open net file explaining the interface bindings of the transitions occurring in the reachability graph. NB: The rest of the file is ignored."
   string

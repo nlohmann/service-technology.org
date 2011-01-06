@@ -51,18 +51,18 @@ int StandardCostFunction::next(int action, std::vector<int>& dfaStates) {
 
 StandardCostFunction::StandardCostFunction(std::string filename) {
 
-  Config dfa;
-  dfa.readFile(filename.c_str());
+  Config cf;
+  cf.readFile(filename.c_str());
   
-  dfa.lookupValue("name", name);
+  cf.lookupValue("name", name);
   
   // cases 
-  Setting& cCases = dfa.lookup("cases");
+  Setting& cCases = cf.lookup("cases");
   for (int i = 0; i < cCases.getLength(); ++i) {
     Setting& cCase = cCases[i];
     std::string caseName;
     cCase.lookupValue("name", caseName);
-    Setting& cCondition = dfa.lookup(cCase.getPath() + ".condition");
+    Setting& cCondition = cf.lookup(cCase.getPath() + ".condition");
     
     cases.push_back(Condition());
     Condition& currentCase = cases[cases.size()-1];
@@ -84,7 +84,7 @@ StandardCostFunction::StandardCostFunction(std::string filename) {
   }
   
   // values
-  Setting& cValues = dfa.lookup("values");
+  Setting& cValues = cf.lookup("values");
   for (int i = 0; i < cValues.getLength(); ++i) {
     Setting& cValueTriple = cValues[i];
     std::string action, caseName;

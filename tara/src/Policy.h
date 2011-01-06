@@ -5,17 +5,24 @@
 #include "Condition.h"
 
 class CostGraph;
+class ReachabilityGraph;
 
 class Policy {
   public:
   MarkingCondition* condition;
-  std::vector<std::pair<int,int> > bounds;
+  std::map<int, std::pair<int,int> > bounds;
   bool satisfies(CostGraph* cg, int state);
+  std::string name;
+};
+
+class SimplePolicy : public Policy {
+  public: 
+  SimplePolicy(std::string filename, ReachabilityGraph* rg);
 };
 
 class PermanentPolicy : public Policy {
 public:
-  PermanentPolicy(std::vector<std::pair<int,int> > bounds) {
+  PermanentPolicy(std::map<int, std::pair<int,int> > bounds) {
     condition = new PermanentCondition();
     this->bounds = bounds;
   }

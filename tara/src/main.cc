@@ -280,16 +280,12 @@ int main(int argc, char** argv) {
   
   
 
-  MarkingCondition* mc = new MarkingCondition();
- 
-  mc->constraints[rg.insertPlace("D")] = std::pair<int,int>(1,1);
-  
- // Policy* p = new PermanentPolicy(bounds); 
-  Policy* p = new Policy();
-  p->condition = mc;
-  p->bounds.push_back(std::pair<int,int>(-10000,-5));  
   std::vector<Policy*> policies;
-  policies.push_back(p); 
+
+  for (int i = 0; i < args_info.dfa_given; ++i) {  
+	policies.push_back(new SimplePolicy(args_info.pol_arg[i], &rg)); 
+ }
+ 
   CostGraph cg = CostGraph(rg, policies);
   cg.print();
   /*Situation s;

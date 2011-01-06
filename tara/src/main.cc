@@ -279,8 +279,15 @@ int main(int argc, char** argv) {
   } 
   
   
+
+  MarkingCondition* mc = new MarkingCondition();
+ 
+  mc->constraints[rg.insertPlace("D")] = std::pair<int,int>(1,1);
   
-  Policy* p = new PermanentPolicy(bounds); 
+ // Policy* p = new PermanentPolicy(bounds); 
+  Policy* p = new Policy();
+  p->condition = mc;
+  p->bounds.push_back(std::pair<int,int>(-10000,-5));  
   std::vector<Policy*> policies;
   policies.push_back(p); 
   CostGraph cg = CostGraph(rg, policies);
@@ -292,6 +299,7 @@ int main(int argc, char** argv) {
   cg.closure(S);*/
   KnowledgeGraph kg = KnowledgeGraph(&cg);
   kg.print();
+  kg.reflag();
   kg.printToDot();
 /*
   // set output destination

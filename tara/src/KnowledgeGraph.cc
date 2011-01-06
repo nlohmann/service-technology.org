@@ -13,6 +13,7 @@ int KnowledgeGraph::insertNode(std::set<Situation> situations) {
   }
   int size = bubbles.size();
   bubbles[size] = situations;
+  flags[size] = 0;
   return size;
 }
 
@@ -101,6 +102,8 @@ KnowledgeGraph::KnowledgeGraph(CostGraph* cg) : cg(cg) {
     }
       
   (delta[currentRefNode])[currentRefAction] = currentNode;
+
+  (invDelta[currentNode]).insert(currentRefNode); 
       
   }
   
@@ -149,8 +152,13 @@ void KnowledgeGraph::printToDot() {
   std::set<int> visited;
   
   std::cout << "digraph{" << std::endl;
-  std::cout << "0 [label=\"Bad state\"]" << std::endl;
-  std::cout << "1 [label=\"Root\"]" << std::endl;
+  //std::cout << "ratio=1.5" << std::endl;
+  std::cout << "edge [fontname=Helvetica fontsize=20]" << std::endl;
+  std::cout << "node [fontname=Helvetica fontsize=0]" << std::endl;
+//  std::cout << "r [label=\"\", width=0, height=0]" << std::endl;
+// std::cout << "r -> 1 [arrowsize=0.5]" << std::endl;
+  std::cout << "0 [label=\"\", shape=circle, width=0.2,height=0.2, style=filled, fillcolor=red]" << std::endl;
+  std::cout << "1 [label=\"\", shape=circle, width=0.2,height=0.2, style=filled, fillcolor=blue]" << std::endl;
   
   printToDot_r(1,visited);
   
@@ -161,14 +169,16 @@ void KnowledgeGraph::printToDot() {
   
   void KnowledgeGraph::printToDot_r(int s, std::set<int>& visited) {
   // //std::cerr << "hallo" << std::endl;
-  if (visited.find(s) == visited.end()) {
+  if (flags[s] == 1 && visited.find(s) == visited.end()) {
     visited.insert(s);
     if (s > 1) {
       std::string myLabel;
       for (std::set<Situation>::iterator it = bubbles[s].begin(); it != bubbles[s].end(); ++it) {
         myLabel += cg->valueString(it->state);
       }
-      std::cout << s << "[label=\"" << myLabel << "\"]" << std::endl;
+      // myLabel = itoa(flags[s]);
+      std::cout << s << "[width=0.1, height=0.1 ,label=\"\"]" << std::endl ; 
+      // << "[label=\"" << myLabel << "\"]" << std::endl;
     }
 
     if (delta.find(s) != delta.end()) {
@@ -176,14 +186,66 @@ void KnowledgeGraph::printToDot() {
       std::map<int,int>& enabled = delta.find(s)->second;
       
       for (std::map<int,int>::iterator it = enabled.begin(); it != enabled.end(); ++it) {
-        std::cout << s << " -> " << it->second << "[label=\"" << revLabelString(TaraHelpers::getLabelByID(it->first).channel) << "\"]" << std::endl;
-        printToDot_r(it->second, visited);
-      
+        if (bubbles[it->second].size() != 0 && flags[it->second] == 1) {
+          std::cout << s << " -> " << it->second << "[arrowsize=0.8, label=\" " << revLabelString(TaraHelpers::getLabelByID(it->first).channel) << "      \"]" << std::endl;
+          printToDot_r(it->second, visited);
+  }
       }
     
     }
   }
 }
 
+void KnowledgeGraph::reflag() {
+  // Start with the bad state's predecessors.
+  // Flag all predecessors with 1.
+  // If a predecessor was already flagged with 1, do not again look at its predecessors.
+  // In the end, flag all 0's with 2's.
+
+  // First flag all states with 0
+  for (int i = 0; i < bubbles.size(); ++i) {
+    
+    if (flags[i] == 0) {
+      flags[i] = 0;
+    }
+    
+  }
+  
+  std::stack<int> toFlag;
+  
+  // push the bad state
+  toFlag.push(0);
+  
+  while (toFlag.size() > 0) {
+    
+    int curState = toFlag.top(); toFlag.pop();
+    if (flags[curState] != 1) { // Flag itself and queue predeccessors!
+      flags[curState] = 1;
+      if (invDelta.find(curState) != invDelta.end()) { // if there is at least one predecessor
+       std::cerr << "found a predecessor" << std::endl;
+      std::set<int>& enabled = invDelta.find(curState)->second; // The map comtaining all predecessors.
+      for (std::set<int>::iterator it = enabled.begin(); it != enabled.end(); ++it) { // run over all predecessors. push them on the stack!
+        if ((*it) != -1) {
+        std::cerr << "pushing " << *it << std::endl;
+        toFlag.push(*it);
+        }
+      }
+      
+    }
+    }
+
+      
+  }
+  
+  // Now run over all states and set flags to 2 if they are not yet set to 1.
+  for (int i = 0; i < bubbles.size(); ++i) {
+    
+    if (flags[i] == 0) {
+      flags[i] = 2;
+    }
+    
+  }
+  
+}
 
 

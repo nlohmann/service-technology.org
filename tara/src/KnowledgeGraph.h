@@ -17,8 +17,12 @@ public:
   // nodes -> labels -> nodes
   std::map<int, std::map<int, int> > delta;
 
-  // nodes -> T/F
-  std::map<int, bool> good;
+  // inverse predecessor map
+  std::map<int, std::set<int> > invDelta;
+
+
+  // 1 - bad state reachable, 2 - bad state not reachable, 0 - no idea
+  std::map<int, int> flags;
 
   int getNode(std::set<Situation> situations);    
   
@@ -33,6 +37,8 @@ public:
   
   void printToDot_r(int s, std::set<int>& visited);
   void printToDot();
+  
+  void reflag();
   
 };
 

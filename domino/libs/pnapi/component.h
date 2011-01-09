@@ -13,9 +13,9 @@
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-08-13 13:25:24 +0200 (Fri, 13 Aug 2010) $
+ * \date    $Date: 2010-12-19 01:57:04 +0100 (Sun, 19 Dec 2010) $
  *
- * \version $Revision: 6026 $
+ * \version $Revision: 6434 $
  */
 
 #ifndef PNAPI_COMPONENT_H
@@ -203,7 +203,7 @@ public: /* public methods */
   /// add an interface label
   void addLabel(Label & label, unsigned int = 1);
   /// remove an interface label
-  void removeLabel(const Label & label);
+  void removeLabel(Label & label);
   //@}
   
   /*!

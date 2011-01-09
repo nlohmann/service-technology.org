@@ -751,9 +751,11 @@ void Transition::addLabel(Label & label, unsigned int weight)
 /*!
  * \brief remove an interface label
  */
-void Transition::removeLabel(const Label & label)
+void Transition::removeLabel(Label & label)
 {
   labels_.erase(const_cast<Label *>(&label));
+  label.removeTransition(*this);
+  updateType();
 }
 
 /*!
@@ -802,6 +804,18 @@ Arc::Arc(PetriNet & net, util::ComponentObserver & observer,
   source_(&source), target_(&target), weight_(weight)
 {
   PNAPI_ASSERT(&observer.getPetriNet() == &net);
+  
+  // if the source is a transition
+  if(dynamic_cast<Place *>(source_) == NULL)
+  {
+    // then the target must be a place
+    PNAPI_ASSERT_USER((dynamic_cast<Place *>(target_) != NULL), "arcs between transitions are not allowed", exception::UserCausedError::UE_ARC_CONFLICT);
+  }
+  else
+  {
+    // the target must be a transition
+    PNAPI_ASSERT_USER((dynamic_cast<Place *>(target_) == NULL), "arcs between places are not allowed", exception::UserCausedError::UE_ARC_CONFLICT);
+  }
 
   observer_.updateArcCreated(*this);
 }

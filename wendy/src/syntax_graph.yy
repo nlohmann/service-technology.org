@@ -108,8 +108,8 @@ state:
         /* ================================================================================= */
 
         /* current marking is representative of an SCC and either reduction by smart sending events or correctness criteria livelock freedom is turned on */
-        if (currentLowlink == $2 and
-                not args_info.ignoreUnreceivedMessages_flag or args_info.correctness_arg == correctness_arg_livelock) {
+        if ((currentLowlink == $2 and not args_info.ignoreUnreceivedMessages_flag)
+            or args_info.correctness_arg == correctness_arg_livelock) {
 
             // insert representative into current SCC of inner markings
             currentSCC.insert($2);

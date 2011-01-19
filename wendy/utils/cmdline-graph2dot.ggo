@@ -1,0 +1,48 @@
+args "--long-help --show-required --include-getopt"
+
+package "graph2dot"
+purpose "Converts a reachability graph into a Graphviz dot notation"
+
+
+section "Input/output"
+
+option "graph" g
+ "Read a reachability graph from file. (If option is omitted, graph2dot reads from stdin)"
+ typestr="FILE"
+ string optional
+
+option "dot" d
+ "Write the dot representation to file. (If option is omitted, graph2dot writes to stdout)"
+ typestr="FILE"
+ string optional
+
+
+section "Options"
+
+option "columns" c
+  "Number of places of a marking to be printed in a state before a newline is printed."
+  int optional
+  
+option "emptyStates" e
+  "Do not print the marking in a state, but only a small circle (useful for large graphs)."
+  flag off
+
+option "pathOnly" p
+  "Only print the states on the witness/counterexample path"
+  flag off
+
+option "filter" f
+  "Print only the marking of the given places in the states. Multiple places can be given, either as comma-separated list or with multiple `--filter' options."
+  typestr="PLACE"
+  string multiple optional
+
+option "exclude" x
+  "Do not print the marking of the given places in the states. Multiple places can be given, either as comma-separated list or with multiple `--exclude' options."
+  typestr="PLACE"
+  string multiple optional
+
+
+text "\n"
+text "Examples:\n"
+text "   graph2dot -c1 -fp1,p2,p3 -g net.graph -d net.dot\n\n"
+text "   lola net.lola -M | graph2dot | dot -Tpng -o net.png"

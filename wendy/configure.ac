@@ -47,6 +47,6 @@ AC_CHECK_SIZEOF([void*])
 # write files
 AC_CONFIG_FILES([
 	Makefile libs/pnapi/Makefile src/Makefile src/wendy.conf doc/Makefile
-	doc/Doxyfile doc/Doxydetails tests/Makefile tests/package.m4])
+	doc/Doxyfile doc/Doxydetails tests/Makefile tests/package.m4 utils/Makefile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

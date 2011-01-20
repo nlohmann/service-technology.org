@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     g.info();
 
     unsigned int i = 0;
-    const unsigned int j = 100;
+    const unsigned int j = 50;
 
 // /*
     while (g.rule63() or g.rule2() or g.rule62() ) {

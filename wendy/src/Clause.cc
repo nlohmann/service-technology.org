@@ -258,7 +258,7 @@ void Clause::printToStream(const bool& dot, std::ostream& file) {
                 file << stringOr;
             }
 
-            file << Label::id2name[i+1];
+            file << Label::id2name[i + 1];
 
             first = false;
         }

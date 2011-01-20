@@ -31,7 +31,7 @@ Results::~Results() {
     delete output;
 }
 
-Results::operator std::ostream&() const {
+Results::operator std::ostream& () const {
     return output->stream();
 }
 

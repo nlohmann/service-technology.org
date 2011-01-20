@@ -63,7 +63,7 @@ Output::Output() :
 Output::Output(const std::string& str, const std::string& kind) :
     os((!str.compare("-")) ?
        std::cout :
-       *(new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
+       * (new std::ofstream(str.c_str(), std::ofstream::out | std::ofstream::trunc))
       ),
     filename(str), temp(NULL), kind(kind) {
     if (not os.good()) {
@@ -118,7 +118,7 @@ Output::~Output() {
  This implicit conversation operator allows to use Output objects like
  ostream streams.
 */
-Output::operator std::ostream&() const {
+Output::operator std::ostream& () const {
     return os;
 }
 

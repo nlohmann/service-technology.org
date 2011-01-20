@@ -143,17 +143,17 @@ bool LivelockOperatingGuideline::getSCCsRecursively(StoredKnowledge* currentNode
     // iterate over the successors of current node
     // in case of traversing an SCS subsystem, we only use edges contained within the setOfEdges given as a parameter
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-        if (currentNode->successors[l-1] != NULL and currentNode->successors[l-1] != StoredKnowledge::empty and
-                currentNode->successors[l-1]->is_sane and
+        if (currentNode->successors[l - 1] != NULL and currentNode->successors[l - 1] != StoredKnowledge::empty and
+                currentNode->successors[l - 1]->is_sane and
                 (ignoreEdges or setOfEdges[currentNode].find(l - 1) != setOfEdges[currentNode].end())) {
 
             // we have not yet touched the successor node and successor node is to be visited
             // and if we should consider the edge
-            if (visited.find(currentNode->successors[l-1]) == visited.end() and
-                    toBeVisited.find(currentNode->successors[l-1]) != toBeVisited.end()) {
+            if (visited.find(currentNode->successors[l - 1]) == visited.end() and
+                    toBeVisited.find(currentNode->successors[l - 1]) != toBeVisited.end()) {
 
                 // do Tarjan algorithm for the successor state
-                if (not getSCCsRecursively(currentNode->successors[l-1], visited, toBeVisited, setOfEdges, setOfSCCs, ignoreEdges)
+                if (not getSCCsRecursively(currentNode->successors[l - 1], visited, toBeVisited, setOfEdges, setOfSCCs, ignoreEdges)
                         and not ignoreEdges) {
 
                     return false;
@@ -161,15 +161,15 @@ bool LivelockOperatingGuideline::getSCCsRecursively(StoredKnowledge* currentNode
 
                 // adjust lowlink value
                 StoredKnowledge::tarjanMapping[currentNode].second = MINIMUM(StoredKnowledge::tarjanMapping[currentNode].second,
-                                                                             StoredKnowledge::tarjanMapping[currentNode->successors[l-1]].second);
+                                                                             StoredKnowledge::tarjanMapping[currentNode->successors[l - 1]].second);
             } else {
 
                 // current node has been visited before, now check if it is still on the Tarjan stack
-                if (findNodeInStack(currentNode->successors[l-1])) {
+                if (findNodeInStack(currentNode->successors[l - 1])) {
 
                     // adjust lowlink value
                     StoredKnowledge::tarjanMapping[currentNode].second = MINIMUM(StoredKnowledge::tarjanMapping[currentNode].second,
-                                                                                 StoredKnowledge::tarjanMapping[currentNode->successors[l-1]].first);
+                                                                                 StoredKnowledge::tarjanMapping[currentNode->successors[l - 1]].first);
                 }
             }
         }
@@ -302,7 +302,7 @@ CompositeMarking* LivelockOperatingGuideline::getSuccessorMarking(const StoredKn
 
     for (innermarkingcount_t i = 0; i < storedKnowledge->sizeAllMarkings; ++i) {
 
-        if (storedKnowledge->inner[i] == innerMarking and (*storedKnowledge->interface[i] == *interface)) {
+        if (storedKnowledge->inner[i] == innerMarking and(*storedKnowledge->interface[i] == *interface)) {
 
             marking = new CompositeMarking(storedKnowledge, innerMarking, interface);
 
@@ -427,8 +427,8 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
         for (Label_ID j = Label::first_receive; j <= Label::last_sync; ++j) {
 
             // do we actually have to consider the successor knowledge
-            if (currentMarking->storedKnowledge->successors[j-1] == NULL or
-                    knowledgeSCS.find(currentMarking->storedKnowledge->successors[j-1]) == knowledgeSCS.end()) {
+            if (currentMarking->storedKnowledge->successors[j - 1] == NULL or
+                    knowledgeSCS.find(currentMarking->storedKnowledge->successors[j - 1]) == knowledgeSCS.end()) {
 
                 continue;
             }
@@ -460,7 +460,7 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
                 }
 
                 // everything is fine, so get the successor marking
-                successorMarking = getSuccessorMarking(currentMarking->storedKnowledge->successors[j-1], currentMarking->innerMarking_ID, candidate_interface, foundSuccessorMarking);
+                successorMarking = getSuccessorMarking(currentMarking->storedKnowledge->successors[j - 1], currentMarking->innerMarking_ID, candidate_interface, foundSuccessorMarking);
 
             } else if (SYNC(j)) { // synch step
 
@@ -468,7 +468,7 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
 
                 for (Label_ID l = 0; l < currentInner->out_degree; ++l) {
                     if (currentInner->labels[l] == j) {
-                        successorMarking = getSuccessorMarking(currentMarking->storedKnowledge->successors[j-1], currentInner->successors[l], candidate_interface, foundSuccessorMarking);
+                        successorMarking = getSuccessorMarking(currentMarking->storedKnowledge->successors[j - 1], currentInner->successors[l], candidate_interface, foundSuccessorMarking);
                     }
                 }
             }
@@ -620,7 +620,7 @@ void LivelockOperatingGuideline::getEdgesOfSCS(const std::set<StoredKnowledge* >
         std::set<Label_ID> succ;
 
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if (SCS.find((*iter)->successors[l-1]) != SCS.end()) {
+            if (SCS.find((*iter)->successors[l - 1]) != SCS.end()) {
                 // remember edge
                 succ.insert(l - 1);
 

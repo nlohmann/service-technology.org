@@ -199,15 +199,15 @@ void StoredKnowledge::analyzeSCCOfKnowledges(std::set<StoredKnowledge*>& knowled
     FOREACH(iScc, knowledgeSet) {
         // for each successor which is part of the current SCC, register the predecessor
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if ((**iScc).successors[l-1] != NULL and(**iScc).successors[l-1] != empty and
-                    knowledgeSet.find((**iScc).successors[l-1]) != knowledgeSet.end()) {
+            if ((**iScc).successors[l - 1] != NULL and(**iScc).successors[l - 1] != empty and
+                    knowledgeSet.find((**iScc).successors[l - 1]) != knowledgeSet.end()) {
 
-                tempPredecessors[(**iScc).successors[l-1]].insert(*iScc);
+                tempPredecessors[(**iScc).successors[l - 1]].insert(*iScc);
             }
             // check if there exists a successor (within or outside of the current SCC) from which a
             // final node is reachable
-            if ((**iScc).successors[l-1] != NULL and(**iScc).successors[l-1] != empty and
-                    (**iScc).successors[l-1]->is_final_reachable) {
+            if ((**iScc).successors[l - 1] != NULL and(**iScc).successors[l - 1] != empty and
+                    (**iScc).successors[l - 1]->is_final_reachable) {
                 is_final_reachable = true;
             }
         }
@@ -285,11 +285,11 @@ void StoredKnowledge::rearrangeKnowledgeBubble() {
             InnerMarking_ID temp_inner = inner[j];
             InterfaceMarking* temp_interface = interface[j];
 
-            inner[j] = inner[ sizeDeadlockMarkings-1 ];
-            interface[j] = interface[ sizeDeadlockMarkings-1 ];
+            inner[j] = inner[ sizeDeadlockMarkings - 1 ];
+            interface[j] = interface[ sizeDeadlockMarkings - 1 ];
 
-            inner[ sizeDeadlockMarkings-1 ] = temp_inner;
-            interface[ sizeDeadlockMarkings-1 ] = temp_interface;
+            inner[ sizeDeadlockMarkings - 1 ] = temp_inner;
+            interface[ sizeDeadlockMarkings - 1 ] = temp_interface;
 
             --sizeDeadlockMarkings;
         } else {
@@ -538,7 +538,7 @@ hash_t StoredKnowledge::hash() const {
 
 void StoredKnowledge::addSuccessor(const Label_ID& label, StoredKnowledge* const knowledge) {
     // we will never store label 0 (tau) -- hence decrease the label
-    successors[label-1] = knowledge;
+    successors[label - 1] = knowledge;
 
     // statistics output
     if (args_info.reportFrequency_arg and ++stats.storedEdges % args_info.reportFrequency_arg == 0) {
@@ -563,18 +563,18 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
 
     // if we find a sending successor, this node is OK
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-        if (successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
+        if (successors[l - 1] != NULL and successors[l - 1] != empty and successors[l - 1]->is_sane) {
 
-            if (checkOnTarjanStack and successors[l-1]->is_on_tarjan_stack) {
+            if (checkOnTarjanStack and successors[l - 1]->is_on_tarjan_stack) {
                 is_on_tarjan_stack = true;
                 continue;
             }
 
-            if (args_info.correctness_arg == correctness_arg_livelock and not successors[l-1]->is_final_reachable) {
+            if (args_info.correctness_arg == correctness_arg_livelock and not successors[l - 1]->is_final_reachable) {
                 continue;
             }
 
-            is_final_reachable = successors[l-1]->is_final_reachable;
+            is_final_reachable = successors[l - 1]->is_final_reachable;
 
             return true;
         }
@@ -590,19 +590,19 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
         // output place exists a respective receiving edge
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
 
-            if (interface[i]->marked(l) and successors[l-1] != NULL and successors[l-1] != empty and
-                    successors[l-1]->is_sane) {
+            if (interface[i]->marked(l) and successors[l - 1] != NULL and successors[l - 1] != empty and
+                    successors[l - 1]->is_sane) {
 
-                if (checkOnTarjanStack and successors[l-1]->is_on_tarjan_stack) {
+                if (checkOnTarjanStack and successors[l - 1]->is_on_tarjan_stack) {
                     is_on_tarjan_stack = true;
                     continue;
                 }
 
-                if (args_info.correctness_arg == correctness_arg_livelock and not successors[l-1]->is_final_reachable) {
+                if (args_info.correctness_arg == correctness_arg_livelock and not successors[l - 1]->is_final_reachable) {
                     continue;
                 }
 
-                is_final_reachable = successors[l-1]->is_final_reachable;
+                is_final_reachable = successors[l - 1]->is_final_reachable;
 
                 resolved = true;
                 break;
@@ -617,18 +617,18 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
         // check if a synchronous action can resolve this deadlock
         for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
             if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
-                    successors[l-1] != NULL and successors[l-1] != empty and successors[l-1]->is_sane) {
+                    successors[l - 1] != NULL and successors[l - 1] != empty and successors[l - 1]->is_sane) {
 
-                if (checkOnTarjanStack and successors[l-1]->is_on_tarjan_stack) {
+                if (checkOnTarjanStack and successors[l - 1]->is_on_tarjan_stack) {
                     is_on_tarjan_stack = true;
                     continue;
                 }
 
-                if (args_info.correctness_arg == correctness_arg_livelock and not successors[l-1]->is_final_reachable) {
+                if (args_info.correctness_arg == correctness_arg_livelock and not successors[l - 1]->is_final_reachable) {
                     continue;
                 }
 
-                is_final_reachable = successors[l-1]->is_final_reachable;
+                is_final_reachable = successors[l - 1]->is_final_reachable;
 
                 resolved = true;
                 break;
@@ -662,9 +662,9 @@ bool StoredKnowledge::sat(const bool checkOnTarjanStack) {
 void StoredKnowledge::traverse() {
     if (seen.insert(this).second) {
         for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-            if (successors[l-1] != NULL and successors[l-1] != empty and
-                    (successors[l-1]->is_sane or args_info.diagnose_given)) {
-                successors[l-1]->traverse();
+            if (successors[l - 1] != NULL and successors[l - 1] != empty and
+                    (successors[l - 1]->is_sane or args_info.diagnose_given)) {
+                successors[l - 1]->traverse();
             }
         }
     }
@@ -798,14 +798,14 @@ void StoredKnowledge::print(std::ostream& file) const {
     file << "\n";
 
     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-        if (successors[l-1] != NULL and
-                successors[l-1] != empty and
-                (seen.find(successors[l-1]) != seen.end())) {
+        if (successors[l - 1] != NULL and
+                successors[l - 1] != empty and
+                (seen.find(successors[l - 1]) != seen.end())) {
             file << "    " << Label::id2name[l] << " -> "
-                 << reinterpret_cast<size_t>(successors[l-1])
+                 << reinterpret_cast<size_t>(successors[l - 1])
                  << "\n";
         } else {
-            if (successors[l-1] == empty and not args_info.sa_given) {
+            if (successors[l - 1] == empty and not args_info.sa_given) {
                 emptyNodeReachable = true;
                 file << "    " << Label::id2name[l] << " -> 0\n";
             }
@@ -832,7 +832,7 @@ std::string StoredKnowledge::formula(bool dot) const {
 
     // collect outgoing !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-        if (successors[l-1] != NULL and successors[l-1]->is_sane) {
+        if (successors[l - 1] != NULL and successors[l - 1]->is_sane) {
 
             sendDisjunction.insert(Label::id2name[l]);
         }
@@ -851,8 +851,8 @@ std::string StoredKnowledge::formula(bool dot) const {
         for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
             // receiving event resolves deadlock
             if (interface[i]->marked(l) and
-                    successors[l-1] != NULL and successors[l-1] != empty and
-                    successors[l-1]->is_sane) {
+                    successors[l - 1] != NULL and successors[l - 1] != empty and
+                    successors[l - 1]->is_sane) {
 
                 disjunctionSendingReceivingSynchronous.insert(Label::id2name[l]);
             }
@@ -862,8 +862,8 @@ std::string StoredKnowledge::formula(bool dot) const {
         for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
             // synchronous communication resolves deadlock
             if (InnerMarking::synchs[l].find(inner[i]) != InnerMarking::synchs[l].end() and
-                    successors[l-1] != NULL and successors[l-1] != empty and
-                    successors[l-1]->is_sane) {
+                    successors[l - 1] != NULL and successors[l - 1] != empty and
+                    successors[l - 1]->is_sane) {
 
                 disjunctionSendingReceivingSynchronous.insert(Label::id2name[l]);
             }
@@ -1005,18 +1005,18 @@ void StoredKnowledge::output_dot(std::ostream& file) {
 
                 // draw the edges
                 for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-                    if (it->second[i]->successors[l-1] != NULL and
-                            (seen.find(it->second[i]->successors[l-1]) != seen.end()) and
-                            (args_info.showEmptyNode_flag or it->second[i]->successors[l-1] != empty)) {
+                    if (it->second[i]->successors[l - 1] != NULL and
+                            (seen.find(it->second[i]->successors[l - 1]) != seen.end()) and
+                            (args_info.showEmptyNode_flag or it->second[i]->successors[l - 1] != empty)) {
                         file << "\"" << it->second[i] << "\" -> \""
-                             << it->second[i]->successors[l-1]
+                             << it->second[i]->successors[l - 1]
                              << "\" [label=\"" << PREFIX(l)
                              << Label::id2name[l] << "\"]\n";
                     }
 
                     // draw edges to the empty node if requested
                     if (args_info.showEmptyNode_flag and
-                            it->second[i]->successors[l-1] == empty) {
+                            it->second[i]->successors[l - 1] == empty) {
                         emptyNodeReachable = true;
                         file << "\"" << it->second[i] << "\" -> 0"
                              << " [label=\"" << PREFIX(l)
@@ -1171,21 +1171,21 @@ void StoredKnowledge::output_results(Results& r) {
                     temp << "      successors = (";
                     // draw the edges
                     for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-                        if (it->second[i]->successors[l-1] != NULL and
-                                (seen.find(it->second[i]->successors[l-1]) != seen.end()) and
-                                (args_info.showEmptyNode_flag or it->second[i]->successors[l-1] != empty)) {
+                        if (it->second[i]->successors[l - 1] != NULL and
+                                (seen.find(it->second[i]->successors[l - 1]) != seen.end()) and
+                                (args_info.showEmptyNode_flag or it->second[i]->successors[l - 1] != empty)) {
 
                             if (not firstSuccessor) {
                                 temp << ", ";
                             }
                             temp << "(\"" << Label::id2name[l] << "\", "
-                                 << reinterpret_cast<size_t>(it->second[i]->successors[l-1]) << ")";
+                                 << reinterpret_cast<size_t>(it->second[i]->successors[l - 1]) << ")";
                             firstSuccessor = false;
                         }
 
                         // draw edges to the empty node if requested
                         if (args_info.showEmptyNode_flag and
-                                it->second[i]->successors[l-1] == empty) {
+                                it->second[i]->successors[l - 1] == empty) {
                             emptyNodeReachable = true;
                             temp << "(\"" << Label::id2name[l] << "\", " << 0 << ")";
                         }

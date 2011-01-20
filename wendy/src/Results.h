@@ -16,7 +16,7 @@ class Results {
         ~Results();
 
         /// implicit conversation operator to ostream
-        operator std::ostream&() const;
+        operator std::ostream& () const;
 
         void add(std::string,              std::stringstream&);
         void add(std::string, std::string, std::stringstream&);

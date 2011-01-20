@@ -72,7 +72,7 @@ class Output {
         ~Output();
 
         /// implicit conversation operator to ostream
-        operator std::ostream&() const;
+        operator std::ostream& () const;
 
         /// returns the filename of this object
         std::string name() const;

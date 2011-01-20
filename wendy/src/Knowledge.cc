@@ -407,7 +407,7 @@ void Knowledge::sequentializeReceivingEvents() {
                     // check if waitstate activates only a single receiving event
                     if (marked == 1) {
                         // this receiving event has to be considered
-                        consideredReceivingEvents[consideredReceivingEvent-1] = true;
+                        consideredReceivingEvents[consideredReceivingEvent - 1] = true;
                     }
 
                     // remember to visit this state again; we only store the
@@ -433,7 +433,7 @@ void Knowledge::sequentializeReceivingEvents() {
             if ((*currenState)->marked(l)) {
 
                 // it will be considered, so continue with the next waitstate
-                if (consideredReceivingEvents[l-1]) {
+                if (consideredReceivingEvents[l - 1]) {
                     consideredReceivingEvent = l;
                     break;
                 }
@@ -456,7 +456,7 @@ void Knowledge::sequentializeReceivingEvents() {
 
         // consider the temporal receiving event for real
         if (realEvent) {
-            consideredReceivingEvents[consideredReceivingEvent-1] = true;
+            consideredReceivingEvents[consideredReceivingEvent - 1] = true;
         }
     } // end for, traverse through states
 }
@@ -473,7 +473,7 @@ void Knowledge::sequentializeReceivingEvents() {
 bool Knowledge::considerReceivingEvent(const Label_ID& label) const {
     assert(args_info.seqReceivingEvents_flag);
 
-    return consideredReceivingEvents[label-1];
+    return consideredReceivingEvents[label - 1];
 }
 
 

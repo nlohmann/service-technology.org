@@ -87,10 +87,10 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge*> & knowledge
     for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
         // receiving event resolves deadlock
         if (interface->marked(l) and
-                (knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end() or
+                (knowledgeSet.find(storedKnowledge->successors[l - 1]) == knowledgeSet.end() or
                  (useEdges and edges.find(l - 1) == edges.end())) and
-                storedKnowledge->successors[l-1] != NULL and storedKnowledge->successors[l-1] != StoredKnowledge::empty and
-                storedKnowledge->successors[l-1]->is_sane) {
+                storedKnowledge->successors[l - 1] != NULL and storedKnowledge->successors[l - 1] != StoredKnowledge::empty and
+                storedKnowledge->successors[l - 1]->is_sane) {
 
             booleanClause->labelPossible(l);
             emptyClause = false;
@@ -101,10 +101,10 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge*> & knowledge
     for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
         // synchronous communication resolves deadlock
         if (InnerMarking::synchs[l].find(innerMarking_ID) != InnerMarking::synchs[l].end() and
-                (knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end() or
+                (knowledgeSet.find(storedKnowledge->successors[l - 1]) == knowledgeSet.end() or
                  (useEdges and edges.find(l - 1) == edges.end())) and
-                storedKnowledge->successors[l-1] != NULL and storedKnowledge->successors[l-1] != StoredKnowledge::empty and
-                storedKnowledge->successors[l-1]->is_sane) {
+                storedKnowledge->successors[l - 1] != NULL and storedKnowledge->successors[l - 1] != StoredKnowledge::empty and
+                storedKnowledge->successors[l - 1]->is_sane) {
 
             booleanClause->labelPossible(l);
             emptyClause = false;
@@ -113,10 +113,10 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge*> & knowledge
 
     // collect outgoing !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-        if ((knowledgeSet.find(storedKnowledge->successors[l-1]) == knowledgeSet.end()  or
+        if ((knowledgeSet.find(storedKnowledge->successors[l - 1]) == knowledgeSet.end()  or
                 (useEdges and edges.find(l - 1) == edges.end())) and
-                storedKnowledge->successors[l-1] != NULL and
-                storedKnowledge->successors[l-1]->is_sane) {
+                storedKnowledge->successors[l - 1] != NULL and
+                storedKnowledge->successors[l - 1]->is_sane) {
 
             booleanClause->labelPossible(l);
             emptyClause = false;

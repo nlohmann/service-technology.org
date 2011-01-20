@@ -220,14 +220,14 @@ void Diagnosis::output_results(Results& r) {
                 temp << "      successors = (";
                 // draw the edges
                 for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-                    if (it->second[i]->successors[l-1] != NULL and
-                            (StoredKnowledge::seen.find(it->second[i]->successors[l-1]) != StoredKnowledge::seen.end())) {
+                    if (it->second[i]->successors[l - 1] != NULL and
+                            (StoredKnowledge::seen.find(it->second[i]->successors[l - 1]) != StoredKnowledge::seen.end())) {
 
                         if (not firstSuccessor) {
                             temp << ", ";
                         }
                         temp << "(\"" << Label::id2name[l] << "\", "
-                             << reinterpret_cast<size_t>(it->second[i]->successors[l-1]) << ")";
+                             << reinterpret_cast<size_t>(it->second[i]->successors[l - 1]) << ")";
                         firstSuccessor = false;
                     }
                 }
@@ -355,10 +355,10 @@ void Diagnosis::output_diagnosedot(std::ostream& file) {
 
                 // draw the edges
                 for (Label_ID l = Label::first_receive; l <= Label::last_sync; ++l) {
-                    if (it->second[i]->successors[l-1] != NULL and
-                            (StoredKnowledge::seen.find(it->second[i]->successors[l-1]) != StoredKnowledge::seen.end())) {
+                    if (it->second[i]->successors[l - 1] != NULL and
+                            (StoredKnowledge::seen.find(it->second[i]->successors[l - 1]) != StoredKnowledge::seen.end())) {
                         file << "\"" << it->second[i] << "\" -> \""
-                             << it->second[i]->successors[l-1]
+                             << it->second[i]->successors[l - 1]
                              << "\" [label=\"" << PREFIX(l)
                              << Label::id2name[l] << "\"]\n";
                     }

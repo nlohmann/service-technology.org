@@ -46,7 +46,7 @@
  initialize() is called to copy the markingMap into a C-style array.
 */
 class InnerMarking {
-    friend class Diagnosis;
+        friend class Diagnosis;
 
     public: /* static functions */
         /// copy markings from temporary storage to array

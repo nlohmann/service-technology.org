@@ -10,6 +10,7 @@ class Node;
 class Graph {
     private:
         static unsigned int l;
+        static unsigned int r2, r63, r62, r1;
 
     private:
         std::map<unsigned int, Node*> nodes;
@@ -25,10 +26,9 @@ class Graph {
         void print();
         void info();
 
-        bool rule613();
+        bool rule2();
+        bool rule63();
         bool rule62();
-        bool r();
-        bool r2();
 };
 
 class Node {

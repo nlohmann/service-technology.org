@@ -5,7 +5,7 @@
 #include "Graph.h"
 #include "verbose.h"
 #include "Output.h"
-#include "cmdline-graph2dot.h"
+#include "cmdline.h"
 
 using std::string;
 
@@ -67,20 +67,15 @@ int main(int argc, char** argv) {
     g.info();
 
     unsigned int i = 0;
+    const unsigned int j = 100;
 
-    while (g.rule613() or g.rule62() or g.r()) {
-        if (++i % 100 == 0) {
-            fprintf(stderr, "%5d  ", i);
+// /*
+    while (g.rule63() or g.rule2() or g.rule62() ) {
+        if (++i % j == 0) {
             g.info();
         }
     }
-
-    while (g.r2()) {
-        if (++i % 100 == 0) {
-            fprintf(stderr, "%5d  ", i);
-            g.info();
-        }
-    }
+// */
 
     g.info();
     g.print();

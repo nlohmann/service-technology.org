@@ -42,34 +42,36 @@
      KW_STATE = 258,
      KW_PROG = 259,
      KW_LOWLINK = 260,
-     COLON = 261,
-     COMMA = 262,
-     ARROW = 263,
-     INDENT = 264,
-     BANG = 265,
-     STAR = 266,
-     QUESTION = 267,
-     NUMBER = 268,
-     NAME = 269,
-     MESSAGE = 270,
-     PATHARROW = 271
+     KW_SCC = 261,
+     COLON = 262,
+     COMMA = 263,
+     ARROW = 264,
+     INDENT = 265,
+     BANG = 266,
+     STAR = 267,
+     QUESTION = 268,
+     NUMBER = 269,
+     NAME = 270,
+     MESSAGE = 271,
+     PATHARROW = 272
    };
 #endif
 /* Tokens.  */
 #define KW_STATE 258
 #define KW_PROG 259
 #define KW_LOWLINK 260
-#define COLON 261
-#define COMMA 262
-#define ARROW 263
-#define INDENT 264
-#define BANG 265
-#define STAR 266
-#define QUESTION 267
-#define NUMBER 268
-#define NAME 269
-#define MESSAGE 270
-#define PATHARROW 271
+#define KW_SCC 261
+#define COLON 262
+#define COMMA 263
+#define ARROW 264
+#define INDENT 265
+#define BANG 266
+#define STAR 267
+#define QUESTION 268
+#define NUMBER 269
+#define NAME 270
+#define MESSAGE 271
+#define PATHARROW 272
 
 
 
@@ -87,7 +89,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 91 "syntax_graph.h"
+#line 93 "syntax_graph.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

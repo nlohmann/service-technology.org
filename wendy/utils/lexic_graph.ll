@@ -24,6 +24,7 @@ number    "-"?[0-9][0-9]*
 ">>>>> "{number}" States, "{number}" Edges, "{number}" Hash table entries" { /* skip */ }
 
 "STATE"                 { return KW_STATE; }
+"SCC:"                  { return KW_SCC; }
 "Prog:"                 { return KW_PROG; }
 "Lowlink:"              { return KW_LOWLINK; }
 "!"                     { return BANG; }
@@ -50,5 +51,5 @@ number    "-"?[0-9][0-9]*
 %%
 
 void graph_error(const char *msg) {
-  fprintf(stderr, "%d: %s\n", graph_lineno, msg);
+  fprintf(stderr, "%d: %s - last token '%s'\n", graph_lineno, msg, graph_text);
 }

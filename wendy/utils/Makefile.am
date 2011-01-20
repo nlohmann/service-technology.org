@@ -5,7 +5,7 @@ bin_PROGRAMS =  graph2dot
 AM_CPPFLAGS = -I$(top_srcdir)
 
 graph2dot_SOURCES = syntax_graph.yy lexic_graph.ll \
-                    cmdline-graph2dot.c cmdline-graph2dot.h \
+                    cmdline.c cmdline.h \
                     graph2dot.cc Graph.cc Graph.h util.h verbose.cc verbose.h \
                     Output.cc Output.h
 
@@ -37,7 +37,7 @@ MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)
 #----------------------------------------------------------#
 .ggo.c:
 	$(AM_V_GEN)$(GENGETOPT) --input=$< -F $(@:.c=)
-GENGETOPT_FILES = cmdline-graph2dot.ggo
+GENGETOPT_FILES = cmdline.ggo
 BUILT_SOURCES += $(GENGETOPT_FILES:.ggo=.c)
 EXTRA_DIST += $(GENGETOPT_FILES)
 MAINTAINERCLEANFILES += $(GENGETOPT_FILES:.ggo=.c) $(GENGETOPT_FILES:.ggo=.h)

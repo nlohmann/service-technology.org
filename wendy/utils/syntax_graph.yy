@@ -1,4 +1,4 @@
-%token KW_STATE KW_PROG KW_LOWLINK
+%token KW_STATE KW_PROG KW_LOWLINK KW_SCC
 %token COLON COMMA ARROW INDENT BANG STAR QUESTION
 %token NUMBER NAME MESSAGE PATHARROW
 
@@ -10,13 +10,13 @@
 %{
 #include <cstdio>
 #include "Graph.h"
-#include "cmdline-graph2dot.h"
+#include "cmdline.h"
 
 using std::map;
 using std::vector;
 
 #define YYERROR_VERBOSE
-#define YYMAXDEPTH 65535
+#define YYMAXDEPTH 111655350
 
 int currentState = 0;
 
@@ -47,7 +47,7 @@ states:
 ;
 
 state:
-  KW_STATE annotation NUMBER { currentState = $3; } prog lowlink
+  KW_STATE annotation NUMBER { currentState = $3; } prog lowlink scc
   markings transitions
 ;
 
@@ -69,6 +69,15 @@ lowlink:
   /* empty */
 | KW_LOWLINK NUMBER
 ;
+
+scc:
+  /* empty */
+| KW_SCC statenumbers
+;
+
+statenumbers:
+  NUMBER
+| NUMBER statenumbers;
 
 markings:
   marking

@@ -41,6 +41,7 @@ option "exclude" x
   typestr="PLACE"
   string multiple optional
 
+option "verbose" v "" flag off
 
 text "\n"
 text "Examples:\n"

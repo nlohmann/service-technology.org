@@ -66,16 +66,19 @@ int main(int argc, char** argv) {
     unsigned int i = 0;
     const unsigned int j = 50;
 
-// /*
+    if (not args_info.noReduction_flag) {
     while (g.rule63() or g.rule2() or g.rule62() ) {
         if (++i % j == 0) {
             g.info();
         }
     }
-// */
+}
 
     g.info();
-//    g.print();
+
+    if (args_info.dot_flag) {
+        g.print();
+    }
 
     return EXIT_SUCCESS;
 }

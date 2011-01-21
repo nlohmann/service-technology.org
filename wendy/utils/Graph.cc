@@ -4,9 +4,12 @@
 #include <pnapi/pnapi.h>
 #include "util.h"
 #include "Graph.h"
+#include "cmdline.h"
+
+extern gengetopt_args_info args_info;
+
 
 #define TAU 0
-//#define DEBUG 1
 
 using pnapi::Transition;
 typedef std::pair<std::set<unsigned int>::iterator, bool> ii;
@@ -62,11 +65,11 @@ void Graph::initLabels() {
         }
     }
 
-#ifdef DEBUG
+    if (args_info.verbose_flag) {
     FOREACH(t, net.getTransitions()) {
         std::cerr << (*t)->getName() << " " << labels[(*t)->getName()] << "\n";
     }
-#endif
+}
 }
 
 void Graph::addEdge(unsigned int source, unsigned int target, std::string label) {
@@ -120,9 +123,9 @@ bool Graph::rule63() {
             const unsigned int source = n->first;
             const unsigned int target = *(n->second->postset[TAU].begin());
 
-#ifdef DEBUG
+if (args_info.verbose_flag) {
             std::cerr << "[R6.3] merge nodes " << source << " and " << target << std::endl;
-#endif
+}
 
             // remove the linking tau-edge
             removeEdge(source, target, TAU);
@@ -160,9 +163,9 @@ bool Graph::rule62() {
                 const unsigned int source = n1->first;
                 const unsigned int target = *n2;
 
-#ifdef DEBUG
+if (args_info.verbose_flag) {
                 std::cerr << "[R6.2] merge nodes " << source << " and " << target << std::endl;
-#endif
+}
 
                 // remove the linking tau-edge
                 removeEdge(source, target, TAU);
@@ -189,9 +192,9 @@ bool Graph::rule2() {
             const unsigned int target = *n2;
             if (source != target and nodes[*n2]->postset[TAU].find(n1->first) != nodes[*n2]->postset[TAU].end()) {
 
-#ifdef DEBUG
+if (args_info.verbose_flag) {
                 std::cerr << "[R2] merge nodes " << source << " and " << target << std::endl;
-#endif
+}
 
                 // merge the nodes (target remains)
                 merge(source, target);
@@ -234,9 +237,9 @@ bool Graph::rule62() {
                 const unsigned int source = n1->first;
                 const unsigned int target = *n2;
 
-#ifdef DEBUG
+if (args_info.verbose_flag) {
                 std::cerr << "[R62] merge nodes " << source << " and " << target << std::endl;
-#endif
+}
 
                 // remove the linking tau-edge
                 removeEdge(source, target, TAU);

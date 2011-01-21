@@ -1,13 +1,18 @@
 #pragma once
 
+#include <pnapi/pnapi.h>
 #include <map>
 #include <vector>
 #include <set>
 #include <string>
 
+
 class Node;
 
 class Graph {
+    public:
+        static pnapi::PetriNet net;
+
     private:
         static unsigned int l;
         static unsigned int r2, r63, r62, r1;

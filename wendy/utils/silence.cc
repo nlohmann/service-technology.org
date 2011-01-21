@@ -13,10 +13,7 @@ extern int graph_parse();
 extern int graph_lex_destroy();
 extern FILE* graph_in;
 
-FILE* dot_out = stdout;
 Graph g;
-pnapi::PetriNet net;
-
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -46,12 +43,12 @@ int main(int argc, char** argv) {
     | 1. parse the open net |
     `----------------------*/
     status("reading from stdin...");
-    std::cin >> pnapi::io::owfn >> net;
+    std::cin >> pnapi::io::owfn >> Graph::net;
 
     g.initLabels();
 
     Output* temp = new Output();
-    temp->stream() << pnapi::io::lola << net;
+    temp->stream() << pnapi::io::lola << Graph::net;
 
     std::string command_line = "lola-statespace " + temp->name() + " -M";
 
@@ -78,7 +75,7 @@ int main(int argc, char** argv) {
 // */
 
     g.info();
-    g.print();
+//    g.print();
 
     return EXIT_SUCCESS;
 }

@@ -1,19 +1,19 @@
 .SUFFIXES = .ggo
 
-bin_PROGRAMS =  graph2dot
+bin_PROGRAMS =  silence
 
 AM_CPPFLAGS = -I$(top_srcdir)
 
-graph2dot_SOURCES = syntax_graph.yy lexic_graph.ll \
+silence_SOURCES = syntax_graph.yy lexic_graph.ll \
                     cmdline.c cmdline.h \
-                    graph2dot.cc Graph.cc Graph.h util.h verbose.cc verbose.h \
+                    silence.cc Graph.cc Graph.h util.h verbose.cc verbose.h \
                     Output.cc Output.h
 
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI
-graph2dot_CPPFLAGS = -I$(top_srcdir)/libs -I$(top_srcdir)/libs/pnapi
-graph2dot_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
+silence_CPPFLAGS = -I$(top_srcdir)/libs -I$(top_srcdir)/libs/pnapi
+silence_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 
 #---------------------------------------------------#
@@ -27,7 +27,7 @@ DISTCLEANFILES =
 #--------------------------------------------------------------#
 # GENERIC: organize distribution and cleaning of Bison sources #
 #--------------------------------------------------------------#
-BISON_FILES = $(filter %.yy,$(graph2dot_SOURCES))
+BISON_FILES = $(filter %.yy,$(silence_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)

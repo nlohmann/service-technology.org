@@ -8,7 +8,6 @@
 #define TAU 0
 //#define DEBUG 1
 
-extern pnapi::PetriNet net;
 using pnapi::Transition;
 typedef std::pair<std::set<unsigned int>::iterator, bool> ii;
 
@@ -17,6 +16,8 @@ unsigned int Graph::r1 = 0;
 unsigned int Graph::r2 = 0;
 unsigned int Graph::r62 = 0;
 unsigned int Graph::r63 = 0;
+
+pnapi::PetriNet Graph::net;
 
 void Graph::info() {
     unsigned int e = 0;

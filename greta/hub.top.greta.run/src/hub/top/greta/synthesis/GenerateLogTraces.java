@@ -110,7 +110,11 @@ public class GenerateLogTraces implements IWorkbenchWindowActionDelegate {
     }
     
     if (adaptiveSystem != null) {
-      return BuildBP.initSynthesis(adaptiveSystem);
+      try {
+        return BuildBP.initSynthesis(adaptiveSystem);
+      } catch (InvalidModelException e) {
+        Activator.getPluginHelper().logError("Could not generate traces from "+selectedURI, e);
+      }
     }
     
     PtNet net = ActionHelper.getPtNet(selectedURI);
@@ -118,7 +122,7 @@ public class GenerateLogTraces implements IWorkbenchWindowActionDelegate {
       try {
         return BuildBP.init(net);
       } catch (InvalidModelException e) {
-        Activator.getPluginHelper().logError("Could not generate traces from "+selectedURI);
+        Activator.getPluginHelper().logError("Could not generate traces from "+selectedURI, e);
       }
     }
     return null;

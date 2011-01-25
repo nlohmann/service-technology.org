@@ -44,6 +44,7 @@ import hub.top.editor.eclipse.ResourceHelper;
 import hub.top.editor.ptnetLoLA.Node;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.uma.DNodeBP;
+import hub.top.uma.InvalidModelException;
 import hub.top.greta.synthesis.DNode2PtNet;
 import hub.top.greta.verification.BuildBP;
 
@@ -62,12 +63,14 @@ import org.eclipse.gmf.runtime.emf.core.GMFEditingDomainFactory;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.internal.UIPlugin;
 
 public class BuildBranchingProcessMulti implements IWorkbenchWindowActionDelegate {
 
@@ -170,9 +173,16 @@ public class BuildBranchingProcessMulti implements IWorkbenchWindowActionDelegat
           
           long start = System.currentTimeMillis();
         
-          AdaptiveSystem inst = InstantiateSystem.instantiateSystem(adaptiveSystem, parameter, min, max);
-          
-          final BuildBP build = new BuildBP(inst, selectedFile);
+          AdaptiveSystem inst;
+          BuildBP build;
+          try {
+            inst = InstantiateSystem.instantiateSystem(adaptiveSystem, parameter, min, max);
+            build = new BuildBP(inst, selectedFile);
+          } catch (InvalidModelException e) {
+            ActionHelper.showMessageDialogue(MessageDialog.ERROR,
+                "Build branching process", "Failed to build branching process. "+e.getMessage());
+            return Status.CANCEL_STATUS;
+          }
           boolean interrupted = !build.run(monitor, System.out);
           DNodeBP bp = build.getBranchingProcess();
           bp.getStatistics();

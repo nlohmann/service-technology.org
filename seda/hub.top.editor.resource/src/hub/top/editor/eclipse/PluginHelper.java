@@ -78,4 +78,14 @@ public class PluginHelper {
 				IStatus.ERROR, fHostPluginID, IStatus.OK, error, throwable)
 			);
 	}
+	
+	 /**
+   * log a warning within the host plugin of this helper
+   * @param warning message to be logged
+   */
+  public void logWarning(String warning) {
+    fHostPlugin.getLog().log(new Status(
+        IStatus.WARNING, fHostPluginID, IStatus.OK, warning, null)
+      );
+  }
 }

@@ -663,7 +663,7 @@ public class ViewGeneration2 {
          ISystemModel sysModel = Uma.readSystemFromFile(fromFile);
          DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
 
-         DNodeBP build = Uma.buildPrefix(sys, 3);
+         DNodeBP build = Uma.buildPrefix(Uma.initBuildPrefix_View(sys, 3));
          
          build.foldingEquivalence();
          
@@ -687,7 +687,7 @@ public class ViewGeneration2 {
          ISystemModel sysModel = Uma.readSystemFromFile(systemFile);
          DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
 
-         DNodeBP build = Uma.initBuildPrefix(sys, 3);
+         DNodeBP build = Uma.initBuildPrefix_View(sys, 3);
          
          LinkedList<String[]> traces = readTraces(traceFile);
 

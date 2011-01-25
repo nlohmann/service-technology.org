@@ -41,17 +41,17 @@ import hub.top.adaptiveSystem.Condition;
 import hub.top.adaptiveSystem.Event;
 import hub.top.adaptiveSystem.Node;
 import hub.top.adaptiveSystem.Temp;
-import hub.top.greta.run.actions.ActionHelper;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeBP_Scenario;
 import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys_AdaptiveSystem;
+import hub.top.uma.InvalidModelException;
+import hub.top.uma.Options;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CommandStack;
 import org.eclipse.emf.common.util.BasicEList;
@@ -59,8 +59,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.edit.command.DeleteCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
 
@@ -111,12 +110,19 @@ public class SimulationInt_EventAction2 extends SimulationInteractiveAction {
     // clear the list of new nodes from last step
     newNodes.clear(); 
 
+    DNodeSys_AdaptiveSystem system;
     // transform current system model and process instance into Uma's input format
     // TODO: compute system when starting simulation, update adaptive process only
-    DNodeSys_AdaptiveSystem system = new DNodeSys_AdaptiveSystem(simView.adaptiveSystem);
-    DNodeBP bp = new DNodeBP_Scenario(system);
-    bp.configure_Scenarios();
-    bp.configure_buildOnly();
+    try {
+      system = new DNodeSys_AdaptiveSystem(simView.adaptiveSystem);
+    } catch (InvalidModelException e) {
+      MessageDialog.openError(this.workbenchWindow.getShell(), "Animated one step.", "Failed to animate. "+e.getMessage());
+      return;
+    }
+    
+    Options o = new Options(system);
+    o.configure_buildOnly();
+    DNodeBP bp = new DNodeBP_Scenario(system, o);
     
 // for debugging
 //    IEditorInput in = simView.processViewEditor.getEditorInput();

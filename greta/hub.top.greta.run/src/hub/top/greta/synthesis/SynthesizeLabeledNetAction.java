@@ -63,12 +63,14 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gmf.runtime.emf.core.GMFEditingDomainFactory;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
@@ -125,7 +127,15 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
     if (adaptiveSystem == null)
       return;
       
-    final BuildBP build = new BuildBP(BuildBP.init(adaptiveSystem), selectedFile);
+    final BuildBP build;
+    try {
+      build = new BuildBP(BuildBP.init(adaptiveSystem), selectedFile);
+    } catch (InvalidModelException e) {
+      ActionHelper.showMessageDialogue(MessageDialog.ERROR, 
+          "Syntheszed Petri net", 
+          "Failed to synthesize Petri net. "+e.getMessage());
+      return;
+    }
     
     Job bpBuildJob = new Job("Synthesizing Labeled Net") 
     {
@@ -150,7 +160,7 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
           IPath targetPath = selectedFile.getFullPath().removeFileExtension().addFileExtension("ptnet");
           */
           
-          build.writeBPtoFile(monitor, null, "_synbp");
+          // build.writeBPtoFile(monitor, null, "_synbp");
           
           /*
           TransactionalEditingDomain editing = GMFEditingDomainFactory.INSTANCE.createEditingDomain();
@@ -161,8 +171,11 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
             monitor.subTask("generating labeled net");
 
             hub.top.petrinet.PetriNet net2 = hub.top.uma.synthesis.NetSynthesis.foldToNet_labeled(build.getBranchingProcess());
-            hub.top.petrinet.PetriNetIO.writeToFile(net2, selectedFile.getRawLocation().removeFileExtension().toString(), hub.top.petrinet.PetriNetIO.FORMAT_LOLA, 0);
-            
+            //String netFileName = selectedFile.getRawLocation().removeFileExtension().toString();
+            //hub.top.petrinet.PetriNetIO.writeToFile(net2, netFileName, hub.top.petrinet.PetriNetIO.FORMAT_LOLA, 0);
+            IPath targetPath = selectedFile.getFullPath().removeFileExtension().addFileExtension("lola");
+            ActionHelper.writeFile(targetPath, hub.top.petrinet.PetriNetIO.toLoLA(net2));
+            /*
             for (Place p : net2.getPlaces()) {
               if (p.getName().startsWith("controller"))
                 p.addRole("controller");
@@ -180,7 +193,7 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
             net2.spreadRolesToTransitions_union();
             net2.setRoles_unassigned();
             hub.top.petrinet.PetriNetIO.writeToFile(net2, selectedFile.getRawLocation().removeFileExtension().toString(), hub.top.petrinet.PetriNetIO.FORMAT_DOT, hub.top.petrinet.PetriNetIO.PARAM_SWIMLANE);
-
+             */
             try {
              monitor.subTask("comparing synthesized net and specification");
              DNodeBP dbp = build.getBranchingProcess();
@@ -195,6 +208,29 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
               Activator.getPluginHelper().logError("Failed to compare net and specification.", e);
             }
             
+            hub.top.petrinet.PetriNet eq_cust = computeComponent(net2, 
+                new String[] { 
+                "cust", "eq[cust]", "eq", 
+                "car", "car[need]", "car[done]", 
+                "maps", "maps[need]", "maps[done]", "map", "map req",
+                "request vehicle", "granted vehicle", "jeep", 
+                "support", "letter of recommendation", 
+                "req missing docs", "missing docs" } );
+            hub.top.petrinet.PetriNetIO.writeToFile(eq_cust, selectedFile.getRawLocation().removeFileExtension().toString()+"_eq", hub.top.petrinet.PetriNetIO.FORMAT_LOLA, 0);
+
+            hub.top.petrinet.PetriNet gfz = computeComponent(net2, 
+                new String[] { 
+                "GFZ",
+                "support", "letter of recommendation", 
+                "req missing docs", "missing docs" } );
+            hub.top.petrinet.PetriNetIO.writeToFile(gfz, selectedFile.getRawLocation().removeFileExtension().toString()+"_gfz", hub.top.petrinet.PetriNetIO.FORMAT_LOLA, 0);
+
+            hub.top.petrinet.PetriNet partner = computeComponent(net2, 
+                new String[] { 
+                "partner", "partner[avail]",
+                "request vehicle", "granted vehicle", "map", "map req" });
+            hub.top.petrinet.PetriNetIO.writeToFile(partner, selectedFile.getRawLocation().removeFileExtension().toString()+"_partner", hub.top.petrinet.PetriNetIO.FORMAT_LOLA, 0);
+
             /*
             hub.top.petrinet.PetriNet net_controller = new hub.top.petrinet.PetriNet(net2);
             String[] keep = new String[] { "controller" };
@@ -238,7 +274,6 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
             net_user.removeIsolatedNodes();
             hub.top.petrinet.PetriNetIO_out.writeToFile(net_user, selectedFile.getRawLocation().removeFileExtension().toString()+"_user", hub.top.petrinet.PetriNetIO_out.FORMAT_LOLA, 0);
           */
-            
           } catch (IOException e) {
             Activator.getPluginHelper().logError("Could not write Petri net plain text file", e);
           }
@@ -257,6 +292,14 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
     bpBuildJob.schedule();
   }
   
+  public static hub.top.petrinet.PetriNet computeComponent(hub.top.petrinet.PetriNet net, String[] keep) {
+    hub.top.petrinet.PetriNet net_component = new hub.top.petrinet.PetriNet(net);
+    removeAllNodesNotIn(net_component, keep);            
+    net_component.removeParallelTransitions();
+    net_component.removeIsolatedNodes();
+    return net_component;
+  }
+  
   public static void removeAllNodesNotIn(hub.top.petrinet.PetriNet net, String[] keep) {
     LinkedList<hub.top.petrinet.Node> toRemove = new LinkedList<hub.top.petrinet.Node>();
     for (hub.top.petrinet.Place p : net.getPlaces()) {
@@ -270,18 +313,19 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
     }
     
     for (hub.top.petrinet.Transition t : net.getTransitions()) {
-      boolean neededTransition = false;
+      boolean neededTransitionPre = false;
+      boolean neededTransitionPost = false;
       for (hub.top.petrinet.Place p : t.getPreSet()) {
         if (!toRemove.contains(p)) {
-          neededTransition = true; break;
+          neededTransitionPre = true; break;
         }
       }
       for (hub.top.petrinet.Place p : t.getPostSet()) {
         if (!toRemove.contains(p)) {
-          neededTransition = true;
+          neededTransitionPost = true;
         }
       }
-      if (!neededTransition) toRemove.add(t);
+      if (!neededTransitionPre || !neededTransitionPost) toRemove.add(t);
     }
     
     for (hub.top.petrinet.Node n : toRemove) {

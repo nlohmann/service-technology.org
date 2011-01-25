@@ -42,6 +42,7 @@ import hub.top.editor.eclipse.ResourceHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
+import hub.top.uma.InvalidModelException;
 import hub.top.greta.synthesis.DNode2PtNet;
 import hub.top.greta.verification.BuildBP;
 
@@ -58,6 +59,7 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.emf.core.GMFEditingDomainFactory;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
@@ -111,7 +113,13 @@ public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
 		DNode.idGen = 0;
 			
 		//final DNodeBP bp = BuildBP.init(adaptiveSystem);
-		final BuildBP build = new BuildBP(adaptiveSystem, selectedFile);
+		final BuildBP build;
+		try {
+		  build = new BuildBP(adaptiveSystem, selectedFile);
+		} catch (InvalidModelException e) {
+      MessageDialog.openError(this.workbenchWindow.getShell(), "Build branching process.", "Failed to build branching process. "+e.getMessage());
+      return;
+		}
 		
 		Job bpBuildJob = new Job("constructing branching process") 
 		{
@@ -126,12 +134,12 @@ public class BuildBranchingProcess2 implements IWorkbenchWindowActionDelegate {
 			  //build.analyze(monitor, System.out);
 				
 			  //build.minimize(monitor, System.out);
-			  build.writeBPtoFile(monitor, System.out, "_bp2");
+			  build.writeBPtoFile(monitor, System.out, "_bp");
 			  
 			  PtNet net = DNode2PtNet.process(build.getBranchingProcess());
 			  
         String modelName = selectedFile.getFullPath().removeFileExtension().lastSegment();
-        IPath targetPath = selectedFile.getFullPath().removeLastSegments(1).append(modelName+"_bp2").addFileExtension("ptnet");
+        IPath targetPath = selectedFile.getFullPath().removeLastSegments(1).append(modelName+"_bp").addFileExtension("ptnet");
         TransactionalEditingDomain editing = GMFEditingDomainFactory.INSTANCE.createEditingDomain();
         FileIOHelper.writeEObjectToResource(net, editing, targetPath);
 

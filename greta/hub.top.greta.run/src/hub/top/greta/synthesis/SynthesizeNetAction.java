@@ -41,6 +41,7 @@ import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.greta.run.actions.ActionHelper;
 import hub.top.greta.verification.BuildBP;
+import hub.top.uma.InvalidModelException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -52,6 +53,7 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gmf.runtime.emf.core.GMFEditingDomainFactory;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
@@ -108,7 +110,15 @@ public class SynthesizeNetAction implements IWorkbenchWindowActionDelegate {
     if (adaptiveSystem == null)
       return;
       
-    final BuildBP build = new BuildBP(BuildBP.initSynthesis(adaptiveSystem), selectedFile);
+    final BuildBP build;
+    try {
+      build = new BuildBP(BuildBP.init(adaptiveSystem), selectedFile);
+    } catch (InvalidModelException e) {
+      ActionHelper.showMessageDialogue(MessageDialog.ERROR, 
+          "Syntheszed Petri net", 
+          "Failed to synthesize Petri net. "+e.getMessage());
+      return;
+    }
     
     Job bpBuildJob = new Job("Synthesizing Petri Net") 
     {

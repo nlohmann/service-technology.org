@@ -43,6 +43,7 @@ import hub.top.editor.eclipse.ResourceHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
+import hub.top.uma.InvalidModelException;
 import hub.top.greta.simulation.AdaptiveProcessSimulationView;
 import hub.top.greta.synthesis.DNode2Oclet;
 import hub.top.greta.synthesis.DNode2PtNet;
@@ -121,7 +122,14 @@ public class CheckSoundness implements IWorkbenchWindowActionDelegate {
 			return;
 			
 		//final DNodeBP bp = BuildBP.init(adaptiveSystem);
-		final BuildBP build = new BuildBP(adaptiveSystem, selectedFile);
+		final BuildBP build;
+		try {
+		  build = new BuildBP(adaptiveSystem, selectedFile);
+		} catch (InvalidModelException e) {
+		  ActionHelper.showMessageDialogue(MessageDialog.ERROR, 
+		      "Check soundness.", "Failed to check soundness. "+e.getMessage());
+		  return;
+		}
 		final Shell shell = workbenchWindow.getShell();
 		
 		Job bpBuildJob = new Job("constructing branching process") 

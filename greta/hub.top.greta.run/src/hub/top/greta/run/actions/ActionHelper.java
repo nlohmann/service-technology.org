@@ -52,6 +52,9 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.gmf.runtime.notation.Diagram;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 
 public class ActionHelper extends hub.top.editor.eclipse.ActionHelper {
@@ -193,5 +196,13 @@ public class ActionHelper extends hub.top.editor.eclipse.ActionHelper {
     IPath targetPath = new Path(targetPathStr+suffix+".dot");
 
     ActionHelper.writeFile (targetPath, bp.toDot());
+  }
+  
+  public static void showMessageDialogue(final int kind, final String title, final String message) {
+    Display.getDefault().syncExec(new Runnable() {
+      public void run() {         
+        MessageDialog.open(kind, null, title, message, SWT.NONE);
+      }
+    });
   }
 }

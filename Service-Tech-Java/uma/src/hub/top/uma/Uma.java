@@ -86,19 +86,40 @@ public class Uma {
   }
   
   public static DNodeBP initBuildPrefix(DNodeSys sys, int bound) {
-    DNodeBP build = new DNodeBP(sys);
-    build.configure_buildOnly();
-    build.configure_setBound(bound);
     
-    if (sys instanceof DNodeSys_PetriNet) build.configure_PetriNet();
-    else build.configure_Scenarios();
+    Options o = new Options(sys);
+    o.configure_buildOnly();
+    o.configure_setBound(bound);
+    
+    DNodeBP build = new DNodeBP(sys, o);
     
     return build;
   }
   
-  public static DNodeBP buildPrefix(DNodeSys sys, int bound) {
+  public static DNodeBP initBuildPrefix_Synthesis(DNodeSys sys, int bound) {
     
-    DNodeBP build = initBuildPrefix(sys, bound);
+    Options o = new Options(sys);
+    o.configure_synthesis();
+    o.configure_setBound(bound);
+    
+    DNodeBP build = new DNodeBP(sys, o);
+    
+    return build;
+  }
+  
+  public static DNodeBP initBuildPrefix_View(DNodeSys sys, int bound) {
+    Options o = new Options(sys);
+    o.configure_buildOnly();
+    o.configure_setBound(bound);
+    o.configure_simplifyNet();
+    
+    DNodeBP build = new DNodeBP(sys, o);
+    
+    return build;
+  }
+  
+  public static DNodeBP buildPrefix(DNodeBP build) {
+    
     int fired, totalFired = 0, step = 0;
     while ((fired = build.step()) > 0) {
       totalFired += fired;
@@ -114,7 +135,7 @@ public class Uma {
     
     ISystemModel sysModel = readSystemFromFile(options_inFile);
     DNodeSys sys = getBehavioralSystemModel(sysModel);
-    DNodeBP build = buildPrefix(sys, bound);
+    DNodeBP build = buildPrefix(initBuildPrefix(sys, bound));
 
     if (options_outputFormat == PetriNetIO.FORMAT_DOT) {
       System.out.println("writing to "+options_inFile+".bp.dot");

@@ -28,6 +28,7 @@ import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
+import hub.top.uma.Options;
 import hub.top.uma.DNodeSet.DNodeSetElement;
 
 import java.util.HashMap;
@@ -496,9 +497,11 @@ public class NetSynthesis {
     net2.turnIntoUnlabeledNet();
     DNodeSys_PetriNet sys2 = new DNodeSys_PetriNet(net2);
     
-    DNodeBP dbp2 = new DNodeBP(sys2);
-    dbp2.configure_buildOnly();
-    dbp2.configure_PetriNet();
+    Options o = new Options(sys2);
+    o.configure_buildOnly();
+    o.configure_PetriNet();
+    
+    DNodeBP dbp2 = new DNodeBP(sys2, o);
     
     while ((dbp2.step() > 0));
 

@@ -79,7 +79,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	 * 
 	 * @param as
 	 */
-	public DNodeSys_AdaptiveSystem(AdaptiveSystem as) {
+	public DNodeSys_AdaptiveSystem(AdaptiveSystem as) throws InvalidModelException {
 
 		// initialize the standard data structures
 		super();
@@ -112,9 +112,12 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
    * 
 	 * @param as
 	 */
-	private void buildNameTable(AdaptiveSystem as) {
+	private void buildNameTable(AdaptiveSystem as) throws InvalidModelException {
 
 		nodeNum = 0;
+		
+		if (as.getAdaptiveProcess() == null)
+		  throw new InvalidModelException(InvalidModelException.NO_INITIAL_STATE, as);
 		
 		// collect all names and assign each new name a new ID
 		for (Node n : as.getAdaptiveProcess().getNodes()) {
@@ -150,6 +153,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	 * @return
 	 */
 	private Collection<DNode> translateToDNodes(OccurrenceNet o, boolean isAnti, boolean beginAtMarked) {
+		// LinkedList<DNode> allNodes = new LinkedList<DNode>();
 		LinkedList<DNode> maxNodes = new LinkedList<DNode>();
 		LinkedList<Node> searchQueue = new LinkedList<Node>();
 		
@@ -250,6 +254,8 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 			
 			// create new DNode d for Node n
 			DNode d = new DNode(nameToID.get(n.getName()), pre);
+      //allNodes.add(d);
+      
 			if (n instanceof Event) {
 				d.isEvent = true;
 				// remember all events of a DoNet: these will be fired if enabled
@@ -288,6 +294,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 			nodeEncoding.put(n, d);		// store new pair
 			nodeOrigin.put(d, n);     // and its reverse mapping
 		}
+		// return allNodes;
 		return maxNodes;
 	}
 
@@ -299,11 +306,11 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	 */
 	private DNodeSet buildDNodeRepresentation(Oclet o) {
 		
-		Collection<DNode> maxNodesOfO = translateToDNodes(o.getDoNet(), o.getOrientation() == Orientation.ANTI, false);
+		Collection<DNode> nodesOfO = translateToDNodes(o.getDoNet(), o.getOrientation() == Orientation.ANTI, false);
 		
 		// store the constructed DNodes in a DNodeSet, this represents the oclet
 		DNodeSet ds = new DNodeSet(properNames.length);
-		for (DNode d : maxNodesOfO)
+		for (DNode d : nodesOfO)
 			ds.add(d);
 		
 		// a maximal condition in the PreNet may not have a successor
@@ -314,6 +321,7 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
       if (!ds.allConditions.contains(d))
         ds.add(d);
     }
+    
     
     if (o.getOrientation() == Orientation.ANTI) {
       hasDynamicSynchronization = true;
@@ -331,11 +339,11 @@ public class DNodeSys_AdaptiveSystem extends DNodeSys {
 	 */
 	private DNodeSet buildDNodeRepresentation(AdaptiveProcess ap) {
 		
-		Collection<DNode> maxNodesOfAP = translateToDNodes(ap, false, true);
+		Collection<DNode> nodesOfAP = translateToDNodes(ap, false, true);
 		
 		// store the constructed DNodes in a DNodeSet, this represents the oclet
 		DNodeSet ds = new DNodeSet(properNames.length);
-		for (DNode d : maxNodesOfAP)
+		for (DNode d : nodesOfAP)
 			ds.add(d);
 		return ds;
 	}

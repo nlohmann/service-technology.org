@@ -46,8 +46,9 @@ import java.util.LinkedList;
 
 public class DNodeBP_Scenario extends DNodeBP {
 
-  public DNodeBP_Scenario(DNodeSys system) {
-    super(system);
+  public DNodeBP_Scenario(DNodeSys system, Options options) {
+    super(system, options);
+    getOptions().configure_Scenarios();
   }
   
   public LinkedList<DNode> getImpliedScenarios() {

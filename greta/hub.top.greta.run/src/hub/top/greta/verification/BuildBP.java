@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import hub.top.adaptiveSystem.AdaptiveSystem;
 import hub.top.editor.eclipse.FileIOHelper;
 import hub.top.editor.ptnetLoLA.PtNet;
+import hub.top.greta.run.actions.ActionHelper;
 import hub.top.uma.DNodeBP_Scenario;
 import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys_PtNet;
@@ -52,6 +53,7 @@ import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeSys_AdaptiveSystem;
 import hub.top.uma.InvalidModelException;
+import hub.top.uma.Options;
 
 public class BuildBP {
   
@@ -84,7 +86,7 @@ public class BuildBP {
   /**
    * @param adaptiveSystem
    */
-  public BuildBP(AdaptiveSystem adaptiveSystem) {
+  public BuildBP(AdaptiveSystem adaptiveSystem) throws InvalidModelException {
     this(BuildBP.init(adaptiveSystem));
   }
   
@@ -99,7 +101,7 @@ public class BuildBP {
    * @param adaptiveSystem
    * @param srcFile
    */
-  public BuildBP(AdaptiveSystem adaptiveSystem, IFile srcFile) {
+  public BuildBP(AdaptiveSystem adaptiveSystem, IFile srcFile) throws InvalidModelException {
     this(BuildBP.init(adaptiveSystem), srcFile);
   }
   
@@ -222,8 +224,8 @@ public class BuildBP {
         String outFileAppendix) {
     if (srcFile != null) {
       monitor.subTask("writing dot file");
-      IOUtil.writeDotFile(bp, srcFile, outFileAppendix);
-      
+      ActionHelper.writeDotFile(bp, srcFile, outFileAppendix);
+      /*
       DNodeSet.option_printAnti = false;
       IOUtil.writeDotFile(bp, srcFile, outFileAppendix+"_positive");
       DNodeSet.option_printAnti = true;
@@ -234,6 +236,7 @@ public class BuildBP {
       } catch (IOException e) {
         
       }
+      */
       return true;
     }
     return false;
@@ -252,30 +255,36 @@ public class BuildBP {
     return bp;
   }
   
-  public static DNodeBP init(AdaptiveSystem adaptiveSystem) {
+  public static DNodeBP init(AdaptiveSystem adaptiveSystem) throws InvalidModelException {
     DNodeSys_AdaptiveSystem system = new DNodeSys_AdaptiveSystem(adaptiveSystem);
-    DNodeBP bp = new DNodeBP_Scenario(system);
-    bp.configure_buildOnly();
-    bp.configure_Scenarios();
+    
+    Options o = new Options(system);
+    o.configure_buildOnly();
+
+    DNodeBP bp = new DNodeBP_Scenario(system, o);
     //bp.configure_stopIfUnSafe();
     return bp;
   }
   
-  public static DNodeBP initSynthesis(AdaptiveSystem adaptiveSystem) {
+  public static DNodeBP initSynthesis(AdaptiveSystem adaptiveSystem) throws InvalidModelException {
     DNodeSys_AdaptiveSystem system = new DNodeSys_AdaptiveSystem(adaptiveSystem);
-    DNodeBP bp = new DNodeBP_Scenario(system);
-    bp.configure_synthesis();
-    bp.configure_Scenarios();
-    bp.configure_stopIfUnSafe();
+    
+    Options o = new Options(system);
+    o.configure_synthesis();
+    o.configure_stopIfUnSafe();
+
+    DNodeBP bp = new DNodeBP_Scenario(system, o);
     return bp;
   }
   
   public static DNodeBP init(PtNet net) throws InvalidModelException {
     DNodeSys_PtNet system = new DNodeSys_PtNet(net);
-    DNodeBP bp = new DNodeBP(system);
-    bp.configure_buildOnly();
-    bp.configure_PetriNet();
-    bp.configure_stopIfUnSafe();
+    
+    Options o = new Options(system);
+    o.configure_buildOnly();
+    o.configure_stopIfUnSafe();
+    
+    DNodeBP bp = new DNodeBP(system, o);
     return bp;
   }
   

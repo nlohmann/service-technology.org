@@ -215,7 +215,7 @@ public class MineSimplify {
     boolean abstractCycles) throws InvalidModelException {
     
     DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
-    DNodeBP build = Uma.initBuildPrefix(sys, 0);
+    DNodeBP build = Uma.initBuildPrefix_View(sys, 0);
 
     sim._time_buildBP_start = System.currentTimeMillis();
     //Uma.out.println("generating view for "+traces.size()+" traces...");

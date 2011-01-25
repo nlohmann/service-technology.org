@@ -74,11 +74,13 @@ public class UmaTest extends hub.top.test.TestCase {
     try {
       PetriNet net = PetriNetIO.readNetFromFile(testFileRoot+"/net_2bounded.lola");
       DNodeSys_PetriNet sys = new DNodeSys_PetriNet(net);
-      DNodeBP build = new DNodeBP(sys);
-      build.configure_buildOnly();
-      build.configure_PetriNet();
-      build.configure_setBound(2);
       
+      Options o = new Options(sys);
+      o.configure_buildOnly();
+      o.configure_PetriNet();
+      o.configure_setBound(2);
+      
+      DNodeBP build = new DNodeBP(sys, o);
       while (build.step() > 0) {
       }
       
@@ -105,11 +107,13 @@ public class UmaTest extends hub.top.test.TestCase {
     try {
       PetriNet net = PetriNetIO.readNetFromFile(testFileRoot+"/net_2bounded.lola");
       DNodeSys_PetriNet sys = new DNodeSys_PetriNet(net);
-      DNodeBP build = new DNodeBP(sys);
-      build.configure_buildOnly();
-      build.configure_PetriNet();
-      build.configure_stopIfUnSafe();
       
+      Options o = new Options(sys);
+      o.configure_buildOnly();
+      o.configure_PetriNet();
+      o.configure_stopIfUnSafe();
+      
+      DNodeBP build = new DNodeBP(sys, o);
       while (build.step() > 0) {
       }
       
@@ -133,11 +137,13 @@ public class UmaTest extends hub.top.test.TestCase {
       OcletSpecification os = new OcletSpecification(net);
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
-      DNodeBP build = new DNodeBP(sys);
-      build.configure_buildOnly();
-      build.configure_Scenarios();
-      build.configure_stopIfUnSafe();
       
+      Options o = new Options(sys);
+      o.configure_buildOnly();
+      o.configure_Scenarios();
+      o.configure_stopIfUnSafe();
+      
+      DNodeBP build = new DNodeBP(sys, o);
       while (build.step() > 0) {
       }
       
@@ -163,11 +169,13 @@ public class UmaTest extends hub.top.test.TestCase {
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
       short eventToCheck = sys.nameToID.get("X");
-      DNodeBP build = new DNodeBP(sys);
-      build.configure_buildOnly();
-      build.configure_Scenarios();
-      build.configure_checkExecutable(eventToCheck);
-      
+
+      Options o = new Options(sys);
+      o.configure_buildOnly();
+      o.configure_Scenarios();
+      o.configure_checkExecutable(eventToCheck);
+
+      DNodeBP build = new DNodeBP(sys, o);
       while (build.step() > 0) {
       }
       
@@ -194,11 +202,13 @@ public class UmaTest extends hub.top.test.TestCase {
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
       short eventToCheck = sys.nameToID.get("Z");
-      DNodeBP build = new DNodeBP(sys);
-      build.configure_buildOnly();
-      build.configure_Scenarios();
-      build.configure_checkExecutable(eventToCheck);
       
+      Options o = new Options(sys);
+      o.configure_buildOnly();
+      o.configure_Scenarios();
+      o.configure_checkExecutable(eventToCheck);
+      
+      DNodeBP build = new DNodeBP(sys, o);
       while (build.step() > 0) {
       }
       
@@ -248,11 +258,12 @@ public class UmaTest extends hub.top.test.TestCase {
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
       DNode eventToCheck = sys.getResultNode(e3);
       
-      DNodeBP build = new DNodeBP(sys);
-      build.configure_buildOnly();
-      build.configure_Scenarios();
-      build.configure_checkExecutable(eventToCheck);
-      
+      Options o = new Options(sys);
+      o.configure_buildOnly();
+      o.configure_Scenarios();
+      o.configure_checkExecutable(eventToCheck);
+
+      DNodeBP build = new DNodeBP(sys, o);
       while (build.step() > 0) {
       }
       
@@ -269,13 +280,14 @@ public class UmaTest extends hub.top.test.TestCase {
   
       // then check for executability of an event with the same label as e3
       sys = new DNodeSys_OcletSpecification(os);
-      short eventLabelToCheck = sys.nameToID.get(e3.getName());    
+      short eventLabelToCheck = sys.nameToID.get(e3.getName());
       
-      build = new DNodeBP(sys);
-      build.configure_buildOnly();
-      build.configure_Scenarios();
-      build.configure_checkExecutable(eventLabelToCheck);
+      Options o2 = new Options(sys);
+      o2.configure_buildOnly();
+      o2.configure_Scenarios();
+      o2.configure_checkExecutable(eventLabelToCheck);
       
+      build = new DNodeBP(sys, o2);
       while (build.step() > 0) {
       }
       
@@ -300,11 +312,13 @@ public class UmaTest extends hub.top.test.TestCase {
       OcletSpecification os = new OcletSpecification(net);
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
-      DNodeBP build = new DNodeBP(sys);
-      build.configure_buildOnly();
-      build.configure_Scenarios();
-      build.configure_stopIfUnSafe();
       
+      Options o = new Options(sys);
+      o.configure_buildOnly();
+      o.configure_Scenarios();
+      o.configure_stopIfUnSafe();
+      
+      DNodeBP build = new DNodeBP(sys, o);
       while (build.step() > 0) {
       }
       
@@ -329,11 +343,13 @@ public class UmaTest extends hub.top.test.TestCase {
       OcletSpecification os = new OcletSpecification(net);
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
-      DNodeBP build = new DNodeBP(sys);
-      build.configure_buildOnly();
-      build.configure_Scenarios();
-      build.configure_stopIfUnSafe();
       
+      Options o = new Options(sys);
+      o.configure_buildOnly();
+      o.configure_Scenarios();
+      o.configure_stopIfUnSafe();
+      
+      DNodeBP build = new DNodeBP(sys, o);
       while (build.step() > 0) {
       }
       
@@ -369,11 +385,13 @@ public class UmaTest extends hub.top.test.TestCase {
       OcletSpecification os = new OcletSpecification(net);
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
-      DNodeBP build = new DNodeBP(sys);
-      build.configure_buildOnly();
-      build.configure_Scenarios();
-      build.configure_stopIfUnSafe();
       
+      Options o = new Options(sys);
+      o.configure_buildOnly();
+      o.configure_Scenarios();
+      o.configure_stopIfUnSafe();
+      
+      DNodeBP build = new DNodeBP(sys, o);
       while (build.step() > 0) {
       }
       
@@ -401,11 +419,13 @@ public class UmaTest extends hub.top.test.TestCase {
       OcletSpecification os = new OcletSpecification(net);
       
       DNodeSys_OcletSpecification sys = new DNodeSys_OcletSpecification(os);
-      DNodeBP build = new DNodeBP(sys);
-      build.configure_buildOnly();
-      build.configure_Scenarios();
-      build.configure_stopIfUnSafe();
       
+      Options o = new Options(sys);
+      o.configure_buildOnly();
+      o.configure_Scenarios();
+      o.configure_stopIfUnSafe();
+      
+      DNodeBP build = new DNodeBP(sys, o);
       while (build.step() > 0) {
       }
       

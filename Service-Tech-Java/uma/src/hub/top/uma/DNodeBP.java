@@ -92,136 +92,20 @@ public class DNodeBP {
 	 * conditions as equivalence notion.
 	 * 
 	 * @param as
+	 * @param options set to <code>null</code> for default options
 	 */
-	public DNodeBP(DNodeSys system) {
+	public DNodeBP(DNodeSys system, Options options) {
 
 		// instantiate DNode representation of the adaptive system
 		dNodeAS = system;
-		
 		initialize();
-
-		options = new Options();
-    options.searchStrat_size = true;
-		options.cutOffEquiv_conditionHistory = true;
 		
-    options.checkProperties = true;
-    configure_setBound(0);
-    options.checkProperty_DeadCondition = true;
+		if (options == null)
+		  this.options = new Options(system);
+		else 
+		  this.options = options;
 	}
 	
-	// ----- various configuration settings for different use cases -------
-	
-  /**
-   * configure unfolding algorithm for scenario-based specifications
-   */
-  public void configure_Scenarios() {
-    // search strategy: lexicographic
-    options.searchStrat_size = true;
-    options.searchStrat_predecessor = false;
-    options.searchStrat_lexicographic = true;
-    
-    // determine equivalence of cuts by history
-    options.cutOffEquiv_conditionHistory = true;
-    options.cutOffEquiv_marking = false;
-  }
-	
-	 /**
-   * configure unfolding algorithm for Petri net semantics
-   */
-  public void configure_PetriNet() {
-    // search strategy: predecessor
-    options.searchStrat_size = true;
-    options.searchStrat_predecessor = false;
-    options.searchStrat_lexicographic = true;
-    
-    // determine equivalence of cuts by markings
-    options.cutOffEquiv_conditionHistory = true;
-    options.cutOffEquiv_marking = false;
-  }
-  
-  /**
-   * configure unfolding algorithm to construct BP only
-   */
-  public void configure_buildOnly() {
-      options.checkProperties = false;
-      options.checkProperty_DeadCondition = false;
-      
-      configure_setBound(0);
-      
-      options.cutOffTermination_reachability = true;
-  }
-  
-  /**
-   * configure unfolding algorithm to construct BP only
-   */
-  public void configure_checkProperties() {
-      options.checkProperties = true;
-      configure_setBound(1);
-      options.checkProperty_DeadCondition = true;
-  }
-  
-  /**
-   * configure unfolding algorithm to stop if system is unsafe
-   */
-  public void configure_stopIfUnSafe() {
-      options.checkProperties = true;
-      configure_setBound(1);
-  }
-  
-  /**
-   * configure unfolding algorithm to stop if system is unsafe
-   */
-  public void configure_synthesis() {
-    options.checkProperties = false;
-    options.checkProperty_DeadCondition = false;
-    configure_setBound(0);
-      
-    options.cutOffTermination_reachability = false;
-    options.cutOffTermination_synthesis = true;
-  }
-  
-	/**
-	 * set bound of computed prefix, i.e. maximum number of conditions
-	 * with the same label in a cut
-	 * 
-	 * @param k
-	 */
-	public void configure_setBound(int k) {
-		options.boundToCheck = k;
-	}
-	
-	/**
-	 * configure unfolding algorithm to construct BP only
-	 */
-	public void configure_checkSoundness() {
-		options.checkProperties = true;
-	  configure_setBound(1);
-	  options.checkProperty_DeadCondition = true;
-	}
-	
-	/**
-	 * Construct BP to check whether the event with the given
-	 * label ID is executable in the system.
-	 * 
-	 * @param eventID
-	 */
-	public void configure_checkExecutable(short eventID) {
-	  options.checkProperties = true;
-    options.checkProperty_ExecutableEventID = eventID;
-    options.cutOffTermination_reachability = true;
-	}
-	
-	 /**
-   * Construct BP to check whether the given event from
-   * {@link DNodeSys#fireableEvents} is executable.
-   * 
-   * @param event
-   */
-  public void configure_checkExecutable(DNode event) {
-    options.checkProperties = true;
-    options.checkProperty_ExecutableEvent = event.globalId;
-    options.cutOffTermination_reachability = true;
-  }
   
   /* ==========================================================================
    * 
@@ -300,7 +184,7 @@ public class DNodeBP {
       cosetIdEx.add(dSymm.id);
       
       // check for unsafe behavior
-      if (options.boundToCheck == 1) {
+      if (getOptions().boundToCheck == 1) {
         if (existing.id == dSymm.id) {
           propertyCheck |= PROP_UNSAFE;
           System.out.println("found two concurrent conditions with the same name: "+existing+", "+dSymm);
@@ -379,13 +263,13 @@ public class DNodeBP {
 		//co.put(newNode, coset);
 		
     // check for violation of k-boundedness
-    if (options.boundToCheck > 1) {
+    if (getOptions().boundToCheck > 1) {
       int coNum = 0;
       for (DNode other : co.get(newNode)) {
         if (other.id == newNode.id) coNum++;
       }
       
-      if (coNum > options.boundToCheck) {
+      if (coNum > getOptions().boundToCheck) {
         // found k other concurrent conditions with the same id
         // bound violated
         propertyCheck |= PROP_UNSAFE;
@@ -578,7 +462,7 @@ public class DNodeBP {
 		  if (putIndex == null) continue;  // no, skip condition
 		  
       // consider only conditions which are NOT successors of a cutOff event
-      if (options.cutOffTermination_reachability
+      if (getOptions().cutOffTermination_reachability
           && (cond.pre != null && cond.pre.length > 0 && cond.pre[0].isCutOff))
       {
         continue;
@@ -1252,14 +1136,14 @@ public class DNodeBP {
   			if (newEvent.isCutOff == true)
   			  setCutOff(newEvent);
   			
-        if (options.checkProperties)
+        if (getOptions().checkProperties)
           checkProperties(newEvent);
         
 			} else {
 			  currentPrimeCut = null;
 			}
 			
-			if (options.checkProperties)
+			if (getOptions().checkProperties)
 				checkProperties();
 			
 			long _debug_cutOfftime = (_debug_t5_computed_cutOff ? (_debug_t5b_cutOff-_debug_t4b_t5a_primeConfig) : 0);
@@ -1416,8 +1300,8 @@ public class DNodeBP {
     boolean includeEvent = false;
 
     // collected all predecessor events if using the lexicographic search strategy
-    if (options.searchStrat_predecessor || options.searchStrat_lexicographic) computePredecessors = true;
-    if (options.searchStrat_size) includeEvent = true;
+    if (getOptions().searchStrat_predecessor || getOptions().searchStrat_lexicographic) computePredecessors = true;
+    if (getOptions().searchStrat_size) includeEvent = true;
     
     currentPrimeCut = bp.getPrimeCut(event, computePredecessors, includeEvent);
     currentPrimeConfig = bp.getPrimeConfiguration;
@@ -1447,27 +1331,27 @@ public class DNodeBP {
   public boolean isCutOffEvent(DNode event) {
     
     // pick a search strategy for determing the cut off event
-    if (options.searchStrat_predecessor) {
+    if (getOptions().searchStrat_predecessor) {
       
       // pick an equivalence criterion for determining equivalent cuts
-      if (options.cutOffEquiv_history) {
+      if (getOptions().cutOffEquiv_history) {
         if (findEquivalentCut_history(event, currentPrimeCut, currentPrimeConfig)) {
           return true;
         }
         
-      } else if (options.cutOffEquiv_marking) {
+      } else if (getOptions().cutOffEquiv_marking) {
         if (findEquivalentCut_marking_predecessor(event, currentPrimeCut, currentPrimeConfig)) {
           return true;
         }
         
-      } else if (options.cutOffEquiv_conditionHistory ) {
+      } else if (getOptions().cutOffEquiv_conditionHistory ) {
         int currentConfigSize = bp.getPrimeConfiguration_size;
         if (findEquivalentCut_conditionHistory_signature_size(
             currentConfigSize, event, currentPrimeCut, currentPrimeConfig)) {
           return true;
         }
         
-      } else if (options.cutOffEquiv_eventSignature) {
+      } else if (getOptions().cutOffEquiv_eventSignature) {
         if (findEquivalentCut_eventSignature_predecessor(event, currentPrimeCut, currentPrimeConfig)) {
           return true;
         }
@@ -1475,17 +1359,17 @@ public class DNodeBP {
         assert false : "No valid search strategy given.";
       }
       
-    } else if (options.searchStrat_size) {
+    } else if (getOptions().searchStrat_size) {
       // search for cut off events in all previously constructed events
 
       // pick an equivalence criterion for determining equivalent cuts
-      if (options.cutOffEquiv_conditionHistory ) {
+      if (getOptions().cutOffEquiv_conditionHistory ) {
         if (findEquivalentCut_conditionHistory_signature_size(
             primeConfiguration_Size.get(event), event, currentPrimeCut, bp.getAllEvents())) {
           return true;
         }
         
-      } else if (options.cutOffEquiv_eventSignature) {
+      } else if (getOptions().cutOffEquiv_eventSignature) {
         if (findEquivalentCut_eventSignature_size(
             primeConfiguration_Size.get(event), event, currentPrimeCut, bp.getAllEvents())) {
           return true;
@@ -1614,7 +1498,7 @@ public class DNodeBP {
     
     if (abort) return 0;
     
-    if (propertyCheck == PROP_NONE || !options.stopIfPropertyFound)
+    if (propertyCheck == PROP_NONE || !getOptions().stopIfPropertyFound)
       return fired;
     else
       return 0; // abort if properties violated/abortion condition holds
@@ -2286,7 +2170,7 @@ public class DNodeBP {
         continue;
 
       // retrieve the cut reached by the old event 'e'
-      DNode[] oldCut = bp.getPrimeCut(e, options.searchStrat_lexicographic, options.searchStrat_lexicographic);
+      DNode[] oldCut = bp.getPrimeCut(e, getOptions().searchStrat_lexicographic, getOptions().searchStrat_lexicographic);
       
       // cuts of different lenghts cannot reach the same state, skip
       if (newCut.length != oldCut.length)
@@ -2296,7 +2180,7 @@ public class DNodeBP {
       if (newCutConfigSize == bp.getPrimeConfiguration_size) {
         
         // and if not lexicographic, then the new event cannot be cut-off event
-        if (!options.searchStrat_lexicographic) continue;
+        if (!getOptions().searchStrat_lexicographic) continue;
         // LEXIK: otherwise compare whether the old event's configuration is
         // lexicographically smaller than the new event's configuration
         if (!isSmaller_lexicographic(primeConfigurationString.get(e), primeConfigurationString.get(newEvent))) {
@@ -2476,7 +2360,7 @@ public class DNodeBP {
   private boolean isSmaller_lexicographic(short[] oldConfigIDs, short[] newConfigIDs) {
     //System.out.println(toString(oldConfigIDs)+" <? "+toString(newConfigIDs));
     
-    if (options.searchStrat_lexicographic == false) return false;
+    if (getOptions().searchStrat_lexicographic == false) return false;
     if (oldConfigIDs.length != newConfigIDs.length) {
       System.err.println("Error: lexicographically comparing configurations of different size");
       return false;
@@ -2506,7 +2390,7 @@ public class DNodeBP {
    */
   @SuppressWarnings("unused")
   private boolean isSmaller_lexicographic_acc(byte[] oldConfig, byte[] newConfig) {
-    if (options.searchStrat_lexicographic == false) return false;
+    if (getOptions().searchStrat_lexicographic == false) return false;
 
     // both configurations have same size by assumption
     // iterate over the ID-sorted configurations and compare configs lexicographically
@@ -2708,8 +2592,10 @@ public class DNodeBP {
 	  if (!foldingEquivalenceCompleted) {
 	    buildFoldingEquivalence();
 	    relaxFoldingEquivalence();
+	    
 	    // required for synthesis, check with simplification
-	    extendFoldingEquivalence_forward(); 
+	    if (getOptions().folding_extendEquivalence_forward)
+	      extendFoldingEquivalence_forward(); 
 	    
 	    //extendFoldingEquivalence_maximal();
 	    //extendFoldingEquivalence_backwards();
@@ -3582,7 +3468,7 @@ public class DNodeBP {
 	 */
   private boolean checkProperties() {
     
-    if (options.boundToCheck == 1) {
+    if (getOptions().boundToCheck == 1) {
       // TODO: generalize to check k-boundedness
       
       if (currentPrimeCut == null)
@@ -3615,16 +3501,16 @@ public class DNodeBP {
   private boolean checkProperties(DNode firedEvent) {
 
     if (!firedEvent.isAnti
-        && options.checkProperty_ExecutableEventID == firedEvent.id)
+        && getOptions().checkProperty_ExecutableEventID == firedEvent.id)
     {
       // event with the configured labeled was fired
       propertyCheck |= PROP_EXECUTEDEVENT;
       return false;
     }
     
-    if (!firedEvent.isAnti && options.checkProperty_ExecutableEvent != -1) {
+    if (!firedEvent.isAnti && getOptions().checkProperty_ExecutableEvent != -1) {
       for (int i=0; i<firedEvent.causedBy.length; i++) {
-        if (options.checkProperty_ExecutableEvent == firedEvent.causedBy[i]) {
+        if (getOptions().checkProperty_ExecutableEvent == firedEvent.causedBy[i]) {
           // event with the configured ID was fired
           propertyCheck |= PROP_EXECUTEDEVENT;
           return false;
@@ -3655,7 +3541,7 @@ public class DNodeBP {
 	public boolean findDeadConditions (boolean first) {
 	  
 	  // do not check for dead conditions unless needed
-    if (!options.checkProperty_DeadCondition)
+    if (!getOptions().checkProperty_DeadCondition)
       return false;
 		
 		// do not check if the BP is unsafe, in this case, the construction
@@ -3769,7 +3655,7 @@ public class DNodeBP {
 	 */
 	public boolean isGloballySafe() {
 		
-		if (options.boundToCheck == 0)
+		if (getOptions().boundToCheck == 0)
 			return true;
 		
     // compare all concurrent conditions
@@ -3782,7 +3668,7 @@ public class DNodeBP {
         if (d.id == id) coNum++;
       }
       
-      if (coNum > options.boundToCheck) {
+      if (coNum > getOptions().boundToCheck) {
         // found k other concurrent conditions with the same id
         // bound violated
         propertyCheck |= PROP_UNSAFE;
@@ -3798,7 +3684,7 @@ public class DNodeBP {
 	 * @return true iff the process is safe
 	 */
 	public boolean isSafe() {
-	  if (options.boundToCheck == 0) return true;
+	  if (getOptions().boundToCheck == 0) return true;
 	  return (propertyCheck & PROP_UNSAFE) == 0;
 	}
 	
@@ -3807,9 +3693,9 @@ public class DNodeBP {
 	 * is executable in the system
 	 */
 	public boolean canExecuteEvent() {
-	  if (options.checkProperty_ExecutableEventID != -1)
+	  if (getOptions().checkProperty_ExecutableEventID != -1)
 	    return (propertyCheck & PROP_EXECUTEDEVENT) == PROP_EXECUTEDEVENT;
-	  if (options.checkProperty_ExecutableEvent != -1)
+	  if (getOptions().checkProperty_ExecutableEvent != -1)
 	    return (propertyCheck & PROP_EXECUTEDEVENT) == PROP_EXECUTEDEVENT;
 	  return true;
 	}
@@ -3819,7 +3705,7 @@ public class DNodeBP {
    * {@link #findDeadConditions(boolean)} first, to find the dead conditions
    */
   public boolean hasDeadCondition() {
-    if (!options.checkProperty_DeadCondition) return true;
+    if (!getOptions().checkProperty_DeadCondition) return true;
     return (propertyCheck & PROP_DEADCONDITION) > 0;
   }
 
@@ -3834,99 +3720,6 @@ public class DNodeBP {
 //    }
 //    return result + "]";
 //  }
-  
-  /**
-   * Stores all options used in the construction of the branching process 
-   */
-  public static class Options {
-    
-	//// --- search strategies for finding cut-off events
-    /**
-     *  check for cut-off events using the lexicographic order on events:
-     *  compare each candidate event only with events that are predecessors
-     *  of the candidate event
-     */
-    protected boolean searchStrat_predecessor = false;
-    /**
-     *  check for cut-off events using the size of the local configurations:
-     *  compare each candidate event only with events that have been added
-     *  previously and which have a strictly smaller prime configuration
-     */
-    protected boolean searchStrat_size = false;
-    /**
-     *  check for cut-off events using a lexicographic order in the transition names:
-     *  compare each candidate event only with events that have been added
-     *  previously and which have a smaller or equal prime configuration, if
-     *  two configurations have equal size, then their lexicographic order determines
-     *  the order of the configuration
-     */
-    protected boolean searchStrat_lexicographic = false;
-    
-    //// --- equivalence notions for detecting whether two events are equivalent
-    /**
-     *  check for equivalence of cuts by comparing their histories for
-     *  enabling the same sets of events
-     */
-    protected boolean cutOffEquiv_eventSignature = false;
-    /**
-     *  check for equivalence of cuts by comparing their histories for
-     *  isomorphism to the maximal depth of the histories in the input system
-     */
-    protected boolean cutOffEquiv_history = false;
-    /**
-     * check for equivalence of cuts by comparing the reached markings only
-     */
-    protected boolean cutOffEquiv_marking = false;
-    /**
-     *  check for equivalence of cuts by comparing the histories of conditions
-     *  with respect to the conditions of the given system
-     */
-    protected boolean cutOffEquiv_conditionHistory = false;
-    
-    /**
-     * compute finite complete prefix until all reachable states have been
-     * computed (default: <code>true</code>)
-     */
-    protected boolean cutOffTermination_reachability = true;
-    /**
-     * compute finite complete prefix until finite complete prefix is successor
-     * complete and can be folded into an equivalent Petri net
-     * (default: <code>false</code>)
-     */
-    protected boolean cutOffTermination_synthesis = false;
-
-
-    //// --- analysis flags
-    /**
-     * whether properties shall be checked on the fly at all
-     */
-    protected boolean checkProperties = false;
-    /**
-     * check whether the system is k-bounded
-     */
-    protected int boundToCheck = 0;
-    /**
-     * check whether the system has dead conditions (which have no post-event
-     */
-    protected boolean checkProperty_DeadCondition = false;
-    /**
-     * stop BP construction if the property to be checked has been found
-     */
-    protected boolean stopIfPropertyFound = true;
-    /**
-     * check whether the event with the given label-ID can be executed 
-     */
-    protected short checkProperty_ExecutableEventID = -1;
-    /**
-     * check whether the given event (in terms of its global ID from
-     * {@link DNodeSys}) can be executed 
-     */
-    protected int checkProperty_ExecutableEvent = -1;
-  } // end of Options
-  
-  // =========================================================================
-  //  members and methods used for debugging
-  // =========================================================================
   
   // use to log procedure calls and intermediate results in a separate file
   public StringBuilder _debug_log = new StringBuilder();
@@ -3982,6 +3775,14 @@ public class DNodeBP {
       result+=array[i];
     }
     return result+"]";
+  }
+
+
+  /**
+   * @return options for constructing the branching process
+   */
+  public Options getOptions() {
+    return options;
   }
 
 }

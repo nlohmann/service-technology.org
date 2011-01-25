@@ -27,6 +27,7 @@ import hub.top.petrinet.Transition;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.InvalidModelException;
+import hub.top.uma.Options;
 import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.Uma;
 
@@ -48,12 +49,14 @@ public class Unfolder_PetriNet {
     try {
       sys = new DNodeSys_PetriNet(net);
       
-      // initialize unfolder
-      bp = new DNodeBP(sys);
+      Options o = new Options(sys);
       // configure to unfold a Petri net
-      bp.configure_PetriNet();
+      o.configure_PetriNet();
       // stop construction of unfolding when reaching an unsafe marking
-      bp.configure_stopIfUnSafe();
+      o.configure_stopIfUnSafe();
+      
+      // initialize unfolder
+      bp = new DNodeBP(sys, o);
       
     } catch (InvalidModelException e) {
       

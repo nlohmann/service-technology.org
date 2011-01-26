@@ -5,4 +5,5 @@ purpose "Reduces internal behavior in service models."
 
 option "verbose" v "Show verbose information" flag off
 option "dot" d "Create dot output" flag off
-option "noReduction" m "Switch of reduction" flag off
+option "tarjan" t "Apply Tarjan's algorithm" flag off
+option "noReduction" n "Switch of reduction" flag off

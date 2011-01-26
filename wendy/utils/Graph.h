@@ -14,8 +14,7 @@ class Graph {
         static pnapi::PetriNet net;
 
     private:
-        static unsigned int l;
-        static unsigned int r2, r63, r62, r1;
+        static unsigned int r1, r2, r63, r62;
 
     private:
         std::map<unsigned int, Node*> nodes;
@@ -26,6 +25,10 @@ class Graph {
         void removeEdge(unsigned int, unsigned int, unsigned int);
 
     public:
+        unsigned int init;
+
+        void tarjan(unsigned int, bool=true);
+
         void initLabels();
         void addEdge(unsigned int, unsigned int, std::string);
         void print();
@@ -40,4 +43,6 @@ class Node {
     public:
         std::map<unsigned int, std::set<unsigned int> > preset;
         std::map<unsigned int, std::set<unsigned int> > postset;
+        unsigned int lowlink;
+        unsigned int dfs;
 };

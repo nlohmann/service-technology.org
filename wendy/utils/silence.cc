@@ -7,8 +7,6 @@
 #include "Output.h"
 #include "cmdline.h"
 
-using std::string;
-
 extern int graph_parse();
 extern int graph_lex_destroy();
 extern FILE* graph_in;
@@ -45,14 +43,27 @@ int main(int argc, char** argv) {
     status("reading from stdin...");
     std::cin >> pnapi::io::owfn >> Graph::net;
 
-    g.initLabels();
 
+    /*--------------------------------------------.
+    | 2. write inner of the open net to LoLA file |
+    `--------------------------------------------*/
     Output* temp = new Output();
     temp->stream() << pnapi::io::lola << Graph::net;
 
     std::string command_line = "lola-statespace " + temp->name() + " -M";
 
-    // call LoLA
+
+    /*--------------------.
+    | 3. initialize graph |
+    `--------------------*/
+
+    g.initLabels();
+
+
+    /*------------------------------------------.
+    | 4. call LoLA and parse reachability graph |
+    `------------------------------------------*/
+
     status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
     graph_in = popen(command_line.c_str(), "r");
     graph_parse();
@@ -63,22 +74,36 @@ int main(int argc, char** argv) {
 
     g.info();
 
+
+    /*----------------.
+    | 5. reduce graph |
+    `----------------*/
+
     unsigned int i = 0;
     const unsigned int j = 50;
 
     if (not args_info.noReduction_flag) {
-    while (g.rule63() or g.rule2() or g.rule62() ) {
-        if (++i % j == 0) {
-            g.info();
+        while (g.rule63() or g.rule2() or g.rule62()) {
+            if (++i % j == 0) {
+                g.info();
+            }
         }
+        g.info();
     }
-}
 
-    g.info();
+
+    /*----------.
+    | 6. output |
+    `----------*/
 
     if (args_info.dot_flag) {
         g.print();
     }
+
+    if (args_info.tarjan_flag) {
+        g.tarjan(g.init);
+    }
+
 
     return EXIT_SUCCESS;
 }

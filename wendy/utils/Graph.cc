@@ -14,7 +14,6 @@ extern gengetopt_args_info args_info;
 using pnapi::Transition;
 typedef std::pair<std::set<unsigned int>::iterator, bool> ii;
 
-unsigned int Graph::l = 0;
 unsigned int Graph::r1 = 0;
 unsigned int Graph::r2 = 0;
 unsigned int Graph::r62 = 0;
@@ -37,6 +36,7 @@ void Graph::info() {
 }
 
 void Graph::initLabels() {
+    init = 0;
     unsigned int event = 1;
 
     const std::set<pnapi::Label*> outputLabels(net.getInterface().getOutputLabels());
@@ -66,10 +66,10 @@ void Graph::initLabels() {
     }
 
     if (args_info.verbose_flag) {
-    FOREACH(t, net.getTransitions()) {
-        std::cerr << (*t)->getName() << " " << labels[(*t)->getName()] << "\n";
+        FOREACH(t, net.getTransitions()) {
+            std::cerr << (*t)->getName() << " " << labels[(*t)->getName()] << "\n";
+        }
     }
-}
 }
 
 void Graph::addEdge(unsigned int source, unsigned int target, std::string label) {
@@ -87,7 +87,7 @@ void Graph::addEdge(unsigned int source, unsigned int target, std::string label)
 
     ii ii1 = t->preset[labelNum].insert(source);
     s->postset[labelNum].insert(target);
-    
+
     if (not ii1.second) {
         r1++;
     }
@@ -123,9 +123,9 @@ bool Graph::rule63() {
             const unsigned int source = n->first;
             const unsigned int target = *(n->second->postset[TAU].begin());
 
-if (args_info.verbose_flag) {
-            std::cerr << "[R6.3] merge nodes " << source << " and " << target << std::endl;
-}
+            if (args_info.verbose_flag) {
+                std::cerr << "[R6.3] merge nodes " << source << " and " << target << std::endl;
+            }
 
             // remove the linking tau-edge
             removeEdge(source, target, TAU);
@@ -163,9 +163,9 @@ bool Graph::rule62() {
                 const unsigned int source = n1->first;
                 const unsigned int target = *n2;
 
-if (args_info.verbose_flag) {
-                std::cerr << "[R6.2] merge nodes " << source << " and " << target << std::endl;
-}
+                if (args_info.verbose_flag) {
+                    std::cerr << "[R6.2] merge nodes " << source << " and " << target << std::endl;
+                }
 
                 // remove the linking tau-edge
                 removeEdge(source, target, TAU);
@@ -192,9 +192,9 @@ bool Graph::rule2() {
             const unsigned int target = *n2;
             if (source != target and nodes[*n2]->postset[TAU].find(n1->first) != nodes[*n2]->postset[TAU].end()) {
 
-if (args_info.verbose_flag) {
-                std::cerr << "[R2] merge nodes " << source << " and " << target << std::endl;
-}
+                if (args_info.verbose_flag) {
+                    std::cerr << "[R2] merge nodes " << source << " and " << target << std::endl;
+                }
 
                 // merge the nodes (target remains)
                 merge(source, target);
@@ -215,46 +215,6 @@ if (args_info.verbose_flag) {
 
     return false;
 }
-
-/*
-bool Graph::rule62() {
-    FOREACH(n1, nodes) {
-        FOREACH(n2, n1->second->postset[TAU]) {
-            bool possible = true;
-
-            // check if two TAU-connected nodes have the same postset
-            FOREACH(l, labels) {
-                if (l->second == TAU) {
-                    continue;
-                }
-                if (n1->second->postset[l->second] != nodes[*n2]->postset[l->second]) {
-                    possible = false;
-                    break;
-                }
-            }
-
-            if (possible) {
-                const unsigned int source = n1->first;
-                const unsigned int target = *n2;
-
-if (args_info.verbose_flag) {
-                std::cerr << "[R62] merge nodes " << source << " and " << target << std::endl;
-}
-
-                // remove the linking tau-edge
-                removeEdge(source, target, TAU);
-
-                // merge the nodes (target remains)
-                merge(source, target);
-
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-*/
 
 inline void Graph::removeEdge(unsigned int source, unsigned int target, unsigned int label) {
 //    std::cerr << "removing edge " << source << " -> " << target << " with label " << label << "\n";
@@ -282,6 +242,10 @@ inline void Graph::removeNode(unsigned int node) {
 
 // node1 will remain
 inline void Graph::merge(unsigned int node1, unsigned int node2) {
+    if (node2 == init) {
+        init = node1;
+    }
+
     Node* const n1 = nodes[node1];
     Node* const n2 = nodes[node2];
 
@@ -290,7 +254,7 @@ inline void Graph::merge(unsigned int node1, unsigned int node2) {
         FOREACH(t, l->second) {
             ii ii1 = n1->postset[l->first].insert(*t);
             nodes[*t]->preset[l->first].insert(node1);
-            
+
             if (not ii1.second) {
                 r1++;
             }
@@ -310,4 +274,54 @@ inline void Graph::merge(unsigned int node1, unsigned int node2) {
 
     // remove node2
     removeNode(node2);
+}
+
+void Graph::tarjan(unsigned int v, bool firstCall) {
+    static std::stack<unsigned int> Tarj;
+    static std::set<unsigned int> Tarj_set;
+    static unsigned int maxdfs = 0;
+    static std::set<unsigned int> weiss;
+
+    if (firstCall) {
+        FOREACH(n, nodes) {
+            weiss.insert(n->first);
+        }
+    }
+
+    Node* const n = nodes[v];
+    n->dfs = maxdfs;
+    n->lowlink = maxdfs;
+    maxdfs += 1;
+
+    Tarj.push(v);
+    Tarj_set.insert(v);
+    weiss.erase(v);
+
+    FOREACH(l, n->postset) {
+        FOREACH(vprime, n->postset[l->first]) {
+            Node* const nprime = nodes[*vprime];
+            if (weiss.find(*vprime) != weiss.end()) {
+                tarjan(*vprime, false);
+                n->lowlink = MINIMUM(n->lowlink, nprime->lowlink);
+            } else {
+                if (Tarj_set.find(*vprime) != Tarj_set.end()) {
+                    n->lowlink = MINIMUM(n->lowlink, nprime->dfs);
+                }
+            }
+        }
+    }
+
+    std::cerr << "node " << v << " has lowlink " << n->lowlink << "\n";
+
+    if (n->lowlink == n->dfs) {
+        unsigned int vstar;
+        std::cerr << " -> SCC: [";
+        do {
+            vstar = Tarj.top();
+            Tarj_set.erase(vstar);
+            Tarj.pop();
+            std::cerr << vstar << " ";
+        } while (vstar != v);
+        std::cerr << "]\n";
+    }
 }

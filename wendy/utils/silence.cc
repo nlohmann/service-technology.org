@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
     `----------*/
 
     if (args_info.dot_flag) {
-        g.print();
+        g.dot();
     }
 
     if (args_info.tarjan_flag) {

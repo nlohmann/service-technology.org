@@ -85,7 +85,7 @@ markings:
 ;
 
 marking:
-  NAME COLON NUMBER
+  NAME COLON NUMBER { g.addMarking(currentState, $1, $3); }
 ;
 
 transitions:

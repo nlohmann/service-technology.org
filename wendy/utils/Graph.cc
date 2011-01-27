@@ -1,6 +1,7 @@
 #include <iostream>
 #include <set>
 #include <cassert>
+#include <sstream>
 #include <pnapi/pnapi.h>
 #include "util.h"
 #include "Graph.h"
@@ -45,6 +46,7 @@ void Graph::initLabels() {
         const std::set<Transition*> preset((**l).getTransitions());
         FOREACH(t, preset) {
             labels[(**t).getName()] = event;
+            labels2[event] = (**t).getName();
         }
     }
 
@@ -53,6 +55,7 @@ void Graph::initLabels() {
         const std::set<Transition*> postset((**l).getTransitions());
         FOREACH(t, postset) {
             labels[(**t).getName()] = event;
+            labels2[event] = (**t).getName();
         }
     }
 
@@ -62,6 +65,7 @@ void Graph::initLabels() {
 
         FOREACH(t, (**l).getTransitions()) {
             labels[(**t).getName()] = event;
+            labels2[event] = (**t).getName();
         }
     }
 
@@ -70,9 +74,16 @@ void Graph::initLabels() {
             std::cerr << (*t)->getName() << " " << labels[(*t)->getName()] << "\n";
         }
     }
+
+    FOREACH(t, net.getTransitions()) {
+        if (labels[(*t)->getName()] == 0) {
+            labels2[0] = (*t)->getName();
+            break;
+        }
+    }
 }
 
-void Graph::addEdge(unsigned int source, unsigned int target, std::string label) {
+void Graph::addEdge(unsigned int source, unsigned int target, const char* label) {
     const unsigned int labelNum = labels[label];
 
     Node* s = nodes[source];
@@ -93,7 +104,7 @@ void Graph::addEdge(unsigned int source, unsigned int target, std::string label)
     }
 }
 
-void Graph::print() {
+void Graph::dot() {
     std::cout << "digraph d {\n";
 
     FOREACH(n1, nodes) {
@@ -311,17 +322,62 @@ void Graph::tarjan(unsigned int v, bool firstCall) {
         }
     }
 
-    std::cerr << "node " << v << " has lowlink " << n->lowlink << "\n";
+
+    /* done with state v */
+    std::cout << "STATE " << v << " Lowlink: " << n->lowlink;
+
+//    std::cerr << "node " << v << " has lowlink " << n->lowlink << "\n";
+
 
     if (n->lowlink == n->dfs) {
+        unsigned int count = 0;
+        std::stringstream ss;
         unsigned int vstar;
-        std::cerr << " -> SCC: [";
+//        std::cerr << " -> SCC: [";
         do {
+            ++count;
             vstar = Tarj.top();
             Tarj_set.erase(vstar);
             Tarj.pop();
-            std::cerr << vstar << " ";
+            if (vstar != v) {
+            ss << vstar << " ";
+        }
+//            std::cerr << vstar << " ";
         } while (vstar != v);
-        std::cerr << "]\n";
+        if (count > 1) {
+            std::cout << " SCC: " << ss.str();
+        }
+//        std::cerr << "]\n";
     }
+
+    std::cout << "\n";
+
+    bool comma = false;
+    FOREACH(m, n->markings) {
+        std::cout << (comma ? ",\n" : "");
+        std::cout << m->first << " : " << m->second;
+        if (not comma) {
+            comma = true;
+        }
+    }
+    std::cout << "\n\n";
+
+    FOREACH(l, n->postset) {
+        FOREACH(vprime, n->postset[l->first]) {
+            std::cout << labels2[l->first] << " -> " << *vprime << "\n";
+        }
+    }
+    std::cout << "\n";
+}
+
+void Graph::addMarking(unsigned int n, const char* place, unsigned int tokens) {
+    Node* state = nodes[n];
+    if (not state) {
+        state = nodes[n] = new Node();
+    }
+    state->addMarking(place, tokens);
+}
+
+inline void Node::addMarking(const char* place, unsigned int tokens) {
+    markings[place] = tokens;
 }

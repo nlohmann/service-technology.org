@@ -305,6 +305,10 @@ int main(int argc, char** argv) {
     std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
 #endif
 
+    if (args_info.internalReduction_flag) {
+        command_line = "../utils/silence < " + std::string(args_info.inputs[0]) + " --tarjan";
+    }
+
     // call LoLA
     status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
     time(&start_time);

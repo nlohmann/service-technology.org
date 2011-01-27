@@ -148,6 +148,11 @@ option "quitAsSoonAsPossible" -
   details="Once all waitstates of a knowledge are resolved no more successor knowledges are calculated.\n"
   flag off
 
+option "internalReduction" -
+  "Reduce internal behavior."
+  details="Apply reduction rules to remove internal behavior that does not change the communication protocol of the service (experimental feature)."
+  flag off
+
 
 section "Debugging"
 sectiondesc="These options control how much debug output Wendy creates.\n"

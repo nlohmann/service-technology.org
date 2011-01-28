@@ -91,6 +91,7 @@ int main(int argc, char** argv) {
         g.info();
     }
 
+    g.reenumerate();
 
     /*----------.
     | 6. output |
@@ -101,7 +102,7 @@ int main(int argc, char** argv) {
     }
 
     if (args_info.tarjan_flag) {
-        g.tarjan(g.init);
+        g.tarjan();
     }
 
 

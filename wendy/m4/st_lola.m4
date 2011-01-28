@@ -1,14 +1,15 @@
 # serial 1
 AC_DEFUN([AC_ST_LOLA],[
 
-export PATH=`pwd`:$PATH
+AC_PATH_PROG(WGET, [wget], [])
 
+export PATH=`pwd`:$PATH
 AC_PATH_PROG(LOLA, [lola-statespace], [])
 if test "${LOLA}" = ""; then
   AC_MSG_WARN([LoLA was not found! It is now downloaded and built.])
 
   AC_MSG_NOTICE([downloading LoLA from service-technology.org...])
-  wget http://service-technology.org/files/lola/lola.tar.gz > /dev/null 2> /dev/null
+  ${WGET} http://service-technology.org/files/lola/lola.tar.gz > /dev/null 2> /dev/null
   tar xfz lola.tar.gz
 
   LOLADIR=`ls -d1 */ | grep lola`

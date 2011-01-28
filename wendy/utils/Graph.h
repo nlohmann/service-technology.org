@@ -21,14 +21,13 @@ class Graph {
         std::map<std::string, unsigned int> labels;
         std::map<unsigned int, std::string> labels2;
 
-        void merge(unsigned int, unsigned int);
+        void mergeNode(unsigned int&, unsigned int&);
+        void renameNode(unsigned int, unsigned int);
         void removeNode(unsigned int);
         void removeEdge(unsigned int, unsigned int, unsigned int);
 
     public:
-        unsigned int init;
-
-        void tarjan(unsigned int, bool=true);
+        void tarjan(unsigned int=0, bool=true);
 
         void initLabels();
         void addEdge(unsigned int, unsigned int, const char*);
@@ -36,6 +35,7 @@ class Graph {
         void dot();
         void out();
         void info();
+        void reenumerate();
 
         bool rule2();
         bool rule63();

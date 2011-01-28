@@ -299,7 +299,6 @@ int main(int argc, char** argv) {
     // select LoLA binary and build LoLA command
 #if defined(__MINGW32__)
 //    // MinGW does not understand pathnames with "/", so we use the basename
-//    std::string command_line = std::string(basename(args_info.lola_arg)) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
     std::string command_line = "\"" + std::string(args_info.lola_arg) + "\" " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> nul");
 #else
     std::string command_line = std::string(args_info.lola_arg) + " " + temp->name() + " -M" + (args_info.verbose_flag ? "" : " 2> /dev/null");
@@ -307,6 +306,9 @@ int main(int argc, char** argv) {
 
     if (args_info.internalReduction_flag) {
         command_line = "../utils/silence < " + std::string(args_info.inputs[0]) + " --tarjan";
+
+        // to avoid a (yet to be identified) bug, we need to switch off this reduction
+        args_info.ignoreUnreceivedMessages_flag = 1;
     }
 
     // call LoLA

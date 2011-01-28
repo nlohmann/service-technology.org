@@ -267,7 +267,9 @@ bool InnerMarking::waitstate(const Label_ID& l) const {
           later on; false, otherwise
 */
 bool InnerMarking::sentMessagesConsumed(const InterfaceMarking& interface) const {
+    assert(possibleSendEvents);
     char* possibleSendEventsDecoded = possibleSendEvents->decode();
+    assert (possibleSendEventsDecoded);
 
     // iterate over all possible input messages
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
@@ -289,11 +291,11 @@ bool InnerMarking::sentMessagesConsumed(const InterfaceMarking& interface) const
   determines which sending events are potentially reachable from this marking
 */
 void InnerMarking::calcReachableSendingEvents() {
-
     if (possibleSendEvents == NULL) {
         // we reserve a Boolean value for each sending event possible
         possibleSendEvents = new PossibleSendEvents();
     }
+    assert(possibleSendEvents);
 
     if (out_degree > 0) {
         // remember which directly reachable sending events (edges) we have considered already

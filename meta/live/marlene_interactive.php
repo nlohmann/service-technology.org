@@ -183,6 +183,7 @@ $("#more"+infoid).hide();
     echo "<th width=\"43%\">required messages</th>\n";
     echo "<th width=\"5%\"></th></tr>\n";
   $dll = file($diagfile["residence"]);
+  sort($dll, SORT_STRING);
   foreach ($dll as $index => $line)
   {
     $hasAdapter = false;
@@ -199,6 +200,10 @@ END;
     else if ( ! strcmp($type, "LL") )
     {
       $type = "livelock";
+    }
+    else if ( ! strcmp($type, "MA") )
+    {
+      $type = "unattended choice";
     }
   
     $more = LIVEBASE."/resource/images/more.png";

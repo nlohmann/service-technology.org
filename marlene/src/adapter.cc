@@ -364,28 +364,15 @@ const pnapi::PetriNet * Adapter::buildController()
 
 #if defined(HAVE_LIBCONFIG__) and HAVE_LIBCONFIG__ == 1
 
-        // we need the most-permissive partners of all nets, calculate them:
-        // maybe do it threaded?
-        /*
-        for (int i = 0; i < _nets.size(); ++i)
-        {
-            Output owfn_temp;
-                //        Output sa_temp;
-                //       Output og_temp;
-
-            std::string owfn_filename(owfn_temp.name());
-            std::string sa_filename = owfn_filename + ".sa";
-            std::string og_filename = owfn_filename + ".og";
-
-            std::string mpp_command = path2wendy;
-        }*/
-
-        // for now, expect mpp to be given:
+        // open MPPs for each net or create them if necessary
+        std::vector<std::string> mpp_files;
         for (unsigned i = 0; i < args_info.inputs_num; ++i)
         {
             std::string filename = std::string(args_info.inputs[i]);
             std::string results_filename = filename + ".results";
             std::string sa_filename = filename + ".sa";
+
+            mpp_files.push_back(results_filename);
 
             std::ifstream rfile(results_filename.c_str());
             if (! rfile)
@@ -408,18 +395,20 @@ const pnapi::PetriNet * Adapter::buildController()
 
         MarkingInformation mi(mi_filename);
         Diagnosis diag(diag_filename, mi);
+        diag.readMPPs(mpp_files);
         diag.evaluateDeadlocks(_nets, *_engine);
         if (args_info.property_arg == property_arg_livelock)
         {
             diag.evaluateLivelocks(_nets, *_engine);
         }
+        diag.evaluateAlternatives(_nets, *_engine);
 
         diag.outputLive();
 
         // diagnosis_superfluous = diag.superfluous;
         if (diag.superfluous)
         {
-            args_info.diagnosis_flag = 0;
+            // args_info.diagnosis_flag = 0;
         }
 #endif
 
@@ -496,7 +485,7 @@ const pnapi::PetriNet * Adapter::buildController()
     if (not args_info.diagnosis_flag)
     {
         // CG workaround
-        
+
         status("Port work-around: adding all labels to port `controller'.");
 
         _controller->createPort("controller");
@@ -510,7 +499,7 @@ const pnapi::PetriNet * Adapter::buildController()
 
             _controller->getInterface().mergePorts(*port1, *port2, "controller");
         }
-       
+
     }
 
     time(&end_time);

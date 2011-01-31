@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
     `----------------*/
 
     unsigned int i = 0;
-    const unsigned int j = 50;
+    const unsigned int j = 100;
 
     if (not args_info.noReduction_flag) {
         while (g.rule63() or g.rule2() or g.rule62()) {
@@ -92,6 +92,7 @@ int main(int argc, char** argv) {
     }
 
     g.reenumerate();
+    g.tarjan();
 
     /*----------.
     | 6. output |
@@ -101,8 +102,8 @@ int main(int argc, char** argv) {
         g.dot();
     }
 
-    if (args_info.tarjan_flag) {
-        g.tarjan();
+    if (args_info.output_flag) {
+        g.out();
     }
 
 

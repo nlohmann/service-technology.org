@@ -18,6 +18,7 @@ class Graph {
 
     private:
         std::map<unsigned int, Node*> nodes;
+        std::vector<unsigned int> orderedNodes;
         std::map<std::string, unsigned int> labels;
         std::map<unsigned int, std::string> labels2;
 
@@ -27,7 +28,7 @@ class Graph {
         void removeEdge(unsigned int, unsigned int, unsigned int);
 
     public:
-        void tarjan(unsigned int=0, bool=true);
+        void tarjan(unsigned int = 0, bool = true);
 
         void initLabels();
         void addEdge(unsigned int, unsigned int, const char*);
@@ -49,6 +50,7 @@ class Node {
         unsigned int lowlink;
         unsigned int dfs;
 
+        std::string scc;
         std::map<std::string, unsigned int> markings;
         void addMarking(const char*, unsigned int);
 };

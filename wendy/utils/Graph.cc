@@ -107,9 +107,13 @@ void Graph::dot() {
     std::cout << "digraph d {\n";
 
     FOREACH(n1, nodes) {
+        const Node* v1 = nodes[n1->first];
+
         FOREACH(l, n1->second->postset) {
             FOREACH(n2, l->second) {
-                std::cout << "  " << n1->first << " -> " << *n2 << " [label=\"" << l->first << "\"";
+                const Node* v2 = nodes[*n2];
+
+                std::cout << "  " << v1->dfs << " -> " << v2->dfs << " [label=\"" << l->first << "\"";
 
                 if (l->first == TAU) {
                     std::cout << " penwidth=5.0";
@@ -122,6 +126,37 @@ void Graph::dot() {
 
     std::cout << "}\n";
 }
+
+
+void Graph::out() {
+    FOREACH(n1, orderedNodes) {
+        const Node* v1 = nodes[*n1];
+
+        std::cout << "STATE " << v1->dfs << " Lowlink: " << v1->lowlink << " " << v1->scc << "\n";
+
+        bool comma = false;
+        FOREACH(m, v1->markings) {
+            std::cout << (comma ? ",\n" : "");
+            std::cout << m->first << " : " << m->second;
+            if (not comma) {
+                comma = true;
+            }
+        }
+        std::cout << "\n\n";
+
+
+        FOREACH(l, v1->postset) {
+            FOREACH(n2, l->second) {
+                const Node* v2 = nodes[*n2];
+
+                std::cout << labels2[l->first] << " -> " << v2->dfs << "\n";
+            }
+        }
+        std::cout << "\n";
+    }
+}
+
+
 
 /*!
 \note Rule 6.3: Source node has exactly one outgoing edge, and that is a TAU edge.
@@ -227,15 +262,11 @@ bool Graph::rule2() {
 }
 
 inline void Graph::removeEdge(unsigned int source, unsigned int target, unsigned int label) {
-//    std::cerr << "removing edge " << source << " -> " << target << " with label " << label << "\n";
-
     nodes[source]->postset[label].erase(target);
     nodes[target]->preset[label].erase(source);
 }
 
 inline void Graph::removeNode(unsigned int node) {
-//    std::cerr << "removing node " << node << "\n";
-
     FOREACH(n, nodes) {
         FOREACH(l, n->second->preset) {
             l->second.erase(node);
@@ -303,6 +334,7 @@ void Graph::tarjan(unsigned int v, bool firstCall) {
     }
 
     Node* const n = nodes[v];
+    assert(n);
     n->dfs = maxdfs;
     n->lowlink = maxdfs;
     maxdfs += 1;
@@ -314,6 +346,7 @@ void Graph::tarjan(unsigned int v, bool firstCall) {
     FOREACH(l, n->postset) {
         FOREACH(vprime, n->postset[l->first]) {
             Node* const nprime = nodes[*vprime];
+            assert(nprime);
             if (weiss.find(*vprime) != weiss.end()) {
                 tarjan(*vprime, false);
                 n->lowlink = MINIMUM(n->lowlink, nprime->lowlink);
@@ -325,52 +358,26 @@ void Graph::tarjan(unsigned int v, bool firstCall) {
         }
     }
 
-
-    /* done with state v */
-    std::cout << "STATE " << v << " Lowlink: " << n->lowlink;
-
-//    std::cerr << "node " << v << " has lowlink " << n->lowlink << "\n";
-
+    orderedNodes.push_back(v);
 
     if (n->lowlink == n->dfs) {
         unsigned int count = 0;
         std::stringstream ss;
         unsigned int vstar;
-//        std::cerr << " -> SCC: [";
         do {
             ++count;
             vstar = Tarj.top();
             Tarj_set.erase(vstar);
             Tarj.pop();
             if (vstar != v) {
-            ss << vstar << " ";
-        }
-//            std::cerr << vstar << " ";
+                ss << vstar << " ";
+            }
         } while (vstar != v);
+
         if (count > 1) {
-            std::cout << " SCC: " << ss.str();
-        }
-//        std::cerr << "]\n";
-    }
-
-    std::cout << "\n";
-
-    bool comma = false;
-    FOREACH(m, n->markings) {
-        std::cout << (comma ? ",\n" : "");
-        std::cout << m->first << " : " << m->second;
-        if (not comma) {
-            comma = true;
+            n->scc = "SCC: " + ss.str();
         }
     }
-    std::cout << "\n\n";
-
-    FOREACH(l, n->postset) {
-        FOREACH(vprime, n->postset[l->first]) {
-            std::cout << labels2[l->first] << " -> " << *vprime << "\n";
-        }
-    }
-    std::cout << "\n";
 }
 
 void Graph::addMarking(unsigned int n, const char* place, unsigned int tokens) {

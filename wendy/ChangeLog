@@ -22,6 +22,11 @@ Version 3.2-unreleased
 
 * added `silence' utility to implement reduction of internal actions
 
+* implemented `--internalReduction' parameter to reduce internal actions
+
+* adjusted configure script to download and compile LoLA if it is not found
+  in the path
+
 Version 3.1 (15 July 2010)
 ==========================
 

@@ -335,24 +335,20 @@ void processCommandLine(int argc, char** argv) {
             }
         }
     }
-  // Initialize reports object for graph output
+    // Initialize reports object for graph output
 
-  if (args_info.graph_given || args_info.marking_given) {
-	TheGraphReport = new graphreport_yes(graphfile);
-	}
-	else
-	{
-	  if (args_info.Graph_given || args_info.Marking_given) {
-	TheGraphReport = new graphreport_yes();
-	}
-	else
-	{
-	TheGraphReport = new graphreport_no();
-	}
-}
-	
-	
-	
+    if (args_info.graph_given || args_info.marking_given) {
+        TheGraphReport = new graphreport_yes(graphfile);
+    } else {
+        if (args_info.Graph_given || args_info.Marking_given) {
+            TheGraphReport = new graphreport_yes();
+        } else {
+            TheGraphReport = new graphreport_no();
+        }
+    }
+
+
+
 
     // set output filename for "-r" option
     if (args_info.resultFile_given) {
@@ -490,8 +486,8 @@ int main(int argc, char** argv) {
             }
 
             for (i = 0; i < Transitions[0]->cnt; ++i) {
-                Transitions[i]->PrevEnabled = (i == 0 ? NULL : Transitions[i-1]);
-                Transitions[i]->NextEnabled = (i == Transitions[0]->cnt - 1 ? NULL : Transitions[i+1]);
+                Transitions[i]->PrevEnabled = (i == 0 ? NULL : Transitions[i - 1]);
+                Transitions[i]->NextEnabled = (i == Transitions[0]->cnt - 1 ? NULL : Transitions[i + 1]);
                 Transitions[i]->enabled = true;
             }
 
@@ -548,7 +544,7 @@ int main(int argc, char** argv) {
             if (i >= Places[0]->cnt) {
                 break;
             }
-            while (h > 0 && !(Places[h-1]->significant)) {
+            while (h > 0 && !(Places[h - 1]->significant)) {
                 h--;
             }
             if (h <= 0) {
@@ -557,8 +553,8 @@ int main(int argc, char** argv) {
             if (h <= i) {
                 break;
             }
-            tmpPlace = Places[h-1];
-            Places[h-1] = Places[i];
+            tmpPlace = Places[h - 1];
+            Places[h - 1] = Places[i];
             Places[i] = tmpPlace;
         }
         Places[0]->NrSignificant = i;
@@ -578,8 +574,8 @@ int main(int argc, char** argv) {
         }
 
         for (j = 0; j < Transitions[0]->cnt; ++j) {
-            Transitions[j]->PrevEnabled = (j == 0 ? NULL : Transitions[j-1]);
-            Transitions[j]->NextEnabled = (j == Transitions[0]->cnt - 1 ? NULL : Transitions[j+1]);
+            Transitions[j]->PrevEnabled = (j == 0 ? NULL : Transitions[j - 1]);
+            Transitions[j]->NextEnabled = (j == Transitions[0]->cnt - 1 ? NULL : Transitions[j + 1]);
             Transitions[j]->enabled = true;
         }
 

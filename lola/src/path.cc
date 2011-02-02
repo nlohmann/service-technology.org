@@ -182,7 +182,7 @@ Transition* insert_down(formula* f) {
             }
             break;
         case disj:
-            return(insert_down(((booleanformula*) f) ->sub[(rand() %(((booleanformula*) f) ->cardsub - ((booleanformula*) f) ->firstvalid)) + ((booleanformula*) f) ->firstvalid]));
+            return(insert_down(((booleanformula*) f) ->sub[(rand() % (((booleanformula*) f) ->cardsub - ((booleanformula*) f) ->firstvalid)) + ((booleanformula*) f) ->firstvalid]));
         case conj:
             for (i = ((booleanformula*) f)->firstvalid; i < ((booleanformula*) f)->cardsub; i++) {
                 if (tt = insert_down(((booleanformula*) f)->sub[i])) {
@@ -292,11 +292,11 @@ void find_path() {
         Transitions[x] -> set_hashchange();
     }
     // 2. new hash table
-    hashcounter = new unsigned int [HASHSIZE+1];
-    globalhashcounter = new unsigned int [HASHSIZE+1];
+    hashcounter = new unsigned int [HASHSIZE + 1];
+    globalhashcounter = new unsigned int [HASHSIZE + 1];
     // 3. new path
 // was like this, but did not compile:  path = new (Transition *)[MAXPATH+1];
-    path = new Transition *[MAXPATH+1];
+    path = new Transition *[MAXPATH + 1];
 //otherpath = new (Transition *) [MAXPATH+1];
 
     // 4. optimize formula
@@ -326,10 +326,10 @@ void find_path() {
         for (x = 0; x < Transitions[0]->cnt; x++) {
             Transitions[x]->enabled = true;
             if (x < Transitions[0]->cnt - 1) {
-                Transitions[x]->NextEnabled = Transitions[x+1];
+                Transitions[x]->NextEnabled = Transitions[x + 1];
             }
             if (x) {
-                Transitions[x]->PrevEnabled = Transitions[x-1];
+                Transitions[x]->PrevEnabled = Transitions[x - 1];
             }
 #ifdef STUBBORN
             Transitions[x]->mustbeincluded =

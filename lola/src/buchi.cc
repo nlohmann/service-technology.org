@@ -31,7 +31,7 @@ buchitransition** buchistate::getenabled() {
     int i, j;
     buchitransition** enabled;
 
-    enabled = new buchitransition * [nrdelta+1];
+    enabled = new buchitransition * [nrdelta + 1];
     for (i = j = 0; i < nrdelta; i++) {
         if (delta[i]->guard->value) {
             enabled[j++] = delta[i];

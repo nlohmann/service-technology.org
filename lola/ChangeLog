@@ -25,6 +25,8 @@ Version 1.15-unreleased
 * fixed bug #15678 (`https://gna.org/bugs/?15678'): `HOME' now switches on
   `TWOPHASE' if `STUBBORN' is also used
 
+* started implementing stubborn sets for `STATESPACE' option
+
 Version 1.14
 ============
 

@@ -63,7 +63,7 @@ void check();
 // Algorithmische Idee:
 // Start: eine Abstrakte Symmetrie
 // Ziel: passende Symmetrien = abstrakte Symm mit einelementigen Mengen
-// Weg: 
+// Weg:
 // 1. Refine = Schlussfolgerungen aus gegebener abstrakter Symmetrie
 // Mehr dazu weiter unten
 // 2. Define = systematisches Probieren einer weiteren Verfeinerung
@@ -71,10 +71,10 @@ void check();
 // mehr dazu unter Define*
 
 
-// Grundprinzip von Refine: 
+// Grundprinzip von Refine:
 // - nimm zwei Constraints [A1,B1] und [A2,B2], eine Bogenrichtung und eine
 //   Vielfacheit
-// - zaehle fuer jeden Knoten in A1 und B1, wieviele solche Boegen er von/zu 
+// - zaehle fuer jeden Knoten in A1 und B1, wieviele solche Boegen er von/zu
 //   einem Knoten in A2 bzw B2 hat.
 // - fuer jedes i: neues Constraint [A1i,B1i], wobei A1i,B1i die Mengen der
 //   Knoten aus A1,B1 mit i Hits
@@ -96,22 +96,22 @@ Reaktoreintrag::Reaktoreintrag() {
     // Feld "node" wird in "FuelleReaktor" initialisiert
 }
 
-// Pro Knotentyp (1. Index) je ein Zaehlarray fuer 
+// Pro Knotentyp (1. Index) je ein Zaehlarray fuer
 // die Ai ("DO") und die Bi ("CO") (2. Index).
 
-Reaktoreintrag* Reaktor[2][2]; 
+Reaktoreintrag* Reaktor[2][2];
 
 
 // ToDo ist ein Element in der Liste derjenigen Constraints, mit denen
 // noch nicht alle Refines ausprobiert wurden
 
-class ToDo { 
+class ToDo {
     public:
         unsigned int constraint; // Die Nr des fraglichen Constraints im
-                                 // Array aller Constraints (= Specification) 
+        // Array aller Constraints (= Specification)
         ToDo* next;              // Listenpointer
         ToDo(NodeType, unsigned int); // kreiert neuen Eintrag und sortiert
-                                      // ihn am Listenanfang ein
+        // ihn am Listenanfang ein
 };
 
 ToDo* ToDoList[2];  // Eine für Platzconstraints, eine für Transitionsconstraints
@@ -150,12 +150,12 @@ inline void reportprogress() {
 }
 
 unsigned int DeadBranches; // zaehlt rekursive Abstiege, die nicht zu einem
-                           // Element des Ezeugendensystems fuehren
-                           // (einzige Quelle fuer Exponentialitaet)
+// Element des Ezeugendensystems fuehren
+// (einzige Quelle fuer Exponentialitaet)
 unsigned int CardGenerators; // Anzahl der berechneten Erzeugenden
 
 
-// Fuer jeden Knoten werden die Arrays der eingehenden und ausgehenden 
+// Fuer jeden Knoten werden die Arrays der eingehenden und ausgehenden
 // Boegen nach Vielfacheit sortiert. So stehen z.B. spaeter die Boegen
 // gleicher Vielfachheit als zusammenhaengende Bereiche zur Verfuegung
 // Alle Sortierroutinen in symm.cc sind Quicksort.
@@ -206,7 +206,7 @@ void init_syms() {
                                                               = Specification[TR][0].parent = 0;
     Specification[PL][0].last = Places[0]-> cnt - 1;
     Specification[TR][0].last = Transitions[0]-> cnt - 1;
-   CardSpecification[PL] = CardSpecification[TR] = 1;
+    CardSpecification[PL] = CardSpecification[TR] = 1;
 
     // Anlegen der Zaehlarrays
     Reaktor[PL][DO] = new Reaktoreintrag [Places[0]->cnt];
@@ -286,7 +286,7 @@ unsigned int get_card_arcs_out(Node* node) {
 }
 
 // Zwei Variablen zur Uebergabe von Parametern an die darauffolgenden
-// Sortierroutinen, die anderweitig nicht in die einheitliche Signatur 
+// Sortierroutinen, die anderweitig nicht in die einheitliche Signatur
 // der Sortierroutinen passen wuerden
 
 unsigned int this_arc_nr;
@@ -315,7 +315,7 @@ void PlaceSort(unsigned int from, unsigned int to, unsigned int attribute(Node*)
     greater = to;
 
     while (current <= greater) {
-        if (attribute((Node*) Places[current]) < attribute((Node*) Places[current-1])) {
+        if (attribute((Node*) Places[current]) < attribute((Node*) Places[current - 1])) {
             swap = Places[current];
             sw = CurrentMarking[current];
             Places[current] = Places[less];
@@ -323,7 +323,7 @@ void PlaceSort(unsigned int from, unsigned int to, unsigned int attribute(Node*)
             Places[less] = swap;
             CurrentMarking[less++] = sw;
         } else {
-            if (attribute((Node*) Places[current]) == attribute((Node*) Places[current-1])) {
+            if (attribute((Node*) Places[current]) == attribute((Node*) Places[current - 1])) {
                 current++;
             } else {
                 swap = Places[current];
@@ -354,12 +354,12 @@ void TransitionSort(unsigned int from, unsigned int to, unsigned int attribute(N
     greater = to;
 
     while (current <= greater) {
-        if (attribute((Node*) Transitions[current]) < attribute((Node*) Transitions[current-1])) {
+        if (attribute((Node*) Transitions[current]) < attribute((Node*) Transitions[current - 1])) {
             swap = Transitions[current];
             Transitions[current++] = Transitions[less];
             Transitions[less++] = swap;
         } else {
-            if (attribute((Node*) Transitions[current]) == attribute((Node*) Transitions[current-1])) {
+            if (attribute((Node*) Transitions[current]) == attribute((Node*) Transitions[current - 1])) {
                 current++;
             } else {
                 swap = Transitions[current];
@@ -400,20 +400,22 @@ void SplitPlacesInVorReaktor(unsigned int c, unsigned int attribute(Node*)) {
 
     // Solange noch verschiedene Werte im verbleibenden Constraint...
     while (attribute((Node*) Places[firstc]) != attribute((Node*) Places[lastc])) {
-	// Suche erste Stelle, wo Nachbarknoten unterschiedliche Werte liefern
+        // Suche erste Stelle, wo Nachbarknoten unterschiedliche Werte liefern
         // (dort wird Constraint geteilt)
-        for (i = firstc + 1; attribute((Node*) Places[firstc]) == attribute((Node*) Places[i]); i++);
+        for (i = firstc + 1; attribute((Node*) Places[firstc]) == attribute((Node*) Places[i]); i++) {
+            ;
+        }
         newc = CardSpecification[PL]; // naechste freie Constraintnummer
         // Teilen: wir haben ja sortiert...
         Specification[PL][oldc].last = i - 1;
         Specification[PL][newc].first = i;
         Specification[PL][newc].last = lastc;
         Specification[PL][newc].changed = NULL; // um ToDo kuemmern wir uns
-                                                // spaeter
+        // spaeter
         Specification[PL][newc].parent = 0;    // keine der hier
-                                               // vorgenommenen Separierungen
-                                               // wird je zurueckgenommen,
-                                              // also brauchen wir kein parent
+        // vorgenommenen Separierungen
+        // wird je zurueckgenommen,
+        // also brauchen wir kein parent
         CardSpecification[PL]++;
         reportprogress();
 #ifdef DISTRIBUTE
@@ -435,7 +437,9 @@ void SplitTransitionsInVorReaktor(unsigned int c, unsigned int attribute(Node*))
     firstc = Specification[TR][c].first;
     lastc = Specification[TR][c].last;
     while (attribute((Node*) Transitions[firstc]) != attribute((Node*) Transitions[lastc])) {
-        for (i = firstc + 1; attribute((Node*) Transitions[firstc]) == attribute((Node*) Transitions[i]); i++);
+        for (i = firstc + 1; attribute((Node*) Transitions[firstc]) == attribute((Node*) Transitions[i]); i++) {
+            ;
+        }
         newc = CardSpecification[TR];
         Specification[TR][oldc].last = i - 1;
         Specification[TR][newc].first = i;
@@ -591,13 +595,17 @@ Partition* part;
 void UnifyClasses(unsigned int e1, unsigned int e2) { // union von union-find
     unsigned int c1, c2, c, e;
 
-     // Bestimme Klasse c1 von Element e1
-    for (c1 = e1; !(part[c1].top); c1 = part[c1].nextorcard);
+    // Bestimme Klasse c1 von Element e1
+    for (c1 = e1; !(part[c1].top); c1 = part[c1].nextorcard) {
+        ;
+    }
     // Bestimme Klasse c2 von Element e2
-    for (c2 = e2; !(part[c2].top); c2 = part[c2].nextorcard);
+    for (c2 = e2; !(part[c2].top); c2 = part[c2].nextorcard) {
+        ;
+    }
     // Falls Klassen noch verschieden...
     if (c1 != c2) {
-	// haenge kleinere an groessere
+        // haenge kleinere an groessere
         if (part[c1].nextorcard > part[c2].nextorcard) {
             part[c1].nextorcard += part[c2].nextorcard;
             part[c2].nextorcard = c1;
@@ -612,7 +620,7 @@ void UnifyClasses(unsigned int e1, unsigned int e2) { // union von union-find
     } else {
         c = c1;
     }
-     // Pfadkomprimierung, um Komplexitaet nlog*n zu erreichen
+    // Pfadkomprimierung, um Komplexitaet nlog*n zu erreichen
     while (e1 != c) {
         e = part[e1].nextorcard;
         part[e1].nextorcard = c;
@@ -663,7 +671,7 @@ void CountSort(NodeType n, DomType d, unsigned int from, unsigned int to) {
     while (current <= greater) {
         if (Reaktor[n][d][current].stamp != Stamp) {
             Reaktor[n][d][current].count = 0;
-            if (Reaktor[n][d][current-1].stamp != Stamp) {
+            if (Reaktor[n][d][current - 1].stamp != Stamp) {
                 Reaktor[n][d][current++ -1].count = 0;
             } else {
                 Reaktor[n][d][less].node->pos[d] = current;
@@ -673,8 +681,8 @@ void CountSort(NodeType n, DomType d, unsigned int from, unsigned int to) {
                 Reaktor[n][d][less++] = swap;
             }
         } else {
-            if (Reaktor[n][d][current-1].stamp != Stamp) {
-                Reaktor[n][d][current-1].count = 0;
+            if (Reaktor[n][d][current - 1].stamp != Stamp) {
+                Reaktor[n][d][current - 1].count = 0;
                 Reaktor[n][d][greater].node->pos[d] = current;
                 Reaktor[n][d][current].node -> pos[d] = greater;
                 swap = Reaktor[n][d][current];
@@ -682,14 +690,14 @@ void CountSort(NodeType n, DomType d, unsigned int from, unsigned int to) {
                 Reaktor[n][d][greater--] = swap;
 
             } else {
-                if (Reaktor[n][d][current-1].count < Reaktor[n][d][current].count) {
+                if (Reaktor[n][d][current - 1].count < Reaktor[n][d][current].count) {
                     Reaktor[n][d][greater].node->pos[d] = current;
                     Reaktor[n][d][current].node -> pos[d] = greater;
                     swap = Reaktor[n][d][current];
                     Reaktor[n][d][current] = Reaktor[n][d][greater];
                     Reaktor[n][d][greater--] = swap;
                 } else {
-                    if (Reaktor[n][d][current-1].count == Reaktor[n][d][current].count) {
+                    if (Reaktor[n][d][current - 1].count == Reaktor[n][d][current].count) {
                         current++;
                     } else {
                         Reaktor[n][d][less].node->pos[d] = current;
@@ -723,12 +731,12 @@ void ImageSort(Node** vector, unsigned int from, unsigned int to) {
     greater = to;
 
     while (current <= greater) {
-        if (CurrentMarking[((Place*) vector[current])->index] < CurrentMarking[((Place*) vector[current-1])->index]) {
+        if (CurrentMarking[((Place*) vector[current])->index] < CurrentMarking[((Place*) vector[current - 1])->index]) {
             swap = vector[current];
             vector[current++] = vector[less];
             vector[less++] = swap;
         } else {
-            if (CurrentMarking[((Place*) vector[current])->index] == CurrentMarking[((Place*) vector[current -1])->index]) {
+            if (CurrentMarking[((Place*) vector[current])->index] == CurrentMarking[((Place*) vector[current - 1])->index]) {
                 current++;
             } else {
                 swap = vector[greater];
@@ -745,8 +753,8 @@ void ImageSort(Node** vector, unsigned int from, unsigned int to) {
     }
 }
 
-// Nachdem fuer ein Constraint und eine Vielfachheit die eingehenden 
-// oder ausgehenden Boegen zu allen anderen Constraints gezaehlt sind, 
+// Nachdem fuer ein Constraint und eine Vielfachheit die eingehenden
+// oder ausgehenden Boegen zu allen anderen Constraints gezaehlt sind,
 // muessen die anderen Constraints in kleinere zerlegt werden
 // n: PL oder TR, c: Index des zu splittenden Constraints in Specification[n]
 
@@ -761,10 +769,12 @@ bool Split(NodeType n, unsigned int c) {
             ||
             (Reaktor[n][CO][firstc].count != Reaktor[n][CO][lastc].count)) {
         for (i = firstc + 1; (Reaktor[n][DO][firstc].count == Reaktor[n][DO][i].count)
-                && (Reaktor[n][CO][firstc].count == Reaktor[n][CO][i].count); i++);
-	// Wenn fuer ein  entstehendes Constraint [A,B] |A| != |B| ist,
- 	// koennen keine Symms konsistent sein. Hier: entweder |A| = 0 
-	// oder |B| = 0.
+                && (Reaktor[n][CO][firstc].count == Reaktor[n][CO][i].count); i++) {
+            ;
+        }
+        // Wenn fuer ein  entstehendes Constraint [A,B] |A| != |B| ist,
+        // koennen keine Symms konsistent sein. Hier: entweder |A| = 0
+        // oder |B| = 0.
         if (Reaktor[n][DO][firstc].count != Reaktor[n][CO][firstc].count) {
             DeadBranches++;
             return false;
@@ -774,14 +784,14 @@ bool Split(NodeType n, unsigned int c) {
 #ifdef DISTRIBUTE
         progress();
 #endif
-	//Zerschneiden des Constraints in zwei Teile
+        //Zerschneiden des Constraints in zwei Teile
         Specification[n][oldc].last = i - 1;
         Specification[n][newc].first = i;
         Specification[n][newc].last = lastc;
         Specification[n][newc].parent = c;
         firstc = i;
         oldc = newc;
-	// Fuer Schnittprodukte sollte Refine nochmals probiert werden
+        // Fuer Schnittprodukte sollte Refine nochmals probiert werden
         Specification[n][newc].changed = new ToDo(n, newc);
     }
     if (oldc != c) {
@@ -796,10 +806,10 @@ bool Split(NodeType n, unsigned int c) {
 }
 
 // Testausgabe der Spec
-void PrintSpec(char * mess) {
+void PrintSpec(char* mess) {
     unsigned int n, c, i;
 
-	cout << "***** " << mess << " *****" << endl;
+    cout << "***** " << mess << " *****" << endl;
     for (n = 0; n < 2; n++) {
         cout << (n ? "Transitions\n" : "Places\n");
         for (c = 0; c < CardSpecification[n]; c++) {
@@ -834,20 +844,20 @@ bool Refine(NodeType n, unsigned int ref) {
     Reaktoreintrag* r;
     // unused: Arc * a,* aa;
 
-	// das andere Ende eines Bogens hat immer den dualen Knotentyp
+    // das andere Ende eines Bogens hat immer den dualen Knotentyp
     othern = n ? PL : TR;
-     // splitte sowohl mit eingehenden als auch ausgehenden Kanten
+    // splitte sowohl mit eingehenden als auch ausgehenden Kanten
     for (arcdir = 0; arcdir < 2; arcdir++) {
         // unused: unsigned int otherarcdir = 1 - arcdir;
-	// Anzahl der Kanten (wegen Praepozessing gleich fuer alle Knoten im
-	// Constraint)
+        // Anzahl der Kanten (wegen Praepozessing gleich fuer alle Knoten im
+        // Constraint)
         currentcardarc = arcdir ? Reaktor[n][DO][Specification[n][ref].first].node->NrOfArriving
                          : Reaktor[n][DO][Specification[n][ref].first].node->NrOfLeaving;
-	// Pro Durchlauf wird jeweils der (wg Praeprozessing zusammenhaengende)
-	// Block von Kanten gleicher Vielfachheit abgearbeitet
-	// Deshalb Reinitialisierung ausserhalb des Schleifenkopfes
+        // Pro Durchlauf wird jeweils der (wg Praeprozessing zusammenhaengende)
+        // Block von Kanten gleicher Vielfachheit abgearbeitet
+        // Deshalb Reinitialisierung ausserhalb des Schleifenkopfes
         for (j = 0; j < currentcardarc;) {
-	    // Neue Zaehlrunde. Damit werden alle Reaktor.count-Werte 
+            // Neue Zaehlrunde. Damit werden alle Reaktor.count-Werte
             // ungueltig
             NewStamp();
             do {
@@ -865,10 +875,10 @@ bool Refine(NodeType n, unsigned int ref) {
                         }
                     }
                 }
-	 	// Nachgeholte Reinitialisierung: Teste auf Ende eines
-		// zusammenhaengenden Bereiches gleicher Vielfachheit in
-		// Bogenliste (wg Praeprozessing fuer alle Knoten in einem
-		// Constraint einheitlich)
+                // Nachgeholte Reinitialisierung: Teste auf Ende eines
+                // zusammenhaengenden Bereiches gleicher Vielfachheit in
+                // Bogenliste (wg Praeprozessing fuer alle Knoten in einem
+                // Constraint einheitlich)
                 m1 =  arcdir ?
                       Reaktor[n][DO][Specification[n][ref].first].node->ArrivingArcs[j]-> Multiplicity
                       :
@@ -883,10 +893,10 @@ bool Refine(NodeType n, unsigned int ref) {
                     m2 = m1 + 1;
                 }
             } while (m1 == m2);
-	    // cmax: Alle Constraints in Specification mit index < cmax
-	  // gab es schon vor dem Splitten Neue bekommen indizes >= cmax
+            // cmax: Alle Constraints in Specification mit index < cmax
+            // gab es schon vor dem Splitten Neue bekommen indizes >= cmax
             cmax = CardSpecification[othern];
-	    // Das Separieren von Constraints auf der Basis der Zaehlergebnisse
+            // Das Separieren von Constraints auf der Basis der Zaehlergebnisse
             for (c = 0; c < cmax; c++) {
                 CountSort(othern, DO, Specification[othern][c].first, Specification[othern][c].last);
                 CountSort(othern, CO, Specification[othern][c].first, Specification[othern][c].last);
@@ -927,10 +937,10 @@ bool RefineUntilNothingChanges(NodeType n) {
     return true;
 }
 
-// Beim Backtracking von einem Split muessen Constraints wieder 
+// Beim Backtracking von einem Split muessen Constraints wieder
 // zusammengefuegt werden. Wir verlassen uns darauf, dass die Teilcpnstraints
 // in ihrem Reaktor noch die gleichen Index-Bereiche einnehmen. Das ist so,
-// weil Splitten im Reaktor nur am Ort sortiert, 
+// weil Splitten im Reaktor nur am Ort sortiert,
 // d.h. ggf. INNERHALB des Indexbereiches
 // Knoten permutiert
 // Also reicht es, first und last zuaktualisieren und den Constraint-Eintrag
@@ -973,44 +983,54 @@ void ReUnify(unsigned int plpegel, unsigned int trpegel) {
 }
 
 #if defined(SYMMPROD)
-unsigned int gcd(unsigned int n,unsigned int m){ return m==0?n:gcd(m,n%m); }
+unsigned int gcd(unsigned int n, unsigned int m) {
+    return m == 0 ? n : gcd(m, n % m);
+}
 
 void MinimizeCarrier(unsigned int pos) {
-	unsigned int orbit(Store[CurrentStore].image[pos].value->nr); // number of the orbit
-	unsigned int level(Store[CurrentStore].argnr); // offset for permutation vector
-	unsigned int ocyclen(1); // length of the orbit cycle (containing the orbit number)
-	unsigned int* ovec(Store[CurrentStore].image[pos].vector); // permutation vector
-	bool* visited = new bool[Places[0]->cnt-level+1]; // to mark visited cycles
-	unsigned int* cycle = new unsigned int[Places[0]->cnt-level+1]; // temporary memory for a cycle
-	for(unsigned int j=0; j<Places[0]->cnt-level; ++j) visited[j]=false;
-	unsigned int i(orbit);
-	visited[i-level]=true;
+    unsigned int orbit(Store[CurrentStore].image[pos].value->nr); // number of the orbit
+    unsigned int level(Store[CurrentStore].argnr); // offset for permutation vector
+    unsigned int ocyclen(1); // length of the orbit cycle (containing the orbit number)
+    unsigned int* ovec(Store[CurrentStore].image[pos].vector); // permutation vector
+    bool* visited = new bool[Places[0]->cnt - level + 1]; // to mark visited cycles
+    unsigned int* cycle = new unsigned int[Places[0]->cnt - level + 1]; // temporary memory for a cycle
+    for (unsigned int j = 0; j < Places[0]->cnt - level; ++j) {
+        visited[j] = false;
+    }
+    unsigned int i(orbit);
+    visited[i - level] = true;
 
-	while ((i=ovec[i-level])!=orbit) { 
-		++ocyclen; 
-		visited[i-level]=true; 
-	} // calculate the orbit cycle length
+    while ((i = ovec[i - level]) != orbit) {
+        ++ocyclen;
+        visited[i - level] = true;
+    } // calculate the orbit cycle length
 
-	for(unsigned int element=0; element<Places[0]->cnt-level; ++element) // go through the possible elements of non-trivial cycles
-	{
-		if (visited[element]) continue; // don't do this element again
-		unsigned int ecyclen(1); // length of the element's cycle
-		visited[element] = true;
-		cycle[0] = i = element+level; // start saving this cycle
-		while ((i=ovec[i-level])!=element+level) { 
-			cycle[ecyclen++] = i; 
-			visited[i-level] = true; 
-		} // calculate the element's cycle length and save the cycle
-		if (ecyclen==1) continue; // an identity; nothing to do
-		unsigned int ecycles(ecyclen); // the number of cycles the element's cycle will be split into
-		while ((i=gcd(ecycles,ocyclen))>1) ecycles /= i; // remove prime factors of ocyclen from ecycles
-		if (ecycles>1) // the ecycle can be split
-			for(i=0; i<ecyclen; ++i) // now store the replacement cycles
-				ovec[cycle[i]-level] = cycle[(i+ecycles)%ecyclen];
-	}
+    for (unsigned int element = 0; element < Places[0]->cnt - level; ++element) { // go through the possible elements of non-trivial cycles
+        if (visited[element]) {
+            continue;    // don't do this element again
+        }
+        unsigned int ecyclen(1); // length of the element's cycle
+        visited[element] = true;
+        cycle[0] = i = element + level; // start saving this cycle
+        while ((i = ovec[i - level]) != element + level) {
+            cycle[ecyclen++] = i;
+            visited[i - level] = true;
+        } // calculate the element's cycle length and save the cycle
+        if (ecyclen == 1) {
+            continue;    // an identity; nothing to do
+        }
+        unsigned int ecycles(ecyclen); // the number of cycles the element's cycle will be split into
+        while ((i = gcd(ecycles, ocyclen)) > 1) {
+            ecycles /= i;    // remove prime factors of ocyclen from ecycles
+        }
+        if (ecycles > 1) // the ecycle can be split
+            for (i = 0; i < ecyclen; ++i) { // now store the replacement cycles
+                ovec[cycle[i] - level] = cycle[(i + ecycles) % ecyclen];
+            }
+    }
 
-	delete[] visited;
-	delete[] cycle;
+    delete[] visited;
+    delete[] cycle;
 }
 #endif
 
@@ -1031,16 +1051,17 @@ void StoreSymmetry(unsigned int pos) {
                 Reaktor[PL][CO][Specification[PL][c].first].node->nr;
         }
     }
-	MinimizeCarrier(pos);
-    for (c = 0; c < Places[0]->cnt-offset; ++c)
-            UnifyClasses(c+offset,v[c]);
+    MinimizeCarrier(pos);
+    for (c = 0; c < Places[0]->cnt - offset; ++c) {
+        UnifyClasses(c + offset, v[c]);
+    }
 #else
     for (c = 0; c < CardSpecification[PL]; c++) {
-	// Vektor eintragen
+        // Vektor eintragen
         if (Reaktor[PL][DO][Specification[PL][c].first].node->nr >= offset) {
             v[Reaktor[PL][DO][Specification[PL][c].first].node->nr - offset] =
                 Reaktor[PL][CO][Specification[PL][c].first].node->nr;
-	// Klassen der Knotenpartition aktualisieren
+            // Klassen der Knotenpartition aktualisieren
             UnifyClasses(Reaktor[PL][DO][Specification[PL][c].first].node->nr, Reaktor[PL][CO][Specification[PL][c].first].node->nr);
         }
     }
@@ -1051,22 +1072,24 @@ void StoreSymmetry(unsigned int pos) {
 void WriteSymms() {
     if (Yflg) {
         unsigned int etage, raum, x, y;
-	// aufsteigende Etagen = aufsteigend erzwungene id (Struktur des
-	// Erzeugendensystems)
+        // aufsteigende Etagen = aufsteigend erzwungene id (Struktur des
+        // Erzeugendensystems)
         for (etage = 0; etage < CardStore; etage++) {
-	     // Raum: Ein Generator der aktuellen Etage
+            // Raum: Ein Generator der aktuellen Etage
             for (raum = 0; raum < Store[etage].card; raum++) {
                 cout << "GENERATOR # " << etage + 1 << "." << raum + 1 << "\n";
                 for (x = Store[etage].argnr; x < Places[0]->cnt; x++) {
                     // write cycle of x iff x is smallest el. of its cycle
 
                     // 1. find out whether x is smallest cycle member
-                    for (y = Store[etage].image[raum].vector[x-Store[etage].argnr]; y > x ; y = Store[etage].image[raum].vector[y-Store[etage].argnr]);
-                    if ((y == x) && (Store[etage].image[raum].vector[x-Store[etage].argnr] != x)) {
+                    for (y = Store[etage].image[raum].vector[x - Store[etage].argnr]; y > x ; y = Store[etage].image[raum].vector[y - Store[etage].argnr]) {
+                        ;
+                    }
+                    if ((y == x) && (Store[etage].image[raum].vector[x - Store[etage].argnr] != x)) {
                         // print cycle of x
                         cout << "(";
                         cout << Places[x] -> name;
-                        for (y = Store[etage].image[raum].vector[x-Store[etage].argnr]; y > x ; y = Store[etage].image[raum].vector[y-Store[etage].argnr]) {
+                        for (y = Store[etage].image[raum].vector[x - Store[etage].argnr]; y > x ; y = Store[etage].image[raum].vector[y - Store[etage].argnr]) {
                             cout << " " << Places[y] -> name;
                         }
                         cout << ")\n";
@@ -1091,12 +1114,14 @@ void WriteSymms() {
                     // write cycle of x iff x is smallest el. of its cycle
 
                     // 1. find out whether x is smallest cycle member
-                    for (y = Store[etage].image[raum].vector[x-Store[etage].argnr]; y > x ; y = Store[etage].image[raum].vector[y-Store[etage].argnr]);
-                    if ((y == x) && (Store[etage].image[raum].vector[x-Store[etage].argnr] != x)) {
+                    for (y = Store[etage].image[raum].vector[x - Store[etage].argnr]; y > x ; y = Store[etage].image[raum].vector[y - Store[etage].argnr]) {
+                        ;
+                    }
+                    if ((y == x) && (Store[etage].image[raum].vector[x - Store[etage].argnr] != x)) {
                         // print cycle of x
                         symmstream << "(";
                         symmstream << Places[x] -> name;
-                        for (y = Store[etage].image[raum].vector[x-Store[etage].argnr]; y > x ; y = Store[etage].image[raum].vector[y-Store[etage].argnr]) {
+                        for (y = Store[etage].image[raum].vector[x - Store[etage].argnr]; y > x ; y = Store[etage].image[raum].vector[y - Store[etage].argnr]) {
                             symmstream << " " << Places[y] -> name;
                         }
                         symmstream << ")\n";
@@ -1133,14 +1158,16 @@ void DefineToOther(unsigned int imagepos) {
     // unused: DomType dir;
     unsigned int MyCardSpecification[2];
 
-	// suche mehrelementiges Platzconstraint, Index -> cntriv
-    for (cntriv = 0; Specification[PL][cntriv].first == Specification[PL][cntriv].last; cntriv++);
-	// speichere B in possibleImages
+    // suche mehrelementiges Platzconstraint, Index -> cntriv
+    for (cntriv = 0; Specification[PL][cntriv].first == Specification[PL][cntriv].last; cntriv++) {
+        ;
+    }
+    // speichere B in possibleImages
     possibleImages = new Node * [Specification[PL][cntriv].last - Specification[PL][cntriv].first + 2];
     for (i = Specification[PL][cntriv].first; i <= Specification[PL][cntriv].last; i++) {
-        possibleImages[i-Specification[PL][cntriv].first] = Reaktor[PL][CO][i].node;
+        possibleImages[i - Specification[PL][cntriv].first] = Reaktor[PL][CO][i].node;
     }
-    possibleImages[i-Specification[PL][cntriv].first] = NULL;
+    possibleImages[i - Specification[PL][cntriv].first] = NULL;
 
     // Spalte [{x},{y}] fuer erstes y
     Specification[PL][CardSpecification[PL]].first = Specification[PL][CardSpecification[PL]].last
@@ -1170,19 +1197,19 @@ void DefineToOther(unsigned int imagepos) {
                 }
             }
         }
-	// Reinitialisierung dadurch, dass im Constraint [{x},{y}] das
-	// alte y einfach gegen den naechsten Wert aus possibleImages
-	// getauscht wird
-        if (possibleImages[j+1]) {
+        // Reinitialisierung dadurch, dass im Constraint [{x},{y}] das
+        // alte y einfach gegen den naechsten Wert aus possibleImages
+        // getauscht wird
+        if (possibleImages[j + 1]) {
             ReUnify(MyCardSpecification[PL], MyCardSpecification[TR]);
-            i = possibleImages[j+1]->pos[CO];
+            i = possibleImages[j + 1]->pos[CO];
             Reaktor[PL][CO][i].node->pos[CO] =
                 Specification[PL][CardSpecification[PL] - 1].first;
             Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first].node->pos[CO] = i;
             swap = Reaktor[PL][CO][i];
             Reaktor[PL][CO][i] = Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first];
             Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first] = swap;
-            Specification[PL][CardSpecification[PL] - 1].changed = new ToDo(PL, CardSpecification[PL]-1);
+            Specification[PL][CardSpecification[PL] - 1].changed = new ToDo(PL, CardSpecification[PL] - 1);
             Specification[PL][cntriv].changed = new ToDo(PL, cntriv);
 
         }
@@ -1207,12 +1234,14 @@ void OnlineDefineToOther() {
     // unused: DomType dir;
     unsigned int MyCardSpecification[2];
 
-    for (cntriv = 0; Specification[PL][cntriv].first == Specification[PL][cntriv].last; cntriv++);
+    for (cntriv = 0; Specification[PL][cntriv].first == Specification[PL][cntriv].last; cntriv++) {
+        ;
+    }
     possibleImages = new Node * [Specification[PL][cntriv].last - Specification[PL][cntriv].first + 2];
     for (i = Specification[PL][cntriv].first; i <= Specification[PL][cntriv].last; i++) {
-        possibleImages[i-Specification[PL][cntriv].first] = Reaktor[PL][CO][i].node;
+        possibleImages[i - Specification[PL][cntriv].first] = Reaktor[PL][CO][i].node;
     }
-    possibleImages[i-Specification[PL][cntriv].first] = NULL;
+    possibleImages[i - Specification[PL][cntriv].first] = NULL;
     Specification[PL][CardSpecification[PL]].first = Specification[PL][CardSpecification[PL]].last
                                                      = Specification[PL][cntriv].first;
     Specification[PL][CardSpecification[PL]].parent = cntriv;
@@ -1239,8 +1268,8 @@ void OnlineDefineToOther() {
             }
         }
         ReUnify(MyCardSpecification[PL], MyCardSpecification[TR]);
-        if (possibleImages[j+1]) {
-            i = possibleImages[j+1]->pos[CO];
+        if (possibleImages[j + 1]) {
+            i = possibleImages[j + 1]->pos[CO];
             Reaktor[PL][CO][i].node->pos[CO] =
                 Specification[PL][CardSpecification[PL] - 1].first;
             Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first].node->pos[CO] = i;
@@ -1289,9 +1318,9 @@ void OnlineCanonize() {
     // get all images
     possibleImages = new Node * [Specification[PL][cntriv].last - Specification[PL][cntriv].first + 2];
     for (i = Specification[PL][cntriv].first; i <= Specification[PL][cntriv].last; i++) {
-        possibleImages[i-Specification[PL][cntriv].first] = Reaktor[PL][CO][i].node;
+        possibleImages[i - Specification[PL][cntriv].first] = Reaktor[PL][CO][i].node;
     }
-    possibleImages[i-Specification[PL][cntriv].first] = NULL;
+    possibleImages[i - Specification[PL][cntriv].first] = NULL;
     ImageSort(possibleImages, 0, Specification[PL][cntriv].last - Specification[PL][cntriv].first);
     maxmarking = CurrentMarking[((Place*) possibleImages[Specification[PL][cntriv].last - Specification[PL][cntriv].first])->index];
     Reaktor[PL][DO][SourceIndex].node -> pos[DO] = Specification[PL][cntriv].first;
@@ -1363,8 +1392,8 @@ void OnlineCanonize() {
             }
         }
         ReUnify(MyCardSpecification[PL], MyCardSpecification[TR]);
-        if (possibleImages[j+1]) {
-            i = possibleImages[j+1]->pos[CO];
+        if (possibleImages[j + 1]) {
+            i = possibleImages[j + 1]->pos[CO];
             Reaktor[PL][CO][i].node->pos[CO] =
                 Specification[PL][CardSpecification[PL] - 1].first;
             Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first].node->pos[CO] = i;
@@ -1383,80 +1412,112 @@ void OnlineCanonize() {
 #if defined(SYMMPROD)
 void BuildInconsistencies(unsigned int orbit, bool* inconsistent) {
     if (!Store[CurrentStore].image[orbit].vector) {
-		unsigned int k,l;
-		inconsistent[orbit] = true;
-		for(l=Store[CurrentStore].image[orbit].value->nr; !(part[l].top); l=part[l].nextorcard);
-		for (unsigned int i=orbit+1; i<Store[CurrentStore].length; ++i)
-		{
-			for(k=Store[CurrentStore].image[i].value->nr; !(part[k].top); k=part[k].nextorcard);
-			if (k==l) inconsistent[i]=true;
-		}
-	}
+        unsigned int k, l;
+        inconsistent[orbit] = true;
+        for (l = Store[CurrentStore].image[orbit].value->nr; !(part[l].top); l = part[l].nextorcard) {
+            ;
+        }
+        for (unsigned int i = orbit + 1; i < Store[CurrentStore].length; ++i) {
+            for (k = Store[CurrentStore].image[i].value->nr; !(part[k].top); k = part[k].nextorcard) {
+                ;
+            }
+            if (k == l) {
+                inconsistent[i] = true;
+            }
+        }
+    }
 }
 #endif
 
 #if defined(SYMMPROD)
 void BuildProducts(unsigned int orbit, bool* inconsistent) {
-	unsigned int StorePos(CurrentStore);
-	if (!Store[StorePos].image[orbit].vector) return; // empty orbit, nothing to do
+    unsigned int StorePos(CurrentStore);
+    if (!Store[StorePos].image[orbit].vector) {
+        return;    // empty orbit, nothing to do
+    }
 
-	unsigned int j;
-	unsigned int bpstore, bporbit, bpnext, bpval, bplevel, k, bpnull(0);
-	unsigned int* bpcomp; // a permutation to compose the orbit's permutation(representative) with
-	unsigned int* bpnxvc; // the result of this composition
-	unsigned int level(Store[StorePos].argnr); // virtual offset of this orbit's vector
+    unsigned int j;
+    unsigned int bpstore, bporbit, bpnext, bpval, bplevel, k, bpnull(0);
+    unsigned int* bpcomp; // a permutation to compose the orbit's permutation(representative) with
+    unsigned int* bpnxvc; // the result of this composition
+    unsigned int level(Store[StorePos].argnr); // virtual offset of this orbit's vector
 
-	for(j=0; j<Store[StorePos].length; ++j) // count the number of still missing orbits
-		if (!(Store[StorePos].image[j].vector || inconsistent[j])) ++bpnull;
-	if (!bpnull) return; // all orbits are there, nothing to do
-	unsigned int* bplist(new unsigned int[bpnull + 1]); // a list of all orbits to work on
-	bplist[0] = orbit; // initially only the one given as parameter of this function
-	unsigned int bplength(0); // length minus one of the bplist
+    for (j = 0; j < Store[StorePos].length; ++j) // count the number of still missing orbits
+        if (!(Store[StorePos].image[j].vector || inconsistent[j])) {
+            ++bpnull;
+        }
+    if (!bpnull) {
+        return;    // all orbits are there, nothing to do
+    }
+    unsigned int* bplist(new unsigned int[bpnull + 1]); // a list of all orbits to work on
+    bplist[0] = orbit; // initially only the one given as parameter of this function
+    unsigned int bplength(0); // length minus one of the bplist
 
-    for(unsigned int bp = 0; bp <= bplength; ++bp)
-	{
-		orbit = bplist[bp]; // the orbit to compose now
-	    compose = Store[StorePos].image[orbit].vector; // the representative of the orbit
-		for(bpstore = CardStore; Store[bpstore-1].argnr>Store[StorePos].image[orbit].value->nr ; --bpstore);
-		for(; bpstore > StorePos; --bpstore) // go through all earlier built representatives (other groups and orbits)
-			for(bporbit = 0; bporbit < Store[bpstore-1].length; ++bporbit)
-			{
-				bpcomp = Store[bpstore-1].image[bporbit].vector; // get a previously produced vector(permutation)
-				if (!bpcomp) continue; // and check if it exists, if not: no composition is possible
-				bplevel = Store[bpstore-1].argnr; // offset (the virtual beginning of the vector bpcomp)
-				if (Store[StorePos].image[orbit].value->nr < bplevel) continue; // this permutation leads into same orbit, nothing new
-				bpval = bpcomp[Store[StorePos].image[orbit].value->nr - bplevel]; // get the new composed orbit number
-				if (bpval <= level) continue; // we ran into the symmetry group; no new orbit
-				for(bpnext = 0; Store[StorePos].image[bpnext].value->nr != bpval; ++bpnext); // find bpval's position in the store (the orbit number)
-				if (Store[StorePos].image[bpnext].vector) continue; // if a representative already exists for this orbit do nothing
-				bplist[++bplength] = bpnext; // a new orbit is found, we have to build products for it later
-				bpnxvc = Store[StorePos].image[bpnext].vector = new unsigned int[Places[0]->cnt - level + 1];
-	            for (k = 0 ; k < Places[0]->cnt - level; ++k) // now build the product vector bpcomp[compose[]] as new representative
-					bpnxvc[k] = (compose[k]<bplevel ? compose[k] : bpcomp[compose[k] - bplevel]); 
-				MinimizeCarrier(bpnext); // remove cycles if possible (by building powers)
-				if (--bpnull==0) { delete[] bplist; return; } // if this was the last missing orbit: stop immediately
-			}
-	}
-	delete[] bplist;
+    for (unsigned int bp = 0; bp <= bplength; ++bp) {
+        orbit = bplist[bp]; // the orbit to compose now
+        compose = Store[StorePos].image[orbit].vector; // the representative of the orbit
+        for (bpstore = CardStore; Store[bpstore - 1].argnr > Store[StorePos].image[orbit].value->nr ; --bpstore) {
+            ;
+        }
+        for (; bpstore > StorePos; --bpstore) // go through all earlier built representatives (other groups and orbits)
+            for (bporbit = 0; bporbit < Store[bpstore - 1].length; ++bporbit) {
+                bpcomp = Store[bpstore - 1].image[bporbit].vector; // get a previously produced vector(permutation)
+                if (!bpcomp) {
+                    continue;    // and check if it exists, if not: no composition is possible
+                }
+                bplevel = Store[bpstore - 1].argnr; // offset (the virtual beginning of the vector bpcomp)
+                if (Store[StorePos].image[orbit].value->nr < bplevel) {
+                    continue;    // this permutation leads into same orbit, nothing new
+                }
+                bpval = bpcomp[Store[StorePos].image[orbit].value->nr - bplevel]; // get the new composed orbit number
+                if (bpval <= level) {
+                    continue;    // we ran into the symmetry group; no new orbit
+                }
+                for (bpnext = 0; Store[StorePos].image[bpnext].value->nr != bpval; ++bpnext) {
+                    ;    // find bpval's position in the store (the orbit number)
+                }
+                if (Store[StorePos].image[bpnext].vector) {
+                    continue;    // if a representative already exists for this orbit do nothing
+                }
+                bplist[++bplength] = bpnext; // a new orbit is found, we have to build products for it later
+                bpnxvc = Store[StorePos].image[bpnext].vector = new unsigned int[Places[0]->cnt - level + 1];
+                for (k = 0 ; k < Places[0]->cnt - level; ++k) { // now build the product vector bpcomp[compose[]] as new representative
+                    bpnxvc[k] = (compose[k] < bplevel ? compose[k] : bpcomp[compose[k] - bplevel]);
+                }
+                MinimizeCarrier(bpnext); // remove cycles if possible (by building powers)
+                if (--bpnull == 0) {
+                    delete[] bplist;    // if this was the last missing orbit: stop immediately
+                    return;
+                }
+            }
+    }
+    delete[] bplist;
 }
 #else
 void BuildProducts(unsigned int orbit) {
-	unsigned int StorePos(CurrentStore);
-	unsigned int val, composed, k;
+    unsigned int StorePos(CurrentStore);
+    unsigned int val, composed, k;
 
     if (Store[StorePos].image[orbit].vector) {
         compose = Store[StorePos].image[orbit].vector;
         while (1) {
             val = compose[Store[StorePos].image[orbit].value->nr - Store[StorePos].argnr];
-            if (val == Store[StorePos].argnr) break;
-            for (composed = 0; Store[StorePos].image[composed].value->nr != val; ++composed);
-            for (k = 0; k < Places[0]->cnt - Store[StorePos].argnr; k++)
+            if (val == Store[StorePos].argnr) {
+                break;
+            }
+            for (composed = 0; Store[StorePos].image[composed].value->nr != val; ++composed) {
+                ;
+            }
+            for (k = 0; k < Places[0]->cnt - Store[StorePos].argnr; k++) {
                 reservecompose[k] = Store[StorePos].image[orbit].vector[compose[k] - Store[StorePos].argnr];
-            if ((Store[StorePos].image[composed].vector)) compose=reservecompose;
-            else {
+            }
+            if ((Store[StorePos].image[composed].vector)) {
+                compose = reservecompose;
+            } else {
                 Store[StorePos].image[composed].vector = new unsigned int [Places[0]->cnt - Store[StorePos].argnr + 1];
-                for (k = 0; k < Places[0]->cnt - Store[StorePos].argnr; k++)
+                for (k = 0; k < Places[0]->cnt - Store[StorePos].argnr; k++) {
                     Store[StorePos].image[composed].vector[k] = reservecompose[k];
+                }
                 compose = Store[StorePos].image[composed].vector;
             }
         }
@@ -1470,9 +1531,9 @@ void BuildProducts(unsigned int orbit) {
 void DefineToId(void) {
 
     unsigned int cntriv, // ein nichttriviales Constraint
-nrmin, // Nr des kleinsten Knotens eines nichttrivialen Constraints
-intriv, // dessen Pos im Reaktor
-c, i, j,k, MyCardSpecification[2], oldstorenr;
+             nrmin, // Nr des kleinsten Knotens eines nichttrivialen Constraints
+             intriv, // dessen Pos im Reaktor
+             c, i, j, k, MyCardSpecification[2], oldstorenr;
     // unused: unsigned int MyStorePosition;
     // unused: unsigned int val;
     // unused: unsigned int composed;
@@ -1483,13 +1544,12 @@ c, i, j,k, MyCardSpecification[2], oldstorenr;
     SymmImage* sigma;
     // unused: SymmImage * svec;
 
-	// suche dasjenige mehrelementige Constraint, das den kleinsten
-	// Knoten enthält
+    // suche dasjenige mehrelementige Constraint, das den kleinsten
+    // Knoten enthält
     nrmin = UINT_MAX; // groesser als jeder korrekte Wert
     for (c = 0; c < CardSpecification[PL]; c++) {
-        if (Specification[PL][c].first != Specification[PL][c].last) 
-	{
-		// bin in mehrelementigem Constraint
+        if (Specification[PL][c].first != Specification[PL][c].last) {
+            // bin in mehrelementigem Constraint
             for (i = Specification[PL][c].first; i <= Specification[PL][c].last; i++) {
                 if (Reaktor[PL][DO][i].node->nr < nrmin) {
                     nrmin = Reaktor[PL][DO][i].node->nr;
@@ -1499,26 +1559,23 @@ c, i, j,k, MyCardSpecification[2], oldstorenr;
             }
         }
     }
-	// bereite Symmetriespeicher auf die neuen Elemente vor
-     // Speichere potentielle Images in Store
+    // bereite Symmetriespeicher auf die neuen Elemente vor
+    // Speichere potentielle Images in Store
     CardStore++;
     oldstorenr = CurrentStore;
     CurrentStore = CardStore - 1;
     Store[CurrentStore].arg = Reaktor[PL][DO][intriv].node;
     Store[CurrentStore].argnr = nrmin;
-    Store[CardStore-1].image = new SymmImage [Specification[PL][cntriv].last - Specification[PL][cntriv].first + 1];
+    Store[CardStore - 1].image = new SymmImage [Specification[PL][cntriv].last - Specification[PL][cntriv].first + 1];
     Store[CurrentStore].length = Specification[PL][cntriv].last - Specification[PL][cntriv].first;
-    for (j = 0, k = 0;j <= Store[CurrentStore].length; j++,k++) {
-	if(j+Specification[PL][cntriv].first == intriv)
-	{
-		// skip arg as image
-		k--;
-	}
-	else
-	{
-        Store[CurrentStore].image[k].vector = NULL;
-        Store[CurrentStore].image[k].value = Reaktor[PL][CO][j + Specification[PL][cntriv].first].node;
-	}
+    for (j = 0, k = 0; j <= Store[CurrentStore].length; j++, k++) {
+        if (j + Specification[PL][cntriv].first == intriv) {
+            // skip arg as image
+            k--;
+        } else {
+            Store[CurrentStore].image[k].vector = NULL;
+            Store[CurrentStore].image[k].value = Reaktor[PL][CO][j + Specification[PL][cntriv].first].node;
+        }
 
     }
 
@@ -1552,8 +1609,10 @@ c, i, j,k, MyCardSpecification[2], oldstorenr;
     }
     ReUnify(MyCardSpecification[PL], MyCardSpecification[TR]);
 #if defined(SYMMPROD)
-	bool* inconsistent = new bool[Store[CurrentStore].length];
-	for (j = 0; j < Store[CurrentStore].length; ++j) inconsistent[j]=false;
+    bool* inconsistent = new bool[Store[CurrentStore].length];
+    for (j = 0; j < Store[CurrentStore].length; ++j) {
+        inconsistent[j] = false;
+    }
 #endif
     for (j = 0; j < Store[CurrentStore].length; j++) {
         sigma = Store[CurrentStore].image + j;
@@ -1562,8 +1621,8 @@ c, i, j,k, MyCardSpecification[2], oldstorenr;
 #else
         if (!(sigma->vector)) // try to find a new representative if the orbit is empty so far
 #endif
-		{
-	    i = sigma->value->pos[CO];
+        {
+            i = sigma->value->pos[CO];
             Reaktor[PL][CO][i].node->pos[CO] = Specification[PL][CardSpecification[PL] - 1].first;
             Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first].node ->pos[CO] = i;
             swap = Reaktor[PL][CO][i];
@@ -1578,20 +1637,20 @@ c, i, j,k, MyCardSpecification[2], oldstorenr;
                     DefineToOther(j); // try to complete the current abstract permutation to a full one
                 }
 #if defined(SYMMPROD)
-				BuildProducts(j,inconsistent);
+                BuildProducts(j, inconsistent);
 #else
-				BuildProducts(j); // we build products with earlier found generators and/or this generator itself here
+                BuildProducts(j); // we build products with earlier found generators and/or this generator itself here
 #endif
             }
 #if defined(SYMMPROD)
-			BuildInconsistencies(j,inconsistent); // check if orbit is inconsistent; it may lead to more inconsistent orbits
+            BuildInconsistencies(j, inconsistent); // check if orbit is inconsistent; it may lead to more inconsistent orbits
 #endif
             ReUnify(MyCardSpecification[PL], MyCardSpecification[TR]);
         }
     }
     CurrentStore = oldstorenr;
 #if defined(SYMMPROD)
-	delete[] inconsistent;
+    delete[] inconsistent;
 #endif
 }
 
@@ -1613,8 +1672,8 @@ void ComputeSymmetries(void) {
     Stamp = 1;
     InitialConstraint();
     FuelleReaktor();
-	// Refine kann hier nicht fehlschlagen, weil id auf jeden Fall
-	// konsistent sein muss
+    // Refine kann hier nicht fehlschlagen, weil id auf jeden Fall
+    // konsistent sein muss
     if (!RefineUntilNothingChanges(PL)) {
         cout << " Was komisches ist passiert";
     }
@@ -1624,23 +1683,23 @@ void ComputeSymmetries(void) {
         CurrentMarking[i] = Places[i]->initial_marking;
 
     }
-	// Lege Aeq-Klassen an
+    // Lege Aeq-Klassen an
     part = new Partition [Places[0]-> cnt];
     for (i = 0; i < Places[0]->cnt; i++) {
         part[i].nextorcard = 1;
         part[i].top = true;
     }
-	// Lege Speicher fuer Generatoren an
+    // Lege Speicher fuer Generatoren an
     Store = new SymmStore [Places[0]->cnt];
     CardStore = 0;
     plp = CardSpecification[PL];
     trp = CardSpecification[TR];
-	// Starte Suche nach Generatoren
+    // Starte Suche nach Generatoren
     if (CardSpecification[PL] != Places[0]->cnt) {
         DefineToId();
     }
     ReUnify(plp, trp);
-	// Berechne Generatoren- und Symmetriezahl
+    // Berechne Generatoren- und Symmetriezahl
     CardGenerators = 0;
     CardSymm = 1;
     for (i = 0; i < CardStore; i++) {
@@ -1664,7 +1723,7 @@ void ComputeSymmetries(void) {
             i++;
         } else {
             for (j = i + 1; j < CardStore; j++) {
-                Store[j-1] = Store[j];
+                Store[j - 1] = Store[j];
             }
             CardStore--;
         }
@@ -1677,7 +1736,9 @@ void ComputeSymmetries(void) {
     // zu Constraints werden. Countsort wird misbraucht.
     NewStamp();
     for (i = 0; i < Places[0]->cnt; i++) {
-        for (j = i; !part[j].top; j = part[j].nextorcard);
+        for (j = i; !part[j].top; j = part[j].nextorcard) {
+            ;
+        }
         Reaktor[PL][DO][Places[i]->pos[DO]].stamp = Reaktor[PL][CO][Places[i]->pos[CO]].stamp = Stamp;
         Reaktor[PL][DO][Places[i]->pos[DO]].count = Reaktor[PL][CO][Places[i]->pos[CO]].count = j;
     }
@@ -1700,7 +1761,9 @@ void ComputeSymmetries(void) {
         }
     }
     for (i = 0; i < Places[0]->cnt; i++) {
-        for (j = i; !part[j].top; j = part[j].nextorcard);
+        for (j = i; !part[j].top; j = part[j].nextorcard) {
+            ;
+        }
         Places[i]->set_hash(part[j].nextorcard);
     }
     CurrentSymm = new unsigned int [Places[0]->cnt];
@@ -1749,7 +1812,9 @@ void ComputePartition(void) {
     // zu Constraints werden. Countsort wird misbraucht.
     NewStamp();
     for (i = 0; i < Places[0]->cnt; i++) {
-        for (j = i; !part[j].top; j = part[j].nextorcard);
+        for (j = i; !part[j].top; j = part[j].nextorcard) {
+            ;
+        }
         Reaktor[PL][DO][Places[i]->pos[DO]].stamp = Reaktor[PL][CO][Places[i]->pos[CO]].stamp = Stamp;
         Reaktor[PL][DO][Places[i]->pos[DO]].count = Reaktor[PL][CO][Places[i]->pos[CO]].count = j;
     }
@@ -1770,7 +1835,9 @@ void ComputePartition(void) {
         }
     }
     for (i = 0; i < Places[0]->cnt; i++) {
-        for (j = i; !part[j].top; j = part[j].nextorcard);
+        for (j = i; !part[j].top; j = part[j].nextorcard) {
+            ;
+        }
         Places[i]->set_hash(part[j].nextorcard);
     }
 #else
@@ -1788,7 +1855,7 @@ void FirstSymm()
     for (i = 0; i < CardStore; i++) {
         Store[i].current = Store[i].card;
         for (j = Store[i].argnr; j < Places[i]->cnt; j++) {
-            Store[i].reference[j-Store[i].argnr] = j;
+            Store[i].reference[j - Store[i].argnr] = j;
         }
     }
     for (i = 0; i < Places[0]->cnt; i++) {
@@ -1812,7 +1879,7 @@ unsigned int NextSymm(unsigned int scg) {
         return Places[0]->cnt + 27;
     }
     l = 0;
-    if ((Store[r = CardStore-1].argnr) <= scg) {
+    if ((Store[r = CardStore - 1].argnr) <= scg) {
         m = r;
     } else {
         m = l;
@@ -1831,7 +1898,7 @@ unsigned int NextSymm(unsigned int scg) {
                 break;
             }
             if (Store[m].argnr < scg) {
-                if (Store[m+1].argnr > scg) {
+                if (Store[m + 1].argnr > scg) {
                     break;
                 } else {
                     l = m;
@@ -1850,7 +1917,7 @@ unsigned int NextSymm(unsigned int scg) {
     sigma = Store + m;
     sigma ->current--;
     for (unsigned int i = sigma->argnr; i < Places[0]->cnt; i++) {
-        CurrentSymm[i] = sigma->reference[sigma->image[sigma->current].vector[i-sigma->argnr] - sigma->argnr];
+        CurrentSymm[i] = sigma->reference[sigma->image[sigma->current].vector[i - sigma->argnr] - sigma->argnr];
     }
     for (unsigned int i = m + 1; i < CardStore; i++) {
         for (unsigned int j = Store[i].argnr; j < Places[0]->cnt; j++) {
@@ -2267,12 +2334,10 @@ State* canonical_representitive_on_the_fly() {
     return binSearch();
 }
 
-void PrintStore()
-{
-	int etage, raum;
+void PrintStore() {
+    int etage, raum;
 
-	for(etage=0;etage<CardStore;etage++)
-	{
-		cout << "Etage " << etage << "; arg=" << Store[etage].arg->name << " card=" << Store[etage].card << endl;
-	}
+    for (etage = 0; etage < CardStore; etage++) {
+        cout << "Etage " << etage << "; arg=" << Store[etage].arg->name << " card=" << Store[etage].card << endl;
+    }
 }

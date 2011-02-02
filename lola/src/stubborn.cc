@@ -29,9 +29,9 @@ void insert_up(State*, formula*);
 void insert_global_down(formula*);
 
 extern unsigned int* checkstart;
+
 void stubbornclosure() {
     Transition* current;
-    int i;
 
     current->NrStubborn = 0;
     for (current = current -> StartOfStubbornList; current; current = current -> NextStubborn) {
@@ -49,7 +49,7 @@ void stubbornclosure() {
             }
 #endif
         }
-        for (i = 0; current -> mustbeincluded[i]; i++) {
+        for (int i = 0; current -> mustbeincluded[i]; i++) {
             if (!current -> mustbeincluded[i]->instubborn) {
                 current -> mustbeincluded[i]->instubborn = true;
                 current -> mustbeincluded[i]->NextStubborn  = NULL;
@@ -544,14 +544,14 @@ Transition** stubbornfirelistneg(State* s, formula* f) {
 
 Transition** stubbornfirelistctl() {
     Transition** result, * current, *start;
-    int i;
 
+    // stubborn does not work with X-operators
     if (xoperators) {
         return firelist();
     }
+
     // try for all enabled invisible transitions if there is
     // a stubborn superset without other enabled transitions
-    //
     for (start = Transitions[0]->StartOfEnabledList; start; start = start -> NextEnabled) {
         if (start -> visible) {
             continue;
@@ -564,9 +564,8 @@ Transition** stubbornfirelistctl() {
         start -> StartOfStubbornList = start -> EndOfStubbornList = start;
         start -> instubborn = true;
         start -> NextStubborn = NULL;
-        for (current = current -> StartOfStubbornList; current;
-                current = current -> NextStubborn) {
-            for (i = 0; current -> mustbeincluded[i]; i++) {
+        for (current = current -> StartOfStubbornList; current; current = current -> NextStubborn) {
+            for (int i = 0; current -> mustbeincluded[i]; i++) {
 #ifdef EXTENDEDCTL
                 if (!(current->mustbeincluded[i] -> pathrestriction[TemporalIndex])) {
                     continue;
@@ -589,7 +588,7 @@ Transition** stubbornfirelistctl() {
                 }
             }
         }
-        result = new Transition * [2];
+        result = new Transition*[2];
         result[0] = start;
         result[1] = NULL;
         for (current = current -> StartOfStubbornList; current; current = current -> NextStubborn) {
@@ -599,6 +598,7 @@ Transition** stubbornfirelistctl() {
 nextstart:
         ;
     }
+
     return firelist();
 }
 

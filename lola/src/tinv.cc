@@ -110,10 +110,10 @@ equation::equation(Node* p) : sum(NULL) {
 #endif
 
     ++NrOfEquations;
-     
+
 }
 
-equation** esystem, **newesystem;
+equation** esystem, ** newesystem;
 unsigned int* lastconsidered;
 
 void equation::apply() {
@@ -405,7 +405,9 @@ void progress_measure() {
         // equations that cancel out all places are collected
         // in bucket esystem[Places[0]->cnt]].
         reference[i] = new equation(Transitions[i]);
-        for (anchor = &(reference[i]->sum); *anchor; anchor = &((*anchor)->next));
+        for (anchor = &(reference[i]->sum); *anchor; anchor = &((*anchor)->next)) {
+            ;
+        }
         *anchor = new summand(Transitions[i], 1);
         (*anchor)->next = NULL;
         reference[i]->next = esystem[reference[i]->sum->var->nr];

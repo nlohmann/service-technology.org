@@ -100,7 +100,9 @@ UValue* UEnuType::make() {
 
 UEnuType::UEnuType(UEnList* l) {
     UEnList* ll;
-    for (size = 0, ll = l; ll; ll = ll -> next, size++);
+    for (size = 0, ll = l; ll; ll = ll -> next, size++) {
+        ;
+    }
     tags = new EnSymbol * [size];
     for (unsigned int i = 0; i < size; i++) {
         tags[i] = l->sy;
@@ -189,7 +191,9 @@ bool UArrType::iscompatible(UType* t) {
 
 URecType::URecType(URcList* l) {
     URcList* ll;
-    for (card = 0, ll = l; ll; ll = ll -> next, card++);
+    for (card = 0, ll = l; ll; ll = ll -> next, card++) {
+        ;
+    }
     tags = new RcSymbol * [card];
     component = new UType * [card ];
     size = 1;
@@ -598,7 +602,9 @@ char* UNumValue::text() {
     unsigned int i, len;
     char* c;
 
-    for (len = 0, i = v; i > 0 ; len ++, i /= 10);
+    for (len = 0, i = v; i > 0 ; len ++, i /= 10) {
+        ;
+    }
     c = new char [len + 1];
     sprintf(c, "%u", v);
     return c;
@@ -1946,7 +1952,7 @@ UValueList* UOpTerm::evaluate() {
     UValueList** subindex;
 
     subresult = new UValueList * [arity + 1] ;
-    subindex = new UValueList * [arity +1 ] ;
+    subindex = new UValueList * [arity + 1 ] ;
 
     for (i = 0; i < arity; i++) {
         subresult[i] = sub[i] -> evaluate();
@@ -1966,7 +1972,9 @@ UValueList* UOpTerm::evaluate() {
         try {
             f -> body -> execute();
         } catch (ExitException) {}
-        for (last = &vl; * last; last = & ((* last) -> next));
+        for (last = &vl; * last; last = & ((* last) -> next)) {
+            ;
+        }
         * last = f -> result;
         for (UValueList* vc = * last; vc; vc = vc -> next) {
             bla = vc -> val -> text();

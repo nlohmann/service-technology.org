@@ -62,8 +62,8 @@ class State {
         unsigned int nr;
         State** witness;  // Next states in witness path (per subformula)
         Transition** witnesstransition;  // transition realising the witness path
-        Transition** * checkfirelist;
-        State** * checksucc;
+        Transition*** checkfirelist;
+        State*** checksucc;
         State** checkparent;
         unsigned int* checkcurrent;
         bool* value;  // value of subformulas
@@ -104,19 +104,19 @@ inline State::State() {
 #endif
 #ifdef MODELCHECKING
     nr = card++;
-    witness = new State * [F -> tempcard+5];
-    witnesstransition = new Transition * [F -> tempcard+5];
-    value = new bool [F -> card+5];
-    known = new bool [F -> card+5];
+    witness = new State * [F -> tempcard + 5];
+    witnesstransition = new Transition * [F -> tempcard + 5];
+    value = new bool [F -> card + 5];
+    known = new bool [F -> card + 5];
     for (int i = 0; i < F->card; i++) {
         known[i] = false;
     }
-    checkfirelist = new Transition** [F-> tempcard+5];
-    checksucc = new State** [F-> tempcard+5];
-    checkparent = new State * [F -> tempcard+5];
-    checkcurrent = new unsigned int [F -> tempcard+5];
-    checkdfs = new unsigned int [F -> tempcard+5];
-    checkmin = new unsigned int [F -> tempcard+5];
+    checkfirelist = new Transition** [F-> tempcard + 5];
+    checksucc = new State** [F-> tempcard + 5];
+    checkparent = new State * [F -> tempcard + 5];
+    checkcurrent = new unsigned int [F -> tempcard + 5];
+    checkdfs = new unsigned int [F -> tempcard + 5];
+    checkmin = new unsigned int [F -> tempcard + 5];
     checknexttar = new State * [F -> tempcard];
     F -> evaluateatomic(this);
     checkprevtar = new State * [F -> tempcard];
@@ -311,14 +311,14 @@ inline void Decision::insert(unsigned int v, Statevector* vec, unsigned int idx,
         newsv = new Statevector * [2 * capacity];
         pos = 0;
         for (i = size; i > 0; i--) {
-            if (value[i-1] < v) {
+            if (value[i - 1] < v) {
                 pos = i;
                 break;
             }
-            newv[i] = value[i-1];
-            newi[i] = index[i-1];
-            newd[i] = next[i-1];
-            newsv[i] = vector[i-1];
+            newv[i] = value[i - 1];
+            newi[i] = index[i - 1];
+            newd[i] = next[i - 1];
+            newsv[i] = vector[i - 1];
         }
         newv[pos] = v;
         newi[pos] = idx;
@@ -343,14 +343,14 @@ inline void Decision::insert(unsigned int v, Statevector* vec, unsigned int idx,
     } else {
         pos = 0;
         for (i = size; i > 0; i--) {
-            if (value[i-1] < v) {
+            if (value[i - 1] < v) {
                 pos = i;
                 break;
             }
-            value[i] = value[i-1];
-            index[i] = index[i-1];
-            next[i] = next[i-1];
-            vector[i] = vector[i-1];
+            value[i] = value[i - 1];
+            index[i] = index[i - 1];
+            next[i] = next[i - 1];
+            vector[i] = vector[i - 1];
         }
         value[pos] = v;
         index[pos] = idx;
@@ -463,7 +463,7 @@ inline State* bit_search() {
 #else
     canonize_on_the_fly();
 #endif
-    return (BitHashTable[kanhash/MPERWORD] >> (kanhash % MPERWORD) & 1) ? CurrentState : NULL;
+    return (BitHashTable[kanhash / MPERWORD] >> (kanhash % MPERWORD) & 1) ? CurrentState : NULL;
 #else
     return (BitHashTable[Places[0]->hash_value / MPERWORD] >> (Places[0]->hash_value % MPERWORD) & 1) ? CurrentState : NULL;
 #endif
@@ -823,8 +823,8 @@ inline void canonize() {
         for (current = 0; current < Store[level].card; current++) {
             for (i = Store[level].argnr; i < Places[0]->cnt; i++) {
                 if ((current_min < Store[level].card ?
-                        kanrep[Store[level].image[current_min].vector[i-Store[level].argnr]] : kanrep[i])
-                        != kanrep[Store[level].image[current].vector[i-Store[level].argnr]]) {
+                        kanrep[Store[level].image[current_min].vector[i - Store[level].argnr]] : kanrep[i])
+                        != kanrep[Store[level].image[current].vector[i - Store[level].argnr]]) {
                     break;
                 }
             }
@@ -832,8 +832,8 @@ inline void canonize() {
                 continue;
             }
             if ((current_min < Store[level].card ?
-                    kanrep[Store[level].image[current_min].vector[i-Store[level].argnr]] : kanrep[i])
-                    > kanrep[Store[level].image[current].vector[i-Store[level].argnr]]) {
+                    kanrep[Store[level].image[current_min].vector[i - Store[level].argnr]] : kanrep[i])
+                    > kanrep[Store[level].image[current].vector[i - Store[level].argnr]]) {
                 current_min = current;
             }
         }
@@ -842,7 +842,7 @@ inline void canonize() {
                 kanrep1[i] = kanrep[i];
             }
             for (i = Store[level].argnr; i < Places[0]->cnt; i++) {
-                kanrep1[i] = kanrep[Store[level].image[current_min].vector[i-Store[level].argnr]];
+                kanrep1[i] = kanrep[Store[level].image[current_min].vector[i - Store[level].argnr]];
             }
             swap = kanrep;
             kanrep = kanrep1;
@@ -1285,7 +1285,9 @@ inline void binDelete(binDecision** Bucket) {
         unsigned char* v, * o;
         v = (*Bucket) -> vector;
 
-        for (oldlist = &((*Bucket) -> nextold); (*oldlist) -> nextold ; oldlist = & ((*oldlist) -> nextold));
+        for (oldlist = &((*Bucket) -> nextold); (*oldlist) -> nextold ; oldlist = & ((*oldlist) -> nextold)) {
+            ;
+        }
 #ifdef SWEEP
         (*Bucket) -> persistent = (*oldlist) -> persistent;
 #endif

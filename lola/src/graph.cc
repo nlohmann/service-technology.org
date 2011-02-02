@@ -110,10 +110,14 @@ Transition** firelist() {
     int i;
     tl = new Transition * [Transitions[0] -> NrEnabled + 1];
     for (i = 0, t = Transitions[0]->StartOfEnabledList; t; t = t -> NextEnabled) {
+
+    // when using EXTENDEDCTL, only return enabled transitions satisfying
+    // the transition formula
 #ifdef EXTENDEDCTL
         if (t -> pathrestriction[TemporalIndex]) {
 #endif
             tl[i++] = t;
+            
 #ifdef EXTENDEDCTL
         }
 #endif

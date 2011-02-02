@@ -37,7 +37,7 @@ binDecision* SameValue;   // already processed states in current sweep with prog
 
 pendinglist** currentpending;  // unprocessed persistent states; toggle for current resp. next sweep
 pendinglist** nextpending;
-pendinglist** * pendingtail; // for inserting in pending for current;
+pendinglist*** pendingtail;  // for inserting in pending for current;
 
 void printstate(char const*, unsigned int*);
 void print_path(State*);

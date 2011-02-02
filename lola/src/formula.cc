@@ -28,7 +28,9 @@ formula* F;
 unsigned int formula::card = 0;
 unsigned int formula::tempcard = 0;
 
+/// seems only to be used with EXTENDEDCTL
 unsigned int TemporalIndex;
+
 bool* DeadStatePathRestriction;
 unsigned int xoperators = 0;
 
@@ -137,12 +139,11 @@ unsigned int untilformula::collectsubs(FType ty, formula** subs, unsigned int po
 }
 
 
-atomicformula::atomicformula(FType t, Place* pp, unsigned int kk) {
-    type = t;
-    p = pp;
-    k = kk;
-    // mark environment of p as visible
+atomicformula::atomicformula(FType t, Place* pp, unsigned int kk) : p(pp), k(kk) {
+    type = t; // this should be put in the initializer list, too
+
 #ifdef STUBBORN
+    // mark environment of p as visible
     for (unsigned int i = 0; p -> PreTransitions[i]; i++) {
         p -> PreTransitions[i] -> visible = true;
     }
@@ -520,7 +521,7 @@ formula* transitionformula::replacequantifiers() {
             pl = v -> var -> type -> make();
             pl -> assign(vl);
             cc[j] = pl -> text();
-            inst[j] = new char [strlen(v -> name)+strlen(cc[j]) + 2];
+            inst[j] = new char [strlen(v -> name) + strlen(cc[j]) + 2];
             strcpy(inst[j], v -> name);
             strcpy(inst[j] + strlen(inst[j]), "=");
             strcpy(inst[j] + strlen(inst[j]), cc[j]);
@@ -787,7 +788,7 @@ bool booleanformula::evaluatetransition(Transition* t) {
 void atomicformula::setstatic() {
 #ifdef WITHFORMULA
     if (!(p -> propositions)) {
-        p -> propositions = new formula * [p -> cardprop+10];
+        p -> propositions = new formula * [p -> cardprop + 10];
         p -> cardprop = 0;
     }
     p -> propositions[p -> cardprop ++] = this;
@@ -1661,7 +1662,7 @@ Transition** atomicformula::spp2(State* s) {
         return NULL;
     }
     Transition** result;
-    result = new Transition * [cardnew+1];
+    result = new Transition * [cardnew + 1];
     for (i = 0, j = 0; i < cardnew; i++) {
         while (!stublist[j]) {
             j++;
@@ -1700,53 +1701,55 @@ staticformula::staticformula(UExpression* e) {
 
 
 
-int initialize_statepredicate() // return: value if formula constant
-{
+int initialize_statepredicate() { // return: value if formula constant
 //initialize state predicate, if present
 #ifdef WITHFORMULA
-  int res;
+    int res;
 
-  if(!F) {
-    fprintf(stderr, "lola: specify predicate in analysis task file!\n");
-    _exit(4);
-  }
+    if (!F) {
+        fprintf(stderr, "lola: specify predicate in analysis task file!\n");
+        _exit(4);
+    }
 
-  F = F -> reduce(&res);
-  if(res<2) return res;
-  F = F -> posate(); // eliminate negations
-  F -> tempcard = 0;
-  F -> card = 0;
-  F -> setstatic();
-  if(F ->  tempcard)
-  {
-    fprintf(stderr, "lola: temporal operators are not allowed in state predicates\n");
-    exit(3);
-  }
-  cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
-  F -> parent = NULL;
-  F -> initatomic();
-	return -1;
+    F = F -> reduce(&res);
+    if (res < 2) {
+        return res;
+    }
+    F = F -> posate(); // eliminate negations
+    F -> tempcard = 0;
+    F -> card = 0;
+    F -> setstatic();
+    if (F ->  tempcard) {
+        fprintf(stderr, "lola: temporal operators are not allowed in state predicates\n");
+        exit(3);
+    }
+    cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
+    F -> parent = NULL;
+    F -> initatomic();
+    return -1;
 #endif
 }
-int initialize_ctl() // return: value if formula constant
-{
+
+int initialize_ctl() { // return: value if formula constant
 //initialize formula
 #ifdef WITHFORMULA
-  int res;
+    int res;
 
-  if(!F) {
-    fprintf(stderr, "lola: specify formula in analysis task file!\n");
-    _exit(4);
-  }
+    if (!F) {
+        fprintf(stderr, "lola: specify formula in analysis task file!\n");
+        _exit(4);
+    }
 
-  F = F -> reduce(&res);
-  if(res<2) return res;
-  F = F -> posate(); // eliminate negations
-  F -> tempcard = 0;
-  F -> setstatic();
-  cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
-  F -> parent = NULL;
-  F -> initatomic();
-	return -1;
+    F = F -> reduce(&res);
+    if (res < 2) {
+        return res;
+    }
+    F = F -> posate(); // eliminate negations
+    F -> tempcard = 0;
+    F -> setstatic();
+    cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
+    F -> parent = NULL;
+    F -> initatomic();
+    return -1;
 #endif
 }

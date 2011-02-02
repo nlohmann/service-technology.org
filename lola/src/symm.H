@@ -39,7 +39,7 @@ class SymmStore {
         SymmImage* image;  // Alle möglichen Bilder für Knoten (*)
 };
 
-    // union-find Datenstruktur
+// union-find Datenstruktur
 class Partition {
     public:
         unsigned int nextorcard;  // top + --> nr des Parent im Baum

@@ -1951,6 +1951,10 @@ transitionformula:  key_exists quantification colon transitionformula {
 					}
 				| lpar transitionformula rpar {$$ = $2;}
 				| formulatransition {
+#if defined(STATESPACE) && defined(STUBBORN)
+                    $1->visible = true;
+                    std::cerr << "visible transition: " << $1->name << "\n";
+#endif
 					if($1->vars && $1 -> vars -> card)
 					{
 						yyerror("HL transition requires firing mode");
@@ -1958,6 +1962,10 @@ transitionformula:  key_exists quantification colon transitionformula {
 					$$ = new transitionformula($1 -> transition);
 				}
 				| formulatransition dot lbrack parfiringmode rbrack {
+#if defined(STATESPACE) && defined(STUBBORN)
+                    $1->visible = true;
+                    std::cerr << "visible transition: " << $1->name << "\n";
+#endif
 					if((! $1 -> vars) || ($1 -> vars -> card == 0))
 					{
 						yyerror("LL transition does not require firing mode");

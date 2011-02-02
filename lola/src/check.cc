@@ -34,9 +34,6 @@ using std::ofstream;
 unsigned int NrStates = 0;
 State* initial;
 
-#define true 1
-#define false 0
-
 unsigned int* checkstart;
 unsigned int formulaindex;
 
@@ -420,18 +417,19 @@ int modelcheck() {
     for (unsigned int i = 0; i < Transitions[0]->cnt; i++) {
 #ifdef EXTENDED
         for (unsigned int j = 0; j < F -> tempcard; j++) {
-            Transitions[i]-> lstdisabled[j] =
-                Transitions[i]-> lstfired[j] = 0;
+            Transitions[i]-> lstdisabled[j] = Transitions[i]-> lstfired[j] = 0;
         }
 #endif
         Transitions[i]->pathrestriction = new bool [F -> tempcard];
-    for(int j = 0; j < F->tempcard;j++)
-	Transitions[i]->pathrestriction[j] = false;
+        for (int j = 0; j < F->tempcard; j++) {
+            Transitions[i]->pathrestriction[j] = false;
+        }
     }
     DeadStatePathRestriction = new bool [F -> tempcard];
-    for(int j = 0; j < F->tempcard;j++)
-	DeadStatePathRestriction[j] = true;
-	
+    for (int j = 0; j < F->tempcard; j++) {
+        DeadStatePathRestriction[j] = true;
+    }
+
 
 #ifdef WITHFORMULA
     for (unsigned int i = 0; i < Places[0]->cnt; i++) {
@@ -1576,7 +1574,9 @@ void searchEU(State* s, untilformula* f) {
                         // thus, we sort the unique already
                         //fired transition to the beginning of the firelist.
 
-                        for (i = 0; newFL[i] != CurrentState->checkfirelist[f->tempindex][0]; i++);
+                        for (i = 0; newFL[i] != CurrentState->checkfirelist[f->tempindex][0]; i++) {
+                            ;
+                        }
                         newFL[i] = newFL[0];
                         newFL[0] = CurrentState -> checkfirelist[f->tempindex][0];
                         delete [] CurrentState -> checkfirelist[f->tempindex];
@@ -1928,7 +1928,9 @@ void futuresearchAU(State* s, untilformula* f) {
                             // thus, we sort the unique already
                             //fired transition to the beginning of the firelist.
 
-                            for (i = 0; newFL[i] != CurrentState->checkfirelist[f->tempindex][0]; i++);
+                            for (i = 0; newFL[i] != CurrentState->checkfirelist[f->tempindex][0]; i++) {
+                                ;
+                            }
                             newFL[i] = newFL[0];
                             newFL[0] = CurrentState -> checkfirelist[f->tempindex][0];
                             delete [] CurrentState -> checkfirelist[f->tempindex];
@@ -2229,8 +2231,7 @@ void searchAF(State* s, unarytemporalformula* f) {
         CurrentState -> value[f->index] = false;
         CurrentState -> known[f->index] = true;
 
-	if(CurrentState->checkfirelist[f->tempindex][CurrentState->checkcurrent[f->tempindex]])
-	{
+        if (CurrentState->checkfirelist[f->tempindex][CurrentState->checkcurrent[f->tempindex]]) {
             // explore next state
             CurrentState -> checkfirelist[f->tempindex][CurrentState ->
                                                         checkcurrent[f->tempindex]] -> fire();
@@ -2238,11 +2239,10 @@ void searchAF(State* s, unarytemporalformula* f) {
             if (!(Edges % REPORTFREQUENCY))
                 cout << "st: " << NrStates << "    edg: " << Edges
                      << "\n";
-            if (NewState = binSearch())
-	    {
-	     if (NewState -> known[f->index]) {
+            if (NewState = binSearch()) {
+                if (NewState -> known[f->index]) {
                     // state exists, value known
-                     if (!NewState -> value[f->index]) {
+                    if (!NewState -> value[f->index]) {
                         // state exists, value f --> counterex found!
                         // state either on stack or does not model A phi U psi
                         found = true;
@@ -2260,7 +2260,7 @@ void searchAF(State* s, unarytemporalformula* f) {
                         [CurrentState -> checkcurrent[f->tempindex]]
                         -> backfire();
                         CurrentState -> checkcurrent[f->tempindex]++;
- 			 }
+                    }
                 }   else {
                     // state exists, value unknown
                     check(NewState, f->element);
@@ -2322,23 +2322,23 @@ void searchAF(State* s, unarytemporalformula* f) {
         } else {
             // return to previous state
             CurrentState -> value[f->index] = true;
-	    CurrentState -> known[f->index] = true;
-    if (!(CurrentState -> checkfirelist[f->tempindex][0])) {
-        if (Transitions[0]->NrEnabled) {
-            // no tau-successors, but state not dead
-        }
-        // dead state: this state counts as successor state
-        if (DeadStatePathRestriction[f -> tempindex]) {
-            check(CurrentState, f -> element);
-            if (!(CurrentState->value[f->element->index])) {
-                CurrentState -> value[f->index] = false;
-                CurrentState -> witness[f->tempindex] = NULL;
-                CurrentState -> witnesstransition[f->tempindex] = NULL;
-		found = true;
-		break;
+            CurrentState -> known[f->index] = true;
+            if (!(CurrentState -> checkfirelist[f->tempindex][0])) {
+                if (Transitions[0]->NrEnabled) {
+                    // no tau-successors, but state not dead
+                }
+                // dead state: this state counts as successor state
+                if (DeadStatePathRestriction[f -> tempindex]) {
+                    check(CurrentState, f -> element);
+                    if (!(CurrentState->value[f->element->index])) {
+                        CurrentState -> value[f->index] = false;
+                        CurrentState -> witness[f->tempindex] = NULL;
+                        CurrentState -> witnesstransition[f->tempindex] = NULL;
+                        found = true;
+                        break;
+                    }
+                }
             }
-        }
-    }
             if (NewState = CurrentState -> checkparent[f->tempindex]) {
                 NewState -> checkfirelist[f->tempindex]
                 [NewState -> checkcurrent[f->tempindex]]->backfire();
@@ -2480,22 +2480,22 @@ void searchEG(State* s, unarytemporalformula* f) {
             // return to previous state
             CurrentState -> value[f->index] = false;
             CurrentState -> known[f->index] = false;
-    if (!(CurrentState -> checkfirelist[f->tempindex][0])) {
-        if (Transitions[0]->NrEnabled) {
-            // no tau-successors, but state not dead
-        }
-        // dead state: this state counts as successor state
-        if (DeadStatePathRestriction[f -> tempindex]) {
-            check(CurrentState, f -> element);
-            if ((CurrentState->value[f->element->index])) {
-                CurrentState -> value[f->index] = true;
-                CurrentState -> witness[f->tempindex] = NULL;
-                CurrentState -> witnesstransition[f->tempindex] = NULL;
-		found = true;
-		break;
+            if (!(CurrentState -> checkfirelist[f->tempindex][0])) {
+                if (Transitions[0]->NrEnabled) {
+                    // no tau-successors, but state not dead
+                }
+                // dead state: this state counts as successor state
+                if (DeadStatePathRestriction[f -> tempindex]) {
+                    check(CurrentState, f -> element);
+                    if ((CurrentState->value[f->element->index])) {
+                        CurrentState -> value[f->index] = true;
+                        CurrentState -> witness[f->tempindex] = NULL;
+                        CurrentState -> witnesstransition[f->tempindex] = NULL;
+                        found = true;
+                        break;
+                    }
+                }
             }
-        }
-    }
             if (NewState = CurrentState -> checkparent[f->tempindex]) {
                 NewState -> checkfirelist[f->tempindex]
                 [NewState -> checkcurrent[f->tempindex]]->backfire();

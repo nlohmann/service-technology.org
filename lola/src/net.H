@@ -43,9 +43,6 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
-// these are keywords in c++: #define true 1
-// these are keywords in c++: #define false 0
-
 /// file names for input and output
 
 extern char* netfile;   ///< name of file containing LoLA net input
@@ -106,7 +103,7 @@ inline void Node::NewArriving(Arc& a) {
     for (int i = 0; i < NrOfArriving - 1; i++) { ///copy old entries
         ArrivingArcs[i] = Old[i];
     }
-    ArrivingArcs[NrOfArriving -1] = & a; /// add new arc
+    ArrivingArcs[NrOfArriving - 1] = & a; /// add new arc
     delete [] Old; /// free old array
 }
 
@@ -118,7 +115,7 @@ inline void Node::NewLeaving(Arc& a) {
     for (int i = 0; i < NrOfLeaving - 1; i++) { /// copy old entries
         LeavingArcs[i] = Old[i];
     }
-    LeavingArcs[NrOfLeaving -1] = & a; /// add new arc
+    LeavingArcs[NrOfLeaving - 1] = & a; /// add new arc
     delete [] Old; /// free old arry
 }
 
@@ -223,7 +220,7 @@ inline Place::Place(char* name) : Node(name) {
     bounded = true;
 #endif
 #ifdef STUBBORN
-    visible = 0; // real setting in sortscapegoats()
+    visible = false; // real setting in sortscapegoats()
 #endif
 #ifdef WITHFORMULA
     cardprop = 0;
@@ -314,8 +311,8 @@ inline void Place::initialize() {
 
     // Create list of pre-transitions. If this place is the scapegoat for a disabled transition in
     // stubborn set then these transitions must be in the stubborn set, too.
-    PreTransitions = new Transition * [NrOfArriving+1];
-    PostTransitions = new Transition * [NrOfLeaving+1];
+    PreTransitions = new Transition * [NrOfArriving + 1];
+    PostTransitions = new Transition * [NrOfLeaving + 1];
     for (i = 0; i < NrOfArriving; i++) {
         PreTransitions[i] = ArrivingArcs[i]-> tr;
     }

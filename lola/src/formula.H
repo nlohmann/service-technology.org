@@ -39,15 +39,15 @@ class PlSymbol;
 
 class formula {
     public:
-        static unsigned int card; // Laenge eines Labelfeldes fuer alle Teilformeln
-        static unsigned int tempcard; // Laenge eines Labelfeldes fuer alle temporalen Teilformeln
-        unsigned int index; // Index in Labelfeldern fuer alle Teilformeln
-        unsigned int tempindex; // Index in Labelfeldern fuer alle temporalen Teilformeln
+        static unsigned int card; ///< Laenge eines Labelfeldes fuer alle Teilformeln
+        static unsigned int tempcard; ///< Laenge eines Labelfeldes fuer alle temporalen Teilformeln
+        unsigned int index; ///< Index in Labelfeldern fuer alle Teilformeln
+        unsigned int tempindex; ///< Index in Labelfeldern fuer alle temporalen Teilformeln
         FType type;
         bool value;
         bool atomic;
-        virtual formula* posate() = 0;  // remove negation in formulae without temporal
-        virtual formula* negate() = 0;  // operators
+        virtual formula* posate() = 0;  ///< remove negation in formulae without temporal
+        virtual formula* negate() = 0;  ///< operators
         virtual void evaluateatomic(State*) = 0;
         virtual bool initatomic() = 0;
         virtual formula* copy() = 0;

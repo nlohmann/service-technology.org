@@ -32,6 +32,7 @@
   #define FULL
   #define FULLTARJAN
   #define TARJAN
+  #define WITHFORMULA
 #endif
 
 #undef APPROXIMATE_CANONIZATION

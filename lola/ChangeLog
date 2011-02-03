@@ -25,7 +25,10 @@ Version 1.15-unreleased
 * fixed bug #15678 (`https://gna.org/bugs/?15678'): `HOME' now switches on
   `TWOPHASE' if `STUBBORN' is also used
 
-* started implementing stubborn sets for `STATESPACE' option
+* started implementing stubborn sets for `STATESPACE' option; this option now
+  assumes an extended CTL formula of the form E[\tau]F \phi to be given. All
+  mentioned transitions in \tau are set to visible, and the formula \phi is
+  treated like a state predicate.
 
 Version 1.14
 ============

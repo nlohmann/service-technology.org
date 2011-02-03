@@ -49,6 +49,7 @@ Label_ID Label::send_events = 0;
 Label_ID Label::receive_events = 0;
 Label_ID Label::sync_events = 0;
 Label_ID Label::events = 0;
+std::string Label::visible_transitions = "";
 
 std::map<Label_ID, string> Label::id2name;
 std::map<string, Label_ID> Label::name2id;
@@ -74,6 +75,7 @@ void Label::initialize() {
 
         const set<Transition*> preset((**l).getTransitions());
         FOREACH(t, preset) {
+            visible_transitions += (visible_transitions.empty() ? "" : " OR ") + (**t).getName();
             name2id[(**t).getName()] = events;
         }
     }
@@ -94,6 +96,7 @@ void Label::initialize() {
 
         const set<Transition*> postset((**l).getTransitions());
         FOREACH(t, postset) {
+            visible_transitions += (visible_transitions.empty() ? "" : " OR ") + (**t).getName();
             name2id[(**t).getName()] = events;
         }
     }
@@ -113,6 +116,7 @@ void Label::initialize() {
 
         const set<Transition*> trans((**l).getTransitions());
         FOREACH(t, trans) {
+            visible_transitions += (visible_transitions.empty() ? "" : " OR ") + (**t).getName();
             name2id[(**t).getName()] = events;
         }
     }

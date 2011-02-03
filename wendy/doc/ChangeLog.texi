@@ -13,6 +13,8 @@
 @item implemented @samp{--internalReduction} parameter to reduce internal actions
 
 @item adjusted configure script to download and compile LoLA if it is not found in the path
+
+@item Wendy creates an extended @acronym{CTL} formula which is added to the intermediate LoLA output. It is used to apply @acronym{CTL}*-preserving partial order reduction when building the state space of the inner of the net. The formula is used to tell LoLA which transitions are visible; that is, which transitions must not be ignored during reduction.
 @end itemize
 
 

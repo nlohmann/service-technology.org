@@ -269,7 +269,7 @@ bool InnerMarking::waitstate(const Label_ID& l) const {
 bool InnerMarking::sentMessagesConsumed(const InterfaceMarking& interface) const {
     assert(possibleSendEvents);
     char* possibleSendEventsDecoded = possibleSendEvents->decode();
-    assert (possibleSendEventsDecoded);
+    assert(possibleSendEventsDecoded);
 
     // iterate over all possible input messages
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {

@@ -74,6 +74,9 @@ class Label {
         static void output_results(Results&);
 
     public: /* static attributes */
+        /// a list of visisble transitions (used by LoLA)
+        static std::string visible_transitions;
+
         /// label of first receive (?) event
         static Label_ID first_receive;
         /// label of last receive (?) event

@@ -65,6 +65,18 @@ Output* markingoutput = NULL;
 clock_t start_clock = clock();
 
 
+/// replace one occurrence of a substring in a string
+std::string replaceOnce(std::string result, const std::string& replaceWhat,
+                        const std::string& replaceWithWhat) {
+    const int pos = result.find(replaceWhat);
+    if (pos == -1) {
+        return result;
+    }
+    result.replace(pos, replaceWhat.size(), replaceWithWhat);
+    return result;
+}
+
+
 /// check if a file exists and can be opened for reading
 inline bool fileExists(const std::string& filename) {
     std::ifstream tmp(filename.c_str(), std::ios_base::in);
@@ -285,7 +297,14 @@ int main(int argc, char** argv) {
     | 4. write inner of the open net to LoLA file |
     `--------------------------------------------*/
     Output* temp = new Output();
-    temp->stream() << pnapi::io::lola << *InnerMarking::net;
+    std::stringstream ss;
+    ss << pnapi::io::lola << pnapi::io::formula << *InnerMarking::net;
+    std::string lola_net = ss.str();
+    if (not Label::visible_transitions.empty()) {
+        lola_net = replaceOnce(lola_net, "FORMULA", "FORMULA EXPATH (" + Label::visible_transitions + ") EVENTUALLY");
+    }
+    temp->stream() << lola_net << std::endl;
+
     // marking information output
     if (args_info.mi_given) {
         std::string mi_filename = args_info.mi_arg ? args_info.mi_arg : filename + ".mi";

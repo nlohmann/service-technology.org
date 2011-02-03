@@ -27,6 +27,12 @@ Version 3.2-unreleased
 * adjusted configure script to download and compile LoLA if it is not found
   in the path
 
+* Wendy creates an extended CTL formula which is added to the intermediate
+  LoLA output. It is used to apply CTL*-preserving partial order reduction
+  when building the state space of the inner of the net. The formula is
+  used to tell LoLA which transitions are visible; that is, which
+  transitions must not be ignored during reduction.
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

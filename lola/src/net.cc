@@ -446,14 +446,15 @@ int main(int argc, char** argv) {
             removeisolated();
 
 #if defined(STATESPACE) && defined(STUBBORN)
-            // throw away temporal operators formula
-            assert(F);
-            assert(((unarytemporalformula *)F));
-            assert(((unarytemporalformula *)F)->element);
-            F = ((unarytemporalformula *)F)->element;
+            if (F) {
+                // throw away temporal operators formula
+                assert(((unarytemporalformula *)F));
+                assert(((unarytemporalformula *)F)->element);
+                F = ((unarytemporalformula *)F)->element;
 
-            // initialze the formulae behind EF
-            initialize_statepredicate();
+                // initialze the formulae behind EF
+                initialize_statepredicate();
+            }
 #endif
 
         } catch (overflow) {

@@ -37,6 +37,8 @@ number    [0-9][0-9]*
 
 %%
 
+"Formula with\n"{number}" subformula(s)." { /* skip */ }
+
 "STATE"      { return KW_STATE; }
 "Lowlink:"   { return KW_LOWLINK; }
 "SCC:"       { return KW_SCC; }

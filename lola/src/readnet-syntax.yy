@@ -1953,7 +1953,7 @@ transitionformula:  key_exists quantification colon transitionformula {
 				| formulatransition {
 #if defined(STATESPACE) && defined(STUBBORN)
                     $1->transition->visible = true;
-                    std::cerr << "visible transition: " << $1->name << "\n";
+//                    std::cerr << "visible transition: " << $1->name << "\n";
 #endif
 					if($1->vars && $1 -> vars -> card)
 					{
@@ -1964,7 +1964,7 @@ transitionformula:  key_exists quantification colon transitionformula {
 				| formulatransition dot lbrack parfiringmode rbrack {
 #if defined(STATESPACE) && defined(STUBBORN)
                     $1->transition->visible = true;
-                    std::cerr << "visible transition: " << $1->name << "\n";
+//                    std::cerr << "visible transition: " << $1->name << "\n";
 #endif
 					if((! $1 -> vars) || ($1 -> vars -> card == 0))
 					{

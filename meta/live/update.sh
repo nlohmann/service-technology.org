@@ -15,8 +15,7 @@ chmod a+x bin/genet
 
 # LoLA
 TOOL=lola
-wget http://esla.informatik.uni-rostock.de:8080/job/lola/179/artifact/lola/lola.tar.gz
-# wget http://esla.informatik.uni-rostock.de:8080/job/$TOOL/lastSuccessfulBuild/artifact/$TOOL/$TOOL.tar.gz
+wget http://esla.informatik.uni-rostock.de:8080/job/$TOOL/lastSuccessfulBuild/artifact/$TOOL/$TOOL.tar.gz
 # wget http://service-technology.org/files/lola/lola.tar.gz
 tar xfz $TOOL.tar.gz
 cd $TOOL*

@@ -34,7 +34,120 @@
 #include "Output.h"
 
 #include "diagnosis.h"
+bool Diagnosis::DiagnosisInformation::operator==(
+        const DiagnosisInformation & d1) const {
+    if (d1.type != type) {
+        return false;
+    } else if (d1.pendingMessages != pendingMessages) {
+        return false;
+    } else if (d1.requiredMessages != requiredMessages) {
+        return false;
+    } else if (d1.previouslyAppliedRules != previouslyAppliedRules) {
+        return false;
+    } else if (d1.netsInFinalState != netsInFinalState) {
+        return false;
+    }
+    return true;
+}
 
+bool Diagnosis::DiagnosisInformation::operator<=(
+        const DiagnosisInformation & d2) const {
+    //                    if (type != "MA") {
+    //                        return *this == d2;
+    //                    }
+    if (type != d2.type or netsInFinalState != d2.netsInFinalState) {
+        return false;
+    }
+    if (std::includes(d2.requiredMessages.begin(),
+            d2.requiredMessages.end(), requiredMessages.begin(),
+            requiredMessages.end())) {
+        if (std::includes(d2.pendingMessages.begin(),
+                d2.pendingMessages.end(), pendingMessages.begin(),
+                pendingMessages.end())) {
+            if (std::includes(d2.previouslyAppliedRules.begin(),
+                    d2.previouslyAppliedRules.end(),
+                    previouslyAppliedRules.begin(),
+                    previouslyAppliedRules.end())) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool Diagnosis::DiagnosisInformation::operator()(
+        const DiagnosisInformation & d1, const DiagnosisInformation & d2) const {
+
+    status("Comparing %s and %s", d1.getLive().c_str(),
+            d2.getLive().c_str());
+    // d1 is surely less than d2 if type is lexicographical less
+    if (d1.type < d2.type) {
+        status("%s < %s", d1.type.c_str(), d2.type.c_str());
+        return true;
+    } else if (d1.type == d2.type) {
+        // if type is the same, it depends on the size of pending messages
+        if (d1.pendingMessages.size() < d2.pendingMessages.size()
+                or (d1.pendingMessages.size() == d2.pendingMessages.size()
+                        and d1.pendingMessages < d2.pendingMessages)) {
+            status("less pending");
+            return true;
+        }
+        if (d1.pendingMessages == d2.pendingMessages) {
+            if (d1.requiredMessages.size() < d2.requiredMessages.size()
+                    or (d1.requiredMessages.size()
+                            == d2.requiredMessages.size()
+                            and d1.requiredMessages < d2.requiredMessages)) {
+                status("less required");
+                return true;
+            }
+            if (d1.requiredMessages == d2.requiredMessages) {
+                if (d1.previouslyAppliedRules.size()
+                        < d2.previouslyAppliedRules.size()
+                        or (d1.previouslyAppliedRules.size()
+                                == d2.previouslyAppliedRules.size()
+                                and d1.previouslyAppliedRules
+                                        < d2.previouslyAppliedRules)) {
+                    status("less rules");
+                    return true;
+                }
+                if (d1.previouslyAppliedRules == d2.previouslyAppliedRules) {
+                    if (d1.netsInFinalState.size()
+                            < d2.netsInFinalState.size()
+                            or (d1.netsInFinalState.size()
+                                    == d2.netsInFinalState.size()
+                                    and d1.netsInFinalState
+                                            < d2.netsInFinalState)) {
+                        status("less final");
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+/*
+ bool Diagnosis::DiagnosisInformation::operator()(
+ const DiagnosisInformation & d1, const DiagnosisInformation & d2) const {
+ if (d1.type < d2.type) {
+ return true;
+ if (d1.pendingMessages < d2.pendingMessages) {
+ return true;
+ }
+ if (d1.requiredMessages < d2.requiredMessages) {
+ return true;
+ }
+ if (d1.previouslyAppliedRules < d2.previouslyAppliedRules) {
+ return true;
+ }
+ if (d1.netsInFinalState < d2.netsInFinalState) {
+ return true;
+ }
+ return false;
+ }
+ }
+ */
 Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
         unsigned int messageBound) :
     dgraph(new DGraph), mi(pmi), live(args_info.live_arg,
@@ -165,7 +278,8 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
 
         // look for all unresolvable waitstates inside the current node
         try {
-            for (int j = 0; j < states[i]["unresolvableWaitstates"].getLength(); ++j) {
+            for (int j = 0; j
+                    < states[i]["unresolvableWaitstates"].getLength(); ++j) {
                 node->waitstateMarkings.push_back(mi.getIDForMarking(
                         states[i]["unresolvableWaitstates"][j]));
             }
@@ -373,7 +487,8 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
                     status("--> %s has no successor, %d",
                             mpp.getLabelForID(iter->first).c_str(),
                             iter->second);
-                    diNode->missedAlternatives.insert(mpp.getLabelForID(iter->first));
+                    diNode->missedAlternatives.insert(mpp.getLabelForID(
+                            iter->first));
                     dgraph->alternativeNodes.insert(diNode);
                     // look at all the waitstates
                     // for (int i = 0; i < diNode->waitstateMarkings.size(); ++i) {
@@ -482,8 +597,8 @@ void Diagnosis::evaluateLivelocks(std::vector<pnapi::PetriNet *> & nets,
                         dI->requiredMessages.end());
 
                 dI->previouslyAppliedRules = node->rulesApplied;
-
-                diagnosisInformation.insert(*dI);
+                if (dI->requiredMessages.size() > 0)
+                    diagnosisInformation.insert(*dI);
             }
         }
     }
@@ -503,11 +618,13 @@ void Diagnosis::evaluateAlternatives(std::vector<pnapi::PetriNet *> & nets,
     std::string prefix = "engine.";
 
     // iterate over all nodes containing deadlocks
-    for (std::set< DNode *>::iterator i = dgraph->alternativeNodes.begin(); i != dgraph->alternativeNodes.end(); ++i) {
+    for (std::set<DNode *>::iterator i = dgraph->alternativeNodes.begin(); i
+            != dgraph->alternativeNodes.end(); ++i) {
         DNode * node = *i;
-        {
+        if (node->successors.size() > 0) {
 
-            message("Missed Alternative (node %d, %d)", node->getID(), dgraph->getNameForID(node->getID()));
+            message("Missed Alternative (node %d, %d)", node->getID(),
+                    dgraph->getNameForID(node->getID()));
             for (unsigned int j = 0; j < node->waitstateMarkings.size(); ++j) {
                 DiagnosisInformation * dI = new DiagnosisInformation;
                 dI->type = "MA";
@@ -524,9 +641,10 @@ void Diagnosis::evaluateAlternatives(std::vector<pnapi::PetriNet *> & nets,
                     std::string isFinal = required.back();
                     required.pop_back();
                     for (int rm = 0; rm < required.size(); ++rm) {
-                        if (node->missedAlternatives.find(required[rm]) != node->missedAlternatives.end())
-                        {
-                            status(" message %s was missed AND required", required[rm].c_str());
+                        if (node->missedAlternatives.find(required[rm])
+                                != node->missedAlternatives.end()) {
+                            status(" message %s was missed AND required",
+                                    required[rm].c_str());
                             dI->requiredMessages.push_back(required[rm]);
                         }
                     }
@@ -549,9 +667,20 @@ void Diagnosis::evaluateAlternatives(std::vector<pnapi::PetriNet *> & nets,
 }
 
 void Diagnosis::outputLive() const {
+
     for (std::set<DiagnosisInformation>::const_iterator di =
             diagnosisInformation.begin(); di != diagnosisInformation.end(); ++di) {
-        live.stream() << di->getLive();
+        bool covered = false;
+        std::set<DiagnosisInformation>::const_iterator next = di;
+        ++next;
+        for (; next != diagnosisInformation.end() and not covered; ++next) {
+            if (*di <= *next) {
+                covered = true;
+            }
+        }
+        if (not covered) {
+            live.stream() << di->getLive();
+        }
     }
 }
 

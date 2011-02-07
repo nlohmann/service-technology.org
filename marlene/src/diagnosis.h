@@ -42,34 +42,10 @@ class Diagnosis {
 
                 std::string getLive() const;
 
-                bool operator==(const DiagnosisInformation & d1) const {
-                    if (d1.pendingMessages == pendingMessages) {
-                        return true;
-                    } else if (d1.requiredMessages == requiredMessages) {
-                        return true;
-                    } else if (d1.previouslyAppliedRules
-                            == previouslyAppliedRules) {
-                        return true;
-                    } else if (d1.netsInFinalState == netsInFinalState) {
-                        return true;
-                    }
-                    return false;
-                }
-
+                bool operator==(const DiagnosisInformation & d1) const;
+                bool operator<=(const DiagnosisInformation & d2) const;
                 bool operator()(const DiagnosisInformation & d1,
-                        const DiagnosisInformation & d2) const {
-                    if (d1.pendingMessages < d2.pendingMessages) {
-                        return true;
-                    } else if (d1.requiredMessages < d2.requiredMessages) {
-                        return true;
-                    } else if (d1.previouslyAppliedRules
-                            < d2.previouslyAppliedRules) {
-                        return true;
-                    } else if (d1.netsInFinalState < d2.netsInFinalState) {
-                        return true;
-                    }
-                    return false;
-                }
+                        const DiagnosisInformation & d2) const;
         };
 
         DGraph * dgraph;

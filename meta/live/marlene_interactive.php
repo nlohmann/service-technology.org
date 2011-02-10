@@ -72,6 +72,8 @@
 
   $fakecall = "marlene";
   $realcall = "marlene";
+  $adaptercall = "marlene";
+  $fakeadapter = "";
   $fakeresult = "";
   $first = true;
 
@@ -79,6 +81,7 @@
   {
     $fakecall .= " ".$info["basename"];
     $realcall .= " ".$info["residence"];
+    $adaptercall .= " ".$info["residence"];
     if ($first == true)
     {
       $first = false;
@@ -94,11 +97,17 @@
 
   $fakecall .= " -o ".$fakeresult;
   $realcall .= " -o ".$realresult;
+  $adaptercall .= " -o ".$realresult;
 
   $fakecall .= " -r ".$rulefile["basename"];
   $realcall .= " -r ".$rulefile["residence"];
+  $adaptercall .= " -r ".$rulefile["residence"];
 
+  $fakecall .= " --property=livelock";
+  $fakeadapter .= $fakecall;
+  $fakecall .= " --diagnosis";
   $realcall .= " --diagnosis --property=livelock --live=".$diagfile["residence"]; //." -v 2>&1";
+  $adaptercall .= " --property=livelock"; //." -v 2>&1";
 
 ?>
 
@@ -333,6 +342,8 @@ END;
   if ( $hasAdapter )
   {
     echo "<h2>Synthesized Adapter</h2>\n";
+    $call_result = console($fakeadapter, $adaptercall);
+
     drawImage($fakeresult);
     echo "<ul>";
     echo "<li><a href=".getLink($fakeresult).">".basename($fakeresult)."</a></li>";

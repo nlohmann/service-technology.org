@@ -78,18 +78,18 @@ bool Diagnosis::DiagnosisInformation::operator<=(
 bool Diagnosis::DiagnosisInformation::operator()(
         const DiagnosisInformation & d1, const DiagnosisInformation & d2) const {
 
-    status("Comparing %s and %s", d1.getLive().c_str(),
-            d2.getLive().c_str());
+    //    status("Comparing %s and %s", d1.getLive().c_str(),
+    //            d2.getLive().c_str());
     // d1 is surely less than d2 if type is lexicographical less
     if (d1.type < d2.type) {
-        status("%s < %s", d1.type.c_str(), d2.type.c_str());
+//        status("%s < %s", d1.type.c_str(), d2.type.c_str());
         return true;
     } else if (d1.type == d2.type) {
         // if type is the same, it depends on the size of pending messages
         if (d1.pendingMessages.size() < d2.pendingMessages.size()
                 or (d1.pendingMessages.size() == d2.pendingMessages.size()
                         and d1.pendingMessages < d2.pendingMessages)) {
-            status("less pending");
+//            status("less pending");
             return true;
         }
         if (d1.pendingMessages == d2.pendingMessages) {
@@ -97,7 +97,7 @@ bool Diagnosis::DiagnosisInformation::operator()(
                     or (d1.requiredMessages.size()
                             == d2.requiredMessages.size()
                             and d1.requiredMessages < d2.requiredMessages)) {
-                status("less required");
+//                status("less required");
                 return true;
             }
             if (d1.requiredMessages == d2.requiredMessages) {
@@ -107,7 +107,7 @@ bool Diagnosis::DiagnosisInformation::operator()(
                                 == d2.previouslyAppliedRules.size()
                                 and d1.previouslyAppliedRules
                                         < d2.previouslyAppliedRules)) {
-                    status("less rules");
+//                    status("less rules");
                     return true;
                 }
                 if (d1.previouslyAppliedRules == d2.previouslyAppliedRules) {
@@ -117,7 +117,7 @@ bool Diagnosis::DiagnosisInformation::operator()(
                                     == d2.netsInFinalState.size()
                                     and d1.netsInFinalState
                                             < d2.netsInFinalState)) {
-                        status("less final");
+//                        status("less final");
                         return true;
                     }
                 }
@@ -336,8 +336,8 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
             diagInfo.lookupValue("statistics.inner_markings", innermarkings);
             diagInfo.lookupValue("statistics.nodes", nodes);
 
-            status("%s has %d inner markings and %d nodes.",
-                    resultfiles[i].c_str(), innermarkings, nodes);
+            //            status("%s has %d inner markings and %d nodes.",
+            //                    resultfiles[i].c_str(), innermarkings, nodes);
 
             // setting the initial node
             int initialNode;
@@ -429,8 +429,8 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
             diNode = stack.front().first;
             mppNode = stack.front().second;
             stack.pop_front();
-            status("Nodes %d and %d are related", dgraph->getNameForID(
-                    diNode->getID()), mpp.getNameForID(mppNode->getID()));
+            //            status("Nodes %d and %d are related", dgraph->getNameForID(
+            //                    diNode->getID()), mpp.getNameForID(mppNode->getID()));
             std::map<unsigned int, bool> hasSuccessor;
             for (int x = 0; x < diNode->successors.size(); ++x) {
                 for (int y = 0; y < mppNode->successors.size(); ++y) {
@@ -458,8 +458,8 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
                                 std::string("sync_t_send_").size());
                     }
 
-                    status(" ... stripped %s and %s?", diLabel.c_str(),
-                            mppLabel.c_str());
+                    //                    status(" ... stripped %s and %s?", diLabel.c_str(),
+                    //                            mppLabel.c_str());
                     std::pair<DNode*, DNode*> newNodePair;
                     bool putOnStack = false;
                     if (diLabel == mppLabel) {
@@ -476,7 +476,7 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
                     }
                     if (putOnStack and not nodePairSeen[newNodePair]) {
                         stack.push_front(newNodePair);
-                        status("Put next node pair on stack");
+                        //                        status("Put next node pair on stack");
                     }
                 }
             }
@@ -484,9 +484,9 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
             for (std::map<unsigned int, bool>::iterator iter =
                     hasSuccessor.begin(); iter != hasSuccessor.end(); ++iter) {
                 if (not iter->second) {
-                    status("--> %s has no successor, %d",
-                            mpp.getLabelForID(iter->first).c_str(),
-                            iter->second);
+                    //                    status("--> %s has no successor, %d",
+                    //                            mpp.getLabelForID(iter->first).c_str(),
+                    //                            iter->second);
                     diNode->missedAlternatives.insert(mpp.getLabelForID(
                             iter->first));
                     dgraph->alternativeNodes.insert(diNode);
@@ -518,7 +518,7 @@ void Diagnosis::evaluateDeadlocks(std::vector<pnapi::PetriNet *> & nets,
         DNode * node = dgraph->deadlockNodes[i];
         {
 
-            message("Deadlock %d (node %d)", i + 1, node->getID());
+//            message("Deadlock %d (node %d)", i + 1, node->getID());
             for (unsigned int j = 0; j < node->deadlockMarkings.size(); ++j) {
                 DiagnosisInformation * dI = new DiagnosisInformation;
                 dI->type = "DL";
@@ -569,8 +569,8 @@ void Diagnosis::evaluateLivelocks(std::vector<pnapi::PetriNet *> & nets,
         DNode * node = dgraph->livelockNodes[i];
         {
 
-            message("Livelock %d (node %d, %d)", i + 1, node->getID(),
-                    dgraph->getNameForID(node->getID()));
+//            message("Livelock %d (node %d, %d)", i + 1, node->getID(),
+//                    dgraph->getNameForID(node->getID()));
             for (unsigned int j = 0; j < node->livelockMarkings.size(); ++j) {
                 DiagnosisInformation * dI = new DiagnosisInformation;
                 dI->type = "LL";
@@ -623,8 +623,8 @@ void Diagnosis::evaluateAlternatives(std::vector<pnapi::PetriNet *> & nets,
         DNode * node = *i;
         if (node->successors.size() > 0) {
 
-            message("Missed Alternative (node %d, %d)", node->getID(),
-                    dgraph->getNameForID(node->getID()));
+            //            message("Missed Alternative (node %d, %d)", node->getID(),
+            //                    dgraph->getNameForID(node->getID()));
             for (unsigned int j = 0; j < node->waitstateMarkings.size(); ++j) {
                 DiagnosisInformation * dI = new DiagnosisInformation;
                 dI->type = "MA";
@@ -643,8 +643,8 @@ void Diagnosis::evaluateAlternatives(std::vector<pnapi::PetriNet *> & nets,
                     for (int rm = 0; rm < required.size(); ++rm) {
                         if (node->missedAlternatives.find(required[rm])
                                 != node->missedAlternatives.end()) {
-                            status(" message %s was missed AND required",
-                                    required[rm].c_str());
+//                            status(" message %s was missed AND required",
+//                                    required[rm].c_str());
                             dI->requiredMessages.push_back(required[rm]);
                         }
                     }
@@ -668,6 +668,12 @@ void Diagnosis::evaluateAlternatives(std::vector<pnapi::PetriNet *> & nets,
 
 void Diagnosis::outputLive() const {
 
+    FUNCIN
+    if (superfluous) {
+        FUNCOUT
+        return;
+    }
+
     for (std::set<DiagnosisInformation>::const_iterator di =
             diagnosisInformation.begin(); di != diagnosisInformation.end(); ++di) {
         bool covered = false;
@@ -682,9 +688,12 @@ void Diagnosis::outputLive() const {
             live.stream() << di->getLive();
         }
     }
+    FUNCOUT
 }
 
 std::string Diagnosis::DiagnosisInformation::getLive() const {
+
+    FUNCIN
     std::string result = type + ";";
     bool first = true;
     for (std::set<unsigned int>::iterator net = netsInFinalState.begin(); net
@@ -737,6 +746,7 @@ std::string Diagnosis::DiagnosisInformation::getLive() const {
 
     result += "\n";
 
+    FUNCOUT
     return result;
 
 }

@@ -72,6 +72,7 @@ int main(int argc, char** argv) {
     status("%s is done", _ctool_("LoLA"));
     delete temp;
 
+    g.init();
     g.info();
 
 
@@ -79,13 +80,14 @@ int main(int argc, char** argv) {
     | 5. reduce graph |
     `----------------*/
 
-    unsigned int i = 0;
-    const unsigned int j = 100;
-
     if (not args_info.noReduction_flag) {
-        while (g.rule63() or g.rule2() or g.rule62()) {
+        static unsigned int i = 0;
+        static const unsigned int j = 1000;
+
+//        while (g.rule63() or g.rule2() or g.rule62()) {
+        while (g.metaRule()) {
             if (++i % j == 0) {
-                g.info();
+                g.shortInfo();
             }
         }
         g.info();
@@ -107,5 +109,5 @@ int main(int argc, char** argv) {
     }
 
 
-    return EXIT_SUCCESS;
+    _exit(EXIT_SUCCESS);
 }

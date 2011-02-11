@@ -6,6 +6,7 @@
 #include "util.h"
 #include "Graph.h"
 #include "cmdline.h"
+#include "verbose.h"
 
 extern gengetopt_args_info args_info;
 
@@ -22,6 +23,10 @@ unsigned int Graph::r63 = 0;
 
 pnapi::PetriNet Graph::net;
 
+void Graph::shortInfo() {
+    message("   N=%d, R1=%d, R2=%d, R6.2=%d, R6.3=%d", nodes.size(), r1, r2, r62, r63);
+}
+
 void Graph::info() {
     unsigned int e = 0;
     unsigned int t = 0;
@@ -33,7 +38,7 @@ void Graph::info() {
         t += n->second->postset[TAU].size();
     }
 
-    std::cerr << "N=" << nodes.size() << ", E=" << e << ", TAU=" << t << ", R1=" << r1 << " R2=" << r2 << " R6.2=" << r62 << " R6.3=" << r63 << "\n";
+    message("   N=%d, E=%d, τ=%d, R1=%d, R2=%d, R6.2=%d, R6.3=%d", nodes.size(), e, t, r1, r2, r62, r63);
 }
 
 void Graph::initLabels() {
@@ -68,7 +73,7 @@ void Graph::initLabels() {
         }
     }
 
-    if (args_info.verbose_flag) {
+    if (args_info.debug_flag) {
         FOREACH(t, net.getTransitions()) {
             std::cerr << (*t)->getName() << " " << labels[(*t)->getName()] << "\n";
         }
@@ -103,6 +108,23 @@ void Graph::addEdge(unsigned int source, unsigned int target, const char* label)
     }
 }
 
+void Graph::init() {
+    nodeVec.reserve(nodes.size());
+
+    FOREACH(n, nodes) {
+        Node* v = nodes[n->first];
+        assert(n->first == nodeVec.size());
+        nodeVec.push_back(v);
+    }
+    status("initialized node vector (size %lu)", nodeVec.size());
+}
+
+void Graph::addFinal(unsigned int node) {
+    Node* n = nodes[node];
+    assert(n);
+    n->isFinal = true;
+}
+
 void Graph::dot() {
     std::cout << "digraph d {\n";
 
@@ -125,6 +147,7 @@ void Graph::dot() {
     }
 
     std::cout << "}\n";
+    std::cout << std::flush;
 }
 
 
@@ -154,6 +177,109 @@ void Graph::out() {
         }
         std::cout << "\n";
     }
+
+    std::cout << std::flush;
+}
+
+
+
+bool Graph::metaRule() {
+    // look at all nodes...
+    FOREACH(n1, nodes) {
+        assert(nodes[n1->first]);
+
+        /**********\
+        * RULE 6.3 *
+        \**********/
+
+        // n1 (source) has exactly one outgoing edge, and that is a TAU edge
+        if (n1->second->postset.size() == 1 and n1->second->postset[TAU].size() == 1) {
+            unsigned int source = n1->first;
+            unsigned int target = *(n1->second->postset[TAU].begin());
+            assert(nodes[target]);
+
+            if (args_info.debug_flag) {
+                std::cerr << "[R6.3] merge nodes " << source << " and " << target << std::endl;
+            }
+
+            // remove the linking tau-edge
+            removeEdge(source, target, TAU);
+
+            // merge the nodes (target remains)
+            mergeNode(target, source);
+
+            r63++;
+            return true;
+        }
+
+
+        // ... and their TAU-successors
+        FOREACH(n2, n1->second->postset[TAU]) {
+            unsigned int source = n1->first;
+            unsigned int target = *n2;
+            assert(nodes[target]);
+
+            /********\
+            * RULE 2 *
+            \********/
+
+            if (source != target and nodes[*n2]->postset[TAU].find(n1->first) != nodes[*n2]->postset[TAU].end()) {
+
+                if (args_info.debug_flag) {
+                    std::cerr << "[R2] merge nodes " << source << " and " << target << std::endl;
+                }
+
+                // merge the nodes (source remains)
+                mergeNode(source, target);
+
+                // add tau loop
+                ii ii1 = n1->second->preset[TAU].insert(source);
+                n1->second->postset[TAU].insert(source);
+
+                if (not ii1.second) {
+                    r1++;
+                }
+
+                r2++;
+                return true;
+            }
+
+
+            /**********\
+            * RULE 6.2 *
+            \**********/
+
+            bool possible = true;
+
+            FOREACH(l, labels) {
+                FOREACH(n3, n1->second->postset[l->second]) {
+                    if (*n3 != *n2) {
+                        if (nodes[*n2]->postset[l->second].find(*n3) == nodes[*n2]->postset[l->second].end()) {
+                            possible = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (possible) {
+                if (args_info.debug_flag) {
+                    std::cerr << "[R6.2] merge nodes " << source << " and " << target << std::endl;
+                }
+
+                // remove the linking tau-edge
+                removeEdge(source, target, TAU);
+
+                // merge the nodes (source remains)
+                mergeNode(source, target);
+
+                r62++;
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 
@@ -168,7 +294,7 @@ bool Graph::rule63() {
             unsigned int source = n->first;
             unsigned int target = *(n->second->postset[TAU].begin());
 
-            if (args_info.verbose_flag) {
+            if (args_info.debug_flag) {
                 std::cerr << "[R6.3] merge nodes " << source << " and " << target << std::endl;
             }
 
@@ -208,7 +334,7 @@ bool Graph::rule62() {
                 unsigned int source = n1->first;
                 unsigned int target = *n2;
 
-                if (args_info.verbose_flag) {
+                if (args_info.debug_flag) {
                     std::cerr << "[R6.2] merge nodes " << source << " and " << target << std::endl;
                 }
 
@@ -237,7 +363,7 @@ bool Graph::rule2() {
             unsigned int target = *n2;
             if (source != target and nodes[*n2]->postset[TAU].find(n1->first) != nodes[*n2]->postset[TAU].end()) {
 
-                if (args_info.verbose_flag) {
+                if (args_info.debug_flag) {
                     std::cerr << "[R2] merge nodes " << source << " and " << target << std::endl;
                 }
 
@@ -277,8 +403,10 @@ inline void Graph::removeNode(unsigned int node) {
     }
 
     // remove
-    delete nodes[node];
+//    delete nodes[node]; // would be expensive and useless
+    nodes[node] = NULL;
     nodes.erase(nodes.find(node));
+    deleted.insert(node);
 }
 
 // node1 will remain
@@ -293,6 +421,8 @@ inline void Graph::mergeNode(unsigned int& node1, unsigned int& node2) {
 
     Node* const n1 = nodes[node1];
     Node* const n2 = nodes[node2];
+    assert(n1);
+    assert(n2);
 
     // copy the postset of n2 to n1
     FOREACH(l, n2->postset) {
@@ -317,6 +447,12 @@ inline void Graph::mergeNode(unsigned int& node1, unsigned int& node2) {
         }
     }
 
+    // don't reduce away final states
+    if (n2->isFinal) {
+        n1->markings = n2->markings;
+        n1->isFinal = true;
+    }
+
     // remove node2
     removeNode(node2);
 }
@@ -328,6 +464,7 @@ void Graph::tarjan(unsigned int v, bool firstCall) {
     static std::set<unsigned int> weiss;
 
     if (firstCall) {
+        status("detecting SCCs");
         FOREACH(n, nodes) {
             weiss.insert(n->first);
         }
@@ -399,8 +536,6 @@ void Graph::reenumerate() {
         nodeNames.push_back(n->first);
     }
 
-    std::map<unsigned int, unsigned int> translate;
-
     for (size_t i = 0; i < nodeNames.size(); ++i) {
         if (nodeNames[i] != i) {
             assert(nodes[i] == NULL);
@@ -411,6 +546,8 @@ void Graph::reenumerate() {
             nodes.erase(nodeNames[i]);
         }
     }
+
+    status("reenumerating edges");
 
     // rename edges
     FOREACH(n1, nodes) {
@@ -430,3 +567,50 @@ void Graph::reenumerate() {
         }
     }
 }
+
+
+void Graph::reenumerate2() {
+    // collect a sorted list of the nodenames
+    std::vector<unsigned int> nodeNames;
+    FOREACH(n, nodes) {
+        nodeNames.push_back(n->first);
+    }
+
+    std::set<unsigned int>::iterator freeSpace = deleted.begin();
+    for (size_t i = nodeNames.size(); i > 0; --i) {
+//        printf("checking %d\n", nodeNames[i-1]);
+        if (nodeNames[i - 1] != i and nodeNames[i - 1] > nodeNames.size()) {
+//            printf(" -> move to %d\n", *freeSpace);
+            translate[nodeNames[i - 1]] = *freeSpace;
+
+
+            // rename node in list
+            nodes[*freeSpace] = nodes[nodeNames[i - 1]];
+            nodes.erase(nodeNames[i - 1]);
+            freeSpace++;
+
+        }
+    }
+
+    status("reenumerating edges (%lu/%lu)", translate.size(), nodes.size());
+
+    // rename edges
+    FOREACH(n1, nodes) {
+        FOREACH(l, n1->second->postset) {
+            FOREACH(a, translate) {
+                if (l->second.erase(a->first) != 0) {
+                    l->second.insert(a->second);
+                }
+            }
+        }
+        FOREACH(l, n1->second->preset) {
+            FOREACH(a, translate) {
+                if (l->second.erase(a->first) != 0) {
+                    l->second.insert(a->second);
+                }
+            }
+        }
+    }
+}
+
+Node::Node() : isFinal(false) {}

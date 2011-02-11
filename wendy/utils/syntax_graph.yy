@@ -1,5 +1,5 @@
 %token KW_STATE KW_PROG KW_LOWLINK KW_SCC
-%token COLON COMMA ARROW INDENT BANG STAR QUESTION
+%token COLON COMMA ARROW INDENT QUESTION
 %token NUMBER NAME MESSAGE PATHARROW
 
 %token_table
@@ -8,26 +8,21 @@
 
 
 %{
-#include <cstdio>
+#include <map>
 #include "Graph.h"
-#include "cmdline.h"
-
-using std::map;
-using std::vector;
 
 #define YYERROR_VERBOSE
 #define YYMAXDEPTH 111655350
 
 int currentState = 0;
 
-extern Graph g;
+/// a marking of the PN API net
+std::map<const pnapi::Place*, unsigned int> marking;
 
-extern gengetopt_args_info args_info;
+extern Graph g;
 
 extern int graph_lex();
 extern int graph_error(const char *);
-
-extern FILE *dot_out;
 %}
 
 %union {
@@ -37,7 +32,6 @@ extern FILE *dot_out;
 
 %type <val> NUMBER
 %type <name> NAME
-%type <val> annotation
 
 %%
 
@@ -47,17 +41,14 @@ states:
 ;
 
 state:
-  KW_STATE annotation NUMBER { currentState = $3; } prog lowlink scc
-  markings transitions
-;
-
-annotation:
-  /* empty */
-    { $$ = 0; }
-| STAR
-    { $$ = 1; }
-| BANG
-    { $$ = 2; }
+  KW_STATE NUMBER { currentState = $2; } prog lowlink scc
+  markings {
+      const bool final = Graph::net.getFinalCondition().isSatisfied(pnapi::Marking(marking, &(Graph::net)));
+      if (final) {
+          g.addFinal(currentState);
+      }
+      marking.clear();
+  } transitions
 ;
 
 prog:
@@ -85,7 +76,7 @@ markings:
 ;
 
 marking:
-  NAME COLON NUMBER { g.addMarking(currentState, $1, $3); }
+  NAME COLON NUMBER { g.addMarking(currentState, $1, $3); marking[Graph::net.findPlace($1)] = $3; free($1); }
 ;
 
 transitions:
@@ -94,10 +85,7 @@ transitions:
 ;
 
 transition:
-  NAME ARROW NUMBER
-  {
-      g.addEdge(currentState, $3, $1);
-  }
-| NAME ARROW QUESTION
-| NAME PATHARROW NUMBER
+  NAME ARROW NUMBER { g.addEdge(currentState, $3, $1); free($1); }
+| NAME ARROW QUESTION { free($1); }
+| NAME PATHARROW NUMBER { free ($1); }
 ;

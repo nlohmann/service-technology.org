@@ -22,6 +22,9 @@ AC_ST_AUTOTEST
 AC_ST_PNAPI([4.02])
 AC_ST_VERBOSE
 
+# needed to integrate "silence" utility
+AC_DEFINE_UNQUOTED([UTIL_FOLDER], ["`pwd`/utils"], [The path to the utils folder.])
+
 # search for optional tools needed by "make check"
 AC_PATH_PROG(CNF2BITS,    [wendyFormula2bits], not found)
 AC_PATH_PROG(FIONA,       [fiona], not found)

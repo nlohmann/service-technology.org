@@ -27,17 +27,17 @@ number    "-"?[0-9][0-9]*
 "SCC:"                  { return KW_SCC; }
 "Prog:"                 { return KW_PROG; }
 "Lowlink:"              { return KW_LOWLINK; }
-"!"                     { return BANG; }
-"*"                     { return STAR; }
+"!"                     { /* skip */ }
+"*"                     { /* skip */ }
 "?"                     { return QUESTION; }
 ":"                     { return COLON; }
 ","                     { return COMMA; }
 "->"                    { return ARROW; }
 "=>"                    { return PATHARROW; }
 
-{number}  { char *temp = (char *)malloc((strlen(graph_text)+1) * sizeof(char));
-            strcpy(temp, graph_text);
-            graph_lval.val = atoi(temp); return NUMBER; }
+{number}  { //char *temp = (char *)malloc((strlen(graph_text)+1) * sizeof(char));
+            //strcpy(temp, graph_text);
+            graph_lval.val = atoi(graph_text); return NUMBER; }
 
 {name}    { char *temp = (char *)malloc((strlen(graph_text)+1) * sizeof(char));
             strcpy(temp, graph_text);

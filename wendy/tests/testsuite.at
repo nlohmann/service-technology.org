@@ -972,6 +972,31 @@ AT_CLEANUP
 
 
 ############################################################################
+AT_BANNER([Internal Reduction])
+############################################################################
+
+AT_SETUP([Deliver goods])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/deliver_goods.owfn .])
+AT_CHECK([WENDY deliver_goods.owfn --verbose --internal],0,ignore,stderr)
+AT_CHECK([GREP -q "net is controllable: YES" stderr])
+AT_CHECK([GREP -q "wendy: stored 150 inner markings (1 final, 0 bad, 0 inevitable deadlocks)" stderr])
+AT_CHECK([GREP -q "wendy: 1376 knowledges reachable" stderr])
+AT_KEYWORDS(internal)
+AT_CLEANUP
+
+AT_SETUP([Philosophers])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/phcontrol6.unf.owfn .])
+AT_CHECK([WENDY phcontrol6.unf.owfn --verbose --internal],0,ignore,stderr)
+AT_CHECK([GREP -q "net is controllable: YES" stderr])
+AT_CHECK([GREP -q "wendy: stored 729 inner markings (1 final, 1 bad, 0 inevitable deadlocks)" stderr])
+AT_CHECK([GREP -q "wendy: 728 knowledges reachable" stderr])
+AT_KEYWORDS(internal)
+AT_CLEANUP
+
+
+############################################################################
 AT_BANNER([Synchronous Communication])
 ############################################################################
 

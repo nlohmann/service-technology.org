@@ -315,6 +315,8 @@ int main(int argc, char** argv) {
     /*------------------------------------------.
     | 5. call LoLA and parse reachability graph |
     `------------------------------------------*/
+    const char* statespace_tool = (args_info.internalReduction_flag ? "Silence" : "LoLA");
+
     // select LoLA binary and build LoLA command
 #if defined(__MINGW32__)
 //    // MinGW does not understand pathnames with "/", so we use the basename
@@ -325,18 +327,18 @@ int main(int argc, char** argv) {
 
     // use reduction tool in case --internalReduction is used
     if (args_info.internalReduction_flag) {
-        command_line = "../utils/silence < " + std::string(args_info.inputs[0]) + " --output";
+        command_line = std::string(UTIL_FOLDER) + "/silence < " + args_info.inputs[0] + " --output" + (args_info.verbose_flag ? " --verbose" : " 2> /dev/null");
     }
 
     // call LoLA
-    status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
+    status("calling %s: '%s'", _ctool_(statespace_tool), command_line.c_str());
     time(&start_time);
     graph_in = popen(command_line.c_str(), "r");
     graph_parse();
     pclose(graph_in);
     graph_lex_destroy();
     time(&end_time);
-    status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
+    status("%s is done [%.0f sec]", _ctool_(statespace_tool), difftime(end_time, start_time));
     delete temp;
 
     // close marking information output file

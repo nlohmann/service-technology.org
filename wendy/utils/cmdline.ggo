@@ -4,6 +4,7 @@ package "silence"
 purpose "Reduces internal behavior in service models."
 
 option "verbose" v "Show verbose information" flag off
+option "debug" - "Show debug information" flag off
 option "dot" d "Create dot output" flag off
 option "output" o "Output reduced state space" flag off
 option "noReduction" n "Switch of reduction" flag off

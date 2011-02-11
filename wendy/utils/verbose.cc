@@ -27,6 +27,9 @@
 #include "cmdline.h"
 #include "verbose.h"
 
+#undef PACKAGE
+#define PACKAGE "silence"
+
 extern gengetopt_args_info args_info;
 
 

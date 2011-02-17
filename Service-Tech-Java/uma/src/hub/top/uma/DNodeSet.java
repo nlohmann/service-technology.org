@@ -685,7 +685,7 @@ public class DNodeSet {
 			
 			String auxLabel = "";
       String antiLabel = n.isAnti ? "--" : "";
-      String nodeLabel = "'"+properNames[n.id]+"'"+antiLabel+"'("+n.id+")["+n.globalId+"]";
+      String nodeLabel = "'"+properNames[n.id]+"'"+antiLabel+" ("+n.id+")["+n.globalId+"]";
 				
 			b.append("  c"+n.globalId+"_l [shape=none];\n");
 			b.append("  c"+n.globalId+"_l -> c"+n.globalId+" [headlabel=\""+nodeLabel+" "+auxLabel+"\"]\n");
@@ -717,7 +717,7 @@ public class DNodeSet {
 			
       String auxLabel = "";
       String antiLabel = n.isAnti ? "--" : "";
-      String nodeLabel = "'"+properNames[n.id]+"'"+antiLabel+"'("+n.id+")["+n.globalId+"]";
+      String nodeLabel = "'"+properNames[n.id]+"'"+antiLabel+" ("+n.id+")["+n.globalId+"]";
 
 			b.append("  e"+n.globalId+"_l [shape=none];\n");
 			b.append("  e"+n.globalId+"_l -> e"+n.globalId+" [headlabel=\""+nodeLabel+" "+auxLabel+"\"]\n");

@@ -20,6 +20,8 @@ package hub.top.uma;
 
 import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.DNodeSys.EventPreSet;
+import hub.top.uma.synthesis.IEquivalentConditions;
+import hub.top.uma.synthesis.LabelEquivalence;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +57,7 @@ public class DNodeBP {
   /**
    * all configuration options used in the construction of the branching process 
    */
-  private Options options;
+  private final Options options;
 
   ////--- fields and members of the branching process construction algorithm
   
@@ -1441,22 +1443,24 @@ public class DNodeBP {
   
   /**
    * A guarded linked list collecting all events that shall be checked again
-   * for being cut-off events. The list only takes new events via <code>addLast</code>
-   * if {@link #balanceCutOffEvents()} is set to <code>true</code>. 
+   * for being cut-off events. Events must be added via {@link #checkForCutOff_again(DNode)} only.
    */
-  private LinkedList<DNode> balanceCutOffEvents_list = new LinkedList<DNode>() {
+  private LinkedList<DNode> balanceCutOffEvents_list = new LinkedList<DNode>();
 
-    private static final long serialVersionUID = -2108724782357061697L;
-
-    /**
-     * Append a new event iff {@link DNodeBP#balanceCutOffEvents_allow} is
-     * <code>true</code>.
-     */
-    public void addLast(DNode o) {
-      if (balanceCutOffEvents_allow == false) return;
-      else super.addLast(o);
-    };
-  };
+  /**
+   * Add event 'e' to the list of events that shall be checked again for being
+   * cut-off events. See {@link #balanceCutOffEvents_allow}.
+   * 
+   * Events are only checked if {@link #balanceCutOffEvents_allow} is set to <code>true</code>.
+   * The value of {@link #balanceCutOffEvents_allow} is controlled by the
+   * algorithm in {@link #balanceCutOffEvents()}.
+   *  
+   * @param e
+   */
+  protected void checkForCutOff_again(DNode e) {
+    if (balanceCutOffEvents_allow == false) return;
+    balanceCutOffEvents_list.addLast(e);
+  }
   
   /**
    * Checks each event in {@link #balanceCutOffEvents()} again for being
@@ -1550,6 +1554,16 @@ public class DNodeBP {
    * for deciding behavioral properties ({@link #checkProperties()}).
    */
   private HashMap<DNode, DNode> elementary_ccPair = new HashMap<DNode, DNode>();
+  
+  /**
+   * @return the mapping of cutOff events to their equivalent counter parts
+   * 
+   * TODO: method is public to be called from extending plugins, check consistency of other fields when the method is re-used in another context
+   */
+  public HashMap<DNode, DNode> getElementary_ccPair() {
+    // FIXME: return only after computation finished?
+    return elementary_ccPair;
+  }
 
 	/**
 	 * Update the mapping that relates each new cutOff event to its equivalent
@@ -1560,8 +1574,10 @@ public class DNodeBP {
 	 *     the new event that is a cutOff event
 	 * @param equivalentEvent
 	 *     the old event to which <code>newEvent</code> is equivalent
+	 *     
+   * TODO: method is protected to be called from extending plugins, check consistency of other fields when the method is re-used in another context
 	 */
-	private void updateCCpair(DNode newEvent, DNode equivalentEvent) {
+	protected void updateCCpair(DNode newEvent, DNode equivalentEvent) {
 	  DNode existing = elementary_ccPair.get(equivalentEvent);
 	  if (existing == null)
 	    elementary_ccPair.put(newEvent, equivalentEvent);
@@ -1579,8 +1595,10 @@ public class DNodeBP {
    *     the new conditions
    * @param equivalentEvent
    *     the old conditions to which <code>newConditions</code> are equivalent
+   *     
+   * TODO: method is protected to be called from extending plugins, check consistency of other fields when the method is re-used in another context
    */
-  private void updateCCpair(DNode newEvent, DNode[] newConditions, DNode equivalentConditions[]) {
+  protected void updateCCpair(DNode newEvent, DNode[] newConditions, DNode equivalentConditions[]) {
     for (int i=0; i<newConditions.length; i++) {
       
       DNode existing = elementary_ccPair.get(equivalentConditions[i]);
@@ -2060,11 +2078,13 @@ public class DNodeBP {
 	 * and partial results are stored in <code>newCutSignature</code>. The signature
 	 * gets extended in consecutive calls of this method.
 	 * 
+	 * TODO: method is protected to be called from extending plugins, check consistency of other fields when the method is re-used in another context
+	 * 
 	 * @param newCutSignature
 	 * @param newCut
 	 * @param oldCut 
 	 */
-	private boolean equivalentCuts_conditionSignature_history(byte[] newCutSignature, DNode newCut[], DNode oldCut[]) {
+	protected boolean equivalentCuts_conditionSignature_history(byte[] newCutSignature, DNode newCut[], DNode oldCut[]) {
 
     //System.out.println(toString(newCutSignature));
 	  
@@ -2189,7 +2209,7 @@ public class DNodeBP {
           // were added in the wrong order and we check again whether 'e' is a cut-off event
           if (e.post != null && e.post.length > 0 && e.post[0]._isNew) {
             //System.out.println("smaller event added later, should switch cut-off");
-            balanceCutOffEvents_list.addLast(e);
+            checkForCutOff_again(e);
           }
           continue;
         }
@@ -2215,8 +2235,10 @@ public class DNodeBP {
    * @return
    *   a fresh condition signature stating that the number of occurrences
    *   of conditions in a cut is unknown (value 255)
+   *   
+   * TODO: method is protected to be called from extending plugins, check consistency of other fields when the method is re-used in another context
    */
-  private byte[] cutSignature_conditions_init255() {
+  protected byte[] cutSignature_conditions_init255() {
     byte signature[] = new byte[dNodeAS.preConditions.length];
 
     for (int i=0; i<signature.length; i++)
@@ -2231,6 +2253,16 @@ public class DNodeBP {
    * used in {@link #findEquivalentCut_conditionHistory_signature_size(int, DNode, DNode[], Iterable)}
    */
   private HashMap<DNode, Integer> primeConfiguration_Size = new HashMap<DNode, Integer>();
+  
+  /**
+   * TODO: method is protected to be called from extending plugins, check consistency of other fields when the method is re-used in another context
+   * 
+   * @return size of the prime configuration for each event of the branching process,
+   *         stored in {@link #primeConfiguration_Size}
+   */
+  protected HashMap<DNode, Integer> getPrimeConfiguration_Size () {
+    return primeConfiguration_Size;
+  }
 
   /**
    * Optimizes finding a cut-off event.
@@ -2242,6 +2274,15 @@ public class DNodeBP {
    * Hash-values of the cut is computed by {@link #hashCut(DNode[])}.
    */
   private HashMap<DNode, Integer> primeConfiguration_CutHash = new HashMap<DNode, Integer>();
+  
+  /**
+   * TODO: method is protected to be called from extending plugins, check consistency of other fields when the method is re-used in another context
+   * 
+   * @return hashvalues of the reached cut stored in {@link #primeConfiguration_CutHash}
+   */
+  protected HashMap<DNode, Integer> getPrimeConfiguration_CutHash () {
+    return primeConfiguration_CutHash;
+  }
   
    /**
    * @param cut
@@ -2346,6 +2387,16 @@ public class DNodeBP {
    * {@link #findEquivalentCut_conditionHistory_signature_size(int, DNode, DNode[], Iterable)}
    */
   private HashMap<DNode, short[]> primeConfigurationString = new HashMap<DNode, short[]>();
+  
+  /**
+   * TODO: method is protected to be called from extending plugins, check consistency of other fields when the method is re-used in another context
+   * 
+   * @return lexicographic string representation of the prime configuration reached
+   *         by an event, stored in {@link #primeConfigurationString}
+   */
+  protected HashMap<DNode, short[]> getPrimeConfigurationString () {
+    return primeConfigurationString;
+  }
 	
   
   /**
@@ -2357,7 +2408,7 @@ public class DNodeBP {
    * @param newConfigIDs
    * @return <code>true</code> iff oldConfig is smaller than newConfig
    */
-  private boolean isSmaller_lexicographic(short[] oldConfigIDs, short[] newConfigIDs) {
+  protected boolean isSmaller_lexicographic(short[] oldConfigIDs, short[] newConfigIDs) {
     //System.out.println(toString(oldConfigIDs)+" <? "+toString(newConfigIDs));
     
     if (getOptions().searchStrat_lexicographic == false) return false;
@@ -2389,7 +2440,7 @@ public class DNodeBP {
    * @return <code>true</code> iff oldConfig is smaller than newConfig
    */
   @SuppressWarnings("unused")
-  private boolean isSmaller_lexicographic_acc(byte[] oldConfig, byte[] newConfig) {
+  protected boolean isSmaller_lexicographic_acc(byte[] oldConfig, byte[] newConfig) {
     if (getOptions().searchStrat_lexicographic == false) return false;
 
     // both configurations have same size by assumption
@@ -2883,7 +2934,7 @@ public class DNodeBP {
     HashSet<DNode> dSucc = new HashSet<DNode>();
     HashSet<DNode> d2Succ = new HashSet<DNode>();
     
-    //Uma.out.println("top: "+top);
+    Uma.out.println("top: "+top);
     
     int print_count = 1;
     while (!top.isEmpty()) {
@@ -2894,10 +2945,10 @@ public class DNodeBP {
         print_count = 0;
       }
       
-      //Uma.out.println("top: "+top);
+      Uma.out.println("top: "+top);
       DNode d = top.iterator().next();
       top.remove(d);
-      //Uma.out.println("removed "+d);
+      Uma.out.println("removed "+d);
 
       to_join.clear();
       to_join.add(d);
@@ -2916,7 +2967,7 @@ public class DNodeBP {
           dSucc.add(elementary_ccPair.get(e));
         }
       }
-      //Uma.out.println("  has successors: "+dSucc);
+      Uma.out.println("  has successors: "+dSucc);
       
       int joint_size = dCl.size();    //
       
@@ -2927,7 +2978,7 @@ public class DNodeBP {
         if (d.id != d2.id) continue;
         if (areFoldingEquivalent(d, d2)) continue;
         
-        //Uma.out.println("  comparing to "+d2);
+        Uma.out.println("  comparing to "+d2);
         
         HashSet<DNode> d2Cl = foldingEquivalenceClasses.get(elementary_ccPair.get(d2));
         
@@ -2941,7 +2992,7 @@ public class DNodeBP {
             d2Succ.add(elementary_ccPair.get(e2));
           }
         }
-        //Uma.out.println("    has successors: "+d2Succ);
+        Uma.out.println("    has successors: "+d2Succ);
         
         // Check if we can join the classes of 'd' and 'd2': this is possible
         // if each successor of the class of 'd' has an equivalent successor of
@@ -2953,7 +3004,7 @@ public class DNodeBP {
           
           if (!d2Succ.contains(e)) {
             all_dSucc_HaveEquivalent = false;
-            //Uma.out.println("    -> "+e+" not in post "+d2);
+            Uma.out.println("    -> "+e+" not in post "+d2);
             break;
           }
           
@@ -3001,7 +3052,7 @@ public class DNodeBP {
           
           if (!dSucc.contains(e2)) {
             all_dSucc_HaveEquivalent = false;
-            //Uma.out.println("    -> "+e2+" not in post "+d);
+            Uma.out.println("    -> "+e2+" not in post "+d);
             break;
           }
           
@@ -3037,10 +3088,10 @@ public class DNodeBP {
         
         if (all_dSucc_HaveEquivalent && all_d2Succ_HaveEquivalent) {
           to_join.add(d2);
-          //Uma.out.println("  JOINING "+d+" and "+d2);
+          Uma.out.println("  JOINING "+d+" and "+d2);
           joint_size += d2Cl.size();    //
         } else {
-          //Uma.out.println("  NOT joining "+d+" and "+d2);
+          Uma.out.println("  NOT joining "+d+" and "+d2);
         }
         
         //if (!ignoreFoldThreshold && joint_size > foldThreshold * idFrequency[d.id]) break;      //
@@ -3163,14 +3214,31 @@ public class DNodeBP {
 	  return complexCond;
 	}
 	
-	/**
-	 * The equivalence relation on events and conditions {@link #elementary_ccPair}
-	 * is generated based on local knowledge and may be too coarse, e.g. by the
-	 * {@link #minimizeFoldingRelation()} function. We occasionally set two events as equivalent
-	 * while their pre-conditions are not pairwise equivalent. For these events
-	 * we have to drop the equivalence relation. This is done by this method.
-	 */
-	public void relaxFoldingEquivalence() {
+	 /**
+   * The equivalence relation on events and conditions {@link #elementary_ccPair}
+   * is generated based on local knowledge and may be too coarse, e.g. by the
+   * {@link #minimizeFoldingRelation()} function. We occasionally set two events as equivalent
+   * while their pre-conditions are not pairwise equivalent. For these events
+   * we have to drop the equivalence relation. This is done by this method.
+   */
+  public void relaxFoldingEquivalence() {
+    relaxFoldingEquivalence(LabelEquivalence.instance);
+  }
+	
+  /**
+   * The equivalence relation on events and conditions
+   * {@link #elementary_ccPair} is generated based on local knowledge and may be
+   * too coarse, e.g. by the {@link #minimizeFoldingRelation()} function. We
+   * occasionally set two events as equivalent while their pre-conditions are
+   * not pairwise equivalent. For these events we have to drop the equivalence
+   * relation. This is done by this method.
+   * 
+   * @param splitter
+   *          the equivalence splitter that is used to refine equivalence
+   *          classes, the given splitter may implement another equivalence
+   *          criterion that the default {@link LabelEquivalence}
+   */
+	public void relaxFoldingEquivalence(IEquivalentConditions splitter) {
 	  
 	  // --------------------------------------------------------------------
 	  // split equivalence classes by labels
@@ -3178,27 +3246,17 @@ public class DNodeBP {
 	  
 	  // compute splitted equivalence classes
 	  LinkedList<HashSet<DNode>> equiv_to_set = new LinkedList<HashSet<DNode>>();
+    
 	  for (Entry<DNode, HashSet<DNode>> cl : foldingEquivalenceClasses.entrySet()) {
-	    HashMap<Short, HashSet<DNode>> labelClasses = new HashMap<Short, HashSet<DNode>>();
-	    for (DNode d : cl.getValue()) {
-	      if (!labelClasses.containsKey(d.id))
-	        labelClasses.put(d.id, new HashSet<DNode>());
-	      labelClasses.get(d.id).add(d);
-	    }
-	    
-	    if (labelClasses.keySet().size() > 1) {
-	      // there are several nodes with different labels in the same equivalence class
-	      // we cannot fold them to the same node, so split the class
-	      //System.out.println("splitting equivalence class "+cl.getValue() +" by label");
-	      for (Entry<Short, HashSet<DNode>> sub_cl : labelClasses.entrySet()) {
-	        // each set 'sub_cl.getValue()' becomes a new equivalence class
-	        equiv_to_set.add(sub_cl.getValue());
-	      }
-	    }
+
+	    Collection<HashSet<DNode>> refined = splitter.splitIntoEquivalenceClasses(cl.getValue());
+	    // split only if there is something to split
+	    if (refined.size() > 1) equiv_to_set.addAll(refined);
 	  }
 	  
 	  // update the equivalence classes as computed earlier
 	  for (HashSet<DNode> cl_new : equiv_to_set) {
+	    Uma.out.println("splitting by successors: "+cl_new);
 	    splitFoldingEquivalence(cl_new);
 	  }
 	  
@@ -3254,9 +3312,11 @@ public class DNodeBP {
     
     // update the equivalence classes as computed earlier
     for (HashSet<DNode> cl_new : equiv_to_set) {
+      Uma.out.println("splitting "+cl_new);
       splitFoldingEquivalence(cl_new);
     }
 	}
+
 	
 	/**
 	 * Split the {@link #foldingEquivalenceClass}es. The nodes 'equiv_to_set'

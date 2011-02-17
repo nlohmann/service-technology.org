@@ -178,13 +178,13 @@ public class Options {
    *  compare each candidate event only with events that are predecessors
    *  of the candidate event
    */
-  protected boolean searchStrat_predecessor = false;
+  public boolean searchStrat_predecessor = false;
   /**
    *  check for cut-off events using the size of the local configurations:
    *  compare each candidate event only with events that have been added
    *  previously and which have a strictly smaller prime configuration
    */
-  protected boolean searchStrat_size = false;
+  public boolean searchStrat_size = false;
   /**
    *  check for cut-off events using a lexicographic order in the transition names:
    *  compare each candidate event only with events that have been added
@@ -192,40 +192,40 @@ public class Options {
    *  two configurations have equal size, then their lexicographic order determines
    *  the order of the configuration
    */
-  protected boolean searchStrat_lexicographic = false;
+  public boolean searchStrat_lexicographic = false;
   
   //// --- equivalence notions for detecting whether two events are equivalent
   /**
    *  check for equivalence of cuts by comparing their histories for
    *  enabling the same sets of events
    */
-  protected boolean cutOffEquiv_eventSignature = false;
+  public boolean cutOffEquiv_eventSignature = false;
   /**
    *  check for equivalence of cuts by comparing their histories for
    *  isomorphism to the maximal depth of the histories in the input system
    */
-  protected boolean cutOffEquiv_history = false;
+  public boolean cutOffEquiv_history = false;
   /**
    * check for equivalence of cuts by comparing the reached markings only
    */
-  protected boolean cutOffEquiv_marking = false;
+  public boolean cutOffEquiv_marking = false;
   /**
    *  check for equivalence of cuts by comparing the histories of conditions
    *  with respect to the conditions of the given system
    */
-  protected boolean cutOffEquiv_conditionHistory = false;
+  public boolean cutOffEquiv_conditionHistory = false;
   
   /**
    * compute finite complete prefix until all reachable states have been
    * computed (default: <code>true</code>)
    */
-  protected boolean cutOffTermination_reachability = true;
+  public boolean cutOffTermination_reachability = true;
   /**
    * compute finite complete prefix until finite complete prefix is successor
    * complete and can be folded into an equivalent Petri net
    * (default: <code>false</code>)
    */
-  protected boolean cutOffTermination_synthesis = false;
+  public boolean cutOffTermination_synthesis = false;
 
 
   //// --- synthesis flags
@@ -234,34 +234,34 @@ public class Options {
    * set to <code>false</code> if no cut-off events are computed
    * (default: <code>true</code>)
    */
-  protected boolean folding_extendEquivalence_forward = true;
+  public boolean folding_extendEquivalence_forward = true;
 
   
   //// --- analysis flags
   /**
    * whether properties shall be checked on the fly at all
    */
-  protected boolean checkProperties = false;
+  public boolean checkProperties = false;
   /**
    * check whether the system is k-bounded
    */
-  protected int boundToCheck = 0;
+  public int boundToCheck = 0;
   /**
    * check whether the system has dead conditions (which have no post-event
    */
-  protected boolean checkProperty_DeadCondition = false;
+  public boolean checkProperty_DeadCondition = false;
   /**
    * stop BP construction if the property to be checked has been found
    */
-  protected boolean stopIfPropertyFound = true;
+  public boolean stopIfPropertyFound = true;
   /**
    * check whether the event with the given label-ID can be executed 
    */
-  protected short checkProperty_ExecutableEventID = -1;
+  public short checkProperty_ExecutableEventID = -1;
   /**
    * check whether the given event (in terms of its global ID from
    * {@link DNodeSys}) can be executed 
    */
-  protected int checkProperty_ExecutableEvent = -1;
+  public int checkProperty_ExecutableEvent = -1;
   
 }

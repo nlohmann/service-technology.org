@@ -260,6 +260,7 @@ public class MineSimplify {
     HashSet<DNode> implied = dep.getImpliedConditions_solution();
     sim._time_implied_finish = System.currentTimeMillis();
     
+    
     sim._time_fold_start = System.currentTimeMillis();
     if (printDetail) Uma.out.println("fold net..");
     NetSynthesis synth = new NetSynthesis(build);
@@ -268,27 +269,26 @@ public class MineSimplify {
     sim._comp_fold = complexitySimple(net);
     sim._size_fold = net.getInfo();
     
+    
     if (printDetail) Uma.out.println("remove implied places..");
     LinkedList<Place> impliedPlaces = new LinkedList<Place>();
     for (Place p : net.getPlaces()) {
       boolean allImplied = true;
       DNode b = synth.n2d.get(p);
       for (DNode bPrime : build.foldingEquivalence().get(build.equivalentNode().get(b))) {
-        /*
-        if (!implied.contains(bPrime)) {
-          allImplied = false;
-        }
-        */
+        
+        //if (!implied.contains(bPrime)) {
+        //  allImplied = false;
+        //}
         if (implied.contains(bPrime)) {
           impliedPlaces.add(p);
           break;
         }
       }
-      /*
-      if (allImplied) {
-        impliedPlaces.add(p);
-      }
-      */
+      
+      //if (allImplied) {
+      //  impliedPlaces.add(p);
+      //}
     }
     
     for (Place p : impliedPlaces) {
@@ -313,16 +313,17 @@ public class MineSimplify {
       }
     }
     
+    
     for (Transition t : net.getTransitions()) {
       LinkedList<Place> maxPlaces = new LinkedList<Place>();
       for (Place p : t.getPostSet()) {
         if (p.getOutgoing().isEmpty())
           maxPlaces.add(p);
       }
-      /*
-      if (!maxPlaces.isEmpty() && maxPlaces.size() == t.getPostSet().size())
-        maxPlaces.removeLast();
-      */
+      
+      //if (!maxPlaces.isEmpty() && maxPlaces.size() == t.getPostSet().size())
+      //  maxPlaces.removeLast();
+
       for (Place p : maxPlaces) {
         
         boolean isSinglePost = false;
@@ -340,18 +341,20 @@ public class MineSimplify {
     }
     sim._comp_implied = complexitySimple(net);
     sim._size_implied = net.getInfo();
+
     
     _debug_lastViewBuild = build;
 
     sim._time_chain_start = System.currentTimeMillis();
     if (abstractCycles) {
-      //while (collapseChains(net));
+      while (collapseChains(net));
     }
     sim._comp_chain = complexitySimple(net);
     sim._size_chain = net.getInfo();
     
     removeFlowerPlaces(net, 0.05f);
     sim._time_chain_finish = System.currentTimeMillis();
+    
     
     Uma.out.println("done");
     

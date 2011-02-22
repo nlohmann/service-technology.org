@@ -395,6 +395,11 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 					t->addLabel(netLabel, (*f)->getWeight());
 					//cout << "input"<<netLabel.getName()<<std::endl;
 					}
+					else
+					{
+					  t->addLabel(*nets[x]->getInterface().findLabel(place->getName()), (*f)->getWeight());
+					//cout << "input label already exists" << std::endl;
+					}
 				}
             } else {
 				//it is an internal place create its complement
@@ -465,6 +470,10 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
 					if(nets[x]->getInterface().findLabel(place->getName())==NULL){
 					pnapi::Label& netLabel = nets[x]->getInterface().addOutputLabel(place->getName());
 						t->addLabel(netLabel, (*f)->getWeight());}
+					else
+					{
+					  t->addLabel(*nets[x]->getInterface().findLabel(place->getName()), (*f)->getWeight());
+					}
 				}
             } 
 			else {//it is an internal place

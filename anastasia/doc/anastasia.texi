@@ -141,7 +141,9 @@ The distribution contains several directories:
 The Texinfo documentation of Anastasia. The documentation can be created using @samp{make pdf}. Note you need to have Anastasia properly installed before (see installation description above).
 
 @item libs
-The Petri Net @acronym{API} used by Anastasia to parse and organize Petri nets.
+Anastasia comes with several necessary tools and libraries: the Petri Net @acronym{API} to parse and organize Petri nets, the integer programming solver
+@acronym{lpsolve}, the boolean satisfiability solver @acronym{MiniSat}, and the reachability checker @acronym{Sara}. The latter is also independently available at the same
+site as Anastasia.
 
 @item man
 The manpage of Anastasia which can be displayed using @samp{man anastasia} after having Anastasia installed (see installation description above).
@@ -229,7 +231,7 @@ anastasia net.owfn --config=myconf.conf
 
 A configuration file consists of @code{parameter = value} lines, each line setting the value of a parameter. Note: If not all parameters are defined, the standard values apply.
 
-The configure script creates a default configuration file @file{anastasia.conf} which located in the @file{src} folder. When installing Anastasia, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
+The configure script creates a default configuration file @file{anastasia.conf} which is located in the @file{src} folder. When installing Anastasia, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
 
 When Anastasia is executed, it evaluates parameters as follows:
 @enumerate
@@ -273,7 +275,7 @@ There is no output to file at this time, use the shell redirection mechanism if 
 
 @section Checkable Properties
 
-The properties the set of places finally printed to standard output should have can be specified by the
+The properties that the set of places finally being printed to standard output should have can be specified by the
 following options:
 
 @cartouche
@@ -406,7 +408,7 @@ Finally, by selecting none of the above modifiers, one can obtain a set of place
 
 @section Finding a Witness against Liveness in Free-Choice nets
 
-Any single result obtained from Anastasia can be forwarded to a non-liveness checker by selecting the option @option{--nonlive}, but some
+Any single result obtained from Anastasia can be forwarded to a non-liveness checker by selecting the option @option{--witness}, but some
 conditions must be met for this to work:
 @enumerate
 @item The Petri net must be a free-choice net, i.e. transitions with a common preplace have to have the same preset.
@@ -436,17 +438,41 @@ If you would like to see the clauses, use the option @option{--clauses} and add 
 @chapter Theory
 
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
-Anastasia implements several algorithms and result published in several scientific articles.
+Anastasia implements several algorithms and results published in several scientific articles.
 
 @c <<-- CHANGE START (theory) -->>
 
-@section <<-- THEORY -->>
+@section Petri net properties in general
 
-@subsubheading <<-- THEORY -->>
+A good overview over Petri nets including siphons, traps, liveness, and deadlocks can be found
+in Murata's often cited work:
 
 @quotation
-<<-- THEORY -->>
+T. Murata. @b{Petri nets: Properties, analysis and applications}. @i{Proc. IEEE} @b{77}:4, pp.201--221, 1989.
 @end quotation
+
+@section Free Choice nets
+
+The most complete overview of Free Choice nets including a proof of the equivalence of liveness and
+the Commoner-Hack property for this class of nets can be found in the work of Desel and Esparza:
+
+@quotation
+J. Desel, J. Esparza. @b{Free Choice Petri Nets}. Cambridge University Press, ISBN 0-521-46519-2, 1995.
+@end quotation
+
+@section Using SAT solvers to compute siphons and traps
+
+How to build formulae that allow for using SAT solvers to determine siphons, traps, and even counterexamples
+to the Commoner-Hack property is shown in the following paper.
+
+@quotation
+O. Oanea, H. Wimmel, K. Wolf. @b{New Algorithms for Deciding the Siphon-Trap Property}. @i{Lecture Notes in Computer Science} @b{6128}, pp.267--286, 2010.
+@end quotation
+
+@section Constructing Witnesses for Non-liveness
+
+A paper presenting a fast algorithm for computing a witness for non-liveness, i.e. finding a firing sequence
+that will empty a siphon without a marked trap in a Free Choice net, is in the works.
 
 @c <<-- CHANGE END -->>
 

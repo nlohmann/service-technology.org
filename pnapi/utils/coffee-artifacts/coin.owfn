@@ -1,0 +1,26 @@
+PLACE
+INTERNAL init, @customer, @automaton, transitToCustomer, transitToAutomaton;
+SYNCHRONOUS sendToCustomer, receiceFromCustomer, sendToAutomaton, receiveFromAutomaton;
+
+INITIALMARKING init, @customer;
+FINALCONDITION (transitToAutomaton = 0 AND transitToCustomer = 0);
+
+TRANSITION t1
+CONSUME @customer;
+PRODUCE transitToAutomaton;
+SYNCHRONIZE sendToAutomaton;
+
+TRANSITION t2
+CONSUME transitToAutomaton;
+PRODUCE @automaton;
+SYNCHRONIZE receiceFromCustomer;
+
+TRANSITION t3
+CONSUME @automaton;
+PRODUCE transitToCustomer;
+SYNCHRONIZE sendToCustomer;
+
+TRANSITION t4
+CONSUME transitToCustomer;
+PRODUCE @customer;
+SYNCHRONIZE receiveFromAutomaton;

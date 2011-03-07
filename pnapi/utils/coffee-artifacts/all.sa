@@ -1,0 +1,53 @@
+{
+  generator:    Wendy 3.0 (i386-apple-darwin10.3.0)
+  invocation:   wendy all.owfn --sa
+  events:       0 send, 0 receive, 13 synchronous
+  statistics:   18 nodes
+}
+
+INTERFACE
+  SYNCHRONOUS
+    state.pay, state.orderTea, cup.fillTea, state.orderCoffee, cup.receiceFromCustomer, coin.receiceFromCustomer, cup.fillCoffee, cup.sendToAutomaton, coin.receiveFromAutomaton, cup.sendToCustomer, coin.sendToAutomaton, cup.receiveFromAutomaton, coin.sendToCustomer;
+
+NODES
+  4297174368 : INITIAL
+    state.orderTea -> 4297177280
+    state.orderCoffee -> 4297178064
+    coin.sendToAutomaton -> 4297169152
+  4297125024
+    coin.receiceFromCustomer -> 4297129248
+  4297129248
+    state.pay -> 4297175216
+  4297138368
+    cup.receiveFromAutomaton -> 4297181024
+  4297165088 : FINAL
+  4297167120
+    cup.receiveFromAutomaton -> 4297165088
+  4297169152
+    state.orderTea -> 4297181264
+    state.orderCoffee -> 4297125024
+    coin.receiceFromCustomer -> 4297171440
+  4297169200
+    cup.sendToCustomer -> 4297167120
+  4297171440
+    state.pay -> 4297172416
+    state.orderTea -> 4297178656
+    state.orderCoffee -> 4297129248
+  4297172416
+    state.orderTea -> 4297176992
+    state.orderCoffee -> 4297175216
+  4297175216
+    cup.fillCoffee -> 4297169200
+  4297175584
+    cup.sendToCustomer -> 4297138368
+  4297176992
+    cup.fillTea -> 4297175584
+  4297177280
+    coin.sendToAutomaton -> 4297181264
+  4297178064
+    coin.sendToAutomaton -> 4297125024
+  4297178656
+    state.pay -> 4297176992
+  4297181024 : FINAL
+  4297181264
+    coin.receiceFromCustomer -> 4297178656

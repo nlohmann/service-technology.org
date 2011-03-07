@@ -1,0 +1,17 @@
+PLACE
+INTERNAL orderedTea;
+
+INITIALMARKING ;
+FINALCONDITION TRUE;
+
+{only fillTea after orderedTea}
+
+TRANSITION t1
+CONSUME ;
+PRODUCE orderedTea;
+CONSTRAIN state.orderTea;
+
+TRANSITION t2
+CONSUME orderedTea;
+PRODUCE;
+CONSTRAIN cup.fillTea;

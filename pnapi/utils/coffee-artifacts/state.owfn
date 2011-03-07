@@ -1,0 +1,21 @@
+PLACE
+INTERNAL notPaid, paid, notOrdered, teaOrdered, coffeeOrdered;
+SYNCHRONOUS orderTea, orderCoffee, pay;
+
+INITIALMARKING notPaid, notOrdered;
+FINALCONDITION TRUE;
+
+TRANSITION t1
+CONSUME notPaid;
+PRODUCE paid;
+SYNCHRONIZE pay;
+
+TRANSITION t2
+CONSUME notOrdered;
+PRODUCE teaOrdered;
+SYNCHRONIZE orderTea;
+
+TRANSITION t3
+CONSUME notOrdered;
+PRODUCE coffeeOrdered;
+SYNCHRONIZE orderCoffee;

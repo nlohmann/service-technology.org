@@ -1,0 +1,36 @@
+PLACE
+INTERNAL empty, coffee, tea, @automaton, @customer, transitToCustomer, transitToAutomaton;
+SYNCHRONOUS sendToCustomer, receiceFromCustomer, sendToAutomaton, receiveFromAutomaton, fillCoffee, fillTea;
+
+INITIALMARKING empty, @automaton;
+FINALCONDITION (transitToAutomaton = 0 AND transitToCustomer = 0);
+
+TRANSITION t1
+CONSUME empty, @automaton;
+PRODUCE tea, @automaton;
+SYNCHRONIZE fillTea;
+
+TRANSITION t2
+CONSUME empty, @automaton;
+PRODUCE coffee, @automaton;
+SYNCHRONIZE fillCoffee;
+
+{TRANSITION t3
+CONSUME @customer;
+PRODUCE transitToAutomaton;
+SYNCHRONIZE sendToAutomaton;
+
+TRANSITION t4
+CONSUME transitToAutomaton;
+PRODUCE @automaton;
+SYNCHRONIZE receiceFromCustomer;}
+
+TRANSITION t5
+CONSUME @automaton;
+PRODUCE transitToCustomer;
+SYNCHRONIZE sendToCustomer;
+
+TRANSITION t6
+CONSUME transitToCustomer;
+PRODUCE @customer;
+SYNCHRONIZE receiveFromAutomaton;

@@ -1,0 +1,22 @@
+PLACE
+INTERNAL donthaveCoin, haveCoin;
+
+INITIALMARKING donthaveCoin:1;
+FINALCONDITION TRUE;
+
+{paying means having the coin}
+
+TRANSITION t1
+CONSUME donthaveCoin;
+PRODUCE haveCoin;
+CONSTRAIN coin.receiceFromCustomer;
+
+TRANSITION t2
+CONSUME haveCoin;
+PRODUCE ;
+CONSTRAIN state.pay;
+
+TRANSITION t3
+CONSUME haveCoin;
+PRODUCE ;
+CONSTRAIN coin.sendToCustomer;

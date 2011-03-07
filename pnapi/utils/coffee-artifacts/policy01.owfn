@@ -1,0 +1,17 @@
+PLACE
+INTERNAL paid;
+
+INITIALMARKING ;
+FINALCONDITION TRUE;
+
+{only fillTea after paid}
+
+TRANSITION t1
+CONSUME ;
+PRODUCE paid;
+CONSTRAIN state.pay;
+
+TRANSITION t2
+CONSUME paid;
+PRODUCE;
+CONSTRAIN cup.fillTea;

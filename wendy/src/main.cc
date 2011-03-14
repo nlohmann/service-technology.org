@@ -298,11 +298,12 @@ int main(int argc, char** argv) {
     `--------------------------------------------*/
     Output* temp = new Output();
     std::stringstream ss;
-    ss << pnapi::io::lola << pnapi::io::formula << *InnerMarking::net;
+//    ss << pnapi::io::lola << pnapi::io::formula << *InnerMarking::net;
+    ss << pnapi::io::lola << *InnerMarking::net;
     std::string lola_net = ss.str();
-    if (not Label::visible_transitions.empty()) {
-        lola_net = replaceOnce(lola_net, "FORMULA", "FORMULA EXPATH (" + Label::visible_transitions + ") EVENTUALLY");
-    }
+//    if (not Label::visible_transitions.empty()) {
+//        lola_net = replaceOnce(lola_net, "FORMULA", "FORMULA EXPATH (" + Label::visible_transitions + ") EVENTUALLY");
+//    }
     temp->stream() << lola_net << std::endl;
 
     // marking information output

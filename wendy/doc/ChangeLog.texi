@@ -15,6 +15,8 @@
 @item adjusted configure script to download and compile LoLA if it is not found in the path
 
 @item Wendy creates an extended @acronym{CTL} formula which is added to the intermediate LoLA output. It is used to apply @acronym{CTL}*-preserving partial order reduction when building the state space of the inner of the net. The formula is used to tell LoLA which transitions are visible; that is, which transitions must not be ignored during reduction.
+
+@item fixed bug #17896 (see @url{https://gna.org/bugs/?17896}): crash on empty input nets
 @end itemize
 
 
@@ -52,6 +54,7 @@ Niels Lohmann and Daniela Weinberg. @b{Wendy: A tool to synthesize partners for 
 @item added a parameter @option{-r}/@option{--resultFile} to write all analysis results into a single file in the file format of libconfig (see @url{http://www.hyperrealm.com/libconfig})
 
 @item fixed bug #15385 (see @url{https://gna.org/bugs/?15385}): runtime output using the @option{--stats} crashed under certain Linux systems
+
 @item updated to Petri Net API 4.00 (revision r5519)
 @end itemize
 

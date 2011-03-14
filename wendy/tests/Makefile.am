@@ -53,7 +53,8 @@ TESTFILES = 06-03-23_BPM06_shop_sect_6.fiona.og \
             CB.owfn CR.owfn TPO.owfn bug14782.owfn bug14798.owfn \
             phils_3_1.owfn RS.owfn cyclicFullCoffee.pnml \
             moreThanOneFinalLiteral.owfn innerCyclicMPPacyclic.owfn \
-			bug16258-1.owfn bug16258-2.owfn deliver_goods.owfn
+			bug16258-1.owfn bug16258-2.owfn deliver_goods.owfn \
+			bug17896.owfn
 
 
 #-----------------------------------------#

@@ -33,6 +33,9 @@ Version 3.2-unreleased
   used to tell LoLA which transitions are visible; that is, which
   transitions must not be ignored during reduction.
 
+* fixed bug #17896 (see `https://gna.org/bugs/?17896'): crash on empty
+  input nets
+
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for
 complete version history.

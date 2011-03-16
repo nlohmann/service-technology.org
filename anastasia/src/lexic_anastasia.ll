@@ -47,6 +47,8 @@ nempty Nonempty
 marked Marked
 unmarked Unmarked
 subset Subset
+inscc InSCC
+coverscc CoverSCC
 opand and
 opor or
 opimpl ->
@@ -71,6 +73,8 @@ bigor OR
 <stateformula>{marked}	{ return MARKED; }
 <stateformula>{unmarked}	{ return UNMARKED; }
 <stateformula>{subset}	{ return SUBSET; }
+<stateformula>{inscc}	{ return INSCC; }
+<stateformula>{coverscc}	{ return COVERSCC; }
 <stateformula>{opand}		{ return OPAND; }
 <stateformula>{opor}		{ return OPOR; }
 <stateformula>{opimpl}	{ return OPIMPL; }

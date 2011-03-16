@@ -8,16 +8,44 @@
 
 
 
-Anastasia implements several algorithms and result published in several
+Anastasia implements several algorithms and results published in several
 scientific articles.
 
-<<- THEORY ->>
-==============
+Petri net properties in general
+===============================
 
-<<- THEORY ->>
-..............
+A good overview over Petri nets including siphons, traps, liveness, and
+deadlocks can be found in Murata's often cited work:
 
-     <<- THEORY ->>
+     T. Murata. Petri nets: Properties, analysis and applications. Proc. IEEE
+     77:4, pp.201-221, 1989.
+
+Free Choice nets
+================
+
+The most complete overview of Free Choice nets including a proof of the
+equivalence of liveness and the Commoner-Hack property for this class of nets
+can be found in the work of Desel and Esparza:
+
+     J. Desel, J. Esparza. Free Choice Petri Nets. Cambridge University Press,
+     ISBN 0-521-46519-2, 1995.
+
+Using SAT solvers to compute siphons and traps
+==============================================
+
+How to build formulae that allow for using SAT solvers to determine siphons,
+traps, and even counterexamples to the Commoner-Hack property is shown in the
+following paper.
+
+     O. Oanea, H. Wimmel, K. Wolf. New Algorithms for Deciding the Siphon-Trap
+     Property. Lecture Notes in Computer Science 6128, pp.267-286, 2010.
+
+Constructing Witnesses for Non-liveness
+=======================================
+
+A paper presenting a fast algorithm for computing a witness for non-liveness,
+i.e. finding a firing sequence that will empty a siphon without a marked trap
+in a Free Choice net, is in the works.
 
 
 

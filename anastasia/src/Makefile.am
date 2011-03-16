@@ -3,17 +3,17 @@ bin_PROGRAMS = anastasia
 
 # the plain sources you need to compile (no generated code)
 # <<-- CHANGE START (the program's sources) -->>
-anastasia_SOURCES = main.cc formula.cc formula.h witness.cc witness.h \
+anastasia_SOURCES = main.cc formula.cc formula.h witness.cc witness.h tarjan.cc tarjan.h \
                     verbose.cc verbose.h \
                     cmdline.c cmdline.h \
                     Output.cc Output.h \
-					lexic_anastasia.ll syntax_anastasia.yy
+			lexic_anastasia.ll syntax_anastasia.yy
 # <<-- CHANGE END -->>
 
 # the configuration files
 sysconf_DATA = anastasia.conf
 
-# pass the sysconfdir to Satana (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
+# pass the sysconfdir to Anastasia (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
 anastasia_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\" -I$(top_srcdir)/libs
 anastasia_LDADD = $(top_builddir)/libs/minisat/libminisat.a $(top_builddir)/libs/sara/libsara.a $(top_builddir)/libs/lp_solve/liblpsolve55.la 
 

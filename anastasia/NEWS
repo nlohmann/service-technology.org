@@ -8,15 +8,11 @@
 
 
 
-Version 1.0-unreleased (25 October 2010)
-========================================
+Version 1.1 (16 March 2011)
+===========================
 
-* First version of Anastasia
+* User defined formula supports checking for strongly connected components.
 
-* Computes siphons, traps, and their combinations.
-
-* Allows to enforce or forbid places and to minimize or maximize the result.
-
-* Allows to compute a set of results covering all coverable places.
+* Solutions can also be recognized with -r, not only computed.
 
 \nSee file ChangeLog <http://service-technology.org/files/anastasia/ChangeLog> for\ncomplete version history.\n

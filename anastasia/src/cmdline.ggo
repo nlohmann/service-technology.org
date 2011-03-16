@@ -35,6 +35,7 @@ groupoption "snoopy" y
   "Print the output in the format of Snoopy."
   details="This option is used when the output should be read by the tool Snoopy.\n"
   group="Output Format"
+
   
 section "Properties"
 defgroup "Property" groupdesc="Select the general property to be checked:" required
@@ -105,6 +106,12 @@ option "witness" w
 option "loopnet" l
   "The Petri net itself is modified. A new transition is created, its preset consists of all places so far having an empty postset, its postset of those having an empty preset. Useful for workflow nets."
   flag off
+
+option "recognize" r
+  "Instead of computing a set of places for the property, check if given sets of places have the property. Places have to be comma-separated, sets are separated by blank or newline. Disables -c, -w, and MinMax."
+  string
+  typestr="FILENAME"
+  optional
 
 defgroup "MinMax" groupdesc="Use these options to minimize or maximize the result so that the property still holds:"
 

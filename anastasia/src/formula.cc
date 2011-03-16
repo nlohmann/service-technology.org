@@ -9,9 +9,9 @@
  *
  * \since   2010/10/20
  *
- * \date    $Date: 2010-10-25 11:22:01 +0200 (Mo, 25. Okt 2010) $
+ * \date    $Date: 2011-03-16 11:22:01 +0200 (Mi, 16. Mar 2011) $
  *
- * \version $Revision: 1.0 $
+ * \version $Revision: 1.1 $
  */
 
 #include "formula.h"
@@ -949,5 +949,269 @@ void Formula::MinMax(setVar sv, bool maximize, set<Place*>* enforce, set<Place*>
 		solve(); // resolve the formula
 		if (pgen) removeLastClause(); // and remove the clause of the generating place again 
 	}
+}
+
+/** The property of a given set variable being contained in a strongly connected component of the net.
+	@param sv The set variable.
+	@return A variable representing if sv is an SCC.
+*/
+boolVar Formula::InSCC(setVar sv) {
+	if (sv==0) return 0; // no set variable given
+	boolVar base(svtov[sv]); // offset for sv
+	boolVar x; // the final result
+	if (verbose) x=createVar(sv,"_inscc");
+	else x=createVar();
+	if (scc.empty()) { // we need to compute the SCCs first
+		Tarjan tj(pn); 
+		tj.buildGraph(); 
+		tj.getComponents(scc);
+	}
+	// now create one boolean variable for each SCC
+	vector<boolVar> sccvar;
+	if (verbose)
+		for (unsigned int i=0; i<scc.size(); ++i)
+		{
+			stringstream sstr;
+			string sccvarname;
+			sstr << "_inscc_" << i;
+			sstr >> sccvarname;
+			sccvar.push_back(createVar(sv,sccvarname));
+		}
+	else
+		for (unsigned int i=0; i<scc.size(); ++i)
+			sccvar.push_back(createVar());
+	// set a variable if its SCC collides with sv
+	vector<Literal> clause1,clause2;
+	clause2.push_back(0);
+	clause2.push_back(0);
+	clause2.push_back(0);
+	for(unsigned int i=0; i<scc.size(); ++i)
+	{
+		clause1.clear();
+		clause1.push_back(-sccvar[i]);
+		clause2[0] = sccvar[i];
+		set<Place*>::iterator pit;
+		for(pit=scc[i].begin(); pit!=scc[i].end(); ++pit)
+		{
+			clause1.push_back(base+p2id[*pit]);
+			clause2[1] = -(base+p2id[*pit]);
+			f.push_back(clause2);
+		}
+		clause1.push_back(0);
+		f.push_back(clause1);
+	}
+	// clauses for at least two SCC's
+	clause1.clear();
+	clause1.push_back(x);
+	for(unsigned int i=1; i<scc.size(); ++i)
+		clause1.push_back(sccvar[i]);
+	clause1.push_back(0);
+	f.push_back(clause1);
+	for(unsigned int i=0; i<scc.size()-1; ++i)
+	{
+		clause1[i+1] = sccvar[i];
+		f.push_back(clause1);
+	}
+	// clauses for at most one SCC
+	clause2.clear();
+	clause2.push_back(-x);
+	clause2.push_back(0);
+	clause2.push_back(0);
+	clause2.push_back(0);
+	for(unsigned int i=0; i<scc.size(); ++i)
+	{
+		clause2[1] = -sccvar[i];
+		for(unsigned j=i+1; j<scc.size(); ++j)
+		{
+			clause2[2] = -sccvar[j];
+			f.push_back(clause2);
+		}
+	}
+	return x;
+}
+
+/** The property of a given set variable being contained in a strongly connected component of the net.
+	@param sv The set variable.
+*/
+void Formula::XinSCC(setVar sv) {
+	if (sv==0) return; // no set variable given
+	boolVar base(svtov[sv]); // offset for sv
+	if (scc.empty()) { // we need to compute the SCCs first
+		Tarjan tj(pn); 
+		tj.buildGraph(); 
+		tj.getComponents(scc);
+	}
+	// now create one boolean variable for each SCC
+	vector<boolVar> sccvar;
+	if (verbose)
+		for (unsigned int i=0; i<scc.size(); ++i)
+		{
+			stringstream sstr;
+			string sccvarname;
+			sstr << "_inscc_" << i;
+			sstr >> sccvarname;
+			sccvar.push_back(createVar(sv,sccvarname));
+		}
+	else
+		for (unsigned int i=0; i<scc.size(); ++i)
+			sccvar.push_back(createVar());
+	// set a variable if its SCC collides with sv
+	vector<Literal> clause1,clause2;
+	clause2.push_back(0);
+	clause2.push_back(0);
+	clause2.push_back(0);
+	for(unsigned int i=0; i<scc.size(); ++i)
+	{
+		clause1.clear();
+		clause1.push_back(-sccvar[i]);
+		clause2[0] = sccvar[i];
+		set<Place*>::iterator pit;
+		for(pit=scc[i].begin(); pit!=scc[i].end(); ++pit)
+		{
+			clause1.push_back(base+p2id[*pit]);
+			clause2[1] = -(base+p2id[*pit]);
+			f.push_back(clause2);
+		}
+		clause1.push_back(0);
+		f.push_back(clause1);
+	}
+	// clauses for at most one SCC
+	clause2.clear();
+	clause2.push_back(0);
+	clause2.push_back(0);
+	clause2.push_back(0);
+	for(unsigned int i=0; i<scc.size(); ++i)
+	{
+		clause2[0] = -sccvar[i];
+		for(unsigned j=i+1; j<scc.size(); ++j)
+		{
+			clause2[1] = -sccvar[j];
+			f.push_back(clause2);
+		}
+	}
+}
+
+/** The property of a given set variable representing a set of places covering at least one
+	strongly connected component of the net completely.
+	@param sv The set variable.
+	@return A variable representing if sv covers an SCC.
+*/
+boolVar Formula::CoverSCC(setVar sv) {
+	if (sv==0) return 0; // no set variable given
+	boolVar base(svtov[sv]); // offset for sv
+	boolVar x; // the final result
+	if (verbose) x=createVar(sv,"_covscc");
+	else x=createVar();
+	if (scc.empty()) { // we need to compute the SCCs first
+		Tarjan tj(pn); 
+		tj.buildGraph(); 
+		tj.getComponents(scc);
+	}
+	// now create one boolean variable for each SCC
+	vector<boolVar> sccvar;
+	if (verbose)
+		for (unsigned int i=0; i<scc.size(); ++i)
+		{
+			stringstream sstr;
+			string sccvarname;
+			sstr << "_covscc_" << i;
+			sstr >> sccvarname;
+			sccvar.push_back(createVar(sv,sccvarname));
+		}
+	else
+		for (unsigned int i=0; i<scc.size(); ++i)
+			sccvar.push_back(createVar());
+	// set a variable if its SCC in contained completely in sv
+	vector<Literal> clause1,clause2;
+	clause2.push_back(0);
+	clause2.push_back(0);
+	clause2.push_back(0);
+	for(unsigned int i=0; i<scc.size(); ++i)
+	{
+		clause1.clear();
+		clause1.push_back(sccvar[i]);
+		clause2[0] = -sccvar[i];
+		set<Place*>::iterator pit;
+		for(pit=scc[i].begin(); pit!=scc[i].end(); ++pit)
+		{
+			clause1.push_back(-(base+p2id[*pit]));
+			clause2[1] = base+p2id[*pit];
+			f.push_back(clause2);
+		}
+		clause1.push_back(0);
+		f.push_back(clause1);
+	}
+	// clauses for at least one SCC
+	clause1.clear();
+	clause1.push_back(-x);
+	for(unsigned int i=0; i<scc.size(); ++i)
+		clause1.push_back(sccvar[i]);
+	clause1.push_back(0);
+	f.push_back(clause1);
+	// clauses for no SCC covered
+	clause2.clear();
+	clause2.push_back(x);
+	clause2.push_back(0);
+	clause2.push_back(0);
+	for(unsigned int i=0; i<scc.size(); ++i)
+	{
+		clause2[1] = -sccvar[i];
+		f.push_back(clause2);
+	}
+	return x;
+}
+
+/** The property of a given set variable representing a set of places covering at least one
+	strongly connected component of the net completely.
+	@param sv The set variable.
+*/
+void Formula::XcoverSCC(setVar sv) {
+	if (sv==0) return; // no set variable given
+	boolVar base(svtov[sv]); // offset for sv
+	if (scc.empty()) { // we need to compute the SCCs first
+		Tarjan tj(pn); 
+		tj.buildGraph(); 
+		tj.getComponents(scc);
+	}
+	// now create one boolean variable for each SCC
+	vector<boolVar> sccvar;
+	if (verbose)
+		for (unsigned int i=0; i<scc.size(); ++i)
+		{
+			stringstream sstr;
+			string sccvarname;
+			sstr << "_covscc_" << i;
+			sstr >> sccvarname;
+			sccvar.push_back(createVar(sv,sccvarname));
+		}
+	else
+		for (unsigned int i=0; i<scc.size(); ++i)
+			sccvar.push_back(createVar());
+	// set a variable if its SCC in contained completely in sv
+	vector<Literal> clause1,clause2;
+	clause2.push_back(0);
+	clause2.push_back(0);
+	clause2.push_back(0);
+	for(unsigned int i=0; i<scc.size(); ++i)
+	{
+		clause1.clear();
+		clause1.push_back(sccvar[i]);
+		clause2[0] = -sccvar[i];
+		set<Place*>::iterator pit;
+		for(pit=scc[i].begin(); pit!=scc[i].end(); ++pit)
+		{
+			clause1.push_back(-(base+p2id[*pit]));
+			clause2[1] = base+p2id[*pit];
+			f.push_back(clause2);
+		}
+		clause1.push_back(0);
+		f.push_back(clause1);
+	}
+	// clauses for at least one SCC
+	clause1.clear();
+	for(unsigned int i=0; i<scc.size(); ++i)
+		clause1.push_back(sccvar[i]);
+	clause1.push_back(0);
+	f.push_back(clause1);
 }
 

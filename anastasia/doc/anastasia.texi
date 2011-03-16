@@ -331,8 +331,9 @@ Clauses come in four flavors:
 @cartouche
 @smallexample
 ForcedSet: Siphon(X), Trap(X), MaxTrap(X,Y), Empty(X), Nonempty(X), Marked(X), Unmarked(X), 
-           Subset(X,Y)
-EquiSet: x<->Siphon(X), x<->Trap(X), x<->MaxTrap(X), x<->Empty(X), x<->Marked(X), x<->Subset(X)
+           Subset(X,Y), InSCC(X), CoverSCC(X)
+EquiSet: x<->Siphon(X), x<->Trap(X), x<->MaxTrap(X), x<->Empty(X), x<->Marked(X), x<->Subset(X),
+           x<->InSCC(X), x<->CoverSCC(X)
 BoolExp: x<->a op b, x<->AND a b c, x<->OR a b c; with op being one of: and,or,->,<->
 Literal: x, -x.
 @end smallexample
@@ -342,7 +343,9 @@ The clauses of the @samp{ForcedSet} demand that the mentioned set variables have
 that @samp{X} is a siphon for @samp{Siphon(X)}, that @samp{Y} is the maximal trap in @samp{X} for @samp{MaxTrap(X,Y)}, or that @samp{X} is a
 subset (or equal to) @samp{Y} for @samp{Subset(X,Y)}. @samp{Nonempty(X)} and @samp{Empty(X)} means that @samp{X}
 should contain a place or not, @samp{Marked(X)} and @samp{Unmarked(X)} means that at least one place in @samp{X}
-should contain a token in the initial marking of the Petri net, or not.
+should contain a token in the initial marking of the Petri net, or not. @samp{InSCC(X)} and @samp{CoverSCC(X)}
+ensure that @samp{X} is contained in or covering the places of a strongly connected connected component
+of the Petri net, respectively.
 
 Clauses of the @samp{EquiSet} will declare a boolean variable that becomes true if and only if the named property is true.
 Boolean variables may not be declared twice, i.e. you need to use a different name for each boolean variable introduced
@@ -405,6 +408,18 @@ When the covering set of results is printed, each result will be precluded by th
 After all results have been shown, a list of all places that could not be covered is also given.
 
 Finally, by selecting none of the above modifiers, one can obtain a set of places satisfying the unmodified property.
+
+@section Recognizing sets of places
+
+Instead of computing sets of places satisfying a property, it is also possible to just check if a given set of places
+has the property. As the property is user-definable, usually the time complexity for recognition will be less than
+optimal, espaecially for simple structural properties. Sets of places to be checked can be written into a file which is read by
+Anastasia using the option @option{-r}. Blanks or newline characters separate different sets of places while a comma
+is used to separate places inside a set. Anastasia will check each set in the file with respect to the chosen property.
+If the property holds, all important assignments for set variables will be printed. E.g. for the user-defined formula
+for Commoner-Hack from above, the file might contain sets of places that could be siphons without a marked trap (or not).
+If Anastasia detects that one of the sets is such a siphon, the siphon and its included maximal trap will be printed
+since the line @samp{FORMULA(X,Y):} defines both, the siphon and its maximal trap, as important.
 
 @section Finding a Witness against Liveness in Free-Choice nets
 
@@ -514,6 +529,15 @@ The given Petri net file could not be interpreted correctly. Check the format op
 @smallexample
 @cartouche
 anastasia: <varying error message from the parser> -- aborting [#02]
+@end cartouche
+@end smallexample
+
+@item #03
+The given file of sets of places for the recognition option @option{-r} was inaccessible.
+
+@smallexample
+@cartouche
+anastasia: could not read file 'FILENAME' for option -r -- aborting [#03]
 @end cartouche
 @end smallexample
 

@@ -1,6 +1,13 @@
 @c <<-- CHANGE START (version information) -->>
 
-@heading Version 1.0-unreleased (25 October 2010)
+@heading Version 1.1 (16 March 2011)
+@itemize
+@item User defined formula supports checking for strongly connected components.
+
+@item Solutions can also be recognized with -r, not only computed.
+@end itemize
+
+@heading Version 1.0 (25 October 2010)
 @itemize
 @item First version of Anastasia
 

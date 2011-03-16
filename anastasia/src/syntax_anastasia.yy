@@ -17,7 +17,7 @@
  along with Anastasia.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
 
-%token SIPHON TRAP MAXTRAP EMPTY NEMPTY MARKED UNMARKED SUBSET OPAND OPOR OPIMPL OPEQU BIGAND BIGOR NEGATION COMMA SETNAME VARNAME POPEN PCLOSE FORMULA COLON
+%token SIPHON TRAP MAXTRAP EMPTY NEMPTY MARKED UNMARKED SUBSET INSCC COVERSCC OPAND OPOR OPIMPL OPEQU BIGAND BIGOR NEGATION COMMA SETNAME VARNAME POPEN PCLOSE FORMULA COLON
 
 %defines
 %name-prefix="anastasia_"
@@ -79,12 +79,16 @@ clause:
 |	MARKED POPEN xsetname PCLOSE { pf->XMarked(Xvar); }
 |	UNMARKED POPEN xsetname PCLOSE { pf->XNMarked(Xvar); }
 |	SUBSET POPEN xsetname COMMA ysetname PCLOSE { pf->XSubset(Xvar,Yvar); }
+|	INSCC POPEN xsetname PCLOSE { pf->XinSCC(Xvar); }
+|	COVERSCC POPEN xsetname PCLOSE { pf->XcoverSCC(Xvar); }
 |	varname OPEQU SIPHON POPEN xsetname PCLOSE { Bvar = pf->Siphon(Xvar); pf->setVarName(Bvar,Bname); vars[Bname]=Bvar; }
 |	varname OPEQU TRAP POPEN xsetname PCLOSE { Bvar = pf->Trap(Xvar); pf->setVarName(Bvar,Bname); vars[Bname]=Bvar; }
 |	varname OPEQU MAXTRAP POPEN xsetname COMMA ysetname PCLOSE { Bvar = pf->MaxTrap(Xvar,Yvar); pf->setVarName(Bvar,Bname); vars[Bname]=Bvar; }
 |	varname OPEQU EMPTY POPEN xsetname PCLOSE { Bvar = pf->Empty(Xvar); pf->setVarName(Bvar,Bname); vars[Bname]=Bvar; }
 |	varname OPEQU MARKED POPEN xsetname PCLOSE { Bvar = pf->Marked(Xvar); pf->setVarName(Bvar,Bname); vars[Bname]=Bvar; }
 |	varname OPEQU SUBSET POPEN xsetname COMMA ysetname PCLOSE { Bvar = pf->Subset(Xvar,Yvar); pf->setVarName(Bvar,Bname); vars[Bname]=Bvar; }
+|	varname OPEQU INSCC POPEN xsetname PCLOSE { Bvar = pf->InSCC(Xvar); pf->setVarName(Bvar,Bname); vars[Bname]=Bvar; }
+|	varname OPEQU COVERSCC POPEN xsetname PCLOSE { Bvar = pf->CoverSCC(Xvar); pf->setVarName(Bvar,Bname); vars[Bname]=Bvar; }
 |	varname OPEQU bformula
 |	literal { pf->SetTo((Lvar>0?Lvar:-Lvar),(Lvar>0)); }
 ;

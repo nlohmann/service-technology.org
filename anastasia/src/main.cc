@@ -48,6 +48,7 @@ using std::string;
 using std::stringstream;
 using std::ostream;
 using std::ofstream;
+using std::ifstream;
 
 /// the command line parameters
 gengetopt_args_info args_info;
@@ -71,6 +72,9 @@ extern Formula* pf;
 extern vector<setVar> mainvars;
 vector<string> mainvarName;
 setVar generateFormula(Formula& f);
+
+/// for reading sets of places from an input file
+bool readPlaceSets(PetriNet& pn, char* filename, vector<set<Place*> >& pv);
 
 /// check if a file exists and can be opened for reading
 inline bool fileExists(const std::string& filename) {
@@ -238,7 +242,119 @@ int main(int argc, char** argv) {
 	}
 
     /*----------------------------------------.
-    | 3. Check the Property                   |
+    | 3. Recognition                          |
+    `----------------------------------------*/
+
+	vector<set<Place*> > recsets;
+	if (args_info.recognize_given) {
+		if (!readPlaceSets(net,args_info.recognize_arg,recsets))
+			abort(3,"could not read file '%s' for option -r",args_info.recognize_arg);
+		time_t mytime(clock()); // measure time for formula creation and evaluation
+		// here we start generating the formula to be checked, according to the selected property	
+		Formula* gf(NULL); // general formula	
+		setVar X(0); // the main variable for which the user wants so see the satisfying assignment
+		if (!args_info.nocopy_given) // formula may be needed more than once and can be copied
+		{	
+			gf = new Formula(net);
+			X = generateFormula(*gf);
+		}
+
+		// Output header
+		cout << "Recognized as ";
+		if (args_info.utrap_given) cout << "unmarked traps:" << endl;
+		if (args_info.mtrap_given) cout << "marked traps:" << endl;
+		if (args_info.trap_given) cout << "traps:" << endl;
+		if (args_info.usiphon_given) cout << "unmarked siphons:" << endl;
+		if (args_info.msiphon_given) cout << "marked siphons:" << endl;
+		if (args_info.siphon_given) cout << "siphons:" << endl;
+		if (args_info.swot_given) cout << "siphons without trap:" << endl;
+		if (args_info.swomt_given) cout << "siphons without marked trap:" << endl;
+		if (args_info.formula_given) cout << "satisfying the formula:" << endl;
+		bool atleastone(false); // to be able to output "no solutions"
+
+		set<Place*> enforce,forbid; // for enforcing or forbidding place membership in a solution
+		Place* p(NULL);
+		for(unsigned int i=0; i<args_info.include_given; ++i) // read in the option --include
+		{
+			p = net.findPlace(args_info.include_arg[i]);
+			if (p) enforce.insert(p);
+			p = NULL;
+		}	
+		for(unsigned int i=0; i<args_info.exclude_given; ++i) // read in the option --exclude
+		{
+			p = net.findPlace(args_info.exclude_arg[i]);
+			if (p) forbid.insert(p);
+			p = NULL;
+		}
+
+		// go through all sets of places from the file and check them
+		for(unsigned int k=0; k<recsets.size(); ++k)
+		{
+			// here we start generating the formula to be checked, according to the selected property	
+			Formula f(net);	
+			if (gf) f.copyFormula(*gf); // we are allowed to copy the general formula
+			else X = generateFormula(f); // the general formula does not exist, we build our formula here
+
+			// now we add the forced and forbidden places to the formula
+			for(set<Place*>::iterator pit=enforce.begin(); pit!=enforce.end(); ++pit)	
+				f.SetTo(f.getVar(X,**pit),true);
+			for(set<Place*>::iterator pit=forbid.begin(); pit!=forbid.end(); ++pit)	
+				f.SetTo(f.getVar(X,**pit),false);
+			// next, set X to the given set from the file
+			set<Place*> pall(net.getPlaces());
+			for(set<Place*>::iterator pit=recsets[k].begin(); pit!=recsets[k].end(); ++pit)	
+			{
+				f.SetTo(f.getVar(X,**pit),true);
+				pall.erase(*pit);
+			}
+			// and set everything to false that isn't in the set of places
+			for(set<Place*>::iterator pit=pall.begin(); pit!=pall.end(); ++pit)	
+				f.SetTo(f.getVar(X,**pit),false);
+			if (args_info.verbose_given) { 
+				status("Formula constructed in %.2f seconds.",(float)(clock()-mytime)/CLOCKS_PER_SEC);
+				mytime = clock();
+			}
+			if (args_info.clauses_given && k==0) { // the user wants to see the clauses, so print them
+				if (args_info.clauses_arg) { // either to the given file
+					ofstream outfile(args_info.clauses_arg);
+					if (!outfile.is_open()) abort(6,"error while writing clauses to file '%s'",args_info.clauses_arg);
+					f.printClauses(outfile);
+					outfile.close();
+				} else f.printClauses(cout); // or to stdout
+				mytime = clock(); // printing the clauses doesn't count for the solving time
+			}
+			if (!f.solve()) {
+				if (args_info.verbose_given) {
+					status("SAT-solving failed in %.2f seconds.",(float)(clock()-mytime)/CLOCKS_PER_SEC);
+					mytime = clock();
+				}
+			} else { // if there is a solution
+				atleastone = true;
+				if (args_info.verbose_given) {
+					status("SAT-solving successful in %.2f seconds.",(float)(clock()-mytime)/CLOCKS_PER_SEC);
+					mytime = clock();
+				}
+				for(set<Place*>::iterator pit=recsets[k].begin(); pit!=recsets[k].end(); ++pit)
+					cout << (*pit)->getName() << " ";
+				cout << endl;
+				for(unsigned int j=1; j<mainvars.size(); ++j)
+				{
+					set<Place*> einfo(f.getAssignment(mainvars[j]));
+					cout << "   A corresponding satisfying assignment for " << mainvarName[j] << " is" << endl << "   ";
+					bool something(false);
+					for(set<Place*>::iterator pit=einfo.begin(); pit!=einfo.end(); ++pit,something=true)
+						cout << (*pit)->getName() << " ";
+					if (!something) cout << "<empty set>";
+					cout << endl;
+				}
+			}
+		}
+		if (!atleastone) cout << "<empty list>" << endl;
+		return EXIT_SUCCESS;
+	}
+
+    /*----------------------------------------.
+    | 4. Check the Property                   |
     `----------------------------------------*/
 
 	// first some info for the option --cover going over all the places
@@ -367,7 +483,7 @@ int main(int argc, char** argv) {
 		if (args_info.usiphon_given) cout << " unmarked siphon";
 		if (args_info.msiphon_given) cout << " marked siphon";
 		if (args_info.siphon_given) cout << " siphon";
-		if (args_info.formula_given) cout << " satisifying set";
+		if (args_info.formula_given) cout << " satisfying set";
 		cout << "s ( place ) = " << endl << endl;
 		unsigned int nr(1);
 		for(mit=coverinfo.begin(); mit!=coverinfo.end(); ++mit,++nr)
@@ -439,7 +555,7 @@ int main(int argc, char** argv) {
 	}
 
     /*----------------------------------------.
-    | 3. Check for a Witness Path             |
+    | 5. Check for a Witness Path             |
     `----------------------------------------*/
 
 	// we may check for a witness path if the previous algorithm provided us with
@@ -455,6 +571,14 @@ int main(int argc, char** argv) {
 		w.initSWOMT(coverinfo.begin()->first); // with its initial node being the found siphon
 		vector<Transition*> fseq; // the firing sequence, to be filled by computeGraph
 		set<Place*> siphon(w.computeGraph(fseq)); // here the graph gets constructed and we find a result
+/* for plots uncomment this:
+mytime = clock()-mytime;
+ofstream plotfile ( "plotfile.txt", std::ios::app );
+plotfile << (float)(net.getPlaces().size())/37.5 << " ";
+if (mytime>5625) plotfile << "7.5 + " << endl; else plotfile << (float)(mytime)/750 << " " << endl;
+cout << CLOCKS_PER_SEC << endl;
+plotfile.close();
+*/
 		status("emptying path found%s in %.2f seconds.",(loop[0]?" for "+loop[0]->getName():"").c_str(),(float)(clock()-mytime)/CLOCKS_PER_SEC);
 		set<Place*>::iterator pit;
 		if (args_info.snoopy_given) { // output for snoopy
@@ -539,5 +663,32 @@ setVar generateFormula(Formula& f) {
 	return X;
 }
 
+bool readPlaceSets(PetriNet& pn, char* filename, vector<set<Place*> >& pv) {
+	ifstream infile(filename);
+	if (!infile) return false;
+	string in;
+	unsigned int nr(0);
+	pv.clear();
+	while (infile >> in) 
+	{
+		++nr;
+		set<Place*> pset;
+		char* seq = new char[strlen(in.c_str())+1];
+		strcpy(seq,in.c_str()); 
+		char* tok = strtok(seq,","); 
+		while (tok!=NULL) {
+			string placename(tok);
+			Place* p(pn.findPlace(placename));
+			if (p) pset.insert(p);
+			else status("Unknown place '%s' on line %d in file %s",placename.c_str(),nr,filename);
+			// on to the next place
+			tok = strtok(NULL,",");
+		}
+		delete[] seq;
+		pv.push_back(pset);
+	}
+	infile.close();
+	return true;
+}
 
 /* <<-- CHANGE END -->> */

@@ -9,9 +9,9 @@
  *
  * \since   2010/10/20
  *
- * \date    $Date: 2010-10-20 11:22:00 +0200 (Mi, 20. Okt 2010) $
+ * \date    $Date: 2011-03-16 11:22:00 +0200 (Mi, 16. Mar 2011) $
  *
- * \version $Revision: 1.0 $
+ * \version $Revision: 1.1 $
  */
 
 #ifndef FORMULA_H
@@ -24,6 +24,7 @@
 #include <iostream>
 #include <sstream>
 #include <pnapi/pnapi.h>
+#include "tarjan.h"
 
 using std::set;
 using std::vector;
@@ -174,6 +175,18 @@ public:
 	/// Minimize or maximize the solution of the formula regarding a set variable
 	void MinMax(setVar sv, bool maximize, set<Place*>* enforce=NULL, set<Place*>* forbid=NULL, Place* pgen=NULL);
 
+	/// The property of being contained in an SCC for a set variable, encapsulated in a boolVar
+	boolVar InSCC(setVar sv);
+
+	/// The property of being contained in an SCC for a set variable
+	void XinSCC(setVar sv);
+
+	/// The property of containing an SCC for a set variable, encapsulated in a boolVar
+	boolVar CoverSCC(setVar sv);
+
+	/// The property of containing an SCC for a set variable
+	void XcoverSCC(setVar sv);
+
 	/// Verbosity of 1 will allow variable naming
 	int verbose;
 private:
@@ -212,6 +225,9 @@ private:
 
 	/// If the formula was satisfiable
 	bool satisfied;
+
+	/// A vector containing the strongly connected components of the net (places only)
+	vector<set<Place*> > scc;
 };
 
 #endif

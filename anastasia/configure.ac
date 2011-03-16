@@ -1,4 +1,4 @@
-AC_INIT(Anastasia, 1.0, anastasia@service-technology.org, anastasia, http://service-technology.org/anastasia)
+AC_INIT(Anastasia, 1.1, anastasia@service-technology.org, anastasia, http://service-technology.org/anastasia)
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])

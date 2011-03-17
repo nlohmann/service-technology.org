@@ -84,15 +84,14 @@ AT_CLEANUP
 AT_SETUP([CSV Output])
 AT_CHECK([cp TESTFILES/test2.owfn .])
 AT_CHECK([ANASTASIA --mtrap --owfn --outcsv test2.owfn], 0, stdout, ignore)
-AT_CHECK([GREP -q "p1,p3" stdout], 0, ignore)
+AT_CHECK([GREP -q "p.,p." stdout], 0, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
 AT_SETUP([CSV Output, Recognition])
 AT_CHECK([cp TESTFILES/test2.owfn TESTFILES/insets.txt .])
 AT_CHECK([ANASTASIA --mtrap --owfn --outcsv -rinsets.txt test2.owfn], 0, stdout, ignore)
-AT_CHECK([GREP -q "p1,p3" stdout], 0, ignore)
-AT_CHECK([GREP -q "p1,p2,p3" stdout], 0, ignore)
+AT_CHECK([GREP -q "p.,p.,p." stdout], 0, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -100,8 +99,7 @@ AT_SETUP([Stdout, Recognition])
 AT_CHECK([cp TESTFILES/test2.owfn TESTFILES/insets.txt .])
 AT_CHECK([ANASTASIA --mtrap --owfn -rinsets.txt test2.owfn], 0, stdout, ignore)
 AT_CHECK([GREP -q "Recognized as marked traps" stdout], 0, ignore)
-AT_CHECK([GREP -q "p1 p3" stdout], 0, ignore)
-AT_CHECK([GREP -q "p1 p2 p3" stdout], 0, ignore)
+AT_CHECK([GREP -q "p. p. p." stdout], 0, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 

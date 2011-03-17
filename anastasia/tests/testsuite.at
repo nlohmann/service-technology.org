@@ -71,6 +71,40 @@ AT_CHECK([GREP -q "|p1" stdout], 0, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
+AT_SETUP([Snoopy Output, Recognition])
+AT_CHECK([cp TESTFILES/test2.owfn TESTFILES/insets.txt .])
+AT_CHECK([ANASTASIA --mtrap --owfn --snoopy -rinsets.txt test2.owfn], 0, stdout, ignore)
+AT_CHECK([GREP -q "4" stdout], 0, ignore)
+AT_CHECK([GREP -q "5" stdout], 0, ignore)
+AT_CHECK([GREP -q "6" stdout], 1, ignore)
+AT_CHECK([GREP -q "7" stdout], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([CSV Output])
+AT_CHECK([cp TESTFILES/test2.owfn .])
+AT_CHECK([ANASTASIA --mtrap --owfn --outcsv test2.owfn], 0, stdout, ignore)
+AT_CHECK([GREP -q "p1,p3" stdout], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([CSV Output, Recognition])
+AT_CHECK([cp TESTFILES/test2.owfn TESTFILES/insets.txt .])
+AT_CHECK([ANASTASIA --mtrap --owfn --outcsv -rinsets.txt test2.owfn], 0, stdout, ignore)
+AT_CHECK([GREP -q "p1,p3" stdout], 0, ignore)
+AT_CHECK([GREP -q "p1,p2,p3" stdout], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Stdout, Recognition])
+AT_CHECK([cp TESTFILES/test2.owfn TESTFILES/insets.txt .])
+AT_CHECK([ANASTASIA --mtrap --owfn -rinsets.txt test2.owfn], 0, stdout, ignore)
+AT_CHECK([GREP -q "Recognized as marked traps" stdout], 0, ignore)
+AT_CHECK([GREP -q "p1 p3" stdout], 0, ignore)
+AT_CHECK([GREP -q "p1 p2 p3" stdout], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Properties])
 ############################################################################
@@ -188,6 +222,26 @@ AT_CHECK([cp TESTFILES/test.owfn TESTFILES/formula3.txt .])
 AT_CHECK([ANASTASIA test.owfn --owfn --formula=formula3.txt --clauses], 0, stdout, ignore)
 AT_CHECK([GREP -q "assignment for Y" stdout], 0, ignore)
 AT_CHECK([GREP -q "p. p. p. p. p. p." stdout], 0, ignore)
+AT_KEYWORDS(userdefined)
+AT_CLEANUP
+
+AT_SETUP([SCC-Siphon using ForceSet])
+AT_CHECK([cp TESTFILES/fcSWOMT4.owfn TESTFILES/formula4.txt .])
+AT_CHECK([ANASTASIA fcSWOMT4.owfn --owfn --formula=formula4.txt -iptl1 --max], 0, stdout, ignore)
+AT_CHECK([GREP -q "maximal sat" stdout], 0, ignore)
+AT_CHECK([GREP -q "p.l. p.l. p.l. p.l. p.l." stdout], 0, ignore)
+AT_CHECK([GREP -q "p.r." stdout], 1, ignore)
+AT_CHECK([GREP -q "ptle" stdout], 1, ignore)
+AT_KEYWORDS(userdefined)
+AT_CLEANUP
+
+AT_SETUP([SCC-Siphon using EquSet])
+AT_CHECK([cp TESTFILES/fcSWOMT4.owfn TESTFILES/formula5.txt .])
+AT_CHECK([ANASTASIA fcSWOMT4.owfn --owfn --formula=formula5.txt -iptr1 --max], 0, stdout, ignore)
+AT_CHECK([GREP -q "maximal sat" stdout], 0, ignore)
+AT_CHECK([GREP -q "p.r. p.r. p.r. p.r. p.r." stdout], 0, ignore)
+AT_CHECK([GREP -q "p.l." stdout], 1, ignore)
+AT_CHECK([GREP -q "ptre" stdout], 1, ignore)
 AT_KEYWORDS(userdefined)
 AT_CLEANUP
 
@@ -385,6 +439,13 @@ AT_SETUP([Wrong Petri net format])
 AT_CHECK([cp TESTFILES/test.owfn .])
 AT_CHECK([ANASTASIA test.owfn --lola --swomt ], 1, stdout, stderr)
 AT_CHECK([GREP -q "aborting ..02." stderr], 0, ignore)
+AT_KEYWORDS(fatalerrors)
+AT_CLEANUP
+
+AT_SETUP([File for recognition missing])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([ANASTASIA test.owfn --owfn --swomt -rrec.txt ], 1, stdout, stderr)
+AT_CHECK([GREP -q "aborting ..03." stderr], 0, ignore)
 AT_KEYWORDS(fatalerrors)
 AT_CLEANUP
 

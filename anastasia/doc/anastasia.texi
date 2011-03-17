@@ -269,7 +269,9 @@ an additional transition. This can be useful when checking a free-choice net for
 By default, Anastasia prints out a set of places with a given property to standard output. The places are
 printed on a single line separated by blanks. The property is stated in a line above the places.
 Alternate formats will be implemented if necessary. At the moment, output can be formatted for the
-tool Snoopy by specifying the option @option{--snoopy}.
+tool Snoopy by specifying the option @option{--snoopy} or to be reused with Anastasia's recognition
+option @option{--recognize} by specifying the option @option{--outcsv}. In the latter case, the output
+is reduced to (a list of) comma separated values.
 
 There is no output to file at this time, use the shell redirection mechanism if file output is required.
 

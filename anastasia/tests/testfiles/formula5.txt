@@ -1,0 +1,9 @@
+
+FORMULA(X):
+a<->Siphon(X),
+b<->Marked(X),
+c<->InSCC(X),
+d<->CoverSCC(X),
+e<->AND a b c d,
+e;
+

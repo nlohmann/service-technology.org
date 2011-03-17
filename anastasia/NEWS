@@ -8,11 +8,13 @@
 
 
 
-Version 1.1 (16 March 2011)
+Version 1.1 (17 March 2011)
 ===========================
 
 * User defined formula supports checking for strongly connected components.
 
 * Solutions can also be recognized with -r, not only computed.
+
+* Output as (a list of) comma separated values with -o.
 
 \nSee file ChangeLog <http://service-technology.org/files/anastasia/ChangeLog> for\ncomplete version history.\n

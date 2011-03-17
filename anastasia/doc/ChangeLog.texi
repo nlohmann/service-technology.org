@@ -1,10 +1,12 @@
 @c <<-- CHANGE START (version information) -->>
 
-@heading Version 1.1 (16 March 2011)
+@heading Version 1.1 (17 March 2011)
 @itemize
 @item User defined formula supports checking for strongly connected components.
 
 @item Solutions can also be recognized with -r, not only computed.
+
+@item Output as (a list of) comma separated values with -o.
 @end itemize
 
 @heading Version 1.0 (25 October 2010)

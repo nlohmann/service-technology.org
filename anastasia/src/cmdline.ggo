@@ -31,6 +31,11 @@ groupoption "pnml" -
 
 defgroup "Output Format" groupdesc="Choose an option for a different output format:"
 
+groupoption "outcsv" o
+  "Print the output in the format Anastasia can input for recognition."
+  details="This option is used when the output should be read again later by Anastasia.\n"
+  group="Output Format"
+
 groupoption "snoopy" y
   "Print the output in the format of Snoopy."
   details="This option is used when the output should be read by the tool Snoopy.\n"

@@ -260,16 +260,29 @@ int main(int argc, char** argv) {
 		}
 
 		// Output header
-		cout << "Recognized as ";
-		if (args_info.utrap_given) cout << "unmarked traps:" << endl;
-		if (args_info.mtrap_given) cout << "marked traps:" << endl;
-		if (args_info.trap_given) cout << "traps:" << endl;
-		if (args_info.usiphon_given) cout << "unmarked siphons:" << endl;
-		if (args_info.msiphon_given) cout << "marked siphons:" << endl;
-		if (args_info.siphon_given) cout << "siphons:" << endl;
-		if (args_info.swot_given) cout << "siphons without trap:" << endl;
-		if (args_info.swomt_given) cout << "siphons without marked trap:" << endl;
-		if (args_info.formula_given) cout << "satisfying the formula:" << endl;
+		if (args_info.snoopy_given) {
+			if (args_info.swot_given) cout << " bad siphon";
+			if (args_info.swomt_given) cout << " non-ch siphon";
+			if (args_info.utrap_given) cout << " unmarked trap";
+			if (args_info.mtrap_given) cout << " marked trap";
+			if (args_info.trap_given) cout << " trap";
+			if (args_info.usiphon_given) cout << " unmarked siphon";
+			if (args_info.msiphon_given) cout << " marked siphon";
+			if (args_info.siphon_given) cout << " siphon";
+			if (args_info.formula_given) cout << " satisfying set";
+			cout << "s ( place ) = " << endl << endl;
+		} else if (!args_info.outcsv_given) {
+			cout << "Recognized as ";
+			if (args_info.utrap_given) cout << "unmarked traps:" << endl;
+			if (args_info.mtrap_given) cout << "marked traps:" << endl;
+			if (args_info.trap_given) cout << "traps:" << endl;
+			if (args_info.usiphon_given) cout << "unmarked siphons:" << endl;
+			if (args_info.msiphon_given) cout << "marked siphons:" << endl;
+			if (args_info.siphon_given) cout << "siphons:" << endl;
+			if (args_info.swot_given) cout << "siphons without trap:" << endl;
+			if (args_info.swomt_given) cout << "siphons without marked trap:" << endl;
+			if (args_info.formula_given) cout << "satisfying the formula:" << endl;
+		}
 		bool atleastone(false); // to be able to output "no solutions"
 
 		set<Place*> enforce,forbid; // for enforcing or forbidding place membership in a solution
@@ -334,22 +347,44 @@ int main(int argc, char** argv) {
 					status("SAT-solving successful in %.2f seconds.",(float)(clock()-mytime)/CLOCKS_PER_SEC);
 					mytime = clock();
 				}
-				for(set<Place*>::iterator pit=recsets[k].begin(); pit!=recsets[k].end(); ++pit)
-					cout << (*pit)->getName() << " ";
-				cout << endl;
-				for(unsigned int j=1; j<mainvars.size(); ++j)
-				{
-					set<Place*> einfo(f.getAssignment(mainvars[j]));
-					cout << "   A corresponding satisfying assignment for " << mainvarName[j] << " is" << endl << "   ";
-					bool something(false);
-					for(set<Place*>::iterator pit=einfo.begin(); pit!=einfo.end(); ++pit,something=true)
-						cout << (*pit)->getName() << " ";
-					if (!something) cout << "<empty set>";
+				if (args_info.snoopy_given) {
+					cout << k+1;
+					bool comma(false);
+					for(set<Place*>::iterator pit=recsets[k].begin(); pit!=recsets[k].end(); ++pit, comma=true)
+					{
+						if (comma) cout << "," << endl;
+						cout << "\t|";	
+						if ((*pit)->getName().find('.')!=string::npos && (*pit)->getName()[0]=='P')
+							cout << (*pit)->getName().substr(1);
+						else cout << (*pit)->getName();
+						cout << "\t:1";
+					}
 					cout << endl;
+				} else {
+					bool comma(false);
+					for(set<Place*>::iterator pit=recsets[k].begin(); pit!=recsets[k].end(); ++pit, comma=true)
+					{
+						if (args_info.outcsv_given && comma) cout << ",";
+						cout << (*pit)->getName();
+						if (!args_info.outcsv_given) cout << " ";
+					}
+					cout << endl;
+					if (!args_info.outcsv_given)
+						for(unsigned int j=1; j<mainvars.size(); ++j)
+						{
+							set<Place*> einfo(f.getAssignment(mainvars[j]));
+							cout << "   A corresponding satisfying assignment for " << mainvarName[j] << " is" << endl << "   ";
+							bool something(false);
+							for(set<Place*>::iterator pit=einfo.begin(); pit!=einfo.end(); ++pit,something=true)
+								cout << (*pit)->getName() << " ";
+							if (!something) cout << "<empty set>";
+							cout << endl;
+						}
 				}
 			}
 		}
-		if (!atleastone) cout << "<empty list>" << endl;
+		if (!atleastone && !args_info.snoopy_given && !args_info.outcsv_given) 
+			cout << "<empty list>" << endl;
 		return EXIT_SUCCESS;
 	}
 
@@ -462,15 +497,17 @@ int main(int argc, char** argv) {
 	// we are done, now we can print the result
 	set<Place*>::iterator pit;
 	if (coverinfo.size()==0) { // if there is no positive result ...
-		if (args_info.utrap_given) cout << "No unmarked trap found." << endl;
-		if (args_info.mtrap_given) cout << "No marked trap found." << endl;
-		if (args_info.trap_given) cout << "No trap found." << endl;
-		if (args_info.usiphon_given) cout << "No unmarked siphon found." << endl;
-		if (args_info.msiphon_given) cout << "No marked siphon found." << endl;
-		if (args_info.siphon_given) cout << "No siphon found." << endl;
-		if (args_info.swot_given || args_info.swomt_given)
-			cout << "Every siphon contains a " << (args_info.swomt_given?"marked ":"") << "trap." << endl;
-		if (args_info.formula_given) cout << "The formula is unsatisfiable." << endl;
+		if (!args_info.outcsv_given) {
+			if (args_info.utrap_given) cout << "No unmarked trap found." << endl;
+			if (args_info.mtrap_given) cout << "No marked trap found." << endl;
+			if (args_info.trap_given) cout << "No trap found." << endl;
+			if (args_info.usiphon_given) cout << "No unmarked siphon found." << endl;
+			if (args_info.msiphon_given) cout << "No marked siphon found." << endl;
+			if (args_info.siphon_given) cout << "No siphon found." << endl;
+			if (args_info.swot_given || args_info.swomt_given)
+				cout << "Every siphon contains a " << (args_info.swomt_given?"marked ":"") << "trap." << endl;
+			if (args_info.formula_given) cout << "The formula is unsatisfiable." << endl;
+		}
 	} else if (args_info.snoopy_given && !args_info.witness_given) { // if output format snoopy was selected ...
 		if (args_info.min_given) cout << " minimal";
 		if (args_info.pmin_given) cout << " place-minimal";
@@ -498,6 +535,17 @@ int main(int argc, char** argv) {
 					cout << (*pit)->getName().substr(1);
 				else cout << (*pit)->getName();
 				cout << "\t:1";
+			}
+			cout << endl;
+		}
+	} else if (args_info.outcsv_given) { // if short csv output was selected
+		for(mit=coverinfo.begin(); mit!=coverinfo.end(); ++mit)
+		{
+			bool something(false);
+			for(pit=mit->first.begin(); pit!=mit->first.end(); ++pit,something=true)
+			{
+				if (something) cout << ",";
+				cout << (*pit)->getName();
 			}
 			cout << endl;
 		}

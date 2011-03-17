@@ -10,9 +10,10 @@
 # <<-- CHANGE START (testfiles) -->>
 TESTFILES = test.owfn test.pnml test2.owfn \
 		philsfc.llnet phils10.llnet \
-		fcSWOMT1.owfn fcSWOMT2.owfn fcSWOMT3.owfn \
-		formula.txt formula2.txt formula3.txt defectiveformula.txt rvalformula.txt lvalformula.txt \
-		anastasia.conf
+		fcSWOMT1.owfn fcSWOMT2.owfn fcSWOMT3.owfn fcSWOMT4.owfn \
+		formula.txt formula2.txt formula3.txt formula4.txt \
+		formula5.txt defectiveformula.txt rvalformula.txt lvalformula.txt \
+		insets.txt anastasia.conf
 # <<-- CHANGE END -->>
 
 

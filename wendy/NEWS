@@ -20,8 +20,6 @@ Version 3.2-unreleased
 * updated LCOV (`http://ltp.sourceforge.net/coverage/lcov.php') to 1.9 and
   removed ZCOV, because LCOV can do branch coverage as well
 
-* added `silence' utility to implement reduction of internal actions
-
 * implemented `--internalReduction' parameter to reduce internal actions
   using the algorithm described in
 

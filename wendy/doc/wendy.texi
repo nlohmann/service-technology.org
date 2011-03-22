@@ -170,6 +170,8 @@ In order to run, compile, and develop Wendy, several tools are required.
 @item copy the binary @file{src/lola-statespace} to a directory of your path
 (e.g., @file{/usr/local/bin}) or call @samp{make install}
 @end enumerate
+
+If LoLA is not installed before Wendy is configured, a source release of LoLA is automatically downloaded and compiled.
 @end itemize
 
 Wendy's configure script checks whether LoLA (with binary @file{lola-statespace}) is found in the path and adjusts the configuration file @file{src/wendy.conf} accordingly.
@@ -179,7 +181,7 @@ Wendy's configure script checks whether LoLA (with binary @file{lola-statespace}
 To compile the source code from a source distribution, the following tools are required.
 
 @itemize
-@item GCC (@url{http://gcc.gnu.org/})
+@item GCC (@url{http://gcc.gnu.org/}) or Clang (@url{http://clang.llvm.org/})
 @item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/})
 @end itemize
 

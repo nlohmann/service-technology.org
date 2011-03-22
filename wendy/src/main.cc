@@ -333,11 +333,16 @@ int main(int argc, char** argv) {
     Output *temp2 = NULL;
     if (args_info.internalReduction_flag) {
         temp2 = Graph::internalReduction(graph_in);
+        pclose(graph_in);
         graph_in = fopen(temp2->name().c_str(), "r");
     }
 
     graph_parse();
-    pclose(graph_in);
+    if (args_info.internalReduction_flag) {
+        fclose(graph_in);
+    } else {
+        pclose(graph_in);
+    }
     graph_lex_destroy();
     time(&end_time);
     status("%s%s is done [%.0f sec]", _ctool_("LoLA"), (args_info.internalReduction_flag ? " and internal reduction" : ""), difftime(end_time, start_time));

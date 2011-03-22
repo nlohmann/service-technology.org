@@ -157,6 +157,18 @@ AT_CHECK([GREP -q "result = true;" myCoffee.results])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
+AT_SETUP([Alignment warning for high message bounds])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK([WENDY myCoffee.owfn --messagebound=16 --lola=],1,ignore,stderr)
+AT_CHECK([GREP -q "wendy: note: a better alignment could save 1 bytes/interface marking" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Memory Management])
+############################################################################
+
 AT_SETUP([Releasing allocated memory])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/PO.owfn .])
@@ -182,6 +194,15 @@ AT_CHECK([cp TESTFILES/myCoffee.owfn .])
 AT_CHECK_LOLA
 AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes WENDY_RAW myCoffee.owfn --finalize],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(valgrind)
+AT_CLEANUP
+
+AT_SETUP([Checking for memory leaks with Valgrind (int.)])
+AT_CHECK([cp TESTFILES/myCoffee.owfn .])
+AT_CHECK_LOLA
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes WENDY_RAW myCoffee.owfn --finalize --internal],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(valgrind)
 AT_CLEANUP
 
 AT_SETUP([Checking for memory leaks with Valgrind (LL-OG)])
@@ -189,13 +210,7 @@ AT_CHECK([cp TESTFILES/zeus.owfn .])
 AT_CHECK_LOLA
 AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes WENDY_RAW zeus.owfn --finalize --correctness=livelock --og],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
-AT_CLEANUP
-
-AT_SETUP([Alignment warning for high message bounds])
-AT_CHECK([cp TESTFILES/myCoffee.owfn .])
-AT_CHECK([WENDY myCoffee.owfn --messagebound=16 --lola=],1,ignore,stderr)
-AT_CHECK([GREP -q "wendy: note: a better alignment could save 1 bytes/interface marking" stderr])
-AT_KEYWORDS(error)
+AT_KEYWORDS(valgrind)
 AT_CLEANUP
 
 

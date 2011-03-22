@@ -25,6 +25,9 @@ Runtime
        4. copy the binary `src/lola-statespace' to a directory of your path
           (e.g., `/usr/local/bin') or call `make install'
 
+     If LoLA is not installed before Wendy is configured, a source release of
+     LoLA is automatically downloaded and compiled.
+
 Wendy's configure script checks whether LoLA (with binary `lola-statespace')
 is found in the path and adjusts the configuration file `src/wendy.conf'
 accordingly.
@@ -35,7 +38,7 @@ Compilation
 To compile the source code from a source distribution, the following tools are
 required.
 
-   * GCC (`http://gcc.gnu.org/')
+   * GCC (`http://gcc.gnu.org/') or Clang (`http://clang.llvm.org/')
 
    * GNU Make (`http://www.gnu.org/software/make/')
 

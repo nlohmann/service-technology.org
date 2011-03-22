@@ -21,7 +21,7 @@ extern FILE* reducedgraph_in;
 using pnapi::Transition;
 typedef std::pair<std::set<unsigned int>::iterator, bool> ii;
 
-Graph Graph::g;
+Graph *Graph::g;
 unsigned int Graph::r1 = 0;
 unsigned int Graph::r2 = 0;
 unsigned int Graph::r62 = 0;
@@ -111,17 +111,6 @@ void Graph::addEdge(unsigned int source, unsigned int target, const char* label)
     if (not ii1.second) {
         r1++;
     }
-}
-
-void Graph::init() {
-    nodeVec.reserve(nodes.size());
-
-    FOREACH(n, nodes) {
-        GraphNode* v = nodes[n->first];
-        assert(n->first == nodeVec.size());
-        nodeVec.push_back(v);
-    }
-    status("initialized node vector (size %lu)", nodeVec.size());
 }
 
 void Graph::addFinal(unsigned int node) {
@@ -600,29 +589,37 @@ GraphNode::GraphNode() : isFinal(false) {}
 
 
 Output *Graph::internalReduction(FILE *fullGraph) {
-    g.initLabels();
+    g = new Graph();
+    g->initLabels();
 
     reducedgraph_in = fullGraph;
     reducedgraph_parse();
     pclose(reducedgraph_in);
     reducedgraph_lex_destroy();
 
-    g.init();
-    g.info();
+    g->info();
 
     static unsigned int i = 0;
     static const unsigned int j = 1000;
 
-    while (g.metaRule()) {
+    while (g->metaRule()) {
         if (++i % j == 0) {
-            g.shortInfo();
+            g->shortInfo();
         }
     }
-    g.info();
+    g->info();
 
-    g.reenumerate();
-    g.tarjan();
+    g->reenumerate();
+    g->tarjan();
 
-    return g.out();
+    Output *result = g->out();
+    delete g;
+    return result;
 }
 
+Graph::~Graph() {
+    FOREACH(node, nodes) {
+        delete node->second;
+        node->second = NULL;
+    }
+}

@@ -14,11 +14,10 @@ class Graph {
         static unsigned int r1, r2, r63, r62;
 
     public:
-        static Graph g;
+        static Graph *g;
 
     private:
         std::map<unsigned int, GraphNode*> nodes;
-        std::vector<GraphNode*> nodeVec;
 
         /// nodes, ordered during the depth-first search
         std::vector<unsigned int> orderedNodes;
@@ -59,6 +58,7 @@ class Graph {
         void addFinal(unsigned int);
 
         static Output *internalReduction(FILE *fullGraph);
+        ~Graph();
 };
 
 class GraphNode {

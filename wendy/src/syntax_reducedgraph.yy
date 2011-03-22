@@ -44,7 +44,7 @@ state:
   markings {
       const bool final = InnerMarking::net->getFinalCondition().isSatisfied(pnapi::Marking(__marking, InnerMarking::net));
       if (final) {
-          Graph::g.addFinal(currentState);
+          Graph::g->addFinal(currentState);
       }
       __marking.clear();
   } transitions
@@ -75,7 +75,7 @@ markings:
 ;
 
 marking:
-  NAME COLON NUMBER { Graph::g.addMarking(currentState, $1, $3); __marking[InnerMarking::net->findPlace($1)] = $3; free($1); }
+  NAME COLON NUMBER { Graph::g->addMarking(currentState, $1, $3); __marking[InnerMarking::net->findPlace($1)] = $3; free($1); }
 ;
 
 transitions:
@@ -84,7 +84,7 @@ transitions:
 ;
 
 transition:
-  NAME ARROW NUMBER { Graph::g.addEdge(currentState, $3, $1); free($1); }
+  NAME ARROW NUMBER { Graph::g->addEdge(currentState, $3, $1); free($1); }
 | NAME ARROW QUESTION { free($1); }
 | NAME PATHARROW NUMBER { free ($1); }
 ;

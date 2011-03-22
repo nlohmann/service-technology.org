@@ -261,12 +261,19 @@ Since Wendy Version 2.6, direct support of Fiona's file format has been disconti
 @c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
 Wendy implements several algorithms and result published in several scientific articles.
 
+@section Tool Paper
+
+@quotation
+Niels Lohmann and Daniela Weinberg. @b{Wendy: A tool to synthesize partners for services}. In Johan Lilius and Wojciech Penczek, editors, @i{31st International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, PETRI NETS 2010, Braga, Portugal, June 21-25, 2010, Proceedings}, volume 6128 of Lecture Notes in Computer Science, pages 297–307, June 2010. Springer-Verlag.
+@end quotation
+
+
 @section Operating Guidelines
 
 @subsubheading General Algorithm
 
 @quotation
-Niels Lohmann, Peter Massuthe, and Karsten Wolf. @b{Operating Guidelines for Finite-State Services}. In Jetty Kleijn and Alex Yakovlev, editors, @i{28th International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, ICATPN 2007, Siedlce, Poland, June 25-29, 2007, Proceedings}, volume 4546 of Lecture Notes in Computer Science, pages 321-341, June 2007. Springer-Verlag 
+Niels Lohmann, Peter Massuthe, and Karsten Wolf. @b{Operating Guidelines for Finite-State Services}. In Jetty Kleijn and Alex Yakovlev, editors, @i{28th International Conference on Applications and Theory of Petri Nets and Other Models of Concurrency, ICATPN 2007, Siedlce, Poland, June 25-29, 2007, Proceedings}, volume 4546 of Lecture Notes in Computer Science, pages 321-341, June 2007. Springer-Verlag.
 @end quotation
 
 @subsubheading Cover Constraints
@@ -304,6 +311,13 @@ Niels Lohmann. @b{Why does my service have no partners?}. In Roberto Bruni and K
 @quotation
 Nannette Liske, Niels Lohmann, Christian Stahl, and Karsten Wolf. @b{Another Approach to Service Instance Migration}. In Luciano Baresi, Chi-Hung Chi, and Jun Suzuki, editors, @i{Service-Oriented Computing - ICSOC 2009, 7th International Conference, Stockholm, Sweden, November 24-27, 2009. Proceedings}, Lecture Notes in Computer Science, November 2009. Springer-Verlag.
 @end quotation
+
+@subsubheading Internal Behavior Reduction
+
+@quotation
+Niels Lohmann. @b{Internal behavior reduction for partner synthesis}. In Daniel Eichhorn, Agnes Koschmider, and Huayu Zhang, editors, @i{Proceedings of the 3rd Central-European Workshop on Services and their Composition, ZEUS 2011, Karlsruhe, Germany, February 21-22, 2011}, volume 705 of CEUR Workshop Proceedings, March 2011. CEUR-WS.org.
+@end quotation
+
 
 @sp 3
 

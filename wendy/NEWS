@@ -23,6 +23,14 @@ Version 3.2-unreleased
 * added `silence' utility to implement reduction of internal actions
 
 * implemented `--internalReduction' parameter to reduce internal actions
+  using the algorithm described in
+
+       Niels Lohmann. Internal behavior reduction for partner synthesis. In
+       Daniel Eichhorn, Agnes Koschmider, and Huayu Zhang, editors,
+       Proceedings of the 3rd Central-European Workshop on Services and
+       their Composition, ZEUS 2011, Karlsruhe, Germany, February 21-22,
+       2011, volume 705 of CEUR Workshop Proceedings, March 2011.
+       CEUR-WS.org.
 
 * adjusted configure script to download and compile LoLA if it is not found
   in the path
@@ -35,6 +43,9 @@ Version 3.2-unreleased
 
 * fixed bug #17896 (see `https://gna.org/bugs/?17896'): crash on empty
   input nets
+
+* LoLA is now automatically downloaded and compiled if the configure script
+  does not find an installed version.
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

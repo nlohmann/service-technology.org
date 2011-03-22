@@ -10,13 +10,19 @@
 
 @item added @samp{silence} utility to implement reduction of internal actions
 
-@item implemented @samp{--internalReduction} parameter to reduce internal actions
+@item implemented @samp{--internalReduction} parameter to reduce internal actions using the algorithm described in
+
+@quotation
+Niels Lohmann. @b{Internal behavior reduction for partner synthesis}. In Daniel Eichhorn, Agnes Koschmider, and Huayu Zhang, editors, @i{Proceedings of the 3rd Central-European Workshop on Services and their Composition, ZEUS 2011, Karlsruhe, Germany, February 21-22, 2011}, volume 705 of CEUR Workshop Proceedings, March 2011. CEUR-WS.org.
+@end quotation
 
 @item adjusted configure script to download and compile LoLA if it is not found in the path
 
 @item Wendy creates an extended @acronym{CTL} formula which is added to the intermediate LoLA output. It is used to apply @acronym{CTL}*-preserving partial order reduction when building the state space of the inner of the net. The formula is used to tell LoLA which transitions are visible; that is, which transitions must not be ignored during reduction.
 
 @item fixed bug #17896 (see @url{https://gna.org/bugs/?17896}): crash on empty input nets
+
+@item LoLA is now automatically downloaded and compiled if the configure script does not find an installed version.
 @end itemize
 
 

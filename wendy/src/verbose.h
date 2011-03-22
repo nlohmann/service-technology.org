@@ -35,6 +35,9 @@ void message(const char* format, ...);
 /// print a message if "--verbose" parameter was given
 void status(const char* format, ...);
 
+/// print a debug message
+#define alive() (message("alive at %s:%d (%s)", __FILE__, __LINE__, __FUNCTION__))
+
 /// abort with an error message and an error code
 __attribute__((noreturn)) void abort(unsigned short code, const char* format, ...);
 

@@ -17,11 +17,13 @@ wendy_SOURCES = AnnotationLivelockOG.cc AnnotationLivelockOG.h \
                 Output.cc Output.h \
                 PossibleSendEvents.h PossibleSendEvents.cc \
                 Queue.h Queue.cc \
+                InternalReduction.h InternalReduction.cc \
                 Results.h Results.cc \
                 SCSHandler.cc SCSHandler.h \
                 StoredKnowledge.h StoredKnowledge.cc \
                 syntax_cover.yy lexic_cover.ll \
                 syntax_graph.yy lexic_graph.ll \
+                syntax_reducedgraph.yy lexic_reducedgraph.ll \
                 types.h \
                 util.h \
                 verbose.cc verbose.h

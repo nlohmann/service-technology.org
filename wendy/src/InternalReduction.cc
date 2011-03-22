@@ -3,7 +3,7 @@
 #include <cassert>
 #include <sstream>
 #include <pnapi/pnapi.h>
-#include "Innermarking.h"
+#include "InnerMarking.h"
 #include "util.h"
 #include "InternalReduction.h"
 #include "cmdline.h"
@@ -27,7 +27,6 @@ unsigned int Graph::r2 = 0;
 unsigned int Graph::r62 = 0;
 unsigned int Graph::r63 = 0;
 
-//pnapi::PetriNet Graph::net;
 
 void Graph::shortInfo() {
     message("   N=%d, R1=%d, R2=%d, R6.2=%d, R6.3=%d", nodes.size(), r1, r2, r62, r63);
@@ -96,14 +95,14 @@ void Graph::initLabels() {
 void Graph::addEdge(unsigned int source, unsigned int target, const char* label) {
     const unsigned int labelNum = labels[label];
 
-    Node* s = nodes[source];
-    Node* t = nodes[target];
+    GraphNode* s = nodes[source];
+    GraphNode* t = nodes[target];
 
     if (not s) {
-        s = nodes[source] = new Node();
+        s = nodes[source] = new GraphNode();
     }
     if (not t) {
-        t = nodes[target] = new Node();
+        t = nodes[target] = new GraphNode();
     }
 
     ii ii1 = t->preset[labelNum].insert(source);
@@ -118,7 +117,7 @@ void Graph::init() {
     nodeVec.reserve(nodes.size());
 
     FOREACH(n, nodes) {
-        Node* v = nodes[n->first];
+        GraphNode* v = nodes[n->first];
         assert(n->first == nodeVec.size());
         nodeVec.push_back(v);
     }
@@ -126,42 +125,16 @@ void Graph::init() {
 }
 
 void Graph::addFinal(unsigned int node) {
-    Node* n = nodes[node];
+    GraphNode* n = nodes[node];
     assert(n);
     n->isFinal = true;
 }
-
-void Graph::dot() {
-    std::cout << "digraph d {\n";
-
-    FOREACH(n1, nodes) {
-        const Node* v1 = nodes[n1->first];
-
-        FOREACH(l, n1->second->postset) {
-            FOREACH(n2, l->second) {
-                const Node* v2 = nodes[*n2];
-
-                std::cout << "  " << v1->dfs << " -> " << v2->dfs << " [label=\"" << l->first << "\"";
-
-                if (l->first == TAU) {
-                    std::cout << " penwidth=5.0";
-                }
-
-                std::cout << "];\n";
-            }
-        }
-    }
-
-    std::cout << "}\n";
-    std::cout << std::flush;
-}
-
 
 Output* Graph::out() {
     Output* temp = new Output();
 
     FOREACH(n1, orderedNodes) {
-        const Node* v1 = nodes[*n1];
+        const GraphNode* v1 = nodes[*n1];
 
         temp->stream() << "STATE " << v1->dfs << " Lowlink: " << v1->lowlink << " " << v1->scc << "\n";
 
@@ -178,7 +151,7 @@ Output* Graph::out() {
 
         FOREACH(l, v1->postset) {
             FOREACH(n2, l->second) {
-                const Node* v2 = nodes[*n2];
+                const GraphNode* v2 = nodes[*n2];
 
                 temp->stream() << labels2[l->first] << " -> " << v2->dfs << "\n";
             }
@@ -429,8 +402,8 @@ inline void Graph::mergeNode(unsigned int& node1, unsigned int& node2) {
         node2 = temp;
     }
 
-    Node* const n1 = nodes[node1];
-    Node* const n2 = nodes[node2];
+    GraphNode* const n1 = nodes[node1];
+    GraphNode* const n2 = nodes[node2];
     assert(n1);
     assert(n2);
 
@@ -480,7 +453,7 @@ void Graph::tarjan(unsigned int v, bool firstCall) {
         }
     }
 
-    Node* const n = nodes[v];
+    GraphNode* const n = nodes[v];
     assert(n);
     n->dfs = maxdfs;
     n->lowlink = maxdfs;
@@ -492,7 +465,7 @@ void Graph::tarjan(unsigned int v, bool firstCall) {
 
     FOREACH(l, n->postset) {
         FOREACH(vprime, n->postset[l->first]) {
-            Node* const nprime = nodes[*vprime];
+            GraphNode* const nprime = nodes[*vprime];
             assert(nprime);
             if (weiss.find(*vprime) != weiss.end()) {
                 tarjan(*vprime, false);
@@ -528,14 +501,14 @@ void Graph::tarjan(unsigned int v, bool firstCall) {
 }
 
 void Graph::addMarking(unsigned int n, const char* place, unsigned int tokens) {
-    Node* state = nodes[n];
+    GraphNode* state = nodes[n];
     if (not state) {
-        state = nodes[n] = new Node();
+        state = nodes[n] = new GraphNode();
     }
     state->addMarking(place, tokens);
 }
 
-inline void Node::addMarking(const char* place, unsigned int tokens) {
+inline void GraphNode::addMarking(const char* place, unsigned int tokens) {
     markings[place] = tokens;
 }
 
@@ -623,7 +596,7 @@ void Graph::reenumerate2() {
     }
 }
 
-Node::Node() : isFinal(false) {}
+GraphNode::GraphNode() : isFinal(false) {}
 
 
 Output *Graph::internalReduction(FILE *fullGraph) {

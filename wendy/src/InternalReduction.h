@@ -7,7 +7,7 @@
 #include "Output.h"
 
 
-class Node;
+class GraphNode;
 
 class Graph {
     private:
@@ -17,8 +17,8 @@ class Graph {
         static Graph g;
 
     private:
-        std::map<unsigned int, Node*> nodes;
-        std::vector<Node*> nodeVec;
+        std::map<unsigned int, GraphNode*> nodes;
+        std::vector<GraphNode*> nodeVec;
 
         /// nodes, ordered during the depth-first search
         std::vector<unsigned int> orderedNodes;
@@ -38,15 +38,10 @@ class Graph {
         void removeNode(unsigned int);
         void removeEdge(unsigned int, unsigned int, unsigned int);
 
-    public:
         void tarjan(unsigned int = 0, bool = true);
 
         void init();
         void initLabels();
-        void addEdge(unsigned int, unsigned int, const char*);
-        void addMarking(unsigned int, const char*, unsigned int);
-        void addFinal(unsigned int);
-        void dot();
         Output *out();
         void shortInfo();
         void info();
@@ -58,12 +53,17 @@ class Graph {
         bool rule63();
         bool rule62();
 
+    public:
+        void addEdge(unsigned int, unsigned int, const char*);
+        void addMarking(unsigned int, const char*, unsigned int);
+        void addFinal(unsigned int);
+
         static Output *internalReduction(FILE *fullGraph);
 };
 
-class Node {
+class GraphNode {
     public:
-        Node();
+        GraphNode();
 
         std::map<unsigned int, std::set<unsigned int> > preset;
         std::map<unsigned int, std::set<unsigned int> > postset;

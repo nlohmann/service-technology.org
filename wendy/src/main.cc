@@ -341,7 +341,7 @@ int main(int argc, char** argv) {
     pclose(graph_in);
     graph_lex_destroy();
     time(&end_time);
-    status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
+    status("%s%s is done [%.0f sec]", _ctool_("LoLA"), (args_info.internalReduction_flag ? " and internal reduction" : ""), difftime(end_time, start_time));
     delete temp;
     delete temp2;
 

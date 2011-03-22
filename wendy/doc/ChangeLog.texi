@@ -8,8 +8,6 @@
 
 @item updated LCOV (@url{http://ltp.sourceforge.net/coverage/lcov.php}) to 1.9 and removed ZCOV, because LCOV can do branch coverage as well
 
-@item added @samp{silence} utility to implement reduction of internal actions
-
 @item implemented @samp{--internalReduction} parameter to reduce internal actions using the algorithm described in
 
 @quotation

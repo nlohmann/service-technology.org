@@ -333,7 +333,6 @@ int main(int argc, char** argv) {
     Output *temp2 = NULL;
     if (args_info.internalReduction_flag) {
         temp2 = Graph::internalReduction(graph_in);
-        fclose(graph_in);
         graph_in = fopen(temp2->name().c_str(), "r");
     }
 

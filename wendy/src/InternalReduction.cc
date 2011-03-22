@@ -21,7 +21,7 @@ extern FILE* reducedgraph_in;
 using pnapi::Transition;
 typedef std::pair<std::set<unsigned int>::iterator, bool> ii;
 
-Graph *Graph::g;
+Graph* Graph::g;
 unsigned int Graph::r1 = 0;
 unsigned int Graph::r2 = 0;
 unsigned int Graph::r62 = 0;
@@ -585,10 +585,10 @@ void Graph::reenumerate2() {
     }
 }
 
-GraphNode::GraphNode() : isFinal(false) {}
+GraphNode::GraphNode() : lowlink(0), dfs(0), isFinal(false) {}
 
 
-Output *Graph::internalReduction(FILE *fullGraph) {
+Output* Graph::internalReduction(FILE* fullGraph) {
     g = new Graph();
     g->initLabels();
 
@@ -612,7 +612,7 @@ Output *Graph::internalReduction(FILE *fullGraph) {
     g->reenumerate();
     g->tarjan();
 
-    Output *result = g->out();
+    Output* result = g->out();
     delete g;
     return result;
 }

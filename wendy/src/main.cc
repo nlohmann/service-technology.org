@@ -330,10 +330,10 @@ int main(int argc, char** argv) {
     time(&start_time);
     graph_in = popen(command_line.c_str(), "r");
 
-    Output *temp2 = NULL;
+    Output* temp2 = NULL;
     if (args_info.internalReduction_flag) {
         temp2 = Graph::internalReduction(graph_in);
-        pclose(graph_in);
+//        pclose(graph_in);
         graph_in = fopen(temp2->name().c_str(), "r");
     }
 

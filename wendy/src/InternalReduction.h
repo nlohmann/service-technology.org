@@ -14,7 +14,7 @@ class Graph {
         static unsigned int r1, r2, r63, r62;
 
     public:
-        static Graph *g;
+        static Graph* g;
 
     private:
         std::map<unsigned int, GraphNode*> nodes;
@@ -41,7 +41,7 @@ class Graph {
 
         void init();
         void initLabels();
-        Output *out();
+        Output* out();
         void shortInfo();
         void info();
         void reenumerate();
@@ -57,7 +57,7 @@ class Graph {
         void addMarking(unsigned int, const char*, unsigned int);
         void addFinal(unsigned int);
 
-        static Output *internalReduction(FILE *fullGraph);
+        static Output* internalReduction(FILE* fullGraph);
         ~Graph();
 };
 

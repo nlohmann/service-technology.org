@@ -1,4 +1,4 @@
-@heading Version 3.2-unreleased
+@heading Version 3.2
 @itemize
 @item test scripts now use the @samp{petri} utility to convert automata to open nets
 

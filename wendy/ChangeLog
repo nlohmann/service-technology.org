@@ -8,8 +8,8 @@
                       http://service-technology.org/wendy
 
 
-Version 3.2-unreleased
-======================
+Version 3.2
+===========
 
 * test scripts now use the `petri' utility to convert automata to open nets
 

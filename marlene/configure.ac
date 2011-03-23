@@ -29,7 +29,7 @@ AC_PROG_YACC
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_WENDY([3.3])
-AC_ST_CANDY([1.0])
+# AC_ST_CANDY([1.0])
 AC_ST_AUTOTEST
 AC_ST_PNAPI([4.02])
 AC_ST_CONFIGPP([1.4])

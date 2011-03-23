@@ -17,8 +17,7 @@
  along with Marlene.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef MARKINGS_H_
-#define MARKINGS_H_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -64,4 +63,3 @@ class Marking
         std::vector< std::string > getRequiredMessages(pnapi::PetriNet & net, std::string prefix = "");
 };
 
-#endif /* MARKINGS_H_ */

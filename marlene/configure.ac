@@ -28,16 +28,18 @@ AC_PROG_YACC
 
 # use the service-technology.org macros
 AC_ST_BASIC
+AC_ST_WENDY([3.3])
+AC_ST_CANDY([1.0])
 AC_ST_AUTOTEST
 AC_ST_PNAPI([4.02])
+AC_ST_CONFIGPP([1.4])
 AC_ST_VERBOSE
 
 # search for optional tools needed by "make check"
 AC_PATH_PROG(VALGRIND, [valgrind], [])
 AC_PATH_PROG(DIFF, [diff], [])
 
-AC_PATH_PROGS(WENDY, [wendy], [])
-AC_PATH_PROGS(CANDY, [candy], [])
+# AC_PATH_PROGS(CANDY, [candy], [])
 
 CONVERTER=sa2on
 
@@ -80,14 +82,14 @@ AC_MSG_CHECKING([weather to be sunny])
 AC_MSG_RESULT([better should be])
 
 # check for libconfig
-AC_LANG([C++])
-AC_CHECK_LIB(config++, config_init)
-if test "${ac_cv_lib_configpp_config_init}" == "yes" ; then
-    LIBCONFIG="1" #AC_DEFINE([LIBCONFIG],[1],[])
-else
-    LIBCONFIG="0" #AC_DEFINE([LIBCONFIG],[0],[])
-fi
-AC_SUBST(LIBCONFIG)
+#AC_LANG([C++])
+#AC_CHECK_LIB(config++, config_init)
+#if test "${ac_cv_lib_configpp_config_init}" == "yes" ; then
+#    LIBCONFIG="1" #AC_DEFINE([LIBCONFIG],[1],[])
+#else
+#    LIBCONFIG="0" #AC_DEFINE([LIBCONFIG],[0],[])
+#fi
+#AC_SUBST(LIBCONFIG)
 
 # Checks for header files.
 AC_HEADER_SYS_WAIT

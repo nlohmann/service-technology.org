@@ -17,6 +17,18 @@
  along with Marlene.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
+// shared pointers
+#include <cstddef> // for __GLIBCXX__
+
+#ifdef __GLIBCXX__
+#  include <tr1/memory>
+#else
+#  ifdef __IBMCPP__
+#    define __IBMCPP_TR1__
+#  endif
+#  include <memory>
+#endif
+
 // include standard C++ headers
 #include <string>
 #include <iostream>
@@ -36,7 +48,7 @@
 #include "Output.h"
 #include "verbose.h"
 
-// include PN Api headers
+// include PN API headers
 #include "pnapi/pnapi.h"
 
 /// a variable holding the time of the call
@@ -73,7 +85,7 @@ int main(int argc, char* argv[])
     // set the function to call on normal termination
     atexit(terminationHandler);
 
-    std::vector< pnapi::PetriNet * > nets;
+    std::vector< std::tr1::shared_ptr<pnapi::PetriNet> > nets;
 
     /*************************************************\
     * Parsing the command line and evaluation options *
@@ -110,7 +122,7 @@ int main(int argc, char* argv[])
     {
         for ( unsigned i = 0; i < args_info.inputs_num; ++i )
         {
-            pnapi::PetriNet * net = new pnapi::PetriNet();
+            std::tr1::shared_ptr<pnapi::PetriNet> net (new pnapi::PetriNet());
 
             std::string filename = args_info.inputs[i];
             status("reading open net from file \"%s\"", filename.c_str());
@@ -150,7 +162,7 @@ int main(int argc, char* argv[])
     else
     {
         //! parsing open net for stdin aka std::cin
-        pnapi::PetriNet * net = new pnapi::PetriNet();
+        std::tr1::shared_ptr< pnapi::PetriNet > net ( new pnapi::PetriNet());
         nets.push_back(net);
         try
         {
@@ -184,13 +196,11 @@ int main(int argc, char* argv[])
     {
         time(&start_time);
         status("reading transformation rules from file \"%s\"", args_info.rulefile_arg);
-        FILE * rulefile (NULL);
-        if((rulefile = fopen(args_info.rulefile_arg,"r")))
+        std::tr1::shared_ptr < FILE > rulefile (fopen(args_info.rulefile_arg,"r"), fclose);
+        status("file pointer = %d", rulefile.get());
+        if(rulefile.get() != NULL)
         {
             rs.addRules(rulefile);
-            // not needed here, rulefile will be closed in addRules()
-            // fclose(rulefile);
-            rulefile = NULL;
         }
         else
         {
@@ -225,7 +235,7 @@ int main(int argc, char* argv[])
     \*************************/
 
     time(&start_time);
-    const pnapi::PetriNet * controller = adapter.buildController();
+    std::tr1::shared_ptr < const pnapi::PetriNet > controller (adapter.buildController());
     time(&end_time);
     if ( not args_info.diagnosis_flag)
     {
@@ -255,7 +265,8 @@ int main(int argc, char* argv[])
         {
             std::string filename = (args_info.output_given ? std::string(args_info.output_arg) : std::string("-"));
             Output outfile(filename, std::string("final adapter"));
-            outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, PACKAGE_STRING)
+            std::string ps(PACKAGE_STRING);
+            outfile.stream() << pnapi::io::owfn << meta(pnapi::io::CREATOR, ps)
                              << meta(pnapi::io::INVOCATION, invocation) << engine;
         }
     }
@@ -264,10 +275,6 @@ int main(int argc, char* argv[])
     * Deleting all nets *
     \*******************/
 
-    for ( unsigned int index = 0; index < nets.size(); ++index)
-    {
-        delete nets[index];
-    }
     nets.clear();
 
     }

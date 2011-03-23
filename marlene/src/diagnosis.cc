@@ -52,9 +52,6 @@ bool Diagnosis::DiagnosisInformation::operator==(
 
 bool Diagnosis::DiagnosisInformation::operator<=(
         const DiagnosisInformation & d2) const {
-    //                    if (type != "MA") {
-    //                        return *this == d2;
-    //                    }
     if (type != d2.type or netsInFinalState != d2.netsInFinalState) {
         return false;
     }
@@ -78,18 +75,13 @@ bool Diagnosis::DiagnosisInformation::operator<=(
 bool Diagnosis::DiagnosisInformation::operator()(
         const DiagnosisInformation & d1, const DiagnosisInformation & d2) const {
 
-    //    status("Comparing %s and %s", d1.getLive().c_str(),
-    //            d2.getLive().c_str());
-    // d1 is surely less than d2 if type is lexicographical less
     if (d1.type < d2.type) {
-//        status("%s < %s", d1.type.c_str(), d2.type.c_str());
         return true;
     } else if (d1.type == d2.type) {
         // if type is the same, it depends on the size of pending messages
         if (d1.pendingMessages.size() < d2.pendingMessages.size()
                 or (d1.pendingMessages.size() == d2.pendingMessages.size()
                         and d1.pendingMessages < d2.pendingMessages)) {
-//            status("less pending");
             return true;
         }
         if (d1.pendingMessages == d2.pendingMessages) {
@@ -97,7 +89,6 @@ bool Diagnosis::DiagnosisInformation::operator()(
                     or (d1.requiredMessages.size()
                             == d2.requiredMessages.size()
                             and d1.requiredMessages < d2.requiredMessages)) {
-//                status("less required");
                 return true;
             }
             if (d1.requiredMessages == d2.requiredMessages) {
@@ -107,7 +98,6 @@ bool Diagnosis::DiagnosisInformation::operator()(
                                 == d2.previouslyAppliedRules.size()
                                 and d1.previouslyAppliedRules
                                         < d2.previouslyAppliedRules)) {
-//                    status("less rules");
                     return true;
                 }
                 if (d1.previouslyAppliedRules == d2.previouslyAppliedRules) {
@@ -117,7 +107,6 @@ bool Diagnosis::DiagnosisInformation::operator()(
                                     == d2.netsInFinalState.size()
                                     and d1.netsInFinalState
                                             < d2.netsInFinalState)) {
-//                        status("less final");
                         return true;
                     }
                 }
@@ -127,27 +116,6 @@ bool Diagnosis::DiagnosisInformation::operator()(
     return false;
 }
 
-/*
- bool Diagnosis::DiagnosisInformation::operator()(
- const DiagnosisInformation & d1, const DiagnosisInformation & d2) const {
- if (d1.type < d2.type) {
- return true;
- if (d1.pendingMessages < d2.pendingMessages) {
- return true;
- }
- if (d1.requiredMessages < d2.requiredMessages) {
- return true;
- }
- if (d1.previouslyAppliedRules < d2.previouslyAppliedRules) {
- return true;
- }
- if (d1.netsInFinalState < d2.netsInFinalState) {
- return true;
- }
- return false;
- }
- }
- */
 Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
         unsigned int messageBound) :
     dgraph(new DGraph), mi(pmi), live(args_info.live_arg,
@@ -234,21 +202,13 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
         }
 
         // add node
-        DNode * node = new DNode(init);
+        std::tr1::shared_ptr<DNode> node(new DNode(init));
         dgraph->nodeMap[init.id] = node;
-        //if ( init.has_deadlock )
-        // look for all deadlocks inside the current node
         try {
             for (int j = 0; j < states[i]["internalDeadlocks"].getLength(); ++j) {
                 node->deadlockMarkings.push_back(mi.getIDForMarking(
                         states[i]["internalDeadlocks"][j]));
             }
-            /*
-             int dlID = 0;
-             states[i].lookupValue("deadlockMarking", dlID);
-             status("Deadlock marking %d = %d", dlID, mi.getIDForMarking(dlID));
-             node->deadlockMarkings.push_back(mi.getIDForMarking(dlID));
-             */
 
             dgraph->deadlockNodes.push_back(node);
         } catch (libconfig::SettingNotFoundException ex) {
@@ -264,12 +224,6 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
                             states[i]["internalLivelocks"][j][k]));
                 }
             }
-            /*
-             int dlID = 0;
-             states[i].lookupValue("deadlockMarking", dlID);
-             status("Deadlock marking %d = %d", dlID, mi.getIDForMarking(dlID));
-             node->deadlockMarkings.push_back(mi.getIDForMarking(dlID));
-             */
 
             dgraph->livelockNodes.push_back(node);
         } catch (libconfig::SettingNotFoundException ex) {
@@ -283,14 +237,6 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
                 node->waitstateMarkings.push_back(mi.getIDForMarking(
                         states[i]["unresolvableWaitstates"][j]));
             }
-            /*
-             int dlID = 0;
-             states[i].lookupValue("deadlockMarking", dlID);
-             status("Deadlock marking %d = %d", dlID, mi.getIDForMarking(dlID));
-             node->deadlockMarkings.push_back(mi.getIDForMarking(dlID));
-             */
-
-            // dgraph->deadlockNodes.push_back(node);
         } catch (libconfig::SettingNotFoundException ex) {
             //           status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
         }
@@ -300,17 +246,12 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
     }
 
     dgraph->collectRules();
-
-    // diagInfo.write(stderr);
 }
 
 Diagnosis::~Diagnosis() {
-    delete dgraph;
-    //for (std::set< DiagnosisInformation >::iterator iter = diagnosisInformation.begin(); iter != diagnosisInformation.end(); ++iter)
-    {
-        //delete(&(*iter));
-    }
+    FUNCIN
     diagnosisInformation.clear();
+    FUNCOUT
 }
 
 void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
@@ -335,9 +276,6 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
 
             diagInfo.lookupValue("statistics.inner_markings", innermarkings);
             diagInfo.lookupValue("statistics.nodes", nodes);
-
-            //            status("%s has %d inner markings and %d nodes.",
-            //                    resultfiles[i].c_str(), innermarkings, nodes);
 
             // setting the initial node
             int initialNode;
@@ -372,11 +310,6 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
                 states[i].lookupValue("id", id);
 
                 init.id = mpp.getIDForName(id);
-                // does the node have deadlocks of livelocks?
-                // states[i].lookupValue("internalDeadlock", init.has_deadlock);
-                // states[i].lookupValue("internalLivelock", init.has_livelock);
-
-                // status("Node %d has deadlock: %s", id, (init.has_deadlock?"yes":"no"));
 
                 // get all successors of the node
                 try {
@@ -390,7 +323,6 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
                         int nodeId = states[i]["successors"][j][1];
                         unsigned int nid = mpp.getIDForName(nodeId);
 
-                        //status("Successor: label = %d, node = %d", lid, nid);
                         // remember the successor for the current node
                         init.successors.push_back(std::make_pair(lid, nid));
 
@@ -405,7 +337,7 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
                 }
 
                 // add node
-                DNode * node = new DNode(init);
+                std::tr1::shared_ptr< DNode > node (new DNode(init));
                 mpp.nodeMap[init.id] = node;
 
                 mpp.nodes.push_back(node);
@@ -418,11 +350,11 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
         }
 
         // simulation relation to Diagnosis Information
-        DNode * diNode = dgraph->nodeMap[dgraph->initialNode];
-        DNode * mppNode = mpp.nodeMap[mpp.initialNode];
-        std::list<std::pair<DNode*, DNode*> > stack;
+        std::tr1::shared_ptr< DNode > diNode (dgraph->nodeMap[dgraph->initialNode]);
+        std::tr1::shared_ptr< DNode > mppNode (mpp.nodeMap[mpp.initialNode]);
+        std::list<std::pair< std::tr1::shared_ptr< DNode >, std::tr1::shared_ptr< DNode > > > stack;
         stack.push_front(std::make_pair(diNode, mppNode));
-        std::map<std::pair<DNode*, DNode*>, bool> nodePairSeen;
+        std::map<std::pair< std::tr1::shared_ptr< DNode >, std::tr1::shared_ptr< DNode > >, bool> nodePairSeen;
 
         do {
             nodePairSeen[stack.front()] = true;
@@ -460,7 +392,7 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
 
                     //                    status(" ... stripped %s and %s?", diLabel.c_str(),
                     //                            mppLabel.c_str());
-                    std::pair<DNode*, DNode*> newNodePair;
+                    std::pair< std::tr1::shared_ptr< DNode >, std::tr1::shared_ptr< DNode > > newNodePair;
                     bool putOnStack = false;
                     if (diLabel == mppLabel) {
                         newNodePair
@@ -476,7 +408,6 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
                     }
                     if (putOnStack and not nodePairSeen[newNodePair]) {
                         stack.push_front(newNodePair);
-                        //                        status("Put next node pair on stack");
                     }
                 }
             }
@@ -484,17 +415,9 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
             for (std::map<unsigned int, bool>::iterator iter =
                     hasSuccessor.begin(); iter != hasSuccessor.end(); ++iter) {
                 if (not iter->second) {
-                    //                    status("--> %s has no successor, %d",
-                    //                            mpp.getLabelForID(iter->first).c_str(),
-                    //                            iter->second);
                     diNode->missedAlternatives.insert(mpp.getLabelForID(
                             iter->first));
                     dgraph->alternativeNodes.insert(diNode);
-                    // look at all the waitstates
-                    // for (int i = 0; i < diNode->waitstateMarkings.size(); ++i) {
-                    //    Marking & m = *(mi.markings[node->waitstateMarkings[i]]);
-                    //    m.getRequiredMessages()
-                    //}
                 }
             }
         } while (stack.size() > 0);
@@ -502,7 +425,7 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
     }
 }
 
-void Diagnosis::evaluateDeadlocks(std::vector<pnapi::PetriNet *> & nets,
+void Diagnosis::evaluateDeadlocks(std::vector< std::tr1::shared_ptr < pnapi::PetriNet > > & nets,
         pnapi::PetriNet & engine) {
     FUNCIN
     if (superfluous) {
@@ -515,12 +438,12 @@ void Diagnosis::evaluateDeadlocks(std::vector<pnapi::PetriNet *> & nets,
 
     // iterate over all nodes containing deadlocks
     for (unsigned int i = 0; i < dgraph->deadlockNodes.size(); ++i) {
-        DNode * node = dgraph->deadlockNodes[i];
+        std::tr1::shared_ptr< DNode > node (dgraph->deadlockNodes[i]);
         {
 
 //            message("Deadlock %d (node %d)", i + 1, node->getID());
             for (unsigned int j = 0; j < node->deadlockMarkings.size(); ++j) {
-                DiagnosisInformation * dI = new DiagnosisInformation;
+                std::tr1::shared_ptr< DiagnosisInformation > dI (new DiagnosisInformation());
                 dI->type = "DL";
 
                 Marking & m = *(mi.markings[node->deadlockMarkings[j]]);
@@ -554,7 +477,7 @@ void Diagnosis::evaluateDeadlocks(std::vector<pnapi::PetriNet *> & nets,
     FUNCOUT
 }
 
-void Diagnosis::evaluateLivelocks(std::vector<pnapi::PetriNet *> & nets,
+void Diagnosis::evaluateLivelocks(std::vector< std::tr1::shared_ptr < pnapi::PetriNet > > & nets,
         pnapi::PetriNet & engine) {
     FUNCIN
     if (superfluous) {
@@ -566,13 +489,13 @@ void Diagnosis::evaluateLivelocks(std::vector<pnapi::PetriNet *> & nets,
 
     // iterate over all nodes containing livelocks
     for (unsigned int i = 0; i < dgraph->livelockNodes.size(); ++i) {
-        DNode * node = dgraph->livelockNodes[i];
+        std::tr1::shared_ptr< DNode > node = dgraph->livelockNodes[i];
         {
 
 //            message("Livelock %d (node %d, %d)", i + 1, node->getID(),
 //                    dgraph->getNameForID(node->getID()));
             for (unsigned int j = 0; j < node->livelockMarkings.size(); ++j) {
-                DiagnosisInformation * dI = new DiagnosisInformation;
+                std::tr1::shared_ptr< DiagnosisInformation > dI (new DiagnosisInformation());
                 dI->type = "LL";
                 Marking & m = *(mi.markings[node->livelockMarkings[j]]);
                 dI->pendingMessages = m.getPendingMessages(engine, prefix,
@@ -606,7 +529,7 @@ void Diagnosis::evaluateLivelocks(std::vector<pnapi::PetriNet *> & nets,
     FUNCOUT
 }
 
-void Diagnosis::evaluateAlternatives(std::vector<pnapi::PetriNet *> & nets,
+void Diagnosis::evaluateAlternatives(std::vector< std::tr1::shared_ptr < pnapi::PetriNet > > & nets,
         pnapi::PetriNet & engine) {
     FUNCIN
     if (superfluous) {
@@ -618,15 +541,13 @@ void Diagnosis::evaluateAlternatives(std::vector<pnapi::PetriNet *> & nets,
     std::string prefix = "engine.";
 
     // iterate over all nodes containing deadlocks
-    for (std::set<DNode *>::iterator i = dgraph->alternativeNodes.begin(); i
+    for (std::set< std::tr1::shared_ptr< DNode > >::iterator i = dgraph->alternativeNodes.begin(); i
             != dgraph->alternativeNodes.end(); ++i) {
-        DNode * node = *i;
+        std::tr1::shared_ptr< DNode > node (*i);
         if (node->successors.size() > 0) {
 
-            //            message("Missed Alternative (node %d, %d)", node->getID(),
-            //                    dgraph->getNameForID(node->getID()));
             for (unsigned int j = 0; j < node->waitstateMarkings.size(); ++j) {
-                DiagnosisInformation * dI = new DiagnosisInformation;
+                std::tr1::shared_ptr< DiagnosisInformation > dI (new DiagnosisInformation());
                 dI->type = "MA";
 
                 Marking & m = *(mi.markings[node->waitstateMarkings[j]]);
@@ -760,9 +681,7 @@ DGraph::DGraph() :
 
 DGraph::~DGraph() {
     FUNCIN
-    for (unsigned int i = 0; i < nodes.size(); ++i) {
-        delete nodes[i];
-    }
+    nodes.clear();
     FUNCOUT
 }
 
@@ -819,12 +738,12 @@ void DGraph::collectRules() {
     while (not queue.empty()) {
         unsigned int id = *(queue.begin());
         queue.pop_front();
-        DNode * node = nodeMap[id];
+        std::tr1::shared_ptr< DNode > node = nodeMap[id];
         seen[id] = true;
 
         for (unsigned int s = 0; s < node->successors.size(); ++s) {
             std::string label = getLabelForID(node->successors[s].first);
-            DNode * snode = nodeMap[node->successors[s].second];
+            std::tr1::shared_ptr< DNode > snode = nodeMap[node->successors[s].second];
             unsigned int before = snode->rulesApplied.size();
 
             if (label.find("sync_rule_") == 0) {

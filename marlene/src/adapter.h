@@ -26,8 +26,19 @@
  *
  */
 
-#ifndef ADAPTER_H_
-#define ADAPTER_H_
+#pragma once
+
+// shared pointers
+#include <cstddef> // for __GLIBCXX__
+
+#ifdef __GLIBCXX__
+#  include <tr1/memory>
+#else
+#  ifdef __IBMCPP__
+#    define __IBMCPP_TR1__
+#  endif
+#  include <memory>
+#endif
 
 #include <vector>
 #include <iostream>
@@ -67,7 +78,7 @@ public:
      *                      engine
      * \param messagebound  the messagebound of the nets
      */
-    Adapter(std::vector< pnapi::PetriNet *> & nets, RuleSet & rs,
+    Adapter(std::vector< std::tr1::shared_ptr< pnapi::PetriNet > > & nets, RuleSet & rs,
             ControllerType contType = SYNCHRONOUS,
             unsigned int messagebound = 1,
             bool useCompPlace = true);
@@ -83,7 +94,7 @@ public:
      * \return pointer to the engine containing appropriate interface and
      *         rule transitions
      */
-    const pnapi::PetriNet * buildEngine();
+    std::tr1::shared_ptr < const pnapi::PetriNet > buildEngine();
 
     /*!
      * \brief Actually builds the controller.
@@ -93,18 +104,18 @@ public:
      * \return pointer to the controller of Adapter::_engine composed with
      *         Adapter::_nets, NULL if no controller could be built
      */
-    const pnapi::PetriNet * buildController();
+    std::tr1::shared_ptr < const pnapi::PetriNet > buildController();
 
 private:
 
     //! pnapi::PetriNet containing the engine part of the adapter
-    pnapi::PetriNet * _engine;
+    std::tr1::shared_ptr < pnapi::PetriNet > _engine;
 
     //! pnapi::PetriNet containing the engine part of the adapter
-    pnapi::PetriNet * _controller;
+    std::tr1::shared_ptr < pnapi::PetriNet > _controller;
 
     //! vector of all nets being adapted
-    std::vector< pnapi::PetriNet * > & _nets;
+    std::vector< std::tr1::shared_ptr < pnapi::PetriNet > > & _nets;
 
     //! a #RuleSet which describes the engines behavior
     RuleSet & _rs;
@@ -158,6 +169,8 @@ private:
      * \return string representing the rule's for using as transition name
      */
     static inline std::string getRuleName(unsigned int i);
+
+    static inline std::string computeMPP(std::string);
 
     std::string cost_file_content;
 
@@ -283,7 +296,7 @@ public:
      *
      * \param inputStream a file pointer to the file containing the transformation rules
      */
-    void addRules(FILE * inputStream);
+    void addRules(std::tr1::shared_ptr < FILE > inputStream);
 
     /*!
      * \brief Returns a const reference to the transformation rules.
@@ -291,7 +304,7 @@ public:
      * \return list of transformation rules
      * \todo Warum keine Referenzen?
      */
-    inline const std::list< AdapterRule * > getRules() const;
+    inline const std::list< std::tr1::shared_ptr < AdapterRule > > getRules() const;
 
     /*!
      * \brief Returns the message name for an ID.
@@ -310,7 +323,7 @@ private:
     std::map< std::string, unsigned int > _messageId;
 
     //! a list of message transformation rules
-    std::list< AdapterRule * > _adapterRules;
+    std::list< std::tr1::shared_ptr < AdapterRule > > _adapterRules;
 
     //! the highest used ID for a message name, is increased by getIdForMessage()
     unsigned int _maxId;
@@ -336,5 +349,3 @@ private:
 
 };
 
-
-#endif /*ADAPTER_H_*/

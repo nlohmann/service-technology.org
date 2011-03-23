@@ -17,8 +17,7 @@
  along with Marlene.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef MACROS_H
-#define MACROS_H
+#pragma once
 
 #include <iostream>
 
@@ -55,4 +54,3 @@ extern unsigned int veryverboseindent;
 #endif
 #endif
 
-#endif

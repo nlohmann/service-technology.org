@@ -1,5 +1,4 @@
-#ifndef VERBOSE_H
-#define VERBOSE_H
+#pragma once
 
 #include <config.h>
 #include <cstdio>
@@ -117,4 +116,3 @@ const bool _useColor = false;
 /// color a command-line parameter
 #define _cparameter_(s)  (std::string(_cC_) + s + _c_).c_str()
 
-#endif

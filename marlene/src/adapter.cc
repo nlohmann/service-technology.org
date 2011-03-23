@@ -19,6 +19,18 @@
 
 #include "config.h"
 
+// shared pointer
+#include <cstddef> // for __GLIBCXX__
+
+#ifdef __GLIBCXX__
+#  include <tr1/memory>
+#else
+#  ifdef __IBMCPP__
+#    define __IBMCPP_TR1__
+#  endif
+#  include <memory>
+#endif
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -48,10 +60,10 @@
 
 /* For documentation of the following functions, please see header file. */
 
-Adapter::Adapter(std::vector<pnapi::PetriNet *> & nets, RuleSet & rs,
+Adapter::Adapter(std::vector< std::tr1::shared_ptr< pnapi::PetriNet > > & nets, RuleSet & rs,
         ControllerType contType, unsigned int messageBound,
         bool useCompPlaces) :
-    _engine(new pnapi::PetriNet), _controller(NULL), _nets(nets), _rs(rs),
+    _engine(new pnapi::PetriNet), _controller(), _nets(nets), _rs(rs),
             _contType(contType), _messageBound(messageBound),
             _useCompPlaces(useCompPlaces) {
     FUNCIN
@@ -63,13 +75,13 @@ Adapter::~Adapter() {
     FUNCIN
     // deleting the engine if it exists
     //delete (_engine);
-    _engine = NULL;
+    //_engine = NULL;
     //delete (_controller);
-    _controller = NULL;
+    //_controller = NULL;
     FUNCOUT
 }
 
-const pnapi::PetriNet * Adapter::buildEngine() {
+std::tr1::shared_ptr < const pnapi::PetriNet > Adapter::buildEngine() {
     FUNCIN
 
     // create port to the controller
@@ -97,7 +109,7 @@ const pnapi::PetriNet * Adapter::buildEngine() {
     return _engine;
 }
 
-const pnapi::PetriNet * Adapter::buildController() {
+std::tr1::shared_ptr < const pnapi::PetriNet > Adapter::buildController() {
     FUNCIN
 
     using namespace pnapi;
@@ -338,29 +350,8 @@ const pnapi::PetriNet * Adapter::buildController() {
         std::vector<std::string> mpp_files;
         for (unsigned i = 0; i < args_info.inputs_num; ++i) {
             std::string filename = std::string(args_info.inputs[i]);
-            std::string results_filename = filename + ".results";
-            std::string sa_filename = filename + ".sa";
 
-            mpp_files.push_back(results_filename);
-
-            std::ifstream rfile(results_filename.c_str());
-            if (!rfile) {
-                std::string mpp_command = path2wendy + " --sa="
-                        + sa_filename + " --result=" + results_filename
-                        + " " + filename;
-                status(
-                        "Generating most-permissive partner for `%s' by executing",
-                        filename.c_str());
-                status("%s", mpp_command.c_str());
-                time(&start_time);
-                int result = system(mpp_command.c_str());
-                result = WEXITSTATUS(result);
-                time(&end_time);
-                status("Wendy done [%.0f sec]", difftime(end_time,
-                        start_time));
-                rfile.open(results_filename.c_str());
-            }
-            rfile.close();
+            mpp_files.push_back(Adapter::computeMPP(filename));
         }
 
         MarkingInformation mi(mi_filename);
@@ -400,7 +391,7 @@ const pnapi::PetriNet * Adapter::buildController() {
             * transform most-permissive partner to open net *
          \***********************************************/
         time(&start_time);
-        delete _controller;
+        // _controller.release();
 
         std::string path2genet = std::string(args_info.genet_arg);
         std::string path2petrify = std::string(args_info.petrify_arg);
@@ -410,19 +401,19 @@ const pnapi::PetriNet * Adapter::buildController() {
         {
             status("Using Genet for conversion from SA to open net.");
             pnapi::PetriNet::setGenet(path2genet);
-            _controller = new pnapi::PetriNet(*mpp_sa,
-                    pnapi::PetriNet::GENET, args_info.messagebound_arg + 1);
+            _controller = std::tr1::shared_ptr<pnapi::PetriNet> (new pnapi::PetriNet(*mpp_sa,
+                    pnapi::PetriNet::GENET, args_info.messagebound_arg + 1));
         } else if (args_info.sa2on_arg == sa2on_arg_petrify
                 and path2petrify != "") {
             status("Using Petrify for conversion from SA to open net.");
             pnapi::PetriNet::setPetrify(path2petrify);
-            _controller = new pnapi::PetriNet(*mpp_sa,
-                    pnapi::PetriNet::PETRIFY);
+            _controller = std::tr1::shared_ptr<pnapi::PetriNet> (new pnapi::PetriNet(*mpp_sa,
+                    pnapi::PetriNet::PETRIFY));
         } else {
             status(
                     "Using a state machine for conversion from SA to open net.");
-            _controller = new pnapi::PetriNet(*mpp_sa,
-                    pnapi::PetriNet::STATEMACHINE);
+            _controller = std::tr1::shared_ptr<pnapi::PetriNet> (new pnapi::PetriNet(*mpp_sa,
+                    pnapi::PetriNet::STATEMACHINE));
         }
         delete mpp_sa;
     }
@@ -608,9 +599,9 @@ void Adapter::createRuleTransitions() {
     unsigned int transNumber = 1;
 
     // get given rules
-    std::list<RuleSet::AdapterRule *> rules = _rs.getRules();
+    std::list< std::tr1::shared_ptr < RuleSet::AdapterRule > > rules = _rs.getRules();
     // iterate them
-    std::list<RuleSet::AdapterRule *>::iterator ruleIter = rules.begin();
+    std::list< std::tr1::shared_ptr < RuleSet::AdapterRule > >::iterator ruleIter = rules.begin();
     while (ruleIter != rules.end()) {
         const RuleSet::AdapterRule & rule = **ruleIter;
 
@@ -938,6 +929,56 @@ inline std::string Adapter::getRuleName(unsigned int i) {
     FUNCOUT
 }
 
+inline std::string Adapter::computeMPP(std::string filename) {
+
+    std::string results_filename = filename + ".results";
+    std::string sa_filename = filename + ".sa";
+
+    std::string path2wendy = std::string(args_info.wendy_arg);
+    // wendy is really essential
+    assert(path2wendy != "");
+
+    time_t start_time, end_time;
+
+    std::ifstream rfile(results_filename.c_str());
+    if (!rfile) {
+
+        std::ifstream owfnFile(filename.c_str());
+        Output normNet;
+
+        std::tr1::shared_ptr<pnapi::PetriNet> net (new pnapi::PetriNet);
+        owfnFile >> pnapi::io::owfn >> *net;
+        owfnFile.close();
+
+        if (not net->isNormal()) {
+            net->normalize();
+            normNet.stream() << pnapi::io::owfn << *net << std::flush;
+            filename = normNet.name();
+            // normNet.stream().flush();
+        }
+
+        std::string mpp_command = path2wendy + " --sa="
+                + sa_filename + " --result=" + results_filename
+                + " " + filename;
+        status(
+                "Generating most-permissive partner for `%s' by executing",
+                filename.c_str());
+
+        status("%s", mpp_command.c_str());
+        time(&start_time);
+        int result = system(mpp_command.c_str());
+        result = WEXITSTATUS(result);
+        time(&end_time);
+        status("Wendy done [%.0f sec]", difftime(end_time,
+                start_time));
+        rfile.open(results_filename.c_str());
+    }
+    rfile.close();
+
+    return results_filename;
+
+}
+
 RuleSet::RuleSet() :
     _maxId(0) {
     FUNCIN
@@ -947,17 +988,11 @@ RuleSet::RuleSet() :
 
 RuleSet::~RuleSet() {
     FUNCIN
-    std::list<AdapterRule *>::iterator rule = _adapterRules.begin();
-    while (rule != _adapterRules.end()) {
-        delete *rule;
-
-        ++rule;
-    }
     _adapterRules.clear();
     FUNCOUT
 }
 
-void RuleSet::addRules(FILE * inputStream) {
+void RuleSet::addRules(std::tr1::shared_ptr < FILE > inputStream) {
     FUNCIN
     extern FILE * adapt_rules_yyin;
     extern int adapt_rules_yyparse();
@@ -978,11 +1013,10 @@ void RuleSet::addRules(FILE * inputStream) {
      */
 
     workingSet = this;
-    adapt_rules_yyin = inputStream;
+    adapt_rules_yyin = inputStream.get();
     adapt_rules_yylineno = 1;
 
     adapt_rules_yyparse();
-    fclose(adapt_rules_yyin);
 #ifdef YY_FLEX_HAS_YYLEX_DESTROY
     adapt_rules_yylex_destroy();
 #endif
@@ -990,7 +1024,7 @@ void RuleSet::addRules(FILE * inputStream) {
     FUNCOUT
 }
 
-inline const std::list<RuleSet::AdapterRule *> RuleSet::getRules() const {
+inline const std::list< std::tr1::shared_ptr < RuleSet::AdapterRule > > RuleSet::getRules() const {
     FUNCIN
     FUNCOUT
     return _adapterRules;

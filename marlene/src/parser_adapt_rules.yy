@@ -1,7 +1,8 @@
 /*****************************************************************************\
  Marlene -- synthesizing behavioral adapters
 
- Copyright (C) 2009  Christian Gierds <gierds@informatik.hu-berlin.de>
+ Copyright (C) 2009, 2010, 2011
+    Christian Gierds <gierds@informatik.hu-berlin.de>
 
  Marlene is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free
@@ -115,12 +116,12 @@ partial_rule:
     ARROW channel_list
     {
         std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$3);
-        std::list< unsigned int > * slist = new std::list< unsigned int >();
-        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, *slist, cfmodus);
+        std::tr1::shared_ptr < std::list< unsigned int > > slist (new std::list< unsigned int >());
+        std::tr1::shared_ptr < RuleSet::AdapterRule > rule (new RuleSet::AdapterRule(rulepair, *slist, cfmodus));
         workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;
-	delete slist;
+	// delete slist;
     }
 |
     channel_list 
@@ -128,7 +129,7 @@ partial_rule:
     ARROW channel_list
     {
         std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$5);
-        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, *$3, cfmodus);
+        std::tr1::shared_ptr < RuleSet::AdapterRule > rule (new RuleSet::AdapterRule(rulepair, *$3, cfmodus));
         workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;
@@ -144,12 +145,12 @@ total_rule:
     opt_costvalue
     {
         std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$3);
-        std::list< unsigned int > * slist = new std::list< unsigned int >();
-        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, *slist, RuleSet::AdapterRule::AR_NORMAL, $4);
+        std::tr1::shared_ptr< std::list< unsigned int > > slist (new std::list< unsigned int >());
+        std::tr1::shared_ptr < RuleSet::AdapterRule > rule (new RuleSet::AdapterRule(rulepair, *slist, RuleSet::AdapterRule::AR_NORMAL, $4));
 	workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;
-	delete slist;
+	// delete slist;
     }
 |    
     opt_channel_list 
@@ -158,7 +159,7 @@ total_rule:
     opt_costvalue
     {
         std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$5);
-        RuleSet::AdapterRule * rule = new RuleSet::AdapterRule(rulepair, *$3, RuleSet::AdapterRule::AR_NORMAL, $6);
+        std::tr1::shared_ptr < RuleSet::AdapterRule > rule (new RuleSet::AdapterRule(rulepair, *$3, RuleSet::AdapterRule::AR_NORMAL, $6));
         workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;

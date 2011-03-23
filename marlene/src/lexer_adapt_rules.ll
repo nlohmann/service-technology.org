@@ -1,7 +1,8 @@
 /*****************************************************************************\
  Marlene -- synthesizing behavioral adapters
 
- Copyright (C) 2009  Christian Gierds <gierds@informatik.hu-berlin.de>
+ Copyright (C) 2009, 2010, 2011
+    Christian Gierds <gierds@informatik.hu-berlin.de>
 
  Marlene is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free

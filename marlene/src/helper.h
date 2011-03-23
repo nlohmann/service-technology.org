@@ -17,8 +17,7 @@
  along with Marlene.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef HELPER_H
-#define HELPER_H
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -41,4 +40,3 @@ extern bool fileExists(std::string filename);
 
 extern std::string toString(int i);
 
-#endif

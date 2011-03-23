@@ -17,8 +17,19 @@
  along with Marlene.  If not, see <http://www.gnu.org/licenses/>.
  \*****************************************************************************/
 
-#ifndef DIAGNOSIS_H_
-#define DIAGNOSIS_H_
+#pragma once
+
+// shared pointers
+#include <cstddef> // for __GLIBCXX__
+
+#ifdef __GLIBCXX__
+#  include <tr1/memory>
+#else
+#  ifdef __IBMCPP__
+#    define __IBMCPP_TR1__
+#  endif
+#  include <memory>
+#endif
 
 #include <string>
 #include <vector>
@@ -48,7 +59,7 @@ class Diagnosis {
                         const DiagnosisInformation & d2) const;
         };
 
-        DGraph * dgraph;
+        std::tr1::shared_ptr<DGraph> dgraph;
         MarkingInformation & mi;
         Output live;
         std::set<DiagnosisInformation, DiagnosisInformation>
@@ -65,11 +76,11 @@ class Diagnosis {
         ~Diagnosis();
 
         void readMPPs(std::vector<std::string> & resultfiles);
-        void evaluateDeadlocks(std::vector<pnapi::PetriNet *> & nets,
+        void evaluateDeadlocks(std::vector< std::tr1::shared_ptr < pnapi::PetriNet > > & nets,
                 pnapi::PetriNet & engine);
-        void evaluateLivelocks(std::vector<pnapi::PetriNet *> & nets,
+        void evaluateLivelocks(std::vector< std::tr1::shared_ptr < pnapi::PetriNet > > & nets,
                 pnapi::PetriNet & engine);
-        void evaluateAlternatives(std::vector<pnapi::PetriNet *> & nets,
+        void evaluateAlternatives(std::vector< std::tr1::shared_ptr < pnapi::PetriNet > > & nets,
                 pnapi::PetriNet & engine);
         void outputLive() const;
 };
@@ -89,12 +100,12 @@ class DGraph {
 
         ~DGraph();
 
-        std::vector<DNode *> nodes;
-        std::map<unsigned int, DNode *> nodeMap;
+        std::vector< std::tr1::shared_ptr<DNode> > nodes;
+        std::map<unsigned int, std::tr1::shared_ptr<DNode> > nodeMap;
         unsigned int initialNode;
-        std::vector<DNode *> deadlockNodes;
-        std::vector<DNode *> livelockNodes;
-        std::set<DNode *> alternativeNodes;
+        std::vector< std::tr1::shared_ptr<DNode> > deadlockNodes;
+        std::vector< std::tr1::shared_ptr<DNode> > livelockNodes;
+        std::set< std::tr1::shared_ptr<DNode> > alternativeNodes;
         std::map<unsigned int, unsigned int> noOfPredecessors;
 
         unsigned int getIDForName(int nameId);
@@ -145,4 +156,3 @@ class DNode {
 
 };
 
-#endif /* DIAGNOSIS_H_ */

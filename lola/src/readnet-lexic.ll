@@ -29,96 +29,107 @@ class case_list;
 #include "readnet-syntax.h"
 
 void setlval();
+extern void yyerror(char const * mess);
 %}
 
 %%
-AUTOMATON	 { return key_automaton;}
-FINAL 		 { return key_final;}
-RECORD           { return key_record;}
-END              { return key_end;}
-SORT		 { return key_sort;}
-FUNCTION         { return key_function;}
-SAFE             { return key_safe;}
-DO               { return key_do;}
-ARRAY		 { return key_array;}
-STRONG		 { return key_strong;}
-WEAK		 { return key_weak;}
-FAIR		 { return key_fair;}
-ENUMERATE        { return key_enumerate;}
-CONSTANT         { return key_constant;}
-BOOLEAN          {return key_boolean;}
-OF               {return key_of;}
-BEGIN            {return key_begin;}
-WHILE            {return key_while;}
-IF               {return key_if;}
-THEN             {return key_then;}
-ELSE             {return key_else;}
-SWITCH           {return key_switch;}
-CASE             {return key_case;}
-NEXTSTEP         {return key_next;}
-REPEAT           {return key_repeat;}
-FOR              {return key_for;}
-TO               {return key_to;}
-ALL              {return key_all;}
-EXIT             {return key_exit;}
-EXISTS           {return key_exists;}
-RETURN           {return key_return;}
-TRUE             {return key_true;}
-FALSE            {return key_false;}
-MOD              {return key_mod;}
-VAR              { return key_var;}
-GUARD            { return key_guard;}
-STATE            { return key_state; }
-PATH             { return key_path; }
-GENERATOR        { return key_generator;}
-ANALYSE          { return key_analyse; }
-PLACE            { return key_place; }
-TRANSITION       { return key_transition; }
-MARKING          { return key_marking; }
-CONSUME          { return key_consume; }
-PRODUCE          { return key_produce; }
-FORMULA		 { return key_formula; }
-EXPATH           { return exists; }
-ALLPATH          { return forall; }
-ALWAYS           { return globally; }
-UNTIL       	 { return until; }
-EVENTUALLY       { return future; }
-AND              { return tand; }
-OR               { return tor; }
-NOT              { return tnot; }
-\<\-\>           { return tiff;}
-\<\>             {return tneq;}
-\-\>             {return timplies;}
-=                { return eqqual; }
-\[               {return lbrack;}
-\]               {return rbrack;}
-\.               {return dot;}
-\+               {return pplus;}
-\-               {return mminus;}
-\*               {return times;}
-\/               {return divide;}
-\:               { return colon; }
-\;               { return semicolon; }
-\| 	 	 { return slash; }
-\(               { return lpar; }
-\)               { return rpar; }
-,                { return comma; }
-[>]              { return tgt; }
-[<]              { return tlt; }
-[#]              { return tneq; }
-[>]=             { return tgeq; }
-[<]=             { return tleq; }
-[0-9][0-9]*      { setlval(); return number; }
-"{"[^\n\r]*"}"   { break; }
-[^,;:()\t \n\r\{\}][^,;:()\t \n\r\{\}]*		{setlval(); return ident; }
-[\n\r]           { yylineno++; break; }
-[ \t]            { break; }
+
+ALL                                      { return key_all;}
+ANALYSE                                  { return key_analyse; }
+ARRAY                                    { return key_array;}
+AUTOMATON                                { return key_automaton;}
+BEGIN                                    { return key_begin;}
+BOOLEAN                                  { return key_boolean;}
+CASE                                     { return key_case;}
+CONSTANT                                 { return key_constant;}
+CONSUME                                  { return key_consume; }
+DO                                       { return key_do;}
+ELSE                                     { return key_else;}
+END                                      { return key_end;}
+ENUMERATE                                { return key_enumerate;}
+EXISTS                                   { return key_exists;}
+EXIT                                     { return key_exit;}
+FAIR                                     { return key_fair;}
+FALSE                                    { return key_false;}
+FINAL                                    { return key_final;}
+FOR                                      { return key_for;}
+FORMULA                                  { return key_formula; }
+FUNCTION                                 { return key_function;}
+GENERATOR                                { return key_generator;}
+GUARD                                    { return key_guard;}
+IF                                       { return key_if;}
+MARKING                                  { return key_marking; }
+MOD                                      { return key_mod;}
+NEXTSTEP                                 { return key_next;}
+OF                                       { return key_of;}
+PATH                                     { return key_path; }
+PLACE                                    { return key_place; }
+PRODUCE                                  { return key_produce; }
+RECORD                                   { return key_record;}
+REPEAT                                   { return key_repeat;}
+RETURN                                   { return key_return;}
+SAFE                                     { return key_safe;}
+SORT                                     { return key_sort;}
+STATE                                    { return key_state; }
+STRONG                                   { return key_strong;}
+SWITCH                                   { return key_switch;}
+THEN                                     { return key_then;}
+TO                                       { return key_to;}
+TRANSITION                               { return key_transition; }
+TRUE                                     { return key_true;}
+VAR                                      { return key_var;}
+WEAK                                     { return key_weak;}
+WHILE                                    { return key_while;}
+
+ALLPATH                                  { return forall; }
+ALWAYS                                   { return globally; }
+AND                                      { return tand; }
+EVENTUALLY                               { return future; }
+EXPATH                                   { return exists; }
+NOT                                      { return tnot; }
+OR                                       { return tor; }
+UNTIL                                    { return until; }
+
+\<\-\>                                   { return tiff;}
+\<\>                                     { return tneq;}
+\-\>                                     { return timplies;}
+=                                        { return eqqual; }
+\[                                       { return lbrack;}
+\]                                       { return rbrack;}
+\.                                       { return dot;}
+\+                                       { return pplus;}
+\-                                       { return mminus;}
+\*                                       { return times;}
+\/                                       { return divide;}
+\:                                       { return colon; }
+\;                                       { return semicolon; }
+\|                                       { return slash; }
+\(                                       { return lpar; }
+\)                                       { return rpar; }
+,                                        { return comma; }
+[>]                                      { return tgt; }
+[<]                                      { return tlt; }
+[#]                                      { return tneq; }
+[>]=                                     { return tgeq; }
+[<]=                                     { return tleq; }
+
+[\n\r]                                   { /* whitespace */ }
+[ \t]                                    { /* whitespace */ }
+
+[0-9]+                                   { setlval(); return number; }
+
+"{"[^\n\r]*"}"                           { /* comments */ }
+
+[^,;:()\t \n\r\{\}]+                     { setlval(); return ident; }
+
+.                                        { yyerror("lexical error"); }
+
 %%
 
-void setlval()  // pass token string as attribute to bison
-{
+/*! pass token string as attribute to bison */
+inline void setlval() {
   yylval.str = new char[strlen(yytext)+1];
-  strcpy(yylval.str,yytext);
+  strcpy(yylval.str, yytext);
 }
 
 
@@ -129,19 +140,21 @@ bool taskfile = false;
 extern char * diagnosefilename;
 
 //// FUNCTION MOVE FROM BISON PARSER BY NIELS
-int yywrap()
-{
-	yylineno = 1;
-	if(taskfile) return 1;
-	if(!analysefile) return 1;
-	taskfile = true;
-	yyin = fopen(analysefile,"r");
-	if(!yyin)
-	{
-	  fprintf(stderr, "lola: cannot open analysis task file '%s'\n", analysefile);
-		exit(4);
-	}
-	diagnosefilename = analysefile;
-	return(0);
-}
+int yywrap() {
+  yylineno = 1;
 
+  if(taskfile or !analysefile)
+    return 1;
+
+  taskfile = true;
+
+  yyin = fopen(analysefile, "r");
+  if (!yyin) {
+    fprintf(stderr, "lola: cannot open analysis task file '%s'\n", analysefile);
+    exit(4);
+  }
+
+  diagnosefilename = analysefile;
+
+  return 0;
+}

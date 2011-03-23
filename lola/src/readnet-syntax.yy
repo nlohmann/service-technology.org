@@ -27,6 +27,7 @@
 #include "formula.H"
 #include "buchi.H"
 #include "unfold.H"
+#include "verbose.h"
 #include <cstdio>
 #include <climits>
 
@@ -36,6 +37,7 @@ extern char *yytext;
 
 #define YYDEBUG 1
 void yyerror(char const *);
+void yyerrors(char *token, char const* format, ...);
 
 class arc_list
 {
@@ -70,26 +72,26 @@ VaSymbol * VS;
 %}
 %union
 {
-	char * str;
-	int value;
-	UType * t;
-	URcList * rcl;
-	UEnList * el;
-	ULVal * lval;
-	int * exl;
-	UStatement * stm;
-	case_list * cl;
-	UFunction * fu;
-	UExpression * ex;
-	arc_list * al;
-	formula * form;
-	IdList * idl;
-	UTermList * tlist;
-	Place * pl;
-	Transition * tr;
-	fmode * fm;
-	TrSymbol * ts;
-	VaSymbol * varsy;
+    char* str;
+    int value;
+    UType* t;
+    URcList* rcl;
+    UEnList* el;
+    ULVal* lval;
+    int* exl;
+    UStatement* stm;
+    case_list* cl;
+    UFunction* fu;
+    UExpression* ex;
+    arc_list* al;
+    formula* form;
+    IdList* idl;
+    UTermList* tlist;
+    Place* pl;
+    Transition* tr;
+    fmode* fm;
+    TrSymbol* ts;
+    VaSymbol* varsy;
 }
 
 
@@ -180,191 +182,224 @@ extern int yylineno;
  %}
 
 %%
-input: declarations net            { 
-F = NULL ; 
-}
-     | declarations net formulaheader ctlformula { 
-F = $4;
-}
-	| declarations net key_analyse key_place aplace {
-	F = NULL;
-	CheckPlace = $5;
+
+input:
+  declarations net { F = NULL; }
+| declarations net formulaheader ctlformula { F = $4; }
+| declarations net key_analyse key_place aplace {
+    F = NULL;
+    CheckPlace = $5;
 #ifdef STUBBORN
-	Transitions[0]->StartOfStubbornList = NULL;
-int i;
-	for(i=0;CheckPlace -> PreTransitions[i];i++)
-	{
-		CheckPlace->PreTransitions[i]->instubborn = true;
-		CheckPlace->PreTransitions[i]->NextStubborn = Transitions[0]->StartOfStubbornList;
-		Transitions[0]->StartOfStubbornList = CheckPlace->PreTransitions[i];
-	}
-	Transitions[0]->EndOfStubbornList = LastAttractor = CheckPlace -> PreTransitions[0];
+    Transitions[0]->StartOfStubbornList = NULL;
+    int i;
+    for (i = 0; CheckPlace -> PreTransitions[i]; i++) {
+        CheckPlace->PreTransitions[i]->instubborn = true;
+        CheckPlace->PreTransitions[i]->NextStubborn = Transitions[0]->StartOfStubbornList;
+        Transitions[0]->StartOfStubbornList = CheckPlace->PreTransitions[i];
+    }
+    Transitions[0]->EndOfStubbornList = LastAttractor = CheckPlace -> PreTransitions[0];
 #endif
+    }
+| declarations net key_analyse key_transition atransition {
+        F = NULL;
+        CheckTransition = $5;
+#ifdef STUBBORN
+        Transitions[0]->EndOfStubbornList = LastAttractor = Transitions[0]->StartOfStubbornList = CheckTransition;
+        CheckTransition -> NextStubborn = NULL;
+        CheckTransition -> instubborn = true;
+#endif
+    }
+| declarations net key_analyse key_marking amarkinglist  { F = NULL;}
+| declarations net key_automaton automaton  {F = NULL;}
+;
+
+
+formulaheader:
+  key_formula { LocalTable = new SymbolTab(2); }
+;
+
+
+atransition:
+  nodeident {
+        TS = (TrSymbol*) TransitionTable -> lookup($1);
+        if (!TS) {
+            yyerror("transition does not exist");
+        }
+        if (TS -> vars && TS -> vars -> card) {
+            yyerror("HL transition requires firing mode");
+        }
+        $$ = TS -> transition;
+    }
+| hlprefix lbrack firingmode rbrack {
+        unsigned int i, j, card;
+        fmode* fm;
+        // unused: VaSymbol * v;
+        UValue* vl;
+        char** cc;
+        char** inst;
+        unsigned int len;
+        for (card = 0, fm = $3; fm; fm = fm -> next, card++) {
+            ;
+        }
+        if (card != $1 -> vars -> card) {
+            yyerror("firing mode incomplete");
+        }
+        cc = new char* [ card + 10];
+        inst = new char* [ card + 10];
+        len = strlen($1->name) + 4;
+        j = 0;
+        for (i = 0; i < LocalTable->size; i++) {
+            for (VS = (VaSymbol*)(LocalTable -> table[i]); VS; VS = (VaSymbol*)(VS -> next)) {
+                UValue* pl;
+                for (fm = $3; fm; fm = fm ->next) {
+                    if (fm -> v == VS) {
+                        break;
+                    }
                 }
-	| declarations net key_analyse key_transition atransition {
-	F = NULL;
-	CheckTransition = $5;
-#ifdef STUBBORN
-	Transitions[0]->EndOfStubbornList = LastAttractor = Transitions[0]->StartOfStubbornList = CheckTransition;
-	CheckTransition -> NextStubborn = NULL;
-	CheckTransition -> instubborn = true;
-#endif
-	}
-	| declarations net key_analyse key_marking amarkinglist  { F = NULL;}
-	| declarations net key_automaton automaton  {F = NULL;}
-     ; 
-formulaheader: key_formula {LocalTable = new SymbolTab(2);}
-			;
-atransition: nodeident {
-				TS = (TrSymbol *) TransitionTable -> lookup($1);
-				if(!TS) yyerror("transition does not exist");
-				if(TS -> vars && TS -> vars -> card)
-				{
-					yyerror("HL transition requires firing mode");
-				}
-				$$ = TS -> transition;
-			}
+                if (!fm) {
+                    yyerror("firing mode incomplete");
+                }
+                vl = fm -> t -> evaluate();
+                pl = VS -> var -> type -> make();
+                pl -> assign(vl);
+                cc[j] = pl -> text();
+                inst[j] = new char [strlen(VS -> name) + strlen(cc[j]) + 20];
+                strcpy(inst[j], VS -> name);
+                strcpy(inst[j] + strlen(inst[j]), "=");
+                strcpy(inst[j] + strlen(inst[j]), cc[j]);
+                len += strlen(inst[j]) + 1;
+                j++;
+            }
+        }
+        char* llt;
+        llt = new char[len + 20];
+        strcpy(llt, $1 -> name);
+        strcpy(llt + strlen(llt), ".[");
+        for (j = 0; j < card; j++) {
+            strcpy(llt + strlen(llt), inst[j]);
+            strcpy(llt + strlen(llt), "|");
+        }
+        strcpy(llt + (strlen(llt) - 1), "]");
+        TS = (TrSymbol*) TransitionTable -> lookup(llt);
+        if (!TS) {
+            yyerror("transition instance does not exist");
+        }
+        if (TS -> vars && TS -> vars -> card) {
+            yyerror("HL and LL transition names mixed up");
+        }
+        $$ = TS -> transition;
+    }
+;
 
-		   | hlprefix lbrack firingmode rbrack {
-		   unsigned int i, j,card;
-		   fmode * fm;
-		   // unused: VaSymbol * v;
-		   UValue * vl;
-		   char ** cc;
-		   char ** inst;
-		   unsigned int len;
-		   for(card=0,fm=$3;fm;fm = fm -> next,card++);
-		   if(card != $1 -> vars -> card)
-		   {
-			yyerror("firing mode incomplete");
-		   }
-		   cc = new char * [ card + 10];
-		   inst= new char * [ card + 10];
-		   len = strlen($1->name) + 4;
-		   j=0;
-		   for(i=0;i<LocalTable->size;i++)
-		   {
-			for(VS = (VaSymbol *) (LocalTable -> table[i]);VS; VS = (VaSymbol *) (VS -> next))
-			{
-				UValue * pl;
-				for(fm=$3;fm;fm=fm ->next)
-				{	
-					if(fm -> v == VS) break;
-				}
-				if(!fm) yyerror("firing mode incomplete");
-				vl = fm -> t -> evaluate();
-				pl = VS -> var -> type -> make();
-				pl -> assign(vl);
-				cc[j] = pl -> text();
-				inst[j] = new char [strlen(VS -> name)+strlen(cc[j]) + 20];
-				strcpy(inst[j],VS -> name);
-				strcpy(inst[j]+strlen(inst[j]),"=");
-				strcpy(inst[j]+strlen(inst[j]),cc[j]);
-				len += strlen(inst[j]) + 1;
-				j++;
-			}
-		   } 
-		   char * llt;
-		   llt = new char[len+20];
-		   strcpy(llt,$1 -> name);
-		   strcpy(llt+strlen(llt),".[");
-		   for(j=0;j<card;j++)
-		   {
-			strcpy(llt + strlen(llt),inst[j]);
-			strcpy(llt + strlen(llt),"|");
-		   }
-		   strcpy(llt + (strlen(llt) - 1),"]");
-		   TS = (TrSymbol *) TransitionTable -> lookup(llt);
-		   if(!TS) yyerror("transition instance does not exist");
-		   if(TS -> vars && TS -> vars -> card)
-		   {
-			yyerror("HL and LL transition names mixed up");
-		   }
-		   $$ = TS -> transition;
-		   }
-		   ;
-hlprefix: nodeident dot {
-			TS = (TrSymbol *) TransitionTable -> lookup($1);
-			if(!TS) yyerror("transition does not exist");
-			if( ( !(TS -> vars) || TS -> vars -> card == 0))
-			{
-				yyerror("only HL transitions require firing mode");
-			}
-			$$ = TS;
-			LocalTable = TS -> vars;
-			}
-			;
-firingmode: nodeident eqqual expression  {
-			VS = (VaSymbol *) LocalTable -> lookup($1);
-			if(!VS) yyerror("transition does not have this variable");
-			if(! (VS -> var -> type -> iscompatible($3 -> type)))
-			{
-				yyerror("expression not compatible with transition variable");
-			}
-			$$ = new fmode;
-			$$ -> next = NULL;
-			$$ -> v = VS;
-			$$ -> t = $3;
-			}
-            | firingmode slash nodeident eqqual expression {
-			fmode * fm;
-			VS = (VaSymbol *) LocalTable -> lookup($3);
-			if(!VS) yyerror("transition does not have this variable");
-			if(! (VS -> var -> type -> iscompatible($5 -> type)))
-			{
-				yyerror("expression not compatible with transition variable");
-			}
-			$$ = new fmode;
-			$$ -> next = $1;
-			$$ -> v = VS;
-			$$ -> t = $5 ;
-			for(fm = $1; fm ; fm = fm -> next)
-			{
-				if(fm -> v == $$ -> v)
-				{
-					yyerror("variable appears twice in firing mode");
-				}
-			}
-			}
-			;
 
-aplace: nodeident {
-	PS = (PlSymbol *) PlaceTable ->lookup($1); 
-	if(!PS) yyerror("Place does not exist");
-	if(PS -> sort) yyerror("HL places require instance");
-	$$ = PS -> place;
-	}
-	  | nodeident dot expression {
-	PS = (PlSymbol *) PlaceTable ->lookup($1); 
-	if(!PS) yyerror("Place does not exist");
-	if(!(PS -> sort)) yyerror("LL places do not require instance");
-	if(!(PS -> sort -> iscompatible($3 -> type)))
-	{	
-		yyerror("place color not compatible to place sort");
-	}
-	UValue * vl , * pl;
-	vl = $3 -> evaluate();
-	pl = PS -> sort -> make();
-	pl -> assign(vl);
-	char * inst;
-	inst = pl -> text();
-	char * ll;
-	ll = new char [strlen(PS -> name) + strlen(inst) + 20];
-	strcpy(ll,PS -> name);
-	strcpy(ll + strlen(ll),".");
-	strcpy(ll + strlen(ll),inst);
-	PS = (PlSymbol *) PlaceTable -> lookup(ll);
-	if(!PS) yyerror("place instance does not exist");
-	if(PS->sort) yyerror("mixed up HL and LL place names");
-	$$ = PS -> place;
-	}
-	  ;
-declarations: 
-			| declarations declaration
-			;
-declaration: key_sort sortdeclarations
-		   | key_function {LocalTable = new SymbolTab(1);} functiondeclaration
-		   ;
+hlprefix:
+  nodeident dot {
+        TS = (TrSymbol*) TransitionTable -> lookup($1);
+        if (!TS) {
+            yyerror("transition does not exist");
+        }
+        if ((!(TS -> vars) || TS -> vars -> card == 0)) {
+            yyerror("only HL transitions require firing mode");
+        }
+        $$ = TS;
+        LocalTable = TS -> vars;
+    }
+;
+
+
+firingmode:
+  nodeident eqqual expression  {
+        VS = (VaSymbol*) LocalTable -> lookup($1);
+        if (!VS) {
+            yyerror("transition does not have this variable");
+        }
+        if (!(VS -> var -> type -> iscompatible($3 -> type))) {
+            yyerror("expression not compatible with transition variable");
+        }
+        $$ = new fmode;
+        $$ -> next = NULL;
+        $$ -> v = VS;
+        $$ -> t = $3;
+    }
+| firingmode slash nodeident eqqual expression {
+        fmode* fm;
+        VS = (VaSymbol*) LocalTable -> lookup($3);
+        if (!VS) {
+            yyerror("transition does not have this variable");
+        }
+        if (!(VS -> var -> type -> iscompatible($5 -> type))) {
+            yyerror("expression not compatible with transition variable");
+        }
+        $$ = new fmode;
+        $$ -> next = $1;
+        $$ -> v = VS;
+        $$ -> t = $5 ;
+        for (fm = $1; fm ; fm = fm -> next) {
+            if (fm -> v == $$ -> v) {
+                yyerror("variable appears twice in firing mode");
+            }
+        }
+    }
+;
+
+
+aplace:
+  nodeident {
+        PS = (PlSymbol*) PlaceTable ->lookup($1);
+        if (!PS) {
+            yyerror("Place does not exist");
+        }
+        if (PS -> sort) {
+            yyerror("HL places require instance");
+        }
+        $$ = PS -> place;
+    }
+| nodeident dot expression {
+        PS = (PlSymbol*) PlaceTable ->lookup($1);
+        if (!PS) {
+            yyerror("Place does not exist");
+        }
+        if (!(PS -> sort)) {
+            yyerror("LL places do not require instance");
+        }
+        if (!(PS -> sort -> iscompatible($3 -> type))) {
+            yyerror("place color not compatible to place sort");
+        }
+        UValue* vl , * pl;
+        vl = $3 -> evaluate();
+        pl = PS -> sort -> make();
+        pl -> assign(vl);
+        char* inst;
+        inst = pl -> text();
+        char* ll;
+        ll = new char [strlen(PS -> name) + strlen(inst) + 20];
+        strcpy(ll, PS -> name);
+        strcpy(ll + strlen(ll), ".");
+        strcpy(ll + strlen(ll), inst);
+        PS = (PlSymbol*) PlaceTable -> lookup(ll);
+        if (!PS) {
+            yyerror("place instance does not exist");
+        }
+        if (PS->sort) {
+            yyerror("mixed up HL and LL place names");
+        }
+        $$ = PS -> place;
+    }
+;
+
+
+declarations:
+  /* empty */
+| declarations declaration
+;
+
+
+declaration:
+  key_sort sortdeclarations
+| key_function {LocalTable = new SymbolTab(1); } functiondeclaration
+;
+
+
 sortdeclarations: sortdeclaration |
 				   sortdeclarations sortdeclaration
 				   ;
@@ -375,7 +410,7 @@ sortdeclaration:  ident eqqual sortdescription semicolon {
 				SoSymbol * s;
 				if( (s = (SoSymbol *) (GlobalTable -> lookup($1))) )
 				{
-					yyerror("sort symbol name already used");
+					yyerrors($1, "sort symbol name '%s' already used", $1);
 				}
 				s = new SoSymbol($1,$3);
 			}
@@ -385,7 +420,7 @@ sortdescription : key_boolean { $$ = TheBooType; }
 							// assign an additional name to an existing sort
 							SoSymbol * s;
 							s = (SoSymbol *) (GlobalTable -> lookup($1));
-							if(!s) yyerror("undefined sort name");
+							if(!s) yyerrors($1, "undefined sort name '%s'", $1);
 							if(s -> kind != so) yyerror("sort name expected");
 							$$ = s -> type;
 						}
@@ -580,7 +615,7 @@ repeat_statement: key_repeat statement_seq until expression key_end {
 for_statement: key_for ident eqqual expression key_to expression key_do statement_seq key_end {
 		VaSymbol * v;
 		v = (VaSymbol *) LocalTable -> lookup($2);
-		if(!v) yyerror("loop variable not declared");
+		if(!v) yyerrors($2, "loop variable '%s' not declared", $2);
 		$$ = new UForStatement;
 		((UForStatement *) $$) -> var = v -> var;
 		if(! ( v->var->type -> iscompatible($4 -> type)))
@@ -599,7 +634,7 @@ for_statement: key_for ident eqqual expression key_to expression key_do statemen
 forall_statement: key_for key_all ident key_do statement_seq key_end {
 			VaSymbol * v;
 			v = (VaSymbol *) LocalTable -> lookup($3);
-			if(!v) yyerror("loop variable not declared");
+			if(!v) yyerrors($3, "loop variable '%s' not declared", $3);
 			$$ = new UForallStatement;
 			((UForallStatement *) $$) -> var = v -> var;
 			((UForallStatement *) $$) -> body = $5;
@@ -708,7 +743,7 @@ assignment: lvalue eqqual expression {
 lvalue: ident {
 		VaSymbol * v;
 		v = (VaSymbol *) (LocalTable -> lookup($1));
-		if(!v) yyerror("variable not defined");
+		if(!v) yyerrors($1, "variable '%s' not defined", $1);
 		$$ = new UVarLVal;
 		((UVarLVal*) $$) -> var = v -> var;
 		$$ -> type = ((UVarLVal *) $$) -> var -> type;
@@ -969,9 +1004,9 @@ fac: ident {
 			if(!s) 
 			{
 				printf("%s", $1);
-				yyerror("identifier not defined");
+				yyerrors($1, "identifier '%s' not defined", $1);
 			}
-			if(s->kind != en) yyerror("identifier of wrong kind");
+			if(s->kind != en) yyerrors($1, "identifier '%s' of wrong kind", $1);
 			n = (EnSymbol *) s;
 			e = new UEnuconstantExpression;
 			e -> type = n -> type;
@@ -1153,7 +1188,7 @@ amarking: nodeident colon number {
 				}
 				if(!PS -> sort)
 				{	
-					yyerror("multiterm expression not allowed for low level places");
+					yyerrors($1, "multiterm expression not allowed for low level place '%s'", $1);
 				}
 				pv = PS -> sort -> make();
 				for(tl = $3; tl; tl = tl -> next) // do for all mt components
@@ -1330,7 +1365,7 @@ placelist:  placelist comma place
 place:   nodeident {
 			 if(PlaceTable -> lookup($1))
 			 {
-			   yyerror("Place name used twice");
+			   yyerrors($1, "place '%s' name used twice", $1);
 		     }
 			 P = new Place($1);
 		     PS = new PlSymbol(P);
@@ -1343,7 +1378,7 @@ place:   nodeident {
 			char * c;
 			if(PlaceTable -> lookup($1))
 			{
-				yyerror("Place name used twice");
+ 			   yyerrors($1, "place '%s' name used twice", $1);
 			}
 			c = new char [strlen($1)+10];
 			strcpy(c,$1);
@@ -1385,7 +1420,7 @@ marking: nodeident colon number {
   PS = (PlSymbol *) PlaceTable -> lookup($1);
   if(!PS)
     {
-      yyerror("place does not exist");
+      yyerrors($1, "place '%s' does not exist", $1);
     }
   if(PS -> sort)
   {
@@ -1412,7 +1447,7 @@ marking: nodeident colon number {
 				}
 				if(!PS -> sort)
 				{	
-					yyerror("multiterm expression not allowed for low level places");
+					yyerrors($1, "multiterm expression not allowed for low level place '%s'", $1);
 				}
 				pv = PS -> sort -> make();
 				for(tl = $3; tl; tl = tl -> next) // do for all mt components
@@ -1458,7 +1493,7 @@ hlterm : ident {
 		VS =(VaSymbol *)  (LocalTable -> lookup($1));
 		if(!VS)
 		{
-			yyerror("undeclared variable in term");
+			yyerrors($1, "undeclared variable '%s' in term", $1);
 		}
 		tl = new UTermList;
 		tl -> next = NULL;
@@ -1474,7 +1509,7 @@ hlterm : ident {
 		UTermList * tl;
 		UOpTerm * ot;
 		FS = (FcSymbol *) GlobalTable -> lookup($1);
-		if(!FS) yyerror("operation symbol not declared");
+		if(!FS) yyerrors($1, "operation symbol '%s' not declared", $1);
 		if(FS ->kind != fc) yyerror("wrong symbol used as operation symbol");
 		unsigned int i;
 		UTermList * l;
@@ -1511,242 +1546,243 @@ termlist : {$$ = NULL;}
 transitionlist: transition
               | transitionlist transition
               ;
-transition: key_transition tname transitionvariables guard key_consume arclist semicolon key_produce arclist semicolon  {
-  unsigned int card;
-  unsigned int i;
-  arc_list * current;
-  /* 1. Transition anlegen */
-  if(TransitionTable -> lookup($2))
-    {
-      yyerror("transition name used twice");
+transition: key_transition tname {
+    if (TransitionTable -> lookup($2)) {
+        yyerrors($2, "transition name '%s' used twice", $2);
     }
-  TS = new TrSymbol($2);
-  TS -> vars = LocalTable;
-  TS -> guard = $4;
+} transitionvariables guard key_consume arclist semicolon key_produce arclist semicolon  {
+    unsigned int card;
+    unsigned int i;
+    arc_list* current;
+    /* 1. Transition anlegen */
+    TS = new TrSymbol($2);
+    TS -> vars = LocalTable;
+    TS -> guard = $5;
 
-  // unfold HL transitions
-  // -> create transition instance for every assignment to the variables that
-  //    matches the guard
+    // unfold HL transitions
+    // -> create transition instance for every assignment to the variables that
+    //    matches the guard
 
 
-  // init: initially, all variables have initial value
+    // init: initially, all variables have initial value
 
-  while(1)
-  {
-	if(TS -> guard)
-	{
-		UValue * v;
-		v = TS -> guard -> evaluate();
-		if(((UBooValue * )v) -> v == false) goto nextass;
-	}
-	// A) create LL transition with current variable assignment
+    while (1) {
+        if (TS -> guard) {
+            UValue* v;
+            v = TS -> guard -> evaluate();
+            if (((UBooValue*)v) -> v == false) {
+                goto nextass;
+            }
+        }
+    // A) create LL transition with current variable assignment
 
-  /* generate name */
-  char * llt;
-  if((!LocalTable) || LocalTable -> card == 0)
-  {
-	llt = TS -> name;
-	TS -> vars = NULL;
-  }
-  else
-  {
-  char ** assignment;
-  unsigned int len;
-  len = 0;
-  assignment = new char * [LocalTable -> card + 1000];
-  VaSymbol * vs;
-  unsigned int i,j;
-  j=0;
-  for(i=0;i < LocalTable -> size; i++)
-  {
-	for(vs = (VaSymbol *) (LocalTable-> table[i]); vs ; vs = (VaSymbol *) vs -> next)
-	{
-		char * inst;
-		inst = vs -> var -> value -> text();
-		assignment[j] = new char[strlen(vs -> name) + 10 + strlen(inst)];
-		strcpy(assignment[j],vs -> name);
-		strcpy(assignment[j]+strlen(vs -> name),"=");
-		strcpy(assignment[j]+strlen(vs -> name)+1,inst);
-		len += strlen(assignment[j++]);
-	}
-  }
-  llt = new char [ strlen(TS -> name)  + len + LocalTable -> card + 1000];
-  strcpy(llt,TS->name);
-  strcpy(llt + strlen(llt),".[");
-  for(i=0;i<LocalTable -> card; i++)
-  {
-	strcpy(llt + strlen(llt),assignment[i]);
-	strcpy(llt + strlen(llt),"|");
-  }
-  strcpy(llt + (strlen(llt) - 1), "]");
-  }
-  TrSymbol * TSI;
-  if((!LocalTable) || LocalTable -> card == 0)
-  {
-	TSI = TS;
-  }
-  else
-  {
-  TSI = (TrSymbol *) TransitionTable -> lookup(llt);
-  if(TSI) yyerror("transition instance already exists");
-  TSI = new TrSymbol(llt);
-  TSI -> vars = NULL;
-  TSI -> guard = NULL;
-  }
-  T = TSI -> transition = new Transition(TSI -> name);
-  T -> fairness = $3;
-  /* 2. Inliste eintragen */
-  /* HL-Boegen in LL-Boegen uebersetzen und zur Liste hinzufuegen */
-  arc_list * root;
-  root = $6;
-  for(current = root;current; current = current -> next)
-  {
-	if(current -> mt)
-	{
-		// traverse multiterm
-		arc_list * a;
-		UTermList * mc;
-		UValueList * vl;
-		UValueList * vc;
-		UValue * pv;
-		pv = current -> place -> sort -> make();
-		for(mc = current -> mt; mc ; mc = mc -> next)
-		{	
-			vl = mc -> t -> evaluate();
+        /* generate name */
+        char* llt;
+        if ((!LocalTable) || LocalTable -> card == 0) {
+            llt = TS -> name;
+            TS -> vars = NULL;
+        } else {
+            char** assignment;
+            unsigned int len;
+            len = 0;
+            assignment = new char * [LocalTable -> card + 1000];
+            VaSymbol* vs;
+            unsigned int i, j;
+            j = 0;
+            for (i = 0; i < LocalTable -> size; i++) {
+                for (vs = (VaSymbol*)(LocalTable-> table[i]); vs ; vs = (VaSymbol*) vs -> next) {
+                    char* inst;
+                    inst = vs -> var -> value -> text();
+                    assignment[j] = new char[strlen(vs -> name) + 10 + strlen(inst)];
+                    strcpy(assignment[j], vs -> name);
+                    strcpy(assignment[j] + strlen(vs -> name), "=");
+                    strcpy(assignment[j] + strlen(vs -> name) + 1, inst);
+                    len += strlen(assignment[j++]);
+                }
+            }
+            llt = new char [ strlen(TS -> name)  + len + LocalTable -> card + 1000];
+            strcpy(llt, TS->name);
+            strcpy(llt + strlen(llt), ".[");
+            for (i = 0; i < LocalTable -> card; i++) {
+                strcpy(llt + strlen(llt), assignment[i]);
+                strcpy(llt + strlen(llt), "|");
+            }
+            strcpy(llt + (strlen(llt) - 1), "]");
+        }
+        TrSymbol* TSI;
+        if ((!LocalTable) || LocalTable -> card == 0) {
+            TSI = TS;
+        } else {
+            TSI = (TrSymbol*) TransitionTable -> lookup(llt);
+            if (TSI) {
+                yyerror("transition instance already exists");
+            }
+            TSI = new TrSymbol(llt);
+            TSI -> vars = NULL;
+            TSI -> guard = NULL;
+        }
+        T = TSI -> transition = new Transition(TSI -> name);
+        T -> fairness = $4;
+        /* 2. Inliste eintragen */
+        /* HL-Boegen in LL-Boegen uebersetzen und zur Liste hinzufuegen */
+        arc_list* root;
+        root = $7;
+        for (current = root; current; current = current -> next) {
+            if (current -> mt) {
+    // traverse multiterm
+                arc_list* a;
+                UTermList* mc;
+                UValueList* vl;
+                UValueList* vc;
+                UValue* pv;
+                pv = current -> place -> sort -> make();
+                for (mc = current -> mt; mc ; mc = mc -> next) {
+                    vl = mc -> t -> evaluate();
 
-			for(vc = vl; vc; vc  = vc -> next)
-			{
-				char * inst;
-				char * ll;
-				pv -> assign(vc -> val);
-				inst = pv -> text();
-				ll = new char [strlen(current -> place -> name) + strlen(inst) + 20];
-				strcpy(ll,current->place->name);
-				strcpy(ll+strlen(current->place->name),".");
-				strcpy(ll+strlen(current->place->name)+1,inst);
-				PS = (PlSymbol *) PlaceTable -> lookup(ll);
-				if(!ll) yyerror("place instance does not exist");
-				if(PS -> sort) yyerror("arcs to HL places are not allowed");
-				a = new arc_list;
-				a -> place = PS;
-				a -> mt = NULL;
-				a -> nu =mc -> mult;
-				a -> next = root;
-				root = a;
-			}
-		}
-	}
-  }
-  /* Anzahl der Boegen */
-  for(card = 0, current = root;current;card++,current = current -> next);
-  T->ArrivingArcs = new  Arc * [card+10];
-  /* Schleife ueber alle Boegen */
-  for(current = root;current;current = current -> next)
-    {
-	  /* Bogen ist nur HL-Bogen */
-	  if(current -> place -> sort) continue;
-	  /* Vielfachheit 0 */
-	  if(current -> nu == 0) continue;
-      /* gibt es Bogen schon? */
+                    for (vc = vl; vc; vc  = vc -> next) {
+                        char* inst;
+                        char* ll;
+                        pv -> assign(vc -> val);
+                        inst = pv -> text();
+                        ll = new char [strlen(current -> place -> name) + strlen(inst) + 20];
+                        strcpy(ll, current->place->name);
+                        strcpy(ll + strlen(current->place->name), ".");
+                        strcpy(ll + strlen(current->place->name) + 1, inst);
+                        PS = (PlSymbol*) PlaceTable -> lookup(ll);
+                        if (!ll) {
+                            yyerror("place instance does not exist");
+                        }
+                        if (PS -> sort) {
+                            yyerror("arcs to HL places are not allowed");
+                        }
+                        a = new arc_list;
+                        a -> place = PS;
+                        a -> mt = NULL;
+                        a -> nu = mc -> mult;
+                        a -> next = root;
+                        root = a;
+                    }
+                }
+            }
+        }
+        /* Anzahl der Boegen */
+        for (card = 0, current = root; current; card++, current = current -> next) {
+            ;
+        }
+        T->ArrivingArcs = new  Arc * [card + 10];
+        /* Schleife ueber alle Boegen */
+        for (current = root; current; current = current -> next) {
+            /* Bogen ist nur HL-Bogen */
+            if (current -> place -> sort) {
+                continue;
+            }
+            /* Vielfachheit 0 */
+            if (current -> nu == 0) {
+                continue;
+            }
+            /* gibt es Bogen schon? */
 
-      for(i = 0; i < T->NrOfArriving;i++)
-	{
-	  if(current->place -> place == T->ArrivingArcs[i]->pl)
-	    {
-	      /* Bogen existiert, nur Vielfachheit addieren */
-	      *(T->ArrivingArcs[i]) += current->nu;
-	      break;
-	    }
-	}
-      if(i>=T->NrOfArriving)
-	{
-	  T->ArrivingArcs[T->NrOfArriving] = new Arc(T,current->place->place,true,current->nu);
-	  T->NrOfArriving++;
-	  current -> place -> place -> references ++;
-	}
-    }
-  /* 2. Outliste eintragen */
-  root = $9;
-  for(current = root;current; current = current -> next)
-  {
-	if(current -> mt)
-	{
-		// traverse multiterm
-		arc_list * a;
-		UTermList * mc;
-		UValueList * vl;
-		UValueList * vc;
-		UValue * pv;
-		pv = current -> place -> sort -> make();
-		for(mc = current -> mt; mc ; mc = mc -> next)
-		{	
-			vl = mc -> t -> evaluate();
-			for(vc = vl; vc; vc  = vc -> next)
-			{
-				char * inst;
-				char * ll;
-				pv -> assign(vc -> val);
-				inst = pv -> text();
-				ll = new char [strlen(current -> place -> name) + strlen(inst) + 20];
-				strcpy(ll,current->place->name);
-				strcpy(ll+strlen(current->place->name),".");
-				strcpy(ll+strlen(current->place->name)+1,inst);
-				PS = (PlSymbol *) PlaceTable -> lookup(ll);
-				if(!ll) yyerror("place instance does not exist");
-				a = new arc_list;
-				a -> place = PS;
-				a -> mt = NULL;
-				a -> nu =mc -> mult;
-				a -> next = root;
-				root = a;
-			}
-		}
-	}
-  }
-  /* Anzahl der Boegen */
-  for(card = 0, current = root;current;card++,current = current -> next);
-  T->LeavingArcs = new  Arc * [card+10];
-  /* Schleife ueber alle Boegen */
-  for(current = root;current;current = current -> next)
-    {
-	  /* Bogen ist nur HL-Bogen */
-	  if(current -> place -> sort) continue;
-	  /* Vielfachheit 0 */
-	  if(current -> nu == 0) continue;
-      /* gibt es Bogen schon? */
+            for (i = 0; i < T->NrOfArriving; i++) {
+                if (current->place -> place == T->ArrivingArcs[i]->pl) {
+                    /* Bogen existiert, nur Vielfachheit addieren */
+                    *(T->ArrivingArcs[i]) += current->nu;
+                    break;
+                }
+            }
+            if (i >= T->NrOfArriving) {
+                T->ArrivingArcs[T->NrOfArriving] = new Arc(T, current->place->place, true, current->nu);
+                T->NrOfArriving++;
+                current -> place -> place -> references ++;
+            }
+        }
+        /* 2. Outliste eintragen */
+        root = $10;
+        for (current = root; current; current = current -> next) {
+            if (current -> mt) {
+    // traverse multiterm
+                arc_list* a;
+                UTermList* mc;
+                UValueList* vl;
+                UValueList* vc;
+                UValue* pv;
+                pv = current -> place -> sort -> make();
+                for (mc = current -> mt; mc ; mc = mc -> next) {
+                    vl = mc -> t -> evaluate();
+                    for (vc = vl; vc; vc  = vc -> next) {
+                        char* inst;
+                        char* ll;
+                        pv -> assign(vc -> val);
+                        inst = pv -> text();
+                        ll = new char [strlen(current -> place -> name) + strlen(inst) + 20];
+                        strcpy(ll, current->place->name);
+                        strcpy(ll + strlen(current->place->name), ".");
+                        strcpy(ll + strlen(current->place->name) + 1, inst);
+                        PS = (PlSymbol*) PlaceTable -> lookup(ll);
+                        if (!ll) {
+                            yyerror("place instance does not exist");
+                        }
+                        a = new arc_list;
+                        a -> place = PS;
+                        a -> mt = NULL;
+                        a -> nu = mc -> mult;
+                        a -> next = root;
+                        root = a;
+                    }
+                }
+            }
+        }
+        /* Anzahl der Boegen */
+        for (card = 0, current = root; current; card++, current = current -> next) {
+            ;
+        }
+        T->LeavingArcs = new  Arc * [card + 10];
+        /* Schleife ueber alle Boegen */
+        for (current = root; current; current = current -> next) {
+            /* Bogen ist nur HL-Bogen */
+            if (current -> place -> sort) {
+                continue;
+            }
+            /* Vielfachheit 0 */
+            if (current -> nu == 0) {
+                continue;
+            }
+            /* gibt es Bogen schon? */
 
-      for(i = 0; i < T->NrOfLeaving;i++)
-	{
-	  if(current->place -> place == T->LeavingArcs[i]->pl)
-	    {
-	      /* Bogen existiert, nur Vielfachheit addieren */
-	      *(T->LeavingArcs[i]) += current->nu;
-	      break;
-	    }
-	}
-      if(i>=T->NrOfLeaving)
-	{
-	  T->LeavingArcs[T->NrOfLeaving] = new Arc(T,current->place -> place,false,current->nu);
-	  T -> NrOfLeaving++;
-	  current -> place -> place -> references ++;
-	}
-    }
-	// B) switch to next assignment
+            for (i = 0; i < T->NrOfLeaving; i++) {
+                if (current->place -> place == T->LeavingArcs[i]->pl) {
+                    /* Bogen existiert, nur Vielfachheit addieren */
+                    *(T->LeavingArcs[i]) += current->nu;
+                    break;
+                }
+            }
+            if (i >= T->NrOfLeaving) {
+                T->LeavingArcs[T->NrOfLeaving] = new Arc(T, current->place -> place, false, current->nu);
+                T -> NrOfLeaving++;
+                current -> place -> place -> references ++;
+            }
+        }
+    // B) switch to next assignment
 nextass:
-	if((!LocalTable) || LocalTable -> card == 0) break;
-	unsigned int k;
-	VaSymbol * vv;
-	for(k=0;k < LocalTable -> size;k++)
-	{
-		for(vv = (VaSymbol *) (LocalTable-> table[k]); vv;vv = (VaSymbol *) (vv -> next))
-		{
-			(*(vv -> var -> value)) ++;
-			if(!(vv -> var -> value -> isfirst()) ) break;
-		}
-		if(vv) break;
-	}
-	if(!vv) break;
-	}
+        if ((!LocalTable) || LocalTable -> card == 0) {
+            break;
+        }
+        unsigned int k;
+        VaSymbol* vv;
+        for (k = 0; k < LocalTable -> size; k++) {
+            for (vv = (VaSymbol*)(LocalTable-> table[k]); vv; vv = (VaSymbol*)(vv -> next)) {
+                (*(vv -> var -> value)) ++;
+                if (!(vv -> var -> value -> isfirst())) {
+                    break;
+                }
+            }
+            if (vv) {
+                break;
+            }
+        }
+        if (!vv) {
+            break;
+        }
+    }
 }
 ;
 transitionvariables: vardeclarations {$$ = 0;}
@@ -1767,47 +1803,41 @@ arclist: { $$ = NULL;}
     }
       ;
 arc:  nodeident colon number {
-      unsigned int i;
-      PS = (PlSymbol *) PlaceTable -> lookup($1);
-      if(!PS)
-	{
-	  yyerror("place does not exist");
-	}
-	if(PS -> sort)
-	{
-		yyerror("arc expression of high level places must be term expressions");
-	}
-      $$ = new arc_list;
-      $$ -> place = PS;
-      $$-> next = (arc_list *)  0;
-      sscanf($3,"%u",&i);
-      $$ -> nu = i;
-	  $$ -> mt = NULL;
+        unsigned int i;
+        PS = (PlSymbol*) PlaceTable -> lookup($1);
+        if (!PS) {
+            yyerrors($1, "place '%s' does not exist", $1);
+        }
+        if (PS -> sort) {
+            yyerror("arc expression of high level places must be term expressions");
+        }
+        $$ = new arc_list;
+        $$ -> place = PS;
+        $$-> next = (arc_list*)  0;
+        sscanf($3, "%u", &i);
+        $$ -> nu = i;
+        $$ -> mt = NULL;
     }
-	| nodeident colon multiterm {
-		UTermList * tl;
-		PS = (PlSymbol *) PlaceTable -> lookup($1);
-		if(!PS)
-		{
-			yyerror("place does not exist");
-		}
-		if(!(PS -> sort))
-		{
-			yyerror("low level places require numerical multiplicity");
-		}
-		$$ = new arc_list;
-		$$ -> place = PS; 
-		$$ -> nu = 0;
-		$$ -> mt = $3;
-		$$ -> next = NULL;
-		for(tl = $3; tl; tl = tl -> next)
-		{
-			if(!(PS -> sort -> iscompatible(tl -> t -> type)))
-			{
-				yyerror("type mismatch between place and arc expression");
-			}
-		}
-	}
+| nodeident colon multiterm {
+UTermList* tl;
+PS = (PlSymbol*) PlaceTable -> lookup($1);
+if (!PS) {
+    yyerror("place does not exist");
+}
+if (!(PS -> sort)) {
+    yyerrors($1, "low level place '%s' require numerical multiplicity", $1);
+}
+$$ = new arc_list;
+$$ -> place = PS;
+$$ -> nu = 0;
+$$ -> mt = $3;
+$$ -> next = NULL;
+for (tl = $3; tl; tl = tl -> next) {
+    if (!(PS -> sort -> iscompatible(tl -> t -> type))) {
+        yyerror("type mismatch between place and arc expression");
+    }
+}
+}
 	;
 numex:     number { 
 			$$ = new UIntconstantExpression();
@@ -1975,7 +2005,7 @@ transitionformula:  key_exists quantification colon transitionformula {
 				;
 formulatransition: nodeident {
 					TS = (TrSymbol *) TransitionTable -> lookup($1);
-					if(!TS) yyerror("transition does not exist");
+					if(!TS) yyerrors($1, "transition '%s' does not exist", $1);
 					$$ = TS;
 				}
 				;
@@ -2169,30 +2199,25 @@ if(F)
 }
 }
 
-/*
-bool taskfile = false;
 
-int yywrap()
-{
-	yylineno = 1;
-	if(taskfile) return 1;
-	if(!analysefile) return 1;
-	taskfile = true;
-	yyin = fopen(analysefile,"r");
-	if(!yyin)
-	{
-		cerr << "cannot open analysis task file: " << analysefile << "\n";
-		exit(4);
-	}
-	diagnosefilename = analysefile;
-	return(0);
+/// display a parser error and exit
+void yyerrors(char* token, char const* format, ...) {
+    fprintf(stderr, "%s: %s:%d - ", _ctool_(PACKAGE), _cfilename_(diagnosefilename), yylineno);
+
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+
+    fprintf(stderr, "\n");
+    message("error near '%s'", token);
+    displayFileError(diagnosefilename, yylineno, token);
+    abort(3, "syntax error");
 }
-*/
 
 
 /// display a parser error and exit
-void yyerror(char const * mess) {
-    fprintf(stderr, "lola: %s:%d: error near '%s': %s\n", diagnosefilename, yylineno, yytext, mess);
-	exit(3);
+void yyerror(char const* mess) {
+    yyerrors(yytext, mess);
 }
 

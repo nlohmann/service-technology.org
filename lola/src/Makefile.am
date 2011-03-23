@@ -21,6 +21,7 @@ lola_SOURCES = readnet-syntax.yy \
                reports.cc reports.H \
                sweep.cc sweep.H \
                structure.H \
+               verbose.cc verbose.h \
                userconfig.H 
 
 # additional source code

@@ -48,6 +48,9 @@
 using std::set_new_handler;
 using std::string;
 
+// a structure containing command line parameters
+gengetopt_args_info args_info;
+
 
 unsigned int BitVectorSize = 0;
 Place** Places;
@@ -145,9 +148,6 @@ unsigned int NonEmptyHash;
 
 /// process the command line options using GNU gengetopt
 void processCommandLine(int argc, char** argv) {
-    // a structure containing command line parameters
-    gengetopt_args_info args_info;
-
     // call the cmdline parser, initiate args_info
     if (cmdline_parser(argc, argv, &args_info) != 0) {
         fprintf(stderr, "      see 'lola --help' for more information\n");

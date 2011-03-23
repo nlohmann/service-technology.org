@@ -16,8 +16,7 @@ BEGIN
 FOR ALL x DO RETURN x END
 END
 
-PLACE nrea : reader , rea : reader , sem : reader , nwri : writer , wri : writer{ ,
- pen : writer  ,  key } ;
+PLACE nrea : reader , rea : reader , sem : reader , nwri : writer , wri : writer { , pen : writer  ,  key } ;
 
 MARKING nrea : allreaders() , nwri : allwriters() , sem : allreaders() { , key : 1 }  ;
 

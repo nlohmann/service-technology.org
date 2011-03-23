@@ -119,6 +119,11 @@ option "Master" c
  "Master in distributed search"
  flag off hidden
 
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+
 
 text "
 Return Values:

@@ -2125,11 +2125,12 @@ automaton:
         BuchiTable = new SymbolTab(10);
     } statepart finalpart transitionpart {
         {
+            int j;
             buchitransition* bt;
             for (int i = 0; i < buchistate::nr; i++) {
                 buchistate* b = buchiautomaton[i];
                 b->delta = new buchitransition * [b->nrdelta + 1];
-                for (int j = 0, bt = b->transitionlist; bt; bt = bt->next, j++) {
+                for (j = 0, bt = b->transitionlist; bt; bt = bt->next, j++) {
                     b->delta[j] = bt;
                 }
             }

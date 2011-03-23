@@ -1,4 +1,7 @@
-@heading Version 3.2
+@heading Version 3.3-unreleased
+
+
+@heading Version 3.2 (23 March 2011)
 @itemize
 @item test scripts now use the @samp{petri} utility to convert automata to open nets
 

@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-#ifndef _OUTPUT_H
-#define _OUTPUT_H
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -93,5 +91,3 @@ class Output {
         /// the kind of the file
         const std::string kind;
 };
-
-#endif

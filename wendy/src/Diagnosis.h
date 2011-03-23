@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-#ifndef _DIAGNOSIS_H
-#define _DIAGNOSIS_H
+#pragma once
 
 #include <fstream>
 #include "StoredKnowledge.h"
@@ -56,5 +54,3 @@ class Diagnosis {
         /// return the last marking from which two given markings are reachable
         static InnerMarking_ID lastCommonPredecessor(InnerMarking_ID, InnerMarking_ID);
 };
-
-#endif

@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-#ifndef _INTERFACEMARKING_H
-#define _INTERFACEMARKING_H
+#pragma once
 
 #include <ostream>
 #include <vector>
@@ -135,5 +133,3 @@ class InterfaceMarking {
         /// a byte array to store the interface markings
         uint8_t* storage;
 };
-
-#endif

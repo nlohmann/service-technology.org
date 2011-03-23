@@ -17,12 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef COVER_H_
-#define COVER_H_
-
-/************
- * Includes *
- ************/
+#pragma once
 
 #include <pnapi/pnapi.h>
 #include <map>
@@ -141,5 +136,3 @@ class Cover {
         /// synchronous labels
         static std::vector<std::string> synchronousLabels;
 };
-
-#endif /*COVER_H_*/

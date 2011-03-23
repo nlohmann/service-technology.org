@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-#ifndef _INNERMARKING_H
-#define _INNERMARKING_H
+#pragma once
 
 #include <pnapi/pnapi.h>
 #include <vector>
@@ -146,5 +144,3 @@ class InnerMarking {
         /// receiving transitions that are potentially reachable
         PossibleSendEvents* possibleSendEvents;
 };
-
-#endif

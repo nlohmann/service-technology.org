@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef ANNOTATIONLIVELOCKOG_H_
-
-#define ANNOTATIONLIVELOCKOG_H_
+#pragma once
 
 #include <set>
 #include <string>
@@ -29,7 +27,8 @@
 /*!
   Livelock Operating Guideline only
 
-  a set of knowledges is annotated with a set of label IDs which will be transformed into a real string later on
+  a set of knowledges is annotated with a set of label IDs which will be
+  transformed into a real string later on
 */
 class AnnotationElement {
 
@@ -112,6 +111,3 @@ class AnnotationLivelockOG {
         /// current pointer
         AnnotationElement* currentPointer;
 };
-
-
-#endif /* ANNOTATIONLIVELOCKOG_H_ */

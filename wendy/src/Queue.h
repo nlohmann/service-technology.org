@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-#ifndef _QUEUE_H
-#define _QUEUE_H
+#pragma once
 
 #include "types.h"
 #include "InterfaceMarking.h"
@@ -67,5 +65,3 @@ class Queue {
         /// returns the top inner marking
         const InnerMarking_ID& popInner();
 };
-
-#endif

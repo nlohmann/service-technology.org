@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-#ifndef __TYPES_H
-#define __TYPES_H
+#pragma once
 
 #include <config.h>
 #ifdef HAVE_STDINT_H
@@ -37,5 +35,3 @@ typedef uint32_t innermarkingcount_t;
 
 /// the range of inner markings (max. 4294967296)
 typedef uint32_t InnerMarking_ID;
-
-#endif

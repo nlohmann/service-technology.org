@@ -17,8 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef _UTIL_H
-#define _UTIL_H
+#pragma once
 
 /*!
   \def FOREACH(I, C)
@@ -47,5 +46,3 @@
 
 #define MINIMUM(X, Y) ((X) < (Y) ? (X) : (Y))
 #define MAXIMUM(X, Y) ((X) > (Y) ? (X) : (Y))
-
-#endif

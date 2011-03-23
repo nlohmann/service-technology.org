@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-#ifndef _STOREDKNOWLEDGE_H
-#define _STOREDKNOWLEDGE_H
+#pragma once
 
 #include <iostream>
 #include <map>
@@ -200,5 +198,3 @@ class StoredKnowledge {
         /// the successors of this knowledge (length is fixed by the labels)
         StoredKnowledge** successors;
 };
-
-#endif

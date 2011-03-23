@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-#ifndef _SCSHANDLER_H
-#define _SCSHANDLER_H
+#pragma once
 
 #include <map>
 #include <set>
@@ -110,6 +108,3 @@ class SCSHandler {
         void initialize(SetOfEdges& SCS, unsigned int& _numberOfAllEdges);
 
 };
-
-
-#endif

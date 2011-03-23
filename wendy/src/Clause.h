@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-#ifndef CLAUSE_H_
-#define CLAUSE_H_
+#pragma once
 
 #include <set>
 #include <string>
@@ -29,7 +27,8 @@
 class StoredKnowledge;
 
 /*!
- sort of dummy class to hold a const pointer, which we need in Clause to store a pointer to a final knowledge
+ sort of dummy class to hold a const pointer, which we need in Clause to
+ store a pointer to a final knowledge
 */
 class FinalKnowledge {
     public: /* member functios */
@@ -125,6 +124,3 @@ class Clause {
         char* decodedLabels;
 
 };
-
-
-#endif /* CLAUSE_H_ */

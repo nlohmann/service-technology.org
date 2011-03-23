@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-#ifndef _KNOWLEDGE_H
-#define _KNOWLEDGE_H
+#pragma once
 
 #include <vector>
 #include <map>
@@ -99,5 +97,3 @@ class Knowledge {
         ///                 which are essential to resolve each and every waitstate
         std::vector<bool> consideredReceivingEvents;
 };
-
-#endif

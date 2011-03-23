@@ -8,42 +8,8 @@
                       http://service-technology.org/wendy
 
 
-Version 3.2
-===========
-
-* test scripts now use the `petri' utility to convert automata to open nets
-
-* added target to create complete manual (execute `make manual -C doc')
-
-* updated the Petri Net API 4.02 (revision r5970)
-
-* updated LCOV (`http://ltp.sourceforge.net/coverage/lcov.php') to 1.9 and
-  removed ZCOV, because LCOV can do branch coverage as well
-
-* implemented `--internalReduction' parameter to reduce internal actions
-  using the algorithm described in
-
-       Niels Lohmann. Internal behavior reduction for partner synthesis. In
-       Daniel Eichhorn, Agnes Koschmider, and Huayu Zhang, editors,
-       Proceedings of the 3rd Central-European Workshop on Services and
-       their Composition, ZEUS 2011, Karlsruhe, Germany, February 21-22,
-       2011, volume 705 of CEUR Workshop Proceedings, March 2011.
-       CEUR-WS.org.
-
-* adjusted configure script to download and compile LoLA if it is not found
-  in the path
-
-* Wendy creates an extended CTL formula which is added to the intermediate
-  LoLA output. It is used to apply CTL*-preserving partial order reduction
-  when building the state space of the inner of the net. The formula is
-  used to tell LoLA which transitions are visible; that is, which
-  transitions must not be ignored during reduction.
-
-* fixed bug #17896 (see `https://gna.org/bugs/?17896'): crash on empty
-  input nets
-
-* LoLA is now automatically downloaded and compiled if the configure script
-  does not find an installed version.
+Version 3.3-unreleased
+======================
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

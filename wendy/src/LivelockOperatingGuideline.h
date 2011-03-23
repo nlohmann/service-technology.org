@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-#ifndef LIVELOCKOPERATINGGUIDELINE_H_
-#define LIVELOCKOPERATINGGUIDELINE_H_
+#pragma once
 
 #include <set>
 #include <vector>
@@ -132,5 +130,3 @@ class LivelockOperatingGuideline {
         /// write the annotation of the livelock operating guideline to the given output stream
         static void output_cyclic(const bool& dot, std::ostream& file);
 };
-
-#endif /* LIVELOCKOPERATINGGUIDELINE_H_ */

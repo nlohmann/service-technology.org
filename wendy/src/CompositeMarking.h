@@ -17,8 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef COMPOSITEMARKING_H_
-#define COMPOSITEMARKING_H_
+#pragma once
 
 #include "StoredKnowledge.h"
 #include "InnerMarking.h"
@@ -118,6 +117,3 @@ class CompositeMarkingsHandler {
         /// represents the formula (set of disjunctions which each are a set again)
         static std::vector<Clause* > conjunctionOfDisjunctionsBoolean;
 };
-
-
-#endif /* COMPOSITEMARKING_H_ */

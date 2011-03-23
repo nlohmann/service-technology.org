@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-#ifndef _POSSIBLESENDEVENTS_H
-#define _POSSIBLESENDEVENTS_H
+#pragma once
 
 #include "types.h"
 
@@ -71,5 +69,3 @@ class PossibleSendEvents {
         /// array of all sending events (possible or not); built by decode()
         char* decodedLabels;
 };
-
-#endif

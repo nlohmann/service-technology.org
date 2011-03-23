@@ -17,9 +17,7 @@
  along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
-#ifndef _LABEL_H
-#define _LABEL_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -106,5 +104,3 @@ class Label {
         /// given a transition name, the communication label
         static std::map<std::string, Label_ID> name2id;
 };
-
-#endif

@@ -261,15 +261,6 @@ AT_CHECK([GREP -q "Controller was not built" stderr],0)
 AT_KEYWORDS(specadapters)
 AT_CLEANUP
 
-AT_SETUP([diagnosis of unadaptability])
-AT_CHECK_WENDY
-AT_CHECK_LOLA
-AT_CHECK_LIBCONFIG
-AT_CHECK([cp TESTFILES/ca1.owfn TESTFILES/td.owfn TESTFILES/td.ar .])
-AT_CHECK([MARLENE ca1.owfn td.owfn --diagnosis --verbose DEFAULTPARAMETERS],0,ignore,ignore)
-AT_KEYWORDS(specadapters)
-AT_CLEANUP
-
 AT_SETUP([region based conversion (Petrify) for controller])
 AT_CHECK_PETRIFY
 AT_CHECK_WENDY
@@ -308,6 +299,53 @@ AT_CHECK([GREP -q "Using a state machine for conversion from SA to open net." st
 AT_CHECK([MARLENE ca1.owfn td.owfn --rulefile=td.ar --conf=nopetrify.conf --messagebound=1 --verbose --sa2on=genet --wendy=WENDY],0,ignore,stderr)
 AT_CHECK([GREP -q "Using a state machine for conversion from SA to open net." stderr],0)
 AT_KEYWORDS(specadapters)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Diagnosis])
+############################################################################
+
+AT_SETUP([diagnosis of unadaptability (deadlock)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK_LIBCONFIG
+AT_CHECK([cp TESTFILES/d1.owfn TESTFILES/d2.owfn TESTFILES/diag0.ar .])
+AT_CHECK([MARLENE d1.owfn d2.owfn --rulefile=diag0.ar --diagnosis --property=livelock --verbose DEFAULTPARAMETERS],0,ignore,ignore)
+AT_CHECK([GREP "DL;1;b2;a1,a2;;" live.txt],0,ignore)
+AT_KEYWORDS(diagnosis)
+AT_CLEANUP
+
+AT_SETUP([diagnosis of unadaptability (livelock)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK_LIBCONFIG
+AT_CHECK([cp TESTFILES/d1.owfn TESTFILES/d2.owfn TESTFILES/diag1.ar .])
+AT_CHECK([MARLENE d1.owfn d2.owfn --rulefile=diag1.ar --diagnosis --property=livelock --verbose DEFAULTPARAMETERS],0,ignore,ignore)
+AT_CHECK([GREP "LL;;;a2;1,2;" live.txt],0,ignore)
+AT_CHECK([GREP "LL;1;;a1,quit;1,2;" live.txt],0,ignore)
+AT_CHECK([GREP "LL;1;a2;a1,a2;1,2;" live.txt],0,ignore)
+AT_CHECK([GREP "LL;1;b1;a1,a2;1,2;" live.txt],0,ignore)
+AT_KEYWORDS(diagnosis)
+AT_CLEANUP
+
+AT_SETUP([diagnosis of unadaptability (unattended choice)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK_LIBCONFIG
+AT_CHECK([cp TESTFILES/d1.owfn TESTFILES/d2.owfn TESTFILES/diag0.ar .])
+AT_CHECK([MARLENE d1.owfn d2.owfn --rulefile=diag0.ar --diagnosis --property=livelock --verbose DEFAULTPARAMETERS],0,ignore,ignore)
+AT_CHECK([GREP "MA;1;b2;a1;;" live.txt],0,ignore)
+AT_KEYWORDS(diagnosis)
+AT_CLEANUP
+
+AT_SETUP([diagnosis of unadaptability (adaptable)])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK_LIBCONFIG
+AT_CHECK([cp TESTFILES/d1.owfn TESTFILES/d2.owfn TESTFILES/diag2.ar .])
+AT_CHECK([MARLENE d1.owfn d2.owfn --rulefile=diag2.ar --diagnosis --property=livelock --verbose DEFAULTPARAMETERS],0,ignore,stderr)
+AT_CHECK([GREP "The nets are adaptable, please run in non-diagnosis mode." stderr],0,ignore)
+AT_KEYWORDS(diagnosis)
 AT_CLEANUP
 
 ############################################################################

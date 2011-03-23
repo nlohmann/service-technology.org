@@ -29,7 +29,8 @@ TESTFILES = test.owfn test.ar \
 	    sync1_exp.owfn sync2_exp.owfn sync3_exp.owfn \
 	    async1_exp.owfn async2_exp.owfn async3_exp.owfn \
 	    bug_compplaces.owfn bug_compplaces.ar \
-            some-rules.ar
+      some-rules.ar \
+      d1.owfn d2.owfn diag0.ar diag1.ar diag2.ar
 
 
 #-----------------------------------------#

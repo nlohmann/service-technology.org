@@ -21,7 +21,6 @@
 
 // shared pointer
 #include <cstddef> // for __GLIBCXX__
-
 #ifdef __GLIBCXX__
 #  include <tr1/memory>
 #else
@@ -60,8 +59,9 @@
 
 /* For documentation of the following functions, please see header file. */
 
-Adapter::Adapter(std::vector< std::tr1::shared_ptr< pnapi::PetriNet > > & nets, RuleSet & rs,
-        ControllerType contType, unsigned int messageBound,
+Adapter::Adapter(
+        std::vector<std::tr1::shared_ptr<pnapi::PetriNet> > & nets,
+        RuleSet & rs, ControllerType contType, unsigned int messageBound,
         bool useCompPlaces) :
     _engine(new pnapi::PetriNet), _controller(), _nets(nets), _rs(rs),
             _contType(contType), _messageBound(messageBound),
@@ -81,7 +81,7 @@ Adapter::~Adapter() {
     FUNCOUT
 }
 
-std::tr1::shared_ptr < const pnapi::PetriNet > Adapter::buildEngine() {
+std::tr1::shared_ptr<const pnapi::PetriNet> Adapter::buildEngine() {
     FUNCIN
 
     // create port to the controller
@@ -109,7 +109,7 @@ std::tr1::shared_ptr < const pnapi::PetriNet > Adapter::buildEngine() {
     return _engine;
 }
 
-std::tr1::shared_ptr < const pnapi::PetriNet > Adapter::buildController() {
+std::tr1::shared_ptr<const pnapi::PetriNet> Adapter::buildController() {
     FUNCIN
 
     using namespace pnapi;
@@ -401,19 +401,21 @@ std::tr1::shared_ptr < const pnapi::PetriNet > Adapter::buildController() {
         {
             status("Using Genet for conversion from SA to open net.");
             pnapi::PetriNet::setGenet(path2genet);
-            _controller = std::tr1::shared_ptr<pnapi::PetriNet> (new pnapi::PetriNet(*mpp_sa,
-                    pnapi::PetriNet::GENET, args_info.messagebound_arg + 1));
+            _controller = std::tr1::shared_ptr<pnapi::PetriNet>(
+                    new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::GENET,
+                            args_info.messagebound_arg + 1));
         } else if (args_info.sa2on_arg == sa2on_arg_petrify
                 and path2petrify != "") {
             status("Using Petrify for conversion from SA to open net.");
             pnapi::PetriNet::setPetrify(path2petrify);
-            _controller = std::tr1::shared_ptr<pnapi::PetriNet> (new pnapi::PetriNet(*mpp_sa,
-                    pnapi::PetriNet::PETRIFY));
+            _controller = std::tr1::shared_ptr<pnapi::PetriNet>(
+                    new pnapi::PetriNet(*mpp_sa, pnapi::PetriNet::PETRIFY));
         } else {
             status(
                     "Using a state machine for conversion from SA to open net.");
-            _controller = std::tr1::shared_ptr<pnapi::PetriNet> (new pnapi::PetriNet(*mpp_sa,
-                    pnapi::PetriNet::STATEMACHINE));
+            _controller = std::tr1::shared_ptr<pnapi::PetriNet>(
+                    new pnapi::PetriNet(*mpp_sa,
+                            pnapi::PetriNet::STATEMACHINE));
         }
         delete mpp_sa;
     }
@@ -599,9 +601,11 @@ void Adapter::createRuleTransitions() {
     unsigned int transNumber = 1;
 
     // get given rules
-    std::list< std::tr1::shared_ptr < RuleSet::AdapterRule > > rules = _rs.getRules();
+    std::list<std::tr1::shared_ptr<RuleSet::AdapterRule> > rules =
+            _rs.getRules();
     // iterate them
-    std::list< std::tr1::shared_ptr < RuleSet::AdapterRule > >::iterator ruleIter = rules.begin();
+    std::list<std::tr1::shared_ptr<RuleSet::AdapterRule> >::iterator
+            ruleIter = rules.begin();
     while (ruleIter != rules.end()) {
         const RuleSet::AdapterRule & rule = **ruleIter;
 
@@ -946,7 +950,7 @@ inline std::string Adapter::computeMPP(std::string filename) {
         std::ifstream owfnFile(filename.c_str());
         Output normNet;
 
-        std::tr1::shared_ptr<pnapi::PetriNet> net (new pnapi::PetriNet);
+        std::tr1::shared_ptr<pnapi::PetriNet> net(new pnapi::PetriNet);
         owfnFile >> pnapi::io::owfn >> *net;
         owfnFile.close();
 
@@ -957,11 +961,9 @@ inline std::string Adapter::computeMPP(std::string filename) {
             // normNet.stream().flush();
         }
 
-        std::string mpp_command = path2wendy + " --sa="
-                + sa_filename + " --result=" + results_filename
-                + " " + filename;
-        status(
-                "Generating most-permissive partner for `%s' by executing",
+        std::string mpp_command = path2wendy + " --sa=" + sa_filename
+                + " --result=" + results_filename + " " + filename;
+        status("Generating most-permissive partner for `%s' by executing",
                 filename.c_str());
 
         status("%s", mpp_command.c_str());
@@ -969,8 +971,7 @@ inline std::string Adapter::computeMPP(std::string filename) {
         int result = system(mpp_command.c_str());
         result = WEXITSTATUS(result);
         time(&end_time);
-        status("Wendy done [%.0f sec]", difftime(end_time,
-                start_time));
+        status("Wendy done [%.0f sec]", difftime(end_time, start_time));
         rfile.open(results_filename.c_str());
     }
     rfile.close();
@@ -992,7 +993,7 @@ RuleSet::~RuleSet() {
     FUNCOUT
 }
 
-void RuleSet::addRules(std::tr1::shared_ptr < FILE > inputStream) {
+void RuleSet::addRules(std::tr1::shared_ptr<FILE> inputStream) {
     FUNCIN
     extern FILE * adapt_rules_yyin;
     extern int adapt_rules_yyparse();
@@ -1024,7 +1025,7 @@ void RuleSet::addRules(std::tr1::shared_ptr < FILE > inputStream) {
     FUNCOUT
 }
 
-inline const std::list< std::tr1::shared_ptr < RuleSet::AdapterRule > > RuleSet::getRules() const {
+inline const std::list<std::tr1::shared_ptr<RuleSet::AdapterRule> > RuleSet::getRules() const {
     FUNCIN
     FUNCOUT
     return _adapterRules;

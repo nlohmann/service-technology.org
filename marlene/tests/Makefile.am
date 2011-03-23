@@ -43,7 +43,8 @@ TESTFILES = test.owfn test.ar \
 # Absolute filenames are expected, but you may use '*' as wildcard. For
 # example '*/libs/*' ignores everything in the 'libs' directory and
 # '*/cmdline.c' will exclude any file in the sources called 'cmdline.c'.
-NO_COVER_FILES = */libs/* */parser_adapt_rules.cc */lexer_adapt_rules.cc */cmdline.* */Output.*
+NO_COVER_FILES = */libs/* */parser_adapt_rules.cc */lexer_adapt_rules.cc */cmdline.* */Output.* \
+		 */lexer_marking_information.cc */parser_marking_information.cc
 
 
 

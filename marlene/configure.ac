@@ -39,7 +39,7 @@ AC_ST_VERBOSE
 AC_PATH_PROG(VALGRIND, [valgrind], [])
 AC_PATH_PROG(DIFF, [diff], [])
 
-# AC_PATH_PROGS(CANDY, [candy], [])
+AC_PATH_PROGS(CANDY, [candy], [])
 
 CONVERTER=sa2on
 

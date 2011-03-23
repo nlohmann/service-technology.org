@@ -25,6 +25,7 @@
 #include "Graph.h"  // Graph class
 #include "Output.h"  // handles output
 #include "verbose.h"  // status, debug, abort messages
+#include <ctime> // clock_t
 
 
 // og, cf and nf lexer and parser

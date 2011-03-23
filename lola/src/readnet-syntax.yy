@@ -30,6 +30,9 @@
 #include "verbose.h"
 #include <cstdio>
 #include <climits>
+#include <unistd.h>
+#include <cstdarg>
+
 
 extern UBooType * TheBooType;
 extern UNumType * TheNumType;

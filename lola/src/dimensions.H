@@ -33,6 +33,9 @@
   #define FULLTARJAN
   #define TARJAN
   #define WITHFORMULA
+  #undef FIRELIST
+  #define FIRELIST stubbornfirelistctl
+ // #define GRAPH simple_depth_first
 #endif
 
 #undef APPROXIMATE_CANONIZATION

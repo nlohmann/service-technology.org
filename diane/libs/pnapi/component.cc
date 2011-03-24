@@ -30,7 +30,7 @@ using util::ComponentObserver;
  */
 Node::Node(PetriNet & net, util::ComponentObserver & observer,
            const std::string & name) :
-  net_(net), observer_(observer), color_("")
+  net_(net), observer_(observer)
 {
   PNAPI_ASSERT(&observer.getPetriNet() == &net);
   history_.push_back(name);
@@ -42,7 +42,7 @@ Node::Node(PetriNet & net, util::ComponentObserver & observer,
  */
 Node::Node(PetriNet & net, util::ComponentObserver & observer,
            const Node & node, const std::string & prefix) :
-  net_(net), observer_(observer), history_(node.history_), color_(node.color_)
+  net_(net), observer_(observer), history_(node.history_)
 {
   PNAPI_ASSERT(&observer.getPetriNet() == &net);
   if (!prefix.empty())
@@ -221,25 +221,6 @@ const std::set<Arc *> & Node::getPostsetArcs() const
   return postsetArcs_;
 }
 
-/*!
- * \brief set node color (dot output)
- * 
- * \param color A valid dot color value. If empty, default colors will be used.
- * 
- * \note Use at own risk!
- */
-void Node::setColor(const std::string & color)
-{
-  color_ = color;
-}
-
-/*!
- * \brief returns the node's color (dot output)
- */
-const std::string & Node::getColor() const
-{
-  return color_;
-}
 
 /*!
  * \brief merges another node into this one

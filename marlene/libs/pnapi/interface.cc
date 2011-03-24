@@ -182,7 +182,7 @@ Interface::Interface(PetriNet & net, const Interface & interface1, const Interfa
  */
 Interface::~Interface()
 {
-  clear();
+  // clear();
 }
 
 /*!

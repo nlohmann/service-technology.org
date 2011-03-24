@@ -305,14 +305,14 @@ PetriNet::PetriNet(const PetriNet & net) :
  */
 PetriNet::~PetriNet()
 {
-  clear();
+  //clear();
 
-  PNAPI_ASSERT(nodes_.empty());
-  PNAPI_ASSERT(nodesByName_.empty());
-  PNAPI_ASSERT(transitions_.empty());
-  PNAPI_ASSERT(places_.empty());
-  PNAPI_ASSERT(arcs_.empty());
-  PNAPI_ASSERT(roles_.empty());
+  //PNAPI_ASSERT(nodes_.empty());
+  //PNAPI_ASSERT(nodesByName_.empty());
+  //PNAPI_ASSERT(transitions_.empty());
+  //PNAPI_ASSERT(places_.empty());
+  //PNAPI_ASSERT(arcs_.empty());
+  //PNAPI_ASSERT(roles_.empty());
 }
 
 /*!

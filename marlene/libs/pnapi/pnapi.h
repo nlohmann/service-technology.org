@@ -7,9 +7,9 @@
  *
  * \since   2008/12/09
  *
- * \date    $Date: 2010-03-14 13:44:15 +0100 (Sun, 14 Mar 2010) $
+ * \date    $Date: 2010-08-19 11:06:02 +0200 (Do, 19. Aug 2010) $
  *
- * \version $Revision: 5513 $
+ * \version $Revision: 6062 $
  */
 
 #ifndef PNAPI_PNAPI_H
@@ -45,7 +45,7 @@ using pnapi::operator&&;
  *
  * For using it, simply include the header file pnapi.h in your code:
  * \code
- * // #include "pnapi.h"
+ * #include <pnapi.h>
  * \endcode
  *
  * Everything you will use can be found in the following namespaces:
@@ -59,26 +59,26 @@ using pnapi::operator&&;
  * 
  * \section sec Some Examples
  * 
- * Creating a small Petrinet
+ * Creating a small Petri net
  * \code
  * PetriNet net;
- * Place & p1 = net.createPlace();
+ * Place &p1 = net.createPlace();
  * p1.mark();
- * Place & p2 = net.createPlace();
- * Transition & t = net.createTransition();
- * net.createArc(p1,t);
- * net.createArc(t,p2);
+ * Place &p2 = net.createPlace();
+ * Transition &t = net.createTransition();
+ * net.createArc(p1, t);
+ * net.createArc(t, p2);
  * \endcode
  * 
  * Assigning a final condition
  * \code
  * // net from the previous example is recycled here
  * net.finalCondition() = ((p1 == 0) && (p2 == 1));
- * Place & p3 = net.createPlace();
+ * Place &p3 = net.createPlace();
  * net.finalCondition() = (net.finalCondition().formula() && (p3 == 0));
  * \endcode
  * 
- * Reading from stream
+ * Reading from a stream
  * \code
  * istream is;
  * is >> io::owfn >> net;
@@ -91,6 +91,8 @@ using pnapi::operator&&;
  * os << io::lola << net;
  * // LoLA with formulae
  * os << io::lola << io::formula << net;
+ * // PNML
+ * os << io::pnml << net;
  * \endcode
  * 
  * Reducing by applying some rules
@@ -107,6 +109,7 @@ using pnapi::operator&&;
  * \code
  * net.isNormal();
  * net.isWorkflow();
+ * net.isFreeChoice();
  * \endcode
  */
 

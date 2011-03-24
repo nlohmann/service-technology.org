@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: gierds $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2010-07-27 18:53:14 +0200 (Tue, 27 Jul 2010) $
+ * \date    $Date: 2011-03-24 14:54:57 +0100 (Do, 24. Mrz 2011) $
  *
- * \version $Revision: 5964 $
+ * \version $Revision: 6507 $
  */
 
 #include "config.h"
@@ -65,7 +65,7 @@ namespace util
 ComponentObserver::ComponentObserver(PetriNet & net) :
   net_(net)
 {
-  PNAPI_ASSERT(&net.observer_ == this); 
+  PNAPI_ASSERT(&net.observer_ == this);
 }
 
 
@@ -86,10 +86,10 @@ void ComponentObserver::updateNodeNameHistory(Node & node,
 {
   PNAPI_ASSERT_USER(net_.containsNode(node), string("Node '") + node.getName() + "' does not belong to this net");
 
-  
+
   // remove access to nodes by their former names
   net_.nodesByName_.erase(*oldHistory.begin());
-  
+
   try
   {
     initializeNodeNameHistory(node);
@@ -98,7 +98,7 @@ void ComponentObserver::updateNodeNameHistory(Node & node,
   {
     // undo change
     net_.nodesByName_[*oldHistory.begin()] = &node;
-    
+
     throw e;
   }
 }
@@ -144,7 +144,7 @@ void ComponentObserver::updateArcCreated(Arc & arc)
 
 /*
  * \brief inform nodes abput removed arc between them
- * 
+ *
  * \pre Arc has to be removed from PetriNet::arcs_ before calling this
  */
 void ComponentObserver::updateArcRemoved(Arc & arc)
@@ -164,7 +164,7 @@ void ComponentObserver::updateArcRemoved(Arc & arc)
 
 /*
  * \brief inform the net about a mirrored arc
- * 
+ *
  * Only purpose of this function is erasing the original arc
  * by mirroring so that ComponentObserver::updateArcRemoved
  * can be called.
@@ -202,7 +202,7 @@ void ComponentObserver::updateTransitionLabels(Transition & trans)
   {
     net_.synchronizedTransitions_.insert(&trans);
   }
-  else  
+  else
   {
     net_.synchronizedTransitions_.erase(&trans);
   }
@@ -252,8 +252,8 @@ void PetriNet::setGenet(const std::string & genet)
  * \brief setting path to Petrify
  */
 void PetriNet::setPetrify(const std::string & petrify)
-{ 
-  pathToPetrify_ = petrify; 
+{
+  pathToPetrify_ = petrify;
 }
 
 /****************************************************************************
@@ -264,11 +264,11 @@ void PetriNet::setPetrify(const std::string & petrify)
 
 /*!
  * \brief constructor
- * 
+ *
  * \note The condition is set to True by default.
  */
 PetriNet::PetriNet() :
-  observer_(*this), warnings_(0), reductionCache_(NULL), genetCapacity_(2), 
+  observer_(*this), warnings_(0), reductionCache_(NULL), genetCapacity_(2),
   automatonConverter_(STATEMACHINE), interface_(*this)
 {
 }
@@ -305,14 +305,14 @@ PetriNet::PetriNet(const PetriNet & net) :
  */
 PetriNet::~PetriNet()
 {
-  //clear();
+  clear();
 
-  //PNAPI_ASSERT(nodes_.empty());
-  //PNAPI_ASSERT(nodesByName_.empty());
-  //PNAPI_ASSERT(transitions_.empty());
-  //PNAPI_ASSERT(places_.empty());
-  //PNAPI_ASSERT(arcs_.empty());
-  //PNAPI_ASSERT(roles_.empty());
+  PNAPI_ASSERT(nodes_.empty());
+  PNAPI_ASSERT(nodesByName_.empty());
+  PNAPI_ASSERT(transitions_.empty());
+  PNAPI_ASSERT(places_.empty());
+  PNAPI_ASSERT(arcs_.empty());
+  PNAPI_ASSERT(roles_.empty());
 }
 
 /*!
@@ -326,7 +326,7 @@ void PetriNet::clear()
   warnings_ = 0;
   roles_.clear();
   interface_.clear();
-  
+
   // delete all places
   set<Place *> places = places_;
   PNAPI_FOREACH(it, places)
@@ -340,6 +340,8 @@ void PetriNet::clear()
   {
     deleteTransition(**it);
   }
+  places_.clear();
+  transitions_.clear();
 }
 
 /*!
@@ -378,7 +380,7 @@ PetriNet::copyStructure(const PetriNet & net, const std::string & prefix)
       p.addLabel(*l);
     }
   }
-  
+
   // add all transitions of the net
   PNAPI_FOREACH(it, net.transitions_)
   {
@@ -438,28 +440,28 @@ const Condition & PetriNet::getFinalCondition() const
 
 /*!
  * \brief guess a place relation
- * 
+ *
  * Given a second net, this method guesses a relation from the other net's
  * places tho this net's places to be used when merging Final Conditions.
  */
 std::map<const Place *, const Place *> PetriNet::guessPlaceRelation(const PetriNet & net) const
 {
   map<const Place *, const Place *> result;
-  
+
   PNAPI_FOREACH(p, net.places_)
   {
     result[*p] = findPlace((*p)->getName());
   }
-  
+
   return result;
 }
 
 /*!
  * \brief Compose this net to a second net.
- * 
+ *
  * Given a second Petri net "net", a resulting net is created
  * by applying the following steps:
- * 
+ *
  * 1.: The interfaces will be composed, gaining new places
  *     and a set of common synchronous labels.
  * 2.: Internal places of this net and "net" are prefixed and copied
@@ -475,29 +477,29 @@ std::map<const Place *, const Place *> PetriNet::guessPlaceRelation(const PetriN
  *     partner transition, it will be copied and "killed" by adding
  *     an empty pre-place.
  *     d) If a label has to be copied that was replaced by a place in
- *     step 1, an arc to this place will be created instead.  
+ *     step 1, an arc to this place will be created instead.
  * 4.: Final conditions will be merged.
- * 
+ *
  * \todo  review me!
  * \todo  Think about synchronous transitions!!!
- * 
+ *
  */
 void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
                        const std::string & netPrefix)
 {
   // ------------ STEP 1 -----------------------------
-  
+
   // mapping from old interface to new interface and new places
   map<Label *, Label *> label2label;
   map<Label *, Place *> label2place;
   // common synchronous labels
   set<Label *> commonLabels;
-  
+
   // compose interface
   PetriNet result(interface_, net.interface_, label2label, label2place, commonLabels);
 
   // ------------ STEP 2 -----------------------------
-  
+
   // mapping from source nets' places to result net's places
   map<const Place *, const Place *> placeMap;
 
@@ -540,7 +542,7 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
       {
         result.createArc(rt, *const_cast<Place *>(placeMap[static_cast<Place *>(&(*f)->getTargetNode())]), (*f)->getWeight());
       }
-      
+
       // copy labels
       PNAPI_FOREACH(l, (*t)->getLabels())
       {
@@ -568,7 +570,7 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
       mergeThis.insert(*t);
     }
   }
-  
+
   // iterate through other net's transitions and copy transitions
   PNAPI_FOREACH(t, net.transitions_)
   {
@@ -590,7 +592,7 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
       {
         result.createArc(rt, *const_cast<Place *>(placeMap[static_cast<Place *>(&(*f)->getTargetNode())]), (*f)->getWeight());
       }
-      
+
       // copy labels
       PNAPI_FOREACH(l, (*t)->getLabels())
       {
@@ -618,11 +620,11 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
       mergeOther.insert(*t);
     }
   }
-  
+
 
   /*
    * transitions without a partner
-   *  
+   *
    * Transitions of the other net are assumed as "lonely".
    * If such a transition gets a partner, it is removed from this set.
    * Own transitions are assumed as not "lonely". If such a transition
@@ -642,7 +644,7 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
     {
       set<string> t1Labels = (*t1)->getSynchronousLabelNames();
       set<string> t2Labels = (*t2)->getSynchronousLabelNames();
-      set<string> t12Labels = util::setIntersection(t1Labels, t2Labels); 
+      set<string> t12Labels = util::setIntersection(t1Labels, t2Labels);
 
       if(!t12Labels.empty()) // if t1 and t2 share at least one label
       {
@@ -743,12 +745,12 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
             rt.addLabel(*rl, l->second);
           }
         }
-        
+
         if(doomed)
         {
           doomedTransitions.insert(&rt);
         }
-        
+
         // both transitions found a partner
         stayLonely = false;
         lonelyTransitions2.erase(*t2);
@@ -772,7 +774,7 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
     {
       result.createArc(*const_cast<Place *>(placeMap[static_cast<Place *>(&(*f)->getSourceNode())]), rt, (*f)->getWeight());
     }
-  
+
     // copy postset arcs
     PNAPI_FOREACH(f, (*t)->getPostsetArcs())
     {
@@ -803,7 +805,7 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
         rt.addLabel(*rl, l->second);
       }
     }
-    
+
     // this transition is dead
     doomedTransitions.insert(&rt);
   }
@@ -818,7 +820,7 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
     {
       result.createArc(*const_cast<Place *>(placeMap[static_cast<Place *>(&(*f)->getSourceNode())]), rt, (*f)->getWeight());
     }
-  
+
     // copy postset arcs
     PNAPI_FOREACH(f, (*t)->getPostsetArcs())
     {
@@ -849,11 +851,11 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
         rt.addLabel(*rl, l->second);
       }
     }
-    
+
     // this transition is dead
     doomedTransitions.insert(&rt);
   }
-  
+
 
   // kill doomed transitions
   PNAPI_FOREACH(t, doomedTransitions)
@@ -866,6 +868,20 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
   result.finalCondition_.conjunct(finalCondition_, placeMap);
   result.finalCondition_.conjunct(net.finalCondition_, placeMap);
 
+  set<Place *> formerInterface;
+  PNAPI_FOREACH(p, label2place)
+  {
+    if(p->second != NULL)
+    {
+      formerInterface.insert(p->second); // removing duplicates
+    }
+  }
+  PNAPI_FOREACH(p, formerInterface)
+  {
+    // former interface places have to be empty
+    result.finalCondition_.addProposition(formula::FormulaEqual(**p, 0));
+  }
+
   // overwrite this net with the resulting net
   *this = result;
 }
@@ -873,11 +889,11 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
 
 /*!
  * \brief create an arc between two nodes
- * 
+ *
  * \param   source  the source Node
  * \param   target  the target Node
  * \param   weight  weight of the Arc
- * 
+ *
  * \return  the newly created Arc
  */
 Arc & PetriNet::createArc(Node & source, Node & target, unsigned int weight)
@@ -888,13 +904,13 @@ Arc & PetriNet::createArc(Node & source, Node & target, unsigned int weight)
 
 /*!
  * \brief creates a place
- * 
+ *
  * If an empty name is given, one is generated using getUniqueNodeName().
  *
  * \param   name  the (initial) name of the place
  * \param   tokens initial marking of this place
  * \param   capacity capacity of this place
- * 
+ *
  * \return  the newly created place
  */
 Place & PetriNet::createPlace(const std::string & name,
@@ -908,7 +924,7 @@ Place & PetriNet::createPlace(const std::string & name,
 
 /*!
  * \brief creates a transition
- * 
+ *
  * If an empty name is given, one is generated using getUniqueNodeName().
  */
 Transition & PetriNet::createTransition(const std::string & name)
@@ -993,7 +1009,7 @@ bool PetriNet::containsNode(const Node & node) const
       return true;
     }
   }
-  
+
   return false;
 }
 
@@ -1023,7 +1039,7 @@ Node * PetriNet::findNode(const std::string & name) const
 
 /*!
  * \brief find a place by name
- * 
+ *
  * \return  a pointer to the place or a NULL pointer if the place was not
  *          found.
  */
@@ -1036,7 +1052,7 @@ Place * PetriNet::findPlace(const std::string & name) const
 
 /*!
  * \brief find a transition by name
- * 
+ *
  * \return  a pointer to the transition or a NULL pointer if the transition
  *          was not found.
  */
@@ -1146,7 +1162,7 @@ const std::set<Transition *> & PetriNet::getSynchronizedTransitions() const
 /*!
  * \brief Adds a role
  */
-void PetriNet::addRole(const std::string & roleName) 
+void PetriNet::addRole(const std::string & roleName)
 {
   roles_.insert(roleName);
 }
@@ -1165,7 +1181,7 @@ void PetriNet::addRoles(const std::set<std::string> & roles)
 
 /*!
  * \brief get a unique node name
- * 
+ *
  * \param   base  base name
  * \return  a string to be used as a name for a new node
  */
@@ -1181,7 +1197,8 @@ std::string PetriNet::getUniqueNodeName(const std::string & base) const
     str << base << ++i;
     name = str.str();
   }
-  while(nodesByName_.find(name) != nodesByName_.end());
+  while((nodesByName_.find(name) != nodesByName_.end()) || // name used for a node
+        (interface_.findLabel(name) != NULL)); // name used for a label
 
   return name;
 }
@@ -1210,7 +1227,7 @@ bool PetriNet::isFreeChoice() const
       }
     }
   }
-  
+
   return true;
 }
 
@@ -1245,7 +1262,7 @@ bool PetriNet::isRoleSpecified(const std::string & roleName) const
   {
     return true;
   }
-  
+
   return false;
 }
 
@@ -1278,9 +1295,9 @@ std::map<Transition *, std::string> PetriNet::normalize()
   {
     edgeLabels[*t] = "TAU";
   }
-  
+
   // get input labels
-  set<Label *> inputLabels = interface_.getInputLabels(); 
+  set<Label *> inputLabels = interface_.getInputLabels();
   PNAPI_FOREACH(label, inputLabels)
   {
     PNAPI_FOREACH(t, (*label)->getTransitions())
@@ -1290,7 +1307,7 @@ std::map<Transition *, std::string> PetriNet::normalize()
   }
 
   // get output labels
-  set<Label *> outputLabels = interface_.getOutputLabels(); 
+  set<Label *> outputLabels = interface_.getOutputLabels();
   PNAPI_FOREACH(label, outputLabels)
   {
     PNAPI_FOREACH(t, (*label)->getTransitions())
@@ -1298,7 +1315,7 @@ std::map<Transition *, std::string> PetriNet::normalize()
       edgeLabels[*t] = (*label)->getName();
     }
   }
-  
+
   // get synchronous labels
   set<Label *> synLabels = interface_.getSynchronousLabels();
   PNAPI_FOREACH(label, synLabels)
@@ -1315,13 +1332,13 @@ std::map<Transition *, std::string> PetriNet::normalize()
 
 /*!
  * \brief product with Constraint oWFN
- * 
+ *
  * described in "Behavioral Constraints for Services" (BPM 2007)
  * (http://dx.doi.org/10.1007/978-3-540-75183-0_20)
  *
  * \note  There is an error in definition 5: The arcs of the transitions
  *        with empty label are missing.
- * 
+ *
  * \pre   Interface of 'net' is empty.
  */
 void PetriNet::produce(const PetriNet & net, const std::string & aPrefix,
@@ -1418,7 +1435,7 @@ PetriNet::translateConstraintLabels(const PetriNet & net) throw (exception::Inpu
   {
     PNAPI_ASSERT(it1->first != NULL);
     Transition & t = *it1->first;
-    
+
     PNAPI_FOREACH(it2, it1->second)
     {
       Transition * labelTrans = findTransition(*it2);
@@ -1441,7 +1458,7 @@ PetriNet::translateConstraintLabels(const PetriNet & net) throw (exception::Inpu
           string filename =
             ((net.meta_.find(io::INPUTFILE) != net.meta_.end())
             ? net.meta_.find(io::INPUTFILE)->second : "");
-          
+
           throw exception::InputError(exception::InputError::SEMANTIC_ERROR, filename,
                                       0, *it2, "unknown transition");
         }
@@ -1487,7 +1504,7 @@ void PetriNet::createArcs(Transition & trans, Transition & otherTrans,
     Arc & arc = **it;
     Place & place = ((placeMapping == NULL) ? arc.getPlace() :
                      (*const_cast<Place *>(placeMapping->find(&arc.getPlace())->second)));
-    
+
     new Arc(*this, observer_, arc, trans, place);
   }
 }
@@ -1515,13 +1532,13 @@ bool PetriNet::isWorkflow() const
   map<Node *, int> indices; ///< index property for nodes
   map<Node *, unsigned int> lowlink; ///< lowlink property for nodes
   set<Node *> stacked; ///< the stack indication for nodes
-  
+
   // finding places described in condition (1) & (2)
   PNAPI_FOREACH(p, places_)
   {
     // set all places' index values to ``undefined''
     indices[*p] = (-1);
-    
+
     if((*p)->getPreset().empty())
     {
       if(first == NULL)
@@ -1545,7 +1562,7 @@ bool PetriNet::isWorkflow() const
       }
     }
   }
-  
+
   if((first == NULL) || (last == NULL))
   {
     return false;
@@ -1585,10 +1602,10 @@ std::string PetriNet::getMetaInformation(std::ios_base & ios,
   map<io::MetaInformation, string> & streamMeta = io::util::MetaData::data(ios);
   if(streamMeta.find(i) != streamMeta.end())
     return streamMeta.find(i)->second;
-  
+
   if(meta_.find(i) != meta_.end())
     return meta_.find(i)->second;
-  
+
   return def;
 }
 
@@ -1611,7 +1628,7 @@ PetriNet & PetriNet::prefixLabelNames(const std::string & prefix)
   {
     port->second->prefixLabels(prefix);
   }
-  
+
   return *this;
 }
 
@@ -1626,7 +1643,7 @@ PetriNet & PetriNet::prefixNodeNames(const std::string & prefix)
   {
     (*it)->prefixNameHistory(prefix);
   }
-  
+
   return *this;
 }
 
@@ -1636,7 +1653,7 @@ PetriNet & PetriNet::prefixNodeNames(const std::string & prefix)
 void PetriNet::deletePlace(Place & place)
 {
   finalCondition_.removePlace(place);
-  
+
   places_.erase(&place);
   deleteNode(place);
 }
@@ -1658,7 +1675,7 @@ void PetriNet::deleteTransition(Transition & trans)
 
 /*!
  * \brief deletes a node
- * 
+ *
  * \note  Never call this method directly! Use deletePlace() or
  *        deleteTransition() instead!
  */
@@ -1672,13 +1689,13 @@ void PetriNet::deleteNode(Node & node)
 
   while(!node.getPreset().empty())
     deleteArc(*findArc(**node.getPreset().begin(), node));
-  
+
   while (!node.getPostset().empty())
     deleteArc(*findArc(node, **node.getPostset().begin()));
 
   // remove access to this nodes
   nodesByName_.erase(*node.getNameHistory().begin());
-  
+
   nodes_.erase(&node);
 
   delete &node;
@@ -1687,7 +1704,7 @@ void PetriNet::deleteNode(Node & node)
 
 /*!
  * \brief deletes an arc
- * 
+ *
  * \pre Net and Arc have the same observer
  */
 void PetriNet::deleteArc(Arc & arc)
@@ -1705,8 +1722,8 @@ void PetriNet::deleteArc(Arc & arc)
 /*!
  * \brief normalizes a net according to [LohmannMW_2007_icatpn], Figure 4
  *        with fix for arc weights
- * 
- * Each interface place connected with an unnormal transition 
+ *
+ * Each interface place connected with an unnormal transition
  * will be wrapped by a n-bounded place, where n is the maximum
  * weight of all arcs connected to the interface place.
  */
@@ -1726,21 +1743,21 @@ void PetriNet::normalize_classical()
         break;
       }
     }
-    
+
     // if a transition was not normal
     if(!needToWrap)
     {
       continue;
     }
-    
+
     unsigned int complementMarking = 0;
     // then we create a wrapper place
     Place & np = createPlace();
     // and a complement place
     Place & cp = createPlace();
-    
+
     set<Transition *> transitions = (*label)->getTransitions();
-    
+
     // connect postset of the interface place to the wrapper place
     PNAPI_FOREACH(t, transitions)
     {
@@ -1754,7 +1771,7 @@ void PetriNet::normalize_classical()
       // remove original "arc"
       (*t)->removeLabel(**label);
     }
-    
+
     // connect wrapper place with actual place
     Transition & t = createTransition();
     t.addLabel(**label);
@@ -1764,9 +1781,9 @@ void PetriNet::normalize_classical()
     // adjust complement place
     cp.setTokenCount(complementMarking);
     // adjust final condition
-    finalCondition_ = (finalCondition_.getFormula() && (np == 0) && (cp == complementMarking));  
+    finalCondition_ = (finalCondition_.getFormula() && (np == 0) && (cp == complementMarking));
   }
-  
+
   // iterate through output places
   set<Label *> outputs = interface_.getOutputLabels();
   PNAPI_FOREACH(label, outputs)
@@ -1781,19 +1798,19 @@ void PetriNet::normalize_classical()
         break;
       }
     }
-    
+
     // if a transition was not normal
     if(!needToWrap)
     {
       continue;
     }
-    
+
     unsigned int complementMarking = 0;
     // then we create a wrapper place
     Place & np = createPlace();
     // and a complement place
     Place & cp = createPlace();
-    
+
     set<Transition *> transitions = (*label)->getTransitions();
     // connect preset of the interface place to the wrapper place
     PNAPI_FOREACH(t, transitions)
@@ -1808,7 +1825,7 @@ void PetriNet::normalize_classical()
       // remove original "arc"
       (*t)->removeLabel(**label);
     }
-    
+
     // connect wrapper place with actual place
     Transition & t = createTransition();
     t.addLabel(**label);
@@ -1829,12 +1846,12 @@ std::map<std::string, std::string> PetriNet::canonicalNames()
   int i = 0;
   int j = 0;
   stringstream name;
-  
+
   PNAPI_FOREACH(p, places_)
   {
     name << "p" << (++i);
     result[name.str()] = (*p)->getName();
-    
+
     try
     {
       (**p).setName(name.str());
@@ -1849,7 +1866,7 @@ std::map<std::string, std::string> PetriNet::canonicalNames()
         name.str("");
         name.clear();
         name << "_" << (++j);
-        
+
         try
         {
           (**p).setName(name.str());
@@ -1858,18 +1875,18 @@ std::map<std::string, std::string> PetriNet::canonicalNames()
         catch(exception::Error & e) { /* retry */ }
       }
     }
-    
+
     name.str("");
-    name.clear(); 
+    name.clear();
   }
-  
+
   i = 0;
-  
+
   PNAPI_FOREACH(t, transitions_)
   {
     name << "t" << (++i);
     result[name.str()] = (*t)->getName();
-    
+
     try
     {
       (**t).setName(name.str());
@@ -1884,7 +1901,7 @@ std::map<std::string, std::string> PetriNet::canonicalNames()
         name.str("");
         name.clear();
         name << "_" << (++j);
-        
+
         try
         {
           (**t).setName(name.str());
@@ -1893,11 +1910,11 @@ std::map<std::string, std::string> PetriNet::canonicalNames()
         catch(exception::Error & e) { /* retry */ }
       }
     }
-    
+
     name.str("");
-    name.clear(); 
+    name.clear();
   }
-  
+
   PNAPI_FOREACH(n, tmp)
   {
     n->first->setName(n->second);
@@ -1909,12 +1926,12 @@ std::map<std::string, std::string> PetriNet::canonicalNames()
 
 /*!
  * \brief normalization after [Aalst07]
- * 
+ *
  * This method detects sequences of transitions with interface
  * communication. Then, it tries to normalize the net through
  * the rules from [Aalst07].
  *
- * \todo     The rules from [Aalst07] will follow soon!
+ * \todo     The rules from [Aalst07] will follow "soon"!
  */
 void PetriNet::normalize_rules()
 {
@@ -1924,7 +1941,7 @@ void PetriNet::normalize_rules()
 
 /*!
  * \brief returns one node's conflict cluster
- * 
+ *
  * Let n be a node in a Petri net. Then n is in n's
  * conflict cluster [n]. For each place p in [n] the
  * postset of p is also in [n]. For each transition t

@@ -165,6 +165,7 @@ class UNumValue: public UValue {
         UValue* modop(UValue*);
         UValue* negop();
         char* text();
+        UNumValue(UType*, int);
 };
 
 class UBooValue: public UValue {
@@ -184,6 +185,7 @@ class UBooValue: public UValue {
         UValue* modop(UValue*);
         UValue* negop();
         char* text();
+        UBooValue(UType*, bool);
 };
 
 class UEnuValue: public UValue {
@@ -215,6 +217,7 @@ class UEnuValue: public UValue {
             return NULL;
         }
         char* text();
+        UEnuValue(UType*, int);
 };
 
 //class ULstValue : public UValue

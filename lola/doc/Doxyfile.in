@@ -555,6 +555,7 @@ FILE_PATTERNS          = *.c \
                          *.i++ \
                          *.inl \
                          *.h \
+                         *.H \
                          *.hh \
                          *.hxx \
                          *.hpp \

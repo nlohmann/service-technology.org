@@ -118,7 +118,7 @@ inline Transition::Transition(char* name): Node(name) {
 #ifndef MODELCHECKING
     lastfired = lastdisabled = 0;
     down = false;
-    add_up = (Transition**) 0;
+    add_up = NULL;
 #endif
 #endif
 #ifdef CYCLE

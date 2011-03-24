@@ -1203,36 +1203,42 @@ AT_BANNER([Memory Leaks])
 ############################################################################
 
 AT_SETUP([Testing parser (lola)])
+AT_XFAIL_IF(true)
 m4_define([NET], [test_input.lola])
 m4_define([PARAMS], [--input=lola --verbose])
 TEST_LEAK
 AT_CLEANUP
 
 AT_SETUP([Testing parser (owfn)])
+AT_XFAIL_IF(true)
 m4_define([NET], [test_input.owfn])
 m4_define([PARAMS], [--input=owfn --verbose])
 TEST_LEAK
 AT_CLEANUP
 
 AT_SETUP([Testing parser (pn/sa)])
+AT_XFAIL_IF(true)
 m4_define([NET], [test_myCoffee.sa])
 m4_define([PARAMS], [--input=sa --verbose])
 TEST_LEAK
 AT_CLEANUP
 
 AT_SETUP([Testing parser (pnml)])
+AT_XFAIL_IF(true)
 m4_define([NET], [test_input.pnml])
 m4_define([PARAMS], [--input=pnml --verbose])
 TEST_LEAK
 AT_CLEANUP
 
 AT_SETUP([Testing parser (woflan)])
+AT_XFAIL_IF(true)
 m4_define([NET], [woflan1.xml.tpn])
 m4_define([PARAMS], [--input=tpn --verbose])
 TEST_LEAK
 AT_CLEANUP
 
 AT_SETUP([Composition with ports])
+AT_XFAIL_IF(true)
 m4_define([NET], [test_compose_ports_1.owfn])
 m4_define([NET2], [test_compose_ports_2.owfn])
 m4_define([PARAMS], [--compose=NET2])
@@ -1538,6 +1544,7 @@ AT_KEYWORDS([customer marlene])
 AT_CLEANUP
 
 AT_SETUP([Mia])
+AT_XFAIL_IF(true)
 AT_CHECK_WGET
 AT_CHECK([AT_CHECK_CUSTOMER mia], 0, ignore, ignore)
 AT_KEYWORDS([customer mia])
@@ -1556,6 +1563,7 @@ AT_KEYWORDS([customer stanca])
 AT_CLEANUP
 
 AT_SETUP([Wendy])
+AT_XFAIL_IF(true)
 AT_CHECK_WGET
 AT_CHECK([AT_CHECK_CUSTOMER wendy], 0, ignore, ignore)
 AT_KEYWORDS([customer wendy])

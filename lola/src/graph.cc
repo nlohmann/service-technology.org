@@ -25,6 +25,7 @@
 #include "stubborn.H"
 #include "dimensions.H"
 #include "reports.H"
+#include "Globals.h"
 
 #ifdef DISTRIBUTE
 #include "distribute.h"
@@ -92,8 +93,8 @@ void statistics(unsigned int s, unsigned int e, unsigned int h) {
     cout << "\n\n>>>>> " << s << " States, " << e << " Edges, " << h << " Hash table entries\n\n";
 
     static bool first = true;
-    if (resultfile && first) {
-        fprintf(resultfile, "statistics: {\n  states = %d;\n  edges = %d;\n  hash_table_entries = %d;\n};\n", s, e, h);
+    if (Globals::resultfile && first) {
+        fprintf(Globals::resultfile, "statistics: {\n  states = %d;\n  edges = %d;\n  hash_table_entries = %d;\n};\n", s, e, h);
         first = false;
     }
 #endif
@@ -108,16 +109,16 @@ Transition** firelist() {
     Transition** tl;
     Transition* t;
     int i;
-    tl = new Transition * [Transitions[0] -> NrEnabled + 1];
-    for (i = 0, t = Transitions[0]->StartOfEnabledList; t; t = t -> NextEnabled) {
+    tl = new Transition * [Globals::Transitions[0] -> NrEnabled + 1];
+    for (i = 0, t = Globals::Transitions[0]->StartOfEnabledList; t; t = t -> NextEnabled) {
 
-    // when using EXTENDEDCTL, only return enabled transitions satisfying
-    // the transition formula
+        // when using EXTENDEDCTL, only return enabled transitions satisfying
+        // the transition formula
 #ifdef EXTENDEDCTL
         if (t -> pathrestriction[TemporalIndex]) {
 #endif
             tl[i++] = t;
-            
+
 #ifdef EXTENDEDCTL
         }
 #endif
@@ -134,8 +135,8 @@ void printstate(char const*, unsigned int*);
 void printmarking() {
     unsigned int i;
 
-    for (i = 0; i < Places[0]->cnt; i++) {
-        cout << Places[i]->name << " : " << CurrentMarking[i] << endl;
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        cout << Globals::Places[i]->name << " : " << Globals::CurrentMarking[i] << endl;
     }
     cout << "-------" << endl;
 }
@@ -171,15 +172,15 @@ unsigned int MinBookmark; // MIN number of the first closed marking
 void print_path(State* s, ostream* pathstream = NULL) {
     // check if this is the first call (i.e., pathstream == NULL)
     if (pathstream == NULL) {
-        if (!pflg && ! Pflg && !resultfile) {
+        if (!Globals::pflg && ! Globals::Pflg && !Globals::resultfile) {
             return;
         }
 
         // prepare pathstream: either open a file or point to stdout
-        if (pflg) {
-            pathstream = new ofstream(pathfile);
+        if (Globals::pflg) {
+            pathstream = new ofstream(Globals::pathfile);
             if (pathstream->fail()) {
-                fprintf(stderr, "lola: cannot open path output file '%s'\n", pathfile);
+                fprintf(stderr, "lola: cannot open path output file '%s'\n", Globals::pathfile);
                 fprintf(stderr, "      no output written\n");
                 _exit(4);
             }
@@ -187,8 +188,8 @@ void print_path(State* s, ostream* pathstream = NULL) {
             pathstream = &cout;
         }
 
-        if (resultfile) {
-            fprintf(resultfile, "  path = (");
+        if (Globals::resultfile) {
+            fprintf(Globals::resultfile, "  path = (");
         } else {
             (*pathstream) << "PATH \n";
         }
@@ -196,8 +197,8 @@ void print_path(State* s, ostream* pathstream = NULL) {
         // recursive call
         print_path(s, pathstream);
 
-        if (resultfile) {
-            fprintf(resultfile, ");\n");
+        if (Globals::resultfile) {
+            fprintf(Globals::resultfile, ");\n");
         }
 
         // close pathstream to force file output
@@ -214,14 +215,14 @@ void print_path(State* s, ostream* pathstream = NULL) {
         // recursive call
         print_path(s->parent, pathstream);
 
-        if (resultfile) {
+        if (Globals::resultfile) {
             static bool comma = false;
             if (comma) {
-                fprintf(resultfile, ", ");
+                fprintf(Globals::resultfile, ", ");
             } else {
                 comma = true;
             }
-            fprintf(resultfile, "\"%s\"", s->parent->firelist[s->parent->current]->name);
+            fprintf(Globals::resultfile, "\"%s\"", s->parent->firelist[s->parent->current]->name);
             return;
         }
 
@@ -259,68 +260,68 @@ void printincompletestates(State* s, ostream* graphstream, int level = 1) {
     }
 
     // output to result file
-    if (resultfile) {
+    if (Globals::resultfile) {
         static bool comma = false;
         if (comma) {
-            fprintf(resultfile, ",");
+            fprintf(Globals::resultfile, ",");
         } else {
             comma = true;
         }
-        fprintf(resultfile, "\n    { id = %d; ", s ->dfs);
+        fprintf(Globals::resultfile, "\n    { id = %d; ", s ->dfs);
         if (level) {
-            fprintf(resultfile, "\n      witness = true;");
+            fprintf(Globals::resultfile, "\n      witness = true;");
         }
-        fprintf(resultfile, "\n      state = (");
+        fprintf(Globals::resultfile, "\n      state = (");
 
-        for (i = 0, j = 0; i < Places[0]->cnt; ++i) {
-            if (CurrentMarking[i]) {
-                if (CurrentMarking[i] == VERYLARGE) {
-                    fprintf(resultfile, "%s(\"%s\", -1)", (j++ ? ", " : ""), Places[i]->name);
+        for (i = 0, j = 0; i < Globals::Places[0]->cnt; ++i) {
+            if (Globals::CurrentMarking[i]) {
+                if (Globals::CurrentMarking[i] == VERYLARGE) {
+                    fprintf(Globals::resultfile, "%s(\"%s\", -1)", (j++ ? ", " : ""), Globals::Places[i]->name);
                 } else {
-                    fprintf(resultfile, "%s(\"%s\", %d)", (j++ ? ", " : ""), Places[i]->name, CurrentMarking[i]);
+                    fprintf(Globals::resultfile, "%s(\"%s\", %d)", (j++ ? ", " : ""), Globals::Places[i]->name, Globals::CurrentMarking[i]);
                 }
             }
         }
 
-        fprintf(resultfile, ");\n");
-        fprintf(resultfile, "      successors = (");
+        fprintf(Globals::resultfile, ");\n");
+        fprintf(Globals::resultfile, "      successors = (");
 
         if (!level) {
             bool comma = false;
             for (i = 0; i < s->current; ++i) {
                 if (comma) {
-                    fprintf(resultfile, ", ");
+                    fprintf(Globals::resultfile, ", ");
                 } else {
                     comma = true;
                 }
-                fprintf(resultfile, "(\"%s\", %d)", s->firelist[i]->name, s->succ[i]->dfs);
+                fprintf(Globals::resultfile, "(\"%s\", %d)", s->firelist[i]->name, s->succ[i]->dfs);
             }
             if (comma) {
-                fprintf(resultfile, ", ");
+                fprintf(Globals::resultfile, ", ");
             } else {
                 comma = true;
             }
-            fprintf(resultfile, "(\"%s\", %d)", s->firelist[i]->name, s->succ[i]->dfs);
+            fprintf(Globals::resultfile, "(\"%s\", %d)", s->firelist[i]->name, s->succ[i]->dfs);
             for (i = s->current + 1; s->firelist[i]; ++i) {
-                fprintf(resultfile, ", (\"%s\", -1)", s->firelist[i]->name);
+                fprintf(Globals::resultfile, ", (\"%s\", -1)", s->firelist[i]->name);
             }
         }
 
-        fprintf(resultfile, "); }");
+        fprintf(Globals::resultfile, "); }");
     }
 
 
     // output to stream (file or stdout)
-    if (gmflg || GMflg) {
+    if (Globals::gmflg || Globals::GMflg) {
         (*graphstream) << "STATE " << (level ? "! " : "* ") << s ->dfs ;
         j = 0;
-        if (graphformat == 'm') {
-            for (i = 0; i < Places[0]->cnt; ++i) {
-                if (CurrentMarking[i]) {
-                    if (CurrentMarking[i] == VERYLARGE) {
-                        (*graphstream) << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << "oo" ;
+        if (Globals::graphformat == 'm') {
+            for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+                if (Globals::CurrentMarking[i]) {
+                    if (Globals::CurrentMarking[i] == VERYLARGE) {
+                        (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : " << "oo" ;
                     } else {
-                        (*graphstream) << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << CurrentMarking[i] ;
+                        (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : " << Globals::CurrentMarking[i] ;
                     }
                 }
             }
@@ -385,15 +386,15 @@ void printincompletestates(State* s, ostream* graphstream, int level = 1) {
 void print_reg_path(State* s, State* startofrepeatingseq, ostream* pathstream = NULL) {
     // check if this is the first call (i.e., pathstream == NULL)
     if (pathstream == NULL) {
-        if (!pflg && ! Pflg && !resultfile) {
+        if (!Globals::pflg && ! Globals::Pflg && !Globals::resultfile) {
             return;
         }
 
         // prepare pathstream: either open a file or point to stdout
-        if (pflg) {
-            pathstream = new ofstream(pathfile);
+        if (Globals::pflg) {
+            pathstream = new ofstream(Globals::pathfile);
             if (pathstream->fail()) {
-                fprintf(stderr, "lola: cannot open path output file '%s'\n", pathfile);
+                fprintf(stderr, "lola: cannot open path output file '%s'\n", Globals::pathfile);
                 fprintf(stderr, "      no output written\n");
                 _exit(4);
             }
@@ -401,8 +402,8 @@ void print_reg_path(State* s, State* startofrepeatingseq, ostream* pathstream = 
             pathstream = &cout;
         }
 
-        if (resultfile) {
-            fprintf(resultfile, "  path = (");
+        if (Globals::resultfile) {
+            fprintf(Globals::resultfile, "  path = (");
         } else {
             (*pathstream) << "PATH EXPRESSION \n";
         }
@@ -410,8 +411,8 @@ void print_reg_path(State* s, State* startofrepeatingseq, ostream* pathstream = 
         // recursive call
         print_reg_path(s, startofrepeatingseq, pathstream);
 
-        if (resultfile) {
-            fprintf(resultfile, ");\n");
+        if (Globals::resultfile) {
+            fprintf(Globals::resultfile, ");\n");
         }
 
         // close pathstream to force file output
@@ -432,55 +433,55 @@ void print_reg_path(State* s, State* startofrepeatingseq, ostream* pathstream = 
                 // unused: int i;
                 print_reg_path(s->parent, s->smaller, pathstream);
                 if (s->smaller) {
-                    if (Pflg || pflg) {
+                    if (Globals::Pflg || Globals::pflg) {
                         (*pathstream) << " ";
                     }
                 } else {
-                    if (Pflg || pflg) {
+                    if (Globals::Pflg || Globals::pflg) {
                         (*pathstream) << "\n";
                     }
                 }
-                if (Pflg || pflg) {
+                if (Globals::Pflg || Globals::pflg) {
                     (*pathstream) << s->parent->firelist[s->parent->current]->name;
                 } else {
                     if (comma) {
-                        fprintf(resultfile, ", ");
+                        fprintf(Globals::resultfile, ", ");
                     }
-                    fprintf(resultfile, "\"%s\"", s->parent->firelist[s->parent->current]->name);
+                    fprintf(Globals::resultfile, "\"%s\"", s->parent->firelist[s->parent->current]->name);
                     comma = false;
                 }
             }
             if (s->smaller) {
-                if (Pflg || pflg) {
+                if (Globals::Pflg || Globals::pflg) {
                     (*pathstream) << " )";
                 }
             }
-            if (Pflg || pflg) {
+            if (Globals::Pflg || Globals::pflg) {
                 (*pathstream) << "\n(";
             } else {
                 if (comma) {
-                    fprintf(resultfile, ", ");
+                    fprintf(Globals::resultfile, ", ");
                 }
-                fprintf(resultfile, ");\n  cycle = (");
+                fprintf(Globals::resultfile, ");\n  cycle = (");
                 comma = false;
             }
         } else {
             if (s->parent) {
                 // unused: int i;
                 print_reg_path(s->parent, startofrepeatingseq, pathstream);
-                if (Pflg || pflg) {
+                if (Globals::Pflg || Globals::pflg) {
                     (*pathstream)  << " " << s->parent->firelist[s->parent->current]->name;
                 } else {
                     if (comma) {
-                        fprintf(resultfile, ", ");
+                        fprintf(Globals::resultfile, ", ");
                     } else {
                         comma = true;
                     }
-                    fprintf(resultfile, "\"%s\"", s->parent->firelist[s->parent->current]->name);
+                    fprintf(Globals::resultfile, "\"%s\"", s->parent->firelist[s->parent->current]->name);
                 }
             }
             if (s->smaller) {
-                if (Pflg || pflg) {
+                if (Globals::Pflg || Globals::pflg) {
                     (*pathstream) << " )";
                 }
             }
@@ -490,28 +491,28 @@ void print_reg_path(State* s, State* startofrepeatingseq, ostream* pathstream = 
             // unused: int i;
             print_reg_path(s->parent, s->smaller, pathstream);
             if (s->smaller) {
-                if (Pflg || pflg) {
+                if (Globals::Pflg || Globals::pflg) {
                     (*pathstream) << " ";
                 }
             } else {
-                if (Pflg || pflg) {
+                if (Globals::Pflg || Globals::pflg) {
                     (*pathstream) << "\n";
                 }
             }
-            if (Pflg || pflg) {
+            if (Globals::Pflg || Globals::pflg) {
                 (*pathstream) << s->parent->firelist[s->parent->current]->name;
             } else {
                 if (comma) {
-                    fprintf(resultfile, ", ");
+                    fprintf(Globals::resultfile, ", ");
                 } else {
                     comma = true;
                 }
-                fprintf(resultfile, "\"%s\"", s->parent->firelist[s->parent->current]->name);
+                fprintf(Globals::resultfile, "\"%s\"", s->parent->firelist[s->parent->current]->name);
             }
 
         }
         if (s->smaller) {
-            if (Pflg || pflg) {
+            if (Globals::Pflg || Globals::pflg) {
                 (*pathstream) << " )";
             }
         }
@@ -631,8 +632,8 @@ bool analyse_fairness(State* pool, unsigned int level) {
 #endif
                     unsigned int cardS;
                     unsigned int i;
-                    for (i = 0; i < Transitions[0]->cnt; i++) {
-                        Transitions[i]-> faired = Transitions[i]->fairabled = 0;
+                    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+                        Globals::Transitions[i]-> faired = Globals::Transitions[i]->fairabled = 0;
                     }
                     for (cardS = 1, ss = S->nexttar;; cardS++, ss = ss ->nexttar) {
                         for (i = 0; ss->firelist[i]; i++) {
@@ -656,30 +657,30 @@ bool analyse_fairness(State* pool, unsigned int level) {
                         goto aftercheck;
                     }
 #endif
-                    for (i = 0; i < Transitions[0]->cnt; i++) {
-                        if (Transitions[i]->fairness > 0) {
-                            if ((!Transitions[i]->faired) &&
-                                    Transitions[i]->fairabled == cardS) {
+                    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+                        if (Globals::Transitions[i]->fairness > 0) {
+                            if ((!Globals::Transitions[i]->faired) &&
+                                    Globals::Transitions[i]->fairabled == cardS) {
                                 goto aftercheck;
                                 // no subset can be fair
                             }
                         }
                     }
-                    for (i = 0; i < Transitions[0]->cnt; i++) {
-                        if (Transitions[i]->fairness == 2) {
-                            if (Transitions[i]->fairabled && ! Transitions[i]->faired) {
+                    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+                        if (Globals::Transitions[i]->fairness == 2) {
+                            if (Globals::Transitions[i]->fairabled && ! Globals::Transitions[i]->faired) {
                                 // 1. remove all transitions
                                 // from S that enable t[i]
                                 // At this point, there must
                                 // be some state remaining in S,
                                 // otherwise the weak fairness test
                                 // would have failed.
-                                while (Transitions[i]->fairabled) {
+                                while (Globals::Transitions[i]->fairabled) {
                                     State* E;
                                     unsigned int j;
                                     E = NULL;
                                     for (j = 0; S -> firelist[j]; j++) {
-                                        if (S -> firelist[j] == Transitions[i]) {
+                                        if (S -> firelist[j] == Globals::Transitions[i]) {
                                             E = S;
                                             break;
                                         }
@@ -689,7 +690,7 @@ bool analyse_fairness(State* pool, unsigned int level) {
                                         E -> expired = true;
                                         E -> nexttar -> prevtar = E -> prevtar;
                                         E -> prevtar -> nexttar = E -> nexttar;
-                                        Transitions[i]->fairabled--;
+                                        Globals::Transitions[i]->fairabled--;
                                     }
                                 }
                                 if (analyse_fairness(S, level + 1)) {
@@ -698,7 +699,7 @@ bool analyse_fairness(State* pool, unsigned int level) {
                                 goto aftercheck;
                             }
                         }
-                        Transitions[i] -> faired = Transitions[i]-> fairabled = 0;
+                        Globals::Transitions[i] -> faired = Globals::Transitions[i]-> fairabled = 0;
                     }
                     return true; // arrived here only if all transitions have paased fairness test.
 
@@ -754,15 +755,15 @@ unsigned int depth_first() {
     isbounded = 1;
 #ifndef CYCLE
     // organize output file for -m/-M/-g/-G parameters
-    if (gmflg) {
-        graphstream = new ofstream(graphfile);
+    if (Globals::gmflg) {
+        graphstream = new ofstream(Globals::graphfile);
         if (graphstream->fail()) {
-            fprintf(stderr, "lola: cannot open graph output file '%s'\n", graphfile);
+            fprintf(stderr, "lola: cannot open graph output file '%s'\n", Globals::graphfile);
             fprintf(stderr, "      no output written\n");
             _exit(4);
         }
     }
-    if (GMflg) {
+    if (Globals::GMflg) {
         graphstream = &std::cout;
     }
 #else
@@ -770,7 +771,7 @@ unsigned int depth_first() {
 #endif
 #ifndef DISTRIBUTE
 #if defined(SYMMETRY) && SYMMINTEGRATION==1
-    Trace = new SearchTrace [Places[0]->cnt];
+    Trace = new SearchTrace [Globals::Places[0]->cnt];
 #endif
     // initialize hash table
     for (i = 0; i < HASHSIZE; ++i) {
@@ -810,12 +811,12 @@ unsigned int depth_first() {
     NrOfStates = 0;
     Edges = 0;
 
-    while (get_new_vector(CurrentMarking, WhyTerminated)) {
+    while (get_new_vector(Globals::CurrentMarking, WhyTerminated)) {
         // don't worry, this loop ends only after the end of the actual dfs loop
 
         CurrentState = new State;
-        for (i = 0; i < Transitions[0]->cnt; ++i) {
-            Transitions[i]->check_enabled();
+        for (i = 0; i < Globals::Transitions[0]->cnt; ++i) {
+            Globals::Transitions[i]->check_enabled();
         }
         CurrentState->firelist = FIRELIST();
         ++NrOfStates;
@@ -839,16 +840,16 @@ unsigned int depth_first() {
         IsCyclic = false;
     }
 #else
-        if (fl) {
-            for (i = 0, IsCyclic = false; fl[i]; ++i) {
-                if (fl[i]->cyclic) {
-                    IsCyclic = true;
-                    break;
-                }
+    if (fl) {
+        for (i = 0, IsCyclic = false; fl[i]; ++i) {
+            if (fl[i]->cyclic) {
+                IsCyclic = true;
+                break;
             }
-        } else {
-            IsCyclic = false;
         }
+    } else {
+        IsCyclic = false;
+    }
 #endif
     if (IsCyclic) {
         CurrentState = INSERTPROC();
@@ -860,12 +861,12 @@ unsigned int depth_first() {
     }
 #else
 
-        CurrentState = INSERTPROC();
-        CurrentState -> firelist = FIRELIST();
+    CurrentState = INSERTPROC();
+    CurrentState -> firelist = FIRELIST();
 #endif
 #endif
 #ifdef COVER
-        Ancestor = new unsigned int[Places[0]->cnt + 1];
+        Ancestor = new unsigned int[Globals::Places[0]->cnt + 1];
 #endif
         CurrentState -> current = 0;
         CurrentState -> parent = NULL;
@@ -874,22 +875,22 @@ unsigned int depth_first() {
             // early abortion
             cout << "\ndead state found!\n";
 
-            if (resultfile) {
-                fprintf(resultfile, "deadlock: {\n  result = true;\n  ");
+            if (Globals::resultfile) {
+                fprintf(Globals::resultfile, "deadlock: {\n  result = true;\n  ");
             }
 
-            printstate("", CurrentMarking);
+            printstate("", Globals::CurrentMarking);
             print_path(CurrentState);
 
-            if (resultfile) {
-                fprintf(resultfile, "};\n");
-                fprintf(resultfile, "statespace: {\n  complete = false;\n  states = ( ");
+            if (Globals::resultfile) {
+                fprintf(Globals::resultfile, "};\n");
+                fprintf(Globals::resultfile, "statespace: {\n  complete = false;\n  states = ( ");
             }
 
             printincompletestates(CurrentState, graphstream);
 
-            if (resultfile) {
-                fprintf(resultfile, "\n  );\n};\n");
+            if (Globals::resultfile) {
+                fprintf(Globals::resultfile, "\n  );\n};\n");
             }
 
             statistics(NrOfStates, Edges, NonEmptyHash);
@@ -917,7 +918,7 @@ unsigned int depth_first() {
         if (CheckTransition->enabled) {
             // early abortion
             cout << "\ntransition " << CheckTransition -> name << " is not dead!\n";
-            printstate("", CurrentMarking);
+            printstate("", Globals::CurrentMarking);
             print_path(CurrentState);
             printincompletestates(CurrentState, graphstream);
             statistics(NrOfStates, Edges, NonEmptyHash);
@@ -929,7 +930,7 @@ unsigned int depth_first() {
         if (!CurrentState->firelist) {
             // early abortion
             cout << "\nstate found!\n";
-            printstate("", CurrentMarking);
+            printstate("", Globals::CurrentMarking);
             print_path(CurrentState);
             printincompletestates(CurrentState, graphstream);
             statistics(NrOfStates, Edges, NonEmptyHash);
@@ -937,15 +938,15 @@ unsigned int depth_first() {
         }
 #endif
 #if defined (REACHABILITY ) && ! defined ( STUBBORN ) && ! defined(DISTRIBUTE)
-        for (i = 0; i < Places[0]->cnt; ++i) {
-            if (CurrentMarking[i] != Places[i]->target_marking) {
+        for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+            if (Globals::CurrentMarking[i] != Globals::Places[i]->target_marking) {
                 break;
             }
         }
-        if (i >= Places[0]->cnt) { // target_marking found!
+        if (i >= Globals::Places[0]->cnt) { // target_marking found!
             // early abortion
             cout << "\nstate found!\n";
-            printstate("", CurrentMarking);
+            printstate("", Globals::CurrentMarking);
             print_path(CurrentState);
             printincompletestates(CurrentState, graphstream);
             statistics(NrOfStates, Edges, NonEmptyHash);
@@ -967,25 +968,25 @@ unsigned int depth_first() {
 #endif
 #ifdef STATEPREDICATE
         if (F -> initatomic()) {
-            if (resultfile) {
-                fprintf(resultfile, "statepredicate: {\n  result = true;\n  ");
+            if (Globals::resultfile) {
+                fprintf(Globals::resultfile, "statepredicate: {\n  result = true;\n  ");
             }
 #if defined(LIVEPROP) && ! defined(TWOPHASE)
             largest_sat = 1;
 #else
             cout << "\nstate found!\n";
 
-            printstate("", CurrentMarking);
+            printstate("", Globals::CurrentMarking);
             print_path(CurrentState);
             printincompletestates(CurrentState, graphstream);
 
-            if (resultfile) {
-                fprintf(resultfile, "};\n");
+            if (Globals::resultfile) {
+                fprintf(Globals::resultfile, "};\n");
             }
 
             statistics(NrOfStates, Edges, NonEmptyHash);
 #ifdef DISTRIBUTE
-            heureka(resultfixedR, CurrentMarking);
+            heureka(resultfixedR, Globals::CurrentMarking);
             end_communication();
 #endif
             return 1;
@@ -993,7 +994,7 @@ unsigned int depth_first() {
         }
 #endif
 #ifdef TARJAN
-        CurrentState->succ = new State*[CardFireList+1];
+        CurrentState->succ = new State*[CardFireList + 1];
         CurrentState->dfs = CurrentState->min = 0;
 #ifdef FULLTARJAN
 #ifndef STATESPACE
@@ -1034,26 +1035,26 @@ unsigned int depth_first() {
 #ifdef DEADLOCK
                 if (!Transitions[0]->NrEnabled) {
                     cout << "heureka" << endl;
-                    heureka(resultfixedR, CurrentMarking);
+                    heureka(resultfixedR, Globals::CurrentMarking);
                     end_communication();
                     return 1;
                 }
 #endif
 #ifdef DEADTRANSITION
                 if (CheckTransition -> enabled) {
-                    heureka(resultfixedR, CurrentMarking);
+                    heureka(resultfixedR, Globals::CurrentMarking);
                     end_communication();
                     return 1;
                 }
 #endif
 #ifdef REACHABILITY
-                for (i = 0; i < Places[0]->cnt; ++i) {
-                    if (CurrentMarking[i] != Places[i]->target_marking) {
+                for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+                    if (Globals::CurrentMarking[i] != Globals::Places[i]->target_marking) {
                         break;
                     }
                 }
-                if (i < Places[0]->cnt) {
-                    heureka(resultfixedR, CurrentMarking);
+                if (i < Globals::Places[0]->cnt) {
+                    heureka(resultfixedR, Globals::CurrentMarking);
                     end_communication();
                     return 1;
                 }
@@ -1065,7 +1066,7 @@ unsigned int depth_first() {
 #endif
 #ifdef STATEPREDICATE
                 if (F -> value) {
-                    heureka(resultfixedR, CurrentMarking);
+                    heureka(resultfixedR, Globals::CurrentMarking);
                     end_communication();
                     return 1;
                 }
@@ -1080,22 +1081,22 @@ unsigned int depth_first() {
 
                 NewOmegas = NULL;
                 // for all ancestor states do ...
-                for (i = 0; i < Places[0]->cnt; ++i) {
-                    Ancestor[i] = CurrentMarking[i];
+                for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+                    Ancestor[i] = Globals::CurrentMarking[i];
                 }
                 for (smallerstate = CurrentState; smallerstate; smallerstate = smallerstate->parent) {
                     smallerstate -> firelist[smallerstate ->  current] -> traceback();
                     NrCovered = 0;
-                    for (i = 0; i < Places[0]->cnt; ++i) {
+                    for (i = 0; i < Globals::Places[0]->cnt; ++i) {
                         // case 1: smaller state[i] > current state [i]
                         // ---> continue with previous state
-                        if (Ancestor[i] > CurrentMarking[i]) {
+                        if (Ancestor[i] > Globals::CurrentMarking[i]) {
                             goto nextstate;
                         }
 
                         // case 2: smaller state < current state
                         // count w-Intro
-                        if (Ancestor[i] < CurrentMarking[i]) {
+                        if (Ancestor[i] < Globals::CurrentMarking[i]) {
                             NrCovered++;
                         }
                         // case 3: smaller state = current state --> do nothing
@@ -1114,18 +1115,18 @@ unsigned int depth_first() {
 
                     // Here, smallerstate IS less than current state.
                     isbounded = 0;
-                    NewOmegas = new Place*[NrCovered+1];
+                    NewOmegas = new Place*[NrCovered + 1];
 
                     // for all fragements of state vector do ...
                     NrCovered = 0;
-                    for (i = 0; i < Places[0]->cnt; ++i) {
-                        if (Ancestor[i] < CurrentMarking[i]) {
+                    for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+                        if (Ancestor[i] < Globals::CurrentMarking[i]) {
                             // Here we have a place that deserves a new Omega
                             // 1. set old value in place record
-                            Places[i] -> lastfinite = CurrentMarking[i];
-                            Places[i] -> set_cmarking(VERYLARGE);
-                            Places[i] -> bounded = false;
-                            NewOmegas[NrCovered++] = Places[i];
+                            Globals::Places[i] -> lastfinite = Globals::CurrentMarking[i];
+                            Globals::Places[i] -> set_cmarking(VERYLARGE);
+                            Globals::Places[i] -> bounded = false;
+                            NewOmegas[NrCovered++] = Globals::Places[i];
                         }
                     }
                     NewOmegas[NrCovered] = NULL;
@@ -1148,7 +1149,7 @@ endomegaproc:
                 canonize();
                 if (!search_and_insert(kanrep))
 #else
-                if (!search_and_insert(CurrentMarking))
+                if (!search_and_insert(Globals::CurrentMarking))
 #endif
 #else
                 if ((NewState = SEARCHPROC()))
@@ -1278,7 +1279,7 @@ endomegaproc:
                     NewState -> current = 0;
                     NewState -> parent = CurrentState;
 #ifdef TARJAN
-                    NewState -> succ =  new State * [CardFireList+1];
+                    NewState -> succ =  new State * [CardFireList + 1];
                     CurrentState -> succ[CurrentState -> current] = NewState;
 #endif
 #ifdef EVENTUALLYPROP
@@ -1298,18 +1299,18 @@ endomegaproc:
                             largest_sat = NewState -> dfs + 1;
                         }
 #else
-                        if (resultfile) {
-                            fprintf(resultfile, "statepredicate: {\n  result = true;\n  ");
+                        if (Globals::resultfile) {
+                            fprintf(Globals::resultfile, "statepredicate: {\n  result = true;\n  ");
                         }
 
                         // early abortion
                         cout << "\nstate found!\n";
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         printincompletestates(NewState, graphstream);
 
-                        if (resultfile) {
-                            fprintf(resultfile, "};\n");
+                        if (Globals::resultfile) {
+                            fprintf(Globals::resultfile, "};\n");
                         }
 
 
@@ -1326,22 +1327,22 @@ endomegaproc:
                     if (!(NewState -> firelist) || !(NewState -> firelist[0])) {
                         // early abortion
                         cout << "\ndead state found!\n";
-                        if (resultfile) {
-                            fprintf(resultfile, "deadlock: {\n  result = true;\n");
+                        if (Globals::resultfile) {
+                            fprintf(Globals::resultfile, "deadlock: {\n  result = true;\n");
                         }
 
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         print_path(NewState);
 
-                        if (resultfile) {
-                            fprintf(resultfile, "};\n");
-                            fprintf(resultfile, "statespace: {\n  complete = false;\n  states = ( ");
+                        if (Globals::resultfile) {
+                            fprintf(Globals::resultfile, "};\n");
+                            fprintf(Globals::resultfile, "statespace: {\n  complete = false;\n  states = ( ");
                         }
 
                         printincompletestates(NewState, graphstream);
 
-                        if (resultfile) {
-                            fprintf(resultfile, "\n  );\n};\n");
+                        if (Globals::resultfile) {
+                            fprintf(Globals::resultfile, "\n  );\n};\n");
                         }
 
                         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -1354,7 +1355,7 @@ endomegaproc:
                         // early abortion
                         cout << "\ntransition " <<  CheckTransition -> name << " is not dead!\n";
 
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         printincompletestates(NewState, graphstream);
                         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -1365,7 +1366,7 @@ endomegaproc:
                     if (!NewState -> firelist) {
                         // early abortion
                         cout << "\nstate found!\n";
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         printincompletestates(NewState, graphstream);
                         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -1373,16 +1374,16 @@ endomegaproc:
                     }
 #endif
 #if ( defined (REACHABILITY ) && ! defined ( STUBBORN ) )
-                    for (i = 0; i < Places[0]->cnt; ++i) {
-                        if (CurrentMarking[i] != Places[i]->target_marking) {
+                    for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+                        if (Globals::CurrentMarking[i] != Globals::Places[i]->target_marking) {
                             break;
                         }
                     }
                     // target_marking found!
-                    if (i >= Places[0]->cnt) {
+                    if (i >= Globals::Places[0]->cnt) {
                         // early abortion
                         cout << "\nstate found!\n";
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         printincompletestates(NewState, graphstream);
                         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -1395,23 +1396,23 @@ endomegaproc:
                     if (!isbounded) {
                         cout << "net is unbounded!\n";
 
-                        if (resultfile) {
-                            fprintf(resultfile, "unbounded: {\n  result = true;\n");
+                        if (Globals::resultfile) {
+                            fprintf(Globals::resultfile, "unbounded: {\n  result = true;\n");
                         }
 
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         print_reg_path(CurrentState, CurrentState->smaller);
                         cout << "\n";
 
-                        if (resultfile) {
-                            fprintf(resultfile, "};\n");
-                            fprintf(resultfile, "statespace: {\n  complete = false;\n  states = ( ");
+                        if (Globals::resultfile) {
+                            fprintf(Globals::resultfile, "};\n");
+                            fprintf(Globals::resultfile, "statespace: {\n  complete = false;\n  states = ( ");
                         }
 
                         printincompletestates(CurrentState, graphstream);
 
-                        if (resultfile) {
-                            fprintf(resultfile, " );\n};\n");
+                        if (Globals::resultfile) {
+                            fprintf(Globals::resultfile, " );\n};\n");
                         }
 
                         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -1421,7 +1422,7 @@ endomegaproc:
 #ifdef BOUNDEDPLACE
                     if (!CheckPlace -> bounded) {
                         cout << "place " << CheckPlace -> name << " is unbounded!\n";
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         print_reg_path(CurrentState, CurrentState->smaller);
                         cout << "\n";
                         printincompletestates(CurrentState, graphstream);
@@ -1506,7 +1507,9 @@ endomegaproc:
                     if (forgotten) {
                         // fire list must be extended
                         unsigned int nf;
-                        for (nf = 0; forgotten[nf]; nf++);
+                        for (nf = 0; forgotten[nf]; nf++) {
+                            ;
+                        }
                         Transition** newFL = new Transition * [nf + CurrentState -> current + 1];
                         State** newSucc = new State * [nf + CurrentState -> current];
                         for (i = 0; i < CurrentState -> current; ++i) {
@@ -1530,21 +1533,21 @@ endomegaproc:
 #endif
 #ifndef CYCLE
 #ifdef TARJAN
-                if (gmflg || GMflg) {
+                if (Globals::gmflg || Globals::GMflg) {
                     (*graphstream) << "STATE " << CurrentState ->dfs;
                     (*graphstream) << " Prog: " << CurrentState -> progress_value;
 
                     if (CurrentState -> persistent) {
                         (*graphstream) << " persistent ";
                     }
-                    if (graphformat == 'm') {
+                    if (Globals::graphformat == 'm') {
                         int j = 0;
-                        for (i = 0; i < Places[0]->cnt; ++i) {
-                            if (CurrentMarking[i]) {
-                                if (CurrentMarking[i] == VERYLARGE) {
-                                    (*graphstream) << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << "oo" ;
+                        for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+                            if (Globals::CurrentMarking[i]) {
+                                if (Globals::CurrentMarking[i] == VERYLARGE) {
+                                    (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : " << "oo" ;
                                 } else {
-                                    (*graphstream) << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << CurrentMarking[i];
+                                    (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : " << Globals::CurrentMarking[i];
                                 }
                             }
                         }
@@ -1558,45 +1561,45 @@ endomegaproc:
 
 #ifndef BOUNDEDNET // there is still a bug...
                 /*
-                      if (resultfile) {
+                      if (Globals::resultfile) {
                         static bool first = true;
                         if (first) {
                           first = false;
-                          fprintf(resultfile, "statespace: {\n  complete = false; // we cannot be sure\n  states = (\n");
+                          fprintf(Globals::resultfile, "statespace: {\n  complete = false; // we cannot be sure\n  states = (\n");
                         }
 
                         static bool comma = false;
                         if (comma) {
-                          fprintf(resultfile, ",\n");
+                          fprintf(Globals::resultfile, ",\n");
                         } else {
                           comma = true;
                         }
-                        fprintf(resultfile, "    { id = %d;\n", CurrentState->dfs);
-                        fprintf(resultfile, "      progress = %d;\n", CurrentState->progress_value);
+                        fprintf(Globals::resultfile, "    { id = %d;\n", CurrentState->dfs);
+                        fprintf(Globals::resultfile, "      progress = %d;\n", CurrentState->progress_value);
                         if(CurrentState -> persistent) {
-                          fprintf(resultfile, "      persistent = true;\n");
+                          fprintf(Globals::resultfile, "      persistent = true;\n");
                         }
-                        fprintf(resultfile, "      state = (");
+                        fprintf(Globals::resultfile, "      state = (");
 
                         int j = 0;
-                        for(i=0;i<Places[0]->cnt; ++i) {
-                          if(CurrentMarking[i]) {
-                            if(CurrentMarking[i] == VERYLARGE) {
-                              fprintf(resultfile, "%s(\"%s\", -1)", (j++ ? ", " : ""), Places[i]->name);
+                        for(i=0;i<Globals::Places[0]->cnt; ++i) {
+                          if(Globals::CurrentMarking[i]) {
+                            if(Globals::CurrentMarking[i] == VERYLARGE) {
+                              fprintf(Globals::resultfile, "%s(\"%s\", -1)", (j++ ? ", " : ""), Globals::Places[i]->name);
                             }
                             else {
-                              fprintf(resultfile, "%s(\"%s\", %d)", (j++ ? ", " : ""), Places[i]->name, CurrentMarking[i]);
+                              fprintf(Globals::resultfile, "%s(\"%s\", %d)", (j++ ? ", " : ""), Globals::Places[i]->name, Globals::CurrentMarking[i]);
                             }
                           }
                         }
-                        fprintf(resultfile, ");\n");
-                        fprintf(resultfile, "      successors = (");
+                        fprintf(Globals::resultfile, ");\n");
+                        fprintf(Globals::resultfile, "      successors = (");
 
                         j = 0;
                         for(i=0; CurrentState ->firelist[i]; ++i) {
-                          fprintf(resultfile, "%s(\"%s\", %d)", (j++ ? ", " : ""), CurrentState->firelist[i]->name, CurrentState->succ[i]->dfs);
+                          fprintf(Globals::resultfile, "%s(\"%s\", %d)", (j++ ? ", " : ""), CurrentState->firelist[i]->name, CurrentState->succ[i]->dfs);
                         }
-                        fprintf(resultfile, "); }");
+                        fprintf(Globals::resultfile, "); }");
                       }
                 */
 #endif
@@ -1617,12 +1620,12 @@ endomegaproc:
                     if (!forgotten) {
                         // check for forgotten down transitions (SPP3 of
                         // Kristensen/Valmari (2000)
-                        for (i = 0; i < Transitions[0]->cnt; ++i) {
-                            if (Transitions[i]->down) {
-                                if (Transitions[i]->lastfired <= CurrentState ->dfs) {
+                        for (i = 0; i < Globals::Transitions[0]->cnt; ++i) {
+                            if (Globals::Transitions[i]->down) {
+                                if (Globals::Transitions[i]->lastfired <= CurrentState ->dfs) {
                                     // no occurrence of down transition
                                     // inside tscc -> need to extend
-                                    stubborninsert(Transitions[i]);
+                                    stubborninsert(Globals::Transitions[i]);
                                     stubbornclosure();
                                     // check for unfired transitions in
                                     // stubborn set
@@ -1630,7 +1633,7 @@ endomegaproc:
                                     unsigned int m, n;
                                     Transition* st;
 
-                                    for (st = Transitions[0]-> StartOfStubbornList; st; st = st->NextStubborn) {
+                                    for (st = Globals::Transitions[0]-> StartOfStubbornList; st; st = st->NextStubborn) {
                                         if (st->enabled) {
                                             for (m = 0; CurrentState->firelist[m]; ++m) {
                                                 if (st == CurrentState->firelist[m]) {
@@ -1643,11 +1646,11 @@ endomegaproc:
                                                 // searching and extend firing list by
                                                 // unfired transitions in this stubborn set
 
-                                                forgotten = new Transition * [Transitions[0]->NrStubborn + 1];
+                                                forgotten = new Transition * [Globals::Transitions[0]->NrStubborn + 1];
                                                 for (n = 0; st; st = st -> NextStubborn) {
                                                     st -> instubborn = false;
                                                     if (st -> enabled) {
-                                                        Transitions[0]->NrStubborn--;
+                                                        Globals::Transitions[0]->NrStubborn--;
                                                         for (m = 0; CurrentState -> firelist[m]; ++m) {
                                                             if (CurrentState->firelist[m] == st) {
                                                                 break;
@@ -1658,14 +1661,14 @@ endomegaproc:
                                                         }
                                                     }
                                                 }
-                                                Transitions[0]->StartOfStubbornList = NULL;
+                                                Globals::Transitions[0]->StartOfStubbornList = NULL;
                                                 goto afterdownsearch;
                                             }
                                         }
-                                        Transitions[0]->StartOfStubbornList = st -> NextStubborn;
+                                        Globals::Transitions[0]->StartOfStubbornList = st -> NextStubborn;
                                         st -> instubborn = false;
-                                        if (Transitions[i]->enabled) {
-                                            Transitions[0]-> NrStubborn--;
+                                        if (Globals::Transitions[i]->enabled) {
+                                            Globals::Transitions[0]-> NrStubborn--;
                                         }
                                     }
                                 }
@@ -1679,8 +1682,10 @@ afterdownsearch:
                     if (forgotten) {
                         // fire list must be extended
                         unsigned int nf;
-                        for (nf = 0; forgotten[nf]; ++nf);
-                        Transition** newFL = new Transition * [nf + CurrentState -> current+1];
+                        for (nf = 0; forgotten[nf]; ++nf) {
+                            ;
+                        }
+                        Transition** newFL = new Transition * [nf + CurrentState -> current + 1];
                         State** newSucc = new State * [nf + CurrentState -> current];
                         for (i = 0; i < CurrentState -> current; ++i) {
                             newFL[i] = CurrentState -> firelist[i];
@@ -1703,7 +1708,7 @@ afterdownsearch:
                         if (largest_sat <= CurrentState -> dfs) {
                             // tscc did not reach prop -> prop not live
                             cout << "\npredicate not live: not satisfiable beyond reported state\n\n";
-                            printstate("", CurrentMarking);
+                            printstate("", Globals::CurrentMarking);
                             statistics(NrOfStates, Edges, NonEmptyHash);
                             return 1;
                         }
@@ -1715,8 +1720,8 @@ afterdownsearch:
                     unsigned int CardIgnored;
 
                     CardIgnored = 0;
-                    Transitions[0]-> StartOfIgnoredList = NULL;
-                    for (ignored = Transitions[0]->StartOfEnabledList; ignored;
+                    Globals::Transitions[0]-> StartOfIgnoredList = NULL;
+                    for (ignored = Globals::Transitions[0]->StartOfEnabledList; ignored;
                             ignored = ignored -> NextEnabled) {
 
                         if ((ignored -> lastdisabled <= CurrentState -> dfs)
@@ -1724,11 +1729,11 @@ afterdownsearch:
 
                             // transition IS ignored
                             ++CardIgnored;
-                            ignored -> NextIgnored = Transitions[0]->StartOfIgnoredList;
-                            Transitions[0]->StartOfIgnoredList = ignored;
+                            ignored -> NextIgnored = Globals::Transitions[0]->StartOfIgnoredList;
+                            Globals::Transitions[0]->StartOfIgnoredList = ignored;
                         }
                     }
-                    if (Transitions[0]->StartOfIgnoredList) {
+                    if (Globals::Transitions[0]->StartOfIgnoredList) {
                         // there are ignored transitions
                         Transition* tt;
                         Transition** newFL = new Transition *[CurrentState -> current + CardIgnored + 1];
@@ -1738,7 +1743,7 @@ afterdownsearch:
                             newFL[u] = CurrentState->firelist[u];
                             newSucc[u] = CurrentState -> succ[u];
                         }
-                        for (tt = Transitions[0]->StartOfIgnoredList; tt; tt = tt -> NextIgnored) {
+                        for (tt = Globals::Transitions[0]->StartOfIgnoredList; tt; tt = tt -> NextIgnored) {
                             newFL[u++] = tt;
                         }
                         newFL[u] = NULL;
@@ -1755,11 +1760,11 @@ afterdownsearch:
 
                         MinBookmark = NrOfStates;
                         s = new StatevectorList;
-                        s -> sv = new Statevector(Places[0]->cnt);
+                        s -> sv = new Statevector(Globals::Places[0]->cnt);
                         s -> next = TSCCRepresentitives;
                         TSCCRepresentitives = s;
-                        for (i = 0; i < Places[0]->cnt; ++i) {
-                            s -> sv ->set(i, CurrentMarking[i]);
+                        for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+                            s -> sv ->set(i, Globals::CurrentMarking[i]);
                         }
                     }
 #endif
@@ -1810,40 +1815,40 @@ afterdownsearch:
         cout << "\nno conclusive result!\n";
 #else
 #ifdef REACHABILITY
-    cout << "\nstate is not reachable!\n";
+        cout << "\nstate is not reachable!\n";
 #endif
 #ifdef DEADLOCK
-    cout << "\nnet does not have deadlocks!\n";
-    if (resultfile) {
-        fprintf(resultfile, "\n  );\n};\ndeadlock: {\n  result = false;\n};\n");
-    }
+        cout << "\nnet does not have deadlocks!\n";
+        if (Globals::resultfile) {
+            fprintf(Globals::resultfile, "\n  );\n};\ndeadlock: {\n  result = false;\n};\n");
+        }
 #endif
 #if defined(STATEPREDICATE) && ! defined(LIVEPROP)
-    cout << "\n predicate is not satisfiable!\n";
-    if (resultfile) {
-        fprintf(resultfile, "statepredicate: {\n  result = false;\n};\n");
-    }
+        cout << "\n predicate is not satisfiable!\n";
+        if (Globals::resultfile) {
+            fprintf(Globals::resultfile, "statepredicate: {\n  result = false;\n};\n");
+        }
 
 #endif
 #ifdef DEADTRANSITION
-    cout << "\ntransition " << CheckTransition -> name << " is dead!\n";
+        cout << "\ntransition " << CheckTransition -> name << " is dead!\n";
 #endif
 #ifdef BOUNDEDPLACE
-    cout << "\nplace " << CheckPlace -> name << " is bounded!\n";
+        cout << "\nplace " << CheckPlace -> name << " is bounded!\n";
 #endif
 #if defined(LIVEPROP) && ! defined(TWOPHASE)
-    cout << "\npredicate is live!\n";
+        cout << "\npredicate is live!\n";
 #endif
 #ifdef BOUNDEDNET
-    if (isbounded) {
-        cout << "\nnet is bounded!\n";
-        if (resultfile) {
-            fprintf(resultfile, "unbounded: {\n  result = false;\n};\n");
+        if (isbounded) {
+            cout << "\nnet is bounded!\n";
+            if (Globals::resultfile) {
+                fprintf(Globals::resultfile, "unbounded: {\n  result = false;\n};\n");
+            }
+        } else {
+            /// can this ever happen here?
+            cout << "\nnet is unbounded!\n";
         }
-    } else {
-        /// can this ever happen here?
-        cout << "\nnet is unbounded!\n";
-    }
 #endif
 #endif
 #endif
@@ -1857,8 +1862,8 @@ afterdownsearch:
     cout << "\n eventually phi holds\n";
 #endif
 #ifdef FULL
-    if (resultfile) {
-        fprintf(resultfile, "\n  );\n};\n");
+    if (Globals::resultfile) {
+        fprintf(Globals::resultfile, "\n  );\n};\n");
     }
 #endif
     statistics(NrOfStates, Edges, NonEmptyHash);
@@ -1876,24 +1881,24 @@ afterdownsearch:
 
 // specify property specific initialization routines
 
-int initialize_none() {return -1;}
-int initialize_place()
-{
-   if(!CheckPlace) {
-      fprintf(stderr, "lola: specify place to be checked in analysis task file\n");
-      fprintf(stderr, "      mandatory for task BOUNDEDPLACE\n");
-      _exit(4);
-   }
-	return -1;
+int initialize_none() {
+    return -1;
 }
-int initialize_transition()
-{
-   if(!CheckTransition) {
-      fprintf(stderr, "lola: specify transition to be checked in analysis task file\n");
-      fprintf(stderr, "      mandatory for task DEADTRANSITION\n");
-      _exit(4);
-   }
-return -1;
+int initialize_place() {
+    if (!Globals::CheckPlace) {
+        fprintf(stderr, "lola: specify place to be checked in analysis task file\n");
+        fprintf(stderr, "      mandatory for task BOUNDEDPLACE\n");
+        _exit(4);
+    }
+    return -1;
+}
+int initialize_transition() {
+    if (!Globals::CheckTransition) {
+        fprintf(stderr, "lola: specify transition to be checked in analysis task file\n");
+        fprintf(stderr, "      mandatory for task DEADTRANSITION\n");
+        _exit(4);
+    }
+    return -1;
 }
 
 // select property specific initialization procedure
@@ -1931,17 +1936,17 @@ return -1;
 #endif
 
 /*!
- 	\brief compares current and target marking, used in search procedures
-	\return 0 markings different
-	\return 1 markings different
+    \brief compares current and target marking, used in search procedures
+    \return 0 markings different
+    \return 1 markings different
 */
-int compare_markings()
-{
-   for(int i=0; i<Places[0]->cnt; ++i) {
-     if(CurrentMarking[i] != Places[i]->target_marking)
-       return 0;
-   }
-	return 1;
+int compare_markings() {
+    for (int i = 0; i < Globals::Places[0]->cnt; ++i) {
+        if (Globals::CurrentMarking[i] != Globals::Places[i]->target_marking) {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 #ifdef REACHABILITY
@@ -1982,31 +1987,31 @@ int compare_markings()
 
 /*!
  \brief plain depth first search, no scc, no tscc, no fairness
- 
+
  \return 1 if we found what we were looking for; that is, the search is aborted
          Examples: deadlock found, state found, unbounded net found, etc.
- 
+
  \return 0 if we did not found what we were looking for; that is, complete search
          Examples: no deadlock found, no dead transition found, etc.
 */
 unsigned int simple_depth_first() {
 
-  State * NewState; ///< state most recently generated during search
+    State* NewState;  ///< state most recently generated during search
 
 
-  // initialize hash table
-  for(int i = 0; i < HASHSIZE; ++i) {
+    // initialize hash table
+    for (int i = 0; i < HASHSIZE; ++i) {
 #ifdef BITHASH
-    BitHashTable[i] = 0;
+        BitHashTable[i] = 0;
 #else
-    binHashTable[i] = NULL;
+        binHashTable[i] = NULL;
 #endif
-  }
+    }
 
 #if defined(SYMMETRY) && SYMMINTEGRATION==1
-  // this data structure is used for skipping symmetries in the
-  //    "for all symmetries sigma lookup sigma(m)" loop
-  Trace = new SearchTrace [Places[0]->cnt];
+    // this data structure is used for skipping symmetries in the
+    //    "for all symmetries sigma lookup sigma(m)" loop
+    Trace = new SearchTrace [Globals::Places[0]->cnt];
 #endif
 
 // initialize property
@@ -2014,255 +2019,255 @@ unsigned int simple_depth_first() {
 // determined structurally
 // instances of this macros have shape int initialize_*();
 
-  int result = INITIALIZE_PROPERTY();
-  if(result >= 0)
-  {
-      return result;
-  }
+    int result = INITIALIZE_PROPERTY();
+    if (result >= 0) {
+        return result;
+    }
 
 
-// Insert initial state (already in CurrentMarking) 
+// Insert initial state (already in Globals::CurrentMarking)
 // into data stucture. The preceding SEARCHPROC
 // sets static variables needed by INSERTPROC.
-  if(SEARCHPROC()) cerr << "Sollte eigentlich nicht vorkommen";
-  CurrentState = INSERTPROC();
-  CurrentState -> parent = NULL; // parent in search tree
-  CurrentState -> firelist = FIRELIST(); // the transitions to be fired
-  CurrentState -> current = 0; // index of current transition to be fired in firelist
+    if (SEARCHPROC()) {
+        cerr << "Sollte eigentlich nicht vorkommen";
+    }
+    CurrentState = INSERTPROC();
+    CurrentState -> parent = NULL; // parent in search tree
+    CurrentState -> firelist = FIRELIST(); // the transitions to be fired
+    CurrentState -> current = 0; // index of current transition to be fired in firelist
 
-	// report initial state to graph output
-	TheGraphReport -> tell();
+    // report initial state to graph output
+    TheGraphReport -> tell();
 
 // Initialize statistical information
-  NrOfStates = 1;
-  Edges = 0;
+    NrOfStates = 1;
+    Edges = 0;
 
 #ifdef COVER
-   // a marking that is used to search backwards for covered states
-   Ancestor = new unsigned int[Places[0]->cnt + 1];
-  CurrentState->NewOmega = NULL; // a vector that records where new
-                                 // omegas have been inserted
-                                 // while producung this state, used for
-                                 // backtracking
-  Place ** NewOmegas = NULL;     // holds CurrentState->NewOmega when
-                                 // processing it (saves derefencings)
-   
+    // a marking that is used to search backwards for covered states
+    Ancestor = new unsigned int[Globals::Places[0]->cnt + 1];
+    CurrentState->NewOmega = NULL; // a vector that records where new
+    // omegas have been inserted
+    // while producung this state, used for
+    // backtracking
+    Place** NewOmegas = NULL;      // holds CurrentState->NewOmega when
+    // processing it (saves derefencings)
+
 #endif
 
 #ifndef FULL
-	if(CHECK_EARLY_ABORTION)  // this is property dependent
-	{
-		cout << "\n" << EARLY_ABORT_MESSAGE << "\n";
-      if (resultfile) {
-        fprintf(resultfile, "%s : {\n  result = true;\n  ", RESULT_NAME);
-      }
+    if (CHECK_EARLY_ABORTION) { // this is property dependent
+        cout << "\n" << EARLY_ABORT_MESSAGE << "\n";
+        if (Globals::resultfile) {
+            fprintf(Globals::resultfile, "%s : {\n  result = true;\n  ", RESULT_NAME);
+        }
 
-      printstate("",CurrentMarking);  // print witness state
-      print_path(CurrentState);     // print witness path
+        printstate("", Globals::CurrentMarking); // print witness state
+        print_path(CurrentState);     // print witness path
 
-      if (resultfile) {
-        fprintf(resultfile, "};\n");
-        fprintf(resultfile, "statespace: {\n  complete = false;\n  states = ( ");
-      }
+        if (Globals::resultfile) {
+            fprintf(Globals::resultfile, "};\n");
+            fprintf(Globals::resultfile, "statespace: {\n  complete = false;\n  states = ( ");
+        }
 
 
-      if (resultfile) {
-        fprintf(resultfile, "\n  );\n};\n");
-      }
+        if (Globals::resultfile) {
+            fprintf(Globals::resultfile, "\n  );\n};\n");
+        }
 
-      statistics(NrOfStates,Edges,NonEmptyHash);
+        statistics(NrOfStates, Edges, NonEmptyHash);
 
-      return 1;
-	}
+        return 1;
+    }
 #endif
 
-  // process marking until returning from initial state
-  while(CurrentState)   // NULL after having backtracked from initial state
-   {
-  if(CurrentState -> firelist[CurrentState->current]) {
-    // there is a next state that needs to be explored
-    ++Edges;
-    if(!(Edges % REPORTFREQUENCY)) {
-      cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
-    }
-    CurrentState -> firelist[CurrentState -> current] -> fire();
+    // process marking until returning from initial state
+    while (CurrentState) { // NULL after having backtracked from initial state
+        if (CurrentState -> firelist[CurrentState->current]) {
+            // there is a next state that needs to be explored
+            ++Edges;
+            if (!(Edges % REPORTFREQUENCY)) {
+                cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
+            }
+            CurrentState -> firelist[CurrentState -> current] -> fire();
 
 #ifdef COVER
-   //In coverability graphs, we need to check for new w
-   // 1. Search backwards until last w-Intro for smaller state
-  unsigned int NrCovered;
-  State * smallerstate;
+            //In coverability graphs, we need to check for new w
+            // 1. Search backwards until last w-Intro for smaller state
+            unsigned int NrCovered;
+            State* smallerstate;
 
-  NewOmegas = NULL;
-   // for all ancestor states do ...
-  for(int i=0; i<Places[0]->cnt; ++i) {
-    Ancestor[i]= CurrentMarking[i];
-  }
-  for(smallerstate = CurrentState; smallerstate; smallerstate = smallerstate->parent) {
-    smallerstate -> firelist[smallerstate ->  current] -> traceback();
-    NrCovered = 0;
-    for(int i=0; i<Places[0]->cnt; ++i) {
-      // case 1: smaller state[i] > current state [i]
-      // ---> continue with previous state
-      if(Ancestor[i] > CurrentMarking[i]) {
-        goto nextstate;
-      }
+            NewOmegas = NULL;
+            // for all ancestor states do ...
+            for (int i = 0; i < Globals::Places[0]->cnt; ++i) {
+                Ancestor[i] = Globals::CurrentMarking[i];
+            }
+            for (smallerstate = CurrentState; smallerstate; smallerstate = smallerstate->parent) {
+                smallerstate -> firelist[smallerstate ->  current] -> traceback();
+                NrCovered = 0;
+                for (int i = 0; i < Globals::Places[0]->cnt; ++i) {
+                    // case 1: smaller state[i] > current state [i]
+                    // ---> continue with previous state
+                    if (Ancestor[i] > Globals::CurrentMarking[i]) {
+                        goto nextstate;
+                    }
 
-      // case 2: smaller state < current state
-      // count w-Intro
-      if(Ancestor[i] < CurrentMarking[i]) {
-        NrCovered++;
-      }
-      // case 3: smaller state = current state --> do nothing
-    }
+                    // case 2: smaller state < current state
+                    // count w-Intro
+                    if (Ancestor[i] < Globals::CurrentMarking[i]) {
+                        NrCovered++;
+                    }
+                    // case 3: smaller state = current state --> do nothing
+                }
 
-    // if arrived here, it holds smaller <= current
-    // covering is proper iff NrCovered > 0
-    // If covering is not proper, (smaller state = current state)
-    // current marking is not new, ancestors of smaller marking cannot
-    // be smaller than current marking, since they would be smaller than
-    // this smaller marking --> leave w-Intro procedure
-    if(!NrCovered) {
-      smallerstate = NULL;
-      goto endomegaproc;
-    }
+                // if arrived here, it holds smaller <= current
+                // covering is proper iff NrCovered > 0
+                // If covering is not proper, (smaller state = current state)
+                // current marking is not new, ancestors of smaller marking cannot
+                // be smaller than current marking, since they would be smaller than
+                // this smaller marking --> leave w-Intro procedure
+                if (!NrCovered) {
+                    smallerstate = NULL;
+                    goto endomegaproc;
+                }
 
-    // Here, smallerstate IS less than current state.
-    NewOmegas = new Place*[NrCovered+1];
-    
-    // for all fragements of state vector do ...
-    NrCovered = 0;
-    for(int i=0; i<Places[0]->cnt; ++i) {
-      if(Ancestor[i] < CurrentMarking[i]) {
-        // Here we have a place that deserves a new Omega
-        // 1. set old value in place record
-        Places[i] -> lastfinite = CurrentMarking[i];
-        Places[i] -> set_cmarking(VERYLARGE);
-        Places[i] -> bounded = false;
-        NewOmegas[NrCovered++] = Places[i];
-      }
-    }
-    NewOmegas[NrCovered] = NULL;
-    goto endomegaproc;
-    if(smallerstate -> smaller) { // smallerstate is a omega-introducing state
-      break;
-    }
+                // Here, smallerstate IS less than current state.
+                NewOmegas = new Place*[NrCovered + 1];
 
-    nextstate: ;
-  }
+                // for all fragements of state vector do ...
+                NrCovered = 0;
+                for (int i = 0; i < Globals::Places[0]->cnt; ++i) {
+                    if (Ancestor[i] < Globals::CurrentMarking[i]) {
+                        // Here we have a place that deserves a new Omega
+                        // 1. set old value in place record
+                        Globals::Places[i] -> lastfinite = Globals::CurrentMarking[i];
+                        Globals::Places[i] -> set_cmarking(VERYLARGE);
+                        Globals::Places[i] -> bounded = false;
+                        NewOmegas[NrCovered++] = Globals::Places[i];
+                    }
+                }
+                NewOmegas[NrCovered] = NULL;
+                goto endomegaproc;
+                if (smallerstate -> smaller) { // smallerstate is a omega-introducing state
+                    break;
+                }
 
-  endomegaproc:
-  if(!NewOmegas) smallerstate = NULL;
+nextstate:
+                ;
+            }
+
+endomegaproc:
+            if (!NewOmegas) {
+                smallerstate = NULL;
+            }
 #endif
 
-     /// I really mean = and not ==
-     if((NewState = SEARCHPROC()))
-       {
-       // State exists! --> backtracking to previous state
+            /// I really mean = and not ==
+            if ((NewState = SEARCHPROC())) {
+                // State exists! --> backtracking to previous state
 
 #ifdef COVER
-	 // revert omega introduction
-         if(NewOmegas) {
-           // Replace new omegas by their old values
-           for(int i=0; NewOmegas[i]; ++i) {
-             NewOmegas[i]->set_cmarking(NewOmegas[i]->lastfinite);
-             NewOmegas[i]->bounded = true;
-           }
-           delete[] NewOmegas;
-         }
+                // revert omega introduction
+                if (NewOmegas) {
+                    // Replace new omegas by their old values
+                    for (int i = 0; NewOmegas[i]; ++i) {
+                        NewOmegas[i]->set_cmarking(NewOmegas[i]->lastfinite);
+                        NewOmegas[i]->bounded = true;
+                    }
+                    delete[] NewOmegas;
+                }
 #endif
-         CurrentState -> firelist[CurrentState -> current] -> backfire();
-         ++(CurrentState -> current);
-       } else {
-	// State does not exist! --> check property, insert, go ahead
+                CurrentState -> firelist[CurrentState -> current] -> backfire();
+                ++(CurrentState -> current);
+            } else {
+                // State does not exist! --> check property, insert, go ahead
 
-  NewState = INSERTPROC();
+                NewState = INSERTPROC();
 #ifdef WITHFORMULA
-         update_formula(CurrentState -> firelist[CurrentState -> current]);
+                update_formula(CurrentState -> firelist[CurrentState -> current]);
 #endif
-  NewState -> firelist = FIRELIST();
-  ++NrOfStates;
-  TheGraphReport -> tell();
+                NewState -> firelist = FIRELIST();
+                ++NrOfStates;
+                TheGraphReport -> tell();
 #ifdef MAXIMALSTATES
-  checkMaximalStates(NrOfStates); ///// LINE ADDED BY NIELS
+                checkMaximalStates(NrOfStates); ///// LINE ADDED BY NIELS
 #endif
-  NewState -> current = 0;
-  NewState -> parent = CurrentState;
+                NewState -> current = 0;
+                NewState -> parent = CurrentState;
 #ifdef COVER
-  NewState -> smaller = smallerstate;
-  NewState -> NewOmega = NewOmegas;
+                NewState -> smaller = smallerstate;
+                NewState -> NewOmega = NewOmegas;
 #endif
-  CurrentState = NewState;
+                CurrentState = NewState;
 #ifndef FULL
-	if(CHECK_EARLY_ABORTION)
-	{
-		cout << "\n" << EARLY_ABORT_MESSAGE << "\n";
-      if (resultfile) {
-        fprintf(resultfile, "%s: {\n  result = true;\n  ", RESULT_NAME);
-      }
+                if (CHECK_EARLY_ABORTION) {
+                    cout << "\n" << EARLY_ABORT_MESSAGE << "\n";
+                    if (Globals::resultfile) {
+                        fprintf(Globals::resultfile, "%s: {\n  result = true;\n  ", RESULT_NAME);
+                    }
 
-      printstate("",CurrentMarking);
-      print_path(CurrentState);
+                    printstate("", Globals::CurrentMarking);
+                    print_path(CurrentState);
 
-      if (resultfile) {
-        fprintf(resultfile, "};\n");
-        fprintf(resultfile, "statespace: {\n  complete = false;\n  states = ( ");
-      }
+                    if (Globals::resultfile) {
+                        fprintf(Globals::resultfile, "};\n");
+                        fprintf(Globals::resultfile, "statespace: {\n  complete = false;\n  states = ( ");
+                    }
 
 
-      if (resultfile) {
-        fprintf(resultfile, "\n  );\n};\n");
-      }
+                    if (Globals::resultfile) {
+                        fprintf(Globals::resultfile, "\n  );\n};\n");
+                    }
 
-      statistics(NrOfStates,Edges,NonEmptyHash);
+                    statistics(NrOfStates, Edges, NonEmptyHash);
 
-      return 1;
-	}
+                    return 1;
+                }
 #endif
-} // end else branch for "if state exists"
-} else {
-  // firing list completed --> close state and return to previous state
+            } // end else branch for "if state exists"
+        } else {
+            // firing list completed --> close state and return to previous state
 #ifdef COVER
-        if(CurrentState -> NewOmega) {
-          // Replace new omegas by their old values
-          for(int i=0; CurrentState ->NewOmega[i]; ++i) {
-            CurrentState ->NewOmega[i]->set_cmarking(CurrentState ->NewOmega[i]->lastfinite);
-            CurrentState ->NewOmega[i]->bounded = true;
-          }
-          delete [] CurrentState ->NewOmega;
-        }
+            if (CurrentState -> NewOmega) {
+                // Replace new omegas by their old values
+                for (int i = 0; CurrentState ->NewOmega[i]; ++i) {
+                    CurrentState ->NewOmega[i]->set_cmarking(CurrentState ->NewOmega[i]->lastfinite);
+                    CurrentState ->NewOmega[i]->bounded = true;
+                }
+                delete [] CurrentState ->NewOmega;
+            }
 #endif
 
-        CurrentState = CurrentState -> parent;
-        if(CurrentState) {
-          CurrentState -> firelist[CurrentState -> current] -> backfire();
+            CurrentState = CurrentState -> parent;
+            if (CurrentState) {
+                CurrentState -> firelist[CurrentState -> current] -> backfire();
 #ifdef WITHFORMULA
-          update_formula(CurrentState -> firelist[CurrentState -> current]);
+                update_formula(CurrentState -> firelist[CurrentState -> current]);
 #endif
-          ++(CurrentState -> current);
+                ++(CurrentState -> current);
+            }
         }
-      }
     }
 // search finished
 #ifdef BITHASH
-  cout << "\nno conclusive result!\n";
+    cout << "\nno conclusive result!\n";
 #else
 #ifdef FULL
-  if (resultfile) {
-    fprintf(resultfile, "\n  );\n};\n");
-  }
+    if (Globals::resultfile) {
+        fprintf(Globals::resultfile, "\n  );\n};\n");
+    }
 #else
-  cout << "\n" << LATE_ABORT_MESSAGE << "\n";
-  if (resultfile) {
-    fprintf(resultfile, "%s: {\n  result = false;\n};\n", RESULT_NAME);
-  }
+    cout << "\n" << LATE_ABORT_MESSAGE << "\n";
+    if (Globals::resultfile) {
+        fprintf(Globals::resultfile, "%s: {\n  result = false;\n};\n", RESULT_NAME);
+    }
 #endif
 #endif
-  statistics(NrOfStates,Edges,NonEmptyHash);
+    statistics(NrOfStates, Edges, NonEmptyHash);
 
 
-  // return 0: we did not find what we were looking for
-  return 0;
+    // return 0: we did not find what we were looking for
+    return 0;
 }
 
 
@@ -2283,15 +2288,15 @@ unsigned int breadth_first() {
     unsigned int i;
 
     Edges = 0;
-    if (gmflg) {
-        graphstream = new ofstream(graphfile);
+    if (Globals::gmflg) {
+        graphstream = new ofstream(Globals::graphfile);
         if (graphstream->fail()) {
-            fprintf(stderr, "lola: cannot open graph output file '%s'\n", graphfile);
+            fprintf(stderr, "lola: cannot open graph output file '%s'\n", Globals::graphfile);
             fprintf(stderr, "      no output written\n");
             _exit(4);
         }
     }
-    if (GMflg) {
+    if (Globals::GMflg) {
         graphstream = &std::cout;
     }
 
@@ -2317,7 +2322,7 @@ unsigned int breadth_first() {
     canonize();
     search_and_insert(kanrep);
 #else
-    search_and_insert(CurrentMarking);
+    search_and_insert(Globals::CurrentMarking);
 #endif
     initial = CurrentState = new State();
 #else
@@ -2327,25 +2332,25 @@ unsigned int breadth_first() {
     CurrentState -> dfs = 0;
     CurrentState -> current = 0;
     CurrentState -> min = true;
-    for (i = 0; i < Transitions[0]->cnt; i++) {
-        Transitions[i]->check_enabled();
+    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+        Globals::Transitions[i]->check_enabled();
     }
     CurrentState -> firelist = FIRELIST();
 #ifdef COVER
     CurrentState -> NewOmega = NULL;
-    Ancestor = new unsigned int [Places[0]->cnt + 1];
+    Ancestor = new unsigned int [Globals::Places[0]->cnt + 1];
 #endif
     int j;
-    if (gmflg || GMflg) {
+    if (Globals::gmflg || Globals::GMflg) {
         (*graphstream) << "STATE " << CurrentState ->dfs << "; DEPTH 0";
         j = 0;
-        if (graphformat == 'm') {
-            for (i = 0; i < Places[0]->cnt; ++i) {
-                if (CurrentMarking[i]) {
-                    if (CurrentMarking[i] == VERYLARGE) {
-                        (*graphstream) << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << "oo" ;
+        if (Globals::graphformat == 'm') {
+            for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+                if (Globals::CurrentMarking[i]) {
+                    if (Globals::CurrentMarking[i] == VERYLARGE) {
+                        (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : " << "oo" ;
                     } else {
-                        (*graphstream) << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << CurrentMarking[i];
+                        (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : " << Globals::CurrentMarking[i];
                     }
                 }
             }
@@ -2365,7 +2370,7 @@ unsigned int breadth_first() {
 #ifdef DEADTRANSITION
         cout << "\ntransition " << CheckTransition -> name << " is not dead!\n";
 #endif
-        printstate("", CurrentMarking);
+        printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
         statistics(NrOfStates, Edges, NonEmptyHash);
         return 1;
@@ -2374,7 +2379,7 @@ unsigned int breadth_first() {
 #if defined(DEADTRANSITION) && !defined(STUBBORN)
     if (CheckTransition->enabled) {
         cout << "\ntransition " << CheckTransition -> name << " is not dead!\n";
-        printstate("", CurrentMarking);
+        printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
         statistics(NrOfStates, Edges, NonEmptyHash);
         return 1;
@@ -2391,14 +2396,14 @@ unsigned int breadth_first() {
     if (!CurrentState -> firelist || !(CurrentState -> firelist[0])) {
         // early abortion
         cout << "\ndead state found!\n";
-        if (resultfile) {
-            fprintf(resultfile, "deadlock: {\n  result = true;\n");
+        if (Globals::resultfile) {
+            fprintf(Globals::resultfile, "deadlock: {\n  result = true;\n");
         }
-        printstate("", CurrentMarking);
+        printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
 
-        if (resultfile) {
-            fprintf(resultfile, "};\n");
+        if (Globals::resultfile) {
+            fprintf(Globals::resultfile, "};\n");
         }
 
         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -2428,7 +2433,7 @@ unsigned int breadth_first() {
     F -> parent = NULL;
     if (F -> initatomic()) {
         cout << "\nstate found!\n";
-        printstate("", CurrentMarking);
+        printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
         printincompletestates(CurrentState, graphstream);
         if (graphstream != &cout) {
@@ -2440,15 +2445,15 @@ unsigned int breadth_first() {
 #endif
 
 #if ( defined (REACHABILITY ) && ! defined ( STUBBORN ) )
-    for (i = 0; i < Places[0]->cnt; ++i) {
-        if (CurrentMarking[i] != Places[i]->target_marking) {
+    for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+        if (Globals::CurrentMarking[i] != Globals::Places[i]->target_marking) {
             break;
         }
     }
-    if (i >= Places[0]->cnt) { // target_marking found!
+    if (i >= Globals::Places[0]->cnt) { // target_marking found!
         // early abortion
         cout << "\nstate found!\n";
-        printstate("", CurrentMarking);
+        printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
         statistics(NrOfStates, Edges, NonEmptyHash);
         return 1;
@@ -2479,54 +2484,54 @@ unsigned int breadth_first() {
                 State* smallerstate;
                 Place** NewOmegas;
 
-        for(i=0; i<Places[0]->cnt; ++i) {
-          Ancestor[i] = CurrentMarking[i];
-        }
-        NewOmegas = NULL;
-        // for all ancestor states do ...
-        for(smallerstate = CurrentState; smallerstate; smallerstate = smallerstate -> parent) {
-          smallerstate -> firelist[smallerstate -> current] -> traceback();
-          NrCovered = 0;
-          for(i=0; i<Places[0]->cnt; ++i) {
-            // case 1: smaller state[i] > current state [i]
-            // ---> continue with previous state
-            if(Ancestor[i] > CurrentMarking[i]) {
-              goto nextstate;
-            }
-            // case 2: smaller state < current state
-            // count w-Intro
-            if(Ancestor[i] < CurrentMarking[i]) {
-              ++NrCovered;
-            }
-            // case 3: smaller state = current state --> do nothing
-          }
-          // if arrived here, it holds smaller <= current
-          // covering is proper iff NrCovered > 0
-          // If covering is not proper, (smaller state = current state)
-          // current marking is not new, ancestors of smaller marking cannot
-          // be smaller than current marking, since they would be smaller than
-          // this smaller marking --> leave w-Intro procedure
-          if(!NrCovered) {
-            smallerstate = NULL;
-            goto endomegaproc;
-          }
-          // Here, smallerstate IS less than current state.
-          isbounded = 0;
-          NewOmegas = new Place * [NrCovered+1];
-          // for all fragements of state vector do ...
-          NrCovered = 0;
-          for(i=0; i<Places[0]->cnt; ++i) {
-            if(Ancestor[i] < CurrentMarking[i]) {
-              // Here we have a place that deserves a new Omega
-              // 1. set old value in place record
-              Places[i] -> lastfinite = CurrentMarking[i];
-              Places[i] -> set_cmarking(VERYLARGE);
-              Places[i] -> bounded = false;
-              NewOmegas[NrCovered++] = Places[i];
-            }
-          }
-          NewOmegas[NrCovered] = NULL;
-          goto endomegaproc;
+                for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+                    Ancestor[i] = Globals::CurrentMarking[i];
+                }
+                NewOmegas = NULL;
+                // for all ancestor states do ...
+                for (smallerstate = CurrentState; smallerstate; smallerstate = smallerstate -> parent) {
+                    smallerstate -> firelist[smallerstate -> current] -> traceback();
+                    NrCovered = 0;
+                    for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+                        // case 1: smaller state[i] > current state [i]
+                        // ---> continue with previous state
+                        if (Ancestor[i] > Globals::CurrentMarking[i]) {
+                            goto nextstate;
+                        }
+                        // case 2: smaller state < current state
+                        // count w-Intro
+                        if (Ancestor[i] < Globals::CurrentMarking[i]) {
+                            ++NrCovered;
+                        }
+                        // case 3: smaller state = current state --> do nothing
+                    }
+                    // if arrived here, it holds smaller <= current
+                    // covering is proper iff NrCovered > 0
+                    // If covering is not proper, (smaller state = current state)
+                    // current marking is not new, ancestors of smaller marking cannot
+                    // be smaller than current marking, since they would be smaller than
+                    // this smaller marking --> leave w-Intro procedure
+                    if (!NrCovered) {
+                        smallerstate = NULL;
+                        goto endomegaproc;
+                    }
+                    // Here, smallerstate IS less than current state.
+                    isbounded = 0;
+                    NewOmegas = new Place * [NrCovered + 1];
+                    // for all fragements of state vector do ...
+                    NrCovered = 0;
+                    for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+                        if (Ancestor[i] < Globals::CurrentMarking[i]) {
+                            // Here we have a place that deserves a new Omega
+                            // 1. set old value in place record
+                            Globals::Places[i] -> lastfinite = Globals::CurrentMarking[i];
+                            Globals::Places[i] -> set_cmarking(VERYLARGE);
+                            Globals::Places[i] -> bounded = false;
+                            NewOmegas[NrCovered++] = Globals::Places[i];
+                        }
+                    }
+                    NewOmegas[NrCovered] = NULL;
+                    goto endomegaproc;
 
 nextstate:
                     if (smallerstate -> smaller) { // smallerstate is a omega-introducing state
@@ -2548,7 +2553,7 @@ endomegaproc:
                 canonize();
                 if (!search_and_insert(kanrep, DistributeNow))
 #else
-                if (!search_and_insert(CurrentMarking, DistributeNow))
+                if (!search_and_insert(Globals::CurrentMarking, DistributeNow))
 #endif
 #else
                 if (NewState = SEARCHPROC())
@@ -2591,19 +2596,19 @@ endomegaproc:
                     NewState -> firelist = FIRELIST();
                     NewState -> parent = CurrentState;
                     NewState -> succ =  new State * [CardFireList];
-                    if (gmflg || GMflg) {
+                    if (Globals::gmflg || Globals::GMflg) {
                         (*graphstream) << "STATE " << NewState ->dfs << " FROM " <<
                                        CurrentState -> dfs << " BY " <<
                                        CurrentState -> firelist[CurrentState -> current] -> name
                                        << "; DEPTH " << limit;
                         j = 0;
-                        if (graphformat == 'm') {
-                            for (i = 0; i < Places[0]->cnt; i++) {
-                                if (CurrentMarking[i]) {
-                                    if (CurrentMarking[i] == VERYLARGE) {
-                                        (*graphstream) << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << "oo" ;
+                        if (Globals::graphformat == 'm') {
+                            for (i = 0; i < Globals::Places[0]->cnt; i++) {
+                                if (Globals::CurrentMarking[i]) {
+                                    if (Globals::CurrentMarking[i] == VERYLARGE) {
+                                        (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : " << "oo" ;
                                     } else {
-                                        (*graphstream) << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << CurrentMarking[i] ;
+                                        (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : " << Globals::CurrentMarking[i] ;
                                     }
                                 }
                             }
@@ -2627,7 +2632,7 @@ endomegaproc:
 #ifdef STATEPREDICATE
                         cout << "state found!\n";
 #endif
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         statistics(NrOfStates, Edges, NonEmptyHash);
                         return 1;
@@ -2636,7 +2641,7 @@ endomegaproc:
 #ifdef BOUNDEDPLACE
                     if (!CheckPlace -> bounded) {
                         cout << "place " << CheckPlace -> name << " is unbounded!\n";
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         NewState -> smaller = smallerstate;
                         print_reg_path(NewState, smallerstate);
                         cout << "\n";
@@ -2648,17 +2653,17 @@ endomegaproc:
                     if (!isbounded) {
                         cout << "net is unbounded!\n";
 
-                        if (resultfile) {
-                            fprintf(resultfile, "unbounded: {\n  result = true;\n");
+                        if (Globals::resultfile) {
+                            fprintf(Globals::resultfile, "unbounded: {\n  result = true;\n");
                         }
 
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         NewState -> smaller = smallerstate;
                         print_reg_path(NewState, smallerstate);
                         cout << "\n";
 
-                        if (resultfile) {
-                            fprintf(resultfile, "};\n");
+                        if (Globals::resultfile) {
+                            fprintf(Globals::resultfile, "};\n");
                         }
 
                         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -2670,15 +2675,15 @@ endomegaproc:
                         // early abortion
                         cout << "\ndead state found!\n";
 
-                        if (resultfile) {
-                            fprintf(resultfile, "deadlock: {\n  result = true;\n");
+                        if (Globals::resultfile) {
+                            fprintf(Globals::resultfile, "deadlock: {\n  result = true;\n");
                         }
 
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         print_path(NewState);
 
-                        if (resultfile) {
-                            fprintf(resultfile, "};\n");
+                        if (Globals::resultfile) {
+                            fprintf(Globals::resultfile, "};\n");
                         }
 
                         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -2688,7 +2693,7 @@ endomegaproc:
 #if defined(DEADTRANSITION)
                     if (CheckTransition->enabled) {
                         cout << "\ntransition " << CheckTransition -> name << " is not dead!\n";
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         print_path(CurrentState);
                         statistics(NrOfStates, Edges, NonEmptyHash);
                         return 1;
@@ -2698,22 +2703,22 @@ endomegaproc:
                     if (! NewState -> firelist || F->value) {
                         // early abortion
                         cout << "\nstate found!\n";
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         statistics(NrOfStates, Edges, NonEmptyHash);
                         return 1;
                     }
 #endif
 #if ( defined (REACHABILITY ) && ! defined ( STUBBORN ) )
-                    for (i = 0; i < Places[0]->cnt; i++) {
-                        if (CurrentMarking[i] != Places[i]->target_marking) {
+                    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+                        if (Globals::CurrentMarking[i] != Globals::Places[i]->target_marking) {
                             break;
                         }
                     }
-                    if (i >= Places[0]->cnt) { // target_marking found!
+                    if (i >= Globals::Places[0]->cnt) { // target_marking found!
                         // early abortion
                         cout << "\nstate found!\n";
-                        printstate("", CurrentMarking);
+                        printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         statistics(NrOfStates, Edges, NonEmptyHash);
                         return 1;
@@ -2754,7 +2759,7 @@ endomegaproc:
                     if (CurrentState -> NewOmega) {
                         for (i = 0; CurrentState -> NewOmega[i]; i++) {
                             CurrentState -> NewOmega[i] -> lastfinite =
-                                CurrentMarking[CurrentState -> NewOmega[i] -> index];
+                                Globals::CurrentMarking[CurrentState -> NewOmega[i] -> index];
                             CurrentState -> NewOmega[i] -> bounded = false;
                             CurrentState -> NewOmega[i] -> set_cmarking(VERYLARGE);
                         }
@@ -2818,8 +2823,8 @@ endomegaproc:
 #endif
 #ifdef DEADLOCK
     cout << "\nnet does not have deadlocks!\n";
-    if (resultfile) {
-        fprintf(resultfile, "deadlock: {\n  result = false;\n}\n");
+    if (Globals::resultfile) {
+        fprintf(Globals::resultfile, "deadlock: {\n  result = false;\n}\n");
     }
 #endif
 #if defined(STATEPREDICATE) && ! defined(LIVEPROP)
@@ -2834,8 +2839,8 @@ endomegaproc:
 #ifdef BOUNDEDNET
     if (isbounded) {
         cout << "\nnet is bounded!\n";
-        if (resultfile) {
-            fprintf(resultfile, "unbounded: {\n  result = false;\n}\n\n");
+        if (Globals::resultfile) {
+            fprintf(Globals::resultfile, "unbounded: {\n  result = false;\n}\n\n");
         }
     } else {
         cout << "\nnet is unbounded!\n";
@@ -3043,8 +3048,10 @@ bool target_reach() {
             if (forgotten && forgotten[0]) {
                 // fire list must be extended
                 unsigned int nf;
-                for (nf = 0; forgotten[nf]; nf++);
-                Transition** newFL = new Transition * [nf + CurrentState -> current+1];
+                for (nf = 0; forgotten[nf]; nf++) {
+                    ;
+                }
+                Transition** newFL = new Transition * [nf + CurrentState -> current + 1];
                 State** newSucc = new State * [nf + CurrentState -> current];
                 for (i = 0; i < CurrentState -> current; i++) {
                     newFL[i] = CurrentState -> firelist[i];
@@ -3087,32 +3094,32 @@ bool target_reach() {
 #ifdef REVERSIBILITY
 int reversibility() {
     unsigned int i;
-    for (i = 0; i < Places[0]->cnt; i++) {
-        Places[i]->initial_marking = CurrentMarking[i];
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        Globals::Places[i]->initial_marking = Globals::CurrentMarking[i];
     }
     // Compute representitives of all TSCC
     depth_first();
     //Check whether initial marking is reachable
     for (; TSCCRepresentitives; TSCCRepresentitives = TSCCRepresentitives->next) {
         // 1. initialize start and target markings
-        for (i = 0; i < Places[0]->cnt; i++) {
-            Places[i]->target_marking = Places[i]->initial_marking;
-            Places[i]->set_cmarking((*TSCCRepresentitives->sv)[i]);
+        for (i = 0; i < Globals::Places[0]->cnt; i++) {
+            Globals::Places[i]->target_marking = Globals::Places[i]->initial_marking;
+            Globals::Places[i]->set_cmarking((*TSCCRepresentitives->sv)[i]);
         }
-        for (i = 0; i < Transitions[0]->cnt; i++) {
-            Transitions[i]->check_enabled();
+        for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+            Globals::Transitions[i]->check_enabled();
         }
         if (!mutual_reach()) {
             cout << "\nnot reversible: no return to m0 from reported state\n\n";
 
-            if (resultfile) {
-                fprintf(resultfile, "reversibility: {\n  result = false;\n");
+            if (Globals::resultfile) {
+                fprintf(Globals::resultfile, "reversibility: {\n  result = false;\n");
             }
 
-            printstate("", CurrentMarking);
+            printstate("", Globals::CurrentMarking);
 
-            if (resultfile) {
-                fprintf(resultfile, "};\n");
+            if (Globals::resultfile) {
+                fprintf(Globals::resultfile, "};\n");
             }
 
             return 1;
@@ -3120,8 +3127,8 @@ int reversibility() {
     }
     cout << "\n net is reversible!\n";
 
-    if (resultfile) {
-        fprintf(resultfile, "reversibility: {\n  result = true;\n};\n");
+    if (Globals::resultfile) {
+        fprintf(Globals::resultfile, "reversibility: {\n  result = true;\n};\n");
     }
     return(0);
 }
@@ -3156,24 +3163,24 @@ int liveproperty() {
     cout << "\n Formula with\n" << F -> card << " subformula.\n";
     F -> parent = NULL;
 
-    for (i = 0; i < Places[0]->cnt; i++) {
-        Places[i]->initial_marking = CurrentMarking[i];
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        Globals::Places[i]->initial_marking = Globals::CurrentMarking[i];
     }
     // Compute representitives of all TSCC
     depth_first();
     //Check whether target state is reachable
     for (; TSCCRepresentitives; TSCCRepresentitives = TSCCRepresentitives->next) {
         // 1. initialize start and target markings
-        for (i = 0; i < Places[0]->cnt; i++) {
-            Places[i]->target_marking = Places[i]->initial_marking;
-            Places[i]->set_cmarking((*(TSCCRepresentitives->sv))[i]);
+        for (i = 0; i < Globals::Places[0]->cnt; i++) {
+            Globals::Places[i]->target_marking = Globals::Places[i]->initial_marking;
+            Globals::Places[i]->set_cmarking((*(TSCCRepresentitives->sv))[i]);
         }
-        for (i = 0; i < Transitions[0]->cnt; i++) {
-            Transitions[i]->check_enabled();
+        for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+            Globals::Transitions[i]->check_enabled();
         }
         if (!target_reach()) {
             cout << "\npredicate not live: not satisfiable beyond reported state\n\n";
-            printstate("", CurrentMarking);
+            printstate("", Globals::CurrentMarking);
             return 1;
         }
     }
@@ -3205,12 +3212,12 @@ int home() {
     // First loop creates candidate for home property
     while (New) {
         // 1. initialize start and target markings
-        for (i = 0; i < Places[0]->cnt; i++) {
-            Places[i]->target_marking = Candidate->sv->vector[i];
-            Places[i]->set_cmarking(New->sv->vector[i]);
+        for (i = 0; i < Globals::Places[0]->cnt; i++) {
+            Globals::Places[i]->target_marking = Candidate->sv->vector[i];
+            Globals::Places[i]->set_cmarking(New->sv->vector[i]);
         }
-        for (i = 0; i < Transitions[0]->cnt; i++) {
-            Transitions[i]->check_enabled();
+        for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+            Globals::Transitions[i]->check_enabled();
         }
         if (!mutual_reach()) {
             Candidate -> next = Old;
@@ -3221,17 +3228,17 @@ int home() {
     }
     while (Old) {
         // 1. initialize start and target markings
-        for (i = 0; i < Places[0]->cnt; i++) {
-            Places[i]->target_marking = Candidate->sv->vector[i];
-            Places[i]->set_cmarking(Old->sv->vector[i]);
+        for (i = 0; i < Globals::Places[0]->cnt; i++) {
+            Globals::Places[i]->target_marking = Candidate->sv->vector[i];
+            Globals::Places[i]->set_cmarking(Old->sv->vector[i]);
         }
-        for (i = 0; i < Transitions[0]->cnt; i++) {
-            Transitions[i]->check_enabled();
+        for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+            Globals::Transitions[i]->check_enabled();
         }
         if (!mutual_reach()) {
             cout << "\nnet does not have home markings!\n\n";
-            if (resultfile) {
-                fprintf(resultfile, "homemarking: {\n  result = false;\n};\n");
+            if (Globals::resultfile) {
+                fprintf(Globals::resultfile, "homemarking: {\n  result = false;\n};\n");
             }
             return 1;
         }
@@ -3239,17 +3246,17 @@ int home() {
     }
 
     cout << "\n\n home marking found (reported state)\n\n";
-    if (resultfile) {
-        fprintf(resultfile, "homemarking: {\n  result = true;\n");
+    if (Globals::resultfile) {
+        fprintf(Globals::resultfile, "homemarking: {\n  result = true;\n");
     }
 
-    for (i = 0; i < Places[0]->cnt; i++) {
-        Places[i]->set_cmarking(Candidate->sv->vector[i]);
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        Globals::Places[i]->set_cmarking(Candidate->sv->vector[i]);
     }
-    printstate("", CurrentMarking);
+    printstate("", Globals::CurrentMarking);
 
-    if (resultfile) {
-        fprintf(resultfile, "};\n");
+    if (Globals::resultfile) {
+        fprintf(Globals::resultfile, "};\n");
     }
 
     return(0);
@@ -3267,8 +3274,8 @@ int home() {
 void print_binDec(binDecision* d, int indent);
 void print_binDec(int h) {
     unsigned int i;
-    for (i = 0; i < Places[0] -> NrSignificant; i++) {
-        cout << Places[i] -> name << ": " << Places[i] -> nrbits;
+    for (i = 0; i < Globals::Places[0] -> NrSignificant; i++) {
+        cout << Globals::Places[i] -> name << ": " << Globals::Places[i] -> nrbits;
     }
     cout << endl;
     print_binDec(binHashTable[h], 0);
@@ -3292,12 +3299,12 @@ void print_binDec(binDecision* d, int indent) {
     }
 
     cout << "b " << d -> bitnr << " v ";
-    for (i = 0; i < (BitVectorSize - (d -> bitnr + 1)) ; i += 8) {
-        cout << (unsigned int)(d -> vector)[i/8] << " " ;
+    for (i = 0; i < (Globals::BitVectorSize - (d -> bitnr + 1)) ; i += 8) {
+        cout << (unsigned int)(d -> vector)[i / 8] << " " ;
     }
 
-    for (i = 0; i < BitVectorSize - (d -> bitnr + 1); i++) {
-        cout << (((d->vector)[i/8] >> (7 - i % 8)) % 2);
+    for (i = 0; i < Globals::BitVectorSize - (d -> bitnr + 1); i++) {
+        cout << (((d->vector)[i / 8] >> (7 - i % 8)) % 2);
     }
     cout << endl;
     print_binDec(d -> nextold, indent + 1);
@@ -3315,16 +3322,16 @@ unsigned int compute_scc() {
     State* NewState;
 
     // init initial marking and hash table
-    if (gmflg || GMflg) {
-        if (gmflg) {
-            graphstream = new ofstream(graphfile);
+    if (Globals::gmflg || Globals::GMflg) {
+        if (Globals::gmflg) {
+            graphstream = new ofstream(Globals::graphfile);
             if (graphstream->fail()) {
-                fprintf(stderr, "lola: cannot open graph output file '%s'\n", graphfile);
+                fprintf(stderr, "lola: cannot open graph output file '%s'\n", Globals::graphfile);
                 fprintf(stderr, "      no output written\n");
                 _exit(4);
             }
         }
-        if (GMflg) {
+        if (Globals::GMflg) {
             graphstream = &std::cout;
         }
     }
@@ -3344,7 +3351,7 @@ unsigned int compute_scc() {
     CurrentState -> current = 0;
     CurrentState -> parent = NULL;
 
-    CurrentState -> succ = new State * [CardFireList+1];
+    CurrentState -> succ = new State * [CardFireList + 1];
     CurrentState -> dfs = CurrentState -> min = 0;
     CurrentState -> nexttar = CurrentState -> prevtar = CurrentState;
     TarStack = CurrentState;
@@ -3376,14 +3383,14 @@ unsigned int compute_scc() {
                 NewState -> nexttar -> prevtar = NewState;
                 NewState -> current = NewState -> tarlevel = 0;
                 NewState -> parent = CurrentState;
-                NewState -> succ =  new State * [CardFireList+1];
+                NewState -> succ =  new State * [CardFireList + 1];
                 CurrentState -> succ[CurrentState -> current] = NewState;
                 CurrentState = NewState;
             }
         } else {
             // close state and return to previous state
 
-            if (gmflg || GMflg) {
+            if (Globals::gmflg || Globals::GMflg) {
                 (*graphstream) << "STATE " << CurrentState ->dfs;
                 (*graphstream) << " Lowlink: " << CurrentState ->min;
             }
@@ -3406,13 +3413,13 @@ unsigned int compute_scc() {
                 // print out SCC
                 for (s = CurrentState ; s -> nexttar != CurrentState; s = s -> nexttar) {
                     if (! nonTrivialSCC) {
-                        if (gmflg || GMflg) {
+                        if (Globals::gmflg || Globals::GMflg) {
                             (*graphstream) << " SCC:";
                         }
                     }
                     nonTrivialSCC = true;
 
-                    if (gmflg || GMflg) {
+                    if (Globals::gmflg || Globals::GMflg) {
                         (*graphstream) << " " << s->nexttar->dfs;
                     }
 
@@ -3421,19 +3428,19 @@ unsigned int compute_scc() {
                 s -> tarlevel = 1;
             }
 
-            if (gmflg || GMflg) {
+            if (Globals::gmflg || Globals::GMflg) {
                 // in the next line "&& gmflg" was added by Niels, because it was like this in the code I collected
-                if (CurrentState -> persistent && gmflg) {
+                if (CurrentState -> persistent && Globals::gmflg) {
                     (*graphstream) << " persistent ";
                 }
-                if (graphformat == 'm') {
+                if (Globals::graphformat == 'm') {
                     int j = 0;
-                    for (i = 0; i < Places[0]->cnt; ++i) {
-                        if (CurrentMarking[i]) {
-                            if (CurrentMarking[i] == VERYLARGE) {
-                                (*graphstream) << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << "oo" ;
+                    for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+                        if (Globals::CurrentMarking[i]) {
+                            if (Globals::CurrentMarking[i] == VERYLARGE) {
+                                (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : " << "oo" ;
                             } else {
-                                (*graphstream) << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << CurrentMarking[i];
+                                (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : " << Globals::CurrentMarking[i];
                             }
                         }
                     }

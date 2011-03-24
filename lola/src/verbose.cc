@@ -134,7 +134,7 @@ void abort(unsigned short code, const char* format, ...) {
         status("last error message: %s", strerror(errno));
     }
 
-    exit(EXIT_FAILURE);
+    exit(code);
 }
 
 
@@ -155,7 +155,7 @@ void displayFileError(char* filename, int lineno, char* token) {
 
     fprintf(stderr, "\n");
     if (lineno > 1 and not oldline.empty() and oldline.length() <= 80) {
-        fprintf(stderr, "%s%-4d%s  %s\n", _cb_, lineno-1, _c_, oldline.c_str());
+        fprintf(stderr, "%s%-4d%s  %s\n", _cb_, lineno - 1, _c_, oldline.c_str());
     }
 
     fprintf(stderr, "%s%-4d%s  %s\n", _cb_, lineno, _c_, line.c_str());

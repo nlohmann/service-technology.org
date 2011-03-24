@@ -21,6 +21,9 @@
 
 #include "buchi.H"
 
+using std::cout;
+using std::endl;
+
 int buchistate::nr = 0;
 
 SymbolTab* BuchiTable;

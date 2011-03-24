@@ -25,6 +25,7 @@
 #include "net.H"
 #include "stubborn.H"
 #include "check.H"
+#include "Globals.h"
 
 #include <fstream>
 #include <iostream>
@@ -50,30 +51,30 @@ unsigned int formulaindex;
 */
 void printstate(char const* c, unsigned int* st) {
     // write state to result file
-    if (resultfile) {
-        fprintf(resultfile, "  state = ( ");
-        for (unsigned int i = 0, j = 0; i < Places[0]->cnt; ++i) {
+    if (Globals::resultfile) {
+        fprintf(Globals::resultfile, "  state = ( ");
+        for (unsigned int i = 0, j = 0; i < Globals::Places[0]->cnt; ++i) {
             if (st[i]) {
                 if (st[i] == VERYLARGE) {
-                    fprintf(resultfile, "%s(\"%s\", -1)", (j++ ? ", " : ""), Places[i]->name);
+                    fprintf(Globals::resultfile, "%s(\"%s\", -1)", (j++ ? ", " : ""), Globals::Places[i]->name);
                 } else {
-                    fprintf(resultfile, "%s(\"%s\", %d)", (j++ ? ", " : ""), Places[i]->name, st[i]);
+                    fprintf(Globals::resultfile, "%s(\"%s\", %d)", (j++ ? ", " : ""), Globals::Places[i]->name, st[i]);
                 }
             }
         }
-        fprintf(resultfile, " );\n");
+        fprintf(Globals::resultfile, " );\n");
         return;
     }
 
-    if (Sflg) {
+    if (Globals::Sflg) {
         cout << "STATE";
         cout << c;
-        for (unsigned int i = 0, j = 0; i < Places[0]->cnt; i++) {
+        for (unsigned int i = 0, j = 0; i < Globals::Places[0]->cnt; i++) {
             if (st[i]) {
                 if (st[i] == VERYLARGE) {
-                    cout << (j++ ? ",\n" : "\n") << Places[i]->name << " : oo" ;
+                    cout << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : oo" ;
                 } else {
-                    cout << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << st[i];
+                    cout << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : " << st[i];
                 }
             }
         }
@@ -81,21 +82,21 @@ void printstate(char const* c, unsigned int* st) {
         return;
     }
 
-    if (sflg) {
-        ofstream statestream(statefile);
+    if (Globals::sflg) {
+        ofstream statestream(Globals::statefile);
         if (!statestream) {
-            fprintf(stderr, "lola: cannot open state output file '%s'\n", statefile);
+            fprintf(stderr, "lola: cannot open state output file '%s'\n", Globals::statefile);
             fprintf(stderr, "      no output written\n");
             return;
         }
 
         statestream << "STATE";
-        for (unsigned int i = 0, j = 0; i < Places[0]->cnt; i++) {
+        for (unsigned int i = 0, j = 0; i < Globals::Places[0]->cnt; i++) {
             if (st[i]) {
                 if (st[i] == VERYLARGE) {
-                    statestream << (j++ ? ",\n" : "\n") << Places[i]->name << " : oo" ;
+                    statestream << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : oo" ;
                 } else {
-                    statestream << (j++ ? ",\n" : "\n") << Places[i]->name << " : " << st[i];
+                    statestream << (j++ ? ",\n" : "\n") << Globals::Places[i]->name << " : " << st[i];
                 }
             }
         }
@@ -414,15 +415,15 @@ void print_check_path(State* ini, formula* form, ofstream& out) {
 
 int modelcheck() {
     currentdfsnum = 1;
-    for (unsigned int i = 0; i < Transitions[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Transitions[0]->cnt; i++) {
 #ifdef EXTENDED
         for (unsigned int j = 0; j < F -> tempcard; j++) {
-            Transitions[i]-> lstdisabled[j] = Transitions[i]-> lstfired[j] = 0;
+            Globals::Transitions[i]-> lstdisabled[j] = Globals::Transitions[i]-> lstfired[j] = 0;
         }
 #endif
-        Transitions[i]->pathrestriction = new bool [F -> tempcard];
+        Globals::Transitions[i]->pathrestriction = new bool [F -> tempcard];
         for (int j = 0; j < F->tempcard; j++) {
-            Transitions[i]->pathrestriction[j] = false;
+            Globals::Transitions[i]->pathrestriction[j] = false;
         }
     }
     DeadStatePathRestriction = new bool [F -> tempcard];
@@ -432,9 +433,9 @@ int modelcheck() {
 
 
 #ifdef WITHFORMULA
-    for (unsigned int i = 0; i < Places[0]->cnt; i++) {
-        Places[i] -> propositions = new formula * [Places[i] -> cardprop];
-        Places[i]->cardprop = 0;
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
+        Globals::Places[i] -> propositions = new formula * [Globals::Places[i] -> cardprop];
+        Globals::Places[i]->cardprop = 0;
     }
 #endif
     int res;
@@ -456,17 +457,17 @@ int modelcheck() {
     check(initial, F);
     cout << "\nresult: " << (initial -> value[F -> index] ? "true" : "false") << "\n";
     statistics(NrStates + 1, Edges, NonEmptyHash);
-    if (pflg) {
-        ofstream pathstream(pathfile);
+    if (Globals::pflg) {
+        ofstream pathstream(Globals::pathfile);
         if (!pathstream) {
-            fprintf(stderr, "lola: cannot open path output file '%s'\n", pathfile);
+            fprintf(stderr, "lola: cannot open path output file '%s'\n", Globals::pathfile);
             fprintf(stderr, "      no output written\n");
-            pflg = false;
+            Globals::pflg = false;
         } else {
             print_check_path(initial, F, pathstream);
         }
     }
-    if (Pflg) {
+    if (Globals::Pflg) {
         print_check_path(initial, F);
     }
     return (initial -> value[F -> index] ? 0 : 1);
@@ -597,8 +598,8 @@ bool check_analyse_fairness(State* pool, unsigned int level, unsigned int findex
 #endif
                     unsigned int cardS;
                     unsigned int i;
-                    for (i = 0; i < Transitions[0]->cnt; i++) {
-                        Transitions[i]-> faired = Transitions[i]->fairabled = 0;
+                    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+                        Globals::Transitions[i]-> faired = Globals::Transitions[i]->fairabled = 0;
                     }
                     for (cardS = 1, ss = S->checknexttar[findex];; cardS++, ss = ss ->checknexttar[findex]) {
                         for (i = 0; ss->checkfirelist[findex][i]; i++) {
@@ -622,30 +623,30 @@ bool check_analyse_fairness(State* pool, unsigned int level, unsigned int findex
                         goto aftercheck;
                     }
 #endif
-                    for (i = 0; i < Transitions[0]->cnt; i++) {
-                        if (Transitions[i]->fairness > 0) {
-                            if ((!Transitions[i]->faired) &&
-                                    Transitions[i]->fairabled == cardS) {
+                    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+                        if (Globals::Transitions[i]->fairness > 0) {
+                            if ((!Globals::Transitions[i]->faired) &&
+                                    Globals::Transitions[i]->fairabled == cardS) {
                                 goto aftercheck;
                                 // no subset can be fair
                             }
                         }
                     }
-                    for (i = 0; i < Transitions[0]->cnt; i++) {
-                        if (Transitions[i]->fairness == 2) {
-                            if (Transitions[i]->fairabled && ! Transitions[i]->faired) {
+                    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+                        if (Globals::Transitions[i]->fairness == 2) {
+                            if (Globals::Transitions[i]->fairabled && ! Globals::Transitions[i]->faired) {
                                 // 1. remove all transitions
                                 // from S that enable t[i]
                                 // At this point, there must
                                 // be some state remaining in S,
                                 // otherwise the weak fairness test
                                 // would have failed.
-                                while (Transitions[i]->fairabled) {
+                                while (Globals::Transitions[i]->fairabled) {
                                     State* E;
                                     unsigned int j;
                                     E = NULL;
                                     for (j = 0; S -> checkfirelist[findex][j]; j++) {
-                                        if (S -> checkfirelist[findex][j] == Transitions[i]) {
+                                        if (S -> checkfirelist[findex][j] == Globals::Transitions[i]) {
                                             E = S;
                                             break;
                                         }
@@ -655,7 +656,7 @@ bool check_analyse_fairness(State* pool, unsigned int level, unsigned int findex
                                         E -> checkexpired[findex] = true;
                                         E -> checknexttar[findex] -> checkprevtar[findex] = E -> checkprevtar[findex];
                                         E -> checkprevtar[findex] -> checknexttar[findex] = E -> checknexttar[findex];
-                                        Transitions[i]->fairabled--;
+                                        Globals::Transitions[i]->fairabled--;
                                     }
                                 }
                                 if (check_analyse_fairness(S, level + 1, findex)) {
@@ -664,7 +665,7 @@ bool check_analyse_fairness(State* pool, unsigned int level, unsigned int findex
                                 goto aftercheck;
                             }
                         }
-                        Transitions[i] -> faired = Transitions[i]-> fairabled = 0;
+                        Globals::Transitions[i] -> faired = Globals::Transitions[i]-> fairabled = 0;
                     }
                     return true; // arrived here only if all transitions have paased fairness test.
 
@@ -1049,7 +1050,7 @@ void searchAX(State* s, unarytemporalformula* f) {
     s -> known[f->index] = true;
 
     if (!(s -> checkfirelist[f->tempindex][0])) {
-        if (Transitions[0]->NrEnabled) {
+        if (Globals::Transitions[0]->NrEnabled) {
             // no tau-successors, but state not dead
             return;
         }
@@ -1105,7 +1106,7 @@ void searchEX(State* s, unarytemporalformula* f) {
     s -> known[f->index] = true;
 
     if (!(s -> checkfirelist[f->tempindex][0])) {
-        if (Transitions[0]-> NrEnabled) {
+        if (Globals::Transitions[0]-> NrEnabled) {
             // no tau-successors, but state not dead
             return;
         }
@@ -2324,7 +2325,7 @@ void searchAF(State* s, unarytemporalformula* f) {
             CurrentState -> value[f->index] = true;
             CurrentState -> known[f->index] = true;
             if (!(CurrentState -> checkfirelist[f->tempindex][0])) {
-                if (Transitions[0]->NrEnabled) {
+                if (Globals::Transitions[0]->NrEnabled) {
                     // no tau-successors, but state not dead
                 }
                 // dead state: this state counts as successor state
@@ -2481,7 +2482,7 @@ void searchEG(State* s, unarytemporalformula* f) {
             CurrentState -> value[f->index] = false;
             CurrentState -> known[f->index] = false;
             if (!(CurrentState -> checkfirelist[f->tempindex][0])) {
-                if (Transitions[0]->NrEnabled) {
+                if (Globals::Transitions[0]->NrEnabled) {
                     // no tau-successors, but state not dead
                 }
                 // dead state: this state counts as successor state

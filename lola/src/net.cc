@@ -34,7 +34,9 @@
 #include "path.H"
 #include "sweep.H"
 #include "cmdline.h"
+#include "verbose.h"
 #include "reports.H"
+#include "Globals.h"
 
 #include <fstream>
 #include <iostream>
@@ -52,12 +54,10 @@ using std::string;
 gengetopt_args_info args_info;
 
 
-unsigned int BitVectorSize = 0;
-Place** Places;
-Place* CheckPlace = NULL;
-Transition* CheckTransition = NULL;
-Transition** Transitions;
-unsigned int*   CurrentMarking;
+
+
+/*------------------------------------------------------------------------*/
+
 unsigned int Arc::cnt = 0;
 unsigned int Place::hash_value = 0;
 unsigned int Transition::cnt = 0;
@@ -81,23 +81,18 @@ Transition* Transition::StartOfStubbornList = NULL;
 Transition* Transition::EndOfStubbornList = NULL;
 #endif
 
+/*------------------------------------------------------------------------*/
+
+
 #ifdef WITHFORMULA
 extern unsigned int* checkstart;
 #endif
 
-char* lownetfile = NULL;
-char* pnmlfile = NULL;
-char* netfile = NULL;
-char* analysefile = NULL;
-char* graphfile = NULL;
-char* pathfile = NULL;
-char* statefile = NULL;
-char* symmfile = NULL;
-char* netbasename = NULL;
-FILE* resultfile = NULL;
 
-bool hflg, Nflg, nflg, Aflg, Sflg, Yflg, Pflg, GMflg, aflg, sflg, yflg, pflg, gmflg, cflg = false;
-char graphformat = '\0';
+
+
+
+
 
 int garbagefound = 0;
 char* reserve;
@@ -118,9 +113,8 @@ char* reserve;
 */
 void checkMaximalStates(unsigned int states) {
     if (states >= MAXIMALSTATES) {
-        fprintf(stderr, "\nlola: maximal number of states reached\n");
-        fprintf(stderr, "      %d processed states, %d MAXIMALSTATES\n", states, MAXIMALSTATES);
-        _exit(5);
+        status("%d processed states, %d MAXIMALSTATES", states, MAXIMALSTATES);
+        abort(5, "maximal number of states reached");
     }
 }
 #endif
@@ -134,7 +128,7 @@ inline void garbagecollection() {}
 void findcyclingtransitions();
 void myown_newhandler() {
     delete reserve;
-    fprintf(stderr, "\nlola: new failed\n");
+    message("%s", _cwarning_("new failed"));
     throw overflow();
 }
 
@@ -207,60 +201,60 @@ void processCommandLine(int argc, char** argv) {
 
 
     // set LoLA's flag variables
-    hflg = args_info.userconfig_given;
-    Nflg = args_info.Net_given;
-    nflg = args_info.net_given;
-    Aflg = args_info.Analysis_given;
-    aflg = args_info.analysis_given;
-    Sflg = args_info.State_given;
-    sflg = args_info.state_given;
-    Yflg = args_info.Automorphisms_given;
-    yflg = args_info.automorphisms_given;
-    Pflg = args_info.Path_given;
-    pflg = args_info.path_given;
-    GMflg = args_info.Graph_given + args_info.Marking_given;
-    gmflg = args_info.graph_given + args_info.marking_given;
-    cflg = args_info.Master_given;
+    Globals::hflg = args_info.userconfig_given;
+    Globals::Nflg = args_info.Net_given;
+    Globals::nflg = args_info.net_given;
+    Globals::Aflg = args_info.Analysis_given;
+    Globals::aflg = args_info.analysis_given;
+    Globals::Sflg = args_info.State_given;
+    Globals::sflg = args_info.state_given;
+    Globals::Yflg = args_info.Automorphisms_given;
+    Globals::yflg = args_info.automorphisms_given;
+    Globals::Pflg = args_info.Path_given;
+    Globals::pflg = args_info.path_given;
+    Globals::GMflg = args_info.Graph_given + args_info.Marking_given;
+    Globals::gmflg = args_info.graph_given + args_info.marking_given;
+    Globals::cflg = args_info.Master_given;
 
     // set graph format
     if (args_info.Graph_given || args_info.graph_given) {
-        graphformat = 'g';
+        Globals::graphformat = 'g';
     }
     if (args_info.Marking_given || args_info.marking_given) {
-        graphformat = 'm';
+        Globals::graphformat = 'm';
     }
 
     // determine net file name and its basename
     if (args_info.inputs_num == 1) {
         string temp = string(args_info.inputs[0]);
-        netfile = (char*)realloc(netfile, temp.size() + 1);
-        strcpy(netfile, temp.c_str());
+        Globals::netfile = (char*)realloc(Globals::netfile, temp.size() + 1);
+        strcpy(Globals::netfile, temp.c_str());
 
         temp = temp.substr(0, temp.find_last_of("."));
-        netbasename = (char*)realloc(netbasename, temp.size() + 1);
-        strcpy(netbasename, temp.c_str());
+        Globals::Globals::netbasename = (char*)realloc(Globals::Globals::netbasename, temp.size() + 1);
+        strcpy(Globals::Globals::netbasename, temp.c_str());
     } else {
         string temp = "unknown_net";
-        netbasename = (char*)realloc(netbasename, temp.size() + 1);
-        strcpy(netbasename, temp.c_str());
+        Globals::Globals::netbasename = (char*)realloc(Globals::Globals::netbasename, temp.size() + 1);
+        strcpy(Globals::Globals::netbasename, temp.c_str());
     }
 
     // set output filenames for "-n" option
     if (args_info.net_given) {
         if (args_info.net_arg) {
             string temp = string(args_info.net_arg);
-            lownetfile = (char*)realloc(lownetfile, temp.size() + 1);
-            strcpy(lownetfile, temp.c_str());
+            Globals::lownetfile = (char*)realloc(Globals::lownetfile, temp.size() + 1);
+            strcpy(Globals::lownetfile, temp.c_str());
             temp = string(args_info.net_arg) + ".pnml";
-            pnmlfile = (char*)realloc(pnmlfile, temp.size() + 1);
-            strcpy(pnmlfile, temp.c_str());
+            Globals::pnmlfile = (char*)realloc(Globals::pnmlfile, temp.size() + 1);
+            strcpy(Globals::pnmlfile, temp.c_str());
         } else {
-            string temp = string(netbasename) + ".llnet";
-            lownetfile = (char*)realloc(lownetfile, temp.size() + 1);
-            strcpy(lownetfile, temp.c_str());
-            temp = string(netbasename) + ".pnml";
-            pnmlfile = (char*)realloc(pnmlfile, temp.size() + 1);
-            strcpy(pnmlfile, temp.c_str());
+            string temp = string(Globals::Globals::netbasename) + ".llnet";
+            Globals::lownetfile = (char*)realloc(Globals::lownetfile, temp.size() + 1);
+            strcpy(Globals::lownetfile, temp.c_str());
+            temp = string(Globals::Globals::netbasename) + ".pnml";
+            Globals::pnmlfile = (char*)realloc(Globals::pnmlfile, temp.size() + 1);
+            strcpy(Globals::pnmlfile, temp.c_str());
         }
     }
 
@@ -268,12 +262,12 @@ void processCommandLine(int argc, char** argv) {
     if (args_info.analysis_given) {
         if (args_info.analysis_arg) {
             string temp = string(args_info.analysis_arg);
-            analysefile = (char*)realloc(analysefile, temp.size() + 1);
-            strcpy(analysefile, temp.c_str());
+            Globals::analysefile = (char*)realloc(Globals::analysefile, temp.size() + 1);
+            strcpy(Globals::analysefile, temp.c_str());
         } else {
-            string temp = string(netbasename) + ".task";
-            analysefile = (char*)realloc(analysefile, temp.size() + 1);
-            strcpy(analysefile, temp.c_str());
+            string temp = string(Globals::Globals::netbasename) + ".task";
+            Globals::analysefile = (char*)realloc(Globals::analysefile, temp.size() + 1);
+            strcpy(Globals::analysefile, temp.c_str());
         }
     }
 
@@ -281,12 +275,12 @@ void processCommandLine(int argc, char** argv) {
     if (args_info.path_given) {
         if (args_info.path_arg) {
             string temp = string(args_info.path_arg);
-            pathfile = (char*)realloc(pathfile, temp.size() + 1);
-            strcpy(pathfile, temp.c_str());
+            Globals::pathfile = (char*)realloc(Globals::pathfile, temp.size() + 1);
+            strcpy(Globals::pathfile, temp.c_str());
         } else {
-            string temp = string(netbasename) + ".path";
-            pathfile = (char*)realloc(pathfile, temp.size() + 1);
-            strcpy(pathfile, temp.c_str());
+            string temp = string(Globals::netbasename) + ".path";
+            Globals::pathfile = (char*)realloc(Globals::pathfile, temp.size() + 1);
+            strcpy(Globals::pathfile, temp.c_str());
         }
     }
 
@@ -294,12 +288,12 @@ void processCommandLine(int argc, char** argv) {
     if (args_info.state_given) {
         if (args_info.state_arg) {
             string temp = string(args_info.state_arg);
-            statefile = (char*)realloc(statefile, temp.size() + 1);
-            strcpy(statefile, temp.c_str());
+            Globals::statefile = (char*)realloc(Globals::statefile, temp.size() + 1);
+            strcpy(Globals::statefile, temp.c_str());
         } else {
-            string temp = string(netbasename) + ".state";
-            statefile = (char*)realloc(statefile, temp.size() + 1);
-            strcpy(statefile, temp.c_str());
+            string temp = string(Globals::netbasename) + ".state";
+            Globals::statefile = (char*)realloc(Globals::statefile, temp.size() + 1);
+            strcpy(Globals::statefile, temp.c_str());
         }
     }
 
@@ -307,12 +301,12 @@ void processCommandLine(int argc, char** argv) {
     if (args_info.automorphisms_given) {
         if (args_info.automorphisms_arg) {
             string temp = string(args_info.automorphisms_arg);
-            symmfile = (char*)realloc(symmfile, temp.size() + 1);
-            strcpy(symmfile, temp.c_str());
+            Globals::symmfile = (char*)realloc(Globals::symmfile, temp.size() + 1);
+            strcpy(Globals::symmfile, temp.c_str());
         } else {
-            string temp = string(netbasename) + ".symm";
-            symmfile = (char*)realloc(symmfile, temp.size() + 1);
-            strcpy(symmfile, temp.c_str());
+            string temp = string(Globals::netbasename) + ".symm";
+            Globals::symmfile = (char*)realloc(Globals::symmfile, temp.size() + 1);
+            strcpy(Globals::symmfile, temp.c_str());
         }
     }
 
@@ -321,24 +315,24 @@ void processCommandLine(int argc, char** argv) {
     if (args_info.graph_given || args_info.marking_given) {
         if (args_info.graph_arg) {
             string temp = string(args_info.graph_arg);
-            graphfile = (char*)realloc(graphfile, temp.size() + 1);
-            strcpy(graphfile, temp.c_str());
+            Globals::graphfile = (char*)realloc(Globals::graphfile, temp.size() + 1);
+            strcpy(Globals::graphfile, temp.c_str());
         } else {
             if (args_info.marking_arg) {
                 string temp = string(args_info.marking_arg);
-                graphfile = (char*)realloc(graphfile, temp.size() + 1);
-                strcpy(graphfile, temp.c_str());
+                Globals::graphfile = (char*)realloc(Globals::graphfile, temp.size() + 1);
+                strcpy(Globals::graphfile, temp.c_str());
             } else {
-                string temp = string(netbasename) + ".graph";
-                graphfile = (char*)realloc(graphfile, temp.size() + 1);
-                strcpy(graphfile, temp.c_str());
+                string temp = string(Globals::netbasename) + ".graph";
+                Globals::graphfile = (char*)realloc(Globals::graphfile, temp.size() + 1);
+                strcpy(Globals::graphfile, temp.c_str());
             }
         }
     }
     // Initialize reports object for graph output
 
     if (args_info.graph_given || args_info.marking_given) {
-        TheGraphReport = new graphreport_yes(graphfile);
+        TheGraphReport = new graphreport_yes(Globals::graphfile);
     } else {
         if (args_info.Graph_given || args_info.Marking_given) {
             TheGraphReport = new graphreport_yes();
@@ -353,15 +347,15 @@ void processCommandLine(int argc, char** argv) {
     // set output filename for "-r" option
     if (args_info.resultFile_given) {
         if (args_info.resultFile_arg) {
-            resultfile = fopen(args_info.resultFile_arg, "w");
+            Globals::resultfile = fopen(args_info.resultFile_arg, "w");
         } else {
-            resultfile = fopen((string(netbasename) + ".result").c_str(), "w");
+            Globals::resultfile = fopen((string(Globals::netbasename) + ".result").c_str(), "w");
         }
-        if (!resultfile) {
+        if (!Globals::resultfile) {
             fprintf(stderr, "lola: could not create result file\n");
             exit(4);
         }
-        configurationResult(resultfile);
+        configurationResult(Globals::resultfile);
     }
 
     // release memory
@@ -401,7 +395,7 @@ int main(int argc, char** argv) {
         // 1. Fileoptionen holen und auswerten
         processCommandLine(argc, argv);
 
-        if (hflg) {
+        if (Globals::hflg) {
             reportconfiguration();
         }
 
@@ -409,15 +403,14 @@ int main(int argc, char** argv) {
         NonEmptyHash = 0;
         try {
 #ifdef BITHASH
-            BitHashTable = new unsigned int [ HASHSIZE];
+            BitHashTable = new unsigned int [HASHSIZE];
 #else
 #ifndef SWEEP
             binHashTable = new binDecision * [HASHSIZE];
 #endif
 #endif
         } catch (overflow) {
-            fprintf(stderr, "lola: hash table too large\n");
-            _exit(2);
+            abort(2, "hash table too large");
         }
         for (i = 0; i < HASHSIZE; i++) {
 #ifdef BITHASH
@@ -432,9 +425,8 @@ int main(int argc, char** argv) {
             PlaceTable = new SymbolTab(65536);
             TransitionTable = new SymbolTab(65536);
         } catch (overflow) {
+            abort(2, "not enough memory to read net");
             //write(2,mess,sizeof(mess));
-            fprintf(stderr, "lola: not enough space to read net\n");
-            _exit(2);
         }
         try {
 
@@ -448,9 +440,9 @@ int main(int argc, char** argv) {
 #if defined(STATESPACE) && defined(STUBBORN)
             if (F) {
                 // throw away temporal operators formula
-                assert(((unarytemporalformula *)F));
-                assert(((unarytemporalformula *)F)->element);
-                F = ((unarytemporalformula *)F)->element;
+                assert(((unarytemporalformula*)F));
+                assert(((unarytemporalformula*)F)->element);
+                F = ((unarytemporalformula*)F)->element;
 
                 // initialze the formulae behind EF
                 initialize_statepredicate();
@@ -458,56 +450,56 @@ int main(int argc, char** argv) {
 #endif
 
         } catch (overflow) {
-            fprintf(stderr, "lola: not enough space to store net\n");
-            _exit(2);
+            abort(2, "not enough memory to store net");
         }
 
         delete PlaceTable;
         delete TransitionTable;
         unsigned int j;
 
-        for (j = 0; j < Places[0]->cnt; ++j) {
-            Places[j] -> set_hash(rand());
+        for (j = 0; j < Globals::Places[0]->cnt; ++j) {
+            Globals::Places[j] -> set_hash(rand());
         }
-#ifndef STATESPACE
-        cout << Places[0]->cnt << " Places\n";
-        cout << Transitions[0]->cnt << " Transitions\n";
+#ifndef STATESPACEw
+        message("%d places", Globals::Places[0]->cnt);
+        message("%d transitions", Globals::Transitions[0]->cnt);
 #endif
-        Places[0]->NrSignificant = Places[0]->cnt;
+        Globals::Places[0]->NrSignificant = Globals::Places[0]->cnt;
 
 
 #ifdef SYMMETRY
         try {
+            status("calculating symmetries");
             if (SYMMINTEGRATION == 1 || SYMMINTEGRATION == 3) {
                 ComputeSymmetries();
             } else {
                 ComputePartition();
             }
 
-            for (i = 0; i < Places[0]->cnt; ++i) {
-                Places[i]-> index = i;
-                CurrentMarking[i] = Places[i]->initial_marking;
+            for (i = 0; i < Globals::Places[0]->cnt; ++i) {
+                Globals::Places[i]-> index = i;
+                Globals::CurrentMarking[i] = Globals::Places[i]->initial_marking;
             }
 
-            for (i = 0; i < Transitions[0]->cnt; ++i) {
-                Transitions[i]->enabled = false;
+            for (i = 0; i < Globals::Transitions[0]->cnt; ++i) {
+                Globals::Transitions[i]->enabled = false;
             }
 
-            for (i = 0; i < Transitions[0]->cnt; ++i) {
-                Transitions[i]->initialize();
+            for (i = 0; i < Globals::Transitions[0]->cnt; ++i) {
+                Globals::Transitions[i]->initialize();
             }
 
-            for (i = 0; i < Transitions[0]->cnt; ++i) {
-                Transitions[i]->PrevEnabled = (i == 0 ? NULL : Transitions[i - 1]);
-                Transitions[i]->NextEnabled = (i == Transitions[0]->cnt - 1 ? NULL : Transitions[i + 1]);
-                Transitions[i]->enabled = true;
+            for (i = 0; i < Globals::Transitions[0]->cnt; ++i) {
+                Globals::Transitions[i]->PrevEnabled = (i == 0 ? NULL : Globals::Transitions[i - 1]);
+                Globals::Transitions[i]->NextEnabled = (i == Globals::Transitions[0]->cnt - 1 ? NULL : Globals::Transitions[i + 1]);
+                Globals::Transitions[i]->enabled = true;
             }
 
-            Transitions[0]->StartOfEnabledList = Transitions[0];
-            Transitions[0]->NrEnabled = Transitions[0]->cnt;
+            Globals::Transitions[0]->StartOfEnabledList = Globals::Transitions[0];
+            Globals::Transitions[0]->NrEnabled = Globals::Transitions[0]->cnt;
 
-            for (i = 0; i < Transitions[0]->cnt; ++i) {
-                Transitions[i]->check_enabled();
+            for (i = 0; i < Globals::Transitions[0]->cnt; ++i) {
+                Globals::Transitions[i]->check_enabled();
             }
 
 #ifdef PREDUCTION
@@ -515,9 +507,9 @@ int main(int argc, char** argv) {
 
             // close significant bit upwards, since we cannot permute places after
             // symmetry calculation
-            i = Places[0]->cnt - 1;
+            i = Globals::Places[0]->cnt - 1;
             while (1) {
-                if (Places[i]->significant) {
+                if (Globals::Places[i]->significant) {
                     break;
                 }
                 if (i == 0) {
@@ -527,15 +519,16 @@ int main(int argc, char** argv) {
             }
 
             for (h = 0; h < i; ++h) {
-                Places[h]->significant = true;
+                Globals::Places[h]->significant = true;
             }
-            Places[0]->NrSignificant = h + 1;
+            Globals::Places[0]->NrSignificant = h + 1;
             // If we did not find a significant place, we set the number to 0 anyway
             // to avoid subsequent problems.
-            if (Places[0]->NrSignificant) {
-                Places[0]->NrSignificant = 1;
+            if (Globals::Places[0]->NrSignificant) {
+                Globals::Places[0]->NrSignificant = 1;
             }
-            cerr << "\n" << Places[0]->NrSignificant << " significant places\n";
+            status("removed %d implicit places (PREDUCTION)", Globals::Places[0]->cnt - Globals::Places[0]->NrSignificant);
+            message("%d significant places", Globals::Places[0]->NrSignificant);
 #endif
         } catch (overflow) {
             fprintf(stderr, "lola: not enough space to store generating set for symmetries!\n");
@@ -548,15 +541,15 @@ int main(int argc, char** argv) {
         // sort places according to significance. This must not happen in the presence of
         // symmetry reduction since places have been sorted by discretion of the symmetry
         // calculation algorithm and subsequent procedure depend on that order.
-        for (i = 0, h = Places[0]->cnt;; i++, h--) {
+        for (i = 0, h = Globals::Places[0]->cnt;; i++, h--) {
             Place* tmpPlace;
-            while (i < Places[0]->cnt && Places[i]->significant) {
+            while (i < Globals::Places[0]->cnt && Globals::Places[i]->significant) {
                 i++;
             }
-            if (i >= Places[0]->cnt) {
+            if (i >= Globals::Places[0]->cnt) {
                 break;
             }
-            while (h > 0 && !(Places[h - 1]->significant)) {
+            while (h > 0 && !(Globals::Places[h - 1]->significant)) {
                 h--;
             }
             if (h <= 0) {
@@ -565,56 +558,56 @@ int main(int argc, char** argv) {
             if (h <= i) {
                 break;
             }
-            tmpPlace = Places[h - 1];
-            Places[h - 1] = Places[i];
-            Places[i] = tmpPlace;
+            tmpPlace = Globals::Places[h - 1];
+            Globals::Places[h - 1] = Globals::Places[i];
+            Globals::Places[i] = tmpPlace;
         }
-        Places[0]->NrSignificant = i;
-        cerr << "\n" << Places[0]->NrSignificant << " significant places\n";
+        Globals::Places[0]->NrSignificant = i;
+        status("%d implicit places removed (PREDUCTION)", Globals::Places[0]->cnt - Globals::Places[0]->NrSignificant);
+        message("%d significant places", Globals::Places[0]->NrSignificant);
 #endif
-        for (j = 0; j < Places[0]->cnt; ++j) {
-            Places[j]-> index = j;
-            CurrentMarking[j] = Places[j]->initial_marking;
+        for (j = 0; j < Globals::Places[0]->cnt; ++j) {
+            Globals::Places[j]-> index = j;
+            Globals::CurrentMarking[j] = Globals::Places[j]->initial_marking;
         }
 
-        for (j = 0; j < Transitions[0]->cnt; ++j) {
-            Transitions[j]->enabled = false;
+        for (j = 0; j < Globals::Transitions[0]->cnt; ++j) {
+            Globals::Transitions[j]->enabled = false;
         }
 
-        for (j = 0; j < Transitions[0]->cnt; ++j) {
-            Transitions[j]->initialize();
+        for (j = 0; j < Globals::Transitions[0]->cnt; ++j) {
+            Globals::Transitions[j]->initialize();
         }
 
-        for (j = 0; j < Transitions[0]->cnt; ++j) {
-            Transitions[j]->PrevEnabled = (j == 0 ? NULL : Transitions[j - 1]);
-            Transitions[j]->NextEnabled = (j == Transitions[0]->cnt - 1 ? NULL : Transitions[j + 1]);
-            Transitions[j]->enabled = true;
+        for (j = 0; j < Globals::Transitions[0]->cnt; ++j) {
+            Globals::Transitions[j]->PrevEnabled = (j == 0 ? NULL : Globals::Transitions[j - 1]);
+            Globals::Transitions[j]->NextEnabled = (j == Globals::Transitions[0]->cnt - 1 ? NULL : Globals::Transitions[j + 1]);
+            Globals::Transitions[j]->enabled = true;
         }
 
-        Transitions[0]->StartOfEnabledList = Transitions[0];
-        Transitions[0]->NrEnabled = Transitions[0]->cnt;
+        Globals::Transitions[0]->StartOfEnabledList = Globals::Transitions[0];
+        Globals::Transitions[0]->NrEnabled = Globals::Transitions[0]->cnt;
 
-        for (j = 0; j < Transitions[0]->cnt; ++j) {
-            Transitions[j]->check_enabled();
+        for (j = 0; j < Globals::Transitions[0]->cnt; ++j) {
+            Globals::Transitions[j]->check_enabled();
         }
 #endif
 
 #if defined(CYCLE) || defined(STRUCT)
         tsolve();
-        for (i = 0; i < Transitions[0]->cnt; ++i) {
-            if (Transitions[i]->cyclic) {
-                cout << Transitions[i]->name << endl;
+        for (i = 0; i < Globals::Transitions[0]->cnt; ++i) {
+            if (Globals::Transitions[i]->cyclic) {
+                cout << Globals::Transitions[i]->name << endl;
             }
         }
 #endif
 
-        unsigned int ii;
-        for (ii = 0; ii < Transitions[0]->cnt; ++ii) {
-            Transitions[ii]->check_enabled();
+        for (unsigned int ii = 0; ii < Globals::Transitions[0]->cnt; ++ii) {
+            Globals::Transitions[ii]->check_enabled();
         }
-        for (ii = 0; ii < Places[0]->cnt; ++ii) {
-            CurrentMarking[ii] = Places[ii]->initial_marking;
-            Places[ii]->index = ii;
+        for (unsigned int ii = 0; ii < Globals::Places[0]->cnt; ++ii) {
+            Globals::CurrentMarking[ii] = Globals::Places[ii]->initial_marking;
+            Globals::Places[ii]->index = ii;
         }
 
 #ifdef LTLPROP
@@ -622,21 +615,21 @@ int main(int argc, char** argv) {
 #endif
 
         // print nets to stdout or file
-        if (Nflg) {
+        if (Globals::Nflg) {
             printnet();
             printpnml();
         }
-        if (nflg) {
-            ofstream lownetstream(lownetfile);
+        if (Globals::nflg) {
+            ofstream lownetstream(Globals::lownetfile);
             if (!lownetstream) {
-                fprintf(stderr, "lola: cannot open net output file '%s'\n", lownetfile);
+                fprintf(stderr, "lola: cannot open net output file '%s'\n", Globals::lownetfile);
                 fprintf(stderr, "      no output written\n");
             } else {
                 printnettofile(lownetstream);
             }
-            ofstream pnmlstream(pnmlfile);
+            ofstream pnmlstream(Globals::pnmlfile);
             if (!pnmlstream) {
-                fprintf(stderr, "lola: cannot open net output file '%s'\n", pnmlfile);
+                fprintf(stderr, "lola: cannot open net output file '%s'\n", Globals::pnmlfile);
                 fprintf(stderr, "      no output written\n");
             } else {
                 printpnmltofile(pnmlstream);
@@ -644,15 +637,16 @@ int main(int argc, char** argv) {
         }
 
 #ifdef DISTRIBUTE
-        SignificantLength = Places[0] -> NrSignificant;
+        SignificantLength = Globals::Places[0] -> NrSignificant;
         if (!init_storage()) {
             _exit(6);
         }
 #endif
 
-        for (j = 0, BitVectorSize = 0; j < Places[0]->NrSignificant; ++j) {
-            BitVectorSize += Places[j]->nrbits;
+        for (j = 0, Globals::BitVectorSize = 0; j < Globals::Places[0]->NrSignificant; ++j) {
+            Globals::BitVectorSize += Globals::Places[j]->nrbits;
         }
+        status("bit vector size: %d bit", Globals::BitVectorSize);
 
 //#ifdef WITHFORMULA
 //        if (F) {
@@ -709,12 +703,10 @@ int main(int argc, char** argv) {
 #endif
 
         } catch (overflow) {
-            fprintf(stderr, "lola: memory exhausted\n");
-            _exit(2);
+            abort(2, "memory exhausted");
         }
     } catch (overflow) {
-        fprintf(stderr, "lola: memory exhausted\n");
-        _exit(2);
+        abort(2, "memory exhausted");
     }
 }
 
@@ -731,20 +723,23 @@ int main(int argc, char** argv) {
 */
 void removeisolated() {
 #ifndef STATESPACE
+    unsigned int isolatedPlacesRemoved = 0;
     unsigned int i = 0;
-    while (i < Places[0]->cnt) {
-        if (Places[i]->references == 0) { // Place isolated
-            Place* p = Places[Places[0]->cnt - 1];
-            Places[Places[0]->cnt - 1] = Places[i];
-            Places[i] = p;
-            --(Places[0]->cnt);
+    while (i < Globals::Places[0]->cnt) {
+        if (Globals::Places[i]->references == 0) { // Place isolated
+            Place* p = Globals::Places[Globals::Places[0]->cnt - 1];
+            Globals::Places[Globals::Places[0]->cnt - 1] = Globals::Places[i];
+            Globals::Places[i] = p;
+            --(Globals::Places[0]->cnt);
+            ++isolatedPlacesRemoved;
         } else {
             ++i;
         }
     }
+    status("%d isolated places removed", isolatedPlacesRemoved);
 #endif
-    for (unsigned int i = 0; i < Transitions[0]->cnt; ++i) {
-        Transitions[i]->nr = i;
+    for (unsigned int i = 0; i < Globals::Transitions[0]->cnt; ++i) {
+        Globals::Transitions[i]->nr = i;
     }
 }
 
@@ -766,7 +761,7 @@ void findcyclingtransitions() {
     bool IsTransition ;
 
     // init
-    currentnode = Transitions[0];
+    currentnode = Globals::Transitions[0];
     IsTransition = true;
     currentnode -> pos[0] = 0 ;
     currentnode -> parent = NULL ; // bottom stack element
@@ -800,18 +795,18 @@ void findcyclingtransitions() {
             currenttransition = (Transition*) currentnode;
             if (currenttransition -> IncrPlaces[0]) {
                 // no sink transition
-                newnode = Transitions[currenttransition -> IncrPlaces[currenttransition->pos[0]]];
+                newnode = Globals::Transitions[currenttransition -> IncrPlaces[currenttransition->pos[0]]];
                 IsTransition = false;
             } else {
                 // sink transition -> successors are source transitions
-                for (; currenttransition->pos[0] < Transitions[0]->cnt;
+                for (; currenttransition->pos[0] < Globals::Transitions[0]->cnt;
                         currenttransition->pos[0] ++) {
-                    if (!(Transitions[currenttransition->pos[0]]->DecrPlaces[0])) {
+                    if (!(Globals::Transitions[currenttransition->pos[0]]->DecrPlaces[0])) {
                         break;
                     }
                 }
-                if (currenttransition->pos[0] < Transitions[0]->cnt) {
-                    newnode = Transitions[currenttransition->pos[0]];
+                if (currenttransition->pos[0] < Globals::Transitions[0]->cnt) {
+                    newnode = Globals::Transitions[currenttransition->pos[0]];
                     IsTransition = true;
                 }
             }
@@ -863,9 +858,9 @@ void findcyclingtransitions() {
             }
         }
     }
-    for (int j = 0; j < Transitions[0]->cnt; j++) {
-        if (Transitions[j]-> cyclic) {
-            cerr << "\n" << Transitions[j] -> name;
+    for (int j = 0; j < Globals::Transitions[0]->cnt; j++) {
+        if (Globals::Transitions[j]-> cyclic) {
+            cerr << "\n" << Globals::Transitions[j] -> name;
         }
     }
 }

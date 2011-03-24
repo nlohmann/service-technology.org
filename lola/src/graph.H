@@ -23,16 +23,20 @@
 #define GRAPH_H
 
 #include "net.H"
+#include "Globals.h"
 #include "dimensions.H"
 #include "symm.H"
 #include "formula.H"
+
+using std::cout;
+using std::endl;
+using std::ofstream;
+
 
 // depository and search structures for reachability graph, TARJAN
 
 //#define CYCRED
 extern State* CurrentState;
-
-extern unsigned int BitVectorSize;
 
 class Statevector;
 
@@ -373,15 +377,15 @@ extern unsigned int Scapegoat;
 extern Statevector* LastVector;
 
 // search_marking exists in two versions. One uses
-// CurrentMarking and Places[0]->hash_value, the other
+// CurrentMarking and Globals::Places[0]->hash_value, the other
 // one uses kanrep and kanhash
 
 #if defined(SYMMETRY) && SYMMINTEGRATION==3
 #define MARKINGVECTOR kanrep
 #define HASHENTRY kanhash
 #else
-#define MARKINGVECTOR CurrentMarking
-#define HASHENTRY Places[0]->hash_value
+#define MARKINGVECTOR Globals::CurrentMarking
+#define HASHENTRY Globals::Places[0]->hash_value
 #endif
 
 inline State* search_marking() {
@@ -441,7 +445,7 @@ inline State* search_marking() {
         // Interpolationssuche beendet, jetzt im Statevector suchen
         i++;
         v = d -> vector[m];
-        for (j = d->index[m] + 1; i < (d->next[m] ? d -> next[m] -> PlaceNr : Places[0]-> NrSignificant); i++, j++) {
+        for (j = d->index[m] + 1; i < (d->next[m] ? d -> next[m] -> PlaceNr : Globals::Places[0]-> NrSignificant); i++, j++) {
             if ((*(d -> vector[m]))[j] != MARKINGVECTOR[i]) {
                 return NULL;
             }
@@ -465,7 +469,7 @@ inline State* bit_search() {
 #endif
     return (BitHashTable[kanhash / MPERWORD] >> (kanhash % MPERWORD) & 1) ? CurrentState : NULL;
 #else
-    return (BitHashTable[Places[0]->hash_value / MPERWORD] >> (Places[0]->hash_value % MPERWORD) & 1) ? CurrentState : NULL;
+    return (BitHashTable[Globals::Places[0]->hash_value / MPERWORD] >> (Globals::Places[0]->hash_value % MPERWORD) & 1) ? CurrentState : NULL;
 #endif
 }
 
@@ -473,7 +477,7 @@ inline State* bit_insert() {
 #ifdef SYMMETRY
     BitHashTable[kanhash / MPERWORD] |= 1 << (kanhash % MPERWORD);
 #else
-    BitHashTable[Places[0]->hash_value / MPERWORD] |= 1 << (Places[0]->hash_value % MPERWORD);
+    BitHashTable[Globals::Places[0]->hash_value / MPERWORD] |= 1 << (Globals::Places[0]->hash_value % MPERWORD);
 #endif
     return new State();
 }
@@ -564,7 +568,7 @@ inline void trace();
 //     // Interpolationssuche beendet, jetzt im Statevector suchen
 //     i++;
 //      v = d -> vector[m];
-//      for(j=d->index[m]+1;i < (d->next[m] ? d -> next[m] -> PlaceNr : Places[0]-> NrSignificant); i++,j++)
+//      for(j=d->index[m]+1;i < (d->next[m] ? d -> next[m] -> PlaceNr : Globals::Places[0]-> NrSignificant); i++,j++)
 //  {
 //    trace();
 //    if((*(d -> vector[m]))[j] != CurrentMarking[i]) return NULL;
@@ -592,7 +596,7 @@ inline void trace();
 //  v = Trace[pos].lv;
 //  if(i > d -> PlaceNr)
 //    {
-//      for(j=d->index[m]+i-d->PlaceNr;i < (d->next[m] ? d -> next[m]->PlaceNr : Places[0]->NrSignificant);i++,j++)
+//      for(j=d->index[m]+i-d->PlaceNr;i < (d->next[m] ? d -> next[m]->PlaceNr : Globals::Places[0]->NrSignificant);i++,j++)
 //  {
 //    trace();
 //    if((*(d->vector[m]))[j] != CurrentMarking[CurrentSymm[i]]) return NULL;
@@ -652,7 +656,7 @@ inline void trace();
 //      // Interpolationssuche beendet, jetzt im Statevector suchen
 //      i++;
 //      v = d -> vector[m];
-//      for(j=d->index[m]+1;i < (d->next[m] ? d -> next[m] -> PlaceNr : Places[0]-> NrSignificant); i++,j++)
+//      for(j=d->index[m]+1;i < (d->next[m] ? d -> next[m] -> PlaceNr : Globals::Places[0]-> NrSignificant); i++,j++)
 //  {
 //    if((*(d -> vector[m]))[j] != CurrentMarking[CurrentSymm[i]]) return NULL;
 //    trace();
@@ -668,9 +672,9 @@ inline void trace();
 
 inline void print_marking() {
     unsigned int i;
-    for (i = 0; i < Places[0]->cnt; i++) {
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
         if (MARKINGVECTOR[i]) {
-            cout << Places[i]->name << ": " << MARKINGVECTOR[i] << ", ";
+            cout << Globals::Places[i]->name << ": " << MARKINGVECTOR[i] << ", ";
         }
     }
 }
@@ -730,8 +734,8 @@ inline State* insert_marking() {
         if (Scapegoat == LastDecision -> PlaceNr) {
             // In diesem Fall muss die Tabelle um einen neuen Eintrag ergaenzt werden und ein neuer
             // Statevector angelegt
-            sv = new Statevector(Places[0]->NrSignificant - Scapegoat);
-            for (i = Scapegoat; i < Places[0]-> NrSignificant; i++) {
+            sv = new Statevector(Globals::Places[0]->NrSignificant - Scapegoat);
+            for (i = Scapegoat; i < Globals::Places[0]-> NrSignificant; i++) {
                 sv -> set(i - Scapegoat, MARKINGVECTOR[i]);
             }
             LastDecision -> insert(MARKINGVECTOR[Scapegoat], sv, 0, NULL);
@@ -761,8 +765,8 @@ inline State* insert_marking() {
             LastDecision -> next[LastChoice] = NewDecision;
             // bearbeite die Seite der neuen Markierung
             newindex = 1 - oldindex;
-            sv = new Statevector(Places[0]->NrSignificant - Scapegoat);
-            for (i = Scapegoat; i < Places[0]-> NrSignificant; i++) {
+            sv = new Statevector(Globals::Places[0]->NrSignificant - Scapegoat);
+            for (i = Scapegoat; i < Globals::Places[0]-> NrSignificant; i++) {
                 sv ->set(i - Scapegoat, MARKINGVECTOR[i]);
             }
             NewDecision -> value[newindex] = MARKINGVECTOR[Scapegoat];
@@ -789,8 +793,8 @@ inline State* insert_marking() {
         d -> value[0] = MARKINGVECTOR[0];
         d -> index[0] = 0;
         d -> next[0] = NULL;
-        sv = d -> vector[0] = new Statevector(Places[0] -> NrSignificant);
-        for (i = 0; i < Places[0]-> NrSignificant; i++) {
+        sv = d -> vector[0] = new Statevector(Globals::Places[0] -> NrSignificant);
+        for (i = 0; i < Globals::Places[0]-> NrSignificant; i++) {
             sv ->set(i, MARKINGVECTOR[i]);
         }
 #if defined(COVER) || defined(TARJAN) || defined(MODELCHECKING)
@@ -813,22 +817,22 @@ inline void canonize() {
 
     // 2. Markierung nach kanrep austragen
 
-    for (i = 0; i < Places[0]->cnt; i++) {
-        kanrep[i] = CurrentMarking[i];
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        kanrep[i] = Globals::CurrentMarking[i];
     }
 
     // 3. Sortieren auf kanrep
     for (level = 0; level < CardStore; level++) {
         current_min = Store[level].card;
         for (current = 0; current < Store[level].card; current++) {
-            for (i = Store[level].argnr; i < Places[0]->cnt; i++) {
+            for (i = Store[level].argnr; i < Globals::Places[0]->cnt; i++) {
                 if ((current_min < Store[level].card ?
                         kanrep[Store[level].image[current_min].vector[i - Store[level].argnr]] : kanrep[i])
                         != kanrep[Store[level].image[current].vector[i - Store[level].argnr]]) {
                     break;
                 }
             }
-            if (i >= Places[0]->cnt) {
+            if (i >= Globals::Places[0]->cnt) {
                 continue;
             }
             if ((current_min < Store[level].card ?
@@ -841,7 +845,7 @@ inline void canonize() {
             for (i = 0; i < Store[level].argnr; i++) {
                 kanrep1[i] = kanrep[i];
             }
-            for (i = Store[level].argnr; i < Places[0]->cnt; i++) {
+            for (i = Store[level].argnr; i < Globals::Places[0]->cnt; i++) {
                 kanrep1[i] = kanrep[Store[level].image[current_min].vector[i - Store[level].argnr]];
             }
             swap = kanrep;
@@ -851,8 +855,8 @@ inline void canonize() {
     }
     // 5. suchen
     kanhash = 0;
-    for (i = 0; i < Places[0]->cnt; i++) {
-        kanhash += Places[i]->hash_factor * kanrep[i];
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        kanhash += Globals::Places[i]->hash_factor * kanrep[i];
         kanhash %= HASHSIZE;
     }
 }
@@ -899,7 +903,7 @@ inline void printdecision(Decision* d) {
         if (d->next[m]) {
             limit = d -> next[m]->PlaceNr;
         } else {
-            limit = Places[0]->NrSignificant;
+            limit = Globals::Places[0]->NrSignificant;
         }
 
         for (i = d->PlaceNr, j = d->index[m] + 1; i < limit; i++, j++) {
@@ -980,8 +984,8 @@ inline binDecision::binDecision(int b) {
     unsigned int i;
     bitnr = b;
     nextold = nextnew = NULL;
-    vector = new unsigned char [(BitVectorSize - (bitnr + 2)) / 8 + 2];
-    for (i = 0; i < (BitVectorSize - (bitnr + 2)) / 8 + 1; i++) {
+    vector = new unsigned char [(Globals::BitVectorSize - (bitnr + 2)) / 8 + 2];
+    for (i = 0; i < (Globals::BitVectorSize - (bitnr + 2)) / 8 + 1; i++) {
         vector[i] = 0;
     }
 #ifdef SWEEP
@@ -1043,7 +1047,7 @@ inline State* bin_symm_search_marking() {
     cout << endl;
     print_binDec(0);
     cout << endl;
-    if (!binHashTable[Places[0]->hash_value]) {
+    if (!binHashTable[Globals::Places[0]->hash_value]) {
         return NULL;
     }
     if ((st = symm_first_binSearch())) {
@@ -1065,7 +1069,7 @@ inline State* bin_symm_search_marking() {
 #endif
     to = todec;
 
-    while ((bin_p = NextSymm(Scapegoat)) < Places[0]->cnt) {
+    while ((bin_p = NextSymm(Scapegoat)) < Globals::Places[0]->cnt) {
         if ((st = symm_next_binSearch())) {
             return st;
         }
@@ -1110,16 +1114,16 @@ inline State* binSearch(binDecision* Bucket) {
     while (1) {
 
         // - fill byte starting at bit s
-        while (bin_s < 8 && bin_p < Places[0] -> NrSignificant) {
-            if (8 - bin_s < Places[bin_p]->nrbits - bin_pb) {
-                inttobits(&bin_byte, bin_s, 8 - bin_s, (MARKINGVECTOR[bin_p] % (1 << (Places[bin_p] -> nrbits - bin_pb))) >> (Places[bin_p]->nrbits + bin_s - (8 + bin_pb)));
+        while (bin_s < 8 && bin_p < Globals::Places[0] -> NrSignificant) {
+            if (8 - bin_s < Globals::Places[bin_p]->nrbits - bin_pb) {
+                inttobits(&bin_byte, bin_s, 8 - bin_s, (MARKINGVECTOR[bin_p] % (1 << (Globals::Places[bin_p] -> nrbits - bin_pb))) >> (Globals::Places[bin_p]->nrbits + bin_s - (8 + bin_pb)));
                 bin_pb += 8 - bin_s;
                 bin_s = 8;
                 break;
 
             } else {
-                inttobits(&bin_byte, bin_s, Places[bin_p] -> nrbits - bin_pb, MARKINGVECTOR[bin_p] % (1 << (Places[bin_p] -> nrbits - bin_pb)));
-                bin_s += Places[bin_p] -> nrbits - bin_pb;
+                inttobits(&bin_byte, bin_s, Globals::Places[bin_p] -> nrbits - bin_pb, MARKINGVECTOR[bin_p] % (1 << (Globals::Places[bin_p] -> nrbits - bin_pb)));
+                bin_s += Globals::Places[bin_p] -> nrbits - bin_pb;
                 bin_p++;
                 bin_pb = 0;
             }
@@ -1128,7 +1132,7 @@ inline State* binSearch(binDecision* Bucket) {
         bin_d = 8 - logzwo(bin_v[bin_t] ^ bin_byte);
         // - conclude
         // case 0: length of vector reached without difference = state found
-        if (bin_b + bin_d >= BitVectorSize) {
+        if (bin_b + bin_d >= Globals::BitVectorSize) {
 #if defined(TARJAN) || defined(MODELCHECKING) || defined(COVER)
             return vectordec -> state;
 #else
@@ -1206,10 +1210,10 @@ inline State* binInsert(binDecision** Bucket) {
         *Bucket = new binDecision(-1);
         // 3. remaining places
         vby = vbi = 0;
-        for (bin_p = 0; bin_p < Places[0]-> NrSignificant; bin_p ++) {
-            inttobits((*Bucket)->vector + vby, vbi, Places[bin_p] -> nrbits, MARKINGVECTOR[bin_p]);
-            vby += (vbi + Places[bin_p] -> nrbits) / 8;
-            vbi = (vbi + Places[bin_p] -> nrbits) % 8;
+        for (bin_p = 0; bin_p < Globals::Places[0]-> NrSignificant; bin_p ++) {
+            inttobits((*Bucket)->vector + vby, vbi, Globals::Places[bin_p] -> nrbits, MARKINGVECTOR[bin_p]);
+            vby += (vbi + Globals::Places[bin_p] -> nrbits) / 8;
+            vbi = (vbi + Globals::Places[bin_p] -> nrbits) % 8;
         }
 #if (defined(SYMMETRY) && SYMMINTEGRATION == 2)
         (*Bucket)->prev = NULL;
@@ -1245,17 +1249,17 @@ inline State* binInsert(binDecision** Bucket) {
 
     // 2. remaining bit of current place
     if (bin_pb) {
-        inttobits(newd->vector, vbi, Places[bin_p] -> nrbits - bin_pb, MARKINGVECTOR[bin_p] % (1 << (Places[bin_p] -> nrbits - bin_pb)));
-        vby += (vbi + Places[bin_p] -> nrbits - bin_pb) / 8;
-        vbi = (vbi + Places[bin_p] -> nrbits - bin_pb) % 8;
+        inttobits(newd->vector, vbi, Globals::Places[bin_p] -> nrbits - bin_pb, MARKINGVECTOR[bin_p] % (1 << (Globals::Places[bin_p] -> nrbits - bin_pb)));
+        vby += (vbi + Globals::Places[bin_p] -> nrbits - bin_pb) / 8;
+        vbi = (vbi + Globals::Places[bin_p] -> nrbits - bin_pb) % 8;
         bin_p++;
     }
 
     // 3. remaining places
-    for (; bin_p < Places[0]-> NrSignificant; bin_p ++) {
-        inttobits(newd->vector + vby, vbi, Places[bin_p] -> nrbits, MARKINGVECTOR[bin_p]);
-        vby += (vbi + Places[bin_p] -> nrbits) / 8;
-        vbi = (vbi + Places[bin_p] -> nrbits) % 8;
+    for (; bin_p < Globals::Places[0]-> NrSignificant; bin_p ++) {
+        inttobits(newd->vector + vby, vbi, Globals::Places[bin_p] -> nrbits, MARKINGVECTOR[bin_p]);
+        vby += (vbi + Globals::Places[bin_p] -> nrbits) / 8;
+        vbi = (vbi + Globals::Places[bin_p] -> nrbits) % 8;
     }
 
 #if defined(TARJAN) || defined(MODELCHECKING) || defined(COVER)
@@ -1314,17 +1318,17 @@ inline void binDelete(binDecision** Bucket) {
                 /* 1. upper part of o --> lower part of v */
                 v[vbyte] = (v[vbyte]  & vuppermask) | ((o[obyte] & ouppermask) >> upper);
                 vbyte++;
-                if (8 * vbyte >= BitVectorSize) {
+                if (8 * vbyte >= Globals::BitVectorSize) {
                     break;
                 }
                 /* 2. lower part of o --> upper part of v */
                 v[vbyte] = (v[vbyte]  & vlowermask) | ((o[obyte++] & olowermask) << lower);
-                if ((*oldlist)->bitnr + 8 * obyte >= BitVectorSize) {
+                if ((*oldlist)->bitnr + 8 * obyte >= Globals::BitVectorSize) {
                     break;
                 }
             } while (1);
         } else {
-            for (obyte = 0; (*oldlist)->bitnr + 8 * obyte < BitVectorSize; obyte++) {
+            for (obyte = 0; (*oldlist)->bitnr + 8 * obyte < Globals::BitVectorSize; obyte++) {
                 v[vbyte++] = o[obyte];
             }
         }
@@ -1383,24 +1387,24 @@ inline State* symm_first_binSearch() {
             if (bin_pb == 0) {
                 trace();
             }
-            if (8 - bin_s < Places[bin_p]->nrbits - bin_pb) {
-                inttobits(&bin_byte, bin_s, 8 - bin_s, (MARKINGVECTOR[bin_p] % (1 << (Places[bin_p] -> nrbits - bin_pb))) >> (Places[bin_p]->nrbits + bin_s - (8 + bin_pb)));
+            if (8 - bin_s < Globals::Places[bin_p]->nrbits - bin_pb) {
+                inttobits(&bin_byte, bin_s, 8 - bin_s, (MARKINGVECTOR[bin_p] % (1 << (Globals::Places[bin_p] -> nrbits - bin_pb))) >> (Globals::Places[bin_p]->nrbits + bin_s - (8 + bin_pb)));
                 bin_pb += 8 - bin_s;
                 bin_s = 8;
                 break;
 
             } else {
-                inttobits(&bin_byte, bin_s, Places[bin_p] -> nrbits - bin_pb, MARKINGVECTOR[bin_p] % (1 << (Places[bin_p] -> nrbits - bin_pb)));
-                bin_s += Places[bin_p] -> nrbits - bin_pb;
+                inttobits(&bin_byte, bin_s, Globals::Places[bin_p] -> nrbits - bin_pb, MARKINGVECTOR[bin_p] % (1 << (Globals::Places[bin_p] -> nrbits - bin_pb)));
+                bin_s += Globals::Places[bin_p] -> nrbits - bin_pb;
                 bin_p++;
                 bin_pb = 0;
             }
-        } while (bin_s < 8 && bin_p < Places[0] -> NrSignificant);
+        } while (bin_s < 8 && bin_p < Globals::Places[0] -> NrSignificant);
         // - compare byte with bin_v[bin_t] and find first difference
         bin_d = 8 - logzwo(bin_v[bin_t] ^ bin_byte);
         // - conclude
         // case 0: length of vector reached without difference = state found
-        if (bin_b + bin_d >= BitVectorSize) {
+        if (bin_b + bin_d >= Globals::BitVectorSize) {
 #if defined(TARJAN) || defined(MODELCHECKING) || defined(COVER)
             return vectordec -> state;
 #else
@@ -1423,7 +1427,7 @@ checkagain:
                             return NULL;
                         }
                         Scapegoat--;
-                        pb = Places[Scapegoat] -> nrbits;
+                        pb = Globals::Places[Scapegoat] -> nrbits;
                     }
                 } else {
                     bin_s = 0;
@@ -1475,7 +1479,7 @@ checkagain:
                         return NULL;
                     }
                     Scapegoat--;
-                    pb = Places[Scapegoat] -> nrbits;
+                    pb = Globals::Places[Scapegoat] -> nrbits;
                 }
             } else {
                 bin_s = 0;
@@ -1510,24 +1514,24 @@ inline State* symm_next_binSearch() {
         // - fill byte starting at bit s
         do {
             trace();
-            if (8 - bin_s < Places[bin_p]->nrbits - bin_pb) {
-                inttobits(&bin_byte, bin_s, 8 - bin_s, (MARKINGVECTOR[CurrentSymm[bin_p]] % (1 << (Places[bin_p] -> nrbits - bin_pb))) >> (Places[bin_p]->nrbits + bin_s - (8 + bin_pb)));
+            if (8 - bin_s < Globals::Places[bin_p]->nrbits - bin_pb) {
+                inttobits(&bin_byte, bin_s, 8 - bin_s, (MARKINGVECTOR[CurrentSymm[bin_p]] % (1 << (Globals::Places[bin_p] -> nrbits - bin_pb))) >> (Globals::Places[bin_p]->nrbits + bin_s - (8 + bin_pb)));
                 bin_pb += 8 - bin_s;
                 bin_s = 8;
                 break;
 
             } else {
-                inttobits(&bin_byte, bin_s, Places[bin_p] -> nrbits - bin_pb, MARKINGVECTOR[CurrentSymm[bin_p]] % (1 << (Places[bin_p] -> nrbits - bin_pb)));
-                bin_s += Places[bin_p] -> nrbits - bin_pb;
+                inttobits(&bin_byte, bin_s, Globals::Places[bin_p] -> nrbits - bin_pb, MARKINGVECTOR[CurrentSymm[bin_p]] % (1 << (Globals::Places[bin_p] -> nrbits - bin_pb)));
+                bin_s += Globals::Places[bin_p] -> nrbits - bin_pb;
                 bin_p++;
                 bin_pb = 0;
             }
-        } while (bin_s < 8 && bin_p < Places[0] -> NrSignificant);
+        } while (bin_s < 8 && bin_p < Globals::Places[0] -> NrSignificant);
         // - compare byte with bin_v[bin_t] and find first difference
         bin_d = 8 - logzwo(bin_v[bin_t] ^ bin_byte);
         // - conclude
         // case 0: length of vector reached without difference = state found
-        if (bin_b + bin_d >= BitVectorSize) {
+        if (bin_b + bin_d >= Globals::BitVectorSize) {
 #if defined(TARJAN) || defined(MODELCHECKING) || defined(COVER)
             return vectordec -> state;
 #else
@@ -1550,7 +1554,7 @@ checkagain:
                             return NULL;
                         }
                         Scapegoat--;
-                        pb = Places[Scapegoat] -> nrbits;
+                        pb = Globals::Places[Scapegoat] -> nrbits;
                     }
                 } else {
                     bin_s = 0;
@@ -1602,7 +1606,7 @@ checkagain:
                         return NULL;
                     }
                     Scapegoat--;
-                    pb = Places[Scapegoat] -> nrbits;
+                    pb = Globals::Places[Scapegoat] -> nrbits;
                 }
             } else {
                 bin_s = 0;

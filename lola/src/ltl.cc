@@ -447,7 +447,7 @@ unsigned int depth_first() {
     CurrentState -> parent = NULL;
     F -> initatomic();
 
-    CurrentState -> succ = new State * [CardFireList+1];
+    CurrentState -> succ = new State * [CardFireList + 1];
     CurrentState -> dfs = CurrentState -> min = 0;
     CurrentState -> phi = F -> value;
     CurrentState -> nexttar = CurrentState -> prevtar = CurrentState;
@@ -494,7 +494,7 @@ unsigned int depth_first() {
                 NewState -> nexttar -> prevtar = NewState;
                 NewState -> current = 0;
                 NewState -> parent = CurrentState;
-                NewState -> succ =  new State * [CardFireList+1];
+                NewState -> succ =  new State * [CardFireList + 1];
                 CurrentState -> succ[CurrentState -> current] = NewState;
                 CurrentState = NewState;
             }

@@ -206,7 +206,7 @@ void atomicformula::evaluateatomic(State* s) {
 #ifdef MODELCHECKING
     switch (type) {
         case eq:
-            if (CurrentMarking[p->index] == k) {
+            if (Globals::CurrentMarking[p->index] == k) {
                 s -> value[index] = true;
 
             } else {
@@ -215,7 +215,7 @@ void atomicformula::evaluateatomic(State* s) {
             s -> known[index] = true;
             break;
         case neq:
-            if (CurrentMarking[p->index] != k) {
+            if (Globals::CurrentMarking[p->index] != k) {
                 s -> value[index] = true;
 
             } else {
@@ -224,7 +224,7 @@ void atomicformula::evaluateatomic(State* s) {
             s -> known[index] = true;
             break;
         case leq:
-            if (CurrentMarking[p->index] <= k) {
+            if (Globals::CurrentMarking[p->index] <= k) {
                 s -> value[index] = true;
 
             } else {
@@ -233,7 +233,7 @@ void atomicformula::evaluateatomic(State* s) {
             s -> known[index] = true;
             break;
         case geq:
-            if (CurrentMarking[p->index] >= k) {
+            if (Globals::CurrentMarking[p->index] >= k) {
                 s -> value[index] = true;
 
             } else {
@@ -242,7 +242,7 @@ void atomicformula::evaluateatomic(State* s) {
             s -> known[index] = true;
             break;
         case lt:
-            if (CurrentMarking[p->index] < k) {
+            if (Globals::CurrentMarking[p->index] < k) {
                 s -> value[index] = true;
 
             } else {
@@ -251,7 +251,7 @@ void atomicformula::evaluateatomic(State* s) {
             s -> known[index] = true;
             break;
         case gt:
-            if (CurrentMarking[p->index] > k) {
+            if (Globals::CurrentMarking[p->index] > k) {
                 s -> value[index] = true;
 
             } else {
@@ -296,32 +296,32 @@ void untilformula::evaluateatomic(State* s) {
 bool atomicformula::initatomic() {
     switch (type) {
         case  eq:
-            if (CurrentMarking[p->index] == k) {
+            if (Globals::CurrentMarking[p->index] == k) {
                 return(value = true);
             }
             return(value = false);
         case neq:
-            if (CurrentMarking[p->index] != k) {
+            if (Globals::CurrentMarking[p->index] != k) {
                 return(value = true);
             }
             return(value = false);
         case leq:
-            if (CurrentMarking[p->index] <= k) {
+            if (Globals::CurrentMarking[p->index] <= k) {
                 return(value = true);
             }
             return(value = false);
         case geq:
-            if (CurrentMarking[p->index] >= k) {
+            if (Globals::CurrentMarking[p->index] >= k) {
                 return(value = true);
             }
             return(value = false);
         case  lt:
-            if (CurrentMarking[p->index] < k) {
+            if (Globals::CurrentMarking[p->index] < k) {
                 return(value = true);
             }
             return(value = false);
         case  gt:
-            if (CurrentMarking[p->index] > k) {
+            if (Globals::CurrentMarking[p->index] > k) {
                 return(value = true);
             }
             return(value = false);
@@ -857,13 +857,13 @@ void untilformula::setstatic() {
     tempindex = tempcard++;
     unsigned int i;
     if (tformula) {
-        for (i = 0; i < Transitions[0]->cnt; i++) {
-            Transitions[i]->pathrestriction[tempindex] = tformula -> evaluatetransition(Transitions[i]);
+        for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+            Globals::Transitions[i]->pathrestriction[tempindex] = tformula -> evaluatetransition(Globals::Transitions[i]);
         }
         DeadStatePathRestriction[tempindex] = tformula -> evaluatetransition(NULL);
     } else {
-        for (i = 0; i < Transitions[0]->cnt; i++) {
-            Transitions[i]->pathrestriction[tempindex] = true;
+        for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+            Globals::Transitions[i]->pathrestriction[tempindex] = true;
         }
         DeadStatePathRestriction[tempindex] = true;
     }
@@ -879,13 +879,13 @@ void unarytemporalformula::setstatic() {
     tempindex = tempcard++;
     unsigned int i;
     if (tformula) {
-        for (i = 0; i < Transitions[0]->cnt; i++) {
-            Transitions[i]->pathrestriction[tempindex] = tformula -> evaluatetransition(Transitions[i]);
+        for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+            Globals::Transitions[i]->pathrestriction[tempindex] = tformula -> evaluatetransition(Globals::Transitions[i]);
         }
         DeadStatePathRestriction[tempindex] = tformula -> evaluatetransition(NULL);
     } else {
-        for (i = 0; i < Transitions[0]->cnt; i++) {
-            Transitions[i]->pathrestriction[tempindex] = true;
+        for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+            Globals::Transitions[i]->pathrestriction[tempindex] = true;
         }
         DeadStatePathRestriction[tempindex] = true;
     }
@@ -903,32 +903,32 @@ void atomicformula::updateatomic() {
 
     switch (type) {
         case eq:
-            if (CurrentMarking[p -> index] == k) {
+            if (Globals::CurrentMarking[p -> index] == k) {
                 newvalue = true;
             }
             break;
         case neq:
-            if (CurrentMarking[p -> index] != k) {
+            if (Globals::CurrentMarking[p -> index] != k) {
                 newvalue = true;
             }
             break;
         case leq:
-            if (CurrentMarking[p -> index] <= k) {
+            if (Globals::CurrentMarking[p -> index] <= k) {
                 newvalue = true;
             }
             break;
         case geq:
-            if (CurrentMarking[p -> index] >= k) {
+            if (Globals::CurrentMarking[p -> index] >= k) {
                 newvalue = true;
             }
             break;
         case gt:
-            if (CurrentMarking[p -> index] > k) {
+            if (Globals::CurrentMarking[p -> index] > k) {
                 newvalue = true;
             }
             break;
         case lt:
-            if (CurrentMarking[p -> index] < k) {
+            if (Globals::CurrentMarking[p -> index] < k) {
                 newvalue = true;
             }
             break;
@@ -1005,42 +1005,42 @@ formula* atomicformula::reduce(int* res) {
     }
     switch (type) {
         case eq:
-            if (CurrentMarking[p -> index] == k) {
+            if (Globals::CurrentMarking[p -> index] == k) {
                 * res = 1;
             } else {
                 * res = 0;
             }
             break;
         case neq:
-            if (CurrentMarking[p -> index] != k) {
+            if (Globals::CurrentMarking[p -> index] != k) {
                 * res = 1;
             } else {
                 * res = 0;
             }
             break;
         case leq:
-            if (CurrentMarking[p -> index] <= k) {
+            if (Globals::CurrentMarking[p -> index] <= k) {
                 * res = 1;
             } else {
                 * res = 0;
             }
             break;
         case geq:
-            if (CurrentMarking[p -> index] >= k) {
+            if (Globals::CurrentMarking[p -> index] >= k) {
                 * res = 1;
             } else {
                 * res = 0;
             }
             break;
         case lt:
-            if (CurrentMarking[p -> index] < k) {
+            if (Globals::CurrentMarking[p -> index] < k) {
                 * res = 1;
             } else {
                 * res = 0;
             }
             break;
         case gt:
-            if (CurrentMarking[p -> index] > k) {
+            if (Globals::CurrentMarking[p -> index] > k) {
                 * res = 1;
             } else {
                 * res = 0;
@@ -1517,14 +1517,14 @@ void update_formula(Transition* t) {
     // update value of formula after having fired t
 
 #ifdef WITHFORMULA
-    for (unsigned int i = 0; t->DecrPlaces[i] < Places[0]->cnt; i++) {
-        for (unsigned int j = 0; j < Places[t->DecrPlaces[i]] -> cardprop; j++) {
-            Places[t->DecrPlaces[i]]->propositions[j] -> updateatomic();
+    for (unsigned int i = 0; t->DecrPlaces[i] < Globals::Places[0]->cnt; i++) {
+        for (unsigned int j = 0; j < Globals::Places[t->DecrPlaces[i]] -> cardprop; j++) {
+            Globals::Places[t->DecrPlaces[i]]->propositions[j] -> updateatomic();
         }
     }
-    for (unsigned int i = 0; t->IncrPlaces[i] < Places[0]->cnt; i++) {
-        for (unsigned int j = 0; j < Places[t->IncrPlaces[i]] -> cardprop; j++) {
-            Places[t->IncrPlaces[i]]->propositions[j] -> updateatomic();
+    for (unsigned int i = 0; t->IncrPlaces[i] < Globals::Places[0]->cnt; i++) {
+        for (unsigned int j = 0; j < Globals::Places[t->IncrPlaces[i]] -> cardprop; j++) {
+            Globals::Places[t->IncrPlaces[i]]->propositions[j] -> updateatomic();
         }
     }
 #endif
@@ -1588,7 +1588,7 @@ Transition** atomicformula::spp2(State* s) {
             }
             break;
         case eq:
-            if (CurrentMarking[p -> index] < k) {
+            if (Globals::CurrentMarking[p -> index] < k) {
                 for (i = 0; i < p -> NrOfArriving; i++) {
                     if (p -> ArrivingArcs[i] -> tr -> lastfired <= s -> dfs) {
                         // last occurrence of t happened before entering this scc

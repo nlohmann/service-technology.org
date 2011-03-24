@@ -29,6 +29,8 @@ void insert_up(State*, formula*);
 void insert_global_down(formula*);
 
 extern unsigned int* checkstart;
+extern Transition* LastAttractor;  ///< Last transition in list of
+
 
 void stubbornclosure() {
     Transition* current;
@@ -71,10 +73,10 @@ void sortscapegoats() {
 
 
     // count number of invisible pre-transitions
-    for (i = 0; i < Places[0]->cnt; i++) {
-        for (j = 0; Places[i]->PreTransitions[j]; j++) {
-            if (Places[i]->PreTransitions[j]->visible) {
-                Places[i]->visible ++;
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        for (j = 0; Globals::Places[i]->PreTransitions[j]; j++) {
+            if (Globals::Places[i]->PreTransitions[j]->visible) {
+                Globals::Places[i]->visible ++;
             }
         }
     }
@@ -82,19 +84,19 @@ void sortscapegoats() {
     // sort PrePlaces and Pre such that places without
     // visible pretransitions move to the beginning
 
-    for (i = 0; i < Transitions[i]->cnt; i++) {
+    for (i = 0; i < Globals::Transitions[i]->cnt; i++) {
         // sort lists of transition i
         firstnz = 0;
         firstunknown = 0;
-        while (Transitions[i]->PrePlaces[firstunknown] < Places[0]->cnt) {
-            if (!Places[Transitions[i]->PrePlaces[firstunknown]] -> visible) {
+        while (Globals::Transitions[i]->PrePlaces[firstunknown] < Globals::Places[0]->cnt) {
+            if (!Globals::Places[Globals::Transitions[i]->PrePlaces[firstunknown]] -> visible) {
                 // swap firstnz <--> firstunknown
-                tmp = Transitions[i]->Pre[firstunknown];
-                tmpp = Transitions[i]->PrePlaces[firstunknown];
-                Transitions[i]->Pre[firstunknown] = Transitions[i]->Pre[firstnz];
-                Transitions[i]->PrePlaces[firstunknown] = Transitions[i]->PrePlaces[firstnz];
-                Transitions[i]->Pre[firstnz] = tmp;
-                Transitions[i]->PrePlaces[firstnz] = tmpp;
+                tmp = Globals::Transitions[i]->Pre[firstunknown];
+                tmpp = Globals::Transitions[i]->PrePlaces[firstunknown];
+                Globals::Transitions[i]->Pre[firstunknown] = Globals::Transitions[i]->Pre[firstnz];
+                Globals::Transitions[i]->PrePlaces[firstunknown] = Globals::Transitions[i]->PrePlaces[firstnz];
+                Globals::Transitions[i]->Pre[firstnz] = tmp;
+                Globals::Transitions[i]->PrePlaces[firstnz] = tmpp;
                 firstnz ++;
             }
             firstunknown ++;
@@ -142,7 +144,7 @@ void insert_up(State* s, formula* f) {
             }
             break;
         case eq:
-            if (CurrentMarking[((atomicformula*) f) ->p->index] < ((atomicformula*) f)  -> k) {
+            if (Globals::CurrentMarking[((atomicformula*) f) ->p->index] < ((atomicformula*) f)  -> k) {
                 for (i = 0; i < ((atomicformula*) f) ->p->NrOfArriving; i++) {
                     stubborninsert(((atomicformula*) f) ->p->ArrivingArcs[i]->tr);
                 }
@@ -257,8 +259,8 @@ void insert_up(State* s, formula* f) {
             break;
         case ax:
         case ex:
-            for (i = 0; i < Transitions[0]->cnt; i++) {
-                stubborninsert(Transitions[i]);
+            for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+                stubborninsert(Globals::Transitions[i]);
             }
             break;
 #endif
@@ -320,7 +322,7 @@ void insert_down(State* s, formula* f) {
 
     switch (f -> type) {
         case neq:
-            if (CurrentMarking[((atomicformula*) f)->p->index] < ((atomicformula*) f)->k) {
+            if (Globals::CurrentMarking[((atomicformula*) f)->p->index] < ((atomicformula*) f)->k) {
                 for (i = 0; i < ((atomicformula*) f)->p->NrOfArriving; i++) {
                     stubborninsert(((atomicformula*) f)->p->ArrivingArcs[i]->tr);
                 }
@@ -429,8 +431,8 @@ void insert_down(State* s, formula* f) {
 
         case ax:
         case ex:
-            for (i = 0; i < Transitions[0]->cnt; i++) {
-                stubborninsert(Transitions[i]);
+            for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+                stubborninsert(Globals::Transitions[i]);
             }
             break;
 #endif
@@ -495,9 +497,9 @@ Transition** stubbornfirelist(State* s, formula* f) {
     t -> StartOfStubbornList = NULL;
     insert_up(s, f);
     stubbornclosure();
-    i = Transitions[0]->NrStubborn;
-    result = new Transition * [Transitions[0]->NrStubborn + 1];
-    for (t = Transitions[0]->StartOfStubbornList, i = 0; t; t = t -> NextStubborn) {
+    i = Globals::Transitions[0]->NrStubborn;
+    result = new Transition * [Globals::Transitions[0]->NrStubborn + 1];
+    for (t = Globals::Transitions[0]->StartOfStubbornList, i = 0; t; t = t -> NextStubborn) {
         t -> instubborn = false;
         if (t -> enabled
 #ifdef EXTENDEDCTL
@@ -527,8 +529,8 @@ Transition** stubbornfirelistneg(State* s, formula* f) {
     t -> StartOfStubbornList = NULL;
     insert_down(s, f);
     stubbornclosure();
-    result = new Transition * [Transitions[0]->NrStubborn + 1];
-    for (t = Transitions[0]->StartOfStubbornList, i = 0; t; t = t -> NextStubborn) {
+    result = new Transition * [Globals::Transitions[0]->NrStubborn + 1];
+    for (t = Globals::Transitions[0]->StartOfStubbornList, i = 0; t; t = t -> NextStubborn) {
         t -> instubborn = false;
         if (t -> enabled
 #ifdef EXTENDEDCTL
@@ -552,7 +554,7 @@ Transition** stubbornfirelistctl() {
 
     // try for all enabled invisible transitions if there is
     // a stubborn superset without other enabled transitions
-    for (start = Transitions[0]->StartOfEnabledList; start; start = start -> NextEnabled) {
+    for (start = Globals::Transitions[0]->StartOfEnabledList; start; start = start -> NextEnabled) {
         if (start -> visible) {
             continue;
         }
@@ -613,13 +615,13 @@ Transition** stubbornfireliststatic() {
 
     if (LastAttractor) {
         LastAttractor -> NextStubborn = NULL;
-        Transitions[0]->EndOfStubbornList = LastAttractor;
+        Globals::Transitions[0]->EndOfStubbornList = LastAttractor;
         stubbornclosure();
     }
-    result = new Transition * [Transitions[0]->NrStubborn + 1];
+    result = new Transition * [Globals::Transitions[0]->NrStubborn + 1];
     i = 0;
     if (LastAttractor) {
-        for (t = Transitions[0]->StartOfStubbornList;; t = t -> NextStubborn) {
+        for (t = Globals::Transitions[0]->StartOfStubbornList;; t = t -> NextStubborn) {
             if (t -> enabled) {
                 result[i++] = t;
             }
@@ -635,7 +637,7 @@ Transition** stubbornfireliststatic() {
         }
     }
     result[i] = NULL;
-    CardFireList = Transitions[0]-> NrStubborn;
+    CardFireList = Globals::Transitions[0]-> NrStubborn;
     return result;
 }
 
@@ -647,26 +649,26 @@ Transition** stubbornfirelistnogoal() {
     // computes a stubborn superset of a single enabled transition.
     // We use the first element of enabling list
 
-    Transitions[0]->NrStubborn = 0;
-    if (Transitions[0]->StartOfEnabledList) {
-        Transitions[0]->StartOfEnabledList -> NextStubborn = NULL;
-        Transitions[0]->StartOfStubbornList =
-            Transitions[0]->EndOfStubbornList = Transitions[0]->StartOfEnabledList;
-        Transitions[0]->StartOfStubbornList->instubborn = true;
+    Globals::Transitions[0]->NrStubborn = 0;
+    if (Globals::Transitions[0]->StartOfEnabledList) {
+        Globals::Transitions[0]->StartOfEnabledList -> NextStubborn = NULL;
+        Globals::Transitions[0]->StartOfStubbornList =
+            Globals::Transitions[0]->EndOfStubbornList = Globals::Transitions[0]->StartOfEnabledList;
+        Globals::Transitions[0]->StartOfStubbornList->instubborn = true;
         stubbornclosure();
     } else {
-        Transitions[0]->StartOfStubbornList = NULL;
+        Globals::Transitions[0]->StartOfStubbornList = NULL;
     }
-    result = new Transition * [Transitions[0]->NrStubborn + 1];
+    result = new Transition * [Globals::Transitions[0]->NrStubborn + 1];
     i = 0;
-    for (t = Transitions[0]->StartOfStubbornList; t; t = t -> NextStubborn) {
+    for (t = Globals::Transitions[0]->StartOfStubbornList; t; t = t -> NextStubborn) {
         t -> instubborn = false;
         if (t -> enabled) {
             result[i++] = t;
         }
     }
     result[i] = NULL;
-    CardFireList = Transitions[0]-> NrStubborn;
+    CardFireList = Globals::Transitions[0]-> NrStubborn;
     return result;
 }
 
@@ -680,37 +682,37 @@ Transition** stubbornfirelistreach() {
     // Attractor set generation is controlled by the comparison
     // between target and current marking.
 
-    for (i = 0; i < Places[0]->cnt; i++) {
-        if (CurrentMarking[i] != Places[i]->target_marking) {
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        if (Globals::CurrentMarking[i] != Globals::Places[i]->target_marking) {
             break;
         }
     }
-    if (i >= Places[0]->cnt) { // target_marking found!
+    if (i >= Globals::Places[0]->cnt) { // target_marking found!
         return NULL;
     }
-    if (CurrentMarking[i] > Places[i]->target_marking) {
-        Attr = Places[i]->PostTransitions;
+    if (Globals::CurrentMarking[i] > Globals::Places[i]->target_marking) {
+        Attr = Globals::Places[i]->PostTransitions;
     } else {
-        Attr = Places[i]->PreTransitions;
+        Attr = Globals::Places[i]->PreTransitions;
     }
-    Transitions[0]->StartOfStubbornList = NULL;
+    Globals::Transitions[0]->StartOfStubbornList = NULL;
     for (i = 0; Attr[i]; i++) {
-        Attr[i]->NextStubborn = Transitions[0]->StartOfStubbornList;
-        Transitions[0]->StartOfStubbornList = Attr[i];
+        Attr[i]->NextStubborn = Globals::Transitions[0]->StartOfStubbornList;
+        Globals::Transitions[0]->StartOfStubbornList = Attr[i];
         Attr[i]->instubborn = true;
     }
-    Transitions[0]->EndOfStubbornList = Attr[0];
+    Globals::Transitions[0]->EndOfStubbornList = Attr[0];
     stubbornclosure();
-    result = new Transition * [Transitions[0]->NrStubborn + 1];
+    result = new Transition * [Globals::Transitions[0]->NrStubborn + 1];
     i = 0;
-    for (t = Transitions[0]->StartOfStubbornList; t; t = t -> NextStubborn) {
+    for (t = Globals::Transitions[0]->StartOfStubbornList; t; t = t -> NextStubborn) {
         if (t -> enabled) {
             result[i++] = t;
         }
         t -> instubborn = false;
     }
     result[i] = NULL;
-    CardFireList = Transitions[0]-> NrStubborn;
+    CardFireList = Globals::Transitions[0]-> NrStubborn;
     return result;
 }
 
@@ -721,8 +723,8 @@ void NewStubbStamp() {
         StubbStamp ++;
     } else {
         unsigned int i;
-        for (i = 0; i < Transitions[0]->cnt; i++) {
-            Transitions[i]-> stamp = 0;
+        for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+            Globals::Transitions[i]-> stamp = 0;
         }
         StubbStamp = 1;
     }
@@ -738,15 +740,15 @@ Transition** tsccstubbornlist() {
     // The TSCC based optimisation is included
 
     // 1. start with enabled transition
-    if (Transitions[0]->TarjanStack =  Transitions[0]->StartOfEnabledList) {
+    if (Globals::Transitions[0]->TarjanStack =  Globals::Transitions[0]->StartOfEnabledList) {
         maxdfs = 0;
         NewStubbStamp();
-        Transitions[0]->TarjanStack -> nextontarjanstack = Transitions[0]->TarjanStack;
-        Transitions[0]->TarjanStack -> stamp  = StubbStamp;
-        Transitions[0]->TarjanStack -> dfs = Transitions[0]->TarjanStack -> min = maxdfs++;
-        Transitions[0]->TarjanStack -> mbiindex = 0;
-        current = Transitions[0]->TarjanStack;
-        Transitions[0]->CallStack = current;
+        Globals::Transitions[0]->TarjanStack -> nextontarjanstack = Globals::Transitions[0]->TarjanStack;
+        Globals::Transitions[0]->TarjanStack -> stamp  = StubbStamp;
+        Globals::Transitions[0]->TarjanStack -> dfs = Globals::Transitions[0]->TarjanStack -> min = maxdfs++;
+        Globals::Transitions[0]->TarjanStack -> mbiindex = 0;
+        current = Globals::Transitions[0]->TarjanStack;
+        Globals::Transitions[0]->CallStack = current;
         current -> nextoncallstack = NULL;
     } else {
         result = new Transition * [1];
@@ -766,13 +768,13 @@ Transition** tsccstubbornlist() {
                 current -> mbiindex++;
             } else {
                 // not yet visited
-                next -> nextontarjanstack = Transitions[0]->TarjanStack;
-                Transitions[0]->TarjanStack = next;
+                next -> nextontarjanstack = Globals::Transitions[0]->TarjanStack;
+                Globals::Transitions[0]->TarjanStack = next;
                 next -> min = next -> dfs = maxdfs++;
                 next -> stamp = StubbStamp;
                 next -> mbiindex = 0;
                 next -> nextoncallstack = current;
-                Transitions[0]->CallStack = next;
+                Globals::Transitions[0]->CallStack = next;
                 current = next;
             }
         } else {
@@ -781,13 +783,13 @@ Transition** tsccstubbornlist() {
                 // remove all states behind current from Tarjanstack;
                 // if enabled -> final sequence
                 while (1) {
-                    if (Transitions[0]->TarjanStack -> enabled) {
+                    if (Globals::Transitions[0]->TarjanStack -> enabled) {
                         // final sequence
                         unsigned int cardstubborn;
                         Transition* t;
 
                         cardstubborn = 0;
-                        for (t = Transitions[0]->TarjanStack;; t = t -> nextontarjanstack) {
+                        for (t = Globals::Transitions[0]->TarjanStack;; t = t -> nextontarjanstack) {
                             if (t -> enabled) {
                                 cardstubborn ++;
                             }
@@ -797,7 +799,7 @@ Transition** tsccstubbornlist() {
                         }
                         result = new Transition * [cardstubborn + 2];
                         cardstubborn = 0;
-                        for (t = Transitions[0]->TarjanStack;; t = t -> nextontarjanstack) {
+                        for (t = Globals::Transitions[0]->TarjanStack;; t = t -> nextontarjanstack) {
                             if (t -> enabled) {
                                 result[cardstubborn++] = t;
                             }
@@ -808,10 +810,10 @@ Transition** tsccstubbornlist() {
                             }
                         }
                     } else {
-                        if (Transitions[0]->TarjanStack == current) {
+                        if (Globals::Transitions[0]->TarjanStack == current) {
                             break;
                         }
-                        Transitions[0]->TarjanStack = Transitions[0]->TarjanStack -> nextontarjanstack;
+                        Globals::Transitions[0]->TarjanStack = Globals::Transitions[0]->TarjanStack -> nextontarjanstack;
                     }
                 }
             }
@@ -878,8 +880,8 @@ Transition** structreachstubbornset() { // used: relaxed reachability, cycle det
         t -> StartOfStubbornList = NULL;
         insert_global_up(F);
         stubbornclosure();
-        result = new Transition * [Transitions[0]->NrStubborn + 5];
-        for (t = Transitions[0]->StartOfStubbornList, i = 0; t; t = t -> NextStubborn) {
+        result = new Transition * [Globals::Transitions[0]->NrStubborn + 5];
+        for (t = Globals::Transitions[0]->StartOfStubbornList, i = 0; t; t = t -> NextStubborn) {
             t -> instubborn = false;
             if (t -> enabled) {
                 result[i++] = t;

@@ -24,6 +24,8 @@
 #include "distribute.h"
 #endif
 
+using std::cout;
+
 #if defined(PREDUCTION) || defined(CYCLE) || defined(STRUCT) || defined(SWEEP)
 unsigned int NrOfEquations;
 
@@ -190,8 +192,8 @@ void equation::apply() {
         esystem[tmp->sum->var->nr] = tmp;
 #ifdef SWEEP
     } else {
-        tmp->next = esystem[Places[0]->cnt];
-        esystem[Places[0]->cnt] = tmp;
+        tmp->next = esystem[Globals::Places[0]->cnt];
+        esystem[Globals::Places[0]->cnt] = tmp;
     }
 #endif
 }
@@ -204,25 +206,25 @@ void tsolve() {
     summand** anchor;
 
     // step 0: all no-change transitions must be set to "cyclic"
-    for (i = 0; i < Transitions[0]->cnt; i++) {
-        if (!(Transitions[i]->IncrPlaces[0]) && !(Transitions[i]->DecrPlaces[0])) {
-            Transitions[i]->cyclic = true;
+    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+        if (!(Globals::Transitions[i]->IncrPlaces[0]) && !(Globals::Transitions[i]->DecrPlaces[0])) {
+            Globals::Transitions[i]->cyclic = true;
         }
     }
 
     round = 1;
-    esystem = new equation * [ Transitions[0]->cnt];
-    newesystem = new equation * [ Transitions[0]->cnt];
-    lastconsidered = new unsigned int [ Transitions[0]->cnt];
+    esystem = new equation * [ Globals::Transitions[0]->cnt];
+    newesystem = new equation * [ Globals::Transitions[0]->cnt];
+    lastconsidered = new unsigned int [ Globals::Transitions[0]->cnt];
     NrOfEquations = 0;
 
     // load equations into esystem
-    for (i = 0; i < Transitions[0]->cnt; i++) {
+    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
         esystem[i] = newesystem[i] = NULL;
         lastconsidered[i] = 0;
     }
 
-    for (i = 0; i < Places[0]->cnt; i++) {
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
         e = new equation(Places[i]);
         if (!e->sum) {
             delete e;
@@ -243,7 +245,7 @@ void tsolve() {
     while (1) {
         // Matrix->obere Dreiecksform
 
-        for (i = 0; i < Transitions[0]->cnt; i++) {
+        for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
             while (esystem[i] && esystem[i]->next) {
                 esystem[i]->apply();
             }
@@ -252,7 +254,7 @@ void tsolve() {
         // extract variables and re-organize esystem
         bool newcyclic;
         newcyclic = false;
-        for (i = Transitions[i]->cnt - 1; i >= 0; i--) {
+        for (i = Globals::Transitions[i]->cnt - 1; i >= 0; i--) {
             if (!esystem[i]) {
                 continue;
             }
@@ -293,7 +295,7 @@ void tsolve() {
             }
         }
         if (!newcyclic) {
-            for (i = 0; i < Transitions[i]->cnt; i++) {
+            for (i = 0; i < Globals::Transitions[i]->cnt; i++) {
                 while (newesystem[i]) {
                     equation* e;
                     while (newesystem[i]->sum) {
@@ -325,17 +327,17 @@ void tsolve() {
 
 #ifdef PREDUCTION
 void psolve() {
-    esystem = new equation*[Places[0]->cnt];
+    esystem = new equation*[Globals::Places[0]->cnt];
     NrOfEquations = 0;
 
     // load equations into esystem
-    for (int i = 0; i < Places[0]->cnt; ++i) {
+    for (int i = 0; i < Globals::Places[0]->cnt; ++i) {
         esystem[i] = NULL;
-        Places[i]->nr = i;
+        Globals::Places[i]->nr = i;
     }
 
-    for (int i = 0; i < Transitions[0]->cnt; ++i) {
-        equation* e = new equation(Transitions[i]);
+    for (int i = 0; i < Globals::Transitions[0]->cnt; ++i) {
+        equation* e = new equation(Globals::Transitions[i]);
         if (!e->sum) {
             delete e;
             continue;
@@ -351,16 +353,16 @@ void psolve() {
     }
 
     // Matrix->obere Dreiecksform
-    for (int i = 0; i < Places[0]->cnt; ++i) {
+    for (int i = 0; i < Globals::Places[0]->cnt; ++i) {
         while (esystem[i] && esystem[i]->next) {
             esystem[i]->apply();
         }
     }
 
     // set head variables as significant and remove equations
-    for (int i = 0; i < Places[0]->cnt; ++i) {
+    for (int i = 0; i < Globals::Places[0]->cnt; ++i) {
         if (esystem[i]) {
-            Places[i]->significant = true;
+            Globals::Places[i]->significant = true;
             while (esystem[i]->sum) {
                 summand* s = esystem[i]->sum;
                 esystem[i]->sum = esystem[i]->sum->next;
@@ -387,28 +389,28 @@ void progress_measure() {
     long int* denominator;
     long int g;
 
-    esystem = new equation * [ Places[0]->cnt + Transitions[0]->cnt]; // entry = list of all equations where p is smallest summand != 0
+    esystem = new equation * [ Globals::Places[0]->cnt + Globals::Transitions[0]->cnt]; // entry = list of all equations where p is smallest summand != 0
     reference = new equation * [Transitions[0]->cnt]; // entry = the equation belonging to t
     value = new long int [Transitions[0]->cnt];
     denominator = new long int [Transitions[0]->cnt];
     NrOfEquations = 0;
 
     // load equations into esystem
-    for (i = 0; i < Places[0]->cnt ; i++) {
+    for (i = 0; i < Globals::Places[0]->cnt ; i++) {
         esystem[i] = NULL;
-        Places[i]->nr = i;
+        Globals::Places[i]->nr = i;
     }
-    esystem[Places[0]->cnt] = NULL;
+    esystem[Globals::Places[0]->cnt] = NULL;
 
-    for (i = 0; i < Transitions[0]->cnt; i++) {
-        Transitions[i]->nr = Places[0]->cnt + i;  // all transitions get same number; this way all
+    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+        Globals::Transitions[i]->nr = Globals::Places[0]->cnt + i;  // all transitions get same number; this way all
         // equations that cancel out all places are collected
-        // in bucket esystem[Places[0]->cnt]].
-        reference[i] = new equation(Transitions[i]);
+        // in bucket esystem[Globals::Places[0]->cnt]].
+        reference[i] = new equation(Globals::Transitions[i]);
         for (anchor = &(reference[i]->sum); *anchor; anchor = &((*anchor)->next)) {
             ;
         }
-        *anchor = new summand(Transitions[i], 1);
+        *anchor = new summand(Globals::Transitions[i], 1);
         (*anchor)->next = NULL;
         reference[i]->next = esystem[reference[i]->sum->var->nr];
         esystem[reference[i]->sum->var->nr] = reference[i];
@@ -421,13 +423,13 @@ void progress_measure() {
     }
     // Matrix->obere Dreiecksform
 
-    for (i = 0; i < Places[0]->cnt; i++) {
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
         while (esystem[i] && esystem[i]->next) {
             esystem[i]->apply();
         }
     }
-    for (i = 0; i < Transitions[0]->cnt; i++) {
-        if (reference[i]->sum->var->nr < Places[0]->cnt) {
+    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+        if (reference[i]->sum->var->nr < Globals::Places[0]->cnt) {
             // among the linear independent transitions->progress value 1
             value[i] = 1;
             denominator[i] = 1;
@@ -435,7 +437,7 @@ void progress_measure() {
             // linear dependent
             value[i] = 0;
             for (s = reference[i]->sum; s; s = s->next) {
-                if (((Transition*) s->var) == Transitions[i]) {
+                if (((Transition*) s->var) == Globals::Transitions[i]) {
                     denominator[i] = s->value;
                 } else {
                     value[i] -= s->value;
@@ -456,7 +458,7 @@ void progress_measure() {
 
         }
     }
-    for (i = 0; i < Places[0]->cnt + Transitions[0]->cnt; i++) {
+    for (i = 0; i < Globals::Places[0]->cnt + Globals::Transitions[0]->cnt; i++) {
         if (esystem[i]) {
             while (esystem[i]->sum) {
                 s = esystem[i]->sum;
@@ -469,20 +471,20 @@ void progress_measure() {
     delete [] esystem;
     // multiply all values with gcd
     long int gcd = 1;
-    for (i = 0; i < Transitions[i]->cnt; i++) {
+    for (i = 0; i < Globals::Transitions[i]->cnt; i++) {
         g = ggt(gcd, denominator[i]);
         gcd = (gcd / g);
         gcd = gcd * denominator[i];     // computes lcm
     }
     int MinProgress, MaxProgress;
     ZeroProgress = 0;
-    if (Transitions[0]) {
+    if (Globals::Transitions[0]) {
         MinProgress = MaxProgress = value[0] * (gcd / denominator[0]);
     }
-    for (i = 0; i < Transitions[i]->cnt; i++) {
+    for (i = 0; i < Globals::Transitions[i]->cnt; i++) {
         long int p;
-        p = Transitions[i]->progress_value =  value[i] * (gcd / denominator[i]);
-        cout << Transitions[i]->name << " : " << Transitions[i]->progress_value << endl;
+        p = Globals::Transitions[i]->progress_value =  value[i] * (gcd / denominator[i]);
+        cout << Globals::Transitions[i]->name << " : " << Globals::Transitions[i]->progress_value << endl;
         if (!p) {
             ZeroProgress = 1;
         }

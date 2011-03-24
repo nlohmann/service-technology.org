@@ -22,6 +22,7 @@
 #include "symm.H"
 #include <climits>
 #include "graph.H"
+#include "Globals.h"
 #include <cstdlib>
 
 // for testing purposes only
@@ -114,7 +115,7 @@ class ToDo {
         // ihn am Listenanfang ein
 };
 
-ToDo* ToDoList[2];  // Eine für Platzconstraints, eine für Transitionsconstraints
+ToDo* ToDoList[2];  // Eine für Platzconstraints, eine für Globals::Transitionsconstraints
 
 ToDo::ToDo(NodeType TY, unsigned int co) {
     next = ToDoList[TY];
@@ -200,35 +201,35 @@ void init_syms() {
     ToDoList[PL] = ToDoList[TR] = NULL; // Zunaechst mal nix zu tun
 
     // wir starten mit den Constraints [P,P] und [T,T]
-    Specification[PL] = new Constraint [Places[0] -> cnt];
-    Specification[TR] = new Constraint[Transitions[0] -> cnt];
+    Specification[PL] = new Constraint [Globals::Places[0] -> cnt];
+    Specification[TR] = new Constraint[Globals::Transitions[0] -> cnt];
     Specification[PL][0].first = Specification[TR][0].first = Specification[PL][0].parent
                                                               = Specification[TR][0].parent = 0;
-    Specification[PL][0].last = Places[0]-> cnt - 1;
-    Specification[TR][0].last = Transitions[0]-> cnt - 1;
+    Specification[PL][0].last = Globals::Places[0]-> cnt - 1;
+    Specification[TR][0].last = Globals::Transitions[0]-> cnt - 1;
     CardSpecification[PL] = CardSpecification[TR] = 1;
 
     // Anlegen der Zaehlarrays
-    Reaktor[PL][DO] = new Reaktoreintrag [Places[0]->cnt];
-    Reaktor[PL][CO] = new Reaktoreintrag [Places[0]->cnt];
-    Reaktor[TR][DO] = new Reaktoreintrag [Transitions[0]->cnt];
-    Reaktor[TR][CO] = new Reaktoreintrag [Transitions[0]->cnt];
+    Reaktor[PL][DO] = new Reaktoreintrag [Globals::Places[0]->cnt];
+    Reaktor[PL][CO] = new Reaktoreintrag [Globals::Places[0]->cnt];
+    Reaktor[TR][DO] = new Reaktoreintrag [Globals::Transitions[0]->cnt];
+    Reaktor[TR][CO] = new Reaktoreintrag [Globals::Transitions[0]->cnt];
 
     // Alle Bogenlisten sortieren
-    for (unsigned i = 0; i < Places[0]->cnt; i++) {
-        if (Places[i]->NrOfLeaving) {
-            ArcSort(Places[i]->LeavingArcs, 0, Places[i]->NrOfLeaving - 1);
+    for (unsigned i = 0; i < Globals::Places[0]->cnt; i++) {
+        if (Globals::Places[i]->NrOfLeaving) {
+            ArcSort(Globals::Places[i]->LeavingArcs, 0, Globals::Places[i]->NrOfLeaving - 1);
         }
-        if (Places[i]->NrOfArriving) {
-            ArcSort(Places[i]->ArrivingArcs, 0, Places[i]->NrOfArriving - 1);
+        if (Globals::Places[i]->NrOfArriving) {
+            ArcSort(Globals::Places[i]->ArrivingArcs, 0, Globals::Places[i]->NrOfArriving - 1);
         }
     }
-    for (unsigned i = 0; i < Transitions[0]->cnt; i++) {
-        if (Transitions[i]->NrOfLeaving) {
-            ArcSort(Transitions[i]->LeavingArcs, 0, Transitions[i]->NrOfLeaving - 1);
+    for (unsigned i = 0; i < Globals::Transitions[0]->cnt; i++) {
+        if (Globals::Transitions[i]->NrOfLeaving) {
+            ArcSort(Globals::Transitions[i]->LeavingArcs, 0, Globals::Transitions[i]->NrOfLeaving - 1);
         }
-        if (Transitions[i]->NrOfArriving) {
-            ArcSort(Transitions[i]->ArrivingArcs, 0, Transitions[i]->NrOfArriving - 1);
+        if (Globals::Transitions[i]->NrOfArriving) {
+            ArcSort(Globals::Transitions[i]->ArrivingArcs, 0, Globals::Transitions[i]->NrOfArriving - 1);
         }
     }
     DeadBranches = CardGenerators = 0;
@@ -243,7 +244,7 @@ void init_syms() {
 // Diese Schritte passieren zu einem Zeitpunkt, wo klar ist, dass
 // fuer jeden Constraint [A,B] gilt: A=B. Daher wird noch nicht die
 // Datenstruktur Reaktor genutzt, die auf A!=B gemuenzt ist. Statt dessen
-// rechnen wir noch auf den Arrays Places unf Transitions selbst und
+// rechnen wir noch auf den Arrays Globals::Places unf Globals::Transitions selbst und
 // kopieren spaeter in den Reaktor (Funktion "FuelleReaktor").
 
 // Ist ein zu analysierender Platz p gegeben, soll [{p},{p}] ein
@@ -253,13 +254,13 @@ void init_syms() {
 // Platzarrays
 
 unsigned int get_target_place(Node* node) {
-    return ((Place*) node) == CheckPlace ? 1 : 0;
+    return ((Place*) node) == Globals::CheckPlace ? 1 : 0;
 }
 
 // Dito fuer den Fall, dass eine zu analysierende Transition gegeben ist
 
 unsigned int get_target_transition(Node* node) {
-    return ((Transition*) node) == CheckTransition ? 1 : 0;
+    return ((Transition*) node) == Globals::CheckTransition ? 1 : 0;
 }
 
 // Ist eine zu erreichende Zielmarkierung gegeben, soll jede Symm diese
@@ -315,23 +316,23 @@ void PlaceSort(unsigned int from, unsigned int to, unsigned int attribute(Node*)
     greater = to;
 
     while (current <= greater) {
-        if (attribute((Node*) Places[current]) < attribute((Node*) Places[current - 1])) {
-            swap = Places[current];
-            sw = CurrentMarking[current];
-            Places[current] = Places[less];
-            CurrentMarking[current++] = CurrentMarking[less];
-            Places[less] = swap;
-            CurrentMarking[less++] = sw;
+        if (attribute((Node*) Globals::Places[current]) < attribute((Node*) Globals::Places[current - 1])) {
+            swap = Globals::Places[current];
+            sw = Globals::CurrentMarking[current];
+            Globals::Places[current] = Globals::Places[less];
+            Globals::CurrentMarking[current++] = Globals::CurrentMarking[less];
+            Globals::Places[less] = swap;
+            Globals::CurrentMarking[less++] = sw;
         } else {
-            if (attribute((Node*) Places[current]) == attribute((Node*) Places[current - 1])) {
+            if (attribute((Node*) Globals::Places[current]) == attribute((Node*) Globals::Places[current - 1])) {
                 current++;
             } else {
-                swap = Places[current];
-                sw = CurrentMarking[current];
-                Places[current] = Places[greater];
-                CurrentMarking[current] = CurrentMarking[greater];
-                Places[greater] = swap;
-                CurrentMarking[greater--] = sw;
+                swap = Globals::Places[current];
+                sw = Globals::CurrentMarking[current];
+                Globals::Places[current] = Globals::Places[greater];
+                Globals::CurrentMarking[current] = Globals::CurrentMarking[greater];
+                Globals::Places[greater] = swap;
+                Globals::CurrentMarking[greater--] = sw;
             }
         }
     }
@@ -354,17 +355,17 @@ void TransitionSort(unsigned int from, unsigned int to, unsigned int attribute(N
     greater = to;
 
     while (current <= greater) {
-        if (attribute((Node*) Transitions[current]) < attribute((Node*) Transitions[current - 1])) {
-            swap = Transitions[current];
-            Transitions[current++] = Transitions[less];
-            Transitions[less++] = swap;
+        if (attribute((Node*) Globals::Transitions[current]) < attribute((Node*) Globals::Transitions[current - 1])) {
+            swap = Globals::Transitions[current];
+            Globals::Transitions[current++] = Globals::Transitions[less];
+            Globals::Transitions[less++] = swap;
         } else {
-            if (attribute((Node*) Transitions[current]) == attribute((Node*) Transitions[current - 1])) {
+            if (attribute((Node*) Globals::Transitions[current]) == attribute((Node*) Globals::Transitions[current - 1])) {
                 current++;
             } else {
-                swap = Transitions[current];
-                Transitions[current] = Transitions[greater];
-                Transitions[greater--] = swap;
+                swap = Globals::Transitions[current];
+                Globals::Transitions[current] = Globals::Transitions[greater];
+                Globals::Transitions[greater--] = swap;
             }
         }
     }
@@ -399,10 +400,10 @@ void SplitPlacesInVorReaktor(unsigned int c, unsigned int attribute(Node*)) {
     lastc = Specification[PL][c].last;
 
     // Solange noch verschiedene Werte im verbleibenden Constraint...
-    while (attribute((Node*) Places[firstc]) != attribute((Node*) Places[lastc])) {
+    while (attribute((Node*) Globals::Places[firstc]) != attribute((Node*) Globals::Places[lastc])) {
         // Suche erste Stelle, wo Nachbarknoten unterschiedliche Werte liefern
         // (dort wird Constraint geteilt)
-        for (i = firstc + 1; attribute((Node*) Places[firstc]) == attribute((Node*) Places[i]); i++) {
+        for (i = firstc + 1; attribute((Node*) Globals::Places[firstc]) == attribute((Node*) Globals::Places[i]); i++) {
             ;
         }
         newc = CardSpecification[PL]; // naechste freie Constraintnummer
@@ -436,8 +437,8 @@ void SplitTransitionsInVorReaktor(unsigned int c, unsigned int attribute(Node*))
     oldc = c;
     firstc = Specification[TR][c].first;
     lastc = Specification[TR][c].last;
-    while (attribute((Node*) Transitions[firstc]) != attribute((Node*) Transitions[lastc])) {
-        for (i = firstc + 1; attribute((Node*) Transitions[firstc]) == attribute((Node*) Transitions[i]); i++) {
+    while (attribute((Node*) Globals::Transitions[firstc]) != attribute((Node*) Globals::Transitions[lastc])) {
+        for (i = firstc + 1; attribute((Node*) Globals::Transitions[firstc]) == attribute((Node*) Globals::Transitions[i]); i++) {
             ;
         }
         newc = CardSpecification[TR];
@@ -476,46 +477,46 @@ void InitialConstraint() {
     }
     // Separierung nach Vielfachheiten der i-ten Kanten - nie falsch
     this_direction = DO;
-    bmax = Places[Places[0]->cnt - 1]->NrOfLeaving;
+    bmax = Globals::Places[Globals::Places[0]->cnt - 1]->NrOfLeaving;
     for (b = 0; b < bmax; b++) {
         this_arc_nr = b;
         cmax = CardSpecification[PL];
         for (c = 0; c < cmax; c++) {
-            if (Places[Specification[PL][c].first]->NrOfLeaving > b) {
+            if (Globals::Places[Specification[PL][c].first]->NrOfLeaving > b) {
                 SplitPlacesInVorReaktor(c, get_arc_mult);
             }
         }
     }
     this_direction = CO;
-    bmax = Places[Places[0]->cnt - 1]->NrOfArriving;
+    bmax = Globals::Places[Globals::Places[0]->cnt - 1]->NrOfArriving;
     for (b = 0; b < bmax; b++) {
         this_arc_nr = b;
         cmax = CardSpecification[PL];
         for (c = 0; c < cmax; c++) {
-            if (Places[Specification[PL][c].first]->NrOfArriving > b) {
+            if (Globals::Places[Specification[PL][c].first]->NrOfArriving > b) {
                 SplitPlacesInVorReaktor(c, get_arc_mult);
             }
         }
     }
 
     this_direction = DO;
-    bmax = Transitions[Transitions[0]->cnt - 1]->NrOfLeaving;
+    bmax = Globals::Transitions[Globals::Transitions[0]->cnt - 1]->NrOfLeaving;
     for (b = 0; b < bmax; b++) {
         this_arc_nr = b;
         cmax = CardSpecification[TR];
         for (c = 0; c < cmax; c++) {
-            if (Transitions[Specification[TR][c].first]->NrOfLeaving > b) {
+            if (Globals::Transitions[Specification[TR][c].first]->NrOfLeaving > b) {
                 SplitTransitionsInVorReaktor(c, get_arc_mult);
             }
         }
     }
     this_direction = CO;
-    bmax = Transitions[Transitions[0]->cnt - 1]->NrOfArriving;
+    bmax = Globals::Transitions[Globals::Transitions[0]->cnt - 1]->NrOfArriving;
     for (b = 0; b < bmax; b++) {
         this_arc_nr = b;
         cmax = CardSpecification[TR];
         for (c = 0; c < cmax; c++) {
-            if (Transitions[Specification[TR][c].first]->NrOfArriving > b) {
+            if (Globals::Transitions[Specification[TR][c].first]->NrOfArriving > b) {
                 SplitTransitionsInVorReaktor(c, get_arc_mult);
             }
         }
@@ -546,9 +547,9 @@ void InitialConstraint() {
     // equivalence. Doing it here seems to be a good approximation.
     for (c = 0; c < CardSpecification[TR]; c++) {
         for (unsigned int i = Specification[TR][c].first; i <= Specification[TR][c].last; i++) {
-            if (Transitions[i]->cyclic) {
+            if (Globals::Transitions[i]->cyclic) {
                 for (b = Specification[TR][c].first; b <= Specification[TR][c].last; b++) {
-                    Transitions[b] -> cyclic = true;
+                    Globals::Transitions[b] -> cyclic = true;
                 }
                 break;
             }
@@ -563,21 +564,21 @@ void InitialConstraint() {
 void FuelleReaktor() {
     unsigned int i, c;
 
-    for (i = 0; i < Places[0]->cnt; i++) {
-        Places[i]->pos[DO] = Places[i]->pos[CO] = i;
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        Globals::Places[i]->pos[DO] = Globals::Places[i]->pos[CO] = i;
     }
-    for (i = 0; i < Transitions[i]->cnt; i++) {
-        Transitions[i]-> pos[DO] = Transitions[i]->pos[CO] = i;
+    for (i = 0; i < Globals::Transitions[i]->cnt; i++) {
+        Globals::Transitions[i]-> pos[DO] = Globals::Transitions[i]->pos[CO] = i;
     }
     for (c = 0; c < CardSpecification[PL]; c++) {
         for (i = Specification[PL][c].first; i <= Specification[PL][c].last; i++) {
-            Reaktor[PL][DO][i].node = Reaktor[PL][CO][i].node = Places[i];
+            Reaktor[PL][DO][i].node = Reaktor[PL][CO][i].node = Globals::Places[i];
         }
         Specification[PL][c].changed = new ToDo(PL, c);
     }
     for (c = 0; c < CardSpecification[TR]; c++) {
         for (i = Specification[TR][c].first; i <= Specification[TR][c].last; i++) {
-            Reaktor[TR][DO][i].node = Reaktor[TR][CO][i].node = Transitions[i];
+            Reaktor[TR][DO][i].node = Reaktor[TR][CO][i].node = Globals::Transitions[i];
         }
         Specification[TR][c].changed = new ToDo(TR, c);
     }
@@ -642,7 +643,7 @@ void NewStamp() {
     if (Stamp == UINT_MAX) {
         for (NodeType n = 0; n < 2; n++)
             for (DomType d = 0; d < 2; d++)
-                for (unsigned int i = 0; i < (n ? Transitions[0]->cnt : Places[0]->cnt); i++) {
+                for (unsigned int i = 0; i < (n ? Globals::Transitions[0]->cnt : Globals::Places[0]->cnt); i++) {
                     Reaktor[n][d][i].stamp = 0;
                 }
         Stamp = 1;
@@ -731,12 +732,12 @@ void ImageSort(Node** vector, unsigned int from, unsigned int to) {
     greater = to;
 
     while (current <= greater) {
-        if (CurrentMarking[((Place*) vector[current])->index] < CurrentMarking[((Place*) vector[current - 1])->index]) {
+        if (Globals::CurrentMarking[((Place*) vector[current])->index] < Globals::CurrentMarking[((Place*) vector[current - 1])->index]) {
             swap = vector[current];
             vector[current++] = vector[less];
             vector[less++] = swap;
         } else {
-            if (CurrentMarking[((Place*) vector[current])->index] == CurrentMarking[((Place*) vector[current - 1])->index]) {
+            if (Globals::CurrentMarking[((Place*) vector[current])->index] == Globals::CurrentMarking[((Place*) vector[current - 1])->index]) {
                 current++;
             } else {
                 swap = vector[greater];
@@ -811,7 +812,7 @@ void PrintSpec(char* mess) {
 
     cout << "***** " << mess << " *****" << endl;
     for (n = 0; n < 2; n++) {
-        cout << (n ? "Transitions\n" : "Places\n");
+        cout << (n ? "Globals::Transitions\n" : "Globals::Places\n");
         for (c = 0; c < CardSpecification[n]; c++) {
             cout << c << "(" << Specification[n][c].first << "-" << Specification[n][c].last << ": {";
             for (i = Specification[n][c].first; i <= Specification[n][c].last; i++) {
@@ -992,9 +993,9 @@ void MinimizeCarrier(unsigned int pos) {
     unsigned int level(Store[CurrentStore].argnr); // offset for permutation vector
     unsigned int ocyclen(1); // length of the orbit cycle (containing the orbit number)
     unsigned int* ovec(Store[CurrentStore].image[pos].vector); // permutation vector
-    bool* visited = new bool[Places[0]->cnt - level + 1]; // to mark visited cycles
-    unsigned int* cycle = new unsigned int[Places[0]->cnt - level + 1]; // temporary memory for a cycle
-    for (unsigned int j = 0; j < Places[0]->cnt - level; ++j) {
+    bool* visited = new bool[Globals::Places[0]->cnt - level + 1]; // to mark visited cycles
+    unsigned int* cycle = new unsigned int[Globals::Places[0]->cnt - level + 1]; // temporary memory for a cycle
+    for (unsigned int j = 0; j < Globals::Places[0]->cnt - level; ++j) {
         visited[j] = false;
     }
     unsigned int i(orbit);
@@ -1005,7 +1006,7 @@ void MinimizeCarrier(unsigned int pos) {
         visited[i - level] = true;
     } // calculate the orbit cycle length
 
-    for (unsigned int element = 0; element < Places[0]->cnt - level; ++element) { // go through the possible elements of non-trivial cycles
+    for (unsigned int element = 0; element < Globals::Places[0]->cnt - level; ++element) { // go through the possible elements of non-trivial cycles
         if (visited[element]) {
             continue;    // don't do this element again
         }
@@ -1043,7 +1044,7 @@ void StoreSymmetry(unsigned int pos) {
     // offset: Wir speichern nur den Teil der Symm, von dem nicht klar ist dass
     // dass er per Konstruktion sowieso id sein muss
     offset = Store[CurrentStore].arg->nr;
-    v = Store[CurrentStore].image[pos].vector = new unsigned int [Places[0]->cnt - offset];
+    v = Store[CurrentStore].image[pos].vector = new unsigned int [Globals::Places[0]->cnt - offset];
 #if defined(SYMMPROD)
     for (c = 0; c < CardSpecification[PL]; ++c) {
         if (Reaktor[PL][DO][Specification[PL][c].first].node->nr >= offset) {
@@ -1052,7 +1053,7 @@ void StoreSymmetry(unsigned int pos) {
         }
     }
     MinimizeCarrier(pos);
-    for (c = 0; c < Places[0]->cnt - offset; ++c) {
+    for (c = 0; c < Globals::Places[0]->cnt - offset; ++c) {
         UnifyClasses(c + offset, v[c]);
     }
 #else
@@ -1070,7 +1071,7 @@ void StoreSymmetry(unsigned int pos) {
 
 // Alle Syms in Zyklenschreibweise ausgeben
 void WriteSymms() {
-    if (Yflg) {
+    if (Globals::Yflg) {
         unsigned int etage, raum, x, y;
         // aufsteigende Etagen = aufsteigend erzwungene id (Struktur des
         // Erzeugendensystems)
@@ -1078,7 +1079,7 @@ void WriteSymms() {
             // Raum: Ein Generator der aktuellen Etage
             for (raum = 0; raum < Store[etage].card; raum++) {
                 cout << "GENERATOR # " << etage + 1 << "." << raum + 1 << "\n";
-                for (x = Store[etage].argnr; x < Places[0]->cnt; x++) {
+                for (x = Store[etage].argnr; x < Globals::Places[0]->cnt; x++) {
                     // write cycle of x iff x is smallest el. of its cycle
 
                     // 1. find out whether x is smallest cycle member
@@ -1088,9 +1089,9 @@ void WriteSymms() {
                     if ((y == x) && (Store[etage].image[raum].vector[x - Store[etage].argnr] != x)) {
                         // print cycle of x
                         cout << "(";
-                        cout << Places[x] -> name;
+                        cout << Globals::Places[x] -> name;
                         for (y = Store[etage].image[raum].vector[x - Store[etage].argnr]; y > x ; y = Store[etage].image[raum].vector[y - Store[etage].argnr]) {
-                            cout << " " << Places[y] -> name;
+                            cout << " " << Globals::Places[y] -> name;
                         }
                         cout << ")\n";
                     }
@@ -1099,10 +1100,10 @@ void WriteSymms() {
             }
         }
     }
-    if (yflg) {
-        ofstream symmstream(symmfile);
+    if (Globals::yflg) {
+        ofstream symmstream(Globals::symmfile);
         if (!symmstream) {
-            cerr << "Cannot open symmetry output file: " << symmfile
+            cerr << "Cannot open symmetry output file: " << Globals::symmfile
                  << "\nno output written";
             return;
         }
@@ -1110,7 +1111,7 @@ void WriteSymms() {
         for (etage = 0; etage < CardStore; etage++) {
             for (raum = 0; raum < Store[etage].card; raum++) {
                 symmstream << "GENERATOR # " << etage + 1 << "." << raum + 1 << "\n";
-                for (x = Store[etage].argnr; x < Places[0]->cnt; x++) {
+                for (x = Store[etage].argnr; x < Globals::Places[0]->cnt; x++) {
                     // write cycle of x iff x is smallest el. of its cycle
 
                     // 1. find out whether x is smallest cycle member
@@ -1120,9 +1121,9 @@ void WriteSymms() {
                     if ((y == x) && (Store[etage].image[raum].vector[x - Store[etage].argnr] != x)) {
                         // print cycle of x
                         symmstream << "(";
-                        symmstream << Places[x] -> name;
+                        symmstream << Globals::Places[x] -> name;
                         for (y = Store[etage].image[raum].vector[x - Store[etage].argnr]; y > x ; y = Store[etage].image[raum].vector[y - Store[etage].argnr]) {
-                            symmstream << " " << Places[y] -> name;
+                            symmstream << " " << Globals::Places[y] -> name;
                         }
                         symmstream << ")\n";
                     }
@@ -1187,7 +1188,7 @@ void DefineToOther(unsigned int imagepos) {
     // probiere alle y aus B (erstes ist schon geladen)
     for (j = 0; possibleImages[j]; j++) {
         if (RefineUntilNothingChanges(PL)) {
-            if (CardSpecification[PL] == Places[0]->cnt) {
+            if (CardSpecification[PL] == Globals::Places[0]->cnt) {
                 StoreSymmetry(imagepos);
                 break;
             } else {
@@ -1257,7 +1258,7 @@ void OnlineDefineToOther() {
     MyCardSpecification[TR] = CardSpecification[TR];
     for (j = 0; possibleImages[j]; j++) {
         if (RefineUntilNothingChanges(PL)) {
-            if (CardSpecification[PL] == Places[0]->cnt) {
+            if (CardSpecification[PL] == Globals::Places[0]->cnt) {
                 found = true;
                 break;
             } else {
@@ -1322,7 +1323,7 @@ void OnlineCanonize() {
     }
     possibleImages[i - Specification[PL][cntriv].first] = NULL;
     ImageSort(possibleImages, 0, Specification[PL][cntriv].last - Specification[PL][cntriv].first);
-    maxmarking = CurrentMarking[((Place*) possibleImages[Specification[PL][cntriv].last - Specification[PL][cntriv].first])->index];
+    maxmarking = Globals::CurrentMarking[((Place*) possibleImages[Specification[PL][cntriv].last - Specification[PL][cntriv].first])->index];
     Reaktor[PL][DO][SourceIndex].node -> pos[DO] = Specification[PL][cntriv].first;
     Reaktor[PL][DO][Specification[PL][cntriv].first].node -> pos[DO] = SourceIndex;
     swap = Reaktor[PL][DO][SourceIndex];
@@ -1352,26 +1353,26 @@ void OnlineCanonize() {
     MyCardSpecification[PL] = CardSpecification[PL];
     MyCardSpecification[TR] = CardSpecification[TR];
     for (j = 0; possibleImages[j]; j++) {
-        checkmarking = CurrentMarking[((Place*) possibleImages[j])->index];
+        checkmarking = Globals::CurrentMarking[((Place*) possibleImages[j])->index];
         if (checkmarking > maxmarking) {
             break;
         }
         NewStamp();
         if (RefineUntilNothingChanges(PL)) {
-            if (CardSpecification[PL] == Places[0]->cnt) {
+            if (CardSpecification[PL] == Globals::Places[0]->cnt) {
                 Attempt++;
                 found = true;
                 maxmarking = checkmarking;
-                for (i = 0; i < Places[0]->cnt; i++) {
+                for (i = 0; i < Globals::Places[0]->cnt; i++) {
                     kanrep1[Reaktor[PL][DO][i].node -> nr] =
-                        CurrentMarking[((Place*) Reaktor[PL][CO][i].node)->index];
+                        Globals::CurrentMarking[((Place*) Reaktor[PL][CO][i].node)->index];
                 }
-                for (i = 0; i < Places[0]->cnt; i++) {
+                for (i = 0; i < Globals::Places[0]->cnt; i++) {
                     if (kanrep[i] != kanrep1[i]) {
                         break;
                     }
                 }
-                if (i < Places[0]->cnt && kanrep1[i] < kanrep[i]) {
+                if (i < Globals::Places[0]->cnt && kanrep1[i] < kanrep[i]) {
                     swaprep = kanrep;
                     kanrep = kanrep1;
                     kanrep1 = swaprep;
@@ -1480,8 +1481,8 @@ void BuildProducts(unsigned int orbit, bool* inconsistent) {
                     continue;    // if a representative already exists for this orbit do nothing
                 }
                 bplist[++bplength] = bpnext; // a new orbit is found, we have to build products for it later
-                bpnxvc = Store[StorePos].image[bpnext].vector = new unsigned int[Places[0]->cnt - level + 1];
-                for (k = 0 ; k < Places[0]->cnt - level; ++k) { // now build the product vector bpcomp[compose[]] as new representative
+                bpnxvc = Store[StorePos].image[bpnext].vector = new unsigned int[Globals::Places[0]->cnt - level + 1];
+                for (k = 0 ; k < Globals::Places[0]->cnt - level; ++k) { // now build the product vector bpcomp[compose[]] as new representative
                     bpnxvc[k] = (compose[k] < bplevel ? compose[k] : bpcomp[compose[k] - bplevel]);
                 }
                 MinimizeCarrier(bpnext); // remove cycles if possible (by building powers)
@@ -1508,14 +1509,14 @@ void BuildProducts(unsigned int orbit) {
             for (composed = 0; Store[StorePos].image[composed].value->nr != val; ++composed) {
                 ;
             }
-            for (k = 0; k < Places[0]->cnt - Store[StorePos].argnr; k++) {
+            for (k = 0; k < Globals::Places[0]->cnt - Store[StorePos].argnr; k++) {
                 reservecompose[k] = Store[StorePos].image[orbit].vector[compose[k] - Store[StorePos].argnr];
             }
             if ((Store[StorePos].image[composed].vector)) {
                 compose = reservecompose;
             } else {
-                Store[StorePos].image[composed].vector = new unsigned int [Places[0]->cnt - Store[StorePos].argnr + 1];
-                for (k = 0; k < Places[0]->cnt - Store[StorePos].argnr; k++) {
+                Store[StorePos].image[composed].vector = new unsigned int [Globals::Places[0]->cnt - Store[StorePos].argnr + 1];
+                for (k = 0; k < Globals::Places[0]->cnt - Store[StorePos].argnr; k++) {
                     Store[StorePos].image[composed].vector[k] = reservecompose[k];
                 }
                 compose = Store[StorePos].image[composed].vector;
@@ -1604,7 +1605,7 @@ void DefineToId(void) {
     if (!RefineUntilNothingChanges(PL)) {
         cout << " magic error\n";
     }
-    if (CardSpecification[PL] != Places[0]->cnt) {
+    if (CardSpecification[PL] != Globals::Places[0]->cnt) {
         DefineToId();
     }
     ReUnify(MyCardSpecification[PL], MyCardSpecification[TR]);
@@ -1631,7 +1632,7 @@ void DefineToId(void) {
             Specification[PL][cntriv].changed = new ToDo(PL, cntriv);
             Specification[PL][MyCardSpecification[PL] - 1].changed = new ToDo(PL, MyCardSpecification[PL] - 1);
             if (RefineUntilNothingChanges(PL)) { // no inconsistency so far
-                if (CardSpecification[PL] == Places[0]->cnt) { // found a representative = full permutation
+                if (CardSpecification[PL] == Globals::Places[0]->cnt) { // found a representative = full permutation
                     StoreSymmetry(j); // so store it away
                 } else {
                     DefineToOther(j); // try to complete the current abstract permutation to a full one
@@ -1668,7 +1669,7 @@ void ComputeSymmetries(void) {
 
     cout << "\n computing symmetries...\n";
     init_syms();
-    reservecompose = new unsigned int [Places[0]->cnt];
+    reservecompose = new unsigned int [Globals::Places[0]->cnt];
     Stamp = 1;
     InitialConstraint();
     FuelleReaktor();
@@ -1677,25 +1678,25 @@ void ComputeSymmetries(void) {
     if (!RefineUntilNothingChanges(PL)) {
         cout << " Was komisches ist passiert";
     }
-    for (i = 0; i < Places[0]->cnt; i++) {
-        Places[i] = (Place*) Reaktor[PL][DO][i].node;
-        Places[i]-> nr = Places[i] -> index = i;
-        CurrentMarking[i] = Places[i]->initial_marking;
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        Globals::Places[i] = (Place*) Reaktor[PL][DO][i].node;
+        Globals::Places[i]-> nr = Globals::Places[i] -> index = i;
+        Globals::CurrentMarking[i] = Globals::Places[i]->initial_marking;
 
     }
     // Lege Aeq-Klassen an
-    part = new Partition [Places[0]-> cnt];
-    for (i = 0; i < Places[0]->cnt; i++) {
+    part = new Partition [Globals::Places[0]-> cnt];
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
         part[i].nextorcard = 1;
         part[i].top = true;
     }
     // Lege Speicher fuer Generatoren an
-    Store = new SymmStore [Places[0]->cnt];
+    Store = new SymmStore [Globals::Places[0]->cnt];
     CardStore = 0;
     plp = CardSpecification[PL];
     trp = CardSpecification[TR];
     // Starte Suche nach Generatoren
-    if (CardSpecification[PL] != Places[0]->cnt) {
+    if (CardSpecification[PL] != Globals::Places[0]->cnt) {
         DefineToId();
     }
     ReUnify(plp, trp);
@@ -1719,7 +1720,7 @@ void ComputeSymmetries(void) {
     }
     for (i = 0; i < CardStore;) {
         if (Store[i].card) {
-            Store[i].reference = new unsigned int[Places[0]->cnt - Store[i].argnr + 1];
+            Store[i].reference = new unsigned int[Globals::Places[0]->cnt - Store[i].argnr + 1];
             i++;
         } else {
             for (j = i + 1; j < CardStore; j++) {
@@ -1735,12 +1736,12 @@ void ComputeSymmetries(void) {
     // Reaktoren auf Markierungsabb.suche vorbereiten, indem Aeq.klassen
     // zu Constraints werden. Countsort wird misbraucht.
     NewStamp();
-    for (i = 0; i < Places[0]->cnt; i++) {
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
         for (j = i; !part[j].top; j = part[j].nextorcard) {
             ;
         }
-        Reaktor[PL][DO][Places[i]->pos[DO]].stamp = Reaktor[PL][CO][Places[i]->pos[CO]].stamp = Stamp;
-        Reaktor[PL][DO][Places[i]->pos[DO]].count = Reaktor[PL][CO][Places[i]->pos[CO]].count = j;
+        Reaktor[PL][DO][Globals::Places[i]->pos[DO]].stamp = Reaktor[PL][CO][Globals::Places[i]->pos[CO]].stamp = Stamp;
+        Reaktor[PL][DO][Globals::Places[i]->pos[DO]].count = Reaktor[PL][CO][Globals::Places[i]->pos[CO]].count = j;
     }
     j = CardSpecification[PL];
     for (i = 0; i < j; i++) {
@@ -1755,21 +1756,21 @@ void ComputeSymmetries(void) {
     // Hashfaktoren eintragen: aeq. Plaetze bekommen gleichen Hashwert,
     // damit nur in einem Bucker gesucht werden muss
 #if SYMMINTEGRATION < 3
-    for (i = 0; i < Places[i]->cnt; i++) {
+    for (i = 0; i < Globals::Places[i]->cnt; i++) {
         if (part[i].top) {
             part[i].nextorcard = rand();
         }
     }
-    for (i = 0; i < Places[0]->cnt; i++) {
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
         for (j = i; !part[j].top; j = part[j].nextorcard) {
             ;
         }
-        Places[i]->set_hash(part[j].nextorcard);
+        Globals::Places[i]->set_hash(part[j].nextorcard);
     }
-    CurrentSymm = new unsigned int [Places[0]->cnt];
+    CurrentSymm = new unsigned int [Globals::Places[0]->cnt];
 #else
-    kanrep = new unsigned int [Places[0]->cnt];
-    kanrep1 = new unsigned int [Places[0]->cnt];
+    kanrep = new unsigned int [Globals::Places[0]->cnt];
+    kanrep1 = new unsigned int [Globals::Places[0]->cnt];
 #endif
     WriteSymms();
 }
@@ -1789,14 +1790,14 @@ void ComputePartition(void) {
     if (!RefineUntilNothingChanges(PL)) {
         cout << " Was komisches ist passiert";
     }
-    for (i = 0; i < Places[0]->cnt; i++) {
-        Places[i] = (Place*) Reaktor[PL][DO][i].node;
-        Places[i]-> nr = Places[i] -> index = i;
-        CurrentMarking[i] = Places[i]->initial_marking;
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        Globals::Places[i] = (Place*) Reaktor[PL][DO][i].node;
+        Globals::Places[i]-> nr = Globals::Places[i] -> index = i;
+        Globals::CurrentMarking[i] = Globals::Places[i]->initial_marking;
     }
     // partition places
-    part = new Partition [Places[0]-> cnt];
-    for (i = 0; i < Places[0]->cnt; i++) {
+    part = new Partition [Globals::Places[0]-> cnt];
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
         part[i].nextorcard = 1;
         part[i].top = true;
     }
@@ -1811,12 +1812,12 @@ void ComputePartition(void) {
     // Reaktoren auf Markierungsabb.suche vorbereiten, indem Aeq.klassen
     // zu Constraints werden. Countsort wird misbraucht.
     NewStamp();
-    for (i = 0; i < Places[0]->cnt; i++) {
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
         for (j = i; !part[j].top; j = part[j].nextorcard) {
             ;
         }
-        Reaktor[PL][DO][Places[i]->pos[DO]].stamp = Reaktor[PL][CO][Places[i]->pos[CO]].stamp = Stamp;
-        Reaktor[PL][DO][Places[i]->pos[DO]].count = Reaktor[PL][CO][Places[i]->pos[CO]].count = j;
+        Reaktor[PL][DO][Globals::Places[i]->pos[DO]].stamp = Reaktor[PL][CO][Globals::Places[i]->pos[CO]].stamp = Stamp;
+        Reaktor[PL][DO][Globals::Places[i]->pos[DO]].count = Reaktor[PL][CO][Globals::Places[i]->pos[CO]].count = j;
     }
     j = CardSpecification[PL];
     for (i = 0; i < j; i++) {
@@ -1829,20 +1830,20 @@ void ComputePartition(void) {
     }
 #if SYMMINTERGATION < 3
     // Hashfaktoren eintragen
-    for (i = 0; i < Places[i]->cnt; i++) {
+    for (i = 0; i < Globals::Places[i]->cnt; i++) {
         if (part[i].top) {
             part[i].nextorcard = rand();
         }
     }
-    for (i = 0; i < Places[0]->cnt; i++) {
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
         for (j = i; !part[j].top; j = part[j].nextorcard) {
             ;
         }
-        Places[i]->set_hash(part[j].nextorcard);
+        Globals::Places[i]->set_hash(part[j].nextorcard);
     }
 #else
-    kanrep = new unsigned int [Places[0]->cnt];
-    kanrep1 = new unsigned int [Places[0]->cnt];
+    kanrep = new unsigned int [Globals::Places[0]->cnt];
+    kanrep1 = new unsigned int [Globals::Places[0]->cnt];
 #endif
 }
 
@@ -1854,11 +1855,11 @@ void FirstSymm()
 
     for (i = 0; i < CardStore; i++) {
         Store[i].current = Store[i].card;
-        for (j = Store[i].argnr; j < Places[i]->cnt; j++) {
+        for (j = Store[i].argnr; j < Globals::Places[i]->cnt; j++) {
             Store[i].reference[j - Store[i].argnr] = j;
         }
     }
-    for (i = 0; i < Places[0]->cnt; i++) {
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
         CurrentSymm[i] = i;
     }
 }
@@ -1876,7 +1877,7 @@ unsigned int NextSymm(unsigned int scg) {
     // search the largest argument less or equal to scg
 
     if (Store[0].argnr > scg) {
-        return Places[0]->cnt + 27;
+        return Globals::Places[0]->cnt + 27;
     }
     l = 0;
     if ((Store[r = CardStore - 1].argnr) <= scg) {
@@ -1910,17 +1911,17 @@ unsigned int NextSymm(unsigned int scg) {
     }
     while (!(Store[m].current)) {
         if (m == 0) {
-            return Places[0]->cnt + 27;
+            return Globals::Places[0]->cnt + 27;
         }
         Store[m].current = Store[m--].card;
     };
     sigma = Store + m;
     sigma ->current--;
-    for (unsigned int i = sigma->argnr; i < Places[0]->cnt; i++) {
+    for (unsigned int i = sigma->argnr; i < Globals::Places[0]->cnt; i++) {
         CurrentSymm[i] = sigma->reference[sigma->image[sigma->current].vector[i - sigma->argnr] - sigma->argnr];
     }
     for (unsigned int i = m + 1; i < CardStore; i++) {
-        for (unsigned int j = Store[i].argnr; j < Places[0]->cnt; j++) {
+        for (unsigned int j = Store[i].argnr; j < Globals::Places[0]->cnt; j++) {
             Store[i].reference[j - Store[i].argnr] = CurrentSymm[j];
         }
     }
@@ -1931,7 +1932,7 @@ void AllSyms() {
     unsigned int i;
     FirstSymm();
     i = 1;
-    while (NextSymm(Places[0]->cnt) <= Places[0]->cnt) {
+    while (NextSymm(Globals::Places[0]->cnt) <= Globals::Places[0]->cnt) {
         i++;
     }
     cout << i << "\n";
@@ -1940,16 +1941,16 @@ void AllSyms() {
 
 void check() {
     unsigned int i, j, k;
-    for (i = 0; i < Places[0]->cnt; i++) {
-        if (Places[i] != Reaktor[PL][DO][Places[i]->pos[DO]].node) {
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        if (Globals::Places[i] != Reaktor[PL][DO][Globals::Places[i]->pos[DO]].node) {
             cout << "aua\n";
         }
-        if (Places[i] != Reaktor[PL][CO][Places[i]->pos[CO]].node) {
+        if (Globals::Places[i] != Reaktor[PL][CO][Globals::Places[i]->pos[CO]].node) {
             cout << "weia\n";
         }
     }
 
-    for (i = 0; i < Places[0]->cnt; i++) {
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
         if (!Reaktor[PL][DO][i].node) {
             cout << "aah\n";
         }
@@ -1957,16 +1958,16 @@ void check() {
             cout << "uuh\n";
         }
     }
-    for (i = 0; i < Transitions[0]->cnt; i++) {
-        if (Transitions[i] != Reaktor[TR][DO][Transitions[i]->pos[DO]].node) {
+    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+        if (Globals::Transitions[i] != Reaktor[TR][DO][Globals::Transitions[i]->pos[DO]].node) {
             cout << "aua\n";
         }
-        if (Transitions[i] != Reaktor[TR][CO][Transitions[i]->pos[CO]].node) {
+        if (Globals::Transitions[i] != Reaktor[TR][CO][Globals::Transitions[i]->pos[CO]].node) {
             cout << "weia\n";
         }
     }
 
-    for (i = 0; i < Transitions[0]->cnt; i++) {
+    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
         if (!Reaktor[TR][DO][i].node) {
             cout << "aah\n";
         }
@@ -1974,10 +1975,10 @@ void check() {
             cout << "uuh\n";
         }
     }
-    if (CardSpecification[PL] > Places[0]->cnt) {
+    if (CardSpecification[PL] > Globals::Places[0]->cnt) {
         cout << "sclimm\n";
     }
-    if (CardSpecification[TR] > Transitions[0]->cnt) {
+    if (CardSpecification[TR] > Globals::Transitions[0]->cnt) {
         cout << "auch sclimm\n";
     }
     for (i = 0; i < CardSpecification[PL]; i++) {
@@ -1990,7 +1991,7 @@ void check() {
             cout << "auch boese\n";
         }
     }
-    for (i = 0; i < Places[0]->cnt; i++) {
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
         k = 0;
         for (j = 0; j < CardSpecification[PL]; j++) {
             if ((Specification[PL][j].first <= i)  && (i <= Specification[PL][j].last)) {
@@ -2001,7 +2002,7 @@ void check() {
             cout << "unfassbar\n";
         }
     }
-    for (i = 0; i < Transitions[0]->cnt; i++) {
+    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
         k = 0;
         for (j = 0; j < CardSpecification[TR]; j++) {
             if ((Specification[TR][j].first <= i)  && (i <= Specification[TR][j].last)) {
@@ -2034,11 +2035,11 @@ State* symm_search2(Decision* d) {
             // try to calculate a symmetry from current to this state
             NewStamp();
             v = d -> vector[i];
-            for (k = Places[0]->cnt - 1;; k--) {
-                Reaktor[PL][DO][k].count = CurrentMarking[((Place*) Reaktor[PL][DO][k].node)->index];
+            for (k = Globals::Places[0]->cnt - 1;; k--) {
+                Reaktor[PL][DO][k].count = Globals::CurrentMarking[((Place*) Reaktor[PL][DO][k].node)->index];
                 Reaktor[PL][DO][k].stamp = Reaktor[PL][CO][k].stamp = Stamp;
-                Reaktor[PL][CO][Places[k]->pos[CO]].count = (*v)[v->length + k - Places[0]->cnt];
-                if (v->length + k == Places[0]->cnt) {
+                Reaktor[PL][CO][Globals::Places[k]->pos[CO]].count = (*v)[v->length + k - Globals::Places[0]->cnt];
+                if (v->length + k == Globals::Places[0]->cnt) {
                     v = v -> prev;
                 }
                 if (k == 0) {
@@ -2070,7 +2071,7 @@ State* symm_search2(Decision* d) {
                     continue;
                 }
             }
-            if (CardSpecification[PL] == Places[0]->cnt) {
+            if (CardSpecification[PL] == Globals::Places[0]->cnt) {
                 ReUnify(MyCardSpecification[PL], MyCardSpecification[TR]);
 #if defined(TARJAN) || defined(COVER) || defined(MODELCHECKING)
                 return d -> vector[i]->state;
@@ -2110,10 +2111,10 @@ State* symm_search_marking2() {
     lv = LastVector;
     li = Scapegoat;
     lc = LastChoice;
-    if (HashTable[Places[0]->hash_value]) {
+    if (HashTable[Globals::Places[0]->hash_value]) {
         NewStamp();
-        for (unsigned int i = 0; i < Places[0]->cnt; i++) {
-            Reaktor[PL][DO][i].count = CurrentMarking[((Place*) Reaktor[PL][DO][i].node)->index];
+        for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
+            Reaktor[PL][DO][i].count = Globals::CurrentMarking[((Place*) Reaktor[PL][DO][i].node)->index];
             Reaktor[PL][DO][i].stamp = Stamp;
         }
         for (unsigned int i = 0; i < CardSpecification[PL]; i++) {
@@ -2123,7 +2124,7 @@ State* symm_search_marking2() {
         LastVector = lv;
         Scapegoat = li;
         LastChoice = lc;
-        return symm_search2(HashTable[Places[0]->hash_value]);
+        return symm_search2(HashTable[Globals::Places[0]->hash_value]);
     }
     LastDecision = ld;
     LastVector = lv;
@@ -2160,11 +2161,11 @@ State* bin_symm_search2(binDecision* d) {
 #endif
 
     // try to calculate a symmetry from current to this state
-    p = Places[0] -> cnt - 1;
+    p = Globals::Places[0] -> cnt - 1;
     v = d -> vector;
     t = (BitVectorSize - (d -> bitnr + 1)) / 8;
     s = (BitVectorSize - (d -> bitnr + 1)) % 8;
-    pb = Places[p] -> nrbits;
+    pb = Globals::Places[p] -> nrbits;
     byte = v[t] >> (8 - s);
     pm = 0;
 
@@ -2175,7 +2176,7 @@ State* bin_symm_search2(binDecision* d) {
             // place has more bits left than remaining in current byte
             if (s) {
                 // at least, there _are_ bits left in current byte
-                pm += byte << (Places[p]->nrbits - pb);
+                pm += byte << (Globals::Places[p]->nrbits - pb);
                 pb -= s;
                 s = 0;
             } else {
@@ -2203,18 +2204,18 @@ State* bin_symm_search2(binDecision* d) {
             }
         } else {
             // all bits left for this place are in current byte
-            pm += (byte % (1 << pb)) << (Places[p]->nrbits - pb);
+            pm += (byte % (1 << pb)) << (Globals::Places[p]->nrbits - pb);
             byte = byte >> pb;
             s -= pb;
 
-            Reaktor[PL][DO][Places[p]->pos[DO]].count = MARKINGVECTOR[p];
+            Reaktor[PL][DO][Globals::Places[p]->pos[DO]].count = MARKINGVECTOR[p];
             Reaktor[PL][DO][p].stamp =  Reaktor[PL][CO][p].stamp = Stamp;
-            Reaktor[PL][CO][Places[p]->pos[CO]].count = pm;
+            Reaktor[PL][CO][Globals::Places[p]->pos[CO]].count = pm;
             if (p == 0) {
                 break;
             }
             p--;
-            pb = Places[p]->nrbits;
+            pb = Globals::Places[p]->nrbits;
             pm = 0;
         }
     }
@@ -2246,7 +2247,7 @@ State* bin_symm_search2(binDecision* d) {
             return NULL;
         }
     }
-    if (CardSpecification[PL] == Places[0]->cnt) {
+    if (CardSpecification[PL] == Globals::Places[0]->cnt) {
         ReUnify(MyCardSpecification[PL], MyCardSpecification[TR]);
 #if defined(TARJAN) || defined(COVER) || defined(MODELCHECKING)
         return st;
@@ -2284,10 +2285,10 @@ State* bin_symm_search_marking2() {
     //lv = LastVector;
     //li = Scapegoat;
     //lc = LastChoice;
-    if (binHashTable[Places[0]->hash_value]) {
+    if (binHashTable[Globals::Places[0]->hash_value]) {
         NewStamp();
-        for (unsigned i = 0; i < Places[0]->cnt; i++) {
-            Reaktor[PL][DO][i].count = CurrentMarking[((Place*) Reaktor[PL][DO][i].node)->index];
+        for (unsigned i = 0; i < Globals::Places[0]->cnt; i++) {
+            Reaktor[PL][DO][i].count = Globals::CurrentMarking[((Place*) Reaktor[PL][DO][i].node)->index];
             Reaktor[PL][DO][i].stamp = Stamp;
         }
         for (unsigned i = 0; i < CardSpecification[PL]; i++) {
@@ -2297,7 +2298,7 @@ State* bin_symm_search_marking2() {
         //   LastVector = lv;
         //  Scapegoat = li;
         // LastChoice = lc;
-        return bin_symm_search2(binHashTable[Places[0]->hash_value]);
+        return bin_symm_search2(binHashTable[Globals::Places[0]->hash_value]);
     }
     //LastDecision = ld;
     //LastVector = lv;
@@ -2313,18 +2314,18 @@ void canonize_on_the_fly() {
     // partition).
     Attempt = 0;
     found = false;
-    for (i = 0; i < Places[0]->cnt; i++) {
-        kanrep[i] = CurrentMarking[i];
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        kanrep[i] = Globals::CurrentMarking[i];
     }
-    if (CardSpecification[PL] >= Places[0] -> cnt) {
-        kanhash = Places[0]->hash_value;
+    if (CardSpecification[PL] >= Globals::Places[0] -> cnt) {
+        kanhash = Globals::Places[0]->hash_value;
         return;
     }
 
     OnlineCanonize();
     kanhash = 0;
-    for (i = 0; i < Places[0]->cnt; i++) {
-        kanhash += Places[i] -> hash_factor * kanrep[i];
+    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+        kanhash += Globals::Places[i] -> hash_factor * kanrep[i];
         kanhash %= HASHSIZE;
     }
 }

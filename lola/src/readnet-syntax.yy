@@ -32,12 +32,15 @@
 #include <climits>
 #include <unistd.h>
 #include <cstdarg>
+#include "Globals.h"
 #include <libgen.h>
 
 
 extern UBooType* TheBooType;
 extern UNumType* TheNumType;
 extern char* yytext;
+
+extern Transition* LastAttractor;  ///< Last transition in list of
 
 #define YYDEBUG 1
 void yyerror(char const*);
@@ -199,25 +202,25 @@ input:
 | declarations net formulaheader ctlformula { F = $4; }
 | declarations net _ANALYSE_ _PLACE_ aplace {
     F = NULL;
-    CheckPlace = $5;
+    Globals::CheckPlace = $5;
 #ifdef STUBBORN
-    Transitions[0]->StartOfStubbornList = NULL;
+    Globals::Transitions[0]->StartOfStubbornList = NULL;
     int i;
-    for (i = 0; CheckPlace->PreTransitions[i]; i++) {
-        CheckPlace->PreTransitions[i]->instubborn = true;
-        CheckPlace->PreTransitions[i]->NextStubborn = Transitions[0]->StartOfStubbornList;
-        Transitions[0]->StartOfStubbornList = CheckPlace->PreTransitions[i];
+    for (i = 0; Globals::CheckPlace->PreTransitions[i]; i++) {
+        Globals::CheckPlace->PreTransitions[i]->instubborn = true;
+        Globals::CheckPlace->PreTransitions[i]->NextStubborn = Globals::Transitions[0]->StartOfStubbornList;
+        Globals::Transitions[0]->StartOfStubbornList = Globals::CheckPlace->PreTransitions[i];
     }
-    Transitions[0]->EndOfStubbornList = LastAttractor = CheckPlace->PreTransitions[0];
+    Globals::Transitions[0]->EndOfStubbornList = LastAttractor = Globals::CheckPlace->PreTransitions[0];
 #endif
     }
 | declarations net _ANALYSE_ _TRANSITION_ atransition {
         F = NULL;
-        CheckTransition = $5;
+        Globals::CheckTransition = $5;
 #ifdef STUBBORN
-        Transitions[0]->EndOfStubbornList = LastAttractor = Transitions[0]->StartOfStubbornList = CheckTransition;
-        CheckTransition->NextStubborn = NULL;
-        CheckTransition->instubborn = true;
+        Globals::Transitions[0]->EndOfStubbornList = LastAttractor = Globals::Transitions[0]->StartOfStubbornList = Globals::CheckTransition;
+        Globals::CheckTransition->NextStubborn = NULL;
+        Globals::CheckTransition->instubborn = true;
 #endif
     }
 | declarations net _ANALYSE_ _MARKING_ amarkinglist  { F = NULL; }
@@ -1269,70 +1272,70 @@ net:
         unsigned int i, h, j;
         Symbol* ss;
         // Create array of places
-        Places = new Place* [PlaceTable->card + 10];
-        CurrentMarking = new unsigned int [PlaceTable->card + 10];
+        Globals::Places = new Place* [PlaceTable->card + 10];
+        Globals::CurrentMarking = new unsigned int [PlaceTable->card + 10];
         i = 0;
         for (h = 0; h < PlaceTable->size; h++) {
             for (ss = PlaceTable->table[h]; ss; ss = ss->next) {
                 if (!(((PlSymbol*) ss)->sort)) {
-                    Places[i++] = ((PlSymbol*) ss)->place;
+                    Globals::Places[i++] = ((PlSymbol*) ss)->place;
                 }
             }
         }
         PlaceTable->card = i;
 #ifdef WITHFORMULA
         for (i = 0; i < PlaceTable->card; i++) {
-            Places[i]->propositions = NULL;
+            Globals::Places[i]->propositions = NULL;
         }
 #endif
         // Create array of transitions
-        Transitions = new Transition* [TransitionTable->card + 10];
+        Globals::Transitions = new Transition* [TransitionTable->card + 10];
         i = 0;
         for (h = 0; h < TransitionTable->size; h++) {
             for (ss = TransitionTable->table[h]; ss; ss = ss->next) {
                 if (!(((TrSymbol*) ss)->vars)) {
-                    Transitions[i++] = ((TrSymbol*) ss)->transition;
+                    Globals::Transitions[i++] = ((TrSymbol*) ss)->transition;
                 }
             }
         }
         TransitionTable->card = i;
         // Create arc list of places pass 1 (count nr of arcs)
         for (i = 0; i < TransitionTable->card; i++) {
-            for (j = 0; j < Transitions[i]->NrOfArriving; j++) {
-                Transitions[i]->ArrivingArcs[j]->pl->NrOfLeaving++;
+            for (j = 0; j < Globals::Transitions[i]->NrOfArriving; j++) {
+                Globals::Transitions[i]->ArrivingArcs[j]->pl->NrOfLeaving++;
             }
-            for (j = 0; j < Transitions[i]->NrOfLeaving; j++) {
-                Transitions[i]->LeavingArcs[j]->pl->NrOfArriving++;
+            for (j = 0; j < Globals::Transitions[i]->NrOfLeaving; j++) {
+                Globals::Transitions[i]->LeavingArcs[j]->pl->NrOfArriving++;
             }
         }
         // pass 2 (allocate arc arrays)
         for (i = 0; i < PlaceTable->card; i++) {
-            Places[i]->ArrivingArcs = new Arc * [Places[i]->NrOfArriving + 10];
-            Places[i]->NrOfArriving = 0;
-            Places[i]->LeavingArcs = new Arc * [Places[i]->NrOfLeaving + 10];
-            Places[i]->NrOfLeaving = 0;
+            Globals::Places[i]->ArrivingArcs = new Arc * [Globals::Places[i]->NrOfArriving + 10];
+            Globals::Places[i]->NrOfArriving = 0;
+            Globals::Places[i]->LeavingArcs = new Arc * [Globals::Places[i]->NrOfLeaving + 10];
+            Globals::Places[i]->NrOfLeaving = 0;
         }
         // pass 3 (fill in arcs)
         for (i = 0; i < TransitionTable->card; i++) {
-            for (j = 0; j < Transitions[i]->NrOfLeaving; j++) {
+            for (j = 0; j < Globals::Transitions[i]->NrOfLeaving; j++) {
                 Place* pl;
-                pl = Transitions[i]->LeavingArcs[j]->pl;
-                pl->ArrivingArcs[pl->NrOfArriving] = Transitions[i]->LeavingArcs[j];
+                pl = Globals::Transitions[i]->LeavingArcs[j]->pl;
+                pl->ArrivingArcs[pl->NrOfArriving] = Globals::Transitions[i]->LeavingArcs[j];
                 pl->NrOfArriving ++;
             }
-            for (j = 0; j < Transitions[i]->NrOfArriving; j++) {
+            for (j = 0; j < Globals::Transitions[i]->NrOfArriving; j++) {
                 Place* pl;
-                pl = Transitions[i]->ArrivingArcs[j]->pl;
-                pl->LeavingArcs[pl->NrOfLeaving] = Transitions[i]->ArrivingArcs[j];
+                pl = Globals::Transitions[i]->ArrivingArcs[j]->pl;
+                pl->LeavingArcs[pl->NrOfLeaving] = Globals::Transitions[i]->ArrivingArcs[j];
                 pl->NrOfLeaving ++;
             }
         }
         for (i = 0; i < TransitionTable->card; i++) {
 #ifdef STUBBORN
-            Transitions[i]->mustbeincluded = Transitions[i]->conflicting;
+            Globals::Transitions[i]->mustbeincluded = Globals::Transitions[i]->conflicting;
 #if defined(EXTENDED) && defined(MODELCHECKING)
-            Transitions[i]->lstfired = new unsigned int [10];
-            Transitions[i]->lstdisabled = new unsigned int [10];
+            Globals::Transitions[i]->lstfired = new unsigned int [10];
+            Globals::Transitions[i]->lstdisabled = new unsigned int [10];
 #endif
 #endif
         }
@@ -1343,10 +1346,10 @@ net:
         // initialize places
 #ifdef STUBBORN
         for (i = 0; i < PlaceTable->card; i++) {
-            Places[i]->initialize();
+            Globals::Places[i]->initialize();
         }
 #endif
-        Transitions[0]->StartOfEnabledList = Transitions[0];
+        Globals::Transitions[0]->StartOfEnabledList = Globals::Transitions[0];
         // The following pieces of code initialize static attractor sets for
         // various problems.
 #ifdef BOUNDEDNET
@@ -1356,22 +1359,22 @@ net:
         int p, c, a; // produced, consumed tokens, current arc
         for (i = 0; i < TransitionTable->card; i++) {
             // count produced tokens
-            for (a = 0, p = 0; a < Transitions[i]->NrOfLeaving; a++) {
-                p += Transitions[i]->LeavingArcs[a]->Multiplicity;
+            for (a = 0, p = 0; a < Globals::Transitions[i]->NrOfLeaving; a++) {
+                p += Globals::Transitions[i]->LeavingArcs[a]->Multiplicity;
             }
             // count consumed tokens
-            for (a = 0, c = 0; a < Transitions[i]->NrOfArriving; a++) {
-                c += Transitions[i]->ArrivingArcs[a]->Multiplicity;
+            for (a = 0, c = 0; a < Globals::Transitions[i]->NrOfArriving; a++) {
+                c += Globals::Transitions[i]->ArrivingArcs[a]->Multiplicity;
             }
             if (p > c) {
-                Transitions[i]->instubborn = true;
+                Globals::Transitions[i]->instubborn = true;
                 if (LastAttractor) {
-                    Transitions[i]->NextStubborn =
-                        Transitions[i]->StartOfStubbornList;
-                    Transitions[i]->StartOfStubbornList = Transitions[i];
+                    Globals::Transitions[i]->NextStubborn =
+                        Globals::Transitions[i]->StartOfStubbornList;
+                    Globals::Transitions[i]->StartOfStubbornList = Globals::Transitions[i];
                 } else {
-                    Transitions[i]->StartOfStubbornList = LastAttractor = Transitions[i];
-                    Transitions[i]->NextStubborn = NULL;
+                    Globals::Transitions[i]->StartOfStubbornList = LastAttractor = Globals::Transitions[i];
+                    Globals::Transitions[i]->NextStubborn = NULL;
                 }
             }
         }
@@ -2138,9 +2141,9 @@ automaton:
         }
         // process all guard formulas
         int i, j, res;
-        for (i = 0; i < Places[0]->NrSignificant; i++) {
-            Places[i]->cardprop = 0;
-            Places[i]->propositions = NULL;
+        for (i = 0; i < Globals::Places[0]->NrSignificant; i++) {
+            Globals::Places[i]->cardprop = 0;
+            Globals::Places[i]->propositions = NULL;
         }
         for (i = 0; i < buchistate::nr; i++)
             for (j = 0; j < buchiautomaton[i]->nrdelta; j++) {
@@ -2258,36 +2261,44 @@ btransition:
 
 %%
 
-char * diagnosefilename;
+char* diagnosefilename = NULL;
 
 
 void readnet() {
-    yydebug = 0;
-    diagnosefilename = NULL;
-    if (netfile) {
-        yyin = fopen(netfile, "r");
+//    yydebug = 0;
+
+    if (Globals::netfile) {
+        yyin = fopen(Globals::netfile, "r");
         if (!yyin) {
-            abort(4, "cannot open net file '%s'", _cfilename_(netfile));
+            abort(4, "cannot open net file '%s'", _cfilename_(Globals::netfile));
         }
-        diagnosefilename = netfile;
+        status("reading net from file '%s'", _cfilename_(Globals::netfile));
+        diagnosefilename = Globals::netfile;
+    } else {
+        status("reading net from standard input");
     }
+
     GlobalTable = new SymbolTab(1024);
     TheBooType = new UBooType();
     TheNumType = new UNumType(0, INT_MAX);
+
     yyparse();
-    for (unsigned int ii = 0; ii < Places[0]->cnt; ii++) {
-        CurrentMarking[ii] = Places[ii]->initial_marking;
-        Places[ii]->index = ii;
+
+    // get initial marking
+    for (unsigned int ii = 0; ii < Globals::Places[0]->cnt; ii++) {
+        Globals::CurrentMarking[ii] = Globals::Places[ii]->initial_marking;
+        Globals::Places[ii]->index = ii;
     }
+
     if (F) {
         F = F->replacequantifiers();
         F->tempcard = 0;
         F = F->merge();
 #if defined(MODELCHECKING)
         unsigned int i;
-        for (i = 0; i < Transitions[0]->cnt; i++) {
-            Transitions[i]->lstfired = new unsigned int [F->tempcard];
-            Transitions[i]->lstdisabled = new unsigned int [F->tempcard];
+        for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+            Globals::Transitions[i]->lstfired = new unsigned int [F->tempcard];
+            Globals::Transitions[i]->lstdisabled = new unsigned int [F->tempcard];
         }
 #endif
     }
@@ -2296,7 +2307,8 @@ void readnet() {
 
 /// display a parser error and exit
 void yyerrors(char* token, char const* format, ...) {
-    fprintf(stderr, "%s: %s:%d:%d - ", _ctool_(PACKAGE), _cfilename_(basename(diagnosefilename)), yylineno, yycolno);
+    fprintf(stderr, "%s: %s:%d:%d - ", _ctool_(PACKAGE),
+    _cfilename_(basename(diagnosefilename)), yylineno, yycolno);
 
     va_list args;
     va_start(args, format);

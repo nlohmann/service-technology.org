@@ -27,6 +27,8 @@
 class arc_list;
 class case_list;
 #include "readnet-syntax.h"
+#include "verbose.h"
+#include "Globals.h"
 
 void setlval();
 void setcol();
@@ -37,6 +39,13 @@ int yycolno = 1;
 %s IN_COMMENT
 
 %%
+
+ /* from http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html */
+"/*"                                     { setcol(); BEGIN(IN_COMMENT); }
+<IN_COMMENT>"*/"                         { setcol(); BEGIN(INITIAL); }
+<IN_COMMENT>[^*\n\r]+                    { setcol(); /* comments */ }
+<IN_COMMENT>"*"                          { setcol(); /* comments */ }
+<IN_COMMENT>[\n\r]                       { setcol(); /* comments */ }
 
 ALL                                      { setcol(); return _ALL_; }
 ANALYSE                                  { setcol(); return _ANALYSE_; }
@@ -124,11 +133,6 @@ UNTIL                                    { setcol(); return _UNTIL_; }
 
 "{"[^\n\r]*"}"                           { setcol(); /* comments */ }
 
- /* from http://flex.sourceforge.net/manual/How-can-I-match-C_002dstyle-comments_003f.html */
-"/*"                                     { setcol(); BEGIN(IN_COMMENT); }
-<IN_COMMENT>"*/"                         { setcol(); BEGIN(INITIAL); }
-<IN_COMMENT>[^*\n]+                      { setcol(); /* comments */ }
-
 
 [^,;:()\t \n\r\{\}]+                     { setcol(); setlval(); return IDENTIFIER; }
 
@@ -154,20 +158,21 @@ bool taskfile = false;
 int yywrap() {
     extern char* diagnosefilename;
 
-    if (taskfile or !analysefile) {
+    if (taskfile or !Globals::analysefile) {
         return 1;
     }
 
     taskfile = true;
 
-    yyin = fopen(analysefile, "r");
+    yyin = fopen(Globals::analysefile, "r");
     if (!yyin) {
+        abort(4, "cannot open analysis task file '%s'", _cfilename_(Globals::analysefile));
+    } else {
+        status("reading analysis file '%s'", _cfilename_(Globals::analysefile));
         yylineno = 1;
-        fprintf(stderr, "lola: cannot open analysis task file '%s'n", analysefile);
-        exit(4);
     }
 
-    diagnosefilename = analysefile;
+    diagnosefilename = Globals::analysefile;
 
     return 0;
 }

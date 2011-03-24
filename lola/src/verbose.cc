@@ -154,12 +154,12 @@ void displayFileError(char* filename, int lineno, char* token) {
     }
 
     fprintf(stderr, "\n");
-    if (lineno > 1 and not oldline.empty() and oldline.length() < 80) {
+    if (lineno > 1 and not oldline.empty() and oldline.length() <= 80) {
         fprintf(stderr, "%s%-4d%s  %s\n", _cb_, lineno-1, _c_, oldline.c_str());
     }
 
     fprintf(stderr, "%s%-4d%s  %s\n", _cb_, lineno, _c_, line.c_str());
-    if (line.length() < 80 and firstpos != std::string::npos) {
+    if (firstpos != std::string::npos and firstpos <= 80) {
         fprintf(stderr, "      ");
         for (unsigned int i = 0; i < firstpos; ++i) {
             fprintf(stderr, " ");

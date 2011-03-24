@@ -730,8 +730,8 @@ int main(int argc, char** argv) {
        made unaccessible by decreasing the place count.
 */
 void removeisolated() {
-    unsigned int i = 0;
 #ifndef STATESPACE
+    unsigned int i = 0;
     while (i < Places[0]->cnt) {
         if (Places[i]->references == 0) { // Place isolated
             Place* p = Places[Places[0]->cnt - 1];
@@ -743,7 +743,7 @@ void removeisolated() {
         }
     }
 #endif
-    for (i = 0; i < Transitions[0]->cnt; ++i) {
+    for (unsigned int i = 0; i < Transitions[0]->cnt; ++i) {
         Transitions[i]->nr = i;
     }
 }

@@ -189,6 +189,7 @@ extern YYSTYPE yylval;
 extern int yylex();
 extern FILE *yyin;
 extern int yylineno;
+extern int yycolno;
 %}
 
 %%
@@ -2295,7 +2296,7 @@ void readnet() {
 
 /// display a parser error and exit
 void yyerrors(char* token, char const* format, ...) {
-    fprintf(stderr, "%s: %s:%d - ", _ctool_(PACKAGE), _cfilename_(basename(diagnosefilename)), yylineno);
+    fprintf(stderr, "%s: %s:%d:%d - ", _ctool_(PACKAGE), _cfilename_(basename(diagnosefilename)), yylineno, yycolno);
 
     va_list args;
     va_start(args, format);

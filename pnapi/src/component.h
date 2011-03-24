@@ -204,6 +204,8 @@ public: /* public methods */
   void addLabel(Label & label, unsigned int = 1);
   /// remove an interface label
   void removeLabel(Label & label);
+  /// remove an interface label
+  void removeLabel(Label * label);
   //@}
   
   /*!

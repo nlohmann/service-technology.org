@@ -484,7 +484,7 @@ unsigned int PetriNet::reduce_rule_3p()
     {
       if( ((*p) != minPlace) &&
           ( reductionCache_->intervals_[*p].getLower() - reductionCache_->intervals_[minPlace].getLower() ==
-            (*p)->getTokenCount() - minPlace->getTokenCount()) ) // precondition 3
+            (int) (*p)->getTokenCount() - (int) minPlace->getTokenCount()) ) // precondition 3
       {
         obsoletePlaces.insert(*p);
         replaceRelation[*p]=minPlace;
@@ -1137,8 +1137,8 @@ unsigned int PetriNet::reduce_rule_6()
     if( (t->getPostset().size() != 1) || // precondition 2a
         (!(t->getOutputLabels().empty())) || // precondition 2b
         ((*p)->getPostset().find(t) != (*p)->getPostset().end()) || // precondition 4
-        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getLower() != (*p)->getTokenCount())) ||
-        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getUpper() != (*p)->getTokenCount())) ) // precondition 8
+        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getLower() != (int)(*p)->getTokenCount())) ||
+        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getUpper() != (int)(*p)->getTokenCount())) ) // precondition 8
     {
       continue;
     }

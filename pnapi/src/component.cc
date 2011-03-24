@@ -759,6 +759,16 @@ void Transition::removeLabel(Label & label)
 }
 
 /*!
+ * \brief remove an interface label
+ */
+void Transition::removeLabel(Label * label)
+{
+  labels_.erase(label);
+  label->removeTransition(this);
+  updateType();
+}
+
+/*!
  * \brief get mapping of interface labels to their weight
  */
 const std::map<Label *, unsigned int> & Transition::getLabels() const

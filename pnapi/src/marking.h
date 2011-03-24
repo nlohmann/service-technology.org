@@ -87,7 +87,7 @@ public: /* public methods */
   /// copy constructor
   AbstractMarking(const AbstractMarking<T> &, PetriNet *, const std::map<const Place *, const Place *> &);
   /// destructor
-  virtual ~AbstractMarking() {};
+  virtual ~AbstractMarking() {}
   /// assignment operator
   AbstractMarking & operator=(const AbstractMarking<T> &);
   //@}
@@ -176,7 +176,7 @@ public: /* public methods */
   /// constructor
   Marking(const Marking &, PetriNet *, const std::map<const Place *, const Place *> &);
   /// destructor
-  virtual ~Marking() {};
+  virtual ~Marking() {}
   /// assignment operator
   Marking & operator=(const Marking &);
   //@}
@@ -213,7 +213,7 @@ public: /* public methods */
   /// constructor
   PlaceIndexVector(const PlaceIndexVector &, PetriNet *, const std::map<const Place *, const Place *> &);
   /// destructor
-  virtual ~PlaceIndexVector() {};
+  virtual ~PlaceIndexVector() {}
   /// assignment operator
   PlaceIndexVector & operator=(const PlaceIndexVector &);
   //@}
@@ -244,7 +244,7 @@ public: /* public methods */
   /// constructor
   OmegaMarking(const OmegaMarking &, PetriNet *, const std::map<const Place *, const Place *> &);
   /// destructor
-  virtual ~OmegaMarking() {};
+  virtual ~OmegaMarking() {}
   /// assignment operator
   OmegaMarking & operator=(const OmegaMarking &);
   //@}

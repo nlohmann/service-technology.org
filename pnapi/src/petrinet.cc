@@ -305,14 +305,14 @@ PetriNet::PetriNet(const PetriNet & net) :
  */
 PetriNet::~PetriNet()
 {
-//  clear();
-//
-//  PNAPI_ASSERT(nodes_.empty());
-//  PNAPI_ASSERT(nodesByName_.empty());
-//  PNAPI_ASSERT(transitions_.empty());
-//  PNAPI_ASSERT(places_.empty());
-//  PNAPI_ASSERT(arcs_.empty());
-//  PNAPI_ASSERT(roles_.empty());
+  clear();
+
+  PNAPI_ASSERT(nodes_.empty());
+  PNAPI_ASSERT(nodesByName_.empty());
+  PNAPI_ASSERT(transitions_.empty());
+  PNAPI_ASSERT(places_.empty());
+  PNAPI_ASSERT(arcs_.empty());
+  PNAPI_ASSERT(roles_.empty());
 }
 
 /*!
@@ -340,6 +340,8 @@ void PetriNet::clear()
   {
     deleteTransition(**it);
   }
+  places_.clear();
+  transitions_.clear();
 }
 
 /*!

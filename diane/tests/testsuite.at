@@ -102,7 +102,6 @@ AT_CLEANUP
 ############################################################################
 
 AT_SETUP([Number of Service Components obtained by recomposing with threshold])
-AT_XFAIL_IF(true)
 AT_CHECK([cp TESTFILES/B1s633s4784.lola.owfn .])
 AT_CHECK([DIANE B1s633s4784.lola.owfn --threshold=3 --service --format=owfn],0,stdout)
 AT_CHECK([GREP -q "number of components: 5" stdout],0)
@@ -110,7 +109,6 @@ AT_KEYWORDS(service)
 AT_CLEANUP
 
 AT_SETUP([Number of Service Components obtained by recomposing with threshold and interface label given])
-AT_XFAIL_IF(true)
 AT_CHECK([cp TESTFILES/B1s633s4784.lola.owfn .])
 AT_CHECK([DIANE B1s633s4784.lola.owfn --threshold=3 --interface="Data" --service --format=owfn],0,stdout)
 AT_CHECK([GREP -q "number of components: 8" stdout],0)
@@ -118,7 +116,6 @@ AT_KEYWORDS(service)
 AT_CLEANUP
 
 AT_SETUP([Printing nets and their complement with respect to the initial process])
-AT_XFAIL_IF(true)
 AT_CHECK([cp TESTFILES/B1s633s4784.lola.owfn .])
 AT_CHECK([DIANE B1s633s4784.lola.owfn --threshold=3 --complement  --interface="Data" --service --format=owfn ],0,stdout)
 AT_CHECK([GREP -q "number of components: 8" stdout],0)
@@ -127,7 +124,6 @@ AT_KEYWORDS(service)
 AT_CLEANUP
 
 AT_SETUP([Recomposing to medium sized components])
-AT_XFAIL_IF(true)
 AT_CHECK([cp TESTFILES/B1s633s4784.lola.owfn .])
 AT_CHECK([DIANE B1s633s4784.lola.owfn --threshold=3 --complement --interface="Data"  --service --compose --format=owfn ],0,stdout)
 AT_CHECK([GREP -q "number of components: 8" stdout],0)

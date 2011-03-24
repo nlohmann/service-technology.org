@@ -55,43 +55,9 @@ gengetopt_args_info args_info;
 
 
 
-
-/*------------------------------------------------------------------------*/
-
-unsigned int Arc::cnt = 0;
-unsigned int Place::hash_value = 0;
-unsigned int Transition::cnt = 0;
-
-#ifdef STUBBORN
-unsigned int Transition::NrStubborn = 0;
-Transition* Transition::TarjanStack = NULL;
-Transition* Transition::CallStack = NULL;
-#endif
-
-Transition* LastAttractor;  // Last transition in static attractor sets
-unsigned int Transition::NrEnabled = 0;
-Transition* Transition::StartOfEnabledList = NULL;
-
-#ifdef EXTENDED
-Transition* Transition::StartOfIgnoredList = NULL;
-#endif
-
-#ifdef STUBBORN
-Transition* Transition::StartOfStubbornList = NULL;
-Transition* Transition::EndOfStubbornList = NULL;
-#endif
-
-/*------------------------------------------------------------------------*/
-
-
 #ifdef WITHFORMULA
 extern unsigned int* checkstart;
 #endif
-
-
-
-
-
 
 
 int garbagefound = 0;
@@ -144,56 +110,39 @@ unsigned int NonEmptyHash;
 void processCommandLine(int argc, char** argv) {
     // call the cmdline parser, initiate args_info
     if (cmdline_parser(argc, argv, &args_info) != 0) {
-        fprintf(stderr, "      see 'lola --help' for more information\n");
-        exit(4);
+        abort(4, "wrong command line option");
     }
 
     // check if at most one net file is given
     if (args_info.inputs_num > 1) {
-        fprintf(stderr, "lola: more than one net file given\n");
-        fprintf(stderr, "      see 'lola --help' for more information\n");
-        exit(4);
+        abort(4, "more than one net file given");
     }
 
     // check if output parameters are given at most once
     if (args_info.Net_given + args_info.net_given > 1) {
-        fprintf(stderr, "lola: more than one '-n' / '-N' option given\n");
-        fprintf(stderr, "      see 'lola --help' for more information\n");
-        exit(4);
+        abort(4, "more than one '-n' / '-N' option given");
     }
     if (args_info.Analysis_given + args_info.analysis_given > 1) {
-        fprintf(stderr, "lola: more than one '-a' / '-A' option given\n");
-        fprintf(stderr, "      see 'lola --help' for more information\n");
-        exit(4);
+        abort(4, "more than one '-a' / '-A' option given");
     }
     if (args_info.State_given + args_info.state_given > 1) {
-        fprintf(stderr, "lola: more than one '-s' / '-S' option given\n");
-        fprintf(stderr, "      see 'lola --help' for more information\n");
-        exit(4);
+        abort(4, "more than one '-s' / '-S' option given");
     }
     if (args_info.Automorphisms_given + args_info.automorphisms_given > 1) {
-        fprintf(stderr, "lola: more than one '-y' / '-Y' option given\n");
-        fprintf(stderr, "      see 'lola --help' for more information\n");
-        exit(4);
+        abort(4, "more than one '-y' / '-Y' option given");
     }
     if (args_info.Graph_given + args_info.graph_given + args_info.Marking_given + args_info.marking_given > 1) {
-        fprintf(stderr, "lola: more than one '-g' / '-G' / '-m' / '-M' option given\n");
-        fprintf(stderr, "      see 'lola --help' for more information\n");
-        exit(4);
+        abort(4, "more than one '-g' / '-G' / '-m' / '-M' option given");
     }
     if (args_info.Path_given + args_info.path_given > 1) {
-        fprintf(stderr, "lola: more than one '-p' / '-P' option given\n");
-        fprintf(stderr, "      see 'lola --help' for more information\n");
-        exit(4);
+        abort(4, "more than one '-p' / '-P' option given");
     }
 
 
     // process --offspring option
     if (args_info.offspring_given) {
         if (!strcmp(args_info.offspring_arg, "")) {
-            fprintf(stderr, "lola: option '--offspring' must not have an empty argument\n");
-            fprintf(stderr, "      see 'lola --help' for more information\n");
-            exit(4);
+            abort(4, "option '--offspring' must not have an empty argument");
         }
         createUserconfigFile(args_info.offspring_arg);
         exit(EXIT_SUCCESS);
@@ -352,8 +301,7 @@ void processCommandLine(int argc, char** argv) {
             Globals::resultfile = fopen((string(Globals::netbasename) + ".result").c_str(), "w");
         }
         if (!Globals::resultfile) {
-            fprintf(stderr, "lola: could not create result file\n");
-            exit(4);
+            abort(4, "could not create result file");
         }
         configurationResult(Globals::resultfile);
     }

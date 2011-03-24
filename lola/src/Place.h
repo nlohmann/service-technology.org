@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Arc.h"
+#include "Node.h"
 #include "Globals.h"
 #include "verbose.h"
 #include "dimensions.H"

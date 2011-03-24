@@ -3,6 +3,8 @@
 #include <iostream>
 #include "Globals.h"
 #include "Arc.h"
+#include "Node.h"
+#include "Place.h"
 using std::cerr;
 
 //extern Place** Globals::Places;

@@ -5,7 +5,7 @@ noinst_PROGRAMS = lola
 lola_SOURCES = readnet-syntax.yy \
                readnet-lexic.ll \
                cmdline.c cmdline.h \
-               net.cc net.H Node.h Place.h Transition.h Arc.h \
+               net.cc net.H Node.h Place.h Place.cc Transition.h Transition.cc Arc.cc Arc.h \
                Globals.h Globals.cc \
                buchi.cc buchi.H \
                formula.cc formula.H \

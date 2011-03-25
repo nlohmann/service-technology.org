@@ -17,7 +17,7 @@
  along with Sara.  If not, see <http://www.gnu.org/licenses/>. 
 \*****************************************************************************/
 
-%token COLON COMMA ARROW NUMBER NAME ENAME RESULT NEGATE SEMICOLON PROBLEM GOAL REACHABILITY REALIZABILITY NFILE NTYPE TYPEOWFN TYPELOLA TYPEPNML INITIALM FINALM COVER REACH MYLEQ MYGEQ CONSTRAINTS PLUS MINUS
+%token COLON COMMA ARROW NUMBER NAME ENAME RESULT NEGATE SEMICOLON PROBLEM GOAL REACHABILITY REALIZABILITY NFILE NTYPE TYPEOWFN TYPELOLA TYPEPNML INITIALM FINALM COVER REACH MYLEQ MYGEQ CONSTRAINTS PLUS MINUS RESOR
 
 %defines
 %name-prefix="sara_"
@@ -164,6 +164,8 @@ showresult:
 	/* empty */
 |   RESULT ENAME SEMICOLON { sara::pbl.setNegateResult(false); sara::pbl.setResultText(sara_NAME_token); }
 |   RESULT NEGATE ENAME SEMICOLON { sara::pbl.setNegateResult(true); sara::pbl.setResultText(sara_NAME_token); }
+|   RESULT RESOR ENAME SEMICOLON { sara::pbl.setNegateResult(false); sara::pbl.setOrResult(true); sara::pbl.setResultText(sara_NAME_token); }
+|   RESULT RESOR NEGATE ENAME SEMICOLON { sara::pbl.setNegateResult(true); sara::pbl.setOrResult(true); sara::pbl.setResultText(sara_NAME_token); }
 ;
 
 

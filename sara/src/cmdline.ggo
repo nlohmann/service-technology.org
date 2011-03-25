@@ -46,6 +46,10 @@ option "show" s
   details="The actual firing sequence is colored gray (a darker transition fires more often), adjacent places are also gray. Unfirable components (of places and transitions) are colored red."
   flag off
 
+option "yesno" -
+  "Only print the decision, without further reasoning."
+  flag off
+
 section "Creating problem files"
 sectiondesc="See detailed help for the syntax of problems (e.g. for manual creation).\n"
 

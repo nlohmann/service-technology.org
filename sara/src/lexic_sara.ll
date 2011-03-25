@@ -55,6 +55,7 @@ reach REACH
 constraints CONSTRAINTS
 result RESULT
 negate NEGATE
+resor OR
 
 %%
 
@@ -81,6 +82,7 @@ negate NEGATE
 {constraints}	{ return CONSTRAINTS; }
 {result} { BEGIN(xname); return RESULT; }
 {negate} { return NEGATE; }
+{resor} { return RESOR; }
 {number}     { sara_lval.val = atoi(sara_text); return NUMBER; }
 
 <nname>{name}       { sara_NAME_token = sara_text; return NAME; }

@@ -57,6 +57,8 @@ map<Place*,int> revporder;
 map<string,bool> results;
 /// for property checks via owfn2sara: if lp_solve fails the result can be indecisive
 map<string,bool> indecisive;
+/// for ordering the properties correctly
+vector<string> resorder;
 
 bool flag_droppast(false);
 int val_droppast(0);
@@ -73,6 +75,7 @@ bool flag_scapegoat(false);
 bool flag_break(false);
 bool flag_witness(false);
 bool flag_joborder(false);
+bool flag_yesno(false);
 
 } // end namespace sara
 
@@ -140,6 +143,7 @@ int main(int argc, char** argv) {
 	flag_break = args_info.break_given;
 	flag_witness = args_info.witness_given;
 	flag_joborder = args_info.joborder_given;
+	flag_yesno = args_info.yesno_given;
 
 /****************
 * NO ARGS GIVEN *
@@ -316,11 +320,13 @@ if (args_info.input_given || args_info.pipe_given) {
 	// walk through the problem list
 	for(unsigned int x=0; x<pbls.size(); ++x)
 	{
-		if (results.find(pbls.at(x).getResultText())==results.end())
+		if (results.find(pbls.at(x).getResultText())==results.end()) {
 			results[pbls.at(x).getResultText()] = true;
-		else if (pbls.at(x).getResultText()!="")
+			if (pbls.at(x).getResultText()!="")
+				resorder.push_back(pbls.at(x).getResultText());
+		} else if (pbls.at(x).getResultText()!="")
 			if (!results[pbls.at(x).getResultText()]) continue;
-		cout << "sara: Problem " << (++loops) << ": " << pbls.at(x).getName() << endl;
+		if (!flag_yesno) cout << "sara: Problem " << (++loops) << ": " << pbls.at(x).getName() << endl;
 		if (args_info.log_given) // print info also to log file if one has been given
 			cerr << "sara: Problem " << (loops) << ": " << pbls.at(x).getName() << endl;
 		PetriNet* pn(pbls.at(x).getPetriNet()); // obtain the Petri net and its P/T-ordering
@@ -375,7 +381,7 @@ if (args_info.input_given || args_info.pipe_given) {
 						results[pbls.at(x).getResultText()] = false;
 				}
 				else { 
-					cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;
+					if (!flag_yesno) cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;
 					if (!pbls.at(x).isNegateResult())
 						results[pbls.at(x).getResultText()] = false;
 				}
@@ -397,15 +403,15 @@ if (args_info.input_given || args_info.pipe_given) {
 					// count the solutions
 					if (reach.getStatus()==Reachalyzer::SOLUTION_FOUND) {
 						solcnt+=reach.numberOfSolutions(); 
-						if (pbls.at(x).isNegateResult())
+						if (pbls.at(x).isNegateResult() ^ pbls.at(x).isOrResult())
 							results[pbls.at(x).getResultText()] = false;
 					} else if (reach.getStatus()==Reachalyzer::SOLUTIONS_LOST) {
 						indecisive[pbls.at(x).getResultText()] = true;
 					} else {
-						if (!pbls.at(x).isNegateResult())
+						if (!pbls.at(x).isNegateResult() ^ pbls.at(x).isOrResult())
 							results[pbls.at(x).getResultText()] = false;
 					}
-					reach.printResult(x+1); // ... and print the result
+					if (!flag_yesno) reach.printResult(x+1); // ... and print the result
 					int mtl = reach.getMaxTraceLength(); // get the maximal solution length for this problem
 					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
 					avetracelen += reach.getSumTraceLength(); // sum up solution lengths for average calculation
@@ -421,24 +427,55 @@ if (args_info.input_given || args_info.pipe_given) {
 					}
 					if (args_info.time_given) // if --time was specified, print the time used
 						cout << "sara: Time: " << (float)(mytime)/CLOCKS_PER_SEC << " sec." << endl;
-				} else cout << "sara: UNSOLVED: error while initializing lp_solve" << endl;
+				} else { if (!flag_yesno)
+						cout << "sara: UNSOLVED: error while initializing lp_solve" << endl;
+					indecisive[pbls.at(x).getResultText()] = true;
+				}
 				break;
 			}
 		}
-		cout << endl;
+		if (!flag_yesno) cout << endl;
 	}
 
 	clock_t endtime = clock();
 	if (args_info.verbose_given)
 	{
 		cout << "sara: " << solcnt << " Solution" << (solcnt!=1?"s":"") << " produced." << endl;
-		if (solcnt>1 && maxtracelen>=0)
+		if (solcnt>1 && maxtracelen>=0 && !flag_yesno)
 		{
 			cout << "sara: Maximal solution length is " << maxtracelen;
 			if (avetracelen!=maxtracelen*solcnt) cout << ", average is " << (avetracelen%solcnt==0?"":"about ") << avetracelen/solcnt+(avetracelen%solcnt>=solcnt/2?1:0);
 			cout << "." << endl;
 		}
 	}
+	if (flag_yesno) {
+		for(unsigned int i=0; i<resorder.size(); ++i)
+			if (resorder[i]!="")
+			{
+				if (indecisive.find(resorder[i])==indecisive.end()) {
+					if (results[resorder[i]]) cout << "FORMULA FALSE" << endl;
+					else cout << "FORMULA TRUE" << endl;
+				} else {
+					if (results[resorder[i]]) cout << "CANNOT_COMPUTE" << endl;
+					else cout << "FORMULA TRUE" << endl;
+				}
+				cout << "TECHNIQUES PARTIAL_ORDERS OTHERS" << endl;
+			}
+	} else {
+		for(unsigned int i=0; i<resorder.size(); ++i)
+			if (resorder[i]!="")
+			{
+				cout << "sara: The property of " << resorder[i];
+				if (indecisive.find(resorder[i])==indecisive.end()) {
+					if (results[resorder[i]]) cout << " is fulfilled." << endl;
+					else cout << " does not hold in general." << endl;
+				} else {
+					if (results[resorder[i]]) cout << " could not be decided." << endl;
+					else cout << " does not hold in general." << endl;
+				}
+			}
+	}
+/*
 	map<string,bool>::iterator mbit;
 	for(mbit=results.begin(); mbit!=results.end(); ++mbit)
 		if (mbit->first!="")
@@ -452,6 +489,7 @@ if (args_info.input_given || args_info.pipe_given) {
 				else cout << " does not hold in general." << endl;
 			}
 		}
+*/
 	if (args_info.time_given) // print time use if --time was specified
 		cout << "sara: Used " << (float)(endtime-starttime)/CLOCKS_PER_SEC << " seconds overall." << endl;
 }

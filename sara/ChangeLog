@@ -8,6 +8,13 @@
 
 
 PURPOSE
+Version 1.05 (25 Mar 2011)
+==========================
+
+* added output option for simple yes/no
+
+* multiple problems can be logically ORed
+
 Version 1.04 (03 Nov 2010)
 ==========================
 

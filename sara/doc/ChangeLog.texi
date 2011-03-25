@@ -1,4 +1,10 @@
 @c <<-- CHANGE START (version information) -->>
+@heading Version 1.05 (25 Mar 2011)
+@itemize
+@item added output option for simple yes/no
+@item multiple problems can be logically ORed
+@end itemize
+
 @heading Version 1.04 (03 Nov 2010)
 @itemize
 @item wrapped Sara into the namespace sara

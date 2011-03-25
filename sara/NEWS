@@ -8,11 +8,11 @@
 
 
 PURPOSE
-Version 1.04 (03 Nov 2010)
+Version 1.05 (25 Mar 2011)
 ==========================
 
-* wrapped Sara into the namespace sara
+* added output option for simple yes/no
 
-* added entry point for using Sara as a library
+* multiple problems can be logically ORed
 
 \nSee file ChangeLog <http://service-technology.org/files/sara/ChangeLog> for\ncomplete version history.\n

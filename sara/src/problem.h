@@ -138,6 +138,12 @@ public:
 	/// The name of the property to be checked by this problem instance
 	string getResultText() const;
 
+	/// Set whether the final result of a property check should be computed as an OR
+	void setOrResult(bool res);
+
+	/// Whether the final result of a property check should be ORed
+	bool isOrResult() const;
+
 	/// Goals
 	enum Types {
 		REACHABLE = 0,
@@ -196,6 +202,9 @@ private:
 
 	/// The name a property to be checked
 	string result;
+
+	/// Whether all or at least one problem has to check out for the property
+	bool resor;
 };
 
 }

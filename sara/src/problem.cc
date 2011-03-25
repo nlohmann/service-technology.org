@@ -534,4 +534,18 @@ bool Problem::isNegateResult() const { return negate; }
 */
 string Problem::getResultText() const { return result; }
 
+/** When a property needs to be checked by Sara, we can set this flag to tell whether all or at least problem
+	instance should fulfill the property.
+	@param neg False=All problems must have a solution, True=At least one problem must
+		have a solution.
+*/
+void Problem::setOrResult(bool res) { resor = res; }
+
+/** When a property needs to be checked by Sara, we can set this flag to tell whether all or at least problem
+	instance should fulfill the property.
+	@return False=All problems must have a solution, True=At least one problem must
+		have a solution.
+*/
+bool Problem::isOrResult() const { return resor; }
+
 } // end namespace sara

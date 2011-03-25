@@ -64,7 +64,7 @@ namespace sara {
 
 /** Standard constructor.
 */
-Problem::Problem() : deinit(false),generalcover(false),type(REACHABLE),nettype(LOLA),pn(NULL),negate(false) {}
+Problem::Problem() : deinit(false),generalcover(false),type(REACHABLE),nettype(LOLA),pn(NULL),negate(false),resor(false) {}
 
 /** Destructor.
 */
@@ -536,7 +536,7 @@ string Problem::getResultText() const { return result; }
 
 /** When a property needs to be checked by Sara, we can set this flag to tell whether all or at least problem
 	instance should fulfill the property.
-	@param neg False=All problems must have a solution, True=At least one problem must
+	@param res False=All problems must have a solution, True=At least one problem must
 		have a solution.
 */
 void Problem::setOrResult(bool res) { resor = res; }

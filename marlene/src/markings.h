@@ -15,7 +15,7 @@
 
  You should have received a copy of the GNU Affero General Public License
  along with Marlene.  If not, see <http://www.gnu.org/licenses/>.
-\*****************************************************************************/
+ \*****************************************************************************/
 
 #pragma once
 
@@ -28,38 +28,38 @@
 // forward declarations
 class Marking;
 
-class MarkingInformation
-{
+class MarkingInformation {
     private:
         unsigned int markingId;
-        std::map< int, unsigned int > marking2id;
-        std::map< unsigned int, int > id2marking;
+        std::map<int, unsigned int> marking2id;
+        std::map<unsigned int, int> id2marking;
 
     public:
-        std::map< unsigned int, Marking * > markings;
+        std::map<unsigned int, Marking *> markings;
 
         MarkingInformation(std::string & filename);
 
-        unsigned int getIDForMarking( int nameId );
-        int getMarkingForID( unsigned int id );
+        unsigned int getIDForMarking(int nameId);
+        int getMarkingForID(unsigned int id);
 };
 
-class Marking
-{
+class Marking {
     private:
         unsigned int placeId;
-        std::map< std::string, unsigned int > place2id;
-        std::map< unsigned int, std::string > id2place;
+        std::map<std::string, unsigned int> place2id;
+        std::map<unsigned int, std::string> id2place;
 
     public:
-        std::vector< std::pair< unsigned int, unsigned int> > marking;
+        std::vector<std::pair<unsigned int, unsigned int> > marking;
 
         Marking();
 
-        unsigned int getIDForPlace( std::string & place );
-        std::string & getPlaceForID( unsigned int id );
+        unsigned int getIDForPlace(std::string & place);
+        std::string & getPlaceForID(unsigned int id);
 
-        std::vector< std::string > getPendingMessages(pnapi::PetriNet & net, std::string prefix = "", unsigned int messageBound = 1);
-        std::vector< std::string > getRequiredMessages(pnapi::PetriNet & net, std::string prefix = "");
+        std::vector<std::string> getPendingMessages(pnapi::PetriNet & net,
+                std::string prefix = "", unsigned int messageBound = 1);
+        std::vector<std::string> getRequiredMessages(pnapi::PetriNet & net,
+                std::string prefix = "");
 };
 

@@ -42,7 +42,13 @@ extern int adapt_rules_yylineno;
 extern int adapt_rules_yylex();
 extern int adapt_rules_yyerror(const char*);
 
-RuleSet * workingSet = NULL;
+#ifdef USE_SHARED_PTR
+typedef std::tr1::shared_ptr < std::list< unsigned int > > uilist_ptr;
+#else
+typedef std::list< unsigned int > * uilist_ptr;
+#endif
+
+RuleSet::RuleSet_ptr workingSet;
 RuleSet::AdapterRule::cfMode cfmodus = RuleSet::AdapterRule::AR_NORMAL;
 
 int adapt_rules_yyerror(const char* msg)
@@ -116,12 +122,14 @@ partial_rule:
     ARROW channel_list
     {
         std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$3);
-        std::tr1::shared_ptr < std::list< unsigned int > > slist (new std::list< unsigned int >());
-        std::tr1::shared_ptr < RuleSet::AdapterRule > rule (new RuleSet::AdapterRule(rulepair, *slist, cfmodus));
+        uilist_ptr slist (new std::list< unsigned int >());
+        RuleSet::AdapterRule::AdapterRule_ptr rule (new RuleSet::AdapterRule(rulepair, *slist, cfmodus));
         workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;
-	// delete slist;
+        #ifndef USE_SHARED_PTR
+	delete slist;
+        #endif
     }
 |
     channel_list 
@@ -129,7 +137,7 @@ partial_rule:
     ARROW channel_list
     {
         std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$5);
-        std::tr1::shared_ptr < RuleSet::AdapterRule > rule (new RuleSet::AdapterRule(rulepair, *$3, cfmodus));
+        RuleSet::AdapterRule::AdapterRule_ptr rule (new RuleSet::AdapterRule(rulepair, *$3, cfmodus));
         workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;
@@ -145,12 +153,14 @@ total_rule:
     opt_costvalue
     {
         std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$3);
-        std::tr1::shared_ptr< std::list< unsigned int > > slist (new std::list< unsigned int >());
-        std::tr1::shared_ptr < RuleSet::AdapterRule > rule (new RuleSet::AdapterRule(rulepair, *slist, RuleSet::AdapterRule::AR_NORMAL, $4));
+        uilist_ptr slist (new std::list< unsigned int >());
+        RuleSet::AdapterRule::AdapterRule_ptr rule (new RuleSet::AdapterRule(rulepair, *slist, RuleSet::AdapterRule::AR_NORMAL, $4));
 	workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;
-	// delete slist;
+        #ifndef USE_SHARED_PTR
+	delete slist;
+        #endif
     }
 |    
     opt_channel_list 
@@ -159,7 +169,7 @@ total_rule:
     opt_costvalue
     {
         std::pair< std::list<unsigned int>, std::list<unsigned int> > rulepair(*$1, *$5);
-        std::tr1::shared_ptr < RuleSet::AdapterRule > rule (new RuleSet::AdapterRule(rulepair, *$3, RuleSet::AdapterRule::AR_NORMAL, $6));
+        RuleSet::AdapterRule::AdapterRule_ptr rule (new RuleSet::AdapterRule(rulepair, *$3, RuleSet::AdapterRule::AR_NORMAL, $6));
         workingSet->_adapterRules.push_back(rule);
         delete $1;
         delete $3;

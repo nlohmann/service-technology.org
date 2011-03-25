@@ -2,13 +2,13 @@
 # thanks to Niels for this code snipplet
 AC_DEFUN([AC_ST_WENDY],[
 
-AC_PATH_PROGS(WGET, [wget], [])
-AC_PATH_PROGS(GTAR, [gtar tar], [])
-
 export PATH=`pwd`:$PATH
 AC_PATH_PROG(WENDY, [wendy], [])
 if test "${WENDY}" = ""; then
   AC_MSG_WARN([Wendy was not found! It is now downloaded and built.])
+
+    AC_PATH_PROGS(WGET, [wget], [])
+    AC_PATH_PROGS(GTAR, [gtar tar], [])
 
   if test "${WGET}" != "" -a "${GTAR}" != ""; then
     AC_MSG_NOTICE([downloading Wendy from service-technology.org...])

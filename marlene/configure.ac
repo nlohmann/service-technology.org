@@ -28,7 +28,7 @@ AC_PROG_YACC
 
 # use the service-technology.org macros
 AC_ST_BASIC
-AC_ST_WENDY([3.3])
+# AC_ST_WENDY([3.3])
 # AC_ST_CANDY([1.0])
 AC_ST_AUTOTEST
 AC_ST_PNAPI([4.02])
@@ -39,6 +39,7 @@ AC_ST_VERBOSE
 AC_PATH_PROG(VALGRIND, [valgrind], [])
 AC_PATH_PROG(DIFF, [diff], [])
 
+AC_PATH_PROGS(WENDY, [wendy], [])
 AC_PATH_PROGS(CANDY, [candy], [])
 
 CONVERTER=sa2on
@@ -93,7 +94,24 @@ AC_MSG_RESULT([better should be])
 
 # Checks for header files.
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADER([tr1/memory.h])
+AC_CHECK_HEADERS([tr1/memory])
+AH_BOTTOM([#ifdef __cplusplus
+#if defined(HAVE_TR1_MEMORY) and HAVE_TR1_MEMORY == 1
+// shared pointers
+#include <cstddef> // for __GLIBCXX__
+
+#  ifdef __GLIBCXX__
+#    include <tr1/memory>
+#  else
+#    ifdef __IBMCPP__
+#      define __IBMCPP_TR1__
+#    endif
+#    include <memory>
+#  endif
+#  define USE_SHARED_PTR 1
+#endif
+#endif
+])
 
 # check for required functions and die if they are not found
 AC_FUNC_ERROR_AT_LINE

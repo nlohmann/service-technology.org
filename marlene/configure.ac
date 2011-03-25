@@ -93,6 +93,7 @@ AC_MSG_RESULT([better should be])
 
 # Checks for header files.
 AC_HEADER_SYS_WAIT
+AC_CHECK_HEADER([tr1/memory.h])
 
 # check for required functions and die if they are not found
 AC_FUNC_ERROR_AT_LINE

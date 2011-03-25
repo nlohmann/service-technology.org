@@ -1398,10 +1398,12 @@ place:
         c = new char [strlen($1) + 10];
         strcpy(c, $1);
         PS = new PlSymbol(c, $3);
+
+        // unfolding: creating low-level places
         UValue* v = $3->make();
         do {
             char* lowtag = v->text();
-            char* lowlevelplace = new char [ strlen(c) + strlen(lowtag) + 20];
+            char* lowlevelplace = new char [strlen(c) + strlen(lowtag) + 20];
             strcpy(lowlevelplace, c);
             strcpy(lowlevelplace + strlen(c), ".");
             strcpy(lowlevelplace + strlen(c) + 1, lowtag);
@@ -1454,6 +1456,8 @@ marking:
         if (!PS->sort) {
             yyerrors($1, "multiterm expression not allowed for low-level place '%s'", _cimportant_($1));
         }
+
+        // unfolding: find marked low-level places
         UValue* pv = PS->sort->make();
         for (UTermList* tl = $3; tl; tl = tl->next) { // do for all mt components
             // check type compatibility

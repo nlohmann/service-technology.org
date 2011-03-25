@@ -103,7 +103,7 @@ UValue* UEnuType::make() {
 
 UEnuType::UEnuType(UEnList* l) {
     UEnList* ll;
-    for (size = 0, ll = l; ll; ll = ll->next, size++);
+    for (size = 0, ll = l; ll; ll = ll->next, size++) ;
     tags = new EnSymbol * [size];
     for (unsigned int i = 0; i < size; i++) {
         tags[i] = l->sy;
@@ -147,7 +147,7 @@ URcList::URcList(RcSymbol* _sy, UType* _ty, URcList* _next) : sy(_sy), ty(_ty), 
 
 URecType::URecType(URcList* l) {
     URcList* ll;
-    for (card = 0, ll = l; ll; ll = ll->next, card++);
+    for (card = 0, ll = l; ll; ll = ll->next, card++) ;
     tags = new RcSymbol * [card];
     component = new UType * [card ];
     size = 1;

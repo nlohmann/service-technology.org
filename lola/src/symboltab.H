@@ -43,12 +43,13 @@ class SymbolTab {
 extern SymbolTab* PlaceTable, * TransitionTable;
 
 typedef enum {va, en, rc, fc, so, pl, tr, fp, st} kinds;
+
 class Symbol {
     public:
         char* name;
         kinds kind;
         Symbol* next;
-        Symbol(char*, SymbolTab*);
+        Symbol(char*, SymbolTab*, kinds);
         ~Symbol();
 };
 

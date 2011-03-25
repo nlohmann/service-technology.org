@@ -63,8 +63,9 @@ class EnSymbol;
 class UEnList {
     public:
         EnSymbol* sy;
-        int v;
         UEnList* next;
+        UEnList();
+        UEnList(EnSymbol*);
 };
 
 class UEnuType: public UType {
@@ -91,6 +92,7 @@ class URcList {
         RcSymbol* sy;
         UType* ty;
         URcList* next;
+        URcList(RcSymbol*, UType*, URcList*);
 };
 
 class URecType: public UType {

@@ -46,6 +46,7 @@ const char* getUTypeName(UTypeClass c) {
         case(boo): return "Boolean";
         case(enu): return "enumeration";
     }
+    return NULL;
 }
 
 UBooType* TheBooType;
@@ -102,9 +103,7 @@ UValue* UEnuType::make() {
 
 UEnuType::UEnuType(UEnList* l) {
     UEnList* ll;
-    for (size = 0, ll = l; ll; ll = ll->next, size++) {
-        ;
-    }
+    for (size = 0, ll = l; ll; ll = ll->next, size++);
     tags = new EnSymbol * [size];
     for (unsigned int i = 0; i < size; i++) {
         tags[i] = l->sy;
@@ -114,6 +113,10 @@ UEnuType::UEnuType(UEnList* l) {
     }
     tag = enu;
 }
+
+UEnList::UEnList() : sy(NULL), next(NULL) {}
+
+UEnList::UEnList(EnSymbol* _sy) : sy(_sy), next(NULL) {}
 
 UArrType::UArrType(UType* in, UType* co) {
     index = in;
@@ -140,11 +143,11 @@ bool UArrType::iscompatible(UType* t) {
     return (component->iscompatible(((UArrType*) t)->component));
 }
 
+URcList::URcList(RcSymbol* _sy, UType* _ty, URcList* _next) : sy(_sy), ty(_ty), next(_next) {}
+
 URecType::URecType(URcList* l) {
     URcList* ll;
-    for (card = 0, ll = l; ll; ll = ll->next, card++) {
-        ;
-    }
+    for (card = 0, ll = l; ll; ll = ll->next, card++);
     tags = new RcSymbol * [card];
     component = new UType * [card ];
     size = 1;
@@ -191,7 +194,7 @@ bool UNumValue::iseqqual(UValue* val) {
     if (val->type->tag != num) {
         return false;
     }
-    UNumValue* vv = (UNumValue*) val;
+    UNumValue* vv = static_cast<UNumValue*>(val);
     return (v == vv->v);
 }
 
@@ -199,7 +202,7 @@ bool UBooValue::iseqqual(UValue* val) {
     if (val->type->tag != boo) {
         return false;
     }
-    UBooValue* vv = (UBooValue*) val;
+    UBooValue* vv = static_cast<UBooValue*>(val);
     return (v == vv->v);
 }
 
@@ -207,7 +210,7 @@ bool UEnuValue::iseqqual(UValue* val) {
     if (!type->iscompatible(val->type)) {
         return false;
     }
-    UEnuValue* vv = (UEnuValue*) val;
+    UEnuValue* vv = static_cast<UEnuValue*>(val);
     return (v == vv->v);
 }
 
@@ -216,7 +219,7 @@ bool UArrValue::iseqqual(UValue* val) {
         return false;
     }
     UArrValue* vv = (UArrValue*) val;
-    for (unsigned i = 0; i < ((UArrType*) type)->index->size; i++) {
+    for (unsigned i = 0; i < (static_cast<UArrType*>(type))->index->size; i++) {
         if (!content[i]->iseqqual(vv->content[i])) {
             return false;
         }
@@ -228,8 +231,8 @@ bool URecValue::iseqqual(UValue* val) {
     if (! type->iscompatible(val->type)) {
         return false;
     }
-    URecValue* vv = (URecValue*) val;
-    for (int i = 0; i < ((URecType*) type)->card; i++) {
+    URecValue* vv = static_cast<URecValue*>(val);
+    for (int i = 0; i < (static_cast<URecType*>(type))->card; i++) {
         if (!content[i]->iseqqual(vv->content[i])) {
             return false;
         }
@@ -241,7 +244,7 @@ bool UNumValue::islesseqqual(UValue* val) {
     if (val->type->tag != num) {
         return false;
     }
-    UNumValue* vv = (UNumValue*) val;
+    UNumValue* vv = static_cast<UNumValue*>(val);
     return (v <= vv->v);
 }
 
@@ -249,7 +252,7 @@ bool UBooValue::islesseqqual(UValue* val) {
     if (val->type->tag != boo) {
         return false;
     }
-    UBooValue* vv = (UBooValue*) val;
+    UBooValue* vv = static_cast<UBooValue*>(val);
     return (v <= vv->v);
 }
 
@@ -257,7 +260,7 @@ bool UEnuValue::islesseqqual(UValue* val) {
     if (!type->iscompatible(val->type)) {
         return false;
     }
-    UEnuValue* vv = (UEnuValue*) val;
+    UEnuValue* vv = static_cast<UEnuValue*>(val);
     return (v <= vv->v);
 }
 
@@ -266,7 +269,7 @@ bool UArrValue::islesseqqual(UValue* val) {
         return false;
     }
     UArrValue* vv = (UArrValue*) val;
-    for (unsigned int i = 0; i < ((UArrType*) type)->index->size; i++) {
+    for (unsigned int i = 0; i < (static_cast<UArrType*>(type))->index->size; i++) {
         if (!content[i]->islesseqqual(vv->content[i])) {
             return false;
         }
@@ -278,8 +281,8 @@ bool URecValue::islesseqqual(UValue* val) {
     if (! type->iscompatible(val->type)) {
         return false;
     }
-    URecValue* vv = (URecValue*) val;
-    for (int i = 0; i < ((URecType*) type)->card; i++) {
+    URecValue* vv = static_cast<URecValue*>(val);
+    for (int i = 0; i < (static_cast<URecType*>(type))->card; i++) {
         if (!content[i]->islesseqqual(vv->content[i])) {
             return false;
         }
@@ -288,7 +291,7 @@ bool URecValue::islesseqqual(UValue* val) {
 }
 
 void UNumValue::assign(UValue* val) {
-    v = ((UNumValue*) val)->v;
+    v = (static_cast<UNumValue*>(val))->v;
     while (v < ((UNumType*) type)->lower) {
         v += ((UNumType*) type)->size;
     }
@@ -298,16 +301,16 @@ void UNumValue::assign(UValue* val) {
 }
 
 void UBooValue::assign(UValue* val) {
-    v = ((UBooValue*) val)->v;
+    v = (static_cast<UBooValue*>(val))->v;
 }
 
 void UEnuValue::assign(UValue* val) {
-    v = ((UEnuValue*) val)->v;
+    v = (static_cast<UEnuValue*>(val))->v;
 }
 
 void UArrValue::assign(UValue* val) {
-    UArrValue* arr = arr = (UArrValue*) val;
-    for (int i = ((UArrType*) type)->index->size - 1; i >= 0; i--) {
+    UArrValue* arr = (UArrValue*) val;
+    for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         content[i]->assign(arr->content[i]);
     }
 }
@@ -342,16 +345,16 @@ char* UEnuValue::text() {
 }
 
 char* UArrValue::text() {
-    char** cc = new char * [((UArrType*) type)->index->size];
+    char** cc = new char * [(static_cast<UArrType*>(type))->index->size];
     unsigned int len = 1;
-    for (unsigned int i = 0; i < ((UArrType*) type)->index->size; i++) {
+    for (unsigned int i = 0; i < (static_cast<UArrType*>(type))->index->size; i++) {
         cc[i] = content[i]->text();
         len += strlen(cc[i]) + 1;
     }
     char* c = new char [len + 2];
     strcpy(c, "[");
     len = 1;
-    for (unsigned int i = 0; i < ((UArrType*) type)->index->size; i++) {
+    for (unsigned int i = 0; i < (static_cast<UArrType*>(type))->index->size; i++) {
         strcpy(c + len, cc[i]);
         len += strlen(cc[i]);
         delete [] cc[i];
@@ -364,16 +367,16 @@ char* UArrValue::text() {
 }
 
 char* URecValue::text() {
-    char** cc = new char * [((URecType*) type)->card];
+    char** cc = new char * [(static_cast<URecType*>(type))->card];
     unsigned int len = 1;
-    for (int i = 0; i < ((URecType*) type)->card; i++) {
+    for (int i = 0; i < (static_cast<URecType*>(type))->card; i++) {
         cc[i] = content[i]->text();
         len += strlen(cc[i]) + 1;
     }
     char* c = new char [len + 2];
     strcpy(c, "<");
     len = 1;
-    for (int i = 0; i < ((URecType*) type)->card; i++) {
+    for (int i = 0; i < (static_cast<URecType*>(type))->card; i++) {
         strcpy(c + len, cc[i]);
         len += strlen(cc[i]);
         delete [] cc[i];
@@ -386,8 +389,8 @@ char* URecValue::text() {
 }
 
 void URecValue::assign(UValue* val) {
-    URecValue* rec = rec = (URecValue*) val;
-    for (int i = ((URecType*) type)->card - 1; i >= 0; i--) {
+    URecValue* rec = static_cast<URecValue*>(val);
+    for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         content[i]->assign(rec->content[i]);
     }
 
@@ -422,7 +425,7 @@ UValue* UEnuValue::copy() {
 
 void UEnuValue::operator++ (int) {
     ++v;
-    if (v >= ((UEnuType*) type)->size) {
+    if ((unsigned int)v >= ((UEnuType*) type)->size) {
         v = 0;
     }
 }
@@ -434,15 +437,15 @@ void UEnuValue::print(ostream& os) {
 UValue* UArrValue::copy() {
     UArrValue* val = new UArrValue();
     val->type = type;
-    val->content = new UValue * [((UArrType*) type)->index->size];
-    for (unsigned int i = 0; i < ((UArrType*) type)->index->size; i++) {
+    val->content = new UValue * [(static_cast<UArrType*>(type))->index->size];
+    for (unsigned int i = 0; i < (static_cast<UArrType*>(type))->index->size; i++) {
         val->content[i] = content[i]->copy();
     }
     return val;
 }
 
 void UArrValue::operator++(int) {
-    for (int i = ((UArrType*) type)->index->size - 1; i >= 0; i--) {
+    for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         (*(content[i]))++;
         if (!(content[i]->isfirst())) {
             break;
@@ -452,10 +455,10 @@ void UArrValue::operator++(int) {
 
 void UArrValue::print(ostream& os) {
     os << "[";
-    for (unsigned int i = 0; i < ((UArrType*) type)->component->size - 1; ++i) {
+    for (unsigned int i = 0; i < (static_cast<UArrType*>(type))->component->size - 1; ++i) {
         os << content[i] << "|";
     }
-    os << content[((UArrType*) type)->component->size - 1] << "]";
+    os << content[(static_cast<UArrType*>(type))->component->size - 1] << "]";
 }
 
 
@@ -463,15 +466,15 @@ void UArrValue::print(ostream& os) {
 UValue* URecValue::copy() {
     URecValue* val = new URecValue();
     val->type = type;
-    val->content = new UValue * [((URecType*) type)->card];
-    for (int i = 0; i < ((URecType*) type)->card; i++) {
+    val->content = new UValue * [(static_cast<URecType*>(type))->card];
+    for (int i = 0; i < (static_cast<URecType*>(type))->card; i++) {
         val->content[i] = content[i]->copy();
     }
     return val;
 }
 
 void URecValue::operator++ (int) {
-    for (int i = ((URecType*) type)->card - 1; i >= 0; i--) {
+    for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         (*(content[i]))++;
         if (!(content[i]->isfirst())) {
             break;
@@ -481,10 +484,10 @@ void URecValue::operator++ (int) {
 
 void URecValue::print(ostream& os) {
     os << "<";
-    for (int i = 0; i < ((URecType*) type)->card - 1; i++) {
+    for (int i = 0; i < (static_cast<URecType*>(type))->card - 1; i++) {
         os << content[i] << "|";
     }
-    os << content[((URecType*) type)->card - 1] << ">";
+    os << content[(static_cast<URecType*>(type))->card - 1] << ">";
 }
 
 void UWhileStatement::execute() {
@@ -514,7 +517,7 @@ void UReturnStatement::execute() {
 
 void UConditionalStatement::execute() {
     UValue* val = cond->evaluate();
-    if (((UBooValue*) val)->v == false) {
+    if ((static_cast<UBooValue*>(val))->v == false) {
         no->execute();
     } else {
         yes->execute();
@@ -756,7 +759,7 @@ UValue* UBooValue::addop(UValue* scd) { // OR
 
 UValue* UArrValue::negop() {
     UArrValue* ret = (UArrValue*) type->make();
-    for (int i = ((UArrType*) type)->index->size - 1; i >= 0; i--) {
+    for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         ret->content[i] = content[i]->negop();
     }
     return ret;
@@ -765,7 +768,7 @@ UValue* UArrValue::negop() {
 UValue* UArrValue::mulop(UValue* scd) {
     UArrValue* s = (UArrValue*) scd;
     UArrValue* ret = (UArrValue*) type->make();
-    for (int i = ((UArrType*) type)->index->size - 1; i >= 0; i--) {
+    for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         ret->content[i] = content[i]->mulop(s->content[i]);
     }
     return ret;
@@ -774,7 +777,7 @@ UValue* UArrValue::mulop(UValue* scd) {
 UValue* UArrValue::divop(UValue* scd) {
     UArrValue* s = (UArrValue*) scd;
     UArrValue* ret = (UArrValue*) type->make();
-    for (int i = ((UArrType*) type)->index->size - 1; i >= 0; i--) {
+    for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         ret->content[i] = content[i]->divop(s->content[i]);
     }
     return ret;
@@ -783,7 +786,7 @@ UValue* UArrValue::divop(UValue* scd) {
 UValue* UArrValue::modop(UValue* scd) {
     UArrValue* s = (UArrValue*) scd;
     UArrValue* ret = (UArrValue*) type->make();
-    for (int i = ((UArrType*) type)->index->size - 1; i >= 0; i--) {
+    for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         ret->content[i] = content[i]->modop(s->content[i]);
     }
     return ret;
@@ -792,7 +795,7 @@ UValue* UArrValue::modop(UValue* scd) {
 UValue* UArrValue::subop(UValue* scd) {
     UArrValue* s = (UArrValue*) scd;
     UArrValue* ret = (UArrValue*) type->make();
-    for (int i = ((UArrType*) type)->index->size - 1; i >= 0; i--) {
+    for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         ret->content[i] = content[i]->subop(s->content[i]);
     }
     return ret;
@@ -801,7 +804,7 @@ UValue* UArrValue::subop(UValue* scd) {
 UValue* UArrValue::addop(UValue* scd) {
     UArrValue* s = (UArrValue*) scd;
     UArrValue* ret = (UArrValue*) type->make();
-    for (int i = ((UArrType*) type)->index->size - 1; i >= 0; i--) {
+    for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         ret->content[i] = content[i]->addop(s->content[i]);
     }
     return ret;
@@ -809,7 +812,7 @@ UValue* UArrValue::addop(UValue* scd) {
 
 UValue* URecValue::negop() {
     URecValue* ret = (URecValue*) type->make();
-    for (int i = ((URecType*) type)->card - 1; i >= 0; i--) {
+    for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         ret->content[i] = content[i]->negop();
     }
     return ret;
@@ -818,7 +821,7 @@ UValue* URecValue::negop() {
 UValue* URecValue::addop(UValue* scd) {
     URecValue* s = (URecValue*) scd;
     URecValue* ret = (URecValue*) type->make();
-    for (int i = ((URecType*) type)->card - 1; i >= 0; i--) {
+    for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         ret->content[i] = content[i]->addop(s->content[i]);
     }
     return ret;
@@ -827,7 +830,7 @@ UValue* URecValue::addop(UValue* scd) {
 UValue* URecValue::subop(UValue* scd) {
     URecValue* s = (URecValue*) scd;
     URecValue* ret = (URecValue*) type->make();
-    for (int i = ((URecType*) type)->card - 1; i >= 0; i--) {
+    for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         ret->content[i] = content[i]->subop(s->content[i]);
     }
     return ret;
@@ -836,7 +839,7 @@ UValue* URecValue::subop(UValue* scd) {
 UValue* URecValue::mulop(UValue* scd) {
     URecValue* s = (URecValue*) scd;
     URecValue* ret = (URecValue*) type->make();
-    for (int i = ((URecType*) type)->card - 1; i >= 0; i--) {
+    for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         ret->content[i] = content[i]->mulop(s->content[i]);
     }
     return ret;
@@ -845,7 +848,7 @@ UValue* URecValue::mulop(UValue* scd) {
 UValue* URecValue::divop(UValue* scd) {
     URecValue* s = (URecValue*) scd;
     URecValue* ret = (URecValue*) type->make();
-    for (int i = ((URecType*) type)->card - 1; i >= 0; i--) {
+    for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         ret->content[i] = content[i]->divop(s->content[i]);
     }
     return ret;
@@ -854,7 +857,7 @@ UValue* URecValue::divop(UValue* scd) {
 UValue* URecValue::modop(UValue* scd) {
     URecValue* s = (URecValue*) scd;
     URecValue* ret = (URecValue*) type->make();
-    for (int i = ((URecType*) type)->card - 1; i >= 0; i--) {
+    for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         ret->content[i] = content[i]->modop(s->content[i]);
     }
     return ret;
@@ -873,7 +876,7 @@ bool UEnuValue::isfirst() {
 }
 
 bool UArrValue::isfirst() {
-    for (unsigned int i = 0; i < ((UArrType*) type)->index->size; ++i) {
+    for (unsigned int i = 0; i < (static_cast<UArrType*>(type))->index->size; ++i) {
         if (!(content[i]->isfirst())) {
             return false;
         }
@@ -882,7 +885,7 @@ bool UArrValue::isfirst() {
 }
 
 bool URecValue::isfirst() {
-    for (int i = 0; i < ((URecType*) type)->card; ++i) {
+    for (int i = 0; i < (static_cast<URecType*>(type))->card; ++i) {
         if (!(content[i]->isfirst())) {
             return false;
         }
@@ -933,25 +936,25 @@ UValue* UAddExpression::evaluate() {
 
 UValue* UTrueExpression::evaluate() {
     UValue* val = TheBooType->make();
-    ((UBooValue*) val)->v = true;
+    (static_cast<UBooValue*>(val))->v = true;
     return val;
 }
 
 UValue* UFalseExpression::evaluate() {
     UValue* val = TheBooType->make();
-    ((UBooValue*) val)->v = false;
+    (static_cast<UBooValue*>(val))->v = false;
     return val;
 }
 
 UValue* UEnuconstantExpression::evaluate() {
     UValue* val = type->make();
-    ((UEnuValue*) val)->v = nu;
+    (static_cast<UEnuValue*>(val))->v = nu;
     return val;
 }
 
 UValue* UIntconstantExpression::evaluate() {
     UValue* val = TheNumType->make();
-    ((UNumValue*) val)->v = nu;
+    (static_cast<UNumValue*>(val))->v = nu;
     return val;
 }
 
@@ -965,14 +968,11 @@ UValue* URecordExpression::evaluate() {
     UValue** c = new UValue * [card];
     for (unsigned int i = 0; i < card; ++i) {
         c[i] = cont[i]->evaluate();
-        URcList* rc1 = new URcList;
-        rc1->next = rc;
-        rc1->ty = c[i]->type;
-        rc1->sy = NULL;
+        URcList* rc1 = new URcList(NULL, c[i]->type, rc);
         rc = rc1;
     }
 
-    URecType* t = new URecType(rc);
+    URecType* t = new URecType(rc); // leaks!
     URecValue* a = (URecValue*)(t->make());
     for (unsigned int i = 0; i < card; ++i) {
         a->content[i]->assign(c[i]);
@@ -990,7 +990,7 @@ UValue* UArrayExpression::evaluate() {
     for (unsigned int i = 0; i < card; i++) {
         c[i] = cont[i]->evaluate();
     }
-    UArrType* t = new UArrType(it, c[0]->type);
+    UArrType* t = new UArrType(it, c[0]->type); // leaks!
     UArrValue* a = (UArrValue*)(t->make());
     for (unsigned int i = 0; i < card; i++) {
         a->content[i]->assign(c[i]);
@@ -1085,11 +1085,11 @@ bool deep_compatible(UType* t1, UType* t2, UTypeClass t) {
         return false;
     }
     if (t1->tag == arr) {
-        return deep_compatible(((UArrType*)  t1)->component, ((UArrType*) t2)->component, t);
+        return deep_compatible(((UArrType*) t1)->component, ((UArrType*) t2)->component, t);
     } else {
         // t1->tag must be rec
-        for (int i = 0; i < ((URecType*) t1)->card; i++) {
-            if (!deep_compatible(((URecType*) t1)->component[i], ((URecType*) t2)->component[i], t)) {
+        for (int i = 0; i < (static_cast<URecType*>(t1))->card; i++) {
+            if (!deep_compatible((static_cast<URecType*>(t1))->component[i], ((URecType*) t2)->component[i], t)) {
                 return false;
             }
         }
@@ -1105,11 +1105,11 @@ bool deep_compatible(UType* t1, UTypeClass t) {
         return false;
     }
     if (t1->tag == arr) {
-        return deep_compatible(((UArrType*)  t1)->component, t);
+        return deep_compatible((static_cast<UArrType*>(t1))->component, t);
     } else {
         // t1->tag must be rec
-        for (int i = 0; i < ((URecType*) t1)->card; i++) {
-            if (!deep_compatible(((URecType*) t1)->component[i], t)) {
+        for (int i = 0; i < (static_cast<URecType*>(t1))->card; i++) {
+            if (!deep_compatible((static_cast<URecType*>(t1))->component[i], t)) {
                 return false;
             }
         }
@@ -1121,7 +1121,7 @@ UValueList* UVarTerm::evaluate() {
     UValueList* vl = new UValueList;
     vl->next = NULL;
     vl->val = v->get();
-    char* c = vl->val->text(); // unused!?
+//    char* c = vl->val->text(); // unused!?
     return vl;
 }
 
@@ -1155,9 +1155,9 @@ UValueList* UOpTerm::evaluate() {
             ;
         }
         *last = f->result;
-        for (UValueList* vc = * last; vc; vc = vc->next) {
-            char* bla = vc->val->text(); // unused!?
-        }
+//        for (UValueList* vc = * last; vc; vc = vc->next) {
+//            char* bla = vc->val->text(); // unused!?
+//        }
         f->leave();
 
         // 2. Neue Argumentkombination
@@ -1187,9 +1187,9 @@ UValueList* UOpTerm::evaluate() {
                         }
                     }
                     delete [] subresult;
-                    for (UValueList* vc = vl; vc; vc = vc->next) {
-                        char* bla = vc->val->text(); // unused!?
-                    }
+//                    for (UValueList* vc = vl; vc; vc = vc->next) {
+//                        char* bla = vc->val->text(); // unused!?
+//                    }
                     return vl;
                 }
             }

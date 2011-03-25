@@ -473,10 +473,7 @@ enu:
             yyerrors($1, "element name '%s' of enumeration already used", _cimportant_($1));
         }
         e = new EnSymbol($1);
-        UEnList* eel = new UEnList;
-        eel->sy = e;
-        eel->next = NULL;
-        $$ = eel;
+        $$ = new UEnList(e);
     }
 ;
 
@@ -497,11 +494,7 @@ recordcomponent:
             yyerrors($1, "record component name '%s' already used", _cimportant_($1));
         }
         r = new RcSymbol($1, $3);
-        URcList* rl = new URcList;
-        rl->next = NULL;
-        rl->sy = r;
-        rl->ty = $3;
-        $$ = rl;
+        $$ = new URcList(r, $3, NULL);
     }
 ;
 

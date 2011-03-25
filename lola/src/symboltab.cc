@@ -25,20 +25,17 @@
 SymbolTab* PlaceTable, * TransitionTable;
 extern SymbolTab* GlobalTable, * LocalTable;
 
-SymbolTab::SymbolTab(unsigned int s = 65536) {
-    size = s;
-    table = new Symbol * [s];
-    card = 0;
-    for (unsigned int i = 0; i < s; i++) {
+SymbolTab::SymbolTab(unsigned int s = 65536) : card(0), size(s) {
+    table = new Symbol*[s];
+    for (unsigned int i = 0; i < s; ++i) {
         table[i] = NULL;
     }
 }
 
 SymbolTab::~SymbolTab() {
     for (unsigned int i = 0; i < size; i++) {
-        Symbol* temp;
         while (table[i]) {
-            temp = table[i];
+            Symbol* temp = table[i];
             table[i] = table[i] -> next;
             delete temp;
         }
@@ -49,14 +46,13 @@ SymbolTab::~SymbolTab() {
 
 Symbol* SymbolTab::lookup(char* name) {
     /* 1. Hashvalue bestimmen */
-    unsigned int h, i;
-    Symbol* lst;
-    h = 0;
-    for (i = 0; i < strlen(name); i++) {
+    unsigned int h = 0;
+    for (unsigned int i = 0; i < strlen(name); i++) {
         h += (int) name[i];
         h %= size;
     }
     /* 2. suchen */
+    Symbol* lst;
     for (lst = table[h]; lst; lst = lst -> next) {
         if (!strcmp(lst->name, name)) {
             break;
@@ -65,14 +61,13 @@ Symbol* SymbolTab::lookup(char* name) {
     return lst;
 }
 
-Symbol::Symbol(char* n, SymbolTab* table) {
-    name = n;
+Symbol::Symbol(char* n, SymbolTab* table, kinds _kind) : name(n), kind(_kind) {
     table->add(this);
 }
+
 void SymbolTab::add(Symbol* s) {
     /* 1. Hashvalue bestimmen */
     unsigned int h = 0;
-
     for (unsigned int i = 0; i < strlen(s->name); i++) {
         h += (int) s->name[i];
         h %= size;
@@ -86,50 +81,24 @@ void SymbolTab::add(Symbol* s) {
 
 Symbol::~Symbol() {}
 
-PlSymbol::PlSymbol(char* txt, UType* _sort): Symbol(txt, PlaceTable), sort(_sort) {
-    place = NULL;
-    kind = pl;
-}
+PlSymbol::PlSymbol(char* txt, UType* _sort): Symbol(txt, PlaceTable, pl), place(NULL), sort(_sort) {}
 
-PlSymbol::PlSymbol(Place* p, UType* _sort): Symbol(p->name, PlaceTable), sort(_sort) {
-    place = p;
-    kind = pl;
-}
+PlSymbol::PlSymbol(Place* p, UType* _sort): Symbol(p->name, PlaceTable, pl), place(p), sort(_sort) {}
 
-TrSymbol::TrSymbol(char* c): Symbol(c, TransitionTable) {
-    vars = NULL;;
-    guard = NULL;
-    transition = NULL;
-    kind = tr;
-}
+TrSymbol::TrSymbol(char* c): Symbol(c, TransitionTable, tr), transition(NULL), vars(NULL), guard(NULL) {}
 
-SoSymbol::SoSymbol(char* name, UType* ty): Symbol(name, GlobalTable) {
-    kind = so;
-    type = ty;
-}
+SoSymbol::SoSymbol(char* name, UType* ty): Symbol(name, GlobalTable, so), type(ty) {}
 
-StSymbol::StSymbol(char* name): Symbol(name, BuchiTable) {
-    kind = st;
+StSymbol::StSymbol(char* name): Symbol(name, BuchiTable, st) {
     state = new buchistate(name);
 }
 
-RcSymbol::RcSymbol(char* name, UType* ty): Symbol(name, GlobalTable) {
-    type = ty;
-    kind = rc;
-}
+RcSymbol::RcSymbol(char* name, UType* ty): Symbol(name, GlobalTable, rc), type(ty) {}
 
-VaSymbol::VaSymbol(char* name, UVar* t): Symbol(name, LocalTable) {
-    var = t;
-    kind = va;
-}
+VaSymbol::VaSymbol(char* name, UVar* t): Symbol(name, LocalTable, va), var(t) {}
 
-FcSymbol::FcSymbol(char* name, UFunction* f): Symbol(name, GlobalTable) {
-    function = f;
-    kind = fc;
-}
+FcSymbol::FcSymbol(char* name, UFunction* f): Symbol(name, GlobalTable, fc), function(f) {}
 
-EnSymbol::EnSymbol(char* name): Symbol(name, GlobalTable) {
-    kind = en;
-}
+EnSymbol::EnSymbol(char* name): Symbol(name, GlobalTable, en) {}
 
 IdList::IdList(char* _name, IdList *_next) : name(_name), next(_next) {}

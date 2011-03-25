@@ -46,13 +46,6 @@ clock_t start_clock = clock();
 void terminationHandler() {
     // release memory (used to detect memory leaks)
     // if (args_info.finalize_flag)
-    {
-        time_t start_time, end_time;
-        time(&start_time);
-        cmdline_parser_free(&args_info);
-        time(&end_time);
-        status("released memory [%.0f sec]", difftime(end_time, start_time));
-    }
     // print statistics
     if (args_info.stats_flag) {
         message("runtime: %.2f sec", (static_cast<double> (clock())
@@ -178,8 +171,8 @@ int main(int argc, char* argv[]) {
                     args_info.rulefile_arg, "r"), fclose);
             if (rulefile.get() != NULL) {
 #else
-            FILE * rulefile = fopen(args_info.rulefile_arg, "r");
-            if (rulefile != NULL) {
+                FILE * rulefile = fopen(args_info.rulefile_arg, "r");
+                if (rulefile != NULL) {
 #endif
                 rs.addRules(rulefile);
             } else {
@@ -212,6 +205,22 @@ int main(int argc, char* argv[]) {
                     invocation) << engine;
 
             //quit
+            {
+                time_t start_time, end_time;
+                time(&start_time);
+                cmdline_parser_free(&args_info);
+                time(&end_time);
+                status("released memory [%.0f sec]", difftime(end_time,
+                        start_time));
+            }
+
+#ifndef USE_SHARED_PTR
+            // delete(controller);
+            for (unsigned int i = 0; i < nets.size(); ++i) {
+                delete(nets[i]);
+            }
+#endif
+            nets.clear();
             return 0;
         }
 
@@ -220,8 +229,7 @@ int main(int argc, char* argv[]) {
          \*************************/
 
         time(&start_time);
-        PetriNet_const_ptr controller(
-                adapter.buildController());
+        PetriNet_const_ptr controller(adapter.buildController());
         time(&end_time);
         if (not args_info.diagnosis_flag) {
             status("controller built [%.0f sec]", difftime(end_time,
@@ -237,6 +245,22 @@ int main(int argc, char* argv[]) {
                     invocation) << *controller;
 
             //quit
+            {
+                time_t start_time, end_time;
+                time(&start_time);
+                cmdline_parser_free(&args_info);
+                time(&end_time);
+                status("released memory [%.0f sec]", difftime(end_time,
+                        start_time));
+            }
+
+#ifndef USE_SHARED_PTR
+            // delete(controller);
+            for (unsigned int i = 0; i < nets.size(); ++i) {
+                delete(nets[i]);
+            }
+#endif
+            nets.clear();
             return 0;
         }
 
@@ -280,6 +304,13 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
     // cmdline_parser_free(&args_info);
+    {
+        time_t start_time, end_time;
+        time(&start_time);
+        cmdline_parser_free(&args_info);
+        time(&end_time);
+        status("released memory [%.0f sec]", difftime(end_time, start_time));
+    }
 
     return 0;
 }

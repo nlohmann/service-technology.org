@@ -296,8 +296,7 @@ void UEnuValue::assign(UValue* val) {
 }
 
 void UArrValue::assign(UValue* val) {
-    UArrValue* arr;
-    arr = (UArrValue*) val;
+    UArrValue* arr = arr = (UArrValue*) val;
     for (int i = ((UArrType*) type)->index->size - 1; i >= 0; i--) {
         content[i]->assign(arr->content[i]);
     }
@@ -377,8 +376,7 @@ char* URecValue::text() {
 }
 
 void URecValue::assign(UValue* val) {
-    URecValue* rec;
-    rec = (URecValue*) val;
+    URecValue* rec = rec = (URecValue*) val;
     for (int i = ((URecType*) type)->card - 1; i >= 0; i--) {
         content[i]->assign(rec->content[i]);
     }

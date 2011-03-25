@@ -27,7 +27,7 @@
 #include "graph.H"
 #include "stubborn.H"
 #include "check.H"
-#include "Globals.H"
+#include "Globals.h"
 
 #ifdef FINDPATH
 

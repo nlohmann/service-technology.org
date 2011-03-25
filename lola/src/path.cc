@@ -27,10 +27,9 @@
 #include "graph.H"
 #include "stubborn.H"
 #include "check.H"
+#include "Globals.H"
 
 #ifdef FINDPATH
-//unsigned int numberenabled;
-//unsigned int * enabledstatistic;
 
 Transition** Reserve;  // Transiitons rejected in first selection scheme
 unsigned int Rescounter; // next free entry in Reserve
@@ -48,7 +47,7 @@ unsigned int* globalhashcounter;
         {\
             if((X)->enabled)\
             {\
-                if((myRand() <= (1.0 / (1.0 + globalhashcounter[(Places[0]->hash_value+(X)->hash_change) % HASHSIZE] ))))\
+                if((myRand() <= (1.0 / (1.0 + globalhashcounter[(Globals::Places[0]->hash_value+(X)->hash_change) % HASHSIZE] ))))\
                 {\
                     return(X);\
                 }\
@@ -104,7 +103,7 @@ Transition* insert_up(formula* f) {
             }
             break;
         case eq:
-            if (CurrentMarking[((atomicformula*) f) ->p->index] < ((atomicformula*) f)  -> k) {
+            if (Globals::CurrentMarking[((atomicformula*) f) ->p->index] < ((atomicformula*) f)  -> k) {
                 for (i = 0; i < ((atomicformula*) f) ->p->NrOfArriving; i++) {
                     stubbinsert(((atomicformula*) f) ->p->ArrivingArcs[i]->tr);
                 }
@@ -151,7 +150,7 @@ Transition* insert_down(formula* f) {
 
     switch (f -> type) {
         case neq:
-            if (CurrentMarking[((atomicformula*) f) ->p->index] < ((atomicformula*) f) ->k) {
+            if (Globals::CurrentMarking[((atomicformula*) f) ->p->index] < ((atomicformula*) f) ->k) {
                 for (i = 0; i < ((atomicformula*) f) ->p->NrOfArriving; i++) {
                     stubbinsert(((atomicformula*) f) ->p->ArrivingArcs[i]->tr);
                 }
@@ -220,7 +219,7 @@ Transition* GetFullTransition() {
 Transition* GetStubbornTransition() {
     Transition* t;
 
-    Transitions[0]->StartOfStubbornList = NULL;
+    Globals::Transitions[0]->StartOfStubbornList = NULL;
     StubbornStamp++;
     Rescounter = 0;
     if (t = insert_up(F)) {
@@ -260,7 +259,7 @@ void find_path() {
 
     int res;
     unsigned int OriginalNrEnabled;
-    Reserve = new Transition * [Transitions[0]->cnt];
+    Reserve = new Transition * [Globals::Transitions[0]->cnt];
     if (!F) {
         fprintf(stderr, "lola: specify predicate in analysis task file\n");
         fprintf(stderr, "      mandatory for task FINDPATH\n");
@@ -284,12 +283,12 @@ void find_path() {
     attempt = 0;
     StubbornStamp = 0;
     // 1. initial state speichern
-    for (x = 0; x < Places[0] -> cnt; x++) {
-        Places[x]->initial_marking = CurrentMarking[x];
+    for (x = 0; x < Globals::Places[0] -> cnt; x++) {
+        Globals::Places[x]->initial_marking = Globals::CurrentMarking[x];
     }
     // store change of hash values by transition occurrences
-    for (x = 0; x < Transitions[0]->cnt; x++) {
-        Transitions[x] -> set_hashchange();
+    for (x = 0; x < Globals::Transitions[0]->cnt; x++) {
+        Globals::Transitions[x] -> set_hashchange();
     }
     // 2. new hash table
     hashcounter = new unsigned int [HASHSIZE + 1];
@@ -307,7 +306,7 @@ void find_path() {
         globalhashcounter[x] = 0;
     }
     globalnonemptyhash = 1;
-    OriginalNrEnabled = Transitions[0]->NrEnabled;
+    OriginalNrEnabled = Globals::Transitions[0]->NrEnabled;
     while (1) {
 //for(sss=0;sss<11;sss++)
 //{
@@ -320,50 +319,50 @@ void find_path() {
         // init new search attempt
         attempt++;
         cerr << "Attempt # " << attempt << "\n";
-        for (x = 0; x < Places[0]->cnt; x++) {
-            Places[x]->set_marking(Places[x]->initial_marking);
+        for (x = 0; x < Globals::Places[0]->cnt; x++) {
+            Globals::Places[x]->set_marking(Globals::Places[x]->initial_marking);
         }
-        for (x = 0; x < Transitions[0]->cnt; x++) {
-            Transitions[x]->enabled = true;
-            if (x < Transitions[0]->cnt - 1) {
-                Transitions[x]->NextEnabled = Transitions[x + 1];
+        for (x = 0; x < Globals::Transitions[0]->cnt; x++) {
+            Globals::Transitions[x]->enabled = true;
+            if (x < Globals::Transitions[0]->cnt - 1) {
+                Globals::Transitions[x]->NextEnabled = Globals::Transitions[x + 1];
             }
             if (x) {
-                Transitions[x]->PrevEnabled = Transitions[x - 1];
+                Globals::Transitions[x]->PrevEnabled = Globals::Transitions[x - 1];
             }
 #ifdef STUBBORN
-            Transitions[x]->mustbeincluded =
-                Transitions[x]->conflicting;
+            Globals::Transitions[x]->mustbeincluded =
+                Globals::Transitions[x]->conflicting;
 #endif
         }
-        Transitions[0]->StartOfEnabledList = Transitions[0];
-        Transitions[Transitions[0]->cnt - 1]->NextEnabled = NULL;
-        Transitions[0]->PrevEnabled = NULL;
-        for (x = 0; x < Transitions[0]->cnt; x++) {
-            Transitions[x]->check_enabled();
+        Globals::Transitions[0]->StartOfEnabledList = Globals::Transitions[0];
+        Globals::Transitions[Globals::Transitions[0]->cnt - 1]->NextEnabled = NULL;
+        Globals::Transitions[0]->PrevEnabled = NULL;
+        for (x = 0; x < Globals::Transitions[0]->cnt; x++) {
+            Globals::Transitions[x]->check_enabled();
 #ifdef STUBBORN
-            Transitions[x]->instubborn = 0;
+            Globals::Transitions[x]->instubborn = 0;
 #endif
         }
-        Transitions[0]->NrEnabled = OriginalNrEnabled;
+        Globals::Transitions[0]->NrEnabled = OriginalNrEnabled;
         for (x = 0; x < HASHSIZE; x++) {
             hashcounter[x] = 0;
         }
         nonemptyhash = NrOfStates = 1;
-        hashcounter[Places[0]->hash_value] ++;
-        globalhashcounter[Places[0]->hash_value] ++;
+        hashcounter[Globals::Places[0]->hash_value] ++;
+        globalhashcounter[Globals::Places[0]->hash_value] ++;
         if (F -> initatomic()) {
             cout << "\n\nInitial state satisfies formula\n\n";
-            if (pflg) {
-                ofstream pathstream(pathfile);
+            if (Globals::pflg) {
+                ofstream pathstream(Globals::pathfile);
                 if (!pathstream) {
-                    fprintf(stderr, "lola: cannot open path output file '%s'\n", pathfile);
+                    fprintf(stderr, "lola: cannot open path output file '%s'\n", Globals::pathfile);
                     fprintf(stderr, "      no output written\n");
-                    pflg = false;
+                    Globals::pflg = false;
                 }
                 pathstream << "PATH\n";
             }
-            if (Pflg) {
+            if (Globals::Pflg) {
                 cout <<  "PATH\n";
             }
             return;
@@ -390,36 +389,36 @@ void find_path() {
             update_formula(t);
             if (F->value) {
                 cout << "\n\n State found!\n\n";
-                if (pflg) {
-                    ofstream pathstream(pathfile);
+                if (Globals::pflg) {
+                    ofstream pathstream(Globals::pathfile);
                     if (!pathstream) {
-                        fprintf(stderr, "lola: cannot open path output file '%s'\n", pathfile);
+                        fprintf(stderr, "lola: cannot open path output file '%s'\n", Globals::pathfile);
                         fprintf(stderr, "      no output written\n");
-                        pflg = false;
+                        Globals::pflg = false;
                     }
                     pathstream << "PATH\n";
                     for (j = 0; j <= k; j++) {
                         pathstream << path[j]->name << "\n";
                     }
                 }
-                if (Pflg) {
+                if (Globals::Pflg) {
                     cout << "PATH\n";
                     for (j = 0; j <= k; j++) {
                         cout << path[j]->name << "\n";
                     }
                 }
-                printstate("", CurrentMarking);
+                printstate("", Globals::CurrentMarking);
                 return;
             }
             NrOfStates++;
-            if (!hashcounter[Places[0]->hash_value]) {
+            if (!hashcounter[Globals::Places[0]->hash_value]) {
                 nonemptyhash++;
             }
-            if (!globalhashcounter[Places[0]->hash_value]) {
+            if (!globalhashcounter[Globals::Places[0]->hash_value]) {
                 globalnonemptyhash++;
             }
-            hashcounter[Places[0]->hash_value]++;
-            globalhashcounter[Places[0]->hash_value]++;
+            hashcounter[Globals::Places[0]->hash_value]++;
+            globalhashcounter[Globals::Places[0]->hash_value]++;
         }
         cerr << "hash entries (this attempt): " << nonemptyhash << " (all attempts): " << globalnonemptyhash << "\n";
     }

@@ -18,7 +18,7 @@ class Transition: public Node {
     public:
         static unsigned int cnt; ///< statistics; overall number of transitions
         static Transition* StartOfEnabledList;  ///< anchor to list of enabled transitions
-        Transition(char*);  ///< constructor
+        Transition(char*, unsigned int);  ///< constructor
         ~Transition(); ///< destructor
         unsigned int fairness; ///< fairness constraint defined for this transition: 0=no, 1=weak, 2=strong
         static unsigned int NrEnabled; ///< Number of enabled tr. at Globals::CurrentMarking
@@ -102,7 +102,7 @@ class Transition: public Node {
 };
 
 /// constructor
-inline Transition::Transition(char* name): Node(name) {
+inline Transition::Transition(char* name, unsigned int _fairness): Node(name), fairness(_fairness) {
     cnt += 1;
     if (!(cnt % REPORTFREQUENCY)) {
         cerr << "\n" << cnt << "transitions parsed\n";

@@ -29,6 +29,25 @@
 extern void yyerrors(char* token, char const* format, ...);
 extern char* yytext;
 
+inline long unsigned int power(unsigned int a, unsigned int b) {
+    long unsigned int c;
+    c = 1;
+    for (unsigned int i = 0; i < b; i++) {
+        c *= a;
+    }
+    return c;
+}
+
+const char* getUTypeName(UTypeClass c) {
+    switch(c) {
+        case(arr): return "array";
+        case(rec): return "record";
+        case(num): return "integer";
+        case(boo): return "Boolean";
+        case(enu): return "enumeration";
+    }
+}
+
 UBooType* TheBooType;
 UNumType* TheNumType;
 
@@ -94,15 +113,6 @@ UEnuType::UEnuType(UEnList* l) {
         l = l->next;
     }
     tag = enu;
-}
-
-long unsigned int power(unsigned int a, unsigned int b) {
-    long unsigned int c;
-    c = 1;
-    for (unsigned int i = 0; i < b; i++) {
-        c *= a;
-    }
-    return c;
 }
 
 UArrType::UArrType(UType* in, UType* co) {
@@ -565,7 +575,7 @@ void runtimeerror(char const* mess) {
     yyerrors(yytext, "runtime error: %s", _cimportant_(mess));
 }
 
-UValue*   UCallExpression::evaluate() {
+UValue* UCallExpression::evaluate() {
     fct->enter();
     for (int i = 0; i < fct->arity; i++) {
         (fct->formalpar)[i]->assign((currentpar[i])->evaluate());
@@ -613,35 +623,19 @@ UValue* UGreaterthanExpression::evaluate() {
 }
 
 UValue* ULesseqqualExpression::evaluate() {
-    UValue* l;
-    UValue* r;
-    UBooValue* ret;
-
-    l = left->evaluate();
-    r = right->evaluate();
-    ret = (UBooValue*)(TheBooType->make());
-    if (l->islesseqqual(r)) {
-        ret->v = true;
-    } else {
-        ret->v = false;
-    }
+    UValue* l = left->evaluate();
+    UValue* r = right->evaluate();
+    UBooValue* ret = (UBooValue*)(TheBooType->make());
+    ret->v = l->islesseqqual(r);
     return ret;
 }
 
 
 UValue* UGreatereqqualExpression::evaluate() {
-    UValue* l;
-    UValue* r;
-    UBooValue* ret;
-
-    l = left->evaluate();
-    r = right->evaluate();
-    ret = (UBooValue*)(TheBooType->make());
-    if (r->islesseqqual(l)) {
-        ret->v = true;
-    } else {
-        ret->v = false;
-    }
+    UValue* l = left->evaluate();
+    UValue* r = right->evaluate();
+    UBooValue* ret = (UBooValue*)(TheBooType->make());
+    ret->v = r->islesseqqual(l);
     return ret;
 }
 
@@ -649,7 +643,6 @@ UValue* ULessthanExpression::evaluate() {
     UValue* l = left->evaluate();
     UValue* r = right->evaluate();
     UBooValue* ret = (UBooValue*)(TheBooType->make());
-
     ret->v = (l->islesseqqual(r) and not l->iseqqual(r));
     return ret;
 }
@@ -1082,7 +1075,7 @@ UVar::UVar(UType* t) {
 }
 
 bool deep_compatible(UType* t1, UType* t2, UTypeClass t) {
-    if (! t1->iscompatible(t2)) {
+    if (not t1->iscompatible(t2)) {
         return false;
     }
     if (t1->tag == t && t2->tag == t) {
@@ -1203,3 +1196,7 @@ UValueList* UOpTerm::evaluate() {
         }
     }
 }
+
+fmode::fmode() : v(NULL), t(NULL), next(NULL) {}
+
+fmode::fmode(VaSymbol* _v, UExpression* _t, fmode* _next) : v(_v), t(_t), next(_next) {}

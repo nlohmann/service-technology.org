@@ -56,8 +56,8 @@ class PlSymbol: public Symbol {
     public:
         Place* place;
         UType* sort;
-        PlSymbol(Place*);  // LL- places
-        PlSymbol(char*);  // HL-places
+        PlSymbol(Place*, UType*);  // LL- places
+        PlSymbol(char*, UType*);   // HL-places
 };
 
 class TrSymbol: public Symbol {
@@ -111,6 +111,7 @@ class IdList {
     public:
         char* name;
         IdList* next;
+        IdList(char*, IdList*);
 };
 
 #endif

@@ -29,6 +29,8 @@ typedef enum {
     arr, rec, num, boo, enu //,set, lst
 } UTypeClass;
 
+const char* getUTypeName(UTypeClass c);
+
 class UValue;
 
 class UType {
@@ -82,25 +84,6 @@ class UArrType: public UType {
         UValue* make();
 };
 
-//class ULstType: public UType
-//{
-//public:
-//UType * component;
-//unsigned int maxlength;
-//bool iscompatible(UType*);
-//ULstType(UType *, unsigned int);
-//UValue * make();
-//};
-
-//class USetType: public UType
-//{
-//public:
-//UType * component;
-//bool iscompatible(UType*);
-//USetType(UType *);
-//UValue * make();
-//};
-
 class RcSymbol;
 
 class URcList {
@@ -123,12 +106,11 @@ class URecType: public UType {
 class UValue {
     public:
         UType* type;
-        //unsigned long int numeric;
         virtual UValue* copy() = 0;
         virtual void assign(UValue*) = 0;
         virtual bool isfirst() = 0;
         virtual void print(ostream&) = 0;
-        virtual void operator ++ (int) = 0;
+        virtual void operator++ (int) = 0;
         virtual bool iseqqual(UValue*) = 0;
         virtual bool islesseqqual(UValue*) = 0;
         virtual UValue* addop(UValue*) = 0;
@@ -142,9 +124,8 @@ class UValue {
         virtual ~UValue(void) {}
 };
 
-inline ostream& operator << (ostream& os, UValue* val) {
+inline ostream& operator<< (ostream& os, UValue* val) {
     val->print(os);
-
     return os;
 }
 
@@ -152,7 +133,7 @@ class UNumValue: public UValue {
     public:
         int v;
         UValue* copy();
-        void operator ++ (int);
+        void operator++ (int);
         virtual bool isfirst();
         void print(ostream&);
         void assign(UValue*);
@@ -172,7 +153,7 @@ class UBooValue: public UValue {
     public:
         bool v;
         UValue* copy();
-        void operator ++ (int);
+        void operator++ (int);
         void print(ostream&);
         void assign(UValue*);
         virtual bool iseqqual(UValue*);
@@ -192,53 +173,27 @@ class UEnuValue: public UValue {
     public:
         int v;
         UValue* copy();
-        void operator ++ (int);
+        void operator++ (int);
         void print(ostream&);
         void assign(UValue*);
         virtual bool iseqqual(UValue*);
         virtual bool isfirst();
         virtual bool islesseqqual(UValue*);
-        UValue* addop(UValue*) {
-            return NULL;
-        }
-        UValue* subop(UValue*) {
-            return NULL;
-        }
-        UValue* mulop(UValue*) {
-            return NULL;
-        }
-        UValue* divop(UValue*) {
-            return NULL;
-        }
-        UValue* modop(UValue*) {
-            return NULL;
-        }
-        UValue* negop() {
-            return NULL;
-        }
+        UValue* addop(UValue*) { return NULL;}
+        UValue* subop(UValue*) { return NULL;}
+        UValue* mulop(UValue*) { return NULL;}
+        UValue* divop(UValue*) { return NULL;}
+        UValue* modop(UValue*) { return NULL;}
+        UValue* negop()        { return NULL;}
         char* text();
         UEnuValue(UType*, int);
 };
-
-//class ULstValue : public UValue
-//{
-//public:
-//unsigned int length;
-//UValue ** content;
-//UValue * copy();
-//void operator ++ (int);
-//void print(ostream &);
-//void assign(UValue *);
-//virtual bool iseqqual(UValue *);
-//virtual bool islesseqqual(UValue *);
-//UValue * addop(UValue *);
-//};
 
 class UArrValue : public UValue {
     public:
         UValue** content;
         UValue* copy();
-        void operator ++ (int);
+        void operator++ (int);
         void print(ostream&);
         void assign(UValue*);
         virtual bool iseqqual(UValue*);
@@ -253,24 +208,11 @@ class UArrValue : public UValue {
         char* text();
 };
 
-//class USetValue : public UValue
-//{
-//public:
-//bool * content;
-//UValue * copy();
-//void operator ++ (int);
-//void print(ostream &);
-//void assign(UValue *);
-//virtual bool iseqqual(UValue *);
-//virtual bool islesseqqual(UValue *);
-//UValue * addop(UValue *);
-//};
-
 class URecValue : public UValue {
     public:
         UValue** content;
         UValue* copy();
-        void operator ++ (int);
+        void operator++ (int);
         void print(ostream&);
         virtual bool isfirst();
         void assign(UValue*);
@@ -291,8 +233,6 @@ class UExpression {
         virtual UValue* evaluate() = 0;
         virtual ~UExpression() {}
 };
-
-//class DerefList;
 
 class ULVal {
     public:
@@ -323,15 +263,6 @@ class UArrayLVal : public ULVal {
         UType* indextype;
         UValue* dereference();
 };
-
-//class DerefList
-//{
-//public:
-//UValue * val;
-//unsigned long int oldnumeric;
-//DerefList * next;
-//virtual void correct() = 0;
-//};
 
 class UStatement {
     public:
@@ -380,7 +311,6 @@ class UCaseStatement : public UStatement {
         void execute();
 };
 
-
 class UForStatement : public UStatement {
     public:
         UVar* var;
@@ -415,15 +345,6 @@ class UForallStatement : public UStatement {
         void execute();
 };
 
-//class UForinStatement : public UStatement
-//{
-//public:
-//UVar * var;
-//UStatement * body;
-//UValue * set;
-//void execute();
-//};
-
 class URepeatStatement : public UStatement {
     public:
         UExpression* cond;
@@ -451,22 +372,6 @@ class UGreatereqqualExpression : public UExpression {
         UExpression* right;
         UValue* evaluate();
 };
-
-//class UPrefixExpression : public UExpression
-//{
-//public:
-//UExpression * left;
-//UExpression * right;
-//UValue * evaluate();
-//};
-
-//class UInExpression : public UExpression
-//{
-//public:
-//UExpression * left;
-//UExpression * right;
-//UValue * evaluate();
-//};
 
 class USubExpression : public UExpression {
     public:
@@ -579,7 +484,6 @@ class UUneqqualExpression : public UExpression {
         UValue* evaluate();
 };
 
-
 class UValueList {
     public:
         UValue* val;
@@ -618,7 +522,6 @@ class UVar {
         UVar(UType*);
 };
 
-
 bool deep_compatible(UType*, UType*, UTypeClass);
 bool deep_compatible(UType*, UTypeClass);
 
@@ -655,11 +558,15 @@ class ExitException {}; //Exit-Anweisung wird als Exception realisiert
 
 class VaSymbol;
 
+
+/// \todo Warum steht das hier?
 class fmode {
     public:
         VaSymbol* v;
         UExpression* t;
         fmode* next;
+        fmode();
+        fmode(VaSymbol*, UExpression*, fmode*);
 };
 
 #endif

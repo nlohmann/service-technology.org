@@ -22,7 +22,7 @@ extern unsigned int currentdfsnum;
 class Place: public Node {
     public:
         static unsigned int cnt; ///< overall number of places;
-        Place(char*);  ///< constructor
+        Place(char*, unsigned int, unsigned int);  ///< constructor
         ~Place(); ///< destructor
         static unsigned int hash_value; ///< hash value of Globals::CurrentMarking
         // TODO: conditional compilation?
@@ -60,7 +60,7 @@ class Place: public Node {
 };
 
 /// constructor
-inline Place::Place(char* name) : Node(name) {
+inline Place::Place(char* name, unsigned int _capacity, unsigned int _nrbits) : Node(name), capacity(_capacity), nrbits(_nrbits) {
     cnt += 1;
 #ifdef PREDUCTION
     significant = false; // in this case, psolve() sets sign. places subsequently

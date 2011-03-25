@@ -51,7 +51,9 @@ class arc_list {
         PlSymbol* place;
         UTermList* mt;
         unsigned int nu;
-        arc_list*     next;
+        arc_list* next;
+        arc_list() : place(NULL), mt(NULL), nu(0), next(NULL) {}
+        arc_list(PlSymbol* _place, UTermList* _mt, unsigned int _nu, arc_list* _next) : place(_place), mt(_mt), nu(_nu), next(_next) {}
 };
 
 class case_list {
@@ -59,6 +61,8 @@ class case_list {
         UStatement* stm;
         UExpression* exp;
         case_list* next;
+        case_list() : stm(NULL), exp(NULL), next(NULL) {}
+        case_list(UStatement* _stm, UExpression* _exp, case_list* _next) : stm(_stm), exp(_exp), next(_next) {}
 };
 
 /* list of places and multiplicities to become arcs */
@@ -224,7 +228,7 @@ input:
 #endif
     }
 | declarations net _ANALYSE_ _MARKING_ amarkinglist  { F = NULL; }
-| declarations net _AUTOMATON_ automaton  {F = NULL; }
+| declarations net _AUTOMATON_ automaton             {F = NULL; }
 ;
 
 
@@ -245,19 +249,17 @@ atransition:
         $$ = TS->transition;
     }
 | hlprefix _leftbracket_ firingmode _rightbracket_ {
-        unsigned int i, j, card;
+        unsigned int card;
         fmode* fm;
-        UValue* vl;
-        unsigned int len;
         for (card = 0, fm = $3; fm; fm = fm->next, card++);
         if (card != $1->vars->card) {
             yyerror("firing mode incomplete");
         }
         char** cc = new char* [ card + 10];
         char** inst = new char* [ card + 10];
-        len = strlen($1->name) + 4;
-        j = 0;
-        for (i = 0; i < LocalTable->size; i++) {
+        unsigned int len = strlen($1->name) + 4;
+        unsigned int j = 0;
+        for (unsigned int i = 0; i < LocalTable->size; i++) {
             for (VS = (VaSymbol*)(LocalTable->table[i]); VS; VS = (VaSymbol*)(VS->next)) {
                 for (fm = $3; fm; fm = fm->next) {
                     if (fm->v == VS) {
@@ -267,7 +269,7 @@ atransition:
                 if (!fm) {
                     yyerror("firing mode incomplete");
                 }
-                vl = fm->t->evaluate();
+                UValue* vl = fm->t->evaluate();
                 UValue* pl = VS->var->type->make();
                 pl->assign(vl);
                 cc[j] = pl->text();
@@ -289,7 +291,7 @@ atransition:
         strcpy(llt + (strlen(llt) - 1), "]");
         TS = (TrSymbol*) TransitionTable->lookup(llt);
         if (!TS) {
-            yyerror("transition instance does not exist");
+            yyerrors(llt, "transition instance '%s' does not exist", _cimportant_(llt));
         }
         if (TS->vars && TS->vars->card) {
             yyerror("high-level and low-level transition names mixed up");
@@ -323,10 +325,7 @@ firingmode:
         if (!(VS->var->type->iscompatible($3->type))) {
             yyerrors(yytext, "expression not compatible with variable of transition '%s'", _cimportant_($1));
         }
-        $$ = new fmode;
-        $$->next = NULL;
-        $$->v = VS;
-        $$->t = $3;
+        $$ = new fmode(VS, $3, NULL);
     }
 | firingmode _slash_ nodeident _equals_ expression {
         VS = (VaSymbol*) LocalTable->lookup($3);
@@ -336,10 +335,7 @@ firingmode:
         if (!(VS->var->type->iscompatible($5->type))) {
             yyerrors(yytext, "expression not compatible with variable of transition '%s'", _cimportant_($3));
         }
-        $$ = new fmode;
-        $$->next = $1;
-        $$->v = VS;
-        $$->t = $5 ;
+        $$ = new fmode(VS, $5, $1);
         for (fmode* fm = $1; fm ; fm = fm->next) {
             if (fm->v == $$->v) {
                 yyerror("variable appears twice in firing mode");
@@ -369,7 +365,8 @@ aplace:
             yyerrors($1, "low-level place '%s' does not require an instance", _cimportant_($1));
         }
         if (!(PS->sort->iscompatible($3->type))) {
-            yyerrors($1, "place color not compatible to sort of place '%s'", _cimportant_($1));
+            yyerrors($1, "place color (%s) not compatible to sort of place '%s' (%s)",
+                _cimportant_(getUTypeName(PS->sort->tag)), _cimportant_(getUTypeName($3->type->tag)), _cimportant_($1));
         }
         UValue* vl = $3->evaluate();
         UValue* pl = PS->sort->make();
@@ -381,7 +378,7 @@ aplace:
         strcpy(ll + strlen(ll), inst);
         PS = (PlSymbol*) PlaceTable->lookup(ll);
         if (!PS) {
-            yyerror("place instance does not exist");
+            yyerrors(ll, "place instance '%s' does not exist", _cimportant_(ll));
         }
         if (PS->sort) {
             yyerror("mixed up high-level and low-level place names");
@@ -413,7 +410,6 @@ sortdeclaration:
   IDENTIFIER _equals_ sortdescription _semicolon_ {
         // sort symbols are globally visible. A sort entry in the
         // symbol table relates a name to a sort description (UType)
-
         SoSymbol* s;
         if ((s = (SoSymbol*)(GlobalTable->lookup($1)))) {
             yyerrors($1, "sort symbol name '%s' already used", _cimportant_($1));
@@ -432,7 +428,7 @@ sortdescription:
             yyerrors($1, "undefined sort name '%s'", _cimportant_($1));
         }
         if (s->kind != so) {
-            yyerrors($1, "sort name expected - '%s' is not a sort", _cimportant_($1));
+            yyerrors($1, "sort name expected, but '%s' is not a sort", _cimportant_($1));
         }
         $$ = s->type;
     }
@@ -442,7 +438,7 @@ sortdescription:
 | _ARRAY_ sortdescription _OF_ sortdescription {
         // index type must be scalar
         if ($2->tag != boo && $2->tag != num && $2->tag != enu) {
-            yyerror("non-scalar type as index of array");
+            yyerrors(yytext, "non-scalar type '%s' as index of array", _cimportant_(getUTypeName($2->tag)));
         }
         $$ = new UArrType($2, $4);
     }
@@ -547,14 +543,10 @@ vdeclaration:
 
 identlist:
   IDENTIFIER {
-        $$ = new IdList;
-        $$->name = $1;
-        $$->next = NULL;
+        $$ = new IdList($1, NULL);
     }
 | IDENTIFIER _comma_ identlist {
-        $$ = new IdList;
-        $$->name = $1;
-        $$->next = $3;
+        $$ = new IdList($1, $3);
     }
 ;
 
@@ -641,7 +633,8 @@ statement:
 while_statement:
   _WHILE_ expression _DO_ statement_seq _END_ {
         if ($2->type->tag != boo) {
-            yyerror("while condition must be Boolean");
+            yyerrors(yytext, "while condition must be %s, but is %s",
+                _cimportant_("Boolean"), _cimportant_(getUTypeName($2->type->tag)));
         }
         $$ = new UWhileStatement;
         ((UWhileStatement*) $$)->cond = $2;
@@ -653,7 +646,8 @@ while_statement:
 repeat_statement:
   _REPEAT_ statement_seq _UNTIL_ expression _END_ {
         if ($4->type->tag != boo) {
-            yyerror("repeat condition must be Boolean");
+            yyerrors(yytext, "repeat condition must be %s, but is %s",
+                _cimportant_("Boolean"), _cimportant_(getUTypeName($4->type->tag)));
         }
         $$ = new URepeatStatement;
         ((URepeatStatement*) $$)->cond = $4;
@@ -671,10 +665,12 @@ for_statement:
         $$ = new UForStatement;
         ((UForStatement*) $$)->var = v->var;
         if (!(v->var->type->iscompatible($4->type))) {
-            yyerror("initial expression of for statement not compatible to counter variable");
+            yyerrors(yytext, "initial expression of for statement (%s) is not compatible to counter variable (%s)",
+                _cimportant_(getUTypeName(v->var->type->tag)), _cimportant_(getUTypeName($4->type->tag)));
         }
         if (!(v->var->type->iscompatible($6->type))) {
-            yyerror("exit expression of for statement not compatible to counter variable");
+            yyerrors(yytext, "exit expression of for statement (%s) is not compatible to counter variable (%s)",
+              _cimportant_(getUTypeName(v->var->type->tag)), _cimportant_(getUTypeName($6->type->tag)));
         }
         ((UForStatement*) $$)->init = $4;
         ((UForStatement*) $$)->finit = $6;
@@ -700,7 +696,8 @@ forall_statement:
 if_statement:
   _IF_ expression _THEN_ statement_seq _END_ {
         if ($2->type->tag != boo) {
-            yyerror("condition in if statement must be Boolean");
+            yyerrors(yytext, "condition in if statement must be %s, but is %s",
+                _cimportant_("Boolean"), _cimportant_(getUTypeName($2->type->tag)));
         }
         $$ = new UConditionalStatement;
         ((UConditionalStatement*) $$)->cond = $2;
@@ -709,7 +706,8 @@ if_statement:
     }
 | _IF_ expression _THEN_ statement_seq _ELSE_ statement_seq _END_ {
         if ($2->type->tag != boo) {
-            yyerror("condition in if statement must be Boolean");
+            yyerrors(yytext, "condition in if statement must be %s, but is %s",
+                _cimportant_("Boolean"), _cimportant_(getUTypeName($2->type->tag)));
         }
         $$ = new UConditionalStatement;
         ((UConditionalStatement*) $$)->cond = $2;
@@ -722,7 +720,8 @@ if_statement:
 return_statement:
   _RETURN_ expression {
         if (!($2->type->iscompatible(CurrentFunction->type))) {
-            yyerror("returned value incompatible to function type");
+            yyerrors(yytext, "returned value (%s) incompatible to function type (%s)",
+              _cimportant_(getUTypeName($2->type->tag)), _cimportant_(getUTypeName(CurrentFunction->type->tag)));
         }
         $$ = new UReturnStatement;
         ((UReturnStatement*) $$)->fct = CurrentFunction;
@@ -745,7 +744,8 @@ case_statement:
         case_list* l;
         for (l = $3, crd = 0; l; l = l->next, crd++) {
             if (!($2->type->iscompatible(l->exp->type))) {
-                yyerror("case item incompatible to case expression");
+                yyerrors(yytext, "case item (%s) incompatible to case expression (%s)",
+                  _cimportant_(getUTypeName($2->type->tag)), _cimportant_(getUTypeName(l->exp->type->tag)));
             }
         }
         $$ = new UCaseStatement;
@@ -764,7 +764,8 @@ case_statement:
         case_list* l;
         for (l = $3, crd = 0; l; l = l->next, crd++) {
             if (!($2->type->iscompatible(l->exp->type))) {
-                yyerror("case item incompatible to case expression");
+                yyerrors(yytext, "case item (%s) incompatible to case expression (%s)",
+                  _cimportant_(getUTypeName($2->type->tag)), _cimportant_(getUTypeName(l->exp->type->tag)));
             }
         }
         $$ = new UCaseStatement;
@@ -789,10 +790,7 @@ caselist:
 
 case:
   _CASE_ expression _colon_ statement_seq {
-        $$ = new case_list;
-        $$->exp = $2;
-        $$->stm = $4;
-        $$->next = NULL;
+        $$ = new case_list($4, $2, NULL);
     }
 ;
 
@@ -800,7 +798,8 @@ case:
 assignment:
   lvalue _equals_ expression {
         if (!($1->type->iscompatible($3->type))) {
-            yyerror("incompatible types in assignment");
+            yyerrors(yytext, "incompatible types in assignment (%s vs. %s)",
+              _cimportant_(getUTypeName($1->type->tag)), _cimportant_(getUTypeName($3->type->tag)));
         }
         $$ = new UAssignStatement;
         ((UAssignStatement*) $$)->left = $1;
@@ -821,10 +820,10 @@ lvalue:
     }
 | lvalue _leftbracket_ expression _rightbracket_ {
         if ($1->type->tag != arr) {
-            yyerrors(yytext, "component of '%s' referenced which is not an array", $1);
+            yyerrors(yytext, "component of '%s' referenced which is not an array, but %s", $1, _cimportant_(getUTypeName($1->type->tag)));
         }
         if (($3->type->tag != boo) && ($3->type->tag != num) && ($3->type->tag != enu)) {
-            yyerror("non-scalar expression for array index");
+            yyerrors(yytext, "non-scalar expression (%s) for array index", _cimportant_(getUTypeName($3->type->tag)));
         }
         $$ = new UArrayLVal;
         $$->type = ((UArrType*)($1->type))->component;
@@ -1087,10 +1086,10 @@ fac:
     }
 | lvalue _leftbracket_ expression _rightbracket_ {
         if ($1->type->tag != arr) {
-            yyerror("component of something not an array referenced");
+            yyerrors(yytext, "component of something not an array (%s) referenced", _cimportant_(getUTypeName($1->type->tag)));
         }
         if (($3->type->tag != boo) && ($3->type->tag != num) && ($3->type->tag != enu)) {
-            yyerror("non-scalar expression for array index");
+            yyerrors(yytext, "non-scalar expression (%s) for array index", _cimportant_(getUTypeName($3->type->tag)));
         }
         UArrayLVal* a = new UArrayLVal;
         a->type = ((UArrType*)($1->type))->component;
@@ -1123,8 +1122,6 @@ fac:
 
 functioncall:
   IDENTIFIER _leftparenthesis_ expressionlist _rightparenthesis_ {
-        case_list* c;
-        int i;
         FcSymbol* f = (FcSymbol*) GlobalTable->lookup($1);
         if (!f) {
             yyerrors($1, "undefined function '%s' called", _cimportant_($1));
@@ -1133,13 +1130,15 @@ functioncall:
         e->fct = f->function;
         e->type = f->function->type;
         e->currentpar = new UExpression* [f->function->arity + 10];
+        case_list* c;
+        int i;
         for (i = 0, c = $3; i < f-> function->arity; i++) {
             if (!c) {
                 yyerrors(yytext, "too few arguments to function '%s'", _cimportant_($1));
             }
             e->currentpar[i] = c->exp;
             if (!(c->exp->type->iscompatible(f->function->formalpar[i]->type))) {
-                yyerrors(yytext, "type mismatch in call parameter of function '%s'", _cimportant_($1));
+                yyerrors(yytext, "type mismatch in call parameter %d of function '%s'", i+1, _cimportant_($1));
             }
             c = c->next;
         }
@@ -1154,14 +1153,10 @@ functioncall:
 expressionlist:
   /* empty */ { $$ = NULL; }
 | expression {
-        $$ = new case_list;
-        $$->exp = $1;
-        $$->next = NULL;
+        $$ = new case_list(NULL, $1, NULL);
     }
 | expression _comma_ expressionlist {
-        $$ = new case_list;
-        $$->exp = $1;
-        $$->next = $3;
+        $$ = new case_list(NULL, $1, $3);
     }
 ;
 
@@ -1169,12 +1164,8 @@ expressionlist:
 arrayvalue:
   _leftbracket_ valuelist _rightbracket_ {
         unsigned int h;
-        int i;
         case_list* c;
-
-        for (c = $2, h = 0; c; c = c->next, h++) {
-            ;
-        }
+        for (c = $2, h = 0; c; c = c->next, h++);
         UNumType* it = new UNumType(1, h);
         UType* ct = $2->exp->type;
         UArrType* at = new UArrType(it, ct);
@@ -1182,6 +1173,7 @@ arrayvalue:
         e->type = at;
         e->card = h;
         e->cont = new UExpression* [h + 10];
+        int i;
         for (i = 0, c = $2; i < (int)h; i++, c = c->next) {
             e->cont[i] = c->exp;
             if (!(ct->iscompatible(c->exp->type))) {
@@ -1196,14 +1188,10 @@ arrayvalue:
 
 valuelist:
   expression {
-        $$ = new case_list;
-        $$->exp = $1;
-        $$->next = NULL;
+        $$ = new case_list(NULL, $1, NULL);
     }
 | expression _slash_ valuelist {
-        $$ = new case_list;
-        $$->next = $3;
-        $$->exp = $1;
+        $$ = new case_list(NULL, $1, $3);
     }
 ;
 
@@ -1229,35 +1217,31 @@ amarking:
         }
     }
 | nodeident _colon_ multiterm {
-        char* inst, * ll;
-        UTermList* tl;
-        UValueList* vl, * currentvl;
-        UValue* pv;
-        PlSymbol* PSI;
         PS = (PlSymbol*) PlaceTable->lookup($1);
         if (!PS) {
-            yyerror("place does not exist");
+            yyerrors($1, "place '%s' does not exist", _cimportant_($1));
         }
         if (!PS->sort) {
             yyerrors($1, "multiterm expression not allowed for low-level place '%s'", _cimportant_($1));
         }
-        pv = PS->sort->make();
-        for (tl = $3; tl; tl = tl->next) { // do for all mt components
+        UValue* pv = PS->sort->make();
+        for (UTermList* tl = $3; tl; tl = tl->next) { // do for all mt components
             // check type compatibility
             if (!(PS->sort->iscompatible(tl->t->type))) {
-                yyerror("marking expression not compatible to sort of place");
+                yyerrors(yytext, "marking expression %s not compatible to sort %s of place '%s'",
+                _cimportant_(getUTypeName(tl->t->type->tag)), _cimportant_(getUTypeName(PS->sort->tag)), _cimportant_($1));
             }
-            vl = tl->t->evaluate();
-            for (currentvl = vl; currentvl; currentvl = currentvl->next) {
+            UValueList* vl = tl->t->evaluate();
+            for (UValueList* currentvl = vl; currentvl; currentvl = currentvl->next) {
                 pv->assign(currentvl->val); // type adjustment
-                inst = pv->text();
-                ll = new char [strlen($1) + strlen(inst) + 20];
+                char* inst = pv->text();
+                char* ll = new char [strlen($1) + strlen(inst) + 20];
                 strcpy(ll, $1);
                 strcpy(ll + strlen($1), ".");
                 strcpy(ll + (strlen($1) + 1), inst);
-                PSI = (PlSymbol*) PlaceTable->lookup(ll);
+                PlSymbol* PSI = (PlSymbol*) PlaceTable->lookup(ll);
                 if (!PSI) {
-                    yyerror("place instance does not exist");
+                    yyerrors(ll, "place instance '%s' does not exist", _cimportant_(ll));
                 }
                 PSI->place->target_marking += tl->mult;
             }
@@ -1270,13 +1254,12 @@ net:
   _PLACE_ placelists _semicolon_ _MARKING_ {LocalTable = NULL; }
   markinglist _semicolon_ transitionlist {
         unsigned int i, h, j;
-        Symbol* ss;
         // Create array of places
         Globals::Places = new Place* [PlaceTable->card + 10];
         Globals::CurrentMarking = new unsigned int [PlaceTable->card + 10];
         i = 0;
         for (h = 0; h < PlaceTable->size; h++) {
-            for (ss = PlaceTable->table[h]; ss; ss = ss->next) {
+            for (Symbol* ss = PlaceTable->table[h]; ss; ss = ss->next) {
                 if (!(((PlSymbol*) ss)->sort)) {
                     Globals::Places[i++] = ((PlSymbol*) ss)->place;
                 }
@@ -1292,7 +1275,7 @@ net:
         Globals::Transitions = new Transition* [TransitionTable->card + 10];
         i = 0;
         for (h = 0; h < TransitionTable->size; h++) {
-            for (ss = TransitionTable->table[h]; ss; ss = ss->next) {
+            for (Symbol* ss = TransitionTable->table[h]; ss; ss = ss->next) {
                 if (!(((TrSymbol*) ss)->vars)) {
                     Globals::Transitions[i++] = ((TrSymbol*) ss)->transition;
                 }
@@ -1409,11 +1392,9 @@ place:
         if (PlaceTable->lookup($1)) {
             yyerrors($1, "place '%s' name used twice", _cimportant_($1));
         }
-        P = new Place($1);
-        PS = new PlSymbol(P);
-        PS->sort = NULL;
-        P->capacity = CurrentCapacity;
-        P->nrbits = CurrentCapacity > 0 ? logzwo(CurrentCapacity) : 32;
+        const unsigned int capacity = (CurrentCapacity > 0) ? logzwo(CurrentCapacity) : 32;
+        P = new Place($1, CurrentCapacity, capacity);
+        PS = new PlSymbol(P, NULL);
     }
 | nodeident _colon_ sortdescription {
         // high level place: unfold to all instances
@@ -1423,26 +1404,20 @@ place:
         }
         c = new char [strlen($1) + 10];
         strcpy(c, $1);
-        PS =  new PlSymbol(c);
-        PS->sort = $3;
-        UValue* v;
-        v = $3->make();
+        PS = new PlSymbol(c, $3);
+        UValue* v = $3->make();
         do {
-            char* lowlevelplace;
-            char* lowtag;
-            lowtag = v->text();
-            lowlevelplace = new char [ strlen(c) + strlen(lowtag) + 20];
+            char* lowtag = v->text();
+            char* lowlevelplace = new char [ strlen(c) + strlen(lowtag) + 20];
             strcpy(lowlevelplace, c);
             strcpy(lowlevelplace + strlen(c), ".");
             strcpy(lowlevelplace + strlen(c) + 1, lowtag);
             if (PlaceTable->lookup(lowlevelplace)) {
-                yyerror("place instance name already used");
+                yyerrors(lowlevelplace, "place instance '%s' name already used", _cimportant_(lowlevelplace));
             }
-            P = new Place(lowlevelplace);
-            P->capacity = CurrentCapacity;
-            P->nrbits = CurrentCapacity > 0 ? logzwo(CurrentCapacity) : 32;
-            PS = new PlSymbol(P);
-            PS->sort = NULL;
+            const unsigned int capacity = (CurrentCapacity > 0) ? logzwo(CurrentCapacity) : 32;
+            P = new Place(lowlevelplace, CurrentCapacity, capacity);
+            PS = new PlSymbol(P, NULL);
             (*v)++;
         } while (!(v->isfirst()));
     }
@@ -1481,7 +1456,7 @@ marking:
         PlSymbol* PSI;
         PS = (PlSymbol*) PlaceTable->lookup($1);
         if (!PS) {
-            yyerror("place does not exist");
+            yyerrors($1, "place '%s' does not exist", _cimportant_($1));
         }
         if (!PS->sort) {
             yyerrors($1, "multiterm expression not allowed for low-level place '%s'", _cimportant_($1));
@@ -1502,7 +1477,7 @@ marking:
                 strcpy(ll + (strlen($1) + 1), inst);
                 PSI = (PlSymbol*) PlaceTable->lookup(ll);
                 if (!PSI) {
-                    yyerror("place instance does not exist");
+                    yyerrors(ll, "place instance '%s' does not exist", _cimportant_(ll));
                 }
                 (* PSI->place) += tl->mult;
             }
@@ -1570,7 +1545,8 @@ hlterm:
         ot->sub = new UTerm* [i + 5];
         for (i = 0, l = $3; i < ot->arity; i++, l = l->next) {
             if (!(ot->f->formalpar[i]->type->iscompatible(l->t->type))) {
-                yyerror("type mismatch in subterm(s)");
+                yyerrors(yytext, "type mismatch in subterm %d: %s given, but %s expected",
+                  i+1, _cimportant_(getUTypeName(l->t->type->tag)), _cimportant_(getUTypeName(ot->f->formalpar[i]->type->tag)));
             }
             ot->sub[i] = l->t;
         }
@@ -1602,7 +1578,7 @@ transition:
   transitionvariables guard _CONSUME_ arclist _semicolon_ _PRODUCE_ arclist _semicolon_ {
         unsigned int card;
         unsigned int i;
-        arc_list* current;
+        //arc_list* current;
         /* 1. Transition anlegen */
         TS = new TrSymbol($2);
         TS->vars = LocalTable;
@@ -1670,21 +1646,18 @@ transition:
                 TSI->vars = NULL;
                 TSI->guard = NULL;
             }
-            T = TSI->transition = new Transition(TSI->name);
-            T->fairness = $4;
+            T = TSI->transition = new Transition(TSI->name, $4);
             /* 2. Inliste eintragen */
             /* HL-Boegen in LL-Boegen uebersetzen und zur Liste hinzufuegen */
             arc_list* root;
             root = $7;
-            for (current = root; current; current = current->next) {
+            for (arc_list* current = root; current; current = current->next) {
                 if (current->mt) {
                     // traverse multiterm
-                    arc_list* a;
                     UTermList* mc;
                     UValueList* vl;
                     UValueList* vc;
-                    UValue* pv;
-                    pv = current->place->sort->make();
+                    UValue* pv = current->place->sort->make();
                     for (mc = current->mt; mc ; mc = mc->next) {
                         vl = mc->t->evaluate();
 
@@ -1704,23 +1677,18 @@ transition:
                             if (PS->sort) {
                                 yyerror("arcs to high-level places are not allowed");
                             }
-                            a = new arc_list;
-                            a->place = PS;
-                            a->mt = NULL;
-                            a->nu = mc->mult;
-                            a->next = root;
+                            arc_list* a = new arc_list(PS, NULL, mc->mult, root);
                             root = a;
                         }
                     }
                 }
             }
             /* Anzahl der Boegen */
-            for (card = 0, current = root; current; card++, current = current->next) {
-                ;
-            }
+            arc_list* current;
+            for (card = 0, current = root; current; card++, current = current->next);
             T->ArrivingArcs = new Arc * [card + 10];
             /* Schleife ueber alle Boegen */
-            for (current = root; current; current = current->next) {
+            for (arc_list* current = root; current; current = current->next) {
                 /* Bogen ist nur HL-Bogen */
                 if (current->place->sort) {
                     continue;
@@ -1746,15 +1714,13 @@ transition:
             }
             /* 2. Outliste eintragen */
             root = $10;
-            for (current = root; current; current = current->next) {
+            for (arc_list* current = root; current; current = current->next) {
                 if (current->mt) {
                     // traverse multiterm
-                    arc_list* a;
                     UTermList* mc;
                     UValueList* vl;
                     UValueList* vc;
-                    UValue* pv;
-                    pv = current->place->sort->make();
+                    UValue* pv = current->place->sort->make();
                     for (mc = current->mt; mc ; mc = mc->next) {
                         vl = mc->t->evaluate();
                         for (vc = vl; vc; vc  = vc->next) {
@@ -1770,11 +1736,7 @@ transition:
                             if (!ll) {
                                 yyerror("place instance does not exist");
                             }
-                            a = new arc_list;
-                            a->place = PS;
-                            a->mt = NULL;
-                            a->nu = mc->mult;
-                            a->next = root;
+                            arc_list* a = new arc_list(PS, NULL, mc->mult, root);
                             root = a;
                         }
                     }
@@ -1786,7 +1748,7 @@ transition:
             }
             T->LeavingArcs = new Arc* [card + 10];
             /* Schleife ueber alle Boegen */
-            for (current = root; current; current = current->next) {
+            for (arc_list* current = root; current; current = current->next) {
                 /* Bogen ist nur HL-Bogen */
                 if (current->place->sort) {
                     continue;
@@ -1876,11 +1838,7 @@ arc:
         if (PS->sort) {
             yyerrors(yytext, "arc expression of high level place '%s' must be term expressions", _cimportant_($1));
         }
-        $$ = new arc_list;
-        $$->place = PS;
-        $$->next = (arc_list*)  0;
-        $$->nu = atoi($3);
-        $$->mt = NULL;
+        $$ = new arc_list(PS, NULL, atoi($3), NULL);
     }
 | nodeident _colon_ multiterm {
         PS = (PlSymbol*) PlaceTable->lookup($1);
@@ -1890,11 +1848,7 @@ arc:
         if (!(PS->sort)) {
             yyerrors($1, "low-level place '%s' requires numerical multiplicity", _cimportant_($1));
         }
-        $$ = new arc_list;
-        $$->place = PS;
-        $$->nu = 0;
-        $$->mt = $3;
-        $$->next = NULL;
+        $$ = new arc_list(PS, $3, 0, NULL);
         for (UTermList* tl = $3; tl; tl = tl->next) {
             if (!(PS->sort->iscompatible(tl->t->type))) {
                 yyerrors($1, "type mismatch between place '%s' and arc expression", _cimportant_($1));
@@ -2115,10 +2069,7 @@ fmodeblock:
         if (!(VS->var->type->iscompatible($3->type))) {
             yyerror("variable binding incompatible with variable type");
         }
-        $$ = new fmode;
-        $$->v = VS;
-        $$->t = $3 ;
-        $$->next = NULL;
+        $$ = new fmode(VS, $3, NULL);
     }
 ;
 

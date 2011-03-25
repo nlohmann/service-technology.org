@@ -86,12 +86,12 @@ void SymbolTab::add(Symbol* s) {
 
 Symbol::~Symbol() {}
 
-PlSymbol::PlSymbol(char* txt): Symbol(txt, PlaceTable) {
+PlSymbol::PlSymbol(char* txt, UType* _sort): Symbol(txt, PlaceTable), sort(_sort) {
     place = NULL;
     kind = pl;
 }
 
-PlSymbol::PlSymbol(Place* p): Symbol(p->name, PlaceTable) {
+PlSymbol::PlSymbol(Place* p, UType* _sort): Symbol(p->name, PlaceTable), sort(_sort) {
     place = p;
     kind = pl;
 }
@@ -131,3 +131,5 @@ FcSymbol::FcSymbol(char* name, UFunction* f): Symbol(name, GlobalTable) {
 EnSymbol::EnSymbol(char* name): Symbol(name, GlobalTable) {
     kind = en;
 }
+
+IdList::IdList(char* _name, IdList *_next) : name(_name), next(_next) {}

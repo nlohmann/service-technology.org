@@ -357,14 +357,14 @@ char* UArrValue::text() {
 char* URecValue::text() {
     char** cc = new char * [((URecType*) type)->card];
     unsigned int len = 1;
-    for (unsigned int i = 0; i < ((URecType*) type)->card; i++) {
+    for (int i = 0; i < ((URecType*) type)->card; i++) {
         cc[i] = content[i]->text();
         len += strlen(cc[i]) + 1;
     }
     char* c = new char [len + 2];
     strcpy(c, "<");
     len = 1;
-    for (unsigned int i = 0; i < ((URecType*) type)->card; i++) {
+    for (int i = 0; i < ((URecType*) type)->card; i++) {
         strcpy(c + len, cc[i]);
         len += strlen(cc[i]);
         delete [] cc[i];
@@ -1130,7 +1130,7 @@ UValueList* UVarTerm::evaluate() {
     UValueList* vl = new UValueList;
     vl->next = NULL;
     vl->val = v->get();
-    char* c = vl->val->text();
+    char* c = vl->val->text(); // unused!?
     return vl;
 }
 
@@ -1165,7 +1165,7 @@ UValueList* UOpTerm::evaluate() {
         }
         *last = f->result;
         for (UValueList* vc = * last; vc; vc = vc->next) {
-            char *bla = vc->val->text();
+            char* bla = vc->val->text(); // unused!?
         }
         f->leave();
 
@@ -1197,7 +1197,7 @@ UValueList* UOpTerm::evaluate() {
                     }
                     delete [] subresult;
                     for (UValueList* vc = vl; vc; vc = vc->next) {
-                        char* bla = vc->val->text();
+                        char* bla = vc->val->text(); // unused!?
                     }
                     return vl;
                 }

@@ -35,6 +35,7 @@ public class InvalidModelException extends Exception {
   public static final int OCLET_HISTORY_NOT_PREFIX = 4;
   public static final int OCLET_HISTORY_INCOMPLETE_PREFIX = 5;
   public static final int NO_INITIAL_STATE = 6;
+  public static final int UNKNOWN_MODEL_TYPE = 7;
   
   private Object cause;
   private int reason;
@@ -67,6 +68,7 @@ public class InvalidModelException extends Exception {
     case OCLET_HISTORY_NOT_PREFIX: return "Prefix of oclet is not a history";
     case OCLET_HISTORY_INCOMPLETE_PREFIX: return "Prefix of oclet is incomplete";
     case NO_INITIAL_STATE: return "System has no initial state";
+    case UNKNOWN_MODEL_TYPE: return "Unknown model type";
     }
     return "";
   }

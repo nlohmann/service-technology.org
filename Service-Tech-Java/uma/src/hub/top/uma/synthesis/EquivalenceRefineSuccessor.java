@@ -29,13 +29,13 @@ import java.util.HashMap;
 import com.google.gwt.dev.util.collect.HashSet;
 
 /**
- * Implementation of {@link IEquivalentConditions} to partition an equivalence class
+ * Implementation of {@link IEquivalentNodesRefine} to partition an equivalence class
  * of nodes into finer equivalence classes. Two nodes are equivalent iff they have
  * equivalent successor sets.
  * 
  * @author dfahland
  */
-public class SuccessorEquivalence implements IEquivalentConditions {
+public class EquivalenceRefineSuccessor implements IEquivalentNodesRefine {
   
   private DNodeBP bp;
   
@@ -46,7 +46,7 @@ public class SuccessorEquivalence implements IEquivalentConditions {
    * 
    * @param bp
    */
-  public SuccessorEquivalence(DNodeBP bp) {
+  public EquivalenceRefineSuccessor(DNodeBP bp) {
     this.bp = bp;
   }
   
@@ -64,16 +64,38 @@ public class SuccessorEquivalence implements IEquivalentConditions {
       return result;
     }
     
-    HashMap<DNode[], HashSet<DNode>> succ = new HashMap<DNode[], HashSet<DNode>>();
-    
     Uma.out.print("splitting: "+nodes);
+    
+    HashMap<DNode[], HashSet<DNode>> succ = successorEquivalence(bp, nodes);
+    
+    Uma.out.print(" --> ");
+    for (HashSet<DNode> part : succ.values()) {
+      Uma.out.print(part+" | ");
+    }
+    Uma.out.println();
+    
+    return succ.values(); // each partition becomes a separate equivalence class
+  }
+  
+  /**
+   * Partitions the set of 'nodes' into equivalence classes based on the equivalence relation
+   * on the 'nodes' stored in 'bp'.
+   *  
+   * @param bp
+   * @param nodes
+   * @return a map that points to the equivalence classes, the key of each equivalence classes
+   *         is an array of the canonical representatives of the successors of all nodes in the
+   *         class
+   */
+  public static HashMap<DNode[], HashSet<DNode>> successorEquivalence(DNodeBP bp, HashSet<DNode> nodes) {
+    HashMap<DNode[], HashSet<DNode>> succ = new HashMap<DNode[], HashSet<DNode>>();
     
     // partition the set of nodes in this equivalence class based on their
     // successors: two nodes go into the same partition if their sets of successors
     // are equivalent
     for (DNode d : nodes) {
       // compute the set of successors of 'd' (i.e. their canonical representatives)
-      DNode s[] = getSuccessorEquivalence(d);
+      DNode s[] = getSuccessorEquivalence(bp, d);
       
       boolean found = false;
       for (DNode[] s2 : succ.keySet()) {  // get all successor sets stored in 'succ'
@@ -89,27 +111,25 @@ public class SuccessorEquivalence implements IEquivalentConditions {
       }
     }
     
-    Uma.out.print(" --> ");
-    for (HashSet<DNode> part : succ.values()) {
-      Uma.out.print(part+" | ");
-    }
-    Uma.out.println();
-    
-    return succ.values(); // each partition becomes a separate equivalence class
+    return succ;
   }
   
   /**
+   * @param bp
    * @param d
    * @return a vector of the the canonical representatives of the
-   *         successors of 'd'
+   *         successors of 'd' according to the equivalence stored in 'bp'
    */
-  private DNode[] getSuccessorEquivalence(DNode d) {
+  public static DNode[] getSuccessorEquivalence(DNodeBP bp, DNode d) {
+    if (d.post == null) return new DNode[0];
+    
     DNode[] s = new DNode[d.post.length];
     for (int i=0; i<d.post.length; i++) {
       s[i] = bp.getElementary_ccPair().get(d.post[i]);
     }
     return s;
   }
+
 }
 
 

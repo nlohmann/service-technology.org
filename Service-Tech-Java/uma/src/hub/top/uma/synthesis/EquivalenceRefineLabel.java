@@ -26,15 +26,15 @@ import java.util.HashMap;
 import com.google.gwt.dev.util.collect.HashSet;
 
 /**
- * Implementation of {@link IEquivalentConditions} to partition an equivalence class
+ * Implementation of {@link IEquivalentNodesRefine} to partition an equivalence class
  * of nodes into finer equivalence classes. Two nodes are equivalent iff they have
  * the same label.
  * 
  * @author dfahland
  */
-public class LabelEquivalence implements IEquivalentConditions {
+public class EquivalenceRefineLabel implements IEquivalentNodesRefine {
 
-  public static final LabelEquivalence instance = new LabelEquivalence();
+  public static final EquivalenceRefineLabel instance = new EquivalenceRefineLabel();
   
   /*
    * (non-Javadoc)

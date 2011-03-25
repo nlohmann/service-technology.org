@@ -29,7 +29,7 @@ import com.google.gwt.dev.util.collect.HashSet;
  * 
  * @author dfahland
  */
-public interface IEquivalentConditions {
+public interface IEquivalentNodesRefine {
 
   /**
    * Partition the set of nodes into several sets of equivalent nodes.

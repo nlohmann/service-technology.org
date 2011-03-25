@@ -1,0 +1,35 @@
+1x case0 b+complete c+complete e+complete j+complete E+complete
+1x case1 b+complete d+complete j+complete E+complete
+1x case2 S+complete g+complete i+complete k+complete E+complete
+1x case3 S+complete b+complete E+complete
+1x case4 S+complete b+complete j+complete e+complete c+complete E+complete
+1x case5 e+complete b+complete c+complete S+complete j+complete E+complete
+1x case6 S+complete b+complete c+complete e+complete E+complete j+complete
+1x case7 S+complete b+complete c+complete e+complete j+complete E+complete
+1x case8 S+complete c+complete b+complete e+complete j+complete E+complete
+1x case9 c+complete b+complete S+complete e+complete j+complete E+complete
+1x case10 S+complete c+complete e+complete j+complete E+complete
+1x case11 S+complete b+complete d+complete E+complete j+complete
+1x case12 S+complete b+complete d+complete j+complete E+complete
+1x case13 S+complete d+complete b+complete j+complete E+complete
+1x case14 S+complete e+complete j+complete E+complete
+1x case15 S+complete d+complete j+complete E+complete
+1x case16 S+complete f+complete h+complete g+complete i+complete
+1x case17 S+complete b+complete j+complete E+complete
+1x case18 f+complete h+complete g+complete i+complete k+complete E+complete
+1x case19 f+complete g+complete h+complete i+complete k+complete E+complete
+1x case20 S+complete b+complete c+complete
+1x case21 d+complete j+complete E+complete
+1x case22 h+complete g+complete i+complete k+complete E+complete
+1x case23 g+complete h+complete i+complete k+complete E+complete
+1x case24 S+complete E+complete g+complete i+complete h+complete k+complete f+complete
+1x case25 f+complete S+complete g+complete h+complete i+complete k+complete E+complete
+1x case26 S+complete h+complete g+complete i+complete f+complete k+complete E+complete
+1x case27 f+complete S+complete g+complete i+complete h+complete k+complete E+complete
+1x case28 S+complete f+complete g+complete i+complete h+complete k+complete E+complete
+1x case29 S+complete f+complete h+complete g+complete i+complete k+complete E+complete
+1x case30 S+complete f+complete g+complete h+complete i+complete k+complete E+complete
+1x case31 g+complete f+complete h+complete S+complete i+complete k+complete E+complete
+1x case32 S+complete g+complete i+complete h+complete k+complete E+complete
+1x case33 S+complete h+complete g+complete i+complete k+complete E+complete
+1x case34 S+complete b+complete c+complete e+complete

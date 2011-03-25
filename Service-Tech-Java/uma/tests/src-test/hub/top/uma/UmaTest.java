@@ -10,9 +10,12 @@ import hub.top.scenario.DNodeSys_OcletSpecification;
 import hub.top.scenario.Oclet;
 import hub.top.scenario.OcletIO;
 import hub.top.scenario.OcletSpecification;
+import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.synthesis.NetSynthesis;
 
 import java.io.IOException;
+
+import com.google.gwt.dev.util.collect.HashSet;
 
 public class UmaTest extends hub.top.test.TestCase {
 	
@@ -434,6 +437,46 @@ public class UmaTest extends hub.top.test.TestCase {
         NetSynthesis.doesImplement(net2, build);
       
       assertEquals(lastTest, diag.result, NetSynthesis.COMPARE_EQUAL);
+      
+    } catch (IOException e) {
+      System.err.println("Couldn't read test file: "+e);
+      assertTrue(lastTest, false);
+    } catch (InvalidModelException e) {
+      assertTrue(lastTest, false);
+    }
+  }
+  
+  public void testConcurrentStructural_net() {
+    lastTest = "Concurrency of nodes (structural test)";
+    try {
+    
+      ISystemModel sysModel = Uma.readSystemFromFile(testFileRoot+"/net_lexik.lola");
+      DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
+      DNodeBP build = Uma.initBuildPrefix(sys, 1);
+      
+      while (build.step() > 0) {
+      }
+      
+      DNodeSetElement allnodes = build.bp.getAllNodes();
+      
+      // compare for all nodes of the branching process that concurrencies are
+      // computed consistently
+      
+      for (DNode d : allnodes) {
+        if (d.isEvent) continue;    // build.co only for conditions
+        for (DNode d2 : allnodes) {
+          if (d2.isEvent) continue; // build.co only for conditions
+          
+          boolean co1 = build.co.get(d).contains(d2);
+          boolean co2 = build.co.get(d2).contains(d);
+          boolean co3 = build.areConcurrent_struct(d, d2);
+          boolean co4 = build.areConcurrent_struct(d2, d);
+          
+          assertTrue(lastTest + " # symmetric co relation", co1 == co2);
+          assertTrue(lastTest + " # symmetric co structural", co3 == co4);
+          assertTrue(lastTest + " # relation ("+co1+") = structural ("+co3+"): "+d+" || "+d2, co1 == co3);
+        }
+      }
       
     } catch (IOException e) {
       System.err.println("Couldn't read test file: "+e);

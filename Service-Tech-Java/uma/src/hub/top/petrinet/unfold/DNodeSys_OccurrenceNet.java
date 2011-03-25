@@ -19,6 +19,7 @@ package hub.top.petrinet.unfold;
 
 import hub.top.petrinet.Node;
 import hub.top.petrinet.PetriNet;
+import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeSet;
@@ -30,12 +31,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 public class DNodeSys_OccurrenceNet extends DNodeSys {
   
   private int                 nodeNum;       // counter number of nodes 
   private Map<DNode, Node>    nodeOrigin;    // inverse of #nodeEncoding
   private Map<Node, DNode>    nodeEncoding;  // encoding of net Nodes as DNodes
+  
+  private Set<Place>          implicitPlaces;// implicit places of the net
 
   /**
    * Construct {@link DNodeSys} from a Petri net. Every transition becomes
@@ -45,7 +49,7 @@ public class DNodeSys_OccurrenceNet extends DNodeSys {
    * @param net
    * @throws InvalidModelException
    */
-  public DNodeSys_OccurrenceNet(PetriNet net) throws InvalidModelException {
+  public DNodeSys_OccurrenceNet(PetriNet net, Set<Place> implicitPlaces) throws InvalidModelException {
     // initialize the standard data structures
     super();
     
@@ -53,6 +57,8 @@ public class DNodeSys_OccurrenceNet extends DNodeSys {
     buildNameTable(net);
     nodeEncoding = new HashMap<Node, DNode>(nodeNum);
     nodeOrigin = new HashMap<DNode, Node>(nodeNum);
+    
+    this.implicitPlaces = implicitPlaces; 
     
     // and set the initial state
     initialRun = buildDNodeRepresentation(net);
@@ -172,6 +178,8 @@ public class DNodeSys_OccurrenceNet extends DNodeSys {
       DNode d = new DNode(nameToID.get(n.getName()), pre);
       if (n instanceof Transition) {
         d.isEvent = true;
+      } else if (n instanceof Place) {
+        d.isImplied = implicitPlaces.contains((Place)n);
       }
       
       // initialize post-set of new DNode d

@@ -26,6 +26,7 @@ import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeSet;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Options;
 import hub.top.uma.DNodeSet.DNodeSetElement;
@@ -86,9 +87,17 @@ public class Unfolder_PetriNet {
    * @return
    */
   public PetriNet getUnfoldingAsPetriNet() {
+    return convertToPetrinet(bp.getBranchingProcess());
+  }
 
+  /**
+   * Convert the branching process into a Petri net and return this Petri net
+   * @param bp
+   * @return
+   */
+  public static PetriNet convertToPetrinet(DNodeSet bp) {
     PetriNet unfolding = new PetriNet();
-    DNodeSetElement allNodes = bp.getBranchingProcess().getAllNodes();
+    DNodeSetElement allNodes = bp.getAllNodes();
     
     HashMap<Integer, Node> nodeMap = new HashMap<Integer, Node>();
     
@@ -106,7 +115,7 @@ public class Unfolder_PetriNet {
       Place p = unfolding.addPlace(name);
       nodeMap.put(n.globalId, p);
       
-      if (bp.getBranchingProcess().initialConditions.contains(n))
+      if (bp.initialConditions.contains(n))
         p.setTokens(1);
     }
 

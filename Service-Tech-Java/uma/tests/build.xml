@@ -85,6 +85,7 @@
     	  <sysproperty key="test.testFileRoot" path="${testfiles}"/>
 	      <test name="hub.top.scenario.OcletTest" />	
 	      <test name="hub.top.uma.UmaTest" />
+	   	  <test name="hub.top.uma.UmaFoldTest" />
 	    </junit>
 		
 		<!-- Cobertura: generate HTML coverage report -->

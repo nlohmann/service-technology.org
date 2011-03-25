@@ -160,6 +160,39 @@ public class DNodeSet {
 		if (newNode.isEvent) allEvents.add(newNode);
 		else allConditions.add(newNode);
 	}
+
+	/**
+	 * Remove node b from this set.
+	 * TODO: update {@link #maxNodesInitial} 
+	 * 
+	 * @param b
+	 */
+  protected void remove(DNode b) {
+    
+    for (DNode e : b.post) {
+      // remove 'b' from the pre-set of each of its post-events
+      DNode[] e_pre_new = new DNode[e.pre.length-1];
+      for (int i=0,j=0; i<e.pre.length; i++) {
+        if (e.pre[i] == b) continue;
+        e_pre_new[j++] = e.pre[i];
+      }
+      e.pre = e_pre_new;
+    }
+    
+    for (DNode e : b.pre) {
+      // remove 'b' from the pre-set of each of its post-events
+      DNode[] e_post_new = new DNode[e.post.length-1];
+      for (int i=0,j=0; i<e.post.length; i++) {
+        if (e.post[i] == b) continue;
+        e_post_new[j++] = e.post[i];
+      }
+      e.post = e_post_new;
+    }
+    
+    allConditions.remove(b);
+  }
+	  
+
 	
 	/**
 	 * @return all nodes in this {@link DNodeSet} by backwards search from its
@@ -378,6 +411,38 @@ public class DNodeSet {
     } // breadth-first search
 
     return configuration;
+  }
+  
+  /**
+   * @param d
+   * @return all transitive predecessors of 'd'
+   */
+  public HashSet<DNode> getAllPredecessors(DNode d) {
+    // the events of the configuration before 'cut'
+    HashSet<DNode> predecessors = new HashSet<DNode>();
+
+    // find all predecessor events of 'cut'
+    // by backwards breadth-first search from 'cut'
+    LinkedList<DNode> queue = new LinkedList<DNode>();
+    queue.add(d);
+    predecessors.add(d);
+    
+    // run breadth-first search
+    while (!queue.isEmpty()) {
+      
+      DNode first = queue.removeFirst();
+      
+      for (DNode pre : first.pre)
+      {
+        if (!predecessors.contains(pre)) {
+          // only add to the queue if not queued already
+          queue.add(pre);
+          predecessors.add(pre);
+        }
+      } // all preconditions of the current event
+    } // breadth-first search
+
+    return predecessors;
   }
 	
 	/**

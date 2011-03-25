@@ -1,0 +1,81 @@
+PLACE
+    p1_a,
+    p2_b,
+    p3_c,
+    p4_d,
+    p5_c,
+    p6_e,
+    p7_f,
+    p8_e,
+    p9_f,
+    p10_g,
+    p11_g,
+    p12_h,
+    p13_i
+;
+
+MARKING
+    p1_a : 1
+;
+
+TRANSITION t1_A
+CONSUME
+    p12_h : 1;
+PRODUCE
+    p2_b : 1,
+    p3_c : 1;
+
+TRANSITION t2_B
+CONSUME
+    p12_h : 1;
+PRODUCE
+    p4_d : 1,
+    p5_c : 1;
+
+TRANSITION t3_C
+CONSUME
+    p2_b : 1;
+PRODUCE
+    p6_e : 1;
+
+TRANSITION t4_D
+CONSUME
+    p3_c : 1,
+    p13_i : 1;
+PRODUCE
+    p7_f : 1;
+
+TRANSITION t5_E
+CONSUME
+    p4_d : 1;
+PRODUCE
+    p8_e : 1;
+
+TRANSITION t6_D
+CONSUME
+    p5_c : 1,
+    p13_i : 1;
+PRODUCE
+    p9_f : 1;
+
+TRANSITION t7_F
+CONSUME
+    p6_e : 1,
+    p7_f : 1;
+PRODUCE
+    p10_g : 1;
+
+TRANSITION t8_F
+CONSUME
+    p8_e : 1,
+    p9_f : 1;
+PRODUCE
+    p11_g : 1;
+
+TRANSITION t0_I
+CONSUME
+    p1_a : 1;
+PRODUCE
+    p12_h : 1,
+    p13_i : 1;
+

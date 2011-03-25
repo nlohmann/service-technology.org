@@ -55,6 +55,9 @@ public class MineSimplify {
   private ISystemModel sysModel;
   private LinkedList<String[]> allTraces;
   
+  private DNodeBP build = null;                            // the branching process of sysModel
+  private HashMap<Place, HashSet<DNode>> place_conditions; // all conditions labeled with the given place
+  
   private PetriNet simplifiedNet;
   private PetriNet originalNet;
   
@@ -62,7 +65,25 @@ public class MineSimplify {
   private float netComplexity_simplified;
   
   /**
-   * Read the systemModel and the traces to simplify from files.
+   * Configuration for the simplification procedure in {@link MineSimplify}.
+   */
+  public static class Configuration {
+    
+    public boolean unfold_refold = true; 
+    public boolean remove_implied = true;
+    public boolean abstract_chains = true;
+    public boolean remove_flower_places = true;
+    
+  }
+  
+  /**
+   * configuration used for simplification
+   */
+  private Configuration config;
+  
+  /**
+   * Simplify a system model wrt. a given set of traces.
+   * Read the systemModel to simplify and the corresponding traces from files.
    * 
    * @param fileName_system_sysPath
    * @param fileName_trace
@@ -75,15 +96,38 @@ public class MineSimplify {
   {
     this.fileName_system_sysPath = fileName_system_sysPath;
     this.fileName_trace = fileName_trace;
+    this.config = new Configuration();  // standard configuration
     
     sysModel = Uma.readSystemFromFile(fileName_system_sysPath);
     allTraces = ViewGeneration2.readTraces(fileName_trace);
   }
   
+  /**
+   * Simplify a system model wrt. a given set of traces
+   * 
+   * @param sysModel
+   * @param allTraces
+   */
   public MineSimplify(ISystemModel sysModel, LinkedList<String[]> allTraces) 
   {
     this.sysModel = sysModel;
     this.allTraces = allTraces;
+    this.config = new Configuration();  // standard configuration
+  }
+
+  /**
+   * Simplify a system model wrt. a given set of traces. The simplification
+   * steps can be configured using the {@link Configuration} object 'config'. 
+   * 
+   * @param sysModel
+   * @param allTraces
+   * @param config
+   */
+  public MineSimplify(ISystemModel sysModel, LinkedList<String[]> allTraces, Configuration config) 
+  {
+    this.sysModel = sysModel;
+    this.allTraces = allTraces;
+    this.config = config;               // user-defined config
   }
   
   /**
@@ -109,7 +153,7 @@ public class MineSimplify {
     
     _time_start = System.currentTimeMillis();
     
-    simplifiedNet = simplifyModel(this, sysModel, allTraces, true);
+    simplifiedNet = simplifyModel(sysModel, allTraces, config);
     if (simplifiedNet == null)
       return false;
     
@@ -158,10 +202,26 @@ public class MineSimplify {
     return result_string;
   }
   
+  /**
+   * @return original Petri net
+   */
+  public PetriNet getOriginalNet() {
+    return originalNet;
+  }
+  
+  /**
+   * @return resulting simplified net after executing {@link #run()}
+   */
   public PetriNet getSimplifiedNet() {
     return simplifiedNet;
   }
   
+  /**
+   * Write results to files. Requires that this simplification object was
+   * instantiated with {@link MineSimplify#MineSimplify(String, String)}.
+   *   
+   * @throws IOException
+   */
   public void writeResults() throws IOException {
     
     if (simplifiedNet == null)
@@ -177,47 +237,85 @@ public class MineSimplify {
     writeFile(targetPath_result, generateResultsFile());
   }
   
+  /**
+   * Helper function to write a string to a file.
+   * 
+   * @param fileName
+   * @param contents
+   * @throws IOException
+   */
   private void writeFile(String fileName, String contents) throws IOException {
     FileWriter fstream = new FileWriter(fileName);
     BufferedWriter out = new BufferedWriter(fstream);
     out.write(contents);
     out.close();
   }
-  
-  private static DNodeBP _debug_lastViewBuild = null;
-  private static HashMap<Object, String> _debug_colorMap2;
-  
-  private long _time_buildBP_start;
-  private long _time_buildBP_finish;
-  
-  private long _time_equiv_start;
-  private long _time_equiv_finish;
-  
-  private long _time_implied_start;
-  private long _time_implied_finish;
 
-  private long _time_fold_start;
-  private long _time_fold_finish;
-
-  private long _time_chain_start;
-  private long _time_chain_finish;
-  
-  private float _comp_fold;
-  private float _comp_implied;
-  private float _comp_chain;
-  
-  private String _size_bp;
-  private String _size_fold;
-  private String _size_implied;
-  private String _size_chain;
-  
-  private static PetriNet simplifyModel(MineSimplify sim, ISystemModel sysModel, LinkedList<String[]> traces,
-    boolean abstractCycles) throws InvalidModelException {
+  /**
+   * Main routine to simplify the given sysModel wrt. the traces. Simplification
+   * steps are configured (see {@link Configuration} ).
+   * 
+   * @param sysModel
+   * @param traces
+   * @param config
+   * @return the simplified Petri net
+   * @throws InvalidModelException
+   */
+  private PetriNet simplifyModel(ISystemModel sysModel, LinkedList<String[]> traces,
+    Configuration config) throws InvalidModelException {
     
-    DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
-    DNodeBP build = Uma.initBuildPrefix_View(sys, 0);
+    // step 1) unfold and refold-model
+    PetriNet net = null;
+    if (config.unfold_refold) {
+      net = unfoldRefold(sysModel, traces);
+    } else if (sysModel instanceof PetriNet) {
+      net = (PetriNet)sysModel;
+    } else {
+      throw new InvalidModelException(InvalidModelException.UNKNOWN_MODEL_TYPE, sysModel);
+    }
 
-    sim._time_buildBP_start = System.currentTimeMillis();
+    // step 2) find implied places
+    _time_implied_start = System.currentTimeMillis();
+    if (config.remove_implied) {
+      assertBranchingProcess(sysModel, traces);
+      HashSet<DNode> implied = findImpliedConditions();
+      removeImpliedPlaces(net, place_conditions, implied);
+    }
+    _time_implied_finish = System.currentTimeMillis();
+    
+    // step 3) collapse chains of transitions
+    _time_chain_start = System.currentTimeMillis();
+    if (config.abstract_chains) {
+      while (collapseChains(net));
+    }
+    _comp_chain = complexitySimple(net);
+    _size_chain = net.getInfo();
+
+    // step 3) remove flower places
+    if (config.remove_flower_places) {
+      removeFlowerPlaces(net, 0.05f);
+    }
+    _time_chain_finish = System.currentTimeMillis();
+    
+    Uma.out.println("done");
+    return net;
+  }
+  
+  /**
+   * Compute the unfolding of the system model up to the given traces and fold
+   * the resulting unfolding back to a Petri net. Stores the computed branching
+   * process for later use.
+   * 
+   * @param sysModel
+   * @param traces
+   * @return refolded Petri net
+   * @throws InvalidModelException
+   */
+  private PetriNet unfoldRefold(ISystemModel sysModel, LinkedList<String[]> traces)  throws InvalidModelException {
+    DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
+    build = Uma.initBuildPrefix_View(sys, 0);
+
+    _time_buildBP_start = System.currentTimeMillis();
     //Uma.out.println("generating view for "+traces.size()+" traces...");
     ViewGeneration2 viewGen = new ViewGeneration2(build);
     for (String[] trace : traces) {
@@ -225,13 +323,13 @@ public class MineSimplify {
     }
     boolean printDetail = (build.getBranchingProcess().allConditions.size()
         +build.getBranchingProcess().allEvents.size() > 10000) ? true : false;
-    sim._time_buildBP_finish = System.currentTimeMillis();
-    sim._size_bp = build.getStatistics();
+    _time_buildBP_finish = System.currentTimeMillis();
+    _size_bp = build.getStatistics();
     
     // viewGen.identifyFoldingRelation();
     //build.debugPrintCCpairs();
     
-    sim._time_equiv_start = System.currentTimeMillis();
+    _time_equiv_start = System.currentTimeMillis();
     if (printDetail) Uma.out.println("equivalence..");
     build.foldingEquivalence();
     
@@ -249,33 +347,110 @@ public class MineSimplify {
     while (build.extendFoldingEquivalence_deterministic()) {
       if (printDetail) Uma.out.println("determinize..");
     }
-    sim._time_equiv_finish = System.currentTimeMillis();
+    _time_equiv_finish = System.currentTimeMillis();
     
     //build.simplifyFoldingEquivalence();
     
-    sim._time_implied_start = System.currentTimeMillis();
+    _time_fold_start = System.currentTimeMillis();
+    if (printDetail) Uma.out.println("fold net..");
+    NetSynthesis synth = new NetSynthesis(build);
+    PetriNet net = synth.foldToNet_labeled(false);
+    
+    // remember for each place, which conditions represent a token on this place
+    // this information will be needed when checking for implied places
+    place_conditions = new HashMap<Place, HashSet<DNode>>();
+    for (Place p : net.getPlaces()) {
+      DNode b = synth.n2d.get(p);
+      place_conditions.put(p, build.foldingEquivalence().get(build.equivalentNode().get(b)));
+    }
+    
+    _time_fold_finish = System.currentTimeMillis();
+    _comp_fold = complexitySimple(net);
+    _size_fold = net.getInfo();
+    
+    _comp_implied = complexitySimple(net);
+    _size_implied = net.getInfo();
+    
+    _debug_lastViewBuild = build;
+
+    return net;
+  }
+  
+  /**
+   * Assert that for the given system model, the branching process up to the given
+   * traces is available ({@link #build}). If it has not been computed before,
+   * then compute it now.
+   * 
+   * @param sysModel
+   * @param traces
+   * @throws InvalidModelException
+   */
+  private void assertBranchingProcess(ISystemModel sysModel, LinkedList<String[]> traces) throws InvalidModelException {
+    if (build != null) return;
+
+    DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
+    build = Uma.initBuildPrefix_View(sys, 0);
+
+    _time_buildBP_start = System.currentTimeMillis();
+    //Uma.out.println("generating view for "+traces.size()+" traces...");
+    ViewGeneration2 viewGen = new ViewGeneration2(build);
+    for (String[] trace : traces) {
+      viewGen.extendByTrace(trace);
+    }
+
+    if (sysModel instanceof PetriNet) {
+      // collect for each place of the net, all conditions that represent a token on the place
+      // required for finding implicit places
+      PetriNet net = (PetriNet)sysModel;
+      place_conditions = new HashMap<Place, HashSet<DNode>>();
+      for (Place p : net.getPlaces()) {
+        
+        place_conditions.put(p, new HashSet<DNode>());
+        for (DNode b : build.getBranchingProcess().getAllConditions()) {
+          if (sys.properNames[b.id].equals(p.getName())) {
+            place_conditions.get(p).add(b);
+          }
+        }
+      }
+    }
+  }
+  
+  /**
+   * @return the set of implied conditions in the branching process of the system model
+   */
+  private HashSet<DNode> findImpliedConditions() {
+    
+    boolean printDetail = (build.getBranchingProcess().allConditions.size()
+        +build.getBranchingProcess().allEvents.size() > 10000) ? true : false;
+
     if (printDetail) Uma.out.println("transitive dependencies..");
     TransitiveDependencies dep = new TransitiveDependencies(build);
     if (printDetail) Uma.out.println("find solution..");
     HashSet<DNode> implied = dep.getImpliedConditions_solution();
-    sim._time_implied_finish = System.currentTimeMillis();
-    
-    
-    sim._time_fold_start = System.currentTimeMillis();
-    if (printDetail) Uma.out.println("fold net..");
-    NetSynthesis synth = new NetSynthesis(build);
-    PetriNet net = synth.foldToNet_labeled(false);
-    sim._time_fold_finish = System.currentTimeMillis();
-    sim._comp_fold = complexitySimple(net);
-    sim._size_fold = net.getInfo();
-    
+
+    return implied;
+  }
+  
+  /**
+   * Remove all implied places from the net. The implied places are computed from
+   * the set of implied conditions of the branching process ({@link #findImpliedConditions()}).
+   * 
+   * @param net
+   * @param place_conditions
+   * @param implied
+   */
+  private void removeImpliedPlaces(PetriNet net, HashMap<Place, HashSet<DNode> > place_conditions, HashSet<DNode> implied)
+  {
+
+    boolean printDetail = (build.getBranchingProcess().allConditions.size()
+        +build.getBranchingProcess().allEvents.size() > 10000) ? true : false;
     
     if (printDetail) Uma.out.println("remove implied places..");
     LinkedList<Place> impliedPlaces = new LinkedList<Place>();
     for (Place p : net.getPlaces()) {
       boolean allImplied = true;
-      DNode b = synth.n2d.get(p);
-      for (DNode bPrime : build.foldingEquivalence().get(build.equivalentNode().get(b))) {
+
+      for (DNode bPrime : place_conditions.get(p)) {
         
         //if (!implied.contains(bPrime)) {
         //  allImplied = false;
@@ -339,27 +514,9 @@ public class MineSimplify {
         }
       }
     }
-    sim._comp_implied = complexitySimple(net);
-    sim._size_implied = net.getInfo();
-
-    
-    _debug_lastViewBuild = build;
-
-    sim._time_chain_start = System.currentTimeMillis();
-    if (abstractCycles) {
-      while (collapseChains(net));
-    }
-    sim._comp_chain = complexitySimple(net);
-    sim._size_chain = net.getInfo();
-    
-    removeFlowerPlaces(net, 0.05f);
-    sim._time_chain_finish = System.currentTimeMillis();
-    
-    
-    Uma.out.println("done");
-    
-    return net;
   }
+  
+
   
   private static HashMap<Object, String> _debug_cycleAbstraction_coloring;
   
@@ -553,6 +710,34 @@ public class MineSimplify {
     }
   }
   
+  // fields for recording times and sizes for benchmark experiments
+  private static DNodeBP _debug_lastViewBuild = null;
+  private static HashMap<Object, String> _debug_colorMap2;
+  
+  private long _time_buildBP_start;
+  private long _time_buildBP_finish;
+  
+  private long _time_equiv_start;
+  private long _time_equiv_finish;
+  
+  private long _time_implied_start;
+  private long _time_implied_finish;
+
+  private long _time_fold_start;
+  private long _time_fold_finish;
+
+  private long _time_chain_start;
+  private long _time_chain_finish;
+  
+  private float _comp_fold;
+  private float _comp_implied;
+  private float _comp_chain;
+  
+  private String _size_bp;
+  private String _size_fold;
+  private String _size_implied;
+  private String _size_chain;
+  
   private static float simplestThreshold;
   
   public static void simplify(String system, String log, boolean repeat) throws IOException, InvalidModelException {
@@ -625,4 +810,5 @@ public class MineSimplify {
     
     //simplify("./examples/caise11/t32f0n05.lola", "./examples/caise11/t32f0n05.log.txt", false); // slow
   }
+  
 }

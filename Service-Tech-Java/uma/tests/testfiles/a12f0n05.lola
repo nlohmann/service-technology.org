@@ -1,0 +1,59 @@
+{
+  input file:
+  invocation:
+  net size:     |P|= 14  |P_in|= 0  |P_out|= 0  |T|= 12  |F|= 50
+}
+
+PLACE     P_3, P_4, P_8, P_9, P_13, P_10, P_2, P_14, P_5, P_1, P_6, P_11, P_7, P_12, e+complete_loop, f+complete_loop, h+complete_loop, E+complete_final;
+
+MARKING
+   P_8:1, P_13:1, P_6:1, e+complete_loop:1, f+complete_loop:1, h+complete_loop:1;
+
+TRANSITION c+complete
+  CONSUME P_13:1;
+  PRODUCE P_3:1;
+
+TRANSITION k+complete
+  CONSUME P_11:1, P_7:1;
+  PRODUCE P_12:1, P_9:1, P_10:1, P_3:1, P_14:1;
+
+TRANSITION i+complete
+  CONSUME P_4:1, P_1:1;
+  PRODUCE P_7:1, P_11:1;
+
+TRANSITION g+complete
+  CONSUME P_13:1, P_6:1;
+  PRODUCE P_1:1;
+
+TRANSITION e+complete
+  CONSUME e+complete_loop:1;
+  PRODUCE P_9:1, P_2:1, P_5:1, P_12:1, e+complete_loop:1;
+
+TRANSITION b+complete
+  CONSUME P_6:1;
+  PRODUCE P_10:1, P_5:1;
+
+TRANSITION f+complete
+  CONSUME  f+complete_loop:1;
+  PRODUCE  f+complete_loop:1;
+
+TRANSITION h+complete
+  CONSUME h+complete_loop:1;
+  PRODUCE P_4:1, P_11:1, h+complete_loop:1;
+
+TRANSITION S+complete
+  CONSUME P_8:1;
+  PRODUCE P_4:1, P_9:1, P_3:1, P_14:1, P_2:1, P_10:1, P_12:1;
+
+TRANSITION d+complete
+  CONSUME P_13:1;
+  PRODUCE P_9:1, P_2:1, P_3:1, P_10:1, P_5:1, P_12:1;
+
+TRANSITION j+complete
+  CONSUME P_5:1, P_9:1, P_2:1;
+  PRODUCE P_14:1, P_9:1;
+
+TRANSITION E+complete
+  CONSUME P_12:1, P_14:1, P_9:1, P_3:1, P_10:1;
+  PRODUCE E+complete_final:1;
+

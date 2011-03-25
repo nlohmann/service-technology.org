@@ -20,8 +20,9 @@ package hub.top.uma;
 
 import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.DNodeSys.EventPreSet;
-import hub.top.uma.synthesis.IEquivalentConditions;
-import hub.top.uma.synthesis.LabelEquivalence;
+import hub.top.uma.synthesis.EquivalenceRefineSuccessor;
+import hub.top.uma.synthesis.IEquivalentNodesRefine;
+import hub.top.uma.synthesis.EquivalenceRefineLabel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1196,6 +1197,43 @@ public class DNodeBP {
     //  updateConcurrencyRelation(d, new DNode[]{d});
     //}
     updateConcurrencyRelation(postConditions[0], postConditions);
+	}
+
+  /**
+   * Determines whether 'd' and 'd2' are concurrent using a structural search on
+   * the branching process instead of the explicit concurrency relation
+   * {@link #co}.
+   * 
+   * @param d
+   * @param d2
+   * @return <code>true</code> iff the nodes 'd' and 'd2' are concurrent
+   */
+	public boolean areConcurrent_struct(DNode d, DNode d2) {
+	  
+	  HashSet<DNode> dPre = bp.getAllPredecessors(d);
+	  if (dPre.contains(d2)) return false;
+	  HashSet<DNode> dPre2 = bp.getAllPredecessors(d2);
+	  if (dPre2.contains(d)) return false;
+	  
+	  for (DNode b : dPre) {
+      if (b.isEvent) continue;
+	    if (!dPre2.contains(b)) continue;
+	    if (b.post == null) continue;
+	    
+	    boolean e_in_dPre_notIn_dPre2 = false;
+	    boolean e_in_dPre2_notIn_dPre = false;
+	    // condition 'b' is in the intersection of dPre and dPre2
+	    for (DNode e : b.post) {
+	      // one post-event 'e' of 'b' that is predecessor of 'd' but not of 'd2'
+	      if (dPre.contains(e) && !dPre2.contains(e)) e_in_dPre_notIn_dPre2 = true;
+        // one post-event 'e' of 'b' that is predecessor of 'd2' but not of 'd'
+	      if (dPre2.contains(e) && !dPre.contains(e)) e_in_dPre2_notIn_dPre = true;
+	    }
+	    if (e_in_dPre_notIn_dPre2 && e_in_dPre2_notIn_dPre) // 'd' and 'd2' conflict on b
+	      return false;
+	  }
+	  
+	  return true;
 	}
 	
 	/**
@@ -2980,6 +3018,14 @@ public class DNodeBP {
         
         Uma.out.println("  comparing to "+d2);
         
+        if (areConcurrent_struct(d, d2)) {
+          System.out.println("    are CONCURRENT, NOT joining");
+          continue;
+        } else {
+          // System.out.println("    are NOT concurrent");
+        }
+
+        
         HashSet<DNode> d2Cl = foldingEquivalenceClasses.get(elementary_ccPair.get(d2));
         
         // collect the for each successor 'e2' of each node in the class of 'd2',
@@ -3101,6 +3147,8 @@ public class DNodeBP {
         joinEquivalenceClasses(to_join);
         changed = true;
         
+        /* join pre-sets assuming ordered labels of predecessors
+        
         // join the pre-set of all joined transitions
         LinkedList<DNode> preJoin = new LinkedList<DNode>();
         for (int i=0; i<d.pre.length; i++) {
@@ -3117,11 +3165,245 @@ public class DNodeBP {
           joinEquivalenceClasses(preJoin);
         }
         
+        */
+        
+        // fix the order of events to merge, so that each event has a unique index
+        // the index will be used to relate pre-conditions of different events to each other
+        DNode[] _to_join = new DNode[to_join.size()];
+        _to_join = to_join.toArray(_to_join);
+        
+        /*
+        int minPreSize = Integer.MAX_VALUE;
+        int minIndex = -1;
+        for (int i=0; i<_to_join.length; i++) {
+          if (minPreSize > _to_join[i].pre.length) {
+            minPreSize = _to_join[i].pre.length;
+            minIndex = i;
+          }
+        }
+        */
+        
+        int maxDirectPreSize = 0;
+        int maxIndex = -1;
+        for (int i=0; i<_to_join.length; i++) {
+          int i_pre_direct = 0;
+          for (int j=0; j<_to_join[i].pre.length; j++) {
+            if (!_to_join[i].pre[j].isImplied) i_pre_direct++;
+          }
+          
+          if (maxDirectPreSize < i_pre_direct) {
+            maxDirectPreSize = i_pre_direct;
+            maxIndex = i;
+          }
+        }
+        
+        // all pre-conditions of all events that we join
+        // later, we remove all conditions that have been joined with some other
+        // condition. the remaining conditions are implied conditions that are
+        // no longer required in the net and hence will be removed
+        HashSet<DNode> nonJoinedConditions = new HashSet<DNode>();
+        for (DNode d2 : to_join) {
+          for (DNode b : d2.pre) nonJoinedConditions.add(b);
+        }
+        
+        // collect conditions: for each condition of the event with the least pre-conditions
+        // we have to find an equivalent condition of each other event
+        DNode[][] joinNodes = new DNode[maxDirectPreSize][_to_join.length];
+        
+        int maxIndex_preIndex[] = new int[_to_join[maxIndex].pre.length];
+        
+        // match all conditions with the same label. these are definitely equivalent
+        // event with the least pre-conditions defines the distribution
+        // all other pre-conditions must be matched here
+        for (int j=0,j2=0; j<_to_join[maxIndex].pre.length; j++) {
+          if (!_to_join[maxIndex].pre[j].isImplied) {
+            maxIndex_preIndex[j] = j2;
+            joinNodes[j2][maxIndex] = _to_join[maxIndex].pre[j];
+            nonJoinedConditions.remove(joinNodes[j2][maxIndex]);
+            j2++;
+          } else {
+            maxIndex_preIndex[j] = -1;
+          }
+        }
+        
+        for (int i=0; i<_to_join.length; i++) {
+          if (i == maxIndex) continue;
+
+          // find for each pre-condition of event i 
+          for (int k=0; k<_to_join[i].pre.length; k++) {
+            // the corresponding pre-condition of event maxIndex with the same label
+            // if it exists
+            for (int j=0; j<_to_join[maxIndex].pre.length; j++) {
+              if (_to_join[maxIndex].pre[j].isImplied) continue;
+              
+              if (_to_join[i].pre[k].id == _to_join[maxIndex].pre[j].id) {
+                joinNodes[maxIndex_preIndex[j]][i] = _to_join[i].pre[k];
+                nonJoinedConditions.remove(joinNodes[maxIndex_preIndex[j]][i]);
+                break;
+              }
+            }
+          }
+        }
+        // now, we have found all pre-conditions of all events that match by label
+        // next: find the missing conditions using Kiepuziewski et al
+        
+        for (int j=0; j<joinNodes.length; j++) {
+          for (int i=0; i<joinNodes[j].length; i++) {
+            // the j-th precondition of 'minIndex' already has an equivalent
+            // precondition of event 'i', done
+            if (joinNodes[j][i] != null) continue;
+            
+            // the j-th precondition of 'minIndex' has no equivalent
+            // precondition of event 'i' yet. find one
+            DNode toMatch = joinNodes[j][maxIndex];
+            
+            LinkedList<DNode> matchConditions = new LinkedList<DNode>();
+            for (DNode pre : _to_join[i].pre) {
+              if (!nonJoinedConditions.contains(pre)) continue;
+              if (!pre.isImplied) matchConditions.addLast(pre);
+            }
+            for (DNode pre : _to_join[i].pre) {
+              if (!nonJoinedConditions.contains(pre)) continue;
+              if (pre.isImplied) matchConditions.addLast(pre);
+            }
+            
+            for (DNode matchCondition : matchConditions) {
+              // check if 'toMatch' and 'matchCondition' are successor equivalent
+              // get future equivalence classes
+              DNode[] future_toMatch = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, toMatch);
+              DNode[] future_matchCon = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, matchCondition);
+              // and compare
+              if (!Arrays.equals(future_toMatch, future_matchCon)) continue;
+                
+              // make 'toMatch' and 'matchCondition' equivalent
+              joinNodes[j][i] = matchCondition;
+              nonJoinedConditions.remove(matchCondition);
+              break;
+            }
+
+            /*
+            HashSet<DNode> grey = bp.getAllPredecessors(toMatch);
+            // get all predecessors of the event for which we want to find the
+            // precondition to match 'j'
+            HashSet<DNode> potentiallyBlack = bp.getAllPredecessors(_to_join[i]);
+            
+            for (DNode greyNode : grey) {
+              if (greyNode.isEvent) continue;
+              
+              for (DNode black : greyNode.post) {
+                if (potentiallyBlack.contains(black)) {
+                  for (DNode matchCondition : black.post) {
+                    
+                    // we can only match to implied conditions
+                    if (!matchCondition.isImplied) continue;
+                    if (!nonJoinedConditions.contains(matchCondition)) continue;
+                    
+                    // check if 'toMatch' and 'matchCondition' are successor equivalent
+                    // get future equivalence classes
+                    DNode[] future_toMatch = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, toMatch);
+                    DNode[] future_matchCon = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, matchCondition);
+                    // and compare
+                    if (!Arrays.equals(future_toMatch, future_matchCon)) continue;
+                      
+                    // make 'toMatch' and 'matchCondition' equivalent
+                    joinNodes[j][i] = matchCondition;
+                    nonJoinedConditions.remove(matchCondition);
+                  }
+                }
+              }
+            }
+            */
+          }
+        }
+        
+
+        
+        for (int j=0; j<joinNodes.length; j++) {
+          LinkedList<DNode> joinConditions = new LinkedList<DNode>();
+          for (int i=0; i<joinNodes[j].length; i++) {
+            if (joinNodes[j][i] != null) { 
+              joinConditions.add(elementary_ccPair.get(joinNodes[j][i]));
+              joinNodes[j][i].isImplied = false;
+
+              // and add the predecessors of the joined pre-sets to the queue 
+              if (joinNodes[j][i].pre != null) {
+                for (DNode e : joinNodes[j][i].pre) {
+                  top.add(e);
+                }
+              }
+            }
+          }
+          joinEquivalenceClasses(joinConditions);
+        }
+        
+        for (DNode b : nonJoinedConditions) {
+          
+          this.bp.remove(b);
+          
+          //System.out.println("non-joined: "+b);
+        }
+
+        
         top.removeAll(foldingEquivalenceClasses.get(elementary_ccPair.get(d)));
       }
     }
     return changed;
   }
+	
+	/**
+	 * Remove a superfluous condition from the branching process after computing the
+	 * folding equivalence. A condition is superfluous if it expresses a conflict
+	 * between events that all have been folded into the same equivalence class, and
+	 * this equivalence class of events has more pre-conditions to express enabling.
+	 * 
+	 * In this case, the superfluous condition has become an implied condition. Call
+	 * this method repeatedly to remove all superfluous conditions.
+	 * 
+	 * @return <code>true</code> iff a superfluous condition was found and removed from
+	 * the branching process.
+	 */
+	public boolean refineFoldingEquivalence_removeSuperfluous () {
+	  
+    for (Entry<DNode, HashSet<DNode>> cl : foldingEquivalenceClasses.entrySet()) {
+      DNode e = cl.getKey();
+      if (!e.isEvent) continue;
+      if (e.pre == null || e.pre.length <= 1) continue;
+      
+      HashSet<DNode> superFluousConflicts = new HashSet<DNode>();
+      for (DNode b : e.pre) {
+        if (b.post != null && b.post.length > 1) superFluousConflicts.add(elementary_ccPair.get(b));
+      }
+      
+      for (DNode ePrime : cl.getValue()) {
+        if (ePrime == e) continue;
+        
+        HashSet<DNode> superFluousConflictsPrime = new HashSet<DNode>();
+        for (DNode bPrime : ePrime.pre) superFluousConflictsPrime.add(elementary_ccPair.get(bPrime));
+        superFluousConflicts.retainAll(superFluousConflictsPrime);
+      }
+      
+      for (DNode b : superFluousConflicts) {
+        boolean allPostInCl = true;
+        for (DNode bPost : b.post) {
+          if (!cl.getValue().contains(bPost)) {
+            allPostInCl = false;
+            break;
+          }
+        }
+        
+        if (allPostInCl) {
+          // found a former conflict between events that are now folded into one event
+          // the conflict is superfluous
+          for (DNode bPrime : foldingEquivalenceClasses.get(elementary_ccPair.get(b))) {
+            this.bp.remove(bPrime);
+          }
+          return true;
+        }
+      }
+    }
+	  
+	  return false;
+	}
 
 	public boolean extendFoldingEquivalence_deterministic() {
 	  
@@ -3222,7 +3504,7 @@ public class DNodeBP {
    * we have to drop the equivalence relation. This is done by this method.
    */
   public void relaxFoldingEquivalence() {
-    relaxFoldingEquivalence(LabelEquivalence.instance);
+    relaxFoldingEquivalence(EquivalenceRefineLabel.instance);
   }
 	
   /**
@@ -3236,9 +3518,9 @@ public class DNodeBP {
    * @param splitter
    *          the equivalence splitter that is used to refine equivalence
    *          classes, the given splitter may implement another equivalence
-   *          criterion that the default {@link LabelEquivalence}
+   *          criterion that the default {@link EquivalenceRefineLabel}
    */
-	public void relaxFoldingEquivalence(IEquivalentConditions splitter) {
+	public void relaxFoldingEquivalence(IEquivalentNodesRefine splitter) {
 	  
 	  // --------------------------------------------------------------------
 	  // split equivalence classes by labels

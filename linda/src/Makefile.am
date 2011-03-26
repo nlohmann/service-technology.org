@@ -17,7 +17,7 @@ linda_SOURCES = main.cc \
 		costs.cc costs.h
 
 linda_LDADD = $(top_builddir)/libs/lp_solve/liblpsolve55.la
-linda_CPPFLAGS = -I$(top_srcdir)/libs/lp_solve
+linda_CPPFLAGS = -I$(top_srcdir)/libs/lp_solve -I$(top_srcdir)/libs
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI

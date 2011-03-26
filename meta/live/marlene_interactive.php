@@ -54,7 +54,7 @@
   }
   
   else if (!strcmp($_SESSION[$tool]["process"], 'marlene_ia/iReroute.owfn')) {
-    $services = array("marlene/ip.owfn", "marlene/ip2.owfn", "marlene/req.owfn");
+    $services = array("marlene/ip.owfn", "marlene/ip2.owfn", "marlene/req2.owfn");
     $rules = createFile("diag_iReroute.ar");
   }
   

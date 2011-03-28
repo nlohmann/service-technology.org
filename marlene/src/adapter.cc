@@ -81,11 +81,9 @@ Adapter::~Adapter() {
     FUNCIN
 #ifndef USE_SHARED_PTR
     // deleting the engine if it exists
-    if (_engine != NULL)
-        delete (_engine);
+    delete (_engine);
     _engine = NULL;
-    if (_controller != NULL)
-        delete (_controller);
+    delete (_controller);
     _controller = NULL;
 #endif
     FUNCOUT

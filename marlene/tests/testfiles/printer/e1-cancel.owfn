@@ -1,0 +1,54 @@
+PLACE
+INTERNAL
+  pl2, pl8, pl1, pl9, pl18, i, f, pl26, pl11, pl23;
+INPUT
+;
+OUTPUT
+;
+SYNCHRONOUS
+  ETrigger, EHandle, ECancel;
+
+INITIALMARKING
+  i: 1;
+FINALCONDITION
+  (f = 1) AND ALL_OTHER_PLACES_EMPTY;
+
+TRANSITION tr4
+  CONSUME pl18: 1, pl2: 1, pl26: 1;
+  PRODUCE pl11: 1;
+
+TRANSITION tr9
+  CONSUME pl11: 1;
+  PRODUCE pl26: 1, pl8: 1;
+  SYNCHRONIZE EHandle;
+
+TRANSITION tr14
+  CONSUME pl26: 1, pl8: 1;
+  PRODUCE pl18: 1, pl23: 1;
+
+TRANSITION tr5
+  CONSUME pl23: 1;
+  PRODUCE pl1: 1, pl26: 1;
+  SYNCHRONIZE ETrigger;
+
+TRANSITION tr1
+  CONSUME pl26: 1, pl8: 1;
+  PRODUCE pl8: 1, pl9: 1;
+
+TRANSITION tr15
+  CONSUME pl18: 2, pl9: 1;
+  PRODUCE pl18: 2, pl26: 1;
+
+TRANSITION tr2
+  CONSUME i: 1;
+  PRODUCE pl18: 2, pl2: 2, pl26: 1;
+
+TRANSITION tr6
+  CONSUME pl18: 2, pl1: 2, pl26: 1;
+  PRODUCE f: 1;
+
+TRANSITION tr8
+  CONSUME pl8: 1, pl9: 1;
+  PRODUCE pl18: 1, pl2: 1, pl9: 1;
+  SYNCHRONIZE ECancel;
+

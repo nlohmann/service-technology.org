@@ -1,0 +1,137 @@
+AT_INIT([Benchmarks])
+AT_COLOR_TESTS
+
+############################################################################
+AT_BANNER([Benchmark Set Printer (basic)])
+############################################################################
+
+AT_SETUP([E1/F1])
+m4_define([TESTCASE],[e1f1_single])
+AT_CHECK([cp TESTFILES/printer/e1.owfn TESTFILES/printer/f1.owfn TESTFILES/printer/sprinter.ar .])
+AT_CHECK([MARLENE e1.owfn f1.owfn --rulefile=sprinter.ar --stats DEFAULTPARAMETERS],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+AT_SETUP([E1/F2])
+m4_define([TESTCASE],[e1f2_single])
+AT_CHECK([cp TESTFILES/printer/e1.owfn TESTFILES/printer/f2.owfn TESTFILES/printer/sprinter.ar .])
+AT_CHECK([MARLENE e1.owfn f2.owfn --rulefile=sprinter.ar --stats DEFAULTPARAMETERS],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+AT_SETUP([E2/F1])
+m4_define([TESTCASE],[e2f1_single])
+AT_CHECK([cp TESTFILES/printer/e2.owfn TESTFILES/printer/f1.owfn TESTFILES/printer/sprinter.ar .])
+AT_CHECK([MARLENE e2.owfn f1.owfn --rulefile=sprinter.ar --stats DEFAULTPARAMETERS],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+AT_SETUP([E2/F2])
+m4_define([TESTCASE],[e2f2_single])
+AT_CHECK([cp TESTFILES/printer/e2.owfn TESTFILES/printer/f2.owfn TESTFILES/printer/sprinter.ar .])
+AT_CHECK([MARLENE e2.owfn f2.owfn --rulefile=sprinter.ar --stats DEFAULTPARAMETERS],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Benchmark Set Printer (at most one)])
+############################################################################
+
+AT_SETUP([E1/F1])
+m4_define([TESTCASE],[e1f1_amo])
+AT_CHECK([cp TESTFILES/printer/e1.owfn TESTFILES/printer/f1.owfn TESTFILES/printer/sprinter2.ar .])
+AT_CHECK([MARLENE e1.owfn f1.owfn --rulefile=sprinter2.ar --stats DEFAULTPARAMETERS],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+AT_SETUP([E1/F2])
+m4_define([TESTCASE],[e1f2_amo])
+AT_CHECK([cp TESTFILES/printer/e1.owfn TESTFILES/printer/f2.owfn TESTFILES/printer/sprinter2.ar .])
+AT_CHECK([MARLENE e1.owfn f2.owfn --rulefile=sprinter2.ar --stats DEFAULTPARAMETERS],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+AT_SETUP([E2/F1])
+m4_define([TESTCASE],[e2f1_amo])
+AT_CHECK([cp TESTFILES/printer/e2.owfn TESTFILES/printer/f1.owfn TESTFILES/printer/sprinter2.ar .])
+AT_CHECK([MARLENE e2.owfn f1.owfn --rulefile=sprinter2.ar --stats DEFAULTPARAMETERS],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+AT_SETUP([E2/F2])
+m4_define([TESTCASE],[e2f2_amo])
+AT_CHECK([cp TESTFILES/printer/e2.owfn TESTFILES/printer/f2.owfn TESTFILES/printer/sprinter2.ar .])
+AT_CHECK([MARLENE e2.owfn f2.owfn --rulefile=sprinter2.ar --stats DEFAULTPARAMETERS],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Benchmark Set Printer (cancel/reset)])
+############################################################################
+
+AT_SETUP([E1(cancel)/F1(cancel)])
+m4_define([TESTCASE],[e1cf1c_cr])
+AT_CHECK([cp TESTFILES/printer/e1-cancel.owfn TESTFILES/printer/f1-cancel.owfn TESTFILES/printer/printer.ar .])
+AT_CHECK([MARLENE e1-cancel.owfn f1-cancel.owfn --rulefile=printer.ar --stats DEFAULTPARAMETERS],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+AT_SETUP([E1(cancel)/F1(reset)])
+m4_define([TESTCASE],[e1cf1r_cr])
+AT_CHECK([cp TESTFILES/printer/e1-cancel.owfn TESTFILES/printer/f1-reset.owfn TESTFILES/printer/printer.ar .])
+AT_CHECK([MARLENE e1-cancel.owfn f1-reset.owfn --rulefile=printer.ar --stats DEFAULTPARAMETERS],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+AT_SETUP([E1(reset)/F1(cancel)])
+m4_define([TESTCASE],[e1rf1c_cr])
+AT_CHECK([cp TESTFILES/printer/e1-reset.owfn TESTFILES/printer/f1-cancel.owfn TESTFILES/printer/printer.ar .])
+AT_CHECK([MARLENE e1-reset.owfn f1-cancel.owfn --rulefile=printer.ar --stats DEFAULTPARAMETERS],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+AT_SETUP([E1(reset)/F1(reset)])
+m4_define([TESTCASE],[e1rf1r_cr])
+AT_CHECK([cp TESTFILES/printer/e1-reset.owfn TESTFILES/printer/f1-reset.owfn TESTFILES/printer/printer.ar .])
+AT_CHECK([MARLENE e1-reset.owfn f1-reset.owfn --rulefile=printer.ar --stats DEFAULTPARAMETERS],0,ignore,stderr)
+AT_CHECK([GREP "runtime:" stderr | AWK '{print "YVALUE="$3}' > BENCHRESULTS/TESTCASE.time])
+AT_CHECK([GREP "memory consumption:" stderr | AWK '{print "YVALUE="$4}' > BENCHRESULTS/TESTCASE.memory])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.time])
+AT_CHECK([echo "URL=SVNURL" >> BENCHRESULTS/TESTCASE.memory])
+AT_CLEANUP
+
+
+

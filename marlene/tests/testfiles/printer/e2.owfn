@@ -1,0 +1,29 @@
+PLACE
+INTERNAL
+  i, pl3, pl8, pl13, f;
+INPUT
+  EDone, EAck;
+OUTPUT
+  ETrigger, EHandle;
+
+INITIALMARKING
+  i: 1;
+FINALCONDITION
+  (f = 1) AND ALL_OTHER_PLACES_EMPTY;
+
+TRANSITION tr4
+  CONSUME i: 1;
+  PRODUCE pl3: 1, EHandle: 1;
+
+TRANSITION tr9
+  CONSUME pl3: 1, EAck: 1;
+  PRODUCE pl8: 1;
+
+TRANSITION tr14
+  CONSUME pl8: 1;
+  PRODUCE ETrigger: 1, pl13: 1;
+
+TRANSITION tr5
+  CONSUME EDone: 1, pl13: 1;
+  PRODUCE f: 1;
+

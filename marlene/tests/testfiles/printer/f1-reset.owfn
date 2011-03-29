@@ -1,0 +1,46 @@
+PLACE
+INTERNAL
+  pl2, pl8, i, pl9, pl18, f, pl1, pl10;
+INPUT
+;
+OUTPUT
+;
+SYNCHRONOUS
+  FTrigger, FHandle, FReset;
+
+INITIALMARKING
+  i: 1;
+FINALCONDITION
+  (f = 1) AND ALL_OTHER_PLACES_EMPTY;
+
+TRANSITION tr5
+  CONSUME pl1: 1, pl8: 1;
+  PRODUCE pl18: 1, pl1: 1, pl10: 1;
+  SYNCHRONIZE FTrigger;
+
+TRANSITION tr1
+  CONSUME i: 1;
+  PRODUCE pl2: 2, pl1: 1, pl10: 2;
+
+TRANSITION tr7
+  CONSUME pl1: 1;
+  PRODUCE pl9: 1;
+  SYNCHRONIZE FReset;
+
+TRANSITION tr11
+  CONSUME pl10: 2, pl9: 1;
+  PRODUCE pl1: 1, pl10: 2;
+
+TRANSITION tr19
+  CONSUME pl18: 2, pl1: 1, pl10: 2;
+  PRODUCE f: 1;
+
+TRANSITION tr6
+  CONSUME pl8: 1, pl9: 1;
+  PRODUCE pl2: 1, pl10: 1, pl9: 1;
+
+TRANSITION tr2
+  CONSUME pl2: 1, pl1: 1, pl10: 1;
+  PRODUCE pl1: 1, pl8: 1;
+  SYNCHRONIZE FHandle;
+

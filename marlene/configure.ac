@@ -40,21 +40,26 @@ if test -z "$GENET" ; then
   AC_MSG_WARN([GENET not found. See file README.])
 else
   CONVERTER=genet
+  DEFCONVERTER=genet
 fi
 
 AC_PATH_PROGS(PETRIFY, [petrify4.2 petrify4.1 petrify4.0 petrify], [])
 if test -z "$PETRIFY" ; then
   AC_MSG_WARN([Petrify was not found. See file README.])
 else 
-#  if test -z "$GENET" ; then
-    CONVERTER=petrify
-#  fi
+  CONVERTER=petrify
+  if test -z "$GENET" ; then
+    DEFCONVERTER=petrify
+  fi
 fi
 
+AC_MSG_CHECKING([default sa converter])
+AC_MSG_RESULT($DEFCONVERTER)
 AC_MSG_CHECKING([default sa converter for test cases])
 AC_MSG_RESULT($CONVERTER)
 
 AC_SUBST(CONVERTER)
+AC_SUBST(DEFCONVERTER)
 
 # enable Windows temp files
 AC_ARG_ENABLE(windowstemp,

@@ -23,14 +23,18 @@ TESTFILES = test.owfn test.ar \
 	    test-n.owfn test-n.ar \
 	    ca1.owfn ca1_sync.owfn ca2.owfn td.owfn td_cyclic.owfn \
 	    td.ar td_sync.ar td_sync2.ar \
-		td_ret.owfn td_ret.ar \
+            td_ret.owfn td_ret.ar \
 	    nopetrify.conf \
 	    wrongsyntax.owfn wrongsyntax.ar wronglexic.ar \
 	    sync1_exp.owfn sync2_exp.owfn sync3_exp.owfn \
 	    async1_exp.owfn async2_exp.owfn async3_exp.owfn \
 	    bug_compplaces.owfn bug_compplaces.ar \
-      some-rules.ar \
-      d1.owfn d2.owfn diag0.ar diag1.ar diag2.ar
+	    some-rules.ar \
+	    d1.owfn d2.owfn diag0.ar diag1.ar diag2.ar \
+	    printer/e1.owfn printer/e2.owfn printer/f1.owfn printer/f2.owfn \
+	    printer/e1-cancel.owfn printer/e1-reset.owfn \
+	    printer/f1-cancel.owfn printer/f1-reset.owfn \
+	    printer/sprinter.ar printer/sprinter2.ar printer/printer.ar
 
 
 #-----------------------------------------#

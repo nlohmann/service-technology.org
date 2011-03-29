@@ -25,7 +25,7 @@ genet = '"@GENET@"'
 
 # Which shall be the primary converter?
 
-sa2on = @CONVERTER@
+sa2on = @DEFCONVERTER@
 
 # Wendy needs to create a temporary file to pass it to LoLA. The filename
 # Wendy should use can be specified below. The filename should end with

@@ -1,0 +1,33 @@
+args "--include-getopt --show-required --no-handle-error"
+
+purpose "Structures for Automated Reachability Analysis:
+Convert formulae of the Model Checking Contest into Sara
+problem files."
+
+option "net" n
+  "The filename of the Petri net to be checked against the formulae."
+  typestr="FILENAME"
+  string
+
+option "owfn" o
+  "Specify net as being in OWFN format (instead of PNML)."
+  details="The Petri net used for creating a problem file is assumed to be in OWFN format (*.owfn). The option is not necessary if the filename contains 'owfn'.
+"
+  flag off
+
+option "lola" l
+  "Specify net as being in LOLA llnet format (instead of PNML)."
+  details="The Petri net used for creating a problem file is assumed to be in LOLA format (*.llnet). The option is not necessary if the filename contains 'llnet'.
+"
+  flag off
+
+option "pnml" p
+  "Specify net as being in PNML format."
+  details="The Petri net used for creating a problem file is assumed to be in PNML format. The option may be necessary if the filename contains either 'owfn' or 'llnet'."
+  flag off
+
+option "formula" f
+  "The file containing the formulae."
+  typestr="FILENAME"
+  string
+

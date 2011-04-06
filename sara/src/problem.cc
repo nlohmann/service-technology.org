@@ -146,6 +146,7 @@ string Problem::getName() const { return name; }
 */
 Marking Problem::getInitialMarking() {
 	if (pn==NULL) getPetriNet();
+	if (initial.empty()) return Marking(*pn,false);
 	map<const Place*,unsigned int> result;
 	map<string,int>::iterator it;
 	for(it=initial.begin(); it!=initial.end(); ++it)

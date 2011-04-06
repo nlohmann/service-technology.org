@@ -71,7 +71,7 @@ problem:
 	GOAL gtype SEMICOLON
 	NFILE ENAME { sara::pbl.setFilename(sara_NAME_token); } 
 	NTYPE ntype SEMICOLON
-	INITIALM inodes SEMICOLON
+	marking
 	FINALM mode { sara::pbl.setGeneralCover(sara::cov); } fnodes SEMICOLON
 	constraints
 	showresult
@@ -93,6 +93,11 @@ mode:
 	/* empty */ { sara::cov=false; }
 |	COVER { sara::cov=true; }
 |	REACH { sara::cov=false; }
+;
+
+marking:
+	/* empty */
+|	INITIALM inodes SEMICOLON
 ;
 
 inodes:

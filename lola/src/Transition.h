@@ -105,7 +105,7 @@ class Transition: public Node {
 inline Transition::Transition(char* name, unsigned int _fairness): Node(name), fairness(_fairness) {
     cnt += 1;
     if (!(cnt % REPORTFREQUENCY)) {
-        cerr << "\n" << cnt << "transitions parsed\n";
+        cerr << "\n" << cnt << " transitions parsed\n";
     }
     enabled = false;  // real setting in first enabledness check
 #ifdef STUBBORN

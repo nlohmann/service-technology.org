@@ -2316,6 +2316,13 @@ unsigned int breadth_first() {
 #endif
     }
 #endif
+#ifdef STATEPREDICATE
+    if (!F) {
+        fprintf(stderr, "lola: specify predicate in analysis task file!\n");
+        fprintf(stderr, "      mandatory for task STATEPREDICATE\n");
+        _exit(4);
+    }
+#endif
     NrOfStates = d = limit = 1;
 #ifdef DISTRIBUTE
 #if defined(SYMMETRY) && SYMMINTEGRATION == 3
@@ -2421,11 +2428,14 @@ unsigned int breadth_first() {
 #endif
 #ifdef STATEPREDICATE
     int res;
+	// wird jetzt (06.04.11) weiter oben geprüft...
+	/*
     if (!F) {
         fprintf(stderr, "lola: specify predicate in analysis task file!\n");
         fprintf(stderr, "      mandatory for task STATEPREDICATE\n");
         _exit(4);
     }
+	*/
     F = F->reduce(&res);
     if (res < 2) {
         return res;

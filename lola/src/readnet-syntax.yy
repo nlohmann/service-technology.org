@@ -2232,6 +2232,22 @@ void readnet() {
 
     yyparse();
 
+	#ifdef BOUNDEDPLACE
+        if (!Globals::CheckPlace) {
+			abort(4, "place to be checked is missing (see analysis task file)");
+        }
+	#endif
+	#ifdef DEADTRANSITION
+		    if (!Globals::CheckTransition) {
+		        abort(4, "transition to be checked is missing (see analysis task file)");
+		    }
+	#endif
+	#ifdef STATEPREDICATE
+		if (!F) {
+			abort(4, "predicate to be checked is missing (see analysis task file)");
+		}
+	#endif
+
     // get initial marking
     for (unsigned int ii = 0; ii < Globals::Places[0]->cnt; ii++) {
         Globals::CurrentMarking[ii] = Globals::Places[ii]->initial_marking;

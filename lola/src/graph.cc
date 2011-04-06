@@ -786,11 +786,6 @@ unsigned int depth_first() {
 #ifndef TWOPHASE
     int res;
 
-    if (!F) {
-        fprintf(stderr, "lola: specify predicate in analysis task file!\n");
-        _exit(4);
-    }
-
     F = F->reduce(&res);
     if (res < 2) {
         return res;
@@ -901,19 +896,8 @@ unsigned int depth_first() {
 #ifdef TSCC
         TSCCRepresentitives = NULL;
 #endif
-#ifdef BOUNDEDPLACE
-        if (!Globals::CheckPlace) {
-            fprintf(stderr, "lola: specify place to be checked in analysis task file\n");
-            fprintf(stderr, "      mandatory for task BOUNDEDPLACE\n");
-            _exit(4);
-        }
-#endif
+
 #ifdef DEADTRANSITION
-        if (!Globals::CheckTransition) {
-            fprintf(stderr, "lola: specify transition to be checked in analysis task file\n");
-            fprintf(stderr, "      mandatory for task DEADTRANSITION\n");
-            _exit(4);
-        }
 #ifndef DISTRIBUTE
         if (Globals::CheckTransition->enabled) {
             // early abortion
@@ -1879,32 +1863,9 @@ afterdownsearch:
 #endif
 }
 
-// specify property specific initialization routines
-
-int initialize_none() {
-    return -1;
-}
-int initialize_place() {
-    if (!Globals::CheckPlace) {
-        fprintf(stderr, "lola: specify place to be checked in analysis task file\n");
-        fprintf(stderr, "      mandatory for task BOUNDEDPLACE\n");
-        _exit(4);
-    }
-    return -1;
-}
-int initialize_transition() {
-    if (!Globals::CheckTransition) {
-        fprintf(stderr, "lola: specify transition to be checked in analysis task file\n");
-        fprintf(stderr, "      mandatory for task DEADTRANSITION\n");
-        _exit(4);
-    }
-    return -1;
-}
-
 // select property specific initialization procedure
 
 #ifdef STATEPREDICATE
-#define INITIALIZE_PROPERTY initialize_statepredicate
 #define CHECK_EARLY_ABORTION (F->value)
 #define EARLY_ABORT_MESSAGE "state found!"
 #define LATE_ABORT_MESSAGE "state not found!"
@@ -1912,7 +1873,6 @@ int initialize_transition() {
 #endif
 
 #ifdef DEADLOCK
-#define INITIALIZE_PROPERTY initialize_none
 #define CHECK_EARLY_ABORTION (!CurrentState->firelist || !(CurrentState->firelist[0]))
 #define EARLY_ABORT_MESSAGE "dead state found!"
 #define LATE_ABORT_MESSAGE "net does not have deadlocks!"
@@ -1920,7 +1880,6 @@ int initialize_transition() {
 #endif
 
 #ifdef BOUNDEDPLACE
-#define INITIALIZE_PROPERTY initialize_place
 #define CHECK_EARLY_ABPRTION (!Globals::CheckPlace->bounded)
 #define EARLY_ABORT_MESSAGE "place "<< Globals::CheckPlace->name << " is unbounded!"
 #define LATE_ABORT_MESSAGE "place "<< Globals::CheckPlace->name << " is bounded!"
@@ -1928,7 +1887,6 @@ int initialize_transition() {
 #endif
 
 #ifdef DEADTRANSITION
-#define INITIALIZE_PROPERTY initialize_transition
 #define CHECK_EARLY_ABORTION (Globals::CheckTransition->enabled)
 #define EARLY_ABORT_MESSAGE "transition " << Globals::CheckTransition->name << " is not dead\n"
 #define LATE_ABORT_MESSAGE "transition " << Globals::CheckTransition->name << " is dead\n"
@@ -1950,7 +1908,6 @@ int compare_markings() {
 }
 
 #ifdef REACHABILITY
-#define INITIALIZE_PROPERTY initialize_none
 #ifdef STUBBORN
 #define CHECK_EARLY_ABORTION (!CurrentState->firelist)
 #else
@@ -1962,16 +1919,12 @@ int compare_markings() {
 #endif
 
 #ifdef BOUNDEDNET
-#define INITIALIZE_PROPERTY initialize_none
 #define CHECK_EARLY_ABORTION (NewOmegas)
 #define EARLY_ABORT_MESSAGE "net is unbounded!"
 #define LATE_ABORT_MESSAGE "net is bounded!"
 #define RESULT_NAME "unbounded"
 #endif
 
-#ifndef INITIALIZE_PROPERTY
-#define INITIALIZE_PROPERTY initialize_none
-#endif
 #ifndef CHECK_EARLY_ABORTION
 #define CHECK_EARLY_ABORTION (1)
 #endif
@@ -2013,17 +1966,6 @@ unsigned int simple_depth_first() {
     //    "for all symmetries sigma lookup sigma(m)" loop
     Trace = new SearchTrace [Globals::Places[0]->cnt];
 #endif
-
-// initialize property
-// return value > 0 signals that result for this property is
-// determined structurally
-// instances of this macros have shape int initialize_*();
-
-    int result = INITIALIZE_PROPERTY();
-    if (result >= 0) {
-        return result;
-    }
-
 
 // Insert initial state (already in Globals::CurrentMarking)
 // into data stucture. The preceding SEARCHPROC
@@ -2316,13 +2258,6 @@ unsigned int breadth_first() {
 #endif
     }
 #endif
-#ifdef STATEPREDICATE
-    if (!F) {
-        fprintf(stderr, "lola: specify predicate in analysis task file!\n");
-        fprintf(stderr, "      mandatory for task STATEPREDICATE\n");
-        _exit(4);
-    }
-#endif
     NrOfStates = d = limit = 1;
 #ifdef DISTRIBUTE
 #if defined(SYMMETRY) && SYMMINTEGRATION == 3
@@ -2343,14 +2278,6 @@ unsigned int breadth_first() {
         Globals::Transitions[i]->check_enabled();
     }
     CurrentState->firelist = FIRELIST();
-
-#ifdef DEADTRANSITION
-    if (!Globals::CheckTransition) {
-        fprintf(stderr, "lola: specify transition to be checked in analysis task file\n");
-        fprintf(stderr, "      mandatory for task DEADTRANSITION\n");
-        _exit(4);
-    }
-#endif
 
 #ifdef COVER
     CurrentState->NewOmega = NULL;
@@ -2401,13 +2328,6 @@ unsigned int breadth_first() {
         return 1;
     }
 #endif
-#ifdef BOUNDEDPLACE
-    if (!Globals::CheckPlace) {
-        fprintf(stderr, "lola: specify place to be checked in analysis task file\n");
-        fprintf(stderr, "      mandatory for task BOUNDEDPLACE\n");
-        _exit(4);
-    }
-#endif
 #ifdef DEADLOCK
     if (!CurrentState->firelist || !(CurrentState->firelist[0])) {
         // early abortion
@@ -2428,14 +2348,6 @@ unsigned int breadth_first() {
 #endif
 #ifdef STATEPREDICATE
     int res;
-	// wird jetzt (06.04.11) weiter oben geprüft...
-	/*
-    if (!F) {
-        fprintf(stderr, "lola: specify predicate in analysis task file!\n");
-        fprintf(stderr, "      mandatory for task STATEPREDICATE\n");
-        _exit(4);
-    }
-	*/
     F = F->reduce(&res);
     if (res < 2) {
         return res;
@@ -3162,11 +3074,13 @@ int liveproperty() {
     unsigned int i;
 
     int res;
+	/*
     if (!F) {
         fprintf(stderr, "lola: specify predicate in analysis task file!\n");
         fprintf(stderr, "      mandatory for task LIVEPROP\n");
         _exit(4);
     }
+	*/
     F = F->reduce(&res);
     if (res < 2) {
         return res;

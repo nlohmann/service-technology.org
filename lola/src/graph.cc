@@ -2336,6 +2336,15 @@ unsigned int breadth_first() {
         Globals::Transitions[i]->check_enabled();
     }
     CurrentState->firelist = FIRELIST();
+
+#ifdef DEADTRANSITION
+    if (!Globals::CheckTransition) {
+        fprintf(stderr, "lola: specify transition to be checked in analysis task file\n");
+        fprintf(stderr, "      mandatory for task DEADTRANSITION\n");
+        _exit(4);
+    }
+#endif
+
 #ifdef COVER
     CurrentState->NewOmega = NULL;
     Ancestor = new unsigned int [Globals::Places[0]->cnt + 1];

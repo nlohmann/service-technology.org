@@ -454,11 +454,23 @@ void Problem::showTVector() {
 
 /** Print the initial marking. */
 void Problem::showInitial() {
+	if (initial.empty()) {
+		Marking m0(getInitialMarking());
+		for(unsigned int i=0; i<placeorder.size(); ++i)
+			if (m0[*(placeorder[i])]>0)
+			{
+				cout << placeorder[i]->getName();
+				if (m0[*(placeorder[i])]>1) 
+					cout << ":" << m0[*(placeorder[i])];
+				cout << " ";
+			}
+		return;
+	}
 	for(unsigned int i=0; i<placeorder.size(); ++i)
 		if (initial.find(placeorder[i]->getName())!=initial.end())
 		{
 			cout << placeorder[i]->getName();
-			if (initial[placeorder[i]->getName()]>1) 
+			if (initial[placeorder[i]->getName()]!=1) 
 				cout << ":" << initial[placeorder[i]->getName()];
 			cout << " ";
 		}
@@ -472,7 +484,7 @@ void Problem::showFinal() {
 			cout << placeorder[i]->getName(); 
 			if (cover.find(placeorder[i]->getName())==cover.end()) 
 			{
-				if (required[placeorder[i]->getName()]>1) 
+				if (required[placeorder[i]->getName()]!=1) 
 					cout << ":" << required[placeorder[i]->getName()];
 				cout << " ";
 			} else {

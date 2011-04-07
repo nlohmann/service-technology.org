@@ -245,7 +245,8 @@ void Parser::close_element()
     {
       std::string id = pnml_attributes[current_depth]["id"];
       std::string name = pnml_attributes[current_depth]["__name__"];
-      std::string usedName = id; // = name.empty() ? id : name; 
+      std::string usedName = name.empty() ? id : name; 
+//      std::string usedName = id; // = name.empty() ? id : name; 
       pnml_id2node[id] = &net_.createPlace(usedName, atoi(pnml_attributes[current_depth]["__initialMarking__"].c_str()));
       break;
     }

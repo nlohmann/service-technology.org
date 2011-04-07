@@ -156,7 +156,8 @@ int main(int argc, char** argv) {
 			cout << ";" << endl;
 			cout << "\tRESULT OR ";
 			if (roots[i]->isLeaf()==BFNode::BFFORM && roots[i]->getOp()==BFNode::BFNOT) 
-				cout << "NEGATE ";
+			{ if (quant[i])	cout << "NEGATE "; }
+			else if (!quant[i]) cout << "NEGATE ";
 			cout << formid[i] << ";" << endl << endl;
 		}
 

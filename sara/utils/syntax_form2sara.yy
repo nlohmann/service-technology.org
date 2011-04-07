@@ -73,22 +73,42 @@ quantifier:
 
 subformula:
 	atomic
-|	POPEN { node->setInner(BFNode::BFAND); list.push_back(node); node=new BFNode(); list.back()->addSon(node); } subformula PCLOSE andorformula { node=list.back(); list.pop_back(); }
-|	NOTSIGN POPEN { node->setInner(BFNode::BFNOT); list.push_back(node); node=new BFNode(); list.back()->addSon(node); } subformula PCLOSE { node=list.back(); list.pop_back(); }
+|	POPEN {	node->setInner(BFNode::BFAND); list.push_back(node); 
+		node=new BFNode(); list.back()->addSon(node); } 
+	subformula PCLOSE andorformula { node=list.back(); list.pop_back(); }
+|	NOTSIGN POPEN {	node->setInner(BFNode::BFAND); list.push_back(node);
+			node=new BFNode(); node->setInner(BFNode::BFNOT); list.back()->addSon(node); list.push_back(node); 
+			node=new BFNode(); list.back()->addSon(node); } 
+	subformula PCLOSE { list.pop_back(); } 
+	andorformula { node=list.back(); list.pop_back(); }
 ;
 
 andorformula:
-	andformula
-|	orformula
+	ANDSIGN POPEN { node=new BFNode(); list.back()->addSon(node); } subformula PCLOSE andformula
+|	ANDSIGN NOTSIGN POPEN {	node=new BFNode(); node->setInner(BFNode::BFNOT); list.back()->addSon(node); list.push_back(node); 
+				node=new BFNode(); list.back()->addSon(node); } 
+	subformula PCLOSE { list.pop_back(); } andformula
+|	ORSIGN POPEN { list.back()->setInner(BFNode::BFOR); node=new BFNode(); list.back()->addSon(node); } subformula PCLOSE orformula
+|	ORSIGN NOTSIGN POPEN {	list.back()->setInner(BFNode::BFOR); 
+				node=new BFNode(); node->setInner(BFNode::BFNOT); list.back()->addSon(node); list.push_back(node); 
+				node=new BFNode(); list.back()->addSon(node); } 
+	subformula PCLOSE { list.pop_back(); } orformula
+|	/* empty */
 ;
 
 andformula:
 	ANDSIGN POPEN { node=new BFNode(); list.back()->addSon(node); } subformula PCLOSE andformula
+|	ANDSIGN NOTSIGN POPEN {	node=new BFNode(); node->setInner(BFNode::BFNOT); list.back()->addSon(node); list.push_back(node); 
+				node=new BFNode(); list.back()->addSon(node); } 
+	subformula PCLOSE { list.pop_back(); } andformula
 |	/* empty */
 ;
 
 orformula:
-	ORSIGN POPEN { list.back()->setInner(BFNode::BFOR); node=new BFNode(); list.back()->addSon(node); } subformula PCLOSE orformula
+	ORSIGN POPEN { node=new BFNode(); list.back()->addSon(node); } subformula PCLOSE orformula
+|	ORSIGN NOTSIGN POPEN {	node=new BFNode(); node->setInner(BFNode::BFNOT); list.back()->addSon(node); list.push_back(node); 
+				node=new BFNode(); list.back()->addSon(node); } 
+	subformula PCLOSE { list.pop_back(); } orformula
 |	/* empty */
 ;
 

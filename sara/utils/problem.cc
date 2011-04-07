@@ -476,7 +476,7 @@ void Problem::showInitial() {
 		if (initial.find(placeorder[i]->getName())!=initial.end())
 		{
 			cout << placeorder[i]->getName();
-			if (initial[placeorder[i]->getName()]>1) 
+			if (initial[placeorder[i]->getName()]!=1) 
 				cout << ":" << initial[placeorder[i]->getName()];
 			cout << " ";
 		}
@@ -490,7 +490,7 @@ void Problem::showFinal() {
 			cout << placeorder[i]->getName(); 
 			if (cover.find(placeorder[i]->getName())==cover.end()) 
 			{
-				if (required[placeorder[i]->getName()]>1) 
+				if (required[placeorder[i]->getName()]!=1) 
 					cout << ":" << required[placeorder[i]->getName()];
 				cout << " ";
 			} else {

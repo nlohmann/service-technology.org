@@ -1704,11 +1704,6 @@ staticformula::staticformula(UExpression* e) {
 int initialize_statepredicate() { // return: value if formula constant
 //initialize state predicate, if present
 #ifdef WITHFORMULA
-    if (!F) {
-        fprintf(stderr, "lola: specify predicate in analysis task file!\n");
-        _exit(4);
-    }
-
     int res;
     F = F -> reduce(&res);
     if (res < 2) {
@@ -1735,11 +1730,6 @@ int initialize_ctl() { // return: value if formula constant
 //initialize formula
 #ifdef WITHFORMULA
     int res;
-
-    if (!F) {
-        fprintf(stderr, "lola: specify formula in analysis task file!\n");
-        _exit(4);
-    }
 
     F = F -> reduce(&res);
     if (res < 2) {

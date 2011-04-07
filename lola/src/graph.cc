@@ -786,11 +786,6 @@ unsigned int depth_first() {
 #ifndef TWOPHASE
     int res;
 
-    if (!F) {
-        fprintf(stderr, "lola: specify predicate in analysis task file!\n");
-        _exit(4);
-    }
-
     F = F->reduce(&res);
     if (res < 2) {
         return res;
@@ -901,19 +896,7 @@ unsigned int depth_first() {
 #ifdef TSCC
         TSCCRepresentitives = NULL;
 #endif
-#ifdef BOUNDEDPLACE
-        if (!Globals::CheckPlace) {
-            fprintf(stderr, "lola: specify place to be checked in analysis task file\n");
-            fprintf(stderr, "      mandatory for task BOUNDEDPLACE\n");
-            _exit(4);
-        }
-#endif
 #ifdef DEADTRANSITION
-        if (!Globals::CheckTransition) {
-            fprintf(stderr, "lola: specify transition to be checked in analysis task file\n");
-            fprintf(stderr, "      mandatory for task DEADTRANSITION\n");
-            _exit(4);
-        }
 #ifndef DISTRIBUTE
         if (Globals::CheckTransition->enabled) {
             // early abortion
@@ -1885,19 +1868,9 @@ int initialize_none() {
     return -1;
 }
 int initialize_place() {
-    if (!Globals::CheckPlace) {
-        fprintf(stderr, "lola: specify place to be checked in analysis task file\n");
-        fprintf(stderr, "      mandatory for task BOUNDEDPLACE\n");
-        _exit(4);
-    }
     return -1;
 }
 int initialize_transition() {
-    if (!Globals::CheckTransition) {
-        fprintf(stderr, "lola: specify transition to be checked in analysis task file\n");
-        fprintf(stderr, "      mandatory for task DEADTRANSITION\n");
-        _exit(4);
-    }
     return -1;
 }
 
@@ -2019,10 +1992,8 @@ unsigned int simple_depth_first() {
 // determined structurally
 // instances of this macros have shape int initialize_*();
 
+	
     int result = INITIALIZE_PROPERTY();
-    if (result >= 0) {
-        return result;
-    }
 
 
 // Insert initial state (already in Globals::CurrentMarking)
@@ -2316,13 +2287,6 @@ unsigned int breadth_first() {
 #endif
     }
 #endif
-#ifdef STATEPREDICATE
-    if (!F) {
-        fprintf(stderr, "lola: specify predicate in analysis task file!\n");
-        fprintf(stderr, "      mandatory for task STATEPREDICATE\n");
-        _exit(4);
-    }
-#endif
     NrOfStates = d = limit = 1;
 #ifdef DISTRIBUTE
 #if defined(SYMMETRY) && SYMMINTEGRATION == 3
@@ -2343,14 +2307,6 @@ unsigned int breadth_first() {
         Globals::Transitions[i]->check_enabled();
     }
     CurrentState->firelist = FIRELIST();
-
-#ifdef DEADTRANSITION
-    if (!Globals::CheckTransition) {
-        fprintf(stderr, "lola: specify transition to be checked in analysis task file\n");
-        fprintf(stderr, "      mandatory for task DEADTRANSITION\n");
-        _exit(4);
-    }
-#endif
 
 #ifdef COVER
     CurrentState->NewOmega = NULL;
@@ -2401,13 +2357,6 @@ unsigned int breadth_first() {
         return 1;
     }
 #endif
-#ifdef BOUNDEDPLACE
-    if (!Globals::CheckPlace) {
-        fprintf(stderr, "lola: specify place to be checked in analysis task file\n");
-        fprintf(stderr, "      mandatory for task BOUNDEDPLACE\n");
-        _exit(4);
-    }
-#endif
 #ifdef DEADLOCK
     if (!CurrentState->firelist || !(CurrentState->firelist[0])) {
         // early abortion
@@ -2428,14 +2377,6 @@ unsigned int breadth_first() {
 #endif
 #ifdef STATEPREDICATE
     int res;
-	// wird jetzt (06.04.11) weiter oben geprüft...
-	/*
-    if (!F) {
-        fprintf(stderr, "lola: specify predicate in analysis task file!\n");
-        fprintf(stderr, "      mandatory for task STATEPREDICATE\n");
-        _exit(4);
-    }
-	*/
     F = F->reduce(&res);
     if (res < 2) {
         return res;
@@ -3162,11 +3103,6 @@ int liveproperty() {
     unsigned int i;
 
     int res;
-    if (!F) {
-        fprintf(stderr, "lola: specify predicate in analysis task file!\n");
-        fprintf(stderr, "      mandatory for task LIVEPROP\n");
-        _exit(4);
-    }
     F = F->reduce(&res);
     if (res < 2) {
         return res;

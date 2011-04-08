@@ -59,6 +59,10 @@ map<string,bool> results;
 map<string,bool> indecisive;
 /// for ordering the properties correctly
 vector<string> resorder;
+/// if the result of several problems should be ORed (or ANDed)
+map<string,bool> orresult;
+/// if no computation should be done at all (dummy for model checking contest)
+map<string,bool> donotcompute;
 
 bool flag_droppast(false);
 int val_droppast(0);
@@ -320,6 +324,7 @@ if (args_info.input_given || args_info.pipe_given) {
 	// walk through the problem list
 	for(unsigned int x=0; x<pbls.size(); ++x)
 	{
+		orresult[pbls.at(x).getResultText()]=pbls.at(x).isOrResult();
 		if (results.find(pbls.at(x).getResultText())==results.end()) {
 			results[pbls.at(x).getResultText()] = true;
 			if (pbls.at(x).getResultText()!="")
@@ -377,12 +382,12 @@ if (args_info.input_given || args_info.pipe_given) {
 					int mtl = solutions.printSolutions(avetracelen,pbls.at(x),x); // get the solution length for this problem
 					if (mtl>maxtracelen) maxtracelen=mtl; // and maximize over all problems
 					solcnt+=solutions.size();
-					if (pbls.at(x).isNegateResult())
+					if (pbls.at(x).isNegateResult() ^ pbls.at(x).isOrResult())
 						results[pbls.at(x).getResultText()] = false;
 				}
 				else { 
 					if (!flag_yesno) cout << "sara: INFEASIBLE: the transition multiset is not realizable." << endl;
-					if (!pbls.at(x).isNegateResult())
+					if (!pbls.at(x).isNegateResult() ^ pbls.at(x).isOrResult())
 						results[pbls.at(x).getResultText()] = false;
 				}
 				if ((!solutions.almostEmpty() || !verbose) && !args_info.continue_given) break;
@@ -433,6 +438,7 @@ if (args_info.input_given || args_info.pipe_given) {
 				}
 				break;
 			}
+			case Problem::DUMMY: donotcompute[pbls.at(x).getResultText()] = true; break;
 		}
 		if (!flag_yesno) cout << endl;
 	}
@@ -452,26 +458,35 @@ if (args_info.input_given || args_info.pipe_given) {
 		for(unsigned int i=0; i<resorder.size(); ++i)
 			if (resorder[i]!="")
 			{
-				if (indecisive.find(resorder[i])==indecisive.end()) {
-					if (results[resorder[i]]) cout << "FORMULA FALSE" << endl;
+				bool tech(true);
+				if (donotcompute.find(resorder[i])!=donotcompute.end())
+					{ cout << "DO_NOT_COMPETE" << endl; tech=false; }
+				else if (indecisive.find(resorder[i])==indecisive.end()) {
+					if (results[resorder[i]] ^ !orresult[resorder[i]]) cout << "FORMULA FALSE" << endl;
 					else cout << "FORMULA TRUE" << endl;
 				} else {
-					if (results[resorder[i]]) cout << "CANNOT_COMPUTE" << endl;
-					else cout << "FORMULA TRUE" << endl;
+					if (results[resorder[i]]) { 
+						cout << "CANNOT_COMPUTE" << endl;
+						tech = false;
+					} else
+						if (!orresult[resorder[i]]) cout << "FORMULA FALSE" << endl;
+						else cout << "FORMULA TRUE" << endl;
 				}
-				cout << "TECHNIQUES PARTIAL_ORDERS OTHERS" << endl;
+				if (tech) cout << "TECHNIQUES ABSTRACTIONS PARTIAL_ORDERS OTHERS" << endl;
 			}
 	} else {
 		for(unsigned int i=0; i<resorder.size(); ++i)
-			if (resorder[i]!="")
+			if (resorder[i]!="" && donotcompute.find(resorder[i])==donotcompute.end())
 			{
 				cout << "sara: The property of " << resorder[i];
 				if (indecisive.find(resorder[i])==indecisive.end()) {
-					if (results[resorder[i]]) cout << " is fulfilled." << endl;
-					else cout << " does not hold in general." << endl;
+					if (results[resorder[i]] ^ orresult[resorder[i]]) cout << " is fulfilled." << endl;
+					else cout << " does not hold." << endl;
 				} else {
 					if (results[resorder[i]]) cout << " could not be decided." << endl;
-					else cout << " does not hold in general." << endl;
+					else 
+						if (orresult[resorder[i]]) cout << " is fulfilled." << endl;
+						else cout << " does not hold." << endl;
 				}
 			}
 	}

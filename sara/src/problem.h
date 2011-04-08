@@ -9,9 +9,9 @@
  *
  * \since   2010/09/16
  *
- * \date    $Date: 2010-09-16 12:00:00 +0200 (Do, 16. Sep 2010) $
+ * \date    $Date: 2011-04-08 12:00:00 +0200 (Fr, 08. Apr 2011) $
  *
- * \version $Revision: 1.03 $
+ * \version $Revision: 1.06 $
  */
 
 #ifndef PROBLEM_H
@@ -147,7 +147,8 @@ public:
 	/// Goals
 	enum Types {
 		REACHABLE = 0,
-		REALIZABLE = 1
+		REALIZABLE = 1,
+		DUMMY = 2
 	};
 
 	/// Types of Petri nets

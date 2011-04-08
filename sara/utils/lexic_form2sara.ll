@@ -57,6 +57,9 @@ number    [0-9][0-9]*
 "not"	{ return NOTSIGN; }
 "and"	{ return ANDSIGN; }
 "or"	{ return ORSIGN; }
+"NOT"	{ return NOTSIGN; }
+"AND"	{ return ANDSIGN; }
+"OR"	{ return ORSIGN; }
 
 {number}     { form2sara_lval.val = atoi(form2sara_text); return NUMBER; }
 
@@ -71,6 +74,6 @@ number    [0-9][0-9]*
 
 __attribute__((noreturn)) void form2sara_error(const char *msg) {
   status("%d: error near '%s': %s", form2sara_lineno, form2sara_text, msg);
-  abort(30, "error while parsing the formula file");
+  abort(31, "error while parsing the formula file");
 }
 

@@ -82,10 +82,20 @@ int main(int argc, char** argv) {
 
 	for(unsigned int i=0; i<roots.size(); ++i)
 	{
+		if (!quant[i])
+		{
+			BFNode* top = new BFNode();
+			top->setInner(BFNode::BFNOT);
+			top->addSon(roots[i]);
+			roots[i] = top;
+		}
+		roots[i]->toDNF(false);
+/*
 		// if the root is a NOT it is preserved, everything else is converted to DNF
 		if (roots[i]->isLeaf()==BFNode::BFFORM && roots[i]->getOp()==BFNode::BFNOT) 
 			(*(roots[i]->getSons().begin()))->toDNF(false);
 		else roots[i]->toDNF(false);
+*/
 /* output: the formula tree/graph
 		cout << "FORMULA " << formid[i] << " (" << (quant[i]?"reachable":"invariant") << ")" << endl;
 		set<BFNode*> go;
@@ -131,8 +141,9 @@ int main(int argc, char** argv) {
 		set<BFNode*>::iterator nit;
 		for(nit=orloop.begin(); nit!=orloop.end(); ++nit)
 		{
-			cout << "PROBLEM " << formid[i] << ":" << endl;
-			cout << "\tGOAL REACHABILITY;" << endl;
+			cout << "PROBLEM " << formid[i] << ":" << endl << "\tGOAL ";
+			if (!quant[i] && orloop.size()>1) cout << "DUMMY;" << endl;
+			else cout << "REACHABILITY;" << endl;
 			cout << "\tFILE " << args_info.net_arg << " TYPE ";
 			if (args_info.owfn_given) cout << "OWFN;" << endl;
 			else if (args_info.lola_given) cout << "LOLA;" << endl;
@@ -159,6 +170,7 @@ int main(int argc, char** argv) {
 			{ if (quant[i])	cout << "NEGATE "; }
 			else if (!quant[i]) cout << "NEGATE ";
 			cout << formid[i] << ";" << endl << endl;
+			if (!quant[i] && orloop.size()>1) break;
 		}
 
 		// delete the formula

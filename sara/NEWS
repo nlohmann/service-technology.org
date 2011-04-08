@@ -8,11 +8,15 @@
 
 
 PURPOSE
-Version 1.05 (25 Mar 2011)
+Version 1.06 (08 Apr 2011)
 ==========================
 
-* added output option for simple yes/no
+* bug fix: lost constraints led to false negatives
 
-* multiple problems can be logically ORed
+* initial marking read from net if missing in problem statement
+
+* local changes to PNML parser to use name tags for IDs
+
+* allowing for dummy problem statements
 
 \nSee file ChangeLog <http://service-technology.org/files/sara/ChangeLog> for\ncomplete version history.\n

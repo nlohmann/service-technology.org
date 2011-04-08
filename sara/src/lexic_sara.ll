@@ -43,6 +43,7 @@ problem PROBLEM
 goal GOAL
 reachability REACHABILITY
 realizability REALIZABILITY
+dummy DUMMY
 nfile FILE
 ntype TYPE
 typeowfn OWFN
@@ -70,6 +71,7 @@ resor OR
 {goal}		{ return GOAL; }
 {reachability}	{ return REACHABILITY; }
 {realizability} { return REALIZABILITY; }
+{dummy}	{ return XDUMMY; }
 {nfile}	{ return NFILE; }
 {ntype}	{ BEGIN(nname); return NTYPE; }
 {typeowfn}	{ return TYPEOWFN; }

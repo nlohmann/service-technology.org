@@ -9,9 +9,9 @@
  *
  * \since   2009/10/21
  *
- * \date    $Date: 2009-10-21 12:00:00 +0200 (Mi, 21. Okt 2009) $
+ * \date    $Date: 2011-04-08 12:00:00 +0200 (Fr, 08. Apr 2011) $
  *
- * \version $Revision: -1 $
+ * \version $Revision: 1.06 $
  */
 
 #include <cstdio>

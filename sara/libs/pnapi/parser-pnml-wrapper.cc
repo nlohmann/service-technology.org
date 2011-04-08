@@ -254,7 +254,8 @@ void Parser::close_element()
     {
       std::string id = pnml_attributes[current_depth]["id"];
       std::string name = pnml_attributes[current_depth]["__name__"];
-      std::string usedName = id; // = name.empty() ? id : name; 
+      std::string usedName = name.empty() ? id : name; 
+//      std::string usedName = id; // = name.empty() ? id : name; 
       Transition * currentTransition = &net_.createTransition(usedName);
       pnml_id2node[id] = currentTransition;
 

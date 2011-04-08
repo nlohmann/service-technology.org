@@ -269,6 +269,8 @@ It has the following content, defining the problem statement.
 @end cartouche
 
 The problem statement can of course be edited and e.g. the initial or final marking can be changed.
+If the line containing the initial marking is omitted or does not contain any place names the
+initial marking will instead be taken from the given Petri net description.
 In the file @file{test11.sara} there are three problem statements specifying very different final markings.
 
 @cartouche
@@ -387,15 +389,17 @@ One additional line may be added after the last line of any problem:
 
 @cartouche
 @smallexample
-RESULT [NEGATE] <string>
+RESULT [OR] [NEGATE] <string>
 @end smallexample
 @end cartouche
 
 Sara will handle the <string> as the name of a property which is fulfilled if all problems
 in the problem file appended with this same line have a positive result, i.e. each time a
 firing sequence is found. The optional parameter NEGATE inverts this: all problems
-containing this line must fail for the property to hold. Sara will output if the property
-holds or not after checking all problems in the file. Different properties may be checked
+containing this line must fail for the property to hold. The parameter OR means that one
+positive solution will be sufficient to fulfill the property. Sara will output if the property
+holds or not after checking all problems in the file (if the decision can be made early,
+Sara will take that shortcut, though). Different properties may be checked
 by using different strings in the same problem file. The string must not contain any of
 the following special symbols: +-<>:,; or blanks.
  
@@ -661,8 +665,8 @@ additional debugging output.
 
 @section Additional Utilities
 
-Additional utilities can be found in the utils directory. At this time there is
-only one tool: owfn2sara. Owfn2sara takes a list of Petri net files from stdin,
+Additional utilities can be found in the utils directory. At this time there are
+two of them: owfn2sara and form2sara. Owfn2sara takes a list of Petri net files from stdin,
 computes a final marking for each net (containing each place with an empty postset)
 and creates a list of problem instances, at least one for each net, which are written to stdout. 
 This list can be piped to the main tool Sara to check if certain properties hold.
@@ -681,6 +685,10 @@ then the final marking is reachable.
 @end cartouche
 
 All options can be combined to check for all properties at once.
+
+The tool form2sara was written for a model checking contest and can create Sara problem
+files from a Petri net and a formula specifying the final marking given in the contest's
+syntax.
 
 @section Using Sara as a library
 
@@ -933,6 +941,24 @@ solutions were not stored. This is a bug and should never occur.
 @smallexample
 @cartouche
 sara: solved, but no solution found -- aborting [#14]
+@end cartouche
+@end smallexample
+
+@item #31
+The utility form2sara could not parse the file containing the formula.
+
+@smallexample
+@cartouche
+sara: error while parsing the formula file -- aborting [#31]
+@end cartouche
+@end smallexample
+
+@item #32
+The utility form2sara could not access the file containing the formula.
+
+@smallexample
+@cartouche
+sara: could not read formula file -- aborting [#32]
 @end cartouche
 @end smallexample
 

@@ -9,9 +9,9 @@
  *
  * \since   2009/10/21
  *
- * \date    $Date: 2010-08-20 12:00:00 +0200 (Fr, 20. Aug 2010) $
+ * \date    $Date: 2011-04-08 12:00:00 +0200 (Fr, 08. Apr 2011) $
  *
- * \version $Revision: 1.02 $
+ * \version $Revision: 1.06 $
  */
 
 #include <vector>
@@ -157,7 +157,7 @@ void Reachalyzer::start() {
 		if (verbose>1) cerr << "Lookup-Table-Size: " << shortcut.size() << endl; // debug info
 		map<Transition*,int> oldvector(tps.first()->getFullVector()); // the previous (father) solution of lp_solve
 		// make a copy of the active job before we change it
-		PartialSolution ps(*(tps.first()));
+//		PartialSolution ps(*(tps.first()));
 		nextJump(*(tps.first())); // create a new jump if one has been precomputed, before changes are made
 		tps.first()->touchConstraints(false); // mark all normal constraints so far as old
 		tps.first()->buildSimpleConstraints(im); // compute and create new constraints
@@ -235,6 +235,8 @@ void Reachalyzer::start() {
 				}
 			}
 		}
+		// make a copy of the active job before we change it
+		PartialSolution ps(*(tps.first()));
 		tps.first()->transformJumps(fullvector); // change jump constraints to normal ones
 		if (tps.findPast(tps.first())) // check if the transformed job has already been done before
 		{ // i.e. if there is a previous job with the same constraints

@@ -1,4 +1,12 @@
 @c <<-- CHANGE START (version information) -->>
+@heading Version 1.06 (08 Apr 2011)
+@itemize
+@item bug fix: lost constraints led to false negatives
+@item initial marking read from net if missing in problem statement
+@item local changes to PNML parser to use name tags for IDs
+@item allowing for dummy problem statements
+@end itemize
+
 @heading Version 1.05 (25 Mar 2011)
 @itemize
 @item added output option for simple yes/no

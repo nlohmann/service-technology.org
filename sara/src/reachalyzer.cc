@@ -49,6 +49,7 @@ using std::setw;
 namespace sara {
 
 extern bool flag_verbose, flag_show, flag_break, flag_treemaxjob, flag_witness;
+extern int val_maxdepth;
 
 /*! Constructor with a Petri net, an initial and a final marking to test whether
 	the final marking can be covered from the initial marking.
@@ -193,6 +194,8 @@ void Reachalyzer::start() {
 		tps.first()->touchConstraints(true); // mark all jump constraints so far as old
 		// calculate what the new constraints changed in the solution of lp_solve
 		map<Transition*,int> fullvector(lpwrap.getTVector(net));
+		// check if the solution is longer than the parameter -M (if given), if so, omit it
+		if (checkSize(fullvector)) { tps.pop_front(false); ++loops; continue; }
 		// delete all "unknown" jobs covered by this job if we are interested in a counterexample
 		if (flag_verbose || flag_show) unknown.deleteCovered(fullvector); 
 		map<Transition*,int> diff; // this contains changes from the old to the new solution
@@ -296,8 +299,8 @@ void Reachalyzer::printResult(int pbnr) {
 	}
 	else if (errors) cout << "sara: UNSOLVED: Result is indecisive due to failure of lp_solve." << endl;
 	else if (suboptimal) cout << "sara: UNSOLVED: Result is indecisive due to non-minimal solutions by lp_solve." << endl;
-	else if (flag_treemaxjob) cout << "sara: UNSOLVED: solution may have been cut off due to command line switch -T" << endl;
-	if (!errors && !flag_treemaxjob && (flag_witness || solutions.almostEmpty()))
+	else if (flag_treemaxjob || val_maxdepth>0) cout << "sara: UNSOLVED: solutions may have been cut off due to command line switch -M/-T" << endl;
+	if (!errors && !flag_treemaxjob && val_maxdepth==0 && (flag_witness || solutions.almostEmpty()))
 	{ // if we have no solution or witnesses are sought anyway
 		if (suboptimal) cout << "sara: The following information might therefore not be relevant." << endl;
 		if (failure.trueSize()>0 && !flag_break)
@@ -457,6 +460,15 @@ int Reachalyzer::getSumTraceLength() const { return sumsollen; }
 	@return Number of solutions.
 */
 int Reachalyzer::numberOfSolutions() { return solutions.size(); }
+
+bool Reachalyzer::checkSize(map<Transition*,int>& solution) {
+	if (val_maxdepth==0) return false;
+	map<Transition*,int>::iterator mit;
+	int val(0);
+	for(mit=solution.begin(); mit!=solution.end(); ++mit)
+		val += mit->second;
+	return (val_maxdepth<val);
+}
 
 } // end namespace sara
 

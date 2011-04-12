@@ -80,6 +80,7 @@ bool flag_break(false);
 bool flag_witness(false);
 bool flag_joborder(false);
 bool flag_yesno(false);
+int val_maxdepth(0);
 
 } // end namespace sara
 
@@ -148,6 +149,7 @@ int main(int argc, char** argv) {
 	flag_witness = args_info.witness_given;
 	flag_joborder = args_info.joborder_given;
 	flag_yesno = args_info.yesno_given;
+	if (args_info.maxdepth_given) val_maxdepth = args_info.maxdepth_arg;
 
 /****************
 * NO ARGS GIVEN *
@@ -462,15 +464,15 @@ if (args_info.input_given || args_info.pipe_given) {
 				if (donotcompute.find(resorder[i])!=donotcompute.end())
 					{ cout << "DO_NOT_COMPETE" << endl; tech=false; }
 				else if (indecisive.find(resorder[i])==indecisive.end()) {
-					if (results[resorder[i]] ^ !orresult[resorder[i]]) cout << "FORMULA FALSE" << endl;
-					else cout << "FORMULA TRUE" << endl;
+					if (results[resorder[i]] ^ !orresult[resorder[i]]) cout << "FORMULA " << resorder[i] << " FALSE ";
+					else cout << "FORMULA " << resorder[i] << " TRUE ";
 				} else {
 					if (results[resorder[i]]) { 
 						cout << "CANNOT_COMPUTE" << endl;
 						tech = false;
 					} else
-						if (!orresult[resorder[i]]) cout << "FORMULA FALSE" << endl;
-						else cout << "FORMULA TRUE" << endl;
+						if (!orresult[resorder[i]]) cout << "FORMULA " << resorder[i] << " FALSE ";
+						else cout << "FORMULA " << resorder[i] << " TRUE ";
 				}
 				if (tech) cout << "TECHNIQUES ABSTRACTIONS PARTIAL_ORDERS OTHERS" << endl;
 			}

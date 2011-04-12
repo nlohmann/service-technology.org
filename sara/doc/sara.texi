@@ -389,7 +389,7 @@ One additional line may be added after the last line of any problem:
 
 @cartouche
 @smallexample
-RESULT [OR] [NEGATE] <string>
+RESULT [OR] [NEGATE] <string>;
 @end smallexample
 @end cartouche
 
@@ -491,6 +491,22 @@ a non-minimal solution in the (rare) case a smaller one is found later.
 sara -i test5.sara -C -P
 @end smallexample
 @end cartouche
+
+The search space can be limited (and thus made finite) by providing the option @option{-M} followed
+by a number. If this number is smaller than the size of a solution of the linear programming solver
+integrated in Sara, the solution will be disregarded. Sara will neither try to transform this
+solution into a firing sequence nor will Sara extend this solution. So using the command
+
+@cartouche
+@smallexample
+sara -i test5.sara -C -M14
+@end smallexample
+@end cartouche
+
+Sara will find firing sequences of at most length 14 that are solutions to the given problem.
+If solutions are found at all, all minimal solutions are computed. Some non-minimal solutions
+may be omitted if their Parikh-vector is larger than that of another solution. If there is
+no solution up to the given length, Sara will state that the problem remains unsolved.
 
 Additional information about the problem(s) and the result(s) can be provided with the verbose option @option{-v}.
 First, the input used by Sara is stated: Petri net file, initial marking, final marking, constraints.

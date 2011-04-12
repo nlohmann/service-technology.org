@@ -1,4 +1,10 @@
 @c <<-- CHANGE START (version information) -->>
+@heading Version 1.07 (12 Apr 2011)
+@itemize
+@item added option -M to limit the solution length for finding minimal solutions
+@item last output changes for the model checking contest
+@end itemize
+
 @heading Version 1.06 (08 Apr 2011)
 @itemize
 @item bug fix: lost constraints led to false negatives

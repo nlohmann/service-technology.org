@@ -77,6 +77,9 @@ public:
 	/// Get the number of solutions in the solutions queue
 	int numberOfSolutions();
 
+	/// Check if the allowed maximal solution length is exceeded
+	bool checkSize(map<Transition*,int>& solution);
+
 	/// Status
 	enum errorMessage {
 		SOLUTION_FOUND = 0,

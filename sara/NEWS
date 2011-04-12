@@ -8,15 +8,11 @@
 
 
 PURPOSE
-Version 1.06 (08 Apr 2011)
+Version 1.07 (12 Apr 2011)
 ==========================
 
-* bug fix: lost constraints led to false negatives
+* added option -M to limit the solution length for finding minimal solutions
 
-* initial marking read from net if missing in problem statement
-
-* local changes to PNML parser to use name tags for IDs
-
-* allowing for dummy problem statements
+* last output changes for the model checking contest
 
 \nSee file ChangeLog <http://service-technology.org/files/sara/ChangeLog> for\ncomplete version history.\n

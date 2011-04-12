@@ -67,6 +67,15 @@ AT_CHECK([GREP -q "SOLUTION(15):" stdout])
 AT_KEYWORDS(solver)
 AT_CLEANUP
 
+AT_SETUP([Maximal search depth])
+AT_CHECK([cp TESTFILES/test5.sara TESTFILES/test5.owfn .])
+AT_CHECK([SARA -i test5.sara -M14 -C -v],0,stdout,stderr)
+AT_CHECK([GREP -q "2 solutions" stdout])
+AT_CHECK([GREP -q "SOLUTION(13):" stdout])
+AT_CHECK([GREP -q "SOLUTION(14):" stdout])
+AT_KEYWORDS(solver)
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Finding infeasible marking equations])
 ############################################################################

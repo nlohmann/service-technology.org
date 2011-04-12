@@ -8,6 +8,13 @@
 
 
 PURPOSE
+Version 1.07 (12 Apr 2011)
+==========================
+
+* added option -M to limit the solution length for finding minimal solutions
+
+* last output changes for the model checking contest
+
 Version 1.06 (08 Apr 2011)
 ==========================
 

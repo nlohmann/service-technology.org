@@ -142,8 +142,9 @@ int main(int argc, char** argv) {
 		for(nit=orloop.begin(); nit!=orloop.end(); ++nit)
 		{
 			cout << "PROBLEM " << formid[i] << ":" << endl << "\tGOAL ";
-			if (!quant[i] && orloop.size()>1) cout << "DUMMY;" << endl;
-			else cout << "REACHABILITY;" << endl;
+//			if (!quant[i] && orloop.size()>1) cout << "DUMMY;" << endl;
+//			else 
+			cout << "REACHABILITY;" << endl;
 			cout << "\tFILE " << args_info.net_arg << " TYPE ";
 			if (args_info.owfn_given) cout << "OWFN;" << endl;
 			else if (args_info.lola_given) cout << "LOLA;" << endl;
@@ -151,6 +152,7 @@ int main(int argc, char** argv) {
 			cout << "\tFINAL COVER ";
 			set<BFNode*>::iterator ait;
 			set<BFNode*> aset((*nit)->getSons());
+			if (aset.empty()) aset.insert(*nit);
 			bool comma(false);
 			for(ait=aset.begin(); ait!=aset.end(); ++ait,comma=true)
 			{
@@ -165,12 +167,12 @@ int main(int argc, char** argv) {
 				cout << (*ait)->getOp();
 			}
 			cout << ";" << endl;
-			cout << "\tRESULT OR ";
+			cout << "\tRESULT" << (quant[i]?" OR ":" ");
 			if (roots[i]->isLeaf()==BFNode::BFFORM && roots[i]->getOp()==BFNode::BFNOT) 
 			{ if (quant[i])	cout << "NEGATE "; }
 			else if (!quant[i]) cout << "NEGATE ";
 			cout << formid[i] << ";" << endl << endl;
-			if (!quant[i] && orloop.size()>1) break;
+//			if (!quant[i] && orloop.size()>1) break;
 		}
 
 		// delete the formula

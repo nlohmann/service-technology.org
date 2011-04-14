@@ -151,6 +151,10 @@ void BFNode::toDNF(bool neg) {
 		return;
 	}
 	if (op==BFNOT) neg = !neg; // negate subformulae
+	if (neg) {
+		if (op==BFAND) op=BFOR;
+		else if (op==BFOR) op=BFAND;
+	}
 	set<BFNode*>::iterator sit;
 	for(sit=succ.begin(); sit!=succ.end(); ++sit)
 		(*sit)->toDNF(neg); // step recursively thru subformulae

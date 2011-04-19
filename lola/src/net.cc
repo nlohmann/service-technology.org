@@ -40,9 +40,12 @@
 
 #include <fstream>
 #include <iostream>
+#include <string>
+#include <vector>
 #include <cctype>
 #include <cstdlib>
 #include <cstdio>
+#include <cstring>
 #include <unistd.h>
 #include <new>
 #include <string>
@@ -311,6 +314,43 @@ void processCommandLine(int argc, char** argv) {
 }
 
 
+
+// Fix argv such that inputs like "lola net.lola -a analysisfile.task" are
+// allowed even though gengetopt would complain about the space after "-a".
+void fix_argv(int& argc, char** &argv) {
+    std::vector<std::string> new_argv;
+    std::string temp;
+    for (unsigned int i = 0; i < argc; ++i) {
+        // collect the whole entry
+        unsigned int j = 0;
+        while (argv[i][j] != NULL) {
+            temp += argv[i][j];
+            j++;
+        }
+
+        // only start a new argv entry if this one does not end with a "-x"
+        // option and the next one does not start with "-"
+        if (not(j > 1 and argv[i][j - 2] == '-' and strchr("apsgmnyrh", argv[i][j - 1]) != NULL and (i == argc - 1 or(i < argc - 1 and argv[i + 1][0] != '-')))) {
+            new_argv.push_back(temp);
+            temp.clear();
+        }
+    }
+
+    // don't forget the last entry
+    if (not temp.empty()) {
+        new_argv.push_back(temp);
+    }
+
+    // copy result to argv
+    for (size_t i = 0; i < new_argv.size(); ++i) {
+        strcpy(argv[i], new_argv[i].c_str());
+    }
+
+    // also adjust argc
+    argc = new_argv.size();
+}
+
+
 int main(int argc, char** argv) {
     // handling "lola --bug" (for debug purposes)
     if (argc == 2 && string(argv[1]) == "--bug") {
@@ -341,6 +381,7 @@ int main(int argc, char** argv) {
         garbagefound = 0;
 
         // 1. Fileoptionen holen und auswerten
+        fix_argv(argc, argv);
         processCommandLine(argc, argv);
 
         if (Globals::hflg) {

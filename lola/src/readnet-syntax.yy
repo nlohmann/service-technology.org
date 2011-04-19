@@ -228,7 +228,7 @@ input:
 #endif
     }
 | declarations net _ANALYSE_ _MARKING_ amarkinglist  { F = NULL; }
-| declarations net _AUTOMATON_ automaton             {F = NULL; }
+| declarations net _AUTOMATON_ automaton             { F = NULL; }
 ;
 
 

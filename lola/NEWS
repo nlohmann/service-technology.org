@@ -30,6 +30,10 @@ Version 1.15-unreleased
   mentioned transitions in \tau are set to visible, and the formula \phi is
   treated like a state predicate.
 
+* fixed bug #18024 (`https://gna.org/bugs/?18024'): parameters can now be
+  used without trailing space, for instance `-a analysisfile.task' is now
+  equivalent to `-aanalysisfile.task'
+
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for
 complete version history.

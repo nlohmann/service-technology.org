@@ -11,6 +11,8 @@
 @item fixed bug #15678 (@url{https://gna.org/bugs/?15678}): @option{HOME} now switches on @option{TWOPHASE} if @option{STUBBORN} is also used
 
 @item started implementing stubborn sets for @option{STATESPACE} option; this option now assumes an extended @acronym{CTL} formula of the form @b{E}[@math{\tau}]@b{F}@tie{}@math{\phi} to be given. All mentioned transitions in @math{\tau} are set to visible, and the formula @math{\phi} is treated like a state predicate.
+
+@item fixed bug #18024 (@url{https://gna.org/bugs/?18024}): parameters can now be used without trailing space, for instance @samp{-a analysisfile.task} is now equivalent to @samp{-aanalysisfile.task}
 @end itemize
 
 

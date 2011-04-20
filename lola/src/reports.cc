@@ -1,15 +1,13 @@
-
 #include "reports.H"
 #include "graph.H"
+#include "verbose.h"
 
 void printstate(const char*, unsigned int*);
 
 graphreport_yes::graphreport_yes(char* name) {
     graphstream = new std::ofstream(name);
     if (graphstream->fail()) {
-        fprintf(stderr, "lola: cannot open graph output file '%s'\n", name);
-        fprintf(stderr, "      no output written\n");
-        _exit(4);
+        abort(4, "cannot open graph output file '%s' - no output written", name);
     }
 }
 

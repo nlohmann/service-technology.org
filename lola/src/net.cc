@@ -520,9 +520,7 @@ int main(int argc, char** argv) {
             message("%d significant places", Globals::Places[0]->NrSignificant);
 #endif
         } catch (overflow) {
-            fprintf(stderr, "lola: not enough space to store generating set for symmetries!\n");
-            fprintf(stderr, "      try again without use of symmetries!\n");
-            _exit(2);
+            abort(2, "not enough space to store generating set for symmetries - try again without use of symmetries");
         }
 #else
 #ifdef PREDUCTION
@@ -659,7 +657,7 @@ int main(int argc, char** argv) {
 
 #ifdef SWEEP
             return 1 - sweep();
-            exit(888);
+//            exit(888);
 #endif
 
 #ifdef MODELCHECKING

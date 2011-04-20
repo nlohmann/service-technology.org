@@ -145,8 +145,7 @@ Constraint* Specification[2]; // Arrays fuer die Constraints (PL/TR)
 
 inline void reportprogress() {
     if (!((CardSpecification[PL] + CardSpecification[TR]) % REPORTFREQUENCY)) {
-        cerr << "Depth " << CardSpecification[PL] + CardSpecification[TR]
-             << "\n";
+        message("Depth %d", CardSpecification[PL] + CardSpecification[TR]);
     }
 }
 
@@ -1103,9 +1102,7 @@ void WriteSymms() {
     if (Globals::yflg) {
         ofstream symmstream(Globals::symmfile);
         if (!symmstream) {
-            cerr << "Cannot open symmetry output file: " << Globals::symmfile
-                 << "\nno output written";
-            return;
+            abort(4, "cannot open symmetry output file '%s' - no output written", Globals::symmfile);
         }
         unsigned int etage, raum, x, y;
         for (etage = 0; etage < CardStore; etage++) {

@@ -28,6 +28,7 @@
 #include "stubborn.H"
 #include "check.H"
 #include "Globals.h"
+#include "verbose.h"
 
 #ifdef FINDPATH
 
@@ -261,8 +262,7 @@ void find_path() {
     unsigned int OriginalNrEnabled;
     Reserve = new Transition * [Globals::Transitions[0]->cnt];
     if (!F) {
-        fprintf(stderr, "lola: specify predicate in analysis task file\n");
-        fprintf(stderr, "      mandatory for task FINDPATH\n");
+        abort(4, "specify predicate in analysis task file - mandatory for task FINDPATH");
     }
     F = F -> reduce(& res);
     if (res == 0) {
@@ -275,9 +275,7 @@ void find_path() {
     F -> tempcard = 0;
     F -> setstatic();
     if (F -> tempcard > 0) {
-        fprintf(stderr, "lola: do not use temporal operators in this mode\n");
-        fprintf(stderr, "      not allowed for task FINDPATH\n");
-        _exit(3);
+        abort(3, "do not use temporal operators in this mode - not allowed for task FINDPATH");
     }
     cout << "\nFormula with\n" << F -> card << " subformulas.\n";
     attempt = 0;

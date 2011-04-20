@@ -660,6 +660,7 @@
 #endif
     #endif
   #else
+    #undef FIRELIST
     #define FIRELIST firelist
 #ifdef DEPTH_FIRST
 #undef GRAPH

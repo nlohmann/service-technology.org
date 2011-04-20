@@ -25,6 +25,7 @@
 #include "formula.H"
 #include "tinv.H"
 #include "sweep.H"
+#include "verbose.h"
 
 #ifdef SWEEP
 void print_binDec(binDecision* , int);
@@ -169,9 +170,7 @@ int sweep() {
     if (gmflg) {
         graphstream = new ofstream(graphfile);
         if (!graphstream) {
-            cerr << "Cannot open graph output file: " << graphfile
-                 << "\nno output written\n";
-            gmflg = false;
+            abort(4, "cannot open graph output file '%s' - no output written", graphfile);
         }
     }
 
@@ -241,9 +240,7 @@ int sweep() {
 #ifdef STATEPREDICATE
     int res;
     if (!F) {
-        fprintf(stderr, "lola: specify predicate in analysis task file!\n");
-        fprintf(stderr, "      mandatory for task STATEPREDICATE\n");
-        _exit(4);
+        abort(4, "specify predicate in analysis task file - mandatory for task STATEPREDICATE");
     }
     F = F -> reduce(&res);
     if (res < 2) {
@@ -253,9 +250,7 @@ int sweep() {
     F -> tempcard = 0;
     F -> setstatic();
     if (F ->  tempcard) {
-        fprintf(stderr, "lola: temporal operators are not allowed in state predicates\n");
-        fprintf(stderr, "      not allowed for task STATEPREDICATE\n");
-        exit(3);
+        abort(3, "temporal operators are not allowed in state predicates - not allowed for task STATEPREDICATE");
     }
     cout << "\n Formula with\n" << F -> card << " subformula.\n";
     F -> parent = NULL;

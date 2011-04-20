@@ -25,6 +25,7 @@
 #include <cstdlib>
 #include <string>
 #include "dimensions.H"
+#include "verbose.h"
 
 using std::cout;
 using std::endl;
@@ -365,9 +366,7 @@ void createUserconfigFile(char* suffix) {
     // open file
     FILE* userconfig = fopen(filename.c_str(), "w");
     if (!userconfig) {
-        fprintf(stderr, "lola: cannot write to userconfig offspring file '%s'\n", filename.c_str());
-        fprintf(stderr, "      no output written\n");
-        exit(4);
+        abort(4, "cannot write to userconfig offspring file '%s' - no output written", filename.c_str());
     }
 
     // print header

@@ -26,6 +26,7 @@
 #include "dimensions.H"
 #include "reports.H"
 #include "Globals.h"
+#include "verbose.h"
 
 #ifdef DISTRIBUTE
 #include "distribute.h"
@@ -180,9 +181,7 @@ void print_path(State* s, ostream* pathstream = NULL) {
         if (Globals::pflg) {
             pathstream = new ofstream(Globals::pathfile);
             if (pathstream->fail()) {
-                fprintf(stderr, "lola: cannot open path output file '%s'\n", Globals::pathfile);
-                fprintf(stderr, "      no output written\n");
-                _exit(4);
+                abort(4, "cannot open path output file '%s' - no output written", Globals::pathfile);
             }
         } else {
             pathstream = &cout;
@@ -394,9 +393,7 @@ void print_reg_path(State* s, State* startofrepeatingseq, ostream* pathstream = 
         if (Globals::pflg) {
             pathstream = new ofstream(Globals::pathfile);
             if (pathstream->fail()) {
-                fprintf(stderr, "lola: cannot open path output file '%s'\n", Globals::pathfile);
-                fprintf(stderr, "      no output written\n");
-                _exit(4);
+                abort(4, "cannot open path output file '%s' - no output written", Globals::pathfile);
             }
         } else {
             pathstream = &cout;
@@ -758,9 +755,7 @@ unsigned int depth_first() {
     if (Globals::gmflg) {
         graphstream = new ofstream(Globals::graphfile);
         if (graphstream->fail()) {
-            fprintf(stderr, "lola: cannot open graph output file '%s'\n", Globals::graphfile);
-            fprintf(stderr, "      no output written\n");
-            _exit(4);
+            abort(4, "cannot open graph output file '%s' - no output written", Globals::graphfile);
         }
     }
     if (Globals::GMflg) {
@@ -794,8 +789,7 @@ unsigned int depth_first() {
     F->tempcard = 0;
     F->setstatic();
     if (F->tempcard) {
-        fprintf(stderr, "lola: temporal operators are not allowed in state predicates\n");
-        exit(3);
+        abort(3, "temporal operators are not allowed in state predicates");
     }
     cout << "\n Formula with\n" << F->card << " subformula(s).\n";
     F->parent = NULL;
@@ -1002,7 +996,7 @@ unsigned int depth_first() {
 #ifdef DISTRIBUTE
                     rapport(rapportstring);
 #else
-                    cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
+                    message("st: %d     edg: %d", NrOfStates, Edges);
 #endif
                 }
                 CurrentState->firelist[CurrentState->current]->fire();
@@ -2058,7 +2052,7 @@ unsigned int simple_depth_first() {
             // there is a next state that needs to be explored
             ++Edges;
             if (!(Edges % REPORTFREQUENCY)) {
-                cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
+                message("st: %d     edg: %d", NrOfStates, Edges);
             }
             CurrentState->firelist[CurrentState->current]->fire();
 
@@ -2262,9 +2256,7 @@ unsigned int breadth_first() {
     if (Globals::gmflg) {
         graphstream = new ofstream(Globals::graphfile);
         if (graphstream->fail()) {
-            fprintf(stderr, "lola: cannot open graph output file '%s'\n", Globals::graphfile);
-            fprintf(stderr, "      no output written\n");
-            _exit(4);
+            abort(4, "cannot open graph output file '%s' - no output written", Globals::graphfile);
         }
     }
     if (Globals::GMflg) {
@@ -2385,9 +2377,7 @@ unsigned int breadth_first() {
     F->tempcard = 0;
     F->setstatic();
     if (F->tempcard) {
-        fprintf(stderr, "lola: temporal operators are not allowed in state predicates\n");
-        fprintf(stderr, "      not allowed for task STATEPREDICATE\n");
-        exit(3);
+        abort(3, "temporal operators are not allowed in state predicates - not allowed for task STATEPREDICATE");
     }
     cout << "\n Formula with\n" << F->card << " subformula.\n";
     F->parent = NULL;
@@ -3111,9 +3101,7 @@ int liveproperty() {
     F->tempcard = 0;
     F->setstatic();
     if (F->tempcard) {
-        fprintf(stderr, "lola: temporal operators are not allowed in state predicates\n");
-        fprintf(stderr, "      not allowed for task LIVEPROP\n");
-        exit(3);
+        abort(3, "temporal operators are not allowed in state predicates - not allowed for task LIVEPROP");
     }
     cout << "\n Formula with\n" << F->card << " subformula.\n";
     F->parent = NULL;
@@ -3158,8 +3146,7 @@ int home() {
     depth_first();
     Candidate = TSCCRepresentitives;
     if (!Candidate) {
-        fprintf(stderr, "lola: serious internal error, maybe memory overflow?\n");
-        _exit(2);
+        abort(2, "serious internal error, maybe memory overflow?");
     }
     New = Candidate->next;
     Old = NULL;
@@ -3281,9 +3268,7 @@ unsigned int compute_scc() {
         if (Globals::gmflg) {
             graphstream = new ofstream(Globals::graphfile);
             if (graphstream->fail()) {
-                fprintf(stderr, "lola: cannot open graph output file '%s'\n", Globals::graphfile);
-                fprintf(stderr, "      no output written\n");
-                _exit(4);
+                abort(4, "cannot open graph output file '%s' - no output written", Globals::graphfile);
             }
         }
         if (Globals::GMflg) {

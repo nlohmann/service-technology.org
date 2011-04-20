@@ -23,6 +23,7 @@
 #include "formula.H"
 #include "graph.H"
 #include "unfold.H"
+#include "verbose.h"
 
 formula* F;
 unsigned int formula::card = 0;
@@ -1715,8 +1716,7 @@ int initialize_statepredicate() { // return: value if formula constant
     F -> card = 0;
     F -> setstatic();
     if (F ->  tempcard) {
-        fprintf(stderr, "lola: temporal operators are not allowed in state predicates\n");
-        exit(3);
+        abort(3, "temporal operators are not allowed in state predicates");
     }
     cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
     F -> parent = NULL;

@@ -82,7 +82,7 @@ char* reserve;
 */
 void checkMaximalStates(unsigned int states) {
     if (states >= MAXIMALSTATES) {
-        status("%d processed states, %d MAXIMALSTATES", states, MAXIMALSTATES);
+        status("%d processed states, %d %s", states, MAXIMALSTATES, _cparameter_("MAXIMALSTATES"));
         abort(5, "maximal number of states reached");
     }
 }
@@ -516,7 +516,7 @@ int main(int argc, char** argv) {
             if (Globals::Places[0]->NrSignificant) {
                 Globals::Places[0]->NrSignificant = 1;
             }
-            status("removed %d implicit places (PREDUCTION)", Globals::Places[0]->cnt - Globals::Places[0]->NrSignificant);
+            status("removed %d implicit places (%s)", Globals::Places[0]->cnt - Globals::Places[0]->NrSignificant, _cparameter_("PREDUCTION"));
             message("%d significant places", Globals::Places[0]->NrSignificant);
 #endif
         } catch (overflow) {
@@ -550,7 +550,7 @@ int main(int argc, char** argv) {
             Globals::Places[i] = tmpPlace;
         }
         Globals::Places[0]->NrSignificant = i;
-        status("%d implicit places removed (PREDUCTION)", Globals::Places[0]->cnt - Globals::Places[0]->NrSignificant);
+        status("%d implicit places removed (%s)", Globals::Places[0]->cnt - Globals::Places[0]->NrSignificant, _cparameter_("PREDUCTION"));
         message("%d significant places", Globals::Places[0]->NrSignificant);
 #endif
         for (j = 0; j < Globals::Places[0]->cnt; ++j) {
@@ -609,15 +609,13 @@ int main(int argc, char** argv) {
         if (Globals::nflg) {
             ofstream lownetstream(Globals::lownetfile);
             if (!lownetstream) {
-                fprintf(stderr, "lola: cannot open net output file '%s'\n", Globals::lownetfile);
-                fprintf(stderr, "      no output written\n");
+                abort(4, "cannot open net output file '%s' - no output written", Globals::lownetfile);
             } else {
                 printnettofile(lownetstream);
             }
             ofstream pnmlstream(Globals::pnmlfile);
             if (!pnmlstream) {
-                fprintf(stderr, "lola: cannot open net output file '%s'\n", Globals::pnmlfile);
-                fprintf(stderr, "      no output written\n");
+                abort(4, "cannot open net output file '%s' - no output written", Globals::pnmlfile);
             } else {
                 printpnmltofile(pnmlstream);
             }

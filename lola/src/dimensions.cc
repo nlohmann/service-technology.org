@@ -366,7 +366,7 @@ void createUserconfigFile(char* suffix) {
     // open file
     FILE* userconfig = fopen(filename.c_str(), "w");
     if (!userconfig) {
-        abort(4, "cannot write to userconfig offspring file '%s' - no output written", filename.c_str());
+        abort(4, "cannot write to userconfig offspring file '%s%s' - no output written", _cfilename_(filename), _bold_);
     }
 
     // print header
@@ -534,6 +534,6 @@ void createUserconfigFile(char* suffix) {
     fprintf(userconfig, "#define STATESPACE\n");
 #endif
 
-    fprintf(stderr, "lola: successfully wrote userconfig offspring file '%s'\n", filename.c_str());
+    message("successfully wrote userconfig offspring file '%s'", _cfilename_(filename));
     fclose(userconfig);
 }

@@ -131,7 +131,7 @@ void abort(unsigned short code, const char* format, ...) {
     status("see manual for a documentation of this error");
 
     if (errno != 0) {
-        status("last error message: %s", strerror(errno));
+        status("last error message: %s", _cbad_(strerror(errno)));
     }
 
     exit(code);

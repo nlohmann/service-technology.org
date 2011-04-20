@@ -26,6 +26,7 @@
 #include "stubborn.H"
 #include "check.H"
 #include "Globals.h"
+#include "verbose.h"
 
 #include <fstream>
 #include <iostream>
@@ -85,9 +86,7 @@ void printstate(char const* c, unsigned int* st) {
     if (Globals::sflg) {
         ofstream statestream(Globals::statefile);
         if (!statestream) {
-            fprintf(stderr, "lola: cannot open state output file '%s'\n", Globals::statefile);
-            fprintf(stderr, "      no output written\n");
-            return;
+            abort(4, "cannot open state output file '%s' - no output written", Globals::statefile);
         }
 
         statestream << "STATE";
@@ -460,9 +459,7 @@ int modelcheck() {
     if (Globals::pflg) {
         ofstream pathstream(Globals::pathfile);
         if (!pathstream) {
-            fprintf(stderr, "lola: cannot open path output file '%s'\n", Globals::pathfile);
-            fprintf(stderr, "      no output written\n");
-            Globals::pflg = false;
+            abort(4, "cannot open path output file '%s' - no output written", Globals::pathfile);
         } else {
             print_check_path(initial, F, pathstream);
         }

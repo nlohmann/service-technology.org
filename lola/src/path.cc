@@ -354,9 +354,7 @@ void find_path() {
             if (Globals::pflg) {
                 ofstream pathstream(Globals::pathfile);
                 if (!pathstream) {
-                    fprintf(stderr, "lola: cannot open path output file '%s'\n", Globals::pathfile);
-                    fprintf(stderr, "      no output written\n");
-                    Globals::pflg = false;
+                    abort(4, "cannot open path output file '%s' - no output written", Globals::pathfile);
                 }
                 pathstream << "PATH\n";
             }
@@ -390,9 +388,7 @@ void find_path() {
                 if (Globals::pflg) {
                     ofstream pathstream(Globals::pathfile);
                     if (!pathstream) {
-                        fprintf(stderr, "lola: cannot open path output file '%s'\n", Globals::pathfile);
-                        fprintf(stderr, "      no output written\n");
-                        Globals::pflg = false;
+                        abort(4, "cannot open path output file '%s' - no output written", Globals::pathfile);
                     }
                     pathstream << "PATH\n";
                     for (j = 0; j <= k; j++) {

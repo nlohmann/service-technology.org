@@ -93,8 +93,7 @@ void print_path(State* s) {
     if (pflg) {
         ofstream pathstream(pathfile);
         if (!pathstream) {
-            fprintf(stderr, "lola: cannot open path output file '%s'\n", pathfile);
-            fprintf(stderr, "      no output written\n");
+            abort(4, "cannot open path output file '%s' - no output written", pathfile);
         }
         pathstream << "PATH\n";
         printpath(s, &pathstream);
@@ -405,9 +404,7 @@ unsigned int depth_first() {
     if (gmflg) {
         graphstream = new ofstream(graphfile);
         if (!*graphstream) {
-            fprintf(stderr, "lola: cannot open graph output file '%s'\n", graphfile);
-            fprintf(stderr, "      no output written\n");
-            gmflg = false;
+            abort(4, "cannot open graph output file '%s' - no output written", graphfile);
         }
     }
 #if defined(SYMMETRY) && SYMMINTEGRATION==1

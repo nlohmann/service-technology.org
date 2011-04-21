@@ -366,7 +366,7 @@ void createUserconfigFile(char* suffix) {
     // open file
     FILE* userconfig = fopen(filename.c_str(), "w");
     if (!userconfig) {
-        abort(4, "cannot write to userconfig offspring file '%s%s' - no output written", _cfilename_(filename), _bold_);
+        abort(4, "cannot write to userconfig offspring file '%s%s' - no output written", _cfilename_(filename));
     }
 
     // print header

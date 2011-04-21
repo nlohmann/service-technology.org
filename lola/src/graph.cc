@@ -181,7 +181,7 @@ void print_path(State* s, ostream* pathstream = NULL) {
         if (Globals::pflg) {
             pathstream = new ofstream(Globals::pathfile);
             if (pathstream->fail()) {
-                abort(4, "cannot open path output file '%s' - no output written", Globals::pathfile);
+                abort(4, "cannot open path output file '%s' - no output written", _cfilename_(Globals::pathfile));
             }
         } else {
             pathstream = &cout;
@@ -393,7 +393,7 @@ void print_reg_path(State* s, State* startofrepeatingseq, ostream* pathstream = 
         if (Globals::pflg) {
             pathstream = new ofstream(Globals::pathfile);
             if (pathstream->fail()) {
-                abort(4, "cannot open path output file '%s' - no output written", Globals::pathfile);
+                abort(4, "cannot open path output file '%s' - no output written", _cfilename_(Globals::pathfile));
             }
         } else {
             pathstream = &cout;
@@ -755,7 +755,7 @@ unsigned int depth_first() {
     if (Globals::gmflg) {
         graphstream = new ofstream(Globals::graphfile);
         if (graphstream->fail()) {
-            abort(4, "cannot open graph output file '%s' - no output written", Globals::graphfile);
+            abort(4, "cannot open graph output file '%s' - no output written", _cfilename_(Globals::graphfile));
         }
     }
     if (Globals::GMflg) {
@@ -2422,7 +2422,7 @@ unsigned int breadth_first() {
 #ifdef DISTRIBUTE
                     rapport(rapportstring);
 #else
-                    cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
+		    message("st: %d     edg: %d", NrOfStates, Edges);
 #endif
                 }
                 CurrentState->firelist[CurrentState->current]->fire();
@@ -2857,7 +2857,7 @@ bool mutual_reach() {
             // there is a next state that needs to be explored
             Edges ++;
             if (!(Edges % REPORTFREQUENCY)) {
-                cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
+		message("st: %d     edg: %d", NrOfStates, Edges);
             }
             CurrentState->firelist[CurrentState->current]->fire();
             if ((NewState = SEARCHPROC())) {
@@ -2952,7 +2952,7 @@ bool target_reach() {
             // there is a next state that needs to be explored
             Edges ++;
             if (!(Edges % REPORTFREQUENCY)) {
-                cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
+		message("st: %d     edg: %d", NrOfStates, Edges);
             }
             CurrentState->firelist[CurrentState->current]->fire();
             if ((NewState = SEARCHPROC())) {
@@ -3268,7 +3268,7 @@ unsigned int compute_scc() {
         if (Globals::gmflg) {
             graphstream = new ofstream(Globals::graphfile);
             if (graphstream->fail()) {
-                abort(4, "cannot open graph output file '%s' - no output written", Globals::graphfile);
+                abort(4, "cannot open graph output file '%s' - no output written", _cfilename_(Globals::graphfile));
             }
         }
         if (Globals::GMflg) {
@@ -3302,7 +3302,7 @@ unsigned int compute_scc() {
             // there is a next state that needs to be explored
             ++Edges;
             if (!(Edges % REPORTFREQUENCY)) {
-                cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
+                message("st: %d     edg: %d", NrOfStates, Edges);
             }
             CurrentState->firelist[CurrentState->current]->fire();
             if ((NewState = SEARCHPROC())) {

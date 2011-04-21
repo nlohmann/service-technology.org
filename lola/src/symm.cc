@@ -1102,7 +1102,7 @@ void WriteSymms() {
     if (Globals::yflg) {
         ofstream symmstream(Globals::symmfile);
         if (!symmstream) {
-            abort(4, "cannot open symmetry output file '%s' - no output written", Globals::symmfile);
+            abort(4, "cannot open symmetry output file '%s' - no output written", _cfilename_(Globals::symmfile));
         }
         unsigned int etage, raum, x, y;
         for (etage = 0; etage < CardStore; etage++) {

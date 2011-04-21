@@ -93,7 +93,7 @@ void print_path(State* s) {
     if (pflg) {
         ofstream pathstream(pathfile);
         if (!pathstream) {
-            abort(4, "cannot open path output file '%s' - no output written", pathfile);
+            abort(4, "cannot open path output file '%s' - no output written", _cfilename_(pathfile));
         }
         pathstream << "PATH\n";
         printpath(s, &pathstream);
@@ -404,7 +404,7 @@ unsigned int depth_first() {
     if (gmflg) {
         graphstream = new ofstream(graphfile);
         if (!*graphstream) {
-            abort(4, "cannot open graph output file '%s' - no output written", graphfile);
+            abort(4, "cannot open graph output file '%s' - no output written", _cfilename_(graphfile));
         }
     }
 #if defined(SYMMETRY) && SYMMINTEGRATION==1
@@ -461,7 +461,7 @@ unsigned int depth_first() {
             // there is a next state that needs to be explored
             Edges ++;
             if (!(Edges % REPORTFREQUENCY)) {
-                cerr << "st: " << NrOfStates << "     edg: " << Edges << "\n";
+		message("st: %d     edg: %d", NrOfStates, Edges);
             }
             CurrentState -> firelist[CurrentState -> current] -> fire();
             if (NewState = SEARCHPROC()) {

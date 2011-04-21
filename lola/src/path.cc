@@ -354,7 +354,7 @@ void find_path() {
             if (Globals::pflg) {
                 ofstream pathstream(Globals::pathfile);
                 if (!pathstream) {
-                    abort(4, "cannot open path output file '%s' - no output written", Globals::pathfile);
+                    abort(4, "cannot open path output file '%s' - no output written", _cfilename_(Globals::pathfile));
                 }
                 pathstream << "PATH\n";
             }
@@ -368,7 +368,8 @@ void find_path() {
             Transition* t;
 
             if (!((NrOfStates) % REPORTFREQUENCY)) {
-                cerr << "Depth " << NrOfStates << "\n";
+		message("Depth %d", NrOfStates);
+                //cerr << "Depth " << NrOfStates << "\n";
             }
             if (!(t =
 #ifdef STUBBORN
@@ -388,7 +389,7 @@ void find_path() {
                 if (Globals::pflg) {
                     ofstream pathstream(Globals::pathfile);
                     if (!pathstream) {
-                        abort(4, "cannot open path output file '%s' - no output written", Globals::pathfile);
+                        abort(4, "cannot open path output file '%s' - no output written", _cfilename_(Globals::pathfile));
                     }
                     pathstream << "PATH\n";
                     for (j = 0; j <= k; j++) {

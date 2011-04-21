@@ -170,7 +170,7 @@ int sweep() {
     if (gmflg) {
         graphstream = new ofstream(graphfile);
         if (!graphstream) {
-            abort(4, "cannot open graph output file '%s' - no output written", graphfile);
+            abort(4, "cannot open graph output file '%s' - no output written", _cfilename_(graphfile));
         }
     }
 

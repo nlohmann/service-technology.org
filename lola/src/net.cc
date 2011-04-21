@@ -609,13 +609,13 @@ int main(int argc, char** argv) {
         if (Globals::nflg) {
             ofstream lownetstream(Globals::lownetfile);
             if (!lownetstream) {
-                abort(4, "cannot open net output file '%s' - no output written", Globals::lownetfile);
+                abort(4, "cannot open net output file '%s' - no output written", _cfilename_(Globals::lownetfile));
             } else {
                 printnettofile(lownetstream);
             }
             ofstream pnmlstream(Globals::pnmlfile);
             if (!pnmlstream) {
-                abort(4, "cannot open net output file '%s' - no output written", Globals::pnmlfile);
+                abort(4, "cannot open net output file '%s' - no output written", _cfilename_(Globals::pnmlfile));
             } else {
                 printpnmltofile(pnmlstream);
             }

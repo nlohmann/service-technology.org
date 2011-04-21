@@ -873,7 +873,7 @@ void searchEF(State* s, unarytemporalformula* f) {
             if (NewState = binSearch()) {
                 Edges ++;
                 if (!(Edges % REPORTFREQUENCY)) {
-                    cout << "st: " << NrStates << "     edg: " << Edges << "\n";
+		    message("st: %d     edg: %d", NrStates, Edges);
                 }
                 if (NewState -> known[f->index]) {
                     if (NewState -> value[f->index]) {
@@ -944,7 +944,7 @@ void searchEF(State* s, unarytemporalformula* f) {
 
                 Edges ++;
                 if (!(Edges % REPORTFREQUENCY)) {
-                    cout << "st: " << NrStates << "     edg: " << Edges << "\n";
+		    message("st: %d     edg: %d", NrStates, Edges);
                 }
                 NewState -> checkcurrent[f->tempindex] = 0;
                 NewState -> checkparent[f->tempindex] = CurrentState;
@@ -1075,7 +1075,7 @@ void searchAX(State* s, unarytemporalformula* f) {
         }
         Edges ++;
         if (!(Edges % REPORTFREQUENCY)) {
-            cout << "st: " << NrStates << "     edg: " << Edges << "\n";
+	    message("st: %d     edg: %d", NrStates, Edges);
         }
         check(NewState, f->element);
         if (!(NewState->value[f->element->index])) {
@@ -1131,7 +1131,7 @@ void searchEX(State* s, unarytemporalformula* f) {
         }
         Edges ++;
         if (!(Edges % REPORTFREQUENCY)) {
-            cout << "st: " << NrStates << "     edg: " << Edges << "\n";
+            message("st: %d     edg: %d", NrStates, Edges);
         }
         check(NewState, f->element);
         if (NewState->value[f->element->index]) {
@@ -1185,7 +1185,7 @@ void searchAG(State* s, unarytemporalformula* f) {
             if (NewState = binSearch()) {
                 Edges ++;
                 if (!(Edges % REPORTFREQUENCY)) {
-                    cout << "st: " << NrStates << "     edg: " << Edges << "\n";
+                    message("st: %d     edg: %d", NrStates, Edges);
                 }
                 if (NewState -> known[f->index]) {
                     if (!(NewState -> value[f->index])) {
@@ -1254,7 +1254,7 @@ void searchAG(State* s, unarytemporalformula* f) {
 #endif
                 Edges ++;
                 if (!(Edges % REPORTFREQUENCY)) {
-                    cout << "st: " << NrStates << "     edg: " << Edges << "\n";
+                    message("st: %d     edg: %d", NrStates, Edges);
                 }
                 NewState -> checkcurrent[f->tempindex] = 0;
                 NewState -> checkparent[f->tempindex] = CurrentState;
@@ -1386,9 +1386,9 @@ void searchEU(State* s, untilformula* f) {
             CurrentState -> checkfirelist[f->tempindex][CurrentState ->
                                                         checkcurrent[f->tempindex]] -> fire();
             Edges ++;
-            if (!(Edges % REPORTFREQUENCY))
-                cout << "st: " << NrStates << "    edg: " << Edges
-                     << "\n";
+            if (!(Edges % REPORTFREQUENCY)) {
+                message("st: %d     edg: %d", NrStates, Edges);
+	    }
             if (NewState = binSearch()) {
                 // state exists
                 if (NewState -> known[f->index]) {
@@ -1690,9 +1690,9 @@ void futuresearchAU(State* s, untilformula* f) {
                 CurrentState -> checkfirelist[f->tempindex][CurrentState ->
                                                             checkcurrent[f->tempindex]] -> fire();
                 Edges ++;
-                if (!(Edges % REPORTFREQUENCY))
-                    cout << "st: " << NrStates << "    edg: " << Edges
-                         << "\n";
+                if (!(Edges % REPORTFREQUENCY)) {
+                    message("st: %d     edg: %d", NrStates, Edges);
+		}
                 if (NewState = binSearch()) {
                     // state exists
                     if (NewState -> known[f->index]) {
@@ -2062,9 +2062,9 @@ void searchAU(State* s, untilformula* f) {
             CurrentState -> checkfirelist[f->tempindex][CurrentState ->
                                                         checkcurrent[f->tempindex]] -> fire();
             Edges ++;
-            if (!(Edges % REPORTFREQUENCY))
-                cout << "st: " << NrStates << "    edg: " << Edges
-                     << "\n";
+            if (!(Edges % REPORTFREQUENCY)) {
+                message("st: %d     edg: %d", NrStates, Edges);
+	    }
             if (NewState = binSearch()) {
                 // state exists
                 if (NewState -> known[f->index]) {
@@ -2234,9 +2234,9 @@ void searchAF(State* s, unarytemporalformula* f) {
             CurrentState -> checkfirelist[f->tempindex][CurrentState ->
                                                         checkcurrent[f->tempindex]] -> fire();
             Edges ++;
-            if (!(Edges % REPORTFREQUENCY))
-                cout << "st: " << NrStates << "    edg: " << Edges
-                     << "\n";
+            if (!(Edges % REPORTFREQUENCY)) {
+                message("st: %d     edg: %d", NrStates, Edges);
+	    }
             if (NewState = binSearch()) {
                 if (NewState -> known[f->index]) {
                     // state exists, value known
@@ -2390,9 +2390,9 @@ void searchEG(State* s, unarytemporalformula* f) {
             CurrentState -> checkfirelist[f->tempindex][CurrentState ->
                                                         checkcurrent[f->tempindex]] -> fire();
             Edges ++;
-            if (!(Edges % REPORTFREQUENCY))
-                cout << "st: " << NrStates << "    edg: " << Edges
-                     << "\n";
+            if (!(Edges % REPORTFREQUENCY)) {
+                message("st: %d     edg: %d", NrStates, Edges);
+	    }
             if (NewState = binSearch()) {
                 // state exists
                 if (NewState -> known[f->index]) {
@@ -2553,9 +2553,9 @@ void futuresearchAF(State* s, unarytemporalformula* f) {
                 CurrentState -> checkfirelist[f->tempindex][CurrentState ->
                                                             checkcurrent[f->tempindex]] -> fire();
                 Edges ++;
-                if (!(Edges % REPORTFREQUENCY))
-                    cout << "st: " << NrStates << "    edg: " << Edges
-                         << "\n";
+                if (!(Edges % REPORTFREQUENCY)) {
+                    message("st: %d     edg: %d", NrStates, Edges);
+		}
                 if (NewState = binSearch()) {
                     // state exists
                     if (NewState -> known[f->index]) {
@@ -2731,9 +2731,9 @@ void futuresearchEG(State* s, unarytemporalformula* f) {
                 CurrentState -> checkfirelist[f->tempindex][CurrentState ->
                                                             checkcurrent[f->tempindex]] -> fire();
                 Edges ++;
-                if (!(Edges % REPORTFREQUENCY))
-                    cout << "st: " << NrStates << "    edg: " << Edges
-                         << "\n";
+                if (!(Edges % REPORTFREQUENCY)) {
+                    message("st: %d     edg: %d", NrStates, Edges);
+		}
                 if (NewState = binSearch()) {
                     // state exists
                     if (NewState -> known[f->index]) {

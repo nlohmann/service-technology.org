@@ -7,7 +7,7 @@ void printstate(const char*, unsigned int*);
 graphreport_yes::graphreport_yes(char* name) {
     graphstream = new std::ofstream(name);
     if (graphstream->fail()) {
-        abort(4, "cannot open graph output file '%s' - no output written", name);
+        abort(4, "cannot open graph output file '%s' - no output written", _cfilename_(name));
     }
 }
 

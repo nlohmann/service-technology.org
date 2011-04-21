@@ -262,7 +262,7 @@ void find_path() {
     unsigned int OriginalNrEnabled;
     Reserve = new Transition * [Globals::Transitions[0]->cnt];
     if (!F) {
-        abort(4, "specify predicate in analysis task file - mandatory for task FINDPATH");
+        abort(4, "specify predicate in analysis task file - mandatory for task %s", _cparameter_("FINDPATH"));
     }
     F = F -> reduce(& res);
     if (res == 0) {
@@ -275,7 +275,7 @@ void find_path() {
     F -> tempcard = 0;
     F -> setstatic();
     if (F -> tempcard > 0) {
-        abort(3, "do not use temporal operators in this mode - not allowed for task FINDPATH");
+        abort(3, "do not use temporal operators in this mode - not allowed for task %s", _cparameter_("FINDPATH"));
     }
     cout << "\nFormula with\n" << F -> card << " subformulas.\n";
     attempt = 0;

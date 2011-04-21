@@ -239,7 +239,7 @@ int sweep() {
 #ifdef STATEPREDICATE
     int res;
     if (!F) {
-        abort(4, "specify predicate in analysis task file - mandatory for task STATEPREDICATE");
+        abort(4, "specify predicate in analysis task file - mandatory for task %s", _cparameter_("STATEPREDICATE"));
     }
     F = F -> reduce(&res);
     if (res < 2) {
@@ -249,7 +249,7 @@ int sweep() {
     F -> tempcard = 0;
     F -> setstatic();
     if (F ->  tempcard) {
-        abort(3, "temporal operators are not allowed in state predicates - not allowed for task STATEPREDICATE");
+        abort(3, "temporal operators are not allowed in state predicates - not allowed for task %s", _cparameter_("STATEPREDICATE"));
     }
     cout << "\n Formula with\n" << F -> card << " subformula.\n";
     F -> parent = NULL;

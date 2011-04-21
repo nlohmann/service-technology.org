@@ -416,7 +416,7 @@ unsigned int depth_first() {
 #ifdef WITHFORMULA
     int res;
     if (!F) {
-        abort(4, "specify predicate in analysis task file");
+        abort(4, "specify predicate in analysis task file (%s)", _cparameter_("WITHFORMULA"));
     }
     F = F -> reduce(&res);
     if (res < 2) {
@@ -426,7 +426,7 @@ unsigned int depth_first() {
     F -> tempcard = 0;
     F -> setstatic();
     if (F ->  tempcard) {
-        abort(3, "temporal operators are not allowed in state predicates");
+        abort(3, "temporal operators are not allowed in state predicates (%s)", _cparameter_("WITHFORMULA"));
     }
     cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
     F -> parent = NULL;

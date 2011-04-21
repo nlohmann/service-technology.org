@@ -83,7 +83,7 @@ char* reserve;
 void checkMaximalStates(unsigned int states) {
     if (states >= MAXIMALSTATES) {
         status("%d processed states, %d %s", states, MAXIMALSTATES, _cparameter_("MAXIMALSTATES"));
-        abort(5, "maximal number of states reached");
+        abort(5, "maximal number of states reached (%s)", _cparameter_("MAXIMALSTATES"));
     }
 }
 #endif
@@ -145,7 +145,7 @@ void processCommandLine(int argc, char** argv) {
     // process --offspring option
     if (args_info.offspring_given) {
         if (!strcmp(args_info.offspring_arg, "")) {
-            abort(4, "option '--offspring' must not have an empty argument");
+            abort(4, "option '%s' must not have an empty argument", _cparameter_("--offspring"));
         }
         createUserconfigFile(args_info.offspring_arg);
         exit(EXIT_SUCCESS);
@@ -399,7 +399,7 @@ int main(int argc, char** argv) {
 #endif
 #endif
         } catch (overflow) {
-            abort(2, "hash table too large");
+            abort(2, "hash table too large (see parameter %s)", _cparameter_("HASHSIZE"));
         }
         for (i = 0; i < HASHSIZE; i++) {
 #ifdef BITHASH
@@ -520,7 +520,7 @@ int main(int argc, char** argv) {
             message("%d significant places", Globals::Places[0]->NrSignificant);
 #endif
         } catch (overflow) {
-            abort(2, "not enough space to store generating set for symmetries - try again without use of symmetries");
+            abort(2, "not enough space to store generating set for symmetries - try again without use of %d", _cparameter("SYMMETRY"));
         }
 #else
 #ifdef PREDUCTION
@@ -721,7 +721,7 @@ void removeisolated() {
             ++i;
         }
     }
-    status("%d isolated places removed", isolatedPlacesRemoved);
+    status("%d isolated places removed (%s)", isolatedPlacesRemoved, _cparameter_("STATESPACE"));
 #endif
     for (unsigned int i = 0; i < Globals::Transitions[0]->cnt; ++i) {
         Globals::Transitions[i]->nr = i;

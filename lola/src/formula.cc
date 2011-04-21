@@ -1716,7 +1716,7 @@ int initialize_statepredicate() { // return: value if formula constant
     F -> card = 0;
     F -> setstatic();
     if (F ->  tempcard) {
-        abort(3, "temporal operators are not allowed in state predicates");
+        abort(3, "temporal operators are not allowed in state predicates (%s)", _cparameter_("WITHFORMULA"));
     }
     cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
     F -> parent = NULL;

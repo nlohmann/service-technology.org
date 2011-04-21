@@ -789,7 +789,7 @@ unsigned int depth_first() {
     F->tempcard = 0;
     F->setstatic();
     if (F->tempcard) {
-        abort(3, "temporal operators are not allowed in state predicates");
+        abort(3, "temporal operators are not allowed in state predicates (%s)", _cparameter_("WITHFORMULA"));
     }
     cout << "\n Formula with\n" << F->card << " subformula(s).\n";
     F->parent = NULL;
@@ -2256,7 +2256,7 @@ unsigned int breadth_first() {
     if (Globals::gmflg) {
         graphstream = new ofstream(Globals::graphfile);
         if (graphstream->fail()) {
-            abort(4, "cannot open graph output file '%s' - no output written", Globals::graphfile);
+            abort(4, "cannot open graph output file '%s' - no output written", _cfilename_(Globals::graphfile));
         }
     }
     if (Globals::GMflg) {
@@ -2377,7 +2377,7 @@ unsigned int breadth_first() {
     F->tempcard = 0;
     F->setstatic();
     if (F->tempcard) {
-        abort(3, "temporal operators are not allowed in state predicates - not allowed for task STATEPREDICATE");
+        abort(3, "temporal operators are not allowed in state predicates - not allowed for task %s", _cparameter_("STATEPREDICATE"));
     }
     cout << "\n Formula with\n" << F->card << " subformula.\n";
     F->parent = NULL;
@@ -3101,7 +3101,7 @@ int liveproperty() {
     F->tempcard = 0;
     F->setstatic();
     if (F->tempcard) {
-        abort(3, "temporal operators are not allowed in state predicates - not allowed for task LIVEPROP");
+        abort(3, "temporal operators are not allowed in state predicates - not allowed for task %s", _cparameter_("LIVEPROB"));
     }
     cout << "\n Formula with\n" << F->card << " subformula.\n";
     F->parent = NULL;

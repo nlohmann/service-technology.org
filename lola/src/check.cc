@@ -86,7 +86,7 @@ void printstate(char const* c, unsigned int* st) {
     if (Globals::sflg) {
         ofstream statestream(Globals::statefile);
         if (!statestream) {
-            abort(4, "cannot open state output file '%s' - no output written", Globals::statefile);
+            abort(4, "cannot open state output file '%s' - no output written", _cfilename_(Globals::statefile));
         }
 
         statestream << "STATE";
@@ -459,7 +459,7 @@ int modelcheck() {
     if (Globals::pflg) {
         ofstream pathstream(Globals::pathfile);
         if (!pathstream) {
-            abort(4, "cannot open path output file '%s' - no output written", Globals::pathfile);
+            abort(4, "cannot open path output file '%s' - no output written", _cfilename_(Globals::pathfile));
         } else {
             print_check_path(initial, F, pathstream);
         }

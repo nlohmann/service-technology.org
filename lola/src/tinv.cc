@@ -20,11 +20,13 @@
 
 
 #include "tinv.H"
+#include "Globals.h"
 #ifdef DISTRIBUTE
 #include "distribute.h"
 #endif
 
 using std::cout;
+using std::endl;
 
 #if defined(PREDUCTION) || defined(CYCLE) || defined(STRUCT) || defined(SWEEP)
 unsigned int NrOfEquations;
@@ -390,9 +392,9 @@ void progress_measure() {
     long int g;
 
     esystem = new equation * [ Globals::Places[0]->cnt + Globals::Transitions[0]->cnt]; // entry = list of all equations where p is smallest summand != 0
-    reference = new equation * [Transitions[0]->cnt]; // entry = the equation belonging to t
-    value = new long int [Transitions[0]->cnt];
-    denominator = new long int [Transitions[0]->cnt];
+    reference = new equation * [Globals::Transitions[0]->cnt]; // entry = the equation belonging to t
+    value = new long int [Globals::Transitions[0]->cnt];
+    denominator = new long int [Globals::Transitions[0]->cnt];
     NrOfEquations = 0;
 
     // load equations into esystem

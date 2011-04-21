@@ -19,6 +19,7 @@
 \*****************************************************************************/
 
 
+#include "Globals.h"
 #include "graph.H"
 #include "net.H"
 #include "stubborn.H"
@@ -48,6 +49,12 @@ long int ProgressValueHigh, ProgressValueLow;   // the actual current progress v
 int CurrentSection;       // {0, progress span, 2* progress span}  ; index for processing part of current sweep
 
 long int NrSame, NrPersistent, PeakMemUse, CurrentMemUse, TransitionsFired, NrSweeps;
+
+
+inline void report_sweep_statistics() {
+    message("%d sweeps, %d transitions fired, peak %d States, %d States persistent.",
+        NrSweeps, TransitionsFired, PeakMemUse, NrPersistent);
+}
 
 
 void print_sweep(char* text) {
@@ -163,29 +170,29 @@ int sweep() {
     BucketSize = new int [3 * ProgressSpan + 12] ;
 
     // init stuff for checking properties and outputting
-    for (j = 0; j < Transitions[0]->cnt; j++) {
-        Transitions[j]->check_enabled();
+    for (j = 0; j < Globals::Transitions[0]->cnt; j++) {
+        Globals::Transitions[j]->check_enabled();
     }
     ofstream* graphstream;
-    if (gmflg) {
-        graphstream = new ofstream(graphfile);
+    if (Globals::gmflg) {
+        graphstream = new ofstream(Globals::graphfile);
         if (!graphstream) {
-            abort(4, "cannot open graph output file '%s' - no output written", _cfilename_(graphfile));
+            abort(4, "cannot open graph output file '%s' - no output written", _cfilename_(Globals::graphfile));
         }
     }
 
 
     int jj;
-    if (gmflg) {
+    if (Globals::gmflg) {
         (*graphstream) << "STATE x" << "; PROGRESS 0";
         j = 0;
-        if (graphformat == 'm') {
-            for (jj = 0; jj < Places[0]->cnt; jj++) {
-                if (CurrentMarking[jj]) {
-                    if (CurrentMarking[jj] == VERYLARGE) {
-                        (*graphstream) << (j++ ? ",\n" : "\n") << Places[jj]->name << " : " << "oo" ;
+        if (Globals::graphformat == 'm') {
+            for (jj = 0; jj < Globals::Places[0]->cnt; jj++) {
+                if (Globals::CurrentMarking[jj]) {
+                    if (Globals::CurrentMarking[jj] == VERYLARGE) {
+                        (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[jj]->name << " : " << "oo" ;
                     } else {
-                        (*graphstream) << (j++ ? ",\n" : "\n") << Places[jj]->name << " : " << CurrentMarking[jj];
+                        (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[jj]->name << " : " << Globals::CurrentMarking[jj];
                     }
                 }
             }
@@ -193,16 +200,16 @@ int sweep() {
         }
         (*graphstream) << "\n\n";
     }
-    if (GMflg) {
+    if (Globals::GMflg) {
         cout << "STATE x" << "; PROGRESS 0";
         j = 0;
-        if (graphformat == 'm') {
-            for (jj = 0; jj < Places[0]->cnt; jj++) {
-                if (CurrentMarking[jj]) {
-                    if (CurrentMarking[jj] == VERYLARGE) {
-                        cout << (j++ ? ",\n" : "\n") << Places[jj]->name << " : " << "oo" ;
+        if (Globals::graphformat == 'm') {
+            for (jj = 0; jj < Globals::Places[0]->cnt; jj++) {
+                if (Globals::CurrentMarking[jj]) {
+                    if (Globals::CurrentMarking[jj] == VERYLARGE) {
+                        cout << (j++ ? ",\n" : "\n") << Globals::Places[jj]->name << " : " << "oo" ;
                     } else {
-                        cout << (j++ ? ",\n" : "\n") << Places[jj]->name << " : " << CurrentMarking[jj];
+                        cout << (j++ ? ",\n" : "\n") << Globals::Places[jj]->name << " : " << Globals::CurrentMarking[jj];
                     }
                 }
             }
@@ -213,27 +220,19 @@ int sweep() {
 #ifdef DEADTRANSITION
     if (CheckTransition -> enabled) {
         cout << "\ntransition " << CheckTransition -> name << " is not dead!\n";
-        printstate("", CurrentMarking);
+        printstate("", Globals::CurrentMarking);
         // statistics
-        cerr << NrSweeps << "sweeps, "
-             << TransitionsFired << " transitions fired, "
-             << "peak " << PeakMemUse << " States, "
-             << NrPersistent << " States persistent."
-             << endl;
+        report_sweep_statistics();
         return 1;
     }
 #endif
 #ifdef DEADLOCK
-    if (Transitions[0]->NrEnabled == 0) {
+    if (Globals::Transitions[0]->NrEnabled == 0) {
         // early abortion
         cout << "\ndead state found!\n";
-        printstate("", CurrentMarking);
+        printstate("", Globals::CurrentMarking);
         // statistics
-        cerr << NrSweeps << "sweeps, "
-             << TransitionsFired << " transitions fired, "
-             << "peak " << PeakMemUse << " States, "
-             << NrPersistent << " States persistent."
-             << endl;
+        report_sweep_statistics();
         return 1;
     }
 #endif
@@ -256,34 +255,26 @@ int sweep() {
     F -> parent = NULL;
     if (F -> initatomic()) {
         cout << "\nstate found!\n";
-        printstate("", CurrentMarking);
+        printstate("", Globals::CurrentMarking);
         // statistics
-        cerr << NrSweeps << "sweeps, "
-             << TransitionsFired << " transitions fired, "
-             << "peak " << PeakMemUse << " States, "
-             << NrPersistent << " States persistent."
-             << endl;
+        report_sweep_statistics();
         return 1;
     }
 #endif
 
 #ifdef REACHABILITY
-    for (jj = 0; jj < Places[0]->cnt; jj++) {
-        if (CurrentMarking[jj] != Places[jj]->target_marking) {
+    for (jj = 0; jj < Globals::Places[0]->cnt; jj++) {
+        if (Globals::CurrentMarking[jj] != Globals::Places[jj]->target_marking) {
             break;
         }
     }
-    if (jj >= Places[0]->cnt) { // target_marking found!
+    if (jj >= Globals::Places[0]->cnt) { // target_marking found!
         // early abortion
         cout << "\nstate found!\n";
-        printstate("", CurrentMarking);
+        printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
         // statistics
-        cerr << NrSweeps << "sweeps, "
-             << TransitionsFired << " transitions fired, "
-             << "peak " << PeakMemUse << " States, "
-             << NrPersistent << " States persistent."
-             << endl;
+        report_sweep_statistics();
         return 1;
     }
 #endif
@@ -325,11 +316,11 @@ int sweep() {
             // unused: unsigned int k;
             unsigned  char* v;
             // unused: bool spl;
-            p = Places[0] -> cnt - 1;
+            p = Globals::Places[0] -> cnt - 1;
             v = CurrentSweep[CurrentSection * ProgressSpan + ProgressValueLow]->vector;
-            t = BitVectorSize / 8;
-            s = BitVectorSize % 8;
-            pb = Places[p] -> nrbits;
+            t = Globals::BitVectorSize / 8;
+            s = Globals::BitVectorSize % 8;
+            pb = Globals::Places[p] -> nrbits;
             byte = v[t] >> (8 - s);
             pm = 0;
 
@@ -340,7 +331,7 @@ int sweep() {
                     // place has more bits left than remaining in current byte
                     if (s) {
                         // at least, there _are_ bits left in current byte
-                        pm += byte << (Places[p]->nrbits - pb);
+                        pm += byte << (Globals::Places[p]->nrbits - pb);
                         pb -= s;
                         s = 0;
                     } else {
@@ -352,7 +343,7 @@ int sweep() {
                     }
                 } else {
                     // all bits left for this place are in current byte
-                    pm += (byte % (1 << pb)) << (Places[p]->nrbits - pb);
+                    pm += (byte % (1 << pb)) << (Globals::Places[p]->nrbits - pb);
                     byte = byte >> pb;
                     s -= pb;
                     MARKINGVECTOR[p] = pm;
@@ -360,7 +351,7 @@ int sweep() {
                         break;
                     }
                     p--;
-                    pb = Places[p]->nrbits;
+                    pb = Globals::Places[p]->nrbits;
                     pm = 0;
                 }
             }
@@ -399,8 +390,8 @@ int sweep() {
             //print_sweep("After Removal");
             // process
             //   init transitions
-            for (jj = 0; jj < Transitions[0]->cnt; jj++) {
-                Transitions[jj] -> check_enabled();
+            for (jj = 0; jj < Globals::Transitions[0]->cnt; jj++) {
+                Globals::Transitions[jj] -> check_enabled();
             }
             //   compute successors
             Transition** fl = FIRELIST();
@@ -419,7 +410,7 @@ int sweep() {
                          << endl;
 		    */
 		    //additional space and commata between pers. and prog.val added...
-		    message("Sw #  %d, %d fired, curr. %d st, peak %d st, %d pers., prog.val %d", NrSweeps, TransitionsFired, CurrentMemUse, PeakMemUse, NrPersistent, ProgressValueHigh* ProgressSpan + ProgressValueLow);
+		    message("Sw #%2d, %7d fired, curr. %6d st, peak %6d st, %6d pers., prog.val %3d", NrSweeps, TransitionsFired, CurrentMemUse, PeakMemUse, NrPersistent, ProgressValueHigh* ProgressSpan + ProgressValueLow);
                 }
                 fl[currentfired] -> fire();
 #ifdef STATEPREDICATE
@@ -453,16 +444,16 @@ int sweep() {
                 }
 
                 // output and check property
-                if (gmflg) {
+                if (Globals::gmflg) {
                     (*graphstream) << "STATE x BY " << fl[currentfired]->name << "; PROGRESS " << ProgressValueHigh* ProgressSpan + ProgressValueLow;
                     j = 0;
-                    if (graphformat == 'm') {
-                        for (jj = 0; jj < Places[0]->cnt; jj++) {
-                            if (CurrentMarking[jj]) {
-                                if (CurrentMarking[jj] == VERYLARGE) {
-                                    (*graphstream) << (j++ ? ",\n" : "\n") << Places[jj]->name << " : " << "oo" ;
+                    if (Globals::graphformat == 'm') {
+                        for (jj = 0; jj < Globals::Places[0]->cnt; jj++) {
+                            if (Globals::CurrentMarking[jj]) {
+                                if (Globals::CurrentMarking[jj] == VERYLARGE) {
+                                    (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[jj]->name << " : " << "oo" ;
                                 } else {
-                                    (*graphstream) << (j++ ? ",\n" : "\n") << Places[jj]->name << " : " << CurrentMarking[jj] ;
+                                    (*graphstream) << (j++ ? ",\n" : "\n") << Globals::Places[jj]->name << " : " << Globals::CurrentMarking[jj] ;
                                 }
                             }
                         }
@@ -470,16 +461,16 @@ int sweep() {
                     }
                     (*graphstream) << "\n\n";
                 }
-                if (GMflg) {
+                if (Globals::GMflg) {
                     cout << "STATE x BY " << fl[currentfired]->name << "; PROGRESS " << ProgressValueHigh* ProgressSpan + ProgressValueLow;
                     j = 0;
-                    if (graphformat == 'm') {
-                        for (jj = 0; jj < Places[0]->cnt; jj++) {
-                            if (CurrentMarking[jj]) {
-                                if (CurrentMarking[jj] == VERYLARGE) {
-                                    cout << (j++ ? ",\n" : "\n") << Places[jj]->name << " : " << "oo" ;
+                    if (Globals::graphformat == 'm') {
+                        for (jj = 0; jj < Globals::Places[0]->cnt; jj++) {
+                            if (Globals::CurrentMarking[jj]) {
+                                if (Globals::CurrentMarking[jj] == VERYLARGE) {
+                                    cout << (j++ ? ",\n" : "\n") << Globals::Places[jj]->name << " : " << "oo" ;
                                 } else {
-                                    cout << (j++ ? ",\n" : "\n") << Places[jj]->name << " : " << CurrentMarking[jj] ;
+                                    cout << (j++ ? ",\n" : "\n") << Globals::Places[jj]->name << " : " << Globals::CurrentMarking[jj] ;
                                 }
                             }
                         }
@@ -491,27 +482,19 @@ int sweep() {
                 if (CheckTransition -> enabled) {
                     // early abortion
                     cout << "\ntransition " << CheckTransition -> name << " is not dead!\n";
-                    printstate("", CurrentMarking);
+                    printstate("", Globals::CurrentMarking);
                     // statistics
-                    cerr << NrSweeps << "sweeps, "
-                         << TransitionsFired << " transitions fired, "
-                         << "peak " << PeakMemUse << " States, "
-                         << NrPersistent << " States persistent."
-                         << endl;
+                    report_sweep_statistics();
                     return 1;
                 }
 #endif
 #ifdef DEADLOCK
-                if (!(Transitions[0]-> StartOfEnabledList)) {
+                if (!(Globals::Transitions[0]-> StartOfEnabledList)) {
                     // early abortion
                     cout << "\ndead state found!\n";
-                    printstate("", CurrentMarking);
+                    printstate("", Globals::CurrentMarking);
                     // statistics
-                    cerr << NrSweeps << "sweeps, "
-                         << TransitionsFired << " transitions fired, "
-                         << "peak " << PeakMemUse << " States, "
-                         << NrPersistent << " States persistent."
-                         << endl;
+                    report_sweep_statistics();
                     return 1;
                 }
 #endif
@@ -520,32 +503,24 @@ int sweep() {
                 if (F->value) {
                     // early abortion
                     cout << "\nstate found!\n";
-                    printstate("", CurrentMarking);
+                    printstate("", Globals::CurrentMarking);
                     // statistics
-                    cerr << NrSweeps << "sweeps, "
-                         << TransitionsFired << " transitions fired, "
-                         << "peak " << PeakMemUse << " States, "
-                         << NrPersistent << " States persistent."
-                         << endl;
+                    report_sweep_statistics();
                     return 1;
                 }
 #endif
 #ifdef REACHABILITY
-                for (jj = 0; jj < Places[0]->cnt; jj++) {
-                    if (CurrentMarking[jj] != Places[jj]->target_marking) {
+                for (jj = 0; jj < Globals::Places[0]->cnt; jj++) {
+                    if (Globals::CurrentMarking[jj] != Globals::Places[jj]->target_marking) {
                         break;
                     }
                 }
-                if (jj < Places[0]->cnt) { // target_marking found!
+                if (jj < Globals::Places[0]->cnt) { // target_marking found!
                     // early abortion
                     cout << "\nstate found!\n";
-                    printstate("", CurrentMarking);
+                    printstate("", Globals::CurrentMarking);
                     // statistics
-                    cerr << NrSweeps << "sweeps, "
-                         << TransitionsFired << " transitions fired, "
-                         << "peak " << PeakMemUse << " States, "
-                         << NrPersistent << " States persistent."
-                         << endl;
+                    report_sweep_statistics();
                     return 1;
                 }
 #endif
@@ -655,11 +630,7 @@ back:
                 cout << "\ntransition " << CheckTransition -> name << " is dead!\n";
 #endif
                 // statistics
-                cerr << NrSweeps << "sweeps, "
-                     << TransitionsFired << " transitions fired, "
-                     << "peak " << PeakMemUse << " States, "
-                     << NrPersistent << " States persistent."
-                     << endl;
+                report_sweep_statistics();
                 return 0;
             }
             if ((!NrAhead) && pendinglistempty) {
@@ -711,11 +682,7 @@ back:
                     cout << "\ntransition " << CheckTransition -> name << " is dead!\n";
 #endif
                     // statistics
-                    cerr << NrSweeps << "sweeps, "
-                         << TransitionsFired << " transitions fired, "
-                         << "peak " << PeakMemUse << " States, "
-                         << NrPersistent << " States persistent."
-                         << endl;
+                    report_sweep_statistics();
                     return 0;
                 }
                 ProgressValueHigh = currentpending[i] -> value;

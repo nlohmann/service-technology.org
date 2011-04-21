@@ -316,7 +316,7 @@ void find_path() {
 //}
         // init new search attempt
         attempt++;
-        cerr << "Attempt # " << attempt << "\n";
+        message("Attempt #%d", attempt);
         for (x = 0; x < Globals::Places[0]->cnt; x++) {
             Globals::Places[x]->set_marking(Globals::Places[x]->initial_marking);
         }
@@ -369,7 +369,6 @@ void find_path() {
 
             if (!((NrOfStates) % REPORTFREQUENCY)) {
 		message("Depth %d", NrOfStates);
-                //cerr << "Depth " << NrOfStates << "\n";
             }
             if (!(t =
 #ifdef STUBBORN

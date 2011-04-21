@@ -2022,7 +2022,8 @@ unsigned int simple_depth_first() {
 
 #ifndef FULL
     if (CHECK_EARLY_ABORTION) { // this is property dependent
-        cout << "\n" << EARLY_ABORT_MESSAGE << "\n";
+        cout << "\n";
+        cout << _ctool_("lola: ") << _cgood_(EARLY_ABORT_MESSAGE) << "\n";
         if (Globals::resultfile) {
             fprintf(Globals::resultfile, "%s : {\n  result = true;\n  ", RESULT_NAME);
         }
@@ -2166,7 +2167,8 @@ endomegaproc:
                 CurrentState = NewState;
 #ifndef FULL
                 if (CHECK_EARLY_ABORTION) {
-                    cout << "\n" << EARLY_ABORT_MESSAGE << "\n";
+                    cout << "\n";
+                    cout << _ctool_("lola: ") << _cgood_(EARLY_ABORT_MESSAGE) << "\n";
                     if (Globals::resultfile) {
                         fprintf(Globals::resultfile, "%s: {\n  result = true;\n  ", RESULT_NAME);
                     }
@@ -2222,7 +2224,8 @@ endomegaproc:
         fprintf(Globals::resultfile, "\n  );\n};\n");
     }
 #else
-    cout << "\n" << LATE_ABORT_MESSAGE << "\n";
+    cout << "\n";
+    cout << _ctool_("lola: ") << _cbad_(LATE_ABORT_MESSAGE) << "\n";
     if (Globals::resultfile) {
         fprintf(Globals::resultfile, "%s: {\n  result = false;\n};\n", RESULT_NAME);
     }

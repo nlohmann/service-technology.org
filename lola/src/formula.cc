@@ -399,19 +399,16 @@ bool booleanformula::initatomic() {
     }
 }
 
-/// \todo Karsten fragen: Rückgabe?
 bool unarytemporalformula::initatomic() {
     element -> initatomic();
-
-    // Karsten fragen: Rückgabe?
+    return true; // to have a return value
 }
 
 /// \todo Karsten fragen: Rückgabe?
 bool untilformula::initatomic() {
     hold -> initatomic();
     goal -> initatomic();
-
-    // Karsten fragen: Rückgabe?
+    return true; // to have a return value
 }
 
 formula* hlatomicformula::copy() {

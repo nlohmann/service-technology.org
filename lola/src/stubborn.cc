@@ -740,7 +740,7 @@ Transition** tsccstubbornlist() {
     // The TSCC based optimisation is included
 
     // 1. start with enabled transition
-    if (Globals::Transitions[0]->TarjanStack =  Globals::Transitions[0]->StartOfEnabledList) {
+    if ((Globals::Transitions[0]->TarjanStack = Globals::Transitions[0]->StartOfEnabledList)) {
         maxdfs = 0;
         NewStubbStamp();
         Globals::Transitions[0]->TarjanStack -> nextontarjanstack = Globals::Transitions[0]->TarjanStack;
@@ -757,7 +757,7 @@ Transition** tsccstubbornlist() {
         return result;
     }
     while (current) {
-        if (next = current->mustbeincluded[current->mbiindex]) {
+        if ((next = current->mustbeincluded[current->mbiindex])) {
             // Successor exists
             if (next->stamp == StubbStamp) {
                 // already visited

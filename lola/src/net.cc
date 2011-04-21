@@ -458,7 +458,7 @@ int main(int argc, char** argv) {
 
 #ifdef SYMMETRY
         try {
-            status("calculating symmetries");
+            //message("calculating symmetries");
             if (SYMMINTEGRATION == 1 || SYMMINTEGRATION == 3) {
                 ComputeSymmetries();
             } else {
@@ -520,7 +520,7 @@ int main(int argc, char** argv) {
             message("%d significant places", Globals::Places[0]->NrSignificant);
 #endif
         } catch (overflow) {
-            abort(2, "not enough space to store generating set for symmetries - try again without use of %d", _cparameter("SYMMETRY"));
+            abort(2, "not enough space to store generating set for symmetries - try again without use of %d", _cparameter_("SYMMETRY"));
         }
 #else
 #ifdef PREDUCTION

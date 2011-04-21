@@ -791,7 +791,8 @@ unsigned int depth_first() {
     if (F->tempcard) {
         abort(3, "temporal operators are not allowed in state predicates (%s)", _cparameter_("WITHFORMULA"));
     }
-    cout << "\n Formula with\n" << F->card << " subformula(s).\n";
+    //cout << "\n Formula with\n" << F->card << " subformula(s).\n";
+    message("Formula with %d subformula(s) (%s)", F->card, _cparameter_("WITHFORMULA"));
     F->parent = NULL;
 #endif
 #endif
@@ -862,7 +863,8 @@ unsigned int depth_first() {
 #if defined(DEADLOCK) && !defined(DISTRIBUTE)
         if (!(CurrentState->firelist) || !(CurrentState->firelist[0])) {
             // early abortion
-            cout << "\ndead state found!\n";
+            //cout << "\ndead state found!\n";
+	    message(_cgood_("dead state found!"));
 
             if (Globals::resultfile) {
                 fprintf(Globals::resultfile, "deadlock: {\n  result = true;\n  ");
@@ -894,7 +896,8 @@ unsigned int depth_first() {
 #ifndef DISTRIBUTE
         if (Globals::CheckTransition->enabled) {
             // early abortion
-            cout << "\ntransition " << Globals::CheckTransition->name << " is not dead!\n";
+            //cout << "\ntransition " << Globals::CheckTransition->name << " is not dead!\n";
+	    message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
             printstate("", Globals::CurrentMarking);
             print_path(CurrentState);
             printincompletestates(CurrentState, graphstream);
@@ -906,7 +909,8 @@ unsigned int depth_first() {
 #if defined ( STUBBORN ) && defined ( REACHABILITY ) && ! defined(DISTRIBUTE)
         if (!CurrentState->firelist) {
             // early abortion
-            cout << "\nstate found!\n";
+            //cout << "\nstate found!\n";
+	    message(_cgood_("state found!"));
             printstate("", Globals::CurrentMarking);
             print_path(CurrentState);
             printincompletestates(CurrentState, graphstream);
@@ -922,7 +926,8 @@ unsigned int depth_first() {
         }
         if (i >= Globals::Places[0]->cnt) { // target_marking found!
             // early abortion
-            cout << "\nstate found!\n";
+            //cout << "\nstate found!\n";
+	    message(_cgood_("state found!"));
             printstate("", Globals::CurrentMarking);
             print_path(CurrentState);
             printincompletestates(CurrentState, graphstream);
@@ -939,7 +944,8 @@ unsigned int depth_first() {
 
 #ifdef EVENTUALLYPROP
         if (F->initatomic()) {
-            cout << "\neventually phi holds.\n";
+            //cout << "\neventually phi holds.\n";
+	    message("eventually phi holds (%s)", _cparameter_("EVENTUALLYPROP"));
             statistics(NrOfStates, Edges, NonEmptyHash);
         }
 #endif
@@ -951,7 +957,8 @@ unsigned int depth_first() {
 #if defined(LIVEPROP) && ! defined(TWOPHASE)
             largest_sat = 1;
 #else
-            cout << "\nstate found!\n";
+            //cout << "\nstate found!\n";
+	    message(_cgood_("state found!"));
 
             printstate("", Globals::CurrentMarking);
             print_path(CurrentState);
@@ -1011,7 +1018,7 @@ unsigned int depth_first() {
                 // checking the property efficiently.
 #ifdef DEADLOCK
                 if (!Transitions[0]->NrEnabled) {
-                    cout << "heureka" << endl;
+                    cout << "heureka" << endl;	//ToDo?! ;-)
                     heureka(resultfixedR, Globals::CurrentMarking);
                     end_communication();
                     return 1;
@@ -1281,7 +1288,8 @@ endomegaproc:
                         }
 
                         // early abortion
-                        cout << "\nstate found!\n";
+                        //cout << "\nstate found!\n";
+			message(_cgood_("state found!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         printincompletestates(NewState, graphstream);
@@ -1303,7 +1311,8 @@ endomegaproc:
 #ifdef DEADLOCK
                     if (!(NewState->firelist) || !(NewState->firelist[0])) {
                         // early abortion
-                        cout << "\ndead state found!\n";
+                        //cout << "\ndead state found!\n";
+			message(_cgood_("dead state found!"));
                         if (Globals::resultfile) {
                             fprintf(Globals::resultfile, "deadlock: {\n  result = true;\n");
                         }
@@ -1330,8 +1339,8 @@ endomegaproc:
 #ifdef DEADTRANSITION
                     if (Globals::CheckTransition->enabled) {
                         // early abortion
-                        cout << "\ntransition " <<  Globals::CheckTransition->name << " is not dead!\n";
-
+                        //cout << "\ntransition " <<  Globals::CheckTransition->name << " is not dead!\n";
+			message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         printincompletestates(NewState, graphstream);
@@ -1342,7 +1351,8 @@ endomegaproc:
 #if ( defined ( STUBBORN ) && defined ( REACHABILITY ) )
                     if (!NewState->firelist) {
                         // early abortion
-                        cout << "\nstate found!\n";
+                        //cout << "\nstate found!\n";
+			message(_cgood_("state found!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         printincompletestates(NewState, graphstream);
@@ -1359,7 +1369,8 @@ endomegaproc:
                     // target_marking found!
                     if (i >= Globals::Places[0]->cnt) {
                         // early abortion
-                        cout << "\nstate found!\n";
+                        //cout << "\nstate found!\n";
+			message(_cgood_("state found!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         printincompletestates(NewState, graphstream);
@@ -1371,7 +1382,8 @@ endomegaproc:
                     CurrentState = NewState;
 #ifdef BOUNDEDNET
                     if (!isbounded) {
-                        cout << "net is unbounded!\n";
+                        //cout << "net is unbounded!\n";
+			message(_cgood_("net is unbounded!"));
 
                         if (Globals::resultfile) {
                             fprintf(Globals::resultfile, "unbounded: {\n  result = true;\n");
@@ -1398,7 +1410,8 @@ endomegaproc:
 #endif
 #ifdef BOUNDEDPLACE
                     if (!Globals::CheckPlace->bounded) {
-                        cout << "place " << Globals::CheckPlace->name << " is unbounded!\n";
+                        //cout << "place " << Globals::CheckPlace->name << " is unbounded!\n";
+			message("%s %s %s", _cgood_("place"), _cgood_(Globals::CheckPlace->name), _cgood_("is unbounded!"));
                         printstate("", Globals::CurrentMarking);
                         print_reg_path(CurrentState, CurrentState->smaller);
                         cout << "\n";
@@ -1454,13 +1467,16 @@ endomegaproc:
                         oldc = CurrentState->current;
                         if (analyse_fairness(start, 1)) {
 #ifdef EVENTUALLYPROP
-                            cout << "eventually phi does not hold" << endl;
+                            //cout << "eventually phi does not hold" << endl;
+			    message(_cgood_("eventually phi holds"));
 #endif
 #ifdef FAIRPROP
-                            cout << "GF phi does not hold" << endl;
+                            //cout << "GF phi does not hold" << endl;
+			    message(_cgood_("GF phi does not hold"));
 #endif
 #ifdef STABLEPROP
-                            cout << "FG phi does not hold" << endl;
+                            //cout << "FG phi does not hold" << endl;
+			    message(_cgood_("FG phi does not hold"));
 #endif
                             return 1;
                         }
@@ -1684,7 +1700,8 @@ afterdownsearch:
                         // check if tscc reached property
                         if (largest_sat <= CurrentState->dfs) {
                             // tscc did not reach prop->prop not live
-                            cout << "\npredicate not live: not satisfiable beyond reported state\n\n";
+                            //cout << "\npredicate not live: not satisfiable beyond reported state\n\n";
+		            message(_cgood_("predicate not live: not satisfiable beyond reported state"));
                             printstate("", Globals::CurrentMarking);
                             statistics(NrOfStates, Edges, NonEmptyHash);
                             return 1;
@@ -1789,54 +1806,67 @@ afterdownsearch:
 
 #else
 #ifdef BITHASH
-        cout << "\nno conclusive result!\n";
+        //cout << "\nno conclusive result!\n";
+	message(_cbad_("no conclusive result!"));
 #else
 #ifdef REACHABILITY
-        cout << "\nstate is not reachable!\n";
+        //cout << "\nstate is not reachable!\n";
+	message(_cbad_("state is not reachable!"));
 #endif
 #ifdef DEADLOCK
-        cout << "\nnet does not have deadlocks!\n";
+        //cout << "\nnet does not have deadlocks!\n";
+	message(_cbad_("net does not have deadlocks!"));
         if (Globals::resultfile) {
             fprintf(Globals::resultfile, "\n  );\n};\ndeadlock: {\n  result = false;\n};\n");
         }
 #endif
 #if defined(STATEPREDICATE) && ! defined(LIVEPROP)
-        cout << "\n predicate is not satisfiable!\n";
+        //cout << "\n predicate is not satisfiable!\n";
+	message(_cbad_("predicate is not satisfiable!"));
         if (Globals::resultfile) {
             fprintf(Globals::resultfile, "statepredicate: {\n  result = false;\n};\n");
         }
 
 #endif
 #ifdef DEADTRANSITION
-        cout << "\ntransition " << Globals::CheckTransition->name << " is dead!\n";
+        //cout << "\ntransition " << Globals::CheckTransition->name << " is dead!\n";
+	message("%s %s %s", _cbad_("transition"), _cbad_(Globals::CheckTransition->name), _cbad_("is dead!"));
 #endif
 #ifdef BOUNDEDPLACE
-        cout << "\nplace " << Globals::CheckPlace->name << " is bounded!\n";
+        //cout << "\nplace " << Globals::CheckPlace->name << " is bounded!\n";
+	message("%s %s %s", _cbad_("place"), _cbad_(Globals::CheckPlace->name), _cbad_("is bounded!"));
 #endif
 #if defined(LIVEPROP) && ! defined(TWOPHASE)
-        cout << "\npredicate is live!\n";
+        //cout << "\npredicate is live!\n";
+	message(_cbad_("predicate is live!"));
 #endif
 #ifdef BOUNDEDNET
         if (isbounded) {
-            cout << "\nnet is bounded!\n";
+            //cout << "\nnet is bounded!\n";
+	    message(_cbad_("net is bounded!"));
             if (Globals::resultfile) {
                 fprintf(Globals::resultfile, "unbounded: {\n  result = false;\n};\n");
             }
         } else {
             /// can this ever happen here?
+	    /// mmmh, das läßt sich herausfinden...
+	    assert(isbounded == true);
             cout << "\nnet is unbounded!\n";
         }
 #endif
 #endif
 #endif
 #ifdef STABLEPROP
-    cout << "\n FG phi holds" << endl;
+    //cout << "\n FG phi holds" << endl;
+    message(_cbad_("FG phi holds!"));
 #endif
 #ifdef FAIRPROP
-    cout << "\n GF phi holds" << endl;
+    //cout << "\n GF phi holds" << endl;
+    message(_cbad_("GF phi holds!"));
 #endif
 #ifdef EVENTUALLYPROP
-    cout << "\n eventually phi holds\n";
+    //cout << "\n eventually phi holds\n";
+    message(_cbad_("eventually phi holds!"));
 #endif
 #ifdef FULL
     if (Globals::resultfile) {
@@ -2022,8 +2052,9 @@ unsigned int simple_depth_first() {
 
 #ifndef FULL
     if (CHECK_EARLY_ABORTION) { // this is property dependent
-        cout << "\n";
-        cout << _ctool_("lola: ") << _cgood_(EARLY_ABORT_MESSAGE) << "\n";
+        //cout << "\n";
+        //cout << _ctool_("lola: ") << _cgood_(EARLY_ABORT_MESSAGE) << "\n";
+	message(_cgood_(EARLY_ABORT_MESSAGE));
         if (Globals::resultfile) {
             fprintf(Globals::resultfile, "%s : {\n  result = true;\n  ", RESULT_NAME);
         }
@@ -2167,8 +2198,9 @@ endomegaproc:
                 CurrentState = NewState;
 #ifndef FULL
                 if (CHECK_EARLY_ABORTION) {
-                    cout << "\n";
-                    cout << _ctool_("lola: ") << _cgood_(EARLY_ABORT_MESSAGE) << "\n";
+                    //cout << "\n";
+                    //cout << _ctool_("lola: ") << _cgood_(EARLY_ABORT_MESSAGE) << "\n";
+		    message(_cgood_(EARLY_ABORT_MESSAGE));
                     if (Globals::resultfile) {
                         fprintf(Globals::resultfile, "%s: {\n  result = true;\n  ", RESULT_NAME);
                     }
@@ -2217,15 +2249,17 @@ endomegaproc:
     }
 // search finished
 #ifdef BITHASH
-    cout << "\nno conclusive result!\n";
+    //cout << "\nno conclusive result!\n";
+    message(_cbad_("no conclusive result!"));
 #else
 #ifdef FULL
     if (Globals::resultfile) {
         fprintf(Globals::resultfile, "\n  );\n};\n");
     }
 #else
-    cout << "\n";
-    cout << _ctool_("lola: ") << _cbad_(LATE_ABORT_MESSAGE) << "\n";
+    //cout << "\n";
+    //cout << _ctool_("lola: ") << _cbad_(LATE_ABORT_MESSAGE) << "\n";
+    message(_cbad_(LATE_ABORT_MESSAGE));
     if (Globals::resultfile) {
         fprintf(Globals::resultfile, "%s: {\n  result = false;\n};\n", RESULT_NAME);
     }
@@ -2332,10 +2366,12 @@ unsigned int breadth_first() {
     if (!CurrentState->firelist) {
         // early abortion
 #ifdef REACHABILITY
-        cout << "\nstate found!\n";
+        //cout << "\nstate found!\n";
+	message(_cgood_("state found!"));
 #endif
 #ifdef DEADTRANSITION
-        cout << "\ntransition " << Globals::CheckTransition->name << " is not dead!\n";
+        //cout << "\ntransition " << Globals::CheckTransition->name << " is not dead!\n";
+	message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
 #endif
         printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
@@ -2345,7 +2381,8 @@ unsigned int breadth_first() {
 #endif
 #if defined(DEADTRANSITION) && !defined(STUBBORN)
     if (Globals::CheckTransition->enabled) {
-        cout << "\ntransition " << Globals::CheckTransition->name << " is not dead!\n";
+        //cout << "\ntransition " << Globals::CheckTransition->name << " is not dead!\n";
+	message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
         printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -2355,7 +2392,8 @@ unsigned int breadth_first() {
 #ifdef DEADLOCK
     if (!CurrentState->firelist || !(CurrentState->firelist[0])) {
         // early abortion
-        cout << "\ndead state found!\n";
+        //cout << "\ndead state found!\n";
+	message(_cgood_("dead state found!"));
         if (Globals::resultfile) {
             fprintf(Globals::resultfile, "deadlock: {\n  result = true;\n");
         }
@@ -2382,10 +2420,12 @@ unsigned int breadth_first() {
     if (F->tempcard) {
         abort(3, "temporal operators are not allowed in state predicates - not allowed for task %s", _cparameter_("STATEPREDICATE"));
     }
-    cout << "\n Formula with\n" << F->card << " subformula.\n";
+    //cout << "\n Formula with\n" << F->card << " subformula.\n";
+    message("Formula with %d subformula(s)", F->card);
     F->parent = NULL;
     if (F->initatomic()) {
-        cout << "\nstate found!\n";
+        //cout << "\nstate found!\n";
+	message(_cgood_("state found!"));
         printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
         printincompletestates(CurrentState, graphstream);
@@ -2405,7 +2445,8 @@ unsigned int breadth_first() {
     }
     if (i >= Globals::Places[0]->cnt) { // target_marking found!
         // early abortion
-        cout << "\nstate found!\n";
+        //cout << "\nstate found!\n";
+	message(_cgood_("state found!"));
         printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -2580,10 +2621,12 @@ endomegaproc:
                     if (!NewState->firelist) {
                         // early abortion
 #ifdef REACHABILITY
-                        cout << "\nstate found!\n";
+                        //cout << "\nstate found!\n";
+			message(_cgood_("state found!"));
 #endif
 #ifdef STATEPREDICATE
-                        cout << "state found!\n";
+                        //cout << "state found!\n";
+			message(_cgood_("state found!"));
 #endif
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
@@ -2593,7 +2636,8 @@ endomegaproc:
 #endif
 #ifdef BOUNDEDPLACE
                     if (!Globals::CheckPlace->bounded) {
-                        cout << "place " << Globals::CheckPlace->name << " is unbounded!\n";
+                        //cout << "place " << Globals::CheckPlace->name << " is unbounded!\n";
+			message("%s %s %s", _cgood_("place"), _cgood_(Globals::CheckPlace->name), _cgood_("is unbounded!"));
                         printstate("", Globals::CurrentMarking);
                         NewState->smaller = smallerstate;
                         print_reg_path(NewState, smallerstate);
@@ -2604,7 +2648,8 @@ endomegaproc:
 #endif
 #ifdef BOUNDEDNET
                     if (!isbounded) {
-                        cout << "net is unbounded!\n";
+                        //cout << "net is unbounded!\n";
+			message(_cgood_("net is unbounded!"));
 
                         if (Globals::resultfile) {
                             fprintf(Globals::resultfile, "unbounded: {\n  result = true;\n");
@@ -2626,7 +2671,8 @@ endomegaproc:
 #ifdef DEADLOCK
                     if (!NewState->firelist || !(NewState->firelist[0])) {
                         // early abortion
-                        cout << "\ndead state found!\n";
+                        //cout << "\ndead state found!\n";
+			message(_cgood_("dead state found!"));
 
                         if (Globals::resultfile) {
                             fprintf(Globals::resultfile, "deadlock: {\n  result = true;\n");
@@ -2645,7 +2691,8 @@ endomegaproc:
 #endif
 #if defined(DEADTRANSITION)
                     if (Globals::CheckTransition->enabled) {
-                        cout << "\ntransition " << Globals::CheckTransition->name << " is not dead!\n";
+                        //cout << "\ntransition " << Globals::CheckTransition->name << " is not dead!\n";
+			message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(CurrentState);
                         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -2655,7 +2702,8 @@ endomegaproc:
 #ifdef STATEPREDICATE
                     if (! NewState->firelist || F->value) {
                         // early abortion
-                        cout << "\nstate found!\n";
+                        //cout << "\nstate found!\n";
+			message(_cgood_("state found!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -2670,7 +2718,8 @@ endomegaproc:
                     }
                     if (i >= Globals::Places[0]->cnt) { // target_marking found!
                         // early abortion
-                        cout << "\nstate found!\n";
+                        //cout << "\nstate found!\n";
+			message(_cgood_("state found!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -2772,31 +2821,40 @@ endomegaproc:
     }
 
 #ifdef REACHABILITY
-    cout << "\n state is not reachable!\n";
+    //cout << "\n state is not reachable!\n";
+    message(_cbad_("state is not reachable!"));
 #endif
 #ifdef DEADLOCK
-    cout << "\nnet does not have deadlocks!\n";
+    //cout << "\nnet does not have deadlocks!\n";
+    message(_cbad_("net does not have deadlocks!"));
     if (Globals::resultfile) {
         fprintf(Globals::resultfile, "deadlock: {\n  result = false;\n}\n");
     }
 #endif
 #if defined(STATEPREDICATE) && ! defined(LIVEPROP)
-    cout << "\n predicate is not satisfiable!\n";
+    //cout << "\n predicate is not satisfiable!\n";
+    message(_cbad_("predicate is not satisfiable!"));
 #endif
 #ifdef DEADTRANSITION
-    cout << "\ntransition " << Globals::CheckTransition->name << " is dead!\n";
+    //cout << "\ntransition " << Globals::CheckTransition->name << " is dead!\n";
+    message("%s %s %s", _cbad_("transition"), _cbad_(Globals::CheckTransition->name), _cbad_("is dead!"));
 #endif
 #ifdef BOUNDEDPLACE
-    cout << "\nplace " << Globals::CheckPlace->name << " is bounded!\n";
+    //cout << "\nplace " << Globals::CheckPlace->name << " is bounded!\n";
+    message("%s %s %s", _cbad_("place"), _cbad_(Globals::CheckPlace->name), _cbad_("is unbounded!"));
 #endif
 #ifdef BOUNDEDNET
     if (isbounded) {
-        cout << "\nnet is bounded!\n";
+        //cout << "\nnet is bounded!\n";
+	message(_cbad_("net is bounded!"));
         if (Globals::resultfile) {
             fprintf(Globals::resultfile, "unbounded: {\n  result = false;\n}\n\n");
         }
     } else {
-        cout << "\nnet is unbounded!\n";
+	//sollte nicht stattfinden, oder?!
+	assert(isbounded == true);
+        //cout << "\nnet is unbounded!\n";
+	message(_cgood_("net is unbounded!"));
     }
 #endif
 #endif
@@ -3063,7 +3121,8 @@ int reversibility() {
             Globals::Transitions[i]->check_enabled();
         }
         if (!mutual_reach()) {
-            cout << "\nnot reversible: no return to m0 from reported state\n\n";
+            //cout << "\nnot reversible: no return to m0 from reported state\n\n";
+	    message(_cbad("not reversible: no return to m0 from reported state"));
 
             if (Globals::resultfile) {
                 fprintf(Globals::resultfile, "reversibility: {\n  result = false;\n");
@@ -3078,7 +3137,8 @@ int reversibility() {
             return 1;
         }
     }
-    cout << "\n net is reversible!\n";
+    //cout << "\n net is reversible!\n";
+    message(_cgood_("net is reversible!"));
 
     if (Globals::resultfile) {
         fprintf(Globals::resultfile, "reversibility: {\n  result = true;\n};\n");
@@ -3106,7 +3166,8 @@ int liveproperty() {
     if (F->tempcard) {
         abort(3, "temporal operators are not allowed in state predicates - not allowed for task %s", _cparameter_("LIVEPROB"));
     }
-    cout << "\n Formula with\n" << F->card << " subformula.\n";
+    //cout << "\n Formula with\n" << F->card << " subformula.\n";
+    message("Formula with %d subformula(s)", F->card);
     F->parent = NULL;
 
     for (i = 0; i < Globals::Places[0]->cnt; i++) {
@@ -3125,12 +3186,14 @@ int liveproperty() {
             Globals::Transitions[i]->check_enabled();
         }
         if (!target_reach()) {
-            cout << "\npredicate not live: not satisfiable beyond reported state\n\n";
+            //cout << "\npredicate not live: not satisfiable beyond reported state\n\n";
+	    message(_cbad_("predicate not live: not satisfiable beyond reported state"));
             printstate("", Globals::CurrentMarking);
             return 1;
         }
     }
-    cout << "\n predicate is live!\n";
+    //cout << "\n predicate is live!\n";
+    message(_cgood_("predicate is live!"));
     return(0);
 }
 #endif
@@ -3181,7 +3244,8 @@ int home() {
             Globals::Transitions[i]->check_enabled();
         }
         if (!mutual_reach()) {
-            cout << "\nnet does not have home markings!\n\n";
+            //cout << "\nnet does not have home markings!\n\n";
+	    message(_cbad_("net does not have home markings!"));
             if (Globals::resultfile) {
                 fprintf(Globals::resultfile, "homemarking: {\n  result = false;\n};\n");
             }
@@ -3190,7 +3254,8 @@ int home() {
         Old = Old->next;
     }
 
-    cout << "\n\n home marking found (reported state)\n\n";
+    //cout << "\n\n home marking found (reported state)\n\n";
+    message(_cgood_("home marking found (reported state)"));
     if (Globals::resultfile) {
         fprintf(Globals::resultfile, "homemarking: {\n  result = true;\n");
     }

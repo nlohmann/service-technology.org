@@ -1664,7 +1664,7 @@ void ComputeSymmetries(void) {
     // unused: unsigned int h;
     unsigned int plp, trp;
 
-    cout << "\n computing symmetries...\n";
+    status("calculating symmetries");
     init_syms();
     reservecompose = new unsigned int [Globals::Places[0]->cnt];
     Stamp = 1;
@@ -1726,8 +1726,10 @@ void ComputeSymmetries(void) {
             CardStore--;
         }
     }
-    cout << "\n" << CardGenerators << " generators in " << CardStore << " groups for " << CardSymm << " symmetries found.\n";
-    cout << DeadBranches << " dead branches entered during calculation.\n";
+    //cout << "\n" << CardGenerators << " generators in " << CardStore << " groups for " << CardSymm << " symmetries found.\n";
+    //cout << DeadBranches << " dead branches entered during calculation.\n";
+    message("%d generators in %d groups for %d symmetries found", CardGenerators, CardStore, CardSymm);
+    message("%d dead branches entered during symmetrie calculation", DeadBranches);
 
 #if SYMMINTEGRATION == 2
     // Reaktoren auf Markierungsabb.suche vorbereiten, indem Aeq.klassen
@@ -1779,7 +1781,8 @@ void ComputePartition(void) {
     unsigned int c;
     // unused: unsigned int plp,trp;
 
-    cout << "\n partitioning nodes wrt symmetries...\n";
+    //cout << "\n partitioning nodes wrt symmetries...\n";
+    message("partitioning nodes wrt symmetries...");
     init_syms();
     Stamp = 1;
     InitialConstraint();
@@ -1804,7 +1807,8 @@ void ComputePartition(void) {
         }
     }
 
-    cout << "\n" << CardSpecification[PL] << " classes computed.\n";
+    //cout << "\n" << CardSpecification[PL] << " classes computed.\n";
+    message("%d classes computed (%s)", CardSpecification[PL], _cparameter_("SYMMETRY"));
 
     // Reaktoren auf Markierungsabb.suche vorbereiten, indem Aeq.klassen
     // zu Constraints werden. Countsort wird misbraucht.

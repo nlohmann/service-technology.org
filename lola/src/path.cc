@@ -368,7 +368,7 @@ void find_path() {
             Transition* t;
 
             if (!((NrOfStates) % REPORTFREQUENCY)) {
-		message("Depth %d", NrOfStates);
+                message("Depth %d", NrOfStates);
             }
             if (!(t =
 #ifdef STUBBORN

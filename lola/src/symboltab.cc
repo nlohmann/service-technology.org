@@ -101,4 +101,4 @@ FcSymbol::FcSymbol(char* name, UFunction* f): Symbol(name, GlobalTable, fc), fun
 
 EnSymbol::EnSymbol(char* name): Symbol(name, GlobalTable, en) {}
 
-IdList::IdList(char* _name, IdList *_next) : name(_name), next(_next) {}
+IdList::IdList(char* _name, IdList* _next) : name(_name), next(_next) {}

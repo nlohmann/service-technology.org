@@ -39,12 +39,17 @@ inline long unsigned int power(unsigned int a, unsigned int b) {
 }
 
 const char* getUTypeName(UTypeClass c) {
-    switch(c) {
-        case(arr): return "array";
-        case(rec): return "record";
-        case(num): return "integer";
-        case(boo): return "Boolean";
-        case(enu): return "enumeration";
+    switch (c) {
+        case(arr):
+            return "array";
+        case(rec):
+            return "record";
+        case(num):
+            return "integer";
+        case(boo):
+            return "Boolean";
+        case(enu):
+            return "enumeration";
     }
     return NULL;
 }
@@ -69,13 +74,17 @@ bool UNumType::iscompatible(UType* t) {
     return true;
 }
 
-UNumValue::UNumValue(UType* _type, int _v) : v(_v) { type = _type; }
+UNumValue::UNumValue(UType* _type, int _v) : v(_v) {
+    type = _type;
+}
 
 UValue* UNumType::make() {
     return new UNumValue(this, lower);
 }
 
-UBooValue::UBooValue(UType* _type, bool _v) : v(_v) { type = _type; }
+UBooValue::UBooValue(UType* _type, bool _v) : v(_v) {
+    type = _type;
+}
 
 UValue* UBooType::make() {
     return new UBooValue(this, false);
@@ -95,7 +104,9 @@ bool UEnuType::iscompatible(UType* t) {
     return (t->tag == enu || t == this);
 }
 
-UEnuValue::UEnuValue(UType* _type, int _v) : v(_v) { type = _type; }
+UEnuValue::UEnuValue(UType* _type, int _v) : v(_v) {
+    type = _type;
+}
 
 UValue* UEnuType::make() {
     return new UEnuValue(this, 0);
@@ -103,7 +114,9 @@ UValue* UEnuType::make() {
 
 UEnuType::UEnuType(UEnList* l) {
     UEnList* ll;
-    for (size = 0, ll = l; ll; ll = ll->next, size++) ;
+    for (size = 0, ll = l; ll; ll = ll->next, size++) {
+        ;
+    }
     tags = new EnSymbol * [size];
     for (unsigned int i = 0; i < size; i++) {
         tags[i] = l->sy;
@@ -137,7 +150,7 @@ UValue* UArrType::make() {
 }
 
 bool UArrType::iscompatible(UType* t) {
-    if (t->tag != arr or ((UArrType*) t)->index->size != index->size) {
+    if (t->tag != arr or((UArrType*) t)->index->size != index->size) {
         return false;
     }
     return (component->iscompatible(((UArrType*) t)->component));
@@ -147,7 +160,9 @@ URcList::URcList(RcSymbol* _sy, UType* _ty, URcList* _next) : sy(_sy), ty(_ty), 
 
 URecType::URecType(URcList* l) {
     URcList* ll;
-    for (card = 0, ll = l; ll; ll = ll->next, card++) ;
+    for (card = 0, ll = l; ll; ll = ll->next, card++) {
+        ;
+    }
     tags = new RcSymbol * [card];
     component = new UType * [card ];
     size = 1;

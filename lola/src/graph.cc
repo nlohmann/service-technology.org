@@ -868,7 +868,7 @@ unsigned int depth_first() {
         if (!(CurrentState->firelist) || !(CurrentState->firelist[0])) {
             // early abortion
             //cout << "\ndead state found!\n";
-	    message(_cgood_("dead state found!"));
+            message(_cgood_("dead state found!"));
 
             if (Globals::resultfile) {
                 fprintf(Globals::resultfile, "deadlock: {\n  result = true;\n  ");
@@ -901,7 +901,7 @@ unsigned int depth_first() {
         if (Globals::CheckTransition->enabled) {
             // early abortion
             //cout << "\ntransition " << Globals::CheckTransition->name << " is not dead!\n";
-	    message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
+            message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
             printstate("", Globals::CurrentMarking);
             print_path(CurrentState);
             printincompletestates(CurrentState, graphstream);
@@ -914,7 +914,7 @@ unsigned int depth_first() {
         if (!CurrentState->firelist) {
             // early abortion
             //cout << "\nstate found!\n";
-	    message(_cgood_("state found!"));
+            message(_cgood_("state found!"));
             printstate("", Globals::CurrentMarking);
             print_path(CurrentState);
             printincompletestates(CurrentState, graphstream);
@@ -931,7 +931,7 @@ unsigned int depth_first() {
         if (i >= Globals::Places[0]->cnt) { // target_marking found!
             // early abortion
             //cout << "\nstate found!\n";
-	    message(_cgood_("state found!"));
+            message(_cgood_("state found!"));
             printstate("", Globals::CurrentMarking);
             print_path(CurrentState);
             printincompletestates(CurrentState, graphstream);
@@ -949,7 +949,7 @@ unsigned int depth_first() {
 #ifdef EVENTUALLYPROP
         if (F->initatomic()) {
             //cout << "\neventually phi holds.\n";
-	    message("eventually phi holds (%s)", _cparameter_("EVENTUALLYPROP"));
+            message("eventually phi holds (%s)", _cparameter_("EVENTUALLYPROP"));
             statistics(NrOfStates, Edges, NonEmptyHash);
         }
 #endif
@@ -962,7 +962,7 @@ unsigned int depth_first() {
             largest_sat = 1;
 #else
             //cout << "\nstate found!\n";
-	    message(_cgood_("state found!"));
+            message(_cgood_("state found!"));
 
             printstate("", Globals::CurrentMarking);
             print_path(CurrentState);
@@ -1022,7 +1022,7 @@ unsigned int depth_first() {
                 // checking the property efficiently.
 #ifdef DEADLOCK
                 if (!Transitions[0]->NrEnabled) {
-                    cout << "heureka" << endl;	//ToDo?! ;-)
+                    cout << "heureka" << endl;  //ToDo?! ;-)
                     heureka(resultfixedR, Globals::CurrentMarking);
                     end_communication();
                     return 1;
@@ -1293,7 +1293,7 @@ endomegaproc:
 
                         // early abortion
                         //cout << "\nstate found!\n";
-			message(_cgood_("state found!"));
+                        message(_cgood_("state found!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         printincompletestates(NewState, graphstream);
@@ -1316,7 +1316,7 @@ endomegaproc:
                     if (!(NewState->firelist) || !(NewState->firelist[0])) {
                         // early abortion
                         //cout << "\ndead state found!\n";
-			message(_cgood_("dead state found!"));
+                        message(_cgood_("dead state found!"));
                         if (Globals::resultfile) {
                             fprintf(Globals::resultfile, "deadlock: {\n  result = true;\n");
                         }
@@ -1344,7 +1344,7 @@ endomegaproc:
                     if (Globals::CheckTransition->enabled) {
                         // early abortion
                         //cout << "\ntransition " <<  Globals::CheckTransition->name << " is not dead!\n";
-			message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
+                        message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         printincompletestates(NewState, graphstream);
@@ -1356,7 +1356,7 @@ endomegaproc:
                     if (!NewState->firelist) {
                         // early abortion
                         //cout << "\nstate found!\n";
-			message(_cgood_("state found!"));
+                        message(_cgood_("state found!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         printincompletestates(NewState, graphstream);
@@ -1374,7 +1374,7 @@ endomegaproc:
                     if (i >= Globals::Places[0]->cnt) {
                         // early abortion
                         //cout << "\nstate found!\n";
-			message(_cgood_("state found!"));
+                        message(_cgood_("state found!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         printincompletestates(NewState, graphstream);
@@ -1387,7 +1387,7 @@ endomegaproc:
 #ifdef BOUNDEDNET
                     if (!isbounded) {
                         //cout << "net is unbounded!\n";
-			message(_cgood_("net is unbounded!"));
+                        message(_cgood_("net is unbounded!"));
 
                         if (Globals::resultfile) {
                             fprintf(Globals::resultfile, "unbounded: {\n  result = true;\n");
@@ -1415,7 +1415,7 @@ endomegaproc:
 #ifdef BOUNDEDPLACE
                     if (!Globals::CheckPlace->bounded) {
                         //cout << "place " << Globals::CheckPlace->name << " is unbounded!\n";
-			message("%s %s %s", _cgood_("place"), _cgood_(Globals::CheckPlace->name), _cgood_("is unbounded!"));
+                        message("%s %s %s", _cgood_("place"), _cgood_(Globals::CheckPlace->name), _cgood_("is unbounded!"));
                         printstate("", Globals::CurrentMarking);
                         print_reg_path(CurrentState, CurrentState->smaller);
                         cout << "\n";
@@ -1472,15 +1472,15 @@ endomegaproc:
                         if (analyse_fairness(start, 1)) {
 #ifdef EVENTUALLYPROP
                             //cout << "eventually phi does not hold" << endl;
-			    message(_cgood_("eventually phi holds"));
+                            message(_cgood_("eventually phi holds"));
 #endif
 #ifdef FAIRPROP
                             //cout << "GF phi does not hold" << endl;
-			    message(_cgood_("GF phi does not hold"));
+                            message(_cgood_("GF phi does not hold"));
 #endif
 #ifdef STABLEPROP
                             //cout << "FG phi does not hold" << endl;
-			    message(_cgood_("FG phi does not hold"));
+                            message(_cgood_("FG phi does not hold"));
 #endif
                             return 1;
                         }
@@ -1705,7 +1705,7 @@ afterdownsearch:
                         if (largest_sat <= CurrentState->dfs) {
                             // tscc did not reach prop->prop not live
                             //cout << "\npredicate not live: not satisfiable beyond reported state\n\n";
-		            message(_cgood_("predicate not live: not satisfiable beyond reported state"));
+                            message(_cgood_("predicate not live: not satisfiable beyond reported state"));
                             printstate("", Globals::CurrentMarking);
                             statistics(NrOfStates, Edges, NonEmptyHash);
                             return 1;
@@ -1811,22 +1811,22 @@ afterdownsearch:
 #else
 #ifdef BITHASH
         //cout << "\nno conclusive result!\n";
-	message(_cbad_("no conclusive result!"));
+        message(_cbad_("no conclusive result!"));
 #else
 #ifdef REACHABILITY
         //cout << "\nstate is not reachable!\n";
-	message(_cbad_("state is not reachable!"));
+        message(_cbad_("state is not reachable!"));
 #endif
 #ifdef DEADLOCK
         //cout << "\nnet does not have deadlocks!\n";
-	message(_cbad_("net does not have deadlocks!"));
+        message(_cbad_("net does not have deadlocks!"));
         if (Globals::resultfile) {
             fprintf(Globals::resultfile, "\n  );\n};\ndeadlock: {\n  result = false;\n};\n");
         }
 #endif
 #if defined(STATEPREDICATE) && ! defined(LIVEPROP)
         //cout << "\n predicate is not satisfiable!\n";
-	message(_cbad_("predicate is not satisfiable!"));
+        message(_cbad_("predicate is not satisfiable!"));
         if (Globals::resultfile) {
             fprintf(Globals::resultfile, "statepredicate: {\n  result = false;\n};\n");
         }
@@ -1834,27 +1834,27 @@ afterdownsearch:
 #endif
 #ifdef DEADTRANSITION
         //cout << "\ntransition " << Globals::CheckTransition->name << " is dead!\n";
-	message("%s %s %s", _cbad_("transition"), _cbad_(Globals::CheckTransition->name), _cbad_("is dead!"));
+        message("%s %s %s", _cbad_("transition"), _cbad_(Globals::CheckTransition->name), _cbad_("is dead!"));
 #endif
 #ifdef BOUNDEDPLACE
         //cout << "\nplace " << Globals::CheckPlace->name << " is bounded!\n";
-	message("%s %s %s", _cbad_("place"), _cbad_(Globals::CheckPlace->name), _cbad_("is bounded!"));
+        message("%s %s %s", _cbad_("place"), _cbad_(Globals::CheckPlace->name), _cbad_("is bounded!"));
 #endif
 #if defined(LIVEPROP) && ! defined(TWOPHASE)
         //cout << "\npredicate is live!\n";
-	message(_cbad_("predicate is live!"));
+        message(_cbad_("predicate is live!"));
 #endif
 #ifdef BOUNDEDNET
         if (isbounded) {
             //cout << "\nnet is bounded!\n";
-	    message(_cbad_("net is bounded!"));
+            message(_cbad_("net is bounded!"));
             if (Globals::resultfile) {
                 fprintf(Globals::resultfile, "unbounded: {\n  result = false;\n};\n");
             }
         } else {
             /// can this ever happen here?
-	    /// mmmh, das läßt sich herausfinden...
-	    assert(isbounded == true);
+            /// mmmh, das läßt sich herausfinden...
+            assert(isbounded == true);
             cout << "\nnet is unbounded!\n";
         }
 #endif
@@ -2020,7 +2020,7 @@ unsigned int simple_depth_first() {
 // determined structurally
 // instances of this macros have shape int initialize_*();
 
-	
+
     int result = INITIALIZE_PROPERTY();
 
 
@@ -2058,7 +2058,7 @@ unsigned int simple_depth_first() {
     if (CHECK_EARLY_ABORTION) { // this is property dependent
         //cout << "\n";
         //cout << _ctool_("lola: ") << _cgood_(EARLY_ABORT_MESSAGE) << "\n";
-	message(_cgood_(EARLY_ABORT_MESSAGE));
+        message(_cgood_(EARLY_ABORT_MESSAGE));
         if (Globals::resultfile) {
             fprintf(Globals::resultfile, "%s : {\n  result = true;\n  ", RESULT_NAME);
         }
@@ -2204,7 +2204,7 @@ endomegaproc:
                 if (CHECK_EARLY_ABORTION) {
                     //cout << "\n";
                     //cout << _ctool_("lola: ") << _cgood_(EARLY_ABORT_MESSAGE) << "\n";
-		    message(_cgood_(EARLY_ABORT_MESSAGE));
+                    message(_cgood_(EARLY_ABORT_MESSAGE));
                     if (Globals::resultfile) {
                         fprintf(Globals::resultfile, "%s: {\n  result = true;\n  ", RESULT_NAME);
                     }
@@ -2371,11 +2371,11 @@ unsigned int breadth_first() {
         // early abortion
 #ifdef REACHABILITY
         //cout << "\nstate found!\n";
-	message(_cgood_("state found!"));
+        message(_cgood_("state found!"));
 #endif
 #ifdef DEADTRANSITION
         //cout << "\ntransition " << Globals::CheckTransition->name << " is not dead!\n";
-	message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
+        message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
 #endif
         printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
@@ -2386,7 +2386,7 @@ unsigned int breadth_first() {
 #if defined(DEADTRANSITION) && !defined(STUBBORN)
     if (Globals::CheckTransition->enabled) {
         //cout << "\ntransition " << Globals::CheckTransition->name << " is not dead!\n";
-	message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
+        message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
         printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -2397,7 +2397,7 @@ unsigned int breadth_first() {
     if (!CurrentState->firelist || !(CurrentState->firelist[0])) {
         // early abortion
         //cout << "\ndead state found!\n";
-	message(_cgood_("dead state found!"));
+        message(_cgood_("dead state found!"));
         if (Globals::resultfile) {
             fprintf(Globals::resultfile, "deadlock: {\n  result = true;\n");
         }
@@ -2429,7 +2429,7 @@ unsigned int breadth_first() {
     F->parent = NULL;
     if (F->initatomic()) {
         //cout << "\nstate found!\n";
-	message(_cgood_("state found!"));
+        message(_cgood_("state found!"));
         printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
         printincompletestates(CurrentState, graphstream);
@@ -2450,7 +2450,7 @@ unsigned int breadth_first() {
     if (i >= Globals::Places[0]->cnt) { // target_marking found!
         // early abortion
         //cout << "\nstate found!\n";
-	message(_cgood_("state found!"));
+        message(_cgood_("state found!"));
         printstate("", Globals::CurrentMarking);
         print_path(CurrentState);
         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -2470,7 +2470,7 @@ unsigned int breadth_first() {
 #ifdef DISTRIBUTE
                     rapport(rapportstring);
 #else
-		    report_statistics();
+                    report_statistics();
 #endif
                 }
                 CurrentState->firelist[CurrentState->current]->fire();
@@ -2626,11 +2626,11 @@ endomegaproc:
                         // early abortion
 #ifdef REACHABILITY
                         //cout << "\nstate found!\n";
-			message(_cgood_("state found!"));
+                        message(_cgood_("state found!"));
 #endif
 #ifdef STATEPREDICATE
                         //cout << "state found!\n";
-			message(_cgood_("state found!"));
+                        message(_cgood_("state found!"));
 #endif
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
@@ -2641,7 +2641,7 @@ endomegaproc:
 #ifdef BOUNDEDPLACE
                     if (!Globals::CheckPlace->bounded) {
                         //cout << "place " << Globals::CheckPlace->name << " is unbounded!\n";
-			message("%s %s %s", _cgood_("place"), _cgood_(Globals::CheckPlace->name), _cgood_("is unbounded!"));
+                        message("%s %s %s", _cgood_("place"), _cgood_(Globals::CheckPlace->name), _cgood_("is unbounded!"));
                         printstate("", Globals::CurrentMarking);
                         NewState->smaller = smallerstate;
                         print_reg_path(NewState, smallerstate);
@@ -2653,7 +2653,7 @@ endomegaproc:
 #ifdef BOUNDEDNET
                     if (!isbounded) {
                         //cout << "net is unbounded!\n";
-			message(_cgood_("net is unbounded!"));
+                        message(_cgood_("net is unbounded!"));
 
                         if (Globals::resultfile) {
                             fprintf(Globals::resultfile, "unbounded: {\n  result = true;\n");
@@ -2676,7 +2676,7 @@ endomegaproc:
                     if (!NewState->firelist || !(NewState->firelist[0])) {
                         // early abortion
                         //cout << "\ndead state found!\n";
-			message(_cgood_("dead state found!"));
+                        message(_cgood_("dead state found!"));
 
                         if (Globals::resultfile) {
                             fprintf(Globals::resultfile, "deadlock: {\n  result = true;\n");
@@ -2696,7 +2696,7 @@ endomegaproc:
 #if defined(DEADTRANSITION)
                     if (Globals::CheckTransition->enabled) {
                         //cout << "\ntransition " << Globals::CheckTransition->name << " is not dead!\n";
-			message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
+                        message("%s %s %s", _cgood_("transition"), _cgood_(Globals::CheckTransition->name), _cgood_("is not dead!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(CurrentState);
                         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -2707,7 +2707,7 @@ endomegaproc:
                     if (! NewState->firelist || F->value) {
                         // early abortion
                         //cout << "\nstate found!\n";
-			message(_cgood_("state found!"));
+                        message(_cgood_("state found!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -2723,7 +2723,7 @@ endomegaproc:
                     if (i >= Globals::Places[0]->cnt) { // target_marking found!
                         // early abortion
                         //cout << "\nstate found!\n";
-			message(_cgood_("state found!"));
+                        message(_cgood_("state found!"));
                         printstate("", Globals::CurrentMarking);
                         print_path(NewState);
                         statistics(NrOfStates, Edges, NonEmptyHash);
@@ -2850,15 +2850,15 @@ endomegaproc:
 #ifdef BOUNDEDNET
     if (isbounded) {
         //cout << "\nnet is bounded!\n";
-	message(_cbad_("net is bounded!"));
+        message(_cbad_("net is bounded!"));
         if (Globals::resultfile) {
             fprintf(Globals::resultfile, "unbounded: {\n  result = false;\n}\n\n");
         }
     } else {
-	//sollte nicht stattfinden, oder?!
-	assert(isbounded == true);
+        //sollte nicht stattfinden, oder?!
+        assert(isbounded == true);
         //cout << "\nnet is unbounded!\n";
-	message(_cgood_("net is unbounded!"));
+        message(_cgood_("net is unbounded!"));
     }
 #endif
 #endif
@@ -2922,7 +2922,7 @@ bool mutual_reach() {
             // there is a next state that needs to be explored
             Edges ++;
             if (!(Edges % REPORTFREQUENCY)) {
-		report_statistics();
+                report_statistics();
             }
             CurrentState->firelist[CurrentState->current]->fire();
             if ((NewState = SEARCHPROC())) {
@@ -3017,7 +3017,7 @@ bool target_reach() {
             // there is a next state that needs to be explored
             Edges ++;
             if (!(Edges % REPORTFREQUENCY)) {
-		report_statistics();
+                report_statistics();
             }
             CurrentState->firelist[CurrentState->current]->fire();
             if ((NewState = SEARCHPROC())) {
@@ -3068,6 +3068,7 @@ bool target_reach() {
                 }
                 Transition** newFL = new Transition * [nf + CurrentState->current + 1];
                 State** newSucc = new State * [nf + CurrentState->current];
+                unsigned int i;
                 for (i = 0; i < CurrentState->current; i++) {
                     newFL[i] = CurrentState->firelist[i];
                     newSucc[i] = CurrentState->succ[i];
@@ -3126,7 +3127,7 @@ int reversibility() {
         }
         if (!mutual_reach()) {
             //cout << "\nnot reversible: no return to m0 from reported state\n\n";
-	    message(_cbad("not reversible: no return to m0 from reported state"));
+            message(_cbad("not reversible: no return to m0 from reported state"));
 
             if (Globals::resultfile) {
                 fprintf(Globals::resultfile, "reversibility: {\n  result = false;\n");
@@ -3191,7 +3192,7 @@ int liveproperty() {
         }
         if (!target_reach()) {
             //cout << "\npredicate not live: not satisfiable beyond reported state\n\n";
-	    message(_cbad_("predicate not live: not satisfiable beyond reported state"));
+            message(_cbad_("predicate not live: not satisfiable beyond reported state"));
             printstate("", Globals::CurrentMarking);
             return 1;
         }
@@ -3249,7 +3250,7 @@ int home() {
         }
         if (!mutual_reach()) {
             //cout << "\nnet does not have home markings!\n\n";
-	    message(_cbad_("net does not have home markings!"));
+            message(_cbad_("net does not have home markings!"));
             if (Globals::resultfile) {
                 fprintf(Globals::resultfile, "homemarking: {\n  result = false;\n};\n");
             }

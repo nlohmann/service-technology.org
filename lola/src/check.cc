@@ -950,8 +950,8 @@ void searchEF(State* s, unarytemporalformula* f) {
 
                 Edges ++;
                 if (!(Edges % REPORTFREQUENCY)) {
-		            report_statistics();
-                            }
+                    report_statistics();
+                }
                 NewState -> checkcurrent[f->tempindex] = 0;
                 NewState -> checkparent[f->tempindex] = CurrentState;
                 NewState -> checkdfs[f->tempindex] = NewState -> checkmin[f->tempindex] = cardstates++;
@@ -1081,7 +1081,7 @@ void searchAX(State* s, unarytemporalformula* f) {
         }
         Edges ++;
         if (!(Edges % REPORTFREQUENCY)) {
-	        report_statistics();
+            report_statistics();
         }
         check(NewState, f->element);
         if (!(NewState->value[f->element->index])) {
@@ -1394,7 +1394,7 @@ void searchEU(State* s, untilformula* f) {
             Edges ++;
             if (!(Edges % REPORTFREQUENCY)) {
                 report_statistics();
-	    }
+            }
             if (NewState = binSearch()) {
                 // state exists
                 if (NewState -> known[f->index]) {
@@ -1698,7 +1698,7 @@ void futuresearchAU(State* s, untilformula* f) {
                 Edges ++;
                 if (!(Edges % REPORTFREQUENCY)) {
                     report_statistics();
-		}
+                }
                 if (NewState = binSearch()) {
                     // state exists
                     if (NewState -> known[f->index]) {
@@ -2070,7 +2070,7 @@ void searchAU(State* s, untilformula* f) {
             Edges ++;
             if (!(Edges % REPORTFREQUENCY)) {
                 report_statistics();
-	    }
+            }
             if (NewState = binSearch()) {
                 // state exists
                 if (NewState -> known[f->index]) {
@@ -2242,7 +2242,7 @@ void searchAF(State* s, unarytemporalformula* f) {
             Edges ++;
             if (!(Edges % REPORTFREQUENCY)) {
                 report_statistics();
-	    }
+            }
             if (NewState = binSearch()) {
                 if (NewState -> known[f->index]) {
                     // state exists, value known
@@ -2398,7 +2398,7 @@ void searchEG(State* s, unarytemporalformula* f) {
             Edges ++;
             if (!(Edges % REPORTFREQUENCY)) {
                 report_statistics();
-	    }
+            }
             if (NewState = binSearch()) {
                 // state exists
                 if (NewState -> known[f->index]) {
@@ -2561,7 +2561,7 @@ void futuresearchAF(State* s, unarytemporalformula* f) {
                 Edges ++;
                 if (!(Edges % REPORTFREQUENCY)) {
                     report_statistics();
-		}
+                }
                 if (NewState = binSearch()) {
                     // state exists
                     if (NewState -> known[f->index]) {
@@ -2739,7 +2739,7 @@ void futuresearchEG(State* s, unarytemporalformula* f) {
                 Edges ++;
                 if (!(Edges % REPORTFREQUENCY)) {
                     report_statistics();
-		}
+                }
                 if (NewState = binSearch()) {
                     // state exists
                     if (NewState -> known[f->index]) {

@@ -53,7 +53,7 @@ long int NrSame, NrPersistent, PeakMemUse, CurrentMemUse, TransitionsFired, NrSw
 
 inline void report_sweep_statistics() {
     message("%d sweeps, %d transitions fired, peak %d States, %d States persistent.",
-        NrSweeps, TransitionsFired, PeakMemUse, NrPersistent);
+            NrSweeps, TransitionsFired, PeakMemUse, NrPersistent);
 }
 
 
@@ -400,17 +400,17 @@ int sweep() {
                 // fire
                 TransitionsFired++;
                 if (!(TransitionsFired % REPORTFREQUENCY)) {
-		    /*
-                    cerr << "Sw # " << NrSweeps << ", "
-                         << TransitionsFired << " fired, "
-                         << "curr. " << CurrentMemUse << " st, "
-                         << "peak " << PeakMemUse << " st, "
-                         << NrPersistent << " pers."
-                         << "prog.val " << ProgressValueHigh* ProgressSpan + ProgressValueLow
-                         << endl;
-		    */
-		    //additional space and commata between pers. and prog.val added...
-		    message("Sw #%2d, %7d fired, curr. %6d st, peak %6d st, %6d pers., prog.val %3d", NrSweeps, TransitionsFired, CurrentMemUse, PeakMemUse, NrPersistent, ProgressValueHigh* ProgressSpan + ProgressValueLow);
+                    /*
+                            cerr << "Sw # " << NrSweeps << ", "
+                                 << TransitionsFired << " fired, "
+                                 << "curr. " << CurrentMemUse << " st, "
+                                 << "peak " << PeakMemUse << " st, "
+                                 << NrPersistent << " pers."
+                                 << "prog.val " << ProgressValueHigh* ProgressSpan + ProgressValueLow
+                                 << endl;
+                    */
+                    //additional space and commata between pers. and prog.val added...
+                    message("Sw #%2d, %7d fired, curr. %6d st, peak %6d st, %6d pers., prog.val %3d", NrSweeps, TransitionsFired, CurrentMemUse, PeakMemUse, NrPersistent, ProgressValueHigh * ProgressSpan + ProgressValueLow);
                 }
                 fl[currentfired] -> fire();
 #ifdef STATEPREDICATE

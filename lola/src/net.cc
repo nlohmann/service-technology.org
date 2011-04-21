@@ -323,8 +323,8 @@ void fix_argv(int& argc, char** &argv) {
     // store invocation in a std::string for meta information in file output
     for (int i = 0; i < argc; ++i) {
         invocation += (i == 0 ? "" : " ") + std::string(argv[i]);
-    } 
-    
+    }
+
     std::vector<std::string> new_argv;
     std::string temp;
     for (unsigned int i = 0; i < argc; ++i) {
@@ -337,7 +337,7 @@ void fix_argv(int& argc, char** &argv) {
 
         // only start a new argv entry if this one does not end with a "-x"
         // option and the next one does not start with "-"
-        if (not(j > 1 and argv[i][j - 2] == '-' and strchr("apsgmnyrh", argv[i][j - 1]) != NULL and (i == argc - 1 or(i < argc - 1 and argv[i + 1][0] != '-')))) {
+        if (not(j > 1 and argv[i][j - 2] == '-' and strchr("apsgmnyrh", argv[i][j - 1]) != NULL and(i == argc - 1 or(i < argc - 1 and argv[i + 1][0] != '-')))) {
             new_argv.push_back(temp);
             temp.clear();
         }

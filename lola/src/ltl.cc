@@ -461,7 +461,7 @@ unsigned int depth_first() {
             // there is a next state that needs to be explored
             Edges ++;
             if (!(Edges % REPORTFREQUENCY)) {
-		message("st: %d     edg: %d", NrOfStates, Edges);
+                message("st: %d     edg: %d", NrOfStates, Edges);
             }
             CurrentState -> firelist[CurrentState -> current] -> fire();
             if (NewState = SEARCHPROC()) {

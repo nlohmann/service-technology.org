@@ -409,6 +409,7 @@ int sweep() {
                 // fire
                 TransitionsFired++;
                 if (!(TransitionsFired % REPORTFREQUENCY)) {
+		    /*
                     cerr << "Sw # " << NrSweeps << ", "
                          << TransitionsFired << " fired, "
                          << "curr. " << CurrentMemUse << " st, "
@@ -416,6 +417,9 @@ int sweep() {
                          << NrPersistent << " pers."
                          << "prog.val " << ProgressValueHigh* ProgressSpan + ProgressValueLow
                          << endl;
+		    */
+		    //additional space and commata between pers. and prog.val added...
+		    message("Sw #  %d, %d fired, curr. %d st, peak %d st, %d pers., prog.val %d", NrSweeps, TransitionsFired, CurrentMemUse, PeakMemUse, NrPersistent, ProgressValueHigh* ProgressSpan + ProgressValueLow);
                 }
                 fl[currentfired] -> fire();
 #ifdef STATEPREDICATE

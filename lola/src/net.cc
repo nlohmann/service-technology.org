@@ -56,6 +56,8 @@ using std::string;
 // a structure containing command line parameters
 gengetopt_args_info args_info;
 
+/// the invocation string
+std::string invocation;
 
 
 #ifdef WITHFORMULA
@@ -123,22 +125,22 @@ void processCommandLine(int argc, char** argv) {
 
     // check if output parameters are given at most once
     if (args_info.Net_given + args_info.net_given > 1) {
-        abort(4, "more than one '-n' / '-N' option given");
+        abort(4, "more than one '%s' / '%s' option given", _cparameter_("-n"), _cparameter_("-N"));
     }
     if (args_info.Analysis_given + args_info.analysis_given > 1) {
-        abort(4, "more than one '-a' / '-A' option given");
+        abort(4, "more than one '%s' / '%s' option given", _cparameter_("-a"), _cparameter_("-A"));
     }
     if (args_info.State_given + args_info.state_given > 1) {
-        abort(4, "more than one '-s' / '-S' option given");
+        abort(4, "more than one '%s' / '%s' option given", _cparameter_("-s"), _cparameter_("-S"));
     }
     if (args_info.Automorphisms_given + args_info.automorphisms_given > 1) {
-        abort(4, "more than one '-y' / '-Y' option given");
+        abort(4, "more than one '%s' / '%s' option given", _cparameter_("-y"), _cparameter_("-Y"));
     }
     if (args_info.Graph_given + args_info.graph_given + args_info.Marking_given + args_info.marking_given > 1) {
-        abort(4, "more than one '-g' / '-G' / '-m' / '-M' option given");
+        abort(4, "more than one '%s' / '%s' / '%s' / '%s' option given", _cparameter_("-g"), _cparameter_("-G"), _cparameter_("-m"), _cparameter_("-M"));
     }
     if (args_info.Path_given + args_info.path_given > 1) {
-        abort(4, "more than one '-p' / '-P' option given");
+        abort(4, "more than one '%s' / '%s' option given", _cparameter_("-p"), _cparameter_("-P"));
     }
 
 
@@ -318,12 +320,17 @@ void processCommandLine(int argc, char** argv) {
 // Fix argv such that inputs like "lola net.lola -a analysisfile.task" are
 // allowed even though gengetopt would complain about the space after "-a".
 void fix_argv(int& argc, char** &argv) {
+    // store invocation in a std::string for meta information in file output
+    for (int i = 0; i < argc; ++i) {
+        invocation += (i == 0 ? "" : " ") + std::string(argv[i]);
+    } 
+    
     std::vector<std::string> new_argv;
     std::string temp;
     for (unsigned int i = 0; i < argc; ++i) {
         // collect the whole entry
         unsigned int j = 0;
-        while (argv[i][j] != NULL) {
+        while (argv[i][j] != '\0') {
             temp += argv[i][j];
             j++;
         }
@@ -721,7 +728,7 @@ void removeisolated() {
             ++i;
         }
     }
-    status("%d isolated places removed (%s)", isolatedPlacesRemoved, _cparameter_("STATESPACE"));
+    status("%d isolated places removed", isolatedPlacesRemoved);
 #endif
     for (unsigned int i = 0; i < Globals::Transitions[0]->cnt; ++i) {
         Globals::Transitions[i]->nr = i;

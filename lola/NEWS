@@ -34,6 +34,11 @@ Version 1.15-unreleased
   used without trailing space, for instance `-a analysisfile.task' is now
   equivalent to `-aanalysisfile.task'
 
+* configure LoLA with `--enable-syslog' to additionally write verbose output
+  to the syslog (e.g. `/var/log/system.log')
+
+* polished messages
+
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for
 complete version history.

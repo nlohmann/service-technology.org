@@ -26,6 +26,7 @@ AC_PROG_YACC
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_AUTOTEST
+AC_ST_VERBOSE
 
 # use drand48 if possible and fall back to rand otherwise
 AC_CHECK_FUNCS([drand48])

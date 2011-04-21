@@ -77,6 +77,10 @@ unsigned int NrOfStates;
 unsigned int Edges;
 
 
+inline void report_statistics() {
+    message("st: %10d edg: %10d", NrOfStates, Edges);
+}
+
 
 
 /*!
@@ -1003,7 +1007,7 @@ unsigned int depth_first() {
 #ifdef DISTRIBUTE
                     rapport(rapportstring);
 #else
-                    message("st: %d     edg: %d", NrOfStates, Edges);
+                    report_statistics();
 #endif
                 }
                 CurrentState->firelist[CurrentState->current]->fire();
@@ -2084,7 +2088,7 @@ unsigned int simple_depth_first() {
             // there is a next state that needs to be explored
             ++Edges;
             if (!(Edges % REPORTFREQUENCY)) {
-                message("st: %d     edg: %d", NrOfStates, Edges);
+                report_statistics();
             }
             CurrentState->firelist[CurrentState->current]->fire();
 
@@ -2466,7 +2470,7 @@ unsigned int breadth_first() {
 #ifdef DISTRIBUTE
                     rapport(rapportstring);
 #else
-		    message("st: %d     edg: %d", NrOfStates, Edges);
+		    report_statistics();
 #endif
                 }
                 CurrentState->firelist[CurrentState->current]->fire();
@@ -2918,7 +2922,7 @@ bool mutual_reach() {
             // there is a next state that needs to be explored
             Edges ++;
             if (!(Edges % REPORTFREQUENCY)) {
-		message("st: %d     edg: %d", NrOfStates, Edges);
+		report_statistics();
             }
             CurrentState->firelist[CurrentState->current]->fire();
             if ((NewState = SEARCHPROC())) {
@@ -3013,7 +3017,7 @@ bool target_reach() {
             // there is a next state that needs to be explored
             Edges ++;
             if (!(Edges % REPORTFREQUENCY)) {
-		message("st: %d     edg: %d", NrOfStates, Edges);
+		report_statistics();
             }
             CurrentState->firelist[CurrentState->current]->fire();
             if ((NewState = SEARCHPROC())) {
@@ -3370,7 +3374,7 @@ unsigned int compute_scc() {
             // there is a next state that needs to be explored
             ++Edges;
             if (!(Edges % REPORTFREQUENCY)) {
-                message("st: %d     edg: %d", NrOfStates, Edges);
+                report_statistics();
             }
             CurrentState->firelist[CurrentState->current]->fire();
             if ((NewState = SEARCHPROC())) {

@@ -29,7 +29,10 @@ option "safe" s
   "Assume that the message bound 1 one and the target net is safe."
   flag off
 
-
+option "distributed" d
+  "Invoke distributed mia"
+  flag off
+    
 section "Debug"
 
 option "verbose" v
@@ -96,3 +99,5 @@ option "noClean" -
   flag off
 
 text "\nReport bugs to mia@service-technology.org\nMia's home page: http://service-technology.org/mia"
+
+ 

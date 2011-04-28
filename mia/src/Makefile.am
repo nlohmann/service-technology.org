@@ -5,10 +5,11 @@ bin_PROGRAMS = mia
 mia_SOURCES = syntax_graph.yy lexic_graph.ll \
               syntax_im.yy lexic_im.ll \
               syntax_mi.yy lexic_mi.ll \
+              SafeMarking.cc SafeMarking.h \
               main.cc \
               verbose.cc verbose.h \
               cmdline.c cmdline.h \
-              Output.cc Output.h
+              Output.cc Output.h 
 
 # the configuration files
 sysconf_DATA = mia.conf

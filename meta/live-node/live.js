@@ -8,7 +8,7 @@ var processpool = new Array();
 // variables for memory consumption check
 var maxMem = 0;
 var maxPid = 0;
-var maxName = "";
+var maxName = '';
 
 // kill loop for memory consumption
 setInterval(function() {
@@ -17,7 +17,7 @@ setInterval(function() {
         var pi = processpool[p].pid;
 
         exec('ps -p ' + pi + ' -o rss -o comm -o pid | grep ' + pi, function(error,stdout,stderr) {
-            var dataarray = stdout.split(" ");
+            var dataarray = stdout.split(' ');
 
             if (dataarray[0] > maxMem) {
                 maxMem = dataarray[0];
@@ -28,16 +28,20 @@ setInterval(function() {
     }
 
     if (maxPid != 0 && require('os').freemem() < 512*1024*1024) {
-        console.log("stopping " + maxName + " " + maxPid + " (memory " + maxMem + ")");
-        process.kill(maxPid, 'SIGINT');
+        console.log('[' + maxPid + '] terminating ' + maxName + ': memory limit reached');
+        try {
+            process.kill(maxPid, 'SIGINT');
+        } catch(e) {
+            console.error('[' + maxPid + '] error: ' + e['message']);
+        }
         maxMem = 0;
         maxPid = 0;
-        maxName = "";
+        maxName = '';
     }
 }, 2000);
 
 
-var s = http.createServer(function (req, res) {
+var server = http.createServer(function (req, res) {
   // extract HTTP POST query and tool name from request
   var post = require('url').parse(req.url, true);
   var tool = post['pathname'].substr(1);
@@ -50,14 +54,15 @@ var s = http.createServer(function (req, res) {
 
   // give first feedback
   res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.write("Executing " + tool + "...\n");
+  res.write('Executing ' + tool + '...\n');
 
 
   // start tool
   var child = spawn(tool, parameters, {'cwd': '/tmp'});
+  var pid = child.pid;
   processpool.push(child);
 
-  console.log("started " + tool + " " + child.pid + " (" + processpool.length + ")");
+  console.log('[' + child.pid + '] started ' + tool + ' (process #' + processpool.length + ')');
 
   // redirect stdout to output
   child.stdout.on('data', function(data) {
@@ -71,20 +76,19 @@ var s = http.createServer(function (req, res) {
 
   // close connection once the tool terminates
   child.on('exit', function(code) {
-      console.log(tool + " terminated with code " + code);
-
       processpool.splice(processpool.indexOf(child), 1);
       clearTimeout(killprocess);
-      res.end(tool + " done with code " + code + "\n");
+
+      console.log('[' + pid + '] terminated ' + tool + ': exit code ' + code + ' (' + processpool.length + ' processes left)');
+      res.end(tool + ' terminated ' + tool + ' with code ' + code + '\n');
   });
 
   // kill tool after 60 seconds of execution
   var killprocess = setTimeout(function() {
-      console.log("stopping " + tool + " " + child.pid + " (timeout)");
-      res.write("Killing " + tool + "\n");
+      console.log('[' + maxPid + '] terminating ' + maxName + ': time limit reached');
       child.kill('SIGINT');
   }, 60000);
 });
 
-s.listen(1337);
+server.listen(1337);
 console.log('Server running at http://127.0.0.1:1337/');

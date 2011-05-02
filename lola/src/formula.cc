@@ -1715,7 +1715,8 @@ int initialize_statepredicate() { // return: value if formula constant
     if (F ->  tempcard) {
         abort(3, "temporal operators are not allowed in state predicates (%s)", _cparameter_("WITHFORMULA"));
     }
-    cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
+    message("Formula with %d subformula(s) (%s)", F->card, _cparameter_("WITHFORMULA"));
+    //cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
     F -> parent = NULL;
     F -> initatomic();
 
@@ -1735,7 +1736,8 @@ int initialize_ctl() { // return: value if formula constant
     F = F -> posate(); // eliminate negations
     F -> tempcard = 0;
     F -> setstatic();
-    cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
+    message("Formula with %d subformula(s) (%s)", F->card, _cparameter_("WITHFORMULA"));
+    //cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
     F -> parent = NULL;
     F -> initatomic();
     return -1;

@@ -59,7 +59,10 @@ State* TarStack;
 unsigned int NrOfStates;
 unsigned int Edges;
 void statistics(unsigned int s, unsigned int e, unsigned int h) {
-    cout << "\n\n>>>>> " << s << " States, " << e << " Edges, " << h << " Hash table entries\n\n";
+//    cerr << "\n\n";
+    message(">>>>> %d States, %d Edges, %d Hash table entries", s, e, h);
+//    cerr << "\n";
+    //cout << "\n\n>>>>> " << s << " States, " << e << " Edges, " << h << " Hash table entries\n\n";
 }
 
 Transition** firelist() {
@@ -428,7 +431,7 @@ unsigned int depth_first() {
     if (F ->  tempcard) {
         abort(3, "temporal operators are not allowed in state predicates (%s)", _cparameter_("WITHFORMULA"));
     }
-    cout << "\n Formula with\n" << F -> card << " subformula(s).\n";
+    message("Formula with %d subformula(s) (%s)", F->card, _cparameter_("WITHFORMULA"));
     F -> parent = NULL;
 #endif
     if (SEARCHPROC()) {

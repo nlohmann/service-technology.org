@@ -95,7 +95,10 @@ inline void report_statistics() {
 */
 void statistics(unsigned int s, unsigned int e, unsigned int h) {
 #ifndef STATESPACE
-    cout << "\n\n>>>>> " << s << " States, " << e << " Edges, " << h << " Hash table entries\n\n";
+//    cerr << "\n\n";
+    message(">>>>> %d States, %d Edges, %d Hash table entries", s, e, h);
+//    cerr << "\n";
+//    cout << "\n\n>>>>> " << s << " States, " << e << " Edges, " << h << " Hash table entries\n\n";
 
     static bool first = true;
     if (Globals::resultfile && first) {
@@ -2425,7 +2428,7 @@ unsigned int breadth_first() {
         abort(3, "temporal operators are not allowed in state predicates - not allowed for task %s", _cparameter_("STATEPREDICATE"));
     }
     //cout << "\n Formula with\n" << F->card << " subformula.\n";
-    message("Formula with %d subformula(s)", F->card);
+    message("Formula with %d subformula(s) (%s)", F->card, _cparameter_("STATEPREDICATE"));
     F->parent = NULL;
     if (F->initatomic()) {
         //cout << "\nstate found!\n";
@@ -3169,10 +3172,10 @@ int liveproperty() {
     F->tempcard = 0;
     F->setstatic();
     if (F->tempcard) {
-        abort(3, "temporal operators are not allowed in state predicates - not allowed for task %s", _cparameter_("LIVEPROB"));
+        abort(3, "temporal operators are not allowed in state predicates - not allowed for task %s", _cparameter_("LIVEPROP"));
     }
     //cout << "\n Formula with\n" << F->card << " subformula.\n";
-    message("Formula with %d subformula(s)", F->card);
+    message("Formula with %d subformula(s) (%s)", F->card, _cparameter_("LIVEPROP"));
     F->parent = NULL;
 
     for (i = 0; i < Globals::Places[0]->cnt; i++) {

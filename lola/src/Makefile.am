@@ -34,40 +34,7 @@ lola_EXTRASOURCES = ltl.H ltl.cc
 include $(top_srcdir)/m4/Makefile.src
 
 # user configs
-EXTRA_DIST += configs/boundednet/userconfig.H                    \
-              configs/boundednetsymm/userconfig.H                \
-              configs/boundedplace/userconfig.H                  \
-              configs/bpm-liveprop/userconfig.H                  \
-              configs/bpm-liveprop1/userconfig.H                 \
-              configs/bpm-modelchecking/userconfig.H             \
-              configs/bpm-modelchecking-naiv/userconfig.H        \
-              configs/bpm-modelchecking1/userconfig.H            \
-              configs/bpm-modelchecking1-naiv/userconfig.H       \
-              configs/bpm-statepredicate/userconfig.H            \
-              configs/bpm-statepredicate-naiv/userconfig.H       \
-              configs/bpm-statepredicate1/userconfig.H           \
-              configs/bpm-statepredicate1-naiv/userconfig.H      \
-              configs/coverstatepredicate/userconfig.H           \
-              configs/deadlock/userconfig.H                      \
-              configs/deadlock1/userconfig.H                     \
-              configs/deadtransition/userconfig.H                \
-              configs/findpath/userconfig.H                      \
-              configs/full/userconfig.H                          \
-              configs/full1/userconfig.H                         \
-              configs/fullcover/userconfig.H                     \
-              configs/fulllimited/userconfig.H                   \
-              configs/liveprop/userconfig.H                      \
-              configs/liveprop1/userconfig.H                     \
-              configs/modelchecking/userconfig.H                 \
-              configs/none/userconfig.H                          \
-              configs/prom-boundednet/userconfig.H               \
-              configs/prom-deadlock/userconfig.H                 \
-              configs/prom-home/userconfig.H                     \
-              configs/prom-reversibility/userconfig.H            \
-              configs/statepredicate/userconfig.H                \
-              configs/statepredicate1/userconfig.H               \
-              configs/statespace/userconfig.H                    \
-              configs/statespace1/userconfig.H
+EXTRA_DIST += configs
 
 
 #############################################################################

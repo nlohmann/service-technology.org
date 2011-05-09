@@ -1926,16 +1926,16 @@ int initialize_transition() {
 #ifdef BOUNDEDPLACE
 #define INITIALIZE_PROPERTY initialize_place
 #define CHECK_EARLY_ABPRTION (!Globals::CheckPlace->bounded)
-#define EARLY_ABORT_MESSAGE "place "<< Globals::CheckPlace->name << " is unbounded!"
-#define LATE_ABORT_MESSAGE "place "<< Globals::CheckPlace->name << " is bounded!"
+#define EARLY_ABORT_MESSAGE std::string("place " + std::string(Globals::CheckPlace->name) + " is unbounded!").c_str()
+#define LATE_ABORT_MESSAGE std::string("place " + std::string(Globals::CheckPlace->name) + " is bounded!").c_str()
 #define RESULT_NAME "unbounded place"
 #endif
 
 #ifdef DEADTRANSITION
 #define INITIALIZE_PROPERTY initialize_transition
 #define CHECK_EARLY_ABORTION (Globals::CheckTransition->enabled)
-#define EARLY_ABORT_MESSAGE "transition " << Globals::CheckTransition->name << " is not dead\n"
-#define LATE_ABORT_MESSAGE "transition " << Globals::CheckTransition->name << " is dead\n"
+#define EARLY_ABORT_MESSAGE std::string("transition " + std::string(Globals::CheckTransition->name) + " is not dead\n").c_str()
+#define LATE_ABORT_MESSAGE std::string("transition " + std::string(Globals::CheckTransition->name) + " is dead\n").c_str()
 #define RESULT_NAME "not dead"
 #endif
 
@@ -3130,7 +3130,7 @@ int reversibility() {
         }
         if (!mutual_reach()) {
             //cout << "\nnot reversible: no return to m0 from reported state\n\n";
-            message(_cbad("not reversible: no return to m0 from reported state"));
+            message(_cbad_("not reversible: no return to m0 from reported state"));
 
             if (Globals::resultfile) {
                 fprintf(Globals::resultfile, "reversibility: {\n  result = false;\n");

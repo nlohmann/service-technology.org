@@ -6,6 +6,7 @@
 #include <config.h>
 #include <cstdio>
 #include <string>
+#include <cstring>
 #include <map>
 
 #define YYDEBUG 1

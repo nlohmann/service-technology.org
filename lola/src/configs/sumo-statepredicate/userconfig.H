@@ -33,8 +33,8 @@
 // space construction reaches a state with more tokens on a place
 // than specified.
 
-//#define CHECKCAPACITY
-//#define CAPACITY 1
+#define CHECKCAPACITY
+#define CAPACITY 255
 
 // REPORTFREQUENCY controls the output of progress messages to the
 // terminal (to be precise: to the standard error stream).
@@ -151,9 +151,9 @@
 //#define HOME
 //#define FINDPATH
 //#define FULL
-#define DEADLOCK
+//#define DEADLOCK
 //#define NONE
-//#define STATEPREDICATE
+#define STATEPREDICATE
 //#define LIVEPROP
 //#define FAIRPROP
 //#define STABLEPROP

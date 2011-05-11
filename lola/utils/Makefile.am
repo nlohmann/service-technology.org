@@ -1,12 +1,14 @@
 .SUFFIXES = .ggo
 
-bin_PROGRAMS =  graph2dot
+bin_PROGRAMS =  graph2dot form
 
 AM_CPPFLAGS = -I$(top_srcdir)
 
 graph2dot_SOURCES = syntax_graph.yy lexic_graph.ll \
                     cmdline-graph2dot.c cmdline-graph2dot.h \
                     graph2dot.cc
+
+form_SOURCES = form-syntax.yy form-lexic.ll
 
 #---------------------------------------------------#
 # GENERIC: initialization for other generic targets #
@@ -19,7 +21,7 @@ DISTCLEANFILES =
 #--------------------------------------------------------------#
 # GENERIC: organize distribution and cleaning of Bison sources #
 #--------------------------------------------------------------#
-BISON_FILES = $(filter %.yy,$(graph2dot_SOURCES))
+BISON_FILES = $(filter %.yy,$(graph2dot_SOURCES)) $(filter %.yy,$(form_SOURCES))
 BUILT_SOURCES += $(BISON_FILES:.yy=.cc)
 EXTRA_DIST += $(BISON_FILES:.yy=.h)
 MAINTAINERCLEANFILES += $(BISON_FILES:.yy=.h)

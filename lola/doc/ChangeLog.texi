@@ -17,6 +17,8 @@
 @item configure LoLA with @option{--enable-syslog} to additionally write verbose output to the syslog (e.g. @file{/var/log/system.log})
 
 @item polished messages
+
+@item added tool @samp{form} (in folder @file{utils}) to translate formulae of the SUMo 2011 Model Checking Contest into LoLA file format
 @end itemize
 
 

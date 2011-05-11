@@ -39,6 +39,9 @@ Version 1.15-unreleased
 
 * polished messages
 
+* added tool `form' (in folder `utils') to translate formulae of the SUMo
+  2011 Model Checking Contest into LoLA file format
+
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for
 complete version history.

@@ -1,4 +1,4 @@
-EXTRA_PROGRAMS = bin-lola-boundednet bin-lola-boundednetsymm bin-lola-boundedplace bin-lola-bpm-liveprop bin-lola-bpm-liveprop1 bin-lola-bpm-modelchecking bin-lola-bpm-modelchecking-naiv bin-lola-bpm-modelchecking1 bin-lola-bpm-modelchecking1-naiv bin-lola-bpm-statepredicate bin-lola-bpm-statepredicate-naiv bin-lola-bpm-statepredicate1 bin-lola-bpm-statepredicate1-naiv bin-lola-coverstatepredicate bin-lola-deadlock bin-lola-deadlock1 bin-lola-deadtransition bin-lola-findpath bin-lola-full bin-lola-full1 bin-lola-fullcover bin-lola-fulllimited bin-lola-liveprop bin-lola-liveprop1 bin-lola-modelchecking bin-lola-none bin-lola-prom-boundednet bin-lola-prom-deadlock bin-lola-prom-home bin-lola-prom-reversibility bin-lola-statepredicate bin-lola-statepredicate1 bin-lola-statespace bin-lola-statespace1 bin-lola-sumo-deadlock 
+EXTRA_PROGRAMS = bin-lola-boundednet bin-lola-boundednetsymm bin-lola-boundedplace bin-lola-bpm-liveprop bin-lola-bpm-liveprop1 bin-lola-bpm-modelchecking bin-lola-bpm-modelchecking-naiv bin-lola-bpm-modelchecking1 bin-lola-bpm-modelchecking1-naiv bin-lola-bpm-statepredicate bin-lola-bpm-statepredicate-naiv bin-lola-bpm-statepredicate1 bin-lola-bpm-statepredicate1-naiv bin-lola-coverstatepredicate bin-lola-deadlock bin-lola-deadlock1 bin-lola-deadtransition bin-lola-findpath bin-lola-full bin-lola-full1 bin-lola-fullcover bin-lola-fulllimited bin-lola-liveprop bin-lola-liveprop1 bin-lola-modelchecking bin-lola-none bin-lola-prom-boundednet bin-lola-prom-deadlock bin-lola-prom-home bin-lola-prom-reversibility bin-lola-statepredicate bin-lola-statepredicate1 bin-lola-statespace bin-lola-statespace1 bin-lola-sumo-deadlock bin-lola-sumo-statepredicate 
 
 bin_lola_boundednet_SOURCES = $(lola_SOURCES)
 bin_lola_boundednet_CPPFLAGS = $(AM_CPPFLAGS)
@@ -209,4 +209,10 @@ bin_lola_sumo_deadlock_CPPFLAGS = $(AM_CPPFLAGS)
 lola-sumo-deadlock:
 	$(AM_V_at)$(MAKE) bin-lola-sumo-deadlock$(EXEEXT) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/sumo-deadlock $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
 	$(AM_V_GEN)mv $(builddir)/bin-lola-sumo-deadlock$(EXEEXT) $(builddir)/lola-sumo-deadlock$(EXEEXT)
+
+bin_lola_sumo_statepredicate_SOURCES = $(lola_SOURCES)
+bin_lola_sumo_statepredicate_CPPFLAGS = $(AM_CPPFLAGS)
+lola-sumo-statepredicate:
+	$(AM_V_at)$(MAKE) bin-lola-sumo-statepredicate$(EXEEXT) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/sumo-statepredicate $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-sumo-statepredicate$(EXEEXT) $(builddir)/lola-sumo-statepredicate$(EXEEXT)
 

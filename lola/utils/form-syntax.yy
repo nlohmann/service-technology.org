@@ -19,6 +19,7 @@ std::string currentComparison = "";
 int instances = 0;
 int multiplicity = 0;
 int instanceCount = 0;
+bool invariant = false;
 
 extern int yylex();
 extern int yyerror(const char *);
@@ -51,6 +52,7 @@ formula:
     quantifier subformula EOL
     {
         fprintf(outfile, ")\n");
+        fprintf(outfile, "{ %s }\n", invariant ? "INVARIANT" : "REACHABILITY");
         fclose(outfile);
     }
 ;
@@ -59,10 +61,12 @@ quantifier:
     REACHABLE
     {
         fprintf(outfile, "(");
+        invariant = false;
     }
 |   INVARIANT
     {
         fprintf(outfile, "(NOT ");
+        invariant = true;
     }
 ;
 

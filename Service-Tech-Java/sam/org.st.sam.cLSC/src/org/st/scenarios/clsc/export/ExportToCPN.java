@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.cpntools.accesscpn.model.Instance;
-import org.cpntools.accesscpn.model.ModelFactory;
 import org.cpntools.accesscpn.model.Page;
 import org.cpntools.accesscpn.model.PetriNet;
 import org.cpntools.accesscpn.model.Place;
@@ -43,6 +42,8 @@ import org.st.scenarios.clsc.Specification;
 
 public class ExportToCPN {
 
+	private BuildCPNUtil toCPN;
+	
 	private Specification spec;
 	private PetriNet net;
 
@@ -64,6 +65,7 @@ public class ExportToCPN {
 	 */
 	public ExportToCPN(Specification spec) {
 		this.spec = spec;
+		this.toCPN = new BuildCPNUtil();
 	}
 
 	/**
@@ -72,7 +74,7 @@ public class ExportToCPN {
 	 * @return the resulting {@link PetriNet} that can be exported to CPN Tools
 	 */
 	public PetriNet translate() {
-		this.net = ModelFactory.INSTANCE.createPetriNet();
+		this.net = toCPN.createPetriNet();
 
 		// write type declarations
 		addTypeDeclarations();
@@ -89,7 +91,7 @@ public class ExportToCPN {
 
 		// create the main page to contain all scenarios and their
 		// interconnections
-		mainPage = BuildCPNUtil.addPage(net, "Spec");
+		mainPage = toCPN.addPage(net, "Spec");
 
 		// translate each scenario
 		for (Scenario s : spec.scenarios) {
@@ -117,10 +119,10 @@ public class ExportToCPN {
 	private Page translateScenario_toPage(Scenario s) {
 		
 		// create the page
-		Page pg = BuildCPNUtil.addPage(net, s.getName());
+		Page pg = toCPN.addPage(net, s.getName());
 		scenario_to_page.put(s, pg);
 
-		Instance t_scen = BuildCPNUtil.createSubPageTransition(pg, mainPage, s.getName());
+		Instance t_scen = toCPN.createSubPageTransition(pg, mainPage, s.getName());
 
 		Chart main = s.mainChart;
 
@@ -131,13 +133,13 @@ public class ExportToCPN {
 		// create a transition for each main-chart event
 		HashMap<Event, Transition> e2t = new HashMap<Event, Transition>();
 		for (Event e : main.getEvents()) {
-			Transition t = BuildCPNUtil.addTransition(pg, e.name);
+			Transition t = toCPN.addTransition(pg, e.name);
 			e2t.put(e, t);
 
 			// and add a place to count occurrences of t
-			Place p = BuildCPNUtil.addPlace(pg, "", "INT", "1`0");
-			BuildCPNUtil.addArc(pg, p, t, "j");
-			BuildCPNUtil.addArc(pg, t, p, "j+1");
+			Place p = toCPN.addPlace(pg, "", "INT", "1`0");
+			toCPN.addArc(pg, p, t, "j");
+			toCPN.addArc(pg, t, p, "j+1");
 		}
 
 		// create the places surrounding the transitions of the main-chart events 
@@ -145,17 +147,17 @@ public class ExportToCPN {
 
 			int hist_var_count = 0;
 			for (Dependency d : e.in) {
-				Place p = BuildCPNUtil.addPlace(pg, "", "TOKENHIST");
+				Place p = toCPN.addPlace(pg, "", "TOKENHIST");
 				// Annotate the incoming arcs of the transition with a history
 				// variable. Each incoming dependency 'd' defines a new incoming arc
 				// which requires a new history variable "hX"
-				BuildCPNUtil.addArc(pg, p, e2t.get(d.getTarget()), "h"+hist_var_count);
+				toCPN.addArc(pg, p, e2t.get(d.getTarget()), "h"+hist_var_count);
 				hist_var_count++;
 
 				// Annotate the outgoing arcs of the transition with the
 				// function that extends the consumed token histories with an
 				// occurrence of the event represented by this transition
-				BuildCPNUtil.addArc( pg,	e2t.get(d.getSource()),	p,
+				toCPN.addArc( pg,	e2t.get(d.getSource()),	p,
 						getTransitionOutGoingArcFunction(d.getSource(),	getPredecessorEvents(d.getSource(), s)));
 			}
 
@@ -165,16 +167,16 @@ public class ExportToCPN {
 				// level place and connect it to the hierarchical transition that
 				// contains this scenario
 				if (!maxPlaces.containsKey(e.name)) {
-					Place p = BuildCPNUtil.addPlace(mainPage, e.name, "TOKENHIST");
+					Place p = toCPN.addPlace(mainPage, e.name, "TOKENHIST");
 					maxPlaces.put(e.name, p);
 				}
 				Place pTop = maxPlaces.get(e.name);
-				BuildCPNUtil.addArc(mainPage, t_scen, pTop, "");
+				toCPN.addArc(mainPage, t_scen, pTop, "");
 
 				// then create the scenario level reference place and connect it
 				// to the specification level place
-				RefPlace p = BuildCPNUtil.addReferencePlace(pg, e.name, "TOKENHIST", "", pTop, t_scen);
-				BuildCPNUtil.addArc(pg, e2t.get(e), p,
+				RefPlace p = toCPN.addReferencePlace(pg, e.name, "TOKENHIST", "", pTop, t_scen);
+				toCPN.addArc(pg, e2t.get(e), p,
 						getTransitionOutGoingArcFunction(e,	getPredecessorEvents(e, s)));
 			}
 
@@ -182,7 +184,7 @@ public class ExportToCPN {
 				// each minimal main chart event consumes from its places that were
 				// created and defined in translateScenario_activationLogic()
 				for (int i = 0; i < minPlaces.get(e).length; i++) {
-					BuildCPNUtil.addArc(pg, minPlaces.get(e)[i], e2t.get(e),	"h"+i);
+					toCPN.addArc(pg, minPlaces.get(e)[i], e2t.get(e),	"h"+i);
 				}
 			}
 		} // create places
@@ -282,7 +284,7 @@ public class ExportToCPN {
 			// scenario without pre-chart, create an initially marked place for
 			// each minimal main-chart event
 			for (Event f : main.getMinEvents()) {
-				Place p = BuildCPNUtil.addPlace(pg, "init", "TOKENHIST", "1`{max=[nullEV],deps=[]}");
+				Place p = toCPN.addPlace(pg, "init", "TOKENHIST", "1`{max=[nullEV],deps=[]}");
 				minPlaces.put(f, new Place[] { p });
 			}
 		} else {
@@ -292,22 +294,22 @@ public class ExportToCPN {
 				// the scenario consumes a token produced by each maximal
 				// pre-chart event
 				if (!maxPlaces.containsKey(e.name)) {
-					Place p = BuildCPNUtil.addPlace(mainPage, e.name, "TOKENHIST");
+					Place p = toCPN.addPlace(mainPage, e.name, "TOKENHIST");
 					maxPlaces.put(e.name, p);
 				}
 
 				// add an arc from the specification level interface place to
 				// the hierarchical transition representing the scenario
 				Place p = maxPlaces.get(e.name);
-				BuildCPNUtil.addArc(mainPage, p, t_scen, "");
+				toCPN.addArc(mainPage, p, t_scen, "");
 			}
 
 			// the transition to activate the scenario
-			Transition t_activate = BuildCPNUtil.addTransition(pg, "activate_"+s.getName(), "[endsWith(h,hPre)]");
-			Place      p_preChart = BuildCPNUtil.addPlace(pg, "pre_"+s.getName(), "TOKENHIST",
+			Transition t_activate = toCPN.addTransition(pg, "activate_"+s.getName(), "[endsWith(h,hPre)]");
+			Place      p_preChart = toCPN.addPlace(pg, "pre_"+s.getName(), "TOKENHIST",
 					"1`"+translateChartToTokenHistoryString(pre));
-			BuildCPNUtil.addArc(pg, p_preChart, t_activate, "hPre");
-			BuildCPNUtil.addArc(pg, t_activate, p_preChart, "hPre");
+			toCPN.addArc(pg, p_preChart, t_activate, "hPre");
+			toCPN.addArc(pg, t_activate, p_preChart, "hPre");
 
 			// create for each minimal main chart event its own set of
 			// pre-places
@@ -326,14 +328,14 @@ public class ExportToCPN {
 				// create interface place at the scenario-level and connect it
 				// to the place with the same name at the specification level
 				Place pTop = maxPlaces.get(e.name);
-				RefPlace p = BuildCPNUtil.addReferencePlace(pg, e.name, "TOKENHIST", "", pTop, t_scen);
+				RefPlace p = toCPN.addReferencePlace(pg, e.name, "TOKENHIST", "", pTop, t_scen);
 
 				// the activation transition consumes from the scenario level place 
-				BuildCPNUtil.addArc(pg, p, t_activate, "h"+hist_var_count);
+				toCPN.addArc(pg, p, t_activate, "h"+hist_var_count);
 				// and produces on the corresponding place for each minimal main-chart event 
 				for (Event f : main.getMinEvents()) {
-					Place p2 = BuildCPNUtil.addPlace(pg, "", "TOKENHIST");
-					BuildCPNUtil.addArc(pg, t_activate, p2, "h"+ hist_var_count);
+					Place p2 = toCPN.addPlace(pg, "", "TOKENHIST");
+					toCPN.addArc(pg, t_activate, p2, "h"+ hist_var_count);
 					minPlaces.get(f)[hist_var_count] = p2;
 				}
 				
@@ -463,34 +465,34 @@ public class ExportToCPN {
 	 * declare all color sets required for the translation
 	 */
 	private void addTypeDeclarations() {
-		BuildCPNUtil.declareStandardColors(net);
+		toCPN.declareStandardColors(net);
 		// colset STRINGLIST = list STRING;
-		BuildCPNUtil.declareColorSet_list(net, "STRINGLIST", "STRING");
+		toCPN.declareColorSet_list(net, "STRINGLIST", "STRING");
 		// colset ID = product STRING * INT;
-		BuildCPNUtil.declareColorSet_product(net, "ID", new String[] {
+		toCPN.declareColorSet_product(net, "ID", new String[] {
 				"STRING", "INT" });
 		// val nullEV = ("", 0); (* --- the nill event used to terminate token
 		// histories --- *)
-		BuildCPNUtil.declareMLFunction(net, "val "+getNullEventString()+" = "+getEventString("", 0)+";");
+		toCPN.declareMLFunction(net, "val "+getNullEventString()+" = "+getEventString("", 0)+";");
 
 		// colset EVENTLIST = list ID;
-		BuildCPNUtil.declareColorSet_list(net, "EVENTLIST", "ID");
+		toCPN.declareColorSet_list(net, "EVENTLIST", "ID");
 		// colset HISTREL = record event:ID * pred:ID;
-		BuildCPNUtil.declareColorSet_record(net, "HISTREL", new String[] {
+		toCPN.declareColorSet_record(net, "HISTREL", new String[] {
 				"event", "ID", "pred", "ID" });
 		// colset EVENTDEP = list HISTREL
-		BuildCPNUtil.declareColorSet_list(net, "EVENTDEP", "HISTREL");
+		toCPN.declareColorSet_list(net, "EVENTDEP", "HISTREL");
 		// colset TOKENHIST = record max:EVENTLIST * deps:EVENTDEP;
-		BuildCPNUtil.declareColorSet_record(net, "TOKENHIST", new String[] {
+		toCPN.declareColorSet_record(net, "TOKENHIST", new String[] {
 				"max", "EVENTLIST", "deps", "EVENTDEP" });
 		// colset TOKENHISTLIST = list TOKENHIST;
-		BuildCPNUtil.declareColorSet_list(net, "TOKENHISTLIST", "TOKENHIST");
+		toCPN.declareColorSet_list(net, "TOKENHISTLIST", "TOKENHIST");
 
 		// colset EVENTPAIR = product ID * ID;
-		BuildCPNUtil.declareColorSet_product(net, "EVENTPAIR", new String[] {
+		toCPN.declareColorSet_product(net, "EVENTPAIR", new String[] {
 				"ID", "ID" });
 		// colset EVENTPAIRLIST = list EVENTPAIR;
-		BuildCPNUtil.declareColorSet_list(net, "EVENTPAIRLIST", "EVENTPAIR");
+		toCPN.declareColorSet_list(net, "EVENTPAIRLIST", "EVENTPAIR");
 	}
 
 	/**
@@ -498,17 +500,17 @@ public class ExportToCPN {
 	 */
 	private void addVariableDeclarations() {
 		// the variable to read the prechart from a dedicated place
-		BuildCPNUtil.declareVariable(net, "hPre", "TOKENHIST");
+		toCPN.declareVariable(net, "hPre", "TOKENHIST");
 		// each incoming arc of a transition gets a different variable
 		// determine the maximum indegree of a transition, and declare
 		// a variable
 		int histVars = getNumberOfHistVariables();
 		for (int i = 0; i < histVars; i++) {
-			BuildCPNUtil.declareVariable(net, "h" + i, "TOKENHIST");
+			toCPN.declareVariable(net, "h" + i, "TOKENHIST");
 		}
 
 		// we need to count occurrences of transitions. this is the variable
-		BuildCPNUtil.declareVariable(net, "j", "INT");
+		toCPN.declareVariable(net, "j", "INT");
 	}
 
 	/**
@@ -523,25 +525,24 @@ public class ExportToCPN {
 	 */
 	private void addFunctionDeclarations() {
 		try {
-			BuildCPNUtil.declareMLFunction(net,
+			toCPN.declareMLFunction(net,
 					readFromFile(DIR_ML_DECLARATIONS + "/getEvent.ml.txt"));
-			BuildCPNUtil.declareMLFunction(net,
+			toCPN.declareMLFunction(net,
 					readFromFile(DIR_ML_DECLARATIONS + "/appendEvent.ml.txt"));
-			BuildCPNUtil
-					.declareMLFunction(net, readFromFile(DIR_ML_DECLARATIONS
+			toCPN.declareMLFunction(net, readFromFile(DIR_ML_DECLARATIONS
 							+ "/joinHistories.ml.txt"));
 
-			BuildCPNUtil.declareMLFunction(net,
+			toCPN.declareMLFunction(net,
 					readFromFile(DIR_ML_DECLARATIONS + "/matchEvent.ml.txt"));
-			BuildCPNUtil.declareMLFunction(net,
+			toCPN.declareMLFunction(net,
 					readFromFile(DIR_ML_DECLARATIONS + "/matchEvents.ml.txt"));
-			BuildCPNUtil.declareMLFunction(net,
+			toCPN.declareMLFunction(net,
 					readFromFile(DIR_ML_DECLARATIONS
 							+ "/getPredecessorEvents.ml.txt"));
-			BuildCPNUtil.declareMLFunction(net,
+			toCPN.declareMLFunction(net,
 					readFromFile(DIR_ML_DECLARATIONS
 							+ "/matchPredecessors.ml.txt"));
-			BuildCPNUtil.declareMLFunction(net,
+			toCPN.declareMLFunction(net,
 					readFromFile(DIR_ML_DECLARATIONS + "/endsWith.ml.txt"));
 
 		} catch (FileNotFoundException e) {

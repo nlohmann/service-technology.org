@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: CLSC
+Bundle-SymbolicName: org.st.sam.cLSC
+Bundle-Version: 1.0.0.qualifier
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.st.scenarios.clsc,
+ org.st.scenarios.clsc.export
+Import-Package: org.cpntools.accesscpn.model,
+ org.cpntools.accesscpn.model.exporter,
+ org.cpntools.accesscpn.model.util

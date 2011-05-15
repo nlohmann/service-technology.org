@@ -34,4 +34,24 @@ public class Specification {
 	public Specification() {
 		scenarios = new LinkedList<Scenario>();
 	}
+	
+	public String toDot() {
+		StringBuilder b = new StringBuilder();
+		
+		b.append("digraph Specification {\n");
+		
+	    // standard style for nodes and edges
+	    b.append("graph [fontname=\"Helvetica\" nodesep=0.3 ranksep=\"0.2 equally\" fontsize=10];\n");
+	    b.append("node [fontname=\"Helvetica\" fontsize=8 shape=box fixedsize width=\"1.0\" height=\".3\" label=\"\" style=filled fillcolor=white];\n");
+	    b.append("edge [fontname=\"Helvetica\" fontsize=8 color=black arrowhead=none weight=\"20.0\"];\n\n");
+
+	    for (Scenario s : scenarios) {
+	    	b.append(s.toDot());
+	    	b.append("\n");
+	    }
+		
+	    b.append("}\n");
+	    
+		return b.toString();
+	}
 }

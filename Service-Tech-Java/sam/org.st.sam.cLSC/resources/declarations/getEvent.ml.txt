@@ -1,0 +1,5 @@
+fun getEvent (eventName:STRING, ev::events:EVENTLIST) =
+  (* --- find the event event in the list that has the given name *)
+  if #1 ev = eventName then ev
+  else getEvent(eventName, events)
+| getEvent (_, nil) = nullEV;

@@ -1,0 +1,17 @@
+fun appendEvent (newEvent: ID,
+                             predName::predNames: STRINGLIST,
+                             hist: TOKENHIST) =
+(* --- append newEvent to hist: remove its predecessors
+         from max and add the event dependencies to hist *)
+let
+  val predEvent = getEvent(predName, #max hist)
+  val oldHist = #max hist
+  val redMax = rmall predEvent oldHist
+  val extHist =
+    {max=redMax,
+      deps={event=newEvent, pred=predEvent }::(#deps hist) }
+in
+  appendEvent(newEvent, predNames, extHist)
+end
+| appendEvent(newEvent: ID, nil, hist: TOKENHIST) =
+  { max = newEvent::(#max hist), deps =(#deps hist) };

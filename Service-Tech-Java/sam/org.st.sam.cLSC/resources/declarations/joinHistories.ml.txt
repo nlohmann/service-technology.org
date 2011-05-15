@@ -1,0 +1,12 @@
+fun joinHistories (hist::hists: TOKENHISTLIST) =
+(* --- join a set of token histories: events are uniquely
+         identified by a counting number, so joining all
+         events and relations and removing duplicates yields
+         their union *)
+let
+  val joined = joinHistories(hists)
+in
+  { max=remdupl (union (#max hist) (#max joined)),
+     deps=remdupl (union (#deps hist) (#deps joined)) }
+end
+| joinHistories nil = {max=[], deps=[] };

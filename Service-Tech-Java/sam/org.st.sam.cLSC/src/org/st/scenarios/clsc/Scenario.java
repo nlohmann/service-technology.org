@@ -49,4 +49,46 @@ public class Scenario {
 	public String getName() {
 		return name;
 	}
+	
+	public String toDot() {
+		StringBuilder b = new StringBuilder();
+		
+		String sName = name.replace(' ', '_');
+		
+		b.append("subgraph cluster_"+sName+" {\n");
+		 
+		if (preChart != null) {
+			for (Event e : preChart.getEvents()) {
+				b.append("e"+e.hashCode()+"[label=\""+e.name+"\" fillcolor=\"grey\"]\n");
+			}
+			for (Dependency d : preChart.getDependencies()) {
+				b.append("e"+d.getSource().hashCode()+" -> e"+d.getTarget().hashCode()+";\n");
+			}
+		}
+		
+		b.append("\n");
+		
+		if (mainChart != null) {
+			for (Event e : mainChart.getEvents()) {
+				b.append("e"+e.hashCode()+"[label=\""+e.name+"\"]\n");
+			}
+			for (Dependency d : mainChart.getDependencies()) {
+				b.append("e"+d.getSource().hashCode()+" -> e"+d.getTarget().hashCode()+";\n");
+			}
+		}
+		
+		b.append("\n");
+		
+		if (preChart != null && mainChart != null) {
+			for (Event e : preChart.getMaxEvents()) {
+				for (Event f : mainChart.getMinEvents()) {
+					b.append("e"+e.hashCode()+" -> e"+f.hashCode()+";\n");
+				}
+			}
+		}
+		
+		b.append("}\n");
+		
+		return b.toString();
+	}
 }

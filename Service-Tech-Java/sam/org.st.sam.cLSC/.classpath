@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="libs-external/org.cpntools.accesscpn.model_1.0.1.jar"/>
 	<classpathentry kind="lib" path="libs-external/org.cpntools.accesscpn.model.exporter_1.0.1.jar"/>
 	<classpathentry kind="lib" path="tests/libs-external/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="libs-external/antlr-runtime-3.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

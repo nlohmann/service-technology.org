@@ -38,9 +38,9 @@
          	debug="on" />
 	</target>
 	
-	<target name="check" depends="build-test">
+	<target name="check" depends="svn-clean,build-test">
 		<echo message="Running JUnit tests in ${test.basedir}" />
-	    <junit fork="yes">
+	    <junit fork="yes" dir="${home}">
 	    	
 	      <!-- class path of the code to test and the Junit framework -->
 	      <classpath refid="classpath.test"/>
@@ -50,8 +50,9 @@
     	  <formatter type="plain" />
 	    	
 	      <!-- JUnit: test cases to run -->
-	    	  <sysproperty key="test.testFileRoot" path="${dir.testfiles}"/>
-	      <test name="org.st.scenarios.test.TranslationTest" />
+	      <sysproperty key="test.testFileRoot" path="${dir.testfiles}"/>
+	      <test name="org.st.scenarios.test.ParserTest" todir="${test.basedir}"/>
+	      <test name="org.st.scenarios.test.TranslationTest"  todir="${test.basedir}"/>
 	    </junit>
 		
 		<antcall target="clean" />

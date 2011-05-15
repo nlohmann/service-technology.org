@@ -3,7 +3,7 @@
 	<!-- the pre-build hook, add here all dependencies and steps to be
 	     carried out before executing the project build task -->
 	
-	<target name="pre-build">
+	<target name="pre-build" depends="parser_cLSC">
 	</target>
 	
 	<target name="pre-svn-clean">
@@ -11,6 +11,29 @@
 	
 	<fileset dir="${home}" id="distfiles.includes">
 		<include name="README"/>
+		<include name="src/org/st/scenarios/clsc/CLSC.g"/>
 	</fileset>
+	
+	<!-- generate LoLA parser files -->
+	<target name="parser_cLSC.dependencies" 
+			description="Check dependencies for generating Java class files from ANTLR parser description.">
+	    <condition property="updateParser_lola.notRequired">
+	        <and>
+	    		<uptodate
+	    			targetfile="./src/org/st/scenarios/clsc/CLSCLexer.java"
+	    			srcfile="./src/org/st/scenarios/clsc/CLSC.g" />
+	    		<uptodate
+	    			targetfile="./src/org/st/scenarios/clsc/CLSCParser.java"
+	    			srcfile="./src/org/st/scenarios/clsc/CLSC.g" />
+	        </and>
+	    </condition>
+	</target>
+	<target name="parser_cLSC" depends="parser_cLSC.dependencies" unless="updateParser_cLSC.notRequired"
+			description="Generate Java class files from ANTLR parser description.">
+		<echo message="Generating parser sources in ${make.basedir}..." />
+		<java classpath="libs-build/antlr-3.2.jar" classname="org.antlr.Tool">
+			<arg path="./src/org/st/scenarios/clsc/CLSC.g"/>
+		</java>
+	</target>
 
 </project>

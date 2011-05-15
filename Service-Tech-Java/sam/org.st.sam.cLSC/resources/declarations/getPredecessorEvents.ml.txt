@@ -1,0 +1,7 @@
+fun getPredecessorEvents( ev: ID, dep::deps: EVENTDEP) =
+(* --- return all direct predecessors of ev *)
+  if (#event dep = ev) andalso (#pred dep <> nullEV ) then
+    (#pred dep)::getPredecessorEvents(ev, deps)
+  else
+    getPredecessorEvents(ev, deps)
+| getPredecessorEvents( _, nil) = nil;

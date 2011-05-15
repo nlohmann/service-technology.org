@@ -1,0 +1,5 @@
+fun matchEvent(ev1::max2: EVENTLIST, ev2: ID) =
+(* --- find the event ev1 that has the same name as event ev2 *)
+  if #1 ev1 = #1 ev2 then (ev1,ev2)
+  else matchEvent(max2, ev2)
+| matchEvent(nil, ev2) = ( nullEV, ev2 );

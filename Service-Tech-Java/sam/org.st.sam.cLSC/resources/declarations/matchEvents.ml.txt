@@ -1,0 +1,4 @@
+fun matchEvents(max1: EVENTLIST, ev2::max2: EVENTLIST) =
+(* --- find for each event ev2 the event ev1 that has the same name *)
+  matchEvent(max1, ev2) :: matchEvents(max1, max2)
+| matchEvents(_, nil) = nil;

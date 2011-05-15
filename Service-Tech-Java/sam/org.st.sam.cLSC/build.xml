@@ -97,7 +97,7 @@
 		
 		<!-- build distributable JAR file -->
 		<echo message="Creating distributable JAR file ${home}/${build.target}.jar" />
-		<jar destfile="${dir.builddir}/${build.target}.jar" basedir="${dir.builddir}/" manifest="META-INF/MANIFEST.MF">
+		<jar destfile="${dir.builddir}/${build.target}.jar" basedir="${dir.builddir}/" manifest="META-INF/MANIFEST.MF" >
 			<include name="**/*.class"/>
 			<include name="AUTHORS"/>
 			<include name="ChangeLog"/>
@@ -157,8 +157,9 @@
 	<target name="dist-bin" depends="jar"
 			description="Create binary distribution .zip of ${build.name}.">
 		
-		<mkdir dir="${dir.distbindir}/${libs}" />
-		<copy file="${dir.builddir}/${build.target}.jar" todir="${dir.distbindir}/${libs}" />
+		<!-- mkdir dir="${dir.distbindir}/${libs}" / -->
+		<!-- copy file="${dir.builddir}/${build.target}.jar" todir="${dir.distbindir}/${libs}" / -->
+		<copy file="${dir.builddir}/${build.target}.jar" todir="${dir.distbindir}" />
 		
 		<mkdir dir="${dir.distbindir}/${libs.external}" />
 		<copy todir="${dir.distbindir}/${libs.external}">
@@ -166,6 +167,21 @@
 				<include name="*.jar" />
 			</fileset>
 		</copy>
+		
+		<mkdir dir="${dir.distbindir}/resources" />
+		<copy todir="${dir.distbindir}/resources">
+			<fileset dir="${home}/resources">
+				<include name="**/*.ml.txt" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${dir.distbindir}">
+			<fileset dir="${home}/resources/launch">
+				<include name="sam.bat" />
+				<include name="sam.sh" />
+			</fileset>
+		</copy>
+
 		
 		<zip destfile="${home}/${package}-bin.zip">
 			<zipfileset dir="${dir.distbindir}" />

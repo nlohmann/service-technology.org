@@ -66,7 +66,7 @@ public class PetriNetIO {
 
       
     } else if (format == FORMAT_OWFN) {
-
+    	
       OWFNLexer lex = new OWFNLexer(new ANTLRFileStream(fileName));
       CommonTokenStream tokens = new CommonTokenStream(lex);
   

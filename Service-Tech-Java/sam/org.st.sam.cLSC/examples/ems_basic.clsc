@@ -1,0 +1,43 @@
+cLSC ems0
+MAIN
+  EVENT ems0_e0 medic!avail;
+  DEPENDENCIES ;
+  
+cLSC ems1
+PRE
+  EVENT ems1_e0 medic!avail;
+  DEPENDENCIES ;
+MAIN
+  EVENT ems1_e1 medic_check;
+  EVENT ems1_e2 ems?avail;
+  EVENT ems1_e3 ems!location;
+  EVENT ems1_e4 medic?location;
+  DEPENDENCIES
+  	ems1_e1 -> ems1_e4,
+  	ems1_e2 -> ems1_e3,
+  	ems1_e3 -> ems1_e4;
+
+cLSC ems2
+PRE
+  EVENT ems2_e0 medic!avail;
+  DEPENDENCIES ;
+MAIN
+  EVENT ems2_e1 medic_check;
+  EVENT ems2_e2 ems?avail;
+  EVENT ems2_e3 ems!none;
+  EVENT ems2_e4 medic?none;
+  EVENT ems2_e5 medic!avail;
+  DEPENDENCIES
+  	ems2_e1 -> ems2_e4,
+  	ems2_e2 -> ems2_e3,
+  	ems2_e3 -> ems2_e4,
+  	ems2_e4 -> ems2_e5;
+  	
+cLSC ems3
+PRE
+  EVENT ems3_e0 medic?location;
+  DEPENDENCIES ;
+MAIN
+  EVENT ems3_e1 medic_1st_aid;
+  EVENT ems3_e2 medic!avail;
+  DEPENDENCIES ems3_e1 -> ems3_e2; 

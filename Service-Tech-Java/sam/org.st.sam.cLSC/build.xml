@@ -175,6 +175,15 @@
 			</fileset>
 		</copy>
 		
+		<mkdir dir="${dir.distbindir}/examples" />
+		<copy todir="${dir.distbindir}/examples">
+			<fileset dir="${home}/examples">
+				<include name="*.clsc" />
+				<include name="*.cpn" />
+				<include name="*.png" />
+			</fileset>
+		</copy>
+		
 		<copy todir="${dir.distbindir}">
 			<fileset dir="${home}/resources/launch">
 				<include name="sam.bat" />

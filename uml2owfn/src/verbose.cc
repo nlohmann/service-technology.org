@@ -24,6 +24,7 @@
 #include <cstring>
 #include <string>
 #include <fstream>
+#include <cstdio>
 //#include "cmdline.h"
 #include "verbose.h"
 

@@ -22,6 +22,7 @@
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>
+#include <cstdio>
 #include <string>
 #include <fstream>
 #include "cmdline.h"

@@ -163,7 +163,7 @@ marking:
 /* ----------------- FINALCONDITION ----------------- */
 
 final_condition:
-	KEY_TRUE SEMICOLON
+	(marking KEY_AND KEY_EMPTY) SEMICOLON
 ;
 
 /* ----------------- TRANSITION ----------------- */
@@ -259,6 +259,8 @@ KEY_PRODUCE  : 'PRODUCE' ;
 
 KEY_FINALCONDITION  : 'FINALCONDITION' ;
 KEY_TRUE : 'TRUE' ;
+KEY_AND : 'AND';
+KEY_EMPTY : 'ALL_OTHER_PLACES_EMPTY';
 
 COLON : ':' ;
 COMMA : ',' ;

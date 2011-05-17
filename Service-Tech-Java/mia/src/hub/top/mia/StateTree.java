@@ -22,9 +22,11 @@ public class StateTree {
 		comp = new MarkingComparator();
 	}
 
+	
+
 	/**
 	 * find smallest ancestor that contains cluster
-	 * 
+	 * TODO: change successor procedure, for each father, find ancestor that contains cluster
 	 * @param current
 	 * @param cluster
 	 */
@@ -238,6 +240,7 @@ public class StateTree {
 
 	/**
 	 * breadth first search traversal of the state tree
+	 * compute intersections between all possible subtrees having the same depth
 	 */
 	public void traverseTree() {
 		LinkedList<SafeMarking> queue = new LinkedList<SafeMarking>();
@@ -312,6 +315,10 @@ public class StateTree {
 
 	}
 
+	/**
+	 * TODO: implement remove duplicates
+	 * @param currentClusters
+	 */
 	private void removeDuplicates(ArrayList<SafeMarking> currentClusters) {
 		/*
 		 * for (int i = 0; i<currentClusters.size(); i++) { for (int j = 0; ) }
@@ -321,6 +328,7 @@ public class StateTree {
 
 	/**
 	 * breadth first search traversal of the state tree
+	 * if direct successors of tree can be further refined, go further, otherwise add it to the final result
 	 */
 	public void gatherResult() {
 		// TODO: implement gather results

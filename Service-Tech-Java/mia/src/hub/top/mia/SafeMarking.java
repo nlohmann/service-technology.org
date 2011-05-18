@@ -60,7 +60,8 @@ public class SafeMarking implements Cloneable{
 	}
 	
 	public void addFather(SafeMarking father) {
-		if (!fathers.contains(father)) {
+		if (!fathers.contains(father) && !equals(father)) {
+			//System.out.println("Link between: " + toString() + ": " + father);
 			fathers.add(father);
 		}
 	}
@@ -72,7 +73,7 @@ public class SafeMarking implements Cloneable{
 	}
 	
 	public void addChild(SafeMarking child) {
-		if (!children.contains(child)) {
+		if (!children.contains(child) && !equals(child)) {
 			children.add(child);
 		}
 	}
@@ -138,7 +139,7 @@ public class SafeMarking implements Cloneable{
 	 * end result is subcone
 	 * @return
 	 */
-	public HashSet<SafeMarking> computeDifference() {
+	public HashSet<SafeMarking> getSubcone() {
 		HashSet<SafeMarking> subcone = new HashSet<SafeMarking>();
 		
 		for (SafeMarking leaf : leafs) {
@@ -176,9 +177,12 @@ public class SafeMarking implements Cloneable{
 		return true;
 	}
 	
-	public void mergeLeafs(SafeMarking other) {
-		System.out.println("Merging leafs of " + toString() + " and " + other);
+	public void mergeLeafs(SafeMarking other) {		
+		if (equals(other)) {
+			return;
+		}
 		
+		//System.out.println("Merging leafs of " + toString() + " and " + other);
 		HashSet<SafeMarking> otherLeafs = other.getLeafs();
 		for (SafeMarking otherLeaf : otherLeafs) {
 			addLeaf(otherLeaf);

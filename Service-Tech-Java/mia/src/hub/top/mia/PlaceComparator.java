@@ -4,6 +4,11 @@ import hub.top.petrinet.Place;
 
 import java.util.Comparator;
 
+/**
+ * compare places based on lexicographical order
+ * @author darsinte
+ *
+ */
 public class PlaceComparator implements Comparator<Place>{
 
 	@Override

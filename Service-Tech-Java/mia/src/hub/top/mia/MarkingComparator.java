@@ -2,6 +2,11 @@ package hub.top.mia;
 
 import java.util.Comparator;
 
+/**
+ * compare markings based on how many bits are set
+ * @author darsinte
+ *
+ */
 public class MarkingComparator implements Comparator<SafeMarking>{
 
 	@Override

@@ -23,10 +23,12 @@ public class Mia {
 	private Place[] placesOld, placesNew;
 	private ArrayList<SafeMarking> globalStates;
 	private Pattern pattern;
-
+	private StateTree tree;
+	
 	public Mia() {
 		globalStates = new ArrayList<SafeMarking>();
 		pattern = Pattern.compile(PLACE, Pattern.CASE_INSENSITIVE);
+		tree = new StateTree();
 	}
 
 	/**
@@ -186,6 +188,10 @@ public class Mia {
 			for (SafeMarking element : globalStates) {
 				System.out.println(element);
 			}
+			
+			tree.buildTree(globalStates);
+			tree.traverseTree();
+			
 			// read any errors from the attempted command - not of interest
 			// at the moment
 			while ((s = stdError.readLine()) != null) {
@@ -202,8 +208,8 @@ public class Mia {
 			// usage: mia n_old.owfn n_new.owfn
 			System.out.println("Usage: mia n_old.owfn n_new.owfn");
 		} else {
-			//new Mia().run(args[0], args[1]);
-			new Mia().test();
+			new Mia().run(args[0], args[1]);
+			//new Mia().test();
 		}
 	}
 }

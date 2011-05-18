@@ -10,7 +10,9 @@ public class StateTree {
 	private SafeMarking root;
 	private MarkingComparator comp;
 	private SafeMarking successor;
-
+	private HashSet<SafeMarking> successors;
+	
+	
 	/** some constants **/
 	public static final int INTERSECTION_EMPTY = 0;
 	public static final int INTERSECTION_SINGLE = 1;
@@ -22,11 +24,10 @@ public class StateTree {
 		comp = new MarkingComparator();
 	}
 
-	
-
 	/**
-	 * find smallest ancestor that contains cluster
-	 * TODO: change successor procedure, for each father, find ancestor that contains cluster
+	 * find smallest ancestor that contains cluster TODO: change successor
+	 * procedure, for each father, find ancestor that contains cluster
+	 * 
 	 * @param current
 	 * @param cluster
 	 */
@@ -49,6 +50,30 @@ public class StateTree {
 		}
 	}
 
+	/**
+	 * find smallest ancestor of leaf that contains current cluster
+	 * @param current
+	 * @param cluster
+	 */
+	public void findSuccessors(SafeMarking current, SafeMarking cluster) {
+		HashSet<SafeMarking> fathers = current.getFathers();
+		boolean found = false;
+		
+		//System.out.println("Current: " + current + " : " + cluster);
+		
+		for (SafeMarking father : fathers) {
+			if (father.contains(cluster)) {
+				//System.out.println("Father: " + father + " : " + cluster);
+				findSuccessors(father, cluster);
+				found = true;
+			}
+		}
+
+		if (!found) {
+			successors.add(current);
+		}
+	}
+	
 	/**
 	 * build state tree
 	 */
@@ -87,57 +112,53 @@ public class StateTree {
 		MarkingComparator comp = new MarkingComparator();
 		clusters.toArray(arrayClusters);
 		Arrays.sort(arrayClusters, comp);
-
-		//System.out.println("-----------");
-		//for (SafeMarking cluster : arrayClusters) {
-			//System.out.println(cluster);
-		//}
-
+		successors = new HashSet<SafeMarking>();
+		
+		// hashset with all successors, needed at the end to merge leaf sets
+		HashSet<SafeMarking> allSuccessors = new HashSet<SafeMarking>();
+		
 		// iterate over all clusters in descending order
 		for (SafeMarking cluster : arrayClusters) {
 
-			System.out.println("Current cluster: " + cluster);
-
+			//System.out.println("Current cluster: " + cluster);
 			HashSet<SafeMarking> leafs = cluster.getLeafs();
-			HashSet<SafeMarking> successors = new HashSet<SafeMarking>();
 
 			// iterate over all leafs
 			for (SafeMarking leaf : leafs) {
 
-				System.out.println("Leaf: " + leaf);
+				//System.out.println("Leaf: " + leaf);
 				// get fathers of leaf
 				HashSet<SafeMarking> fathers = leaf.getFathers();
 
 				if (fathers.isEmpty()) {
 					//System.out.println("Leaf Link: " + leaf + " " + cluster);
 					leaf.addFather(cluster);
+					cluster.addChild(leaf);
 				} else {
 					// compute intersection between all fathers of all leafs
-					successor = leaf;
-					findSuccessor(leaf, cluster);
+					successors.clear();
+					findSuccessors(leaf, cluster);
 
-					System.out.println("After find successor: " + successor
-							+ " " + cluster);
-
-					if (!successor.equals(leaf)) {
-						System.out.println("Inner Link: " + successor + " "
-								+ cluster);
-						cluster.addChild(successor);
-						successor.addFather(cluster);
-						successors.add((SafeMarking) successor.clone());
-					} else {
-						// add leaf link
+					if (successors.isEmpty()) {
+						// add link between leaf and cluster
 						leaf.addFather(cluster);
-						//System.out.println("Leaf Link: " + leaf + " " + cluster);
+						cluster.addChild(leaf);
+					} else {
+						for (SafeMarking successor : successors) {
+							successor.addFather(cluster);
+							cluster.addChild(successor);
+							allSuccessors.add(successor);
+						}
 					}
 				}
 			}
+
 			
 			// merge leafs of all successors with leafset of current node
-			for (SafeMarking node : successors) {
+			for (SafeMarking node : allSuccessors) {
 				cluster.mergeLeafs(node);
 			}
-			
+			allSuccessors.clear();
 		}
 
 		// check if we have empty intersection already
@@ -239,8 +260,8 @@ public class StateTree {
 	}
 
 	/**
-	 * breadth first search traversal of the state tree
-	 * compute intersections between all possible subtrees having the same depth
+	 * breadth first search traversal of the state tree compute intersections
+	 * between all possible subtrees having the same depth
 	 */
 	public void traverseTree() {
 		LinkedList<SafeMarking> queue = new LinkedList<SafeMarking>();
@@ -255,7 +276,7 @@ public class StateTree {
 			// check if depth is increased, if so, compute intersections
 			if (currentDepth < current.getDepth()) {
 				// compute intersections between clusters
-				computeIntersections(currentClusters);
+				//computeIntersections(currentClusters);
 
 				// reset clusters array
 				currentClusters.clear();
@@ -264,19 +285,24 @@ public class StateTree {
 			currentClusters.add(current);
 
 			// output current node
-			// System.out.println(current + " d:" + current.getDepth());
+			System.out.println(current + " d:" + current.getDepth());
 
 			// push children in the queue
 			HashSet<SafeMarking> children = current.getChildren();
+			System.out.println("Children of current:");
 			for (SafeMarking child : children) {
+				System.out.println(child);
+				
 				child.setDepth(current.getDepth() + 1);
 				queue.addLast(child);
 			}
+			
+			System.out.println();
 
 		} while (!queue.isEmpty());
 
 		// call compute intersections for last set of clusters
-		computeIntersections(currentClusters);
+		//computeIntersections(currentClusters);
 	}
 
 	/**
@@ -317,18 +343,23 @@ public class StateTree {
 
 	/**
 	 * TODO: implement remove duplicates
+	 * 
 	 * @param currentClusters
 	 */
 	private void removeDuplicates(ArrayList<SafeMarking> currentClusters) {
-		/*
-		 * for (int i = 0; i<currentClusters.size(); i++) { for (int j = 0; ) }
-		 */
-
+		for (int i = 0; i<currentClusters.size(); i++) { 
+			for (int j = 0; j < currentClusters.size(); j++) {
+				SafeMarking ci = currentClusters.get(i);
+				SafeMarking cj = currentClusters.get(j);
+				if (ci.isEquivalent(cj) && comp.compare(ci, cj) > 0);
+			}
+		}
 	}
 
 	/**
-	 * breadth first search traversal of the state tree
-	 * if direct successors of tree can be further refined, go further, otherwise add it to the final result
+	 * breadth first search traversal of the state tree if direct successors of
+	 * tree can be further refined, go further, otherwise add it to the final
+	 * result
 	 */
 	public void gatherResult() {
 		// TODO: implement gather results

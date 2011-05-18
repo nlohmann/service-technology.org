@@ -111,6 +111,52 @@ public class Mia {
 		System.out.println("************* Traversing tree ***********");
 		tree.traverseTree();
 	}
+	
+	public void testMinimization() {
+		ArrayList<SafeMarking> global_states = new ArrayList<SafeMarking>();
+		
+		BitSet m1_old = new BitSet();
+		m1_old.set(0);
+		m1_old.set(2);
+
+		BitSet m1_new = new BitSet();
+		m1_new.set(0);
+		m1_new.set(2);
+
+		BitSet m2_old = new BitSet();
+		m2_old.set(0);
+		m2_old.set(3);
+
+		BitSet m2_new = new BitSet();
+		m2_new.set(0);
+		m2_new.set(3);
+
+		BitSet m3_old = new BitSet();
+		m3_old.set(1);
+		m3_old.set(2);
+
+		BitSet m3_new = new BitSet();
+		m3_new.set(1);
+		m3_new.set(2);
+
+		BitSet m4_old = new BitSet();
+		m4_old.set(1);
+		m4_old.set(3);
+
+		BitSet m4_new = new BitSet();
+		m4_new.set(1);
+		m4_new.set(3);
+
+		global_states.add(new SafeMarking(m1_old, m1_new, SafeMarking.LEAF));
+		global_states.add(new SafeMarking(m2_old, m2_new, SafeMarking.LEAF));
+		global_states.add(new SafeMarking(m3_old, m3_new, SafeMarking.LEAF));
+		global_states.add(new SafeMarking(m4_old, m4_new, SafeMarking.LEAF));
+
+		StateTree tree = new StateTree();
+		tree.buildTree(global_states);
+		tree.traverseTree();
+		
+	}
 
 	public void run(String strOld, String strNew) {
 		String s;
@@ -208,8 +254,9 @@ public class Mia {
 			// usage: mia n_old.owfn n_new.owfn
 			System.out.println("Usage: mia n_old.owfn n_new.owfn");
 		} else {
-			new Mia().run(args[0], args[1]);
+			//new Mia().run(args[0], args[1]);
 			//new Mia().test();
+			new Mia().testMinimization();
 		}
 	}
 }

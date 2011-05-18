@@ -5,7 +5,7 @@ import java.util.HashSet;
 
 public class SafeMarking implements Cloneable{
 	private int type, depth;
-	private boolean decomposed;
+	private boolean decomposed, removed;
 	private BitSet m_Old, m_New;
 	private HashSet<SafeMarking> leafs, fathers, children;
 	
@@ -89,8 +89,14 @@ public class SafeMarking implements Cloneable{
 		return result;
 	}
 	
-	public boolean equals(SafeMarking other) {
-		return (m_Old.equals(other.getM_Old()) && m_New.equals(other.getM_New())); 
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof SafeMarking)) {
+			return false;
+		}
+		
+		SafeMarking element = (SafeMarking) other; 
+		return (m_Old.equals(element.getM_Old()) && m_New.equals(element.getM_New())); 
 	}
 	
 	public boolean contains(SafeMarking other) {
@@ -162,17 +168,53 @@ public class SafeMarking implements Cloneable{
 		return subcone;
 	}
 	
+	/**
+	 * two clusters are equivalent if the subcones are equal
+	 * @param other
+	 * @return
+	 */
 	public boolean isEquivalent(SafeMarking other) {
-		HashSet<SafeMarking> otherLeafs = other.getLeafs();
-		
-		if (leafs.size() != otherLeafs.size()) {
+		if (equals(other)) {
 			return false;
 		}
 		
-		for (SafeMarking leaf : leafs) {
-			if (!otherLeafs.contains(leaf))
-				return false;
+		HashSet<SafeMarking> otherSubcone = other.getSubcone();
+		HashSet<SafeMarking> currentSubcone = getSubcone();
+		
+		//System.out.println("evaluating is equivalent!");
+		if (currentSubcone.isEmpty() && otherSubcone.isEmpty()) {
+			return false;
 		}
+		
+		if (currentSubcone.size() != otherSubcone.size()) {
+			return false;
+		}
+			
+		for (SafeMarking currentElement : currentSubcone) {
+			boolean found = false;
+			for (SafeMarking otherElement : otherSubcone) {
+				if (currentElement.equals(otherElement)) {
+					found = true;
+				}
+			}
+			
+			if (!found) {
+				return false;
+			}
+		}
+		
+		/*
+		System.out.println("Subcone of current: " + toString());
+		for (SafeMarking subcone : currentSubcone) {
+			System.out.println(subcone);
+		}
+
+		System.out.println("Subcone of other: " + other);
+		for (SafeMarking subcone : otherSubcone) {
+			System.out.println(subcone);
+		}
+		System.out.println();
+		*/
 		
 		return true;
 	}
@@ -205,4 +247,21 @@ public class SafeMarking implements Cloneable{
 			return this;
 		}
 	}
+	
+	public void setRemoved(boolean removed) {
+		this.removed = removed;
+	}
+	
+	public boolean isRemoved() {
+		return removed;
+	}
+	
+	public void removeChild(SafeMarking child) {
+		children.remove(child);
+	}
+	
+	public void removeFather(SafeMarking father) {
+		children.remove(father);
+	}
+	
 }

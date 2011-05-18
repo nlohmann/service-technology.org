@@ -54,6 +54,18 @@ public class Mia {
 		return result;
 	}
 
+	public Marking parseSafeMarking(BitSet safeMarking, Place[] places) {
+		Marking marking = new Marking();
+		
+		for (int i = 0; i<safeMarking.size(); i++) {
+			if (safeMarking.get(i) == true) {
+				marking.addPlace(places[i]);
+			}
+		}
+			
+		return marking;
+	}
+	
 	public void test() {
 		ArrayList<SafeMarking> global_states = new ArrayList<SafeMarking>();
 
@@ -155,7 +167,7 @@ public class Mia {
 		StateTree tree = new StateTree();
 		tree.buildTree(global_states);
 		tree.traverseTree();
-		
+		tree.computeCombinations();
 	}
 
 	public void run(String strOld, String strNew) {

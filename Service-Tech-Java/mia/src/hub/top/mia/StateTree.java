@@ -207,7 +207,7 @@ public class StateTree {
 	 * @param clusters
 	 */
 	private void computeIntersections(ArrayList<SafeMarking> clusters) {
-		System.out.println("Processing Clusters...");
+		//System.out.println("Processing Clusters...");
 
 		// generate all subsets of clusters
 		int clustersSize = clusters.size();
@@ -215,31 +215,49 @@ public class StateTree {
 		BitSet generator = new BitSet();
 		generator.set(0);
 		HashSet<SafeMarking> validClusters = new HashSet<SafeMarking>();
-
+		HashSet<SafeMarking> result = new HashSet<SafeMarking>();
+		
 		while (!generator.get(clustersSize)) {
-			System.out.println(generator);
-
-			HashSet<SafeMarking> result = clusters.get(0).getLeafs();
+			//System.out.println("Generator: " + generator);
+			//System.out.println("Processing subsets...");
+			
+			boolean isFirst = true;
 			for (int i = 0; i < noBits; i++) {
 				if (generator.get(i) == true) {
 					SafeMarking cluster = clusters.get(i);
-					result = computeIntersection(result, cluster.getLeafs());
+					
+					// discard combination if one of the sides of the cluster is empty
+					if (cluster.isSideEmpty()) break;
+					
+					if (isFirst) {
+						isFirst = false;
+						result.addAll(cluster.getLeafs());
+					} else {
+						result = computeIntersection(result, cluster.getLeafs());
+					}
+					//System.out.println(cluster);
 					validClusters.add(cluster);
 				}
 			}
 
 			if (result.size() == StateTree.INTERSECTION_SINGLE) {
-				// we have a candidate!
+				// we have a candidate!	
+				System.out.println("Found combination: ");
 				for (SafeMarking cluster : validClusters) {
 					cluster.setDecomposed(true);
+					System.out.println(cluster);
 				}
+				
+				//TODO: implement cone property check 
+				
+				System.out.println();
 			}
 
-			System.out.println("Common intersection:");
-			for (SafeMarking node : result) {
-				System.out.println(node);
-			}
-			System.out.println();
+			//System.out.println("Common intersection:");
+			//for (SafeMarking node : result) {
+				//System.out.println(node);
+			//}
+			//System.out.println();
 
 			// generate next subset, simulate addition with 1
 			int i = 0;
@@ -256,15 +274,39 @@ public class StateTree {
 
 			// reset clusters
 			validClusters.clear();
+			result.clear();
 		}
 		System.out.println();
 	}
 
 	/**
-	 * breadth first search traversal of the state tree compute intersections
-	 * between all possible subtrees having the same depth
+	 * breadth first search traversal of the state tree 
 	 */
 	public void traverseTree() {
+		LinkedList<SafeMarking> queue = new LinkedList<SafeMarking>();
+		queue.add(root);
+
+		do {
+			SafeMarking current = queue.poll();
+
+			// output current node
+			System.out.println("Current: " + current + " d:" + current.getDepth());
+
+			// push children in the queue
+			HashSet<SafeMarking> children = current.getChildren();
+			for (SafeMarking child : children) {
+				queue.addLast(child);
+			}
+		} while (!queue.isEmpty());
+
+		// call compute intersections for last set of clusters
+	}
+
+	/**
+	 * compute intersections
+	 * between all possible subtrees having the same depth
+	 */
+	public void computeCombinations() {
 		LinkedList<SafeMarking> queue = new LinkedList<SafeMarking>();
 		queue.add(root);
 
@@ -277,16 +319,13 @@ public class StateTree {
 			// check if depth is increased, if so, compute intersections
 			if (currentDepth < current.getDepth()) {
 				// compute intersections between clusters
-				// computeIntersections(currentClusters);
+				computeIntersections(currentClusters);
 
 				// reset clusters array
 				currentClusters.clear();
 				currentDepth++;
 			}
 			currentClusters.add(current);
-
-			// output current node
-			System.out.println(current + " d:" + current.getDepth());
 
 			// push children in the queue
 			HashSet<SafeMarking> children = current.getChildren();
@@ -299,9 +338,9 @@ public class StateTree {
 		} while (!queue.isEmpty());
 
 		// call compute intersections for last set of clusters
-		// computeIntersections(currentClusters);
+		computeIntersections(currentClusters);
 	}
-
+	
 	/**
 	 * traverse tree in breadth first search and compute subtrees having the
 	 * same set of leafs traverse the tree for the second time in order to

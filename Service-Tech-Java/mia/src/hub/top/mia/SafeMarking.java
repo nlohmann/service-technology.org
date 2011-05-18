@@ -219,6 +219,13 @@ public class SafeMarking implements Cloneable{
 		return true;
 	}
 	
+	public boolean isSideEmpty() {
+		if (m_Old.cardinality() == 0 || m_New.cardinality() == 0) {
+			return true;
+		}
+		return false;
+	}
+	
 	public void mergeLeafs(SafeMarking other) {		
 		if (equals(other)) {
 			return;

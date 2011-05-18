@@ -249,6 +249,9 @@ public class StateTree {
 				}
 				
 				//TODO: implement cone property check 
+				// compute subcones of cluster
+				// convert elements of subcones to marking of a petri net
+				// check strongly connected components criteria
 				
 				System.out.println();
 			}

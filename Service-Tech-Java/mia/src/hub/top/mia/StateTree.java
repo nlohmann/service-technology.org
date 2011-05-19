@@ -75,7 +75,12 @@ public class StateTree {
 	}
 
 	/**
-	 * build state tree
+	 * build state tree from global_states
+	 * Step 1: compute intersections between all pairs of states - gives all inner nodes
+	 * Step 2: sort inner nodes in descending order 
+	 * Step 3: traverse inner nodes in descending order and 
+	 *         add link between each smallest ancestor of each leaf and current cluster
+	 * @param global_states
 	 */
 	public void buildTree(ArrayList<SafeMarking> global_states) {
 		// compute all intersections
@@ -193,11 +198,6 @@ public class StateTree {
 			}
 		}
 
-		/*
-		 * System.out.println("[Intermediate]: Common intersection:"); for
-		 * (SafeMarking node : result) { System.out.println(node); }
-		 */
-
 		return result;
 	}
 
@@ -308,6 +308,7 @@ public class StateTree {
 	/**
 	 * compute intersections
 	 * between all possible subtrees having the same depth
+	 * if intersection is a single element - mark as valid candidate for combination of independent branches
 	 */
 	public void computeCombinations() {
 		LinkedList<SafeMarking> queue = new LinkedList<SafeMarking>();

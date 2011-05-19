@@ -6,11 +6,13 @@
                      http://service-technology.org/lola
 
 
-Version 1.15-unreleased
-=======================
+Version 1.15
+============
 
 * fixed bug #15223 (`https://gna.org/bugs/?15223'): the coverability graph is
   now not used in the `HOME' mode
+
+* fixed compilation problems under Linux
 
 * added a parameter `-r'/`--resultFile' to write all analysis results into a
   single file in the file format of libconfig (see
@@ -41,6 +43,9 @@ Version 1.15-unreleased
 
 * added tool `form' (in folder `utils') to translate formulae of the SUMo
   2011 Model Checking Contest into LoLA file format
+
+* version submitted to the SUMo 2011 Model Checking Contest
+  (`http://sumo.lip6.fr/Model_Checking_Contest.html')
 
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for

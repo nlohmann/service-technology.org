@@ -1282,7 +1282,7 @@ Both depth first search and breadth first search are available. Breadth first se
 @subsection Checking Liveness
 @cindex @code{#LIVEPRPOP}
 
-A state predicate is reachable live iff, from every reachable marking, there is a marking reachable where the given predicate is satisfied. The property corresponds to the @acronym{CTL} specification @b{AG}@tie{}@b{EF}@tie{}@math{\phi}. 
+A state predicate is reachable live iff, from every reachable marking, there is a marking reachable where the given predicate is satisfied. The property corresponds to the @acronym{CTL} specification @b{AG}@tie{}@b{EF}@tie{}@math{\phi}.
 
 Edit file @file{userconfig.H} and select the option @samp{#LIVEPRPOP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
 

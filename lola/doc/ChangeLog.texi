@@ -1,6 +1,8 @@
-@heading Version 1.15-unreleased
+@heading Version 1.15
 @itemize
 @item fixed bug #15223 (@url{https://gna.org/bugs/?15223}): the coverability graph is now not used in the @option{HOME} mode
+
+@item fixed compilation problems under Linux
 
 @item added a parameter @option{-r}/@option{--resultFile} to write all analysis results into a single file in the file format of libconfig (see @url{http://www.hyperrealm.com/libconfig})
 
@@ -19,6 +21,8 @@
 @item polished messages
 
 @item added tool @samp{form} (in folder @file{utils}) to translate formulae of the SUMo 2011 Model Checking Contest into LoLA file format
+
+@item version submitted to the SUMo 2011 Model Checking Contest (@url{http://sumo.lip6.fr/Model_Checking_Contest.html})
 @end itemize
 
 

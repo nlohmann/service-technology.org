@@ -180,7 +180,7 @@ public class Mia {
 
 	public void testCone(PetriNet net) {
 		Marking initial = new Marking(net);
-		initial.addPlace(net.findPlace("p6"));
+		initial.addPlace(net.findPlace("p1"));
 		
 		Marking m1 = new Marking();
 		m1.addPlace(net.findPlace("p3"));
@@ -193,7 +193,8 @@ public class Mia {
 		subcone.add(m2);
 		
 		initial.computeCone(subcone);
-		initial.printCone();
+		//initial.printCone();
+		initial.generateTCSSs();
 	}
 	
 	public void run(String strOld, String strNew) {

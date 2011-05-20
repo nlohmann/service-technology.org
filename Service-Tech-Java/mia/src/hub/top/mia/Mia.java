@@ -170,6 +170,26 @@ public class Mia {
 		tree.computeCombinations();
 	}
 
+	public void testCone(PetriNet net) {
+		Marking initial = new Marking(net);
+		initial.addPlace(net.findPlace("p6"));
+		
+		Marking m1 = new Marking();
+		m1.addPlace(net.findPlace("p3"));
+		
+		Marking m2 = new Marking();
+		m2.addPlace(net.findPlace("p5"));
+		
+		HashSet<Marking> subcone = new HashSet<Marking>();
+		subcone.add(m1);
+		subcone.add(m2);
+		
+		System.out.println(m1.equals(m2));
+		
+		initial.computeCone(subcone);
+		initial.printCone();
+	}
+	
 	public void run(String strOld, String strNew) {
 		String s;
 		try {
@@ -247,8 +267,10 @@ public class Mia {
 				System.out.println(element);
 			}
 			
-			tree.buildTree(globalStates);
-			tree.traverseTree();
+			testCone(n_Old);
+			
+			//tree.buildTree(globalStates);
+			//tree.traverseTree();
 			
 			// read any errors from the attempted command - not of interest
 			// at the moment
@@ -266,9 +288,9 @@ public class Mia {
 			// usage: mia n_old.owfn n_new.owfn
 			System.out.println("Usage: mia n_old.owfn n_new.owfn");
 		} else {
-			//new Mia().run(args[0], args[1]);
+			new Mia().run(args[0], args[1]);
 			//new Mia().test();
-			new Mia().testMinimization();
+			//new Mia().testMinimization();
 		}
 	}
 }

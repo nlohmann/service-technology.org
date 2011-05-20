@@ -4,6 +4,7 @@ import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +23,9 @@ public class Marking implements Cloneable {
 	private HashSet<Marking> successors;
 	private HashSet<Marking> cone;
 
+	/** is true if marking is part of subcone and also of the cone**/
+	private boolean hasCone;
+	
 	public Marking() {
 		markedPlaces = new HashSet<Place>();
 		successors = new HashSet<Marking>();
@@ -37,6 +41,7 @@ public class Marking implements Cloneable {
 
 	public Marking(SafeMarking marking) {
 		// TODO: convert from SafeMarking back to marking
+		// need places of net in lexicographical order
 	}
 
 	public void setNet(PetriNet net) {
@@ -47,22 +52,77 @@ public class Marking implements Cloneable {
 		return net;
 	}
 
-	public boolean isEnabled(Transition transition) {
-		List<Place> preset = transition.getPreSet();
+	/**
+	 * check if transition is forward enabled
+	 * @param transition
+	 * @return
+	 */
+	public boolean isForwardEnabled(Transition transition) {
+		List<Place> preSet = transition.getPreSet();
 
-		for (Place place : preset) {
-			if (!markedPlaces.contains(place)) {
+		for (Place place : preSet) {
+			if (!getMarkedPlaces().contains(place)) {
 				return false;
 			}
 		}
 
 		return true;
 	}
+	
+	/**
+	 * check if transition is backward enabled
+	 * @param transition
+	 * @return
+	 */
+	public boolean isBackwardEnabled(Transition transition) {
+		List<Place> postSet = transition.getPostSet();
 
-	public Marking fire(Transition transition) {
+		for (Place place : postSet) {
+			if (!getMarkedPlaces().contains(place)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+	
+	/**
+	 * fire transition backward
+	 * @param transition
+	 * @return
+	 */
+	public Marking fireBackward(Transition transition){
 		Marking result = new Marking();
 
-		HashSet<Place> newPlaces = (HashSet<Place>) markedPlaces.clone();
+		HashSet<Place> newPlaces = (HashSet<Place>) getMarkedPlaces().clone();
+
+		List<Place> preSet = transition.getPreSet();
+		List<Place> postSet = transition.getPostSet();
+
+		// delete places in preset
+		for (Place place : postSet) {
+			newPlaces.remove(place);
+		}
+
+		// add places from postset
+		for (Place place : preSet) {
+			newPlaces.add(place);
+		}
+
+		result.setMarkedPlaces(newPlaces);
+		
+		return result;
+	}
+	
+	/**
+	 * fire transition forward
+	 * @param transition
+	 * @return
+	 */
+	public Marking fireForward(Transition transition) {
+		Marking result = new Marking();
+
+		HashSet<Place> newPlaces = (HashSet<Place>) getMarkedPlaces().clone();
 
 		List<Place> preset = transition.getPreSet();
 		List<Place> postSet = transition.getPostSet();
@@ -77,18 +137,31 @@ public class Marking implements Cloneable {
 			newPlaces.add(place);
 		}
 
+		result.setMarkedPlaces(newPlaces);
+		
 		return result;
 
 	}
 
+	/**
+	 * generate backward and forward successors
+	 */
 	public void generateSuccessors() {
 		for (Place place : markedPlaces) {
-			LinkedList<Transition> transitions = (LinkedList<Transition>) place
+			// generate forward successors
+			LinkedList<Transition> postSet = (LinkedList<Transition>) place
 					.getPostSet();
-
-			for (Transition transition : transitions) {
-				if (isEnabled(transition)) {
-					getSuccessors().add(fire(transition));
+			for (Transition transition : postSet) {
+				if (isForwardEnabled(transition)) {
+					successors.add(fireForward(transition));
+				}
+			}
+			
+			// generate backward successors
+			LinkedList<Transition> preSet = (LinkedList<Transition>) place.getPreSet();
+			for (Transition transition : preSet) {
+				if (isBackwardEnabled(transition)) {
+					successors.add(fireBackward(transition));
 				}
 			}
 		}
@@ -103,44 +176,176 @@ public class Marking implements Cloneable {
 	}
 	
 	/**
-	 * compute cone and check that all elements of subcones are part of the cone
-	 * @param current
+	 * check if element is part of the cone
+	 * @param element
+	 * @return
 	 */
-	public void computeCone(Marking current, HashSet<Marking> subcone) {
-		// TODO: compute cone from current submarking, check if subcone elements
-		// are contained in cone
+	public boolean isInCone(Marking element) {
+		for (Marking node : cone) {
+			if (element.equals(node)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * compute cone having as a source current marking 
+	 * check that all elements of subcones are part of the cone
+	 * @param subcone
+	 */
+	public void computeCone(HashSet<Marking> subcone) {
 		// start from current marking, recursively generate successors until
 		// nothing new is added
-
 		// initially add this to cone
 
 		boolean expanded = false;
 		cone.add(this);
-		HashSet<Marking> newSuccessors = new HashSet<Marking>();
 		
+		// check if current node is part of cone
+		for (Marking element : subcone) {
+			if (element.equals(this)) {
+				element.setHasCone(true);
+			}
+		}
+			
+		// set with newly generated successors
+		ArrayList<Marking> currentSuccessors = new ArrayList<Marking>();
+		currentSuccessors.add(this);
+		
+		ArrayList<Marking> newSuccessors = new ArrayList<Marking>();
 		do {
 			expanded  = false;
 			newSuccessors.clear();
 			
-			for (Marking successor : cone) {
+			for (Marking successor : currentSuccessors) {
 				successor.generateSuccessors();
 				HashSet<Marking> successors = successor.getSuccessors();
 
 				for (Marking newSuccessor : successors) {
-					if (!cone.contains(newSuccessor)) {
+					// add element to cone if it is not in cone and not generated previosuly
+					if (!isInCone(newSuccessor) && !newSuccessors.contains(newSuccessor)) {
+						// check if some element of the subcone is equal to successor
+						for (Marking element : subcone) {
+							if (element.equals(newSuccessor)) {
+								element.setHasCone(true);
+							}
+						}
+						
+						// add successor to newly generated successors list
 						newSuccessors.add(newSuccessor);
+						
+						// set expanded to true
+						expanded = true;
 					}
 				}
 			}
 			
 			// add new elements
 			cone.addAll(newSuccessors);
+			
+			// add current successors to the list for the next iteration
+			currentSuccessors.clear();
+			currentSuccessors.addAll(newSuccessors);
 		} while (expanded);
-
+		
+		// check if all subcone elements are part of the cone
+		boolean hasCone = true;
+		for (Marking element : subcone) {
+			if (!element.isHasCone()) {
+				hasCone = false;
+			}
+		}
+		
+		if (!hasCone) {
+			System.out.println("Property does not hold!");
+		} else {
+			System.out.println("Property holds!");
+		}
 	}
 
+	public void printCone() {
+		System.out.println("Cone generated by: " + toString());
+		for (Marking element : cone) {
+			System.out.println(element);
+		}
+		
+		System.out.println();
+	}
+	
+	@Override
+	public String toString() {
+		String result = "[";
+		
+		for (Place place : markedPlaces) {
+			result += place.getName();
+		}
+		
+		result += "]";
+		return result;
+	}
+	
 	public void addPlace(Place place) {
-		markedPlaces.add(place);
+		getMarkedPlaces().add(place);
 	}
 
+	public void setHasCone(boolean hasCone) {
+		this.hasCone = hasCone;
+	}
+
+	public boolean isHasCone() {
+		return hasCone;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (! (other instanceof Marking)) {
+			return false;
+		}
+		
+		Marking markingOther = (Marking) other;
+		if (size() != markingOther.size()) {
+			return false;
+		}
+		
+		for (Place place : markedPlaces) {
+			if (!markingOther.isMarked(place)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+
+	public void setMarkedPlaces(HashSet<Place> markedPlaces) {
+		this.markedPlaces = markedPlaces;
+	}
+
+	public HashSet<Place> getMarkedPlaces() {
+		return markedPlaces;
+	}
+	
+	/**
+	 * test whether a certain place is marked
+	 * @param place
+	 * @return
+	 */
+	public boolean isMarked(Place place) {
+		for (Place marked : markedPlaces) {
+			if (marked.getUniqueIdentifier().equals(place.getUniqueIdentifier())) {
+				return true;
+			}
+		}
+		
+		return false;
+	}	
+	
+	/**
+	 * size of the marking
+	 * @return
+	 */
+	public int size() {
+		return markedPlaces.size();
+	}
 }

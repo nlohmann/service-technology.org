@@ -5,9 +5,12 @@ import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
+import java.util.regex.Matcher;
 
 /**
  * Marking of a given PetriNet
@@ -23,25 +26,46 @@ public class Marking implements Cloneable {
 	private HashSet<Marking> successors;
 	private HashSet<Marking> cone;
 
-	/** is true if marking is part of subcone and also of the cone**/
+	/** is true if marking is part of sub-cone and also of the cone**/
 	private boolean hasCone;
+	
+	/** reference to places of a marking sorted in alphabetical order**/
+	private Place[] sortedPlaces;
+	
+	/** TSCCs related fields **/
+	private int index, lowlink;
+	private static int nextIndex;
+	
+	private Stack<Marking> stack;
+	private boolean isInTSCC, isInSCC;
 	
 	public Marking() {
 		markedPlaces = new HashSet<Place>();
 		successors = new HashSet<Marking>();
 		cone = new HashSet<Marking>();
+		index = lowlink = 0;
+		isInTSCC = setInSCC(false);
 	}
 
 	public Marking(PetriNet net) {
-		markedPlaces = new HashSet<Place>();
-		successors = new HashSet<Marking>();
-		cone = new HashSet<Marking>();
+		this();
 		this.net = net;
 	}
 
-	public Marking(SafeMarking marking) {
-		// TODO: convert from SafeMarking back to marking
-		// need places of net in lexicographical order
+	/**
+	 * convert from BitSet to places representation
+	 * need places of net in lexicographical order
+	 * @param safeMarking
+	 * @param sortedPlaces
+	 */
+	public Marking(BitSet safeMarking, Place[] sortedPlaces) {		
+		this();
+		
+		for (int i = 0; i<sortedPlaces.length; i++) {
+			if (safeMarking.get(i) == true) {
+				markedPlaces.add(sortedPlaces[i]);
+			}
+		}
 	}
 
 	public void setNet(PetriNet net) {
@@ -99,12 +123,12 @@ public class Marking implements Cloneable {
 		List<Place> preSet = transition.getPreSet();
 		List<Place> postSet = transition.getPostSet();
 
-		// delete places in preset
+		// delete places in postset
 		for (Place place : postSet) {
 			newPlaces.remove(place);
 		}
 
-		// add places from postset
+		// add places from preset
 		for (Place place : preSet) {
 			newPlaces.add(place);
 		}
@@ -195,7 +219,7 @@ public class Marking implements Cloneable {
 	 * check that all elements of subcones are part of the cone
 	 * @param subcone
 	 */
-	public void computeCone(HashSet<Marking> subcone) {
+	public boolean computeCone(HashSet<Marking> subcone) {
 		// start from current marking, recursively generate successors until
 		// nothing new is added
 		// initially add this to cone
@@ -224,9 +248,9 @@ public class Marking implements Cloneable {
 				HashSet<Marking> successors = successor.getSuccessors();
 
 				for (Marking newSuccessor : successors) {
-					// add element to cone if it is not in cone and not generated previosuly
+					// add element to cone if it is not in cone and not generated previously
 					if (!isInCone(newSuccessor) && !newSuccessors.contains(newSuccessor)) {
-						// check if some element of the subcone is equal to successor
+						// check if some element of the sub-cone is equal to successor
 						for (Marking element : subcone) {
 							if (element.equals(newSuccessor)) {
 								element.setHasCone(true);
@@ -250,19 +274,14 @@ public class Marking implements Cloneable {
 			currentSuccessors.addAll(newSuccessors);
 		} while (expanded);
 		
-		// check if all subcone elements are part of the cone
-		boolean hasCone = true;
+		// check if all sub-cone elements are part of the cone
 		for (Marking element : subcone) {
 			if (!element.isHasCone()) {
-				hasCone = false;
+				return false;
 			}
 		}
 		
-		if (!hasCone) {
-			System.out.println("Property does not hold!");
-		} else {
-			System.out.println("Property holds!");
-		}
+		return true;
 	}
 
 	public void printCone() {
@@ -347,5 +366,106 @@ public class Marking implements Cloneable {
 	 */
 	public int size() {
 		return markedPlaces.size();
+	}
+	
+	/**
+	 * generate TCSSs of cone with source this
+	 * use Tarjan's algorithm
+	 */
+	// TODO: generate TSCCs
+	public void generateTCSSs() {
+		stack = new Stack<Marking>();
+		
+		for (Marking element : cone) {
+			if (element.indexUndefined()) {
+				strongConnect(element);
+			}
+		}
+	}
+	
+	private void strongConnect(Marking current) {
+		int index = Marking.getNextIndex();
+		current.setIndex(index);
+		current.setLowlink(index);
+		
+		// push current node into the stack
+		stack.push(current);
+		
+		HashSet<Marking> successors = current.getSuccessors();
+		
+		for (Marking successor : successors) {
+			if (successor.indexUndefined()) {
+				strongConnect(successor);
+				
+				int temp = successor.getIndex();
+				if (temp < current.getIndex()) {
+					current.setIndex(temp);
+				}
+			} else if (stack.contains(successor)){
+				int temp = successor.getIndex();
+				if (temp < current.getIndex()) {
+					current.setIndex(temp);
+				}
+			}
+		}
+		
+		// if current is a root node, pop the stack and generate TSCC
+		if (current.getLowlink() == current.getIndex()) {
+			Marking node; 
+			do {
+				node = stack.pop();
+				
+				// add node to current tscc
+				node.setInSCC(true);
+				
+			} while(node.equals(current));
+		}
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public int setLowlink(int lowlink) {
+		this.lowlink = lowlink;
+		return lowlink;
+	}
+
+	public int getLowlink() {
+		return lowlink;
+	}
+	
+	public static int getNextIndex() {
+		nextIndex++;
+		return nextIndex;
+	}
+	
+	public boolean indexUndefined() {
+		if (index == 0) {
+			return true;
+		}
+		
+		return false;
+	}
+
+	public void setInTSCC(boolean isInTSCC) {
+		this.isInTSCC = isInTSCC;
+	}
+
+	public boolean isInTSCC() {
+		return isInTSCC;
+	}
+
+	public boolean setInSCC(boolean isInSCC) {
+		this.isInSCC = isInSCC;
+		return isInSCC;
+	}
+
+	public boolean isInSCC() {
+		return isInSCC;
 	}
 }

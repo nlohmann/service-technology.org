@@ -18,6 +18,14 @@ import java.util.regex.Pattern;
 
 import javax.management.RuntimeErrorException;
 
+/**
+ * library for distributed instance migration 
+ * 
+ * Assumptions:
+ * - places have names of the following form: literals followed by a number 
+ * @author darsinte
+ *
+ */
 public class Mia {
 	public static final String PLACE = "[a-z]*[0-9]*";
 	private Place[] placesOld, placesNew;
@@ -183,8 +191,6 @@ public class Mia {
 		HashSet<Marking> subcone = new HashSet<Marking>();
 		subcone.add(m1);
 		subcone.add(m2);
-		
-		System.out.println(m1.equals(m2));
 		
 		initial.computeCone(subcone);
 		initial.printCone();

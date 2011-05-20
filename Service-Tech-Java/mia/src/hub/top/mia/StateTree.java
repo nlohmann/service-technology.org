@@ -414,6 +414,7 @@ public class StateTree {
 				SafeMarking ci = currentClusters.get(i);
 				SafeMarking cj = currentClusters.get(j);
 
+
 				if (ci.isEquivalent(cj) && lexComp.compare(ci, cj) > 0) {
 					System.out.println("remove! " + cj + " because of " + ci + " ");
 					cj.setRemoved(true);
@@ -426,10 +427,11 @@ public class StateTree {
 	 * breadth first search traversal of the state tree if direct successors of
 	 * tree can be further refined, go further, otherwise add it to the final
 	 * result
+	 * output should be distributed migration relation
 	 */
 	public void gatherResult() {
 		// TODO: implement gather results
 		// traverse tree in breadth first search order
-		
+		// if a child can be further refined, 
 	}
 }

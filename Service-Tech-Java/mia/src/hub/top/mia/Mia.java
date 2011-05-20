@@ -193,7 +193,7 @@ public class Mia {
 		subcone.add(m2);
 		
 		initial.computeCone(subcone);
-		//initial.printCone();
+		initial.printCone();
 		initial.generateTCSSs();
 	}
 	

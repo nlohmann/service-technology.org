@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
-import java.util.regex.Matcher;
 
 /**
  * Marking of a given PetriNet
@@ -179,7 +178,7 @@ public class Marking implements Cloneable {
 					.getPostSet();
 			for (Transition transition : postSet) {
 				if (isForwardEnabled(transition)) {
-					getForwardSuccessor().add(fireForward(transition));
+					forwardSuccessor.add(fireForward(transition));
 				}
 			}
 			
@@ -187,7 +186,7 @@ public class Marking implements Cloneable {
 			LinkedList<Transition> preSet = (LinkedList<Transition>) place.getPreSet();
 			for (Transition transition : preSet) {
 				if (isBackwardEnabled(transition)) {
-					getBackSuccesors().add(fireBackward(transition));
+					backSuccesors.add(fireBackward(transition));
 				}
 			}
 		}
@@ -397,7 +396,7 @@ public class Marking implements Cloneable {
 		
 		HashSet<Marking> successors = current.getForwardSuccessor();
 		
-		for (Marking successor : successors) {
+		for (Marking successor : successors) {			
 			if (successor.indexUndefined()) {
 				strongConnect(successor);
 				

@@ -192,9 +192,11 @@ public class Mia {
 		subcone.add(m1);
 		subcone.add(m2);
 		
-		initial.computeCone(subcone);
-		initial.printCone();
-		initial.generateTCSSs();
+		Cone cone = new Cone(initial);
+		cone.generateCone(subcone);
+		cone.printCone();
+		cone.generateTCSSs();
+		
 	}
 	
 	public void run(String strOld, String strNew) {
@@ -274,10 +276,12 @@ public class Mia {
 				System.out.println(element);
 			}
 			
-			testCone(n_Old);
+			//testCone(n_Old);
 			
-			//tree.buildTree(globalStates);
-			//tree.traverseTree();
+			tree.buildTree(globalStates);
+			tree.traverseTree();
+			
+			tree.computeCombinations();
 			
 			// read any errors from the attempted command - not of interest
 			// at the moment

@@ -166,7 +166,7 @@ public class StateTree {
 		}
 
 		// check if we have empty intersection already
-		if (arrayClusters[arrayClusters.length - 1].isEmpty()) {
+		if (arrayClusters.length > 0 && arrayClusters[arrayClusters.length - 1].isEmpty()) {
 			root = arrayClusters[arrayClusters.length - 1];
 		} else {
 			// add clusters with no fathers as children of root
@@ -245,8 +245,9 @@ public class StateTree {
 				System.out.println("Found combination: ");
 				for (SafeMarking cluster : validClusters) {
 					cluster.setDecomposed(true);
-					System.out.println(cluster);
+					System.out.println(cluster + " " + cluster.hashCode());
 				}
+				
 				
 				//TODO: implement cone property check 
 				// compute subcones of cluster
@@ -297,12 +298,14 @@ public class StateTree {
 
 			// push children in the queue
 			HashSet<SafeMarking> children = current.getChildren();
+			
+			System.out.println("Children of current:");
 			for (SafeMarking child : children) {
+				System.out.print(child + " ");
 				queue.addLast(child);
 			}
+			System.out.println();
 		} while (!queue.isEmpty());
-
-		// call compute intersections for last set of clusters
 	}
 
 	/**
@@ -391,7 +394,7 @@ public class StateTree {
 			for (SafeMarking child : children) {
 				if (child.isRemoved()) {
 					// remove link between current and child
-					System.out.println("Removing: " + child);
+					//System.out.println("Removing: " + child);
 					current.removeChild(child);
 					child.removeFather(current);
 				} else {

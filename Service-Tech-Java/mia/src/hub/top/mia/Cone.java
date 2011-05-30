@@ -5,6 +5,11 @@ import java.util.HashSet;
 import java.util.Stack;
 import java.util.Vector;
 
+/**
+ * Implements the functionalities related to cones
+ * @author darsinte
+ *
+ */
 public class Cone {
 	/** set with all elements of the cone **/
 	private Vector<Marking> cone;
@@ -147,7 +152,7 @@ public class Cone {
 	
 	/**
 	 * generate TCSSs of cone with source this
-	 * use Tarjan's algorithm
+	 * use Tarjan's algorithm 
 	 */
 	public void generateTCSSs() {
 		stack = new Stack<Marking>();
@@ -159,6 +164,10 @@ public class Cone {
 		}
 	}
 	
+	/**
+	 * compute terminal strongly connected components from current submarking
+	 * @param current
+	 */
 	private void strongConnect(Marking current) {
 		int index = Marking.getNextIndex();
 		current.setIndex(index);
@@ -201,6 +210,7 @@ public class Cone {
 			} while(!node.equals(current));
 			
 			// check if all successors of all scc members are in same scc - found tscc
+			// TODO: all tscc-s must have at least one element in the distributed instance migration relation
 			boolean isTSCC = true;
 			for (Marking sccNode : sccNodes) {
 				HashSet<Marking> sccSuccessors = sccNode.getForwardSuccessor();
@@ -225,6 +235,24 @@ public class Cone {
 
 	public void setSource(Marking source) {
 		this.source = source;
+	}
+	
+	/***
+	 * check if from a given marking a TSCC of the cone is reachable
+	 * @param node
+	 * @return
+	 */
+	public boolean isTSCCReachable(Marking node) {
+		if (node.isInTSCC()) {
+			return true;
+		}
+		
+		HashSet<Marking> forwardSuccessors = node.getForwardSuccessor();
+		for (Marking successor : forwardSuccessors) {
+			return isTSCCReachable(successor);
+		}
+		
+		return false;
 	}
 
 	public Marking getSource() {

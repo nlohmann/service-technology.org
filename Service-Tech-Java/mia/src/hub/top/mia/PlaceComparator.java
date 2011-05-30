@@ -5,7 +5,7 @@ import hub.top.petrinet.Place;
 import java.util.Comparator;
 
 /**
- * compare places based on lexicographical order
+ * compare places based on lexicographical order, needed for minimizing the state tree
  * @author darsinte
  *
  */

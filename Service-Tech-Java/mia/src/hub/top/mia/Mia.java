@@ -197,6 +197,12 @@ public class Mia {
 		cone.printCone();
 		cone.generateTCSSs();
 		
+		Marking node = cone.getElement(m1);
+		if (cone.isTSCCReachable(node)) {
+			System.out.println(m1 + " is reachable!");
+		} else {
+			System.out.println(m1 + " is not reachable!");
+		}
 	}
 	
 	public void run(String strOld, String strNew) {
@@ -276,11 +282,13 @@ public class Mia {
 				System.out.println(element);
 			}
 			
-			//testCone(n_Old);
+			// pass reference to sorted places
+			tree.setSortedPlaces_No(placesOld);
+			tree.setSortedPlaces_Nn(placesNew);
 			
+			// compute distributed jumper transitions
 			tree.buildTree(globalStates);
 			tree.traverseTree();
-			
 			tree.computeCombinations();
 			
 			// read any errors from the attempted command - not of interest

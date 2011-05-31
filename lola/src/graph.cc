@@ -336,7 +336,7 @@ void printincompletestates(State* s, ostream* graphstream, int level = 1) {
         (*graphstream) << "\n\n";
         if (!level) {
             for (i = 0; i < s->current; ++i) {
-                (*graphstream) << s->firelist[i]->name << "->" << s->succ[i]->dfs << "\n";
+                (*graphstream) << s->firelist[i]->name << " -> " << s->succ[i]->dfs << "\n";
             }
             (*graphstream) << s->firelist[s->current]->name << " => " << s->succ[s->current]->dfs << "\n";
             for (i = s->current + 1; s->firelist[i]; ++i) {
@@ -1554,7 +1554,7 @@ endomegaproc:
                     }
                     (*graphstream) << "\n\n";
                     for (i = 0; CurrentState->firelist[i]; ++i) {
-                        (*graphstream) << CurrentState->firelist[i]->name << "->" << CurrentState->succ[i]->dfs << "\n";
+                        (*graphstream) << CurrentState->firelist[i]->name << " -> " << CurrentState->succ[i]->dfs << "\n";
                     }
                     (*graphstream) << endl;
                 }
@@ -3463,7 +3463,7 @@ unsigned int compute_scc() {
                 }
                 (*graphstream) << "\n\n";
                 for (i = 0; CurrentState->firelist[i]; ++i) {
-                    (*graphstream) << CurrentState->firelist[i]->name << "->" << CurrentState->succ[i]->dfs << "\n";
+                    (*graphstream) << CurrentState->firelist[i]->name << " -> " << CurrentState->succ[i]->dfs << "\n";
                 }
                 (*graphstream) << endl;
             }

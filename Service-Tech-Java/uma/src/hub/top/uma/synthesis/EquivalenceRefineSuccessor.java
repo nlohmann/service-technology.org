@@ -25,6 +25,8 @@ import hub.top.uma.Uma;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import com.google.gwt.dev.util.collect.HashSet;
 
@@ -54,22 +56,21 @@ public class EquivalenceRefineSuccessor implements IEquivalentNodesRefine {
    * (non-Javadoc)
    * @see hub.top.uma.synthesis.IEquivalentConditions#splitIntoEquivalenceClasses(java.util.Collection)
    */
-  public Collection<HashSet<DNode>> splitIntoEquivalenceClasses(
-      HashSet<DNode> nodes)
+  public Collection<Set<DNode>> splitIntoEquivalenceClasses(Set<DNode> nodes)
   {
     // do not split sets of events
     if (!nodes.isEmpty() && nodes.iterator().next().isEvent) {
-      HashSet<HashSet<DNode>> result = new HashSet<HashSet<DNode>>();
+      Set<Set<DNode>> result = new HashSet<Set<DNode>>();
       result.add(nodes);
       return result;
     }
     
     Uma.out.print("splitting: "+nodes);
     
-    HashMap<DNode[], HashSet<DNode>> succ = successorEquivalence(bp, nodes);
+    Map<DNode[], Set<DNode>> succ = successorEquivalence(bp, nodes);
     
     Uma.out.print(" --> ");
-    for (HashSet<DNode> part : succ.values()) {
+    for (Set<DNode> part : succ.values()) {
       Uma.out.print(part+" | ");
     }
     Uma.out.println();
@@ -87,8 +88,8 @@ public class EquivalenceRefineSuccessor implements IEquivalentNodesRefine {
    *         is an array of the canonical representatives of the successors of all nodes in the
    *         class
    */
-  public static HashMap<DNode[], HashSet<DNode>> successorEquivalence(DNodeBP bp, HashSet<DNode> nodes) {
-    HashMap<DNode[], HashSet<DNode>> succ = new HashMap<DNode[], HashSet<DNode>>();
+  public static Map<DNode[], Set<DNode>> successorEquivalence(DNodeBP bp, Set<DNode> nodes) {
+    Map<DNode[], Set<DNode>> succ = new HashMap<DNode[], Set<DNode>>();
     
     // partition the set of nodes in this equivalence class based on their
     // successors: two nodes go into the same partition if their sets of successors
@@ -125,7 +126,7 @@ public class EquivalenceRefineSuccessor implements IEquivalentNodesRefine {
     
     DNode[] s = new DNode[d.post.length];
     for (int i=0; i<d.post.length; i++) {
-      s[i] = bp.getElementary_ccPair().get(d.post[i]);
+      s[i] = bp.futureEquivalence().getElementary_ccPair().get(d.post[i]);
     }
     return s;
   }

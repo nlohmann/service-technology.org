@@ -21,6 +21,7 @@ package hub.top.uma.synthesis;
 import hub.top.uma.DNode;
 
 import java.util.Collection;
+import java.util.Set;
 
 import com.google.gwt.dev.util.collect.HashSet;
 
@@ -40,7 +41,7 @@ public interface IEquivalentNodesRefine {
    *         returned collection must contain only one set that equals the
    *         original set of 'nodes'
    */
-  public Collection<HashSet<DNode>> splitIntoEquivalenceClasses(
-      HashSet<DNode> nodes);
+  public Collection<Set<DNode>> splitIntoEquivalenceClasses(
+      Set<DNode> nodes);
 
 }

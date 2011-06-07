@@ -271,7 +271,7 @@ public class TransitiveDependencies {
             // and all conditions 'cPrime' that are equivalent to 'c' (and would be
             // folded to the same place as 'c'
             boolean cEquivIsImplied = false;
-            for (DNode cPrime : build.foldingEquivalence().get(build.equivalentNode().get(c))) {
+            for (DNode cPrime : build.futureEquivalence().get(build.equivalentNode().get(c))) {
               if (implied.contains(cPrime)) {
                 cEquivIsImplied = true;
                 break;

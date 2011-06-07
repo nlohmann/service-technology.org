@@ -25,6 +25,7 @@ import hub.top.petrinet.Transition;
 import hub.top.petrinet.unfold.DNodeSys_PetriNet;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeRefold;
 import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
@@ -32,6 +33,9 @@ import hub.top.uma.Options;
 import hub.top.uma.DNodeSet.DNodeSetElement;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.gwt.dev.util.collect.HashSet;
 
 /**
@@ -42,7 +46,7 @@ import com.google.gwt.dev.util.collect.HashSet;
  */
 public class NetSynthesis {
   
-  private DNodeBP bp;
+  private DNodeRefold bp;
   
   /**
    *  map that assigns each DNode to its synthesize net counter-part
@@ -57,7 +61,7 @@ public class NetSynthesis {
    */
   public HashMap<Node, DNode> n2d;
 
-  public NetSynthesis(DNodeBP bp) {
+  public NetSynthesis(DNodeRefold bp) {
     this.bp = bp;
   }
   
@@ -102,17 +106,17 @@ public class NetSynthesis {
     if (computeFoldingEquivalence) {
       // we still have to compute the folding equivalence for the synthesis
       bp.equivalentNode();
-      bp.extendFoldingEquivalence_maximal();
-      while (bp.extendFoldingEquivalence_backwards());
+      bp.extendFutureEquivalence_maximal();
+      while (bp.extendFutureEquivalence_backwards());
       //bp.debug_printFoldingEquivalence();
       
-      bp.relaxFoldingEquivalence();
+      bp.relaxFutureEquivalence();
       
       //bp.debug_printFoldingEquivalence();
     }
     
     // maps each DNode to its least equivalent DNode (to itself it is the least)
-    HashMap<DNode, DNode> equiv = bp.equivalentNode();
+    Map<DNode, DNode> equiv = bp.equivalentNode();
     // map that assigns each DNode to its synthesize net counter-part
     // built up during net construction
     d2n = new HashMap<DNode, Node>();
@@ -256,6 +260,20 @@ public class NetSynthesis {
       }
     }
     
+    for (Transition s1 : net.getTransitions()) {
+      System.out.print(s1+" -->");
+      for (DNode e: fromNodes) {
+        if (!e.isEvent) continue;
+        DNode e2 = e;
+        while (equiv.get(e) != null && equiv.get(e) != e)
+          e = equiv.get(e);
+        if (n2d.get(s1) == e) {
+          System.out.print(e2+", ");
+        }
+      }
+      System.out.println();
+    }
+    
     return net;
   }
   
@@ -269,7 +287,7 @@ public class NetSynthesis {
    *                    folding equivalence still has to be computed
    * @return
    */
-  public static PetriNet foldToNet_labeled(DNodeBP bp, DNodeSetElement fromNodes, boolean computeFoldingEquivalence) {
+  public static PetriNet foldToNet_labeled(DNodeRefold bp, DNodeSetElement fromNodes, boolean computeFoldingEquivalence) {
    NetSynthesis synth = new NetSynthesis(bp);
    return synth.foldToNet_labeled(fromNodes, computeFoldingEquivalence);
   }
@@ -282,7 +300,7 @@ public class NetSynthesis {
    *                    folding equivalence still has to be computed
    * @return
    */
-  public static PetriNet foldToNet_labeled(DNodeBP bp, boolean computeFoldingEquivalence) {
+  public static PetriNet foldToNet_labeled(DNodeRefold bp, boolean computeFoldingEquivalence) {
     DNodeSetElement showNodes = getAllNodes_notHotAnti(bp);
     return foldToNet_labeled(bp, showNodes, computeFoldingEquivalence);
   }
@@ -295,7 +313,7 @@ public class NetSynthesis {
    * @param bp
    * @return
    */
-  public static PetriNet foldToNet_labeled(DNodeBP bp) {
+  public static PetriNet foldToNet_labeled(DNodeRefold bp) {
     DNodeSetElement showNodes = getAllNodes_notHotAnti(bp);
     return foldToNet_labeled(bp, showNodes, true);
   }
@@ -505,7 +523,7 @@ public class NetSynthesis {
     
     while ((dbp2.step() > 0));
 
-    dbp2.foldingEquivalence();
+    dbp2.futureEquivalence();
 
     int result = hub.top.uma.synthesis.NetSynthesis.compareBehavior(dbp, dbp2);
     switch (result) {
@@ -632,7 +650,7 @@ public class NetSynthesis {
           // a matching node 'b' that matches 'b2' = d2Pre[i]
           DNode b = matchMap.get(d2Pre[i]);
           // and all nodes of 'sys' that are equivalent to 'b'
-          HashSet<DNode> dPre_i = dbp.foldingEquivalence().get(dbp.equivalentNode().get(b)); 
+          Set<DNode> dPre_i = dbp.futureEquivalence().get(dbp.equivalentNode().get(b)); 
           
           // and collect all successors of 'b' (and its equivalent nodes,
           // these successors are possible nodes 'd' of 'sys' to match 'd2'
@@ -746,7 +764,7 @@ public class NetSynthesis {
         
         // 'd' was not matched, so check whether an equivalent node was matched
         boolean matched = false;
-        for (DNode dPrime : dbp.foldingEquivalence().get(dbp.equivalentNode().get(d))) {
+        for (DNode dPrime : dbp.futureEquivalence().get(dbp.equivalentNode().get(d))) {
           if (matchMap.containsValue(dPrime)) {
             matched = true;
             break;
@@ -791,7 +809,7 @@ public class NetSynthesis {
    * @param fillEnd
    * @param add
    */
-  private static void insertSetSorted(HashSet<DNode>[] sets, int fillStart, int fillEnd, HashSet<DNode> add) {
+  private static void insertSetSorted(Set<DNode>[] sets, int fillStart, int fillEnd, Set<DNode> add) {
     if (fillStart == fillEnd) {
       sets[fillStart] = add;
       return;

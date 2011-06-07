@@ -394,7 +394,7 @@ public class UmaTest extends hub.top.test.TestCase {
       o.configure_Scenarios();
       o.configure_stopIfUnSafe();
       
-      DNodeBP build = new DNodeBP(sys, o);
+      DNodeRefold build = new DNodeRefold(sys, o);
       while (build.step() > 0) {
       }
       
@@ -428,7 +428,7 @@ public class UmaTest extends hub.top.test.TestCase {
       o.configure_Scenarios();
       o.configure_stopIfUnSafe();
       
-      DNodeBP build = new DNodeBP(sys, o);
+      DNodeRefold build = new DNodeRefold(sys, o);
       while (build.step() > 0) {
       }
       

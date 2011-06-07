@@ -107,13 +107,13 @@ public class Uma {
     return build;
   }
   
-  public static DNodeBP initBuildPrefix_View(DNodeSys sys, int bound) {
+  public static DNodeRefold initBuildPrefix_View(DNodeSys sys, int bound) {
     Options o = new Options(sys);
     o.configure_buildOnly();
     o.configure_setBound(bound);
     o.configure_simplifyNet();
     
-    DNodeBP build = new DNodeBP(sys, o);
+    DNodeRefold build = new DNodeRefold(sys, o);
     
     return build;
   }

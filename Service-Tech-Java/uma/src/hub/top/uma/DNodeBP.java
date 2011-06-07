@@ -1126,7 +1126,7 @@ public class DNodeBP {
           // for all other events, check whether it is a cutOff event
     			if (isCutOffEvent(newEvent)) {
     				newEvent.isCutOff = true;
-    				_debug_log.append("is a cut-off event because of "+elementary_ccPair.get(newEvent)+"\n");
+    				_debug_log.append("is a cut-off event because of "+futureEquivalence.getElementary_ccPair().get(newEvent)+"\n");
     				_debug_log.append(toString(primeConfigurationString.get(newEvent))+"\n");//" > "+toString(primeConfigurationString.get(elementary_ccPair.get(newEvent)))+"\n");
     			} else {
     			  _debug_log.append(toString(primeConfigurationString.get(newEvent))+"\n");
@@ -1532,6 +1532,23 @@ public class DNodeBP {
     // System.out.println("----- next step -----");
     EnablingInfo info = getAllEnabledEvents(dNodeAS.fireableEvents);
     enablingQueue.insertAll(info);
+    
+    /*
+     * for checking quasi liveness
+     * 
+    Uma.out.println("found "+enablingQueue.size()+" enabled events");
+    
+    for (LinkedList<SyncInfo> enabled : enablingQueue.queue.values()) {
+      for (SyncInfo s : enabled) {
+        if (s.events[0].id == getOptions().checkProperty_ExecutableEventID) {
+          propertyCheck |= PROP_EXECUTEDEVENT;
+          Uma.out.println("found event early");
+          return 0;
+        }
+      }
+    }
+    */
+    
     int fired = fireAllEnabledEvents();
     
     // some cut-off events may not have been detected because
@@ -1578,92 +1595,61 @@ public class DNodeBP {
    * --------------------------------------------------------------------------
    */
 	
-	/**
-   * Maps each cut-off event and each post-condition of a cut-off event to its
-   * smallest equivalent event (condition) of the branching process.
-   * 
-   * Two nodes are equivalent iff their futures in the full (infinite)
-   * unfolding are isomorphic. Cut-off events that are equivalent to the
-   * initial cut have no entry in this map.
-   * 
-   * This mapping is updated by {@link #updateCCpair(DNode, DNode)} and
-   * {@link #updateCCpair(DNode[], DNode[])} and is used for computing foldings
-   * of the McMillan prefix ({@link #minimizeFoldingRelation()} and {@link #relaxFoldingEquivalence()}) and
-   * for deciding behavioral properties ({@link #checkProperties()}).
-   */
-  private HashMap<DNode, DNode> elementary_ccPair = new HashMap<DNode, DNode>();
-  
-  /**
-   * @return the mapping of cutOff events to their equivalent counter parts
-   * 
-   * TODO: method is public to be called from extending plugins, check consistency of other fields when the method is re-used in another context
-   */
-  public HashMap<DNode, DNode> getElementary_ccPair() {
-    // FIXME: return only after computation finished?
-    return elementary_ccPair;
-  }
-
+	private final FutureEquivalence futureEquivalence = new FutureEquivalence();
+	
 	/**
 	 * Update the mapping that relates each new cutOff event to its equivalent
 	 * old event. If the equivalent event is a cutOff event as well, follow the
 	 * equivalence relation transitively to the first event.
 	 * 
-	 * @param newEvent
+	 * @param cutOffEvent
 	 *     the new event that is a cutOff event
 	 * @param equivalentEvent
 	 *     the old event to which <code>newEvent</code> is equivalent
 	 *     
    * TODO: method is protected to be called from extending plugins, check consistency of other fields when the method is re-used in another context
 	 */
-	protected void updateCCpair(DNode newEvent, DNode equivalentEvent) {
-	  DNode existing = elementary_ccPair.get(equivalentEvent);
-	  if (existing == null)
-	    elementary_ccPair.put(newEvent, equivalentEvent);
-	  else
-	    elementary_ccPair.put(newEvent, existing);
+	protected void setCutOffEvent(DNode cutOffEvent, DNode equivalentEvent) {
+	  futureEquivalence.putElementaryEquivalent(cutOffEvent, equivalentEvent);
 	}
 	
 	/**
    * Update the mapping that relates each new condition of a cutOff event to
    * its equivalent counterpart condition.
    * 
-   * @param newEvent
+   * @param cutOffEvent
    *     the new cut-off event
-   * @param newConditions
+   * @param cutOffConditions
    *     the new conditions
-   * @param equivalentEvent
-   *     the old conditions to which <code>newConditions</code> are equivalent
+   * @param equivalentConditions
+   *     the old conditions to which <code>cutOffConditions</code> are equivalent
    *     
    * TODO: method is protected to be called from extending plugins, check consistency of other fields when the method is re-used in another context
    */
-  protected void updateCCpair(DNode newEvent, DNode[] newConditions, DNode equivalentConditions[]) {
-    for (int i=0; i<newConditions.length; i++) {
+  protected void setCutOffConditions(DNode cutOffEvent, DNode[] cutOffConditions, DNode equivalentConditions[]) {
+    for (int i=0; i<cutOffConditions.length; i++) {
       
-      DNode existing = elementary_ccPair.get(equivalentConditions[i]);
-      if (existing == null)
-        elementary_ccPair.put(newConditions[i], equivalentConditions[i]);
-      else
-        elementary_ccPair.put(newConditions[i], existing);
+      futureEquivalence.putElementaryEquivalent(cutOffConditions[i], equivalentConditions[i]);
       
-      if (newConditions[i] == equivalentConditions[i]) {
+      if (cutOffConditions[i] == equivalentConditions[i]) {
         //System.out.println("[DNodeBP:updateCCpair] WARNING: making "+newConditions[i]+" equivalent to itself");
       } else {
         
         // update mapping only for post-conditions of cut-off event
-        if (newConditions[i].pre != null && newConditions[i].pre.length > 0
-            && newConditions[i].pre[0] != newEvent) {
+        if (cutOffConditions[i].pre != null && cutOffConditions[i].pre.length > 0
+            && cutOffConditions[i].pre[0] != cutOffEvent) {
           continue;
         }
         
         //System.out.println("setting cut-off condition: "+newConditions[i]+" because of "+equivalentConditions[i]);
-        newConditions[i].isCutOff = true; // remember it
+        cutOffConditions[i].isCutOff = true; // remember it
       }
     }
   }
   
-  public void debugPrintCCpairs() {
+  public void debugPrintCutOffPairs() {
     System.out.println("----- CC-pairs -----");
-    for (Entry<DNode, DNode> cc : elementary_ccPair.entrySet()) {
+    for (Entry<DNode, DNode> cc : futureEquivalence.getElementary_ccPair().entrySet()) {
       System.out.println(cc.getKey()+" --> "+cc.getValue());
     }
     System.out.println("---- /CC-pairs -----");
@@ -1737,15 +1723,15 @@ public class DNodeBP {
 	private boolean findEquivalentCut_history(DNode newEvent, DNode[] newCut, HashSet<DNode> eventsToCompare) {
 
 		if (equivalentCuts_history(newCut, bp.initialCut)) {
-		  updateCCpair(newEvent, newCut, bp.initialCut);
+		  setCutOffConditions(newEvent, newCut, bp.initialCut);
 			return true;
 		}
 
 		for (DNode e : eventsToCompare) {
 			DNode[] oldCut = bp.getPrimeCut(e, false, false);
 			if (equivalentCuts_history(newCut, oldCut)) {
-			  updateCCpair(newEvent, e); // update the cutOff mapping
-			  updateCCpair(newEvent, newCut, oldCut);
+			  setCutOffEvent(newEvent, e); // update the cutOff mapping
+			  setCutOffConditions(newEvent, newCut, oldCut);
 				return true;
 			}
 		}
@@ -1827,7 +1813,7 @@ public class DNodeBP {
 		// check the initial cut for equivalence
 		if (newCut.length == bp.initialCut.length)
 			if (equivalentCuts_eventSignature_predecessor(newCutSignature, bp.initialCut)) { 
-			  updateCCpair(newEvent, newCut, bp.initialCut); // make new and old cut equivalent
+			  setCutOffConditions(newEvent, newCut, bp.initialCut); // make new and old cut equivalent
 				return true;
 			}
 		
@@ -1836,8 +1822,8 @@ public class DNodeBP {
 			DNode[] oldCut = bp.getPrimeCut(e, false, false);
 			if (newCut.length == oldCut.length)
 				if (equivalentCuts_eventSignature_predecessor(newCutSignature, oldCut)) {
-	        updateCCpair(newEvent, e);     // make new and old event equivalent
-	        updateCCpair(newEvent, newCut, oldCut);  // make new and old cut equivalent
+	        setCutOffEvent(newEvent, e);     // make new and old event equivalent
+	        setCutOffConditions(newEvent, newCut, oldCut);  // make new and old cut equivalent
 					return true;
 				}
 		}
@@ -1970,7 +1956,7 @@ public class DNodeBP {
 		if (newCut.length == bp.initialCut.length)
 			if (equivalentCuts_eventSignature_lexik(newEventSignature, bp.initialCut)) {
 				//System.out.println(toString(newCut)+ " equals initial");
-			  updateCCpair(newEvent, newCut, bp.initialCut); // make new and old cut equivalent
+			  setCutOffConditions(newEvent, newCut, bp.initialCut); // make new and old cut equivalent
 				return true;
 			}
 		
@@ -1994,8 +1980,8 @@ public class DNodeBP {
 				//System.out.println("prime cut of "+e);
 				if (equivalentCuts_eventSignature_lexik(newEventSignature, oldCut)) {
 					//System.out.println(toString(newCut)+ " equals " + toString(oldCut));
-	        updateCCpair(newEvent, e);    // make new and old event equivalent
-	        updateCCpair(newEvent, newCut, oldCut); // make new and old cut equivalent
+	        setCutOffEvent(newEvent, e);    // make new and old event equivalent
+	        setCutOffConditions(newEvent, newCut, oldCut); // make new and old cut equivalent
 					return true;
 				}
 			}
@@ -2071,15 +2057,15 @@ public class DNodeBP {
 	private boolean findEquivalentCut_marking_predecessor(DNode newEvent, DNode[] newCut, HashSet<DNode> eventsToCompare) {
 
 		if (equivalentCuts_marking(newCut, bp.initialCut)) {
-		  updateCCpair(newEvent, newCut, bp.initialCut);
+		  setCutOffConditions(newEvent, newCut, bp.initialCut);
 			return true;
 		}
 		
 		for (DNode e : eventsToCompare) {
 			DNode[] oldCut = bp.getPrimeCut(e, false, false);
 			if (equivalentCuts_marking(newCut, oldCut)) {
-	      updateCCpair(newEvent, e);    // make new and old event equivalent
-	      updateCCpair(newEvent, newCut, oldCut); // make new and old cut equivalent
+	      setCutOffEvent(newEvent, e);    // make new and old event equivalent
+	      setCutOffConditions(newEvent, newCut, oldCut); // make new and old cut equivalent
 				return true;
 			}
 		}
@@ -2186,7 +2172,7 @@ public class DNodeBP {
     if (newCut.length == bp.initialCut.length)
       if (equivalentCuts_conditionSignature_history(newCutSignature, newCut, bp.initialCut)) {
         // yes, newEvent reaches the initial cut again
-        updateCCpair(newEvent, newCut, bp.initialCut);
+        setCutOffConditions(newEvent, newCut, bp.initialCut);
         return true; // 'newEvent' is a cut-off event 
       }
     
@@ -2259,8 +2245,8 @@ public class DNodeBP {
       // by comparing their condition signatures
       if (equivalentCuts_conditionSignature_history(newCutSignature, newCut, oldCut)) {
         // yes, equivalent cuts, make events and conditions equivalent
-        updateCCpair(newEvent, e);
-        updateCCpair(newEvent, newCut, oldCut);
+        setCutOffEvent(newEvent, e);
+        setCutOffConditions(newEvent, newCut, oldCut);
         // and yes, 'newEvent' is a cut-off event
         return true;
       }
@@ -2504,1196 +2490,51 @@ public class DNodeBP {
    * ==========================================================================
    */
    	
-	
-	/**
-	 * Remove all nodes from the branching process that are not part of
-	 * its minimal complete finite prefix. 
-	 */
-	public void minimizeFoldingRelation() {
+  private boolean futureEquivalenceInitialized = false;
 
-	  //System.out.println("minimize()");
-	  
-	  // run a breadth-first search from the maximal nodes of the branching
-	  // process to its initial nodes, for each node that has no equivalent
-	  // smaller node yet, seek an equivalent image node,  
-	  LinkedList<DNode> queue = new LinkedList<DNode>();
-	  queue.addAll(bp.getCurrentMaxNodes());
-	  
-	  while (!queue.isEmpty()) {
-	    DNode d = queue.removeFirst();
-	    DNode e = elementary_ccPair.get(d);
-	    
-	    
-	    if (e == null) {   // d has no equivalent partner yet, see if there is one
-
-	      if (d.post == null || d.post.length == 0) {
-	        // d has no successor, search in all maximal nodes for an equivalent node
-	        for (DNode d_img : bp.getCurrentMaxNodes()) {
-	          if (d_img == d) continue;
-	          if (d_img.id != d.id) continue;
-	          // do not map normal nodes to non-existing nodes
-	          if (d_img.isAnti != d.isAnti) continue; 
-	          
-	          // d and d0 are nodes with the same ID and without successor
-	          if (elementary_ccPair.get(d_img) != null) continue;
-	          // d0 also has no equivalent node, e.g. is not a cut-off node
-	          // then d and d0 are equivalent
-	          
-	          //System.out.println(d+" --> "+d_img+" (max nodes)");
-	          elementary_ccPair.put(d, d_img);
-	          d.isCutOff = true;
-	        }
-	        continue;
-	        // TODO: shouldn't we add 'd's successors to the queue?
-	      }
-	      
-	      // 'd' has successor nodes, an equivalent node 'd_img' must have the
-	      // corresponding equivalent successors, we find 'd_img' by searching in
-	      // the equivalent nodes of 'd's successors for a node with the same id
-	      // as the node 'd'
-        DNode d_img = null;
-	      
-	      // see if all successors of 'd0' have an equivalent node
-	      // and whether the equivalent nodes have all the same predecessor
-	      
-	      // for each successor 'd.post' of 'd'
-	      // find the equivalent image node 'dPost_img'
-	      DNode[] dPost_img = new DNode[d.post.length];
-	      for (int i=0; i<d.post.length; i++) {
-	        dPost_img[i] = elementary_ccPair.get(d.post[i]);
-	      }
-	      
-	      // then see if all images of the successors of 'd' have a common
-	      // predecessor
-	      
-	      // there is no image of the first successor of 'd': we cannot minimize
-	      if (dPost_img[0] == null)
-	        continue;  // no equivalent partner of the first successor
-
-	      // find the predecessor of the image of 'd's first successor  that has
-	      // same id (name) as DNode 'd', this predecessor should be 'd_img'
-	      //System.out.print("checking 0: "+dPost_img[0]+"...");
-	      for (int j=0; j<dPost_img[0].pre.length; j++)
-	        if (dPost_img[0].pre[j].id == d.id) {
-	          d_img = dPost_img[0].pre[j];
-	          break;
-	        }
-	      //System.out.println(" found "+d_img);
-	      
-	      // the image of the first successor of 'd' has no predecessor with
-	      // the same id as 'd', there is no node we can make equivalent to 'd'
-	      if (d_img == null) continue;  // no match :(
-	      
-	      // the found image has a different number of successors,
-	      // they cannot be equivalent
-	      if (d_img.post.length != d.post.length) continue;
-	      
-	      // now check whether each image of all successors of 'd' also have
-	      // 'd_img' as their predecessor
-	      boolean notFound = false;
-	      for (int i=1; i<dPost_img.length; i++) {
-          boolean foundPreFor_i = false;
-          //System.out.print("checking "+i+": "+dPost_img[i]+"...");
-          if (dPost_img[i] != null)
-  	        for (int j=0; j<dPost_img[i].pre.length; j++) {
-  	          if (dPost_img[i].pre[j] == d_img) {
-  	            // the i-th successor has 'd_img' as predecessor
-  	            //System.out.println(" found again");
-  	            foundPreFor_i = true; break; 
-  	          }
-  	        }
-          if (!foundPreFor_i) {
-            //System.out.println(" found not");
-            // if the ith successor does not have 'd_img' as predecessor,
-            // then we have no node we can make equivalent to 'd' 
-            notFound = true;
-            break;
-          }
-	      }
-	      
-	      if (notFound)
-	        continue;  // no match :(
-	      
-	      //System.out.println(d+" --> "+d_img+" (successor)");
-	      elementary_ccPair.put(d, d_img);
-	      d.isCutOff = true;
-	      // extended equivalence relation by 'd' ~ 'd_img' 
-	    }
-      // and continue with all predecessors of 'd'
-      for (DNode dPre : d.pre)
-        if (!queue.contains(dPre)) queue.addLast(dPre);
-	  } // END: search all nodes of the branching process 
-	  
-	  HashSet<DNode> seen = new HashSet<DNode>();
-	  queue.addAll(bp.initialConditions);
-	  while (!queue.isEmpty()) {
-	    DNode d = queue.removeFirst();
-	    seen.add(d);
-	    
-	    if (!d.isCutOff && (d.pre.length > 0)) {
-	      boolean allPreAreCutOff = true;
-	      for (DNode dPre : d.pre) {
-	        if (!dPre.isCutOff) { allPreAreCutOff = false; break; }
-	      }
-	      if (allPreAreCutOff) {
-	        // all predecessors are marked as cutOff, but this one not
-	        // this node actually resides beyond the minimal prefix (there
-	        // is some other configuration that is a cut-off configuration and
-	        // this event extends the other configuration)
-	        
-	        // so map this node to the corresponding node
-	        // take any predecessor of d, get its corresponding equivalent 
-	        // node 'preEquiv' and map 'd' to the corresponding successor
-	        // of 'preEquiv'
-	        DNode preEquiv = elementary_ccPair.get(d.pre[0]);
-	        for (DNode d0 : preEquiv.post) {
-	          if (d0.id == d.id) {
-	            //System.out.println(d+" --> "+d0+" (initial)");
-	            d.isCutOff = true;
-	            updateCCpair(d, d0);
-	            break;
-	          }
-	        }
-	        // done, continue with d's successors iteratively
-	      }
-	    }
-	  
-	    // add all successors of d of which all predecessors have already
-	    // been visited
-	    if (d.post != null)
-  	    for (DNode dPost : d.post) {
-  	      boolean seenAll = true;
-  	      for (DNode dPostPre : dPost.pre)
-  	        if (!seen.contains(dPostPre)) { seenAll = false; break; }
-  	      if (seenAll) {
-  	        queue.addLast(dPost);
-  	      }
-  	    }
-	  }
-  }
-	
-	/**
-   * Represents the folding equivalence classes of the folding equivalence.
-   * Each canonical node 'd' is assigned the set of all nodes equivalent nodes
-   * that can reach 'd' via {@link #elementary_ccPair}.
-   */
-	public HashMap<DNode, HashSet<DNode> > foldingEquivalence() {
-	  if (!foldingEquivalenceCompleted) {
-	    buildFoldingEquivalence();
-	    relaxFoldingEquivalence();
-	    
-	    // required for synthesis, check with simplification
-	    if (getOptions().folding_extendEquivalence_forward)
-	      extendFoldingEquivalence_forward(); 
-	    
-	    //extendFoldingEquivalence_maximal();
-	    //extendFoldingEquivalence_backwards();
-	    //relaxFoldingEquivalence();
-	    
-	    foldingEquivalenceCompleted = true;
-	  }
-    return foldingEquivalenceClasses;
-	}
-	
-	/**
-	 * Represents the folding equivalence classes of the folding equivalence.
-	 * Each canonical node 'd' is assigned the set of all nodes equivalent nodes
-	 * that can reached 'd' via {@link #elementary_ccPair}. Is set by
-	 * {@link #buildFoldingEquivalence()}
-	 */
-  private HashMap<DNode, HashSet<DNode> > foldingEquivalenceClasses = null;
-  private boolean foldingEquivalenceCompleted = false;
-	
-	/**
-	 * The equivalence relation on events and conditions {@link #elementary_ccPair}
-	 * assigns to each node of the branching process an equivalent node with the
-	 * same future. This method builds the explicit equivalence classes of this relation.
-	 */
-	private void buildFoldingEquivalence() {
-	  
-	  // update the equivalence relation to point for each node to its canonic
-	  // equivalent node (i.e. the smallest node), and populate the equivalence classes
-	  for (DNode d : bp.getAllNodes()) {
-	    // create for each node an equivalence class
-	    if (!elementary_ccPair.containsKey(d)) {
-	      elementary_ccPair.put(d, d);
-	    } else {
-	      // get the least equivalent node of 'd':
-	      // collect all nodes reachable downwards via elementary_ccPair
-	      HashSet<DNode> equivSet = new HashSet<DNode>();
-	      equivSet.add(d);
-        DNode dOther = elementary_ccPair.get(d);
-	      while (dOther != null && !equivSet.contains(dOther)) {
-	        equivSet.add(dOther);
-          dOther = elementary_ccPair.get(dOther);
-	      }
-	      // and take from all reachable nodes the node with the least id
-	      dOther = d;
-	      for (DNode d2 : equivSet) {
-	        if (d2.globalId < dOther.globalId) dOther = d2;
-	      }
-	      
-	      elementary_ccPair.put(d, dOther);
-	    }
-	  }
-	  
-	  foldingEquivalenceClasses = new HashMap<DNode, HashSet<DNode>>();
-
-	  // build the equivalence classes of the equivalence relation
-	  for (DNode d : bp.getAllNodes()) {
-	    if (!foldingEquivalenceClasses.containsKey(elementary_ccPair.get(d))) {
-	      setFoldingEquivalenceClass(elementary_ccPair.get(d), new HashSet<DNode>());
-	    }
-	    foldingEquivalenceClasses.get(elementary_ccPair.get(d)).add(d);
-	  }
-	}
-	
-	/**
-	 * @param d1
-	 * @param d2
-	 * @return <code>true</code> iff d1 and d2 belong to the same equivalence class
-	 * of the folding relation
-	 */
-	public boolean areFoldingEquivalent(DNode d1, DNode d2) {
-	  return elementary_ccPair.get(d1) == elementary_ccPair.get(d2);
-	}
-	
-	/**
-	 * @param cl
-	 * @return <code>true</code> iff the set 'cl' is an equivalence class of
-	 * the {@link #foldingEquivalenceClass}
-	 */
-	private boolean areFoldingEquivalenceClass(HashSet<DNode> cl) {
-	  if (cl.isEmpty()) return true;
-	  DNode d = cl.iterator().next();
-	  DNode c = elementary_ccPair.get(d);
-	  
-	  return foldingEquivalenceClasses.get(c).equals(cl);
-	}
-	
-	/**
-	 * Extend the {@link #foldingEquivalenceClass}es by exploring the unfolding forward
-	 * and making nodes with equivalent pre-sets and equal labels equivalent until no
-	 * more change in the equivalence relation is made.
-	 */
-	private void extendFoldingEquivalence_forward () {
-	  
-	  boolean extended = true;
-	  while (extended) {
-	    extended = false;
-	    
-	    LinkedList<HashSet<DNode>> newClasses = new LinkedList<HashSet<DNode>>();
-	    
-	    // extend folding equivalence for post-conditions of equivalent events
-	    for (Entry<DNode, HashSet<DNode>> cl : foldingEquivalenceClasses.entrySet()) {
-        if (!cl.getKey().isEvent) continue;
-        
-        DNode e = cl.getKey();
-        if (e.isAnti) continue; // do not do anything for anti-events
-	      if (e.post == null) continue;
-	      for (int i=0; i<e.post.length; i++) {
-	        
-	        HashSet<DNode> newEquivalenceClass = new HashSet<DNode>();
-
-	        for (DNode e2 : cl.getValue()) {
-	          if (e2.isAnti) continue; // do not do anything for anti-events
-	          
-	          if (!areFoldingEquivalent(e.post[i], e2.post[i])) {
-	            //System.out.println("extending: post-condition "+e.post[i]+" of "+e+" and "+e2.post[i]+" of "+e2+" are not equivalent yet");
-	            extended = true;
-	          } else {
-	            for (DNode b : foldingEquivalenceClasses.get(elementary_ccPair.get(e2.post[i]))) {
-	              if (!areFoldingEquivalent(b, e2.post[i])) {
-	                System.out.println("NOT extending: post-conditions "+i+" of "+e+" and "+e2+" are equivalent");
-	                System.out.println("   but "+b+" ~ "+e2.post[i]+" are not");
-	              }
-	            }
-	          }
-	          newEquivalenceClass.add(e2.post[i]);
-	        }
-	        newClasses.addLast(newEquivalenceClass);
-	      }
-	    }
-	    
-	    for (HashSet<DNode> newClass : newClasses)
-	      joinEquivalenceClasses(newClass);
-	    
-	    // extend folding equivalence for post-events of equivalent conditions
-	    newClasses.clear();
-	    
-      // we group all events if they have equivalent pre-conditions
-	    // this map stores the sets of events that have equivalent pre-conditions
-      HashMap<DNode[], HashSet<DNode>> preSetClasses = new HashMap<DNode[], HashSet<DNode>>();
-      for (Entry<DNode, HashSet<DNode>> cl : foldingEquivalenceClasses.entrySet()) {
-        
-        // compare events
-        if (!cl.getKey().isEvent) continue;
-        // check each event of an equivalence class
-        for (DNode e : cl.getValue()) {
-          if (e.isAnti) continue; // do not do anything for anti-events
-          
-          // determine the pre-set in 'preSetClasses' that equivalently represents
-          // the pre-set of 'e'
-          DNode[] e_preSet_equiv = null;
-          for (DNode[] preSet : preSetClasses.keySet()) {
-            if (preSet.length != e.pre.length) continue;
-            
-            int i=0;
-            for (; i < e.pre.length; i++) {
-              if (!areFoldingEquivalent(e.pre[i], preSet[i]))
-                break;
-            }
-            if (i == e.pre.length) {
-              // each pre-decessor of 'e' is equivalent to the corresponding predecessor
-              // of 'preSet'
-              e_preSet_equiv = preSet;
-            }
-          }
-          
-          if (e_preSet_equiv == null) {
-            // equivalence class of the pre-set of 'e' is not represented yet
-            //  in 'preSetClasses', create a new equivalence class
-            e_preSet_equiv = e.pre;
-            preSetClasses.put(e_preSet_equiv, new HashSet<DNode>());
-          }
-          // 'd' belongs to the subequivalence class of its pre-set
-          preSetClasses.get(e_preSet_equiv).add(e);
-        }
-      }
-
-      for (HashSet<DNode> cl : preSetClasses.values()) {
-        // all events in 'cl' have a pre-set from the same equivalence class
-        
-        // split each class by labels
-        HashMap<Short, HashSet<DNode>> cl_lab = new HashMap<Short, HashSet<DNode>>();
-        for (DNode e : cl) {
-          if (!cl_lab.containsKey(e.id))
-            cl_lab.put(e.id, new HashSet<DNode>());
-          cl_lab.get(e.id).add(e);
-        }
-        
-        for (HashSet<DNode> sub_cl : cl_lab.values()) {
-          if (!areFoldingEquivalenceClass(sub_cl)) {
-            //System.out.println("extending folding equialence to "+sub_cl);
-            newClasses.addLast(sub_cl);
-            extended = true;
-          }
-        }
-      }
-      
-      for (HashSet<DNode> newClass : newClasses)
-        joinEquivalenceClasses(newClass);
-	  }
-	}
-	
-	//public static float foldThreshold = .1f;
-	//public static boolean ignoreFoldThreshold = true;
-	
-	/**
-	 * Put all nodes with the same {@link DNode#id} that have no successor
-	 * into the same equivalence class.
-	 */
-	public void extendFoldingEquivalence_maximal() {
-	  
-	  int idFrequency[] = new int[dNodeAS.currentNameID];  //
-	  for (DNode d : bp.getAllNodes()) {                   //
-	    idFrequency[d.id]++;                               //
-	  }
-	  
-	  //float foldThreshold = 0.05f;                          //
-
-	  boolean changed = true;
-	  while (changed) {
-	    
-	    changed = false;
-	    
-	    ArrayList<DNode> maximalNodes = new ArrayList<DNode>();
-	    
-	    for (Entry<DNode, HashSet<DNode>> cl : foldingEquivalenceClasses.entrySet()) {
-	      boolean allMaximal = true;
-	      for (DNode d : cl.getValue()) {
-	        if (d.post != null && d.post.length > 0) {
-	          allMaximal = false;
-	          break;
-	        }
-	      }
-	      if (allMaximal) {
-	        
-	        //if (ignoreFoldThreshold || cl.getValue().size() < idFrequency[cl.getKey().id] * foldThreshold)  //
-	           maximalNodes.add(cl.getKey());
-	      }
-	    }
-	    
-	    for (int i=0; i<maximalNodes.size(); i++) {
-	      DNode d = maximalNodes.get(i);
-	      LinkedList<DNode> dEquiv = new LinkedList<DNode>();
-	      
-	      dEquiv.add(d);
-	      int equivSize = foldingEquivalenceClasses.get(d).size();                   //
-	      
-	      for (int j=i+1; j<maximalNodes.size(); j++) {
-	        DNode e = maximalNodes.get(j);
-	        if (d.id == e.id) {
-	          dEquiv.add(e);
-	          
-	          equivSize += foldingEquivalenceClasses.get(e).size();                  //
-	          //if (!ignoreFoldThreshold && equivSize >= idFrequency[d.id] * foldThreshold) break;             //
-	        }
-	      }
-	      
-	      if (dEquiv.size() > 1) {
-	        joinEquivalenceClasses(dEquiv);
-	        changed = true;
-	        break;
-	      }
-	    }
-	  }
-	}
-	
-	public boolean extendFoldingEquivalence_backwards() {
-    boolean changed = false;
-    
-    int idFrequency[] = new int[dNodeAS.currentNameID];  //
-    for (DNode d : bp.getAllNodes()) {                   //
-      idFrequency[d.id]++;                               //
-    }
-    //float foldThreshold = .1f;                          //
-    
-    LinkedHashSet<DNode> top = new LinkedHashSet<DNode>();
-    for (DNode d : bp.getAllNodes()) {
-      if (d.isAnti) continue;
-      if ((d.post == null || d.post.length == 0) && d.pre != null) {
-        for (DNode e : d.pre)
-          top.add(e);
-      }
-    }
-
-    LinkedList<DNode> to_join = new LinkedList<DNode>();
-    HashSet<DNode> dSucc = new HashSet<DNode>();
-    HashSet<DNode> d2Succ = new HashSet<DNode>();
-    
-    Uma.out.println("top: "+top);
-    
-    int print_count = 1;
-    while (!top.isEmpty()) {
-      
-      if ((print_count % 100) == 0) Uma.out.print(top.size()+" ");
-      if (print_count++ > 1000) {
-        Uma.out.print("\n");
-        print_count = 0;
-      }
-      
-      Uma.out.println("top: "+top);
-      DNode d = top.iterator().next();
-      top.remove(d);
-      Uma.out.println("removed "+d);
-
-      to_join.clear();
-      to_join.add(d);
-
-      HashSet<DNode> dCl = foldingEquivalenceClasses.get(elementary_ccPair.get(d));
-
-      //if (!ignoreFoldThreshold && dCl.size() > idFrequency[d.id] * foldThreshold) continue;     //
-      
-      // collect the for each successor 'e' of each node in the class of 'd',
-      // the canonical representative of 'e'
-      dSucc.clear();
-      for (DNode dPrime : dCl) {
-        if (dPrime.post == null) continue;
-        for (DNode e : dPrime.post) {
-          if (e.isAnti) continue;
-          dSucc.add(elementary_ccPair.get(e));
-        }
-      }
-      Uma.out.println("  has successors: "+dSucc);
-      
-      int joint_size = dCl.size();    //
-      
-      for (DNode d2 : foldingEquivalenceClasses.keySet()) {
-
-        if (d == d2) continue;
-        if (d2.isAnti) continue;
-        if (d.id != d2.id) continue;
-        if (areFoldingEquivalent(d, d2)) continue;
-        
-        Uma.out.println("  comparing to "+d2);
-        
-        if (areConcurrent_struct(d, d2)) {
-          System.out.println("    are CONCURRENT, NOT joining");
-          continue;
-        } else {
-          // System.out.println("    are NOT concurrent");
-        }
-
-        
-        HashSet<DNode> d2Cl = foldingEquivalenceClasses.get(elementary_ccPair.get(d2));
-        
-        // collect the for each successor 'e2' of each node in the class of 'd2',
-        // the canonical representative of 'e2'
-        d2Succ.clear();
-        for (DNode d2Prime : d2Cl) {
-          if (d2Prime.post == null) continue;
-          for (DNode e2 : d2Prime.post) {
-            if (e2.isAnti) continue;
-            d2Succ.add(elementary_ccPair.get(e2));
-          }
-        }
-        Uma.out.println("    has successors: "+d2Succ);
-        
-        // Check if we can join the classes of 'd' and 'd2': this is possible
-        // if each successor of the class of 'd' has an equivalent successor of
-        // the class of 'd2'. This is the case if each canonical representative
-        // of a successor of 'd' is also a canonical representative of a 
-        // successor of 'd2'.
-        boolean all_dSucc_HaveEquivalent = true;
-        for (DNode e : dSucc) {
-          
-          if (!d2Succ.contains(e)) {
-            all_dSucc_HaveEquivalent = false;
-            Uma.out.println("    -> "+e+" not in post "+d2);
-            break;
-          }
-          
-          /*
-          boolean e_has_equivalent = false;
-          for (DNode d2Prime : d2Cl) {
-            if (d2Prime.post == null) continue;
-            for (int i = 0; i<d2Prime.post.length; i++) {
-              if (d2Prime.post[i].isAnti) continue;
-              // post-sets are ordered by IDs, nothing to find beyond this point
-              if (d2Prime.post[i].id > e.id) break;     
-              // post-sets are ordered by IDs, nothing to find here
-              if (d2Prime.post[i].id != e.id) continue; 
-              // same ID, check for equivalence
-              if (elementary_ccPair.get(d2Prime.post[i].id) == e) {
-                e_has_equivalent = true;
-                break;
-              }
-            }
-            if (e_has_equivalent) break;
-          }
-          if (!e_has_equivalent) {
-            all_dSucc_HaveEquivalent = false;
-            break;
-          }*/
-        }
-        
-        boolean all_d2Succ_HaveEquivalent = true;
-        /*
-        for (DNode e2 : d2Succ) {
-          boolean e2_has_equiv = false;
-          for (DNode e : dSucc) {
-            if (areFoldingEquivalent(e2, e)) {
-              e2_has_equiv = true;
-              break;
-            }
-          }
-          if (!e2_has_equiv) {
-            all_d2Succ_HaveEquivalent = false;
-            break;
-          }
-        }
-        */
-        for (DNode e2 : d2Succ) {
-          
-          if (!dSucc.contains(e2)) {
-            all_dSucc_HaveEquivalent = false;
-            Uma.out.println("    -> "+e2+" not in post "+d);
-            break;
-          }
-          
-          /*
-          boolean e2_has_equivalent = false;
-          for (DNode dPrime : dCl) {
-            if (dPrime.post == null) continue;
-            for (int i = 0; i<dPrime.post.length; i++) {
-              if (dPrime.post[i].isAnti) continue;
-              // post-sets are ordered by IDs, nothing to find beyond this point
-              if (dPrime.post[i].id > e2.id) break;     
-              // post-sets are ordered by IDs, nothing to find here
-              if (dPrime.post[i].id != e2.id) continue; 
-              // same ID, check for equivalence
-              if (elementary_ccPair.get(dPrime.post[i].id) == e2) {
-                e2_has_equivalent = true;
-                break;
-              }
-            }
-            if (e2_has_equivalent) break;
-          }
-          if (!e2_has_equivalent) {
-            all_d2Succ_HaveEquivalent = false;
-            break;
-          }*/
-        }
-        
-        
-        if (dSucc.isEmpty() && !d2Succ.isEmpty() || !dSucc.isEmpty() && d2Succ.isEmpty()) {
-          all_dSucc_HaveEquivalent = false;
-          all_d2Succ_HaveEquivalent = false;
-        }
-        
-        if (all_dSucc_HaveEquivalent && all_d2Succ_HaveEquivalent) {
-          to_join.add(d2);
-          Uma.out.println("  JOINING "+d+" and "+d2);
-          joint_size += d2Cl.size();    //
-        } else {
-          Uma.out.println("  NOT joining "+d+" and "+d2);
-        }
-        
-        //if (!ignoreFoldThreshold && joint_size > foldThreshold * idFrequency[d.id]) break;      //
-      }
-      
-      if (to_join.size() > 1) {
-        joinEquivalenceClasses(to_join);
-        changed = true;
-        
-        /* join pre-sets assuming ordered labels of predecessors
-        
-        // join the pre-set of all joined transitions
-        LinkedList<DNode> preJoin = new LinkedList<DNode>();
-        for (int i=0; i<d.pre.length; i++) {
-          preJoin.clear();
-          for (DNode d2 : to_join) {
-            preJoin.add(elementary_ccPair.get(d2.pre[i]));
-            // and add the predecessors of the joined pre-sets to the queue 
-            if (d2.pre[i].pre != null) {
-              for (DNode e : d2.pre[i].pre) {
-                top.add(e);
-              }
-            }
-          }
-          joinEquivalenceClasses(preJoin);
-        }
-        
-        */
-        
-        // fix the order of events to merge, so that each event has a unique index
-        // the index will be used to relate pre-conditions of different events to each other
-        DNode[] _to_join = new DNode[to_join.size()];
-        _to_join = to_join.toArray(_to_join);
-        
-        /*
-        int minPreSize = Integer.MAX_VALUE;
-        int minIndex = -1;
-        for (int i=0; i<_to_join.length; i++) {
-          if (minPreSize > _to_join[i].pre.length) {
-            minPreSize = _to_join[i].pre.length;
-            minIndex = i;
-          }
-        }
-        */
-        
-        int maxDirectPreSize = 0;
-        int maxIndex = -1;
-        for (int i=0; i<_to_join.length; i++) {
-          int i_pre_direct = 0;
-          for (int j=0; j<_to_join[i].pre.length; j++) {
-            if (!_to_join[i].pre[j].isImplied) i_pre_direct++;
-          }
-          
-          if (maxDirectPreSize < i_pre_direct) {
-            maxDirectPreSize = i_pre_direct;
-            maxIndex = i;
-          }
-        }
-        
-        // all pre-conditions of all events that we join
-        // later, we remove all conditions that have been joined with some other
-        // condition. the remaining conditions are implied conditions that are
-        // no longer required in the net and hence will be removed
-        HashSet<DNode> nonJoinedConditions = new HashSet<DNode>();
-        for (DNode d2 : to_join) {
-          for (DNode b : d2.pre) nonJoinedConditions.add(b);
-        }
-        
-        // collect conditions: for each condition of the event with the least pre-conditions
-        // we have to find an equivalent condition of each other event
-        DNode[][] joinNodes = new DNode[maxDirectPreSize][_to_join.length];
-        
-        int maxIndex_preIndex[] = new int[_to_join[maxIndex].pre.length];
-        
-        // match all conditions with the same label. these are definitely equivalent
-        // event with the least pre-conditions defines the distribution
-        // all other pre-conditions must be matched here
-        for (int j=0,j2=0; j<_to_join[maxIndex].pre.length; j++) {
-          if (!_to_join[maxIndex].pre[j].isImplied) {
-            maxIndex_preIndex[j] = j2;
-            joinNodes[j2][maxIndex] = _to_join[maxIndex].pre[j];
-            nonJoinedConditions.remove(joinNodes[j2][maxIndex]);
-            j2++;
-          } else {
-            maxIndex_preIndex[j] = -1;
-          }
-        }
-        
-        for (int i=0; i<_to_join.length; i++) {
-          if (i == maxIndex) continue;
-
-          // find for each pre-condition of event i 
-          for (int k=0; k<_to_join[i].pre.length; k++) {
-            // the corresponding pre-condition of event maxIndex with the same label
-            // if it exists
-            for (int j=0; j<_to_join[maxIndex].pre.length; j++) {
-              if (_to_join[maxIndex].pre[j].isImplied) continue;
-              
-              if (_to_join[i].pre[k].id == _to_join[maxIndex].pre[j].id) {
-                joinNodes[maxIndex_preIndex[j]][i] = _to_join[i].pre[k];
-                nonJoinedConditions.remove(joinNodes[maxIndex_preIndex[j]][i]);
-                break;
-              }
-            }
-          }
-        }
-        // now, we have found all pre-conditions of all events that match by label
-        // next: find the missing conditions using Kiepuziewski et al
-        
-        for (int j=0; j<joinNodes.length; j++) {
-          for (int i=0; i<joinNodes[j].length; i++) {
-            // the j-th precondition of 'minIndex' already has an equivalent
-            // precondition of event 'i', done
-            if (joinNodes[j][i] != null) continue;
-            
-            // the j-th precondition of 'minIndex' has no equivalent
-            // precondition of event 'i' yet. find one
-            DNode toMatch = joinNodes[j][maxIndex];
-            
-            LinkedList<DNode> matchConditions = new LinkedList<DNode>();
-            for (DNode pre : _to_join[i].pre) {
-              if (!nonJoinedConditions.contains(pre)) continue;
-              if (!pre.isImplied) matchConditions.addLast(pre);
-            }
-            for (DNode pre : _to_join[i].pre) {
-              if (!nonJoinedConditions.contains(pre)) continue;
-              if (pre.isImplied) matchConditions.addLast(pre);
-            }
-            
-            for (DNode matchCondition : matchConditions) {
-              // check if 'toMatch' and 'matchCondition' are successor equivalent
-              // get future equivalence classes
-              DNode[] future_toMatch = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, toMatch);
-              DNode[] future_matchCon = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, matchCondition);
-              // and compare
-              if (!Arrays.equals(future_toMatch, future_matchCon)) continue;
-                
-              // make 'toMatch' and 'matchCondition' equivalent
-              joinNodes[j][i] = matchCondition;
-              nonJoinedConditions.remove(matchCondition);
-              break;
-            }
-
-            /*
-            HashSet<DNode> grey = bp.getAllPredecessors(toMatch);
-            // get all predecessors of the event for which we want to find the
-            // precondition to match 'j'
-            HashSet<DNode> potentiallyBlack = bp.getAllPredecessors(_to_join[i]);
-            
-            for (DNode greyNode : grey) {
-              if (greyNode.isEvent) continue;
-              
-              for (DNode black : greyNode.post) {
-                if (potentiallyBlack.contains(black)) {
-                  for (DNode matchCondition : black.post) {
-                    
-                    // we can only match to implied conditions
-                    if (!matchCondition.isImplied) continue;
-                    if (!nonJoinedConditions.contains(matchCondition)) continue;
-                    
-                    // check if 'toMatch' and 'matchCondition' are successor equivalent
-                    // get future equivalence classes
-                    DNode[] future_toMatch = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, toMatch);
-                    DNode[] future_matchCon = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, matchCondition);
-                    // and compare
-                    if (!Arrays.equals(future_toMatch, future_matchCon)) continue;
-                      
-                    // make 'toMatch' and 'matchCondition' equivalent
-                    joinNodes[j][i] = matchCondition;
-                    nonJoinedConditions.remove(matchCondition);
-                  }
-                }
-              }
-            }
-            */
-          }
-        }
-        
-
-        
-        for (int j=0; j<joinNodes.length; j++) {
-          LinkedList<DNode> joinConditions = new LinkedList<DNode>();
-          for (int i=0; i<joinNodes[j].length; i++) {
-            if (joinNodes[j][i] != null) { 
-              joinConditions.add(elementary_ccPair.get(joinNodes[j][i]));
-              joinNodes[j][i].isImplied = false;
-
-              // and add the predecessors of the joined pre-sets to the queue 
-              if (joinNodes[j][i].pre != null) {
-                for (DNode e : joinNodes[j][i].pre) {
-                  top.add(e);
-                }
-              }
-            }
-          }
-          joinEquivalenceClasses(joinConditions);
-        }
-        
-        for (DNode b : nonJoinedConditions) {
-          
-          this.bp.remove(b);
-          
-          //System.out.println("non-joined: "+b);
-        }
-
-        
-        top.removeAll(foldingEquivalenceClasses.get(elementary_ccPair.get(d)));
-      }
-    }
-    return changed;
-  }
-	
-	/**
-	 * Remove a superfluous condition from the branching process after computing the
-	 * folding equivalence. A condition is superfluous if it expresses a conflict
-	 * between events that all have been folded into the same equivalence class, and
-	 * this equivalence class of events has more pre-conditions to express enabling.
-	 * 
-	 * In this case, the superfluous condition has become an implied condition. Call
-	 * this method repeatedly to remove all superfluous conditions.
-	 * 
-	 * @return <code>true</code> iff a superfluous condition was found and removed from
-	 * the branching process.
-	 */
-	public boolean refineFoldingEquivalence_removeSuperfluous () {
-	  
-    for (Entry<DNode, HashSet<DNode>> cl : foldingEquivalenceClasses.entrySet()) {
-      DNode e = cl.getKey();
-      if (!e.isEvent) continue;
-      if (e.pre == null || e.pre.length <= 1) continue;
-      
-      HashSet<DNode> superFluousConflicts = new HashSet<DNode>();
-      for (DNode b : e.pre) {
-        if (b.post != null && b.post.length > 1) superFluousConflicts.add(elementary_ccPair.get(b));
-      }
-      
-      for (DNode ePrime : cl.getValue()) {
-        if (ePrime == e) continue;
-        
-        HashSet<DNode> superFluousConflictsPrime = new HashSet<DNode>();
-        for (DNode bPrime : ePrime.pre) superFluousConflictsPrime.add(elementary_ccPair.get(bPrime));
-        superFluousConflicts.retainAll(superFluousConflictsPrime);
-      }
-      
-      for (DNode b : superFluousConflicts) {
-        boolean allPostInCl = true;
-        for (DNode bPost : b.post) {
-          if (!cl.getValue().contains(bPost)) {
-            allPostInCl = false;
-            break;
-          }
-        }
-        
-        if (allPostInCl) {
-          // found a former conflict between events that are now folded into one event
-          // the conflict is superfluous
-          for (DNode bPrime : foldingEquivalenceClasses.get(elementary_ccPair.get(b))) {
-            this.bp.remove(bPrime);
-          }
-          return true;
-        }
-      }
-    }
-	  
-	  return false;
-	}
-
-	public boolean extendFoldingEquivalence_deterministic() {
-	  
-	  boolean changed = false;
-	  
-    LinkedList<DNode> overlapping = new LinkedList<DNode>();
-    HashSet<DNode> to_join = new HashSet<DNode>();
-    
-    ArrayList<DNode> eventList = new ArrayList<DNode>();
-    for (DNode e : foldingEquivalenceClasses.keySet()) {
-      if (!e.isEvent) continue;
-      if (e.isAnti) continue;
-      
-      eventList.add(e);
-    }    
-    
-	  for (int k=0;k<eventList.size(); k++) {
-	    DNode e = eventList.get(k);
-	    // We update the equivalence relation in this loop. So it may
-	    // happen that some event in 'eventList' is no longer a canonical
-	    // event when we reach it. In this case, skip the event.
-	    if (elementary_ccPair.get(e) != e) continue;
-	    
-	    overlapping.clear();
-	    overlapping.add(e);
-	    
-	    for (int l=k+1; l<eventList.size(); l++) {
-	      DNode e2 = eventList.get(l);
-	      if (e.id != e2.id) continue;
-        // We update the equivalence relation in this loop. So it may
-        // happen that some event in 'eventList' is no longer a canonical
-        // event when we reach it. In this case, skip the event.
-	      if (elementary_ccPair.get(e2) != e2) continue;
-	      
-	      for (int i=0; i<e.pre.length; i++) {
-	        if (areFoldingEquivalent(e.pre[i], e2.pre[i])) {
-	          overlapping.add(e2);
-	          break;
-	        }
-	      }
-	    }
-	    
-      if (overlapping.size() > 1) {
-        for (int i=0; i<e.pre.length; i++) {
-          to_join.clear();
-          for (DNode e2 : overlapping)
-            to_join.add(elementary_ccPair.get(e2.pre[i]));
-          joinEquivalenceClasses(to_join);
-        }
-        
-        joinEquivalenceClasses(overlapping);
-        
-        for (int i=0; i<e.post.length; i++) {
-          to_join.clear();
-          for (DNode e2 : overlapping)
-            to_join.add(elementary_ccPair.get(e2.post[i]));
-          joinEquivalenceClasses(to_join);
-        }
-        changed = true;
-      }
-	  }
-
-	  return changed;
-	}
-	
-	public Collection<Short> simplifyFoldingEquivalence() {
-	  
-	  HashSet<Short> complexCond = new HashSet<Short>();
-
-    for (Entry<DNode, HashSet<DNode>> cl : foldingEquivalenceClasses.entrySet()) {
-      DNode d = cl.getKey();
-      if (d.isAnti) continue;
-      if (d.isEvent) continue;
-      
-      HashSet<DNode> dPre = new HashSet<DNode>();
-      HashSet<DNode> foldedPre = new HashSet<DNode>();
-      for (DNode dPrime : cl.getValue()) {
-        if (dPrime.pre == null) continue;
-        for (DNode pre : dPrime.pre) {
-          foldedPre.add(elementary_ccPair.get(pre));
-          dPre.addAll(foldingEquivalenceClasses.get(elementary_ccPair.get(pre)));
-        }
-      }
-      
-      if (foldedPre.size() > 0 && dPre.size()/foldedPre.size() > 2)
-        complexCond.add(d.id);
-
-      System.out.println(d+" has complexity "+dPre.size()+"/"+foldedPre.size());
-    }
-	  return complexCond;
-	}
-	
-	 /**
-   * The equivalence relation on events and conditions {@link #elementary_ccPair}
-   * is generated based on local knowledge and may be too coarse, e.g. by the
-   * {@link #minimizeFoldingRelation()} function. We occasionally set two events as equivalent
-   * while their pre-conditions are not pairwise equivalent. For these events
-   * we have to drop the equivalence relation. This is done by this method.
-   */
-  public void relaxFoldingEquivalence() {
-    relaxFoldingEquivalence(EquivalenceRefineLabel.instance);
-  }
-	
   /**
-   * The equivalence relation on events and conditions
-   * {@link #elementary_ccPair} is generated based on local knowledge and may be
-   * too coarse, e.g. by the {@link #minimizeFoldingRelation()} function. We
-   * occasionally set two events as equivalent while their pre-conditions are
-   * not pairwise equivalent. For these events we have to drop the equivalence
-   * relation. This is done by this method.
-   * 
-   * @param splitter
-   *          the equivalence splitter that is used to refine equivalence
-   *          classes, the given splitter may implement another equivalence
-   *          criterion that the default {@link EquivalenceRefineLabel}
+   * @return the mapping of cutOff events to their equivalent counter parts
    */
-	public void relaxFoldingEquivalence(IEquivalentNodesRefine splitter) {
-	  
-	  // --------------------------------------------------------------------
-	  // split equivalence classes by labels
-    // --------------------------------------------------------------------
-	  
-	  // compute splitted equivalence classes
-	  LinkedList<HashSet<DNode>> equiv_to_set = new LinkedList<HashSet<DNode>>();
-    
-	  for (Entry<DNode, HashSet<DNode>> cl : foldingEquivalenceClasses.entrySet()) {
-
-	    Collection<HashSet<DNode>> refined = splitter.splitIntoEquivalenceClasses(cl.getValue());
-	    // split only if there is something to split
-	    if (refined.size() > 1) equiv_to_set.addAll(refined);
-	  }
-	  
-	  // update the equivalence classes as computed earlier
-	  for (HashSet<DNode> cl_new : equiv_to_set) {
-	    Uma.out.println("splitting by successors: "+cl_new);
-	    splitFoldingEquivalence(cl_new);
-	  }
-	  
-    // --------------------------------------------------------------------
-    // split equivalence classes of events by pre-sets
-    // --------------------------------------------------------------------
-	  
-    // compute splitted equivalence classes
-    equiv_to_set.clear();
-    for (Entry<DNode, HashSet<DNode>> cl : foldingEquivalenceClasses.entrySet()) {
-      // split only events
-      if (!cl.getKey().isEvent) continue;
-      
-      HashMap<DNode[], HashSet<DNode>> preSetClasses = new HashMap<DNode[], HashSet<DNode>>();
-      for (DNode d : cl.getValue()) {
-        
-        DNode[] d_preSet_equiv = null;
-        for (DNode[] preSet : preSetClasses.keySet()) {
-          if (preSet.length != d.pre.length) continue;
-          
-          int i=0;
-          for (; i < d.pre.length; i++) {
-            if (!areFoldingEquivalent(d.pre[i], preSet[i]))
-              break;
-          }
-          if (i == d.pre.length) {
-            // each pre-decessor of 'd' is equivalent to the corresponding predecessor
-            // of 'preSet'
-            d_preSet_equiv = preSet;
-          }
-        }
-        
-        if (d_preSet_equiv == null) {
-          // equivalence class of the pre-set of 'd' is not represented yet
-          //  in 'preSetClasses', create a new equivalence class
-          d_preSet_equiv = d.pre;
-          preSetClasses.put(d_preSet_equiv, new HashSet<DNode>());
-        }
-        // 'd' belongs to the subequivalence class of its pre-set
-        preSetClasses.get(d_preSet_equiv).add(d);
-      }
-      
-      if (preSetClasses.keySet().size() > 1) {
-        // there are several nodes with different labels in the same equivalence class
-        // we cannot fold them to the same node, so split the class
-        //System.out.println("splitting equivalence class "+cl.getValue() +" by pre-sets");
-        for (Entry<DNode[], HashSet<DNode>> sub_cl : preSetClasses.entrySet()) {
-          // each set 'sub_cl.getValue()' becomes a new equivalence class
-          equiv_to_set.add(sub_cl.getValue());
-        }
-      }
+  public Map<DNode, DNode> equivalentNode() {
+    if (!futureEquivalenceInitialized) {
+      // first compute the folding equivalence, which also sets elementary_ccPair
+      initializeFutureEquivalence();
+      futureEquivalenceInitialized = true;
     }
-    
-    // update the equivalence classes as computed earlier
-    for (HashSet<DNode> cl_new : equiv_to_set) {
-      Uma.out.println("splitting "+cl_new);
-      splitFoldingEquivalence(cl_new);
-    }
-	}
-
-	
-	/**
-	 * Split the {@link #foldingEquivalenceClass}es. The nodes 'equiv_to_set'
-	 * must be equivalent already. Make all nodes in 'equiv_to_set' a new
-	 * equivalence class.
-	 * 
-	 * @param equiv_to_set
-	 */
-	private void splitFoldingEquivalence(HashSet<DNode> equiv_to_set) {
-	  
-	  if (equiv_to_set.isEmpty()) return;
-	  
-	  DNode someNode = equiv_to_set.iterator().next();
-	  
-	  // all nodes of the current equivalence class of 'equiv_to_set' which
-	  // will remain in the old equivalence class
-	  HashSet<DNode> otherNodes = new HashSet<DNode>();
-	  for (DNode d : foldingEquivalenceClasses.get(elementary_ccPair.get(someNode))) {
-	    if (!equiv_to_set.contains(d)) {
-	      otherNodes.add(d);
-	    }
-	  }
-	  
-	  updateFoldingEquivalence(equiv_to_set);
-	  updateFoldingEquivalence(otherNodes);
-	}
-
-	/**
-	 * Join the equivalence classes of all nodes in 'to_be_equivalent' 
-	 * into one new equivalence class.
-	 * 
-	 * @param to_be_equivalent
-	 */
-	private void joinEquivalenceClasses(Collection<DNode> to_be_equivalent) {
-	  //System.out.println("join: "+to_be_equivalent);
-	  
-	  // get for each node of 'to_be_equivalent' all its equivalent nodes
-	  // and put them in:
-	  HashSet<DNode> newEquivalenceClass = new HashSet<DNode>();
-	  for (DNode d : to_be_equivalent) {
-	    newEquivalenceClass.addAll(foldingEquivalenceClasses.get(elementary_ccPair.get(d)));
-	  }
-	  updateFoldingEquivalence(newEquivalenceClass);
-	}
-	
-  /**
-   * Update the folding equivalence to make all nodes in 'new_class' an
-   * equivalence class. This method does not update other equivalence classes. To
-   * ensure consistency, use {@link #splitFoldingEquivalence(HashSet)} or
-   * {@link #joinEquivalenceClasses(HashSet)}.
-   * 
-   * @param new_class
-   */
-  private void updateFoldingEquivalence(HashSet<DNode> new_class) {
-    
-    if (new_class.isEmpty()) return;
-     
-    // determine the least node in this class as canonical representative
-    DNode sub_d_min = null;
-    for (DNode sub_d : new_class) {
-      if (sub_d_min == null) sub_d_min = sub_d;
-      else if (sub_d.globalId < sub_d_min.globalId) sub_d_min = sub_d;
-    }
-    
-    // update the mappings for all nodes in the new equivalence class and set the
-    // explicit equivalence class
-    for (DNode d : new_class) {
-      // set equivalent 
-      elementary_ccPair.put(d, sub_d_min);
-      // clear old equivalence class information
-      foldingEquivalenceClasses.remove(d);
-    }
-    // set new equivalence class information
-    setFoldingEquivalenceClass(sub_d_min, new_class);    
+    return futureEquivalence.getElementary_ccPair();
   }
-  
+
   /**
-   * Define a new folding equivalence class: the nodes 'folding_class' are equivalent,
-   * the node 'canonical' is a member of 'folding class', i.e., 
-   * <code>folding_class.contains(canonical) == true</code>, and represents the canonical
-   * node of this class s.t. <code>elementary_ccPair.get(d) == canonical</code> for each
-   * node 'd' of 'folding_class'.
+   * Initialize the {@link #futureEquivalence} which defines which nodes of the
+   * branching process have equivalent futures. The default implementation takes
+   * the basic equivalence mappings from events to their cut-off events and
+   * extends it to equivalence classes with canonical representatives.
    * 
-   * This method must be called in a proper context, i.e., when initializing 
-   * {@link #foldingEquivalenceClass} in {@link #buildFoldingEquivalence()} or when
-   * properly updating the folding equivalence in {@link #updateFoldingEquivalence(HashSet)}.
-   * 
-   * @param canonical
-   * @param folding_class
+   * Extensions of this class may refine this method to provide additional
+   * intialization. Any refinement must first call this method with
+   * <code>super.initializeFutureEquivalence()</code> before extending the
+   * future equivalence.
    */
-  private void setFoldingEquivalenceClass(DNode canonical, HashSet<DNode> folding_class) {
-    if (canonical == null) {
-      System.err.println("trying to set invalid folding equivalence class: "+folding_class);
+  protected void initializeFutureEquivalence() {
+    futureEquivalence.completeElementaryEquivalence(bp.getAllNodes());
+    futureEquivalence.initFutureEquivalenceClasses();
+    // remember here so that refinements of this method do not invoke
+    // this method again when calling futureEquivalence()
+    futureEquivalenceInitialized = true;  
+  }
+
+  /**
+   * @return the future equivalence of this branching process, if called for the
+   *         first time, the future equivalence is initialized from the
+   *         identified cut-off events (see {@link #initialize()}), the future
+   *         equivalence may be modified by extensionds of this class
+   */
+  public final FutureEquivalence futureEquivalence() {
+    if (!futureEquivalenceInitialized) {
+      // also set futureEquivalenceInitialized to true
+      initializeFutureEquivalence();
     }
-    foldingEquivalenceClasses.put(canonical, folding_class);
+    return futureEquivalence;
   }
   
 	/* --------------------------------------------------------------------------
@@ -3718,16 +2559,6 @@ public class DNodeBP {
     return bp;
   }
 
-  /**
-   * @return the mapping of cutOff events to their equivalent counter parts
-   */
-  public HashMap<DNode, DNode> equivalentNode() {
-    if (!foldingEquivalenceCompleted) {
-      // first compute the folding equivalence, which also sets elementary_ccPair
-      foldingEquivalence();
-    }
-    return elementary_ccPair;
-  }
 
   // remember all statistics values in fields of the class
   // for later retrieval
@@ -3765,8 +2596,8 @@ public class DNodeBP {
       
       statistic_arcNum += n.pre.length; 
     }
-    return "|B|= "+statistic_condNum +" |E|= "+statistic_eventNum+" |E_cutOff|= "+statistic_cutOffNum+" |F|= "+statistic_arcNum;
-    //return statistic_condNum +";"+statistic_eventNum+";"+statistic_arcNum;
+    //return "|B|= "+statistic_condNum +" |E|= "+statistic_eventNum+" |E_cutOff|= "+statistic_cutOffNum+" |F|= "+statistic_arcNum;
+    return statistic_condNum +";"+statistic_eventNum+";"+statistic_arcNum;
   }
   
   /**
@@ -3847,6 +2678,7 @@ public class DNodeBP {
     {
       // event with the configured labeled was fired
       propertyCheck |= PROP_EXECUTEDEVENT;
+      Uma.out.println("event found.");
       return false;
     }
     
@@ -3855,11 +2687,21 @@ public class DNodeBP {
         if (getOptions().checkProperty_ExecutableEvent == firedEvent.causedBy[i]) {
           // event with the configured ID was fired
           propertyCheck |= PROP_EXECUTEDEVENT;
+          Uma.out.println("event found.");
           return false;
         }
       }
     }
     return true;
+  }
+  
+  /**
+   * Reset all internal fields regarding whether the property to check for holds.
+   * This reset can be used for checking multiple properties on the same branching
+   * process.
+   */
+  public void resetPropertyCheck() {
+    propertyCheck = PROP_NONE;
   }
 	
   /**
@@ -4082,13 +2924,13 @@ public class DNodeBP {
     System.out.println("--- equivalence relation ---");
     System.out.println("EVENTS:");
     for (DNode e : bp.getAllEvents()) {
-      if (elementary_ccPair.get(e) == e)
-        System.out.println(e+": "+foldingEquivalenceClasses.get(e));
+      if (futureEquivalence.getElementary_ccPair().get(e) == e)
+        System.out.println(e+": "+futureEquivalence().get(e));
     }
     System.out.println("CONDITIONS:");
     for (DNode b : bp.getAllConditions()) {
-      if (elementary_ccPair.get(b) == b)
-        System.out.println(b+": "+foldingEquivalenceClasses.get(b));
+      if (futureEquivalence.getElementary_ccPair().get(b) == b)
+        System.out.println(b+": "+futureEquivalence().get(b));
     }
     System.out.println("--- /equivalence relation ---");
   }

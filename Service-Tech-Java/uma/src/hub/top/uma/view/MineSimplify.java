@@ -26,6 +26,7 @@ import hub.top.petrinet.Place;
 import hub.top.petrinet.Transition;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeRefold;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
@@ -38,6 +39,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 import com.google.gwt.dev.util.collect.HashSet;
 
@@ -55,8 +58,8 @@ public class MineSimplify {
   private ISystemModel sysModel;
   private LinkedList<String[]> allTraces;
   
-  private DNodeBP build = null;                            // the branching process of sysModel
-  private HashMap<Place, HashSet<DNode>> place_conditions; // all conditions labeled with the given place
+  private DNodeRefold build = null;                            // the branching process of sysModel
+  private HashMap<Place, Set<DNode>> place_conditions; // all conditions labeled with the given place
   
   private PetriNet simplifiedNet;
   private PetriNet originalNet;
@@ -71,7 +74,7 @@ public class MineSimplify {
     
     public boolean unfold_refold = true; 
     public boolean remove_implied = true;
-    public boolean abstract_chains = true;
+    public boolean abstract_chains = false;
     public boolean remove_flower_places = true;
     
   }
@@ -82,7 +85,7 @@ public class MineSimplify {
   private Configuration config;
   
   /**
-   * Simplify a system model wrt. a given set of traces.
+   * Simplify a system model wrt. a given set of traces in the standard configuration.
    * Read the systemModel to simplify and the corresponding traces from files.
    * 
    * @param fileName_system_sysPath
@@ -94,9 +97,26 @@ public class MineSimplify {
   public MineSimplify(String fileName_system_sysPath, String fileName_trace) 
     throws IOException, InvalidModelException, FileNotFoundException
   {
+    this(fileName_system_sysPath, fileName_trace, new Configuration());
+  }
+  
+  /**
+   * Simplify a system model wrt. a given set of traces.
+   * Read the systemModel to simplify and the corresponding traces from files.
+   * 
+   * @param fileName_system_sysPath
+   * @param fileName_trace
+   * @param config
+   * @throws IOException
+   * @throws InvalidModelException
+   * @throws FileNotFoundException
+   */
+  public MineSimplify(String fileName_system_sysPath, String fileName_trace, Configuration config) 
+    throws IOException, InvalidModelException, FileNotFoundException
+  {
     this.fileName_system_sysPath = fileName_system_sysPath;
     this.fileName_trace = fileName_trace;
-    this.config = new Configuration();  // standard configuration
+    this.config = config;
     
     sysModel = Uma.readSystemFromFile(fileName_system_sysPath);
     allTraces = ViewGeneration2.readTraces(fileName_trace);
@@ -235,6 +255,13 @@ public class MineSimplify {
     
     String targetPath_result = fileName_system_sysPath+".simplified.result.txt";
     writeFile(targetPath_result, generateResultsFile());
+    
+    PetriNet bp = NetSynthesis.convertToPetriNet(_debug_lastViewBuild, _debug_lastViewBuild.getBranchingProcess().getAllNodes(), false);
+    
+    String targetPath_bp = fileName_system_sysPath+".bp.lola";
+    PetriNetIO.writeToFile(bp, targetPath_bp, PetriNetIO.FORMAT_LOLA, 0);
+    
+
   }
   
   /**
@@ -269,7 +296,7 @@ public class MineSimplify {
     if (config.unfold_refold) {
       net = unfoldRefold(sysModel, traces);
     } else if (sysModel instanceof PetriNet) {
-      net = (PetriNet)sysModel;
+      net = new PetriNet((PetriNet)sysModel);
     } else {
       throw new InvalidModelException(InvalidModelException.UNKNOWN_MODEL_TYPE, sysModel);
     }
@@ -277,7 +304,7 @@ public class MineSimplify {
     // step 2) find implied places
     _time_implied_start = System.currentTimeMillis();
     if (config.remove_implied) {
-      assertBranchingProcess(sysModel, traces);
+      assertBranchingProcess(net, sysModel, traces);
       HashSet<DNode> implied = findImpliedConditions();
       removeImpliedPlaces(net, place_conditions, implied);
     }
@@ -331,22 +358,33 @@ public class MineSimplify {
     
     _time_equiv_start = System.currentTimeMillis();
     if (printDetail) Uma.out.println("equivalence..");
-    build.foldingEquivalence();
+    build.futureEquivalence();
     
     //build.debug_printFoldingEquivalence();
     
     if (printDetail) Uma.out.println("join maximal..");
-    build.extendFoldingEquivalence_maximal();
-    if (printDetail) Uma.out.println("fold backwards..");
-    while (build.extendFoldingEquivalence_backwards()) {
+    build.extendFutureEquivalence_maximal();
+    
+    int changed;
+    do {
+      changed = 0;
+      
       if (printDetail) Uma.out.println("fold backwards..");
-    }
-    if (printDetail) Uma.out.println("relax..");
-    build.relaxFoldingEquivalence();
-    if (printDetail) Uma.out.println("determinize..");
-    while (build.extendFoldingEquivalence_deterministic()) {
+      while (build.extendFutureEquivalence_backwards_complete()) {
+        changed++;
+        if (printDetail) Uma.out.println("fold backwards..");
+      }
+      if (printDetail) Uma.out.println("relax..");
+      build.relaxFutureEquivalence();
       if (printDetail) Uma.out.println("determinize..");
-    }
+      while (build.extendFutureEquivalence_deterministic()) {
+        changed++;
+        if (printDetail) Uma.out.println("determinize..");
+      }
+      
+      //if (build.blockedFolding()) changed++;
+    } while (changed > 0);
+    
     _time_equiv_finish = System.currentTimeMillis();
     
     //build.simplifyFoldingEquivalence();
@@ -358,10 +396,10 @@ public class MineSimplify {
     
     // remember for each place, which conditions represent a token on this place
     // this information will be needed when checking for implied places
-    place_conditions = new HashMap<Place, HashSet<DNode>>();
+    place_conditions = new HashMap<Place, Set<DNode>>();
     for (Place p : net.getPlaces()) {
       DNode b = synth.n2d.get(p);
-      place_conditions.put(p, build.foldingEquivalence().get(build.equivalentNode().get(b)));
+      place_conditions.put(p, build.futureEquivalence().get(build.equivalentNode().get(b)));
     }
     
     _time_fold_finish = System.currentTimeMillis();
@@ -381,28 +419,31 @@ public class MineSimplify {
    * traces is available ({@link #build}). If it has not been computed before,
    * then compute it now.
    * 
+   * @param net
    * @param sysModel
    * @param traces
    * @throws InvalidModelException
    */
-  private void assertBranchingProcess(ISystemModel sysModel, LinkedList<String[]> traces) throws InvalidModelException {
+  private void assertBranchingProcess(PetriNet net, ISystemModel sysModel, LinkedList<String[]> traces) throws InvalidModelException {
     if (build != null) return;
 
     DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
     build = Uma.initBuildPrefix_View(sys, 0);
 
     _time_buildBP_start = System.currentTimeMillis();
-    //Uma.out.println("generating view for "+traces.size()+" traces...");
+    //Uma.out.println("assert existence of branching process...");
     ViewGeneration2 viewGen = new ViewGeneration2(build);
     for (String[] trace : traces) {
       viewGen.extendByTrace(trace);
     }
-
+    _time_buildBP_finish = System.currentTimeMillis();
+    _size_bp = build.getStatistics();
+    _debug_lastViewBuild = build;
+    
     if (sysModel instanceof PetriNet) {
       // collect for each place of the net, all conditions that represent a token on the place
       // required for finding implicit places
-      PetriNet net = (PetriNet)sysModel;
-      place_conditions = new HashMap<Place, HashSet<DNode>>();
+      place_conditions = new HashMap<Place, Set<DNode>>();
       for (Place p : net.getPlaces()) {
         
         place_conditions.put(p, new HashSet<DNode>());
@@ -439,13 +480,13 @@ public class MineSimplify {
    * @param place_conditions
    * @param implied
    */
-  private void removeImpliedPlaces(PetriNet net, HashMap<Place, HashSet<DNode> > place_conditions, HashSet<DNode> implied)
+  private void removeImpliedPlaces(PetriNet net, Map<Place, Set<DNode> > place_conditions, Set<DNode> implied)
   {
 
     boolean printDetail = (build.getBranchingProcess().allConditions.size()
         +build.getBranchingProcess().allEvents.size() > 10000) ? true : false;
     
-    if (printDetail) Uma.out.println("remove implied places..");
+    Uma.out.println("remove implied places..");
     LinkedList<Place> impliedPlaces = new LinkedList<Place>();
     for (Place p : net.getPlaces()) {
       boolean allImplied = true;
@@ -614,7 +655,7 @@ public class MineSimplify {
       }
     }
     // we abstract to chains of length 1, so return false if there is nothing left to abstract
-    if (longestChain.size() <= 1) return false;
+    if (longestChain == null || longestChain.size() <= 1) return false;
     
     // abstract the chain
     // remember all places to keep: the pre-set of the first transition,
@@ -741,6 +782,10 @@ public class MineSimplify {
   private static float simplestThreshold;
   
   public static void simplify(String system, String log, boolean repeat) throws IOException, InvalidModelException {
+    simplify(system, log, repeat, new Configuration());
+  }
+  
+  public static void simplify(String system, String log, boolean repeat, Configuration config) throws IOException, InvalidModelException {
     
     MineSimplify bestSim = null;
     
@@ -751,7 +796,7 @@ public class MineSimplify {
       //DNodeBP.foldThreshold = (float)(i+1)/10;
       
       Uma.out.print(system+"... ");
-      MineSimplify sim = new MineSimplify(system, log);
+      MineSimplify sim = new MineSimplify(system, log, config);
       sim.prepareModel();
       sim.run();
       
@@ -773,42 +818,78 @@ public class MineSimplify {
     bestSim.writeResults();
   }
   
-  public static void main(String[] args) throws IOException, InvalidModelException {
-    
+  public static void runExperiment(String path, Configuration config) throws IOException, InvalidModelException {
     //DNodeBP.ignoreFoldThreshold = false;
     
     // AMC
-    simplify("./examples/caise11/Aandoening_A.lola", "./examples/caise11/Aandoening_A.log.txt", true); // F
-    simplify("./examples/caise11/Aandoening_B.lola", "./examples/caise11/Aandoening_B.log.txt", true); // F
-    simplify("./examples/caise11/Aandoening_C.lola", "./examples/caise11/Aandoening_C.log.txt", true); // F
-    simplify("./examples/caise11/AMC.lola", "./examples/caise11/AMC.log.txt", true); // F
+    simplify(path+"/Aandoening_A.lola", path+"/Aandoening_A.log.txt", true, config); // F
+    simplify(path+"/Aandoening_B.lola", path+"/Aandoening_B.log.txt", true, config); // F
+    simplify(path+"/Aandoening_C.lola", path+"/Aandoening_C.log.txt", true, config); // F
+    simplify(path+"/AMC.lola", path+"/AMC.log.txt", true, config); // F
     
     // Catharina
-    simplify("./examples/caise11/Complications.filtered80.lola", "./examples/caise11/Complications.filtered80.log.txt", true); // F
+    simplify(path+"/Complications.filtered80.lola", path+"/Complications.filtered80.log.txt", true, config); // F
     
     // Heusden
-    simplify("./examples/caise11/Afschriften.lola", "./examples/caise11/Afschriften.log.txt", true); // F
-    simplify("./examples/caise11/BezwaarWOZ_filtered_All.lola", "./examples/caise11/BezwaarWOZ_filtered_All.log.txt", true); // F
+    simplify(path+"/Afschriften.lola", path+"/Afschriften.log.txt", true, config); // F
+    simplify(path+"/BezwaarWOZ_filtered_All.lola", path+"/BezwaarWOZ_filtered_All.log.txt", true, config); // F
 
-    simplify("./examples/caise11/a12f0n00.lola", "./examples/caise11/a12f0n00.log.txt", true); // F
-    simplify("./examples/caise11/a12f0n05.lola", "./examples/caise11/a12f0n05.log.txt", true); // F
-    simplify("./examples/caise11/a12f0n10.lola", "./examples/caise11/a12f0n10.log.txt", true); // F
-    simplify("./examples/caise11/a12f0n20.lola", "./examples/caise11/a12f0n20.log.txt", true); // F
-    simplify("./examples/caise11/a12f0n50.lola", "./examples/caise11/a12f0n50.log.txt", true); // F
+    simplify(path+"/a12f0n00.lola", path+"/a12f0n00.log.txt", true, config); // F
+    simplify(path+"/a12f0n05.lola", path+"/a12f0n05.log.txt", true, config); // F
+    simplify(path+"/a12f0n10.lola", path+"/a12f0n10.log.txt", true, config); // F
+    simplify(path+"/a12f0n20.lola", path+"/a12f0n20.log.txt", true, config); // F
+    simplify(path+"/a12f0n50.lola", path+"/a12f0n50.log.txt", true, config); // F
+    
+    simplify(path+"/a22f0n00.lola", path+"/a22f0n00.log.txt", true, config); // F
+    simplify(path+"/a22f0n05.lola", path+"/a22f0n05.log.txt", true, config); // F
+    //simplify(path+"/a22f0n10.lola", path+"/a22f0n10.log.txt", false, config); // slow
+    //simplify(path+"/a22f0n20.lola", path+"/a22f0n20.log.txt", false, config); // slow
+    //simplify(path+"/a22f0n50.lola", path+"/a22f0n50.log.txt", false, config); // slow
+    
+    simplify(path+"/a32f0n00.lola", path+"/a32f0n00.log.txt", true, config);
+    simplify(path+"/a32f0n05.lola", path+"/a32f0n05.log.txt", true, config); // F
+    //simplify(path+"/a32f0n10.lola", path+"/a32f0n10.log.txt", false, config); // slow 
+    //simplify(path+"/a32f0n20.lola", path+"/a32f0n20.log.txt", false, config); // slow 
+    //simplify(path+"/a32f0n50.lola", path+"/a32f0n50.log.txt", false, config); // slow
+    
+    //simplify(path+"/t32f0n05.lola", path+"/t32f0n05.log.txt", false, config); // slow
+    
+  }
+  
+  public static void main(String[] args) throws IOException, InvalidModelException {
 
-    simplify("./examples/caise11/a22f0n00.lola", "./examples/caise11/a22f0n00.log.txt", true); // F
-    simplify("./examples/caise11/a22f0n05.lola", "./examples/caise11/a22f0n05.log.txt", true); // F
-    simplify("./examples/caise11/a22f0n10.lola", "./examples/caise11/a22f0n10.log.txt", false); // slow
-    simplify("./examples/caise11/a22f0n20.lola", "./examples/caise11/a22f0n20.log.txt", false); // slow
-    simplify("./examples/caise11/a22f0n50.lola", "./examples/caise11/a22f0n50.log.txt", false); // slow
+    Configuration c = new Configuration();
+    /*
+    c.unfold_refold = true;
+    c.remove_implied = false;
+    c.abstract_chains = false;
+    c.remove_flower_places = false;
+    runExperiment("./examples/bpm11/exp1_foldRefold", c);
+    */
+    c.unfold_refold = true;
+    c.remove_implied = true;
+    c.abstract_chains = false;
+    c.remove_flower_places = false;
+    runExperiment("./examples/bpm11/exp2_foldRefold_implied", c);
     
-    simplify("./examples/caise11/a32f0n00.lola", "./examples/caise11/a32f0n00.log.txt", true);
-    simplify("./examples/caise11/a32f0n05.lola", "./examples/caise11/a32f0n05.log.txt", true); // F
-    simplify("./examples/caise11/a32f0n10.lola", "./examples/caise11/a32f0n10.log.txt", false); // slow 
-    simplify("./examples/caise11/a32f0n20.lola", "./examples/caise11/a32f0n20.log.txt", false); // slow 
-    simplify("./examples/caise11/a32f0n50.lola", "./examples/caise11/a32f0n50.log.txt", false); // slow
-    
-    //simplify("./examples/caise11/t32f0n05.lola", "./examples/caise11/t32f0n05.log.txt", false); // slow
+    c.unfold_refold = false;
+    c.remove_implied = true;
+    c.abstract_chains = false;
+    c.remove_flower_places = false;
+    runExperiment("./examples/bpm11/exp3_implied", c);
+    /*
+    c.unfold_refold = true;
+    c.remove_implied = true;
+    c.abstract_chains = true;
+    c.remove_flower_places = false;
+    runExperiment("./examples/bpm11/exp4_foldRefold_implied_chains", c);
+    */
+    c.unfold_refold = true;
+    c.remove_implied = true;
+    c.abstract_chains = true;
+    c.remove_flower_places = true;
+    runExperiment("./examples/bpm11/exp5_complete", c);
+
   }
   
 }

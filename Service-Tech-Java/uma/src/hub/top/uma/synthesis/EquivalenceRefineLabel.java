@@ -22,6 +22,8 @@ import hub.top.uma.DNode;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import com.google.gwt.dev.util.collect.HashSet;
 
@@ -40,9 +42,9 @@ public class EquivalenceRefineLabel implements IEquivalentNodesRefine {
    * (non-Javadoc)
    * @see hub.top.uma.synthesis.IEquivalentConditions#splitIntoEquivalenceClasses(java.util.Collection)
    */
-  public Collection<HashSet<DNode>> splitIntoEquivalenceClasses(HashSet<DNode> nodes) {
+  public Collection<Set<DNode>> splitIntoEquivalenceClasses(Set<DNode> nodes) {
     
-    HashMap<Short, HashSet<DNode>> labelClasses = new HashMap<Short, HashSet<DNode>>();
+    Map<Short, Set<DNode>> labelClasses = new HashMap<Short, Set<DNode>>();
     for (DNode d : nodes) {
       if (!labelClasses.containsKey(d.id))
         labelClasses.put(d.id, new HashSet<DNode>());

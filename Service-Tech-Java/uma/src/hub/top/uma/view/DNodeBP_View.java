@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import hub.top.petrinet.unfold.DNodeSys_PetriNet;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeRefold;
 import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.Options;
@@ -34,7 +35,7 @@ import hub.top.uma.Options;
  * 
  * @author dfahland
  */
-public class DNodeBP_View extends DNodeBP {
+public class DNodeBP_View extends DNodeRefold {
 
   public DNodeBP_View(DNodeSys system) {
     this(system, 1);

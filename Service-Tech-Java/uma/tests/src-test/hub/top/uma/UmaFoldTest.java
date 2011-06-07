@@ -63,27 +63,27 @@ public class UmaFoldTest extends hub.top.test.TestCase {
       occnet.turnIntoLabeledNet();
       
       DNodeSys_OccurrenceNet sys = new DNodeSys_OccurrenceNet(occnet, new HashSet<Place>());
-      DNodeBP build = Uma.initBuildPrefix_View(sys, 0);
+      DNodeRefold build = Uma.initBuildPrefix_View(sys, 0);
 
       Uma.out.println("equivalence..");
-      build.foldingEquivalence();
+      build.futureEquivalence();
 
 
       Uma.out.println("join maximal..");
-      build.extendFoldingEquivalence_maximal();
+      build.extendFutureEquivalence_maximal();
       Uma.out.println("fold backwards..");
-      while (build.extendFoldingEquivalence_backwards()) {
+      while (build.extendFutureEquivalence_backwards()) {
         Uma.out.println("fold backwards..");
       }
       
-      while (build.refineFoldingEquivalence_removeSuperfluous()) {
+      while (build.refineFutureEquivalence_removeSuperfluous()) {
         Uma.out.println("remove superfluous..");
       }
 
       hub.top.uma.synthesis.EquivalenceRefineSuccessor splitter = new hub.top.uma.synthesis.EquivalenceRefineSuccessor(build); 
 
       Uma.out.println("relax..");
-      build.relaxFoldingEquivalence(splitter);
+      build.relaxFutureEquivalence(splitter);
       Uma.out.println("determinize..");
 
       NetSynthesis synth = new NetSynthesis(build);
@@ -116,26 +116,26 @@ public class UmaFoldTest extends hub.top.test.TestCase {
       occnet.turnIntoLabeledNet();
       
       DNodeSys_OccurrenceNet sys = new DNodeSys_OccurrenceNet(occnet, new HashSet<Place>());
-      DNodeBP build = Uma.initBuildPrefix_View(sys, 0);
+      DNodeRefold build = Uma.initBuildPrefix_View(sys, 0);
 
       Uma.out.println("equivalence..");
-      build.foldingEquivalence();
+      build.futureEquivalence();
 
       Uma.out.println("join maximal..");
-      build.extendFoldingEquivalence_maximal();
+      build.extendFutureEquivalence_maximal();
       Uma.out.println("fold backwards..");
-      while (build.extendFoldingEquivalence_backwards()) {
+      while (build.extendFutureEquivalence_backwards()) {
         Uma.out.println("fold backwards..");
       }
       
-      while (build.refineFoldingEquivalence_removeSuperfluous()) {
+      while (build.refineFutureEquivalence_removeSuperfluous()) {
         Uma.out.println("remove superfluous..");
       }
 
       hub.top.uma.synthesis.EquivalenceRefineSuccessor splitter = new hub.top.uma.synthesis.EquivalenceRefineSuccessor(build); 
 
       Uma.out.println("relax..");
-      build.relaxFoldingEquivalence(splitter);
+      build.relaxFutureEquivalence(splitter);
       Uma.out.println("determinize..");
 
       NetSynthesis synth = new NetSynthesis(build);

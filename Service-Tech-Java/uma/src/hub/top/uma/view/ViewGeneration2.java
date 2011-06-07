@@ -23,6 +23,7 @@ import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeRefold;
 import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeBP.EnablingInfo;
 import hub.top.uma.DNodeSet.DNodeSetElement;
@@ -49,7 +50,7 @@ import java.util.Map.Entry;
 
 public class ViewGeneration2 {
   
-  private DNodeBP   build;
+  private DNodeRefold   build;
   private DNodeSet  bp;
   
   public HashMap<DNode, Integer> eventOccurrences;
@@ -62,7 +63,7 @@ public class ViewGeneration2 {
    *  
    * @param build
    */
-  public ViewGeneration2 (DNodeBP build) {
+  public ViewGeneration2 (DNodeRefold build) {
     this.build = build;
     this.bp = build.getBranchingProcess();
     
@@ -84,7 +85,7 @@ public class ViewGeneration2 {
    */
   public boolean extendByTrace(String[] trace) {
     HashSet<DNode> run = new HashSet<DNode>();
-    HashSet<DNode> runCut = new HashSet<DNode>();
+    LinkedList<DNode> runCut = new LinkedList<DNode>();
     
     for (DNode b : bp.initialCut) {
       run.add(b);
@@ -121,7 +122,7 @@ public class ViewGeneration2 {
         if (fireEvent.post != null)
           for (DNode b : fireEvent.post) {
             run.add(b);
-            runCut.add(b);
+            runCut.addLast(b);
           }
         
         if (!eventOccurrences.containsKey(fireEvent))
@@ -213,17 +214,19 @@ public class ViewGeneration2 {
       }
     } // for all events in the trace
     
+    HashSet<DNode> runCut_set = new HashSet<DNode>(runCut);
+    
     boolean newCut = true;
     for (HashSet<DNode> cut : equivalentTraces.keySet()) {
-      if (cut.equals(runCut)) {
+      if (cut.equals(runCut_set)) {
         equivalentTraces.get(cut).add(trace);
         newCut = false;
         break;
       }
     }
     if (newCut) {
-      equivalentTraces.put(runCut, new LinkedList<String[]>());
-      equivalentTraces.get(runCut).add(trace);
+      equivalentTraces.put(runCut_set, new LinkedList<String[]>());
+      equivalentTraces.get(runCut_set).add(trace);
     }
     
 
@@ -294,7 +297,7 @@ public class ViewGeneration2 {
       DNode[] marking = getInitialMarkin_equiv();
       
       for (DNode b : marking) {
-        for (DNode bPrime : build.foldingEquivalence().get(build.equivalentNode().get(b))) {
+        for (DNode bPrime : build.futureEquivalence().get(build.equivalentNode().get(b))) {
           if (!countMap.containsKey(bPrime))
             countMap.put(bPrime, 0);
           countMap.put(bPrime, countMap.get(bPrime)+1);
@@ -323,13 +326,13 @@ public class ViewGeneration2 {
         
         marking = getSuccessorMarking_equiv(marking, fireEvent);
         for (DNode b : marking) {
-          for (DNode bPrime : build.foldingEquivalence().get(build.equivalentNode().get(b))) {
+          for (DNode bPrime : build.futureEquivalence().get(build.equivalentNode().get(b))) {
             if (!countMap.containsKey(bPrime))
               countMap.put(bPrime, 0);
             countMap.put(bPrime, countMap.get(bPrime)+1);
           }
         }
-        for (DNode ePrime : build.foldingEquivalence().get(build.equivalentNode().get(fireEvent))) {
+        for (DNode ePrime : build.futureEquivalence().get(build.equivalentNode().get(fireEvent))) {
           if (!countMap.containsKey(ePrime))
             countMap.put(ePrime, 0);
           countMap.put(ePrime, countMap.get(ePrime)+1);
@@ -351,7 +354,7 @@ public class ViewGeneration2 {
   }
   
   public DNodeSetElement getNonBlockedNodes(LinkedList<String[]> traces, float threshold) {
-    build.foldingEquivalence();
+    build.futureEquivalence();
     
     HashMap<DNode, Float> covering = calculateCovering(traces);
     DNodeSetElement showNodes = new DNodeSetElement();
@@ -391,7 +394,7 @@ public class ViewGeneration2 {
     HashSet<DNode> possibleConditions = new HashSet<DNode>();
     for (DNode b : marking) {
       // retrieve all conditions equivalent to 'b'
-      for (DNode bPrime : build.foldingEquivalence().get(build.equivalentNode().get(b))) {
+      for (DNode bPrime : build.futureEquivalence().get(build.equivalentNode().get(b))) {
         possibleConditions.add(bPrime);
         if (bPrime.post == null) continue;
         for (DNode e : bPrime.post)
@@ -432,7 +435,7 @@ public class ViewGeneration2 {
         if (consume[i]) continue;
         // token i is consumed if the corresponding condition marking[i]
         // is equivalent to the pre-place 'p' of 'transition'
-        if (build.areFoldingEquivalent(p, marking[i])) {
+        if (build.futureEquivalence().areFoldingEquivalent(p, marking[i])) {
           consume[i] = true;
           break;
         }
@@ -663,9 +666,9 @@ public class ViewGeneration2 {
          ISystemModel sysModel = Uma.readSystemFromFile(fromFile);
          DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
 
-         DNodeBP build = Uma.buildPrefix(Uma.initBuildPrefix_View(sys, 3));
+         DNodeRefold build = (DNodeRefold)Uma.buildPrefix(Uma.initBuildPrefix_View(sys, 3));
          
-         build.foldingEquivalence();
+         build.futureEquivalence();
          
          ViewGeneration2 viewGen = new ViewGeneration2(build);
          LinkedList<String[]> traces = viewGen.generateRandomTraces(numTraces, traceLength);
@@ -687,7 +690,7 @@ public class ViewGeneration2 {
          ISystemModel sysModel = Uma.readSystemFromFile(systemFile);
          DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
 
-         DNodeBP build = Uma.initBuildPrefix_View(sys, 3);
+         DNodeRefold build = Uma.initBuildPrefix_View(sys, 3);
          
          LinkedList<String[]> traces = readTraces(traceFile);
 

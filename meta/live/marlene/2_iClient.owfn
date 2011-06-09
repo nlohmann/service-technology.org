@@ -1,0 +1,51 @@
+{ iClient }
+
+PLACE
+INTERNAL
+  q0,  { initial }
+  q1,
+  q2,
+  q3,
+  qw;
+
+OUTPUT
+  login_usr,
+  pass_pin,
+  getfile_file,
+  logout;
+
+INITIALMARKING
+  q0;
+
+FINALMARKING
+  qw;
+
+TRANSITION t1    { !login }
+CONSUME
+  q0;
+PRODUCE
+  q1,
+  login_usr;
+
+TRANSITION t2    { !pass }
+CONSUME
+  q1;
+PRODUCE
+  q2,
+  pass_pin;
+
+TRANSITION t3    { !getfile }
+CONSUME
+  q2;
+PRODUCE
+  q3,
+  getfile_file;
+
+TRANSITION t4    { !logout }
+CONSUME
+  q3;
+PRODUCE
+  qw,
+  logout;
+
+{ END OF FILE }

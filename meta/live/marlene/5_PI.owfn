@@ -1,0 +1,35 @@
+{ PI }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,
+  pw;
+  
+INPUT
+  orderChangeResponse;
+
+OUTPUT
+  orderChange;
+
+INITIALMARKING
+  p0;
+
+FINALMARKING
+  pw;
+
+TRANSITION t1    { !Order Change }
+CONSUME
+  p0;
+PRODUCE
+  p1,
+  orderChange;
+
+TRANSITION t2    { ?Order Change Response }
+CONSUME
+  p1,
+  orderChangeResponse;
+PRODUCE
+  pw;
+
+{ END OF FILE }

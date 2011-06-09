@@ -1,0 +1,24 @@
+{ Q2 }
+
+PLACE
+INTERNAL
+  q0,  { initial }
+  qw;
+INPUT
+  login_acc_pin;
+
+
+INITIALMARKING
+  q0;
+
+FINALMARKING
+  qw;
+
+TRANSITION t1    { ?login }
+CONSUME
+  q0,
+  login_acc_pin;
+PRODUCE
+  qw;
+
+{ END OF FILE }

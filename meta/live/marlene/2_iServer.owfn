@@ -1,0 +1,84 @@
+{ iServer }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,
+  p2,
+  p3,
+  p4,
+  pw;
+  
+INPUT
+  open_ctl,
+  user_name_pwd_ctl,
+  put_fn_ctl,
+  get_fn_ctl,
+  close_ctl;
+  
+OUTPUT
+  ack;
+
+INITIALMARKING
+  p0;
+
+FINALMARKING
+  pw;
+
+TRANSITION t1    { ?open }
+CONSUME
+  p0,
+  open_ctl;
+PRODUCE
+  p1,
+  ack;
+
+TRANSITION t2    { ?user }
+CONSUME
+  p1,
+  user_name_pwd_ctl;
+PRODUCE
+  p2,
+  ack;
+
+TRANSITION t3    { ?put }
+CONSUME
+  p2,
+  put_fn_ctl;
+PRODUCE
+  p3,
+  ack;
+
+TRANSITION t4    { ?close }
+CONSUME
+  p3,
+  close_ctl;
+PRODUCE
+  pw,
+  ack;
+
+TRANSITION t5    { ?get }
+CONSUME
+  p2,
+  get_fn_ctl;
+PRODUCE
+  p4,
+  ack;
+
+TRANSITION t6    { ?close }
+CONSUME
+  p4,
+  close_ctl;
+PRODUCE
+  pw,
+  ack;
+
+TRANSITION t7    { ?close }
+CONSUME
+  p2,
+  close_ctl;
+PRODUCE
+  pw,
+  ack;
+
+{ END OF FILE }

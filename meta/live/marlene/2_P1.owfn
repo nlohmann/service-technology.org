@@ -1,0 +1,34 @@
+{ P1 }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,
+  pw;
+INPUT
+  reply_page;
+
+OUTPUT
+  request_url;
+
+INITIALMARKING
+  p0;
+
+FINALMARKING
+  pw;
+
+TRANSITION t1    { !request }
+CONSUME
+  p0;
+PRODUCE
+  p1,
+  request_url;
+
+TRANSITION t2    { ?reply }
+CONSUME
+  p1,
+  reply_page;
+PRODUCE
+  pw;
+
+{ END OF FILE }

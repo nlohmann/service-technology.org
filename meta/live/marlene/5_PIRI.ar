@@ -1,0 +1,6 @@
+orderChange -> poChangeRequest;
+poChangeConfirmation -> orderChangeResponse;
+-> ack;
+poUpdate, poChangeConfirmation -> orderChangeResponse;
+poUpdate, orderChangeResponse -> orderChangeResponse;
+noMoreUpdate ->;

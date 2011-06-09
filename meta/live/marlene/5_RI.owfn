@@ -1,0 +1,61 @@
+{ RI }
+
+PLACE
+INTERNAL
+  r0,  { initial }
+  r1,
+  r2,
+  r3,
+  rw;
+  
+INPUT
+  poChangeRequest,
+  ack;
+
+OUTPUT
+  poChangeConfirmation,
+  poUpdate,
+  noMoreUpdate;
+
+INITIALMARKING
+  r0;
+
+FINALMARKING
+  rw;
+
+TRANSITION t1    { ?PO Change Request }
+CONSUME
+  r0,
+  poChangeRequest;
+PRODUCE
+  r1;
+
+TRANSITION t2    { !PO Change Confirmation }
+CONSUME
+  r1;
+PRODUCE
+  r2,
+  poChangeConfirmation;
+
+TRANSITION t3    { !PO Update }
+CONSUME
+  r2;
+PRODUCE
+  r3,
+  poUpdate;
+
+TRANSITION t4    { ?ack }
+CONSUME
+  r3,
+  ack;
+PRODUCE
+  r2;
+
+TRANSITION t5    { No more update }
+CONSUME
+  r2;
+PRODUCE
+  rw,
+  noMoreUpdate;
+
+{ END OF FILE }

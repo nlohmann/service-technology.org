@@ -1,0 +1,34 @@
+{ Q1 }
+
+PLACE
+INTERNAL
+  q0,  { initial }
+  q1,
+  qw;
+INPUT
+  query_handle;
+
+OUTPUT
+  return_file;
+
+INITIALMARKING
+  q0;
+
+FINALMARKING
+  qw;
+
+TRANSITION t1    { ?query }
+CONSUME
+  q0,
+  query_handle;
+PRODUCE
+  q1;
+
+TRANSITION t2    { !return }
+CONSUME
+  q1;
+PRODUCE
+  qw,
+  return_file;
+
+{ END OF FILE }

@@ -174,6 +174,8 @@ private: /* private variables */
   std::set<std::string> roles_;
   /// interface labels
   std::map<Label *, unsigned int> labels_;
+  /// confidence level
+  int confidence_;
   
 public: /* public methods */
   /*!
@@ -196,6 +198,8 @@ public: /* public methods */
   //@{
   /// set transition cost
   void setCost(int);
+  /// set confidence
+  void setConfidence(int);
   /// add role
   void addRole(const std::string &);
   /// add a set of roles
@@ -238,6 +242,8 @@ public: /* public methods */
   bool equalLabels(const Transition &) const;
   /// get mapping of interface labels to their weight
   const std::map<Label *, unsigned int> & getLabels() const;
+  /// get confidence
+  int getConfidence() const;
   //@}
   
 private: /* private methods */

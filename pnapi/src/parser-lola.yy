@@ -55,7 +55,7 @@
   ****************************************************************************/
 
 %token LCONTROL RCONTROL KEY_TRUE KEY_FALSE KEY_SAFE KEY_PLACE
-%token KEY_TRANSITION KEY_MARKING KEY_CONSUME KEY_PRODUCE
+%token KEY_TRANSITION KEY_MARKING KEY_CONSUME KEY_PRODUCE KEY_HIGH KEY_LOW
 %token COLON SEMICOLON COMMA NUMBER NEGATIVE_NUMBER IDENT
 
 
@@ -65,7 +65,7 @@
   char * yt_str;
 }
 
-%type <yt_int> NUMBER NEGATIVE_NUMBER
+%type <yt_int> NUMBER NEGATIVE_NUMBER opt_confidence
 %type <yt_str> IDENT
 
 %start net
@@ -173,12 +173,13 @@ transitions:
 ;
 
 transition: 
-  KEY_TRANSITION node_name 
+  KEY_TRANSITION node_name opt_confidence
   { 
     // parser_.check(!parser_.net_.containsNode(parser_.nodeName_.str()), "node name already used");
     try
     {
       parser_.transition_ = &(parser_.net_.createTransition(parser_.nodeName_.str()));
+	  parser_.transition_->setConfidence($3);
     }
     catch(exception::Error & e)
     {
@@ -197,6 +198,12 @@ transition:
     parser_.target_ = reinterpret_cast<Node * *>(&(parser_.place_)); 
   }
   arcs SEMICOLON 
+;
+
+opt_confidence:
+  /* empty */  	{ $$ = 0; }
+| KEY_LOW 	{ $$ = 1; }
+| KEY_HIGH  	{ $$ = 2; }
 ;
 
 arcs: 

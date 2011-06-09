@@ -66,6 +66,8 @@ TRUE                            { return tt::KEY_TRUE; }
 FALSE                           { return tt::KEY_FALSE; }
 
  /* keywords */
+HIGH				{ return tt::KEY_HIGH; }
+LOW				{ return tt::KEY_LOW; }
 SAFE                            { return tt::KEY_SAFE; }
 PLACE                           { return tt::KEY_PLACE; }
 TRANSITION                      { return tt::KEY_TRANSITION; }

@@ -1,0 +1,79 @@
+{ Client }
+
+PLACE
+INTERNAL
+  r0,  { initial }
+  r1,
+  r2,
+  r3,
+  r4,
+  r5,
+  rw;
+  
+INPUT
+  clientQuote,
+  ack;
+
+OUTPUT
+  oneOrderItem,
+  noMoreItem,
+  shipmentAndInvoiceAddresses,
+  paymentInfo;
+
+INITIALMARKING
+  r0;
+
+FINALMARKING
+  rw;
+
+TRANSITION t1    { !One Order Item }
+CONSUME
+  r0;
+PRODUCE
+  r1,
+  oneOrderItem;
+
+TRANSITION t2    { ?ack }
+CONSUME
+  r1,
+  ack;
+PRODUCE
+  r2;
+
+TRANSITION t3    { tau }
+CONSUME
+  r2;
+PRODUCE
+  r0;
+
+TRANSITION t4    { !No More Item }
+CONSUME
+  r2;
+PRODUCE
+  r3,
+  noMoreItem;
+
+TRANSITION t5    { ?clientQuote }
+CONSUME
+  r3,
+  clientQuote;
+PRODUCE
+  r4;
+
+TRANSITION t6    { !Shipment and Invoice Addresses }
+CONSUME
+  r4;
+PRODUCE
+  r5,
+  shipmentAndInvoiceAddresses;
+  
+TRANSITION t7    { !Payment Info }
+CONSUME
+  r5;
+PRODUCE
+  rw,
+  paymentInfo;
+
+  
+
+{ END OF FILE }

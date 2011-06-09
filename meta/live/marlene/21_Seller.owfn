@@ -1,0 +1,90 @@
+{ Seller }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1,
+  p2,
+  p3,
+  p4,
+  p5,
+  p6,
+  pw;
+  
+INPUT
+  orderItemList,
+  shipmentAddress,
+  invoiceAddress,
+  checkPaymentInfo,
+  ccPaymentInfo;
+
+OUTPUT
+  sellerQuote,
+  conditionI,
+  conditionJ;
+
+INITIALMARKING
+  p0;
+
+FINALMARKING
+  pw;
+
+TRANSITION t1    { ?Order Item List }
+CONSUME
+  p0,
+  orderItemList;
+PRODUCE
+  p1;
+
+TRANSITION t2    { !Quote }
+CONSUME
+  p1;
+PRODUCE
+  p2,
+  sellerQuote;
+
+TRANSITION t3    { ?Shipment Address }
+CONSUME
+  p2,
+  shipmentAddress;
+PRODUCE
+  p3;
+
+TRANSITION t4    { ?Invoice Address }
+CONSUME
+  p3,
+  invoiceAddress;
+PRODUCE
+  p4;
+
+TRANSITION t5    { !Condition i }
+CONSUME
+  p4;
+PRODUCE
+  p5,
+  conditionI;
+
+TRANSITION t6    { ?Check Payment Info }
+CONSUME
+  p5,
+  checkPaymentInfo;
+PRODUCE
+  pw;
+
+TRANSITION t7    { !Condition j }
+CONSUME
+  p4;
+PRODUCE
+  p6,
+  conditionJ;
+
+TRANSITION t8    { ?CC Payment Info }
+CONSUME
+  p6,
+  ccPaymentInfo;
+PRODUCE
+  pw;
+
+
+
+{ END OF FILE }

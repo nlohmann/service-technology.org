@@ -76,6 +76,11 @@
     $services = array("marlene/5_PI.owfn", "marlene/5_RI.owfn");
     $rules = createFile("diag_i5_re.ar");
   }
+
+  else if (!strcmp($_SESSION[$tool]["process"], 'marlene_ia/i21_re.owfn')) {
+    $services = array("marlene/21_Seller.owfn", "marlene/21_Client.owfn");
+    $rules = createFile("diag_i21_re.ar");
+  }
   
   $services = prepareFiles($services);
   // $rules = createFile("diag.ar");

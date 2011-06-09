@@ -57,8 +57,25 @@
     $services = array("marlene/ip.owfn", "marlene/ip2.owfn", "marlene/req2.owfn");
     $rules = createFile("diag_iReroute.ar");
   }
-  
 
+// examples for ICSOC  
+  else if (!strcmp($_SESSION[$tool]["process"], 'marlene_ia/i2_re1.owfn')) {
+    $services = array("marlene/2_P1.owfn", "marlene/2_Q1.owfn");
+    $rules = createFile("diag_i2_re1.ar");
+  }
+  else if (!strcmp($_SESSION[$tool]["process"], 'marlene_ia/i2_re2.owfn')) {
+    $services = array("marlene/2_P2.owfn", "marlene/2_Q2.owfn");
+    $rules = createFile("diag_i2_re2.ar");
+  }
+  else if (!strcmp($_SESSION[$tool]["process"], 'marlene_ia/i2_sc.owfn')) {
+    $services = array("marlene/2_iServer.owfn", "marlene/2_iClient.owfn");
+    $rules = createFile("diag_i2_sc.ar");
+  }
+
+  else if (!strcmp($_SESSION[$tool]["process"], 'marlene_ia/i5_re.owfn')) {
+    $services = array("marlene/5_PI.owfn", "marlene/5_RI.owfn");
+    $rules = createFile("diag_i5_re.ar");
+  }
   
   $services = prepareFiles($services);
   // $rules = createFile("diag.ar");

@@ -407,10 +407,10 @@ public class DNodeRefold extends DNodeBP {
         print_count = 0;
       }
       
-      //Uma.out.println("top: "+top);
+      Uma.out.println("top: "+top);
       DNode d = top.iterator().next();
       top.remove(d);
-      //Uma.out.println("removed "+d);
+      Uma.out.println("removed "+d);
 
       to_join.clear();
       to_join.add(d);
@@ -429,7 +429,7 @@ public class DNodeRefold extends DNodeBP {
           dSucc.add(elementary_ccPair.get(e));
         }
       }
-      //Uma.out.println("  has successors: "+dSucc);
+      Uma.out.println("  has successors: "+dSucc);
       
       int joint_size = dCl.size();    //
       
@@ -440,7 +440,7 @@ public class DNodeRefold extends DNodeBP {
         if (d.id != d2.id) continue;
         if (futureEquivalence().areFoldingEquivalent(d, d2)) continue;
         
-        //Uma.out.println("  comparing to "+d2);
+        Uma.out.println("  comparing to "+d2);
         
         if (areConcurrent_struct(d, d2)) {
           //System.out.println("    are CONCURRENT, NOT joining");
@@ -462,7 +462,7 @@ public class DNodeRefold extends DNodeBP {
             d2Succ.add(elementary_ccPair.get(e2));
           }
         }
-        //Uma.out.println("    has successors: "+d2Succ);
+        Uma.out.println("    has successors: "+d2Succ);
         
         // Check if we can join the classes of 'd' and 'd2': this is possible
         // if each successor of the class of 'd' has an equivalent successor of
@@ -474,7 +474,7 @@ public class DNodeRefold extends DNodeBP {
           
           if (!d2Succ.contains(e)) {
             all_dSucc_HaveEquivalent = false;
-            //Uma.out.println("    -> "+e+" not in post "+d2);
+            Uma.out.println("    -> "+e+" not in post "+d2);
             break;
           }
           
@@ -522,7 +522,7 @@ public class DNodeRefold extends DNodeBP {
           
           if (!dSucc.contains(e2)) {
             all_dSucc_HaveEquivalent = false;
-            //Uma.out.println("    -> "+e2+" not in post "+d);
+            Uma.out.println("    -> "+e2+" not in post "+d);
             break;
           }
           
@@ -558,10 +558,10 @@ public class DNodeRefold extends DNodeBP {
         
         if (all_dSucc_HaveEquivalent && all_d2Succ_HaveEquivalent) {
           to_join.add(d2);
-          //Uma.out.println("  JOINING "+d+" and "+d2);
+          Uma.out.println("  JOINING "+d+" and "+d2);
           joint_size += d2Cl.size();    //
         } else {
-          //Uma.out.println("  NOT joining "+d+" and "+d2);
+          Uma.out.println("  NOT joining "+d+" and "+d2);
         }
         
         //if (!ignoreFoldThreshold && joint_size > foldThreshold * idFrequency[d.id]) break;      //
@@ -632,7 +632,7 @@ public class DNodeRefold extends DNodeBP {
         }
         
         // collect conditions: for each condition of the event with the least pre-conditions
-        // we have to find an equivalent condition of each other event
+        // we have to find an equivalent condition of every other event
         DNode[][] joinNodes = new DNode[maxDirectPreSize][_to_join.length];
         
         int maxIndex_preIndex[] = new int[_to_join[maxIndex].pre.length];
@@ -768,8 +768,7 @@ public class DNodeRefold extends DNodeBP {
         for (DNode b : nonJoinedConditions) {
           
           this.bp.remove(b);
-          
-          //System.out.println("non-joined: "+b);
+          System.out.println("non-joined: "+b);
         }
 
         

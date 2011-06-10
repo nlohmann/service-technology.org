@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import com.google.gwt.dev.util.collect.HashSet;
 
@@ -62,7 +63,7 @@ public class FutureEquivalence implements Map<DNode, Set<DNode>> {
   protected void putElementaryEquivalent(DNode newNode, DNode existing) {
     DNode _existing = getElementary_ccPair().get(existing);
     if (_existing == null)
-      getElementary_ccPair().put(newNode, _existing);
+      getElementary_ccPair().put(newNode, existing);
     else
       getElementary_ccPair().put(newNode, _existing);
   }
@@ -169,7 +170,7 @@ public class FutureEquivalence implements Map<DNode, Set<DNode>> {
    * @param to_be_equivalent
    */
   public void joinEquivalenceClasses(Collection<DNode> to_be_equivalent) {
-    //System.out.println("join: "+to_be_equivalent);
+    System.out.println("join: "+to_be_equivalent);
     
     // get for each node of 'to_be_equivalent' all its equivalent nodes
     // and put them in:
@@ -280,4 +281,31 @@ public class FutureEquivalence implements Map<DNode, Set<DNode>> {
     return foldingEquivalenceClasses.values();
   }
 
+  public void _debugPrintCutOffPairs() {
+    System.out.println("----- CC-pairs -----");
+    for (Entry<DNode, DNode> cc : getElementary_ccPair().entrySet()) {
+      System.out.println(cc.getKey()+" --> "+cc.getValue());
+    }
+    System.out.println("---- /CC-pairs -----");
+  }
+  
+  /**
+   * print which events and which conditions are equivalent according
+   * to {@link #elementary_ccPair}.
+   */
+  public void _debug_printFoldingEquivalence() {
+    System.out.println("--- equivalence relation ---");
+    System.out.println("EVENTS:");
+    for (DNode e : this.keySet()) {
+      if (e.isEvent)
+        System.out.println(e+": "+this.get(e));
+    }
+    System.out.println("CONDITIONS:");
+    for (DNode b : this.keySet()) {
+      if (!b.isEvent)
+        System.out.println(b+": "+this.get(b));
+    }
+    System.out.println("--- /equivalence relation ---");
+  }
+  
 }

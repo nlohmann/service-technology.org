@@ -1610,6 +1610,7 @@ public class DNodeBP {
    * TODO: method is protected to be called from extending plugins, check consistency of other fields when the method is re-used in another context
 	 */
 	protected void setCutOffEvent(DNode cutOffEvent, DNode equivalentEvent) {
+	  //System.out.println("setting cut-off event: "+cutOffEvent+" --> "+equivalentEvent);
 	  futureEquivalence.putElementaryEquivalent(cutOffEvent, equivalentEvent);
 	}
 	
@@ -1645,14 +1646,6 @@ public class DNodeBP {
         cutOffConditions[i].isCutOff = true; // remember it
       }
     }
-  }
-  
-  public void debugPrintCutOffPairs() {
-    System.out.println("----- CC-pairs -----");
-    for (Entry<DNode, DNode> cc : futureEquivalence.getElementary_ccPair().entrySet()) {
-      System.out.println(cc.getKey()+" --> "+cc.getValue());
-    }
-    System.out.println("---- /CC-pairs -----");
   }
   
   /* ==========================================================================
@@ -2915,25 +2908,6 @@ public class DNodeBP {
   // remember when we started with the branching process construction for
   // the exeuction time profile
   long _debug_t0 = System.currentTimeMillis();
-
-  /**
-   * print which events and which conditions are equivalent according
-   * to {@link #elementary_ccPair}.
-   */
-  public void debug_printFoldingEquivalence() {
-    System.out.println("--- equivalence relation ---");
-    System.out.println("EVENTS:");
-    for (DNode e : bp.getAllEvents()) {
-      if (futureEquivalence.getElementary_ccPair().get(e) == e)
-        System.out.println(e+": "+futureEquivalence().get(e));
-    }
-    System.out.println("CONDITIONS:");
-    for (DNode b : bp.getAllConditions()) {
-      if (futureEquivalence.getElementary_ccPair().get(b) == b)
-        System.out.println(b+": "+futureEquivalence().get(b));
-    }
-    System.out.println("--- /equivalence relation ---");
-  }
 
   /**
    * @param array

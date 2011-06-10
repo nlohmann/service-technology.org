@@ -14,6 +14,7 @@ import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.synthesis.NetSynthesis;
 
 import java.io.IOException;
+import java.util.Map.Entry;
 
 import com.google.gwt.dev.util.collect.HashSet;
 
@@ -41,8 +42,6 @@ public class UmaTest extends hub.top.test.TestCase {
       while (build.step() > 0) {
       }
       
-      System.out.println(build.getStatistics());
-
       //String targetPath_dot = testFileRoot+"/net_lexik.bp.dot";
       //writeFile(targetPath_dot, build.toDot());
       
@@ -51,6 +50,42 @@ public class UmaTest extends hub.top.test.TestCase {
           && build.statistic_condNum == 14
           && build.statistic_cutOffNum == 3
           && build.statistic_arcNum == 24);
+      
+    } catch (InvalidModelException e) {
+      System.err.println("Invalid model: "+e);
+      assertTrue(lastTest, false);
+    } catch (IOException e) {
+      System.err.println("Couldn't read test file: "+e);
+      assertTrue(lastTest, false);
+    }
+  }
+  
+  public void test_regression_cutOff () {
+    
+    lastTest = "Regression test: correct cut-off events";
+    
+    try {
+
+      ISystemModel sysModel = Uma.readSystemFromFile(testFileRoot+"/net_lexik.lola");
+      DNodeSys sys = Uma.getBehavioralSystemModel(sysModel);
+      DNodeBP build = Uma.initBuildPrefix(sys, 1);
+      
+      while (build.step() > 0);
+      
+      int cutOffCount = 0;
+      for (DNode e : build.getBranchingProcess().allEvents) {
+        if (!e.isCutOff) continue; 
+        cutOffCount++;
+        if (sys.properNames[e.id].equals("u")) {
+          short otherId = build.futureEquivalence().getElementary_ccPair().get(e).id;
+          assertEquals("cut-off event u mapped to v", "v", sys.properNames[otherId]);
+        }
+        if (sys.properNames[e.id].equals("x")) {
+          short otherId = build.futureEquivalence().getElementary_ccPair().get(e).id;
+          assertEquals("cut-off event x mapped to x", "x", sys.properNames[otherId]);
+        }
+      }
+      assertEquals("Found 3 cut-off events", 3, cutOffCount);
       
     } catch (InvalidModelException e) {
       System.err.println("Invalid model: "+e);

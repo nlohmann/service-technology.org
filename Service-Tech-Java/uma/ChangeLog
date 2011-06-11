@@ -1,3 +1,10 @@
+UMA v.1.2.4
+-----------
+
+* refactored code, separating branching process construction from
+  folding routine
+* fixed small bugs on folding algorithm and net synthesis
+
 UMA v.1.2.3
 -----------
 

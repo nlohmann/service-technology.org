@@ -62,10 +62,11 @@ public class FutureEquivalence implements Map<DNode, Set<DNode>> {
    */
   protected void putElementaryEquivalent(DNode newNode, DNode existing) {
     DNode _existing = getElementary_ccPair().get(existing);
-    if (_existing == null)
+    if (_existing == null) {
       getElementary_ccPair().put(newNode, existing);
-    else
+    } else {
       getElementary_ccPair().put(newNode, _existing);
+    }
   }
 
   /**
@@ -74,6 +75,9 @@ public class FutureEquivalence implements Map<DNode, Set<DNode>> {
    * same future. This method builds the explicit equivalence classes of this relation.
    */
   public void completeElementaryEquivalence(Iterable<DNode> allNodes) {
+    
+    _debugPrintCutOffPairs();
+    System.out.println(elementary_ccPair.keySet());
     
     // update the equivalence relation to point for each node to its canonic
     // equivalent node (i.e. the smallest node), and populate the equivalence classes
@@ -97,7 +101,10 @@ public class FutureEquivalence implements Map<DNode, Set<DNode>> {
           if (d2.globalId < dOther.globalId) dOther = d2;
         }
         
-        elementary_ccPair.put(d, dOther);
+        // and set equivalence for each node in the class
+        for (DNode d2 : equivSet) {
+          elementary_ccPair.put(d2, dOther);
+        }
       }
     }
   }

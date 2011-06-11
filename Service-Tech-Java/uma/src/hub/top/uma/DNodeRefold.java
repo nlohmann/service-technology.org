@@ -371,6 +371,15 @@ public class DNodeRefold extends DNodeBP {
     }
   }
   
+  private static class JoinConditions {
+    DNode[]   _to_join;
+    DNode[][] joinNodes;
+    int maxIndex_preIndex[];
+    HashSet<DNode> nonJoinedConditions;
+    int maxDirectPreSize = 0;
+    int maxIndex = -1;
+  };
+  
   public boolean extendFutureEquivalence_backwards() {
     boolean changed = false;
     
@@ -390,6 +399,7 @@ public class DNodeRefold extends DNodeBP {
     }
 
     LinkedList<DNode> to_join = new LinkedList<DNode>();
+    LinkedList<JoinConditions> to_joinB = new LinkedList<DNodeRefold.JoinConditions>();
     HashSet<DNode> dSucc = new HashSet<DNode>();
     HashSet<DNode> d2Succ = new HashSet<DNode>();
     
@@ -438,6 +448,7 @@ public class DNodeRefold extends DNodeBP {
         if (d == d2) continue;
         if (d2.isAnti) continue;
         if (d.id != d2.id) continue;
+        if (d.isEvent != d2.isEvent) continue;
         if (futureEquivalence().areFoldingEquivalent(d, d2)) continue;
         
         Uma.out.println("  comparing to "+d2);
@@ -591,188 +602,229 @@ public class DNodeRefold extends DNodeBP {
         top.removeAll(foldingEquivalence().get(elementary_ccPair.get(d)));
         */
         
+        JoinConditions jc = new JoinConditions();
+        
         // fix the order of events to merge, so that each event has a unique index
         // the index will be used to relate pre-conditions of different events to each other
-        DNode[] _to_join = new DNode[to_join.size()];
-        _to_join = to_join.toArray(_to_join);
+        jc._to_join = new DNode[to_join.size()];
+        jc._to_join = to_join.toArray(jc._to_join);
+                
+        //to_joinB.add(jc);
+      //}
+      
+      //if (top.isEmpty()) {
         
-        /*
-        int minPreSize = Integer.MAX_VALUE;
-        int minIndex = -1;
-        for (int i=0; i<_to_join.length; i++) {
-          if (minPreSize > _to_join[i].pre.length) {
-            minPreSize = _to_join[i].pre.length;
-            minIndex = i;
-          }
-        }
-        */
+        //System.out.println("Joining conditions");
         
-        int maxDirectPreSize = 0;
-        int maxIndex = -1;
-        for (int i=0; i<_to_join.length; i++) {
-          int i_pre_direct = 0;
-          for (int j=0; j<_to_join[i].pre.length; j++) {
-            if (!_to_join[i].pre[j].isImplied) i_pre_direct++;
+        //while (!to_joinB.isEmpty()) {
+          
+          //JoinConditions jc = to_joinB.removeFirst();
+          
+          for (DNode e : jc._to_join) {
+            System.out.println("  "+e+" has pred: "+DNode.toString(e.pre));
           }
           
-          if (maxDirectPreSize < i_pre_direct) {
-            maxDirectPreSize = i_pre_direct;
-            maxIndex = i;
+          /*
+          int minPreSize = Integer.MAX_VALUE;
+          int minIndex = -1;
+          for (int i=0; i<_to_join.length; i++) {
+            if (minPreSize > _to_join[i].pre.length) {
+              minPreSize = _to_join[i].pre.length;
+              minIndex = i;
+            }
           }
-        }
-        
-        // all pre-conditions of all events that we join
-        // later, we remove all conditions that have been joined with some other
-        // condition. the remaining conditions are implied conditions that are
-        // no longer required in the net and hence will be removed
-        HashSet<DNode> nonJoinedConditions = new HashSet<DNode>();
-        for (DNode d2 : to_join) {
-          // initialize, remove joined conditions afterwards
-          for (DNode b : d2.pre) nonJoinedConditions.add(b); 
-        }
-        
-        // collect conditions: for each condition of the event with the least pre-conditions
-        // we have to find an equivalent condition of every other event
-        DNode[][] joinNodes = new DNode[maxDirectPreSize][_to_join.length];
-        
-        int maxIndex_preIndex[] = new int[_to_join[maxIndex].pre.length];
-        
-        // Match all conditions with the same label: these are definitely equivalent.
-        // The event with the least pre-conditions defines the distribution;
-        // all other pre-conditions must be matched here.
-        for (int j=0,j2=0; j<_to_join[maxIndex].pre.length; j++) {
-          if (!_to_join[maxIndex].pre[j].isImplied) {
-            maxIndex_preIndex[j] = j2;
-            joinNodes[j2][maxIndex] = _to_join[maxIndex].pre[j];
-            nonJoinedConditions.remove(joinNodes[j2][maxIndex]);
-            j2++;
-          } else {
-            maxIndex_preIndex[j] = -1;
+          */
+          
+          jc.maxDirectPreSize = 0;
+          jc.maxIndex = -1;
+          for (int i=0; i<jc._to_join.length; i++) {
+            int i_pre_direct = 0;
+            for (int j=0; j<jc._to_join[i].pre.length; j++) {
+              if (!jc._to_join[i].pre[j].isImplied) i_pre_direct++;
+            }
+            
+            if (jc.maxDirectPreSize < i_pre_direct) {
+              jc.maxDirectPreSize = i_pre_direct;
+              jc.maxIndex = i;
+            }
           }
-        }
-        
-        for (int i=0; i<_to_join.length; i++) {
-          if (i == maxIndex) continue;
 
-          // find for each pre-condition of event i 
-          for (int k=0; k<_to_join[i].pre.length; k++) {
-            // the corresponding pre-condition of event maxIndex with the same label
-            // if it exists
-            for (int j=0; j<_to_join[maxIndex].pre.length; j++) {
-              if (_to_join[maxIndex].pre[j].isImplied) continue;
-              
-              if (_to_join[i].pre[k].id == _to_join[maxIndex].pre[j].id) {
-                joinNodes[maxIndex_preIndex[j]][i] = _to_join[i].pre[k];
-                nonJoinedConditions.remove(joinNodes[maxIndex_preIndex[j]][i]);
-                break;
+        
+          // all pre-conditions of all events that we join
+          // later, we remove all conditions that have been joined with some other
+          // condition. the remaining conditions are implied conditions that are
+          // no longer required in the net and hence will be removed
+          jc.nonJoinedConditions = new HashSet<DNode>();
+          for (DNode d2 : to_join) {
+            // initialize, remove joined conditions afterwards
+            for (DNode b : d2.pre) jc.nonJoinedConditions.add(b); 
+          }
+          
+          // collect conditions: for each condition of the event with the least pre-conditions
+          // we have to find an equivalent condition of every other event
+          jc.joinNodes = new DNode[jc.maxDirectPreSize][jc._to_join.length];
+          
+          jc.maxIndex_preIndex = new int[jc._to_join[jc.maxIndex].pre.length];
+          
+          // Match all conditions with the same label: these are definitely equivalent.
+          // The event with the least pre-conditions defines the distribution;
+          // all other pre-conditions must be matched here.
+          for (int j=0,j2=0; j<jc._to_join[jc.maxIndex].pre.length; j++) {
+            if (!jc._to_join[jc.maxIndex].pre[j].isImplied) {
+              jc.maxIndex_preIndex[j] = j2;
+              jc.joinNodes[j2][jc.maxIndex] = jc._to_join[jc.maxIndex].pre[j];
+              jc.nonJoinedConditions.remove(jc.joinNodes[j2][jc.maxIndex]);
+              j2++;
+            } else {
+              jc.maxIndex_preIndex[j] = -1;
+            }
+          }
+          
+          for (int i=0; i<jc._to_join.length; i++) {
+            if (i == jc.maxIndex) continue;
+  
+            // find for each pre-condition of event i 
+            for (int k=0; k<jc._to_join[i].pre.length; k++) {
+              // the corresponding pre-condition of event maxIndex with the same label
+              // if it exists
+              for (int j=0; j<jc._to_join[jc.maxIndex].pre.length; j++) {
+                if (jc._to_join[jc.maxIndex].pre[j].isImplied) continue;
+                
+                if (jc._to_join[i].pre[k].id == jc._to_join[jc.maxIndex].pre[j].id) {
+                  jc.joinNodes[jc.maxIndex_preIndex[j]][i] = jc._to_join[i].pre[k];
+                  jc.nonJoinedConditions.remove(jc.joinNodes[jc.maxIndex_preIndex[j]][i]);
+                  System.out.println("  joining "+jc._to_join[jc.maxIndex].pre[j]+" and "+jc.joinNodes[jc.maxIndex_preIndex[j]][i]);
+                  break;
+                }
               }
             }
           }
-        }
-        // now, we have found all pre-conditions of all events that match by label
-        // next: find the missing conditions using Kiepuziewski et al
-        
-        for (int j=0; j<joinNodes.length; j++) {
-          for (int i=0; i<joinNodes[j].length; i++) {
-            // the j-th precondition of 'minIndex' already has an equivalent
-            // precondition of event 'i', done
-            if (joinNodes[j][i] != null) continue;
-            
-            // the j-th precondition of 'minIndex' has no equivalent
-            // precondition of event 'i' yet. find one
-            DNode toMatch = joinNodes[j][maxIndex];
-
-            // check all preconditions of event 'i', first check the non-implied conditions
-            LinkedList<DNode> matchConditions = new LinkedList<DNode>();
-            for (DNode pre : _to_join[i].pre) {
-              if (!nonJoinedConditions.contains(pre)) continue;
-              if (areConcurrent_struct(toMatch, pre)) continue;
-              if (!pre.isImplied) matchConditions.addLast(pre);
-            }
-            // then the implied conditions
-            for (DNode pre : _to_join[i].pre) {
-              if (!nonJoinedConditions.contains(pre)) continue;
-              if (areConcurrent_struct(toMatch, pre)) continue;
-              if (pre.isImplied) matchConditions.addLast(pre);
-            }
-            
-            for (DNode matchCondition : matchConditions) {
-              // check if 'toMatch' and 'matchCondition' are successor equivalent
-              // get future equivalence classes
-              DNode[] future_toMatch = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, toMatch);
-              DNode[] future_matchCon = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, matchCondition);
-              // and compare
-              if (!Arrays.equals(future_toMatch, future_matchCon)) continue;
-                
-              // make 'toMatch' and 'matchCondition' equivalent
-              joinNodes[j][i] = matchCondition;
-              nonJoinedConditions.remove(matchCondition);
-              break;
-            }
-
-            /*
-            HashSet<DNode> grey = bp.getAllPredecessors(toMatch);
-            // get all predecessors of the event for which we want to find the
-            // precondition to match 'j'
-            HashSet<DNode> potentiallyBlack = bp.getAllPredecessors(_to_join[i]);
-            
-            for (DNode greyNode : grey) {
-              if (greyNode.isEvent) continue;
+          // now, we have found all pre-conditions of all events that match by label
+          // next: find the missing conditions based on futures
+          
+          for (int j=0; j<jc.joinNodes.length; j++) {
+            for (int i=0; i<jc.joinNodes[j].length; i++) {
+              // the j-th precondition of 'minIndex' already has an equivalent
+              // precondition of event 'i', done
+              if (jc.joinNodes[j][i] != null) continue;
               
-              for (DNode black : greyNode.post) {
-                if (potentiallyBlack.contains(black)) {
-                  for (DNode matchCondition : black.post) {
-                    
-                    // we can only match to implied conditions
-                    if (!matchCondition.isImplied) continue;
-                    if (!nonJoinedConditions.contains(matchCondition)) continue;
-                    
-                    // check if 'toMatch' and 'matchCondition' are successor equivalent
-                    // get future equivalence classes
-                    DNode[] future_toMatch = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, toMatch);
-                    DNode[] future_matchCon = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, matchCondition);
-                    // and compare
-                    if (!Arrays.equals(future_toMatch, future_matchCon)) continue;
+              // the j-th precondition of 'minIndex' has no equivalent
+              // precondition of event 'i' yet. find one
+              DNode toMatch = jc.joinNodes[j][jc.maxIndex];
+  
+              // check all preconditions of event 'i', first check the non-implied conditions
+              LinkedList<DNode> matchConditions = new LinkedList<DNode>();
+              for (DNode pre : jc._to_join[i].pre) {
+                if (!jc.nonJoinedConditions.contains(pre)) continue;
+                if (areConcurrent_struct(toMatch, pre)) continue;
+                if (!pre.isImplied) matchConditions.addLast(pre);
+              }
+              // then the implied conditions
+              for (DNode pre : jc._to_join[i].pre) {
+                if (!jc.nonJoinedConditions.contains(pre)) continue;
+                if (areConcurrent_struct(toMatch, pre)) continue;
+                if (pre.isImplied) matchConditions.addLast(pre);
+              }
+              
+              for (DNode matchCondition : matchConditions) {
+                // check if 'toMatch' and 'matchCondition' are successor equivalent
+                // get future equivalence classes
+                DNode[] future_toMatch = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, toMatch);
+                DNode[] future_matchCon = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, matchCondition);
+                
+                System.out.println("can "+toMatch+" join with "+matchCondition+"?");
+                System.out.println("  future: "+DNode.toString(future_toMatch));
+                System.out.println("  future: "+DNode.toString(future_matchCon));
+                
+                // and compare
+                if (!Arrays.equals(future_toMatch, future_matchCon)) {
+                  System.out.println("  are not equal");
+                  continue;
+                }
+                  
+                // make 'toMatch' and 'matchCondition' equivalent
+                jc.joinNodes[j][i] = matchCondition;
+                jc.nonJoinedConditions.remove(matchCondition);
+                break;
+              }
+  
+              /*
+              HashSet<DNode> grey = bp.getAllPredecessors(toMatch);
+              // get all predecessors of the event for which we want to find the
+              // precondition to match 'j'
+              HashSet<DNode> potentiallyBlack = bp.getAllPredecessors(_to_join[i]);
+              
+              for (DNode greyNode : grey) {
+                if (greyNode.isEvent) continue;
+                
+                for (DNode black : greyNode.post) {
+                  if (potentiallyBlack.contains(black)) {
+                    for (DNode matchCondition : black.post) {
                       
-                    // make 'toMatch' and 'matchCondition' equivalent
-                    joinNodes[j][i] = matchCondition;
-                    nonJoinedConditions.remove(matchCondition);
+                      // we can only match to implied conditions
+                      if (!matchCondition.isImplied) continue;
+                      if (!nonJoinedConditions.contains(matchCondition)) continue;
+                      
+                      // check if 'toMatch' and 'matchCondition' are successor equivalent
+                      // get future equivalence classes
+                      DNode[] future_toMatch = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, toMatch);
+                      DNode[] future_matchCon = EquivalenceRefineSuccessor.getSuccessorEquivalence(this, matchCondition);
+                      // and compare
+                      if (!Arrays.equals(future_toMatch, future_matchCon)) continue;
+                        
+                      // make 'toMatch' and 'matchCondition' equivalent
+                      joinNodes[j][i] = matchCondition;
+                      nonJoinedConditions.remove(matchCondition);
+                    }
+                  }
+                }
+              }
+              */
+            }
+          }
+          
+  
+          
+          for (int j=0; j<jc.joinNodes.length; j++) {
+            LinkedList<DNode> joinConditions = new LinkedList<DNode>();
+            for (int i=0; i<jc.joinNodes[j].length; i++) {
+              if (jc.joinNodes[j][i] != null) { 
+                joinConditions.add(elementary_ccPair.get(jc.joinNodes[j][i]));
+                jc.joinNodes[j][i].isImplied = false;
+  
+                // and add the predecessors of the joined pre-sets to the queue 
+                if (jc.joinNodes[j][i].pre != null) {
+                  for (DNode e : jc.joinNodes[j][i].pre) {
+                    top.add(e);
                   }
                 }
               }
             }
-            */
+            futureEquivalence().joinEquivalenceClasses(joinConditions);
           }
-        }
-        
-
-        
-        for (int j=0; j<joinNodes.length; j++) {
-          LinkedList<DNode> joinConditions = new LinkedList<DNode>();
-          for (int i=0; i<joinNodes[j].length; i++) {
-            if (joinNodes[j][i] != null) { 
-              joinConditions.add(elementary_ccPair.get(joinNodes[j][i]));
-              joinNodes[j][i].isImplied = false;
-
-              // and add the predecessors of the joined pre-sets to the queue 
-              if (joinNodes[j][i].pre != null) {
-                for (DNode e : joinNodes[j][i].pre) {
+          
+          for (DNode b : jc.nonJoinedConditions) {
+            boolean isSinglePre = false;
+            for (DNode e : b.post) {
+              if (e.pre.length == 1) {
+                isSinglePre = true;
+                break;
+              }
+            }
+            if (!isSinglePre) {
+              this.bp.remove(b);
+              System.out.println("non-joined: "+b);
+              
+            } else {
+              if (b.pre != null) {
+                for (DNode e : b.pre) {
                   top.add(e);
                 }
               }
             }
           }
-          futureEquivalence().joinEquivalenceClasses(joinConditions);
-        }
-        
-        for (DNode b : nonJoinedConditions) {
-          
-          this.bp.remove(b);
-          System.out.println("non-joined: "+b);
-        }
-
-        
-        top.removeAll(futureEquivalence().get(elementary_ccPair.get(d)));
+          top.removeAll(futureEquivalence().get(elementary_ccPair.get(d)));
+        //}
       }
     }
     return changed;

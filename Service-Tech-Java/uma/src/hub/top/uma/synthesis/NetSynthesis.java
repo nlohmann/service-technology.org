@@ -170,7 +170,7 @@ public class NetSynthesis {
       if (!e.isEvent) continue;  
       // events only
       
-      if (!e.isCutOff || equiv.get(e) == e) {
+      if (equiv.get(e) == e) {
         String label = "";
         if (e.isAnti && !e.isHot)
           label = "tau_"+e.globalId;   // hide cold anti-events
@@ -179,6 +179,7 @@ public class NetSynthesis {
         Transition t = net.addTransition(label);
         d2n.put(e, t);
         n2d.put(t, e);
+        System.out.println(e + " --first--> "+t);
       }
     }
 
@@ -190,7 +191,7 @@ public class NetSynthesis {
       // events only
       
       Transition t = null;
-      if (!e.isCutOff) {
+      if (equiv.get(e) == e) {
         // get transition if already generated
         t = (Transition) d2n.get(e);
       } else {
@@ -205,6 +206,8 @@ public class NetSynthesis {
           t = net.addTransition(label);
           d2n.put(e, t);
           n2d.put(t, e);
+          
+          System.out.println(e + " --second--> "+t);
         } else {
           
           // follow down the chain of equivalent events until
@@ -213,6 +216,8 @@ public class NetSynthesis {
             e2 = equiv.get(e2);
           
           t = (Transition)d2n.get(e2);
+          d2n.put(e, t);
+          System.out.println(e + " --recall--> "+t);
         }
       }
       

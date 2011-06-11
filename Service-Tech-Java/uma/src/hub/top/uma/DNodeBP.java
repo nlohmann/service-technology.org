@@ -1598,6 +1598,18 @@ public class DNodeBP {
 	private final FutureEquivalence futureEquivalence = new FutureEquivalence();
 	
 	/**
+	 * maps each cut-off event to its equivalent event 
+	 */
+	private final Map<DNode, DNode> cutOffEquivalentEvent = new HashMap<DNode, DNode>();
+	
+	/**
+	 * @return the mapping that assigns each cut-off event its equivalent event
+	 */
+	public Map<DNode, DNode> getCutOffEquivalentEvent () {
+	  return cutOffEquivalentEvent;
+	}
+	
+	/**
 	 * Update the mapping that relates each new cutOff event to its equivalent
 	 * old event. If the equivalent event is a cutOff event as well, follow the
 	 * equivalence relation transitively to the first event.
@@ -1610,7 +1622,8 @@ public class DNodeBP {
    * TODO: method is protected to be called from extending plugins, check consistency of other fields when the method is re-used in another context
 	 */
 	protected void setCutOffEvent(DNode cutOffEvent, DNode equivalentEvent) {
-	  //System.out.println("setting cut-off event: "+cutOffEvent+" --> "+equivalentEvent);
+	  System.out.println("setting cut-off event: "+cutOffEvent+" --> "+equivalentEvent);
+	  cutOffEquivalentEvent.put(cutOffEvent, equivalentEvent);
 	  futureEquivalence.putElementaryEquivalent(cutOffEvent, equivalentEvent);
 	}
 	

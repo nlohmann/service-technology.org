@@ -1475,7 +1475,7 @@ endomegaproc:
                         if (analyse_fairness(start, 1)) {
 #ifdef EVENTUALLYPROP
                             //cout << "eventually phi does not hold" << endl;
-                            message(_cgood_("eventually phi holds"));
+                            message(_cgood_("eventually phi does not hold"));
 #endif
 #ifdef FAIRPROP
                             //cout << "GF phi does not hold" << endl;
@@ -1925,7 +1925,7 @@ int initialize_transition() {
 
 #ifdef BOUNDEDPLACE
 #define INITIALIZE_PROPERTY initialize_place
-#define CHECK_EARLY_ABPRTION (!Globals::CheckPlace->bounded)
+#define CHECK_EARLY_ABORTION (!Globals::CheckPlace->bounded)
 #define EARLY_ABORT_MESSAGE std::string("place " + std::string(Globals::CheckPlace->name) + " is unbounded!").c_str()
 #define LATE_ABORT_MESSAGE std::string("place " + std::string(Globals::CheckPlace->name) + " is bounded!").c_str()
 #define RESULT_NAME "unbounded place"
@@ -1934,8 +1934,8 @@ int initialize_transition() {
 #ifdef DEADTRANSITION
 #define INITIALIZE_PROPERTY initialize_transition
 #define CHECK_EARLY_ABORTION (Globals::CheckTransition->enabled)
-#define EARLY_ABORT_MESSAGE std::string("transition " + std::string(Globals::CheckTransition->name) + " is not dead\n").c_str()
-#define LATE_ABORT_MESSAGE std::string("transition " + std::string(Globals::CheckTransition->name) + " is dead\n").c_str()
+#define EARLY_ABORT_MESSAGE std::string("transition " + std::string(Globals::CheckTransition->name) + " is not dead").c_str()
+#define LATE_ABORT_MESSAGE std::string("transition " + std::string(Globals::CheckTransition->name) + " is dead").c_str()
 #define RESULT_NAME "not dead"
 #endif
 

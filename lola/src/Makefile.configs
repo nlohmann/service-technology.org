@@ -1,4 +1,4 @@
-EXTRA_PROGRAMS = bin-lola-boundednet bin-lola-boundednetsymm bin-lola-boundedplace bin-lola-bpm-liveprop bin-lola-bpm-liveprop1 bin-lola-bpm-modelchecking bin-lola-bpm-modelchecking-naiv bin-lola-bpm-modelchecking1 bin-lola-bpm-modelchecking1-naiv bin-lola-bpm-statepredicate bin-lola-bpm-statepredicate-naiv bin-lola-bpm-statepredicate1 bin-lola-bpm-statepredicate1-naiv bin-lola-coverstatepredicate bin-lola-deadlock bin-lola-deadlock1 bin-lola-deadtransition bin-lola-findpath bin-lola-full bin-lola-full1 bin-lola-fullcover bin-lola-fulllimited bin-lola-liveprop bin-lola-liveprop1 bin-lola-modelchecking bin-lola-none bin-lola-prom-boundednet bin-lola-prom-deadlock bin-lola-prom-home bin-lola-prom-reversibility bin-lola-statepredicate bin-lola-statepredicate1 bin-lola-statespace bin-lola-statespace1 bin-lola-sumo-deadlock bin-lola-sumo-statepredicate 
+EXTRA_PROGRAMS = bin-lola-boundednet bin-lola-boundednetsymm bin-lola-boundedplace bin-lola-bpm-liveprop bin-lola-bpm-liveprop1 bin-lola-bpm-modelchecking bin-lola-bpm-modelchecking-naiv bin-lola-bpm-modelchecking1 bin-lola-bpm-modelchecking1-naiv bin-lola-bpm-statepredicate bin-lola-bpm-statepredicate-naiv bin-lola-bpm-statepredicate1 bin-lola-bpm-statepredicate1-naiv bin-lola-coverstatepredicate bin-lola-deadlock bin-lola-deadlock1 bin-lola-deadtransition bin-lola-eventuallyprop bin-lola-fairprop bin-lola-findpath bin-lola-full bin-lola-full1 bin-lola-fullcover bin-lola-fulllimited bin-lola-home bin-lola-liveprop bin-lola-liveprop1 bin-lola-modelchecking bin-lola-none bin-lola-prom-boundednet bin-lola-prom-deadlock bin-lola-prom-home bin-lola-prom-reversibility bin-lola-reachability bin-lola-reversibility bin-lola-statepredicate bin-lola-statepredicate1 bin-lola-statespace bin-lola-statespace1 bin-lola-sumo-statepredicate 
 
 bin_lola_boundednet_SOURCES = $(lola_SOURCES)
 bin_lola_boundednet_CPPFLAGS = $(AM_CPPFLAGS)
@@ -102,6 +102,18 @@ lola-deadtransition:
 	$(AM_V_at)$(MAKE) bin-lola-deadtransition$(EXEEXT) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/deadtransition $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
 	$(AM_V_GEN)mv $(builddir)/bin-lola-deadtransition$(EXEEXT) $(builddir)/lola-deadtransition$(EXEEXT)
 
+bin_lola_eventuallyprop_SOURCES = $(lola_SOURCES)
+bin_lola_eventuallyprop_CPPFLAGS = $(AM_CPPFLAGS)
+lola-eventuallyprop:
+	$(AM_V_at)$(MAKE) bin-lola-eventuallyprop$(EXEEXT) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/eventuallyprop $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-eventuallyprop$(EXEEXT) $(builddir)/lola-eventuallyprop$(EXEEXT)
+
+bin_lola_fairprop_SOURCES = $(lola_SOURCES)
+bin_lola_fairprop_CPPFLAGS = $(AM_CPPFLAGS)
+lola-fairprop:
+	$(AM_V_at)$(MAKE) bin-lola-fairprop$(EXEEXT) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/fairprop $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-fairprop$(EXEEXT) $(builddir)/lola-fairprop$(EXEEXT)
+
 bin_lola_findpath_SOURCES = $(lola_SOURCES)
 bin_lola_findpath_CPPFLAGS = $(AM_CPPFLAGS)
 lola-findpath:
@@ -131,6 +143,12 @@ bin_lola_fulllimited_CPPFLAGS = $(AM_CPPFLAGS)
 lola-fulllimited:
 	$(AM_V_at)$(MAKE) bin-lola-fulllimited$(EXEEXT) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/fulllimited $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
 	$(AM_V_GEN)mv $(builddir)/bin-lola-fulllimited$(EXEEXT) $(builddir)/lola-fulllimited$(EXEEXT)
+
+bin_lola_home_SOURCES = $(lola_SOURCES)
+bin_lola_home_CPPFLAGS = $(AM_CPPFLAGS)
+lola-home:
+	$(AM_V_at)$(MAKE) bin-lola-home$(EXEEXT) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/home $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-home$(EXEEXT) $(builddir)/lola-home$(EXEEXT)
 
 bin_lola_liveprop_SOURCES = $(lola_SOURCES)
 bin_lola_liveprop_CPPFLAGS = $(AM_CPPFLAGS)
@@ -180,6 +198,18 @@ lola-prom-reversibility:
 	$(AM_V_at)$(MAKE) bin-lola-prom-reversibility$(EXEEXT) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/prom-reversibility $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
 	$(AM_V_GEN)mv $(builddir)/bin-lola-prom-reversibility$(EXEEXT) $(builddir)/lola-prom-reversibility$(EXEEXT)
 
+bin_lola_reachability_SOURCES = $(lola_SOURCES)
+bin_lola_reachability_CPPFLAGS = $(AM_CPPFLAGS)
+lola-reachability:
+	$(AM_V_at)$(MAKE) bin-lola-reachability$(EXEEXT) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/reachability $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-reachability$(EXEEXT) $(builddir)/lola-reachability$(EXEEXT)
+
+bin_lola_reversibility_SOURCES = $(lola_SOURCES)
+bin_lola_reversibility_CPPFLAGS = $(AM_CPPFLAGS)
+lola-reversibility:
+	$(AM_V_at)$(MAKE) bin-lola-reversibility$(EXEEXT) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/reversibility $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
+	$(AM_V_GEN)mv $(builddir)/bin-lola-reversibility$(EXEEXT) $(builddir)/lola-reversibility$(EXEEXT)
+
 bin_lola_statepredicate_SOURCES = $(lola_SOURCES)
 bin_lola_statepredicate_CPPFLAGS = $(AM_CPPFLAGS)
 lola-statepredicate:
@@ -203,12 +233,6 @@ bin_lola_statespace1_CPPFLAGS = $(AM_CPPFLAGS)
 lola-statespace1:
 	$(AM_V_at)$(MAKE) bin-lola-statespace1$(EXEEXT) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/statespace1 $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
 	$(AM_V_GEN)mv $(builddir)/bin-lola-statespace1$(EXEEXT) $(builddir)/lola-statespace1$(EXEEXT)
-
-bin_lola_sumo_deadlock_SOURCES = $(lola_SOURCES)
-bin_lola_sumo_deadlock_CPPFLAGS = $(AM_CPPFLAGS)
-lola-sumo-deadlock:
-	$(AM_V_at)$(MAKE) bin-lola-sumo-deadlock$(EXEEXT) $(AM_MAKEFLAGS) DEFAULT_INCLUDES="-I $(srcdir)/configs/sumo-deadlock $(DEFAULT_INCLUDES)" CPPFLAGS=-DSTANDARDCONFIG
-	$(AM_V_GEN)mv $(builddir)/bin-lola-sumo-deadlock$(EXEEXT) $(builddir)/lola-sumo-deadlock$(EXEEXT)
 
 bin_lola_sumo_statepredicate_SOURCES = $(lola_SOURCES)
 bin_lola_sumo_statepredicate_CPPFLAGS = $(AM_CPPFLAGS)

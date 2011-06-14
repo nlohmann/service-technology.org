@@ -181,6 +181,7 @@ AT_CHECK_LOLA
 AT_CHECK([ANICA --foo],1,ignore,stderr)
 AT_CHECK([GREP -q "unrecognized option" stderr])
 AT_CHECK([GREP -q "invalid command-line parameter(s)" stderr])
+AT_CHECK([GREP -q "aborting \[[#07\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
@@ -190,6 +191,7 @@ AT_CHECK([cp TESTFILES/potentialCausal.lola .])
 AT_CHECK([cp TESTFILES/potentialConflict.lola .])
 AT_CHECK([ANICA potentialCausal.lola potentialConflict.lola],1,ignore,stderr)
 AT_CHECK([GREP -q "at most one input file must be given" stderr])
+AT_CHECK([GREP -q "aborting \[[#04\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
@@ -197,6 +199,7 @@ AT_SETUP([Unknown file])
 AT_CHECK_LOLA
 AT_CHECK([ANICA potentialConflict.lola],1,ignore,stderr)
 AT_CHECK([GREP -q "could not open file" stderr])
+AT_CHECK([GREP -q "aborting \[[#01\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
@@ -205,7 +208,7 @@ AT_CHECK([cp TESTFILES/potentialConflict.lola .])
 AT_DATA([my_anica.conf], [invalid="PARAMETER"
 ])
 AT_CHECK([ANICA --config=my_anica.conf potentialConflict.lola],1,ignore,stderr)
-AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
+AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
@@ -214,7 +217,7 @@ AT_CHECK([cp TESTFILES/potentialConflict.lola .])
 AT_DATA([anica.conf], [invalid="PARAMETER"
 ])
 AT_CHECK([ANICA potentialConflict.lola],1,ignore,stderr)
-AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
+AT_CHECK([GREP -q "aborting \[[#10\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
@@ -223,6 +226,7 @@ AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/missing-confidence.lola .])
 AT_CHECK([ANICA missing-confidence.lola],1,ignore,stderr)
 AT_CHECK([GREP -q "has unknown confidence level" stderr])
+AT_CHECK([GREP -q "aborting \[[#06\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
@@ -230,7 +234,8 @@ AT_SETUP([Active causal requires potential causal])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/potentialCausal.lola .])
 AT_CHECK([ANICA potentialCausal.lola --potentialPlaces=conflict --activePlaces=causal],1,ignore,stderr)
-AT_CHECK([GREP -q "active causal requires potential causal" stderr])
+AT_CHECK([GREP -q "activeCausal requires potentialCausal" stderr])
+AT_CHECK([GREP -q "aborting \[[#07\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
@@ -238,7 +243,8 @@ AT_SETUP([Active conflict requires potential conflict])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/potentialCausal.lola .])
 AT_CHECK([ANICA potentialCausal.lola --potentialPlaces=causal --activePlaces=conflict],1,ignore,stderr)
-AT_CHECK([GREP -q "active conflict requires potential conflict" stderr])
+AT_CHECK([GREP -q "activeConflict requires potentialConflict" stderr])
+AT_CHECK([GREP -q "aborting \[[#07\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 

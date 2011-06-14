@@ -85,7 +85,7 @@ void evaluateParameters(int argc, char** argv) {
 
         // call the config file parser
         if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
-            abort(14, "error reading configuration file '%s'", args_info.config_arg);
+            abort(10, "error reading configuration file '%s'", args_info.config_arg);
         } else {
             status("using configuration file '%s'", args_info.config_arg);
         }
@@ -101,7 +101,7 @@ void evaluateParameters(int argc, char** argv) {
             params->initialize = 0;
             params->override = 0;
             if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
-                abort(14, "error reading configuration file '%s'", conf_filename.c_str());
+                abort(10, "error reading configuration file '%s'", conf_filename.c_str());
             } else {
                 status("using configuration file '%s'", conf_filename.c_str());
             }
@@ -123,10 +123,10 @@ void evaluateParameters(int argc, char** argv) {
 	bool checkActiveConflict = ((args_info.activePlaces_arg == activePlaces_arg_conflict) || (args_info.activePlaces_arg == activePlaces_arg_both));
 
 	if (checkActiveCausal && !checkPotentialCausal) {
-		abort(4, "active causal requires potential causal");
+		abort(7, "activeCausal requires potentialCausal");
 	}
 	if (checkActiveConflict && !checkPotentialConflict) {
-		abort(4, "active conflict requires potential conflict");
+		abort(7, "activeConflict requires potentialConflict");
 	}
 
     free(params);
@@ -214,7 +214,7 @@ bool callLoLA(std::string netFile) {
 		return false;
 	}
 	else {
-		abort(2, "LoLA parse error");
+		abort(9, "LoLA parse error");
 	}
 }
 
@@ -320,7 +320,7 @@ int main(int argc, char** argv) {
 		if (curConfidence == 0) {
 			// unlabeled transition
 			if (args_info.unlabeledTransitions_arg == unlabeledTransitions_arg_none) {
-				abort(2, "%s has unknown confidence level", (**t).getName().c_str());
+				abort(6, "%s has unknown confidence level", (**t).getName().c_str());
 			}
 			else if (args_info.unlabeledTransitions_arg == unlabeledTransitions_arg_low) {
 				(**t).setConfidence(1);
@@ -696,7 +696,7 @@ int main(int argc, char** argv) {
 		if (!args_info.noClean_flag) {
 			FOREACH(f, allNets) {
 				if (remove((*f).c_str()) != 0) {
-					abort(12, "file %s cannot be deleted", _cfilename_(*f));
+					abort(5, "file %s cannot be deleted", _cfilename_(*f));
 				}
 			}
 		}
@@ -712,7 +712,7 @@ int main(int argc, char** argv) {
 			else {result = 1;}
 		}
 
-		if (result < 0) {abort(2, "unknown result");}
+		if (result < 0) {abort(21, "unknown result");}
 
 		if (args_info.resultFile_given) {
 		    std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : fileName + ".results";

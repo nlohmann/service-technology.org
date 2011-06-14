@@ -65,6 +65,7 @@ Permission is granted to copy, distribute and/or modify this document under the 
 * First Steps::How to set up and install Anica.
 * Command Line Options::How to run Anica.
 * Theory::The theory behind Anica.
+* Results::What information is written to the results files.
 * Exit and Error Codes::What the error and exit codes of Anica mean.
 * ChangeLog::Version history.
 * GNU Free Documentation License::The license of this manual.
@@ -233,7 +234,7 @@ The parameters can also be controlled using a configuration file that can be rea
 
 @cartouche
 @smallexample
-anica net.owfn --config=myconf.conf
+anica net.lola --config=myconf.conf
 @end smallexample
 @end cartouche
 
@@ -280,12 +281,148 @@ See @url{http://service-technology.org/publications} for more information.
 
 @c --------------------------------------------------------------------------
 
+@node Results
+@chapter Results
+
+@heading @code{decomposition}
+@findex decomposition
+
+This part lists information on the decomposition process.
+
+@ftable @code
+@item success
+True if decomposition of the input open net was successfull. [Boolean]
+
+@item bounded_transitions
+The number of unbounded transitions. [Integer]
+
+@item multiple_predecessors
+The number of unbounded transitions with more than one predecessor (transition). [Integer]
+
+@item initial_marked_places
+The number of initial marked places from 'bounded_transitions'. [Integer]
+
+@item interface_corrected_places
+The number of not bilateral shared places. [Integer]
+
+@item fragment_connections
+The number of forced connections of fragments (with pairwise identical roles). [Integer]
+
+@item places_inserted
+The number of inserted places by necessary corrections. [Integer]
+
+@item transitions_inserted
+The number of inserted transitions by necessary corrections. [Integer]
+@item lola_called
+True, if LoLA was called. [Boolean]
+@item arcs_inserted
+The number of inserted arcs by necessary corrections. [Integer]
+
+@item places_deleted
+The number of deleted places by necessary corrections. [Integer]
+
+@item transitions_deleted
+The number of deleted transitions by necessary corrections. [Integer]
+
+@item arcs_deleted
+The number of deleted arcs by necessary corrections. [Integer]
+
+@item roles_annotated
+The number of roles annotated. Annotated roles can be given or created by parameter @option{--concatenateAnnotations}. [Integer]
+
+@item concatenation_necessary
+True if parameter @option{--concatenateAnnotations} was necessary. [Boolean]
+
+@item lola_called
+True, if LoLA was called. [Boolean]
+
+@item diane_calls
+The number of times Diane was called. [Integer]
+
+@item not_annotated_transitions
+The number of not annotated transitions. [Integer]
+
+@item annotations_forced
+The number of forced decisions during the role annotation to unsassigned fragments. Each time a decision is forced another decomposition was possible. See also 'annotation_alternatives'. [Integer]
+
+@item annotation_alternatives
+The number of all possibilites during forced decisions. If an unassigned fragment is forced to a specific role there are at least two alternatives. These alternatives are count. This number just counts the alternatives for all forced decisions, you may note, that forcing one decision yields or blocks other (forced) decisions. [Integer]
+
+@end ftable
+
+@heading @code{meta}
+@findex meta
+
+This part lists information on the tool itself.
+
+@ftable @code
+@item invocation
+The invocation string of the tool. [String]
+
+@item package_name
+@itemx package_version
+@itemx svn_version
+The name of the tool, its version, and (when applicable) the version of the SVN revision. [String]
+@end ftable
+
+@heading @code{workflow}
+@findex workflow
+
+This part lists all kind of information of the input workflow.
+
+@ftable @code
+@item isFreeChoice
+Belongs the input worklfow to the freechoice class of petri nets. [Boolean]
+
+@item hasCycles
+Are there any cycles in the input workflow? [Boolean]
+
+@item roles
+The number of roles of the input workflow. [Integer]
+
+@item places
+The number of places of the input workflow. [Integer]
+
+@item transitions
+The number of transitions of the input workflow. [Integer]
+
+@item arcs
+The number of arcs of the input workflow. [Integer]
+@end ftable
+
+@c --------------------------------------------------------------------------
 
 @node Exit and Error Codes
 @chapter Exit and Error Codes
 @section Exit Codes
 
-Anica will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input open net could be read, <<-- MORE ERRORS -->>. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+Anica will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the lola net could be read, all external calls were successfull and---if requested---output files could be successfully written. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+
+Note that Anica's exit code is @b{not} related to the result of the interference result. The messages
+
+@smallexample
+@cartouche
+anica: Non-Interference: PASSED
+@end cartouche
+@end smallexample
+
+and
+
+@smallexample
+@cartouche
+anica: Non-Interference: POTENTIAL
+@end cartouche
+@end smallexample
+
+and
+
+@smallexample
+@cartouche
+anica: Non-Interference: FAILED
+@end cartouche
+@end smallexample
+
+all yield exit code @samp{0} (successful termination).
 
 @section Error Codes
 
@@ -296,11 +433,95 @@ In case any error occurs, Anica aborts with exit code @samp{1} and prints a mess
 @c <<-- CHANGE START (exit/error codes) -->>
 
 @item #01
-<<-- ERROR DESCRIPTION -->>
+Error opening the lola net or input file not found.
 
 @smallexample
 @cartouche
-anica: <<-- ERROR MESSAGE -->> -- aborting [#01]
+anica: could not open file `foo.lola' -- aborting [#01]
+@end cartouche
+@end smallexample
+
+@item #02
+Error parsing the lola net. Usually indicates the line of the error and some more or less helpful message on the parse error.
+
+@smallexample
+@cartouche
+anica:13: error near `Place': syntax error, unexpected IDENT,
+           expecting KEY_INTERFACE or KEY_PLACE -- aborting [#02]
+@end cartouche
+@end smallexample
+
+@item #03
+Error opening a file (to write). Usually, this error occurs in case Anica is called in a directory without (writing) permissions. Output files can be the target files of the @option{--resultFile} or any dot file @option{--dot-*} parameter as well as the temporary files by LoLA.
+
+@smallexample
+@cartouche
+anica: file foo.bar cannot be opened -- aborting [#03]
+@end cartouche
+@end smallexample
+
+@item #04
+At most one file can be read at once. If no input filename is given, the lola net is read from standard input.
+
+@smallexample
+@cartouche
+anica: at most one input file must be given -- aborting [#04]
+@end cartouche
+@end smallexample
+
+@item #05
+Error deleting a file. Usually, this error occurs in case a file was deleted before (by anybody else).
+
+@smallexample
+@cartouche
+anica: file foo.bar cannot be deleted -- aborting [#03]
+@end cartouche
+@end smallexample
+
+@item #06
+Error processing the lola net. This error occurs in case any transition in the input lola net has no confidence assignment. To avoid this error, reannotate the transitions in the lola net or use the parameter @option{--unlabeledTransitions}.
+
+@smallexample
+@cartouche
+anica: t1 has unknown confidence level -- aborting [#6]
+@end cartouche
+@end smallexample
+
+@item #07
+A wrong command-line parameter was given or there was a problem with the combination of command-line parameters. This message is usually accompanied by another message describing the exact problem. Run @samp{anica --help} for an overview of the valid command-line parameters.
+
+@smallexample
+@cartouche
+anica: `activeCausal' requires `potentialCausal'
+anica: invalid command-line parameter(s) -- aborting [#07]
+@end cartouche
+@end smallexample
+
+@item #08
+Assertation violation. Usually, this error occurs in case Anica has internal problems...maybe you found a bug.
+
+@smallexample
+@cartouche
+anica: unknown result -- aborting [#09]
+@end cartouche
+@end smallexample
+
+@item #09
+Error parsing the lola result. Usually indicates a wrong lola version.
+
+@smallexample
+@cartouche
+anica: LoLA parse error -- aborting [#02]
+@end cartouche
+@end smallexample
+
+@item #10
+Anica cannot find the configuration file given by @file{--config} parameter or it has syntax errors. For an example configuration file, see the standard configuration file @file{src/anica.conf} created by the configure script. See @url{http://www.gnu.org/software/gengetopt/gengetopt.html#Configuration-files} for more information on configuration file.
+
+@smallexample
+@cartouche
+anica: Error opening configuration file `myconf.conf'
+anica: error reading configuration file `myconf.conf' -- aborting [#14]
 @end cartouche
 @end smallexample
 

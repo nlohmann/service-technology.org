@@ -1,0 +1,27 @@
+PLACE
+  p1,p2,s
+;
+
+
+MARKING
+  s:    1
+;
+
+
+TRANSITION l1 LOW
+CONSUME
+  s:    1;
+PRODUCE
+  p1:	1;
+
+TRANSITION l2 LOW
+CONSUME
+  p1:	1;
+PRODUCE
+  p2:	1;
+
+TRANSITION h1 HIGH
+CONSUME
+  p2:	1;
+PRODUCE
+  s:	1;

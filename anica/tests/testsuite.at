@@ -1,0 +1,374 @@
+AT_INIT
+AT_COLOR_TESTS
+
+m4_define(AT_CHECK_LOLA, [AT_CHECK([if test "LOLA" == ""; then exit 77; fi])])
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([ANICA --help],0,ignore)
+AT_CHECK([ANICA --detailed-help],0,ignore)
+AT_CHECK([ANICA --full-help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([ANICA --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Parameters])
+############################################################################
+
+AT_SETUP([Piping from stdin])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/potentialCausal.lola .])
+AT_CHECK([cat potentialCausal.lola | ANICA],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Reading from file])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/potentialCausal.lola .])
+AT_CHECK([ANICA potentialCausal.lola],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Using a given configuration file])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/potentialCausal.lola .])
+AT_DATA([my_anica.conf], [verbose
+])
+AT_CHECK([ANICA --config=my_anica.conf potentialCausal.lola],0,ignore,stderr)
+AT_CHECK([GREP -q "using configuration file 'my_anica.conf'" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Using a present configuration file])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/potentialCausal.lola .])
+AT_DATA([anica.conf], [verbose
+])
+AT_CHECK([ANICA potentialCausal.lola],0,ignore,stderr)
+AT_CHECK([GREP -q "using configuration file 'anica.conf'" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Cleaning vs. no cleaning of temporary files])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola ],0,ignore,ignore)
+AT_CHECK([test -f activeCausal.lola.causal.s.h1.l1.lola],1)
+AT_CHECK([ANICA --noClean activeCausal.lola ],0,ignore,ignore)
+AT_CHECK([test -f activeCausal.lola.causal.s.h1.l1.lola],0)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Witness path])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola --witnessPath],0,ignore,ignore)
+AT_CHECK([test -f activeCausal.lola.causal.s.h1.l1.path],0)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Results output])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola --resultFile],0,ignore,ignore)
+AT_CHECK([GREP -q "non-interference = \"FAILED\"" activeCausal.lola.results])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Check potential causal only])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/medical.lola .])
+AT_CHECK([ANICA medical.lola --potentialPlaces=causal --activePlaces=none --resultFile],0,ignore, ignore)
+AT_CHECK([GREP -q "active_causal = 0" medical.lola.results])
+AT_CHECK([GREP -q "active_conflict = 0" medical.lola.results])
+AT_CHECK([GREP -q "potential_causal = 1" medical.lola.results])
+AT_CHECK([GREP -q "potential_conflict = 0" medical.lola.results])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Check potential conflict only])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/medical.lola .])
+AT_CHECK([ANICA medical.lola --potentialPlaces=conflict --activePlaces=none --resultFile],0,ignore, ignore)
+AT_CHECK([GREP -q "active_causal = 0" medical.lola.results])
+AT_CHECK([GREP -q "active_conflict = 0" medical.lola.results])
+AT_CHECK([GREP -q "potential_causal = 0" medical.lola.results])
+AT_CHECK([GREP -q "potential_conflict = 1" medical.lola.results])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Check active causal only])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/medical.lola .])
+AT_CHECK([ANICA medical.lola --potentialPlaces=causal --activePlaces=causal --resultFile],0,ignore, ignore)
+AT_CHECK([GREP -q "active_causal = 1" medical.lola.results])
+AT_CHECK([GREP -q "active_conflict = 0" medical.lola.results])
+AT_CHECK([GREP -q "potential_causal = 1" medical.lola.results])
+AT_CHECK([GREP -q "potential_conflict = 0" medical.lola.results])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Check active conflict only])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/medical.lola .])
+AT_CHECK([ANICA medical.lola --potentialPlaces=conflict --activePlaces=conflict --resultFile],0,ignore, ignore)
+AT_CHECK([GREP -q "active_causal = 0" medical.lola.results])
+AT_CHECK([GREP -q "active_conflict = 1" medical.lola.results])
+AT_CHECK([GREP -q "potential_causal = 0" medical.lola.results])
+AT_CHECK([GREP -q "potential_conflict = 1" medical.lola.results])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([One active only])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/medical.lola .])
+AT_CHECK([ANICA medical.lola --oneActiveOnly --resultFile],0,ignore, ignore)
+AT_CHECK([GREP -q "active_causal = 1" medical.lola.results])
+AT_CHECK([GREP -q "active_conflict = 0" medical.lola.results])
+AT_CHECK([GREP -q "potential_causal = 1" medical.lola.results])
+AT_CHECK([GREP -q "potential_conflict = 1" medical.lola.results])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Label transitions HIGH])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/missing-confidence.lola .])
+AT_CHECK([ANICA missing-confidence.lola -v --unlabeledTransitions=high],0,ignore,stderr)
+AT_CHECK([GREP -q "only one confidence level used" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Label transitions LOW])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/missing-confidence.lola .])
+AT_CHECK([ANICA missing-confidence.lola -v --unlabeledTransitions=low],0,ignore,stderr)
+AT_CHECK([GREP -q "only one confidence level used" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Bug information output])
+AT_CHECK_LOLA
+AT_CHECK([ANICA --bug],0,ignore,stderr)
+AT_CHECK([GREP -q "please send file 'bug.log' to anica@service-technology.org!" stderr])
+AT_CHECK([test -f bug.log])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Determining runtime and allocated memory])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/potentialCausal.lola .])
+AT_CHECK([ANICA potentialCausal.lola --verbose --stats],0,ignore,stderr)
+AT_CHECK([GREP -q "runtime" stderr])
+AT_CHECK([GREP -q "memory consumption" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Errors])
+############################################################################
+AT_SETUP([Invalid parameter(s)])
+AT_CHECK_LOLA
+AT_CHECK([ANICA --foo],1,ignore,stderr)
+AT_CHECK([GREP -q "unrecognized option" stderr])
+AT_CHECK([GREP -q "invalid command-line parameter(s)" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Multiple inputs])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/potentialCausal.lola .])
+AT_CHECK([cp TESTFILES/potentialConflict.lola .])
+AT_CHECK([ANICA potentialCausal.lola potentialConflict.lola],1,ignore,stderr)
+AT_CHECK([GREP -q "at most one input file must be given" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Unknown file])
+AT_CHECK_LOLA
+AT_CHECK([ANICA potentialConflict.lola],1,ignore,stderr)
+AT_CHECK([GREP -q "could not open file" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Invalid given configuration file])
+AT_CHECK([cp TESTFILES/potentialConflict.lola .])
+AT_DATA([my_anica.conf], [invalid="PARAMETER"
+])
+AT_CHECK([ANICA --config=my_anica.conf potentialConflict.lola],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Invalid present configuration file])
+AT_CHECK([cp TESTFILES/potentialConflict.lola .])
+AT_DATA([anica.conf], [invalid="PARAMETER"
+])
+AT_CHECK([ANICA potentialConflict.lola],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#14\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Missing confidence])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/missing-confidence.lola .])
+AT_CHECK([ANICA missing-confidence.lola],1,ignore,stderr)
+AT_CHECK([GREP -q "has unknown confidence level" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Active causal requires potential causal])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/potentialCausal.lola .])
+AT_CHECK([ANICA potentialCausal.lola --potentialPlaces=conflict --activePlaces=causal],1,ignore,stderr)
+AT_CHECK([GREP -q "active causal requires potential causal" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Active conflict requires potential conflict])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/potentialCausal.lola .])
+AT_CHECK([ANICA potentialCausal.lola --potentialPlaces=causal --activePlaces=conflict],1,ignore,stderr)
+AT_CHECK([GREP -q "active conflict requires potential conflict" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Dot Output])
+############################################################################
+AT_SETUP([Potential Places (both)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola --dotPotential=both],0,ignore,stderr)
+AT_CHECK([test -f activeCausal.lola.potential.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Potential Places (causal)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola --dotPotential=causal],0,ignore,stderr)
+AT_CHECK([test -f activeCausal.lola.potential.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Potential Places (conflict)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola --dotPotential=conflict],0,ignore,stderr)
+AT_CHECK([test -f activeCausal.lola.potential.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Active Places (both)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola --dotActive=both],0,ignore,stderr)
+AT_CHECK([test -f activeCausal.lola.active.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Active Places (causal)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola --dotActive=causal],0,ignore,stderr)
+AT_CHECK([test -f activeCausal.lola.active.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Active Places (conflict)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola --dotActive=conflict],0,ignore,stderr)
+AT_CHECK([test -f activeCausal.lola.active.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Confidence (both)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola --dotConfidence=both],0,ignore,stderr)
+AT_CHECK([test -f activeCausal.lola.confidence.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Confidence (high)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola --dotConfidence=high],0,ignore,stderr)
+AT_CHECK([test -f activeCausal.lola.confidence.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+AT_SETUP([Confidence (low)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola --dotConfidence=low],0,ignore,stderr)
+AT_CHECK([test -f activeCausal.lola.confidence.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Valgrind])
+############################################################################
+
+AT_SETUP([Checking for memory leaks])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/medical.lola .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes ANICA_RAW medical.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both],0,ignore,stderr)
+AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
+AT_KEYWORDS(valgrind)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Coverage])
+############################################################################
+AT_SETUP([Potential causal (Lola)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/potentialCausal.lola .])
+AT_CHECK([ANICA potentialCausal.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola --activePlaces=none],0,ignore,stderr)
+AT_CHECK([GREP -q "Non-Interference: POTENTIAL" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Potential conflict (Lola)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/potentialConflict.lola .])
+AT_CHECK([ANICA potentialConflict.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola --activePlaces=none],0,ignore,stderr)
+AT_CHECK([GREP -q "Non-Interference: POTENTIAL" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Active causal (Lola)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
+AT_CHECK([GREP -q "Non-Interference: FAILED" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Active conflict (Lola)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeConflict.lola .])
+AT_CHECK([ANICA activeConflict.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
+AT_CHECK([GREP -q "Non-Interference: FAILED" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Medical (Lola)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/medical.lola .])
+AT_CHECK([ANICA medical.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
+AT_CHECK([GREP -q "Non-Interference: FAILED" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP

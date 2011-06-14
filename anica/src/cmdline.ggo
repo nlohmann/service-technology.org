@@ -1,0 +1,143 @@
+# This is the only input file for gengetopt.
+
+# arguments for gengetopt ... what do they do?
+# --long-help: long usage line in help
+# --include-getopt: adds code for getopt_long in generated C file
+# --show-required: output of help will specify which options are mandatory
+# --unamed-opts=FILE: accept options without names
+# --no-handle-error: TODO
+# --conf-parser: TODO
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+
+description "About Anica:"
+purpose "Automated Non-Interference Check Assistent.\n
+This program checks safe petri nets for positive place based non-interference by reducing the problem to reachability.\n\n  Report bugs to anica@service-technology.org.\n  Visit Anica's home page at http://service-technology.org/anica"
+
+section "Analysis Task"
+sectiondesc="<<-- Anica is able to find potential and active interfering places. By default, Anica will find both. -->>\n"
+
+option "potentialPlaces" -
+  "Potential Places."
+  details="Used to find specified potential places.\n"
+  values="causal","conflict","both" enum
+  default="both"
+  optional
+
+option "activePlaces" -
+  "Active Places."
+  details="Used to find specified active places.\n"
+  values="causal","conflict","both","none" enum
+  default="both"
+  optional
+
+option "oneActiveOnly" -
+  "Only one active place."
+  details="After the first active place the check will be finished.\n"
+  flag off
+
+
+section "Input/Output"
+sectiondesc="<<-- When called without an input file, Anica reads from the standard input stream. -->>\n"
+
+option "resultFile" r
+  "Results output."
+  string
+  typestr="FILENAME"
+  argoptional
+  optional
+
+option "witnessPath" -
+  "Save witness path of active places."
+  details="For each active place (and transition combination) one witness path will be saved.\n"
+  flag off
+
+option "dotConfidence" -
+  "Create a dot file with confidence annotations."
+  details="This option is used when Anica should create an colored dot file with the annotated confidence levels of the transitions.\n"
+  values="low","high","both" enum
+  default="both"
+  optional
+
+option "dotPotential" -
+  "Create a dot file with potential interfering places."
+  details="This option is used when Anica should create an colored dot file with potential interfering places.\n"
+  #dependon="potentialPlaces"
+  values="causal","conflict","both" enum
+  default="both"
+  optional
+
+option "dotActive" -
+  "Create a dot file with active interfering places."
+  details="This option is used when Anica should create an colored dot file with active interfering places.\n"
+  #dependon="activePlaces"
+  values="causal","conflict","both" enum
+  default="both"
+  optional
+
+section "Configuration"
+sectiondesc="<<-- Anica relies on several other tools. These options configure Anica to find these tools. -->>\n"
+
+option "config" c
+  "Read configuration from file."
+  details="If no file is given, Anica first tries to parse file `anica.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Anica was installed) and then from the current working directory. If neither file was found, the standard values are assumed.\n"
+  string
+  typestr="FILE"
+  optional
+
+option "lola" -
+  "Set the path and binary of LoLA."
+  details="The Lola binary. Lola can be downloaded from http://service-technology.org/lola and compiled using `make lola'.\n"
+  string
+  typestr="FILENAME"
+  default="lola-statepredicate1"
+  optional
+  hidden
+
+option "unlabeledTransitions" -
+  "How to handle unlabeled transitions."
+  details="By default unlabeled transitions are not allowed. To be more flexible you can choose a standard value for unlabeled transitions.\n"
+  values="high","low","none" enum
+  default="none"
+  optional
+
+option "modus" -
+  "Determines wether LoLA is called directly or a makefile is created."
+  details="Calling LoLA directly may cause long terms of unobservable actions but provide informations automatically.\n"
+  values="lola","makefile" enum
+  default="lola"
+  optional
+
+option "tmpfile" -
+  "Set the path and name of temporary files."
+  details="The filename Anica should use to create temporary files (i.e., the output derived from Wendy). The filename should end with `XXXXXX' which is replaced at runtime with a random string.\n"
+  string
+  typestr="FILENAME"
+  default="/tmp/anica-XXXXXX"
+  optional
+  hidden
+
+option "noClean" -
+  "Do not delete temporary files."
+  details="Any temporary files created will be kept after Anica terminates.\n"
+  flag off
+
+
+section "Debugging"
+sectiondesc="<<-- These options control how much debug output Anica creates. -->>\n"
+
+option "verbose" v
+  "Show verbose messages."
+  details="Show verbose information reporting intermediate steps.\n"
+  flag off
+
+option "bug" -
+  "Write configuration information into a file `bug.log'."
+  details="This output file gives information on the machine Anica was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+  flag off
+  hidden
+
+option "stats" -
+  "Display time and memory consumption on termination."
+  details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
+  flag off
+  hidden

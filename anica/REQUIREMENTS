@@ -1,0 +1,65 @@
+				_          _           
+			   / \   _ __ (_) ___ __ _ 
+			  / _ \ | '_ \| |/ __/ _` |
+			 / ___ \| | | | | (_| (_| |
+			/_/   \_\_| |_|_|\___\__,_|         
+			Automated Non-Interference Check Assistent
+			http://service-technology.org/anica
+
+In order to run, compile, and develop Anica, several tools are required.
+
+Runtime
+-------
+
+   * Lola (`http://service-technology.org/lola'). A suitable Lola binary can
+     be created as follows:
+       1. download `http://service-technology.org/files/lola/lola.tar.gz'
+
+       2. untar `lola.tar.gz', configure
+
+       3. call `make'
+
+       4. copy the binary `src/lola' to a directory of your path (e.g.,
+          `/usr/local/bin') or call `make install'
+
+Anica's configure script checks whether Lola (with binary
+`lola-statepredicate1') is found in the path and adjusts the configuration
+file `src/anica.conf' accordingly.
+
+Compilation
+-----------
+
+To compile the source code from a source distribution, the following tools are
+required.
+
+   * GCC (`http://gcc.gnu.org/')
+
+   * GNU Make (`http://www.gnu.org/software/make/')
+
+Development
+-----------
+
+In case you want to make changes to the source code, the following tools are
+required to reconfigure and compile Anica.
+
+   * Autoconf, `http://www.gnu.org/software/autoconf/'
+
+   * Automake, `http://www.gnu.org/software/automake/'
+
+   * Bison, `http://www.gnu.org/software/bison/'
+
+   * flex, `http://flex.sourceforge.net/'
+
+   * Gengetopt, `http://www.gnu.org/software/gengetopt/'
+
+   * help2man, `http://www.gnu.org/software/help2man/'
+
+   * Texinfo, `http://www.gnu.org/software/texinfo/'
+
+
+
+
+Please check our nightly build server at
+`http://service-technology.org/nightly' for the versions we use during
+development.
+

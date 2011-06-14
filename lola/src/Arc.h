@@ -19,12 +19,11 @@ class Arc {
 };
 
 /// constructor
-inline Arc::Arc(Transition* t, Place* p, bool totrans, unsigned int mult) {
-    tr = t;
-    pl = p;
-    Source = totrans ? (Node*) p : (Node*) t;
-    Destination = totrans ? (Node*) t : (Node*) p;
-    Multiplicity = mult;
+inline Arc::Arc(Transition* t, Place* p, bool totrans, unsigned int mult) :
+    Source(totrans ? reinterpret_cast<Node*>(p) : reinterpret_cast<Node*>(t)),
+    Destination(totrans ? reinterpret_cast<Node*>(t) : reinterpret_cast<Node*>(p)),
+    pl(p), tr(t), Multiplicity(mult)
+{
     cnt++;
 }
 

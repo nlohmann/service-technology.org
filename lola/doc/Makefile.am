@@ -1,6 +1,6 @@
 info_TEXINFOS = lola.texi
 
-lola_TEXINFOS = ChangeLog.texi graph2dot.out figs
+lola_TEXINFOS = ChangeLog.texi graph2dot.out figs fdl.texi
 
 TEXINFO_TEX = texinfo.tex
 

@@ -15,7 +15,7 @@
 
 This manual is for LoLA -- A Low Level Petri Net Analyser, last updated @value{UPDATED}.
 
-Copyright @copyright{} 2009 Karsten Wolf
+Copyright @copyright{} 2011 Karsten Wolf
 
 @end copying
 
@@ -56,14 +56,14 @@ Copyright @copyright{} 2009 Karsten Wolf
 
 @menu
 * About LoLA::An introduction to LoLA and its range of application
+* Download and First Steps::Where to get and how to bootstrap LoLA
 * Net File Format::A description of LoLA's input net file format
 * Supported Properties::The properties LoLA can analyze
 * Reduction Techniques::Reduction techniques LoLA uses to fight state space explosion
 * Output::The file formats LoLA outputs
-* Download::Where to get LoLA
-* First Steps::How to bootstrap LoLA
 * Additional Utilities::Additional tools to postprocess LoLA's outputs
 * ChangeLog::Version history
+* GNU Free Documentation License::The license of this manual.
 * Indices::Concept and keyword indices
 @end menu
 
@@ -122,7 +122,7 @@ In a joint project, researchers at Humboldt-Universit@"at zu Berlin and the Semi
 @b{More information:}
 @itemize
 @item
-Christian Stahl, Wolfgang Reisig, and Milos Krstic. @b{Hazard Detection in a GALS Wrapper: A Case Study}. In Jörg Desel and Y. Watanabe, editors, @i{Proceedings of the Fifth International Conference on Application of Concurrency to System Design (@acronym{ACSD}'05), St. Malo, France}, pages 234-243, June 2005. IEEE Computer Society.
+Christian Stahl, Wolfgang Reisig, and Milos Krstic. @b{Hazard Detection in a GALS Wrapper: A Case Study}. In J@"org Desel and Y. Watanabe, editors, @i{Proceedings of the Fifth International Conference on Application of Concurrency to System Design (@acronym{ACSD}'05), St. Malo, France}, pages 234-243, June 2005. IEEE Computer Society.@footnote{@url{http://www.informatik.hu-berlin.de/top/download/publications/StahlRK2005_acsd.pdf}}
 @end itemize
 
 
@@ -132,7 +132,7 @@ The language @acronym{WS-BPEL} has been proposed by an industrial consortium for
 
 @b{More information:}
 @itemize
-@item Sebastian Hinz, Karsten Schmidt, and Christian Stahl. @b{Transforming @acronym{BPEL} to Petri Nets}. In Wil M. P. van der Aalst, B. Benatallah, F. Casati, and F. Curbera, editors, @i{Proceedings of the Third International Conference on Business Process Management (@acronym{BPM} 2005)}, volume 3649 of Lecture Notes in Computer Science, Nancy, France, pages 220-235, September 2005. [@url{http://dx.doi.org/10.1007/11538394_15, @acronym{DOI}}]
+@item Sebastian Hinz, Karsten Schmidt, and Christian Stahl. @b{Transforming @acronym{BPEL} to Petri Nets}. In Wil M. P. van der Aalst, B. Benatallah, F. Casati, and F. Curbera, editors, @i{Proceedings of the Third International Conference on Business Process Management (@acronym{BPM} 2005)}, volume 3649 of Lecture Notes in Computer Science, Nancy, France, pages 220-235, September 2005.@footnote{@url{http://www.informatik.uni-rostock.de/tpp/publications/HinzSS_2005_bpm.pdf}}
 @end itemize
 
 
@@ -142,7 +142,7 @@ The language @acronym{WS-BPEL} has been proposed by an industrial consortium for
 
 @b{More information:}
 @itemize
-@item Niels Lohmann, Oliver Kopp, Frank Leymann, and Wolfgang Reisig. @b{Analyzing BPEL4Chor: Verification and Participant Synthesis}. In Marlon Dumas and Reiko Heckel, editors, @i{Web Services and Formal Methods, Forth International Workshop, @acronym{WS-FM} 2007}, Brisbane, Australia, September 28-29, 2007, Proceedings, volume 4937 of Lecture Notes in Computer Science, pages 46-60, 2008. Springer-Verlag. [@url{http://dx.doi.org/10.1007/978-3-540-79230-7_4, @acronym{DOI}}]
+@item Niels Lohmann, Oliver Kopp, Frank Leymann, and Wolfgang Reisig. @b{Analyzing BPEL4Chor: Verification and Participant Synthesis}. In Marlon Dumas and Reiko Heckel, editors, @i{Web Services and Formal Methods, Forth International Workshop, @acronym{WS-FM} 2007}, Brisbane, Australia, September 28-29, 2007, Proceedings, volume 4937 of Lecture Notes in Computer Science, pages 46-60, 2008. Springer-Verlag.@footnote{@url{http://www.informatik.uni-rostock.de/tpp/publications/LohmannKLR_2007_wsfm.pdf}}
 @end itemize
 
 
@@ -152,8 +152,8 @@ In 2003, H. Garavel posted a place/transition net to the Petri net mailing list.
 
 @b{More information:}
 @itemize
-@item @url{http://www.informatik.uni-hamburg.de/cgi-bin/TGI/pnml/getpost?id=2003/07/2709, The original posting}
-@item @url{http://www.informatik.uni-hamburg.de/cgi-bin/TGI/pnml/getpost?id=2003/09/2736, The summary of responses}
+@item The original posting@footnote{@url{http://www.informatik.uni-hamburg.de/cgi-bin/TGI/pnml/getpost?id=2003/07/2709}}
+@item The summary of responses@footnote{@url{http://www.informatik.uni-hamburg.de/cgi-bin/TGI/pnml/getpost?id=2003/09/2736}}
 @end itemize
 
 
@@ -169,9 +169,11 @@ A biochemical network reflects substances and known reactions for their mutual t
 LoLA has been integrated into various other tools.
 
 @itemize
-@item @url{http://www2.informatik.hu-berlin.de/top/pnk/, The Petri Net Kernel}
-@item @url{http://www.fmi.uni-stuttgart.de/szs/tools/mckit/, The Model Checking Kit}
-@item @url{http://move.lip6.fr/software/CPNAMI/index.html, CPN-AMI}
+@item The Petri Net Kernel@footnote{@url{http://www2.informatik.hu-berlin.de/top/pnk/}}
+@item The Model Checking Kit@footnote{@url{http://www.fmi.uni-stuttgart.de/szs/tools/mckit/}}
+@item CPN-AMI@footnote{@url{http://move.lip6.fr/software/CPNAMI/index.html}}
+@item ProM@footnote{@url{http://www.promtools.org/prom6/}}
+@item Oryx@footnote{@url{http://bpt.hpi.uni-potsdam.de/Oryx/}}
 @end itemize
 
 
@@ -179,9 +181,166 @@ LoLA has been integrated into various other tools.
 
 
 @c ==========================================================================
+@node Download and First Steps
+@chapter Download and First Steps
+
+This chapter briefly summarizes where you can download LoLA and how you set it up.
+
+@section Download
+
+The most recent version of LoLA (as of @value{UPDATED-MONTH}, the most recent version is @value{VERSION}) can be downloaded at @url{http://service-technology.org/files/lola}.
+
+The use of LoLA is free under the @acronym{GNU} Affero General Public License (@acronym{AGPL}) which is part of the distribution (see file @file{COPYING}). An online version is available at @url{http://www.gnu.org/licenses/agpl-3.0.html}.
+
+@section Configuration and Compilation
+
+To unpack the downloaded tarball, say @file{lola-@value{VERSION}.tar.gz}, go to your download directory and execute
+
+@cartouche
+@smallexample
+$ gunzip lola-@value{VERSION}.tar.gz
+$ tar xf lola-@value{VERSION}.tar
+@end smallexample
+@end cartouche
+
+This creates a directory @file{lola-@value{VERSION}} which contains the LoLA distribution. You first need to configure LoLA by executing
+
+@cartouche
+@smallexample
+$ cd lola-@value{VERSION}
+$ ./configure
+@end smallexample
+@end cartouche
+
+The only prerequisite of LoLA is a working C++ compiler such as GCC or Clang. If an error occurs (e.g., if a required tool was not found), you should see a warning like:
+
+@smallexample
+configure: error: C++ compiler cannot create executables
+See `config.log' for more details.
+@end smallexample
+
+In that case, please review the file @file{config.log}. If you cannot resolve the problem, please send the file to @email{lola@@service-technology.org}.
+
+If everything is OK, you should see a message like
+
+@smallexample
+------------------------------------------------------------------------------
+ Please have a look at the documentation and edit the file 'src/userconfig.H'
+ according to your needs. Then, run 'make' to compile LoLA.
+
+ Alternatively, you can compile a preconfigured version of LoLA using a
+ configuration from directory 'src/configs'. To use, for example, the
+ configuration 'src/configs/deadlock/userconfig.H', run 'make lola-deadlock'.
+ To compile all preconfigured versions, run 'make all-configs'.
+------------------------------------------------------------------------------
+@end smallexample
+
+This means you have two options to continue:
+
+@subsection User-defined Configuration
+
+The configuration of LoLA is organized in the file @file{userconfig.H} in the @file{src} directory. You first need to edit this file to configure LoLA to your needs. Most parts of this file concern properties to be verified or available reduction techniques. The effect of editing those parts of @file{userconfig.H} is explained in the respective section of the online documentation. The only remaining option is @samp{HASHSIZE}. Its value controls the size of the hash table for storing visited states. A larger value speeds up state space exploration a little bit at the price of requiring more memory for the table itself. For most users, the original value should be satisfactory.
+
+After editing @file{userconfig.H}, execute
+
+@cartouche
+@smallexample
+$ make
+@end smallexample
+@end cartouche
+
+to compile a LoLA binary. If you experience any compiler warnings, don't panic: LoLA contains some generated or third party code that we cannot influence.
+
+The binary is created in the @file{src} directory. You can review the used configuration by executing
+
+@cartouche
+@smallexample
+$ cd src
+$ ./lola -h
+
+LoLA - A low level Analyzer
+---------------------------
+
+state space based verification of low level Petri nets.
+written by Karsten Wolf
+NO WARRANTY!
+http://wwwteo.informatik.uni-rostock.de/ls_tpp/lola
+
+This executable is compiled in the following configuration:
+* Verification problem: 
+  FULL: compute a graph without evaluating any property
+
+* Graph exploration strategy: 
+  DEPTH_FIRST: depth first search order
+
+* Reduction techniques applied:
+  STUBBORN   : partial order reduction using stubborn sets
+  PREDUCTION : compress states using P-invariants
+  SMALLSTATE : use light weight data structure for states
+
+* Values of numerical parameters: 
+  HASHSIZE        : 65536 entries in hash table.
+  REPORTFREQUENCY : status report every 100000 transitions fired.
+  CAPACITY        : at most -1 tokens on any place.
+@end smallexample
+@end cartouche
+
+@subsection Pre-defined Configuration
+
+Alternatively, you can compile on of the preconfigured versions of LoLA using a configuration from the directory @file{src/configs}. To use, for example, the  configuration @file{src/configs/deadlock/userconfig.H}, run
+
+@cartouche
+@smallexample
+$ make lola-deadlock
+@end smallexample
+@end cartouche
+
+To compile all preconfigured versions, run
+
+@cartouche
+@smallexample
+$ make all-configs
+@end smallexample
+@end cartouche
+
+
+@section Installation
+
+To install the compiled binaries, executed
+
+@cartouche
+@smallexample
+$ make install
+@end smallexample
+@end cartouche
+
+If you need any further information, see file @file{INSTALL} for detailed instructions.
+
+
+
+@c --------------------------------------------------------------------------
+@section Contents of the Distribution
+
+The distribution contains several directories:
+
+@table @file
+@item doc
+The Texinfo documentation of LoLA. The documentation can be created using @samp{make pdf}. Note you need to have LoLA properly installed before (see Installation description above).
+
+@item src
+The source code of LoLA.
+
+@item tests
+Testcases for LoLA which check the generated binary.
+@end table
+
+
+
+
+@c ==========================================================================
 @node Net File Format
 @chapter Net File Format
-@cindex @code{NET}
+@cindex @code{NET} keyword
 
 In LoLA, the Petri net to be analysed needs to be provided in textual representation. LoLA supports place-transition nets and high-level nets in the shape of an interpreted algebraic Petri net. A place-transition net description starts with the keyword @samp{NET}, followed by the specification of
 
@@ -230,12 +389,25 @@ helloworld
 @end example
 @end cartouche
 
-Identifiers must be separated from other parts of the net file specification using white space characters. White space characters include the blank, newline, and tab characters as well as comments. A comment in LoLA is any text between a pair of curling brackets @samp{@{}, @samp{@}} on the same line.
+
+Identifiers must be separated from other parts of the net file specification using white space characters. White space characters include the blank, newline, and tab characters as well as comments.
+
+@subsection Comments
+
+A comment in LoLA is any text between a pair of curling brackets @samp{@{}, @samp{@}} on the same line. Furthermore, multi-line C-style comments are allowed.
 
 @cartouche
-@b{Example:}
+@b{Example for a single-line comment:}
 @example
 @{ A @{ comment @}
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for a multi-line comment:}
+@example
+/* This text is a comment.
+   This text is still a comment. */
 @end example
 @end cartouche
 
@@ -262,12 +434,12 @@ Every sequence of digits, separated by white space (blank, tab, newline, or comm
 
 
 @subsection Places
-@cindex @code{#CAPACITY @i{k}}
-@cindex @code{#CHECKCAPACITY @i{k}}
-@cindex @code{PLACE}
-@cindex @code{SAFE}
+@cindex @code{CAPACITY @i{k}} parameter
+@cindex @code{CHECKCAPACITY @i{k}}
+@cindex @code{PLACE} declaration
+@cindex @code{SAFE}, part of @code{PLACE} declaration
 
-In LoLA, every place is represented as a unique name. The name can be an identifier according to the general rules for building identifiers or a  number. The set of places is specified by the keyword @samp{PLACE}, followed by a list of sections. Each section starts with a capacity specification and is followed by a comma-separated list of the places names, finished by a @samp{;}. The capacity statement may by empty or consist of the keyword @samp{SAFE}, optionally followed by a number. Using @samp{SAFE} without number is equivalent to the specification @samp{SAFE@tie{}1}. If the file @file{userconfig.H} contains the directive @samp{#CAPACITY@tie{}@i{k}}, an empty capacity specification is equivalent to the specification @samp{SAFE@tie{}@i{k}}. Otherwise, an empty specification represents an unbounded capacity (which is internally approximated by a capacity of @math{2^{32}}). A capacity statement specifies the maximum number of tokens expected on the places which are specified subsequently. LoLA uses the capacity statement only for a compact representation of markings. The firing rule is not effected by the capacity specification. Optionally, the validity of the capacity specifications can be checked during state space generation. For this purpose, the directive @samp{CHECKCAPACITY} must be active in the file @file{userconfig.H}.
+In LoLA, every place is represented as a unique name. The name can be an identifier according to the general rules for building identifiers or a  number. The set of places is specified by the keyword @samp{PLACE}, followed by a list of sections. Each section starts with a capacity specification and is followed by a comma-separated list of the places names, finished by a @samp{;}. The capacity statement may by empty or consist of the keyword @samp{SAFE}, optionally followed by a number. Using @samp{SAFE} without number is equivalent to the specification @samp{SAFE@tie{}1}. If the file @file{userconfig.H} contains the directive @samp{CAPACITY@tie{}@i{k}}, an empty capacity specification is equivalent to the specification @samp{SAFE@tie{}@i{k}}. Otherwise, an empty specification represents an unbounded capacity (which is internally approximated by a capacity of @math{2^{32}}). A capacity statement specifies the maximum number of tokens expected on the places which are specified subsequently. LoLA uses the capacity statement only for a compact representation of markings. The firing rule is not effected by the capacity specification. Optionally, the validity of the capacity specifications can be checked during state space generation. For this purpose, the directive @samp{CHECKCAPACITY} must be active in the file @file{userconfig.H}.
 
 @cartouche
 @b{Example:}
@@ -276,12 +448,12 @@ PLACE SAFE p1, 17, helloworld, p[]....8[[[;
 p2 , p3 ; SAFE 7 : p4 , p5;
 @end example
 
-specifies 8 places. Places @samp{p1}, @samp{17}, @samp{hellworld}, @samp{p[]....8[[[} are expected to never contain more than 1 token. Places @samp{p2}, @samp{p3} have either unknown bound (without @samp{#CAPACITY} in @file{userconfig.H}), or the bound specified in @file{userconfig.H}. Places @samp{p4} and @samp{p5} are expected to contain at most 7 tokens.
+specifies 8 places. Places @samp{p1}, @samp{17}, @samp{hellworld}, @samp{p[]....8[[[} are expected to never contain more than 1 token. Places @samp{p2}, @samp{p3} have either unknown bound (without @samp{CAPACITY} in @file{userconfig.H}), or the bound specified in @file{userconfig.H}. Places @samp{p4} and @samp{p5} are expected to contain at most 7 tokens.
 @end cartouche
 
 
 @subsection Initial Marking
-@cindex @code{MARKING}
+@cindex @code{MARKING} declaration
 
 The initial marking of the net is specified in a separate section starting with the keyword @samp{MARKING} and finished by a @samp{;}. In between, there is a comma-separated list. Each list item consists of a place name, a @samp{:}, and a number. The number specifies the number of tokens initially being on the mentioned place. Places which are not mentioned get 0 tokens initially. For places mentioned more than once, the specified token counts are summed up. 
 
@@ -296,11 +468,11 @@ assigns 17 tokens to place @samp{p1}, 3 tokens to place @samp{p2}, and 0 tokens 
 
 
 @subsection Transitions and Arcs
-@cindex @code{TRANSITION}
-@cindex @code{WEAK FAIR}
-@cindex @code{STRONG FAIR}
-@cindex @code{CONSUME}
-@cindex @code{PRODUCE}
+@cindex @code{TRANSITION} declaration
+@cindex @code{WEAK FAIR}, part of @code{TRANSITION} declaration
+@cindex @code{STRONG FAIR} part of @code{TRANSITION} declaration
+@cindex @code{CONSUME}, part of @code{TRANSITION} declaration
+@cindex @code{PRODUCE}, part of @code{TRANSITION} declaration
 
 In LoLA, there is, for each transition, a distinguished section for defining that transition and all connecting arcs. The section starts with the keyword @samp{TRANSITION} followed by the name of the transition. This name may be built general rules for building identifiers or a number.
 
@@ -336,13 +508,13 @@ may be treated unfair. It removes a token from @samp{p1} and does not put tokens
 
 
 @subsection Sorts
-@cindex @code{SORTS}
-@cindex @code{BOOLEAN}
-@cindex @code{TRUE}
-@cindex @code{FALSE}
-@cindex @code{ENUMERATE}
-@cindex @code{ARRAY}
-@cindex @code{RECORD}
+@cindex @code{SORTS} keyword
+@cindex @code{BOOLEAN} sort
+@cindex @code{TRUE}, value of @code{BOOLEAN} sort
+@cindex @code{FALSE}, value of @code{BOOLEAN} sort
+@cindex @code{ENUMERATE} sort
+@cindex @code{ARRAY} sort
+@cindex @code{RECORD} sort
 
 Sorts represents domains for tokens on places. A sort name can be buit according to the general rules for building identifiers. The set of sorts is specified by the keyword @samp{SORTS}, followed by a list of sort definitions. Each definition consists of a sort name, a @samp{:}, and a sort description which ends with a @samp{;}. The following descriptions are available:
 
@@ -492,8 +664,8 @@ For sorts, several compatibility rules apply:
 @cindex @code{FOR} operation
 @cindex @code{SWITCH} operation
 @cindex @code{IF} operation
-@cindex @code{FUNCTION}
-@cindex @code{VAR}
+@cindex @code{FUNCTION} declaration
+@cindex @code{VAR} declaration
 
 Operations represent mappings between sorts. The specification of an operation consists of an operation symbol which can later on be used in terms, a typing which controls the construction of terms, and a meaning which is basically a side-effect free program.
 
@@ -611,9 +783,9 @@ END
 
 
 @subsection Expressions and Left Values
-@cindex @code{AND}
-@cindex @code{OR}
-@cindex @code{NOT}
+@cindex @code{AND} expression
+@cindex @code{OR} expression
+@cindex @code{NOT} expression
 
 Expressions can be used in the descriptions of the meaning of operations, in transition guards, and in the specification of state predicates and @acronym{CTL} formulas. An expression represents a single value that may depend on arguments of the operation and values of variables.
 
@@ -681,12 +853,12 @@ evaluates to the multiset that assigns 7 to @samp{FALSE} and 5 to @samp{TRUE}, u
 
 
 @subsection Places
-@cindex @code{#CAPACITY @i{k}}
-@cindex @code{#CHECKCAPACITY @i{k}}
-@cindex @code{PLACE}
-@cindex @code{SAFE}
+@cindex @code{CAPACITY @i{k}} parameter
+@cindex @code{CHECKCAPACITY @i{k}} option
+@cindex @code{PLACE} declaration
+@cindex @code{SAFE}, part of @code{PLACE} declaration
 
-In LoLA, every place is represented as a unique name. The name can be an identifier according to the general rules for building identifiers or a  number. The set of places is specified by the keyword @samp{PLACE}, followed by a list of sections. Each section starts with a capacity specification and is followed by a comma-separated list, finished by a @samp{;}. Each entra in the list consists of a place name, a @samp{:}, and a sort name. The sort name specifies the data domain for tokens on the mentioned place. The capacity statement may by empty or consist of the keyword @samp{SAFE}, optionally followed by a number. Using @samp{SAFE} without number is equivalent to the specification @samp{SAFE@tie{}1}. If the file @file{userconfig.H} contains the directive @samp{#CAPACITY@tie{}@i{k}}, an empty capacity specification is equivalent to the specification @samp{SAFE@tie{}@i{k}}. Otherwise, an empty specification represents an unbounded capacity (which is internally approximated by a capacity of @math{2^{32}}). A capacity statement specifies the maximum number of tokens of a particular value expected on the places which are speficied subsequently. LoLA uses the capacity statement only for a compact representation of markings. The firing rule is not effected by the capacity specification. Optionally, the validity of the capacity specifications can be checked during state space generation. For this purpose, the directive @samp{CHECKCAPACITY} must be active in the file @file{userconfig.H}. The specification of HL-net places may be arbitrarily mixed with the specification of place/transition net places. This option must, however, be used with care as LoLA translates every HL net place into a set of place/transition net places. Every resulting place has a name that consists of the name of the HL Net place, a @samp{.}, and a  text representation of a value. LoLA does not avoid resulting name clashes with specified place/transition net place names. 
+In LoLA, every place is represented as a unique name. The name can be an identifier according to the general rules for building identifiers or a  number. The set of places is specified by the keyword @samp{PLACE}, followed by a list of sections. Each section starts with a capacity specification and is followed by a comma-separated list, finished by a @samp{;}. Each entra in the list consists of a place name, a @samp{:}, and a sort name. The sort name specifies the data domain for tokens on the mentioned place. The capacity statement may by empty or consist of the keyword @samp{SAFE}, optionally followed by a number. Using @samp{SAFE} without number is equivalent to the specification @samp{SAFE@tie{}1}. If the file @file{userconfig.H} contains the directive @samp{CAPACITY@tie{}@i{k}}, an empty capacity specification is equivalent to the specification @samp{SAFE@tie{}@i{k}}. Otherwise, an empty specification represents an unbounded capacity (which is internally approximated by a capacity of @math{2^{32}}). A capacity statement specifies the maximum number of tokens of a particular value expected on the places which are speficied subsequently. LoLA uses the capacity statement only for a compact representation of markings. The firing rule is not effected by the capacity specification. Optionally, the validity of the capacity specifications can be checked during state space generation. For this purpose, the directive @samp{CHECKCAPACITY} must be active in the file @file{userconfig.H}. The specification of HL-net places may be arbitrarily mixed with the specification of place/transition net places. This option must, however, be used with care as LoLA translates every HL net place into a set of place/transition net places. Every resulting place has a name that consists of the name of the HL Net place, a @samp{.}, and a  text representation of a value. LoLA does not avoid resulting name clashes with specified place/transition net place names. 
 
 @cartouche
 @b{Example:}
@@ -695,14 +867,14 @@ PLACE SAFE p1 : phil, 17 : phil, helloworld, p[]....8[[[ : bla;
 p2 : bla , p3 : bla; SAFE 7 : p4 : bla , p5;
 @end example
 
-specifies 8 high level places. Places @samp{p1}, @samp{17} contain tokens of sort (domain) @samp{phil}, places @samp{helloworld} and @samp{p5} are in fact low level places, i.e. they contain black tokens. The remaining places contain tokens of sort (domain) @samp{bla}. Places @samp{p1}, @samp{17}, @samp{hellworld}, @samp{p[]....8[[[} are expected to never contain more than 1 token per value. Places @samp{p2}, @samp{p3} have either unknown bound (without @samp{#CAPACITY} in @file{userconfig.H}), or the bound specified in @file{userconfig.H}. Places @samp{p4} and @samp{p5} are expected to contain at most 7 tokens. 
+specifies 8 high level places. Places @samp{p1}, @samp{17} contain tokens of sort (domain) @samp{phil}, places @samp{helloworld} and @samp{p5} are in fact low level places, i.e. they contain black tokens. The remaining places contain tokens of sort (domain) @samp{bla}. Places @samp{p1}, @samp{17}, @samp{hellworld}, @samp{p[]....8[[[} are expected to never contain more than 1 token per value. Places @samp{p2}, @samp{p3} have either unknown bound (without @samp{CAPACITY} in @file{userconfig.H}), or the bound specified in @file{userconfig.H}. Places @samp{p4} and @samp{p5} are expected to contain at most 7 tokens. 
 
 If sort @samp{bla} is defined as @samp{bla = [ 1 , 3 ] ;} then LoLA will internally consider places @samp{p2.1}, @samp{p2.2}, @samp{p2.3}, @samp{p3.1} and so on.
 @end cartouche
 
 
 @subsection Initial Marking
-@cindex @code{MARKING}
+@cindex @code{MARKING} declaration
 
 The initial marking of the net is specified in a separate section starting with the keyword @samp{MARKING} and finished by a @samp{;}. In between, there is a comma-separated list. Each list item consists either of a low level place name, a @samp{:}, and a number, or a high level place name, a @samp{:}, and a multiterm of the sort which is specified for the corresponding place. The number specifies the number of tokens initially being on the mentioned low level place. The multiterm represents the number of tokens of each value on a high level place. Places which are not mentioned get 0 tokens initially. For places mentioned more than once, the specified token counts are summed up.
 
@@ -717,12 +889,12 @@ assigns as many tokens to place p1 as the sum of results of evaluating @samp{all
 
 
 @subsection Transitions and Arcs
-@cindex @code{TRANSITION}
-@cindex @code{WEAK FAIR}
-@cindex @code{STRONG FAIR}
-@cindex @code{CONSUME}
-@cindex @code{PRODUCE}
-@cindex @code{GUARD}
+@cindex @code{TRANSITION} declaration
+@cindex @code{WEAK FAIR}, part of @code{TRANSITION} declaration
+@cindex @code{STRONG FAIR}, part of @code{TRANSITION} declaration
+@cindex @code{CONSUME}, part of @code{TRANSITION} declaration
+@cindex @code{PRODUCE}, part of @code{TRANSITION} declaration
+@cindex @code{GUARD}, part of @code{TRANSITION} declaration
 
 In LoLA, there is, for each transition, a distinguished section for defining that transition and all connecting arcs. The section starts with the keyword @samp{TRANSITION} followed by the name of the transition. This name may be built general rules for building identifiers or a number. 
 
@@ -776,6 +948,18 @@ Using LoLA, you can verify various properties, including properties of
 @item a @acronym{CTL}-formula
 @end itemize
 
+The property to check is chosen in the file @file{userconfig.H}. In case a wrong choice was made, a compilation error will occur:
+
+@cartouche
+@b{Example if no configuration was chosen:}
+@example
+$ make
+In file included from readnet-syntax.yy:23:
+./dimensions.H:172:4: error: #error "define a verification task by uncommenting
+                      the corresponding line in file userconfig.H!"
+@end example
+@end cartouche
+
 
 
 @c --------------------------------------------------------------------------
@@ -783,16 +967,36 @@ Using LoLA, you can verify various properties, including properties of
 
 
 @subsection Checking Reversibility
-@cindex @code{#REVERSIBILITY}
+@cindex @code{REVERSIBILITY} analysis task
+@cindex @code{lola-reversibility} preconfigured binary
 
 A net is @dfn{reversible} iff the initial marking is reachable from every reachable marking. 
 
-Edit file @file{userconfig.H} and select the option @samp{#REVERSIBILITY} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification. 
+Edit file @file{userconfig.H} and select the option @samp{REVERSIBILITY} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-reversibility} to create a preconfigured binary @file{lola-reversibility}. Call that file with your net specification. 
 
 @cartouche
-@b{Example:}
+@b{Example for a non-revesible net:}
 @example
-lola ph.net
+$ lola-reversibility phils.lola
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: >>>>> 272 States, 370 Edges, 272 Hash table entries
+lola: >>>>> 1 States, 0 Edges, 1 Hash table entries
+lola: not reversible: no return to m0 from reported state
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for a reversible net:}
+@example
+$ lola-reversibility data.lola
+lola: 50 places
+lola: 40 transitions
+lola: 20 significant places
+lola: >>>>> 21 States, 40 Edges, 21 Hash table entries
+lola: >>>>> 1 States, 0 Edges, 1 Hash table entries
+lola: net is reversible!
 @end example
 @end cartouche
 
@@ -803,17 +1007,35 @@ The following reduction techniques may be applied:
 @end itemize
 
 
-@subsection Checking Deadlock freedom
-@cindex @code{#DEADLOCK}
+@subsection Checking Deadlock Freedom
+@cindex @code{DEADLOCK} analysis task
+@cindex @code{lola-deadlock} preconfigured binary
 
 A @dfn{deadlock} is a marking (reachable from the initial marking) that does not enable any transition. 
 
-Edit file @file{userconfig.H} and select the option @samp{#DEADLOCK} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification. 
+Edit file @file{userconfig.H} and select the option @samp{DEADLOCK} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-deadlock} to create a preconfigured binary @file{lola-deadlock}. Call that file with your net specification.  Call that file with your net specification. 
 
 @cartouche
-@b{Example:}
+@b{Example for a net with deadlocks:}
 @example
-lola ph.net
+$ lola-deadlock phils.lola
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: dead state found!
+lola: >>>>> 11 States, 10 Edges, 11 Hash table entries
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for a net without deadlocks:}
+@example
+$ lola-deadlock data.lola
+lola: 50 places
+lola: 40 transitions
+lola: 20 significant places
+lola: net does not have deadlocks!
+lola: >>>>> 21 States, 40 Edges, 21 Hash table entries
 @end example
 @end cartouche
 
@@ -833,16 +1055,38 @@ Both depth first search and breadth first search are available. Breadth first se
 
 
 @subsection Checking Existence of Home Markings
-@cindex @code{#HOME}
+@cindex @code{HOME} analysis task
+@cindex @code{lola-home} preconfigured binary
 
 A @dfn{home marking} is a marking that is reachable from every reachable marking. 
 
-Edit file @file{userconfig.H} and select the option @samp{#HOME} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification. 
+Edit file @file{userconfig.H} and select the option @samp{HOME} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-home} to create a preconfigured binary @file{lola-home}. Call that file with your net specification.  Call that file with your net specification. 
+Call that file with your net specification.
 
 @cartouche
-@b{Example:}
+@b{Example for a net with home markings:}
 @example
-lola ph.net
+$ lola-home phils.lola
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: >>>>> 272 States, 370 Edges, 272 Hash table entries
+lola: home marking found (reported state)
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for a net without home markings:}
+@example
+$ lola-home process.lola
+lola: 11 places
+lola: 10 transitions
+lola: 9 significant places
+lola: >>>>> 6 States, 5 Edges, 6 Hash table entries
+lola: >>>>> 1 States, 0 Edges, 1 Hash table entries
+lola: >>>>> 1 States, 0 Edges, 1 Hash table entries
+lola: >>>>> 1 States, 0 Edges, 1 Hash table entries
+lola: net does not have home markings!
 @end example
 @end cartouche
 
@@ -856,16 +1100,34 @@ The following reduction techniques may be applied:
 
 
 @subsection Checking Boundedness
-@cindex @code{#BOUNDEDNET}
+@cindex @code{BOUNDEDNET} analysis task
+@cindex @code{lola-boundednet} preconfigured binary
 
 A net is @dfn{bounded} iff it has finitely many reachable markings. 
 
-Edit file @file{userconfig.H} and select the option @samp{#BOUNDEDNET} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification. 
+Edit file @file{userconfig.H} and select the option @samp{BOUNDEDNET} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-boundednet} to create a preconfigured binary @file{lola-boundednet}. Call that file with your net specification. 
 
 @cartouche
-@b{Example:}
+@b{Example for an unbounded net:}
 @example
-lola ph.net
+$ lola-boundednet planner.lola
+lola: 126 places
+lola: 128 transitions
+lola: 82 significant places
+lola: net is unbounded!
+lola: >>>>> 3 States, 2 Edges, 3 Hash table entries
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for a bounded net:}
+@example
+$ lola-boundednet process.lola
+lola: 11 places
+lola: 10 transitions
+lola: 9 significant places
+lola: net is bounded!
+lola: >>>>> 6 States, 5 Edges, 6 Hash table entries
 @end example
 @end cartouche
 
@@ -897,16 +1159,24 @@ This verification problem is not directly supported in LoLA. You can, however, e
 
 
 @subsection Checking Nothing
-@cindex @code{#FULL}
+@cindex @code{FULL} analysis task
+@cindex @code{lola-full} preconfigured binary
 
 LoLA has the opportunity of generating a state space without checking any property. This feature is useful for evaluating reduction techniques, or for obtaining (and post-processing) the full state space. 
 
-Edit file @file{userconfig.H} and select the option @samp{#FULL} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification. 
+Edit file @file{userconfig.H} and select the option @samp{FULL} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-full} to create a preconfigured binary @file{lola-full}. Call that file with your net specification. 
 
 @cartouche
 @b{Example:}
 @example
-lola ph.net
+$ lola-full phils.lola
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: st:      49035 edg:     100000
+lola: st:      58615 edg:     200000
+lola: st:      59005 edg:     300000
+lola: >>>>> 59048 States, 393650 Edges, 38883 Hash table entries
 @end example
 @end cartouche
 
@@ -923,16 +1193,19 @@ Both depth first search and breadth first search are available. Breadth first se
 
 
 @subsection Not Checking
-@cindex @code{#NONE}
+@cindex @code{NONE} analysis task
+@cindex @code{lola-none} preconfigured binary
 
 LoLA has the opportunity of being run without generating any state space. This feature is useful for getting access to generated pre-processing information such as the unfolded version of a high-level net, the automorphisms generated for the symmetry method, or the progress measure generated for the sweep-line method. 
 
-Edit file @file{userconfig.H} and select the option @samp{#NONE} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification. 
+Edit file @file{userconfig.H} and select the option @samp{NONE} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-none} to create a preconfigured binary @file{lola-none}. Call that file with your net specification. 
 
 @cartouche
 @b{Example:}
 @example
-lola ph.net
+$ lola-none choreography.lola 
+lola: 511 places
+lola: 457 transitions
 @end example
 @end cartouche
 
@@ -949,7 +1222,7 @@ The following reduction techniques may be applied:
 
 
 @subsection Specification
-@cindex @code{ANALYSE MARKING}
+@cindex @code{ANALYSE MARKING} task specification
 @cindex @code{.task} files
 
 The marking to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option @option{-a}. If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with @file{.task}. If option @option{-A} is used instead of @option{-a}, the specification is read from the standard input stream. 
@@ -973,16 +1246,34 @@ ANALYSE MARKING p1 : all(), bla: L(all())
 
 
 @subsection Checking Reachability
-@cindex @code{#REACHABILITY}
+@cindex @code{REACHABILITY} analysis task
+@cindex @code{lola-reachability} preconfigured binary
 
 A marking is @dfn{reachable} iff there is a transition sequence that transforms the initial marking into the analysed one. 
 
-Edit file @file{userconfig.H} and select the option @samp{#REACHABILITY} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{REACHABILITY} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-reachability} to create a preconfigured binary @file{lola-reachability}. Call that file with your net specification and the specified marking to be analysed. 
 
 @cartouche
-@b{Example:}
+@b{Example for a reachable marking:}
 @example
-lola ph.net -a ph.state
+$ lola-reachability phils.lola -a ph.state 
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: state found!
+lola: >>>>> 11 States, 10 Edges, 11 Hash table entries
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for an unreachable marking:}
+@example
+$ lola-reachability phils.lola -a ph2.state 
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: state is unreachable!
+lola: >>>>> 14676 States, 24161 Edges, 13174 Hash table entries
 @end example
 @end cartouche
 
@@ -1054,16 +1345,16 @@ is live.
 
 
 @subsection Specification
-@cindex @code{ANALYSE PLACE}
+@cindex @code{ANALYSE PLACE} task specification
 @cindex @code{.task} files
-@cindex @code{-a} option
-@cindex @code{--Analysis} option
-@cindex @code{-A} option
-@cindex @code{--analysis} option
-@cindex @code{-n} option
-@cindex @code{--net} option
-@cindex @code{-N} option
-@cindex @code{--Net} option
+@cindex @code{-a} command-line option
+@cindex @code{--Analysis} command-line option
+@cindex @code{-A} command-line option
+@cindex @code{--analysis} command-line option
+@cindex @code{-n} command-line option
+@cindex @code{--net} command-line option
+@cindex @code{-N} command-line option
+@cindex @code{--Net} command-line option
 
 The place to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option @option{-a}. If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with @file{.task}. If option @option{-A} is used instead of @option{-a}, the specification is read from the standard input stream. 
 
@@ -1085,16 +1376,35 @@ ANALYSE PLACE hl.1
 
 
 @subsection Checking Boundedness
-@cindex @code{#BOUNDEDPLACE}
+@cindex @code{BOUNDEDPLACE} analysis task
+@cindex @code{lola-boundedplace} preconfigured binary
 
 A place is @dfn{bounded} iff there is a fixed natural number that is greater than the number of tokens on that place, for every reachable marking. 
 
-Edit file @file{userconfig.H} and select the option @samp{#BOUNDEDPLACE} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{BOUNDEDPLACE} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-boundedplace} to create a preconfigured binary @file{lola-boundedplace}. Call that file with your net specification and the specified marking to be analysed. 
+
 
 @cartouche
-@b{Example:}
+@b{Example for an unbounded place:}
 @example
-lola ph.net -a ph.place
+$ lola-boundedplace planner.lola -a planner.place 
+lola: 126 places
+lola: 128 transitions
+lola: 82 significant places
+lola: place Sent2Disp.<NEC-MT1065|Doc2|FALSE> is unbounded!
+lola: >>>>> 3 States, 2 Edges, 3 Hash table entries
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for a bounded place:}
+@example
+$ lola-boundedplace phils.lola -a ph.place 
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: place th.1 is bounded!
+lola: >>>>> 29895 States, 46264 Edges, 23968 Hash table entries
 @end example
 @end cartouche
 
@@ -1139,12 +1449,12 @@ Place @samp{p1} is live iff the predicate @samp{p1 > 0} is live.
 
 
 @subsection Specification
-@cindex @code{ANALYSE TRANSITION}
+@cindex @code{ANALYSE TRANSITION} task specification
 @cindex @code{.task} files
-@cindex @code{-a} option
-@cindex @code{--Analysis} option
-@cindex @code{-A} option
-@cindex @code{--analysis} option
+@cindex @code{-a} command-line option
+@cindex @code{--Analysis} command-line option
+@cindex @code{-A} command-line option
+@cindex @code{--analysis} command-line option
 
 The transition to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option @option{-a}. If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with @file{.task}. If option @option{-A} is used instead of @option{-a}, the specification is read from the standard input stream. 
 
@@ -1165,17 +1475,36 @@ ANALYSE TRANSITION tr.[y=3]
 @end cartouche
 
 
+
 @subsection Checking Death
-@cindex @code{#DEADTRANSITION}
+@cindex @code{DEADTRANSITION} analysis task
+@cindex @code{lola-deadtransition} preconfigured binary
 
 A transition is @dfn{dead} iff it is disabled in every marking reachable from the initial marking. 
 
-Edit file @file{userconfig.H} and select the option @samp{#DEADTRANSITION} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{DEADTRANSITION} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-deadtransition} to create a preconfigured binary @file{lola-deadtransition}. Call that file with your net specification and the specified marking to be analysed. 
 
 @cartouche
-@b{Example:}
+@b{Example for a dead transition:}
 @example
-lola ph.net -a ph.transition
+$ lola-deadtransition phils.lola -a ph.transition 
+lola: 50 places
+lola: 40 transitions
+lola: 40 significant places
+lola: transition tr.[y=3] is dead
+lola: >>>>> 1 States, 0 Edges, 1 Hash table entries
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for a quasilive transition:}
+@example
+$ lola-deadtransition phils.lola -a ph2.transition 
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: transition tr.[y=3] is not dead
+lola: >>>>> 2 States, 1 Edges, 2 Hash table entries
 @end example
 @end cartouche
 
@@ -1223,12 +1552,12 @@ is live.
 @subsection Specification
 @cindex @code{FORMULA}, state predicate specification
 @cindex @code{.task} files
-@cindex @code{ALWAYS}
-@cindex @code{EVENTUALLY}
-@cindex @code{NEXTSTEP}
-@cindex @code{UNTIL}
-@cindex @code{EXPATH}
-@cindex @code{ALLPATH}
+@cindex @code{ALWAYS} temporal operator
+@cindex @code{EVENTUALLY} temporal operator
+@cindex @code{NEXTSTEP} temporal operator
+@cindex @code{UNTIL} temporal operator
+@cindex @code{EXPATH} path quantifier
+@cindex @code{ALLPATH} path quantifier
 
 The predicate to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option @option{-a}. If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with @file{.task}. If option @option{-A} is used instead of @option{-a}, the specification is read from the standard input stream. 
 
@@ -1246,22 +1575,42 @@ FORMULA (p1 > 2 AND p3 = 4) OR p6 < 5
 @cartouche
 @b{Example for a high level specification:}
 @example
-FORMULA ALL x : phil : [ x = 3 ] OR hasright . ( x ) > 0
+FORMULA ALL x : phil : ( [ x = 3 ] OR hr . ( x ) > 0 )
 @end example
 @end cartouche
 
 
 @subsection Checking Reachability
-@cindex @code{#STATEPREDICATE}
+@cindex @code{STATEPREDICATE} analysis task
+@cindex @code{lola-statepredicate} preconfigured binary
 
 A state predicate is reachable if there is a marking reachable from the initial marking where the given predicate is satisfied. 
 
-Edit file @file{userconfig.H} and select the option @samp{#STATEPREDICATE} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{STATEPREDICATE} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-statepredicate} to create a preconfigured binary @file{lola-statepredicate}. Call that file with your net specification and the specified marking to be analysed. 
 
 @cartouche
-@b{Example:}
+@b{Example for a satisfiable state predicate:}
 @example
-lola ph.net -a ph.statepredicate
+$ lola-statepredicate phils.lola -a ph.statepredicate 
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: Formula with 10 subformula(s) (WITHFORMULA)
+lola: state found!
+lola: >>>>> 84 States, 83 Edges, 84 Hash table entries
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for an unsatisfiable state predicate:}
+@example
+$ lola-statepredicate phils.lola -a ph2.statepredicate 
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: Formula with 10 subformula(s) (WITHFORMULA)
+lola: state not found!
+lola: >>>>> 35702 States, 60313 Edges, 27342 Hash table entries
 @end example
 @end cartouche
 
@@ -1280,16 +1629,37 @@ Both depth first search and breadth first search are available. Breadth first se
 
 
 @subsection Checking Liveness
-@cindex @code{#LIVEPRPOP}
+@cindex @code{LIVEPRPOP} analysis task
+@cindex @code{lola-liveprop} preconfigured binary
 
 A state predicate is reachable live iff, from every reachable marking, there is a marking reachable where the given predicate is satisfied. The property corresponds to the @acronym{CTL} specification @b{AG}@tie{}@b{EF}@tie{}@math{\phi}.
 
-Edit file @file{userconfig.H} and select the option @samp{#LIVEPRPOP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{LIVEPRPOP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-liveprop} to create a preconfigured binary @file{lola-liveprop}. Call that file with your net specification and the specified marking to be analysed. 
 
 @cartouche
-@b{Example:}
+@b{Example for a nonlive state predicate:}
 @example
-lola ph.net -a ph.statepredicate
+$ lola-liveprop phils.lola -a ph.statepredicate 
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: Formula with 10 subformula(s) (LIVEPROP)
+lola: >>>>> 272 States, 370 Edges, 272 Hash table entries
+lola: >>>>> 1 States, 0 Edges, 1 Hash table entries
+lola: predicate not live: not satisfiable beyond reported state
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for a live state predicate:}
+@example
+$ lola-liveprop data.lola -a data.statepredicate 
+lola: 50 places
+lola: 40 transitions
+lola: 20 significant places
+lola: Formula with 11 subformula(s) (LIVEPROP)
+lola: >>>>> 21 States, 40 Edges, 21 Hash table entries
+lola: predicate is live!
 @end example
 @end cartouche
 
@@ -1303,16 +1673,38 @@ The following reduction techniques may be applied:
 
 
 @subsection Checking Fairness
-@cindex @code{#FAIRPRPOP}
+@cindex @code{FAIRPRPOP} analysis task
+@cindex @code{lola-fairprop} preconfigured binary
 
 A state predicate is fair iff it occurs infinitely often on every path that starts with the initial marking and treats all transitions fair w.r.t. their specified fairness assumption. The property corresponds to the LTL specification @b{GF}@tie{}@math{\phi}. 
 
-Edit file @file{userconfig.H} and select the option @samp{#FAIRPRPOP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{FAIRPRPOP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-fairprop} to create a preconfigured binary @file{lola-fairprop}. Call that file with your net specification and the specified marking to be analysed. 
 
 @cartouche
-@b{Example:}
+@b{Example for a satisfiable formula:}
 @example
-lola ph.net -a ph.statepredicate
+$ lola-fairprop phils.lola -a ph.statepredicate
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: Formula with 11 subformula(s) (WITHFORMULA)
+lola: st:      49035 edg:     100000
+lola: st:      58615 edg:     200000
+lola: st:      59005 edg:     300000
+lola: GF phi holds!
+lola: >>>>> 59048 States, 393650 Edges, 38883 Hash table entries
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for an unsatisfiable formula:}
+@example
+$ lola-fairprop data.lola -a data.statepredicate 
+lola: 50 places
+lola: 40 transitions
+lola: 20 significant places
+lola: Formula with 11 subformula(s) (WITHFORMULA)
+lola: GF phi does not hold
 @end example
 @end cartouche
 
@@ -1324,16 +1716,37 @@ The following reduction techniques may be applied:
 
 
 @subsection Checking Stabilization
-@cindex @code{#STABLEPRPOP}
+@cindex @code{STABLEPRPOP} analysis task
 
 A state predicate stabilizes iff, on every path that starts with the initial marking and treats all transitions fair w.r.t. their specified fairness assumption, the predicate is satisfied for all but finitely many states. The property corresponds to the LTL specification @b{FG}@tie{}@math{\phi}. 
 
-Edit file @file{userconfig.H} and select the option @samp{#STABLEPRPOP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{STABLEPRPOP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
 
 @cartouche
-@b{Example:}
+@b{Example for a satisfiable predicate:}
 @example
-lola ph.net -a ph.statepredicate
+$ lola-fairprop phils.lola -a ph.statepredicate
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: Formula with 10 subformula(s) (WITHFORMULA)
+lola: st:      49035 edg:     100000
+lola: st:      58615 edg:     200000
+lola: st:      59005 edg:     300000
+lola: GF phi holds!
+lola: >>>>> 59048 States, 393650 Edges, 38883 Hash table entries
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for an unsatisfiable predicate:}
+@example
+$ lola-fairprop phils.lola -a ph2.statepredicate 
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: Formula with 10 subformula(s) (WITHFORMULA)
+lola: GF phi does not hold
 @end example
 @end cartouche
 
@@ -1344,16 +1757,38 @@ The following reduction techniques may be applied:
 @end itemize
 
 @subsection Checking Eventual Occurrence
-@cindex @code{#EVENTUALLYPRPOP}
+@cindex @code{EVENTUALLYPROP} analysis task
+@cindex @code{lola-eventuallyprop} preconfigured binary
 
 A state predicate stabilizes iff, on every path that starts with the initial marking and treats all transitions fair w.r.t. their specified fairness assumption, the predicate is satisfied for all but finitely many states. The property corresponds to the LTL specification @b{F}@tie{}@math{\phi}. 
 
-Edit file @file{userconfig.H} and select the option @samp{#EVENTUALLYPRPOP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{EVENTUALLYPROP} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-eventuallyprop} to create a preconfigured binary @file{lola-eventuallyprop}. Call that file with your net specification and the specified marking to be analysed. 
 
 @cartouche
-@b{Example:}
+@b{Example for an eventually satisfiable predicate:}
 @example
-lola ph.net -a ph.statepredicate
+$ lola-eventuallyprop phils.lola -a ph.statepredicate 
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+lola: Formula with 10 subformula(s) (WITHFORMULA)
+lola: eventually phi holds (EVENTUALLYPROP)
+lola: >>>>> 1 States, 0 Edges, 1 Hash table entries
+lola: eventually phi holds
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for an unsatisfiable predicate:}
+@example
+$ lola-eventuallyprop data.lola -a data.statepredicate 
+lola: 50 places
+lola: 40 transitions
+lola: 20 significant places
+lola: Formula with 11 subformula(s) (WITHFORMULA)
+lola: eventually phi holds (EVENTUALLYPROP)
+lola: >>>>> 1 States, 0 Edges, 1 Hash table entries
+lola: eventually phi does not hold
 @end example
 @end cartouche
 
@@ -1372,21 +1807,21 @@ The following reduction techniques may be applied:
 @subsection Specification
 @cindex @code{FORMULA}, @acronym{CTL} specification
 @cindex @code{.task} files
-@cindex @code{-a} option
-@cindex @code{--Analysis} option
-@cindex @code{-A} option
-@cindex @code{--analysis} option
-@cindex @code{AND}
-@cindex @code{OR}
-@cindex @code{NOT}
-@cindex @code{ALWAYS}
-@cindex @code{EVENTUALLY}
-@cindex @code{NEXTSTEP}
-@cindex @code{UNTIL}
-@cindex @code{EXPATH}
-@cindex @code{ALLPATH}
-@cindex @code{ALL}
-@cindex @code{EXISTS}
+@cindex @code{-a} command-line option
+@cindex @code{--Analysis} command-line option
+@cindex @code{-A} command-line option
+@cindex @code{--analysis} command-line option
+@cindex @code{AND} operator
+@cindex @code{OR} operator
+@cindex @code{NOT} operator
+@cindex @code{ALWAYS} temporal operator
+@cindex @code{EVENTUALLY} temporal operator
+@cindex @code{NEXTSTEP} temporal operator
+@cindex @code{UNTIL} temporal operator
+@cindex @code{EXPATH} path quantifier
+@cindex @code{ALLPATH} path quantifier
+@cindex @code{ALL} quantifier
+@cindex @code{EXISTS} quantifier
 
 
 The formula to be analysed can be specified in a separate file. The file name is passed to LoLA using the command line option @option{-a}. If no file name is provided, LoLA generates a file name by replacing the extension of the net input file with @file{.task}. If option @option{-A} is used instead of @option{-a}, the specification is read from the standard input stream. Instead of a specification in a separate file, the specification can be immediately appended to the specification of the net. This approach is recommended if LoLA is integrated into another tool and communicates via standard input/output streams.
@@ -1445,7 +1880,7 @@ For high-level nets, there are the following additional features:
 @cartouche
 @b{Example:}
 @example
-EXPATH EVENTUALLY ALL x : phil : ( [x = 3 ] OR [ hasleft . ( x ) > 0 )] )
+EXPATH EVENTUALLY ALL x : phil : ( [x = 3 ] OR [ hl . ( x ) > 0 )] )
 @end example
 specifies that there is a reachable marking where all instances of high level place @samp{hasleft}, except @samp{hasleft.3}, have at least one token.
 @end cartouche
@@ -1456,16 +1891,43 @@ specifies that there is a reachable marking where all instances of high level pl
 
 
 @subsection Model Checking
-@cindex @code{#MODELCHECKING}
+@cindex @code{MODELCHECKING} analysis task
+@cindex @code{lola-modelchecking} preconfigured binary
 
 A @acronym{CTL} formula is @dfn{valid} iff it is satisfied by the initial marking of the net. 
 
-Edit file @file{userconfig.H} and select the option @samp{#MODELCHECKING} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Call that file with your net specification and the specified marking to be analysed. 
+Edit file @file{userconfig.H} and select the option @samp{MODELCHECKING} (by uncommenting the appropriate line and commenting all other lines in the properties section). Call @samp{make} for generating an executable file. Alternatively, execute @samp{make lola-modelchecking} to create a preconfigured binary @file{lola-modelchecking}. Call that file with your net specification and the specified marking to be analysed. 
 
 @cartouche
-@b{Example:}
+@b{Example for an unsatisfiable formula:}
 @example
-lola ph.net -a ph.ctlformula
+$ lola-modelchecking phils.lola -a phils.ctlformula 
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+
+Formula with 
+11 subformulas
+and 1 temporal operators.
+
+result: false
+lola: >>>>> 4 States, 4 Edges, 4 Hash table entries
+@end example
+@end cartouche
+
+@cartouche
+@b{Example for a satisfiable formula:}
+@example
+$ lola-modelchecking ../tests/testfiles/phils.lola -a phils2.ctlformula 
+lola: 50 places
+lola: 40 transitions
+lola: 30 significant places
+
+Formula with 
+11 subformulas
+and 1 temporal operators.
+
+result: true
 @end example
 @end cartouche
 
@@ -1499,6 +1961,7 @@ Most techniques may be applied in combination. LoLA shall always use a version o
 
 
 
+
 @c --------------------------------------------------------------------------
 @section Symmetries
 
@@ -1511,11 +1974,11 @@ Unlike many other tools, LoLA can determine symmetry in the system completely on
 
 
 @subheading Invocation
-@cindex @code{#SYMMETRY}
-@cindex @code{#SYMMINTEGRATION}, part of @code{#SYMMETRY}
-@cindex @code{#MAXATTEMPT}, part of @code{#SYMMETRY}
+@cindex @code{SYMMETRY} reduction
+@cindex @code{SYMMINTEGRATION}, part of @code{SYMMETRY} reduction
+@cindex @code{MAXATTEMPT}, part of @code{SYMMETRY} reduction
 
-The symmetry method is invoked by uncommenting the line @samp{#SYMMETRY} in the file @file{userconfig.H}, prior to the generation of an executable file. The value @samp{#SYMMINTEGRATION} selects a particular strategy of generating a symmetrically reduced state space. @samp{SYMMINTEGRATION} can be given any value between 1 and 5. The values have the following meaning:
+The symmetry method is invoked by uncommenting the line @samp{SYMMETRY} in the file @file{userconfig.H}, prior to the generation of an executable file. The value @samp{SYMMINTEGRATION} selects a particular strategy of generating a symmetrically reduced state space. @samp{SYMMINTEGRATION} can be given any value between 1 and 5. The values have the following meaning:
 
 @table @asis
 @itemx 1
@@ -1551,11 +2014,11 @@ The symmetry method can be applied in combination with the stubborn set method, 
 The symmetry methods implemented in LoLA correspond to the publications:
 
 @itemize
-@item Tommi A. Junttila. @b{New canonical representative marking algorithms for place/transition-nets}. In J. Cortadella and W. Reisig, editors, @i{Application and Theory of Petri Nets 2004}, volume 3099 of Lecture Notes in Computer Science, pages 258-277. Springer, 2004.
+@item Tommi A. Junttila. @b{New canonical representative marking algorithms for place/transition-nets}. In J. Cortadella and W. Reisig, editors, @i{Application and Theory of Petri Nets 2004}, volume 3099 of Lecture Notes in Computer Science, pages 258-277. Springer, 2004.@footnote{@url{http://dx.doi.org/10.1007/978-3-540-27793-4_15}}
 
-@item Karsten Schmidt. @b{How to Calculate Symmetries of Petri Nets}. @i{Acta Inf.}, 36(7):545-590, 2000. [@url{http://dx.doi.org/10.1007/s002360050002, @acronym{DOI}}]
+@item Karsten Schmidt. @b{How to Calculate Symmetries of Petri Nets}. @i{Acta Inf.}, 36(7):545-590, 2000.@footnote{@url{http://dx.doi.org/10.1007/s002360050002}}
 
-@item Karsten Schmidt. @b{Integrating Low Level Symmetries into Reachability Analysis}. In Susanne Graf and Michael I. Schwartzbach, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems: 6th International Conference, @acronym{TACAS} 2000, Held as Part of the Joint European Conferences on Theory and Practice of Software, @acronym{ETAPS} 2000, Berlin, Germany, March/April 2000. Proceedings}, volume 1785 of Lecture Notes in Computer Science, pages 315-330, 2000. Springer-Verlag. [@url{http://www.springerlink.com/content/d8dckgmuf9p3bq3c/, SpringerLink}]
+@item Karsten Schmidt. @b{Integrating Low Level Symmetries into Reachability Analysis}. In Susanne Graf and Michael I. Schwartzbach, editors, @i{Tools and Algorithms for the Construction and Analysis of Systems: 6th International Conference, @acronym{TACAS} 2000, Held as Part of the Joint European Conferences on Theory and Practice of Software, @acronym{ETAPS} 2000, Berlin, Germany, March/April 2000. Proceedings}, volume 1785 of Lecture Notes in Computer Science, pages 315-330, 2000. Springer-Verlag.@footnote{@url{http://dx.doi.org/10.1007/3-540-46419-0_22}}
 @end itemize
 
 
@@ -1571,10 +2034,10 @@ LoLA features a broad range of stubborn set methods. Each is optimised for the v
 
 
 @subheading Invocation
-@cindex @code{#STUBBORN}
-@cindex @code{#RELAXED}, part of @code{#STUBBORN}
+@cindex @code{STUBBORN} reduction
+@cindex @code{RELAXED}, part of @code{STUBBORN} reduction
 
-The stubborn set method is invoked by uncommenting the line @samp{#STUBBORN} in the file @file{userconfig.H}, prior to the generation of an executable file. The option @samp{#RELAXED} toggles the choice between the strict and the relaxed version of the stubborn set method. It is only relevant for reachability and dead transition verification. We recommend to use the strict version in those cases where the investigated marking/state predicate is expected to be reachable or the investigated transition is expected not to be dead. Otherwise, we recommend to use the relaxed version. 
+The stubborn set method is invoked by uncommenting the line @samp{STUBBORN} in the file @file{userconfig.H}, prior to the generation of an executable file. The option @samp{RELAXED} toggles the choice between the strict and the relaxed version of the stubborn set method. It is only relevant for reachability and dead transition verification. We recommend to use the strict version in those cases where the investigated marking/state predicate is expected to be reachable or the investigated transition is expected not to be dead. Otherwise, we recommend to use the relaxed version. 
 
 
 @subheading Compatibility
@@ -1587,15 +2050,15 @@ The stubborn set method is compatible with all other reduction techniques, and b
 Most stubborn set methods implemented in LoLA correspond to the publications:
 
 @itemize
-@item Antti Valmari. @b{The State Explosion Problem}. In W. Reisig and G. Rozenberg, Eds, @i{Lectures on Petri Nets I: Basic Models, Advances in Petri Nets, the Volumes Are Based on the Advanced Course on Petri Nets}, volume 1491 of Lecture Notes in Computer Science, pages 429-528, 1998. Springer-Verlag.
+@item Antti Valmari. @b{The State Explosion Problem}. In W. Reisig and G. Rozenberg, Eds, @i{Lectures on Petri Nets I: Basic Models, Advances in Petri Nets, the Volumes Are Based on the Advanced Course on Petri Nets}, volume 1491 of Lecture Notes in Computer Science, pages 429-528, 1998. Springer-Verlag.@footnote{@url{http://dx.doi.org/10.1007/3-540-65306-6_21}}
 
-@item Rob Gerth, Ruurd Kuiper, Doron Peled, Wojciech Penczek: @b{A Partial Order Approach to Branching Time Logic Model Checking}. @i{Inf. Comput.} 150(2): 132-152 (1999)
+@item Rob Gerth, Ruurd Kuiper, Doron Peled, Wojciech Penczek: @b{A Partial Order Approach to Branching Time Logic Model Checking}. @i{Inf. Comput.} 150(2): 132-152 (1999)@footnote{@url{http://dx.doi.org/10.1006/inco.1998.2778}}
 
-@item Lars Michael Kristensen, Karsten Schmidt, Antti Valmari: @b{Question-guided stubborn set methods for state properties}. @i{Formal Methods in System Design (@acronym{FMSD})} 29(3):215-251 (2006). [@url{http://dx.doi.org/10.1007/s10703-006-0006-1, @acronym{DOI}}]
+@item Lars Michael Kristensen, Karsten Schmidt, Antti Valmari: @b{Question-guided stubborn set methods for state properties}. @i{Formal Methods in System Design (@acronym{FMSD})} 29(3):215-251 (2006).@footnote{@url{http://dx.doi.org/10.1007/s10703-006-0006-1}}
 
 @item Karsten Schmidt. @b{Stubborn Sets for Model Checking the EF/AG Fragment of @acronym{CTL}}. @i{Fundam. Inform.}, 43(1-4):331-341, August 2000.
 
-@item Karsten Schmidt. @b{Stubborn Sets for Standard Properties}. In @i{Applications and Theory of Petri Nets 1999: 20th International Conference, @acronym{ICATPN}'99, Williamsburg, Virginia, USA, June 1999. Proceedings}, volume 1639 of Lecture Notes in Computer Science, pages 46-65, 1999. Springer-Verlag. [@url{http://www.springerlink.com/content/mtj3p6183xchedr9/, SpringerLink}]
+@item Karsten Schmidt. @b{Stubborn Sets for Standard Properties}. In @i{Applications and Theory of Petri Nets 1999: 20th International Conference, @acronym{ICATPN}'99, Williamsburg, Virginia, USA, June 1999. Proceedings}, volume 1639 of Lecture Notes in Computer Science, pages 46-65, 1999. Springer-Verlag.@footnote{@url{http://dx.doi.org/10.1007/3-540-48745-X_4}}
 @end itemize
 
 
@@ -1605,10 +2068,10 @@ Most stubborn set methods implemented in LoLA correspond to the publications:
 
 
 @subheading Applicability
-@cindex @code{-y} option
-@cindex @code{-Y} option
-@cindex @code{--automorphisms} option
-@cindex @code{--Automorphisms} option
+@cindex @code{-y} command-line option
+@cindex @code{-Y} command-line option
+@cindex @code{--automorphisms} command-line option
+@cindex @code{--Automorphisms} command-line option
 
 The sweep line method is available for all reachability, and dead transition problems. Use of the method is recommended for systems which exhibit substantial sequential subbehaviours in their components. 
 
@@ -1617,8 +2080,8 @@ The sweep-line method is based on a so-called progress measure. LoLA generates s
 
 @subheading Invocation
 
-@cindex @code{#SWEEP}
-The sweep-line method is invoked by uncommenting the line @samp{#SWEEP} in the file @file{userconfig.H}, prior to the generation of an executable file. 
+@cindex @code{SWEEP} reduction
+The sweep-line method is invoked by uncommenting the line @samp{SWEEP} in the file @file{userconfig.H}, prior to the generation of an executable file. 
 
 
 @subheading Compatibility
@@ -1649,11 +2112,11 @@ The cycle coverage method is available only for the verification of reachability
 
 
 @subheading Invocation
-@cindex @code{#CYCLE}
-@cindex @code{#MAXUNSAVED}, part of @code{#CYCLE}
-@cindex @code{#NONBRANCHINGONLY}, part of @code{#CYCLE}
+@cindex @code{CYCLE} reduction
+@cindex @code{MAXUNSAVED}, part of @code{CYCLE} reduction
+@cindex @code{NONBRANCHINGONLY}, part of @code{CYCLE} reduction
 
-The cycle coverage method is invoked by uncommenting the line @samp{#CYCLE} in the file @file{userconfig.H}, prior to the generation of an executable file. The method basically consists of storing only as many states as necessary to have at least one state per cycle in the state space in the set of stored states. Other states are computed and processed but not stored. By the cycle coverage property, this method terminates but may compute one and the same state several times. The option @samp{#MAXUNSAVED} controls the time/space trade-off through storing additional states. A large number leads to better reduction but increase of run-time while a small number leads to fast verification but weaker reduction. Another way of controlling the trade-off is to set (uncomment) the option @samp{#NONBRANCHINGONLY} in the file @file{userconfig.H}. This method has a reasonable performance but may lead to less significant reduction than a good value for @samp{#MAXUNSAVED}. 
+The cycle coverage method is invoked by uncommenting the line @samp{CYCLE} in the file @file{userconfig.H}, prior to the generation of an executable file. The method basically consists of storing only as many states as necessary to have at least one state per cycle in the state space in the set of stored states. Other states are computed and processed but not stored. By the cycle coverage property, this method terminates but may compute one and the same state several times. The option @samp{MAXUNSAVED} controls the time/space trade-off through storing additional states. A large number leads to better reduction but increase of run-time while a small number leads to fast verification but weaker reduction. Another way of controlling the trade-off is to set (uncomment) the option @samp{NONBRANCHINGONLY} in the file @file{userconfig.H}. This method has a reasonable performance but may lead to less significant reduction than a good value for @samp{MAXUNSAVED}. 
 
 
 @subheading Compatibility
@@ -1681,9 +2144,9 @@ The coverability graph construction is available for the verification of bounded
 
 
 @subheading Invocation
-@cindex @code{#COVER}
+@cindex @code{COVER} reduction
 
-The coverability graph method is invoked by uncommenting the line @samp{#COVER} in the file @file{userconfig.H}, prior to the generation of an executable file. 
+The coverability graph method is invoked by uncommenting the line @samp{COVER} in the file @file{userconfig.H}, prior to the generation of an executable file. 
 
 
 @subheading Compatibility
@@ -1698,7 +2161,7 @@ The coverability graph method implemented in LoLA corresponds to the publication
 @itemize
 @item R.M. Karp, R.E. Miller: Parallel program schemata. J. Computer and System Sciences 4, 1969, pp. 147-195
 
-@item Karsten Schmidt. @b{Model-Checking with Coverability Graphs}. @i{Formal Methods in System Design}, 15(3):239-254, November 1999. [@url{http://dx.doi.org/10.1023/A:1008753219837, @acronym{DOI}}]
+@item Karsten Schmidt. @b{Model-Checking with Coverability Graphs}. @i{Formal Methods in System Design}, 15(3):239-254, November 1999.@footnote{@url{http://dx.doi.org/10.1023/A:1008753219837}}
 @end itemize
 
 
@@ -1715,9 +2178,9 @@ It is not a complete verification technique. It rather generates random executio
 
 
 @subheading Invocation
-@cindex @code{#FINDPATH}
+@cindex @code{FINDPATH} analysis task
 
-The attracted execution method is invoked by uncommenting the line @samp{#FINDPATH} in the file @file{userconfig.H}, prior to the generation of an executable file. 
+The attracted execution method is invoked by uncommenting the line @samp{FINDPATH} in the file @file{userconfig.H}, prior to the generation of an executable file. 
 
 
 @subheading Compatibility
@@ -1736,9 +2199,9 @@ The compression of states is applicable for all properties supported by LoLA. It
 
 
 @subheading Invocation
-@cindex @code{#PREDUCTION}
+@cindex @code{PREDUCTION} reduction
 
-The state compression method is invoked by uncommenting the line @samp{#PREDUCTION} in the file @file{userconfig.H}, prior to the generation of an executable file. 
+The state compression method is invoked by uncommenting the line @samp{PREDUCTION} in the file @file{userconfig.H}, prior to the generation of an executable file. 
 
 
 @subheading Compatibility
@@ -1810,12 +2273,12 @@ uncaught memory overflow, or bug
 
 @c --------------------------------------------------------------------------
 @section Witness Path
-@cindex @code{PATH}
+@cindex @code{PATH} output
 @cindex @code{.path} files
-@cindex @code{-p} option
-@cindex @code{-P} option
-@cindex @code{--path} option
-@cindex @code{--Path} option
+@cindex @code{-p} command-line option
+@cindex @code{-P} command-line option
+@cindex @code{--path} command-line option
+@cindex @code{--Path} command-line option
 
 For some problems, LoLA is able to provide a witness or counterexample path for the verification problem. This path can be accessed using the @option{-p} or @option{-P} command line option when running LoLA. When the @option{-p} option is followed by a file name, the path is written to the specified file. If @option{-p} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.path}. Using @option{-P}, the path is written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
@@ -1827,12 +2290,12 @@ If the coverability graph option is used, parts of the path may be enclosed in p
 
 @c --------------------------------------------------------------------------
 @section Witness State
-@cindex @code{STATE}
+@cindex @code{STATE} output
 @cindex @code{.state} files
-@cindex @code{-s} option
-@cindex @code{-S} option
-@cindex @code{--state} option
-@cindex @code{--State} option
+@cindex @code{-s} command-line option
+@cindex @code{-S} command-line option
+@cindex @code{--state} command-line option
+@cindex @code{--State} command-line option
 
 For some problems, LoLA is able to provide a witness state for the verification problem. This state can be accessed using the @option{-s} or @option{-S} command line option when running LoLA. When the @option{-s} option is followed by a file name, the state is written to the specified file. If @option{-s} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.state}. Using @option{-S}, the state is written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
@@ -1842,16 +2305,16 @@ The state output starts with @samp{STATE}, followed by the description of a  mar
 
 @c --------------------------------------------------------------------------
 @section Computed Portion of the State Space
-@cindex @code{STATE}
+@cindex @code{STATE} output
 @cindex @code{.graph} files
-@cindex @code{-g} option
-@cindex @code{-G} option
-@cindex @code{--graph} option
-@cindex @code{--Graph} option
-@cindex @code{-m} option
-@cindex @code{-M} option
-@cindex @code{--marking} option
-@cindex @code{--Marking} option
+@cindex @code{-g} command-line option
+@cindex @code{-G} command-line option
+@cindex @code{--graph} command-line option
+@cindex @code{--Graph} command-line option
+@cindex @code{-m} command-line option
+@cindex @code{-M} command-line option
+@cindex @code{--marking} command-line option
+@cindex @code{--Marking} command-line option
 
 For most verification runs, LoLA is able to report on the computed portion of the state space. Exceptions concern the use of reduction techniques (like the sweep-line method or the goal-oriented execution) and the verification of some properties where advanced state space exploration strategies (other then normal depth-first or breadth-first search) are applied. Graph output can be activated using the @option{-g}, @option{-G}, @option{-m}, or @option{-M} command line options when running LoLA. When the @option{-g} or @option{-m} option is followed by a file name, the graph is written to the specified file. If @option{-g} or @option{-m} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.graph}. Using @option{-G} or @option{-M}, the graph is written to the standard output stream which is convenient for integrating LoLA into other tools. The graph output consists of a list of states. If the @option{-m} or @option{-M} options are used, we write for each state, a header, the corresponding marking (in the same syntax as for the place/transition net initial marking), and information about successors. The first and third part of the description depend on the underlying search strategy. If the @option{-g} or @option{-G} options are used, only the first and third parts of the description (i.e., the mere graph structure) are written. 
 
@@ -1868,10 +2331,10 @@ Subsequent to the (optional) marking description, the list of considered transit
 @c --------------------------------------------------------------------------
 @section Place/Transition Net
 @cindex @code{.llnet} files
-@cindex @code{-n} option
-@cindex @code{-N} option
-@cindex @code{--net} option
-@cindex @code{--Net} option
+@cindex @code{-n} command-line option
+@cindex @code{-N} command-line option
+@cindex @code{--net} command-line option
+@cindex @code{--Net} command-line option
 
 This feature is only useful if the original net specification is a high-level net. Then, it is possible to generate a complete net description file in the place/transition net syntax, containing the semantically equivalent low level counterpart of the given high-level net. This output option is triggered by the @option{-n} or @option{-N} command line option. When the @option{-n} option is followed by a file name, the net is written to the specified file. If @option{-n} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.llnet}. Using @option{-N}, the net is written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
@@ -1881,12 +2344,12 @@ The names used in the generated description correspond to the internally used na
 
 @c --------------------------------------------------------------------------
 @section Net Automorphisms
-@cindex @code{GENERATOR}
+@cindex @code{GENERATOR} output
 @cindex @code{.symm} files
-@cindex @code{-y} option
-@cindex @code{-Y} option
-@cindex @code{--automorphisms} option
-@cindex @code{--Automorphisms} option
+@cindex @code{-y} command-line option
+@cindex @code{-Y} command-line option
+@cindex @code{--automorphisms} command-line option
+@cindex @code{--Automorphisms} command-line option
 
 In most cases where the symmetry method is applied, LoLA is able to report the computed set of net automorphisms which describe the symmetries in the net. This information can be accessed using the @option{-y} or @option{-Y} command line option when running LoLA. When the @option{-y} option is followed by a file name, the automorphisms are written to the specified file. If @option{-y} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.symm}. Using @option{-Y}, the automorphisms are written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
@@ -1911,12 +2374,12 @@ a->b, b->c, c->a, d->f, e->e, f->d.
 
 @c --------------------------------------------------------------------------
 @section The Generated Progress Measure
-@cindex @code{PROGRESS MEASURE}
+@cindex @code{PROGRESS MEASURE} output
 @cindex @code{.state} files
-@cindex @code{-y} option
-@cindex @code{-Y} option
-@cindex @code{--automorphisms} option
-@cindex @code{--Automorphisms} option
+@cindex @code{-y} command-line option
+@cindex @code{-Y} command-line option
+@cindex @code{--automorphisms} command-line option
+@cindex @code{--Automorphisms} command-line option
 
 If the sweep-line method is among the reduction techniques to be used, LoLA calculates a progress measure which is an important ingredient to that technique. This measure can be accessed using the @option{-y} or @option{-Y} command line option when running LoLA. When the @option{-y} option is followed by a file name, the measure is written to the specified file. If @option{-y} is used without a file name, a file name is created by replacing the suffix of the net specification file with @file{.state}. Using @option{-Y}, the progress measure is written to the standard output stream which is convenient for integrating LoLA into other tools. 
 
@@ -1926,119 +2389,20 @@ The output starts with the text @samp{PROGRESS MEASURE}, followed by a white spa
 
 @c --------------------------------------------------------------------------
 @section Status information
-@cindex @code{#REPORTFREQUENCY}
+@cindex @code{REPORTFREQUENCY} parameter
 
-During the execution of LoLA, status information is generated and printed to the standard error output stream. During calculation of net automorphisms, LoLA reports traversal of certain levels in a search tree (which has a size that is equal to the number of places and transitions in the place-transition net). During standard state space exploration, LoLA reports the number of visited states and explored state changes. During plain execution, LoLA reports the number of fired transition. Using the sweep-line method, LoLA reports the number of fired transition, the currently processed round and progress value as well as current and peak number of stored states. The amount of produced information can be controlled through the directive @samp{#REPORTFREQUENCY} in the file @file{userconfig.H}. The value refers in most cases to the number of fired transitions after which a message is produced. For the calculation of automorphisms, it refers to the depth at which a message is emitted.
+During the execution of LoLA, status information is generated and printed to the standard error output stream. During calculation of net automorphisms, LoLA reports traversal of certain levels in a search tree (which has a size that is equal to the number of places and transitions in the place-transition net). During standard state space exploration, LoLA reports the number of visited states and explored state changes. During plain execution, LoLA reports the number of fired transition. Using the sweep-line method, LoLA reports the number of fired transition, the currently processed round and progress value as well as current and peak number of stored states. The amount of produced information can be controlled through the directive @samp{REPORTFREQUENCY} in the file @file{userconfig.H}. The value refers in most cases to the number of fired transitions after which a message is produced. For the calculation of automorphisms, it refers to the depth at which a message is emitted.
 
 
 
 @c --------------------------------------------------------------------------
 @section State Limit
-@cindex @code{#MAXIMALSTATES}
+@cindex @code{MAXIMALSTATES} parameter
 
-The number of states to be generated can be controlled through the directive @samp{#MAXIMALSTATES} in the file @file{userconfig.H}. As soon as this number of states was generated, LoLA terminates with return value 5. 
-
-
-
-
-@c ==========================================================================
-@node Download
-@chapter Download
-
-The use of LoLA is free under the @acronym{GNU} General Public License which is part of the distribution.
-
-After downloading and unpacking LoLA, there will be a directory called lola containing a number of C++ source files. For running LoLA,
-
-@cindex @code{#HASHSIZE}
-@cindex @code{-h} option
-@cindex @code{--userconfig} option
-
-@itemize
-@item edit the file @file{userconfig.H}. Most parts of this file concern properties to be verified or available reduction techniques. The effect of editing those parts of @file{userconfig.H} is explained in the respective section of the online documentation. The only remaining option is @samp{#HASHSIZE}. Its value controls the size of the hash table for storing visited states. A larger value speeds up state space exploration a little bit at the price of requiring more memory for the table itself. For most users, the original value should be satisfactory.
-
-@item Create an executable file by calling the shell tool @samp{make}. As a result, there will be an executable called @file{lola}.
-
-@item Call @file{lola} with a file containing the net description, a file containing information about the verified property (if applicable -- refer to the documentation for details), and some command line options controlling the desired output information (also explained in the documentation).
-@item The configuration in which LoLA has been generated can be accessed calling @file{lola} with the command line option @option{-h}.
-@end itemize
-
-In a subdirectory of LoLA, you can find a number of example Petri net descriptions as well as examples for additional information about verification problems.
+The number of states to be generated can be controlled through the directive @samp{MAXIMALSTATES} in the file @file{userconfig.H}. As soon as this number of states was generated, LoLA terminates with return value 5. 
 
 
 
-
-
-@c ==========================================================================
-@node First Steps
-@chapter First Steps
-
-
-
-@c --------------------------------------------------------------------------
-@section Setup and Installation
-
-@enumerate
-@item Go to @url{http://service-technology.org/files/lola} and download the latest release version of LoLA, say @file{lola-@value{VERSION}.tar.gz}. To setup and compile LoLA, change into your download directory and type
-
-@cartouche
-@smallexample
-tar xfz lola-@value{VERSION}.tar.gz
-cd lola-@value{VERSION}
-./configure
-make
-@end smallexample
-@end cartouche
-
-After compilation, a binary @samp{src/lola} is generated.@footnote{On Microsoft Windows, the file will be called @file{lola.exe}.} If you experience any compiler warnings, don't panic: LoLA contains some generated or third party code that we cannot influence.
-
-@item To test whether everything went fine, type
-
-@cartouche
-@smallexample
-make check
-@end smallexample
-@end cartouche
-
-to execute the testcases located in @file{tests}. If everything went fine, you should see something like:
-
-@smallexample
-==================
-All 9 tests passed
-==================
-@end smallexample
-
-If an error occurs, please send the output to @email{lola@@service-technology.org}.
-
-@item To install the binary, the manpage, and the documentation, type
-
-@cartouche
-@smallexample
-make install
-@end smallexample
-@end cartouche
-
-You might need superuser permissions to do so.
-@end enumerate
-
-If you need any further information, see file @file{INSTALL} for detailed instructions.
-
-
-
-@c --------------------------------------------------------------------------
-@section Contents of the Distribution
-
-The distribution contains several directories:
-
-@table @file
-@item doc
-The Texinfo documentation of LoLA and a @acronym{PDF} file @file{background.pdf} with a short description of the setting in which LoLA should be used. The documentation can be created using @samp{make pdf}. Note you need to have LoLA properly installed before (see Installation description above).
-
-@item src
-The source code of LoLA.
-
-@item tests
-Testcases for LoLA which check the generated binary.
-@end table
 
 
 
@@ -2056,7 +2420,7 @@ The Dining Philosophers can deadlock if every philosopher takes his left fork. L
 
 @cartouche
 @smallexample
-lola-deadlock phils.llnet
+$ lola-deadlock phils.lola
 @end smallexample
 @end cartouche
 
@@ -2075,9 +2439,9 @@ To visualize the generated state space and the deadlock trace, execute
 
 @cartouche
 @smallexample
-lola-deadlock phils.llnet -m
-graph2dot -g phils.graph -d phils-deadlock.dot
-dot phils-deadlock.dot -Tpng -O
+$ lola-deadlock phils.lola -m
+$ graph2dot -g phils.graph -d phils-deadlock.dot
+$ dot phils-deadlock.dot -Tpng -O
 @end smallexample
 @end cartouche
 
@@ -2093,9 +2457,9 @@ To draw the whole reachability graph of the Dining Philosophers, execute the fol
 
 @cartouche
 @smallexample
-lola-full phils.llnet -m
-graph2dot -g phils.graph -d phils.dot
-dot phils.dot -T png -O
+$ lola-full phils.lola -m
+$ graph2dot -g phils.graph -d phils.dot
+$ dot phils.dot -T png -O
 @end smallexample
 @end cartouche
 
@@ -2106,7 +2470,12 @@ The resulting graph @file{phils.dot.png} should look as the graph in Fig. 2.
 @center @b{Figure 2.} Reachability graph of the Dining Philosophers
 @sp 1
 
-To display all command-line parameters of @sansserif{graph2dot}, enter
+To display all command-line parameters of @sansserif{graph2dot}, enter @cartouche
+@smallexample
+$ graph2dot --help
+@end smallexample
+@end cartouche
+
 
 @smallexample
 @include graph2dot.out
@@ -2131,6 +2500,10 @@ The most recent change log is available at LoLA's website at @url{http://service
 
 
 @c --------------------------------------------------------------------------
+
+@node GNU Free Documentation License
+@appendix The GNU Free Documentation License
+@include fdl.texi
 
 @node Indices
 @unnumbered Index

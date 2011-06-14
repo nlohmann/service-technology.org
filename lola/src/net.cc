@@ -379,7 +379,7 @@ int main(int argc, char** argv) {
         exit(EXIT_SUCCESS);
     }
 
-    int i, h;
+    int i;
 
 
     // 0. eigenen New-Handler installieren
@@ -515,6 +515,7 @@ int main(int argc, char** argv) {
                 i--;
             }
 
+            int h;
             for (h = 0; h < i; ++h) {
                 Globals::Places[h]->significant = true;
             }
@@ -533,6 +534,8 @@ int main(int argc, char** argv) {
 #else
 #ifdef PREDUCTION
         psolve();
+
+        int h;
         // sort places according to significance. This must not happen in the presence of
         // symmetry reduction since places have been sorted by discretion of the symmetry
         // calculation algorithm and subsequent procedure depend on that order.

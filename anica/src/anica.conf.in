@@ -6,9 +6,8 @@
 # empty. In that case, you need to manually add the path to the respective
 # tool.
 
-# <<-- CHANGE START (needed binaries, etc. in config-file) -->>
 # Anica needs a Lola binary. Such a Lola binary can be built by executing
-# "make lola" using a recent Lola distribution, available at 
+# "make lola-statepredicate1" using a recent Lola distribution, available at 
 # http://service-technology.org/files/lola
 
 lola = @lola@
@@ -18,4 +17,3 @@ lola = @lola@
 # 'XXXXXX' which is replaced at runtime with a random string.
 
 tmpfile = /tmp/anica-XXXXXX
-# <<-- CHANGE END -->>

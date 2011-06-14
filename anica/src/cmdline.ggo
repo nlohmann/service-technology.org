@@ -86,7 +86,7 @@ option "config" c
 
 option "lola" -
   "Set the path and binary of LoLA."
-  details="The Lola binary. Lola can be downloaded from http://service-technology.org/lola and compiled using `make lola'.\n"
+  details="The Lola binary (lola-statepredicate1). Lola can be downloaded from http://service-technology.org/lola and compiled using `make lola-statepredicate1'.\n"
   string
   typestr="FILENAME"
   default="lola-statepredicate1"

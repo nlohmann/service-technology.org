@@ -86,56 +86,56 @@ AT_CLEANUP
 
 AT_SETUP([Check potential causal only])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/medical.lola .])
-AT_CHECK([ANICA medical.lola --potentialPlaces=causal --activePlaces=none --resultFile],0,ignore, ignore)
-AT_CHECK([GREP -q "active_causal = 0" medical.lola.results])
-AT_CHECK([GREP -q "active_conflict = 0" medical.lola.results])
-AT_CHECK([GREP -q "potential_causal = 1" medical.lola.results])
-AT_CHECK([GREP -q "potential_conflict = 0" medical.lola.results])
+AT_CHECK([cp TESTFILES/both.lola .])
+AT_CHECK([ANICA both.lola --potentialPlaces=causal --activePlaces=none --resultFile],0,ignore, ignore)
+AT_CHECK([GREP -q "active_causal = 0" both.lola.results])
+AT_CHECK([GREP -q "active_conflict = 0" both.lola.results])
+AT_CHECK([GREP -q "potential_causal = 1" both.lola.results])
+AT_CHECK([GREP -q "potential_conflict = 0" both.lola.results])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
 AT_SETUP([Check potential conflict only])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/medical.lola .])
-AT_CHECK([ANICA medical.lola --potentialPlaces=conflict --activePlaces=none --resultFile],0,ignore, ignore)
-AT_CHECK([GREP -q "active_causal = 0" medical.lola.results])
-AT_CHECK([GREP -q "active_conflict = 0" medical.lola.results])
-AT_CHECK([GREP -q "potential_causal = 0" medical.lola.results])
-AT_CHECK([GREP -q "potential_conflict = 1" medical.lola.results])
+AT_CHECK([cp TESTFILES/both.lola .])
+AT_CHECK([ANICA both.lola --potentialPlaces=conflict --activePlaces=none --resultFile],0,ignore, ignore)
+AT_CHECK([GREP -q "active_causal = 0" both.lola.results])
+AT_CHECK([GREP -q "active_conflict = 0" both.lola.results])
+AT_CHECK([GREP -q "potential_causal = 0" both.lola.results])
+AT_CHECK([GREP -q "potential_conflict = 1" both.lola.results])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
 AT_SETUP([Check active causal only])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/medical.lola .])
-AT_CHECK([ANICA medical.lola --potentialPlaces=causal --activePlaces=causal --resultFile],0,ignore, ignore)
-AT_CHECK([GREP -q "active_causal = 1" medical.lola.results])
-AT_CHECK([GREP -q "active_conflict = 0" medical.lola.results])
-AT_CHECK([GREP -q "potential_causal = 1" medical.lola.results])
-AT_CHECK([GREP -q "potential_conflict = 0" medical.lola.results])
+AT_CHECK([cp TESTFILES/both.lola .])
+AT_CHECK([ANICA both.lola --potentialPlaces=causal --activePlaces=causal --resultFile],0,ignore, ignore)
+AT_CHECK([GREP -q "active_causal = 1" both.lola.results])
+AT_CHECK([GREP -q "active_conflict = 0" both.lola.results])
+AT_CHECK([GREP -q "potential_causal = 1" both.lola.results])
+AT_CHECK([GREP -q "potential_conflict = 0" both.lola.results])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
 AT_SETUP([Check active conflict only])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/medical.lola .])
-AT_CHECK([ANICA medical.lola --potentialPlaces=conflict --activePlaces=conflict --resultFile],0,ignore, ignore)
-AT_CHECK([GREP -q "active_causal = 0" medical.lola.results])
-AT_CHECK([GREP -q "active_conflict = 1" medical.lola.results])
-AT_CHECK([GREP -q "potential_causal = 0" medical.lola.results])
-AT_CHECK([GREP -q "potential_conflict = 1" medical.lola.results])
+AT_CHECK([cp TESTFILES/both.lola .])
+AT_CHECK([ANICA both.lola --potentialPlaces=conflict --activePlaces=conflict --resultFile],0,ignore, ignore)
+AT_CHECK([GREP -q "active_causal = 0" both.lola.results])
+AT_CHECK([GREP -q "active_conflict = 1" both.lola.results])
+AT_CHECK([GREP -q "potential_causal = 0" both.lola.results])
+AT_CHECK([GREP -q "potential_conflict = 1" both.lola.results])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
 AT_SETUP([One active only])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/medical.lola .])
-AT_CHECK([ANICA medical.lola --oneActiveOnly --resultFile],0,ignore, ignore)
-AT_CHECK([GREP -q "active_causal = 1" medical.lola.results])
-AT_CHECK([GREP -q "active_conflict = 0" medical.lola.results])
-AT_CHECK([GREP -q "potential_causal = 1" medical.lola.results])
-AT_CHECK([GREP -q "potential_conflict = 1" medical.lola.results])
+AT_CHECK([cp TESTFILES/both.lola .])
+AT_CHECK([ANICA both.lola --oneActiveOnly --resultFile],0,ignore, ignore)
+AT_CHECK([GREP -q "active_causal = 1" both.lola.results])
+AT_CHECK([GREP -q "active_conflict = 0" both.lola.results])
+AT_CHECK([GREP -q "potential_causal = 1" both.lola.results])
+AT_CHECK([GREP -q "potential_conflict = 1" both.lola.results])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -323,8 +323,8 @@ AT_BANNER([Valgrind])
 
 AT_SETUP([Checking for memory leaks])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/medical.lola .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes ANICA_RAW medical.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both],0,ignore,stderr)
+AT_CHECK([cp TESTFILES/both.lola .])
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes ANICA_RAW both.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP
@@ -365,10 +365,34 @@ AT_CHECK([GREP -q "Non-Interference: FAILED" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 
-AT_SETUP([Medical (Lola)])
+AT_SETUP([Both (Lola)])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/medical.lola .])
-AT_CHECK([ANICA medical.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
+AT_CHECK([cp TESTFILES/both.lola .])
+AT_CHECK([ANICA both.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
 AT_CHECK([GREP -q "Non-Interference: FAILED" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Active causal (Makefile)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
+AT_CHECK([test -f activeCausal.lola.makefile])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Active conflict (Makefile)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeConflict.lola .])
+AT_CHECK([ANICA activeConflict.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
+AT_CHECK([test -f activeConflict.lola.makefile])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Both (Makefile)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/both.lola .])
+AT_CHECK([ANICA both.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
+AT_CHECK([test -f both.lola.makefile])
 AT_KEYWORDS(tests)
 AT_CLEANUP

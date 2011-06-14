@@ -171,8 +171,8 @@ In order to run, compile, and develop Anica, several tools are required.
 @enumerate
 @item download @url{http://service-technology.org/files/lola/lola.tar.gz}
 @item untar @file{lola.tar.gz}, configure
-@item call @samp{make}
-@item copy the binary @file{src/lola} to a directory of your path
+@item call @samp{make lola-statepredicate1}
+@item copy the binary @file{src/lola-statepredicate1} to a directory of your path
 (e.g., @file{/usr/local/bin}) or call @samp{make install}
 @end enumerate
 @end itemize

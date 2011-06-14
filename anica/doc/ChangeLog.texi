@@ -1,18 +1,4 @@
-@c <<-- CHANGE START (version information) -->>
 @heading Version 0.9-unreleased
 @itemize
 @item updated PNAPI and ST-macros
 @end itemize
-
-@heading Version 0.8 (33 October 2009)
-@itemize
-@item first release of Anica
-
-@item <<-- normalizes a net and pipes the result to Wendy. -->>
-
-@item <<-- CHANGES -->>
-
-@end itemize
-
-@heading Version 0.0 (32 October 2009)
-@c <<-- CHANGE END -->>

@@ -132,12 +132,6 @@ void evaluateParameters(int argc, char** argv) {
     free(params);
 }
 
-void colorConfidence(enum enum_dotConfidence Confidence, pnapi::PetriNet & Petrinet) {
-	PNAPI_FOREACH(t, Petrinet.getTransitions()) {
-		
-	}
-}
-
 void createDotFile(const std::string & OutputFile, pnapi::PetriNet & Petrinet, const std::string InputFile) {
 	std::ofstream outStream;
 
@@ -242,8 +236,6 @@ void terminationHandler() {
 
 /// main-function
 int main(int argc, char** argv) {
-    time_t start_time, end_time;
-
     // set the function to call on normal termination
     atexit(terminationHandler);
 

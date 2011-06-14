@@ -23,7 +23,7 @@
 # <<-- CHANGE START (testfiles) -->>
 TESTFILES = activeCausal.lola \
             activeConflict.lola \
-            medical.lola \
+            both.lola \
 			potentialCausal.lola \
 			potentialConflict.lola \
 			missing-confidence.lola

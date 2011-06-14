@@ -17,9 +17,9 @@ Runtime
 
        2. untar `lola.tar.gz', configure
 
-       3. call `make'
+       3. call `make lola-statepredicate1'
 
-       4. copy the binary `src/lola' to a directory of your path (e.g.,
+       4. copy the binary `src/lola-statepredicate1' to a directory of your path (e.g.,
           `/usr/local/bin') or call `make install'
 
 Anica's configure script checks whether Lola (with binary

@@ -374,7 +374,6 @@ AT_KEYWORDS(tests)
 AT_CLEANUP
 
 AT_SETUP([Active causal (Makefile)])
-AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/activeCausal.lola .])
 AT_CHECK([ANICA activeCausal.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
 AT_CHECK([test -f activeCausal.lola.makefile])
@@ -382,7 +381,6 @@ AT_KEYWORDS(tests)
 AT_CLEANUP
 
 AT_SETUP([Active conflict (Makefile)])
-AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/activeConflict.lola .])
 AT_CHECK([ANICA activeConflict.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
 AT_CHECK([test -f activeConflict.lola.makefile])
@@ -390,7 +388,6 @@ AT_KEYWORDS(tests)
 AT_CLEANUP
 
 AT_SETUP([Both (Makefile)])
-AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/both.lola .])
 AT_CHECK([ANICA both.lola -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
 AT_CHECK([test -f both.lola.makefile])

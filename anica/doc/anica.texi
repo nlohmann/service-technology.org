@@ -113,7 +113,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All <<-- TESTNUM -->> tests were successful.
+All 44 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{anica@@service-technology.org}.
@@ -175,6 +175,7 @@ In order to run, compile, and develop Anica, several tools are required.
 @item copy the binary @file{src/lola-statepredicate1} to a directory of your path
 (e.g., @file{/usr/local/bin}) or call @samp{make install}
 @end enumerate
+@item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/}).
 @end itemize
 
 Anica's configure script checks whether Lola (with binary @file{lola-statepredicate1}) is found in the path and adjusts the configuration file @file{src/anica.conf} accordingly.

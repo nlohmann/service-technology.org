@@ -128,6 +128,9 @@ void evaluateParameters(int argc, char** argv) {
 	if (checkActiveConflict && !checkPotentialConflict) {
 		abort(7, "activeConflict requires potentialConflict");
 	}
+	if (args_info.dotActive_given && args_info.modus_arg == modus_arg_makefile) {
+		status(_cwarning_("activePlaces requieres modus=lola: no dot-file will be created."));
+	}
 
     free(params);
 }
@@ -658,30 +661,31 @@ int main(int argc, char** argv) {
 
 			message("%s %s %s", _cgood_("makefile"), _cfilename_(std::string(fileName + ".makefile")), _cgood_("created"));
 
-		}
-
-		if (args_info.dotActive_given) {
-			PNAPI_FOREACH(p, net.getPlaces()) {
-				(**p).setColor("");
-				if (args_info.dotActive_arg != dotActive_arg_conflict) {
-					// causal interesting
-					if (activeCausal.find(*p) != activeCausal.end()) {
-						// causal confirmed
-						(**p).setColor("yellow");
-						if (args_info.dotActive_arg == dotActive_arg_both) {
-							if (activeConflict.find(*p) != activeConflict.end()) {
-								(**p).setColor("orange");
+		} // (args_info.modus_arg == modus_arg_makefile) {
+		else {
+			if (args_info.dotActive_given) {
+				PNAPI_FOREACH(p, net.getPlaces()) {
+					(**p).setColor("");
+					if (args_info.dotActive_arg != dotActive_arg_conflict) {
+						// causal interesting
+						if (activeCausal.find(*p) != activeCausal.end()) {
+							// causal confirmed
+							(**p).setColor("yellow");
+							if (args_info.dotActive_arg == dotActive_arg_both) {
+								if (activeConflict.find(*p) != activeConflict.end()) {
+									(**p).setColor("orange");
+								}
 							}
 						}
 					}
-				}
-				else {
-					if (activeConflict.find(*p) != activeConflict.end()) {
-						(**p).setColor("red");
+					else {
+						if (activeConflict.find(*p) != activeConflict.end()) {
+							(**p).setColor("red");
+						}
 					}
 				}
+				createDotFile(std::string(fileName + ".active"), net, fileName);
 			}
-			createDotFile(std::string(fileName + ".active"), net, fileName);
 		}
 
 	} // if (checkActiveCausal || checkActiveConflict) {
@@ -719,9 +723,9 @@ int main(int argc, char** argv) {
 
 		    Results results(results_filename);
 
-			if (result == 0) {results.add("non-interference", (char*)"FAILED");}
-			if (result == 1) {results.add("non-interference", (char*)"POTENTIAL");}
-			if (result == 2) {results.add("non-interference", (char*)"PASSED");}
+			if (result == 0) {results.add("result.non-interference", (char*)"FAILED");}
+			if (result == 1) {results.add("result.non-interference", (char*)"POTENTIAL");}
+			if (result == 2) {results.add("result.non-interference", (char*)"PASSED");}
 
 			results.add("places.potential_causal", (unsigned int)potentialCausal.size());
 			results.add("places.potential_conflict", (unsigned int)potentialConflict.size());

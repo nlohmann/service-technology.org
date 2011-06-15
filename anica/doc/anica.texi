@@ -284,69 +284,24 @@ See @url{http://service-technology.org/publications} for more information.
 @node Results
 @chapter Results
 
-@heading @code{decomposition}
-@findex decomposition
+@heading @code{places}
+@findex places
 
-This part lists information on the decomposition process.
+This part lists information on the checked places.
 
 @ftable @code
-@item success
-True if decomposition of the input open net was successfull. [Boolean]
 
-@item bounded_transitions
-The number of unbounded transitions. [Integer]
+@item potential_causal
+The number of potential causal places. [Integer]
 
-@item multiple_predecessors
-The number of unbounded transitions with more than one predecessor (transition). [Integer]
+@item potential_conflict
+The number of potential conflict places. [Integer]
 
-@item initial_marked_places
-The number of initial marked places from 'bounded_transitions'. [Integer]
+@item active_causal
+The number of active causal places. [Integer]
 
-@item interface_corrected_places
-The number of not bilateral shared places. [Integer]
-
-@item fragment_connections
-The number of forced connections of fragments (with pairwise identical roles). [Integer]
-
-@item places_inserted
-The number of inserted places by necessary corrections. [Integer]
-
-@item transitions_inserted
-The number of inserted transitions by necessary corrections. [Integer]
-@item lola_called
-True, if LoLA was called. [Boolean]
-@item arcs_inserted
-The number of inserted arcs by necessary corrections. [Integer]
-
-@item places_deleted
-The number of deleted places by necessary corrections. [Integer]
-
-@item transitions_deleted
-The number of deleted transitions by necessary corrections. [Integer]
-
-@item arcs_deleted
-The number of deleted arcs by necessary corrections. [Integer]
-
-@item roles_annotated
-The number of roles annotated. Annotated roles can be given or created by parameter @option{--concatenateAnnotations}. [Integer]
-
-@item concatenation_necessary
-True if parameter @option{--concatenateAnnotations} was necessary. [Boolean]
-
-@item lola_called
-True, if LoLA was called. [Boolean]
-
-@item diane_calls
-The number of times Diane was called. [Integer]
-
-@item not_annotated_transitions
-The number of not annotated transitions. [Integer]
-
-@item annotations_forced
-The number of forced decisions during the role annotation to unsassigned fragments. Each time a decision is forced another decomposition was possible. See also 'annotation_alternatives'. [Integer]
-
-@item annotation_alternatives
-The number of all possibilites during forced decisions. If an unassigned fragment is forced to a specific role there are at least two alternatives. These alternatives are count. This number just counts the alternatives for all forced decisions, you may note, that forcing one decision yields or blocks other (forced) decisions. [Integer]
+@item active_conflict
+The number of active conflict places. [Integer]
 
 @end ftable
 
@@ -365,29 +320,37 @@ The invocation string of the tool. [String]
 The name of the tool, its version, and (when applicable) the version of the SVN revision. [String]
 @end ftable
 
-@heading @code{workflow}
-@findex workflow
+@heading @code{net}
+@findex net
 
-This part lists all kind of information of the input workflow.
+This part lists all kind of information of the input net.
 
 @ftable @code
-@item isFreeChoice
-Belongs the input worklfow to the freechoice class of petri nets. [Boolean]
-
-@item hasCycles
-Are there any cycles in the input workflow? [Boolean]
-
-@item roles
-The number of roles of the input workflow. [Integer]
 
 @item places
-The number of places of the input workflow. [Integer]
+The number of places of the input net. [Integer]
 
 @item transitions
-The number of transitions of the input workflow. [Integer]
+The number of transitions of the input net. [Integer]
+
+@item high
+The number of transitions assigned with high confidence level of the input net. [Integer]
+
+@item low
+The number of transitions assigned with low confidence level of the input net. [Integer]
 
 @item arcs
-The number of arcs of the input workflow. [Integer]
+The number of arcs of the input net. [Integer]
+@end ftable
+
+@heading @code{result}
+@findex meta
+
+This part lists information on the result.
+
+@ftable @code
+@item non-interference
+The result of non-interference check. Possible values are: FAILED, POTENTIAL and PASSED. [String]
 @end ftable
 
 @c --------------------------------------------------------------------------

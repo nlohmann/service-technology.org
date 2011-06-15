@@ -1,4 +1,4 @@
-AC_INIT([LoLA], 1.15, lola@service-technology.org, lola, http://service-technology.org/lola)
+AC_INIT([LoLA], 1.16, lola@service-technology.org, lola, http://service-technology.org/lola)
 
 AC_MSG_NOTICE([ _          _        _    ])
 AC_MSG_NOTICE([| |    ___ | |      / \   ])

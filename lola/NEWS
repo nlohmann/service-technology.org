@@ -6,46 +6,19 @@
                      http://service-technology.org/lola
 
 
-Version 1.15
+Version 1.16
 ============
-
-* fixed bug #15223 (`https://gna.org/bugs/?15223'): the coverability graph is
-  now not used in the `HOME' mode
-
-* fixed compilation problems under Linux
-
-* added a parameter `-r'/`--resultFile' to write all analysis results into a
-  single file in the file format of libconfig (see
-  `http://www.hyperrealm.com/libconfig')
-
-* fixed bug #12910 and bug #15282 (`https://gna.org/bugs/?12910' and
-  `https://gna.org/bugs/?15282'): file output for `-g' and `-m' parameter was
-  broken
-
-* added user configurations for the binaries used by the ProM plugin
-
-* fixed bug #15678 (`https://gna.org/bugs/?15678'): `HOME' now switches on
-  `TWOPHASE' if `STUBBORN' is also used
-
-* started implementing stubborn sets for `STATESPACE' option; this option now
-  assumes an extended CTL formula of the form E[\tau]F \phi to be given. All
-  mentioned transitions in \tau are set to visible, and the formula \phi is
-  treated like a state predicate.
-
-* fixed bug #18024 (`https://gna.org/bugs/?18024'): parameters can now be
-  used without trailing space, for instance `-a analysisfile.task' is now
-  equivalent to `-aanalysisfile.task'
-
-* configure LoLA with `--enable-syslog' to additionally write verbose output
-  to the syslog (e.g. `/var/log/system.log')
-
-* polished messages
-
-* added tool `form' (in folder `utils') to translate formulae of the SUMo
-  2011 Model Checking Contest into LoLA file format
 
 * version submitted to the SUMo 2011 Model Checking Contest
   (`http://sumo.lip6.fr/Model_Checking_Contest.html')
+
+* version presented at the full day tutorial "Verification with LoLA" at the
+  PETRI NETS / ACSD Joint Conferences 2011
+  (`http://www.informatik.uni-rostock.de/tpp/lola/tutorial/')
+
+* minor bug fixes
+
+* overworked manual
 
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for

@@ -287,7 +287,26 @@ This executable is compiled in the following configuration:
 
 @subsection Pre-defined Configuration
 
-Alternatively, you can compile on of the preconfigured versions of LoLA using a configuration from the directory @file{src/configs}. To use, for example, the  configuration @file{src/configs/deadlock/userconfig.H}, run
+Alternatively, you can compile one of the preconfigured versions of LoLA. These versions already cover a lot of scenarios. The following preconfigured versions are available:
+@multitable @columnfractions .25 .75
+@headitem Name @tab Description
+@item @code{lola-boundednet} @tab check for boundedness of the net
+@item @code{lola-boundedplace} @tab check for boundedness of a given place
+@item @code{lola-deadlock} @tab check for deadlock freedom of the net
+@item @code{lola-deadtransition} @tab check for death of a given transition
+@item @code{lola-eventuallyprop} @tab check for eventual occurrence of a given state predicate
+@item @code{lola-fairprop} @tab check for fairness of a given state predicate
+@item @code{lola-full} @tab generate the full state space of the net
+@item @code{lola-home} @tab check for the existence of home markings
+@item @code{lola-liveprop} @tab check for liveness of a given state predicate
+@item @code{lola-modelchecking} @tab check whether a given @acronym{CTL} formula is valid
+@item @code{lola-none} @tab do nothing but unfolding of high-level nets
+@item @code{lola-reachability} @tab check whether a given marking is reachable
+@item @code{lola-reversibility} @tab check whether the net is reversible
+@item @code{lola-statepredicate} @tab check for reachability of a given statepredicate
+@end multitable
+
+To compile the, for example, the binary @file{lola-deadlock}, run
 
 @cartouche
 @smallexample
@@ -302,6 +321,9 @@ To compile all preconfigured versions, run
 $ make all-configs
 @end smallexample
 @end cartouche
+
+
+
 
 
 @section Installation
@@ -323,7 +345,7 @@ If you need any further information, see file @file{INSTALL} for detailed instru
 
 The distribution contains several directories:
 
-@table @file
+@table @code
 @item doc
 The Texinfo documentation of LoLA. The documentation can be created using @samp{make pdf}. Note you need to have LoLA properly installed before (see Installation description above).
 
@@ -528,7 +550,7 @@ s1 = BOOLEAN ;
 @end example
 @end cartouche
 
-@item an interval of natural numbers, specified as a comma-separated pair of  numbers, enclosed in brackets @samp{[} and @samp{]}. The description represents all values which are natural numbers greater or equal to the left number, and less or equal to the right number.
+@item an interval of natural numbers, specified as a comma-separated pair of numbers, enclosed in brackets @samp{[} and @samp{]}. The description represents all values which are natural numbers greater than or equal to the left number, and less than or equal to the right number.
 
 @cartouche
 @b{Example:}
@@ -830,7 +852,7 @@ evaluates to
 
 @subsection Terms and Multiterms
 
-Terms represents combinations of defined operations, that is, mappings between domains which are specified as sorts. 
+Terms represents combinations of defined operations; that is, mappings between domains which are specified as sorts. 
 
 A Term is a variable (which must be declared in the context of the term occurrence, or an operation symbol with a comma-separated list of (sub-)terms, enclosed in parenthesis. The number of subterms must fit to the number of specified arguments for the operation. 
 

@@ -10,7 +10,7 @@
 # "make lola-statepredicate1" using a recent Lola distribution, available at 
 # http://service-technology.org/files/lola
 
-lola = @lola@
+lola = @LOLA@
 
 # Anica needs to create a temporary file to pass it to Lola. The filename
 # anica should use can be specified below. The filename should end with

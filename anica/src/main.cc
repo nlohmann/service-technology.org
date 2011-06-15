@@ -56,7 +56,7 @@ void evaluateParameters(int argc, char** argv) {
 
     // store invocation in a std::string for meta information in file output
     for (int i = 0; i < argc; ++i) {
-        invocation += std::string(argv[i]) + " ";
+        invocation += (i == 0 ? "" : " ") + std::string(argv[i]);
     }
 
     // initialize the parameters structure
@@ -87,7 +87,7 @@ void evaluateParameters(int argc, char** argv) {
         if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
             abort(10, "error reading configuration file '%s'", args_info.config_arg);
         } else {
-            status("using configuration file '%s'", args_info.config_arg);
+            status("using configuration file '%s'", _cfilename_(args_info.config_arg));
         }
     } else {
         // check for configuration files
@@ -103,7 +103,7 @@ void evaluateParameters(int argc, char** argv) {
             if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
                 abort(10, "error reading configuration file '%s'", conf_filename.c_str());
             } else {
-                status("using configuration file '%s'", conf_filename.c_str());
+                status("using configuration file '%s'", _cfilename_(conf_filename));
             }
         } else {
             status("not using a configuration file");
@@ -180,7 +180,7 @@ bool callLoLA(std::string netFile) {
     // select LoLA binary and build LoLA command
 #if defined(__MINGW32__)
     // MinGW does not understand pathnames with "/", so we use the basename
-    std::string command_line(basename(args_info.lola_arg));
+    std::string command_line = "\"" + std::string(args_info.lola_arg)
 #else
     std::string command_line(args_info.lola_arg);
 #endif
@@ -191,12 +191,12 @@ bool callLoLA(std::string netFile) {
 	}
     command_line += outputParam;
 
-    //status("calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
+    status("........calling %s: '%s'", _ctool_("LoLA"), command_line.c_str());
     time(&start_time);
 	FILE *fp = popen(command_line.c_str(), "r");
 	pclose(fp);
     time(&end_time);
-    //status("%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
+    status("........%s is done [%.0f sec]", _ctool_("LoLA"), difftime(end_time, start_time));
 
 	std::fstream f;
     f.open(fileName.c_str(), std::ios::in);
@@ -209,6 +209,12 @@ bool callLoLA(std::string netFile) {
 		foundNoState = curLine.find("state not found!");
     }
 	f.close();
+
+	if (!args_info.noClean_flag) {
+		if (remove(fileName.c_str()) != 0) {
+			abort(5, "file %s cannot be deleted", _cfilename_(fileName));
+		}
+	}
 
 	if (foundState != std::string::npos && foundNoState == std::string::npos) {
 		return true;
@@ -248,7 +254,6 @@ int main(int argc, char** argv) {
     evaluateParameters(argc, argv);
     Output::setTempfileTemplate(args_info.tmpfile_arg);
     Output::setKeepTempfiles(args_info.noClean_flag);
-
 
     /*----------------------.
     | 1. parse the open net |

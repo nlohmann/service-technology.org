@@ -15,8 +15,7 @@ setInterval(function() {
     if (require('os').freemem() < MEMORYLIMIT*1048576) {
         exec('ps -o pid -m', function(error,stdout,stderr) {
             var psresult = stdout.split('\n');
-
-            for (i = 0; i < psresult.length; ++i) {
+            for (i = 0; i < psresult.length; i++) {
                 if (processpool.indexOf(parseInt(psresult[i])) != -1) {
                     console.log('[' + psresult[i] + '] terminating: memory limit (' + MEMORYLIMIT + ' MB) reached');
                     process.kill(psresult[i], 'SIGINT');
@@ -44,7 +43,7 @@ var server = http.createServer(function (req, res) {
   try {
       child = spawn(tool, parameters, {'cwd': '/tmp'});
   } catch(e) {
-      console.error('Server could not start ' + tool + ': ' + e.message + " - request answered with 503");
+      console.error('Server could not start ' + tool + ': ' + e.message + ' - request answered with 503');
       res.writeHead(503, {'Content-Type': 'text/plain'});
       res.end('The server is currently overloaded. Please try again later.\n');
       return;
@@ -71,7 +70,7 @@ var server = http.createServer(function (req, res) {
   // close connection once the tool terminates
   child.on('exit', function(code) {
       code = (code == null) ? '- (forced termination)' : code;
-      processpool.splice(processpool.indexOf(child.pid), 1);
+      processpool.splice(processpool.indexOf(pid), 1);
       clearTimeout(killprocess);
 
       console.log('[' + pid + '] terminated ' + tool + ': exit code ' + code + ' (' + processpool.length + ' processes left)');
@@ -91,12 +90,12 @@ console.log('Server running at http://127.0.0.1:1337/');
 // if anything goes wrong: kill all spawned children
 process.on('uncaughtException', function (err) {
   console.error('Server experienced uncaught exception: ' + err);
-  for (pid in processpool) {
-      console.log('[' + pid + '] terminating: global error');
+  for (i = 0; i < processpool.length; i++) {
+      console.log('[' + processpool[i] + '] terminating: global error');
       try {
-          process.kill(pid, 'SIGINT');
+          process.kill(processpool[i], 'SIGINT');
       } catch(e) {
-          console.error('[' + pid + '] error: ' + e['message']);
+          console.error('[' + processpool[i] + '] error: ' + e['message']);
       }
   }
   

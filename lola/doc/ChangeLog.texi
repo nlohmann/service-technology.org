@@ -1,3 +1,10 @@
+@heading Version 1.17-unreleased
+@itemize
+@item small bugfixes
+
+@item added script @file{utils/newlola.sh} to generate a LoLA binary given a @file{userconfig.H} file
+@end itemize
+
 @heading Version 1.16
 @itemize
 @item version submitted to the SUMo 2011 Model Checking Contest (@url{http://sumo.lip6.fr/Model_Checking_Contest.html})

@@ -227,7 +227,7 @@ void tsolve() {
     }
 
     for (i = 0; i < Globals::Places[0]->cnt; i++) {
-        e = new equation(Places[i]);
+        e = new equation(Globals::Places[i]);
         if (!e->sum) {
             delete e;
             continue;

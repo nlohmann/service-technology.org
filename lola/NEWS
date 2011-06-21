@@ -6,19 +6,13 @@
                      http://service-technology.org/lola
 
 
-Version 1.16
-============
+Version 1.17-unreleased
+=======================
 
-* version submitted to the SUMo 2011 Model Checking Contest
-  (`http://sumo.lip6.fr/Model_Checking_Contest.html')
+* small bugfixes
 
-* version presented at the full day tutorial "Verification with LoLA" at the
-  PETRI NETS / ACSD Joint Conferences 2011
-  (`http://www.informatik.uni-rostock.de/tpp/lola/tutorial/')
-
-* minor bug fixes
-
-* overworked manual
+* added script `utils/newlola.sh' to generate a LoLA binary given a
+  `userconfig.H' file
 
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for

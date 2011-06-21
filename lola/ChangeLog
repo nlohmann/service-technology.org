@@ -6,6 +6,14 @@
                      http://service-technology.org/lola
 
 
+Version 1.17-unreleased
+=======================
+
+* small bugfixes
+
+* added script `utils/newlola.sh' to generate a LoLA binary given a
+  `userconfig.H' file
+
 Version 1.16
 ============
 

@@ -710,18 +710,10 @@ int main(int argc, char** argv) {
 			}
 		}
 
-		int result = -1;
+		int result = 2;
 
-		if (checkActiveCausal || checkActiveConflict) {
-			if (activeCausal.size() + activeConflict.size() > 0) {result = 0;}
-			else {result = 2;}
-		}
-		else {
-			if (potentialCausal.size() + potentialConflict.size() > 0) {result = 1;}
-			else {result = 1;}
-		}
-
-		if (result < 0) {abort(21, "unknown result");}
+		if (potentialCausal.size() + potentialConflict.size() > 0) {result = 1;}
+		if ((checkActiveCausal || checkActiveConflict) && (activeCausal.size() + activeConflict.size() > 0)) {result = 0;}
 
 		if (args_info.resultFile_given) {
 		    std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : fileName + ".results";

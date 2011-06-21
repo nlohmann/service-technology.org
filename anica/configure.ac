@@ -16,7 +16,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 
 # use the service-technology.org macros
 AC_ST_BASIC
-AC_ST_LOLA([1.15])
+AC_ST_LOLA([1.16])
 AC_ST_AUTOTEST
 AC_ST_PNAPI([4.03])
 AC_ST_VERBOSE

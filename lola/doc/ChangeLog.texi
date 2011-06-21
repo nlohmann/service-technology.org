@@ -3,6 +3,8 @@
 @item small bugfixes
 
 @item added script @file{utils/newlola.sh} to generate a LoLA binary given a @file{userconfig.H} file
+
+@item fixed bug bug #17421 (@url{https://gna.org/bugs/?17421}): @acronym{CTL} model checking (@code{MODELCHECKING}) and the liveness check (@code{LIVEPROP}) yielded different results
 @end itemize
 
 @heading Version 1.16

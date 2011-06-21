@@ -73,6 +73,7 @@ m4_define([LOLA_DEADLOCK],        [cover.sh @abs_top_builddir@/src/lola-deadlock
 m4_define([LOLA_FULLLIMITED],     [cover.sh @abs_top_builddir@/src/lola-fulllimited])
 m4_define([LOLA_LIVEPROP],        [cover.sh @abs_top_builddir@/src/lola-liveprop])
 m4_define([LOLA_MODELCHECKING],   [cover.sh @abs_top_builddir@/src/lola-modelchecking])
+m4_define([LOLA_STATEPREDICATE],  [cover.sh @abs_top_builddir@/src/lola-statepredicate])
 m4_define([LOLA_STATEPREDICATE1], [cover.sh @abs_top_builddir@/src/lola-statepredicate1])
 m4_define([LOLA_STATESPACE],      [cover.sh @abs_top_builddir@/src/lola-statespace])
 

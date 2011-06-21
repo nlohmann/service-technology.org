@@ -332,3 +332,12 @@ AT_CHECK([LOLA_STATESPACE bug15282.lola -M],0,stdout,stderr)
 AT_CHECK([GREP -q "STATE 2 Lowlink: 2" stdout],0)
 AT_KEYWORDS(bugs)
 AT_CLEANUP
+
+AT_SETUP([Bug 17421 (https://gna.org/bugs/?17421)])
+AT_CHECK([cp TESTFILES/bug17421.lola TESTFILES/bug17421.ctlformula TESTFILES/bug17421.statepredicate .])
+AT_CHECK([LOLA_MODELCHECKING bug17421.lola -abug17421.ctlformula],1,stdout,stderr)
+AT_CHECK([GREP -q "result: false" stdout],0)
+AT_CHECK([LOLA_STATEPREDICATE bug17421.lola -abug17421.statepredicate],1,stdout,stderr)
+AT_CHECK([GREP -q "state not found" stderr],0)
+AT_KEYWORDS(bugs)
+AT_CLEANUP

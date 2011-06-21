@@ -22,6 +22,7 @@
 TESTFILES = bug15282.lola \
             bug12922.lola \
             bug13988.lola bug13988-1.task bug13988-2.task \
+            bug17421.lola bug17421.statepredicate bug17421.ctlformula \
             choreography.lola \
             choreography.tar.gz \
             data.lola \

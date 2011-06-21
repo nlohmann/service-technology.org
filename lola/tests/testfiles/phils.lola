@@ -6,16 +6,16 @@
 { * release left fork                                       }
 { * release right fork                                      }
 
-{ For scaling the number of philosopher,                          }
-{ - change the right hand number in line 17 (sort declaration) to }
-{   the desired number of philosophers                            }
+{ For scaling the number of philosopher,                                   }
+{ - change the right hand number in lines 17 and 18 (sort declarations) to }
+{   the desired number of philosophers                                     }
 
 {-----------------------------------------------------------------------------}
 {Section 1: Declare data types and operations }
 
 SORT 
 	phil = [ 1 , 10 ];   { range from 1 to #phil }
-	fork = phil ;
+	fork = [ 1 , 10 ];   { range from 1 to #phil }
 
 FUNCTION L ( x : phil ) : fork 
 { Given a philosopher, assign its left fork }
@@ -45,12 +45,38 @@ BEGIN
 	END
 END
 
+
+FUNCTION allbutone () : phil
+{ This function return every element of sort phil, except 1              }
+{ We do not need this function for the net itself, but we use it in some }
+{ high level verifiation tasks                                           }
+
+VAR x: phil;
+
+BEGIN
+	FOR ALL x DO 
+		IF x # 1 THEN 
+			RETURN x 
+		END 
+	END
+END
+
+FUNCTION first() : phil
+{ This function returns the first element of sort phil }
+{ We use this function to address a single philosopher in some verification tasks }
+
+BEGIN
+	RETURN 1
+END
+
 {------------------------------------------------------------------------------------}
 { Section 2: Specify actual net }
 
-PLACE th : phil,
+PLACE     
+
+SAFE  : th : phil,
 	  hl : phil,
-	  ea : phil,
+ea : phil,
 	  hr : phil,
 	  fo : fork;
 
@@ -59,26 +85,27 @@ MARKING th : all(),    { due to the meaning of all(), all instances of th are ma
 					   { parent terms (linear extension of term evaluation to }
 					   { multisets                                            }
 
-TRANSITION tl
+TRANSITION tl STRONG FAIR
 	VAR y : phil;
 	CONSUME th : y, 
 			fo : L(y);
 	PRODUCE hl : y ;
 	  
-TRANSITION tr
+TRANSITION tr STRONG FAIR
 	VAR y : phil;
 	CONSUME hl : y, 
 		    fo : R(y);
 	PRODUCE ea : y ;
 	  
-TRANSITION rl
+TRANSITION rl WEAK FAIR
 	VAR y : phil;
 	CONSUME ea : y;
 	PRODUCE hr : y, 
 		    fo : L(y);
 	  
-TRANSITION rr
+TRANSITION rr WEAK FAIR
 	VAR y : phil;
 	CONSUME hr : y;
 	PRODUCE th : y, 
 			fo : R(y);
+	  

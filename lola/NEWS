@@ -14,6 +14,10 @@ Version 1.17-unreleased
 * added script `utils/newlola.sh' to generate a LoLA binary given a
   `userconfig.H' file
 
+* fixed bug bug #17421 (`https://gna.org/bugs/?17421'): CTL model checking
+  (`MODELCHECKING') and the liveness check (`LIVEPROP') yielded different
+  results
+
 
 See file ChangeLog <http://service-technology.org/files/lola/ChangeLog> for
 complete version history.

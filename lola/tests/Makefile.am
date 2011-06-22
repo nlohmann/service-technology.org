@@ -35,7 +35,70 @@ TESTFILES = bug15282.lola \
             process.lola \
             process.task \
             umlprocess.lola \
-            unbounded.lola
+            unbounded.lola \
+            FMS10.pnml.lola \
+            fNOKFMSM01.task \
+            fNOKFMSM02.task \
+            fNOKFMSM03.task \
+            fNOKFMSM04.task \
+            fNOKFMSM05.task \
+            fNOKFMSM06.task \
+            fNOKFMSM07.task \
+            fNOKFMSM08.task \
+            fNOKFMSM09.task \
+            fNOKFMSM10.task \
+            fOKFMSM01.task \
+            fOKFMSM02.task \
+            fOKFMSM03.task \
+            fOKFMSM04.task \
+            fOKFMSM05.task \
+            fOKFMSM06.task \
+            fOKFMSM07.task \
+            fOKFMSM08.task \
+            fOKFMSM09.task \
+            fOKFMSM10.task \
+            MAPK8.pnml.lola \
+            fNOKMAPK01.task \
+            fNOKMAPK02.task \
+            fNOKMAPK03.task \
+            fNOKMAPK04.task \
+            fNOKMAPK05.task \
+            fNOKMAPK06.task \
+            fNOKMAPK07.task \
+            fNOKMAPK08.task \
+            fNOKMAPK09.task \
+            fNOKMAPK10.task \
+            fOKMAPK01.task \
+            fOKMAPK02.task \
+            fOKMAPK03.task \
+            fOKMAPK04.task \
+            fOKMAPK05.task \
+            fOKMAPK06.task \
+            fOKMAPK07.task \
+            fOKMAPK08.task \
+            fOKMAPK09.task \
+            fOKMAPK10.task \
+            Kanban5.pnml.lola \
+            fNOKKBNM01.task \
+            fNOKKBNM02.task \
+            fNOKKBNM03.task \
+            fNOKKBNM04.task \
+            fNOKKBNM05.task \
+            fNOKKBNM06.task \
+            fNOKKBNM07.task \
+            fNOKKBNM08.task \
+            fNOKKBNM09.task \
+            fNOKKBNM10.task \
+            fOKKBNM01.task \
+            fOKKBNM02.task \
+            fOKKBNM03.task \
+            fOKKBNM04.task \
+            fOKKBNM05.task \
+            fOKKBNM06.task \
+            fOKKBNM07.task \
+            fOKKBNM08.task \
+            fOKKBNM09.task \
+            fOKKBNM10.task
 
 
 #-----------------------------------------#

@@ -1,0 +1,2 @@
+FORMULA (((MEKP_Phase2 = 100)) AND ((MEKPP_Phase2 = 40)) AND ((Phase2 = 21)))
+{ REACHABILITY }

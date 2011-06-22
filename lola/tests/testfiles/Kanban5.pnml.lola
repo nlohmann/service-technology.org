@@ -1,0 +1,75 @@
+{ Petri net created by Petri Net API 4.03-unreleased Frontend (i386-apple-darwin10.7.0) reading Kanban5.pnml }
+
+PLACE
+  P1, P2, P3, P4, Pback1, Pback2, Pback3, Pback4, Pm1, Pm2, Pm3, Pm4, Pout1, Pout2, Pout3, Pout4;
+
+MARKING
+  P1:5, P2:5, P3:5, P4:5;
+
+
+TRANSITION tback1
+  CONSUME Pback1:1;
+  PRODUCE Pm1:1;
+
+TRANSITION tback2
+  CONSUME Pback2:1;
+  PRODUCE Pm2:1;
+
+TRANSITION tback3
+  CONSUME Pback3:1;
+  PRODUCE Pm3:1;
+
+TRANSITION tback4
+  CONSUME Pback4:1;
+  PRODUCE Pm4:1;
+
+TRANSITION tin4
+  CONSUME P4:1;
+  PRODUCE Pm4:1;
+
+TRANSITION tok1
+  CONSUME Pm1:1;
+  PRODUCE Pout1:1;
+
+TRANSITION tok2
+  CONSUME Pm2:1;
+  PRODUCE Pout2:1;
+
+TRANSITION tok3
+  CONSUME Pm3:1;
+  PRODUCE Pout3:1;
+
+TRANSITION tok4
+  CONSUME Pm4:1;
+  PRODUCE Pout4:1;
+
+TRANSITION tout1
+  CONSUME Pout1:1;
+  PRODUCE P1:1;
+
+TRANSITION tredo1
+  CONSUME Pm1:1;
+  PRODUCE Pback1:1;
+
+TRANSITION tredo2
+  CONSUME Pm2:1;
+  PRODUCE Pback2:1;
+
+TRANSITION tredo3
+  CONSUME Pm3:1;
+  PRODUCE Pback3:1;
+
+TRANSITION tredo4
+  CONSUME Pm4:1;
+  PRODUCE Pback4:1;
+
+TRANSITION tsynch1_23
+  CONSUME P1:1, Pout2:1, Pout3:1;
+  PRODUCE P2:1, P3:1, Pm1:1;
+
+TRANSITION tsynch4_23
+  CONSUME P2:1, P3:1, Pout4:1;
+  PRODUCE P4:1, Pm2:1, Pm3:1;
+
+
+{ END OF FILE }

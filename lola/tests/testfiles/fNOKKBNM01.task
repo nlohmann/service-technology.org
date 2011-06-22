@@ -1,0 +1,2 @@
+FORMULA (((Pout1 = 1000)) AND ((Pback1 = 1000)) AND ((Pm1 = 1000)) AND ((P1 = 1)))
+{ REACHABILITY }

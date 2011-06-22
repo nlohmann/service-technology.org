@@ -1,0 +1,2 @@
+FORMULA (((RasGTP = 40)) AND ((Raf_RasGTP = 41)))
+{ REACHABILITY }

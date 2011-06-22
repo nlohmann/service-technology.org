@@ -1,0 +1,2 @@
+FORMULA (((M3 = 1)) AND ((P12M3 = 1)))
+{ REACHABILITY }

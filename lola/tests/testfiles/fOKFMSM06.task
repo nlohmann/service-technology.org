@@ -1,0 +1,2 @@
+FORMULA (((M2 = 1)) AND ((P2M2 = 0)))
+{ REACHABILITY }

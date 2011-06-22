@@ -155,7 +155,7 @@ bool PathFinder::recurse() {
 				if (solutions.push_solved(new PartialSolution(newps))) // no more transitions to fire, so we have a solution
 					if (flag_forceprint) printSolution(&newps); // should we print it immediately?
 			} else {
-				if (tps.first()->compareSequence(fseq) && !tps.first()->getRemains().empty()) 
+				if (tps.first()->compareSequence(fseq,rec_tv) && !tps.first()->getRemains().empty()) 
 					failure.push_fail(new PartialSolution(newps)); // sequence was not extended
 				else if (!tps.findPast(&newps) && tps.find(&newps)>=0) // if it's not already in queue or past ...
 					tps.push_back(new PartialSolution(newps)); // put the job into the queue
@@ -175,7 +175,7 @@ bool PathFinder::recurse() {
 			if (verbose>1) {
 				if (passedon && !isSmaller(fulltvector,torealize)) cerr << "Beyond Passed on TVector:" << endl;
 				else if (terminate) cerr << "Full Solution found:" << endl; 
-				else if (tps.first()->compareSequence(fseq) && !tps.first()->getRemains().empty()) 
+				else if (tps.first()->compareSequence(fseq,rec_tv) && !tps.first()->getRemains().empty()) 
 					cerr << "Failure:" << endl;
 				else cerr << "Partial Solution:" << endl;
 				newps.show();

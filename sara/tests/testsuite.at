@@ -271,8 +271,8 @@ AT_KEYWORDS(options)
 AT_CLEANUP
 
 AT_SETUP([Witness Always])
-AT_CHECK([cp TESTFILES/test8_1.sara TESTFILES/test8_1.owfn .])
-AT_CHECK([SARA -i test8_1.sara -v -W],0,stdout,stderr)
+AT_CHECK([cp TESTFILES/test8_2.sara TESTFILES/test8_2.owfn .])
+AT_CHECK([SARA -i test8_2.sara -v -W],0,stdout,stderr)
 AT_CHECK([GREP -q "backtrack" stdout])
 AT_CHECK([GREP -q "1 Solution produced" stdout])
 AT_KEYWORDS(options)

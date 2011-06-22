@@ -1,4 +1,9 @@
 @c <<-- CHANGE START (version information) -->>
+@heading Version 1.08 (22 May 2011)
+@itemize
+@item bug fix: partial solutions dropped when new transition were added but never fired
+@end itemize
+
 @heading Version 1.07 (12 Apr 2011)
 @itemize
 @item added option -M to limit the solution length for finding minimal solutions

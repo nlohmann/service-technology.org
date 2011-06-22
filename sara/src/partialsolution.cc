@@ -569,9 +569,12 @@ void PartialSolution::popJC() { if (!jc.empty()) jc.erase(jc.begin()); }
 
 /** Compare the firing sequence in this partial solution with seq.
 	@param seq A firing sequence.
-	@return If the two sequences are permutations of each other.
+	@param rem A remainder of non-firable transitions.
+	@return If the two sequences are permutations of each other and no new
+		transitions appear in the remainder compared to the full transition
+		vector of this partial solution.
 */
-bool PartialSolution::compareSequence(vector<Transition*> seq) {
+bool PartialSolution::compareSequence(vector<Transition*> seq, map<Transition*,int> rem) {
 	if (seq.size()!=tseq.size()) return false;
 	map<Transition*,int> cnt;
 	for(unsigned int i=0; i<tseq.size(); ++i) {
@@ -580,7 +583,15 @@ bool PartialSolution::compareSequence(vector<Transition*> seq) {
 	}
 	map<Transition*,int>::iterator mit;
 	for(mit=cnt.begin(); mit!=cnt.end(); ++mit)
+	{
 		if (mit->second!=0) return false;
+	}
+	for(mit=rem.begin(); mit!=rem.end(); ++mit)
+	{
+		if (mit->second==0) continue;
+		if (fulltv.find(mit->first)==fulltv.end()) return false;
+		else if (fulltv.find(mit->first)->second==0) return false;
+	}
 	return true;
 }
 

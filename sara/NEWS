@@ -8,11 +8,10 @@
 
 
 PURPOSE
-Version 1.07 (12 Apr 2011)
+Version 1.08 (22 May 2011)
 ==========================
 
-* added option -M to limit the solution length for finding minimal solutions
-
-* last output changes for the model checking contest
+* bug fix: partial solutions dropped when new transition were added but
+  never fired
 
 \nSee file ChangeLog <http://service-technology.org/files/sara/ChangeLog> for\ncomplete version history.\n

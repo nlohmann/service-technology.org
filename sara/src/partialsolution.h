@@ -157,7 +157,7 @@ public:
 	void popJC();
 
 	/// Check if the given firing sequence is a permutation of the one in this partial solution
-	bool compareSequence(vector<Transition*> seq);
+	bool compareSequence(vector<Transition*> seq, map<Transition*,int> rem);
 
 	/// Alter all jump constraints into normal ones
 	void transformJumps(map<Transition*,int>& fullvector);

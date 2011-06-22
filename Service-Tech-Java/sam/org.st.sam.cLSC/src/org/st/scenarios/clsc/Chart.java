@@ -42,6 +42,15 @@ public class Chart {
 		events = new LinkedList<Event>();
 		dependencies = new LinkedList<Dependency>();
 	}
+	
+  /**
+   * Create a copy of chart c
+   * @param c
+   */  
+	public Chart(Chart c) {
+    events = new LinkedList<Event>(c.getEvents());
+    dependencies = new LinkedList<Dependency>(c.getDependencies());
+  }
 
 	/**
 	 * Add event <code>e</code> to the chart having direct predecessors
@@ -122,4 +131,37 @@ public class Chart {
 		}
 		return max;
 	}
+
+	/**
+	 * Append chart c to this chart 
+	 * @param c
+	 */
+	public void append(Chart c) {
+	  
+	  List<Event> oldMax = new LinkedList<Event>();
+	  for (Event e : getEvents()) {
+	    if (e.isMax()) oldMax.add(e);
+	  }
+	  
+	  this.events.addAll(c.getEvents());
+	  this.dependencies.addAll(c.getDependencies());
+
+	  // synchronize this chart with the appended chart by adding
+    // a dependency from each maximal event of this chart to each
+	  // minimal events of the appended chart
+	  for (Event e : oldMax) {
+	    for (Event f : c.getEvents()) {
+	      if (f.isMin()) {
+	        addDependency(e, f);
+	      }
+	    }
+	  }
+	}
+	
+	public static Chart concat(Chart c1, Chart c2) {
+	  Chart c1_prime = new Chart(c1);
+	  c1_prime.append(c2);
+	  return c1_prime;
+	}
+	
 }

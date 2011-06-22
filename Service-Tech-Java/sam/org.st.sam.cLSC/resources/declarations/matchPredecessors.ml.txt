@@ -1,14 +1,22 @@
 fun matchPredecessors ( pair::matched: EVENTPAIRLIST,
-               hist: TOKENHIST, histPre: TOKENHIST) =
+               hist: TOKENHIST, histPre: TOKENHIST,
+               allMatch: EVENTPAIRLIST) =
 (* --- recursively match predecessor events of matching events
          by backwards traversing the token histories simultaneously *)
 if #1 pair = nullEV then false
 else
-  let
-    val pred1 = getPredecessorEvents(#1 pair, #deps hist)
-    val pred2 = getPredecessorEvents(#2 pair, #deps histPre)
-    val matchedPred = matchEvents( pred1, pred2 )
-  in
-    matchPredecessors ( matched^^matchedPred, hist, histPre )
-  end
-| matchPredecessors ( nil, _, _) = true;
+  (* --- the matched pair has to be consistent with all previous
+           matches stored in 'allMatch' *)
+  if consistentMapping( pair, allMatch ) then
+    let
+    (* --- it is consistent: match predecessors *)
+      val pred1 = getPredecessorEvents(#1 pair, #deps hist)
+      val pred2 = getPredecessorEvents(#2 pair, #deps histPre)
+      val matchedPred = matchEvents( pred1, pred2 )
+    in
+      matchPredecessors ( matched^^matchedPred, hist, histPre,
+                                        allMatch^^matchedPred )
+    end
+  else
+    false
+| matchPredecessors ( nil, _, _,_ ) = true;

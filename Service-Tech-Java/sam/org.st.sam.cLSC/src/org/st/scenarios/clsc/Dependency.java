@@ -43,4 +43,9 @@ public class Dependency {
 	public Event getTarget() {
 		return target;
 	}
+	
+	@Override
+	public String toString() {
+	  return "("+source+" -> "+target+")";
+	}
 }

@@ -1,0 +1,1241 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="no"?>
+<workspaceElements>
+<generator format="6" tool="Access/CPN" version="1.0.0"/>
+<cpnet>
+<globbox>
+<color id="">
+<id>UNIT</id>
+<unit/>
+</color>
+<color id="">
+<id>INT</id>
+<int/>
+</color>
+<color id="">
+<id>BOOL</id>
+<bool/>
+</color>
+<color id="">
+<id>STRING</id>
+<string/>
+</color>
+<color id="">
+<id>STRINGLIST</id>
+<list>
+<id>STRING</id>
+</list>
+</color>
+<color id="">
+<id>ID</id>
+<product>
+<id>STRING</id>
+<id>INT</id>
+</product>
+</color>
+<ml id="">val nullEV = ("", 0);</ml>
+<color id="">
+<id>EVENTLIST</id>
+<list>
+<id>ID</id>
+</list>
+</color>
+<color id="">
+<id>HISTREL</id>
+<record>
+<recordfield>
+<id>event</id>
+<id>ID</id>
+</recordfield>
+<recordfield>
+<id>pred</id>
+<id>ID</id>
+</recordfield>
+</record>
+</color>
+<color id="">
+<id>EVENTDEP</id>
+<list>
+<id>HISTREL</id>
+</list>
+</color>
+<color id="">
+<id>TOKENHIST</id>
+<record>
+<recordfield>
+<id>max</id>
+<id>EVENTLIST</id>
+</recordfield>
+<recordfield>
+<id>deps</id>
+<id>EVENTDEP</id>
+</recordfield>
+</record>
+</color>
+<color id="">
+<id>TOKENHISTLIST</id>
+<list>
+<id>TOKENHIST</id>
+</list>
+</color>
+<color id="">
+<id>EVENTPAIR</id>
+<product>
+<id>ID</id>
+<id>ID</id>
+</product>
+</color>
+<color id="">
+<id>EVENTPAIRLIST</id>
+<list>
+<id>EVENTPAIR</id>
+</list>
+</color>
+<var id="">
+<type>
+<id>TOKENHIST</id>
+</type>
+<id>hPre</id>
+</var>
+<var id="">
+<type>
+<id>TOKENHIST</id>
+</type>
+<id>h0</id>
+</var>
+<var id="">
+<type>
+<id>TOKENHIST</id>
+</type>
+<id>h1</id>
+</var>
+<var id="">
+<type>
+<id>INT</id>
+</type>
+<id>j</id>
+</var>
+<ml id="">fun getEvent (eventName:STRING, ev::events:EVENTLIST) =&#13;
+  (* --- find the event event in the list that has the given name *)&#13;
+  if #1 ev = eventName then ev&#13;
+  else getEvent(eventName, events)&#13;
+| getEvent (_, nil) = nullEV;&#13;
+</ml>
+<ml id="">fun appendEvent (newEvent: ID,&#13;
+                             predName::predNames: STRINGLIST,&#13;
+                             hist: TOKENHIST) =&#13;
+(* --- append newEvent to hist: remove its predecessors&#13;
+         from max and add the event dependencies to hist *)&#13;
+let&#13;
+  val predEvent = getEvent(predName, #max hist)&#13;
+  val oldHist = #max hist&#13;
+  val redMax = rmall predEvent oldHist&#13;
+  val extHist =&#13;
+    {max=redMax,&#13;
+      deps={event=newEvent, pred=predEvent }::(#deps hist) }&#13;
+in&#13;
+  appendEvent(newEvent, predNames, extHist)&#13;
+end&#13;
+| appendEvent(newEvent: ID, nil, hist: TOKENHIST) =&#13;
+  { max = newEvent::(#max hist), deps =(#deps hist) };&#13;
+</ml>
+<ml id="">fun joinHistories (hist::hists: TOKENHISTLIST) =&#13;
+(* --- join a set of token histories: events are uniquely&#13;
+         identified by a counting number, so joining all&#13;
+         events and relations and removing duplicates yields&#13;
+         their union *)&#13;
+let&#13;
+  val joined = joinHistories(hists)&#13;
+in&#13;
+  { max=remdupl (union (#max hist) (#max joined)),&#13;
+     deps=remdupl (union (#deps hist) (#deps joined)) }&#13;
+end&#13;
+| joinHistories nil = {max=[], deps=[] };&#13;
+</ml>
+<ml id="">fun matchEvent(ev1::max2: EVENTLIST, ev2: ID) =&#13;
+(* --- find the event ev1 that has the same name as event ev2 *)&#13;
+  if #1 ev1 = #1 ev2 then (ev1,ev2)&#13;
+  else matchEvent(max2, ev2)&#13;
+| matchEvent(nil, ev2) = ( nullEV, ev2 );&#13;
+</ml>
+<ml id="">fun matchEvents(max1: EVENTLIST, ev2::max2: EVENTLIST) =&#13;
+(* --- find for each event ev2 the event ev1 that has the same name *)&#13;
+  matchEvent(max1, ev2) :: matchEvents(max1, max2)&#13;
+| matchEvents(_, nil) = nil;&#13;
+</ml>
+<ml id="">fun getPredecessorEvents( ev: ID, dep::deps: EVENTDEP) =&#13;
+(* --- return all direct predecessors of ev *)&#13;
+  if (#event dep = ev) andalso (#pred dep &lt;&gt; nullEV ) then&#13;
+    (#pred dep)::getPredecessorEvents(ev, deps)&#13;
+  else&#13;
+    getPredecessorEvents(ev, deps)&#13;
+| getPredecessorEvents( _, nil) = nil;&#13;
+</ml>
+<ml id="">fun consistentMapping( pair: EVENTPAIR, m::allMatch: EVENTPAIRLIST) =&#13;
+(* --- the matched pair is consistent with all previous matches iff&#13;
+         if the second component (i.e. of histPre) of the pair&#13;
+         has been matched before (i.e. is in allMatch), then&#13;
+         the first component (i.e. the run) of the pair agrees&#13;
+         on the previous match *)&#13;
+  if (#2 pair = #2 m) then&#13;
+    if (#1 pair = #1 m) then true&#13;
+    else false&#13;
+  else&#13;
+    consistentMapping( pair, allMatch)&#13;
+| consistentMapping( _, nil) = true;&#13;
+</ml>
+<ml id="">fun matchPredecessors ( pair::matched: EVENTPAIRLIST,&#13;
+               hist: TOKENHIST, histPre: TOKENHIST,&#13;
+               allMatch: EVENTPAIRLIST) =&#13;
+(* --- recursively match predecessor events of matching events&#13;
+         by backwards traversing the token histories simultaneously *)&#13;
+if #1 pair = nullEV then false&#13;
+else&#13;
+  (* --- the matched pair has to be consistent with all previous&#13;
+           matches stored in 'allMatch' *)&#13;
+  if consistentMapping( pair, allMatch ) then&#13;
+    let&#13;
+    (* --- it is consistent: match predecessors *)&#13;
+      val pred1 = getPredecessorEvents(#1 pair, #deps hist)&#13;
+      val pred2 = getPredecessorEvents(#2 pair, #deps histPre)&#13;
+      val matchedPred = matchEvents( pred1, pred2 )&#13;
+    in&#13;
+      matchPredecessors ( matched^^matchedPred, hist, histPre,&#13;
+                                        allMatch^^matchedPred )&#13;
+    end&#13;
+  else&#13;
+    false&#13;
+| matchPredecessors ( nil, _, _,_ ) = true;&#13;
+</ml>
+<ml id="">fun endsWith(hist: TOKENHIST, histPre: TOKENHIST) =&#13;
+(* --- hist ends with histPre if the maximal events of histPre&#13;
+         match the maximal events of hist, and if their&#13;
+         predecessor events match recursively *)&#13;
+let&#13;
+  val matched = matchEvents( #max hist, #max histPre)&#13;
+in&#13;
+  matchPredecessors( matched, hist, histPre, matched )&#13;
+end;&#13;
+</ml>
+</globbox>
+<page id="id0">
+<pageattr name="Spec"/>
+<trans id="id2">
+<box h="40.0" w="60.0"/>
+<posattr x="0" y="0"/>
+<text>scenario0</text>
+<subst portsock="(id16,id14)(id20,id14)" subpage="id1">
+<subpageinfo>
+<posattr x="0" y="-24"/>
+</subpageinfo>
+</subst>
+</trans>
+<place id="id14">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="0" y="-100"/>
+<text>a</text>
+<type id="id14a">
+<posattr x="36.0" y="-124.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id14b">
+<posattr x="36.0" y="-76.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</initmark>
+</place>
+<trans id="id24">
+<box h="40.0" w="60.0"/>
+<posattr x="0" y="-200"/>
+<text>scenario1</text>
+<subst portsock="(id30,id14)(id70,id68)" subpage="id23">
+<subpageinfo>
+<posattr x="0" y="-224"/>
+</subpageinfo>
+</subst>
+</trans>
+<place id="id68">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="0" y="-300"/>
+<text>d</text>
+<type id="id68a">
+<posattr x="36.0" y="-324.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id68b">
+<posattr x="36.0" y="-276.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</initmark>
+</place>
+<arc id="id15" order="1" orientation="TtoP">
+<transend idref="id2"/>
+<placeend idref="id14"/>
+<annot id="id15a">
+<posattr x="0.0" y="-50.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</annot>
+</arc>
+<arc id="id19" order="1" orientation="TtoP">
+<transend idref="id2"/>
+<placeend idref="id14"/>
+<annot id="id19a">
+<posattr x="0.0" y="-50.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</annot>
+</arc>
+<arc id="id25" order="1" orientation="PtoT">
+<transend idref="id24"/>
+<placeend idref="id14"/>
+<annot id="id25a">
+<posattr x="0.0" y="-150.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</annot>
+</arc>
+<arc id="id69" order="1" orientation="TtoP">
+<transend idref="id24"/>
+<placeend idref="id68"/>
+<annot id="id69a">
+<posattr x="0.0" y="-250.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</annot>
+</arc>
+</page>
+<page id="id1">
+<pageattr name="scenario0"/>
+<place id="id3">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="0" y="0"/>
+<text>init</text>
+<type id="id3a">
+<posattr x="36.0" y="-24.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id3b">
+<posattr x="36.0" y="24.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>1`{max=[nullEV],deps=[]}</text>
+</initmark>
+</place>
+<place id="id4">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="100" y="0"/>
+<text>init</text>
+<type id="id4a">
+<posattr x="136.0" y="-24.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id4b">
+<posattr x="136.0" y="24.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>1`{max=[nullEV],deps=[]}</text>
+</initmark>
+</place>
+<trans id="id5">
+<box h="40.0" w="60.0"/>
+<posattr x="0" y="-100"/>
+<text>a</text>
+<cond id="id5a">
+<posattr x="-36.0" y="-124.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</cond>
+<time id="id5b">
+<posattr x="36.0" y="-76.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</time>
+<code id="id5c">
+<posattr x="36.0" y="-100.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</code>
+</trans>
+<place id="id6">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="100" y="-100"/>
+<text/>
+<type id="id6a">
+<posattr x="136.0" y="-124.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>INT</text>
+</type>
+<initmark id="id6b">
+<posattr x="136.0" y="-76.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>1`0</text>
+</initmark>
+<fusioninfo name="a_counter">
+<posattr x="75" y="-116"/>
+</fusioninfo>
+</place>
+<trans id="id10">
+<box h="40.0" w="60.0"/>
+<posattr x="200" y="-100"/>
+<text>a</text>
+<cond id="id10a">
+<posattr x="164.0" y="-124.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</cond>
+<time id="id10b">
+<posattr x="236.0" y="-76.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</time>
+<code id="id10c">
+<posattr x="236.0" y="-100.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</code>
+</trans>
+<place id="id11">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="300" y="-100"/>
+<text/>
+<type id="id11a">
+<posattr x="336.0" y="-124.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>INT</text>
+</type>
+<initmark id="id11b">
+<posattr x="336.0" y="-76.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>1`0</text>
+</initmark>
+<fusioninfo name="a_counter">
+<posattr x="275" y="-116"/>
+</fusioninfo>
+</place>
+<place id="id16">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="0" y="-200"/>
+<text>a</text>
+<type id="id16a">
+<posattr x="36.0" y="-224.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id16b">
+<posattr x="36.0" y="-176.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</initmark>
+<port type="Out">
+<posattr x="0" y="-224"/>
+</port>
+</place>
+<place id="id20">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="100" y="-200"/>
+<text>a</text>
+<type id="id20a">
+<posattr x="136.0" y="-224.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id20b">
+<posattr x="136.0" y="-176.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</initmark>
+<port type="Out">
+<posattr x="100" y="-224"/>
+</port>
+</place>
+<arc id="id8" order="1" orientation="PtoT">
+<transend idref="id5"/>
+<placeend idref="id6"/>
+<annot id="id8a">
+<posattr x="50.0" y="-100.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>j</text>
+</annot>
+</arc>
+<arc id="id9" order="1" orientation="TtoP">
+<transend idref="id5"/>
+<placeend idref="id6"/>
+<annot id="id9a">
+<posattr x="50.0" y="-100.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>j+1</text>
+</annot>
+</arc>
+<arc id="id12" order="1" orientation="PtoT">
+<transend idref="id10"/>
+<placeend idref="id11"/>
+<annot id="id12a">
+<posattr x="250.0" y="-100.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>j</text>
+</annot>
+</arc>
+<arc id="id13" order="1" orientation="TtoP">
+<transend idref="id10"/>
+<placeend idref="id11"/>
+<annot id="id13a">
+<posattr x="250.0" y="-100.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>j+1</text>
+</annot>
+</arc>
+<arc id="id17" order="1" orientation="TtoP">
+<transend idref="id5"/>
+<placeend idref="id16"/>
+<annot id="id17a">
+<posattr x="0.0" y="-150.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>appendEvent(("a",j), [""], joinHistories( [h0] ) )</text>
+</annot>
+</arc>
+<arc id="id18" order="1" orientation="PtoT">
+<transend idref="id5"/>
+<placeend idref="id3"/>
+<annot id="id18a">
+<posattr x="0.0" y="-50.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>h0</text>
+</annot>
+</arc>
+<arc id="id21" order="1" orientation="TtoP">
+<transend idref="id10"/>
+<placeend idref="id20"/>
+<annot id="id21a">
+<posattr x="150.0" y="-150.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>appendEvent(("a",j), [""], joinHistories( [h0] ) )</text>
+</annot>
+</arc>
+<arc id="id22" order="1" orientation="PtoT">
+<transend idref="id10"/>
+<placeend idref="id4"/>
+<annot id="id22a">
+<posattr x="150.0" y="-50.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>h0</text>
+</annot>
+</arc>
+</page>
+<page id="id23">
+<pageattr name="scenario1"/>
+<trans id="id26">
+<box h="40.0" w="60.0"/>
+<posattr x="0" y="-100"/>
+<text>activate_scenario1</text>
+<cond id="id26a">
+<posattr x="-36.0" y="-124.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>[endsWith( joinHistories([h0]),hPre)]</text>
+</cond>
+<time id="id26b">
+<posattr x="36.0" y="-76.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</time>
+<code id="id26c">
+<posattr x="36.0" y="-100.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</code>
+</trans>
+<place id="id27">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="100" y="-100"/>
+<text>pre_scenario1</text>
+<type id="id27a">
+<posattr x="136.0" y="-124.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id27b">
+<posattr x="136.0" y="-76.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>1`{max=[("a", 0)], deps=[{event=("a", 0),pred=nullEV}]}</text>
+</initmark>
+</place>
+<place id="id30">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="0" y="0"/>
+<text>a</text>
+<type id="id30a">
+<posattr x="36.0" y="-24.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id30b">
+<posattr x="36.0" y="24.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</initmark>
+<port type="In">
+<posattr x="0" y="-24"/>
+</port>
+</place>
+<place id="id32">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="0" y="-200"/>
+<text/>
+<type id="id32a">
+<posattr x="36.0" y="-224.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id32b">
+<posattr x="36.0" y="-176.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</initmark>
+</place>
+<place id="id34">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="100" y="-200"/>
+<text/>
+<type id="id34a">
+<posattr x="136.0" y="-224.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id34b">
+<posattr x="136.0" y="-176.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</initmark>
+</place>
+<trans id="id36">
+<box h="40.0" w="60.0"/>
+<posattr x="0" y="-300"/>
+<text>b</text>
+<cond id="id36a">
+<posattr x="-36.0" y="-324.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>[endsWith( joinHistories([h0]),hPre)]</text>
+</cond>
+<time id="id36b">
+<posattr x="36.0" y="-276.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</time>
+<code id="id36c">
+<posattr x="36.0" y="-300.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</code>
+</trans>
+<place id="id37">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="100" y="-300"/>
+<text/>
+<type id="id37a">
+<posattr x="136.0" y="-324.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>INT</text>
+</type>
+<initmark id="id37b">
+<posattr x="136.0" y="-276.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>1`0</text>
+</initmark>
+<fusioninfo name="b_counter">
+<posattr x="75" y="-316"/>
+</fusioninfo>
+</place>
+<place id="id41">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="200" y="-300"/>
+<text/>
+<type id="id41a">
+<posattr x="236.0" y="-324.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id41b">
+<posattr x="236.0" y="-276.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>1`{max=[("a", 0)], deps=[{event=("a", 0),pred=nullEV}]}</text>
+</initmark>
+</place>
+<trans id="id44">
+<box h="40.0" w="60.0"/>
+<posattr x="300" y="-300"/>
+<text>c</text>
+<cond id="id44a">
+<posattr x="264.0" y="-324.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>[endsWith( joinHistories([h0]),hPre)]</text>
+</cond>
+<time id="id44b">
+<posattr x="336.0" y="-276.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</time>
+<code id="id44c">
+<posattr x="336.0" y="-300.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</code>
+</trans>
+<place id="id45">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="400" y="-300"/>
+<text/>
+<type id="id45a">
+<posattr x="436.0" y="-324.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>INT</text>
+</type>
+<initmark id="id45b">
+<posattr x="436.0" y="-276.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>1`0</text>
+</initmark>
+<fusioninfo name="c_counter">
+<posattr x="375" y="-316"/>
+</fusioninfo>
+</place>
+<place id="id49">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="500" y="-300"/>
+<text/>
+<type id="id49a">
+<posattr x="536.0" y="-324.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id49b">
+<posattr x="536.0" y="-276.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>1`{max=[("a", 0)], deps=[{event=("a", 0),pred=nullEV}]}</text>
+</initmark>
+</place>
+<trans id="id52">
+<box h="40.0" w="60.0"/>
+<posattr x="0" y="-500"/>
+<text>d</text>
+<cond id="id52a">
+<posattr x="-36.0" y="-524.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>[endsWith( joinHistories([h0, h1]),hPre)]</text>
+</cond>
+<time id="id52b">
+<posattr x="36.0" y="-476.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</time>
+<code id="id52c">
+<posattr x="36.0" y="-500.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</code>
+</trans>
+<place id="id53">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="100" y="-500"/>
+<text/>
+<type id="id53a">
+<posattr x="136.0" y="-524.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>INT</text>
+</type>
+<initmark id="id53b">
+<posattr x="136.0" y="-476.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>1`0</text>
+</initmark>
+<fusioninfo name="d_counter">
+<posattr x="75" y="-516"/>
+</fusioninfo>
+</place>
+<place id="id57">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="200" y="-500"/>
+<text/>
+<type id="id57a">
+<posattr x="236.0" y="-524.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id57b">
+<posattr x="236.0" y="-476.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>1`{max=[("b", 0), ("c", 1)], deps=[{event=("a", 2),pred=nullEV}, {event=("b", 0),pred=("a", 2)}, {event=("c", 1),pred=("a", 2)}]}</text>
+</initmark>
+</place>
+<place id="id62">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="0" y="-400"/>
+<text/>
+<type id="id62a">
+<posattr x="36.0" y="-424.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id62b">
+<posattr x="36.0" y="-376.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</initmark>
+</place>
+<place id="id65">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="100" y="-400"/>
+<text/>
+<type id="id65a">
+<posattr x="136.0" y="-424.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id65b">
+<posattr x="136.0" y="-376.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</initmark>
+</place>
+<place id="id70">
+<ellipse h="40.0" w="60.0"/>
+<posattr x="0" y="-600"/>
+<text>d</text>
+<type id="id70a">
+<posattr x="36.0" y="-624.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>TOKENHIST</text>
+</type>
+<initmark id="id70b">
+<posattr x="36.0" y="-576.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text/>
+</initmark>
+<port type="Out">
+<posattr x="0" y="-624"/>
+</port>
+</place>
+<arc id="id28" order="1" orientation="PtoT">
+<transend idref="id26"/>
+<placeend idref="id27"/>
+<annot id="id28a">
+<posattr x="50.0" y="-100.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>hPre</text>
+</annot>
+</arc>
+<arc id="id29" order="1" orientation="TtoP">
+<transend idref="id26"/>
+<placeend idref="id27"/>
+<annot id="id29a">
+<posattr x="50.0" y="-100.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>hPre</text>
+</annot>
+</arc>
+<arc id="id31" order="1" orientation="PtoT">
+<transend idref="id26"/>
+<placeend idref="id30"/>
+<annot id="id31a">
+<posattr x="0.0" y="-50.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>h0</text>
+</annot>
+</arc>
+<arc id="id33" order="1" orientation="TtoP">
+<transend idref="id26"/>
+<placeend idref="id32"/>
+<annot id="id33a">
+<posattr x="0.0" y="-150.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>h0</text>
+</annot>
+</arc>
+<arc id="id35" order="1" orientation="TtoP">
+<transend idref="id26"/>
+<placeend idref="id34"/>
+<annot id="id35a">
+<posattr x="50.0" y="-150.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>h0</text>
+</annot>
+</arc>
+<arc id="id39" order="1" orientation="PtoT">
+<transend idref="id36"/>
+<placeend idref="id37"/>
+<annot id="id39a">
+<posattr x="50.0" y="-300.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>j</text>
+</annot>
+</arc>
+<arc id="id40" order="1" orientation="TtoP">
+<transend idref="id36"/>
+<placeend idref="id37"/>
+<annot id="id40a">
+<posattr x="50.0" y="-300.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>j+1</text>
+</annot>
+</arc>
+<arc id="id42" order="1" orientation="PtoT">
+<transend idref="id36"/>
+<placeend idref="id41"/>
+<annot id="id42a">
+<posattr x="100.0" y="-300.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>hPre</text>
+</annot>
+</arc>
+<arc id="id43" order="1" orientation="TtoP">
+<transend idref="id36"/>
+<placeend idref="id41"/>
+<annot id="id43a">
+<posattr x="100.0" y="-300.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>hPre</text>
+</annot>
+</arc>
+<arc id="id47" order="1" orientation="PtoT">
+<transend idref="id44"/>
+<placeend idref="id45"/>
+<annot id="id47a">
+<posattr x="350.0" y="-300.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>j</text>
+</annot>
+</arc>
+<arc id="id48" order="1" orientation="TtoP">
+<transend idref="id44"/>
+<placeend idref="id45"/>
+<annot id="id48a">
+<posattr x="350.0" y="-300.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>j+1</text>
+</annot>
+</arc>
+<arc id="id50" order="1" orientation="PtoT">
+<transend idref="id44"/>
+<placeend idref="id49"/>
+<annot id="id50a">
+<posattr x="400.0" y="-300.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>hPre</text>
+</annot>
+</arc>
+<arc id="id51" order="1" orientation="TtoP">
+<transend idref="id44"/>
+<placeend idref="id49"/>
+<annot id="id51a">
+<posattr x="400.0" y="-300.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>hPre</text>
+</annot>
+</arc>
+<arc id="id55" order="1" orientation="PtoT">
+<transend idref="id52"/>
+<placeend idref="id53"/>
+<annot id="id55a">
+<posattr x="50.0" y="-500.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>j</text>
+</annot>
+</arc>
+<arc id="id56" order="1" orientation="TtoP">
+<transend idref="id52"/>
+<placeend idref="id53"/>
+<annot id="id56a">
+<posattr x="50.0" y="-500.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>j+1</text>
+</annot>
+</arc>
+<arc id="id58" order="1" orientation="PtoT">
+<transend idref="id52"/>
+<placeend idref="id57"/>
+<annot id="id58a">
+<posattr x="100.0" y="-500.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>hPre</text>
+</annot>
+</arc>
+<arc id="id59" order="1" orientation="TtoP">
+<transend idref="id52"/>
+<placeend idref="id57"/>
+<annot id="id59a">
+<posattr x="100.0" y="-500.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>hPre</text>
+</annot>
+</arc>
+<arc id="id60" order="1" orientation="PtoT">
+<transend idref="id36"/>
+<placeend idref="id32"/>
+<annot id="id60a">
+<posattr x="0.0" y="-250.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>h0</text>
+</annot>
+</arc>
+<arc id="id61" order="1" orientation="PtoT">
+<transend idref="id44"/>
+<placeend idref="id34"/>
+<annot id="id61a">
+<posattr x="200.0" y="-250.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>h0</text>
+</annot>
+</arc>
+<arc id="id63" order="1" orientation="PtoT">
+<transend idref="id52"/>
+<placeend idref="id62"/>
+<annot id="id63a">
+<posattr x="0.0" y="-450.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>h0</text>
+</annot>
+</arc>
+<arc id="id64" order="1" orientation="TtoP">
+<transend idref="id36"/>
+<placeend idref="id62"/>
+<annot id="id64a">
+<posattr x="0.0" y="-350.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>appendEvent(("b",j), ["a"], joinHistories( [h0] ) )</text>
+</annot>
+</arc>
+<arc id="id66" order="1" orientation="PtoT">
+<transend idref="id52"/>
+<placeend idref="id65"/>
+<annot id="id66a">
+<posattr x="50.0" y="-450.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>h1</text>
+</annot>
+</arc>
+<arc id="id67" order="1" orientation="TtoP">
+<transend idref="id44"/>
+<placeend idref="id65"/>
+<annot id="id67a">
+<posattr x="200.0" y="-350.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>appendEvent(("c",j), ["a"], joinHistories( [h0] ) )</text>
+</annot>
+</arc>
+<arc id="id71" order="1" orientation="TtoP">
+<transend idref="id52"/>
+<placeend idref="id70"/>
+<annot id="id71a">
+<posattr x="0.0" y="-550.0"/>
+<fillattr colour="White" filled="false" pattern="Solid"/>
+<lineattr colour="Black" thick="0" type="Solid"/>
+<textattr bold="false" colour="Black"/>
+<text>appendEvent(("d",j), ["b", "c"], joinHistories( [h0, h1] ) )</text>
+</annot>
+</arc>
+</page>
+<fusion id="id7" name="a_counter">
+<fusion_elm idref="id6"/>
+<fusion_elm idref="id11"/>
+</fusion>
+<fusion id="id38" name="b_counter">
+<fusion_elm idref="id37"/>
+</fusion>
+<fusion id="id46" name="c_counter">
+<fusion_elm idref="id45"/>
+</fusion>
+<fusion id="id54" name="d_counter">
+<fusion_elm idref="id53"/>
+</fusion>
+</cpnet>
+</workspaceElements>

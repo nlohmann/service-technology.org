@@ -5,5 +5,5 @@ fun endsWith(hist: TOKENHIST, histPre: TOKENHIST) =
 let
   val matched = matchEvents( #max hist, #max histPre)
 in
-  matchPredecessors( matched, hist, histPre )
+  matchPredecessors( matched, hist, histPre, matched )
 end;

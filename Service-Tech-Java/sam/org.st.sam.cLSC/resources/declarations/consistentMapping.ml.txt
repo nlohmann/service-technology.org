@@ -1,0 +1,12 @@
+fun consistentMapping( pair: EVENTPAIR, m::allMatch: EVENTPAIRLIST) =
+(* --- the matched pair is consistent with all previous matches iff
+         if the second component (i.e. of histPre) of the pair
+         has been matched before (i.e. is in allMatch), then
+         the first component (i.e. the run) of the pair agrees
+         on the previous match *)
+  if (#2 pair = #2 m) then
+    if (#1 pair = #1 m) then true
+    else false
+  else
+    consistentMapping( pair, allMatch)
+| consistentMapping( _, nil) = true;

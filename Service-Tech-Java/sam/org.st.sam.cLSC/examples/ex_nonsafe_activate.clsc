@@ -1,0 +1,17 @@
+cLSC scenario0
+MAIN
+  EVENT ems0_e0 a;
+  EVENT ems0_e1 a;
+  DEPENDENCIES ;
+  
+cLSC scenario1
+PRE
+  EVENT ems1_e0 a;
+  DEPENDENCIES ;
+MAIN
+  EVENT ems1_e1 b;
+  EVENT ems1_e2 c;
+  EVENT ems1_e3 d;
+  DEPENDENCIES
+  	ems1_e1 -> ems1_e3,
+  	ems1_e2 -> ems1_e3;

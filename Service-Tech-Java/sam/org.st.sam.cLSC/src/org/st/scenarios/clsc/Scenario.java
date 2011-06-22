@@ -19,6 +19,11 @@
 
 package org.st.scenarios.clsc;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * A scenario consists of two {@link Chart}s, a pre-chart (describing the
  * pre-condition of the scenario) and a main-chart (describing the contribution
@@ -90,5 +95,61 @@ public class Scenario {
 		b.append("}\n");
 		
 		return b.toString();
+	}
+	
+	public Chart getLocalHistory(Event e) {
+	  // events and dependencies of the local history of e (without e)
+    List<Event> events = new LinkedList<Event>();
+    List<Dependency> dependencies = new LinkedList<Dependency>();
+
+    // get all transitive predecessors of e
+    LinkedList<Event> queue = new LinkedList<Event>();
+    for (Dependency d : e.in) {
+      queue.add(d.getSource());
+      events.add(d.getSource());
+    }
+    
+    while (!queue.isEmpty()) {
+      Event e2 = queue.removeFirst();
+      
+      for (Dependency d : e2.in) {
+        dependencies.add(d);
+        if (!events.contains(d.getSource())) {
+          events.add(d.getSource());
+          queue.add(d.getSource());
+        }
+      }
+    }
+    
+    if (preChart != null && mainChart.getEvents().contains(e)) {
+      // and the complete prechart of the scenario
+      events.addAll(preChart.getEvents());
+      dependencies.addAll(preChart.getDependencies());
+      
+      // together the synchronizing dependencies between pre and main
+      for (Event f : preChart.getEvents()) {
+        if (f.isMax()) {
+          for (Event g : mainChart.getEvents()) {
+            if (g.isMin() && events.contains(g)) {
+              dependencies.add(new Dependency(f, g));
+            }
+          }
+        }
+      }
+    }
+    
+    // now create a new chart c that is isomorphic to the
+    // collected events and dependencies 
+    Map<Event, Event> e2e = new HashMap<Event, Event>();
+
+    Chart c = new Chart();
+    for (Event f : events) {
+      e2e.put(f, c.addEvent(f.name));
+    }
+    for (Dependency d : dependencies) {
+      c.addDependency(e2e.get(d.getSource()), e2e.get(d.getTarget()));
+    }
+    
+    return c;
 	}
 }

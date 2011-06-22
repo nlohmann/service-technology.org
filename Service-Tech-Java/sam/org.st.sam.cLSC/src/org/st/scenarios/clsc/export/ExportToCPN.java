@@ -137,9 +137,34 @@ public class ExportToCPN {
 			e2t.put(e, t);
 
 			// and add a place to count occurrences of t
-			Place p = toCPN.addPlace(pg, "", "INT", "1`0");
+			RefPlace p = toCPN.addFusionPlace(pg, "", "INT", "1`0", e.name+"_counter");
 			toCPN.addArc(pg, p, t, "j");
 			toCPN.addArc(pg, t, p, "j+1");
+			
+			Chart cHist = s.getLocalHistory(e);
+			
+			if (cHist.getEvents().size() > 0) {
+  			Place pHist = toCPN.addPlace(pg, "", "TOKENHIST",
+  			                "1`"+translateChartToTokenHistoryString(cHist));
+        toCPN.addArc(pg, pHist, t, "hPre");
+        toCPN.addArc(pg, t, pHist, "hPre");
+        
+        // get the number of direct predecessors of e and build a list
+        // of history variable names, one for each predecessor
+        String t_activate_incoming_hist = "";
+        int hist_var_count = 0;
+        for (Event f : cHist.getEvents()) {
+          if (!f.isMax()) continue;
+          
+          if (hist_var_count > 0) t_activate_incoming_hist += ", ";
+          t_activate_incoming_hist += "h"+hist_var_count;
+          hist_var_count++;
+        }
+  
+        // set the guard for activating the scenario
+        String t_activate_guard = "[endsWith( joinHistories(["+t_activate_incoming_hist+"]),hPre)]";
+        t.getCondition().setText(t_activate_guard);
+			}
 		}
 
 		// create the places surrounding the transitions of the main-chart events 
@@ -469,8 +494,7 @@ public class ExportToCPN {
 		// colset STRINGLIST = list STRING;
 		toCPN.declareColorSet_list(net, "STRINGLIST", "STRING");
 		// colset ID = product STRING * INT;
-		toCPN.declareColorSet_product(net, "ID", new String[] {
-				"STRING", "INT" });
+		toCPN.declareColorSet_product(net, "ID", new String[] { "STRING", "INT" });
 		// val nullEV = ("", 0); (* --- the nill event used to terminate token
 		// histories --- *)
 		toCPN.declareMLFunction(net, "val "+getNullEventString()+" = "+getEventString("", 0)+";");
@@ -478,19 +502,16 @@ public class ExportToCPN {
 		// colset EVENTLIST = list ID;
 		toCPN.declareColorSet_list(net, "EVENTLIST", "ID");
 		// colset HISTREL = record event:ID * pred:ID;
-		toCPN.declareColorSet_record(net, "HISTREL", new String[] {
-				"event", "ID", "pred", "ID" });
+		toCPN.declareColorSet_record(net, "HISTREL", new String[] { "event", "ID", "pred", "ID" });
 		// colset EVENTDEP = list HISTREL
 		toCPN.declareColorSet_list(net, "EVENTDEP", "HISTREL");
 		// colset TOKENHIST = record max:EVENTLIST * deps:EVENTDEP;
-		toCPN.declareColorSet_record(net, "TOKENHIST", new String[] {
-				"max", "EVENTLIST", "deps", "EVENTDEP" });
+		toCPN.declareColorSet_record(net, "TOKENHIST", new String[] {	"max", "EVENTLIST", "deps", "EVENTDEP" });
 		// colset TOKENHISTLIST = list TOKENHIST;
 		toCPN.declareColorSet_list(net, "TOKENHISTLIST", "TOKENHIST");
 
 		// colset EVENTPAIR = product ID * ID;
-		toCPN.declareColorSet_product(net, "EVENTPAIR", new String[] {
-				"ID", "ID" });
+		toCPN.declareColorSet_product(net, "EVENTPAIR", new String[] { "ID", "ID" });
 		// colset EVENTPAIRLIST = list EVENTPAIR;
 		toCPN.declareColorSet_list(net, "EVENTPAIRLIST", "EVENTPAIR");
 	}
@@ -529,19 +550,19 @@ public class ExportToCPN {
 					readFromFile(DIR_ML_DECLARATIONS + "/getEvent.ml.txt"));
 			toCPN.declareMLFunction(net,
 					readFromFile(DIR_ML_DECLARATIONS + "/appendEvent.ml.txt"));
-			toCPN.declareMLFunction(net, readFromFile(DIR_ML_DECLARATIONS
-							+ "/joinHistories.ml.txt"));
+			toCPN.declareMLFunction(net,
+			    readFromFile(DIR_ML_DECLARATIONS + "/joinHistories.ml.txt"));
 
 			toCPN.declareMLFunction(net,
 					readFromFile(DIR_ML_DECLARATIONS + "/matchEvent.ml.txt"));
 			toCPN.declareMLFunction(net,
 					readFromFile(DIR_ML_DECLARATIONS + "/matchEvents.ml.txt"));
 			toCPN.declareMLFunction(net,
-					readFromFile(DIR_ML_DECLARATIONS
-							+ "/getPredecessorEvents.ml.txt"));
+					readFromFile(DIR_ML_DECLARATIONS + "/getPredecessorEvents.ml.txt"));
+      toCPN.declareMLFunction(net,
+          readFromFile(DIR_ML_DECLARATIONS + "/consistentMapping.ml.txt"));
 			toCPN.declareMLFunction(net,
-					readFromFile(DIR_ML_DECLARATIONS
-							+ "/matchPredecessors.ml.txt"));
+					readFromFile(DIR_ML_DECLARATIONS + "/matchPredecessors.ml.txt"));
 			toCPN.declareMLFunction(net,
 					readFromFile(DIR_ML_DECLARATIONS + "/endsWith.ml.txt"));
 

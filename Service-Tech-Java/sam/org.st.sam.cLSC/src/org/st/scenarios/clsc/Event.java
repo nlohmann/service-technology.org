@@ -56,4 +56,9 @@ public class Event {
 	public boolean isMin() {
 		return this.in.isEmpty();
 	}
+	
+	@Override
+	public String toString() {
+	  return name;
+	}
 }

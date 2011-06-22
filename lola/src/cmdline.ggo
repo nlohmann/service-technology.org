@@ -125,6 +125,15 @@ option "verbose" v
   flag off
 
 
+#section "Other Options"
+#
+#option "capacity" C
+#  "Set the default number of tokens per place. Can be overridden by specifying #'SAFE' statements in the net input file.\n"
+#  int
+#  typestr="NUMBER"
+#  optional
+
+
 text "
 Return Values:
   The return values of the executable of LoLA has the following meaning: 

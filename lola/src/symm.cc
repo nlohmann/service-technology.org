@@ -1494,12 +1494,12 @@ void BuildProducts(unsigned int orbit, bool* inconsistent) {
 #else
 void BuildProducts(unsigned int orbit) {
     unsigned int StorePos(CurrentStore);
-    unsigned int val, composed, k;
+    unsigned int composed, k;
 
     if (Store[StorePos].image[orbit].vector) {
         compose = Store[StorePos].image[orbit].vector;
         while (1) {
-            val = compose[Store[StorePos].image[orbit].value->nr - Store[StorePos].argnr];
+            unsigned int val = compose[Store[StorePos].image[orbit].value->nr - Store[StorePos].argnr];
             if (val == Store[StorePos].argnr) {
                 break;
             }
@@ -2337,9 +2337,7 @@ State* canonical_representitive_on_the_fly() {
 }
 
 void PrintStore() {
-    int etage, raum;
-
-    for (etage = 0; etage < CardStore; etage++) {
+    for (int etage = 0; etage < CardStore; ++etage) {
         cout << "Etage " << etage << "; arg=" << Store[etage].arg->name << " card=" << Store[etage].card << endl;
     }
 }

@@ -420,7 +420,7 @@ RestoreInUniqueRecurBdd (
 
   nodelist = subtable->nodelist;
 
-  pos = ddHash (cuddT (f), cuddE (f), subtable->shift);
+  pos = (unsigned int) ddHash (cuddT (f), cuddE (f), subtable->shift);
 
 #ifdef DDDMP_DEBUG
   /* verify uniqueness to avoid duplicate nodes in unique table */

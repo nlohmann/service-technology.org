@@ -103,7 +103,7 @@ AC_CHECK_HEADERS([include/cwctype])
 AC_CHECK_FUNC([iswblank])
 
 # Checks for JNI integration
-AC_CHECK_HEADERS([jni.h])
+#AC_CHECK_HEADERS([jni.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -141,6 +141,7 @@ AC_CONFIG_FILES([Makefile
                  utils/pccts/support/genmk/Makefile
                  maintainer/Makefile
                  ])
+AC_CONFIG_FILES([libs/cudd/testobj.sh], [chmod +x libs/cudd/testobj.sh])
 AC_OUTPUT
 
 

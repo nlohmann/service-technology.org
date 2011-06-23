@@ -98,7 +98,8 @@ TESTFILES = bug15282.lola \
             fOKKBNM07.task \
             fOKKBNM08.task \
             fOKKBNM09.task \
-            fOKKBNM10.task
+            fOKKBNM10.task \
+            prodstorecons3.net prodstorecons3.task
 
 
 #-----------------------------------------#

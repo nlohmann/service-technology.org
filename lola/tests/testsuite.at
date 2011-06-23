@@ -342,6 +342,16 @@ AT_CHECK([GREP -q "state not found" stderr],0)
 AT_KEYWORDS(bugs)
 AT_CLEANUP
 
+AT_SETUP([Bug of L. Cabac at the PETRI NETS 2011])
+AT_CHECK([cp TESTFILES/prodstorecons3.net TESTFILES/prodstorecons3.task .])
+AT_CHECK([LOLA_BOUNDEDNET prodstorecons3.net],1,stdout,stderr)
+AT_CHECK([GREP -q "lola: net is bounded!" stderr],0)
+AT_CHECK([LOLA_BOUNDEDPLACE prodstorecons3.net -a],1,stdout,stderr)
+AT_CHECK([GREP -q "lola: place store is bounded!" stderr],0)
+AT_KEYWORDS(bugs)
+AT_CLEANUP
+
+
 
 ############################################################################
 AT_BANNER([Model Checking Contest 2011])
@@ -386,9 +396,9 @@ AT_CHECK([LOLA_STATEPREDICATE MAPK8.pnml.lola -afOKMAPK04.task],0,stdout,stderr)
 AT_CHECK([LOLA_STATEPREDICATE MAPK8.pnml.lola -afOKMAPK05.task],0,stdout,stderr)
 AT_CHECK([LOLA_STATEPREDICATE MAPK8.pnml.lola -afOKMAPK06.task],0,stdout,stderr)
 AT_CHECK([LOLA_STATEPREDICATE MAPK8.pnml.lola -afOKMAPK07.task],0,stdout,stderr)
-#AT_CHECK([LOLA_STATEPREDICATE MAPK8.pnml.lola -afOKMAPK08.task],0,stdout,stderr)
-#AT_CHECK([LOLA_STATEPREDICATE MAPK8.pnml.lola -afOKMAPK09.task],0,stdout,stderr)
-#AT_CHECK([LOLA_STATEPREDICATE MAPK8.pnml.lola -afOKMAPK10.task],0,stdout,stderr)
+#AT_CHECK([LOLA_STATEPREDICATE MAPK8.pnml.lola -afOKMAPK08.task],0,stdout,stderr) # formula is unsatisfiable
+#AT_CHECK([LOLA_STATEPREDICATE MAPK8.pnml.lola -afOKMAPK09.task],0,stdout,stderr) # formula is unsatisfiable
+#AT_CHECK([LOLA_STATEPREDICATE MAPK8.pnml.lola -afOKMAPK10.task],0,stdout,stderr) # formula is unsatisfiable
 AT_KEYWORDS(contest)
 AT_CLEANUP
 

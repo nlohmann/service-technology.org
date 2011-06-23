@@ -1,0 +1,61 @@
+PLACE
+  p3,
+  p8,
+  p17,
+  p18,
+  store,
+  capacity,
+  p43,
+  p47;
+
+MARKING
+  capacity: 2,
+  p43: 1,
+  p47: 1;
+
+TRANSITION produce
+CONSUME
+  p8: 1;
+
+PRODUCE
+  p3: 1;
+
+TRANSITION put
+CONSUME
+  p3: 1,
+  capacity: 1;
+
+PRODUCE
+  store: 1,
+  p8: 1;
+
+TRANSITION get
+CONSUME
+  p18: 1,
+  store: 1;
+
+PRODUCE
+  p17: 1,
+  capacity: 1;
+
+TRANSITION consume
+CONSUME
+  p17: 1;
+
+PRODUCE
+  p18: 1;
+
+TRANSITION initP
+CONSUME
+  p43: 1;
+
+PRODUCE
+  p8: 1;
+
+TRANSITION initC
+CONSUME
+  p47: 1;
+
+PRODUCE
+  p18: 1;
+

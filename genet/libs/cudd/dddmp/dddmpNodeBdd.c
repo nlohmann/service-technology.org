@@ -343,7 +343,7 @@ RemoveFromUniqueRecurBdd (
 
     nodelist = subtable->nodelist;
 
-    pos = ddHash (cuddT (f), cuddE (f), subtable->shift);
+    pos = ddHash ((unsigned int) cuddT (f),(unsigned int) cuddE (f), subtable->shift);
     node = nodelist[pos];
     last = NULL;
     while (node != sentinel) {
@@ -420,7 +420,8 @@ RestoreInUniqueRecurBdd (
 
   nodelist = subtable->nodelist;
 
-  pos = (unsigned int) ddHash (cuddT (f), cuddE (f), subtable->shift);
+  // \TODO: check definition of ddHash (include/CuddInt.h) for type sizes
+  pos = ddHash ((unsigned int) cuddT (f),(unsigned int) cuddE (f), subtable->shift);
 
 #ifdef DDDMP_DEBUG
   /* verify uniqueness to avoid duplicate nodes in unique table */

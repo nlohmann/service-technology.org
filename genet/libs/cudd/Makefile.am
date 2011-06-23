@@ -117,8 +117,8 @@ CC = $(CXX)
 TESTS = testobj.sh
 check_PROGRAMS = testobj
 testobj_SOURCES = obj/testobj.cc include/cudd.h test-helper.cc
-testobj_LDADD = libobj.a libdddmp.a libcudd.a libmtr.a \
-	libst.a libepd.a libutil.a
+testobj_LDADD = libobj.la libdddmp.la libcudd.la libmtr.la \
+	libst.la libepd.la libutil.la
 
 EXTRA_DIST += testobj.sh
 

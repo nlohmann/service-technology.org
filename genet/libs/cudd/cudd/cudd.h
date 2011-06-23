@@ -408,7 +408,7 @@ typedef int (*DD_QSFP)(const void *, const void *);
   SeeAlso      [Cudd_Regular Cudd_IsComplement]
 
 ******************************************************************************/
-#define Cudd_Complement(node) ((DdNode *)((unsigned intptr_t)(node) | 01))
+#define Cudd_Complement(node) ((DdNode *)((uintptr_t)(node) | 01))
 
 
 /**Macro***********************************************************************

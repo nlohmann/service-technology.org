@@ -1,0 +1,140 @@
+#SUBDIRS = parser
+
+# everything for the parser
+DLG = $(abs_builddir)/../utils/pccts/dlg/dlg
+DLG_FILE = parser.dlg
+DLG_FLAGS = -C2 -i -CC
+
+ANTLR = $(abs_builddir)/../utils/pccts/antlr/antlr
+ANTLR_H = $(abs_srcdir)/../utils/pccts/h
+ANTLR_FLAGS = -CC -mrhoist off
+
+TOKENS = parser/tokens.h
+# grammar file
+GRM = ts.g
+# lexer file
+#SCAN = DLGLexer
+
+# files created by antlr
+ANTLR_CPP = parser/ts.cpp parser/TSParser.cpp
+ANTLR_DIST = parser/TSParser.h parser/$(DLG_FILE) $(TOKENS)
+ANTLR_SPAWN = $(ANTLR_CPP) $(ANTLR_DIST)
+	      
+
+#files created by dlg
+DLG_CPP = parser/DLGLexer.cpp
+DLG_DIST = parser/DLGLexer.h
+DLG_SPAWN = $(DLG_CPP) $(DLG_DIST)
+
+
+
+# the main program
+bin_PROGRAMS = genet
+lib_LTLIBRARIES = libgenet.la
+
+# the plain sources you need to compile (no generated code)
+libgenet_la_SOURCES = Encoding.cpp Encoding.h \
+		EvTRel.cpp EvTRel.h \
+		HashRegions.h \
+		Region.cpp Region.h RegionGeneric.h \
+		SS.cpp SS.h \
+		TRel.cpp TRel.h \
+		conservative.cpp divide_conquer.cpp \
+		Output.h Output.cc \
+		cpp_interface.h dll_entry.cpp \
+		main.cpp \
+		parser/global.h \
+		parser/$(GRM) \
+		$(ANTLR_SPAWN) \
+		$(DLG_SPAWN)
+#		parser/DLGLexer.cpp parser/DLGLexer.h \
+#		parser/TSParser.cpp parser/TSParser.h \
+#		parser/kk.g parser/ts.g \
+#		parser/tokens.h \
+#		parser/ts.cpp
+#mining.cpp mining.h
+
+genet_SOURCES = genet.cpp
+
+# Versioning rules ( C:R:A )
+#
+# 1. Start with version 0:0:0.
+# 2. If any of the sources have changed, increment R. This is a new revision
+#    of the current interface.
+# 3. If the interface has changed, increment C and set R to 0. This is the
+#    first revision of a new interface.
+# 4. If the new interface is a superset of the previous interface
+#    (that is, if the previous interface has not been broken by the
+#    changes in this new release), increment A. This release is backwards
+#    compatible with the previous release.
+# 5. If the new interface has removed elements with respect to the
+#    previous interface, then backward compatibility is broken; set A to 0.
+#    This release has a new, but backwards incompatible interface.
+#
+# For more info see section 6.3 of the GNU Libtool Manual.
+VERINFO = -version-info 0:0:0
+
+libgenet_la_LDFLAGS = $(VERINFO) -no-undefined
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libgenet.pc
+# includedir = @includedir@/genet
+
+# include_HEADERS = $(filter %.h,$(libgenet_la_SOURCES))
+
+
+
+# pass the sysconfdir to Wendy (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
+genet_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\" -DPCCTS_USE_NAMESPACE_STD
+
+# only add the local Petri net API if necessary
+#if COMPILE_PNAPI
+#genet_CPPFLAGS += -I$(top_srcdir)/libs
+#genet_LDADD = $(top_builddir)/libs/antlr/libantlr.a
+#endif
+
+# flags for the preprocessor: set the include path found by configure
+genet_CPPFLAGS += -I$(top_srcdir)/libs/cudd/include \
+		  -I$(top_srcdir)/libs/alglib \
+		  -I$(top_srcdir)/utils/pccts/h \
+		  -I$(top_srcdir)/src
+
+libgenet_la_CPPFLAGS = $(genet_CPPFLAGS)
+
+# list all libraries Genet needs
+genet_LDADD = libgenet.la
+  
+#  $(builddir)/../libs/cudd/libobj.la \
+#	$(builddir)/../libs/cudd/libdddmp.la \
+#	$(builddir)/../libs/cudd/libcudd.la \
+#	$(builddir)/../libs/cudd/libmtr.la \
+#	$(builddir)/../libs/cudd/libst.la \
+#	$(builddir)/../libs/cudd/libutil.la \
+#	$(builddir)/../libs/cudd/libepd.la \
+#	$(builddir)/../libs/alglib/libalglib.la \
+#	$(builddir)/../utils/pccts/h/libantlr.la
+
+libgenet_la_LIBADD = ../libs/cudd/libobj.la \
+	../libs/cudd/libdddmp.la \
+	../libs/cudd/libcudd.la \
+	../libs/cudd/libmtr.la \
+	../libs/cudd/libst.la \
+	../libs/cudd/libutil.la \
+	../libs/cudd/libepd.la \
+	../libs/alglib/libalglib.la \
+	../utils/pccts/h/libantlr.la
+
+
+#	parser/libparser.a
+
+BUILT_SOURCES = $(ANTLR_CPP) $(DLG_CPP)
+
+EXTRA_DIST = 
+
+$(ANTLR_SPAWN) : parser/$(GRM)
+	cd parser && $(ANTLR) $(ANTLR_FLAGS) $(GRM) && cd ..
+
+$(DLG_SPAWN) : parser/$(DLG_FILE)
+	cd parser && $(DLG) $(DLG_FLAGS) $(DLG_FILE) && cd ..
+
+DISTCLEANFILES = $(ANTLR_SPAWN) $(DLG_SPAWN)
+

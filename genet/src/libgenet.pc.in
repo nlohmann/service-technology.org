@@ -1,0 +1,14 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: Genet Lib
+Description: Library file for using Genet in PROM
+Version: @VERSION@
+URL: 
+Requires:
+Conflicts:
+Libs: -L${libdir} -lgenet
+Libs.private:
+Cflags: 

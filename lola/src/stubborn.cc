@@ -18,18 +18,24 @@
  along with LoLA.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
 #include "net.H"
 #include "graph.H"
 #include "formula.H"
 #include <climits>
+
 #ifdef STUBBORN
 
+#define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
+
 void insert_up(State*, formula*);
+void insert_down(State*, formula*);
 void insert_global_down(formula*);
 
 extern unsigned int* checkstart;
 extern Transition* LastAttractor;  ///< Last transition in list of
+
+/// \todo vielleicht static zu NewStubbStamp() machen?
+unsigned int StubbStamp = 0;
 
 
 void stubbornclosure() {
@@ -42,7 +48,7 @@ void stubbornclosure() {
 #endif
         if (current->enabled) {
             Transition::NrStubborn++;
-#if defined(RELAXED)
+#ifdef RELAXED
             // condition SPP1 from Kristensen/Valmari (Petri nets 2000)
             if (current->down) {
                 insert_up(NULL, F);
@@ -50,7 +56,7 @@ void stubbornclosure() {
 #endif
         }
         for (int i = 0; current->mustbeincluded[i]; i++) {
-            if (!current->mustbeincluded[i]->instubborn) {
+            if (not current->mustbeincluded[i]->instubborn) {
                 current->mustbeincluded[i]->instubborn = true;
                 current->mustbeincluded[i]->NextStubborn  = NULL;
                 Transition::EndOfStubbornList->NextStubborn = current->mustbeincluded[i];
@@ -60,13 +66,11 @@ void stubbornclosure() {
     }
 }
 
-
+/*!
+ Sort places with only invisible pre-transitions to the beginning of the list
+ used for enabledness-check, s.t. these places become scapegoat more likely.
+*/
 void sortscapegoats() {
-    // sort places with only invisible pre-transitions to the
-    // beginning of the list used for enabledness-check, s.t.
-    // these places become scapegoat more likely
-
-
     // count number of invisible pre-transitions
     for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
         for (unsigned int j = 0; Globals::Places[i]->PreTransitions[j]; j++) {
@@ -78,13 +82,12 @@ void sortscapegoats() {
 
     // sort PrePlaces and Pre such that places without
     // visible pretransitions move to the beginning
-
     for (unsigned int i = 0; i < Globals::Transitions[i]->cnt; i++) {
         // sort lists of transition i
         unsigned int firstnz = 0;
         unsigned int firstunknown = 0;
         while (Globals::Transitions[i]->PrePlaces[firstunknown] < Globals::Places[0]->cnt) {
-            if (!Globals::Places[Globals::Transitions[i]->PrePlaces[firstunknown]]->visible) {
+            if (not Globals::Places[Globals::Transitions[i]->PrePlaces[firstunknown]]->visible) {
                 // swap firstnz <--> firstunknown
                 unsigned int tmp = Globals::Transitions[i]->Pre[firstunknown];
                 unsigned int tmpp = Globals::Transitions[i]->PrePlaces[firstunknown];
@@ -92,19 +95,12 @@ void sortscapegoats() {
                 Globals::Transitions[i]->PrePlaces[firstunknown] = Globals::Transitions[i]->PrePlaces[firstnz];
                 Globals::Transitions[i]->Pre[firstnz] = tmp;
                 Globals::Transitions[i]->PrePlaces[firstnz] = tmpp;
-                firstnz ++;
+                firstnz++;
             }
-            firstunknown ++;
+            firstunknown++;
         }
     }
 }
-
-
-
-
-
-
-
 
 void stubborninsert(Transition* t) {
     if (t->instubborn) {
@@ -120,13 +116,7 @@ void stubborninsert(Transition* t) {
     }
 }
 
-
-void insert_down(State*, formula*);
-
-
-
 void insert_up(State* s, formula* f) {
-    State* ss;
     unsigned int i;
 
     switch (f->type) {
@@ -167,7 +157,7 @@ void insert_up(State* s, formula* f) {
                 if (!(s->value[((booleanformula*) f)->sub[i]->index])) {
                     break;
                 }
-                i += 1;
+                ++i;
                 i %= ((booleanformula*) f)->cardsub;
                 if (i == checkstart[f->index]) {
                     break;
@@ -194,14 +184,17 @@ void insert_up(State* s, formula* f) {
         case ef:
             break;
         case ag:
-            for (ss = s; (ss->value[((unarytemporalformula*) f)->element->index]); ss = ss->witness[f->tempindex]) {
-                for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
-                    stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
+            {
+                State* ss;
+                for (ss = s; (ss->value[((unarytemporalformula*) f)->element->index]); ss = ss->witness[f->tempindex]) {
+                    for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
+                        stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
+                    }
+                    stubborninsert(ss->witnesstransition[f->tempindex]);
                 }
-                stubborninsert(ss->witnesstransition[f->tempindex]);
+                insert_up(ss, ((unarytemporalformula*) f)->element);
+                break;
             }
-            insert_up(ss, ((unarytemporalformula*) f)->element);
-            break;
         case eg:
             if (s->value[((unarytemporalformula*) f)->element->index]) {
                 insert_down(s, ((unarytemporalformula*) f)->element);
@@ -218,8 +211,7 @@ void insert_up(State* s, formula* f) {
             }
             break;
         case af:
-            for (ss = s; s->checkmin[f->tempindex] < UINT_MAX; ss = ss->
-                                                                    witness[f->tempindex]) {
+            for (State* ss = s; s->checkmin[f->tempindex] < UINT_MAX; ss = ss->witness[f->tempindex]) {
                 ss->checkmin[f->tempindex] = UINT_MAX;
                 for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
                     stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
@@ -227,29 +219,31 @@ void insert_up(State* s, formula* f) {
                 stubborninsert(ss->witnesstransition[f->tempindex]);
                 insert_up(ss, ((unarytemporalformula*) f)->element);
             }
-            for (ss = s; ss->checkmin[f->tempindex] == UINT_MAX; ss =
-                        ss->witness[f->tempindex]) {
+            for (State* ss = s; ss->checkmin[f->tempindex] == UINT_MAX; ss = ss->witness[f->tempindex]) {
                 ss->checkmin[f->tempindex] = 0;
             }
             break;
         case au:
-            for (ss = s; (s->checkmin[f->tempindex] < UINT_MAX) && (s->value[((untilformula*) f)->hold->index]); ss = ss->
-                    witness[f->tempindex]) {
-                ss->checkmin[f->tempindex] = UINT_MAX;
-                for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
-                    stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
+            {
+                State *ss;
+                for (ss = s; (s->checkmin[f->tempindex] < UINT_MAX) && (s->value[((untilformula*) f)->hold->index]); ss = ss->
+                        witness[f->tempindex]) {
+                    ss->checkmin[f->tempindex] = UINT_MAX;
+                    for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
+                        stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
+                    }
+                    stubborninsert(ss->witnesstransition[f->tempindex]);
+                    insert_up(ss, ((untilformula*) f)->goal);
                 }
-                stubborninsert(ss->witnesstransition[f->tempindex]);
-                insert_up(ss, ((untilformula*) f)->goal);
+                if (!ss->value[((untilformula*) f)->hold->index]) {
+                    insert_up(ss, ((untilformula*) f)->hold);
+                }
+                for (ss = s; ss->checkmin[f->tempindex] == UINT_MAX; ss =
+                            ss->witness[f->tempindex]) {
+                    ss->checkmin[f->tempindex] = 0;
+                }
+                break;
             }
-            if (!ss->value[((untilformula*) f)->hold->index]) {
-                insert_up(ss, ((untilformula*) f)->hold);
-            }
-            for (ss = s; ss->checkmin[f->tempindex] == UINT_MAX; ss =
-                        ss->witness[f->tempindex]) {
-                ss->checkmin[f->tempindex] = 0;
-            }
-            break;
         case ax:
         case ex:
             for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
@@ -261,7 +255,6 @@ void insert_up(State* s, formula* f) {
             cout << "feature not implemented (yet)\n";
     }
 }
-
 
 void insert_global_up(formula* f) {
     unsigned int i;
@@ -310,7 +303,6 @@ void insert_global_up(formula* f) {
 }
 
 void insert_down(State* s, formula* f) {
-    State* ss;
     unsigned int i;
 
     switch (f->type) {
@@ -356,7 +348,7 @@ void insert_down(State* s, formula* f) {
                     break;
                 }
 #endif
-                i += 1;
+                ++i;
                 i %= ((booleanformula*) f)->cardsub;
                 if (i == checkstart[f->index]) {
                     break;
@@ -374,39 +366,48 @@ void insert_down(State* s, formula* f) {
             break;
 #ifdef MODELCHECKING
         case ef:
-            for (ss = s; !(ss->value[((unarytemporalformula*) f)->element->index]); ss = ss->witness[f->tempindex]) {
-                for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
-                    stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
+            {
+                State* ss;
+                for (ss = s; !(ss->value[((unarytemporalformula*) f)->element->index]); ss = ss->witness[f->tempindex]) {
+                    for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
+                        stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
+                    }
+                    stubborninsert(ss->witnesstransition[f->tempindex]);
                 }
-                stubborninsert(ss->witnesstransition[f->tempindex]);
+                insert_down(ss, ((unarytemporalformula*) f)->element);
+                break;
             }
-            insert_down(ss, ((unarytemporalformula*) f)->element);
-            break;
         case ag:
             break;
         case eg:
-            for (ss = s; (ss->checkmin[f->tempindex] < UINT_MAX); ss = ss->witness[f->tempindex]) {
-                ss->checkmin[f->tempindex] = UINT_MAX;
-                for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
-                    stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
+            {
+                State* ss;
+                for (ss = s; (ss->checkmin[f->tempindex] < UINT_MAX); ss = ss->witness[f->tempindex]) {
+                    ss->checkmin[f->tempindex] = UINT_MAX;
+                    for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
+                        stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
+                    }
+                    stubborninsert(ss->witnesstransition[f->tempindex]);
+                    insert_down(ss, ((unarytemporalformula*) f)->element);
                 }
-                stubborninsert(ss->witnesstransition[f->tempindex]);
-                insert_down(ss, ((unarytemporalformula*) f)->element);
+                for (ss = s; (ss->checkmin[f->tempindex] < UINT_MAX); ss = ss->witness[f->tempindex]) {
+                    ss->checkmin[f->tempindex] = 0;
+                }
+                break;
             }
-            for (ss = s; (ss->checkmin[f->tempindex] < UINT_MAX); ss = ss->witness[f->tempindex]) {
-                ss->checkmin[f->tempindex] = 0;
-            }
-            break;
         case eu:
-            for (ss = s; !(ss->value[((untilformula*) f)->goal->index]); ss = ss->witness[f->tempindex]) {
-                for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
-                    stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
+            {
+                State *ss;
+                for (ss = s; !(ss->value[((untilformula*) f)->goal->index]); ss = ss->witness[f->tempindex]) {
+                    for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
+                        stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
+                    }
+                    stubborninsert(ss->witnesstransition[f->tempindex]);
+                    insert_down(ss, ((untilformula*) f)->hold);
                 }
-                stubborninsert(ss->witnesstransition[f->tempindex]);
-                insert_down(ss, ((untilformula*) f)->hold);
+                insert_down(ss, ((untilformula*) f)->goal);
+                break;
             }
-            insert_down(ss, ((untilformula*) f)->goal);
-            break;
         case af:
             if (s->value[((unarytemporalformula*) f)->element->index]) {
                 insert_down(s, ((unarytemporalformula*) f)->element);
@@ -433,7 +434,6 @@ void insert_down(State* s, formula* f) {
             cout << "feature not implemented (yet)\n";
     }
 }
-
 
 void insert_global_down(formula* f) {
     unsigned int i;
@@ -587,12 +587,12 @@ nextstart:
     return firelist();
 }
 
-
+/*!
+ Computes a stubborn superset of a static attractor set. The attractor set
+ is given as initial segment of the stubborn set list, terminated by
+ LastAttractor.
+*/
 Transition** stubbornfireliststatic() {
-    // computes a stubborn superset of a static attractor set.
-    // The attractor set is given as initial segment of the stubborn
-    // set list, terminated by LastAttractor
-
     if (LastAttractor) {
         LastAttractor->NextStubborn = NULL;
         Transition::EndOfStubbornList = LastAttractor;
@@ -622,11 +622,11 @@ Transition** stubbornfireliststatic() {
     return result;
 }
 
-
+/*!
+ Computes a stubborn superset of a single enabled transition. We use the
+ first element of enabling list.
+*/
 Transition** stubbornfirelistnogoal() {
-    // computes a stubborn superset of a single enabled transition.
-    // We use the first element of enabling list
-
     Transition::NrStubborn = 0;
     if (Transition::StartOfEnabledList) {
         Transition::StartOfEnabledList->NextStubborn = NULL;
@@ -649,13 +649,13 @@ Transition** stubbornfirelistnogoal() {
     return result;
 }
 
+/*!
+ Computes a stubborn superset of an attractor set for the reachability of
+ target_marking. Attractor set generation is controlled by the comparison
+ between target and current marking.
+*/
 Transition** stubbornfirelistreach() {
     unsigned int i;
-    // computes a stubborn superset of an attractor set for
-    // the reachability of target_marking.
-    // Attractor set generation is controlled by the comparison
-    // between target and current marking.
-
     for (i = 0; i < Globals::Places[0]->cnt; i++) {
         if (Globals::CurrentMarking[i] != Globals::Places[i]->target_marking) {
             break;
@@ -690,9 +690,6 @@ Transition** stubbornfirelistreach() {
     return result;
 }
 
-/// \todo vielleicht static zu NewStubbStamp() machen?
-unsigned int StubbStamp = 0;
-
 void NewStubbStamp() {
     if (StubbStamp < UINT_MAX) {
         ++StubbStamp;
@@ -704,13 +701,13 @@ void NewStubbStamp() {
     }
 }
 
-#define MINIMUM(X,Y) ((X) < (Y) ? (X) : (Y))
+/*!
+ Computes stubborn set without goal orientation. The TSCC based optimisation
+ is included.
+*/
 Transition** tsccstubbornlist() {
     unsigned int maxdfs;
     Transition* current, * next;
-
-    // computes stubborn set without goal orientation.
-    // The TSCC based optimisation is included
 
     // 1. start with enabled transition
     if ((Globals::Transitions[0]->TarjanStack = Globals::Transitions[0]->StartOfEnabledList)) {
@@ -755,7 +752,7 @@ Transition** tsccstubbornlist() {
             if (current->dfs == current->min) {
                 // remove all states behind current from Tarjanstack;
                 // if enabled->final sequence
-                while (1) {
+                while (true) {
                     if (Globals::Transitions[0]->TarjanStack->enabled) {
                         // final sequence
                         unsigned int cardstubborn;
@@ -779,7 +776,7 @@ Transition** tsccstubbornlist() {
                             if (t == current) {
                                 result[cardstubborn] = NULL;
                                 CardFireList = cardstubborn;
-                                return(result);
+                                return result;
                             }
                         }
                     } else {
@@ -801,20 +798,19 @@ Transition** tsccstubbornlist() {
 
 Transition** relaxedstubbornset() {
 #if defined(WITHFORMULA) && ! defined(MODELCHECKING)
-    Transition** firstattempt;
-    unsigned int i;
 
 #if !defined(LIVEPROP) || (defined(RELAXED) && defined(TWOPHASE))
     if (F->value) {
         return NULL;
     }
 #endif
-    firstattempt = tsccstubbornlist();
+    Transition** firstattempt = tsccstubbornlist();
 #if defined(LIVEPROP) && (!defined(RELAXED) || !defined(TWOPHASE))
     if (F->value) {
         return firstattempt;
     }
 #endif
+    unsigned int i;
     for (i = 0; firstattempt[i]; i++) {
         if (firstattempt[i]->down) {
             break;
@@ -829,16 +825,14 @@ Transition** relaxedstubbornset() {
 #endif
 }
 
-Transition** structreachstubbornset() { // used: relaxed reachability, cycle detection by t-inv
+Transition** structreachstubbornset() {
+    // used: relaxed reachability, cycle detection by t-inv
 #if defined(WITHFORMULA) && ! defined(MODELCHECKING) && defined(STRUCT)
-    Transition** firstattempt;
-    unsigned int i;
-    Transition* t;
-
     if (F->value) {
         return NULL;
     }
-    firstattempt = tsccstubbornlist();
+    Transition** firstattempt = tsccstubbornlist();
+    unsigned int i;
     for (i = 0; firstattempt[i]; i++) {
         if (firstattempt[i]->cyclic) {
             break;
@@ -852,7 +846,7 @@ Transition** structreachstubbornset() { // used: relaxed reachability, cycle det
         insert_global_up(F);
         stubbornclosure();
         Transition** result = new Transition * [Transition::NrStubborn + 5];
-        for (t = Transition::StartOfStubbornList, i = 0; t; t = t->NextStubborn) {
+        for (Transition* t = Transition::StartOfStubbornList, i = 0; t; t = t->NextStubborn) {
             t->instubborn = false;
             if (t->enabled) {
                 result[i++] = t;
@@ -862,7 +856,6 @@ Transition** structreachstubbornset() { // used: relaxed reachability, cycle det
         return result;
     }
     return firstattempt;
-
 #endif
 }
 
@@ -883,7 +876,6 @@ Transition** structstubbornset() {
     return reduced;
 }
 #endif
-
 
 
 #endif

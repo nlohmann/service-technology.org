@@ -27,6 +27,7 @@
 ******************************************************************************/
 
 #include "dddmpInt.h"
+#include <stdint.h>
 
 /*---------------------------------------------------------------------------*/
 /* Stucture declarations                                                     */
@@ -342,13 +343,13 @@ RemoveFromUniqueRecurAdd (
 
     nodelist = subtable->nodelist;
 
-    pos = ddHash (cuddT (f), cuddE (f), subtable->shift);
+    pos = ddHash ((uintptr_t) cuddT (f), (uintptr_t) cuddE (f), subtable->shift);
     node = nodelist[pos];
-    last = NULL;
+    last = (uintptr_t) 0;
     while (node != sentinel) {
       next = node->next;
       if (node == f) {
-        if (last != NULL)  
+        if (last != (uintptr_t) 0)  
   	  last->next = next;
         else 
           nodelist[pos] = next;
@@ -359,7 +360,7 @@ RemoveFromUniqueRecurAdd (
       }
     }
 
-    f->next = NULL;
+    f->next = (uintptr_t) 0;
 
   }
 
@@ -406,7 +407,7 @@ RestoreInUniqueRecurAdd (
     /* StQ 11.02.2004:
        Bug fixed --> restore NULL within the next field */
     /*DddmpClearVisitedAdd (f);*/
-    f->next = NULL;
+    f->next = (uintptr_t) 0;
 
     return;
   }
@@ -419,7 +420,7 @@ RestoreInUniqueRecurAdd (
 
   nodelist = subtable->nodelist;
 
-  pos = ddHash (cuddT (f), cuddE (f), subtable->shift);
+  pos = ddHash ((uintptr_t) cuddT (f), (uintptr_t) cuddE (f), subtable->shift);
 
 #ifdef DDDMP_DEBUG
   /* verify uniqueness to avoid duplicate nodes in unique table */

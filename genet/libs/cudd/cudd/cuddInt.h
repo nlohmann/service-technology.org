@@ -70,8 +70,10 @@
 #endif
 
 #include <math.h>
+#include <stdint.h>
 #include "cudd.h"
 #include "st.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -249,11 +251,11 @@ typedef struct DdHook {		/* hook list element */
 } DdHook;
 
 #if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
-typedef long long ptrint;
-typedef unsigned long long ptruint;
+typedef intptr_t ptrint;
+typedef uintptr_t ptruint;
 #else
-typedef int ptrint;
-typedef unsigned int ptruint;
+typedef intptr_t ptrint;
+typedef uintptr_t ptruint;
 #endif
 
 #ifdef __osf__
@@ -708,11 +710,11 @@ typedef struct DdLevelQueue {
 ******************************************************************************/
 #if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
 #define ddHash(f,g,s) \
-((((unsigned)(ptruint)(f) * DD_P1 + \
-   (unsigned)(ptruint)(g)) * DD_P2) >> (s))
+((((uintptr_t)(f) * DD_P1 + \
+   (uintptr_t)(g)) * DD_P2) >> (s))
 #else
 #define ddHash(f,g,s) \
-((((unsigned)(f) * DD_P1 + (unsigned)(g)) * DD_P2) >> (s))
+((((uintptr_t)(f) * DD_P1 + (uintptr_t)(g)) * DD_P2) >> (s))
 #endif
 
 
@@ -729,13 +731,13 @@ typedef struct DdLevelQueue {
 ******************************************************************************/
 #if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
 #define ddCHash(o,f,g,h,s) \
-((((((unsigned)(ptruint)(f) + (unsigned)(ptruint)(o)) * DD_P1 + \
-    (unsigned)(ptruint)(g)) * DD_P2 + \
-   (unsigned)(ptruint)(h)) * DD_P3) >> (s))
+((((((uintptr_t)(f) + (uintptr_t)(o)) * DD_P1 + \
+    (uintptr_t)(g)) * DD_P2 + \
+   (uintptr_t)(h)) * DD_P3) >> (s))
 #else
 #define ddCHash(o,f,g,h,s) \
-((((((unsigned)(f) + (unsigned)(o)) * DD_P1 + (unsigned)(g)) * DD_P2 + \
-   (unsigned)(h)) * DD_P3) >> (s))
+((((((uintptr_t)(f) + (uintptr_t)(o)) * DD_P1 + (uintptr_t)(g)) * DD_P2 + \
+   (uintptr_t)(h)) * DD_P3) >> (s))
 #endif
 
 
@@ -753,11 +755,11 @@ typedef struct DdLevelQueue {
 ******************************************************************************/
 #if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
 #define ddCHash2(o,f,g,s) \
-(((((unsigned)(ptruint)(f) + (unsigned)(ptruint)(o)) * DD_P1 + \
-   (unsigned)(ptruint)(g)) * DD_P2) >> (s))
+((((uintptr_t)(f) + (uintptr_t)(o)) * DD_P1 + \
+   (uintptr_t)(g)) * DD_P2) >> (s))
 #else
 #define ddCHash2(o,f,g,s) \
-(((((unsigned)(f) + (unsigned)(o)) * DD_P1 + (unsigned)(g)) * DD_P2) >> (s))
+(((((uintptr_t)(f) + (uintptr_t)(o)) * DD_P1 + (uintptr_t)(g)) * DD_P2) >> (s))
 #endif
 
 
@@ -772,7 +774,7 @@ typedef struct DdLevelQueue {
   SeeAlso     []
 
 ******************************************************************************/
-#define cuddClean(p) ((DdNode *)((ptruint)(p) & ~0xf))
+#define cuddClean(p) ((DdNode *)((uintptr_t)(p) & ~0xf))
 
 
 /**Macro***********************************************************************

@@ -4,14 +4,17 @@
 
 #include "ap.h"
 #include "ialglib.h"
-
-double log1p(double x);
-
-
-double expm1(double x);
+#include <cmath>
 
 
-double cosm1(double x);
+
+// double log1p(double x) __THROW;
+
+
+// double expm1(double x) __THROW;
+
+
+double cosm1(double x) throw ();
 
 
 #endif

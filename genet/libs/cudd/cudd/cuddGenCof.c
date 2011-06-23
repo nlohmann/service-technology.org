@@ -77,7 +77,7 @@
 
 #include "util.h"
 #include "cuddInt.h"
-
+#include <stdint.h>
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -226,7 +226,7 @@ Cudd_bddRestrict(
     /* Check if supports intersect. */
     retval = Cudd_ClassifySupport(dd,f,c,&commonSupport,&suppF,&suppC);
     if (retval == 0) {
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(commonSupport); cuddRef(suppF); cuddRef(suppC);
     Cudd_IterDerefBdd(dd,suppF);
@@ -240,9 +240,9 @@ Cudd_bddRestrict(
 
     /* Abstract from c the variables that do not appear in f. */
     cplus = Cudd_bddExistAbstract(dd, c, suppC);
-    if (cplus == NULL) {
+    if (cplus == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(dd,suppC);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(cplus);
     Cudd_IterDerefBdd(dd,suppC);
@@ -251,9 +251,9 @@ Cudd_bddRestrict(
 	dd->reordered = 0;
 	res = cuddBddRestrictRecur(dd, f, cplus);
     } while (dd->reordered == 1);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(dd,cplus);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(res);
     Cudd_IterDerefBdd(dd,cplus);
@@ -374,31 +374,31 @@ Cudd_bddConstrainDecomp(
 
     /* Create an initialize decomposition array. */
     decomp = ALLOC(DdNode *,dd->size);
-    if (decomp == NULL) {
+    if (decomp == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < dd->size; i++) {
-	decomp[i] = NULL;
+	decomp[i] = (uintptr_t) 0;
     }
     do {
 	dd->reordered = 0;
 	/* Clean up the decomposition array in case reordering took place. */
 	for (i = 0; i < dd->size; i++) {
-	    if (decomp[i] != NULL) {
+	    if (decomp[i] != (uintptr_t) 0) {
 		Cudd_IterDerefBdd(dd, decomp[i]);
-		decomp[i] = NULL;
+		decomp[i] = (uintptr_t) 0;
 	    }
 	}
 	res = cuddBddConstrainDecomp(dd,f,decomp);
     } while (dd->reordered == 1);
     if (res == 0) {
 	FREE(decomp);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     /* Missing components are constant ones. */
     for (i = 0; i < dd->size; i++) {
-	if (decomp[i] == NULL) {
+	if (decomp[i] == (uintptr_t) 0) {
 	    decomp[i] = DD_ONE(dd);
 	    cuddRef(decomp[i]);
 	}
@@ -436,21 +436,21 @@ Cudd_addRestrict(
 
     /* Check if supports intersect. */
     supp_f = Cudd_Support(dd, f);
-    if (supp_f == NULL) {
-	return(NULL);
+    if (supp_f == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
     cuddRef(supp_f);
     supp_c = Cudd_Support(dd, c);
-    if (supp_c == NULL) {
+    if (supp_c == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,supp_f);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(supp_c);
     commonSupport = Cudd_bddLiteralSetIntersection(dd, supp_f, supp_c);
-    if (commonSupport == NULL) {
+    if (commonSupport == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,supp_f);
 	Cudd_RecursiveDeref(dd,supp_c);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(commonSupport);
     Cudd_RecursiveDeref(dd,supp_f);
@@ -509,21 +509,21 @@ Cudd_bddCharToVect(
 {
     int i, j;
     DdNode **vect;
-    DdNode *res = NULL;
+    DdNode *res = (uintptr_t) 0;
 
-    if (f == Cudd_Not(DD_ONE(dd))) return(NULL);
+    if (f == Cudd_Not(DD_ONE(dd))) return((uintptr_t) 0);
 
     vect = ALLOC(DdNode *, dd->size);
-    if (vect == NULL) {
+    if (vect == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     do {
 	dd->reordered = 0;
 	for (i = 0; i < dd->size; i++) {
 	    res = cuddBddCharToVect(dd,f,dd->vars[dd->invperm[i]]);
-	    if (res == NULL) {
+	    if (res == (uintptr_t) 0) {
 		/* Clean up the vector array in case reordering took place. */
 		for (j = 0; j < i; j++) {
 		    Cudd_IterDerefBdd(dd, vect[dd->invperm[j]]);
@@ -534,9 +534,9 @@ Cudd_bddCharToVect(
 	    vect[dd->invperm[i]] = res;
 	}
     } while (dd->reordered == 1);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	FREE(vect);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     return(vect);
 
@@ -607,7 +607,7 @@ Cudd_bddSqueeze(
 	dd->reordered = 0;
 	res = cuddBddSqueeze(dd,l,u);
     } while (dd->reordered == 1);
-    if (res == NULL) return(NULL);
+    if (res == (uintptr_t) 0) return((uintptr_t) 0);
     /* We now compare the result with the bounds and return the smallest.
     ** We first compare to u, so that in case l == 0 and u == 1, we return
     ** 0 as in other minimization algorithms. */
@@ -659,12 +659,12 @@ Cudd_bddMinimize(
     if (f == Cudd_Not(c)) return(Cudd_Not(DD_ONE(dd)));
 
     cplus = Cudd_RemapOverApprox(dd,c,0,0,1.0);
-    if (cplus == NULL) return(NULL);
+    if (cplus == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(cplus);
     res = Cudd_bddLICompaction(dd,f,cplus);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(dd,cplus);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(res);
     Cudd_IterDerefBdd(dd,cplus);
@@ -702,19 +702,19 @@ Cudd_SubsetCompress(
     DdNode *res, *tmp1, *tmp2;
 
     tmp1 = Cudd_SubsetShortPaths(dd, f, nvars, threshold, 0);
-    if (tmp1 == NULL) return(NULL);
+    if (tmp1 == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(tmp1);
     tmp2 = Cudd_RemapUnderApprox(dd,tmp1,nvars,0,1.0);
-    if (tmp2 == NULL) {
+    if (tmp2 == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(dd,tmp1);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(tmp2);
     Cudd_IterDerefBdd(dd,tmp1);
     res = Cudd_bddSqueeze(dd,tmp2,f);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(dd,tmp2);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(res);
     Cudd_IterDerefBdd(dd,tmp2);
@@ -753,7 +753,7 @@ Cudd_SupersetCompress(
 
     subset = Cudd_SubsetCompress(dd, Cudd_Not(f),nvars,threshold);
 
-    return(Cudd_NotCond(subset, (subset != NULL)));
+    return(Cudd_NotCond(subset, (subset != (uintptr_t) 0)));
 
 } /* end of Cudd_SupersetCompress */
 
@@ -809,7 +809,7 @@ cuddBddConstrainRecur(
 
     /* Check the cache. */
     r = cuddCacheLookup2(dd, Cudd_bddConstrain, f, c);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
 	return(Cudd_NotCond(r,comple));
     }
     
@@ -835,8 +835,8 @@ cuddBddConstrainRecur(
 
     if (!Cudd_IsConstant(Cv)) {
 	t = cuddBddConstrainRecur(dd, Fv, Cv);
-	if (t == NULL)
-	    return(NULL);
+	if (t == (uintptr_t) 0)
+	    return((uintptr_t) 0);
     } else if (Cv == one) {
 	t = Fv;
     } else {		/* Cv == zero: return Fnv @ Cnv */
@@ -844,8 +844,8 @@ cuddBddConstrainRecur(
 	    r = Fnv;
 	} else {
 	    r = cuddBddConstrainRecur(dd, Fnv, Cnv);
-	    if (r == NULL)
-		return(NULL);
+	    if (r == (uintptr_t) 0)
+		return((uintptr_t) 0);
 	}
 	return(Cudd_NotCond(r,comple));
     }
@@ -853,9 +853,9 @@ cuddBddConstrainRecur(
 
     if (!Cudd_IsConstant(Cnv)) {
 	e = cuddBddConstrainRecur(dd, Fnv, Cnv);
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     } else if (Cnv == one) {
 	e = Fnv;
@@ -869,18 +869,18 @@ cuddBddConstrainRecur(
 	t = Cudd_Not(t);
 	e = Cudd_Not(e);
 	r = (t == e) ? t : cuddUniqueInter(dd, index, t, e);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd, e);
 	    Cudd_IterDerefBdd(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	r = Cudd_Not(r);
     } else {
 	r = (t == e) ? t : cuddUniqueInter(dd, index, t, e);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd, e);
 	    Cudd_IterDerefBdd(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     }
     cuddDeref(t);
@@ -937,7 +937,7 @@ cuddBddRestrictRecur(
 
     /* Check the cache. */
     r = cuddCacheLookup2(dd, Cudd_bddRestrict, f, c);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
 	return(Cudd_NotCond(r,comple));
     }
 
@@ -957,13 +957,13 @@ cuddBddRestrictRecur(
 	}
 	/* Take the OR by applying DeMorgan. */
 	d = cuddBddAndRecur(dd, s1, s2);
-	if (d == NULL) return(NULL);
+	if (d == (uintptr_t) 0) return((uintptr_t) 0);
 	d = Cudd_Not(d);
 	cuddRef(d);
 	r = cuddBddRestrictRecur(dd, f, d);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd, d);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(r);
 	Cudd_IterDerefBdd(dd, d);
@@ -987,7 +987,7 @@ cuddBddRestrictRecur(
 
     if (!Cudd_IsConstant(Cv)) {
 	t = cuddBddRestrictRecur(dd, Fv, Cv);
-	if (t == NULL) return(NULL);
+	if (t == (uintptr_t) 0) return((uintptr_t) 0);
     } else if (Cv == one) {
 	t = Fv;
     } else {		/* Cv == zero: return(Fnv @ Cnv) */
@@ -995,7 +995,7 @@ cuddBddRestrictRecur(
 	    r = Fnv;
 	} else {
 	    r = cuddBddRestrictRecur(dd, Fnv, Cnv);
-	    if (r == NULL) return(NULL);
+	    if (r == (uintptr_t) 0) return((uintptr_t) 0);
 	}
 	return(Cudd_NotCond(r,comple));
     }
@@ -1003,9 +1003,9 @@ cuddBddRestrictRecur(
 
     if (!Cudd_IsConstant(Cnv)) {
 	e = cuddBddRestrictRecur(dd, Fnv, Cnv);
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     } else if (Cnv == one) {
 	e = Fnv;
@@ -1019,18 +1019,18 @@ cuddBddRestrictRecur(
 	t = Cudd_Not(t);
 	e = Cudd_Not(e);
 	r = (t == e) ? t : cuddUniqueInter(dd, index, t, e);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd, e);
 	    Cudd_IterDerefBdd(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	r = Cudd_Not(r);
     } else {
 	r = (t == e) ? t : cuddUniqueInter(dd, index, t, e);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd, e);
 	    Cudd_IterDerefBdd(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     }
     cuddDeref(t);
@@ -1086,7 +1086,7 @@ cuddBddNPAndRecur(
     /* Check cache. */
     if (F->ref != 1 || G->ref != 1) {
 	r = cuddCacheLookup2(manager, Cudd_bddNPAnd, f, g);
-	if (r != NULL) return(r);
+	if (r != (uintptr_t) 0) return(r);
     }
 
     /* Here we can skip the use of cuddI, because the operands are known
@@ -1108,13 +1108,13 @@ cuddBddNPAndRecur(
 	}
 	/* Take the OR by applying DeMorgan. */
 	d = cuddBddAndRecur(manager, gt, ge);
-	if (d == NULL) return(NULL);
+	if (d == (uintptr_t) 0) return((uintptr_t) 0);
 	d = Cudd_Not(d);
 	cuddRef(d);
 	r = cuddBddNPAndRecur(manager, f, d);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(manager, d);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(r);
 	Cudd_IterDerefBdd(manager, d);
@@ -1144,13 +1144,13 @@ cuddBddNPAndRecur(
     }
 
     t = cuddBddAndRecur(manager, ft, gt);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(t);
 
     e = cuddBddAndRecur(manager, fe, ge);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(manager, t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
@@ -1159,18 +1159,18 @@ cuddBddNPAndRecur(
     } else {
 	if (Cudd_IsComplement(t)) {
 	    r = cuddUniqueInter(manager,(int)index,Cudd_Not(t),Cudd_Not(e));
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(manager, t);
 		Cudd_IterDerefBdd(manager, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    r = Cudd_Not(r);
 	} else {
 	    r = cuddUniqueInter(manager,(int)index,t,e);
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(manager, t);
 		Cudd_IterDerefBdd(manager, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	}
     }
@@ -1220,7 +1220,7 @@ cuddAddConstrainRecur(
 
     /* Check the cache. */
     r = cuddCacheLookup2(dd, Cudd_addConstrain, f, c);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
 	return(r);
     }
     
@@ -1242,8 +1242,8 @@ cuddAddConstrainRecur(
 
     if (!Cudd_IsConstant(Cv)) {
 	t = cuddAddConstrainRecur(dd, Fv, Cv);
-	if (t == NULL)
-	    return(NULL);
+	if (t == (uintptr_t) 0)
+	    return((uintptr_t) 0);
     } else if (Cv == one) {
 	t = Fv;
     } else {		/* Cv == zero: return Fnv @ Cnv */
@@ -1251,8 +1251,8 @@ cuddAddConstrainRecur(
 	    r = Fnv;
 	} else {
 	    r = cuddAddConstrainRecur(dd, Fnv, Cnv);
-	    if (r == NULL)
-		return(NULL);
+	    if (r == (uintptr_t) 0)
+		return((uintptr_t) 0);
 	}
 	return(r);
     }
@@ -1260,9 +1260,9 @@ cuddAddConstrainRecur(
 
     if (!Cudd_IsConstant(Cnv)) {
 	e = cuddAddConstrainRecur(dd, Fnv, Cnv);
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     } else if (Cnv == one) {
 	e = Fnv;
@@ -1273,10 +1273,10 @@ cuddAddConstrainRecur(
     cuddRef(e);
 
     r = (t == e) ? t : cuddUniqueInter(dd, index, t, e);
-    if (r == NULL) {
+    if (r == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, e);
 	Cudd_RecursiveDeref(dd, t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(t);
     cuddDeref(e);
@@ -1323,7 +1323,7 @@ cuddAddRestrictRecur(
 
     /* Check the cache. */
     r = cuddCacheLookup2(dd, Cudd_addRestrict, f, c);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
 	return(r);
     }
 
@@ -1338,12 +1338,12 @@ cuddAddRestrictRecur(
 	s2 = cuddE(c);
 	/* Take the OR by applying DeMorgan. */
 	d = cuddAddApplyRecur(dd, Cudd_addOr, s1, s2);
-	if (d == NULL) return(NULL);
+	if (d == (uintptr_t) 0) return((uintptr_t) 0);
 	cuddRef(d);
 	r = cuddAddRestrictRecur(dd, f, d);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, d);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(r);
 	Cudd_RecursiveDeref(dd, d);
@@ -1363,7 +1363,7 @@ cuddAddRestrictRecur(
 
     if (!Cudd_IsConstant(Cv)) {
 	t = cuddAddRestrictRecur(dd, Fv, Cv);
-	if (t == NULL) return(NULL);
+	if (t == (uintptr_t) 0) return((uintptr_t) 0);
     } else if (Cv == one) {
 	t = Fv;
     } else {		/* Cv == zero: return(Fnv @ Cnv) */
@@ -1371,7 +1371,7 @@ cuddAddRestrictRecur(
 	    r = Fnv;
 	} else {
 	    r = cuddAddRestrictRecur(dd, Fnv, Cnv);
-	    if (r == NULL) return(NULL);
+	    if (r == (uintptr_t) 0) return((uintptr_t) 0);
 	}
 	return(r);
     }
@@ -1379,9 +1379,9 @@ cuddAddRestrictRecur(
 
     if (!Cudd_IsConstant(Cnv)) {
 	e = cuddAddRestrictRecur(dd, Fnv, Cnv);
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     } else if (Cnv == one) {
 	e = Fnv;
@@ -1392,10 +1392,10 @@ cuddAddRestrictRecur(
     cuddRef(e);
 
     r = (t == e) ? t : cuddUniqueInter(dd, index, t, e);
-    if (r == NULL) {
+    if (r == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, e);
 	Cudd_RecursiveDeref(dd, t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(t);
     cuddDeref(e);
@@ -1450,26 +1450,26 @@ cuddBddLICompaction(
     ** in successive invocations.
     */
     marktable = st_init_table(st_ptrcmp,st_ptrhash);
-    if (marktable == NULL) {
-	return(NULL);
+    if (marktable == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
     markcache = st_init_table(MarkCacheCompare,MarkCacheHash);
-    if (markcache == NULL) {
+    if (markcache == (uintptr_t) 0) {
 	st_free_table(marktable);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     if (cuddBddLICMarkEdges(dd,f,c,marktable,markcache) == CUDD_OUT_OF_MEM) {
-	st_foreach(markcache, MarkCacheCleanUp, NULL);
+	st_foreach(markcache, MarkCacheCleanUp, (uintptr_t) 0);
 	st_free_table(marktable);
 	st_free_table(markcache);
-	return(NULL);
+	return((uintptr_t) 0);
     }
-    st_foreach(markcache, MarkCacheCleanUp, NULL);
+    st_foreach(markcache, MarkCacheCleanUp, (uintptr_t) 0);
     st_free_table(markcache);
     buildcache = st_init_table(st_ptrcmp,st_ptrhash);
-    if (buildcache == NULL) {
+    if (buildcache == (uintptr_t) 0) {
 	st_free_table(marktable);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     res = cuddBddLICBuildResult(dd,f,buildcache,marktable);
     st_free_table(buildcache);
@@ -1518,7 +1518,7 @@ cuddBddConstrainDecomp(
     }
     /* Compute abstraction of top variable. */
     fAbs = cuddBddAndRecur(dd, fv, fvn);
-    if (fAbs == NULL) {
+    if (fAbs == (uintptr_t) 0) {
 	return(0);
     }
     cuddRef(fAbs);
@@ -1533,7 +1533,7 @@ cuddBddConstrainDecomp(
     /* Compute the component of the decomposition corresponding to the
     ** top variable and store it in the decomposition array. */
     result = cuddBddConstrainRecur(dd, f, fAbs);
-    if (result == NULL) {
+    if (result == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(dd,fAbs);
 	return(0);
     }
@@ -1573,7 +1573,7 @@ cuddBddCharToVect(
     statLine(dd);
     /* Check the cache. */
     res = cuddCacheLookup2(dd, cuddBddCharToVect, f, x);
-    if (res != NULL) {
+    if (res != (uintptr_t) 0) {
 	return(res);
     }
 
@@ -1602,21 +1602,21 @@ cuddBddCharToVect(
     if (fE == zero) return(cuddBddCharToVect(dd, fT, x));
 
     T = cuddBddCharToVect(dd, fT, x);
-    if (T == NULL) {
-	return(NULL);
+    if (T == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
     cuddRef(T);
     E = cuddBddCharToVect(dd, fE, x);
-    if (E == NULL) {
+    if (E == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(dd,T);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(E);
     res = cuddBddIteRecur(dd, dd->vars[F->index], T, E);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(dd,T);
 	Cudd_IterDerefBdd(dd,E);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(T);
     cuddDeref(E);
@@ -1651,7 +1651,7 @@ cuddBddLICMarkEdges(
     DdNode *one, *zero;
     unsigned int topf, topc;
     int comple;
-    int resT, resE, res, retval;
+    intptr_t resT, resE, res, retval;
     char **slot;
     MarkCacheKey *key;
 
@@ -1672,7 +1672,7 @@ cuddBddLICMarkEdges(
 
     /* Check the cache. */
     key = ALLOC(MarkCacheKey, 1);
-    if (key == NULL) {
+    if (key == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	return(CUDD_OUT_OF_MEM);
     }
@@ -1720,9 +1720,9 @@ cuddBddLICMarkEdges(
     if (topf <= topc) {
 	retval = st_find_or_add(table, (char *)f, (char ***)&slot);
 	if (retval == 0) {
-	    *slot = (char *) (ptrint)((resT << 2) | resE);
+	    *slot = (char *) (intptr_t)((resT << 2) | resE);
 	} else if (retval == 1) {
-	    *slot = (char *) (ptrint)((int)((ptrint) *slot) | (resT << 2) | resE);
+	    *slot = (char *) (intptr_t)((int)((intptr_t) *slot) | (resT << 2) | resE);
 	} else {
 	    FREE(key);
 	    return(CUDD_OUT_OF_MEM);
@@ -1731,7 +1731,7 @@ cuddBddLICMarkEdges(
 
     /* Cache result. */
     res = resT | resE;
-    if (st_insert(cache, (char *)key, (char *)(ptrint)res) == ST_OUT_OF_MEM) {
+    if (st_insert(cache, (char *)key, (char *)(intptr_t)res) == ST_OUT_OF_MEM) {
 	FREE(key);
 	return(CUDD_OUT_OF_MEM);
     }
@@ -1769,7 +1769,7 @@ cuddBddLICBuildResult(
     DdNode *one, *zero;
     int	index;
     int comple;
-    int markT, markE, markings;
+    intptr_t markT, markE, markings;
 
     one = DD_ONE(dd);
     zero = Cudd_Not(one);
@@ -1786,7 +1786,7 @@ cuddBddLICBuildResult(
 
     /* Retrieve the edge markings. */
     if (st_lookup_int(table, (char *)f, &markings) == 0)
-	return(NULL);
+	return((uintptr_t) 0);
     markT = markings >> 2;
     markE = markings & 3;
 
@@ -1795,8 +1795,8 @@ cuddBddLICBuildResult(
 
     if (markT == DD_LIC_NL) {
 	t = cuddBddLICBuildResult(dd,Fv,cache,table);
-	if (t == NULL) {
-	    return(NULL);
+	if (t == (uintptr_t) 0) {
+	    return((uintptr_t) 0);
 	}
     } else if (markT == DD_LIC_1) {
 	t = one;
@@ -1806,9 +1806,9 @@ cuddBddLICBuildResult(
     cuddRef(t);
     if (markE == DD_LIC_NL) {
 	e = cuddBddLICBuildResult(dd,Fnv,cache,table);
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd,t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     } else if (markE == DD_LIC_1) {
 	e = one;
@@ -1826,18 +1826,18 @@ cuddBddLICBuildResult(
 	    t = Cudd_Not(t);
 	    e = Cudd_Not(e);
 	    r = (t == e) ? t : cuddUniqueInter(dd, index, t, e);
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(dd, e);
 		Cudd_IterDerefBdd(dd, t);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    r = Cudd_Not(r);
 	} else {
 	    r = (t == e) ? t : cuddUniqueInter(dd, index, t, e);
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(dd, e);
 		Cudd_IterDerefBdd(dd, t);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	}
     }
@@ -1847,7 +1847,7 @@ cuddBddLICBuildResult(
     if (st_insert(cache, (char *)f, (char *)r) == ST_OUT_OF_MEM) {
 	cuddRef(r);
 	Cudd_IterDerefBdd(dd,r);
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     return(Cudd_NotCond(r,comple));
@@ -1877,8 +1877,8 @@ MarkCacheHash(
 
     entry = (MarkCacheKey *) ptr;
 
-    val = (int) (ptrint) entry->f;
-    val = val * 997 + (int) (ptrint) entry->c;
+    val = (int) (intptr_t) entry->f;
+    val = val * 997 + (int) (intptr_t) entry->c;
 
     return ((val < 0) ? -val : val) % modulus;
 
@@ -2002,7 +2002,7 @@ cuddBddSqueeze(
 
     /* Check the cache. */
     r = cuddCacheLookup2(dd, Cudd_bddSqueeze, l, u);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
 	return(Cudd_NotCond(r,comple));
     }
 
@@ -2031,14 +2031,14 @@ cuddBddSqueeze(
     if ((lt == zero || Cudd_bddLeq(dd,lt,le)) &&
 	(ut == one  || Cudd_bddLeq(dd,ue,ut))) { /* remap */
 	r = cuddBddSqueeze(dd, le, ue);
-	if (r == NULL)
-	    return(NULL);
+	if (r == (uintptr_t) 0)
+	    return((uintptr_t) 0);
 	return(Cudd_NotCond(r,comple));
     } else if ((le == zero || Cudd_bddLeq(dd,le,lt)) &&
 	       (ue == one  || Cudd_bddLeq(dd,ut,ue))) { /* remap */
 	r = cuddBddSqueeze(dd, lt, ut);
-	if (r == NULL)
-	    return(NULL);
+	if (r == (uintptr_t) 0)
+	    return((uintptr_t) 0);
 	return(Cudd_NotCond(r,comple));
     } else if ((le == zero || Cudd_bddLeq(dd,le,Cudd_Not(ut))) &&
 	       (ue == one  || Cudd_bddLeq(dd,Cudd_Not(lt),ue))) { /* c-remap */
@@ -2046,21 +2046,21 @@ cuddBddSqueeze(
 	cuddRef(t);
 	if (Cudd_IsComplement(t)) {
 	    r = cuddUniqueInter(dd, index, Cudd_Not(t), t);
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(dd, t);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    r = Cudd_Not(r);
 	} else {
 	    r = cuddUniqueInter(dd, index, t, Cudd_Not(t));
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(dd, t);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	}
 	cuddDeref(t);
-	if (r == NULL)
-	    return(NULL);
+	if (r == (uintptr_t) 0)
+	    return((uintptr_t) 0);
 	cuddCacheInsert2(dd, Cudd_bddSqueeze, l, u, r);
 	return(Cudd_NotCond(r,comple));
     } else if ((lt == zero || Cudd_bddLeq(dd,lt,Cudd_Not(ue))) &&
@@ -2069,21 +2069,21 @@ cuddBddSqueeze(
 	cuddRef(e);
 	if (Cudd_IsComplement(e)) {
 	    r = cuddUniqueInter(dd, index, Cudd_Not(e), e);
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(dd, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	} else {
 	    r = cuddUniqueInter(dd, index, e, Cudd_Not(e));
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(dd, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    r = Cudd_Not(r);
 	}
 	cuddDeref(e);
-	if (r == NULL)
-	    return(NULL);
+	if (r == (uintptr_t) 0)
+	    return((uintptr_t) 0);
 	cuddCacheInsert2(dd, Cudd_bddSqueeze, l, u, r);
 	return(Cudd_NotCond(r,comple));
     }
@@ -2097,39 +2097,39 @@ cuddBddSqueeze(
     if (Cudd_bddLeq(dd,lt,ue) && Cudd_bddLeq(dd,le,ut)) {
 	DdNode *au, *al;
 	au = cuddBddAndRecur(dd,ut,ue);
-	if (au == NULL)
-	    return(NULL);
+	if (au == (uintptr_t) 0)
+	    return((uintptr_t) 0);
 	cuddRef(au);
 	al = cuddBddAndRecur(dd,Cudd_Not(lt),Cudd_Not(le));
-	if (al == NULL) {
+	if (al == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd,au);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(al);
 	al = Cudd_Not(al);
 	ar = cuddBddSqueeze(dd, al, au);
-	if (ar == NULL) {
+	if (ar == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd,au);
 	    Cudd_IterDerefBdd(dd,al);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(ar);
 	Cudd_IterDerefBdd(dd,au);
 	Cudd_IterDerefBdd(dd,al);
     } else {
-	ar = NULL;
+	ar = (uintptr_t) 0;
     }
 #endif
 
     t = cuddBddSqueeze(dd, lt, ut);
-    if (t == NULL) {
-	return(NULL);
+    if (t == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
     cuddRef(t);
     e = cuddBddSqueeze(dd, le, ue);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(dd,t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
@@ -2137,18 +2137,18 @@ cuddBddSqueeze(
 	t = Cudd_Not(t);
 	e = Cudd_Not(e);
 	r = (t == e) ? t : cuddUniqueInter(dd, index, t, e);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd, e);
 	    Cudd_IterDerefBdd(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	r = Cudd_Not(r);
     } else {
 	r = (t == e) ? t : cuddUniqueInter(dd, index, t, e);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd, e);
 	    Cudd_IterDerefBdd(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     }
     cuddDeref(t);
@@ -2158,7 +2158,7 @@ cuddBddSqueeze(
     /* Check whether there is a result obtained by abstraction and whether
     ** it is better than the one obtained by recursion. */
     cuddRef(r);
-    if (ar != NULL) {
+    if (ar != (uintptr_t) 0) {
 	if (Cudd_DagSize(ar) <= Cudd_DagSize(r)) {
 	    Cudd_IterDerefBdd(dd, r);
 	    r = ar;

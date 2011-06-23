@@ -3407,7 +3407,7 @@ Cudd_StdPreReordHook(
   const char *str,
   void *data)
 {
-    Cudd_ReorderingType method = (Cudd_ReorderingType) (ptruint) data;
+    Cudd_ReorderingType method = (Cudd_ReorderingType) (uintptr_t) data;
     int retval;
 
     retval = fprintf(dd->out,"%s reordering with ", str);
@@ -3500,7 +3500,7 @@ Cudd_StdPostReordHook(
   const char *str,
   void *data)
 {
-    long initialTime = (long long) data;
+    long initialTime = (intptr_t) data;
     int retval;
     long finalTime = util_cpu_time();
     double totalTimeSec = (double)(finalTime - initialTime) / 1000.0;

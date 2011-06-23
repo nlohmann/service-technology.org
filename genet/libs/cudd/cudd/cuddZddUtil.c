@@ -560,7 +560,7 @@ Cudd_zddDumpDot(
     int		i, j;
     int		slots;
     DdNodePtr	*nodelist;
-    long long	refAddr, diff, mask;
+    intptr_t	refAddr, diff, mask;
 
     /* Build a bit array with the support of f. */
     sorted = ALLOC(int,nvars);
@@ -606,11 +606,11 @@ Cudd_zddDumpDot(
     */
 
     /* Find the bits that are different. */
-    refAddr = (long long) f[0];
+    refAddr = (intptr_t) f[0];
     diff = 0;
     gen = st_init_gen(visited);
     while (st_gen(gen, &scan, NULL)) {
-	diff |= refAddr ^ (long long) scan;
+	diff |= refAddr ^ (intptr_t) scan;
     }
     st_free_gen(gen);
 

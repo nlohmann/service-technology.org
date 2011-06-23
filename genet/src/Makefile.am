@@ -41,12 +41,12 @@ libgenet_la_SOURCES = Encoding.cpp Encoding.h \
 		TRel.cpp TRel.h \
 		conservative.cpp divide_conquer.cpp \
 		Output.h Output.cc \
-		cpp_interface.h dll_entry.cpp \
 		main.cpp \
 		parser/global.h \
 		parser/$(GRM) \
 		$(ANTLR_SPAWN) \
 		$(DLG_SPAWN)
+#		cpp_interface.h dll_entry.cpp \
 #		parser/DLGLexer.cpp parser/DLGLexer.h \
 #		parser/TSParser.cpp parser/TSParser.h \
 #		parser/kk.g parser/ts.g \

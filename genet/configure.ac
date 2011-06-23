@@ -96,6 +96,8 @@ AC_CHECK_HEADERS([sys/socket.h socket.h], [], [],
 #endif
 ]])
 
+AC_CHECK_FUNC([gamma])
+
 # Checks for GNULIB stuff
 AC_CHECK_HEADERS([include/cwctype])
 AC_CHECK_FUNC([iswblank])

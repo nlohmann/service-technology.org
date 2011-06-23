@@ -116,11 +116,11 @@ static char rcsid[] DD_UNUSED = "$Id: cuddLCache.c,v 1.24 2009/03/08 02:49:02 fa
 ******************************************************************************/
 #if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
 #define ddLCHash2(f,g,shift) \
-((((unsigned)(ptruint)(f) * DD_P1 + \
-   (unsigned)(ptruint)(g)) * DD_P2) >> (shift))
+((((uintptr_t)(f) * DD_P1 + \
+   (uintptr_t)(g)) * DD_P2) >> (shift))
 #else
 #define ddLCHash2(f,g,shift) \
-((((unsigned)(f) * DD_P1 + (unsigned)(g)) * DD_P2) >> (shift))
+((((uintptr_t)(f) * DD_P1 + (uintptr_t)(g)) * DD_P2) >> (shift))
 #endif
 
 
@@ -168,7 +168,7 @@ DD_INLINE static DdHashItem * cuddHashTableAlloc (DdHashTable *hash);
   Synopsis    [Initializes a local computed table.]
 
   Description [Initializes a computed table.  Returns a pointer the
-  the new local cache in case of success; NULL otherwise.]
+  the new local cache in case of success; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -186,9 +186,9 @@ cuddLocalCacheInit(
     int logSize;
 
     cache = ALLOC(DdLocalCache,1);
-    if (cache == NULL) {
+    if (cache == (uintptr_t) 0) {
 	manager->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cache->manager = manager;
     cache->keysize = keySize;
@@ -200,10 +200,10 @@ cuddLocalCacheInit(
     cacheSize = 1 << logSize;
     cache->item = (DdLocalCacheItem *)
 	ALLOC(char, cacheSize * cache->itemsize);
-    if (cache->item == NULL) {
+    if (cache->item == (uintptr_t) 0) {
 	manager->errorCode = CUDD_MEMORY_OUT;
 	FREE(cache);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cache->slots = cacheSize;
     cache->shift = sizeof(int) * 8 - logSize;
@@ -231,7 +231,7 @@ cuddLocalCacheInit(
 
   Description [Initializes the computed table. It is called by
   Cudd_Init. Returns a pointer the the new local cache in case of
-  success; NULL otherwise.]
+  success; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -290,7 +290,7 @@ cuddLocalCacheInsert(
   Synopsis [Looks up in a local cache.]
 
   Description [Looks up in a local cache. Returns the result if found;
-  it returns NULL if no result is found.]
+  it returns (uintptr_t) 0 if no result is found.]
 
   SideEffects [None]
 
@@ -310,7 +310,7 @@ cuddLocalCacheLookup(
     posn = ddLCHash(key,cache->keysize,cache->shift);
     entry = (DdLocalCacheItem *) ((char *) cache->item +
 				  posn * cache->itemsize);
-    if (entry->value != NULL &&
+    if (entry->value != (uintptr_t) 0 &&
 	memcmp(key,entry->key,cache->keysize*sizeof(DdNode *)) == 0) {
 	cache->hits++;
 	value = Cudd_Regular(entry->value);
@@ -327,7 +327,7 @@ cuddLocalCacheLookup(
 	cuddLocalCacheResize(cache);
     }
 
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of cuddLocalCacheLookup */
 
@@ -356,20 +356,20 @@ cuddLocalCacheClearDead(
     DdNodePtr *key;
     unsigned int i, j;
 
-    while (cache != NULL) {
+    while (cache != (uintptr_t) 0) {
 	keysize = cache->keysize;
 	itemsize = cache->itemsize;
 	slots = cache->slots;
 	item = cache->item;
 	for (i = 0; i < slots; i++) {
-	    if (item->value != NULL) {
+	    if (item->value != (uintptr_t) 0) {
 		if (Cudd_Regular(item->value)->ref == 0) {
-		    item->value = NULL;
+		    item->value = (uintptr_t) 0;
 		} else {
 		    key = item->key;
 		    for (j = 0; j < keysize; j++) {
 			if (Cudd_Regular(key[j])->ref == 0) {
-			    item->value = NULL;
+			    item->value = (uintptr_t) 0;
 			    break;
 			}
 		    }
@@ -402,7 +402,7 @@ cuddLocalCacheClearAll(
 {
     DdLocalCache *cache = manager->localCaches;
 
-    while (cache != NULL) {
+    while (cache != (uintptr_t) 0) {
 	memset(cache->item, 0, cache->slots * cache->itemsize);
 	cache = cache->next;
     }
@@ -452,7 +452,7 @@ cuddLocalCacheProfile(
     totalcount = 0.0;
 
     hystogram = ALLOC(long, nbins);
-    if (hystogram == NULL) {
+    if (hystogram == (uintptr_t) 0) {
 	return(0);
     }
     for (i = 0; i < nbins; i++) {
@@ -523,7 +523,7 @@ cuddLocalCacheProfile(
   Synopsis    [Initializes a hash table.]
 
   Description [Initializes a hash table. Returns a pointer to the new
-  table if successful; NULL otherwise.]
+  table if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -544,14 +544,14 @@ cuddHashTableInit(
 #pragma pointer_size short
 #endif
     hash = ALLOC(DdHashTable, 1);
-    if (hash == NULL) {
+    if (hash == (uintptr_t) 0) {
 	manager->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     hash->keysize = keySize;
     hash->manager = manager;
-    hash->memoryList = NULL;
-    hash->nextFree = NULL;
+    hash->memoryList = (uintptr_t) 0;
+    hash->nextFree = (uintptr_t) 0;
     hash->itemsize = (keySize + 1) * sizeof(DdNode *) +
 	sizeof(ptrint) + sizeof(DdHashItem *);
     /* We have to guarantee that the shift be < 32. */
@@ -560,10 +560,10 @@ cuddHashTableInit(
     hash->numBuckets = 1 << logSize;
     hash->shift = sizeof(int) * 8 - logSize;
     hash->bucket = ALLOC(DdHashItem *, hash->numBuckets);
-    if (hash->bucket == NULL) {
+    if (hash->bucket == (uintptr_t) 0) {
 	manager->errorCode = CUDD_MEMORY_OUT;
 	FREE(hash);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     memset(hash->bucket, 0, hash->numBuckets * sizeof(DdHashItem *));
     hash->size = 0;
@@ -603,14 +603,14 @@ cuddHashTableQuit(
 
     for (i = 0; i < numBuckets; i++) {
 	bucket = hash->bucket[i];
-	while (bucket != NULL) {
+	while (bucket != (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, bucket->value);
 	    bucket = bucket->next;
 	}
     }
 
     memlist = hash->memoryList;
-    while (memlist != NULL) {
+    while (memlist != (uintptr_t) 0) {
 	nextmem = (DdHashItem **) memlist[0];
 	FREE(memlist);
 	memlist = nextmem;
@@ -661,7 +661,7 @@ cuddHashTableInsert(
 	if (result == 0) return(0);
     }
     item = cuddHashTableAlloc(hash);
-    if (item == NULL) return(0);
+    if (item == (uintptr_t) 0) return(0);
     hash->size++;
     item->value = value;
     cuddRef(value);
@@ -684,7 +684,7 @@ cuddHashTableInsert(
 
   Description [Looks up a key consisting of more than three pointers
   in a hash table.  Returns the value associated to the key if there
-  is an entry for the given key in the table; NULL otherwise. If the
+  is an entry for the given key in the table; (uintptr_t) 0 otherwise. If the
   entry is present, its reference counter is decremented if not
   saturated. If the counter reaches 0, the value of the entry is
   dereferenced, and the entry is returned to the free list.]
@@ -710,10 +710,10 @@ cuddHashTableLookup(
 
     posn = ddLCHash(key,hash->keysize,hash->shift);
     item = hash->bucket[posn];
-    prev = NULL;
+    prev = (uintptr_t) 0;
 
     keysize = hash->keysize;
-    while (item != NULL) {
+    while (item != (uintptr_t) 0) {
 	DdNodePtr *key2 = item->key;
 	int equal = 1;
 	for (i = 0; i < keysize; i++) {
@@ -727,7 +727,7 @@ cuddHashTableLookup(
 	    cuddSatDec(item->count);
 	    if (item->count == 0) {
 		cuddDeref(value);
-		if (prev == NULL) {
+		if (prev == (uintptr_t) 0) {
 		    hash->bucket[posn] = item->next;
 		} else {
 		    prev->next = item->next;
@@ -741,7 +741,7 @@ cuddHashTableLookup(
 	prev = item;
 	item = item->next;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of cuddHashTableLookup */
 
@@ -779,13 +779,13 @@ cuddHashTableInsert1(
 	if (result == 0) return(0);
     }
     item = cuddHashTableAlloc(hash);
-    if (item == NULL) return(0);
+    if (item == (uintptr_t) 0) return(0);
     hash->size++;
     item->value = value;
     cuddRef(value);
     item->count = count;
     item->key[0] = f;
-    posn = ddLCHash2(f,f,hash->shift);
+    posn = ddLCHash2((uintptr_t) f,(uintptr_t) f,hash->shift);
     item->next = hash->bucket[posn];
     hash->bucket[posn] = item;
 
@@ -800,7 +800,7 @@ cuddHashTableInsert1(
 
   Description [Looks up a key consisting of one pointer in a hash table.
   Returns the value associated to the key if there is an entry for the given
-  key in the table; NULL otherwise. If the entry is present, its reference
+  key in the table; (uintptr_t) 0 otherwise. If the entry is present, its reference
   counter is decremented if not saturated. If the counter reaches 0, the
   value of the entry is dereferenced, and the entry is returned to the free
   list.]
@@ -825,16 +825,16 @@ cuddHashTableLookup1(
 
     posn = ddLCHash2(f,f,hash->shift);
     item = hash->bucket[posn];
-    prev = NULL;
+    prev = (uintptr_t) 0;
 
-    while (item != NULL) {
+    while (item != (uintptr_t) 0) {
 	DdNodePtr *key = item->key;
 	if (f == key[0]) {
 	    DdNode *value = item->value;
 	    cuddSatDec(item->count);
 	    if (item->count == 0) {
 		cuddDeref(value);
-		if (prev == NULL) {
+		if (prev == (uintptr_t) 0) {
 		    hash->bucket[posn] = item->next;
 		} else {
 		    prev->next = item->next;
@@ -848,7 +848,7 @@ cuddHashTableLookup1(
 	prev = item;
 	item = item->next;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of cuddHashTableLookup1 */
 
@@ -887,7 +887,7 @@ cuddHashTableInsert2(
 	if (result == 0) return(0);
     }
     item = cuddHashTableAlloc(hash);
-    if (item == NULL) return(0);
+    if (item == (uintptr_t) 0) return(0);
     hash->size++;
     item->value = value;
     cuddRef(value);
@@ -909,7 +909,7 @@ cuddHashTableInsert2(
 
   Description [Looks up a key consisting of two pointer in a hash table.
   Returns the value associated to the key if there is an entry for the given
-  key in the table; NULL otherwise. If the entry is present, its reference
+  key in the table; (uintptr_t) 0 otherwise. If the entry is present, its reference
   counter is decremented if not saturated. If the counter reaches 0, the
   value of the entry is dereferenced, and the entry is returned to the free
   list.]
@@ -935,16 +935,16 @@ cuddHashTableLookup2(
 
     posn = ddLCHash2(f,g,hash->shift);
     item = hash->bucket[posn];
-    prev = NULL;
+    prev = (uintptr_t) 0;
 
-    while (item != NULL) {
+    while (item != (uintptr_t) 0) {
 	DdNodePtr *key = item->key;
 	if ((f == key[0]) && (g == key[1])) {
 	    DdNode *value = item->value;
 	    cuddSatDec(item->count);
 	    if (item->count == 0) {
 		cuddDeref(value);
-		if (prev == NULL) {
+		if (prev == (uintptr_t) 0) {
 		    hash->bucket[posn] = item->next;
 		} else {
 		    prev->next = item->next;
@@ -958,7 +958,7 @@ cuddHashTableLookup2(
 	prev = item;
 	item = item->next;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of cuddHashTableLookup2 */
 
@@ -998,7 +998,7 @@ cuddHashTableInsert3(
 	if (result == 0) return(0);
     }
     item = cuddHashTableAlloc(hash);
-    if (item == NULL) return(0);
+    if (item == (uintptr_t) 0) return(0);
     hash->size++;
     item->value = value;
     cuddRef(value);
@@ -1021,7 +1021,7 @@ cuddHashTableInsert3(
 
   Description [Looks up a key consisting of three pointers in a hash table.
   Returns the value associated to the key if there is an entry for the given
-  key in the table; NULL otherwise. If the entry is present, its reference
+  key in the table; (uintptr_t) 0 otherwise. If the entry is present, its reference
   counter is decremented if not saturated. If the counter reaches 0, the
   value of the entry is dereferenced, and the entry is returned to the free
   list.]
@@ -1048,16 +1048,16 @@ cuddHashTableLookup3(
 
     posn = ddLCHash3(f,g,h,hash->shift);
     item = hash->bucket[posn];
-    prev = NULL;
+    prev = (uintptr_t) 0;
 
-    while (item != NULL) {
+    while (item != (uintptr_t) 0) {
 	DdNodePtr *key = item->key;
 	if ((f == key[0]) && (g == key[1]) && (h == key[2])) {
 	    DdNode *value = item->value;
 	    cuddSatDec(item->count);
 	    if (item->count == 0) {
 		cuddDeref(value);
-		if (prev == NULL) {
+		if (prev == (uintptr_t) 0) {
 		    hash->bucket[posn] = item->next;
 		} else {
 		    prev->next = item->next;
@@ -1071,7 +1071,7 @@ cuddHashTableLookup3(
 	prev = item;
 	item = item->next;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of cuddHashTableLookup3 */
 
@@ -1122,7 +1122,7 @@ cuddLocalCacheResize(
 	(DdLocalCacheItem *) ALLOC(char, slots * cache->itemsize);
     MMoutOfMemory = saveHandler;
     /* If we fail to allocate the new table we just give up. */
-    if (item == NULL) {
+    if (item == (uintptr_t) 0) {
 #ifdef DD_VERBOSE
 	(void) fprintf(cache->manager->err,"Resizing failed. Giving up.\n");
 #endif
@@ -1141,7 +1141,7 @@ cuddLocalCacheResize(
     /* Copy from old cache to new one. */
     for (i = 0; (unsigned) i < oldslots; i++) {
 	old = (DdLocalCacheItem *) ((char *) olditem + i * cache->itemsize);
-	if (old->value != NULL) {
+	if (old->value != (uintptr_t) 0) {
 	    posn = ddLCHash(old->key,cache->keysize,shift);
 	    entry = (DdLocalCacheItem *) ((char *) item +
 					  posn * cache->itemsize);
@@ -1244,7 +1244,7 @@ cuddLocalCacheRemoveFromList(
     prevCache = &(manager->localCaches);
     nextCache = manager->localCaches;
 
-    while (nextCache != NULL) {
+    while (nextCache != (uintptr_t) 0) {
 	if (nextCache == cache) {
 	    *prevCache = nextCache->next;
 	    return;
@@ -1303,7 +1303,7 @@ cuddHashTableResize(
 #endif
     buckets = ALLOC(DdHashItem *, numBuckets);
     MMoutOfMemory = saveHandler;
-    if (buckets == NULL) {
+    if (buckets == (uintptr_t) 0) {
 	hash->maxsize <<= 1;
 	return(1);
     }
@@ -1319,7 +1319,7 @@ cuddHashTableResize(
     if (hash->keysize == 1) {
 	for (j = 0; j < oldNumBuckets; j++) {
 	    item = oldBuckets[j];
-	    while (item != NULL) {
+	    while (item != (uintptr_t) 0) {
 		next = item->next;
 		key = item->key;
 		posn = ddLCHash2(key[0], key[0], shift);
@@ -1331,7 +1331,7 @@ cuddHashTableResize(
     } else if (hash->keysize == 2) {
 	for (j = 0; j < oldNumBuckets; j++) {
 	    item = oldBuckets[j];
-	    while (item != NULL) {
+	    while (item != (uintptr_t) 0) {
 		next = item->next;
 		key = item->key;
 		posn = ddLCHash2(key[0], key[1], shift);
@@ -1343,7 +1343,7 @@ cuddHashTableResize(
     } else if (hash->keysize == 3) {
 	for (j = 0; j < oldNumBuckets; j++) {
 	    item = oldBuckets[j];
-	    while (item != NULL) {
+	    while (item != (uintptr_t) 0) {
 		next = item->next;
 		key = item->key;
 		posn = ddLCHash3(key[0], key[1], key[2], shift);
@@ -1355,7 +1355,7 @@ cuddHashTableResize(
     } else {
 	for (j = 0; j < oldNumBuckets; j++) {
 	    item = oldBuckets[j];
-	    while (item != NULL) {
+	    while (item != (uintptr_t) 0) {
 		next = item->next;
 		posn = ddLCHash(item->key, hash->keysize, shift);
 		item->next = buckets[posn];
@@ -1377,7 +1377,7 @@ cuddHashTableResize(
   Description [Fast storage allocation for items in a hash table. The
   first 4 bytes of a chunk contain a pointer to the next block; the
   rest contains DD_MEM_CHUNK spaces for hash items.  Returns a pointer to
-  a new item if successful; NULL is memory is full.]
+  a new item if successful; (uintptr_t) 0 is memory is full.]
 
   SideEffects [None]
 
@@ -1399,7 +1399,7 @@ cuddHashTableAlloc(
 #endif
     DdHashItem **mem, *thisOne, *next, *item;
 
-    if (hash->nextFree == NULL) {
+    if (hash->nextFree == (uintptr_t) 0) {
 	saveHandler = MMoutOfMemory;
 	MMoutOfMemory = Cudd_OutOfMem;
 	mem = (DdHashItem **) ALLOC(char,(DD_MEM_CHUNK+1) * itemsize);
@@ -1407,10 +1407,10 @@ cuddHashTableAlloc(
 #ifdef __osf__
 #pragma pointer_size restore
 #endif
-	if (mem == NULL) {
-	    if (hash->manager->stash != NULL) {
+	if (mem == (uintptr_t) 0) {
+	    if (hash->manager->stash != (uintptr_t) 0) {
 		FREE(hash->manager->stash);
-		hash->manager->stash = NULL;
+		hash->manager->stash = (uintptr_t) 0;
 		/* Inhibit resizing of tables. */
 		hash->manager->maxCacheHard = hash->manager->cacheSlots - 1;
 		hash->manager->cacheSlack = - (int) (hash->manager->cacheSlots + 1);
@@ -1429,10 +1429,10 @@ cuddHashTableAlloc(
 #pragma pointer_size restore
 #endif
 	    }
-	    if (mem == NULL) {
+	    if (mem == (uintptr_t) 0) {
 		(*MMoutOfMemory)((long)((DD_MEM_CHUNK + 1) * itemsize));
 		hash->manager->errorCode = CUDD_MEMORY_OUT;
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	}
 
@@ -1447,7 +1447,7 @@ cuddHashTableAlloc(
 	    thisOne = next;
 	}
 
-	thisOne->next = NULL;
+	thisOne->next = (uintptr_t) 0;
 
     }
     item = hash->nextFree;

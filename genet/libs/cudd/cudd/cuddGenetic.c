@@ -191,7 +191,7 @@ cuddGa(
   int  upper /* highest level to be reorderded */)
 {
     int 	i,n,m;		/* dummy/loop vars */
-    int		index;
+    intptr_t		index;
 #ifdef DD_STATS
     double	average_fitness;
 #endif
@@ -214,7 +214,7 @@ cuddGa(
 
     /* Allocate population table. */
     storedd = ALLOC(int,(popsize+2)*(numvars+1));
-    if (storedd == NULL) {
+    if (storedd == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -228,7 +228,7 @@ cuddGa(
     ** by the computed table.
     */
     repeat = ALLOC(int,popsize);
-    if (repeat == NULL) {
+    if (repeat == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	FREE(storedd);
 	return(0);
@@ -237,7 +237,7 @@ cuddGa(
 	repeat[i] = 0;
     }
     computed = st_init_table(array_compare,array_hash);
-    if (computed == NULL) {
+    if (computed == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	FREE(storedd);
 	FREE(repeat);
@@ -287,7 +287,7 @@ cuddGa(
 	if (st_lookup_int(computed,(char *)&STOREDD(i,0),&index)) {
 	    repeat[index]++;
 	} else {
-	    if (st_insert(computed,(char *)&STOREDD(i,0),(char *)(long long)i) ==
+	    if (st_insert(computed,(char *)&STOREDD(i,0),(char *)(intptr_t)i) ==
 	    ST_OUT_OF_MEM) {
 		FREE(storedd);
 		FREE(repeat);
@@ -370,7 +370,7 @@ cuddGa(
 		repeat[index]--;
 		if (repeat[index] == 0) {
 		    int *pointer = &STOREDD(index,0);
-		    result = st_delete(computed, &pointer, NULL);
+		    result = st_delete(computed, &pointer, (uintptr_t) 0);
 		    if (!result) {
 			FREE(storedd);
 			FREE(repeat);
@@ -390,7 +390,7 @@ cuddGa(
 		    repeat[index]++;
 		} else {
 		    if (st_insert(computed,(char *)&STOREDD(large,0),
-		    (char *)(long long)large) == ST_OUT_OF_MEM) {
+		    (char *)(intptr_t)large) == ST_OUT_OF_MEM) {
 			FREE(storedd);
 			FREE(repeat);
 			st_free_table(computed);
@@ -415,7 +415,7 @@ cuddGa(
 
     /* Clean up, build the result DD, and return. */
     st_free_table(computed);
-    computed = NULL;
+    computed = (uintptr_t) 0;
     result = build_dd(table,small,lower,upper);
     FREE(storedd);
     FREE(repeat);
@@ -451,7 +451,7 @@ make_random(
     int	next;		/* next random number without repetitions */
 
     used = ALLOC(int,numvars);
-    if (used == NULL) {
+    if (used == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -554,7 +554,7 @@ build_dd(
 {
     int 	i,j;		/* loop vars */
     int 	position;
-    int		index;
+    intptr_t		index;
     int		limit;		/* how large the DD for this order can grow */
     int		size;
 
@@ -798,11 +798,11 @@ PMX(
     int		u,v;		/* aux vars */
 
     inv1 = ALLOC(int,maxvar);
-    if (inv1 == NULL) {
+    if (inv1 == (uintptr_t) 0) {
 	return(0);
     }
     inv2 = ALLOC(int,maxvar);
-    if (inv2 == NULL) {
+    if (inv2 == (uintptr_t) 0) {
 	FREE(inv1);
 	return(0);
     }
@@ -916,7 +916,7 @@ roulette(
     int i;
 
     wheel = ALLOC(double,popsize);
-    if (wheel == NULL) {
+    if (wheel == (uintptr_t) 0) {
 	return(0);
     }
 

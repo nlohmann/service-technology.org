@@ -63,6 +63,7 @@
 
 #include "mtr.h"
 #include "epd.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -363,7 +364,7 @@ typedef int (*DD_QSFP)(const void *, const void *);
   SeeAlso      [Cudd_NotCond]
 
 ******************************************************************************/
-#define Cudd_Not(node) ((DdNode *)((long long)(node) ^ (long long)01))
+#define Cudd_Not(node) ((DdNode *)((intptr_t)(node) ^ (intptr_t)01))
 
 
 /**Macro***********************************************************************
@@ -379,7 +380,7 @@ typedef int (*DD_QSFP)(const void *, const void *);
   SeeAlso      [Cudd_Not]
 
 ******************************************************************************/
-#define Cudd_NotCond(node,c) ((DdNode *)((long long)(node) ^ (c)))
+#define Cudd_NotCond(node,c) ((DdNode *)((intptr_t)(node) ^ (c)))
 
 
 /**Macro***********************************************************************
@@ -393,7 +394,7 @@ typedef int (*DD_QSFP)(const void *, const void *);
   SeeAlso      [Cudd_Complement Cudd_IsComplement]
 
 ******************************************************************************/
-#define Cudd_Regular(node) ((DdNode *)((long long)(node) & ~01))
+#define Cudd_Regular(node) ((DdNode *)((intptr_t)(node) & ~01))
 
 
 /**Macro***********************************************************************
@@ -407,7 +408,7 @@ typedef int (*DD_QSFP)(const void *, const void *);
   SeeAlso      [Cudd_Regular Cudd_IsComplement]
 
 ******************************************************************************/
-#define Cudd_Complement(node) ((DdNode *)((unsigned long long)(node) | 01))
+#define Cudd_Complement(node) ((DdNode *)((uintptr_t)(node) | 01))
 
 
 /**Macro***********************************************************************
@@ -421,7 +422,7 @@ typedef int (*DD_QSFP)(const void *, const void *);
   SeeAlso      [Cudd_Regular Cudd_Complement]
 
 ******************************************************************************/
-#define Cudd_IsComplement(node)	((int) ((long long) (node) & 01))
+#define Cudd_IsComplement(node)	((int) ((intptr_t) (node) & 01))
 
 
 /**Macro***********************************************************************

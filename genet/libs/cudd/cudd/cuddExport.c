@@ -96,8 +96,8 @@ static char rcsid[] DD_UNUSED = "$Id: cuddExport.c,v 1.22 2009/03/08 02:49:02 fa
 /*---------------------------------------------------------------------------*/
 
 static int ddDoDumpBlif (DdManager *dd, DdNode *f, FILE *fp, st_table *visited, char **names, int mv);
-static int ddDoDumpDaVinci (DdManager *dd, DdNode *f, FILE *fp, st_table *visited, char **names, ptruint mask);
-static int ddDoDumpDDcal (DdManager *dd, DdNode *f, FILE *fp, st_table *visited, char **names, ptruint mask);
+static int ddDoDumpDaVinci (DdManager *dd, DdNode *f, FILE *fp, st_table *visited, char **names, uintptr_t mask);
+static int ddDoDumpDDcal (DdManager *dd, DdNode *f, FILE *fp, st_table *visited, char **names, uintptr_t mask);
 static int ddDoDumpFactoredForm (DdManager *dd, DdNode *f, FILE *fp, char **names);
 
 /**AutomaticEnd***************************************************************/
@@ -139,16 +139,16 @@ Cudd_DumpBlif(
   FILE * fp /* pointer to the dump file */,
   int mv /* 0: blif, 1: blif-MV */)
 {
-    DdNode	*support = NULL;
+    DdNode	*support = (uintptr_t) 0;
     DdNode	*scan;
-    int		*sorted = NULL;
+    int		*sorted = (uintptr_t) 0;
     int		nvars = dd->size;
     int		retval;
     int		i;
 
     /* Build a bit array with the support of f. */
     sorted = ALLOC(int,nvars);
-    if (sorted == NULL) {
+    if (sorted == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	goto failure;
     }
@@ -156,7 +156,7 @@ Cudd_DumpBlif(
 
     /* Take the union of the supports of each output function. */
     support = Cudd_VectorSupport(dd,f,n);
-    if (support == NULL) goto failure;
+    if (support == (uintptr_t) 0) goto failure;
     cuddRef(support);
     scan = support;
     while (!cuddIsConstant(scan)) {
@@ -164,10 +164,10 @@ Cudd_DumpBlif(
 	scan = cuddT(scan);
     }
     Cudd_RecursiveDeref(dd,support);
-    support = NULL; /* so that we do not try to free it in case of failure */
+    support = (uintptr_t) 0; /* so that we do not try to free it in case of failure */
 
     /* Write the header (.model .inputs .outputs). */
-    if (mname == NULL) {
+    if (mname == (uintptr_t) 0) {
 	retval = fprintf(fp,".model DD\n.inputs");
     } else {
 	retval = fprintf(fp,".model %s\n.inputs",mname);
@@ -180,7 +180,7 @@ Cudd_DumpBlif(
     /* Write the input list by scanning the support array. */
     for (i = 0; i < nvars; i++) {
 	if (sorted[i]) {
-	    if (inames == NULL) {
+	    if (inames == (uintptr_t) 0) {
 		retval = fprintf(fp," %d", i);
 	    } else {
 		retval = fprintf(fp," %s", inames[i]);
@@ -189,13 +189,13 @@ Cudd_DumpBlif(
 	}
     }
     FREE(sorted);
-    sorted = NULL;
+    sorted = (uintptr_t) 0;
 
     /* Write the .output line. */
     retval = fprintf(fp,"\n.outputs");
     if (retval == EOF) goto failure;
     for (i = 0; i < n; i++) {
-	if (onames == NULL) {
+	if (onames == (uintptr_t) 0) {
 	    retval = fprintf(fp," f%d", i);
 	} else {
 	    retval = fprintf(fp," %s", onames[i]);
@@ -215,8 +215,8 @@ Cudd_DumpBlif(
     return(1);
 
 failure:
-    if (sorted != NULL) FREE(sorted);
-    if (support != NULL) Cudd_RecursiveDeref(dd,support);
+    if (sorted != (uintptr_t) 0) FREE(sorted);
+    if (support != (uintptr_t) 0) Cudd_RecursiveDeref(dd,support);
     return(0);
 
 } /* end of Cudd_DumpBlif */
@@ -254,13 +254,13 @@ Cudd_DumpBlifBody(
   FILE * fp /* pointer to the dump file */,
   int mv /* 0: blif, 1: blif-MV */)
 {
-    st_table	*visited = NULL;
+    st_table	*visited = (uintptr_t) 0;
     int		retval;
     int		i;
 
     /* Initialize symbol table for visited nodes. */
     visited = st_init_table(st_ptrcmp, st_ptrhash);
-    if (visited == NULL) goto failure;
+    if (visited == (uintptr_t) 0) goto failure;
 
     /* Call the function that really gets the job done. */
     for (i = 0; i < n; i++) {
@@ -273,19 +273,19 @@ Cudd_DumpBlifBody(
     ** the multiplexer representing the top node.
     */
     for (i = 0; i < n; i++) {
-	if (onames == NULL) {
+	if (onames == (uintptr_t) 0) {
 	    retval = fprintf(fp,
 #if SIZEOF_VOID_P == 8
-		".names %lx f%d\n", (ptruint) f[i] / (ptruint) sizeof(DdNode), i);
+		".names %lx f%d\n", (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode), i);
 #else
-		".names %x f%d\n", (ptruint) f[i] / (ptruint) sizeof(DdNode), i);
+		".names %x f%d\n", (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode), i);
 #endif
 	} else {
 	    retval = fprintf(fp,
 #if SIZEOF_VOID_P == 8
-		".names %lx %s\n", (ptruint) f[i] / (ptruint) sizeof(DdNode), onames[i]);
+		".names %lx %s\n", (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode), onames[i]);
 #else
-		".names %x %s\n", (ptruint) f[i] / (ptruint) sizeof(DdNode), onames[i]);
+		".names %x %s\n", (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode), onames[i]);
 #endif
 	}
 	if (retval == EOF) goto failure;
@@ -301,7 +301,7 @@ Cudd_DumpBlifBody(
     return(1);
 
 failure:
-    if (visited != NULL) st_free_table(visited);
+    if (visited != (uintptr_t) 0) st_free_table(visited);
     return(0);
 
 } /* end of Cudd_DumpBlifBody */
@@ -345,12 +345,12 @@ Cudd_DumpDot(
   char ** onames /* array of output names (or NULL) */,
   FILE * fp /* pointer to the dump file */)
 {
-    DdNode	*support = NULL;
+    DdNode	*support = (uintptr_t) 0;
     DdNode	*scan;
-    int		*sorted = NULL;
+    int		*sorted = (uintptr_t) 0;
     int		nvars = dd->size;
-    st_table	*visited = NULL;
-    st_generator *gen = NULL;
+    st_table	*visited = (uintptr_t) 0;
+    st_generator *gen = (uintptr_t) 0;
     int		retval;
     int		i, j;
     int		slots;
@@ -359,7 +359,7 @@ Cudd_DumpDot(
 
     /* Build a bit array with the support of f. */
     sorted = ALLOC(int,nvars);
-    if (sorted == NULL) {
+    if (sorted == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	goto failure;
     }
@@ -367,7 +367,7 @@ Cudd_DumpDot(
 
     /* Take the union of the supports of each output function. */
     support = Cudd_VectorSupport(dd,f,n);
-    if (support == NULL) goto failure;
+    if (support == (uintptr_t) 0) goto failure;
     cuddRef(support);
     scan = support;
     while (!cuddIsConstant(scan)) {
@@ -375,11 +375,11 @@ Cudd_DumpDot(
 	scan = cuddT(scan);
     }
     Cudd_RecursiveDeref(dd,support);
-    support = NULL; /* so that we do not try to free it in case of failure */
+    support = (uintptr_t) 0; /* so that we do not try to free it in case of failure */
 
     /* Initialize symbol table for visited nodes. */
     visited = st_init_table(st_ptrcmp, st_ptrhash);
-    if (visited == NULL) goto failure;
+    if (visited == (uintptr_t) 0) goto failure;
 
     /* Collect all the nodes of this DD in the symbol table. */
     for (i = 0; i < n; i++) {
@@ -399,14 +399,14 @@ Cudd_DumpDot(
     */
 
     /* Find the bits that are different. */
-    refAddr = (long long) Cudd_Regular(f[0]);
+    refAddr = (intptr_t) Cudd_Regular(f[0]);
     diff = 0;
     gen = st_init_gen(visited);
-    if (gen == NULL) goto failure;
-    while (st_gen(gen, &scan, NULL)) {
-	diff |= refAddr ^ (long long) scan;
+    if (gen == (uintptr_t) 0) goto failure;
+    while (st_gen(gen, &scan, (uintptr_t) 0)) {
+	diff |= refAddr ^ (intptr_t) scan;
     }
-    st_free_gen(gen); gen = NULL;
+    st_free_gen(gen); gen = (uintptr_t) 0;
 
     /* Choose the mask. */
     for (i = 0; (unsigned) i < 8 * sizeof(long); i += 4) {
@@ -433,7 +433,7 @@ Cudd_DumpDot(
     if (retval == EOF) goto failure;
     for (i = 0; i < nvars; i++) {
 	if (sorted[dd->invperm[i]]) {
-	    if (inames == NULL || inames[dd->invperm[i]] == NULL) {
+	    if (inames == (uintptr_t) 0 || inames[dd->invperm[i]] == (uintptr_t) 0) {
 		retval = fprintf(fp,"\" %d \" -> ", dd->invperm[i]);
 	    } else {
 		retval = fprintf(fp,"\" %s \" -> ", inames[dd->invperm[i]]);
@@ -448,7 +448,7 @@ Cudd_DumpDot(
     retval = fprintf(fp,"{ rank = same; node [shape = box]; edge [style = invis];\n");
     if (retval == EOF) goto failure;
     for (i = 0; i < n; i++) {
-	if (onames == NULL) {
+	if (onames == (uintptr_t) 0) {
 	    retval = fprintf(fp,"\"F%d\"", i);
 	} else {
 	    retval = fprintf(fp,"\"  %s  \"", onames[i]);
@@ -467,7 +467,7 @@ Cudd_DumpDot(
 	if (sorted[dd->invperm[i]]) {
 	    retval = fprintf(fp,"{ rank = same; ");
 	    if (retval == EOF) goto failure;
-	    if (inames == NULL || inames[dd->invperm[i]] == NULL) {
+	    if (inames == (uintptr_t) 0 || inames[dd->invperm[i]] == (uintptr_t) 0) {
 		retval = fprintf(fp,"\" %d \";\n", dd->invperm[i]);
 	    } else {
 		retval = fprintf(fp,"\" %s \";\n", inames[dd->invperm[i]]);
@@ -477,10 +477,10 @@ Cudd_DumpDot(
 	    slots = dd->subtables[i].slots;
 	    for (j = 0; j < slots; j++) {
 		scan = nodelist[j];
-		while (scan != NULL) {
+		while (scan != (uintptr_t) 0) {
 		    if (st_is_member(visited,(char *) scan)) {
 			retval = fprintf(fp,"\"%p\";\n",
-			    (void *) ((mask & (ptrint) scan) /
+			    (void *) ((mask & (intptr_t) scan) /
 			    sizeof(DdNode)));
 			if (retval == EOF) goto failure;
 		    }
@@ -500,10 +500,10 @@ Cudd_DumpDot(
     slots = dd->constants.slots;
     for (j = 0; j < slots; j++) {
 	scan = nodelist[j];
-	while (scan != NULL) {
+	while (scan != (uintptr_t) 0) {
 	    if (st_is_member(visited,(char *) scan)) {
 		retval = fprintf(fp,"\"%p\";\n",
-		    (void *) ((mask & (ptrint) scan) / sizeof(DdNode)));
+		    (void *) ((mask & (intptr_t) scan) / sizeof(DdNode)));
 		if (retval == EOF) goto failure;
 	    }
 	    scan = scan->next;
@@ -515,7 +515,7 @@ Cudd_DumpDot(
     /* Write edge info. */
     /* Edges from the output nodes. */
     for (i = 0; i < n; i++) {
-	if (onames == NULL) {
+	if (onames == (uintptr_t) 0) {
 	    retval = fprintf(fp,"\"F%d\"", i);
 	} else {
 	    retval = fprintf(fp,"\"  %s  \"", onames[i]);
@@ -524,10 +524,10 @@ Cudd_DumpDot(
 	/* Account for the possible complement on the root. */
 	if (Cudd_IsComplement(f[i])) {
 	    retval = fprintf(fp," -> \"%p\" [style = dotted];\n",
-		(void *) ((mask & (ptrint) f[i]) / sizeof(DdNode)));
+		(void *) ((mask & (intptr_t) f[i]) / sizeof(DdNode)));
 	} else {
 	    retval = fprintf(fp," -> \"%p\" [style = solid];\n",
-		(void *) ((mask & (ptrint) f[i]) / sizeof(DdNode)));
+		(void *) ((mask & (intptr_t) f[i]) / sizeof(DdNode)));
 	}
 	if (retval == EOF) goto failure;
     }
@@ -539,28 +539,28 @@ Cudd_DumpDot(
 	    slots = dd->subtables[i].slots;
 	    for (j = 0; j < slots; j++) {
 		scan = nodelist[j];
-		while (scan != NULL) {
+		while (scan != (uintptr_t) 0) {
 		    if (st_is_member(visited,(char *) scan)) {
 			retval = fprintf(fp,
 			    "\"%p\" -> \"%p\";\n",
-			    (void *) ((mask & (ptrint) scan) /
+			    (void *) ((mask & (intptr_t) scan) /
 			    sizeof(DdNode)),
-			    (void *) ((mask & (ptrint) cuddT(scan)) /
+			    (void *) ((mask & (intptr_t) cuddT(scan)) /
 			    sizeof(DdNode)));
 			if (retval == EOF) goto failure;
 			if (Cudd_IsComplement(cuddE(scan))) {
 			    retval = fprintf(fp,
 				"\"%p\" -> \"%p\" [style = dotted];\n",
-				(void *) ((mask & (ptrint) scan) /
+				(void *) ((mask & (intptr_t) scan) /
 				sizeof(DdNode)),
-				(void *) ((mask & (ptrint) cuddE(scan)) /
+				(void *) ((mask & (intptr_t) cuddE(scan)) /
 				sizeof(DdNode)));
 			} else {
 			    retval = fprintf(fp,
 				"\"%p\" -> \"%p\" [style = dashed];\n",
-				(void *) ((mask & (ptrint) scan) /
+				(void *) ((mask & (intptr_t) scan) /
 				sizeof(DdNode)),
-				(void *) ((mask & (ptrint) cuddE(scan)) /
+				(void *) ((mask & (intptr_t) cuddE(scan)) /
 				sizeof(DdNode)));
 			}
 			if (retval == EOF) goto failure;
@@ -576,10 +576,10 @@ Cudd_DumpDot(
     slots = dd->constants.slots;
     for (j = 0; j < slots; j++) {
 	scan = nodelist[j];
-	while (scan != NULL) {
+	while (scan != (uintptr_t) 0) {
 	    if (st_is_member(visited,(char *) scan)) {
 		retval = fprintf(fp,"\"%p\" [label = \"%g\"];\n",
-		    (void *) ((mask & (ptrint) scan) / sizeof(DdNode)),
+		    (void *) ((mask & (intptr_t) scan) / sizeof(DdNode)),
 		    cuddV(scan));
 		if (retval == EOF) goto failure;
 	    }
@@ -596,9 +596,9 @@ Cudd_DumpDot(
     return(1);
 
 failure:
-    if (sorted != NULL) FREE(sorted);
-    if (support != NULL) Cudd_RecursiveDeref(dd,support);
-    if (visited != NULL) st_free_table(visited);
+    if (sorted != (uintptr_t) 0) FREE(sorted);
+    if (support != (uintptr_t) 0) Cudd_RecursiveDeref(dd,support);
+    if (visited != (uintptr_t) 0) st_free_table(visited);
     return(0);
 
 } /* end of Cudd_DumpDot */
@@ -631,17 +631,17 @@ Cudd_DumpDaVinci(
   char ** onames /* array of output names (or NULL) */,
   FILE * fp /* pointer to the dump file */)
 {
-    DdNode	  *support = NULL;
+    DdNode	  *support = (uintptr_t) 0;
     DdNode	  *scan;
-    st_table	  *visited = NULL;
+    st_table	  *visited = (uintptr_t) 0;
     int		  retval;
     int		  i;
     st_generator  *gen;
-    ptruint       refAddr, diff, mask;
+    uintptr_t       refAddr, diff, mask;
 
     /* Initialize symbol table for visited nodes. */
     visited = st_init_table(st_ptrcmp, st_ptrhash);
-    if (visited == NULL) goto failure;
+    if (visited == (uintptr_t) 0) goto failure;
 
     /* Collect all the nodes of this DD in the symbol table. */
     for (i = 0; i < n; i++) {
@@ -661,16 +661,16 @@ Cudd_DumpDaVinci(
     */
 
     /* Find the bits that are different. */
-    refAddr = (ptruint) Cudd_Regular(f[0]);
+    refAddr = (uintptr_t) Cudd_Regular(f[0]);
     diff = 0;
     gen = st_init_gen(visited);
-    while (st_gen(gen, &scan, NULL)) {
-	diff |= refAddr ^ (ptruint) scan;
+    while (st_gen(gen, &scan, (uintptr_t) 0)) {
+	diff |= refAddr ^ (uintptr_t) scan;
     }
     st_free_gen(gen);
 
     /* Choose the mask. */
-    for (i = 0; (unsigned) i < 8 * sizeof(ptruint); i += 4) {
+    for (i = 0; (unsigned) i < 8 * sizeof(uintptr_t); i += 4) {
 	mask = (1 << i) - 1;
 	if (diff <= mask) break;
     }
@@ -678,13 +678,13 @@ Cudd_DumpDaVinci(
 
     /* Initialize symbol table for visited nodes. */
     visited = st_init_table(st_ptrcmp, st_ptrhash);
-    if (visited == NULL) goto failure;
+    if (visited == (uintptr_t) 0) goto failure;
 
     retval = fprintf(fp, "[");
     if (retval == EOF) goto failure;
     /* Call the function that really gets the job done. */
     for (i = 0; i < n; i++) {
-	if (onames == NULL) {
+	if (onames == (uintptr_t) 0) {
 	    retval = fprintf(fp,
 			     "l(\"f%d\",n(\"root\",[a(\"OBJECT\",\"f%d\")],",
 			     i,i);
@@ -711,8 +711,8 @@ Cudd_DumpDaVinci(
     return(1);
 
 failure:
-    if (support != NULL) Cudd_RecursiveDeref(dd,support);
-    if (visited != NULL) st_free_table(visited);
+    if (support != (uintptr_t) 0) Cudd_RecursiveDeref(dd,support);
+    if (visited != (uintptr_t) 0) st_free_table(visited);
     return(0);
 
 } /* end of Cudd_DumpDaVinci */
@@ -745,19 +745,19 @@ Cudd_DumpDDcal(
   char ** onames /* array of output names (or NULL) */,
   FILE * fp /* pointer to the dump file */)
 {
-    DdNode	  *support = NULL;
+    DdNode	  *support = (uintptr_t) 0;
     DdNode	  *scan;
-    int		  *sorted = NULL;
+    int		  *sorted = (uintptr_t) 0;
     int		  nvars = dd->size;
-    st_table	  *visited = NULL;
+    st_table	  *visited = (uintptr_t) 0;
     int		  retval;
     int		  i;
     st_generator  *gen;
-    ptruint       refAddr, diff, mask;
+    uintptr_t       refAddr, diff, mask;
 
     /* Initialize symbol table for visited nodes. */
     visited = st_init_table(st_ptrcmp, st_ptrhash);
-    if (visited == NULL) goto failure;
+    if (visited == (uintptr_t) 0) goto failure;
 
     /* Collect all the nodes of this DD in the symbol table. */
     for (i = 0; i < n; i++) {
@@ -777,16 +777,16 @@ Cudd_DumpDDcal(
     */
 
     /* Find the bits that are different. */
-    refAddr = (ptruint) Cudd_Regular(f[0]);
+    refAddr = (uintptr_t) Cudd_Regular(f[0]);
     diff = 0;
     gen = st_init_gen(visited);
-    while (st_gen(gen, &scan, NULL)) {
-	diff |= refAddr ^ (ptruint) scan;
+    while (st_gen(gen, &scan, (uintptr_t) 0)) {
+	diff |= refAddr ^ (uintptr_t) scan;
     }
     st_free_gen(gen);
 
     /* Choose the mask. */
-    for (i = 0; (unsigned) i < 8 * sizeof(ptruint); i += 4) {
+    for (i = 0; (unsigned) i < 8 * sizeof(uintptr_t); i += 4) {
 	mask = (1 << i) - 1;
 	if (diff <= mask) break;
     }
@@ -794,7 +794,7 @@ Cudd_DumpDDcal(
 
     /* Build a bit array with the support of f. */
     sorted = ALLOC(int,nvars);
-    if (sorted == NULL) {
+    if (sorted == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	goto failure;
     }
@@ -802,7 +802,7 @@ Cudd_DumpDDcal(
 
     /* Take the union of the supports of each output function. */
     support = Cudd_VectorSupport(dd,f,n);
-    if (support == NULL) goto failure;
+    if (support == (uintptr_t) 0) goto failure;
     cuddRef(support);
     scan = support;
     while (!cuddIsConstant(scan)) {
@@ -810,10 +810,10 @@ Cudd_DumpDDcal(
 	scan = cuddT(scan);
     }
     Cudd_RecursiveDeref(dd,support);
-    support = NULL; /* so that we do not try to free it in case of failure */
+    support = (uintptr_t) 0; /* so that we do not try to free it in case of failure */
     for (i = 0; i < nvars; i++) {
 	if (sorted[dd->invperm[i]]) {
-	    if (inames == NULL || inames[dd->invperm[i]] == NULL) {
+	    if (inames == (uintptr_t) 0 || inames[dd->invperm[i]] == (uintptr_t) 0) {
 		retval = fprintf(fp,"v%d", dd->invperm[i]);
 	    } else {
 		retval = fprintf(fp,"%s", inames[dd->invperm[i]]);
@@ -824,25 +824,25 @@ Cudd_DumpDDcal(
 	if (retval == EOF) goto failure;
     }
     FREE(sorted);
-    sorted = NULL;
+    sorted = (uintptr_t) 0;
 
     /* Initialize symbol table for visited nodes. */
     visited = st_init_table(st_ptrcmp, st_ptrhash);
-    if (visited == NULL) goto failure;
+    if (visited == (uintptr_t) 0) goto failure;
 
     /* Call the function that really gets the job done. */
     for (i = 0; i < n; i++) {
 	retval = ddDoDumpDDcal(dd,Cudd_Regular(f[i]),fp,visited,inames,mask);
 	if (retval == 0) goto failure;
-	if (onames == NULL) {
+	if (onames == (uintptr_t) 0) {
 	    retval = fprintf(fp, "f%d = ", i);
 	} else {
 	    retval = fprintf(fp, "%s = ", onames[i]);
 	}
 	if (retval == EOF) goto failure;
 	retval = fprintf(fp, "n%p%s\n",
-			 (void *) (((ptruint) f[i] & mask) /
-			 (ptruint) sizeof(DdNode)),
+			 (void *) (((uintptr_t) f[i] & mask) /
+			 (uintptr_t) sizeof(DdNode)),
 			 Cudd_IsComplement(f[i]) ? "'" : "");
 	if (retval == EOF) goto failure;
     }
@@ -851,7 +851,7 @@ Cudd_DumpDDcal(
     retval = fprintf(fp, "[");
     if (retval == EOF) goto failure;
     for (i = 0; i < n; i++) {
-	if (onames == NULL) {
+	if (onames == (uintptr_t) 0) {
 	    retval = fprintf(fp, "f%d", i);
 	} else {
 	    retval = fprintf(fp, "%s", onames[i]);
@@ -866,9 +866,9 @@ Cudd_DumpDDcal(
     return(1);
 
 failure:
-    if (sorted != NULL) FREE(sorted);
-    if (support != NULL) Cudd_RecursiveDeref(dd,support);
-    if (visited != NULL) st_free_table(visited);
+    if (sorted != (uintptr_t) 0) FREE(sorted);
+    if (support != (uintptr_t) 0) Cudd_RecursiveDeref(dd,support);
+    if (visited != (uintptr_t) 0) st_free_table(visited);
     return(0);
 
 } /* end of Cudd_DumpDDcal */
@@ -908,7 +908,7 @@ Cudd_DumpFactoredForm(
 
     /* Call the function that really gets the job done. */
     for (i = 0; i < n; i++) {
-	if (onames == NULL) {
+	if (onames == (uintptr_t) 0) {
 	    retval = fprintf(fp, "f%d = ", i);
 	} else {
 	    retval = fprintf(fp, "%s = ", onames[i]);
@@ -982,19 +982,19 @@ ddDoDumpBlif(
 	return(1);
 
     /* Check for abnormal condition that should never happen. */
-    if (f == NULL)
+    if (f == (uintptr_t) 0)
 	return(0);
 
     /* Mark node as visited. */
-    if (st_insert(visited, (char *) f, NULL) == ST_OUT_OF_MEM)
+    if (st_insert(visited, (char *) f, (uintptr_t) 0) == ST_OUT_OF_MEM)
 	return(0);
 
     /* Check for special case: If constant node, generate constant 1. */
     if (f == DD_ONE(dd)) {
 #if SIZEOF_VOID_P == 8
-	retval = fprintf(fp, ".names %lx\n1\n",(ptruint) f / (ptruint) sizeof(DdNode));
+	retval = fprintf(fp, ".names %lx\n1\n",(uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #else
-	retval = fprintf(fp, ".names %x\n1\n",(ptruint) f / (ptruint) sizeof(DdNode));
+	retval = fprintf(fp, ".names %x\n1\n",(uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #endif
 	if (retval == EOF) {
 	    return(0);
@@ -1009,11 +1009,11 @@ ddDoDumpBlif(
     if (f == DD_ZERO(dd)) {
 #if SIZEOF_VOID_P == 8
 	retval = fprintf(fp, ".names %lx\n%s",
-			 (ptruint) f / (ptruint) sizeof(DdNode),
+			 (uintptr_t) f / (uintptr_t) sizeof(DdNode),
 			 mv ? "0\n" : "");
 #else
 	retval = fprintf(fp, ".names %x\n%s",
-			 (ptruint) f / (ptruint) sizeof(DdNode),
+			 (uintptr_t) f / (uintptr_t) sizeof(DdNode),
 			 mv ? "0\n" : "");
 #endif
 	if (retval == EOF) {
@@ -1034,7 +1034,7 @@ ddDoDumpBlif(
     if (retval != 1) return(retval);
 
     /* Write multiplexer taking complement arc into account. */
-    if (names != NULL) {
+    if (names != (uintptr_t) 0) {
 	retval = fprintf(fp,".names %s", names[f->index]);
     } else {
 #if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
@@ -1050,52 +1050,52 @@ ddDoDumpBlif(
     if (mv) {
 	if (Cudd_IsComplement(cuddE(f))) {
 	    retval = fprintf(fp," %lx %lx %lx\n.def 0\n1 1 - 1\n0 - 0 1\n",
-		(ptruint) T / (ptruint) sizeof(DdNode),
-		(ptruint) E / (ptruint) sizeof(DdNode),
-		(ptruint) f / (ptruint) sizeof(DdNode));
+		(uintptr_t) T / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) E / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) f / (uintptr_t) sizeof(DdNode));
 	} else {
 	    retval = fprintf(fp," %lx %lx %lx\n.def 0\n1 1 - 1\n0 - 1 1\n",
-		(ptruint) T / (ptruint) sizeof(DdNode),
-		(ptruint) E / (ptruint) sizeof(DdNode),
-		(ptruint) f / (ptruint) sizeof(DdNode));
+		(uintptr_t) T / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) E / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) f / (uintptr_t) sizeof(DdNode));
 	}
     } else {
 	if (Cudd_IsComplement(cuddE(f))) {
 	    retval = fprintf(fp," %lx %lx %lx\n11- 1\n0-0 1\n",
-		(ptruint) T / (ptruint) sizeof(DdNode),
-		(ptruint) E / (ptruint) sizeof(DdNode),
-		(ptruint) f / (ptruint) sizeof(DdNode));
+		(uintptr_t) T / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) E / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) f / (uintptr_t) sizeof(DdNode));
 	} else {
 	    retval = fprintf(fp," %lx %lx %lx\n11- 1\n0-1 1\n",
-		(ptruint) T / (ptruint) sizeof(DdNode),
-		(ptruint) E / (ptruint) sizeof(DdNode),
-		(ptruint) f / (ptruint) sizeof(DdNode));
+		(uintptr_t) T / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) E / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) f / (uintptr_t) sizeof(DdNode));
 	}
     }
 #else
     if (mv) {
 	if (Cudd_IsComplement(cuddE(f))) {
 	    retval = fprintf(fp," %x %x %x\n.def 0\n1 1 - 1\n0 - 0 1\n",
-		(ptruint) T / (ptruint) sizeof(DdNode),
-		(ptruint) E / (ptruint) sizeof(DdNode),
-		(ptruint) f / (ptruint) sizeof(DdNode));
+		(uintptr_t) T / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) E / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) f / (uintptr_t) sizeof(DdNode));
 	} else {
 	    retval = fprintf(fp," %x %x %x\n.def 0\n1 1 - 1\n0 - 1 1\n",
-		(ptruint) T / (ptruint) sizeof(DdNode),
-		(ptruint) E / (ptruint) sizeof(DdNode),
-		(ptruint) f / (ptruint) sizeof(DdNode));
+		(uintptr_t) T / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) E / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) f / (uintptr_t) sizeof(DdNode));
 	}
     } else {
 	if (Cudd_IsComplement(cuddE(f))) {
 	    retval = fprintf(fp," %x %x %x\n11- 1\n0-0 1\n",
-		(ptruint) T / (ptruint) sizeof(DdNode),
-		(ptruint) E / (ptruint) sizeof(DdNode),
-		(ptruint) f / (ptruint) sizeof(DdNode));
+		(uintptr_t) T / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) E / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) f / (uintptr_t) sizeof(DdNode));
 	} else {
 	    retval = fprintf(fp," %x %x %x\n11- 1\n0-1 1\n",
-		(ptruint) T / (ptruint) sizeof(DdNode),
-		(ptruint) E / (ptruint) sizeof(DdNode),
-		(ptruint) f / (ptruint) sizeof(DdNode));
+		(uintptr_t) T / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) E / (uintptr_t) sizeof(DdNode),
+		(uintptr_t) f / (uintptr_t) sizeof(DdNode));
 	}
     }
 #endif
@@ -1129,17 +1129,17 @@ ddDoDumpDaVinci(
   FILE * fp,
   st_table * visited,
   char ** names,
-  ptruint mask)
+  uintptr_t mask)
 {
     DdNode  *T, *E;
     int	    retval;
-    ptruint id;
+    uintptr_t id;
 
 #ifdef DD_DEBUG
     assert(!Cudd_IsComplement(f));
 #endif
 
-    id = ((ptruint) f & mask) / sizeof(DdNode);
+    id = ((uintptr_t) f & mask) / sizeof(DdNode);
 
     /* If already visited, insert a reference. */
     if (st_is_member(visited, (char *) f) == 1) {
@@ -1152,11 +1152,11 @@ ddDoDumpDaVinci(
     }
 
     /* Check for abnormal condition that should never happen. */
-    if (f == NULL)
+    if (f == (uintptr_t) 0)
 	return(0);
 
     /* Mark node as visited. */
-    if (st_insert(visited, (char *) f, NULL) == ST_OUT_OF_MEM)
+    if (st_insert(visited, (char *) f, (uintptr_t) 0) == ST_OUT_OF_MEM)
 	return(0);
 
     /* Check for special case: If constant node, generate constant 1. */
@@ -1172,7 +1172,7 @@ ddDoDumpDaVinci(
     }
 
     /* Recursive calls. */
-    if (names != NULL) {
+    if (names != (uintptr_t) 0) {
 	retval = fprintf(fp,
 			 "l(\"%p\",n(\"internal\",[a(\"OBJECT\",\"%s\"),",
 			 (void *) id, names[f->index]);
@@ -1228,17 +1228,17 @@ ddDoDumpDDcal(
   FILE * fp,
   st_table * visited,
   char ** names,
-  ptruint mask)
+  uintptr_t mask)
 {
     DdNode  *T, *E;
     int	    retval;
-    ptruint id, idT, idE;
+    uintptr_t id, idT, idE;
 
 #ifdef DD_DEBUG
     assert(!Cudd_IsComplement(f));
 #endif
 
-    id = ((ptruint) f & mask) / sizeof(DdNode);
+    id = ((uintptr_t) f & mask) / sizeof(DdNode);
 
     /* If already visited, do nothing. */
     if (st_is_member(visited, (char *) f) == 1) {
@@ -1246,11 +1246,11 @@ ddDoDumpDDcal(
     }
 
     /* Check for abnormal condition that should never happen. */
-    if (f == NULL)
+    if (f == (uintptr_t) 0)
 	return(0);
 
     /* Mark node as visited. */
-    if (st_insert(visited, (char *) f, NULL) == ST_OUT_OF_MEM)
+    if (st_insert(visited, (char *) f, (uintptr_t) 0) == ST_OUT_OF_MEM)
 	return(0);
 
     /* Check for special case: If constant node, assign constant. */
@@ -1272,9 +1272,9 @@ ddDoDumpDDcal(
     E = Cudd_Regular(cuddE(f));
     retval = ddDoDumpDDcal(dd,E,fp,visited,names,mask);
     if (retval != 1) return(retval);
-    idT = ((ptruint) T & mask) / sizeof(DdNode);
-    idE = ((ptruint) E & mask) / sizeof(DdNode);
-    if (names != NULL) {
+    idT = ((uintptr_t) T & mask) / sizeof(DdNode);
+    idE = ((uintptr_t) E & mask) / sizeof(DdNode);
+    if (names != (uintptr_t) 0) {
 	retval = fprintf(fp, "n%p = %s * n%p + %s' * n%p%s\n",
 			 (void *) id, names[f->index],
 			 (void *) idT, names[f->index],
@@ -1331,7 +1331,7 @@ ddDoDumpFactoredForm(
 #endif
 
     /* Check for abnormal condition that should never happen. */
-    if (f == NULL)
+    if (f == (uintptr_t) 0)
 	return(0);
 
     /* Recursive calls. */
@@ -1339,7 +1339,7 @@ ddDoDumpFactoredForm(
     E = cuddE(f);
     if (T != DD_ZERO(dd)) {
 	if (E != DD_ONE(dd)) {
-	    if (names != NULL) {
+	    if (names != (uintptr_t) 0) {
 		retval = fprintf(fp, "%s", names[f->index]);
 	    } else {
 #if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
@@ -1364,7 +1364,7 @@ ddDoDumpFactoredForm(
     }
     E = Cudd_Regular(E);
     if (T != DD_ONE(dd)) {
-	if (names != NULL) {
+	if (names != (uintptr_t) 0) {
 	    retval = fprintf(fp, "!%s", names[f->index]);
 	} else {
 #if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4

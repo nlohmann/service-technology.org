@@ -2,6 +2,7 @@
 #include <stdafx.h>
 #include "nearunityunit.h"
 
+/*
 double log1p(double x)
 {
     double result;
@@ -62,9 +63,9 @@ double expm1(double x)
     result = r+r;
     return result;
 }
+*/
 
-
-double cosm1(double x)
+double cosm1(double x) throw ()
 {
     double result;
     double xx;

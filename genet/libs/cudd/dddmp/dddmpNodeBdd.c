@@ -27,6 +27,7 @@
 ******************************************************************************/
 
 #include "dddmpInt.h"
+#include <stdint.h>
 
 /*---------------------------------------------------------------------------*/
 /* Stucture declarations                                                     */
@@ -343,13 +344,13 @@ RemoveFromUniqueRecurBdd (
 
     nodelist = subtable->nodelist;
 
-    pos = ddHash ((unsigned long) cuddT (f),(unsigned long) cuddE (f), subtable->shift);
+    pos = ddHash ((uintptr_t) cuddT (f), (uintptr_t) cuddE (f), subtable->shift);
     node = nodelist[pos];
-    last = NULL;
+    last = (uintptr_t) NULL;
     while (node != sentinel) {
       next = node->next;
       if (node == f) {
-        if (last != NULL)  
+        if (last != (uintptr_t) NULL)  
   	  last->next = next;
         else 
           nodelist[pos] = next;
@@ -360,7 +361,7 @@ RemoveFromUniqueRecurBdd (
       }
     }
 
-    f->next = NULL;
+    f->next = (uintptr_t) NULL;
 
   }
 
@@ -407,7 +408,7 @@ RestoreInUniqueRecurBdd (
     /* StQ 11.02.2004:
        Bug fixed --> restore NULL within the next field */
     /*DddmpClearVisitedBdd (f);*/   
-    f->next = NULL;
+    f->next = (uintptr_t) NULL;
 
     return;
   }
@@ -420,8 +421,7 @@ RestoreInUniqueRecurBdd (
 
   nodelist = subtable->nodelist;
 
-  // \TODO: check definition of ddHash (include/CuddInt.h) for type sizes
-  pos = ddHash ((unsigned long) cuddT (f),(unsigned long) cuddE (f), subtable->shift);
+  pos = ddHash ((uintptr_t)cuddT (f), (uintptr_t) cuddE (f), subtable->shift);
 
 #ifdef DDDMP_DEBUG
   /* verify uniqueness to avoid duplicate nodes in unique table */

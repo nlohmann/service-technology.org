@@ -31,6 +31,7 @@
 ******************************************************************************/
 
 #include "dddmpInt.h"
+#include <stdint.h>
 
 /*---------------------------------------------------------------------------*/
 /* Stucture declarations                                                     */
@@ -161,9 +162,9 @@ Dddmp_cuddBddArrayStorePrefix (
    *  Check if File needs to be opened in the proper mode.
    */
 
-  if (fp == NULL) {
+  if (fp == (uintptr_t) 0) {
     fp = fopen (fname, "w");
-    Dddmp_CheckAndGotoLabel (fp==NULL, "Error opening file.",
+    Dddmp_CheckAndGotoLabel (fp==(uintptr_t) 0, "Error opening file.",
       failure);
     fileToClose = 1;
   }
@@ -287,9 +288,9 @@ Dddmp_cuddBddArrayStoreBlif (
    *  Check if File needs to be opened in the proper mode.
    */
 
-  if (fp == NULL) {
+  if (fp == (uintptr_t) 0) {
     fp = fopen (fname, "w");
-    Dddmp_CheckAndGotoLabel (fp==NULL, "Error opening file.",
+    Dddmp_CheckAndGotoLabel (fp==(uintptr_t) 0, "Error opening file.",
       failure);
     fileToClose = 1;
   }
@@ -413,9 +414,9 @@ Dddmp_cuddBddArrayStoreSmv (
    *  Check if File needs to be opened in the proper mode.
    */
 
-  if (fp == NULL) {
+  if (fp == (uintptr_t) 0) {
     fp = fopen (fname, "w");
-    Dddmp_CheckAndGotoLabel (fp==NULL, "Error opening file.",
+    Dddmp_CheckAndGotoLabel (fp==(uintptr_t) 0, "Error opening file.",
       failure);
     fileToClose = 1;
   }
@@ -494,16 +495,16 @@ DddmpCuddDdArrayStorePrefix (
   FILE *fp            /* IN: Pointer to the dump file */
   )
 {
-  DdNode *support = NULL;
+  DdNode *support = (uintptr_t) 0;
   DdNode *scan;
-  int *sorted = NULL;
+  int *sorted = (uintptr_t) 0;
   int nVars = ddMgr->size;
   int retValue;
   int i;
 
   /* Build a bit array with the support of f. */
   sorted = ALLOC(int, nVars);
-  if (sorted == NULL) {
+  if (sorted == (uintptr_t) 0) {
     ddMgr->errorCode = CUDD_MEMORY_OUT;
     Dddmp_CheckAndGotoLabel (1, "Allocation Error.", failure);
   }
@@ -513,7 +514,7 @@ DddmpCuddDdArrayStorePrefix (
 
   /* Take the union of the supports of each output function. */
   support = Cudd_VectorSupport(ddMgr,f,n);
-  Dddmp_CheckAndGotoLabel (support==NULL,
+  Dddmp_CheckAndGotoLabel (support==(uintptr_t) 0,
     "Error in function Cudd_VectorSupport.", failure);
   cuddRef(support);
   scan = support;
@@ -523,10 +524,10 @@ DddmpCuddDdArrayStorePrefix (
   }
   Cudd_RecursiveDeref(ddMgr,support);
   /* so that we do not try to free it in case of failure */
-  support = NULL;
+  support = (uintptr_t) 0;
 
   /* Write the header (.model .inputs .outputs). */
-  if (modelName == NULL) {
+  if (modelName == (uintptr_t) 0) {
     retValue = fprintf (fp, "(COMMENT - model name: Unknown )\n");
   } else {
     retValue = fprintf (fp, "(COMMENT - model name: %s )\n", modelName);
@@ -542,7 +543,7 @@ DddmpCuddDdArrayStorePrefix (
   /* Write the input list by scanning the support array. */
   for (i = 0; i < nVars; i++) {
     if (sorted[i]) {
-      if (inputNames == NULL) {
+      if (inputNames == (uintptr_t) 0) {
 	retValue = fprintf(fp," inNode%d", i);
       } else {
 	retValue = fprintf(fp," %s", inputNames[i]);
@@ -552,7 +553,7 @@ DddmpCuddDdArrayStorePrefix (
     }
   }
   FREE(sorted);
-  sorted = NULL;
+  sorted = (uintptr_t) 0;
   retValue = fprintf(fp, " )\n");
   if (retValue == EOF) {
     return(0);
@@ -564,7 +565,7 @@ DddmpCuddDdArrayStorePrefix (
     return(0);
   }
   for (i = 0; i < n; i++) {
-    if (outputNames == NULL) {
+    if (outputNames == (uintptr_t) 0) {
       retValue = fprintf (fp," outNode%d", i);
     } else {
       retValue = fprintf (fp," %s", outputNames[i]);
@@ -584,10 +585,10 @@ DddmpCuddDdArrayStorePrefix (
   return(1);
 
 failure:
-    if (sorted != NULL) {
+    if (sorted != (uintptr_t) 0) {
       FREE(sorted);
     }
-    if (support != NULL) {
+    if (support != (uintptr_t) 0) {
       Cudd_RecursiveDeref(ddMgr,support);
     }
     return(0);
@@ -631,13 +632,13 @@ DddmpCuddDdArrayStorePrefixBody (
   FILE *fp              /* IN: Pointer to the dump file */
   )
 {
-  st_table *visited = NULL;
+  st_table *visited = (uintptr_t) 0;
   int retValue;
   int i;
 
   /* Initialize symbol table for visited nodes. */
   visited = st_init_table(st_ptrcmp, st_ptrhash);
-  Dddmp_CheckAndGotoLabel (visited==NULL,
+  Dddmp_CheckAndGotoLabel (visited==(uintptr_t) 0,
     "Error if function st_init_table.", failure);
 
   /* Call the function that really gets the job done. */
@@ -653,7 +654,7 @@ DddmpCuddDdArrayStorePrefixBody (
    ** the multiplexer representing the top node.
    */
   for (i=0; i<n; i++) {
-    if (outputNames == NULL) {
+    if (outputNames == (uintptr_t) 0) {
       retValue = fprintf (fp,  "(BUF outNode%d ", i);
     } else {
       retValue = fprintf (fp,  "(BUF %s ", outputNames[i]);
@@ -664,18 +665,18 @@ DddmpCuddDdArrayStorePrefixBody (
     if (Cudd_IsComplement(f[i])) {
 #if SIZEOF_VOID_P == 8
       retValue = fprintf (fp, "(NOT node%lx))\n",
-        (unsigned long long) f[i] / (unsigned long long) sizeof(DdNode));
+        (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode));
 #else
       retValue = fprintf (fp, "(NOT node%x))\n",
-        (unsigned) f[i] / (unsigned) sizeof(DdNode));
+        (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode));
 #endif
     } else {
 #if SIZEOF_VOID_P == 8
       retValue = fprintf (fp, "node%lx)\n",
-        (unsigned long long) f[i] / (unsigned long long) sizeof(DdNode));
+        (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode));
 #else
       retValue = fprintf (fp, "node%x)\n",
-        (unsigned) f[i] / (unsigned) sizeof(DdNode));
+        (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode));
 #endif
     }
     Dddmp_CheckAndGotoLabel (retValue==EOF,
@@ -687,7 +688,7 @@ DddmpCuddDdArrayStorePrefixBody (
   return(1);
 
 failure:
-    if (visited != NULL) st_free_table(visited);
+    if (visited != (uintptr_t) 0) st_free_table(visited);
     return(0);
 
 }
@@ -740,12 +741,12 @@ DddmpCuddDdArrayStorePrefixStep (
   }
 
   /* Check for abnormal condition that should never happen. */
-  if (f == NULL) {
+  if (f == (uintptr_t) 0) {
     return(0);
   }
 
   /* Mark node as visited. */
-  if (st_insert(visited, (char *) f, NULL) == ST_OUT_OF_MEM) {
+  if (st_insert(visited, (char *) f, (uintptr_t) 0) == ST_OUT_OF_MEM) {
     return(0);
   }
 
@@ -754,11 +755,11 @@ DddmpCuddDdArrayStorePrefixStep (
 #if SIZEOF_VOID_P == 8
     retValue = fprintf (fp,
       "(OR node%lx vss vdd)\n",
-      (unsigned long long) f / (unsigned long long) sizeof(DdNode));
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #else
     retValue = fprintf (fp,
       "(OR node%x vss vdd)\n",
-      (unsigned) f / (unsigned) sizeof(DdNode));
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #endif
     if (retValue == EOF) {
        return(0);
@@ -776,11 +777,11 @@ DddmpCuddDdArrayStorePrefixStep (
 #if SIZEOF_VOID_P == 8
     retValue = fprintf (fp,
       "(AND node%lx vss vdd)\n",
-       (unsigned long long) f / (unsigned long long) sizeof(DdNode));
+       (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #else
     retValue = fprintf (fp,
       "(AND node%x vss vdd)\n",
-      (unsigned) f / (unsigned) sizeof(DdNode));
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #endif
    if (retValue == EOF) {
      return(0);
@@ -808,16 +809,16 @@ DddmpCuddDdArrayStorePrefixStep (
   /* Write multiplexer taking complement arc into account. */
 #if SIZEOF_VOID_P == 8
   retValue = fprintf (fp, "(OR node%lx (AND ",
-    (unsigned long long) f / (unsigned long long) sizeof(DdNode));
+    (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #else
   retValue = fprintf (fp, "(OR node%x (AND ",
-    (unsigned) f / (unsigned) sizeof(DdNode));
+    (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #endif
   if (retValue == EOF) {
     return(0);
   }
 
-  if (names != NULL) {
+  if (names != (uintptr_t) 0) {
     retValue = fprintf(fp, "%s ", names[f->index]);
   } else {
     retValue = fprintf(fp, "inNode%d ", f->index);
@@ -828,16 +829,16 @@ DddmpCuddDdArrayStorePrefixStep (
 
 #if SIZEOF_VOID_P == 8
   retValue = fprintf (fp, "node%lx) (AND (NOT ",
-    (unsigned long long) T / (unsigned long long) sizeof(DdNode));
+    (uintptr_t) T / (uintptr_t) sizeof(DdNode));
 #else
   retValue = fprintf (fp, "node%x) (AND (NOT ",
-    (unsigned) T / (unsigned) sizeof(DdNode));
+    (uintptr_t) T / (uintptr_t) sizeof(DdNode));
 #endif
   if (retValue == EOF) {
     return(0);
   }
 
-  if (names != NULL) {
+  if (names != (uintptr_t) 0) {
     retValue = fprintf (fp, "%s", names[f->index]);
   } else {
     retValue = fprintf (fp, "inNode%d", f->index);
@@ -849,18 +850,18 @@ DddmpCuddDdArrayStorePrefixStep (
 #if SIZEOF_VOID_P == 8
   if (Cudd_IsComplement(cuddE(f))) {
     retValue = fprintf (fp, ") (NOT node%lx)))\n",
-      (unsigned long long) E / (unsigned long long) sizeof(DdNode));
+      (uintptr_t) E / (uintptr_t) sizeof(DdNode));
   } else {
     retValue = fprintf (fp, ") node%lx))\n",
-      (unsigned long long) E / (unsigned long long) sizeof(DdNode));
+      (uintptr_t) E / (uintptr_t) sizeof(DdNode));
   }
 #else
   if (Cudd_IsComplement(cuddE(f))) {
     retValue = fprintf (fp, ") (NOT node%x)))\n",
-      (unsigned) E / (unsigned) sizeof(DdNode));
+      (uintptr_t) E / (uintptr_t) sizeof(DdNode));
   } else {
     retValue = fprintf (fp, ") node%x))\n",
-      (unsigned) E / (unsigned) sizeof(DdNode));
+      (uintptr_t) E / (uintptr_t) sizeof(DdNode));
   }
 #endif
 
@@ -907,16 +908,16 @@ DddmpCuddDdArrayStoreBlif (
   FILE *fp            /* IN: Pointer to the dump file */
   )
 {
-  DdNode *support = NULL;
+  DdNode *support = (uintptr_t) 0;
   DdNode *scan;
-  int *sorted = NULL;
+  int *sorted = (uintptr_t) 0;
   int nVars = ddMgr->size;
   int retValue;
   int i;
 
   /* Build a bit array with the support of f. */
   sorted = ALLOC (int, nVars);
-  if (sorted == NULL) {
+  if (sorted == (uintptr_t) 0) {
     ddMgr->errorCode = CUDD_MEMORY_OUT;
     Dddmp_CheckAndGotoLabel (1, "Allocation Error.", failure);
   }
@@ -926,7 +927,7 @@ DddmpCuddDdArrayStoreBlif (
 
   /* Take the union of the supports of each output function. */
   support = Cudd_VectorSupport(ddMgr,f,n);
-  Dddmp_CheckAndGotoLabel (support==NULL,
+  Dddmp_CheckAndGotoLabel (support==(uintptr_t) 0,
     "Error in function Cudd_VectorSupport.", failure);
   cuddRef(support);
   scan = support;
@@ -935,11 +936,11 @@ DddmpCuddDdArrayStoreBlif (
     scan = cuddT(scan);
   }
   Cudd_RecursiveDeref(ddMgr,support);
-  support = NULL;
+  support = (uintptr_t) 0;
   /* so that we do not try to free it in case of failure */
 
   /* Write the header (.model .inputs .outputs). */
-  if (modelName == NULL) {
+  if (modelName == (uintptr_t) 0) {
     retValue = fprintf(fp,".model DD\n.inputs");
   } else {
     retValue = fprintf(fp,".model %s\n.inputs", modelName);
@@ -951,7 +952,7 @@ DddmpCuddDdArrayStoreBlif (
   /* Write the input list by scanning the support array. */
   for (i = 0; i < nVars; i++) {
     if (sorted[i]) {
-      if (inputNames == NULL || (inputNames[i] == NULL)) {
+      if (inputNames == (uintptr_t) 0 || (inputNames[i] == (uintptr_t) 0)) {
 	retValue = fprintf(fp," inNode%d", i);
       } else {
 	retValue = fprintf(fp," %s", inputNames[i]);
@@ -961,14 +962,14 @@ DddmpCuddDdArrayStoreBlif (
     }
   }
   FREE(sorted);
-  sorted = NULL;
+  sorted = (uintptr_t) 0;
 
   /* Write the .output line. */
   retValue = fprintf(fp,"\n.outputs");
   Dddmp_CheckAndGotoLabel (retValue==EOF,
     "Error during file store.", failure);
   for (i = 0; i < n; i++) {
-    if (outputNames == NULL || (outputNames[i] == NULL)) {
+    if (outputNames == (uintptr_t) 0 || (outputNames[i] == (uintptr_t) 0)) {
       retValue = fprintf(fp," outNode%d", i);
     } else {
       retValue = fprintf(fp," %s", outputNames[i]);
@@ -993,10 +994,10 @@ DddmpCuddDdArrayStoreBlif (
   return(1);
 
 failure:
-  if (sorted != NULL) {
+  if (sorted != (uintptr_t) 0) {
     FREE(sorted);
   }
-  if (support != NULL) {
+  if (support != (uintptr_t) 0) {
     Cudd_RecursiveDeref(ddMgr,support);
   }
 
@@ -1038,13 +1039,13 @@ DddmpCuddDdArrayStoreBlifBody (
   FILE *fp              /* IN: Pointer to the dump file */
   )
 {
-  st_table *visited = NULL;
+  st_table *visited = (uintptr_t) 0;
   int retValue;
   int i;
 
   /* Initialize symbol table for visited nodes. */
   visited = st_init_table(st_ptrcmp, st_ptrhash);
-  Dddmp_CheckAndGotoLabel (visited==NULL,
+  Dddmp_CheckAndGotoLabel (visited==(uintptr_t) 0,
     "Error if function st_init_table.", failure);
 
   /* Call the function that really gets the job done. */
@@ -1062,23 +1063,23 @@ DddmpCuddDdArrayStoreBlifBody (
    */
 
   for (i = 0; i < n; i++) {
-    if (outputNames == NULL) {
+    if (outputNames == (uintptr_t) 0) {
       retValue = fprintf(fp,
 #if SIZEOF_VOID_P == 8
         ".names node%lx outNode%d\n",
-        (unsigned long long) f[i] / (unsigned long long) sizeof(DdNode), i);
+        (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode), i);
 #else
 	".names node%x outNode%d\n",
-        (unsigned) f[i] / (unsigned) sizeof(DdNode), i);
+        (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode), i);
 #endif
     } else {
       retValue = fprintf(fp,
 #if SIZEOF_VOID_P == 8
         ".names node%lx %s\n",
-        (unsigned long long) f[i] / (unsigned long long) sizeof(DdNode), outputNames[i]);
+        (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode), outputNames[i]);
 #else
         ".names node%x %s\n",
-        (unsigned) f[i] / (unsigned) sizeof(DdNode), outputNames[i]);
+        (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode), outputNames[i]);
 #endif
     }
     Dddmp_CheckAndGotoLabel (retValue==EOF,
@@ -1096,7 +1097,7 @@ DddmpCuddDdArrayStoreBlifBody (
   return(1);
 
 failure:
-  if (visited != NULL) {
+  if (visited != (uintptr_t) 0) {
     st_free_table(visited);
   }
   return(0);
@@ -1141,12 +1142,12 @@ DddmpCuddDdArrayStoreBlifStep (
   }
 
   /* Check for abnormal condition that should never happen. */
-  if (f == NULL) {
+  if (f == (uintptr_t) 0) {
     return(0);
   }
 
   /* Mark node as visited. */
-  if (st_insert(visited, (char *) f, NULL) == ST_OUT_OF_MEM) {
+  if (st_insert(visited, (char *) f, (uintptr_t) 0) == ST_OUT_OF_MEM) {
     return(0);
   }
 
@@ -1154,10 +1155,10 @@ DddmpCuddDdArrayStoreBlifStep (
   if (f == DD_ONE(ddMgr)) {
 #if SIZEOF_VOID_P == 8
     retValue = fprintf(fp, ".names node%lx\n1\n",
-      (unsigned long long) f / (unsigned long long) sizeof(DdNode));
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #else
     retValue = fprintf(fp, ".names node%x\n1\n",
-      (unsigned) f / (unsigned) sizeof(DdNode));
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #endif
      if (retValue == EOF) {
        return(0);
@@ -1172,10 +1173,10 @@ DddmpCuddDdArrayStoreBlifStep (
   if (f == DD_ZERO(ddMgr)) {
 #if SIZEOF_VOID_P == 8
     retValue = fprintf(fp, ".names node%lx\n",
-      (unsigned long long) f / (unsigned long long) sizeof(DdNode));
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #else
     retValue = fprintf(fp, ".names node%x\n",
-      (unsigned) f / (unsigned) sizeof(DdNode));
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #endif
     if (retValue == EOF) {
       return(0);
@@ -1196,7 +1197,7 @@ DddmpCuddDdArrayStoreBlifStep (
   if (retValue != 1) return(retValue);
 
   /* Write multiplexer taking complement arc into account. */
-  if (names != NULL) {
+  if (names != (uintptr_t) 0) {
     retValue = fprintf(fp,".names %s", names[f->index]);
   } else {
     retValue = fprintf(fp,".names inNode%d", f->index);
@@ -1208,26 +1209,26 @@ DddmpCuddDdArrayStoreBlifStep (
 #if SIZEOF_VOID_P == 8
   if (Cudd_IsComplement(cuddE(f))) {
     retValue = fprintf(fp," node%lx node%lx node%lx\n11- 1\n0-0 1\n",
-      (unsigned long long) T / (unsigned long long) sizeof(DdNode),
-      (unsigned long long) E / (unsigned long long) sizeof(DdNode),
-      (unsigned long long) f / (unsigned long long) sizeof(DdNode));
+      (uintptr_t) T / (uintptr_t) sizeof(DdNode),
+      (uintptr_t) E / (uintptr_t) sizeof(DdNode),
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
   } else {
     retValue = fprintf(fp," node%lx node%lx node%lx\n11- 1\n0-1 1\n",
-      (unsigned long long) T / (unsigned long long) sizeof(DdNode),
-      (unsigned long long) E / (unsigned long long) sizeof(DdNode),
-      (unsigned long long) f / (unsigned long long) sizeof(DdNode));
+      (uintptr_t) T / (uintptr_t) sizeof(DdNode),
+      (uintptr_t) E / (uintptr_t) sizeof(DdNode),
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
   }
 #else
   if (Cudd_IsComplement(cuddE(f))) {
     retValue = fprintf(fp," node%x node%x node%x\n11- 1\n0-0 1\n",
-      (unsigned) T / (unsigned) sizeof(DdNode),
-      (unsigned) E / (unsigned) sizeof(DdNode),
-      (unsigned) f / (unsigned) sizeof(DdNode));
+      (uintptr_t) T / (uintptr_t) sizeof(DdNode),
+      (uintptr_t) E / (uintptr_t) sizeof(DdNode),
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
   } else {
     retValue = fprintf(fp," node%x node%x node%x\n11- 1\n0-1 1\n",
-      (unsigned) T / (unsigned) sizeof(DdNode),
-      (unsigned) E / (unsigned) sizeof(DdNode),
-      (unsigned) f / (unsigned) sizeof(DdNode));
+      (uintptr_t) T / (uintptr_t) sizeof(DdNode),
+      (uintptr_t) E / (uintptr_t) sizeof(DdNode),
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
   }
 #endif
   if (retValue == EOF) {
@@ -1279,16 +1280,16 @@ DddmpCuddDdArrayStoreSmv (
   FILE *fp            /* IN: Pointer to the dump file */
   )
 {
-  DdNode *support = NULL;
+  DdNode *support = (uintptr_t) 0;
   DdNode *scan;
-  int *sorted = NULL;
+  int *sorted = (uintptr_t) 0;
   int nVars = ddMgr->size;
   int retValue;
   int i;
 
   /* Build a bit array with the support of f. */
   sorted = ALLOC(int, nVars);
-  if (sorted == NULL) {
+  if (sorted == (uintptr_t) 0) {
     ddMgr->errorCode = CUDD_MEMORY_OUT;
     Dddmp_CheckAndGotoLabel (1, "Allocation Error.", failure);
   }
@@ -1298,7 +1299,7 @@ DddmpCuddDdArrayStoreSmv (
 
   /* Take the union of the supports of each output function. */
   support = Cudd_VectorSupport(ddMgr,f,n);
-  Dddmp_CheckAndGotoLabel (support==NULL,
+  Dddmp_CheckAndGotoLabel (support==(uintptr_t) 0,
     "Error in function Cudd_VectorSupport.", failure);
   cuddRef(support);
   scan = support;
@@ -1308,10 +1309,10 @@ DddmpCuddDdArrayStoreSmv (
   }
   Cudd_RecursiveDeref(ddMgr,support);
   /* so that we do not try to free it in case of failure */
-  support = NULL;
+  support = (uintptr_t) 0;
 
   /* Write the header */
-  if (modelName == NULL) {
+  if (modelName == (uintptr_t) 0) {
     retValue = fprintf (fp, "MODULE main -- Unknown\n");
   } else {
     retValue = fprintf (fp, "MODULE main -- %s\n", modelName);
@@ -1328,7 +1329,7 @@ DddmpCuddDdArrayStoreSmv (
   /* Write the input list by scanning the support array. */
   for (i=0; i<nVars; i++) {
     if (sorted[i]) {
-      if (inputNames == NULL) {
+      if (inputNames == (uintptr_t) 0) {
 	retValue = fprintf (fp, " inNode%d : boolean;\n", i);
       } else {
 	retValue = fprintf (fp, " %s : boolean;\n", inputNames[i]);
@@ -1338,7 +1339,7 @@ DddmpCuddDdArrayStoreSmv (
     }
   }
   FREE(sorted);
-  sorted = NULL;
+  sorted = (uintptr_t) 0;
 
   retValue = fprintf (fp, "\nDEFINE\n");
 
@@ -1350,10 +1351,10 @@ DddmpCuddDdArrayStoreSmv (
   return(1);
 
 failure:
-    if (sorted != NULL) {
+    if (sorted != (uintptr_t) 0) {
       FREE(sorted);
     }
-    if (support != NULL) {
+    if (support != (uintptr_t) 0) {
       Cudd_RecursiveDeref(ddMgr,support);
     }
     return(0);
@@ -1397,13 +1398,13 @@ DddmpCuddDdArrayStoreSmvBody (
   FILE *fp              /* IN: Pointer to the dump file */
   )
 {
-  st_table *visited = NULL;
+  st_table *visited = (uintptr_t) 0;
   int retValue;
   int i;
 
   /* Initialize symbol table for visited nodes. */
   visited = st_init_table(st_ptrcmp, st_ptrhash);
-  Dddmp_CheckAndGotoLabel (visited==NULL,
+  Dddmp_CheckAndGotoLabel (visited==(uintptr_t) 0,
     "Error if function st_init_table.", failure);
 
   /* Call the function that really gets the job done. */
@@ -1421,7 +1422,7 @@ DddmpCuddDdArrayStoreSmvBody (
    */
 
   for (i=0; i<n; i++) {
-    if (outputNames == NULL) {
+    if (outputNames == (uintptr_t) 0) {
       retValue = fprintf (fp,  "outNode%d := ", i);
     } else {
       retValue = fprintf (fp,  "%s := ", outputNames[i]);
@@ -1432,18 +1433,18 @@ DddmpCuddDdArrayStoreSmvBody (
     if (Cudd_IsComplement(f[i])) {
 #if SIZEOF_VOID_P == 8
       retValue = fprintf (fp, "!node%lx\n",
-        (unsigned long long) f[i] / (unsigned long long) sizeof(DdNode));
+        (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode));
 #else
       retValue = fprintf (fp, "!node%x\n",
-        (unsigned) f[i] / (unsigned) sizeof(DdNode));
+        (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode));
 #endif
     } else {
 #if SIZEOF_VOID_P == 8
       retValue = fprintf (fp, "node%lx\n",
-        (unsigned long long) f[i] / (unsigned long long) sizeof(DdNode));
+        (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode));
 #else
       retValue = fprintf (fp, "node%x\n",
-        (unsigned) f[i] / (unsigned) sizeof(DdNode));
+        (uintptr_t) f[i] / (uintptr_t) sizeof(DdNode));
 #endif
     }
     Dddmp_CheckAndGotoLabel (retValue==EOF,
@@ -1455,7 +1456,7 @@ DddmpCuddDdArrayStoreSmvBody (
   return(1);
 
 failure:
-    if (visited != NULL) st_free_table(visited);
+    if (visited != (uintptr_t) 0) st_free_table(visited);
     return(0);
 
 }
@@ -1508,12 +1509,12 @@ DddmpCuddDdArrayStoreSmvStep (
   }
 
   /* Check for abnormal condition that should never happen. */
-  if (f == NULL) {
+  if (f == (uintptr_t) 0) {
     return(0);
   }
 
   /* Mark node as visited. */
-  if (st_insert(visited, (char *) f, NULL) == ST_OUT_OF_MEM) {
+  if (st_insert(visited, (char *) f, (uintptr_t) 0) == ST_OUT_OF_MEM) {
     return(0);
   }
 
@@ -1522,11 +1523,11 @@ DddmpCuddDdArrayStoreSmvStep (
 #if SIZEOF_VOID_P == 8
     retValue = fprintf (fp,
       "node%lx := 1;\n",
-      (unsigned long long) f / (unsigned long long) sizeof(DdNode));
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #else
     retValue = fprintf (fp,
       "node%x := 1;\n",
-      (unsigned) f / (unsigned) sizeof(DdNode));
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #endif
     if (retValue == EOF) {
        return(0);
@@ -1544,11 +1545,11 @@ DddmpCuddDdArrayStoreSmvStep (
 #if SIZEOF_VOID_P == 8
     retValue = fprintf (fp,
       "node%lx := 0;\n",
-       (unsigned long long) f / (unsigned long long) sizeof(DdNode));
+       (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #else
     retValue = fprintf (fp,
       "node%x := 0;\n",
-      (unsigned) f / (unsigned) sizeof(DdNode));
+      (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #endif
    if (retValue == EOF) {
      return(0);
@@ -1576,16 +1577,16 @@ DddmpCuddDdArrayStoreSmvStep (
   /* Write multiplexer taking complement arc into account. */
 #if SIZEOF_VOID_P == 8
   retValue = fprintf (fp, "node%lx := ",
-    (unsigned long long) f / (unsigned long long) sizeof(DdNode));
+    (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #else
   retValue = fprintf (fp, "node%x := ",
-    (unsigned) f / (unsigned) sizeof(DdNode));
+    (uintptr_t) f / (uintptr_t) sizeof(DdNode));
 #endif
   if (retValue == EOF) {
     return(0);
   }
 
-  if (names != NULL) {
+  if (names != (uintptr_t) 0) {
     retValue = fprintf(fp, "%s ", names[f->index]);
   } else {
     retValue = fprintf(fp, "inNode%d ", f->index);
@@ -1596,16 +1597,16 @@ DddmpCuddDdArrayStoreSmvStep (
 
 #if SIZEOF_VOID_P == 8
   retValue = fprintf (fp, "& node%lx | ",
-    (unsigned long long) T / (unsigned long long) sizeof(DdNode));
+    (uintptr_t) T / (uintptr_t) sizeof(DdNode));
 #else
   retValue = fprintf (fp, "& node%x | ",
-    (unsigned) T / (unsigned) sizeof(DdNode));
+    (uintptr_t) T / (uintptr_t) sizeof(DdNode));
 #endif
   if (retValue == EOF) {
     return(0);
   }
 
-  if (names != NULL) {
+  if (names != (uintptr_t) 0) {
     retValue = fprintf (fp, "!%s ", names[f->index]);
   } else {
     retValue = fprintf (fp, "!inNode%d ", f->index);
@@ -1617,18 +1618,18 @@ DddmpCuddDdArrayStoreSmvStep (
 #if SIZEOF_VOID_P == 8
   if (Cudd_IsComplement(cuddE(f))) {
     retValue = fprintf (fp, "& !node%lx\n",
-      (unsigned long long) E / (unsigned long long) sizeof(DdNode));
+      (uintptr_t) E / (uintptr_t) sizeof(DdNode));
   } else {
     retValue = fprintf (fp, "& node%lx\n",
-      (unsigned long long) E / (unsigned long long) sizeof(DdNode));
+      (uintptr_t) E / (uintptr_t) sizeof(DdNode));
   }
 #else
   if (Cudd_IsComplement(cuddE(f))) {
     retValue = fprintf (fp, "& !node%x\n",
-      (unsigned) E / (unsigned) sizeof(DdNode));
+      (uintptr_t) E / (uintptr_t) sizeof(DdNode));
   } else {
     retValue = fprintf (fp, "& node%x\n",
-      (unsigned) E / (unsigned) sizeof(DdNode));
+      (uintptr_t) E / (uintptr_t) sizeof(DdNode));
   }
 #endif
 

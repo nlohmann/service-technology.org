@@ -139,7 +139,8 @@ Cudd_DebugCheck(
   DdManager * table)
 {
     unsigned int i;
-    int		j,count;
+    int		j;
+    intptr_t count;
     int		slots;
     DdNodePtr	*nodelist;
     DdNode	*f;
@@ -153,7 +154,7 @@ Cudd_DebugCheck(
 
 
     edgeTable = st_init_table(st_ptrcmp,st_ptrhash);
-    if (edgeTable == NULL) return(CUDD_OUT_OF_MEM);
+    if (edgeTable == (uintptr_t) 0) return(CUDD_OUT_OF_MEM);
 
     /* Check the BDD/ADD subtables. */
     for (i = 0; i < (unsigned) table->size; i++) {
@@ -172,7 +173,7 @@ Cudd_DebugCheck(
 	    f = nodelist[j];
 	    while (f != sentinel) {
 		totalNode++;
-		if (cuddT(f) != NULL && cuddE(f) != NULL && f->ref != 0) {
+		if (cuddT(f) != (uintptr_t) 0 && cuddE(f) != (uintptr_t) 0 && f->ref != 0) {
 		    if ((int) f->index != index) {
 			(void) fprintf(table->err,
 				       "Error: node has illegal index\n");
@@ -214,7 +215,7 @@ Cudd_DebugCheck(
 			count = 1;
 		    }
 		    if (st_insert(edgeTable,(char *)cuddT(f),
-		    (char *)(long long)count) == ST_OUT_OF_MEM) {
+		    (char *)(intptr_t)count) == ST_OUT_OF_MEM) {
 			st_free_table(edgeTable);
 			return(CUDD_OUT_OF_MEM);
 		    }
@@ -229,11 +230,11 @@ Cudd_DebugCheck(
 			count = 1;
 		    }
 		    if (st_insert(edgeTable,(char *)Cudd_Regular(cuddE(f)),
-		    (char *)(long long)count) == ST_OUT_OF_MEM) {
+		    (char *)(intptr_t)count) == ST_OUT_OF_MEM) {
 			st_free_table(edgeTable);
 			return(CUDD_OUT_OF_MEM);
 		    }
-		} else if (cuddT(f) != NULL && cuddE(f) != NULL && f->ref == 0) {
+		} else if (cuddT(f) != (uintptr_t) 0 && cuddE(f) != (uintptr_t) 0 && f->ref == 0) {
 		    deadNode++;
 #if 0
 		    debugCheckParent(table,f);
@@ -274,9 +275,9 @@ Cudd_DebugCheck(
 	deadNode = 0;
 	for (j = 0; j < slots; j++) {	/* for each subtable slot */
 	    f = nodelist[j];
-	    while (f != NULL) {
+	    while (f != (uintptr_t) 0) {
 		totalNode++;
-		if (cuddT(f) != NULL && cuddE(f) != NULL && f->ref != 0) {
+		if (cuddT(f) != (uintptr_t) 0 && cuddE(f) != (uintptr_t) 0 && f->ref != 0) {
 		    if ((int) f->index != index) {
 			(void) fprintf(table->err,
 				       "Error: ZDD node has illegal index\n");
@@ -320,7 +321,7 @@ Cudd_DebugCheck(
 			count = 1;
 		    }
 		    if (st_insert(edgeTable,(char *)cuddT(f),
-		    (char *)(long long)count) == ST_OUT_OF_MEM) {
+		    (char *)(intptr_t)count) == ST_OUT_OF_MEM) {
 			st_free_table(edgeTable);
 			return(CUDD_OUT_OF_MEM);
 		    }
@@ -334,12 +335,12 @@ Cudd_DebugCheck(
 			count = 1;
 		    }
 		    if (st_insert(edgeTable,(char *)cuddE(f),
-		    (char *)(long long)count) == ST_OUT_OF_MEM) {
+		    (char *)(intptr_t)count) == ST_OUT_OF_MEM) {
 			st_free_table(edgeTable);
 			table->errorCode = CUDD_MEMORY_OUT;
 			return(CUDD_OUT_OF_MEM);
 		    }
-		} else if (cuddT(f) != NULL && cuddE(f) != NULL && f->ref == 0) {
+		} else if (cuddT(f) != (uintptr_t) 0 && cuddE(f) != (uintptr_t) 0 && f->ref == 0) {
 		    deadNode++;
 #if 0
 		    debugCheckParent(table,f);
@@ -375,7 +376,7 @@ Cudd_DebugCheck(
     deadNode = 0;
     for (j = 0; j < slots; j++) {
 	f = nodelist[j];
-	while (f != NULL) {
+	while (f != (uintptr_t) 0) {
 	    totalNode++;
 	    if (f->ref != 0) {
 		if (f->index != CUDD_CONST_INDEX) {
@@ -383,11 +384,11 @@ Cudd_DebugCheck(
 #if SIZEOF_VOID_P == 8
 		    fprintf(table->err,
 			    "       node 0x%lx, id = %u, ref = %u, value = %g\n",
-			    (ptruint)f,f->index,f->ref,cuddV(f));
+			    (uintptr_t)f,f->index,f->ref,cuddV(f));
 #else
 		    fprintf(table->err,
 			    "       node 0x%x, id = %hu, ref = %hu, value = %g\n",
-			    (ptruint)f,f->index,f->ref,cuddV(f));
+			    (uintptr_t)f,f->index,f->ref,cuddV(f));
 #endif
 		    flag = 1;
 		}
@@ -411,9 +412,9 @@ Cudd_DebugCheck(
     while (st_gen(gen, &f, &count)) {
 	if (count > (int)(f->ref) && f->ref != DD_MAXREF) {
 #if SIZEOF_VOID_P == 8
-	    fprintf(table->err,"ref count error at node 0x%lx, count = %d, id = %u, ref = %u, then = 0x%lx, else = 0x%lx\n",(ptruint)f,count,f->index,f->ref,(ptruint)cuddT(f),(ptruint)cuddE(f));
+	    fprintf(table->err,"ref count error at node 0x%lx, count = %d, id = %u, ref = %u, then = 0x%lx, else = 0x%lx\n",(uintptr_t)f,count,f->index,f->ref,(uintptr_t)cuddT(f),(uintptr_t)cuddE(f));
 #else
-	    fprintf(table->err,"ref count error at node 0x%x, count = %d, id = %hu, ref = %hu, then = 0x%x, else = 0x%x\n",(ptruint)f,count,f->index,f->ref,(ptruint)cuddT(f),(ptruint)cuddE(f));
+	    fprintf(table->err,"ref count error at node 0x%x, count = %d, id = %hu, ref = %hu, then = 0x%x, else = 0x%x\n",(uintptr_t)f,count,f->index,f->ref,(uintptr_t)cuddT(f),(uintptr_t)cuddE(f));
 #endif
 	    debugFindParent(table,f);
 	    flag = 1;
@@ -527,10 +528,10 @@ in unique table no. %d (difference=%d)\n", i, dead);
 	totalDead += dead;
 	for (j = 0; (unsigned) j < subtable->slots; j++) {
 	    node = nodelist[j];
-	    if (node != NULL) {
+	    if (node != (uintptr_t) 0) {
 		nonEmpty++;
 	    }
-	    while (node != NULL) {
+	    while (node != (uintptr_t) 0) {
 		keys--;
 		if (node->ref == 0) {
 		    dead--;
@@ -559,10 +560,10 @@ in ZDD unique table no. %d (difference=%d)\n", i, dead);
     totalDead += dead;
     for (j = 0; (unsigned) j < subtable->slots; j++) {
 	node = nodelist[j];
-	if (node != NULL) {
+	if (node != (uintptr_t) 0) {
 	    nonEmpty++;
 	}
-	while (node != NULL) {
+	while (node != (uintptr_t) 0) {
 	    keys--;
 	    if (node->ref == 0) {
 		dead--;
@@ -647,10 +648,10 @@ cuddHeapProfile(
     /* Print header. */
 #if SIZEOF_VOID_P == 8
     retval = fprintf(dd->out,"*** DD heap profile for 0x%lx ***\n",
-		     (ptruint) dd);
+		     (uintptr_t) dd);
 #else
     retval = fprintf(dd->out,"*** DD heap profile for 0x%x ***\n",
-		     (ptruint) dd);
+		     (uintptr_t) dd);
 #endif
     if (retval == EOF) return 0;
 
@@ -709,9 +710,9 @@ cuddPrintNode(
 {
     f = Cudd_Regular(f);
 #if SIZEOF_VOID_P == 8
-    (void) fprintf(fp,"       node 0x%lx, id = %u, ref = %u, then = 0x%lx, else = 0x%lx\n",(ptruint)f,f->index,f->ref,(ptruint)cuddT(f),(ptruint)cuddE(f));
+    (void) fprintf(fp,"       node 0x%lx, id = %u, ref = %u, then = 0x%lx, else = 0x%lx\n",(uintptr_t)f,f->index,f->ref,(uintptr_t)cuddT(f),(uintptr_t)cuddE(f));
 #else
-    (void) fprintf(fp,"       node 0x%x, id = %hu, ref = %hu, then = 0x%x, else = 0x%x\n",(ptruint)f,f->index,f->ref,(ptruint)cuddT(f),(ptruint)cuddE(f));
+    (void) fprintf(fp,"       node 0x%x, id = %hu, ref = %hu, then = 0x%x, else = 0x%x\n",(uintptr_t)f,f->index,f->ref,(uintptr_t)cuddT(f),(uintptr_t)cuddE(f));
 #endif
 
 } /* end of cuddPrintNode */
@@ -749,20 +750,20 @@ cuddPrintVarGroups(
     MtrNode *node;
     int level;
 
-    assert(root != NULL);
-    assert(root->younger == NULL || root->younger->elder == root);
-    assert(root->elder == NULL || root->elder->younger == root);
+    assert(root != (uintptr_t) 0);
+    assert(root->younger == (uintptr_t) 0 || root->younger->elder == root);
+    assert(root->elder == (uintptr_t) 0 || root->elder->younger == root);
     if (zdd) {
 	level = dd->permZ[root->index];
     } else {
 	level = dd->perm[root->index];
     }
     if (!silent) (void) printf("(%d",level);
-    if (MTR_TEST(root,MTR_TERMINAL) || root->child == NULL) {
+    if (MTR_TEST(root,MTR_TERMINAL) || root->child == (uintptr_t) 0) {
 	if (!silent) (void) printf(",");
     } else {
 	node = root->child;
-	while (node != NULL) {
+	while (node != (uintptr_t) 0) {
 	    assert(node->low >= root->low && (int) (node->low + node->size) <= (int) (root->low + root->size));
 	    assert(node->parent == root);
 	    cuddPrintVarGroups(dd,node,zdd,silent);
@@ -778,7 +779,7 @@ cuddPrintVarGroups(
 	    if (MTR_TEST(root,MTR_SOFT)) (void) printf("S");
 	}
 	(void) printf(")");
-	if (root->parent == NULL) (void) printf("\n");
+	if (root->parent == (uintptr_t) 0) (void) printf("\n");
     }
     assert((root->flags &~(MTR_TERMINAL | MTR_SOFT | MTR_FIXED | MTR_NEWNODE)) == 0);
     return;
@@ -818,14 +819,14 @@ debugFindParent(
 
 	for (j=0;j<slots;j++) {
 	    f = nodelist[j];
-	    while (f != NULL) {
+	    while (f != (uintptr_t) 0) {
 		if (cuddT(f) == node || Cudd_Regular(cuddE(f)) == node) {
 #if SIZEOF_VOID_P == 8
 		    (void) fprintf(table->out,"parent is at 0x%lx, id = %u, ref = %u, then = 0x%lx, else = 0x%lx\n",
-			(ptruint)f,f->index,f->ref,(ptruint)cuddT(f),(ptruint)cuddE(f));
+			(uintptr_t)f,f->index,f->ref,(uintptr_t)cuddT(f),(uintptr_t)cuddE(f));
 #else
 		    (void) fprintf(table->out,"parent is at 0x%x, id = %hu, ref = %hu, then = 0x%x, else = 0x%x\n",
-			(ptruint)f,f->index,f->ref,(ptruint)cuddT(f),(ptruint)cuddE(f));
+			(uintptr_t)f,f->index,f->ref,(uintptr_t)cuddT(f),(uintptr_t)cuddE(f));
 #endif
 		}
 		f = f->next;
@@ -864,7 +865,7 @@ debugCheckParent(
 
 	for (j=0;j<slots;j++) {
 	    f = nodelist[j];
-	    while (f != NULL) {
+	    while (f != (uintptr_t) 0) {
 		if ((Cudd_Regular(cuddE(f)) == node || cuddT(f) == node) && f->ref != 0) {
 		    (void) fprintf(table->err,
 				   "error with zero ref count\n");

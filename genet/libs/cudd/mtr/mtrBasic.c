@@ -62,6 +62,7 @@
 
 #include "util.h"
 #include "mtrInt.h"
+#include <stdint.h>
 
 
 /*---------------------------------------------------------------------------*/
@@ -162,9 +163,9 @@ Mtr_InitTree(void)
     MtrNode *node;
 
     node = Mtr_AllocNode();
-    if (node == NULL) return(NULL);
+    if (node == (uintptr_t) 0) return((uintptr_t) 0);
 
-    node->parent = node->child = node->elder = node->younger = NULL;
+    node->parent = node->child = node->elder = node->younger = (uintptr_t) 0;
     node->flags = 0;
 
     return(node);
@@ -187,7 +188,7 @@ void
 Mtr_FreeTree(
   MtrNode * node)
 {
-    if (node == NULL) return;
+    if (node == (uintptr_t) 0) return;
     if (! MTR_TEST(node,MTR_TERMINAL)) Mtr_FreeTree(node->child);
     Mtr_FreeTree(node->younger);
     Mtr_DeallocNode(node);
@@ -203,7 +204,7 @@ Mtr_FreeTree(
   Description [Makes a copy of tree. If parameter expansion is greater
   than 1, it will expand the tree by that factor. It is an error for
   expansion to be less than 1. Returns a pointer to the copy if
-  successful; NULL otherwise.]
+  successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -217,23 +218,23 @@ Mtr_CopyTree(
 {
     MtrNode *copy;
 
-    if (node == NULL) return(NULL);
-    if (expansion < 1) return(NULL);
+    if (node == (uintptr_t) 0) return((uintptr_t) 0);
+    if (expansion < 1) return((uintptr_t) 0);
     copy = Mtr_AllocNode();
-    if (copy == NULL) return(NULL);
-    copy->parent = copy->elder = copy->child = copy->younger = NULL;
-    if (node->child != NULL) {
+    if (copy == (uintptr_t) 0) return((uintptr_t) 0);
+    copy->parent = copy->elder = copy->child = copy->younger = (uintptr_t) 0;
+    if (node->child != (uintptr_t) 0) {
 	copy->child = Mtr_CopyTree(node->child, expansion);
-	if (copy->child == NULL) {
+	if (copy->child == (uintptr_t) 0) {
 	    Mtr_DeallocNode(copy);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     }
-    if (node->younger != NULL) {
+    if (node->younger != (uintptr_t) 0) {
 	copy->younger = Mtr_CopyTree(node->younger, expansion);
-	if (copy->younger == NULL) {
+	if (copy->younger == (uintptr_t) 0) {
 	    Mtr_FreeTree(copy);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     }
     copy->flags = node->flags;
@@ -243,7 +244,7 @@ Mtr_CopyTree(
     if (copy->younger) copy->younger->elder = copy;
     if (copy->child) {
 	MtrNode *auxnode = copy->child;
-	while (auxnode != NULL) {
+	while (auxnode != (uintptr_t) 0) {
 	    auxnode->parent = copy;
 	    auxnode = auxnode->younger;
 	}
@@ -271,10 +272,10 @@ Mtr_MakeFirstChild(
 {
     child->parent = parent;
     child->younger = parent->child;
-    child->elder = NULL;
-    if (parent->child != NULL) {
+    child->elder = (uintptr_t) 0;
+    if (parent->child != (uintptr_t) 0) {
 #ifdef MTR_DEBUG
-	assert(parent->child->elder == NULL);
+	assert(parent->child->elder == (uintptr_t) 0);
 #endif
 	parent->child->elder = child;
     }
@@ -302,14 +303,14 @@ Mtr_MakeLastChild(
 {
     MtrNode *node;
 
-    child->younger = NULL;
+    child->younger = (uintptr_t) 0;
 
-    if (parent->child == NULL) {
+    if (parent->child == (uintptr_t) 0) {
 	parent->child = child;
-	child->elder = NULL;
+	child->elder = (uintptr_t) 0;
     } else {
 	for (node = parent->child;
-	     node->younger != NULL;
+	     node->younger != (uintptr_t) 0;
 	     node = node->younger);
 	node->younger = child;
 	child->elder = node;
@@ -339,9 +340,9 @@ Mtr_CreateFirstChild(
     MtrNode *child;
 
     child = Mtr_AllocNode();
-    if (child == NULL) return(NULL);
+    if (child == (uintptr_t) 0) return((uintptr_t) 0);
 
-    child->child = child->younger = child-> elder = NULL;
+    child->child = child->younger = child-> elder = (uintptr_t) 0;
     child->flags = 0;
     Mtr_MakeFirstChild(parent,child);
     return(child);
@@ -368,9 +369,9 @@ Mtr_CreateLastChild(
     MtrNode *child;
 
     child = Mtr_AllocNode();
-    if (child == NULL) return(NULL);
+    if (child == (uintptr_t) 0) return((uintptr_t) 0);
 
-    child->child = child->younger = child->elder = NULL;
+    child->child = child->younger = child->elder = (uintptr_t) 0;
     child->flags = 0;
     Mtr_MakeLastChild(parent,child);
     return(child);
@@ -396,7 +397,7 @@ Mtr_MakeNextSibling(
   MtrNode * second)
 {
     second->younger = first->younger;
-    if (first->younger != NULL) {
+    if (first->younger != (uintptr_t) 0) {
 	first->younger->elder = second;
     }
     second->parent = first->parent;
@@ -422,18 +423,18 @@ void
 Mtr_PrintTree(
   MtrNode * node)
 {
-    if (node == NULL) return;
+    if (node == (uintptr_t) 0) return;
     (void) fprintf(stdout,
 #if SIZEOF_VOID_P == 8
     "N=0x%-8lx C=0x%-8lx Y=0x%-8lx E=0x%-8lx P=0x%-8lx F=%x L=%u S=%u\n",
-    (unsigned long long) node, (unsigned long long) node->child,
-    (unsigned long long) node->younger, (unsigned long long) node->elder,
-    (unsigned long long) node->parent, node->flags, node->low, node->size);
+    (uintptr_t) node, (uintptr_t) node->child,
+    (uintptr_t) node->younger, (uintptr_t) node->elder,
+    (uintptr_t) node->parent, node->flags, node->low, node->size);
 #else
     "N=0x%-8x C=0x%-8x Y=0x%-8x E=0x%-8x P=0x%-8x F=%x L=%hu S=%hu\n",
-    (unsigned) node, (unsigned) node->child,
-    (unsigned) node->younger, (unsigned) node->elder,
-    (unsigned) node->parent, node->flags, node->low, node->size);
+    (uintptr_t) node, (uintptr_t) node->child,
+    (uintptr_t) node->younger, (uintptr_t) node->elder,
+    (uintptr_t) node->parent, node->flags, node->low, node->size);
 #endif
     if (!MTR_TEST(node,MTR_TERMINAL)) Mtr_PrintTree(node->child);
     Mtr_PrintTree(node->younger);

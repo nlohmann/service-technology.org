@@ -119,10 +119,10 @@ static char rcsid[] DD_UNUSED = "$Id: cuddLevelQ.c,v 1.13 2009/03/08 02:49:02 fa
 ******************************************************************************/
 #if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
 #define lqHash(key,shift) \
-(((unsigned)(ptruint)(key) * DD_P1) >> (shift))
+(((uintptr_t)(key) * DD_P1) >> (shift))
 #else
 #define lqHash(key,shift) \
-(((unsigned)(key) * DD_P1) >> (shift))
+(((uintptr_t)(key) * DD_P1) >> (shift))
 #endif
 
 
@@ -153,7 +153,7 @@ static int hashResize (DdLevelQueue *queue);
   where inserts are based on the levels of the nodes. Within each
   level the policy is FIFO. Level queues are useful in traversing a
   BDD top-down. Queue items are kept in a free list when dequeued for
-  efficiency. Returns a pointer to the new queue if successful; NULL
+  efficiency. Returns a pointer to the new queue if successful; (uintptr_t) 0
   otherwise.]
 
   SideEffects [None]
@@ -171,8 +171,8 @@ cuddLevelQueueInit(
     int logSize;
 
     queue = ALLOC(DdLevelQueue,1);
-    if (queue == NULL)
-	return(NULL);
+    if (queue == (uintptr_t) 0)
+	return((uintptr_t) 0);
 #ifdef __osf__
 #pragma pointer_size save
 #pragma pointer_size short
@@ -182,9 +182,9 @@ cuddLevelQueueInit(
 #ifdef __osf__
 #pragma pointer_size restore
 #endif
-    if (queue->last == NULL) {
+    if (queue->last == (uintptr_t) 0) {
 	FREE(queue);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     /* Use a hash table to test for uniqueness. */
     if (numBuckets < 2) numBuckets = 2;
@@ -199,10 +199,10 @@ cuddLevelQueueInit(
 #ifdef __osf__
 #pragma pointer_size restore
 #endif
-    if (queue->buckets == NULL) {
+    if (queue->buckets == (uintptr_t) 0) {
 	FREE(queue->last);
 	FREE(queue);
-	return(NULL);
+	return((uintptr_t) 0);
     }
 #ifdef __osf__
 #pragma pointer_size save
@@ -213,8 +213,8 @@ cuddLevelQueueInit(
 #ifdef __osf__
 #pragma pointer_size restore
 #endif
-    queue->first = NULL;
-    queue->freelist = NULL;
+    queue->first = (uintptr_t) 0;
+    queue->freelist = (uintptr_t) 0;
     queue->levels = levels;
     queue->itemsize = itemSize;
     queue->size = 0;
@@ -242,12 +242,12 @@ cuddLevelQueueQuit(
 {
     DdQueueItem *item;
 
-    while (queue->freelist != NULL) {
+    while (queue->freelist != (uintptr_t) 0) {
 	item = queue->freelist;
 	queue->freelist = item->next;
 	FREE(item);
     }
-    while (queue->first != NULL) {
+    while (queue->first != (uintptr_t) 0) {
 	item = (DdQueueItem *) queue->first;
 	queue->first = item->next;
 	FREE(item);
@@ -266,7 +266,7 @@ cuddLevelQueueQuit(
 
   Description [Inserts a new key in a level queue. A new entry is
   created in the queue only if the node is not already
-  enqueued. Returns a pointer to the queue item if successful; NULL
+  enqueued. Returns a pointer to the queue item if successful; (uintptr_t) 0
   otherwise.]
 
   SideEffects [None]
@@ -288,13 +288,13 @@ cuddLevelQueueEnqueue(
 #endif
     /* Check whether entry for this node exists. */
     item = hashLookup(queue,key);
-    if (item != NULL) return(item);
+    if (item != (uintptr_t) 0) return(item);
 
     /* Get a free item from either the free list or the memory manager. */
-    if (queue->freelist == NULL) {
+    if (queue->freelist == (uintptr_t) 0) {
 	item = (DdQueueItem *) ALLOC(char, queue->itemsize);
-	if (item == NULL)
-	    return(NULL);
+	if (item == (uintptr_t) 0)
+	    return((uintptr_t) 0);
     } else {
 	item = queue->freelist;
 	queue->freelist = item->next;
@@ -313,9 +313,9 @@ cuddLevelQueueEnqueue(
 	/* There are no items at the current level.  Look for the first
 	** non-empty level preceeding this one. */
 	plevel = level;
-	while (plevel != 0 && queue->last[plevel] == NULL)
+	while (plevel != 0 && queue->last[plevel] == (uintptr_t) 0)
 	    plevel--;
-	if (queue->last[plevel] == NULL) {
+	if (queue->last[plevel] == (uintptr_t) 0) {
 	    /* No element precedes this one in the queue. */
 	    item->next = (DdQueueItem *) queue->first;
 	    queue->first = item;
@@ -328,7 +328,7 @@ cuddLevelQueueEnqueue(
 
     /* Insert entry for the key in the hash table. */
     if (hashInsert(queue,item) == 0) {
-	return(NULL);
+	return((uintptr_t) 0);
     }
     return(item);
 
@@ -359,7 +359,7 @@ cuddLevelQueueDequeue(
     /* Since we delete from the front, if this is the last item for
     ** its level, there are no other items for the same level. */
     if (queue->last[level] == item)
-	queue->last[level] = NULL;
+	queue->last[level] = (uintptr_t) 0;
 
     queue->first = item->next;
     /* Put item on the free list. */
@@ -382,7 +382,7 @@ cuddLevelQueueDequeue(
   Synopsis    [Looks up a key in the hash table of a level queue.]
 
   Description [Looks up a key in the hash table of a level queue. Returns
-  a pointer to the item with the given key if the key is found; NULL
+  a pointer to the item with the given key if the key is found; (uintptr_t) 0
   otherwise.]
 
   SideEffects [None]
@@ -401,13 +401,13 @@ hashLookup(
     posn = lqHash(key,queue->shift);
     item = queue->buckets[posn];
 
-    while (item != NULL) {
+    while (item != (uintptr_t) 0) {
 	if (item->key == key) {
 	    return(item);
 	}
 	item = item->cnext;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of hashLookup */
 
@@ -470,13 +470,13 @@ hashDelete(
     posn = lqHash(item->key,queue->shift);
     prevItem = queue->buckets[posn];
 
-    if (prevItem == NULL) return;
+    if (prevItem == (uintptr_t) 0) return;
     if (prevItem == item) {
 	queue->buckets[posn] = prevItem->cnext;
 	return;
     }
 
-    while (prevItem->cnext != NULL) {
+    while (prevItem->cnext != (uintptr_t) 0) {
 	if (prevItem->cnext == item) {
 	    prevItem->cnext = item->cnext;
 	    return;
@@ -533,7 +533,7 @@ hashResize(
 #endif
     buckets = queue->buckets = ALLOC(DdQueueItem *, numBuckets);
     MMoutOfMemory = saveHandler;
-    if (buckets == NULL) {
+    if (buckets == (uintptr_t) 0) {
 	queue->maxsize <<= 1;
 	return(1);
     }
@@ -547,7 +547,7 @@ hashResize(
 #endif
     for (j = 0; j < oldNumBuckets; j++) {
 	item = oldBuckets[j];
-	while (item != NULL) {
+	while (item != (uintptr_t) 0) {
 	    next = item->cnext;
 	    posn = lqHash(item->key, shift);
 	    item->cnext = buckets[posn];

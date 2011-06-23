@@ -65,6 +65,7 @@
 
 #include "util.h"
 #include "cuddInt.h"
+#include <stdint.h>
 
 /*---------------------------------------------------------------------------*/
 /* Constant declarations                                                     */
@@ -138,7 +139,7 @@ cuddInitCache(
     unsigned int logSize;
 #ifndef DD_CACHE_PROFILE
     DdNodePtr *mem;
-    ptruint offset;
+    uintptr_t offset;
 #endif
 
     /* Round cacheSize to largest power of 2 not greater than the requested
@@ -146,7 +147,7 @@ cuddInitCache(
     logSize = cuddComputeFloorLog2(ddMax(cacheSize,unique->slots/2));
     cacheSize = 1 << logSize;
     unique->acache = ALLOC(DdCache,cacheSize+1);
-    if (unique->acache == NULL) {
+    if (unique->acache == (uintptr_t) 0) {
 	unique->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -158,10 +159,10 @@ cuddInitCache(
     unique->memused += (cacheSize) * sizeof(DdCache);
 #else
     mem = (DdNodePtr *) unique->acache;
-    offset = (ptruint) mem & (sizeof(DdCache) - 1);
+    offset = (uintptr_t) mem & (sizeof(DdCache) - 1);
     mem += (sizeof(DdCache) - offset) / sizeof(DdNodePtr);
     unique->cache = (DdCache *) mem;
-    assert(((ptruint) unique->cache & (sizeof(DdCache) - 1)) == 0);
+    assert(((uintptr_t) unique->cache & (sizeof(DdCache) - 1)) == 0);
     unique->memused += (cacheSize+1) * sizeof(DdCache);
 #endif
     unique->cacheSlots = cacheSize;
@@ -188,7 +189,7 @@ cuddInitCache(
     /* Initialize the cache */
     for (i = 0; (unsigned) i < cacheSize; i++) {
 	unique->cache[i].h = 0; /* unused slots */
-	unique->cache[i].data = NULL; /* invalid entry */
+	unique->cache[i].data = (uintptr_t) 0; /* invalid entry */
 #ifdef DD_CACHE_PROFILE
 	unique->cache[i].count = 0;
 #endif
@@ -213,7 +214,7 @@ cuddInitCache(
 void
 cuddCacheInsert(
   DdManager * table,
-  ptruint op,
+  uintptr_t op,
   DdNode * f,
   DdNode * g,
   DdNode * h,
@@ -221,16 +222,16 @@ cuddCacheInsert(
 {
     int posn;
     register DdCache *entry;
-    ptruint uf, ug, uh;
+    uintptr_t uf, ug, uh;
 
-    uf = (ptruint) f | (op & 0xe);
-    ug = (ptruint) g | (op >> 4);
-    uh = (ptruint) h;
+    uf = (uintptr_t) f | (op & 0xe);
+    ug = (uintptr_t) g | (op >> 4);
+    uh = (uintptr_t) h;
 
     posn = ddCHash2(uh,uf,ug,table->cacheShift);
     entry = &table->cache[posn];
 
-    table->cachecollisions += entry->data != NULL;
+    table->cachecollisions += entry->data != (uintptr_t) 0;
     table->cacheinserts++;
 
     entry->f    = (DdNode *) uf;
@@ -264,20 +265,20 @@ cuddCacheInsert2(
   DdNode * g,
   DdNode * data)
 {
-    int posn;
+    intptr_t posn;
     register DdCache *entry;
 
-    posn = ddCHash2(op,f,g,table->cacheShift);
+    posn = ddCHash2((uintptr_t)op,(uintptr_t)f,(uintptr_t)g,(uintptr_t)table->cacheShift);
     entry = &table->cache[posn];
 
-    if (entry->data != NULL) {
+    if (entry->data != (uintptr_t) 0) {
 	table->cachecollisions++;
     }
     table->cacheinserts++;
 
     entry->f = f;
     entry->g = g;
-    entry->h = (ptruint) op;
+    entry->h = (uintptr_t) op;
     entry->data = data;
 #ifdef DD_CACHE_PROFILE
     entry->count++;
@@ -305,20 +306,20 @@ cuddCacheInsert1(
   DdNode * f,
   DdNode * data)
 {
-    int posn;
+    intptr_t posn;
     register DdCache *entry;
 
-    posn = ddCHash2(op,f,f,table->cacheShift);
+    posn = ddCHash2((uintptr_t)op,(uintptr_t)f,(uintptr_t)f,table->cacheShift);
     entry = &table->cache[posn];
 
-    if (entry->data != NULL) {
+    if (entry->data != (uintptr_t) 0) {
 	table->cachecollisions++;
     }
     table->cacheinserts++;
 
     entry->f = f;
     entry->g = f;
-    entry->h = (ptruint) op;
+    entry->h = (uintptr_t) op;
     entry->data = data;
 #ifdef DD_CACHE_PROFILE
     entry->count++;
@@ -343,7 +344,7 @@ cuddCacheInsert1(
 DdNode *
 cuddCacheLookup(
   DdManager * table,
-  ptruint op,
+  uintptr_t op,
   DdNode * f,
   DdNode * g,
   DdNode * h)
@@ -351,22 +352,22 @@ cuddCacheLookup(
     int posn;
     DdCache *en,*cache;
     DdNode *data;
-    ptruint uf, ug, uh;
+    uintptr_t uf, ug, uh;
 
-    uf = (ptruint) f | (op & 0xe);
-    ug = (ptruint) g | (op >> 4);
-    uh = (ptruint) h;
+    uf = (uintptr_t) f | (op & 0xe);
+    ug = (uintptr_t) g | (op >> 4);
+    uh = (uintptr_t) h;
 
     cache = table->cache;
 #ifdef DD_DEBUG
-    if (cache == NULL) {
-	return(NULL);
+    if (cache == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
 #endif
 
     posn = ddCHash2(uh,uf,ug,table->cacheShift);
     en = &cache[posn];
-    if (en->data != NULL && en->f==(DdNodePtr)uf && en->g==(DdNodePtr)ug &&
+    if (en->data != (uintptr_t) 0 && en->f==(DdNodePtr)uf && en->g==(DdNodePtr)ug &&
 	en->h==uh) {
 	data = Cudd_Regular(en->data);
 	table->cacheHits++;
@@ -384,7 +385,7 @@ cuddCacheLookup(
 	cuddCacheResize(table);
     }
 
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of cuddCacheLookup */
 
@@ -405,30 +406,30 @@ cuddCacheLookup(
 DdNode *
 cuddCacheLookupZdd(
   DdManager * table,
-  ptruint op,
+  uintptr_t op,
   DdNode * f,
   DdNode * g,
   DdNode * h)
 {
-    int posn;
+    intptr_t posn;
     DdCache *en,*cache;
     DdNode *data;
-    ptruint uf, ug, uh;
+    uintptr_t uf, ug, uh;
 
-    uf = (ptruint) f | (op & 0xe);
-    ug = (ptruint) g | (op >> 4);
-    uh = (ptruint) h;
+    uf = (uintptr_t) f | (op & 0xe);
+    ug = (uintptr_t) g | (op >> 4);
+    uh = (uintptr_t) h;
 
     cache = table->cache;
 #ifdef DD_DEBUG
-    if (cache == NULL) {
-	return(NULL);
+    if (cache == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
 #endif
 
     posn = ddCHash2(uh,uf,ug,table->cacheShift);
     en = &cache[posn];
-    if (en->data != NULL && en->f==(DdNodePtr)uf && en->g==(DdNodePtr)ug &&
+    if (en->data != (uintptr_t) 0 && en->f==(DdNodePtr)uf && en->g==(DdNodePtr)ug &&
 	en->h==uh) {
 	data = Cudd_Regular(en->data);
 	table->cacheHits++;
@@ -446,7 +447,7 @@ cuddCacheLookupZdd(
 	cuddCacheResize(table);
     }
 
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of cuddCacheLookupZdd */
 
@@ -477,14 +478,14 @@ cuddCacheLookup2(
 
     cache = table->cache;
 #ifdef DD_DEBUG
-    if (cache == NULL) {
-	return(NULL);
+    if (cache == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
 #endif
 
-    posn = ddCHash2(op,f,g,table->cacheShift);
+    posn = ddCHash2((uintptr_t)op,(uintptr_t)f,(uintptr_t)g,table->cacheShift);
     en = &cache[posn];
-    if (en->data != NULL && en->f==f && en->g==g && en->h==(ptruint)op) {
+    if (en->data != (uintptr_t) 0 && en->f==f && en->g==g && en->h==(uintptr_t)op) {
 	data = Cudd_Regular(en->data);
 	table->cacheHits++;
 	if (data->ref == 0) {
@@ -501,7 +502,7 @@ cuddCacheLookup2(
 	cuddCacheResize(table);
     }
 
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of cuddCacheLookup2 */
 
@@ -510,7 +511,7 @@ cuddCacheLookup2(
 
   Synopsis [Looks up in the cache for the result of op applied to f.]
 
-  Description [Returns the result if found; it returns NULL if no
+  Description [Returns the result if found; it returns (uintptr_t) 0 if no
   result is found.]
 
   SideEffects [None]
@@ -524,20 +525,20 @@ cuddCacheLookup1(
   DD_CTFP1 op,
   DdNode * f)
 {
-    int posn;
+    intptr_t posn;
     DdCache *en,*cache;
     DdNode *data;
 
     cache = table->cache;
 #ifdef DD_DEBUG
-    if (cache == NULL) {
-	return(NULL);
+    if (cache == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
 #endif
 
-    posn = ddCHash2(op,f,f,table->cacheShift);
+    posn = ddCHash2((uintptr_t)op,(uintptr_t)f,(uintptr_t)f,table->cacheShift);
     en = &cache[posn];
-    if (en->data != NULL && en->f==f && en->h==(ptruint)op) {
+    if (en->data != (uintptr_t) 0 && en->f==f && en->h==(uintptr_t)op) {
 	data = Cudd_Regular(en->data);
 	table->cacheHits++;
 	if (data->ref == 0) {
@@ -554,7 +555,7 @@ cuddCacheLookup1(
 	cuddCacheResize(table);
     }
 
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of cuddCacheLookup1 */
 
@@ -579,20 +580,20 @@ cuddCacheLookup2Zdd(
   DdNode * f,
   DdNode * g)
 {
-    int posn;
+    intptr_t posn;
     DdCache *en,*cache;
     DdNode *data;
 
     cache = table->cache;
 #ifdef DD_DEBUG
-    if (cache == NULL) {
-	return(NULL);
+    if (cache == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
 #endif
 
-    posn = ddCHash2(op,f,g,table->cacheShift);
+    posn = ddCHash2((uintptr_t)op,(uintptr_t)f,(uintptr_t)g,table->cacheShift);
     en = &cache[posn];
-    if (en->data != NULL && en->f==f && en->g==g && en->h==(ptruint)op) {
+    if (en->data != (uintptr_t) 0 && en->f==f && en->g==g && en->h==(uintptr_t)op) {
 	data = Cudd_Regular(en->data);
 	table->cacheHits++;
 	if (data->ref == 0) {
@@ -609,7 +610,7 @@ cuddCacheLookup2Zdd(
 	cuddCacheResize(table);
     }
 
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of cuddCacheLookup2Zdd */
 
@@ -632,20 +633,20 @@ cuddCacheLookup1Zdd(
   DD_CTFP1 op,
   DdNode * f)
 {
-    int posn;
+    intptr_t posn;
     DdCache *en,*cache;
     DdNode *data;
 
     cache = table->cache;
 #ifdef DD_DEBUG
-    if (cache == NULL) {
-	return(NULL);
+    if (cache == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
 #endif
 
-    posn = ddCHash2(op,f,f,table->cacheShift);
+    posn = ddCHash2((uintptr_t)op,(uintptr_t)f,(uintptr_t)f,table->cacheShift);
     en = &cache[posn];
-    if (en->data != NULL && en->f==f && en->h==(ptruint)op) {
+    if (en->data != (uintptr_t) 0 && en->f==f && en->h==(uintptr_t)op) {
 	data = Cudd_Regular(en->data);
 	table->cacheHits++;
 	if (data->ref == 0) {
@@ -662,7 +663,7 @@ cuddCacheLookup1Zdd(
 	cuddCacheResize(table);
     }
 
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of cuddCacheLookup1Zdd */
 
@@ -686,23 +687,23 @@ cuddCacheLookup1Zdd(
 DdNode *
 cuddConstantLookup(
   DdManager * table,
-  ptruint op,
+  uintptr_t op,
   DdNode * f,
   DdNode * g,
   DdNode * h)
 {
     int posn;
     DdCache *en,*cache;
-    ptruint uf, ug, uh;
+    uintptr_t uf, ug, uh;
 
-    uf = (ptruint) f | (op & 0xe);
-    ug = (ptruint) g | (op >> 4);
-    uh = (ptruint) h;
+    uf = (uintptr_t) f | (op & 0xe);
+    ug = (uintptr_t) g | (op >> 4);
+    uh = (uintptr_t) h;
 
     cache = table->cache;
 #ifdef DD_DEBUG
-    if (cache == NULL) {
-	return(NULL);
+    if (cache == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
 #endif
     posn = ddCHash2(uh,uf,ug,table->cacheShift);
@@ -711,7 +712,7 @@ cuddConstantLookup(
     /* We do not reclaim here because the result should not be
      * referenced, but only tested for being a constant.
      */
-    if (en->data != NULL &&
+    if (en->data != (uintptr_t) 0 &&
 	en->f == (DdNodePtr)uf && en->g == (DdNodePtr)ug && en->h == uh) {
 	table->cacheHits++;
 	return(en->data);
@@ -725,7 +726,7 @@ cuddConstantLookup(
 	cuddCacheResize(table);
     }
 
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of cuddConstantLookup */
 
@@ -769,12 +770,12 @@ cuddCacheProfile(
     totalcount = 0.0;
 
     hystogramQ = ALLOC(double, nbins);
-    if (hystogramQ == NULL) {
+    if (hystogramQ == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
     hystogramR = ALLOC(double, nbins);
-    if (hystogramR == NULL) {
+    if (hystogramR == (uintptr_t) 0) {
 	FREE(hystogramQ);
 	table->errorCode = CUDD_MEMORY_OUT;
 	return(0);
@@ -888,14 +889,14 @@ cuddCacheResize(
 {
     DdCache *cache, *oldcache, *oldacache, *entry, *old;
     int i;
-    int posn, shift;
+    intptr_t posn, shift;
     unsigned int slots, oldslots;
     double offset;
     int moved = 0;
     extern DD_OOMFP MMoutOfMemory;
     DD_OOMFP saveHandler;
 #ifndef DD_CACHE_PROFILE
-    ptruint misalignment;
+    uintptr_t misalignment;
     DdNodePtr *mem;
 #endif
 
@@ -918,7 +919,7 @@ cuddCacheResize(
     table->acache = cache = ALLOC(DdCache,slots+1);
     MMoutOfMemory = saveHandler;
     /* If we fail to allocate the new table we just give up. */
-    if (cache == NULL) {
+    if (cache == (uintptr_t) 0) {
 #ifdef DD_VERBOSE
 	(void) fprintf(table->err,"Resizing failed. Giving up.\n");
 #endif
@@ -936,10 +937,10 @@ cuddCacheResize(
     table->cache = cache;
 #else
     mem = (DdNodePtr *) cache;
-    misalignment = (ptruint) mem & (sizeof(DdCache) - 1);
+    misalignment = (uintptr_t) mem & (sizeof(DdCache) - 1);
     mem += (sizeof(DdCache) - misalignment) / sizeof(DdNodePtr);
     table->cache = cache = (DdCache *) mem;
-    assert(((ptruint) table->cache & (sizeof(DdCache) - 1)) == 0);
+    assert(((uintptr_t) table->cache & (sizeof(DdCache) - 1)) == 0);
 #endif
     shift = --(table->cacheShift);
     table->memused += (slots - oldslots) * sizeof(DdCache);
@@ -947,7 +948,7 @@ cuddCacheResize(
 
     /* Clear new cache. */
     for (i = 0; (unsigned) i < slots; i++) {
-	cache[i].data = NULL;
+	cache[i].data = (uintptr_t) 0;
 	cache[i].h = 0;
 #ifdef DD_CACHE_PROFILE
 	cache[i].count = 0;
@@ -957,8 +958,8 @@ cuddCacheResize(
     /* Copy from old cache to new one. */
     for (i = 0; (unsigned) i < oldslots; i++) {
 	old = &oldcache[i];
-	if (old->data != NULL) {
-	    posn = ddCHash2(old->h,old->f,old->g,shift);
+	if (old->data != (uintptr_t) 0) {
+	    posn = ddCHash2((uintptr_t)old->h,(uintptr_t)old->f,(uintptr_t)old->g,shift);
 	    entry = &cache[posn];
 	    entry->f = old->f;
 	    entry->g = old->g;
@@ -1007,8 +1008,8 @@ cuddCacheFlush(
     slots = table->cacheSlots;
     cache = table->cache;
     for (i = 0; i < slots; i++) {
-	table->cachedeletions += cache[i].data != NULL;
-	cache[i].data = NULL;
+	table->cachedeletions += cache[i].data != (uintptr_t) 0;
+	cache[i].data = (uintptr_t) 0;
     }
     table->cacheLastInserts = table->cacheinserts;
 

@@ -54,6 +54,7 @@ arithmetic   domain     # trials      peak         rms
 Cephes Math Library Release 2.8:  June, 2000
 Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 *************************************************************************/
+/*
 double erf(double x)
 {
     double result;
@@ -92,7 +93,7 @@ double erf(double x)
     result = s*(1-erfc(x));
     return result;
 }
-
+*/
 
 /*************************************************************************
 Complementary error function
@@ -121,6 +122,7 @@ arithmetic   domain     # trials      peak         rms
 Cephes Math Library Release 2.8:  June, 2000
 Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 *************************************************************************/
+/*
 double erfc(double x)
 {
     double result;
@@ -163,7 +165,7 @@ double erfc(double x)
     result = exp(-ap::sqr(x))*p/q;
     return result;
 }
-
+*/
 
 /*************************************************************************
 Normal distribution function

@@ -29,6 +29,7 @@
 ******************************************************************************/
 
 #include "dddmpInt.h"
+#include <stdint.h>
 
 /*---------------------------------------------------------------------------*/
 /* Stucture declarations                                                     */
@@ -768,13 +769,13 @@ RemoveFromUniqueRecurCnf (
 
     nodelist = subtable->nodelist;
 
-    pos = ddHash (cuddT (f), cuddE (f), subtable->shift);
+    pos = ddHash ((uintptr_t) cuddT (f),(uintptr_t)  cuddE (f), subtable->shift);
     node = nodelist[pos];
-    last = NULL;
+    last = (uintptr_t) 0;
     while (node != sentinel) {
       next = node->next;
       if (node == f) {
-        if (last != NULL)  
+        if (last != (uintptr_t) 0)  
   	  last->next = next;
         else 
           nodelist[pos] = next;
@@ -785,7 +786,7 @@ RemoveFromUniqueRecurCnf (
       }
     }
 
-    f->next = NULL;
+    f->next = (uintptr_t) 0;
 
   }
 
@@ -832,7 +833,7 @@ RestoreInUniqueRecurCnf (
     /* StQ 11.02.2004:
        Bug fixed --> restore NULL within the next field */
     /*DddmpClearVisitedCnf (f);*/
-    f->next = NULL;
+    f->next = (uintptr_t) 0;
 
     return;
   }
@@ -845,7 +846,7 @@ RestoreInUniqueRecurCnf (
 
   nodelist = subtable->nodelist;
 
-  pos = ddHash (cuddT (f), cuddE (f), subtable->shift);
+  pos = ddHash ((uintptr_t) cuddT (f), (uintptr_t) cuddE (f), subtable->shift);
 
 #ifdef DDDMP_DEBUG
   /* verify uniqueness to avoid duplicate nodes in unique table */
@@ -899,9 +900,9 @@ DddmpPrintBddAndNextRecur (
   fPtr = Cudd_Regular (f);
   
   if (Cudd_IsComplement (f)) {
-    fprintf (stdout, "sign=- ptr=%ld ", ((long long) fPtr));
+    fprintf (stdout, "sign=- ptr=%ld ", ((long)((intptr_t) fPtr)));
   } else {
-    fprintf (stdout, "sign=+ ptr=%ld ", ((long long) fPtr));
+    fprintf (stdout, "sign=+ ptr=%ld ", ((long)((intptr_t) fPtr)));
   }
  
   if (cuddIsConstant (fPtr)) {
@@ -912,9 +913,9 @@ DddmpPrintBddAndNextRecur (
 
   fprintf (stdout,  
     "thenPtr=%ld elsePtr=%ld BddId=%d CnfId=%d Visited=%d\n",
-    ((long long) cuddT (fPtr)), ((long long) cuddE (fPtr)),
+    ((intptr_t) cuddT (fPtr)), ((intptr_t) cuddE (fPtr)),
     fPtr->index, DddmpReadNodeIndexCnf (fPtr),
-    DddmpVisitedCnf (fPtr));
+    ((int)((intptr_t) DddmpVisitedCnf (fPtr))));
   
   tPtr  = cuddT (fPtr);
   ePtr = cuddE (fPtr);

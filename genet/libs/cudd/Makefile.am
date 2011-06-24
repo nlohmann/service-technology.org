@@ -116,7 +116,7 @@ CC = $(CXX)
 # test program for the C++ object-oriented encapsulation of CUDD
 TESTS = testobj.sh
 check_PROGRAMS = testobj
-testobj_SOURCES = obj/testobj.cc include/cudd.h test-helper.cc
+testobj_SOURCES = obj/testobj.cc include/cudd.h 
 testobj_LDADD = libobj.la libdddmp.la libcudd.la libmtr.la \
 	libst.la libepd.la libutil.la
 

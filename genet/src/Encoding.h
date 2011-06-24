@@ -21,7 +21,8 @@ const int EVENT_ENCODING = 1;
 
 using namespace __gnu_cxx; // extension to include the hash_map
 
-class Encoding {
+class Encoding
+{
     map<string, BDD> mencoding;
     Cudd *mgr;
     int nvars;
@@ -36,30 +37,36 @@ class Encoding {
 
 public:
     BDD ps_vars, ns_vars;
-    Encoding() {}
+    Encoding() : mgr(0), nvars(0), nsvars(0), nred_vars(0) {}
     Encoding(Tts *t, int encoding_method, Cudd *manager);
     Encoding(const Encoding &e);
     void encode(Tts *t);
     void encode_on_events(Tts *t);
     BDD state(string s);
-    int enc_vars() const {
+    int enc_vars() const
+    {
         return nvars;
     }
-    int red_vars() const {
+    int red_vars() const
+    {
         return nred_vars;
     }
-    int next_vars() const {
+    int next_vars() const
+    {
         return nsvars;
     }
     BDD change_vars(const BDD &g);
-    bool variable_redundant(int i) {
+    bool variable_redundant(int i)
+    {
         return reds_variables.find(i) != reds_variables.end();
     }
-    int ns_var_index(int i)  {
+    int ns_var_index(int i)
+    {
         assert(i < nvars);
         return psvar_to_nsvar[i];
     }
-    int ps_var_index(int i)  {
+    int ps_var_index(int i)
+    {
         assert(i >= nvars);
         return nsvar_to_psvar[i];
     }

@@ -1,4 +1,4 @@
-AC_INIT(Genet, 1.1, jcarmona@lsi.upc.edu, genet, http://www.lsi.upc.edu/~jcarmona/genet.html)
+AC_INIT(Genet, 1.2-unreleased, jcarmona@lsi.upc.edu, genet, http://www.lsi.upc.edu/~jcarmona/genet.html)
 
 AC_MSG_NOTICE([   ____                 _    ])
 AC_MSG_NOTICE([  / ___| ___ _ __   ___| |_  ])
@@ -14,25 +14,18 @@ AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 
-AM_INIT_AUTOMAKE(gnu)
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+AC_PROG_CXX
+
+AC_ST_BASIC
+AC_ST_AUTOTEST
 
 # parameters for Libtool
 AC_PROG_LIBTOOL
 AC_LIBTOOL_WIN32_DLL
 AC_CONFIG_MACRO_DIR([m4])
 
-# check for programs needed to compile
-AC_PROG_CXX
-AM_PROG_CC_C_O
-AC_PROG_SED
-AC_PROG_GREP
-AC_PROG_AWK
-AC_PROG_RANLIB
-
-# look up canonical build name and write it to config.h
-AC_CANONICAL_BUILD
-AC_DEFINE_UNQUOTED([CONFIG_BUILDSYSTEM], ["$build"], [The platform.])
+# search for optional tools needed by "make check"
+AC_PATH_PROG(VALGRIND,    [valgrind], not found)
 
 # check for functions
 AC_CHECK_FUNCS([popen pclose],,AC_MSG_WARN([cannot use pipes -- expect bad performance]))
@@ -140,8 +133,15 @@ AC_CONFIG_FILES([Makefile
                  utils/pccts/sorcerer/Makefile
                  utils/pccts/support/genmk/Makefile
                  maintainer/Makefile
+                 doc/Makefile
+                 doc/Doxyfile 
+                 doc/Doxydetails 
+                 tests/Makefile 
+                 tests/package.m4
                  ])
 AC_CONFIG_FILES([libs/cudd/testobj.sh], [chmod +x libs/cudd/testobj.sh])
+AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
+
 AC_OUTPUT
 
 

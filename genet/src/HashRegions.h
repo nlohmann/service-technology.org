@@ -8,7 +8,8 @@ const int HASH_SIZE=2000;
 //template<>
 struct hashRegion
 {
-    size_t operator()(Region *a) const {
+    size_t operator()(Region *a) const
+    {
 
         size_t h  = a->cache_key() % HASH_SIZE;
 //	 cout << "              key : " << h << endl;
@@ -31,7 +32,8 @@ public :
 
 struct hashSS
 {
-    size_t operator()(SS a) const {
+    size_t operator()(SS a) const
+    {
 
         size_t h  = a.getNodeSize() % HASH_SIZE;
 //	 cout << "           bdd key: " << h << endl;

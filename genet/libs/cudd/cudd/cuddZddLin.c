@@ -167,14 +167,14 @@ cuddZddLinearSifting(
     empty = table->zero;
 
     /* Find order in which to sift variables. */
-    var = NULL;
+    var = (uintptr_t) 0;
     zdd_entry = ALLOC(int, size);
-    if (zdd_entry == NULL) {
+    if (zdd_entry == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto cuddZddSiftingOutOfMem;
     }
     var = ALLOC(int, size);
-    if (var == NULL) {
+    if (var == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto cuddZddSiftingOutOfMem;
     }
@@ -219,8 +219,8 @@ cuddZddLinearSifting(
 
 cuddZddSiftingOutOfMem:
 
-    if (zdd_entry != NULL) FREE(zdd_entry);
-    if (var != NULL) FREE(var);
+    if (zdd_entry != (uintptr_t) 0) FREE(zdd_entry);
+    if (var != (uintptr_t) 0) FREE(var);
 
     return(0);
 
@@ -297,12 +297,12 @@ cuddZddLinearInPlace(
     ** in the x list. The chain pointed by special holds the elements
     ** that will move to the y list.
     */
-    g = special = NULL;
+    g = special = (uintptr_t) 0;
     for (i = 0; i < xslots; i++) {
 	f = xlist[i];
-	if (f == NULL) continue;
-	xlist[i] = NULL;
-	while (f != NULL) {
+	if (f == (uintptr_t) 0) continue;
+	xlist[i] = (uintptr_t) 0;
+	while (f != (uintptr_t) 0) {
 	    next = f->next;
 	    f1 = cuddT(f);
 	    /* if (f1->index == yindex) */ cuddSatDec(f1->ref);
@@ -325,7 +325,7 @@ cuddZddLinearInPlace(
     */
     for (i = 0; i < yslots; i++) {
 	f = ylist[i];
-	while (f != NULL) {
+	while (f != (uintptr_t) 0) {
 	    if (f->ref != 0) {
 		f->index = xindex;
 	    }
@@ -335,7 +335,7 @@ cuddZddLinearInPlace(
 
     /* Move special nodes to the y list. */
     f = special;
-    while (f != NULL) {
+    while (f != (uintptr_t) 0) {
 	next = f->next;
 	f1 = cuddT(f);
 	f11 = cuddT(f1);
@@ -360,7 +360,7 @@ cuddZddLinearInPlace(
     ** They form a linked list pointed by g.
     */
     f = g;
-    while (f != NULL) {
+    while (f != (uintptr_t) 0) {
 #ifdef DD_COUNT
 	table->swapSteps++;
 #endif
@@ -388,7 +388,7 @@ cuddZddLinearInPlace(
 	    /* For each element newf1 in collision list ylist[posn]. */
 	    newf1 = ylist[posn];
 	    /* Search the collision chain skipping the marked nodes. */
-	    while (newf1 != NULL) {
+	    while (newf1 != (uintptr_t) 0) {
 		if (cuddT(newf1) == f01 && cuddE(newf1) == f10 &&
 		    (int) newf1->index == yindex) {
 		    cuddSatInc(newf1->ref);
@@ -396,9 +396,9 @@ cuddZddLinearInPlace(
 		}
 		newf1 = newf1->next;
 	    } /* while newf1 */
-	    if (newf1 == NULL) {	/* no match */
+	    if (newf1 == (uintptr_t) 0) {	/* no match */
 		newf1 = cuddDynamicAllocNode(table);
-		if (newf1 == NULL)
+		if (newf1 == (uintptr_t) 0)
 		    goto zddSwapOutOfMem;
 		newf1->index = yindex; newf1->ref = 1;
 		cuddT(newf1) = f01;
@@ -425,7 +425,7 @@ cuddZddLinearInPlace(
 	    posn = ddHash(f11, f00, yshift);
 	    /* For each element newf0 in collision list ylist[posn]. */
 	    newf0 = ylist[posn];
-	    while (newf0 != NULL) {
+	    while (newf0 != (uintptr_t) 0) {
 		if (cuddT(newf0) == f11 && cuddE(newf0) == f00 &&
 		    (int) newf0->index == yindex) {
 		    cuddSatInc(newf0->ref);
@@ -433,9 +433,9 @@ cuddZddLinearInPlace(
 		}
 		newf0 = newf0->next;
 	    } /* while newf0 */
-	    if (newf0 == NULL) {	/* no match */
+	    if (newf0 == (uintptr_t) 0) {	/* no match */
 		newf0 = cuddDynamicAllocNode(table);
-		if (newf0 == NULL)
+		if (newf0 == (uintptr_t) 0)
 		    goto zddSwapOutOfMem;
 		newf0->index = yindex; newf0->ref = 1;
 		cuddT(newf0) = f11; cuddE(newf0) = f00;
@@ -460,27 +460,27 @@ cuddZddLinearInPlace(
 	f->next = xlist[posn];
 	xlist[posn] = f;
 	f = next;
-    } /* while f != NULL */
+    } /* while f != (uintptr_t) 0 */
 
     /* GC the y layer and move the marked nodes to the x list. */
 
     /* For each node f in ylist. */
     for (i = 0; i < yslots; i++) {
-	previous = NULL;
+	previous = (uintptr_t) 0;
 	f = ylist[i];
-	while (f != NULL) {
+	while (f != (uintptr_t) 0) {
 	    next = f->next;
 	    if (f->ref == 0) {
 		cuddSatDec(cuddT(f)->ref);
 		cuddSatDec(cuddE(f)->ref);
 		cuddDeallocNode(table, f);
 		newykeys--;
-		if (previous == NULL)
+		if (previous == (uintptr_t) 0)
 		    ylist[i] = next;
 		else
 		    previous->next = next;
 	    } else if ((int) f->index == xindex) { /* move marked node */
-		if (previous == NULL)
+		if (previous == (uintptr_t) 0)
 		    ylist[i] = next;
 		else
 		    previous->next = next;
@@ -490,7 +490,7 @@ cuddZddLinearInPlace(
 		posn = ddHash(f1, empty, yshift);
 		/* For each element newf1 in collision list ylist[posn]. */
 		newf1 = ylist[posn];
-		while (newf1 != NULL) {
+		while (newf1 != (uintptr_t) 0) {
 		    if (cuddT(newf1) == f1 && cuddE(newf1) == empty &&
 			(int) newf1->index == yindex) {
 			cuddSatInc(newf1->ref);
@@ -498,9 +498,9 @@ cuddZddLinearInPlace(
 		    }
 		    newf1 = newf1->next;
 		} /* while newf1 */
-		if (newf1 == NULL) {	/* no match */
+		if (newf1 == (uintptr_t) 0) {	/* no match */
 		    newf1 = cuddDynamicAllocNode(table);
-		    if (newf1 == NULL)
+		    if (newf1 == (uintptr_t) 0)
 			goto zddSwapOutOfMem;
 		    newf1->index = yindex; newf1->ref = 1;
 		    cuddT(newf1) = f1; cuddE(newf1) = empty;
@@ -510,7 +510,7 @@ cuddZddLinearInPlace(
 		    newykeys++;
 		    newf1->next = ylist[posn];
 		    ylist[posn] = newf1;
-		    if (posn == i && previous == NULL)
+		    if (posn == i && previous == (uintptr_t) 0)
 			previous = newf1;
 		    cuddSatInc(f1->ref);
 		    cuddSatInc(empty->ref);
@@ -589,11 +589,11 @@ cuddZddLinearAux(
     assert(table->subtableZ[x].keys > 0);
 #endif
 
-    moveDown = NULL;
-    moveUp = NULL;
+    moveDown = (uintptr_t) 0;
+    moveUp = (uintptr_t) 0;
 
     if (x == xLow) {
-	moveDown = cuddZddLinearDown(table, x, xHigh, NULL);
+	moveDown = cuddZddLinearDown(table, x, xHigh, (uintptr_t) 0);
 	/* At this point x --> xHigh. */
 	if (moveDown == (Move *) CUDD_OUT_OF_MEM)
 	    goto cuddZddLinearAuxOutOfMem;
@@ -603,7 +603,7 @@ cuddZddLinearAux(
 	    goto cuddZddLinearAuxOutOfMem;
 
     } else if (x == xHigh) {
-	moveUp = cuddZddLinearUp(table, x, xLow, NULL);
+	moveUp = cuddZddLinearUp(table, x, xLow, (uintptr_t) 0);
 	/* At this point x --> xLow. */
 	if (moveUp == (Move *) CUDD_OUT_OF_MEM)
 	    goto cuddZddLinearAuxOutOfMem;
@@ -613,13 +613,13 @@ cuddZddLinearAux(
 	    goto cuddZddLinearAuxOutOfMem;
 
     } else if ((x - xLow) > (xHigh - x)) { /* must go down first: shorter */
-	moveDown = cuddZddLinearDown(table, x, xHigh, NULL);
+	moveDown = cuddZddLinearDown(table, x, xHigh, (uintptr_t) 0);
 	/* At this point x --> xHigh. */
 	if (moveDown == (Move *) CUDD_OUT_OF_MEM)
 	    goto cuddZddLinearAuxOutOfMem;
 	moveUp = cuddZddUndoMoves(table,moveDown);
 #ifdef DD_DEBUG
-	assert(moveUp == NULL || moveUp->x == x);
+	assert(moveUp == (uintptr_t) 0 || moveUp->x == x);
 #endif
 	moveUp = cuddZddLinearUp(table, x, xLow, moveUp);
 	if (moveUp == (Move *) CUDD_OUT_OF_MEM)
@@ -630,14 +630,14 @@ cuddZddLinearAux(
 	    goto cuddZddLinearAuxOutOfMem;
 
     } else {
-	moveUp = cuddZddLinearUp(table, x, xLow, NULL);
+	moveUp = cuddZddLinearUp(table, x, xLow, (uintptr_t) 0);
 	/* At this point x --> xHigh. */
 	if (moveUp == (Move *) CUDD_OUT_OF_MEM)
 	    goto cuddZddLinearAuxOutOfMem;
 	/* Then move up. */
 	moveDown = cuddZddUndoMoves(table,moveUp);
 #ifdef DD_DEBUG
-	assert(moveDown == NULL || moveDown->y == x);
+	assert(moveDown == (uintptr_t) 0 || moveDown->y == x);
 #endif
 	moveDown = cuddZddLinearDown(table, x, xHigh, moveDown);
 	if (moveDown == (Move *) CUDD_OUT_OF_MEM)
@@ -648,12 +648,12 @@ cuddZddLinearAux(
 	    goto cuddZddLinearAuxOutOfMem;
     }
 
-    while (moveDown != NULL) {
+    while (moveDown != (uintptr_t) 0) {
 	move = moveDown->next;
 	cuddDeallocMove(table, moveDown);
 	moveDown = move;
     }
-    while (moveUp != NULL) {
+    while (moveUp != (uintptr_t) 0) {
 	move = moveUp->next;
 	cuddDeallocMove(table, moveUp);
 	moveUp = move;
@@ -663,14 +663,14 @@ cuddZddLinearAux(
 
 cuddZddLinearAuxOutOfMem:
     if (moveDown != (Move *) CUDD_OUT_OF_MEM) {
-	while (moveDown != NULL) {
+	while (moveDown != (uintptr_t) 0) {
 	    move = moveDown->next;
 	    cuddDeallocMove(table, moveDown);
 	    moveDown = move;
 	}
     }
     if (moveUp != (Move *) CUDD_OUT_OF_MEM) {
-	while (moveUp != NULL) {
+	while (moveUp != (uintptr_t) 0) {
 	    move = moveUp->next;
 	    cuddDeallocMove(table, moveUp);
 	    moveUp = move;
@@ -689,7 +689,7 @@ cuddZddLinearAuxOutOfMem:
   Description [Sifts a variable up applying the XOR
   transformation. Moves y up until either it reaches the bound (xLow)
   or the size of the ZDD heap increases too much.  Returns the set of
-  moves in case of success; NULL if memory is full.]
+  moves in case of success; (uintptr_t) 0 if memory is full.]
 
   SideEffects [None]
 
@@ -721,7 +721,7 @@ cuddZddLinearUp(
 	if (newsize == 0)
 	    goto cuddZddLinearUpOutOfMem;
 	move = (Move *) cuddDynamicAllocNode(table);
-	if (move == NULL)
+	if (move == (uintptr_t) 0)
 	    goto cuddZddLinearUpOutOfMem;
 	move->x = x;
 	move->y = y;
@@ -757,7 +757,7 @@ cuddZddLinearUp(
     return(moves);
 
 cuddZddLinearUpOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -773,7 +773,7 @@ cuddZddLinearUpOutOfMem:
 
   Description [Sifts a variable down. Moves x down until either it
   reaches the bound (xHigh) or the size of the ZDD heap increases too
-  much. Returns the set of moves in case of success; NULL if memory is
+  much. Returns the set of moves in case of success; (uintptr_t) 0 if memory is
   full.]
 
   SideEffects [None]
@@ -806,7 +806,7 @@ cuddZddLinearDown(
 	if (newsize == 0)
 	    goto cuddZddLinearDownOutOfMem;
 	move = (Move *) cuddDynamicAllocNode(table);
-	if (move == NULL)
+	if (move == (uintptr_t) 0)
 	    goto cuddZddLinearDownOutOfMem;
 	move->x = x;
 	move->y = y;
@@ -840,7 +840,7 @@ cuddZddLinearDown(
     return(moves);
 
 cuddZddLinearDownOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -875,13 +875,13 @@ cuddZddLinearBackward(
     int		res;
 
     /* Find the minimum size among moves. */
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	if (move->size < size) {
 	    size = move->size;
 	}
     }
 
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	if (move->size == size) return(1);
 	if (move->flags == CUDD_LINEAR_TRANSFORM_MOVE) {
 	    res = cuddZddLinearInPlace(table,(int)move->x,(int)move->y);
@@ -918,14 +918,14 @@ cuddZddUndoMoves(
   DdManager * table,
   Move * moves)
 {
-    Move *invmoves = NULL;
+    Move *invmoves = (uintptr_t) 0;
     Move *move;
     Move *invmove;
     int	size;
 
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	invmove = (Move *) cuddDynamicAllocNode(table);
-	if (invmove == NULL) goto cuddZddUndoMovesOutOfMem;
+	if (invmove == (uintptr_t) 0) goto cuddZddUndoMovesOutOfMem;
 	invmove->x = move->x;
 	invmove->y = move->y;
 	invmove->next = invmoves;
@@ -956,7 +956,7 @@ cuddZddUndoMoves(
     return(invmoves);
 
 cuddZddUndoMovesOutOfMem:
-    while (invmoves != NULL) {
+    while (invmoves != (uintptr_t) 0) {
 	move = invmoves->next;
 	cuddDeallocMove(table, invmoves);
 	invmoves = move;

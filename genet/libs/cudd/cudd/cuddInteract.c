@@ -245,7 +245,7 @@ cuddInitInteract(
 
     words = ((n * (n-1)) >> (1 + LOGBPL)) + 1;
     table->interact = interact = ALLOC(long,words);
-    if (interact == NULL) {
+    if (interact == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -254,7 +254,7 @@ cuddInitInteract(
     }
 
     support = ALLOC(int,n);
-    if (support == NULL) {
+    if (support == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	FREE(interact);
 	return(0);

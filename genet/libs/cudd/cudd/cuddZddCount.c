@@ -141,7 +141,7 @@ Cudd_zddCount(
     base  = DD_ONE(zdd);
     empty = DD_ZERO(zdd);
     table = st_init_table(st_ptrcmp, st_ptrhash);
-    if (table == NULL) return(CUDD_OUT_OF_MEM);
+    if (table == (uintptr_t) 0) return(CUDD_OUT_OF_MEM);
     res = cuddZddCountStep(P, table, base, empty);
     if (res == CUDD_OUT_OF_MEM) {
 	zdd->errorCode = CUDD_MEMORY_OUT;
@@ -180,7 +180,7 @@ Cudd_zddCountDouble(
     base  = DD_ONE(zdd);
     empty = DD_ZERO(zdd);
     table = st_init_table(st_ptrcmp, st_ptrhash);
-    if (table == NULL) return((double)CUDD_OUT_OF_MEM);
+    if (table == (uintptr_t) 0) return((double)CUDD_OUT_OF_MEM);
     res = cuddZddCountDoubleStep(P, table, base, empty);
     if (res == (double)CUDD_OUT_OF_MEM) {
 	zdd->errorCode = CUDD_MEMORY_OUT;
@@ -239,7 +239,7 @@ cuddZddCountStep(
 	cuddZddCountStep(cuddT(P), table, base, empty);
 
     dummy = ALLOC(int, 1);
-    if (dummy == NULL) {
+    if (dummy == (uintptr_t) 0) {
 	return(CUDD_OUT_OF_MEM);
     }
     *dummy = res;
@@ -289,7 +289,7 @@ cuddZddCountDoubleStep(
 	cuddZddCountDoubleStep(cuddT(P), table, base, empty);
 
     dummy = ALLOC(double, 1);
-    if (dummy == NULL) {
+    if (dummy == (uintptr_t) 0) {
 	return((double)CUDD_OUT_OF_MEM);
     }
     *dummy = res;

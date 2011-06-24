@@ -117,7 +117,7 @@ static DdNode * cuddAddOuterSumRecur (DdManager *dd, DdNode *M, DdNode *r, DdNod
   (columns).  The product of A and B then depends on x (rows) and y
   (columns).  Only the z variables have to be explicitly identified;
   they are the "summation" variables.  Returns a pointer to the
-  result if successful; NULL otherwise.]
+  result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -138,9 +138,9 @@ Cudd_addMatrixMultiply(
     /* Array vars says what variables are "summation" variables. */
     nvars = dd->size;
     vars = ALLOC(int,nvars);
-    if (vars == NULL) {
+    if (vars == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < nvars; i++) {
         vars[i] = 0;
@@ -169,7 +169,7 @@ Cudd_addMatrixMultiply(
   procedure by Clarke et al..  Matrix A has x's as row variables and z's
   as column variables, while matrix B has z's as row variables and y's
   as column variables. Returns the pointer to the result if successful;
-  NULL otherwise. The resulting matrix has x's as row variables and y's
+  (uintptr_t) 0 otherwise. The resulting matrix has x's as row variables and y's
   as column variables.]
 
   SideEffects [None]
@@ -188,24 +188,24 @@ Cudd_addTimesPlus(
     DdNode *w, *cube, *tmp, *res; 
     int i;
     tmp = Cudd_addApply(dd,Cudd_addTimes,A,B);
-    if (tmp == NULL) return(NULL);
+    if (tmp == (uintptr_t) 0) return((uintptr_t) 0);
     Cudd_Ref(tmp);
     Cudd_Ref(cube = DD_ONE(dd));
     for (i = nz-1; i >= 0; i--) {
 	 w = Cudd_addIte(dd,z[i],cube,DD_ZERO(dd));
-	 if (w == NULL) {
+	 if (w == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,tmp);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	 }
 	 Cudd_Ref(w);
 	 Cudd_RecursiveDeref(dd,cube);
 	 cube = w;
     }
     res = Cudd_addExistAbstract(dd,tmp,cube);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,tmp);
 	Cudd_RecursiveDeref(dd,cube);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     Cudd_Ref(res);
     Cudd_RecursiveDeref(dd,cube);
@@ -228,7 +228,7 @@ Cudd_addTimesPlus(
   of f and g then depends on x (rows) and y (columns).  Only the z
   variables have to be explicitly identified; they are the
   "abstraction" variables.  Returns a pointer to the result if
-  successful; NULL otherwise. ]
+  successful; (uintptr_t) 0 otherwise. ]
 
   SideEffects [None]
 
@@ -248,16 +248,16 @@ Cudd_addTriangle(
 
     nvars = dd->size;
     vars = ALLOC(int, nvars);
-    if (vars == NULL) {
+    if (vars == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < nvars; i++) vars[i] = -1;
     for (i = 0; i < nz; i++) vars[z[i]->index] = i;
-    cube = Cudd_addComputeCube(dd, z, NULL, nz);
-    if (cube == NULL) {
+    cube = Cudd_addComputeCube(dd, z, (uintptr_t) 0, nz);
+    if (cube == (uintptr_t) 0) {
 	FREE(vars);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(cube);
 
@@ -265,9 +265,9 @@ Cudd_addTriangle(
 	dd->reordered = 0;
 	res = addTriangleRecur(dd, f, g, vars, cube);
     } while (dd->reordered == 1);
-    if (res != NULL) cuddRef(res);
+    if (res != (uintptr_t) 0) cuddRef(res);
     Cudd_RecursiveDeref(dd,cube);
-    if (res != NULL) cuddDeref(res);
+    if (res != (uintptr_t) 0) cuddDeref(res);
     FREE(vars);
     return(res);
 
@@ -281,7 +281,7 @@ Cudd_addTriangle(
   Description [Takes the pointwise minimum of a matrix and the outer
   sum of two vectors.  This procedure is used in the Floyd-Warshall
   all-pair shortest path algorithm.  Returns a pointer to the result if
-  successful; NULL otherwise.]
+  successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -320,7 +320,7 @@ Cudd_addOuterSum(
   Synopsis    [Performs the recursive step of Cudd_addMatrixMultiply.]
 
   Description [Performs the recursive step of Cudd_addMatrixMultiply.
-  Returns a pointer to the result if successful; NULL otherwise.]
+  Returns a pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -391,7 +391,7 @@ addMMRecur(
 
     cacheOp = (DD_CTFP) addMMRecur;
     res = cuddCacheLookup2(dd,cacheOp,A,B);
-    if (res != NULL) {
+    if (res != (uintptr_t) 0) {
 	/* If the result is 0, there is no need to normalize.
 	** Otherwise we count the number of z variables between
 	** the current depth and the top of the ADDs. These are
@@ -410,16 +410,16 @@ addMMRecur(
 	if (scale > 1.0) {
 	    cuddRef(res);
 	    add_scale = cuddUniqueConst(dd,(CUDD_VALUE_TYPE)scale);
-	    if (add_scale == NULL) {
+	    if (add_scale == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd, res);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    cuddRef(add_scale);
 	    scaled = cuddAddApplyRecur(dd,Cudd_addTimes,res,add_scale);
-	    if (scaled == NULL) {
+	    if (scaled == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd, add_scale);
 		Cudd_RecursiveDeref(dd, res);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    cuddRef(scaled);
 	    Cudd_RecursiveDeref(dd, add_scale);
@@ -445,12 +445,12 @@ addMMRecur(
     }
 
     t = addMMRecur(dd, At, Bt, (int)topV, vars);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(t);
     e = addMMRecur(dd, Ae, Be, (int)topV, vars);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
@@ -461,10 +461,10 @@ addMMRecur(
 	** which correspond to two submatrices of the result.
 	*/
 	res = (t == e) ? t : cuddUniqueInter(dd,index,t,e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, t);
 	    Cudd_RecursiveDeref(dd, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(res);
 	cuddDeref(t);
@@ -474,10 +474,10 @@ addMMRecur(
 	** the rows of B. The two subresults must be added.
 	*/
 	res = cuddAddApplyRecur(dd,Cudd_addPlus,t,e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, t);
 	    Cudd_RecursiveDeref(dd, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(res);
 	Cudd_RecursiveDeref(dd, t);
@@ -503,16 +503,16 @@ addMMRecur(
 	}
 	if (scale > 1.0) {
 	    add_scale = cuddUniqueConst(dd,(CUDD_VALUE_TYPE)scale);
-	    if (add_scale == NULL) {
+	    if (add_scale == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd, res);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    cuddRef(add_scale);
 	    scaled = cuddAddApplyRecur(dd,Cudd_addTimes,res,add_scale);
-	    if (scaled == NULL) {
+	    if (scaled == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd, res);
 		Cudd_RecursiveDeref(dd, add_scale);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    cuddRef(scaled);
 	    Cudd_RecursiveDeref(dd, add_scale);
@@ -531,7 +531,7 @@ addMMRecur(
   Synopsis    [Performs the recursive step of Cudd_addTriangle.]
 
   Description [Performs the recursive step of Cudd_addTriangle. Returns
-  a pointer to the result if successful; NULL otherwise.]
+  a pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -566,7 +566,7 @@ addTriangleRecur(
 
     if (f->ref != 1 || g->ref != 1) {
 	res = cuddCacheLookup(dd, DD_ADD_TRIANGLE_TAG, f, g, cube);
-	if (res != NULL) {
+	if (res != (uintptr_t) 0) {
 	    return(res);
 	}
     }
@@ -578,31 +578,31 @@ addTriangleRecur(
     if (top == topg) {gv = cuddT(g); gvn = cuddE(g);} else {gv = gvn = g;}
 
     t = addTriangleRecur(dd, fv, gv, vars, cube);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(t);
     e = addTriangleRecur(dd, fvn, gvn, vars, cube);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
     index = dd->invperm[top];
     if (vars[index] < 0) {
 	res = (t == e) ? t : cuddUniqueInter(dd,index,t,e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, t);
 	    Cudd_RecursiveDeref(dd, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(t);
 	cuddDeref(e);
     } else {
 	res = cuddAddApplyRecur(dd,Cudd_addMinimum,t,e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, t);
 	    Cudd_RecursiveDeref(dd, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(res);
 	Cudd_RecursiveDeref(dd, t);
@@ -624,7 +624,7 @@ addTriangleRecur(
   Synopsis    [Performs the recursive step of Cudd_addOuterSum.]
 
   Description [Performs the recursive step of Cudd_addOuterSum.
-  Returns a pointer to the result if successful; NULL otherwise.]
+  Returns a pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -668,7 +668,7 @@ cuddAddOuterSumRecur(
 
     /* Check the cache. */
     R = cuddCacheLookup(dd,DD_ADD_OUT_SUM_TAG,M,r,c);
-    if (R != NULL) return(R);
+    if (R != (uintptr_t) 0) return(R);
 
     topM = cuddI(dd,M->index); topr = cuddI(dd,r->index);
     topc = cuddI(dd,c->index);
@@ -681,20 +681,20 @@ cuddAddOuterSumRecur(
 
     /* Recursively solve. */
     Rt = cuddAddOuterSumRecur(dd,Mt,rt,ct);
-    if (Rt == NULL) return(NULL);
+    if (Rt == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(Rt);
     Re = cuddAddOuterSumRecur(dd,Me,re,ce);
-    if (Re == NULL) {
+    if (Re == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, Rt);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(Re);
     index = dd->invperm[v];
     R = (Rt == Re) ? Rt : cuddUniqueInter(dd,index,Rt,Re);
-    if (R == NULL) {
+    if (R == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, Rt);
 	Cudd_RecursiveDeref(dd, Re);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(Rt);
     cuddDeref(Re);

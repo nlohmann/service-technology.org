@@ -191,7 +191,7 @@ static int ddIsVarHandled (DdManager *dd, int index);
   position in the order is known to the manager. If the variable does
   not exist yet, the position is assumed to be the same as the index.
   The group tree is created if it does not exist yet.
-  Returns a pointer to the group if successful; NULL otherwise.]
+  Returns a pointer to the group if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [The variable tree is changed.]
 
@@ -217,14 +217,14 @@ Cudd_MakeTreeNode(
     level = (low < (unsigned int) dd->size) ? dd->perm[low] : low;
 
     if (level + size - 1> (int) MTR_MAXHIGH)
-	return(NULL);
+	return((uintptr_t) 0);
 
     /* If the tree does not exist yet, create it. */
     tree = dd->tree;
-    if (tree == NULL) {
+    if (tree == (uintptr_t) 0) {
 	dd->tree = tree = Mtr_InitGroupTree(0, dd->size);
-	if (tree == NULL)
-	    return(NULL);
+	if (tree == (uintptr_t) 0)
+	    return((uintptr_t) 0);
 	tree->index = dd->invperm[0];
     }
 
@@ -235,8 +235,8 @@ Cudd_MakeTreeNode(
 
     /* Create the group. */
     group = Mtr_MakeGroup(tree, level, size, type);
-    if (group == NULL)
-	return(NULL);
+    if (group == (uintptr_t) 0)
+	return((uintptr_t) 0);
 
     /* Initialize the index field to the index of the variable currently
     ** in position low. This field will be updated by the reordering
@@ -280,7 +280,7 @@ cuddTreeSifting(
     ** variables are in a single group. After reordering this tree is
     ** destroyed.
     */
-    tempTree = table->tree == NULL;
+    tempTree = table->tree == (uintptr_t) 0;
     if (tempTree) {
 	table->tree = Mtr_InitGroupTree(0,table->size);
 	table->tree->index = table->invperm[0];
@@ -368,8 +368,8 @@ ddTreeSiftingAux(
 #endif
 
     auxnode = treenode;
-    while (auxnode != NULL) {
-	if (auxnode->child != NULL) {
+    while (auxnode != (uintptr_t) 0) {
+	if (auxnode->child != (uintptr_t) 0) {
 	    if (!ddTreeSiftingAux(table, auxnode->child, method))
 		return(0);
 	    saveCheck = table->groupcheck;
@@ -416,7 +416,7 @@ ddCountInternalMtrNodes(
 
     nodeCount = 0;
     auxnode = treenode;
-    while (auxnode != NULL) {
+    while (auxnode != (uintptr_t) 0) {
 	if (!(MTR_TEST(auxnode,MTR_TERMINAL))) {
 	    nodeCount++;
 	    count = ddCountInternalMtrNodes(table,auxnode->child);
@@ -641,7 +641,7 @@ ddFindNodeHiLo(
 	** fully instantiated.  This way we avoid breaking up a group.
 	*/
 	MtrNode *auxnode = treenode->child;
-	if (auxnode == NULL) {
+	if (auxnode == (uintptr_t) 0) {
 	    *upper = (unsigned int) table->size - 1;
 	} else {
 	    /* Search the subgroup that strands the table->size line.
@@ -649,7 +649,7 @@ ddFindNodeHiLo(
 	    ** upper will get -1, thus correctly signaling that no reordering
 	    ** should take place.
 	    */
-	    while (auxnode != NULL) {
+	    while (auxnode != (uintptr_t) 0) {
 		int thisLower = table->perm[auxnode->low];
 		int thisUpper = thisLower + auxnode->size - 1;
 		if (thisUpper >= table->size && thisLower < table->size)
@@ -736,20 +736,20 @@ ddGroupSifting(
     nvars = table->size;
 
     /* Order variables to sift. */
-    entry = NULL;
-    sifted = NULL;
+    entry = (uintptr_t) 0;
+    sifted = (uintptr_t) 0;
     var = ALLOC(int,nvars);
-    if (var == NULL) {
+    if (var == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto ddGroupSiftingOutOfMem;
     }
     entry = ALLOC(int,nvars);
-    if (entry == NULL) {
+    if (entry == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto ddGroupSiftingOutOfMem;
     }
     sifted = ALLOC(int,nvars);
-    if (sifted == NULL) {
+    if (sifted == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto ddGroupSiftingOutOfMem;
     }
@@ -886,9 +886,9 @@ ddGroupSifting(
     return(1);
 
 ddGroupSiftingOutOfMem:
-    if (entry != NULL)	FREE(entry);
-    if (var != NULL)	FREE(var);
-    if (sifted != NULL)	FREE(sifted);
+    if (entry != (uintptr_t) 0)	FREE(entry);
+    if (var != (uintptr_t) 0)	FREE(var);
+    if (sifted != (uintptr_t) 0)	FREE(sifted);
 
     return(0);
 
@@ -971,7 +971,7 @@ ddGroupSiftingAux(
 #endif
 
     initialSize = table->keys - table->isolated;
-    moves = NULL;
+    moves = (uintptr_t) 0;
 
     originalSize = initialSize;		/* for lazy sifting */
 
@@ -1111,7 +1111,7 @@ ddGroupSiftingAux(
 	if (!result) goto ddGroupSiftingAuxOutOfMem;
     }
 
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -1120,7 +1120,7 @@ ddGroupSiftingAux(
     return(1);
 
 ddGroupSiftingAuxOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -1221,7 +1221,7 @@ ddGroupSiftingUp(
 		i = table->subtables[i].next;
 	    table->subtables[i].next = gxtop;
 	    move = (Move *)cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddGroupSiftingUpOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddGroupSiftingUpOutOfMem;
 	    move->x = x;
 	    move->y = y;
 	    move->flags = MTR_NEWNODE;
@@ -1244,7 +1244,7 @@ ddGroupSiftingUp(
 		L += table->subtables[y].keys - isolated;
 	    }
 	    move = (Move *)cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddGroupSiftingUpOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddGroupSiftingUpOutOfMem;
 	    move->x = x;
 	    move->y = y;
 	    move->flags = MTR_DEFAULT;
@@ -1283,7 +1283,7 @@ ddGroupSiftingUp(
     return(1);
 
 ddGroupSiftingUpOutOfMem:
-    while (*moves != NULL) {
+    while (*moves != (uintptr_t) 0) {
 	move = (*moves)->next;
 	cuddDeallocMove(table, *moves);
 	*moves = move;
@@ -1381,7 +1381,7 @@ ddGroupSiftingDown(
 	    table->subtables[x].next = y;
 	    table->subtables[gybot].next = gxtop;
 	    move = (Move *)cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddGroupSiftingDownOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddGroupSiftingDownOutOfMem;
 	    move->x = x;
 	    move->y = y;
 	    move->flags = MTR_NEWNODE;
@@ -1406,7 +1406,7 @@ ddGroupSiftingDown(
 
 	    /* Record move. */
 	    move = (Move *) cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddGroupSiftingDownOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddGroupSiftingDownOutOfMem;
 	    move->x = x;
 	    move->y = y;
 	    move->flags = MTR_DEFAULT;
@@ -1459,7 +1459,7 @@ ddGroupSiftingDown(
     return(1);
 
 ddGroupSiftingDownOutOfMem:
-    while (*moves != NULL) {
+    while (*moves != (uintptr_t) 0) {
 	move = (*moves)->next;
 	cuddDeallocMove(table, *moves);
 	*moves = move;
@@ -1555,7 +1555,7 @@ ddGroupMove(
 
     /* Store group move */
     move = (Move *) cuddDynamicAllocNode(table);
-    if (move == NULL) goto ddGroupMoveOutOfMem;
+    if (move == (uintptr_t) 0) goto ddGroupMoveOutOfMem;
     move->x = swapx;
     move->y = swapy;
     move->flags = MTR_DEFAULT;
@@ -1566,7 +1566,7 @@ ddGroupMove(
     return(table->keys - table->isolated);
 
 ddGroupMoveOutOfMem:
-    while (*moves != NULL) {
+    while (*moves != (uintptr_t) 0) {
 	move = (*moves)->next;
 	cuddDeallocMove(table, *moves);
 	*moves = move;
@@ -1676,29 +1676,29 @@ ddGroupSiftingBackward(
     unsigned int pairlev;
 
     if (lazyFlag) {
-	end_move = NULL;
+	end_move = (uintptr_t) 0;
 
 	/* Find the minimum size, and the earliest position at which it
 	** was achieved. */
-	for (move = moves; move != NULL; move = move->next) {
+	for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	    if (move->size < size) {
 		size = move->size;
 		end_move = move;
 	    } else if (move->size == size) {
-		if (end_move == NULL) end_move = move;
+		if (end_move == (uintptr_t) 0) end_move = move;
 	    }
 	}
 
 	/* Find among the moves that give minimum size the one that
 	** minimizes the distance from the corresponding variable. */
-	if (moves != NULL) {
+	if (moves != (uintptr_t) 0) {
 	    diff = Cudd_ReadSize(table) + 1;
 	    index = (upFlag == 1) ?
 		    table->invperm[moves->x] : table->invperm[moves->y];
 	    pairlev =
 		(unsigned) table->perm[Cudd_bddReadPairIndex(table, index)];
 
-	    for (move = moves; move != NULL; move = move->next) {
+	    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 		if (move->size == size) {
 		    if (upFlag == 1) {
 			tmp_diff = (move->x > pairlev) ?
@@ -1716,7 +1716,7 @@ ddGroupSiftingBackward(
 	}
     } else {
 	/* Find the minimum size. */
-	for (move = moves; move != NULL; move = move->next) {
+	for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	    if (move->size < size) {
 		size = move->size;
 	    }
@@ -1726,7 +1726,7 @@ ddGroupSiftingBackward(
     /* In case of lazy sifting, end_move identifies the position at
     ** which we want to stop.  Otherwise, we stop as soon as we meet
     ** the minimum size. */
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	if (lazyFlag) {
 	    if (move == end_move) return(1);
 	} else {
@@ -1795,7 +1795,7 @@ ddMergeGroups(
     auxnode = treenode;
     do {
 	auxnode->index = newindex;
-	if (auxnode->parent == NULL ||
+	if (auxnode->parent == (uintptr_t) 0 ||
 		(int) auxnode->parent->index != saveindex)
 	    break;
 	auxnode = auxnode->parent;

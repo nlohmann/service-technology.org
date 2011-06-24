@@ -131,8 +131,8 @@ Dddmp_cuddBddArrayStorePrefix (
   DdManager *ddMgr       /* IN: DD Manager */,
   int nroots             /* IN: number of output BDD roots to be stored */,
   DdNode **f             /* IN: array of BDD roots to be stored */,
-  char **inputNames      /* IN: array of variable names (or NULL) */,
-  char **outputNames     /* IN: array of root names (or NULL) */,
+  char **inputNames      /* IN: array of variable names (or (uintptr_t) 0) */,
+  char **outputNames     /* IN: array of root names (or (uintptr_t) 0) */,
   char *modelName        /* IN: Model Name */,
   char *fname            /* IN: File name */,
   FILE *fp               /* IN: File pointer to the store file */
@@ -257,8 +257,8 @@ Dddmp_cuddBddArrayStoreBlif (
   DdManager *ddMgr       /* IN: DD Manager */,
   int nroots             /* IN: number of output BDD roots to be stored */,
   DdNode **f             /* IN: array of BDD roots to be stored */,
-  char **inputNames      /* IN: array of variable names (or NULL) */,
-  char **outputNames     /* IN: array of root names (or NULL) */,
+  char **inputNames      /* IN: array of variable names (or (uintptr_t) 0) */,
+  char **outputNames     /* IN: array of root names (or (uintptr_t) 0) */,
   char *modelName        /* IN: Model Name */,
   char *fname            /* IN: File name */,
   FILE *fp               /* IN: File pointer to the store file */
@@ -383,8 +383,8 @@ Dddmp_cuddBddArrayStoreSmv (
   DdManager *ddMgr       /* IN: DD Manager */,
   int nroots             /* IN: number of output BDD roots to be stored */,
   DdNode **f             /* IN: array of BDD roots to be stored */,
-  char **inputNames      /* IN: array of variable names (or NULL) */,
-  char **outputNames     /* IN: array of root names (or NULL) */,
+  char **inputNames      /* IN: array of variable names (or (uintptr_t) 0) */,
+  char **outputNames     /* IN: array of root names (or (uintptr_t) 0) */,
   char *modelName        /* IN: Model Name */,
   char *fname            /* IN: File name */,
   FILE *fp               /* IN: File pointer to the store file */
@@ -489,9 +489,9 @@ DddmpCuddDdArrayStorePrefix (
   DdManager *ddMgr    /* IN: Manager */,
   int n               /* IN: Number of output nodes to be dumped */,
   DdNode **f          /* IN: Array of output nodes to be dumped */,
-  char **inputNames   /* IN: Array of input names (or NULL) */,
-  char **outputNames  /* IN: Array of output names (or NULL) */,
-  char *modelName     /* IN: Model name (or NULL) */,
+  char **inputNames   /* IN: Array of input names (or (uintptr_t) 0) */,
+  char **outputNames  /* IN: Array of output names (or (uintptr_t) 0) */,
+  char *modelName     /* IN: Model name (or (uintptr_t) 0) */,
   FILE *fp            /* IN: Pointer to the dump file */
   )
 {
@@ -627,8 +627,8 @@ DddmpCuddDdArrayStorePrefixBody (
   DdManager *ddMgr      /* IN: Manager */,
   int n                 /* IN: Number of output nodes to be dumped */,
   DdNode **f            /* IN: Array of output nodes to be dumped */,
-  char **inputNames     /* IN: Array of input names (or NULL) */,
-  char **outputNames    /* IN: Array of output names (or NULL) */,
+  char **inputNames     /* IN: Array of input names (or (uintptr_t) 0) */,
+  char **outputNames    /* IN: Array of output names (or (uintptr_t) 0) */,
   FILE *fp              /* IN: Pointer to the dump file */
   )
 {
@@ -902,9 +902,9 @@ DddmpCuddDdArrayStoreBlif (
   DdManager *ddMgr    /* IN: Manager */,
   int n               /* IN: Number of output nodes to be dumped */,
   DdNode **f          /* IN: Array of output nodes to be dumped */,
-  char **inputNames   /* IN: Array of input names (or NULL) */,
-  char **outputNames  /* IN: Array of output names (or NULL) */,
-  char *modelName     /* IN: Model name (or NULL) */,
+  char **inputNames   /* IN: Array of input names (or (uintptr_t) 0) */,
+  char **outputNames  /* IN: Array of output names (or (uintptr_t) 0) */,
+  char *modelName     /* IN: Model name (or (uintptr_t) 0) */,
   FILE *fp            /* IN: Pointer to the dump file */
   )
 {
@@ -1034,8 +1034,8 @@ DddmpCuddDdArrayStoreBlifBody (
   DdManager *ddMgr      /* IN: Manager */,
   int n                 /* IN: Number of output nodes to be dumped */,
   DdNode **f            /* IN: Array of output nodes to be dumped */,
-  char **inputNames     /* IN: Array of input names (or NULL) */,
-  char **outputNames    /* IN: Array of output names (or NULL) */,
+  char **inputNames     /* IN: Array of input names (or (uintptr_t) 0) */,
+  char **outputNames    /* IN: Array of output names (or (uintptr_t) 0) */,
   FILE *fp              /* IN: Pointer to the dump file */
   )
 {
@@ -1274,9 +1274,9 @@ DddmpCuddDdArrayStoreSmv (
   DdManager *ddMgr    /* IN: Manager */,
   int n               /* IN: Number of output nodes to be dumped */,
   DdNode **f          /* IN: Array of output nodes to be dumped */,
-  char **inputNames   /* IN: Array of input names (or NULL) */,
-  char **outputNames  /* IN: Array of output names (or NULL) */,
-  char *modelName     /* IN: Model name (or NULL) */,
+  char **inputNames   /* IN: Array of input names (or (uintptr_t) 0) */,
+  char **outputNames  /* IN: Array of output names (or (uintptr_t) 0) */,
+  char *modelName     /* IN: Model name (or (uintptr_t) 0) */,
   FILE *fp            /* IN: Pointer to the dump file */
   )
 {
@@ -1393,8 +1393,8 @@ DddmpCuddDdArrayStoreSmvBody (
   DdManager *ddMgr      /* IN: Manager */,
   int n                 /* IN: Number of output nodes to be dumped */,
   DdNode **f            /* IN: Array of output nodes to be dumped */,
-  char **inputNames     /* IN: Array of input names (or NULL) */,
-  char **outputNames    /* IN: Array of output names (or NULL) */,
+  char **inputNames     /* IN: Array of input names (or (uintptr_t) 0) */,
+  char **outputNames    /* IN: Array of output names (or (uintptr_t) 0) */,
   FILE *fp              /* IN: Pointer to the dump file */
   )
 {

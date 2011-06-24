@@ -94,7 +94,7 @@ Dddmp_cuddBddDisplayBinary(
     return (0);
   }
 
-  while (fgets(buf, 999,fp)!=NULL) {
+  while (fgets(buf, 999,fp)!=(uintptr_t) 0) {
     fprintf (fpo, "%s", buf);
     if (strncmp(buf, ".nnodes", 7) == 0) {
       sscanf (buf, "%*s %d", &nnodes);

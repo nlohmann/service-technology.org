@@ -109,7 +109,7 @@ static char rcsid[] DD_UNUSED = "$Id: cuddInit.c,v 1.33 2007/07/01 05:10:50 fabi
   basic constants and the projection functions. If maxMemory is 0,
   Cudd_Init decides suitable values for the maximum size of the cache
   and for the limit for fast unique table growth based on the available
-  memory. Returns a pointer to the manager if successful; NULL
+  memory. Returns a pointer to the manager if successful; (uintptr_t) 0
   otherwise.]
 
   SideEffects [None]
@@ -139,27 +139,27 @@ Cudd_Init(
     looseUpTo = (unsigned int) ((maxMemory / sizeof(DdNode)) /
 				DD_MAX_LOOSE_FRACTION);
     unique = cuddInitTable(numVars,numVarsZ,numSlots,looseUpTo);
-    if (unique == NULL) return(NULL);
+    if (unique == (uintptr_t) 0) return((uintptr_t) 0);
     unique->maxmem = (unsigned long) maxMemory / 10 * 9;
     maxCacheSize = (unsigned int) ((maxMemory / sizeof(DdCache)) /
 				   DD_MAX_CACHE_FRACTION);
     result = cuddInitCache(unique,cacheSize,maxCacheSize);
-    if (result == 0) return(NULL);
+    if (result == 0) return((uintptr_t) 0);
 
     saveHandler = MMoutOfMemory;
     MMoutOfMemory = Cudd_OutOfMem;
     unique->stash = ALLOC(char,(maxMemory / DD_STASH_FRACTION) + 4);
     MMoutOfMemory = saveHandler;
-    if (unique->stash == NULL) {
+    if (unique->stash == (uintptr_t) 0) {
 	(void) fprintf(unique->err,"Unable to set aside memory\n");
     }
 
     /* Initialize constants. */
     unique->one = cuddUniqueConst(unique,1.0);
-    if (unique->one == NULL) return(0);
+    if (unique->one == (uintptr_t) 0) return(0);
     cuddRef(unique->one);
     unique->zero = cuddUniqueConst(unique,0.0);
-    if (unique->zero == NULL) return(0);
+    if (unique->zero == (uintptr_t) 0) return(0);
     cuddRef(unique->zero);
 #ifdef HAVE_IEEE_754
     if (DD_PLUS_INF_VAL != DD_PLUS_INF_VAL * 3 ||
@@ -169,10 +169,10 @@ Cudd_Init(
     }
 #endif
     unique->plusinfinity = cuddUniqueConst(unique,DD_PLUS_INF_VAL);
-    if (unique->plusinfinity == NULL) return(0);
+    if (unique->plusinfinity == (uintptr_t) 0) return(0);
     cuddRef(unique->plusinfinity);
     unique->minusinfinity = cuddUniqueConst(unique,DD_MINUS_INF_VAL);
-    if (unique->minusinfinity == NULL) return(0);
+    if (unique->minusinfinity == (uintptr_t) 0) return(0);
     cuddRef(unique->minusinfinity);
     unique->background = unique->zero;
 
@@ -181,13 +181,13 @@ Cudd_Init(
     zero = Cudd_Not(one);
     /* Create the projection functions. */
     unique->vars = ALLOC(DdNodePtr,unique->maxSize);
-    if (unique->vars == NULL) {
+    if (unique->vars == (uintptr_t) 0) {
 	unique->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < unique->size; i++) {
 	unique->vars[i] = cuddUniqueInter(unique,i,one,zero);
-	if (unique->vars[i] == NULL) return(0);
+	if (unique->vars[i] == (uintptr_t) 0) return(0);
 	cuddRef(unique->vars[i]);
     }
 
@@ -218,7 +218,7 @@ void
 Cudd_Quit(
   DdManager * unique)
 {
-    if (unique->stash != NULL) FREE(unique->stash);
+    if (unique->stash != (uintptr_t) 0) FREE(unique->stash);
     cuddFreeTable(unique);
 
 } /* end of Cudd_Quit */
@@ -249,7 +249,7 @@ cuddZddInitUniv(
     int		i;
 
     zdd->univ = ALLOC(DdNodePtr, zdd->sizeZ);
-    if (zdd->univ == NULL) {
+    if (zdd->univ == (uintptr_t) 0) {
 	zdd->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -260,7 +260,7 @@ cuddZddInitUniv(
 	unsigned int index = zdd->invpermZ[i];
 	p = res;
 	res = cuddUniqueInterZdd(zdd, index, p, p);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(zdd,p);
 	    FREE(zdd->univ);
 	    return(0);

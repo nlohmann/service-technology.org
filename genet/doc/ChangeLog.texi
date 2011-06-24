@@ -1,0 +1,20 @@
+@heading Version 1.2-unreleased
+
+@itemize
+@item patch libs (especially Cudd) to allow compilation on different architectures.
+
+@end itemize
+
+@heading Version 1.1 (8 April 2011)
+@itemize
+@item integration into ProM using JNA (Java Native Access) @url{https://github.com/twall/jna}
+@item patch libraries to be independent of Posix particulars, Genet compiles now as pure Windows binary.
+
+@end itemize
+
+@heading Version 1.0 (24 September 2009)
+@itemize
+@item using autotools to distribute Genet.
+
+@end itemize
+

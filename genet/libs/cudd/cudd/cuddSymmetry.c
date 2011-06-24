@@ -334,14 +334,14 @@ cuddSymmSifting(
     size = table->size;
 
     /* Find order in which to sift variables. */
-    var = NULL;
+    var = (uintptr_t) 0;
     entry = ALLOC(int,size);
-    if (entry == NULL) {
+    if (entry == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto ddSymmSiftingOutOfMem;
     }
     var = ALLOC(int,size);
-    if (var == NULL) {
+    if (var == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto ddSymmSiftingOutOfMem;
     }
@@ -400,8 +400,8 @@ cuddSymmSifting(
 
 ddSymmSiftingOutOfMem:
 
-    if (entry != NULL) FREE(entry);
-    if (var != NULL) FREE(var);
+    if (entry != (uintptr_t) 0) FREE(entry);
+    if (var != (uintptr_t) 0) FREE(var);
 
     return(0);
 
@@ -455,14 +455,14 @@ cuddSymmSiftingConv(
     size = table->size;
 
     /* Find order in which to sift variables. */
-    var = NULL;
+    var = (uintptr_t) 0;
     entry = ALLOC(int,size);
-    if (entry == NULL) {
+    if (entry == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto ddSymmSiftingConvOutOfMem;
     }
     var = ALLOC(int,size);
-    if (var == NULL) {
+    if (var == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto ddSymmSiftingConvOutOfMem;
     }
@@ -572,8 +572,8 @@ cuddSymmSiftingConv(
 
 ddSymmSiftingConvOutOfMem:
 
-    if (entry != NULL) FREE(entry);
-    if (var != NULL) FREE(var);
+    if (entry != (uintptr_t) 0) FREE(entry);
+    if (var != (uintptr_t) 0) FREE(var);
 
     return(0);
 
@@ -649,8 +649,8 @@ ddSymmSiftingAux(
 
     initialSize = table->keys - table->isolated;
 
-    moveDown = NULL;
-    moveUp = NULL;
+    moveDown = (uintptr_t) 0;
+    moveUp = (uintptr_t) 0;
 
     if ((x - xLow) > (xHigh - x)) {
 	/* Will go down first, unless x == xHigh:
@@ -702,7 +702,7 @@ ddSymmSiftingAux(
 	moveDown = ddSymmSiftingDown(table,x,xHigh);
 	    /* after this point x --> xHigh, unless early term */
 	if (moveDown == MV_OOM) goto ddSymmSiftingAuxOutOfMem;
-	if (moveDown == NULL) return(1);
+	if (moveDown == (uintptr_t) 0) return(1);
 
 	x = moveDown->y;
 	/* Find bottom of x's group */
@@ -739,7 +739,7 @@ ddSymmSiftingAux(
 	moveUp = ddSymmSiftingUp(table,x,xLow);
 	    /* after this point x --> xLow, unless early term */
 	if (moveUp == MV_OOM) goto ddSymmSiftingAuxOutOfMem;
-	if (moveUp == NULL) return(1);
+	if (moveUp == (uintptr_t) 0) return(1);
 
 	x = moveUp->x;
 	/* Find top of x's group */
@@ -767,7 +767,7 @@ ddSymmSiftingAux(
 	/* at this point x == xHigh, unless early term */
 	if (moveDown == MV_OOM) goto ddSymmSiftingAuxOutOfMem;
 
-	if (moveDown != NULL) {
+	if (moveDown != (uintptr_t) 0) {
 	    x = moveDown->y;	/* x is top here */
 	    i = x;
 	    while ((unsigned) i < table->subtables[i].next) {
@@ -790,7 +790,7 @@ ddSymmSiftingAux(
 	moveUp = ddSymmSiftingUp(table,x,xLow);
 	if (moveUp == MV_OOM) goto ddSymmSiftingAuxOutOfMem;
 
-	if (moveUp != NULL) {
+	if (moveUp != (uintptr_t) 0) {
 	    x = moveUp->x;
 	    i = table->subtables[x].next;
 	} else {
@@ -809,7 +809,7 @@ ddSymmSiftingAux(
 	    /* No new symmetry groups detected, return to best position */
 	    result = ddSymmSiftingBackward(table,moveUp,initialSize);
 	} else {
-	    while (moveDown != NULL) {
+	    while (moveDown != (uintptr_t) 0) {
 		move = moveDown->next;
 		cuddDeallocMove(table, moveDown);
 		moveDown = move;
@@ -828,7 +828,7 @@ ddSymmSiftingAux(
 	/* at this point x == xHigh, unless early term */
 	if (moveUp == MV_OOM) goto ddSymmSiftingAuxOutOfMem;
 
-	if (moveUp != NULL) {
+	if (moveUp != (uintptr_t) 0) {
 	    x = moveUp->x;
 	    i = table->subtables[x].next;
 	} else {
@@ -846,7 +846,7 @@ ddSymmSiftingAux(
 	moveDown = ddSymmSiftingDown(table,x,xHigh);
 	if (moveDown == MV_OOM) goto ddSymmSiftingAuxOutOfMem;
 
-	if (moveDown != NULL) {
+	if (moveDown != (uintptr_t) 0) {
 	    x = moveDown->y;
 	    i = x;
 	    while ((unsigned) i < table->subtables[i].next) {
@@ -867,7 +867,7 @@ ddSymmSiftingAux(
 	    /* No new symmetries detected, go back to best position */
 	    result = ddSymmSiftingBackward(table,moveDown,initialSize);
 	} else {
-	    while (moveUp != NULL) {
+	    while (moveUp != (uintptr_t) 0) {
 		move = moveUp->next;
 		cuddDeallocMove(table, moveUp);
 		moveUp = move;
@@ -879,12 +879,12 @@ ddSymmSiftingAux(
 	if (!result) goto ddSymmSiftingAuxOutOfMem;
     }
 
-    while (moveDown != NULL) {
+    while (moveDown != (uintptr_t) 0) {
 	move = moveDown->next;
 	cuddDeallocMove(table, moveDown);
 	moveDown = move;
     }
-    while (moveUp != NULL) {
+    while (moveUp != (uintptr_t) 0) {
 	move = moveUp->next;
 	cuddDeallocMove(table, moveUp);
 	moveUp = move;
@@ -894,14 +894,14 @@ ddSymmSiftingAux(
 
 ddSymmSiftingAuxOutOfMem:
     if (moveDown != MV_OOM) {
-	while (moveDown != NULL) {
+	while (moveDown != (uintptr_t) 0) {
 	    move = moveDown->next;
 	    cuddDeallocMove(table, moveDown);
 	    moveDown = move;
 	}
     }
     if (moveUp != MV_OOM) {
-	while (moveUp != NULL) {
+	while (moveUp != (uintptr_t) 0) {
 	    move = moveUp->next;
 	    cuddDeallocMove(table, moveUp);
 	    moveUp = move;
@@ -945,8 +945,8 @@ ddSymmSiftingConvAux(
 
     initialSize = table->keys - table->isolated;
 
-    moveDown = NULL;
-    moveUp = NULL;
+    moveDown = (uintptr_t) 0;
+    moveUp = (uintptr_t) 0;
 
     if (x == xLow) { /* Sift down */
 #ifdef DD_DEBUG
@@ -959,7 +959,7 @@ ddSymmSiftingConvAux(
 	moveDown = ddSymmSiftingDown(table,x,xHigh);
 	/* at this point x == xHigh, unless early term */
 	if (moveDown == MV_OOM) goto ddSymmSiftingConvAuxOutOfMem;
-	if (moveDown == NULL) return(1);
+	if (moveDown == (uintptr_t) 0) return(1);
 
 	x = moveDown->y;
 	i = x;
@@ -997,7 +997,7 @@ ddSymmSiftingConvAux(
 	moveUp = ddSymmSiftingUp(table,x,xLow);
 	    /* at this point x == xLow, unless early term */
 	if (moveUp == MV_OOM) goto ddSymmSiftingConvAuxOutOfMem;
-	if (moveUp == NULL) return(1);
+	if (moveUp == (uintptr_t) 0) return(1);
 
 	x = moveUp->x;
 	i = table->subtables[x].next;
@@ -1024,7 +1024,7 @@ ddSymmSiftingConvAux(
 	    /* at this point x == xHigh, unless early term */
 	if (moveDown == MV_OOM) goto ddSymmSiftingConvAuxOutOfMem;
 
-	if (moveDown != NULL) {
+	if (moveDown != (uintptr_t) 0) {
 	    x = moveDown->y;
 	    i = x;
 	    while ((unsigned) i < table->subtables[i].next) {
@@ -1046,7 +1046,7 @@ ddSymmSiftingConvAux(
 	moveUp = ddSymmSiftingUp(table,x,xLow);
 	if (moveUp == MV_OOM) goto ddSymmSiftingConvAuxOutOfMem;
 
-	if (moveUp != NULL) {
+	if (moveUp != (uintptr_t) 0) {
 	    x = moveUp->x;
 	    i = table->subtables[x].next;
 	} else {
@@ -1065,7 +1065,7 @@ ddSymmSiftingConvAux(
 	    /* No new symmetry groups detected, return to best position */
 	    result = ddSymmSiftingBackward(table,moveUp,initialSize);
 	} else {
-	    while (moveDown != NULL) {
+	    while (moveDown != (uintptr_t) 0) {
 		move = moveDown->next;
 		cuddDeallocMove(table, moveDown);
 		moveDown = move;
@@ -1084,7 +1084,7 @@ ddSymmSiftingConvAux(
 	/* at this point x == xHigh, unless early term */
 	if (moveUp == MV_OOM) goto ddSymmSiftingConvAuxOutOfMem;
 
-	if (moveUp != NULL) {
+	if (moveUp != (uintptr_t) 0) {
 	    x = moveUp->x;
 	    i = table->subtables[x].next;
 	} else {
@@ -1102,7 +1102,7 @@ ddSymmSiftingConvAux(
 	moveDown = ddSymmSiftingDown(table,x,xHigh);
 	if (moveDown == MV_OOM) goto ddSymmSiftingConvAuxOutOfMem;
 
-	if (moveDown != NULL) {
+	if (moveDown != (uintptr_t) 0) {
 	    x = moveDown->y;
 	    i = x;
 	    while ((unsigned) i < table->subtables[i].next) {
@@ -1123,7 +1123,7 @@ ddSymmSiftingConvAux(
 	    /* No new symmetries detected, go back to best position */
 	    result = ddSymmSiftingBackward(table,moveDown,initialSize);
 	} else {
-	    while (moveUp != NULL) {
+	    while (moveUp != (uintptr_t) 0) {
 		move = moveUp->next;
 		cuddDeallocMove(table, moveUp);
 		moveUp = move;
@@ -1135,12 +1135,12 @@ ddSymmSiftingConvAux(
 	if (!result) goto ddSymmSiftingConvAuxOutOfMem;
     }
 
-    while (moveDown != NULL) {
+    while (moveDown != (uintptr_t) 0) {
 	move = moveDown->next;
 	cuddDeallocMove(table, moveDown);
 	moveDown = move;
     }
-    while (moveUp != NULL) {
+    while (moveUp != (uintptr_t) 0) {
 	move = moveUp->next;
 	cuddDeallocMove(table, moveUp);
 	moveUp = move;
@@ -1150,14 +1150,14 @@ ddSymmSiftingConvAux(
 
 ddSymmSiftingConvAuxOutOfMem:
     if (moveDown != MV_OOM) {
-	while (moveDown != NULL) {
+	while (moveDown != (uintptr_t) 0) {
 	    move = moveDown->next;
 	    cuddDeallocMove(table, moveDown);
 	    moveDown = move;
 	}
     }
     if (moveUp != MV_OOM) {
-	while (moveUp != NULL) {
+	while (moveUp != (uintptr_t) 0) {
 	    move = moveUp->next;
 	    cuddDeallocMove(table, moveUp);
 	    moveUp = move;
@@ -1207,7 +1207,7 @@ ddSymmSiftingUp(
 #endif
 
 
-    moves = NULL;
+    moves = (uintptr_t) 0;
     yindex = table->invperm[y];
 
     /* Initialize the lower bound.
@@ -1268,7 +1268,7 @@ ddSymmSiftingUp(
 		L += table->subtables[y].keys - isolated;
 	    }
 	    move = (Move *) cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddSymmSiftingUpOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddSymmSiftingUpOutOfMem;
 	    move->x = x;
 	    move->y = y;
 	    move->size = size;
@@ -1301,7 +1301,7 @@ ddSymmSiftingUp(
     return(moves);
 
 ddSymmSiftingUpOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -1347,7 +1347,7 @@ ddSymmSiftingDown(
     int  checkR;
 #endif
 
-    moves = NULL;
+    moves = (uintptr_t) 0;
     /* Initialize R */
     xindex = table->invperm[x];
     gxtop = table->subtables[x].next;
@@ -1399,7 +1399,7 @@ ddSymmSiftingDown(
 #endif
 	    if (size == 0) goto ddSymmSiftingDownOutOfMem;
 	    move = (Move *) cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddSymmSiftingDownOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddSymmSiftingDownOutOfMem;
 	    move->x = x;
 	    move->y = y;
 	    move->size = size;
@@ -1442,7 +1442,7 @@ ddSymmSiftingDown(
     return(moves);
 
 ddSymmSiftingDownOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -1521,7 +1521,7 @@ ddSymmGroupMove(
 					/* its symmetry to top of its group */
     /* Store group move */
     move = (Move *) cuddDynamicAllocNode(table);
-    if (move == NULL) return(0);
+    if (move == (uintptr_t) 0) return(0);
     move->x = swapx;
     move->y = swapy;
     move->size = size;
@@ -1625,13 +1625,13 @@ ddSymmSiftingBackward(
     Move *move;
     int  res;
 
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	if (move->size < size) {
 	    size = move->size;
 	}
     }
 
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	if (move->size == size) return(1);
 	if (table->subtables[move->x].next == move->x && table->subtables[move->y].next == move->y) {
 	    res = cuddSwapInPlace(table,(int)move->x,(int)move->y);

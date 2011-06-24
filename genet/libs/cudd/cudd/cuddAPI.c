@@ -241,7 +241,7 @@ static int addMultiplicityGroups (DdManager *dd, MtrNode *treenode, int multipli
 
   Description [Creates a new ADD variable.  The new variable has an
   index equal to the largest previous index plus 1.  Returns a
-  pointer to the new variable if successful; NULL otherwise.
+  pointer to the new variable if successful; (uintptr_t) 0 otherwise.
   An ADD variable differs from a BDD variable because it points to the
   arithmetic zero, instead of having a complement pointer to 1. ]
 
@@ -257,7 +257,7 @@ Cudd_addNewVar(
 {
     DdNode *res;
 
-    if ((unsigned int) dd->size >= CUDD_MAXINDEX - 1) return(NULL);
+    if ((unsigned int) dd->size >= CUDD_MAXINDEX - 1) return((uintptr_t) 0);
     do {
 	dd->reordered = 0;
 	res = cuddUniqueInter(dd,dd->size,DD_ONE(dd),DD_ZERO(dd));
@@ -275,7 +275,7 @@ Cudd_addNewVar(
   Description [Creates a new ADD variable.  The new variable has an
   index equal to the largest previous index plus 1 and is positioned at
   the specified level in the order.  Returns a pointer to the new
-  variable if successful; NULL otherwise.]
+  variable if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -289,9 +289,9 @@ Cudd_addNewVarAtLevel(
 {
     DdNode *res;
 
-    if ((unsigned int) dd->size >= CUDD_MAXINDEX - 1) return(NULL);
+    if ((unsigned int) dd->size >= CUDD_MAXINDEX - 1) return((uintptr_t) 0);
     if (level >= dd->size) return(Cudd_addIthVar(dd,level));
-    if (!cuddInsertSubtables(dd,1,level)) return(NULL);
+    if (!cuddInsertSubtables(dd,1,level)) return((uintptr_t) 0);
     do {
 	dd->reordered = 0;
 	res = cuddUniqueInter(dd,dd->size - 1,DD_ONE(dd),DD_ZERO(dd));
@@ -308,7 +308,7 @@ Cudd_addNewVarAtLevel(
 
   Description [Creates a new BDD variable.  The new variable has an
   index equal to the largest previous index plus 1.  Returns a
-  pointer to the new variable if successful; NULL otherwise.]
+  pointer to the new variable if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -321,7 +321,7 @@ Cudd_bddNewVar(
 {
     DdNode *res;
 
-    if ((unsigned int) dd->size >= CUDD_MAXINDEX - 1) return(NULL);
+    if ((unsigned int) dd->size >= CUDD_MAXINDEX - 1) return((uintptr_t) 0);
     res = cuddUniqueInter(dd,dd->size,dd->one,Cudd_Not(dd->one));
 
     return(res);
@@ -336,7 +336,7 @@ Cudd_bddNewVar(
   Description [Creates a new BDD variable.  The new variable has an
   index equal to the largest previous index plus 1 and is positioned at
   the specified level in the order.  Returns a pointer to the new
-  variable if successful; NULL otherwise.]
+  variable if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -350,9 +350,9 @@ Cudd_bddNewVarAtLevel(
 {
     DdNode *res;
 
-    if ((unsigned int) dd->size >= CUDD_MAXINDEX - 1) return(NULL);
+    if ((unsigned int) dd->size >= CUDD_MAXINDEX - 1) return((uintptr_t) 0);
     if (level >= dd->size) return(Cudd_bddIthVar(dd,level));
-    if (!cuddInsertSubtables(dd,1,level)) return(NULL);
+    if (!cuddInsertSubtables(dd,1,level)) return((uintptr_t) 0);
     res = dd->vars[dd->size - 1];
 
     return(res);
@@ -366,7 +366,7 @@ Cudd_bddNewVarAtLevel(
 
   Description [Retrieves the ADD variable with index i if it already
   exists, or creates a new ADD variable.  Returns a pointer to the
-  variable if successful; NULL otherwise.  An ADD variable differs from
+  variable if successful; (uintptr_t) 0 otherwise.  An ADD variable differs from
   a BDD variable because it points to the arithmetic zero, instead of
   having a complement pointer to 1. ]
 
@@ -383,7 +383,7 @@ Cudd_addIthVar(
 {
     DdNode *res;
 
-    if ((unsigned int) i >= CUDD_MAXINDEX - 1) return(NULL);
+    if ((unsigned int) i >= CUDD_MAXINDEX - 1) return((uintptr_t) 0);
     do {
 	dd->reordered = 0;
 	res = cuddUniqueInter(dd,i,DD_ONE(dd),DD_ZERO(dd));
@@ -400,7 +400,7 @@ Cudd_addIthVar(
 
   Description [Retrieves the BDD variable with index i if it already
   exists, or creates a new BDD variable.  Returns a pointer to the
-  variable if successful; NULL otherwise.]
+  variable if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -415,7 +415,7 @@ Cudd_bddIthVar(
 {
     DdNode *res;
 
-    if ((unsigned int) i >= CUDD_MAXINDEX - 1) return(NULL);
+    if ((unsigned int) i >= CUDD_MAXINDEX - 1) return((uintptr_t) 0);
     if (i < dd->size) {
 	res = dd->vars[i];
     } else {
@@ -433,7 +433,7 @@ Cudd_bddIthVar(
 
   Description [Retrieves the ZDD variable with index i if it already
   exists, or creates a new ZDD variable.  Returns a pointer to the
-  variable if successful; NULL otherwise.]
+  variable if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -450,7 +450,7 @@ Cudd_zddIthVar(
     DdNode *lower;
     int j;
 
-    if ((unsigned int) i >= CUDD_MAXINDEX - 1) return(NULL);
+    if ((unsigned int) i >= CUDD_MAXINDEX - 1) return((uintptr_t) 0);
 
     /* The i-th variable function has the following structure:
     ** at the level corresponding to index i there is a node whose "then"
@@ -465,8 +465,8 @@ Cudd_zddIthVar(
 	zvar = cuddUniqueInterZdd(dd, i, lower, DD_ZERO(dd));
     } while (dd->reordered == 1);
 
-    if (zvar == NULL)
-	return(NULL);
+    if (zvar == (uintptr_t) 0)
+	return((uintptr_t) 0);
     cuddRef(zvar);
 
     /* Now we add the "filler" nodes above the level of index i. */
@@ -475,9 +475,9 @@ Cudd_zddIthVar(
 	    dd->reordered = 0;
 	    res = cuddUniqueInterZdd(dd, dd->invpermZ[j], zvar, zvar);
 	} while (dd->reordered == 1);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(dd,zvar);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(res);
 	Cudd_RecursiveDerefZdd(dd,zvar);
@@ -542,7 +542,7 @@ Cudd_zddVarsFromBddVars(
 	}
     } else {
 	permutation = ALLOC(int,dd->sizeZ);
-	if (permutation == NULL) {
+	if (permutation == (uintptr_t) 0) {
 	    dd->errorCode = CUDD_MEMORY_OUT;
 	    return(0);
 	}
@@ -560,15 +560,15 @@ Cudd_zddVarsFromBddVars(
 	if (res == 0) return(0);
     }
     /* Copy and expand the variable group tree if it exists. */
-    if (dd->treeZ != NULL) {
+    if (dd->treeZ != (uintptr_t) 0) {
 	Cudd_FreeZddTree(dd);
     }
-    if (dd->tree != NULL) {
+    if (dd->tree != (uintptr_t) 0) {
 	dd->treeZ = Mtr_CopyTree(dd->tree, multiplicity);
-	if (dd->treeZ == NULL) return(0);
+	if (dd->treeZ == (uintptr_t) 0) return(0);
     } else if (multiplicity > 1) {
 	dd->treeZ = Mtr_InitGroupTree(0, dd->sizeZ);
-	if (dd->treeZ == NULL) return(0);
+	if (dd->treeZ == (uintptr_t) 0) return(0);
 	dd->treeZ->index = dd->invpermZ[0];
     }
     /* Create groups for the ZDD variables derived from the same BDD variable.
@@ -577,12 +577,12 @@ Cudd_zddVarsFromBddVars(
 	char *vmask, *lmask;
 
 	vmask = ALLOC(char, dd->size);
-	if (vmask == NULL) {
+	if (vmask == (uintptr_t) 0) {
 	    dd->errorCode = CUDD_MEMORY_OUT;
 	    return(0);
 	}
 	lmask =  ALLOC(char, dd->size);
-	if (lmask == NULL) {
+	if (lmask == (uintptr_t) 0) {
 	    dd->errorCode = CUDD_MEMORY_OUT;
 	    return(0);
 	}
@@ -605,7 +605,7 @@ Cudd_zddVarsFromBddVars(
 
   Description [Retrieves the ADD for constant c if it already
   exists, or creates a new ADD.  Returns a pointer to the
-  ADD if successful; NULL otherwise.]
+  ADD if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -1008,7 +1008,7 @@ Cudd_ReadZddOne(
   int  i)
 {
     if (i < 0)
-	return(NULL);
+	return((uintptr_t) 0);
     return(i < dd->sizeZ ? dd->univ[i] : DD_ONE(dd));
 
 } /* end of Cudd_ReadZddOne */
@@ -1527,7 +1527,7 @@ Cudd_ReadUsedSlots(
 	nodelist = subtable->nodelist;
 	for (j = 0; (unsigned) j < subtable->slots; j++) {
 	    node = nodelist[j];
-	    if (node != NULL) {
+	    if (node != (uintptr_t) 0) {
 		used++;
 	    }
 	}
@@ -1538,7 +1538,7 @@ Cudd_ReadUsedSlots(
     nodelist = subtable->nodelist;
     for (j = 0; (unsigned) j < subtable->slots; j++) {
 	node = nodelist[j];
-	if (node != NULL) {
+	if (node != (uintptr_t) 0) {
 	    used++;
 	}
     }
@@ -2149,11 +2149,11 @@ Cudd_SetTree(
   DdManager * dd,
   MtrNode * tree)
 {
-    if (dd->tree != NULL) {
+    if (dd->tree != (uintptr_t) 0) {
 	Mtr_FreeTree(dd->tree);
     }
     dd->tree = tree;
-    if (tree == NULL) return;
+    if (tree == (uintptr_t) 0) return;
 
     fixVarTree(tree, dd->perm, dd->size);
     return;
@@ -2176,9 +2176,9 @@ void
 Cudd_FreeTree(
   DdManager * dd)
 {
-    if (dd->tree != NULL) {
+    if (dd->tree != (uintptr_t) 0) {
 	Mtr_FreeTree(dd->tree);
-	dd->tree = NULL;
+	dd->tree = (uintptr_t) 0;
     }
     return;
 
@@ -2221,11 +2221,11 @@ Cudd_SetZddTree(
   DdManager * dd,
   MtrNode * tree)
 {
-    if (dd->treeZ != NULL) {
+    if (dd->treeZ != (uintptr_t) 0) {
 	Mtr_FreeTree(dd->treeZ);
     }
     dd->treeZ = tree;
-    if (tree == NULL) return;
+    if (tree == (uintptr_t) 0) return;
 
     fixVarTree(tree, dd->permZ, dd->sizeZ);
     return;
@@ -2248,9 +2248,9 @@ void
 Cudd_FreeZddTree(
   DdManager * dd)
 {
-    if (dd->treeZ != NULL) {
+    if (dd->treeZ != (uintptr_t) 0) {
 	Mtr_FreeTree(dd->treeZ);
-	dd->treeZ = NULL;
+	dd->treeZ = (uintptr_t) 0;
     }
     return;
 
@@ -2389,7 +2389,7 @@ Cudd_ReadInvPermZdd(
   Synopsis    [Returns the i-th element of the vars array.]
 
   Description [Returns the i-th element of the vars array if it falls
-  within the array bounds; NULL otherwise. If i is the index of an
+  within the array bounds; (uintptr_t) 0 otherwise. If i is the index of an
   existing variable, this function produces the same result as
   Cudd_bddIthVar. However, if the i-th var does not exist yet,
   Cudd_bddIthVar will create it, whereas Cudd_ReadVars will not.]
@@ -2404,7 +2404,7 @@ Cudd_ReadVars(
   DdManager * dd,
   int  i)
 {
-    if (i < 0 || i > dd->size) return(NULL);
+    if (i < 0 || i > dd->size) return((uintptr_t) 0);
     return(dd->vars[i]);
 
 } /* end of Cudd_ReadVars */
@@ -3122,7 +3122,7 @@ Cudd_ReadPeakNodeCount(
     long count = 0;
     DdNodePtr *scan = dd->memoryList;
 
-    while (scan != NULL) {
+    while (scan != (uintptr_t) 0) {
 	count += DD_MEM_CHUNK;
 	scan = (DdNodePtr *) *scan;
     }
@@ -3264,7 +3264,7 @@ Cudd_AddHook(
     /* Scan the list and find whether the function is already there.
     ** If so, just return. */
     nextHook = *hook;
-    while (nextHook != NULL) {
+    while (nextHook != (uintptr_t) 0) {
 	if (nextHook->f == f) {
 	    return(2);
 	}
@@ -3274,11 +3274,11 @@ Cudd_AddHook(
     /* The function was not in the list. Create a new item and append it
     ** to the end of the list. */
     newHook = ALLOC(DdHook,1);
-    if (newHook == NULL) {
+    if (newHook == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
-    newHook->next = NULL;
+    newHook->next = (uintptr_t) 0;
     newHook->f = f;
     *hook = newHook;
     return(1);
@@ -3324,7 +3324,7 @@ Cudd_RemoveHook(
 	return(0);
     }
     nextHook = *hook;
-    while (nextHook != NULL) {
+    while (nextHook != (uintptr_t) 0) {
 	if (nextHook->f == f) {
 	    *hook = nextHook->next;
 	    FREE(nextHook);
@@ -3377,7 +3377,7 @@ Cudd_IsInHook(
 	return(0);
     }
     /* Scan the list and find whether the function is already there. */
-    while (hook != NULL) {
+    while (hook != (uintptr_t) 0) {
 	if (hook->f == f) {
 	    return(1);
 	}
@@ -3798,7 +3798,7 @@ Cudd_ReadSwapSteps(
   Synopsis    [Reads the maximum allowed number of live nodes.]
 
   Description [Reads the maximum allowed number of live nodes. When this
-  number is exceeded, the package returns NULL.]
+  number is exceeded, the package returns (uintptr_t) 0.]
 
   SideEffects [none]
 
@@ -3819,7 +3819,7 @@ Cudd_ReadMaxLive(
   Synopsis    [Sets the maximum allowed number of live nodes.]
 
   Description [Sets the maximum allowed number of live nodes. When this
-  number is exceeded, the package returns NULL.]
+  number is exceeded, the package returns (uintptr_t) 0.]
 
   SideEffects [none]
 
@@ -3841,7 +3841,7 @@ Cudd_SetMaxLive(
   Synopsis    [Reads the maximum allowed memory.]
 
   Description [Reads the maximum allowed memory. When this
-  number is exceeded, the package returns NULL.]
+  number is exceeded, the package returns (uintptr_t) 0.]
 
   SideEffects [none]
 
@@ -3862,7 +3862,7 @@ Cudd_ReadMaxMemory(
   Synopsis    [Sets the maximum allowed memory.]
 
   Description [Sets the maximum allowed memory. When this
-  number is exceeded, the package returns NULL.]
+  number is exceeded, the package returns (uintptr_t) 0.]
 
   SideEffects [none]
 
@@ -4361,9 +4361,9 @@ fixVarTree(
     treenode->index = treenode->low;
     treenode->low = ((int) treenode->index < size) ?
 	perm[treenode->index] : treenode->index;
-    if (treenode->child != NULL)
+    if (treenode->child != (uintptr_t) 0)
 	fixVarTree(treenode->child, perm, size);
-    if (treenode->younger != NULL)
+    if (treenode->younger != (uintptr_t) 0)
 	fixVarTree(treenode->younger, perm, size);
     return;
 
@@ -4407,8 +4407,8 @@ addMultiplicityGroups(
     int i, j;
     MtrNode *auxnode = treenode;
 
-    while (auxnode != NULL) {
-	if (auxnode->child != NULL) {
+    while (auxnode != (uintptr_t) 0) {
+	if (auxnode->child != (uintptr_t) 0) {
 	    addMultiplicityGroups(dd,auxnode->child,multiplicity,vmask,lmask);
 	}
 	/* Build remaining groups. */
@@ -4422,7 +4422,7 @@ addMultiplicityGroups(
 		while (lmask[j] == 1) j++;
 		node = Mtr_MakeGroup(auxnode, j * multiplicity, multiplicity,
 				     MTR_FIXED);
-		if (node == NULL) {
+		if (node == (uintptr_t) 0) {
 		    return(0);
 		}
 		node->index = dd->invpermZ[i * multiplicity];

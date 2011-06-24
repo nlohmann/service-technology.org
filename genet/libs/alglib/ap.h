@@ -167,7 +167,6 @@ public:
     double x, y;
 };
 
-const complex operator/(const complex& lhs, const complex& rhs);
 bool operator==(const complex& lhs, const complex& rhs);
 bool operator!=(const complex& lhs, const complex& rhs);
 const complex operator+(const complex& lhs);

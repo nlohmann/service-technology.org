@@ -181,7 +181,7 @@ cuddAnnealing(
     /* Keep track of the best order. */
     BestCost = size;
     BestOrder = ALLOC(int,nvars);
-    if (BestOrder == NULL) {
+    if (BestOrder == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -370,7 +370,7 @@ ddExchange(
 
     x_next = cuddNextHigh(table,x);
     y_next = cuddNextLow(table,y);
-    moves = NULL;
+    moves = (uintptr_t) 0;
     initial_size = limit_size = table->keys - table->isolated;
 
     for (;;) {
@@ -378,7 +378,7 @@ ddExchange(
 	    size = cuddSwapInPlace(table,x,x_next);
 	    if (size == 0) goto ddExchangeOutOfMem;
 	    move = (Move *)cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddExchangeOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddExchangeOutOfMem;
 	    move->x = x;
 	    move->y = x_next;
 	    move->size = size;
@@ -387,7 +387,7 @@ ddExchange(
 	    size = cuddSwapInPlace(table,y_next,y);
 	    if (size == 0) goto ddExchangeOutOfMem;
 	    move = (Move *)cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddExchangeOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddExchangeOutOfMem;
 	    move->x = y_next;
 	    move->y = y;
 	    move->size = size;
@@ -396,7 +396,7 @@ ddExchange(
 	    size = cuddSwapInPlace(table,x,x_next);
 	    if (size == 0) goto ddExchangeOutOfMem;
 	    move = (Move *)cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddExchangeOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddExchangeOutOfMem;
 	    move->x = x;
 	    move->y = x_next;
 	    move->size = size;
@@ -410,7 +410,7 @@ ddExchange(
 	    size = cuddSwapInPlace(table,x,x_next);
 	    if (size == 0) goto ddExchangeOutOfMem;
 	    move = (Move *)cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddExchangeOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddExchangeOutOfMem;
 	    move->x = x;
 	    move->y = x_next;
 	    move->size = size;
@@ -423,7 +423,7 @@ ddExchange(
 	    size = cuddSwapInPlace(table,x,x_next);
 	    if (size == 0) goto ddExchangeOutOfMem;
 	    move = (Move *)cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddExchangeOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddExchangeOutOfMem;
 	    move->x = x;
 	    move->y = x_next;
 	    move->size = size;
@@ -432,7 +432,7 @@ ddExchange(
 	    size = cuddSwapInPlace(table,y_next,y);
 	    if (size == 0) goto ddExchangeOutOfMem;
 	    move = (Move *)cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddExchangeOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddExchangeOutOfMem;
 	    move->x = y_next;
 	    move->y = y;
 	    move->size = size;
@@ -457,7 +457,7 @@ ddExchange(
         size = cuddSwapInPlace(table,y_next,y);
         if (size == 0) goto ddExchangeOutOfMem;
         move = (Move *)cuddDynamicAllocNode(table);
-        if (move == NULL) goto ddExchangeOutOfMem;
+        if (move == (uintptr_t) 0) goto ddExchangeOutOfMem;
         move->x = y_next;
         move->y = y;
         move->size = size;
@@ -469,7 +469,7 @@ ddExchange(
     result = siftBackwardProb(table,moves,initial_size,temp);
     if (!result) goto ddExchangeOutOfMem;
 
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -477,7 +477,7 @@ ddExchange(
     return(1);
 
 ddExchangeOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
         move = moves->next;
         cuddDeallocMove(table, moves);
         moves = move;
@@ -519,20 +519,20 @@ ddJumpingAux(
     assert(table->subtables[x].keys > 0);
 #endif
 
-    moves = NULL;
+    moves = (uintptr_t) 0;
 
     if (cuddNextLow(table,x) < x_low) {
 	if (cuddNextHigh(table,x) > x_high) return(1);
 	moves = ddJumpingDown(table,x,x_high,initial_size);
 	/* after that point x --> x_high unless early termination */
-	if (moves == NULL) goto ddJumpingAuxOutOfMem;
+	if (moves == (uintptr_t) 0) goto ddJumpingAuxOutOfMem;
 	/* move backward and stop at best position or accept uphill move */
 	result = siftBackwardProb(table,moves,initial_size,temp);
 	if (!result) goto ddJumpingAuxOutOfMem;
     } else if (cuddNextHigh(table,x) > x_high) {
 	moves = ddJumpingUp(table,x,x_low,initial_size);
 	/* after that point x --> x_low unless early termination */
-	if (moves == NULL) goto ddJumpingAuxOutOfMem;
+	if (moves == (uintptr_t) 0) goto ddJumpingAuxOutOfMem;
 	/* move backward and stop at best position or accept uphill move */
 	result = siftBackwardProb(table,moves,initial_size,temp);
 	if (!result) goto ddJumpingAuxOutOfMem;
@@ -540,7 +540,7 @@ ddJumpingAux(
 	(void) fprintf(table->err,"Unexpected condition in ddJumping\n");
 	goto ddJumpingAuxOutOfMem;
     }
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -548,7 +548,7 @@ ddJumpingAux(
     return(1);
 
 ddJumpingAuxOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -563,7 +563,7 @@ ddJumpingAuxOutOfMem:
   Synopsis    [This function is for jumping up.]
 
   Description [This is a simplified version of ddSiftingUp. It does not
-  use lower bounding. Returns the set of moves in case of success; NULL
+  use lower bounding. Returns the set of moves in case of success; (uintptr_t) 0
   if memory is full.]
 
   SideEffects [None]
@@ -584,13 +584,13 @@ ddJumpingUp(
     int        size;
     int        limit_size = initial_size;
 
-    moves = NULL;
+    moves = (uintptr_t) 0;
     y = cuddNextLow(table,x);
     while (y >= x_low) {
 	size = cuddSwapInPlace(table,y,x);
 	if (size == 0) goto ddJumpingUpOutOfMem;
 	move = (Move *)cuddDynamicAllocNode(table);
-	if (move == NULL) goto ddJumpingUpOutOfMem;
+	if (move == (uintptr_t) 0) goto ddJumpingUpOutOfMem;
 	move->x = y;
 	move->y = x;
 	move->size = size;
@@ -607,12 +607,12 @@ ddJumpingUp(
     return(moves);
 
 ddJumpingUpOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of ddJumpingUp */
 
@@ -622,7 +622,7 @@ ddJumpingUpOutOfMem:
   Synopsis    [This function is for jumping down.]
 
   Description [This is a simplified version of ddSiftingDown. It does not
-  use lower bounding. Returns the set of moves in case of success; NULL
+  use lower bounding. Returns the set of moves in case of success; (uintptr_t) 0
   if memory is full.]
 
   SideEffects [None]
@@ -643,13 +643,13 @@ ddJumpingDown(
     int        size;
     int        limit_size = initial_size;
 
-    moves = NULL;
+    moves = (uintptr_t) 0;
     y = cuddNextHigh(table,x);
     while (y <= x_high) {
 	size = cuddSwapInPlace(table,x,y);
 	if (size == 0) goto ddJumpingDownOutOfMem;
 	move = (Move *)cuddDynamicAllocNode(table);
-	if (move == NULL) goto ddJumpingDownOutOfMem;
+	if (move == (uintptr_t) 0) goto ddJumpingDownOutOfMem;
 	move->x = x;
 	move->y = y;
 	move->size = size;
@@ -666,12 +666,12 @@ ddJumpingDown(
     return(moves);
 
 ddJumpingDownOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of ddJumpingDown */
 
@@ -703,7 +703,7 @@ siftBackwardProb(
     double coin, threshold;
 
     /* Look for best size during the last sifting */
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	if (move->size < best_size) {
 	    best_size = move->size;
 	}
@@ -731,7 +731,7 @@ siftBackwardProb(
     ** accept the uphill move. Go to best position.
     */
     res = table->keys - table->isolated;
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	if (res == best_size) return(1);
 	res = cuddSwapInPlace(table,(int)move->x,(int)move->y);
 	if (!res) return(0);

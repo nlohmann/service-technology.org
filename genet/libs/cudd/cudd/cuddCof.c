@@ -108,7 +108,7 @@ static char rcsid[] DD_UNUSED = "$Id: cuddCof.c,v 1.9 2004/08/13 18:04:47 fabio 
 
   Description [Computes the cofactor of f with respect to g; g must be
   the BDD or the ADD of a cube. Returns a pointer to the cofactor if
-  successful; NULL otherwise.]
+  successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -127,7 +127,7 @@ Cudd_Cofactor(
     if (g == zero || g == DD_ZERO(dd)) {
 	(void) fprintf(dd->err,"Cudd_Cofactor: Invalid restriction 1\n");
 	dd->errorCode = CUDD_INVALID_ARG;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     do {
 	dd->reordered = 0;
@@ -215,7 +215,7 @@ cuddCheckCube(
   Synopsis    [Performs the recursive step of Cudd_Cofactor.]
 
   Description [Performs the recursive step of Cudd_Cofactor. Returns a
-  pointer to the cofactor if successful; NULL otherwise.]
+  pointer to the cofactor if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -247,7 +247,7 @@ cuddCofactorRecur(
 
     comple = f != F;
     r = cuddCacheLookup2(dd,Cudd_Cofactor,F,g);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
 	return(Cudd_NotCond(r,comple));
     }
 
@@ -282,17 +282,17 @@ cuddCofactorRecur(
 	    (void) fprintf(dd->out,
 			   "Cudd_Cofactor: Invalid restriction 2\n");
 	    dd->errorCode = CUDD_INVALID_ARG;
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
-	if (r == NULL) return(NULL);
+	if (r == (uintptr_t) 0) return((uintptr_t) 0);
     } else /* if (topf < topg) */ {
 	t = cuddCofactorRecur(dd, f1, g);
-	if (t == NULL) return(NULL);
+	if (t == (uintptr_t) 0) return((uintptr_t) 0);
     	cuddRef(t);
     	e = cuddCofactorRecur(dd, f0, g);
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(e);
 
@@ -300,15 +300,15 @@ cuddCofactorRecur(
 	    r = t;
 	} else if (Cudd_IsComplement(t)) {
 	    r = cuddUniqueInter(dd,(int)F->index,Cudd_Not(t),Cudd_Not(e));
-	    if (r != NULL)
+	    if (r != (uintptr_t) 0)
 		r = Cudd_Not(r);
 	} else {
 	    r = cuddUniqueInter(dd,(int)F->index,t,e);
 	}
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd ,e);
 	    Cudd_RecursiveDeref(dd ,t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(t);
 	cuddDeref(e);

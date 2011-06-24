@@ -1,6 +1,7 @@
 #include "EvTRel.h"
 
-EvTRel::EvTRel(const EvTRel &e) {
+EvTRel::EvTRel(const EvTRel &e)
+{
     name = e.name;
 //	mgr = e.mgr;
     ER = e.ER;
@@ -13,7 +14,8 @@ EvTRel::EvTRel(const EvTRel &e) {
 }
 
 EvTRel&
-EvTRel::operator=(const EvTRel &other) {
+EvTRel::operator=(const EvTRel &other)
+{
     name = other.name;
 //	mgr = other.mgr;
     ER = other.ER;
@@ -27,7 +29,8 @@ EvTRel::operator=(const EvTRel &other) {
 }
 
 
-EvTRel::EvTRel(string n/*, Cudd m*/) {
+EvTRel::EvTRel(string n/*, Cudd m*/)
+{
     name = n;
 //	mgr = m;
 //	ER = SR = TR = mgr.bddZero();
@@ -42,52 +45,60 @@ EvTRel::EvTRel(string n/*, Cudd m*/) {
 }
 
 SS
-EvTRel::add_er(const SS &g) {
+EvTRel::add_er(const SS &g)
+{
     ER = ER + g;
     return ER;
 }
 
 SS
-EvTRel::add_sr(const SS &g) {
+EvTRel::add_sr(const SS &g)
+{
     SR = SR + g;
     return SR;
 }
 
 SS
-EvTRel::add_tr(const SS &g) {
+EvTRel::add_tr(const SS &g)
+{
     TR = TR + g;
     ++sizetr;
     return TR;
 }
 
 SS
-EvTRel::add_rev_tr(const SS &g) {
+EvTRel::add_rev_tr(const SS &g)
+{
     rTR = rTR + g;
     return rTR;
 }
 
 
 SS
-EvTRel::set_er(const SS &g) {
+EvTRel::set_er(const SS &g)
+{
     ER = g;
     return ER;
 }
 
 SS
-EvTRel::set_sr(const SS &g) {
+EvTRel::set_sr(const SS &g)
+{
     SR = g;
     return SR;
 }
 
 
 SS
-EvTRel::set_tr(const SS &g) {
+EvTRel::set_tr(const SS &g)
+{
     TR = g;
     return TR;
 }
 
 SS
-EvTRel::set_rev_tr(const SS &g) {
+EvTRel::set_rev_tr(const SS &g)
+{
     rTR = g;
     return rTR;
 }

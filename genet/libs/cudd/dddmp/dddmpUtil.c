@@ -141,7 +141,7 @@ DddmpStrDup (
   char *str2;
 
   str2 = DDDMP_ALLOC(char,strlen(str)+1);
-  if (str2 != NULL) {
+  if (str2 != (uintptr_t) 0) {
     strcpy (str2,str);
   }
 
@@ -170,25 +170,25 @@ DddmpStrArrayDup (
   int i;
 
   array2 = DDDMP_ALLOC(char *, n);
-  if (array2 == NULL) {
+  if (array2 == (uintptr_t) 0) {
     (void) fprintf (stderr, "DddmpStrArrayDup: Error allocating memory\n");
     fflush (stderr);
-    return NULL;
+    return (uintptr_t) 0;
   }
 
   /*
-   * initialize all slots to NULL for fair FREEing in case of failure
+   * initialize all slots to (uintptr_t) 0 for fair FREEing in case of failure
    */
 
   for (i=0; i<n; i++) {
-    array2[i] = NULL;
+    array2[i] = (uintptr_t) 0;
   }
 
   for (i=0; i<n; i++) { 
-    if (array[i] != NULL) {
-      if ((array2[i]=DddmpStrDup(array[i]))==NULL) {
+    if (array[i] != (uintptr_t) 0) {
+      if ((array2[i]=DddmpStrDup(array[i]))==(uintptr_t) 0) {
         DddmpStrArrayFree (array2, n);
-        return (NULL);
+        return ((uintptr_t) 0);
       }
     }
   }
@@ -218,31 +218,31 @@ DddmpStrArrayRead (
   char **array;
   int i;
 
-  assert(fp!=NULL);
+  assert(fp!=(uintptr_t) 0);
 
   array = DDDMP_ALLOC(char *, n);
-  if (array == NULL) {
+  if (array == (uintptr_t) 0) {
     (void) fprintf (stderr, "DddmpStrArrayRead: Error allocating memory\n");
     fflush (stderr);
-    return NULL;
+    return (uintptr_t) 0;
   }
 
   /*
-   * initialize all slots to NULL for fair FREEing in case of failure
+   * initialize all slots to (uintptr_t) 0 for fair FREEing in case of failure
    */
   for (i=0; i<n; i++) 
-    array[i] = NULL;
+    array[i] = (uintptr_t) 0;
 
   for (i=0; i < n; i++) { 
     if (fscanf (fp, "%s", buf)==EOF) {
       fprintf (stderr, "DddmpStrArrayRead: Error reading file - EOF found\n");
       fflush (stderr);
       DddmpStrArrayFree (array, n);
-      return (NULL);
+      return ((uintptr_t) 0);
     }
-    if ((array[i]=DddmpStrDup(buf))==NULL) {
+    if ((array[i]=DddmpStrDup(buf))==(uintptr_t) 0) {
       DddmpStrArrayFree (array, n);
-      return (NULL);
+      return ((uintptr_t) 0);
     }
   }
 
@@ -270,7 +270,7 @@ DddmpStrArrayWrite (
 {
   int i;
 
-  assert(fp!=NULL);
+  assert(fp!=(uintptr_t) 0);
 
   for (i=0; i<n; i++) { 
     if (fprintf (fp, " %s", array[i]) == EOF) {
@@ -304,7 +304,7 @@ DddmpStrArrayFree (
 {
   int i;
 
-  if (array == NULL) {
+  if (array == (uintptr_t) 0) {
     return;
   }
 
@@ -339,10 +339,10 @@ DddmpIntArrayDup (
   int i;
 
   array2 = DDDMP_ALLOC(int, n);
-  if (array2 == NULL) {
+  if (array2 == (uintptr_t) 0) {
     (void) fprintf (stderr, "DddmpIntArrayDup: Error allocating memory\n");
     fflush (stderr);
-    return (NULL);
+    return ((uintptr_t) 0);
   }
 
   for (i=0; i<n; i++) { 
@@ -374,13 +374,13 @@ DddmpIntArrayRead (
   int *array;
   int i;
 
-  assert(fp!=NULL);
+  assert(fp!=(uintptr_t) 0);
 
   array = DDDMP_ALLOC(int, n);
-  if (array == NULL) {
+  if (array == (uintptr_t) 0) {
     (void) fprintf (stderr, "DddmpIntArrayRead: Error allocating memory\n");
     fflush (stderr);
-    return NULL;
+    return (uintptr_t) 0;
   }
 
   for (i=0; i < n; i++) { 
@@ -389,7 +389,7 @@ DddmpIntArrayRead (
         "DddmpIntArrayRead: Error reading file - EOF found\n");
       fflush (stderr);
       DDDMP_FREE (array);
-      return (NULL);
+      return ((uintptr_t) 0);
     }
   }
 
@@ -417,7 +417,7 @@ DddmpIntArrayWrite (
 {
   int i;
 
-  assert(fp!=NULL);
+  assert(fp!=(uintptr_t) 0);
 
   for (i=0; i<n; i++) { 
     if (fprintf (fp, " %d", array[i]) == EOF) {

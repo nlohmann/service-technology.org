@@ -7,13 +7,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/*
- * Class:     genet_LibGenet
- * Method:    genet_init
- * Signature: (I[Ljava/lang/String;)I
- */
-JNIEXPORT jint JNICALL Java_genet_LibGenet_genet_1init
-  (JNIEnv *, jobject, jint, jobjectArray);
+    /*
+     * Class:     genet_LibGenet
+     * Method:    genet_init
+     * Signature: (I[Ljava/lang/String;)I
+     */
+    JNIEXPORT jint JNICALL Java_genet_LibGenet_genet_1init
+    (JNIEnv *, jobject, jint, jobjectArray);
 
 #ifdef __cplusplus
 }

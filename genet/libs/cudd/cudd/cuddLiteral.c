@@ -105,7 +105,7 @@ static char rcsid[] DD_UNUSED = "$Id: cuddLiteral.c,v 1.8 2004/08/13 18:04:50 fa
   literals in the set. The empty set is represented by the constant 1.
   No variable can be simultaneously present in both phases in a set.
   Returns a pointer to the BDD representing the intersected sets, if
-  successful; NULL otherwise.]
+  successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -140,7 +140,7 @@ Cudd_bddLiteralSetIntersection(
   Description [Performs the recursive step of
   Cudd_bddLiteralSetIntersection. Scans the cubes for common variables,
   and checks whether they agree in phase.  Returns a pointer to the
-  resulting cube if successful; NULL otherwise.]
+  resulting cube if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -206,7 +206,7 @@ cuddBddLiteralSetIntersectionRecur(
     if (f == one) return(one);
 
     res = cuddCacheLookup2(dd,Cudd_bddLiteralSetIntersection,f,g);
-    if (res != NULL) {
+    if (res != (uintptr_t) 0) {
 	return(res);
     }
 
@@ -231,8 +231,8 @@ cuddBddLiteralSetIntersectionRecur(
     }
 
     tmp = cuddBddLiteralSetIntersectionRecur(dd,fc,gc);
-    if (tmp == NULL) {
-	return(NULL);
+    if (tmp == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
 
     if (phasef != phaseg) {
@@ -244,9 +244,9 @@ cuddBddLiteralSetIntersectionRecur(
 	} else {
 	    res = cuddBddAndRecur(dd,dd->vars[F->index],tmp);
 	}
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,tmp);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(tmp); /* Just cuddDeref, because it is included in result */
     }

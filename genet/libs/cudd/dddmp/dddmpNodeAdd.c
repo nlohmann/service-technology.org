@@ -156,7 +156,7 @@ DddmpWriteNodeIndexAdd (
   )
 {
   if (1 || !Cudd_IsConstant (f)) {
-    f->next = (struct DdNode *)((ptruint)((id)<<1));
+    f->next = (struct DdNode *)((uintptr_t)((id)<<1));
   }
 
   return;
@@ -183,7 +183,7 @@ DddmpReadNodeIndexAdd (
   )
 {
   if (1 || !Cudd_IsConstant (f)) {
-    return ((int)(((ptruint)(f->next))>>1));
+    return ((int)(((uintptr_t)(f->next))>>1));
   } else {
     return (1);
   }
@@ -207,7 +207,7 @@ DddmpVisitedAdd (
   )
 {
   f = Cudd_Regular(f);
-  return ((int)((ptruint)(f->next)) & (01));
+  return ((int)((uintptr_t)(f->next)) & (01));
 }
 
 /**Function********************************************************************
@@ -229,7 +229,7 @@ DddmpSetVisitedAdd (
 {
   f = Cudd_Regular(f);
 
-  f->next = (DdNode *)(ptruint)((int)((ptruint)(f->next))|01);
+  f->next = (DdNode *)(uintptr_t)((int)((uintptr_t)(f->next))|01);
 
   return;
 }
@@ -253,7 +253,7 @@ DddmpClearVisitedAdd (
 {
   f = Cudd_Regular (f);
 
-  f->next = (DdNode *)(ptruint)((int)((ptruint)(f->next)) & (~01));
+  f->next = (DdNode *)(uintptr_t)((int)((uintptr_t)(f->next)) & (~01));
 
   return;
 }
@@ -405,7 +405,7 @@ RestoreInUniqueRecurAdd (
 
   if (cuddIsConstant (f)) {
     /* StQ 11.02.2004:
-       Bug fixed --> restore NULL within the next field */
+       Bug fixed --> restore (uintptr_t) 0 within the next field */
     /*DddmpClearVisitedAdd (f);*/
     f->next = (uintptr_t) 0;
 

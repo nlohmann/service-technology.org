@@ -1,0 +1,40 @@
+AT_INIT
+AT_COLOR_TESTS
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([GENET --help],0,ignore)
+AT_CHECK([GENET --detailed-help],0,ignore)
+AT_CHECK([GENET --full-help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([GENET --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Sample input])
+############################################################################
+
+AT_SETUP([TS with OR (cardinality 2)])
+AT_CHECK([cp TESTFILES/or.sg .])
+AT_CHECK([GENET -k 2 or.sg],0,stdout,ignore)
+AT_CHECK([GREP -q "# Total size in nodes: 72" stdout])
+AT_CHECK([GREP -q "# Total size in nodes: 53" stdout])
+AT_KEYWORDS(sample)
+AT_CLEANUP
+
+AT_SETUP([TS with OR (cardinality 1)])
+AT_CHECK([cp TESTFILES/or.sg .])
+AT_CHECK([GENET -k 1 or.sg],0,stdout,ignore)
+AT_CHECK([GREP -q "# Excitation closure violation max capacity 1. Splitting labels." stdout])
+AT_CHECK([GREP -q "# Total size in nodes: 64" stdout])
+AT_CHECK([GREP -q "# Total size in nodes: 48" stdout])
+AT_KEYWORDS(sample)
+AT_CLEANUP
+

@@ -228,7 +228,7 @@ cuddCacheInsert(
     ug = (uintptr_t) g | (op >> 4);
     uh = (uintptr_t) h;
 
-    posn = ddCHash2(uh,uf,ug,table->cacheShift);
+    posn = ddCHash2((uintptr_t)uh,(uintptr_t)uf,(uintptr_t)ug,table->cacheShift);
     entry = &table->cache[posn];
 
     table->cachecollisions += entry->data != (uintptr_t) 0;
@@ -333,7 +333,7 @@ cuddCacheInsert1(
   Synopsis    [Looks up in the cache for the result of op applied to f,
   g, and h.]
 
-  Description [Returns the result if found; it returns NULL if no
+  Description [Returns the result if found; it returns (uintptr_t) 0 if no
   result is found.]
 
   SideEffects [None]
@@ -395,7 +395,7 @@ cuddCacheLookup(
   Synopsis    [Looks up in the cache for the result of op applied to f,
   g, and h.]
 
-  Description [Returns the result if found; it returns NULL if no
+  Description [Returns the result if found; it returns (uintptr_t) 0 if no
   result is found.]
 
   SideEffects [None]
@@ -457,7 +457,7 @@ cuddCacheLookupZdd(
   Synopsis    [Looks up in the cache for the result of op applied to f
   and g.]
 
-  Description [Returns the result if found; it returns NULL if no
+  Description [Returns the result if found; it returns (uintptr_t) 0 if no
   result is found.]
 
   SideEffects [None]
@@ -565,7 +565,7 @@ cuddCacheLookup1(
   Synopsis [Looks up in the cache for the result of op applied to f
   and g.]
 
-  Description [Returns the result if found; it returns NULL if no
+  Description [Returns the result if found; it returns (uintptr_t) 0 if no
   result is found.]
 
   SideEffects [None]
@@ -619,7 +619,7 @@ cuddCacheLookup2Zdd(
 
   Synopsis [Looks up in the cache for the result of op applied to f.]
 
-  Description [Returns the result if found; it returns NULL if no
+  Description [Returns the result if found; it returns (uintptr_t) 0 if no
   result is found.]
 
   SideEffects [None]
@@ -677,7 +677,7 @@ cuddCacheLookup1Zdd(
   g, and h. Assumes that the calling procedure (e.g.,
   Cudd_bddIteConstant) is only interested in whether the result is
   constant or not. Returns the result if found (possibly
-  DD_NON_CONSTANT); otherwise it returns NULL.]
+  DD_NON_CONSTANT); otherwise it returns (uintptr_t) 0.]
 
   SideEffects [None]
 

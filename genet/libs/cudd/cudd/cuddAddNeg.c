@@ -105,7 +105,7 @@ static char rcsid[] DD_UNUSED = "$Id: cuddAddNeg.c,v 1.12 2009/02/20 02:14:58 fa
   Synopsis    [Computes the additive inverse of an ADD.]
 
   Description [Computes the additive inverse of an ADD. Returns a pointer
-  to the result if successful; NULL otherwise.]
+  to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -133,7 +133,7 @@ Cudd_addNegate(
 
   Description [Rounds off the discriminants of an ADD. The discriminants are
   rounded off to N digits after the decimal. Returns a pointer to the result
-  ADD if successful; NULL otherwise.]
+  ADD if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -190,26 +190,26 @@ cuddAddNegateRecur(
 
     /* Check cache */
     res = cuddCacheLookup1(dd,Cudd_addNegate,f);
-    if (res != NULL) return(res);
+    if (res != (uintptr_t) 0) return(res);
 
     /* Recursive Step */
     fv = cuddT(f);
     fvn = cuddE(f);
     T = cuddAddNegateRecur(dd,fv);
-    if (T == NULL) return(NULL);
+    if (T == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(T);
 
     E = cuddAddNegateRecur(dd,fvn);
-    if (E == NULL) {
+    if (E == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,T);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(E);
     res = (T == E) ? T : cuddUniqueInter(dd,(int)f->index,T,E);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, T);
 	Cudd_RecursiveDeref(dd, E);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(T);
     cuddDeref(E);
@@ -251,28 +251,28 @@ cuddAddRoundOffRecur(
     }
     cacheOp = (DD_CTFP1) Cudd_addRoundOff;
     res = cuddCacheLookup1(dd,cacheOp,f);
-    if (res != NULL) {
+    if (res != (uintptr_t) 0) {
 	return(res);
     }
     /* Recursive Step */
     fv = cuddT(f);
     fvn = cuddE(f);
     T = cuddAddRoundOffRecur(dd,fv,trunc);
-    if (T == NULL) {
-       return(NULL);
+    if (T == (uintptr_t) 0) {
+       return((uintptr_t) 0);
     }
     cuddRef(T);
     E = cuddAddRoundOffRecur(dd,fvn,trunc);
-    if (E == NULL) {
+    if (E == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,T);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(E);
     res = (T == E) ? T : cuddUniqueInter(dd,(int)f->index,T,E);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,T);
 	Cudd_RecursiveDeref(dd,E);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(T);
     cuddDeref(E);

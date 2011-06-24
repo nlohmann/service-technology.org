@@ -194,11 +194,11 @@ Cudd_zddPrintSubtable(
 		(void) fprintf(table->out,
 #if SIZEOF_VOID_P == 8
 		    "ID = 0x%lx\tindex = %u\tr = %u\t",
-		    (ptruint) z1 / (ptruint) sizeof(DdNode),
+		    (uintptr_t) z1 / (uintptr_t) sizeof(DdNode),
 		    z1->index, z1->ref);
 #else
 		    "ID = 0x%x\tindex = %hu\tr = %hu\t",
-		    (ptruint) z1 / (ptruint) sizeof(DdNode),
+		    (uintptr_t) z1 / (uintptr_t) sizeof(DdNode),
 		    z1->index, z1->ref);
 #endif
 		z1_next = cuddT(z1);
@@ -209,10 +209,10 @@ Cudd_zddPrintSubtable(
 		else {
 #if SIZEOF_VOID_P == 8
 		    (void) fprintf(table->out, "T = 0x%lx\t",
-			(ptruint) z1_next / (ptruint) sizeof(DdNode));
+			(uintptr_t) z1_next / (uintptr_t) sizeof(DdNode));
 #else
 		    (void) fprintf(table->out, "T = 0x%x\t",
-			(ptruint) z1_next / (ptruint) sizeof(DdNode));
+			(uintptr_t) z1_next / (uintptr_t) sizeof(DdNode));
 #endif
 		}
 		z1_next = cuddE(z1);
@@ -223,10 +223,10 @@ Cudd_zddPrintSubtable(
 		else {
 #if SIZEOF_VOID_P == 8
 		    (void) fprintf(table->out, "E = 0x%lx\n",
-			(ptruint) z1_next / (ptruint) sizeof(DdNode));
+			(uintptr_t) z1_next / (uintptr_t) sizeof(DdNode));
 #else
 		    (void) fprintf(table->out, "E = 0x%x\n",
-			(ptruint) z1_next / (ptruint) sizeof(DdNode));
+			(uintptr_t) z1_next / (uintptr_t) sizeof(DdNode));
 #endif
 		}
 

@@ -86,19 +86,19 @@ Dddmp_Text2Bin (
   int retValue;
  
   ddMgr = Cudd_Init(0,0,CUDD_UNIQUE_SLOTS,CUDD_CACHE_SLOTS,0);
-  if (ddMgr == NULL) {
+  if (ddMgr == (uintptr_t) 0) {
     return (0);
   }
 
-  nRoots = Dddmp_cuddBddArrayLoad(ddMgr,DDDMP_ROOT_MATCHLIST,NULL,
-    DDDMP_VAR_MATCHIDS,NULL,NULL,NULL,
-    DDDMP_MODE_TEXT,filein,NULL,&roots);
+  nRoots = Dddmp_cuddBddArrayLoad(ddMgr,DDDMP_ROOT_MATCHLIST,(uintptr_t) 0,
+    DDDMP_VAR_MATCHIDS,(uintptr_t) 0,(uintptr_t) 0,(uintptr_t) 0,
+    DDDMP_MODE_TEXT,filein,(uintptr_t) 0,&roots);
 
   Dddmp_CheckAndGotoLabel (nRoots<=0,
     "Negative Number of Roots.", failure);
 
-  retValue = Dddmp_cuddBddArrayStore (ddMgr,NULL,nRoots,roots,NULL,
-    NULL,NULL,DDDMP_MODE_BINARY,DDDMP_VARIDS,fileout,NULL);
+  retValue = Dddmp_cuddBddArrayStore (ddMgr,(uintptr_t) 0,nRoots,roots,(uintptr_t) 0,
+    (uintptr_t) 0,(uintptr_t) 0,DDDMP_MODE_BINARY,DDDMP_VARIDS,fileout,(uintptr_t) 0);
 
   Dddmp_CheckAndGotoLabel (retValue<=0,
     "Error code returned.", failure);
@@ -137,19 +137,19 @@ Dddmp_Bin2Text (
   int retValue;
 
   ddMgr = Cudd_Init(0,0,CUDD_UNIQUE_SLOTS,CUDD_CACHE_SLOTS,0);
-  if (ddMgr == NULL) {
+  if (ddMgr == (uintptr_t) 0) {
     return (0);
   }
 
-  nRoots = Dddmp_cuddBddArrayLoad(ddMgr,DDDMP_ROOT_MATCHLIST,NULL,
-    DDDMP_VAR_MATCHIDS,NULL,NULL,NULL,
-    DDDMP_MODE_BINARY,filein,NULL,&roots);
+  nRoots = Dddmp_cuddBddArrayLoad(ddMgr,DDDMP_ROOT_MATCHLIST,(uintptr_t) 0,
+    DDDMP_VAR_MATCHIDS,(uintptr_t) 0,(uintptr_t) 0,(uintptr_t) 0,
+    DDDMP_MODE_BINARY,filein,(uintptr_t) 0,&roots);
 
   Dddmp_CheckAndGotoLabel (nRoots<=0,
     "Negative Number of Roots.", failure);
 
-  retValue = Dddmp_cuddBddArrayStore (ddMgr,NULL,nRoots,roots,NULL,
-    NULL,NULL,DDDMP_MODE_TEXT,DDDMP_VARIDS,fileout,NULL);
+  retValue = Dddmp_cuddBddArrayStore (ddMgr,(uintptr_t) 0,nRoots,roots,(uintptr_t) 0,
+    (uintptr_t) 0,(uintptr_t) 0,DDDMP_MODE_TEXT,DDDMP_VARIDS,fileout,(uintptr_t) 0);
 
   Dddmp_CheckAndGotoLabel (retValue<=0,
     "Error code returned.", failure);

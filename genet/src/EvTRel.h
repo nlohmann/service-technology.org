@@ -5,7 +5,8 @@
 //#include "cuddObj.hh"
 #include "SS.h"
 
-class EvTRel {
+class EvTRel
+{
     string name;
 //	Cudd mgr;
     SS ER;
@@ -33,35 +34,44 @@ public:
     SS set_rev_tr(const SS &g);
 
 
-    SS get_tr() {
+    SS get_tr()
+    {
         return TR;
     }
-    SS get_rev_tr() {
+    SS get_rev_tr()
+    {
         return rTR;
     }
-    SS get_er() {
+    SS get_er()
+    {
         return ER;
     }
-    SS get_sr() {
+    SS get_sr()
+    {
         return SR;
     }
-    int get_sizetr() {
+    int get_sizetr() const
+    {
         return sizetr;
     }
 
     EvTRel& operator=(const EvTRel& other);
 
-    void print_name() {
+    void print_name() const
+    {
         cout << name << " ";
     }
 
-    void print_er() {
+    void print_er()
+    {
         ER.print();
     }
-    void print_tr() {
+    void print_tr()
+    {
         TR.print();
     }
-    void Minimize() {
+    void Minimize()
+    {
         ER.Minimize();
         SR.Minimize();
         TR.Minimize();
@@ -69,13 +79,16 @@ public:
 
     /*	void print_er() { ER.print(mgr.ReadSize(),2); }
     	void print_tr() { TR.print(mgr.ReadSize(),2); }*/
-    bool is_excitation_closed() {
+    bool is_excitation_closed() const
+    {
         return ec;
     }
-    void set_excitation_closed(bool b) {
+    void set_excitation_closed(bool b)
+    {
         ec = b;
     }
-    int getNodeCount() {
+    int getNodeCount()
+    {
         return size_t(ER.nodeCount() + SR.nodeCount() + TR.nodeCount());
     }
     /*	void set_intersect_covering(SS &g) {states_intersect = g;}

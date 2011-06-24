@@ -107,7 +107,7 @@ static char rcsid[] DD_UNUSED = "$Id: cuddAndAbs.c,v 1.19 2004/08/13 18:04:46 fa
 
   Description [Takes the AND of two BDDs and simultaneously abstracts
   the variables in cube. The variables are existentially abstracted.
-  Returns a pointer to the result is successful; NULL otherwise.
+  Returns a pointer to the result is successful; (uintptr_t) 0 otherwise.
   Cudd_bddAndAbstract implements the semiring matrix multiplication
   algorithm for the boolean semiring.]
 
@@ -137,13 +137,13 @@ Cudd_bddAndAbstract(
 /**Function********************************************************************
 
   Synopsis [Takes the AND of two BDDs and simultaneously abstracts the
-  variables in cube.  Returns NULL if too many nodes are required.]
+  variables in cube.  Returns (uintptr_t) 0 if too many nodes are required.]
 
   Description [Takes the AND of two BDDs and simultaneously abstracts
   the variables in cube. The variables are existentially abstracted.
-  Returns a pointer to the result is successful; NULL otherwise.
+  Returns a pointer to the result is successful; (uintptr_t) 0 otherwise.
   In particular, if the number of new nodes created exceeds
-  <code>limit</code>, this function returns NULL.]
+  <code>limit</code>, this function returns (uintptr_t) 0.]
 
   SideEffects [None]
 
@@ -185,7 +185,7 @@ Cudd_bddAndAbstractLimit(
 
   Description [Takes the AND of two BDDs and simultaneously abstracts
   the variables in cube. The variables are existentially abstracted.
-  Returns a pointer to the result is successful; NULL otherwise.]
+  Returns a pointer to the result is successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -250,7 +250,7 @@ cuddBddAndAbstractRecur(
     /* Check cache. */
     if (F->ref != 1 || G->ref != 1) {
 	r = cuddCacheLookup(manager, DD_BDD_AND_ABSTRACT_TAG, f, g, cube);
-	if (r != NULL) {
+	if (r != (uintptr_t) 0) {
 	    return(r);
 	}
     }
@@ -282,7 +282,7 @@ cuddBddAndAbstractRecur(
     if (topcube == top) {	/* quantify */
 	DdNode *Cube = cuddT(cube);
 	t = cuddBddAndAbstractRecur(manager, ft, gt, Cube);
-	if (t == NULL) return(NULL);
+	if (t == (uintptr_t) 0) return((uintptr_t) 0);
 	/* Special case: 1 OR anything = 1. Hence, no need to compute
 	** the else branch if t is 1. Likewise t + t * anything == t.
 	** Notice that t == fe implies that fe does not depend on the
@@ -303,9 +303,9 @@ cuddBddAndAbstractRecur(
 	} else {
 	    e = cuddBddAndAbstractRecur(manager, fe, ge, Cube);
 	}
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(manager, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	if (t == e) {
 	    r = t;
@@ -313,10 +313,10 @@ cuddBddAndAbstractRecur(
 	} else {
 	    cuddRef(e);
 	    r = cuddBddAndRecur(manager, Cudd_Not(t), Cudd_Not(e));
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(manager, t);
 		Cudd_IterDerefBdd(manager, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    r = Cudd_Not(r);
 	    cuddRef(r);
@@ -326,12 +326,12 @@ cuddBddAndAbstractRecur(
 	}
     } else {
 	t = cuddBddAndAbstractRecur(manager, ft, gt, cube);
-	if (t == NULL) return(NULL);
+	if (t == (uintptr_t) 0) return((uintptr_t) 0);
 	cuddRef(t);
 	e = cuddBddAndAbstractRecur(manager, fe, ge, cube);
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(manager, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	if (t == e) {
 	    r = t;
@@ -341,18 +341,18 @@ cuddBddAndAbstractRecur(
 	    if (Cudd_IsComplement(t)) {
 		r = cuddUniqueInter(manager, (int) index,
 				    Cudd_Not(t), Cudd_Not(e));
-		if (r == NULL) {
+		if (r == (uintptr_t) 0) {
 		    Cudd_IterDerefBdd(manager, t);
 		    Cudd_IterDerefBdd(manager, e);
-		    return(NULL);
+		    return((uintptr_t) 0);
 		}
 		r = Cudd_Not(r);
 	    } else {
 		r = cuddUniqueInter(manager,(int)index,t,e);
-		if (r == NULL) {
+		if (r == (uintptr_t) 0) {
 		    Cudd_IterDerefBdd(manager, t);
 		    Cudd_IterDerefBdd(manager, e);
-		    return(NULL);
+		    return((uintptr_t) 0);
 		}
 	    }
 	    cuddDeref(e);

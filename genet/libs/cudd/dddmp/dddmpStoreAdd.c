@@ -87,9 +87,9 @@ static int NodeTextStoreAdd(DdManager *ddMgr, DdNode *f, int mode, int *supporti
 int
 Dddmp_cuddAddStore (
   DdManager *ddMgr          /* IN: DD Manager */,
-  char *ddname              /* IN: DD name (or NULL) */,
+  char *ddname              /* IN: DD name (or (uintptr_t) 0) */,
   DdNode *f                 /* IN: ADD root to be stored */,
-  char **varnames           /* IN: array of variable names (or NULL) */,
+  char **varnames           /* IN: array of variable names (or (uintptr_t) 0) */,
   int *auxids               /* IN: array of converted var ids */,
   int mode                  /* IN: storing mode selector */,
   Dddmp_VarInfoType varinfo /* IN: extra info for variables in text mode */,
@@ -101,7 +101,7 @@ Dddmp_cuddAddStore (
   DdNode *tmpArray[1];
 
   tmpArray[0] = f;
-  retValue = Dddmp_cuddAddArrayStore (ddMgr, ddname, 1, tmpArray, NULL,
+  retValue = Dddmp_cuddAddArrayStore (ddMgr, ddname, 1, tmpArray, (uintptr_t) 0,
     varnames, auxids, mode, varinfo, fname, fp);
 
   return (retValue);
@@ -129,11 +129,11 @@ Dddmp_cuddAddStore (
 int
 Dddmp_cuddAddArrayStore (
   DdManager *ddMgr          /* IN: DD Manager */,
-  char *ddname              /* IN: DD name (or NULL) */,
+  char *ddname              /* IN: DD name (or (uintptr_t) 0) */,
   int nRoots                /* IN: number of output BDD roots to be stored */,
   DdNode **f                /* IN: array of ADD roots to be stored */,
-  char **rootnames          /* IN: array of root names (or NULL) */,
-  char **varnames           /* IN: array of variable names (or NULL) */,
+  char **rootnames          /* IN: array of root names (or (uintptr_t) 0) */,
+  char **varnames           /* IN: array of variable names (or (uintptr_t) 0) */,
   int *auxids               /* IN: array of converted var IDs */,
   int mode                  /* IN: storing mode selector */,
   Dddmp_VarInfoType varinfo /* IN: extra info for variables in text mode */,
@@ -215,11 +215,11 @@ int
 DddmpCuddDdArrayStoreBdd (
   Dddmp_DecompType ddType   /* IN: Selects the decomp type: BDD or ADD */,
   DdManager *ddMgr          /* IN: DD Manager */,
-  char *ddname              /* IN: DD name (or NULL) */,
+  char *ddname              /* IN: DD name (or (uintptr_t) 0) */,
   int nRoots                /* IN: number of output BDD roots to be stored */,
   DdNode **f                /* IN: array of DD roots to be stored */,
-  char **rootnames          /* IN: array of root names (or NULL) */,
-  char **varnames           /* IN: array of variable names (or NULL) */,
+  char **rootnames          /* IN: array of root names (or (uintptr_t) 0) */,
+  char **varnames           /* IN: array of variable names (or (uintptr_t) 0) */,
   int *auxids               /* IN: array of converted var IDs */,
   int mode                  /* IN: storing mode selector */,
   Dddmp_VarInfoType varinfo /* IN: extra info for variables in text mode */,
@@ -227,14 +227,14 @@ DddmpCuddDdArrayStoreBdd (
   FILE *fp                  /* IN: File pointer to the store file */ 
   )
 {
-  DdNode *support = (uintptr_t) NULL;
+  DdNode *support = (uintptr_t) (uintptr_t) 0;
   DdNode *scan;
-  int *ids = (uintptr_t) NULL;
-  int *permids = (uintptr_t) NULL;
-  int *invpermids = (uintptr_t) NULL;
-  int *supportids = (uintptr_t) NULL;
-  int *outids = (uintptr_t) NULL;
-  char **outvarnames = (uintptr_t) NULL;
+  int *ids = (uintptr_t) (uintptr_t) 0;
+  int *permids = (uintptr_t) (uintptr_t) 0;
+  int *invpermids = (uintptr_t) (uintptr_t) 0;
+  int *supportids = (uintptr_t) (uintptr_t) 0;
+  int *outids = (uintptr_t) (uintptr_t) 0;
+  char **outvarnames = (uintptr_t) (uintptr_t) 0;
   int nVars = ddMgr->size;
   int nnodes;
   int retValue;
@@ -254,9 +254,9 @@ DddmpCuddDdArrayStoreBdd (
    *  Check if File needs to be opened in the proper mode.
    */
 
-  if (fp == (uintptr_t) NULL) {
+  if (fp == (uintptr_t) (uintptr_t) 0) {
     fp = fopen (fname, "w");
-    Dddmp_CheckAndGotoLabel (fp==(uintptr_t) NULL, "Error opening file.",
+    Dddmp_CheckAndGotoLabel (fp==(uintptr_t) (uintptr_t) 0, "Error opening file.",
       failure);
     fileToClose = 1;
   }
@@ -283,14 +283,14 @@ DddmpCuddDdArrayStoreBdd (
    */
 
   ids = DDDMP_ALLOC (int, nVars);
-  Dddmp_CheckAndGotoLabel (ids==(uintptr_t) NULL, "Error allocating memory.", failure);
+  Dddmp_CheckAndGotoLabel (ids==(uintptr_t) (uintptr_t) 0, "Error allocating memory.", failure);
   permids = DDDMP_ALLOC (int, nVars);
-  Dddmp_CheckAndGotoLabel (permids==(uintptr_t) NULL, "Error allocating memory.", failure);
+  Dddmp_CheckAndGotoLabel (permids==(uintptr_t) (uintptr_t) 0, "Error allocating memory.", failure);
   invpermids = DDDMP_ALLOC (int, nVars);
-  Dddmp_CheckAndGotoLabel (invpermids==(uintptr_t) NULL, "Error allocating memory.",
+  Dddmp_CheckAndGotoLabel (invpermids==(uintptr_t) (uintptr_t) 0, "Error allocating memory.",
     failure);
   supportids = DDDMP_ALLOC (int, nVars+1);
-  Dddmp_CheckAndGotoLabel (supportids==(uintptr_t) NULL, "Error allocating memory.",
+  Dddmp_CheckAndGotoLabel (supportids==(uintptr_t) (uintptr_t) 0, "Error allocating memory.",
     failure);
     
   for (i=0; i<nVars; i++) {
@@ -301,16 +301,16 @@ DddmpCuddDdArrayStoreBdd (
   
   /* 
    *  Take the union of the supports of each output function.
-   *  skip NULL functions.
+   *  skip (uintptr_t) 0 functions.
    *  Set permids and invpermids of support variables to the proper values.
    */
 
   for (i=0; i<nRoots; i++) {
-    if (f[i] == (uintptr_t) NULL) {
+    if (f[i] == (uintptr_t) (uintptr_t) 0) {
       continue;
     }
     support = Cudd_Support (ddMgr, f[i]);
-    Dddmp_CheckAndGotoLabel (support==(uintptr_t) NULL, "NULL support returned.",
+    Dddmp_CheckAndGotoLabel (support==(uintptr_t) (uintptr_t) 0, "(uintptr_t) 0 support returned.",
       failure);
     cuddRef (support);
     scan = support;
@@ -323,7 +323,7 @@ DddmpCuddDdArrayStoreBdd (
     Cudd_RecursiveDeref (ddMgr, support);
   }
   /* so that we do not try to free it in case of failure */
-  support = (uintptr_t) NULL;
+  support = (uintptr_t) (uintptr_t) 0;
 
   /*
    *  Set supportids to incremental (shrinked) values following the ordering.
@@ -361,7 +361,7 @@ DddmpCuddDdArrayStoreBdd (
       }
       break;
     case DDDMP_MODE_BINARY:
-      outids = (uintptr_t) NULL;
+      outids = (uintptr_t) (uintptr_t) 0;
       break;
   }
 
@@ -395,7 +395,7 @@ DddmpCuddDdArrayStoreBdd (
       failure);
   }
 
-  if (ddname != (uintptr_t) NULL) {
+  if (ddname != (uintptr_t) (uintptr_t) 0) {
     retValue = fprintf (fp, ".dd %s\n",ddname);
     Dddmp_CheckAndGotoLabel (retValue==EOF, "Error writing to file.",
       failure);
@@ -415,7 +415,7 @@ DddmpCuddDdArrayStoreBdd (
 
   /*------------  Write the Var Names by scanning the ids array -------------*/
 
-  if (varnames != (uintptr_t) NULL) {
+  if (varnames != (uintptr_t) (uintptr_t) 0) {
 
     retValue = fprintf (fp, ".suppvarnames");
     Dddmp_CheckAndGotoLabel (retValue==EOF, "Error writing to file.",
@@ -423,12 +423,12 @@ DddmpCuddDdArrayStoreBdd (
 
     for (i=0; i<nVars; i++) {
       if (ids[i] >= 0) {
-        if (varnames[ids[i]] == (uintptr_t) NULL) {
+        if (varnames[ids[i]] == (uintptr_t) (uintptr_t) 0) {
           (void) fprintf (stderr,
              "DdStore Warning: null variable name. DUMMY%d generated\n", i);
           fflush (stderr);
           varnames[ids[i]] = DDDMP_ALLOC (char, 10);
-          Dddmp_CheckAndGotoLabel (varnames[ids[i]] == (uintptr_t) NULL,
+          Dddmp_CheckAndGotoLabel (varnames[ids[i]] == (uintptr_t) (uintptr_t) 0,
             "Error allocating memory.", failure);
           sprintf (varnames[ids[i]], "DUMMY%d", i);
         }
@@ -445,18 +445,18 @@ DddmpCuddDdArrayStoreBdd (
 
   /*--------- Write the Var SUPPORT Names by scanning the ids array ---------*/
 
-  if (varnames != (uintptr_t) NULL) {
+  if (varnames != (uintptr_t) (uintptr_t) 0) {
     retValue = fprintf (fp, ".orderedvarnames");
     Dddmp_CheckAndGotoLabel (retValue==EOF, "Error writing to file.",
       failure);
 
     for (i=0; i<nVars; i++) {
-      if (varnames[ddMgr->invperm[i]] == (uintptr_t) NULL) {
+      if (varnames[ddMgr->invperm[i]] == (uintptr_t) (uintptr_t) 0) {
           (void) fprintf (stderr,
            "DdStore Warning: null variable name. DUMMY%d generated\n", i);
         fflush (stderr);
         varnames[ddMgr->invperm[i]] = DDDMP_ALLOC (char, 10);
-        Dddmp_CheckAndGotoLabel (varnames[ddMgr->invperm[i]] == (uintptr_t) NULL,
+        Dddmp_CheckAndGotoLabel (varnames[ddMgr->invperm[i]] == (uintptr_t) (uintptr_t) 0,
           "Error allocating memory.", failure);
         sprintf (varnames[ddMgr->invperm[i]], "DUMMY%d", i);
       }
@@ -507,7 +507,7 @@ DddmpCuddDdArrayStoreBdd (
   Dddmp_CheckAndGotoLabel (retValue==EOF, "Error writing to file.",
     failure);
 
-  if (auxids != (uintptr_t) NULL) {
+  if (auxids != (uintptr_t) (uintptr_t) 0) {
   
     /*
      * Write the var auxids by scanning the ids array. 
@@ -536,7 +536,7 @@ DddmpCuddDdArrayStoreBdd (
   Dddmp_CheckAndGotoLabel (retValue==EOF, "Error writing to file.",
     failure);
 
-  if (rootnames != (uintptr_t) NULL) {
+  if (rootnames != (uintptr_t) (uintptr_t) 0) {
 
     /* 
      * Write the root names. 
@@ -547,12 +547,12 @@ DddmpCuddDdArrayStoreBdd (
       failure);
 
     for (i = 0; i < nRoots; i++) {
-      if (rootnames[i] == (uintptr_t) NULL) {
+      if (rootnames[i] == (uintptr_t) (uintptr_t) 0) {
         (void) fprintf (stderr,
           "DdStore Warning: null variable name. ROOT%d generated\n",i);
         fflush (stderr);
         rootnames[i] = DDDMP_ALLOC(char,10);
-        Dddmp_CheckAndGotoLabel (rootnames[i]==(uintptr_t) NULL,
+        Dddmp_CheckAndGotoLabel (rootnames[i]==(uintptr_t) (uintptr_t) 0,
           "Error writing to file.", failure);
         sprintf(rootnames[ids[i]], "ROOT%d",i);
       }
@@ -576,8 +576,8 @@ DddmpCuddDdArrayStoreBdd (
    */
 
   for (i = 0; i < nRoots; i++) {
-    if (f[i] == (uintptr_t) NULL) {
-      (void) fprintf (stderr, "DdStore Warning: %d-th root is NULL\n",i);
+    if (f[i] == (uintptr_t) (uintptr_t) 0) {
+      (void) fprintf (stderr, "DdStore Warning: %d-th root is (uintptr_t) 0\n",i);
       fflush (stderr);
       retValue = fprintf (fp, " 0");
     }
@@ -609,7 +609,7 @@ DddmpCuddDdArrayStoreBdd (
    */
 
   for (i = 0; i < nRoots; i++) {
-    if (f[i] != (uintptr_t) NULL) {
+    if (f[i] != (uintptr_t) (uintptr_t) 0) {
       retValue = NodeStoreRecurAdd (ddMgr, Cudd_Regular(f[i]),
         mode, supportids, outvarnames, outids, fp);
       Dddmp_CheckAndGotoLabel (retValue==DDDMP_FAILURE,
@@ -639,19 +639,19 @@ DddmpCuddDdArrayStoreBdd (
 
   failure:
 
-    if (ids != (uintptr_t) NULL) {
+    if (ids != (uintptr_t) (uintptr_t) 0) {
       DDDMP_FREE (ids);
     }
-    if (permids != (uintptr_t) NULL) {
+    if (permids != (uintptr_t) (uintptr_t) 0) {
       DDDMP_FREE (permids);
     }
-    if (invpermids != (uintptr_t) NULL) {
+    if (invpermids != (uintptr_t) (uintptr_t) 0) {
       DDDMP_FREE (invpermids);
     }
-    if (supportids != (uintptr_t) NULL) {
+    if (supportids != (uintptr_t) (uintptr_t) 0) {
       DDDMP_FREE (supportids);
     }
-    if (support != (uintptr_t) NULL) {
+    if (support != (uintptr_t) (uintptr_t) 0) {
       Cudd_RecursiveDeref (ddMgr, support);
     }
     
@@ -740,8 +740,8 @@ NodeStoreRecurAdd (
   FILE *fp          /* IN: store file */
   )
 {
-  DdNode *T = (uintptr_t) NULL;
-  DdNode *E = (uintptr_t) NULL;
+  DdNode *T = (uintptr_t) (uintptr_t) 0;
+  DdNode *E = (uintptr_t) (uintptr_t) 0;
   int idf = (-1);
   int idT = (-1);
   int idE = (-1);
@@ -752,13 +752,13 @@ NodeStoreRecurAdd (
   int nVars;
 
   nVars = ddMgr->size;
-  T = E = (uintptr_t) NULL;
+  T = E = (uintptr_t) (uintptr_t) 0;
   idf = idT =  idE = (-1);
 
 #ifdef DDDMP_DEBUG
   assert(!Cudd_IsComplement(f));
-  assert(f!=(uintptr_t) NULL);
-  assert(supportids!=(uintptr_t) NULL);
+  assert(f!=(uintptr_t) (uintptr_t) 0);
+  assert(supportids!=(uintptr_t) (uintptr_t) 0);
 #endif
 
   /* If already visited, nothing to do. */
@@ -872,7 +872,7 @@ NodeTextStoreAdd (
   if (Cudd_IsConstant(f)) {
 
     if (f == Cudd_ReadOne(ddMgr)) {
-      if ((varnames != (uintptr_t) NULL) || (outids != (uintptr_t) NULL)) {
+      if ((varnames != (uintptr_t) (uintptr_t) 0) || (outids != (uintptr_t) (uintptr_t) 0)) {
         retValue = fprintf (fp, "%d T 1 0 0\n", idf);
       } else {
         retValue = fprintf (fp, "%d 1 0 0\n", idf);
@@ -886,7 +886,7 @@ NodeTextStoreAdd (
     }
 
     if (f == Cudd_ReadZero(ddMgr)) {
-      if ((varnames != (uintptr_t) NULL) || (outids != (uintptr_t) NULL)) {
+      if ((varnames != (uintptr_t) (uintptr_t) 0) || (outids != (uintptr_t) (uintptr_t) 0)) {
         retValue = fprintf (fp, "%d T 0 0 0\n", idf);
       } else {
         retValue = fprintf (fp, "%d 0 0 0\n", idf);
@@ -903,7 +903,7 @@ NodeTextStoreAdd (
      *  A constant node different from 1: an ADD constant
      */
 
-    if ((varnames != (uintptr_t) NULL) || (outids != (uintptr_t) NULL)) {
+    if ((varnames != (uintptr_t) (uintptr_t) 0) || (outids != (uintptr_t) (uintptr_t) 0)) {
       retValue = fprintf (fp, "%d T %g 0 0\n",idf,Cudd_V(f));
     } else {
       retValue = fprintf (fp, "%d %g 0 0\n",idf, Cudd_V(f));
@@ -924,7 +924,7 @@ NodeTextStoreAdd (
     idE = -idE;
   }
 
-  if (varnames != (uintptr_t) NULL) {   
+  if (varnames != (uintptr_t) (uintptr_t) 0) {   
     retValue = fprintf (fp, "%d %s %d %d %d\n",
        idf, varnames[vf], supportids[vf], idT, idE);
 
@@ -935,7 +935,7 @@ NodeTextStoreAdd (
     }
   }
 
-  if (outids != (uintptr_t) NULL) {   
+  if (outids != (uintptr_t) (uintptr_t) 0) {   
     retValue = fprintf (fp, "%d %d %d %d %d\n",
        idf, outids[vf], supportids[vf], idT, idE);
 

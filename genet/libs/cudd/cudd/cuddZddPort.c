@@ -116,7 +116,7 @@ static DdNode * zddPortToBddStep (DdManager *dd, DdNode *f, int depth);
   ZDD variables, and that the variable order is the same for both types
   of variables. These conditions are established if the ZDD variables
   are created by one call to Cudd_zddVarsFromBddVars with multiplicity =
-  1. Returns a pointer to the resulting ZDD if successful; NULL otherwise.]
+  1. Returns a pointer to the resulting ZDD if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -145,7 +145,7 @@ Cudd_zddPortFromBdd(
   Synopsis [Converts a ZDD into a BDD.]
 
   Description [Converts a ZDD into a BDD. Returns a pointer to the resulting
-  ZDD if successful; NULL otherwise.]
+  ZDD if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -215,7 +215,7 @@ zddPortFromBddStep(
 
     /* Computed table look-up. */
     res = cuddCacheLookup1Zdd(dd,Cudd_zddPortFromBdd,B);
-    if (res != NULL) {
+    if (res != (uintptr_t) 0) {
 	level = cuddI(dd,Breg->index);
 	/* Adding DC vars. */
 	if (expected < level) {
@@ -225,9 +225,9 @@ zddPortFromBddStep(
 		prevZdd = res;
 		id = dd->invperm[level];
 		res = cuddZddGetNode(dd, id, prevZdd, prevZdd);
-		if (res == NULL) {
+		if (res == (uintptr_t) 0) {
 		    Cudd_RecursiveDerefZdd(dd, prevZdd);
-		    return(NULL);
+		    return((uintptr_t) 0);
 		}
 		cuddRef(res);
 		Cudd_RecursiveDerefZdd(dd, prevZdd);
@@ -248,19 +248,19 @@ zddPortFromBddStep(
     id = Breg->index;
     level = cuddI(dd,id);
     t = zddPortFromBddStep(dd, Bt, level+1);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(t);
     e = zddPortFromBddStep(dd, Be, level+1);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_RecursiveDerefZdd(dd, t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
     res = cuddZddGetNode(dd, id, t, e);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_RecursiveDerefZdd(dd, t);
 	Cudd_RecursiveDerefZdd(dd, e);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(res);
     Cudd_RecursiveDerefZdd(dd, t);
@@ -272,9 +272,9 @@ zddPortFromBddStep(
 	prevZdd = res;
 	id = dd->invperm[level];
 	res = cuddZddGetNode(dd, id, prevZdd, prevZdd);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(dd, prevZdd);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(res);
 	Cudd_RecursiveDerefZdd(dd, prevZdd);
@@ -317,21 +317,21 @@ zddPortToBddStep(
     index = dd->invpermZ[depth];
     level = cuddIZ(dd,f->index);
     var = cuddUniqueInter(dd,index,one,Cudd_Not(one));
-    if (var == NULL) return(NULL);
+    if (var == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(var);
 
     if (level > (unsigned) depth) {
 	E = zddPortToBddStep(dd,f,depth+1);
-	if (E == NULL) {
+	if (E == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,var);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(E);
 	res = cuddBddIteRecur(dd,var,Cudd_Not(one),E);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,var);
 	    Cudd_RecursiveDeref(dd,E);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(res);
 	Cudd_RecursiveDeref(dd,var);
@@ -341,31 +341,31 @@ zddPortToBddStep(
     }
 
     res = cuddCacheLookup1(dd,Cudd_zddPortToBdd,f);
-    if (res != NULL) {
+    if (res != (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,var);
 	return(res);
     }
 
     T = zddPortToBddStep(dd,cuddT(f),depth+1);
-    if (T == NULL) {
+    if (T == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,var);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(T);
     E = zddPortToBddStep(dd,cuddE(f),depth+1);
-    if (E == NULL) {
+    if (E == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,var);
 	Cudd_RecursiveDeref(dd,T);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(E);
 
     res = cuddBddIteRecur(dd,var,T,E);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,var);
 	Cudd_RecursiveDeref(dd,T);
 	Cudd_RecursiveDeref(dd,E);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(res);
     Cudd_RecursiveDeref(dd,var);

@@ -299,7 +299,7 @@ Cudd_DelayedDerefBdd(
 
     N = table->deathRow[table->nextDead];
 
-    if (N != NULL) {
+    if (N != (uintptr_t) 0) {
 #endif
 #ifdef DD_DEBUG
 	assert(!Cudd_IsComplement(N));
@@ -341,7 +341,7 @@ Cudd_DelayedDerefBdd(
 	    MMoutOfMemory = Cudd_OutOfMem;
 	    newRow = REALLOC(DdNodePtr,table->deathRow,2*table->deathRowDepth);
 	    MMoutOfMemory = saveHandler;
-	    if (newRow == NULL) {
+	    if (newRow == (uintptr_t) 0) {
 		table->nextDead = 0;
 	    } else {
 		int i;
@@ -349,7 +349,7 @@ Cudd_DelayedDerefBdd(
 		i = table->deathRowDepth;
 		table->deathRowDepth <<= 1;
 		for (; i < table->deathRowDepth; i++) {
-		    newRow[i] = NULL;
+		    newRow[i] = (uintptr_t) 0;
 		}
 		table->deadMask = table->deathRowDepth - 1;
 		table->deathRow = newRow;
@@ -512,7 +512,7 @@ Cudd_CheckZeroRef(
 	nodelist = subtable->nodelist;
 	for (j = 0; (unsigned) j < subtable->slots; j++) {
 	    node = nodelist[j];
-	    while (node != NULL) {
+	    while (node != (uintptr_t) 0) {
 		if (node->ref != 0 && node->ref != DD_MAXREF) {
 		    index = (int) node->index;
 		    if (node == manager->univ[manager->permZ[index]]) {
@@ -536,7 +536,7 @@ Cudd_CheckZeroRef(
     nodelist = manager->constants.nodelist;
     for (j = 0; (unsigned) j < manager->constants.slots; j++) {
 	node = nodelist[j];
-	while (node != NULL) {
+	while (node != (uintptr_t) 0) {
 	    if (node->ref != 0 && node->ref != DD_MAXREF) {
 		if (node == manager->one) {
 		    if ((int) node->ref != remain) {
@@ -689,9 +689,9 @@ cuddShrinkDeathRow(
 
     if (table->deathRowDepth > 3) {
 	for (i = table->deathRowDepth/4; i < table->deathRowDepth; i++) {
-	    if (table->deathRow[i] == NULL) break;
+	    if (table->deathRow[i] == (uintptr_t) 0) break;
 	    Cudd_IterDerefBdd(table,table->deathRow[i]);
-	    table->deathRow[i] = NULL;
+	    table->deathRow[i] = (uintptr_t) 0;
 	}
 	table->deathRowDepth /= 4;
 	table->deadMask = table->deathRowDepth - 1;
@@ -726,13 +726,13 @@ cuddClearDeathRow(
     int i;
 
     for (i = 0; i < table->deathRowDepth; i++) {
-	if (table->deathRow[i] == NULL) break;
+	if (table->deathRow[i] == (uintptr_t) 0) break;
 	Cudd_IterDerefBdd(table,table->deathRow[i]);
-	table->deathRow[i] = NULL;
+	table->deathRow[i] = (uintptr_t) 0;
     }
 #ifdef DD_DEBUG
     for (; i < table->deathRowDepth; i++) {
-	assert(table->deathRow[i] == NULL);
+	assert(table->deathRow[i] == (uintptr_t) 0);
     }
 #endif
     table->nextDead = 0;

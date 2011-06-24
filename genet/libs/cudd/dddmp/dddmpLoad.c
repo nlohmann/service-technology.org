@@ -105,12 +105,12 @@ Dddmp_cuddBddLoad (
   DdNode *f , **tmpArray;
   int i, nRoots;
 
-  nRoots = Dddmp_cuddBddArrayLoad(ddMgr,DDDMP_ROOT_MATCHLIST,NULL,
+  nRoots = Dddmp_cuddBddArrayLoad(ddMgr,DDDMP_ROOT_MATCHLIST,(uintptr_t) 0,
     varMatchMode,varmatchnames,varmatchauxids,varcomposeids,
     mode,file,fp,&tmpArray);
 
   if (nRoots == 0) {
-    return (NULL);
+    return ((uintptr_t) 0);
   } else {
     f = tmpArray[0];
     if (nRoots > 1) {
@@ -152,15 +152,15 @@ Dddmp_cuddBddLoad (
     ordering.
     
     <li> varMatchMode=DDDMP_VAR_MATCHNAMES <p>
-    requires a non NULL varmatchnames parameter; this is a vector of
+    requires a non (uintptr_t) 0 varmatchnames parameter; this is a vector of
     strings in one-to-one correspondence with variable IDs of the
     reading manager. Variables in the DD file read are matched with
-    manager variables according to their name (a non NULL varnames
+    manager variables according to their name (a non (uintptr_t) 0 varnames
     parameter was required while storing the DD file).
     
     <li> varMatchMode=DDDMP_VAR_MATCHIDS <p>
     has a meaning similar to DDDMP_VAR_MATCHNAMES, but integer auxiliary
-    IDs are used instead of strings; the additional non NULL
+    IDs are used instead of strings; the additional non (uintptr_t) 0
     varmatchauxids parameter is needed.
     
     <li> varMatchMode=DDDMP_VAR_COMPOSEIDS <p>
@@ -170,7 +170,7 @@ Dddmp_cuddBddLoad (
     
     In the present implementation, the array varnames (3), varauxids (4)
     and composeids (5) need to have one entry for each variable in the 
-    DD manager (NULL pointers are allowed for unused variables
+    DD manager ((uintptr_t) 0 pointers are allowed for unused variables
     in varnames). Hence variables need to be already present in the 
     manager. All arrays are sorted according to IDs.
 
@@ -268,12 +268,12 @@ Dddmp_cuddAddLoad (
   DdNode *f , **tmpArray;
   int i, nRoots;
 
-  nRoots = Dddmp_cuddAddArrayLoad (ddMgr, DDDMP_ROOT_MATCHLIST,NULL,
+  nRoots = Dddmp_cuddAddArrayLoad (ddMgr, DDDMP_ROOT_MATCHLIST,(uintptr_t) 0,
     varMatchMode, varmatchnames, varmatchauxids, varcomposeids,
     mode, file, fp, &tmpArray);
 
   if (nRoots == 0) {
-    return (NULL);
+    return ((uintptr_t) 0);
   } else {
     f = tmpArray[0];
     if (nRoots > 1) {
@@ -397,19 +397,19 @@ Dddmp_cuddHeaderLoad (
 {
   Dddmp_Hdr_t *Hdr;
   int i, fileToClose;
-  int *tmpVarIds = NULL;
-  int *tmpVarComposeIds = NULL;
-  int *tmpVarAuxIds = NULL; 
+  int *tmpVarIds = (uintptr_t) 0;
+  int *tmpVarComposeIds = (uintptr_t) 0;
+  int *tmpVarAuxIds = (uintptr_t) 0; 
 
   fileToClose = 0;
-  if (fp == NULL) {
+  if (fp == (uintptr_t) 0) {
     fp = fopen (file, "r");
-    Dddmp_CheckAndGotoLabel (fp==NULL, "Error opening file.",
+    Dddmp_CheckAndGotoLabel (fp==(uintptr_t) 0, "Error opening file.",
       failure);
     fileToClose = 1;
   }
 
-  Hdr = DddmpBddReadHeader (NULL, fp);
+  Hdr = DddmpBddReadHeader ((uintptr_t) 0, fp);
 
   Dddmp_CheckAndGotoLabel (Hdr->nnodes==0, "Zero number of nodes.",
     failure);
@@ -426,49 +426,49 @@ Dddmp_cuddHeaderLoad (
    *  Support Varnames
    */
 
-  if (Hdr->suppVarNames != NULL) {
+  if (Hdr->suppVarNames != (uintptr_t) 0) {
     *suppVarNames = DDDMP_ALLOC (char *, *nsuppvars);
-    Dddmp_CheckAndGotoLabel (*suppVarNames==NULL,
+    Dddmp_CheckAndGotoLabel (*suppVarNames==(uintptr_t) 0,
       "Error allocating memory.", failure);
 
     for (i=0; i<*nsuppvars; i++) {
       (*suppVarNames)[i] = DDDMP_ALLOC (char,
         (strlen (Hdr->suppVarNames[i]) + 1));
-      Dddmp_CheckAndGotoLabel (Hdr->suppVarNames[i]==NULL,
+      Dddmp_CheckAndGotoLabel (Hdr->suppVarNames[i]==(uintptr_t) 0,
         "Support Variable Name Missing in File.", failure);
       strcpy ((*suppVarNames)[i], Hdr->suppVarNames[i]);
     }
   } else {
-    *suppVarNames = NULL;
+    *suppVarNames = (uintptr_t) 0;
   }
 
   /*
    *  Ordered Varnames
    */
 
-  if (Hdr->orderedVarNames != NULL) {
+  if (Hdr->orderedVarNames != (uintptr_t) 0) {
     *orderedVarNames = DDDMP_ALLOC (char *, *nVars);
-    Dddmp_CheckAndGotoLabel (*orderedVarNames==NULL,
+    Dddmp_CheckAndGotoLabel (*orderedVarNames==(uintptr_t) 0,
       "Error allocating memory.", failure);
 
     for (i=0; i<*nVars; i++) {
       (*orderedVarNames)[i]  = DDDMP_ALLOC (char,
         (strlen (Hdr->orderedVarNames[i]) + 1));
-      Dddmp_CheckAndGotoLabel (Hdr->orderedVarNames[i]==NULL,
+      Dddmp_CheckAndGotoLabel (Hdr->orderedVarNames[i]==(uintptr_t) 0,
         "Support Variable Name Missing in File.", failure);
       strcpy ((*orderedVarNames)[i], Hdr->orderedVarNames[i]);
     }
   } else {
-    *orderedVarNames = NULL;
+    *orderedVarNames = (uintptr_t) 0;
   }
 
   /*
    *  Variable Ids
    */
 
-  if (Hdr->ids != NULL) {
+  if (Hdr->ids != (uintptr_t) 0) {
     tmpVarIds = DDDMP_ALLOC (int, *nsuppvars);
-    Dddmp_CheckAndGotoLabel (tmpVarIds==NULL, "Error allocating memory.",
+    Dddmp_CheckAndGotoLabel (tmpVarIds==(uintptr_t) 0, "Error allocating memory.",
       failure);
     for (i=0; i<*nsuppvars; i++) {
       tmpVarIds[i] = Hdr->ids[i];
@@ -476,16 +476,16 @@ Dddmp_cuddHeaderLoad (
 
     *varIds = tmpVarIds; 
   } else {
-    *varIds = NULL;
+    *varIds = (uintptr_t) 0;
   }
 
   /*
    *  Variable Compose Ids
    */
 
-  if (Hdr->permids != NULL) {
+  if (Hdr->permids != (uintptr_t) 0) {
     tmpVarComposeIds = DDDMP_ALLOC (int, *nsuppvars);
-    Dddmp_CheckAndGotoLabel (tmpVarComposeIds==NULL,
+    Dddmp_CheckAndGotoLabel (tmpVarComposeIds==(uintptr_t) 0,
       "Error allocating memory.", failure);
     for (i=0; i<*nsuppvars; i++) {
       tmpVarComposeIds[i] = Hdr->permids[i];
@@ -493,16 +493,16 @@ Dddmp_cuddHeaderLoad (
 
     *varComposeIds = tmpVarComposeIds; 
   } else {
-    *varComposeIds = NULL;
+    *varComposeIds = (uintptr_t) 0;
   }
 
   /*
    *  Variable Auxiliary Ids
    */
 
-  if (Hdr->auxids != NULL) {
+  if (Hdr->auxids != (uintptr_t) 0) {
     tmpVarAuxIds = DDDMP_ALLOC (int, *nsuppvars);
-    Dddmp_CheckAndGotoLabel (tmpVarAuxIds==NULL,
+    Dddmp_CheckAndGotoLabel (tmpVarAuxIds==(uintptr_t) 0,
       "Error allocating memory.", failure);
     for (i=0; i<*nsuppvars; i++) {
       tmpVarAuxIds[i] = Hdr->auxids[i];
@@ -510,7 +510,7 @@ Dddmp_cuddHeaderLoad (
 
     *varAuxIds = tmpVarAuxIds; 
   } else {
-    *varAuxIds = NULL;
+    *varAuxIds = (uintptr_t) 0;
   }
 
   /*
@@ -569,15 +569,15 @@ Dddmp_cuddHeaderLoad (
     is used to allow variable match according to the position in the ordering.
     
     <li> varMatchMode=DDDMP_VAR_MATCHNAMES <p>
-    requires a non NULL varmatchnames parameter; this is a vector of
+    requires a non (uintptr_t) 0 varmatchnames parameter; this is a vector of
     strings in one-to-one correspondence with variable IDs of the
     reading manager. Variables in the DD file read are matched with
-    manager variables according to their name (a non NULL varnames
+    manager variables according to their name (a non (uintptr_t) 0 varnames
     parameter was required while storing the DD file).
     
     <li> varMatchMode=DDDMP_VAR_MATCHIDS <p>
     has a meaning similar to DDDMP_VAR_MATCHNAMES, but integer auxiliary
-    IDs are used instead of strings; the additional non NULL
+    IDs are used instead of strings; the additional non (uintptr_t) 0
     varmatchauxids parameter is needed.
     
     <li> varMatchMode=DDDMP_VAR_COMPOSEIDS <p>
@@ -587,7 +587,7 @@ Dddmp_cuddHeaderLoad (
     
     In the present implementation, the array varnames (3), varauxids (4)
     and composeids (5) need to have one entry for each variable in the 
-    DD manager (NULL pointers are allowed for unused variables
+    DD manager ((uintptr_t) 0 pointers are allowed for unused variables
     in varnames). Hence variables need to be already present in the 
     manager. All arrays are sorted according to IDs.
     ]
@@ -614,39 +614,39 @@ DddmpCuddDdArrayLoad (
   DdNode ***pproots                 /* OUT: array BDD roots (by reference) */
   )
 {
-  Dddmp_Hdr_t *Hdr = NULL;
-  DdNode *f = NULL;
-  DdNode *T = NULL;
-  DdNode *E = NULL;
+  Dddmp_Hdr_t *Hdr = (uintptr_t) 0;
+  DdNode *f = (uintptr_t) 0;
+  DdNode *T = (uintptr_t) 0;
+  DdNode *E = (uintptr_t) 0;
   struct binary_dd_code code;
   char buf[DDDMP_MAXSTRLEN];
   int retValue, id, size, maxv;
   int i, j, k, maxaux, var, vT, vE, idT, idE;
   double addConstant;
-  int *permsupport = NULL;
-  int *convertids = NULL;
-  int *invconvertids = NULL;
-  int *invauxids = NULL;
-  char **sortedvarnames = NULL;
+  int *permsupport = (uintptr_t) 0;
+  int *convertids = (uintptr_t) 0;
+  int *invconvertids = (uintptr_t) 0;
+  int *invauxids = (uintptr_t) 0;
+  char **sortedvarnames = (uintptr_t) 0;
   int  nddvars, nRoots;
-  DdNode **pnodes = NULL;
-  unsigned char *pvars1byte = NULL;
-  unsigned short *pvars2byte = NULL;
-  DdNode **proots = NULL;
+  DdNode **pnodes = (uintptr_t) 0;
+  unsigned char *pvars1byte = (uintptr_t) 0;
+  unsigned short *pvars2byte = (uintptr_t) 0;
+  DdNode **proots = (uintptr_t) 0;
   int fileToClose = 0;
 
-  *pproots = NULL;
+  *pproots = (uintptr_t) 0;
 
-  if (fp == NULL) {
+  if (fp == (uintptr_t) 0) {
     fp = fopen (file, "r");
-    Dddmp_CheckAndGotoLabel (fp==NULL, "Error opening file.",
+    Dddmp_CheckAndGotoLabel (fp==(uintptr_t) 0, "Error opening file.",
       failure);
     fileToClose = 1;
   }
 
   nddvars = ddMgr->size;
 
-  Hdr = DddmpBddReadHeader (NULL, fp);
+  Hdr = DddmpBddReadHeader ((uintptr_t) 0, fp);
 
   Dddmp_CheckAndGotoLabel (Hdr->nnodes==0, "Zero number of nodes.",
     failure);
@@ -682,7 +682,7 @@ DddmpCuddDdArrayLoad (
    */
 
   permsupport = DDDMP_ALLOC (int, Hdr->nsuppvars);
-  Dddmp_CheckAndGotoLabel (permsupport==NULL, "Error allocating memory.",
+  Dddmp_CheckAndGotoLabel (permsupport==(uintptr_t) 0, "Error allocating memory.",
     failure);
   for (i=0,k=0; i < Hdr->nVars; i++) { 
     for (j=0; j < Hdr->nsuppvars; j++) { 
@@ -693,16 +693,16 @@ DddmpCuddDdArrayLoad (
   }
   Dddmp_Assert (k==Hdr->nsuppvars, "k==Hdr->nsuppvars");
 
-  if (Hdr->suppVarNames != NULL) {
+  if (Hdr->suppVarNames != (uintptr_t) 0) {
     /*
      *  Varnames are sorted for binary search
      */
 
     sortedvarnames = DDDMP_ALLOC(char *, Hdr->nsuppvars);
-    Dddmp_CheckAndGotoLabel (sortedvarnames==NULL, "Error allocating memory.",
+    Dddmp_CheckAndGotoLabel (sortedvarnames==(uintptr_t) 0, "Error allocating memory.",
       failure);
     for (i=0; i<Hdr->nsuppvars; i++) {
-      Dddmp_CheckAndGotoLabel (Hdr->suppVarNames[i]==NULL,
+      Dddmp_CheckAndGotoLabel (Hdr->suppVarNames[i]==(uintptr_t) 0,
         "Support Variable Name Missing in File.", failure);
       sortedvarnames[i] = Hdr->suppVarNames[i];
     }    
@@ -719,7 +719,7 @@ DddmpCuddDdArrayLoad (
    */ 
 
   convertids = DDDMP_ALLOC (int, Hdr->nsuppvars);
-  Dddmp_CheckAndGotoLabel (convertids==NULL, "Error allocating memory.",
+  Dddmp_CheckAndGotoLabel (convertids==(uintptr_t) 0, "Error allocating memory.",
     failure);
 
   again_matchmode:
@@ -736,7 +736,7 @@ DddmpCuddDdArrayLoad (
       }
       break;
     case DDDMP_VAR_MATCHAUXIDS:
-      if (Hdr->auxids == NULL) {
+      if (Hdr->auxids == (uintptr_t) 0) {
         (void) fprintf (stderr,
            "DdLoad Error: variable auxids matching requested\n");
         (void) fprintf (stderr, "but .auxids not found in BDD file\n");
@@ -753,7 +753,7 @@ DddmpCuddDdArrayLoad (
       }
       /* generate invaux array */
       invauxids = DDDMP_ALLOC (int, maxaux+1);
-      Dddmp_CheckAndGotoLabel (invauxids==NULL, "Error allocating memory.",
+      Dddmp_CheckAndGotoLabel (invauxids==(uintptr_t) 0, "Error allocating memory.",
         failure);
 
       for (i=0; i<=maxaux; i++) {
@@ -781,7 +781,7 @@ DddmpCuddDdArrayLoad (
       }
       break;
     case DDDMP_VAR_MATCHNAMES:
-      if (Hdr->suppVarNames == NULL) {
+      if (Hdr->suppVarNames == (uintptr_t) 0) {
         (void) fprintf (stderr,
           "DdLoad Error: variable names matching requested\n");
         (void) fprintf (stderr, "but .suppvarnames not found in BDD file\n");
@@ -793,7 +793,7 @@ DddmpCuddDdArrayLoad (
 
       /* generate invaux array */
       invauxids = DDDMP_ALLOC (int, Hdr->nsuppvars);
-      Dddmp_CheckAndGotoLabel (invauxids==NULL, "Error allocating memory.",
+      Dddmp_CheckAndGotoLabel (invauxids==(uintptr_t) 0, "Error allocating memory.",
         failure);
 
       for (i=0; i<Hdr->nsuppvars; i++) {
@@ -801,9 +801,9 @@ DddmpCuddDdArrayLoad (
       }
 
       for (i=0; i<nddvars; i++) {
-        if (varmatchnames[i]==NULL) {
+        if (varmatchnames[i]==(uintptr_t) 0) {
           (void) fprintf (stderr,
-            "DdLoad Warning: NULL match variable name (id: %d). Ignored.\n",
+            "DdLoad Warning: (uintptr_t) 0 match variable name (id: %d). Ignored.\n",
             i);
           fflush (stderr);
         }
@@ -816,8 +816,8 @@ DddmpCuddDdArrayLoad (
       }
       /* generate convertids array */
       for (i=0; i<Hdr->nsuppvars; i++) {
-        Dddmp_Assert (Hdr->suppVarNames[i]!=NULL,
-          "Hdr->suppVarNames[i] != NULL");
+        Dddmp_Assert (Hdr->suppVarNames[i]!=(uintptr_t) 0,
+          "Hdr->suppVarNames[i] != (uintptr_t) 0");
         j=FindVarname(Hdr->suppVarNames[i],sortedvarnames,Hdr->nsuppvars);
         Dddmp_Assert ((j>=0) && (j<Hdr->nsuppvars),
           "(j>=0) && (j<Hdr->nsuppvars)");
@@ -848,7 +848,7 @@ DddmpCuddDdArrayLoad (
   }
  
   invconvertids = DDDMP_ALLOC (int, maxv+1);
-  Dddmp_CheckAndGotoLabel (invconvertids==NULL, "Error allocating memory.",
+  Dddmp_CheckAndGotoLabel (invconvertids==(uintptr_t) 0, "Error allocating memory.",
     failure);
 
   for (i=0; i<=maxv; i++) {
@@ -860,17 +860,17 @@ DddmpCuddDdArrayLoad (
   }
 
   pnodes = DDDMP_ALLOC(DdNode *,(Hdr->nnodes+1));
-  Dddmp_CheckAndGotoLabel (pnodes==NULL, "Error allocating memory.",
+  Dddmp_CheckAndGotoLabel (pnodes==(uintptr_t) 0, "Error allocating memory.",
     failure);
 
   if (Hdr->nsuppvars < 256) {
     pvars1byte = DDDMP_ALLOC(unsigned char,(Hdr->nnodes+1));
-    Dddmp_CheckAndGotoLabel (pvars1byte==NULL, "Error allocating memory.",
+    Dddmp_CheckAndGotoLabel (pvars1byte==(uintptr_t) 0, "Error allocating memory.",
       failure);
   }
   else if (Hdr->nsuppvars < 0xffff) {
     pvars2byte = DDDMP_ALLOC(unsigned short,(Hdr->nnodes+1));
-    Dddmp_CheckAndGotoLabel (pvars2byte==NULL, "Error allocating memory.",
+    Dddmp_CheckAndGotoLabel (pvars2byte==(uintptr_t) 0, "Error allocating memory.",
       failure);
   } else {
     (void) fprintf (stderr, 
@@ -930,7 +930,7 @@ DddmpCuddDdArrayLoad (
           /* StQ 11.02.2004:
              Bug fixed --> Reference All Nodes for ADD */
           Cudd_Ref (pnodes[i]);       
-          Dddmp_CheckAndGotoLabel (pnodes[i]==NULL, "NULL pnodes.",
+          Dddmp_CheckAndGotoLabel (pnodes[i]==(uintptr_t) 0, "(uintptr_t) 0 pnodes.",
             failure);
           continue;
         } else {
@@ -1022,9 +1022,9 @@ DddmpCuddDdArrayLoad (
       if (cuddIsConstant(T))
         vT = Hdr->nsuppvars;
       else {
-        if (pvars1byte != NULL)
+        if (pvars1byte != (uintptr_t) 0)
           vT = pvars1byte[idT];
-        else if (pvars2byte != NULL)
+        else if (pvars2byte != (uintptr_t) 0)
           vT = pvars2byte[idT];
         else
           vT = invconvertids[T->index];
@@ -1041,9 +1041,9 @@ DddmpCuddDdArrayLoad (
       if (cuddIsConstant(E))
         vE = Hdr->nsuppvars;
       else {
-        if (pvars1byte != NULL)
+        if (pvars1byte != (uintptr_t) 0)
           vE = pvars1byte[idE];
-        else if (pvars2byte != NULL)
+        else if (pvars2byte != (uintptr_t) 0)
           vE = pvars2byte[idE];
         else
           vE = invconvertids[E->index];
@@ -1076,10 +1076,10 @@ DddmpCuddDdArrayLoad (
       break;
     }
 
-    if (pvars1byte != NULL) {
+    if (pvars1byte != (uintptr_t) 0) {
       pvars1byte[i] = (unsigned char) var;
     } else {
-      if (pvars2byte != NULL) {
+      if (pvars2byte != (uintptr_t) 0) {
         pvars2byte[i] = (unsigned short) var;
       }
     }
@@ -1120,7 +1120,7 @@ DddmpCuddDdArrayLoad (
 
   /* BDD Roots */
   proots = DDDMP_ALLOC(DdNode *,nRoots);
-  Dddmp_CheckAndGotoLabel (proots==NULL, "Error allocating memory.",
+  Dddmp_CheckAndGotoLabel (proots==(uintptr_t) 0, "Error allocating memory.",
     failure);
 
   for(i=0; i<nRoots; ++i) {
@@ -1143,9 +1143,9 @@ DddmpCuddDdArrayLoad (
 
     id = Hdr->rootids[i];
     if (id==0) {
-      (void) fprintf (stderr, "DdLoad Warning: NULL root found in file\n");
+      (void) fprintf (stderr, "DdLoad Warning: (uintptr_t) 0 root found in file\n");
       fflush (stderr);
-      f = NULL;
+      f = (uintptr_t) 0;
     } else {
       if (id<0) {
         f = Cudd_Not(pnodes[-id]);
@@ -1231,13 +1231,13 @@ DddmpBddReadHeader (
   FILE *fp          /* IN: file pointer */
   )
 {
-  Dddmp_Hdr_t *Hdr = NULL;
+  Dddmp_Hdr_t *Hdr = (uintptr_t) 0;
   char buf[DDDMP_MAXSTRLEN];
   int retValue, fileToClose = 0;
 
-  if (fp == NULL) {
+  if (fp == (uintptr_t) 0) {
     fp = fopen (file, "r");
-    Dddmp_CheckAndGotoLabel (fp==NULL, "Error opening file.",
+    Dddmp_CheckAndGotoLabel (fp==(uintptr_t) 0, "Error opening file.",
       failure);
     fileToClose = 1;
   }
@@ -1245,26 +1245,26 @@ DddmpBddReadHeader (
   /* START HEADER */
 
   Hdr = DDDMP_ALLOC (Dddmp_Hdr_t,1);
-  if (Hdr == NULL) {
-    return NULL;
+  if (Hdr == (uintptr_t) 0) {
+    return (uintptr_t) 0;
   }
-  Hdr->ver = NULL;
+  Hdr->ver = (uintptr_t) 0;
   Hdr->mode = 0;
   Hdr->ddType = DDDMP_BDD;
   Hdr->varinfo = DDDMP_VARIDS;
-  Hdr->dd = NULL;
+  Hdr->dd = (uintptr_t) 0;
   Hdr->nnodes = 0;
   Hdr->nVars = 0;
   Hdr->nsuppvars = 0;
-  Hdr->suppVarNames = NULL;
-  Hdr->orderedVarNames = NULL;
-  Hdr->ids = NULL;
-  Hdr->permids = NULL;
-  Hdr->auxids = NULL;
-  Hdr->cnfids = NULL;
+  Hdr->suppVarNames = (uintptr_t) 0;
+  Hdr->orderedVarNames = (uintptr_t) 0;
+  Hdr->ids = (uintptr_t) 0;
+  Hdr->permids = (uintptr_t) 0;
+  Hdr->auxids = (uintptr_t) 0;
+  Hdr->cnfids = (uintptr_t) 0;
   Hdr->nRoots = 0;
-  Hdr->rootids = NULL;
-  Hdr->rootnames = NULL;
+  Hdr->rootids = (uintptr_t) 0;
+  Hdr->rootnames = (uintptr_t) 0;
   Hdr->nAddedCnfVar = 0;
   Hdr->nVarsCnf = 0;
   Hdr->nClausesCnf = 0;
@@ -1288,7 +1288,7 @@ DddmpBddReadHeader (
         failure);
 
       Hdr->ver=DddmpStrDup(buf);
-      Dddmp_CheckAndGotoLabel (Hdr->ver==NULL,
+      Dddmp_CheckAndGotoLabel (Hdr->ver==(uintptr_t) 0,
         "Error allocating memory.", failure);
 
       continue;
@@ -1329,7 +1329,7 @@ DddmpBddReadHeader (
         failure);
 
       Hdr->dd = DddmpStrDup (buf);
-      Dddmp_CheckAndGotoLabel (Hdr->dd==NULL, "Error allocating memory.",
+      Dddmp_CheckAndGotoLabel (Hdr->dd==(uintptr_t) 0, "Error allocating memory.",
         failure);
 
       continue;
@@ -1361,7 +1361,7 @@ DddmpBddReadHeader (
 
     if (matchkeywd(buf, ".orderedvarnames")) {
       Hdr->orderedVarNames = DddmpStrArrayRead (fp, Hdr->nVars);
-      Dddmp_CheckAndGotoLabel (Hdr->orderedVarNames==NULL,
+      Dddmp_CheckAndGotoLabel (Hdr->orderedVarNames==(uintptr_t) 0,
         "Error allocating memory.", failure);
 
       continue;
@@ -1371,7 +1371,7 @@ DddmpBddReadHeader (
       ((strcmp (Hdr->ver, "DDDMP-1.0") == 0) &&
       matchkeywd (buf, ".varnames"))) {
       Hdr->suppVarNames = DddmpStrArrayRead (fp, Hdr->nsuppvars);
-      Dddmp_CheckAndGotoLabel (Hdr->suppVarNames==NULL,
+      Dddmp_CheckAndGotoLabel (Hdr->suppVarNames==(uintptr_t) 0,
         "Error allocating memory.", failure);
 
       continue;
@@ -1379,7 +1379,7 @@ DddmpBddReadHeader (
 
     if matchkeywd(buf, ".ids") {
       Hdr->ids = DddmpIntArrayRead(fp,Hdr->nsuppvars);
-      Dddmp_CheckAndGotoLabel (Hdr->ids==NULL,
+      Dddmp_CheckAndGotoLabel (Hdr->ids==(uintptr_t) 0,
         "Error allocating memory.", failure);
 
       continue;
@@ -1387,7 +1387,7 @@ DddmpBddReadHeader (
 
     if (matchkeywd(buf, ".permids")) {
       Hdr->permids = DddmpIntArrayRead(fp,Hdr->nsuppvars);
-      Dddmp_CheckAndGotoLabel (Hdr->permids==NULL,
+      Dddmp_CheckAndGotoLabel (Hdr->permids==(uintptr_t) 0,
         "Error allocating memory.", failure);
 
       continue;
@@ -1395,7 +1395,7 @@ DddmpBddReadHeader (
 
     if (matchkeywd(buf, ".auxids")) {
       Hdr->auxids = DddmpIntArrayRead(fp,Hdr->nsuppvars);
-      Dddmp_CheckAndGotoLabel (Hdr->auxids==NULL,
+      Dddmp_CheckAndGotoLabel (Hdr->auxids==(uintptr_t) 0,
         "Error allocating memory.", failure);
 
       continue;
@@ -1411,7 +1411,7 @@ DddmpBddReadHeader (
 
     if (matchkeywd(buf, ".rootids")) {
       Hdr->rootids = DddmpIntArrayRead(fp,Hdr->nRoots);
-      Dddmp_CheckAndGotoLabel (Hdr->rootids==NULL,
+      Dddmp_CheckAndGotoLabel (Hdr->rootids==(uintptr_t) 0,
         "Error allocating memory.", failure);
 
       continue;
@@ -1419,7 +1419,7 @@ DddmpBddReadHeader (
 
     if (matchkeywd(buf, ".rootnames")) {
       Hdr->rootnames = DddmpStrArrayRead(fp,Hdr->nRoots);
-      Dddmp_CheckAndGotoLabel (Hdr->rootnames==NULL,
+      Dddmp_CheckAndGotoLabel (Hdr->rootnames==(uintptr_t) 0,
         "Error allocating memory.", failure);
 
       continue;
@@ -1444,7 +1444,7 @@ failure:
 
   DddmpFreeHeader(Hdr);
 
-  return (NULL);
+  return ((uintptr_t) 0);
 }
 
 

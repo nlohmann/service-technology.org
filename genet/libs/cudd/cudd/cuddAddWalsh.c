@@ -107,7 +107,7 @@ static DdNode * addWalshInt (DdManager *dd, DdNode **x, DdNode **y, int n);
   Synopsis    [Generates a Walsh matrix in ADD form.]
 
   Description [Generates a Walsh matrix in ADD form. Returns a pointer
-  to the matrixi if successful; NULL otherwise.]
+  to the matrixi if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -146,7 +146,7 @@ Cudd_addWalsh(
   simultaneously, one can OR the two macros:
   CUDD_RESIDUE_MSB | CUDD_RESIDUE_TC.
   Cudd_addResidue returns a pointer to the resulting ADD if successful;
-  NULL otherwise.]
+  (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -167,37 +167,37 @@ Cudd_addResidue(
     DdNode **array[2], *var, *tmp, *res;
 
     /* Sanity check. */
-    if (n < 1 && m < 2) return(NULL);
+    if (n < 1 && m < 2) return((uintptr_t) 0);
 
     msbLsb = options & CUDD_RESIDUE_MSB;
     tc = options & CUDD_RESIDUE_TC;
 
     /* Allocate and initialize working arrays. */
     array[0] = ALLOC(DdNode *,m);
-    if (array[0] == NULL) {
+    if (array[0] == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     array[1] = ALLOC(DdNode *,m);
-    if (array[1] == NULL) {
+    if (array[1] == (uintptr_t) 0) {
 	FREE(array[0]);
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < m; i++) {
-	array[0][i] = array[1][i] = NULL;
+	array[0][i] = array[1][i] = (uintptr_t) 0;
     }
 
     /* Initialize residues. */
     for (i = 0; i < m; i++) {
 	tmp = cuddUniqueConst(dd,(CUDD_VALUE_TYPE) i);
-	if (tmp == NULL) {
+	if (tmp == (uintptr_t) 0) {
 	    for (j = 0; j < i; j++) {
 		Cudd_RecursiveDeref(dd,array[1][j]);
 	    }
 	    FREE(array[0]);
 	    FREE(array[1]);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(tmp);
 	array[1][i] = tmp;
@@ -216,19 +216,19 @@ Cudd_addResidue(
 	    index = top+k;
 	}
 	var = cuddUniqueInter(dd,index,DD_ONE(dd),DD_ZERO(dd));
-	if (var == NULL) {
+	if (var == (uintptr_t) 0) {
 	    for (j = 0; j < m; j++) {
 		Cudd_RecursiveDeref(dd,array[previous][j]);
 	    }
 	    FREE(array[0]);
 	    FREE(array[1]);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(var);
 	for (i = 0; i < m; i ++) {
 	    t = (i + residue) % m;
 	    tmp = Cudd_addIte(dd,var,array[previous][t],array[previous][i]);
-	    if (tmp == NULL) {
+	    if (tmp == (uintptr_t) 0) {
 		for (j = 0; j < i; j++) {
 		    Cudd_RecursiveDeref(dd,array[thisOne][j]);
 		}
@@ -237,7 +237,7 @@ Cudd_addResidue(
 		}
 		FREE(array[0]);
 		FREE(array[1]);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    cuddRef(tmp);
 	    array[thisOne][i] = tmp;
@@ -285,7 +285,7 @@ Cudd_addResidue(
   Synopsis    [Implements the recursive step of Cudd_addWalsh.]
 
   Description [Generates a Walsh matrix in ADD form. Returns a pointer
-  to the matrixi if successful; NULL otherwise.]
+  to the matrixi if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -306,36 +306,36 @@ addWalshInt(
 
     /* Build bottom part of ADD outside loop */
     minusone = cuddUniqueConst(dd,(CUDD_VALUE_TYPE) -1);
-    if (minusone == NULL) return(NULL);
+    if (minusone == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(minusone);
     v = Cudd_addIte(dd, y[n-1], minusone, one);
-    if (v == NULL) {
+    if (v == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, minusone);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(v);
     u = Cudd_addIte(dd, x[n-1], v, one);
-    if (u == NULL) {
+    if (u == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, minusone);
 	Cudd_RecursiveDeref(dd, v);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(u);
     Cudd_RecursiveDeref(dd, v);
     if (n>1) {
 	w = Cudd_addIte(dd, y[n-1], one, minusone);
-	if (w == NULL) {
+	if (w == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, minusone);
 	    Cudd_RecursiveDeref(dd, u);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(w);
 	t = Cudd_addIte(dd, x[n-1], w, minusone);
-	if (t == NULL) {
+	if (t == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, minusone);
 	    Cudd_RecursiveDeref(dd, u);
 	    Cudd_RecursiveDeref(dd, w);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(t);
 	Cudd_RecursiveDeref(dd, w);
@@ -346,37 +346,37 @@ addWalshInt(
     for (i=n-2; i>=0; i--) {
 	t1 = t; u1 = u;
 	v = Cudd_addIte(dd, y[i], t1, u1);
-	if (v == NULL) {
+	if (v == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, u1);
 	    Cudd_RecursiveDeref(dd, t1);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(v);
 	u = Cudd_addIte(dd, x[i], v, u1);
-	if (u == NULL) {
+	if (u == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, u1);
 	    Cudd_RecursiveDeref(dd, t1);
 	    Cudd_RecursiveDeref(dd, v);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(u);
 	Cudd_RecursiveDeref(dd, v);
 	if (i>0) {
 	    w = Cudd_addIte(dd, y[i], u1, t1);
-	    if (w == NULL) {
+	    if (w == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd, u1);
 		Cudd_RecursiveDeref(dd, t1);
 		Cudd_RecursiveDeref(dd, u);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    cuddRef(w);
 	    t = Cudd_addIte(dd, x[i], w, t1);
-	    if (u == NULL) {
+	    if (u == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd, u1);
 		Cudd_RecursiveDeref(dd, t1);
 		Cudd_RecursiveDeref(dd, u);
 		Cudd_RecursiveDeref(dd, w);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    cuddRef(t);
 	    Cudd_RecursiveDeref(dd, w);

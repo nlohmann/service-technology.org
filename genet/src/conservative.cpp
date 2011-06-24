@@ -22,76 +22,95 @@ Region *find_cc_newregion(string event,TRel &tr,const SS &er, Region &partition,
                           list<Region *> &locregs, list<Region *> &minregs,map<string,int> &flow_map);
 
 // the following two methods should be changed to incorporate the topset information, instead of the unitary inc/decrement
-void update_covering_region(Region *r, map<string,EvTRel *> &tr_map,map<string,int> &flow_map,set<string> localEvs) {
+void update_covering_region(Region *r, map<string,EvTRel *> &tr_map,map<string,int> &flow_map,set<string> localEvs)
+{
     set<string>::const_iterator it;
     SS rsup = r->sup();
-    for(it=localEvs.begin(); it!=localEvs.end(); ++it) {
-        if (tr_map[*it]->get_er() <= rsup) {
+    for(it=localEvs.begin(); it!=localEvs.end(); ++it)
+    {
+        if (tr_map[*it]->get_er() <= rsup)
+        {
             flow_map[*it]--;
         }
-        if (tr_map[*it]->get_sr() <= rsup) {
+        if (tr_map[*it]->get_sr() <= rsup)
+        {
             flow_map[*it]++;
         }
     }
 }
 
-void update_covering_event(string event, map<string,EvTRel *> &tr_map,map<string,int> &flow_map,list<Region *> &locregs) {
+void update_covering_event(string event, map<string,EvTRel *> &tr_map,map<string,int> &flow_map,list<Region *> &locregs)
+{
     list<Region *>::const_iterator it;
     SS er = tr_map[event]->get_er();
     SS sr = tr_map[event]->get_sr();
-    for(it=locregs.begin(); it!=locregs.end(); ++it) {
-        if (er <= (*it)->sup()) {
+    for(it=locregs.begin(); it!=locregs.end(); ++it)
+    {
+        if (er <= (*it)->sup())
+        {
             flow_map[event]--;
         }
-        if (sr <= (*it)->sup()) {
+        if (sr <= (*it)->sup())
+        {
             flow_map[event]++;
         }
     }
 }
 
 void remove_covering_region(string /*event*/, map<string,EvTRel *> &tr_map, const SS &sr, Region &partition, const SS &/*state_space*/,
-                            list<Region *> &localRegs,set<string> localEvs,map<string,int> &flow_map) {
+                            list<Region *> &localRegs,set<string> localEvs,map<string,int> &flow_map)
+{
     list<Region *>::iterator it;
-    for(it=localRegs.begin(); it!=localRegs.end(); ++it) {
-        if (sr <= (*it)->sup()) {
+    for(it=localRegs.begin(); it!=localRegs.end(); ++it)
+    {
+        if (sr <= (*it)->sup())
+        {
             break;
         }
     }
-    if (it != localRegs.end()) {
+    if (it != localRegs.end())
+    {
         SS rsup = (*it)->sup();
         partition.additive_substraction(**it);
         localRegs.erase(it);
         set<string>::const_iterator ite;
-        for(ite=localEvs.begin(); ite!=localEvs.end(); ++ite) {
-            if (tr_map[*ite]->get_er() <= rsup) {
+        for(ite=localEvs.begin(); ite!=localEvs.end(); ++ite)
+        {
+            if (tr_map[*ite]->get_er() <= rsup)
+            {
                 flow_map[*ite]++;
             }
-            if (tr_map[*ite]->get_sr() <= rsup) {
+            if (tr_map[*ite]->get_sr() <= rsup)
+            {
                 flow_map[*ite]--;
             }
         }
     }
 }
 
-bool generate_conservative_cover(TRel &tr, int kmax, const SS &state_space, const SS &initial_state, list<Region *> &minregs) {
+bool generate_conservative_cover(TRel &tr, int kmax, const SS &state_space, const SS &initial_state, list<Region *> &minregs)
+{
 
     set<string> Evs, problem_events;
     map<string,EvTRel *> tr_map = tr.get_map_trs();
     map<string,EvTRel *>::const_iterator itm;
-    for(itm=tr_map.begin(); itm != tr_map.end(); ++itm) {
+    for(itm=tr_map.begin(); itm != tr_map.end(); ++itm)
+    {
         Evs.insert(itm->first);
     }
 
     vector<list<Region *> > CCs(10);
     int i = 0;
-    do {
+    do
+    {
         string cover_event = *(Evs.begin());
         set<string> localEvs;
         localEvs.insert(cover_event);
 //		cout << "event a cobrir: " << cover_event << endl;
         CCs[i] = find_conservative_component(tr_map[cover_event],tr,kmax ,state_space,localEvs,minregs,problem_events);
 //		cout << "Found a conservative component with " << CCs[i].size() << " places" << endl;
-        if (not CCs[i].empty())	{
+        if (not CCs[i].empty())
+        {
             cout << endl << endl << "# Conservative component " << i << " --------------------"<< endl;
             print_cc(CCs[i],tr,initial_state,kmax,localEvs);
             ++i;
@@ -103,8 +122,10 @@ bool generate_conservative_cover(TRel &tr, int kmax, const SS &state_space, cons
 
         if (i>=10) CCs.resize(CCs.size() + 10);
 
-    } while (not Evs.empty());
-    if (not problem_events.empty()) {
+    }
+    while (not Evs.empty());
+    if (not problem_events.empty())
+    {
         list<Region *> cc_problem;
         print_cc(cc_problem,tr,initial_state,kmax,problem_events);
     }
@@ -114,12 +135,14 @@ bool generate_conservative_cover(TRel &tr, int kmax, const SS &state_space, cons
 
 list<Region *>
 find_conservative_component(EvTRel *tr_ev,TRel &tr, int kmax, const SS &state_space,set<string> &localEvs, list<Region *> &minregs,
-                            set<string> &problem_events) {
+                            set<string> &problem_events)
+{
     map<string,bool> event_covered_cc;
     map<string,EvTRel *> tr_map = tr.get_map_trs();
     map<string,int> flow_map;
     map<string,EvTRel *>::const_iterator itm;
-    for(itm=tr_map.begin(); itm != tr_map.end(); ++itm) {
+    for(itm=tr_map.begin(); itm != tr_map.end(); ++itm)
+    {
         event_covered_cc[itm->first] = false;
         flow_map[itm->first] = 0;
     }
@@ -129,7 +152,8 @@ find_conservative_component(EvTRel *tr_ev,TRel &tr, int kmax, const SS &state_sp
     Region partition(SS(0));
     // covering the pre-set
     Region *r = find_cc_region(*(localEvs.begin()),tr,tr_ev->get_er(),partition,state_space,kmax,localRegs,minregs,flow_map);
-    if (r == NULL) {
+    if (r == NULL)
+    {
         /*		cout << "PROBLEM: couldnt find a region covering event " << *(localEvs.begin()) << endl;
         		exit(1);*/
         problem_events.insert(*(localEvs.begin()));
@@ -143,27 +167,33 @@ find_conservative_component(EvTRel *tr_ev,TRel &tr, int kmax, const SS &state_sp
 
     // covering the post-set
     r = find_cc_region(*(localEvs.begin()),tr,tr_ev->get_sr(),partition,state_space,kmax,localRegs,minregs,flow_map);
-    if (r != NULL) {
+    if (r != NULL)
+    {
         Pending.push_back(r);
         localRegs.push_back(r);
         partition.additive_union(*r,kmax);
     }
     update_covering_event(*(localEvs.begin()),tr_map,flow_map,localRegs);
 
-    while (not Pending.empty()) {
+    while (not Pending.empty())
+    {
         r = Pending.front();
         Pending.pop_front();
         SS rsup = r->sup();
-        for(itm=tr_map.begin(); itm != tr_map.end(); ++itm) {
+        for(itm=tr_map.begin(); itm != tr_map.end(); ++itm)
+        {
             bool event_involved = false;
-            if (itm->second->get_er() <= rsup or itm->second->get_sr() <= rsup /*(not rsup.Intersect(itm->second->get_sr()).is_empty())*/) {
-                if (not event_covered_cc[itm->first]) {
+            if (itm->second->get_er() <= rsup or itm->second->get_sr() <= rsup /*(not rsup.Intersect(itm->second->get_sr()).is_empty())*/)
+            {
+                if (not event_covered_cc[itm->first])
+                {
 //					cout << "    event involved:" << itm->first <<endl;
                     event_involved = true;
                     localEvs.insert(itm->first);
                     update_covering_event(itm->first, tr_map,flow_map,localRegs);
                     r = find_cc_region(itm->first,tr,itm->second->get_er(),partition,state_space,kmax,localRegs,minregs,flow_map);
-                    if (r != NULL) {
+                    if (r != NULL)
+                    {
                         event_covered_cc[itm->first]=true;
                         Pending.push_back(r);
                         localRegs.push_back(r);
@@ -173,7 +203,8 @@ find_conservative_component(EvTRel *tr_ev,TRel &tr, int kmax, const SS &state_sp
                     }
 
                     r = find_cc_region(itm->first,tr,itm->second->get_sr(),partition,state_space,kmax,localRegs,minregs,flow_map);
-                    if (r != NULL) {
+                    if (r != NULL)
+                    {
                         event_covered_cc[itm->first]=true;
                         Pending.push_back(r);
                         localRegs.push_back(r);
@@ -184,12 +215,15 @@ find_conservative_component(EvTRel *tr_ev,TRel &tr, int kmax, const SS &state_sp
 
                     // now forces the conservative condition to hold on the event
                     bool progress = true;
-                    while (flow_map[itm->first]!= 0 and progress) {
+                    while (flow_map[itm->first]!= 0 and progress)
+                    {
                         cout << " Trying to add regions to balance " << itm->first << endl;
                         progress = false;
-                        if (flow_map[itm->first] > 0) {
+                        if (flow_map[itm->first] > 0)
+                        {
                             r = find_cc_newregion(itm->first,tr,itm->second->get_er(),partition,state_space,kmax,localRegs,minregs,flow_map);
-                            if (r != NULL) {
+                            if (r != NULL)
+                            {
 //								cout << "   adding a preregion\n";
                                 Pending.push_back(r);
                                 localRegs.push_back(r);
@@ -198,9 +232,11 @@ find_conservative_component(EvTRel *tr_ev,TRel &tr, int kmax, const SS &state_sp
                                 progress = true;
                             }
                         }
-                        else {
+                        else
+                        {
                             r = find_cc_newregion(itm->first,tr,itm->second->get_sr(),partition,state_space,kmax,localRegs,minregs,flow_map);
-                            if (r != NULL) {
+                            if (r != NULL)
+                            {
 //								cout << "   adding a postregion\n";
                                 Pending.push_back(r);
                                 localRegs.push_back(r);
@@ -212,12 +248,15 @@ find_conservative_component(EvTRel *tr_ev,TRel &tr, int kmax, const SS &state_sp
                     }
 
                     // if no addition can be done, then iteratively remove regions to force conservativeness
-                    while (flow_map[itm->first]!= 0 ) {
-                        if (flow_map[itm->first] > 0) {
+                    while (flow_map[itm->first]!= 0 )
+                    {
+                        if (flow_map[itm->first] > 0)
+                        {
 //							cout << "Removing a post covering for " << itm->first << endl;
                             remove_covering_region(itm->first,tr_map,itm->second->get_sr(),partition,state_space,localRegs,localEvs,flow_map);
                         }
-                        else {
+                        else
+                        {
 //							cout << "Removing a pre covering for " << itm->first << endl;
                             remove_covering_region(itm->first,tr_map,itm->second->get_er(),partition,state_space,localRegs,localEvs,flow_map);
                         }
@@ -229,18 +268,22 @@ find_conservative_component(EvTRel *tr_ev,TRel &tr, int kmax, const SS &state_sp
         }
     }
 
-    for(itm=tr_map.begin(); itm != tr_map.end(); ++itm) {
+    for(itm=tr_map.begin(); itm != tr_map.end(); ++itm)
+    {
 
 //		if (flow_map[itm->first] != 0) cout << "Event " << itm->first << " unbalanced: " << flow_map[itm->first]<< "\n";
 
         // now forces the conservative condition to hold on the event
         bool progress = true;
-        while (flow_map[itm->first]!= 0 and progress) {
+        while (flow_map[itm->first]!= 0 and progress)
+        {
             cout << " Trying to add regions to balance " << itm->first << endl;
             progress = false;
-            if (flow_map[itm->first] > 0) {
+            if (flow_map[itm->first] > 0)
+            {
                 r = find_cc_newregion(itm->first,tr,itm->second->get_er(),partition,state_space,kmax,localRegs,minregs,flow_map);
-                if (r != NULL) {
+                if (r != NULL)
+                {
 //					cout << "   adding a preregion\n";
                     Pending.push_back(r);
                     localRegs.push_back(r);
@@ -249,9 +292,11 @@ find_conservative_component(EvTRel *tr_ev,TRel &tr, int kmax, const SS &state_sp
                     progress = true;
                 }
             }
-            else {
+            else
+            {
                 r = find_cc_newregion(itm->first,tr,itm->second->get_sr(),partition,state_space,kmax,localRegs,minregs,flow_map);
-                if (r != NULL) {
+                if (r != NULL)
+                {
 //					cout << "   adding a postregion\n";
                     Pending.push_back(r);
                     localRegs.push_back(r);
@@ -263,12 +308,15 @@ find_conservative_component(EvTRel *tr_ev,TRel &tr, int kmax, const SS &state_sp
         }
 
         // if no addition can be done, then iteratively remove regions to force conservativeness
-        while (flow_map[itm->first]!= 0 ) {
-            if (flow_map[itm->first] > 0) {
+        while (flow_map[itm->first]!= 0 )
+        {
+            if (flow_map[itm->first] > 0)
+            {
 //				cout << "Removing a post covering for " << itm->first << endl;
                 remove_covering_region(itm->first,tr_map,itm->second->get_sr(),partition,state_space,localRegs,localEvs,flow_map);
             }
-            else {
+            else
+            {
 //				cout << "Removing a pre covering for " << itm->first << endl;
                 remove_covering_region(itm->first,tr_map,itm->second->get_er(),partition,state_space,localRegs,localEvs,flow_map);
             }
@@ -284,17 +332,21 @@ find_conservative_component(EvTRel *tr_ev,TRel &tr, int kmax, const SS &state_sp
 
 Region *
 find_cc_region(string /*event*/,TRel &tr,const SS &cover, Region &partition, const SS &state_space,int kmax,
-               list<Region *> &locregs, list<Region *> &minregs,map<string,int> &/*flow_map*/, bool accept_existing) {
+               list<Region *> &locregs, list<Region *> &minregs,map<string,int> &/*flow_map*/, bool accept_existing)
+{
 //	if (not er.Intersect(partition).is_empty()) return NULL;
 
     if (not partition.test_additive_union(Region(cover),kmax)) return NULL;
 
     //check whether a precomputed region exists in the component
-    if (accept_existing) {
+    if (accept_existing)
+    {
         list<Region *>::const_iterator it;
-        for(it=locregs.begin(); it !=locregs.end(); ++it) {
+        for(it=locregs.begin(); it !=locregs.end(); ++it)
+        {
             Region *r = *it;
-            if (r->sup() >= cover and partition.test_additive_union(*r,kmax)) {
+            if (r->sup() >= cover and partition.test_additive_union(*r,kmax))
+            {
                 return NULL;
             }
         }
@@ -302,9 +354,11 @@ find_cc_region(string /*event*/,TRel &tr,const SS &cover, Region &partition, con
 
     //check whether a precomputed region can be used
     list<Region *>::const_iterator it;
-    for(it=minregs.begin(); it !=minregs.end(); ++it) {
+    for(it=minregs.begin(); it !=minregs.end(); ++it)
+    {
         Region *r = *it;
-        if (r->sup() >= cover and partition.test_additive_union(*r,kmax)) {
+        if (r->sup() >= cover and partition.test_additive_union(*r,kmax))
+        {
             return r;
         }
     }
@@ -313,12 +367,14 @@ find_cc_region(string /*event*/,TRel &tr,const SS &cover, Region &partition, con
     P.push(new Region(cover));
     Region *result = NULL;
     hash_map<Region*, bool, hashRegion, KeysReg> cache_generate_local;
-    while(not P.empty()) {
+    while(not P.empty())
+    {
         Region *r = P.front();
         P.pop();
 
         string violating_event = r->choose_event_non_constant_gradient(tr);
-        if (violating_event  != "") {
+        if (violating_event  != "")
+        {
 
             int gmin, gmax;
             r->corner_gradients(violating_event,tr,gmin,gmax);
@@ -328,16 +384,20 @@ find_cc_region(string /*event*/,TRel &tr,const SS &cover, Region &partition, con
             //cout << "--  Extending arcs leaving for " << violating_event << " with g= " << g << endl;
             bool b = r1->extend_arcs_leaving(violating_event,g,kmax,tr);
             if (not b) delete r1;
-            else {
+            else
+            {
                 if (b and  (cache_generate_local.find(r1) == cache_generate_local.end()) and partition.test_additive_union(*r1,kmax)
-                        and not(r1->proper(state_space))) {
+                        and not(r1->proper(state_space)))
+                {
                     cache_generate_local[r1] = true;
-                    if (r1->is_region(tr,false)) {
+                    if (r1->is_region(tr,false))
+                    {
                         minregs.push_back(r1);
                         result = r1;//cout << "   1.regio\n";r1->print();
                         break;
                     }
-                    else {
+                    else
+                    {
                         P.push(r1);
                     }
                 }
@@ -348,30 +408,36 @@ find_cc_region(string /*event*/,TRel &tr,const SS &cover, Region &partition, con
             //cout << "--  Extending arcs entering for " << violating_event << " with g= " << g +1 << endl;
             b = r2->extend_arcs_entering(violating_event,g+1,kmax,tr);
             if (not b) delete r2;
-            else {
+            else
+            {
                 if (b and (cache_generate_local.find(r2) == cache_generate_local.end()) and partition.test_additive_union(*r2,kmax)
-                        and not(r2->proper(state_space)) ) {
+                        and not(r2->proper(state_space)) )
+                {
                     cache_generate_local[r2] = true;
-                    if (r2->is_region(tr,false)) {
+                    if (r2->is_region(tr,false))
+                    {
                         minregs.push_back(r2);
                         result = r2; //cout << "   2.regio\n";r2->print();
                         break;
                     }
-                    else {
+                    else
+                    {
                         P.push(r2);
                     }
                 }
                 else delete r2;
             }
         }
-        else {
+        else
+        {
             minregs.push_back(r);
             result = r;
             break;
         }
     }
 
-    while (not P.empty()) {
+    while (not P.empty())
+    {
         Region *r = P.front();
         P.pop();
         delete r;
@@ -382,7 +448,8 @@ find_cc_region(string /*event*/,TRel &tr,const SS &cover, Region &partition, con
 
 Region *
 find_cc_newregion(string /*event*/,TRel &tr,const SS &cover, Region &partition, const SS &state_space,int kmax,
-                  list<Region *> &locregs, list<Region *> &minregs,map<string,int> &/*flow_map*/) {
+                  list<Region *> &locregs, list<Region *> &minregs,map<string,int> &/*flow_map*/)
+{
 //	assert(er.Intersect(partition).is_empty());
 //	if (not sr.Intersect(partition).is_empty()) return NULL;
     if (not partition.test_additive_union(Region(cover),kmax)) return NULL;
@@ -390,12 +457,15 @@ find_cc_newregion(string /*event*/,TRel &tr,const SS &cover, Region &partition, 
 
     //check whether a precomputed region can be used
     list<Region *>::const_iterator it;
-    for(it=minregs.begin(); it !=minregs.end(); ++it) {
+    for(it=minregs.begin(); it !=minregs.end(); ++it)
+    {
         Region *r = *it;
-        if (r->sup() >= cover and partition.test_additive_union(*r,kmax)) {
+        if (r->sup() >= cover and partition.test_additive_union(*r,kmax))
+        {
             list<Region *>::const_iterator it;
             bool exist = false;
-            for(it=locregs.begin(); it!=locregs.end() and not exist; ++it) {
+            for(it=locregs.begin(); it!=locregs.end() and not exist; ++it)
+            {
                 if ((**it) == (*r)) exist=true;
             }
             if (not exist) return r;
@@ -407,12 +477,14 @@ find_cc_newregion(string /*event*/,TRel &tr,const SS &cover, Region &partition, 
     P.push(new Region(cover));
     Region *result = NULL;
     hash_map<Region*, bool, hashRegion, KeysReg> cache_generate_local;
-    while(not P.empty()) {
+    while(not P.empty())
+    {
         Region *r = P.front();
         P.pop();
 
         string violating_event = r->choose_event_non_constant_gradient(tr);
-        if (violating_event  != "") {
+        if (violating_event  != "")
+        {
 
             int gmin, gmax;
             r->corner_gradients(violating_event,tr,gmin,gmax);
@@ -422,23 +494,29 @@ find_cc_newregion(string /*event*/,TRel &tr,const SS &cover, Region &partition, 
             //cout << "--  Extending arcs leaving for " << violating_event << " with g= " << g << endl;
             bool b = r1->extend_arcs_leaving(violating_event,g,kmax,tr);
             if (not b) delete r1;
-            else {
+            else
+            {
                 if (b and  (cache_generate_local.find(r1) == cache_generate_local.end()) and partition.test_additive_union(*r1,kmax)
-                        and not(r1->proper(state_space))) {
+                        and not(r1->proper(state_space)))
+                {
                     cache_generate_local[r1] = true;
-                    if (r1->is_region(tr,false)) {
+                    if (r1->is_region(tr,false))
+                    {
                         bool exist = false;
                         list<Region *>::const_iterator it;
-                        for(it=locregs.begin(); it!=locregs.end() and not exist; ++it) {
+                        for(it=locregs.begin(); it!=locregs.end() and not exist; ++it)
+                        {
                             if ((**it) == (*r1)) exist=true;
                         }
-                        if (not exist) {
+                        if (not exist)
+                        {
                             minregs.push_back(r1);
                             result = r1;//cout << "   1.regio\n";r1->print();
                             break;
                         }
                     }
-                    else {
+                    else
+                    {
                         P.push(r1);
                     }
                 }
@@ -449,30 +527,37 @@ find_cc_newregion(string /*event*/,TRel &tr,const SS &cover, Region &partition, 
             //cout << "--  Extending arcs entering for " << violating_event << " with g= " << g +1 << endl;
             b = r2->extend_arcs_entering(violating_event,g+1,kmax,tr);
             if (not b) delete r2;
-            else {
+            else
+            {
                 if (b and (cache_generate_local.find(r2) == cache_generate_local.end()) and partition.test_additive_union(*r2,kmax)
-                        and not(r2->proper(state_space))) {
+                        and not(r2->proper(state_space)))
+                {
                     cache_generate_local[r2] = true;
-                    if (r2->is_region(tr,false)) {
+                    if (r2->is_region(tr,false))
+                    {
                         bool exist = false;
                         list<Region *>::const_iterator it;
-                        for(it=locregs.begin(); it!=locregs.end() and not exist; ++it) {
+                        for(it=locregs.begin(); it!=locregs.end() and not exist; ++it)
+                        {
                             if ((**it) == (*r2)) exist=true;
                         }
-                        if (not exist) {
+                        if (not exist)
+                        {
                             minregs.push_back(r2);
                             result = r2; //cout << "   2.regio\n";r2->print();
                             break;
                         }
                     }
-                    else {
+                    else
+                    {
                         P.push(r2);
                     }
                 }
                 else delete r2;
             }
         }
-        else {
+        else
+        {
 //			cout << "3.regio\n";r->print();
             minregs.push_back(r);
             result = r;
@@ -480,7 +565,8 @@ find_cc_newregion(string /*event*/,TRel &tr,const SS &cover, Region &partition, 
         }
     }
 
-    while (not P.empty()) {
+    while (not P.empty())
+    {
         Region *r = P.front();
         P.pop();
         delete r;
@@ -490,25 +576,29 @@ find_cc_newregion(string /*event*/,TRel &tr,const SS &cover, Region &partition, 
 }
 
 
-bool generate_conservative_sm_cover(TRel &tr, int /*kmax*/, const SS &state_space, const SS &initial_state, list<Region *> &minregs) {
+bool generate_conservative_sm_cover(TRel &tr, int /*kmax*/, const SS &state_space, const SS &initial_state, list<Region *> &minregs)
+{
 
     set<string> Evs, problem_events;
     map<string,EvTRel *> tr_map = tr.get_map_trs();
     map<string,EvTRel *>::const_iterator itm;
-    for(itm=tr_map.begin(); itm != tr_map.end(); ++itm) {
+    for(itm=tr_map.begin(); itm != tr_map.end(); ++itm)
+    {
         Evs.insert(itm->first);
     }
 
     vector<list<Region *> > CCs(10);
     int i = 0;
-    do {
+    do
+    {
         string cover_event = *(Evs.begin());
         set<string> localEvs;
         localEvs.insert(cover_event);
         //cout << "event a cobrir: " << cover_event << endl;
         CCs[i] = find_sm(tr_map[cover_event],tr,/* kmax */1,state_space,localEvs,minregs,problem_events);
 //		cout << "Found a conservative component with " << CCs[i-1].size() << " places" << endl;
-        if (not CCs[i].empty())	{
+        if (not CCs[i].empty())
+        {
             cout << endl << endl << "# State machine " << i << " --------------------"<< endl;
             print_cc(CCs[i],tr,initial_state,1,localEvs);
             ++i;
@@ -520,8 +610,10 @@ bool generate_conservative_sm_cover(TRel &tr, int /*kmax*/, const SS &state_spac
 
         if (i>=10) CCs.resize(CCs.size() + 10);
 
-    } while (not Evs.empty());
-    if (not problem_events.empty()) {
+    }
+    while (not Evs.empty());
+    if (not problem_events.empty())
+    {
         list<Region *> cc_problem;
         print_cc(cc_problem,tr,initial_state,1,problem_events);
     }
@@ -532,11 +624,13 @@ bool generate_conservative_sm_cover(TRel &tr, int /*kmax*/, const SS &state_spac
 
 list<Region *>
 find_sm(EvTRel *tr_ev,TRel &tr, int /*kmax*/, const SS &state_space,set<string> &localEvs, list<Region *> &minregs,
-        set<string> &problem_events) {
+        set<string> &problem_events)
+{
     map<string,bool> event_covered_cc;
     map<string,EvTRel *> tr_map = tr.get_map_trs();
     map<string,EvTRel *>::const_iterator itm;
-    for(itm=tr_map.begin(); itm != tr_map.end(); ++itm) {
+    for(itm=tr_map.begin(); itm != tr_map.end(); ++itm)
+    {
         event_covered_cc[itm->first] = false;
     }
 
@@ -546,7 +640,8 @@ find_sm(EvTRel *tr_ev,TRel &tr, int /*kmax*/, const SS &state_space,set<string> 
 
     // covering the pre-set
     Region *r = find_sm_region(tr,tr_ev->get_er(),partition,state_space,/*kmax*/1,localRegs,minregs);
-    if (r == NULL) {
+    if (r == NULL)
+    {
         /*		cout << "PROBLEM: couldnt find a region covering event " << *(localEvs.begin()) << endl;
         		exit(1);*/
         problem_events.insert(*(localEvs.begin()));
@@ -559,24 +654,30 @@ find_sm(EvTRel *tr_ev,TRel &tr, int /*kmax*/, const SS &state_space,set<string> 
 
     // covering the post-set
     r = find_sm_region(tr,tr_ev->get_sr(),partition,state_space,/*kmax*/1,localRegs,minregs);
-    if (r != NULL) {
+    if (r != NULL)
+    {
         Pending.push_back(r);
         localRegs.push_back(r);
         partition += r->sup();
     }
 
-    while (not Pending.empty()) {
+    while (not Pending.empty())
+    {
         r = Pending.front();
         Pending.pop_front();
         SS rsup = r->sup();
-        for(itm=tr_map.begin(); itm != tr_map.end(); ++itm) {
+        for(itm=tr_map.begin(); itm != tr_map.end(); ++itm)
+        {
             bool event_involved = false;
-            if (itm->second->get_er() <= rsup or itm->second->get_sr() <= rsup /*(not rsup.Intersect(itm->second->get_sr()).is_empty())*/) {
-                if (not event_covered_cc[itm->first]) {
+            if (itm->second->get_er() <= rsup or itm->second->get_sr() <= rsup /*(not rsup.Intersect(itm->second->get_sr()).is_empty())*/)
+            {
+                if (not event_covered_cc[itm->first])
+                {
                     event_involved = true;
                     localEvs.insert(itm->first);
                     r = find_sm_region(tr,itm->second->get_er(),partition,state_space,/*kmax*/1,localRegs,minregs);
-                    if (r != NULL) {
+                    if (r != NULL)
+                    {
                         event_covered_cc[itm->first]=true;
                         Pending.push_back(r);
                         localRegs.push_back(r);
@@ -584,7 +685,8 @@ find_sm(EvTRel *tr_ev,TRel &tr, int /*kmax*/, const SS &state_space,set<string> 
                     }
 
                     r = find_sm_region(tr,itm->second->get_sr(),partition,state_space,/*kmax*/1,localRegs,minregs);
-                    if (r != NULL) {
+                    if (r != NULL)
+                    {
                         event_covered_cc[itm->first]=true;
                         Pending.push_back(r);
                         localRegs.push_back(r);
@@ -605,7 +707,8 @@ find_sm(EvTRel *tr_ev,TRel &tr, int /*kmax*/, const SS &state_space,set<string> 
 }
 
 Region *
-find_sm_region(TRel &tr,const SS &sr, const SS &partition, const SS &state_space,int kmax, list<Region *> &locregs, list<Region *> &minregs) {
+find_sm_region(TRel &tr,const SS &sr, const SS &partition, const SS &state_space,int kmax, list<Region *> &locregs, list<Region *> &minregs)
+{
 //	assert(er.Intersect(partition).is_empty());
 
 
@@ -613,13 +716,15 @@ find_sm_region(TRel &tr,const SS &sr, const SS &partition, const SS &state_space
 
     //check whether a precomputed region exists in the component
     list<Region *>::const_iterator it;
-    for(it=locregs.begin(); it !=locregs.end(); ++it) {
+    for(it=locregs.begin(); it !=locregs.end(); ++it)
+    {
         Region *r = *it;
         if (r->sup() >= sr and partition.Intersect(r->sup()).is_empty()) return NULL;
     }
 
     //check whether a precomputed region can be used
-    for(it=minregs.begin(); it !=minregs.end(); ++it) {
+    for(it=minregs.begin(); it !=minregs.end(); ++it)
+    {
         Region *r = *it;
         if (r->sup() >= sr and partition.Intersect(r->sup()).is_empty()) return r;
     }
@@ -628,12 +733,14 @@ find_sm_region(TRel &tr,const SS &sr, const SS &partition, const SS &state_space
     P.push(new Region(sr));
     Region *result = NULL;
     hash_map<Region*, bool, hashRegion, KeysReg> cache_generate_local;
-    while(not P.empty()) {
+    while(not P.empty())
+    {
         Region *r = P.front();
         P.pop();
 
         string violating_event = r->choose_event_non_constant_gradient(tr);
-        if (violating_event  != "") {
+        if (violating_event  != "")
+        {
 
             int gmin, gmax;
             r->corner_gradients(violating_event,tr,gmin,gmax);
@@ -643,11 +750,14 @@ find_sm_region(TRel &tr,const SS &sr, const SS &partition, const SS &state_space
             //cout << "--  Extending arcs leaving for " << violating_event << " with g= " << g << endl;
             bool b = r1->extend_arcs_leaving(violating_event,g,kmax,tr);
             if (not b) delete r1;
-            else {
+            else
+            {
                 if (b and  (cache_generate_local.find(r1) == cache_generate_local.end()) and partition.Intersect(r1->sup()).is_empty()
-                        and not(r1->proper(state_space))) {
+                        and not(r1->proper(state_space)))
+                {
                     cache_generate_local[r1] = true;
-                    if (r1->is_region(tr,false)) {
+                    if (r1->is_region(tr,false))
+                    {
                         minregs.push_back(r1);
                         result = r1;//cout << "   1.regio\n";r1->print();
                         break;
@@ -666,7 +776,8 @@ find_sm_region(TRel &tr,const SS &sr, const SS &partition, const SS &state_space
                         	  			 }
                         */
                     }
-                    else {
+                    else
+                    {
                         P.push(r1);
                     }
                 }
@@ -677,11 +788,14 @@ find_sm_region(TRel &tr,const SS &sr, const SS &partition, const SS &state_space
             //cout << "--  Extending arcs entering for " << violating_event << " with g= " << g +1 << endl;
             b = r2->extend_arcs_entering(violating_event,g+1,kmax,tr);
             if (not b) delete r2;
-            else {
+            else
+            {
                 if (b and (cache_generate_local.find(r2) == cache_generate_local.end()) and partition.Intersect(r2->sup()).is_empty()
-                        and not(r2->proper(state_space))) {
+                        and not(r2->proper(state_space)))
+                {
                     cache_generate_local[r2] = true;
-                    if (r2->is_region(tr,false)) {
+                    if (r2->is_region(tr,false))
+                    {
                         minregs.push_back(r2);
                         result = r2; //cout << "   2.regio\n";r2->print();
                         break;
@@ -700,14 +814,16 @@ find_sm_region(TRel &tr,const SS &sr, const SS &partition, const SS &state_space
                         	  				}
                         */
                     }
-                    else {
+                    else
+                    {
                         P.push(r2);
                     }
                 }
                 else delete r2;
             }
         }
-        else {
+        else
+        {
             //cout << "			3.regio\n";r->print();
             minregs.push_back(r);
             result = r;
@@ -729,7 +845,8 @@ find_sm_region(TRel &tr,const SS &sr, const SS &partition, const SS &state_space
         }
     }
 
-    while (not P.empty()) {
+    while (not P.empty())
+    {
         Region *r = P.front();
         P.pop();
         delete r;
@@ -738,7 +855,8 @@ find_sm_region(TRel &tr,const SS &sr, const SS &partition, const SS &state_space
     return result;
 }
 
-void print_cc(const list<Region *> &locregs,TRel &tr, const SS &initial, int KMAX,const set<string> &localEvs) {
+void print_cc(const list<Region *> &locregs,TRel &tr, const SS &initial, int KMAX,const set<string> &localEvs)
+{
     int pnumber = 0;
     map<Region *, string> places;
     map<string,int> marking;
@@ -751,12 +869,14 @@ void print_cc(const list<Region *> &locregs,TRel &tr, const SS &initial, int KMA
 
 //	bool notsafe = false;
     list<Region *>::const_iterator itmr;
-    for(itmr = locregs.begin(); itmr != locregs.end(); ++itmr) {
+    for(itmr = locregs.begin(); itmr != locregs.end(); ++itmr)
+    {
 //(*itmr)->print();
         std::ostringstream o;
         if (!(o << pnumber++)) cout << "Problems when converting an integer to a string\n";
         places[*itmr] = "p" + o.str();
-        if ((*itmr)->cardinality(initial)) {
+        if ((*itmr)->cardinality(initial))
+        {
             marking[places[*itmr]] = (*itmr)->cardinality(initial);
 //			if (marking[places[*itmr]] > 1) notsafe = true;
         }
@@ -766,7 +886,8 @@ void print_cc(const list<Region *> &locregs,TRel &tr, const SS &initial, int KMA
     map <EvTRel *, map<Region *,bool> > selfloop_red;
     // arcs from places to transitions
     map<string,map<string,bool> > eventtoplaces;
-    for(ittr = events_tr.begin(); ittr != events_tr.end(); ++ittr) {
+    for(ittr = events_tr.begin(); ittr != events_tr.end(); ++ittr)
+    {
 
         if (localEvs.find(ittr->first) == localEvs.end()) continue;
 
@@ -774,11 +895,14 @@ void print_cc(const list<Region *> &locregs,TRel &tr, const SS &initial, int KMA
         SS er_event = tr.get_event_tr(event)->get_er();
         list<Region *> pre_regions = compute_preregions(locregs,tr,er_event);
         bool pre_arc_inserted = false;
-        for(itmr = pre_regions.begin(); itmr != pre_regions.end(); ++itmr) {
-            if (not essential_arc(pre_regions,selfloop_red[tr.get_event_tr(event)],*itmr,tr.get_event_tr(event))) {
+        for(itmr = pre_regions.begin(); itmr != pre_regions.end(); ++itmr)
+        {
+            if (not essential_arc(pre_regions,selfloop_red[tr.get_event_tr(event)],*itmr,tr.get_event_tr(event)))
+            {
                 //				cout << "event " << event << " is not connected to " << places[*itmr] <<  " " << pre_regions.size() <<endl;
             }
-            else {
+            else
+            {
                 pre_arc_inserted = true;
                 Region *r = *itmr;
                 Region max_topset = r->compute_max_enabling_topset(er_event);
@@ -791,7 +915,8 @@ void print_cc(const list<Region *> &locregs,TRel &tr, const SS &initial, int KMA
                 r->corner_gradients(event,tr, k1, k2);
                 if (k1 != k2) r->print();
                 assert(k1==k2);
-                if (k1 > -k) {
+                if (k1 > -k)
+                {
 //	cout << "# arc(II) " << event <<  " k: " << k << " k1: " << k1  << " -->" << places[r]  << endl;
 //  r->print();
                     eventtoplaces[event][places[r]] = true;
@@ -806,21 +931,25 @@ void print_cc(const list<Region *> &locregs,TRel &tr, const SS &initial, int KMA
     }
 
     // arcs from transitions to places
-    for(ittr = events_tr.begin(); ittr != events_tr.end(); ++ittr) {
+    for(ittr = events_tr.begin(); ittr != events_tr.end(); ++ittr)
+    {
 
         if (localEvs.find(ittr->first) == localEvs.end()) continue;
 
         string event = ittr->first;
         SS er_event = tr.get_event_tr(event)->get_er();
         SS sr_event = tr.get_event_tr(event)->get_sr();
-        for(itmr = locregs.begin(); itmr != locregs.end(); ++itmr) {
+        for(itmr = locregs.begin(); itmr != locregs.end(); ++itmr)
+        {
             Region *r = *itmr;
-            if (sr_event <= r->sup() and not eventtoplaces[event][places[r]]/*and er_event * r->sup() == mgr.bddZero()*/) {
+            if (sr_event <= r->sup() and not eventtoplaces[event][places[r]]/*and er_event * r->sup() == mgr.bddZero()*/)
+            {
                 int k1,k2;
 //				r->recheck_gradients(tr,false);
                 r->corner_gradients(event,tr, k1, k2);
                 assert(k1 == k2);
-                if (k1>0) {
+                if (k1>0)
+                {
                     //cout << "arc " << event <<  " -- " << k1 << " -->" << places[r]  << endl;
                     cout << event << " " << places[r];
                     if (k1>1) cout << "(" << k1 << ") ";
@@ -830,11 +959,13 @@ void print_cc(const list<Region *> &locregs,TRel &tr, const SS &initial, int KMA
         }
     }
 
-    if (KMAX > 1) {
+    if (KMAX > 1)
+    {
 
         cout << ".capacity ";
         list<Region *>::const_iterator itmr;
-        for(itmr = locregs.begin(); itmr != locregs.end(); ++itmr) {
+        for(itmr = locregs.begin(); itmr != locregs.end(); ++itmr)
+        {
             cout << " " << places[*itmr] << "=" << KMAX;
         }
         cout <<  endl;
@@ -842,7 +973,8 @@ void print_cc(const list<Region *> &locregs,TRel &tr, const SS &initial, int KMA
 
     cout << ".marking {";
     map<string,int>::const_iterator itmark;
-    for(itmark = marking.begin(); itmark != marking.end(); ++itmark) {
+    for(itmark = marking.begin(); itmark != marking.end(); ++itmark)
+    {
         if (itmark->second > 1) cout << " " << itmark->first << "=" << itmark->second;
         else cout << " " << itmark->first;
     }

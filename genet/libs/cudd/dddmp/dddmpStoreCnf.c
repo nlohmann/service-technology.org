@@ -96,7 +96,7 @@ Dddmp_cuddBddStoreCnf (
   DdNode *f                     /* IN: BDD root to be stored */,
   Dddmp_DecompCnfStoreType mode /* IN: format selection */,
   int noHeader                  /* IN: do not store header iff 1 */,
-  char **varNames               /* IN: array of variable names (or NULL) */,
+  char **varNames               /* IN: array of variable names (or (uintptr_t) 0) */,
   int *bddIds                   /* IN: array of var ids */,
   int *bddAuxIds                /* IN: array of BDD node Auxiliary Ids */,
   int *cnfIds                   /* IN: array of CNF var ids */,
@@ -185,7 +185,7 @@ Dddmp_cuddBddArrayStoreCnf (
   int rootN                     /* IN: # output BDD roots to be stored */,
   Dddmp_DecompCnfStoreType mode /* IN: format selection */,
   int noHeader                  /* IN: do not store header iff 1 */,
-  char **varNames               /* IN: array of variable names (or NULL) */,
+  char **varNames               /* IN: array of variable names (or (uintptr_t) 0) */,
   int *bddIds                   /* IN: array of converted var IDs */,
   int *bddAuxIds                /* IN: array of BDD node Auxiliary Ids */,
   int *cnfIds                   /* IN: array of converted var IDs */,
@@ -247,7 +247,7 @@ Dddmp_cuddBddArrayStoreCnf (
     The following arrays: varNames, bddIds, bddAuxIds, and cnfIds 
     fix the correspondence among variable names, BDD ids, BDD 
     auxiliary ids and the ids used to store the CNF problem.
-    All these arrays are automatically created iff NULL.
+    All these arrays are automatically created iff (uintptr_t) 0.
     Auxiliary variable, iff necessary, are created starting from value
     idInitial.
     Iff idInitial is <= 0 its value is selected as the number of internal
@@ -298,10 +298,10 @@ DddmpCuddBddArrayStoreCnf (
   int rootN                      /* IN: # of output BDD roots to be stored */,
   Dddmp_DecompCnfStoreType mode  /* IN: format selection */,
   int noHeader                   /* IN: do not store header iff 1 */,
-  char **varNames                /* IN: array of variable names (or NULL) */,
-  int *bddIds                    /* IN: array of BDD node Ids (or NULL) */,
-  int *bddAuxIds                 /* IN: array of BDD Aux Ids (or NULL) */,
-  int *cnfIds                    /* IN: array of CNF ids (or NULL) */,
+  char **varNames                /* IN: array of variable names (or (uintptr_t) 0) */,
+  int *bddIds                    /* IN: array of BDD node Ids (or (uintptr_t) 0) */,
+  int *bddAuxIds                 /* IN: array of BDD Aux Ids (or (uintptr_t) 0) */,
+  int *cnfIds                    /* IN: array of CNF ids (or (uintptr_t) 0) */,
   int idInitial                  /* IN: starting id for cutting variables */,
   int edgeInTh                   /* IN: Max # Incoming Edges */,
   int pathLengthTh               /* IN: Max Path Length */,
@@ -311,11 +311,11 @@ DddmpCuddBddArrayStoreCnf (
   int *varNewNPtr                /* OUT: number of new variable created */ 
   )
 {
-  DdNode *support = (uintptr_t) NULL;
-  DdNode *scan = (uintptr_t) NULL;
-  int *bddIdsInSupport = (uintptr_t) NULL;
-  int *permIdsInSupport = (uintptr_t) NULL;
-  int *rootStartLine = (uintptr_t) NULL;
+  DdNode *support = (uintptr_t) (uintptr_t) 0;
+  DdNode *scan = (uintptr_t) (uintptr_t) 0;
+  int *bddIdsInSupport = (uintptr_t) (uintptr_t) 0;
+  int *permIdsInSupport = (uintptr_t) (uintptr_t) 0;
+  int *rootStartLine = (uintptr_t) (uintptr_t) 0;
   int nVar, nVarInSupport, retValue, i, j, fileToClose;
   int varMax, clauseN, flagVar, intStringLength;
   int bddIdsToFree = 0;
@@ -328,8 +328,8 @@ DddmpCuddBddArrayStoreCnf (
 
   /*---------------------------- Set Initial Values -------------------------*/
 
-  support = scan = (uintptr_t) NULL;
-  bddIdsInSupport = permIdsInSupport = rootStartLine = (uintptr_t) NULL;
+  support = scan = (uintptr_t) (uintptr_t) 0;
+  bddIdsInSupport = permIdsInSupport = rootStartLine = (uintptr_t) (uintptr_t) 0;
   nVar = ddMgr->size;
   fileToClose = 0;
   sprintf (intString, "%d", INT_MAX);
@@ -337,9 +337,9 @@ DddmpCuddBddArrayStoreCnf (
 
   /*---------- Check if File needs to be opened in the proper mode ----------*/
 
-  if (fp == (uintptr_t) NULL) {
+  if (fp == (uintptr_t) (uintptr_t) 0) {
     fp = fopen (fname, "w");
-    Dddmp_CheckAndGotoLabel (fp==(uintptr_t) NULL, "Error opening file.",
+    Dddmp_CheckAndGotoLabel (fp==(uintptr_t) (uintptr_t) 0, "Error opening file.",
       failure);
     fileToClose = 1;
   }
@@ -348,11 +348,11 @@ DddmpCuddBddArrayStoreCnf (
 
   /* BDD Ids */
   bddIdsInSupport = DDDMP_ALLOC (int, nVar);
-  Dddmp_CheckAndGotoLabel (bddIdsInSupport==(uintptr_t) NULL, "Error allocating memory.",
+  Dddmp_CheckAndGotoLabel (bddIdsInSupport==(uintptr_t) (uintptr_t) 0, "Error allocating memory.",
     failure);
   /* BDD PermIds */
   permIdsInSupport = DDDMP_ALLOC (int, nVar);
-  Dddmp_CheckAndGotoLabel (permIdsInSupport==(uintptr_t) NULL, "Error allocating memory.",
+  Dddmp_CheckAndGotoLabel (permIdsInSupport==(uintptr_t) (uintptr_t) 0, "Error allocating memory.",
     failure);
   /* Support Size (Number of BDD Ids-PermIds */
   nVarInSupport = 0;
@@ -363,16 +363,16 @@ DddmpCuddBddArrayStoreCnf (
 
   /* 
    *  Take the union of the supports of each output function.
-   *  Skip NULL functions.
+   *  Skip (uintptr_t) 0 functions.
    */
 
 
   for (i=0; i<rootN; i++) {
-    if (f[i] == (uintptr_t) NULL) {
+    if (f[i] == (uintptr_t) (uintptr_t) 0) {
       continue;
     }
     support = Cudd_Support (ddMgr, f[i]);
-    Dddmp_CheckAndGotoLabel (support==(uintptr_t) NULL, "NULL support returned.",
+    Dddmp_CheckAndGotoLabel (support==(uintptr_t) (uintptr_t) 0, "(uintptr_t) 0 support returned.",
       failure);
     cuddRef (support);
     scan = support;
@@ -387,7 +387,7 @@ DddmpCuddBddArrayStoreCnf (
     Cudd_RecursiveDeref (ddMgr, support);
   }
   /* so that we do not try to free it in case of failure */
-  support = (uintptr_t) NULL;
+  support = (uintptr_t) (uintptr_t) 0;
 
   /*---------------------------- Start HEADER -------------------------------*/
 
@@ -402,7 +402,7 @@ DddmpCuddBddArrayStoreCnf (
 
   /*-------------------- Generate Bdd IDs IFF necessary ---------------------*/
 
-  if (bddIds == (uintptr_t) NULL) {
+  if (bddIds == (uintptr_t) (uintptr_t) 0) {
     if (noHeader==0) {
       fprintf (fp, "c # Warning: BDD IDs missing ... evaluating them.\n");
       fprintf (fp, "c # \n");
@@ -411,18 +411,18 @@ DddmpCuddBddArrayStoreCnf (
 
     bddIdsToFree = 1;
     bddIds = DDDMP_ALLOC (int, nVar);
-    Dddmp_CheckAndGotoLabel (bddIds==(uintptr_t) NULL, "Error allocating memory.",
+    Dddmp_CheckAndGotoLabel (bddIds==(uintptr_t) (uintptr_t) 0, "Error allocating memory.",
       failure);
 
     /* Get BDD-IDs Directly from Cudd Manager */
     for (i=0; i<nVar; i++) {
       bddIds[i] = i;
     }   
-  } /* end if bddIds == (uintptr_t) NULL */
+  } /* end if bddIds == (uintptr_t) (uintptr_t) 0 */
 
   /*------------------ Generate AUX BDD IDs IF necessary --------------------*/
 
-  if (bddAuxIds == (uintptr_t) NULL) {
+  if (bddAuxIds == (uintptr_t) (uintptr_t) 0) {
     if (noHeader==0) {
       fprintf (fp, "c # Warning: AUX IDs missing ... equal to BDD IDs.\n");
       fprintf (fp, "c #\n");
@@ -431,17 +431,17 @@ DddmpCuddBddArrayStoreCnf (
 
     bddAuxIdsToFree = 1;
     bddAuxIds = DDDMP_ALLOC (int, nVar);
-    Dddmp_CheckAndGotoLabel (bddAuxIds==(uintptr_t) NULL, "Error allocating memory.",
+    Dddmp_CheckAndGotoLabel (bddAuxIds==(uintptr_t) (uintptr_t) 0, "Error allocating memory.",
       failure);
 
     for (i=0; i<nVar; i++) {
       bddAuxIds[i] = bddIds[i];
     }
-  } /* end if cnfIds == (uintptr_t) NULL */
+  } /* end if cnfIds == (uintptr_t) (uintptr_t) 0 */
 
   /*------------------- Generate CNF IDs IF necessary -----------------------*/
 
-  if (cnfIds == (uintptr_t) NULL) {
+  if (cnfIds == (uintptr_t) (uintptr_t) 0) {
     if (noHeader==0) {
       fprintf (fp, "c # Warning: CNF IDs missing ... equal to BDD IDs.\n");
       fprintf (fp, "c #\n");
@@ -450,18 +450,18 @@ DddmpCuddBddArrayStoreCnf (
 
     cnfIdsToFree = 1;
     cnfIds = DDDMP_ALLOC (int, nVar);
-    Dddmp_CheckAndGotoLabel (cnfIds==(uintptr_t) NULL, "Error allocating memory.",
+    Dddmp_CheckAndGotoLabel (cnfIds==(uintptr_t) (uintptr_t) 0, "Error allocating memory.",
       failure);
 
     for (i=0; i<nVar; i++) {
       cnfIds[i] = bddIds[i] + 1;
     }
-  } /* end if cnfIds == (uintptr_t) NULL */
+  } /* end if cnfIds == (uintptr_t) (uintptr_t) 0 */
 
   /*------------------ Generate Var Names IF necessary ----------------------*/
 
   flagVar = 0;
-  if (varNames == (uintptr_t) NULL) {
+  if (varNames == (uintptr_t) (uintptr_t) 0) {
     if (noHeader==0) {
       fprintf (fp,
         "c # Warning: null variable names ... create DUMMY names.\n");
@@ -472,16 +472,16 @@ DddmpCuddBddArrayStoreCnf (
     varNamesToFree = 1;
     varNames = DDDMP_ALLOC (char *, nVar);
     for (i=0; i<nVar; i++) {
-       varNames[i] = (uintptr_t) NULL;       
+       varNames[i] = (uintptr_t) (uintptr_t) 0;       
     }
-    Dddmp_CheckAndGotoLabel (varNames==(uintptr_t) NULL, "Error allocating memory.",
+    Dddmp_CheckAndGotoLabel (varNames==(uintptr_t) (uintptr_t) 0, "Error allocating memory.",
       failure);
 
     flagVar = 1;
   } else {
     /* Protect the user also from partially loaded varNames array !!! */
     for (i=0; i<nVar && flagVar==0; i++) {
-      if (varNames[i] == (uintptr_t) NULL) {
+      if (varNames[i] == (uintptr_t) (uintptr_t) 0) {
         flagVar = 1;
       }
     }
@@ -489,7 +489,7 @@ DddmpCuddBddArrayStoreCnf (
 
   if (flagVar == 1) {
     for (i=0; i<nVar; i++) {
-      if (varNames[i] == (uintptr_t) NULL) {
+      if (varNames[i] == (uintptr_t) (uintptr_t) 0) {
         sprintf (tmpString, "DUMMY%d", bddIds[i]);
         varNames[i] = DDDMP_ALLOC (char, (strlen (tmpString)+1));
         strcpy (varNames[i], tmpString);
@@ -512,7 +512,7 @@ DddmpCuddBddArrayStoreCnf (
     fprintf (fp, "c .nsuppvars %d\n", nVarInSupport);
 
     /* Support Variable Names */
-    if (varNames != (uintptr_t) NULL) {
+    if (varNames != (uintptr_t) (uintptr_t) 0) {
       fprintf (fp, "c .suppvarnames");
       for (i=0; i<nVar; i++) {
         if (bddIdsInSupport[i] >= 0) {
@@ -523,7 +523,7 @@ DddmpCuddBddArrayStoreCnf (
     }
 
     /* Ordered Variable Names */
-    if (varNames != (uintptr_t) NULL) {
+    if (varNames != (uintptr_t) (uintptr_t) 0) {
       fprintf (fp, "c .orderedvarnames");
       for (i=0; i<nVar; i++) {
         fprintf (fp, " %s", varNames[i]);
@@ -625,7 +625,7 @@ DddmpCuddBddArrayStoreCnf (
   clauseN = 0;
   varMax = -1;
   rootStartLine = DDDMP_ALLOC (int, rootN);
-  Dddmp_CheckAndGotoLabel (rootStartLine==(uintptr_t) NULL, "Error allocating memory.",
+  Dddmp_CheckAndGotoLabel (rootStartLine==(uintptr_t) (uintptr_t) 0, "Error allocating memory.",
     failure);
   for (i=0; i<rootN; i++) {
     rootStartLine[i] = (-1);
@@ -724,7 +724,7 @@ DddmpCuddBddArrayStoreCnf (
 
   failure:
 
-    if (support != (uintptr_t) NULL) {
+    if (support != (uintptr_t) (uintptr_t) 0) {
       Cudd_RecursiveDeref (ddMgr, support);
     }
     DDDMP_FREE (bddIdsInSupport);
@@ -784,7 +784,7 @@ StoreCnfNodeByNode (
   int i, idf;
 
   for (i=0; i<rootN; i++) {
-    if (f[i] != (uintptr_t) NULL) {
+    if (f[i] != (uintptr_t) (uintptr_t) 0) {
       if (!cuddIsConstant(Cudd_Regular (f[i]))) {
         /*
          *  Set Starting Line for this Root
@@ -863,7 +863,7 @@ StoreCnfNodeByNodeRecur (
 
 #ifdef DDDMP_DEBUG
   assert(!Cudd_IsComplement(f));
-  assert(f!=(uintptr_t) NULL);
+  assert(f!=(uintptr_t) (uintptr_t) 0);
 #endif
 
   /* If constant, nothing to do. */
@@ -1108,13 +1108,13 @@ StoreCnfMaxtermByMaxterm (
   int i, j, *list;
 
   list = DDDMP_ALLOC (int, ddMgr->size);
-  if (list == (uintptr_t) NULL) {
+  if (list == (uintptr_t) (uintptr_t) 0) {
     ddMgr->errorCode = CUDD_MEMORY_OUT;
     return (DDDMP_FAILURE);
   }
 
   for (i=0; i<rootN; i++) {
-    if (f[i] != (uintptr_t) NULL) {
+    if (f[i] != (uintptr_t) (uintptr_t) 0) {
       if (!cuddIsConstant(Cudd_Regular (f[i]))) {
         for (j=0; j<ddMgr->size; j++) {
           list[j] = 2;
@@ -1173,13 +1173,13 @@ StoreCnfBest (
   int i, j, *list;
 
   list = DDDMP_ALLOC (int, ddMgr->size);
-  if (list == (uintptr_t) NULL) {
+  if (list == (uintptr_t) (uintptr_t) 0) {
     ddMgr->errorCode = CUDD_MEMORY_OUT;
     return (DDDMP_FAILURE);
   }
 
   for (i=0; i<rootN; i++) {
-    if (f[i] != (uintptr_t) NULL) {
+    if (f[i] != (uintptr_t) (uintptr_t) 0) {
       if (!cuddIsConstant(Cudd_Regular (f[i]))) {
         for (j=0; j<ddMgr->size; j++) {
           list[j] = 2;

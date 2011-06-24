@@ -108,7 +108,7 @@ static char rcsid[] DD_UNUSED = "$Id: cuddSolve.c,v 1.12 2004/08/13 18:04:51 fab
   Description [Implements the solution for F(x,y) = 0. The return
   value is the consistency condition. The y variables are the unknowns
   and the remaining variables are the parameters.  Returns the
-  consistency condition if successful; NULL otherwise. Cudd_SolveEqn
+  consistency condition if successful; (uintptr_t) 0 otherwise. Cudd_SolveEqn
   allocates an array and fills it with the indices of the
   unknowns. This array is used by Cudd_VerifySol.]
 
@@ -131,11 +131,11 @@ Cudd_SolveEqn(
     int *temp;
 
     *yIndex = temp = ALLOC(int, n);
-    if (temp == NULL) {
+    if (temp == (uintptr_t) 0) {
 	bdd->errorCode = CUDD_MEMORY_OUT;
 	(void) fprintf(bdd->out,
 		       "Cudd_SolveEqn: Out of memory for yIndex\n");
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     do {
@@ -193,7 +193,7 @@ Cudd_VerifySol(
   Synopsis    [Implements the recursive step of Cudd_SolveEqn.]
 
   Description [Implements the recursive step of Cudd_SolveEqn. 
-  Returns NULL if the intermediate solution blows up
+  Returns (uintptr_t) 0 if the intermediate solution blows up
   or reordering occurs. The parametric solutions are
   stored in the array G.]
 
@@ -236,7 +236,7 @@ cuddSolveEqnRecur(
 	Fm1 = Cudd_Not(Fm1);
 	cuddRef(Fm1);
     } else {
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     Fn = cuddSolveEqnRecur(bdd, Fm1, nextY, G, n, yIndex, i+1);
@@ -244,7 +244,7 @@ cuddSolveEqnRecur(
 	cuddRef(Fn);
     } else {
 	Cudd_RecursiveDeref(bdd, Fm1);
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     Fv = cuddCofactorRecur(bdd, F, variables[yIndex[i]]);
@@ -253,7 +253,7 @@ cuddSolveEqnRecur(
     } else {
 	Cudd_RecursiveDeref(bdd, Fm1);
 	Cudd_RecursiveDeref(bdd, Fn);
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     Fvbar = cuddCofactorRecur(bdd, F, Cudd_Not(variables[yIndex[i]]));
@@ -263,7 +263,7 @@ cuddSolveEqnRecur(
 	Cudd_RecursiveDeref(bdd, Fm1);
 	Cudd_RecursiveDeref(bdd, Fn);
 	Cudd_RecursiveDeref(bdd, Fv);
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     /* Build i-th component of the solution. */
@@ -275,7 +275,7 @@ cuddSolveEqnRecur(
 	Cudd_RecursiveDeref(bdd, Fn);
 	Cudd_RecursiveDeref(bdd, Fv);
 	Cudd_RecursiveDeref(bdd, Fvbar);
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     T = cuddBddRestrictRecur(bdd, w, Cudd_Not(Fm1));
@@ -287,7 +287,7 @@ cuddSolveEqnRecur(
 	Cudd_RecursiveDeref(bdd, Fv);
 	Cudd_RecursiveDeref(bdd, Fvbar);
 	Cudd_RecursiveDeref(bdd, w);
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     Cudd_RecursiveDeref(bdd,Fm1);
@@ -303,7 +303,7 @@ cuddSolveEqnRecur(
 	} else {
 	    Cudd_RecursiveDeref(bdd, Fn);
 	    Cudd_RecursiveDeref(bdd, T);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	Cudd_RecursiveDeref(bdd,T);
 	T = w;
@@ -347,7 +347,7 @@ cuddVerifySol(
 	if (w) {
 	    cuddRef(w);
 	} else {
-	    return(NULL); 
+	    return((uintptr_t) 0); 
 	}
 	Cudd_RecursiveDeref(bdd,R);
 	R = w;

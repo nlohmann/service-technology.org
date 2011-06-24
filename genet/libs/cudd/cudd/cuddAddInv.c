@@ -106,7 +106,7 @@ static char rcsid[] DD_UNUSED = "$Id: cuddAddInv.c,v 1.9 2004/08/13 18:04:45 fab
   Description [Computes an n ADD where the discriminants are the
   multiplicative inverses of the corresponding discriminants of the
   argument ADD.  Returns a pointer to the resulting ADD in case of
-  success. Returns NULL if any discriminants smaller than epsilon is
+  success. Returns (uintptr_t) 0 if any discriminants smaller than epsilon is
   encountered.]
 
   SideEffects [None]
@@ -122,7 +122,7 @@ Cudd_addScalarInverse(
 
     if (!cuddIsConstant(epsilon)) {
 	(void) fprintf(dd->err,"Invalid epsilon\n");
-	return(NULL);
+	return((uintptr_t) 0);
     }
     do {
 	dd->reordered = 0;
@@ -142,7 +142,7 @@ Cudd_addScalarInverse(
   Synopsis    [Performs the recursive step of addScalarInverse.]
 
   Description [Returns a pointer to the resulting ADD in case of
-  success. Returns NULL if any discriminants smaller than epsilon is
+  success. Returns (uintptr_t) 0 if any discriminants smaller than epsilon is
   encountered.]
 
   SideEffects [None]
@@ -159,31 +159,31 @@ cuddAddScalarInverseRecur(
 
     statLine(dd);
     if (cuddIsConstant(f)) {
-	if (ddAbs(cuddV(f)) < cuddV(epsilon)) return(NULL);
+	if (ddAbs(cuddV(f)) < cuddV(epsilon)) return((uintptr_t) 0);
 	value = 1.0 / cuddV(f);
 	res = cuddUniqueConst(dd,value);
 	return(res);
     }
 
     res = cuddCacheLookup2(dd,Cudd_addScalarInverse,f,epsilon);
-    if (res != NULL) return(res);
+    if (res != (uintptr_t) 0) return(res);
 
     t = cuddAddScalarInverseRecur(dd,cuddT(f),epsilon);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(t);
 
     e = cuddAddScalarInverseRecur(dd,cuddE(f),epsilon);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
     res = (t == e) ? t : cuddUniqueInter(dd,(int)f->index,t,e);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, t);
 	Cudd_RecursiveDeref(dd, e);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(t);
     cuddDeref(e);

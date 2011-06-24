@@ -203,7 +203,7 @@ Cudd_ReduceHeap(
 
     /* Run the hook functions. */
     hook = table->preReorderingHook;
-    while (hook != NULL) {
+    while (hook != (uintptr_t) 0) {
 	int res = (hook->f)(table, "BDD", (void *)heuristic);
 	if (res == 0) return(0);
 	hook = hook->next;
@@ -301,7 +301,7 @@ Cudd_ReduceHeap(
 
     /* Run hook functions. */
     hook = table->postReorderingHook;
-    while (hook != NULL) {
+    while (hook != (uintptr_t) 0) {
 	int res = (hook->f)(table, "BDD", (void *)(intptr_t)localTime);
 	if (res == 0) return(0);
 	hook = hook->next;
@@ -390,7 +390,7 @@ Cudd_ShuffleHeap(
   Description [Dynamically allocates a Node. This procedure is similar
   to cuddAllocNode in Cudd_Table.c, but it does not attempt garbage
   collection, because during reordering there are no dead nodes.
-  Returns a pointer to a new node if successful; NULL is memory is
+  Returns a pointer to a new node if successful; (uintptr_t) 0 is memory is
   full.]
 
   SideEffects [None]
@@ -408,15 +408,15 @@ cuddDynamicAllocNode(
     extern DD_OOMFP MMoutOfMemory;
     DD_OOMFP saveHandler;
 
-    if (table->nextFree == NULL) {        /* free list is empty */
+    if (table->nextFree == (uintptr_t) 0) {        /* free list is empty */
 	/* Try to allocate a new block. */
 	saveHandler = MMoutOfMemory;
 	MMoutOfMemory = Cudd_OutOfMem;
 	mem = (DdNodePtr *) ALLOC(DdNode, DD_MEM_CHUNK + 1);
 	MMoutOfMemory = saveHandler;
-	if (mem == NULL && table->stash != NULL) {
+	if (mem == (uintptr_t) 0 && table->stash != (uintptr_t) 0) {
 	    FREE(table->stash);
-	    table->stash = NULL;
+	    table->stash = (uintptr_t) 0;
 	    /* Inhibit resizing of tables. */
 	    table->maxCacheHard = table->cacheSlots - 1;
 	    table->cacheSlack = - (int) (table->cacheSlots + 1);
@@ -425,7 +425,7 @@ cuddDynamicAllocNode(
 	    }
 	    mem = (DdNodePtr *) ALLOC(DdNode,DD_MEM_CHUNK + 1);
 	}
-	if (mem == NULL) {
+	if (mem == (uintptr_t) 0) {
 	    /* Out of luck. Call the default handler to do
 	    ** whatever it specifies for a failed malloc.  If this
 	    ** handler returns, then set error code, print
@@ -438,7 +438,7 @@ cuddDynamicAllocNode(
 	    (void) fprintf(table->err,"Memory in use = %lu\n",
 			   table->memused);
 #endif
-	    return(NULL);
+	    return((uintptr_t) 0);
 	} else {	/* successful allocation; slice memory */
 	    unsigned long offset;
 	    table->memused += (DD_MEM_CHUNK + 1) * sizeof(DdNode);
@@ -463,7 +463,7 @@ cuddDynamicAllocNode(
 	    } while (++i < DD_MEM_CHUNK);
 
 	    list[DD_MEM_CHUNK-1].ref = 0;
-	    list[DD_MEM_CHUNK - 1].next = NULL;
+	    list[DD_MEM_CHUNK - 1].next = (uintptr_t) 0;
 
 	    table->nextFree = &list[0];
 	}
@@ -513,14 +513,14 @@ cuddSifting(
     size = table->size;
 
     /* Find order in which to sift variables. */
-    var = NULL;
+    var = (uintptr_t) 0;
     entry = ALLOC(int,size);
-    if (entry == NULL) {
+    if (entry == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto cuddSiftingOutOfMem;
     }
     var = ALLOC(int,size);
-    if (var == NULL) {
+    if (var == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto cuddSiftingOutOfMem;
     }
@@ -566,8 +566,8 @@ cuddSifting(
 
 cuddSiftingOutOfMem:
 
-    if (entry != NULL) FREE(entry);
-    if (var != NULL) FREE(var);
+    if (entry != (uintptr_t) 0) FREE(entry);
+    if (var != (uintptr_t) 0) FREE(var);
 
     return(0);
 
@@ -653,10 +653,10 @@ cuddSwapping(
 	}
 	previousSize = table->keys - table->isolated;
 	moves = ddSwapAny(table,x,y);
-	if (moves == NULL) goto cuddSwappingOutOfMem;
+	if (moves == (uintptr_t) 0) goto cuddSwappingOutOfMem;
 	result = ddSiftingBackward(table,previousSize,moves);
 	if (!result) goto cuddSwappingOutOfMem;
-	while (moves != NULL) {
+	while (moves != (uintptr_t) 0) {
 	    move = moves->next;
 	    cuddDeallocMove(table, moves);
 	    moves = move;
@@ -680,7 +680,7 @@ cuddSwapping(
     return(1);
 
 cuddSwappingOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -826,7 +826,7 @@ cuddSwapInPlace(
 	** y will stay there; the others are put in a chain.
 	** The chain is handled as a LIFO; g points to the beginning.
 	*/
-	g = NULL;
+	g = (uintptr_t) 0;
 	if ((oldxkeys >= xslots || (unsigned) xslots == table->initSlots) &&
 	    oldxkeys <= DD_MAX_SUBTABLE_DENSITY * xslots) {
 	    for (i = 0; i < xslots; i++) {
@@ -851,7 +851,7 @@ cuddSwapInPlace(
 		*previousP = sentinel;
 	    } /* for each slot of the x subtable */
 	} else {		/* resize xlist */
-	    DdNode *h = NULL;
+	    DdNode *h = (uintptr_t) 0;
 	    DdNodePtr *newxlist;
 	    unsigned int newxslots;
 	    int newxshift;
@@ -893,7 +893,7 @@ cuddSwapInPlace(
 	    MMoutOfMemory = Cudd_OutOfMem;
 	    newxlist = ALLOC(DdNodePtr, newxslots);
 	    MMoutOfMemory = saveHandler;
-	    if (newxlist == NULL) {
+	    if (newxlist == (uintptr_t) 0) {
 		(void) fprintf(table->err, "Unable to resize subtable %d for lack of memory\n", i);
 		newxlist = xlist;
 		newxslots = xslots;
@@ -918,7 +918,7 @@ cuddSwapInPlace(
 	    }
 	    /* Move nodes that were parked in list h to their new home. */
 	    f = h;
-	    while (f != NULL) {
+	    while (f != (uintptr_t) 0) {
 		next = f->next;
 		f1 = cuddT(f);
 		f0 = cuddE(f);
@@ -949,7 +949,7 @@ cuddSwapInPlace(
 	** already changed to yindex.
 	*/
 	f = g;
-	while (f != NULL) {
+	while (f != (uintptr_t) 0) {
 	    next = f->next;
 	    /* Find f1, f0, f11, f10, f01, f00. */
 	    f1 = cuddT(f);
@@ -1000,7 +1000,7 @@ cuddSwapInPlace(
 		    cuddSatInc(newf1->ref);
 		} else { /* no match */
 		    newf1 = cuddDynamicAllocNode(table);
-		    if (newf1 == NULL)
+		    if (newf1 == (uintptr_t) 0)
 			goto cuddSwapOutOfMem;
 		    newf1->index = xindex; newf1->ref = 1;
 		    cuddT(newf1) = f11;
@@ -1054,7 +1054,7 @@ cuddSwapInPlace(
 		    cuddSatInc(newf0->ref);
 		} else { /* no match */
 		    newf0 = cuddDynamicAllocNode(table);
-		    if (newf0 == NULL)
+		    if (newf0 == (uintptr_t) 0)
 			goto cuddSwapOutOfMem;
 		    newf0->index = xindex; newf0->ref = 1;
 		    cuddT(newf0) = f10;
@@ -1094,7 +1094,7 @@ cuddSwapInPlace(
 	    f->next = *previousP;
 	    *previousP = f;
 	    f = next;
-	} /* while f != NULL */
+	} /* while f != (uintptr_t) 0 */
 
 	/* GC the y layer. */
 
@@ -1259,7 +1259,7 @@ cuddBddAlignToZdd(
 	return(0);
     /* Create and initialize the inverse permutation array. */
     invperm = ALLOC(int,table->size);
-    if (invperm == NULL) {
+    if (invperm == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -1355,7 +1355,7 @@ ddSwapAny(
 
     xNext = cuddNextHigh(table,x);
     yNext = cuddNextLow(table,y);
-    moves = NULL;
+    moves = (uintptr_t) 0;
     limitSize = table->keys - table->isolated;
 
     for (;;) {
@@ -1363,7 +1363,7 @@ ddSwapAny(
 	    size = cuddSwapInPlace(table,x,xNext);
 	    if (size == 0) goto ddSwapAnyOutOfMem;
 	    move = (Move *) cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddSwapAnyOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddSwapAnyOutOfMem;
 	    move->x = x;
 	    move->y = xNext;
 	    move->size = size;
@@ -1373,7 +1373,7 @@ ddSwapAny(
 	    size = cuddSwapInPlace(table,yNext,y);
 	    if (size == 0) goto ddSwapAnyOutOfMem;
 	    move = (Move *) cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddSwapAnyOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddSwapAnyOutOfMem;
 	    move->x = yNext;
 	    move->y = y;
 	    move->size = size;
@@ -1383,7 +1383,7 @@ ddSwapAny(
 	    size = cuddSwapInPlace(table,x,xNext);
 	    if (size == 0) goto ddSwapAnyOutOfMem;
 	    move = (Move *) cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddSwapAnyOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddSwapAnyOutOfMem;
 	    move->x = x;
 	    move->y = xNext;
 	    move->size = size;
@@ -1397,7 +1397,7 @@ ddSwapAny(
 	    size = cuddSwapInPlace(table,x,xNext);
 	    if (size == 0) goto ddSwapAnyOutOfMem;
 	    move = (Move *) cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddSwapAnyOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddSwapAnyOutOfMem;
 	    move->x = x;
 	    move->y = xNext;
 	    move->size = size;
@@ -1410,7 +1410,7 @@ ddSwapAny(
 	    size = cuddSwapInPlace(table,x,xNext);
 	    if (size == 0) goto ddSwapAnyOutOfMem;
 	    move = (Move *) cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddSwapAnyOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddSwapAnyOutOfMem;
 	    move->x = x;
 	    move->y = xNext;
 	    move->size = size;
@@ -1420,7 +1420,7 @@ ddSwapAny(
 	    size = cuddSwapInPlace(table,yNext,y);
 	    if (size == 0) goto ddSwapAnyOutOfMem;
 	    move = (Move *) cuddDynamicAllocNode(table);
-	    if (move == NULL) goto ddSwapAnyOutOfMem;
+	    if (move == (uintptr_t) 0) goto ddSwapAnyOutOfMem;
 	    move->x = yNext;
 	    move->y = y;
 	    move->size = size;
@@ -1442,7 +1442,7 @@ ddSwapAny(
 	size = cuddSwapInPlace(table,yNext,y);
 	if (size == 0) goto ddSwapAnyOutOfMem;
 	move = (Move *) cuddDynamicAllocNode(table);
-	if (move == NULL) goto ddSwapAnyOutOfMem;
+	if (move == (uintptr_t) 0) goto ddSwapAnyOutOfMem;
 	move->x = yNext;
 	move->y = y;
 	move->size = size;
@@ -1453,12 +1453,12 @@ ddSwapAny(
     return(moves);
 
 ddSwapAnyOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of ddSwapAny */
 
@@ -1491,8 +1491,8 @@ ddSiftingAux(
 
     initialSize = table->keys - table->isolated;
 
-    moveDown = NULL;
-    moveUp = NULL;
+    moveDown = (uintptr_t) 0;
+    moveUp = (uintptr_t) 0;
 
     if (x == xLow) {
 	moveDown = ddSiftingDown(table,x,xHigh);
@@ -1514,7 +1514,7 @@ ddSiftingAux(
 	moveDown = ddSiftingDown(table,x,xHigh);
 	/* At this point x --> xHigh unless bounding occurred. */
 	if (moveDown == (Move *) CUDD_OUT_OF_MEM) goto ddSiftingAuxOutOfMem;
-	if (moveDown != NULL) {
+	if (moveDown != (uintptr_t) 0) {
 	    x = moveDown->y;
 	}
 	moveUp = ddSiftingUp(table,x,xLow);
@@ -1527,7 +1527,7 @@ ddSiftingAux(
 	moveUp = ddSiftingUp(table,x,xLow);
 	/* At this point x --> xLow unless bounding occurred. */
 	if (moveUp == (Move *) CUDD_OUT_OF_MEM) goto ddSiftingAuxOutOfMem;
-	if (moveUp != NULL) {
+	if (moveUp != (uintptr_t) 0) {
 	    x = moveUp->x;
 	}
 	moveDown = ddSiftingDown(table,x,xHigh);
@@ -1537,12 +1537,12 @@ ddSiftingAux(
 	if (!result) goto ddSiftingAuxOutOfMem;
     }
 
-    while (moveDown != NULL) {
+    while (moveDown != (uintptr_t) 0) {
 	move = moveDown->next;
 	cuddDeallocMove(table, moveDown);
 	moveDown = move;
     }
-    while (moveUp != NULL) {
+    while (moveUp != (uintptr_t) 0) {
 	move = moveUp->next;
 	cuddDeallocMove(table, moveUp);
 	moveUp = move;
@@ -1552,14 +1552,14 @@ ddSiftingAux(
 
 ddSiftingAuxOutOfMem:
     if (moveDown != (Move *) CUDD_OUT_OF_MEM) {
-	while (moveDown != NULL) {
+	while (moveDown != (uintptr_t) 0) {
 	    move = moveDown->next;
 	    cuddDeallocMove(table, moveDown);
 	    moveDown = move;
 	}
     }
     if (moveUp != (Move *) CUDD_OUT_OF_MEM) {
-	while (moveUp != NULL) {
+	while (moveUp != (uintptr_t) 0) {
 	    move = moveUp->next;
 	    cuddDeallocMove(table, moveUp);
 	    moveUp = move;
@@ -1577,7 +1577,7 @@ ddSiftingAuxOutOfMem:
 
   Description [Sifts a variable up. Moves y up until either it reaches
   the bound (xLow) or the size of the DD heap increases too much.
-  Returns the set of moves in case of success; NULL if memory is full.]
+  Returns the set of moves in case of success; (uintptr_t) 0 if memory is full.]
 
   SideEffects [None]
 
@@ -1602,7 +1602,7 @@ ddSiftingUp(
     int zindex;
 #endif
 
-    moves = NULL;
+    moves = (uintptr_t) 0;
     yindex = table->invperm[y];
 
     /* Initialize the lower bound.
@@ -1646,7 +1646,7 @@ ddSiftingUp(
 	    L += table->subtables[y].keys - isolated;
 	}
 	move = (Move *) cuddDynamicAllocNode(table);
-	if (move == NULL) goto ddSiftingUpOutOfMem;
+	if (move == (uintptr_t) 0) goto ddSiftingUpOutOfMem;
 	move->x = x;
 	move->y = y;
 	move->size = size;
@@ -1660,7 +1660,7 @@ ddSiftingUp(
     return(moves);
 
 ddSiftingUpOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -1676,7 +1676,7 @@ ddSiftingUpOutOfMem:
 
   Description [Sifts a variable down. Moves x down until either it
   reaches the bound (xHigh) or the size of the DD heap increases too
-  much. Returns the set of moves in case of success; NULL if memory is
+  much. Returns the set of moves in case of success; (uintptr_t) 0 if memory is
   full.]
 
   SideEffects [None]
@@ -1702,7 +1702,7 @@ ddSiftingDown(
     int		zindex;
 #endif
 
-    moves = NULL;
+    moves = (uintptr_t) 0;
     /* Initialize R */
     xindex = table->invperm[x];
     limitSize = size = table->keys - table->isolated;
@@ -1737,7 +1737,7 @@ ddSiftingDown(
 	size = cuddSwapInPlace(table,x,y);
 	if (size == 0) goto ddSiftingDownOutOfMem;
 	move = (Move *) cuddDynamicAllocNode(table);
-	if (move == NULL) goto ddSiftingDownOutOfMem;
+	if (move == (uintptr_t) 0) goto ddSiftingDownOutOfMem;
 	move->x = x;
 	move->y = y;
 	move->size = size;
@@ -1751,7 +1751,7 @@ ddSiftingDown(
     return(moves);
 
 ddSiftingDownOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -1783,13 +1783,13 @@ ddSiftingBackward(
     Move *move;
     int	res;
 
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	if (move->size < size) {
 	    size = move->size;
 	}
     }
 
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	if (move->size == size) return(1);
 	res = cuddSwapInPlace(table,(int)move->x,(int)move->y);
 	if (!res) return(0);
@@ -2002,15 +2002,15 @@ bddFixTree(
   DdManager * table,
   MtrNode * treenode)
 {
-    if (treenode == NULL) return;
+    if (treenode == (uintptr_t) 0) return;
     treenode->low = ((int) treenode->index < table->size) ?
 	table->perm[treenode->index] : treenode->index;
-    if (treenode->child != NULL) {
+    if (treenode->child != (uintptr_t) 0) {
 	bddFixTree(table, treenode->child);
     }
-    if (treenode->younger != NULL)
+    if (treenode->younger != (uintptr_t) 0)
 	bddFixTree(table, treenode->younger);
-    if (treenode->parent != NULL && treenode->low < treenode->parent->low) {
+    if (treenode->parent != (uintptr_t) 0 && treenode->low < treenode->parent->low) {
 	treenode->parent->low = treenode->low;
 	treenode->parent->index = treenode->index;
     }
@@ -2041,7 +2041,7 @@ ddUpdateMtrTree(
     unsigned int i, size;
     int index, level, minLevel, maxLevel, minIndex;
 
-    if (treenode == NULL) return(1);
+    if (treenode == (uintptr_t) 0) return(1);
 
     minLevel = CUDD_MAXINDEX;
     maxLevel = 0;
@@ -2066,11 +2066,11 @@ ddUpdateMtrTree(
 	return(0);
     }
 
-    if (treenode->child != NULL) {
+    if (treenode->child != (uintptr_t) 0) {
 	if (!ddUpdateMtrTree(table, treenode->child, perm, invperm))
 	    return(0);
     }
-    if (treenode->younger != NULL) {
+    if (treenode->younger != (uintptr_t) 0) {
 	if (!ddUpdateMtrTree(table, treenode->younger, perm, invperm))
 	    return(0);
     }
@@ -2100,7 +2100,7 @@ ddCheckPermuation(
     unsigned int i, size;
     int index, level, minLevel, maxLevel;
 
-    if (treenode == NULL) return(1);
+    if (treenode == (uintptr_t) 0) return(1);
 
     minLevel = table->size;
     maxLevel = 0;
@@ -2117,11 +2117,11 @@ ddCheckPermuation(
     if (size != treenode->size)
 	return(0);
 
-    if (treenode->child != NULL) {
+    if (treenode->child != (uintptr_t) 0) {
 	if (!ddCheckPermuation(table, treenode->child, perm, invperm))
 	    return(0);
     }
-    if (treenode->younger != NULL) {
+    if (treenode->younger != (uintptr_t) 0) {
 	if (!ddCheckPermuation(table, treenode->younger, perm, invperm))
 	    return(0);
     }

@@ -50,6 +50,7 @@ Cephes Math Library Release 2.8:  June, 2000
 Original copyright 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier
 Translated to AlgoPascal by Bochkanov Sergey (2005, 2006, 2007).
 *************************************************************************/
+/*
 double gamma(double x) throw ()
 {
 #ifndef ALGLIB_INTERCEPTS_SPECFUNCS
@@ -145,7 +146,7 @@ double gamma(double x) throw ()
     return _i_gamma(x);
 #endif
 }
-
+*/
 
 /*************************************************************************
 Natural logarithm of gamma function

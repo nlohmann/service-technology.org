@@ -137,7 +137,7 @@ Cudd_zddPrintMinterm(
 
     size = (int)zdd->sizeZ;
     list = ALLOC(int, size);
-    if (list == NULL) {
+    if (list == (uintptr_t) 0) {
 	zdd->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -172,7 +172,7 @@ Cudd_zddPrintCover(
     size = (int)zdd->sizeZ;
     if (size % 2 != 0) return(0); /* number of variables should be even */
     list = ALLOC(int, size);
-    if (list == NULL) {
+    if (list == (uintptr_t) 0) {
 	zdd->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -252,7 +252,7 @@ Cudd_zddPrintDebug(
 
   Description [Defines an iterator on the paths of a ZDD
   and finds its first path. Returns a generator that contains the
-  information necessary to continue the enumeration if successful; NULL
+  information necessary to continue the enumeration if successful; (uintptr_t) 0
   otherwise.<p>
   A path is represented as an array of literals, which are integers in
   {0, 1, 2}; 0 represents an else arc out of a node, 1 represents a then arc
@@ -279,30 +279,30 @@ Cudd_zddFirstPath(
     int nvars;
 
     /* Sanity Check. */
-    if (zdd == NULL || f == NULL) return(NULL);
+    if (zdd == (uintptr_t) 0 || f == (uintptr_t) 0) return((uintptr_t) 0);
 
     /* Allocate generator an initialize it. */
     gen = ALLOC(DdGen,1);
-    if (gen == NULL) {
+    if (gen == (uintptr_t) 0) {
 	zdd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     gen->manager = zdd;
     gen->type = CUDD_GEN_ZDD_PATHS;
     gen->status = CUDD_GEN_EMPTY;
-    gen->gen.cubes.cube = NULL;
+    gen->gen.cubes.cube = (uintptr_t) 0;
     gen->gen.cubes.value = DD_ZERO_VAL;
     gen->stack.sp = 0;
-    gen->stack.stack = NULL;
-    gen->node = NULL;
+    gen->stack.stack = (uintptr_t) 0;
+    gen->node = (uintptr_t) 0;
 
     nvars = zdd->sizeZ;
     gen->gen.cubes.cube = ALLOC(int,nvars);
-    if (gen->gen.cubes.cube == NULL) {
+    if (gen->gen.cubes.cube == (uintptr_t) 0) {
 	zdd->errorCode = CUDD_MEMORY_OUT;
 	FREE(gen);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < nvars; i++) gen->gen.cubes.cube[i] = 2;
 
@@ -311,13 +311,13 @@ Cudd_zddFirstPath(
     ** constant level.
     */
     gen->stack.stack = ALLOC(DdNodePtr, nvars+1);
-    if (gen->stack.stack == NULL) {
+    if (gen->stack.stack == (uintptr_t) 0) {
 	zdd->errorCode = CUDD_MEMORY_OUT;
 	FREE(gen->gen.cubes.cube);
 	FREE(gen);
-	return(NULL);
+	return((uintptr_t) 0);
     }
-    for (i = 0; i <= nvars; i++) gen->stack.stack[i] = NULL;
+    for (i = 0; i <= nvars; i++) gen->stack.stack[i] = (uintptr_t) 0;
 
     /* Find the first path of the ZDD. */
     gen->stack.stack[gen->stack.sp] = f; gen->stack.sp++;
@@ -458,7 +458,7 @@ done:
   Description [Converts a path of a ZDD representing a cover to a
   string.  The string represents an implicant of the cover.  The path
   is typically produced by Cudd_zddForeachPath.  Returns a pointer to
-  the string if successful; NULL otherwise.  If the str input is NULL,
+  the string if successful; (uintptr_t) 0 otherwise.  If the str input is (uintptr_t) 0,
   it allocates a new string.  The string passed to this function must
   have enough room for all variables and for the terminator.]
 
@@ -471,18 +471,18 @@ char *
 Cudd_zddCoverPathToString(
   DdManager *zdd		/* DD manager */,
   int *path			/* path of ZDD representing a cover */,
-  char *str			/* pointer to string to use if != NULL */
+  char *str			/* pointer to string to use if != (uintptr_t) 0 */
   )
 {
     int nvars = zdd->sizeZ;
     int i;
     char *res;
 
-    if (nvars & 1) return(NULL);
+    if (nvars & 1) return((uintptr_t) 0);
     nvars >>= 1;
-    if (str == NULL) {
+    if (str == (uintptr_t) 0) {
 	res = ALLOC(char, nvars+1);
-	if (res == NULL) return(NULL);
+	if (res == (uintptr_t) 0) return((uintptr_t) 0);
     } else {
 	res = str;
     }
@@ -546,15 +546,15 @@ Cudd_zddDumpDot(
   DdManager * dd /* manager */,
   int  n /* number of output nodes to be dumped */,
   DdNode ** f /* array of output nodes to be dumped */,
-  char ** inames /* array of input names (or NULL) */,
-  char ** onames /* array of output names (or NULL) */,
+  char ** inames /* array of input names (or (uintptr_t) 0) */,
+  char ** onames /* array of output names (or (uintptr_t) 0) */,
   FILE * fp /* pointer to the dump file */)
 {
-    DdNode	*support = NULL;
+    DdNode	*support = (uintptr_t) 0;
     DdNode	*scan;
-    int		*sorted = NULL;
+    int		*sorted = (uintptr_t) 0;
     int		nvars = dd->sizeZ;
-    st_table	*visited = NULL;
+    st_table	*visited = (uintptr_t) 0;
     st_generator *gen;
     int		retval;
     int		i, j;
@@ -564,7 +564,7 @@ Cudd_zddDumpDot(
 
     /* Build a bit array with the support of f. */
     sorted = ALLOC(int,nvars);
-    if (sorted == NULL) {
+    if (sorted == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	goto failure;
     }
@@ -573,7 +573,7 @@ Cudd_zddDumpDot(
     /* Take the union of the supports of each output function. */
     for (i = 0; i < n; i++) {
 	support = Cudd_Support(dd,f[i]);
-	if (support == NULL) goto failure;
+	if (support == (uintptr_t) 0) goto failure;
 	cuddRef(support);
 	scan = support;
 	while (!cuddIsConstant(scan)) {
@@ -582,11 +582,11 @@ Cudd_zddDumpDot(
 	}
 	Cudd_RecursiveDeref(dd,support);
     }
-    support = NULL; /* so that we do not try to free it in case of failure */
+    support = (uintptr_t) 0; /* so that we do not try to free it in case of failure */
 
     /* Initialize symbol table for visited nodes. */
     visited = st_init_table(st_ptrcmp, st_ptrhash);
-    if (visited == NULL) goto failure;
+    if (visited == (uintptr_t) 0) goto failure;
 
     /* Collect all the nodes of this DD in the symbol table. */
     for (i = 0; i < n; i++) {
@@ -609,7 +609,7 @@ Cudd_zddDumpDot(
     refAddr = (intptr_t) f[0];
     diff = 0;
     gen = st_init_gen(visited);
-    while (st_gen(gen, &scan, NULL)) {
+    while (st_gen(gen, &scan, (uintptr_t) 0)) {
 	diff |= refAddr ^ (intptr_t) scan;
     }
     st_free_gen(gen);
@@ -639,7 +639,7 @@ Cudd_zddDumpDot(
     if (retval == EOF) goto failure;
     for (i = 0; i < nvars; i++) {
 	if (sorted[dd->invpermZ[i]]) {
-	    if (inames == NULL) {
+	    if (inames == (uintptr_t) 0) {
 		retval = fprintf(fp,"\" %d \" -> ", dd->invpermZ[i]);
 	    } else {
 		retval = fprintf(fp,"\" %s \" -> ", inames[dd->invpermZ[i]]);
@@ -654,7 +654,7 @@ Cudd_zddDumpDot(
     retval = fprintf(fp,"{ rank = same; node [shape = box]; edge [style = invis];\n");
     if (retval == EOF) goto failure;
     for (i = 0; i < n; i++) {
-	if (onames == NULL) {
+	if (onames == (uintptr_t) 0) {
 	    retval = fprintf(fp,"\"F%d\"", i);
 	} else {
 	    retval = fprintf(fp,"\"  %s  \"", onames[i]);
@@ -673,7 +673,7 @@ Cudd_zddDumpDot(
 	if (sorted[dd->invpermZ[i]]) {
 	    retval = fprintf(fp,"{ rank = same; ");
 	    if (retval == EOF) goto failure;
-	    if (inames == NULL) {
+	    if (inames == (uintptr_t) 0) {
 		retval = fprintf(fp,"\" %d \";\n", dd->invpermZ[i]);
 	    } else {
 		retval = fprintf(fp,"\" %s \";\n", inames[dd->invpermZ[i]]);
@@ -683,10 +683,10 @@ Cudd_zddDumpDot(
 	    slots = dd->subtableZ[i].slots;
 	    for (j = 0; j < slots; j++) {
 		scan = nodelist[j];
-		while (scan != NULL) {
+		while (scan != (uintptr_t) 0) {
 		    if (st_is_member(visited,(char *) scan)) {
 			retval = fprintf(fp,"\"%p\";\n", (void *)
-					 ((mask & (ptrint) scan) /
+					 ((mask & (intptr_t) scan) /
 					  sizeof(DdNode)));
 			if (retval == EOF) goto failure;
 		    }
@@ -706,10 +706,10 @@ Cudd_zddDumpDot(
     slots = dd->constants.slots;
     for (j = 0; j < slots; j++) {
 	scan = nodelist[j];
-	while (scan != NULL) {
+	while (scan != (uintptr_t) 0) {
 	    if (st_is_member(visited,(char *) scan)) {
 		retval = fprintf(fp,"\"%p\";\n", (void *)
-				 ((mask & (ptrint) scan) / sizeof(DdNode)));
+				 ((mask & (intptr_t) scan) / sizeof(DdNode)));
 		if (retval == EOF) goto failure;
 	    }
 	    scan = scan->next;
@@ -721,14 +721,14 @@ Cudd_zddDumpDot(
     /* Write edge info. */
     /* Edges from the output nodes. */
     for (i = 0; i < n; i++) {
-	if (onames == NULL) {
+	if (onames == (uintptr_t) 0) {
 	    retval = fprintf(fp,"\"F%d\"", i);
 	} else {
 	    retval = fprintf(fp,"\"  %s  \"", onames[i]);
 	}
 	if (retval == EOF) goto failure;
 	retval = fprintf(fp," -> \"%p\" [style = solid];\n",
-			 (void *) ((mask & (ptrint) f[i]) /
+			 (void *) ((mask & (intptr_t) f[i]) /
 					  sizeof(DdNode)));
 	if (retval == EOF) goto failure;
     }
@@ -740,19 +740,19 @@ Cudd_zddDumpDot(
 	    slots = dd->subtableZ[i].slots;
 	    for (j = 0; j < slots; j++) {
 		scan = nodelist[j];
-		while (scan != NULL) {
+		while (scan != (uintptr_t) 0) {
 		    if (st_is_member(visited,(char *) scan)) {
 			retval = fprintf(fp,
 			    "\"%p\" -> \"%p\";\n",
-			    (void *) ((mask & (ptrint) scan) / sizeof(DdNode)),
-			    (void *) ((mask & (ptrint) cuddT(scan)) /
+			    (void *) ((mask & (intptr_t) scan) / sizeof(DdNode)),
+			    (void *) ((mask & (intptr_t) cuddT(scan)) /
 				      sizeof(DdNode)));
 			if (retval == EOF) goto failure;
 			retval = fprintf(fp,
 					 "\"%p\" -> \"%p\" [style = dashed];\n",
-					 (void *) ((mask & (ptrint) scan)
+					 (void *) ((mask & (intptr_t) scan)
 						   / sizeof(DdNode)),
-					 (void *) ((mask & (ptrint)
+					 (void *) ((mask & (intptr_t)
 						    cuddE(scan)) /
 						   sizeof(DdNode)));
 			if (retval == EOF) goto failure;
@@ -768,10 +768,10 @@ Cudd_zddDumpDot(
     slots = dd->constants.slots;
     for (j = 0; j < slots; j++) {
 	scan = nodelist[j];
-	while (scan != NULL) {
+	while (scan != (uintptr_t) 0) {
 	    if (st_is_member(visited,(char *) scan)) {
 		retval = fprintf(fp,"\"%p\" [label = \"%g\"];\n",
-				 (void *) ((mask & (ptrint) scan) /
+				 (void *) ((mask & (intptr_t) scan) /
 					   sizeof(DdNode)),
 				 cuddV(scan));
 		if (retval == EOF) goto failure;
@@ -789,8 +789,8 @@ Cudd_zddDumpDot(
     return(1);
 
 failure:
-    if (sorted != NULL) FREE(sorted);
-    if (visited != NULL) st_free_table(visited);
+    if (sorted != (uintptr_t) 0) FREE(sorted);
+    if (visited != (uintptr_t) 0) st_free_table(visited);
     return(0);
 
 } /* end of Cudd_zddDumpBlif */
@@ -822,7 +822,7 @@ cuddZddP(
     int retval;
     st_table *table = st_init_table(st_ptrcmp, st_ptrhash);
 
-    if (table == NULL) return(0);
+    if (table == (uintptr_t) 0) return(0);
 
     retval = zp2(zdd, f, table);
     st_free_table(table);
@@ -859,7 +859,7 @@ zp2(
     int		T, E;
     DdNode	*base = DD_ONE(zdd);
 
-    if (f == NULL)
+    if (f == (uintptr_t) 0)
 	return(0);
 
     if (Cudd_IsConstant(f)) {
@@ -869,15 +869,15 @@ zp2(
     if (st_is_member(t, (char *)f) == 1)
 	return(1);
 
-    if (st_insert(t, (char *) f, NULL) == ST_OUT_OF_MEM)
+    if (st_insert(t, (char *) f, (uintptr_t) 0) == ST_OUT_OF_MEM)
 	return(0);
 
 #if SIZEOF_VOID_P == 8
     (void) fprintf(zdd->out, "ID = 0x%lx\tindex = %u\tr = %u\t",
-	(ptruint)f / (ptruint) sizeof(DdNode), f->index, f->ref);
+	(uintptr_t)f / (uintptr_t) sizeof(DdNode), f->index, f->ref);
 #else
     (void) fprintf(zdd->out, "ID = 0x%x\tindex = %hu\tr = %hu\t",
-	(ptruint)f / (ptruint) sizeof(DdNode), f->index, f->ref);
+	(uintptr_t)f / (uintptr_t) sizeof(DdNode), f->index, f->ref);
 #endif
 
     n = cuddT(f);
@@ -886,11 +886,11 @@ zp2(
 	T = 1;
     } else {
 #if SIZEOF_VOID_P == 8
-	(void) fprintf(zdd->out, "T = 0x%lx\t", (ptruint) n /
-		       (ptruint) sizeof(DdNode));
+	(void) fprintf(zdd->out, "T = 0x%lx\t", (uintptr_t) n /
+		       (uintptr_t) sizeof(DdNode));
 #else
-	(void) fprintf(zdd->out, "T = 0x%x\t", (ptruint) n /
-		       (ptruint) sizeof(DdNode));
+	(void) fprintf(zdd->out, "T = 0x%x\t", (uintptr_t) n /
+		       (uintptr_t) sizeof(DdNode));
 #endif
 	T = 0;
     }
@@ -901,11 +901,11 @@ zp2(
 	E = 1;
     } else {
 #if SIZEOF_VOID_P == 8
-	(void) fprintf(zdd->out, "E = 0x%lx\n", (ptruint) n /
-		      (ptruint) sizeof(DdNode));
+	(void) fprintf(zdd->out, "E = 0x%lx\n", (uintptr_t) n /
+		      (uintptr_t) sizeof(DdNode));
 #else
-	(void) fprintf(zdd->out, "E = 0x%x\n", (ptruint) n /
-		       (ptruint) sizeof(DdNode));
+	(void) fprintf(zdd->out, "E = 0x%x\n", (uintptr_t) n /
+		       (uintptr_t) sizeof(DdNode));
 #endif
 	E = 0;
     }

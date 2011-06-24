@@ -156,7 +156,7 @@ DddmpWriteNodeIndexBdd (
   )
 {
   if (!Cudd_IsConstant (f)) {
-    f->next = (struct DdNode *)((ptruint)((id)<<1));
+    f->next = (struct DdNode *)((uintptr_t)((id)<<1));
   }
 
   return;
@@ -183,7 +183,7 @@ DddmpReadNodeIndexBdd (
   )
 {
   if (!Cudd_IsConstant (f)) {
-    return ((int)(((ptruint)(f->next))>>1));
+    return ((int)(((uintptr_t)(f->next))>>1));
   } else {
     return (1);
   }
@@ -208,7 +208,7 @@ DddmpVisitedBdd (
 {
   f = Cudd_Regular(f);
 
-  return ((int)((ptruint)(f->next)) & (01));
+  return ((int)((uintptr_t)(f->next)) & (01));
 }
 
 /**Function********************************************************************
@@ -230,7 +230,7 @@ DddmpSetVisitedBdd (
 {
   f = Cudd_Regular(f);
 
-  f->next = (DdNode *)(ptruint)((int)((ptruint)(f->next))|01);
+  f->next = (DdNode *)(uintptr_t)((int)((uintptr_t)(f->next))|01);
 
   return;
 }
@@ -254,7 +254,7 @@ DddmpClearVisitedBdd (
 {
   f = Cudd_Regular (f);
 
-  f->next = (DdNode *)(ptruint)((int)((ptruint)(f->next)) & (~01));
+  f->next = (DdNode *)(uintptr_t)((int)((uintptr_t)(f->next)) & (~01));
 
   return;
 }
@@ -346,11 +346,11 @@ RemoveFromUniqueRecurBdd (
 
     pos = ddHash ((uintptr_t) cuddT (f), (uintptr_t) cuddE (f), subtable->shift);
     node = nodelist[pos];
-    last = (uintptr_t) NULL;
+    last = (uintptr_t) (uintptr_t) 0;
     while (node != sentinel) {
       next = node->next;
       if (node == f) {
-        if (last != (uintptr_t) NULL)  
+        if (last != (uintptr_t) (uintptr_t) 0)  
   	  last->next = next;
         else 
           nodelist[pos] = next;
@@ -361,7 +361,7 @@ RemoveFromUniqueRecurBdd (
       }
     }
 
-    f->next = (uintptr_t) NULL;
+    f->next = (uintptr_t) (uintptr_t) 0;
 
   }
 
@@ -406,9 +406,9 @@ RestoreInUniqueRecurBdd (
 
   if (cuddIsConstant (f)) {
     /* StQ 11.02.2004:
-       Bug fixed --> restore NULL within the next field */
+       Bug fixed --> restore (uintptr_t) 0 within the next field */
     /*DddmpClearVisitedBdd (f);*/   
-    f->next = (uintptr_t) NULL;
+    f->next = (uintptr_t) (uintptr_t) 0;
 
     return;
   }

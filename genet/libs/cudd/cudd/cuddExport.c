@@ -133,9 +133,9 @@ Cudd_DumpBlif(
   DdManager * dd /* manager */,
   int  n /* number of output nodes to be dumped */,
   DdNode ** f /* array of output nodes to be dumped */,
-  char ** inames /* array of input names (or NULL) */,
-  char ** onames /* array of output names (or NULL) */,
-  char * mname /* model name (or NULL) */,
+  char ** inames /* array of input names (or (uintptr_t) 0) */,
+  char ** onames /* array of output names (or (uintptr_t) 0) */,
+  char * mname /* model name (or (uintptr_t) 0) */,
   FILE * fp /* pointer to the dump file */,
   int mv /* 0: blif, 1: blif-MV */)
 {
@@ -249,8 +249,8 @@ Cudd_DumpBlifBody(
   DdManager * dd /* manager */,
   int  n /* number of output nodes to be dumped */,
   DdNode ** f /* array of output nodes to be dumped */,
-  char ** inames /* array of input names (or NULL) */,
-  char ** onames /* array of output names (or NULL) */,
+  char ** inames /* array of input names (or (uintptr_t) 0) */,
+  char ** onames /* array of output names (or (uintptr_t) 0) */,
   FILE * fp /* pointer to the dump file */,
   int mv /* 0: blif, 1: blif-MV */)
 {
@@ -341,8 +341,8 @@ Cudd_DumpDot(
   DdManager * dd /* manager */,
   int  n /* number of output nodes to be dumped */,
   DdNode ** f /* array of output nodes to be dumped */,
-  char ** inames /* array of input names (or NULL) */,
-  char ** onames /* array of output names (or NULL) */,
+  char ** inames /* array of input names (or (uintptr_t) 0) */,
+  char ** onames /* array of output names (or (uintptr_t) 0) */,
   FILE * fp /* pointer to the dump file */)
 {
     DdNode	*support = (uintptr_t) 0;
@@ -627,8 +627,8 @@ Cudd_DumpDaVinci(
   DdManager * dd /* manager */,
   int  n /* number of output nodes to be dumped */,
   DdNode ** f /* array of output nodes to be dumped */,
-  char ** inames /* array of input names (or NULL) */,
-  char ** onames /* array of output names (or NULL) */,
+  char ** inames /* array of input names (or (uintptr_t) 0) */,
+  char ** onames /* array of output names (or (uintptr_t) 0) */,
   FILE * fp /* pointer to the dump file */)
 {
     DdNode	  *support = (uintptr_t) 0;
@@ -741,8 +741,8 @@ Cudd_DumpDDcal(
   DdManager * dd /* manager */,
   int  n /* number of output nodes to be dumped */,
   DdNode ** f /* array of output nodes to be dumped */,
-  char ** inames /* array of input names (or NULL) */,
-  char ** onames /* array of output names (or NULL) */,
+  char ** inames /* array of input names (or (uintptr_t) 0) */,
+  char ** onames /* array of output names (or (uintptr_t) 0) */,
   FILE * fp /* pointer to the dump file */)
 {
     DdNode	  *support = (uintptr_t) 0;
@@ -899,8 +899,8 @@ Cudd_DumpFactoredForm(
   DdManager * dd /* manager */,
   int  n /* number of output nodes to be dumped */,
   DdNode ** f /* array of output nodes to be dumped */,
-  char ** inames /* array of input names (or NULL) */,
-  char ** onames /* array of output names (or NULL) */,
+  char ** inames /* array of input names (or (uintptr_t) 0) */,
+  char ** onames /* array of output names (or (uintptr_t) 0) */,
   FILE * fp /* pointer to the dump file */)
 {
     int		retval;

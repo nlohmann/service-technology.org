@@ -148,7 +148,7 @@ static void zddMergeGroups (DdManager *table, MtrNode *treenode, int low, int hi
   position in the order is known to the manager. If the variable does
   not exist yet, the position is assumed to be the same as the index.
   The group tree is created if it does not exist yet.
-  Returns a pointer to the group if successful; NULL otherwise.]
+  Returns a pointer to the group if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [The ZDD variable tree is changed.]
 
@@ -174,14 +174,14 @@ Cudd_MakeZddTreeNode(
     level = (low < (unsigned int) dd->sizeZ) ? dd->permZ[low] : low;
 
     if (level + size - 1> (int) MTR_MAXHIGH)
-	return(NULL);
+	return((uintptr_t) 0);
 
     /* If the tree does not exist yet, create it. */
     tree = dd->treeZ;
-    if (tree == NULL) {
+    if (tree == (uintptr_t) 0) {
 	dd->treeZ = tree = Mtr_InitGroupTree(0, dd->sizeZ);
-	if (tree == NULL)
-	    return(NULL);
+	if (tree == (uintptr_t) 0)
+	    return((uintptr_t) 0);
 	tree->index = dd->invpermZ[0];
     }
 
@@ -192,8 +192,8 @@ Cudd_MakeZddTreeNode(
 
     /* Create the group. */
     group = Mtr_MakeGroup(tree, level, size, type);
-    if (group == NULL)
-	return(NULL);
+    if (group == (uintptr_t) 0)
+	return((uintptr_t) 0);
 
     /* Initialize the index field to the index of the variable currently
     ** in position low. This field will be updated by the reordering
@@ -238,7 +238,7 @@ cuddZddTreeSifting(
     ** variables are in a single group. After reordering this tree is
     ** destroyed.
     */
-    tempTree = table->treeZ == NULL;
+    tempTree = table->treeZ == (uintptr_t) 0;
     if (tempTree) {
 	table->treeZ = Mtr_InitGroupTree(0,table->sizeZ);
 	table->treeZ->index = table->invpermZ[0];
@@ -355,8 +355,8 @@ zddTreeSiftingAux(
 #endif
 
     auxnode = treenode;
-    while (auxnode != NULL) {
-	if (auxnode->child != NULL) {
+    while (auxnode != (uintptr_t) 0) {
+	if (auxnode->child != (uintptr_t) 0) {
 	    if (!zddTreeSiftingAux(table, auxnode->child, method))
 		return(0);
 	    res = zddReorderChildren(table, auxnode, CUDD_REORDER_GROUP_SIFT);
@@ -396,7 +396,7 @@ zddCountInternalMtrNodes(
 
     nodeCount = 0;
     auxnode = treenode;
-    while (auxnode != NULL) {
+    while (auxnode != (uintptr_t) 0) {
 	if (!(MTR_TEST(auxnode,MTR_TERMINAL))) {
 	    nodeCount++;
 	    count = zddCountInternalMtrNodes(table,auxnode->child);
@@ -558,7 +558,7 @@ zddFindNodeHiLo(
 	** fully instantiated.  This way we avoid breaking up a group.
 	*/
 	MtrNode *auxnode = treenode->child;
-	if (auxnode == NULL) {
+	if (auxnode == (uintptr_t) 0) {
 	    *upper = (unsigned int) table->sizeZ - 1;
 	} else {
 	    /* Search the subgroup that strands the table->sizeZ line.
@@ -566,7 +566,7 @@ zddFindNodeHiLo(
 	    ** upper will get -1, thus correctly signaling that no reordering
 	    ** should take place.
 	    */
-	    while (auxnode != NULL) {
+	    while (auxnode != (uintptr_t) 0) {
 		int thisLower = table->permZ[auxnode->low];
 		int thisUpper = thisLower + auxnode->size - 1;
 		if (thisUpper >= table->sizeZ && thisLower < table->sizeZ)
@@ -649,20 +649,20 @@ zddGroupSifting(
     nvars = table->sizeZ;
 
     /* Order variables to sift. */
-    entry = NULL;
-    sifted = NULL;
+    entry = (uintptr_t) 0;
+    sifted = (uintptr_t) 0;
     var = ALLOC(int,nvars);
-    if (var == NULL) {
+    if (var == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto zddGroupSiftingOutOfMem;
     }
     entry = ALLOC(int,nvars);
-    if (entry == NULL) {
+    if (entry == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto zddGroupSiftingOutOfMem;
     }
     sifted = ALLOC(int,nvars);
-    if (sifted == NULL) {
+    if (sifted == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto zddGroupSiftingOutOfMem;
     }
@@ -734,9 +734,9 @@ zddGroupSifting(
     return(1);
 
 zddGroupSiftingOutOfMem:
-    if (entry != NULL)	FREE(entry);
-    if (var != NULL)	FREE(var);
-    if (sifted != NULL)	FREE(sifted);
+    if (entry != (uintptr_t) 0)	FREE(entry);
+    if (var != (uintptr_t) 0)	FREE(var);
+    if (sifted != (uintptr_t) 0)	FREE(sifted);
 
     return(0);
 
@@ -777,7 +777,7 @@ zddGroupSiftingAux(
 #endif
 
     initialSize = table->keysZ;
-    moves = NULL;
+    moves = (uintptr_t) 0;
 
     if (x == xLow) { /* Sift down */
 #ifdef DD_DEBUG
@@ -872,7 +872,7 @@ zddGroupSiftingAux(
 	if (!result) goto zddGroupSiftingAuxOutOfMem;
     }
 
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -881,7 +881,7 @@ zddGroupSiftingAux(
     return(1);
 
 zddGroupSiftingAuxOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -935,7 +935,7 @@ zddGroupSiftingUp(
 #endif
 	    if (size == 0) goto zddGroupSiftingUpOutOfMem;
 	    move = (Move *)cuddDynamicAllocNode(table);
-	    if (move == NULL) goto zddGroupSiftingUpOutOfMem;
+	    if (move == (uintptr_t) 0) goto zddGroupSiftingUpOutOfMem;
 	    move->x = x;
 	    move->y = y;
 	    move->flags = MTR_DEFAULT;
@@ -963,7 +963,7 @@ zddGroupSiftingUp(
     return(1);
 
 zddGroupSiftingUpOutOfMem:
-    while (*moves != NULL) {
+    while (*moves != (uintptr_t) 0) {
 	move = (*moves)->next;
 	cuddDeallocMove(table, *moves);
 	*moves = move;
@@ -1019,7 +1019,7 @@ zddGroupSiftingDown(
 
 	    /* Record move. */
 	    move = (Move *) cuddDynamicAllocNode(table);
-	    if (move == NULL) goto zddGroupSiftingDownOutOfMem;
+	    if (move == (uintptr_t) 0) goto zddGroupSiftingDownOutOfMem;
 	    move->x = x;
 	    move->y = y;
 	    move->flags = MTR_DEFAULT;
@@ -1049,7 +1049,7 @@ zddGroupSiftingDown(
     return(1);
 
 zddGroupSiftingDownOutOfMem:
-    while (*moves != NULL) {
+    while (*moves != (uintptr_t) 0) {
 	move = (*moves)->next;
 	cuddDeallocMove(table, *moves);
 	*moves = move;
@@ -1145,7 +1145,7 @@ zddGroupMove(
 
     /* Store group move */
     move = (Move *) cuddDynamicAllocNode(table);
-    if (move == NULL) goto zddGroupMoveOutOfMem;
+    if (move == (uintptr_t) 0) goto zddGroupMoveOutOfMem;
     move->x = swapx;
     move->y = swapy;
     move->flags = MTR_DEFAULT;
@@ -1156,7 +1156,7 @@ zddGroupMove(
     return(table->keysZ);
 
 zddGroupMoveOutOfMem:
-    while (*moves != NULL) {
+    while (*moves != (uintptr_t) 0) {
 	move = (*moves)->next;
 	cuddDeallocMove(table, *moves);
 	*moves = move;
@@ -1260,13 +1260,13 @@ zddGroupSiftingBackward(
     int  res;
 
 
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	if (move->size < size) {
 	    size = move->size;
 	}
     }
 
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	if (move->size == size) return(1);
 	if ((table->subtableZ[move->x].next == move->x) &&
 	(table->subtableZ[move->y].next == move->y)) {
@@ -1326,7 +1326,7 @@ zddMergeGroups(
     auxnode = treenode;
     do {
 	auxnode->index = newindex;
-	if (auxnode->parent == NULL ||
+	if (auxnode->parent == (uintptr_t) 0 ||
 		(int) auxnode->parent->index != saveindex)
 	    break;
 	auxnode = auxnode->parent;

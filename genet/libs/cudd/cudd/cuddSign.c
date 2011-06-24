@@ -114,7 +114,7 @@ static double * ddCofMintermAux (DdManager *dd, DdNode *node, st_table *table);
 
   Description [Computes the fraction of minterms in the on-set of all
   the positive cofactors of DD. Returns the pointer to an array of
-  doubles if successful; NULL otherwise. The array has as many
+  doubles if successful; (uintptr_t) 0 otherwise. The array has as many
   positions as there are BDD variables in the manager plus one. The
   last position of the array contains the fraction of the minterms in
   the ON-set of the function represented by the BDD or ADD. The other
@@ -130,7 +130,7 @@ Cudd_CofMinterm(
 {
     st_table	*table;
     double	*values;
-    double	*result = NULL;
+    double	*result = (uintptr_t) 0;
     int		i, firstLevel;
 
 #ifdef DD_STATS
@@ -141,17 +141,17 @@ Cudd_CofMinterm(
 #endif
 
     table = st_init_table(st_ptrcmp, st_ptrhash);
-    if (table == NULL) {
+    if (table == (uintptr_t) 0) {
 	(void) fprintf(dd->err,
 		       "out-of-memory, couldn't measure DD cofactors.\n");
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     size = dd->size;
     values = ddCofMintermAux(dd, node, table);
-    if (values != NULL) {
+    if (values != (uintptr_t) 0) {
 	result = ALLOC(double,size + 1);
-	if (result != NULL) {
+	if (result != (uintptr_t) 0) {
 #ifdef DD_STATS
 	    table_mem += (size + 1) * sizeof(double);
 #endif
@@ -176,7 +176,7 @@ Cudd_CofMinterm(
     table_mem += table->num_bins * sizeof(st_table_entry *);
 #endif
     if (Cudd_Regular(node)->ref == 1) FREE(values);
-    st_foreach(table, cuddStCountfree, NULL);
+    st_foreach(table, cuddStCountfree, (uintptr_t) 0);
     st_free_table(table);
 #ifdef DD_STATS
     (void) fprintf(dd->out,"Number of calls: %d\tTable memory: %d bytes\n",
@@ -184,7 +184,7 @@ Cudd_CofMinterm(
     (void) fprintf(dd->out,"Time to compute measures: %s\n",
 		  util_print_time(util_cpu_time() - startTime));
 #endif
-    if (result == NULL) {
+    if (result == (uintptr_t) 0) {
 	(void) fprintf(dd->out,
 		       "out-of-memory, couldn't measure DD cofactors.\n");
 	dd->errorCode = CUDD_MEMORY_OUT;
@@ -254,9 +254,9 @@ ddCofMintermAux(
 	localSize = size - cuddI(dd,N->index) + 1;
     }
     values = ALLOC(double, localSize);
-    if (values == NULL) {
+    if (values == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     if (cuddIsConstant(N)) {
@@ -270,9 +270,9 @@ ddCofMintermAux(
 	Nnv = Cudd_NotCond(cuddE(N),N!=node);
 
 	valuesT = ddCofMintermAux(dd, Nv, table);
-	if (valuesT == NULL) return(NULL);
+	if (valuesT == (uintptr_t) 0) return((uintptr_t) 0);
 	valuesE = ddCofMintermAux(dd, Nnv, table);
-	if (valuesE == NULL) return(NULL);
+	if (valuesE == (uintptr_t) 0) return((uintptr_t) 0);
 
 	if (Cudd_IsConstant(Nv)) {
 	    localSizeT = 1;
@@ -307,7 +307,7 @@ ddCofMintermAux(
     if (N->ref > 1) {
 	if (st_add_direct(table, (char *) node, (char *) values) == ST_OUT_OF_MEM) {
 	    FREE(values);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 #ifdef DD_STATS
 	table_mem += localSize * sizeof(double) + sizeof(st_table_entry);

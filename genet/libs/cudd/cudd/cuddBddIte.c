@@ -127,7 +127,7 @@ static int bddVarToCanonicalSimple (DdManager *dd, DdNode **fp, DdNode **gp, DdN
   Synopsis    [Implements ITE(f,g,h).]
 
   Description [Implements ITE(f,g,h). Returns a pointer to the
-  resulting BDD if successful; NULL if the intermediate result blows
+  resulting BDD if successful; (uintptr_t) 0 if the intermediate result blows
   up.]
 
   SideEffects [None]
@@ -206,7 +206,7 @@ Cudd_bddIteConstant(
 
     /* Cache lookup. */
     r = cuddConstantLookup(dd, DD_BDD_ITE_CONSTANT_TAG, f, g, h);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
 	return(Cudd_NotCond(r,comple && r != DD_NON_CONSTANT));
     }
 
@@ -297,7 +297,7 @@ Cudd_bddIntersect(
   Synopsis    [Computes the conjunction of two BDDs f and g.]
 
   Description [Computes the conjunction of two BDDs f and g. Returns a
-  pointer to the resulting BDD if successful; NULL if the intermediate
+  pointer to the resulting BDD if successful; (uintptr_t) 0 if the intermediate
   result blows up.]
 
   SideEffects [None]
@@ -326,10 +326,10 @@ Cudd_bddAnd(
 /**Function********************************************************************
 
   Synopsis    [Computes the conjunction of two BDDs f and g.  Returns
-  NULL if too many nodes are required.]
+  (uintptr_t) 0 if too many nodes are required.]
 
   Description [Computes the conjunction of two BDDs f and g. Returns a
-  pointer to the resulting BDD if successful; NULL if the intermediate
+  pointer to the resulting BDD if successful; (uintptr_t) 0 if the intermediate
   result blows up or more new nodes than <code>limit</code> are
   required.]
 
@@ -364,7 +364,7 @@ Cudd_bddAndLimit(
   Synopsis    [Computes the disjunction of two BDDs f and g.]
 
   Description [Computes the disjunction of two BDDs f and g. Returns a
-  pointer to the resulting BDD if successful; NULL if the intermediate
+  pointer to the resulting BDD if successful; (uintptr_t) 0 if the intermediate
   result blows up.]
 
   SideEffects [None]
@@ -385,7 +385,7 @@ Cudd_bddOr(
 	dd->reordered = 0;
 	res = cuddBddAndRecur(dd,Cudd_Not(f),Cudd_Not(g));
     } while (dd->reordered == 1);
-    res = Cudd_NotCond(res,res != NULL);
+    res = Cudd_NotCond(res,res != (uintptr_t) 0);
     return(res);
 
 } /* end of Cudd_bddOr */
@@ -396,7 +396,7 @@ Cudd_bddOr(
   Synopsis    [Computes the NAND of two BDDs f and g.]
 
   Description [Computes the NAND of two BDDs f and g. Returns a
-  pointer to the resulting BDD if successful; NULL if the intermediate
+  pointer to the resulting BDD if successful; (uintptr_t) 0 if the intermediate
   result blows up.]
 
   SideEffects [None]
@@ -417,7 +417,7 @@ Cudd_bddNand(
 	dd->reordered = 0;
 	res = cuddBddAndRecur(dd,f,g);
     } while (dd->reordered == 1);
-    res = Cudd_NotCond(res,res != NULL);
+    res = Cudd_NotCond(res,res != (uintptr_t) 0);
     return(res);
 
 } /* end of Cudd_bddNand */
@@ -428,7 +428,7 @@ Cudd_bddNand(
   Synopsis    [Computes the NOR of two BDDs f and g.]
 
   Description [Computes the NOR of two BDDs f and g. Returns a
-  pointer to the resulting BDD if successful; NULL if the intermediate
+  pointer to the resulting BDD if successful; (uintptr_t) 0 if the intermediate
   result blows up.]
 
   SideEffects [None]
@@ -459,7 +459,7 @@ Cudd_bddNor(
   Synopsis    [Computes the exclusive OR of two BDDs f and g.]
 
   Description [Computes the exclusive OR of two BDDs f and g. Returns a
-  pointer to the resulting BDD if successful; NULL if the intermediate
+  pointer to the resulting BDD if successful; (uintptr_t) 0 if the intermediate
   result blows up.]
 
   SideEffects [None]
@@ -490,7 +490,7 @@ Cudd_bddXor(
   Synopsis    [Computes the exclusive NOR of two BDDs f and g.]
 
   Description [Computes the exclusive NOR of two BDDs f and g. Returns a
-  pointer to the resulting BDD if successful; NULL if the intermediate
+  pointer to the resulting BDD if successful; (uintptr_t) 0 if the intermediate
   result blows up.]
 
   SideEffects [None]
@@ -570,7 +570,7 @@ Cudd_bddLeq(
 
     /* Check cache. */
     tmp = cuddCacheLookup2(dd,(DD_CTFP)Cudd_bddLeq,f,g);
-    if (tmp != NULL) {
+    if (tmp != (uintptr_t) 0) {
 	return(tmp == one);
     }
 
@@ -617,7 +617,7 @@ Cudd_bddLeq(
   Synopsis    [Implements the recursive step of Cudd_bddIte.]
 
   Description [Implements the recursive step of Cudd_bddIte. Returns a
-  pointer to the resulting BDD. NULL if the intermediate result blows
+  pointer to the resulting BDD. (uintptr_t) 0 if the intermediate result blows
   up or if reordering occurs.]
 
   SideEffects [None]
@@ -654,7 +654,7 @@ cuddBddIteRecur(
 	    return(f);
 	} else {
 	    res = cuddBddAndRecur(dd,Cudd_Not(f),Cudd_Not(h));
-	    return(Cudd_NotCond(res,res != NULL));
+	    return(Cudd_NotCond(res,res != (uintptr_t) 0));
 	}
     } else if (g == zero || f == Cudd_Not(g)) { /* ITE(F,!F,H) = ITE(F,0,H) = !F * H */
 	if (h == one) {		/* ITE(F,0,1) = !F */
@@ -669,7 +669,7 @@ cuddBddIteRecur(
 	return(res);
     } else if (h == one || f == Cudd_Not(h)) { /* ITE(F,G,!F) = ITE(F,G,1) = !F + G */
 	res = cuddBddAndRecur(dd,f,Cudd_Not(g));
-	return(Cudd_NotCond(res,res != NULL));
+	return(Cudd_NotCond(res,res != (uintptr_t) 0));
     }
 
     /* Check remaining one variable case. */
@@ -690,12 +690,12 @@ cuddBddIteRecur(
     /* A shortcut: ITE(F,G,H) = (v,G,H) if F = (v,1,0), v < top(G,H). */
     if (topf < v && cuddT(f) == one && cuddE(f) == zero) {
 	r = cuddUniqueInter(dd, (int) f->index, g, h);
-	return(Cudd_NotCond(r,comple && r != NULL));
+	return(Cudd_NotCond(r,comple && r != (uintptr_t) 0));
     }
 
     /* Check cache. */
     r = cuddCacheLookup(dd, DD_BDD_ITE_TAG, f, g, h);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
 	return(Cudd_NotCond(r,comple));
     }
 
@@ -727,21 +727,21 @@ cuddBddIteRecur(
 
     /* Recursive step. */
     t = cuddBddIteRecur(dd,Fv,Gv,Hv);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(t);
 
     e = cuddBddIteRecur(dd,Fnv,Gnv,Hnv);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(dd,t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
     r = (t == e) ? t : cuddUniqueInter(dd,index,t,e);
-    if (r == NULL) {
+    if (r == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(dd,t);
 	Cudd_IterDerefBdd(dd,e);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(t);
     cuddDeref(e);
@@ -787,7 +787,7 @@ cuddBddIntersectRecur(
     /* At this point f and g are not constant. */
     if (f > g) { DdNode *tmp = f; f = g; g = tmp; }
     res = cuddCacheLookup2(dd,Cudd_bddIntersect,f,g);
-    if (res != NULL) return(res);
+    if (res != (uintptr_t) 0) return(res);
 
     /* Find splitting variable. Here we can skip the use of cuddI,
     ** because the operands are known to be non-constant.
@@ -824,15 +824,15 @@ cuddBddIntersectRecur(
 
     /* Compute partial results. */
     t = cuddBddIntersectRecur(dd,fv,gv);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(t);
     if (t != zero) {
 	e = zero;
     } else {
 	e = cuddBddIntersectRecur(dd,fnv,gnv);
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     }
     cuddRef(e);
@@ -841,18 +841,18 @@ cuddBddIntersectRecur(
 	res = t;
     } else if (Cudd_IsComplement(t)) {
 	res = cuddUniqueInter(dd,(int)index,Cudd_Not(t),Cudd_Not(e));
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd, t);
 	    Cudd_IterDerefBdd(dd, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	res = Cudd_Not(res);
     } else {
 	res = cuddUniqueInter(dd,(int)index,t,e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(dd, t);
 	    Cudd_IterDerefBdd(dd, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     }
     cuddDeref(e);
@@ -871,7 +871,7 @@ cuddBddIntersectRecur(
 
   Description [Implements the recursive step of Cudd_bddAnd by taking
   the conjunction of two BDDs.  Returns a pointer to the result is
-  successful; NULL otherwise.]
+  successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -919,7 +919,7 @@ cuddBddAndRecur(
     /* Check cache. */
     if (F->ref != 1 || G->ref != 1) {
 	r = cuddCacheLookup2(manager, Cudd_bddAnd, f, g);
-	if (r != NULL) return(r);
+	if (r != (uintptr_t) 0) return(r);
     }
 
     /* Here we can skip the use of cuddI, because the operands are known
@@ -954,13 +954,13 @@ cuddBddAndRecur(
     }
 
     t = cuddBddAndRecur(manager, fv, gv);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(t);
 
     e = cuddBddAndRecur(manager, fnv, gnv);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(manager, t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
@@ -969,18 +969,18 @@ cuddBddAndRecur(
     } else {
 	if (Cudd_IsComplement(t)) {
 	    r = cuddUniqueInter(manager,(int)index,Cudd_Not(t),Cudd_Not(e));
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(manager, t);
 		Cudd_IterDerefBdd(manager, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    r = Cudd_Not(r);
 	} else {
 	    r = cuddUniqueInter(manager,(int)index,t,e);
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(manager, t);
 		Cudd_IterDerefBdd(manager, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	}
     }
@@ -999,7 +999,7 @@ cuddBddAndRecur(
 
   Description [Implements the recursive step of Cudd_bddXor by taking
   the exclusive OR of two BDDs.  Returns a pointer to the result is
-  successful; NULL otherwise.]
+  successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -1041,7 +1041,7 @@ cuddBddXorRecur(
 
     /* Check cache. */
     r = cuddCacheLookup2(manager, Cudd_bddXor, f, g);
-    if (r != NULL) return(r);
+    if (r != (uintptr_t) 0) return(r);
 
     /* Here we can skip the use of cuddI, because the operands are known
     ** to be non-constant.
@@ -1072,13 +1072,13 @@ cuddBddXorRecur(
     }
 
     t = cuddBddXorRecur(manager, fv, gv);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(t);
 
     e = cuddBddXorRecur(manager, fnv, gnv);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(manager, t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
@@ -1087,18 +1087,18 @@ cuddBddXorRecur(
     } else {
 	if (Cudd_IsComplement(t)) {
 	    r = cuddUniqueInter(manager,(int)index,Cudd_Not(t),Cudd_Not(e));
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(manager, t);
 		Cudd_IterDerefBdd(manager, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    r = Cudd_Not(r);
 	} else {
 	    r = cuddUniqueInter(manager,(int)index,t,e);
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(manager, t);
 		Cudd_IterDerefBdd(manager, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	}
     }

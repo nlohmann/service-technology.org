@@ -74,8 +74,8 @@ DD::DD(Cudd *ddManager, DdNode *ddNode) {
 
 
 DD::DD() {
-    ddMgr = NULL;
-    node = NULL;
+    ddMgr = (uintptr_t) 0;
+    node = (uintptr_t) 0;
 
 } // DD::DD
 
@@ -211,7 +211,7 @@ ABDD::ABDD(const ABDD &from) : DD(from) {}
 
 ABDD::~ABDD() {
   /*
-    if (ddMgr != NULL and node != NULL) {
+    if (ddMgr != (uintptr_t) 0 and node != (uintptr_t) 0) {
 	Cudd_RecursiveDeref(ddMgr->p->manager,node);
 	if (ddMgr->isVerbose()) {
 	    cout << "ADD/BDD destructor called for node " << hex <<

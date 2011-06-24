@@ -113,7 +113,7 @@ static DdNode * cuddBddClipAndAbsRecur (DdManager *manager, DdNode *f, DdNode *g
   Synopsis    [Approximates the conjunction of two BDDs f and g.]
 
   Description [Approximates the conjunction of two BDDs f and g. Returns a
-  pointer to the resulting BDD if successful; NULL if the intermediate
+  pointer to the resulting BDD if successful; (uintptr_t) 0 if the intermediate
   result blows up.]
 
   SideEffects [None]
@@ -148,7 +148,7 @@ Cudd_bddClippingAnd(
   Description [Approximates the conjunction of two BDDs f and g and
   simultaneously abstracts the variables in cube. The variables are
   existentially abstracted. Returns a pointer to the resulting BDD if
-  successful; NULL if the intermediate result blows up.]
+  successful; (uintptr_t) 0 if the intermediate result blows up.]
 
   SideEffects [None]
 
@@ -185,7 +185,7 @@ Cudd_bddClippingAndAbstract(
   Synopsis    [Approximates the conjunction of two BDDs f and g.]
 
   Description [Approximates the conjunction of two BDDs f and g. Returns a
-  pointer to the resulting BDD if successful; NULL if the intermediate
+  pointer to the resulting BDD if successful; (uintptr_t) 0 if the intermediate
   result blows up.]
 
   SideEffects [None]
@@ -217,7 +217,7 @@ cuddBddClippingAnd(
 
   Description [Approximates the conjunction of two BDDs f and g and
   simultaneously abstracts the variables in cube. Returns a
-  pointer to the resulting BDD if successful; NULL if the intermediate
+  pointer to the resulting BDD if successful; (uintptr_t) 0 if the intermediate
   result blows up.]
 
   SideEffects [None]
@@ -254,7 +254,7 @@ cuddBddClippingAndAbstract(
 
   Description [Implements the recursive step of Cudd_bddClippingAnd by taking
   the conjunction of two BDDs.  Returns a pointer to the result is
-  successful; NULL otherwise.]
+  successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -309,7 +309,7 @@ cuddBddClippingAndRecur(
 	(direction ? Cudd_bddClippingAnd : cuddBddClippingAnd);
     if (F->ref != 1 || G->ref != 1) {
 	r = cuddCacheLookup2(manager, cacheOp, f, g);
-	if (r != NULL) return(r);
+	if (r != (uintptr_t) 0) return(r);
     }
 
     /* Here we can skip the use of cuddI, because the operands are known
@@ -344,12 +344,12 @@ cuddBddClippingAndRecur(
     }
 
     t = cuddBddClippingAndRecur(manager, ft, gt, distance, direction);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(t);
     e = cuddBddClippingAndRecur(manager, fe, ge, distance, direction);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(manager, t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
@@ -358,18 +358,18 @@ cuddBddClippingAndRecur(
     } else {
 	if (Cudd_IsComplement(t)) {
 	    r = cuddUniqueInter(manager,(int)index,Cudd_Not(t),Cudd_Not(e));
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(manager, t);
 		Cudd_RecursiveDeref(manager, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    r = Cudd_Not(r);
 	} else {
 	    r = cuddUniqueInter(manager,(int)index,t,e);
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(manager, t);
 		Cudd_RecursiveDeref(manager, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	}
     }
@@ -389,7 +389,7 @@ cuddBddClippingAndRecur(
 
   Description [Approximates the AND of two BDDs and simultaneously
   abstracts the variables in cube. The variables are existentially
-  abstracted.  Returns a pointer to the result is successful; NULL
+  abstracted.  Returns a pointer to the result is successful; (uintptr_t) 0
   otherwise.]
 
   SideEffects [None]
@@ -409,7 +409,7 @@ cuddBddClipAndAbsRecur(
     DdNode *F, *ft, *fe, *G, *gt, *ge;
     DdNode *one, *zero, *r, *t, *e, *Cube;
     unsigned int topf, topg, topcube, top, index;
-    ptruint cacheTag;
+    uintptr_t cacheTag;
 
     statLine(manager);
     one = DD_ONE(manager);
@@ -444,7 +444,7 @@ cuddBddClipAndAbsRecur(
     if (F->ref != 1 || G->ref != 1) {
 	r = cuddCacheLookup(manager, cacheTag,
 			    f, g, cube);
-	if (r != NULL) {
+	if (r != (uintptr_t) 0) {
 	    return(r);
 	}
     }
@@ -494,7 +494,7 @@ cuddBddClipAndAbsRecur(
     }
 
     t = cuddBddClipAndAbsRecur(manager, ft, gt, Cube, distance, direction);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
 
     /* Special case: 1 OR anything = 1. Hence, no need to compute
     ** the else branch if t is 1.
@@ -507,19 +507,19 @@ cuddBddClipAndAbsRecur(
     cuddRef(t);
 
     e = cuddBddClipAndAbsRecur(manager, fe, ge, Cube, distance, direction);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(manager, t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
     if (topcube == top) {	/* abstract */
 	r = cuddBddClippingAndRecur(manager, Cudd_Not(t), Cudd_Not(e),
 				    distance, (direction == 0));
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(manager, t);
 	    Cudd_RecursiveDeref(manager, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	r = Cudd_Not(r);
 	cuddRef(r);
@@ -533,18 +533,18 @@ cuddBddClipAndAbsRecur(
     } else {
 	if (Cudd_IsComplement(t)) {
 	    r = cuddUniqueInter(manager,(int)index,Cudd_Not(t),Cudd_Not(e));
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(manager, t);
 		Cudd_RecursiveDeref(manager, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    r = Cudd_Not(r);
 	} else {
 	    r = cuddUniqueInter(manager,(int)index,t,e);
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(manager, t);
 		Cudd_RecursiveDeref(manager, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	}
 	cuddDeref(e);

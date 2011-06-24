@@ -218,7 +218,7 @@ Cudd_PrintMinterm(
     background = manager->background;
     zero = Cudd_Not(manager->one);
     list = ALLOC(int,manager->size);
-    if (list == NULL) {
+    if (list == (uintptr_t) 0) {
 	manager->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -259,7 +259,7 @@ Cudd_bddPrintCover(
 #endif
 
     array = ALLOC(int, Cudd_ReadSize(dd));
-    if (array == NULL) return(0);
+    if (array == (uintptr_t) 0) return(0);
     lb = l;
     cuddRef(lb);
 #ifdef DD_DEBUG
@@ -270,14 +270,14 @@ Cudd_bddPrintCover(
 	DdNode *implicant, *prime, *tmp;
 	int length;
 	implicant = Cudd_LargestCube(dd,lb,&length);
-	if (implicant == NULL) {
+	if (implicant == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,lb);
 	    FREE(array);
 	    return(0);
 	}
 	cuddRef(implicant);
 	prime = Cudd_bddMakePrime(dd,implicant,u);
-	if (prime == NULL) {
+	if (prime == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,lb);
 	    Cudd_RecursiveDeref(dd,implicant);
 	    FREE(array);
@@ -286,7 +286,7 @@ Cudd_bddPrintCover(
 	cuddRef(prime);
 	Cudd_RecursiveDeref(dd,implicant);
 	tmp = Cudd_bddAnd(dd,lb,Cudd_Not(prime));
-	if (tmp == NULL) {
+	if (tmp == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,lb);
 	    Cudd_RecursiveDeref(dd,prime);
 	    FREE(array);
@@ -320,7 +320,7 @@ Cudd_bddPrintCover(
 	(void) fprintf(dd->out, " 1\n");
 #ifdef DD_DEBUG
 	tmp = Cudd_bddOr(dd,prime,cover);
-	if (tmp == NULL) {
+	if (tmp == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,cover);
 	    Cudd_RecursiveDeref(dd,lb);
 	    Cudd_RecursiveDeref(dd,prime);
@@ -387,8 +387,8 @@ Cudd_PrintDebug(
     double minterms;
     int    retval = 1;
 
-    if (f == NULL) {
-	(void) fprintf(dd->out,": is the NULL DD\n");
+    if (f == (uintptr_t) 0) {
+	(void) fprintf(dd->out,": is the (uintptr_t) 0 DD\n");
 	(void) fflush(dd->out);
 	return(0);
     }
@@ -482,7 +482,7 @@ Cudd_EstimateCofactor(
     st_table *table;
 
     table = st_init_table(st_ptrcmp,st_ptrhash);
-    if (table == NULL) return(CUDD_OUT_OF_MEM);
+    if (table == (uintptr_t) 0) return(CUDD_OUT_OF_MEM);
     val = cuddEstimateCofactor(dd,table,Cudd_Regular(f),i,phase,&ptr);
     ddClearFlag(Cudd_Regular(f));
     st_free_table(table);
@@ -586,7 +586,7 @@ Cudd_CountMinterm(
 
     max = pow(2.0,(double)nvars);
     table = cuddHashTableInit(manager,1,2);
-    if (table == NULL) {
+    if (table == (uintptr_t) 0) {
 	return((double)CUDD_OUT_OF_MEM);
     }
     epsilon = Cudd_ReadEpsilon(manager);
@@ -624,11 +624,11 @@ Cudd_CountPath(
     double	i;
 
     table = st_init_table(st_ptrcmp,st_ptrhash);
-    if (table == NULL) {
+    if (table == (uintptr_t) 0) {
 	return((double)CUDD_OUT_OF_MEM);
     }
     i = ddCountPathAux(Cudd_Regular(node),table);
-    st_foreach(table, cuddStCountfree, NULL);
+    st_foreach(table, cuddStCountfree, (uintptr_t) 0);
     st_free_table(table);
     return(i);
 
@@ -665,12 +665,12 @@ Cudd_EpdCountMinterm(
 
     EpdPow2(nvars, &max);
     table = st_init_table(EpdCmp, st_ptrhash);
-    if (table == NULL) {
+    if (table == (uintptr_t) 0) {
 	EpdMakeZero(epd, 0);
 	return(CUDD_OUT_OF_MEM);
     }
     status = ddEpdCountMintermAux(Cudd_Regular(node),&max,epd,table);
-    st_foreach(table, ddEpdFree, NULL);
+    st_foreach(table, ddEpdFree, (uintptr_t) 0);
     st_free_table(table);
     if (status == CUDD_OUT_OF_MEM) {
 	EpdMakeZero(epd, 0);
@@ -708,11 +708,11 @@ Cudd_CountPathsToNonZero(
     double	i;
 
     table = st_init_table(st_ptrcmp,st_ptrhash);
-    if (table == NULL) {
+    if (table == (uintptr_t) 0) {
 	return((double)CUDD_OUT_OF_MEM);
     }
     i = ddCountPathsToNonZero(node,table);
-    st_foreach(table, cuddStCountfree, NULL);
+    st_foreach(table, cuddStCountfree, (uintptr_t) 0);
     st_free_table(table);
     return(i);
 
@@ -725,7 +725,7 @@ Cudd_CountPathsToNonZero(
 
   Description [Finds the variables on which a DD depends.
   Returns a BDD consisting of the product of the variables if
-  successful; NULL otherwise.]
+  successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -745,9 +745,9 @@ Cudd_Support(
     /* Allocate and initialize support array for ddSupportStep. */
     size = ddMax(dd->size, dd->sizeZ);
     support = ALLOC(int,size);
-    if (support == NULL) {
+    if (support == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < size; i++) {
 	support[i] = 0;
@@ -771,10 +771,10 @@ Cudd_Support(
 		var = cuddUniqueInter(dd,i,dd->one,Cudd_Not(dd->one));
 		cuddRef(var);
 		tmp = cuddBddAndRecur(dd,res,var);
-		if (tmp == NULL) {
+		if (tmp == (uintptr_t) 0) {
 		    Cudd_RecursiveDeref(dd,res);
 		    Cudd_RecursiveDeref(dd,var);
-		    res = NULL;
+		    res = (uintptr_t) 0;
 		    break;
 		}
 		cuddRef(tmp);
@@ -786,7 +786,7 @@ Cudd_Support(
     } while (dd->reordered == 1);
 
     FREE(support);
-    if (res != NULL) cuddDeref(res);
+    if (res != (uintptr_t) 0) cuddDeref(res);
     return(res);
 
 } /* end of Cudd_Support */
@@ -797,7 +797,7 @@ Cudd_Support(
   Synopsis    [Finds the variables on which a DD depends.]
 
   Description [Finds the variables on which a DD depends.  Returns an
-  index array of the variables if successful; NULL otherwise.  The
+  index array of the variables if successful; (uintptr_t) 0 otherwise.  The
   size of the array equals the number of variables in the manager.
   Each entry of the array is 1 if the corresponding variable is in the
   support of the DD and 0 otherwise.]
@@ -819,9 +819,9 @@ Cudd_SupportIndex(
     /* Allocate and initialize support array for ddSupportStep. */
     size = ddMax(dd->size, dd->sizeZ);
     support = ALLOC(int,size);
-    if (support == NULL) {
+    if (support == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < size; i++) {
 	support[i] = 0;
@@ -862,7 +862,7 @@ Cudd_SupportSize(
     /* Allocate and initialize support array for ddSupportStep. */
     size = ddMax(dd->size, dd->sizeZ);
     support = ALLOC(int,size);
-    if (support == NULL) {
+    if (support == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	return(CUDD_OUT_OF_MEM);
     }
@@ -893,7 +893,7 @@ Cudd_SupportSize(
   Description [Finds the variables on which a set of DDs depends.
   The set must contain either BDDs and ADDs, or ZDDs.
   Returns a BDD consisting of the product of the variables if
-  successful; NULL otherwise.]
+  successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -914,9 +914,9 @@ Cudd_VectorSupport(
     /* Allocate and initialize support array for ddSupportStep. */
     size = ddMax(dd->size, dd->sizeZ);
     support = ALLOC(int,size);
-    if (support == NULL) {
+    if (support == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < size; i++) {
 	support[i] = 0;
@@ -939,11 +939,11 @@ Cudd_VectorSupport(
 	    var = cuddUniqueInter(dd,i,dd->one,Cudd_Not(dd->one));
 	    cuddRef(var);
 	    tmp = Cudd_bddAnd(dd,res,var);
-	    if (tmp == NULL) {
+	    if (tmp == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd,res);
 		Cudd_RecursiveDeref(dd,var);
 		FREE(support);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    cuddRef(tmp);
 	    Cudd_RecursiveDeref(dd,res);
@@ -965,7 +965,7 @@ Cudd_VectorSupport(
 
   Description [Finds the variables on which a set of DDs depends.
   The set must contain either BDDs and ADDs, or ZDDs.
-  Returns an index array of the variables if successful; NULL otherwise.]
+  Returns an index array of the variables if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -985,9 +985,9 @@ Cudd_VectorSupportIndex(
     /* Allocate and initialize support array for ddSupportStep. */
     size = ddMax(dd->size, dd->sizeZ);
     support = ALLOC(int,size);
-    if (support == NULL) {
+    if (support == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < size; i++) {
 	support[i] = 0;
@@ -1034,7 +1034,7 @@ Cudd_VectorSupportSize(
     /* Allocate and initialize support array for ddSupportStep. */
     size = ddMax(dd->size, dd->sizeZ);
     support = ALLOC(int,size);
-    if (support == NULL) {
+    if (support == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	return(CUDD_OUT_OF_MEM);
     }
@@ -1094,12 +1094,12 @@ Cudd_ClassifySupport(
     /* Allocate and initialize support arrays for ddSupportStep. */
     size = ddMax(dd->size, dd->sizeZ);
     supportF = ALLOC(int,size);
-    if (supportF == NULL) {
+    if (supportF == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
     supportG = ALLOC(int,size);
-    if (supportG == NULL) {
+    if (supportG == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	FREE(supportF);
 	return(0);
@@ -1125,7 +1125,7 @@ Cudd_ClassifySupport(
 	cuddRef(var);
 	if (supportG[i] == 0) {
 	    tmp = Cudd_bddAnd(dd,*onlyF,var);
-	    if (tmp == NULL) {
+	    if (tmp == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd,*common);
 		Cudd_RecursiveDeref(dd,*onlyF);
 		Cudd_RecursiveDeref(dd,*onlyG);
@@ -1138,7 +1138,7 @@ Cudd_ClassifySupport(
 	    *onlyF = tmp;
 	} else if (supportF[i] == 0) {
 	    tmp = Cudd_bddAnd(dd,*onlyG,var);
-	    if (tmp == NULL) {
+	    if (tmp == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd,*common);
 		Cudd_RecursiveDeref(dd,*onlyF);
 		Cudd_RecursiveDeref(dd,*onlyG);
@@ -1151,7 +1151,7 @@ Cudd_ClassifySupport(
 	    *onlyG = tmp;
 	} else {
 	    tmp = Cudd_bddAnd(dd,*common,var);
-	    if (tmp == NULL) {
+	    if (tmp == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd,*common);
 		Cudd_RecursiveDeref(dd,*onlyF);
 		Cudd_RecursiveDeref(dd,*onlyG);
@@ -1224,7 +1224,7 @@ Cudd_bddPickOneCube(
     char   dir;
     int    i;
 
-    if (string == NULL || node == NULL) return(0);
+    if (string == (uintptr_t) 0 || node == (uintptr_t) 0) return(0);
 
     /* The constant 0 function has no on-set cubes. */
     one = DD_ONE(ddm);
@@ -1270,7 +1270,7 @@ Cudd_bddPickOneCube(
   support of <code>f</code>; if this condition is not met the minterm
   built by this procedure may not be contained in
   <code>f</code>. Builds a BDD for the minterm and returns a pointer
-  to it if successful; NULL otherwise. There are three reasons why the
+  to it if successful; (uintptr_t) 0 otherwise. There are three reasons why the
   procedure may fail:
   <ul>
   <li> It may run out of memory;
@@ -1298,15 +1298,15 @@ Cudd_bddPickOneMinterm(
 
     size = dd->size;
     string = ALLOC(char, size);
-    if (string == NULL) {
+    if (string == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     indices = ALLOC(int,n);
-    if (indices == NULL) {
+    if (indices == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	FREE(string);
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     for (i = 0; i < n; i++) {
@@ -1317,7 +1317,7 @@ Cudd_bddPickOneMinterm(
     if (result == 0) {
 	FREE(string);
 	FREE(indices);
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     /* Randomize choice for don't cares. */
@@ -1332,11 +1332,11 @@ Cudd_bddPickOneMinterm(
 
     for (i = n-1; i >= 0; i--) {
 	neW = Cudd_bddAnd(dd,old,Cudd_NotCond(vars[i],string[indices[i]]==0));
-	if (neW == NULL) {
+	if (neW == (uintptr_t) 0) {
 	    FREE(string);
 	    FREE(indices);
 	    Cudd_RecursiveDeref(dd,old);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(neW);
 	Cudd_RecursiveDeref(dd,old);
@@ -1349,7 +1349,7 @@ Cudd_bddPickOneMinterm(
 	cuddDeref(old);
     } else {
 	Cudd_RecursiveDeref(dd,old);
-	old = NULL;
+	old = (uintptr_t) 0;
     }
 #else
     cuddDeref(old);
@@ -1372,7 +1372,7 @@ Cudd_bddPickOneMinterm(
   support of <code>f</code>; if this condition is not met the minterms
   built by this procedure may not be contained in
   <code>f</code>. Builds an array of BDDs for the minterms and returns a
-  pointer to it if successful; NULL otherwise. There are three reasons
+  pointer to it if successful; (uintptr_t) 0 otherwise. There are three reasons
   why the procedure may fail:
   <ul>
   <li> It may run out of memory;
@@ -1404,34 +1404,34 @@ Cudd_bddPickArbitraryMinterms(
 
     minterms = Cudd_CountMinterm(dd,f,n);
     if ((double)k > minterms) {
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     size = dd->size;
     string = ALLOC(char *, k);
-    if (string == NULL) {
+    if (string == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < k; i++) {
 	string[i] = ALLOC(char, size + 1);
-	if (string[i] == NULL) {
+	if (string[i] == (uintptr_t) 0) {
 	    for (j = 0; j < i; j++)
 		FREE(string[i]);
 	    FREE(string);
 	    dd->errorCode = CUDD_MEMORY_OUT;
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	for (j = 0; j < size; j++) string[i][j] = '2';
 	string[i][size] = '\0';
     }
     indices = ALLOC(int,n);
-    if (indices == NULL) {
+    if (indices == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	for (i = 0; i < k; i++)
 	    FREE(string[i]);
 	FREE(string);
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     for (i = 0; i < n; i++) {
@@ -1444,27 +1444,27 @@ Cudd_bddPickArbitraryMinterms(
 	    FREE(string[i]);
 	FREE(string);
 	FREE(indices);
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     old = ALLOC(DdNode *, k);
-    if (old == NULL) {
+    if (old == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	for (i = 0; i < k; i++)
 	    FREE(string[i]);
 	FREE(string);
 	FREE(indices);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     saveString = ALLOC(char, size + 1);
-    if (saveString == NULL) {
+    if (saveString == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	for (i = 0; i < k; i++)
 	    FREE(string[i]);
 	FREE(string);
 	FREE(indices);
 	FREE(old);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     saveFlag = 0;
 
@@ -1530,7 +1530,7 @@ Cudd_bddPickArbitraryMinterms(
 	    } else {
 		neW = Cudd_bddAnd(dd,old[i],vars[j]);
 	    }
-	    if (neW == NULL) {
+	    if (neW == (uintptr_t) 0) {
 		FREE(saveString);
 		for (l = 0; l < k; l++)
 		    FREE(string[l]);
@@ -1539,7 +1539,7 @@ Cudd_bddPickArbitraryMinterms(
 		for (l = 0; l <= i; l++)
 		    Cudd_RecursiveDeref(dd,old[l]);
 		FREE(old);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    cuddRef(neW);
 	    Cudd_RecursiveDeref(dd,old[i]);
@@ -1556,7 +1556,7 @@ Cudd_bddPickArbitraryMinterms(
 	    for (l = 0; l <= i; l++)
 		Cudd_RecursiveDeref(dd,old[l]);
 	    FREE(old);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     }
 
@@ -1620,9 +1620,9 @@ Cudd_SubsetWithMaskVars(
     size = dd->size;
 
     weight = ALLOC(double,size);
-    if (weight == NULL) {
+    if (weight == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < size; i++) {
 	weight[i] = 0.0;
@@ -1640,17 +1640,17 @@ Cudd_SubsetWithMaskVars(
     }
 
     string = ALLOC(char, size + 1);
-    if (string == NULL) {
+    if (string == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	FREE(weight);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     mask = ALLOC(int, size);
-    if (mask == NULL) {
+    if (mask == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	FREE(weight);
 	FREE(string);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < size; i++) {
 	string[i] = '2';
@@ -1658,12 +1658,12 @@ Cudd_SubsetWithMaskVars(
     }
     string[size] = '\0';
     indices = ALLOC(int,nvars);
-    if (indices == NULL) {
+    if (indices == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	FREE(weight);
 	FREE(string);
 	FREE(mask);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < nvars; i++) {
 	indices[i] = vars[i]->index;
@@ -1675,7 +1675,7 @@ Cudd_SubsetWithMaskVars(
 	FREE(string);
 	FREE(mask);
 	FREE(indices);
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     cube = Cudd_ReadOne(dd);
@@ -1688,13 +1688,13 @@ Cudd_SubsetWithMaskVars(
 	    newCube = Cudd_bddIte(dd,cube,vars[i],zero);
 	} else
 	    continue;
-	if (newCube == NULL) {
+	if (newCube == (uintptr_t) 0) {
 	    FREE(weight);
 	    FREE(string);
 	    FREE(mask);
 	    FREE(indices);
 	    Cudd_RecursiveDeref(dd,cube);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(newCube);
 	Cudd_RecursiveDeref(dd,cube);
@@ -1730,13 +1730,13 @@ Cudd_SubsetWithMaskVars(
 	    newCube = Cudd_bddIte(dd,cube,vars[i],zero);
 	} else
 	    continue;
-	if (newCube == NULL) {
+	if (newCube == (uintptr_t) 0) {
 	    FREE(weight);
 	    FREE(string);
 	    FREE(mask);
 	    FREE(indices);
 	    Cudd_RecursiveDeref(dd,cube);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(newCube);
 	Cudd_RecursiveDeref(dd,cube);
@@ -1752,7 +1752,7 @@ Cudd_SubsetWithMaskVars(
 	cuddDeref(subset);
     } else {
 	Cudd_RecursiveDeref(dd,subset);
-	subset = NULL;
+	subset = (uintptr_t) 0;
     }
 
     FREE(weight);
@@ -1770,7 +1770,7 @@ Cudd_SubsetWithMaskVars(
 
   Description [Defines an iterator on the onset of a decision diagram
   and finds its first cube. Returns a generator that contains the
-  information necessary to continue the enumeration if successful; NULL
+  information necessary to continue the enumeration if successful; (uintptr_t) 0
   otherwise.<p>
   A cube is represented as an array of literals, which are integers in
   {0, 1, 2}; 0 represents a complemented literal, 1 represents an
@@ -1803,30 +1803,30 @@ Cudd_FirstCube(
     int nvars;
 
     /* Sanity Check. */
-    if (dd == NULL || f == NULL) return(NULL);
+    if (dd == (uintptr_t) 0 || f == (uintptr_t) 0) return((uintptr_t) 0);
 
     /* Allocate generator an initialize it. */
     gen = ALLOC(DdGen,1);
-    if (gen == NULL) {
+    if (gen == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     gen->manager = dd;
     gen->type = CUDD_GEN_CUBES;
     gen->status = CUDD_GEN_EMPTY;
-    gen->gen.cubes.cube = NULL;
+    gen->gen.cubes.cube = (uintptr_t) 0;
     gen->gen.cubes.value = DD_ZERO_VAL;
     gen->stack.sp = 0;
-    gen->stack.stack = NULL;
-    gen->node = NULL;
+    gen->stack.stack = (uintptr_t) 0;
+    gen->node = (uintptr_t) 0;
 
     nvars = dd->size;
     gen->gen.cubes.cube = ALLOC(int,nvars);
-    if (gen->gen.cubes.cube == NULL) {
+    if (gen->gen.cubes.cube == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	FREE(gen);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 0; i < nvars; i++) gen->gen.cubes.cube[i] = 2;
 
@@ -1835,13 +1835,13 @@ Cudd_FirstCube(
     ** constant level.
     */
     gen->stack.stack = ALLOC(DdNodePtr, nvars+1);
-    if (gen->stack.stack == NULL) {
+    if (gen->stack.stack == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	FREE(gen->gen.cubes.cube);
 	FREE(gen);
-	return(NULL);
+	return((uintptr_t) 0);
     }
-    for (i = 0; i <= nvars; i++) gen->stack.stack[i] = NULL;
+    for (i = 0; i <= nvars; i++) gen->stack.stack[i] = (uintptr_t) 0;
 
     /* Find the first cube of the onset. */
     gen->stack.stack[gen->stack.sp] = f; gen->stack.sp++;
@@ -1999,7 +1999,7 @@ done:
   (possibly incompletely specified) Boolean functions and finds the
   first cube of a cover of the function.  Returns a generator
   that contains the information necessary to continue the enumeration
-  if successful; NULL otherwise.<p>
+  if successful; (uintptr_t) 0 otherwise.<p>
 
   The two argument BDDs are the lower and upper bounds of an interval.
   It is a mistake to call this function with a lower bound that is not
@@ -2032,60 +2032,60 @@ Cudd_FirstPrime(
     int length, result;
 
     /* Sanity Check. */
-    if (dd == NULL || l == NULL || u == NULL) return(NULL);
+    if (dd == (uintptr_t) 0 || l == (uintptr_t) 0 || u == (uintptr_t) 0) return((uintptr_t) 0);
 
     /* Allocate generator an initialize it. */
     gen = ALLOC(DdGen,1);
-    if (gen == NULL) {
+    if (gen == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     gen->manager = dd;
     gen->type = CUDD_GEN_PRIMES;
     gen->status = CUDD_GEN_EMPTY;
-    gen->gen.primes.cube = NULL;
+    gen->gen.primes.cube = (uintptr_t) 0;
     gen->gen.primes.ub = u;
     gen->stack.sp = 0;
-    gen->stack.stack = NULL;
+    gen->stack.stack = (uintptr_t) 0;
     gen->node = l;
     cuddRef(l);
 
     gen->gen.primes.cube = ALLOC(int,dd->size);
-    if (gen->gen.primes.cube == NULL) {
+    if (gen->gen.primes.cube == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	FREE(gen);
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     if (gen->node == Cudd_ReadLogicZero(dd)) {
 	gen->status = CUDD_GEN_EMPTY;
     } else {
 	implicant = Cudd_LargestCube(dd,gen->node,&length);
-	if (implicant == NULL) {
+	if (implicant == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,gen->node);
 	    FREE(gen->gen.primes.cube);
 	    FREE(gen);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(implicant);
 	prime = Cudd_bddMakePrime(dd,implicant,gen->gen.primes.ub);
-	if (prime == NULL) {
+	if (prime == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,gen->node);
 	    Cudd_RecursiveDeref(dd,implicant);
 	    FREE(gen->gen.primes.cube);
 	    FREE(gen);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(prime);
 	Cudd_RecursiveDeref(dd,implicant);
 	tmp = Cudd_bddAnd(dd,gen->node,Cudd_Not(prime));
-	if (tmp == NULL) {
+	if (tmp == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,gen->node);
 	    Cudd_RecursiveDeref(dd,prime);
 	    FREE(gen->gen.primes.cube);
 	    FREE(gen);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(tmp);
 	Cudd_RecursiveDeref(dd,gen->node);
@@ -2096,7 +2096,7 @@ Cudd_FirstPrime(
 	    Cudd_RecursiveDeref(dd,prime);
 	    FREE(gen->gen.primes.cube);
 	    FREE(gen);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	Cudd_RecursiveDeref(dd,prime);
 	gen->status = CUDD_GEN_NONEMPTY;
@@ -2135,13 +2135,13 @@ Cudd_NextPrime(
 	gen->status = CUDD_GEN_EMPTY;
     } else {
 	implicant = Cudd_LargestCube(dd,gen->node,&length);
-	if (implicant == NULL) {
+	if (implicant == (uintptr_t) 0) {
 	    gen->status = CUDD_GEN_EMPTY;
 	    return(0);
 	}
 	cuddRef(implicant);
 	prime = Cudd_bddMakePrime(dd,implicant,gen->gen.primes.ub);
-	if (prime == NULL) {
+	if (prime == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,implicant);
 	    gen->status = CUDD_GEN_EMPTY;
 	    return(0);
@@ -2149,7 +2149,7 @@ Cudd_NextPrime(
 	cuddRef(prime);
 	Cudd_RecursiveDeref(dd,implicant);
 	tmp = Cudd_bddAnd(dd,gen->node,Cudd_Not(prime));
-	if (tmp == NULL) {
+	if (tmp == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,prime);
 	    gen->status = CUDD_GEN_EMPTY;
 	    return(0);
@@ -2180,8 +2180,8 @@ Cudd_NextPrime(
   Description [Computes the cube of an array of BDD variables. If
   non-null, the phase argument indicates which literal of each
   variable should appear in the cube. If phase\[i\] is nonzero, then the
-  positive literal is used. If phase is NULL, the cube is positive unate.
-  Returns a pointer to the result if successful; NULL otherwise.]
+  positive literal is used. If phase is (uintptr_t) 0, the cube is positive unate.
+  Returns a pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -2203,14 +2203,14 @@ Cudd_bddComputeCube(
     cuddRef(cube);
 
     for (i = n - 1; i >= 0; i--) {
-	if (phase == NULL || phase[i] != 0) {
+	if (phase == (uintptr_t) 0 || phase[i] != 0) {
 	    fn = Cudd_bddAnd(dd,vars[i],cube);
 	} else {
 	    fn = Cudd_bddAnd(dd,Cudd_Not(vars[i]),cube);
 	}
-	if (fn == NULL) {
+	if (fn == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,cube);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(fn);
 	Cudd_RecursiveDeref(dd,cube);
@@ -2230,8 +2230,8 @@ Cudd_bddComputeCube(
   Description [Computes the cube of an array of ADD variables.  If
   non-null, the phase argument indicates which literal of each
   variable should appear in the cube. If phase\[i\] is nonzero, then the
-  positive literal is used. If phase is NULL, the cube is positive unate.
-  Returns a pointer to the result if successful; NULL otherwise.]
+  positive literal is used. If phase is (uintptr_t) 0, the cube is positive unate.
+  Returns a pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [none]
 
@@ -2254,14 +2254,14 @@ Cudd_addComputeCube(
     zero = DD_ZERO(dd);
 
     for (i = n - 1; i >= 0; i--) {
-	if (phase == NULL || phase[i] != 0) {
+	if (phase == (uintptr_t) 0 || phase[i] != 0) {
 	    fn = Cudd_addIte(dd,vars[i],cube,zero);
 	} else {
 	    fn = Cudd_addIte(dd,vars[i],zero,cube);
 	}
-	if (fn == NULL) {
+	if (fn == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,cube);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(fn);
 	Cudd_RecursiveDeref(dd,cube);
@@ -2283,7 +2283,7 @@ Cudd_addComputeCube(
   1, the variable of index i appears in true form in the cube; If the
   i-th entry is 0, the variable of index i appears complemented in the
   cube; otherwise the variable does not appear in the cube.  Returns a
-  pointer to the BDD for the cube if successful; NULL otherwise.]
+  pointer to the BDD for the cube if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -2305,9 +2305,9 @@ Cudd_CubeArrayToBdd(
 	if ((array[i] & ~1) == 0) {
 	    var = Cudd_bddIthVar(dd,i);
 	    tmp = Cudd_bddAnd(dd,cube,Cudd_NotCond(var,array[i]==0));
-	    if (tmp == NULL) {
+	    if (tmp == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd,cube);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    cuddRef(tmp);
 	    Cudd_RecursiveDeref(dd,cube);
@@ -2382,7 +2382,7 @@ Cudd_BddToCubeArray(
   Description [Defines an iterator on the nodes of a decision diagram
   and finds its first node. Returns a generator that contains the
   information necessary to continue the enumeration if successful;
-  NULL otherwise.  The nodes are enumerated in a reverse topological
+  (uintptr_t) 0 otherwise.  The nodes are enumerated in a reverse topological
   order, so that a node is always preceded in the enumeration by its
   descendants.]
 
@@ -2402,27 +2402,27 @@ Cudd_FirstNode(
     int size;
 
     /* Sanity Check. */
-    if (dd == NULL || f == NULL) return(NULL);
+    if (dd == (uintptr_t) 0 || f == (uintptr_t) 0) return((uintptr_t) 0);
 
     /* Allocate generator an initialize it. */
     gen = ALLOC(DdGen,1);
-    if (gen == NULL) {
+    if (gen == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     gen->manager = dd;
     gen->type = CUDD_GEN_NODES;
     gen->status = CUDD_GEN_EMPTY;
     gen->stack.sp = 0;
-    gen->node = NULL;
+    gen->node = (uintptr_t) 0;
 
     /* Collect all the nodes on the generator stack for later perusal. */
     gen->stack.stack = cuddNodeArray(Cudd_Regular(f), &size);
-    if (gen->stack.stack == NULL) {
+    if (gen->stack.stack == (uintptr_t) 0) {
 	FREE(gen);
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     gen->gen.nodes.size = size;
 
@@ -2487,7 +2487,7 @@ int
 Cudd_GenFree(
   DdGen * gen)
 {
-    if (gen == NULL) return(0);
+    if (gen == (uintptr_t) 0) return(0);
     switch (gen->type) {
     case CUDD_GEN_CUBES:
     case CUDD_GEN_ZDD_PATHS:
@@ -2515,7 +2515,7 @@ Cudd_GenFree(
   Synopsis    [Queries the status of a generator.]
 
   Description [Queries the status of a generator. Returns 1 if the
-  generator is empty or NULL; 0 otherswise.]
+  generator is empty or (uintptr_t) 0; 0 otherswise.]
 
   SideEffects [None]
 
@@ -2527,7 +2527,7 @@ int
 Cudd_IsGenEmpty(
   DdGen * gen)
 {
-    if (gen == NULL) return(1);
+    if (gen == (uintptr_t) 0) return(1);
     return(gen->status == CUDD_GEN_EMPTY);
 
 } /* end of Cudd_IsGenEmpty */
@@ -2538,7 +2538,7 @@ Cudd_IsGenEmpty(
   Synopsis    [Builds a cube of BDD variables from an array of indices.]
 
   Description [Builds a cube of BDD variables from an array of indices.
-  Returns a pointer to the result if successful; NULL otherwise.]
+  Returns a pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -2558,9 +2558,9 @@ Cudd_IndicesToCube(
     cuddRef(cube);
     for (i = n - 1; i >= 0; i--) {
 	tmp = Cudd_bddAnd(dd,Cudd_bddIthVar(dd,array[i]),cube);
-	if (tmp == NULL) {
+	if (tmp == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd,cube);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(tmp);
 	Cudd_RecursiveDeref(dd,cube);
@@ -2661,8 +2661,8 @@ Cudd_AverageDistance(
     slots = dd->constants.slots;
     for (j = 0; j < slots; j++) {
 	scan = nodelist[j];
-	while (scan != NULL) {
-	    if (scan->next != NULL) {
+	while (scan != (uintptr_t) 0) {
+	    if (scan->next != (uintptr_t) 0) {
 		diff = (intptr_t) scan - (intptr_t) scan->next;
 		nextsubtotal += (double) ddAbs(diff);
 		nextmeasured += 1.0;
@@ -2821,7 +2821,7 @@ Cudd_Density(
   Description [Warns that a memory allocation failed.
   This function can be used as replacement of MMout_of_memory to prevent
   the safe_mem functions of the util package from exiting when malloc
-  returns NULL. One possible use is in case of discretionary allocations;
+  returns (uintptr_t) 0. One possible use is in case of discretionary allocations;
   for instance, the allocation of memory to enlarge the computed table.]
 
   SideEffects [None]
@@ -2866,7 +2866,7 @@ cuddP(
     int retval;
     st_table *table = st_init_table(st_ptrcmp,st_ptrhash);
 
-    if (table == NULL) return(0);
+    if (table == (uintptr_t) 0) return(0);
 
     retval = dp2(dd,f,table);
     st_free_table(table);
@@ -2934,11 +2934,11 @@ cuddCollectNodes(
 	return(1);
 
     /* Check for abnormal condition that should never happen. */
-    if (f == NULL)
+    if (f == (uintptr_t) 0)
 	return(0);
 
     /* Mark node as visited. */
-    if (st_add_direct(visited, (char *) f, NULL) == ST_OUT_OF_MEM)
+    if (st_add_direct(visited, (char *) f, (uintptr_t) 0) == ST_OUT_OF_MEM)
 	return(0);
 
     /* Check terminal case. */
@@ -2962,7 +2962,7 @@ cuddCollectNodes(
 
   Description [Traverses the DD f and collects all its nodes in an array.
   The caller should free the array returned by cuddNodeArray.
-  Returns a pointer to the array of nodes in case of success; NULL
+  Returns a pointer to the array of nodes in case of success; (uintptr_t) 0
   otherwise.  The nodes are collected in reverse topological order, so
   that a node is always preceded in the array by all its descendants.]
 
@@ -2981,9 +2981,9 @@ cuddNodeArray(
 
     size = ddDagInt(Cudd_Regular(f));
     table = ALLOC(DdNodePtr, size);
-    if (table == NULL) {
+    if (table == (uintptr_t) 0) {
 	ddClearFlag(Cudd_Regular(f));
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     retval = cuddNodeArrayRecur(f, table, 0);
@@ -3019,40 +3019,40 @@ dp2(
     DdNode *g, *n, *N;
     int T,E;
 
-    if (f == NULL) {
+    if (f == (uintptr_t) 0) {
 	return(0);
     }
     g = Cudd_Regular(f);
     if (cuddIsConstant(g)) {
 #if SIZEOF_VOID_P == 8
 	(void) fprintf(dd->out,"ID = %c0x%lx\tvalue = %-9g\n", bang(f),
-		(ptruint) g / (ptruint) sizeof(DdNode),cuddV(g));
+		(uintptr_t) g / (uintptr_t) sizeof(DdNode),cuddV(g));
 #else
 	(void) fprintf(dd->out,"ID = %c0x%x\tvalue = %-9g\n", bang(f),
-		(ptruint) g / (ptruint) sizeof(DdNode),cuddV(g));
+		(uintptr_t) g / (uintptr_t) sizeof(DdNode),cuddV(g));
 #endif
 	return(1);
     }
     if (st_is_member(t,(char *) g) == 1) {
 	return(1);
     }
-    if (st_add_direct(t,(char *) g,NULL) == ST_OUT_OF_MEM)
+    if (st_add_direct(t,(char *) g,(uintptr_t) 0) == ST_OUT_OF_MEM)
 	return(0);
 #ifdef DD_STATS
 #if SIZEOF_VOID_P == 8
     (void) fprintf(dd->out,"ID = %c0x%lx\tindex = %d\tr = %d\t", bang(f),
-		(ptruint) g / (ptruint) sizeof(DdNode), g->index, g->ref);
+		(uintptr_t) g / (uintptr_t) sizeof(DdNode), g->index, g->ref);
 #else
     (void) fprintf(dd->out,"ID = %c0x%x\tindex = %d\tr = %d\t", bang(f),
-		(ptruint) g / (ptruint) sizeof(DdNode),g->index,g->ref);
+		(uintptr_t) g / (uintptr_t) sizeof(DdNode),g->index,g->ref);
 #endif
 #else
 #if SIZEOF_VOID_P == 8
     (void) fprintf(dd->out,"ID = %c0x%lx\tindex = %u\t", bang(f),
-		(ptruint) g / (ptruint) sizeof(DdNode),g->index);
+		(uintptr_t) g / (uintptr_t) sizeof(DdNode),g->index);
 #else
     (void) fprintf(dd->out,"ID = %c0x%x\tindex = %hu\t", bang(f),
-		(ptruint) g / (ptruint) sizeof(DdNode),g->index);
+		(uintptr_t) g / (uintptr_t) sizeof(DdNode),g->index);
 #endif
 #endif
     n = cuddT(g);
@@ -3061,9 +3061,9 @@ dp2(
 	T = 1;
     } else {
 #if SIZEOF_VOID_P == 8
-	(void) fprintf(dd->out,"T = 0x%lx\t",(ptruint) n / (ptruint) sizeof(DdNode));
+	(void) fprintf(dd->out,"T = 0x%lx\t",(uintptr_t) n / (uintptr_t) sizeof(DdNode));
 #else
-	(void) fprintf(dd->out,"T = 0x%x\t",(ptruint) n / (ptruint) sizeof(DdNode));
+	(void) fprintf(dd->out,"T = 0x%x\t",(uintptr_t) n / (uintptr_t) sizeof(DdNode));
 #endif
 	T = 0;
     }
@@ -3075,9 +3075,9 @@ dp2(
 	E = 1;
     } else {
 #if SIZEOF_VOID_P == 8
-	(void) fprintf(dd->out,"E = %c0x%lx\n", bang(n), (ptruint) N/(ptruint) sizeof(DdNode));
+	(void) fprintf(dd->out,"E = %c0x%lx\n", bang(n), (uintptr_t) N/(uintptr_t) sizeof(DdNode));
 #else
-	(void) fprintf(dd->out,"E = %c0x%x\n", bang(n), (ptruint) N/(ptruint) sizeof(DdNode));
+	(void) fprintf(dd->out,"E = %c0x%x\n", bang(n), (uintptr_t) N/(uintptr_t) sizeof(DdNode));
 #endif
 	E = 0;
     }
@@ -3300,7 +3300,7 @@ cuddEstimateCofactor(
 		return(CUDD_OUT_OF_MEM);
 	}
     } else if ((ptrT != cuddT(node) || ptrE != cuddE(node)) &&
-	       (*ptr = cuddUniqueLookup(dd,node->index,ptrT,ptrE)) != NULL) {
+	       (*ptr = cuddUniqueLookup(dd,node->index,ptrT,ptrE)) != (uintptr_t) 0) {
 	if (Cudd_IsComplement((*ptr)->next)) {
 	    val = 0;
 	} else {
@@ -3325,7 +3325,7 @@ cuddEstimateCofactor(
   Synopsis    [Checks the unique table for the existence of an internal node.]
 
   Description [Checks the unique table for the existence of an internal
-  node. Returns a pointer to the node if it is in the table; NULL otherwise.]
+  node. Returns a pointer to the node if it is in the table; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -3346,7 +3346,7 @@ cuddUniqueLookup(
     DdSubtable *subtable;
 
     if (index >= unique->size) {
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     level = unique->perm[index];
@@ -3371,7 +3371,7 @@ cuddUniqueLookup(
 	return(looking);
     }
 
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of cuddUniqueLookup */
 
@@ -3450,7 +3450,7 @@ ddCountMintermAux(
 	    return(max);
 	}
     }
-    if (N->ref != 1 && (res = cuddHashTableLookup1(table,node)) != NULL) {
+    if (N->ref != 1 && (res = cuddHashTableLookup1(table,node)) != (uintptr_t) 0) {
 	min = cuddV(res);
 	if (res->ref == 0) {
 	    table->manager->dead++;
@@ -3473,7 +3473,7 @@ ddCountMintermAux(
     min = minT + minE;
 
     if (N->ref != 1) {
-	ptrint fanout = (ptrint) N->ref;
+	intptr_t fanout = (intptr_t) N->ref;
 	cuddSatDec(fanout);
 	res = cuddUniqueConst(table->manager,min);
 	if (!cuddHashTableInsert1(table,node,res,fanout)) {
@@ -3532,7 +3532,7 @@ ddCountPathAux(
     paths = paths1 + paths2;
 
     ppaths = ALLOC(double,1);
-    if (ppaths == NULL) {
+    if (ppaths == (uintptr_t) 0) {
 	return((double)CUDD_OUT_OF_MEM);
     }
 
@@ -3668,7 +3668,7 @@ ddCountPathsToNonZero(
     paths = paths1 + paths2;
 
     ppaths = ALLOC(double,1);
-    if (ppaths == NULL) {
+    if (ppaths == (uintptr_t) 0) {
 	return((double)CUDD_OUT_OF_MEM);
     }
 
@@ -3803,7 +3803,7 @@ ddPickArbitraryMinterms(
     int    i, t, result;
     double min1, min2;
 
-    if (string == NULL || node == NULL) return(0);
+    if (string == (uintptr_t) 0 || node == (uintptr_t) 0) return(0);
 
     /* The constant 0 function has no on-set cubes. */
     one = DD_ONE(dd);
@@ -3861,7 +3861,7 @@ ddPickRepresentativeCube(
     DdNode *N, *T, *E;
     DdNode *one, *bzero;
 
-    if (string == NULL || node == NULL) return(0);
+    if (string == (uintptr_t) 0 || node == (uintptr_t) 0) return(0);
 
     /* The constant 0 function has no on-set cubes. */
     one = DD_ONE(dd);

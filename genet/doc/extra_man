@@ -1,0 +1,22 @@
+[EXIT STATUS]
+Genet exits with 0 on success, and with 1 if an error occurs. See Texinfo manual for detailed information.
+
+[EXAMPLES]
+
+   Example: genet -k 3 shared532_sg.g > shared532_n3.g
+
+   or with drawing
+
+   genet -k 3  shared532_sg.g | draw_astg -nonames | gv -
+
+   For the time being, the input to genet can only be a transition system
+   (not another Petri net). To use genet on an already specified Petri net
+   (e.g. to get a 3 bounded net for a given 1-bounded)
+   preprocess it with write_sg:
+       a. write_sg pn1.g > sg1.g
+       b. genet -k 3 sg1.g > pn2.g
+
+[COPYRIGHT]
+Copyright (c) 2011 Josep Carmona
+
+

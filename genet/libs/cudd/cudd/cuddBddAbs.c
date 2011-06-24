@@ -115,7 +115,7 @@ static int bddCheckPositiveCube (DdManager *manager, DdNode *cube);
   Synopsis [Existentially abstracts all the variables in cube from f.]
 
   Description [Existentially abstracts all the variables in cube from f.
-  Returns the abstracted BDD if successful; NULL otherwise.]
+  Returns the abstracted BDD if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -134,7 +134,7 @@ Cudd_bddExistAbstract(
         (void) fprintf(manager->err,
 		       "Error: Can only abstract positive cubes\n");
 	manager->errorCode = CUDD_INVALID_ARG;
-        return(NULL);
+        return((uintptr_t) 0);
     }
 
     do {
@@ -154,7 +154,7 @@ Cudd_bddExistAbstract(
 
   Description [Takes the exclusive OR of two BDDs and simultaneously abstracts
   the variables in cube. The variables are existentially abstracted.  Returns a
-  pointer to the result is successful; NULL otherwise.]
+  pointer to the result is successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -174,7 +174,7 @@ Cudd_bddXorExistAbstract(
         (void) fprintf(manager->err,
 		       "Error: Can only abstract positive cubes\n");
 	manager->errorCode = CUDD_INVALID_ARG;
-        return(NULL);
+        return((uintptr_t) 0);
     }
 
     do {
@@ -192,7 +192,7 @@ Cudd_bddXorExistAbstract(
   Synopsis    [Universally abstracts all the variables in cube from f.]
 
   Description [Universally abstracts all the variables in cube from f.
-  Returns the abstracted BDD if successful; NULL otherwise.]
+  Returns the abstracted BDD if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -211,14 +211,14 @@ Cudd_bddUnivAbstract(
 	(void) fprintf(manager->err,
 		       "Error: Can only abstract positive cubes\n");
 	manager->errorCode = CUDD_INVALID_ARG;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     do {
 	manager->reordered = 0;
 	res = cuddBddExistAbstractRecur(manager, Cudd_Not(f), cube);
     } while (manager->reordered == 1);
-    if (res != NULL) res = Cudd_Not(res);
+    if (res != (uintptr_t) 0) res = Cudd_Not(res);
 
     return(res);
 
@@ -231,7 +231,7 @@ Cudd_bddUnivAbstract(
 
   Description [Computes the boolean difference of f with respect to the
   variable with index x.  Returns the BDD of the boolean difference if
-  successful; NULL otherwise.]
+  successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -303,7 +303,7 @@ Cudd_bddVarIsDependent(
 
     cacheOp = (DD_CTFP) Cudd_bddVarIsDependent;
     res = cuddCacheLookup2(dd,cacheOp,f,var);
-    if (res != NULL) {
+    if (res != (uintptr_t) 0) {
 	return(res != zero);
     }
 
@@ -336,7 +336,7 @@ Cudd_bddVarIsDependent(
 
   Description [Performs the recursive steps of Cudd_bddExistAbstract.
   Returns the BDD obtained by abstracting the variables
-  of cube from f if successful; NULL otherwise. It is also used by
+  of cube from f if successful; (uintptr_t) 0 otherwise. It is also used by
   Cudd_bddUnivAbstract.]
 
   SideEffects [None]
@@ -369,7 +369,7 @@ cuddBddExistAbstractRecur(
     }
 
     /* Check the cache. */
-    if (F->ref != 1 && (res = cuddCacheLookup2(manager, Cudd_bddExistAbstract, f, cube)) != NULL) {
+    if (F->ref != 1 && (res = cuddCacheLookup2(manager, Cudd_bddExistAbstract, f, cube)) != (uintptr_t) 0) {
 	return(res);
     }
 
@@ -385,7 +385,7 @@ cuddBddExistAbstractRecur(
 	    return(one);
 	}
 	res1 = cuddBddExistAbstractRecur(manager, T, cuddT(cube));
-	if (res1 == NULL) return(NULL);
+	if (res1 == (uintptr_t) 0) return((uintptr_t) 0);
 	if (res1 == one) {
 	    if (F->ref != 1)
 		cuddCacheInsert2(manager, Cudd_bddExistAbstract, f, cube, one);
@@ -393,16 +393,16 @@ cuddBddExistAbstractRecur(
 	}
         cuddRef(res1);
 	res2 = cuddBddExistAbstractRecur(manager, E, cuddT(cube));
-	if (res2 == NULL) {
+	if (res2 == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(manager,res1);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
         cuddRef(res2);
 	res = cuddBddAndRecur(manager, Cudd_Not(res1), Cudd_Not(res2));
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(manager, res1);
 	    Cudd_IterDerefBdd(manager, res2);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	res = Cudd_Not(res);
 	cuddRef(res);
@@ -414,21 +414,21 @@ cuddBddExistAbstractRecur(
         return(res);
     } else { /* if (cuddI(manager,F->index) < cuddI(manager,cube->index)) */
 	res1 = cuddBddExistAbstractRecur(manager, T, cube);
-	if (res1 == NULL) return(NULL);
+	if (res1 == (uintptr_t) 0) return((uintptr_t) 0);
         cuddRef(res1);
 	res2 = cuddBddExistAbstractRecur(manager, E, cube);
-	if (res2 == NULL) {
+	if (res2 == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(manager, res1);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
         cuddRef(res2);
 	/* ITE takes care of possible complementation of res1 and of the
         ** case in which res1 == res2. */
 	res = cuddBddIteRecur(manager, manager->vars[F->index], res1, res2);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(manager, res1);
 	    Cudd_IterDerefBdd(manager, res2);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(res1);
 	cuddDeref(res2);
@@ -447,7 +447,7 @@ cuddBddExistAbstractRecur(
 
   Description [Takes the exclusive OR of two BDDs and simultaneously abstracts
   the variables in cube. The variables are existentially abstracted.  Returns a
-  pointer to the result is successful; NULL otherwise.]
+  pointer to the result is successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -502,7 +502,7 @@ cuddBddXorExistAbstractRecur(
 
     /* Check cache. */
     r = cuddCacheLookup(manager, DD_BDD_XOR_EXIST_ABSTRACT_TAG, f, g, cube);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
 	return(r);
     }
 
@@ -552,7 +552,7 @@ cuddBddXorExistAbstractRecur(
     }
 
     t = cuddBddXorExistAbstractRecur(manager, fv, gv, Cube);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
 
     /* Special case: 1 OR anything = 1. Hence, no need to compute
     ** the else branch if t is 1.
@@ -564,18 +564,18 @@ cuddBddXorExistAbstractRecur(
     cuddRef(t);
 
     e = cuddBddXorExistAbstractRecur(manager, fnv, gnv, Cube);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(manager, t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
     if (topcube == top) {	/* abstract */
 	r = cuddBddAndRecur(manager, Cudd_Not(t), Cudd_Not(e));
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_IterDerefBdd(manager, t);
 	    Cudd_IterDerefBdd(manager, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	r = Cudd_Not(r);
 	cuddRef(r);
@@ -589,18 +589,18 @@ cuddBddXorExistAbstractRecur(
     } else {
 	if (Cudd_IsComplement(t)) {
 	    r = cuddUniqueInter(manager,(int)index,Cudd_Not(t),Cudd_Not(e));
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(manager, t);
 		Cudd_IterDerefBdd(manager, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    r = Cudd_Not(r);
 	} else {
 	    r = cuddUniqueInter(manager,(int)index,t,e);
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_IterDerefBdd(manager, t);
 		Cudd_IterDerefBdd(manager, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	}
 	cuddDeref(e);
@@ -618,7 +618,7 @@ cuddBddXorExistAbstractRecur(
 
   Description [Performs the recursive steps of Cudd_bddBoleanDiff.
   Returns the BDD obtained by XORing the cofactors of f with respect to
-  var if successful; NULL otherwise. Exploits the fact that dF/dx =
+  var if successful; (uintptr_t) 0 otherwise. Exploits the fact that dF/dx =
   dF'/dx.]
 
   SideEffects [None]
@@ -652,7 +652,7 @@ cuddBddBooleanDiffRecur(
 
     /* Check the cache. */
     res = cuddCacheLookup2(manager, cuddBddBooleanDiffRecur, f, var);
-    if (res != NULL) {
+    if (res != (uintptr_t) 0) {
 	return(res);
     }
 
@@ -660,21 +660,21 @@ cuddBddBooleanDiffRecur(
     T = cuddT(f); E = cuddE(f);
 
     res1 = cuddBddBooleanDiffRecur(manager, T, var);
-    if (res1 == NULL) return(NULL);
+    if (res1 == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(res1);
     res2 = cuddBddBooleanDiffRecur(manager, Cudd_Regular(E), var);
-    if (res2 == NULL) {
+    if (res2 == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(manager, res1);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(res2);
     /* ITE takes care of possible complementation of res1 and of the
     ** case in which res1 == res2. */
     res = cuddBddIteRecur(manager, manager->vars[f->index], res1, res2);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_IterDerefBdd(manager, res1);
 	Cudd_IterDerefBdd(manager, res2);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(res1);
     cuddDeref(res2);

@@ -159,7 +159,7 @@ Cudd_ApaNumberOfDigits(
 
   Description [Allocates memory for an arbitrary precision
   integer. Returns a pointer to the allocated memory if successful;
-  NULL otherwise.]
+  (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -568,10 +568,10 @@ Cudd_ApaPrintDecimal(
     int decimalDigits = (int) (digits * log10((double) DD_APA_BASE)) + 1;
 
     work = Cudd_NewApaNumber(digits);
-    if (work == NULL)
+    if (work == (uintptr_t) 0)
 	return(0);
     decimal = ALLOC(unsigned char, decimalDigits);
-    if (decimal == NULL) {
+    if (decimal == (uintptr_t) 0) {
 	FREE(work);
 	return(0);
     }
@@ -625,10 +625,10 @@ Cudd_ApaPrintExponential(
     int decimalDigits = (int) (digits * log10((double) DD_APA_BASE)) + 1;
 
     work = Cudd_NewApaNumber(digits);
-    if (work == NULL)
+    if (work == (uintptr_t) 0)
 	return(0);
     decimal = ALLOC(unsigned char, decimalDigits);
-    if (decimal == NULL) {
+    if (decimal == (uintptr_t) 0) {
 	FREE(work);
 	return(0);
     }
@@ -668,7 +668,7 @@ Cudd_ApaPrintExponential(
   represented as an arbitrary precision unsigned integer, to allow for
   any number of variables CUDD supports.  Returns a pointer to the
   array representing the number of minterms of the function rooted at
-  node if successful; NULL otherwise.]
+  node if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [The number of digits of the result is returned in
   parameter <code>digits</code>.]
@@ -692,38 +692,38 @@ Cudd_ApaCountMinterm(
 
     *digits = Cudd_ApaNumberOfDigits(nvars+1);
     max = Cudd_NewApaNumber(*digits);
-    if (max == NULL) {
-	return(NULL);
+    if (max == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
     Cudd_ApaPowerOfTwo(*digits,max,nvars);
     min = Cudd_NewApaNumber(*digits);
-    if (min == NULL) {
+    if (min == (uintptr_t) 0) {
 	FREE(max);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     Cudd_ApaSetToLiteral(*digits,min,0);
     table = st_init_table(st_ptrcmp,st_ptrhash);
-    if (table == NULL) {
+    if (table == (uintptr_t) 0) {
 	FREE(max);
 	FREE(min);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     i = cuddApaCountMintermAux(Cudd_Regular(node),*digits,max,min,table);
-    if (i == NULL) {
+    if (i == (uintptr_t) 0) {
 	FREE(max);
 	FREE(min);
-	st_foreach(table, cuddApaStCountfree, NULL);
+	st_foreach(table, cuddApaStCountfree, (uintptr_t) 0);
 	st_free_table(table);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     count = Cudd_NewApaNumber(*digits);
-    if (count == NULL) {
+    if (count == (uintptr_t) 0) {
 	FREE(max);
 	FREE(min);
-	st_foreach(table, cuddApaStCountfree, NULL);
+	st_foreach(table, cuddApaStCountfree, (uintptr_t) 0);
 	st_free_table(table);
 	if (Cudd_Regular(node)->ref == 1) FREE(i);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     if (Cudd_IsComplement(node)) {
 	(void) Cudd_ApaSubtract(*digits,max,i,count);
@@ -732,7 +732,7 @@ Cudd_ApaCountMinterm(
     }
     FREE(max);
     FREE(min);
-    st_foreach(table, cuddApaStCountfree, NULL);
+    st_foreach(table, cuddApaStCountfree, (uintptr_t) 0);
     st_free_table(table);
     if (Cudd_Regular(node)->ref == 1) FREE(i);
     return(count);
@@ -765,7 +765,7 @@ Cudd_ApaPrintMinterm(
     DdApaNumber count;
 
     count = Cudd_ApaCountMinterm(dd,node,nvars,&digits);
-    if (count == NULL)
+    if (count == (uintptr_t) 0)
 	return(0);
     result = Cudd_ApaPrintDecimal(fp,digits,count);
     FREE(count);
@@ -805,7 +805,7 @@ Cudd_ApaPrintMintermExp(
     DdApaNumber count;
 
     count = Cudd_ApaCountMinterm(dd,node,nvars,&digits);
-    if (count == NULL)
+    if (count == (uintptr_t) 0)
 	return(0);
     result = Cudd_ApaPrintExponential(fp,digits,count,precision);
     FREE(count);
@@ -843,7 +843,7 @@ Cudd_ApaPrintDensity(
     unsigned int size, remainder, fractional;
 
     count = Cudd_ApaCountMinterm(dd,node,nvars,&digits);
-    if (count == NULL)
+    if (count == (uintptr_t) 0)
 	return(0);
     size = Cudd_DagSize(node);
     density = Cudd_NewApaNumber(digits);
@@ -917,17 +917,17 @@ cuddApaCountMintermAux(
     Nt = cuddT(node); Ne = cuddE(node);
 
     mint1 = cuddApaCountMintermAux(Nt,  digits, max, min, table);
-    if (mint1 == NULL) return(NULL);
+    if (mint1 == (uintptr_t) 0) return((uintptr_t) 0);
     mint2 = cuddApaCountMintermAux(Cudd_Regular(Ne), digits, max, min, table);
-    if (mint2 == NULL) {
+    if (mint2 == (uintptr_t) 0) {
 	if (Nt->ref == 1) FREE(mint1);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     mint = Cudd_NewApaNumber(digits);
-    if (mint == NULL) {
+    if (mint == (uintptr_t) 0) {
 	if (Nt->ref == 1) FREE(mint1);
 	if (Cudd_Regular(Ne)->ref == 1) FREE(mint2);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     if (Cudd_IsComplement(Ne)) {
 	(void) Cudd_ApaSubtract(digits,max,mint2,mint);
@@ -945,7 +945,7 @@ cuddApaCountMintermAux(
     if (node->ref > 1) {
 	if (st_insert(table, (char *)node, (char *)mint) == ST_OUT_OF_MEM) {
 	    FREE(mint);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     }
     return(mint);

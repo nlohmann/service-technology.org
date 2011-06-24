@@ -113,7 +113,7 @@ static void addVarToConst (DdNode *f, DdNode **gp, DdNode **hp, DdNode *one, DdN
   Synopsis    [Implements ITE(f,g,h).]
 
   Description [Implements ITE(f,g,h). This procedure assumes that f is
-  a 0-1 ADD.  Returns a pointer to the resulting ADD if successful; NULL
+  a 0-1 ADD.  Returns a pointer to the resulting ADD if successful; (uintptr_t) 0
   otherwise.]
 
   SideEffects [None]
@@ -198,7 +198,7 @@ Cudd_addIteConstant(
 
     /* Check cache. */
     r = cuddConstantLookup(dd,DD_ADD_ITE_CONSTANT_TAG,f,g,h);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
         return(r);
     }
 
@@ -285,7 +285,7 @@ Cudd_addEvalConst(
 
     /* Check cache. */
     r = cuddConstantLookup(dd,DD_ADD_EVAL_CONST_TAG,f,g,g);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
         return(r);
     }
 
@@ -332,7 +332,7 @@ Cudd_addEvalConst(
 
   Description [Computes the complement of an ADD a la C language: The
   complement of 0 is 1 and the complement of everything else is 0.
-  Returns a pointer to the resulting ADD if successful; NULL otherwise.]
+  Returns a pointer to the resulting ADD if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -391,7 +391,7 @@ Cudd_addLeq(
 
     /* Check cache. */
     tmp = cuddCacheLookup2(dd,(DD_CTFP)Cudd_addLeq,f,g);
-    if (tmp != NULL) {
+    if (tmp != (uintptr_t) 0) {
 	return(tmp == DD_ONE(dd));
     }
 
@@ -429,7 +429,7 @@ Cudd_addLeq(
   Synopsis    [Implements the recursive step of Cudd_addIte(f,g,h).]
 
   Description [Implements the recursive step of Cudd_addIte(f,g,h).
-  Returns a pointer to the resulting ADD if successful; NULL
+  Returns a pointer to the resulting ADD if successful; (uintptr_t) 0
   otherwise.]
 
   SideEffects [None]
@@ -489,7 +489,7 @@ cuddAddIteRecur(
 
     /* Check cache. */
     r = cuddCacheLookup(dd,DD_ADD_ITE_TAG,f,g,h);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
         return(r);
     }
 
@@ -516,21 +516,21 @@ cuddAddIteRecur(
     
     /* Recursive step. */
     t = cuddAddIteRecur(dd,Fv,Gv,Hv);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(t);
 
     e = cuddAddIteRecur(dd,Fnv,Gnv,Hnv);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
     r = (t == e) ? t : cuddUniqueInter(dd,index,t,e);
-    if (r == NULL) {
+    if (r == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,t);
 	Cudd_RecursiveDeref(dd,e);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(t);
     cuddDeref(e);
@@ -547,7 +547,7 @@ cuddAddIteRecur(
   Synopsis    [Performs the recursive step of Cudd_addCmpl.]
 
   Description [Performs the recursive step of Cudd_addCmpl. Returns a
-  pointer to the resulting ADD if successful; NULL otherwise.]
+  pointer to the resulting ADD if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -574,25 +574,25 @@ cuddAddCmplRecur(
 	}
     }
     r = cuddCacheLookup1(dd,Cudd_addCmpl,f);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
 	return(r);
     }
     Fv = cuddT(f);
     Fnv = cuddE(f);
     t = cuddAddCmplRecur(dd,Fv);
-    if (t == NULL) return(NULL);
+    if (t == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(t);
     e = cuddAddCmplRecur(dd,Fnv);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
     r = (t == e) ? t : cuddUniqueInter(dd,(int)f->index,t,e);
-    if (r == NULL) {
+    if (r == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, t);
 	Cudd_RecursiveDeref(dd, e);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(t);
     cuddDeref(e);

@@ -253,9 +253,9 @@ cuddLinearAndSifting(
 
     size = table->size;
 
-    var = NULL;
-    entry = NULL;
-    if (table->linear == NULL) {
+    var = (uintptr_t) 0;
+    entry = (uintptr_t) 0;
+    if (table->linear == (uintptr_t) 0) {
 	result = cuddInitLinear(table);
 	if (result == 0) goto cuddLinearAndSiftingOutOfMem;
 #if 0
@@ -275,12 +275,12 @@ cuddLinearAndSifting(
 
     /* Find order in which to sift variables. */
     entry = ALLOC(int,size);
-    if (entry == NULL) {
+    if (entry == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto cuddLinearAndSiftingOutOfMem;
     }
     var = ALLOC(int,size);
-    if (var == NULL) {
+    if (var == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto cuddLinearAndSiftingOutOfMem;
     }
@@ -330,8 +330,8 @@ cuddLinearAndSifting(
 
 cuddLinearAndSiftingOutOfMem:
 
-    if (entry != NULL) FREE(entry);
-    if (var != NULL) FREE(var);
+    if (entry != (uintptr_t) 0) FREE(entry);
+    if (var != (uintptr_t) 0) FREE(var);
 
     return(0);
 
@@ -425,15 +425,15 @@ cuddLinearInPlace(
 	** The chain is handled as a FIFO; g points to the beginning and
 	** last points to the end.
 	*/
-	g = NULL;
+	g = (uintptr_t) 0;
 #ifdef DD_DEBUG
-	last = NULL;
+	last = (uintptr_t) 0;
 #endif
 	for (i = 0; i < xslots; i++) {
 	    f = xlist[i];
 	    if (f == sentinel) continue;
 	    xlist[i] = sentinel;
-	    if (g == NULL) {
+	    if (g == (uintptr_t) 0) {
 		g = f;
 	    } else {
 		last->next = f;
@@ -446,9 +446,9 @@ cuddLinearInPlace(
 #ifdef DD_DEBUG
 	/* last is always assigned in the for loop because there is at
 	** least one key */
-	assert(last != NULL);
+	assert(last != (uintptr_t) 0);
 #endif
-	last->next = NULL;
+	last->next = (uintptr_t) 0;
 
 #ifdef DD_COUNT
 	table->swapSteps += oldxkeys;
@@ -457,7 +457,7 @@ cuddLinearInPlace(
 	** They form a linked list pointed by g.
 	*/
 	f = g;
-	while (f != NULL) {
+	while (f != (uintptr_t) 0) {
 	    next = f->next;
 	    /* Find f1, f0, f11, f10, f01, f00. */
 	    f1 = cuddT(f);
@@ -508,7 +508,7 @@ cuddLinearInPlace(
 		    cuddSatInc(newf1->ref);
 		} else { /* no match */
 		    newf1 = cuddDynamicAllocNode(table);
-		    if (newf1 == NULL)
+		    if (newf1 == (uintptr_t) 0)
 			goto cuddLinearOutOfMem;
 		    newf1->index = yindex; newf1->ref = 1;
 		    cuddT(newf1) = f11;
@@ -562,7 +562,7 @@ cuddLinearInPlace(
 		    cuddSatInc(newf0->ref);
 		} else { /* no match */
 		    newf0 = cuddDynamicAllocNode(table);
-		    if (newf0 == NULL)
+		    if (newf0 == (uintptr_t) 0)
 			goto cuddLinearOutOfMem;
 		    newf0->index = yindex; newf0->ref = 1;
 		    cuddT(newf0) = f01;
@@ -602,7 +602,7 @@ cuddLinearInPlace(
 	    f->next = *previousP;
 	    *previousP = f;
 	    f = next;
-	} /* while f != NULL */
+	} /* while f != (uintptr_t) 0 */
 
 	/* GC the y layer. */
 
@@ -767,7 +767,7 @@ cuddInitLinear(
     wordsPerRow = ((nvars - 1) >> LOGBPL) + 1;
     words = wordsPerRow * nvars;
     table->linear = linear = ALLOC(long,words);
-    if (linear == NULL) {
+    if (linear == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -817,7 +817,7 @@ cuddResizeLinear(
     wordsPerRow = ((nvars - 1) >> LOGBPL) + 1;
     words = wordsPerRow * nvars;
     table->linear = linear = ALLOC(long,words);
-    if (linear == NULL) {
+    if (linear == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -908,11 +908,11 @@ ddLinearAndSiftingAux(
 
     initialSize = table->keys - table->isolated;
 
-    moveDown = NULL;
-    moveUp = NULL;
+    moveDown = (uintptr_t) 0;
+    moveUp = (uintptr_t) 0;
 
     if (x == xLow) {
-	moveDown = ddLinearAndSiftingDown(table,x,xHigh,NULL);
+	moveDown = ddLinearAndSiftingDown(table,x,xHigh,(uintptr_t) 0);
 	/* At this point x --> xHigh unless bounding occurred. */
 	if (moveDown == (Move *) CUDD_OUT_OF_MEM) goto ddLinearAndSiftingAuxOutOfMem;
 	/* Move backward and stop at best position. */
@@ -920,7 +920,7 @@ ddLinearAndSiftingAux(
 	if (!result) goto ddLinearAndSiftingAuxOutOfMem;
 
     } else if (x == xHigh) {
-	moveUp = ddLinearAndSiftingUp(table,x,xLow,NULL);
+	moveUp = ddLinearAndSiftingUp(table,x,xLow,(uintptr_t) 0);
 	/* At this point x --> xLow unless bounding occurred. */
 	if (moveUp == (Move *) CUDD_OUT_OF_MEM) goto ddLinearAndSiftingAuxOutOfMem;
 	/* Move backward and stop at best position. */
@@ -928,12 +928,12 @@ ddLinearAndSiftingAux(
 	if (!result) goto ddLinearAndSiftingAuxOutOfMem;
 
     } else if ((x - xLow) > (xHigh - x)) { /* must go down first: shorter */
-	moveDown = ddLinearAndSiftingDown(table,x,xHigh,NULL);
+	moveDown = ddLinearAndSiftingDown(table,x,xHigh,(uintptr_t) 0);
 	/* At this point x --> xHigh unless bounding occurred. */
 	if (moveDown == (Move *) CUDD_OUT_OF_MEM) goto ddLinearAndSiftingAuxOutOfMem;
 	moveUp = ddUndoMoves(table,moveDown);
 #ifdef DD_DEBUG
-	assert(moveUp == NULL || moveUp->x == x);
+	assert(moveUp == (uintptr_t) 0 || moveUp->x == x);
 #endif
 	moveUp = ddLinearAndSiftingUp(table,x,xLow,moveUp);
 	if (moveUp == (Move *) CUDD_OUT_OF_MEM) goto ddLinearAndSiftingAuxOutOfMem;
@@ -942,12 +942,12 @@ ddLinearAndSiftingAux(
 	if (!result) goto ddLinearAndSiftingAuxOutOfMem;
 
     } else { /* must go up first: shorter */
-	moveUp = ddLinearAndSiftingUp(table,x,xLow,NULL);
+	moveUp = ddLinearAndSiftingUp(table,x,xLow,(uintptr_t) 0);
 	/* At this point x --> xLow unless bounding occurred. */
 	if (moveUp == (Move *) CUDD_OUT_OF_MEM) goto ddLinearAndSiftingAuxOutOfMem;
 	moveDown = ddUndoMoves(table,moveUp);
 #ifdef DD_DEBUG
-	assert(moveDown == NULL || moveDown->y == x);
+	assert(moveDown == (uintptr_t) 0 || moveDown->y == x);
 #endif
 	moveDown = ddLinearAndSiftingDown(table,x,xHigh,moveDown);
 	if (moveDown == (Move *) CUDD_OUT_OF_MEM) goto ddLinearAndSiftingAuxOutOfMem;
@@ -956,12 +956,12 @@ ddLinearAndSiftingAux(
 	if (!result) goto ddLinearAndSiftingAuxOutOfMem;
     }
 
-    while (moveDown != NULL) {
+    while (moveDown != (uintptr_t) 0) {
 	move = moveDown->next;
 	cuddDeallocMove(table, moveDown);
 	moveDown = move;
     }
-    while (moveUp != NULL) {
+    while (moveUp != (uintptr_t) 0) {
 	move = moveUp->next;
 	cuddDeallocMove(table, moveUp);
 	moveUp = move;
@@ -970,12 +970,12 @@ ddLinearAndSiftingAux(
     return(1);
 
 ddLinearAndSiftingAuxOutOfMem:
-    while (moveDown != NULL) {
+    while (moveDown != (uintptr_t) 0) {
 	move = moveDown->next;
 	cuddDeallocMove(table, moveDown);
 	moveDown = move;
     }
-    while (moveUp != NULL) {
+    while (moveUp != (uintptr_t) 0) {
 	move = moveUp->next;
 	cuddDeallocMove(table, moveUp);
 	moveUp = move;
@@ -993,7 +993,7 @@ ddLinearAndSiftingAuxOutOfMem:
   Description [Sifts a variable up and applies linear transformations.
   Moves y up until either it reaches the bound (xLow) or the size of
   the DD heap increases too much.  Returns the set of moves in case of
-  success; NULL if memory is full.]
+  success; (uintptr_t) 0 if memory is full.]
 
   SideEffects [None]
 
@@ -1062,7 +1062,7 @@ ddLinearAndSiftingUp(
 	newsize = cuddLinearInPlace(table,x,y);
 	if (newsize == 0) goto ddLinearAndSiftingUpOutOfMem;
 	move = (Move *) cuddDynamicAllocNode(table);
-	if (move == NULL) goto ddLinearAndSiftingUpOutOfMem;
+	if (move == (uintptr_t) 0) goto ddLinearAndSiftingUpOutOfMem;
 	move->x = x;
 	move->y = y;
 	move->next = moves;
@@ -1099,7 +1099,7 @@ ddLinearAndSiftingUp(
     return(moves);
 
 ddLinearAndSiftingUpOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -1116,7 +1116,7 @@ ddLinearAndSiftingUpOutOfMem:
   Description [Sifts a variable down and applies linear
   transformations. Moves x down until either it reaches the bound
   (xHigh) or the size of the DD heap increases too much. Returns the
-  set of moves in case of success; NULL if memory is full.]
+  set of moves in case of success; (uintptr_t) 0 if memory is full.]
 
   SideEffects [None]
 
@@ -1181,7 +1181,7 @@ ddLinearAndSiftingDown(
 	newsize = cuddLinearInPlace(table,x,y);
 	if (newsize == 0) goto ddLinearAndSiftingDownOutOfMem;
 	move = (Move *) cuddDynamicAllocNode(table);
-	if (move == NULL) goto ddLinearAndSiftingDownOutOfMem;
+	if (move == (uintptr_t) 0) goto ddLinearAndSiftingDownOutOfMem;
 	move->x = x;
 	move->y = y;
 	move->next = moves;
@@ -1211,7 +1211,7 @@ ddLinearAndSiftingDown(
     return(moves);
 
 ddLinearAndSiftingDownOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -1243,13 +1243,13 @@ ddLinearAndSiftingBackward(
     Move *move;
     int	res;
 
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	if (move->size < size) {
 	    size = move->size;
 	}
     }
 
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	if (move->size == size) return(1);
 	if (move->flags == CUDD_LINEAR_TRANSFORM_MOVE) {
 	    res = cuddLinearInPlace(table,(int)move->x,(int)move->y);
@@ -1285,14 +1285,14 @@ ddUndoMoves(
   DdManager * table,
   Move * moves)
 {
-    Move *invmoves = NULL;
+    Move *invmoves = (uintptr_t) 0;
     Move *move;
     Move *invmove;
     int	size;
 
-    for (move = moves; move != NULL; move = move->next) {
+    for (move = moves; move != (uintptr_t) 0; move = move->next) {
 	invmove = (Move *) cuddDynamicAllocNode(table);
-	if (invmove == NULL) goto ddUndoMovesOutOfMem;
+	if (invmove == (uintptr_t) 0) goto ddUndoMovesOutOfMem;
 	invmove->x = move->x;
 	invmove->y = move->y;
 	invmove->next = invmoves;
@@ -1323,7 +1323,7 @@ ddUndoMoves(
     return(invmoves);
 
 ddUndoMovesOutOfMem:
-    while (invmoves != NULL) {
+    while (invmoves != (uintptr_t) 0) {
 	move = invmoves->next;
 	cuddDeallocMove(table, invmoves);
 	invmoves = move;

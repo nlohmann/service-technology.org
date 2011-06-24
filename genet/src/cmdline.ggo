@@ -1,0 +1,122 @@
+args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
+
+description "About Genet:"
+purpose "Genet: synthesizing Petri nets using region theory."
+
+
+section "GENERAL OPTIONS (SYNTHESIS & MINING)"
+
+option "cardinality" k
+  "to look for region of cardinality at most n."
+  int
+  typestr="n"
+  default="1"
+  optional
+
+option "min_cardinality" m
+  "start the search for regions with bound n >= k => s, where n has been assigned by the -k option . This may speed up the search."
+  int
+  typestr="s"
+  default="1"
+  dependon="cardinality"
+  optional
+
+option "explore" -
+  "explore regions"
+  int
+  typestr="n"
+  default="1"
+  hidden
+  optional
+
+option "encoding" e
+  "encoding of the states: 0 - logarithmic encoding, 1 - event-based encoding."
+  values="0","1" enum
+  typestr="[0|1]"
+  default="1"
+  optional
+
+option "hide" -
+  "hides something."
+  string
+  typestr="sigs"
+  hidden
+  optional
+
+option "projection" p
+  "projects the initial transition system into the events in the list. event_list is a list of events separated by commas."
+  string
+  typestr="event_list"
+  optional
+ 
+
+section "PETRI NET MINING"
+
+option "pm" -
+  "to apply petri net mining (approximation of the excitation closure)"
+  flag off
+
+option "cov" c
+  "number of minimal regions to cover an event. This might be useful when the set of minimal regions is large and therefore one can weaken the condition to cover an event with few regions."
+  int
+  typestr="n"
+  default="1"
+  optional
+
+option "mg" -
+  "mining of a set of state machines (1-bounded Petri nets exhibiting no concurrency) covering the set of events."
+  flag off
+
+option "cc" -
+  "mining of a set of state machines (1-bounded Petri nets exhibiting no concurrency) covering the set of events."
+  flag off
+
+option "rec" -
+  "hierarchical approach to find a set of views of the log in form of Petri nets. By using  some causal dependencies between the events, it collects groups ofevents that are tightly related and projects the log on each group. This option must be used in combination with the synthesis, mining or conservative components derivation."
+  flag off
+
+option "ec" -
+  "by splitting necessary labels, forces excitation closure to hold for the events in the list."
+  string
+  typestr="event_list"
+  optional
+
+section "ADDITIONAL PARAMETERS"
+
+option "output" o
+  "writes output to file instead of STDOUT."
+  string
+  typestr="file"
+  optional
+
+option "config" -
+  "Read configuration from file."
+  details="If no file is given, Genet first tries to parse file `genet.conf' from the sysconf directory (usually `/usr/local/etc'; written in case Genet was installed) and then from the current working directory. If neither file was found, the standard values are assumed.\n"
+  string
+  typestr="file"
+  optional
+
+option "verbose" v
+  "puts Genet in verbose mode."
+  flag off
+
+option "bug" -
+  "outputs some debug information and exits."
+  flag off
+
+
+text "
+   Example: genet -k 3 shared532_sg.g > shared532_n3.g
+
+   or with drawing
+
+   genet -k 3  shared532_sg.g | draw_astg -nonames | gv -
+
+   For the time being, the input to genet can only be a transition system
+   (not another Petri net). To use genet on an already specified Petri net
+   (e.g. to get a 3 bounded net for a given 1-bounded)
+   preprocess it with write_sg:
+       a. write_sg pn1.g > sg1.g
+       b. genet -k 3 sg1.g > pn2.g
+"
+

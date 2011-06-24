@@ -308,7 +308,7 @@ DddmpWriteNodeIndexCnf (
   )
 {
   if (!Cudd_IsConstant (f)) {
-    f->next = (struct DdNode *)((ptruint)((id)<<1));
+    f->next = (struct DdNode *)((uintptr_t)((id)<<1));
   }
 
   return (DDDMP_SUCCESS);
@@ -333,7 +333,7 @@ DddmpVisitedCnf (
 {
   f = Cudd_Regular(f);
 
-  return ((int)((ptruint)(f->next)) & (01));
+  return ((int)((uintptr_t)(f->next)) & (01));
 }
 
 /**Function********************************************************************
@@ -355,7 +355,7 @@ DddmpSetVisitedCnf (
 {
   f = Cudd_Regular(f);
 
-  f->next = (DdNode *)(ptruint)((int)((ptruint)(f->next))|01);
+  f->next = (DdNode *)(uintptr_t)((int)((uintptr_t)(f->next))|01);
 
   return;
 }
@@ -381,7 +381,7 @@ DddmpReadNodeIndexCnf (
   )
 {
   if (!Cudd_IsConstant (f)) {
-    return ((int)(((ptruint)(f->next))>>1));
+    return ((int)(((uintptr_t)(f->next))>>1));
   } else {
     return (1);
   }
@@ -419,9 +419,9 @@ DddmpWriteNodeIndexCnfWithTerminalCheck (
   if (!Cudd_IsConstant (f)) {
     if (Cudd_IsConstant (cuddT (f)) && Cudd_IsConstant (cuddE (f))) {
       /* If Variable SET ID as Variable ID */
-      f->next = (struct DdNode *)((ptruint)((cnfIds[f->index])<<1));
+      f->next = (struct DdNode *)((uintptr_t)((cnfIds[f->index])<<1));
     } else {
-      f->next = (struct DdNode *)((ptruint)((id)<<1));
+      f->next = (struct DdNode *)((uintptr_t)((id)<<1));
       id++;
     }
   }
@@ -485,7 +485,7 @@ DddmpClearVisitedCnf (
 {
   f = Cudd_Regular (f);
 
-  f->next = (DdNode *)(ptruint)((int)((ptruint)(f->next)) & (~01));
+  f->next = (DdNode *)(uintptr_t)((int)((uintptr_t)(f->next)) & (~01));
 
   return;
 }
@@ -831,7 +831,7 @@ RestoreInUniqueRecurCnf (
 
   if (cuddIsConstant (f)) {
     /* StQ 11.02.2004:
-       Bug fixed --> restore NULL within the next field */
+       Bug fixed --> restore (uintptr_t) 0 within the next field */
     /*DddmpClearVisitedCnf (f);*/
     f->next = (uintptr_t) 0;
 
@@ -913,7 +913,7 @@ DddmpPrintBddAndNextRecur (
 
   fprintf (stdout,  
     "thenPtr=%ld elsePtr=%ld BddId=%d CnfId=%d Visited=%d\n",
-    ((intptr_t) cuddT (fPtr)), ((intptr_t) cuddE (fPtr)),
+    (long) ((intptr_t) cuddT (fPtr)), (long) ((intptr_t) cuddE (fPtr)),
     fPtr->index, DddmpReadNodeIndexCnf (fPtr),
     ((int)((intptr_t) DddmpVisitedCnf (fPtr))));
   

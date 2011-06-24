@@ -7,7 +7,8 @@ extern BDD reach;
 
 // undefine SS, since it seems to be somehow definded in gcc 3.4.5 on Solaris-i386
 #undef SS
-class SS   {
+class SS
+{
     bool minimized;
 //	BDD care_set;
 
@@ -19,7 +20,8 @@ public:
     SS(int i);
     SS(const BDD &g);
     SS(const SS &from);
-    bool is_empty() const {
+    bool is_empty() const
+    {
         return states == mgr->bddZero();
     }
     int operator==(const SS& other) const;
@@ -61,7 +63,8 @@ public:
     SS Restrict(const SS& c) const;
     SS Minimize(const SS& c) const;
     void Minimize();
-    void emptySet() {
+    void emptySet()
+    {
         states = mgr->bddZero();
     }
 //    void setCareSet(BDD *g) {care_set = g;}
@@ -71,7 +74,8 @@ public:
     double CountMinterm() const;
     int nodeCount() const;
     void print()  const;
-    size_t getNodeSize()  {
+    size_t getNodeSize()
+    {
         return size_t(states.getNode());
     }
 //    SS PickOneMinterm(SSvector vars) const;

@@ -1,0 +1,35 @@
+   ____                 _    
+  / ___| ___ _ __   ___| |_  
+ | |  _ / _ \ '_ \ / _ \ __| 
+ | |_| |  __/ | | |  __/ |_  
+  \____|\___|_| |_|\___|\__| 
+
+   synthezising Petri nets
+ http://www.lsi.upc.edu/~jcarmona/genet.html 
+
+
+Version 1.2-unreleased
+======================
+
+* patch libs (especially Cudd) to allow compilation on different
+  architectures.
+
+
+Version 1.1 (8 April 2011)
+==========================
+
+* integration into ProM using JNA (Java Native Access)
+  `https://github.com/twall/jna'
+
+* patch libraries to be independent of Posix particulars, Genet compiles
+  now as pure Windows binary.
+
+
+Version 1.0 (24 September 2009)
+===============================
+
+* using autotools to distribute Genet.
+
+
+
+

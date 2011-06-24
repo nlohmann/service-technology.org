@@ -129,7 +129,7 @@ Cudd_addFindMax(
     }
 
     res = cuddCacheLookup1(dd,Cudd_addFindMax,f);
-    if (res != NULL) {
+    if (res != (uintptr_t) 0) {
 	return(res);
     }
 
@@ -169,7 +169,7 @@ Cudd_addFindMin(
     }
 
     res = cuddCacheLookup1(dd,Cudd_addFindMin,f);
-    if (res != NULL) {
+    if (res != (uintptr_t) 0) {
 	return(res);
     }
 
@@ -198,7 +198,7 @@ Cudd_addFindMin(
   part, it is ignored. Repeated calls to this procedure allow one to
   transform an integer-valued ADD into an array of ADDs, one for each
   bit of the leaf values. Returns a pointer to the resulting ADD if
-  successful; NULL otherwise.]
+  successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -218,7 +218,7 @@ Cudd_addIthBit(
     ** global cache.
     */
     index = cuddUniqueConst(dd,(CUDD_VALUE_TYPE) bit);
-    if (index == NULL) return(NULL);
+    if (index == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(index);
 
     do {
@@ -226,9 +226,9 @@ Cudd_addIthBit(
 	res = addDoIthBit(dd, f, index);
     } while (dd->reordered == 1);
 
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, index);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(res);
     Cudd_RecursiveDeref(dd, index);
@@ -253,7 +253,7 @@ Cudd_addIthBit(
   Synopsis    [Performs the recursive step for Cudd_addIthBit.]
 
   Description [Performs the recursive step for Cudd_addIthBit.
-  Returns a pointer to the BDD if successful; NULL otherwise.]
+  Returns a pointer to the BDD if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -281,28 +281,28 @@ addDoIthBit(
 
     /* Check cache. */
     res = cuddCacheLookup2(dd,addDoIthBit,f,index);
-    if (res != NULL) return(res);
+    if (res != (uintptr_t) 0) return(res);
 
     /* Recursive step. */
     v = f->index;
     fv = cuddT(f); fvn = cuddE(f);
 
     T = addDoIthBit(dd,fv,index);
-    if (T == NULL) return(NULL);
+    if (T == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(T);
 
     E = addDoIthBit(dd,fvn,index);
-    if (E == NULL) {
+    if (E == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, T);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(E);
 
     res = (T == E) ? T : cuddUniqueInter(dd,v,T,E);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, T);
 	Cudd_RecursiveDeref(dd, E);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(T);
     cuddDeref(E);

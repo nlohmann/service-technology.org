@@ -11,7 +11,8 @@ extern int extra_vars;
 #define MAX_MULTIPLICITY 10000
 #define MAX_RESERVATION 2
 
-class Region : public RegionGeneric {
+class Region : public RegionGeneric
+{
     vector<SS> R;
     int max_multiplicity;
     map<string,map<int,SS> > grads;
@@ -38,12 +39,14 @@ public:
     int number_violations(TRel &tr, bool compute_trs);
     bool check_splitting(TRel &tr);
     int power();
-    int topset_weight() {
+    int topset_weight()
+    {
         int i = 1;
         while(R[i].is_empty()) ++i;
         return  i;
     }
-    int cardinality(const SS &g) {
+    int cardinality(const SS &g)
+    {
         int i = 0;
         while(not R[i] >= g) ++i;
         return  i;
@@ -63,10 +66,12 @@ public:
     bool proper(const SS &g);
     SS project_er_positive_gradient(string trig_event,SS &er_event, TRel &tr);
     SS sup();
-    double supSize() {
+    double supSize()
+    {
         return sup().CountMinterm();
     }
-    int Size() {
+    int Size()
+    {
         int s = 0;
         for (int k = power(); k >= 0; --k) s += R[k].nodeCount();
         return s;
@@ -74,12 +79,14 @@ public:
     Region compute_max_enabling_topset(const SS &er);
     void print();
     void recheck_gradients(TRel &tr, bool compute_trs);
-    void lazy_recheck_gradients() {
+    void lazy_recheck_gradients()
+    {
         all_grads_computed = false;
     }
 
     bool is_MG_region(TRel &tr);
-    int number_gradients() {
+    int number_gradients()
+    {
         return ngrads;
     }
 
@@ -90,19 +97,22 @@ public:
     bool operator<=(const Region &other) const;
     bool operator>(const Region &other) const;
     bool operator==(const Region &other) const;
-    void Minimize()  {
+    void Minimize()
+    {
         for(int i = 0; i <= power(); ++i) R[i].Minimize();
     }
 
     void complement();
     void remove(const SS &g);
 
-    SS get_i(int i) {
+    SS get_i(int i)
+    {
         return R[i];
     }
     size_t cache_key();
 
-    map<string,map<int,SS> > &get_map_grads() {
+    map<string,map<int,SS> > &get_map_grads()
+    {
         return grads;
     }
 

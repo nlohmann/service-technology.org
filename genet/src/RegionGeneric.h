@@ -4,7 +4,8 @@
 #include "TRel.h"
 #include "SS.h"
 
-class RegionGeneric {
+class RegionGeneric
+{
 
     virtual bool constant_gradient(string name, TRel &tr, int &grad) = 0;
 

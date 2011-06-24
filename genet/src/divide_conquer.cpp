@@ -62,7 +62,8 @@ bool find_spectral_partition(TRel &tr,map<string,bool> &cut1,map<string,bool> &c
     map<string,int> ev_to_ind;
     vector<string> ind_to_ev(tr_map.size());
     int n = 0;
-    for(itm1=tr_map.begin(); itm1 != tr_map.end(); ++itm1) {
+    for(itm1=tr_map.begin(); itm1 != tr_map.end(); ++itm1)
+    {
 //cout << n << ": " << itm1->first << endl;
         ind_to_ev[n] = itm1->first;
         ev_to_ind[itm1->first] = n++;
@@ -75,21 +76,26 @@ bool find_spectral_partition(TRel &tr,map<string,bool> &cut1,map<string,bool> &c
     int j;
 
     al.setbounds(0, n-1, 0, n-1);
-    for(i = 0; i <= n-1; i++) {
-        for(j = 0; j <= n-1; j++) {
+    for(i = 0; i <= n-1; i++)
+    {
+        for(j = 0; j <= n-1; j++)
+        {
             al(i,j) = al(i,j) = 0 ;
         }
     }
     // Loading the Laplacian matrix
     int nord = 0;
     int nconc = 0;
-    for(itm1=tr_map.begin(); itm1 != tr_map.end(); ++itm1) {
+    for(itm1=tr_map.begin(); itm1 != tr_map.end(); ++itm1)
+    {
         EvTRel *ev1 = itm1->second;
         map<string,EvTRel *>::const_iterator itm2;
-        for(itm2=tr_map.begin(); itm2 != tr_map.end(); ++itm2) {
+        for(itm2=tr_map.begin(); itm2 != tr_map.end(); ++itm2)
+        {
             if (itm1 == itm2)  continue;
             EvTRel *ev2 = itm2->second;
-            if ((not ev1->get_sr().Intersect(ev2->get_er()).is_empty()) and ev2->get_sr().Intersect(ev1->get_er()).is_empty()) {
+            if ((not ev1->get_sr().Intersect(ev2->get_er()).is_empty()) and ev2->get_sr().Intersect(ev1->get_er()).is_empty())
+            {
                 al(ev_to_ind[itm1->first],ev_to_ind[itm2->first]) = al(ev_to_ind[itm2->first],ev_to_ind[itm1->first]) = -1;
                 al(ev_to_ind[itm1->first],ev_to_ind[itm1->first])++;
                 al(ev_to_ind[itm2->first],ev_to_ind[itm2->first])++;
@@ -101,7 +107,8 @@ bool find_spectral_partition(TRel &tr,map<string,bool> &cut1,map<string,bool> &c
     //cout << "|ord|: " << nord << " |concs|: " << nconc <<endl;
     // Heuristic to decide when the recursion might be finished
     //cout << nconc << " " << n*n/10 << endl;
-    if (n*n/10 > nconc) {
+    if (n*n/10 > nconc)
+    {
         cout << "# Low concurrency degree exhibited in the considered log\n";
         return true;
     }
@@ -126,12 +133,15 @@ bool find_spectral_partition(TRel &tr,map<string,bool> &cut1,map<string,bool> &c
 
     // Obtaining the partition
     int size_cut1 = 0, size_cut2 = 0;
-    for(i=0; i <= n-1; ++i) {
-        if (z(i,1) < 0) {
+    for(i=0; i <= n-1; ++i)
+    {
+        if (z(i,1) < 0)
+        {
             cut1[ind_to_ev[i]] = true;
             ++size_cut1;
         }
-        else {
+        else
+        {
             cut2[ind_to_ev[i]] = true;
             ++size_cut2;
         }
@@ -154,15 +164,20 @@ bool find_spectral_partition(TRel &tr,map<string,bool> &cut1,map<string,bool> &c
     if (size_cut1 > size_cut2) try_first = 1;
     bool success_cut = false;
     map<string,bool> tmp;
-    do {
+    do
+    {
         int max_border;
-        switch(try_first) {
+        switch(try_first)
+        {
         case 0:
             tmp.clear();
             max_border = size_cut1/2 + 1;
-            for(it = cut1.begin(); it != cut1.end() and max_border > 0; ++it) {
-                if (it->second) {
-                    for(i=0; i <= n-1 and max_border > 0; ++i) {
+            for(it = cut1.begin(); it != cut1.end() and max_border > 0; ++it)
+            {
+                if (it->second)
+                {
+                    for(i=0; i <= n-1 and max_border > 0; ++i)
+                    {
                         if ((ev_to_ind[it->first] == i) or (al(ev_to_ind[it->first],i) == 0) or (not cut2[ind_to_ev[i]]) or tmp[ind_to_ev[i]]) continue;
                         tmp[ind_to_ev[i]] = true;
                         //						cout << "  Adding " << ind_to_ev[i] << " to cut1" << endl;
@@ -171,8 +186,10 @@ bool find_spectral_partition(TRel &tr,map<string,bool> &cut1,map<string,bool> &c
                 }
             }
             // adding only the borders when the partition is not nearly trivial
-            if ((int) (cut1.size() + tmp.size()) <= n - 1) {
-                for(map<string,bool>::iterator it1 = tmp.begin(); it1 != tmp.end(); ++it1) {
+            if ((int) (cut1.size() + tmp.size()) <= n - 1)
+            {
+                for(map<string,bool>::iterator it1 = tmp.begin(); it1 != tmp.end(); ++it1)
+                {
                     cut1[it1->first] = true;
                 }
                 success_cut = true;
@@ -181,9 +198,12 @@ bool find_spectral_partition(TRel &tr,map<string,bool> &cut1,map<string,bool> &c
         case 1:
             tmp.clear();
             max_border = size_cut2/2 + 1;
-            for(it = cut2.begin(); it != cut2.end() and max_border > 0; ++it) {
-                if (it->second) {
-                    for(i=0; i <= n-1 and max_border > 0; ++i) {
+            for(it = cut2.begin(); it != cut2.end() and max_border > 0; ++it)
+            {
+                if (it->second)
+                {
+                    for(i=0; i <= n-1 and max_border > 0; ++i)
+                    {
                         if ((ev_to_ind[it->first] == i) or (al(ev_to_ind[it->first],i) == 0) or (not cut1[ind_to_ev[i]]) or tmp[ind_to_ev[i]]) continue;
                         tmp[ind_to_ev[i]] = true;
 //  		   			cout << "  Adding " << ind_to_ev[i] << " to cut2" << endl;
@@ -191,8 +211,10 @@ bool find_spectral_partition(TRel &tr,map<string,bool> &cut1,map<string,bool> &c
                     }
                 }
             }
-            if ((int)(cut2.size() + tmp.size()) <= n - 1) {
-                for(map<string,bool>::iterator it1 = tmp.begin(); it1 != tmp.end(); ++it1) {
+            if ((int)(cut2.size() + tmp.size()) <= n - 1)
+            {
+                for(map<string,bool>::iterator it1 = tmp.begin(); it1 != tmp.end(); ++it1)
+                {
                     cut2[it1->first] = true;
                 }
                 success_cut = true;
@@ -201,7 +223,8 @@ bool find_spectral_partition(TRel &tr,map<string,bool> &cut1,map<string,bool> &c
         }
         try_first = (try_first + 1) %2;
         ++ntries;
-    } while (ntries < 2 and not success_cut);
+    }
+    while (ntries < 2 and not success_cut);
 
     /*	if (not succes_cut) {
       	cout << "Only half of the interface events were incorporated in one of the cuts\n";
@@ -223,20 +246,24 @@ bool find_spectral_partition(TRel &tr,map<string,bool> &cut1,map<string,bool> &c
 
 
 
-void divide_conquer_cc(TRel &tr, int kmax, const SS &state_space, const SS &initial_state, list<Region *> &minregs) {
+void divide_conquer_cc(TRel &tr, int kmax, const SS &state_space, const SS &initial_state, list<Region *> &minregs)
+{
 
 
     map<string,bool> cut1,cut2;
     bool leaf = find_spectral_partition(tr,cut1,cut2);
     map<string,bool>::const_iterator it;
-    if (not leaf and not cut1.empty() and not cut2.empty()) {
+    if (not leaf and not cut1.empty() and not cut2.empty())
+    {
         cout <<"# cut1: ";
-        for(it=cut1.begin(); it!=cut1.end(); ++it) {
+        for(it=cut1.begin(); it!=cut1.end(); ++it)
+        {
             if (it->second)		cout << " " << it->first;
         }
         cout << endl;
         cout << "# cut2: ";
-        for(it=cut2.begin(); it!=cut2.end(); ++it) {
+        for(it=cut2.begin(); it!=cut2.end(); ++it)
+        {
             if (it->second)		cout << " " << it->first;
         }
         cout << endl;
@@ -253,26 +280,31 @@ void divide_conquer_cc(TRel &tr, int kmax, const SS &state_space, const SS &init
         list<Region *> minregs2;
         divide_conquer_cc(tr2,kmax,state_space2,initial_state,minregs2);
     }
-    else {
+    else
+    {
         if (kmax == 1) generate_conservative_sm_cover(tr, kmax, state_space,initial_state,minregs);
         else generate_conservative_cover(tr, kmax, state_space,initial_state,minregs);
     }
 }
 
-void divide_conquer_mining(TRel &tr, int kmax, const SS &state_space, const SS &initial_state, list<Region *> &minregs) {
+void divide_conquer_mining(TRel &tr, int kmax, const SS &state_space, const SS &initial_state, list<Region *> &minregs)
+{
 
 
     map<string,bool> cut1,cut2;
     bool leaf = find_spectral_partition(tr,cut1,cut2);
     map<string,bool>::const_iterator it;
-    if (not leaf and not cut1.empty() and not cut2.empty()) {
+    if (not leaf and not cut1.empty() and not cut2.empty())
+    {
         cout <<"cut1: ";
-        for(it=cut1.begin(); it!=cut1.end(); ++it) {
+        for(it=cut1.begin(); it!=cut1.end(); ++it)
+        {
             cout << " " << it->first;
         }
         cout << endl;
         cout << "cut2: ";
-        for(it=cut2.begin(); it!=cut2.end(); ++it) {
+        for(it=cut2.begin(); it!=cut2.end(); ++it)
+        {
             cout << " " << it->first;
         }
         cout << endl;
@@ -289,7 +321,8 @@ void divide_conquer_mining(TRel &tr, int kmax, const SS &state_space, const SS &
         list<Region *> minregs2;
         divide_conquer_mining(tr2,kmax,state_space2,initial_state,minregs2);
     }
-    else {
+    else
+    {
         map<string,bool> ec_sigs;
         list<string> violation_events;
         generate_minimal_regions_all(tr, kmax, state_space,minregs,false, false,ec_sigs,violation_events);
@@ -297,20 +330,24 @@ void divide_conquer_mining(TRel &tr, int kmax, const SS &state_space, const SS &
     }
 }
 
-void divide_conquer_synthesis(TRel &tr, int kmax, const SS &state_space, const SS &initial_state, list<Region *> &minregs) {
+void divide_conquer_synthesis(TRel &tr, int kmax, const SS &state_space, const SS &initial_state, list<Region *> &minregs)
+{
 
 
     map<string,bool> cut1,cut2;
     bool leaf = find_spectral_partition(tr,cut1,cut2);
     map<string,bool>::const_iterator it;
-    if (not leaf and not cut1.empty() and not cut2.empty()) {
+    if (not leaf and not cut1.empty() and not cut2.empty())
+    {
         cout <<"cut1: ";
-        for(it=cut1.begin(); it!=cut1.end(); ++it) {
+        for(it=cut1.begin(); it!=cut1.end(); ++it)
+        {
             cout << " " << it->first;
         }
         cout << endl;
         cout << "cut2: ";
-        for(it=cut2.begin(); it!=cut2.end(); ++it) {
+        for(it=cut2.begin(); it!=cut2.end(); ++it)
+        {
             cout << " " << it->first;
         }
         cout << endl;
@@ -327,7 +364,8 @@ void divide_conquer_synthesis(TRel &tr, int kmax, const SS &state_space, const S
         list<Region *> minregs2;
         divide_conquer_mining(tr2,kmax,state_space2,initial_state,minregs2);
     }
-    else {
+    else
+    {
         list<string> viol_events;
         generate_minimal_regions_on_demand(tr, kmax, 1, state_space,minregs,viol_events);
         pn_synthesis(minregs,tr, initial_state, kmax);

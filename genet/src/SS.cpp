@@ -396,17 +396,20 @@ SS::Minimize()
 
 
 void
-SS::print()  const {
+SS::print()  const
+{
     states.print(2,2);
 }
 
 double
-SS::CountMinterm() const {
+SS::CountMinterm() const
+{
     return states.CountMinterm(mgr->ReadSize());
 }
 
 int
-SS::nodeCount() const {
+SS::nodeCount() const
+{
     return states.nodeCount();
 }
 
@@ -415,7 +418,8 @@ SS::PickOneMinterm(int nvars) const
 {
     BDDvector vb(nvars);
     int i;
-    for (i = 0; i < nvars; i++) {
+    for (i = 0; i < nvars; i++)
+    {
         vb[i] = mgr->bddVar(i);
     }
     return SS(states.PickOneMinterm(vb));

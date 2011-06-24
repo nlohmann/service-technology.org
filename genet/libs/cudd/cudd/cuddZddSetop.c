@@ -133,7 +133,7 @@ static void zddVarToConst (DdNode *f, DdNode **gp, DdNode **hp, DdNode *base, Dd
   Synopsis [Computes the ITE of three ZDDs.]
 
   Description [Computes the ITE of three ZDDs. Returns a pointer to the
-  result if successful; NULL otherwise.]
+  result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -163,7 +163,7 @@ Cudd_zddIte(
   Synopsis [Computes the union of two ZDDs.]
 
   Description [Computes the union of two ZDDs. Returns a pointer to the
-  result if successful; NULL otherwise.]
+  result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -192,7 +192,7 @@ Cudd_zddUnion(
   Synopsis [Computes the intersection of two ZDDs.]
 
   Description [Computes the intersection of two ZDDs. Returns a pointer to
-  the result if successful; NULL otherwise.]
+  the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -221,7 +221,7 @@ Cudd_zddIntersect(
   Synopsis [Computes the difference of two ZDDs.]
 
   Description [Computes the difference of two ZDDs. Returns a pointer to the
-  result if successful; NULL otherwise.]
+  result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -278,7 +278,7 @@ Cudd_zddDiffConst(
 
     /* Check cache.  The cache is shared by cuddZddDiff(). */
     res = cuddCacheLookup2Zdd(table, cuddZddDiff, P, Q);
-    if (res != NULL)
+    if (res != (uintptr_t) 0)
 	return(res);
 
     if (cuddIsConstant(P))
@@ -315,7 +315,7 @@ Cudd_zddDiffConst(
   Description [Computes the positive cofactor of a ZDD w.r.t. a
   variable. In terms of combinations, the result is the set of all
   combinations in which the variable is asserted. Returns a pointer to
-  the result if successful; NULL otherwise.]
+  the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -347,7 +347,7 @@ Cudd_zddSubset1(
   Description [Computes the negative cofactor of a ZDD w.r.t. a
   variable. In terms of combinations, the result is the set of all
   combinations in which the variable is negated. Returns a pointer to
-  the result if successful; NULL otherwise.]
+  the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -377,7 +377,7 @@ Cudd_zddSubset0(
   Synopsis [Substitutes a variable with its complement in a ZDD.]
 
   Description [Substitutes a variable with its complement in a ZDD.
-  returns a pointer to the result if successful; NULL otherwise.]
+  returns a pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -392,7 +392,7 @@ Cudd_zddChange(
 {
     DdNode	*res;
 
-    if ((unsigned int) var >= CUDD_MAXINDEX - 1) return(NULL);
+    if ((unsigned int) var >= CUDD_MAXINDEX - 1) return((uintptr_t) 0);
     
     do {
 	dd->reordered = 0;
@@ -462,7 +462,7 @@ cuddZddIte(
 
     /* Check cache. */
     r = cuddCacheLookupZdd(dd,DD_ZDD_ITE_TAG,f,g,h);
-    if (r != NULL) {
+    if (r != (uintptr_t) 0) {
 	return(r);
     }
 
@@ -473,7 +473,7 @@ cuddZddIte(
 
     if (topf < v) {
 	r = cuddZddIte(dd,cuddE(f),g,h);
-	if (r == NULL) return(NULL);
+	if (r == (uintptr_t) 0) return((uintptr_t) 0);
     } else if (topf > v) {
 	if (topg > v) {
 	    Gvn = g;
@@ -488,12 +488,12 @@ cuddZddIte(
 	    Hv = cuddT(h); Hvn = cuddE(h);
 	}
 	e = cuddZddIte(dd,f,Gvn,Hvn);
-	if (e == NULL) return(NULL);
+	if (e == (uintptr_t) 0) return((uintptr_t) 0);
 	cuddRef(e);
 	r = cuddZddGetNode(dd,index,Hv,e);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(dd,e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(e);
     } else {
@@ -509,19 +509,19 @@ cuddZddIte(
 	    Hv = cuddT(h); Hvn = cuddE(h);
 	}
 	e = cuddZddIte(dd,cuddE(f),Gvn,Hvn);
-	if (e == NULL) return(NULL);
+	if (e == (uintptr_t) 0) return((uintptr_t) 0);
 	cuddRef(e);
 	t = cuddZddIte(dd,cuddT(f),Gv,Hv);
-	if (t == NULL) {
+	if (t == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(dd,e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(t);
 	r = cuddZddGetNode(dd,index,t,e);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(dd,e);
 	    Cudd_RecursiveDerefZdd(dd,t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(t);
 	cuddDeref(e);
@@ -565,7 +565,7 @@ cuddZddUnion(
 
     /* Check cache */
     res = cuddCacheLookup2Zdd(table, cuddZddUnion, P, Q);
-    if (res != NULL)
+    if (res != (uintptr_t) 0)
 	return(res);
 
     if (cuddIsConstant(P))
@@ -578,39 +578,39 @@ cuddZddUnion(
 	q_top = zdd->permZ[Q->index];
     if (p_top < q_top) {
 	e = cuddZddUnion(zdd, cuddE(P), Q);
-	if (e == NULL) return (NULL);
+	if (e == (uintptr_t) 0) return ((uintptr_t) 0);
 	cuddRef(e);
 	res = cuddZddGetNode(zdd, P->index, cuddT(P), e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(table, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(e);
     } else if (p_top > q_top) {
 	e = cuddZddUnion(zdd, P, cuddE(Q));
-	if (e == NULL) return(NULL);
+	if (e == (uintptr_t) 0) return((uintptr_t) 0);
 	cuddRef(e);
 	res = cuddZddGetNode(zdd, Q->index, cuddT(Q), e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(table, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(e);
     } else {
 	t = cuddZddUnion(zdd, cuddT(P), cuddT(Q));
-	if (t == NULL) return(NULL);
+	if (t == (uintptr_t) 0) return((uintptr_t) 0);
 	cuddRef(t);
 	e = cuddZddUnion(zdd, cuddE(P), cuddE(Q));
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(table, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(e);
 	res = cuddZddGetNode(zdd, P->index, t, e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(table, t);
 	    Cudd_RecursiveDerefZdd(table, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(t);
 	cuddDeref(e);
@@ -654,7 +654,7 @@ cuddZddIntersect(
 
     /* Check cache. */
     res = cuddCacheLookup2Zdd(table, cuddZddIntersect, P, Q);
-    if (res != NULL)
+    if (res != (uintptr_t) 0)
 	return(res);
 
     if (cuddIsConstant(P))
@@ -667,25 +667,25 @@ cuddZddIntersect(
 	q_top = zdd->permZ[Q->index];
     if (p_top < q_top) {
 	res = cuddZddIntersect(zdd, cuddE(P), Q);
-	if (res == NULL) return(NULL);
+	if (res == (uintptr_t) 0) return((uintptr_t) 0);
     } else if (p_top > q_top) {
 	res = cuddZddIntersect(zdd, P, cuddE(Q));
-	if (res == NULL) return(NULL);
+	if (res == (uintptr_t) 0) return((uintptr_t) 0);
     } else {
 	t = cuddZddIntersect(zdd, cuddT(P), cuddT(Q));
-	if (t == NULL) return(NULL);
+	if (t == (uintptr_t) 0) return((uintptr_t) 0);
 	cuddRef(t);
 	e = cuddZddIntersect(zdd, cuddE(P), cuddE(Q));
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(table, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(e);
 	res = cuddZddGetNode(zdd, P->index, t, e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(table, t);
 	    Cudd_RecursiveDerefZdd(table, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(t);
 	cuddDeref(e);
@@ -729,7 +729,7 @@ cuddZddDiff(
 
     /* Check cache.  The cache is shared by Cudd_zddDiffConst(). */
     res = cuddCacheLookup2Zdd(table, cuddZddDiff, P, Q);
-    if (res != NULL && res != DD_NON_CONSTANT)
+    if (res != (uintptr_t) 0 && res != DD_NON_CONSTANT)
 	return(res);
 
     if (cuddIsConstant(P))
@@ -742,32 +742,32 @@ cuddZddDiff(
 	q_top = zdd->permZ[Q->index];
     if (p_top < q_top) {
 	e = cuddZddDiff(zdd, cuddE(P), Q);
-	if (e == NULL) return(NULL);
+	if (e == (uintptr_t) 0) return((uintptr_t) 0);
 	cuddRef(e);
 	res = cuddZddGetNode(zdd, P->index, cuddT(P), e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(table, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(e);
     } else if (p_top > q_top) {
 	res = cuddZddDiff(zdd, P, cuddE(Q));
-	if (res == NULL) return(NULL);
+	if (res == (uintptr_t) 0) return((uintptr_t) 0);
     } else {
 	t = cuddZddDiff(zdd, cuddT(P), cuddT(Q));
-	if (t == NULL) return(NULL);
+	if (t == (uintptr_t) 0) return((uintptr_t) 0);
 	cuddRef(t);
 	e = cuddZddDiff(zdd, cuddE(P), cuddE(Q));
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(table, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(e);
 	res = cuddZddGetNode(zdd, P->index, t, e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(table, t);
 	    Cudd_RecursiveDerefZdd(table, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(t);
 	cuddDeref(e);
@@ -810,7 +810,7 @@ cuddZddChangeAux(
 
     /* Check cache. */
     res = cuddCacheLookup2Zdd(zdd, cuddZddChangeAux, P, zvar);
-    if (res != NULL)
+    if (res != (uintptr_t) 0)
 	return(res);
 
     top_var = zdd->permZ[P->index];
@@ -818,25 +818,25 @@ cuddZddChangeAux(
 
     if (top_var > level) {
 	res = cuddZddGetNode(zdd, zvar->index, P, DD_ZERO(zdd));
-	if (res == NULL) return(NULL);
+	if (res == (uintptr_t) 0) return((uintptr_t) 0);
     } else if (top_var == level) {
 	res = cuddZddGetNode(zdd, zvar->index, cuddE(P), cuddT(P));
-	if (res == NULL) return(NULL);
+	if (res == (uintptr_t) 0) return((uintptr_t) 0);
     } else {
 	t = cuddZddChangeAux(zdd, cuddT(P), zvar);
-	if (t == NULL) return(NULL);
+	if (t == (uintptr_t) 0) return((uintptr_t) 0);
 	cuddRef(t);
 	e = cuddZddChangeAux(zdd, cuddE(P), zvar);
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(zdd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(e);
 	res = cuddZddGetNode(zdd, P->index, t, e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(zdd, t);
 	    Cudd_RecursiveDerefZdd(zdd, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(t);
 	cuddDeref(e);
@@ -856,7 +856,7 @@ cuddZddChangeAux(
   Description [Computes the positive cofactor of a ZDD w.r.t. a
   variable. In terms of combinations, the result is the set of all
   combinations in which the variable is asserted. Returns a pointer to
-  the result if successful; NULL otherwise. cuddZddSubset1 performs
+  the result if successful; (uintptr_t) 0 otherwise. cuddZddSubset1 performs
   the same function as Cudd_zddSubset1, but does not restart if
   reordering has taken place. Therefore it can be called from within a
   recursive procedure.]
@@ -879,14 +879,14 @@ cuddZddSubset1(
     empty = DD_ZERO(dd);
 
     zvar = cuddUniqueInterZdd(dd, var, base, empty);
-    if (zvar == NULL) {
-	return(NULL);
+    if (zvar == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     } else {
 	cuddRef(zvar);
 	r = zdd_subset1_aux(dd, P, zvar);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(dd, zvar);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(r);
 	Cudd_RecursiveDerefZdd(dd, zvar);
@@ -905,7 +905,7 @@ cuddZddSubset1(
   Description [Computes the negative cofactor of a ZDD w.r.t. a
   variable. In terms of combinations, the result is the set of all
   combinations in which the variable is negated. Returns a pointer to
-  the result if successful; NULL otherwise. cuddZddSubset0 performs
+  the result if successful; (uintptr_t) 0 otherwise. cuddZddSubset0 performs
   the same function as Cudd_zddSubset0, but does not restart if
   reordering has taken place. Therefore it can be called from within a
   recursive procedure.]
@@ -928,14 +928,14 @@ cuddZddSubset0(
     empty = DD_ZERO(dd);
 
     zvar = cuddUniqueInterZdd(dd, var, base, empty);
-    if (zvar == NULL) {
-	return(NULL);
+    if (zvar == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     } else {
 	cuddRef(zvar);
 	r = zdd_subset0_aux(dd, P, zvar);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(dd, zvar);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(r);
 	Cudd_RecursiveDerefZdd(dd, zvar);
@@ -952,7 +952,7 @@ cuddZddSubset0(
   Synopsis [Substitutes a variable with its complement in a ZDD.]
 
   Description [Substitutes a variable with its complement in a ZDD.
-  returns a pointer to the result if successful; NULL
+  returns a pointer to the result if successful; (uintptr_t) 0
   otherwise. cuddZddChange performs the same function as
   Cudd_zddChange, but does not restart if reordering has taken
   place. Therefore it can be called from within a recursive
@@ -972,13 +972,13 @@ cuddZddChange(
     DdNode	*zvar, *res;
 
     zvar = cuddUniqueInterZdd(dd, var, DD_ONE(dd), DD_ZERO(dd));
-    if (zvar == NULL) return(NULL);
+    if (zvar == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(zvar);
 
     res = cuddZddChangeAux(dd, P, zvar);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_RecursiveDerefZdd(dd,zvar);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(res);
     Cudd_RecursiveDerefZdd(dd,zvar);
@@ -1019,7 +1019,7 @@ zdd_subset1_aux(
 
     /* Check cache. */
     res = cuddCacheLookup2Zdd(zdd, zdd_subset1_aux, P, zvar);
-    if (res != NULL)
+    if (res != (uintptr_t) 0)
 	return(res);
 
     if (cuddIsConstant(P)) {
@@ -1037,19 +1037,19 @@ zdd_subset1_aux(
 	res = cuddT(P);
     } else {
         t = zdd_subset1_aux(zdd, cuddT(P), zvar);
-	if (t == NULL) return(NULL);
+	if (t == (uintptr_t) 0) return((uintptr_t) 0);
 	cuddRef(t);
         e = zdd_subset1_aux(zdd, cuddE(P), zvar);
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(zdd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(e);
         res = cuddZddGetNode(zdd, P->index, t, e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(zdd, t);
 	    Cudd_RecursiveDerefZdd(zdd, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(t);
 	cuddDeref(e);
@@ -1086,7 +1086,7 @@ zdd_subset0_aux(
 
     /* Check cache. */
     res = cuddCacheLookup2Zdd(zdd, zdd_subset0_aux, P, zvar);
-    if (res != NULL)
+    if (res != (uintptr_t) 0)
 	return(res);
 
     if (cuddIsConstant(P)) {
@@ -1106,19 +1106,19 @@ zdd_subset0_aux(
     }
     else {
         t = zdd_subset0_aux(zdd, cuddT(P), zvar);
-	if (t == NULL) return(NULL);
+	if (t == (uintptr_t) 0) return((uintptr_t) 0);
 	cuddRef(t);
         e = zdd_subset0_aux(zdd, cuddE(P), zvar);
-	if (e == NULL) {
+	if (e == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(zdd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddRef(e);
         res = cuddZddGetNode(zdd, P->index, t, e);
-	if (res == NULL) {
+	if (res == (uintptr_t) 0) {
 	    Cudd_RecursiveDerefZdd(zdd, t);
 	    Cudd_RecursiveDerefZdd(zdd, e);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	cuddDeref(t);
 	cuddDeref(e);

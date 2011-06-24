@@ -194,7 +194,7 @@ cuddLocalCacheInit(
     cache->keysize = keySize;
     cache->itemsize = (keySize + 1) * sizeof(DdNode *);
 #ifdef DD_CACHE_PROFILE
-    cache->itemsize += sizeof(ptrint);
+    cache->itemsize += sizeof(intptr_t);
 #endif
     logSize = cuddComputeFloorLog2(ddMax(cacheSize,manager->slots/2));
     cacheSize = 1 << logSize;
@@ -553,7 +553,7 @@ cuddHashTableInit(
     hash->memoryList = (uintptr_t) 0;
     hash->nextFree = (uintptr_t) 0;
     hash->itemsize = (keySize + 1) * sizeof(DdNode *) +
-	sizeof(ptrint) + sizeof(DdHashItem *);
+	sizeof(intptr_t) + sizeof(DdHashItem *);
     /* We have to guarantee that the shift be < 32. */
     if (initSize < 2) initSize = 2;
     logSize = cuddComputeFloorLog2(initSize);
@@ -645,7 +645,7 @@ cuddHashTableInsert(
   DdHashTable * hash,
   DdNodePtr * key,
   DdNode * value,
-  ptrint count)
+  intptr_t count)
 {
     int result;
     unsigned int posn;
@@ -764,7 +764,7 @@ cuddHashTableInsert1(
   DdHashTable * hash,
   DdNode * f,
   DdNode * value,
-  ptrint count)
+  intptr_t count)
 {
     int result;
     unsigned int posn;
@@ -872,7 +872,7 @@ cuddHashTableInsert2(
   DdNode * f,
   DdNode * g,
   DdNode * value,
-  ptrint count)
+  intptr_t count)
 {
     int result;
     unsigned int posn;
@@ -983,7 +983,7 @@ cuddHashTableInsert3(
   DdNode * g,
   DdNode * h,
   DdNode * value,
-  ptrint count)
+  intptr_t count)
 {
     int result;
     unsigned int posn;
@@ -1180,11 +1180,11 @@ ddLCHash(
   unsigned int keysize,
   int shift)
 {
-    unsigned int val = (unsigned int) (ptrint) key[0] * DD_P2;
+    unsigned int val = (unsigned int) (intptr_t) key[0] * DD_P2;
     unsigned int i;
 
     for (i = 1; i < keysize; i++) {
-	val = val * DD_P1 + (int) (ptrint) key[i];
+	val = val * DD_P1 + (int) (intptr_t) key[i];
     }
 
     return(val >> shift);

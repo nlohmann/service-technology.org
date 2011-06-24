@@ -158,15 +158,15 @@ cuddExact(
     int unused, nvars, level, result;
     int upperBound, lowerBound, cost;
     int roots;
-    char *mask = NULL;
-    DdHalfWord  *symmInfo = NULL;
-    DdHalfWord **newOrder = NULL;
-    DdHalfWord **oldOrder = NULL;
-    int *newCost = NULL;
-    int *oldCost = NULL;
+    char *mask = (uintptr_t) 0;
+    DdHalfWord  *symmInfo = (uintptr_t) 0;
+    DdHalfWord **newOrder = (uintptr_t) 0;
+    DdHalfWord **oldOrder = (uintptr_t) 0;
+    int *newCost = (uintptr_t) 0;
+    int *oldCost = (uintptr_t) 0;
     DdHalfWord **tmpOrder;
     int *tmpCost;
-    DdHalfWord *bestOrder = NULL;
+    DdHalfWord *bestOrder = (uintptr_t) 0;
     DdHalfWord *order;
 #ifdef DD_STATS
     int  ddTotalSubsets;
@@ -212,25 +212,25 @@ cuddExact(
     if (maxBinomial == -1) goto cuddExactOutOfMem;
 
     newOrder = getMatrix(maxBinomial, size);
-    if (newOrder == NULL) goto cuddExactOutOfMem;
+    if (newOrder == (uintptr_t) 0) goto cuddExactOutOfMem;
 
     newCost = ALLOC(int, maxBinomial);
-    if (newCost == NULL) goto cuddExactOutOfMem;
+    if (newCost == (uintptr_t) 0) goto cuddExactOutOfMem;
 
     oldOrder = getMatrix(maxBinomial, size);
-    if (oldOrder == NULL) goto cuddExactOutOfMem;
+    if (oldOrder == (uintptr_t) 0) goto cuddExactOutOfMem;
 
     oldCost = ALLOC(int, maxBinomial);
-    if (oldCost == NULL) goto cuddExactOutOfMem;
+    if (oldCost == (uintptr_t) 0) goto cuddExactOutOfMem;
 
     bestOrder = ALLOC(DdHalfWord, size);
-    if (bestOrder == NULL) goto cuddExactOutOfMem;
+    if (bestOrder == (uintptr_t) 0) goto cuddExactOutOfMem;
 
     mask = ALLOC(char, nvars);
-    if (mask == NULL) goto cuddExactOutOfMem;
+    if (mask == (uintptr_t) 0) goto cuddExactOutOfMem;
 
     symmInfo = initSymmInfo(table, lower, upper);
-    if (symmInfo == NULL) goto cuddExactOutOfMem;
+    if (symmInfo == (uintptr_t) 0) goto cuddExactOutOfMem;
 
     roots = ddCountRoots(table, lower, upper);
 
@@ -324,13 +324,13 @@ cuddExact(
 
 cuddExactOutOfMem:
 
-    if (newOrder != NULL) freeMatrix(newOrder);
-    if (oldOrder != NULL) freeMatrix(oldOrder);
-    if (bestOrder != NULL) FREE(bestOrder);
-    if (oldCost != NULL) FREE(oldCost);
-    if (newCost != NULL) FREE(newCost);
-    if (symmInfo != NULL) FREE(symmInfo);
-    if (mask != NULL) FREE(mask);
+    if (newOrder != (uintptr_t) 0) freeMatrix(newOrder);
+    if (oldOrder != (uintptr_t) 0) freeMatrix(oldOrder);
+    if (bestOrder != (uintptr_t) 0) FREE(bestOrder);
+    if (oldCost != (uintptr_t) 0) FREE(oldCost);
+    if (newCost != (uintptr_t) 0) FREE(newCost);
+    if (symmInfo != (uintptr_t) 0) FREE(symmInfo);
+    if (mask != (uintptr_t) 0) FREE(mask);
     table->errorCode = CUDD_MEMORY_OUT;
     return(0);
 
@@ -436,7 +436,7 @@ gcd(
   Synopsis    [Allocates a two-dimensional matrix of ints.]
 
   Description [Allocates a two-dimensional matrix of ints.
-  Returns the pointer to the matrix if successful; NULL otherwise.]
+  Returns the pointer to the matrix if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -451,13 +451,13 @@ getMatrix(
     DdHalfWord **matrix;
     int i;
 
-    if (cols*rows == 0) return(NULL);
+    if (cols*rows == 0) return((uintptr_t) 0);
     matrix = ALLOC(DdHalfWord *, rows);
-    if (matrix == NULL) return(NULL);
+    if (matrix == (uintptr_t) 0) return((uintptr_t) 0);
     matrix[0] = ALLOC(DdHalfWord, cols*rows);
-    if (matrix[0] == NULL) {
+    if (matrix[0] == (uintptr_t) 0) {
 	FREE(matrix);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     for (i = 1; i < rows; i++) {
 	matrix[i] = matrix[i-1] + cols;
@@ -957,7 +957,7 @@ pushDown(
   a circular list where each variable points to the next variable in the
   same symmetry group. Only the entries between lower and upper are
   considered.  The procedure returns a pointer to an array
-  holding the symmetry information if successful; NULL otherwise.]
+  holding the symmetry information if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -974,7 +974,7 @@ initSymmInfo(
     DdHalfWord *symmInfo;
 
     symmInfo =  ALLOC(DdHalfWord, table->size);
-    if (symmInfo == NULL) return(NULL);
+    if (symmInfo == (uintptr_t) 0) return((uintptr_t) 0);
 
     for (level = lower; level <= upper; level++) {
 	index = table->invperm[level];

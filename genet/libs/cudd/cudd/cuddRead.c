@@ -186,12 +186,12 @@ Cudd_addRead(
     */
     if (lnx > *nx) {
 	*x = lx = REALLOC(DdNode *, *x, lnx);
-	if (lx == NULL) {
+	if (lx == (uintptr_t) 0) {
 	    dd->errorCode = CUDD_MEMORY_OUT;
 	    return(0);
 	}
 	*xn = lxn =  REALLOC(DdNode *, *xn, lnx);
-	if (lxn == NULL) {
+	if (lxn == (uintptr_t) 0) {
 	    dd->errorCode = CUDD_MEMORY_OUT;
 	    return(0);
 	}
@@ -209,12 +209,12 @@ Cudd_addRead(
     */
     if (lny > *ny) {
 	*y = ly = REALLOC(DdNode *, *y, lny);
-	if (ly == NULL) {
+	if (ly == (uintptr_t) 0) {
 	    dd->errorCode = CUDD_MEMORY_OUT;
 	    return(0);
 	}
 	*yn_ = lyn =  REALLOC(DdNode *, *yn_, lny);
-	if (lyn == NULL) {
+	if (lyn == (uintptr_t) 0) {
 	    dd->errorCode = CUDD_MEMORY_OUT;
 	    return(0);
 	}
@@ -226,13 +226,13 @@ Cudd_addRead(
 	    dd->reordered = 0;
 	    lx[i] = cuddUniqueInter(dd, nv, one, zero);
 	} while (dd->reordered == 1);
-	if (lx[i] == NULL) return(0);
+	if (lx[i] == (uintptr_t) 0) return(0);
         cuddRef(lx[i]);
 	do {
 	    dd->reordered = 0;
 	    lxn[i] = cuddUniqueInter(dd, nv, zero, one);
 	} while (dd->reordered == 1);
-	if (lxn[i] == NULL) return(0);
+	if (lxn[i] == (uintptr_t) 0) return(0);
         cuddRef(lxn[i]);
     }
     for (i = *ny, nv = by + (*ny) * sy; i < lny; i++, nv += sy) {
@@ -240,13 +240,13 @@ Cudd_addRead(
 	    dd->reordered = 0;
 	    ly[i] = cuddUniqueInter(dd, nv, one, zero);
 	} while (dd->reordered == 1);
-	if (ly[i] == NULL) return(0);
+	if (ly[i] == (uintptr_t) 0) return(0);
 	cuddRef(ly[i]);
 	do {
 	    dd->reordered = 0;
 	    lyn[i] = cuddUniqueInter(dd, nv, zero, one);
 	} while (dd->reordered == 1);
-	if (lyn[i] == NULL) return(0);
+	if (lyn[i] == (uintptr_t) 0) return(0);
 	cuddRef(lyn[i]);
     }
     *nx = lnx;
@@ -274,7 +274,7 @@ Cudd_addRead(
 	    } else {
 		w = Cudd_addApply(dd, Cudd_addTimes, minterm1, lxn[i]);
 	    }
-	    if (w == NULL) {
+	    if (w == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd, minterm1);
 		return(0);
 	    }
@@ -289,7 +289,7 @@ Cudd_addRead(
 	    } else {
 		w = Cudd_addApply(dd, Cudd_addTimes, minterm1, lyn[i]);
 	    }
-	    if (w == NULL) {
+	    if (w == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd, minterm1);
 		return(0);
 	    }
@@ -302,14 +302,14 @@ Cudd_addRead(
 	** This call will never cause reordering.
 	*/
 	neW = cuddUniqueConst(dd, val);
-	if (neW == NULL) {
+	if (neW == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, minterm1);
 	    return(0);
 	}
     	cuddRef(neW);
 
 	w = Cudd_addIte(dd, minterm1, neW, *E);
-	if (w == NULL) {
+	if (w == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, minterm1);
 	    Cudd_RecursiveDeref(dd, neW);
 	    return(0);
@@ -403,7 +403,7 @@ Cudd_bddRead(
     }
     if (lnx > *nx) {
 	*x = lx = REALLOC(DdNode *, *x, lnx);
-	if (lx == NULL) {
+	if (lx == (uintptr_t) 0) {
 	    dd->errorCode = CUDD_MEMORY_OUT;
 	    return(0);
 	}
@@ -418,7 +418,7 @@ Cudd_bddRead(
     }
     if (lny > *ny) {
 	*y = ly = REALLOC(DdNode *, *y, lny);
-	if (ly == NULL) {
+	if (ly == (uintptr_t) 0) {
 	    dd->errorCode = CUDD_MEMORY_OUT;
 	    return(0);
 	}
@@ -430,7 +430,7 @@ Cudd_bddRead(
 	    dd->reordered = 0;
 	    lx[i] = cuddUniqueInter(dd, nv, one, zero);
 	} while (dd->reordered == 1);
-	if (lx[i] == NULL) return(0);
+	if (lx[i] == (uintptr_t) 0) return(0);
         cuddRef(lx[i]);
     }
     for (i = *ny, nv = by + (*ny) * sy; i < lny; i++, nv += sy) {
@@ -438,7 +438,7 @@ Cudd_bddRead(
 	    dd->reordered = 0;
 	    ly[i] = cuddUniqueInter(dd, nv, one, zero);
 	} while (dd->reordered == 1);
-	if (ly[i] == NULL) return(0);
+	if (ly[i] == (uintptr_t) 0) return(0);
 	cuddRef(ly[i]);
     }
     *nx = lnx;
@@ -466,7 +466,7 @@ Cudd_bddRead(
 	    } else {
 		w = Cudd_bddAnd(dd, minterm1, Cudd_Not(lx[i]));
 	    }
-	    if (w == NULL) {
+	    if (w == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd, minterm1);
 		return(0);
 	    }
@@ -481,7 +481,7 @@ Cudd_bddRead(
 	    } else {
 		w = Cudd_bddAnd(dd, minterm1, Cudd_Not(ly[i]));
 	    }
-	    if (w == NULL) {
+	    if (w == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd, minterm1);
 		return(0);
 	    }
@@ -492,7 +492,7 @@ Cudd_bddRead(
 	}
 
 	w = Cudd_bddAnd(dd, Cudd_Not(minterm1), Cudd_Not(*E));
-	if (w == NULL) {
+	if (w == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, minterm1);
 	    return(0);
 	}

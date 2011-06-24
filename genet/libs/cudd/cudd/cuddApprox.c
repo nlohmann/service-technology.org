@@ -205,7 +205,7 @@ static int BAapplyBias (DdManager *dd, DdNode *f, DdNode *b, ApproxInfo *info, D
   a variant of Tom Shiple's underapproximation method. The main
   difference from the original method is that density is used as cost
   function.  Returns a pointer to the BDD of the subset if
-  successful. NULL if the procedure runs out of memory. The parameter
+  successful. (uintptr_t) 0 if the procedure runs out of memory. The parameter
   numVars is the maximum number of variables to be used in minterm
   calculation.  The optimal number should be as close as possible to
   the size of the support of f.  However, it is safe to pass the value
@@ -251,7 +251,7 @@ Cudd_UnderApprox(
   works on the complement of the given function. Extracting the subset
   of the complement function is equivalent to extracting the superset
   of the function.
-  Returns a pointer to the BDD of the superset if successful. NULL if
+  Returns a pointer to the BDD of the superset if successful. (uintptr_t) 0 if
   intermediate result causes the procedure to run out of memory. The
   parameter numVars is the maximum number of variables to be used in
   minterm calculation.  The optimal number
@@ -284,7 +284,7 @@ Cudd_OverApprox(
 	subset = cuddUnderApprox(dd, g, numVars, threshold, safe, quality);
     } while (dd->reordered == 1);
     
-    return(Cudd_NotCond(subset, (subset != NULL)));
+    return(Cudd_NotCond(subset, (subset != (uintptr_t) 0)));
     
 } /* end of Cudd_OverApprox */
 
@@ -297,7 +297,7 @@ Cudd_OverApprox(
   Description [Extracts a dense subset from a BDD. This procedure uses
   a remapping technique and density as the cost function.
   Returns a pointer to the BDD of the subset if
-  successful. NULL if the procedure runs out of memory. The parameter
+  successful. (uintptr_t) 0 if the procedure runs out of memory. The parameter
   numVars is the maximum number of variables to be used in minterm
   calculation.  The optimal number should be as close as possible to
   the size of the support of f.  However, it is safe to pass the value
@@ -342,7 +342,7 @@ Cudd_RemapUnderApprox(
   works on the complement of the given function. Extracting the subset
   of the complement function is equivalent to extracting the superset
   of the function.
-  Returns a pointer to the BDD of the superset if successful. NULL if
+  Returns a pointer to the BDD of the superset if successful. (uintptr_t) 0 if
   intermediate result causes the procedure to run out of memory. The
   parameter numVars is the maximum number of variables to be used in
   minterm calculation.  The optimal number
@@ -374,7 +374,7 @@ Cudd_RemapOverApprox(
 	subset = cuddRemapUnderApprox(dd, g, numVars, threshold, quality);
     } while (dd->reordered == 1);
     
-    return(Cudd_NotCond(subset, (subset != NULL)));
+    return(Cudd_NotCond(subset, (subset != (uintptr_t) 0)));
     
 } /* end of Cudd_RemapOverApprox */
 
@@ -389,7 +389,7 @@ Cudd_RemapOverApprox(
   is a function. This procedure tries to approximate where the bias is 0
   and preserve the given function where the bias is 1.
   Returns a pointer to the BDD of the subset if
-  successful. NULL if the procedure runs out of memory. The parameter
+  successful. (uintptr_t) 0 if the procedure runs out of memory. The parameter
   numVars is the maximum number of variables to be used in minterm
   calculation.  The optimal number should be as close as possible to
   the size of the support of f.  However, it is safe to pass the value
@@ -438,7 +438,7 @@ Cudd_BiasedUnderApprox(
   works on the complement of the given function. Extracting the subset
   of the complement function is equivalent to extracting the superset
   of the function.
-  Returns a pointer to the BDD of the superset if successful. NULL if
+  Returns a pointer to the BDD of the superset if successful. (uintptr_t) 0 if
   intermediate result causes the procedure to run out of memory. The
   parameter numVars is the maximum number of variables to be used in
   minterm calculation.  The optimal number
@@ -474,7 +474,7 @@ Cudd_BiasedOverApprox(
 				      quality0);
     } while (dd->reordered == 1);
     
-    return(Cudd_NotCond(subset, (subset != NULL)));
+    return(Cudd_NotCond(subset, (subset != (uintptr_t) 0)));
     
 } /* end of Cudd_BiasedOverApprox */
 
@@ -496,7 +496,7 @@ Cudd_BiasedOverApprox(
   whether its elimination increases density.
   <li> traverse the BDD via DFS and actually perform the elimination.
   </ul>
-  Returns the approximated BDD if successful; NULL otherwise.]
+  Returns the approximated BDD if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -516,9 +516,9 @@ cuddUnderApprox(
     DdNode *subset;
     int result;
 
-    if (f == NULL) {
+    if (f == (uintptr_t) 0) {
 	fprintf(dd->err, "Cannot subset, nil object\n");
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     if (Cudd_IsConstant(f)) {
@@ -527,10 +527,10 @@ cuddUnderApprox(
 
     /* Create table where node data are accessible via a hash table. */
     info = gatherInfo(dd, f, numVars, safe);
-    if (info == NULL) {
+    if (info == (uintptr_t) 0) {
 	(void) fprintf(dd->err, "Out-of-memory; Cannot subset\n");
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     /* Mark nodes that should be replaced by zero. */
@@ -541,7 +541,7 @@ cuddUnderApprox(
 	st_free_table(info->table);
 	FREE(info);
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     /* Build the result. */
@@ -556,7 +556,7 @@ cuddUnderApprox(
     FREE(info);
 
 #ifdef DD_DEBUG
-    if (subset != NULL) {
+    if (subset != (uintptr_t) 0) {
 	cuddRef(subset);
 #if 0
 	(void) Cudd_DebugCheck(dd);
@@ -586,7 +586,7 @@ cuddUnderApprox(
   whether remapping increases density.
   <li> traverse the BDD via DFS and actually perform the elimination.
   </ul>
-  Returns the approximated BDD if successful; NULL otherwise.]
+  Returns the approximated BDD if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -605,10 +605,10 @@ cuddRemapUnderApprox(
     DdNode *subset;
     int result;
 
-    if (f == NULL) {
+    if (f == (uintptr_t) 0) {
 	fprintf(dd->err, "Cannot subset, nil object\n");
 	dd->errorCode = CUDD_INVALID_ARG;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     if (Cudd_IsConstant(f)) {
@@ -617,10 +617,10 @@ cuddRemapUnderApprox(
 
     /* Create table where node data are accessible via a hash table. */
     info = gatherInfo(dd, f, numVars, TRUE);
-    if (info == NULL) {
+    if (info == (uintptr_t) 0) {
 	(void) fprintf(dd->err, "Out-of-memory; Cannot subset\n");
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     /* Mark nodes that should be replaced by zero. */
@@ -631,7 +631,7 @@ cuddRemapUnderApprox(
 	st_free_table(info->table);
 	FREE(info);
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     /* Build the result. */
@@ -646,7 +646,7 @@ cuddRemapUnderApprox(
     FREE(info);
 
 #ifdef DD_DEBUG
-    if (subset != NULL) {
+    if (subset != (uintptr_t) 0) {
 	cuddRef(subset);
 #if 0
 	(void) Cudd_DebugCheck(dd);
@@ -676,7 +676,7 @@ cuddRemapUnderApprox(
   whether remapping increases density.
   <li> traverse the BDD via DFS and actually perform the elimination.
   </ul>
-  Returns the approximated BDD if successful; NULL otherwise.]
+  Returns the approximated BDD if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -698,10 +698,10 @@ cuddBiasedUnderApprox(
     int result;
     DdHashTable	*cache;
 
-    if (f == NULL) {
+    if (f == (uintptr_t) 0) {
 	fprintf(dd->err, "Cannot subset, nil object\n");
 	dd->errorCode = CUDD_INVALID_ARG;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     if (Cudd_IsConstant(f)) {
@@ -710,10 +710,10 @@ cuddBiasedUnderApprox(
 
     /* Create table where node data are accessible via a hash table. */
     info = gatherInfo(dd, f, numVars, TRUE);
-    if (info == NULL) {
+    if (info == (uintptr_t) 0) {
 	(void) fprintf(dd->err, "Out-of-memory; Cannot subset\n");
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     cache = cuddHashTableInit(dd,2,2);
@@ -725,7 +725,7 @@ cuddBiasedUnderApprox(
 	st_free_table(info->table);
 	FREE(info);
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddHashTableQuit(cache);
 
@@ -737,7 +737,7 @@ cuddBiasedUnderApprox(
 	st_free_table(info->table);
 	FREE(info);
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     /* Build the result. */
@@ -752,7 +752,7 @@ cuddBiasedUnderApprox(
     FREE(info);
 
 #ifdef DD_DEBUG
-    if (subset != NULL) {
+    if (subset != (uintptr_t) 0) {
 	cuddRef(subset);
 #if 0
 	(void) Cudd_DebugCheck(dd);
@@ -854,9 +854,9 @@ gatherInfoAux(
     Ne = Cudd_NotCond(cuddE(N), N != node);
 
     infoT = gatherInfoAux(Nt, info, parity);
-    if (infoT == NULL) return(NULL);
+    if (infoT == (uintptr_t) 0) return((uintptr_t) 0);
     infoE = gatherInfoAux(Ne, info, parity);
-    if (infoE == NULL) return(NULL);
+    if (infoE == (uintptr_t) 0) return((uintptr_t) 0);
 
     infoT->functionRef++;
     infoE->functionRef++;
@@ -877,7 +877,7 @@ gatherInfoAux(
 
     /* Insert entry for the node in the table. */
     if (st_insert(info->table,(char *)N, (char *)infoN) == ST_OUT_OF_MEM) {
-	return(NULL);
+	return((uintptr_t) 0);
     }
     return(infoN);
 
@@ -892,7 +892,7 @@ gatherInfoAux(
   node in the BDD . The minterm count is separately computed for the
   node and its complement. This is to avoid cancellation
   errors. Returns a pointer to the data structure holding the
-  information gathered if successful; NULL otherwise.]
+  information gathered if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -919,9 +919,9 @@ gatherInfo(
     }
 
     info = ALLOC(ApproxInfo,1);
-    if (info == NULL) {
+    if (info == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
-	return(NULL);
+	return((uintptr_t) 0);
     }
     info->max = pow(2.0,(double) numVars);
     info->one = DD_ONE(dd);
@@ -933,17 +933,17 @@ gatherInfo(
     ** BDD. info->index points to the next available entry in the array
     ** that stores the per-node information. */
     info->page = ALLOC(NodeData,info->size);
-    if (info->page == NULL) {
+    if (info->page == (uintptr_t) 0) {
 	dd->errorCode = CUDD_MEMORY_OUT;
 	FREE(info);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     memset(info->page, 0, info->size * sizeof(NodeData)); /* clear all page */
     info->table = st_init_table(st_ptrcmp,st_ptrhash);
-    if (info->table == NULL) {
+    if (info->table == (uintptr_t) 0) {
 	FREE(info->page);
 	FREE(info);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     /* We visit the DAG in post-order DFS. Hence, the constant node is
     ** in first position, and the root of the DAG is in last position. */
@@ -953,17 +953,17 @@ gatherInfo(
 	FREE(info->page);
 	FREE(info);
 	st_free_table(info->table);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     info->page[0].mintermsP = info->max;
     info->index = 1;
 
     infoTop = gatherInfoAux(node,info,parity);
-    if (infoTop == NULL) {
+    if (infoTop == (uintptr_t) 0) {
 	FREE(info->page);
 	st_free_table(info->table);
 	FREE(info);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     if (Cudd_IsComplement(node)) {
 	info->minterms = infoTop->mintermsN;
@@ -1013,13 +1013,13 @@ computeSavings(
     ** search will continue from it when it is retrieved. */
     item = (LocalQueueItem *)
 	cuddLevelQueueEnqueue(queue,node,cuddI(dd,node->index));
-    if (item == NULL)
+    if (item == (uintptr_t) 0)
 	return(0);
     (void) st_lookup(info->table, node, &infoN);
     item->localRef = infoN->functionRef;
 
     /* Process the queue. */
-    while (queue->first != NULL) {
+    while (queue->first != (uintptr_t) 0) {
 	item = (LocalQueueItem *) queue->first;
 	node = item->node;
 	cuddLevelQueueDequeue(queue,cuddI(dd,node->index));
@@ -1033,13 +1033,13 @@ computeSavings(
 	if (!cuddIsConstant(cuddT(node))) {
 	    item = (LocalQueueItem *) cuddLevelQueueEnqueue(queue,cuddT(node),
 					 cuddI(dd,cuddT(node)->index));
-	    if (item == NULL) return(0);
+	    if (item == (uintptr_t) 0) return(0);
 	    item->localRef++;
 	}
 	if (!Cudd_IsConstant(cuddE(node))) {
 	    item = (LocalQueueItem *) cuddLevelQueueEnqueue(queue,Cudd_Regular(cuddE(node)),
 					 cuddI(dd,Cudd_Regular(cuddE(node))->index));
-	    if (item == NULL) return(0);
+	    if (item == (uintptr_t) 0) return(0);
 	    item->localRef++;
 	}
     }
@@ -1083,12 +1083,12 @@ updateRefs(
     ** count is set equal to 0 so that the search will continue from it
     ** when it is retrieved. */
     item = (LocalQueueItem *) cuddLevelQueueEnqueue(queue,node,cuddI(dd,node->index));
-    if (item == NULL)
+    if (item == (uintptr_t) 0)
 	return(0);
     (void) st_lookup(info->table, node, &infoN);
     infoN->functionRef = 0;
 
-    if (skip != NULL) {
+    if (skip != (uintptr_t) 0) {
 	/* Increase the function reference count of the node to be skipped
 	** by 1 to account for the node pointing to it that will be created. */
 	skip = Cudd_Regular(skip);
@@ -1097,7 +1097,7 @@ updateRefs(
     }
 
     /* Process the queue. */
-    while (queue->first != NULL) {
+    while (queue->first != (uintptr_t) 0) {
 	item = (LocalQueueItem *) queue->first;
 	node = item->node;
 	cuddLevelQueueDequeue(queue,cuddI(dd,node->index));
@@ -1110,14 +1110,14 @@ updateRefs(
 	if (!cuddIsConstant(cuddT(node))) {
 	    item = (LocalQueueItem *) cuddLevelQueueEnqueue(queue,cuddT(node),
 					 cuddI(dd,cuddT(node)->index));
-	    if (item == NULL) return(0);
+	    if (item == (uintptr_t) 0) return(0);
 	    (void) st_lookup(info->table, cuddT(node), &infoN);
 	    infoN->functionRef--;
 	}
 	if (!Cudd_IsConstant(cuddE(node))) {
 	    item = (LocalQueueItem *) cuddLevelQueueEnqueue(queue,Cudd_Regular(cuddE(node)),
 					 cuddI(dd,Cudd_Regular(cuddE(node))->index));
-	    if (item == NULL) return(0);
+	    if (item == (uintptr_t) 0) return(0);
 	    (void) st_lookup(info->table, Cudd_Regular(cuddE(node)), &infoN);
 	    infoN->functionRef--;
 	}
@@ -1167,18 +1167,18 @@ UAmarkNodes(
 		  info->size, info->minterms);
 #endif
     queue = cuddLevelQueueInit(dd->size,sizeof(GlobalQueueItem),info->size);
-    if (queue == NULL) {
+    if (queue == (uintptr_t) 0) {
 	return(0);
     }
     localQueue = cuddLevelQueueInit(dd->size,sizeof(LocalQueueItem),
 				    dd->initSlots);
-    if (localQueue == NULL) {
+    if (localQueue == (uintptr_t) 0) {
 	cuddLevelQueueQuit(queue);
 	return(0);
     }
     node = Cudd_Regular(f);
     item = (GlobalQueueItem *) cuddLevelQueueEnqueue(queue,node,cuddI(dd,node->index));
-    if (item == NULL) {
+    if (item == (uintptr_t) 0) {
 	cuddLevelQueueQuit(queue);
 	cuddLevelQueueQuit(localQueue);
 	return(0);
@@ -1190,7 +1190,7 @@ UAmarkNodes(
 	item->impactP = 1.0;
 	item->impactN = 0.0;
     }
-    while (queue->first != NULL) {
+    while (queue->first != (uintptr_t) 0) {
 	/* If the size of the subset is below the threshold, quit. */
 	if (info->size <= threshold)
 	    break;
@@ -1205,7 +1205,7 @@ UAmarkNodes(
 	impactP = item->impactP;
 	impactN = item->impactN;
 	numOnset = infoN->mintermsP * impactP + infoN->mintermsN * impactN;
-	savings = computeSavings(dd,node,NULL,info,localQueue);
+	savings = computeSavings(dd,node,(uintptr_t) 0,info,localQueue);
 	if (savings == 0) {
 	    cuddLevelQueueQuit(queue);
 	    cuddLevelQueueQuit(localQueue);
@@ -1225,7 +1225,7 @@ UAmarkNodes(
 	    (void) printf("replace: new size = %d new minterms = %g\n",
 			  info->size, info->minterms);
 #endif
-	    savings -= updateRefs(dd,node,NULL,info,localQueue);
+	    savings -= updateRefs(dd,node,(uintptr_t) 0,info,localQueue);
 	    assert(savings == 0);
 	    continue;
 	}
@@ -1261,7 +1261,7 @@ UAmarkNodes(
 
   Description [Builds the subset BDD. Based on the info table,
   replaces selected nodes by zero. Returns a pointer to the result if
-  successful; NULL otherwise.]
+  successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -1288,11 +1288,11 @@ UAbuildSubset(
 	    return(info->zero);
 	}
 	if (N == node ) {
-	    if (infoN->resultP != NULL) {
+	    if (infoN->resultP != (uintptr_t) 0) {
 		return(infoN->resultP);
 	    }
 	} else {
-	    if (infoN->resultN != NULL) {
+	    if (infoN->resultN != (uintptr_t) 0) {
 		return(infoN->resultN);
 	    }
 	}
@@ -1300,22 +1300,22 @@ UAbuildSubset(
 	(void) fprintf(dd->err,
 		       "Something is wrong, ought to be in info table\n");
 	dd->errorCode = CUDD_INTERNAL_ERROR;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     Nt = Cudd_NotCond(cuddT(N), Cudd_IsComplement(node));
     Ne = Cudd_NotCond(cuddE(N), Cudd_IsComplement(node));
 
     t = UAbuildSubset(dd, Nt, info);
-    if (t == NULL) {
-	return(NULL);
+    if (t == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
     cuddRef(t);
 
     e = UAbuildSubset(dd, Ne, info);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
@@ -1323,18 +1323,18 @@ UAbuildSubset(
 	t = Cudd_Not(t);
 	e = Cudd_Not(e);
 	r = (t == e) ? t : cuddUniqueInter(dd, N->index, t, e);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, e);
 	    Cudd_RecursiveDeref(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	r = Cudd_Not(r);
     } else {
 	r = (t == e) ? t : cuddUniqueInter(dd, N->index, t, e);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, e);
 	    Cudd_RecursiveDeref(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     }
     cuddDeref(t);
@@ -1388,12 +1388,12 @@ RAmarkNodes(
 		  info->size, info->minterms);
 #endif
     queue = cuddLevelQueueInit(dd->size,sizeof(GlobalQueueItem),info->size);
-    if (queue == NULL) {
+    if (queue == (uintptr_t) 0) {
 	return(0);
     }
     localQueue = cuddLevelQueueInit(dd->size,sizeof(LocalQueueItem),
 				    dd->initSlots);
-    if (localQueue == NULL) {
+    if (localQueue == (uintptr_t) 0) {
 	cuddLevelQueueQuit(queue);
 	return(0);
     }
@@ -1401,7 +1401,7 @@ RAmarkNodes(
     node = Cudd_Regular(f);
     item = (GlobalQueueItem *)
 	cuddLevelQueueEnqueue(queue,node,cuddI(dd,node->index));
-    if (item == NULL) {
+    if (item == (uintptr_t) 0) {
 	cuddLevelQueueQuit(queue);
 	cuddLevelQueueQuit(localQueue);
 	return(0);
@@ -1417,7 +1417,7 @@ RAmarkNodes(
     ** The initial node is not terminal because constant nodes are
     ** dealt with in the calling procedure. Subsequent nodes are inserted
     ** only if they are not terminal. */
-    while (queue->first != NULL) {
+    while (queue->first != (uintptr_t) 0) {
 	/* If the size of the subset is below the threshold, quit. */
 	if (info->size <= threshold)
 	    break;
@@ -1447,7 +1447,7 @@ RAmarkNodes(
 	}
 	T = cuddT(node);
 	E = cuddE(node);
-	shared = NULL;
+	shared = (uintptr_t) 0;
 	impactP = item->impactP;
 	impactN = item->impactN;
 	if (Cudd_bddLeq(dd,T,E)) {
@@ -1461,7 +1461,7 @@ RAmarkNodes(
 		impact = impactP;
 		minterms = infoE->mintermsP/2.0 - infoT->mintermsP/2.0;
 		if (infoE->functionRef == 1 && !Cudd_IsConstant(E)) {
-		    savings = 1 + computeSavings(dd,E,NULL,info,localQueue);
+		    savings = 1 + computeSavings(dd,E,(uintptr_t) 0,info,localQueue);
 		    if (savings == 1) {
 			cuddLevelQueueQuit(queue);
 			cuddLevelQueueQuit(localQueue);
@@ -1478,7 +1478,7 @@ RAmarkNodes(
 		impact = impactN;
 		minterms = infoT->mintermsN/2.0 - infoE->mintermsN/2.0;
 		if (infoT->functionRef == 1 && !Cudd_IsConstant(T)) {
-		    savings = 1 + computeSavings(dd,T,NULL,info,localQueue);
+		    savings = 1 + computeSavings(dd,T,(uintptr_t) 0,info,localQueue);
 		    if (savings == 1) {
 			cuddLevelQueueQuit(queue);
 			cuddLevelQueueQuit(localQueue);
@@ -1500,7 +1500,7 @@ RAmarkNodes(
 		minterms = infoT->mintermsP/2.0 -
 		    ((E == Ereg) ? infoE->mintermsP : infoE->mintermsN)/2.0;
 		if (infoT->functionRef == 1 && !Cudd_IsConstant(T)) {
-		    savings = 1 + computeSavings(dd,T,NULL,info,localQueue);
+		    savings = 1 + computeSavings(dd,T,(uintptr_t) 0,info,localQueue);
 		    if (savings == 1) {
 			cuddLevelQueueQuit(queue);
 			cuddLevelQueueQuit(localQueue);
@@ -1518,7 +1518,7 @@ RAmarkNodes(
 		minterms = ((E == Ereg) ? infoE->mintermsN :
 			    infoE->mintermsP)/2.0 - infoT->mintermsN/2.0;
 		if (infoE->functionRef == 1 && !Cudd_IsConstant(E)) {
-		    savings = 1 + computeSavings(dd,E,NULL,info,localQueue);
+		    savings = 1 + computeSavings(dd,E,(uintptr_t) 0,info,localQueue);
 		    if (savings == 1) {
 			cuddLevelQueueQuit(queue);
 			cuddLevelQueueQuit(localQueue);
@@ -1549,7 +1549,7 @@ RAmarkNodes(
 	    }
 	    numOnset = infoN->mintermsP * impactP + infoN->mintermsN * impactN;
 	    savings = computeSavings(dd,node,shared,info,localQueue);
-	    if (shared != NULL) {
+	    if (shared != (uintptr_t) 0) {
 		NodeData *infoS;
 		(void) st_lookup(info->table, Cudd_Regular(shared), &infoS);
 		if (Cudd_IsComplement(shared)) {
@@ -1582,7 +1582,7 @@ RAmarkNodes(
 			  replace, info->size, info->minterms);
 #endif
 	    if (replace == REPLACE_N) {
-		savings -= updateRefs(dd,node,NULL,info,localQueue);
+		savings -= updateRefs(dd,node,(uintptr_t) 0,info,localQueue);
 	    } else if (replace == REPLACE_T) {
 		savings -= updateRefs(dd,node,E,info,localQueue);
 	    } else if (replace == REPLACE_E) {
@@ -1692,12 +1692,12 @@ BAmarkNodes(
 		  info->size, info->minterms);
 #endif
     queue = cuddLevelQueueInit(dd->size,sizeof(GlobalQueueItem),info->size);
-    if (queue == NULL) {
+    if (queue == (uintptr_t) 0) {
 	return(0);
     }
     localQueue = cuddLevelQueueInit(dd->size,sizeof(LocalQueueItem),
 				    dd->initSlots);
-    if (localQueue == NULL) {
+    if (localQueue == (uintptr_t) 0) {
 	cuddLevelQueueQuit(queue);
 	return(0);
     }
@@ -1705,7 +1705,7 @@ BAmarkNodes(
     node = Cudd_Regular(f);
     item = (GlobalQueueItem *)
 	cuddLevelQueueEnqueue(queue,node,cuddI(dd,node->index));
-    if (item == NULL) {
+    if (item == (uintptr_t) 0) {
 	cuddLevelQueueQuit(queue);
 	cuddLevelQueueQuit(localQueue);
 	return(0);
@@ -1721,7 +1721,7 @@ BAmarkNodes(
     ** The initial node is not terminal because constant nodes are
     ** dealt with in the calling procedure. Subsequent nodes are inserted
     ** only if they are not terminal. */
-    while (queue->first != NULL) {
+    while (queue->first != (uintptr_t) 0) {
 	/* If the size of the subset is below the threshold, quit. */
 	if (info->size <= threshold)
 	    break;
@@ -1752,7 +1752,7 @@ BAmarkNodes(
 	}
 	T = cuddT(node);
 	E = cuddE(node);
-	shared = NULL;
+	shared = (uintptr_t) 0;
 	impactP = item->impactP;
 	impactN = item->impactN;
 	if (Cudd_bddLeq(dd,T,E)) {
@@ -1766,7 +1766,7 @@ BAmarkNodes(
 		impact = impactP;
 		minterms = infoE->mintermsP/2.0 - infoT->mintermsP/2.0;
 		if (infoE->functionRef == 1 && !Cudd_IsConstant(E)) {
-		    savings = 1 + computeSavings(dd,E,NULL,info,localQueue);
+		    savings = 1 + computeSavings(dd,E,(uintptr_t) 0,info,localQueue);
 		    if (savings == 1) {
 			cuddLevelQueueQuit(queue);
 			cuddLevelQueueQuit(localQueue);
@@ -1783,7 +1783,7 @@ BAmarkNodes(
 		impact = impactN;
 		minterms = infoT->mintermsN/2.0 - infoE->mintermsN/2.0;
 		if (infoT->functionRef == 1 && !Cudd_IsConstant(T)) {
-		    savings = 1 + computeSavings(dd,T,NULL,info,localQueue);
+		    savings = 1 + computeSavings(dd,T,(uintptr_t) 0,info,localQueue);
 		    if (savings == 1) {
 			cuddLevelQueueQuit(queue);
 			cuddLevelQueueQuit(localQueue);
@@ -1805,7 +1805,7 @@ BAmarkNodes(
 		minterms = infoT->mintermsP/2.0 -
 		    ((E == Ereg) ? infoE->mintermsP : infoE->mintermsN)/2.0;
 		if (infoT->functionRef == 1 && !Cudd_IsConstant(T)) {
-		    savings = 1 + computeSavings(dd,T,NULL,info,localQueue);
+		    savings = 1 + computeSavings(dd,T,(uintptr_t) 0,info,localQueue);
 		    if (savings == 1) {
 			cuddLevelQueueQuit(queue);
 			cuddLevelQueueQuit(localQueue);
@@ -1823,7 +1823,7 @@ BAmarkNodes(
 		minterms = ((E == Ereg) ? infoE->mintermsN :
 			    infoE->mintermsP)/2.0 - infoT->mintermsN/2.0;
 		if (infoE->functionRef == 1 && !Cudd_IsConstant(E)) {
-		    savings = 1 + computeSavings(dd,E,NULL,info,localQueue);
+		    savings = 1 + computeSavings(dd,E,(uintptr_t) 0,info,localQueue);
 		    if (savings == 1) {
 			cuddLevelQueueQuit(queue);
 			cuddLevelQueueQuit(localQueue);
@@ -1854,7 +1854,7 @@ BAmarkNodes(
 	    }
 	    numOnset = infoN->mintermsP * impactP + infoN->mintermsN * impactN;
 	    savings = computeSavings(dd,node,shared,info,localQueue);
-	    if (shared != NULL) {
+	    if (shared != (uintptr_t) 0) {
 		NodeData *infoS;
 		(void) st_lookup(info->table, Cudd_Regular(shared), &infoS);
 		if (Cudd_IsComplement(shared)) {
@@ -1887,7 +1887,7 @@ BAmarkNodes(
 			  replace, info->size, info->minterms);
 #endif
 	    if (replace == REPLACE_N) {
-		savings -= updateRefs(dd,node,NULL,info,localQueue);
+		savings -= updateRefs(dd,node,(uintptr_t) 0,info,localQueue);
 	    } else if (replace == REPLACE_T) {
 		savings -= updateRefs(dd,node,E,info,localQueue);
 	    } else if (replace == REPLACE_E) {
@@ -1974,7 +1974,7 @@ BAmarkNodes(
 
   Description [Builds the subset BDDfor cuddRemapUnderApprox.  Based
   on the info table, performs remapping or replacement at selected
-  nodes. Returns a pointer to the result if successful; NULL
+  nodes. Returns a pointer to the result if successful; (uintptr_t) 0
   otherwise.]
 
   SideEffects [None]
@@ -2001,11 +2001,11 @@ RAbuildSubset(
 
     if (st_lookup(info->table, N, &infoN)) {
 	if (N == node ) {
-	    if (infoN->resultP != NULL) {
+	    if (infoN->resultP != (uintptr_t) 0) {
 		return(infoN->resultP);
 	    }
 	} else {
-	    if (infoN->resultN != NULL) {
+	    if (infoN->resultN != (uintptr_t) 0) {
 		return(infoN->resultN);
 	    }
 	}
@@ -2023,24 +2023,24 @@ RAbuildSubset(
 	    int index = cuddT(N)->index;
 	    e = info->zero;
 	    t = RAbuildSubset(dd, Ntt, info);
-	    if (t == NULL) {
-		return(NULL);
+	    if (t == (uintptr_t) 0) {
+		return((uintptr_t) 0);
 	    }
 	    cuddRef(t);
 	    if (Cudd_IsComplement(t)) {
 		t = Cudd_Not(t);
 		e = Cudd_Not(e);
 		r = (t == e) ? t : cuddUniqueInter(dd, index, t, e);
-		if (r == NULL) {
+		if (r == (uintptr_t) 0) {
 		    Cudd_RecursiveDeref(dd, t);
-		    return(NULL);
+		    return((uintptr_t) 0);
 		}
 		r = Cudd_Not(r);
 	    } else {
 		r = (t == e) ? t : cuddUniqueInter(dd, index, t, e);
-		if (r == NULL) {
+		if (r == (uintptr_t) 0) {
 		    Cudd_RecursiveDeref(dd, t);
-		    return(NULL);
+		    return((uintptr_t) 0);
 		}
 	    }
 	    cuddDeref(t);
@@ -2051,15 +2051,15 @@ RAbuildSubset(
 	    int index = cuddT(N)->index;
 	    t = info->one;
 	    e = RAbuildSubset(dd, Nte, info);
-	    if (e == NULL) {
-		return(NULL);
+	    if (e == (uintptr_t) 0) {
+		return((uintptr_t) 0);
 	    }
 	    cuddRef(e);
 	    e = Cudd_Not(e);
 	    r = (t == e) ? t : cuddUniqueInter(dd, index, t, e);
-	    if (r == NULL) {
+	    if (r == (uintptr_t) 0) {
 		Cudd_RecursiveDeref(dd, e);
-		return(NULL);
+		return((uintptr_t) 0);
 	    }
 	    r =Cudd_Not(r);
 	    cuddDeref(e);
@@ -2069,19 +2069,19 @@ RAbuildSubset(
 	(void) fprintf(dd->err,
 		       "Something is wrong, ought to be in info table\n");
 	dd->errorCode = CUDD_INTERNAL_ERROR;
-	return(NULL);
+	return((uintptr_t) 0);
     }
 
     t = RAbuildSubset(dd, Nt, info);
-    if (t == NULL) {
-	return(NULL);
+    if (t == (uintptr_t) 0) {
+	return((uintptr_t) 0);
     }
     cuddRef(t);
 
     e = RAbuildSubset(dd, Ne, info);
-    if (e == NULL) {
+    if (e == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,t);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(e);
 
@@ -2089,18 +2089,18 @@ RAbuildSubset(
 	t = Cudd_Not(t);
 	e = Cudd_Not(e);
 	r = (t == e) ? t : cuddUniqueInter(dd, N->index, t, e);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, e);
 	    Cudd_RecursiveDeref(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
 	r = Cudd_Not(r);
     } else {
 	r = (t == e) ? t : cuddUniqueInter(dd, N->index, t, e);
-	if (r == NULL) {
+	if (r == (uintptr_t) 0) {
 	    Cudd_RecursiveDeref(dd, e);
 	    Cudd_RecursiveDeref(dd, t);
-	    return(NULL);
+	    return((uintptr_t) 0);
 	}
     }
     cuddDeref(t);
@@ -2154,7 +2154,7 @@ BAapplyBias(
     if (infoF->care == TOTAL_CARE) return(TOTAL_CARE);
 
     if ((f->ref != 1 || Cudd_Regular(b)->ref != 1) &&
-	(res = cuddHashTableLookup2(cache,f,b)) != NULL) {
+	(res = cuddHashTableLookup2(cache,f,b)) != (uintptr_t) 0) {
 	if (res->ref == 0) {
 	    cache->manager->dead++;
 	    cache->manager->constants.dead++;
@@ -2194,7 +2194,7 @@ BAapplyBias(
     }
 
     if (f->ref != 1 || Cudd_Regular(b)->ref != 1) {
-	ptrint fanout = (ptrint) f->ref * Cudd_Regular(b)->ref;
+	intptr_t fanout = (intptr_t) f->ref * Cudd_Regular(b)->ref;
 	cuddSatDec(fanout);
 	if (!cuddHashTableInsert2(cache,f,b,one,fanout)) {
 	    return(CARE_ERROR);

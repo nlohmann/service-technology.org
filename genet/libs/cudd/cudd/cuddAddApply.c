@@ -120,7 +120,7 @@ static char rcsid[] DD_UNUSED = "$Id: cuddAddApply.c,v 1.18 2009/02/19 16:15:26 
   Synopsis    [Applies op to the corresponding discriminants of f and g.]
 
   Description [Applies op to the corresponding discriminants of f and g.
-  Returns a pointer to the result if succssful; NULL otherwise.]
+  Returns a pointer to the result if succssful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -152,7 +152,7 @@ Cudd_addApply(
 
   Synopsis    [Integer and floating point addition.]
 
-  Description [Integer and floating point addition. Returns NULL if not
+  Description [Integer and floating point addition. Returns (uintptr_t) 0 if not
   a terminal case; f+g otherwise.]
 
   SideEffects [None]
@@ -182,7 +182,7 @@ Cudd_addPlus(
 	*f = G;
 	*g = F;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addPlus */
 
@@ -191,7 +191,7 @@ Cudd_addPlus(
 
   Synopsis    [Integer and floating point multiplication.]
 
-  Description [Integer and floating point multiplication. Returns NULL
+  Description [Integer and floating point multiplication. Returns (uintptr_t) 0
   if not a terminal case; f * g otherwise.  This function can be used also
   to take the AND of two 0-1 ADDs.]
 
@@ -223,7 +223,7 @@ Cudd_addTimes(
 	*f = G;
 	*g = F;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addTimes */
 
@@ -233,7 +233,7 @@ Cudd_addTimes(
   Synopsis    [f if f&gt;=g; 0 if f&lt;g.]
 
   Description [Threshold operator for Apply (f if f &gt;=g; 0 if f&lt;g).
-  Returns NULL if not a terminal case; f op g otherwise.]
+  Returns (uintptr_t) 0 if not a terminal case; f op g otherwise.]
 
   SideEffects [None]
 
@@ -257,7 +257,7 @@ Cudd_addThreshold(
 	    return(DD_ZERO(dd));
 	}
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addThreshold */
 
@@ -267,7 +267,7 @@ Cudd_addThreshold(
   Synopsis    [This operator sets f to the value of g wherever g != 0.]
 
   Description [This operator sets f to the value of g wherever g != 0.
-  Returns NULL if not a terminal case; f op g otherwise.]
+  Returns (uintptr_t) 0 if not a terminal case; f op g otherwise.]
 
   SideEffects [None]
 
@@ -287,7 +287,7 @@ Cudd_addSetNZ(
     if (F == DD_ZERO(dd)) return(G);
     if (G == DD_ZERO(dd)) return(F);
     if (cuddIsConstant(G)) return(G);
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addSetNZ */
 
@@ -296,7 +296,7 @@ Cudd_addSetNZ(
 
   Synopsis    [Integer and floating point division.]
 
-  Description [Integer and floating point division. Returns NULL if not
+  Description [Integer and floating point division. Returns (uintptr_t) 0 if not
   a terminal case; f / g otherwise.]
 
   SideEffects [None]
@@ -324,7 +324,7 @@ Cudd_addDivide(
 	res = cuddUniqueConst(dd,value);
 	return(res);
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addDivide */
 
@@ -333,7 +333,7 @@ Cudd_addDivide(
 
   Synopsis    [Integer and floating point subtraction.]
 
-  Description [Integer and floating point subtraction. Returns NULL if
+  Description [Integer and floating point subtraction. Returns (uintptr_t) 0 if
   not a terminal case; f - g otherwise.]
 
   SideEffects [None]
@@ -360,7 +360,7 @@ Cudd_addMinus(
 	res = cuddUniqueConst(dd,value);
 	return(res);
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addMinus */
 
@@ -370,7 +370,7 @@ Cudd_addMinus(
   Synopsis    [Integer and floating point min.]
 
   Description [Integer and floating point min for Cudd_addApply.
-  Returns NULL if not a terminal case; min(f,g) otherwise.]
+  Returns (uintptr_t) 0 if not a terminal case; min(f,g) otherwise.]
 
   SideEffects [None]
 
@@ -405,7 +405,7 @@ Cudd_addMinimum(
 	*f = G;
 	*g = F;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addMinimum */
 
@@ -415,7 +415,7 @@ Cudd_addMinimum(
   Synopsis    [Integer and floating point max.]
 
   Description [Integer and floating point max for Cudd_addApply.
-  Returns NULL if not a terminal case; max(f,g) otherwise.]
+  Returns (uintptr_t) 0 if not a terminal case; max(f,g) otherwise.]
 
   SideEffects [None]
 
@@ -450,7 +450,7 @@ Cudd_addMaximum(
 	*f = G;
 	*g = F;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addMaximum */
 
@@ -460,7 +460,7 @@ Cudd_addMaximum(
   Synopsis    [Returns 1 if f &gt; g and 0 otherwise.]
 
   Description [Returns 1 if f &gt; g and 0 otherwise. Used in
-  conjunction with Cudd_addApply. Returns NULL if not a terminal
+  conjunction with Cudd_addApply. Returns (uintptr_t) 0 if not a terminal
   case.]
 
   SideEffects [None]
@@ -486,7 +486,7 @@ Cudd_addOneZeroMaximum(
 	}
     }
 
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addOneZeroMaximum */
 
@@ -495,7 +495,7 @@ Cudd_addOneZeroMaximum(
 
   Synopsis    [Returns plusinfinity if f=g; returns min(f,g) if f!=g.]
 
-  Description [Returns NULL if not a terminal case; f op g otherwise,
+  Description [Returns (uintptr_t) 0 if not a terminal case; f op g otherwise,
   where f op g is plusinfinity if f=g; min(f,g) if f!=g.]
 
   SideEffects [None]
@@ -526,7 +526,7 @@ Cudd_addDiff(
 	    return(DD_PLUS_INFINITY(dd));
 	}
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addDiff */
 
@@ -535,7 +535,7 @@ Cudd_addDiff(
 
   Synopsis    [f if f==g; background if f!=g.]
 
-  Description [Returns NULL if not a terminal case; f op g otherwise,
+  Description [Returns (uintptr_t) 0 if not a terminal case; f op g otherwise,
   where f op g is f if f==g; background if f!=g.]
 
   SideEffects [None]
@@ -556,7 +556,7 @@ Cudd_addAgreement(
     if (F == dd->background) return(F);
     if (G == dd->background) return(G);
     if (cuddIsConstant(F) && cuddIsConstant(G)) return(dd->background);
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addAgreement */
 
@@ -565,7 +565,7 @@ Cudd_addAgreement(
 
   Synopsis    [Disjunction of two 0-1 ADDs.]
 
-  Description [Disjunction of two 0-1 ADDs. Returns NULL
+  Description [Disjunction of two 0-1 ADDs. Returns (uintptr_t) 0
   if not a terminal case; f OR g otherwise.]
 
   SideEffects [None]
@@ -590,7 +590,7 @@ Cudd_addOr(
 	*f = G;
 	*g = F;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addOr */
 
@@ -599,7 +599,7 @@ Cudd_addOr(
 
   Synopsis    [NAND of two 0-1 ADDs.]
 
-  Description [NAND of two 0-1 ADDs. Returns NULL
+  Description [NAND of two 0-1 ADDs. Returns (uintptr_t) 0
   if not a terminal case; f NAND g otherwise.]
 
   SideEffects [None]
@@ -622,7 +622,7 @@ Cudd_addNand(
 	*f = G;
 	*g = F;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addNand */
 
@@ -631,7 +631,7 @@ Cudd_addNand(
 
   Synopsis    [NOR of two 0-1 ADDs.]
 
-  Description [NOR of two 0-1 ADDs. Returns NULL
+  Description [NOR of two 0-1 ADDs. Returns (uintptr_t) 0
   if not a terminal case; f NOR g otherwise.]
 
   SideEffects [None]
@@ -654,7 +654,7 @@ Cudd_addNor(
 	*f = G;
 	*g = F;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addNor */
 
@@ -663,7 +663,7 @@ Cudd_addNor(
 
   Synopsis    [XOR of two 0-1 ADDs.]
 
-  Description [XOR of two 0-1 ADDs. Returns NULL
+  Description [XOR of two 0-1 ADDs. Returns (uintptr_t) 0
   if not a terminal case; f XOR g otherwise.]
 
   SideEffects [None]
@@ -688,7 +688,7 @@ Cudd_addXor(
 	*f = G;
 	*g = F;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addXor */
 
@@ -697,7 +697,7 @@ Cudd_addXor(
 
   Synopsis    [XNOR of two 0-1 ADDs.]
 
-  Description [XNOR of two 0-1 ADDs. Returns NULL
+  Description [XNOR of two 0-1 ADDs. Returns (uintptr_t) 0
   if not a terminal case; f XNOR g otherwise.]
 
   SideEffects [None]
@@ -722,7 +722,7 @@ Cudd_addXnor(
 	*f = G;
 	*g = F;
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addXnor */
 
@@ -732,7 +732,7 @@ Cudd_addXnor(
   Synopsis    [Applies op to the discriminants of f.]
 
   Description [Applies op to the discriminants of f.
-  Returns a pointer to the result if succssful; NULL otherwise.]
+  Returns a pointer to the result if succssful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -760,7 +760,7 @@ Cudd_addMonadicApply(
 
   Synopsis    [Natural logarithm of an ADD.]
 
-  Description [Natural logarithm of an ADDs. Returns NULL
+  Description [Natural logarithm of an ADDs. Returns (uintptr_t) 0
   if not a terminal case; log(f) otherwise.  The discriminants of f must
   be positive double's.]
 
@@ -779,7 +779,7 @@ Cudd_addLog(
 	DdNode *res = cuddUniqueConst(dd,value);
 	return(res);
     }
-    return(NULL);
+    return((uintptr_t) 0);
 
 } /* end of Cudd_addLog */
 
@@ -794,7 +794,7 @@ Cudd_addLog(
   Synopsis    [Performs the recursive step of Cudd_addApply.]
 
   Description [Performs the recursive step of Cudd_addApply. Returns a
-  pointer to the result if successful; NULL otherwise.]
+  pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -820,12 +820,12 @@ cuddAddApplyRecur(
      */
     statLine(dd);
     res = (*op)(dd,&f,&g);
-    if (res != NULL) return(res);
+    if (res != (uintptr_t) 0) return(res);
 
     /* Check cache. */
     cacheOp = (DD_CTFP) op;
     res = cuddCacheLookup2(dd,cacheOp,f,g);
-    if (res != NULL) return(res);
+    if (res != (uintptr_t) 0) return(res);
 
     /* Recursive step. */
     ford = cuddI(dd,f->index);
@@ -846,21 +846,21 @@ cuddAddApplyRecur(
     }
 
     T = cuddAddApplyRecur(dd,op,fv,gv);
-    if (T == NULL) return(NULL);
+    if (T == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(T);
 
     E = cuddAddApplyRecur(dd,op,fvn,gvn);
-    if (E == NULL) {
+    if (E == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,T);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(E);
 
     res = (T == E) ? T : cuddUniqueInter(dd,(int)index,T,E);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, T);
 	Cudd_RecursiveDeref(dd, E);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(T);
     cuddDeref(E);
@@ -878,7 +878,7 @@ cuddAddApplyRecur(
   Synopsis    [Performs the recursive step of Cudd_addMonadicApply.]
 
   Description [Performs the recursive step of Cudd_addMonadicApply. Returns a
-  pointer to the result if successful; NULL otherwise.]
+  pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -897,11 +897,11 @@ cuddAddMonadicApplyRecur(
     /* Check terminal cases. */
     statLine(dd);
     res = (*op)(dd,f);
-    if (res != NULL) return(res);
+    if (res != (uintptr_t) 0) return(res);
 
     /* Check cache. */
     res = cuddCacheLookup1(dd,op,f);
-    if (res != NULL) return(res);
+    if (res != (uintptr_t) 0) return(res);
 
     /* Recursive step. */
     index = f->index;
@@ -909,21 +909,21 @@ cuddAddMonadicApplyRecur(
     fe = cuddE(f);
 
     T = cuddAddMonadicApplyRecur(dd,op,ft);
-    if (T == NULL) return(NULL);
+    if (T == (uintptr_t) 0) return((uintptr_t) 0);
     cuddRef(T);
 
     E = cuddAddMonadicApplyRecur(dd,op,fe);
-    if (E == NULL) {
+    if (E == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd,T);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddRef(E);
 
     res = (T == E) ? T : cuddUniqueInter(dd,(int)index,T,E);
-    if (res == NULL) {
+    if (res == (uintptr_t) 0) {
 	Cudd_RecursiveDeref(dd, T);
 	Cudd_RecursiveDeref(dd, E);
-	return(NULL);
+	return((uintptr_t) 0);
     }
     cuddDeref(T);
     cuddDeref(E);

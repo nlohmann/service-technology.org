@@ -163,7 +163,7 @@ static DdNode * cuddBddSqueeze (DdManager *dd, DdNode *l, DdNode *u);
     <li> f @ f = 1
     <li> f @ f'= 0
     </ul>
-  Returns a pointer to the result if successful; NULL otherwise. Note that if
+  Returns a pointer to the result if successful; (uintptr_t) 0 otherwise. Note that if
   F=(f1,...,fn) and reordering takes place while computing F @ c, then the
   image restriction property (Img(F,c) = Img(F @ c)) is lost.]
 
@@ -195,7 +195,7 @@ Cudd_bddConstrain(
   (ICCAD90).]
 
   Description [BDD restrict according to Coudert and Madre's algorithm
-  (ICCAD90). Returns the restricted BDD if successful; otherwise NULL.
+  (ICCAD90). Returns the restricted BDD if successful; otherwise (uintptr_t) 0.
   If application of restrict results in a BDD larger than the input
   BDD, the input BDD is returned.]
 
@@ -284,7 +284,7 @@ Cudd_bddRestrict(
   For the rest, the function behaves like AND.  Since the two operands
   play different roles, non-polluting AND is not commutative.
 
-  Returns a pointer to the result if successful; NULL otherwise.]
+  Returns a pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -321,7 +321,7 @@ Cudd_bddNPAnd(
     <li> 1 @ c = 1
     <li> F @ F = 1
     </ul>
-  Returns a pointer to the result if successful; NULL otherwise.]
+  Returns a pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -354,7 +354,7 @@ Cudd_addConstrain(
   order. If canonicity is required, variable ordering must be disabled
   after the decomposition has been computed. Returns an array with one
   entry for each BDD variable in the manager if successful; otherwise
-  NULL. The components of the solution have their reference counts
+  (uintptr_t) 0. The components of the solution have their reference counts
   already incremented (unlike the results of most other functions in
   the package.]
 
@@ -414,7 +414,7 @@ Cudd_bddConstrainDecomp(
   (ICCAD90).]
 
   Description [ADD restrict according to Coudert and Madre's algorithm
-  (ICCAD90). Returns the restricted ADD if successful; otherwise NULL.
+  (ICCAD90). Returns the restricted ADD if successful; otherwise (uintptr_t) 0.
   If application of restrict results in an ADD larger than the input
   ADD, the input ADD is returned.]
 
@@ -491,7 +491,7 @@ Cudd_addRestrict(
   function is based on the description of char-to-vect in "Verification of
   Sequential Machines Using Boolean Functional Vectors" by O. Coudert, C.
   Berthet and J. C. Madre.
-  Returns a pointer to an array containing the result if successful; NULL
+  Returns a pointer to an array containing the result if successful; (uintptr_t) 0
   otherwise. The size of the array equals the number of variables in the
   manager. The components of the solution have their reference counts 
   already incremented (unlike the results of most other functions in 
@@ -554,7 +554,7 @@ Cudd_bddCharToVect(
   wherever <code>c</code> is 1.  Safe minimization means that the size
   of the result is guaranteed not to exceed the size of
   <code>f</code>. This function is based on the DAC97 paper by Hong et
-  al..  Returns a pointer to the result if successful; NULL
+  al..  Returns a pointer to the result if successful; (uintptr_t) 0
   otherwise.]
 
   SideEffects [None]
@@ -587,7 +587,7 @@ Cudd_bddLICompaction(
   <code>l</code> and <code>u</code>, representing the lower bound and
   upper bound of a function interval, Cudd_bddSqueeze produces the BDD
   of a function within the interval with a small BDD.  Returns a
-  pointer to the result if successful; NULL otherwise.]
+  pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -637,7 +637,7 @@ Cudd_bddSqueeze(
   <code>c</code>.]
 
   Description [Finds a small BDD that agrees with <code>f</code> over
-  <code>c</code>.  Returns a pointer to the result if successful; NULL
+  <code>c</code>.  Returns a pointer to the result if successful; (uintptr_t) 0
   otherwise.]
 
   SideEffects [None]
@@ -683,7 +683,7 @@ Cudd_bddMinimize(
   techniques in series. It is more expensive than other subsetting
   procedures, but often produces better results. See
   Cudd_SubsetShortPaths for a description of the threshold and nvars
-  parameters.  Returns a pointer to the result if successful; NULL
+  parameters.  Returns a pointer to the result if successful; (uintptr_t) 0
   otherwise.]
 
   SideEffects [None]
@@ -733,7 +733,7 @@ Cudd_SubsetCompress(
   techniques in series. It is more expensive than other supersetting
   procedures, but often produces better results. See
   Cudd_SupersetShortPaths for a description of the threshold and nvars
-  parameters.  Returns a pointer to the result if successful; NULL
+  parameters.  Returns a pointer to the result if successful; (uintptr_t) 0
   otherwise.]
 
   SideEffects [None]
@@ -768,7 +768,7 @@ Cudd_SupersetCompress(
   Synopsis    [Performs the recursive step of Cudd_bddConstrain.]
 
   Description [Performs the recursive step of Cudd_bddConstrain.
-  Returns a pointer to the result if successful; NULL otherwise.]
+  Returns a pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -897,7 +897,7 @@ cuddBddConstrainRecur(
   Synopsis    [Performs the recursive step of Cudd_bddRestrict.]
 
   Description [Performs the recursive step of Cudd_bddRestrict.
-  Returns the restricted BDD if successful; otherwise NULL.]
+  Returns the restricted BDD if successful; otherwise (uintptr_t) 0.]
 
   SideEffects [None]
 
@@ -1047,7 +1047,7 @@ cuddBddRestrictRecur(
   Synopsis [Implements the recursive step of Cudd_bddAnd.]
 
   Description [Implements the recursive step of Cudd_bddNPAnd.
-  Returns a pointer to the result is successful; NULL otherwise.]
+  Returns a pointer to the result is successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -1188,7 +1188,7 @@ cuddBddNPAndRecur(
   Synopsis    [Performs the recursive step of Cudd_addConstrain.]
 
   Description [Performs the recursive step of Cudd_addConstrain.
-  Returns a pointer to the result if successful; NULL otherwise.]
+  Returns a pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 
@@ -1292,7 +1292,7 @@ cuddAddConstrainRecur(
   Synopsis    [Performs the recursive step of Cudd_addRestrict.]
 
   Description [Performs the recursive step of Cudd_addRestrict.
-  Returns the restricted ADD if successful; otherwise NULL.]
+  Returns the restricted ADD if successful; otherwise (uintptr_t) 0.]
 
   SideEffects [None]
 
@@ -1418,7 +1418,7 @@ cuddAddRestrictRecur(
   wherever <code>c</code> is 1.  Safe minimization means that the size
   of the result is guaranteed not to exceed the size of
   <code>f</code>. This function is based on the DAC97 paper by Hong et
-  al..  Returns a pointer to the result if successful; NULL
+  al..  Returns a pointer to the result if successful; (uintptr_t) 0
   otherwise.]
 
   SideEffects [None]
@@ -1489,7 +1489,7 @@ cuddBddLICompaction(
   Synopsis    [Performs the recursive step of Cudd_bddConstrainDecomp.]
 
   Description [Performs the recursive step of Cudd_bddConstrainDecomp.
-  Returns f super (i) if successful; otherwise NULL.]
+  Returns f super (i) if successful; otherwise (uintptr_t) 0.]
 
   SideEffects [None]
 
@@ -1551,7 +1551,7 @@ cuddBddConstrainDecomp(
 
   Description [Performs the recursive step of Cudd_bddCharToVect.
   This function maintains the invariant that f is non-zero.
-  Returns the i-th component of the vector if successful; otherwise NULL.]
+  Returns the i-th component of the vector if successful; otherwise (uintptr_t) 0.]
 
   SideEffects [None]
 
@@ -1751,7 +1751,7 @@ cuddBddLICMarkEdges(
   Synopsis    [Builds the result of Cudd_bddLICompaction.]
 
   Description [Builds the results of Cudd_bddLICompaction.
-  Returns a pointer to the minimized BDD if successful; otherwise NULL.]
+  Returns a pointer to the minimized BDD if successful; otherwise (uintptr_t) 0.]
 
   SideEffects [None]
 
@@ -1952,7 +1952,7 @@ MarkCacheCleanUp(
   bounds of the interval we obtain a valid solution by taking the
   complement of the solution to the original problem. Therefore, we
   can enforce the condition that the upper bound is always regular.
-  Returns a pointer to the result if successful; NULL otherwise.]
+  Returns a pointer to the result if successful; (uintptr_t) 0 otherwise.]
 
   SideEffects [None]
 

@@ -281,7 +281,7 @@ ddWindowConv2(
 
     nwin = high-low;
     events = ALLOC(int,nwin);
-    if (events == NULL) {
+    if (events == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -515,7 +515,7 @@ ddWindowConv3(
 
     nwin = high-low-1;
     events = ALLOC(int,nwin);
-    if (events == NULL) {
+    if (events == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }
@@ -916,7 +916,7 @@ ddWindowConv4(
 
     nwin = high-low-2;
     events = ALLOC(int,nwin);
-    if (events == NULL) {
+    if (events == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	return(0);
     }

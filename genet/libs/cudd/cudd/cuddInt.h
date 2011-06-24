@@ -250,14 +250,6 @@ typedef struct DdHook {		/* hook list element */
     struct DdHook *next;	/* next element in the list */
 } DdHook;
 
-#if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
-typedef intptr_t ptrint;
-typedef uintptr_t ptruint;
-#else
-typedef intptr_t ptrint;
-typedef uintptr_t ptruint;
-#endif
-
 #ifdef __osf__
 #pragma pointer_size save
 #pragma pointer_size short
@@ -269,7 +261,7 @@ typedef DdNode *DdNodePtr;
 typedef struct DdLocalCacheItem {
     DdNode *value;
 #ifdef DD_CACHE_PROFILE
-    ptrint count;
+    intptr_t count;
 #endif
     DdNode *key[1];
 } DdLocalCacheItem;
@@ -292,7 +284,7 @@ typedef struct DdLocalCache {
 /* Generic hash item. */
 typedef struct DdHashItem {
     struct DdHashItem *next;
-    ptrint count;
+    intptr_t count;
     DdNode *value;
     DdNode *key[1];
 } DdHashItem;
@@ -313,10 +305,10 @@ typedef struct DdHashTable {
 
 typedef struct DdCache {
     DdNode *f,*g;		/* DDs */
-    ptruint h;			/* either operator or DD */
+    uintptr_t h;		/* either operator or DD */
     DdNode *data;		/* already constructed DD */
 #ifdef DD_CACHE_PROFILE
-    ptrint count;
+    intptr_t count;
 #endif
 } DdCache;
 
@@ -708,15 +700,9 @@ typedef struct DdLevelQueue {
   SeeAlso     [ddCHash ddCHash2]
 
 ******************************************************************************/
-#if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
 #define ddHash(f,g,s) \
 ((((uintptr_t)(f) * DD_P1 + \
    (uintptr_t)(g)) * DD_P2) >> (s))
-#else
-#define ddHash(f,g,s) \
-((((uintptr_t)(f) * DD_P1 + (uintptr_t)(g)) * DD_P2) >> (s))
-#endif
-
 
 /**Macro***********************************************************************
 
@@ -729,17 +715,10 @@ typedef struct DdLevelQueue {
   SeeAlso     [ddHash ddCHash2]
 
 ******************************************************************************/
-#if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
 #define ddCHash(o,f,g,h,s) \
 ((((((uintptr_t)(f) + (uintptr_t)(o)) * DD_P1 + \
     (uintptr_t)(g)) * DD_P2 + \
    (uintptr_t)(h)) * DD_P3) >> (s))
-#else
-#define ddCHash(o,f,g,h,s) \
-((((((uintptr_t)(f) + (uintptr_t)(o)) * DD_P1 + (uintptr_t)(g)) * DD_P2 + \
-   (uintptr_t)(h)) * DD_P3) >> (s))
-#endif
-
 
 /**Macro***********************************************************************
 
@@ -753,15 +732,9 @@ typedef struct DdLevelQueue {
   SeeAlso     [ddHash ddCHash]
 
 ******************************************************************************/
-#if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
 #define ddCHash2(o,f,g,s) \
-((((uintptr_t)(f) + (uintptr_t)(o)) * DD_P1 + \
+(((((uintptr_t)(f) + (uintptr_t)(o)) * DD_P1 + \
    (uintptr_t)(g)) * DD_P2) >> (s))
-#else
-#define ddCHash2(o,f,g,s) \
-(((((uintptr_t)(f) + (uintptr_t)(o)) * DD_P1 + (uintptr_t)(g)) * DD_P2) >> (s))
-#endif
-
 
 /**Macro***********************************************************************
 
@@ -1042,16 +1015,16 @@ extern DdNode * cuddBddXorRecur (DdManager *manager, DdNode *f, DdNode *g);
 extern DdNode * cuddBddTransfer (DdManager *ddS, DdManager *ddD, DdNode *f);
 extern DdNode * cuddAddBddDoPattern (DdManager *dd, DdNode *f);
 extern int cuddInitCache (DdManager *unique, unsigned int cacheSize, unsigned int maxCacheSize);
-extern void cuddCacheInsert (DdManager *table, ptruint op, DdNode *f, DdNode *g, DdNode *h, DdNode *data);
+extern void cuddCacheInsert (DdManager *table, uintptr_t op, DdNode *f, DdNode *g, DdNode *h, DdNode *data);
 extern void cuddCacheInsert2 (DdManager *table, DdNode * (*)(DdManager *, DdNode *, DdNode *), DdNode *f, DdNode *g, DdNode *data);
 extern void cuddCacheInsert1 (DdManager *table, DdNode * (*)(DdManager *, DdNode *), DdNode *f, DdNode *data);
-extern DdNode * cuddCacheLookup (DdManager *table, ptruint op, DdNode *f, DdNode *g, DdNode *h);
-extern DdNode * cuddCacheLookupZdd (DdManager *table, ptruint op, DdNode *f, DdNode *g, DdNode *h);
+extern DdNode * cuddCacheLookup (DdManager *table, uintptr_t op, DdNode *f, DdNode *g, DdNode *h);
+extern DdNode * cuddCacheLookupZdd (DdManager *table, uintptr_t op, DdNode *f, DdNode *g, DdNode *h);
 extern DdNode * cuddCacheLookup2 (DdManager *table, DdNode * (*)(DdManager *, DdNode *, DdNode *), DdNode *f, DdNode *g);
 extern DdNode * cuddCacheLookup1 (DdManager *table, DdNode * (*)(DdManager *, DdNode *), DdNode *f);
 extern DdNode * cuddCacheLookup2Zdd (DdManager *table, DdNode * (*)(DdManager *, DdNode *, DdNode *), DdNode *f, DdNode *g);
 extern DdNode * cuddCacheLookup1Zdd (DdManager *table, DdNode * (*)(DdManager *, DdNode *), DdNode *f);
-extern DdNode * cuddConstantLookup (DdManager *table, ptruint op, DdNode *f, DdNode *g, DdNode *h);
+extern DdNode * cuddConstantLookup (DdManager *table, uintptr_t op, DdNode *f, DdNode *g, DdNode *h);
 extern int cuddCacheProfile (DdManager *table, FILE *fp);
 extern void cuddCacheResize (DdManager *table);
 extern void cuddCacheFlush (DdManager *table);
@@ -1093,13 +1066,13 @@ extern int cuddLocalCacheProfile (DdLocalCache *cache);
 #endif
 extern DdHashTable * cuddHashTableInit (DdManager *manager, unsigned int keySize, unsigned int initSize);
 extern void cuddHashTableQuit (DdHashTable *hash);
-extern int cuddHashTableInsert (DdHashTable *hash, DdNodePtr *key, DdNode *value, ptrint count);
+extern int cuddHashTableInsert (DdHashTable *hash, DdNodePtr *key, DdNode *value, intptr_t count);
 extern DdNode * cuddHashTableLookup (DdHashTable *hash, DdNodePtr *key);
-extern int cuddHashTableInsert1 (DdHashTable *hash, DdNode *f, DdNode *value, ptrint count);
+extern int cuddHashTableInsert1 (DdHashTable *hash, DdNode *f, DdNode *value, intptr_t count);
 extern DdNode * cuddHashTableLookup1 (DdHashTable *hash, DdNode *f);
-extern int cuddHashTableInsert2 (DdHashTable *hash, DdNode *f, DdNode *g, DdNode *value, ptrint count);
+extern int cuddHashTableInsert2 (DdHashTable *hash, DdNode *f, DdNode *g, DdNode *value, intptr_t count);
 extern DdNode * cuddHashTableLookup2 (DdHashTable *hash, DdNode *f, DdNode *g);
-extern int cuddHashTableInsert3 (DdHashTable *hash, DdNode *f, DdNode *g, DdNode *h, DdNode *value, ptrint count);
+extern int cuddHashTableInsert3 (DdHashTable *hash, DdNode *f, DdNode *g, DdNode *h, DdNode *value, intptr_t count);
 extern DdNode * cuddHashTableLookup3 (DdHashTable *hash, DdNode *f, DdNode *g, DdNode *h);
 extern DdLevelQueue * cuddLevelQueueInit (int levels, int itemSize, int numBuckets);
 extern void cuddLevelQueueQuit (DdLevelQueue *queue);

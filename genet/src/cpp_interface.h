@@ -10,7 +10,7 @@ extern "C"
 {
 #endif
 
-JNIEXPORT jstring JNICALL Java_edu_upc_lsi_genet_Genet_genetCall (JNIEnv *env, jclass, jstring, jint);
+    JNIEXPORT jstring JNICALL Java_edu_upc_lsi_genet_Genet_genetCall (JNIEnv *env, jclass, jstring, jint);
 
 #ifdef __cplusplus
 }

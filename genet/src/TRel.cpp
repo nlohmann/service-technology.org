@@ -2,7 +2,8 @@
 
 
 
-TRel::TRel(Encoding *e,Tts *ts/*, const Cudd &manager*/) {
+TRel::TRel(Encoding *e,Tts *ts/*, const Cudd &manager*/)
+{
     enc= e;
     mts = ts;
 //	mgr = manager;
@@ -10,49 +11,61 @@ TRel::TRel(Encoding *e,Tts *ts/*, const Cudd &manager*/) {
 }
 
 map<string,bool>
-TRel::tokenize(const string prj_sigs, const string pattern) {
+TRel::tokenize(const string prj_sigs, const string pattern)
+{
     map<string,bool> result;
     size_t n = prj_sigs.length();
 
     int pos = 0;
-    do {
+    do
+    {
         size_t pos_final = min(n,prj_sigs.find(pattern,pos));
         string s;
         s.assign(prj_sigs, pos, pos_final - pos);
         result[s] = true;
         pos = pos_final + 1;
-    } while (pos <= ((int) n - 1));
+    }
+    while (pos <= ((int) n - 1));
 
     return result;
 
 }
 
 void
-TRel::build_tr(map<string,bool> &visible_events) {
+TRel::build_tr(map<string,bool> &visible_events)
+{
     map<string, list<string> > state_classes;
-    if (not visible_events.empty()) {
+    if (not visible_events.empty())
+    {
         list<Ttrans>::iterator it;
-        for(it = mts->ltrans.begin(); it != mts->ltrans.end(); ++it) {
+        for(it = mts->ltrans.begin(); it != mts->ltrans.end(); ++it)
+        {
             string s = (*it).event;
             string source = (*it).source;
             string target = (*it).target;
             string minlex = (source < target ? source : target);
             string maxlex = (source > target ? source : target);
-            if (visible_events.find(s) == visible_events.end() or (not visible_events[s])) {
+            if (visible_events.find(s) == visible_events.end() or (not visible_events[s]))
+            {
                 int n = state_classes[minlex].size();
-                if (n == 0) {
+                if (n == 0)
+                {
                     state_classes[minlex].push_back(minlex);
                 }
-                else if (n == 1) { // the real minimal is another state!
+                else if (n == 1)   // the real minimal is another state!
+                {
                     minlex = state_classes[minlex].front();
                 }
                 int nn = state_classes[maxlex].size();
-                if (nn == 0) {
+                if (nn == 0)
+                {
                     state_classes[minlex].push_back(maxlex);
                     state_classes[maxlex].push_back(minlex);
                 }
-                else if (nn >= 1) {
-                    if (nn == 1) {
+                else if (nn >= 1)
+                {
+                    if (nn == 1)
+                    {
                         string cpmaxlex = maxlex;
                         string othermin = state_classes[maxlex].front();
                         maxlex = (minlex >  othermin ? minlex : othermin);
@@ -60,11 +73,14 @@ TRel::build_tr(map<string,bool> &visible_events) {
                         state_classes[cpmaxlex].clear();
                         state_classes[cpmaxlex].push_back(minlex);
                     }
-                    if (maxlex != minlex) {
+                    if (maxlex != minlex)
+                    {
                         list<string>::const_iterator itm;
-                        for(itm = state_classes[maxlex].begin(); itm != state_classes[maxlex].end(); ++itm) {
+                        for(itm = state_classes[maxlex].begin(); itm != state_classes[maxlex].end(); ++itm)
+                        {
                             if (maxlex != minlex)	state_classes[minlex].push_back(*itm);
-                            if (*itm != maxlex) {
+                            if (*itm != maxlex)
+                            {
                                 state_classes[*itm].clear();
                                 state_classes[*itm].push_back(minlex);
                             }
@@ -90,20 +106,25 @@ TRel::build_tr(map<string,bool> &visible_events) {
 //cout << "state classes computed \n";
 
     list<Ttrans>::iterator it;
-    for(it = mts->ltrans.begin(); it != mts->ltrans.end(); ++it) {
+    for(it = mts->ltrans.begin(); it != mts->ltrans.end(); ++it)
+    {
         string s = (*it).event;
         string source = (*it).source;
-        if (state_classes.find(source) != state_classes.end()) {
+        if (state_classes.find(source) != state_classes.end())
+        {
             source = state_classes[source].front();
         }
         string target = (*it).target;
-        if (state_classes.find(target) != state_classes.end()) {
+        if (state_classes.find(target) != state_classes.end())
+        {
             target = state_classes[target].front();
         }
-        if (visible_events.empty() or (visible_events.find(s) != visible_events.end() and visible_events[s])) {
+        if (visible_events.empty() or (visible_events.find(s) != visible_events.end() and visible_events[s]))
+        {
 // cout << source << " " << s << " " << target << endl;
             map<string,EvTRel *>::iterator itb = eventTRs.find(s);
-            if (itb == eventTRs.end()) {
+            if (itb == eventTRs.end())
+            {
                 eventTRs[s] = new EvTRel(s/*,mgr*/);
                 eventTRs[s]->add_er(SS(enc->state(source)));
                 eventTRs[s]->add_sr(SS(enc->state(target)));
@@ -118,7 +139,8 @@ TRel::build_tr(map<string,bool> &visible_events) {
                 fresh_copy[s] = 1;
                 computed_ecs[s] = false;
             }
-            else {
+            else
+            {
                 EvTRel *etr = (*itb).second;
                 etr->add_er(SS(enc->state(source)));
                 etr->add_sr(SS(enc->state(target)));
@@ -145,8 +167,10 @@ TRel::build_tr(map<string,bool> &visible_events) {
     PStoNS = (int *) malloc(sizeof(int)*2*enc->enc_vars() - enc->red_vars());
     NStoPS = (int *) malloc(sizeof(int)*2*enc->enc_vars() - enc->red_vars());
     int nvi = 0;
-    for(int i = 0; i < enc->enc_vars(); ++i) {
-        if (not enc->variable_redundant(i)) {
+    for(int i = 0; i < enc->enc_vars(); ++i)
+    {
+        if (not enc->variable_redundant(i))
+        {
             /*  		PStoNS[i]=enc->enc_vars() + i;
               		NStoPS[i]=enc->enc_vars() + i;
             */
@@ -154,13 +178,15 @@ TRel::build_tr(map<string,bool> &visible_events) {
             NStoPS[i]=enc->enc_vars() + nvi;
             ++nvi;
         }
-        else {
+        else
+        {
             PStoNS[i]=i;
             NStoPS[i]=i;
         }
     }
     nvi = 0;
-    for(int i = enc->enc_vars(); i < 2*enc->enc_vars() - enc->red_vars(); ++i) {
+    for(int i = enc->enc_vars(); i < 2*enc->enc_vars() - enc->red_vars(); ++i)
+    {
         NStoPS[i]=enc->ps_var_index(i);
         PStoNS[i]=enc->ps_var_index(i);
         ++nvi;
@@ -186,7 +212,8 @@ TRel::build_tr(map<string,bool> &visible_events) {
 }
 
 SS
-TRel::image(string name, const SS &g) {
+TRel::image(string name, const SS &g)
+{
 
     EvTRel *etr = eventTRs[name];
 //	cout << "TR: ";etr->get_tr().print();
@@ -197,7 +224,8 @@ TRel::image(string name, const SS &g) {
 }
 
 SS
-TRel::back_image(string name, const SS &g) {
+TRel::back_image(string name, const SS &g)
+{
 
     EvTRel *etr = eventTRs[name];
     //classical approach for back image
@@ -211,12 +239,14 @@ TRel::back_image(string name, const SS &g) {
 
 
 SS
-TRel::forward(const SS &g) {
+TRel::forward(const SS &g)
+{
 
 //	SS result = mgr.bddZero();
     SS result;
     map<string,EvTRel *>::iterator itb;
-    for (itb = eventTRs.begin(); itb != eventTRs.end(); ++itb) {
+    for (itb = eventTRs.begin(); itb != eventTRs.end(); ++itb)
+    {
         EvTRel *etr = itb->second;
         SS x = g.AndAbstract(etr->get_tr(), SS(enc->ps_vars));
         result += x;
@@ -226,11 +256,13 @@ TRel::forward(const SS &g) {
 }
 
 SS
-TRel::forward_restrict(const SS &g, const SS &r) {
+TRel::forward_restrict(const SS &g, const SS &r)
+{
 //	SS result = mgr.bddZero();
     SS result;
     map<string,EvTRel *>::iterator itb;
-    for (itb = eventTRs.begin(); itb != eventTRs.end(); ++itb) {
+    for (itb = eventTRs.begin(); itb != eventTRs.end(); ++itb)
+    {
         EvTRel *etr = itb->second;
         SS x = g.AndAbstract(etr->get_tr(), SS(enc->ps_vars));
         result += x;
@@ -244,12 +276,14 @@ TRel::forward_restrict(const SS &g, const SS &r) {
 
 
 SS
-TRel::backward(const SS &g) {
+TRel::backward(const SS &g)
+{
 //	SS result = mgr.bddZero();
     SS result;
     map<string,EvTRel *>::iterator itb;
     SS gy = g.Permute(PStoNS);
-    for (itb = eventTRs.begin(); itb != eventTRs.end(); ++itb) {
+    for (itb = eventTRs.begin(); itb != eventTRs.end(); ++itb)
+    {
         EvTRel *etr = itb->second;
         SS x = gy.AndAbstract(etr->get_tr(), SS(enc->ns_vars));
         result += x;
@@ -258,12 +292,14 @@ TRel::backward(const SS &g) {
 }
 
 SS
-TRel::backward_restrict(const SS &g, const SS &r) {
+TRel::backward_restrict(const SS &g, const SS &r)
+{
 //	SS result = mgr.bddZero();
     SS result;
     map<string,EvTRel *>::iterator itb;
     SS gy = g.Permute(PStoNS);
-    for (itb = eventTRs.begin(); itb != eventTRs.end(); ++itb) {
+    for (itb = eventTRs.begin(); itb != eventTRs.end(); ++itb)
+    {
         EvTRel *etr = itb->second;
         SS x = gy.AndAbstract(etr->get_tr(), SS(enc->ns_vars));
         x *= r;
@@ -274,50 +310,59 @@ TRel::backward_restrict(const SS &g, const SS &r) {
 }
 
 SS
-TRel::traversal(const SS &g) {
+TRel::traversal(const SS &g)
+{
 
     SS from = g;
     SS reached = from;
     SS newto;
-    do {
+    do
+    {
         SS to = forward(from);
         newto = to - reached;
         from = newto;
         reached += newto;
-    } while(not newto.is_empty());
+    }
+    while(not newto.is_empty());
 
     return reached;
 }
 
 SS
-TRel::traversal_restrict(const SS &g, const SS &r) {
+TRel::traversal_restrict(const SS &g, const SS &r)
+{
 
     SS from = g;
     SS reached = from;
     SS newto;
-    do {
+    do
+    {
         SS to = forward_restrict(from,r);
         newto = to - reached;
         from = newto;
         reached += newto;
-    } while(not newto.is_empty());
+    }
+    while(not newto.is_empty());
 
     return reached;
 }
 
 
 SS
-TRel::backward_traversal_restrict(const SS &g, const SS &r) {
+TRel::backward_traversal_restrict(const SS &g, const SS &r)
+{
 
     SS from = g;
     SS reached = from;
     SS newto;
-    do {
+    do
+    {
         SS to = backward_restrict(from,r);
         newto = to - reached;
         from = newto;
         reached += newto;
-    } while(not newto.is_empty());
+    }
+    while(not newto.is_empty());
 
     return reached;
 }
@@ -341,7 +386,8 @@ TRel::connected_components(const SS &g, vector<SS> &comps) {
 }
 */
 void
-TRel::split_event_gradients(string event_selected, map<int,SS> &gradients, list<string> &new_names) {
+TRel::split_event_gradients(string event_selected, map<int,SS> &gradients, list<string> &new_names)
+{
 //cout << "#   Split event: " << event_selected << endl;
     map<int,SS>::const_iterator itg = ++gradients.begin();
     /*
@@ -351,7 +397,8 @@ TRel::split_event_gradients(string event_selected, map<int,SS> &gradients, list<
 
     EvTRel *etr = eventTRs[event_selected];
     SS acc_tr,acc_rev_tr;
-    while (itg != gradients.end()) {
+    while (itg != gradients.end())
+    {
         // setting the new event
         char cchar[10];
         sprintf (cchar, "_%d",fresh_copy[event_selected]++);
@@ -383,7 +430,7 @@ TRel::split_event_gradients(string event_selected, map<int,SS> &gradients, list<
         cout << "ER for " << new_name << ": ";
         etr_new->get_er().print();
         cout << "TR for " << new_name << ": ";
-        etr_new->get_tr().print(2,2);	 		
+        etr_new->get_tr().print(2,2);
         */
         new_names.push_back(new_name);
         ++itg;
@@ -409,7 +456,8 @@ TRel::split_event_gradients(string event_selected, map<int,SS> &gradients, list<
 }
 
 void
-TRel::split_event_er(string name, const SS &g) {
+TRel::split_event_er(string name, const SS &g)
+{
     EvTRel *etr = eventTRs[name];
 
     // setting the new event
@@ -454,7 +502,8 @@ TRel::split_event_er(string name, const SS &g) {
 
 
 void
-TRel::split_event_sr(string name, const SS &g) {
+TRel::split_event_sr(string name, const SS &g)
+{
     EvTRel *etr = eventTRs[name];
 
     // setting the new event
@@ -487,14 +536,17 @@ TRel::split_event_sr(string name, const SS &g) {
 }
 
 void
-TRel::trigger_set(string name, list<string> &triggset) {
+TRel::trigger_set(string name, list<string> &triggset)
+{
     map<string,EvTRel *>::iterator itb;
     EvTRel *ev_ref = eventTRs[name];
-    for (itb = eventTRs.begin(); itb != eventTRs.end(); ++itb) {
+    for (itb = eventTRs.begin(); itb != eventTRs.end(); ++itb)
+    {
         EvTRel *etr = itb->second;
         SS x = etr->get_sr() * ev_ref->get_er();
         SS back_x = backward(x) - ev_ref->get_er();
-        if (not back_x.is_empty()) {
+        if (not back_x.is_empty())
+        {
             triggset.push_back(itb->first);
 //  		cout << "trigger de " << name << " es " << itb->first <<endl;
         }
@@ -502,10 +554,12 @@ TRel::trigger_set(string name, list<string> &triggset) {
 }
 
 SS
-TRel::compute_local_state_space() {
+TRel::compute_local_state_space()
+{
     SS result(0);
     map<string,EvTRel *>::iterator itb;
-    for (itb = eventTRs.begin(); itb != eventTRs.end(); ++itb) {
+    for (itb = eventTRs.begin(); itb != eventTRs.end(); ++itb)
+    {
         EvTRel *etr = itb->second;
         result += etr->get_er();
         result += etr->get_sr();

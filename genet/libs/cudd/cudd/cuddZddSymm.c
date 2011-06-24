@@ -209,7 +209,7 @@ cuddZddSymmCheck(
     yindex = table->invpermZ[y];
     for (i = table->subtableZ[x].slots - 1; i >= 0; i--) {
 	f = table->subtableZ[x].nodelist[i];
-	while (f != NULL) {
+	while (f != (uintptr_t) 0) {
 	    /* Find f1, f0, f11, f10, f01, f00 */
 	    f1 = cuddT(f);
 	    f0 = cuddE(f);
@@ -315,14 +315,14 @@ cuddZddSymmSifting(
     nvars = table->sizeZ;
 
     /* Find order in which to sift variables. */
-    var = NULL;
+    var = (uintptr_t) 0;
     zdd_entry = ALLOC(int, nvars);
-    if (zdd_entry == NULL) {
+    if (zdd_entry == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto cuddZddSymmSiftingOutOfMem;
     }
     var = ALLOC(int, nvars);
-    if (var == NULL) {
+    if (var == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto cuddZddSymmSiftingOutOfMem;
     }
@@ -382,9 +382,9 @@ cuddZddSymmSifting(
 
 cuddZddSymmSiftingOutOfMem:
 
-    if (zdd_entry != NULL)
+    if (zdd_entry != (uintptr_t) 0)
 	FREE(zdd_entry);
-    if (var != NULL)
+    if (var != (uintptr_t) 0)
 	FREE(var);
 
     return(0);
@@ -440,14 +440,14 @@ cuddZddSymmSiftingConv(
     nvars = table->sizeZ;
 
     /* Find order in which to sift variables. */
-    var = NULL;
+    var = (uintptr_t) 0;
     zdd_entry = ALLOC(int, nvars);
-    if (zdd_entry == NULL) {
+    if (zdd_entry == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto cuddZddSymmSiftingConvOutOfMem;
     }
     var = ALLOC(int, nvars);
-    if (var == NULL) {
+    if (var == (uintptr_t) 0) {
 	table->errorCode = CUDD_MEMORY_OUT;
 	goto cuddZddSymmSiftingConvOutOfMem;
     }
@@ -563,9 +563,9 @@ cuddZddSymmSiftingConv(
 
 cuddZddSymmSiftingConvOutOfMem:
 
-    if (zdd_entry != NULL)
+    if (zdd_entry != (uintptr_t) 0)
 	FREE(zdd_entry);
-    if (var != NULL)
+    if (var != (uintptr_t) 0)
 	FREE(var);
 
     return(0);
@@ -611,8 +611,8 @@ cuddZddSymmSiftingAux(
 
     initial_size = table->keysZ;
 
-    move_down = NULL;
-    move_up = NULL;
+    move_down = (uintptr_t) 0;
+    move_up = (uintptr_t) 0;
 
     /* Look for consecutive symmetries above x. */
     for (i = x; i > x_low; i--) {
@@ -656,11 +656,11 @@ cuddZddSymmSiftingAux(
 	if (move_down == ZDD_MV_OOM)
 	    goto cuddZddSymmSiftingAuxOutOfMem;
 
-	if (move_down == NULL ||
+	if (move_down == (uintptr_t) 0 ||
 	    table->subtableZ[move_down->y].next != move_down->y) {
 	    /* symmetry detected may have to make another complete
 	       pass */
-            if (move_down != NULL)
+            if (move_down != (uintptr_t) 0)
 		x = move_down->y;
 	    else
 		x = table->subtableZ[x].next;
@@ -709,11 +709,11 @@ cuddZddSymmSiftingAux(
 	if (move_up == ZDD_MV_OOM)
 	    goto cuddZddSymmSiftingAuxOutOfMem;
 
-	if (move_up == NULL ||
+	if (move_up == (uintptr_t) 0 ||
 	    table->subtableZ[move_up->x].next != move_up->x) {
 	    /* symmetry detected may have to make another complete
 		pass */
-            if (move_up != NULL)
+            if (move_up != (uintptr_t) 0)
 		x = move_up->x;
 	    else {
 		while ((unsigned) x < table->subtableZ[x].next)
@@ -756,7 +756,7 @@ cuddZddSymmSiftingAux(
 	if (move_down == ZDD_MV_OOM)
 	    goto cuddZddSymmSiftingAuxOutOfMem;
 
-	if (move_down != NULL) {
+	if (move_down != (uintptr_t) 0) {
 	    x = move_down->y;
 	}
 	else {
@@ -772,11 +772,11 @@ cuddZddSymmSiftingAux(
 	if (move_up == ZDD_MV_OOM)
 	    goto cuddZddSymmSiftingAuxOutOfMem;
 
-	if (move_up == NULL ||
+	if (move_up == (uintptr_t) 0 ||
 	    table->subtableZ[move_up->x].next != move_up->x) {
 	    /* symmetry detected may have to make another complete
 	       pass */
-	    if (move_up != NULL) {
+	    if (move_up != (uintptr_t) 0) {
 		x = move_up->x;
 	    }
 	    else {
@@ -793,7 +793,7 @@ cuddZddSymmSiftingAux(
 		    initial_size);
 	    }
 	    else {
-		while (move_down != NULL) {
+		while (move_down != (uintptr_t) 0) {
 		    move = move_down->next;
 		    cuddDeallocMove(table, move_down);
 		    move_down = move;
@@ -824,7 +824,7 @@ cuddZddSymmSiftingAux(
 	if (move_up == ZDD_MV_OOM)
 	    goto cuddZddSymmSiftingAuxOutOfMem;
 
-	if (move_up != NULL) {
+	if (move_up != (uintptr_t) 0) {
 	    x = move_up->x;
 	}
 	else {
@@ -839,11 +839,11 @@ cuddZddSymmSiftingAux(
 	if (move_down == ZDD_MV_OOM)
 	    goto cuddZddSymmSiftingAuxOutOfMem;
 
-	if (move_down == NULL ||
+	if (move_down == (uintptr_t) 0 ||
 	    table->subtableZ[move_down->y].next != move_down->y) {
 	    /* symmetry detected may have to make another complete
 	       pass */
-            if (move_down != NULL) {
+            if (move_down != (uintptr_t) 0) {
 		x = move_down->y;
 	    }
 	    else {
@@ -862,7 +862,7 @@ cuddZddSymmSiftingAux(
 		    initial_size);
 	    }
 	    else {
-		while (move_up != NULL) {
+		while (move_up != (uintptr_t) 0) {
 		    move = move_up->next;
 		    cuddDeallocMove(table, move_up);
 		    move_up = move;
@@ -883,12 +883,12 @@ cuddZddSymmSiftingAux(
 	    goto cuddZddSymmSiftingAuxOutOfMem;
     }
 
-    while (move_down != NULL) {
+    while (move_down != (uintptr_t) 0) {
 	move = move_down->next;
 	cuddDeallocMove(table, move_down);
 	move_down = move;
     }
-    while (move_up != NULL) {
+    while (move_up != (uintptr_t) 0) {
 	move = move_up->next;
 	cuddDeallocMove(table, move_up);
 	move_up = move;
@@ -898,14 +898,14 @@ cuddZddSymmSiftingAux(
 
 cuddZddSymmSiftingAuxOutOfMem:
     if (move_down != ZDD_MV_OOM) {
-	while (move_down != NULL) {
+	while (move_down != (uintptr_t) 0) {
 	    move = move_down->next;
 	    cuddDeallocMove(table, move_down);
 	    move_down = move;
 	}
     }
     if (move_up != ZDD_MV_OOM) {
-	while (move_up != NULL) {
+	while (move_up != (uintptr_t) 0) {
 	    move = move_up->next;
 	    cuddDeallocMove(table, move_up);
 	    move_up = move;
@@ -950,8 +950,8 @@ cuddZddSymmSiftingConvAux(
 
     initial_size = table->keysZ;
 
-    move_down = NULL;
-    move_up = NULL;
+    move_down = (uintptr_t) 0;
+    move_up = (uintptr_t) 0;
 
     if (x == x_low) { /* Sift down */
         i = table->subtableZ[x].next;
@@ -963,11 +963,11 @@ cuddZddSymmSiftingConvAux(
 	if (move_down == ZDD_MV_OOM)
 	    goto cuddZddSymmSiftingConvAuxOutOfMem;
 
-	if (move_down == NULL ||
+	if (move_down == (uintptr_t) 0 ||
 	    table->subtableZ[move_down->y].next != move_down->y) {
 	    /* symmetry detected may have to make another complete
 		pass */
-            if (move_down != NULL)
+            if (move_down != (uintptr_t) 0)
 		x = move_down->y;
 	    else {
 		while ((unsigned) x < table->subtableZ[x].next)
@@ -1019,11 +1019,11 @@ cuddZddSymmSiftingConvAux(
 	if (move_up == ZDD_MV_OOM)
 	    goto cuddZddSymmSiftingConvAuxOutOfMem;
 
-	if (move_up == NULL ||
+	if (move_up == (uintptr_t) 0 ||
 	    table->subtableZ[move_up->x].next != move_up->x) {
 	    /* symmetry detected may have to make another complete
 	       pass */
-            if (move_up != NULL)
+            if (move_up != (uintptr_t) 0)
 		x = move_up->x;
 	    else {
 		while ((unsigned) x < table->subtableZ[x].next)
@@ -1062,7 +1062,7 @@ cuddZddSymmSiftingConvAux(
 	if (move_down == ZDD_MV_OOM)
 	    goto cuddZddSymmSiftingConvAuxOutOfMem;
 
-	if (move_down != NULL) {
+	if (move_down != (uintptr_t) 0) {
 	    x = move_down->y;
 	}
 	else {
@@ -1080,11 +1080,11 @@ cuddZddSymmSiftingConvAux(
 	if (move_up == ZDD_MV_OOM)
 	    goto cuddZddSymmSiftingConvAuxOutOfMem;
 
-	if (move_up == NULL ||
+	if (move_up == (uintptr_t) 0 ||
 	    table->subtableZ[move_up->x].next != move_up->x) {
 	    /* symmetry detected may have to make another complete
 	       pass */
-	    if (move_up != NULL) {
+	    if (move_up != (uintptr_t) 0) {
 		x = move_up->x;
 	    }
 	    else {
@@ -1101,7 +1101,7 @@ cuddZddSymmSiftingConvAux(
 		    initial_size);
             }
 	    else {
-		while (move_down != NULL) {
+		while (move_down != (uintptr_t) 0) {
 		    move = move_down->next;
 		    cuddDeallocMove(table, move_down);
 		    move_down = move;
@@ -1130,7 +1130,7 @@ cuddZddSymmSiftingConvAux(
 	if (move_up == ZDD_MV_OOM)
 	    goto cuddZddSymmSiftingConvAuxOutOfMem;
 
-	if (move_up != NULL) {
+	if (move_up != (uintptr_t) 0) {
 	    x = move_up->x;
 	}
 	else {
@@ -1145,11 +1145,11 @@ cuddZddSymmSiftingConvAux(
 	if (move_down == ZDD_MV_OOM)
 	    goto cuddZddSymmSiftingConvAuxOutOfMem;
 
-	if (move_down == NULL ||
+	if (move_down == (uintptr_t) 0 ||
 	    table->subtableZ[move_down->y].next != move_down->y) {
 	    /* symmetry detected may have to make another complete
 	       pass */
-            if (move_down != NULL) {
+            if (move_down != (uintptr_t) 0) {
 		x = move_down->y;
 	    }
 	    else {
@@ -1170,7 +1170,7 @@ cuddZddSymmSiftingConvAux(
 		    initial_size);
             }
 	    else {
-		while (move_up != NULL) {
+		while (move_up != (uintptr_t) 0) {
 		    move = move_up->next;
 		    cuddDeallocMove(table, move_up);
 		    move_up = move;
@@ -1191,12 +1191,12 @@ cuddZddSymmSiftingConvAux(
 	    goto cuddZddSymmSiftingConvAuxOutOfMem;
     }
 
-    while (move_down != NULL) {
+    while (move_down != (uintptr_t) 0) {
 	move = move_down->next;
 	cuddDeallocMove(table, move_down);
 	move_down = move;
     }
-    while (move_up != NULL) {
+    while (move_up != (uintptr_t) 0) {
 	move = move_up->next;
 	cuddDeallocMove(table, move_up);
 	move_up = move;
@@ -1206,14 +1206,14 @@ cuddZddSymmSiftingConvAux(
 
 cuddZddSymmSiftingConvAuxOutOfMem:
     if (move_down != ZDD_MV_OOM) {
-	while (move_down != NULL) {
+	while (move_down != (uintptr_t) 0) {
 	    move = move_down->next;
 	    cuddDeallocMove(table, move_down);
 	    move_down = move;
 	}
     }
     if (move_up != ZDD_MV_OOM) {
-	while (move_up != NULL) {
+	while (move_up != (uintptr_t) 0) {
 	    move = move_up->next;
 	    cuddDeallocMove(table, move_up);
 	    move_up = move;
@@ -1256,7 +1256,7 @@ cuddZddSymmSifting_up(
     int		limit_size = initial_size;
     int		i, gytop;
 
-    moves = NULL;
+    moves = (uintptr_t) 0;
     y = cuddZddNextLow(table, x);
     while (y >= x_low) {
 	gytop = table->subtableZ[y].next;
@@ -1275,7 +1275,7 @@ cuddZddSymmSifting_up(
 	    if (size == 0)
 		goto cuddZddSymmSifting_upOutOfMem;
 	    move = (Move *)cuddDynamicAllocNode(table);
-	    if (move == NULL)
+	    if (move == (uintptr_t) 0)
 		goto cuddZddSymmSifting_upOutOfMem;
 	    move->x = y;
 	    move->y = x;
@@ -1303,7 +1303,7 @@ cuddZddSymmSifting_up(
     return(moves);
 
 cuddZddSymmSifting_upOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -1344,7 +1344,7 @@ cuddZddSymmSifting_down(
     int		limit_size = initial_size;
     int		i, gxtop, gybot;
 
-    moves = NULL;
+    moves = (uintptr_t) 0;
     y = cuddZddNextHigh(table, x);
     while (y <= x_high) {
 	gybot = table->subtableZ[y].next;
@@ -1366,7 +1366,7 @@ cuddZddSymmSifting_down(
 	    if (size == 0)
 		goto cuddZddSymmSifting_downOutOfMem;
 	    move = (Move *)cuddDynamicAllocNode(table);
-	    if (move == NULL)
+	    if (move == (uintptr_t) 0)
 		goto cuddZddSymmSifting_downOutOfMem;
 	    move->x = x;
 	    move->y = y;
@@ -1396,7 +1396,7 @@ cuddZddSymmSifting_down(
     return(moves);
 
 cuddZddSymmSifting_downOutOfMem:
-    while (moves != NULL) {
+    while (moves != (uintptr_t) 0) {
 	move = moves->next;
 	cuddDeallocMove(table, moves);
 	moves = move;
@@ -1433,14 +1433,14 @@ cuddZddSymmSiftingBackward(
     int		res;
 
     i_best = -1;
-    for (move = moves, i = 0; move != NULL; move = move->next, i++) {
+    for (move = moves, i = 0; move != (uintptr_t) 0; move = move->next, i++) {
 	if (move->size < size) {
 	    i_best = i;
 	    size = move->size;
 	}
     }
 
-    for (move = moves, i = 0; move != NULL; move = move->next, i++) {
+    for (move = moves, i = 0; move != (uintptr_t) 0; move = move->next, i++) {
 	if (i == i_best) break;
 	if ((table->subtableZ[move->x].next == move->x) &&
 	    (table->subtableZ[move->y].next == move->y)) {
@@ -1546,7 +1546,7 @@ zdd_group_move(
 	x = gxbot;
     } /* while x <= y, end of group movement */
     move = (Move *)cuddDynamicAllocNode(table);
-    if (move == NULL)
+    if (move == (uintptr_t) 0)
 	goto zdd_group_moveOutOfMem;
     move->x = swapx;
     move->y = swapy;
@@ -1557,7 +1557,7 @@ zdd_group_move(
     return(table->keysZ);
 
 zdd_group_moveOutOfMem:
-    while (*moves != NULL) {
+    while (*moves != (uintptr_t) 0) {
 	move = (*moves)->next;
 	cuddDeallocMove(table, *moves);
 	*moves = move;

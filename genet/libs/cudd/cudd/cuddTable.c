@@ -1436,7 +1436,7 @@ cuddUniqueConst(
   DdManager * unique,
   CUDD_VALUE_TYPE  value)
 {
-    int pos;
+    intptr_t pos;
     DdNodePtr *nodelist;
     DdNode *looking;
     hack split;
@@ -1461,7 +1461,7 @@ cuddUniqueConst(
     }
     split.value = value;
 
-    pos = ddHash(split.bits[0], split.bits[1], unique->constants.shift);
+    pos = ddHash((intptr_t)split.bits[0], (intptr_t)split.bits[1], unique->constants.shift);
     nodelist = unique->constants.nodelist;
     looking = nodelist[pos];
 

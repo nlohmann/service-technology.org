@@ -701,8 +701,8 @@ typedef struct DdLevelQueue {
 
 ******************************************************************************/
 #define ddHash(f,g,s) \
-((((uintptr_t)(f) * DD_P1 + \
-   (uintptr_t)(g)) * DD_P2) >> (s))
+((((unsigned int)(uintptr_t)(f) * DD_P1 + \
+   (unsigned int)(uintptr_t)(g)) * DD_P2) >> (s))
 
 /**Macro***********************************************************************
 
@@ -716,9 +716,9 @@ typedef struct DdLevelQueue {
 
 ******************************************************************************/
 #define ddCHash(o,f,g,h,s) \
-((((((uintptr_t)(f) + (uintptr_t)(o)) * DD_P1 + \
-    (uintptr_t)(g)) * DD_P2 + \
-   (uintptr_t)(h)) * DD_P3) >> (s))
+((((((unsigned int)(uintptr_t)(f) + (unsigned int)(uintptr_t)(o)) * DD_P1 + \
+    (unsigned int)(uintptr_t)(g)) * DD_P2 + \
+   (unsigned int)(uintptr_t)(h)) * DD_P3) >> (s))
 
 /**Macro***********************************************************************
 
@@ -733,8 +733,8 @@ typedef struct DdLevelQueue {
 
 ******************************************************************************/
 #define ddCHash2(o,f,g,s) \
-(((((uintptr_t)(f) + (uintptr_t)(o)) * DD_P1 + \
-   (uintptr_t)(g)) * DD_P2) >> (s))
+(((((unsigned int)(uintptr_t)(f) + (unsigned int)(uintptr_t)(o)) * DD_P1 + \
+   (unsigned int)(uintptr_t)(g)) * DD_P2) >> (s))
 
 /**Macro***********************************************************************
 
@@ -747,7 +747,7 @@ typedef struct DdLevelQueue {
   SeeAlso     []
 
 ******************************************************************************/
-#define cuddClean(p) ((DdNode *)((uintptr_t)(p) & ~0xf))
+#define cuddClean(p) ((DdNode *)((unsigned int)(uintptr_t)(p) & ~0xf))
 
 
 /**Macro***********************************************************************

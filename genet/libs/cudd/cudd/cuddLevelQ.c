@@ -117,13 +117,8 @@ static char rcsid[] DD_UNUSED = "$Id: cuddLevelQ.c,v 1.13 2009/03/08 02:49:02 fa
   SeeAlso     [hashInsert hashLookup hashDelete]
 
 ******************************************************************************/
-#if SIZEOF_VOID_P == 8 && SIZEOF_INT == 4
 #define lqHash(key,shift) \
-(((uintptr_t)(key) * DD_P1) >> (shift))
-#else
-#define lqHash(key,shift) \
-(((uintptr_t)(key) * DD_P1) >> (shift))
-#endif
+(((unsigned int)(uintptr_t)(key) * DD_P1) >> (shift))
 
 
 /**AutomaticStart*************************************************************/

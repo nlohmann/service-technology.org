@@ -485,7 +485,7 @@ cuddCacheLookup2(
 
     posn = ddCHash2((uintptr_t)op,(uintptr_t)f,(uintptr_t)g,table->cacheShift);
     en = &cache[posn];
-    if (en->data != (uintptr_t) 0 && en->f==f && en->g==g && en->h==(uintptr_t)op) {
+    if (en->data != (uintptr_t) 0 && en->f==f && en->g==g && en->h==(unsigned int)(uintptr_t)op) {
 	data = Cudd_Regular(en->data);
 	table->cacheHits++;
 	if (data->ref == 0) {

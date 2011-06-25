@@ -32,6 +32,9 @@
 
 #define FUNC std::cerr << " ... in function " << __PRETTY_FUNCTION__ << " in " << __FILE__ << "@" << __LINE__ << std::endl;
 
+extern "C" int mkstemp(char*);
+extern "C" char* strdup(const char*);
+
 /******************
  * STATIC MEMBERS *
  ******************/

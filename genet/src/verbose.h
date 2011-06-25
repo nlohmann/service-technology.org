@@ -26,6 +26,7 @@
 #include <string>
 #include <unistd.h>
 
+extern "C" int fileno(FILE *FP);
 
 /// unconditionally print a message
 void message(const char* format, ...);

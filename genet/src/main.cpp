@@ -280,10 +280,14 @@ int genet_init(int argc,char *argv[])
     {
         string run_pfy = "petrify -dead -o genet_tmp.g -hide " + hide_sigs + " " + string(fname);
         cout << "# Running: " << run_pfy << endl;
-        std::system(run_pfy.c_str());
+        if (std::system(run_pfy.c_str()) != 0) {
+            cout << "# There was an error while running petrify.";
+        }
         string run_write_sg = "write_sg genet_tmp.g -o genet_sg.g";
         cout << "# Running: " << run_write_sg <<endl;
-        std::system(run_write_sg.c_str());
+        if (std::system(run_write_sg.c_str()) != 0) {
+            cout << "# There was an error while running petrify.";
+        }
         cout << "# Done\n";
         strcpy(fname,"genet_sg.g");
     }

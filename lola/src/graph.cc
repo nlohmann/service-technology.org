@@ -1945,7 +1945,7 @@ int initialize_transition() {
     \return 1 markings different
 */
 int compare_markings() {
-    for (int i = 0; i < Globals::Places[0]->cnt; ++i) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; ++i) {
         if (Globals::CurrentMarking[i] != Globals::Places[i]->target_marking) {
             return 0;
         }
@@ -3291,8 +3291,7 @@ int home() {
 
 void print_binDec(binDecision* d, int indent);
 void print_binDec(int h) {
-    unsigned int i;
-    for (i = 0; i < Globals::Places[0]->NrSignificant; i++) {
+    for (int i = 0; i < Globals::Places[0]->NrSignificant; i++) {
         cout << Globals::Places[i]->name << ": " << Globals::Places[i]->nrbits;
     }
     cout << endl;
@@ -3302,12 +3301,11 @@ void print_binDec(int h) {
 
 
 
-
+/*!
+ Print bin decision table at hash entry h.
+*/
 void print_binDec(binDecision* d, int indent) {
-    unsigned int i;
-    // print bin decision table at hash entry h
-
-    for (i = 0; i < indent; i++) {
+    for (int i = 0; i < indent; i++) {
         cout << ".";
     }
 
@@ -3317,11 +3315,11 @@ void print_binDec(binDecision* d, int indent) {
     }
 
     cout << "b " << d->bitnr << " v ";
-    for (i = 0; i < (Globals::BitVectorSize - (d->bitnr + 1)) ; i += 8) {
+    for (unsigned int i = 0; i < (Globals::BitVectorSize - (d->bitnr + 1)) ; i += 8) {
         cout << (unsigned int)(d->vector)[i / 8] << " " ;
     }
 
-    for (i = 0; i < Globals::BitVectorSize - (d->bitnr + 1); i++) {
+    for (unsigned int i = 0; i < Globals::BitVectorSize - (d->bitnr + 1); i++) {
         cout << (((d->vector)[i / 8] >> (7 - i % 8)) % 2);
     }
     cout << endl;

@@ -96,47 +96,47 @@ Transition* insert_up(formula* f) {
 
     switch (f -> type) {
         case neq:
-            for (i = 0; i < ((atomicformula*) f) ->p->NrOfArriving; i++) {
-                stubbinsert(((atomicformula*) f) ->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f) ->p->NrOfArriving; i++) {
+                stubbinsert(static_cast<atomicformula*>(f) ->p->ArrivingArcs[i]->tr);
             }
-            for (i = 0; i < ((atomicformula*) f) ->p->NrOfLeaving; i++) {
-                stubbinsert(((atomicformula*) f) ->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f) ->p->NrOfLeaving; i++) {
+                stubbinsert(static_cast<atomicformula*>(f) ->p->LeavingArcs[i]->tr);
             }
             break;
         case eq:
-            if (Globals::CurrentMarking[((atomicformula*) f) ->p->index] < ((atomicformula*) f)  -> k) {
-                for (i = 0; i < ((atomicformula*) f) ->p->NrOfArriving; i++) {
-                    stubbinsert(((atomicformula*) f) ->p->ArrivingArcs[i]->tr);
+            if (Globals::CurrentMarking[static_cast<atomicformula*>(f) ->p->index] < static_cast<atomicformula*>(f)  -> k) {
+                for (i = 0; i < static_cast<atomicformula*>(f) ->p->NrOfArriving; i++) {
+                    stubbinsert(static_cast<atomicformula*>(f) ->p->ArrivingArcs[i]->tr);
                 }
             } else {
-                for (i = 0; i < ((atomicformula*) f) ->p->NrOfLeaving; i++) {
-                    stubbinsert(((atomicformula*) f) ->p->LeavingArcs[i]->tr);
+                for (i = 0; i < static_cast<atomicformula*>(f) ->p->NrOfLeaving; i++) {
+                    stubbinsert(static_cast<atomicformula*>(f) ->p->LeavingArcs[i]->tr);
                 }
             }
             break;
         case leq:
         case lt:
-            for (i = 0; i < ((atomicformula*) f) ->p->NrOfLeaving; i++) {
-                stubbinsert(((atomicformula*) f) ->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f) ->p->NrOfLeaving; i++) {
+                stubbinsert(static_cast<atomicformula*>(f) ->p->LeavingArcs[i]->tr);
             }
             break;
         case geq:
         case gt:
-            for (i = 0; i < ((atomicformula*) f) ->p->NrOfArriving; i++) {
-                stubbinsert(((atomicformula*) f) ->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f) ->p->NrOfArriving; i++) {
+                stubbinsert(static_cast<atomicformula*>(f) ->p->ArrivingArcs[i]->tr);
             }
             break;
         case conj:
-            return(insert_up(((booleanformula*) f)->sub[0]));
+            return(insert_up(static_cast<booleanformula*>(f)->sub[0]));
         case disj:
-            for (i = 0; i < ((booleanformula*) f)->cardsub; i++) {
-                if (tt = insert_up(((booleanformula*) f)->sub[i])) {
+            for (i = 0; i < static_cast<booleanformula*>(f)->cardsub; i++) {
+                if (tt = insert_up(static_cast<booleanformula*>(f)->sub[i])) {
                     return tt;
                 }
             }
             return NULL;
         case neg:
-            return(insert_down(((unarybooleanformula*) f) ->sub));
+            return(insert_down(static_cast<unarybooleanformula*>(f) ->sub));
             break;
         default:
             cout << "feature not implemented\n";
@@ -151,47 +151,47 @@ Transition* insert_down(formula* f) {
 
     switch (f -> type) {
         case neq:
-            if (Globals::CurrentMarking[((atomicformula*) f) ->p->index] < ((atomicformula*) f) ->k) {
-                for (i = 0; i < ((atomicformula*) f) ->p->NrOfArriving; i++) {
-                    stubbinsert(((atomicformula*) f) ->p->ArrivingArcs[i]->tr);
+            if (Globals::CurrentMarking[static_cast<atomicformula*>(f) ->p->index] < static_cast<atomicformula*>(f) ->k) {
+                for (i = 0; i < static_cast<atomicformula*>(f) ->p->NrOfArriving; i++) {
+                    stubbinsert(static_cast<atomicformula*>(f) ->p->ArrivingArcs[i]->tr);
                 }
             } else {
-                for (i = 0; i < ((atomicformula*) f) ->p->NrOfLeaving; i++) {
-                    stubbinsert(((atomicformula*) f) ->p->LeavingArcs[i]->tr);
+                for (i = 0; i < static_cast<atomicformula*>(f) ->p->NrOfLeaving; i++) {
+                    stubbinsert(static_cast<atomicformula*>(f) ->p->LeavingArcs[i]->tr);
                 }
             }
             break;
         case eq:
-            for (i = 0; i < ((atomicformula*) f) ->p->NrOfArriving; i++) {
-                stubbinsert(((atomicformula*) f) ->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f) ->p->NrOfArriving; i++) {
+                stubbinsert(static_cast<atomicformula*>(f) ->p->ArrivingArcs[i]->tr);
             }
-            for (i = 0; i < ((atomicformula*) f) ->p->NrOfLeaving; i++) {
-                stubbinsert(((atomicformula*) f) ->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f) ->p->NrOfLeaving; i++) {
+                stubbinsert(static_cast<atomicformula*>(f) ->p->LeavingArcs[i]->tr);
             }
             break;
         case geq:
         case gt:
-            for (i = 0; i < ((atomicformula*) f) ->p->NrOfLeaving; i++) {
-                stubbinsert(((atomicformula*) f) ->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f) ->p->NrOfLeaving; i++) {
+                stubbinsert(static_cast<atomicformula*>(f) ->p->LeavingArcs[i]->tr);
             }
             break;
         case leq:
         case lt:
-            for (i = 0; i < ((atomicformula*) f) ->p->NrOfArriving; i++) {
-                stubbinsert(((atomicformula*) f) ->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f) ->p->NrOfArriving; i++) {
+                stubbinsert(static_cast<atomicformula*>(f) ->p->ArrivingArcs[i]->tr);
             }
             break;
         case disj:
-            return(insert_down(((booleanformula*) f) ->sub[(rand() % (((booleanformula*) f) ->cardsub - ((booleanformula*) f) ->firstvalid)) + ((booleanformula*) f) ->firstvalid]));
+            return(insert_down(static_cast<booleanformula*>(f) ->sub[(rand() % (static_cast<booleanformula*>(f) ->cardsub - static_cast<booleanformula*>(f) ->firstvalid)) + static_cast<booleanformula*>(f) ->firstvalid]));
         case conj:
-            for (i = ((booleanformula*) f)->firstvalid; i < ((booleanformula*) f)->cardsub; i++) {
-                if (tt = insert_down(((booleanformula*) f)->sub[i])) {
+            for (i = static_cast<booleanformula*>(f)->firstvalid; i < static_cast<booleanformula*>(f)->cardsub; i++) {
+                if (tt = insert_down(static_cast<booleanformula*>(f)->sub[i])) {
                     return tt;
                 }
             }
             return NULL;
         case neg:
-            return(insert_up(((unarybooleanformula*) f) ->sub));
+            return(insert_up(static_cast<unarybooleanformula*>(f) ->sub));
             break;
         default:
             cout << "feature not implemented\n";

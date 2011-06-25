@@ -121,93 +121,92 @@ void insert_up(State* s, formula* f) {
 
     switch (f->type) {
         case neq:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfArriving; i++) {
-                stubborninsert(((atomicformula*) f)->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfArriving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->ArrivingArcs[i]->tr);
             }
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfLeaving; i++) {
-                stubborninsert(((atomicformula*) f)->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfLeaving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->LeavingArcs[i]->tr);
             }
             break;
         case eq:
-            if (Globals::CurrentMarking[((atomicformula*) f)->p->index] < ((atomicformula*) f)->k) {
-                for (i = 0; i < ((atomicformula*) f)->p->NrOfArriving; i++) {
-                    stubborninsert(((atomicformula*) f)->p->ArrivingArcs[i]->tr);
+            if (Globals::CurrentMarking[static_cast<atomicformula*>(f)->p->index] < static_cast<atomicformula*>(f)->k) {
+                for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfArriving; i++) {
+                    stubborninsert(static_cast<atomicformula*>(f)->p->ArrivingArcs[i]->tr);
                 }
             } else {
-                for (i = 0; i < ((atomicformula*) f)->p->NrOfLeaving; i++) {
-                    stubborninsert(((atomicformula*) f)->p->LeavingArcs[i]->tr);
+                for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfLeaving; i++) {
+                    stubborninsert(static_cast<atomicformula*>(f)->p->LeavingArcs[i]->tr);
                 }
             }
             break;
         case leq:
         case lt:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfLeaving; i++) {
-                stubborninsert(((atomicformula*) f)->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfLeaving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->LeavingArcs[i]->tr);
             }
             break;
         case geq:
         case gt:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfArriving; i++) {
-                stubborninsert(((atomicformula*) f)->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfArriving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->ArrivingArcs[i]->tr);
             }
             break;
         case conj:
 #ifdef MODELCHECKING
             for (i = checkstart[f->index];;) {
-                if (!(s->value[((booleanformula*) f)->sub[i]->index])) {
+                if (!(s->value[static_cast<booleanformula*>(f)->sub[i]->index])) {
                     break;
                 }
                 ++i;
-                i %= ((booleanformula*) f)->cardsub;
+                i %= static_cast<booleanformula*>(f)->cardsub;
                 if (i == checkstart[f->index]) {
                     break;
                 }
             }
 #else
-            for (i = 0; i < ((booleanformula*) f)->cardsub; i++) {
-                if (!(((booleanformula*) f)->sub[i]->value)) {
+            for (i = 0; i < static_cast<booleanformula*>(f)->cardsub; i++) {
+                if (!(static_cast<booleanformula*>(f)->sub[i]->value)) {
                     break;
                 }
             }
 #endif
-            insert_up(s, ((booleanformula*) f)->sub[i]);
+            insert_up(s, static_cast<booleanformula*>(f)->sub[i]);
             break;
         case disj:
-            for (i = 0; i < ((booleanformula*) f)->cardsub; i++) {
-                insert_up(s, ((booleanformula*) f)->sub[i]);
+            for (i = 0; i < static_cast<booleanformula*>(f)->cardsub; i++) {
+                insert_up(s, static_cast<booleanformula*>(f)->sub[i]);
             }
             break;
         case neg:
-            insert_down(s, ((unarybooleanformula*) f)->sub);
+            insert_down(s, static_cast<unarybooleanformula*>(f)->sub);
             break;
 #ifdef MODELCHECKING
         case ef:
             break;
-        case ag:
-            {
-                State* ss;
-                for (ss = s; (ss->value[((unarytemporalformula*) f)->element->index]); ss = ss->witness[f->tempindex]) {
-                    for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
-                        stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
-                    }
-                    stubborninsert(ss->witnesstransition[f->tempindex]);
+        case ag: {
+            State* ss;
+            for (ss = s; (ss->value[static_cast<unarytemporalformula*>(f)->element->index]); ss = ss->witness[f->tempindex]) {
+                for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
+                    stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
                 }
-                insert_up(ss, ((unarytemporalformula*) f)->element);
-                break;
+                stubborninsert(ss->witnesstransition[f->tempindex]);
             }
+            insert_up(ss, static_cast<unarytemporalformula*>(f)->element);
+            break;
+        }
         case eg:
-            if (s->value[((unarytemporalformula*) f)->element->index]) {
-                insert_down(s, ((unarytemporalformula*) f)->element);
+            if (s->value[static_cast<unarytemporalformula*>(f)->element->index]) {
+                insert_down(s, static_cast<unarytemporalformula*>(f)->element);
             } else {
-                insert_up(s, ((unarytemporalformula*) f)->element);
+                insert_up(s, static_cast<unarytemporalformula*>(f)->element);
             }
             break;
         case eu:
-            if (s->value[((untilformula*) f)->hold->index]) {
-                insert_down(s, ((untilformula*) f)->hold);
+            if (s->value[static_cast<untilformula*>(f)->hold->index]) {
+                insert_down(s, static_cast<untilformula*>(f)->hold);
             } else {
-                insert_up(s, ((untilformula*) f)->hold);
-                insert_up(s, ((untilformula*) f)->goal);
+                insert_up(s, static_cast<untilformula*>(f)->hold);
+                insert_up(s, static_cast<untilformula*>(f)->goal);
             }
             break;
         case af:
@@ -217,33 +216,32 @@ void insert_up(State* s, formula* f) {
                     stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
                 }
                 stubborninsert(ss->witnesstransition[f->tempindex]);
-                insert_up(ss, ((unarytemporalformula*) f)->element);
+                insert_up(ss, static_cast<unarytemporalformula*>(f)->element);
             }
             for (State* ss = s; ss->checkmin[f->tempindex] == UINT_MAX; ss = ss->witness[f->tempindex]) {
                 ss->checkmin[f->tempindex] = 0;
             }
             break;
-        case au:
-            {
-                State *ss;
-                for (ss = s; (s->checkmin[f->tempindex] < UINT_MAX) && (s->value[((untilformula*) f)->hold->index]); ss = ss->
-                        witness[f->tempindex]) {
-                    ss->checkmin[f->tempindex] = UINT_MAX;
-                    for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
-                        stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
-                    }
-                    stubborninsert(ss->witnesstransition[f->tempindex]);
-                    insert_up(ss, ((untilformula*) f)->goal);
+        case au: {
+            State* ss;
+            for (ss = s; (s->checkmin[f->tempindex] < UINT_MAX) && (s->value[static_cast<untilformula*>(f)->hold->index]); ss = ss->
+                    witness[f->tempindex]) {
+                ss->checkmin[f->tempindex] = UINT_MAX;
+                for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
+                    stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
                 }
-                if (!ss->value[((untilformula*) f)->hold->index]) {
-                    insert_up(ss, ((untilformula*) f)->hold);
-                }
-                for (ss = s; ss->checkmin[f->tempindex] == UINT_MAX; ss =
-                            ss->witness[f->tempindex]) {
-                    ss->checkmin[f->tempindex] = 0;
-                }
-                break;
+                stubborninsert(ss->witnesstransition[f->tempindex]);
+                insert_up(ss, static_cast<untilformula*>(f)->goal);
             }
+            if (!ss->value[static_cast<untilformula*>(f)->hold->index]) {
+                insert_up(ss, static_cast<untilformula*>(f)->hold);
+            }
+            for (ss = s; ss->checkmin[f->tempindex] == UINT_MAX; ss =
+                        ss->witness[f->tempindex]) {
+                ss->checkmin[f->tempindex] = 0;
+            }
+            break;
+        }
         case ax:
         case ex:
             for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
@@ -261,41 +259,41 @@ void insert_global_up(formula* f) {
 
     switch (f->type) {
         case neq:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfArriving; i++) {
-                stubborninsert(((atomicformula*) f)->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfArriving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->ArrivingArcs[i]->tr);
             }
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfLeaving; i++) {
-                stubborninsert(((atomicformula*) f)->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfLeaving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->LeavingArcs[i]->tr);
             }
             break;
         case eq:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfArriving; i++) {
-                stubborninsert(((atomicformula*) f)->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfArriving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->ArrivingArcs[i]->tr);
             }
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfLeaving; i++) {
-                stubborninsert(((atomicformula*) f)->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfLeaving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->LeavingArcs[i]->tr);
             }
             break;
         case leq:
         case lt:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfLeaving; i++) {
-                stubborninsert(((atomicformula*) f)->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfLeaving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->LeavingArcs[i]->tr);
             }
             break;
         case geq:
         case gt:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfArriving; i++) {
-                stubborninsert(((atomicformula*) f)->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfArriving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->ArrivingArcs[i]->tr);
             }
             break;
         case conj:
         case disj:
-            for (i = 0; i < ((booleanformula*) f)->cardsub; i++) {
-                insert_global_up(((booleanformula*) f)->sub[i]);
+            for (i = 0; i < static_cast<booleanformula*>(f)->cardsub; i++) {
+                insert_global_up(static_cast<booleanformula*>(f)->sub[i]);
             }
             break;
         case neg:
-            insert_global_down(((unarybooleanformula*) f)->sub);
+            insert_global_down(static_cast<unarybooleanformula*>(f)->sub);
             break;
         default:
             cout << "feature not implemented (yet)\n";
@@ -307,119 +305,116 @@ void insert_down(State* s, formula* f) {
 
     switch (f->type) {
         case neq:
-            if (Globals::CurrentMarking[((atomicformula*) f)->p->index] < ((atomicformula*) f)->k) {
-                for (i = 0; i < ((atomicformula*) f)->p->NrOfArriving; i++) {
-                    stubborninsert(((atomicformula*) f)->p->ArrivingArcs[i]->tr);
+            if (Globals::CurrentMarking[static_cast<atomicformula*>(f)->p->index] < static_cast<atomicformula*>(f)->k) {
+                for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfArriving; i++) {
+                    stubborninsert(static_cast<atomicformula*>(f)->p->ArrivingArcs[i]->tr);
                 }
             } else {
-                for (i = 0; i < ((atomicformula*) f)->p->NrOfLeaving; i++) {
-                    stubborninsert(((atomicformula*) f)->p->LeavingArcs[i]->tr);
+                for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfLeaving; i++) {
+                    stubborninsert(static_cast<atomicformula*>(f)->p->LeavingArcs[i]->tr);
                 }
             }
             break;
         case eq:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfArriving; i++) {
-                stubborninsert(((atomicformula*) f)->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfArriving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->ArrivingArcs[i]->tr);
             }
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfLeaving; i++) {
-                stubborninsert(((atomicformula*) f)->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfLeaving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->LeavingArcs[i]->tr);
             }
             break;
         case geq:
         case gt:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfLeaving; i++) {
-                stubborninsert(((atomicformula*) f)->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfLeaving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->LeavingArcs[i]->tr);
             }
             break;
         case leq:
         case lt:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfArriving; i++) {
-                stubborninsert(((atomicformula*) f)->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfArriving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->ArrivingArcs[i]->tr);
             }
             break;
         case disj:
             for (i = checkstart[f->index];;) {
 #ifdef MODELCHECKING
-                if (s->value[((booleanformula*) f)->sub[i]->index]) {
+                if (s->value[static_cast<booleanformula*>(f)->sub[i]->index]) {
                     break;
                 }
 #else
-                if (((booleanformula*) f)->sub[i]->value) {
+                if (static_cast<booleanformula*>(f)->sub[i]->value) {
                     break;
                 }
 #endif
                 ++i;
-                i %= ((booleanformula*) f)->cardsub;
+                i %= static_cast<booleanformula*>(f)->cardsub;
                 if (i == checkstart[f->index]) {
                     break;
                 }
             }
-            insert_down(s, ((booleanformula*) f)->sub[i]);
+            insert_down(s, static_cast<booleanformula*>(f)->sub[i]);
             break;
         case conj:
-            for (i = 0; i < ((booleanformula*) f)->cardsub; i++) {
-                insert_down(s, ((booleanformula*) f)->sub[i]);
+            for (i = 0; i < static_cast<booleanformula*>(f)->cardsub; i++) {
+                insert_down(s, static_cast<booleanformula*>(f)->sub[i]);
             }
             break;
         case neg:
-            insert_up(s, ((unarybooleanformula*) f)->sub);
+            insert_up(s, static_cast<unarybooleanformula*>(f)->sub);
             break;
 #ifdef MODELCHECKING
-        case ef:
-            {
-                State* ss;
-                for (ss = s; !(ss->value[((unarytemporalformula*) f)->element->index]); ss = ss->witness[f->tempindex]) {
-                    for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
-                        stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
-                    }
-                    stubborninsert(ss->witnesstransition[f->tempindex]);
+        case ef: {
+            State* ss;
+            for (ss = s; !(ss->value[static_cast<unarytemporalformula*>(f)->element->index]); ss = ss->witness[f->tempindex]) {
+                for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
+                    stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
                 }
-                insert_down(ss, ((unarytemporalformula*) f)->element);
-                break;
+                stubborninsert(ss->witnesstransition[f->tempindex]);
             }
+            insert_down(ss, static_cast<unarytemporalformula*>(f)->element);
+            break;
+        }
         case ag:
             break;
-        case eg:
-            {
-                State* ss;
-                for (ss = s; (ss->checkmin[f->tempindex] < UINT_MAX); ss = ss->witness[f->tempindex]) {
-                    ss->checkmin[f->tempindex] = UINT_MAX;
-                    for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
-                        stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
-                    }
-                    stubborninsert(ss->witnesstransition[f->tempindex]);
-                    insert_down(ss, ((unarytemporalformula*) f)->element);
+        case eg: {
+            State* ss;
+            for (ss = s; (ss->checkmin[f->tempindex] < UINT_MAX); ss = ss->witness[f->tempindex]) {
+                ss->checkmin[f->tempindex] = UINT_MAX;
+                for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
+                    stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
                 }
-                for (ss = s; (ss->checkmin[f->tempindex] < UINT_MAX); ss = ss->witness[f->tempindex]) {
-                    ss->checkmin[f->tempindex] = 0;
-                }
-                break;
+                stubborninsert(ss->witnesstransition[f->tempindex]);
+                insert_down(ss, static_cast<unarytemporalformula*>(f)->element);
             }
-        case eu:
-            {
-                State *ss;
-                for (ss = s; !(ss->value[((untilformula*) f)->goal->index]); ss = ss->witness[f->tempindex]) {
-                    for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
-                        stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
-                    }
-                    stubborninsert(ss->witnesstransition[f->tempindex]);
-                    insert_down(ss, ((untilformula*) f)->hold);
-                }
-                insert_down(ss, ((untilformula*) f)->goal);
-                break;
+            for (ss = s; (ss->checkmin[f->tempindex] < UINT_MAX); ss = ss->witness[f->tempindex]) {
+                ss->checkmin[f->tempindex] = 0;
             }
+            break;
+        }
+        case eu: {
+            State* ss;
+            for (ss = s; !(ss->value[static_cast<untilformula*>(f)->goal->index]); ss = ss->witness[f->tempindex]) {
+                for (i = 0; ss->witnesstransition[f->tempindex]->conflicting[i]; i++) {
+                    stubborninsert(ss->witnesstransition[f->tempindex]->conflicting[i]);
+                }
+                stubborninsert(ss->witnesstransition[f->tempindex]);
+                insert_down(ss, static_cast<untilformula*>(f)->hold);
+            }
+            insert_down(ss, static_cast<untilformula*>(f)->goal);
+            break;
+        }
         case af:
-            if (s->value[((unarytemporalformula*) f)->element->index]) {
-                insert_down(s, ((unarytemporalformula*) f)->element);
+            if (s->value[static_cast<unarytemporalformula*>(f)->element->index]) {
+                insert_down(s, static_cast<unarytemporalformula*>(f)->element);
             } else {
-                insert_up(s, ((unarytemporalformula*) f)->element);
+                insert_up(s, static_cast<unarytemporalformula*>(f)->element);
             }
             break;
         case au:
-            if (s->value[((untilformula*) f)->goal->index]) {
-                insert_down(s, ((untilformula*) f)->goal);
+            if (s->value[static_cast<untilformula*>(f)->goal->index]) {
+                insert_down(s, static_cast<untilformula*>(f)->goal);
             } else {
-                insert_up(s, ((untilformula*) f)->goal);
+                insert_up(s, static_cast<untilformula*>(f)->goal);
             }
             break;
 
@@ -440,41 +435,41 @@ void insert_global_down(formula* f) {
 
     switch (f->type) {
         case neq:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfArriving; i++) {
-                stubborninsert(((atomicformula*) f)->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfArriving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->ArrivingArcs[i]->tr);
             }
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfLeaving; i++) {
-                stubborninsert(((atomicformula*) f)->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfLeaving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->LeavingArcs[i]->tr);
             }
             break;
         case eq:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfArriving; i++) {
-                stubborninsert(((atomicformula*) f)->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfArriving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->ArrivingArcs[i]->tr);
             }
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfLeaving; i++) {
-                stubborninsert(((atomicformula*) f)->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfLeaving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->LeavingArcs[i]->tr);
             }
             break;
         case geq:
         case gt:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfLeaving; i++) {
-                stubborninsert(((atomicformula*) f)->p->LeavingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfLeaving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->LeavingArcs[i]->tr);
             }
             break;
         case leq:
         case lt:
-            for (i = 0; i < ((atomicformula*) f)->p->NrOfArriving; i++) {
-                stubborninsert(((atomicformula*) f)->p->ArrivingArcs[i]->tr);
+            for (i = 0; i < static_cast<atomicformula*>(f)->p->NrOfArriving; i++) {
+                stubborninsert(static_cast<atomicformula*>(f)->p->ArrivingArcs[i]->tr);
             }
             break;
         case disj:
         case conj:
-            for (i = 0; i < ((booleanformula*) f)->cardsub; i++) {
-                insert_global_down(((booleanformula*) f)->sub[i]);
+            for (i = 0; i < static_cast<booleanformula*>(f)->cardsub; i++) {
+                insert_global_down(static_cast<booleanformula*>(f)->sub[i]);
             }
             break;
         case neg:
-            insert_global_up(((unarybooleanformula*) f)->sub);
+            insert_global_up(static_cast<unarybooleanformula*>(f)->sub);
             break;
         default:
             cout << "feature not implemented (yet)\n";
@@ -666,8 +661,8 @@ Transition** stubbornfirelistreach() {
     }
 
     Transition** Attr = (Globals::CurrentMarking[i] > Globals::Places[i]->target_marking)
-        ? Globals::Places[i]->PostTransitions
-        : Globals::Places[i]->PreTransitions;
+                        ? Globals::Places[i]->PostTransitions
+                        : Globals::Places[i]->PreTransitions;
 
     Transition::StartOfStubbornList = NULL;
     for (i = 0; Attr[i]; i++) {

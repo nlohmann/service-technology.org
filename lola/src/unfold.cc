@@ -233,7 +233,7 @@ bool UArrValue::iseqqual(UValue* val) {
     if (!type->iscompatible(val->type)) {
         return false;
     }
-    UArrValue* vv = (UArrValue*) val;
+    UArrValue* vv = static_cast<UArrValue*>(val);
     for (unsigned i = 0; i < (static_cast<UArrType*>(type))->index->size; i++) {
         if (!content[i]->iseqqual(vv->content[i])) {
             return false;
@@ -283,7 +283,7 @@ bool UArrValue::islesseqqual(UValue* val) {
     if (!type->iscompatible(val->type)) {
         return false;
     }
-    UArrValue* vv = (UArrValue*) val;
+    UArrValue* vv = static_cast<UArrValue*>(val);
     for (unsigned int i = 0; i < (static_cast<UArrType*>(type))->index->size; i++) {
         if (!content[i]->islesseqqual(vv->content[i])) {
             return false;
@@ -307,11 +307,11 @@ bool URecValue::islesseqqual(UValue* val) {
 
 void UNumValue::assign(UValue* val) {
     v = (static_cast<UNumValue*>(val))->v;
-    while (v < ((UNumType*) type)->lower) {
-        v += ((UNumType*) type)->size;
+    while (v < static_cast<UNumType*>(type)->lower) {
+        v += static_cast<UNumType*>(type)->size;
     }
-    while (v > ((UNumType*) type)->upper) {
-        v -= ((UNumType*) type)->size;
+    while (v > static_cast<UNumType*>(type)->upper) {
+        v -= static_cast<UNumType*>(type)->size;
     }
 }
 
@@ -324,7 +324,7 @@ void UEnuValue::assign(UValue* val) {
 }
 
 void UArrValue::assign(UValue* val) {
-    UArrValue* arr = (UArrValue*) val;
+    UArrValue* arr = static_cast<UArrValue*>(val);
     for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         content[i]->assign(arr->content[i]);
     }
@@ -413,8 +413,8 @@ void URecValue::assign(UValue* val) {
 
 void UNumValue::operator++ (int) {
     v++;
-    if (v > ((UNumType*) type)->upper) {
-        v = ((UNumType*) type)->lower;
+    if (v > static_cast<UNumType*>(type)->upper) {
+        v = static_cast<UNumType*>(type)->lower;
     }
 }
 
@@ -616,8 +616,7 @@ UValue* UCallExpression::evaluate() {
 UValue* UUneqqualExpression::evaluate() {
     UValue* l = left->evaluate();
     UValue* r = right->evaluate();
-    UBooValue* ret = (UBooValue*)(TheBooType->make());
-
+    UBooValue* ret = static_cast<UBooValue*>(TheBooType->make());
     ret->v = (not l->iseqqual(r));
     return ret;
 }
@@ -625,8 +624,7 @@ UValue* UUneqqualExpression::evaluate() {
 UValue* UEqualExpression::evaluate() {
     UValue* l = left->evaluate();
     UValue* r = right->evaluate();
-    UBooValue* ret = (UBooValue*)(TheBooType->make());
-
+    UBooValue* ret = static_cast<UBooValue*>(TheBooType->make());
     ret->v = l->iseqqual(r);
     return ret;
 }
@@ -634,8 +632,7 @@ UValue* UEqualExpression::evaluate() {
 UValue* UGreaterthanExpression::evaluate() {
     UValue* l = left->evaluate();
     UValue* r = right->evaluate();
-    UBooValue* ret = (UBooValue*)(TheBooType->make());
-
+    UBooValue* ret = static_cast<UBooValue*>(TheBooType->make());
     ret->v = (r->islesseqqual(l) and not l->iseqqual(r));
     return ret;
 }
@@ -643,7 +640,7 @@ UValue* UGreaterthanExpression::evaluate() {
 UValue* ULesseqqualExpression::evaluate() {
     UValue* l = left->evaluate();
     UValue* r = right->evaluate();
-    UBooValue* ret = (UBooValue*)(TheBooType->make());
+    UBooValue* ret = static_cast<UBooValue*>(TheBooType->make());
     ret->v = l->islesseqqual(r);
     return ret;
 }
@@ -652,7 +649,7 @@ UValue* ULesseqqualExpression::evaluate() {
 UValue* UGreatereqqualExpression::evaluate() {
     UValue* l = left->evaluate();
     UValue* r = right->evaluate();
-    UBooValue* ret = (UBooValue*)(TheBooType->make());
+    UBooValue* ret = static_cast<UBooValue*>(TheBooType->make());
     ret->v = r->islesseqqual(l);
     return ret;
 }
@@ -660,22 +657,22 @@ UValue* UGreatereqqualExpression::evaluate() {
 UValue* ULessthanExpression::evaluate() {
     UValue* l = left->evaluate();
     UValue* r = right->evaluate();
-    UBooValue* ret = (UBooValue*)(TheBooType->make());
+    UBooValue* ret = static_cast<UBooValue*>(TheBooType->make());
     ret->v = (l->islesseqqual(r) and not l->iseqqual(r));
     return ret;
 }
 
 
 UValue* UNumValue::mulop(UValue* scd) {
-    UNumValue* s = (UNumValue*) scd;
-    UNumValue* ret = (UNumValue*) type->make();
+    UNumValue* s = static_cast<UNumValue*>(scd);
+    UNumValue* ret = static_cast<UNumValue*>(type->make());
     ret->v = v * s->v;
     return ret;
 }
 
 UValue* UNumValue::divop(UValue* scd) {
-    UNumValue* s = (UNumValue*) scd;
-    UNumValue* ret = (UNumValue*) type->make();
+    UNumValue* s = static_cast<UNumValue*>(scd);
+    UNumValue* ret = static_cast<UNumValue*>(type->make());
 
     if (s->v == 0) {
         runtimeerror("division by zero");
@@ -686,8 +683,8 @@ UValue* UNumValue::divop(UValue* scd) {
 }
 
 UValue* UNumValue::modop(UValue* scd) {
-    UNumValue* s = (UNumValue*) scd;
-    UNumValue* ret = (UNumValue*) type->make();
+    UNumValue* s = static_cast<UNumValue*>(scd);
+    UNumValue* ret = static_cast<UNumValue*>(type->make());
 
     if (s->v == 0) {
         runtimeerror("division by zero");
@@ -698,34 +695,34 @@ UValue* UNumValue::modop(UValue* scd) {
 }
 
 UValue* UNumValue::subop(UValue* scd) {
-    UNumValue* s = (UNumValue*) scd;
-    UNumValue* ret = (UNumValue*) type->make();
+    UNumValue* s = static_cast<UNumValue*>(scd);
+    UNumValue* ret = static_cast<UNumValue*>(type->make());
     ret->v = v - s->v;
     return ret;
 }
 
 UValue* UNumValue::negop() {
-    UNumValue* ret = (UNumValue*) type->make();
+    UNumValue* ret = static_cast<UNumValue*>(type->make());
     ret->v = - v;
     return ret;
 }
 
 UValue* UBooValue::negop() {
-    UBooValue* ret = (UBooValue*) type->make();
+    UBooValue* ret = static_cast<UBooValue*>(type->make());
     ret->v = not v;
     return ret;
 }
 
 UValue* UNumValue::addop(UValue* scd) {
-    UNumValue* s = (UNumValue*) scd;
-    UNumValue* ret = (UNumValue*) type->make();
+    UNumValue* s = static_cast<UNumValue*>(scd);
+    UNumValue* ret = static_cast<UNumValue*>(type->make());
     ret->v = v + s->v;
     return ret;
 }
 
 UValue* UBooValue::mulop(UValue* scd) { // AND
-    UBooValue* s = (UBooValue*) scd;
-    UBooValue* ret = (UBooValue*) type->make();
+    UBooValue* s = static_cast<UBooValue*>(scd);
+    UBooValue* ret = static_cast<UBooValue*>(type->make());
 
     if (not v) {
         ret->v = false;
@@ -736,23 +733,23 @@ UValue* UBooValue::mulop(UValue* scd) { // AND
 }
 
 UValue* UBooValue::divop(UValue* scd) { // IFF
-    UBooValue* s = (UBooValue*) scd;
-    UBooValue* ret = (UBooValue*) type->make();
+    UBooValue* s = static_cast<UBooValue*>(scd);
+    UBooValue* ret = static_cast<UBooValue*>(type->make());
     ret->v = (s->v == v);
     return ret;
 }
 
 UValue* UBooValue::modop(UValue* scd) { // XOR
-    UBooValue* s = (UBooValue*) scd;
-    UBooValue* ret = (UBooValue*) type->make();
+    UBooValue* s = static_cast<UBooValue*>(scd);
+    UBooValue* ret = static_cast<UBooValue*>(type->make());
 
     ret->v = (s->v != v);
     return ret;
 }
 
 UValue* UBooValue::subop(UValue* scd) { // IMPLIES
-    UBooValue* s = (UBooValue*) scd;
-    UBooValue* ret = (UBooValue*) type->make();
+    UBooValue* s = static_cast<UBooValue*>(scd);
+    UBooValue* ret = static_cast<UBooValue*>(type->make());
     if (s->v or not v) {
         ret->v = true;
         return ret;
@@ -762,8 +759,8 @@ UValue* UBooValue::subop(UValue* scd) { // IMPLIES
 }
 
 UValue* UBooValue::addop(UValue* scd) { // OR
-    UBooValue* s = (UBooValue*) scd;
-    UBooValue* ret = (UBooValue*) type->make();
+    UBooValue* s = static_cast<UBooValue*>(scd);
+    UBooValue* ret = static_cast<UBooValue*>(type->make());
     if (v) {
         ret->v = true;
         return ret;
@@ -773,7 +770,7 @@ UValue* UBooValue::addop(UValue* scd) { // OR
 }
 
 UValue* UArrValue::negop() {
-    UArrValue* ret = (UArrValue*) type->make();
+    UArrValue* ret = static_cast<UArrValue*>(type->make());
     for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         ret->content[i] = content[i]->negop();
     }
@@ -781,8 +778,8 @@ UValue* UArrValue::negop() {
 }
 
 UValue* UArrValue::mulop(UValue* scd) {
-    UArrValue* s = (UArrValue*) scd;
-    UArrValue* ret = (UArrValue*) type->make();
+    UArrValue* s = static_cast<UArrValue*>(scd);
+    UArrValue* ret = static_cast<UArrValue*>(type->make());
     for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         ret->content[i] = content[i]->mulop(s->content[i]);
     }
@@ -790,8 +787,8 @@ UValue* UArrValue::mulop(UValue* scd) {
 }
 
 UValue* UArrValue::divop(UValue* scd) {
-    UArrValue* s = (UArrValue*) scd;
-    UArrValue* ret = (UArrValue*) type->make();
+    UArrValue* s = static_cast<UArrValue*>(scd);
+    UArrValue* ret = static_cast<UArrValue*>(type->make());
     for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         ret->content[i] = content[i]->divop(s->content[i]);
     }
@@ -799,8 +796,8 @@ UValue* UArrValue::divop(UValue* scd) {
 }
 
 UValue* UArrValue::modop(UValue* scd) {
-    UArrValue* s = (UArrValue*) scd;
-    UArrValue* ret = (UArrValue*) type->make();
+    UArrValue* s = static_cast<UArrValue*>(scd);
+    UArrValue* ret = static_cast<UArrValue*>(type->make());
     for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         ret->content[i] = content[i]->modop(s->content[i]);
     }
@@ -808,8 +805,8 @@ UValue* UArrValue::modop(UValue* scd) {
 }
 
 UValue* UArrValue::subop(UValue* scd) {
-    UArrValue* s = (UArrValue*) scd;
-    UArrValue* ret = (UArrValue*) type->make();
+    UArrValue* s = static_cast<UArrValue*>(scd);
+    UArrValue* ret = static_cast<UArrValue*>(type->make());
     for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         ret->content[i] = content[i]->subop(s->content[i]);
     }
@@ -817,8 +814,8 @@ UValue* UArrValue::subop(UValue* scd) {
 }
 
 UValue* UArrValue::addop(UValue* scd) {
-    UArrValue* s = (UArrValue*) scd;
-    UArrValue* ret = (UArrValue*) type->make();
+    UArrValue* s = static_cast<UArrValue*>(scd);
+    UArrValue* ret = static_cast<UArrValue*>(type->make());
     for (int i = (static_cast<UArrType*>(type))->index->size - 1; i >= 0; i--) {
         ret->content[i] = content[i]->addop(s->content[i]);
     }
@@ -826,7 +823,7 @@ UValue* UArrValue::addop(UValue* scd) {
 }
 
 UValue* URecValue::negop() {
-    URecValue* ret = (URecValue*) type->make();
+    URecValue* ret = static_cast<URecValue*>(type->make());
     for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         ret->content[i] = content[i]->negop();
     }
@@ -834,8 +831,8 @@ UValue* URecValue::negop() {
 }
 
 UValue* URecValue::addop(UValue* scd) {
-    URecValue* s = (URecValue*) scd;
-    URecValue* ret = (URecValue*) type->make();
+    URecValue* s = static_cast<URecValue*>(scd);
+    URecValue* ret = static_cast<URecValue*>(type->make());
     for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         ret->content[i] = content[i]->addop(s->content[i]);
     }
@@ -843,8 +840,8 @@ UValue* URecValue::addop(UValue* scd) {
 }
 
 UValue* URecValue::subop(UValue* scd) {
-    URecValue* s = (URecValue*) scd;
-    URecValue* ret = (URecValue*) type->make();
+    URecValue* s = static_cast<URecValue*>(scd);
+    URecValue* ret = static_cast<URecValue*>(type->make());
     for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         ret->content[i] = content[i]->subop(s->content[i]);
     }
@@ -852,8 +849,8 @@ UValue* URecValue::subop(UValue* scd) {
 }
 
 UValue* URecValue::mulop(UValue* scd) {
-    URecValue* s = (URecValue*) scd;
-    URecValue* ret = (URecValue*) type->make();
+    URecValue* s = static_cast<URecValue*>(scd);
+    URecValue* ret = static_cast<URecValue*>(type->make());
     for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         ret->content[i] = content[i]->mulop(s->content[i]);
     }
@@ -861,8 +858,8 @@ UValue* URecValue::mulop(UValue* scd) {
 }
 
 UValue* URecValue::divop(UValue* scd) {
-    URecValue* s = (URecValue*) scd;
-    URecValue* ret = (URecValue*) type->make();
+    URecValue* s = static_cast<URecValue*>(scd);
+    URecValue* ret = static_cast<URecValue*>(type->make());
     for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         ret->content[i] = content[i]->divop(s->content[i]);
     }
@@ -870,8 +867,8 @@ UValue* URecValue::divop(UValue* scd) {
 }
 
 UValue* URecValue::modop(UValue* scd) {
-    URecValue* s = (URecValue*) scd;
-    URecValue* ret = (URecValue*) type->make();
+    URecValue* s = static_cast<URecValue*>(scd);
+    URecValue* ret = static_cast<URecValue*>(type->make());
     for (int i = (static_cast<URecType*>(type))->card - 1; i >= 0; i--) {
         ret->content[i] = content[i]->modop(s->content[i]);
     }
@@ -879,7 +876,7 @@ UValue* URecValue::modop(UValue* scd) {
 }
 
 bool UNumValue::isfirst() {
-    return (v == ((UNumType*) type)->lower);
+    return (v == static_cast<UNumType*>(type)->lower);
 }
 
 bool UBooValue::isfirst() {
@@ -988,7 +985,7 @@ UValue* URecordExpression::evaluate() {
     }
 
     URecType* t = new URecType(rc); // leaks!
-    URecValue* a = (URecValue*)(t->make());
+    URecValue* a = static_cast<URecValue*>(t->make());
     for (unsigned int i = 0; i < card; ++i) {
         a->content[i]->assign(c[i]);
         delete c[i];
@@ -1021,7 +1018,7 @@ UValue* UVarLVal::dereference() {
 
 UValue* URecordLVal::dereference() {
     UValue* v = parent->dereference();
-    return ((URecValue*) v)->content[offset];
+    return static_cast<URecValue*>(v)->content[offset];
 }
 
 UValue* UArrayLVal::dereference() {
@@ -1100,11 +1097,11 @@ bool deep_compatible(UType* t1, UType* t2, UTypeClass t) {
         return false;
     }
     if (t1->tag == arr) {
-        return deep_compatible(((UArrType*) t1)->component, ((UArrType*) t2)->component, t);
+        return deep_compatible(static_cast<UArrType*>(t1)->component, static_cast<UArrType*>(t2)->component, t);
     } else {
         // t1->tag must be rec
         for (int i = 0; i < (static_cast<URecType*>(t1))->card; i++) {
-            if (!deep_compatible((static_cast<URecType*>(t1))->component[i], ((URecType*) t2)->component[i], t)) {
+            if (!deep_compatible((static_cast<URecType*>(t1))->component[i], static_cast<URecType*>(t2)->component[i], t)) {
                 return false;
             }
         }

@@ -279,35 +279,35 @@ void print_counterexample_ag(State* s, unarytemporalformula* f) {
 
 void print_check_path(State* ini, formula* form) {
     if ((form->type == ef) && ini->value[form->index]) {
-        print_witness_ef(ini, (unarytemporalformula*) form);
+        print_witness_ef(ini, static_cast<unarytemporalformula*>(form));
         return;
     }
     if ((form->type == ag) && !ini->value[form->index]) {
-        print_counterexample_ag(ini, (unarytemporalformula*) form);
+        print_counterexample_ag(ini, static_cast<unarytemporalformula*>(form));
         return;
     }
     if ((form->type == eg) && ini->value[form->index]) {
-        print_witness_eg(ini, (unarytemporalformula*) form);
+        print_witness_eg(ini, static_cast<unarytemporalformula*>(form));
         return;
     }
     if ((form->type == eu) && ini->value[form->index]) {
-        print_witness_eu(ini, (untilformula*) form);
+        print_witness_eu(ini, static_cast<untilformula*>(form));
         return;
     }
     if ((form->type == ex) && ini->value[form->index]) {
-        print_witness_ex(ini, (unarytemporalformula*) form);
+        print_witness_ex(ini, static_cast<unarytemporalformula*>(form));
         return;
     }
     if ((form->type == ax) && !ini->value[form->index]) {
-        print_counterexample_ax(ini, (unarytemporalformula*) form);
+        print_counterexample_ax(ini, static_cast<unarytemporalformula*>(form));
         return;
     }
     if ((form->type == af) && !ini->value[form->index]) {
-        print_counterexample_af(ini, (unarytemporalformula*) form);
+        print_counterexample_af(ini, static_cast<unarytemporalformula*>(form));
         return;
     }
     if ((form->type == au) && !ini->value[form->index]) {
-        print_counterexample_au(ini, (untilformula*) form);
+        print_counterexample_au(ini, static_cast<untilformula*>(form));
         return;
     }
     if (form->type != neg && form->type != conj && form->type != disj) {
@@ -315,15 +315,15 @@ void print_check_path(State* ini, formula* form) {
         return;
     }
     if (form->type == neg) {
-        print_check_path(ini, ((unarybooleanformula*) form)->sub);
+        print_check_path(ini, static_cast<unarybooleanformula*>(form)->sub);
         return;
     }
     if (form->type == conj) {
         unsigned int i;
-        for (i = 0; i < ((booleanformula*) form)->cardsub; i++) {
+        for (i = 0; i < static_cast<booleanformula*>(form)->cardsub; i++) {
             cout << "CONJ. " << i << ":\n";
-            print_check_path(ini, ((booleanformula*) form)->sub[i]);
-            if (!(ini->value[((booleanformula*) form)->sub[i]->index])) {
+            print_check_path(ini, static_cast<booleanformula*>(form)->sub[i]);
+            if (!(ini->value[static_cast<booleanformula*>(form)->sub[i]->index])) {
                 break;
             }
         }
@@ -331,10 +331,10 @@ void print_check_path(State* ini, formula* form) {
     }
     if (form->type == disj) {
         unsigned int i;
-        for (i = 0; i < ((booleanformula*) form)->cardsub; i++) {
+        for (i = 0; i < static_cast<booleanformula*>(form)->cardsub; i++) {
             cout << "DISJ. " << i << ":\n";
-            print_check_path(ini, ((booleanformula*) form)->sub[i]);
-            if (ini->value[((booleanformula*) form)->sub[i]->index]) {
+            print_check_path(ini, static_cast<booleanformula*>(form)->sub[i]);
+            if (ini->value[static_cast<booleanformula*>(form)->sub[i]->index]) {
                 break;
             }
         }
@@ -344,35 +344,35 @@ void print_check_path(State* ini, formula* form) {
 
 void print_check_path(State* ini, formula* form, ofstream& out) {
     if ((form->type == ef) && ini->value[form->index]) {
-        print_witness_ef(ini, (unarytemporalformula*) form, out);
+        print_witness_ef(ini, static_cast<unarytemporalformula*>(form), out);
         return;
     }
     if ((form->type == ag) && !ini->value[form->index]) {
-        print_counterexample_ag(ini, (unarytemporalformula*) form, out);
+        print_counterexample_ag(ini, static_cast<unarytemporalformula*>(form), out);
         return;
     }
     if ((form->type == eg) && ini->value[form->index]) {
-        print_witness_eg(ini, (unarytemporalformula*) form, out);
+        print_witness_eg(ini, static_cast<unarytemporalformula*>(form), out);
         return;
     }
     if ((form->type == eu) && ini->value[form->index]) {
-        print_witness_eu(ini, (untilformula*) form, out);
+        print_witness_eu(ini, static_cast<untilformula*>(form), out);
         return;
     }
     if ((form->type == ex) && ini->value[form->index]) {
-        print_witness_ex(ini, (unarytemporalformula*) form, out);
+        print_witness_ex(ini, static_cast<unarytemporalformula*>(form), out);
         return;
     }
     if ((form->type == ax) && !ini->value[form->index]) {
-        print_counterexample_ax(ini, (unarytemporalformula*) form, out);
+        print_counterexample_ax(ini, static_cast<unarytemporalformula*>(form), out);
         return;
     }
     if ((form->type == af) && !ini->value[form->index]) {
-        print_counterexample_af(ini, (unarytemporalformula*) form, out);
+        print_counterexample_af(ini, static_cast<unarytemporalformula*>(form), out);
         return;
     }
     if ((form->type == au) && !ini->value[form->index]) {
-        print_counterexample_au(ini, (untilformula*) form, out);
+        print_counterexample_au(ini, static_cast<untilformula*>(form), out);
         return;
     }
     if (form->type != neg && form->type != conj && form->type != disj) {
@@ -380,15 +380,15 @@ void print_check_path(State* ini, formula* form, ofstream& out) {
         return;
     }
     if (form->type == neg) {
-        print_check_path(ini, ((unarybooleanformula*) form)->sub, out);
+        print_check_path(ini, static_cast<unarybooleanformula*>(form)->sub, out);
         return;
     }
     if (form->type == conj) {
         unsigned int i;
-        for (i = 0; i < ((booleanformula*) form)->cardsub; i++) {
+        for (i = 0; i < static_cast<booleanformula*>(form)->cardsub; i++) {
             out << "CONJ. " << i << ":\n";
-            print_check_path(ini, ((booleanformula*) form)->sub[i], out);
-            if (!(ini->value[((booleanformula*) form)->sub[i]->index])) {
+            print_check_path(ini, static_cast<booleanformula*>(form)->sub[i], out);
+            if (!(ini->value[static_cast<booleanformula*>(form)->sub[i]->index])) {
                 break;
             }
         }
@@ -396,10 +396,10 @@ void print_check_path(State* ini, formula* form, ofstream& out) {
     }
     if (form->type == disj) {
         unsigned int i;
-        for (i = 0; i < ((booleanformula*) form)->cardsub; i++) {
+        for (i = 0; i < static_cast<booleanformula*>(form)->cardsub; i++) {
             out << "DISJ. " << i << ":\n";
-            print_check_path(ini, ((booleanformula*) form)->sub[i], out);
-            if (ini->value[((booleanformula*) form)->sub[i]->index]) {
+            print_check_path(ini, static_cast<booleanformula*>(form)->sub[i], out);
+            if (ini->value[static_cast<booleanformula*>(form)->sub[i]->index]) {
                 break;
             }
         }
@@ -682,8 +682,8 @@ void check(State* s, formula* f) {
     }
     switch (f->type) {
         case neg:
-            check(s, ((unarybooleanformula*) f)->sub);
-            if (s->value[((unarybooleanformula*) f)->sub->index]) {
+            check(s, static_cast<unarybooleanformula*>(f)->sub);
+            if (s->value[static_cast<unarybooleanformula*>(f)->sub->index]) {
                 s->value[f->index] = false;
             } else {
                 s->value[f->index] = true;
@@ -693,16 +693,16 @@ void check(State* s, formula* f) {
 
         case conj:
             checkstart[f->index]++;
-            checkstart[f->index] %= ((booleanformula*) f)->cardsub;
+            checkstart[f->index] %= static_cast<booleanformula*>(f)->cardsub;
             for (i = checkstart[f->index];;) {
-                check(s, ((booleanformula*) f)->sub[i]);
-                if (!(s->value[((booleanformula*) f)->sub[i]->index])) {
+                check(s, static_cast<booleanformula*>(f)->sub[i]);
+                if (!(s->value[static_cast<booleanformula*>(f)->sub[i]->index])) {
                     s->value[f->index] = false;
                     s->known[f->index] = true;
                     return;
                 }
                 i++;
-                i %= ((booleanformula*) f)->cardsub ;
+                i %= static_cast<booleanformula*>(f)->cardsub ;
                 if (i == checkstart[f->index]) {
                     break;
                 }
@@ -713,17 +713,17 @@ void check(State* s, formula* f) {
 
         case disj:
             checkstart[f->index]++;
-            checkstart[f->index] %= ((booleanformula*) f)->cardsub;
+            checkstart[f->index] %= static_cast<booleanformula*>(f)->cardsub;
             for (i = checkstart[f->index];;) {
 
-                check(s, ((booleanformula*) f)->sub[i]);
-                if (s->value[((booleanformula*) f)->sub[i]->index]) {
+                check(s, static_cast<booleanformula*>(f)->sub[i]);
+                if (s->value[static_cast<booleanformula*>(f)->sub[i]->index]) {
                     s->value[f->index] = true;
                     s->known[f->index] = true;
                     return;
                 }
                 i++;
-                i %= ((booleanformula*) f)->cardsub ;
+                i %= static_cast<booleanformula*>(f)->cardsub ;
                 if (i == checkstart[f->index]) {
                     break;
                 }
@@ -733,90 +733,90 @@ void check(State* s, formula* f) {
             return;
 
         case ef:
-            check(s, ((unarytemporalformula*) f)->element);
-            if (s->value[((unarytemporalformula*) f)->element->index]) {
+            check(s, static_cast<unarytemporalformula*>(f)->element);
+            if (s->value[static_cast<unarytemporalformula*>(f)->element->index]) {
                 s->value[f->index] = s->known[f->index] = true;
                 s->witness[f->tempindex] = NULL;
                 s->witnesstransition[f->tempindex] = NULL;
                 return;
             }
-            searchEF(s, (unarytemporalformula*) f);
+            searchEF(s, static_cast<unarytemporalformula*>(f));
             return;
 
         case ag:
-            check(s, ((unarytemporalformula*) f)->element);
-            if (!s->value[((unarytemporalformula*) f)->element->index]) {
+            check(s, static_cast<unarytemporalformula*>(f)->element);
+            if (!s->value[static_cast<unarytemporalformula*>(f)->element->index]) {
                 s->value[f->index] = false;
                 s->known[f->index] = true;
                 s->witness[f->tempindex] = NULL;
                 s->witnesstransition[f->tempindex] = NULL;
                 return;
             }
-            searchAG(s, (unarytemporalformula*) f);
+            searchAG(s, static_cast<unarytemporalformula*>(f));
             return;
 
         case eu:
-            check(s, ((untilformula*) f)->goal);
-            if (s->value[((untilformula*) f)->goal->index]) {
+            check(s, static_cast<untilformula*>(f)->goal);
+            if (s->value[static_cast<untilformula*>(f)->goal->index]) {
                 s->value[f->index] = true;
                 s->known[f->index] = true;
                 s->witness[f->tempindex] = NULL;
                 s->witnesstransition[f->tempindex] = NULL;
                 return;
             }
-            check(s, ((untilformula*) f)->hold);
-            if (!s->value[((untilformula*) f)->hold->index]) {
+            check(s, static_cast<untilformula*>(f)->hold);
+            if (!s->value[static_cast<untilformula*>(f)->hold->index]) {
                 s->value[f->index] = false;
                 s->known[f->index] = true;
                 return;
             }
-            searchEU(s, ((untilformula*) f));
+            searchEU(s, static_cast<untilformula*>(f));
             return;
 
         case eg:
-            check(s, ((unarytemporalformula*) f)->element);
-            if (!s->value[((unarytemporalformula*) f)->element->index]) {
+            check(s, static_cast<unarytemporalformula*>(f)->element);
+            if (!s->value[static_cast<unarytemporalformula*>(f)->element->index]) {
                 s->value[f->index] = false;
                 s->known[f->index] = true;
                 return;
             }
-            searchEG(s, (unarytemporalformula*) f);
+            searchEG(s, static_cast<unarytemporalformula*>(f));
             return;
 
         case af:
-            check(s, ((unarytemporalformula*) f)->element);
-            if (s->value[((unarytemporalformula*) f)->element->index]) {
+            check(s, static_cast<unarytemporalformula*>(f)->element);
+            if (s->value[static_cast<unarytemporalformula*>(f)->element->index]) {
                 s->value[f->index] = true;
                 s->known[f->index] = true;
                 return;
             }
-            searchAF(s, (unarytemporalformula*) f);
+            searchAF(s, static_cast<unarytemporalformula*>(f));
             return;
 
         case au:
-            check(s, ((untilformula*) f)->goal);
-            if (s->value[((untilformula*) f)->goal->index]) {
+            check(s, static_cast<untilformula*>(f)->goal);
+            if (s->value[static_cast<untilformula*>(f)->goal->index]) {
                 s->value[f->index] = true;
                 s->known[f->index] = true;
                 return;
             }
-            check(s, ((untilformula*) f)->hold);
-            if (!s->value[((untilformula*) f)->hold->index]) {
+            check(s, static_cast<untilformula*>(f)->hold);
+            if (!s->value[static_cast<untilformula*>(f)->hold->index]) {
                 s->value[f->index] = false;
                 s->known[f->index] = true;
                 s->witness[f->tempindex] = NULL;
                 s->witnesstransition[f->tempindex] = NULL;
                 return;
             }
-            searchAU(s, ((untilformula*) f));
+            searchAU(s, static_cast<untilformula*>(f));
             return;
 
         case ex:
-            searchEX(s, ((unarytemporalformula*) f));
+            searchEX(s, static_cast<unarytemporalformula*>(f));
             return;
 
         case ax:
-            searchAX(s, ((unarytemporalformula*) f));
+            searchAX(s, static_cast<unarytemporalformula*>(f));
             return;
 
         default:

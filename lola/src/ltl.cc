@@ -571,8 +571,8 @@ unsigned int depth_first() {
                 if (CurrentState -> persistent) {
                     (*graphstream) << " persistent ";
                 }
-                int j = 0;
                 if (graphformat == 'm') {
+                    int j = 0;
                     for (i = 0; i < Places[0]->cnt; i++) {
                         if (CurrentMarking[i]) {
                             if (CurrentMarking[i] == VERYLARGE) {
@@ -594,8 +594,8 @@ unsigned int depth_first() {
             }
             if (GMflg) {
                 cout << "STATE " << CurrentState ->dfs;
-                int j = 0;
                 if (graphformat == 'm') {
+                    int j = 0;
                     for (i = 0; i < Places[0]->cnt; i++) {
                         if (CurrentMarking[i]) {
                             if (CurrentMarking[i] == VERYLARGE) {

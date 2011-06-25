@@ -150,10 +150,10 @@ UValue* UArrType::make() {
 }
 
 bool UArrType::iscompatible(UType* t) {
-    if (t->tag != arr or((UArrType*) t)->index->size != index->size) {
+    if (t->tag != arr or static_cast<UArrType*>(t)->index->size != index->size) {
         return false;
     }
-    return (component->iscompatible(((UArrType*) t)->component));
+    return (component->iscompatible(static_cast<UArrType*>(t)->component));
 }
 
 URcList::URcList(RcSymbol* _sy, UType* _ty, URcList* _next) : sy(_sy), ty(_ty), next(_next) {}
@@ -190,11 +190,11 @@ bool URecType::iscompatible(UType* t) {
     if (t->tag != rec) {
         return false;
     }
-    if (((URecType*) t)->card != card) {
+    if (static_cast<URecType*>(t)->card != card) {
         return false;
     }
     for (int i = 0; i < card ; i++) {
-        if (!(component[i]->iscompatible(((URecType*) t)->component[i]))) {
+        if (!(component[i]->iscompatible(static_cast<URecType*>(t)->component[i]))) {
             return(false);
         }
     }
@@ -354,8 +354,8 @@ char* UBooValue::text() {
 }
 
 char* UEnuValue::text() {
-    char* c = new char [ strlen(((UEnuType*) type)->tags[v]->name)];
-    strcpy(c, ((UEnuType*) type)->tags[v]->name);
+    char* c = new char [ strlen(static_cast<UEnuType*>(type)->tags[v]->name)];
+    strcpy(c, static_cast<UEnuType*>(type)->tags[v]->name);
     return c;
 }
 
@@ -440,13 +440,13 @@ UValue* UEnuValue::copy() {
 
 void UEnuValue::operator++ (int) {
     ++v;
-    if ((unsigned int)v >= ((UEnuType*) type)->size) {
+    if ((unsigned int)v >= static_cast<UEnuType*>(type)->size) {
         v = 0;
     }
 }
 
 void UEnuValue::print(ostream& os) {
-    os << ((UEnuType*) type)->tags[v]->name;
+    os << static_cast<UEnuType*>(type)->tags[v]->name;
 }
 
 UValue* UArrValue::copy() {
@@ -506,7 +506,7 @@ void URecValue::print(ostream& os) {
 }
 
 void UWhileStatement::execute() {
-    while (((UBooValue*)(cond->evaluate()))->v == true) {
+    while (static_cast<UBooValue*>(cond->evaluate())->v == true) {
         body->execute();
     }
 }
@@ -514,7 +514,7 @@ void UWhileStatement::execute() {
 void URepeatStatement::execute() {
     do {
         body->execute();
-    } while (((UBooValue*)(cond->evaluate()))->v != true);
+    } while (static_cast<UBooValue*>(cond->evaluate())->v != true);
 }
 
 void UAssignStatement::execute() {
@@ -1003,7 +1003,7 @@ UValue* UArrayExpression::evaluate() {
         c[i] = cont[i]->evaluate();
     }
     UArrType* t = new UArrType(it, c[0]->type); // leaks!
-    UArrValue* a = (UArrValue*)(t->make());
+    UArrValue* a = static_cast<UArrValue*>(t->make());
     for (unsigned int i = 0; i < card; i++) {
         a->content[i]->assign(c[i]);
         delete c[i];
@@ -1026,13 +1026,13 @@ UValue* UArrayLVal::dereference() {
     UValue* v = parent->dereference();
     UValue* in = idx->evaluate();
     if (indextype->tag == boo) {
-        if (((UBooValue*) in)->v) {
+        if (static_cast<UBooValue*>(in)->v) {
             i = 1;
         } else {
             i = 0;
         }
     } else {
-        i = (((UNumValue*) in)->v - ((UNumType*) indextype)->lower)
+        i = (static_cast<UNumValue*>(in)->v - static_cast<UNumType*>(indextype)->lower)
             % indextype->size ;
     }
     return ((UArrValue*) v)->content[i];
@@ -1049,7 +1049,7 @@ void UVar::assign(UValue* v) {
 void UFunction::enter() {
     for (unsigned int i = 0; i < localsymb->size; i++) {
         for (Symbol* s = localsymb->table[i]; s ; s = s->next) {
-            UVar* va = ((VaSymbol*) s)->var;
+            UVar* va = static_cast<VaSymbol*>(s)->var;
             UValueList* l = new UValueList;
             l->val = va->value;
             l->next = va->stack;
@@ -1069,7 +1069,7 @@ void UFunction::enter() {
 void UFunction::leave() {
     for (unsigned int i = 0; i < localsymb->size; i++) {
         for (Symbol* s = localsymb->table[i]; s; s = s->next) {
-            UVar* va = ((VaSymbol*) s)->var;
+            UVar* va = static_cast<VaSymbol*>(s)->var;
             UValueList* l = va->stack;
             va->value = l->val;
             va->stack = l->next;;

@@ -27,7 +27,7 @@ void graphreport_yes::tell() {
     }
     *graphstream << "\n" << endl;
     *graphstream << "Fire list: \n";
-    for (int i = 0; i < Globals::Transitions[0]->cnt; ++i) {
+    for (unsigned int i = 0; i < Globals::Transitions[0]->cnt; ++i) {
         *graphstream << Globals::Transitions[i] -> name << "\n";
     }
 }

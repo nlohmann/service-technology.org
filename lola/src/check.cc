@@ -314,7 +314,7 @@ void print_check_path(State* ini, formula* form) {
         cout << "NO PATH\n";
         return;
     }
-    if ((form->type == neg)) {
+    if (form->type == neg) {
         print_check_path(ini, ((unarybooleanformula*) form)->sub);
         return;
     }
@@ -367,7 +367,7 @@ void print_check_path(State* ini, formula* form, ofstream& out) {
         print_counterexample_ax(ini, (unarytemporalformula*) form, out);
         return;
     }
-    if ((form->type == af) && !ini->value[form->index], out) {
+    if ((form->type == af) && !ini->value[form->index]) {
         print_counterexample_af(ini, (unarytemporalformula*) form, out);
         return;
     }
@@ -379,7 +379,7 @@ void print_check_path(State* ini, formula* form, ofstream& out) {
         out << "NO PATH\n";
         return;
     }
-    if ((form->type == neg)) {
+    if (form->type == neg) {
         print_check_path(ini, ((unarybooleanformula*) form)->sub, out);
         return;
     }
@@ -416,12 +416,12 @@ int modelcheck() {
         }
 #endif
         Globals::Transitions[i]->pathrestriction = new bool [F->tempcard];
-        for (int j = 0; j < F->tempcard; j++) {
+        for (unsigned int j = 0; j < F->tempcard; j++) {
             Globals::Transitions[i]->pathrestriction[j] = false;
         }
     }
     DeadStatePathRestriction = new bool [F->tempcard];
-    for (int j = 0; j < F->tempcard; j++) {
+    for (unsigned int j = 0; j < F->tempcard; j++) {
         DeadStatePathRestriction[j] = true;
     }
 
@@ -857,7 +857,7 @@ void searchEF(State* s, unarytemporalformula* f) {
         if (CurrentState->checkfirelist[f->tempindex][CurrentState->checkcurrent[f->tempindex]]) {
             // there is a next state that needs to be explored
             CurrentState->checkfirelist[f->tempindex][CurrentState->checkcurrent[f->tempindex]]->fire();
-            if (NewState = binSearch()) {
+            if ((NewState = binSearch())) {
                 Edges ++;
                 if (!(Edges % REPORTFREQUENCY)) {
                     report_statistics();
@@ -1158,7 +1158,7 @@ void searchAG(State* s, unarytemporalformula* f) {
         if (CurrentState->checkfirelist[f->tempindex][CurrentState->checkcurrent[f->tempindex]]) {
             // there is a next state that needs to be explored
             CurrentState->checkfirelist[f->tempindex][CurrentState->checkcurrent[f->tempindex]]->fire();
-            if (NewState = binSearch()) {
+            if ((NewState = binSearch())) {
                 Edges ++;
                 if (!(Edges % REPORTFREQUENCY)) {
                     report_statistics();
@@ -1353,7 +1353,7 @@ void searchEU(State* s, untilformula* f) {
             if (!(Edges % REPORTFREQUENCY)) {
                 report_statistics();
             }
-            if (NewState = binSearch()) {
+            if ((NewState = binSearch())) {
                 // state exists
                 if (NewState->known[f->index]) {
                     // state exists, value known
@@ -1530,7 +1530,7 @@ void searchEU(State* s, untilformula* f) {
                 }
             }
             // return to previous state
-            if (NewState = CurrentState->checkparent[f->tempindex]) {
+            if ((NewState = CurrentState->checkparent[f->tempindex])) {
                 if (NewState->checkmin[f->tempindex] > CurrentState->checkmin[f->tempindex]) {
                     NewState->checkmin[f->tempindex] = CurrentState->checkmin[f->tempindex];
                     NewState->witness[f->tempindex] = CurrentState;
@@ -1544,7 +1544,7 @@ void searchEU(State* s, untilformula* f) {
     }
     if (found) {
         // set witness for current path
-        while (NewState = CurrentState->checkparent[f->tempindex]) {
+        while ((NewState = CurrentState->checkparent[f->tempindex])) {
             NewState->witness[f->tempindex] = CurrentState;
             NewState->witnesstransition[f->tempindex] = NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]];
             NewState->value[f->index] = true;
@@ -1609,7 +1609,7 @@ void futuresearchAU(State* s, untilformula* f) {
                 if (!(Edges % REPORTFREQUENCY)) {
                     report_statistics();
                 }
-                if (NewState = binSearch()) {
+                if ((NewState = binSearch())) {
                     // state exists
                     if (NewState->known[f->index]) {
                         // state exists, value known
@@ -1863,7 +1863,7 @@ void futuresearchAU(State* s, untilformula* f) {
                     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 }
                 // return to previous state
-                if (NewState = CurrentState->checkparent[f->tempindex]) {
+                if ((NewState = CurrentState->checkparent[f->tempindex])) {
                     if (NewState->checkmin[f->tempindex] > CurrentState->checkmin[f->tempindex]) {
                         NewState->checkmin[f->tempindex] = CurrentState->checkmin[f->tempindex];
                         NewState->witness[f->tempindex] = CurrentState;
@@ -1878,7 +1878,7 @@ void futuresearchAU(State* s, untilformula* f) {
     }
     if (found) {
         // set witness for current path
-        while (NewState = CurrentState->checkparent[f->tempindex]) {
+        while ((NewState = CurrentState->checkparent[f->tempindex])) {
             NewState->witness[f->tempindex] = CurrentState;
             NewState->witnesstransition[f->tempindex] = NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]];
             NewState->value[f->index] = true;
@@ -1925,7 +1925,7 @@ void searchAU(State* s, untilformula* f) {
             if (!(Edges % REPORTFREQUENCY)) {
                 report_statistics();
             }
-            if (NewState = binSearch()) {
+            if ((NewState = binSearch())) {
                 // state exists
                 if (NewState->known[f->index]) {
                     // state exists, value known
@@ -2023,7 +2023,7 @@ void searchAU(State* s, untilformula* f) {
         } else {
             // return to previous state
             CurrentState->value[f->index] = true;
-            if (NewState = CurrentState->checkparent[f->tempindex]) {
+            if ((NewState = CurrentState->checkparent[f->tempindex])) {
                 NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]]->backfire();
                 NewState->checkcurrent[f->tempindex]++;
             }
@@ -2032,7 +2032,7 @@ void searchAU(State* s, untilformula* f) {
     }
     if (found) {
         // set witness for current path
-        while (NewState = CurrentState->checkparent[f->tempindex]) {
+        while ((NewState = CurrentState->checkparent[f->tempindex])) {
             NewState->witness[f->tempindex] = CurrentState;
             NewState->witnesstransition[f->tempindex] = NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]];
             NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]]->backfire();
@@ -2068,7 +2068,7 @@ void searchAF(State* s, unarytemporalformula* f) {
             if (!(Edges % REPORTFREQUENCY)) {
                 report_statistics();
             }
-            if (NewState = binSearch()) {
+            if ((NewState = binSearch())) {
                 if (NewState->known[f->index]) {
                     // state exists, value known
                     if (!NewState->value[f->index]) {
@@ -2156,7 +2156,7 @@ void searchAF(State* s, unarytemporalformula* f) {
                     }
                 }
             }
-            if (NewState = CurrentState->checkparent[f->tempindex]) {
+            if ((NewState = CurrentState->checkparent[f->tempindex])) {
                 NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]]->backfire();
                 NewState->checkcurrent[f->tempindex]++;
             }
@@ -2165,7 +2165,7 @@ void searchAF(State* s, unarytemporalformula* f) {
     }
     if (found) {
         // set witness for current path
-        while (NewState = CurrentState->checkparent[f->tempindex]) {
+        while ((NewState = CurrentState->checkparent[f->tempindex])) {
             NewState->witness[f->tempindex] = CurrentState;
             NewState->witnesstransition[f->tempindex] = NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]];
             NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]]->backfire();
@@ -2202,7 +2202,7 @@ void searchEG(State* s, unarytemporalformula* f) {
             if (!(Edges % REPORTFREQUENCY)) {
                 report_statistics();
             }
-            if (NewState = binSearch()) {
+            if ((NewState = binSearch())) {
                 // state exists
                 if (NewState->known[f->index]) {
                     // state exists, value known
@@ -2291,7 +2291,7 @@ void searchEG(State* s, unarytemporalformula* f) {
                     }
                 }
             }
-            if (NewState = CurrentState->checkparent[f->tempindex]) {
+            if ((NewState = CurrentState->checkparent[f->tempindex])) {
                 NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]]->backfire();
                 NewState->checkcurrent[f->tempindex]++;
             }
@@ -2300,7 +2300,7 @@ void searchEG(State* s, unarytemporalformula* f) {
     }
     if (found) {
         // set witness for current path
-        while (NewState = CurrentState->checkparent[f->tempindex]) {
+        while ((NewState = CurrentState->checkparent[f->tempindex])) {
             NewState->witness[f->tempindex] = CurrentState;
             NewState->witnesstransition[f->tempindex] = NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]];
             NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]]->backfire();
@@ -2343,7 +2343,7 @@ void futuresearchAF(State* s, unarytemporalformula* f) {
                 if (!(Edges % REPORTFREQUENCY)) {
                     report_statistics();
                 }
-                if (NewState = binSearch()) {
+                if ((NewState = binSearch())) {
                     // state exists
                     if (NewState->known[f->index]) {
                         // state exists, value known
@@ -2437,7 +2437,7 @@ void futuresearchAF(State* s, unarytemporalformula* f) {
             } else {
                 // return to previous state
                 CurrentState->value[f->index] = true;
-                if (NewState = CurrentState->checkparent[f->tempindex]) {
+                if ((NewState = CurrentState->checkparent[f->tempindex])) {
                     NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]]->backfire();
                     NewState->checkcurrent[f->tempindex]++;
                 }
@@ -2447,7 +2447,7 @@ void futuresearchAF(State* s, unarytemporalformula* f) {
     }
     if (found) {
         // set witness for current path
-        while (NewState = CurrentState->checkparent[f->tempindex]) {
+        while ((NewState = CurrentState->checkparent[f->tempindex])) {
             NewState->witness[f->tempindex] = CurrentState;
             NewState->witnesstransition[f->tempindex] = NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]];
             NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]]->backfire();
@@ -2493,7 +2493,7 @@ void futuresearchEG(State* s, unarytemporalformula* f) {
                 if (!(Edges % REPORTFREQUENCY)) {
                     report_statistics();
                 }
-                if (NewState = binSearch()) {
+                if ((NewState = binSearch())) {
                     // state exists
                     if (NewState->known[f->index]) {
                         // state exists, value known
@@ -2583,7 +2583,7 @@ void futuresearchEG(State* s, unarytemporalformula* f) {
             } else {
                 // return to previous state
                 CurrentState->value[f->index] = false;
-                if (NewState = CurrentState->checkparent[f->tempindex]) {
+                if ((NewState = CurrentState->checkparent[f->tempindex])) {
                     NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]]->backfire();
                     NewState->checkcurrent[f->tempindex]++;
                 }
@@ -2593,7 +2593,7 @@ void futuresearchEG(State* s, unarytemporalformula* f) {
     }
     if (found) {
         // set witness for current path
-        while (NewState = CurrentState->checkparent[f->tempindex]) {
+        while ((NewState = CurrentState->checkparent[f->tempindex])) {
             NewState->witness[f->tempindex] = CurrentState;
             NewState->witnesstransition[f->tempindex] = NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]];
             NewState->checkfirelist[f->tempindex][NewState->checkcurrent[f->tempindex]]->backfire();

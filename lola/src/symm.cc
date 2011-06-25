@@ -2337,7 +2337,7 @@ State* canonical_representitive_on_the_fly() {
 }
 
 void PrintStore() {
-    for (int etage = 0; etage < CardStore; ++etage) {
+    for (unsigned int etage = 0; etage < CardStore; ++etage) {
         cout << "Etage " << etage << "; arg=" << Store[etage].arg->name << " card=" << Store[etage].card << endl;
     }
 }

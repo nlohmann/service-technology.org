@@ -2088,13 +2088,13 @@ automaton:
             }
         }
         // process all guard formulas
-        int i, j, res;
-        for (i = 0; i < Globals::Places[0]->NrSignificant; i++) {
+        for (unsigned int i = 0; i < Globals::Places[0]->NrSignificant; i++) {
             Globals::Places[i]->cardprop = 0;
             Globals::Places[i]->propositions = NULL;
         }
-        for (i = 0; i < buchistate::nr; i++)
-            for (j = 0; j < buchiautomaton[i]->nrdelta; j++) {
+        for (int i = 0; i < buchistate::nr; i++)
+            for (int j = 0; j < buchiautomaton[i]->nrdelta; j++) {
+                int res;
                 buchiautomaton[i]->delta[j]->guard = buchiautomaton[i]->delta[j]->guard->replacequantifiers();
                 buchiautomaton[i]->delta[j]->guard->tempcard = 0;
                 buchiautomaton[i]->delta[j]->guard = buchiautomaton[i]->delta[j]->guard->merge();
@@ -2105,8 +2105,8 @@ automaton:
                 buchiautomaton[i]->delta[j]->guard = buchiautomaton[i]->delta[j]->guard->posate();
                 buchiautomaton[i]->delta[j]->guard->tempcard = 0;
             }
-        for (i = 0; i < buchistate::nr; i++)
-            for (j = 0; j < buchiautomaton[i]->nrdelta; j++) {
+        for (int i = 0; i < buchistate::nr; i++)
+            for (int j = 0; j < buchiautomaton[i]->nrdelta; j++) {
                 buchiautomaton[i]->delta[j]->guard->setstatic();
                 if (buchiautomaton[i]->delta[j]->guard->tempcard) {
                     yyerror("temporal operators not allowed in Buchi automaton");

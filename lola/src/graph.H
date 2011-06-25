@@ -112,7 +112,7 @@ inline State::State() {
     witnesstransition = new Transition * [F -> tempcard + 5];
     value = new bool [F -> card + 5];
     known = new bool [F -> card + 5];
-    for (int i = 0; i < F->card; i++) {
+    for (unsigned int i = 0; i < F->card; i++) {
         known[i] = false;
     }
     checkfirelist = new Transition** [F-> tempcard + 5];
@@ -128,7 +128,7 @@ inline State::State() {
     checkddfs = new unsigned int [ F -> tempcard];
     checkmmin = new unsigned int [F -> tempcard];
     checktarlevel = new unsigned int [ F -> tempcard];
-    for (int i = 0; i < F->tempcard; i++) {
+    for (unsigned int i = 0; i < F->tempcard; i++) {
         witness[i] = NULL;
         witnesstransition[i] = NULL;
         checkexpired[i] = false;

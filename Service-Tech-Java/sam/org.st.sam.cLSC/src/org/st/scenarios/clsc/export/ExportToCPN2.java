@@ -22,18 +22,28 @@ package org.st.scenarios.clsc.export;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.Set;
 
+import org.cpntools.accesscpn.model.Arc;
+import org.cpntools.accesscpn.model.HasId;
 import org.cpntools.accesscpn.model.Instance;
+import org.cpntools.accesscpn.model.Node;
+import org.cpntools.accesscpn.model.Object;
 import org.cpntools.accesscpn.model.Page;
 import org.cpntools.accesscpn.model.PetriNet;
 import org.cpntools.accesscpn.model.Place;
 import org.cpntools.accesscpn.model.PlaceNode;
 import org.cpntools.accesscpn.model.RefPlace;
 import org.cpntools.accesscpn.model.Transition;
+import org.cpntools.accesscpn.model.TransitionNode;
 import org.cpntools.accesscpn.model.util.BuildCPNUtil;
+import org.omg.PortableInterceptor.SUCCESSFUL;
 import org.st.scenarios.clsc.Chart;
 import org.st.scenarios.clsc.Dependency;
 import org.st.scenarios.clsc.Event;
@@ -41,18 +51,21 @@ import org.st.scenarios.clsc.Scenario;
 import org.st.scenarios.clsc.Specification;
 
 
-public class ExportToCPN {
+public class ExportToCPN2 {
 
 	private BuildCPNUtil toCPN;
 	
 	private Specification spec;
 	private PetriNet net;
 
-	private Page mainPage;
-
 	// remember which scenario is translated to which CPN page to properly
 	// implement hierarchies in the net
 	private HashMap<Scenario, Page> scenario_to_page;
+	
+	private HashSet<Transition> activation_transitions;
+	private HashSet<Place> activation_transition_conditions;
+	
+	private Map<Node, List<String> > roleAssignment;
 
 	// each maximal event of a main-chart produces a token on a global place,
 	// this place is uniquely defined by the event's name, this mapping stores
@@ -64,7 +77,7 @@ public class ExportToCPN {
 	 * 
 	 * @param spec
 	 */
-	public ExportToCPN(Specification spec) {
+	public ExportToCPN2(Specification spec) {
 		this.spec = spec;
 		this.toCPN = new BuildCPNUtil();
 	}
@@ -75,7 +88,7 @@ public class ExportToCPN {
 	 * @param hierarchical put each scenario into a separate subpage of the net
 	 * @return the resulting {@link PetriNet} that can be exported to CPN Tools
 	 */
-	public PetriNet translate(boolean hierarchical) {
+	public PetriNet translate() {
 		this.net = toCPN.createPetriNet();
 
 		// write type declarations
@@ -90,20 +103,17 @@ public class ExportToCPN {
 		// initialize bookkeeping data structures on the specification level
 		this.scenario_to_page = new HashMap<Scenario, Page>();
 		this.maxPlaces = new HashMap<String, Place>();
+		this.activation_transitions = new HashSet<Transition>();
+		this.activation_transition_conditions = new HashSet<Place>();
+		this.roleAssignment = new HashMap<Node, List<String>>();
 
 		// create the main page to contain all scenarios and their
 		// interconnections
-		mainPage = toCPN.addPage(net, "Spec");
+		Page mainPage = toCPN.addPage(net, "Spec");
 
 		// translate each scenario
 		for (Scenario s : spec.scenarios) {
-	    // create the page
-	    Page pg;
-	    
-	    if (hierarchical) pg = toCPN.addPage(net, s.getName());
-	    else pg = mainPage;
-	    
-			translateScenario_toPage(s, pg);
+			translateScenario_toPage(s, mainPage);
 		}
 
 		return this.net;
@@ -128,15 +138,11 @@ public class ExportToCPN {
 		
 		scenario_to_page.put(s, pg);
 
-		Instance t_scen = null;
-		if (pg != mainPage)
-		  t_scen = toCPN.createSubPageTransition(pg, mainPage, s.getName());
-
 		Chart main = s.mainChart;
 
 		// compute the logic to connect pre-chart and main-chart, and create
 		// the pre-places of the minimal main-chart events
-		HashMap<Event, Place[]> minPlaces = translateScenario_activationLogic(pg, s, t_scen);
+		HashMap<Event, Place[]> minPlaces = translateScenario_activationLogic(pg, s);
 
 		// create a transition for each main-chart event
 		HashMap<Event, Transition> e2t = new HashMap<Event, Transition>();
@@ -152,7 +158,7 @@ public class ExportToCPN {
 			Chart cHist = s.getLocalHistory(e);
 			
 			if (cHist.getEvents().size() > 0) {
-  			Place pHist = toCPN.addPlace(pg, "", "TOKENHIST", "1`"+translateChartToTokenHistoryString(cHist));
+  			Place pHist = toCPN.addPlace(pg, e.name+"_hist", "TOKENHIST", "1`"+translateChartToTokenHistoryString(cHist));
         toCPN.addArc(pg, pHist, t, "hPre");
         toCPN.addArc(pg, t, pHist, "hPre");
         
@@ -179,7 +185,7 @@ public class ExportToCPN {
 
 			int hist_var_count = 0;
 			for (Dependency d : e.in) {
-				Place p = toCPN.addPlace(pg, "", "TOKENHIST");
+				Place p = toCPN.addPlace(pg, d.getSource().name+"_"+d.getTarget().name, "TOKENHIST");
 				// Annotate the incoming arcs of the transition with a history
 				// variable. Each incoming dependency 'd' defines a new incoming arc
 				// which requires a new history variable "hX"
@@ -199,23 +205,12 @@ public class ExportToCPN {
 				// level place and connect it to the hierarchical transition that
 				// contains this scenario
 				if (!maxPlaces.containsKey(e.name)) {
-					Place p = toCPN.addPlace(mainPage, e.name, "TOKENHIST");
+					Place p = toCPN.addPlace(pg, e.name, "TOKENHIST");
 					maxPlaces.put(e.name, p);
 				}
 				Place pTop = maxPlaces.get(e.name);
-				
-				if (pg != mainPage) {
-  				toCPN.addArc(mainPage, t_scen, pTop, "");
-  
-  				// then create the scenario level reference place and connect it
-  				// to the specification level place
-  				RefPlace p = toCPN.addReferencePlace(pg, e.name, "TOKENHIST", "", pTop, t_scen);
-  				toCPN.addArc(pg, e2t.get(e), p,
-  						getTransitionOutGoingArcFunction(e,	getPredecessorEvents(e, s)));
-				} else {
-          toCPN.addArc(pg, e2t.get(e), pTop,
+        toCPN.addArc(pg, e2t.get(e), pTop,
               getTransitionOutGoingArcFunction(e, getPredecessorEvents(e, s)));				  
-				}
 			}
 
 			if (e.isMin()) {
@@ -303,13 +298,10 @@ public class ExportToCPN {
 	 * 
 	 * @param pg
 	 * @param s
-	 * @param t_scen
-	 *            the hierarchical transition of the specification level that
-	 *            represents the scenario
 	 * @return a mapping that assigns each minimal main-chart event its set of
 	 *         pre-places
 	 */
-	public HashMap<Event, Place[]> translateScenario_activationLogic(Page pg, Scenario s, Instance t_scen) {
+	public HashMap<Event, Place[]> translateScenario_activationLogic(Page pg, Scenario s) {
 
 		Chart pre = s.preChart;
 		Chart main = s.mainChart;
@@ -331,15 +323,8 @@ public class ExportToCPN {
 				// the scenario consumes a token produced by each maximal
 				// pre-chart event
 				if (!maxPlaces.containsKey(e.name)) {
-					Place p = toCPN.addPlace(mainPage, e.name, "TOKENHIST");
+					Place p = toCPN.addPlace(pg, e.name, "TOKENHIST");
 					maxPlaces.put(e.name, p);
-				}
-
-				if (pg != mainPage) {
-  				// add an arc from the specification level interface place to
-  				// the hierarchical transition representing the scenario
-  				Place p = maxPlaces.get(e.name);
-  				toCPN.addArc(mainPage, p, t_scen, "");
 				}
 			}
 
@@ -349,6 +334,9 @@ public class ExportToCPN {
 					"1`"+translateChartToTokenHistoryString(pre));
 			toCPN.addArc(pg, p_preChart, t_activate, "hPre");
 			toCPN.addArc(pg, t_activate, p_preChart, "hPre");
+			
+			activation_transitions.add(t_activate);
+			activation_transition_conditions.add(p_preChart);
 
 			// create for each minimal main chart event its own set of
 			// pre-places
@@ -364,22 +352,13 @@ public class ExportToCPN {
 			
 			int hist_var_count = 0;
 			for (Event e : pre.getMaxEvents()) {
-				Place pTop = maxPlaces.get(e.name);
-				PlaceNode p;
-				
-				if (pg != mainPage) {
-	        // create interface place at the scenario-level and connect it
-	        // to the place with the same name at the specification level
-				  p = toCPN.addReferencePlace(pg, e.name, "TOKENHIST", "", pTop, t_scen);
-				} else {
-				  p = pTop;
-				}
+				PlaceNode p = maxPlaces.get(e.name);
 
 				// the activation transition consumes from the scenario level place 
 				toCPN.addArc(pg, p, t_activate, "h"+hist_var_count);
 				// and produces on the corresponding place for each minimal main-chart event 
 				for (Event f : main.getMinEvents()) {
-					Place p2 = toCPN.addPlace(pg, "", "TOKENHIST");
+					Place p2 = toCPN.addPlace(pg, e.name+"_"+f.name, "TOKENHIST");
 					toCPN.addArc(pg, t_activate, p2, "h"+ hist_var_count);
 					minPlaces.get(f)[hist_var_count] = p2;
 				}
@@ -397,7 +376,278 @@ public class ExportToCPN {
 
 		return minPlaces;
 	}
+	
+	private static String ROLE_UNASSIGNED = "unassigned";
+	
+	public void assignRoles(Map<String, String> assignment) {
+	  for (Page pg : net.getPage()) {
+	    for (Object o : pg.getObject()) {
+	      if (!(o instanceof TransitionNode)) continue;
+	      TransitionNode t = (TransitionNode)o;
 
+        roleAssignment.put(t, new LinkedList<String>());
+	      if (assignment.containsKey(t.getName().getText())) {
+	        roleAssignment.get(t).add(assignment.get(t.getName().getText()));
+	      } else {
+	        roleAssignment.get(t).add(ROLE_UNASSIGNED);
+	      }
+	    }
+	  }
+	  
+	  for (Page pg : net.getPage()) {
+      for (Object o : pg.getObject()) {
+        if (!(o instanceof PlaceNode)) continue;
+        spreadRolesToPlace((PlaceNode)o);
+      }
+    }
+	}
+	
+	private void spreadRolesToPlace(PlaceNode p) {
+    Set<String> env_roles = new HashSet<String>();
+    for (Arc a : p.getSourceArc()) {
+      List<String> roles = roleAssignment.get(a.getTarget());
+      env_roles.addAll(roles);
+    }
+    for (Arc a : p.getTargetArc()) {
+      List<String> roles = roleAssignment.get(a.getSource());
+      env_roles.addAll(roles);
+    }
+    roleAssignment.put(p, new LinkedList<String>(env_roles));	  
+	}
+	
+	public void multiplyActivationLogic() {
+	  // move scenario activation transitions to a page if all successor transitions
+    // also occur on this page
+    for (Transition t : activation_transitions) {
+      
+      if (roleAssignment.get(t).size() == 1 && roleAssignment.get(t).contains(ROLE_UNASSIGNED))
+      {
+        Set<String> successorRoles = new HashSet<String>();
+        for (Arc a : t.getSourceArc()) {
+          for (Arc a2 : a.getTarget().getSourceArc()) {
+            if (a2.getTarget() == t) continue;
+            successorRoles.addAll(roleAssignment.get(a2.getTarget()));
+          }
+        }
+      
+        if (successorRoles.size() == 1 && !successorRoles.contains(ROLE_UNASSIGNED)) {
+          roleAssignment.get(t).clear();
+          roleAssignment.get(t).addAll(successorRoles);
+        } else {
+          successorRoles.remove(ROLE_UNASSIGNED);
+          LinkedList<String> _successorRoles = new LinkedList<String>(successorRoles);
+          
+          // reassign current activation transition and its guard
+          String oldTransitionName = t.getName().getText();
+          String successorRole = _successorRoles.get(0);
+          t.getName().setText(oldTransitionName+"_"+successorRole);
+          roleAssignment.get(t).clear();
+          roleAssignment.get(t).add(successorRole);
+          
+          Page pg = t.getPage();
+  
+          Place activation_place = null;
+          for (Arc a : t.getSourceArc()) {
+            if (activation_transition_conditions.contains(a.getTarget())) {
+              activation_place = (Place)a.getTarget();
+              break;
+            }
+          }
+          
+          List<Place> newPlaces = new LinkedList<Place>();
+          for (int i=1; i<_successorRoles.size(); i++) {
+            successorRole = _successorRoles.get(i);
+            Transition t2 = toCPN.addTransition(pg, oldTransitionName+"_"+successorRole,
+                t.getCondition().getText());
+            Place p2 = toCPN.addPlace(pg, activation_place.getName().getText()+"_"+successorRole,
+                activation_place.getSort().getText(), activation_place.getInitialMarking().getText());
+            toCPN.addArc(pg, t2, p2, "hPre");
+            toCPN.addArc(pg, p2, t2, "hPre");
+            
+            roleAssignment.put(t2, new LinkedList<String>());
+            roleAssignment.get(t2).add(successorRole);
+            newPlaces.add(p2);
+            
+            for (Arc a : t.getSourceArc()) {
+              if (a.getTarget() == activation_place) continue;
+              toCPN.addArc(pg, t2, a.getTarget(), a.getHlinscription().getText());
+            }
+            for (Arc a : t.getTargetArc()) {
+              if (a.getSource() == activation_place) continue;
+              toCPN.addArc(pg, a.getSource(), t2, a.getHlinscription().getText());
+            }
+          }
+          
+          for (Place p : newPlaces) {
+            spreadRolesToPlace(p);
+          }
+        }
+      }
+    }
+	}
+
+	public void splitRolesToSubpages(Page oldPage) {
+	  
+	  Page parentPage = toCPN.addPage(net, "spec");
+	  
+	  Set<String> roles = new HashSet<String>();
+	  Map<String, Page> subPages = new HashMap<String, Page>();
+	  Map<String, Instance> subPageTrans = new HashMap<String, Instance>();
+	  for (List<String> r : roleAssignment.values())
+	    roles.addAll(r);
+	  
+	  roles.remove(oldPage.getName().getText());
+	  
+	  for (String role : roles) {
+	    Page subPage = toCPN.addPage(net, role);
+	    subPages.put(role, subPage);
+	    Instance t_page = toCPN.createSubPageTransition(subPage, parentPage, role);
+	    subPageTrans.put(role, t_page);
+	  }
+	  
+	  Set<Place> sharedPlace = new HashSet<Place>();
+    for (org.cpntools.accesscpn.model.Object o : oldPage.getObject()) {
+      if (! (o instanceof Place))
+        continue;
+      Place p = (Place)o;
+      if (!roleAssignment.containsKey(p)) sharedPlace.add(p);
+      if (roleAssignment.get(p).contains(ROLE_UNASSIGNED)) sharedPlace.add(p);
+      if (roleAssignment.get(p).size() > 1) sharedPlace.add(p);
+    }
+    
+    for (Place p : sharedPlace) {
+      p.setPage(parentPage);
+    }
+    
+    Map<HasId, Page> page_to_set = new HashMap<HasId, Page>();
+    LinkedList<Arc> arc_toRemove = new LinkedList<Arc>();
+	  for (Object o : oldPage.getObject()) {
+      if (! (o instanceof TransitionNode || o instanceof Instance))
+      {
+        continue;
+      }
+      
+      Node t = (Node)o;
+      String subPageName = roleAssignment.get(t).get(0);
+      Page pg = subPages.get(subPageName);
+      if (pg == null) pg = parentPage;
+      page_to_set.put(t,pg);
+      
+      LinkedList<Arc> tgt_arcs = new LinkedList<Arc>(t.getTargetArc());
+      for (Arc a : tgt_arcs) {
+        PlaceNode p = (PlaceNode)a.getSource();
+        if (!sharedPlace.contains(p) || pg == parentPage) {
+          page_to_set.put(p,pg);
+          page_to_set.put(a,pg);
+        } else if (p instanceof Place){
+          
+          Place p2 = (Place) p;
+          
+          RefPlace p_ref = null;
+          for (Object o_ref : pg.getObject()) {
+            if (o_ref instanceof RefPlace) {
+              if (((RefPlace)o_ref).getRef() == p2) {
+                p_ref = (RefPlace)o_ref;
+                break;
+              }
+            }
+          }
+          
+          if (p_ref == null)
+            p_ref = toCPN.addReferencePlace(pg,
+              p2.getName().getText(), 
+              p2.getSort().getText(), 
+              p2.getInitialMarking().getText(), p2, 
+              subPageTrans.get(subPageName));
+          
+          Arc a2 = toCPN.addArc(pg, p_ref, t, a.getHlinscription().getText());
+          
+          boolean arcExists = false;
+          for (Arc p2_out : p2.getSourceArc()) {
+            if (p2_out.getTarget() == subPageTrans.get(subPageName)) {
+              arcExists = true;
+              break;
+            }
+          }
+          if (!arcExists)
+            toCPN.addArc(parentPage, p2, subPageTrans.get(subPageName), a.getHlinscription().getText());
+          
+          arc_toRemove.add(a);
+        }
+      }
+      
+      LinkedList<Arc> src_arcs = new LinkedList<Arc>(t.getSourceArc());
+      for (Arc a : src_arcs) {
+        PlaceNode p = (PlaceNode)a.getTarget();
+        if (!sharedPlace.contains(p) || pg == parentPage) {
+          page_to_set.put(p,pg);
+          page_to_set.put(a,pg);
+        } else if (p instanceof Place){
+          
+          Place p2 = (Place) p;
+          
+          RefPlace p_ref = null;
+          for (Object o_ref : pg.getObject()) {
+            if (o_ref instanceof RefPlace) {
+              if (((RefPlace)o_ref).getRef() == p2) {
+                p_ref = (RefPlace)o_ref;
+                break;
+              }
+            }
+          }
+          
+          if (p_ref == null)
+            p_ref = toCPN.addReferencePlace(pg,
+              p2.getName().getText(), 
+              p2.getSort().getText(), 
+              p2.getInitialMarking().getText(), p2, 
+              subPageTrans.get(subPageName));
+          
+          Arc a2 = toCPN.addArc(pg, t, p_ref, a.getHlinscription().getText());
+          
+          boolean arcExists = false;
+          for (Arc p2_in : p2.getTargetArc()) {
+            if (p2_in.getSource() == subPageTrans.get(subPageName)) {
+              arcExists = true;
+              break;
+            }
+          }
+          if (!arcExists)
+            toCPN.addArc(parentPage, subPageTrans.get(subPageName), p2, a.getHlinscription().getText());
+          
+          arc_toRemove.add(a);
+        }
+      }
+	  }
+	  
+	  for (Entry<HasId, Page> set : page_to_set.entrySet()) {
+	    if (set.getKey() instanceof Object) {
+	      ((Object)set.getKey()).setPage(set.getValue());
+	    }
+	    if (set.getKey() instanceof Arc) {
+	      ((Arc)set.getKey()).setPage(set.getValue());
+	    }
+	  }
+	  
+	  for (Arc a : arc_toRemove) {
+	    a.getPage().getArc().remove(a);
+	  }
+	  
+	  net.getPage().remove(oldPage);
+	  
+	   for (Page pg : net.getPage()) {
+	     for (Arc a : pg.getArc()) {
+	       if (a.getSource().getPage() != a.getTarget().getPage()) {
+	         System.out.println("ERROR: "+a+" connects nodes in different pages:");
+	         System.out.println("   "+a.getSource()+" in "+a.getSource().getPage().getName().getText());
+           System.out.println("   "+a.getTarget()+" in "+a.getTarget().getPage().getName().getText());
+	       }
+	     }
+	   }
+	     
+
+	}
+	
 	/**
 	 * @param e
 	 * @param s

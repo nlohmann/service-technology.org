@@ -69,7 +69,8 @@ import java.util.HashMap;
  *------------------------------------------------------------------*/
  
 net returns [Specification resultSpec]: { spec = new Specification(); }
-	scenarios 
+	scenarios
+	components
 	{$resultSpec = spec; }
 	;
 
@@ -148,6 +149,26 @@ dependency_list:
 ;
 
 
+/* --------------- SCENARIOS ---------------- */
+
+components:
+	(
+		KEY_COMPONENT name1=node_name
+		(name2=node_name COMMA
+			{
+				spec.eventToComponent.put(name2,name1);
+			}
+		)*
+		name3=node_name
+			{
+				spec.eventToComponent.put(name3,name1);
+			}
+		SEMICOLON
+	)*
+;
+
+
+
  /*------------------------------------------------------------------
  * LEXER RULES
  *------------------------------------------------------------------*/
@@ -166,6 +187,8 @@ KEY_MAINCHART : 'MAIN' ;
 KEY_EVENT : 'EVENT' ;
 KEY_DEPENDENCIES : 'DEPENDENCIES' ;
 DEPENDS : '->' ;
+
+KEY_COMPONENT : 'COMPONENT' ;
 
 COLON : ':' ;
 COMMA : ',' ;

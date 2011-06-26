@@ -91,3 +91,23 @@ PRE
 MAIN
   EVENT ems5_e5 trauma_room/treat;
   DEPENDENCIES ;
+  
+COMPONENT medic
+	medic/check,
+	medic/treat_A,
+	medic/treat_B,
+	notification,
+	medic/avail;
+	
+COMPONENT hospital
+	hospital,
+	hospital/treat,
+	hospital/prepare_TR;
+	
+COMPONENT ems
+	ems/location,
+	ems/none;
+
+COMPONENT trauma_room
+	trauma_room,
+	trauma_room/treat;

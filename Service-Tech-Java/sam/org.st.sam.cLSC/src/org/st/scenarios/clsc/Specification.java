@@ -19,8 +19,10 @@
 
 package org.st.scenarios.clsc;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A scenario-based specification is a set of {@link Scenario}s.
@@ -30,9 +32,11 @@ import java.util.List;
 public class Specification {
 
 	public List<Scenario> scenarios;
+	public Map<String, String> eventToComponent;
 	
 	public Specification() {
 		scenarios = new LinkedList<Scenario>();
+		eventToComponent = new HashMap<String, String>();
 	}
 	
 	public String toDot() {

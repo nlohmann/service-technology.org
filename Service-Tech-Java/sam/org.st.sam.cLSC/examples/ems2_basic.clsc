@@ -44,3 +44,16 @@ MAIN
   EVENT ems3_e5 hospital;
   DEPENDENCIES
   	ems3_e4 -> ems3_e5;
+
+COMPONENT medic
+	medic/check,
+	medic/treat_A,
+	medic/avail;
+	
+COMPONENT hospital
+	hospital,
+	hospital/treat;
+	
+COMPONENT ems
+	ems/location,
+	ems/none;

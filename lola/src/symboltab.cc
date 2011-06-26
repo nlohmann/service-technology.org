@@ -18,7 +18,6 @@
  along with LoLA.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-
 #include "symboltab.H"
 #include "net.H"
 
@@ -42,7 +41,6 @@ SymbolTab::~SymbolTab() {
     }
     delete [] table;
 }
-
 
 Symbol* SymbolTab::lookup(char* name) {
     /* 1. Hashvalue bestimmen */

@@ -457,7 +457,7 @@ int main(int argc, char** argv) {
         for (j = 0; j < Globals::Places[0]->cnt; ++j) {
             Globals::Places[j] -> set_hash(rand());
         }
-#ifndef STATESPACEw
+#ifndef STATESPACE
         message("%d places", Globals::Places[0]->cnt);
         message("%d transitions", Globals::Transitions[0]->cnt);
 #endif

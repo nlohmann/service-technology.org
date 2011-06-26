@@ -1321,7 +1321,6 @@ void searchEU(State* s, untilformula* f) {
     State* tarjanroot;
     State* NewState;
 
-    unsigned int MinBookmark = 0;
     bool found = false;
     State* CurrentState = s;
     s->checknexttar[f->tempindex] = s;
@@ -1346,6 +1345,7 @@ void searchEU(State* s, untilformula* f) {
         CurrentState->value[f->index] = false;
         CurrentState->known[f->index] = true;
 
+        unsigned int MinBookmark = 0;
         if (CurrentState->checkfirelist[f->tempindex][CurrentState->checkcurrent[f->tempindex]]) {
             // explore next state
             CurrentState->checkfirelist[f->tempindex][CurrentState->checkcurrent[f->tempindex]]->fire();
@@ -1570,7 +1570,6 @@ void futuresearchAU(State* s, untilformula* f) {
     unsigned int i;
     State* NewState;
 
-    unsigned int MinBookmark = 0;
     int found = 0;
     State* CurrentState = s;
     s->checkprevtar[ f->tempindex] = s->checknexttar[f->tempindex] = s;
@@ -1602,6 +1601,7 @@ void futuresearchAU(State* s, untilformula* f) {
             CurrentState->value[f->index] = true;
             CurrentState->known[f->index] = true;
 
+            unsigned int MinBookmark = 0;
             if (CurrentState->checkfirelist[f->tempindex][CurrentState->checkcurrent[f->tempindex]]) {
                 // explore next state
                 CurrentState->checkfirelist[f->tempindex][CurrentState->checkcurrent[f->tempindex]]->fire();

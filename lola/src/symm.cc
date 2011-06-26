@@ -43,10 +43,10 @@ using std::ofstream;
 #include "distribute.h"
 #endif
 
-unsigned int* kanrep, * kanrep1;
-
-unsigned int* compose, * reservecompose;
-
+unsigned int* kanrep;
+unsigned int* kanrep1;
+unsigned int* compose;
+unsigned int* reservecompose;
 unsigned int kanhash;
 
 void check();
@@ -1292,10 +1292,7 @@ void OnlineCanonize() {
     unsigned int* swaprep;
     Node** possibleImages;
     unsigned int cn, cntriv, i, j;
-    // unused: unsigned int intriv, k;
-    // unused: NodeType type;
     Reaktoreintrag swap;
-    // unused: DomType dir;
     unsigned int MyCardSpecification[2];
     unsigned int SourceIndex;
     unsigned int maxmarking, checkmarking;
@@ -1494,26 +1491,27 @@ void BuildProducts(unsigned int orbit, bool* inconsistent) {
 #else
 void BuildProducts(unsigned int orbit) {
     unsigned int StorePos(CurrentStore);
-    unsigned int composed, k;
 
     if (Store[StorePos].image[orbit].vector) {
         compose = Store[StorePos].image[orbit].vector;
-        while (1) {
+        while (true) {
             unsigned int val = compose[Store[StorePos].image[orbit].value->nr - Store[StorePos].argnr];
             if (val == Store[StorePos].argnr) {
                 break;
             }
+
+            unsigned int composed;
             for (composed = 0; Store[StorePos].image[composed].value->nr != val; ++composed) {
                 ;
             }
-            for (k = 0; k < Globals::Places[0]->cnt - Store[StorePos].argnr; k++) {
+            for (unsigned int k = 0; k < Globals::Places[0]->cnt - Store[StorePos].argnr; k++) {
                 reservecompose[k] = Store[StorePos].image[orbit].vector[compose[k] - Store[StorePos].argnr];
             }
             if ((Store[StorePos].image[composed].vector)) {
                 compose = reservecompose;
             } else {
                 Store[StorePos].image[composed].vector = new unsigned int [Globals::Places[0]->cnt - Store[StorePos].argnr + 1];
-                for (k = 0; k < Globals::Places[0]->cnt - Store[StorePos].argnr; k++) {
+                for (unsigned int k = 0; k < Globals::Places[0]->cnt - Store[StorePos].argnr; k++) {
                     Store[StorePos].image[composed].vector[k] = reservecompose[k];
                 }
                 compose = Store[StorePos].image[composed].vector;
@@ -1524,28 +1522,22 @@ void BuildProducts(unsigned int orbit) {
 #endif
 
 
-// Define in einem Setting, wo noch alle Constraints die Form [A,A] haben
+/*!
+ Define in einem Setting, wo noch alle Constraints die Form [A,A] haben.
+*/
+void DefineToId() {
+    unsigned int cntriv; ///< ein nichttriviales Constraint
+    unsigned int intriv; ///< dessen Pos im Reaktor
 
-void DefineToId(void) {
-
-    unsigned int cntriv, // ein nichttriviales Constraint
-             nrmin, // Nr des kleinsten Knotens eines nichttrivialen Constraints
-             intriv, // dessen Pos im Reaktor
-             c, i, j, k, MyCardSpecification[2], oldstorenr;
-    // unused: unsigned int MyStorePosition;
-    // unused: unsigned int val;
-    // unused: unsigned int composed;
-    // unused: unsigned int current;
-    // unused: NodeType type;
-    Reaktoreintrag swap;
-    DomType dir;
-    SymmImage* sigma;
-    // unused: SymmImage * svec;
+    unsigned int i, j, k;
 
     // suche dasjenige mehrelementige Constraint, das den kleinsten
     // Knoten enthält
-    nrmin = UINT_MAX; // groesser als jeder korrekte Wert
-    for (c = 0; c < CardSpecification[PL]; c++) {
+
+    /// Nr des kleinsten Knotens eines nichttrivialen Constraints
+    unsigned int nrmin = UINT_MAX; // groesser als jeder korrekte Wert
+
+    for (unsigned int c = 0; c < CardSpecification[PL]; c++) {
         if (Specification[PL][c].first != Specification[PL][c].last) {
             // bin in mehrelementigem Constraint
             for (i = Specification[PL][c].first; i <= Specification[PL][c].last; i++) {
@@ -1560,7 +1552,7 @@ void DefineToId(void) {
     // bereite Symmetriespeicher auf die neuen Elemente vor
     // Speichere potentielle Images in Store
     CardStore++;
-    oldstorenr = CurrentStore;
+    unsigned int oldstorenr = CurrentStore;
     CurrentStore = CardStore - 1;
     Store[CurrentStore].arg = Reaktor[PL][DO][intriv].node;
     Store[CurrentStore].argnr = nrmin;
@@ -1577,23 +1569,21 @@ void DefineToId(void) {
 
     }
 
-// separiere Knoten nrmin innerhalb Constraint cntriv
-    for (dir = 0; dir < 2; dir++) {
+    // separiere Knoten nrmin innerhalb Constraint cntriv
+    for (DomType dir = 0; dir < 2; dir++) {
         Reaktor[PL][dir][Specification[PL][cntriv].first].node->pos[dir] = intriv;
         Reaktor[PL][dir][intriv].node->pos[dir] = Specification[PL][cntriv].first;
-        swap = Reaktor[PL][dir][Specification[PL][cntriv].first];
+        Reaktoreintrag swap = Reaktor[PL][dir][Specification[PL][cntriv].first];
         Reaktor[PL][dir][Specification[PL][cntriv].first] = Reaktor[PL][dir][intriv];
         Reaktor[PL][dir][intriv] = swap;
     }
-    Specification[PL][CardSpecification[PL]].last
-    = Specification[PL][CardSpecification[PL]].first = Specification[PL][cntriv].first;
+    Specification[PL][CardSpecification[PL]].last = Specification[PL][CardSpecification[PL]].first = Specification[PL][cntriv].first;
     Specification[PL][CardSpecification[PL]].changed = new ToDo(PL, CardSpecification[PL]);
     Specification[PL][CardSpecification[PL]].parent = cntriv;
     CardSpecification[PL]++;
     (Specification[PL][cntriv].first)++;
     Specification[PL][cntriv].changed = new ToDo(PL, cntriv);
-    MyCardSpecification[PL] = CardSpecification[PL];
-    MyCardSpecification[TR] = CardSpecification[TR];
+    unsigned int MyCardSpecification[2] = {CardSpecification[PL], CardSpecification[TR]};
     reportprogress();
 #ifdef DISTRIBUTE
     progress();
@@ -1613,7 +1603,7 @@ void DefineToId(void) {
     }
 #endif
     for (j = 0; j < Store[CurrentStore].length; j++) {
-        sigma = Store[CurrentStore].image + j;
+        SymmImage* sigma = Store[CurrentStore].image + j;
 #if defined(SYMMPROD)
         if (!(sigma->vector || inconsistent[j])) // only try to find a new representative if the orbit is empty and consistent so far
 #else
@@ -1623,7 +1613,7 @@ void DefineToId(void) {
             i = sigma->value->pos[CO];
             Reaktor[PL][CO][i].node->pos[CO] = Specification[PL][CardSpecification[PL] - 1].first;
             Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first].node ->pos[CO] = i;
-            swap = Reaktor[PL][CO][i];
+            Reaktoreintrag swap = Reaktor[PL][CO][i];
             Reaktor[PL][CO][i] = Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first];
             Reaktor[PL][CO][Specification[PL][CardSpecification[PL] - 1].first] = swap;
             Specification[PL][cntriv].changed = new ToDo(PL, cntriv);
@@ -1653,56 +1643,58 @@ void DefineToId(void) {
 }
 
 
-// Die aktuelle Symm bei Iteration mittels FirstSymm() und NextSymm()
+/// Die aktuelle Symm bei Iteration mittels FirstSymm() und NextSymm()
 unsigned int* CurrentSymm;
 
 
-// Berechnung des Erzeugendensystems
-void ComputeSymmetries(void) {
-    unsigned int i, j;
-    unsigned long int CardSymm;
-    // unused: unsigned int h;
-    unsigned int plp, trp;
-
+/*!
+ Berechnung des Erzeugendensystems
+*/
+void ComputeSymmetries() {
     status("calculating symmetries");
     init_syms();
     reservecompose = new unsigned int [Globals::Places[0]->cnt];
     Stamp = 1;
     InitialConstraint();
     FuelleReaktor();
+
     // Refine kann hier nicht fehlschlagen, weil id auf jeden Fall
     // konsistent sein muss
     if (!RefineUntilNothingChanges(PL)) {
         cout << " Was komisches ist passiert";
     }
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
         Globals::Places[i] = (Place*) Reaktor[PL][DO][i].node;
         Globals::Places[i]-> nr = Globals::Places[i] -> index = i;
         Globals::CurrentMarking[i] = Globals::Places[i]->initial_marking;
 
     }
+
     // Lege Aeq-Klassen an
     part = new Partition [Globals::Places[0]-> cnt];
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
         part[i].nextorcard = 1;
         part[i].top = true;
     }
+
     // Lege Speicher fuer Generatoren an
     Store = new SymmStore [Globals::Places[0]->cnt];
     CardStore = 0;
-    plp = CardSpecification[PL];
-    trp = CardSpecification[TR];
+    unsigned int plp = CardSpecification[PL];
+    unsigned int trp = CardSpecification[TR];
+
     // Starte Suche nach Generatoren
     if (CardSpecification[PL] != Globals::Places[0]->cnt) {
         DefineToId();
     }
     ReUnify(plp, trp);
+
     // Berechne Generatoren- und Symmetriezahl
     CardGenerators = 0;
-    CardSymm = 1;
-    for (i = 0; i < CardStore; i++) {
+    unsigned long int CardSymm = 1;
+    for (unsigned int i = 0; i < CardStore; i++) {
         Store[i].card = 0;
-        for (j = 0; j < Store[i].length; j++) {
+        for (unsigned int j = 0; j < Store[i].length; j++) {
             if (Store[i].image[j].vector) {
                 if (j > Store[i].card) {
                     Store[i].image[Store[i].card] = Store[i].image[j];
@@ -1715,19 +1707,18 @@ void ComputeSymmetries(void) {
         CardSymm *= Store[i].card + 1;
 
     }
-    for (i = 0; i < CardStore;) {
+    for (unsigned int i = 0; i < CardStore;) {
         if (Store[i].card) {
             Store[i].reference = new unsigned int[Globals::Places[0]->cnt - Store[i].argnr + 1];
             i++;
         } else {
-            for (j = i + 1; j < CardStore; j++) {
+            for (unsigned int j = i + 1; j < CardStore; j++) {
                 Store[j - 1] = Store[j];
             }
             CardStore--;
         }
     }
-    //cout << "\n" << CardGenerators << " generators in " << CardStore << " groups for " << CardSymm << " symmetries found.\n";
-    //cout << DeadBranches << " dead branches entered during calculation.\n";
+
     message("%d generators in %d groups for %d symmetries found", CardGenerators, CardStore, CardSymm);
     message("%d dead branches entered during symmetrie calculation", DeadBranches);
 
@@ -1735,15 +1726,15 @@ void ComputeSymmetries(void) {
     // Reaktoren auf Markierungsabb.suche vorbereiten, indem Aeq.klassen
     // zu Constraints werden. Countsort wird misbraucht.
     NewStamp();
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
+        unsigned int j;
         for (j = i; !part[j].top; j = part[j].nextorcard) {
             ;
         }
         Reaktor[PL][DO][Globals::Places[i]->pos[DO]].stamp = Reaktor[PL][CO][Globals::Places[i]->pos[CO]].stamp = Stamp;
         Reaktor[PL][DO][Globals::Places[i]->pos[DO]].count = Reaktor[PL][CO][Globals::Places[i]->pos[CO]].count = j;
     }
-    j = CardSpecification[PL];
-    for (i = 0; i < j; i++) {
+    for (unsigned int i = 0; i < CardSpecification[PL]; i++) {
         CountSort(PL, DO, Specification[PL][i].first, Specification[PL][i].last);
         CountSort(PL, CO, Specification[PL][i].first, Specification[PL][i].last);
         Split(PL, i);
@@ -1755,12 +1746,13 @@ void ComputeSymmetries(void) {
     // Hashfaktoren eintragen: aeq. Plaetze bekommen gleichen Hashwert,
     // damit nur in einem Bucker gesucht werden muss
 #if SYMMINTEGRATION < 3
-    for (i = 0; i < Globals::Places[i]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[i]->cnt; i++) {
         if (part[i].top) {
             part[i].nextorcard = rand();
         }
     }
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
+        unsigned int j;
         for (j = i; !part[j].top; j = part[j].nextorcard) {
             ;
         }
@@ -1774,35 +1766,32 @@ void ComputeSymmetries(void) {
     WriteSymms();
 }
 
-void ComputePartition(void) {
-    unsigned int i, j;
-    // unused: unsigned long int CardSymm;
-    // unused: unsigned int h;
-    unsigned int c;
-    // unused: unsigned int plp,trp;
-
-    //cout << "\n partitioning nodes wrt symmetries...\n";
+void ComputePartition() {
     message("partitioning nodes wrt symmetries...");
     init_syms();
     Stamp = 1;
     InitialConstraint();
     FuelleReaktor();
+
     if (!RefineUntilNothingChanges(PL)) {
         cout << " Was komisches ist passiert";
     }
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
         Globals::Places[i] = (Place*) Reaktor[PL][DO][i].node;
         Globals::Places[i]-> nr = Globals::Places[i] -> index = i;
         Globals::CurrentMarking[i] = Globals::Places[i]->initial_marking;
     }
+
     // partition places
     part = new Partition [Globals::Places[0]-> cnt];
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
         part[i].nextorcard = 1;
         part[i].top = true;
     }
-    for (c = 0; c < CardSpecification[PL]; c++) {
-        for (i = Specification[PL][c].first; i <= Specification[PL][c].last; i++) {
+
+    for (unsigned int c = 0; c < CardSpecification[PL]; c++) {
+        for (unsigned int i = Specification[PL][c].first; i <= Specification[PL][c].last; i++) {
             UnifyClasses(Reaktor[PL][DO][i].node -> nr, Reaktor[PL][DO][Specification[PL][c].first].node->nr);
         }
     }
@@ -1813,15 +1802,15 @@ void ComputePartition(void) {
     // Reaktoren auf Markierungsabb.suche vorbereiten, indem Aeq.klassen
     // zu Constraints werden. Countsort wird misbraucht.
     NewStamp();
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
+        unsigned int j;
         for (j = i; !part[j].top; j = part[j].nextorcard) {
             ;
         }
         Reaktor[PL][DO][Globals::Places[i]->pos[DO]].stamp = Reaktor[PL][CO][Globals::Places[i]->pos[CO]].stamp = Stamp;
         Reaktor[PL][DO][Globals::Places[i]->pos[DO]].count = Reaktor[PL][CO][Globals::Places[i]->pos[CO]].count = j;
     }
-    j = CardSpecification[PL];
-    for (i = 0; i < j; i++) {
+    for (unsigned int i = 0; i < CardSpecification[PL]; i++) {
         CountSort(PL, DO, Specification[PL][i].first, Specification[PL][i].last);
         CountSort(PL, CO, Specification[PL][i].first, Specification[PL][i].last);
         Split(PL, i);
@@ -1831,12 +1820,13 @@ void ComputePartition(void) {
     }
 #if SYMMINTERGATION < 3
     // Hashfaktoren eintragen
-    for (i = 0; i < Globals::Places[i]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[i]->cnt; i++) {
         if (part[i].top) {
             part[i].nextorcard = rand();
         }
     }
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
+        unsigned int j;
         for (j = i; !part[j].top; j = part[j].nextorcard) {
             ;
         }
@@ -1849,38 +1839,34 @@ void ComputePartition(void) {
 }
 
 
-void FirstSymm()
-
-{
-    unsigned int i, j;
-
-    for (i = 0; i < CardStore; i++) {
+void FirstSymm() {
+    for (unsigned int i = 0; i < CardStore; i++) {
         Store[i].current = Store[i].card;
-        for (j = Store[i].argnr; j < Globals::Places[i]->cnt; j++) {
+        for (unsigned int j = Store[i].argnr; j < Globals::Places[i]->cnt; j++) {
             Store[i].reference[j - Store[i].argnr] = j;
         }
     }
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
         CurrentSymm[i] = i;
     }
 }
 
+/*!
+ Identify next symm where at least one value between 0 and scg could have
+ changed.
+
+ \return return the smallest value where something has changed
+ \return return value > #PL --> no more symm.
+*/
 unsigned int NextSymm(unsigned int scg) {
-    //identify next symm where at least one value between 0 and scg
-    // could have changed
-    // return the smallest value where something has changed
-    // return value > #PL --> no more symm.
-
-
-    int l, m, r;
-    SymmStore* sigma;
+    int m;
 
     // search the largest argument less or equal to scg
-
     if (Store[0].argnr > scg) {
         return Globals::Places[0]->cnt + 27;
     }
-    l = 0;
+    int l = 0;
+    int r;
     if ((Store[r = CardStore - 1].argnr) <= scg) {
         m = r;
     } else {
@@ -1916,7 +1902,7 @@ unsigned int NextSymm(unsigned int scg) {
         }
         Store[m].current = Store[m--].card;
     };
-    sigma = Store + m;
+    SymmStore* sigma = Store + m;
     sigma ->current--;
     for (unsigned int i = sigma->argnr; i < Globals::Places[0]->cnt; i++) {
         CurrentSymm[i] = sigma->reference[sigma->image[sigma->current].vector[i - sigma->argnr] - sigma->argnr];
@@ -1930,9 +1916,8 @@ unsigned int NextSymm(unsigned int scg) {
 }
 
 void AllSyms() {
-    unsigned int i;
     FirstSymm();
-    i = 1;
+    unsigned int i = 1;
     while (NextSymm(Globals::Places[0]->cnt) <= Globals::Places[0]->cnt) {
         i++;
     }
@@ -1941,8 +1926,7 @@ void AllSyms() {
 #include"graph.H"
 
 void check() {
-    unsigned int i, j, k;
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
         if (Globals::Places[i] != Reaktor[PL][DO][Globals::Places[i]->pos[DO]].node) {
             cout << "aua\n";
         }
@@ -1951,7 +1935,7 @@ void check() {
         }
     }
 
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
         if (!Reaktor[PL][DO][i].node) {
             cout << "aah\n";
         }
@@ -1959,7 +1943,8 @@ void check() {
             cout << "uuh\n";
         }
     }
-    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+
+    for (unsigned int i = 0; i < Globals::Transitions[0]->cnt; i++) {
         if (Globals::Transitions[i] != Reaktor[TR][DO][Globals::Transitions[i]->pos[DO]].node) {
             cout << "aua\n";
         }
@@ -1968,7 +1953,7 @@ void check() {
         }
     }
 
-    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Transitions[0]->cnt; i++) {
         if (!Reaktor[TR][DO][i].node) {
             cout << "aah\n";
         }
@@ -1976,25 +1961,30 @@ void check() {
             cout << "uuh\n";
         }
     }
+
     if (CardSpecification[PL] > Globals::Places[0]->cnt) {
         cout << "sclimm\n";
     }
+
     if (CardSpecification[TR] > Globals::Transitions[0]->cnt) {
         cout << "auch sclimm\n";
     }
-    for (i = 0; i < CardSpecification[PL]; i++) {
+
+    for (unsigned int i = 0; i < CardSpecification[PL]; i++) {
         if (Specification[PL][i].first > Specification[PL][i].last) {
             cout << "boese\n";
         }
     }
-    for (i = 0; i < CardSpecification[TR]; i++) {
+
+    for (unsigned int i = 0; i < CardSpecification[TR]; i++) {
         if (Specification[TR][i].first > Specification[TR][i].last) {
             cout << "auch boese\n";
         }
     }
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
-        k = 0;
-        for (j = 0; j < CardSpecification[PL]; j++) {
+
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
+        unsigned int k = 0;
+        for (unsigned int j = 0; j < CardSpecification[PL]; j++) {
             if ((Specification[PL][j].first <= i)  && (i <= Specification[PL][j].last)) {
                 k++;
             }
@@ -2003,9 +1993,10 @@ void check() {
             cout << "unfassbar\n";
         }
     }
-    for (i = 0; i < Globals::Transitions[0]->cnt; i++) {
-        k = 0;
-        for (j = 0; j < CardSpecification[TR]; j++) {
+
+    for (unsigned int i = 0; i < Globals::Transitions[0]->cnt; i++) {
+        unsigned int k = 0;
+        for (unsigned int j = 0; j < CardSpecification[TR]; j++) {
             if ((Specification[TR][j].first <= i)  && (i <= Specification[TR][j].last)) {
                 k++;
             }
@@ -2019,16 +2010,11 @@ void check() {
 ///! \todo Rückgabewert!
 State* symm_search2(Decision* d) {
 #if defined(SYMMETRY) && SYMMINTEGRATION == 2
-    unsigned int i, k;
     State* s;
-    unsigned int MyCardSpecification[2];
-    bool spl;
-    ToDo* tmp;
-    MyCardSpecification[PL] = CardSpecification[PL];
-    MyCardSpecification[TR] = CardSpecification[TR];
-    for (i = 0; i < d -> size; i++) {
+    unsigned int MyCardSpecification[2] = {CardSpecification[PL], CardSpecification[TR]};
+    for (unsigned int i = 0; i < d -> size; i++) {
         if (d -> next[i]) {
-            if (s = symm_search2(d->next[i])) {
+            if ((s = symm_search2(d->next[i]))) {
                 return s;
             }
         } else {
@@ -2036,7 +2022,7 @@ State* symm_search2(Decision* d) {
             // try to calculate a symmetry from current to this state
             NewStamp();
             v = d -> vector[i];
-            for (k = Globals::Places[0]->cnt - 1;; k--) {
+            for (unsigned int k = Globals::Places[0]->cnt - 1;; k--) {
                 Reaktor[PL][DO][k].count = Globals::CurrentMarking[((Place*) Reaktor[PL][DO][k].node)->index];
                 Reaktor[PL][DO][k].stamp = Reaktor[PL][CO][k].stamp = Stamp;
                 Reaktor[PL][CO][Globals::Places[k]->pos[CO]].count = (*v)[v->length + k - Globals::Places[0]->cnt];
@@ -2048,13 +2034,13 @@ State* symm_search2(Decision* d) {
                 }
             }
             // Jetzt sortieren, splitten, Symmetrie suchen, reunifizieren, zurueckkehren
-            spl = true;
-            for (k = 0; k < MyCardSpecification[PL]; k++) {
+            bool spl = true;
+            for (unsigned int k = 0; k < MyCardSpecification[PL]; k++) {
                 CountSort(PL, CO, Specification[PL][k].first, Specification[PL][k].last);
                 if (!Split(PL, k)) {
                     spl = false;
                     while (ToDoList[PL]) {
-                        tmp = ToDoList[PL];
+                        ToDo* tmp = ToDoList[PL];
                         ToDoList[PL] = ToDoList[PL] -> next;
                         delete tmp;
                     }
@@ -2097,21 +2083,14 @@ State* symm_search2(Decision* d) {
 }
 
 State* symm_search_marking2() {
-    // unused: int i;
-
-
     State* s;
-    Decision* ld;
-    Statevector* lv;
-    unsigned int lc, li;
-
     if ((s = search_marking())) {
         return s;
     }
-    ld = LastDecision;
-    lv = LastVector;
-    li = Scapegoat;
-    lc = LastChoice;
+    Decision* ld = LastDecision;
+    Statevector* lv = LastVector;
+    unsigned int li = Scapegoat;
+    unsigned int lc = LastChoice;
     if (HashTable[Globals::Places[0]->hash_value]) {
         NewStamp();
         for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
@@ -2131,6 +2110,7 @@ State* symm_search_marking2() {
     LastVector = lv;
     Scapegoat = li;
     LastChoice = lc;
+
     return NULL;
 }
 
@@ -2138,21 +2118,15 @@ State* symm_search_marking2() {
 ///! \todo Rückgabewert!
 State* bin_symm_search2(binDecision* d) {
 #if defined(SYMMETRY) && SYMMINTEGRATION == 2
-    unsigned int pm, p, pb, t, k, byte, s;
-    unsigned  char* v;
     State* st;
-    unsigned int MyCardSpecification[2];
-    bool spl;
-    ToDo* tmp;
-    MyCardSpecification[PL] = CardSpecification[PL];
-    MyCardSpecification[TR] = CardSpecification[TR];
+    unsigned int MyCardSpecification[2] = {CardSpecification[PL], CardSpecification[TR]};
     if (d -> nextold) {
-        if (st = bin_symm_search2(d->nextold)) {
+        if ((st = bin_symm_search2(d->nextold))) {
             return st;
         }
     }
     if (d -> nextnew) {
-        if (st = bin_symm_search2(d->nextnew)) {
+        if ((st = bin_symm_search2(d->nextnew))) {
             return st;
         }
     }
@@ -2162,15 +2136,15 @@ State* bin_symm_search2(binDecision* d) {
 #endif
 
     // try to calculate a symmetry from current to this state
-    p = Globals::Places[0] -> cnt - 1;
-    v = d -> vector;
-    t = (BitVectorSize - (d -> bitnr + 1)) / 8;
-    s = (BitVectorSize - (d -> bitnr + 1)) % 8;
-    pb = Globals::Places[p] -> nrbits;
-    byte = v[t] >> (8 - s);
-    pm = 0;
+    unsigned int p = Globals::Places[0] -> cnt - 1;
+    unsigned char* v = d -> vector;
+    unsigned int t = (Globals::BitVectorSize - (d -> bitnr + 1)) / 8;
+    unsigned int s = (Globals::BitVectorSize - (d -> bitnr + 1)) % 8;
+    unsigned int pb = Globals::Places[p] -> nrbits;
+    unsigned int byte = v[t] >> (8 - s);
+    unsigned int pm = 0;
 
-    while (1) {
+    while (true) {
 
         // compute marking pm of place p corr. to decision entry d
         if (pb > s) {
@@ -2221,16 +2195,16 @@ State* bin_symm_search2(binDecision* d) {
         }
     }
     // Jetzt sortieren, splitten, Symmetrie suchen, reunifizieren, zurueckkehren
-    spl = true;
-    for (k = 0; k < MyCardSpecification[PL]; k++) {
+    bool spl = true;
+    for (unsigned int k = 0; k < MyCardSpecification[PL]; k++) {
 //        CountSort(PL,DO,Specification[PL][k].first,Specification[PL][k].last);
         CountSort(PL, CO, Specification[PL][k].first, Specification[PL][k].last);
     }
-    for (k = 0; k < CardSpecification[PL]; k++) {
+    for (unsigned int k = 0; k < CardSpecification[PL]; k++) {
         if (!Split(PL, k)) {
             spl = false;
             while (ToDoList[PL]) {
-                tmp = ToDoList[PL];
+                ToDo* tmp = ToDoList[PL];
                 ToDoList[PL] = ToDoList[PL] -> next;
                 delete tmp;
             }
@@ -2271,21 +2245,11 @@ State* bin_symm_search2(binDecision* d) {
 }
 
 State* bin_symm_search_marking2() {
-    // unused: int i;
-
-
     State* s;
-    //Decision * ld;
-    //Statevector * lv;
-    //unsigned int lc,li;
-
     if ((s = binSearch())) {
         return s;
     }
-    //ld = LastDecision;
-    //lv = LastVector;
-    //li = Scapegoat;
-    //lc = LastChoice;
+
     if (binHashTable[Globals::Places[0]->hash_value]) {
         NewStamp();
         for (unsigned i = 0; i < Globals::Places[0]->cnt; i++) {
@@ -2295,27 +2259,21 @@ State* bin_symm_search_marking2() {
         for (unsigned i = 0; i < CardSpecification[PL]; i++) {
             CountSort(PL, DO, Specification[PL][i].first, Specification[PL][i].last);
         }
-        //    LastDecision = ld;
-        //   LastVector = lv;
-        //  Scapegoat = li;
-        // LastChoice = lc;
         return bin_symm_search2(binHashTable[Globals::Places[0]->hash_value]);
     }
-    //LastDecision = ld;
-    //LastVector = lv;
-    //Scapegoat = li;
-    //LastChoice = lc;
+
     return NULL;
 }
 
+/*!
+ Return canonical_representitive of current marking as int vector. Use
+ initialized Reaktor (i.e. rely on RefineUntilNothingChanges on initial
+ partition).
+*/
 void canonize_on_the_fly() {
-    unsigned int i;
-    // return canonical_representitive of current marking as int vector.
-    // use initialized Reaktor (i.e. rely on RefineUntilNothingChanges on initial
-    // partition).
     Attempt = 0;
     found = false;
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
         kanrep[i] = Globals::CurrentMarking[i];
     }
     if (CardSpecification[PL] >= Globals::Places[0] -> cnt) {
@@ -2325,7 +2283,7 @@ void canonize_on_the_fly() {
 
     OnlineCanonize();
     kanhash = 0;
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
         kanhash += Globals::Places[i] -> hash_factor * kanrep[i];
         kanhash %= HASHSIZE;
     }
@@ -2338,6 +2296,6 @@ State* canonical_representitive_on_the_fly() {
 
 void PrintStore() {
     for (unsigned int etage = 0; etage < CardStore; ++etage) {
-        cout << "Etage " << etage << "; arg=" << Store[etage].arg->name << " card=" << Store[etage].card << endl;
+        printf("Etage %d; arg=%s card=%d\n", etage, Store[etage].arg->name, Store[etage].card);
     }
 }

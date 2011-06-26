@@ -1008,7 +1008,7 @@ extern unsigned int bin_d; // difference position
 extern unsigned int bin_dir; // did we go "old" or "new" in last decision?
 extern unsigned int bin_b; // bit nr at start of byte
 extern binDecision* fromdec, * todec;
-#if defined(TARJAN) || defined(MODELCHECKING) || defined(COVER)
+#if defined(TARJAN) || defined(MODELCHECKING) || defined(COVER) || defined(SYMMETRY)
 extern binDecision* vectordec;
 #endif
 inline void trace() {

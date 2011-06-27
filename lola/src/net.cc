@@ -327,7 +327,7 @@ void fix_argv(int& argc, char** &argv) {
 
     std::vector<std::string> new_argv;
     std::string temp;
-    for (unsigned int i = 0; i < argc; ++i) {
+    for (int i = 0; i < argc; ++i) {
         // collect the whole entry
         unsigned int j = 0;
         while (argv[i][j] != '\0') {

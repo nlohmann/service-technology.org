@@ -3291,7 +3291,7 @@ int home() {
 
 void print_binDec(binDecision* d, int indent);
 void print_binDec(int h) {
-    for (int i = 0; i < Globals::Places[0]->NrSignificant; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->NrSignificant; i++) {
         cout << Globals::Places[i]->name << ": " << Globals::Places[i]->nrbits;
     }
     cout << endl;

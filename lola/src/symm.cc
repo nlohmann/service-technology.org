@@ -24,32 +24,20 @@
 #include "graph.H"
 #include "Globals.h"
 #include <cstdlib>
+#ifdef DISTRIBUTE
+#include "distribute.h"
+#endif
 
 // for testing purposes only
 //#define SYMMPROD
 
-#define NodeType int
-#define PL 0  /* place */
-#define TR 1  /* transition */
-#define DomType int
-#define DO 0 /* domain */
-#define CO 1 /* codomain */
-
-void PrintStore();
-
 using std::ofstream;
-
-#ifdef DISTRIBUTE
-#include "distribute.h"
-#endif
 
 unsigned int* kanrep;
 unsigned int* kanrep1;
 unsigned int* compose;
 unsigned int* reservecompose;
 unsigned int kanhash;
-
-void check();
 
 // Begriffe:
 // Symmetrie: Bijektion auf Plaetzen und Transitionen, also Menge
@@ -80,8 +68,9 @@ void check();
 // - fuer jedes i: neues Constraint [A1i,B1i], wobei A1i,B1i die Mengen der
 //   Knoten aus A1,B1 mit i Hits
 
-// Ein Reaktoreintrag dient dem Zaehlen der Hits fuer einen Knoten:
-
+/*!
+ Ein Reaktoreintrag dient dem Zaehlen der Hits fuer einen Knoten.
+*/
 class Reaktoreintrag {
     public:
         Node* node; //Knoten, fuer den gezaehlt wird
@@ -90,43 +79,38 @@ class Reaktoreintrag {
         Reaktoreintrag();
 };
 
-
-Reaktoreintrag::Reaktoreintrag() {
-    stamp = 0;
-    count = 0;
-    // Feld "node" wird in "FuelleReaktor" initialisiert
-}
+Reaktoreintrag::Reaktoreintrag() : node(NULL), count(0), stamp(0) {}
 
 // Pro Knotentyp (1. Index) je ein Zaehlarray fuer
 // die Ai ("DO") und die Bi ("CO") (2. Index).
-
 Reaktoreintrag* Reaktor[2][2];
 
 
-// ToDo ist ein Element in der Liste derjenigen Constraints, mit denen
-// noch nicht alle Refines ausprobiert wurden
-
+/*!
+ ToDo ist ein Element in der Liste derjenigen Constraints, mit denen noch
+ nicht alle Refines ausprobiert wurden
+*/
 class ToDo {
     public:
         unsigned int constraint; // Die Nr des fraglichen Constraints im
         // Array aller Constraints (= Specification)
         ToDo* next;              // Listenpointer
-        ToDo(NodeType, unsigned int); // kreiert neuen Eintrag und sortiert
-        // ihn am Listenanfang ein
+        ToDo(NodeType, unsigned int);
 };
 
-ToDo* ToDoList[2];  // Eine für Platzconstraints, eine für Globals::Transitionsconstraints
+ToDo* ToDoList[2];  // Eine für Platzconstraints, eine für Transitionsconstraints
 
-ToDo::ToDo(NodeType TY, unsigned int co) {
-    next = ToDoList[TY];
-    constraint = co;
+/*!
+ Kreiert neuen Eintrag und sortiert ihn am Listenanfang ein.
+*/
+ToDo::ToDo(NodeType TY, unsigned int co) : constraint(co), next(ToDoList[TY]) {
     ToDoList[TY] = this;
 }
 
-// Durch permanentes Umsortieren der Reaktor-Arrays wird
-// sichergestellt, dass die Elemente eines Constraints immer einen
-// zusammenhaengenden Bereich bilden
-
+/*!
+ Durch permanentes Umsortieren der Reaktor-Arrays wird sichergestellt, dass
+ die Elemente eines Constraints immer einen zusammenhaengenden Bereich bilden
+*/
 class Constraint {
     public:
         unsigned int first; // Start des Bereichs im Reaktor-Array, wo Knoten dieser Klasse stehen
@@ -139,10 +123,10 @@ unsigned int CardSpecification[2];  // Anzahl der Constraints (für PL / für TR
 
 Constraint* Specification[2]; // Arrays fuer die Constraints (PL/TR)
 
-
-// Hin und wieder Lebenszeichen geben, damit Nutzer dei Ctrl-C-Taste wieder
-// loslasesst
-
+/*!
+ Hin und wieder Lebenszeichen geben, damit Nutzer dei Ctrl-C-Taste wieder
+ loslasesst
+*/
 inline void reportprogress() {
     if (!((CardSpecification[PL] + CardSpecification[TR]) % REPORTFREQUENCY)) {
         message("Depth %d", CardSpecification[PL] + CardSpecification[TR]);
@@ -154,12 +138,12 @@ unsigned int DeadBranches; // zaehlt rekursive Abstiege, die nicht zu einem
 // (einzige Quelle fuer Exponentialitaet)
 unsigned int CardGenerators; // Anzahl der berechneten Erzeugenden
 
-
-// Fuer jeden Knoten werden die Arrays der eingehenden und ausgehenden
-// Boegen nach Vielfacheit sortiert. So stehen z.B. spaeter die Boegen
-// gleicher Vielfachheit als zusammenhaengende Bereiche zur Verfuegung
-// Alle Sortierroutinen in symm.cc sind Quicksort.
-
+/*!
+ Fuer jeden Knoten werden die Arrays der eingehenden und ausgehenden Boegen
+ nach Vielfacheit sortiert. So stehen z.B. spaeter die Boegen gleicher
+ Vielfachheit als zusammenhaengende Bereiche zur Verfuegung. Alle
+ Sortierroutinen in symm.cc sind Quicksort.
+*/
 void ArcSort(Arc** list, unsigned int from, unsigned int to) {
     unsigned int less, current, greater;
     Arc* swap;
@@ -191,12 +175,10 @@ void ArcSort(Arc** list, unsigned int from, unsigned int to) {
     }
 }
 
-
-// Initialisierung der Symm-Berechnungs-Datenstrukturen
-
+/*!
+ Initialisierung der Symm-Berechnungs-Datenstrukturen
+*/
 void init_syms() {
-    // int i;
-
     ToDoList[PL] = ToDoList[TR] = NULL; // Zunaechst mal nix zu tun
 
     // wir starten mit den Constraints [P,P] und [T,T]
@@ -246,43 +228,55 @@ void init_syms() {
 // rechnen wir noch auf den Arrays Globals::Places unf Globals::Transitions selbst und
 // kopieren spaeter in den Reaktor (Funktion "FuelleReaktor").
 
-// Ist ein zu analysierender Platz p gegeben, soll [{p},{p}] ein
-// Constraint bilden. So bildet jede berechnete Symm p auf p ab und
-// die p betreffenden Resultate bleiben akkurat.
-// Sortieren bewegt diesen Platz ans Ende des
-// Platzarrays
-
+/*!
+ Ist ein zu analysierender Platz p gegeben, soll [{p},{p}] ein Constraint
+ bilden. So bildet jede berechnete Symm p auf p ab und die p betreffenden
+ Resultate bleiben akkurat. Sortieren bewegt diesen Platz ans Ende des
+ Platzarrays.
+*/
 unsigned int get_target_place(Node* node) {
-    return ((Place*) node) == Globals::CheckPlace ? 1 : 0;
+    return (static_cast<Place*>(node) == Globals::CheckPlace) ? 1 : 0;
 }
 
-// Dito fuer den Fall, dass eine zu analysierende Transition gegeben ist
-
+/*!
+ Ist ein zu analysierender Transition t gegeben, soll [{t},{t}] ein Constraint
+ bilden. So bildet jede berechnete Symm t auf t ab und die t betreffenden
+ Resultate bleiben akkurat. Sortieren bewegt diese Transition ans Ende des
+ Platzarrays.
+*/
 unsigned int get_target_transition(Node* node) {
-    return ((Transition*) node) == Globals::CheckTransition ? 1 : 0;
+    return (static_cast<Transition*>(node) == Globals::CheckTransition) ? 1 : 0;
 }
 
-// Ist eine zu erreichende Zielmarkierung gegeben, soll jede Symm diese
-// auf sich selbst abbilden
-
+/*!
+ Ist eine zu erreichende Zielmarkierung gegeben, soll jede Symm diese auf
+ sich selbst abbilden.
+*/
 unsigned int get_target_marking(Node* node) {
-    return ((Place*) node) -> target_marking;
+    return static_cast<Place*>(node)->target_marking;
 }
 
-// Die Anfangsmarkierung soll auf sich selbst abgebildet werden
+/*!
+ Die Anfangsmarkierung soll auf sich selbst abgebildet werden.
+*/
 unsigned int get_marking(Node* node) {
-    return ((Place*) node) -> initial_marking;
+    return static_cast<Place*>(node)->initial_marking;
 }
 
-// Symmetrien koennen sowieso nur Knoten mit gleichem In- und Out-Grad
-// aufeinander abbilden. Das kann man gleich praeprozessen
-
+/*!
+ Symmetrien koennen sowieso nur Knoten mit gleichem In- und Out-Grad
+ aufeinander abbilden. Das kann man gleich praeprozessen.
+*/
 unsigned int get_card_arcs_in(Node* node) {
-    return node ->  NrOfArriving;
+    return node->NrOfArriving;
 }
 
+/*!
+ Symmetrien koennen sowieso nur Knoten mit gleichem In- und Out-Grad
+ aufeinander abbilden. Das kann man gleich praeprozessen.
+*/
 unsigned int get_card_arcs_out(Node* node) {
-    return node -> NrOfLeaving;
+    return node->NrOfLeaving;
 }
 
 // Zwei Variablen zur Uebergabe von Parametern an die darauffolgenden
@@ -292,32 +286,30 @@ unsigned int get_card_arcs_out(Node* node) {
 unsigned int this_arc_nr;
 unsigned int this_direction;
 
-
-// Symmetrien koennen eh nur Knoten aufeinander abbilden, die, fuer eine
-// gegebene Vielfachheit, gleich viele ausgehende bzw eingehende Boegen
-// mit dieser Vielfachheit haben. Setzt man soertierte Bogenlisten und
-// vorangeganges Sortieren nach Bogengesamtzahl voraus, reicht es nun,
-// jeweils anhand der Vielfachheiten der jeweils i-ten Boegen zu
-// sortieren und danach zu separieren
-
+/*!
+ Symmetrien koennen eh nur Knoten aufeinander abbilden, die, fuer eine
+ gegebene Vielfachheit, gleich viele ausgehende bzw eingehende Boegen mit
+ dieser Vielfachheit haben. Setzt man soertierte Bogenlisten und vorangeganges
+ Sortieren nach Bogengesamtzahl voraus, reicht es nun, jeweils anhand der
+ Vielfachheiten der jeweils i-ten Boegen zu sortieren und danach zu
+ separieren.
+*/
 unsigned int get_arc_mult(Node* node) {
-    return ((this_direction ? node -> ArrivingArcs : node -> LeavingArcs)[this_arc_nr] -> Multiplicity);
+    return (this_direction ? node->ArrivingArcs : node->LeavingArcs)[this_arc_nr]->Multiplicity;
 }
 
-
-// Dies ist die generische Sortierroutine fuer Plaetze
+/*!
+ Dies ist die generische Sortierroutine fuer Plaetze
+*/
 void PlaceSort(unsigned int from, unsigned int to, unsigned int attribute(Node*)) {
-    unsigned int less, current, greater, sw;
-    Place* swap;
-
-    less = from;
-    current = from + 1;
-    greater = to;
+    unsigned int less = from;
+    unsigned int current = from + 1;
+    unsigned int greater = to;
 
     while (current <= greater) {
         if (attribute((Node*) Globals::Places[current]) < attribute((Node*) Globals::Places[current - 1])) {
-            swap = Globals::Places[current];
-            sw = Globals::CurrentMarking[current];
+            Place* swap = Globals::Places[current];
+            unsigned int sw = Globals::CurrentMarking[current];
             Globals::Places[current] = Globals::Places[less];
             Globals::CurrentMarking[current++] = Globals::CurrentMarking[less];
             Globals::Places[less] = swap;
@@ -326,8 +318,8 @@ void PlaceSort(unsigned int from, unsigned int to, unsigned int attribute(Node*)
             if (attribute((Node*) Globals::Places[current]) == attribute((Node*) Globals::Places[current - 1])) {
                 current++;
             } else {
-                swap = Globals::Places[current];
-                sw = Globals::CurrentMarking[current];
+                Place* swap = Globals::Places[current];
+                unsigned int sw = Globals::CurrentMarking[current];
                 Globals::Places[current] = Globals::Places[greater];
                 Globals::CurrentMarking[current] = Globals::CurrentMarking[greater];
                 Globals::Places[greater] = swap;
@@ -343,26 +335,24 @@ void PlaceSort(unsigned int from, unsigned int to, unsigned int attribute(Node*)
     }
 }
 
-// dito fuer Transitionen
-
+/*!
+ Dies ist die generische Sortierroutine fuer Transitionen
+*/
 void TransitionSort(unsigned int from, unsigned int to, unsigned int attribute(Node*)) {
-    unsigned int less, current, greater;
-    Transition* swap;
-
-    less = from;
-    current = from + 1;
-    greater = to;
+    unsigned int less = from;
+    unsigned int current = from + 1;
+    unsigned int greater = to;
 
     while (current <= greater) {
         if (attribute((Node*) Globals::Transitions[current]) < attribute((Node*) Globals::Transitions[current - 1])) {
-            swap = Globals::Transitions[current];
+            Transition* swap = Globals::Transitions[current];
             Globals::Transitions[current++] = Globals::Transitions[less];
             Globals::Transitions[less++] = swap;
         } else {
             if (attribute((Node*) Globals::Transitions[current]) == attribute((Node*) Globals::Transitions[current - 1])) {
                 current++;
             } else {
-                swap = Globals::Transitions[current];
+                Transition* swap = Globals::Transitions[current];
                 Globals::Transitions[current] = Globals::Transitions[greater];
                 Globals::Transitions[greater--] = swap;
             }
@@ -386,26 +376,23 @@ void TransitionSort(unsigned int from, unsigned int to, unsigned int attribute(N
 
 // c: zu splittendes Constraint, attribute: Splitkriterium in Form einer
 // der obigen Routinen
-
 void SplitPlacesInVorReaktor(unsigned int c, unsigned int attribute(Node*)) {
-    unsigned int i, firstc, lastc, oldc, newc;
-
-
     PlaceSort(Specification[PL][c].first, Specification[PL][c].last, attribute);
     // Nun bilden die zukünftigen Teilconstraints zusammenhaengende Bereiche im
     // Originalconstraint
-    oldc = c;
-    firstc = Specification[PL][c].first;
-    lastc = Specification[PL][c].last;
+    unsigned int oldc = c;
+    unsigned int firstc = Specification[PL][c].first;
+    unsigned int lastc = Specification[PL][c].last;
 
     // Solange noch verschiedene Werte im verbleibenden Constraint...
     while (attribute((Node*) Globals::Places[firstc]) != attribute((Node*) Globals::Places[lastc])) {
         // Suche erste Stelle, wo Nachbarknoten unterschiedliche Werte liefern
         // (dort wird Constraint geteilt)
+        unsigned int i;
         for (i = firstc + 1; attribute((Node*) Globals::Places[firstc]) == attribute((Node*) Globals::Places[i]); i++) {
             ;
         }
-        newc = CardSpecification[PL]; // naechste freie Constraintnummer
+        unsigned int newc = CardSpecification[PL]; // naechste freie Constraintnummer
         // Teilen: wir haben ja sortiert...
         Specification[PL][oldc].last = i - 1;
         Specification[PL][newc].first = i;
@@ -426,21 +413,18 @@ void SplitPlacesInVorReaktor(unsigned int c, unsigned int attribute(Node*)) {
     }
 }
 
-
 // Kopie der vorigen Routine, aber fuer Transitionen
-
 void SplitTransitionsInVorReaktor(unsigned int c, unsigned int attribute(Node*)) {
-    unsigned int i, firstc, lastc, oldc, newc;
-
     TransitionSort(Specification[TR][c].first, Specification[TR][c].last, attribute);
-    oldc = c;
-    firstc = Specification[TR][c].first;
-    lastc = Specification[TR][c].last;
+    unsigned int oldc = c;
+    unsigned int firstc = Specification[TR][c].first;
+    unsigned int lastc = Specification[TR][c].last;
     while (attribute((Node*) Globals::Transitions[firstc]) != attribute((Node*) Globals::Transitions[lastc])) {
+        unsigned int i;
         for (i = firstc + 1; attribute((Node*) Globals::Transitions[firstc]) == attribute((Node*) Globals::Transitions[i]); i++) {
             ;
         }
-        newc = CardSpecification[TR];
+        unsigned int newc = CardSpecification[TR];
         Specification[TR][oldc].last = i - 1;
         Specification[TR][newc].first = i;
         Specification[TR][newc].last = lastc;
@@ -456,17 +440,16 @@ void SplitTransitionsInVorReaktor(unsigned int c, unsigned int attribute(Node*))
     }
 }
 
-
-// Berechnung der initialen abstrakten Symmetrie
-
+/*!
+  Berechnung der initialen abstrakten Symmetrie
+*/
 void InitialConstraint() {
-    unsigned int c, b, bmax, cmax;
-    // unused: unsigned int i;
+    unsigned int c, b;
 
     // Separierung nach Zahl der eingehenden/ausgehenden Boegen - ist nie falsch
     SplitPlacesInVorReaktor(0, get_card_arcs_in);
     SplitTransitionsInVorReaktor(0, get_card_arcs_in);
-    cmax = CardSpecification[PL];
+    unsigned int cmax = CardSpecification[PL];
     for (c = 0; c < cmax; c++) {
         SplitPlacesInVorReaktor(c, get_card_arcs_out);
     }
@@ -476,7 +459,7 @@ void InitialConstraint() {
     }
     // Separierung nach Vielfachheiten der i-ten Kanten - nie falsch
     this_direction = DO;
-    bmax = Globals::Places[Globals::Places[0]->cnt - 1]->NrOfLeaving;
+    unsigned int bmax = Globals::Places[Globals::Places[0]->cnt - 1]->NrOfLeaving;
     for (b = 0; b < bmax; b++) {
         this_arc_nr = b;
         cmax = CardSpecification[PL];
@@ -557,26 +540,25 @@ void InitialConstraint() {
 #endif
 }
 
-// Kopiere Resultat von InitialConstraint in Reaktor, da ab jetzt linke
-// und rechte Seiten der geordneten Paare abweichen koennen.
-
+/*!
+ Kopiere Resultat von InitialConstraint in Reaktor, da ab jetzt linke und
+ rechte Seiten der geordneten Paare abweichen koennen.
+*/
 void FuelleReaktor() {
-    unsigned int i, c;
-
-    for (i = 0; i < Globals::Places[0]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
         Globals::Places[i]->pos[DO] = Globals::Places[i]->pos[CO] = i;
     }
-    for (i = 0; i < Globals::Transitions[i]->cnt; i++) {
+    for (unsigned int i = 0; i < Globals::Transitions[i]->cnt; i++) {
         Globals::Transitions[i]-> pos[DO] = Globals::Transitions[i]->pos[CO] = i;
     }
-    for (c = 0; c < CardSpecification[PL]; c++) {
-        for (i = Specification[PL][c].first; i <= Specification[PL][c].last; i++) {
+    for (unsigned int c = 0; c < CardSpecification[PL]; c++) {
+        for (unsigned int i = Specification[PL][c].first; i <= Specification[PL][c].last; i++) {
             Reaktor[PL][DO][i].node = Reaktor[PL][CO][i].node = Globals::Places[i];
         }
         Specification[PL][c].changed = new ToDo(PL, c);
     }
-    for (c = 0; c < CardSpecification[TR]; c++) {
-        for (i = Specification[TR][c].first; i <= Specification[TR][c].last; i++) {
+    for (unsigned int c = 0; c < CardSpecification[TR]; c++) {
+        for (unsigned int i = Specification[TR][c].first; i <= Specification[TR][c].last; i++) {
             Reaktor[TR][DO][i].node = Reaktor[TR][CO][i].node = Globals::Transitions[i];
         }
         Specification[TR][c].changed = new ToDo(TR, c);
@@ -836,23 +818,22 @@ void PrintSpec(char* mess) {
     }
 }
 
-
-// Verfeinere Abstrakte Symmetrie asgehend von Constraint ref
-
+/*!
+ Verfeinere Abstrakte Symmetrie asgehend von Constraint ref
+*/
 bool Refine(NodeType n, unsigned int ref) {
-    unsigned int m1, m2, i, j, arcdir, currentcardarc, dir, othern, c, cmax;
-    Reaktoreintrag* r;
-    // unused: Arc * a,* aa;
+    unsigned int i, j, c;
 
     // das andere Ende eines Bogens hat immer den dualen Knotentyp
-    othern = n ? PL : TR;
+    unsigned int othern = n ? PL : TR;
     // splitte sowohl mit eingehenden als auch ausgehenden Kanten
-    for (arcdir = 0; arcdir < 2; arcdir++) {
+    for (unsigned int arcdir = 0; arcdir < 2; arcdir++) {
         // unused: unsigned int otherarcdir = 1 - arcdir;
         // Anzahl der Kanten (wegen Praepozessing gleich fuer alle Knoten im
         // Constraint)
-        currentcardarc = arcdir ? Reaktor[n][DO][Specification[n][ref].first].node->NrOfArriving
-                         : Reaktor[n][DO][Specification[n][ref].first].node->NrOfLeaving;
+        unsigned int currentcardarc = arcdir
+                                      ? Reaktor[n][DO][Specification[n][ref].first].node->NrOfArriving
+                                      : Reaktor[n][DO][Specification[n][ref].first].node->NrOfLeaving;
         // Pro Durchlauf wird jeweils der (wg Praeprozessing zusammenhaengende)
         // Block von Kanten gleicher Vielfachheit abgearbeitet
         // Deshalb Reinitialisierung ausserhalb des Schleifenkopfes
@@ -860,13 +841,14 @@ bool Refine(NodeType n, unsigned int ref) {
             // Neue Zaehlrunde. Damit werden alle Reaktor.count-Werte
             // ungueltig
             NewStamp();
+            unsigned int m1, m2;
             do {
                 for (i = Specification[n][ref].first; i <= Specification[n][ref].last; i++) {
-                    for (dir = 0; dir < 2; dir++) {
-                        r = arcdir ?
-                            & Reaktor[othern][dir][Reaktor[n][dir][i].node->ArrivingArcs[j]->Source->pos[dir]]
-                            :
-                            & Reaktor[othern][dir][Reaktor[n][dir][i].node->LeavingArcs[j]->Destination->pos[dir]];
+                    Reaktoreintrag* r;
+                    for (unsigned int dir = 0; dir < 2; dir++) {
+                        r = arcdir
+                            ? &Reaktor[othern][dir][Reaktor[n][dir][i].node->ArrivingArcs[j]->Source->pos[dir]]
+                            : &Reaktor[othern][dir][Reaktor[n][dir][i].node->LeavingArcs[j]->Destination->pos[dir]];
                         if (r->stamp == Stamp) {
                             r->count++;
                         } else {
@@ -879,23 +861,21 @@ bool Refine(NodeType n, unsigned int ref) {
                 // zusammenhaengenden Bereiches gleicher Vielfachheit in
                 // Bogenliste (wg Praeprozessing fuer alle Knoten in einem
                 // Constraint einheitlich)
-                m1 =  arcdir ?
-                      Reaktor[n][DO][Specification[n][ref].first].node->ArrivingArcs[j]-> Multiplicity
-                      :
-                      Reaktor[n][DO][Specification[n][ref].first].node->LeavingArcs[j]-> Multiplicity;
+                m1 = arcdir
+                     ? Reaktor[n][DO][Specification[n][ref].first].node->ArrivingArcs[j]-> Multiplicity
+                     : Reaktor[n][DO][Specification[n][ref].first].node->LeavingArcs[j]-> Multiplicity;
                 j++;
                 if (j < currentcardarc) {
-                    m2 =  arcdir ?
-                          Reaktor[n][DO][Specification[n][ref].first].node->ArrivingArcs[j]-> Multiplicity
-                          :
-                          Reaktor[n][DO][Specification[n][ref].first].node->LeavingArcs[j]-> Multiplicity;
+                    m2 = arcdir
+                         ? Reaktor[n][DO][Specification[n][ref].first].node->ArrivingArcs[j]-> Multiplicity
+                         : Reaktor[n][DO][Specification[n][ref].first].node->LeavingArcs[j]-> Multiplicity;
                 } else {
                     m2 = m1 + 1;
                 }
             } while (m1 == m2);
             // cmax: Alle Constraints in Specification mit index < cmax
             // gab es schon vor dem Splitten Neue bekommen indizes >= cmax
-            cmax = CardSpecification[othern];
+            unsigned int cmax = CardSpecification[othern];
             // Das Separieren von Constraints auf der Basis der Zaehlergebnisse
             for (c = 0; c < cmax; c++) {
                 CountSort(othern, DO, Specification[othern][c].first, Specification[othern][c].last);
@@ -909,18 +889,17 @@ bool Refine(NodeType n, unsigned int ref) {
     return true;
 }
 
-
-// Wiederholt Refine solnge bis alle ToDo abgearbeitet sind
+/*!
+ Wiederholt Refine solnge bis alle ToDo abgearbeitet sind
+*/
 bool RefineUntilNothingChanges(NodeType n) {
-    ToDo* tmp;
-
     do {
         do {
             if (!Refine(n, ToDoList[n]->constraint)) {
                 for (n = PL; n < 2; n++) {
                     while (ToDoList[n]) {
                         Specification[n][ToDoList[n]->constraint].changed = NULL;
-                        tmp = ToDoList[n];
+                        ToDo* tmp = ToDoList[n];
                         ToDoList[n] = ToDoList[n]-> next;
                         delete tmp;
                     }
@@ -928,7 +907,7 @@ bool RefineUntilNothingChanges(NodeType n) {
                 return false;
             }
             Specification[n][ToDoList[n]->constraint].changed = NULL;
-            tmp = ToDoList[n];
+            ToDo* tmp = ToDoList[n];
             ToDoList[n] = ToDoList[n]-> next;
             delete tmp;
         } while (ToDoList[n]);
@@ -943,18 +922,16 @@ bool RefineUntilNothingChanges(NodeType n) {
 // weil Splitten im Reaktor nur am Ort sortiert,
 // d.h. ggf. INNERHALB des Indexbereiches
 // Knoten permutiert
-// Also reicht es, first und last zuaktualisieren und den Constraint-Eintrag
+// Also reicht es, first und last zu aktualisieren und den Constraint-Eintrag
 // des abgeforkten Constraints zu loeschen. Dieser in der letzte in
 // Specification, da Specification sich stack-artig enwickelt
 
-// plpegel, trpegel: alle Constraints > = pegel werden mit ihren Eltern
-// wiedervereinigt
-
+/*!
+  \param plpegel, trpegel: alle Constraints > = pegel werden mit ihren Eltern
+                           wiedervereinigt
+*/
 void ReUnify(unsigned int plpegel, unsigned int trpegel) {
-    unsigned int c;
-    // unused: NodeType n;
-
-    for (c = CardSpecification[PL] - 1; c >= plpegel; c--) {
+    for (unsigned int c = CardSpecification[PL] - 1; c >= plpegel; c--) {
         if (Specification[PL][c].first < Specification[PL][Specification[PL][c].parent].first) {
             Specification[PL][Specification[PL][c].parent].first = Specification[PL][c].first;
         }
@@ -967,7 +944,7 @@ void ReUnify(unsigned int plpegel, unsigned int trpegel) {
 #ifdef DISTRIBUTE
     progress();
 #endif
-    for (c = CardSpecification[TR] - 1; c >= trpegel; c--) {
+    for (unsigned int c = CardSpecification[TR] - 1; c >= trpegel; c--) {
         if (Specification[TR][c].first < Specification[TR][Specification[TR][c].parent].first) {
             Specification[TR][Specification[TR][c].parent].first = Specification[TR][c].first;
         }
@@ -1144,8 +1121,9 @@ void WriteSymms() {
 // konsistente, auf den Plaetzen einelementige abstrakte Symm sich immer
 // auch auf den Transitionen fortsetzen laesst
 
-
-// imagepos: die Stelle wo ggf eine gefundene Symm in Store einzutragen ist
+/*!
+ \param imagepos: die Stelle wo ggf eine gefundene Symm in Store einzutragen ist
+*/
 void DefineToOther(unsigned int imagepos) {
     // possibleImages: die in Frage kommenden y, also alle Elemente aus B
     Node** possibleImages;
@@ -1923,7 +1901,6 @@ void AllSyms() {
     }
     cout << i << "\n";
 }
-#include"graph.H"
 
 void check() {
     for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
@@ -2007,9 +1984,48 @@ void check() {
     }
 }
 
+/*
+Diese Funktion scheint von niemandem gerufen zu werden. Ich habe sie daher
+auskommentiert.    Niels, 27.6.2011
+
+State* symm_search_marking2() {
+    State* s;
+    if ((s = search_marking())) {
+        return s;
+    }
+    Decision* ld = LastDecision;
+    Statevector* lv = LastVector;
+    unsigned int li = Scapegoat;
+    unsigned int lc = LastChoice;
+    if (HashTable[Globals::Places[0]->hash_value]) {
+        NewStamp();
+        for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
+            Reaktor[PL][DO][i].count = Globals::CurrentMarking[((Place*) Reaktor[PL][DO][i].node)->index];
+            Reaktor[PL][DO][i].stamp = Stamp;
+        }
+        for (unsigned int i = 0; i < CardSpecification[PL]; i++) {
+            CountSort(PL, DO, Specification[PL][i].first, Specification[PL][i].last);
+        }
+        LastDecision = ld;
+        LastVector = lv;
+        Scapegoat = li;
+        LastChoice = lc;
+        return symm_search2(HashTable[Globals::Places[0]->hash_value]);
+    }
+    LastDecision = ld;
+    LastVector = lv;
+    Scapegoat = li;
+    LastChoice = lc;
+
+    return NULL;
+}
+*/
+
+
+#if defined(SYMMETRY) && SYMMINTEGRATION == 2
+
 ///! \todo Rückgabewert!
 State* symm_search2(Decision* d) {
-#if defined(SYMMETRY) && SYMMINTEGRATION == 2
     State* s;
     unsigned int MyCardSpecification[2] = {CardSpecification[PL], CardSpecification[TR]};
     for (unsigned int i = 0; i < d -> size; i++) {
@@ -2079,41 +2095,7 @@ State* symm_search2(Decision* d) {
     }
     ReUnify(MyCardSpecification[PL], MyCardSpecification[TR]);
     return NULL;
-#endif
 }
-
-State* symm_search_marking2() {
-    State* s;
-    if ((s = search_marking())) {
-        return s;
-    }
-    Decision* ld = LastDecision;
-    Statevector* lv = LastVector;
-    unsigned int li = Scapegoat;
-    unsigned int lc = LastChoice;
-    if (HashTable[Globals::Places[0]->hash_value]) {
-        NewStamp();
-        for (unsigned int i = 0; i < Globals::Places[0]->cnt; i++) {
-            Reaktor[PL][DO][i].count = Globals::CurrentMarking[((Place*) Reaktor[PL][DO][i].node)->index];
-            Reaktor[PL][DO][i].stamp = Stamp;
-        }
-        for (unsigned int i = 0; i < CardSpecification[PL]; i++) {
-            CountSort(PL, DO, Specification[PL][i].first, Specification[PL][i].last);
-        }
-        LastDecision = ld;
-        LastVector = lv;
-        Scapegoat = li;
-        LastChoice = lc;
-        return symm_search2(HashTable[Globals::Places[0]->hash_value]);
-    }
-    LastDecision = ld;
-    LastVector = lv;
-    Scapegoat = li;
-    LastChoice = lc;
-
-    return NULL;
-}
-
 
 ///! \todo Rückgabewert!
 State* bin_symm_search2(binDecision* d) {
@@ -2264,6 +2246,8 @@ State* bin_symm_search_marking2() {
 
     return NULL;
 }
+
+#endif
 
 /*!
  Return canonical_representitive of current marking as int vector. Use

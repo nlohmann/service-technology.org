@@ -19,11 +19,18 @@
 \*****************************************************************************/
 
 
-#ifndef SYMM_H
-#define SYMM_H
+#pragma once
 
 #include "net.H"
 #include "dimensions.H"
+
+#define NodeType int
+#define PL 0  /* place */
+#define TR 1  /* transition */
+#define DomType int
+#define DO 0 /* domain */
+#define CO 1 /* codomain */
+
 
 class SymmImage {
     public:
@@ -67,5 +74,6 @@ extern unsigned int CardGenerators; // Anzahl der Erzeugenden für alle Symms
 extern unsigned int kanhash; // hash value of canonical representitive
 
 void AllSyms();
+void PrintStore();
+void check();
 
-#endif

@@ -67,7 +67,7 @@ public class TranslationTest extends TestSuite {
 	public void translate_EMS() throws Exception {
 		Specification spec = createSpecification();
 		ExportToCPN e = new ExportToCPN(spec);
-		PetriNet net = e.translate(true);
+		PetriNet net = e.translate();
 
 		Assert.assertNotNull(net);
 		

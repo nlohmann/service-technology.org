@@ -1,0 +1,82 @@
+cLSC ems0
+MAIN
+  EVENT ems0_e0 medic/!avail;
+  EVENT ems0_e1 hospital;
+  EVENT ems0_e2 medic/check;
+  EVENT ems0_e3 ems/?avail;
+  DEPENDENCIES
+  	ems0_e0 -> ems0_e2,
+  	ems0_e0 -> ems0_e3;
+  
+cLSC ems1b
+PRE
+  EVENT ems1b_e0 ems/?avail;
+  DEPENDENCIES ;
+MAIN
+  EVENT ems1b_e1 ems/none;
+  DEPENDENCIES ;
+  
+cLSC ems1c
+PRE
+  EVENT ems1c_e0 ems/?avail;
+  DEPENDENCIES ;
+MAIN
+  EVENT ems1c_e1 ems/location;
+  DEPENDENCIES ;
+  
+cLSC ems1d
+PRE
+  EVENT ems1d_e0 ems/none;
+  EVENT ems1d_e1 medic/check;
+  DEPENDENCIES ;
+MAIN
+  EVENT ems1d_e2 medic/!avail;
+  EVENT ems1d_e3 medic/check;
+  EVENT ems1d_e4 ems/?avail;
+  DEPENDENCIES
+   	ems1d_e2 -> ems1d_e3,
+  	ems1d_e2 -> ems1d_e4;
+  	
+cLSC ems2
+PRE
+  EVENT ems2_e1 medic/check;
+  EVENT ems2_e2 ems/location;
+  DEPENDENCIES ;
+MAIN
+  EVENT ems2_e3 medic/treat_A;
+  EVENT ems2_e4 patient;
+  EVENT ems2_e5 medic/!avail;
+  EVENT ems2_e6 medic/check;
+  EVENT ems2_e7 ems/?avail;
+  DEPENDENCIES
+  	ems2_e3 -> ems2_e4,
+  	ems2_e3 -> ems2_e5,
+  	ems2_e5 -> ems2_e6,
+  	ems2_e5 -> ems2_e7;
+
+cLSC ems3
+PRE
+  EVENT ems3_e0 medic/treat_A;
+  EVENT ems3_e1 hospital;
+  EVENT ems3_e2 patient;
+  DEPENDENCIES
+  	ems3_e0 -> ems3_e2;
+MAIN
+  EVENT ems3_e4 hospital/treat;
+  EVENT ems3_e5 hospital;
+  DEPENDENCIES
+  	ems3_e4 -> ems3_e5;
+
+COMPONENT medic
+	medic/check,
+	medic/treat_A,
+	medic/!avail;
+	
+COMPONENT hospital
+	hospital,
+	hospital/treat;
+	
+COMPONENT ems
+	ems/location,
+	ems/none,
+	ems/?avail;

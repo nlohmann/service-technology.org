@@ -1,3 +1,9 @@
+SAM v.1.1.0
+---------------
+
++ translation result can be flat or hierarchical, hierarchies
+  are chosen either by scenarios or by components
+
 SAM v.1.0.0
 ---------------
 

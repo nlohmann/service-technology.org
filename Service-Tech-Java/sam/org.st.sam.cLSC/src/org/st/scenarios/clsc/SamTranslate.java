@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.naming.OperationNotSupportedException;
@@ -25,10 +28,10 @@ import org.cpntools.accesscpn.model.Object;
 import org.cpntools.accesscpn.model.Page;
 import org.cpntools.accesscpn.model.PetriNet;
 import org.cpntools.accesscpn.model.PlaceNode;
+import org.cpntools.accesscpn.model.RefPlace;
 import org.cpntools.accesscpn.model.exporter.CPNtoDot;
 import org.cpntools.accesscpn.model.exporter.DOMGenerator;
 import org.st.scenarios.clsc.export.ExportToCPN;
-import org.st.scenarios.clsc.export.ExportToCPN2;
 
 public class SamTranslate {
   
@@ -80,7 +83,6 @@ public class SamTranslate {
     sb.append("                                     components\n");
     sb.append("                      'control' - each component may control activation\n");
     sb.append("                                  of any scenario it is involved\n");
-    sb.append("                      'hierarchical' - render components as subpages\n");
     return sb.toString();
   }
   
@@ -119,8 +121,6 @@ public class SamTranslate {
           options_components = true;
         if ("control".equals(args[i]))
           options_multiply_activation = true;
-        if ("hierarchical".equals(args[i]))
-          options_hierarchy = true;
       }
 
       if ("-m".equals(args[i])) {
@@ -204,15 +204,24 @@ public class SamTranslate {
     }
   }
   
+  private ExportToCPN spec_to_net;
+  
   public PetriNet translateSpec(Specification spec) {
-    ExportToCPN2 e = new ExportToCPN2(spec);
-    PetriNet net = e.translate();
+    spec_to_net = new ExportToCPN(spec);
+    PetriNet net = spec_to_net.translate();
     
-    e.assignRoles(spec.eventToComponent);
+    if (options_components) {
+      spec_to_net.assignRolesToTransitions(spec.eventToComponent);
+    } else {
+      spec_to_net.assignRolesFromScenario();
+    }
     if (options_multiply_activation)
-      e.multiplyActivationLogic();
-    if (options_hierarchy)
-      e.splitRolesToSubpages(net.getPage().get(0));
+      spec_to_net.multiplyActivationLogic();
+    
+    spec_to_net.spreadRolesToAllPlaces();
+    
+    if (!options_flat)
+      spec_to_net.splitRolesToSubpages(net.getPage().get(0), options_components);
     
     return net;
   }
@@ -255,11 +264,41 @@ public class SamTranslate {
         }
       }
       
-      CPNtoDot c2d = new CPNtoDot(net);
-      FileWriter fstream = new FileWriter(fileName+".net."+getFileExtension(format));
-      BufferedWriter out = new BufferedWriter(fstream);
-      out.write(c2d.toDot());
-      out.close();
+      if (options_flat) {
+        Map<java.lang.Object, String> roles = new HashMap<java.lang.Object, String>();
+        for (Entry<Node, List<String>> ass : spec_to_net.getRoleAssignment().entrySet()) {
+          if (ass.getValue().size() != 1) {
+            roles.put(ass.getKey(), null);
+          } else {
+            roles.put(ass.getKey(), ass.getValue().get(0));
+          }
+        }
+        
+        CPNtoDot c2d = new CPNtoDot(net);
+        FileWriter fstream = new FileWriter(fileName+".net."+getFileExtension(format));
+        BufferedWriter out = new BufferedWriter(fstream);
+        out.write(c2d.toDot(new HashMap<java.lang.Object, String>(), roles));
+        out.close();
+      } else {
+        
+        Map<java.lang.Object, String> colorMap = new HashMap<java.lang.Object, String>();
+        for (Page pg : net.getPage()) {
+          for (Object o : pg.getObject()) {
+            if (!(o instanceof RefPlace)) continue;
+            RefPlace p = (RefPlace)o;
+            if (p.getSourceArc().size() == 0 || p.getTargetArc().size() == 0) {
+              colorMap.put(p, "grey");
+            }
+          }
+        }
+        
+        CPNtoDot c2d = new CPNtoDot(net);
+        FileWriter fstream = new FileWriter(fileName+".net."+getFileExtension(format));
+        BufferedWriter out = new BufferedWriter(fstream);
+        out.write(c2d.toDot(colorMap));
+        out.close();
+      }
+      
         
       System.out.println("Result written to "+fileName+".net."+getFileExtension(format));
         

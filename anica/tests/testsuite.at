@@ -258,6 +258,14 @@ AT_CHECK([GREP -q "aborting \[[#02\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
+AT_SETUP([LoLA parse error])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/potentialCausal.lola .])
+AT_CHECK([ANICA potentialCausal.lola --lola=],1,ignore,stderr)
+AT_CHECK([GREP -q "LoLA parse error -- aborting \[[#09\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
 AT_SETUP([Active causal requires potential causal])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/potentialCausal.lola .])

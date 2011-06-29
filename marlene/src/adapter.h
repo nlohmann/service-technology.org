@@ -80,13 +80,13 @@ class Adapter {
          * \param rs            a set of message transformation rules
          * \param contType      sets the interface between engine and controller
          *                      to be SYNCHRONOUS or ASYNCHRONOUS
+         * \param messagebound  the messagebound of the nets
          * \param useCompPlaces flag, whether to use complementary places in the
          *                      engine
-         * \param messagebound  the messagebound of the nets
          */
         Adapter(std::vector<PetriNet_ptr> & nets, RuleSet & rs,
                 ControllerType contType = SYNCHRONOUS,
-                unsigned int messagebound = 1, bool useCompPlace = true);
+                unsigned int messagebound = 1, bool useCompPlaces = true);
 
         /*!
          * \brief Destroys the adapter, also deletes Adapter::_engine.
@@ -231,7 +231,9 @@ class RuleSet {
                  *        rule create an adapter rule.
                  *
                  * \param rule  a reference to a #rulepair
+                 * \param slist list of message types to synchronize
                  * \param modus modus of the transformation rule
+                 * \param costs the costs for firing this rule
                  */
                 AdapterRule(rulepair & rule, syncList & slist,
                         cfMode modus = AR_NORMAL, int costs = 0);

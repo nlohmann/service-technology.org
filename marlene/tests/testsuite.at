@@ -530,3 +530,17 @@ AT_CHECK([GREP -q "writing final adapter to standard output" stderr],0)
 AT_KEYWORDS(bug regression)
 AT_CLEANUP
 
+AT_SETUP([BUG: deadlocks caused by message bound violation should be partly ignored])
+AT_CHECK_WENDY
+AT_CHECK_LOLA
+AT_CHECK_LIBCONFIG
+AT_CHECK([cp TESTFILES/mbv1.owfn TESTFILES/mbv2.owfn TESTFILES/mbv.ar .])
+AT_CHECK([MARLENE mbv1.owfn mbv2.owfn --rulefile=mbv.ar --diagnosis --property=livelock --verbose DEFAULTPARAMETERS],0,ignore,ignore)
+AT_CHECK([GREP -q "DL;1;a;b;1;" live.txt],0)
+AT_CHECK([cp TESTFILES/myCoffee.owfn TESTFILES/myCustomer.owfn TESTFILES/coffeebug.ar .])
+AT_CHECK([MARLENE myCoffee.owfn myCustomer.owfn --rulefile=coffeebug.ar --diagnosis --property=livelock --verbose DEFAULTPARAMETERS],0,ignore,ignore)
+AT_CHECK([GREP -q "DL;;MTeaButton;DServedCoffee,MCoffeeButton,MTeaButton;1,2;" live.txt],1)
+AT_KEYWORDS(bug regression diagnosis)
+AT_CLEANUP
+
+

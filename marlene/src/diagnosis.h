@@ -46,10 +46,10 @@ class DNode {
     private:
         unsigned int id;
 
-        bool has_deadlock;
-        bool has_livelock;
-        bool has_waitstate;
-        bool has_capacity_violation;
+//        bool has_deadlock;
+//        bool has_livelock;
+//        bool has_waitstate;
+//        bool has_capacity_violation;
 
         std::vector<std::vector<int> > mappingToMPP;
         std::vector<int> markings;

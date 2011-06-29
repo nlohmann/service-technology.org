@@ -51,10 +51,13 @@ void terminationHandler() {
         message("runtime: %.2f sec", (static_cast<double> (clock())
                 - static_cast<double> (start_clock)) / CLOCKS_PER_SEC);
         fprintf(stderr, "%s: memory consumption: ", PACKAGE);
-        system(
+        int result = system(
                 (std::string("ps -o rss -o comm | ") + TOOL_GREP + " "
                         + PACKAGE + " | " + TOOL_AWK
                         + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
+        if (result != 0) {
+            status("error while figuring out memory consumption\n");
+        }
     }
 }
 

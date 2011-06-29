@@ -31,6 +31,8 @@ TESTFILES = test.owfn test.ar \
 	    bug_compplaces.owfn bug_compplaces.ar \
 	    some-rules.ar \
 	    d1.owfn d2.owfn diag0.ar diag1.ar diag2.ar \
+	    mbv1.owfn mbv2.owfn mbv.ar \
+	    myCoffee.owfn myCustomer.owfn coffeebug.ar \
 	    printer/e1.owfn printer/e2.owfn printer/f1.owfn printer/f2.owfn \
 	    printer/e1-cancel.owfn printer/e1-reset.owfn \
 	    printer/f1-cancel.owfn printer/f1-reset.owfn \

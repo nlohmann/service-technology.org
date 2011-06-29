@@ -1,0 +1,24 @@
+{ coffee }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p1;
+INPUT
+  b;
+
+INITIALMARKING
+  p0:   1;
+
+FINALMARKING
+  p1:   1;
+
+TRANSITION t1    { !e }
+CONSUME
+  p0:   1,
+  b: 1;
+PRODUCE
+  p1:   1;
+
+{ END OF FILE }
+

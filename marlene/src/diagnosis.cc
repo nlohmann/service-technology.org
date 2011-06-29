@@ -123,11 +123,14 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
             false) //  messageBound
 {
 
+    FUNCIN
+
     // variable to store information from diagnosis file in LibConfig format
     libconfig::Config diagInfo;
     // try to open file or print parse error
     try {
         diagInfo.readFile(filename.c_str());
+        // diagInfo.write(stderr);
     } catch (libconfig::ParseException pex) {
         message("Parse error `%s' in diagnosis file `%s' in line %d.",
                 pex.getError(), pex.getFile(), pex.getLine());
@@ -171,10 +174,6 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
 
         init.id = dgraph->getIDForName(id);
         // does the node have deadlocks of livelocks?
-        states[i].lookupValue("internalDeadlock", init.has_deadlock);
-        states[i].lookupValue("internalLivelock", init.has_livelock);
-
-        // status("Node %d has deadlock: %s", id, (init.has_deadlock?"yes":"no"));
 
         // get all successors of the node
         try {
@@ -208,11 +207,14 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
             for (int j = 0; j < states[i]["internalDeadlocks"].getLength(); ++j) {
                 node->deadlockMarkings.push_back(mi.getIDForMarking(
                         states[i]["internalDeadlocks"][j]));
+//                status("node %d has deadlock in marking %d", node->getID(),
+//                        (int) (states[i]["internalDeadlocks"][j]));
             }
 
             dgraph->deadlockNodes.push_back(node);
         } catch (libconfig::SettingNotFoundException ex) {
-            //           status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
+            /* if there are no internal deadlocks, everything is just fine :) */
+            //            status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
         }
 
         // look for all livelocks inside the current node
@@ -227,7 +229,8 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
 
             dgraph->livelockNodes.push_back(node);
         } catch (libconfig::SettingNotFoundException ex) {
-            // status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
+            /* if there are no internal livelocks, everything is just fine :) */
+            //            status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
         }
 
         // look for all unresolvable waitstates inside the current node
@@ -238,14 +241,15 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
                         states[i]["unresolvableWaitstates"][j]));
             }
         } catch (libconfig::SettingNotFoundException ex) {
-            //           status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
+            /* if there are no unresolvable waitstates, everything is just fine :) */
+            //                       status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
         }
 
         dgraph->nodes.push_back(node);
-
     }
 
     dgraph->collectRules();
+    FUNCOUT
 }
 
 Diagnosis::~Diagnosis() {
@@ -446,7 +450,7 @@ void Diagnosis::evaluateDeadlocks(std::vector<PetriNet_ptr> & nets,
         DNode::DNode_ptr node(dgraph->deadlockNodes[i]);
         {
 
-            //            message("Deadlock %d (node %d)", i + 1, node->getID());
+//            status("Deadlock %d (node %d)", i + 1, node->getID());
             for (unsigned int j = 0; j < node->deadlockMarkings.size(); ++j) {
                 DiagnosisInformation dI;
                 dI.type = "DL";
@@ -469,12 +473,29 @@ void Diagnosis::evaluateDeadlocks(std::vector<PetriNet_ptr> & nets,
                         dI.netsInFinalState.insert(net + 1);
                     }
                 }
-                sort(dI.requiredMessages.begin(),
-                        dI.requiredMessages.end());
+                sort(dI.requiredMessages.begin(), dI.requiredMessages.end());
 
                 dI.previouslyAppliedRules = node->rulesApplied;
 
-                diagnosisInformation.insert(dI);
+                // only insert if deadlock is not caused by message bound violation,
+                // sufficient condition, pending and required messages
+                bool isIntersected = false;
+                for (int index = 0; index < dI.pendingMessages.size()
+                        and not isIntersected; ++index) {
+                    if (find(dI.requiredMessages.begin(),
+                            dI.requiredMessages.end(),
+                            dI.pendingMessages[index])
+                            != dI.requiredMessages.end()) {
+                        isIntersected = true;
+                    }
+                }
+                if (not isIntersected) {
+                    diagnosisInformation.insert(dI);
+                }
+//                status("deadlockInformation: %s", dI.getLive().c_str());
+//                status("size of diagnosis information: %d",
+//                        diagnosisInformation.size());
+
             }
         }
     }
@@ -521,8 +542,7 @@ void Diagnosis::evaluateLivelocks(std::vector<PetriNet_ptr> & nets,
                         dI.netsInFinalState.insert(net + 1);
                     }
                 }
-                sort(dI.requiredMessages.begin(),
-                        dI.requiredMessages.end());
+                sort(dI.requiredMessages.begin(), dI.requiredMessages.end());
 
                 dI.previouslyAppliedRules = node->rulesApplied;
                 if (dI.requiredMessages.size() > 0)
@@ -580,8 +600,7 @@ void Diagnosis::evaluateAlternatives(std::vector<PetriNet_ptr> & nets,
                         dI.netsInFinalState.insert(net + 1);
                     }
                 }
-                sort(dI.requiredMessages.begin(),
-                        dI.requiredMessages.end());
+                sort(dI.requiredMessages.begin(), dI.requiredMessages.end());
 
                 dI.previouslyAppliedRules = node->rulesApplied;
 
@@ -777,8 +796,7 @@ void DGraph::collectRules() {
 }
 
 DNode::DNode(Initializer & init) :
-    id(init.id), has_deadlock(init.has_deadlock), has_livelock(
-            init.has_livelock), successors(init.successors) {
+    id(init.id), successors(init.successors) {
 
 }
 

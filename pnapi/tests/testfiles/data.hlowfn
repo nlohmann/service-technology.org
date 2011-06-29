@@ -19,8 +19,7 @@ END
 PLACE 
 INPUT nrea : reader , rea : reader , sem : reader;
 
-OUTPUT nwri : writer , wri : writer{ ,
-pen : writer  ,  key } ;
+OUTPUT nwri : writer , wri : writer{ ,pen : writer  ,  key } ;
 
 INITIALMARKING nrea : allreaders() , nwri : allwriters() , sem : allreaders() { , key : 1 }  ;
 

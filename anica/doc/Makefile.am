@@ -5,7 +5,7 @@ info_TEXINFOS = anica.texi
 EXTRA_DIST = extra_man
 
 # the height of the README's ASCII art + URL + 3 spaces
-BANNERHEIGHT = 10
+BANNERHEIGHT = 8
 
 # the help option that should be used in the manual
 HELPOPTION = --detailed-help

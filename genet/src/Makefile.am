@@ -141,7 +141,7 @@ $(ANTLR_SPAWN) : parser/$(GRM)
 $(DLG_SPAWN) : parser/$(DLG_FILE)
 	cd parser && $(DLG) $(DLG_FLAGS) $(DLG_FILE) && cd ..
 
-DISTCLEANFILES += $(ANTLR_SPAWN) $(DLG_SPAWN)
+# DISTCLEANFILES += $(ANTLR_SPAWN) $(DLG_SPAWN)
 
 #----------------------------------------------------------------#
 # GENERIC: copy the content of the config.log file to a C header #

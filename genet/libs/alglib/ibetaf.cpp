@@ -163,7 +163,7 @@ double incompletebeta(double a, double b, double x)
         t = t*pow(x, a);
         t = t/a;
         t = t*w;
-        t = t*(gamma(a+b)/(gamma(a)*gamma(b)));
+        t = t*(stdgamma(a+b)/(stdgamma(a)*stdgamma(b)));
         if( flag==1 )
         {
             if( t<=ap::machineepsilon )
@@ -925,7 +925,7 @@ static double incompletebetaps(double a, double b, double x, double maxgam)
     u = a*log(x);
     if( a+b<maxgam&&fabs(u)<log(ap::maxrealnumber) )
     {
-        t = gamma(a+b)/(gamma(a)*gamma(b));
+        t = stdgamma(a+b)/(stdgamma(a)*stdgamma(b));
         s = s*t*pow(x, a);
     }
     else

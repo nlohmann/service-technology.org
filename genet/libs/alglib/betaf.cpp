@@ -73,17 +73,17 @@ double beta(double a, double b)
         result = sg*exp(y);
         return result;
     }
-    y = gamma(y);
+    y = stdgamma(y);
     ap::ap_error::make_assertion(y!=0, "Overflow in Beta");
     if( a>b )
     {
-        y = gamma(a)/y;
-        y = y*gamma(b);
+        y = stdgamma(a)/y;
+        y = y*stdgamma(b);
     }
     else
     {
-        y = gamma(b)/y;
-        y = y*gamma(a);
+        y = stdgamma(b)/y;
+        y = y*stdgamma(a);
     }
     result = y;
     return result;

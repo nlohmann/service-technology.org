@@ -1,4 +1,11 @@
-@heading Version 3.3-unreleased
+@heading Version 3.3 (29 June 2011)
+@itemize
+@item new implementation of the operating guideline for weak termination
+
+@item dot output of the operating guideline for weak termination shows  human-readable node numbers (descending from 1)
+
+@item new parameter @samp{--showInternalNodeNames} shows machine-like node numbers (again)
+@end itemize
 
 
 @heading Version 3.2 (23 March 2011)

@@ -135,7 +135,7 @@ void evaluateParameters(int argc, char** argv) {
     free(params);
 }
 
-void createDotFile(const std::string & OutputFile, pnapi::PetriNet & Petrinet, const std::string InputFile) {
+void createDotFile(const std::string & OutputFile, pnapi::PetriNet & Petrinet, const std::string & InputFile) {
 	std::ofstream outStream;
 
 	outStream.open(std::string(OutputFile + ".dot").c_str(), std::ios_base::trunc);
@@ -180,7 +180,7 @@ bool callLoLA(std::string netFile) {
     // select LoLA binary and build LoLA command
 #if defined(__MINGW32__)
     // MinGW does not understand pathnames with "/", so we use the basename
-    std::string command_line = "\"" + std::string(args_info.lola_arg)
+    std::string command_line = "\"" + std::string(args_info.lola_arg);
 #else
     std::string command_line(args_info.lola_arg);
 #endif
@@ -403,7 +403,7 @@ int main(int argc, char** argv) {
 		bool lowPostDone = false;
 
 		if (checkPotentialCausal) {
-			if (lHighPre.size() != 0 && lLowPost.size() != 0) {
+			if (!lHighPre.empty() && !lLowPost.empty()) {
 				status(_cwarning_("....potential causal"));
 				potentialCausal.insert(*p);
 				FOREACH(t, lHighPre) {
@@ -417,7 +417,7 @@ int main(int argc, char** argv) {
 		}
 
 		if (checkPotentialConflict) {
-			if (lHighPost.size() != 0 && lLowPost.size() != 0) {
+			if (!lHighPost.empty() && !lLowPost.empty()) {
 				status(_cwarning_("....potential conflict"));
 				potentialConflict.insert(*p);
 				FOREACH(t, lHighPost) {
@@ -463,7 +463,7 @@ int main(int argc, char** argv) {
 
 	std::set<std::string> allNets;
 
-	if ((checkActiveCausal || checkActiveConflict) && (potentialCausal.size() + potentialConflict.size() > 0)) {
+	if ((checkActiveCausal || checkActiveConflict) && (!potentialCausal.empty() || !potentialConflict.empty())) {
 
 		status("check active places");
 
@@ -476,7 +476,7 @@ int main(int argc, char** argv) {
 		status("..potential causal places");
 			FOREACH(p, potentialCausal) {
 
-				if (args_info.oneActiveOnly_flag && (activeCausal.size() + activeConflict.size() > 0)) {break;}
+				if (args_info.oneActiveOnly_flag && (!activeCausal.empty() || !activeConflict.empty())) {break;}
 
 				status("....%s (%d combination(s))", (**p).getName().c_str(), highPre.count(*p) * lowPost.count(*p));
 
@@ -545,7 +545,7 @@ int main(int argc, char** argv) {
 			status("..potential conflict places");
 			FOREACH(p, potentialConflict) {
 
-				if (args_info.oneActiveOnly_flag && (activeCausal.size() + activeConflict.size() > 0)) {break;}
+				if (args_info.oneActiveOnly_flag && (!activeCausal.empty() || !activeConflict.empty())) {break;}
 
 				status("....%s (%d combination(s))", (**p).getName().c_str(), highPost.count(*p) * lowPost.count(*p));
 		
@@ -712,14 +712,14 @@ int main(int argc, char** argv) {
 
 		int result = 2;
 		if (checkActiveCausal || checkActiveConflict) {
-			if (activeCausal.size() + activeConflict.size() > 0) {result = 0;}
+			if (!activeCausal.empty() || !activeConflict.empty()) {result = 0;}
 			else {
-				if (!checkActiveCausal && potentialCausal.size() > 0) {result = 1;}
-				if (!checkActiveConflict && potentialConflict.size() > 0) {result = 1;}
+				if (!checkActiveCausal && !potentialCausal.empty()) {result = 1;}
+				if (!checkActiveConflict && !potentialConflict.empty()) {result = 1;}
 			}
 		}
 		else {
-			if (potentialCausal.size() + potentialConflict.size() > 0) {result = 1;}
+			if (!potentialCausal.empty() || !potentialConflict.empty()) {result = 1;}
 		}
 		
 		if (args_info.resultFile_given) {

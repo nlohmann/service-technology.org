@@ -6,7 +6,14 @@
 			Automated Non-Interference Check Assistent
 			http://service-technology.org/anica
 
-Version 0.9-unreleased
-======================
+PURPOSE
+    Anica can check positive place based non-interference for safe petri nets.
+Version 1.0
+===========
 
-* first release of Anica
+* first offical release of Anica
+
+* checks PBNI+ for safe petri nets
+
+
+

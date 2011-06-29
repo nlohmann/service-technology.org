@@ -1,4 +1,5 @@
-@heading Version 0.9-unreleased
+@heading Version 1.0
 @itemize
-@item updated PNAPI and ST-macros
+@item first offical release of Anica
+@item checks PBNI+ for safe petri nets
 @end itemize

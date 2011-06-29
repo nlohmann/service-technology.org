@@ -248,7 +248,7 @@ CompositeMarking* LivelockOperatingGuideline::getSuccessorMarking(const StoredKn
     assert(storedKnowledge != NULL);
     assert(interface != NULL);
 
-    CompositeMarking* marking;
+//    CompositeMarking* marking;
 
     for (innermarkingcount_t i = 0; i < storedKnowledge->sizeAllMarkings; ++i) {
 
@@ -476,7 +476,7 @@ void LivelockOperatingGuideline::calculateTSCCInKnowledgeSetRecursively(Composit
 
         // check whether the TSCC projects exactly onto the given SCS of knowledges
         if (mappingSCC.size() == knowledgeSCS.size()) {
-            FOREACH (knowledge, knowledgeSCS) {
+            FOREACH(knowledge, knowledgeSCS) {
                 if (mappingSCC.find(*knowledge) == mappingSCC.end()) {
                     // delete the clause
                     delete booleanClause;

@@ -85,7 +85,7 @@ AnnotationElement::~AnnotationElement() {
   \param _setOfKnowledges the set of knowledges this annotation belongs to
 */
 AnnotationElementTrue::AnnotationElementTrue(const std::set<StoredKnowledge* > & _setOfKnowledges) :
-               AnnotationElement(_setOfKnowledges)
+    AnnotationElement(_setOfKnowledges)
 
 {
     ++stats.cumulativeNumberOfClauses;
@@ -111,8 +111,8 @@ AnnotationElementTrue::~AnnotationElementTrue() {
   \param nodeMapping in case a more human-readable dot output is to be generated, we map every knowledge to a number and print that one instead
 */
 void AnnotationElementTrue::myAnnotationToStream(const bool& dot,
-                                             std::ostream& file,
-                                             std::map<const StoredKnowledge*, unsigned int>& nodeMapping) const {
+                                                 std::ostream& file,
+                                                 std::map<const StoredKnowledge*, unsigned int>& nodeMapping) const {
     file << "true";
 }
 
@@ -176,8 +176,8 @@ AnnotationElementTransitionLabel::~AnnotationElementTransitionLabel() {
   \param nodeMapping in case a more human-readable dot output is to be generated, we map every knowledge to a number and print that one instead
 */
 void AnnotationElementTransitionLabel::myAnnotationToStream(const bool& dot,
-                                             std::ostream& file,
-                                             std::map<const StoredKnowledge*, unsigned int>& nodeMapping) const {
+                                                            std::ostream& file,
+                                                            std::map<const StoredKnowledge*, unsigned int>& nodeMapping) const {
 
     // create the annotation of the current set of knowledges
     std::string stringAnd = (dot) ? " &and; " : " * ";
@@ -253,7 +253,7 @@ void AnnotationLivelockOG::push(const std::set<StoredKnowledge* > & setOfKnowled
     bool trueAnnotation = true;
 
     // does the current annotation consist of true clauses only
-    FOREACH (literal, annotationBoolean) {
+    FOREACH(literal, annotationBoolean) {
         if (*literal != Clause::trueClause) {
             trueAnnotation = false;
             break;

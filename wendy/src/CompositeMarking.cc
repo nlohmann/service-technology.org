@@ -161,7 +161,7 @@ std::vector<Clause* > CompositeMarkingsHandler::conjunctionOfDisjunctionsBoolean
 CompositeMarking* CompositeMarkingsHandler::isVisited(const StoredKnowledge* _storedKnowledge,
                                                       const InnerMarking_ID _innerMarking_ID,
                                                       InterfaceMarking* _interface,
-                                                      bool &foundMarking) {
+                                                      bool& foundMarking) {
 
     // create new marking
     CompositeMarking* newMarking = new CompositeMarking(_storedKnowledge, _innerMarking_ID, _interface);

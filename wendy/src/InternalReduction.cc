@@ -578,8 +578,7 @@ void Graph::reenumerate2() {
             // rename node in list
             nodes[*freeSpace] = nodes[nodeNames[i - 1]];
             nodes.erase(nodeNames[i - 1]);
-            freeSpace++;
-
+            ++freeSpace;
         }
     }
 

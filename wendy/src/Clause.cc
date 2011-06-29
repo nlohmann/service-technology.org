@@ -106,7 +106,7 @@ void Clause::initialize() {
   \brief all values are initialized with 0
 */
 Clause::Clause()
-    : finalKnowledges(NULL), transitionLiterals(NULL), numberOfFinalKnowledges(0), numberOfTransitionLiterals(0),more_than_one_literal(0) {
+    : finalKnowledges(NULL), transitionLiterals(NULL), numberOfFinalKnowledges(0), numberOfTransitionLiterals(0), more_than_one_literal(0) {
 
 }
 

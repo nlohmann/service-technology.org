@@ -897,7 +897,7 @@ std::string StoredKnowledge::formula(bool dot) const {
         // traverse the conjunctions to access the disjunctions
         FOREACH(it, conjunctionOfDisjunctions) {
             if (it != conjunctionOfDisjunctions.begin()) {
-                formula += (dot) ? " &and; " : " * ";
+                formula += (dot ? " &and; " : " * ");
             }
             if (it->size() > 1) {
                 formula += "(";
@@ -906,7 +906,7 @@ std::string StoredKnowledge::formula(bool dot) const {
             // get clause which contains !, ? or # events
             FOREACH(it2, *it) {
                 if (it2 != it->begin()) {
-                    formula += (dot) ? " &or; " : " + ";
+                    formula += (dot ? " &or; " : " + ");
                 }
                 formula += *it2;
             }

@@ -19,9 +19,9 @@ END
 PLACE 
 INPUT nrea : reader , rea : reader , sem : reader;
 
-OUTPUT nwri : writer , wri : writer{ ,pen : writer  ,  key } ;
+OUTPUT nwri : writer , wri : writer ;
 
-INITIALMARKING nrea : allreaders() , nwri : allwriters() , sem : allreaders() { , key : 1 }  ;
+INITIALMARKING nrea : allreaders() , nwri : allwriters() , sem : allreaders()  ;
 
 FINALMARKING nrea : allreaders() ;
 
@@ -29,8 +29,8 @@ TRANSITION br
 
 VAR x : reader ;
 
-CONSUME { key : 1 , } nrea : x , sem : x ;
-PRODUCE { key : 1 , } rea : x ;
+CONSUME nrea : x , sem : x ;
+PRODUCE rea : x ;
 
 TRANSITION er 
 
@@ -44,7 +44,7 @@ TRANSITION bw
 VAR y : writer ;
 
 CONSUME sem : allreaders() , nwri : y ;
-PRODUCE wri : y { , key : 1 }  ;
+PRODUCE wri : y ;
 
 TRANSITION ew
 
@@ -52,3 +52,4 @@ VAR y : writer ;
 
 CONSUME wri : y ;
 PRODUCE sem : allreaders() , nwri : y ;
+

@@ -53,9 +53,6 @@ class LivelockOperatingGuideline {
             /// number of terminal strongly connected sets within all SCSs
             unsigned int numberOfTSCCInSCSs;
 
-            /// number of true clauses
-            unsigned int numberOfTrueClauses;
-
             /// the number of all annotation elements
             unsigned int numberAllElementsAnnotations;
         } stats;

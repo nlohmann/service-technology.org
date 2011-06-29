@@ -11,6 +11,13 @@
 Version 3.3-unreleased
 ======================
 
+* new implementation of the operating guideline for weak termination
+
+* dot output of the operating guideline for weak termination shows 
+  human-readable node numbers (descending from 1)
+     * new parameter --showInternalNodeNames shows machine like node 
+       numbers (again)
+   
 Version 3.2 (23 March 2011)
 ===========================
 

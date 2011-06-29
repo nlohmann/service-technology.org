@@ -140,7 +140,7 @@ void createDotFile(const std::string & OutputFile, pnapi::PetriNet & Petrinet, c
 
 	outStream.open(std::string(OutputFile + ".dot").c_str(), std::ios_base::trunc);
 	if (outStream.fail()) {
-		abort(3, "file %s cannot be opened", _cfilename_(OutputFile + ".dot"));
+		abort(3, "file %s cannot be created", _cfilename_(OutputFile + ".dot"));
 	}
 
 	outStream << pnapi::io::dot
@@ -380,23 +380,18 @@ int main(int argc, char** argv) {
 		
 		if (checkPotentialCausal) {
 			PNAPI_FOREACH(t, (**p).getPreset()) {
-				//status("....%s", (**t).getName().c_str());
 				if (((pnapi::Transition *)(*t))->getConfidence() == 2) {
 					lHighPre.insert((pnapi::Transition *)*t);
-					//status("......high preset");
 				}
 			}
 		}
 
 		PNAPI_FOREACH(t, (**p).getPostset()) {
-			//status("....%s", (**t).getName().c_str());
 			if (((pnapi::Transition *)(*t))->getConfidence() == 2) {
 				lHighPost.insert((pnapi::Transition *)*t);
-				//status("......high postset");
 			}
 			else {
 				lLowPost.insert((pnapi::Transition *)*t);
-				//status("......low postset");
 			}
 		}
 

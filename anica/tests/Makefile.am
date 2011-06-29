@@ -26,7 +26,8 @@ TESTFILES = activeCausal.lola \
             both.lola \
 			potentialCausal.lola \
 			potentialConflict.lola \
-			missing-confidence.lola
+			missing-confidence.lola \
+			wrong-format.lola
 # <<-- CHANGE END -->>
 
 

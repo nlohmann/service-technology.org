@@ -68,11 +68,20 @@ AT_CHECK([test -f activeCausal.lola.causal.s.h1.l1.lola],0)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-AT_SETUP([Witness path])
+AT_SETUP([Witness path (LoLA)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/activeCausal.lola .])
 AT_CHECK([ANICA activeCausal.lola --witnessPath],0,ignore,ignore)
 AT_CHECK([test -f activeCausal.lola.causal.s.h1.l1.path],0)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Witness path (Makefile)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.lola .])
+AT_CHECK([ANICA activeCausal.lola --witnessPath --modus=makefile],0,ignore,ignore)
+AT_CHECK([test -f activeCausal.lola.makefile])
+AT_CHECK([GREP -q " -p 2> " activeCausal.lola.makefile])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -203,6 +212,16 @@ AT_CHECK([GREP -q "aborting \[[#01\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
+AT_SETUP([Cannot write to file])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/potentialCausal.lola .])
+AT_CHECK([touch potentialCausal.lola.potential.dot])
+AT_CHECK([chmod a-w potentialCausal.lola.potential.dot])
+AT_CHECK([ANICA potentialCausal.lola --dotPotential=causal],1,ignore,stderr)
+AT_CHECK([GREP -q "aborting \[[#03\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
 AT_SETUP([Invalid given configuration file])
 AT_CHECK([cp TESTFILES/potentialConflict.lola .])
 AT_DATA([my_anica.conf], [invalid="PARAMETER"
@@ -227,6 +246,15 @@ AT_CHECK([cp TESTFILES/missing-confidence.lola .])
 AT_CHECK([ANICA missing-confidence.lola],1,ignore,stderr)
 AT_CHECK([GREP -q "has unknown confidence level" stderr])
 AT_CHECK([GREP -q "aborting \[[#06\]]" stderr])
+AT_KEYWORDS(error)
+AT_CLEANUP
+
+AT_SETUP([Syntax error])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/wrong-format.lola .])
+AT_CHECK([ANICA wrong-format.lola],1,ignore,stderr)
+AT_CHECK([GREP -q "error near 'CONSUMING'" stderr])
+AT_CHECK([GREP -q "aborting \[[#02\]]" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 
@@ -261,17 +289,17 @@ AT_CLEANUP
 
 AT_SETUP([Potential Places (causal)])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/activeCausal.lola .])
-AT_CHECK([ANICA activeCausal.lola --dotPotential=causal],0,ignore,stderr)
-AT_CHECK([test -f activeCausal.lola.potential.dot])
+AT_CHECK([cp TESTFILES/potentialCausal.lola .])
+AT_CHECK([ANICA potentialCausal.lola --dotPotential=causal],0,ignore,stderr)
+AT_CHECK([test -f potentialCausal.lola.potential.dot])
 AT_KEYWORDS(output)
 AT_CLEANUP
 
 AT_SETUP([Potential Places (conflict)])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/activeCausal.lola .])
-AT_CHECK([ANICA activeCausal.lola --dotPotential=conflict],0,ignore,stderr)
-AT_CHECK([test -f activeCausal.lola.potential.dot])
+AT_CHECK([cp TESTFILES/potentialConflict.lola .])
+AT_CHECK([ANICA potentialConflict.lola --dotPotential=conflict],0,ignore,stderr)
+AT_CHECK([test -f potentialConflict.lola.potential.dot])
 AT_KEYWORDS(output)
 AT_CLEANUP
 
@@ -293,9 +321,9 @@ AT_CLEANUP
 
 AT_SETUP([Active Places (conflict)])
 AT_CHECK_LOLA
-AT_CHECK([cp TESTFILES/activeCausal.lola .])
-AT_CHECK([ANICA activeCausal.lola --dotActive=conflict],0,ignore,stderr)
-AT_CHECK([test -f activeCausal.lola.active.dot])
+AT_CHECK([cp TESTFILES/activeConflict.lola .])
+AT_CHECK([ANICA activeConflict.lola --dotActive=conflict],0,ignore,stderr)
+AT_CHECK([test -f activeConflict.lola.active.dot])
 AT_KEYWORDS(output)
 AT_CLEANUP
 

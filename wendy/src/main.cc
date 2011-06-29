@@ -39,7 +39,6 @@
 #include "AnnotationLivelockOG.h"
 #include "Clause.h"
 #include "verbose.h"
-#include "SCSHandler.h"
 #include "InternalReduction.h"
 
 
@@ -452,6 +451,7 @@ int main(int argc, char** argv) {
             if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
                 status("number of strongly connected sets within knowledges: %d", LivelockOperatingGuideline::stats.numberOfSCSs);
                 status("number of terminal strongly connected sets: %d", LivelockOperatingGuideline::stats.numberOfTSCCInSCSs);
+                status("number of true annotations: %d", AnnotationElement::stats.numberOfTrueAnnotations);
 
                 double averageSizeOfAnnotation = static_cast<double>(AnnotationElement::stats.cumulativeNumberOfClauses) / static_cast<double>(LivelockOperatingGuideline::stats.numberOfSCSs);
                 status("average number of clauses in an annotation: %.2f", averageSizeOfAnnotation);
@@ -461,8 +461,6 @@ int main(int argc, char** argv) {
 
                 status("maximal number of clauses in an annotation: %d", AnnotationElement::stats.maximalNumberOfClauses);
                 status("maximal number of literals of clause: %d", Clause::stats.maximalSizeOfClause);
-
-                status("found %d bad subsets and skipped those", SCSHandler::countBadSubsystems);
             }
         }
 

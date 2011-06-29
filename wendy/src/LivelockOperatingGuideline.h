@@ -31,10 +31,6 @@ class AnnotationLivelockOG;
 /// set of strongly connected components over knowledges
 typedef std::vector<std::set<StoredKnowledge*> > SetOfSCCs;
 
-/// set of edges between stored knowledges
-typedef std::map<const StoredKnowledge*, std::set<Label_ID> > SetOfEdges;
-
-
 /*!
   does all the work when the livelock operating guideline shall be computed
   * calculate all SCSs within the reachable knowledges
@@ -57,6 +53,9 @@ class LivelockOperatingGuideline {
             /// number of terminal strongly connected sets within all SCSs
             unsigned int numberOfTSCCInSCSs;
 
+            /// number of true clauses
+            unsigned int numberOfTrueClauses;
+
             /// the number of all annotation elements
             unsigned int numberAllElementsAnnotations;
         } stats;
@@ -76,44 +75,33 @@ class LivelockOperatingGuideline {
         static void generateLLOG();
 
         /// write the annotation of the livelock operating guideline to the given output stream
-        static void output(const bool& dot, std::ostream& file);
+        static void output(const bool& dot, std::ostream& file, std::map<const StoredKnowledge*, unsigned int>& nodeMapping);
 
     private: /* static functions */
 
         /// get all strongly connected components of the given set of knowledges
         inline static bool getSCCs(const std::set<StoredKnowledge* > & toBeVisited,
-                                   SetOfSCCs& setOfSCCs,
-                                   SetOfEdges& setOfEdges,
-                                   const bool& ignoreEdges);
+                                   SetOfSCCs& setOfSCCs);
 
         /// searches for the given knowledge in the Tarjan stack
         inline static bool findNodeInStack(const StoredKnowledge* currentNode);
-
-        /// get all edges the knowledges of the given SCS are connected with
-        static void getEdgesOfSCS(const std::set<StoredKnowledge* > &  SCS,
-                                  SetOfEdges& setOfEdges,
-                                  unsigned int& countEdges);
 
         /// recursive function to get the strongly connected components
         static bool getSCCsRecursively(StoredKnowledge* currentNode,
                                        std::set<StoredKnowledge* > & visited,
                                        const std::set<StoredKnowledge* > & toBeVisited,
-                                       SetOfEdges& setOfEdges,
-                                       SetOfSCCs& setOfSCCs,
-                                       const bool& ignoreEdges);
+                                       SetOfSCCs& setOfSCCs);
 
         /// recursive function to get the strongly connected sets
-        static void getStronglyConnectedSetsRecursively(std::set<StoredKnowledge* > & fixedNodes,
+        static void getSCSRecursively(std::set<StoredKnowledge* > & fixedNodes,
                                                         std::set<StoredKnowledge* > & nonFixedNodes);
 
         /// get all terminal strongly connected components within the set of knowledges
-        inline static void calculateTSCCInKnowledgeSet(const std::set<StoredKnowledge* > & knowledgeSCS,
-                                                       SetOfEdges& setOfEdges);
+        inline static void calculateTSCCInKnowledgeSet(const std::set<StoredKnowledge* > & knowledgeSCS);
 
         /// recursive function to get all terminal strongly connected components
         static void calculateTSCCInKnowledgeSetRecursively(CompositeMarking* currentMarking,
-                                                           const std::set<StoredKnowledge* > & knowledgeSCS,
-                                                           SetOfEdges& setOfEdges);
+                                                           const std::set<StoredKnowledge* > & knowledgeSCS);
 
         /// returns the pointer to the marking that corresponds to the given parameters
         inline static CompositeMarking* getSuccessorMarking(const StoredKnowledge* storedKnowledge,
@@ -121,12 +109,9 @@ class LivelockOperatingGuideline {
                                                             InterfaceMarking* interface,
                                                             bool& foundSuccessorMarking);
 
-        /// inner marking is really a waitstate in the context of the current knowledge
-        inline static bool isWaitstateInCurrentKnowledge(const InnerMarking_ID& inner, const InterfaceMarking* interface);
+        /// write the annotation of the livelock operating guideline to the given output stream
+        static void output_acyclic(const bool& dot, std::ostream& file, std::map<const StoredKnowledge*, unsigned int>& nodeMapping);
 
         /// write the annotation of the livelock operating guideline to the given output stream
-        static void output_acyclic(const bool& dot, std::ostream& file);
-
-        /// write the annotation of the livelock operating guideline to the given output stream
-        static void output_cyclic(const bool& dot, std::ostream& file);
+        static void output_cyclic(const bool& dot, std::ostream& file, std::map<const StoredKnowledge*, unsigned int>& nodeMapping);
 };

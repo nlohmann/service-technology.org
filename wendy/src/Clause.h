@@ -43,12 +43,32 @@ class FinalKnowledge {
         const StoredKnowledge* knowledge;
 };
 
+/*!
+ class representing a transition literal
+ it holds a const pointer and a label of the outgoing transition
+*/
+class TransitionLiteral {
+    public: /* member functios */
+
+        /// constructor
+        TransitionLiteral(const StoredKnowledge* _knowledge, const Label_ID& label);
+
+        /// destructor
+        ~TransitionLiteral();
+
+    public: /* member attributes */
+        const StoredKnowledge* knowledge;
+
+        /// label of the transition literal
+        const Label_ID label;
+};
+
 
 /*!
  Livelock Operating Guideline only
 
  a clause of the annotation of the livelock operating guideline
- clauses (final) and (false) are represented by a special pointer
+ clauses (final), (true) and (false) are represented by a special pointer
 */
 class Clause {
 
@@ -77,9 +97,16 @@ class Clause {
         /// the clause holding literal false only (just a placeholder, no object!)
         static Clause* falseClause;
 
-    private: /* static attributes */
-        /// the number of bytes needed
-        static uint8_t bytes;
+        /// the clause holding literal true only (just a placeholder, no object!)
+        static Clause* trueClause;
+
+    public: /* public attributes */
+
+        /// how many final knowledges are part of the current clause
+        unsigned int numberOfFinalKnowledges;
+
+        /// how many transition literals are part of the current clause
+        unsigned int numberOfTransitionLiterals;
 
     public: /* member functions */
 
@@ -93,34 +120,24 @@ class Clause {
         void operator|=(const Clause&);
 
         /// returns a string representation of this clause
-        void printToStream(const bool& dot, std::ostream& file);
+        void printToStream(const bool& dot, std::ostream& file, std::map<const StoredKnowledge*, unsigned int>& nodeMapping);
 
     private: /* member functions */
 
         /// add final knowledge to the clause
         void addFinalKnowledge(const StoredKnowledge* finalKnowledge);
 
-        /// set given label to 1 (is part of the clause)
-        void labelPossible(const Label_ID& l);
-
-        /// returns array of all events (possible or not)
-        inline void decode();
+        /// add a transition literal to the clause
+        void addTransitionLiteral(const StoredKnowledge* finalKnowledge, const Label_ID& l);
 
     private: /* member attributes */
-
-        /// store the bits representing each label of the interface
-        uint8_t* storage;
 
         /// store a pointer to each final knowledge belonging to the current clause
         FinalKnowledge** finalKnowledges;
 
-        /// how many final knowledges are part of the current clause
-        unsigned int numberOfFinalKnowledges;
+        /// store a pointer to each transition literal belonging to the current clause
+        TransitionLiteral** transitionLiterals;
 
         /// this clause stores more than one literal
         unsigned more_than_one_literal : 1;
-
-        /// array of all events (possible or not); built by decode()
-        char* decodedLabels;
-
 };

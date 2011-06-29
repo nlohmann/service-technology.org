@@ -1207,8 +1207,8 @@ AT_SETUP([3 Dining Philosophers])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/phils_3_1.owfn .])
 AT_CHECK([WENDY phils_3_1.owfn --verbose --og --correctness=livelock],0,ignore,stderr)
-AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 2896" stderr])
-AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 2896" stderr])
+AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 93" stderr])
+AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 93" stderr])
 AT_KEYWORDS(livelock-freedom og)
 AT_CLEANUP
 
@@ -1220,6 +1220,16 @@ AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 3
 AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 571" stderr])
 AT_CHECK([GREP -c "<tr><td" RS.dot],0,[370
 ],ignore)
+AT_KEYWORDS(livelock-freedom og)
+AT_CLEANUP
+
+AT_SETUP([True annotations])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/LF_trueAnnotations.owfn .])
+AT_CHECK([WENDY LF_trueAnnotations.owfn --verbose --dot --og --correctness=livelock],0,ignore,stderr)
+AT_CHECK([GREP -q "wendy: number of strongly connected sets within knowledges: 9" stderr])
+AT_CHECK([GREP -q "wendy: number of terminal strongly connected sets: 13" stderr])
+AT_CHECK([GREP -q "wendy: number of true annotations: 4" stderr])
 AT_KEYWORDS(livelock-freedom og)
 AT_CLEANUP
 

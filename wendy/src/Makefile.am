@@ -19,7 +19,6 @@ wendy_SOURCES = AnnotationLivelockOG.cc AnnotationLivelockOG.h \
                 Queue.h Queue.cc \
                 InternalReduction.h InternalReduction.cc \
                 Results.h Results.cc \
-                SCSHandler.cc SCSHandler.h \
                 StoredKnowledge.h StoredKnowledge.cc \
                 syntax_cover.yy lexic_cover.ll \
                 syntax_graph.yy lexic_graph.ll \

@@ -46,11 +46,14 @@ class CompositeMarking {
         /// destructor
         ~CompositeMarking();
 
-        /// returns a string representing the annotation of the composite marking with respect to the given set of knowledges
-        void getMyFormula(const std::set<StoredKnowledge*> & setOfKnowledges, SetOfEdges& setOfEdges, Clause* booleanClause, bool& emptyClause);
+        /// returns a string representing the annotation of the composite marking
+        void getMyFormula(Clause* booleanClause, bool& emptyClause);
 
         /// compare two composite markings
         bool operator== (const CompositeMarking& other) const ;
+
+        /// stream output operator
+        friend std::ostream& operator<< (std::ostream&, const CompositeMarking&);
 
     public: /* member attributes */
 
@@ -81,8 +84,11 @@ class CompositeMarking {
 class CompositeMarkingsHandler {
     public: /* static functions */
 
-        /// returns a pointer in case the given marking can be found in the set of visited markings; NULL otherwise
-        static CompositeMarking* getMarking(const CompositeMarking* marking);
+        /// checks if the given marking has been visited already
+        static CompositeMarking* isVisited(const StoredKnowledge* _storedKnowledge,
+                                           const InnerMarking_ID _innerMarking_ID,
+                                           InterfaceMarking* _interface,
+                                           bool &foundMarking);
 
         /// stores given marking in the set of visited markings
         static void visitMarking(CompositeMarking* marking);

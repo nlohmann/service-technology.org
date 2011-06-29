@@ -745,8 +745,10 @@ void StoredKnowledge::output_og(std::ostream& file) {
     // livelock operating guideline has been calculated
     if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
 
+        std::map<const StoredKnowledge*, unsigned int> nodeMapping;
+
         // get the annotations of the livelock operating guideline
-        LivelockOperatingGuideline::output(false, file);
+        LivelockOperatingGuideline::output(false, file, nodeMapping);
     }
 
     file << "\nNODES\n";
@@ -951,12 +953,16 @@ std::string StoredKnowledge::formula(bool dot) const {
          before.
 */
 void StoredKnowledge::output_dot(std::ostream& file) {
+
+    // store a (human-readable) number for each node found in case the parameter showInternalNodeNames has not been set
+    std::map<const StoredKnowledge*, unsigned int> nodeMapping;
+
     file << "digraph G {\n";
 
     // livelock operating guideline has been calculated
     if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
         // generate dot output showing the annotation of the livelock operating guideline
-        LivelockOperatingGuideline::output(true, file);
+        LivelockOperatingGuideline::output(true, file, nodeMapping);
     }
 
     file  << " node [fontname=\"Helvetica\" fontsize=10]\n"
@@ -976,8 +982,16 @@ void StoredKnowledge::output_dot(std::ostream& file) {
 
                 // livelock operating guideline has been calculated
                 if (args_info.correctness_arg == correctness_arg_livelock and args_info.og_given) {
-                    // formula is not shown, but node number is shown
-                    file << reinterpret_cast<size_t>(it->second[i]) << "\\n";
+                    if (not args_info.showInternalNodeNames_flag) {
+                        if (nodeMapping.find(it->second[i]) == nodeMapping.end()) {
+                            nodeMapping[it->second[i]] = nodeMapping.size();
+                        }
+                        // formula is not shown, but node number is shown
+                        file << nodeMapping[it->second[i]] << "\\n";
+                    } else {
+                        // formula is not shown, but node number is shown
+                        file << reinterpret_cast<size_t>(it->second[i]) << "\\n";
+                    }
                 } else if (not args_info.sa_given) {
                     // show only formula
                     file << it->second[i]->formula(true) << "\\n";

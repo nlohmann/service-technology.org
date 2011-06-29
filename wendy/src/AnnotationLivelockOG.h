@@ -27,8 +27,8 @@
 /*!
   Livelock Operating Guideline only
 
-  a set of knowledges is annotated with a set of label IDs which will be
-  transformed into a real string later on
+  base class for annotating a set of knowledges
+
 */
 class AnnotationElement {
 
@@ -47,32 +47,79 @@ class AnnotationElement {
 
             /// maximal number of clauses per annotation element
             unsigned int maximalNumberOfClauses;
+
+            /// number of true clauses
+            unsigned int numberOfTrueAnnotations;
         } stats;
 
     public: /* member functions */
 
-        /// constructor
-        AnnotationElement(const std::set<StoredKnowledge* > & _setOfKnowledges,
-                          const std::vector<Clause* > & _annotationBoolean);
+        AnnotationElement(const std::set<StoredKnowledge* > & _setOfKnowledges);
 
-        /// destructor
-        ~AnnotationElement();
+        virtual ~AnnotationElement();
 
         /// returns a string containing the annotation of this element
-        void myAnnotationToStream(const bool& dot, std::ostream& file) const;
+        virtual void myAnnotationToStream(const bool& dot, std::ostream& file, std::map<const StoredKnowledge*, unsigned int>& nodeMapping) const = 0;
 
-    private: /* member attributes */
+    protected: /* member attributes */
         /// pointer to the set of knowledges
         StoredKnowledge** setOfKnowledges;
-
-        /// vector of label ids representing the annotation
-        Clause** annotationBool;
 
         /// succeeding element
         AnnotationElement* successor;
 
 };
 
+/*!
+  Livelock Operating Guideline only
+
+  annotation representing literal true only
+
+*/
+class AnnotationElementTrue: public AnnotationElement {
+
+        friend class AnnotationLivelockOG;
+        friend class LivelockOperatingGuideline;
+
+    public: /* member functions */
+
+        /// constructor
+        AnnotationElementTrue(const std::set<StoredKnowledge* > & _setOfKnowledges);
+
+        /// destructor
+        ~AnnotationElementTrue();
+
+        /// returns a string containing the annotation of this element
+        void myAnnotationToStream(const bool& dot, std::ostream& file, std::map<const StoredKnowledge*, unsigned int>& nodeMapping) const;
+
+};
+
+/*!
+  Livelock Operating Guideline only
+
+  a set of knowledges is annotated with a set of transition literals (knowledge + label) or final states
+
+*/
+class AnnotationElementTransitionLabel: public AnnotationElement {
+
+    public: /* member functions */
+
+        /// constructor
+        AnnotationElementTransitionLabel(const std::set<StoredKnowledge* > & _setOfKnowledges,
+                                         const std::vector<Clause* > & _annotationBoolean);
+
+        /// destructor
+        ~AnnotationElementTransitionLabel();
+
+        /// returns a string containing the annotation of this element
+        void myAnnotationToStream(const bool& dot, std::ostream& file, std::map<const StoredKnowledge*, unsigned int>& nodeMapping) const;
+
+    private: /* member attributes */
+
+        /// vector of label ids representing the annotation
+        Clause** annotationBool;
+
+};
 
 /*!
   Livelock Operating Guideline only

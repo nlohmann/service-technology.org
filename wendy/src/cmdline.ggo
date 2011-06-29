@@ -119,6 +119,11 @@ option "showTransients" -
   dependon="dot"
   flag off
 
+option "showInternalNodeNames" -
+  "Show internal node names."
+  details="By default node names are shown as human readable ascending node numbers. This option shows the internal node names.\n"
+  dependon="dot"
+  flag off
 
 section "Reductions"
 sectiondesc="These options control the reductions Wendy uses while synthesizing partners. Note that reduction rules do not necessarily preserve all partners, but return a partner if one exists.\n"

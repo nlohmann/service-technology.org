@@ -35,7 +35,6 @@
 
 /*!
   constructor
-  \todo check if this constructor is always called before CompositeMarkingsHandler::getMarking() -- if yes, combine them
 */
 CompositeMarking::CompositeMarking(const StoredKnowledge* _storedKnowledge,
                                    const InnerMarking_ID _innerMarking_ID,
@@ -61,39 +60,21 @@ CompositeMarking::~CompositeMarking() {
 
 /*!
   constructs a string that contains the annotation of the composite marking with respect to the given set of knowledges
-  \param knowledgeSet set of knowledges
-  \param setOfEdges the currently considered set of edges within the current SCS (set of knowledges)
   \param booleanClause a pointer to the Boolean clause of the composite marking
   \param emptyClause if true, the clause of this composite marking is empty
 */
-void CompositeMarking::getMyFormula(const std::set<StoredKnowledge*> & knowledgeSet,
-                                    SetOfEdges& setOfEdges,
-                                    Clause* booleanClause,
-                                    bool& emptyClause) {
-
-    // edges that belong to the stored knowledge
-    std::set<Label_ID> edges;
-
-    // if the setOfEdges is empty, we ignore it ;-)
-    bool useEdges = false;
-
-    // otherwise, we store the set of edges belonging to the stored knowledge
-    if (not setOfEdges.empty()) {
-        edges = (*setOfEdges.find(storedKnowledge)).second;
-        useEdges = true;
-    }
+void CompositeMarking::getMyFormula(Clause* booleanClause, bool& emptyClause) {
 
     // receiving event
     for (Label_ID l = Label::first_receive; l <= Label::last_receive; ++l) {
         // receiving event resolves deadlock
         if (interface->marked(l) and
-                (knowledgeSet.find(storedKnowledge->successors[l - 1]) == knowledgeSet.end() or
-                 (useEdges and edges.find(l - 1) == edges.end())) and
                 storedKnowledge->successors[l - 1] != NULL and storedKnowledge->successors[l - 1] != StoredKnowledge::empty and
                 storedKnowledge->successors[l - 1]->is_sane) {
 
-            booleanClause->labelPossible(l);
             emptyClause = false;
+
+            booleanClause->addTransitionLiteral(storedKnowledge, l);
         }
     }
 
@@ -101,25 +82,22 @@ void CompositeMarking::getMyFormula(const std::set<StoredKnowledge*> & knowledge
     for (Label_ID l = Label::first_sync; l <= Label::last_sync; ++l) {
         // synchronous communication resolves deadlock
         if (InnerMarking::synchs[l].find(innerMarking_ID) != InnerMarking::synchs[l].end() and
-                (knowledgeSet.find(storedKnowledge->successors[l - 1]) == knowledgeSet.end() or
-                 (useEdges and edges.find(l - 1) == edges.end())) and
                 storedKnowledge->successors[l - 1] != NULL and storedKnowledge->successors[l - 1] != StoredKnowledge::empty and
                 storedKnowledge->successors[l - 1]->is_sane) {
 
-            booleanClause->labelPossible(l);
             emptyClause = false;
+
+            booleanClause->addTransitionLiteral(storedKnowledge, l);
         }
     }
 
     // collect outgoing !-edges
     for (Label_ID l = Label::first_send; l <= Label::last_send; ++l) {
-        if ((knowledgeSet.find(storedKnowledge->successors[l - 1]) == knowledgeSet.end()  or
-                (useEdges and edges.find(l - 1) == edges.end())) and
-                storedKnowledge->successors[l - 1] != NULL and
-                storedKnowledge->successors[l - 1]->is_sane) {
+        if (storedKnowledge->successors[l - 1] != NULL and storedKnowledge->successors[l - 1]->is_sane) {
 
-            booleanClause->labelPossible(l);
             emptyClause = false;
+
+            booleanClause->addTransitionLiteral(storedKnowledge, l);
         }
     }
 
@@ -140,6 +118,13 @@ bool CompositeMarking::operator== (const CompositeMarking& other) const {
     return true;
 }
 
+std::ostream& operator<< (std::ostream& o, const CompositeMarking& m) {
+    o << "[";
+    o << reinterpret_cast<size_t>(m.storedKnowledge);
+    o << ", ";
+    o << "[" << m.innerMarking_ID << ", " << *m.interface << "]";
+    return o << "]";
+}
 
 /***************************
  * CompositeMarkingsHandler *
@@ -162,30 +147,52 @@ std::vector<Clause* > CompositeMarkingsHandler::conjunctionOfDisjunctionsBoolean
  ********************/
 
 /*!
-  checks if the given marking has been visited already, if so return a pointer to the marking otherwise return NULL
+  checks if the given marking has been visited already, if so return a pointer to the marking otherwise return the new marking
   Note: in case the marking has been found, you may need to delete the given marking afterwards
-  \param marking composite marking to be looked for
+  \param _storedKnowledge the knowledge of the new marking
+  \param _innerMarking_ID the inner marking of the new marking
+  \param _interface the interface of the new marking
+  \param foundMarking [in,out] indicates whether the "given" marking has been visited already
+
+  \return pointer to the new marking or the marking that has been visited already but equals to the one given
 
   \todo Niels thinks the for loop can be simplified
 */
-CompositeMarking* CompositeMarkingsHandler::getMarking(const CompositeMarking* marking) {
+CompositeMarking* CompositeMarkingsHandler::isVisited(const StoredKnowledge* _storedKnowledge,
+                                                      const InnerMarking_ID _innerMarking_ID,
+                                                      InterfaceMarking* _interface,
+                                                      bool &foundMarking) {
+
+    // create new marking
+    CompositeMarking* newMarking = new CompositeMarking(_storedKnowledge, _innerMarking_ID, _interface);
+    foundMarking = false;
+
+    // we have not yet seen any marking, so return the newly created one
     if (numberElements == 0) {
-        return NULL;
+        return newMarking;
     }
 
     CompositeMarking* storedMarking;
 
+    // iterate through all visited markings
     for (unsigned int i = 0; i < numberElements; ++i) {
         storedMarking = visitedCompositeMarkings[i];
 
         assert(storedMarking != NULL);
 
-        if (*marking == *storedMarking) {
+        // we have seen the "new" marking already, so return the old one and delete the new one
+        if (*newMarking == *storedMarking) {
+
+            foundMarking = true;
+
+            delete newMarking;
+
             return storedMarking;
         }
     }
 
-    return NULL;
+    // return the newly created marking
+    return newMarking;
 }
 
 
@@ -216,6 +223,23 @@ void CompositeMarkingsHandler::addClause(Clause* booleanClause) {
 
     if (booleanClause == Clause::falseClause) {
         Clause::stats.cumulativeSizeAllClauses++;
+    }
+
+    if (booleanClause == Clause::trueClause) {
+        Clause::stats.cumulativeSizeAllClauses++;
+    }
+
+    if (booleanClause != Clause::falseClause && booleanClause != Clause::trueClause) {
+        Clause::stats.cumulativeSizeAllClauses += booleanClause->numberOfFinalKnowledges;
+        Clause::stats.cumulativeSizeAllClauses += booleanClause->numberOfTransitionLiterals;
+
+        unsigned int countLiteralsOfClause = 0;
+        countLiteralsOfClause += booleanClause->numberOfFinalKnowledges;
+        countLiteralsOfClause += booleanClause->numberOfTransitionLiterals;
+
+        if (countLiteralsOfClause > Clause::stats.maximalSizeOfClause) {
+            Clause::stats.maximalSizeOfClause = countLiteralsOfClause;
+        }
     }
 }
 

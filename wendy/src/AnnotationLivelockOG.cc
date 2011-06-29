@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <vector>
 #include "AnnotationLivelockOG.h"
+#include "util.h"
 
 
 /******************************************
@@ -38,8 +39,86 @@ AnnotationElement::_stats AnnotationElement::stats;
  ******************/
 
 AnnotationElement::_stats::_stats()
-    : cumulativeNumberOfClauses(0), maximalNumberOfClauses(0) {}
+    : cumulativeNumberOfClauses(0), maximalNumberOfClauses(0), numberOfTrueAnnotations(0) {}
 
+
+/******************************************
+ * CONSTRUCTOR, DESTRUCTOR, AND FINALIZER *
+ ******************************************/
+
+/*!
+  constructor
+  \param _setOfKnowledges the set of knowledges this annotation belongs to
+*/
+AnnotationElement::AnnotationElement(const std::set<StoredKnowledge* > & _setOfKnowledges) :
+
+    // create C-Array to store the set of knowledges
+    setOfKnowledges(new StoredKnowledge*[_setOfKnowledges.size() + 1]),
+    successor(NULL) {
+
+    // copy values into the C arrays
+    std::copy(_setOfKnowledges.begin(), _setOfKnowledges.end(), setOfKnowledges);
+
+    // that way we do not need to remember the size of the array
+    setOfKnowledges[_setOfKnowledges.size()] = NULL;
+}
+
+/*!
+  destructor
+*/
+AnnotationElement::~AnnotationElement() {
+    delete[] setOfKnowledges;
+}
+
+
+/**********************************************
+ * AnnotationElementTrue                      *
+ **********************************************/
+
+
+/******************************************
+ * CONSTRUCTOR, DESTRUCTOR, AND FINALIZER *
+ ******************************************/
+
+/*!
+  constructor
+  \param _setOfKnowledges the set of knowledges this annotation belongs to
+*/
+AnnotationElementTrue::AnnotationElementTrue(const std::set<StoredKnowledge* > & _setOfKnowledges) :
+               AnnotationElement(_setOfKnowledges)
+
+{
+    ++stats.cumulativeNumberOfClauses;
+    ++stats.numberOfTrueAnnotations;
+}
+
+
+/*!
+  destructor
+*/
+AnnotationElementTrue::~AnnotationElementTrue() {
+}
+
+
+/******************
+ * MEMBER METHODS *
+ ******************/
+
+/*!
+  creates a string out of the set of strings representing the annotation of the set of knowledges
+  \param dot the string shall be used in the dot output or not
+  \param file a stream to which this annotation goes to
+  \param nodeMapping in case a more human-readable dot output is to be generated, we map every knowledge to a number and print that one instead
+*/
+void AnnotationElementTrue::myAnnotationToStream(const bool& dot,
+                                             std::ostream& file,
+                                             std::map<const StoredKnowledge*, unsigned int>& nodeMapping) const {
+    file << "true";
+}
+
+/*************************************
+ * AnnotationElementTransitionLabel  *
+ *************************************/
 
 /******************************************
  * CONSTRUCTOR, DESTRUCTOR, AND FINALIZER *
@@ -50,19 +129,15 @@ AnnotationElement::_stats::_stats()
   \param _setOfKnowledges the set of knowledges this annotation belongs to
   \param _annotationBoolean disjunction of clauses representing the annotation
 */
-AnnotationElement::AnnotationElement(const std::set<StoredKnowledge* > & _setOfKnowledges,
-                                     const std::vector<Clause* > & _annotationBoolean) :
-    // create C-Array to store the set of knowledges
-    setOfKnowledges(new StoredKnowledge*[_setOfKnowledges.size() + 1]),
+AnnotationElementTransitionLabel::AnnotationElementTransitionLabel(const std::set<StoredKnowledge* > & _setOfKnowledges,
+                                                                   const std::vector<Clause* > & _annotationBoolean) :
+
+    AnnotationElement(_setOfKnowledges),
     // create C-Array to store the set of clauses
-    annotationBool(new Clause*[_annotationBoolean.size() + 1]),
-    successor(NULL) {
-    // copy values into the C arrays
-    std::copy(_setOfKnowledges.begin(), _setOfKnowledges.end(), setOfKnowledges);
+    annotationBool(new Clause*[_annotationBoolean.size() + 1]) {
+
     std::copy(_annotationBoolean.begin(), _annotationBoolean.end(), annotationBool);
 
-    // that way we do not need to remember the size of the array
-    setOfKnowledges[_setOfKnowledges.size()] = NULL;
     annotationBool[_annotationBoolean.size()] = NULL;
 
     // do some statistics
@@ -77,12 +152,11 @@ AnnotationElement::AnnotationElement(const std::set<StoredKnowledge* > & _setOfK
 /*!
   destructor
 */
-AnnotationElement::~AnnotationElement() {
-    delete[] setOfKnowledges;
+AnnotationElementTransitionLabel::~AnnotationElementTransitionLabel() {
 
     // explicitly delete every (real) clause
     for (unsigned int i = 0; annotationBool[i] != NULL; ++i) {
-        if (annotationBool[i] != Clause::falseClause) {
+        if (annotationBool[i] != Clause::falseClause && annotationBool[i] != Clause::trueClause) {
             delete annotationBool[i];
         }
     }
@@ -99,8 +173,11 @@ AnnotationElement::~AnnotationElement() {
   creates a string out of the set of strings representing the annotation of the set of knowledges
   \param dot the string shall be used in the dot output or not
   \param file a stream to which this annotation goes to
+  \param nodeMapping in case a more human-readable dot output is to be generated, we map every knowledge to a number and print that one instead
 */
-void AnnotationElement::myAnnotationToStream(const bool& dot, std::ostream& file) const {
+void AnnotationElementTransitionLabel::myAnnotationToStream(const bool& dot,
+                                             std::ostream& file,
+                                             std::map<const StoredKnowledge*, unsigned int>& nodeMapping) const {
 
     // create the annotation of the current set of knowledges
     std::string stringAnd = (dot) ? " &and; " : " * ";
@@ -113,9 +190,11 @@ void AnnotationElement::myAnnotationToStream(const bool& dot, std::ostream& file
 
         if (annotationBool[i] == Clause::falseClause) {
             file << "false";
+        } else if (annotationBool[i] == Clause::trueClause) {
+            file << "true";
         } else {
             // the clause itself takes care of "(" and ")"
-            annotationBool[i]->printToStream(dot, file);
+            annotationBool[i]->printToStream(dot, file, nodeMapping);
         }
     }
 }
@@ -162,6 +241,7 @@ AnnotationLivelockOG::~AnnotationLivelockOG() {
   inserts an annotation to the queue
   \param setOfKnowledges set of knowledges the annotation belongs to
   \param annotationBoolean set of label ids representing an annotation
+
 */
 void AnnotationLivelockOG::push(const std::set<StoredKnowledge* > & setOfKnowledges,
                                 const std::vector<Clause* > & annotationBoolean) {
@@ -170,8 +250,24 @@ void AnnotationLivelockOG::push(const std::set<StoredKnowledge* > & setOfKnowled
         Clause::initialize();
     }
 
-    // create new annotation element
-    AnnotationElement* annotationElement = new AnnotationElement(setOfKnowledges, annotationBoolean);
+    bool trueAnnotation = true;
+
+    // does the current annotation consist of true clauses only
+    FOREACH (literal, annotationBoolean) {
+        if (*literal != Clause::trueClause) {
+            trueAnnotation = false;
+            break;
+        }
+    }
+
+    AnnotationElement* annotationElement;
+
+    // annotationBoolean is deleted in calling function
+    if (trueAnnotation) {
+        annotationElement = new AnnotationElementTrue(setOfKnowledges);
+    } else {
+        annotationElement = new AnnotationElementTransitionLabel(setOfKnowledges, annotationBoolean);
+    }
 
     // the queue is empty
     if (rootElement == NULL) {

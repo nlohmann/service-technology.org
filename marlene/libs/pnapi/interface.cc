@@ -8,13 +8,13 @@
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
  *          Stephan Mennicke <stephan.mennicke@uni-rostock.de>,
- *          last changes of: $Author: gierds $
+ *          last changes of: $Author: cas $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2011-03-24 14:54:57 +0100 (Do, 24. Mrz 2011) $
+ * \date    $Date: 2010-07-27 18:53:14 +0200 (Tue, 27 Jul 2010) $
  *
- * \version $Revision: 6507 $
+ * \version $Revision: 5964 $
  */
 
 #include "config.h"
@@ -50,17 +50,17 @@ Interface::Interface(PetriNet & net) :
 
 /*!
  * \brief compose constructor
- *
+ * 
  * Given two interfaces, ports with common labels will be composed
  * and the result will be stored in this interface.
  * Ports without a partner will be copied.
- *
+ * 
  * When composing a set of ports there must not remain any unused label
  * (otehrwise an exception will be thrown).
- *
+ * 
  * By composition the given references label2label, label2place
  * and commonLabels will be written.
- *
+ * 
  * \param net underlying petri net
  * \param interface1 first interface of composition
  * \param interface2 second interface of composition
@@ -93,29 +93,29 @@ Interface::Interface(PetriNet & net, const Interface & interface1, const Interfa
         shapes2.insert((*l)->getName());
       }
     }
-
+    
     commonShapes = util::setIntersection(shapes1, shapes2);
-
+    
     PNAPI_FOREACH(s, commonShapes)
     {
       commonLabels.insert(interface1.findLabel(*s));
       commonLabels.insert(interface2.findLabel(*s));
     }
   }
-
+  
   // copy or compose ports of interface1
   PNAPI_FOREACH(port, interface1.ports_)
   {
     set<Label *> labels1 = port->second->getAllLabels();
-    PNAPI_ASSERT_USER(!(labels1.empty()), string("port '") + port->first + "' is empty");
-
+    PNAPI_ASSERT_USER(!(labels1.empty()), string("port '") + port->first + "' is empty"); 
+    
     if(util::setIntersection(labels1, commonLabels).empty()) // no common labels
     {
       // copy port
       string name = interface1.name_ + port->first;
       Port * p = new Port(net_, name);
       ports_[name] = p;
-
+      
       PNAPI_FOREACH(label, labels1)
       {
         label2label[*label] = &(p->addLabel((*label)->getName(), (*label)->getType()));
@@ -127,14 +127,14 @@ Interface::Interface(PetriNet & net, const Interface & interface1, const Interfa
       PNAPI_ASSERT_USER(util::setDifference(labels1, commonLabels).empty(),
                         string("port '") + port->first + "' shares at least one but not all labels",
                         exception::UserCausedError::UE_COMPOSE_ERROR);
-
+                        
       PNAPI_FOREACH(l1, labels1)
       {
         Label * l2 = interface2.findLabel((*l1)->getName());
         PNAPI_ASSERT_USER((*l1)->getType() + l2->getType() == 4,
                           string("labels '") + l2->getName() + "' do not fit by type",
                           exception::UserCausedError::UE_COMPOSE_ERROR);
-
+        
         if(l2->getType() == Label::SYNCHRONOUS)
         {
           commonSynLabels.insert(*l1);
@@ -150,7 +150,7 @@ Interface::Interface(PetriNet & net, const Interface & interface1, const Interfa
       }
     }
   }
-
+  
   // copy remaining ports of interface2
   PNAPI_FOREACH(port, interface2.ports_)
   {
@@ -158,10 +158,10 @@ Interface::Interface(PetriNet & net, const Interface & interface1, const Interfa
     if(util::setIntersection(labels2, commonLabels).empty()) // no common label
     {
       // copy port
-      string name = interface2.name_ + port->first;
+      string name = interface2.name_ + port->first; 
       Port * p = new Port(net_, name);
       ports_[name] = p;
-
+      
       PNAPI_FOREACH(label, port->second->getAllLabels())
       {
         label2label[*label] = &(p->addLabel((*label)->getName(), (*label)->getType()));
@@ -187,7 +187,7 @@ Interface::~Interface()
 
 /*!
  * \brief removes all ports and their labels
- *
+ * 
  * \note Port "" will be recreated.
  */
 void Interface::clear()
@@ -226,7 +226,7 @@ Port & Interface::addPort(const std::string & name)
 void Interface::renamePort(Port & port, const std::string & name)
 {
   PNAPI_ASSERT_USER(ports_[name] == NULL, string("port '") + name + "' already exists");
-
+  
   string oldName = port.getName();
   ports_[name] = &port;
   port.setName(name);
@@ -235,16 +235,16 @@ void Interface::renamePort(Port & port, const std::string & name)
 
 /*!
  * \brief merge two ports
- *
+ * 
  * \note Given ports will be deleted here.
  */
 Port & Interface::mergePorts(Port & port1, Port & port2, const std::string & name)
 {
   map<string, Label::Type> types;
   map<string, map<Transition *, unsigned int> > arcs;
-
+  
   set<Label *> labels = port1.getAllLabels();
-
+  
   PNAPI_FOREACH(l, labels)
   {
     types[(*l)->getName()] = (*l)->getType();
@@ -253,9 +253,9 @@ Port & Interface::mergePorts(Port & port1, Port & port2, const std::string & nam
       arcs[(*l)->getName()][*t] = (*t)->getLabels().find(*l)->second;
     }
   }
-
+  
   labels = port2.getAllLabels();
-
+  
   PNAPI_FOREACH(l, labels)
   {
     types[(*l)->getName()] = (*l)->getType();
@@ -264,28 +264,28 @@ Port & Interface::mergePorts(Port & port1, Port & port2, const std::string & nam
       arcs[(*l)->getName()][*t] = (*t)->getLabels().find(*l)->second;
     }
   }
-
+  
   string newName = ((name == "") ? port1.getName() : name);
-
+  
   ports_.erase(port1.getName());
   ports_.erase(port2.getName());
   delete (&port1);
   delete (&port2);
-
+  
   Port * result = new Port(net_, newName);
   ports_[newName] = result;
-
+  
   PNAPI_FOREACH(t, types)
   {
     Label & l = result->addLabel(t->first, t->second);
     map<Transition *, unsigned int> & arcs_ = arcs[t->first];
-
+    
     PNAPI_FOREACH(a, arcs_)
     {
       a->first->addLabel(l, a->second);
     }
   }
-
+  
   return *result;
 }
 
@@ -302,7 +302,7 @@ Label & Interface::addLabel(const std::string & name, Label::Type type, const st
   case Label::SYNCHRONOUS: result = &addSynchronousLabel(name, port); break;
   default: PNAPI_ASSERT(false);
   }
-
+  
   return *result;
 }
 
@@ -418,7 +418,7 @@ const std::set<Label *> & Interface::getInputLabels(Port & port) const
 
 /*!
  * \brief returning input labels
- *
+ * 
  * if no name (or an empty name) is given, all input labels will be returned.
  */
 std::set<Label *> Interface::getInputLabels(const std::string & port) const
@@ -439,7 +439,7 @@ std::set<Label *> Interface::getInputLabels(const std::string & port) const
       result = p->second->getInputLabels();
     }
   }
-
+  
   return result;
 }
 
@@ -453,7 +453,7 @@ const std::set<Label *> & Interface::getOutputLabels(Port & port) const
 
 /*!
  * \brief returning output labels
- *
+ * 
  * if no name (or an empty name) is given, all output labels will be returned.
  */
 std::set<Label *> Interface::getOutputLabels(const std::string & port) const
@@ -474,7 +474,7 @@ std::set<Label *> Interface::getOutputLabels(const std::string & port) const
       result = p->second->getOutputLabels();
     }
   }
-
+  
   return result;
 }
 
@@ -488,7 +488,7 @@ const std::set<Label *> & Interface::getSynchronousLabels(Port & port) const
 
 /*!
  * \brief returning synchronous labels
- *
+ * 
  * if no name (or an empty name) is given, all synchronous labels will be returned.
  */
 std::set<Label *> Interface::getSynchronousLabels(const std::string & port) const
@@ -509,7 +509,7 @@ std::set<Label *> Interface::getSynchronousLabels(const std::string & port) cons
       result = p->second->getSynchronousLabels();
     }
   }
-
+  
   return result;
 }
 

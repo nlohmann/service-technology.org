@@ -1,8 +1,12 @@
-@heading Version 1.2-unreleased
+@heading Version 1.2
 
 @itemize
 
+@item diagnosis of unadaptable services (only in connection with libconfig++ >= 1.4)
+
 @item improved test coverage of code
+
+@item minor improvements (e.g. smart pointer usage)
 
 @end itemize
 

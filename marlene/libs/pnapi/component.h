@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: gierds $
+ *          last changes of: $Author: cas $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2011-03-24 18:22:04 +0100 (Do, 24. Mrz 2011) $
+ * \date    $Date: 2010-03-12 06:22:18 +0100 (Fri, 12 Mar 2010) $
  *
- * \version $Revision: 6511 $
+ * \version $Revision: 5502 $
  */
 
 #ifndef PNAPI_COMPONENT_H
@@ -72,8 +72,6 @@ private: /* private variables */
   std::set<Node *> postset_;
   /// the arcs to the postset of this node
   std::set<Arc *> postsetArcs_;
-  /// node color (dot output)
-  std::string color_;
   
 public: /* public methods */
   /*!
@@ -94,8 +92,6 @@ public: /* public methods */
   //@{
   /// set new name of the node
   void setName(const std::string &);
-  /// set node color (dot output)
-  void setColor(const std::string & = "");
   /// adds a prefix to all names
   void prefixNameHistory(const std::string &);
   /// merges the histories of two nodes
@@ -112,8 +108,6 @@ public: /* public methods */
   bool isParallel(const Node &) const;
   /// returns the name of the node
   std::string getName() const;
-  /// returns the node's color (dot output)
-  const std::string & getColor() const;
   /// returns the name history
   std::deque<std::string> getNameHistory() const;
   /// returns the node's preset
@@ -203,9 +197,7 @@ public: /* public methods */
   /// add an interface label
   void addLabel(Label & label, unsigned int = 1);
   /// remove an interface label
-  void removeLabel(Label & label);
-  /// remove an interface label
-  void removeLabel(Label * label);
+  void removeLabel(const Label & label);
   //@}
   
   /*!

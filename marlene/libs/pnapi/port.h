@@ -70,6 +70,8 @@ public: /* public methods */
   void addTransition(Transition &);
   /// removing a transition from the attached transitions
   void removeTransition(const Transition &);
+  /// removing a transition from the attached transitions
+  void removeTransition(Transition *);
   /// swaps input and output labels
   void mirror();
   /// prefix this label

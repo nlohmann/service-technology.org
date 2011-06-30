@@ -123,16 +123,21 @@ void Automaton::printToTransitionGraph(std::vector<std::string> & edgeLabels,
   }
 
   // mark final states
+  bool fsfound = false; // final state found ?
+  int foundPosition = 0;
   for(unsigned int i = 0; i < states_.size(); ++i)
   {
     if (states_[i]->isFinal())
     {
-      // each label is mapped to his position in edgeLabes
-      std::string currentLabel = "FINAL";
-      currentLabel += states_[i]->getName();
-      int foundPosition = (int)edgeLabels.size();
-      edgeLabels.push_back(currentLabel);
-      TGStringStream << "p" << states_[i]->getName() << " t" << foundPosition << " p00\n";
+      if (! fsfound)
+      {
+        // There is exactly one FINAL label, everything else confuses Genet
+        std::string currentLabel = "FINAL";
+        foundPosition = (int)edgeLabels.size();
+        edgeLabels.push_back(currentLabel);
+        fsfound = true;
+      }
+      TGStringStream << "p" << states_[i]->getName() << " t" << foundPosition << " p00\n"; //" << states_[i]->getName() << "
     }
   }
 
@@ -228,7 +233,6 @@ void PetriNet::createFromSTG(std::vector<std::string> & edgeLabels,
     systemcall = pathToGenet_ + " -k " + ss.str() + " " + fileName + " > " + pnFileName;
   }
 
-  //int result = system(systemcall.c_str());
   int doNotCare_JustFixWarning = system(systemcall.c_str());
   doNotCare_JustFixWarning = doNotCare_JustFixWarning; // get rid of compilerwarning
 

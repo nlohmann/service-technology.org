@@ -13,9 +13,9 @@
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-07-23 14:38:42 +0200 (Fri, 23 Jul 2010) $
+ * \date    $Date: 2010-08-24 16:23:05 +0200 (Tue, 24 Aug 2010) $
  *
- * \version $Revision: 5949 $
+ * \version $Revision: 6089 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -158,6 +158,9 @@ public: /* public types */
     SET_PILLAT = (IDENTICAL_PLACES | IDENTICAL_TRANSITIONS | SERIES_PLACES |
                   SERIES_TRANSITIONS | SELF_LOOP_PLACES |
                   SELF_LOOP_TRANSITIONS | EQUAL_PLACES),
+    SET_MURATA = (IDENTICAL_PLACES | IDENTICAL_TRANSITIONS |
+                  SERIES_PLACES | SERIES_TRANSITIONS |
+                  SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS),
     SET_STARKE = (STARKE_RULE_3_PLACES | STARKE_RULE_3_TRANSITIONS |
                   STARKE_RULE_4 | STARKE_RULE_7 | STARKE_RULE_8),
     K_BOUNDEDNESS = SET_PILLAT,

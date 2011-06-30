@@ -45,7 +45,7 @@
   }
   
   else if (!strcmp($_SESSION["marlene"]["process"], 'marlene/reroute.owfn')) {
-    $services = array("marlene/ip.owfn", "marlene/ip2.owfn", "marlene/req.owfn");
+    $services = array("marlene/ip.owfn", "marlene/ip2.owfn", "marlene/req2.owfn");
     $rules = array("marlene/rerouting.ar");
   }
   

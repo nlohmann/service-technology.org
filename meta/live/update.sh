@@ -9,8 +9,8 @@ PATH=`pwd`/bin:/usr/local/bin:/usr/bin:/bin:$PATH
 DIR=`pwd`
 
 # Genet
-cp `which genet` bin
-chmod a+x bin/genet
+#cp `which genet` bin
+#chmod a+x bin/genet
 
 
 # LoLA
@@ -27,7 +27,7 @@ cd ..
 rm -fr $TOOL* $TOOL.tar.gz
 
 
-for TOOL in pnapi wendy candy marlene mia bpel2owfn rachel x2dot compilers sayo uml2owfn linda yasmina2
+for TOOL in genet pnapi wendy candy marlene mia bpel2owfn rachel x2dot compilers sayo uml2owfn linda yasmina2
 do
   wget http://esla.informatik.uni-rostock.de:8080/job/$TOOL/lastSuccessfulBuild/artifact/$TOOL/$TOOL.tar.gz
   tar xfz $TOOL.tar.gz

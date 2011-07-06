@@ -1,0 +1,129 @@
+<project name="main" default="all">
+
+    <target name="all" depends="prepare, statsvn, cppcheck, autoreconf, configure, make_all, make_check, make_dist, make_distcheck, documentation, coverage" />
+
+    <target name="prepare" description="Cleans up the directory from earlier builds.">
+        <exec executable="make" failonerror="false">
+            <arg value="--quiet" />
+            <arg value="svn-clean" />
+        </exec>
+        <delete failonerror="false">
+            <fileset dir="." includes="${package}*.tar.gz" />
+            <fileset dir="." includes="statsvn.log" />
+        </delete>
+        <delete dir="statsvn" failonerror="false" />
+        <delete dir="artifacts" failonerror="false" />
+        <mkdir dir="artifacts" />
+    </target>
+
+    <target name="statsvn">
+        <exec executable="svn" failonerror="false" output="statsvn.log">
+            <arg line="log -v --xml" />
+        </exec>
+        <exec executable="java" failonerror="false">
+            <arg line="-jar '${homedir}/local/statsvn/statsvn.jar' -config-file '${homedir}/local/statsvn/config' -tags '.*' -disable-twitter-button -threads 1 -include '**/src/**;**/utils/**' statsvn.log . -output-dir statsvn" />
+        </exec>
+    </target>
+
+    <target name="cppcheck">
+        <touch file="src/tmpfile.c" />
+        <exec executable="cppcheck" failonerror="false" error="artifacts/cppcheck-result.xml">
+            <arg line="src/* --enable=style,information,unusedFunction --force --verbose --report-progress --xml -j2" />
+        </exec>
+        <delete file="src/tmpfile.c" />
+    </target>
+
+    <target name="autogen">
+        <exec executable="env" failonerror="true">
+            <arg value="autogen.sh" />
+        </exec>
+    </target>
+
+    <target name="autoreconf">
+        <exec executable="autoreconf" failonerror="true">
+            <arg value="-iv" />
+        </exec>
+    </target>
+
+    <target name="configure">
+        <exec executable="sh" failonerror="true">
+            <arg value="configure" />
+            <arg value="--disable-shared" />
+        </exec>
+    </target>
+
+    <target name="make_all">
+        <exec executable="make" failonerror="true">
+            <arg value="AM_CFLAGS=-Waddress -Waggregate-return -Wall -Wc++-compat -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wnested-externs -Wno-attributes -Wno-div-by-zero -Wno-endif-labels  -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -pedantic" />
+            <arg value="AM_CXXFLAGS=-Waddress -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -pedantic" />
+<!--            <arg value="AM_CFLAGS=-Wall -Wextra -pedantic -ansi -Wno-format-extra-args -Wformat-y2k -Wformat-nonliteral -Wformat-security -Wformat=2 -Winit-self -Wunused -Wredundant-decls -Wpacked -Wmissing-noreturn -Wmissing-field-initializers" />
+            <arg value="AM_CXXFLAGS=-Wall -Wextra -pedantic -ansi -Wno-format-extra-args -Wformat-y2k -Wformat-nonliteral -Wformat-security -Wformat=2 -Winit-self -Wunused -Wredundant-decls -Wpacked -Wmissing-noreturn -Wmissing-field-initializers" /> -->
+            <arg value="all" />
+        </exec>
+    </target>
+
+    <target name="make_check">
+        <exec executable="make" failonerror="false" resultproperty="result">
+            <arg value="check" />
+        </exec>
+        <copy file="tests/testsuite.log" todir="artifacts" failonerror="false" />
+        <fail>
+            <condition>
+                <not>
+                    <equals arg1="${result}" arg2="0" />
+                </not>
+            </condition>
+        </fail>
+    </target>
+
+    <target name="make_dist">
+        <exec executable="make" failonerror="true">
+            <arg value="dist" />
+            <arg value="distdir=${package}" />
+        </exec>
+    </target>
+
+    <target name="make_distcheck">
+        <exec executable="make" failonerror="true">
+            <arg value="distcheck" />
+            <arg value="distdir=${package}" />
+        </exec>
+    </target>
+
+    <target name="documentation">
+        <exec executable="make" failonerror="false">
+            <arg value="pdf" />
+        </exec>
+        <copy file="doc/${package}.pdf" todir="artifacts" failonerror="false" />
+        <available property="docfolder" file="doc" type="dir" />
+        <mkdir dir="doc" />
+        <mkdir dir="doc/doxygen" />
+        <exec executable="doxygen" dir="doc" failonerror="false" />
+    </target>
+
+    <target name="coverage">
+        <mkdir dir="tests" />
+        <mkdir dir="tests/cover-html" />
+        <exec executable="make" dir="tests" failonerror="false">
+            <arg value="cover" />
+        </exec>
+        <exec executable="sh" dir="tests/cover-html" failonerror="false" output="tmp1">
+            <arg line="-c &quot;grep coverNumHi index.html | sed 's/[^0-9 ]//g' | awk '{print $1}'&quot;" />
+        </exec>
+        <exec executable="sh" dir="tests/cover-html" failonerror="false" output="tmp2">
+            <arg line="-c &quot;grep coverNumHi index.html | sed 's/[^0-9 ]//g' | awk '{print $2}'&quot;" />
+        </exec>
+        <concat destfile="plot_coveredlines">
+          <header>YVALUE=</header>
+          <fileset file="tmp1" />
+        </concat>
+        <concat destfile="plot_totallines">
+          <header>YVALUE=</header>
+          <fileset file="tmp2" />
+        </concat>
+        <delete file="tmp1" failonerror="false" />
+        <delete file="tmp2" failonerror="false" />
+    </target>
+
+</project>
+

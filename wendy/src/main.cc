@@ -425,9 +425,9 @@ int main(int argc, char** argv) {
             Diagnosis::output_results(results);
         }
 
-        results.add("meta.package_name", (char*)PACKAGE_NAME);
-        results.add("meta.package_version", (char*)PACKAGE_VERSION);
-        results.add("meta.svn_version", (char*)VERSION_SVN);
+        results.add("meta.package_name", (const char*)PACKAGE_NAME);
+        results.add("meta.package_version", (const char*)PACKAGE_VERSION);
+        results.add("meta.svn_version", (const char*)VERSION_SVN);
         results.add("meta.invocation", invocation);
     }
 

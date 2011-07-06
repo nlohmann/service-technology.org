@@ -1094,10 +1094,10 @@ void StoredKnowledge::output_migration(std::ostream& o) {
 void StoredKnowledge::output_results(Results& r) {
     switch (args_info.correctness_arg) {
         case(correctness_arg_deadlock):
-            r.add("controllability.correctness", (char*)"deadlock freedom");
+            r.add("controllability.correctness", "deadlock freedom");
             break;
         case(correctness_arg_livelock):
-            r.add("controllability.correctness", (char*)"weak termination");
+            r.add("controllability.correctness", "weak termination");
             break;
     }
 

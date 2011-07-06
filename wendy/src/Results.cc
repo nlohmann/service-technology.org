@@ -45,13 +45,13 @@ void Results::add(std::string part, std::string name, std::string value) {
     values[part][name] = "\"" + value + "\"";
 }
 
-void Results::add(std::string partname, char* value) {
+void Results::add(std::string partname, const char* value) {
     std::string part = partname.substr(0, partname.find_first_of("."));
     std::string name = partname.substr(partname.find_first_of(".") + 1, partname.size());
     add(part, name, value);
 }
 
-void Results::add(std::string part, std::string name, char* value) {
+void Results::add(std::string part, std::string name, const char* value) {
     values[part][name] = std::string("\"") + value + "\"";
 }
 

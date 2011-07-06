@@ -40,8 +40,8 @@ class Results {
         void add(std::string, std::string, std::stringstream&);
         void add(std::string,              std::string);
         void add(std::string, std::string, std::string);
-        void add(std::string,              char*);
-        void add(std::string, std::string, char*);
+        void add(std::string,              const char*);
+        void add(std::string, std::string, const char*);
         void add(std::string,              float);
         void add(std::string, std::string, float);
         void add(std::string,              unsigned int);

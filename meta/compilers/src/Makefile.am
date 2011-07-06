@@ -1,6 +1,6 @@
 bin_PROGRAMS = fiona2wendy wendy2fiona \
 	       wendyFormula2bits \
-	       ig2sa sa2ig \
+	       ig2sa sa2ig sa2result \
 	       wendyReduceBits wendyExpandBits
 
 COMMON = main.cc config.h \
@@ -12,23 +12,26 @@ fiona2wendy_SOURCES = syntax-f2w.yy lexic-f2w.ll \
                       $(COMMON) $(VERBOSE)
 
 wendy2fiona_SOURCES = syntax-w2f.yy lexic-w2f.ll \
-		      $(COMMON)
+          $(COMMON)
 
 wendyFormula2bits_SOURCES = syntax-wf2b.yy lexic-wf2b.ll \
-			    types-wf2b.h \
-		            $(COMMON)
+          types-wf2b.h \
+                $(COMMON)
 
 ig2sa_SOURCES = syntax-ig2sa.yy lexic-ig2sa.ll \
-		$(COMMON)
+    $(COMMON)
 
 sa2ig_SOURCES = syntax-sa2ig.yy lexic-sa2ig.ll \
-		$(COMMON)
+    $(COMMON)
+
+sa2result_SOURCES = syntax-sa2result.yy lexic-sa2result.ll \
+    $(COMMON)
 
 wendyReduceBits_SOURCES = syntax-wrb.yy lexic-wrb.ll \
-			  $(COMMON)
+        $(COMMON)
 
 wendyExpandBits_SOURCES = syntax-web.yy lexic-web.ll \
-			  $(COMMON)
+        $(COMMON)
 
 
 #############################################################################

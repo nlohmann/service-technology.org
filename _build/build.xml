@@ -54,10 +54,8 @@
 
     <target name="make_all">
         <exec executable="make" failonerror="true">
-            <arg value="AM_CFLAGS=-Waddress -Waggregate-return -Wall -Wc++-compat -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wnested-externs -Wno-attributes -Wno-div-by-zero -Wno-endif-labels  -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -pedantic" />
-            <arg value="AM_CXXFLAGS=-Waddress -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -pedantic" />
-<!--            <arg value="AM_CFLAGS=-Wall -Wextra -pedantic -ansi -Wno-format-extra-args -Wformat-y2k -Wformat-nonliteral -Wformat-security -Wformat=2 -Winit-self -Wunused -Wredundant-decls -Wpacked -Wmissing-noreturn -Wmissing-field-initializers" />
-            <arg value="AM_CXXFLAGS=-Wall -Wextra -pedantic -ansi -Wno-format-extra-args -Wformat-y2k -Wformat-nonliteral -Wformat-security -Wformat=2 -Winit-self -Wunused -Wredundant-decls -Wpacked -Wmissing-noreturn -Wmissing-field-initializers" /> -->
+            <arg value="AM_CFLAGS=-Waddress -Waggregate-return -Wall -Wc++-compat -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wnested-externs -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic" />
+            <arg value="AM_CXXFLAGS=-Waddress -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic" />
             <arg value="all" />
         </exec>
     </target>
@@ -126,4 +124,3 @@
     </target>
 
 </project>
-

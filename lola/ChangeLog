@@ -11,6 +11,8 @@ Version 1.17-unreleased
 
 * small bugfixes
 
+* code refactoring
+
 * added script `utils/newlola.sh' to generate a LoLA binary given a
   `userconfig.H' file
 

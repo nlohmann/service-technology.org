@@ -2,6 +2,8 @@
 @itemize
 @item small bugfixes
 
+@item code refactoring
+
 @item added script @file{utils/newlola.sh} to generate a LoLA binary given a @file{userconfig.H} file
 
 @item added files from the SUMo 2011 Model Checking Contest (@url{http://sumo.lip6.fr/Model_Checking_Contest.html}) as test cases

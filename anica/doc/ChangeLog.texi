@@ -1,5 +1,5 @@
 @heading Version 1.0
 @itemize
-@item first offical release of Anica
+@item first official release of Anica
 @item checks PBNI+ for safe petri nets
 @end itemize

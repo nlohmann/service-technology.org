@@ -142,7 +142,7 @@ The distribution contains several directories:
 The Texinfo documentation of Anica. The documentation can be created using @samp{make pdf}. Note you need to have Anica properly installed before (see installation description above).
 
 @item libs
-The Petri Net @acronym{API} used by Anica to parse and organize the open net.
+The Petri Net @acronym{API} used by Anica to parse and organize the lola net.
 
 @item man
 The manpage of Anica which can be displayed using @samp{man anica} after having Anica installed (see installation description above).

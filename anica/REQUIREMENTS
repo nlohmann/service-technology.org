@@ -6,8 +6,6 @@
                    Automated Non-Interference Check Assistant
                        http://service-technology.org/anica
 
-PURPOSE
-    Anica can check positive place based non-interference for safe petri nets.
 In order to run, compile, and develop Anica, several tools are required.
 
 Runtime
@@ -28,8 +26,7 @@ Runtime
 
 Anica's configure script checks whether Lola (with binary
 `lola-statepredicate1') is found in the path and adjusts the configuration
-file `src/anica.conf' accordingly. Lola should be compiled with reduction
-techniques (STUBBORN, PREDUCTION, SMALLSTATE).
+file `src/anica.conf' accordingly.
 
 Compilation
 -----------

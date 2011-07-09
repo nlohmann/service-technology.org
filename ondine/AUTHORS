@@ -1,0 +1,35 @@
+                  ___            _ _
+                 / _ \ _ __   __| (_)_ __   ___
+		| | | | '_ \ / _` | | '_ \ / _ \
+                | |_| | | | | (_| | | | | |  __/
+                 \___/|_| |_|\__,_|_|_| |_|\___|
+		Ondine --- Open Net Divider with INtErface optimization 
+		http://service-technology.org/ondine
+
+
+COPYRIGHT
+    Copyright (c) 2011 Harro Wimmel
+
+
+AUTHORS
+    <<-- CHANGE START (authors) -->>
+    Harro Wimmel
+        implemented everything so far
+    <<-- CHANGE END -->>
+
+
+MAINTAINER
+    Ondine is maintained by Harro Wimmel.
+
+
+CONTACT
+    <<-- CHANGE START (contact Information) -->>
+    Harro Wimmel
+    Institut fuer Informatik
+    Lehrstuhl Programmiersprachen & Programmierung
+    Universitaet Rostock
+    D-18057 Rostock
+
+    <<-- CHANGE END -->>
+    WWW:  http://service-technology.org/ondine
+    E-Mail:  ondine@service-technology.org

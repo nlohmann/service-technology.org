@@ -1,0 +1,158 @@
+AT_INIT
+AT_COLOR_TESTS
+
+# <<-- CHANGE START (tests) -->>
+
+AT_TESTED(versions.sh)
+
+############################################################################
+AT_BANNER([Basic Options])
+############################################################################
+
+AT_SETUP([Help output])
+AT_CHECK([ONDINE --help],0,ignore)
+AT_CHECK([ONDINE --detailed-help],0,ignore)
+AT_CHECK([ONDINE --full-help],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+AT_SETUP([Version output])
+AT_CHECK([ONDINE --version],0,ignore)
+AT_KEYWORDS(basic)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Parameters])
+############################################################################
+
+AT_SETUP([Piping from stdin (OWFN)])
+AT_CHECK([cp TESTFILES/semaphore.owfn .])
+AT_CHECK([cat semaphore.owfn | ONDINE --owfn],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Piping from stdin (LOLA)])
+AT_CHECK([cp TESTFILES/phils10.llnet .])
+AT_CHECK([cat phils10.llnet | ONDINE --lola],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Piping from stdin (PNML)])
+AT_CHECK([cp TESTFILES/test.pnml .])
+AT_CHECK([cat test.pnml | ONDINE --pnml],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Reading from open net file])
+AT_CHECK([cp TESTFILES/semaphore.owfn .])
+AT_CHECK([ONDINE semaphore.owfn],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Reading from LoLA file])
+AT_CHECK([cp TESTFILES/phils10.llnet .])
+AT_CHECK([ONDINE --lola phils10.llnet],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Reading from PNML file])
+AT_CHECK([cp TESTFILES/test.pnml .])
+AT_CHECK([ONDINE --pnml test.pnml],0,ignore, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([File Output])
+AT_CHECK([cp TESTFILES/semaphore2.owfn .])
+AT_CHECK([ONDINE --owfn semaphore2.owfn out1.owfn out2.owfn], 0, ignore, ignore)
+AT_CHECK([GREP -q "PORT compose_out1+out2_to_semaphore2" out1.owfn], 0, ignore)
+AT_CHECK([GREP -q "PORT compose_out1+out2_to_semaphore2" out2.owfn], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Stdout])
+AT_CHECK([cp TESTFILES/semaphore2.owfn .])
+AT_CHECK([ONDINE semaphore2.owfn], 0, stdout, ignore)
+AT_CHECK([GREP -q "PORT compose_to_semaphore2" stdout], 0, ignore)
+AT_CHECK([GREP -q "INPUT" stdout], 0, ignore)
+#AT_CHECK([GREP -q "c., c.;" stdout], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Properties])
+############################################################################
+
+AT_SETUP([Unsplittable Component])
+AT_CHECK([cp TESTFILES/test2.owfn .])
+AT_CHECK([ONDINE --owfn test2.owfn], 1, stdout, stderr)
+AT_CHECK([GREP -q "aborting ..10." stderr], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+
+############################################################################
+AT_BANNER([Debugging])
+############################################################################
+
+AT_SETUP([Bug flag])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([ONDINE test.owfn --bug ], 0, stdout, stderr)
+AT_CHECK([GREP -q "please send file" stderr], 0, ignore)
+AT_KEYWORDS(modifiers)
+AT_CLEANUP
+
+AT_SETUP([Config file])
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/ondine.conf .])
+AT_CHECK([ONDINE test.owfn --config=ondine.conf -v], 0, stdout, stderr)
+AT_CHECK([GREP -q "using configuration file" stderr], 0, ignore)
+AT_KEYWORDS(modifiers)
+AT_CLEANUP
+
+AT_SETUP([Status])
+AT_CHECK([cp TESTFILES/semaphore.owfn .])
+AT_CHECK([ONDINE semaphore.owfn --stats ], 0, stdout, stderr)
+AT_CHECK([GREP -q "runtime" stderr], 0, ignore)
+AT_KEYWORDS(modifiers)
+AT_CLEANUP
+
+############################################################################
+AT_BANNER([Fatal Errors])
+############################################################################
+
+AT_SETUP([No Petri net file])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([ONDINE test2.owfn ],1, stdout, stderr)
+AT_CHECK([GREP -q "aborting ..01." stderr], 0, ignore)
+AT_KEYWORDS(fatalerrors)
+AT_CLEANUP
+
+AT_SETUP([Wrong Petri net format])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([ONDINE test.owfn --lola ], 1, stdout, stderr)
+AT_CHECK([GREP -q "aborting ..02." stderr], 0, ignore)
+AT_KEYWORDS(fatalerrors)
+AT_CLEANUP
+
+AT_SETUP([Too many files given])
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/test2.owfn .])
+AT_CHECK([ONDINE test.owfn test2.owfn test.owfn test2.owfn ], 1, stdout, stderr)
+AT_CHECK([GREP -q "aborting ..04." stderr], 0, ignore)
+AT_KEYWORDS(fatalerrors)
+AT_CLEANUP
+
+AT_SETUP([Wrong option])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([ONDINE test.owfn --narrow ], 1, stdout, stderr)
+AT_CHECK([GREP -q "aborting ..07." stderr], 0, ignore)
+AT_KEYWORDS(fatalerrors)
+AT_CLEANUP
+
+AT_SETUP([Configuration file missing])
+AT_CHECK([cp TESTFILES/test.owfn .])
+AT_CHECK([ONDINE test.owfn --config=myconfig.conf ], 1, stdout, stderr)
+AT_CHECK([GREP -q "aborting ..14." stderr], 0, ignore)
+AT_KEYWORDS(fatalerrors)
+AT_CLEANUP
+
+# <<-- CHANGE END -->>

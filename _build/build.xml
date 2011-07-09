@@ -1,19 +1,17 @@
 <project name="main" default="all">
 
-    <target name="all" depends="prepare, statsvn, cppcheck, autoreconf, configure, make_all, make_check, make_dist, make_distcheck, documentation, coverage" />
+    <target name="all" depends="prepare, statsvn, cppcheck, autogen, configure, make_all, make_distcheck, documentation, coverage" />
 
     <target name="prepare" description="Cleans up the directory from earlier builds.">
+        <mkdir dir="artifacts" />
+    </target>
+
+    <target name="cleanup">
         <exec executable="make" failonerror="false">
             <arg value="--quiet" />
             <arg value="svn-clean" />
         </exec>
-        <delete failonerror="false">
-            <fileset dir="." includes="${package}*.tar.gz" />
-            <fileset dir="." includes="statsvn.log" />
-        </delete>
-        <delete dir="statsvn" failonerror="false" />
         <delete dir="artifacts" failonerror="false" />
-        <mkdir dir="artifacts" />
     </target>
 
     <target name="statsvn">
@@ -27,7 +25,7 @@
 
     <target name="cppcheck">
         <touch file="src/tmpfile.c" />
-        <exec executable="cppcheck" failonerror="false" error="cppcheck-result.xml">
+        <exec executable="cppcheck" failonerror="false" error="artifacts/cppcheck-result.xml">
             <arg line="src/* --enable=style,information,unusedFunction --force --verbose --report-progress --xml -j2" />
         </exec>
         <delete file="src/tmpfile.c" />
@@ -39,17 +37,12 @@
         </exec>
     </target>
 
-    <target name="autoreconf">
-        <exec executable="autoreconf" failonerror="true">
-            <arg value="-iv" />
-        </exec>
-    </target>
-
     <target name="configure">
         <exec executable="sh" failonerror="true">
             <arg value="configure" />
             <arg value="--disable-shared" />
         </exec>
+        <copy file="config.log" todir="artifacts" failonerror="false" />
     </target>
 
     <target name="make_all">
@@ -60,6 +53,7 @@
         </exec>
     </target>
 
+<!--
     <target name="make_check">
         <exec executable="make" failonerror="false" resultproperty="result">
             <arg value="check" />
@@ -80,12 +74,14 @@
             <arg value="distdir=${package}" />
         </exec>
     </target>
+-->
 
     <target name="make_distcheck">
         <exec executable="make" failonerror="true">
             <arg value="distcheck" />
             <arg value="distdir=${package}" />
         </exec>
+        <copy file="${package}.tar.gz" todir="artifacts" failonerror="false" />
     </target>
 
     <target name="documentation">
@@ -93,10 +89,13 @@
             <arg value="pdf" />
         </exec>
         <copy file="doc/${package}.pdf" todir="artifacts" failonerror="false" />
-        <available property="docfolder" file="doc" type="dir" />
-        <mkdir dir="doc" />
+
         <mkdir dir="doc/doxygen" />
         <exec executable="doxygen" dir="doc" failonerror="false" />
+        <mkdir dir="artifacts/doxygen" />
+        <copy todir="artifacts/doxygen" failonerror="false">
+            <fileset dir="doc/doxygen" includes="**"/>
+        </copy>
     </target>
 
     <target name="coverage">
@@ -105,6 +104,8 @@
         <exec executable="make" dir="tests" failonerror="false">
             <arg value="cover" />
         </exec>
+
+<!--
         <exec executable="sh" dir="tests/cover-html" failonerror="false" output="tmp1">
             <arg line="-c &quot;grep coverNumHi index.html | sed 's/[^0-9 ]//g' | awk '{print $1}'&quot;" />
         </exec>
@@ -121,6 +122,7 @@
         </concat>
         <delete file="tmp1" failonerror="false" />
         <delete file="tmp2" failonerror="false" />
+-->
     </target>
 
 </project>

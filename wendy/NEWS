@@ -8,16 +8,10 @@
                       http://service-technology.org/wendy
 
 
-Version 3.3 (29 June 2011)
-==========================
+Version 3.4
+===========
 
-* new implementation of the operating guideline for weak termination
-
-* dot output of the operating guideline for weak termination shows
-  human-readable node numbers (descending from 1)
-
-* new parameter `--showInternalNodeNames' shows machine-like node numbers
-  (again)
+* minor code cleanup
 
 
 See file ChangeLog <http://service-technology.org/files/wendy/ChangeLog> for

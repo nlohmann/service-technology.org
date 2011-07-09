@@ -68,8 +68,8 @@ clock_t start_clock = clock();
 /// replace one occurrence of a substring in a string
 std::string replaceOnce(std::string result, const std::string& replaceWhat,
                         const std::string& replaceWithWhat) {
-    const int pos = result.find(replaceWhat);
-    if (pos == -1) {
+    const size_t pos = result.find(replaceWhat);
+    if (pos == std::string::npos) {
         return result;
     }
     result.replace(pos, replaceWhat.size(), replaceWithWhat);

@@ -1,3 +1,9 @@
+@heading Version 3.4
+@itemize
+@item minor code cleanup
+@end itemize
+
+
 @heading Version 3.3 (29 June 2011)
 @itemize
 @item new implementation of the operating guideline for weak termination

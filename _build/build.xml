@@ -54,8 +54,8 @@
         </exec>
         <record name="artifacts/make.log" action="stop"/>
 
-        <exec executable="gsed" dir="artifacts" failonerror="false">
-            <arg line="-i 's/     \[exec\] //' make.log" />
+        <exec executable="sed" failonerror="false">
+            <arg line="-i 's/     \[exec\] //' artifacts/make.log" />
         </exec>
     </target>
 

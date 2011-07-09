@@ -2,7 +2,7 @@
 
     <basename property="package" file="."/>
 
-    <target name="all" depends="prepare, cppcheck, autogen, configure, make_all, make_distcheck, documentation, coverage" />
+    <target name="all" depends="prepare, cppcheck, statsvn, autogen, configure, make_all, make_check, make_distcheck, documentation, coverage" />
 
     <target name="prepare" description="Cleans up the directory from earlier builds.">
         <mkdir dir="artifacts" />
@@ -18,16 +18,19 @@
         <delete dir="artifacts" failonerror="false" />
     </target>
 
-    <target name="statsvn">
-        <exec executable="svn" failonerror="false" output="statsvn.log">
+    <target name="statsvn" depends="prepare">
+        <exec executable="svn" failonerror="false" output="artifacts/statsvn.log">
             <arg line="log -v --xml" />
         </exec>
-        <exec executable="java" failonerror="false">
-            <arg line="-jar '${homedir}/local/statsvn/statsvn.jar' -config-file '${homedir}/local/statsvn/config' -tags '.*' -disable-twitter-button -threads 1 -include '**/src/**;**/utils/**' statsvn.log . -output-dir statsvn" />
+        <exec executable="statsvn" failonerror="false">
+            <arg line="-disable-twitter-button -threads 10 -include '**/src/**;**/utils/**' artifacts/statsvn.log . -output-dir artifacts/statsvn -cache-dir /tmp/statsvn" />
         </exec>
+<!--        <exec executable="java" failonerror="false">
+            <arg line="-jar '${homedir}/local/statsvn/statsvn.jar' -config-file '${homedir}/local/statsvn/config' -tags '.*' -disable-twitter-button -threads 1 -include '**/src/**;**/utils/**' statsvn.log . -output-dir statsvn" />
+        </exec>-->
     </target>
 
-    <target name="cppcheck">
+    <target name="cppcheck" depends="prepare">
         <touch file="src/tmpfile.c" />
         <exec executable="cppcheck" failonerror="false" error="artifacts/cppcheck-result.xml">
             <arg line="src/* --enable=style,information,unusedFunction --force --verbose --report-progress --xml -j2" />
@@ -44,7 +47,6 @@
     <target name="configure">
         <exec executable="sh" failonerror="true">
             <arg value="configure" />
-            <arg value="--disable-shared" />
         </exec>
         <copy file="config.log" todir="artifacts" failonerror="false" />
     </target>
@@ -73,7 +75,6 @@
         </exec>
     </target>
 
-<!--
     <target name="make_check">
         <exec executable="make" failonerror="false" resultproperty="result">
             <arg value="check" />
@@ -93,15 +94,14 @@
             <arg value="dist" />
             <arg value="distdir=${package}" />
         </exec>
+        <copy file="${package}.tar.gz" todir="artifacts" failonerror="false" />
     </target>
--->
 
     <target name="make_distcheck">
         <exec executable="make" failonerror="true">
             <arg value="distcheck" />
             <arg value="distdir=${package}" />
         </exec>
-        <copy file="${package}.tar.gz" todir="artifacts" failonerror="false" />
     </target>
 
     <target name="documentation">
@@ -124,6 +124,9 @@
         <exec executable="make" dir="tests" failonerror="false">
             <arg value="cover" />
         </exec>
+        <copy todir="artifacts/cover" failonerror="false">
+            <fileset dir="tests/cover-html" includes="**"/>
+        </copy>
 
 <!--
         <exec executable="sh" dir="tests/cover-html" failonerror="false" output="tmp1">

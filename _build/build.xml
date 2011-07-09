@@ -53,6 +53,10 @@
             <arg value="all" />
         </exec>
         <record name="artifacts/make.log" action="stop"/>
+
+        <exec executable="gsed" dir="artifacts" failonerror="false">
+            <arg line="-i 's/     \[exec\] //' make.log" />
+        </exec>
     </target>
 
 <!--

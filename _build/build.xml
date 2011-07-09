@@ -1,6 +1,8 @@
 <project name="main" default="all">
 
-    <target name="all" depends="prepare, statsvn, cppcheck, autogen, configure, make_all, make_distcheck, documentation, coverage" />
+    <basename property="package" file="."/>
+
+    <target name="all" depends="prepare, cppcheck, autogen, configure, make_all, make_distcheck, documentation, coverage" />
 
     <target name="prepare" description="Cleans up the directory from earlier builds.">
         <mkdir dir="artifacts" />
@@ -11,6 +13,8 @@
             <arg value="--quiet" />
             <arg value="svn-clean" />
         </exec>
+        <delete file="${package}.tar.gz" failonerror="false" />
+        <delete dir="doc/doxygen" failonerror="false" />
         <delete dir="artifacts" failonerror="false" />
     </target>
 
@@ -45,11 +49,21 @@
         <copy file="config.log" todir="artifacts" failonerror="false" />
     </target>
 
+    <target name="configure_clang">
+        <exec executable="sh" failonerror="true">
+            <arg value="configure" />
+            <arg value="--disable-shared" />
+            <arg value="CC=clang" />
+            <arg value="CXX=clang++" />
+        </exec>
+        <copy file="config.log" todir="artifacts" failonerror="false" />
+    </target>
+
     <target name="make_all">
         <record name="artifacts/make.log" action="start"/>
         <exec executable="make" failonerror="true">
-            <arg value="AM_CFLAGS=-Waddress -Waggregate-return -Wall -Wc++-compat -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wnested-externs -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic" />
-            <arg value="AM_CXXFLAGS=-Waddress -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic" />
+            <arg value="AM_CFLAGS=-O2 -Waddress -Waggregate-return -Wall -Wc++-compat -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wnested-externs -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic" />
+            <arg value="AM_CXXFLAGS=-O2 -Waddress -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic" />
             <arg value="all" />
         </exec>
         <record name="artifacts/make.log" action="stop"/>

@@ -91,7 +91,7 @@ class LivelockOperatingGuideline {
 
         /// recursive function to get the strongly connected sets
         static void getSCSRecursively(std::set<StoredKnowledge* > & fixedNodes,
-                                                        std::set<StoredKnowledge* > & nonFixedNodes);
+                                      std::set<StoredKnowledge* > & nonFixedNodes);
 
         /// get all terminal strongly connected components within the set of knowledges
         inline static void calculateTSCCInKnowledgeSet(const std::set<StoredKnowledge* > & knowledgeSCS);

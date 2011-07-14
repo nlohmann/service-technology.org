@@ -873,7 +873,6 @@ std::string StoredKnowledge::formula(bool dot) const {
 
         // deadlock is final
         if (interface[i]->unmarked() and InnerMarking::inner_markings[inner[i]]->is_final) {
-
             disjunctionSendingReceivingSynchronous.insert("final");
         }
 

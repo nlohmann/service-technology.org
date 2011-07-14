@@ -88,7 +88,7 @@ class CompositeMarkingsHandler {
         static CompositeMarking* isVisited(const StoredKnowledge* _storedKnowledge,
                                            const InnerMarking_ID _innerMarking_ID,
                                            InterfaceMarking* _interface,
-                                           bool &foundMarking);
+                                           bool& foundMarking);
 
         /// stores given marking in the set of visited markings
         static void visitMarking(CompositeMarking* marking);

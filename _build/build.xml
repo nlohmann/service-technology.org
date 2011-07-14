@@ -4,7 +4,7 @@
 
     <target name="all" depends="prepare, cppcheck, statsvn, autogen, configure, make_all, make_check, make_distcheck, documentation, coverage" />
 
-    <target name="prepare" description="Cleans up the directory from earlier builds.">
+    <target name="prepare">
         <mkdir dir="artifacts" />
     </target>
 
@@ -70,6 +70,7 @@
         </exec>
         <record name="artifacts/make.log" action="stop"/>
 
+        <!-- strip "     [exec] " prefix from output -->
         <exec executable="sed" failonerror="false">
             <arg line="-i 's/     \[exec\] //' artifacts/make.log" />
         </exec>

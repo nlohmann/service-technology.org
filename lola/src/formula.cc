@@ -44,19 +44,19 @@ hlatomicformula::hlatomicformula(FType t, PlSymbol* pp, UExpression* te) {
     color = te;
 }
 
-unsigned int atomicformula::counttype(FType t) {
+unsigned int atomicformula::counttype(FType) {
     return 1;
 }
 
-unsigned int staticformula::counttype(FType t) {
+unsigned int staticformula::counttype(FType) {
     return 1;
 }
 
-unsigned int transitionformula::counttype(FType t) {
+unsigned int transitionformula::counttype(FType) {
     return 1;
 }
 
-unsigned int unarybooleanformula::counttype(FType t) {
+unsigned int unarybooleanformula::counttype(FType) {
     return 1;
 }
 
@@ -78,30 +78,30 @@ unsigned int booleanformula::counttype(FType t) {
     return 1;
 }
 
-unsigned int unarytemporalformula::counttype(FType t) {
+unsigned int unarytemporalformula::counttype(FType) {
     return 1;
 }
 
-unsigned int untilformula::counttype(FType t) {
+unsigned int untilformula::counttype(FType) {
     return 1;
 }
 
-unsigned int transitionformula::collectsubs(FType ty, formula** subs, unsigned int pos) {
+unsigned int transitionformula::collectsubs(FType, formula** subs, unsigned int pos) {
     subs[pos++] = this;
     return pos;
 }
 
-unsigned int staticformula::collectsubs(FType ty, formula** subs, unsigned int pos) {
+unsigned int staticformula::collectsubs(FType, formula** subs, unsigned int pos) {
     subs[pos++] = this;
     return pos;
 }
 
-unsigned int atomicformula::collectsubs(FType ty, formula** subs, unsigned int pos) {
+unsigned int atomicformula::collectsubs(FType, formula** subs, unsigned int pos) {
     subs[pos++] = this;
     return pos;
 }
 
-unsigned int unarybooleanformula::collectsubs(FType ty, formula** subs, unsigned int pos) {
+unsigned int unarybooleanformula::collectsubs(FType, formula** subs, unsigned int pos) {
     subs[pos++] = this;
     return pos;
 }
@@ -127,13 +127,13 @@ unsigned int booleanformula::collectsubs(FType ty, formula** subs, unsigned int 
     return pos;
 }
 
-unsigned int unarytemporalformula::collectsubs(FType ty, formula** subs, unsigned int pos) {
+unsigned int unarytemporalformula::collectsubs(FType, formula** subs, unsigned int pos) {
     tempindex = tempcard++;
     subs[pos++] = this;
     return pos;
 }
 
-unsigned int untilformula::collectsubs(FType ty, formula** subs, unsigned int pos) {
+unsigned int untilformula::collectsubs(FType, formula** subs, unsigned int pos) {
     tempindex = tempcard++;
     subs[pos++] = this;
     return pos;

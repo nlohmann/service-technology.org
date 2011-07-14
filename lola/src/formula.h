@@ -94,9 +94,9 @@ class transitionformula : public formula {
         bool evaluatetransition(Transition*);
         virtual unsigned int  collectsubs(FType, formula**, unsigned int);
         bool initatomic() {
-            return 0;
+            return false;
         }
-        void evaluateatomic(State* s) {}
+        void evaluateatomic(State*) { }
         void print();
 };
 
@@ -114,8 +114,8 @@ class atomicformula : public formula {
         virtual formula* copy();
         formula* merge();
         formula* reduce(int*);
-        bool evaluatetransition(Transition* t) {
-            return 0;
+        bool evaluatetransition(Transition*) {
+            return false;
         }
         virtual unsigned int collectsubs(FType, formula**, unsigned int);
         virtual formula* replacequantifiers();
@@ -218,7 +218,7 @@ class unarytemporalformula : public formula {
         formula* replacequantifiers();
         void setstatic();
         bool evaluatetransition(Transition*) {
-            return 0;
+            return false;
         }
         unarytemporalformula(FType, formula*, formula*);
         void evaluateatomic(State*);
@@ -249,7 +249,7 @@ class untilformula : public formula {
         void evaluateatomic(State*);
         unsigned int counttype(FType);
         bool evaluatetransition(Transition*) {
-            return 0;
+            return false;
         }
         virtual unsigned int collectsubs(FType, formula**, unsigned int);
         bool initatomic();
@@ -281,7 +281,7 @@ class hlatomicformula : public formula {
         formula* copy();
         void updateatomic() {}
         bool evaluatetransition(Transition*) {
-            return 0;
+            return false;
         }
         virtual unsigned int  collectsubs(FType, formula**, unsigned int) {
             return 0;
@@ -291,9 +291,9 @@ class hlatomicformula : public formula {
         unsigned int counttype(FType) {
             return 0;
         }
-        void evaluateatomic(State* s) {}
+        void evaluateatomic(State*) {}
         bool initatomic() {
-            return 0;
+            return false;
         }
         void print();
 };
@@ -327,15 +327,15 @@ class quantifiedformula : public formula {
         }
         formula* copy();
         bool evaluatetransition(Transition*) {
-            return 0;
+            return false;
         }
         formula*   replacequantifiers();
         unsigned int  counttype(FType) {
             return 0;
         }
-        void evaluateatomic(State* s) {}
+        void evaluateatomic(State*) {}
         bool initatomic() {
-            return 0;
+            return false;
         }
         void print();
 };
@@ -362,13 +362,13 @@ class staticformula : public formula {
         virtual unsigned int  collectsubs(FType, formula**, unsigned int);
         formula* copy();
         bool evaluatetransition(Transition*) {
-            return 0;
+            return false;
         }
         formula* replacequantifiers();
         unsigned int  counttype(FType);
-        void evaluateatomic(State* s) {}
+        void evaluateatomic(State*) {}
         bool initatomic() {
-            return 0;
+            return false;
         }
         void print();
 };

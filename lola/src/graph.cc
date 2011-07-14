@@ -2023,9 +2023,8 @@ unsigned int simple_depth_first() {
 // determined structurally
 // instances of this macros have shape int initialize_*();
 
-
     int result = INITIALIZE_PROPERTY();
-
+    (void)result;
 
 // Insert initial state (already in Globals::CurrentMarking)
 // into data stucture. The preceding SEARCHPROC

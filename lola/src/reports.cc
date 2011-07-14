@@ -1,5 +1,5 @@
-#include "reports.H"
-#include "graph.H"
+#include "reports.h"
+#include "graph.h"
 #include "verbose.h"
 
 void printstate(const char*, unsigned int*);

@@ -20,13 +20,13 @@
 
 
 %{
-#include "dimensions.H"
-#include "net.H"
-#include "graph.H"
-#include "symboltab.H"
-#include "formula.H"
-#include "buchi.H"
-#include "unfold.H"
+#include "dimensions.h"
+#include "net.h"
+#include "graph.h"
+#include "symboltab.h"
+#include "formula.h"
+#include "buchi.h"
+#include "unfold.h"
 #include "verbose.h"
 #include <cstdio>
 #include <climits>

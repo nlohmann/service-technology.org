@@ -22,8 +22,7 @@ class Arc {
 inline Arc::Arc(Transition* t, Place* p, bool totrans, unsigned int mult) :
     Source(totrans ? reinterpret_cast<Node*>(p) : reinterpret_cast<Node*>(t)),
     Destination(totrans ? reinterpret_cast<Node*>(t) : reinterpret_cast<Node*>(p)),
-    pl(p), tr(t), Multiplicity(mult)
-{
+    pl(p), tr(t), Multiplicity(mult) {
     cnt++;
 }
 

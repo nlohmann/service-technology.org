@@ -22,10 +22,10 @@
 #ifndef FORMULA_H
 #define FORMULA_H
 
-#include "net.H"
-#include "unfold.H"
-#include "symboltab.H"
-#include "dimensions.H"
+#include "net.h"
+#include "unfold.h"
+#include "symboltab.h"
+#include "dimensions.h"
 
 #include <fstream>
 

@@ -19,11 +19,11 @@
 \*****************************************************************************/
 
 
-#include "graph.H"
-#include "formula.H"
-#include "ltl.H"
-#include "stubborn.H"
-#include "dimensions.H"
+#include "graph.h"
+#include "formula.h"
+#include "ltl.h"
+#include "stubborn.h"
+#include "dimensions.h"
 #include "buchi.h"
 #include "verbose.h"
 
@@ -456,7 +456,7 @@ unsigned int depth_first() {
 
     while (CurrentState) {
 #ifdef EXTENDED
-        // ddfsnum must be passed to net.H for tracing lastdisabed and lastfired
+        // ddfsnum must be passed to net.h for tracing lastdisabed and lastfired
         currentdfsnum = CurrentState -> dfs + 1; // 0 reserved for "never disabled"
         // and "never fired"
 #endif

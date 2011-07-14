@@ -19,12 +19,12 @@
 \*****************************************************************************/
 
 
-#include "net.H"
-#include "formula.H"
-#include "graph.H"
-#include "stubborn.H"
-#include "dimensions.H"
-#include "reports.H"
+#include "net.h"
+#include "formula.h"
+#include "graph.h"
+#include "stubborn.h"
+#include "dimensions.h"
+#include "reports.h"
 #include "Globals.h"
 #include "verbose.h"
 
@@ -154,7 +154,7 @@ StatevectorList* TSCCRepresentitives;
 #ifndef MODELCHECKING
 
 #ifdef STUBBORN
-#include"stubborn.H"
+#include"stubborn.h"
 #endif
 State* SEARCHPROC();
 unsigned int MinBookmark; // MIN number of the first closed marking
@@ -999,7 +999,7 @@ unsigned int depth_first() {
         // process marking until returning from initial state
         while (CurrentState) {
 #ifdef EXTENDED
-            // ddfsnum must be passed to net.H for tracing lastdisabed and lastfired
+            // ddfsnum must be passed to net.h for tracing lastdisabed and lastfired
             currentdfsnum = CurrentState->dfs + 1; // 0 reserved for "never disabled"
             // and "never fired"
 #endif

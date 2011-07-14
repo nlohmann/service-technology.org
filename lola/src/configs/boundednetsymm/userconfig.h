@@ -1,4 +1,4 @@
-// This file 'userconfig.H.offspring' was created by LoLA 1.15-unreleased.
+// This file 'userconfig.h.offspring' was created by LoLA 1.15-unreleased.
 // To compile a binary with this configuration, copy this file into the folder
 // 'src/configs' of the LoLA distribution and execute 'make lola-offspring'.
 // See the manual for a description and all possible parameters.

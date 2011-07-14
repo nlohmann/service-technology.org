@@ -19,44 +19,44 @@
 \*****************************************************************************/
 
 
-#ifndef TINV_H
-#define TINV_H
+#include "symboltab.h"
+#include "formula.h"
+#include "net.h"
 
-#include "net.H"
+#ifndef BUCHI
+#define BUCHI
 
-#if defined(PREDUCTION) || defined(CYCLE) || defined(STRUCT) || defined(SWEEP)
-class summand {
+//
+extern SymbolTab* BuchiTable;
+
+
+class buchitransition;
+
+class buchistate {
     public:
-        Node* var;
-        long int value;
-        summand* next;
-
-        summand(Node*, long int);
+        bool final;
+        char* name;
+        buchitransition** delta;
+        buchitransition** getenabled();
+        int nrdelta;
+        int code;
+        static int nr;
+        buchistate(char*);
+        buchistate() {}
+        buchitransition* transitionlist;   // only used for parsing
+        buchistate* next;  // only used for parsing
 };
 
-class equation {
+class buchitransition {
     public:
-        summand* sum;
-        equation* next;
-
-        void apply();
-        void applyunit(); // applies equations where unit matrix is appended
-        equation(Node*);
+        formula* guard;
+        buchistate* delta;
+        buchitransition* next;   // only used for parsing
 };
 
-class invariant {
-    public:
-        summand* support;
-};
 
-void tsolve();
-void psolve();
-
-extern int ProgressSpan;
-extern int ZeroProgress;
-extern int MonotoneProgress;
-
-void progress_measure();
-#endif
+extern buchistate* initialbuchistate;
+extern buchistate** buchiautomaton;
+void print_buchi();
 
 #endif

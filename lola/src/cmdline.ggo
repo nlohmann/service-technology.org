@@ -99,11 +99,11 @@ option "resultFile" r
 
 section "Used Configuration Output"
 option "userconfig" h
- "Show the configuration (i.e. the values chose in 'userconfig.H') in which this LoLA executable has been compiled."
+ "Show the configuration (i.e. the values chose in 'userconfig.h') in which this LoLA executable has been compiled."
  flag off
  
 option "offspring" -
- "Create a file containing all necessary information to compile a new binary with the same configuration used for this binary. To compile this new binary, copy the resulting file 'userconfig.H.offspring' into the 'src/configs' directory of the source distribution and run 'make lola-offspring'."
+ "Create a file containing all necessary information to compile a new binary with the same configuration used for this binary. To compile this new binary, copy the resulting file 'userconfig.h.offspring' into the 'src/configs' directory of the source distribution and run 'make lola-offspring'."
  typestr="FILE"
  default="offspring"
  string argoptional optional
@@ -147,7 +147,7 @@ Return Values:
   3   Syntax error in the net or property description 
   4   Error in accessing files (cannot open, no write permission etc.) or
       invalid command line parameters.
-  5   Maximal number of states (MAXIMALSTATES in userconfig.H) exceeded
+  5   Maximal number of states (MAXIMALSTATES in userconfig.h) exceeded
   >5  uncaught memory overflow, or bug"
   
 text "

@@ -14,7 +14,7 @@ Version 1.17-unreleased
 * code refactoring
 
 * added script `utils/newlola.sh' to generate a LoLA binary given a
-  `userconfig.H' file
+  `userconfig.h' file
 
 * added files from the SUMo 2011 Model Checking Contest
   (`http://sumo.lip6.fr/Model_Checking_Contest.html') as test cases
@@ -108,9 +108,9 @@ Version 1.12
 
 * addressed bug #13538 (`https://gna.org/bugs/?13538'): `make install'
   installs all binaries with the name `lola' or `lola-xxx' for a standard
-  configuration `userconfig.H.xxx' that are present in the `src' folder.
+  configuration `userconfig.h.xxx' that are present in the `src' folder.
   Likewise, `make uninstall' removes all installed binaries with the name
-  `lola' or `lola-xxx' for a standard configuration `userconfig.H.xxx'
+  `lola' or `lola-xxx' for a standard configuration `userconfig.h.xxx'
 
 * adjusted the parser to cope with different line endings (CR, LF, CRLF)
 
@@ -141,7 +141,7 @@ Version 1.11
   FreeBSD
 
 * added a directory `src/configs' containing some example configurations for
-  LoLA; for each file `userconfig.H.xxx' in directory `src/configs' exists a
+  LoLA; for each file `userconfig.h.xxx' in directory `src/configs' exists a
   Makefile target `lola-xxx' which compiles LoLA with that configuration
 
 * added Makefile target `all-configs' to compile all configurations in
@@ -163,7 +163,7 @@ Version 1.11
 * added `--enable-mpi' command line parameter for the `configure' script to
   use MPI compiler wrappers instead of GCC (disabled by default)
 
-* added an option `MAXIMALSTATES' to `userconfig.H': by defining this option
+* added an option `MAXIMALSTATES' to `userconfig.h': by defining this option
   to a value, say 100000, LoLA will abort as soon as more than 100000 states
   are processed; the exit code will be 5
 
@@ -175,7 +175,7 @@ Version 1.11
 * added `--offspring' command line parameter that creates a file containing
   all necessary information to compile a new binary with the same
   configuration used for the calling binary. To compile this new binary, copy
-  the resulting file `userconfig.H.offspring' into the `src/configs'
+  the resulting file `userconfig.h.offspring' into the `src/configs'
   directory of the source distribution and run `make lola-offspring'.
 
 Version 1.10
@@ -207,7 +207,7 @@ Version 1.03
 * added a test case `umlprocess' to avoid regression of bug #12063
   (`https://gna.org/bugs/?12063')
 
-* out-commented `TWOPHASE' in `userconfig.H' for liveprop test
+* out-commented `TWOPHASE' in `userconfig.h' for liveprop test
 
 * fixed bug #12061 (`https://gna.org/bugs/?12061'): `BOUNDEDNET' now works
   without crashing
@@ -268,7 +268,7 @@ Version 1.01
   rebuilt by `autoreconf -iv'
 
 * the information gathered by the configure script is now collected in a
-  header file `src/config.H'
+  header file `src/config.h'
 
 * tidied Makefiles
 

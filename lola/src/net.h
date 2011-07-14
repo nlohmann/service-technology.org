@@ -33,7 +33,7 @@
 #include "Transition.h"
 #include "Arc.h"
 
-//#include "userconfig.H" // should fix https://gna.org/bugs/?15223
+//#include "userconfig.h" // should fix https://gna.org/bugs/?15223
 
 
 ///// 4 LINES ADDED BY NIELS
@@ -60,7 +60,7 @@ class overflow {}; ///< a dummy class for handling overflow exceptions
 
 
 
-// TODO: shift to check.H ?
+// TODO: shift to check.h ?
 //#ifdef MODELCHECKING
 //extern unsigned int formulaindex; ///< in modelchecking,
 ///< the different subformulas must be treated spearately

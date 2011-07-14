@@ -19,7 +19,7 @@
 \*****************************************************************************/
 
 
-#include "buchi.H"
+#include "buchi.h"
 
 using std::cout;
 using std::endl;

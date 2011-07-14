@@ -19,8 +19,8 @@
 \*****************************************************************************/
 
 
-#include "net.H"
-#include "printnet.H"
+#include "net.h"
+#include "printnet.h"
 #include "Globals.h"
 
 using std::cout;

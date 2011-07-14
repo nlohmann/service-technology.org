@@ -20,22 +20,22 @@
 
 
 #include "config.h"
-#include "printnet.H"
-#include "dimensions.H"
-#include "net.H"
-#include "symboltab.H"
-#include "buchi.H"
-#include "graph.H"
-#include "symm.H"
-#include "stubborn.H"
-#include "tinv.H"
-#include "formula.H"
-#include "check.H"
-#include "path.H"
-#include "sweep.H"
+#include "printnet.h"
+#include "dimensions.h"
+#include "net.h"
+#include "symboltab.h"
+#include "buchi.h"
+#include "graph.h"
+#include "symm.h"
+#include "stubborn.h"
+#include "tinv.h"
+#include "formula.h"
+#include "check.h"
+#include "path.h"
+#include "sweep.h"
 #include "cmdline.h"
 #include "verbose.h"
-#include "reports.H"
+#include "reports.h"
 #include "Globals.h"
 
 #include <fstream>
@@ -76,7 +76,7 @@ char* reserve;
 
         This function makes LoLA abort with exit code 5 if the number of
         currently processed states exceeds the number of states defined as
-        MAXIMALSTATES in file userconfig.H. This function is invoked from
+        MAXIMALSTATES in file userconfig.h. This function is invoked from
         files check.cc, graph.cc, and sweep.cc.
 
  \param states the number of currently processed states
@@ -337,7 +337,7 @@ void fix_argv(int& argc, char** &argv) {
 
         // only start a new argv entry if this one does not end with a "-x"
         // option and the next one does not start with "-"
-        if (not(j > 1 and argv[i][j - 2] == '-' and strchr("apsgmnyrh", argv[i][j - 1]) != NULL and (i == argc - 1 or(i < argc - 1 and argv[i + 1][0] != '-')))) {
+        if (not(j > 1 and argv[i][j - 2] == '-' and strchr("apsgmnyrh", argv[i][j - 1]) != NULL and(i == argc - 1 or(i < argc - 1 and argv[i + 1][0] != '-')))) {
             new_argv.push_back(temp);
             temp.clear();
         }
@@ -371,9 +371,9 @@ int main(int argc, char** argv) {
         printf("- platform:             %s\n", CONFIG_BUILDSYSTEM);
         printf("- config MPI:           %s\n", CONFIG_ENABLEMPI);
 #ifdef STANDARDCONFIG
-        printf("- chosen userconfig.H:  predefined\n");
+        printf("- chosen userconfig.h:  predefined\n");
 #else
-        printf("- chosen userconfig.H:  user-defined\n");
+        printf("- chosen userconfig.h:  user-defined\n");
 #endif
         printf("\n\n");
         exit(EXIT_SUCCESS);

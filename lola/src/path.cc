@@ -21,12 +21,12 @@
 
 #include <cstdlib>
 #include <config.h>
-#include "dimensions.H"
-#include "net.H"
-#include "formula.H"
-#include "graph.H"
-#include "stubborn.H"
-#include "check.H"
+#include "dimensions.h"
+#include "net.h"
+#include "formula.h"
+#include "graph.h"
+#include "stubborn.h"
+#include "check.h"
 #include "Globals.h"
 #include "verbose.h"
 

@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include "net.H"
-#include "dimensions.H"
+#include "net.h"
+#include "dimensions.h"
 
 #define NodeType int
 #define PL 0  /* place */

@@ -63,19 +63,19 @@ fi
 
 # write files
 AC_CONFIG_FILES([
-	Makefile src/Makefile doc/Doxyfile doc/Makefile man/Makefile
-	tests/Makefile tests/package.m4 utils/Makefile])
+	Makefile src/Makefile doc/Doxyfile doc/Doxydetails doc/Makefile
+	man/Makefile tests/Makefile tests/package.m4 utils/Makefile])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT
 
 echo
 echo "------------------------------------------------------------------------------"
-echo " Please have a look at the documentation and edit the file 'src/userconfig.H'"
+echo " Please have a look at the documentation and edit the file 'src/userconfig.h'"
 echo " according to your needs. Then, run 'make' to compile LoLA."
 echo
 echo " Alternatively, you can compile a preconfigured version of LoLA using a"
 echo " configuration from directory 'src/configs'. To use, for example, the"
-echo " configuration 'src/configs/deadlock/userconfig.H', run 'make lola-deadlock'."
+echo " configuration 'src/configs/deadlock/userconfig.h', run 'make lola-deadlock'."
 echo " To compile all preconfigured versions, run 'make all-configs'."
 echo "------------------------------------------------------------------------------"
 echo

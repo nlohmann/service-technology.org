@@ -5,28 +5,28 @@ noinst_PROGRAMS = lola
 lola_SOURCES = readnet-syntax.yy \
                readnet-lexic.ll \
                cmdline.c cmdline.h \
-               net.cc net.H Node.h Place.h Place.cc Transition.h Transition.cc Arc.cc Arc.h \
+               net.cc net.h Node.h Place.h Place.cc Transition.h Transition.cc Arc.cc Arc.h \
                Globals.h Globals.cc \
-               buchi.cc buchi.H \
-               formula.cc formula.H \
-               stubborn.cc stubborn.H \
-               graph.cc graph.H \
-               symboltab.cc symboltab.H \
-               symm.cc symm.H \
-               check.cc check.H \
-               unfold.cc unfold.H \
-               dimensions.cc dimensions.H \
-               path.cc path.H \
-               printnet.cc printnet.H \
-               tinv.cc tinv.H \
-               reports.cc reports.H \
-               sweep.cc sweep.H \
-               structure.H \
+               buchi.cc buchi.h \
+               formula.cc formula.h \
+               stubborn.cc stubborn.h \
+               graph.cc graph.h \
+               symboltab.cc symboltab.h \
+               symm.cc symm.h \
+               check.cc check.h \
+               unfold.cc unfold.h \
+               dimensions.cc dimensions.h \
+               path.cc path.h \
+               printnet.cc printnet.h \
+               tinv.cc tinv.h \
+               reports.cc reports.h \
+               sweep.cc sweep.h \
+               structure.h \
                verbose.cc verbose.h \
-               userconfig.H 
+               userconfig.h 
 
 # additional source code
-lola_EXTRASOURCES = ltl.H ltl.cc
+lola_EXTRASOURCES = ltl.h ltl.cc
 
 ## include a generic Makefile template to organize cleaning etc.
 ## must be included after the source listing and before any definition of
@@ -38,14 +38,14 @@ EXTRA_DIST += configs
 
 
 #############################################################################
-# Create a target "lola-xxx" for each "userconfig.H.xxx" file located in the
+# Create a target "lola-xxx" for each "userconfig.h.xxx" file located in the
 # "configs" directory. The created binaries are cleaned with "make clean".
 #############################################################################
 
-CONFIGS = $(patsubst $(srcdir)/configs/%/userconfig.H,lola-%,$(wildcard $(srcdir)/configs/*/userconfig.H))
+CONFIGS = $(patsubst $(srcdir)/configs/%/userconfig.h,lola-%,$(wildcard $(srcdir)/configs/*/userconfig.h))
 
 # Include a file with directives to create a binary "lola-foo" for each
-# configuration file "configs/foo/userconfig.H".
+# configuration file "configs/foo/userconfig.h".
 include Makefile.configs
 
 MAINTAINERCLEANFILES += $(CONFIGS)

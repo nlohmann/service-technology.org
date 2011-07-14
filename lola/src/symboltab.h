@@ -22,10 +22,10 @@
 #ifndef SYMBOLTAB_H
 #define SYMBOLTAB_H
 
-#include "net.H"
-#include "dimensions.H"
-#include "unfold.H"
-#include "buchi.H"
+#include "net.h"
+#include "dimensions.h"
+#include "unfold.h"
+#include "buchi.h"
 
 class Symbol;
 

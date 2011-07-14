@@ -14,7 +14,7 @@ Version 1.17-unreleased
 * code refactoring
 
 * added script `utils/newlola.sh' to generate a LoLA binary given a
-  `userconfig.H' file
+  `userconfig.h' file
 
 * added files from the SUMo 2011 Model Checking Contest
   (`http://sumo.lip6.fr/Model_Checking_Contest.html') as test cases

@@ -19,9 +19,9 @@
 \*****************************************************************************/
 
 
-#include "symm.H"
+#include "symm.h"
 #include <climits>
-#include "graph.H"
+#include "graph.h"
 #include "Globals.h"
 #include <cstdlib>
 #ifdef DISTRIBUTE

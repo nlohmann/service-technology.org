@@ -18,9 +18,9 @@
  along with LoLA.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#include "net.H"
-#include "graph.H"
-#include "formula.H"
+#include "net.h"
+#include "graph.h"
+#include "formula.h"
 #include <climits>
 
 #ifdef STUBBORN

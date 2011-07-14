@@ -22,11 +22,11 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include "net.H"
+#include "net.h"
 #include "Globals.h"
-#include "dimensions.H"
-#include "symm.H"
-#include "formula.H"
+#include "dimensions.h"
+#include "symm.h"
+#include "formula.h"
 
 using std::cout;
 using std::endl;

@@ -22,8 +22,8 @@
 %option yylineno
 
 %{
-#include "unfold.H"
-#include "symboltab.H"
+#include "unfold.h"
+#include "symboltab.h"
 class arc_list;
 class case_list;
 #include "readnet-syntax.h"

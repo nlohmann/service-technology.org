@@ -22,8 +22,8 @@
 #ifndef UNFOLD_H
 #define UNFOLD_H
 
-#include "net.H"
-#include "dimensions.H"
+#include "net.h"
+#include "dimensions.h"
 
 typedef enum {
     arr, rec, num, boo, enu //,set, lst
@@ -181,12 +181,24 @@ class UEnuValue: public UValue {
         virtual bool iseqqual(UValue*);
         virtual bool isfirst();
         virtual bool islesseqqual(UValue*);
-        UValue* addop(UValue*) { return NULL;}
-        UValue* subop(UValue*) { return NULL;}
-        UValue* mulop(UValue*) { return NULL;}
-        UValue* divop(UValue*) { return NULL;}
-        UValue* modop(UValue*) { return NULL;}
-        UValue* negop()        { return NULL;}
+        UValue* addop(UValue*) {
+            return NULL;
+        }
+        UValue* subop(UValue*) {
+            return NULL;
+        }
+        UValue* mulop(UValue*) {
+            return NULL;
+        }
+        UValue* divop(UValue*) {
+            return NULL;
+        }
+        UValue* modop(UValue*) {
+            return NULL;
+        }
+        UValue* negop()        {
+            return NULL;
+        }
         char* text();
         UEnuValue(UType*, int);
 };

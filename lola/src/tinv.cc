@@ -19,7 +19,7 @@
 \*****************************************************************************/
 
 
-#include "tinv.H"
+#include "tinv.h"
 #include "Globals.h"
 #ifdef DISTRIBUTE
 #include "distribute.h"

@@ -4,12 +4,12 @@
 #include "Node.h"
 #include "Globals.h"
 #include "verbose.h"
-#include "dimensions.H"
+#include "dimensions.h"
 
 class Transition;
 class formula;
 
-// TODO: shift to check.H ?
+// TODO: shift to check.h ?
 #ifdef MODELCHECKING
 extern unsigned int formulaindex; ///< in modelchecking,
 ///< the different subformulas must be treated spearately

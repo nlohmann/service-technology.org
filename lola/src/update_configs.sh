@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # This script creates a file "Makefile.configs" which contains targets to
-# build a preconfigured LoLA for each userconfig.H in the subdirectories of
+# build a preconfigured LoLA for each userconfig.h in the subdirectories of
 # configs. Make sure that, once called, you commit the changed
 # file "Makefile.configs".
 

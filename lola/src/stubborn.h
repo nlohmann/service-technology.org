@@ -19,44 +19,25 @@
 \*****************************************************************************/
 
 
-#include "symboltab.H"
-#include "formula.H"
-#include "net.H"
+#include "graph.h"
+#include "net.h"
+#include "graph.h"
+#include "formula.h"
 
-#ifndef BUCHI
-#define BUCHI
+void stubbornclosure();
+void stubborninsert(Transition*);
+Transition** stubbornfirelist(State* s, formula* f);
+Transition** stubbornfirelistneg(State* s, formula* f);
+Transition** stubbornfireliststatic();
+Transition** stubbornfirelistnogoal();
+Transition** stubbornfirelistpredicate();
+Transition** stubbornfirelistreach();
+Transition** tsccstubbornlist();
+Transition** structstubbornset();
+Transition** stubbornfirelistctl();
+Transition** relaxedstubbornset();
+Transition** structreachstubbornset();
 
-//
-extern SymbolTab* BuchiTable;
-
-
-class buchitransition;
-
-class buchistate {
-    public:
-        bool final;
-        char* name;
-        buchitransition** delta;
-        buchitransition** getenabled();
-        int nrdelta;
-        int code;
-        static int nr;
-        buchistate(char*);
-        buchistate() {}
-        buchitransition* transitionlist;   // only used for parsing
-        buchistate* next;  // only used for parsing
-};
-
-class buchitransition {
-    public:
-        formula* guard;
-        buchistate* delta;
-        buchitransition* next;   // only used for parsing
-};
-
-
-extern buchistate* initialbuchistate;
-extern buchistate** buchiautomaton;
-void print_buchi();
-
+#if defined(MODELCHECKING) && defined(STUBBORN)
+void sortscapegoats();
 #endif

@@ -20,9 +20,9 @@
 
 
 #include <config.h>
-#include "formula.H"
-#include "graph.H"
-#include "unfold.H"
+#include "formula.h"
+#include "graph.h"
+#include "unfold.h"
 #include "verbose.h"
 
 formula* F;

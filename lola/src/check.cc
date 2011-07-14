@@ -18,12 +18,12 @@
  along with LoLA.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#include "graph.H"
-#include "dimensions.H"
-#include "formula.H"
-#include "net.H"
-#include "stubborn.H"
-#include "check.H"
+#include "graph.h"
+#include "dimensions.h"
+#include "formula.h"
+#include "net.h"
+#include "stubborn.h"
+#include "check.h"
 #include "Globals.h"
 #include "verbose.h"
 

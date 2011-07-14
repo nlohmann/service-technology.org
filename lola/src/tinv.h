@@ -19,7 +19,44 @@
 \*****************************************************************************/
 
 
-#include "graph.H"
-#include "formula.H"
+#ifndef TINV_H
+#define TINV_H
 
-int modelcheck();
+#include "net.h"
+
+#if defined(PREDUCTION) || defined(CYCLE) || defined(STRUCT) || defined(SWEEP)
+class summand {
+    public:
+        Node* var;
+        long int value;
+        summand* next;
+
+        summand(Node*, long int);
+};
+
+class equation {
+    public:
+        summand* sum;
+        equation* next;
+
+        void apply();
+        void applyunit(); // applies equations where unit matrix is appended
+        equation(Node*);
+};
+
+class invariant {
+    public:
+        summand* support;
+};
+
+void tsolve();
+void psolve();
+
+extern int ProgressSpan;
+extern int ZeroProgress;
+extern int MonotoneProgress;
+
+void progress_measure();
+#endif
+
+#endif

@@ -11,7 +11,7 @@ echo "compiling LoLA using configuration $1..."
 cd $LOLADIR
 ./configure --prefix=`pwd`/local > /dev/null 2> /dev/null
 
-cp ../$1 src/userconfig.H
+cp ../$1 src/userconfig.h
 
 make > /dev/null 2> /dev/null
 make install > /dev/null 2> /dev/null

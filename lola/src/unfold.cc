@@ -19,10 +19,10 @@
 \*****************************************************************************/
 
 
-#include "net.H"
-#include "dimensions.H"
-#include "unfold.H"
-#include "symboltab.H"
+#include "net.h"
+#include "dimensions.h"
+#include "unfold.h"
+#include "symboltab.h"
 #include <cstring>
 #include <cstdio>
 

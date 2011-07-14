@@ -24,7 +24,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <string>
-#include "dimensions.H"
+#include "dimensions.h"
 #include "verbose.h"
 
 using std::cout;
@@ -348,7 +348,7 @@ void reportconfiguration() {
 
 
 /*!
- \brief write a userconfig.H that would create the same LoLA binary
+ \brief write a userconfig.h that would create the same LoLA binary
 
  In contrast to the result of reportconfiguration(), this function generates
  pure C code that can directly used to compile a LoLA binary.
@@ -356,12 +356,12 @@ void reportconfiguration() {
  This function can be handy if binaries need to be transfered to a different
  operating system or architecture.
 
- \param suffix  a suffix used to create the file `userconfig.H.suffix', the
+ \param suffix  a suffix used to create the file `userconfig.h.suffix', the
                 suffix is set by the command line paramter `--offspring'
  */
 void createUserconfigFile(char* suffix) {
     assert(suffix);
-    std::string filename = "userconfig.H." + std::string(suffix);
+    std::string filename = "userconfig.h." + std::string(suffix);
 
     // open file
     FILE* userconfig = fopen(filename.c_str(), "w");
@@ -370,7 +370,7 @@ void createUserconfigFile(char* suffix) {
     }
 
     // print header
-    fprintf(userconfig, "// This file 'userconfig.H.%s' was created by %s.\n", suffix, PACKAGE_STRING);
+    fprintf(userconfig, "// This file 'userconfig.h.%s' was created by %s.\n", suffix, PACKAGE_STRING);
     fprintf(userconfig, "// To compile a binary with this configuration, copy this file into the folder\n");
     fprintf(userconfig, "// 'src/configs' of the LoLA distribution and execute 'make lola-%s'.\n", suffix);
     fprintf(userconfig, "// See the manual for a description and all possible parameters.\n\n");

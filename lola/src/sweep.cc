@@ -20,12 +20,12 @@
 
 
 #include "Globals.h"
-#include "graph.H"
-#include "net.H"
-#include "stubborn.H"
-#include "formula.H"
-#include "tinv.H"
-#include "sweep.H"
+#include "graph.h"
+#include "net.h"
+#include "stubborn.h"
+#include "formula.h"
+#include "tinv.h"
+#include "sweep.h"
 #include "verbose.h"
 
 #ifdef SWEEP

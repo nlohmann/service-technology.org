@@ -24,7 +24,7 @@
 #ifndef DIMENSIONS_H
 #define DIMENSIONS_H
 
-#include <userconfig.H>
+#include <userconfig.h>
 #include <iostream>
 #include <climits>
 
@@ -169,7 +169,7 @@
 #endif
 
 #if (LT + ST + EV + FA + RC + BP + MC + DT + RV + HO + FP + FU + BN + DL + SP + LP + NO) < 1
-  #error "define a verification task by uncommenting the corresponding line in file userconfig.H!"
+  #error "define a verification task by uncommenting the corresponding line in file userconfig.h!"
 #endif
 
 #if (RC + DT + FU + DL + SP + BN + BP) < 1

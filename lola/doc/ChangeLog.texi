@@ -4,7 +4,7 @@
 
 @item code refactoring
 
-@item added script @file{utils/newlola.sh} to generate a LoLA binary given a @file{userconfig.H} file
+@item added script @file{utils/newlola.sh} to generate a LoLA binary given a @file{userconfig.h} file
 
 @item added files from the SUMo 2011 Model Checking Contest (@url{http://sumo.lip6.fr/Model_Checking_Contest.html}) as test cases
 
@@ -70,7 +70,7 @@
 
 @heading Version 1.12
 @itemize
-@item addressed bug #13538 (@url{https://gna.org/bugs/?13538}): @samp{make install} installs @i{all} binaries with the name @file{lola} or @file{lola-xxx} for a standard configuration @file{userconfig.H.xxx} that are present in the @file{src} folder. Likewise, @samp{make uninstall} removes all installed binaries with the name @file{lola} or @file{lola-xxx} for a standard configuration @file{userconfig.H.xxx}
+@item addressed bug #13538 (@url{https://gna.org/bugs/?13538}): @samp{make install} installs @i{all} binaries with the name @file{lola} or @file{lola-xxx} for a standard configuration @file{userconfig.h.xxx} that are present in the @file{src} folder. Likewise, @samp{make uninstall} removes all installed binaries with the name @file{lola} or @file{lola-xxx} for a standard configuration @file{userconfig.h.xxx}
 
 @item adjusted the parser to cope with different line endings (CR, LF, CRLF)
 
@@ -95,7 +95,7 @@
 
 @item small changes to the test scripts and the lexer to make LoLA compilable on FreeBSD
 
-@item added a directory @file{src/configs} containing some example configurations for LoLA; for each file @file{userconfig.H.xxx} in directory @file{src/configs} exists a Makefile target @samp{lola-xxx} which compiles LoLA with that configuration
+@item added a directory @file{src/configs} containing some example configurations for LoLA; for each file @file{userconfig.h.xxx} in directory @file{src/configs} exists a Makefile target @samp{lola-xxx} which compiles LoLA with that configuration
 
 @item added Makefile target @samp{all-configs} to compile all configurations in directory @file{src/configs}
 
@@ -109,13 +109,13 @@
 
 @item added @samp{--enable-mpi} command line parameter for the @file{configure} script to use @acronym{MPI} compiler wrappers instead of @acronym{GCC} (disabled by default)
 
-@item added an option @code{MAXIMALSTATES} to @file{userconfig.H}: by defining this option to a value, say 100000, LoLA will abort as soon as more than 100000 states are processed; the exit code will be 5
+@item added an option @code{MAXIMALSTATES} to @file{userconfig.h}: by defining this option to a value, say 100000, LoLA will abort as soon as more than 100000 states are processed; the exit code will be 5
 
 @item canonized LoLA's error messages
 
 @item removed directory @file{patches}: these options (show number of states after capacity excess; limited state space generation) are now built into LoLA
 
-@item added @option{--offspring} command line parameter that creates a file containing all necessary information to compile a new binary with the same configuration used for the calling binary. To compile this new binary, copy the resulting file @file{userconfig.H.offspring} into the @file{src/configs} directory of the source distribution and run @samp{make lola-offspring}.
+@item added @option{--offspring} command line parameter that creates a file containing all necessary information to compile a new binary with the same configuration used for the calling binary. To compile this new binary, copy the resulting file @file{userconfig.h.offspring} into the @file{src/configs} directory of the source distribution and run @samp{make lola-offspring}.
 @end itemize
 
 
@@ -142,7 +142,7 @@
 
 @item added a test case @samp{umlprocess} to avoid regression of bug #12063 (@url{https://gna.org/bugs/?12063})
 
-@item out-commented @samp{TWOPHASE} in @file{userconfig.H} for liveprop test
+@item out-commented @samp{TWOPHASE} in @file{userconfig.h} for liveprop test
 
 @item fixed bug #12061 (@url{https://gna.org/bugs/?12061}): @code{BOUNDEDNET} now works without crashing
 
@@ -190,7 +190,7 @@
 
 @item added Makefile target @samp{cvs-clean} that removes all files that can be rebuilt by @samp{autoreconf -iv}
 
-@item the information gathered by the configure script is now collected in a header file @file{src/config.H}
+@item the information gathered by the configure script is now collected in a header file @file{src/config.h}
 
 @item tidied Makefiles
 

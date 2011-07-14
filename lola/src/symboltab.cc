@@ -18,8 +18,8 @@
  along with LoLA.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#include "symboltab.H"
-#include "net.H"
+#include "symboltab.h"
+#include "net.h"
 
 SymbolTab* PlaceTable, * TransitionTable;
 extern SymbolTab* GlobalTable, * LocalTable;

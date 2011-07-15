@@ -357,6 +357,16 @@ ondine: <varying error message from the parser> -- aborting [#02]
 @end cartouche
 @end smallexample
 
+@item #04
+Too many files were given on the command line. At most three are allowed:
+one input and two output files.
+
+@smallexample
+@cartouche
+ondine: at most one input and two output files must be given -- aborting [#04]
+@end cartouche
+@end smallexample
+
 @item #07
 Some option given on the command line is not allowed.
 

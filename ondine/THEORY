@@ -8,9 +8,35 @@
 
 
 
-Ondine implements the following algorithms and results published in
+Ondine implements several algorithms and results published in several
 scientific articles.
 
+Open nets and components
+========================
+
+An overview over open nets with interfaces and their components can be found
+in:
+
+     D.A. Zaitsev. Decomposition of Petri nets. Cybernetics ans Systems
+     Analysis 5, pp.131-140, 2004.
+
+     S. Mennicke, O. Oanea, K. Wolf. Decomposition into open nets. AWPN 2009
+     501, CEUR-WS.org, 2009.
+
+Minimizing the interface
+========================
+
+The algorithm used in Ondine is described here:
+
+     O. Oanea, H. Wimmel, K. Wolf. New Algorithms for Deciding Siphon-Trap
+     Related Properties. To appear in Fundamenta Informaticae, 2011.
+
+Pseudo-Boolean SAT solver
+=========================
+
+The Pseudo-Boolean SAT-solver MiniSAT+ used in Ondine can be found here:
+
+     N. Een, N.S\"orensson. The MiniSAT page, http:\\www.minisat.se (9.7.2011).
 
 
 

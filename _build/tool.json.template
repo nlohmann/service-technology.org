@@ -1,12 +1,12 @@
-<tool>
-    <name>@PACKAGE_NAME@</name>
-    <shortname>@PACKAGE_TARNAME@</shortname>
+    <tool>
+        <name>@PACKAGE_NAME@</name>
+        <shortname>@PACKAGE_TARNAME@</shortname>
 
-    <lastVersion>@PACKAGE_VERSION@</lastVersion>
-    <officialVersion>@OFFICIAL_VERSION@</officialVersion>
+        <lastVersion>@PACKAGE_VERSION@</lastVersion>
+        <officialVersion>@OFFICIAL_VERSION@</officialVersion>
 
-    <path>@TRUNK@</path>
+        <path>@TRUNK@</path>
 
-    <url>@PACKAGE_URL@</url>
-    <email>@PACKAGE_BUGREPORT@</email>
-</tool>
+        <url>@PACKAGE_URL@</url>
+        <email>@PACKAGE_BUGREPORT@</email>
+    </tool>

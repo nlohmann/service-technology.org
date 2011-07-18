@@ -1,0 +1,458 @@
+<tools>
+    <tool>
+        <name>Anastasia</name>
+        <shortname>anastasia</shortname>
+
+        <lastVersion>1.1</lastVersion>
+        <officialVersion>1.0</officialVersion>
+
+        <path>anastasia</path>
+
+        <url>http://service-technology.org/anastasia</url>
+        <email>anastasia@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Anica</name>
+        <shortname>anica</shortname>
+
+        <lastVersion>1.0</lastVersion>
+        <officialVersion>1.0</officialVersion>
+
+        <path>anica</path>
+
+        <url>http://service-technology.org/anica</url>
+        <email>anica@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>GNU BPEL2oWFN</name>
+        <shortname>bpel2owfn</shortname>
+
+        <lastVersion>2.4</lastVersion>
+        <officialVersion>2.4</officialVersion>
+
+        <path>bpel2owfn</path>
+
+        <url>http://service-technology.org/bpel2owfn</url>
+        <email>bpel2owfn@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Candy</name>
+        <shortname>candy</shortname>
+
+        <lastVersion>1.0</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>candy</path>
+
+        <url>http://service-technology.org/candy</url>
+        <email>candy@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Cora</name>
+        <shortname>cora</shortname>
+
+        <lastVersion>0.3-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>cora</path>
+
+        <url>http://service-technology.org/cora</url>
+        <email>cora@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Cosme</name>
+        <shortname>cosme</shortname>
+
+        <lastVersion>1.0</lastVersion>
+        <officialVersion>1.0</officialVersion>
+
+        <path>cosme</path>
+
+        <url>http://service-technology.org/cosme</url>
+        <email>cosme@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Diane</name>
+        <shortname>diane</shortname>
+
+        <lastVersion>1.1-unreleased</lastVersion>
+        <officialVersion>1.0</officialVersion>
+
+        <path>diane</path>
+
+        <url>http://service-technology.org/diane</url>
+        <email>diane@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Domino</name>
+        <shortname>domino</shortname>
+
+        <lastVersion>0.9-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>domino</path>
+
+        <url>http://service-technology.org/domino</url>
+        <email>domino@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Fiona</name>
+        <shortname>fiona</shortname>
+
+        <lastVersion>3.2-unreleased</lastVersion>
+        <officialVersion>3.1</officialVersion>
+
+        <path>fiona</path>
+
+        <url></url>
+        <email>fiona@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Fiona-GUI</name>
+        <shortname>fiona-gui</shortname>
+
+        <lastVersion>0.02</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>fiona-gui</path>
+
+        <url></url>
+        <email>stephan.mennicke@uni-rostock.de</email>
+    </tool>
+    <tool>
+        <name>Genet</name>
+        <shortname>genet</shortname>
+
+        <lastVersion>1.2-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>genet</path>
+
+        <url>http://www.lsi.upc.edu/~jcarmona/genet.html</url>
+        <email>jcarmona@lsi.upc.edu</email>
+    </tool>
+    <tool>
+        <name>Linda</name>
+        <shortname>linda</shortname>
+
+        <lastVersion>0.6-unreleased</lastVersion>
+        <officialVersion>0.5</officialVersion>
+
+        <path>linda</path>
+
+        <url>http://service-technology.org/linda</url>
+        <email>linda@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Lisa</name>
+        <shortname>lisa</shortname>
+
+        <lastVersion>1.0-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>lisa</path>
+
+        <url>http://service-technology.org/lisa</url>
+        <email>lisa@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>LoLA</name>
+        <shortname>lola</shortname>
+
+        <lastVersion>1.17-unreleased</lastVersion>
+        <officialVersion>1.16</officialVersion>
+
+        <path>lola</path>
+
+        <url>http://service-technology.org/lola</url>
+        <email>lola@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Marlene</name>
+        <shortname>marlene</shortname>
+
+        <lastVersion>1.2</lastVersion>
+        <officialVersion>1.2</officialVersion>
+
+        <path>marlene</path>
+
+        <url>http://service-technology.org/tools/marlene</url>
+        <email>marlene@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Maxis</name>
+        <shortname>maxis</shortname>
+
+        <lastVersion>0.1-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>maxis</path>
+
+        <url>http://service-technology.org/maxis </url>
+        <email>parnjai@informatik.hu-berlin.de</email>
+    </tool>
+    <tool>
+        <name>compilers</name>
+        <shortname>compilers</shortname>
+
+        <lastVersion>1.00</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>meta/compilers</path>
+
+        <url>http://service-technology.org/compilers</url>
+        <email>compilers@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>File Formats</name>
+        <shortname>formats</shortname>
+
+        <lastVersion>1.0-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>meta/formats</path>
+
+        <url>http://service-technology.org</url>
+        <email>formats@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Hello</name>
+        <shortname>hello</shortname>
+
+        <lastVersion>1.1-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>meta/hello</path>
+
+        <url>http://service-technology.org/hello</url>
+        <email>hello@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>syntax</name>
+        <shortname>syntax</shortname>
+
+        <lastVersion>1.0</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>meta/reference</path>
+
+        <url></url>
+        <email>niels@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>x2dot</name>
+        <shortname>x2dot</shortname>
+
+        <lastVersion>1.0</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>meta/x2dot</path>
+
+        <url></url>
+        <email>georgstraube@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Mia</name>
+        <shortname>mia</shortname>
+
+        <lastVersion>1.3-unreleased</lastVersion>
+        <officialVersion>1.2</officialVersion>
+
+        <path>mia</path>
+
+        <url>http://service-technology.org/mia</url>
+        <email>mia@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>OGAPI</name>
+        <shortname>ogapi</shortname>
+
+        <lastVersion>1.00-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>ogapi</path>
+
+        <url>http://service-technology.org/ogapi</url>
+        <email>ogapi@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Ondine</name>
+        <shortname>ondine</shortname>
+
+        <lastVersion>1.0</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>ondine</path>
+
+        <url>http://service-technology.org/ondine</url>
+        <email>ondine@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>oWFN2BPEL</name>
+        <shortname>owfn2bpel</shortname>
+
+        <lastVersion>4.9-unreleased</lastVersion>
+        <officialVersion>4.8</officialVersion>
+
+        <path>owfn2bpel</path>
+
+        <url></url>
+        <email>owfn2bpel@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Petri Net API</name>
+        <shortname>pnapi</shortname>
+
+        <lastVersion>4.03-unreleased</lastVersion>
+        <officialVersion>4.02</officialVersion>
+
+        <path>pnapi</path>
+
+        <url>http://service-technology.org/pnapi</url>
+        <email>pnapi@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Rachel</name>
+        <shortname>rachel</shortname>
+
+        <lastVersion>1.14</lastVersion>
+        <officialVersion>1.14</officialVersion>
+
+        <path>rachel</path>
+
+        <url>http://service-technology.org/rachel</url>
+        <email>rachel@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Rebecca</name>
+        <shortname>rebecca</shortname>
+
+        <lastVersion>1.0-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>rebecca</path>
+
+        <url>http://service-technology.org/rebecca</url>
+        <email>rebecca@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Safira</name>
+        <shortname>safira</shortname>
+
+        <lastVersion>2.0</lastVersion>
+        <officialVersion>2.0</officialVersion>
+
+        <path>safira</path>
+
+        <url>http://service-technology.org/safira</url>
+        <email>safira@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Sara</name>
+        <shortname>sara</shortname>
+
+        <lastVersion>1.08</lastVersion>
+        <officialVersion>1.0</officialVersion>
+
+        <path>sara</path>
+
+        <url>http://service-technology.org/sara</url>
+        <email>sara@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Sayo</name>
+        <shortname>sayo</shortname>
+
+        <lastVersion>1.2</lastVersion>
+        <officialVersion>1.2</officialVersion>
+
+        <path>sayo</path>
+
+        <url>http://service-technology.org/sayo</url>
+        <email>sayo@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Stanca</name>
+        <shortname>stanca</shortname>
+
+        <lastVersion>1.1-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>stanca</path>
+
+        <url>http://service-technology.org/stanca</url>
+        <email>stanca@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Tara</name>
+        <shortname>tara</shortname>
+
+        <lastVersion>0.1-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>tara</path>
+
+        <url>http://service-technology.org/tara</url>
+        <email>tara@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Tess</name>
+        <shortname>tess</shortname>
+
+        <lastVersion>1.0-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>tess</path>
+
+        <url>http://service-technology.org/tess</url>
+        <email>tess@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>UML2oWFN</name>
+        <shortname>uml2owfn</shortname>
+
+        <lastVersion>2.11</lastVersion>
+        <officialVersion>2.10</officialVersion>
+
+        <path>uml2owfn</path>
+
+        <url>http://service-technology.org/uml2owfn</url>
+        <email>uml2owfn@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Wendy</name>
+        <shortname>wendy</shortname>
+
+        <lastVersion>3.4-unreleased</lastVersion>
+        <officialVersion>3.3</officialVersion>
+
+        <path>wendy</path>
+
+        <url>http://service-technology.org/wendy</url>
+        <email>wendy@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Yasmina</name>
+        <shortname>yasmina</shortname>
+
+        <lastVersion>1.1-unreleased</lastVersion>
+        <officialVersion>1.0</officialVersion>
+
+        <path>yasmina</path>
+
+        <url>http://service-technology.org/yasmina</url>
+        <email>yasmina@service-technology.org</email>
+    </tool>
+    <tool>
+        <name>Yasmina</name>
+        <shortname>yasmina</shortname>
+
+        <lastVersion>2.0-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+
+        <path>yasmina2</path>
+
+        <url>http://service-technology.org/yasmina</url>
+        <email>yasmina@service-technology.org</email>
+    </tool>
+</tools>

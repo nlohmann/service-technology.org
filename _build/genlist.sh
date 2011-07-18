@@ -3,9 +3,12 @@
 cd ..
 
 HOMEPWD=$(pwd)
+COLLECTION=$(pwd)/_build/tools.xml
 
 echo "generating tool list..."
 TOOLS=$(find * -name configure.ac | grep -v "_build" | sed 's|/configure.ac||')
+
+echo "<tools>" > $COLLECTION
 
 for TOOL in $TOOLS
 do
@@ -35,5 +38,10 @@ do
   echo "[$TOOLNAME] cleaning..."
   make svn-clean >& /dev/null
 
+  cat tool.json >> $COLLECTION
+  rm tool.json
+
   cd $HOMEPWD
 done
+
+echo "</tools>" >> $COLLECTION

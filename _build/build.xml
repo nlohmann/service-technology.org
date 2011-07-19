@@ -13,9 +13,16 @@
             <arg value="--quiet" />
             <arg value="svn-clean" />
         </exec>
+
         <delete file="${package}.tar.gz" failonerror="false" />
-<!--        <delete dir="doc/doxygen" failonerror="false" /> -->
         <delete dir="artifacts" failonerror="false" />
+        <delete dir="statsvn" failonerror="false" />
+        <delete dir="doc/doxygen" failonerror="false" />
+        <delete file="statsvn.log" failonerror="false" />
+        <delete file="cppcheck-result.xml" failonerror="false" />
+        <delete failonerror="false">
+          <fileset dir="." includes="plot_*"/>
+        </delete>
     </target>
 
     <target name="statsvn" depends="prepare">
@@ -103,6 +110,7 @@
             <arg value="distcheck" />
             <arg value="distdir=${package}" />
         </exec>
+        <copy file="${package}.tar.gz" todir="artifacts" failonerror="false" />
     </target>
 
     <target name="documentation">
@@ -123,32 +131,39 @@
     <target name="coverage">
         <mkdir dir="tests" />
         <mkdir dir="tests/cover-html" />
+        <record name="artifacts/cover.log" action="start"/>
         <exec executable="make" dir="tests" failonerror="false">
             <arg value="cover" />
         </exec>
-        <!--
-        <copy todir="artifacts/cover" failonerror="false">
-            <fileset dir="tests/cover-html" includes="**"/>
-        </copy> -->
+        <record name="artifacts/cover.log" action="stop"/>
 
-<!--
-        <exec executable="sh" dir="tests/cover-html" failonerror="false" output="tmp1">
-            <arg line="-c &quot;grep coverNumHi index.html | sed 's/[^0-9 ]//g' | awk '{print $1}'&quot;" />
+        <exec executable="sh" failonerror="false" output="plot_coveredlines">
+            <arg value="-c" />
+            <arg value="grep 'lines......' artifacts/cover.log | sed 's/[()]//g' | awk '{ print &quot;YVALUE=&quot; $4 }'" />
         </exec>
-        <exec executable="sh" dir="tests/cover-html" failonerror="false" output="tmp2">
-            <arg line="-c &quot;grep coverNumHi index.html | sed 's/[^0-9 ]//g' | awk '{print $2}'&quot;" />
+        <exec executable="sh" failonerror="false" output="plot_totallines">
+            <arg value="-c" />
+            <arg value="grep 'lines......' artifacts/cover.log | sed 's/[()]//g' | awk '{ print &quot;YVALUE=&quot; $6 }'" />
         </exec>
-        <concat destfile="plot_coveredlines">
-          <header>YVALUE=</header>
-          <fileset file="tmp1" />
-        </concat>
-        <concat destfile="plot_totallines">
-          <header>YVALUE=</header>
-          <fileset file="tmp2" />
-        </concat>
-        <delete file="tmp1" failonerror="false" />
-        <delete file="tmp2" failonerror="false" />
--->
+
+        <exec executable="sh" failonerror="false" output="plot_coveredfunctions">
+            <arg value="-c" />
+            <arg value="grep 'functions..' artifacts/cover.log | sed 's/[()]//g' | awk '{ print &quot;YVALUE=&quot; $4 }'" />
+        </exec>
+        <exec executable="sh" failonerror="false" output="plot_totalfunctions">
+            <arg value="-c" />
+            <arg value="grep 'functions..' artifacts/cover.log | sed 's/[()]//g' | awk '{ print &quot;YVALUE=&quot; $6 }'" />
+        </exec>
+
+        <exec executable="sh" failonerror="false" output="plot_coveredbranches">
+            <arg value="-c" />
+            <arg value="grep 'branches...' artifacts/cover.log | sed 's/[()]//g' | awk '{ print &quot;YVALUE=&quot; $4 }'" />
+        </exec>
+        <exec executable="sh" failonerror="false" output="plot_totalbranches">
+            <arg value="-c" />
+            <arg value="grep 'branches...' artifacts/cover.log | sed 's/[()]//g' | awk '{ print &quot;YVALUE=&quot; $6 }'" />
+        </exec>
+
     </target>
 
 </project>

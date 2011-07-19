@@ -153,7 +153,8 @@ void evaluateParameters(int argc, char** argv) {
     if (getenv("LOLA") != NULL and not args_info.lola_given) {
         status("using environment variable '%s' set to '%s'",
             _cfilename_("LOLA"), _cfilename_(getenv("LOLA")));
-        args_info.lola_arg = strdup(std::string(getenv("LOLA")).c_str());
+        free(args_info.lola_arg);
+        args_info.lola_arg = strdup(getenv("LOLA"));
     }
 
     // initialize the report frequency

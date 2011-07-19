@@ -14,16 +14,16 @@
             <arg value="svn-clean" />
         </exec>
         <delete file="${package}.tar.gz" failonerror="false" />
-        <delete dir="doc/doxygen" failonerror="false" />
+<!--        <delete dir="doc/doxygen" failonerror="false" /> -->
         <delete dir="artifacts" failonerror="false" />
     </target>
 
     <target name="statsvn" depends="prepare">
-        <exec executable="svn" failonerror="false" output="artifacts/statsvn.log">
+        <exec executable="svn" failonerror="false" output="statsvn.log">
             <arg line="log -v --xml" />
         </exec>
         <exec executable="statsvn" failonerror="false">
-            <arg line="-disable-twitter-button -threads 10 -include '**/src/**;**/utils/**' artifacts/statsvn.log . -output-dir artifacts/statsvn -cache-dir /tmp/statsvn" />
+            <arg line="-disable-twitter-button -threads 10 -include '**/src/**;**/utils/**' statsvn.log . -output-dir statsvn -cache-dir /tmp/statsvn" />
         </exec>
 <!--        <exec executable="java" failonerror="false">
             <arg line="-jar '${homedir}/local/statsvn/statsvn.jar' -config-file '${homedir}/local/statsvn/config' -tags '.*' -disable-twitter-button -threads 1 -include '**/src/**;**/utils/**' statsvn.log . -output-dir statsvn" />
@@ -32,7 +32,7 @@
 
     <target name="cppcheck" depends="prepare">
         <touch file="src/tmpfile.c" />
-        <exec executable="cppcheck" failonerror="false" error="artifacts/cppcheck-result.xml">
+        <exec executable="cppcheck" failonerror="false" error="cppcheck-result.xml">
             <arg line="src/* --enable=style,information,unusedFunction --force --verbose --report-progress --xml -j2" />
         </exec>
         <delete file="src/tmpfile.c" />
@@ -109,14 +109,15 @@
         <exec executable="make" failonerror="false">
             <arg value="pdf" />
         </exec>
-        <copy file="doc/${package}.pdf" todir="artifacts" failonerror="false" />
+        <!-- <copy file="doc/${package}.pdf" todir="artifacts" failonerror="false" /> -->
 
         <mkdir dir="doc/doxygen" />
         <exec executable="doxygen" dir="doc" failonerror="false" />
-        <mkdir dir="artifacts/doxygen" />
+
+        <!-- ><mkdir dir="artifacts/doxygen" />
         <copy todir="artifacts/doxygen" failonerror="false">
             <fileset dir="doc/doxygen" includes="**"/>
-        </copy>
+        </copy> -->
     </target>
 
     <target name="coverage">
@@ -125,9 +126,10 @@
         <exec executable="make" dir="tests" failonerror="false">
             <arg value="cover" />
         </exec>
+        <!--
         <copy todir="artifacts/cover" failonerror="false">
             <fileset dir="tests/cover-html" includes="**"/>
-        </copy>
+        </copy> -->
 
 <!--
         <exec executable="sh" dir="tests/cover-html" failonerror="false" output="tmp1">

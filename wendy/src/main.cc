@@ -133,7 +133,7 @@ void evaluateParameters(int argc, char** argv) {
         std::string conf_generic_filename = std::string(PACKAGE) + ".conf";
         std::string conf_filename = fileExists(conf_generic_filename) ? conf_generic_filename :
                                     (fileExists(std::string(SYSCONFDIR) + "/" + conf_generic_filename) ?
-                                     (std::string(SYSCONFDIR) + "/" + conf_generic_filename) : "");
+                                    (std::string(SYSCONFDIR) + "/" + conf_generic_filename) : "");
 
         if (conf_filename != "") {
             // initialize the config file parser
@@ -147,6 +147,13 @@ void evaluateParameters(int argc, char** argv) {
         } else {
             status("not using a configuration file");
         }
+    }
+
+    // set LoLA if it is present in the environment and not set otherwise
+    if (getenv("LOLA") != NULL and not args_info.lola_given) {
+        status("using environment variable '%s' set to '%s'",
+            _cfilename_("LOLA"), _cfilename_(getenv("LOLA")));
+        args_info.lola_arg = strdup(std::string(getenv("LOLA")).c_str());
     }
 
     // initialize the report frequency

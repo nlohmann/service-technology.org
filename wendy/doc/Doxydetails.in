@@ -21,7 +21,7 @@
 \verbinclude @abs_top_srcdir@/REQUIREMENTS
 
 \section thy Theory behind @PACKAGE_NAME@
-\verbinclude @abs_top_srcdir@/REQUIREMENTS
+\verbinclude @abs_top_srcdir@/THEORY
 
 \section lic License
 \verbinclude @abs_top_srcdir@/COPYING

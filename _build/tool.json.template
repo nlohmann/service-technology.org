@@ -1,12 +1,10 @@
-    <tool>
+    <tool id="@TOOLID@">
         <name>@PACKAGE_NAME@</name>
         <shortname>@PACKAGE_TARNAME@</shortname>
-
+        <path>@TRUNK@</path>
         <lastVersion>@PACKAGE_VERSION@</lastVersion>
         <officialVersion>@OFFICIAL_VERSION@</officialVersion>
-
-        <path>@TRUNK@</path>
-
         <url>@PACKAGE_URL@</url>
         <email>@PACKAGE_BUGREPORT@</email>
     </tool>
+

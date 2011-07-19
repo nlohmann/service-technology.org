@@ -26,6 +26,8 @@ do
   rm tool.json.in
 
   gsed -i "s|@TRUNK@|$TOOL|" tool.json
+  TOOLID=$(echo $TOOL | sed 's@/@_@')
+  gsed -i "s|@TOOLID@|$TOOLID|" tool.json
 
   LASTVERSION=$(curl -s http://download.gna.org/service-tech/$TOOLNAME/ | grep -oh "$TOOLNAME-[0-9.]*" | sort | uniq | sed "s/$TOOLNAME-//g" | sed 's/.$//g' | tail -n1)
   gsed -i "s|@OFFICIAL_VERSION@|$LASTVERSION|" tool.json

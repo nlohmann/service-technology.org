@@ -1,0 +1,218 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>@DESCRIPTION@</description>
+  <logRotator>
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>10</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.SubversionSCM">
+    <locations>
+      <hudson.scm.SubversionSCM_-ModuleLocation>
+        <remote>http://svn.gna.org/svn/service-tech/trunk/@PATH@</remote>
+        <local>.</local>
+      </hudson.scm.SubversionSCM_-ModuleLocation>
+    </locations>
+    <browser class="hudson.scm.browsers.ViewSVN">
+      <url>http://svn.gna.org/viewcvs/service-tech/</url>
+    </browser>
+    <excludedRegions></excludedRegions>
+    <includedRegions></includedRegions>
+    <excludedUsers></excludedUsers>
+    <excludedRevprop></excludedRevprop>
+    <excludedCommitMessages></excludedCommitMessages>
+    <workspaceUpdater class="hudson.scm.subversion.UpdateWithCleanUpdater"/>
+  </scm>
+  <assignedNode>Builder</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector">
+    <hudson.triggers.SCMTrigger>
+      <spec>*/5 * * * *</spec>
+    </hudson.triggers.SCMTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>wget http://svn.gna.org/svn/service-tech/trunk/_build/build.xml</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Ant>
+      <targets></targets>
+      <antName>ant</antName>
+    </hudson.tasks.Ant>
+  </builders>
+  <publishers>
+    <hudson.plugins.warnings.WarningsPublisher>
+      <healthy></healthy>
+      <unHealthy></unHealthy>
+      <thresholdLimit>low</thresholdLimit>
+      <pluginName>[WARNINGS] </pluginName>
+      <defaultEncoding></defaultEncoding>
+      <canRunOnFailed>false</canRunOnFailed>
+      <useDeltaValues>false</useDeltaValues>
+      <thresholds>
+        <unstableTotalAll></unstableTotalAll>
+        <unstableTotalHigh></unstableTotalHigh>
+        <unstableTotalNormal></unstableTotalNormal>
+        <unstableTotalLow></unstableTotalLow>
+        <unstableNewAll></unstableNewAll>
+        <unstableNewHigh></unstableNewHigh>
+        <unstableNewNormal></unstableNewNormal>
+        <unstableNewLow></unstableNewLow>
+        <failedTotalAll></failedTotalAll>
+        <failedTotalHigh></failedTotalHigh>
+        <failedTotalNormal></failedTotalNormal>
+        <failedTotalLow></failedTotalLow>
+        <failedNewAll></failedNewAll>
+        <failedNewHigh></failedNewHigh>
+        <failedNewNormal></failedNewNormal>
+        <failedNewLow></failedNewLow>
+      </thresholds>
+      <shouldDetectModules>false</shouldDetectModules>
+      <parserConfigurations>
+        <hudson.plugins.warnings.ParserConfiguration>
+          <pattern>artifacts/make.log</pattern>
+          <parserName>GNU compiler 4 (ld)</parserName>
+        </hudson.plugins.warnings.ParserConfiguration>
+        <hudson.plugins.warnings.ParserConfiguration>
+          <pattern>artifacts/make.log</pattern>
+          <parserName>GNU compiler 4 (gcc)</parserName>
+        </hudson.plugins.warnings.ParserConfiguration>
+      </parserConfigurations>
+      <consoleLogParsers/>
+    </hudson.plugins.warnings.WarningsPublisher>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>artifacts/**</artifacts>
+      <latestOnly>false</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.plugins.plot.PlotPublisher>
+      <plots>
+        <hudson.plugins.plot.Plot>
+          <title>Line Coverage</title>
+          <yaxis>lines</yaxis>
+          <series>
+            <hudson.plugins.plot.PropertiesSeries>
+              <file>plot_coveredlines</file>
+              <label>covered lines</label>
+              <fileType>properties</fileType>
+            </hudson.plugins.plot.PropertiesSeries>
+            <hudson.plugins.plot.PropertiesSeries>
+              <file>plot_totallines</file>
+              <label>total lines</label>
+              <fileType>properties</fileType>
+            </hudson.plugins.plot.PropertiesSeries>
+          </series>
+          <group>Code Coverage</group>
+          <numBuilds></numBuilds>
+          <csvFileName>1179540877.csv</csvFileName>
+          <csvLastModification>0</csvLastModification>
+          <style>line</style>
+          <useDescr>false</useDescr>
+        </hudson.plugins.plot.Plot>
+        <hudson.plugins.plot.Plot>
+          <title>Function Coverage</title>
+          <yaxis>functions</yaxis>
+          <series>
+            <hudson.plugins.plot.PropertiesSeries>
+              <file>plot_coveredfunctions</file>
+              <label>covered functions</label>
+              <fileType>properties</fileType>
+            </hudson.plugins.plot.PropertiesSeries>
+            <hudson.plugins.plot.PropertiesSeries>
+              <file>plot_totalfunctions</file>
+              <label>total functions</label>
+              <fileType>properties</fileType>
+            </hudson.plugins.plot.PropertiesSeries>
+          </series>
+          <group>Code Coverage</group>
+          <numBuilds></numBuilds>
+          <csvFileName>635865542.csv</csvFileName>
+          <csvLastModification>0</csvLastModification>
+          <style>line</style>
+          <useDescr>false</useDescr>
+        </hudson.plugins.plot.Plot>
+        <hudson.plugins.plot.Plot>
+          <title>Branch Coverage</title>
+          <yaxis>branches</yaxis>
+          <series>
+            <hudson.plugins.plot.PropertiesSeries>
+              <file>plot_coveredbranches</file>
+              <label>covered branches</label>
+              <fileType>properties</fileType>
+            </hudson.plugins.plot.PropertiesSeries>
+            <hudson.plugins.plot.PropertiesSeries>
+              <file>plot_totalbranches</file>
+              <label>total branches</label>
+              <fileType>properties</fileType>
+            </hudson.plugins.plot.PropertiesSeries>
+          </series>
+          <group>Code Coverage</group>
+          <numBuilds></numBuilds>
+          <csvFileName>1893049061.csv</csvFileName>
+          <csvLastModification>0</csvLastModification>
+          <style>line</style>
+          <useDescr>false</useDescr>
+        </hudson.plugins.plot.Plot>
+      </plots>
+    </hudson.plugins.plot.PlotPublisher>
+    <com.thalesgroup.hudson.plugins.cppcheck.CppcheckPublisher>
+      <cppcheckConfig>
+        <cppcheckReportPattern></cppcheckReportPattern>
+        <ignoreBlankFiles>false</ignoreBlankFiles>
+        <configSeverityEvaluation>
+          <threshold></threshold>
+          <newThreshold></newThreshold>
+          <failureThreshold></failureThreshold>
+          <newFailureThreshold></newFailureThreshold>
+          <healthy></healthy>
+          <unHealthy></unHealthy>
+          <severityError>true</severityError>
+          <severityPossibleError>true</severityPossibleError>
+          <severityStyle>true</severityStyle>
+          <severityPossibleStyle>true</severityPossibleStyle>
+        </configSeverityEvaluation>
+        <configGraph>
+          <xSize>500</xSize>
+          <ySize>200</ySize>
+          <diplayAllError>true</diplayAllError>
+          <displaySeverityError>true</displaySeverityError>
+          <displaySeverityPossibleError>true</displaySeverityPossibleError>
+          <displaySeverityStyle>true</displaySeverityStyle>
+          <displaySeverityPossibleStyle>true</displaySeverityPossibleStyle>
+        </configGraph>
+      </cppcheckConfig>
+    </com.thalesgroup.hudson.plugins.cppcheck.CppcheckPublisher>
+    <hudson.plugins.doclinks.DocLinksPublisher>
+      <documents>
+        <hudson.plugins.doclinks.Document>
+          <title>Doxygen</title>
+          <directory>doc/doxygen</directory>
+          <recursive>true</recursive>
+          <file>index.html</file>
+          <id>1</id>
+        </hudson.plugins.doclinks.Document>
+        <hudson.plugins.doclinks.Document>
+          <title>SVN Statistiscs</title>
+          <directory>statsvn</directory>
+          <recursive>true</recursive>
+          <file>index.html</file>
+          <id>2</id>
+        </hudson.plugins.doclinks.Document>
+        <hudson.plugins.doclinks.Document>
+          <title>Code Coverage</title>
+          <directory>tests/cover-html</directory>
+          <recursive>true</recursive>
+          <id>3</id>
+        </hudson.plugins.doclinks.Document>
+      </documents>
+    </hudson.plugins.doclinks.DocLinksPublisher>
+    <hudson.plugins.twitter.TwitterPublisher/>
+  </publishers>
+  <buildWrappers/>
+</project>

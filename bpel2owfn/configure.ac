@@ -11,6 +11,10 @@ AC_MSG_NOTICE([http://www.gnu.org/software/bpel2owfn])
 AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
 AC_MSG_NOTICE()
 
+AC_CONFIG_SRCDIR([src/main.cc])
+AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_AUX_DIR([build-aux])
+
 
 #############################################################################
 # check for prerequisites, programms, headers, and libraries
@@ -19,9 +23,9 @@ AC_MSG_NOTICE()
 AM_INIT_AUTOMAKE(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-# where to look for source code and how the config header should be called
-AC_CONFIG_SRCDIR(src/main.cc)
-AC_CONFIG_HEADERS(src/config.h)
+# use the service-technology.org macros
+AC_ST_BASIC
+AC_ST_AUTOTEST
 
 # check for generic programs
 AC_PROG_CXX
@@ -41,10 +45,6 @@ else
  AC_DEFINE(HAVE_DOT, 1, [Graphviz dot can be used on this system.])
 fi
 
-# set up autotest
-AM_MISSING_PROG(AUTOM4TE, autom4te)
-AC_CONFIG_TESTDIR(tests)
-
 # store the SVN revision number
 AC_DEFINE_UNQUOTED(VERSION_SVN, "`svnversion -n 2> /dev/null`", [The SVN revision.])
 
@@ -58,14 +58,6 @@ AC_DEFINE_UNQUOTED([BUILDSYSTEM], ["$build"], [The platform.])
 # store the SVN revision number
 AC_SUBST(VERSION_SVN, "`svnversion -n 2> /dev/null`")
 AC_DEFINE_UNQUOTED(VERSION_SVN, "${VERSION_SVN}", [The SVN revision.])
-
-# allow the configure script to control assertions (just include config.h)
-AC_HEADER_ASSERT
-AH_BOTTOM([#ifdef __cplusplus
-#include <cassert>
-#else
-#include <assert.h>
-#endif])
 
 
 #############################################################################

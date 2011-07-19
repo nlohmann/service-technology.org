@@ -1,3 +1,6 @@
+# tell aclocal about the macros in the "m4" folder
+ACLOCAL_AMFLAGS = -I m4 --install
+
 # Where else are Makefiles?
 SUBDIRS = src tests doc man
 
@@ -40,38 +43,6 @@ EXTRA_DIST = gui/bpel2owfn-gui.cc \
              gui/translation-de.ts
 
 
-####################################
-# Targets to clean generated files #
-####################################
-
-# remove everything that can be rebuilt
 svn-clean: maintainer-clean
-	-rm -f aclocal.m4
-	-rm -f compile INSTALL
-	-rm -f configure config.guess config.sub
-	-rm -f depcomp
-	-rm -f install-sh
-	-rm -f Makefile.in
-	-rm -f missing
-	-rm -f ylwrap
-	-rm -f -r autom4te.cache
-	-rm -f doc/mdate-sh
-	-rm -f doc/bpel2owfn
-	-rm -f doc/stamp-vti
-	-rm -f doc/version.texi doc/texinfo.tex
-	-rm -f doc/Makefile.in
-	-rm -f man/Makefile.in
-	-rm -f src/Makefile.in
-	-rm -f src/config.h.in src/config.h.in~
-	-rm -f -r src/.deps doc/doxygen
-	-rm -f tests/Makefile.in
-	@echo "-----------------------------------------------------"
-	@echo "To recreate installation status enter"
-	@echo "  aclocal"
-	@echo "  autoconf"
-	@echo "  autoheader"
-	@echo "  automake -ac"
-	@echo
-	@echo "or"
-	@echo "  autoreconf -i"
-	@echo
+	rm -fr configure INSTALL aclocal.m4 src/config.h.in doc/mdate-sh src/config-log.h build-aux
+	for DIR in $(DIST_SUBDIRS) .; do rm -f $$DIR/Makefile.in; done

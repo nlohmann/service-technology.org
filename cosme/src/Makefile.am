@@ -24,7 +24,7 @@ cosme_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
 
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI
-cosme_CPPFLAGS = -I$(top_srcdir)/libs -I$(top_srcdir)/libs/pnapi
+cosme_CPPFLAGS += -I$(top_srcdir)/libs -I$(top_srcdir)/libs/pnapi
 cosme_LDADD = $(top_builddir)/libs/pnapi/libpnapi.a
 endif
 

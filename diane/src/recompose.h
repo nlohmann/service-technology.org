@@ -1,6 +1,6 @@
 /*
  *  recompose.h
- *  
+ *
  *
  *  Created by Olivia Oanea on 8/14/10.
  *  Copyright 2010 University of Rostock. All rights reserved.
@@ -49,15 +49,15 @@ using pnapi::Transition;
 
 extern string  filename;
 
-typedef struct component{
-	PetriNet process; // the initial process
-	string cname; //component name used to derive the component file name
-	set<string> inputl;//set of input labels
+typedef struct component {
+    PetriNet process; // the initial process
+    string cname; //component name used to derive the component file name
+    set<string> inputl;//set of input labels
     set<string> outputl;//set of output labels
-	unsigned int sizep;// number of places of the component which determines recomposition	
+    unsigned int sizep;// number of places of the component which determines recomposition
 } Component;
 
-// builds a component 
+// builds a component
 Component makeComponent(std::pair<vector<bool>, PetriNet> c, PetriNet process);
 // checks whether two components are composable based on their interfaces (ports are liberal)
 bool areAsyncComposable(Component c1, Component c2);
@@ -65,11 +65,11 @@ bool areAsyncComposable(Component c1, Component c2);
 Component asyncCompose(Component c1, Component c2);
 // creates a component net, its component and the composition
 
-// builds a net from a Component structure 
+// builds a net from a Component structure
 PetriNet makeComponentNet(Component c);
 
 //given a set of componentss  of a process recomposes them to medium sized components
-vector<Component> recompose(vector<PetriNet *> nets, PetriNet net);
+vector<Component> recompose(vector<PetriNet*> nets, PetriNet net);
 
 
 //namespace recompose {
@@ -81,7 +81,7 @@ PetriNet deletePattern(PetriNet nnn);
 
 PetriNet addPattern(PetriNet nnn);
 
-PetriNet addinterfcompl(PetriNet nnn,set<string> inputplaces1, set<string> outputplaces1);
+PetriNet addinterfcompl(PetriNet nnn, set<string> inputplaces1, set<string> outputplaces1);
 
 PetriNet complementnet(PetriNet diffc, PetriNet part);
 
@@ -96,16 +96,15 @@ vector<string> setPlaceOrder(PetriNet net);
 
 
 template <class T>
-std::set<T> setUnion(const std::set<T> & a, const std::set<T> & b)
-{
-	std::set<T> result;
-	std::insert_iterator<std::set<T, std::less<T> > > res_ins(result, result.begin());
-	set_union(a.begin(), a.end(), b.begin(), b.end(), res_ins);
-	
-	return result;
+std::set<T> setUnion(const std::set<T> & a, const std::set<T> & b) {
+    std::set<T> result;
+    std::insert_iterator<std::set<T, std::less<T> > > res_ins(result, result.begin());
+    set_union(a.begin(), a.end(), b.begin(), b.end(), res_ins);
+
+    return result;
 }
 
 
 //}
 
-#endif 
+#endif

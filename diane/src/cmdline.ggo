@@ -5,89 +5,89 @@ purpose "Diane - Decomposition Into Atomic NEts."
 description "Diane cuts a Petri net into parts."
 
 option "mode" m
-	"Specifies a certain mode in which Diane will run where 'standard' uses a union-find approach to find the smallest service parts in a non-open net (input: LoLA format), and 'freechoice' finds service parts by manipulating free-choice cluster (input: oWFN format)."
-	string
-	values="standard","freechoice" enum
-	default="standard"
-	typestr="MODE"
-	optional
-	
-option "service" -
-	"Makes the result interpretable as services."
-	details="Takes into account the initial and final markings of a service."
-	flag off
-	
+"Specifies a certain mode in which Diane will run where 'standard' uses a union-find approach to find the smallest service parts in a non-open net (input: LoLA format), and 'freechoice' finds service parts by manipulating free-choice cluster (input: oWFN format)."
+string
+values = "standard", "freechoice" enum
+         default="standard"
+                     typestr = "MODE"
+                               optional
+
+                               option "service" -
+                               "Makes the result interpretable as services."
+                               details = "Takes into account the initial and final markings of a service."
+                                         flag off
+
 #option "complementary" -
-#	"Complements the internal places of the service (makes processes safe)."
+#   "Complements the internal places of the service (makes processes safe)."
 #flag off
 
 
-option "threshold" t
-    "Set the threshold for recomposition."
-   details="Having the original decomposition, set up the number of times recomposition should be attempted (works in combination with the interface places)."
-   int 
-   argoptional
-   dependon="service"
-   default="3"
-	optional
+                                         option "threshold" t
+                                         "Set the threshold for recomposition."
+                                         details = "Having the original decomposition, set up the number of times recomposition should be attempted (works in combination with the interface places)."
+                                                   int
+                                                   argoptional
+                                                   dependon = "service"
+                                                          default="3"
+                                                                          optional
 
-option "interface" i
-    "Set of preferred interface place"
-	details="Having the original decomposition, set up preferred interface places (works in combination with the threshold)."
-	   string multiple
-	  dependon="threshold"
-	   optional
+                                                                          option "interface" i
+                                                                          "Set of preferred interface place"
+                                                                          details = "Having the original decomposition, set up preferred interface places (works in combination with the threshold)."
+                                                                                  string multiple
+                                                                                  dependon = "threshold"
+                                                                                          optional
 
-option "complement" -
-	"Complements services with respect to the initial process."
-	dependon="threshold"
-flag off
+                                                                                          option "complement" -
+                                                                                          "Complements services with respect to the initial process."
+                                                                                          dependon = "threshold"
+                                                                                                  flag off
 
 
-option "compose" c
-		"Recompose components into two medium sized services."
-		dependon="threshold"
-		  flag off
+                                                                                                  option "compose" c
+                                                                                                  "Recompose components into two medium sized services."
+                                                                                                  dependon = "threshold"
+                                                                                                          flag off
 
-section "Input and Output"
+                                                                                                          section "Input and Output"
 
-option "format" f
-    "Specifies the input file's format."
-    string
-    typestr="FORMAT"
-    values="owfn","lola" enum
-    default="lola"
-    optional
+                                                                                                          option "format" f
+                                                                                                          "Specifies the input file's format."
+                                                                                                          string
+                                                                                                          typestr = "FORMAT"
+                                                                                                                  values = "owfn", "lola" enum
+                                                                                                                      default="lola"
+                                                                                                                                      optional
 
-option "prefix" p
-	"Specifies the output files' prefix. If not specified Diane will derive the output filenames from the input filename."
-	string
-	typestr="FILEPREFIX"
-	optional
+                                                                                                                                      option "prefix" p
+                                                                                                                                      "Specifies the output files' prefix. If not specified Diane will derive the output filenames from the input filename."
+                                                                                                                                      string
+                                                                                                                                      typestr = "FILEPREFIX"
+                                                                                                                                              optional
 
-option "quiet" q
-	"No output file will be written by Diane."
-	flag off
+                                                                                                                                              option "quiet" q
+                                                                                                                                              "No output file will be written by Diane."
+                                                                                                                                              flag off
 
-section "Debug Options"
+                                                                                                                                              section "Debug Options"
 
-option "verbose" v
-	"Verbose output."
-	flag off
+                                                                                                                                              option "verbose" v
+                                                                                                                                              "Verbose output."
+                                                                                                                                              flag off
 
-option "bug" -
-  "Write configuration information into a file `bug.log'."
-  details="This output file gives information on the machine Wendy was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
-  flag off
-  hidden
+                                                                                                                                              option "bug" -
+                                                                                                                                              "Write configuration information into a file `bug.log'."
+                                                                                                                                              details = "This output file gives information on the machine Wendy was configured and compiled which should help to fix bugs. The file `bug.log' should be attached to bug reports.\n"
+                                                                                                                                                      flag off
+                                                                                                                                                      hidden
 
-section "Statistical Options"
-	
-option "statistics" s
-	"Statistical output."
-	flag off
-	
-option "csv" -
-	"Writes the statistical output to 'stdout' in CSV format. The column heads are given on 'stderr'."
-	dependon="statistics"
-	flag off
+                                                                                                                                                      section "Statistical Options"
+
+                                                                                                                                                      option "statistics" s
+                                                                                                                                                      "Statistical output."
+                                                                                                                                                      flag off
+
+                                                                                                                                                      option "csv" -
+                                                                                                                                                      "Writes the statistical output to 'stdout' in CSV format. The column heads are given on 'stderr'."
+                                                                                                                                                      dependon = "statistics"
+                                                                                                                                                              flag off

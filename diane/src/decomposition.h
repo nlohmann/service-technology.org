@@ -47,7 +47,7 @@ namespace decomposition {
 
     int computeComponentsByUnionFind(PetriNet&, int*, int, int, map<int, Node*> &);
 
-    void createOpenNetComponentsByUnionFind(vector<PetriNet*> &,PetriNet &net, int*, int, int, map<int, Node*> &);
+    void createOpenNetComponentsByUnionFind(vector<PetriNet*> &, PetriNet& net, int*, int, int, map<int, Node*> &);
 
 } /* namespace decomposition */
 

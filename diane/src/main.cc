@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) {
     _statistics.clear();
 
     if (!args_info.inputs_num) {
-    	exit(EXIT_SUCCESS);
+        exit(EXIT_SUCCESS);
     }
 
     string invocation;
@@ -141,16 +141,15 @@ int main(int argc, char* argv[]) {
             case(mode_arg_standard): {
                 //find out whether it is a .lola or a .owfn (for the final marking)
                 std::string s = args_info.inputs[0];
-                switch (args_info.format_arg)
-                {
-                case format_arg_lola:
-                	inputfile >> pnapi::io::lola >> net;
-                	break;
-                case format_arg_owfn:
-                	inputfile >> pnapi::io::owfn >> net;
-                	break;
-                default:
-                	abort(3, "input format '%s' unknown", args_info.format_orig);
+                switch (args_info.format_arg) {
+                    case format_arg_lola:
+                        inputfile >> pnapi::io::lola >> net;
+                        break;
+                    case format_arg_owfn:
+                        inputfile >> pnapi::io::owfn >> net;
+                        break;
+                    default:
+                        abort(3, "input format '%s' unknown", args_info.format_orig);
                 }
                 break;
             }
@@ -161,12 +160,12 @@ int main(int argc, char* argv[]) {
                 break;
         }
         inputfile.close();
-    } catch (pnapi::exception::InputError e) {
+    } catch (pnapi::exception::InputError& e) {
         abort(2, "could not parse file '%s': %s", args_info.inputs[0], e.message.c_str());
     }
     status("reading file '%s'", args_info.inputs[0]);
-	filename=args_info.inputs[0];
-	
+    filename = args_info.inputs[0];
+
     /*
      * 2. Determine the mode and compute the service parts.
      */
@@ -189,10 +188,10 @@ int main(int argc, char* argv[]) {
         default:
             break; /* do nothing */
     }
-    time_t finish_computing = time(NULL); 
+    time_t finish_computing = time(NULL);
     _statistics.t_computingComponents_ = finish_computing - start_computing;
     //status("computed components of net '%s'", args_info.inputs[0]);
-	//cout << _statistics.fragments_<<endl;
+    //cout << _statistics.fragments_<<endl;
 
     /*
      * 3. Build Fragments.
@@ -206,8 +205,8 @@ int main(int argc, char* argv[]) {
     time_t start_building = time(NULL);
     switch (args_info.mode_arg) {
         case(mode_arg_standard):
-            decomposition::createOpenNetComponentsByUnionFind(nets,net, tree, size, psize, reremap);
-			//statistics(net, nets);
+            decomposition::createOpenNetComponentsByUnionFind(nets, net, tree, size, psize, reremap);
+            //statistics(net, nets);
             break;
         case(mode_arg_freechoice):
             break;
@@ -219,14 +218,14 @@ int main(int argc, char* argv[]) {
     _statistics.t_buildingComponents_ = finish_building - start_building;
     //status("created net fragments of '%s'", args_info.inputs[0]);
 
-	
-	
+
+
     /*
      * 4. Write output files.
      */
     if (!args_info.quiet_flag && !args_info.compose_flag) {
         // writing file output
-		
+
         string fileprefix;
         string filepostfix = ".owfn";
         if (args_info.prefix_given) {
@@ -251,7 +250,7 @@ int main(int argc, char* argv[]) {
                 stringstream ss;
                 string num;
                 /// leading zeros
-                int z = digits - num.length();
+                //unused: int z = digits - num.length();
                 ss /*<< setfill('0') << setw(z)*/ << netnumber;
                 ss >> num;
                 ofstream outputfile((fileprefix + num + filepostfix).c_str());
@@ -261,42 +260,42 @@ int main(int argc, char* argv[]) {
                            << meta(pnapi::io::INVOCATION, invocation)
                            << *nets[j];
                 netnumber++;
-				//if complement compute difference between original net and the 
-				//respective complement then complement the difference and add the construction
-				if (args_info.complement_flag)
-				{
-					net=addComplementaryPlaces(net);//add complementary places to the origina net
-				
-					//ofstream outputfile((std::string(argv[0]) + "compl.owfn").c_str());
-					//compute the difference for  each place / transition of the bign net delete the one from the second net
-					PetriNet diff=net;//delete internal places
-					//build the complement 
-					PetriNet rest=complementnet(diff, *nets[j]);
-					std::ofstream o;
-					o.open((std::string(fileprefix+num+filepostfix + ".compl.owfn").c_str()), std::ios_base::trunc);
-					//PetriNet net2;
-					o << pnapi::io::owfn << rest;
-				}
-				
+                //if complement compute difference between original net and the
+                //respective complement then complement the difference and add the construction
+                if (args_info.complement_flag) {
+                    net = addComplementaryPlaces(net); //add complementary places to the origina net
+
+                    //ofstream outputfile((std::string(argv[0]) + "compl.owfn").c_str());
+                    //compute the difference for  each place / transition of the bign net delete the one from the second net
+                    PetriNet diff = net; //delete internal places
+                    //build the complement
+                    PetriNet rest = complementnet(diff, *nets[j]);
+                    std::ofstream o;
+                    o.open((std::string(fileprefix + num + filepostfix + ".compl.owfn").c_str()), std::ios_base::trunc);
+                    //PetriNet net2;
+                    o << pnapi::io::owfn << rest;
+                }
+
             }
     }
-	
-	/*
-	 * Recomposing until two medium sized components are built 
-	 */
-	if(args_info.compose_flag){
-		 statistics(net, nets);
-		//composes components until a medium sized component is reached, then computes its complement
-		vector<Component> vcp;
-		//status("compose %d components until a medium sized component is reached, then computes its complement",  _statistics.fragments_);
-		vcp= recompose(nets, net);
-			
-		if (!args_info.quiet_flag){
-			for (int j = 0; j < (int) vcp.size(); j++)
-				printComponent(vcp.at(j));
-		}
-	}
-	
+
+    /*
+     * Recomposing until two medium sized components are built
+     */
+    if (args_info.compose_flag) {
+        statistics(net, nets);
+        //composes components until a medium sized component is reached, then computes its complement
+        vector<Component> vcp;
+        //status("compose %d components until a medium sized component is reached, then computes its complement",  _statistics.fragments_);
+        vcp = recompose(nets, net);
+
+        if (!args_info.quiet_flag) {
+            for (int j = 0; j < (int) vcp.size(); j++) {
+                printComponent(vcp.at(j));
+            }
+        }
+    }
+
 
     time_t finish_total = time(NULL);
     _statistics.t_total_ = finish_total - start_total;
@@ -305,8 +304,8 @@ int main(int argc, char* argv[]) {
      * 5. Make statistical output.
      */
     statistics(net, nets);
-	
-	
+
+
 
     // memory cleaner
     delete [] tree;
@@ -452,40 +451,40 @@ void statistics(PetriNet& net, vector<PetriNet*> &nets) {
 }
 
 //prints components, their complements and their composition
-void printComponent(Component c){
-	//status("Printing component:");
-	PetriNet cn=makeComponentNet(c);//get the component net first
-	//compute its complement and also the composition and print them as well to the output
-	std::ofstream oss;
-	PetriNet cwithcompl=addComplementaryPlaces(cn);
-	PetriNet nnp=addPattern(cwithcompl);
-	oss.open((std::string(filename+"_"+c.cname+".owfn").c_str()), std::ios_base::trunc);
-	oss << pnapi::io::owfn << nnp;//print it
-	cout<<"adding... "<<filename+"_"+c.cname+".owfn"<<endl;
+void printComponent(Component c) {
+    //status("Printing component:");
+    PetriNet cn = makeComponentNet(c); //get the component net first
+    //compute its complement and also the composition and print them as well to the output
+    std::ofstream oss;
+    PetriNet cwithcompl = addComplementaryPlaces(cn);
+    PetriNet nnp = addPattern(cwithcompl);
+    oss.open((std::string(filename + "_" + c.cname + ".owfn").c_str()), std::ios_base::trunc);
+    oss << pnapi::io::owfn << nnp;//print it
+    cout << "adding... " << filename + "_" + c.cname + ".owfn" << endl;
 
-	//nnp
-	//compute complement; cmplfordiff
-	if (args_info.complement_flag){
-		cout<<"adding... "<<filename+"_"+c.cname+".compl.owfn"<<endl;
+    //nnp
+    //compute complement; cmplfordiff
+    if (args_info.complement_flag) {
+        cout << "adding... " << filename + "_" + c.cname + ".compl.owfn" << endl;
 
-		PetriNet proccompl=addComplementaryPlaces(c.process);
-		PetriNet diff=complementnet(proccompl, cwithcompl);
-		//PetriNet xdiff=diff;
-		std::ofstream ox;
-		ox.open((std::string(filename+"_"+c.cname+".compl.owfn").c_str()), std::ios_base::trunc);
-		//ox << pnapi::io::owfn << xdiff;//its complement
-		ox << pnapi::io::owfn << diff;
-		std::ofstream oc;
-		oc.open((std::string(filename+"_"+c.cname + ".composed.owfn").c_str()), std::ios_base::trunc);
-		//cout<<"adding... "<<filename+"_"+c.cname+".owfn"<<endl;
-		//PetriNet netcompl=cn
-		nnp.compose(diff, "1", "2");
-		//addinterfcompl adds complementary places to the process to all but interface places
-		//and adds patterns  correspondingly
-		PetriNet nnnn=addinterfcompl(nnp, c.inputl,c.outputl);
-		//cout <<endl << "all size="<<all.size()<<endl;
-		oc << pnapi::io::owfn << nnnn;//print the composition
-	}
-	
-	//cout<<"component "<<c.fileprefix+" "+c.cname+" of size "<<c.sizep<<endl;
+        PetriNet proccompl = addComplementaryPlaces(c.process);
+        PetriNet diff = complementnet(proccompl, cwithcompl);
+        //PetriNet xdiff=diff;
+        std::ofstream ox;
+        ox.open((std::string(filename + "_" + c.cname + ".compl.owfn").c_str()), std::ios_base::trunc);
+        //ox << pnapi::io::owfn << xdiff;//its complement
+        ox << pnapi::io::owfn << diff;
+        std::ofstream oc;
+        oc.open((std::string(filename + "_" + c.cname + ".composed.owfn").c_str()), std::ios_base::trunc);
+        //cout<<"adding... "<<filename+"_"+c.cname+".owfn"<<endl;
+        //PetriNet netcompl=cn
+        nnp.compose(diff, "1", "2");
+        //addinterfcompl adds complementary places to the process to all but interface places
+        //and adds patterns  correspondingly
+        PetriNet nnnn = addinterfcompl(nnp, c.inputl, c.outputl);
+        //cout <<endl << "all size="<<all.size()<<endl;
+        oc << pnapi::io::owfn << nnnn;//print the composition
+    }
+
+    //cout<<"component "<<c.fileprefix+" "+c.cname+" of size "<<c.sizep<<endl;
 }

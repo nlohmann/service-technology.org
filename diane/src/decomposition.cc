@@ -135,11 +135,11 @@ int decomposition::computeComponentsByUnionFind(PetriNet& net, int* tree, int si
         }
     } while (hasChanged);
 
-	if (args_info.service_flag) {
-		
+    if (args_info.service_flag) {
+
         net.getFinalCondition().dnf();
         const pnapi::formula::Formula* f = dynamic_cast<const pnapi::formula::Formula*>(&net.getFinalCondition().getFormula());
-		
+
         std::set<std::string> ss;//set of marked places final markings
         if (typeid(*f) == typeid(pnapi::formula::Disjunction)) {
             const pnapi::formula::Disjunction* fd = dynamic_cast<const pnapi::formula::Disjunction*>(f);
@@ -152,12 +152,12 @@ int decomposition::computeComponentsByUnionFind(PetriNet& net, int* tree, int si
                         if (fp->getTokens() > 0) { //insert only if it is non-zero or it is zero with strict greater sign
                             ss.insert(fp->getPlace().getName());
                         }
-			if(typeid(**cIt)==typeid(pnapi::formula::FormulaGreater)){
-				ss.insert(fp->getPlace().getName() );
-			}	
+                        if (typeid(**cIt) == typeid(pnapi::formula::FormulaGreater)) {
+                            ss.insert(fp->getPlace().getName());
+                        }
                     }
                 }
-				
+
             }
         }
         if (typeid(*f) == typeid(pnapi::formula::Conjunction)) {
@@ -168,40 +168,40 @@ int decomposition::computeComponentsByUnionFind(PetriNet& net, int* tree, int si
                 if (fp->getTokens() > 0) {
                     ss.insert(fp->getPlace().getName());
                 }
-		if(typeid(**cIt)==typeid(pnapi::formula::FormulaGreater)){
-			ss.insert(fp->getPlace().getName() );
-		}	
+                if (typeid(**cIt) == typeid(pnapi::formula::FormulaGreater)) {
+                    ss.insert(fp->getPlace().getName());
+                }
 
             }
         }
-		
-		
-		//threshold: it may be given by the user or we may make it net dependent on the structure
-		//experiments showed that net dependent parameters are not worthwhile mentioneing
-		unsigned int k=0;
-		unsigned int threshold=3;//net.getInternalPlaces().size()/5;
-		if (args_info.threshold_given) {
-			threshold=args_info.threshold_arg;
-		}		
-		set<std::string> datas;	
-		if (args_info.interface_arg){
-			// set of strings involved
-			for (unsigned i = 0; i < args_info.interface_given; ++i){
-				std::string s=args_info.interface_arg[i];
-				cout<<s<<endl;
-	 			datas.insert(s);
-			}
-		}
-	//instead of going through the places arbitrarily as the new pnapi sets us up
-	//we may set up a particular ordering of the set of places
-	vector<string> sop=setPlaceOrder(net);	
-	for (int p = 0; p < sop.size(); ++p){
-		const std::string sp=sop.at(p);
-		
-		Place *it=net.findPlace(sp);
-        //for (set< Place*>::iterator it = net.getPlaces().begin(); it != net.getPlaces().end(); ++it) {
+
+
+        //threshold: it may be given by the user or we may make it net dependent on the structure
+        //experiments showed that net dependent parameters are not worthwhile mentioneing
+        unsigned int k = 0;
+        unsigned int threshold = 3; //net.getInternalPlaces().size()/5;
+        if (args_info.threshold_given) {
+            threshold = args_info.threshold_arg;
+        }
+        set<std::string> datas;
+        if (args_info.interface_arg) {
+            // set of strings involved
+            for (unsigned i = 0; i < args_info.interface_given; ++i) {
+                std::string s = args_info.interface_arg[i];
+                cout << s << endl;
+                datas.insert(s);
+            }
+        }
+        //instead of going through the places arbitrarily as the new pnapi sets us up
+        //we may set up a particular ordering of the set of places
+        vector<string> sop = setPlaceOrder(net);
+        for (int p = 0; p < sop.size(); ++p) {
+            const std::string sp = sop.at(p);
+
+            Place* it = net.findPlace(sp);
+            //for (set< Place*>::iterator it = net.getPlaces().begin(); it != net.getPlaces().end(); ++it) {
             //const std::string sp = (*it)->getName(); cout<<sp<<endl;
-			//if we hit an initially marked place or an finally marked place
+            //if we hit an initially marked place or an finally marked place
             if ((it)->getTokenCount() || (ss.find(sp) != ss.end())) {
                 for (set<Node*>::iterator t = (it)->getPreset().begin(); t != (it)->getPreset().end(); ++t) {
                     Union(remap[it], remap[*t], tree);
@@ -210,22 +210,26 @@ int decomposition::computeComponentsByUnionFind(PetriNet& net, int* tree, int si
                     Union(remap[it], remap[*t], tree);
                 }
             }//if we don't hit interface labels, then the threshold comes into play before we do union
-			//first interface labels
-	   else if (args_info.threshold_given && noInterfaceLabel(datas,sp)){
-				if((k!=threshold)) k++;
-				else {
-					k=0;continue;
-				}
-				for (set<Node *>::iterator t = (it)->getPreset().begin(); t != (it)->getPreset().end(); ++t)
-					Union(remap[it], remap[*t], tree);
-				for (set<Node *>::iterator t = (it)->getPostset().begin(); t != (it)->getPostset().end(); ++t)
-					Union(remap[it], remap[*t], tree);
-					}
-			}
-
+            //first interface labels
+            else if (args_info.threshold_given && noInterfaceLabel(datas, sp)) {
+                if ((k != threshold)) {
+                    k++;
+                } else {
+                    k = 0;
+                    continue;
+                }
+                for (set<Node*>::iterator t = (it)->getPreset().begin(); t != (it)->getPreset().end(); ++t) {
+                    Union(remap[it], remap[*t], tree);
+                }
+                for (set<Node*>::iterator t = (it)->getPostset().begin(); t != (it)->getPostset().end(); ++t) {
+                    Union(remap[it], remap[*t], tree);
+                }
+            }
         }
-    
-	
+
+    }
+
+
     // output: number of components
     int n = 0;
     for (int i = 0; i < psize; ++i)
@@ -236,50 +240,53 @@ int decomposition::computeComponentsByUnionFind(PetriNet& net, int* tree, int si
         if (tree[i] < 0) {
             n++;
         }
-	status("number of components before creating them %d", n);
-	status("%d components", n);
+    status("number of components before creating them %d", n);
+    status("%d components", n);
     return n;
 }
 
 
-void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, PetriNet &net,int* tree, int size, int psize, map<int, Node*> &reremap) {
-	const pnapi::formula::FormulaGreater *fge=NULL;const pnapi::formula::FormulaEqual *fe=NULL;
-	const pnapi::formula::Proposition *fp;
-	std::string sfp;
-	std::set< const Place * > ep=net.getFinalCondition().getFormula().getEmptyPlaces();
-	
-	
-	if (args_info.service_flag)
-	{ // find out the final conditions for the services
-		
-		net.getFinalCondition().dnf(); 
-		const pnapi::formula::Formula * f=dynamic_cast<const pnapi::formula::Formula *>(&net.getFinalCondition().getFormula());
-		if(typeid(*f)==typeid(pnapi::formula::Conjunction)){
-			const pnapi::formula::Conjunction *fc=dynamic_cast<const pnapi::formula::Conjunction *>(f);
-			for(std::set<const pnapi::formula::Formula *>::iterator cIt=fc->getChildren().begin();cIt!=fc->getChildren().end();++cIt){
-				fp=dynamic_cast<const pnapi::formula::Proposition *>(*cIt);
-				if(ep.find(&fp->getPlace())!=ep.end()) continue;
-				sfp=fp->getPlace().getName();
-				//find out whether it is an equality or an inequality
-				if(typeid(**cIt)==typeid(pnapi::formula::FormulaEqual)){//cout<<"hallo"<<sfp<<endl;
-					fe=dynamic_cast<const pnapi::formula::FormulaEqual *>(*cIt);
-					//fe->output(cout);
-				}
-				if(typeid(**cIt)==typeid(pnapi::formula::FormulaGreater)){
-					fge=dynamic_cast<const pnapi::formula::FormulaGreater *>(*cIt);//fge->output(cout);
-					//cout<<"hallo"<<sfp<<endl;
-					
-				}				
-				
-				//const Place *pp=new Place(fp->getPlace());
-				//if(fp->getTokens()>0)
-				//	ss.insert( fp->getPlace().getName() );
-			}
-		}
-	}	
-	//cout<<"sfp"<<fe->getTokens()<<endl;
+void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, PetriNet& net, int* tree, int size, int psize, map<int, Node*> &reremap) {
+    const pnapi::formula::FormulaGreater* fge = NULL;
+    const pnapi::formula::FormulaEqual* fe = NULL;
+    const pnapi::formula::Proposition* fp;
+    std::string sfp;
+    std::set< const Place* > ep = net.getFinalCondition().getFormula().getEmptyPlaces();
+
+
+    if (args_info.service_flag) {
+        // find out the final conditions for the services
+
+        net.getFinalCondition().dnf();
+        const pnapi::formula::Formula* f = dynamic_cast<const pnapi::formula::Formula*>(&net.getFinalCondition().getFormula());
+        if (typeid(*f) == typeid(pnapi::formula::Conjunction)) {
+            const pnapi::formula::Conjunction* fc = dynamic_cast<const pnapi::formula::Conjunction*>(f);
+            for (std::set<const pnapi::formula::Formula*>::iterator cIt = fc->getChildren().begin(); cIt != fc->getChildren().end(); ++cIt) {
+                fp = dynamic_cast<const pnapi::formula::Proposition*>(*cIt);
+                if (ep.find(&fp->getPlace()) != ep.end()) {
+                    continue;
+                }
+                sfp = fp->getPlace().getName();
+                //find out whether it is an equality or an inequality
+                if (typeid(**cIt) == typeid(pnapi::formula::FormulaEqual)) { //cout<<"hallo"<<sfp<<endl;
+                    fe = dynamic_cast<const pnapi::formula::FormulaEqual*>(*cIt);
+                    //fe->output(cout);
+                }
+                if (typeid(**cIt) == typeid(pnapi::formula::FormulaGreater)) {
+                    fge = dynamic_cast<const pnapi::formula::FormulaGreater*>(*cIt); //fge->output(cout);
+                    //cout<<"hallo"<<sfp<<endl;
+
+                }
+
+                //const Place *pp=new Place(fp->getPlace());
+                //if(fp->getTokens()>0)
+                //  ss.insert( fp->getPlace().getName() );
+            }
+        }
+    }
+    //cout<<"sfp"<<fe->getTokens()<<endl;
     //create components, and services respectively
-	for (int i = 0; i < psize; ++i) {
+    for (int i = 0; i < psize; ++i) {
         if (tree[i] == -1) {
             continue;    // interface place found
         }
@@ -289,47 +296,45 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
             nets[x] = new PetriNet();
         }
         Place* p = static_cast<Place*>(reremap[i]);
-        Place *pi=&nets[x]->createPlace(p->getName(), p->getTokenCount());
-		//Place *pi=&nets[x]->createPlace(p->getName(), Node::INTERNAL, p->getTokenCount());
-		
-		//the final marking and the initial marking
-		if (args_info.service_flag){
-			/*const Place *pp=&fp->getPlace();*/
-			//cout<<"hallo"<<sfp<<endl;//
-			if (p->getName()==sfp) {
-				if (fe!=NULL) {
-					pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*pi,fe->getTokens()));
-					nets[x]->getFinalCondition().addProposition(prop);
-					//cout<<"hallo"<<sfp<<endl;//
-					//nets[x]->getFinalCondition().formula().output(std::cout);
-				}
-				else {//cout<<"greater"<<std::endl;
-					pnapi::formula::FormulaGreater prop(pnapi::formula::FormulaGreater(*pi,fge->getTokens()));
-					nets[x]->getFinalCondition().addProposition(prop);///fge->output(cout);
-					
-				}
-			}
-			//net[x]->getFinalCondition()=net->getFinalCondition().getFormula();
-			// add a place and arcs
-			//add complement places -- //make it safe
-			if (args_info.threshold_given){
-				Place * place = nets[x]->findPlace(p->getName()+"$compl");
-				//Place * php= net.findPlace(p->getName());
-				//if ( php != NULL) cout<<"naspa";
-				if ( (place == NULL && p->getTokenCount()==0))
-				{
-					place = &nets[x]->createPlace(p->getName()+"$compl", 1,1);
-					pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*place,1));
-					nets[x]->getFinalCondition().addProposition(prop);//nets[x]->getFinalCondition().formula().output(std::cout);
-				//if(p->getName()=="omega") {pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*place,0));nets[x]->getFinalCondition().addProposition(prop);}
-				//else {pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*place,1));nets[x]->getFinalCondition().addProposition(prop);}
-				//nets[x]->getFinalCondition().formula().output(std::cout);
-				//cout<<php->getPresetArcs().size();
-				}
-			}
-		}
+        Place* pi = &nets[x]->createPlace(p->getName(), p->getTokenCount());
+        //Place *pi=&nets[x]->createPlace(p->getName(), Node::INTERNAL, p->getTokenCount());
+
+        //the final marking and the initial marking
+        if (args_info.service_flag) {
+            /*const Place *pp=&fp->getPlace();*/
+            //cout<<"hallo"<<sfp<<endl;//
+            if (p->getName() == sfp) {
+                if (fe != NULL) {
+                    pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*pi, fe->getTokens()));
+                    nets[x]->getFinalCondition().addProposition(prop);
+                    //cout<<"hallo"<<sfp<<endl;//
+                    //nets[x]->getFinalCondition().formula().output(std::cout);
+                } else { //cout<<"greater"<<std::endl;
+                    pnapi::formula::FormulaGreater prop(pnapi::formula::FormulaGreater(*pi, fge->getTokens()));
+                    nets[x]->getFinalCondition().addProposition(prop);///fge->output(cout);
+
+                }
+            }
+            //net[x]->getFinalCondition()=net->getFinalCondition().getFormula();
+            // add a place and arcs
+            //add complement places -- //make it safe
+            if (args_info.threshold_given) {
+                Place* place = nets[x]->findPlace(p->getName() + "$compl");
+                //Place * php= net.findPlace(p->getName());
+                //if ( php != NULL) cout<<"naspa";
+                if ((place == NULL && p->getTokenCount() == 0)) {
+                    place = &nets[x]->createPlace(p->getName() + "$compl", 1, 1);
+                    pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*place, 1));
+                    nets[x]->getFinalCondition().addProposition(prop);//nets[x]->getFinalCondition().formula().output(std::cout);
+                    //if(p->getName()=="omega") {pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*place,0));nets[x]->getFinalCondition().addProposition(prop);}
+                    //else {pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*place,1));nets[x]->getFinalCondition().addProposition(prop);}
+                    //nets[x]->getFinalCondition().formula().output(std::cout);
+                    //cout<<php->getPresetArcs().size();
+                }
+            }
+        }
     }
-	
+
     for (int i = psize; i < size; ++i) {
         int x = Find(i, tree);
         if (nets[x] == NULL) {
@@ -342,161 +347,156 @@ void decomposition::createOpenNetComponentsByUnionFind(vector<PetriNet*> &nets, 
             Place* place = &(*f)->getPlace();
             Place* netPlace = nets[x]->findPlace(place->getName());
             if (netPlace == NULL) { //it's not a place
-				// but it could be an output label already, check that first
-					bool islabel=false;
-				if(args_info.threshold_given){
-				set<pnapi::Label *> outputl=nets[x]->getInterface().getOutputLabels();
-				for (set<pnapi::Label *>::iterator oi=outputl.begin(); oi!=outputl.end(); ++oi) {
-					if ((*oi)->getName()==place->getName()) {
-						islabel=true;
-						//cout<<"is label"<<std::endl;
-						//t->removeLabel(**oi);
-						std::map< std::string, pnapi::Port * >  xx=nets[x]->getInterface().getPorts();
-						for (std::map< std::string, pnapi::Port *>::iterator ti=xx.begin(); ti!=xx.end(); ++ti) {
-							pnapi::Port * p=(*ti).second;
-							p->removeLabel((*oi)->getName());
-						}
-						
-						//make a place from it and create complement place
-						try{
-							netPlace=&nets[x]->createPlace(place->getName(),0);
-						}
-						catch (pnapi::exception::UserCausedError e) {
-							e.output(cout);//cout<<"create"<<std::endl;
-						}
-						if (nets[x]->findPlace(place->getName()+"$compl")==NULL) {
-							Place *placec = &nets[x]->createPlace(netPlace->getName()+"$compl", 1,1);
-							pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*placec,1));
-							nets[x]->getFinalCondition().addProposition(prop);
-						}
-						nets[x]->createArc(*netPlace, *t, (*f)->getWeight());
-						//build a complement 
-						//if (args_info.complementary_flag){
-						if (nets[x]->findPlace(place->getName()+"$compl")==NULL) {
-							Place *placec = &nets[x]->createPlace(netPlace->getName()+"$compl", 1,1);
-							pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*placec,1));
-							nets[x]->getFinalCondition().addProposition(prop);
-						}
-						//it is internal, create an arc for the complementary
-						//make it internal 
-						if (nets[x]->findPlace(place->getName()+"$compl")!=NULL) {
-							//cout <<endl<<place->getName()<< "gasit";// initially marked
-							//if(place->getTokenCount()||place->getName()==sfp) nets[x]->createArc( *nets[x]->findPlace(place->getName()+"_compl"),*t, (*f)->getWeight());
-							nets[x]->createArc(*t, *nets[x]->findPlace(place->getName()+"$compl"), (*f)->getWeight());
-							//cout << "created arc from "<<t->getName()<<" to "<<place->getName()+"$compl"<<endl;
-						}
-					}
-				}
-				}
-				//make an input label
-                if(!islabel) {
-					if(nets[x]->getInterface().findLabel(place->getName())==NULL){
-					pnapi::Label& netLabel = nets[x]->getInterface().addInputLabel(place->getName());
-					t->addLabel(netLabel, (*f)->getWeight());
-					//cout << "input"<<netLabel.getName()<<std::endl;
-					}
-					else
-					{
-					  t->addLabel(*nets[x]->getInterface().findLabel(place->getName()), (*f)->getWeight());
-					//cout << "input label already exists" << std::endl;
-					}
-				}
+                // but it could be an output label already, check that first
+                bool islabel = false;
+                if (args_info.threshold_given) {
+                    set<pnapi::Label*> outputl = nets[x]->getInterface().getOutputLabels();
+                    for (set<pnapi::Label*>::iterator oi = outputl.begin(); oi != outputl.end(); ++oi) {
+                        if ((*oi)->getName() == place->getName()) {
+                            islabel = true;
+                            //cout<<"is label"<<std::endl;
+                            //t->removeLabel(**oi);
+                            std::map< std::string, pnapi::Port* >  xx = nets[x]->getInterface().getPorts();
+                            for (std::map< std::string, pnapi::Port*>::iterator ti = xx.begin(); ti != xx.end(); ++ti) {
+                                pnapi::Port* p = (*ti).second;
+                                p->removeLabel((*oi)->getName());
+                            }
+
+                            //make a place from it and create complement place
+                            try {
+                                netPlace = &nets[x]->createPlace(place->getName(), 0);
+                            } catch (pnapi::exception::UserCausedError& e) {
+                                e.output(cout);//cout<<"create"<<std::endl;
+                            }
+                            if (nets[x]->findPlace(place->getName() + "$compl") == NULL) {
+                                Place* placec = &nets[x]->createPlace(netPlace->getName() + "$compl", 1, 1);
+                                pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*placec, 1));
+                                nets[x]->getFinalCondition().addProposition(prop);
+                            }
+                            nets[x]->createArc(*netPlace, *t, (*f)->getWeight());
+                            //build a complement
+                            //if (args_info.complementary_flag){
+                            if (nets[x]->findPlace(place->getName() + "$compl") == NULL) {
+                                Place* placec = &nets[x]->createPlace(netPlace->getName() + "$compl", 1, 1);
+                                pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*placec, 1));
+                                nets[x]->getFinalCondition().addProposition(prop);
+                            }
+                            //it is internal, create an arc for the complementary
+                            //make it internal
+                            if (nets[x]->findPlace(place->getName() + "$compl") != NULL) {
+                                //cout <<endl<<place->getName()<< "gasit";// initially marked
+                                //if(place->getTokenCount()||place->getName()==sfp) nets[x]->createArc( *nets[x]->findPlace(place->getName()+"_compl"),*t, (*f)->getWeight());
+                                nets[x]->createArc(*t, *nets[x]->findPlace(place->getName() + "$compl"), (*f)->getWeight());
+                                //cout << "created arc from "<<t->getName()<<" to "<<place->getName()+"$compl"<<endl;
+                            }
+                        }
+                    }
+                }
+                //make an input label
+                if (!islabel) {
+                    if (nets[x]->getInterface().findLabel(place->getName()) == NULL) {
+                        pnapi::Label& netLabel = nets[x]->getInterface().addInputLabel(place->getName());
+                        t->addLabel(netLabel, (*f)->getWeight());
+                        //cout << "input"<<netLabel.getName()<<std::endl;
+                    } else {
+                        t->addLabel(*nets[x]->getInterface().findLabel(place->getName()), (*f)->getWeight());
+                        //cout << "input label already exists" << std::endl;
+                    }
+                }
             } else {
-				//it is an internal place create its complement
-              nets[x]->createArc(*netPlace, *t, (*f)->getWeight());
-				//build a complement 			
-				if(args_info.threshold_given){//if (args_info.complementary_flag){
-					if (nets[x]->findPlace(place->getName()+"$compl")==NULL) {
-						Place *placec = &nets[x]->createPlace(netPlace->getName()+"$compl", 1,1);
-						pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*placec,1));
-						nets[x]->getFinalCondition().addProposition(prop);
-					}
-				}
-			}
-		}
-		//if(args_info.threshold_given){
-		set<Arc*> postset = reremap[i]->getPostsetArcs();
-		for (set<Arc*>::iterator f = postset.begin(); f != postset.end(); ++f) {
+                //it is an internal place create its complement
+                nets[x]->createArc(*netPlace, *t, (*f)->getWeight());
+                //build a complement
+                if (args_info.threshold_given) { //if (args_info.complementary_flag){
+                    if (nets[x]->findPlace(place->getName() + "$compl") == NULL) {
+                        Place* placec = &nets[x]->createPlace(netPlace->getName() + "$compl", 1, 1);
+                        pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*placec, 1));
+                        nets[x]->getFinalCondition().addProposition(prop);
+                    }
+                }
+            }
+        }
+        //if(args_info.threshold_given){
+        set<Arc*> postset = reremap[i]->getPostsetArcs();
+        for (set<Arc*>::iterator f = postset.begin(); f != postset.end(); ++f) {
             Place* place = &(*f)->getPlace();
             Place* netPlace = nets[x]->findPlace(place->getName());
             if (netPlace == NULL) {
-				//check if it is already a label
-				bool islabel=false;
-				if(args_info.threshold_given){
-				//check if it is an input label
-				set<pnapi::Label *> outputl=nets[x]->getInterface().getInputLabels();
-				for (set<pnapi::Label *>::iterator oi=outputl.begin(); oi!=outputl.end(); ++oi) {
-					if ((*oi)->getName()==place->getName()) {
-						islabel=true;
-						
-						std::map< std::string, pnapi::Port * >  xx=nets[x]->getInterface().getPorts();
-						for (std::map< std::string, pnapi::Port *>::iterator ti=xx.begin(); ti!=xx.end(); ++ti) {
-							pnapi::Port * p=(*ti).second;
-							p->removeLabel((*oi)->getName());
-						}
-						//delete the label then make a place from it 
-						//const std::set<Transition*> set=(*oi)->getTransitions();
-						//for (std::set<Transition*>::iterator ti=set.begin(); ti!=set.end(); ++ti) {
-						//	(*ti)->removeLabel(**oi);
-						//}
-						//t->removeLabel(**oi);
-						//if (nets[x]) {
-						//	
-						//}
-						try{
-						netPlace=&nets[x]->createPlace(place->getName(),0);
-						}
-						catch (pnapi::exception::UserCausedError e) {
-							e.output(cout);
-						}
-						if(netPlace!=NULL){if (nets[x]->findPlace(place->getName()+"$compl")==NULL) {
-							try{
-							Place *placec = &nets[x]->createPlace(netPlace->getName()+"$compl", 1,1);
-							
-							pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*placec,1));
-							nets[x]->getFinalCondition().addProposition(prop);
-							}catch (pnapi::exception::UserCausedError e) {
-								e.output(cout);
-							}
-						}
-						nets[x]->createArc(*t, *netPlace, (*f)->getWeight());
-						if (nets[x]->findPlace(place->getName()+"$compl")!=NULL) {
-							nets[x]->createArc( *nets[x]->findPlace(place->getName()+"$compl"), *t,(*f)->getWeight());
-						}}
-					}
-				}
-				}
-				if (!islabel){ //make it an output label
-					if(nets[x]->getInterface().findLabel(place->getName())==NULL){
-					pnapi::Label& netLabel = nets[x]->getInterface().addOutputLabel(place->getName());
-						t->addLabel(netLabel, (*f)->getWeight());}
-					else
-					{
-					  t->addLabel(*nets[x]->getInterface().findLabel(place->getName()), (*f)->getWeight());
-					}
-				}
-            } 
-			else {//it is an internal place
-				nets[x]->createArc(*t, *netPlace, (*f)->getWeight());
-				if(args_info.threshold_given){
-					if (nets[x]->findPlace(place->getName()+"$compl")==NULL) {
-						try{
-						Place *placec = &nets[x]->createPlace(netPlace->getName()+"$compl", 1,1);
-						pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*placec,1));
-						nets[x]->getFinalCondition().addProposition(prop);
-						}
-						catch (pnapi::exception::UserCausedError e) {
-							e.output(cout);
-						}
-					}
-				
-					if (nets[x]->findPlace(place->getName()+"$compl")!=NULL) {
-					
-						nets[x]->createArc( *nets[x]->findPlace(place->getName()+"$compl"), *t,(*f)->getWeight());
-					}
-				}	
-			}
+                //check if it is already a label
+                bool islabel = false;
+                if (args_info.threshold_given) {
+                    //check if it is an input label
+                    set<pnapi::Label*> outputl = nets[x]->getInterface().getInputLabels();
+                    for (set<pnapi::Label*>::iterator oi = outputl.begin(); oi != outputl.end(); ++oi) {
+                        if ((*oi)->getName() == place->getName()) {
+                            islabel = true;
+
+                            std::map< std::string, pnapi::Port* >  xx = nets[x]->getInterface().getPorts();
+                            for (std::map< std::string, pnapi::Port*>::iterator ti = xx.begin(); ti != xx.end(); ++ti) {
+                                pnapi::Port* p = (*ti).second;
+                                p->removeLabel((*oi)->getName());
+                            }
+                            //delete the label then make a place from it
+                            //const std::set<Transition*> set=(*oi)->getTransitions();
+                            //for (std::set<Transition*>::iterator ti=set.begin(); ti!=set.end(); ++ti) {
+                            //  (*ti)->removeLabel(**oi);
+                            //}
+                            //t->removeLabel(**oi);
+                            //if (nets[x]) {
+                            //
+                            //}
+                            try {
+                                netPlace = &nets[x]->createPlace(place->getName(), 0);
+                            } catch (pnapi::exception::UserCausedError& e) {
+                                e.output(cout);
+                            }
+                            if (netPlace != NULL) {
+                                if (nets[x]->findPlace(place->getName() + "$compl") == NULL) {
+                                    try {
+                                        Place* placec = &nets[x]->createPlace(netPlace->getName() + "$compl", 1, 1);
+
+                                        pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*placec, 1));
+                                        nets[x]->getFinalCondition().addProposition(prop);
+                                    } catch (pnapi::exception::UserCausedError& e) {
+                                        e.output(cout);
+                                    }
+                                }
+                                nets[x]->createArc(*t, *netPlace, (*f)->getWeight());
+                                if (nets[x]->findPlace(place->getName() + "$compl") != NULL) {
+                                    nets[x]->createArc(*nets[x]->findPlace(place->getName() + "$compl"), *t, (*f)->getWeight());
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!islabel) { //make it an output label
+                    if (nets[x]->getInterface().findLabel(place->getName()) == NULL) {
+                        pnapi::Label& netLabel = nets[x]->getInterface().addOutputLabel(place->getName());
+                        t->addLabel(netLabel, (*f)->getWeight());
+                    } else {
+                        t->addLabel(*nets[x]->getInterface().findLabel(place->getName()), (*f)->getWeight());
+                    }
+                }
+            } else { //it is an internal place
+                nets[x]->createArc(*t, *netPlace, (*f)->getWeight());
+                if (args_info.threshold_given) {
+                    if (nets[x]->findPlace(place->getName() + "$compl") == NULL) {
+                        try {
+                            Place* placec = &nets[x]->createPlace(netPlace->getName() + "$compl", 1, 1);
+                            pnapi::formula::FormulaEqual prop(pnapi::formula::FormulaEqual(*placec, 1));
+                            nets[x]->getFinalCondition().addProposition(prop);
+                        } catch (pnapi::exception::UserCausedError& e) {
+                            e.output(cout);
+                        }
+                    }
+
+                    if (nets[x]->findPlace(place->getName() + "$compl") != NULL) {
+
+                        nets[x]->createArc(*nets[x]->findPlace(place->getName() + "$compl"), *t, (*f)->getWeight());
+                    }
+                }
             }
         }
-    
+    }
+
 }

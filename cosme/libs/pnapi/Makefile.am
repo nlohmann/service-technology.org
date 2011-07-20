@@ -1,7 +1,7 @@
 ##################################
 # This file has been generated   #
 # automaticall by compiling      #
-# Petri Net API 4.02 #
+# Petri Net API 4.03-unreleased #
 #                                #
 # You MUST NOT change this file. #
 ##################################

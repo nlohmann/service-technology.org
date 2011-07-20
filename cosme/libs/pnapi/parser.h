@@ -20,6 +20,7 @@
 
 #include <sstream>
 #include <vector>
+#include <cstdio> /* to have EOF defined */
 
 namespace pnapi
 {

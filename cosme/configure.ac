@@ -27,7 +27,7 @@ AC_PROG_YACC
 AC_ST_BASIC
 AC_ST_LOLA([1.16])
 AC_ST_AUTOTEST
-AC_ST_PNAPI([4.02])
+AC_ST_PNAPI([4.03])
 AC_ST_VERBOSE
 
 # search for optional tools needed by "make check"

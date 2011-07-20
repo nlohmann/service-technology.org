@@ -46,6 +46,14 @@ TESTFILES = activeCausal.lola \
 NO_COVER_FILES = */libs/* */lexic_*.cc */syntax_*.cc */cmdline.* */verbose.* */Output.*
 
 
+#------------------------------#
+# Part 2a: Tool-specific fixes #
+#------------------------------#
+
+# If LoLA is not installed, the path to the binary needs to be passed as an
+# environment variable to the test scripts.
+TESTSUITEFLAGS = LOLA=$(LOLA)
+
 #--------------------------------------------------------#
 # Part 3: Generics -- YOU MUST NOT CHANGE ANYTHING BELOW #
 #--------------------------------------------------------#

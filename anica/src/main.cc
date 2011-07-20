@@ -110,6 +110,13 @@ void evaluateParameters(int argc, char** argv) {
         }
     }
 
+	// set LoLA if it is present in the environment and not set otherwise
+    if (getenv("LOLA") != NULL and not args_info.lola_given) {
+        status("using environment variable '%s' set to '%s'",
+            _cfilename_("LOLA"), _cfilename_(getenv("LOLA")));
+        free(args_info.lola_arg);
+        args_info.lola_arg = strdup(getenv("LOLA"));
+    }
 
     // check whether at most one file is given
     if (args_info.inputs_num > 1) {

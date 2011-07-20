@@ -5,7 +5,7 @@ AC_MSG_NOTICE([ / ___|___  ___ _ __ ___   ___ ])
 AC_MSG_NOTICE([| |   / _ \\/ __| '_ ` _ \\ / _ \\])
 AC_MSG_NOTICE([| |__| (_) \__ \ | | | | |  __/])
 AC_MSG_NOTICE([ \____\___/|___/_| |_| |_|\___|])
-AC_MSG_NOTICE([checking simulation, matching, and equivalence])
+AC_MSG_NOTICE([Checking Simulation, Matching, and Equivalence])
 AC_MSG_NOTICE([${PACKAGE_URL}])
 AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
 AC_MSG_NOTICE()
@@ -25,7 +25,7 @@ AC_PROG_YACC
 
 # use the service-technology.org macros
 AC_ST_BASIC
-AC_ST_LOLA([1.14])
+AC_ST_LOLA([1.16])
 AC_ST_AUTOTEST
 AC_ST_PNAPI([4.02])
 AC_ST_VERBOSE
@@ -42,6 +42,6 @@ AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 
 # write files
-AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile doc/Doxyfile tests/Makefile tests/package.m4])
+AC_CONFIG_FILES([Makefile libs/pnapi/Makefile src/Makefile src/cosme.conf doc/Doxyfile tests/Makefile tests/package.m4])
 AC_CONFIG_FILES([tests/cover.sh], [chmod +x tests/cover.sh])
 AC_OUTPUT

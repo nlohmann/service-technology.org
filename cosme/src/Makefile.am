@@ -16,6 +16,12 @@ cosme_SOURCES = og-syntax.yy og-lexic.ll \
                 Output.cc Output.h \
                 verbose.cc verbose.h
 
+# the configuration files
+sysconf_DATA = cosme.conf
+
+# pass the sysconfdir to Cosme (ugly, but see http://www.gnu.org/software/autoconf/manual/autoconf.html#Defining-Directories)
+cosme_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\"
+
 # only add the local Petri net API if necessary
 if COMPILE_PNAPI
 cosme_CPPFLAGS = -I$(top_srcdir)/libs -I$(top_srcdir)/libs/pnapi

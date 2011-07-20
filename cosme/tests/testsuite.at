@@ -26,7 +26,7 @@ AT_BANNER([Parameters])
 AT_SETUP([Determining runtime and allocated memory])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/OGs/AP.bits.og TESTFILES/Services/AP-partner.owfn .])
-AT_CHECK([COSME --matching -a AP.bits.og -c AP-partner.owfn --stats], 0, ignore, stderr)
+AT_CHECK([COSME --matching -a AP.bits.og -s AP-partner.owfn --stats], 0, ignore, stderr)
 AT_CHECK([GREP -q "runtime" stderr])
 AT_CHECK([GREP -q "memory consumption" stderr])
 AT_KEYWORDS(infrastructure)
@@ -35,7 +35,7 @@ AT_CLEANUP
 AT_SETUP([Results output])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/OGs/AP.bits.og TESTFILES/Services/AP-partner.owfn .])
-AT_CHECK([COSME --matching -a AP.bits.og -c AP-partner.owfn --resultFile=AP.results], 0, ignore, stderr)
+AT_CHECK([COSME --matching -a AP.bits.og -s AP-partner.owfn --resultFile=AP.results], 0, ignore, stderr)
 AT_CHECK([GREP -q "result = true;" AP.results])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
@@ -43,7 +43,7 @@ AT_CLEANUP
 AT_SETUP([Checking for memory leaks (Matching)])
 AT_CHECK([cp TESTFILES/OGs/AP.bits.og TESTFILES/Services/AP-partner.owfn .])
 AT_CHECK_LOLA
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes COSME_RAW --matching -a AP.bits.og -c AP-partner.owfn --finalize],0,ignore,stderr)
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes COSME_RAW --matching -a AP.bits.og -s AP-partner.owfn --finalize],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_CLEANUP
 
@@ -68,119 +68,119 @@ AT_BANNER([Matching])
 
 AT_SETUP([AP])
 AT_CHECK([cp TESTFILES/OGs/AP.bits.og TESTFILES/Services/AP-partner.owfn .])
-AT_CHECK([COSME --matching -a AP.bits.og -c AP-partner.owfn], 0, ignore, stderr)
+AT_CHECK([COSME --matching -a AP.bits.og -s AP-partner.owfn], 0, ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([auctionService])
 AT_CHECK([cp TESTFILES/OGs/auctionService.bits.og TESTFILES/Services/auctionService-partner.owfn .])
-AT_CHECK([COSME --matching -a auctionService.bits.og -c auctionService-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a auctionService.bits.og -s auctionService-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([BH])
 AT_CHECK([cp TESTFILES/OGs/BH.bits.og TESTFILES/Services/BH-partner.owfn .])
-AT_CHECK([COSME --matching -a BH.bits.og -c BH-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a BH.bits.og -s BH-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([CN])
 AT_CHECK([cp TESTFILES/OGs/CN.bits.og TESTFILES/Services/CN-partner.owfn .])
-AT_CHECK([COSME --matching -a CN.bits.og -c CN-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a CN.bits.og -s CN-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([DG])
 AT_CHECK([cp TESTFILES/OGs/DG.bits.og TESTFILES/Services/DG-partner.owfn .])
-AT_CHECK([COSME --matching -a DG.bits.og -c DG-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a DG.bits.og -s DG-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([loanApprovalProcess])
 AT_CHECK([cp TESTFILES/OGs/loanApprovalProcess.bits.og TESTFILES/Services/loanApprovalProcess-partner.owfn .])
-AT_CHECK([COSME --matching -a loanApprovalProcess.bits.og -c loanApprovalProcess-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a loanApprovalProcess.bits.og -s loanApprovalProcess-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([myCoffee])
 AT_CHECK([cp TESTFILES/OGs/myCoffee.bits.og TESTFILES/Services/myCoffee-partner.owfn .])
-AT_CHECK([COSME --matching -a myCoffee.bits.og -c myCoffee-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a myCoffee.bits.og -s myCoffee-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([phcontrol3.unf])
 AT_CHECK([cp TESTFILES/OGs/phcontrol3.unf.og TESTFILES/Services/phcontrol3.unf-partner.owfn .])
-AT_CHECK([COSME --matching -a phcontrol3.unf.og -c phcontrol3.unf-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a phcontrol3.unf.og -s phcontrol3.unf-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([PO])
 AT_CHECK([cp TESTFILES/OGs/PO.bits.og TESTFILES/Services/PO-partner.owfn .])
-AT_CHECK([COSME --matching -a PO.bits.og -c PO-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a PO.bits.og -s PO-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([QR])
 AT_CHECK([cp TESTFILES/OGs/QR.bits.og TESTFILES/Services/QR-partner.owfn .])
-AT_CHECK([COSME --matching -a QR.bits.og -c QR-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a QR.bits.og -s QR-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([RE])
 AT_CHECK([cp TESTFILES/OGs/RE.bits.og TESTFILES/Services/RE-partner.owfn .])
-AT_CHECK([COSME --matching -a RE.bits.og -c RE-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a RE.bits.og -s RE-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([RS])
 AT_CHECK([cp TESTFILES/OGs/RS.bits.og TESTFILES/Services/RS-partner.owfn .])
-AT_CHECK([COSME --matching -a RS.bits.og -c RS-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a RS.bits.og -s RS-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([TR])
 AT_CHECK([cp TESTFILES/OGs/TR.bits.og TESTFILES/Services/TR-partner.owfn .])
-AT_CHECK([COSME --matching -a TR.bits.og -c TR-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a TR.bits.og -s TR-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([internal])
 AT_CHECK([cp TESTFILES/OGs/internal.og TESTFILES/Services/internal_match.owfn .])
-AT_CHECK([COSME --matching -a internal.og -c internal_match.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a internal.og -s internal_match.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: failed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([internal_match])
 AT_CHECK([cp TESTFILES/OGs/internal-match.bits.og TESTFILES/Services/internal_match-partner.owfn .])
-AT_CHECK([COSME --matching -a internal-match.bits.og -c internal_match-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a internal-match.bits.og -s internal_match-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([interface_match])
 AT_CHECK([cp TESTFILES/OGs/interface_match.og TESTFILES/Services/interface-partner.owfn .])
-AT_CHECK([COSME --matching -a interface_match.og -c interface-partner.owfn],0,ignore, stderr)
+AT_CHECK([COSME --matching -a interface_match.og -s interface-partner.owfn],0,ignore, stderr)
 AT_CHECK([GREP -q "Matching: completed" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP
 
 AT_SETUP([SD])
 AT_CHECK([cp TESTFILES/OGs/SD.bits.og TESTFILES/Services/SD-partner.owfn .])
-AT_CHECK([COSME --matching -a SD.bits.og -c SD-partner.owfn],1,ignore,stderr)
+AT_CHECK([COSME --matching -a SD.bits.og -s SD-partner.owfn],1,ignore,stderr)
 AT_CHECK([GREP -q "cosme: the input open net has no transitions" stderr])
 AT_KEYWORDS(matching)
 AT_CLEANUP

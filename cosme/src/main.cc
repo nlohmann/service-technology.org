@@ -1,3 +1,22 @@
+/*****************************************************************************\
+ Cosme -- Checking Simulation, Matching, and Equivalence
+
+ Copyright (c) 2010 Andreas Lehmann
+
+ Cosme is free software: you can redistribute it and/or modify it under the
+ terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ Cosme is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
+ more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Cosme.  If not, see <http://www.gnu.org/licenses/>.
+\*****************************************************************************/
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -14,6 +33,7 @@
 #include "verbose.h"
 #include "util.h"
 #include "Results.h"
+#include "config-log.h"
 #include <pnapi/pnapi.h>
 
 // lexer and parser
@@ -44,6 +64,12 @@ OperatingGuideline* A;
 OperatingGuideline* B;
 Service* C;
 
+/// check if a file exists and can be opened for reading
+inline bool fileExists(const std::string& filename) {
+    std::ifstream tmp(filename.c_str(), std::ios_base::in);
+    return tmp.good();
+}
+
 // evaluate the command line parameters
 void evaluateParameters(int argc, char** argv) {
     // overwrite invocation for consistent error messages
@@ -60,6 +86,57 @@ void evaluateParameters(int argc, char** argv) {
     // call the cmdline parser
     if (cmdline_parser(argc, argv, &args_info) != 0) {
         abort(7, "invalid command-line parameter(s)");
+    }
+
+	// debug option
+    if (args_info.bug_flag) {
+        {
+            Output debug_output("bug.log", "configuration information");
+            debug_output.stream() << CONFIG_LOG;
+        }
+        message("Please send file '%s' to %s!", _cfilename_("bug.log"), _coutput_(PACKAGE_BUGREPORT));
+        exit(EXIT_SUCCESS);
+    }
+
+    // read a configuration file if necessary
+    if (args_info.config_given) {
+        // initialize the config file parser
+        params->initialize = 0;
+        params->override = 0;
+
+        // call the config file parser
+        if (cmdline_parser_config_file(args_info.config_arg, &args_info, params) != 0) {
+            abort(14, "error reading configuration file '%s'", args_info.config_arg);
+        } else {
+            status("using configuration file '%s'", _cfilename_(args_info.config_arg));
+        }
+    } else {
+        // check for configuration files
+        std::string conf_generic_filename = std::string(PACKAGE) + ".conf";
+        std::string conf_filename = fileExists(conf_generic_filename) ? conf_generic_filename :
+                                    (fileExists(std::string(SYSCONFDIR) + "/" + conf_generic_filename) ?
+                                    (std::string(SYSCONFDIR) + "/" + conf_generic_filename) : "");
+
+        if (conf_filename != "") {
+            // initialize the config file parser
+            params->initialize = 0;
+            params->override = 0;
+            if (cmdline_parser_config_file(const_cast<char*>(conf_filename.c_str()), &args_info, params) != 0) {
+                abort(14, "error reading configuration file '%s'", conf_filename.c_str());
+            } else {
+                status("using configuration file '%s'", _cfilename_(conf_filename));
+            }
+        } else {
+            status("not using a configuration file");
+        }
+    }
+
+    // set LoLA if it is present in the environment and not set otherwise
+    if (getenv("LOLA") != NULL and not args_info.lola_given) {
+        status("using environment variable '%s' set to '%s'",
+            _cfilename_("LOLA"), _cfilename_(getenv("LOLA")));
+        free(args_info.lola_arg);
+        args_info.lola_arg = strdup(getenv("LOLA"));
     }
 
     // check what to do

@@ -1,4 +1,4 @@
-AC_INIT(Diane, 1.1-unreleased, diane@service-technology.org, diane, http://service-technology.org/diane)
+AC_INIT(Diane, 1.1, diane@service-technology.org, diane, http://service-technology.org/diane)
 
 AC_MSG_NOTICE([ ____  _                  ])
 AC_MSG_NOTICE([|  _ \(_) __ _ _ __   ___ ])
@@ -14,19 +14,10 @@ AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 
-AM_INIT_AUTOMAKE(gnits)
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
-
-# Checks for programs.
-AC_PROG_CXX
-AM_PROG_CC_C_O
-AC_PROG_LEX
-AC_PROG_YACC
-
 # use the service-technology.org macros
 AC_ST_BASIC
 AC_ST_AUTOTEST
-AC_ST_PNAPI
+AC_ST_PNAPI([4.02])
 AC_ST_VERBOSE
 
 # check and set exact unsigned types

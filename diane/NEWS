@@ -6,8 +6,8 @@
                      http://service-technology.org/diane
 
 
-Version 1.1-unreleased
-======================
+Version 1.1
+===========
 
 * updated maintainer scripts
 
@@ -17,4 +17,7 @@ Version 1.1-unreleased
 
 * updated pnapi to version 4.02
 
-\nSee file ChangeLog <http://service-technology.org/files/diane/ChangeLog> for\ncomplete version history.\n
+
+See file ChangeLog <http://service-technology.org/files/diane/ChangeLog> for
+complete version history.
+

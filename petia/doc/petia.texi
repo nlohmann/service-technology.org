@@ -1,0 +1,430 @@
+\input texinfo
+@setfilename petia.info
+@include version.texi
+@afourpaper
+@finalout
+@settitle Petia User's Manual
+
+
+@c --------------------------------------------------------------------------
+
+
+@copying
+@b{About this document:}
+
+This manual is for Petia, version @value{VERSION}, a tool for finding equivalent places based on semipositive invariants, last updated @value{UPDATED}.
+
+Copyright @copyright{} 2011 Harro Wimmel
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, with the Front-Cover Texts being ``A GNU Manual,'' and with the Back-Cover Texts as in (a) below.  A copy of the license is included in the section entitled ``GNU Free Documentation License.''
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify this GNU Manual. Buying copies from GNU Press supports the FSF in developing GNU and promoting software freedom.''
+@end quotation
+@end copying
+
+@dircategory service-technology.org
+@direntry
+* Petia: (petia).       A tool for finding equivalent places based on semipositive invariants.
+@end direntry
+
+
+@c --------------------------------------------------------------------------
+
+
+@titlepage
+
+@title Petia
+
+@subtitle Place equivalence based on invariants
+@subtitle @url{http://service-technology.org/petia}
+@vskip 0.5em
+@subtitle Version @value{VERSION}, @value{UPDATED}
+
+@author Harro Wimmel
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+
+@c --------------------------------------------------------------------------
+
+
+@ifnottex
+@node Top
+@top Petia
+@insertcopying
+@end ifnottex
+
+
+@c --------------------------------------------------------------------------
+
+
+@menu
+* First Steps::How to set up and install Petia.
+* Command Line Options::How to run Petia.
+* Theory::The theory behind Petia.
+* Exit and Error Codes::What the error and exit codes of Petia mean.
+* ChangeLog::Version history.
+* GNU Free Documentation License::The license of this manual.
+@end menu
+
+@c --------------------------------------------------------------------------
+
+
+@contents
+@paragraphindent none
+
+
+@c --------------------------------------------------------------------------
+
+
+@node First Steps
+@chapter First Steps
+@section Setup and Installation
+
+@enumerate
+@item Go to @url{http://service-technology.org/files/petia} and download the latest release version of Petia, say @file{petia-@value{VERSION}.tar.gz}. To setup and compile Petia, change into your download directory and type
+
+@cartouche
+@smallexample
+tar xfz petia-@value{VERSION}.tar.gz
+cd petia-@value{VERSION}
+./configure
+make
+@end smallexample
+@end cartouche
+
+After compilation, a binary @samp{src/petia} is generated.@footnote{On Microsoft Windows, the file will be called @file{petia.exe}.} If you experience any compiler warnings, don't panic: Petia contains some generated or third party code that we cannot influence.
+
+@item To test whether everything went fine, type
+
+@cartouche
+@smallexample
+make check
+@end smallexample
+@end cartouche
+
+to execute the testcases located in @file{tests}. If everything went fine, you should see something like:
+
+@smallexample
+## ------------- ##
+## Test results. ##
+## ------------- ##
+
+All 21 tests were successful.
+@end smallexample
+
+If an error occurs, please send the output to @email{petia@@service-technology.org}.
+
+@item To install the binary, the manpage, and the documentation, type
+
+@cartouche
+@smallexample
+make install
+@end smallexample
+@end cartouche
+
+You might need superuser permissions to do so.
+@end enumerate
+
+If you need any further information, see file @file{INSTALL} for detailed instructions.
+
+
+@section Contents of the Distribution
+
+The distribution contains several directories:
+
+@table @file
+@item doc
+The Texinfo documentation of Petia. The documentation can be created using @samp{make pdf}. Note you need to have Petia properly installed before (see installation description above).
+
+@item libs
+Petia comes with some necessary tools and libraries: the Petri Net @acronym{API} to parse and organize Petri nets and the pseudo-boolean satisfiability solver @acronym{MiniSat+}.
+
+@item man
+The manpage of Petia which can be displayed using @samp{man petia} after having Petia installed (see installation description above).
+
+@item src
+The source code of Petia.
+
+@item tests
+Testcases for Petia which check the generated binary.
+@end table
+
+
+@c --------------------------------------------------------------------------
+
+
+@section Requirements
+@anchor{Requirements}
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+In order to run, compile, and develop Petia, several tools are required.
+
+@c <<-- CHANGE START (tools required, etc.) -->>
+
+@subsection Runtime
+@itemize
+@item At the moment, no other tools are required.
+@end itemize
+
+@c <<-- CHANGE END -->>
+
+@subsection Compilation
+To compile the source code from a source distribution, the following tools are required.
+
+@itemize
+@item GCC (@url{http://gcc.gnu.org/})
+@item @acronym{GNU} Make (@url{http://www.gnu.org/software/make/})
+@end itemize
+
+
+@subsection Development
+In case you want to make changes to the source code, the following tools are required to reconfigure and compile Petia.
+
+@itemize
+@item Autoconf, @url{http://www.gnu.org/software/autoconf/}
+@item Automake, @url{http://www.gnu.org/software/automake/}
+@item Bison, @url{http://www.gnu.org/software/bison/}
+@item flex, @url{http://flex.sourceforge.net/}
+@item Gengetopt, @url{http://www.gnu.org/software/gengetopt/}
+@item help2man, @url{http://www.gnu.org/software/help2man/}
+@item Texinfo, @url{http://www.gnu.org/software/texinfo/}
+@end itemize
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Please check our nightly build server at @url{http://service-technology.org/nightly} for the versions we use during development.
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Command Line Options
+@chapter Invoking Petia
+
+Petia is a command line tool and does not come with a fancy @acronym{GUI}. However, Petia can be easily scripted and combined with other tools.
+
+@section Command Line Options
+
+For an overview of the command line options, type @samp{petia -h} to see the following help screen:
+
+@smallexample
+@verbatiminclude cmdline.out
+@end smallexample
+
+
+@section Configuration Files
+
+The parameters can also be controlled using a configuration file that can be read using the @samp{config} option; for example:
+
+@cartouche
+@smallexample
+petia net.owfn --config=myconf.conf
+@end smallexample
+@end cartouche
+
+A configuration file consists of @code{parameter = value} lines, each line setting the value of a parameter. Note: If not all parameters are defined, the standard values apply.
+
+The configure script creates a default configuration file @file{petia.conf} which is located in the @file{src} folder. When installing Petia, this is copied to your sysconfig directory (usually @file{/usr/local/etc}).
+
+When Petia is executed, it evaluates parameters as follows:
+@enumerate
+@item When a configuration file is given via @option{--config}, it is used.
+@item Otherwise, the configuration file @file{petia.conf} in the local directory is used if present.
+@item Otherwise, the configuration file @file{petia.conf} in the sysconf directory (usually @file{/usr/local/etc}) is used if present.
+@item Otherwise, no configuration file is used.
+@end enumerate
+Parameters given via command-line will overwrite parameters given via configuration files.
+
+@section Input
+
+Petia reads a Petri net from standard input unless a filename is given on the command-line.
+The Petri net may be in various formats, so Petia needs to know which format the Petri net is in.
+There are three possibilities at the moment:
+
+@cartouche
+@smallexample
+petia --owfn
+petia --lola
+petia --pnml
+@end smallexample
+@end cartouche
+
+The option @option{--owfn} assumes the Petri net to be in the open net format, the option @option{--lola}
+takes the Petri net to be in the low-level LoLA format, and @option{--pnml} uses the PNML format for input.
+By default, Petri nets are assumed to be in PNML format.
+
+@section Output
+
+By default, Petia prints out a set of equivalence classes of the places of a given net.
+Two places are equivalent if in any semipositive place invariant of the net either
+both or none occur.
+
+The output can be given in a default format or in the format used by the tool Snoopy.
+For the latter, the option @option{--snoopy} can be given on the command line.
+
+
+
+@section Debugging
+
+The option @option{--verbose} may print out additional information if the standard
+format is selected.
+
+@c --------------------------------------------------------------------------
+
+
+@node Theory
+@chapter Theory
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Petia implements several algorithms and results published in several scientific articles.
+
+@c <<-- CHANGE START (theory) -->>
+
+@section Invariants of Petri nets
+
+A good overview over Petri nets in general, including invariants, can be found
+in Murata's often cited work:
+
+@quotation
+T. Murata. @b{Petri nets: Properties, analysis and applications}. @i{Proc. IEEE} @b{77}:4, pp.201--221, 1989.
+@end quotation
+
+@section Linear Programming Solver
+
+The Linear Programming Solver lp_solve can be found here:
+
+@quotation
+M. Berkelaar, K. Eikland, P. Notebaert. @b{lp_solve Reference Guide}, http://lpsolve.sourceforge.net/5.5/ (15.7.2011).
+@end quotation
+
+@c <<-- CHANGE END -->>
+
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+See @url{http://service-technology.org/publications} for more information.
+
+
+@c --------------------------------------------------------------------------
+
+
+@node Exit and Error Codes
+@chapter Exit and Error Codes
+@section Exit Codes
+
+Petia will exit with code @samp{0} in case everything went fine. That is, the command-line parameters were valid, the input Petri net could be read. In case any error occurs, the exit code will be @samp{1} and an error message with an error code (see below) will be printed to the standard error stream.
+
+@section Error Codes
+
+In case any error occurs, Petia aborts with exit code @samp{1} and prints a message with an error code to the standard error stream.
+
+@table @asis
+
+@c <<-- CHANGE START (exit/error codes) -->>
+
+@item #01
+The given filename for the Petri net file is not accessible or does not exist.
+
+@smallexample
+@cartouche
+petia: could not open file 'PETRINET' -- aborting [#01]
+@end cartouche
+@end smallexample
+
+@item #02
+The given Petri net file could not be interpreted correctly. Check the format options.
+
+@smallexample
+@cartouche
+petia: <varying error message from the parser> -- aborting [#02]
+@end cartouche
+@end smallexample
+
+@item #04
+More than one input file was given on the command line.
+
+@smallexample
+@cartouche
+petia: at most one input file must be given -- aborting [#04]
+@end cartouche
+@end smallexample
+
+@item #07
+Some option given on the command line is not allowed.
+
+@smallexample
+@cartouche
+petia: invalid command-line parameter(s) -- aborting [#07]
+@end cartouche
+@end smallexample
+
+@item #11
+An output file could not be created. As there are no output files at this time, this is a bug.
+
+@smallexample
+@cartouche
+petia: could not write to file 'FILENAME' -- aborting [#11]
+@end cartouche
+@end smallexample
+
+@item #12
+lp_solve failed, the problem instance may be too large to handle.
+
+@smallexample
+@cartouche
+petia: <various messages> -- aborting [#12]
+@end cartouche
+@end smallexample
+
+@item #13
+A temporary file could not be created. As temporary files are not used at the moment, this is a bug.
+
+@smallexample
+@cartouche
+petia: could not create to temporary file 'FILENAME' -- aborting [#13]
+@end cartouche
+@end smallexample
+
+@item #14
+The configuration file is missing or cannot be interpreted.
+
+@smallexample
+@cartouche
+petia: error reading configuration file 'FILENAME' -- aborting [#14]
+@end cartouche
+@end smallexample
+
+@c <<-- CHANGE END -->>
+
+@end table
+
+
+@c --------------------------------------------------------------------------
+
+
+@node ChangeLog
+@chapter Version History
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+Petia is developed under the ``Release Early, Release Often'' maxime (see @url{http://catb.org/~esr/writings/cathedral-bazaar/cathedral-bazaar/ar01s04.html}): Whenever enough integrated or non-trivial changes have summed up, a new version is published. Though these releases might now always mark significant changes, they at least allow to quickly fix bugs and avoid infinite procrastination.
+
+@include ChangeLog.texi
+@sp 3
+
+@c !!! DO NOT CHANGE THE NEXT LINE -- IT IS USED AS A FILTER IN SCRIPTS !!!
+The most recent change log is available at Petia's website at @url{http://service-technology.org/files/petia/ChangeLog}.
+
+
+@c --------------------------------------------------------------------------
+
+@node GNU Free Documentation License
+@appendix The GNU Free Documentation License
+
+@include fdl.texi
+
+@bye

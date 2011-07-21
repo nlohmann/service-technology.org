@@ -1,0 +1,26 @@
+[EXIT STATUS]
+Petia exits with 0 on success, and with 1 if an error occurs. See Texinfo manual for detailed information.
+
+[EXAMPLES]
+# <<-- CHANGE START (examples) -->>
+To compute the equivalence class of place of a net 'net.owfn', execute 
+.IP
+petia net.owfn --owfn
+.PP
+The result will be written to the shell.
+# <<-- CHANGE END -->>
+
+[FILES]
+Unless a configuration file is explicitly given using the
+.B --config
+parameter, Petia first tries to parse file
+.B petia.conf
+from the sysconf directory (usually `/usr/local/etc') and then from the current working directory.
+
+[BUGS]
+See https://gna.org/bugs/?group=service-tech for open bugs.
+
+[COPYRIGHT]
+Copyright (c) 2011 Harro Wimmel
+
+

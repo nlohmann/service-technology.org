@@ -1,0 +1,17 @@
+@c <<-- CHANGE START (version information) -->>
+
+@heading Version 1.0 (9 Juli 2011)
+@itemize
+@item First version of Ondine
+
+@item Splits a given Petri net into two open net components (oWFN).
+
+@item Interface is minimized over both components, i.e. as equal as possible
+	distribution of the old interface to the two components and at
+	the same time as few as possible new interface places.
+
+@item Incorporates MiniSAT+, a pseudo-Boolean SAT-solver.
+@end itemize
+
+@heading Version 0.0-unreleased (8 Juli 2011)
+@c <<-- CHANGE END -->>

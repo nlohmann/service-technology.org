@@ -161,13 +161,12 @@ void terminationHandler() {
     if (args_info.stats_flag) {
         message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
         fprintf(stderr, "%s: memory consumption: ", PACKAGE);
-        int i(system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str()));
+        system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str());
     }
 }
 
 /// main-function
 int main(int argc, char** argv) {
-//    time_t start_time, end_time;
 
     // set the function to call on normal termination
     atexit(terminationHandler);
@@ -220,7 +219,7 @@ int main(int argc, char** argv) {
             s << pnapi::io::stat << net;
             status("read net: %s", s.str().c_str());
         }
-    } catch (pnapi::exception::InputError error) {
+    } catch (const pnapi::exception::InputError& error) {
         std::ostringstream s;
         s << error;
         abort(2, "\b%s", s.str().c_str());
@@ -496,7 +495,7 @@ int main(int argc, char** argv) {
 
 	// we are done, now we can print the result
 	set<Place*>::iterator pit;
-	if (coverinfo.size()==0) { // if there is no positive result ...
+	if (coverinfo.empty()) { // if there is no positive result ...
 		if (!args_info.outcsv_given) {
 			if (args_info.utrap_given) cout << "No unmarked trap found." << endl;
 			if (args_info.mtrap_given) cout << "No marked trap found." << endl;
@@ -594,7 +593,7 @@ int main(int argc, char** argv) {
 				cout << endl;
 			}
 		}
-		if (uncovered.size()>0) { // if there were non-coverable places, show them
+		if (!uncovered.empty()) { // if there were non-coverable places, show them
 			cout << "Non-coverable places: ";
 			for(pit=uncovered.begin(); pit!=uncovered.end(); ++pit)
 				cout << (*pit)->getName() << " ";
@@ -608,9 +607,9 @@ int main(int argc, char** argv) {
 
 	// we may check for a witness path if the previous algorithm provided us with
 	// an fc-net and a siphon containing no marked trap
-	if (args_info.witness_given && coverinfo.size()==0) 
+	if (args_info.witness_given && coverinfo.empty()) 
 		status("no result to forward to witness finder");
-	if (args_info.witness_given && coverinfo.size()>0) {
+	if (args_info.witness_given && !coverinfo.empty()) {
 		if (!net.isFreeChoice()) abort(20,"Petri net is not free-choice");
 		if (args_info.cover_given) status("only the first found result is checked");
 		if (args_info.verbose_flag) sara::setVerbose();

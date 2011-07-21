@@ -340,7 +340,7 @@ AT_CHECK([cp TESTFILES/Arcweight.owfn .])
 AT_CHECK([touch foo])
 AT_CHECK([chmod a-w foo])
 AT_CHECK([DOMINO Arcweight.owfn --verbose --tmpfile=foo],1,ignore,stderr)
-AT_CHECK([GREP -q "failed to open file" stderr])
+AT_CHECK([GREP -q "cannot open graph output file 'foo' - no output written" stderr])
 AT_KEYWORDS(error)
 AT_CLEANUP
 

@@ -497,12 +497,17 @@ bool Fragmentation::buildServices() {
 
 		loutputParam += " --marking=";
 		
-		    // create a temporary file
+		// create a temporary file
+		if (args_info.tmpfile_given) {
+		    lfileName = string(args_info.tmpfile_arg);
+		}
+		else {
 #if defined(__MINGW32__)
-		lfileName = mktemp(basename(args_info.tmpfile_arg));
+		    lfileName = mktemp(basename(args_info.tmpfile_arg));
 #else
-		lfileName = mktemp(args_info.tmpfile_arg);
+		    lfileName = mktemp(args_info.tmpfile_arg);
 #endif
+		}
 		loutputParam += lfileName;
 
 		// select LoLA binary and build LoLA command

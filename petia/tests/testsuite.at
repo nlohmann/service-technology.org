@@ -114,9 +114,16 @@ AT_CHECK([GREP -q "please send file" stderr], 0, ignore)
 AT_KEYWORDS(debugging)
 AT_CLEANUP
 
-AT_SETUP([Config file])
+AT_SETUP([Config file 1])
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/petia.conf .])
 AT_CHECK([PETIA --owfn test.owfn --config=petia.conf -v], 0, stdout, stderr)
+AT_CHECK([GREP -q "using configuration file" stderr], 0, ignore)
+AT_KEYWORDS(debugging)
+AT_CLEANUP
+
+AT_SETUP([Config file 2])
+AT_CHECK([cp TESTFILES/test.owfn TESTFILES/petia.conf .])
+AT_CHECK([PETIA --owfn test.owfn -v], 0, stdout, stderr)
 AT_CHECK([GREP -q "using configuration file" stderr], 0, ignore)
 AT_KEYWORDS(debugging)
 AT_CLEANUP

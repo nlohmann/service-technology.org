@@ -47,10 +47,10 @@ public:
 
 	/// Remove all constraints not belonging to the place invariant equation
 	bool stripConstraints();
-
+/*
 	/// Add a new constraint to the linear system
 	bool addConstraint(REAL*, int, REAL);
-
+*/
 	/// Add a new constraint to the linear system (b=true means p=0, b=false means p>=1)
 	bool addConstraint(Place* p, bool b);
 

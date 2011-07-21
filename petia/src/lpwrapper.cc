@@ -130,15 +130,16 @@ bool LPWrapper::stripConstraints() {
 	return resize_lp(lp,basicrows,cols);
 }
 
-/** Forward a constraint to the internal data structure lprec.
+/* Forward a constraint to the internal data structure lprec.
 	@param row A constraint.
 	@param constr_type LE, EQ oder GE.
 	@param rhs The right-hand-side of the constraint.
 	@return If adding the constraint succeeded.
-*/
+
 bool LPWrapper::addConstraint(REAL* row, int constr_type, REAL rhs) {
 	return add_constraint(lp,row,constr_type,rhs);
 }
+*/
 
 /** Forward a constraint to the internal data structure lprec.
 	@param p A place.

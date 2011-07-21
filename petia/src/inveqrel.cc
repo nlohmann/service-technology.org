@@ -75,7 +75,7 @@ bool InvEqRel::join(Place* p1, Place* p2) {
 	if (p1==p2) return false;
 	if (below.find(p2)==below.end()) return false;
 	// get the position of p2 in the finer relation `above'
-	int point(toclass[p2]);
+	unsigned int point(toclass[p2]);
 	// and compare it to that of p1 -- inequality means p1 and p2 cannot be equivalent
 	if (toclass[p1]!=point) return false;
 	// add the class of p2 in the coarser relation `below' to that of p1
@@ -113,7 +113,7 @@ void InvEqRel::split(map<Place*,int> inv) {
 	// one containing all the places with zero entries in inv, the other
 	// containing those with non-zero entries.
 	set<Place*>::iterator pit;
-	int end(above.size());
+	unsigned int end(above.size());
 	// sets before `start' are singletons or empty, we don't need to check there
 	// sets after `end' are those just created -- they already have been split
 	for(unsigned int i=start; i<end; ++i)
@@ -125,7 +125,7 @@ void InvEqRel::split(map<Place*,int> inv) {
 		for(pit=above[i].begin(); pit!=above[i].end(); ++pit)
 			if (inv[*pit]!=0) pset.insert(*pit);
 		// if all or no places have to be split away, there is nothing to do
-		if (pset.size()==above[i].size() || pset.size()==0) continue;
+		if (pset.size()==above[i].size() || pset.empty()) continue;
 		// remove the collected places from the active set
 		for(pit=pset.begin(); pit!=pset.end(); ++pit) 
 		{

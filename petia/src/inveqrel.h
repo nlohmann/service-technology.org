@@ -67,7 +67,7 @@ public:
 	int findClassNum(Place* p);
 
 	/// Get the number of joins in the preparation phase
-	unsigned int preJoinsDone();
+	unsigned int preJoinsDone() const;
 
 private:
 	/// to find a place in the coarser relation ``above''

@@ -67,7 +67,7 @@ public:
 	map<Place*,int>& getPVector();
 
 	/// Get the number of calls to solveSystem() so far
-	int getCalls();
+	int getCalls() const;
 
 	/// Level of verbosity of lp_solve
 	int verbose;

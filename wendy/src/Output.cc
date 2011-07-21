@@ -149,12 +149,12 @@ char* Output::createTmp() {
 #ifdef __MINGW32__
     temp = basename(const_cast<char*>(tempfileTemplate.c_str()));
     if (mktemp(temp) == NULL) {
-        abort(13, "could not create to temporary file '%s'", basename(const_cast<char*>(tempfileTemplate.c_str())));
+        abort(13, "could not create temporary file '%s'", _cfilename_(basename(const_cast<char*>(tempfileTemplate.c_str()))));
     };
 #else
     temp = strdup(tempfileTemplate.c_str());
     if (mkstemp(temp) == -1) {
-        abort(13, "could not create to temporary file '%s'", temp);
+        abort(13, "could not create temporary file '%s'", _cfilename_(temp));
     };
 #endif
     return temp;

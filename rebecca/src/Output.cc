@@ -136,12 +136,12 @@ char* Output::createTmp() {
 #ifdef __MINGW32__
     temp = strdup(basename(args_info.tmpfile_arg));
     if (mktemp(temp) == NULL) {
-        abort(13, "could not create to temporary file '%s'", basename(args_info.tmpfile_arg));
+        abort(13, "could not create temporary file '%s'", _cfilename_(basename(args_info.tmpfile_arg)));
     };
 #else
     temp = strdup(args_info.tmpfile_arg);
     if (mkstemp(temp) == -1) {
-        abort(13, "could not create to temporary file '%s'", temp);
+        abort(13, "could not create temporary file '%s'", _cfilename_(temp));
     };
 #endif
     return temp;

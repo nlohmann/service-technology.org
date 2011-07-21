@@ -10,4 +10,4 @@ libminisatp_a_SOURCES = Main.C Debug.C Debug.h Hardware.h Hardware_adders.C Hard
 	ADTs/Int.h ADTs/Map.h ADTs/Sort.h ADTs/StackAlloc.h ADTs/VecAlloc.h ADTs/VecMaps.h
 
 # -D NDEBUG is necessary to have the "right" exit codes (10/20)
-libminisatp_a_CXXFLAGS = -ffloat-store -D NDEBUG -D NO_GMP -D_FILE_OFFSET_BITS=64
+libminisatp_a_CXXFLAGS = -ffloat-store -D NDEBUG -D NO_GMP -I$(srcdir)/ADTs -include Global.h -include Main.h -D_FILE_OFFSET_BITS=64

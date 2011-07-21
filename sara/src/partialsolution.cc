@@ -196,7 +196,7 @@ void PartialSolution::show() {
 	cerr << endl;
 	cerr << "Remainder: ";
 	map<Transition*,int>::iterator vit;
-	for(vit=getRemains().begin(); vit!=getRemains().end(); vit++)
+	for(vit=getRemains().begin(); vit!=getRemains().end(); ++vit)
 		if (vit->second>0)
 			cerr << vit->first->getName() << ":" << vit->second << " ";
 	cerr << endl;

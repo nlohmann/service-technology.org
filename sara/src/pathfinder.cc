@@ -198,11 +198,11 @@ bool PathFinder::recurse() {
 	Cftit cftit;
 	if (verbose>2) {
 		cerr << "sara: Conflicts:";
-		for(cftit=cftab.begin(); cftit!=cftab.end(); cftit++)
+		for(cftit=cftab.begin(); cftit!=cftab.end(); ++cftit)
 		{
 			set<Transition*>::iterator tit;
 			cerr << cftit->first->getName() << "[";
-			for(tit=cftit->second.begin(); tit!=cftit->second.end(); tit++)
+			for(tit=cftit->second.begin(); tit!=cftit->second.end(); ++tit)
 				cerr << (*tit)->getName() << ",";
 			cerr << "] ";
 		}
@@ -221,7 +221,7 @@ bool PathFinder::recurse() {
 		if (verbose>2) cerr << "Working on " << next->getName() << endl;
 		if (cftit!=cftab.end()) {
 			set<Transition*>::iterator cit;
-			for(cit=cftit->second.begin(); cit!=cftit->second.end(); cit++)
+			for(cit=cftit->second.begin(); cit!=cftit->second.end(); ++cit)
 			{
 				int cpos(revtorder[*cit]);
 				// new depending or conflicting transitions are added to the todo-list recursively
@@ -267,7 +267,7 @@ bool PathFinder::recurse() {
 		// print the stubborn set
 		set<Transition*>::iterator tresit;
 		cerr << "sara: SZK:";
-		for(tresit=tres.begin(); tresit!=tres.end(); tresit++)
+		for(tresit=tres.begin(); tresit!=tres.end(); ++tresit)
 		{
 			cerr << " " << (*tresit)->getName();
 		}
@@ -410,7 +410,7 @@ Place* PathFinder::hinderingPlace(Transition& t) {
 	set<pnapi::Arc*>::iterator ait;
 	set<Place*> pset;
 	set<Place*>::iterator pit;
-	for(ait=aset.begin(); ait!=aset.end(); ait++)
+	for(ait=aset.begin(); ait!=aset.end(); ++ait)
 	{
 		// check if this place has enough tokens, record it as candidate if not
 		if ((*ait)->getWeight()>m0[(*ait)->getPlace()]) 
@@ -447,7 +447,7 @@ set<Transition*> PathFinder::requiredTransitions(Place& p) {
 	set<Transition*> tset;
 	set<pnapi::Arc*> prearc = p.getPresetArcs();
 	set<pnapi::Arc*>::iterator ait;
-	for(ait=prearc.begin(); ait!=prearc.end(); ait++)
+	for(ait=prearc.begin(); ait!=prearc.end(); ++ait)
 	{
 		// find transitions that produce tokens on p
 		Transition* t = &((*ait)->getTransition());
@@ -482,7 +482,7 @@ bool PathFinder::doTarjan(myNode* start, set<Transition*>& result, int& maxdfs) 
 	// marker for "is contained in the stack"
 	start->instack = true;
 	set<int>::iterator it; // int corresponds to Transition* via transitionorder/revtorder, but our choice of ordering
-	for(it=start->nodes.begin(); it!=start->nodes.end(); it++)
+	for(it=start->nodes.begin(); it!=start->nodes.end(); ++it)
 	{
 		myNode* mn(tton[*it]);
 		if (mn->index<0) {

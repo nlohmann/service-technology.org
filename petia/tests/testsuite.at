@@ -103,7 +103,6 @@ AT_CHECK([GREP -q " 75 classes" stdout], 0, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
-
 ############################################################################
 AT_BANNER([Debugging])
 ############################################################################
@@ -112,21 +111,29 @@ AT_SETUP([Bug flag])
 AT_CHECK([cp TESTFILES/test.owfn .])
 AT_CHECK([PETIA --owfn test.owfn --bug ], 0, stdout, stderr)
 AT_CHECK([GREP -q "please send file" stderr], 0, ignore)
-AT_KEYWORDS(modifiers)
+AT_KEYWORDS(debugging)
 AT_CLEANUP
 
 AT_SETUP([Config file])
 AT_CHECK([cp TESTFILES/test.owfn TESTFILES/petia.conf .])
 AT_CHECK([PETIA --owfn test.owfn --config=petia.conf -v], 0, stdout, stderr)
 AT_CHECK([GREP -q "using configuration file" stderr], 0, ignore)
-AT_KEYWORDS(modifiers)
+AT_KEYWORDS(debugging)
 AT_CLEANUP
 
 AT_SETUP([Status])
 AT_CHECK([cp TESTFILES/semaphore.owfn .])
 AT_CHECK([PETIA --owfn semaphore.owfn --stats ], 0, stdout, stderr)
 AT_CHECK([GREP -q "runtime" stderr], 0, ignore)
-AT_KEYWORDS(modifiers)
+AT_KEYWORDS(debugging)
+AT_CLEANUP
+
+AT_SETUP([Fine Relation])
+AT_CHECK([cp TESTFILES/semaphore.owfn .])
+AT_CHECK([PETIA --owfn semaphore.owfn --fine ], 0, stdout, stderr)
+AT_CHECK([GREP -q " 5 classes" stdout], 0, ignore)
+AT_CHECK([GREP -q ": s. s. s. s." stdout], 0, ignore)
+AT_KEYWORDS(debugging)
 AT_CLEANUP
 
 ############################################################################

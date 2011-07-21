@@ -267,7 +267,12 @@ both or none occur.
 The output can be given in a default format or in the format used by the tool Snoopy.
 For the latter, the option @option{--snoopy} can be given on the command line.
 
-
+In the case of a failure of the Linear Programming Solver, the output of Petia
+may be invalid (Petia will tell). Internally, Petia maintains two relations,
+one for places known to be equivalent and one for places that still may be equivalent.
+If everything goes well, both finally coincide, but
+in case of an error, the former (coarser) one is output as the result.
+The latter, finer relation can be obtained by the option @option{--fine}.
 
 @section Debugging
 

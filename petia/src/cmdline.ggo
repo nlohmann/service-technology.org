@@ -81,4 +81,11 @@ option "stats" -
   details="The time is measured using the function clock(3). The memory usage is measured using the ps(1) command. Note that memory consumption contains a small overhead.\n"
   flag off
   hidden
+
+option "fine" f
+  "Select direction from which equivalence is approximated."
+  details="On errors, output can be a too coarse relation, i.e. equivalences remain undetected. Use this option to get a too fine relation instead.\n"
+  flag off
+  hidden
+
 # <<-- CHANGE END -->>

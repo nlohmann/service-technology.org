@@ -271,7 +271,7 @@ int main(int argc, char** argv) {
 	// output in the format used by the tool Snoopy ...
 	if (args_info.snoopy_given) {
 		cout << " equivalence classes ( place ) = " << endl << endl;
-		vector<set<Place*> > vp(ier.getClasses(true));
+		vector<set<Place*> > vp(ier.getClasses(!args_info.fine_given));
 		for(unsigned int i=0; i<vp.size(); ++i)
 		{
 			cout << (i+1);
@@ -291,7 +291,7 @@ int main(int argc, char** argv) {
 			cout << ier.preJoinsDone() << " pre-joins found, ";
 			cout << lp.getCalls() << " calls to lp_solve made." << endl;
 		}
-		vector<set<Place*> > vp(ier.getClasses(true));
+		vector<set<Place*> > vp(ier.getClasses(!args_info.fine_given));
 		cout << "The equivalence relation has " << vp.size() << " classes:" << endl;
 		for(unsigned int i=0; i<vp.size(); ++i)
 		{

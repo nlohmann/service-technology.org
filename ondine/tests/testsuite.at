@@ -9,17 +9,17 @@ AT_TESTED(versions.sh)
 AT_BANNER([Basic Options])
 ############################################################################
 
-AT_SETUP([Help output])
-AT_CHECK([ONDINE --help],0,ignore)
-AT_CHECK([ONDINE --detailed-help],0,ignore)
-AT_CHECK([ONDINE --full-help],0,ignore)
-AT_KEYWORDS(basic)
-AT_CLEANUP
+#AT_SETUP([Help output])
+#AT_CHECK([ONDINE --help],0,ignore)
+#AT_CHECK([ONDINE --detailed-help],0,ignore)
+#AT_CHECK([ONDINE --full-help],0,ignore)
+#AT_KEYWORDS(basic)
+#AT_CLEANUP
 
-AT_SETUP([Version output])
-AT_CHECK([ONDINE --version],0,ignore)
-AT_KEYWORDS(basic)
-AT_CLEANUP
+#AT_SETUP([Version output])
+#AT_CHECK([ONDINE --version],0,ignore)
+#AT_KEYWORDS(basic)
+#AT_CLEANUP
 
 
 ############################################################################

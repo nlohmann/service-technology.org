@@ -266,7 +266,7 @@ int InvEqRel::findClassNum(Place* p) {
 /** Get the number of equivalences found prior to using lp_solve.
 	@return The number of equivalences found.
 */
-unsigned int InvEqRel::preJoinsDone() { return prejoin; }
+unsigned int InvEqRel::preJoinsDone() const { return prejoin; }
 
 /*
 bool InvEqRel::areEqual(Place* p1, Place* p2) {

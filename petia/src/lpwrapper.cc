@@ -198,5 +198,5 @@ map<Place*,int>& LPWrapper::getPVector() {
 /** Get the number of calls to solveSystem() so far.
 	@return The number of calls.
 */
-int LPWrapper::getCalls() { return solvecall; }
+int LPWrapper::getCalls() const { return solvecall; }
 

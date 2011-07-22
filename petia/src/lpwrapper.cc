@@ -26,7 +26,7 @@ using pnapi::Transition;
 	@param pn The Petri net for which the system is created.
 	@param vb If lp_solve should be verbose.
 */
-LPWrapper::LPWrapper(PetriNet& pn, bool vb) : verbose(vb),cols(pn.getPlaces().size()),basicrows(0),net(pn),solvecall(0) {
+LPWrapper::LPWrapper(PetriNet& pn, bool vb) : verbose(vb),cols(static_cast<unsigned int>(pn.getPlaces().size())),basicrows(0),net(pn),solvecall(0) {
 	lp = make_lp(0,cols);
 	if (!lp) abort(12,"could not create LP model");
 }
@@ -116,7 +116,7 @@ int LPWrapper::createIEquation() {
 	set_add_rowmode(lp,FALSE);	
 	if (verbose) write_LP(lp,stderr);
 	else set_verbose(lp,CRITICAL);
-	basicrows = tset.size();
+	basicrows = static_cast<unsigned int>(tset.size());
 	delete[] colpoint;
 	delete[] mat;
 	return (int)(basicrows);

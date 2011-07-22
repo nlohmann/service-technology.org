@@ -53,7 +53,7 @@ InvEqRel::InvEqRel(PetriNet& pn, bool opt) : start(0),net(pn),prejoin(0) {
 		below[*pit]=empty;
 		// a union-find algorithm is used to obtain the class where a place is in `below'
 		unionfind.push_back(-1);
-		pmap[*pit]=pvec.size();
+		pmap[*pit]=static_cast<int>(pvec.size());
 		pvec.push_back(*pit);
 	}
 	if (opt) initPriorityChecks();
@@ -115,7 +115,7 @@ void InvEqRel::split(map<Place*,int> inv) {
 	// one containing all the places with zero entries in inv, the other
 	// containing those with non-zero entries.
 	set<Place*>::iterator pit;
-	unsigned int end(above.size());
+	unsigned int end(static_cast<unsigned int>(above.size()));
 	// sets before `start' are singletons or empty, we don't need to check there
 	// sets after `end' are those just created -- they already have been split
 	for(unsigned int i=start; i<end; ++i)
@@ -133,7 +133,7 @@ void InvEqRel::split(map<Place*,int> inv) {
 		{
 			above[i].erase(*pit);
 			// and also adapt the pointers to the new set (to be created) 
-			toclass[*pit]=above.size();
+			toclass[*pit]=static_cast<unsigned int>(above.size());
 		}
 		// add the new set to the end of the vector
 		above.push_back(pset);
@@ -306,7 +306,7 @@ bool InvEqRel::findPriorityCheck(Place*& p1, Place*& p2) {
 		set<Place*> pset(ppcheck.back());
 		set<Place*>::iterator pit(pset.begin());
 		Place* eqclass1(findClass(*pit));
-		Place* eqclass2;
+		Place* eqclass2(NULL);
 		unsigned int clss(toclass[eqclass1]);
 		bool destroy(false);
 		for(++pit; pit!=pset.end(); ++pit)

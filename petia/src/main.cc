@@ -224,7 +224,7 @@ int main(int argc, char** argv) {
 	// and create the basic system of equations we need
 	lp.createIEquation();
 	// establish representation for the equivalence classes
-	InvEqRel ier(net);
+	InvEqRel ier(net,!args_info.optimize_given);
 	// precompute some equivalences (not using lp_solve)
 	ier.simpleEquivalences();
 	// two placeholders for yet-to-decide equivalence of two places
@@ -288,7 +288,7 @@ int main(int argc, char** argv) {
 	// or standard output ...
 		if (flag_verbose)
 		{
-			cout << ier.preJoinsDone() << " pre-joins found, ";
+			cout << ier.preJoinsDone() << " priority joins found, ";
 			cout << lp.getCalls() << " calls to lp_solve made." << endl;
 		}
 		vector<set<Place*> > vp(ier.getClasses(!args_info.fine_given));
@@ -305,6 +305,5 @@ int main(int argc, char** argv) {
 
     return EXIT_SUCCESS;
 }
-
 
 /* <<-- CHANGE END -->> */

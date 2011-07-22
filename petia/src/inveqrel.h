@@ -37,7 +37,7 @@ class InvEqRel {
 
 public:
 	/// Standard constructor
-	InvEqRel(PetriNet& pn);
+	InvEqRel(PetriNet& pn, bool opt);
 
 	/// Destructor.
 	~InvEqRel();
@@ -69,6 +69,12 @@ public:
 	/// Get the number of joins in the preparation phase
 	unsigned int preJoinsDone() const;
 
+	/// Initialize priority checks
+	void initPriorityChecks();
+
+	/// Get a priority check if there are any
+	bool findPriorityCheck(Place*& p1, Place*& p2);
+
 private:
 	/// to find a place in the coarser relation ``above''
 	map<Place*,unsigned int> toclass;
@@ -96,6 +102,12 @@ private:
 
 	/// number of joins done in the preparation phase
 	unsigned int prejoin;
+
+	/// vector of pre/postsets where the other is a singleton
+	vector<set<Place*> > ppcheck;
+
+	/// vector of singleton pre/postsets
+	vector<Place*> ppplace;
 };
 
 #endif

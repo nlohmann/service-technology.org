@@ -37,8 +37,9 @@ using std::endl;
 /** Constructor for a given Petri net.
 	Yields a structure to compute the equivalence classes.
 	@param pn The Petri net for which the equivalence classes of places are to be determined.
+	@param opt Optimize for less calls to lp_solve, induces some overhead.
 */
-InvEqRel::InvEqRel(PetriNet& pn) : start(0),net(pn),prejoin(0) {
+InvEqRel::InvEqRel(PetriNet& pn, bool opt) : start(0),net(pn),prejoin(0) {
 	set<Place*> pset(pn.getPlaces());
 	// the finer relation `above' separates non-equivalent places by putting them into different sets
 	above.push_back(pset);
@@ -55,6 +56,7 @@ InvEqRel::InvEqRel(PetriNet& pn) : start(0),net(pn),prejoin(0) {
 		pmap[*pit]=pvec.size();
 		pvec.push_back(*pit);
 	}
+	if (opt) initPriorityChecks();
 }
 
 /** Destructor.
@@ -191,6 +193,7 @@ vector<set<Place*> > InvEqRel::getClasses(bool approx) {
 	@return If two places could be obtained. (Otherwise the equivalence relation has been fully computed.)
 */
 bool InvEqRel::getUndecided(Place*& p1, Place*& p2) { 
+	if (findPriorityCheck(p1,p2)) return true;
 	// increment that start pointer to the finer relation `above' to the first interesting class
 	while (start<above.size() && above[start].size()<2) ++start;
 	// if there is none, we are done
@@ -267,6 +270,65 @@ int InvEqRel::findClassNum(Place* p) {
 	@return The number of equivalences found.
 */
 unsigned int InvEqRel::preJoinsDone() const { return prejoin; }
+
+/** Initialize the list of priority checks. These checks may reduce
+	the number of calls to lp_solve.
+*/
+void InvEqRel::initPriorityChecks() {
+	set<Transition*> tset(net.getTransitions());
+	set<Transition*>::iterator tit;
+	for(tit=tset.begin(); tit!=tset.end(); ++tit)
+	{
+		set<pnapi::Arc*> prearcs((*tit)->getPresetArcs());
+		set<pnapi::Arc*> postarcs((*tit)->getPostsetArcs());
+		bool which(prearcs.size()==1);
+		if ((which) ^ (postarcs.size()!=1)) continue;
+		set<Place*> pset;
+		set<pnapi::Arc*>::iterator ait;
+		for(ait=prearcs.begin(); ait!=prearcs.end(); ++ait)
+			if (which) ppplace.push_back(&((*ait)->getPlace()));
+			else pset.insert(&((*ait)->getPlace()));
+		for(ait=postarcs.begin(); ait!=postarcs.end(); ++ait)
+			if (!which) ppplace.push_back(&((*ait)->getPlace()));
+			else pset.insert(&((*ait)->getPlace()));
+		ppcheck.push_back(pset);
+	}
+}
+
+/** If there are priority checks to be done, get one of them.
+	@param p1 The first place of the pair to be checked. 
+	@param p2 The second place of the pair to be checked.
+	@return If there are checks to be done. If not, p1 and p2 remain unchanged.
+*/
+bool InvEqRel::findPriorityCheck(Place*& p1, Place*& p2) {
+	while (!ppcheck.empty())
+	{
+		set<Place*> pset(ppcheck.back());
+		set<Place*>::iterator pit(pset.begin());
+		Place* eqclass1(findClass(*pit));
+		Place* eqclass2;
+		unsigned int clss(toclass[eqclass1]);
+		bool destroy(false);
+		for(++pit; pit!=pset.end(); ++pit)
+		{
+			eqclass2 = findClass(*pit);
+			if (clss!=toclass[eqclass2]) { destroy=true; break; }
+			if (eqclass1!=eqclass2) break; 
+			ppcheck.back().erase(*pit);
+		}
+		if (ppcheck.back().size()<2 || destroy)
+		{
+			if (!destroy) pjoin(eqclass1,ppplace.back());
+			ppcheck.pop_back();
+			ppplace.pop_back();
+			continue;
+		}
+		p1 = eqclass1;
+		p2 = eqclass2;
+		return true;
+	}
+	return false;
+}
 
 /*
 bool InvEqRel::areEqual(Place* p1, Place* p2) {

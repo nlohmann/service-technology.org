@@ -10,11 +10,11 @@
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
 description "About Petia:"
-purpose "Petia computes the equivalence class of places of a net.\nTwo places are equivalent if in every semipositive invariant both or none occur.\nReport bugs to petia@service-technology.org.\n  Visit Petia's home page at http://service-technology.org/petia"
+purpose "Petia computes the equivalence classes of places of a net.\nTwo places are equivalent if in every semipositive invariant both or none occur.\nReport bugs to petia@service-technology.org.\n  Visit Petia's home page at http://service-technology.org/petia"
 
 # <<-- CHANGE START (parameters) -->>
 section "Input/Output"
-sectiondesc="Petia reads from standard input and writes to standard output unless an input file is given. Output is always written to the shell.\n"
+sectiondesc="Petia reads from standard input and writes to standard output unless an input file is given. Output is always written to the shell."
 
 defgroup "Input Format" groupdesc="Choose an option according to the format of the input Petri net:"
 groupoption "lola" -
@@ -61,6 +61,10 @@ option "noClean" -
   details="Any temporary files created will be kept after Petia terminates.\n"
   flag off
 
+option "optimize" o
+  "Reduce calls to lp_solve."
+  details="Guesses are made at which equivalences to test first. This induces some overhead but may reduce the number of calls to lp_solve\n"
+  flag on
 
 section "Debugging"
 sectiondesc="These options control how much debug output Petia creates.\n"

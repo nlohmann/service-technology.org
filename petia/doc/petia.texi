@@ -274,6 +274,25 @@ If everything goes well, both finally coincide, but
 in case of an error, the former (coarser) one is output as the result.
 The latter, finer relation can be obtained by the option @option{--fine}.
 
+@section Optimisation
+
+Calls to a Linear Programming Solver can be costly, therefore it is a good
+idea to look at the structure of a Petri net to find equivalent places, too.
+If there is a transition with singletons as pre- and postset, both places
+will always be in the same equivalence class. If a transition has an empty
+pre- or postset, all places adjacent to that transition are in the same
+equivalence class (there is no semipositive invariant in which these
+places occur). These conditions can be (and are) checked beforehand. If a transition
+has pre- and postsets of which one is a singleton while the other is
+larger, one can deduce from the larger set being all in one equivalence
+class that the singleton has to be in the same class. This cannot be
+checked at the start. Instead, the LP solver must be used to determine
+if all places of the larger set are in the same equivalence class first.
+Only then the deduction can be made. Thus, such deductions must be tried
+throughout the computation. Even though the overhead is minimal, an
+option @option{--optimize} was implemented to regulate if the deductions
+are tried at all. The option is enabled by default.
+
 @section Debugging
 
 The option @option{--verbose} may print out additional information if the standard

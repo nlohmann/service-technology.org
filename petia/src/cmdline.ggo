@@ -10,7 +10,7 @@
 args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --conf-parser"
 
 description "About Petia:"
-purpose "Petia computes the equivalence classes of places of a net.\nTwo places are equivalent if in every semipositive invariant both or none occur.\nReport bugs to petia@service-technology.org.\n  Visit Petia's home page at http://service-technology.org/petia"
+purpose "Petia computes the equivalence classes of places (or transitions) of a net.\nTwo places are equivalent if in every semipositive invariant both or none occur.\nReport bugs to petia@service-technology.org.\n  Visit Petia's home page at http://service-technology.org/petia"
 
 # <<-- CHANGE START (parameters) -->>
 section "Input/Output"
@@ -34,8 +34,17 @@ groupoption "snoopy" y
   "Print the equivalence classes in Snoopy format."
   group="Output Format"
 
+section "Problem Statement"
+sectiondesc="Define the kind of equivalence to be computed.\n"
 
+defgroup "Node Type" groupdesc="Select whether the equivalence should be over places or transitions."
+groupoption "transition" t
+  "An equivalence for transitions is computed."
+  group="Node Type"
 
+groupoption "place" p
+  "An equivalence for places is computed (default)."
+  group="Node Type"
 
 section "Configuration"
 sectiondesc="Configurations are not required at the moment.\n"

@@ -150,7 +150,7 @@ void terminationHandler() {
     if (args_info.stats_flag) {
         message("runtime: %.2f sec", (static_cast<double>(clock()) - static_cast<double>(start_clock)) / CLOCKS_PER_SEC);
         fprintf(stderr, "%s: memory consumption: ", PACKAGE);
-        if (system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str())) ;
+        if (system((std::string("ps -o rss -o comm | ") + TOOL_GREP + " " + PACKAGE + " | " + TOOL_AWK + " '{ if ($1 > max) max = $1 } END { print max \" KB\" }' 1>&2").c_str())) {};
     }
 }
 
@@ -219,48 +219,49 @@ int main(int argc, char** argv) {
     | 2. Compute the equivalence classes  |
     `------------------------------------*/
 
+	bool ntype(!args_info.transition_given);
 	// setup lp_solve
-	LPWrapper lp(net,false);
+	LPWrapper lp(net,ntype,false);
 	// and create the basic system of equations we need
 	lp.createIEquation();
 	// establish representation for the equivalence classes
-	InvEqRel ier(net,!args_info.optimize_given);
+	InvEqRel ier(net,ntype,!args_info.optimize_given);
 	// precompute some equivalences (not using lp_solve)
 	ier.simpleEquivalences();
 	// two placeholders for yet-to-decide equivalence of two places
-	Place* p1;
-	Place* p2;
-	// as long as we find two places for which equivalence has not been decided ...
-	while (ier.getUndecided(p1,p2))
+	Node* n1;
+	Node* n2;
+	// as long as we find two nodes for which equivalence has not been decided ...
+	while (ier.getUndecided(n1,n2))
 	{
-		// add the equations p1=0 and p2>0 to the system
+		// add the equations n1=0 and n2>0 to the system
 		if (!lp.stripConstraints()) abort(12,"failed to remove constraints from LP model");
-		if (!lp.addConstraint(p1,true)) abort(12,"failed to add constraint to LP model");
-		if (!lp.addConstraint(p2,false)) abort(12,"failed to add constraint to LP model");
+		if (!lp.addConstraint(n1,true)) abort(12,"failed to add constraint to LP model");
+		if (!lp.addConstraint(n2,false)) abort(12,"failed to add constraint to LP model");
 		// and solve it
 		int res(lp.solveSystem());
 		if (res>2) status("lp_solve failure -- resulting relation may be too coarse");
 		else if (res<2)
 		{
-			// p1 and p2 can be distinguished
-			map<Place*,int> sol(lp.getPVector());
+			// n1 and n2 can be distinguished
+			map<Node*,int> sol(lp.getNVector());
 			// use the computed invariant to find non-equivalent places (including p1&p2)
 			ier.split(sol);
 		} else {
-			// if the first check fails, now test with p1>0 and p2=0
+			// if the first check fails, now test with n1>0 and n2=0
 			if (!lp.stripConstraints()) abort(12,"failed to remove constraints from LP model");
-			if (!lp.addConstraint(p2,true)) abort(12,"failed to add constraint to LP model");
-			if (!lp.addConstraint(p1,false)) abort(12,"failed to add constraint to LP model");
+			if (!lp.addConstraint(n2,true)) abort(12,"failed to add constraint to LP model");
+			if (!lp.addConstraint(n1,false)) abort(12,"failed to add constraint to LP model");
 			res = lp.solveSystem();
 			if (res>2) status("lp_solve failure -- resulting relation may be too coarse");
 			else if (res<2)
 			{
-				// p1 and p2 can be distinguished
-				map<Place*,int> sol(lp.getPVector());
+				// n1 and n2 can be distinguished
+				map<Node*,int> sol(lp.getNVector());
 				// use the computed invariant to find non-equivalent places (including p1&p2)
 				ier.split(sol);
-			// otherwise, p1&p2 are equivalent, so join their classes
-			} else if (!ier.join(p1,p2)) status("internal failure -- resulting relation may be too coarse");
+			// otherwise, n1&n2 are equivalent, so join their classes
+			} else if (!ier.join(n1,n2)) status("internal failure -- resulting relation may be too coarse");
 		}
 	}
 
@@ -270,17 +271,20 @@ int main(int argc, char** argv) {
 
 	// output in the format used by the tool Snoopy ...
 	if (args_info.snoopy_given) {
-		cout << " equivalence classes ( place ) = " << endl << endl;
-		vector<set<Place*> > vp(ier.getClasses(!args_info.fine_given));
+		cout << " equivalence classes ( ";
+		if (ntype) cout << "place";
+		else cout << "transition";
+		cout << " ) = " << endl << endl;
+		vector<set<Node*> > vp(ier.getClasses(!args_info.fine_given));
 		for(unsigned int i=0; i<vp.size(); ++i)
 		{
 			cout << (i+1);
 			bool comma(false);
-			set<Place*>::iterator pit;
-			for(pit=vp[i].begin(); pit!=vp[i].end(); ++pit, comma=true)
+			set<Node*>::iterator nit;
+			for(nit=vp[i].begin(); nit!=vp[i].end(); ++nit, comma=true)
 			{
 				if (comma) cout << "," << endl;
-				cout << "\t|" << (*pit)->getName() << "\t:1";
+				cout << "\t|" << (*nit)->getName() << "\t:1";
 			}
 			cout << endl;
 		}
@@ -291,14 +295,14 @@ int main(int argc, char** argv) {
 			cout << ier.preJoinsDone() << " priority joins found, ";
 			cout << lp.getCalls() << " calls to lp_solve made." << endl;
 		}
-		vector<set<Place*> > vp(ier.getClasses(!args_info.fine_given));
+		vector<set<Node*> > vp(ier.getClasses(!args_info.fine_given));
 		cout << "The equivalence relation has " << vp.size() << " classes:" << endl;
 		for(unsigned int i=0; i<vp.size(); ++i)
 		{
 			cout << "Class " << (i+1) << ": ";
-			set<Place*>::iterator pit;
-			for(pit=vp[i].begin(); pit!=vp[i].end(); ++pit)
-				cout << (*pit)->getName() << " ";
+			set<Node*>::iterator nit;
+			for(nit=vp[i].begin(); nit!=vp[i].end(); ++nit)
+				cout << (*nit)->getName() << " ";
 			cout << endl;
 		}
 	}

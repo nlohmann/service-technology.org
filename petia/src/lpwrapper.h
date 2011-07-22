@@ -23,6 +23,7 @@
 
 using pnapi::Place;
 using pnapi::Transition;
+using pnapi::Node;
 using pnapi::PetriNet;
 using std::map;
 
@@ -37,7 +38,7 @@ class LPWrapper {
 public:
 
 	/// Constructor
-	LPWrapper(PetriNet& pn, bool vb);
+	LPWrapper(PetriNet& pn, bool ntype, bool vb);
 
 	/// Destructor
 	~LPWrapper();
@@ -52,7 +53,7 @@ public:
 	bool addConstraint(REAL*, int, REAL);
 */
 	/// Add a new constraint to the linear system (b=true means p=0, b=false means p>=1)
-	bool addConstraint(Place* p, bool b);
+	bool addConstraint(Node* n, bool b);
 
 	/// Solve the linear system
 	int solveSystem();
@@ -64,7 +65,7 @@ public:
 	unsigned char getVariables(REAL*);
 
 	/// Get a solution vector
-	map<Place*,int>& getPVector();
+	map<Node*,int>& getNVector();
 
 	/// Get the number of calls to solveSystem() so far
 	int getCalls() const;
@@ -82,17 +83,19 @@ private:
 	/// The number of rows in the system created from the invariant equation
 	unsigned int basicrows;
 
-	/// Internal variables for position of places in the system
-	map<Place*,int> ppos;
+	/// Internal variables for position of places/transitions in the system
+	map<Node*,int> npos;
 
 	/// Internal variables for the solution
-	map<Place*,int> pvector;
+	map<Node*,int> nvector;
 
 	/// The Petri net for which the equation is computed
 	PetriNet& net;
 
 	/// The number of calls to solveSystem() so far
 	int solvecall;
+
+	bool nodetype;
 };
 
 #endif

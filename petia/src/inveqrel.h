@@ -26,6 +26,7 @@
 using pnapi::PetriNet;
 using pnapi::Place;
 using pnapi::Transition;
+using pnapi::Node;
 using std::vector;
 using std::map;
 using std::set;
@@ -37,53 +38,53 @@ class InvEqRel {
 
 public:
 	/// Standard constructor
-	InvEqRel(PetriNet& pn, bool opt);
+	InvEqRel(PetriNet& pn, bool ntype, bool pricheck);
 
 	/// Destructor.
 	~InvEqRel();
 
-	/// Two places to be in the same equivalence class
-	bool join(Place* p1, Place* p2);
+	/// Two places/transitions to be in the same equivalence class
+	bool join(Node* n1, Node* n2);
 
-	/// Two places to be in the same equivalence class, successful joins are counted
-	bool pjoin(Place* p1, Place* p2);
+	/// Two places/transitions to be in the same equivalence class, successful joins are counted
+	bool pjoin(Node* n1, Node* n2);
 
-	/// Coarsen the relation according to an invariant distinguishing two sets of non-equivalent places
-	void split(map<Place*,int> inv);
+	/// Coarsen the relation according to an invariant distinguishing two sets of non-equivalent nodes
+	void split(map<Node*,int> inv);
 
 	/// Get the classes as they are now, approx=true: relation may be coarser, otherwise finer than equivalence
-	vector<set<Place*> > getClasses(bool approx);
+	vector<set<Node*> > getClasses(bool approx);
 
 	/// Check if an equivalence relation has been reached, if not, return two places for which the relation is still unknown
-	bool getUndecided(Place*& p1, Place*& p2);
+	bool getUndecided(Node*& n1, Node*& n2);
 
-	/// Precompute some equivalent places from the structure of the net
+	/// Precompute some equivalent nodes from the structure of the net
 	void simpleEquivalences();
 
-	/// Find the representative of the class containing the place in ``below''
-	Place* findClass(Place* p);
+	/// Find the representative of the class containing the node in ''below''
+	Node* findClass(Node* n);
 
-	/// Find the ID of the class containing the place in ``below''
-	int findClassNum(Place* p);
+	/// Find the ID of the class containing the node in ''below''
+	int findClassNum(Node* n);
 
 	/// Get the number of joins in the preparation phase
 	unsigned int preJoinsDone() const;
 
-	/// Initialize priority checks
+	/// Initialize priority checks. Called by constructor if pricheck=true
 	void initPriorityChecks();
 
-	/// Get a priority check if there are any
-	bool findPriorityCheck(Place*& p1, Place*& p2);
+	/// Get a priority check if there are any. Called by getUndecided()
+	bool findPriorityCheck(Node*& n1, Node*& n2);
 
 private:
-	/// to find a place in the coarser relation ``above''
-	map<Place*,unsigned int> toclass;
+	/// to find a node in the coarser relation ''above''
+	map<Node*,unsigned int> toclass;
 
 	/// a relation coarser than the equivalence
-	vector<set<Place*> > above;
+	vector<set<Node*> > above;
 
 	/// a relation finer than the equivalence
-	map<Place*,set<Place*> > below;
+	map<Node*,set<Node*> > below;
 
 	/// first active entry in above
 	unsigned int start;
@@ -95,19 +96,23 @@ private:
 	vector<int> unionfind;
 
 	/// mapper from int to places, for union-find
-	vector<Place*> pvec;
+	vector<Node*> nvec;
 
 	/// mapper from places to int, for union-find
-	map<Place*,int> pmap;
+	map<Node*,int> nmap;
 
 	/// number of joins done in the preparation phase
 	unsigned int prejoin;
 
 	/// vector of pre/postsets where the other is a singleton
-	vector<set<Place*> > ppcheck;
+	vector<set<Node*> > ppcheck;
 
 	/// vector of singleton pre/postsets
-	vector<Place*> ppplace;
+	vector<Node*> ppnode;
+
+	bool nodetype;
+	set<Node*> places;
+	set<Node*> transitions;
 };
 
 #endif

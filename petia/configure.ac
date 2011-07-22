@@ -1,4 +1,4 @@
-AC_INIT(petia, 1.0, petia@service-technology.org, petia, http://service-technology.org/petia)
+AC_INIT(petia, 1.1, petia@service-technology.org, petia, http://service-technology.org/petia)
 
 AC_MSG_NOTICE([ ____      _  _       ])
 AC_MSG_NOTICE([|  _ \ ___| |(_) __ _ ])

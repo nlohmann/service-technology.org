@@ -8,18 +8,12 @@
 
 
 
-Version 1.0 (20 Juli 2011)
-=============================
+Version 1.1 (22 Juli 2011)
+==========================
 
-* First version of Petia
+* Option -t to determine an equivalence of transitions instead 	of
+  places.
 
-* Detects for any given pair of places if there is a semipositive place 
-	invariant in which one of the places occurs and the other does not.
-	Such places are non-equivalent.
-
-* Builds the equivalence relation over all places of a net and prints
-	the equivalence classes.
-
-* Incorporates lp_solve, a linear programming solver.
+* Fixing a bug occurring in conjunction with empty pre- and/or postsets.
 
 \nSee file ChangeLog <http://service-technology.org/files/petia/ChangeLog> for\ncomplete version history.\n

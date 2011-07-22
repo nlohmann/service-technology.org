@@ -1,16 +1,22 @@
 @c <<-- CHANGE START (version information) -->>
 
-@heading Version 1.0 (9 Juli 2011)
+@heading Version 1.1 (22 Juli 2011)
 @itemize
-@item First version of Ondine
+@item Option -t to determine an equivalence of transitions instead
+	of places.
 
-@item Splits a given Petri net into two open net components (oWFN).
+@item Fixing a bug occurring in conjunction with empty pre- and/or postsets. 
+@end itemize
 
-@item Interface is minimized over both components, i.e. as equal as possible
-	distribution of the old interface to the two components and at
-	the same time as few as possible new interface places.
+@heading Version 1.0 (20 Juli 2011)
+@itemize
+@item First version of Petia
 
-@item Incorporates MiniSAT+, a pseudo-Boolean SAT-solver.
+@item Determines an equivalence class of places of a net, where two
+	places are equivalent if in any semipositive place invariant
+	both occur or both do not occur.
+
+@item Incorporates lp_solve, a Linear Programming Solver.
 @end itemize
 
 @heading Version 0.0-unreleased (8 Juli 2011)

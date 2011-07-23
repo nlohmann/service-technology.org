@@ -1,7 +1,9 @@
 UMA v.1.2.5
 -----------
 
-* fixed computation of implicit places
+* computation of implicit places now in three modes: preserve behavior,
+  preserve visible behavior (that is recorded in a log-induced branching
+  process), and preserve connectivity of the net wrt. the log 
 
 UMA v.1.2.4
 -----------

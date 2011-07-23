@@ -29,6 +29,7 @@ import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeRefold;
 import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys;
+import hub.top.uma.DotColors;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
 import hub.top.uma.synthesis.NetSynthesis;
@@ -40,6 +41,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,8 +60,9 @@ public class MineSimplify {
   
   private ISystemModel sysModel;
   private LinkedList<String[]> allTraces;
-  
-  private DNodeRefold build = null;                            // the branching process of sysModel
+
+  private ViewGeneration2 viewGen;                     // the class used to construct the log-induced branching prefix
+  private DNodeRefold build = null;                    // the branching process of sysModel
   private HashMap<Place, Set<DNode>> place_conditions; // all conditions labeled with the given place
   
   private PetriNet simplifiedNet;
@@ -73,10 +76,15 @@ public class MineSimplify {
    */
   public static class Configuration {
     
+    public static final int REMOVE_IMPLIED_OFF = 0;
+    public static final int REMOVE_IMPLIED_PRESERVE_ALL = 1;
+    public static final int REMOVE_IMPLIED_PRESERVE_VISIBLE = 2;
+    public static final int REMOVE_IMPLIED_PRESERVE_CONNECTED = 3;
+    
     public boolean unfold_refold = true; 
-    public boolean remove_implied = true;
-    public boolean abstract_chains = false;
-    public boolean remove_flower_places = false;
+    public int remove_implied = REMOVE_IMPLIED_PRESERVE_CONNECTED;
+    public boolean abstract_chains = true;
+    public boolean remove_flower_places = true;
     
   }
   
@@ -306,11 +314,10 @@ public class MineSimplify {
 
     // step 2) find implied places
     _time_implied_start = System.currentTimeMillis();
-    if (config.remove_implied) {
-      boolean preservePrecision = false;
+    if (config.remove_implied != Configuration.REMOVE_IMPLIED_OFF) {
       assertBranchingProcess(net, sysModel, traces);
-      HashSet<DNode> implied = findImpliedConditions(preservePrecision);
-      removeImpliedPlaces(net, place_conditions, implied, preservePrecision);
+      HashSet<DNode> implied = findImpliedConditions();
+      removeImpliedPlaces(net, place_conditions, implied);
     }
     _time_implied_finish = System.currentTimeMillis();
     
@@ -348,7 +355,7 @@ public class MineSimplify {
 
     _time_buildBP_start = System.currentTimeMillis();
     //Uma.out.println("generating view for "+traces.size()+" traces...");
-    ViewGeneration2 viewGen = new ViewGeneration2(build);
+    viewGen = new ViewGeneration2(build);
     for (String[] trace : traces) {
       viewGen.extendByTrace(trace);
     }
@@ -436,7 +443,7 @@ public class MineSimplify {
 
     _time_buildBP_start = System.currentTimeMillis();
     //Uma.out.println("assert existence of branching process...");
-    ViewGeneration2 viewGen = new ViewGeneration2(build);
+    viewGen = new ViewGeneration2(build);
     for (String[] trace : traces) {
       viewGen.extendByTrace(trace);
     }
@@ -461,9 +468,15 @@ public class MineSimplify {
   }
   
   /**
+   * list of nodes that were added to the branching process to ensure that
+   * only implied conditions that do not change the behavior get removed
+   */
+  private List<DNode> _extendedNodes = new LinkedList<DNode>();
+  
+  /**
    * @return the set of implied conditions in the branching process of the system model
    */
-  private HashSet<DNode> findImpliedConditions(boolean preservePrecision) {
+  private HashSet<DNode> findImpliedConditions() {
     
     boolean printDetail = (build.getBranchingProcess().allConditions.size()
         +build.getBranchingProcess().allEvents.size() > 10000) ? true : false;
@@ -472,16 +485,56 @@ public class MineSimplify {
     TransitiveDependencies dep = new TransitiveDependencies(build);
     if (printDetail) Uma.out.println("find solution..");
     HashSet<DNode> implied;
-    if (preservePrecision)
-        implied = dep.getImpliedConditions_solution2();
-    else
-        implied = dep.getImpliedConditions_solution();
-
+    if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED) {
+      // locally find all implied conditions, regardless of equivalence classes
+      implied = dep.getImpliedConditions_solutionLocal();
+    } else if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_VISIBLE) {
+      // find equivalence classes of implied conditions
+      implied = dep.getImpliedConditions_solutionGlobal();
+    } else if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_ALL) {
+      // find equivalence classes of implied conditions ensuring that no
+      // new behavior is introduced by considering also future behavior
+      
+      // extend the branching process with events that are enabled, but
+      // did not fire
+      _extendedNodes = dep.extendBranchingProcessWithNextEvents(viewGen.visitedMarkings);
+      // identify implied conditions in this branching process
+      implied = dep.getImpliedConditions_solutionGlobal();
+      // and remove the added events again
+      implied.removeAll(_extendedNodes);
+      dep.removeExtendedNodes();
+    } else {
+      implied = new HashSet<DNode>();
+      System.out.println("Error! Unknown mode for finding implied conditions: "+config.remove_implied);
+    }
     return implied;
   }
   
-  public Set<Place> pseudoImplied = new HashSet<Place>();
-  public Set<DNode> implied;
+  /**
+   * conditions of the branching process identified as implied conditions
+   */
+  private Set<DNode> _implied;
+
+  /**
+   * @return map assigning each implied condition a GraphViz color, conditions
+   *         of the same equivalence class get the same color
+   */
+  public HashMap<DNode, String> _getColoringImplied() {
+    HashMap<DNode, String> colorMap = new HashMap<DNode, String>();
+    LinkedList<Set<DNode>> v = new LinkedList<Set<DNode>>(build.futureEquivalence().values());
+    for (int i=0; i<v.size(); i++) {
+      for (DNode d : v.get(i)) {
+        if (_implied.contains(d))
+          colorMap.put(d, DotColors.colors[i]);
+      }
+    }
+    
+    for (DNode d : _extendedNodes) {
+      colorMap.put(d, "black");
+    }
+    
+    return colorMap;
+  }
   
   /**
    * Remove all implied places from the net. The implied places are computed from
@@ -491,22 +544,29 @@ public class MineSimplify {
    * @param place_conditions
    * @param implied
    */
-  private void removeImpliedPlaces(PetriNet net, Map<Place, Set<DNode> > place_conditions, Set<DNode> implied, boolean preservePrecision)
+  private void removeImpliedPlaces(PetriNet net, Map<Place, Set<DNode> > place_conditions, Set<DNode> implied)
   {
-    this.implied = implied;
+    this._implied = implied;
     
     boolean printDetail = (build.getBranchingProcess().allConditions.size()
         +build.getBranchingProcess().allEvents.size() > 10000) ? true : false;
+    
+    boolean findAllImplied;
+    if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED) {
+      findAllImplied = false;
+    } else {
+      findAllImplied = true;
+    }
     
     Uma.out.println("remove implied places..");
     LinkedList<Place> impliedPlaces = new LinkedList<Place>();
     for (Place p : net.getPlaces()) {
       
-      boolean place_p_isImplied = preservePrecision;
+      boolean place_p_isImplied = findAllImplied;
       
       for (DNode bPrime : place_conditions.get(p)) {
 
-        if (preservePrecision) {
+        if (findAllImplied) {
           // remove place only if every condition is implied
           if (!implied.contains(bPrime)) {
             place_p_isImplied = false;
@@ -891,31 +951,31 @@ public class MineSimplify {
     Configuration c = new Configuration();
     /*
     c.unfold_refold = true;
-    c.remove_implied = false;
+    c.remove_implied = Configuration.REMOVE_IMPLIED_OFF;
     c.abstract_chains = false;
     c.remove_flower_places = false;
     runExperiment("./examples/bpm11/exp1_foldRefold", c);
     */
     c.unfold_refold = true;
-    c.remove_implied = true;
+    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
     c.abstract_chains = false;
     c.remove_flower_places = false;
     runExperiment("./examples/bpm11/exp2_foldRefold_implied", c);
     
     c.unfold_refold = false;
-    c.remove_implied = true;
+    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
     c.abstract_chains = false;
     c.remove_flower_places = false;
     runExperiment("./examples/bpm11/exp3_implied", c);
     /*
     c.unfold_refold = true;
-    c.remove_implied = true;
+    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
     c.abstract_chains = true;
     c.remove_flower_places = false;
     runExperiment("./examples/bpm11/exp4_foldRefold_implied_chains", c);
     */
     c.unfold_refold = true;
-    c.remove_implied = true;
+    c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
     c.abstract_chains = true;
     c.remove_flower_places = true;
     runExperiment("./examples/bpm11/exp5_complete", c);

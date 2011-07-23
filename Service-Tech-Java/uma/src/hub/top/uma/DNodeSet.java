@@ -190,8 +190,8 @@ public class DNodeSet {
         }
         e.post = e_post_new;
       }
-    
-    allConditions.remove(b);
+    if (b.isEvent) allEvents.remove(b);
+    else allConditions.remove(b);
   }
 	  
 

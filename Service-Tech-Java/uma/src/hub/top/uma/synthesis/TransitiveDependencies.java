@@ -18,16 +18,24 @@
 
 package hub.top.uma.synthesis;
 
-import java.util.HashMap;
-import com.google.gwt.dev.util.collect.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-
+import hub.top.scenario.Oclet;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeBP.SyncInfo;
 import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys;
+import hub.top.uma.FutureEquivalence;
 import hub.top.uma.Uma;
+import hub.top.uma.view.ViewGeneration2;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import com.google.gwt.dev.util.collect.HashSet;
 
 /**
  * Compute the transitive dependencies between events of a branching process
@@ -183,7 +191,7 @@ public class TransitiveDependencies {
    * in this set exists a path that connects its pre-set with its post-set.
    * Important: there may be two conditions b1 and b2 that are implied because
    * b1 establishes the path for b2 and vice versa. To determine a maximal set
-   * of implied conditions that can be removed, use {@link #getImpliedConditions_solution()}.
+   * of implied conditions that can be removed, use {@link #getImpliedConditions_solutionLocal()}.
    */
   public HashSet<DNode> getAllImpliedConditions() {
     HashSet<DNode> implied = new HashSet<DNode>();
@@ -225,15 +233,124 @@ public class TransitiveDependencies {
   }
   
   /**
+   * Find each of the <code>transition</code> all possible extensions to
+   * add a new event that consumes from the given <code>cut</code> 
+   * 
+   * @param transitions
+   * @param cut
+   * @return
+   */
+  public DNodeBP.EnablingInfo getAllEnabledTransitions(Collection<DNode> transitions, Collection<DNode> cut) {
+
+    DNodeBP.EnablingInfo enablingInfo = new DNodeBP.EnablingInfo();
+    
+    for (DNode e : transitions) {
+      boolean isEnabled = true;
+      DNode loc[] = new DNode[e.pre.length];
+      for (int pre_index = 0; pre_index < e.pre.length; pre_index++) {
+        boolean endsWith_b = false;
+        for (DNode bCut : cut) {
+          if (bCut.endsWith(e.pre[pre_index])) {
+            loc[pre_index] = bCut;
+            endsWith_b = true; 
+            break;
+          }
+        }
+        if (!endsWith_b) { isEnabled = false; break; }
+      }
+      if (isEnabled) {
+        enablingInfo.putEnabledEvent(e, loc);
+      }
+    }
+    return enablingInfo;
+  }
+  
+  
+  private List<DNode> extendedNodes;
+  
+  /**
+   * Extend the current branching process with all enabled events. This method
+   * limits the extension with to events that are enabled in the given list
+   * of <code>visitedMarkings</code>.
+   * 
+   * @param visitedMarkings
+   * @return list of nodes that were added to the branching process
+   */
+  public List<DNode> extendBranchingProcessWithNextEvents(Collection<? extends Collection<DNode>> visitedMarkings) {
+    
+    extendedNodes = new LinkedList<DNode>();
+    
+    for (Collection<DNode> runCut : visitedMarkings) {
+      // for each marking visited for construcint the branching process
+      DNodeSys sys = build.getSystem();
+      
+      // find all transitions enabled in this marking
+      DNodeBP.EnablingInfo enabled = getAllEnabledTransitions(sys.fireableEvents, runCut);
+      DNodeBP.EnablingQueue queue = build.new EnablingQueue();
+      queue.insertAll(enabled);
+
+      // and check for each enabled event...
+      while (queue.size() > 0) {
+        SyncInfo info = queue.removeFirst();
+        short id = info.events[0].id;
+        
+        // whether there already exists an event  that represents this transition
+        // get all all successor events with the same name as the transition
+        Set<DNode> firedEvents = new HashSet<DNode>();
+        for (DNode b : info.loc) {
+          if (b.post == null) break;
+          for (DNode e : b.post) {
+            if (e.id == id) firedEvents.add(e);
+          }
+        }
+        
+        // and see if one of the events consumes from the enabling location
+        // of the event only
+        boolean alreadyFired = false;
+        for (DNode e : firedEvents) {
+          boolean all_pre_in_loc = true;
+          for (DNode b : e.pre) {
+            boolean b_in_loc = false;
+            for (int i=0; i<info.loc.length; i++) {
+              if (info.loc[i] == b) { b_in_loc = true; break; }
+            }
+            if (!b_in_loc) { all_pre_in_loc = false; break; }
+          }
+          if (all_pre_in_loc) { alreadyFired = true; break; }
+        }
+        // no: add event to the branching process
+        if (!alreadyFired) {
+          DNode post[] = bp.fire(info.events, info.loc);
+          
+          // and remember the new nodes, so they can be removed later
+          for (DNode b : post) extendedNodes.add(b);
+          extendedNodes.add(post[0].pre[0]);
+        }
+      }
+    }
+    return extendedNodes;
+  }
+
+  /**
+   * Remove all nodes from the branching process that have been added by the
+   * previous call of {@link #extendBranchingProcessWithNextEvents(Collection)}.
+   */
+  public void removeExtendedNodes() {
+    for (DNode d : extendedNodes) {
+      bp.remove(d);
+    }
+  }
+  
+  /**
    * @return A set of implied conditions s.t. after removing
    * all conditions of this set from the {@link DNodeSet}, the
    * resulting {@link DNodeSet} still has the same causal relations
-   * as the original set.
+   * as the original set. Implied conditions are chosen locally
+   * regardless of the {@link FutureEquivalence} on the branching
+   * process. 
    */
-  public HashSet<DNode> getImpliedConditions_solution() {
+  public HashSet<DNode> getImpliedConditions_solutionLocal() {
     HashSet<DNode> implied = new HashSet<DNode>();
-    
-    int maxID = build.getSystem().currentNameID;
     
     // find solution per ID, i.e. first consider all conditions with ID 0,
     // then with ID 1, etc. this ensures that globally, conditions with the lowest
@@ -305,9 +422,12 @@ public class TransitiveDependencies {
    * @return A set of implied conditions s.t. after removing
    * all conditions of this set from the {@link DNodeSet}, the
    * resulting {@link DNodeSet} still has the same causal relations
-   * as the original set.
+   * as the original set. Implied conditions are chosen based on
+   * the {@link FutureEquivalence} of the branching process s.t.
+   * a condition is set as implied iff the entire equivalence
+   * class can be set as implied.
    */
-  public HashSet<DNode> getImpliedConditions_solution2() {
+  public HashSet<DNode> getImpliedConditions_solutionGlobal() {
     
     HashSet<DNode> impliedCand = getAllImpliedConditions();
     

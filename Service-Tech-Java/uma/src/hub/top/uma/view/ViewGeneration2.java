@@ -44,17 +44,21 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class ViewGeneration2 {
   
   private DNodeRefold   build;
   private DNodeSet  bp;
   
-  public HashMap<DNode, Integer> eventOccurrences;
-  public HashMap<HashSet<DNode>, LinkedList<String[]>> equivalentTraces;
+  public Map<DNode, Integer> eventOccurrences;
+  public Map<HashSet<DNode>, LinkedList<String[]>> equivalentTraces;
+  public Set<List<DNode>> visitedMarkings;
   
   /**
    * Standard constructor for view generation. The argument takes a branching
@@ -69,9 +73,9 @@ public class ViewGeneration2 {
     
     eventOccurrences = new HashMap<DNode, Integer>();
     equivalentTraces = new HashMap<HashSet<DNode>, LinkedList<String[]>>();
+    visitedMarkings = new HashSet<List<DNode>>();
   }
   
-
   
   /**
    * Extend the branching process by the partially ordered run of the given
@@ -84,13 +88,15 @@ public class ViewGeneration2 {
    * the trace, and <code>false</code> if one action could not be fired
    */
   public boolean extendByTrace(String[] trace) {
-    HashSet<DNode> run = new HashSet<DNode>();
+    Set<DNode> run = new HashSet<DNode>();
     LinkedList<DNode> runCut = new LinkedList<DNode>();
     
     for (DNode b : bp.initialCut) {
       run.add(b);
       runCut.add(b);
     }
+    
+    visitedMarkings.add(runCut);
     
     for (int i = 0; i<trace.length; i++) {
       
@@ -203,6 +209,8 @@ public class ViewGeneration2 {
             if (!eventOccurrences.containsKey(newEvent))
               eventOccurrences.put(newEvent, 0);
             eventOccurrences.put(newEvent, eventOccurrences.get(newEvent)+1);
+            
+            visitedMarkings.add(runCut);
           } else {
             System.out.println("fired event with empty post-set");
           }

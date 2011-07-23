@@ -167,27 +167,29 @@ public class DNodeSet {
 	 * 
 	 * @param b
 	 */
-  protected void remove(DNode b) {
+  public void remove(DNode b) {
     
-    for (DNode e : b.post) {
-      // remove 'b' from the pre-set of each of its post-events
-      DNode[] e_pre_new = new DNode[e.pre.length-1];
-      for (int i=0,j=0; i<e.pre.length; i++) {
-        if (e.pre[i] == b) continue;
-        e_pre_new[j++] = e.pre[i];
+    if (b.post != null)
+      for (DNode e : b.post) {
+        // remove 'b' from the pre-set of each of its post-events
+        DNode[] e_pre_new = new DNode[e.pre.length-1];
+        for (int i=0,j=0; i<e.pre.length; i++) {
+          if (e.pre[i] == b) continue;
+          e_pre_new[j++] = e.pre[i];
+        }
+        e.pre = e_pre_new;
       }
-      e.pre = e_pre_new;
-    }
-    
-    for (DNode e : b.pre) {
-      // remove 'b' from the pre-set of each of its post-events
-      DNode[] e_post_new = new DNode[e.post.length-1];
-      for (int i=0,j=0; i<e.post.length; i++) {
-        if (e.post[i] == b) continue;
-        e_post_new[j++] = e.post[i];
+
+    if (b.pre != null)
+      for (DNode e : b.pre) {
+        // remove 'b' from the pre-set of each of its post-events
+        DNode[] e_post_new = new DNode[e.post.length-1];
+        for (int i=0,j=0; i<e.post.length; i++) {
+          if (e.post[i] == b) continue;
+          e_post_new[j++] = e.post[i];
+        }
+        e.post = e_post_new;
       }
-      e.post = e_post_new;
-    }
     
     allConditions.remove(b);
   }

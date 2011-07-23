@@ -27,6 +27,7 @@ import hub.top.petrinet.Transition;
 import hub.top.uma.DNode;
 import hub.top.uma.DNodeBP;
 import hub.top.uma.DNodeRefold;
+import hub.top.uma.DNodeSet;
 import hub.top.uma.DNodeSys;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.Uma;
@@ -75,7 +76,7 @@ public class MineSimplify {
     public boolean unfold_refold = true; 
     public boolean remove_implied = true;
     public boolean abstract_chains = false;
-    public boolean remove_flower_places = true;
+    public boolean remove_flower_places = false;
     
   }
   
@@ -236,6 +237,10 @@ public class MineSimplify {
     return simplifiedNet;
   }
   
+  public DNodeRefold getBuild() {
+    return build;
+  }
+  
   /**
    * Write results to files. Requires that this simplification object was
    * instantiated with {@link MineSimplify#MineSimplify(String, String)}.
@@ -260,8 +265,6 @@ public class MineSimplify {
     
     String targetPath_bp = fileName_system_sysPath+".bp.lola";
     PetriNetIO.writeToFile(bp, targetPath_bp, PetriNetIO.FORMAT_LOLA, 0);
-    
-
   }
   
   /**
@@ -304,9 +307,10 @@ public class MineSimplify {
     // step 2) find implied places
     _time_implied_start = System.currentTimeMillis();
     if (config.remove_implied) {
+      boolean preservePrecision = false;
       assertBranchingProcess(net, sysModel, traces);
-      HashSet<DNode> implied = findImpliedConditions();
-      removeImpliedPlaces(net, place_conditions, implied);
+      HashSet<DNode> implied = findImpliedConditions(preservePrecision);
+      removeImpliedPlaces(net, place_conditions, implied, preservePrecision);
     }
     _time_implied_finish = System.currentTimeMillis();
     
@@ -459,7 +463,7 @@ public class MineSimplify {
   /**
    * @return the set of implied conditions in the branching process of the system model
    */
-  private HashSet<DNode> findImpliedConditions() {
+  private HashSet<DNode> findImpliedConditions(boolean preservePrecision) {
     
     boolean printDetail = (build.getBranchingProcess().allConditions.size()
         +build.getBranchingProcess().allEvents.size() > 10000) ? true : false;
@@ -467,10 +471,17 @@ public class MineSimplify {
     if (printDetail) Uma.out.println("transitive dependencies..");
     TransitiveDependencies dep = new TransitiveDependencies(build);
     if (printDetail) Uma.out.println("find solution..");
-    HashSet<DNode> implied = dep.getImpliedConditions_solution();
+    HashSet<DNode> implied;
+    if (preservePrecision)
+        implied = dep.getImpliedConditions_solution2();
+    else
+        implied = dep.getImpliedConditions_solution();
 
     return implied;
   }
+  
+  public Set<Place> pseudoImplied = new HashSet<Place>();
+  public Set<DNode> implied;
   
   /**
    * Remove all implied places from the net. The implied places are computed from
@@ -480,36 +491,54 @@ public class MineSimplify {
    * @param place_conditions
    * @param implied
    */
-  private void removeImpliedPlaces(PetriNet net, Map<Place, Set<DNode> > place_conditions, Set<DNode> implied)
+  private void removeImpliedPlaces(PetriNet net, Map<Place, Set<DNode> > place_conditions, Set<DNode> implied, boolean preservePrecision)
   {
-
+    this.implied = implied;
+    
     boolean printDetail = (build.getBranchingProcess().allConditions.size()
         +build.getBranchingProcess().allEvents.size() > 10000) ? true : false;
     
     Uma.out.println("remove implied places..");
     LinkedList<Place> impliedPlaces = new LinkedList<Place>();
     for (Place p : net.getPlaces()) {
-      boolean allImplied = true;
-
+      
+      boolean place_p_isImplied = preservePrecision;
+      
       for (DNode bPrime : place_conditions.get(p)) {
-        
-        //if (!implied.contains(bPrime)) {
-        //  allImplied = false;
-        //}
-        if (implied.contains(bPrime)) {
-          impliedPlaces.add(p);
-          break;
+
+        if (preservePrecision) {
+          // remove place only if every condition is implied
+          if (!implied.contains(bPrime)) {
+            place_p_isImplied = false;
+            break;
+          }
+
+        } else {
+          // remove place as soon as one condition is implied
+          if (implied.contains(bPrime)) {
+            place_p_isImplied = true;
+            break;
+          }
         }
       }
       
-      //if (allImplied) {
-      //  impliedPlaces.add(p);
-      //}
+      if (place_p_isImplied) {
+        
+        //for (DNode bPrime : place_conditions.get(p)) {
+        //  if (!implied.contains(bPrime)) {
+        //    System.out.println(bPrime+" is not implied");
+        //  }
+        //}
+        impliedPlaces.add(p);
+      }
     }
     
     for (Place p : impliedPlaces) {
       boolean isSinglePost = false;
       boolean isSinglePre = false;
+      // ensure that a place is only removed if it does not
+      // partition the net (by removing the last pre-place
+      // or post-place of a transition)
       for (Transition t : p.getPreSet()) {
         if (t.getOutgoing().size() == 1) {
           isSinglePost = true;
@@ -523,8 +552,9 @@ public class MineSimplify {
         }
       }
 
-      if (!isSinglePost && !isSinglePre) {
-        //Uma.out.println("removing implied place: "+p+" "+p.getPreSet()+" "+p.getPostSet());
+      if (!isSinglePost && !isSinglePre)
+      {
+        Uma.out.println("removing implied place: "+p+" "+p.getPreSet()+" "+p.getPostSet());
         net.removePlace(p);
       }
     }

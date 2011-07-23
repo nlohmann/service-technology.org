@@ -143,6 +143,8 @@
 		<copy file="${home}/build.am.xml" todir="${dir.distdir}" />
 		<copy file="${home}/configure.properties" todir="${dir.distdir}" />
 		
+		<copy file="${home}/uma.properties" todir="${dir.distdir}" />
+		
 		<mkdir dir="${dir.distdir}/${tests}" />
 		<copy todir="${dir.distdir}/${tests}">
 			<fileset dir="${dir.tests}" />
@@ -166,6 +168,8 @@
 				<include name="*.jar" />
 			</fileset>
 		</copy>
+		
+		<copy file="${home}/uma.properties" todir="${dir.distbindir}" />
 		
 		<zip destfile="${home}/${package}-bin.zip">
 			<zipfileset dir="${dir.distbindir}" />
@@ -200,6 +204,8 @@
 	<!-- clean all files that have been generated -->
 	<target name="clean"
 			description="Clean all temporary build directories and temporary files.">
+		<ant antfile="${dir.tests}/build.xml" target="clean" inheritall="true">
+		</ant>
 		<delete dir="${dir.distcheckdir}" includeemptydirs="true" failonerror="false"/>
 		<delete dir="${dir.distbindir}" includeemptydirs="true" failonerror="false"/>
 		<delete dir="${dir.distdir}" includeemptydirs="true" failonerror="false"/>
@@ -215,6 +221,8 @@
 	<!-- clean all files that have been generated -->
 	<target name="svn-clean" depends="clean,pre-svn-clean"
 			description="Remove all generated files and set directory back to situation in the repository.">
+		<ant antfile="${dir.tests}/build.xml" target="svn-clean" inheritall="true">
+		</ant>
 		<delete failonerror="false">
 			<fileset dir="${home}">
 				<include name="${build.target}*.zip"/>

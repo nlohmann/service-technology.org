@@ -1622,7 +1622,7 @@ public class DNodeBP {
    * TODO: method is protected to be called from extending plugins, check consistency of other fields when the method is re-used in another context
 	 */
 	protected void setCutOffEvent(DNode cutOffEvent, DNode equivalentEvent) {
-	  System.out.println("setting cut-off event: "+cutOffEvent+" --> "+equivalentEvent);
+	  //System.out.println("setting cut-off event: "+cutOffEvent+" --> "+equivalentEvent);
 	  cutOffEquivalentEvent.put(cutOffEvent, equivalentEvent);
 	  futureEquivalence.putElementaryEquivalent(cutOffEvent, equivalentEvent);
 	}

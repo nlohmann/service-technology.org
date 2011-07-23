@@ -289,11 +289,11 @@ public class FutureEquivalence implements Map<DNode, Set<DNode>> {
   }
 
   public void _debugPrintCutOffPairs() {
-    System.out.println("----- CC-pairs -----");
+    System.out.println("----- CutOff-pairs -----");
     for (Entry<DNode, DNode> cc : getElementary_ccPair().entrySet()) {
       System.out.println(cc.getKey()+" --> "+cc.getValue());
     }
-    System.out.println("---- /CC-pairs -----");
+    System.out.println("---- /CutOff-pairs -----");
   }
   
   /**

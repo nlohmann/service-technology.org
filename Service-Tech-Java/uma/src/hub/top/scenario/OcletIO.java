@@ -58,20 +58,31 @@ public class OcletIO extends PetriNetIO {
     return PetriNetIO.readNetFromFile(fileName);
   }
   
-  public static void writeToFile(OcletSpecification os, String fileName, int format, int parameter) throws IOException {
+  public static void writeFile(String s, String fileName) throws IOException {
 
     // Create file 
-    FileWriter fstream = new FileWriter(fileName+"."+getFileExtension(format));
+    FileWriter fstream = new FileWriter(fileName);
     BufferedWriter out = new BufferedWriter(fstream);
     
-    if (format == FORMAT_DOT) {
-        out.write(toDot(os));
-    } else if (format == FORMAT_LOLA) {
-      out.write(toLoLA(os));
-    }
+    out.write(s);
 
     //Close the output stream
     out.close();
+  }
+  
+  public static void writeToFile(OcletSpecification os, String fileName, int format, int parameter) throws IOException {
+
+    // Create file 
+    String extFileName = fileName+"."+getFileExtension(format);
+    String contents; 
+    if (format == FORMAT_DOT) {
+      contents = toDot(os);
+    } else if (format == FORMAT_LOLA) {
+      contents = toLoLA(os);
+    } else {
+      return;
+    }
+    writeFile(extFileName, contents);
   }
   
   public static String toDot(Oclet o) {

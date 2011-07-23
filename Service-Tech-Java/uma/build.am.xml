@@ -25,6 +25,7 @@
 			src="${pnapi.binurl}"
 			dest="${home}/${pnapi.tmpdir}/${pnapi.bin}.zip" 
 			usetimestamp="true"
+			ignoreerrors="true"
 		/>
 		<mkdir dir="${home}/${pnapi.tmpdir}/${pnapi.bin}/" />
 		<unzip dest="${home}/${pnapi.tmpdir}/${pnapi.bin}/" src="./${pnapi.tmpdir}/${pnapi.bin}.zip" />
@@ -39,6 +40,7 @@
 			src="${pnapi.srcurl}"
 			dest="${home}/${pnapi.tmpdir}/${pnapi.src}.zip" 
 			usetimestamp="true"
+			ignoreerrors="true"
 		/>
 		<mkdir dir="${home}/${pnapi.tmpdir}/${pnapi.src}/" />
 		<unzip dest="${home}/${pnapi.tmpdir}/${pnapi.src}/" src="./${pnapi.tmpdir}/${pnapi.src}.zip" />

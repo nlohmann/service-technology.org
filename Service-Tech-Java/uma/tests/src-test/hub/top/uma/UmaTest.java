@@ -72,16 +72,18 @@ public class UmaTest extends hub.top.test.TestCase {
       
       while (build.step() > 0);
       
+      OcletIO.writeFile(build.toDot(), testFileRoot+"/net_lexik.bp.dot");
+      
       int cutOffCount = 0;
       for (DNode e : build.getBranchingProcess().allEvents) {
         if (!e.isCutOff) continue; 
         cutOffCount++;
         if (sys.properNames[e.id].equals("u")) {
-          short otherId = build.futureEquivalence().getElementary_ccPair().get(e).id;
+          short otherId = build.getCutOffEquivalentEvent().get(e).id;
           assertEquals("cut-off event u mapped to v", "v", sys.properNames[otherId]);
         }
         if (sys.properNames[e.id].equals("x")) {
-          short otherId = build.futureEquivalence().getElementary_ccPair().get(e).id;
+          short otherId = build.getCutOffEquivalentEvent().get(e).id;
           assertEquals("cut-off event x mapped to x", "x", sys.properNames[otherId]);
         }
       }

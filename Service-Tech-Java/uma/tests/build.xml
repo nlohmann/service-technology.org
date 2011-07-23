@@ -15,6 +15,8 @@
 	<property name="dir.coveragereport.xml" location="${test.basedir}/cover-xml" />
 	<property name="src.coveragereport" location="${src}" />
 	
+	<property name="cobertura.datafile" location="${test.basedir}/cobertura.ser" />
+	
 	<property name="testfiles" location="${test.basedir}/testfiles" />
 	
 	<property name="compiled.classes" location="${bin}" />
@@ -57,7 +59,9 @@
 	    <property name="myclasspath" refid="classpath.cobertura"/>
 	    <echo message="classpath= ${myclasspath}"/>
 		
-		<cobertura-instrument todir="${dir.test-instrument}" classpathref="classpath.cobertura">
+		<cobertura-instrument todir="${dir.test-instrument}" 
+				classpathref="classpath.cobertura" 
+				datafile="${cobertura.datafile}">
 			<ignore regex="org.apache.log4j.*" />
 			<ignore regex="gnu.trove.*" />
 
@@ -73,6 +77,7 @@
 	      <!-- class path for code coverage by cobertura -->
 	      <classpath location="${dir.test-instrument}" />
 	      <classpath refid="classpath.cobertura"/>
+	      <jvmarg value="-Dnet.sourceforge.cobertura.datafile=${cobertura.datafile}"/>
 	    	
 	      <!-- class path of the code to test and the Junit framework -->
 	      <classpath refid="classpath.test"/>
@@ -83,20 +88,21 @@
 	    	
 	      <!-- JUnit: test cases to run -->
     	  <sysproperty key="test.testFileRoot" path="${testfiles}"/>
-	      <test name="hub.top.scenario.OcletTest" />	
-	      <test name="hub.top.uma.UmaTest" />
-	   	  <test name="hub.top.uma.UmaFoldTest" />
+	      <test name="hub.top.scenario.OcletTest" todir="${test.basedir}" />	
+	      <test name="hub.top.uma.UmaTest" todir="${test.basedir}" />
+	   	  <test name="hub.top.uma.UmaFoldTest" todir="${test.basedir}" />
 	    </junit>
 		
 		<!-- Cobertura: generate HTML coverage report -->
-		<cobertura-report destdir="${dir.coveragereport.html}" format="html" srcdir="${src.coveragereport}">
-		</cobertura-report>
-		<cobertura-report destdir="${dir.coveragereport.xml}" format="xml" srcdir="${src.coveragereport}">
-		</cobertura-report>		
-		
+		<echo message="Creating Cobertura report, using ${test.basedir}/cobertura.ser" />
+		<cobertura-report destdir="${dir.coveragereport.html}" format="html" srcdir="${src.coveragereport}"
+			datafile="${cobertura.datafile}" />
+		<cobertura-report destdir="${dir.coveragereport.xml}" format="xml" srcdir="${src.coveragereport}"
+			datafile="${cobertura.datafile}" />
+
 		
 		<echo message="Running binary tests in ${test.basedir}" />
-		<java classname="hub.top.uma.Uma" dir="${test.basedir}" fork="true">
+		<java classname="hub.top.uma.Uma" dir="${home}" fork="true">
 			<classpath refid="classpath.run" />
 			<arg value="-i"/>
 			<arg file="${testfiles}/net_lexik.lola" />
@@ -113,7 +119,7 @@
 		<mkdir dir="${_dir}" />
 		
 		<copy file="${testfiles}/EMS.oclets" todir="${_dir}"/>
-		<java classname="hub.top.uma.view.ViewGeneration2" output="${_dir}/viewgeneration.log">
+		<java classname="hub.top.uma.view.ViewGeneration2" dir="${home}" output="${_dir}/viewgeneration.log" fork="true">
 			<classpath refid="classpath.run" />
 			<arg value="-gen"/>
 			<arg value="${_dir}/EMS.oclets"/>
@@ -121,7 +127,7 @@
 			<arg value="30"/>
 			<arg value="${_dir}/EMS_traces.txt"/>
 		</java>
-		<java classname="hub.top.uma.view.ViewGeneration2" output="${_dir}/viewgeneration2.log">
+		<java classname="hub.top.uma.view.ViewGeneration2" dir="${home}" output="${_dir}/viewgeneration2.log" fork="true">
 			<classpath refid="classpath.run" />
 			<arg value="-replay"/>
 			<arg value="${_dir}/EMS.oclets"/>
@@ -132,9 +138,9 @@
                 <fileset id="fs" dir="${_dir}" includes="EMS.oclets.traces.dot"/>
 		    </resourcecount> </not> </condition>
 		</fail>
-
-		<delete dir="${_dir}" includeemptydirs="true" />
-
+<!--
+		<delete dir="${_dir}" includeemptydirs="true"  />
+-->
 	</target>
 	
 	<target name="clean">

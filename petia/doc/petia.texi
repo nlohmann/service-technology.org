@@ -113,7 +113,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All 21 tests were successful.
+All 25 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{petia@@service-technology.org}.
@@ -262,7 +262,9 @@ By default, Petri nets are assumed to be in PNML format.
 
 By default, Petia prints out a set of equivalence classes of the places of a given net.
 Two places are equivalent if in any semipositive place invariant of the net either
-both or none occur.
+both or none occur. With the option @option{--full} two places will be non-equivalent
+even when both occur in an invariant, but with different weights. The default option
+@option{--support} only differentiates between occurrence and non-occurrence.
 
 Petia can also determine equivalence classes of transitions using transition
 invariant, for this use the option @option{--transition} (default is
@@ -270,6 +272,11 @@ invariant, for this use the option @option{--transition} (default is
 
 The output can be given in a default format or in the format used by the tool Snoopy.
 For the latter, the option @option{--snoopy} can be given on the command line.
+
+Petia can show the invariants that where used to distinguish equivalence classes.
+This is forced by the option @option{--invariants}, but note that in output format
+@option{--snoopy} only either the invariants or the equivalence will be printed.
+In the standard output format, both will be shown.
 
 In the case of a failure of the Linear Programming Solver, the output of Petia
 may be invalid (Petia will tell). Internally, Petia maintains two relations,

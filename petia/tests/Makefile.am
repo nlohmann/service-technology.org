@@ -8,9 +8,9 @@
 
 # the files needed by the test cases (without `testfiles/' directory)
 # <<-- CHANGE START (testfiles) -->>
-TESTFILES = test.owfn test.pnml test2.owfn phils10.llnet \
+TESTFILES = test.owfn test.pnml test2.owfn test3.owfn phils10.llnet \
 		semaphore.owfn semaphore2.owfn petia.conf \
-		garavel.llnet coffee.owfn
+		garavel.llnet coffee.owfn support.owfn
 # <<-- CHANGE END -->>
 
 

@@ -34,6 +34,10 @@ groupoption "snoopy" y
   "Print the equivalence classes in Snoopy format."
   group="Output Format"
 
+option "invariants" i
+  "Print the invariants needed for the equivalence, not the equivalence itself."
+  flag off
+
 section "Problem Statement"
 sectiondesc="Define the kind of equivalence to be computed.\n"
 
@@ -45,6 +49,15 @@ groupoption "transition" t
 groupoption "place" p
   "An equivalence for places is computed (default)."
   group="Node Type"
+
+defgroup "Inv Type" groupdesc="Select whether full invariants or only their supports are used."
+groupoption "full" f
+  "Places are equivalent if they have the same value in every invariant."
+  group="Inv Type"
+
+groupoption "support" s
+  "Places are equivalent if they have the same value in the support of every invariant (default)."
+  group="Inv Type"
 
 section "Configuration"
 sectiondesc="Configurations are not required at the moment.\n"
@@ -95,7 +108,7 @@ option "stats" -
   flag off
   hidden
 
-option "fine" f
+option "fine" F
   "Select direction from which equivalence is approximated."
   details="On errors, output can be a too coarse relation, i.e. equivalences remain undetected. Use this option to get a too fine relation instead.\n"
   flag off

@@ -59,7 +59,7 @@ public:
 	bool getUndecided(Node*& n1, Node*& n2);
 
 	/// Precompute some equivalent nodes from the structure of the net
-	void simpleEquivalences();
+	void simpleEquivalences(bool fullinv);
 
 	/// Find the representative of the class containing the node in ''below''
 	Node* findClass(Node* n);
@@ -113,6 +113,7 @@ private:
 	bool nodetype;
 	set<Node*> places;
 	set<Node*> transitions;
+	bool finv;
 };
 
 #endif

@@ -52,8 +52,11 @@ public:
 	/// Add a new constraint to the linear system
 	bool addConstraint(REAL*, int, REAL);
 */
-	/// Add a new constraint to the linear system (b=true means p=0, b=false means p>=1)
+	/// Add a new constraint to the linear system (b=true means n=0, b=false means n>=1)
 	bool addConstraint(Node* n, bool b);
+
+	/// Add a new constraint of the form n1-n2>0 to the system
+	bool addConstraint(Node* n1, Node* n2);
 
 	/// Solve the linear system
 	int solveSystem();

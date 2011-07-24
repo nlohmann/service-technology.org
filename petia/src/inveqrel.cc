@@ -41,7 +41,7 @@ using std::endl;
 	@param ntype Whether the objects are places (true) or transitions (false).
 	@param pricheck Optimize for less calls to lp_solve, induces some overhead.
 */
-InvEqRel::InvEqRel(PetriNet& pn, bool ntype, bool pricheck) : start(0),net(pn),prejoin(0),nodetype(ntype) {
+InvEqRel::InvEqRel(PetriNet& pn, bool ntype, bool pricheck) : start(0),net(pn),prejoin(0),nodetype(ntype),finv(false) {
 	set<Place*> pset(pn.getPlaces());
 	set<Place*>::iterator pit;
 	for(pit=pset.begin(); pit!=pset.end(); ++pit)
@@ -130,23 +130,32 @@ void InvEqRel::split(map<Node*,int> inv) {
 	// sets after `end' are those just created -- they already have been split
 	for(unsigned int i=start; i<end; ++i)
 	{
-		// don't split if there is nothing to split
-		if (above[i].size()<2) continue;
-		set<Node*> nset;
-		// get all nodes with non-zero entries in inv
-		for(nit=above[i].begin(); nit!=above[i].end(); ++nit)
-			if (inv[*nit]!=0) nset.insert(*nit);
-		// if all or no nodes have to be split away, there is nothing to do
-		if (nset.size()==above[i].size() || nset.empty()) continue;
-		// remove the collected nodes from the active set
-		for(nit=nset.begin(); nit!=nset.end(); ++nit) 
+		set<Node*> full(above[i]);
+		while (!full.empty()) 
 		{
-			above[i].erase(*nit);
-			// and also adapt the pointers to the new set (to be created) 
-			toclass[*nit]=static_cast<unsigned int>(above.size());
+			// don't split if there is nothing to split
+			if (full.size()<2) { full.clear(); continue; }
+			set<Node*> nset;
+			// entry of the first element in inv
+			int cmp(inv[*(full.begin())]);
+			// get all nodes with same entry in inv as the first element
+			for(nit=full.begin(); nit!=full.end(); ++nit)
+				if (inv[*nit]==cmp) nset.insert(*nit);
+			// if all or no nodes have to be split away, there is nothing to do
+			if (nset.size()==full.size() || nset.empty()) 
+				{ full.clear(); continue; }
+			// remove the collected nodes from the active set
+			for(nit=nset.begin(); nit!=nset.end(); ++nit) 
+			{
+				above[i].erase(*nit);
+				full.erase(*nit);
+				// and also adapt the pointers to the new set (to be created) 
+				toclass[*nit]=static_cast<unsigned int>(above.size());
+			}
+			// add the new set to the end of the vector
+			above.push_back(nset);
+			if (!finv) full.clear(); // only differentiate once, by support
 		}
-		// add the new set to the end of the vector
-		above.push_back(nset);
 	}
 }
 
@@ -218,8 +227,11 @@ bool InvEqRel::getUndecided(Node*& n1, Node*& n2) {
 
 /** Compute some simple equivalences that can be found by looking at the local structure
 	of the net, without using lp_solve.
+	@param fullinv If node must have the same weight in invariants for the equivalence to hold.
 */
-void InvEqRel::simpleEquivalences() {
+void InvEqRel::simpleEquivalences(bool fullinv) {
+	// save the parameter
+	finv = fullinv;
 	// we check for every node of the other type ...
 	set<Node*> nset(nodetype?transitions:places);
 	set<Node*>::iterator nit;
@@ -251,14 +263,15 @@ void InvEqRel::simpleEquivalences() {
 			// so make them equivalent
 			Node* n1(&((*(arcs1.begin()))->getSourceNode()));
 			Node* n2(&((*(arcs2.begin()))->getTargetNode()));
-			pjoin(n1,n2);
+			if (!fullinv || (*(arcs1.begin()))->getWeight()==(*(arcs2.begin()))->getWeight())
+				pjoin(n1,n2);
 		}
 	}
 }
 
 /** Find the representative of the class containing a given node, in the coarser relation `below'.
 	@param n The node for which the representative is sought.
-	@return The represetative (or NULL in case of an error).
+	@return The representative (or NULL in case of an error).
 */
 Node* InvEqRel::findClass(Node* n) {
 	int j(findClassNum(n));

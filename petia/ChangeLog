@@ -8,6 +8,13 @@
 
 
 
+Version 1.2 (24 Juli 2011)
+==========================
+
+* New option -i to print the separating invariants.
+
+* New option -f to use full invariants instead of support.
+
 Version 1.1 (22 Juli 2011)
 ==========================
 

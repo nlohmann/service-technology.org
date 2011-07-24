@@ -165,6 +165,21 @@ bool LPWrapper::addConstraint(Node* n, bool b) {
 	return add_constraintex(lp,1,row,colno,(b?EQ:GE),(b?0:1));
 }
 
+/** Forward a constraint of the form n1-n2>0 to the internal data structure lprec.
+	@param n1 A node (place or transition).
+	@param n2 A second node.
+	@return If adding the constraint succeeded.
+*/
+bool LPWrapper::addConstraint(Node* n1, Node* n2) {
+	REAL row[2];
+	int colno[2];
+	row[0]=1;
+	row[1]=-1;
+	colno[0]=npos[n1]+1;
+	colno[1]=npos[n2]+1;
+	return add_constraintex(lp,2,row,colno,GE,1);
+}
+
 /** Wrapper for solving the system.
 	@return The result of solve(lp), usually 0 or 1 for success, 2 for unsolvable.
 */

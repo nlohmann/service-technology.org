@@ -8,12 +8,11 @@
 
 
 
-Version 1.1 (22 Juli 2011)
+Version 1.2 (24 Juli 2011)
 ==========================
 
-* Option -t to determine an equivalence of transitions instead 	of
-  places.
+* New option -i to print the separating invariants.
 
-* Fixing a bug occurring in conjunction with empty pre- and/or postsets.
+* New option -f to use full invariants instead of support.
 
 \nSee file ChangeLog <http://service-technology.org/files/petia/ChangeLog> for\ncomplete version history.\n

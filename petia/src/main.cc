@@ -219,6 +219,7 @@ int main(int argc, char** argv) {
     | 2. Compute the equivalence classes  |
     `------------------------------------*/
 
+	vector<map<Node*,int> > inv;
 	bool ntype(!args_info.transition_given);
 	// setup lp_solve
 	LPWrapper lp(net,ntype,false);
@@ -227,17 +228,19 @@ int main(int argc, char** argv) {
 	// establish representation for the equivalence classes
 	InvEqRel ier(net,ntype,!args_info.optimize_given);
 	// precompute some equivalences (not using lp_solve)
-	ier.simpleEquivalences();
+	ier.simpleEquivalences(args_info.full_given);
 	// two placeholders for yet-to-decide equivalence of two places
 	Node* n1;
 	Node* n2;
 	// as long as we find two nodes for which equivalence has not been decided ...
 	while (ier.getUndecided(n1,n2))
 	{
-		// add the equations n1=0 and n2>0 to the system
+		// add the equations n1=0 and n2>0 to the system (or n1-n2>0 for full invariants)
 		if (!lp.stripConstraints()) abort(12,"failed to remove constraints from LP model");
-		if (!lp.addConstraint(n1,true)) abort(12,"failed to add constraint to LP model");
-		if (!lp.addConstraint(n2,false)) abort(12,"failed to add constraint to LP model");
+		if (!args_info.full_given) {
+			if (!lp.addConstraint(n1,true)) abort(12,"failed to add constraint to LP model");
+			if (!lp.addConstraint(n2,false)) abort(12,"failed to add constraint to LP model");
+		} else if (!lp.addConstraint(n1,n2)) abort(12,"failed to add constraint to LP model");
 		// and solve it
 		int res(lp.solveSystem());
 		if (res>2) status("lp_solve failure -- resulting relation may be too coarse");
@@ -245,19 +248,23 @@ int main(int argc, char** argv) {
 		{
 			// n1 and n2 can be distinguished
 			map<Node*,int> sol(lp.getNVector());
+			inv.push_back(sol);
 			// use the computed invariant to find non-equivalent places (including p1&p2)
 			ier.split(sol);
 		} else {
-			// if the first check fails, now test with n1>0 and n2=0
+			// if the first check fails, now test with n1>0 and n2=0 (resp. n2-n1>0)
 			if (!lp.stripConstraints()) abort(12,"failed to remove constraints from LP model");
-			if (!lp.addConstraint(n2,true)) abort(12,"failed to add constraint to LP model");
-			if (!lp.addConstraint(n1,false)) abort(12,"failed to add constraint to LP model");
+			if (!args_info.full_given) {
+				if (!lp.addConstraint(n2,true)) abort(12,"failed to add constraint to LP model");
+				if (!lp.addConstraint(n1,false)) abort(12,"failed to add constraint to LP model");
+			} else if (!lp.addConstraint(n2,n1)) abort(12,"failed to add constraint to LP model");
 			res = lp.solveSystem();
 			if (res>2) status("lp_solve failure -- resulting relation may be too coarse");
 			else if (res<2)
 			{
 				// n1 and n2 can be distinguished
 				map<Node*,int> sol(lp.getNVector());
+				inv.push_back(sol);
 				// use the computed invariant to find non-equivalent places (including p1&p2)
 				ier.split(sol);
 			// otherwise, n1&n2 are equivalent, so join their classes
@@ -269,34 +276,69 @@ int main(int argc, char** argv) {
     | 3. Write result to standard out |
     `--------------------------------*/
 
+	status("%d priority joins found",ier.preJoinsDone());
+	status("%d calls to lp_solve made",lp.getCalls());
+	status("%d invariants computed",inv.size());
 	// output in the format used by the tool Snoopy ...
 	if (args_info.snoopy_given) {
-		cout << " equivalence classes ( ";
+		if (args_info.invariants_given) cout << " invariants ( ";
+		else cout << " equivalence classes ( ";
 		if (ntype) cout << "place";
 		else cout << "transition";
 		cout << " ) = " << endl << endl;
-		vector<set<Node*> > vp(ier.getClasses(!args_info.fine_given));
-		for(unsigned int i=0; i<vp.size(); ++i)
+		if (args_info.invariants_given)
 		{
-			cout << (i+1);
-			bool comma(false);
-			set<Node*>::iterator nit;
-			for(nit=vp[i].begin(); nit!=vp[i].end(); ++nit, comma=true)
+			for(unsigned int i=0; i<inv.size(); ++i)
 			{
-				if (comma) cout << "," << endl;
-				cout << "\t|" << (*nit)->getName() << "\t:1";
+				cout << (i+1);
+				bool comma(false);
+				map<Node*,int>::iterator nit;
+				for(nit=inv[i].begin(); nit!=inv[i].end(); ++nit)
+				{
+					if (nit->second==0) continue;
+					if (comma) cout << "," << endl;
+					cout << "\t|" << nit->first->getName() << "\t:" << nit->second;
+					comma = true;
+				}
+				cout << endl;
 			}
-			cout << endl;
+		} else {
+			vector<set<Node*> > vp(ier.getClasses(!args_info.fine_given));
+			for(unsigned int i=0; i<vp.size(); ++i)
+			{
+				cout << (i+1);
+				bool comma(false);
+				set<Node*>::iterator nit;
+				for(nit=vp[i].begin(); nit!=vp[i].end(); ++nit, comma=true)
+				{
+					if (comma) cout << "," << endl;
+					cout << "\t|" << (*nit)->getName() << "\t:1";
+				}
+				cout << endl;
+			}
 		}
 	} else {
 	// or standard output ...
-		if (flag_verbose)
-		{
-			cout << ier.preJoinsDone() << " priority joins found, ";
-			cout << lp.getCalls() << " calls to lp_solve made." << endl;
+		if (args_info.invariants_given) {
+			if (inv.size()>0) cout << "Invariants used to prove non-equivalence:" << endl;
+			else cout << "No invariants have been constructed." << endl;
+			for(unsigned int i=0; i<inv.size(); ++i)
+			{
+				cout << (i+1) << ") ";
+				bool comma(false);
+				map<Node*,int>::iterator nit;
+				for(nit=inv[i].begin(); nit!=inv[i].end(); ++nit)
+				{
+					if (nit->second==0) continue;
+					if (comma) cout << "+";
+					cout << nit->second << nit->first->getName();
+					comma = true;
+				}
+				cout << endl;
+			}
 		}
 		vector<set<Node*> > vp(ier.getClasses(!args_info.fine_given));
-		cout << "The equivalence relation has " << vp.size() << " classes:" << endl;
+		cout << "The equivalence relation has " << vp.size() << " class" << (vp.size()!=1?"es:":"") << endl;
 		for(unsigned int i=0; i<vp.size(); ++i)
 		{
 			cout << "Class " << (i+1) << ": ";

@@ -5,6 +5,8 @@
 @item New option -n to exclude trivial invariants from consideration.
 
 @item New option -c to determine weakly connected subsets of equivalence classes.
+
+@item Bug fix: linear system over transitions and use of support were buggy.
 @end itemize
 
 @heading Version 1.2 (24 Juli 2011)

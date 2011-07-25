@@ -16,4 +16,6 @@ Version 1.3 (25 Juli 2011)
 * New option -c to determine weakly connected subsets of equivalence
   classes.
 
+* Bug fix: linear system over transitions and use of support were buggy.
+
 \nSee file ChangeLog <http://service-technology.org/files/petia/ChangeLog> for\ncomplete version history.\n

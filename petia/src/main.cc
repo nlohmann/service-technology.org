@@ -237,6 +237,7 @@ int main(int argc, char** argv) {
 	// as long as we find two nodes for which equivalence has not been decided ...
 	while (ier.getUndecided(n1,n2))
 	{
+//cout << "CH: " << n1->getName() << " & " << n2->getName() << endl;
 		int res(0);
 		// solve the system until we get a non-trivial invariant or no solution
 		for(bool go=true; go; go=lp.excludeTrivial())
@@ -248,9 +249,21 @@ int main(int argc, char** argv) {
 				if (!lp.addConstraint(n1,false)) abort(12,"failed to add constraint to LP model");
 			} else if (!lp.addConstraint(n1,n2)) abort(12,"failed to add constraint to LP model");
 			// forbid known trivial invariants that could occur due to n1>0
+//cout << "A" << endl;
 			if (!lp.addTrivialsConstraints(n1)) abort(12,"failed to add constraint to LP model");
+//cout << "B" << endl;
 			// and solve it
 			res = lp.solveSystem();
+//cout << "RES: " << res << endl;
+/*
+if (res<2) {
+cout << "INV1: ";
+map<Node*,int> sol(lp.getNVector());
+for(map<Node*,int>::iterator mit=sol.begin(); mit!=sol.end(); ++mit)
+	cout << mit->second << mit->first->getName() << " ";
+cout << endl;
+}
+*/
 			if (!args_info.nontrivial_given) break;
 		}
 		if (res>2) status("lp_solve failure -- resulting relation may be too coarse");
@@ -260,7 +273,29 @@ int main(int argc, char** argv) {
 			map<Node*,int> sol(lp.getNVector());
 			inv.push_back(sol);
 			// use the computed invariant to find non-equivalent places (including p1&p2)
+/*
+vector<set<Node*> > tmp(ier.getClasses(false));
+cout << "CL: ";
+for(unsigned int i=0; i<tmp.size(); ++i)
+{
+ for(set<Node*>::iterator nx=tmp[i].begin(); nx!=tmp[i].end(); ++nx)
+	cout << (*nx)->getName() << " ";
+ cout << "| ";
+}
+cout << endl;
+*/
 			ier.split(sol);
+/*
+tmp = (ier.getClasses(false));
+cout << "CL: ";
+for(unsigned int i=0; i<tmp.size(); ++i)
+{
+ for(set<Node*>::iterator nx=tmp[i].begin(); nx!=tmp[i].end(); ++nx)
+	cout << (*nx)->getName() << " ";
+ cout << "| ";
+}
+cout << endl;
+*/
 		} else {
 			// if the first check fails, now test with n1>0 and n2=0 (resp. n2-n1>0)
 			// solve the system until we get a non-trivial invariant or no solution
@@ -272,8 +307,20 @@ int main(int argc, char** argv) {
 					if (!lp.addConstraint(n2,false)) abort(12,"failed to add constraint to LP model");
 				} else if (!lp.addConstraint(n2,n1)) abort(12,"failed to add constraint to LP model");
 				// forbid known trivial invariants that could occur due to n2>0
+//cout << "C" << endl;
 				if (!lp.addTrivialsConstraints(n2)) abort(12,"failed to add constraint to LP model");
+//cout << "D" << endl;
 				res = lp.solveSystem();
+//cout << "RES: " << res << endl;
+/*
+if (res<2) {
+cout << "INV2: ";
+map<Node*,int> sol(lp.getNVector());
+for(map<Node*,int>::iterator mit=sol.begin(); mit!=sol.end(); ++mit)
+	cout << mit->second << mit->first->getName() << " ";
+cout << endl;
+}
+*/
 				if (!args_info.nontrivial_given) break;
 			}
 			if (res>2) status("lp_solve failure -- resulting relation may be too coarse");
@@ -283,9 +330,34 @@ int main(int argc, char** argv) {
 				map<Node*,int> sol(lp.getNVector());
 				inv.push_back(sol);
 				// use the computed invariant to find non-equivalent places (including p1&p2)
+/*
+vector<set<Node*> > tmp(ier.getClasses(false));
+cout << "CL: ";
+for(unsigned int i=0; i<tmp.size(); ++i)
+{
+ for(set<Node*>::iterator nx=tmp[i].begin(); nx!=tmp[i].end(); ++nx)
+	cout << (*nx)->getName() << " ";
+ cout << "| ";
+}
+cout << endl;
+*/
 				ier.split(sol);
+/*
+tmp = (ier.getClasses(false));
+cout << "CL: ";
+for(unsigned int i=0; i<tmp.size(); ++i)
+{
+ for(set<Node*>::iterator nx=tmp[i].begin(); nx!=tmp[i].end(); ++nx)
+	cout << (*nx)->getName() << " ";
+ cout << "| ";
+}
+cout << endl;
+*/
 			// otherwise, n1&n2 are equivalent, so join their classes
-			} else if (!ier.join(n1,n2)) status("internal failure -- resulting relation may be too coarse");
+			} else {
+//cout << "HERE" << endl;
+				if (!ier.join(n1,n2)) status("internal failure -- resulting relation may be too coarse");
+			}
 		}
 	}
 

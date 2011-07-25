@@ -101,7 +101,8 @@ int LPWrapper::createIEquation() {
 			// set the nodes in the preset
 			Node* n = &((*ait)->getSourceNode());
 			// to negative weights
-			mat[npos[n]] -= (*ait)->getWeight();
+			if (nodetype) mat[npos[n]] -= (*ait)->getWeight();
+			else mat[npos[n]] += (*ait)->getWeight();
 		}
 		arcs = (*nit)->getPostsetArcs();
 		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
@@ -109,7 +110,8 @@ int LPWrapper::createIEquation() {
 			// and the nodes in the postset
 			Node* n = &((*ait)->getTargetNode());
 			// to positive weights
-			mat[npos[n]] += (*ait)->getWeight();
+			if (nodetype) mat[npos[n]] += (*ait)->getWeight();
+			else mat[npos[n]] -= (*ait)->getWeight();
 		}
 		//initialize the rows
 		if (!add_constraintex(lp,cols,mat,colpoint,EQ,0)) 
@@ -127,7 +129,7 @@ int LPWrapper::createIEquation() {
 	set_add_rowmode(lp,FALSE);	
 	if (verbose) write_LP(lp,stderr);
 	else set_verbose(lp,CRITICAL);
-	basicrows = static_cast<unsigned int>(tset.size());
+	basicrows = static_cast<unsigned int>(nset2.size());
 	delete[] colpoint;
 	delete[] mat;
 	return (int)(basicrows);
@@ -186,6 +188,7 @@ bool LPWrapper::addConstraint(Node* n1, Node* n2) {
 int LPWrapper::solveSystem() {
 	++solvecall;
 	result = solve(lp);
+//write_LP(lp,stdout);
 	return result;
 }
 

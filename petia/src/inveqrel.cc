@@ -29,6 +29,7 @@ using std::vector;
 using std::map;
 using std::set;
 using std::cerr;
+using std::cout;
 using std::endl;
 
 	/***********************************
@@ -138,6 +139,7 @@ void InvEqRel::split(map<Node*,int> inv) {
 			set<Node*> nset;
 			// entry of the first element in inv
 			int cmp(inv[*(full.begin())]);
+			if (!finv) cmp=0;
 			// get all nodes with same entry in inv as the first element
 			for(nit=full.begin(); nit!=full.end(); ++nit)
 				if (inv[*nit]==cmp) nset.insert(*nit);

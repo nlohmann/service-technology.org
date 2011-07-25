@@ -16,6 +16,8 @@ Version 1.3 (25 Juli 2011)
 * New option -c to determine weakly connected subsets of equivalence
   classes.
 
+* Bug fix: linear system over transitions and use of support were buggy.
+
 Version 1.2 (24 Juli 2011)
 ==========================
 

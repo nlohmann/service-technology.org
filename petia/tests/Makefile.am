@@ -10,7 +10,7 @@
 # <<-- CHANGE START (testfiles) -->>
 TESTFILES = test.owfn test.pnml test2.owfn test3.owfn phils10.llnet \
 		semaphore.owfn semaphore2.owfn petia.conf \
-		garavel.llnet coffee.owfn support.owfn
+		garavel.llnet coffee.owfn support.owfn test5.owfn
 # <<-- CHANGE END -->>
 
 

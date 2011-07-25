@@ -289,8 +289,57 @@ int main(int argc, char** argv) {
 		}
 	}
 
+    /*------------------------------------.
+    | 3. Find weakly connected components |
+    `------------------------------------*/
+
+	vector<set<Node*> > vp(ier.getClasses(!args_info.fine_given));
+	if (args_info.connected_given)
+	{
+		unsigned int end(vp.size());
+		for(unsigned int i=0; i<end; ++i) // go through all constructed classes
+		{
+			set<Node*> pset,tset,nset,cset;
+			set<Node*>::iterator nit;
+			while (!vp[i].empty()) // and find a starting point
+			{
+				pset.clear();
+				tset.clear();
+				nset.clear();
+				cset.clear();
+				Node* n1(*(vp[i].begin()));
+				tset.insert(n1);
+				nset.insert(n1);
+				cset.insert(n1);
+				vp[i].erase(n1);
+				while (!tset.empty() || !pset.empty()) // go through the class and its adjacent nodes
+				{
+					Node* n(NULL);
+					bool test(tset.empty());
+					if (test) { n=*(pset.begin()); pset.erase(n); }
+					else { n=*(tset.begin()); tset.erase(n); }
+					set<Node*> pre(n->getPreset()); // here are the
+					set<Node*> post(n->getPostset()); // adjacent nodes
+					for(nit=pre.begin(); nit!=post.end(); ++nit)
+					{
+						if (nit==pre.end()) { nit=post.begin(); if (post.empty()) break; }
+						if (cset.find(*nit)!=cset.end()) continue; // but only visit unvisited nodes
+						if (test && vp[i].find(*nit)==vp[i].end()) continue; // that are not "outside" the class
+						cset.insert(*nit);
+						if (!test) { pset.insert(*nit); continue; }
+						tset.insert(*nit); 
+						nset.insert(*nit); // remember the visited nodes from the class
+						vp[i].erase(*nit);
+					}
+				}
+				if (!vp[i].empty()) vp.push_back(nset); // weakly connected set found, remember it
+			}
+			vp[i] = nset;
+		}
+	}
+
     /*--------------------------------.
-    | 3. Write result to standard out |
+    | 4. Write result to standard out |
     `--------------------------------*/
 
 	status("%d priority joins found",ier.preJoinsDone());
@@ -320,7 +369,6 @@ int main(int argc, char** argv) {
 				cout << endl;
 			}
 		} else {
-			vector<set<Node*> > vp(ier.getClasses(!args_info.fine_given));
 			for(unsigned int i=0; i<vp.size(); ++i)
 			{
 				cout << (i+1);
@@ -354,7 +402,6 @@ int main(int argc, char** argv) {
 				cout << endl;
 			}
 		}
-		vector<set<Node*> > vp(ier.getClasses(!args_info.fine_given));
 		cout << "The equivalence relation has " << vp.size() << " class" << (vp.size()!=1?"es:":"") << endl;
 		for(unsigned int i=0; i<vp.size(); ++i)
 		{

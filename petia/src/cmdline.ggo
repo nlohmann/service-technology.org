@@ -64,6 +64,11 @@ option "nontrivial" n
   details="An invariant is non-trivial if its support has at least 3 elements or two different non-zero weights occur."
   flag off
 
+option "connected" c
+  "Equivalence classes are partitioned into weakly connected sets."
+  details="A set is connected if there is a path between any two nodes of it using only the set and its pre- and postsets."
+  flag off
+
 section "Configuration"
 sectiondesc="Configurations are not required at the moment.\n"
 

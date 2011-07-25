@@ -113,7 +113,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All 25 tests were successful.
+All 28 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{petia@@service-technology.org}.
@@ -258,25 +258,36 @@ The option @option{--owfn} assumes the Petri net to be in the open net format, t
 takes the Petri net to be in the low-level LoLA format, and @option{--pnml} uses the PNML format for input.
 By default, Petri nets are assumed to be in PNML format.
 
-@section Output
+@section Computation
 
 By default, Petia prints out a set of equivalence classes of the places of a given net.
 Two places are equivalent if in any semipositive place invariant of the net either
 both or none occur. With the option @option{--full} two places will be non-equivalent
-even when both occur in an invariant, but with different weights. The default option
+when both occur in an invariant, but with different weights. The default option
 @option{--support} only differentiates between occurrence and non-occurrence.
 
 With the option @option{--nontrivial} trivial invariants will not be
 used to put places into different equivalence classes. An invariant is
 trivial if it contains at most two places with non-zero weight and all
-weights occurring are either zero or one. Note that @option{--full} and
+weights occurring are either zero or one. The option will also exclude
+invariants that are linear combinations of trivial and non-trivial
+invariants. Note that @option{--full} and
 @option{--nontrivial} currently influence each other in a way that may
 lead to wrong results. A warning is printed if both are used at the same
 time.
 
+The option @option{--connected} allows to split up the equivalences classes
+further into their weakly connected subsets. A set is weakly connected
+if for any two nodes in it there is a path that leads from one to the other using
+only the nodes in the set itself, the pre- and postsets of these nodes and
+the adjacent edges. The path may use each edge in or against its original 
+direction. 
+
 Petia can determine equivalence classes of transitions, too, using transition
 invariants, for this apply the option @option{--transition} (default is
 @option{--place} for places and place invariants). 
+
+@section Output
 
 The output can be given in a default format or in the format used by the tool Snoopy.
 For the latter, the option @option{--snoopy} can be given on the command line.

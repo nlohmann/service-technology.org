@@ -126,6 +126,20 @@ AT_CHECK([GREP -q " 1 class" stdout], 0, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
+AT_SETUP([Singleton Invariant])
+AT_CHECK([cp TESTFILES/test5.owfn .])
+AT_CHECK([PETIA --owfn test5.owfn --transition --invariants --nontrivial], 0, stdout, stderr)
+AT_CHECK([GREP -q " 6 classes" stdout], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Connectedness])
+AT_CHECK([cp TESTFILES/semaphore.owfn .])
+AT_CHECK([PETIA --owfn semaphore.owfn --transition --invariants --nontrivial --connected], 0, stdout, stderr)
+AT_CHECK([GREP -q " 3 classes" stdout], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
 AT_SETUP([Coffee])
 AT_CHECK([cp TESTFILES/coffee.owfn .])
 AT_CHECK([PETIA --owfn coffee.owfn --verbose], 0, stdout, stderr)

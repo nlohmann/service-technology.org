@@ -110,9 +110,16 @@ private:
 	/// vector of singleton pre/postsets
 	vector<Node*> ppnode;
 
+	/// over which type of nodes (place/transition) the equivalence is built
 	bool nodetype;
+
+	/// the places of the net
 	set<Node*> places;
+
+	/// the transitions of the net
 	set<Node*> transitions;
+
+	/// if full invariants (true) are used or just the supports (false)
 	bool finv;
 };
 

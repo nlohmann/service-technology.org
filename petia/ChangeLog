@@ -8,6 +8,11 @@
 
 
 
+Version 1.3 (25 Juli 2011)
+==========================
+
+* New option -n to exclude trivial invariants from consideration.
+
 Version 1.2 (24 Juli 2011)
 ==========================
 

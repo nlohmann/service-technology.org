@@ -59,6 +59,11 @@ groupoption "support" s
   "Places are equivalent if they have the same value in the support of every invariant (default)."
   group="Inv Type"
 
+option "nontrivial" n
+  "Only non-trivial invariants are considered."
+  details="An invariant is non-trivial if its support has at least 3 elements or two different non-zero weights occur."
+  flag off
+
 section "Configuration"
 sectiondesc="Configurations are not required at the moment.\n"
 

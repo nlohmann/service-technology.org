@@ -219,6 +219,8 @@ int main(int argc, char** argv) {
     | 2. Compute the equivalence classes  |
     `------------------------------------*/
 
+	if (args_info.full_given && args_info.nontrivial_given)
+		cerr << "petia: using --full with --nontrivial may lead to wrong results" << endl;
 	vector<map<Node*,int> > inv;
 	bool ntype(!args_info.transition_given);
 	// setup lp_solve
@@ -235,14 +237,22 @@ int main(int argc, char** argv) {
 	// as long as we find two nodes for which equivalence has not been decided ...
 	while (ier.getUndecided(n1,n2))
 	{
-		// add the equations n1=0 and n2>0 to the system (or n1-n2>0 for full invariants)
-		if (!lp.stripConstraints()) abort(12,"failed to remove constraints from LP model");
-		if (!args_info.full_given) {
-			if (!lp.addConstraint(n1,true)) abort(12,"failed to add constraint to LP model");
-			if (!lp.addConstraint(n2,false)) abort(12,"failed to add constraint to LP model");
-		} else if (!lp.addConstraint(n1,n2)) abort(12,"failed to add constraint to LP model");
-		// and solve it
-		int res(lp.solveSystem());
+		int res(0);
+		// solve the system until we get a non-trivial invariant or no solution
+		for(bool go=true; go; go=lp.excludeTrivial())
+		{  
+			// add the equations n1=0 and n2>0 to the system (or n1-n2>0 for full invariants)
+			if (!lp.stripConstraints()) abort(12,"failed to remove constraints from LP model");
+			if (!args_info.full_given) {
+				if (!lp.addConstraint(n2,true)) abort(12,"failed to add constraint to LP model");
+				if (!lp.addConstraint(n1,false)) abort(12,"failed to add constraint to LP model");
+			} else if (!lp.addConstraint(n1,n2)) abort(12,"failed to add constraint to LP model");
+			// forbid known trivial invariants that could occur due to n1>0
+			if (!lp.addTrivialsConstraints(n1)) abort(12,"failed to add constraint to LP model");
+			// and solve it
+			res = lp.solveSystem();
+			if (!args_info.nontrivial_given) break;
+		}
 		if (res>2) status("lp_solve failure -- resulting relation may be too coarse");
 		else if (res<2)
 		{
@@ -253,12 +263,19 @@ int main(int argc, char** argv) {
 			ier.split(sol);
 		} else {
 			// if the first check fails, now test with n1>0 and n2=0 (resp. n2-n1>0)
-			if (!lp.stripConstraints()) abort(12,"failed to remove constraints from LP model");
-			if (!args_info.full_given) {
-				if (!lp.addConstraint(n2,true)) abort(12,"failed to add constraint to LP model");
-				if (!lp.addConstraint(n1,false)) abort(12,"failed to add constraint to LP model");
-			} else if (!lp.addConstraint(n2,n1)) abort(12,"failed to add constraint to LP model");
-			res = lp.solveSystem();
+			// solve the system until we get a non-trivial invariant or no solution
+			for(bool go=true; go; go=lp.excludeTrivial())
+			{  
+				if (!lp.stripConstraints()) abort(12,"failed to remove constraints from LP model");
+				if (!args_info.full_given) {
+					if (!lp.addConstraint(n1,true)) abort(12,"failed to add constraint to LP model");
+					if (!lp.addConstraint(n2,false)) abort(12,"failed to add constraint to LP model");
+				} else if (!lp.addConstraint(n2,n1)) abort(12,"failed to add constraint to LP model");
+				// forbid known trivial invariants that could occur due to n2>0
+				if (!lp.addTrivialsConstraints(n2)) abort(12,"failed to add constraint to LP model");
+				res = lp.solveSystem();
+				if (!args_info.nontrivial_given) break;
+			}
 			if (res>2) status("lp_solve failure -- resulting relation may be too coarse");
 			else if (res<2)
 			{
@@ -320,7 +337,7 @@ int main(int argc, char** argv) {
 	} else {
 	// or standard output ...
 		if (args_info.invariants_given) {
-			if (inv.size()>0) cout << "Invariants used to prove non-equivalence:" << endl;
+			if (!inv.empty()) cout << "Invariants used to prove non-equivalence:" << endl;
 			else cout << "No invariants have been constructed." << endl;
 			for(unsigned int i=0; i<inv.size(); ++i)
 			{

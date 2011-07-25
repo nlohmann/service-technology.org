@@ -8,11 +8,9 @@
 
 
 
-Version 1.2 (24 Juli 2011)
+Version 1.3 (25 Juli 2011)
 ==========================
 
-* New option -i to print the separating invariants.
-
-* New option -f to use full invariants instead of support.
+* New option -n to exclude trivial invariants from consideration.
 
 \nSee file ChangeLog <http://service-technology.org/files/petia/ChangeLog> for\ncomplete version history.\n

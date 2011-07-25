@@ -266,8 +266,16 @@ both or none occur. With the option @option{--full} two places will be non-equiv
 even when both occur in an invariant, but with different weights. The default option
 @option{--support} only differentiates between occurrence and non-occurrence.
 
-Petia can also determine equivalence classes of transitions using transition
-invariant, for this use the option @option{--transition} (default is
+With the option @option{--nontrivial} trivial invariants will not be
+used to put places into different equivalence classes. An invariant is
+trivial if it contains at most two places with non-zero weight and all
+weights occurring are either zero or one. Note that @option{--full} and
+@option{--nontrivial} currently influence each other in a way that may
+lead to wrong results. A warning is printed if both are used at the same
+time.
+
+Petia can determine equivalence classes of transitions, too, using transition
+invariants, for this apply the option @option{--transition} (default is
 @option{--place} for places and place invariants). 
 
 The output can be given in a default format or in the format used by the tool Snoopy.
@@ -289,7 +297,7 @@ The latter, finer relation can be obtained by the option @option{--fine}.
 
 Calls to a Linear Programming Solver can be costly, therefore it is a good
 idea to look at the structure of a Petri net to find equivalent places, too.
-If there is a transition with singletons as pre- and postset, both places
+If there is a transition with singleton places as pre- and postset, both places
 will always be in the same equivalence class. If a transition has an empty
 pre- or postset, all places adjacent to that transition are in the same
 equivalence class (there is no semipositive invariant in which these

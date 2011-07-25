@@ -26,6 +26,7 @@ using pnapi::Transition;
 using pnapi::Node;
 using pnapi::PetriNet;
 using std::map;
+using std::set;
 
 /*! \brief For wrapping the needed functionality of lp_solve
 
@@ -73,6 +74,12 @@ public:
 	/// Get the number of calls to solveSystem() so far
 	int getCalls() const;
 
+	/// Check if the solution is a trivial invariant and exclude it
+	bool excludeTrivial();
+
+	/// Add the constraint needed to exclude the trivial invariants
+	bool addTrivialsConstraints(Node* n);
+
 	/// Level of verbosity of lp_solve
 	int verbose;
 
@@ -98,7 +105,14 @@ private:
 	/// The number of calls to solveSystem() so far
 	int solvecall;
 
+	/// type of variables (places/transitions)
 	bool nodetype;
+
+	/// trivial invariants to be excluded
+	map<Node*,set<Node*> > trivials;
+
+	/// result of the last call to solve()
+	int result;
 };
 
 #endif

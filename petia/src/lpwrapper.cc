@@ -28,7 +28,7 @@ using pnapi::Node;
 	@param ntype Node type of the variables (true=places, false=transitions).
 	@param vb If lp_solve should be verbose.
 */
-LPWrapper::LPWrapper(PetriNet& pn, bool ntype, bool vb) : verbose(vb),cols(static_cast<unsigned int>(ntype?pn.getPlaces().size():pn.getTransitions().size())),basicrows(0),net(pn),solvecall(0),nodetype(ntype) {
+LPWrapper::LPWrapper(PetriNet& pn, bool ntype, bool vb) : verbose(vb),cols(static_cast<unsigned int>(ntype?pn.getPlaces().size():pn.getTransitions().size())),basicrows(0),net(pn),solvecall(0),nodetype(ntype),result(2) {
 	lp = make_lp(0,cols);
 	if (!lp) abort(12,"could not create LP model");
 }
@@ -72,7 +72,7 @@ int LPWrapper::createIEquation() {
 	}
 	if (colnr!=(int)(cols)) abort(12,"column number mismatch for LP model");
 
-	//lp_solve objective: minimum weight vector (better idea?)
+	//lp_solve objective: minimum weight vector (for minimal invariants)
 	int *colpoint = new int[cols];
 	REAL *mat = new REAL[cols];
 	for(unsigned int y=0; y<cols; y++)
@@ -98,7 +98,7 @@ int LPWrapper::createIEquation() {
 		set<pnapi::Arc*> arcs = (*nit)->getPresetArcs(); 
 		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
 		{
-			// set the places in the preset
+			// set the nodes in the preset
 			Node* n = &((*ait)->getSourceNode());
 			// to negative weights
 			mat[npos[n]] -= (*ait)->getWeight();
@@ -106,7 +106,7 @@ int LPWrapper::createIEquation() {
 		arcs = (*nit)->getPostsetArcs();
 		for(ait=arcs.begin(); ait!=arcs.end(); ++ait)
 		{
-			// and the places in the postset
+			// and the nodes in the postset
 			Node* n = &((*ait)->getTargetNode());
 			// to positive weights
 			mat[npos[n]] += (*ait)->getWeight();
@@ -185,7 +185,8 @@ bool LPWrapper::addConstraint(Node* n1, Node* n2) {
 */
 int LPWrapper::solveSystem() {
 	++solvecall;
-	return solve(lp);
+	result = solve(lp);
+	return result;
 }
 
 /** Get the name of a place belonging to a column, wrapper for get_col_name.
@@ -226,4 +227,64 @@ map<Node*,int>& LPWrapper::getNVector() {
 	@return The number of calls.
 */
 int LPWrapper::getCalls() const { return solvecall; }
+
+/** Check if the last solution is a trivial invariant, and if so, 
+	exclude it from further considerations.
+	@return If there was a solution and it was trivial.
+*/
+bool LPWrapper::excludeTrivial() {
+	if (result>=2) return false; // no solution found
+	map<Node*,int> inv(getNVector()); // get the solution
+	map<Node*,int>::iterator mit;
+	Node* n1(NULL);
+	Node* n2(NULL);
+	for(mit=inv.begin(); mit!=inv.end(); ++mit)
+		if (mit->second!=0)
+		{
+			if (n2) return false; // more than two entries in the solution
+			n2 = n1;
+			n1 = mit->first;
+		}
+	if (!n1) return true; // no entry at all
+	if (inv[n1]!=1) return false; // wrong weight for trivial invariant
+	if (!n2) // trivial invariant is a singleton
+	{
+		trivials[n1].clear(); // zero it in future solutions
+		return true;
+	}
+	if (inv[n2]!=1) return false; // wrong weight for trivial invariant
+	trivials[n1].insert(n2); // memorize this trivial invariant
+	trivials[n2].insert(n1); // for both occurring nodes
+	return true;
+}
+
+/** Add constraints that forbid trivial invariants.
+	@param n A node that must occur with at least weight one in solutions.
+		Trivial invariants containing this node will be forbidden.
+	@return If the constraints were successfully built.
+*/
+bool LPWrapper::addTrivialsConstraints(Node* n) {
+	if (trivials.find(n)==trivials.end()) return true; // n is not in any trivial invariant
+	set<Node*> nset(trivials[n]); // get all the trivial invariants containing n
+	set<Node*>::iterator nit;
+	REAL row[1];
+	int colno[1];
+	row[0]=1;
+	if (nset.empty()) // if n is a singleton invariant, forbid n>0 as solution
+	{
+		colno[0]=npos[n]+1;
+		return add_constraintex(lp,1,row,colno,EQ,0);
+	}
+	bool done(true);
+	// since n should occur in the next solution, all nodes being
+	// in a trivial invariant with n must not occur (otherwise
+	// the solution is not minimal as the trivial invariant could
+	// be subtracted)
+	for(nit=nset.begin(); nit!=nset.end(); ++nit)
+	{
+		colno[0]=npos[*nit]+1;
+		done &= add_constraintex(lp,1,row,colno,EQ,0);
+	}
+	return done;
+}
 

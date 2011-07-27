@@ -22,8 +22,7 @@
  * \brief Node and label similarity (can be overridden by command line parameters)
  */
 
-#ifndef __VALUES_H
-#define __VALUES_H
+#pragma once
 
 #include "types.h"
 
@@ -35,6 +34,3 @@ inline Value N(const Graph& g1, const Graph& g2, Node q1, Node q2);
 
 /// label similarity
 inline Value L(const Graph& g1, const Graph& g2, Label l1, Label l2);
-
-
-#endif

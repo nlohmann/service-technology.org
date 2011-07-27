@@ -17,14 +17,10 @@
  along with Rachel.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef __HELPERS_H
-#define __HELPERS_H
+#pragma once
 
 #include <vector>
 
 /// updates an index
 void next_index(std::vector<unsigned int> &current_index,
                 const std::vector<unsigned int> &max_index);
-
-
-#endif

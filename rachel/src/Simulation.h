@@ -22,8 +22,7 @@
  * \brief Functions for the simulation-based graph similarity
  */
 
-#ifndef __SIMULATION_H
-#define __SIMULATION_H
+#pragma once
 
 #include "EditDistance.h"
 #include "types.h"
@@ -61,5 +60,3 @@ class Simulation : EditDistance {
         /// weighted weak quantitative simulation
         static Value simulation();
 };
-
-#endif

@@ -17,8 +17,7 @@
  along with Rachel.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef __GRAPH_H
-#define __GRAPH_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -176,5 +175,3 @@ class Graph {
 
         explicit Graph(const std::string&);
 };
-
-#endif

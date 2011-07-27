@@ -17,8 +17,7 @@
  along with Rachel.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef __EDITDISTANCE_H
-#define __EDITDISTANCE_H
+#pragma once
 
 #include "types.h"
 
@@ -55,5 +54,3 @@ class EditDistance {
         /// destructor
         virtual ~EditDistance();
 };
-
-#endif

@@ -17,8 +17,7 @@
  along with Rachel.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef __MATCHING_H
-#define __MATCHING_H
+#pragma once
 
 #include "EditDistance.h"
 #include "types.h"
@@ -72,5 +71,3 @@ class Matching : EditDistance {
         /// weighted matching
         static Value matching();
 };
-
-#endif

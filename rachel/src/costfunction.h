@@ -17,8 +17,7 @@
  along with Rachel.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef __VALUES_H
-#define __VALUES_H
+#pragma once
 
 #include "types.h"
 #include "cmdline.h"
@@ -109,5 +108,3 @@ inline Value L(const Label& l1, const Label& l2) {
     // label has to be changed: modify
     return args_info.benefit_change_arg;
 }
-
-#endif

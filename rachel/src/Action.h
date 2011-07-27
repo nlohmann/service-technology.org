@@ -17,8 +17,7 @@
  along with Rachel.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef __ACTION_H
-#define __ACTION_H
+#pragma once
 
 #include "types.h"
 
@@ -74,6 +73,3 @@ class ActionScript {
         /// constructor to construct a singleton script
         ActionScript(const Action& a);
 };
-
-
-#endif

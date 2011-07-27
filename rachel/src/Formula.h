@@ -17,8 +17,7 @@
  along with Rachel.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
-#ifndef __FORMULA_H
-#define __FORMULA_H
+#pragma once
 
 #include <set>
 #include <string>
@@ -103,6 +102,3 @@ class FormulaFinal : public Formula {
         std::string toDot(bool = true) const;
         bool sat(const std::set<Label>&) const;
 };
-
-
-#endif

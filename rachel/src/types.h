@@ -22,8 +22,7 @@
  * \brief User-defined type definitions for graphs and formulas
  */
 
-#ifndef __TYPES_H
-#define __TYPES_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -74,6 +73,3 @@ typedef std::set<EdgePair> Permutation;
 
 /// container for edge permutations
 typedef std::set<Permutation> Permutations;
-
-
-#endif

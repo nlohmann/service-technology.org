@@ -121,7 +121,7 @@ bool FormulaFalse::sat(const std::set<Label>&) const {
  *
  * This bug was found by Martin Znamirowski. See <http://gna.org/bugs/?11944>.
  */
-bool FormulaFinal::sat(const std::set<Label>& l) const {
+bool FormulaFinal::sat(const std::set<Label>&) const {
     return true;  // true by default
 }
 

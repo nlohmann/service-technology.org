@@ -1,11 +1,10 @@
 AC_INIT([Domino], 0.9-unreleased, domino@service-technology.org, domino, http://service-technology.org/domino)
 
-
-AC_MSG_NOTICE( ____                  _             )
-AC_MSG_NOTICE(|  _ \  ___  _ __ ___ (_)_ __   ___  )
-AC_MSG_NOTICE(| | | |/ _ \| '_ ` _ \| | '_ \ / _ \ )
-AC_MSG_NOTICE(| |_| | (_) | | | | | | | | | | (_) |)
-AC_MSG_NOTICE(|____/ \___/|_| |_| |_|_|_| |_|\___/ )
+AC_MSG_NOTICE([ ____                  _             ])
+AC_MSG_NOTICE([|  _ \  ___  _ __ ___ (_)_ __   ___  ])
+AC_MSG_NOTICE([| | | |/ _ \| '_ ` _ \| | '_ \ / _ \ ])
+AC_MSG_NOTICE([| |_| | (_) | | | | | | | | | | (_) |])
+AC_MSG_NOTICE([|____/ \___/|_| |_| |_|_|_| |_|\___/ ])
 AC_MSG_NOTICE([Decomposition of business workflows into services])
 AC_MSG_NOTICE([${PACKAGE_URL}])
 AC_MSG_NOTICE([version ${PACKAGE_VERSION}])

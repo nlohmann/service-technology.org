@@ -1,11 +1,10 @@
 AC_INIT([Tara], 0.1-unreleased, tara@service-technology.org, tara, http://service-technology.org/tara)
 
-AC_MSG_NOTICE([                    _____               ])
-AC_MSG_NOTICE([                   |_   _|_ _ _ __ __ _ ])
-AC_MSG_NOTICE([                     | |/ _` | '__/ _` |])
-AC_MSG_NOTICE([                     | | (_| | | | (_| |])
-AC_MSG_NOTICE([                     |_|\__,_|_|  \__,_|])
-
+AC_MSG_NOTICE([ _____               ])
+AC_MSG_NOTICE([|_   _|_ _ _ __ __ _ ])
+AC_MSG_NOTICE([  | |/ _` | '__/ _` |])
+AC_MSG_NOTICE([  | | (_| | | | (_| |])
+AC_MSG_NOTICE([  |_|\__,_|_|  \__,_|])
 AC_MSG_NOTICE([Tackling non-functional properties for stateful services])
 AC_MSG_NOTICE([${PACKAGE_URL}])
 AC_MSG_NOTICE([version ${PACKAGE_VERSION}])

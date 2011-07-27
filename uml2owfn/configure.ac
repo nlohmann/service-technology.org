@@ -1,5 +1,15 @@
 AC_INIT(UML2oWFN, 2.11, uml2owfn@service-technology.org, uml2owfn, http://service-technology.org/uml2owfn)
 
+AC_MSG_NOTICE([ _   _ __  __ _     ____    __        _______ _   _ ])
+AC_MSG_NOTICE([| | | |  \/  | |   |___ \ __\ \      / /  ___| \ | |])
+AC_MSG_NOTICE([| | | | |\/| | |     __) / _ \ \ /\ / /| |_  |  \| |])
+AC_MSG_NOTICE([| |_| | |  | | |___ / __/ (_) \ V  V / |  _| | |\  |])
+AC_MSG_NOTICE([ \___/|_|  |_|_____|_____\___/ \_/\_/  |_|   |_| \_|])
+AC_MSG_NOTICE([Translating IBM WebSphere Business Process Models to Petri Nets])
+AC_MSG_NOTICE([${PACKAGE_URL}])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
+AC_MSG_NOTICE()
+
 # prerequisites for Autoconf and Automake
 AC_PREREQ(2.59)
 

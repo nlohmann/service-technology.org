@@ -1,6 +1,16 @@
 AC_PREREQ(2.60)
 AC_INIT([oWFN2BPEL],[4.9-unreleased],[owfn2bpel@service-technology.org],[owfn2bpel])
 
+AC_MSG_NOTICE([    __        _______ _   _ ____  ____  ____  _____ _     ])
+AC_MSG_NOTICE([  __\ \      / /  ___| \ | |___ \| __ )|  _ \| ____| |    ])
+AC_MSG_NOTICE([ / _ \ \ /\ / /| |_  |  \| | __) |  _ \| |_) |  _| | |    ])
+AC_MSG_NOTICE([| (_) \ V  V / |  _| | |\  |/ __/| |_) |  __/| |___| |___ ])
+AC_MSG_NOTICE([ \___/ \_/\_/  |_|   |_| \_|_____|____/|_|   |_____|_____|])
+AC_MSG_NOTICE([Translates open nets to BPEL processes])
+AC_MSG_NOTICE([${PACKAGE_URL}])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION} ])
+AC_MSG_NOTICE()
+
 AM_INIT_AUTOMAKE #(gnits)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 

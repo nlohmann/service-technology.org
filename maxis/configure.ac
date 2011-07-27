@@ -1,5 +1,15 @@
 AC_INIT(Maxis, 0.1-unreleased, parnjai@informatik.hu-berlin.de, maxis, http://service-technology.org/maxis )
 
+AC_MSG_NOTICE([ __  __            _     ])
+AC_MSG_NOTICE([|  \\/  | __ ___  _(_)___ ])
+AC_MSG_NOTICE([| |\\/| |/ _` \\ \\/ / / __|])
+AC_MSG_NOTICE([| |  | | (_| |>  <| \\__ \\])
+AC_MSG_NOTICE([|_|  |_|\\__,_/_/\\_\\_|___/])
+AC_MSG_NOTICE([Analyzing and synthesizing substitutable services])
+AC_MSG_NOTICE([${PACKAGE_URL}])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION} ])
+AC_MSG_NOTICE()
+
 AC_CONFIG_SRCDIR(src/main.cc)
 AC_CONFIG_HEADERS(src/config.h)
 AC_CONFIG_AUX_DIR([build-aux])

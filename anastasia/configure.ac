@@ -1,4 +1,14 @@
-AC_INIT(Anastasia, 1.1, anastasia@service-technology.org, anastasia, http://service-technology.org/anastasia)
+AC_INIT([Anastasia], 1.1, anastasia@service-technology.org, anastasia, http://service-technology.org/anastasia)
+
+AC_MSG_NOTICE([    _                    _            _       ])
+AC_MSG_NOTICE([   / \   _ __   __ _ ___| |_ __ _ ___(_) __ _ ])
+AC_MSG_NOTICE([  / _ \ | '_ \ / _` / __| __/ _` / __| |/ _` |])
+AC_MSG_NOTICE([ / ___ \| | | | (_| \__ \ || (_| \__ \ | (_| |])
+AC_MSG_NOTICE([/_/   \_\_| |_|\__,_|___/\__\__,_|___/_|\__,_|])
+AC_MSG_NOTICE([ANAlyzer for Siphons and TrApS In Arbitrary nets])
+AC_MSG_NOTICE([${PACKAGE_URL}])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
+AC_MSG_NOTICE()
 
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])

@@ -1,5 +1,15 @@
 AC_INIT(Stanca, 1.1-unreleased, stanca@service-technology.org, stanca, http://service-technology.org/stanca)
 
+AC_MSG_NOTICE([ ____  _                        ])
+AC_MSG_NOTICE([/ ___|| |_ __ _ _ __   ___ __ _ ])
+AC_MSG_NOTICE([\___ \| __/ _` | '_ \ / __/ _` |])
+AC_MSG_NOTICE([ ___) | || (_| | | | | (_| (_| |])
+AC_MSG_NOTICE([|____/ \__\__,_|_| |_|\___\__,_|])
+AC_MSG_NOTICE([checking the siphon-trap property using Minisat])
+AC_MSG_NOTICE([${PACKAGE_URL}])
+AC_MSG_NOTICE([version ${PACKAGE_VERSION}])
+AC_MSG_NOTICE()
+
 AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_AUX_DIR([build-aux])

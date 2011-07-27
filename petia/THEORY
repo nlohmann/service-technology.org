@@ -8,4 +8,29 @@
 
 
 
+ Petia implements several algorithms and results published in several
+scientific articles.  
+
+Invariants of Petri nets
+========================
+
+ A good overview over Petri nets in general, including invariants, can be
+found in Murata's often cited work: 
+
+     T. Murata. Petri nets: Properties, analysis and applications. Proc. IEEE
+     77:4, pp.201-221, 1989.
+
+
+Linear Programming Solver
+=========================
+
+ The Linear Programming Solver lp_solve can be found here: 
+
+     M. Berkelaar, K. Eikland, P. Notebaert. lp_solve Reference Guide,
+     http://lpsolve.sourceforge.net/5.5/ (15.7.2011).
+ 
+
+
+
+ See `http://service-technology.org/publications' for more information. 
 

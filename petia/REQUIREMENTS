@@ -8,29 +8,30 @@
 
 
 
-In order to run, compile, and develop Petia, several tools are required.
+In order to run, compile, and develop Petia, several tools are required. 
+
 
 Runtime
 -------
 
    * At the moment, no other tools are required.
+ 
 
 Compilation
 -----------
 
 To compile the source code from a source distribution, the following tools are
-required.
-
+required. 
    * GCC (`http://gcc.gnu.org/')
 
    * GNU Make (`http://www.gnu.org/software/make/')
+ 
 
 Development
 -----------
 
 In case you want to make changes to the source code, the following tools are
-required to reconfigure and compile Petia.
-
+required to reconfigure and compile Petia. 
    * Autoconf, `http://www.gnu.org/software/autoconf/'
 
    * Automake, `http://www.gnu.org/software/automake/'
@@ -48,7 +49,7 @@ required to reconfigure and compile Petia.
 
 
 
-Please check our nightly build server at
+ Please check our nightly build server at
 `http://service-technology.org/nightly' for the versions we use during
-development.
+development.    
 

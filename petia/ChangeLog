@@ -18,6 +18,8 @@ Version 1.3 (25 Juli 2011)
 
 * Bug fix: linear system over transitions and use of support were buggy.
 
+* Added code for allowing the combination of -f and -n.
+
 Version 1.2 (24 Juli 2011)
 ==========================
 

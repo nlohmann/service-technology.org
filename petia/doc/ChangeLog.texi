@@ -7,6 +7,8 @@
 @item New option -c to determine weakly connected subsets of equivalence classes.
 
 @item Bug fix: linear system over transitions and use of support were buggy.
+
+@item Added code for allowing the combination of -f and -n.
 @end itemize
 
 @heading Version 1.2 (24 Juli 2011)

@@ -133,6 +133,13 @@ AT_CHECK([GREP -q " 6 classes" stdout], 0, ignore)
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
+AT_SETUP([Simultaneous -f and -n])
+AT_CHECK([cp TESTFILES/semaphore.owfn .])
+AT_CHECK([PETIA --owfn semaphore.owfn --full --nontrivial], 0, stdout, stderr)
+AT_CHECK([GREP -q " 2 classes" stdout], 0, ignore)
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
 AT_SETUP([Connectedness])
 AT_CHECK([cp TESTFILES/semaphore.owfn .])
 AT_CHECK([PETIA --owfn semaphore.owfn --transition --invariants --nontrivial --connected], 0, stdout, stderr)

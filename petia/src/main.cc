@@ -219,8 +219,6 @@ int main(int argc, char** argv) {
     | 2. Compute the equivalence classes  |
     `------------------------------------*/
 
-	if (args_info.full_given && args_info.nontrivial_given)
-		cerr << "petia: using --full with --nontrivial may lead to wrong results" << endl;
 	vector<map<Node*,int> > inv;
 	bool ntype(!args_info.transition_given);
 	// setup lp_solve
@@ -237,24 +235,32 @@ int main(int argc, char** argv) {
 	// as long as we find two nodes for which equivalence has not been decided ...
 	while (ier.getUndecided(n1,n2))
 	{
-//cout << "CH: " << n1->getName() << " & " << n2->getName() << endl;
 		int res(0);
 		// solve the system until we get a non-trivial invariant or no solution
 		for(bool go=true; go; go=lp.excludeTrivial())
 		{  
-			// add the equations n1=0 and n2>0 to the system (or n1-n2>0 for full invariants)
+			// add the equations n1>0 and n2=0 to the system (or n1-n2>0 for full invariants)
 			if (!lp.stripConstraints()) abort(12,"failed to remove constraints from LP model");
 			if (!args_info.full_given) {
 				if (!lp.addConstraint(n2,true)) abort(12,"failed to add constraint to LP model");
 				if (!lp.addConstraint(n1,false)) abort(12,"failed to add constraint to LP model");
 			} else if (!lp.addConstraint(n1,n2)) abort(12,"failed to add constraint to LP model");
 			// forbid known trivial invariants that could occur due to n1>0
-//cout << "A" << endl;
 			if (!lp.addTrivialsConstraints(n1)) abort(12,"failed to add constraint to LP model");
-//cout << "B" << endl;
+			// for -f & -n: check first for n2=0, later for n2>0
+			if (args_info.full_given && args_info.nontrivial_given)
+				if (!lp.addConstraint(n2,true)) abort(12,"failed to add constraint to LP model");
 			// and solve it
 			res = lp.solveSystem();
-//cout << "RES: " << res << endl;
+			// for -f & -n: if no result so far, check for n2>0 now
+			if (res>1 && args_info.full_given && args_info.nontrivial_given)
+			{
+				if (!lp.stripConstraints()) abort(12,"failed to remove constraints from LP model");
+				if (!lp.addConstraint(n1,n2)) abort(12,"failed to add constraint to LP model");
+				if (!lp.addTrivialsConstraints(n1)) abort(12,"failed to add constraint to LP model");
+				if (!lp.addTrivialsConstraints(n2)) abort(12,"failed to add constraint to LP model");
+				res = lp.solveSystem();
+			}
 /*
 if (res<2) {
 cout << "INV1: ";
@@ -285,19 +291,8 @@ for(unsigned int i=0; i<tmp.size(); ++i)
 cout << endl;
 */
 			ier.split(sol);
-/*
-tmp = (ier.getClasses(false));
-cout << "CL: ";
-for(unsigned int i=0; i<tmp.size(); ++i)
-{
- for(set<Node*>::iterator nx=tmp[i].begin(); nx!=tmp[i].end(); ++nx)
-	cout << (*nx)->getName() << " ";
- cout << "| ";
-}
-cout << endl;
-*/
 		} else {
-			// if the first check fails, now test with n1>0 and n2=0 (resp. n2-n1>0)
+			// if the first check fails, now test with n1=0 and n2>0 (resp. n2-n1>0)
 			// solve the system until we get a non-trivial invariant or no solution
 			for(bool go=true; go; go=lp.excludeTrivial())
 			{  
@@ -307,20 +302,20 @@ cout << endl;
 					if (!lp.addConstraint(n2,false)) abort(12,"failed to add constraint to LP model");
 				} else if (!lp.addConstraint(n2,n1)) abort(12,"failed to add constraint to LP model");
 				// forbid known trivial invariants that could occur due to n2>0
-//cout << "C" << endl;
 				if (!lp.addTrivialsConstraints(n2)) abort(12,"failed to add constraint to LP model");
-//cout << "D" << endl;
+				// for -f & -n: check first for n1=0, later for n1>0
+				if (args_info.full_given && args_info.nontrivial_given)
+					if (!lp.addConstraint(n1,true)) abort(12,"failed to add constraint to LP model");
 				res = lp.solveSystem();
-//cout << "RES: " << res << endl;
-/*
-if (res<2) {
-cout << "INV2: ";
-map<Node*,int> sol(lp.getNVector());
-for(map<Node*,int>::iterator mit=sol.begin(); mit!=sol.end(); ++mit)
-	cout << mit->second << mit->first->getName() << " ";
-cout << endl;
-}
-*/
+				// for -f & -n: if no result so far, check for n1>0 now
+				if (res>1 && args_info.full_given && args_info.nontrivial_given)
+				{
+					if (!lp.stripConstraints()) abort(12,"failed to remove constraints from LP model");
+					if (!lp.addConstraint(n2,n1)) abort(12,"failed to add constraint to LP model");
+					if (!lp.addTrivialsConstraints(n2)) abort(12,"failed to add constraint to LP model");
+					if (!lp.addTrivialsConstraints(n1)) abort(12,"failed to add constraint to LP model");
+					res = lp.solveSystem();
+				}
 				if (!args_info.nontrivial_given) break;
 			}
 			if (res>2) status("lp_solve failure -- resulting relation may be too coarse");
@@ -330,32 +325,9 @@ cout << endl;
 				map<Node*,int> sol(lp.getNVector());
 				inv.push_back(sol);
 				// use the computed invariant to find non-equivalent places (including p1&p2)
-/*
-vector<set<Node*> > tmp(ier.getClasses(false));
-cout << "CL: ";
-for(unsigned int i=0; i<tmp.size(); ++i)
-{
- for(set<Node*>::iterator nx=tmp[i].begin(); nx!=tmp[i].end(); ++nx)
-	cout << (*nx)->getName() << " ";
- cout << "| ";
-}
-cout << endl;
-*/
 				ier.split(sol);
-/*
-tmp = (ier.getClasses(false));
-cout << "CL: ";
-for(unsigned int i=0; i<tmp.size(); ++i)
-{
- for(set<Node*>::iterator nx=tmp[i].begin(); nx!=tmp[i].end(); ++nx)
-	cout << (*nx)->getName() << " ";
- cout << "| ";
-}
-cout << endl;
-*/
 			// otherwise, n1&n2 are equivalent, so join their classes
 			} else {
-//cout << "HERE" << endl;
 				if (!ier.join(n1,n2)) status("internal failure -- resulting relation may be too coarse");
 			}
 		}

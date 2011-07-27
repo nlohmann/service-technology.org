@@ -255,7 +255,7 @@ void Graph::createDotFile() {
     if (args_info.png_flag && !std::string(CONFIG_DOT).empty()) {
         std::string command = std::string(CONFIG_DOT) + " " + dot_filename + " -Tpng -O";
         status("executing '%s'", command.c_str());
-        system(command.c_str());
+        (void)system(command.c_str());
     }
 }
 

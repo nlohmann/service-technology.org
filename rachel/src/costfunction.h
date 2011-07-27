@@ -60,7 +60,7 @@ inline Value discount() {
  *          "--node-similarity". Alternatively, it can be defined in a config
  *          file.
  */
-inline Value N(const Node q1, const Node q2) {
+inline Value N(const Node&, const Node&) {
     // all nodes are equally similar
     return args_info.node_similarity_arg;
 }
@@ -85,7 +85,7 @@ inline Value N(const Node q1, const Node q2) {
  *          "--benefit-delete". Alternatively, they can be defined in a config
  *          file.
  */
-inline Value L(const Label l1, const Label l2) {
+inline Value L(const Label& l1, const Label& l2) {
     // avoid stuttering in both graphs
     if (l1.empty() and l2.empty()) {
         return 0;

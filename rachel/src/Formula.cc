@@ -62,19 +62,19 @@ std::string FormulaOR::toDot(bool noBrackets) const {
     }
 }
 
-std::string FormulaLit::toDot(bool noBrackets) const {
+std::string FormulaLit::toDot(bool) const {
     return literal;
 }
 
-std::string FormulaTrue::toDot(bool noBrackets) const {
+std::string FormulaTrue::toDot(bool) const {
     return "true";
 }
 
-std::string FormulaFalse::toDot(bool noBrackets) const {
+std::string FormulaFalse::toDot(bool) const {
     return "false";
 }
 
-std::string FormulaFinal::toDot(bool noBrackets) const {
+std::string FormulaFinal::toDot(bool) const {
     return "final";
 }
 
@@ -95,11 +95,11 @@ bool FormulaLit::sat(const std::set<Label>& l) const {
     return (l.find(literal) != l.end());
 }
 
-bool FormulaTrue::sat(const std::set<Label>& l) const {
+bool FormulaTrue::sat(const std::set<Label>&) const {
     return true;
 }
 
-bool FormulaFalse::sat(const std::set<Label>& l) const {
+bool FormulaFalse::sat(const std::set<Label>&) const {
     return false;
 }
 

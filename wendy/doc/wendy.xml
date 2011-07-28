@@ -1,0 +1,34 @@
+<tool>
+<toolname>Wendy</toolname>
+<shortname>wendy</shortname> <!-- optional -->
+
+<tagline>synthesizing partners for services</tagline>
+
+<purpose>
+Wendy is a tool to synthesize partners for services. This includes a finite characterization of all partners (called "operating guidelines"). Wendy uses a vast set of reduction rules to synthesize (small) partners. These rules may, however, not preserve all partners of the service under consideration, but will synthesize a partner if one exists.
+</purpose>
+
+<copyright>
+2009, 2010 Niels Lohmann, Christian Sura, and Daniela Weinberg
+</copyright>
+
+<authors>
+* Niels Lohmann implemented the original core functionality of Wendy (operating guidelines)
+* Daniela Weinberg implemented reduction techniques as well as the synthesis of livelock free strategies
+* Christian Sura implemented the functions to cover open nets nodes
+</authors>
+
+<maintainer>Niels Lohmann</maintainer>
+
+<license>AGPL3+</license>
+
+<runtime>lola-statespace</runtime>
+
+<thanks>
+* Thanks to Marc Voorhoeve for reporting some bugs running Wendy in a native (non-Cygwin) Windows environment.
+* Thanks to Christian Gierds for testing Wendy with strange nets that revealed several really subtle bugs.
+* Thanks to Dirk Fahland for pointing out a problem in the STL sorting algorithm which led to a segmentation fault.
+* Thanks to Mike Hordecki for a post on Stack Overflow with a portable preprocessor macro to iterate C++ containers (see 'src/util.h').
+</thanks>
+
+</tool>

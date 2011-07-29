@@ -309,5 +309,16 @@ indent "${CONFSWITCH_TEXT}"
 fi
 
 
+CONTRIBUTORS=`svn log -q ../src | grep -v "\-\-" | awk '{ print $3 }' | sort | uniq -c | sort -nr | awk '{ print "* " $2 " (" $1 ")" }'`
+CONTRIBUTORS=`echo "${CONTRIBUTORS}" | sed 's/al020/Andreas Lehmann/;s/bat/Manja Wolf/;s/bretschn/Jan Bretschneider/;s/cas/Christian Sura/;s/christianstahl/Christian Stahl/;s/danitz/Robert Danitz/;s/delia/Delia Arsinte/;s/fahland/Dirk Fahland/;s/georgstraube/Georgi Straube/;s/gierds/Christian Gierds/;s/heiden/Andreas Heiden/;s/hw138/Harro Wimmel/;s/karstenwolf/Karsten Wolf/;s/kaschner/Kathrin Kaschner/;s/kathrin/Kathrin Kaschner/;s/kern/Leonard Kern/;s/kschmidt/Karsten Wolf/;s/massuthe/Peter Massuthe/;s/nielslohmann/Niels Lohmann/;s/niels/Niels Lohmann/;s/nlohmann/Niels Lohmann/;s/oliviao/Olivia Oanea/;s/parnjai/Jarungjit Parnjai/;s/reinert/Dennis Reinert/;s/rimueller/Richard Müller/;s/rimuelle/Richard Müller/;s/stephan/Stephan Mennicke/;s/suermeli/Jan Sürmeli/;s/theidin/Thomas Heidinger/;s/waltemath/Robert Waltemath/;s/weinberg/Daniela Weinberg/;s/znamirowski/Martin Znamirowski/;s/znamirow/Martin Znamirowski/'`
+
+
+echo "Contributors"
+echo "============"
+echo ""
+echo "${CONTRIBUTORS}"
+echo ""
+
+
 
 

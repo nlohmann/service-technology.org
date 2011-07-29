@@ -32,7 +32,7 @@ noindent() {
 }
 
 indent() {
-	echo "$1" | fmt -w 74 | sed 's/^/    /g' | sed 's/^    \*/  */g'
+	echo "$1" | fmt -w 74 | sed 's/^/  /g' | sed 's/^  \*/*/g'
 }
 
 ##############################################################################
@@ -83,7 +83,7 @@ case $LICENSE in
 		LICENSEVERSION="version 3"
 		;;
 esac
-LICENSETEXT="$TOOLNAME is free software: you can redistribute it and/or modify it under the terms of the $LICENSENAME $LICENSEVERSION as published by the Free Software Foundation, see <$LICENSEURL> or the file \"COPYING\".
+LICENSETEXT="$TOOLNAME is free software: you can redistribute it and/or modify it under the terms of the $LICENSENAME $LICENSEVERSION as published by the Free Software Foundation, see <$LICENSEURL> or the file 'COPYING'.
 
 $TOOLNAME is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the $LICENSENAME for more details.
 
@@ -103,6 +103,19 @@ done
 
 # The authors.
 AUTHORS=`get "authors"`
+AUTHORLINES=`echo "${AUTHORS}" | wc -l | sed 's/ //g'`
+#echo "$F"
+if [ "${AUTHORLINES}" -eq 1 ]; then
+	AUTHORS="${TOOLNAME} was written by ${AUTHORS}."
+else
+	AUTHORS=`indent "${AUTHORS}"`
+fi
+
+# The maintainer
+MAINTAINER=`get "maintainer"`
+MAINTAINERTEXT="${TOOLNAME} is maintained by ${MAINTAINER}. See file 'AUTHORS' for more information."
+
+
 THANKS=`get "thanks"`
 
 
@@ -129,7 +142,15 @@ echo ""
 echo "Authors"
 echo "======="
 echo ""
-echo "See file \"AUTHORS\" for details."
+echo "${AUTHORS}"
+echo ""
+echo "See file 'AUTHORS' for details."
+echo ""
+echo ""
+echo "Maintainer"
+echo "=========="
+echo ""
+noindent "${MAINTAINERTEXT}"
 echo ""
 echo ""
 echo "License"
@@ -141,7 +162,7 @@ echo ""
 echo "Installation"
 echo "============"
 echo ""
-noindent "$TOOLNAME can be easily compiled and installed. See file \"INSTALL\" for instructions. Please also have a look at the file \"REQUIREMENTS\" for information on the tools required to run, compile, and develop $TOOLNAME."
+noindent "$TOOLNAME can be easily compiled and installed. See file 'INSTALL' for instructions. Please also have a look at the file 'REQUIREMENTS' for information on the tools required to run, compile, and develop $TOOLNAME."
 echo ""
 echo ""
 
@@ -176,13 +197,14 @@ REQ_MANIPULATION=""
 # Compilation
 if `echo "$REQ" | grep -q "AC_PROG_CC"`; then REQ_COMPILE="${REQ_COMPILE}* A modern C compiler is required to compile ${TOOLNAME}. We develop using the GNU Compiler Collection (GCC), which should be also the standard compiler on your machine. Recent experiments with LLVM Clang (available at <http://clang.llvm.org>) were also promising."$'\n\n'; fi
 if `echo "$REQ" | grep -q "AC_PROG_CXX"`; then REQ_COMPILE="${REQ_COMPILE}* A modern C++ compiler is required to compile ${TOOLNAME}. We develop using the GNU Compiler Collection (GCC), which should be also the standard compiler on your machine. Recent experiments with LLVM Clang (available at <http://clang.llvm.org>) were also promising."$'\n\n'; fi
+REQ_COMPILE="${REQ_COMPILE}* GNU Make is required to process the Makefiles. Other versions of make may not work. GNU Make is available at <http://www.gnu.org/s/make>."$'\n\n'
 if `echo "$REQ" | grep -q "AC_PROG_LIBTOOL"`; then REQ_COMPILE="${REQ_COMPILE}* Libtool is used to manage static or dynamic libraries. Libtool is available at <http://www.gnu.org/s/libtool>."$'\n\n'; fi
 
 # Runtime
 if `echo "$REQ" | grep -q "lola-statespace"`; then REQ_RUNTIME="${REQ_RUNTIME}* LoLA (lola-statespace) is used by ${TOOLNAME} to generate Petri net state spaces. Without LoLA, ${TOOLNAME} will not work. You can download LoLA at <http://service-technology.org/lola>. After downloading the tarball (<http://service-technology.org/files/lola/lola.tar.gz>), unpack it and execute './configure && make lola-statespace'."$'\n\n'; fi
 
 # Documentation
-if `grep -qR "groff" ${DIR}`; then REQ_DOC="${REQ_DOC}* Groff is used to generate a PDF version of the UNIX Manpage fro ${TOOLNAME}. Groff can be downloaded at <http://www.gnu.org/s/groff>."$'\n\n'; fi
+if `grep -qR "groff" ${DIR}`; then REQ_DOC="${REQ_DOC}* Groff is used to generate a PDF version of the UNIX Manpage fro ${TOOLNAME}. Without Groff, 'make man-pdf' will not work. Groff can be downloaded at <http://www.gnu.org/s/groff>."$'\n\n'; fi
 if `echo "$REQ" | grep -q help2man`; then REQ_DOC="${REQ_DOC}* help2man is used to generate a UNIX Manpage for ${TOOLNAME}. help2man can be downloaded at <http://www.gnu.org/s/help2man>."$'\n\n'; fi
 if `grep -qR "_TEXINFOS" ${DIR}`; then REQ_DOC="${REQ_DOC}* Texinfo is used to geneate a documentation for ${TOOLNAME}. To generate a PDF version of the documentation (in the directory 'doc'), execute 'make pdf'. Texinfo can be downloaded at <http://www.gnu.org/s/texinfo>."$'\n\n'; fi
 
@@ -194,7 +216,7 @@ if `echo "$REQ" | grep -q lcov`; then REQ_TESTS="${REQ_TESTS}* LCOV is used to d
 if `echo "$REQ" | grep -q "\[marlene\]"`; then REQ_TESTS="${REQ_TESTS}* Marlene"$'\n\n'; fi
 if `echo "$REQ" | grep -q "\[mia\]"`; then REQ_TESTS="${REQ_TESTS}* Mia"$'\n\n'; fi
 if `echo "$REQ" | grep -q "\[petri\]"`; then REQ_TESTS="${REQ_TESTS}* The Petri Net API Frontend Tool 'Petri' is used in some test cases to transform service models. Without Petri, some test cases of 'make check' may be skipped. Petri can be downloaded at <http://service-technology.org/pnapi>."$'\n\n'; fi
-if [ `echo "$REQ" | grep -q "\[wendy2fiona\]"` -o `echo "$REQ" | grep -q "\[wendyFormula2bits\]"` ] ; then REQ_TESTS="${REQ_TESTS}* The service-technology.org compilers are used to translate operating guideline file formats during the tests. Without them, some test cases of 'make check' may be skipped."$'\n\n'; fi
+if ([ `echo "$REQ" | grep -q "\[wendy2fiona\]"` ] || [ `echo "$REQ" | grep -q "\[wendyFormula2bits\]"` ]); then REQ_TESTS="${REQ_TESTS}* The service-technology.org compilers are used to translate operating guideline file formats during the tests. Without them, some test cases of 'make check' may be skipped."$'\n\n'; fi
 if `echo "$REQ" | grep -q "\[valgrind\]"`; then REQ_TESTS="${REQ_TESTS}* Valgrind is used to check for memory leaks. Without Valgrind, some test cases of 'make check' may be skipped. Valgrind can be downloaded at <http://valgrind.org>."$'\n\n'; fi
 if `echo "$REQ" | grep -q "\[wendy\]"`; then REQ_TESTS="${REQ_TESTS}* Wendy"$'\n\n'; fi
 
@@ -238,7 +260,7 @@ if [ "$REQ_TESTS" != "" ]; then
 	echo "Tests"
 	echo "-----"
 	echo ""
-	noindent "To make sure ${TOOLNAME} works properly, you can run a test suite by executing 'make check'. The following tools are required to execute this test suite. In case a test fail, please mail the file 'testsuite.log' (in the directory 'tests') to ${EMAIL}."
+	noindent "To make sure ${TOOLNAME} works properly, you can run a test suite by executing 'make check'. The following tools are required to execute this test suite. In case a test fail, please mail the file 'testsuite.log' (in the directory 'tests') to <${EMAIL}>."
 	echo ""
 	indent "${REQ_TESTS}"
 fi
@@ -258,3 +280,34 @@ if [ "$REQ_OTHER" != "" ]; then
 	echo ""
 	indent "${REQ_OTHER}"
 fi
+
+
+
+
+
+# REQUIREMENTS
+
+DIR=".."
+CONFSWITCH=""
+CONFSWITCH="${CONFSWITCH}"$'\n'"`grep -Rh "AC_HEADER_ASSERT" ${DIR}/m4/* ${DIR}/*.ac | sort | uniq`"
+CONFSWITCH="${CONFSWITCH}"$'\n'"`grep -Rh "AC_ARG_ENABLE"    ${DIR}/m4/* ${DIR}/*.ac | sort | uniq`"
+CONFSWITCH="${CONFSWITCH}"$'\n'"`grep -Rh "AC_ARG_WITH"      ${DIR}/m4/* ${DIR}/*.ac | sort | uniq`"
+
+#echo "${CONFSWITCH}"
+
+CONFSWITCH_TEXT=""
+
+if `echo "$CONFSWITCH" | grep -q AC_HEADER_ASSERT`; then CONFSWITCH_TEXT="${CONFSWITCH_TEXT}* --disable-assert - This switch disables assertions."$'\n\n'; fi
+if `echo "$CONFSWITCH" | grep -q syslog`; then CONFSWITCH_TEXT="${CONFSWITCH_TEXT}* --enable-syslog - Status messages are printed to standard output or standard error by default. Using this parameter, they are additionally added to the syslog."$'\n\n'; fi
+if `echo "$CONFSWITCH" | grep -q pnapi`; then CONFSWITCH_TEXT="${CONFSWITCH_TEXT}* --without-pnapi - The configure script will try to link against a preinstalled version of the Petri Net API (libpnapi). If this fails, a shipped version (see 'libs/pnapi') will be used instead. This parameter overrides this check and always uses the shipped version."$'\n\n'; fi
+
+if [ "$CONFSWITCH_TEXT" != "" ]; then
+echo "Configuration Switches"
+echo "======================"
+echo ""
+indent "${CONFSWITCH_TEXT}"
+fi
+
+
+
+

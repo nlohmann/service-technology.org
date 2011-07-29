@@ -14,7 +14,9 @@ Wendy is a tool to synthesize partners for services. This includes a finite char
 
 <authors>
 * Niels Lohmann implemented the original core functionality of Wendy (operating guidelines)
+
 * Daniela Weinberg implemented reduction techniques as well as the synthesis of livelock free strategies
+
 * Christian Sura implemented the functions to cover open nets nodes
 </authors>
 

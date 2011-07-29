@@ -301,10 +301,14 @@ if `echo "$CONFSWITCH" | grep -q AC_HEADER_ASSERT`; then CONFSWITCH_TEXT="${CONF
 if `echo "$CONFSWITCH" | grep -q syslog`; then CONFSWITCH_TEXT="${CONFSWITCH_TEXT}* --enable-syslog - Status messages are printed to standard output or standard error by default. Using this parameter, they are additionally added to the syslog."$'\n\n'; fi
 if `echo "$CONFSWITCH" | grep -q pnapi`; then CONFSWITCH_TEXT="${CONFSWITCH_TEXT}* --without-pnapi - The configure script will try to link against a preinstalled version of the Petri Net API (libpnapi). If this fails, a shipped version (see 'libs/pnapi') will be used instead. This parameter overrides this check and always uses the shipped version."$'\n\n'; fi
 
-if [ "$CONFSWITCH_TEXT" != "" ]; then
 echo "Configuration Switches"
 echo "======================"
 echo ""
+indent "* --help - Show all possible options of the configure script.
+
+* --prefix=DIRECTORY - Define the directory in which ${TOOLNAME} will be installed with 'make install'. If you define DIRECTORY to be '/home/${SHORTNAME}', then the, for example, ${TOOLNAME}'s binaries will be installed in '/home/${SHORTNAME}/bin'. If this switch is not used, it DIRECTORY defaults to '/usr/local' which usually means that you need root access to execute 'make install'.
+"
+if [ "$CONFSWITCH_TEXT" != "" ]; then
 indent "${CONFSWITCH_TEXT}"
 fi
 
@@ -318,7 +322,24 @@ echo "============"
 echo ""
 echo "${CONTRIBUTORS}"
 echo ""
+echo ""
 
 
+echo "Source Code Repository"
+echo "======================"
+echo ""
+noindent "${TOOLNAME} is hosted at Gna!, a project site of the Free Software Foundation, see <https://gna.org/projects/service-tech>. ${TOOLNAME}'s source code is organized in a Subversion repository you can access at <http://svn.gna.org/viewcvs/service-tech/trunk/${SHORTNAME}>. For more information on how to use the SVN repository, please have a look at <https://gna.org/svn/?group=service-tech>.
 
+To build ${TOOLNAME} from the SVN repository, perform the following steps:
+"
+echo "* svn co http://svn.gna.org/svn/service-tech/trunk/${SHORTNAME}
+* cd ${SHORTNAME}
+* autoreconf -i
+* ./configure
+* make"
+echo ""
+noindent "Please have a look at ${TOOLNAME}'s requirement list and make sure that all required build tools such as Autoconf or GNU Make are installed."
+echo ""
+noindent "With 'make svn-clean' you can remove all generated files and bring back ${TOOLNAME} in a state as if it was freshly checked out."
+echo ""
 

@@ -52,6 +52,7 @@ std::ostream & operator<<(std::ostream & os, const PetriNet & net)
   case util::STAT: return __stat::output(os, net);
   case util::PNML: return __pnml::output(os, net);
   case util::WOFLAN: return __woflan::output(os, net);
+  case util::IFN: return __ifn::output(os, net);
 	
   default: PNAPI_ASSERT(false);
   }
@@ -87,6 +88,15 @@ std::istream & operator>>(std::istream & is, PetriNet & net) throw (exception::I
 
   case util::LOLA:
   {
+    net = parser::lola::parse(is);
+
+    net.meta_ = util::MetaData::data(is);
+    break;
+  }
+
+  case util::IFN:
+  {
+    // lola parser is fine...
     net = parser::lola::parse(is);
 
     net.meta_ = util::MetaData::data(is);
@@ -165,6 +175,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Arc & arc)
   {
   case DOT:  return __dot::output(os, arc);
   case LOLA: return __lola::output(os, arc);
+  case IFN: return __ifn::output(os, arc);
   case OWFN: return __owfn::output(os, arc);
   case PNML: return __pnml::output(os, arc);
   case WOFLAN: return __woflan::output(os, arc);
@@ -182,6 +193,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Place & p)
   {
   case DOT:  return __dot::output(os, p);
   case LOLA: return __lola::output(os, p);
+  case IFN: return __ifn::output(os, p);
   case OWFN: return __owfn::output(os, p);
   case PNML: return __pnml::output(os, p);
   case WOFLAN: return __woflan::output(os, p);
@@ -199,6 +211,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Transition & t)
   {
   case DOT:  return __dot::output(os, t);
   case LOLA: return __lola::output(os, t);
+  case IFN: return __ifn::output(os, t);
   case OWFN: return __owfn::output(os, t);
   case PNML: return __pnml::output(os, t);
   case WOFLAN: return __woflan::output(os, t);
@@ -266,6 +279,7 @@ std::ostream & operator<<(std::ostream & os, const formula::Negation & f)
   {
   case DOT:  return __dot::output(os, f);
   case LOLA: return __lola::output(os, f);
+  case IFN: return __ifn::output(os, f);
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
@@ -283,6 +297,7 @@ std::ostream & operator<<(std::ostream & os, const formula::Conjunction & f)
   {
   case DOT:  return __dot::output(os, f);
   case LOLA: return __lola::output(os, f);
+  case IFN: return __ifn::output(os, f);
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
@@ -300,6 +315,7 @@ std::ostream & operator<<(std::ostream & os, const formula::Disjunction & f)
   {
   case DOT:  return __dot::output(os, f);
   case LOLA: return __lola::output(os, f);
+  case IFN: return __ifn::output(os, f);
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
@@ -317,6 +333,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaTrue & f)
   {
   case DOT:  return __dot::output(os, f);
   case LOLA: return __lola::output(os, f);
+  case IFN: return __ifn::output(os, f);
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
@@ -334,6 +351,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaFalse & f)
   {
   case DOT:  return __dot::output(os, f);
   case LOLA: return __lola::output(os, f);
+  case IFN: return __ifn::output(os, f);
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
@@ -351,6 +369,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaEqual & f)
   {
   case DOT:  return __dot::output(os, f);
   case LOLA: return __lola::output(os, f);
+  case IFN: return __ifn::output(os, f);
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
@@ -368,6 +387,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaNotEqual & f)
   {
   case DOT:  return __dot::output(os, f);
   case LOLA: return __lola::output(os, f);
+  case IFN: return __ifn::output(os, f);
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
@@ -385,6 +405,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaGreater & f)
   {
   case DOT:  return __dot::output(os, f);
   case LOLA: return __lola::output(os, f);
+  case IFN: return __ifn::output(os, f);
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
@@ -402,6 +423,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaGreaterEqual 
   {
   case DOT:  return __dot::output(os, f);
   case LOLA: return __lola::output(os, f);
+  case IFN: return __ifn::output(os, f);
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
@@ -419,6 +441,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaLess & f)
   {
   case DOT:  return __dot::output(os, f);
   case LOLA: return __lola::output(os, f);
+  case IFN: return __ifn::output(os, f);
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 
@@ -436,6 +459,7 @@ std::ostream & operator<<(std::ostream & os, const formula::FormulaLessEqual & f
   {
   case DOT:  return __dot::output(os, f);
   case LOLA: return __lola::output(os, f);
+  case IFN: return __ifn::output(os, f);
   case OWFN: return __owfn::output(os, f);
   case PNML: return __pnml::output(os, f);
 

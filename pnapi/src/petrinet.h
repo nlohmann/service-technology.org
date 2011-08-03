@@ -115,6 +115,8 @@ class PetriNet
   /// Petri net output, see pnapi::io
   friend std::ostream & io::__lola::output(std::ostream &, const PetriNet &);
   /// Petri net output, see pnapi::io
+  friend std::ostream & io::__ifn::output(std::ostream &, const PetriNet &);
+  /// Petri net output, see pnapi::io
   friend std::ostream & io::__pnml::output(std::ostream &, const PetriNet &);
   /// Petri net output, see pnapi::io
   friend std::ostream & io::__woflan::output(std::ostream &, const PetriNet &);

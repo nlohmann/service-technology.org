@@ -49,6 +49,7 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
             woflan4.xml.tpn woflan5.xml.tpn woflan6.xml.tpn \
             test_compose_ports_1.owfn test_compose_ports_2.owfn \
             test_cdnf.owfn test_input.lola test_dead_nodes.net.owfn \
+            test_input.ifn \
             test_dnf.owfn test_identical_places.net.owfn \
             test_identical_transitions.net.owfn test_input_roles.owfn \
             test_input_roles_error.owfn test_self_loop_places.net.owfn \

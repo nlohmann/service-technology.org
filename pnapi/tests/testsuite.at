@@ -52,6 +52,22 @@ AT_CHECK([GREP -q "|P|= 50  |P_in|= 0  |P_out|= 0  |T|= 40  |F|= 120" stderr])
 AT_KEYWORDS([frontend input])
 AT_CLEANUP
 
+AT_SETUP([Reading IFN from file])
+m4_define([NET], [test_input.ifn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --verbose --input=ifn],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 50  |P_in|= 0  |P_out|= 0  |T|= 40  |F|= 120" stderr])
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
+AT_SETUP([Reading IFN from pipe])
+m4_define([NET], [test_input.ifn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI --verbose --input=ifn < NET],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 50  |P_in|= 0  |P_out|= 0  |T|= 40  |F|= 120" stderr])
+AT_KEYWORDS([frontend input])
+AT_CLEANUP
+
 AT_SETUP([Reading PNML net from file])
 m4_define([NET], [cyclicFullCoffee.pnml])
 AT_CHECK([cp TESTFILES/NET .])
@@ -106,6 +122,16 @@ AT_CHECK([PETRI NET --output=lola],0)
 AT_CHECK([test -f NET.lola])
 AT_CHECK([PETRI NET.lola --input=lola --verbose],0,ignore,stderr)
 AT_CHECK([GREP -q "|P|= 121  |P_in|= 0  |P_out|= 0  |T|= 88  |F|= 303" stderr])
+AT_KEYWORDS([frontend output])
+AT_CLEANUP
+
+AT_SETUP([Writing LoLA net (from IFN)])
+m4_define([NET], [test_input.ifn])
+AT_CHECK([cp TESTFILES/NET .])
+AT_CHECK([PETRI NET --input=ifn --output=lola],0)
+AT_CHECK([test -f NET.lola])
+AT_CHECK([PETRI NET.lola --input=lola --verbose],0,ignore,stderr)
+AT_CHECK([GREP -q "|P|= 50  |P_in|= 0  |P_out|= 0  |T|= 40  |F|= 120" stderr])
 AT_KEYWORDS([frontend output])
 AT_CLEANUP
 

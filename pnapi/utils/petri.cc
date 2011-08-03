@@ -191,6 +191,15 @@ int main(int argc, char** argv) {
                     current.type = TYPE_WOFLANNET;
                     break;
                 }
+                case(input_arg_ifn): {
+                    current.net = new PetriNet();
+                    std::cin >> meta(io::INPUTFILE, current.filename)
+                             >> meta(io::CREATOR, PACKAGE_STRING)
+                             >> meta(io::INVOCATION, invocation) >> io::ifn >> *(current.net);
+
+                    current.type = TYPE_LOLANET;
+                    break;
+                }
             }
             if (args_info.canonicalNames_given) {
                 map<string, string> names = current.net->canonicalNames();
@@ -272,6 +281,15 @@ int main(int argc, char** argv) {
                                    >> meta(io::INVOCATION, invocation) >> io::woflan >> *(current.net);
 
                             current.type = TYPE_WOFLANNET;
+                            break;
+                        }
+                        case(input_arg_ifn): {
+                            current.net = new PetriNet();
+                            infile >> meta(io::INPUTFILE, current.filename)
+                                   >> meta(io::CREATOR, PACKAGE_STRING)
+                                   >> meta(io::INVOCATION, invocation) >> io::ifn >> *(current.net);
+
+                            current.type = TYPE_LOLANET;
                             break;
                         }
                     }
@@ -644,6 +662,16 @@ int main(int argc, char** argv) {
                             fprintf(s, "%s\n", d.str().c_str());
                             assert(!ferror(s));
                             pclose(s);
+                            break;
+                        }
+                        
+                        // create IFN output
+                        case(output_arg_ifn): {
+                            if (args_info.formula_flag) {
+                                outfile.stream() << io::ifn << io::formula << *(objects[i].net);
+                            } else {
+                                outfile.stream() << io::ifn << *(objects[i].net);
+                            }
                             break;
                         }
                     }

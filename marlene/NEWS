@@ -6,17 +6,7 @@
                   http://service-technology.org/tools/marlene
 
 
-Version 1.2
-===========
+Version 1.3-unreleased
+======================
 
-* diagnosis of unadaptable services (only in connection with libconfig++ >=
-  1.4)
-
-* improved test coverage of code
-
-* minor improvements (e.g. smart pointer usage)
-
-
-See file ChangeLog <http://service-technology.org/files/marlene/ChangeLog> for
-complete version history.
-
+\nSee file ChangeLog <http://service-technology.org/files/marlene/ChangeLog> for\ncomplete version history.\n

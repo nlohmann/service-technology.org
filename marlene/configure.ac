@@ -1,4 +1,4 @@
-AC_INIT([Marlene],[1.2],[marlene@service-technology.org],[marlene],[http://service-technology.org/tools/marlene])
+AC_INIT([Marlene],[1.3-unreleased],[marlene@service-technology.org],[marlene],[http://service-technology.org/tools/marlene])
 
 AC_MSG_NOTICE([ __  __            _                 ])
 AC_MSG_NOTICE([|  \/  | __ _ _ __| | ___ _ __   ___ ])
@@ -30,7 +30,7 @@ AC_PATH_PROG(DIFF, [diff], [])
 AC_PATH_PROGS(WENDY, [wendy], [])
 AC_PATH_PROGS(CANDY, [candy], [])
 
-CONVERTER=sa2on
+CONVERTER=statemachine
 
 AC_PATH_PROGS(GENET, [genet], [])
 if test -z "$GENET" ; then

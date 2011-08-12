@@ -471,43 +471,68 @@ int main(int argc, char** argv) {
 		std::multimap<pnapi::Place *, pnapi::Transition *>::iterator itLow;
 	  	std::pair<std::multimap<pnapi::Place *, pnapi::Transition *>::iterator,std::multimap<pnapi::Place *, pnapi::Transition *>::iterator> retLow;
 
+        bool isActive;
+
 		if (checkActiveCausal) {
 		status("..potential causal places");
 			FOREACH(p, potentialCausal) {
 
 				if (args_info.oneActiveOnly_flag && (!activeCausal.empty() || !activeConflict.empty())) {break;}
+                isActive = false;
 
 				status("....%s (%d combination(s))", (**p).getName().c_str(), highPre.count(*p) * lowPost.count(*p));
 
 				retHigh = highPre.equal_range(*p);
 				for (itHigh=retHigh.first; itHigh!=retHigh.second; ++itHigh) {
-
+                    if (args_info.oneTripleOnly_flag && isActive) {break;}
+                
 					retLow = lowPost.equal_range(*p);
 					for (itLow=retLow.first; itLow!=retLow.second; ++itLow) {
+					    if (args_info.oneTripleOnly_flag && isActive) {break;}
+					
 						status("......%s, %s", (*itHigh).second->getName().c_str(), (*itLow).second->getName().c_str());
 
-						pnapi::PetriNet cNet(net);
-						pnapi::Transition * lowCopy = &cNet.createTransition();
-						pnapi::Transition * highCopy = &cNet.createTransition();
-						pnapi::Place * preHigh = &cNet.createPlace("", 1);
-						pnapi::Place * postHigh = &cNet.createPlace();
-						pnapi::Place * goal = &cNet.createPlace();
-
-						pnapi::Place * curPlace = cNet.findPlace((**p).getName());
+                        pnapi::PetriNet cNet(net);
+                        
+                        pnapi::Place * curPlace = cNet.findPlace((**p).getName());
 						pnapi::Transition * curHigh = cNet.findTransition((*itHigh).second->getName());
 						pnapi::Transition * curLow = cNet.findTransition((*itLow).second->getName());
 
-				
-						PNAPI_FOREACH(prePlace, curLow->getPreset()) {
-							cNet.createArc(**prePlace, *lowCopy);
+						pnapi::Transition * lowCopy = &cNet.createTransition();
+						pnapi::Transition * highCopy = &cNet.createTransition();
+						pnapi::Place * highFired = &cNet.createPlace();
+						pnapi::Place * goal = &cNet.createPlace();
+
+                        std::set< std::pair<pnapi::Node *, pnapi::Node *> > newArcs;
+
+                        PNAPI_FOREACH(prePlace, curHigh->getPreset()) {
+                            newArcs.insert(std::make_pair(*prePlace, highCopy));
+                            //cNet.createArc(**prePlace, *highCopy);
+                        }
+                        PNAPI_FOREACH(postPlace, curHigh->getPostset()) {
+                            newArcs.insert(std::make_pair(highCopy, *postPlace));
+                            //cNet.createArc(*highCopy, **postPlace);
+                        }
+                        
+                        PNAPI_FOREACH(prePlace, curLow->getPreset()) {
+                            cNet.createArc(**prePlace, *lowCopy);
+                        }
+
+						PNAPI_FOREACH(preTransition, curPlace->getPreset()) {
+						    //if ((**preTransition).getName() != (*curHigh).getName()) {
+						        pnapi::Place * cPlace = &cNet.createPlace("", 1);
+						        newArcs.insert(std::make_pair(*preTransition, cPlace));
+							    newArcs.insert(std::make_pair(cPlace, *preTransition));
+							    newArcs.insert(std::make_pair(cPlace, highCopy));
+							//}
 						}
 
-						cNet.createArc(*preHigh, *curHigh);
-						cNet.createArc(*curHigh, *postHigh);
-						cNet.createArc(*highCopy, *preHigh);
-						cNet.createArc(*curPlace, *highCopy);
-						cNet.createArc(*postHigh, *highCopy);
-						cNet.createArc(*postHigh, *lowCopy);
+                        FOREACH(a, newArcs) {
+							cNet.createArc(*a->first, *a->second);
+						}
+
+						cNet.createArc(*highCopy, *highFired);
+						cNet.createArc(*highFired, *lowCopy);
 						cNet.createArc(*lowCopy, *goal);
 				
 						std::string curFileName;
@@ -518,6 +543,7 @@ int main(int argc, char** argv) {
 						o << pnapi::io::lola << cNet;
 						o << "\n\nFORMULA (" << goal->getName() << " = 1 )\n";
 						o.close();
+                        status("........%s created", _cfilename_(curFileName));
 
 						allNets.insert(curFileName);
 
@@ -525,7 +551,7 @@ int main(int argc, char** argv) {
 							// call LoLA
 							if (callLoLA(curFileName)) {
 								status(_cbad_("........active"));
-								activeCausal.insert(*p);
+								isActive = true;
 							}
 							else {
 								status(_cgood_("........not active"));
@@ -535,6 +561,14 @@ int main(int argc, char** argv) {
 					} // for (itLow=retLow.first; itLow!=retLow.second; ++itLow) {
 
 				} // for (itHigh=retHigh.first; itHigh!=retHigh.second; ++itHigh) {
+				
+				if (isActive) {
+				    status(_cbad_("......active"));
+				    activeCausal.insert(*p);
+				}
+				else {
+				    status(_cgood_("......not active"));
+				}
 
 			} // FOREACH(p, potentialCausal) {
 
@@ -545,51 +579,64 @@ int main(int argc, char** argv) {
 			FOREACH(p, potentialConflict) {
 
 				if (args_info.oneActiveOnly_flag && (!activeCausal.empty() || !activeConflict.empty())) {break;}
+				isActive = false;
 
 				status("....%s (%d combination(s))", (**p).getName().c_str(), highPost.count(*p) * lowPost.count(*p));
 		
 				retHigh = highPost.equal_range(*p);
 				for (itHigh=retHigh.first; itHigh!=retHigh.second; ++itHigh) {
-
+				    if (args_info.oneTripleOnly_flag && isActive) {break;}
+				    
 					retLow = lowPost.equal_range(*p);
 					for (itLow=retLow.first; itLow!=retLow.second; ++itLow) {
+					    if (args_info.oneTripleOnly_flag && isActive) {break;}
+					    
 						status("......%s, %s", (*itHigh).second->getName().c_str(), (*itLow).second->getName().c_str());
 
 						pnapi::PetriNet cNet(net);
-						pnapi::Transition * lowCopy = &cNet.createTransition();
-						pnapi::Transition * highCopy = &cNet.createTransition();
-						pnapi::Place * proHigh = &cNet.createPlace();
-						pnapi::Place * notHigh = &cNet.createPlace("", 1);
-						pnapi::Place * goal = &cNet.createPlace();
-
-						pnapi::Place * curPlace = cNet.findPlace((**p).getName());
+                        
+                        pnapi::Place * curPlace = cNet.findPlace((**p).getName());
 						pnapi::Transition * curHigh = cNet.findTransition((*itHigh).second->getName());
 						pnapi::Transition * curLow = cNet.findTransition((*itLow).second->getName());
 
-						std::set< std::pair<pnapi::Node *, pnapi::Node *> > newArcs;
+						pnapi::Transition * lowCopy = &cNet.createTransition("lC");
+						pnapi::Transition * highCopy = &cNet.createTransition("hC");
+						pnapi::Place * highFired = &cNet.createPlace("f");
+						pnapi::Place * highActivated = &cNet.createPlace("a", 1);
+						pnapi::Place * goal = &cNet.createPlace("i");
 
-						PNAPI_FOREACH(postTransition, curPlace->getPostset()) {
-							newArcs.insert(std::make_pair(*postTransition, notHigh));
-							newArcs.insert(std::make_pair(notHigh, *postTransition));
+                        std::set< std::pair<pnapi::Node *, pnapi::Node *> > newArcs;
+
+                        PNAPI_FOREACH(prePlace, curHigh->getPreset()) {
+                            newArcs.insert(std::make_pair(*prePlace, highCopy));
+                            newArcs.insert(std::make_pair(highCopy, *prePlace));
+                            //cNet.createArc(**prePlace, *highCopy);
+                        }
+                        
+                        PNAPI_FOREACH(prePlace, curLow->getPreset()) {
+                            newArcs.insert(std::make_pair(*prePlace, lowCopy));
+                            //cNet.createArc(**prePlace, *lowCopy);
+                        }
+
+						PNAPI_FOREACH(preTransition, curPlace->getPreset()) {
+						    //if ((**preTransition).getName() != (*curHigh).getName()) {
+						        pnapi::Place * cPlace = &cNet.createPlace("", 1);
+						        newArcs.insert(std::make_pair(*preTransition, cPlace));
+							    newArcs.insert(std::make_pair(cPlace, *preTransition));
+							    newArcs.insert(std::make_pair(cPlace, highCopy));
+							//}
 						}
 
-						PNAPI_FOREACH(prePlace, curLow->getPreset()) {
-							newArcs.insert(std::make_pair(*prePlace, lowCopy));
-						}
-
-						PNAPI_FOREACH(prePlace, curHigh->getPreset()) {
-							newArcs.insert(std::make_pair(*prePlace, highCopy));
-							newArcs.insert(std::make_pair(highCopy, *prePlace));
-						}
-
-						FOREACH(a, newArcs) {
+                        FOREACH(a, newArcs) {
 							cNet.createArc(*a->first, *a->second);
 						}
 
-						cNet.createArc(*highCopy, *proHigh);
-						cNet.createArc(*proHigh, *lowCopy);
-						cNet.createArc(*notHigh, *highCopy);
+						cNet.createArc(*highCopy, *highFired);
+						cNet.createArc(*highFired, *lowCopy);
 						cNet.createArc(*lowCopy, *goal);
+						cNet.createArc(*highActivated, *curHigh);
+						cNet.createArc(*curHigh, *highActivated);
+						cNet.createArc(*highActivated, *highCopy);
 
 						std::string curFileName;
 						curFileName = fileName + ".conflict." + (*curPlace).getName() + "." + (*curHigh).getName() + "." + (*curLow).getName() + ".lola";
@@ -599,6 +646,7 @@ int main(int argc, char** argv) {
 						o << pnapi::io::lola << cNet;
 						o << "\n\nFORMULA (" << goal->getName() << " = 1 )\n";
 						o.close();
+						status("........%s created", _cfilename_(curFileName));
 
 						allNets.insert(curFileName);
 
@@ -606,7 +654,7 @@ int main(int argc, char** argv) {
 							// call LoLA
 							if (callLoLA(curFileName)) {
 								status(_cbad_("........active"));
-								activeConflict.insert(*p);
+								isActive = true;
 							}
 							else {
 								status(_cgood_("........not active"));
@@ -616,6 +664,14 @@ int main(int argc, char** argv) {
 					} // for (itLow=retLow.first; itLow!=retLow.second; ++itLow) {
 
 				} // for (itHigh=retHigh.first; itHigh!=retHigh.second; ++itHigh) {
+				
+				if (isActive) {
+				    status(_cbad_("......active"));
+				    activeConflict.insert(*p);
+				}
+				else {
+				    status(_cgood_("......not active"));
+				}
 
 			} // FOREACH(p, potentialConflict) {
 

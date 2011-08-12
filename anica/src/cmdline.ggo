@@ -35,6 +35,10 @@ option "oneActiveOnly" -
   details="After the first active place the check will be finished.\n"
   flag off
 
+option "oneTripleOnly" -
+  "Only one active triple (one high and low combination per place)."
+  details="After the first active triple the check (for this place) will be finished.\n"
+  flag on
 
 section "Input/Output"
 sectiondesc="<<-- When called without an input file, Anica reads from the standard input stream. -->>\n"

@@ -2,7 +2,7 @@
 
     <basename property="package" file="."/>
 
-    <target name="all" depends="prepare, cppcheck, statsvn, autogen, configure, make_all, make_check, make_distcheck, documentation, coverage" />
+    <target name="all" depends="prepare, cppcheck, statsvn, cccc, autogen, configure, make_all, make_check, make_distcheck, documentation, coverage" />
 
     <target name="prepare">
         <mkdir dir="artifacts" />
@@ -17,6 +17,7 @@
         <delete file="${package}.tar.gz" failonerror="false" />
         <delete dir="artifacts" failonerror="false" />
         <delete dir="statsvn" failonerror="false" />
+        <delete dir=".cccc" failonerror="false" />
         <delete dir="doc/doxygen" failonerror="false" />
         <delete file="statsvn.log" failonerror="false" />
         <delete file="cppcheck-result.xml" failonerror="false" />
@@ -35,6 +36,13 @@
 <!--        <exec executable="java" failonerror="false">
             <arg line="-jar '${homedir}/local/statsvn/statsvn.jar' -config-file '${homedir}/local/statsvn/config' -tags '.*' -disable-twitter-button -threads 1 -include '**/src/**;**/utils/**' statsvn.log . -output-dir statsvn" />
         </exec>-->
+    </target>
+
+    <target name="cccc">
+        <exec executable="sh" failonerror="false">
+            <arg value="-c" />
+            <arg value="cccc src/*" />
+        </exec>
     </target>
 
     <target name="cppcheck" depends="prepare">

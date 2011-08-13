@@ -599,11 +599,11 @@ int main(int argc, char** argv) {
 						pnapi::Transition * curHigh = cNet.findTransition((*itHigh).second->getName());
 						pnapi::Transition * curLow = cNet.findTransition((*itLow).second->getName());
 
-						pnapi::Transition * lowCopy = &cNet.createTransition("lC");
-						pnapi::Transition * highCopy = &cNet.createTransition("hC");
-						pnapi::Place * highFired = &cNet.createPlace("f");
-						pnapi::Place * highActivated = &cNet.createPlace("a", 1);
-						pnapi::Place * goal = &cNet.createPlace("i");
+						pnapi::Transition * lowCopy = &cNet.createTransition();
+						pnapi::Transition * highCopy = &cNet.createTransition();
+						pnapi::Place * highFired = &cNet.createPlace();
+						pnapi::Place * highActivated = &cNet.createPlace("", 1);
+						pnapi::Place * goal = &cNet.createPlace();
 
                         std::set< std::pair<pnapi::Node *, pnapi::Node *> > newArcs;
 

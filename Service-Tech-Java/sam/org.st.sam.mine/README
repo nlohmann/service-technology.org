@@ -1,0 +1,60 @@
+
+                              ____    _    __  __ 
+                             / ___|  / \  |  \/  |
+                             \___ \ / _ \ | |\/| |
+                              ___) / ___ \| |  | |
+                             |____/_/   \_\_|  |_|
+                          http://service-technology.org/
+
+
+PURPOSE
+    SAM (our Scenario-based Analysis Methods and tools) have been implemented
+    for validating various analysis, synthesis, and mining techniques for 
+    scenario-based specifications. Its particular strengths include
+    
+     * translating scenario-based specifications to Colored Petri Nets for
+       distributed play-out
+     * mining scenario-based specifications from logs
+     *
+
+    SAM is platform independent and runs on all platforms with a Java runtime
+    environment.
+
+
+COPYRIGHT
+    Copyright (c) Dirk Fahland(1), Amir Kantor(2), Shahar Maoz (2),
+    David Lo (3)
+
+    (1) AIS Group, Eindhoven University of Technology / service-technology.org
+    (2) Prof. Harel research lab at the Weizmann Institute of Science
+    (3) Singapore Management University
+
+
+AUTHORS
+    SAM is written and maintained by Dirk Fahland, Amir Kantor, Shahar Maoz, and
+    David Lo. See file "AUTHORS" for more information.
+
+
+LICENSE
+    License AGPLv3+: GNU Affero General Public License version 3 or later
+    <http://www.gnu.org/licenses/agpl.html>
+
+    SAM is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+
+    See file "COPYING" for the license of SAM.
+
+    Any different licensing scheme may be negotiated with the author(s).
+
+
+INSTALLATION (to be done)
+    SAM can be easily compiled and installed. See file "INSTALL" for
+    instructions.
+
+    SAM uses some generated code. If you want to make changes to the source
+    code, you might need the following tools to regenerate the code:
+     * ???
+
+
+DOCUMENTATION
+    The directory "doc" contains a documentation of SAM.

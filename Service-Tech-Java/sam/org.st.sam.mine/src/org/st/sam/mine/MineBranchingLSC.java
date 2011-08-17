@@ -32,10 +32,10 @@ public class MineBranchingLSC {
     int minSupportThreshold = 5;
     float confidence = 1.0f;
     
-    mineLSCs(logfile, minSupportThreshold, confidence, 0);
+    mineLSCs(logfile, minSupportThreshold, confidence);
   }
   
-  public void mineLSCs(String logFile, int minSupportThreshold, double confidence, double density) throws IOException {
+  public void mineLSCs(String logFile, int minSupportThreshold, double confidence) throws IOException {
     loadXLog(logFile);
     XLog xlog = getXLog();
     System.out.println("log contains "+xlog.size()+" traces");
@@ -144,7 +144,6 @@ public class MineBranchingLSC {
     }
     System.out.println("reduced to "+scenarios.size()+" scenarios");
     writeToFile(tree.toDot(), logFile+"_cov.dot");
-    
   }
   
   public ArrayList<LSC> getLSCs() {

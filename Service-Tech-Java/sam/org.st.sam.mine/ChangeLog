@@ -1,0 +1,6 @@
+SAM/mine v.0.2.0
+----------------
+
++ basic mining algorithm to discover branching time scenarios from
+  logs in XES format
++ some optimizations to reduce the search space during mining 

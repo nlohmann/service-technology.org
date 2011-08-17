@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="tests/src-test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="libs-external/OpenXES-XStream.jar"/>
 	<classpathentry kind="lib" path="libs-external/OpenXES.jar"/>
 	<classpathentry kind="lib" path="libs-external/Spex.jar"/>
 	<classpathentry kind="lib" path="libs-external/xstream-1.3.1.jar"/>
+	<classpathentry kind="lib" path="tests/libs-external/junit-4.8.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

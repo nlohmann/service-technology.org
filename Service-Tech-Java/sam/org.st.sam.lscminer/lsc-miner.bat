@@ -1,0 +1,1 @@
+java -cp "./${libs.absolutelayout.classpath};./${libs.toplink.classpath};./libs\bcel.jar;./libs\jpf-classes.jar;./libs\jpf.jar;./libs\OpenXES-XStream.jar;./libs\OpenXES.jar;./libs\Spex.jar;./libs\xstream-1.3.1.jar;lsc-miner.jar" lscminer.Main

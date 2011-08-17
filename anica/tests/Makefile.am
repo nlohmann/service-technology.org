@@ -21,13 +21,15 @@
 # 4. Add the file to the SVN repository.
 
 # <<-- CHANGE START (testfiles) -->>
-TESTFILES = activeCausal.lola \
-            activeConflict.lola \
-            both.lola \
-			potentialCausal.lola \
-			potentialConflict.lola \
-			missing-confidence.lola \
-			wrong-format.lola
+TESTFILES = activeCausal.ifn \
+            activeConflict.ifn \
+            both.ifn \
+            none.ifn \
+			potentialCausal.ifn \
+			potentialConflict.ifn \
+			missing-confidence.ifn \
+			wrong-format.ifn \
+			causal-illegal-sequence.ifn
 # <<-- CHANGE END -->>
 
 

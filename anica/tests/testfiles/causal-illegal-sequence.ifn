@@ -1,0 +1,29 @@
+PLACE
+  i, s, p1, p2, o;
+
+
+MARKING
+  i:	1
+;
+
+TRANSITION h HIGH
+CONSUME
+  i:	1;
+PRODUCE
+  s:    1,
+  p1:	1;
+
+TRANSITION illegal LOW
+CONSUME
+  p1:   1,
+  s:    1;
+PRODUCE
+  s:    1,
+  p2:   1;
+
+TRANSITION l LOW
+CONSUME
+  s:	1,
+  p2:   1;
+PRODUCE
+  o:    1;

@@ -1,0 +1,38 @@
+INTERFACE
+  INPUT c, t, q;
+  OUTPUT b;
+  
+
+PLACE
+  I, O, R, D;
+
+INITIALMARKING
+  I, R: 2;
+
+FINALCONDITION
+  D = 1;
+
+TRANSITION gco
+  CONSUME
+    I, c;
+  PRODUCE
+    O;
+
+TRANSITION gto
+  CONSUME
+    I, t;
+  PRODUCE
+    O;
+
+
+TRANSITION bs
+  CONSUME
+    O, R;
+  PRODUCE
+    b, I;
+
+TRANSITION get_q
+  CONSUME
+    q, I;
+  PRODUCE
+    D;

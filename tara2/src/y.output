@@ -1,0 +1,428 @@
+Grammatik
+
+    0 $accept: states $end
+
+    1 states: state
+    2       | states state
+
+    3 $@1: /* leer */
+
+    4 state: KW_STATE NUMBER lowlink $@1 scc_markings_transitions
+
+    5 scc_markings_transitions: scc transitions
+
+    6 $@2: /* leer */
+
+    7 scc_markings_transitions: scc markings $@2 transitions
+
+    8 scc: /* leer */
+    9    | KW_SCC scc_members
+
+   10 scc_members: scc_member
+   11            | scc_members scc_member
+
+   12 scc_member: NUMBER
+
+   13 lowlink: KW_LOWLINK NUMBER
+
+   14 markings: markingList
+
+   15 markingList: marking
+   16            | markingList COMMA marking
+
+   17 marking: NAME COLON NUMBER
+
+   18 transitions: /* leer */
+   19            | transitionList
+
+   20 transitionList: transition
+   21               | transitionList transition
+
+   22 transition: NAME ARROW NUMBER
+
+
+Terminale und die Regeln, in denen sie verwendet werden
+
+$end (0) 0
+error (256)
+KW_STATE (258) 4
+KW_LOWLINK (259) 13
+KW_SCC (260) 9
+COLON (261) 17
+COMMA (262) 16
+ARROW (263) 22
+NUMBER (264) 4 12 13 17 22
+NAME (265) 17 22
+
+
+Nicht-Terminal und die Regeln, in denen sie verwendet werden
+
+$accept (11)
+    auf der linken Seite: 0
+states (12)
+    auf der linken Seite: 1 2, auf der rechten Seite: 0 2
+state (13)
+    auf der linken Seite: 4, auf der rechten Seite: 1 2
+$@1 (14)
+    auf der linken Seite: 3, auf der rechten Seite: 4
+scc_markings_transitions (15)
+    auf der linken Seite: 5 7, auf der rechten Seite: 4
+$@2 (16)
+    auf der linken Seite: 6, auf der rechten Seite: 7
+scc (17)
+    auf der linken Seite: 8 9, auf der rechten Seite: 5 7
+scc_members (18)
+    auf der linken Seite: 10 11, auf der rechten Seite: 9 11
+scc_member (19)
+    auf der linken Seite: 12, auf der rechten Seite: 10 11
+lowlink (20)
+    auf der linken Seite: 13, auf der rechten Seite: 4
+markings (21)
+    auf der linken Seite: 14, auf der rechten Seite: 7
+markingList (22)
+    auf der linken Seite: 15 16, auf der rechten Seite: 14 16
+marking (23)
+    auf der linken Seite: 17, auf der rechten Seite: 15 16
+transitions (24)
+    auf der linken Seite: 18 19, auf der rechten Seite: 5 7
+transitionList (25)
+    auf der linken Seite: 20 21, auf der rechten Seite: 19 21
+transition (26)
+    auf der linken Seite: 22, auf der rechten Seite: 20 21
+
+
+Zustand 0
+
+    0 $accept: . states $end
+    1 states: . state
+    2       | . states state
+    4 state: . KW_STATE NUMBER lowlink $@1 scc_markings_transitions
+
+    KW_STATE  schiebe und gehe zu Zustand 1 über
+
+    states  gehe zu Zustand 2 über
+    state   gehe zu Zustand 3 über
+
+
+Zustand 1
+
+    4 state: KW_STATE . NUMBER lowlink $@1 scc_markings_transitions
+
+    NUMBER  schiebe und gehe zu Zustand 4 über
+
+
+Zustand 2
+
+    0 $accept: states . $end
+    2 states: states . state
+    4 state: . KW_STATE NUMBER lowlink $@1 scc_markings_transitions
+
+    $end      schiebe und gehe zu Zustand 5 über
+    KW_STATE  schiebe und gehe zu Zustand 1 über
+
+    state  gehe zu Zustand 6 über
+
+
+Zustand 3
+
+    1 states: state .
+
+    $default  reduziere mit Regel 1 (states)
+
+
+Zustand 4
+
+    4 state: KW_STATE NUMBER . lowlink $@1 scc_markings_transitions
+   13 lowlink: . KW_LOWLINK NUMBER
+
+    KW_LOWLINK  schiebe und gehe zu Zustand 7 über
+
+    lowlink  gehe zu Zustand 8 über
+
+
+Zustand 5
+
+    0 $accept: states $end .
+
+    $default  annehmen
+
+
+Zustand 6
+
+    2 states: states state .
+
+    $default  reduziere mit Regel 2 (states)
+
+
+Zustand 7
+
+   13 lowlink: KW_LOWLINK . NUMBER
+
+    NUMBER  schiebe und gehe zu Zustand 9 über
+
+
+Zustand 8
+
+    3 $@1: .
+    4 state: KW_STATE NUMBER lowlink . $@1 scc_markings_transitions
+
+    $default  reduziere mit Regel 3 ($@1)
+
+    $@1  gehe zu Zustand 10 über
+
+
+Zustand 9
+
+   13 lowlink: KW_LOWLINK NUMBER .
+
+    $default  reduziere mit Regel 13 (lowlink)
+
+
+Zustand 10
+
+    4 state: KW_STATE NUMBER lowlink $@1 . scc_markings_transitions
+    5 scc_markings_transitions: . scc transitions
+    7                         | . scc markings $@2 transitions
+    8 scc: .  [$end, KW_STATE, NAME]
+    9    | . KW_SCC scc_members
+
+    KW_SCC  schiebe und gehe zu Zustand 11 über
+
+    $default  reduziere mit Regel 8 (scc)
+
+    scc_markings_transitions  gehe zu Zustand 12 über
+    scc                       gehe zu Zustand 13 über
+
+
+Zustand 11
+
+    9 scc: KW_SCC . scc_members
+   10 scc_members: . scc_member
+   11            | . scc_members scc_member
+   12 scc_member: . NUMBER
+
+    NUMBER  schiebe und gehe zu Zustand 14 über
+
+    scc_members  gehe zu Zustand 15 über
+    scc_member   gehe zu Zustand 16 über
+
+
+Zustand 12
+
+    4 state: KW_STATE NUMBER lowlink $@1 scc_markings_transitions .
+
+    $default  reduziere mit Regel 4 (state)
+
+
+Zustand 13
+
+    5 scc_markings_transitions: scc . transitions
+    7                         | scc . markings $@2 transitions
+   14 markings: . markingList
+   15 markingList: . marking
+   16            | . markingList COMMA marking
+   17 marking: . NAME COLON NUMBER
+   18 transitions: .  [$end, KW_STATE]
+   19            | . transitionList
+   20 transitionList: . transition
+   21               | . transitionList transition
+   22 transition: . NAME ARROW NUMBER
+
+    NAME  schiebe und gehe zu Zustand 17 über
+
+    $default  reduziere mit Regel 18 (transitions)
+
+    markings        gehe zu Zustand 18 über
+    markingList     gehe zu Zustand 19 über
+    marking         gehe zu Zustand 20 über
+    transitions     gehe zu Zustand 21 über
+    transitionList  gehe zu Zustand 22 über
+    transition      gehe zu Zustand 23 über
+
+
+Zustand 14
+
+   12 scc_member: NUMBER .
+
+    $default  reduziere mit Regel 12 (scc_member)
+
+
+Zustand 15
+
+    9 scc: KW_SCC scc_members .  [$end, KW_STATE, NAME]
+   11 scc_members: scc_members . scc_member
+   12 scc_member: . NUMBER
+
+    NUMBER  schiebe und gehe zu Zustand 14 über
+
+    $default  reduziere mit Regel 9 (scc)
+
+    scc_member  gehe zu Zustand 24 über
+
+
+Zustand 16
+
+   10 scc_members: scc_member .
+
+    $default  reduziere mit Regel 10 (scc_members)
+
+
+Zustand 17
+
+   17 marking: NAME . COLON NUMBER
+   22 transition: NAME . ARROW NUMBER
+
+    COLON  schiebe und gehe zu Zustand 25 über
+    ARROW  schiebe und gehe zu Zustand 26 über
+
+
+Zustand 18
+
+    6 $@2: .
+    7 scc_markings_transitions: scc markings . $@2 transitions
+
+    $default  reduziere mit Regel 6 ($@2)
+
+    $@2  gehe zu Zustand 27 über
+
+
+Zustand 19
+
+   14 markings: markingList .  [$end, KW_STATE, NAME]
+   16 markingList: markingList . COMMA marking
+
+    COMMA  schiebe und gehe zu Zustand 28 über
+
+    $default  reduziere mit Regel 14 (markings)
+
+
+Zustand 20
+
+   15 markingList: marking .
+
+    $default  reduziere mit Regel 15 (markingList)
+
+
+Zustand 21
+
+    5 scc_markings_transitions: scc transitions .
+
+    $default  reduziere mit Regel 5 (scc_markings_transitions)
+
+
+Zustand 22
+
+   19 transitions: transitionList .  [$end, KW_STATE]
+   21 transitionList: transitionList . transition
+   22 transition: . NAME ARROW NUMBER
+
+    NAME  schiebe und gehe zu Zustand 29 über
+
+    $default  reduziere mit Regel 19 (transitions)
+
+    transition  gehe zu Zustand 30 über
+
+
+Zustand 23
+
+   20 transitionList: transition .
+
+    $default  reduziere mit Regel 20 (transitionList)
+
+
+Zustand 24
+
+   11 scc_members: scc_members scc_member .
+
+    $default  reduziere mit Regel 11 (scc_members)
+
+
+Zustand 25
+
+   17 marking: NAME COLON . NUMBER
+
+    NUMBER  schiebe und gehe zu Zustand 31 über
+
+
+Zustand 26
+
+   22 transition: NAME ARROW . NUMBER
+
+    NUMBER  schiebe und gehe zu Zustand 32 über
+
+
+Zustand 27
+
+    7 scc_markings_transitions: scc markings $@2 . transitions
+   18 transitions: .  [$end, KW_STATE]
+   19            | . transitionList
+   20 transitionList: . transition
+   21               | . transitionList transition
+   22 transition: . NAME ARROW NUMBER
+
+    NAME  schiebe und gehe zu Zustand 29 über
+
+    $default  reduziere mit Regel 18 (transitions)
+
+    transitions     gehe zu Zustand 33 über
+    transitionList  gehe zu Zustand 22 über
+    transition      gehe zu Zustand 23 über
+
+
+Zustand 28
+
+   16 markingList: markingList COMMA . marking
+   17 marking: . NAME COLON NUMBER
+
+    NAME  schiebe und gehe zu Zustand 34 über
+
+    marking  gehe zu Zustand 35 über
+
+
+Zustand 29
+
+   22 transition: NAME . ARROW NUMBER
+
+    ARROW  schiebe und gehe zu Zustand 26 über
+
+
+Zustand 30
+
+   21 transitionList: transitionList transition .
+
+    $default  reduziere mit Regel 21 (transitionList)
+
+
+Zustand 31
+
+   17 marking: NAME COLON NUMBER .
+
+    $default  reduziere mit Regel 17 (marking)
+
+
+Zustand 32
+
+   22 transition: NAME ARROW NUMBER .
+
+    $default  reduziere mit Regel 22 (transition)
+
+
+Zustand 33
+
+    7 scc_markings_transitions: scc markings $@2 transitions .
+
+    $default  reduziere mit Regel 7 (scc_markings_transitions)
+
+
+Zustand 34
+
+   17 marking: NAME . COLON NUMBER
+
+    COLON  schiebe und gehe zu Zustand 25 über
+
+
+Zustand 35
+
+   16 markingList: markingList COMMA marking .
+
+    $default  reduziere mit Regel 16 (markingList)

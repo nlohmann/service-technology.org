@@ -1,0 +1,16 @@
+name = "robert";
+states = ["happy", "sad", "melancholic", "euphoric"];
+initial = "sad";
+final = ["euphoric", "happy"];
+actions = ["pet", "poke", "insult", "hug"];
+transitions = ( 
+  ["happy", "poke", "melancholic"], 
+  ["happy", "insult", "sad"], 
+  ["sad", "pet", "melancholic"], 
+  ["sad", "hug", "happy"], 
+  ["melancholic", "poke", "euphoric"], 
+  ["melancholic", "insult", "sad"], 
+  ["euphoric", "hug", "happy"], 
+  ["euphoric", "insult", "melancholic"] 
+ );
+

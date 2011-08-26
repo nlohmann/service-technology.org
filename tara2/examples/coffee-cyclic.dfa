@@ -1,0 +1,12 @@
+name = "last_selection";
+states = ["initial", "coffee", "tea"];
+initial = "initial";
+final = [];
+actions = ["gco", "gto"];
+transitions = ( 
+  ["initial", "gco", "coffee"], 
+  ["initial", "gto", "tea"], 
+  ["coffee", "gto", "tea"], 
+  ["tea", "gco", "coffee"]
+);
+

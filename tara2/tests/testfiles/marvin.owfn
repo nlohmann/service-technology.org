@@ -1,0 +1,63 @@
+{ coffee }
+
+PLACE
+INTERNAL
+  p0,  { initial }
+  p00,
+  p1,		
+  p2,
+  p22,
+  p3,
+  p4;
+
+INITIALMARKING
+  p0:	1,
+  p00:  1
+ ;
+
+
+FINALMARKING
+  p3:	1,
+  p00: 1;
+ ;
+
+
+TRANSITION t1
+CONSUME
+  p0:	1;
+PRODUCE
+  p1:	1;
+
+
+TRANSITION t2
+CONSUME
+  {p00: 1,}
+  p1: 1;
+PRODUCE
+  p00: 1,
+  p2:	1;
+
+TRANSITION t22
+CONSUME
+  p2:  1,
+  p00: 1;
+PRODUCE
+  p22:	1;
+
+TRANSITION t3
+CONSUME
+  p22: 1;
+PRODUCE
+  p1: 1;
+
+TRANSITION t4
+CONSUME
+  p1: 1;
+PRODUCE
+  p3: 1;
+
+TRANSITION t5
+CONSUME
+  p1: 1;
+PRODUCE
+  p4: 1;

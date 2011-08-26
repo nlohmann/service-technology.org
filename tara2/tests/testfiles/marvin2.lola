@@ -1,0 +1,14 @@
+{ Petri net created by Petri Net API 4.03-unreleased }
+
+PLACE
+  p0;
+
+MARKING
+  p0:1;
+
+
+TRANSITION t1
+  CONSUME p0:1;
+  PRODUCE p0:2;
+{ END OF FILE }
+

@@ -28,10 +28,12 @@ center() {
 }
 
 noindent() {
+#	echo "$1"
 	echo "$1" | fmt -w 78
 }
 
 indent() {
+#	echo "$1"
 	echo "$1" | fmt -w 74 | sed 's/^/  /g' | sed 's/^  \*/*/g'
 }
 
@@ -127,47 +129,40 @@ echo "$TAGLINE_CENTER"
 echo "$URL_CENTER"
 echo ""
 echo ""
-echo "Purpose"
-echo "======="
+echo "# Purpose"
 echo ""
 echo "$PURPOSE_FORMATTED"
 echo ""
 echo ""
-echo "Copyright"
-echo "========="
+echo "# Copyright"
 echo ""
 echo "$COPYRIGHT_FORMATTED"
 echo ""
 echo ""
-echo "Authors"
-echo "======="
+echo "# Authors"
 echo ""
 echo "${AUTHORS}"
 echo ""
 echo "See file 'AUTHORS' for details."
 echo ""
 echo ""
-echo "Maintainer"
-echo "=========="
+echo "# Maintainer"
 echo ""
 noindent "${MAINTAINERTEXT}"
 echo ""
 echo ""
-echo "License"
-echo "======="
+echo "# License"
 echo ""
 echo "$LICENSETEXT_FORMATTED"
 echo ""
 echo ""
-echo "Installation"
-echo "============"
+echo "# Installation"
 echo ""
 noindent "$TOOLNAME can be easily compiled and installed. See file 'INSTALL' for instructions. Please also have a look at the file 'REQUIREMENTS' for information on the tools required to run, compile, and develop $TOOLNAME."
 echo ""
 echo ""
 
-echo "Requirements"
-echo "============"
+echo "# Requirements"
 echo ""
 noindent "In order to run, generate the documentation, compile, or develop ${TOOLNAME}, several tools are required."
 echo ""
@@ -201,23 +196,23 @@ REQ_COMPILE="${REQ_COMPILE}* GNU Make is required to process the Makefiles. Othe
 if `echo "$REQ" | grep -q "AC_PROG_LIBTOOL"`; then REQ_COMPILE="${REQ_COMPILE}* Libtool is used to manage static or dynamic libraries. Libtool is available at <http://www.gnu.org/s/libtool>."$'\n\n'; fi
 
 # Runtime
-if `echo "$REQ" | grep -q "lola-statespace"`; then REQ_RUNTIME="${REQ_RUNTIME}* LoLA (lola-statespace) is used by ${TOOLNAME} to generate Petri net state spaces. Without LoLA, ${TOOLNAME} will not work. You can download LoLA at <http://service-technology.org/lola>. After downloading the tarball (<http://service-technology.org/files/lola/lola.tar.gz>), unpack it and execute './configure && make lola-statespace'."$'\n\n'; fi
+if `echo "$REQ" | grep -q "lola-statespace"`; then REQ_RUNTIME="${REQ_RUNTIME}* LoLA (lola-statespace) is used by ${TOOLNAME} to generate Petri net state spaces. Without LoLA, ${TOOLNAME} will not work. You can download LoLA at <http://service-technology.org/lola>. After downloading the tarball (<http://service-technology.org/files/lola/lola.tar.gz>), unpack it and execute \`./configure && make lola-statespace\`."$'\n\n'; fi
 
 # Documentation
-if `grep -qR "groff" ${DIR}`; then REQ_DOC="${REQ_DOC}* Groff is used to generate a PDF version of the UNIX Manpage fro ${TOOLNAME}. Without Groff, 'make man-pdf' will not work. Groff can be downloaded at <http://www.gnu.org/s/groff>."$'\n\n'; fi
+if `grep -qR "groff" ${DIR}`; then REQ_DOC="${REQ_DOC}* Groff is used to generate a PDF version of the UNIX Manpage fro ${TOOLNAME}. Without Groff, \`make man-pdf\` will not work. Groff can be downloaded at <http://www.gnu.org/s/groff>."$'\n\n'; fi
 if `echo "$REQ" | grep -q help2man`; then REQ_DOC="${REQ_DOC}* help2man is used to generate a UNIX Manpage for ${TOOLNAME}. help2man can be downloaded at <http://www.gnu.org/s/help2man>."$'\n\n'; fi
-if `grep -qR "_TEXINFOS" ${DIR}`; then REQ_DOC="${REQ_DOC}* Texinfo is used to geneate a documentation for ${TOOLNAME}. To generate a PDF version of the documentation (in the directory 'doc'), execute 'make pdf'. Texinfo can be downloaded at <http://www.gnu.org/s/texinfo>."$'\n\n'; fi
+if `grep -qR "_TEXINFOS" ${DIR}`; then REQ_DOC="${REQ_DOC}* Texinfo is used to geneate a documentation for ${TOOLNAME}. To generate a PDF version of the documentation (in the directory 'doc'), execute \`make pdf\`. Texinfo can be downloaded at <http://www.gnu.org/s/texinfo>."$'\n\n'; fi
 
 # Tests
-if `echo "$REQ" | grep -q "autom4te"`; then REQ_TESTS="${REQ_TESTS}* Autoconf is used to generate an Autotest testsuite for ${TOOLNAME}. Without Autoconf, 'make check' will not work. Autoconf can be downloaded at <http://www.gnu.org/software/autoconf>."$'\n\n'; fi
+if `echo "$REQ" | grep -q "autom4te"`; then REQ_TESTS="${REQ_TESTS}* Autoconf is used to generate an Autotest testsuite for ${TOOLNAME}. Without Autoconf, \`make check\` will not work. Autoconf can be downloaded at <http://www.gnu.org/software/autoconf>."$'\n\n'; fi
 if `echo "$REQ" | grep -q "\[candy\]"`; then REQ_TESTS="${REQ_TESTS}* Candy"$'\n\n'; fi
-if `echo "$REQ" | grep -q "\[fiona\]"`; then REQ_TESTS="${REQ_TESTS}* Fiona is used in the test cases to synthesize reference partners or operating guidelines. Without Fiona, some test cases of 'make check' may be skipped. Fiona can be downloaded at <http://service-technology.org/fiona>."$'\n\n'; fi
-if `echo "$REQ" | grep -q lcov`; then REQ_TESTS="${REQ_TESTS}* LCOV is used to determine the test case code coverage of ${TOOLNAME}. Without LCOV, 'make cover' will not work. LCOV can be downloaded at <http://ltp.sourceforge.net/coverage/lcov.php>."$'\n\n'; fi
+if `echo "$REQ" | grep -q "\[fiona\]"`; then REQ_TESTS="${REQ_TESTS}* Fiona is used in the test cases to synthesize reference partners or operating guidelines. Without Fiona, some test cases of \`make check\` may be skipped. Fiona can be downloaded at <http://service-technology.org/fiona>."$'\n\n'; fi
+if `echo "$REQ" | grep -q lcov`; then REQ_TESTS="${REQ_TESTS}* LCOV is used to determine the test case code coverage of ${TOOLNAME}. Without LCOV, \`make cover\` will not work. LCOV can be downloaded at <http://ltp.sourceforge.net/coverage/lcov.php>."$'\n\n'; fi
 if `echo "$REQ" | grep -q "\[marlene\]"`; then REQ_TESTS="${REQ_TESTS}* Marlene"$'\n\n'; fi
 if `echo "$REQ" | grep -q "\[mia\]"`; then REQ_TESTS="${REQ_TESTS}* Mia"$'\n\n'; fi
-if `echo "$REQ" | grep -q "\[petri\]"`; then REQ_TESTS="${REQ_TESTS}* The Petri Net API Frontend Tool 'Petri' is used in some test cases to transform service models. Without Petri, some test cases of 'make check' may be skipped. Petri can be downloaded at <http://service-technology.org/pnapi>."$'\n\n'; fi
-if ([ `echo "$REQ" | grep -q "\[wendy2fiona\]"` ] || [ `echo "$REQ" | grep -q "\[wendyFormula2bits\]"` ]); then REQ_TESTS="${REQ_TESTS}* The service-technology.org compilers are used to translate operating guideline file formats during the tests. Without them, some test cases of 'make check' may be skipped."$'\n\n'; fi
-if `echo "$REQ" | grep -q "\[valgrind\]"`; then REQ_TESTS="${REQ_TESTS}* Valgrind is used to check for memory leaks. Without Valgrind, some test cases of 'make check' may be skipped. Valgrind can be downloaded at <http://valgrind.org>."$'\n\n'; fi
+if `echo "$REQ" | grep -q "\[petri\]"`; then REQ_TESTS="${REQ_TESTS}* The Petri Net API Frontend Tool 'Petri' is used in some test cases to transform service models. Without Petri, some test cases of \`make check\` may be skipped. Petri can be downloaded at <http://service-technology.org/pnapi>."$'\n\n'; fi
+if ([ `echo "$REQ" | grep -q "\[wendy2fiona\]"` ] || [ `echo "$REQ" | grep -q "\[wendyFormula2bits\]"` ]); then REQ_TESTS="${REQ_TESTS}* The service-technology.org compilers are used to translate operating guideline file formats during the tests. Without them, some test cases of \`make check\` may be skipped."$'\n\n'; fi
+if `echo "$REQ" | grep -q "\[valgrind\]"`; then REQ_TESTS="${REQ_TESTS}* Valgrind is used to check for memory leaks. Without Valgrind, some test cases of \`make check\` may be skipped. Valgrind can be downloaded at <http://valgrind.org>."$'\n\n'; fi
 if `echo "$REQ" | grep -q "\[wendy\]"`; then REQ_TESTS="${REQ_TESTS}* Wendy"$'\n\n'; fi
 
 # Code Manipulation
@@ -230,8 +225,7 @@ if `echo "$REQ" | grep -q kc++`; then REQ_MANIPULATION="${REQ_MANIPULATION}* Kim
 if `echo "$REQ" | grep -q wget`; then REQ_OTHER="${REQ_OTHER}* Wget may be needed to download additional files such as source tarballs. Wget can be downloaded at <http://www.gnu.org/s/wget>."$'\n\n'; fi
 
 if [ "$REQ_COMPILE" != "" ]; then
-	echo "Compilation"
-	echo "-----------"
+	echo "## Compilation"
 	echo ""
 	noindent "${TOOLNAME} is written in standard C/C++ and can be compiled using a modern compiler. ${TOOLNAME} should compile on any UNIX-like system such as GNU/Linux, Mac OS X, BSD systems, or Solaris. A compilation under Windows is usually possible using Cygwin, which can be downloaded at <http://www.cygwin.com>."
 	echo ""
@@ -239,8 +233,7 @@ if [ "$REQ_COMPILE" != "" ]; then
 fi
 
 if [ "$REQ_RUNTIME" != "" ]; then
-	echo "Runtime"
-	echo "-------"
+	echo "## Runtime"
 	echo ""
 	noindent "${TOOLNAME} requires several tools at runtime. Though it may be cumbersome to install several tools prior to ${TOOLNAME}, it follows the UNIX philosophy of 'one task - one tool' and greatly simplifies development. Please make sure these tools are installed (viz. available in the PATH) prior to executing './configure'."
 	echo ""
@@ -248,26 +241,23 @@ if [ "$REQ_RUNTIME" != "" ]; then
 fi
 
 if [ "$REQ_DOC" != "" ]; then
-	echo "Documentation"
-	echo "-------------"
+	echo "## Documentation"
 	echo ""
-	noindent "There exists several documentations for ${TOOLNAME}. The manual can be generated by executing 'make pdf'. The source code is further documented using Doxygen tags and this Doxygen documentation can be generated by running Doxygen in the 'doc' directory. The following tools are required to generate the documentation. As some tools are invoked by the standard Makefile target 'all', they may be even required to compile ${TOOLNAME}."
+	noindent "There exists several documentations for ${TOOLNAME}. The manual can be generated by executing \`make pdf\`. The source code is further documented using Doxygen tags and this Doxygen documentation can be generated by running Doxygen in the 'doc' directory. The following tools are required to generate the documentation. As some tools are invoked by the standard Makefile target 'all', they may be even required to compile ${TOOLNAME}."
 	echo ""
 	indent "${REQ_DOC}"
 fi
 
 if [ "$REQ_TESTS" != "" ]; then
-	echo "Tests"
-	echo "-----"
+	echo "## Tests"
 	echo ""
-	noindent "To make sure ${TOOLNAME} works properly, you can run a test suite by executing 'make check'. The following tools are required to execute this test suite. In case a test fail, please mail the file 'testsuite.log' (in the directory 'tests') to <${EMAIL}>."
+	noindent "To make sure ${TOOLNAME} works properly, you can run a test suite by executing \`make check\`. The following tools are required to execute this test suite. In case a test fail, please mail the file 'testsuite.log' (in the directory 'tests') to <${EMAIL}>."
 	echo ""
 	indent "${REQ_TESTS}"
 fi
 
 if [ "$REQ_DOC" != "" ]; then
-	echo "Code Manipulation"
-	echo "-----------------"
+	echo "## Code Manipulation"
 	echo ""
 	noindent "${TOOLNAME} uses several code generators that translate domain-specific languages into C/C++ code. Editing these generated files does not make much sense as they might be overwritten automatically. Hence, editing the input files and using the code generators is strongly encouraged. Note that these tools are only required if you intend to make changes to ${TOOLNAME}."
 	echo ""
@@ -275,8 +265,7 @@ if [ "$REQ_DOC" != "" ]; then
 fi
 
 if [ "$REQ_OTHER" != "" ]; then
-	echo "Miscellaneous"
-	echo "-------------"
+	echo "## Miscellaneous"
 	echo ""
 	indent "${REQ_OTHER}"
 fi
@@ -297,16 +286,15 @@ CONFSWITCH="${CONFSWITCH}"$'\n'"`grep -Rh "AC_ARG_WITH"      ${DIR}/m4/* ${DIR}/
 
 CONFSWITCH_TEXT=""
 
-if `echo "$CONFSWITCH" | grep -q AC_HEADER_ASSERT`; then CONFSWITCH_TEXT="${CONFSWITCH_TEXT}* --disable-assert - This switch disables assertions."$'\n\n'; fi
-if `echo "$CONFSWITCH" | grep -q syslog`; then CONFSWITCH_TEXT="${CONFSWITCH_TEXT}* --enable-syslog - Status messages are printed to standard output or standard error by default. Using this parameter, they are additionally added to the syslog."$'\n\n'; fi
-if `echo "$CONFSWITCH" | grep -q pnapi`; then CONFSWITCH_TEXT="${CONFSWITCH_TEXT}* --without-pnapi - The configure script will try to link against a preinstalled version of the Petri Net API (libpnapi). If this fails, a shipped version (see 'libs/pnapi') will be used instead. This parameter overrides this check and always uses the shipped version."$'\n\n'; fi
+if `echo "$CONFSWITCH" | grep -q AC_HEADER_ASSERT`; then CONFSWITCH_TEXT="${CONFSWITCH_TEXT}* \`--disable-assert\` --- This switch disables assertions."$'\n\n'; fi
+if `echo "$CONFSWITCH" | grep -q syslog`; then CONFSWITCH_TEXT="${CONFSWITCH_TEXT}* \`--enable-syslog\` --- Status messages are printed to standard output or standard error by default. Using this parameter, they are additionally added to the syslog."$'\n\n'; fi
+if `echo "$CONFSWITCH" | grep -q pnapi`; then CONFSWITCH_TEXT="${CONFSWITCH_TEXT}* \`--without-pnapi\` --- The configure script will try to link against a preinstalled version of the Petri Net API (libpnapi). If this fails, a shipped version (see 'libs/pnapi') will be used instead. This parameter overrides this check and always uses the shipped version."$'\n\n'; fi
 
-echo "Configuration Switches"
-echo "======================"
+echo "# Configuration Switches"
 echo ""
-indent "* --help - Show all possible options of the configure script.
+indent "* \`--help\` --- Show all possible options of the configure script.
 
-* --prefix=DIRECTORY - Define the directory in which ${TOOLNAME} will be installed with 'make install'. If you define DIRECTORY to be '/home/${SHORTNAME}', then the, for example, ${TOOLNAME}'s binaries will be installed in '/home/${SHORTNAME}/bin'. If this switch is not used, it DIRECTORY defaults to '/usr/local' which usually means that you need root access to execute 'make install'.
+* \`--prefix=DIRECTORY\` --- Define the directory in which ${TOOLNAME} will be installed with \`make install\`. If you define DIRECTORY to be '/home/${SHORTNAME}', then the, for example, ${TOOLNAME}'s binaries will be installed in '/home/${SHORTNAME}/bin'. If this switch is not used, it DIRECTORY defaults to '/usr/local' which usually means that you need root access to execute \`make install\`.
 "
 if [ "$CONFSWITCH_TEXT" != "" ]; then
 indent "${CONFSWITCH_TEXT}"
@@ -317,29 +305,27 @@ CONTRIBUTORS=`svn log -q ../src | grep -v "\-\-" | awk '{ print $3 }' | sort | u
 CONTRIBUTORS=`echo "${CONTRIBUTORS}" | sed 's/al020/Andreas Lehmann/;s/bat/Manja Wolf/;s/bretschn/Jan Bretschneider/;s/cas/Christian Sura/;s/christianstahl/Christian Stahl/;s/danitz/Robert Danitz/;s/delia/Delia Arsinte/;s/fahland/Dirk Fahland/;s/georgstraube/Georgi Straube/;s/gierds/Christian Gierds/;s/heiden/Andreas Heiden/;s/hw138/Harro Wimmel/;s/karstenwolf/Karsten Wolf/;s/kaschner/Kathrin Kaschner/;s/kathrin/Kathrin Kaschner/;s/kern/Leonard Kern/;s/kschmidt/Karsten Wolf/;s/massuthe/Peter Massuthe/;s/nielslohmann/Niels Lohmann/;s/niels/Niels Lohmann/;s/nlohmann/Niels Lohmann/;s/oliviao/Olivia Oanea/;s/parnjai/Jarungjit Parnjai/;s/reinert/Dennis Reinert/;s/rimueller/Richard Müller/;s/rimuelle/Richard Müller/;s/stephan/Stephan Mennicke/;s/suermeli/Jan Sürmeli/;s/theidin/Thomas Heidinger/;s/waltemath/Robert Waltemath/;s/weinberg/Daniela Weinberg/;s/znamirowski/Martin Znamirowski/;s/znamirow/Martin Znamirowski/'`
 
 
-echo "Contributors"
-echo "============"
+echo "# Contributors"
 echo ""
 echo "${CONTRIBUTORS}"
 echo ""
 echo ""
 
 
-echo "Source Code Repository"
-echo "======================"
+echo "# Source Code Repository"
 echo ""
 noindent "${TOOLNAME} is hosted at Gna!, a project site of the Free Software Foundation, see <https://gna.org/projects/service-tech>. ${TOOLNAME}'s source code is organized in a Subversion repository you can access at <http://svn.gna.org/viewcvs/service-tech/trunk/${SHORTNAME}>. For more information on how to use the SVN repository, please have a look at <https://gna.org/svn/?group=service-tech>.
 
 To build ${TOOLNAME} from the SVN repository, perform the following steps:
 "
-echo "* svn co http://svn.gna.org/svn/service-tech/trunk/${SHORTNAME}
-* cd ${SHORTNAME}
-* autoreconf -i
-* ./configure
-* make"
+echo "* \`svn co http://svn.gna.org/svn/service-tech/trunk/${SHORTNAME}\`
+* \`cd ${SHORTNAME}\`
+* \`autoreconf -i\`
+* \`./configure\`
+* \`make\`"
 echo ""
 noindent "Please have a look at ${TOOLNAME}'s requirement list and make sure that all required build tools such as Autoconf or GNU Make are installed."
 echo ""
-noindent "With 'make svn-clean' you can remove all generated files and bring back ${TOOLNAME} in a state as if it was freshly checked out."
+noindent "With \`make svn-clean\` you can remove all generated files and bring back ${TOOLNAME} in a state as if it was freshly checked out."
 echo ""
 

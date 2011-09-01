@@ -1,0 +1,29 @@
+<tool>
+<toolname>Marlene</toolname>
+<shortname>marlene</shortname> <!-- optional -->
+
+<tagline>making adapters behave</tagline>
+
+<purpose>
+Marlene is a tool to synthesize behavioral adapters.
+</purpose>
+
+<copyright>
+2009, 2010, 2011 Christian Gierds
+</copyright>
+
+<authors>
+Christian Gierds
+</authors>
+
+<maintainer>Christian Gierds</maintainer>
+
+<license>AGPL3+</license>
+
+<runtime>wendy</runtime>
+
+<thanks>
+    * Thanks to Arjan Mooij for intensively testing Marlene.
+</thanks>
+
+</tool>

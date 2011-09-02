@@ -32,6 +32,7 @@
 #include "Output.h"
 #include "verbose.h"
 #include "syntax_graph.h"
+#include "DFS_graph.h"
 
 // input files
 extern FILE* graph_in;
@@ -39,6 +40,8 @@ extern FILE* graph_in;
 // the parsers
 extern int graph_parse();
 extern int graph_lex_destroy();
+extern void DFS_graph();
+
 
 using std::cerr;
 using std::cout;
@@ -265,6 +268,8 @@ int main(int argc, char** argv) {
 
     graph_in=fopen(fileName.c_str(),"r");
     graph_parse();
+    /* TODO destroy lexer etc */
+    DFS_graph();
 
     return EXIT_SUCCESS;
 }

@@ -30,12 +30,14 @@ Wrong Input causes undefined behaviour and not necessarily an error message.
 %name-prefix="graph_"
 
 %{
+#include "DFS_graph.h"
 #include <string>
 #include <stdio.h>
 #include <pnapi/pnapi.h>
 #include <map>
 #include <set>
 #include <list>
+#include <utility>
 
 extern int graph_lex();
 extern int graph_error(const char *);
@@ -45,13 +47,18 @@ extern pnapi::PetriNet* net;
 /// current marking of the PN API net; for finding final states
 std::map<const pnapi::Place*, unsigned int> currentMarking;
 
-///currentState
-int currentState;
+///currentState during parsing
+unsigned int currentState;
 
-/// relevante States (1=relevant, 0=irrelevant) 
-std::map<const int, int> relStates;
+/// StateInfo (3=relevant AND final, 1=relevant, 0=irrelevant, 2=irrelevant & final)
+//define G_STATE_FINAL 1
+//define G_STATE_RELEVANT 2
+//define G_STATE_VISITED 4
+std::vector<short> stateInfo(5); //starting with 5
 
+std::map<const unsigned int, innerState *const> innerGraph;
 
+/*legacy */
 ///all relevant runs starting from a state
 ///eg: state 1 -> [ (t3,t4,t5) , (t3,t5,t6,...), ...]
 std::map < const int,std::list < std::list <char*> >* > runs; //TODO: transitions statt C-Strings
@@ -72,55 +79,45 @@ std::map < const int,std::list < std::list <char*> >* > runs; //TODO: transition
 states:
   state
 | states state
+
 ;
 
 state:
-  KW_STATE NUMBER lowlink
+  KW_STATE NUMBER lowlink scc markings
     {
-	// printf("current state: %d\n",$2);
+	//printf("current state: %d\n",$2);
         currentState=$2;
-        /* current marking is representative of an SCC */
-        if ( $2 == $3) {
-            relStates[$2]=1;
-            /* create new list of all runs starting from this state */
-            runs[currentState]= new std::list<std::list<char *> >;
-	    // printf("relevanter Zustand: %d\n", $3);
-        } else
-            relStates[$2]=0;
-    }
-    scc_markings_transitions
-;
 
-scc_markings_transitions:
-    scc transitions { /* no marking: do nothing */ }
- |  scc markings
-    {
-        /* now we read the marking, and can see if we have a final state */
-        /*if this is a final state */
-        if(relStates[currentState] && net->getFinalCondition().isSatisfied(pnapi::Marking(currentMarking, net)) ) {
-             /*DEBUG: printf("(FINAL)\n");*/
-             runs[currentState]->push_front(std::list<char*>()); //empty list, because we have final state
+        //check if we have to resize the stateInfo vector
+        if(stateInfo.capacity()<$2) {
+            stateInfo.resize(2*$2,0);
         }
-        currentMarking.clear();
-   } transitions
-   {
-      //DEBUG: writes for each state all runs to cout
-      if(currentState==0 && relStates[currentState]) {
-         printf("runs from State %d: %d\n",currentState, runs[currentState]->size());
-      
 
-         /*std::list<std::list<char*> >::iterator i;
-         for(i=runs[currentState]->begin(); i!=runs[currentState]->end();i++) {
-           std::list<char *>::iterator j;
-           for(j=i->begin();j!=i->end();j++)
-             printf(" %s ",*j);
-           printf("\n");
-         }*/
-         printf("\n");
-      }
+        /* current marking is representative of an SCC */
+        if($2 == $3) {
+            stateInfo[$2] |= G_STATE_RELEVANT;
+            innerGraph.insert(std::pair<int, innerState *const>($2,new innerState));
+        }
+        /*else {
+            stateInfo[$2]=0;
+            stateInfo[$3]=0;
+       }*/
+
+       // if this state is final, then the lowlink representative is final
+       if(net->getFinalCondition().isSatisfied(pnapi::Marking(currentMarking, net))) {
+           //printf("FINAL: %d\n",$3);
+           stateInfo[$3] |= G_STATE_FINAL;
+       }
+       currentMarking.clear();
+    }
+    transitions
+   {
+      //DEBUG: ausgangsgrad
+/*      if(stateInfo[currentState] & G_STATE_RELEVANT)
+	      printf("Ausgangsgrad von %d: %d\n", currentState, innerGraph[currentState]->transitions.size());
+*/
    }
 ;
-
 
 scc:
   /* empty */
@@ -172,18 +169,27 @@ transition:
   NAME ARROW NUMBER 
   {
     /* look if have an interesting transition */
-    if(relStates[currentState] && relStates[$3]) {
+    /*DEBUG:
+    if(stateInfo[currentState]>3 | stateInfo[$3]>3)
+	printf("problemo\n");
+    */
+    if(stateInfo[currentState] & stateInfo[$3] & G_STATE_RELEVANT ) {
        //printf("%s -> %d\n",$1,$3);
 
+       innerTransition cur= { net->findTransition($1), $3 };
+       free($1); //get rid of those strings
+
+       innerGraph[currentState]->transitions.push_back(cur);
+       innerGraph[currentState]->curTransition=innerGraph[currentState]->transitions.begin();
        /* iterate through all runs of target state and copy
           them to runs of current State with current transition */
 
-       std::list<std::list<char *> >::iterator i;
+/*       std::list<std::list<char *> >::iterator i;
        for(i=runs[$3]->begin(); i!=runs[$3]->end(); i++) {
          std::list <char*> copy=*i;
          copy.push_front($1); // Do we need strdup ?
          runs[currentState]->push_back(copy);
-       }
+       }*/
     }
   }
 ;

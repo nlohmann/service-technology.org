@@ -7,6 +7,7 @@ tara_SOURCES =  main.cc \
                 verbose.cc verbose.h \
                 cmdline.c cmdline.h \
                 Output.cc Output.h \
+                DFS_graph.cc DFS_graph.h \
 		lexic_graph.ll syntax_graph.yy
                 
 # <<-- CHANGE END -->>

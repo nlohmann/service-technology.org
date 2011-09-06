@@ -62,6 +62,97 @@ public class SLogTree {
     }
   }
   
+  public static class TreeStatistics {
+    public double maxOutDegree;
+    public double averageOutDegree;
+    public int depth;
+    public int width;
+    
+    @Override
+    public String toString() {
+      return "out(max): "+maxOutDegree+" out(avg): "+averageOutDegree+" depth: "+depth+" width: "+width;
+    }
+  }
+  
+  /**
+   * @return depth of the tree
+   */
+  private int getDepth() {
+    LinkedList<SLogTreeNode> stack = new LinkedList<SLogTreeNode>();
+    LinkedList<Integer> depths = new LinkedList<Integer>();
+    for (SLogTreeNode n : roots) {
+      stack.add(n);
+      depths.add(0);
+    }
+
+    int maxDepth = 0;
+    while (!stack.isEmpty()) {
+      SLogTreeNode n = stack.pop();
+      int d = depths.pop();
+      maxDepth = (maxDepth < d) ? d : maxDepth;
+      
+      for (SLogTreeNode n2 : n.post) {
+        stack.push(n2);
+        depths.push(d+1);
+      }
+    }
+    return maxDepth;
+  }
+  
+  /**
+   * @return width of the tree (= maximum number of nodes on the same level of three)
+   */
+  private int getWidth() {
+    LinkedList<SLogTreeNode> queue_currentLevel = new LinkedList<SLogTreeNode>();
+    boolean isLeafRow = false;
+    int maxWidth = 0;
+    
+    // add roots to first level of the tree
+    for (SLogTreeNode n : roots) queue_currentLevel.addLast(n);
+    // if there are still successors
+    while (!isLeafRow) {
+      isLeafRow = true;
+      
+      int width = 0;
+      LinkedList<SLogTreeNode> queue_nextLevel = new LinkedList<SLogTreeNode>();
+      // iterate over the next level of the tree
+      while (!queue_currentLevel.isEmpty()) {
+        SLogTreeNode n = queue_currentLevel.removeFirst();
+        // count width
+        width++;
+        // all successors are nodes of the next level, store them in q2
+        for (SLogTreeNode n2 : n.post) {
+          isLeafRow = false;
+          queue_nextLevel.addLast(n2);
+        }
+      } // finished computing next level and current width
+      
+      if (maxWidth < width) maxWidth = width;
+      queue_currentLevel = queue_nextLevel;
+    }
+    return maxWidth;
+  }
+  
+  public TreeStatistics getStatistics() {
+    
+    TreeStatistics s = new TreeStatistics();
+    
+    // get average and maximum out degree
+    int arcs = 0;
+    int maxArcs = 0;
+    for (SLogTreeNode n : nodes) {
+      arcs += n.post.length;
+      maxArcs = (maxArcs < n.post.length) ? n.post.length : maxArcs;
+    }
+    
+    s.averageOutDegree = (double)arcs / (double)nodes.size();
+    s.maxOutDegree = maxArcs;
+    s.depth = getDepth();
+    s.width = getWidth();
+    
+    return s;
+  }
+  
   public String toDot() {
     StringBuilder sb = new StringBuilder();
     

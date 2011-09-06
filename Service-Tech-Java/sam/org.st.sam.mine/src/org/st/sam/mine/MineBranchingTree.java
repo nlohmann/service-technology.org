@@ -74,6 +74,11 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     
   }
   
+  public void clearCoverageMarking() {
+    preChartCoverage.clear();
+    mainChartCoverage.clear();
+  }
+  
   public float confidence(short[] pre, short[] main, boolean markTree) {
     int preMatch = 0;
     int mainMatch_pos = 0;

@@ -17,6 +17,7 @@ import lscminer.datastructure.LSC;
 
 import org.deckfour.xes.model.XLog;
 import org.st.sam.log.SLog;
+import org.st.sam.log.SLogTree;
 import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
 import org.st.sam.log.XESImport;
@@ -29,7 +30,7 @@ public class MineBranchingLSC {
   }
   
   public void mineLSCs(String logfile) throws IOException {
-    int minSupportThreshold = 5;
+    int minSupportThreshold = 10;
     float confidence = 1.0f;
     
     mineLSCs(logfile, minSupportThreshold, confidence);
@@ -38,11 +39,18 @@ public class MineBranchingLSC {
   public void mineLSCs(String logFile, int minSupportThreshold, double confidence) throws IOException {
     loadXLog(logFile);
     XLog xlog = getXLog();
+    mineLSCs(xlog, minSupportThreshold, confidence, logFile);
+  }
+  
+  public void mineLSCs(XLog xlog, int minSupportThreshold, double confidence, String targetFilePrefix) throws IOException {
     System.out.println("log contains "+xlog.size()+" traces");
     setSLog(new SLog(xlog));
     
     MineBranchingTree tree = new MineBranchingTree(getSLog());
-    writeToFile(tree.toDot(), logFile+".dot");
+    writeToFile(tree.toDot(), targetFilePrefix+".dot");
+    
+    String stat = tree.getStatistics().toString();
+    System.out.println("tree statistics: "+stat);
     
     Set<short[]> supportedWords = mineSupportedWords(tree, minSupportThreshold);
     System.out.println("found "+supportedWords.size()+" supported words");
@@ -136,14 +144,27 @@ public class MineBranchingLSC {
     //}
 
     lscs = new ArrayList<LSC>();
+    int scenarioNum = 0;
     for (SScenario s : scenarios) {
+      tree.clearCoverageMarking();
       float conf = tree.confidence(s.pre, s.main, true);
       System.out.println(s + " "+conf);
+      
       LSC l = slog.toLSC(s, minSupportThreshold, conf);
       lscs.add(l);
+      
+      scenarioNum++;
+      writeToFile(tree.toDot(), targetFilePrefix+"_cov_"+scenarioNum+".dot");
     }
     System.out.println("reduced to "+scenarios.size()+" scenarios");
-    writeToFile(tree.toDot(), logFile+"_cov.dot");
+    System.out.println("tree statistics: "+stat);
+    
+    // compute global coverage
+    tree.clearCoverageMarking();
+    for (SScenario s : scenarios) {
+      tree.confidence(s.pre, s.main, true);
+    }
+    writeToFile(tree.toDot(), targetFilePrefix+"_cov.dot");
   }
   
   public ArrayList<LSC> getLSCs() {

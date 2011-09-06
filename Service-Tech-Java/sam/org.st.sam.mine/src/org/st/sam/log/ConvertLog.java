@@ -19,27 +19,24 @@ import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.deckfour.xes.out.XSerializer;
+import org.deckfour.xes.out.XesXmlGZIPSerializer;
 import org.deckfour.xes.out.XesXmlSerializer;
 import org.deckfour.xes.xstream.XLogConverter;
 
 public class ConvertLog {
   
-  private final File logFile;
   private final XFactory xlogFactory;
+  private final XLog log;
   
-  private XLog log;
-  
-  public ConvertLog(String dirName) {
-    logFile = new File(dirName);
+  public ConvertLog() {
     xlogFactory = XFactoryRegistry.instance().currentDefault();
+    log = xlogFactory.createLog();
   }
   
-  public void read() throws FileNotFoundException {
-    
-    log = xlogFactory.createLog();
+  public void read(String dirName) throws FileNotFoundException {
+    File logFile = new File(dirName);
     
     if (logFile.isDirectory()) {
-      
       for (File f : logFile.listFiles()) {
         if (f.getName().endsWith("txt")) {
           readTraceFromFile(f);
@@ -52,12 +49,20 @@ public class ConvertLog {
   
   public void writeLog(String fileName) throws IOException {
     FileOutputStream out = new FileOutputStream(fileName);
-    XSerializer logSerializer = new XesXmlSerializer();
+    XSerializer logSerializer;
+    if (fileName.endsWith("gz"))
+      logSerializer = new XesXmlGZIPSerializer();
+    else
+      logSerializer = new XesXmlSerializer();
     logSerializer.serialize(log, out);
     out.close();
   }
   
-  private void readTraceFromFile(File traceFile) throws FileNotFoundException {
+  public XLog getLog() {
+    return log;
+  }
+  
+  public void readTraceFromFile(File traceFile) throws FileNotFoundException {
     
     System.out.println("Reading "+traceFile.getName());
     
@@ -126,8 +131,9 @@ public class ConvertLog {
       return;
     }
     
-    ConvertLog rl = new ConvertLog(args[0]);
-    rl.read();
+    ConvertLog rl = new ConvertLog();
+    rl.read(args[0]);
+    System.out.println("Writing "+args[1]);
     rl.writeLog(args[1]);
   }
 

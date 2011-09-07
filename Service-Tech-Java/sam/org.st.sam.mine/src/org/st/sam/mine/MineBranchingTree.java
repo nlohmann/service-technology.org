@@ -146,14 +146,16 @@ public class MineBranchingTree extends org.st.sam.log.SLogTree {
     }
     return occurrences;
   }
-  
+
   @Override
-  public String toDot() {
+  public String toDot(Map<Short, String> names) {
     StringBuilder sb = new StringBuilder();
     
     sb.append("digraph D {\n");
     for (SLogTreeNode n : nodes) {
-      String nodeLabel = ""+n.id;
+      if (!names.containsKey(n.id)) names.put(n.id, Short.toString(n.id));
+      
+      String nodeLabel = names.get(n.id);
       String fillString = "";
       if (mainChartCoverage.containsKey(n) && !preChartCoverage.containsKey(n)) {
         nodeLabel += "\\n"+"|"+mainChartCoverage.get(n);

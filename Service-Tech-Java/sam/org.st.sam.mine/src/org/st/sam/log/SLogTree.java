@@ -1,7 +1,10 @@
 package org.st.sam.log;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class SLogTree {
   
@@ -67,6 +70,7 @@ public class SLogTree {
     public double averageOutDegree;
     public int depth;
     public int width;
+    public int alphabetSize;
     
     @Override
     public String toString() {
@@ -137,14 +141,18 @@ public class SLogTree {
     
     TreeStatistics s = new TreeStatistics();
     
+    HashSet<Short> alphabet = new HashSet<Short>();
+    
     // get average and maximum out degree
     int arcs = 0;
     int maxArcs = 0;
     for (SLogTreeNode n : nodes) {
       arcs += n.post.length;
       maxArcs = (maxArcs < n.post.length) ? n.post.length : maxArcs;
+      alphabet.add(n.id);
     }
     
+    s.alphabetSize = alphabet.size();
     s.averageOutDegree = (double)arcs / (double)nodes.size();
     s.maxOutDegree = maxArcs;
     s.depth = getDepth();
@@ -154,10 +162,16 @@ public class SLogTree {
   }
   
   public String toDot() {
+    return toDot(new HashMap<Short, String>());
+  }
+  
+  public String toDot(Map<Short, String> names) {
     StringBuilder sb = new StringBuilder();
     
-    sb.append("digraph D {\n");
+    sb.append("digraph coverage_tree {\n");
     for (SLogTreeNode n : nodes) {
+      if (!names.containsKey(n.id)) names.put(n.id, Short.toString(n.id));
+      
       sb.append(n.globalID + " [ label=\""+n.id+"\" ];\n");
       for (SLogTreeNode n2 : n.post) {
         sb.append(n.globalID + " -> "+n2.globalID+";\n");

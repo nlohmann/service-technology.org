@@ -73,23 +73,30 @@ public class SLog {
     return sb.toString();
   }
 
-  public LSCEvent toLSCEvent(int event) {
+  public LSCEvent toLSCEvent(short event, boolean shortNames) {
     int i1 = originalNames[event].indexOf('|');
     int i2 = originalNames[event].indexOf('|', i1+1);
     String caller = originalNames[event].substring(0, i1);
     String callee = originalNames[event].substring(i1+1, i2);
     String method = originalNames[event].substring(i2+1);
+    
+    if (shortNames) {
+      caller = caller.substring(caller.lastIndexOf('.')+1);
+      callee = callee.substring(callee.lastIndexOf('.')+1);
+      method = method.substring(method.lastIndexOf('.')+1);
+    }
+    
     return new LSCEvent(caller, callee, method);
   }
   
-  public LSC toLSC(SScenario s, int support, double confidence) {
+  public LSC toLSC(SScenario s, int support, double confidence, boolean shortNames) {
     LSCEvent preChart[] = new LSCEvent[s.pre.length];
     for (int i=0; i<s.pre.length; i++) {
-      preChart[i] = toLSCEvent(s.pre[i]); 
+      preChart[i] = toLSCEvent(s.pre[i], shortNames); 
     }
     LSCEvent mainChart[] = new LSCEvent[s.main.length];
     for (int i=0; i<s.main.length; i++) {
-      mainChart[i] = toLSCEvent(s.main[i]); 
+      mainChart[i] = toLSCEvent(s.main[i], shortNames); 
     }
     LSC l = new LSC(preChart, mainChart, support, confidence);
     return l;

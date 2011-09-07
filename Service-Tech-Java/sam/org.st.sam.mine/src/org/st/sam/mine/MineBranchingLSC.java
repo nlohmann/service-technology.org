@@ -1,6 +1,7 @@
 package org.st.sam.mine;
 
 
+import java.awt.PageAttributes.OriginType;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,12 +9,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import lscminer.datastructure.LSC;
+import lscminer.datastructure.LSCEvent;
 
 import org.deckfour.xes.model.XLog;
 import org.st.sam.log.SLog;
@@ -25,6 +28,10 @@ import org.st.sam.log.XESImport;
 public class MineBranchingLSC {
   
   private ArrayList<LSC> lscs;
+  private ArrayList<SScenario> scenarios;
+  
+  private MineBranchingTree tree;
+  private String globalCoverageTree;
   
   public MineBranchingLSC() {
   }
@@ -42,12 +49,42 @@ public class MineBranchingLSC {
     mineLSCs(xlog, minSupportThreshold, confidence, logFile);
   }
   
+  public void mineLSCs_writeResults(String logFile) throws IOException {
+    int minSupportThreshold = 10;
+    float confidence = 1.0f;
+    
+    mineLSCs_writeResults(logFile, minSupportThreshold, confidence);
+  }
+  
+  public void mineLSCs_writeResults(String logFile, int minSupportThreshold, double confidence) throws IOException {
+    
+    mineLSCs(logFile, minSupportThreshold, confidence);
+    
+    String targetFilePrefix = logFile;
+    
+    writeToFile(getTree().toDot(getShortenedNames()), targetFilePrefix+".dot");
+    writeToFile(getCoverageTreeGlobal(), targetFilePrefix+"_cov.dot");
+    for (int scenarioNum=0; scenarioNum<getScenarios().size(); scenarioNum++) {
+      SScenario s =getScenarios().get(scenarioNum);
+      writeToFile(getCoverageTreeFor(s), targetFilePrefix+"_cov_"+(scenarioNum+1)+".dot");
+    }
+    
+    StringBuilder found_lscs = new StringBuilder();
+    for (int i=0; i<lscs.size(); i++) {
+      
+      LSC l = lscs.get(i);
+      found_lscs.append(l.toString());
+      found_lscs.append("\n");
+    }
+    writeToFile(found_lscs.toString(), targetFilePrefix+"_all_lscs.txt");
+    
+  }
+  
   public void mineLSCs(XLog xlog, int minSupportThreshold, double confidence, String targetFilePrefix) throws IOException {
     System.out.println("log contains "+xlog.size()+" traces");
     setSLog(new SLog(xlog));
     
-    MineBranchingTree tree = new MineBranchingTree(getSLog());
-    writeToFile(tree.toDot(), targetFilePrefix+".dot");
+    tree = new MineBranchingTree(getSLog());
     
     String stat = tree.getStatistics().toString();
     System.out.println("tree statistics: "+stat);
@@ -77,7 +114,7 @@ public class MineBranchingLSC {
 
     
     System.out.println("mining scenarios");
-    List<SScenario> scenarios = new ArrayList<SScenario>();
+    scenarios = new ArrayList<SScenario>();
     
     int done = 0;
     supportedWords.clear();
@@ -144,31 +181,111 @@ public class MineBranchingLSC {
     //}
 
     lscs = new ArrayList<LSC>();
-    int scenarioNum = 0;
-    for (SScenario s : scenarios) {
-      tree.clearCoverageMarking();
+    
+    tree.clearCoverageMarking();
+    for (int scenarioNum = 0; scenarioNum < scenarios.size(); scenarioNum++) {
+      SScenario s = scenarios.get(scenarioNum);
       float conf = tree.confidence(s.pre, s.main, true);
-      System.out.println(s + " "+conf);
       
-      LSC l = slog.toLSC(s, minSupportThreshold, conf);
-      lscs.add(l);
-      
-      scenarioNum++;
-      writeToFile(tree.toDot(), targetFilePrefix+"_cov_"+scenarioNum+".dot");
+      LSC l = slog.toLSC(s, minSupportThreshold, conf, true);
+      lscs.add(scenarioNum, l);
     }
     System.out.println("reduced to "+scenarios.size()+" scenarios");
     System.out.println("tree statistics: "+stat);
     
-    // compute global coverage
+
+  }
+  
+  public Map<Short, String> getShortenedNames() {
+    
+    Map<Short, String> shortenedNames = new HashMap<Short, String>();
+    for (short i=0; i<getSLog().originalNames.length; i++) {
+      LSCEvent e = getSLog().toLSCEvent(i, true);
+      shortenedNames.put(i, e.getMethod());
+    }
+    
+    return shortenedNames;
+  }
+  
+  public String getCoverageTreeGlobal() {
+    
     tree.clearCoverageMarking();
-    for (SScenario s : scenarios) {
+    for (int scenarioNum = 0; scenarioNum < scenarios.size(); scenarioNum++) {
+      SScenario s = scenarios.get(scenarioNum);
       tree.confidence(s.pre, s.main, true);
     }
-    writeToFile(tree.toDot(), targetFilePrefix+"_cov.dot");
+    return tree.toDot(getShortenedNames());
+  }
+  
+  public String getCoverageTreeFor(SScenario s) {
+    
+    tree.clearCoverageMarking();
+    tree.confidence(s.pre, s.main, true);
+    return tree.toDot(getShortenedNames());
+  }
+  
+  public static String toMSCRenderer(String name, LSC l) {
+    StringBuilder sb = new StringBuilder();
+    
+    sb.append("# LSC\n");
+    sb.append("msc {\n");
+    
+    List<String> components = new LinkedList<String>();
+    
+    for (LSCEvent e  : l.getPreChart()) {
+      if (!components.contains(e.getCaller())) components.add(e.getCaller());
+      if (!components.contains(e.getCallee())) components.add(e.getCallee());
+    }
+    for (LSCEvent e  : l.getMainChart()) {
+      if (!components.contains(e.getCaller())) components.add(e.getCaller());
+      if (!components.contains(e.getCallee())) components.add(e.getCallee());
+    }
+    
+    sb.append("  width=\""+(components.size()*128)+"\";\n");
+
+    // list components:
+    //  a,b,c;
+    sb.append("  ");
+    Iterator<String> comp = components.iterator();
+    while (comp.hasNext()) {
+      sb.append(comp.next());
+      if (comp.hasNext())
+        sb.append(",");
+      else
+        sb.append(";\n");
+    }
+    
+    // list pre-chart events
+    for (LSCEvent e  : l.getPreChart()) {
+      sb.append("  "+e.getCaller()+"=>"+e.getCallee()+" [ label = \""+e.getMethod()+"\", linecolor = \"blue\" ];\n");
+    }
+    
+    // separate pre- and main-chart
+    sb.append("  ---;\n");
+    
+    // list main-chart events
+    for (LSCEvent e  : l.getMainChart()) {
+      sb.append("  "+e.getCaller()+"=>"+e.getCallee()+" [ label = \""+e.getMethod()+"\", linecolor = \"red\" ];\n");
+    }
+
+    // add name of chart
+    sb.append("  "+components.get(0)+" note "+components.get(0)+" [label=\""+name+"\"];\n");
+    
+    sb.append("}\n");
+
+    return sb.toString();
+  }
+  
+  public MineBranchingTree getTree() {
+    return tree;
   }
   
   public ArrayList<LSC> getLSCs() {
     return lscs;
+  }
+  
+  public ArrayList<SScenario> getScenarios() {
+    return scenarios;
   }
   
   private void removeRedundantScenarios(List<SScenario> scenarios) {
@@ -334,6 +451,8 @@ public class MineBranchingLSC {
     // otherwise the word may continue with any event
       return allEvents;
   }
+  
+
 
   public static void main(String args[]) throws Exception {
     if (args.length != 1) {
@@ -342,8 +461,9 @@ public class MineBranchingLSC {
       return;
     }
     
+    String srcFile = args[0];
     MineBranchingLSC miner = new MineBranchingLSC();
-    miner.mineLSCs(args[0]);
+    miner.mineLSCs_writeResults(srcFile);
   }
   
   public static void writeToFile(String text, String fileName) throws IOException {

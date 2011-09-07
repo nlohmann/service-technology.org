@@ -35,7 +35,7 @@ public class BranchingMinerTest extends TestSuite {
 		String sourceFile = testFileRoot+"/crossftp_succinct_traceset.xes.gz";
 		
 		MineBranchingLSC miner = new MineBranchingLSC();
-		miner.mineLSCs(sourceFile, 10, 1.0);
+		miner.mineLSCs_writeResults(sourceFile, 10, 1.0);
 		
 		checkOutputGeneral(sourceFile, 11);
 	}
@@ -47,7 +47,7 @@ public class BranchingMinerTest extends TestSuite {
     String sourceFile = testFileRoot+"/crossftp_invariants.xes.gz";
     
     MineBranchingLSC miner = new MineBranchingLSC();
-    miner.mineLSCs(sourceFile, 40, 1.0);
+    miner.mineLSCs_writeResults(sourceFile, 40, 1.0);
     
     checkOutputGeneral(sourceFile, 165);
   }
@@ -59,7 +59,7 @@ public class BranchingMinerTest extends TestSuite {
     String sourceFile = testFileRoot+"/jeti_invariants.xes.gz";
     
     MineBranchingLSC miner = new MineBranchingLSC();
-    miner.mineLSCs(sourceFile, 10, 1.0);
+    miner.mineLSCs_writeResults(sourceFile, 10, 1.0);
     
     checkOutputGeneral(sourceFile, 18);
   }

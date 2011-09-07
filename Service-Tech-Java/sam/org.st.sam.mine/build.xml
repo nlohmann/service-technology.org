@@ -161,6 +161,11 @@
 		<!-- copy file="${dir.builddir}/${build.target}.jar" todir="${dir.distbindir}/${libs}" / -->
 		<copy file="${dir.builddir}/${build.target}.jar" todir="${dir.distbindir}" />
 		
+		<!-- include all additional files defined in the configuration file -->
+		<copy todir="${dir.distbindir}">
+			<fileset refid="distbinfiles.includes" />
+		</copy>
+		
 		<mkdir dir="${dir.distbindir}/${libs.external}" />
 		<copy todir="${dir.distbindir}/${libs.external}">
 			<fileset dir="${home}/${libs.external}">
@@ -168,29 +173,36 @@
 			</fileset>
 		</copy>
 		
-		<mkdir dir="${dir.distbindir}/resources" />
-		<copy todir="${dir.distbindir}/resources">
-			<fileset dir="${home}/resources">
-				<include name="**/*.ml.txt" />
-			</fileset>
-		</copy>
-		
 		<mkdir dir="${dir.distbindir}/examples" />
 		<copy todir="${dir.distbindir}/examples">
 			<fileset dir="${home}/examples">
-				<include name="*.clsc" />
-				<include name="*.cpn" />
-				<include name="*.png" />
+				<include name="*.xes.gz" />
+			</fileset>
+		</copy>
+		
+		<mkdir dir="${dir.distbindir}/experiments" />
+		<copy todir="${dir.distbindir}/experiments" >
+			<fileset dir="${home}/experiments">
+				<include name="**/*.xes.gz" />
+			</fileset>
+		</copy>
+		
+		<mkdir dir="${dir.distbindir}/resources" />
+		<copy todir="${dir.distbindir}/resources">
+			<fileset dir="${home}/resources/">
+				<include name="mscgen/bgd.dll" />
+				<include name="mscgen/mscgen.exe" />
 			</fileset>
 		</copy>
 		
 		<copy todir="${dir.distbindir}">
 			<fileset dir="${home}/resources/launch">
-				<include name="sam.bat" />
-				<include name="sam.sh" />
+				<include name="sam_mine.bat" />
+				<include name="sam_mine.sh" />
+				<include name="run_*.bat" />
+				<include name="manual.txt" />
 			</fileset>
 		</copy>
-
 		
 		<zip destfile="${home}/${package}-bin.zip">
 			<zipfileset dir="${dir.distbindir}" />

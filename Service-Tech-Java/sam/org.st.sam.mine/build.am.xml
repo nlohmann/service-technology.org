@@ -11,6 +11,11 @@
 	
 	<fileset dir="${home}" id="distfiles.includes">
 		<include name="README"/>
+		<include name="sam_mine.properties"/>
+	</fileset>
+	
+	<fileset dir="${home}" id="distbinfiles.includes">
+		<include name="sam_mine.properties"/>
 	</fileset>
 	
 </project>

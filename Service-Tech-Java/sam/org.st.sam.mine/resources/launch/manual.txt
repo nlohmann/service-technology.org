@@ -1,0 +1,45 @@
+This release provides automated experiment execution functionality.
+
+To run an experiment, call:
+
+  sam_mine <inputfile.xes.gz> <support> <confidence>
+  
+All log files for experiments are stored in the directory './experiments/'.
+For instance, call:
+
+  sam_mine experiments\crossftp_succinct\crossftp_succinct_traceset.xes.gz 10 1.0
+
+The scenarios will be mined from the given log file. The results will
+be stored in a directory 'results_XXX' next to the given log file. The
+results directory contains the file 
+
+  results.html
+  
+which provides an overview on the mining results: input tree,
+statistics, discovered scenarios and coverage of the tree by the
+scenarios. The file
+
+  lscs.txt
+  
+contains all discovered LSCs that are shown graphically in
+'results.html' in textual form.
+
+The directory name 'results_XXX' mentions the call parameters and the
+time, so running the experiment again will not overwrite the old results.
+
+There are some "Experiment Suites" available.
+
+  * To run a standard experiment with relatively high support and
+    confidence values, execute 'run_all_simple.bat'.
+  * For an experiment with varying support and confidence settings
+    on the same data set, execute 'run_crossftp_succinct_mult.bat'.
+    
+REQUIREMENTS:
+  1. The tool needs 'mscgen' (which is packed with this tool in
+     './resources/mscgen') to render the discovered LSCs.
+  2. The tool needs GraphViz Dot to render the trees.
+  
+The path to the binaries of these tools are stored in './sam_mine.properties'
+The default settings assume 'mscgen' to be stored in  ./resources/mscgen' and
+GraphViz Dot to be available on the path (i.e. can be called from anywhere).
+Adjust the settings in './sam_mine.properties' to your system to run the tool.

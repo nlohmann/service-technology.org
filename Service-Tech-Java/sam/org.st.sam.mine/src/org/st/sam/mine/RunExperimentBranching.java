@@ -3,6 +3,8 @@ package org.st.sam.mine;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,6 +12,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Properties;
 
 import lscminer.datastructure.LSC;
 
@@ -19,24 +22,22 @@ import org.st.sam.mine.MineBranchingLSC;
 public class RunExperimentBranching {
 
   private static String SLASH = System.getProperty("file.separator");
+  
+  private Properties props;
 
-  public RunExperimentBranching() {
-    this(defaultDotBinary(), defaultMscGenBinary());
+  public RunExperimentBranching() throws IOException {
+    props = new Properties();
+    props.load(new FileInputStream("sam_mine.properties"));
+
+    dotRenderer = props.getProperty("sam.dot");
+    mscRenderer = props.getProperty("sam.mscgen");
   }
   
-  public RunExperimentBranching(String dotBinary, String mscGenBinary) {
+  public RunExperimentBranching(String dotBinary, String mscGenBinary) throws IOException {
     mscRenderer = mscGenBinary;
     dotRenderer = dotBinary;
   }
   
-  public static String defaultDotBinary() {
-    return System.getProperty("sam.dot", "dot");
-  }
-  
-  public static String defaultMscGenBinary() {
-    return System.getProperty("sam.mscgen", "."+SLASH+"resources"+SLASH+"mscgen"+SLASH+"mscgen");
-  }
-
   private String mscRenderer;
   private String dotRenderer;
   
@@ -85,8 +86,15 @@ public class RunExperimentBranching {
     MineBranchingLSC miner = new MineBranchingLSC();
     miner.mineLSCs(dir+"/"+inputFile, minSupportThreshold, confidence);
     
-    String SLASH = System.getProperty("file.separator");    
-    String resultsDir = dir+SLASH+"results";
+    boolean render_trees = true;
+    
+    if (miner.getTree().nodes.size() > 3000) {
+      render_trees = false;
+    }
+
+    Date now = new Date();
+    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+    String resultsDir = dir+SLASH+"results_"+minSupportThreshold+"_"+confidence+"_"+dateFormat.format(now);
     
     File f = new File(resultsDir);
     
@@ -113,9 +121,8 @@ public class RunExperimentBranching {
     
     r.append("<h2>General</h2>\n");
     
-    DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-    Date date = new Date();
-    r.append("executed on: "+dateFormat.format(date)+"<br/>\n");
+    DateFormat dateFormat2 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    r.append("executed on: "+dateFormat2.format(now)+"<br/>\n");
     r.append("input file: "+dir+"/"+inputFile+"<br/>\n");
     r.append("min. support threshold: "+minSupportThreshold+"<br/>\n");
     r.append("confidence: "+confidence+"<br/>\n");
@@ -129,15 +136,19 @@ public class RunExperimentBranching {
     r.append("depth: "+stat.depth+"<br/>\n");
     r.append("width: "+stat.width+"<br/>\n");
     
-    String input_tree_dot = inputFile+".dot";
-    String input_tree_svg = inputFile+".svg";
-    
-    miner.getTree().clearCoverageMarking();
-    MineBranchingLSC.writeToFile(miner.getTree().toDot(miner.getShortenedNames()), resultsDir+SLASH+input_tree_dot);
-    systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+input_tree_dot+" -o"+resultsDir+SLASH+input_tree_svg);
-    
-    r.append("<object style='height: 300px' data='"+input_tree_svg+"' type='image/svg+xml'></object><br/>\n");
-    r.append("<a href='"+input_tree_svg+"'>show input tree in fullsize</a><br/>\n");
+    if (render_trees) {
+      String input_tree_dot = inputFile+".dot";
+      String input_tree_svg = inputFile+".svg";
+      
+      miner.getTree().clearCoverageMarking();
+      MineBranchingLSC.writeToFile(miner.getTree().toDot(miner.getShortenedNames()), resultsDir+SLASH+input_tree_dot);
+      systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+input_tree_dot+" -o"+resultsDir+SLASH+input_tree_svg);
+      
+      r.append("<object style='height: 300px' data='"+input_tree_svg+"' type='image/svg+xml'></object><br/>\n");
+      r.append("<a href='"+input_tree_svg+"'>show input tree in fullsize</a><br/>\n");
+    } else {
+      r.append("<i>original tree not shown due to size</i><br/>\n");
+    }
 
     r.append("<h2>Output</h2>\n");
     
@@ -175,21 +186,26 @@ public class RunExperimentBranching {
       
       systemCall(mscRenderer+" -Tsvg -i"+resultsDir+SLASH+lsc_resultfile+" -o "+resultsDir+SLASH+lsc_renderfile);
 
-      String ct_string = miner.getCoverageTreeFor(miner.getScenarios().get(i));
-      String ct_dotfile = "tree_cov_"+(i+1)+".dot";
-      String ct_svgfile = "tree_cov_"+(i+1)+".svg";
-      MineBranchingLSC.writeToFile(ct_string, resultsDir+SLASH+ct_dotfile);
-      
-      systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+ct_dotfile+" -o"+resultsDir+SLASH+ct_svgfile);
-      
-
       r.append("<a name='lsc_"+(i+1)+"'/>\n");
       r.append("<h2>LSC "+(i+1)+"</h2>\n");
       r.append("confidence: "+l.getConfidence()+"<br/>\n");
       r.append("support: "+l.getSupport()+"<br/>\n");
       r.append("<object data='"+lsc_renderfile+"' type='image/svg+xml'></object><br/>\n");
-      r.append("<object style='height: 300px' data='"+ct_svgfile+"' type='image/svg+xml'></object><br/>\n");
-      r.append("<a href='"+ct_svgfile+"'>show coverage tree in fullsize</a><br/>\n");
+
+      if (render_trees) {
+        String ct_string = miner.getCoverageTreeFor(miner.getScenarios().get(i));
+        String ct_dotfile = "tree_cov_"+(i+1)+".dot";
+        String ct_svgfile = "tree_cov_"+(i+1)+".svg";
+        MineBranchingLSC.writeToFile(ct_string, resultsDir+SLASH+ct_dotfile);
+        
+        systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+ct_dotfile+" -o"+resultsDir+SLASH+ct_svgfile);
+        
+        r.append("<object style='height: 300px' data='"+ct_svgfile+"' type='image/svg+xml'></object><br/>\n");
+        r.append("<a href='"+ct_svgfile+"'>show coverage tree in fullsize</a><br/>\n");
+      } else {
+        r.append("<i>scenario coverage tree not shown due to size</i><br/>\n");
+      }
+      
       r.append("<a href='#general'>top</a><br/>\n");
       r.append("<hr/>\n");
     }
@@ -199,14 +215,54 @@ public class RunExperimentBranching {
     System.out.println("finished.");
   }
   
+  private String experimentFileRoot;
+  private String inputFile;
+  private int support;
+  private double confidence;
+  
+  private void printHelp() {
+    System.out.println("Sam/Mine version "+props.getProperty("sam.version"));
+    System.out.println("usage:  sam_mine <inputfile.xes.gz> <support> <confidence>");
+    System.out.println("  <inputfile>     path to log file");
+    System.out.println("  <support>       minimum support threshold (integers > 0)");
+    System.out.println("  <confidence>    minimum confidence (between 0.0 and 1.0)");
+  }
+  
+  public boolean readCommandLine(String[] args) {
+    if (args.length != 3) {
+      printHelp();
+      return false;
+    }
+    
+    File f = new File(args[0]);
+    
+    experimentFileRoot = f.getParent();
+    inputFile = f.getName();
+    try {
+      support = Integer.parseInt(args[1]);
+      confidence = Double.parseDouble(args[2]);
+      
+      if (support < 1) throw new NumberFormatException("support must be larger than 0");
+      if (confidence < 0.0 || confidence > 1.0) throw new NumberFormatException("confidence must be between 0.0 and 1.0");
+      
+    } catch (NumberFormatException e) {
+      System.err.println(e);
+      printHelp();
+      return false;
+    }
+    
+    return true;
+  }
+  
+  public void experiment() throws IOException {
+    experiment(experimentFileRoot, inputFile, support, confidence);
+  }
+  
   public static void main(String[] args) throws IOException {
     
-    String experimentFileRoot = "./experiments";
-
-    RunExperimentBranching e = new RunExperimentBranching();
-    
-    e.experiment(experimentFileRoot+"/crossftp_succinct", "crossftp_succinct_traceset.xes.gz", 10, 1.0);
-    
+    RunExperimentBranching exp = new RunExperimentBranching();
+    if (!exp.readCommandLine(args)) return;
+    exp.experiment();
   }
 
 }

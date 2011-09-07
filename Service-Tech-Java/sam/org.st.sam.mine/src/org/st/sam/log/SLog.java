@@ -83,7 +83,13 @@ public class SLog {
     if (shortNames) {
       caller = caller.substring(caller.lastIndexOf('.')+1);
       callee = callee.substring(callee.lastIndexOf('.')+1);
-      method = method.substring(method.lastIndexOf('.')+1);
+      
+      int lastDotBeforePar = method.lastIndexOf('.', method.indexOf('('));
+      method = method.substring(lastDotBeforePar+1);
+      
+      if (method.length() > 40) {
+        method = method.substring(0, method.indexOf('('))+"(...)";
+      }
     }
     
     return new LSCEvent(caller, callee, method);

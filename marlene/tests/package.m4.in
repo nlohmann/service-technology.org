@@ -83,8 +83,6 @@ m4_define([DEFAULTPARAMETERS],    [--sa2on=@CONVERTER@ --wendy=@WENDY@ --genet=@
 # tools needed by the testscript
 m4_define([WENDY],                [@WENDY@])
 m4_define([CANDY],                [@CANDY@])
-#m4_define([FIONA],               [@FIONA@])
-m4_define([LOLA],                 [@LOLA_STATESPACE@])
 m4_define([PETRIFY],              [@PETRIFY@])
 m4_define([GENET],                [@GENET@])
 m4_define([CONVERTER],            [@CONVERTER@])

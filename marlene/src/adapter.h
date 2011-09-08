@@ -31,6 +31,7 @@
 #include <vector>
 #include <iostream>
 #include <list>
+#include <cstdio>
 #include "pnapi/pnapi.h"
 
 // typedefs for pointers

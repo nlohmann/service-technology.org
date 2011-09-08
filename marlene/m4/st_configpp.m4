@@ -21,6 +21,7 @@ AC_MSG_CHECKING([whether to use installed libconfig++])
       # NO: installed libconfig++ is too old
       LIBCONFIG="0"
       AC_MSG_RESULT([no (version $configpp_version too old)])
+      AC_DEFINE([HAVE_LIBCONFIG__], [0])
       LIBS=${ST_CONFIGPP_OLDLIBS}
     else
       # YES: everything is fine

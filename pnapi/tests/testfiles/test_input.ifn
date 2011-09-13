@@ -94,7 +94,7 @@ TRANSITION tl.[y=1] LOW
 		th.1 : 1;
 	PRODUCE
 		hl.1 : 1;
-TRANSITION rl.[y=4] LOW
+TRANSITION rl.[y=4] DOWN
 	CONSUME
 		ea.4 : 1;
 	PRODUCE
@@ -112,7 +112,7 @@ TRANSITION rl.[y=5] HIGH
 	PRODUCE
 		fo.5 : 1,
 		hr.5 : 1;
-TRANSITION tl.[y=3] HIGH
+TRANSITION tl.[y=3] DOWN
 	CONSUME
 		fo.3 : 1,
 		th.3 : 1;
@@ -208,7 +208,7 @@ TRANSITION tl.[y=8] HIGH
 		th.8 : 1;
 	PRODUCE
 		hl.8 : 1;
-TRANSITION rr.[y=5] LOW
+TRANSITION rr.[y=5] DOWN
 	CONSUME
 		hr.5 : 1;
 	PRODUCE
@@ -226,7 +226,7 @@ TRANSITION tl.[y=9] LOW
 		th.9 : 1;
 	PRODUCE
 		hl.9 : 1;
-TRANSITION rr.[y=6] LOW
+TRANSITION rr.[y=6] DOWN
 	CONSUME
 		hr.6 : 1;
 	PRODUCE

@@ -55,7 +55,7 @@
   ****************************************************************************/
 
 %token LCONTROL RCONTROL KEY_TRUE KEY_FALSE KEY_SAFE KEY_PLACE
-%token KEY_TRANSITION KEY_MARKING KEY_CONSUME KEY_PRODUCE KEY_HIGH KEY_LOW
+%token KEY_TRANSITION KEY_MARKING KEY_CONSUME KEY_PRODUCE KEY_HIGH KEY_LOW KEY_DOWN
 %token COLON SEMICOLON COMMA NUMBER NEGATIVE_NUMBER IDENT
 
 
@@ -203,7 +203,8 @@ transition:
 opt_confidence:
   /* empty */  	{ $$ = 0; }
 | KEY_LOW 	{ $$ = 1; }
-| KEY_HIGH  	{ $$ = 2; }
+| KEY_HIGH  { $$ = 2; }
+| KEY_DOWN  { $$ = 3; }
 ;
 
 arcs: 

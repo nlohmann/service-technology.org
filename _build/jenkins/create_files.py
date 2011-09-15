@@ -19,6 +19,7 @@ for t in data.tools.tool:
     o = open('jobs/' + t.id + '/config.xml', 'w+')
     r = re.sub('@DESCRIPTION@', 'Standard continuos integration job for ' + t.name, templatedata)
     r = re.sub('@PATH@', t.path, r)
+    r = re.sub('@SHORTNAME@', t.shortname, r)
 
     o.write(r)
     o.close()

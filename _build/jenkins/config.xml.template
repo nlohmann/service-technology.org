@@ -47,6 +47,7 @@
     <hudson.tasks.Ant>
       <targets></targets>
       <antName>ant</antName>
+      <properties>package=@SHORTNAME@</properties>
     </hudson.tasks.Ant>
   </builders>
   <publishers>

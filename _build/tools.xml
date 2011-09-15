@@ -329,6 +329,16 @@
         <email>tara@service-technology.org</email>
     </tool>
 
+    <tool id="tara2">
+        <name>Tara</name>
+        <shortname>tara</shortname>
+        <path>tara2</path>
+        <lastVersion>0.1-unreleased</lastVersion>
+        <officialVersion></officialVersion>
+        <url>http://service-technology.org/tara</url>
+        <email>tara@service-technology.org</email>
+    </tool>
+
     <tool id="tess">
         <name>Tess</name>
         <shortname>tess</shortname>

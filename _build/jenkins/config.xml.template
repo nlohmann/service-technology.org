@@ -9,7 +9,9 @@
     <artifactNumToKeep>-1</artifactNumToKeep>
   </logRotator>
   <keepDependencies>false</keepDependencies>
-  <properties/>
+  <properties>
+    <hudson.plugins.disk__usage.DiskUsageProperty/>
+  </properties>
   <scm class="hudson.scm.SubversionSCM">
     <locations>
       <hudson.scm.SubversionSCM_-ModuleLocation>
@@ -161,33 +163,9 @@
         </hudson.plugins.plot.Plot>
       </plots>
     </hudson.plugins.plot.PlotPublisher>
-    <com.thalesgroup.hudson.plugins.cppcheck.CppcheckPublisher>
-      <cppcheckConfig>
-        <cppcheckReportPattern></cppcheckReportPattern>
-        <ignoreBlankFiles>false</ignoreBlankFiles>
-        <configSeverityEvaluation>
-          <threshold></threshold>
-          <newThreshold></newThreshold>
-          <failureThreshold></failureThreshold>
-          <newFailureThreshold></newFailureThreshold>
-          <healthy></healthy>
-          <unHealthy></unHealthy>
-          <severityError>true</severityError>
-          <severityPossibleError>true</severityPossibleError>
-          <severityStyle>true</severityStyle>
-          <severityPossibleStyle>true</severityPossibleStyle>
-        </configSeverityEvaluation>
-        <configGraph>
-          <xSize>500</xSize>
-          <ySize>200</ySize>
-          <diplayAllError>true</diplayAllError>
-          <displaySeverityError>true</displaySeverityError>
-          <displaySeverityPossibleError>true</displaySeverityPossibleError>
-          <displaySeverityStyle>true</displaySeverityStyle>
-          <displaySeverityPossibleStyle>true</displaySeverityPossibleStyle>
-        </configGraph>
-      </cppcheckConfig>
-    </com.thalesgroup.hudson.plugins.cppcheck.CppcheckPublisher>
+    <com.thalesgroup.hudson.plugins.cccc.CcccPublisher>
+      <metricFilePath>.cccc/cccc.xml</metricFilePath>
+    </com.thalesgroup.hudson.plugins.cccc.CcccPublisher>
     <hudson.plugins.doclinks.DocLinksPublisher>
       <documents>
         <hudson.plugins.doclinks.Document>
@@ -212,6 +190,35 @@
         </hudson.plugins.doclinks.Document>
       </documents>
     </hudson.plugins.doclinks.DocLinksPublisher>
+    <org.jenkinsci.plugins.cppcheck.CppcheckPublisher>
+      <cppcheckConfig>
+        <cppcheckReportPattern></cppcheckReportPattern>
+        <ignoreBlankFiles>false</ignoreBlankFiles>
+        <configSeverityEvaluation>
+          <threshold></threshold>
+          <newThreshold></newThreshold>
+          <failureThreshold></failureThreshold>
+          <newFailureThreshold></newFailureThreshold>
+          <healthy></healthy>
+          <unHealthy></unHealthy>
+          <severityError>true</severityError>
+          <severityWarning>true</severityWarning>
+          <severityStyle>true</severityStyle>
+          <severityPerformance>true</severityPerformance>
+          <severityInformation>true</severityInformation>
+        </configSeverityEvaluation>
+        <configGraph>
+          <xSize>500</xSize>
+          <ySize>200</ySize>
+          <displayAllErrors>true</displayAllErrors>
+          <displayErrorSeverity>true</displayErrorSeverity>
+          <displayWarningSeverity>true</displayWarningSeverity>
+          <displayStyleSeverity>true</displayStyleSeverity>
+          <displayPerformanceSeverity>true</displayPerformanceSeverity>
+          <displayInformationSeverity>true</displayInformationSeverity>
+        </configGraph>
+      </cppcheckConfig>
+    </org.jenkinsci.plugins.cppcheck.CppcheckPublisher>
     <hudson.plugins.twitter.TwitterPublisher/>
   </publishers>
   <buildWrappers/>

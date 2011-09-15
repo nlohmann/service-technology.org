@@ -6,8 +6,13 @@
                    Automated Non-Interference Check Assistant
                        http://service-technology.org/anica
 
-Version 1.0
-===========
+Version 1.1 (15 September 2011)
+===============================
+
+* checks PBNID for safe petri nets
+
+Version 1.0 (29 June 2011)
+==========================
 
 * first official release of Anica
 

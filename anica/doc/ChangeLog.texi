@@ -1,4 +1,9 @@
-@heading Version 1.0
+@heading Version 1.1 (15 September 2011)
+@itemize
+@item checks PBNID for safe petri nets
+@end itemize
+
+@heading Version 1.0 (29 June 2011)
 @itemize
 @item first official release of Anica
 @item checks PBNI+ for safe petri nets

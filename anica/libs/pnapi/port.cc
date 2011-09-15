@@ -49,12 +49,10 @@ Port::Port(PetriNet & net, const std::string & name) :
  */
 Port::~Port()
 {
-  std::set<Label *> allLabels(allLabels_);
-  PNAPI_FOREACH(l, allLabels)
+  PNAPI_FOREACH(l, allLabels_)
   {
     delete (*l);
   }
-  allLabels_.clear();
 }
 
 /*!
@@ -291,12 +289,10 @@ Label::Label(PetriNet & net, Port & port, const std::string & name, Type type) :
  */
 Label::~Label()
 {
-  std::set<Transition *> transitions(transitions_);
-  PNAPI_FOREACH(t, transitions)
+  PNAPI_FOREACH(t, transitions_)
   {
-    (*t)->removeLabel(this);    
+    (*t)->removeLabel(*this);    
   }
-  transitions_.clear();
 }
 
 /*!
@@ -380,14 +376,6 @@ void Label::addTransition(Transition & t)
 void Label::removeTransition(const Transition & t)
 {
   transitions_.erase(const_cast<Transition *>(&t));
-}
-
-/*!
- * \brief removing a transition from the attached transitions
- */
-void Label::removeTransition(Transition * t)
-{
-  transitions_.erase(t);
 }
 
 } /* namespace pnapi */

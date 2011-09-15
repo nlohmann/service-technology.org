@@ -159,14 +159,12 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
      KEY_MARKING = 265,
      KEY_CONSUME = 266,
      KEY_PRODUCE = 267,
-     KEY_HIGH = 268,
-     KEY_LOW = 269,
-     COLON = 270,
-     SEMICOLON = 271,
-     COMMA = 272,
-     NUMBER = 273,
-     NEGATIVE_NUMBER = 274,
-     IDENT = 275
+     COLON = 268,
+     SEMICOLON = 269,
+     COMMA = 270,
+     NUMBER = 271,
+     NEGATIVE_NUMBER = 272,
+     IDENT = 273
    };
 
     };
@@ -263,7 +261,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
     static const unsigned char yytable_[];
     static const signed char yytable_ninf_;
 
-    static const signed char yycheck_[];
+    static const unsigned char yycheck_[];
 
     /// For a state, its accessing symbol.
     static const unsigned char yystos_[];
@@ -342,7 +340,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 } } } } // pnapi::parser::lola::yy
 
 /* Line 34 of lalr1.cc  */
-#line 346 "parser-lola.h"
+#line 344 "parser-lola.h"
 
 
 

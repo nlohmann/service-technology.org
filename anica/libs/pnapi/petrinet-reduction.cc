@@ -18,11 +18,11 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Christian Sura <christian.sura@uni-rostock.de>,
- *          last changes of: \$Author: gierds $
+ *          last changes of: \$Author: cas $
  *
  * \since   2006-03-16
  *
- * \date    \$Date: 2011-03-24 18:22:04 +0100 (Thu, 24 Mar 2011) $
+ * \date    \$Date: 2010-06-06 14:46:01 +0200 (Sun, 06 Jun 2010) $
  *
  * \note    This file is part of the tool GNU BPEL2oWFN and was created during
  *          the project Tools4BPEL at the Humboldt-Universität zu Berlin. See
@@ -41,7 +41,7 @@
  *          für Petrinetze" ([Pil08]). These rules preserve lifeness and
  *          k-boundedness.
  * 
- * \version \$Revision: 6511 $
+ * \version \$Revision: 5813 $
  *
  * \ingroup petrinet
  * 
@@ -484,7 +484,7 @@ unsigned int PetriNet::reduce_rule_3p()
     {
       if( ((*p) != minPlace) &&
           ( reductionCache_->intervals_[*p].getLower() - reductionCache_->intervals_[minPlace].getLower() ==
-            (int) (*p)->getTokenCount() - (int) minPlace->getTokenCount()) ) // precondition 3
+            (*p)->getTokenCount() - minPlace->getTokenCount()) ) // precondition 3
       {
         obsoletePlaces.insert(*p);
         replaceRelation[*p]=minPlace;
@@ -1137,8 +1137,8 @@ unsigned int PetriNet::reduce_rule_6()
     if( (t->getPostset().size() != 1) || // precondition 2a
         (!(t->getOutputLabels().empty())) || // precondition 2b
         ((*p)->getPostset().find(t) != (*p)->getPostset().end()) || // precondition 4
-        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getLower() != (int)(*p)->getTokenCount())) ||
-        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getUpper() != (int)(*p)->getTokenCount())) ) // precondition 8
+        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getLower() != (*p)->getTokenCount())) ||
+        ((!(finalCondition_ == true)) && (reductionCache_->intervals_[*p].getUpper() != (*p)->getTokenCount())) ) // precondition 8
     {
       continue;
     }

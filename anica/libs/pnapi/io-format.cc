@@ -224,24 +224,11 @@ std::ostream & output(std::ostream & os, const Place & p)
   stringstream attributes;
   if (p.getTokenCount() == 1)
   {
-    if(p.getColor() == "")
-    {
-      attributes << "fillcolor=black";
-    }
-    else
-    {
-      attributes << "fillcolor=" << p.getColor();
-    }
-    attributes << " peripheries=2 height=\".2\" "
+    attributes << "fillcolor=black peripheries=2 height=\".2\" "
                << "width=\".2\" ";
   }
   else
   {
-    if(p.getColor() != "")
-    {
-      attributes << "fillcolor=" << p.getColor() << " ";
-    }
-    
     if (p.getTokenCount() > 1)
     {
       attributes << "label=\"" << p.getTokenCount() << "\" "
@@ -323,11 +310,7 @@ std::ostream & output(std::ostream & os, const Transition & t)
       
       break;
     }
-    default:
-      if (t.getColor() != "")
-      {
-        attributes << "fillcolor=" << t.getColor();
-      }
+    default: /* do nothing */ ;
     }
   }
 

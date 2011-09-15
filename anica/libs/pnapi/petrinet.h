@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: al020 $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-07-23 14:38:42 +0200 (Fri, 23 Jul 2010) $
+ * \date    $Date: 2011-08-03 15:31:59 +0200 (Wed, 03 Aug 2011) $
  *
- * \version $Revision: 5949 $
+ * \version $Revision: 6813 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -115,6 +115,8 @@ class PetriNet
   /// Petri net output, see pnapi::io
   friend std::ostream & io::__lola::output(std::ostream &, const PetriNet &);
   /// Petri net output, see pnapi::io
+  friend std::ostream & io::__ifn::output(std::ostream &, const PetriNet &);
+  /// Petri net output, see pnapi::io
   friend std::ostream & io::__pnml::output(std::ostream &, const PetriNet &);
   /// Petri net output, see pnapi::io
   friend std::ostream & io::__woflan::output(std::ostream &, const PetriNet &);
@@ -158,6 +160,9 @@ public: /* public types */
     SET_PILLAT = (IDENTICAL_PLACES | IDENTICAL_TRANSITIONS | SERIES_PLACES |
                   SERIES_TRANSITIONS | SELF_LOOP_PLACES |
                   SELF_LOOP_TRANSITIONS | EQUAL_PLACES),
+    SET_MURATA = (IDENTICAL_PLACES | IDENTICAL_TRANSITIONS |
+                  SERIES_PLACES | SERIES_TRANSITIONS |
+                  SELF_LOOP_PLACES | SELF_LOOP_TRANSITIONS),
     SET_STARKE = (STARKE_RULE_3_PLACES | STARKE_RULE_3_TRANSITIONS |
                   STARKE_RULE_4 | STARKE_RULE_7 | STARKE_RULE_8),
     K_BOUNDEDNESS = SET_PILLAT,

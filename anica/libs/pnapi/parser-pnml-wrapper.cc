@@ -68,8 +68,10 @@ char * Lexer::word(char * s)
 {
   char * buf;
   int i, k;
-  for(k = 0; (isspace(s[k]) || (s[k] == '<')); ++k);
-  for(i = k; (s[i] && (!isspace(s[i]))); ++i);
+  for(k = 0; (isspace(s[k]) || (s[k] == '<')); ++k)
+  { /* just count */ }
+  for(i = k; (s[i] && (!isspace(s[i]))); ++i)
+  { /* just count */ }
   buf = (char*)malloc((i - k + 1) * sizeof(char));
   strncpy(buf, &s[k], i - k);
   buf[i - k] = '\0';

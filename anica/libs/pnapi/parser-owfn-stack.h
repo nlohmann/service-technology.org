@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 2.4.2.  */
+/* A Bison parser, made by GNU Bison 2.5.  */
 
 /* Stack handling for Bison parsers in C++
    
-      Copyright (C) 2002-2010 Free Software Foundation, Inc.
+      Copyright (C) 2002-2011 Free Software Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -36,11 +36,11 @@
 #include <deque>
 
 
-/* Line 1066 of lalr1.cc  */
+/* Line 1149 of lalr1.cc  */
 #line 11 "parser-owfn.yy"
 namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
-/* Line 1066 of lalr1.cc  */
+/* Line 1149 of lalr1.cc  */
 #line 45 "parser-owfn-stack.h"
   template <class T, class S = std::deque<T> >
   class stack
@@ -128,11 +128,11 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
     unsigned int range_;
   };
 
-/* Line 1152 of lalr1.cc  */
+/* Line 1235 of lalr1.cc  */
 #line 11 "parser-owfn.yy"
 } } } } // pnapi::parser::owfn::yy
 
-/* Line 1152 of lalr1.cc  */
+/* Line 1235 of lalr1.cc  */
 #line 137 "parser-owfn-stack.h"
 
 #endif // not BISON_STACK_HH[]dnl

@@ -6,13 +6,13 @@
  * \brief   Input/Output related Structures
  *
  * \author  Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: al020 $
  *
  * \since   2009/01/19
  *
- * \date    $Date: 2010-07-10 20:34:52 +0200 (Sat, 10 Jul 2010) $
+ * \date    $Date: 2011-08-03 15:31:59 +0200 (Wed, 03 Aug 2011) $
  *
- * \version $Revision: 5892 $
+ * \version $Revision: 6813 $
  */
 
 
@@ -143,6 +143,8 @@ std::istream & operator>>(std::istream &, Automaton &);
 
 /// Open WorkFlow Net (OWFN) file format
 std::ios_base & owfn(std::ios_base &);
+/// Information Flow Net (ifn) file format
+std::ios_base & ifn(std::ios_base &);
 /// statistical output format
 std::ostream & stat(std::ostream &);
 /// GraphViz DOT output format
@@ -195,7 +197,9 @@ enum Format {
   /// petri net modeling language (?)
   PNML,
   /// WOFLAN format
-  WOFLAN
+  WOFLAN,
+  /// information flow net
+  IFN
 };
 
 /// I/O (sub-)mode
@@ -270,6 +274,46 @@ std::ostream & output(std::ostream &, const formula::FormulaGreater &);
 std::ostream & output(std::ostream &, const formula::FormulaGreaterEqual &);
 } /* namespace __lola */
 
+//**************************
+//*** IFN output format ***
+//**************************
+
+/*!
+ * \brief   IFN I/O implementation
+ */
+namespace __ifn
+{
+/// petri net output
+std::ostream & output(std::ostream &, const PetriNet &);
+/// arc output
+std::ostream & output(std::ostream &, const Arc &);
+/// place output
+std::ostream & output(std::ostream &, const Place &);
+/// transition output
+std::ostream & output(std::ostream &, const Transition &);
+/// negation output
+std::ostream & output(std::ostream &, const formula::Negation &);
+/// conjunction output
+std::ostream & output(std::ostream &, const formula::Conjunction &);
+/// disjunction output
+std::ostream & output(std::ostream &, const formula::Disjunction &);
+/// FormulaTrue output
+std::ostream & output(std::ostream &, const formula::FormulaTrue &);
+/// FormulaFalse output
+std::ostream & output(std::ostream &, const formula::FormulaFalse &);
+/// FormulaEqual output
+std::ostream & output(std::ostream &, const formula::FormulaEqual &);
+/// FormulaNotEqual output
+std::ostream & output(std::ostream &, const formula::FormulaNotEqual &);
+/// FormulaLess output
+std::ostream & output(std::ostream &, const formula::FormulaLess &);
+/// FormulaLessEqual output
+std::ostream & output(std::ostream &, const formula::FormulaLessEqual &);
+/// FormulaGreater output
+std::ostream & output(std::ostream &, const formula::FormulaGreater &);
+/// FormulaGreaterEqual output
+std::ostream & output(std::ostream &, const formula::FormulaGreaterEqual &);
+} /* namespace __ifn */
 
 //**************************
 //*** PNML output format ***

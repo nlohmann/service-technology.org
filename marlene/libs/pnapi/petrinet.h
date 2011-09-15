@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: cas $
+ *          last changes of: $Author: al020 $
  *
  * \since   2005/10/18
  *
- * \date    $Date: 2010-08-24 16:23:05 +0200 (Tue, 24 Aug 2010) $
+ * \date    $Date: 2011-08-03 15:31:59 +0200 (Wed, 03 Aug 2011) $
  *
- * \version $Revision: 6089 $
+ * \version $Revision: 6813 $
  */
 
 #ifndef PNAPI_PETRINET_H
@@ -114,6 +114,8 @@ class PetriNet
   friend std::ostream & io::__stat::output(std::ostream &, const PetriNet &);
   /// Petri net output, see pnapi::io
   friend std::ostream & io::__lola::output(std::ostream &, const PetriNet &);
+  /// Petri net output, see pnapi::io
+  friend std::ostream & io::__ifn::output(std::ostream &, const PetriNet &);
   /// Petri net output, see pnapi::io
   friend std::ostream & io::__pnml::output(std::ostream &, const PetriNet &);
   /// Petri net output, see pnapi::io

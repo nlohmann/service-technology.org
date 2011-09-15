@@ -300,7 +300,7 @@ int main(int argc, char* argv[]) {
 #endif
         nets.clear();
 
-    } catch (pnapi::exception::UserCausedError ex) {
+    } catch (pnapi::exception::UserCausedError& ex) {
         message("Unexpected error, please report this bug to %s.",
                 PACKAGE_BUGREPORT);
         std::cerr << ex << std::endl;

@@ -79,6 +79,13 @@ option "withprefix" -
   is needed. This options adds this prefix."
   flag off
 
+option "useasif" -
+  "Uses net with index <n> as interface specification for characterization of all adaptable nets."
+  int
+  typestr="<n>"
+  default="1"
+  optional
+
 
 section "Debug"
 

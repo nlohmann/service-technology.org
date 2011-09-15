@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 2.4.2.  */
+/* A Bison parser, made by GNU Bison 2.5.  */
 
 /* Skeleton implementation for Bison LALR(1) parsers in C++
    
-      Copyright (C) 2002-2010 Free Software Foundation, Inc.
+      Copyright (C) 2002-2011 Free Software Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 
 /* First part of user declarations.  */
 
-/* Line 310 of lalr1.cc  */
+/* Line 293 of lalr1.cc  */
 #line 41 "parser-owfn.yy"
 
 
@@ -47,7 +47,7 @@
 
 
 
-/* Line 310 of lalr1.cc  */
+/* Line 293 of lalr1.cc  */
 #line 52 "parser-owfn.cc"
 
 
@@ -56,7 +56,7 @@
 /* User implementation prologue.  */
 
 
-/* Line 316 of lalr1.cc  */
+/* Line 299 of lalr1.cc  */
 #line 61 "parser-owfn.cc"
 
 #ifndef YY_
@@ -69,6 +69,26 @@
 # ifndef YY_
 #  define YY_(msgid) msgid
 # endif
+#endif
+
+/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
+   If N is 0, then set CURRENT to the empty location which ends
+   the previous symbol: RHS[0] (always defined).  */
+
+#define YYRHSLOC(Rhs, K) ((Rhs)[K])
+#ifndef YYLLOC_DEFAULT
+# define YYLLOC_DEFAULT(Current, Rhs, N)                               \
+ do                                                                    \
+   if (N)                                                              \
+     {                                                                 \
+       (Current).begin = YYRHSLOC (Rhs, 1).begin;                      \
+       (Current).end   = YYRHSLOC (Rhs, N).end;                        \
+     }                                                                 \
+   else                                                                \
+     {                                                                 \
+       (Current).begin = (Current).end = YYRHSLOC (Rhs, 0).end;        \
+     }                                                                 \
+ while (false)
 #endif
 
 /* Suppress unused-variable warnings by "using" E.  */
@@ -120,13 +140,12 @@ do {					\
 #define YYRECOVERING()  (!!yyerrstatus_)
 
 
-/* Line 379 of lalr1.cc  */
+/* Line 382 of lalr1.cc  */
 #line 11 "parser-owfn.yy"
 namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
-/* Line 379 of lalr1.cc  */
-#line 129 "parser-owfn.cc"
-#if YYERROR_VERBOSE
+/* Line 382 of lalr1.cc  */
+#line 149 "parser-owfn.cc"
 
   /* Return YYSTR after stripping away unnecessary quotes and
      backslashes, so that it's suitable for yyerror.  The heuristic is
@@ -165,7 +184,6 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
     return yystr;
   }
 
-#endif
 
   /// Build a parser object.
   BisonParser::BisonParser (Parser& parser__yyarg)
@@ -266,6 +284,18 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   }
 #endif
 
+  inline bool
+  BisonParser::yy_pact_value_is_default_ (int yyvalue)
+  {
+    return yyvalue == yypact_ninf_;
+  }
+
+  inline bool
+  BisonParser::yy_table_value_is_error_ (int yyvalue)
+  {
+    return yyvalue == yytable_ninf_;
+  }
+
   int
   BisonParser::parse ()
   {
@@ -287,7 +317,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
     /// Location of the lookahead.
     location_type yylloc;
     /// The locations where the error started and ended.
-    location_type yyerror_range[2];
+    location_type yyerror_range[3];
 
     /// $$.
     semantic_type yyval;
@@ -325,7 +355,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
     /* Try to take a decision without lookahead.  */
     yyn = yypact_[yystate];
-    if (yyn == yypact_ninf_)
+    if (yy_pact_value_is_default_ (yyn))
       goto yydefault;
 
     /* Read a lookahead token.  */
@@ -358,8 +388,8 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
     yyn = yytable_[yyn];
     if (yyn <= 0)
       {
-	if (yyn == 0 || yyn == yytable_ninf_)
-	goto yyerrlab;
+	if (yy_table_value_is_error_ (yyn))
+	  goto yyerrlab;
 	yyn = -yyn;
 	goto yyreduce;
       }
@@ -415,7 +445,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
       {
 	  case 2:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 97 "parser-owfn.yy"
     { 
     parser_.net_.setConstraintLabels(parser_.constrains_); 
@@ -424,7 +454,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 4:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 105 "parser-owfn.yy"
     { 
     // clear stringstream
@@ -438,7 +468,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 5:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 114 "parser-owfn.yy"
     { 
     // clear stringstream
@@ -451,56 +481,56 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 21:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 163 "parser-owfn.yy"
     { parser_.labelType_ = Label::INPUT; }
     break;
 
   case 23:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 167 "parser-owfn.yy"
     { parser_.labelType_ = Label::OUTPUT; }
     break;
 
   case 25:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 171 "parser-owfn.yy"
     { parser_.labelType_ = Label::SYNCHRONOUS; }
     break;
 
   case 27:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 176 "parser-owfn.yy"
     { parser_.capacity_ = 0; }
     break;
 
   case 28:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 177 "parser-owfn.yy"
     { parser_.capacity_ = 0; }
     break;
 
   case 30:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 182 "parser-owfn.yy"
     { parser_.capacity_ = 1; }
     break;
 
   case 31:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 183 "parser-owfn.yy"
     { parser_.capacity_ = (yysemantic_stack_[(3) - (2)].yt_int); }
     break;
 
   case 33:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 189 "parser-owfn.yy"
     {
     // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
@@ -527,7 +557,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 35:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 212 "parser-owfn.yy"
     {
     // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
@@ -554,7 +584,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 43:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 247 "parser-owfn.yy"
     {
     if(parser_.place_ != NULL) // is only NULL when parsing interface
@@ -566,7 +596,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 45:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 255 "parser-owfn.yy"
     {
     if(parser_.place_ != NULL) // is only NULL when parsing interface
@@ -578,7 +608,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 47:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 266 "parser-owfn.yy"
     {
     try
@@ -594,7 +624,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 49:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 278 "parser-owfn.yy"
     {
     try
@@ -610,21 +640,21 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 57:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 307 "parser-owfn.yy"
     { parser_.capacity_ = 0; }
     break;
 
   case 58:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 308 "parser-owfn.yy"
     { parser_.capacity_ = 0; }
     break;
 
   case 60:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 314 "parser-owfn.yy"
     {
     // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
@@ -644,7 +674,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 62:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 330 "parser-owfn.yy"
     {
     // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
@@ -664,56 +694,56 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 65:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 354 "parser-owfn.yy"
     { parser_.net_.addRole(parser_.nodeName_.str()); }
     break;
 
   case 66:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 356 "parser-owfn.yy"
     { parser_.net_.addRole(parser_.nodeName_.str()); }
     break;
 
   case 76:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 379 "parser-owfn.yy"
     { parser_.labelType_ = Label::INPUT; }
     break;
 
   case 78:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 383 "parser-owfn.yy"
     { parser_.labelType_ = Label::OUTPUT; }
     break;
 
   case 80:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 387 "parser-owfn.yy"
     { parser_.labelType_ = Label::SYNCHRONOUS; }
     break;
 
   case 82:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 392 "parser-owfn.yy"
     { parser_.capacity_ = 0; }
     break;
 
   case 83:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 393 "parser-owfn.yy"
     { parser_.capacity_ = 0; }
     break;
 
   case 85:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 399 "parser-owfn.yy"
     {
     parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, std::string("label name '") + parser_.nodeName_.str() + "' already used");
@@ -726,7 +756,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 87:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 408 "parser-owfn.yy"
     {
     parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, std::string("label name '") + parser_.nodeName_.str() + "' already used");
@@ -739,7 +769,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 90:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 424 "parser-owfn.yy"
     {
     try
@@ -759,7 +789,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 92:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 443 "parser-owfn.yy"
     {
     try
@@ -775,7 +805,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 94:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 455 "parser-owfn.yy"
     {
     try
@@ -791,7 +821,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 96:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 470 "parser-owfn.yy"
     {
     parser_.label_ = parser_.net_.getInterface().findLabel(parser_.nodeName_.str());
@@ -813,7 +843,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 97:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 487 "parser-owfn.yy"
     {
     parser_.label_ = parser_.net_.getInterface().findLabel(parser_.nodeName_.str());
@@ -835,21 +865,21 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 98:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 512 "parser-owfn.yy"
     { parser_.markInitial_ = true; }
     break;
 
   case 99:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 513 "parser-owfn.yy"
     { parser_.markInitial_ = false; }
     break;
 
   case 104:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 524 "parser-owfn.yy"
     {
     parser_.place_ = parser_.places_[parser_.nodeName_.str()];
@@ -859,7 +889,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 106:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 533 "parser-owfn.yy"
     {      
     if(parser_.markInitial_)
@@ -875,7 +905,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 107:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 544 "parser-owfn.yy"
     {
     if(parser_.markInitial_)
@@ -891,14 +921,14 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 108:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 558 "parser-owfn.yy"
     { parser_.finalMarking_ = new Marking(parser_.net_, true); }
     break;
 
   case 109:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 560 "parser-owfn.yy"
     {
     delete parser_.finalMarking_;
@@ -908,7 +938,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 110:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 565 "parser-owfn.yy"
     {
     parser_.net_.getFinalCondition() = (*(yysemantic_stack_[(1) - (1)].yt_formula));
@@ -923,7 +953,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 111:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 578 "parser-owfn.yy"
     {
     parser_.net_.getFinalCondition().addMarking(*(parser_.finalMarking_));
@@ -934,7 +964,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 112:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 584 "parser-owfn.yy"
     {
     parser_.net_.getFinalCondition().addMarking(*(parser_.finalMarking_));
@@ -945,28 +975,28 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 113:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 592 "parser-owfn.yy"
     { (yyval.yt_formula) = new formula::FormulaTrue(); }
     break;
 
   case 114:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 593 "parser-owfn.yy"
     { (yyval.yt_formula) = new formula::FormulaFalse(); }
     break;
 
   case 115:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 594 "parser-owfn.yy"
     { (yyval.yt_formula) = (yysemantic_stack_[(3) - (2)].yt_formula); }
     break;
 
   case 117:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 600 "parser-owfn.yy"
     {
     parser_.net_.getFinalCondition() = (*(yysemantic_stack_[(3) - (2)].yt_formula));
@@ -976,28 +1006,28 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 118:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 607 "parser-owfn.yy"
     { (yyval.yt_formula) = (yysemantic_stack_[(3) - (2)].yt_formula); }
     break;
 
   case 119:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 608 "parser-owfn.yy"
     { (yyval.yt_formula) = new formula::FormulaTrue(); }
     break;
 
   case 120:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 609 "parser-owfn.yy"
     { (yyval.yt_formula) = new formula::FormulaFalse(); }
     break;
 
   case 121:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 611 "parser-owfn.yy"
     { 
     parser_.wildcardGiven_ = true;
@@ -1007,7 +1037,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 122:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 616 "parser-owfn.yy"
     { 
     (yyval.yt_formula) = new formula::Negation(*(yysemantic_stack_[(2) - (2)].yt_formula));
@@ -1017,7 +1047,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 123:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 621 "parser-owfn.yy"
     {
     (yyval.yt_formula) = new formula::Disjunction(*(yysemantic_stack_[(3) - (1)].yt_formula), *(yysemantic_stack_[(3) - (3)].yt_formula));
@@ -1028,7 +1058,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 124:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 627 "parser-owfn.yy"
     {
     (yyval.yt_formula) = new formula::Conjunction(*(yysemantic_stack_[(3) - (1)].yt_formula), *(yysemantic_stack_[(3) - (3)].yt_formula));
@@ -1039,7 +1069,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 125:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 633 "parser-owfn.yy"
     {
     parser_.wildcardGiven_ = true;
@@ -1049,7 +1079,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 126:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 638 "parser-owfn.yy"
     {
     (yyval.yt_formula) = (yysemantic_stack_[(3) - (1)].yt_formula); // obsolete; kept due to compatibility
@@ -1058,7 +1088,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 127:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 642 "parser-owfn.yy"
     {
     (yyval.yt_formula) = (yysemantic_stack_[(3) - (1)].yt_formula); // obsolete; kept due to compatibility
@@ -1067,7 +1097,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 128:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 646 "parser-owfn.yy"
     {
     parser_.place_ = parser_.places_[parser_.nodeName_.str()];
@@ -1077,7 +1107,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 129:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 651 "parser-owfn.yy"
     {
     (yyval.yt_formula) = (yysemantic_stack_[(3) - (3)].yt_formula);
@@ -1086,7 +1116,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 130:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 658 "parser-owfn.yy"
     { 
     (yyval.yt_formula) = new formula::FormulaEqual(*parser_.place_, (yysemantic_stack_[(2) - (2)].yt_int));
@@ -1095,7 +1125,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 131:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 662 "parser-owfn.yy"
     {
     (yyval.yt_formula) = new formula::Negation(formula::FormulaEqual(*parser_.place_, (yysemantic_stack_[(2) - (2)].yt_int)));
@@ -1104,7 +1134,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 132:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 666 "parser-owfn.yy"
     {
     (yyval.yt_formula) = new formula::FormulaLess(*parser_.place_, (yysemantic_stack_[(2) - (2)].yt_int));
@@ -1113,7 +1143,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 133:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 670 "parser-owfn.yy"
     {
     (yyval.yt_formula) = new formula::FormulaGreater(*parser_.place_, (yysemantic_stack_[(2) - (2)].yt_int));
@@ -1122,7 +1152,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 134:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 674 "parser-owfn.yy"
     {
     (yyval.yt_formula) = new formula::FormulaGreaterEqual(*parser_.place_, (yysemantic_stack_[(2) - (2)].yt_int));
@@ -1131,7 +1161,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 135:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 678 "parser-owfn.yy"
     {
     (yyval.yt_formula) = new formula::FormulaLessEqual(*parser_.place_, (yysemantic_stack_[(2) - (2)].yt_int));
@@ -1140,28 +1170,28 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 136:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 686 "parser-owfn.yy"
     { (yyval.yt_formula) = (yysemantic_stack_[(3) - (2)].yt_formula); }
     break;
 
   case 137:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 687 "parser-owfn.yy"
     { (yyval.yt_formula) = new formula::FormulaTrue(); }
     break;
 
   case 138:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 688 "parser-owfn.yy"
     { (yyval.yt_formula) = new formula::FormulaFalse(); }
     break;
 
   case 139:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 690 "parser-owfn.yy"
     { 
     (yyval.yt_formula) = new formula::Negation(*(yysemantic_stack_[(2) - (2)].yt_formula));
@@ -1171,7 +1201,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 140:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 695 "parser-owfn.yy"
     {
     (yyval.yt_formula) = new formula::Disjunction(*(yysemantic_stack_[(3) - (1)].yt_formula), *(yysemantic_stack_[(3) - (3)].yt_formula));
@@ -1182,7 +1212,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 141:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 701 "parser-owfn.yy"
     {
     (yyval.yt_formula) = new formula::Conjunction(*(yysemantic_stack_[(3) - (1)].yt_formula), *(yysemantic_stack_[(3) - (3)].yt_formula));
@@ -1193,7 +1223,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 142:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 707 "parser-owfn.yy"
     {
     parser_.place_ = parser_.places_[parser_.nodeName_.str()];
@@ -1206,7 +1236,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 143:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 715 "parser-owfn.yy"
     {
     (yyval.yt_formula) = (yysemantic_stack_[(3) - (3)].yt_formula);
@@ -1215,7 +1245,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 146:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 735 "parser-owfn.yy"
     {
     // parser_.check(parser_.labels_[parser_.nodeName_.str()] == NULL, "node name already used");
@@ -1233,7 +1263,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 147:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 748 "parser-owfn.yy"
     {
     parser_.transition_->setCost((yysemantic_stack_[(4) - (4)].yt_int));
@@ -1242,7 +1272,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 148:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 753 "parser-owfn.yy"
     { 
     parser_.target_ = reinterpret_cast<Node * *>(&(parser_.transition_));
@@ -1254,7 +1284,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 149:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 760 "parser-owfn.yy"
     { 
     parser_.source_ = reinterpret_cast<Node * *>(&(parser_.transition_));
@@ -1266,21 +1296,21 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 151:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 770 "parser-owfn.yy"
     { (yyval.yt_int) = 0;  }
     break;
 
   case 152:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 771 "parser-owfn.yy"
     { (yyval.yt_int) = (yysemantic_stack_[(3) - (2)].yt_int); }
     break;
 
   case 155:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 781 "parser-owfn.yy"
     {
     parser_.check(parser_.transition_->getPetriNet().isRoleSpecified(parser_.nodeName_.str()), "role has not been specified");
@@ -1290,7 +1320,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 156:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 786 "parser-owfn.yy"
     {
     parser_.check(parser_.transition_->getPetriNet().isRoleSpecified(parser_.nodeName_.str()), "role has not been specified");
@@ -1300,7 +1330,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 160:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 800 "parser-owfn.yy"
     {
     parser_.place_ = parser_.places_[parser_.nodeName_.str()];
@@ -1314,7 +1344,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 162:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 813 "parser-owfn.yy"
     {
     if(parser_.place_ != NULL)
@@ -1332,7 +1362,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 163:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 826 "parser-owfn.yy"
     {
     if(parser_.place_ != NULL)
@@ -1350,7 +1380,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 167:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 848 "parser-owfn.yy"
     {
     parser_.label_ = parser_.labels_[parser_.nodeName_.str()];
@@ -1362,7 +1392,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 168:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 855 "parser-owfn.yy"
     {
     parser_.label_ = parser_.labels_[parser_.nodeName_.str()];
@@ -1374,25 +1404,36 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   case 171:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 870 "parser-owfn.yy"
     { parser_.constrains_[parser_.transition_].insert(parser_.nodeName_.str()); }
     break;
 
   case 172:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 872 "parser-owfn.yy"
     { parser_.constrains_[parser_.transition_].insert(parser_.nodeName_.str()); }
     break;
 
 
 
-/* Line 677 of lalr1.cc  */
-#line 1393 "parser-owfn.cc"
+/* Line 690 of lalr1.cc  */
+#line 1423 "parser-owfn.cc"
 	default:
           break;
       }
+    /* User semantic actions sometimes alter yychar, and that requires
+       that yytoken be updated with the new translation.  We take the
+       approach of translating immediately before every use of yytoken.
+       One alternative is translating here after every semantic action,
+       but that translation would be missed if the semantic action
+       invokes YYABORT, YYACCEPT, or YYERROR immediately after altering
+       yychar.  In the case of YYABORT or YYACCEPT, an incorrect
+       destructor might then be invoked immediately.  In the case of
+       YYERROR, subsequent parser actions might lead to an incorrect
+       destructor call or verbose syntax error message before the
+       lookahead is translated.  */
     YY_SYMBOL_PRINT ("-> $$ =", yyr1_[yyn], &yyval, &yyloc);
 
     yypop_ (yylen);
@@ -1416,14 +1457,20 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   | yyerrlab -- here on detecting error |
   `------------------------------------*/
   yyerrlab:
+    /* Make sure we have latest lookahead translation.  See comments at
+       user semantic actions for why this is necessary.  */
+    yytoken = yytranslate_ (yychar);
+
     /* If not already recovering from an error, report this error.  */
     if (!yyerrstatus_)
       {
 	++yynerrs_;
+	if (yychar == yyempty_)
+	  yytoken = yyempty_;
 	error (yylloc, yysyntax_error_ (yystate, yytoken));
       }
 
-    yyerror_range[0] = yylloc;
+    yyerror_range[1] = yylloc;
     if (yyerrstatus_ == 3)
       {
 	/* If just tried and failed to reuse lookahead token after an
@@ -1458,7 +1505,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
     if (false)
       goto yyerrorlab;
 
-    yyerror_range[0] = yylocation_stack_[yylen - 1];
+    yyerror_range[1] = yylocation_stack_[yylen - 1];
     /* Do not reclaim the symbols of the rule which action triggered
        this YYERROR.  */
     yypop_ (yylen);
@@ -1475,7 +1522,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
     for (;;)
       {
 	yyn = yypact_[yystate];
-	if (yyn != yypact_ninf_)
+	if (!yy_pact_value_is_default_ (yyn))
 	{
 	  yyn += yyterror_;
 	  if (0 <= yyn && yyn <= yylast_ && yycheck_[yyn] == yyterror_)
@@ -1490,7 +1537,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 	if (yystate_stack_.height () == 1)
 	YYABORT;
 
-	yyerror_range[0] = yylocation_stack_[0];
+	yyerror_range[1] = yylocation_stack_[0];
 	yydestruct_ ("Error: popping",
 		     yystos_[yystate],
 		     &yysemantic_stack_[0], &yylocation_stack_[0]);
@@ -1499,10 +1546,10 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 	YY_STACK_PRINT ();
       }
 
-    yyerror_range[1] = yylloc;
+    yyerror_range[2] = yylloc;
     // Using YYLLOC is tempting, but would change the location of
     // the lookahead.  YYLOC is available though.
-    YYLLOC_DEFAULT (yyloc, (yyerror_range - 1), 2);
+    YYLLOC_DEFAULT (yyloc, yyerror_range, 2);
     yysemantic_stack_.push (yylval);
     yylocation_stack_.push (yyloc);
 
@@ -1525,7 +1572,13 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   yyreturn:
     if (yychar != yyempty_)
-      yydestruct_ ("Cleanup: discarding lookahead", yytoken, &yylval, &yylloc);
+      {
+        /* Make sure we have latest lookahead translation.  See comments
+           at user semantic actions for why this is necessary.  */
+        yytoken = yytranslate_ (yychar);
+        yydestruct_ ("Cleanup: discarding lookahead", yytoken, &yylval,
+                     &yylloc);
+      }
 
     /* Do not reclaim the symbols of the rule which action triggered
        this YYABORT or YYACCEPT.  */
@@ -1544,51 +1597,97 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   // Generate an error message.
   std::string
-  BisonParser::yysyntax_error_ (int yystate, int tok)
+  BisonParser::yysyntax_error_ (int yystate, int yytoken)
   {
-    std::string res;
-    YYUSE (yystate);
-#if YYERROR_VERBOSE
-    int yyn = yypact_[yystate];
-    if (yypact_ninf_ < yyn && yyn <= yylast_)
+    std::string yyres;
+    // Number of reported tokens (one for the "unexpected", one per
+    // "expected").
+    size_t yycount = 0;
+    // Its maximum.
+    enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
+    // Arguments of yyformat.
+    char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
+
+    /* There are many possibilities here to consider:
+       - If this state is a consistent state with a default action, then
+         the only way this function was invoked is if the default action
+         is an error action.  In that case, don't check for expected
+         tokens because there are none.
+       - The only way there can be no lookahead present (in yytoken) is
+         if this state is a consistent state with a default action.
+         Thus, detecting the absence of a lookahead is sufficient to
+         determine that there is no unexpected or expected token to
+         report.  In that case, just report a simple "syntax error".
+       - Don't assume there isn't a lookahead just because this state is
+         a consistent state with a default action.  There might have
+         been a previous inconsistent state, consistent state with a
+         non-default action, or user semantic action that manipulated
+         yychar.
+       - Of course, the expected token list depends on states to have
+         correct lookahead information, and it depends on the parser not
+         to perform extra reductions after fetching a lookahead from the
+         scanner and before detecting a syntax error.  Thus, state
+         merging (from LALR or IELR) and default reductions corrupt the
+         expected token list.  However, the list is correct for
+         canonical LR with one exception: it will still contain any
+         token that will not be accepted due to an error action in a
+         later state.
+    */
+    if (yytoken != yyempty_)
       {
-	/* Start YYX at -YYN if negative to avoid negative indexes in
-	   YYCHECK.  */
-	int yyxbegin = yyn < 0 ? -yyn : 0;
-
-	/* Stay within bounds of both yycheck and yytname.  */
-	int yychecklim = yylast_ - yyn + 1;
-	int yyxend = yychecklim < yyntokens_ ? yychecklim : yyntokens_;
-	int count = 0;
-	for (int x = yyxbegin; x < yyxend; ++x)
-	  if (yycheck_[x + yyn] == x && x != yyterror_)
-	    ++count;
-
-	// FIXME: This method of building the message is not compatible
-	// with internationalization.  It should work like yacc.c does it.
-	// That is, first build a string that looks like this:
-	// "syntax error, unexpected %s or %s or %s"
-	// Then, invoke YY_ on this string.
-	// Finally, use the string as a format to output
-	// yytname_[tok], etc.
-	// Until this gets fixed, this message appears in English only.
-	res = "syntax error, unexpected ";
-	res += yytnamerr_ (yytname_[tok]);
-	if (count < 5)
-	  {
-	    count = 0;
-	    for (int x = yyxbegin; x < yyxend; ++x)
-	      if (yycheck_[x + yyn] == x && x != yyterror_)
-		{
-		  res += (!count++) ? ", expecting " : " or ";
-		  res += yytnamerr_ (yytname_[x]);
-		}
-	  }
+        yyarg[yycount++] = yytname_[yytoken];
+        int yyn = yypact_[yystate];
+        if (!yy_pact_value_is_default_ (yyn))
+          {
+            /* Start YYX at -YYN if negative to avoid negative indexes in
+               YYCHECK.  In other words, skip the first -YYN actions for
+               this state because they are default actions.  */
+            int yyxbegin = yyn < 0 ? -yyn : 0;
+            /* Stay within bounds of both yycheck and yytname.  */
+            int yychecklim = yylast_ - yyn + 1;
+            int yyxend = yychecklim < yyntokens_ ? yychecklim : yyntokens_;
+            for (int yyx = yyxbegin; yyx < yyxend; ++yyx)
+              if (yycheck_[yyx + yyn] == yyx && yyx != yyterror_
+                  && !yy_table_value_is_error_ (yytable_[yyx + yyn]))
+                {
+                  if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
+                    {
+                      yycount = 1;
+                      break;
+                    }
+                  else
+                    yyarg[yycount++] = yytname_[yyx];
+                }
+          }
       }
-    else
-#endif
-      res = YY_("syntax error");
-    return res;
+
+    char const* yyformat = 0;
+    switch (yycount)
+      {
+#define YYCASE_(N, S)                         \
+        case N:                               \
+          yyformat = S;                       \
+        break
+        YYCASE_(0, YY_("syntax error"));
+        YYCASE_(1, YY_("syntax error, unexpected %s"));
+        YYCASE_(2, YY_("syntax error, unexpected %s, expecting %s"));
+        YYCASE_(3, YY_("syntax error, unexpected %s, expecting %s or %s"));
+        YYCASE_(4, YY_("syntax error, unexpected %s, expecting %s or %s or %s"));
+        YYCASE_(5, YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s"));
+#undef YYCASE_
+      }
+
+    // Argument number.
+    size_t yyi = 0;
+    for (char const* yyp = yyformat; *yyp; ++yyp)
+      if (yyp[0] == '%' && yyp[1] == 's' && yyi < yycount)
+        {
+          yyres += yytnamerr_ (yyarg[yyi++]);
+          ++yyp;
+        }
+      else
+        yyres += *yyp;
+    return yyres;
   }
 
 
@@ -1628,9 +1727,9 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
     -197,    10,  -197,  -197,   152,  -197,    10,  -197,  -197
   };
 
-  /* YYDEFACT[S] -- default rule to reduce with in state S when YYTABLE
-     doesn't specify something else to do.  Zero means the default is an
-     error.  */
+  /* YYDEFACT[S] -- default reduction number in state S.  Performed when
+     YYTABLE doesn't specify something else to do.  Zero means the
+     default is an error.  */
   const unsigned char
   BisonParser::yydefact_[] =
   {
@@ -1696,7 +1795,7 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
 
   /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
      positive, shift that token.  If negative, reduce the rule which
-     number is the opposite.  If zero, do what YYDEFACT says.  */
+     number is the opposite.  If YYTABLE_NINF_, syntax error.  */
   const signed char BisonParser::yytable_ninf_ = -110;
   const short int
   BisonParser::yytable_[] =
@@ -2094,11 +2193,11 @@ namespace pnapi { namespace parser { namespace owfn { namespace yy {
   const BisonParser::token_number_type BisonParser::yyundef_token_ = 2;
 
 
-/* Line 1053 of lalr1.cc  */
+/* Line 1136 of lalr1.cc  */
 #line 11 "parser-owfn.yy"
 } } } } // pnapi::parser::owfn::yy
 
-/* Line 1053 of lalr1.cc  */
-#line 2103 "parser-owfn.cc"
+/* Line 1136 of lalr1.cc  */
+#line 2202 "parser-owfn.cc"
 
 

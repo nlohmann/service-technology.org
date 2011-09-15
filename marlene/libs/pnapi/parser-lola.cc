@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 2.4.2.  */
+/* A Bison parser, made by GNU Bison 2.5.  */
 
 /* Skeleton implementation for Bison LALR(1) parsers in C++
    
-      Copyright (C) 2002-2010 Free Software Foundation, Inc.
+      Copyright (C) 2002-2011 Free Software Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 
 /* First part of user declarations.  */
 
-/* Line 310 of lalr1.cc  */
+/* Line 293 of lalr1.cc  */
 #line 41 "parser-lola.yy"
 
 
@@ -46,7 +46,7 @@
 
 
 
-/* Line 310 of lalr1.cc  */
+/* Line 293 of lalr1.cc  */
 #line 51 "parser-lola.cc"
 
 
@@ -55,7 +55,7 @@
 /* User implementation prologue.  */
 
 
-/* Line 316 of lalr1.cc  */
+/* Line 299 of lalr1.cc  */
 #line 60 "parser-lola.cc"
 
 #ifndef YY_
@@ -68,6 +68,26 @@
 # ifndef YY_
 #  define YY_(msgid) msgid
 # endif
+#endif
+
+/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
+   If N is 0, then set CURRENT to the empty location which ends
+   the previous symbol: RHS[0] (always defined).  */
+
+#define YYRHSLOC(Rhs, K) ((Rhs)[K])
+#ifndef YYLLOC_DEFAULT
+# define YYLLOC_DEFAULT(Current, Rhs, N)                               \
+ do                                                                    \
+   if (N)                                                              \
+     {                                                                 \
+       (Current).begin = YYRHSLOC (Rhs, 1).begin;                      \
+       (Current).end   = YYRHSLOC (Rhs, N).end;                        \
+     }                                                                 \
+   else                                                                \
+     {                                                                 \
+       (Current).begin = (Current).end = YYRHSLOC (Rhs, 0).end;        \
+     }                                                                 \
+ while (false)
 #endif
 
 /* Suppress unused-variable warnings by "using" E.  */
@@ -119,13 +139,12 @@ do {					\
 #define YYRECOVERING()  (!!yyerrstatus_)
 
 
-/* Line 379 of lalr1.cc  */
+/* Line 382 of lalr1.cc  */
 #line 11 "parser-lola.yy"
 namespace pnapi { namespace parser { namespace lola { namespace yy {
 
-/* Line 379 of lalr1.cc  */
-#line 128 "parser-lola.cc"
-#if YYERROR_VERBOSE
+/* Line 382 of lalr1.cc  */
+#line 148 "parser-lola.cc"
 
   /* Return YYSTR after stripping away unnecessary quotes and
      backslashes, so that it's suitable for yyerror.  The heuristic is
@@ -164,7 +183,6 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
     return yystr;
   }
 
-#endif
 
   /// Build a parser object.
   BisonParser::BisonParser (Parser& parser__yyarg)
@@ -265,6 +283,18 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
   }
 #endif
 
+  inline bool
+  BisonParser::yy_pact_value_is_default_ (int yyvalue)
+  {
+    return yyvalue == yypact_ninf_;
+  }
+
+  inline bool
+  BisonParser::yy_table_value_is_error_ (int yyvalue)
+  {
+    return yyvalue == yytable_ninf_;
+  }
+
   int
   BisonParser::parse ()
   {
@@ -286,7 +316,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
     /// Location of the lookahead.
     location_type yylloc;
     /// The locations where the error started and ended.
-    location_type yyerror_range[2];
+    location_type yyerror_range[3];
 
     /// $$.
     semantic_type yyval;
@@ -324,7 +354,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 
     /* Try to take a decision without lookahead.  */
     yyn = yypact_[yystate];
-    if (yyn == yypact_ninf_)
+    if (yy_pact_value_is_default_ (yyn))
       goto yydefault;
 
     /* Read a lookahead token.  */
@@ -357,8 +387,8 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
     yyn = yytable_[yyn];
     if (yyn <= 0)
       {
-	if (yyn == 0 || yyn == yytable_ninf_)
-	goto yyerrlab;
+	if (yy_table_value_is_error_ (yyn))
+	  goto yyerrlab;
 	yyn = -yyn;
 	goto yyreduce;
       }
@@ -414,7 +444,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
       {
 	  case 3:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 86 "parser-lola.yy"
     { 
     // clear stringstream
@@ -428,7 +458,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 
   case 4:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 95 "parser-lola.yy"
     { 
     // clear stringstream
@@ -441,35 +471,35 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 
   case 5:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 108 "parser-lola.yy"
     { parser_.capacity_ = 0; }
     break;
 
   case 6:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 109 "parser-lola.yy"
     { parser_.capacity_ = 0; }
     break;
 
   case 8:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 114 "parser-lola.yy"
     { parser_.capacity_ = 1; }
     break;
 
   case 9:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 115 "parser-lola.yy"
     { parser_.capacity_ = (yysemantic_stack_[(3) - (2)].yt_int); }
     break;
 
   case 10:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 120 "parser-lola.yy"
     {
     // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
@@ -486,7 +516,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 
   case 11:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 132 "parser-lola.yy"
     {
     // parser_.check(parser_.places_[parser_.nodeName_.str()] == NULL, "node name already used");
@@ -503,7 +533,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 
   case 15:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 157 "parser-lola.yy"
     {
     parser_.place_ = parser_.places_[parser_.nodeName_.str()];
@@ -513,7 +543,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 
   case 16:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 162 "parser-lola.yy"
     { 
     parser_.place_->setTokenCount((yysemantic_stack_[(4) - (4)].yt_int));
@@ -522,7 +552,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 
   case 19:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 177 "parser-lola.yy"
     { 
     // parser_.check(!parser_.net_.containsNode(parser_.nodeName_.str()), "node name already used");
@@ -540,7 +570,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 
   case 20:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 190 "parser-lola.yy"
     {
     parser_.target_ = reinterpret_cast<Node * *>(&(parser_.transition_));
@@ -550,7 +580,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 
   case 21:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 196 "parser-lola.yy"
     { 
     parser_.source_ = reinterpret_cast<Node * *>(&(parser_.transition_));
@@ -560,39 +590,46 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 
   case 23:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 204 "parser-lola.yy"
     { (yyval.yt_int) = 0; }
     break;
 
   case 24:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 205 "parser-lola.yy"
     { (yyval.yt_int) = 1; }
     break;
 
   case 25:
 
-/* Line 677 of lalr1.cc  */
+/* Line 690 of lalr1.cc  */
 #line 206 "parser-lola.yy"
     { (yyval.yt_int) = 2; }
     break;
 
-  case 29:
+  case 26:
 
-/* Line 677 of lalr1.cc  */
-#line 217 "parser-lola.yy"
+/* Line 690 of lalr1.cc  */
+#line 207 "parser-lola.yy"
+    { (yyval.yt_int) = 3; }
+    break;
+
+  case 30:
+
+/* Line 690 of lalr1.cc  */
+#line 218 "parser-lola.yy"
     {
     parser_.place_ = parser_.places_[parser_.nodeName_.str()];
     parser_.check(parser_.place_ != NULL, "unknown place");
   }
     break;
 
-  case 30:
+  case 31:
 
-/* Line 677 of lalr1.cc  */
-#line 222 "parser-lola.yy"
+/* Line 690 of lalr1.cc  */
+#line 223 "parser-lola.yy"
     {
     Arc * a = parser_.net_.findArc(**(parser_.source_), **(parser_.target_));
     if(a != NULL)
@@ -608,11 +645,22 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 
 
 
-/* Line 677 of lalr1.cc  */
-#line 613 "parser-lola.cc"
+/* Line 690 of lalr1.cc  */
+#line 650 "parser-lola.cc"
 	default:
           break;
       }
+    /* User semantic actions sometimes alter yychar, and that requires
+       that yytoken be updated with the new translation.  We take the
+       approach of translating immediately before every use of yytoken.
+       One alternative is translating here after every semantic action,
+       but that translation would be missed if the semantic action
+       invokes YYABORT, YYACCEPT, or YYERROR immediately after altering
+       yychar.  In the case of YYABORT or YYACCEPT, an incorrect
+       destructor might then be invoked immediately.  In the case of
+       YYERROR, subsequent parser actions might lead to an incorrect
+       destructor call or verbose syntax error message before the
+       lookahead is translated.  */
     YY_SYMBOL_PRINT ("-> $$ =", yyr1_[yyn], &yyval, &yyloc);
 
     yypop_ (yylen);
@@ -636,14 +684,20 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
   | yyerrlab -- here on detecting error |
   `------------------------------------*/
   yyerrlab:
+    /* Make sure we have latest lookahead translation.  See comments at
+       user semantic actions for why this is necessary.  */
+    yytoken = yytranslate_ (yychar);
+
     /* If not already recovering from an error, report this error.  */
     if (!yyerrstatus_)
       {
 	++yynerrs_;
+	if (yychar == yyempty_)
+	  yytoken = yyempty_;
 	error (yylloc, yysyntax_error_ (yystate, yytoken));
       }
 
-    yyerror_range[0] = yylloc;
+    yyerror_range[1] = yylloc;
     if (yyerrstatus_ == 3)
       {
 	/* If just tried and failed to reuse lookahead token after an
@@ -678,7 +732,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
     if (false)
       goto yyerrorlab;
 
-    yyerror_range[0] = yylocation_stack_[yylen - 1];
+    yyerror_range[1] = yylocation_stack_[yylen - 1];
     /* Do not reclaim the symbols of the rule which action triggered
        this YYERROR.  */
     yypop_ (yylen);
@@ -695,7 +749,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
     for (;;)
       {
 	yyn = yypact_[yystate];
-	if (yyn != yypact_ninf_)
+	if (!yy_pact_value_is_default_ (yyn))
 	{
 	  yyn += yyterror_;
 	  if (0 <= yyn && yyn <= yylast_ && yycheck_[yyn] == yyterror_)
@@ -710,7 +764,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 	if (yystate_stack_.height () == 1)
 	YYABORT;
 
-	yyerror_range[0] = yylocation_stack_[0];
+	yyerror_range[1] = yylocation_stack_[0];
 	yydestruct_ ("Error: popping",
 		     yystos_[yystate],
 		     &yysemantic_stack_[0], &yylocation_stack_[0]);
@@ -719,10 +773,10 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 	YY_STACK_PRINT ();
       }
 
-    yyerror_range[1] = yylloc;
+    yyerror_range[2] = yylloc;
     // Using YYLLOC is tempting, but would change the location of
     // the lookahead.  YYLOC is available though.
-    YYLLOC_DEFAULT (yyloc, (yyerror_range - 1), 2);
+    YYLLOC_DEFAULT (yyloc, yyerror_range, 2);
     yysemantic_stack_.push (yylval);
     yylocation_stack_.push (yyloc);
 
@@ -745,7 +799,13 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 
   yyreturn:
     if (yychar != yyempty_)
-      yydestruct_ ("Cleanup: discarding lookahead", yytoken, &yylval, &yylloc);
+      {
+        /* Make sure we have latest lookahead translation.  See comments
+           at user semantic actions for why this is necessary.  */
+        yytoken = yytranslate_ (yychar);
+        yydestruct_ ("Cleanup: discarding lookahead", yytoken, &yylval,
+                     &yylloc);
+      }
 
     /* Do not reclaim the symbols of the rule which action triggered
        this YYABORT or YYACCEPT.  */
@@ -764,51 +824,97 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
 
   // Generate an error message.
   std::string
-  BisonParser::yysyntax_error_ (int yystate, int tok)
+  BisonParser::yysyntax_error_ (int yystate, int yytoken)
   {
-    std::string res;
-    YYUSE (yystate);
-#if YYERROR_VERBOSE
-    int yyn = yypact_[yystate];
-    if (yypact_ninf_ < yyn && yyn <= yylast_)
+    std::string yyres;
+    // Number of reported tokens (one for the "unexpected", one per
+    // "expected").
+    size_t yycount = 0;
+    // Its maximum.
+    enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
+    // Arguments of yyformat.
+    char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
+
+    /* There are many possibilities here to consider:
+       - If this state is a consistent state with a default action, then
+         the only way this function was invoked is if the default action
+         is an error action.  In that case, don't check for expected
+         tokens because there are none.
+       - The only way there can be no lookahead present (in yytoken) is
+         if this state is a consistent state with a default action.
+         Thus, detecting the absence of a lookahead is sufficient to
+         determine that there is no unexpected or expected token to
+         report.  In that case, just report a simple "syntax error".
+       - Don't assume there isn't a lookahead just because this state is
+         a consistent state with a default action.  There might have
+         been a previous inconsistent state, consistent state with a
+         non-default action, or user semantic action that manipulated
+         yychar.
+       - Of course, the expected token list depends on states to have
+         correct lookahead information, and it depends on the parser not
+         to perform extra reductions after fetching a lookahead from the
+         scanner and before detecting a syntax error.  Thus, state
+         merging (from LALR or IELR) and default reductions corrupt the
+         expected token list.  However, the list is correct for
+         canonical LR with one exception: it will still contain any
+         token that will not be accepted due to an error action in a
+         later state.
+    */
+    if (yytoken != yyempty_)
       {
-	/* Start YYX at -YYN if negative to avoid negative indexes in
-	   YYCHECK.  */
-	int yyxbegin = yyn < 0 ? -yyn : 0;
-
-	/* Stay within bounds of both yycheck and yytname.  */
-	int yychecklim = yylast_ - yyn + 1;
-	int yyxend = yychecklim < yyntokens_ ? yychecklim : yyntokens_;
-	int count = 0;
-	for (int x = yyxbegin; x < yyxend; ++x)
-	  if (yycheck_[x + yyn] == x && x != yyterror_)
-	    ++count;
-
-	// FIXME: This method of building the message is not compatible
-	// with internationalization.  It should work like yacc.c does it.
-	// That is, first build a string that looks like this:
-	// "syntax error, unexpected %s or %s or %s"
-	// Then, invoke YY_ on this string.
-	// Finally, use the string as a format to output
-	// yytname_[tok], etc.
-	// Until this gets fixed, this message appears in English only.
-	res = "syntax error, unexpected ";
-	res += yytnamerr_ (yytname_[tok]);
-	if (count < 5)
-	  {
-	    count = 0;
-	    for (int x = yyxbegin; x < yyxend; ++x)
-	      if (yycheck_[x + yyn] == x && x != yyterror_)
-		{
-		  res += (!count++) ? ", expecting " : " or ";
-		  res += yytnamerr_ (yytname_[x]);
-		}
-	  }
+        yyarg[yycount++] = yytname_[yytoken];
+        int yyn = yypact_[yystate];
+        if (!yy_pact_value_is_default_ (yyn))
+          {
+            /* Start YYX at -YYN if negative to avoid negative indexes in
+               YYCHECK.  In other words, skip the first -YYN actions for
+               this state because they are default actions.  */
+            int yyxbegin = yyn < 0 ? -yyn : 0;
+            /* Stay within bounds of both yycheck and yytname.  */
+            int yychecklim = yylast_ - yyn + 1;
+            int yyxend = yychecklim < yyntokens_ ? yychecklim : yyntokens_;
+            for (int yyx = yyxbegin; yyx < yyxend; ++yyx)
+              if (yycheck_[yyx + yyn] == yyx && yyx != yyterror_
+                  && !yy_table_value_is_error_ (yytable_[yyx + yyn]))
+                {
+                  if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
+                    {
+                      yycount = 1;
+                      break;
+                    }
+                  else
+                    yyarg[yycount++] = yytname_[yyx];
+                }
+          }
       }
-    else
-#endif
-      res = YY_("syntax error");
-    return res;
+
+    char const* yyformat = 0;
+    switch (yycount)
+      {
+#define YYCASE_(N, S)                         \
+        case N:                               \
+          yyformat = S;                       \
+        break
+        YYCASE_(0, YY_("syntax error"));
+        YYCASE_(1, YY_("syntax error, unexpected %s"));
+        YYCASE_(2, YY_("syntax error, unexpected %s, expecting %s"));
+        YYCASE_(3, YY_("syntax error, unexpected %s, expecting %s or %s"));
+        YYCASE_(4, YY_("syntax error, unexpected %s, expecting %s or %s or %s"));
+        YYCASE_(5, YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s"));
+#undef YYCASE_
+      }
+
+    // Argument number.
+    size_t yyi = 0;
+    for (char const* yyp = yyformat; *yyp; ++yyp)
+      if (yyp[0] == '%' && yyp[1] == 's' && yyi < yycount)
+        {
+          yyres += yytnamerr_ (yyarg[yyi++]);
+          ++yyp;
+        }
+      else
+        yyres += *yyp;
+    return yyres;
   }
 
 
@@ -818,67 +924,67 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
   const signed char
   BisonParser::yypact_[] =
   {
-        -6,    12,    21,   -14,     7,   -13,   -16,   -16,     9,    -4,
-     -16,   -16,   -16,     8,   -16,   -13,   -13,   -13,   -16,    -8,
-     -16,     8,   -16,    11,    18,   -13,    10,   -13,    18,   -16,
-     -16,   -16,     0,   -16,   -16,   -16,   -16,    19,   -16,   -13,
-     -16,    -1,   -16,    14,    20,   -13,    13,   -16,   -16,   -16,
-     -13,     1,   -16
+         5,    -2,     2,   -15,     0,    -3,   -16,   -16,    -1,    -4,
+     -16,   -16,   -16,     1,   -16,    -3,    -3,    -3,   -16,     6,
+     -16,     1,   -16,    13,    12,    -3,    11,    -3,    12,   -16,
+     -16,   -16,    -6,   -16,   -16,   -16,   -16,   -16,     3,   -16,
+      -3,   -16,     8,   -16,    15,    20,    -3,    14,   -16,   -16,
+     -16,    -3,    10,   -16
   };
 
-  /* YYDEFACT[S] -- default rule to reduce with in state S when YYTABLE
-     doesn't specify something else to do.  Zero means the default is an
-     error.  */
+  /* YYDEFACT[S] -- default reduction number in state S.  Performed when
+     YYTABLE doesn't specify something else to do.  Zero means the
+     default is an error.  */
   const unsigned char
   BisonParser::yydefact_[] =
   {
          0,     7,     0,     0,     0,     0,     1,     8,     0,     7,
        4,     3,    10,     5,     9,    12,     0,     0,    15,     0,
       13,     6,    11,     0,     0,     0,     0,     0,     2,    18,
-      14,    16,    23,    17,    25,    24,    19,     0,    20,    26,
-      29,     0,    27,     0,     0,     0,     0,    21,    28,    30,
-      26,     0,    22
+      14,    16,    23,    17,    25,    24,    26,    19,     0,    20,
+      27,    30,     0,    28,     0,     0,     0,     0,    21,    29,
+      31,    27,     0,    22
   };
 
   /* YYPGOTO[NTERM-NUM].  */
   const signed char
   BisonParser::yypgoto_[] =
   {
-       -16,   -16,    -5,   -16,    24,    22,   -16,    15,   -16,   -16,
-       6,   -16,   -16,   -16,   -16,   -15,    -9,   -16
+       -16,   -16,    -5,   -16,    25,    19,   -16,    16,   -16,   -16,
+       9,   -16,   -16,   -16,   -16,   -13,   -10,   -16
   };
 
   /* YYDEFGOTO[NTERM-NUM].  */
   const signed char
   BisonParser::yydefgoto_[] =
   {
-        -1,     2,    40,     4,     5,    13,    19,    20,    23,    28,
-      29,    37,    39,    50,    36,    41,    42,    43
+        -1,     2,    41,     4,     5,    13,    19,    20,    23,    28,
+      29,    38,    40,    51,    37,    42,    43,    44
   };
 
   /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
      positive, shift that token.  If negative, reduce the rule which
-     number is the opposite.  If zero, do what YYDEFACT says.  */
+     number is the opposite.  If YYTABLE_NINF_, syntax error.  */
   const signed char BisonParser::yytable_ninf_ = -1;
   const unsigned char
   BisonParser::yytable_[] =
   {
-        12,     7,     1,     3,     8,    10,    15,    11,    24,    25,
-      18,    12,    22,    34,    35,    44,    45,    52,    45,     3,
-      18,     6,    32,     9,    14,    17,    26,    27,    31,    46,
-      38,    49,    47,    16,    33,    51,    48,     0,    21,     0,
-      30
+        12,     7,     6,     3,     8,     3,    15,    34,    35,    36,
+      18,    12,    22,     1,    39,    14,    10,     9,    11,    17,
+      18,    27,    32,    24,    25,    45,    46,    53,    46,    26,
+      31,    47,    48,    50,    16,    21,    49,    33,    52,     0,
+       0,    30
   };
 
   /* YYCHECK.  */
   const signed char
   BisonParser::yycheck_[] =
   {
-         5,    15,     8,     7,    18,    18,    10,    20,    16,    17,
-      15,    16,    17,    13,    14,    16,    17,    16,    17,     7,
-      25,     0,    27,    16,    15,    17,    15,     9,    18,    15,
-      11,    18,    12,     9,    28,    50,    45,    -1,    16,    -1,
-      25
+         5,    16,     0,     7,    19,     7,    10,    13,    14,    15,
+      15,    16,    17,     8,    11,    16,    19,    17,    21,    18,
+      25,     9,    27,    17,    18,    17,    18,    17,    18,    16,
+      19,    16,    12,    19,     9,    16,    46,    28,    51,    -1,
+      -1,    25
   };
 
   /* STOS_[STATE-NUM] -- The (internal number of the) accessing
@@ -886,12 +992,12 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
   const unsigned char
   BisonParser::yystos_[] =
   {
-         0,     8,    22,     7,    24,    25,     0,    15,    18,    16,
-      18,    20,    23,    26,    15,    10,    25,    17,    23,    27,
-      28,    26,    23,    29,    16,    17,    15,     9,    30,    31,
-      28,    18,    23,    31,    13,    14,    35,    32,    11,    33,
-      23,    36,    37,    38,    16,    17,    15,    12,    37,    18,
-      34,    36,    16
+         0,     8,    23,     7,    25,    26,     0,    16,    19,    17,
+      19,    21,    24,    27,    16,    10,    26,    18,    24,    28,
+      29,    27,    24,    30,    17,    18,    16,     9,    31,    32,
+      29,    19,    24,    32,    13,    14,    15,    36,    33,    11,
+      34,    24,    37,    38,    39,    17,    18,    16,    12,    38,
+      19,    35,    37,    17
   };
 
 #if YYDEBUG
@@ -902,7 +1008,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
   {
          0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275
+     275,   276
   };
 #endif
 
@@ -910,10 +1016,10 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
   const unsigned char
   BisonParser::yyr1_[] =
   {
-         0,    21,    22,    23,    23,    24,    24,    25,    25,    25,
-      26,    26,    27,    27,    27,    29,    28,    30,    30,    32,
-      33,    34,    31,    35,    35,    35,    36,    36,    36,    38,
-      37
+         0,    22,    23,    24,    24,    25,    25,    26,    26,    26,
+      27,    27,    28,    28,    28,    30,    29,    31,    31,    33,
+      34,    35,    32,    36,    36,    36,    36,    37,    37,    37,
+      39,    38
   };
 
   /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
@@ -922,8 +1028,8 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
   {
          0,     2,     7,     1,     1,     2,     4,     0,     2,     3,
        1,     3,     0,     1,     3,     0,     4,     2,     1,     0,
-       0,     0,    12,     0,     1,     1,     0,     1,     3,     0,
-       4
+       0,     0,    12,     0,     1,     1,     1,     0,     1,     3,
+       0,     4
   };
 
 #if YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
@@ -934,7 +1040,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
   {
     "$end", "error", "$undefined", "LCONTROL", "RCONTROL", "KEY_TRUE",
   "KEY_FALSE", "KEY_SAFE", "KEY_PLACE", "KEY_TRANSITION", "KEY_MARKING",
-  "KEY_CONSUME", "KEY_PRODUCE", "KEY_HIGH", "KEY_LOW", "COLON",
+  "KEY_CONSUME", "KEY_PRODUCE", "KEY_HIGH", "KEY_LOW", "KEY_DOWN", "COLON",
   "SEMICOLON", "COMMA", "NUMBER", "NEGATIVE_NUMBER", "IDENT", "$accept",
   "net", "node_name", "places", "capacity", "place_list", "marking_list",
   "marking", "$@1", "transitions", "transition", "$@2", "$@3", "$@4",
@@ -947,15 +1053,16 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
   const BisonParser::rhs_number_type
   BisonParser::yyrhs_[] =
   {
-        22,     0,    -1,     8,    24,    16,    10,    27,    16,    30,
-      -1,    20,    -1,    18,    -1,    25,    26,    -1,    24,    16,
-      25,    26,    -1,    -1,     7,    15,    -1,     7,    18,    15,
-      -1,    23,    -1,    26,    17,    23,    -1,    -1,    28,    -1,
-      27,    17,    28,    -1,    -1,    23,    29,    15,    18,    -1,
-      30,    31,    -1,    31,    -1,    -1,    -1,    -1,     9,    23,
-      35,    32,    11,    33,    36,    16,    12,    34,    36,    16,
-      -1,    -1,    14,    -1,    13,    -1,    -1,    37,    -1,    36,
-      17,    37,    -1,    -1,    23,    38,    15,    18,    -1
+        23,     0,    -1,     8,    25,    17,    10,    28,    17,    31,
+      -1,    21,    -1,    19,    -1,    26,    27,    -1,    25,    17,
+      26,    27,    -1,    -1,     7,    16,    -1,     7,    19,    16,
+      -1,    24,    -1,    27,    18,    24,    -1,    -1,    29,    -1,
+      28,    18,    29,    -1,    -1,    24,    30,    16,    19,    -1,
+      31,    32,    -1,    32,    -1,    -1,    -1,    -1,     9,    24,
+      36,    33,    11,    34,    37,    17,    12,    35,    37,    17,
+      -1,    -1,    14,    -1,    13,    -1,    15,    -1,    -1,    38,
+      -1,    37,    18,    38,    -1,    -1,    24,    39,    16,    19,
+      -1
   };
 
   /* YYPRHS[YYN] -- Index of the first RHS symbol of rule number YYN in
@@ -965,8 +1072,8 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
   {
          0,     0,     3,    11,    13,    15,    18,    23,    24,    27,
       31,    33,    37,    38,    40,    44,    45,    50,    53,    55,
-      56,    57,    58,    71,    72,    74,    76,    77,    79,    83,
-      84
+      56,    57,    58,    71,    72,    74,    76,    78,    79,    81,
+      85,    86
   };
 
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
@@ -975,8 +1082,8 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
   {
          0,    80,    80,    85,    94,   108,   109,   112,   114,   115,
      119,   131,   149,   151,   152,   157,   156,   171,   172,   177,
-     190,   196,   176,   204,   205,   206,   209,   211,   212,   217,
-     216
+     190,   196,   176,   204,   205,   206,   207,   210,   212,   213,
+     218,   217
   };
 
   // Print the state stack on the debug stream.
@@ -1043,7 +1150,7 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20
+      15,    16,    17,    18,    19,    20,    21
     };
     if ((unsigned int) t <= yyuser_token_number_max_)
       return translate_table[t];
@@ -1052,23 +1159,23 @@ namespace pnapi { namespace parser { namespace lola { namespace yy {
   }
 
   const int BisonParser::yyeof_ = 0;
-  const int BisonParser::yylast_ = 40;
+  const int BisonParser::yylast_ = 41;
   const int BisonParser::yynnts_ = 18;
   const int BisonParser::yyempty_ = -2;
   const int BisonParser::yyfinal_ = 6;
   const int BisonParser::yyterror_ = 1;
   const int BisonParser::yyerrcode_ = 256;
-  const int BisonParser::yyntokens_ = 21;
+  const int BisonParser::yyntokens_ = 22;
 
-  const unsigned int BisonParser::yyuser_token_number_max_ = 275;
+  const unsigned int BisonParser::yyuser_token_number_max_ = 276;
   const BisonParser::token_number_type BisonParser::yyundef_token_ = 2;
 
 
-/* Line 1053 of lalr1.cc  */
+/* Line 1136 of lalr1.cc  */
 #line 11 "parser-lola.yy"
 } } } } // pnapi::parser::lola::yy
 
-/* Line 1053 of lalr1.cc  */
-#line 1073 "parser-lola.cc"
+/* Line 1136 of lalr1.cc  */
+#line 1180 "parser-lola.cc"
 
 

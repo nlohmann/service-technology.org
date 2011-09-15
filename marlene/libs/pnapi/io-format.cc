@@ -699,6 +699,7 @@ std::ostream & output(std::ostream & os, const Place & p)
  */
 std::ostream & output(std::ostream & os, const Transition & t)
 {
+  
   return (os << "TRANSITION " << t.getName()
             << delim(", ")
             << "\n  CONSUME "
@@ -823,6 +824,207 @@ std::ostream & output(std::ostream & os, const formula::FormulaLessEqual & f)
 
 } /* namespace __lola */
 
+
+/*************************************************************************
+ ***** IFN output
+ *************************************************************************/
+
+/*!
+ * \brief writes output type to stream 
+ */
+std::ios_base & ifn(std::ios_base & ios)
+{
+  util::FormatData::data(ios) = util::IFN;
+  return ios;
+}
+
+
+namespace __ifn
+{
+
+/*!
+ * \brief petri net output
+ */
+std::ostream & output(std::ostream & os, const PetriNet & net)
+{
+  string creator = net.getMetaInformation(os, CREATOR, PACKAGE_STRING);
+  string inputfile = net.getMetaInformation(os, INPUTFILE);
+
+  os //< output everything to this stream
+
+  << "{ Petri net created by " << creator
+  << (inputfile.empty() ? "" : " reading " + inputfile)
+  << " }\n\n"
+
+  << "PLACE\n  " << mode(io::util::PLACE) << delim(", ")
+  << net.places_ << ";\n\n"
+
+  << "MARKING\n  " << mode(io::util::PLACE_TOKEN)
+  << filterMarkedPlaces(net.places_) << ";\n\n\n"
+
+  // transitions
+  << delim("\n") << net.transitions_ << endl
+  << endl;
+
+  if (util::FormulaData::data(os).formula)
+  {
+    os << "FORMULA\n  "
+       << net.finalCondition_ << endl
+       << endl;
+  }
+
+  return (os << "{ END OF FILE }\n");
+}
+
+/*!
+ * \brief place output
+ */
+std::ostream & output(std::ostream & os, const Place & p)
+{
+  os << p.getName();
+  
+  if(ModeData::data(os) == io::util::PLACE_TOKEN)
+  {
+    os << ":" << p.getTokenCount();
+  }
+  
+  return os;
+}
+
+/*!
+ * \brief transition output
+ */
+std::ostream & output(std::ostream & os, const Transition & t)
+{
+  string confidence = "";
+  
+  if (t.getConfidence() == 1) {confidence = " LOW";}
+  if (t.getConfidence() == 2) {confidence = " HIGH";}
+  
+  return (os << "TRANSITION " << t.getName()
+            << confidence
+            << delim(", ")
+            << "\n  CONSUME "
+            << t.getPresetArcs() << ";\n"
+            << "  PRODUCE "
+            << t.getPostsetArcs() << ";\n");
+}
+
+/*!
+ * \brief arc output
+ */
+std::ostream & output(std::ostream & os, const Arc & arc)
+{
+  return (os << arc.getPlace().getName() << ":" << arc.getWeight());
+}
+
+/*!
+ * \brief negation output
+ */
+std::ostream & output(std::ostream & os, const formula::Negation & f)
+{
+  if (f.getChildren().empty())
+    throw exception::NotImplementedError("don't know how to print a negation of nothing");
+  else
+    return (os << "NOT (" << **f.getChildren().begin() << ")");
+}
+
+/*
+ * \brief conjunction output
+ */
+std::ostream & output(std::ostream & os, const formula::Conjunction & f)
+{
+  if(f.getChildren().empty())
+  {
+    //return os << formula::FormulaTrue();
+    throw exception::NotImplementedError("don't know how to print an empty conjunction");
+  }
+  else
+    return (os << "(" << delim(" AND ") << f.getChildren() << ")");
+}
+
+
+/*!
+ * \brief disjunction output
+ */
+std::ostream & output(std::ostream & os, const formula::Disjunction & f)
+{
+  if(f.getChildren().empty())
+  {
+    //return os << formula::FormulaFalse();
+    throw exception::NotImplementedError("don't know how to print an empty disjunction");
+  }
+  else
+    return (os << "(" << delim(" OR ") << f.getChildren() << ")");
+}
+
+/*!
+ * \brief output FormulaTrue
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaTrue &)
+{
+  return (os << "TRUE");  // keyword not yet implemented in lola
+  // TODO: remove comment when done
+}
+
+/*!
+ * \brief output FormulaFalse
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaFalse &)
+{
+  return (os << "FALSE"); // keyword not yet implemented in lola
+  // TODO: remove comment when done
+}
+
+/*!
+ * \brief output FormulaEqual
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaEqual & f)
+{
+  return (os << f.getPlace().getName() << " = " << f.getTokens());
+}
+
+/*!
+ * \brief output FormulaNotEqual
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaNotEqual & f)
+{
+  return (os << f.getPlace().getName() << " # " << f.getTokens());
+}
+
+/*!
+ * \brief output FormulaGreater
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaGreater & f)
+{
+  return (os << f.getPlace().getName() << " > " << f.getTokens());
+}
+
+/*!
+ * \brief output FormulaGreaterEqual
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaGreaterEqual & f)
+{
+  return (os << f.getPlace().getName() << " >= " << f.getTokens());
+}
+
+/*!
+ * \brief output FormulaLess
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaLess & f)
+{
+  return (os << f.getPlace().getName() << " < " << f.getTokens());
+}
+
+/*!
+ * \brief output FormulaLessEqual
+ */
+std::ostream & output(std::ostream & os, const formula::FormulaLessEqual & f)
+{
+  return (os << f.getPlace().getName() << " <= " << f.getTokens());
+}
+
+} /* namespace __ifn */
 
 
 /*************************************************************************

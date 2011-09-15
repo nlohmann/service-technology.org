@@ -1,0 +1,11 @@
+Um ein neues Release für ein bereits veröffentliches Tool erzeugen, sind folgende Schritte notwendig:
+1. in der configure.ac die Versionsnummer anpassen
+2. in der changelog.texi einen Eintrag für die neue Versionsnummer anlegen
+3. Commit der neuen Version
+4. Releaserequest an Niels schicken (damit er das Skript ausführt)
+
+Danach am besten noch eine neuen Release vorbereiten. Dazu:
+1. in der configure.ac die Versionsnummer erhöhen und -unreleased dahinter schreiben
+2. in der changelog.texi analog verfahren und dort während der Entwicklung schon die Stichpunkte sammeln
+
+Sofern man so verfährt, ändert sich das eigentlich Releaseverfahren durch Entfernen des Zusatzes "-unreleased".

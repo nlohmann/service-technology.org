@@ -51,7 +51,7 @@ rm -rf ./libs/pnapi/*
 # get last successful build of the API from esla
 cd ./libs/pnapi/
 if [ "$1" == "--most-recent" ]; then
-  wget http://esla.informatik.uni-rostock.de:8080/job/pnapi/lastSuccessfulBuild/artifact/pnapi/pnapi.tar.gz
+  wget http://esla.informatik.uni-rostock.de/jenkins/job/pnapi/lastSuccessfulBuild/artifact/artifacts/pnapi.tar.gz
   tar xfz pnapi.tar.gz
 else
   wget http://service-technology.org/files/pnapi/pnapi.tar.gz

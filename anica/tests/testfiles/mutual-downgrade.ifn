@@ -1,0 +1,67 @@
+PLACE
+  a,b,c,x,y,z,s,cs,ds,dcs
+;
+
+
+MARKING
+  s:    1,
+  a:  1,
+  x:  1
+;
+
+
+TRANSITION h1 HIGH
+CONSUME
+  a:    1;
+PRODUCE
+  b:	  1;
+  
+TRANSITION h2 HIGH
+CONSUME
+  s:      1,
+  b:    1;
+PRODUCE
+  c:	  1,
+  cs:     1;
+
+TRANSITION h3 HIGH
+CONSUME
+  cs:      1,
+  c:    1;
+PRODUCE
+  a:	  1,
+  s:     1;
+  
+TRANSITION l1 LOW
+CONSUME
+  x:    1;
+PRODUCE
+  y:	  1;
+  
+TRANSITION l2 LOW
+CONSUME
+  ds:      1,
+  y:    1;
+PRODUCE
+  z:	  1,
+  cs:     1;
+
+TRANSITION l3 LOW
+CONSUME
+  dcs:      1,
+  z:    1;
+PRODUCE
+  x:	  1,
+  s:     1;
+  
+TRANSITION d1 DOWN
+CONSUME
+  s:     1;
+PRODUCE
+  ds:    1;
+
+TRANSITION d2 DOWN
+CONSUME
+  cs:     1;
+PRODUCE
+  dcs:    1;

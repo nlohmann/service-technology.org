@@ -58,8 +58,8 @@ option "witnessPath" -
 option "dotConfidence" -
   "Create a dot file with confidence annotations."
   details="This option is used when Anica should create an colored dot file with the annotated confidence levels of the transitions.\n"
-  values="low","high","both" enum
-  default="both"
+  values="low","down","high","all" enum
+  default="all"
   optional
 
 option "dotPotential" -
@@ -100,7 +100,7 @@ option "lola" -
 option "unlabeledTransitions" -
   "How to handle unlabeled transitions."
   details="By default unlabeled transitions are not allowed. To be more flexible you can choose a standard value for unlabeled transitions.\n"
-  values="high","low","none" enum
+  values="high","low","down","none" enum
   default="none"
   optional
 

@@ -152,7 +152,7 @@ AT_SETUP([Label transitions HIGH])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/missing-confidence.ifn .])
 AT_CHECK([ANICA missing-confidence.ifn -v --unlabeledTransitions=high],0,ignore,stderr)
-AT_CHECK([GREP -q "only one confidence level used" stderr])
+AT_CHECK([GREP -q "trivial confidence level used" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -160,7 +160,15 @@ AT_SETUP([Label transitions LOW])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/missing-confidence.ifn .])
 AT_CHECK([ANICA missing-confidence.ifn -v --unlabeledTransitions=low],0,ignore,stderr)
-AT_CHECK([GREP -q "only one confidence level used" stderr])
+AT_CHECK([GREP -q "trivial confidence level used" stderr])
+AT_KEYWORDS(infrastructure)
+AT_CLEANUP
+
+AT_SETUP([Label transitions DOWN])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/missing-confidence.ifn .])
+AT_CHECK([ANICA missing-confidence.ifn -v --unlabeledTransitions=down],0,ignore,stderr)
+AT_CHECK([GREP -q "trivial confidence level used" stderr])
 AT_KEYWORDS(infrastructure)
 AT_CLEANUP
 
@@ -335,10 +343,10 @@ AT_CHECK([test -f activeConflict.ifn.active.dot])
 AT_KEYWORDS(output)
 AT_CLEANUP
 
-AT_SETUP([Confidence (both)])
+AT_SETUP([Confidence (all)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/activeCausal.ifn .])
-AT_CHECK([ANICA activeCausal.ifn --dotConfidence=both],0,ignore,stderr)
+AT_CHECK([ANICA activeCausal.ifn --dotConfidence=all],0,ignore,stderr)
 AT_CHECK([test -f activeCausal.ifn.confidence.dot])
 AT_KEYWORDS(output)
 AT_CLEANUP
@@ -359,6 +367,14 @@ AT_CHECK([test -f activeCausal.ifn.confidence.dot])
 AT_KEYWORDS(output)
 AT_CLEANUP
 
+AT_SETUP([Confidence (down)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausal.ifn .])
+AT_CHECK([ANICA activeCausal.ifn --dotConfidence=down],0,ignore,stderr)
+AT_CHECK([test -f activeCausal.ifn.confidence.dot])
+AT_KEYWORDS(output)
+AT_CLEANUP
+
 ############################################################################
 AT_BANNER([Valgrind])
 ############################################################################
@@ -366,7 +382,7 @@ AT_BANNER([Valgrind])
 AT_SETUP([Checking for memory leaks])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/both.ifn .])
-AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes ANICA_RAW both.ifn -v --stats --dotConfidence=both --dotPotential=both --dotActive=both],0,ignore,stderr)
+AT_CHECK([VALGRIND --leak-check=full --show-reachable=yes ANICA_RAW both.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both],0,ignore,stderr)
 AT_CHECK([GREP -q "All heap blocks were freed -- no leaks are possible" stderr])
 AT_KEYWORDS(valgrind)
 AT_CLEANUP
@@ -378,7 +394,7 @@ AT_BANNER([Coverage])
 AT_SETUP([Potential causal (Lola)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/potentialCausal.ifn .])
-AT_CHECK([ANICA potentialCausal.ifn -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola --activePlaces=none],0,ignore,stderr)
+AT_CHECK([ANICA potentialCausal.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=lola --activePlaces=none],0,ignore,stderr)
 AT_CHECK([GREP -q "Non-Interference: POTENTIAL" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
@@ -386,7 +402,7 @@ AT_CLEANUP
 AT_SETUP([Potential conflict (Lola)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/potentialConflict.ifn .])
-AT_CHECK([ANICA potentialConflict.ifn -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola --activePlaces=none],0,ignore,stderr)
+AT_CHECK([ANICA potentialConflict.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=lola --activePlaces=none],0,ignore,stderr)
 AT_CHECK([GREP -q "Non-Interference: POTENTIAL" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
@@ -394,7 +410,7 @@ AT_CLEANUP
 AT_SETUP([Active causal (Lola)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/activeCausal.ifn .])
-AT_CHECK([ANICA activeCausal.ifn -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
+AT_CHECK([ANICA activeCausal.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
 AT_CHECK([GREP -q "Non-Interference: FAILED" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
@@ -402,9 +418,9 @@ AT_CLEANUP
 AT_SETUP([Illegal causal sequence (Lola)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/causal-illegal-sequence.ifn .])
-AT_CHECK([ANICA causal-illegal-sequence.ifn -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
+AT_CHECK([ANICA causal-illegal-sequence.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
 AT_CHECK([GREP -q "Non-Interference: FAILED" stderr])
-AT_CHECK([ANICA causal-illegal-sequence.ifn -v --oneTriple --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
+AT_CHECK([ANICA causal-illegal-sequence.ifn -v --oneTriple --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
 AT_CHECK([GREP -q "........not active" stderr])
 AT_CHECK([GREP -q "Non-Interference: FAILED" stderr])
 AT_KEYWORDS(tests)
@@ -413,7 +429,7 @@ AT_CLEANUP
 AT_SETUP([Active conflict (Lola)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/activeConflict.ifn .])
-AT_CHECK([ANICA activeConflict.ifn -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
+AT_CHECK([ANICA activeConflict.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
 AT_CHECK([GREP -q "Non-Interference: FAILED" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
@@ -421,7 +437,31 @@ AT_CLEANUP
 AT_SETUP([Both (Lola)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/both.ifn .])
-AT_CHECK([ANICA both.ifn -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
+AT_CHECK([ANICA both.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
+AT_CHECK([GREP -q "Non-Interference: FAILED" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Mutual (Lola)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/mutual.ifn .])
+AT_CHECK([ANICA mutual.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
+AT_CHECK([GREP -q "Non-Interference: FAILED" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Mutual downgrade (Lola)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/mutual-downgrade.ifn .])
+AT_CHECK([ANICA mutual-downgrade.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
+AT_CHECK([GREP -q "Non-Interference: PASSED" stderr])
+AT_KEYWORDS(tests)
+AT_CLEANUP
+
+AT_SETUP([Actice causal downgrade (Lola)])
+AT_CHECK_LOLA
+AT_CHECK([cp TESTFILES/activeCausalDowngrade.ifn .])
+AT_CHECK([ANICA activeCausalDowngrade.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
 AT_CHECK([GREP -q "Non-Interference: FAILED" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
@@ -429,35 +469,35 @@ AT_CLEANUP
 AT_SETUP([None (Lola)])
 AT_CHECK_LOLA
 AT_CHECK([cp TESTFILES/none.ifn .])
-AT_CHECK([ANICA none.ifn -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
+AT_CHECK([ANICA none.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=lola],0,ignore,stderr)
 AT_CHECK([GREP -q "Non-Interference: PASSED" stderr])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 
 AT_SETUP([Active causal (Makefile)])
 AT_CHECK([cp TESTFILES/activeCausal.ifn .])
-AT_CHECK([ANICA activeCausal.ifn -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
+AT_CHECK([ANICA activeCausal.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
 AT_CHECK([test -f activeCausal.ifn.makefile])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 
 AT_SETUP([Active conflict (Makefile)])
 AT_CHECK([cp TESTFILES/activeConflict.ifn .])
-AT_CHECK([ANICA activeConflict.ifn -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
+AT_CHECK([ANICA activeConflict.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
 AT_CHECK([test -f activeConflict.ifn.makefile])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 
 AT_SETUP([Both (Makefile)])
 AT_CHECK([cp TESTFILES/both.ifn .])
-AT_CHECK([ANICA both.ifn -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
+AT_CHECK([ANICA both.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
 AT_CHECK([test -f both.ifn.makefile])
 AT_KEYWORDS(tests)
 AT_CLEANUP
 
 AT_SETUP([None (Makefile)])
 AT_CHECK([cp TESTFILES/none.ifn .])
-AT_CHECK([ANICA none.ifn -v --stats --dotConfidence=both --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
+AT_CHECK([ANICA none.ifn -v --stats --dotConfidence=all --dotPotential=both --dotActive=both --modus=makefile],0,ignore,stderr)
 AT_CHECK([test -f none.ifn.makefile])
 AT_KEYWORDS(tests)
 AT_CLEANUP

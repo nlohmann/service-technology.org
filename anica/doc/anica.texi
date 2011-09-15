@@ -114,7 +114,7 @@ to execute the testcases located in @file{tests}. If everything went fine, you s
 ## Test results. ##
 ## ------------- ##
 
-All 48 tests were successful.
+All 56 tests were successful.
 @end smallexample
 
 If an error occurs, please send the output to @email{anica@@service-technology.org}.
@@ -338,6 +338,9 @@ The number of transitions assigned with high confidence level of the input net. 
 
 @item low
 The number of transitions assigned with low confidence level of the input net. [Integer]
+
+@item down
+The number of transitions assigned with downgrading confidence level of the input net. [Integer]
 
 @item arcs
 The number of arcs of the input net. [Integer]

@@ -314,6 +314,7 @@ int main(int argc, char** argv) {
 	bool checkActiveCausal = ((args_info.activePlaces_arg == activePlaces_arg_causal) || (args_info.activePlaces_arg == activePlaces_arg_both));
 	bool checkActiveConflict = ((args_info.activePlaces_arg == activePlaces_arg_conflict) || (args_info.activePlaces_arg == activePlaces_arg_both));
 
+    std::set<pnapi::Transition *> downgradeTransitions;
 	std::set<pnapi::Place *> potentialCausal;
 	std::set<pnapi::Place *> potentialConflict;
 	std::set<pnapi::Place *> activeCausal;
@@ -323,6 +324,7 @@ int main(int argc, char** argv) {
     | 3. handle confidence			   |
     `---------------------------------*/
 
+    unsigned int downTransitions = 0;
 	unsigned int highTransitions = 0;
 	unsigned int lowTransitions = 0;
 	unsigned int curConfidence;
@@ -342,13 +344,22 @@ int main(int argc, char** argv) {
 				(**t).setConfidence(2);
 				highTransitions++;
 			}
+			else if (args_info.unlabeledTransitions_arg == unlabeledTransitions_arg_down) {
+				(**t).setConfidence(3);
+				downTransitions++;
+				downgradeTransitions.insert((pnapi::Transition *)*t);
+			}
 		}
 		else if (curConfidence == 1) {lowTransitions++;}
 		else if (curConfidence == 2) {highTransitions++;}
+		else if (curConfidence == 3) {
+		    downTransitions++;
+		    downgradeTransitions.insert((pnapi::Transition *)*t);
+		}
 	}
 
 	if (lowTransitions == 0 || highTransitions == 0) {
-		status("only one confidence level used");
+		status("trivial confidence level used");
 		message(_cgood_("Non-Interference: PASSED"));
 		return EXIT_SUCCESS;
 	}
@@ -356,11 +367,14 @@ int main(int argc, char** argv) {
 	if (args_info.dotConfidence_given) {
 		PNAPI_FOREACH(t, net.getTransitions()) {
 			(**t).setColor("");
-			if ((**t).getConfidence() == 1 && args_info.dotConfidence_arg != dotConfidence_arg_high) {
+			if ((**t).getConfidence() == 1 && ((args_info.dotConfidence_arg == dotConfidence_arg_low) || (args_info.dotConfidence_arg = dotConfidence_arg_all)) ) {
 				(**t).setColor("green");
 			}
-			if ((**t).getConfidence() == 2 && args_info.dotConfidence_arg != dotConfidence_arg_low) {
-				(**t).setColor("blue");
+			if ((**t).getConfidence() == 2 && ((args_info.dotConfidence_arg == dotConfidence_arg_high) || (args_info.dotConfidence_arg = dotConfidence_arg_all)) ) {
+				(**t).setColor("red");
+			}
+			if ((**t).getConfidence() == 3 && ((args_info.dotConfidence_arg == dotConfidence_arg_down) || (args_info.dotConfidence_arg = dotConfidence_arg_all)) ) {
+				(**t).setColor("yellow");
 			}
 		}
 		createDotFile(std::string(fileName + ".confidence"), net, fileName);
@@ -394,7 +408,7 @@ int main(int argc, char** argv) {
 			if (((pnapi::Transition *)(*t))->getConfidence() == 2) {
 				lHighPost.insert((pnapi::Transition *)*t);
 			}
-			else {
+			else if (((pnapi::Transition *)(*t))->getConfidence() == 1) {
 				lLowPost.insert((pnapi::Transition *)*t);
 			}
 		}
@@ -439,17 +453,17 @@ int main(int argc, char** argv) {
 				// causal interesting
 				if (potentialCausal.find(*p) != potentialCausal.end()) {
 					// causal confirmed
-					(**p).setColor("yellow");
+					(**p).setColor("blue");
 					if (args_info.dotPotential_arg == dotPotential_arg_both) {
 						if (potentialConflict.find(*p) != potentialConflict.end()) {
-							(**p).setColor("orange");
+							(**p).setColor("brown");
 						}
 					}
 				}
 			}
 			else {
 				if (potentialConflict.find(*p) != potentialConflict.end()) {
-					(**p).setColor("red");
+					(**p).setColor("orange");
 				}
 			}
 		}
@@ -507,11 +521,9 @@ int main(int argc, char** argv) {
 
                         PNAPI_FOREACH(prePlace, curHigh->getPreset()) {
                             newArcs.insert(std::make_pair(*prePlace, highCopy));
-                            //cNet.createArc(**prePlace, *highCopy);
                         }
                         PNAPI_FOREACH(postPlace, curHigh->getPostset()) {
                             newArcs.insert(std::make_pair(highCopy, *postPlace));
-                            //cNet.createArc(*highCopy, **postPlace);
                         }
                         
                         PNAPI_FOREACH(prePlace, curLow->getPreset()) {
@@ -525,6 +537,14 @@ int main(int argc, char** argv) {
 							    newArcs.insert(std::make_pair(cPlace, *preTransition));
 							    newArcs.insert(std::make_pair(cPlace, highCopy));
 							}
+						}
+
+                        //handle downgrading transitions
+                        PNAPI_FOREACH(downTransition, downgradeTransitions) {
+					        pnapi::Place * cPlace = &cNet.createPlace("", 1);
+					        newArcs.insert(std::make_pair(*downTransition, cPlace));
+						    newArcs.insert(std::make_pair(cPlace, *downTransition));
+						    newArcs.insert(std::make_pair(cPlace, highCopy));
 						}
 
                         FOREACH(a, newArcs) {
@@ -610,12 +630,10 @@ int main(int argc, char** argv) {
                         PNAPI_FOREACH(prePlace, curHigh->getPreset()) {
                             newArcs.insert(std::make_pair(*prePlace, highCopy));
                             newArcs.insert(std::make_pair(highCopy, *prePlace));
-                            //cNet.createArc(**prePlace, *highCopy);
                         }
                         
                         PNAPI_FOREACH(prePlace, curLow->getPreset()) {
                             newArcs.insert(std::make_pair(*prePlace, lowCopy));
-                            //cNet.createArc(**prePlace, *lowCopy);
                         }
 
 						PNAPI_FOREACH(preTransition, curPlace->getPreset()) {
@@ -625,6 +643,14 @@ int main(int argc, char** argv) {
 							    newArcs.insert(std::make_pair(cPlace, *preTransition));
 							    newArcs.insert(std::make_pair(cPlace, highCopy));
 							}
+						}
+
+                        //handle downgrading transitions
+                        PNAPI_FOREACH(downTransition, downgradeTransitions) {
+					        pnapi::Place * cPlace = &cNet.createPlace("", 1);
+					        newArcs.insert(std::make_pair(*downTransition, cPlace));
+						    newArcs.insert(std::make_pair(cPlace, *downTransition));
+						    newArcs.insert(std::make_pair(cPlace, highCopy));
 						}
 
                         FOREACH(a, newArcs) {
@@ -730,17 +756,17 @@ int main(int argc, char** argv) {
 						// causal interesting
 						if (activeCausal.find(*p) != activeCausal.end()) {
 							// causal confirmed
-							(**p).setColor("yellow");
+							(**p).setColor("blue");
 							if (args_info.dotActive_arg == dotActive_arg_both) {
 								if (activeConflict.find(*p) != activeConflict.end()) {
-									(**p).setColor("orange");
+									(**p).setColor("brown");
 								}
 							}
 						}
 					}
 					else {
 						if (activeConflict.find(*p) != activeConflict.end()) {
-							(**p).setColor("red");
+							(**p).setColor("orange");
 						}
 					}
 				}
@@ -799,6 +825,7 @@ int main(int argc, char** argv) {
 			results.add("net.places", (unsigned int)(net.getPlaces().size()));
 			results.add("net.transitions", (unsigned int)(net.getTransitions().size()));
 			results.add("net.high", highTransitions);
+			results.add("net.down", downTransitions);
 			results.add("net.low", lowTransitions);
 			results.add("net.arcs", (unsigned int)(net.getArcs().size()));
 		}

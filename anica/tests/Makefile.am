@@ -22,12 +22,15 @@
 
 # <<-- CHANGE START (testfiles) -->>
 TESTFILES = activeCausal.ifn \
+            activeCausalDowngrade.ifn \
             activeConflict.ifn \
             both.ifn \
             none.ifn \
 			potentialCausal.ifn \
 			potentialConflict.ifn \
 			missing-confidence.ifn \
+			mutual.ifn \
+			mutual-downgrade.ifn \
 			wrong-format.ifn \
 			causal-illegal-sequence.ifn
 # <<-- CHANGE END -->>

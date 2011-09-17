@@ -26,6 +26,12 @@ Version 4.03-unreleased
 
 * fixed transition types on interface "arc" removing
 
+* added confidence level for transitions (to check non-interference)
+
+* added new file format: IFN (information flow net) based on LoLA format
+
+* creating arcs between two nets will now raise an exception
+
 Version 4.02 (2010-07-28)
 =========================
 

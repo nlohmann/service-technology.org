@@ -898,6 +898,8 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
  */
 Arc & PetriNet::createArc(Node & source, Node & target, unsigned int weight)
 {
+  PNAPI_ASSERT_USER(&source.getPetriNet() == this, "arcs only allowed within the same net", exception::UserCausedError::UE_ARC_CONFLICT);
+  PNAPI_ASSERT_USER(&target.getPetriNet() == this, "arcs only allowed within the same net", exception::UserCausedError::UE_ARC_CONFLICT);
   return *new Arc(*this, observer_, source, target, weight);
 }
 

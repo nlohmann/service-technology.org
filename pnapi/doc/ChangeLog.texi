@@ -7,6 +7,9 @@
 @item introduced classes PlaceIndexVector and OmegaMarking
 @item disabled place-to-place arcs and transition-to-transition arcs
 @item fixed transition types on interface "arc" removing
+@item added confidence level for transitions (to check non-interference)
+@item added new file format: IFN (information flow net) based on LoLA format
+@item creating arcs between two nets will now raise an exception
 @end itemize
 
 @heading Version 4.02 (2010-07-28)

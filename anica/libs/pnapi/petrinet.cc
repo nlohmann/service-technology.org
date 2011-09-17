@@ -9,13 +9,13 @@
  *          Christian Gierds <gierds@informatik.hu-berlin.de>,
  *          Martin Znamirowski <znamirow@informatik.hu-berlin.de>,
  *          Robert Waltemath <robert.waltemath@uni-rostock.de>,
- *          last changes of: $Author: gierds $
+ *          last changes of: $Author: cas $
  *
  * \since   2005-10-18
  *
- * \date    $Date: 2011-03-24 14:54:57 +0100 (Thu, 24 Mar 2011) $
+ * \date    $Date: 2011-09-17 04:12:13 +0200 (Sat, 17 Sep 2011) $
  *
- * \version $Revision: 6507 $
+ * \version $Revision: 6853 $
  */
 
 #include "config.h"
@@ -898,6 +898,8 @@ void PetriNet::compose(const PetriNet & net, const std::string & myPrefix,
  */
 Arc & PetriNet::createArc(Node & source, Node & target, unsigned int weight)
 {
+  PNAPI_ASSERT_USER(&source.getPetriNet() == this, "arcs only allowed within the same net", exception::UserCausedError::UE_ARC_CONFLICT);
+  PNAPI_ASSERT_USER(&target.getPetriNet() == this, "arcs only allowed within the same net", exception::UserCausedError::UE_ARC_CONFLICT);
   return *new Arc(*this, observer_, source, target, weight);
 }
 

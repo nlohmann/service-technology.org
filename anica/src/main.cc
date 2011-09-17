@@ -314,7 +314,7 @@ int main(int argc, char** argv) {
 	bool checkActiveCausal = ((args_info.activePlaces_arg == activePlaces_arg_causal) || (args_info.activePlaces_arg == activePlaces_arg_both));
 	bool checkActiveConflict = ((args_info.activePlaces_arg == activePlaces_arg_conflict) || (args_info.activePlaces_arg == activePlaces_arg_both));
 
-    std::set<pnapi::Transition *> downgradeTransitions;
+    std::set<std::string> downgradeTransitions;
 	std::set<pnapi::Place *> potentialCausal;
 	std::set<pnapi::Place *> potentialConflict;
 	std::set<pnapi::Place *> activeCausal;
@@ -347,14 +347,14 @@ int main(int argc, char** argv) {
 			else if (args_info.unlabeledTransitions_arg == unlabeledTransitions_arg_down) {
 				(**t).setConfidence(3);
 				downTransitions++;
-				downgradeTransitions.insert((pnapi::Transition *)*t);
+				downgradeTransitions.insert((**t).getName());
 			}
 		}
 		else if (curConfidence == 1) {lowTransitions++;}
 		else if (curConfidence == 2) {highTransitions++;}
 		else if (curConfidence == 3) {
 		    downTransitions++;
-		    downgradeTransitions.insert((pnapi::Transition *)*t);
+		    downgradeTransitions.insert((**t).getName());
 		}
 	}
 
@@ -527,7 +527,7 @@ int main(int argc, char** argv) {
                         }
                         
                         PNAPI_FOREACH(prePlace, curLow->getPreset()) {
-                            cNet.createArc(**prePlace, *lowCopy);
+                            newArcs.insert(std::make_pair(*prePlace, lowCopy));
                         }
 
 						PNAPI_FOREACH(preTransition, curPlace->getPreset()) {
@@ -542,8 +542,9 @@ int main(int argc, char** argv) {
                         //handle downgrading transitions
                         PNAPI_FOREACH(downTransition, downgradeTransitions) {
 					        pnapi::Place * cPlace = &cNet.createPlace("", 1);
-					        newArcs.insert(std::make_pair(*downTransition, cPlace));
-						    newArcs.insert(std::make_pair(cPlace, *downTransition));
+					        pnapi::Transition * cDown = (pnapi::Transition *)cNet.findNode(*downTransition);
+					        newArcs.insert(std::make_pair(cDown, cPlace));
+						    newArcs.insert(std::make_pair(cPlace, cDown));
 						    newArcs.insert(std::make_pair(cPlace, highCopy));
 						}
 
@@ -563,6 +564,7 @@ int main(int argc, char** argv) {
 						o << pnapi::io::lola << cNet;
 						o << "\n\nFORMULA (" << goal->getName() << " = 1 )\n";
 						o.close();
+						
                         status("........%s created", _cfilename_(curFileName));
 
 						allNets.insert(curFileName);
@@ -648,8 +650,9 @@ int main(int argc, char** argv) {
                         //handle downgrading transitions
                         PNAPI_FOREACH(downTransition, downgradeTransitions) {
 					        pnapi::Place * cPlace = &cNet.createPlace("", 1);
-					        newArcs.insert(std::make_pair(*downTransition, cPlace));
-						    newArcs.insert(std::make_pair(cPlace, *downTransition));
+					        pnapi::Transition * cDown = (pnapi::Transition *)cNet.findNode(*downTransition);
+					        newArcs.insert(std::make_pair(cDown, cPlace));
+						    newArcs.insert(std::make_pair(cPlace, cDown));
 						    newArcs.insert(std::make_pair(cPlace, highCopy));
 						}
 

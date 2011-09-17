@@ -900,6 +900,7 @@ std::ostream & output(std::ostream & os, const Transition & t)
   
   if (t.getConfidence() == 1) {confidence = " LOW";}
   if (t.getConfidence() == 2) {confidence = " HIGH";}
+  if (t.getConfidence() == 3) {confidence = " DOWN";}
   
   return (os << "TRANSITION " << t.getName()
             << confidence

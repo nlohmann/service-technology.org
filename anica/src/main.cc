@@ -142,6 +142,12 @@ void evaluateParameters(int argc, char** argv) {
     free(params);
 }
 
+void clearColors(pnapi::PetriNet & Petrinet) {
+    PNAPI_FOREACH(node, Petrinet.getNodes()) {
+        (**node).setColor("");
+    }
+}
+
 void createDotFile(const std::string & OutputFile, pnapi::PetriNet & Petrinet, const std::string & InputFile) {
 	std::ofstream outStream;
 
@@ -365,8 +371,8 @@ int main(int argc, char** argv) {
 	}
 
 	if (args_info.dotConfidence_given) {
+	    clearColors(net);
 		PNAPI_FOREACH(t, net.getTransitions()) {
-			(**t).setColor("");
 			if ((**t).getConfidence() == 1 && ((args_info.dotConfidence_arg == dotConfidence_arg_low) || (args_info.dotConfidence_arg = dotConfidence_arg_all)) ) {
 				(**t).setColor("green");
 			}
@@ -447,8 +453,8 @@ int main(int argc, char** argv) {
 	}
 
 	if (args_info.dotPotential_given) {
+	    clearColors(net);
 		PNAPI_FOREACH(p, net.getPlaces()) {
-			(**p).setColor("");
 			if (args_info.dotPotential_arg != dotPotential_arg_conflict) {
 				// causal interesting
 				if (potentialCausal.find(*p) != potentialCausal.end()) {
@@ -753,8 +759,8 @@ int main(int argc, char** argv) {
 		} // (args_info.modus_arg == modus_arg_makefile) {
 		else {
 			if (args_info.dotActive_given) {
+			    clearColors(net);
 				PNAPI_FOREACH(p, net.getPlaces()) {
-					(**p).setColor("");
 					if (args_info.dotActive_arg != dotActive_arg_conflict) {
 						// causal interesting
 						if (activeCausal.find(*p) != activeCausal.end()) {

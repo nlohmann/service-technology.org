@@ -537,7 +537,7 @@ int main(int argc, char** argv) {
                         }
 
 						PNAPI_FOREACH(preTransition, curPlace->getPreset()) {
-						    if ((**preTransition).getName() != (*curLow).getName()) {
+						    if (((**preTransition).getName() != (*curLow).getName()) && ( (**preTransition).getName() != (*curHigh).getName() )) {
 						        pnapi::Place * cPlace = &cNet.createPlace("", 1);
 						        newArcs.insert(std::make_pair(*preTransition, cPlace));
 							    newArcs.insert(std::make_pair(cPlace, *preTransition));
@@ -645,7 +645,7 @@ int main(int argc, char** argv) {
                         }
 
 						PNAPI_FOREACH(preTransition, curPlace->getPreset()) {
-						    if ((**preTransition).getName() != (*curLow).getName()) {
+						    if (((**preTransition).getName() != (*curLow).getName()) && ( (**preTransition).getName() != (*curHigh).getName() )) {
 						        pnapi::Place * cPlace = &cNet.createPlace("", 1);
 						        newArcs.insert(std::make_pair(*preTransition, cPlace));
 							    newArcs.insert(std::make_pair(cPlace, *preTransition));

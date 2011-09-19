@@ -142,13 +142,13 @@ void evaluateParameters(int argc, char** argv) {
     free(params);
 }
 
-void clearColors(pnapi::PetriNet & Petrinet) {
+inline void clearColors(pnapi::PetriNet & Petrinet) {
     PNAPI_FOREACH(node, Petrinet.getNodes()) {
         (**node).setColor("");
     }
 }
 
-void createDotFile(const std::string & OutputFile, pnapi::PetriNet & Petrinet, const std::string & InputFile) {
+inline void createDotFile(const std::string & OutputFile, pnapi::PetriNet & Petrinet, const std::string & InputFile) {
 	std::ofstream outStream;
 
 	outStream.open(std::string(OutputFile + ".dot").c_str(), std::ios_base::trunc);
@@ -167,7 +167,7 @@ void createDotFile(const std::string & OutputFile, pnapi::PetriNet & Petrinet, c
 }
 
 
-bool callLoLA(std::string netFile) {
+inline bool callLoLA(std::string netFile) {
 
 	time_t start_time, end_time;
 	std::string outputParam;
@@ -325,6 +325,11 @@ int main(int argc, char** argv) {
 	std::set<pnapi::Place *> potentialConflict;
 	std::set<pnapi::Place *> activeCausal;
 	std::set<pnapi::Place *> activeConflict;
+	
+	std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> > potentialCausalTriple;
+    std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> > potentialConflictTriple;
+    std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> > activeCausalTriple;
+    std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> > activeConflictTriple;
 
 	/*---------------------------------.
     | 3. handle confidence			   |
@@ -371,7 +376,7 @@ int main(int argc, char** argv) {
 	}
 
 	if (args_info.dotConfidence_given) {
-	    clearColors(net);
+	    //clearColors(net);
 		PNAPI_FOREACH(t, net.getTransitions()) {
 			if ((**t).getConfidence() == 1 && ((args_info.dotConfidence_arg == dotConfidence_arg_low) || (args_info.dotConfidence_arg = dotConfidence_arg_all)) ) {
 				(**t).setColor("green");
@@ -453,7 +458,7 @@ int main(int argc, char** argv) {
 	}
 
 	if (args_info.dotPotential_given) {
-	    clearColors(net);
+	    if (args_info.dotConfidence_given) {clearColors(net);}
 		PNAPI_FOREACH(p, net.getPlaces()) {
 			if (args_info.dotPotential_arg != dotPotential_arg_conflict) {
 				// causal interesting
@@ -511,6 +516,7 @@ int main(int argc, char** argv) {
 					    if (args_info.oneTripleOnly_flag && isActive) {break;}
 					
 						status("......%s, %s", (*itHigh).second->getName().c_str(), (*itLow).second->getName().c_str());
+						potentialCausalTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
 
                         pnapi::PetriNet cNet(net);
                         
@@ -579,6 +585,7 @@ int main(int argc, char** argv) {
 							// call LoLA
 							if (callLoLA(curFileName)) {
 								status(_cbad_("........active"));
+								activeCausalTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
 								isActive = true;
 							}
 							else {
@@ -620,6 +627,7 @@ int main(int argc, char** argv) {
 					    if (args_info.oneTripleOnly_flag && isActive) {break;}
 					    
 						status("......%s, %s", (*itHigh).second->getName().c_str(), (*itLow).second->getName().c_str());
+                        potentialConflictTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
 
 						pnapi::PetriNet cNet(net);
                         
@@ -689,6 +697,7 @@ int main(int argc, char** argv) {
 							// call LoLA
 							if (callLoLA(curFileName)) {
 								status(_cbad_("........active"));
+								activeConflictTriple.insert(std::make_pair(*p, std::make_pair((*itHigh).second, (*itLow).second)));
 								isActive = true;
 							}
 							else {
@@ -759,7 +768,7 @@ int main(int argc, char** argv) {
 		} // (args_info.modus_arg == modus_arg_makefile) {
 		else {
 			if (args_info.dotActive_given) {
-			    clearColors(net);
+			    if (args_info.dotConfidence_given || args_info.dotPotential_given) {clearColors(net);}
 				PNAPI_FOREACH(p, net.getPlaces()) {
 					if (args_info.dotActive_arg != dotActive_arg_conflict) {
 						// causal interesting
@@ -813,6 +822,9 @@ int main(int argc, char** argv) {
 		}
 		
 		if (args_info.resultFile_given) {
+            std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> >::iterator itTriple;
+	  	    std::pair<std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> >::iterator,std::multimap<pnapi::Place *, std::pair<pnapi::Transition *, pnapi::Transition *> >::iterator> retTriple;
+		    
 		    std::string results_filename = args_info.resultFile_arg ? args_info.resultFile_arg : fileName + ".results";
 
 		    Results results(results_filename);
@@ -837,6 +849,39 @@ int main(int argc, char** argv) {
 			results.add("net.down", downTransitions);
 			results.add("net.low", lowTransitions);
 			results.add("net.arcs", (unsigned int)(net.getArcs().size()));
+			
+			FOREACH(p, potentialCausal) {
+			    std::string placeName((**p).getName());
+			    results.add(std::string(placeName + ".causal_candidates").c_str(), (unsigned int)(highPre.count(*p) * lowPost.count(*p)));
+			    results.add(std::string(placeName + ".causal_isActive").c_str(), activeCausal.find(*p) != activeCausal.end());
+			    results.add(std::string(placeName + ".causal_checkedTriples").c_str(), (unsigned int)(potentialCausalTriple.count(*p)));
+			    results.add(std::string(placeName + ".causal_activeTriples").c_str(), (unsigned int)(activeCausalTriple.count(*p)));
+			    
+			    retTriple = potentialCausalTriple.equal_range(*p);
+				for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
+				    results.add(std::string(placeName + ".causal_triple(" + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), false);
+				}
+				retTriple = activeCausalTriple.equal_range(*p);
+				for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
+				    results.add(std::string(placeName + ".causal_triple(" + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), true);
+				}
+			}
+			FOREACH(p, potentialConflict) {
+			    std::string placeName((**p).getName());
+			    results.add(std::string(placeName + ".conflict_candidates").c_str(), (unsigned int)(highPost.count(*p) * lowPost.count(*p)));
+			    results.add(std::string(placeName + ".conflict_isActive").c_str(), activeConflict.find(*p) != activeConflict.end());
+			    results.add(std::string(placeName + ".conflict_checkedTriples").c_str(), (unsigned int)(potentialConflictTriple.count(*p)));
+			    results.add(std::string(placeName + ".conflict_activeTriples").c_str(), (unsigned int)(activeConflictTriple.count(*p)));
+			    
+			    retTriple = potentialConflictTriple.equal_range(*p);
+				for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
+				    results.add(std::string(placeName + ".conflict_triple(" + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), false);
+				}
+				retTriple = activeConflictTriple.equal_range(*p);
+				for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
+				    results.add(std::string(placeName + ".conflict_triple(" + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), true);
+				}
+			}
 		}
 
 		if (result == 0) {message(_cbad_("Non-Interference: FAILED"));}

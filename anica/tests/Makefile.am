@@ -28,6 +28,7 @@ TESTFILES = activeCausal.ifn \
             none.ifn \
 			potentialCausal.ifn \
 			potentialConflict.ifn \
+			trivial-confidence.ifn \
 			missing-confidence.ifn \
 			mutual.ifn \
 			mutual-downgrade.ifn \

@@ -859,11 +859,11 @@ int main(int argc, char** argv) {
 			    
 			    retTriple = potentialCausalTriple.equal_range(*p);
 				for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
-				    results.add(std::string(placeName + ".causal_triple(" + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), false);
+				    results.add(std::string(placeName + ".causal_triple(" + placeName + ", " + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), false);
 				}
 				retTriple = activeCausalTriple.equal_range(*p);
 				for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
-				    results.add(std::string(placeName + ".causal_triple(" + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), true);
+				    results.add(std::string(placeName + ".causal_triple(" + placeName + ", " + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), true);
 				}
 			}
 			FOREACH(p, potentialConflict) {
@@ -875,11 +875,11 @@ int main(int argc, char** argv) {
 			    
 			    retTriple = potentialConflictTriple.equal_range(*p);
 				for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
-				    results.add(std::string(placeName + ".conflict_triple(" + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), false);
+				    results.add(std::string(placeName + ".conflict_triple(" + placeName + ", " + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), false);
 				}
 				retTriple = activeConflictTriple.equal_range(*p);
 				for (itTriple=retTriple.first; itTriple!=retTriple.second; ++itTriple) {
-				    results.add(std::string(placeName + ".conflict_triple(" + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), true);
+				    results.add(std::string(placeName + ".conflict_triple(" + placeName + ", " + (*itTriple).second.first->getName() + ", " + (*itTriple).second.second->getName() + ")").c_str(), true);
 				}
 			}
 		}

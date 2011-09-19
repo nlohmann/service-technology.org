@@ -39,7 +39,7 @@
     </target>
 
     <target name="cccc">
-        <touch file=".cccc/cccc.xml" />
+        <touch file=".cccc/cccc.xml" mkdirs="true" />
         <exec executable="sh" failonerror="false">
             <arg value="-c" />
             <arg value="cccc src/*" />

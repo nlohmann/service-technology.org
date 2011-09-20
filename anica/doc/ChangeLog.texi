@@ -1,4 +1,4 @@
-@heading Version 1.2-unreleased
+@heading Version 1.2 (20 September 2011)
 @itemize
 @item patch for PBNID
 @item reduced patterns for PBNI+ and PBNID (high transition)

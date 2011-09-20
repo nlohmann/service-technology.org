@@ -346,6 +346,45 @@ The number of transitions assigned with downgrading confidence level of the inpu
 The number of arcs of the input net. [Integer]
 @end ftable
 
+@heading @code{<name of place>}
+@findex nameOfPlaces
+
+This part exists for each at least potential interfering place in the input net and lists information on each of them.
+
+@ftable @code
+
+@item causal_activeTriples
+The number of all active causal triples for this place. If option @option{--oneTripleOnly} is used, this number is 0 or 1. [Integer]
+
+@item causal_candidates
+The number of potential causal triples for this place. [Integer]
+
+@item causal_checkedTriples
+The number of checked potential causal triples for this place. Always less or equal to causal_activeTriples. [Integer]
+
+@item causal_isActive
+True if this place is an active causal place, false otherwise. [Boolean]
+
+@item causal_triple(p, h, l)
+Exists for each triple for this place (causal_candidates). True if the triple is active, false otherwise. [Boolean]
+
+@item conflict_activeTriples
+The number of all active conflict triples for this place. If option @option{--oneTripleOnly} is used, this number is 0 or 1. [Integer]
+
+@item conflict_candidates
+The number of potential conflict triples for this place. [Integer]
+
+@item conflict_checkedTriples
+The number of checked potential conflict triples for this place. Always less or equal to conflict_activeTriples. [Integer]
+
+@item conflict_isActive
+True if this place is an active conflict place, false otherwise. [Boolean]
+
+@item conflict_triple(p, h, l)
+Exists for each triple for this place (conflict_candidates). True if the triple is active, false otherwise. [Boolean]
+
+@end ftable
+
 @heading @code{result}
 @findex meta
 

@@ -1,6 +1,9 @@
 @heading Version 1.2-unreleased
 @itemize
-@item ...
+@item patch for PBNID
+@item reduced patterns for PBNI+ and PBNID (high transition)
+@item extended result output
+@item changed colors in dot output 
 @end itemize
 
 @heading Version 1.1 (15 September 2011)

@@ -11,7 +11,7 @@ args "--include-getopt --show-required --unamed-opts=FILE --no-handle-error --co
 
 description "About Anica:"
 purpose "Automated Non-Interference Check Assistent.\n
-This program checks safe petri nets for positive place based non-interference by reducing the problem to reachability.\n\n  Report bugs to anica@service-technology.org.\n  Visit Anica's home page at http://service-technology.org/anica"
+This program checks safe petri nets for non-interference properties.\n\n  Report bugs to anica@service-technology.org.\n  Visit Anica's home page at http://service-technology.org/anica"
 
 section "Analysis Task"
 sectiondesc="<<-- Anica is able to find potential and active interfering places. By default, Anica will find both. -->>\n"

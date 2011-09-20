@@ -9,6 +9,12 @@
 Version 1.2-unreleased
 ======================
 
-* ...
+* patch for PBNID
+
+* reduced patterns for PBNI+ and PBNID (high transition)
+
+* extended result output
+
+* changed colors in dot output
 
 \nSee file ChangeLog <http://service-technology.org/files/anica/ChangeLog> for\ncomplete version history.\n

@@ -9,7 +9,13 @@
 Version 1.2-unreleased
 ======================
 
-* ...
+* patch for PBNID
+
+* reduced patterns for PBNI+ and PBNID (high transition)
+
+* extended result output
+
+* changed colors in dot output
 
 Version 1.1 (15 September 2011)
 ===============================

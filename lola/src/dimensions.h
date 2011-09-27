@@ -26,6 +26,7 @@
 
 #include <userconfig.h>
 #include <iostream>
+#include <cstdio>
 #include <climits>
 
 #ifdef STATESPACE

@@ -1,0 +1,491 @@
+(80 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getDataSocket()
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.resetState()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getFtpDataConnection()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+
+(80 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getDataSocket()
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getFtpDataConnection()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+
+(80 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getDataSocket()
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+
+(80 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getDataSocket()
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+
+(106 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.resetState()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(106 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.resetState()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+
+(106 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getFtpDataConnection()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(106 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getFtpDataConnection()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+
+(106 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(106 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+
+(106 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(106 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+
+(106 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(106 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+
+(94 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(94 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.resetState()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getFtpDataConnection()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+
+(94 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.resetState()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getFtpDataConnection()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+
+(94 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getFtpDataConnection()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+
+(84 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getDataSocket()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getActiveLocalPort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createSocket(java.lang.String, java.net.InetAddress, int, boolean)
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(94 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getFtpDataConnection()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+
+(112 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.resetState()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getFtpDataConnection()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(112 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.resetState()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getFtpDataConnection()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+
+(111 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(111 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+
+(94 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+
+(94 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+
+(106 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(106 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+
+(382 ,1.0)
+COLD: 
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getRemoteAddress()
+	 ENV|org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.gui.FtpConnectionTableModel.getValueAt(int, int)
+HOT: 
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getUser()
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.usermanager.BaseUser|org.apache.ftpserver.usermanager.BaseUser.getName()
+
+(386 ,1.0)
+COLD: 
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.usermanager.BaseUser|org.apache.ftpserver.usermanager.BaseUser.getName()
+	 ENV|org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.gui.FtpConnectionTableModel.getValueAt(int, int)
+HOT: 
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getUser()
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLoginTime()
+
+(94 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+
+(112 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getFtpDataConnection()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(112 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getFtpDataConnection()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+
+(111 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(111 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+
+(94 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+
+(94 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+
+(386 ,1.0)
+COLD: 
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLoginTime()
+HOT: 
+	 ENV|org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.gui.FtpConnectionTableModel.getValueAt(int, int)
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getUser()
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLastAccessTime()
+
+(386 ,1.0)
+COLD: 
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLastAccessTime()
+HOT: 
+	 ENV|org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.gui.FtpConnectionTableModel.getValueAt(int, int)
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getUser()
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getRemoteAddress()
+
+(84 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getActiveLocalPort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createSocket(java.lang.String, java.net.InetAddress, int, boolean)
+
+(94 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+
+(112 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.setPasvCommand()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+
+(94 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getInetAddress()
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+
+(111 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(111 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getPort()
+HOT: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+
+(94 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.ssl.Ssl|org.apache.ftpserver.ssl.Ssl.createServerSocket(java.lang.String, java.net.InetAddress, int)
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassiveAddress()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getSSL()
+
+(386 ,1.0)
+COLD: 
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLoginTime()
+HOT: 
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLastAccessTime()
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getRemoteAddress()
+
+(379 ,1.0)
+COLD: 
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLastAccessTime()
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.usermanager.BaseUser|org.apache.ftpserver.usermanager.BaseUser.getName()
+HOT: 
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLoginTime()
+
+(93 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.isUTF8Encoding()
+HOT: 
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getListEncoding()
+
+(93 ,1.1071428571428572)
+COLD: 
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getListEncoding()
+HOT: 
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(80 ,1.0)
+COLD: 
+	 org.apache.ftpserver.gui.FtpConnectionTableModel$3|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.parse(java.lang.String)
+HOT: 
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(247 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.FtpDataConnection.getDataSocket()
+HOT: 
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(102 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.STOR|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+HOT: 
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(112 ,1.0)
+COLD: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.getPassivePort()
+HOT: 
+	 org.apache.ftpserver.FtpDataConnection|org.apache.ftpserver.DataConnectionConfig|org.apache.ftpserver.DataConnectionConfig.releasePassivePort(int)
+
+(111 ,1.0)
+COLD: 
+	 org.apache.ftpserver.command.PASV|org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpWriter.send(int, java.lang.String, java.lang.String)
+HOT: 
+	 org.apache.ftpserver.FtpWriter|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getLanguage()
+
+(1544 ,1.0)
+COLD: 
+	 ENV|org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.gui.FtpConnectionTableModel.getValueAt(int, int)
+HOT: 
+	 org.apache.ftpserver.gui.FtpConnectionTableModel|org.apache.ftpserver.FtpRequestImpl|org.apache.ftpserver.FtpRequestImpl.getUser()
+

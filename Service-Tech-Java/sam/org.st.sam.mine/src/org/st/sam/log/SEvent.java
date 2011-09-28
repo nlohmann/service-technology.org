@@ -71,4 +71,5 @@ public class SEvent {
   public String getCharacter() {
     return sender+"|"+receiver+"|"+method;
   }
+
 }

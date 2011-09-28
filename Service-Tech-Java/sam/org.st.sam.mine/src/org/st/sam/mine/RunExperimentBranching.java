@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,7 +16,7 @@ import java.util.Properties;
 import lscminer.datastructure.LSC;
 
 import org.st.sam.log.SLogTree.TreeStatistics;
-import org.st.sam.mine.MineBranchingLSC;
+import org.st.sam.util.LSCOutput;
 
 public class RunExperimentBranching {
 
@@ -83,7 +82,7 @@ public class RunExperimentBranching {
 
   
   public void experiment(String dir, String inputFile, int minSupportThreshold, double confidence) throws IOException {
-    MineBranchingLSC miner = new MineBranchingLSC();
+    MineLSC miner = new MineBranchingLSC();
     miner.mineLSCs(dir+"/"+inputFile, minSupportThreshold, confidence);
     
     boolean render_trees = true;
@@ -94,7 +93,7 @@ public class RunExperimentBranching {
 
     Date now = new Date();
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-    String resultsDir = dir+SLASH+"results_"+minSupportThreshold+"_"+confidence+"_"+dateFormat.format(now);
+    String resultsDir = dir+SLASH+"results_B_"+minSupportThreshold+"_"+confidence+"_"+dateFormat.format(now);
     
     File f = new File(resultsDir);
     
@@ -106,17 +105,21 @@ public class RunExperimentBranching {
     }
     
     ArrayList<LSC> lscs = miner.getLSCs();
-
+    
+    for (LSC l : lscs) {
+      LSCOutput.shortenLSCnames(l.getPreChart());
+      LSCOutput.shortenLSCnames(l.getMainChart());
+    }
 
     // resulting html
     StringBuilder r = new StringBuilder();
     r.append("<html>\n");
     r.append("<head>\n");
-    r.append("  <title>Results for "+dir+"/"+inputFile+"</title>\n");
+    r.append("  <title>Branching Results for "+dir+"/"+inputFile+"</title>\n");
     r.append("</head>\n");
     r.append("<body>\n");
     r.append("<a name='general' />\n");
-    r.append("<h1>Results for "+dir+"/"+inputFile+"</h1>\n");
+    r.append("<h1>Branching Results for "+dir+"/"+inputFile+"</h1>\n");
     
     
     r.append("<h2>General</h2>\n");
@@ -136,23 +139,28 @@ public class RunExperimentBranching {
     r.append("depth: "+stat.depth+"<br/>\n");
     r.append("width: "+stat.width+"<br/>\n");
     
+    int treeFigHeight = stat.depth*5;
+    if (treeFigHeight > 600) treeFigHeight = 600;
+    
     if (render_trees) {
       String input_tree_dot = inputFile+".dot";
       String input_tree_svg = inputFile+".svg";
+      String input_tree_png = inputFile+".png";
       
       miner.getTree().clearCoverageMarking();
-      MineBranchingLSC.writeToFile(miner.getTree().toDot(miner.getShortenedNames()), resultsDir+SLASH+input_tree_dot);
+      LSCOutput.writeToFile(miner.getTree().toDot(miner.getShortenedNames()), resultsDir+SLASH+input_tree_dot);
       systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+input_tree_dot+" -o"+resultsDir+SLASH+input_tree_svg);
+      systemCall(dotRenderer+" -Tpng -Gsize=30 "+resultsDir+SLASH+input_tree_dot+" -o"+resultsDir+SLASH+input_tree_png);
       
-      r.append("<object style='height: 300px' data='"+input_tree_svg+"' type='image/svg+xml'></object><br/>\n");
-      r.append("<a href='"+input_tree_svg+"'>show input tree in fullsize</a><br/>\n");
+      //r.append("<object style='height: 300px' data='"+input_tree_svg+"' type='image/svg+xml'></object><br/>\n");
+      r.append("<a href='"+input_tree_svg+"'><img style='height: "+treeFigHeight+"px' src='"+input_tree_png+"'/><br/>\n");
     } else {
       r.append("<i>original tree not shown due to size</i><br/>\n");
     }
 
     r.append("<h2>Output</h2>\n");
     
-    r.append("found "+lscs.size()+" LSCs<br/>\n");
+    r.append("found "+lscs.size()+" branching LSCs<br/>\n");
     for (int i=0; i<lscs.size(); i++) {
       r.append("<a href='#lsc_"+(i+1)+"'>["+(i+1)+"]</a> ");
       if (((i+1) % 20) == 0) r.append("<br/>\n");
@@ -161,12 +169,14 @@ public class RunExperimentBranching {
     
     String output_tree_dot = inputFile+"_cov.dot";
     String output_tree_svg = inputFile+"_cov.svg";
+    String output_tree_png = inputFile+"_cov.png";
     
-    MineBranchingLSC.writeToFile(miner.getCoverageTreeGlobal(), resultsDir+SLASH+output_tree_dot);
+    LSCOutput.writeToFile(miner.getCoverageTreeGlobal(), resultsDir+SLASH+output_tree_dot);
     systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+output_tree_dot+" -o"+resultsDir+SLASH+output_tree_svg);
+    systemCall(dotRenderer+" -Tpng -Gsize=30 "+resultsDir+SLASH+output_tree_dot+" -o"+resultsDir+SLASH+output_tree_png);
     
-    r.append("<object style='height: 300px' data='"+output_tree_svg+"' type='image/svg+xml'></object><br/>\n");
-    r.append("<a href='"+output_tree_svg+"'>show covered tree in fullsize</a><br/>\n");
+    //r.append("<object style='height: 300px' data='"+output_tree_svg+"' type='image/svg+xml'></object><br/>\n");
+    r.append("<a href='"+output_tree_svg+"'><img style='height: "+treeFigHeight+"px' src='"+output_tree_png+"'/><br/>\n");
     r.append("<hr />");
 
     
@@ -179,10 +189,10 @@ public class RunExperimentBranching {
       found_lscs.append(l.toString());
       found_lscs.append("\n");
 
-      String lsc_string = MineBranchingLSC.toMSCRenderer("LSC "+(i+1)+" conf="+l.getConfidence(), l);
+      String lsc_string = LSCOutput.toMSCRenderer("LSC "+(i+1)+" conf="+l.getConfidence()+" supp="+l.getSupport(), l);
       String lsc_resultfile = "lsc_"+(i+1)+".lsc.txt";
       String lsc_renderfile = "lsc_"+(i+1)+".lsc.svg";
-      MineBranchingLSC.writeToFile(lsc_string, resultsDir+SLASH+lsc_resultfile);
+      LSCOutput.writeToFile(lsc_string, resultsDir+SLASH+lsc_resultfile);
       
       systemCall(mscRenderer+" -Tsvg -i"+resultsDir+SLASH+lsc_resultfile+" -o "+resultsDir+SLASH+lsc_renderfile);
 
@@ -193,15 +203,17 @@ public class RunExperimentBranching {
       r.append("<object data='"+lsc_renderfile+"' type='image/svg+xml'></object><br/>\n");
 
       if (render_trees) {
-        String ct_string = miner.getCoverageTreeFor(miner.getScenarios().get(i));
+        String ct_string = miner.getCoverageTreeFor(miner.getScenarios().get(l));
         String ct_dotfile = "tree_cov_"+(i+1)+".dot";
         String ct_svgfile = "tree_cov_"+(i+1)+".svg";
-        MineBranchingLSC.writeToFile(ct_string, resultsDir+SLASH+ct_dotfile);
+        String ct_pngfile = "tree_cov_"+(i+1)+".png";
+        LSCOutput.writeToFile(ct_string, resultsDir+SLASH+ct_dotfile);
         
         systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+ct_dotfile+" -o"+resultsDir+SLASH+ct_svgfile);
+        systemCall(dotRenderer+" -Tpng -Gsize=30 "+resultsDir+SLASH+ct_dotfile+" -o"+resultsDir+SLASH+ct_pngfile);
         
-        r.append("<object style='height: 300px' data='"+ct_svgfile+"' type='image/svg+xml'></object><br/>\n");
-        r.append("<a href='"+ct_svgfile+"'>show coverage tree in fullsize</a><br/>\n");
+        //r.append("<object style='height: 300px' data='"+ct_svgfile+"' type='image/svg+xml'></object><br/>\n");
+        r.append("<a href='"+ct_svgfile+"'><img style='height: "+treeFigHeight+"px' src='"+ct_pngfile+"'/><br/>\n");
       } else {
         r.append("<i>scenario coverage tree not shown due to size</i><br/>\n");
       }
@@ -210,8 +222,8 @@ public class RunExperimentBranching {
       r.append("<hr/>\n");
     }
     r.append("</body>\n");
-    MineBranchingLSC.writeToFile(r.toString(), resultsDir+"/results.html");    
-    MineBranchingLSC.writeToFile(found_lscs.toString(), resultsDir+"/lscs.txt");
+    LSCOutput.writeToFile(r.toString(), resultsDir+"/results.html");    
+    LSCOutput.writeToFile(found_lscs.toString(), resultsDir+"/lscs.txt");
     System.out.println("finished.");
   }
   

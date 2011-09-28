@@ -1,7 +1,7 @@
 package org.st.sam.log;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import com.google.gwt.dev.util.collect.HashSet;
 
 public class SScenario {
 
@@ -11,6 +11,17 @@ public class SScenario {
   public SScenario(short pre[], short main[]) {
     this.pre = pre;
     this.main = main;
+  }
+  
+  public short[] getWord() {
+    short[] word = new short[pre.length+main.length];
+    for (int e=0; e<pre.length; e++) {
+      word[e] = pre[e];
+    }
+    for (int e=0; e<main.length; e++) {
+      word[e+pre.length] = main[e];
+    }
+    return word;
   }
   
   public String toString() {
@@ -66,14 +77,18 @@ public class SScenario {
   }
   
   public boolean weakerThan(SScenario other) {
+    return (isSubSequence(other.pre, this.pre) && isSubSequence(this.main, other.main));
+  }
+  
+  public boolean weakerThan2(SScenario other) {
     
     HashSet<Short> visible = new HashSet<Short>();
-    for (Short e : pre) visible.add(e);
-    for (Short e : main) visible.add(e);
+    for (short e : pre) visible.add(e);
+    for (short e : main) visible.add(e);
     
     HashSet<Short> visible_other = new HashSet<Short>();
-    for (Short e : other.pre) visible_other.add(e);
-    for (Short e : other.main) visible_other.add(e);
+    for (short e : other.pre) visible_other.add(e);
+    for (short e : other.main) visible_other.add(e);
     
     if (isSubWordOf(other.pre, pre, visible_other) && isSubWordOf(main, other.main, visible)) {
       return true;
@@ -110,6 +125,28 @@ public class SScenario {
     }
     // this chart has the same main-chart as 'other' and the
     // 'other's pre-chart is a suffix of this pre-chart
+    return true;
+  }
+  
+  
+  public static boolean isSubSequence(short[] thisChart, short[] otherChart) {
+    
+    int o = 0;
+    for (int t=0; t<thisChart.length; t++) {
+      // for each letter 'this[t]' of 'this', find a letter of 'other'
+      // starting at the last position
+      for ( ; o < otherChart.length; o++) {
+        if (thisChart[t] == otherChart[o]) {
+          // this[t] has a corresponding letter in other at position 'o'
+          break;
+        }
+      }
+      if (o >= otherChart.length) {
+        // could not find this[t] in other at any position
+        return false;
+      }
+      o++; // move to next letter of 'other'
+    }
     return true;
   }
 

@@ -2,14 +2,14 @@ package org.st.sam.mine;
 
 import org.st.sam.log.SLogTree;
 
-public class MineBranchingLSC extends MineLSC {
+public class MineLinearLSC extends MineLSC {
   
-  public MineBranchingLSC() {
-    super(MineLSC.MODE_BRANCHING);
+  public MineLinearLSC() {
+    super(MineLSC.MODE_LINEAR);
   }
   
-  public MineBranchingLSC(SLogTree tree) {
-    super(MineLSC.MODE_BRANCHING, tree);
+  public MineLinearLSC(SLogTree tree) {
+    super(MineLSC.MODE_LINEAR, tree);
   }
 
   public static void main(String args[]) throws Exception {
@@ -22,7 +22,7 @@ public class MineBranchingLSC extends MineLSC {
     String srcFile = args[0];
     int support = Integer.parseInt(args[1]);
     double confidence = Double.parseDouble(args[2]);
-    MineLSC miner = new MineBranchingLSC();
+    MineLSC miner = new MineLinearLSC();
     miner.mineLSCs_writeResults(srcFile, support, confidence);
   }
 }

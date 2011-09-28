@@ -2,7 +2,6 @@ package org.st.sam.log;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidParameterException;
@@ -20,7 +19,6 @@ import org.deckfour.xes.in.XParser;
 import org.deckfour.xes.in.XParserRegistry;
 import org.deckfour.xes.in.XesXmlParser;
 import org.deckfour.xes.model.XLog;
-import org.deckfour.xes.util.progress.XMonitoredInputStream;
 
 public class XESImport {
 

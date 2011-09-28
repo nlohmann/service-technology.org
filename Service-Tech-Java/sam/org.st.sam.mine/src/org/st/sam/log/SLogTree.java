@@ -1,31 +1,110 @@
 package org.st.sam.log;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import com.google.gwt.dev.util.collect.HashMap;
+import com.google.gwt.dev.util.collect.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SLogTree {
   
   public List<SLogTreeNode> nodes = new LinkedList<SLogTreeNode>();
   public List<SLogTreeNode> roots = new LinkedList<SLogTreeNode>();
+  public Map<SLogTreeNode, Integer> nodeCount = new HashMap<SLogTreeNode, Integer>();
   
-  public SLogTree(SLog log) {
+  private final boolean mergeTraces;
+  
+  private Set<SLogTreeNode> leafs = new HashSet<SLogTreeNode>();
+  
+  public SLogTree() {
+    this.mergeTraces = true;
+  }
+  
+  public SLogTree(SLog log, boolean mergeTraces) {
+    this.mergeTraces = mergeTraces;
     buildTree(log);
   }
   
-  private void buildTree(SLog log) {
-    for (int t=0; t<log.traces.length; t++) {
+  public SLogTreeNode contains(short[] trace) {
+    SLogTreeNode current = null;
+    for (int e=0; e<trace.length; e++) {
       
-      SLogTreeNode current = null;
-      for (int e=0; e<log.traces[t].length; e++) {
-        
-        short event = log.traces[t][e];
-        
-        // is this the first event of the trace?
+      short event = trace[e];
+      
+      // is this the first event of the trace?
+      if (current == null) {
+        for (SLogTreeNode r : roots) {
+          if (r.id == event) {
+            // found it, remember
+            current = r;
+            break;
+          }
+        }
         if (current == null) {
-          // yes, see if there is a root event in the tree
+          // no root event for 'event'
+          return null;
+        }
+        
+      // this is a successor event, 'current' represents the predecessor event
+      // in the tree
+      } else {
+        // see if a successor of 'current' represents 'event'
+        boolean inTree = false;
+        for (int e2 = 0; e2 < current.post.length; e2++) {
+          if (current.post[e2].id == event) {
+            // yes, remember it
+            current = current.post[e2];
+            inTree = true;
+            break;
+          }
+        }
+        if (!inTree) {
+          return null;
+        }
+      }
+    }
+    return current;
+  }
+  
+  public short[] getWord(SLogTreeNode n) {
+    LinkedList<Short> path = new LinkedList<Short>();
+    while (n != null) {
+      path.addFirst(n.id);
+      n = n.pre;
+    }
+    short[] result = new short[path.size()];
+    for (int i=0; i<path.size(); i++) {
+      result[i] = path.get(i);
+    }
+    return result;
+  }
+  
+  public List<short[]> getAllWords() {
+    List<short[]> words = new LinkedList<short[]>();
+    for (SLogTreeNode r : roots) {
+      getAllWords(r, words);
+    }
+    return words;
+  } 
+  
+  public void getAllWords(SLogTreeNode n, List<short[]> words) {
+    words.add(getWord(n));
+    for (SLogTreeNode s : n.post) {
+      getAllWords(s, words);
+    }
+  }
+  
+  public SLogTreeNode addTrace(short[] trace) {
+    SLogTreeNode current = null;
+    for (int e=0; e<trace.length; e++) {
+      
+      short event = trace[e];
+      
+      // is this the first event of the trace?
+      if (current == null) {
+        // yes, see if there is a root event in the tree
+        if (mergeTraces) {
           for (SLogTreeNode r : roots) {
             if (r.id == event) {
               // found it, remember
@@ -33,18 +112,21 @@ public class SLogTree {
               break;
             }
           }
-          if (current == null) {
-            // no root event for 'event', create a new event
-            current = new SLogTreeNode(event, null);
-            roots.add(current);
-            nodes.add(current);
-          }
-          
-        // this is a successor event, 'current' represents the predecessor event
-        // in the tree
-        } else {
-          // see if a successor of 'current' represents 'event'
-          boolean inTree = false;
+        }
+        if (current == null) {
+          // no root event for 'event', create a new event
+          current = new SLogTreeNode(event, null);
+          roots.add(current);
+          nodes.add(current);
+          nodeCount.put(current, 0);
+        }
+        
+      // this is a successor event, 'current' represents the predecessor event
+      // in the tree
+      } else {
+        // see if a successor of 'current' represents 'event'
+        boolean inTree = false;
+        if (mergeTraces) {
           for (int e2 = 0; e2 < current.post.length; e2++) {
             if (current.post[e2].id == event) {
               // yes, remember it
@@ -53,15 +135,26 @@ public class SLogTree {
               break;
             }
           }
-          if (!inTree) {
-            // new event
-            SLogTreeNode newNode = new SLogTreeNode(event, current);
-            current.append(newNode);
-            nodes.add(newNode);
-            current = newNode;
-          }
+        }
+        if (!inTree) {
+          // new event
+          SLogTreeNode newNode = new SLogTreeNode(event, current);
+          current.append(newNode);
+          nodes.add(newNode);
+          current = newNode;
+          nodeCount.put(current, 0);
         }
       }
+      // the current node has been visited once more
+      nodeCount.put(current, nodeCount.get(current)+1);
+    }
+    leafs.add(current);
+    return current;
+  }
+  
+  private void buildTree(SLog log) {
+    for (int t=0; t<log.traces.length; t++) {
+      addTrace(log.traces[t]);
     }
   }
   
@@ -172,7 +265,8 @@ public class SLogTree {
     for (SLogTreeNode n : nodes) {
       if (!names.containsKey(n.id)) names.put(n.id, Short.toString(n.id));
       
-      sb.append(n.globalID + " [ label=\""+n.id+"\" ];\n");
+      String label = n.id+" ("+nodeCount.get(n)+")";
+      sb.append(n.globalID + " [ label=\""+label+"\" ];\n");
       for (SLogTreeNode n2 : n.post) {
         sb.append(n.globalID + " -> "+n2.globalID+";\n");
       }

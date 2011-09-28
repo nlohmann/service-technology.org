@@ -1,7 +1,6 @@
 package org.st.sam.log;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import com.google.gwt.dev.util.collect.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -73,38 +72,47 @@ public class SLog {
     return sb.toString();
   }
 
-  public LSCEvent toLSCEvent(short event, boolean shortNames) {
+  public LSCEvent toLSCEvent(short event) {
     int i1 = originalNames[event].indexOf('|');
     int i2 = originalNames[event].indexOf('|', i1+1);
     String caller = originalNames[event].substring(0, i1);
     String callee = originalNames[event].substring(i1+1, i2);
     String method = originalNames[event].substring(i2+1);
     
-    if (shortNames) {
-      caller = caller.substring(caller.lastIndexOf('.')+1);
-      callee = callee.substring(callee.lastIndexOf('.')+1);
-      
-      int lastDotBeforePar = method.lastIndexOf('.', method.indexOf('('));
-      method = method.substring(lastDotBeforePar+1);
-      
-      if (method.length() > 40) {
-        method = method.substring(0, method.indexOf('('))+"(...)";
-      }
-    }
-    
     return new LSCEvent(caller, callee, method);
   }
   
-  public LSC toLSC(SScenario s, int support, double confidence, boolean shortNames) {
+  public LSC toLSC(SScenario s, int support, double confidence) {
     LSCEvent preChart[] = new LSCEvent[s.pre.length];
     for (int i=0; i<s.pre.length; i++) {
-      preChart[i] = toLSCEvent(s.pre[i], shortNames); 
+      preChart[i] = toLSCEvent(s.pre[i]); 
     }
     LSCEvent mainChart[] = new LSCEvent[s.main.length];
     for (int i=0; i<s.main.length; i++) {
-      mainChart[i] = toLSCEvent(s.main[i], shortNames); 
+      mainChart[i] = toLSCEvent(s.main[i]); 
     }
     LSC l = new LSC(preChart, mainChart, support, confidence);
     return l;
+  }
+  
+  public short[] toSScenario_chart(LSCEvent chart[]) throws Exception {
+    short s_chart[] = new short[chart.length];
+    for (int e=0;e<chart.length;e++) {
+      if (!name2id.containsKey(chart[e].toString())) {
+        StringBuilder eventlist = new StringBuilder();
+        for (String ev : name2id.keySet()) {
+          eventlist.append(ev+"\n");
+        }
+        throw new Exception("Event "+chart[e]+" unknown in list:\n "+eventlist);
+      }
+      s_chart[e] = name2id.get(chart[e].toString());
+    }
+    return s_chart;
+  }
+  
+  public SScenario toSScenario(LSC l) throws Exception {
+    short pre[] = toSScenario_chart(l.getPreChart());
+    short main[] = toSScenario_chart(l.getMainChart());
+    return new SScenario(pre, main);
   }
 }

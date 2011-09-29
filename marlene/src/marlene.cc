@@ -128,7 +128,7 @@ int main(int argc, char* argv[]) {
                                 "Open net file %s could not be opened for reading",
                                 filename.c_str());
                     }
-                } catch (pnapi::exception::InputError error) {
+                } catch (const pnapi::exception::InputError& error) {
                     std::cerr << PACKAGE << ":" << error << std::endl;
                     displayFileError(error.filename.c_str(), error.line,
                             error.token.c_str());
@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
                 if (args_info.withprefix_flag) {
                     net->prefixNames("0.");
                 }
-            } catch (pnapi::exception::InputError error) {
+            } catch (const pnapi::exception::InputError& error) {
                 std::cerr << PACKAGE << ":" << error << std::endl;
                 abort(2, " ");
             }

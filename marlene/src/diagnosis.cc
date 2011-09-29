@@ -131,7 +131,7 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
     try {
         diagInfo.readFile(filename.c_str());
         // diagInfo.write(stderr);
-    } catch (libconfig::ParseException pex) {
+    } catch (const libconfig::ParseException & pex) {
         message("Parse error `%s' in diagnosis file `%s' in line %d.",
                 pex.getError(), pex.getFile(), pex.getLine());
     }
@@ -193,7 +193,7 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
                 // node nid has one more predecessor
                 dgraph->noOfPredecessors[nid] += 1;
             }
-        } catch (libconfig::SettingNotFoundException ex) {
+        } catch (const libconfig::SettingNotFoundException & ex) {
             status("Exception: Path = %s, what = %s", ex.getPath(),
                     ex.what());
             message("Malformed diagnosis file?");
@@ -212,7 +212,7 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
             }
 
             dgraph->deadlockNodes.push_back(node);
-        } catch (libconfig::SettingNotFoundException ex) {
+        } catch (const libconfig::SettingNotFoundException & ex) {
             /* if there are no internal deadlocks, everything is just fine :) */
             //            status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
         }
@@ -228,7 +228,7 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
             }
 
             dgraph->livelockNodes.push_back(node);
-        } catch (libconfig::SettingNotFoundException ex) {
+        } catch (const libconfig::SettingNotFoundException & ex) {
             /* if there are no internal livelocks, everything is just fine :) */
             //            status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
         }
@@ -240,7 +240,7 @@ Diagnosis::Diagnosis(std::string filename, MarkingInformation & pmi,
                 node->waitstateMarkings.push_back(mi.getIDForMarking(
                         states[i]["unresolvableWaitstates"][j]));
             }
-        } catch (libconfig::SettingNotFoundException ex) {
+        } catch (const libconfig::SettingNotFoundException & ex) {
             /* if there are no unresolvable waitstates, everything is just fine :) */
             //                       status("Exception: Path = %s, what = %s", ex.getPath(), ex.what());
         }
@@ -271,7 +271,7 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
             // try to open file or print parse error
             try {
                 diagInfo.readFile(resultfiles[i].c_str());
-            } catch (libconfig::ParseException pex) {
+            } catch (const libconfig::ParseException & pex) {
                 message(
                         "Parse error `%s' in diagnosis file `%s' in line %d.",
                         pex.getError(), pex.getFile(), pex.getLine());
@@ -336,7 +336,7 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
                         // node nid has one more predecessor
                         mpp.noOfPredecessors[nid] += 1;
                     }
-                } catch (libconfig::SettingNotFoundException ex) {
+                } catch (const libconfig::SettingNotFoundException & ex) {
                     status("Exception: Path = %s, what = %s", ex.getPath(),
                             ex.what());
                     message("Malformed diagnosis file?");
@@ -350,7 +350,7 @@ void Diagnosis::readMPPs(std::vector<std::string> & resultfiles) {
                 mpp.nodes.push_back(node);
 
             }
-        } catch (libconfig::SettingNotFoundException ex) {
+        } catch (const libconfig::SettingNotFoundException & ex) {
             status("Exception: Path = %s, what = %s", ex.getPath(),
                     ex.what());
             exit(1);

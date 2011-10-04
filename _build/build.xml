@@ -89,8 +89,8 @@
 	<target name="make_all_win">
 	    <record name="artifacts/make.log" action="start"/>
 	    <exec executable="make" failonerror="true">
-	        <arg value="AM_CFLAGS=-O2 -Waddress -Waggregate-return -Wall -Wc++-compat -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wnested-externs -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic" />
-	        <arg value="AM_CXXFLAGS=-O2 -Waddress -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic" />
+	        <arg value="AM_CFLAGS=-O2" />
+	        <arg value="AM_CXXFLAGS=-O2" />
 	        <arg value="AM_LDFLAGS=-lstdc++ -lgcc -lodbc32 -lwsock32 -lwinspool -lwinmm -lshell32 -lcomctl32 -lctl3d32 -lodbc32 -ladvapi32 -lodbc32 -lwsock32 -lopengl32 -lglu32 -lole32 -loleaut32 -luuid" /> <!-- new -->
 	        <arg value="all" />
 	    </exec>

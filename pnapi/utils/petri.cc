@@ -37,7 +37,7 @@ string suffix = "";
 /// a variable holding the time of the call
 clock_t start_clock = clock();
 
-typedef enum { TYPE_OPENNET, TYPE_LOLANET, TYPE_PNMLNET, TYPE_WOFLANNET } objectType;
+typedef enum { TYPE_OPENNET, TYPE_LOLANET, TYPE_PNMLNET, TYPE_WOFLANNET, TYPE_INANET } objectType;
 
 struct FileObject {
     objectType type;
@@ -200,6 +200,15 @@ int main(int argc, char** argv) {
                     current.type = TYPE_LOLANET;
                     break;
                 }
+                case(input_arg_pnt): {
+                    current.net = new PetriNet();
+                    std::cin >> meta(io::INPUTFILE, current.filename)
+                             >> meta(io::CREATOR, PACKAGE_STRING)
+                             >> meta(io::INVOCATION, invocation) >> io::pnt >> *(current.net);
+
+                    current.type = TYPE_INANET;
+                    break;
+                }
             }
             if (args_info.canonicalNames_given) {
                 map<string, string> names = current.net->canonicalNames();
@@ -290,6 +299,15 @@ int main(int argc, char** argv) {
                                    >> meta(io::INVOCATION, invocation) >> io::ifn >> *(current.net);
 
                             current.type = TYPE_LOLANET;
+                            break;
+                        }
+                        case(input_arg_pnt): {
+                            current.net = new PetriNet();
+                            infile >> meta(io::INPUTFILE, current.filename)
+                                   >> meta(io::CREATOR, PACKAGE_STRING)
+                                   >> meta(io::INVOCATION, invocation) >> io::pnt >> *(current.net);
+
+                            current.type = TYPE_INANET;
                             break;
                         }
                     }
@@ -634,6 +652,12 @@ int main(int argc, char** argv) {
                         // create Woflan output
                         case(output_arg_tpn): {
                             outfile.stream() << io::woflan << *(objects[i].net);
+                            break;
+                        }
+
+                        /// create INA outout
+                        case(output_arg_pnt): {
+                            outfile.stream() << io::pnt << *(objects[i].net);
                             break;
                         }
 

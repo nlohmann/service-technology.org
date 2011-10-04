@@ -10,6 +10,8 @@
 @item added confidence level for transitions (to check non-interference)
 @item added new file format: IFN (information flow net) based on LoLA format
 @item creating arcs between two nets will now raise an exception
+@item implemented INA file format (*.pnt) files
+@item fixed bug in exception output
 @end itemize
 
 @heading Version 4.02 (2010-07-28)

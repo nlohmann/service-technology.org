@@ -120,6 +120,8 @@ class PetriNet
   friend std::ostream & io::__pnml::output(std::ostream &, const PetriNet &);
   /// Petri net output, see pnapi::io
   friend std::ostream & io::__woflan::output(std::ostream &, const PetriNet &);
+  /// Petri net output, see pnapi::io
+  friend std::ostream & io::__pnt::output(std::ostream &, const PetriNet &);
 
 public: /* public types */
   /*!

@@ -90,16 +90,20 @@ std::ostream & InputError::output(std::ostream & os) const
     
     size_t firstpos(line_.find(token));
     
-    for(unsigned int i = 0; i < firstpos; ++i)
+    // security check
+    if(firstpos != string::npos)
     {
-      arrows += " ";
+      for(unsigned int i = 0; i < firstpos; ++i)
+      {
+        arrows += " ";
+      }
+      for(unsigned int i = 0; i < token.size(); ++i)
+      {
+        arrows += "^";
+      }
+
+      os << endl << endl << line_ << endl << arrows << endl << endl;
     }
-    for(unsigned int i = 0; i < token.size(); ++i)
-    {
-      arrows += "^";
-    }
-    
-    os << endl << endl << line_ << endl << arrows << endl << endl;  
   }
   ifs.close();
   

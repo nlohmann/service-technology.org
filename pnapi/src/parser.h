@@ -118,6 +118,12 @@ namespace woflan
 PetriNet parse(std::istream &);
 } /* namespace woflan */
 
+namespace pnt
+{
+/// parses stream contents with the associated parser
+PetriNet parse(std::istream &);
+} /* namespace pnt */
+
 } /* namespace parser */
 
 } /* namespace pnapi */

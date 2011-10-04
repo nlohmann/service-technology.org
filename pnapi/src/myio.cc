@@ -53,6 +53,7 @@ std::ostream & operator<<(std::ostream & os, const PetriNet & net)
   case util::PNML: return __pnml::output(os, net);
   case util::WOFLAN: return __woflan::output(os, net);
   case util::IFN: return __ifn::output(os, net);
+  case util::PNT: return __pnt::output(os, net);
 	
   default: PNAPI_ASSERT(false);
   }
@@ -111,6 +112,14 @@ std::istream & operator>>(std::istream & is, PetriNet & net) throw (exception::I
     break;
   }
   
+  case util::PNT:
+  {
+    net = parser::pnt::parse(is);
+
+    net.meta_ = util::MetaData::data(is);
+    break;
+  }
+
   default: PNAPI_ASSERT(false);  // unsupported input format
   }
 
@@ -197,6 +206,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Place & p)
   case OWFN: return __owfn::output(os, p);
   case PNML: return __pnml::output(os, p);
   case WOFLAN: return __woflan::output(os, p);
+  case PNT: return __pnt::output(os, p);
 
   default: PNAPI_ASSERT(false);
   }
@@ -215,6 +225,7 @@ std::ostream & operator<<(std::ostream & os, const pnapi::Transition & t)
   case OWFN: return __owfn::output(os, t);
   case PNML: return __pnml::output(os, t);
   case WOFLAN: return __woflan::output(os, t);
+  case PNT: return __pnt::output(os, t);
 
   default: PNAPI_ASSERT(false);
   }
@@ -521,6 +532,16 @@ std::ostream & operator<<(std::ostream & os, const Edge & e)
   
   default: PNAPI_ASSERT(false); // unsupported format
   }
+}
+
+
+
+/*!
+ * \brief constructor
+ */
+PntNodeData::PntNodeData():
+  placeID(0), transitionID(0), nameID(0)
+{
 }
 
 } /* namespace util */

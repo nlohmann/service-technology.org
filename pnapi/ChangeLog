@@ -32,6 +32,10 @@ Version 4.03-unreleased
 
 * creating arcs between two nets will now raise an exception
 
+* implemented INA file format (*.pnt) files
+
+* fixed bug in exception output
+
 Version 4.02 (2010-07-28)
 =========================
 

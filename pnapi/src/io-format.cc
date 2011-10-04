@@ -1859,6 +1859,153 @@ std::ostream & output(std::ostream & os, const Arc & arc)
 
 } /* namespace __woflan */
 
+
+/*************************************************************************
+ ***** INA output (*.pnt)
+ *************************************************************************/
+
+/*!
+ * \brief writes output type to stream
+ */
+std::ios_base & pnt(std::ios_base & ios)
+{
+  util::FormatData::data(ios) = util::PNT;
+  return ios;
+}
+
+namespace __pnt
+{
+/*!
+ * \brief petri net output
+ */
+std::ostream & output(std::ostream & os, const PetriNet & net)
+{
+  os << "P   M   PRE,POST  NETZ 0\n"
+     << util::mode(io::util::NORMAL) << net.places_
+     << "@\n" << "place nr.             name capacity time\n"
+     << util::mode(io::util::PLACE) << net.places_
+     << "@\n" << "trans nr.             name priority time\n"
+     << net.transitions_
+     << "@\n";
+
+  return os;
+}
+
+/*!
+ * \brief place output
+ */
+std::ostream & output(std::ostream & os, const Place & p)
+{
+  if(ModeData::data(os) == io::util::NORMAL)
+  {
+    os << "  " << getNodeID(os, p) << " " << p.getTokenCount() << "    ";
+    PNAPI_FOREACH(a, p.getPresetArcs())
+    {
+      os << getNodeID(os, (*a)->getSourceNode());
+      if ((*a)->getWeight() > 1)
+      {
+        os << ": " << (*a)->getWeight();
+      }
+      os << " ";
+    }
+    if (p.getPostsetArcs().size() > 0)
+    {
+      PNAPI_FOREACH(a, p.getPostsetArcs())
+      {
+        os << getNodeID(os, (*a)->getTargetNode());
+        if ((*a)->getWeight() > 1)
+        {
+          os << ": " << (*a)->getWeight();
+        }
+        os << " ";
+      }
+    }
+    os << "\n";
+  }
+  else // ModeData::data(os) == io::util::PLACE
+  {
+    os << "       " << getNodeID(os, p) << ": " << getNodeName(os, p) << "      ";
+    if (p.getCapacity() > 0)
+    {
+      os << " " << p.getCapacity();
+    }
+    else
+    {
+      os << "oo";
+    }
+    os << "   0\n";
+  }
+
+  return os;
+}
+
+/*!
+ * \brief transition output
+ */
+std::ostream & output(std::ostream & os, const Transition & t)
+{
+  os << "       " << getNodeID(os, t) << ": " << getNodeName(os, t) << "      0   0\n";
+  return os;
+}
+
+/*!
+ * \brief get file internal node ID
+ */
+int getNodeID(std::ostream & os, const Node & n)
+{
+  Node * n_ = const_cast<Node *>(&n); // casting away the const
+  if(util::PntData::data(os).ids.find(n_) == util::PntData::data(os).ids.end()) // if node not in cache
+  {
+    // get next free id and write to cache
+    if (dynamic_cast<Place *>(n_) != NULL)
+    {
+      util::PntData::data(os).ids[n_] = util::PntData::data(os).placeID++;
+    }
+    else
+    {
+      util::PntData::data(os).ids[n_] = util::PntData::data(os).transitionID++;
+    }
+  }
+  return util::PntData::data(os).ids[n_];
+}
+
+/*!
+ * \brief get a short name of a node
+ *
+ * A node name must not be longer than 16 characters.
+ * Truncating a name could lead to name collisions,
+ * hence we have to find unused node names.
+ *
+ * \pre It is assumed that this method will only be called once for each node.
+ */
+std::string getNodeName(std::ostream & os, const Node & n)
+{
+  string result = n.getName();
+  if(n.getName().length() > 16)
+  {
+    // need to rename
+    stringstream ss;
+    while(n.getPetriNet().findNode(result) != NULL) // while name already used
+    {
+      // clear stream
+      ss.str("");
+      ss.clear();
+      // get next name
+      ss << "tooLong_" << (util::PntData::data(os).nameID++);
+      result = ss.str();
+    }
+  }
+
+  // fill up with whitespace
+  while(result.length() < 16)
+  {
+    result = " " + result;
+  }
+  return result;
+}
+
+} /* namespace pnt */
+
 } /* namespace io */
 
 } /* namespace pnapi */

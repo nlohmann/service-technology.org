@@ -8,6 +8,7 @@ libpnapi_la_SOURCES = \
     parser-pnml.yy parser-pnml-lexer.ll parser-pnml-wrapper.h parser-pnml-wrapper.cc \
     parser-sa.yy parser-sa-lexer.ll parser-sa-wrapper.h parser-sa-wrapper.cc \
     parser-woflan.yy parser-woflan-lexer.ll parser-woflan-wrapper.h parser-woflan-wrapper.cc \
+    parser-pnt.yy parser-pnt-lexer.ll parser-pnt-wrapper.h parser-pnt-wrapper.cc \
     FlexLexer.h \
     pnapi.h pnapi.cc pnapi-assert.h \
     automaton.h automaton.cc\
@@ -46,7 +47,7 @@ libpnapi_la_SOURCES = \
 #    This release has a new, but backwards incompatible interface.
 #
 # For more info see section 6.3 of the GNU Libtool Manual.
-VERINFO = -version-info 13:2:8
+VERINFO = -version-info 14:0:9
 
 libpnapi_la_LDFLAGS = $(VERINFO) -no-undefined
 pkgconfigdir = $(libdir)/pkgconfig

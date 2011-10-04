@@ -79,7 +79,7 @@ TESTFILES = test_input.owfn syntax_example1.owfn syntax_example2.owfn \
             fiona_abnormal_output.normalized.expected.owfn \
             fiona_abnormal_output.owfn fiona_coffee.normalized.expected.owfn \
             fiona_coffee.owfn zeus.owfn test_input.pnml cyclicFullCoffee.pnml \
-            cyclicFullCoffee.owfn phils.pnml phils.lola \
+            cyclicFullCoffee.owfn phils.pnml phils.lola phils.pnt ph.pnt \
             prom-2_7.pnml prom-Heuristics.pnml \
             prom-OverlyPreciseModel_artificialStartEndTasks.pnml \
             prom-peller.pnml prom-ADtranslationAccordingToSpec.pnml \

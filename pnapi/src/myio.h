@@ -155,6 +155,8 @@ std::ios_base & sa(std::ios_base &);
 std::ios_base & lola(std::ios_base &);
 /// PNML file format
 std::ios_base & pnml(std::ios_base &);
+/// INA file format
+std::ios_base & pnt(std::ios_base &);
 /// WOFLAN file format
 std::ios_base & woflan(std::ios_base &);
 /// formula output manipulator
@@ -199,7 +201,9 @@ enum Format {
   /// WOFLAN format
   WOFLAN,
   /// information flow net
-  IFN
+  IFN,
+  /// INA file format
+  PNT
 };
 
 /// I/O (sub-)mode
@@ -509,6 +513,30 @@ std::ostream & output(std::ostream &, const Transition &);
 } /* namespace __woflan*/
 
 
+
+//****************************
+//*** INA output format (*.pnt) ***
+//****************************
+
+/*!
+* \brief INA I/O implementation
+*/
+namespace __pnt
+{
+/// petri net output
+std::ostream & output(std::ostream &, const PetriNet &);
+/// place output
+std::ostream & output(std::ostream &, const Place &);
+/// transition output
+std::ostream & output(std::ostream &, const Transition &);
+/// get file internal node ID
+int getNodeID(std::ostream &, const Node &);
+/// get a short name of a node
+std::string getNodeName(std::ostream &, const Node &);
+
+} /* namespace __pnt */
+
+
 /***************************************************************************
  ***** PART III: Internal Generic I/O Implementation
  ***************************************************************************/
@@ -557,6 +585,25 @@ struct DotNodeName
   std::map<std::string, std::string> names;
 };
 
+/*!
+ * \brief Data for INA output (*.pnt)
+ *
+ * Containing node IDs and name cache
+ */
+struct PntNodeData
+{
+  /// internal IDs for pnt format
+  std::map<Node *, int> ids;
+  /// next place id
+  int placeID;
+  /// next transition id
+  int transitionID;
+  /// next name number
+  unsigned int nameID;
+  /// constructor
+  PntNodeData();
+};
+
 /*** TEMPLATE CLASSES ***/
 
 /*!
@@ -598,6 +645,7 @@ typedef StreamMetaData<Formula> FormulaData;
 typedef StreamMetaData<Role> RoleData;
 typedef StreamMetaData<PortRemoval> PortData;
 typedef StreamMetaData<DotNodeName> DotNameData;
+typedef StreamMetaData<PntNodeData> PntData;
 typedef StreamMetaData<std::map<pnapi::io::MetaInformation, std::string> > MetaData;
 typedef Manipulator<std::pair<pnapi::io::MetaInformation, std::string> > MetaManipulator;
 

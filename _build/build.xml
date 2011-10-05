@@ -1,6 +1,7 @@
 <project name="main" default="all">
 
     <basename property="package" file="."/>
+    <property name="dir" location="."/>
 
     <target name="all" depends="prepare, cppcheck, statsvn, autogen, configure, make_all, make_check, make_distcheck, documentation, coverage" />
     <target name="all_win" depends="prepare, autogen, configure_win, make_all_win" />
@@ -60,7 +61,6 @@
     </target>
 
     <target name="configure_win">
-        <property name="dir" location="."/>
         <exec executable="sh" failonerror="true">
             <arg value="configure" />
             <arg value="--host=i586-mingw32msvc" /> <!-- new -->
@@ -88,7 +88,6 @@
             <arg value="AM_CFLAGS=-O2" />
             <arg value="AM_CXXFLAGS=-O2" />
             <arg value="AM_LDFLAGS=-lstdc++ -lgcc -lodbc32 -lwsock32 -lwinspool -lwinmm -lshell32 -lcomctl32 -lctl3d32 -lodbc32 -ladvapi32 -lodbc32 -lwsock32 -lopengl32 -lglu32 -lole32 -loleaut32 -luuid" /> <!-- new -->
-            <!-- <arg value="all" /> -->
         </exec>
         <record name="artifacts/make.log" action="stop"/>
 
@@ -100,9 +99,11 @@
         <exec executable="make" failonerror="true">
             <arg value="install" />
             <arg value="install-pdf" />
-            <arg value="install-html" />
             <arg value="install" />
         </exec>
+
+        <delete dir="${dir}/${package}/share" failonerror="false" />
+        <zip destfile="${package}-win.zip" basedir="${dir}/${package}" level="9" />
     </target>
 
     <target name="make_all">
@@ -110,7 +111,6 @@
         <exec executable="make" failonerror="true">
             <arg value="AM_CFLAGS=-O2 -Waddress -Waggregate-return -Wall -Wc++-compat -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wnested-externs -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic" />
             <arg value="AM_CXXFLAGS=-O2 -Waddress -Wall -Wcast-align -Wcast-qual -Wconversion -Wempty-body -Wextra -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-y2k -Wformat=2 -Winit-self -Wmissing-field-initializers -Wmissing-include-dirs -Wmissing-noreturn -Wno-attributes -Wno-div-by-zero -Wno-endif-labels -Wno-format-extra-args -Wno-variadic-macros -Wpacked -Wpointer-arith -Wredundant-decls -Wundef -Wuninitialized -Wunused -Wwrite-strings -ansi -pedantic" />
-            <!-- <arg value="all" /> -->
         </exec>
         <record name="artifacts/make.log" action="stop"/>
 
@@ -158,11 +158,6 @@
 
         <mkdir dir="doc/doxygen" />
         <exec executable="doxygen" dir="doc" failonerror="false" />
-
-        <!-- ><mkdir dir="artifacts/doxygen" />
-        <copy todir="artifacts/doxygen" failonerror="false">
-        <fileset dir="doc/doxygen" includes="**"/>
-        </copy> -->
     </target>
 
     <target name="coverage">

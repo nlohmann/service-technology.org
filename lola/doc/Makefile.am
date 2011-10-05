@@ -38,7 +38,7 @@ all: ../ChangeLog
 #############################################################################
 graph2dot.out: $(top_srcdir)/utils/cmdline-graph2dot.ggo $(top_srcdir)/configure.ac
 	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) -C $(top_srcdir)/utils
-	$(AM_V_GEN)$(top_srcdir)/utils/graph2dot --help > graph2dot.out
+	$(AM_V_GEN)$(top_srcdir)/utils/graph2dot$(EXEEXT) --help > graph2dot.out
 
 
 #############################################################################

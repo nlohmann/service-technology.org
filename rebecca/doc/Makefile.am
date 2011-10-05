@@ -25,7 +25,7 @@ rebecca_TEXINFOS = fdl.texi
 # GENERIC: run tool to include help output in documentation #
 #-----------------------------------------------------------#
 cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
-	$(AM_V_GEN)$(top_builddir)/src/$(PACKAGE) $(HELPOPTION) > cmdline.out
+	$(AM_V_GEN)$(top_builddir)/src/$(PACKAGE)$(EXEEXT) $(HELPOPTION) > cmdline.out
 EXTRA_DIST += cmdline.out 
 MAINTAINERCLEANFILES = cmdline.out
 rebecca_TEXINFOS += cmdline.out

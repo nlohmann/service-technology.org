@@ -25,7 +25,7 @@ hello_TEXINFOS = fdl.texi
 # GENERIC: run tool to include help output in documentation #
 #-----------------------------------------------------------#
 cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
-	$(AM_V_GEN)$(top_builddir)/src/$(PACKAGE) $(HELPOPTION) > cmdline.out
+	$(AM_V_GEN)$(top_builddir)/src/$(PACKAGE)$(EXEEXT) $(HELPOPTION) > cmdline.out
 EXTRA_DIST += cmdline.out 
 MAINTAINERCLEANFILES = cmdline.out
 hello_TEXINFOS += cmdline.out
@@ -79,7 +79,7 @@ EXTRA_DIST += $(man_MANS)
 
 $(PACKAGE).1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo extra_man
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/src/$(PACKAGE) \
+		$(top_builddir)/src/$(PACKAGE)$(EXEEXT) \
 		--name="synthesizing partners for services" \
 		--output=$@ \
 		--manual="service-technology.org" \

@@ -6,7 +6,7 @@ EXTRA_DIST = extra
 
 petri.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cmdline.ggo extra
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/utils/petri \
+		$(top_builddir)/utils/petri$(EXEEXT) \
 		--name="$(PACKAGE_NAME) Frontend" \
 		--output=$@ \
 		--manual="service-technology.org" \
@@ -17,7 +17,7 @@ petri.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cmdline.ggo extra
 
 cdnf.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cdnf-cmdline.ggo extra
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/utils/cdnf \
+		$(top_builddir)/utils/cdnf$(EXEEXT) \
 		--name="$(PACKAGE_NAME): canonic disjunctive normal form" \
 		--output=$@ \
 		--manual="service-technology.org" \
@@ -27,7 +27,7 @@ cdnf.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cdnf-cmdline.ggo extra
 
 configurator.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/configurator-cmdline.ggo extra
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/utils/configurator \
+		$(top_builddir)/utils/configurator$(EXEEXT) \
 		--name="$(PACKAGE_NAME): configuration interface" \
 		--output=$@ \
 		--manual="service-technology.org" \

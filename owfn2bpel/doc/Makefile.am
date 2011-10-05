@@ -15,7 +15,7 @@ CLEANFILES = owfn2bpel.dvi
 # run "owfn2bpel --help" to include output in documentation
 #############################################################################
 cmdline.out: $(top_srcdir)/src/cmdline.ggo
-	$(top_srcdir)/src/owfn2bpel --help > cmdline.out
+	$(top_srcdir)/src/owfn2bpel$(EXEEXT) --help > cmdline.out
 
 
 #############################################################################

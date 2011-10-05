@@ -15,7 +15,7 @@ all: ../ChangeLog
 # run "safira --full" to include output in documentation
 #############################################################################
 cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
-	$(top_srcdir)/src/safira --help > cmdline.out
+	$(top_srcdir)/src/safira$(EXEEXT) --help > cmdline.out
 
 
 #############################################################################

@@ -50,4 +50,3 @@ cmdline.out: $(top_srcdir)/src/options.cc $(top_srcdir)/src/options.h $(top_srcd
 #############################################################################
 manual: $(info_TEXINFOS)
 	./gendocs.sh $(PACKAGE) "$(PACKAGE_NAME)"
-	

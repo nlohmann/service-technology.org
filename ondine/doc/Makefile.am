@@ -25,7 +25,7 @@ ondine_TEXINFOS = fdl.texi
 # GENERIC: run tool to include help output in documentation #
 #-----------------------------------------------------------#
 cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
-	$(top_builddir)/src/$(PACKAGE) $(HELPOPTION) > cmdline.out
+	$(top_builddir)/src/$(PACKAGE)$(EXEEXT) $(HELPOPTION) > cmdline.out
 EXTRA_DIST += cmdline.out 
 MAINTAINERCLEANFILES = cmdline.out
 ondine_TEXINFOS += cmdline.out

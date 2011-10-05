@@ -9,7 +9,7 @@ HELPOPTION = --full-help
 
 $(PACKAGE).1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo extra
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/src/$(PACKAGE) \
+		$(top_builddir)/src/$(PACKAGE)$(EXEEXT) \
 		--name="a low-level Petri net analyzer" \
 		--output=$@ \
 		--manual="service-technology.org" \
@@ -19,7 +19,7 @@ $(PACKAGE).1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo extra
 
 graph2dot.1: $(top_srcdir)/configure.ac $(top_srcdir)/utils/cmdline-graph2dot.ggo
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/utils/graph2dot \
+		$(top_builddir)/utils/graph2dot$(EXEEXT) \
 		--name="$(PACKAGE_NAME): graph2dot" \
 		--output=$@ \
 		--manual="service-technology.org" \

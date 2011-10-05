@@ -28,7 +28,7 @@ pnapi_TEXINFOS = fdl.texi
 # GENERIC: run tool to include help output in documentation #
 #-----------------------------------------------------------#
 cmdline.out: $(top_srcdir)/utils/cmdline.ggo $(top_srcdir)/configure.ac
-	$(AM_V_GEN)$(top_builddir)/utils/petri $(HELPOPTION) > cmdline.out
+	$(AM_V_GEN)$(top_builddir)/utils/petri$(EXEEXT) $(HELPOPTION) > cmdline.out
 EXTRA_DIST += cmdline.out 
 MAINTAINERCLEANFILES = cmdline.out
 pnapi_TEXINFOS += cmdline.out

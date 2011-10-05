@@ -15,7 +15,7 @@ all: ../ChangeLog
 # run "yasmina --full" to include output in documentation
 #############################################################################
 cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
-	$(top_srcdir)/src/yasmina --help > cmdline.out
+	$(top_srcdir)/src/yasmina$(EXEEXT) --help > cmdline.out
 
 
 #############################################################################

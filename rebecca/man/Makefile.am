@@ -11,7 +11,7 @@ EXTRA_DIST = $(man_MANS)
 
 $(PACKAGE).1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/src/$(PACKAGE) \
+		$(top_builddir)/src/$(PACKAGE)$(EXEEXT) \
 		--name="$(PACKAGE_NAME)" \
 		--output=$@ \
 		--manual="service-technology.org" \

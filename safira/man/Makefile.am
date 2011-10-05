@@ -9,7 +9,7 @@ HELPOPTION = --detailed-help
 
 $(PACKAGE).1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo extra
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/src/$(PACKAGE) \
+		$(top_builddir)/src/$(PACKAGE)$(EXEEXT) \
 		--name="implementing set algebra for service behavior" \
 		--output=$@ \
 		--manual="service-technology.org" \

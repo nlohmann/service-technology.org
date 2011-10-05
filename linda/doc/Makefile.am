@@ -15,7 +15,7 @@ all: ../ChangeLog
 # run "linda --help" to include output in documentation
 #############################################################################
 cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
-	$(top_srcdir)/src/linda --help > cmdline.out
+	$(top_srcdir)/src/linda$(EXEEXT) --help > cmdline.out
 
 
 #############################################################################

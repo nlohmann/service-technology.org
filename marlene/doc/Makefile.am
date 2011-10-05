@@ -15,7 +15,7 @@ all: ../ChangeLog
 # run "marlene --full-help" to include output in documentation
 #############################################################################
 cmdline.out: $(top_srcdir)/src/cmdline.ggo $(top_srcdir)/configure.ac
-	$(top_srcdir)/src/marlene --full-help > cmdline.out
+	$(top_srcdir)/src/marlene$(EXEEXT) --full-help > cmdline.out
 
 
 #############################################################################

@@ -6,7 +6,7 @@ EXTRA_DIST =
 
 fiona2wendy.1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/src/fiona2wendy \
+		$(top_builddir)/src/fiona2wendy$(EXEEXT) \
 		--name="$(PACKAGE_NAME) fiona2wendy" \
 		--output=$@ \
 		--manual="service-technology.org" \
@@ -16,7 +16,7 @@ fiona2wendy.1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 
 ig2sa.1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/src/ig2sa \
+		$(top_builddir)/src/ig2sa$(EXEEXT) \
 		--name="$(PACKAGE_NAME) ig2sa" \
 		--output=$@ \
 		--manual="service-technology.org" \
@@ -26,7 +26,7 @@ ig2sa.1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 
 sa2ig.1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/src/sa2ig \
+		$(top_builddir)/src/sa2ig$(EXEEXT) \
 		--name="$(PACKAGE_NAME) sa2ig" \
 		--output=$@ \
 		--manual="service-technology.org" \
@@ -36,7 +36,7 @@ sa2ig.1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 
 wendy2fiona.1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/src/wendy2fiona \
+		$(top_builddir)/src/wendy2fiona$(EXEEXT) \
 		--name="$(PACKAGE_NAME) wendy2fiona" \
 		--output=$@ \
 		--manual="service-technology.org" \
@@ -46,7 +46,7 @@ wendy2fiona.1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 
 wendyExpandBits.1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/src/wendyExpandBits \
+		$(top_builddir)/src/wendyExpandBits$(EXEEXT) \
 		--name="$(PACKAGE_NAME) wendyExpandBits" \
 		--output=$@ \
 		--manual="service-technology.org" \
@@ -56,7 +56,7 @@ wendyExpandBits.1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 
 wendyFormula2bits.1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/src/wendyFormula2bits \
+		$(top_builddir)/src/wendyFormula2bits$(EXEEXT) \
 		--name="$(PACKAGE_NAME) wendyFormula2bits" \
 		--output=$@ \
 		--manual="service-technology.org" \
@@ -66,7 +66,7 @@ wendyFormula2bits.1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 
 wendyReduceBits.1: $(top_srcdir)/configure.ac $(top_srcdir)/src/cmdline.ggo
 	$(AM_V_GEN)$(HELP2MAN) \
-		$(top_builddir)/src/wendyReduceBits \
+		$(top_builddir)/src/wendyReduceBits$(EXEEXT) \
 		--name="$(PACKAGE_NAME) wendyReduceBits" \
 		--output=$@ \
 		--manual="service-technology.org" \

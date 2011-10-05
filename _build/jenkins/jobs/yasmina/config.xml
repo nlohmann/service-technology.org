@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>@DESCRIPTION@</description>
+  <description>Standard continuos integration job for Yasmina</description>
   <logRotator>
     <daysToKeep>-1</daysToKeep>
     <numToKeep>10</numToKeep>
@@ -13,7 +13,7 @@
   <scm class="hudson.scm.SubversionSCM">
     <locations>
       <hudson.scm.SubversionSCM_-ModuleLocation>
-        <remote>http://svn.gna.org/svn/service-tech/trunk/@PATH@</remote>
+        <remote>http://svn.gna.org/svn/service-tech/trunk/yasmina</remote>
         <local>.</local>
       </hudson.scm.SubversionSCM_-ModuleLocation>
     </locations>
@@ -45,7 +45,7 @@
     <hudson.tasks.Ant>
       <targets></targets>
       <antName>ant</antName>
-      <properties>package=@SHORTNAME@</properties>
+      <properties>package=yasmina</properties>
     </hudson.tasks.Ant>
   </builders>
   <publishers>

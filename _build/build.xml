@@ -110,6 +110,7 @@
 
         <delete dir="${dir}/${package}/share" failonerror="false" />
         <zip destfile="${package}-win.zip" basedir="${dir}/${package}" level="9" />
+        <delete dir="${dir}/${package}" failonerror="false" />
     </target>
 
     <target name="make_all">

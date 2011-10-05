@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>TOOL</name>
+          <description>Enter the job name - e.g. &quot;wendy&quot;.</description>
+          <defaultValue>---</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+    <hudson.plugins.disk__usage.DiskUsageProperty/>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>master</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/sh
+
+# JENKINS_URL = http://esla.informatik.uni-rostock.de/jenkins
+# TOOL = Name des Tools für die Release
+
+rm -fr *
+
+wget &quot;$JENKINS_URL&quot;job/$TOOL/lastSuccessfulBuild/artifact/artifacts/$TOOL.tar.gz
+tar xfz $TOOL.tar.gz
+cd $TOOL
+./configure
+make all distcheck pdf || exit 1
+
+TARBALLNAME=`ls -1 $TOOL-*.tar.gz`
+gpg --detach $TARBALLNAME
+
+echo &quot;cd /upload/service-tech/$TOOL&quot; &gt; sftp-script
+echo &quot;-rm $TOOL.tar.gz&quot; &gt;&gt; sftp-script
+echo &quot;ln $TARBALLNAME $TOOL.tar.gz&quot; &gt;&gt; sftp-script
+echo &quot;exit&quot; &gt;&gt; sftp-script
+
+scp -C $TARBALLNAME $TARBALLNAME.sig ChangeLog doc/$TOOL.pdf niels@download.gna.org:/upload/service-tech/$TOOL
+sftp -b sftp-script niels@download.gna.org
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.plugins.twitter.TwitterPublisher/>
+  </publishers>
+  <buildWrappers/>
+</project>

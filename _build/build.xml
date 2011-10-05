@@ -22,7 +22,7 @@
         <delete file="statsvn.log" failonerror="false" />
         <delete file="cppcheck-result.xml" failonerror="false" />
         <delete failonerror="false">
-          <fileset dir="." includes="plot_*"/>
+            <fileset dir="." includes="plot_*"/>
         </delete>
     </target>
 
@@ -33,8 +33,8 @@
         <exec executable="statsvn" failonerror="false">
             <arg line="-disable-twitter-button -threads 10 -include '**/src/**;**/utils/**' statsvn.log . -output-dir statsvn -cache-dir /tmp/statsvn" />
         </exec>
-<!--        <exec executable="java" failonerror="false">
-            <arg line="-jar '${homedir}/local/statsvn/statsvn.jar' -config-file '${homedir}/local/statsvn/config' -tags '.*' -disable-twitter-button -threads 1 -include '**/src/**;**/utils/**' statsvn.log . -output-dir statsvn" />
+        <!--        <exec executable="java" failonerror="false">
+        <arg line="-jar '${homedir}/local/statsvn/statsvn.jar' -config-file '${homedir}/local/statsvn/config' -tags '.*' -disable-twitter-button -threads 1 -include '**/src/**;**/utils/**' statsvn.log . -output-dir statsvn" />
         </exec>-->
     </target>
 
@@ -60,9 +60,14 @@
     </target>
 
     <target name="configure_win">
+        <property name="dir" location="."/>
         <exec executable="sh" failonerror="true">
             <arg value="configure" />
             <arg value="--host=i586-mingw32msvc" /> <!-- new -->
+            <arg value="--prefix=${dir}/${package}" />
+            <arg value="--docdir=${dir}/${package}" />
+            <arg value="--bindir=${dir}/${package}" />
+            <arg value="--sysconfdir=${dir}/${package}" />
         </exec>
         <copy file="config.log" todir="artifacts" failonerror="false" />
     </target>
@@ -77,21 +82,28 @@
         <copy file="config.log" todir="artifacts" failonerror="false" />
     </target>
 
-	<target name="make_all_win">
-	    <record name="artifacts/make.log" action="start"/>
-	    <exec executable="make" failonerror="true">
-	        <arg value="AM_CFLAGS=-O2" />
-	        <arg value="AM_CXXFLAGS=-O2" />
-	        <arg value="AM_LDFLAGS=-lstdc++ -lgcc -lodbc32 -lwsock32 -lwinspool -lwinmm -lshell32 -lcomctl32 -lctl3d32 -lodbc32 -ladvapi32 -lodbc32 -lwsock32 -lopengl32 -lglu32 -lole32 -loleaut32 -luuid" /> <!-- new -->
-	        <!-- <arg value="all" /> -->
-	    </exec>
-	    <record name="artifacts/make.log" action="stop"/>
+    <target name="make_all_win">
+        <record name="artifacts/make.log" action="start"/>
+        <exec executable="make" failonerror="true">
+            <arg value="AM_CFLAGS=-O2" />
+            <arg value="AM_CXXFLAGS=-O2" />
+            <arg value="AM_LDFLAGS=-lstdc++ -lgcc -lodbc32 -lwsock32 -lwinspool -lwinmm -lshell32 -lcomctl32 -lctl3d32 -lodbc32 -ladvapi32 -lodbc32 -lwsock32 -lopengl32 -lglu32 -lole32 -loleaut32 -luuid" /> <!-- new -->
+            <!-- <arg value="all" /> -->
+        </exec>
+        <record name="artifacts/make.log" action="stop"/>
 
-	    <!-- strip "     [exec] " prefix from output -->
-	    <exec executable="sed" failonerror="false">
-	        <arg line="-i 's/     \[exec\] //' artifacts/make.log" />
-	    </exec>
-	</target>
+        <!-- strip "     [exec] " prefix from output -->
+        <exec executable="sed" failonerror="false">
+            <arg line="-i 's/     \[exec\] //' artifacts/make.log" />
+        </exec>
+
+        <exec executable="make" failonerror="true">
+            <arg value="install" />
+            <arg value="install-pdf" />
+            <arg value="install-html" />
+            <arg value="install" />
+        </exec>
+    </target>
 
     <target name="make_all">
         <record name="artifacts/make.log" action="start"/>
@@ -149,7 +161,7 @@
 
         <!-- ><mkdir dir="artifacts/doxygen" />
         <copy todir="artifacts/doxygen" failonerror="false">
-            <fileset dir="doc/doxygen" includes="**"/>
+        <fileset dir="doc/doxygen" includes="**"/>
         </copy> -->
     </target>
 

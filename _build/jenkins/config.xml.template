@@ -164,9 +164,6 @@
         </hudson.plugins.plot.Plot>
       </plots>
     </hudson.plugins.plot.PlotPublisher>
-    <com.thalesgroup.hudson.plugins.cccc.CcccPublisher>
-      <metricFilePath>.cccc/cccc.xml</metricFilePath>
-    </com.thalesgroup.hudson.plugins.cccc.CcccPublisher>
     <hudson.plugins.doclinks.DocLinksPublisher>
       <documents>
         <hudson.plugins.doclinks.Document>

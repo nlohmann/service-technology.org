@@ -1090,8 +1090,8 @@ public class PetriNet implements ISystemModel {
    * @return brief summary about this net
    */
   public String getInfo() {
-    return "|P|= "+places.size()+"  |P_in|= "+0+"  |P_out|= "+0+"  |T|= "+transitions.size()+"  |F|= "+getArcs().size();
-    //return places.size()+";"+transitions.size()+";"+getArcs().size();
+    //return "|P|= "+places.size()+"  |P_in|= "+0+"  |P_out|= "+0+"  |T|= "+transitions.size()+"  |F|= "+getArcs().size();
+    return places.size()+";"+transitions.size()+";"+getArcs().size();
   }
   
   /**

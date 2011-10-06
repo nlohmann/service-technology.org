@@ -8,7 +8,7 @@ options {
 /*****************************************************************************\
  * Copyright (c) 2010. All rights reserved. Dirk Fahland. AGPL3.0
  * 
- * ServiceTechnology.org - Petri Net API/Java
+ * ServiceTechnology.org - Petri Net API/Java 
  * 
  * This program and the accompanying materials are made available under
  * the terms of the GNU Affero General Public License Version 3 or later,
@@ -163,7 +163,7 @@ marking:
 /* ----------------- FINALCONDITION ----------------- */
 
 final_condition:
-	(marking KEY_AND KEY_EMPTY) SEMICOLON
+	KEY_TRUE SEMICOLON
 ;
 
 /* ----------------- TRANSITION ----------------- */

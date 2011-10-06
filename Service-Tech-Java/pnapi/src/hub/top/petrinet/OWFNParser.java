@@ -1,10 +1,10 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 src/hub/top/petrinet/OWFN.g 2011-05-17 10:06:52
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g 2011-10-06 19:57:52
 
 /*****************************************************************************\
 
  * Copyright (c) 2010. All rights reserved. Dirk Fahland. AGPL3.0
  * 
- * ServiceTechnology.org - Petri Net API/Java
+ * ServiceTechnology.org - Petri Net API/Java 
  * 
  * This program and the accompanying materials are made available under
  * the terms of the GNU Affero General Public License Version 3 or later,
@@ -28,28 +28,28 @@ import java.util.ArrayList;
 
 public class OWFNParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "KEY_PLACE", "KEY_INTERNAL", "KEY_INPUT", "KEY_OUTPUT", "KEY_INITIALMARKING", "KEY_FINALCONDITION", "IDENT", "NUMBER", "KEY_ROLES", "COMMA", "SEMICOLON", "KEY_SAFE", "COLON", "KEY_AND", "KEY_EMPTY", "KEY_TRANSITION", "KEY_CONSUME", "KEY_PRODUCE", "COMMENT_CONTENTS", "KEY_TRUE", "DIGIT", "WHITESPACE"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "KEY_PLACE", "KEY_INTERNAL", "KEY_INPUT", "KEY_OUTPUT", "KEY_INITIALMARKING", "KEY_FINALCONDITION", "IDENT", "NUMBER", "KEY_ROLES", "COMMA", "SEMICOLON", "KEY_SAFE", "COLON", "KEY_TRUE", "KEY_TRANSITION", "KEY_CONSUME", "KEY_PRODUCE", "COMMENT_CONTENTS", "KEY_AND", "KEY_EMPTY", "DIGIT", "WHITESPACE"
     };
-    public static final int KEY_TRUE=23;
+    public static final int KEY_TRUE=17;
     public static final int KEY_INPUT=6;
-    public static final int KEY_EMPTY=18;
+    public static final int KEY_EMPTY=23;
     public static final int KEY_OUTPUT=7;
     public static final int NUMBER=11;
     public static final int WHITESPACE=25;
     public static final int SEMICOLON=14;
-    public static final int COMMENT_CONTENTS=22;
+    public static final int COMMENT_CONTENTS=21;
     public static final int EOF=-1;
     public static final int COLON=16;
     public static final int KEY_ROLES=12;
-    public static final int KEY_TRANSITION=19;
+    public static final int KEY_TRANSITION=18;
     public static final int COMMA=13;
-    public static final int KEY_PRODUCE=21;
+    public static final int KEY_PRODUCE=20;
     public static final int KEY_SAFE=15;
-    public static final int KEY_AND=17;
+    public static final int KEY_AND=22;
     public static final int KEY_INITIALMARKING=8;
     public static final int KEY_FINALCONDITION=9;
     public static final int IDENT=10;
-    public static final int KEY_CONSUME=20;
+    public static final int KEY_CONSUME=19;
     public static final int DIGIT=24;
     public static final int KEY_PLACE=4;
     public static final int KEY_INTERNAL=5;
@@ -68,7 +68,7 @@ public class OWFNParser extends Parser {
         
 
     public String[] getTokenNames() { return OWFNParser.tokenNames; }
-    public String getGrammarFileName() { return "src/hub/top/petrinet/OWFN.g"; }
+    public String getGrammarFileName() { return "D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g"; }
 
 
 
@@ -95,17 +95,17 @@ public class OWFNParser extends Parser {
 
 
     // $ANTLR start "net"
-    // src/hub/top/petrinet/OWFN.g:66:1: net returns [PetriNet resultNet] : KEY_PLACE ( roles )? KEY_INTERNAL places KEY_INPUT places KEY_OUTPUT places KEY_INITIALMARKING marking_list KEY_FINALCONDITION final_condition transitions ;
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:66:1: net returns [PetriNet resultNet] : KEY_PLACE ( roles )? KEY_INTERNAL places KEY_INPUT places KEY_OUTPUT places KEY_INITIALMARKING marking_list KEY_FINALCONDITION final_condition transitions ;
     public final PetriNet net() throws RecognitionException {
         PetriNet resultNet = null;
 
         try {
-            // src/hub/top/petrinet/OWFN.g:66:33: ( KEY_PLACE ( roles )? KEY_INTERNAL places KEY_INPUT places KEY_OUTPUT places KEY_INITIALMARKING marking_list KEY_FINALCONDITION final_condition transitions )
-            // src/hub/top/petrinet/OWFN.g:66:35: KEY_PLACE ( roles )? KEY_INTERNAL places KEY_INPUT places KEY_OUTPUT places KEY_INITIALMARKING marking_list KEY_FINALCONDITION final_condition transitions
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:66:33: ( KEY_PLACE ( roles )? KEY_INTERNAL places KEY_INPUT places KEY_OUTPUT places KEY_INITIALMARKING marking_list KEY_FINALCONDITION final_condition transitions )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:66:35: KEY_PLACE ( roles )? KEY_INTERNAL places KEY_INPUT places KEY_OUTPUT places KEY_INITIALMARKING marking_list KEY_FINALCONDITION final_condition transitions
             {
              net = new PetriNet(); 
             match(input,KEY_PLACE,FOLLOW_KEY_PLACE_in_net64); 
-            // src/hub/top/petrinet/OWFN.g:68:3: ( roles )?
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:68:3: ( roles )?
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -114,7 +114,7 @@ public class OWFNParser extends Parser {
             }
             switch (alt1) {
                 case 1 :
-                    // src/hub/top/petrinet/OWFN.g:68:4: roles
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:68:4: roles
                     {
                     pushFollow(FOLLOW_roles_in_net69);
                     roles();
@@ -179,7 +179,7 @@ public class OWFNParser extends Parser {
 
 
     // $ANTLR start "node_name"
-    // src/hub/top/petrinet/OWFN.g:82:1: node_name returns [String text] : ( IDENT | NUMBER );
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:82:1: node_name returns [String text] : ( IDENT | NUMBER );
     public final String node_name() throws RecognitionException {
         String text = null;
 
@@ -187,7 +187,7 @@ public class OWFNParser extends Parser {
         Token NUMBER2=null;
 
         try {
-            // src/hub/top/petrinet/OWFN.g:82:32: ( IDENT | NUMBER )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:82:32: ( IDENT | NUMBER )
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -205,7 +205,7 @@ public class OWFNParser extends Parser {
             }
             switch (alt2) {
                 case 1 :
-                    // src/hub/top/petrinet/OWFN.g:83:3: IDENT
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:83:3: IDENT
                     {
                     IDENT1=(Token)match(input,IDENT,FOLLOW_IDENT_in_node_name129); 
                      text = (IDENT1!=null?IDENT1.getText():null);  
@@ -213,7 +213,7 @@ public class OWFNParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // src/hub/top/petrinet/OWFN.g:84:3: NUMBER
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:84:3: NUMBER
                     {
                     NUMBER2=(Token)match(input,NUMBER,FOLLOW_NUMBER_in_node_name137); 
                      text = (NUMBER2!=null?NUMBER2.getText():null); 
@@ -235,7 +235,7 @@ public class OWFNParser extends Parser {
 
 
     // $ANTLR start "roles"
-    // src/hub/top/petrinet/OWFN.g:89:1: roles : KEY_ROLES name1= node_name ( COMMA name2= node_name )* SEMICOLON ;
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:89:1: roles : KEY_ROLES name1= node_name ( COMMA name2= node_name )* SEMICOLON ;
     public final void roles() throws RecognitionException {
         String name1 = null;
 
@@ -243,8 +243,8 @@ public class OWFNParser extends Parser {
 
 
         try {
-            // src/hub/top/petrinet/OWFN.g:89:6: ( KEY_ROLES name1= node_name ( COMMA name2= node_name )* SEMICOLON )
-            // src/hub/top/petrinet/OWFN.g:90:2: KEY_ROLES name1= node_name ( COMMA name2= node_name )* SEMICOLON
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:89:6: ( KEY_ROLES name1= node_name ( COMMA name2= node_name )* SEMICOLON )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:90:2: KEY_ROLES name1= node_name ( COMMA name2= node_name )* SEMICOLON
             {
             match(input,KEY_ROLES,FOLLOW_KEY_ROLES_in_roles152); 
             pushFollow(FOLLOW_node_name_in_roles159);
@@ -258,7 +258,7 @@ public class OWFNParser extends Parser {
                       else
                         net.addRole(name1);
                     
-            // src/hub/top/petrinet/OWFN.g:98:2: ( COMMA name2= node_name )*
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:98:2: ( COMMA name2= node_name )*
             loop3:
             do {
                 int alt3=2;
@@ -271,7 +271,7 @@ public class OWFNParser extends Parser {
 
                 switch (alt3) {
             	case 1 :
-            	    // src/hub/top/petrinet/OWFN.g:99:4: COMMA name2= node_name
+            	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:99:4: COMMA name2= node_name
             	    {
             	    match(input,COMMA,FOLLOW_COMMA_in_roles177); 
             	    pushFollow(FOLLOW_node_name_in_roles181);
@@ -311,13 +311,13 @@ public class OWFNParser extends Parser {
 
 
     // $ANTLR start "places"
-    // src/hub/top/petrinet/OWFN.g:112:1: places : ( capacity place_list SEMICOLON )+ ;
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:112:1: places : ( capacity place_list SEMICOLON )+ ;
     public final void places() throws RecognitionException {
         try {
-            // src/hub/top/petrinet/OWFN.g:112:7: ( ( capacity place_list SEMICOLON )+ )
-            // src/hub/top/petrinet/OWFN.g:113:2: ( capacity place_list SEMICOLON )+
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:112:7: ( ( capacity place_list SEMICOLON )+ )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:113:2: ( capacity place_list SEMICOLON )+
             {
-            // src/hub/top/petrinet/OWFN.g:113:2: ( capacity place_list SEMICOLON )+
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:113:2: ( capacity place_list SEMICOLON )+
             int cnt4=0;
             loop4:
             do {
@@ -331,7 +331,7 @@ public class OWFNParser extends Parser {
 
                 switch (alt4) {
             	case 1 :
-            	    // src/hub/top/petrinet/OWFN.g:114:3: capacity place_list SEMICOLON
+            	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:114:3: capacity place_list SEMICOLON
             	    {
             	    pushFollow(FOLLOW_capacity_in_places214);
             	    capacity();
@@ -374,10 +374,10 @@ public class OWFNParser extends Parser {
 
 
     // $ANTLR start "capacity"
-    // src/hub/top/petrinet/OWFN.g:118:1: capacity : ( | KEY_SAFE COLON | KEY_SAFE NUMBER COLON );
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:118:1: capacity : ( | KEY_SAFE COLON | KEY_SAFE NUMBER COLON );
     public final void capacity() throws RecognitionException {
         try {
-            // src/hub/top/petrinet/OWFN.g:118:9: ( | KEY_SAFE COLON | KEY_SAFE NUMBER COLON )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:118:9: ( | KEY_SAFE COLON | KEY_SAFE NUMBER COLON )
             int alt5=3;
             int LA5_0 = input.LA(1);
 
@@ -408,12 +408,12 @@ public class OWFNParser extends Parser {
             }
             switch (alt5) {
                 case 1 :
-                    // src/hub/top/petrinet/OWFN.g:120:1: 
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:120:1: 
                     {
                     }
                     break;
                 case 2 :
-                    // src/hub/top/petrinet/OWFN.g:120:3: KEY_SAFE COLON
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:120:3: KEY_SAFE COLON
                     {
                     match(input,KEY_SAFE,FOLLOW_KEY_SAFE_in_capacity240); 
                     match(input,COLON,FOLLOW_COLON_in_capacity242); 
@@ -422,7 +422,7 @@ public class OWFNParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // src/hub/top/petrinet/OWFN.g:121:3: KEY_SAFE NUMBER COLON
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:121:3: KEY_SAFE NUMBER COLON
                     {
                     match(input,KEY_SAFE,FOLLOW_KEY_SAFE_in_capacity255); 
                     match(input,NUMBER,FOLLOW_NUMBER_in_capacity257); 
@@ -446,7 +446,7 @@ public class OWFNParser extends Parser {
 
 
     // $ANTLR start "place_list"
-    // src/hub/top/petrinet/OWFN.g:124:1: place_list : (name1= node_name ( COMMA name2= node_name )* )? ;
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:124:1: place_list : (name1= node_name ( COMMA name2= node_name )* )? ;
     public final void place_list() throws RecognitionException {
         String name1 = null;
 
@@ -454,10 +454,10 @@ public class OWFNParser extends Parser {
 
 
         try {
-            // src/hub/top/petrinet/OWFN.g:124:11: ( (name1= node_name ( COMMA name2= node_name )* )? )
-            // src/hub/top/petrinet/OWFN.g:125:2: (name1= node_name ( COMMA name2= node_name )* )?
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:124:11: ( (name1= node_name ( COMMA name2= node_name )* )? )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:125:2: (name1= node_name ( COMMA name2= node_name )* )?
             {
-            // src/hub/top/petrinet/OWFN.g:125:2: (name1= node_name ( COMMA name2= node_name )* )?
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:125:2: (name1= node_name ( COMMA name2= node_name )* )?
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -466,7 +466,7 @@ public class OWFNParser extends Parser {
             }
             switch (alt7) {
                 case 1 :
-                    // src/hub/top/petrinet/OWFN.g:126:5: name1= node_name ( COMMA name2= node_name )*
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:126:5: name1= node_name ( COMMA name2= node_name )*
                     {
                     pushFollow(FOLLOW_node_name_in_place_list278);
                     name1=node_name();
@@ -479,7 +479,7 @@ public class OWFNParser extends Parser {
                     	    */
                     	    net.addPlace_unique(name1);
                     	  
-                    // src/hub/top/petrinet/OWFN.g:133:3: ( COMMA name2= node_name )*
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:133:3: ( COMMA name2= node_name )*
                     loop6:
                     do {
                         int alt6=2;
@@ -492,7 +492,7 @@ public class OWFNParser extends Parser {
 
                         switch (alt6) {
                     	case 1 :
-                    	    // src/hub/top/petrinet/OWFN.g:134:4: COMMA name2= node_name
+                    	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:134:4: COMMA name2= node_name
                     	    {
                     	    match(input,COMMA,FOLLOW_COMMA_in_place_list293); 
                     	    pushFollow(FOLLOW_node_name_in_place_list297);
@@ -537,13 +537,13 @@ public class OWFNParser extends Parser {
 
 
     // $ANTLR start "marking_list"
-    // src/hub/top/petrinet/OWFN.g:147:1: marking_list : ( marking ( COMMA marking )* )? SEMICOLON ;
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:147:1: marking_list : ( marking ( COMMA marking )* )? SEMICOLON ;
     public final void marking_list() throws RecognitionException {
         try {
-            // src/hub/top/petrinet/OWFN.g:147:13: ( ( marking ( COMMA marking )* )? SEMICOLON )
-            // src/hub/top/petrinet/OWFN.g:148:3: ( marking ( COMMA marking )* )? SEMICOLON
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:147:13: ( ( marking ( COMMA marking )* )? SEMICOLON )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:148:3: ( marking ( COMMA marking )* )? SEMICOLON
             {
-            // src/hub/top/petrinet/OWFN.g:148:3: ( marking ( COMMA marking )* )?
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:148:3: ( marking ( COMMA marking )* )?
             int alt9=2;
             int LA9_0 = input.LA(1);
 
@@ -552,14 +552,14 @@ public class OWFNParser extends Parser {
             }
             switch (alt9) {
                 case 1 :
-                    // src/hub/top/petrinet/OWFN.g:148:5: marking ( COMMA marking )*
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:148:5: marking ( COMMA marking )*
                     {
                     pushFollow(FOLLOW_marking_in_marking_list326);
                     marking();
 
                     state._fsp--;
 
-                    // src/hub/top/petrinet/OWFN.g:148:13: ( COMMA marking )*
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:148:13: ( COMMA marking )*
                     loop8:
                     do {
                         int alt8=2;
@@ -572,7 +572,7 @@ public class OWFNParser extends Parser {
 
                         switch (alt8) {
                     	case 1 :
-                    	    // src/hub/top/petrinet/OWFN.g:148:15: COMMA marking
+                    	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:148:15: COMMA marking
                     	    {
                     	    match(input,COMMA,FOLLOW_COMMA_in_marking_list330); 
                     	    pushFollow(FOLLOW_marking_in_marking_list332);
@@ -612,7 +612,7 @@ public class OWFNParser extends Parser {
 
 
     // $ANTLR start "marking"
-    // src/hub/top/petrinet/OWFN.g:151:1: marking : ( node_name | node_name COLON NUMBER );
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:151:1: marking : ( node_name | node_name COLON NUMBER );
     public final void marking() throws RecognitionException {
         Token NUMBER5=null;
         String node_name3 = null;
@@ -621,7 +621,7 @@ public class OWFNParser extends Parser {
 
 
         try {
-            // src/hub/top/petrinet/OWFN.g:151:8: ( node_name | node_name COLON NUMBER )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:151:8: ( node_name | node_name COLON NUMBER )
             int alt10=2;
             int LA10_0 = input.LA(1);
 
@@ -631,7 +631,7 @@ public class OWFNParser extends Parser {
                 if ( (LA10_1==COLON) ) {
                     alt10=2;
                 }
-                else if ( ((LA10_1>=COMMA && LA10_1<=SEMICOLON)||LA10_1==KEY_AND) ) {
+                else if ( ((LA10_1>=COMMA && LA10_1<=SEMICOLON)) ) {
                     alt10=1;
                 }
                 else {
@@ -647,7 +647,7 @@ public class OWFNParser extends Parser {
                 if ( (LA10_2==COLON) ) {
                     alt10=2;
                 }
-                else if ( ((LA10_2>=COMMA && LA10_2<=SEMICOLON)||LA10_2==KEY_AND) ) {
+                else if ( ((LA10_2>=COMMA && LA10_2<=SEMICOLON)) ) {
                     alt10=1;
                 }
                 else {
@@ -665,7 +665,7 @@ public class OWFNParser extends Parser {
             }
             switch (alt10) {
                 case 1 :
-                    // src/hub/top/petrinet/OWFN.g:152:3: node_name
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:152:3: node_name
                     {
                     pushFollow(FOLLOW_node_name_in_marking350);
                     node_name3=node_name();
@@ -679,7 +679,7 @@ public class OWFNParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // src/hub/top/petrinet/OWFN.g:157:3: node_name COLON NUMBER
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:157:3: node_name COLON NUMBER
                     {
                     pushFollow(FOLLOW_node_name_in_marking363);
                     node_name4=node_name();
@@ -709,26 +709,14 @@ public class OWFNParser extends Parser {
 
 
     // $ANTLR start "final_condition"
-    // src/hub/top/petrinet/OWFN.g:165:1: final_condition : ( marking KEY_AND KEY_EMPTY ) SEMICOLON ;
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:165:1: final_condition : KEY_TRUE SEMICOLON ;
     public final void final_condition() throws RecognitionException {
         try {
-            // src/hub/top/petrinet/OWFN.g:165:16: ( ( marking KEY_AND KEY_EMPTY ) SEMICOLON )
-            // src/hub/top/petrinet/OWFN.g:166:2: ( marking KEY_AND KEY_EMPTY ) SEMICOLON
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:165:16: ( KEY_TRUE SEMICOLON )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:166:2: KEY_TRUE SEMICOLON
             {
-            // src/hub/top/petrinet/OWFN.g:166:2: ( marking KEY_AND KEY_EMPTY )
-            // src/hub/top/petrinet/OWFN.g:166:3: marking KEY_AND KEY_EMPTY
-            {
-            pushFollow(FOLLOW_marking_in_final_condition385);
-            marking();
-
-            state._fsp--;
-
-            match(input,KEY_AND,FOLLOW_KEY_AND_in_final_condition387); 
-            match(input,KEY_EMPTY,FOLLOW_KEY_EMPTY_in_final_condition389); 
-
-            }
-
-            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_final_condition392); 
+            match(input,KEY_TRUE,FOLLOW_KEY_TRUE_in_final_condition384); 
+            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_final_condition386); 
 
             }
 
@@ -745,13 +733,13 @@ public class OWFNParser extends Parser {
 
 
     // $ANTLR start "transitions"
-    // src/hub/top/petrinet/OWFN.g:171:1: transitions : ( transition )* ;
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:171:1: transitions : ( transition )* ;
     public final void transitions() throws RecognitionException {
         try {
-            // src/hub/top/petrinet/OWFN.g:171:12: ( ( transition )* )
-            // src/hub/top/petrinet/OWFN.g:172:3: ( transition )*
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:171:12: ( ( transition )* )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:172:3: ( transition )*
             {
-            // src/hub/top/petrinet/OWFN.g:172:3: ( transition )*
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:172:3: ( transition )*
             loop11:
             do {
                 int alt11=2;
@@ -764,9 +752,9 @@ public class OWFNParser extends Parser {
 
                 switch (alt11) {
             	case 1 :
-            	    // src/hub/top/petrinet/OWFN.g:172:5: transition
+            	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:172:5: transition
             	    {
-            	    pushFollow(FOLLOW_transition_in_transitions408);
+            	    pushFollow(FOLLOW_transition_in_transitions402);
             	    transition();
 
             	    state._fsp--;
@@ -796,17 +784,17 @@ public class OWFNParser extends Parser {
 
 
     // $ANTLR start "transition"
-    // src/hub/top/petrinet/OWFN.g:175:1: transition : KEY_TRANSITION node_name ( roles )? KEY_CONSUME arcs KEY_PRODUCE arcs ;
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:175:1: transition : KEY_TRANSITION node_name ( roles )? KEY_CONSUME arcs KEY_PRODUCE arcs ;
     public final void transition() throws RecognitionException {
         String node_name6 = null;
 
 
         try {
-            // src/hub/top/petrinet/OWFN.g:175:11: ( KEY_TRANSITION node_name ( roles )? KEY_CONSUME arcs KEY_PRODUCE arcs )
-            // src/hub/top/petrinet/OWFN.g:176:3: KEY_TRANSITION node_name ( roles )? KEY_CONSUME arcs KEY_PRODUCE arcs
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:175:11: ( KEY_TRANSITION node_name ( roles )? KEY_CONSUME arcs KEY_PRODUCE arcs )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:176:3: KEY_TRANSITION node_name ( roles )? KEY_CONSUME arcs KEY_PRODUCE arcs
             {
-            match(input,KEY_TRANSITION,FOLLOW_KEY_TRANSITION_in_transition435); 
-            pushFollow(FOLLOW_node_name_in_transition437);
+            match(input,KEY_TRANSITION,FOLLOW_KEY_TRANSITION_in_transition429); 
+            pushFollow(FOLLOW_node_name_in_transition431);
             node_name6=node_name();
 
             state._fsp--;
@@ -818,7 +806,7 @@ public class OWFNParser extends Parser {
                 transition_ = &pnapi_lola_yynet.createTransition(nodeName_.str());
                 */
               
-            // src/hub/top/petrinet/OWFN.g:184:3: ( roles )?
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:184:3: ( roles )?
             int alt12=2;
             int LA12_0 = input.LA(1);
 
@@ -827,9 +815,9 @@ public class OWFNParser extends Parser {
             }
             switch (alt12) {
                 case 1 :
-                    // src/hub/top/petrinet/OWFN.g:184:4: roles
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:184:4: roles
                     {
-                    pushFollow(FOLLOW_roles_in_transition447);
+                    pushFollow(FOLLOW_roles_in_transition441);
                     roles();
 
                     state._fsp--;
@@ -840,7 +828,7 @@ public class OWFNParser extends Parser {
 
             }
 
-            match(input,KEY_CONSUME,FOLLOW_KEY_CONSUME_in_transition453); 
+            match(input,KEY_CONSUME,FOLLOW_KEY_CONSUME_in_transition447); 
 
               	/*
                 target_ = reinterpret_cast<Node * *>(&transition_);
@@ -848,12 +836,12 @@ public class OWFNParser extends Parser {
                 */
                 produceArcs = false; 
               
-            pushFollow(FOLLOW_arcs_in_transition462);
+            pushFollow(FOLLOW_arcs_in_transition456);
             arcs();
 
             state._fsp--;
 
-            match(input,KEY_PRODUCE,FOLLOW_KEY_PRODUCE_in_transition466); 
+            match(input,KEY_PRODUCE,FOLLOW_KEY_PRODUCE_in_transition460); 
              
               	/*
                 source_ = reinterpret_cast<Node * *>(&transition_);
@@ -861,7 +849,7 @@ public class OWFNParser extends Parser {
                 */
                 produceArcs = true;
               
-            pushFollow(FOLLOW_arcs_in_transition475);
+            pushFollow(FOLLOW_arcs_in_transition469);
             arcs();
 
             state._fsp--;
@@ -882,13 +870,13 @@ public class OWFNParser extends Parser {
 
 
     // $ANTLR start "arcs"
-    // src/hub/top/petrinet/OWFN.g:205:1: arcs : ( arc ( COMMA arc )* )? SEMICOLON ;
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:205:1: arcs : ( arc ( COMMA arc )* )? SEMICOLON ;
     public final void arcs() throws RecognitionException {
         try {
-            // src/hub/top/petrinet/OWFN.g:205:5: ( ( arc ( COMMA arc )* )? SEMICOLON )
-            // src/hub/top/petrinet/OWFN.g:206:2: ( arc ( COMMA arc )* )? SEMICOLON
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:205:5: ( ( arc ( COMMA arc )* )? SEMICOLON )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:206:2: ( arc ( COMMA arc )* )? SEMICOLON
             {
-            // src/hub/top/petrinet/OWFN.g:206:2: ( arc ( COMMA arc )* )?
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:206:2: ( arc ( COMMA arc )* )?
             int alt14=2;
             int LA14_0 = input.LA(1);
 
@@ -897,14 +885,14 @@ public class OWFNParser extends Parser {
             }
             switch (alt14) {
                 case 1 :
-                    // src/hub/top/petrinet/OWFN.g:206:4: arc ( COMMA arc )*
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:206:4: arc ( COMMA arc )*
                     {
-                    pushFollow(FOLLOW_arc_in_arcs486);
+                    pushFollow(FOLLOW_arc_in_arcs480);
                     arc();
 
                     state._fsp--;
 
-                    // src/hub/top/petrinet/OWFN.g:206:8: ( COMMA arc )*
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:206:8: ( COMMA arc )*
                     loop13:
                     do {
                         int alt13=2;
@@ -917,10 +905,10 @@ public class OWFNParser extends Parser {
 
                         switch (alt13) {
                     	case 1 :
-                    	    // src/hub/top/petrinet/OWFN.g:206:9: COMMA arc
+                    	    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:206:9: COMMA arc
                     	    {
-                    	    match(input,COMMA,FOLLOW_COMMA_in_arcs489); 
-                    	    pushFollow(FOLLOW_arc_in_arcs491);
+                    	    match(input,COMMA,FOLLOW_COMMA_in_arcs483); 
+                    	    pushFollow(FOLLOW_arc_in_arcs485);
                     	    arc();
 
                     	    state._fsp--;
@@ -940,7 +928,7 @@ public class OWFNParser extends Parser {
 
             }
 
-            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_arcs498); 
+            match(input,SEMICOLON,FOLLOW_SEMICOLON_in_arcs492); 
 
             }
 
@@ -957,7 +945,7 @@ public class OWFNParser extends Parser {
 
 
     // $ANTLR start "arc"
-    // src/hub/top/petrinet/OWFN.g:209:1: arc : ( node_name | node_name COLON NUMBER );
+    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:209:1: arc : ( node_name | node_name COLON NUMBER );
     public final void arc() throws RecognitionException {
         String node_name7 = null;
 
@@ -965,18 +953,18 @@ public class OWFNParser extends Parser {
 
 
         try {
-            // src/hub/top/petrinet/OWFN.g:209:4: ( node_name | node_name COLON NUMBER )
+            // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:209:4: ( node_name | node_name COLON NUMBER )
             int alt15=2;
             int LA15_0 = input.LA(1);
 
             if ( (LA15_0==IDENT) ) {
                 int LA15_1 = input.LA(2);
 
-                if ( ((LA15_1>=COMMA && LA15_1<=SEMICOLON)) ) {
-                    alt15=1;
-                }
-                else if ( (LA15_1==COLON) ) {
+                if ( (LA15_1==COLON) ) {
                     alt15=2;
+                }
+                else if ( ((LA15_1>=COMMA && LA15_1<=SEMICOLON)) ) {
+                    alt15=1;
                 }
                 else {
                     NoViableAltException nvae =
@@ -988,11 +976,11 @@ public class OWFNParser extends Parser {
             else if ( (LA15_0==NUMBER) ) {
                 int LA15_2 = input.LA(2);
 
-                if ( ((LA15_2>=COMMA && LA15_2<=SEMICOLON)) ) {
-                    alt15=1;
-                }
-                else if ( (LA15_2==COLON) ) {
+                if ( (LA15_2==COLON) ) {
                     alt15=2;
+                }
+                else if ( ((LA15_2>=COMMA && LA15_2<=SEMICOLON)) ) {
+                    alt15=1;
                 }
                 else {
                     NoViableAltException nvae =
@@ -1009,9 +997,9 @@ public class OWFNParser extends Parser {
             }
             switch (alt15) {
                 case 1 :
-                    // src/hub/top/petrinet/OWFN.g:210:4: node_name
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:210:4: node_name
                     {
-                    pushFollow(FOLLOW_node_name_in_arc509);
+                    pushFollow(FOLLOW_node_name_in_arc503);
                     node_name7=node_name();
 
                     state._fsp--;
@@ -1031,15 +1019,15 @@ public class OWFNParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // src/hub/top/petrinet/OWFN.g:223:4: node_name COLON NUMBER
+                    // D:\\LinuxShared\\eclipseWorkspace-greta\\hub.top.pnapi\\src\\hub\\top\\petrinet\\OWFN.g:223:4: node_name COLON NUMBER
                     {
-                    pushFollow(FOLLOW_node_name_in_arc523);
+                    pushFollow(FOLLOW_node_name_in_arc517);
                     node_name8=node_name();
 
                     state._fsp--;
 
-                    match(input,COLON,FOLLOW_COLON_in_arc525); 
-                    match(input,NUMBER,FOLLOW_NUMBER_in_arc527); 
+                    match(input,COLON,FOLLOW_COLON_in_arc519); 
+                    match(input,NUMBER,FOLLOW_NUMBER_in_arc521); 
 
                     		// FIXME: add arc weight if arc is already present
                     	    Place p = net.findPlace(node_name8);
@@ -1082,8 +1070,8 @@ public class OWFNParser extends Parser {
     public static final BitSet FOLLOW_places_in_net95 = new BitSet(new long[]{0x0000000000000100L});
     public static final BitSet FOLLOW_KEY_INITIALMARKING_in_net99 = new BitSet(new long[]{0x0000000000004C00L});
     public static final BitSet FOLLOW_marking_list_in_net101 = new BitSet(new long[]{0x0000000000000200L});
-    public static final BitSet FOLLOW_KEY_FINALCONDITION_in_net104 = new BitSet(new long[]{0x0000000000000C00L});
-    public static final BitSet FOLLOW_final_condition_in_net106 = new BitSet(new long[]{0x0000000000080000L});
+    public static final BitSet FOLLOW_KEY_FINALCONDITION_in_net104 = new BitSet(new long[]{0x0000000000020000L});
+    public static final BitSet FOLLOW_final_condition_in_net106 = new BitSet(new long[]{0x0000000000040000L});
     public static final BitSet FOLLOW_transitions_in_net110 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_IDENT_in_node_name129 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_NUMBER_in_node_name137 = new BitSet(new long[]{0x0000000000000002L});
@@ -1111,25 +1099,23 @@ public class OWFNParser extends Parser {
     public static final BitSet FOLLOW_node_name_in_marking363 = new BitSet(new long[]{0x0000000000010000L});
     public static final BitSet FOLLOW_COLON_in_marking365 = new BitSet(new long[]{0x0000000000000800L});
     public static final BitSet FOLLOW_NUMBER_in_marking367 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_marking_in_final_condition385 = new BitSet(new long[]{0x0000000000020000L});
-    public static final BitSet FOLLOW_KEY_AND_in_final_condition387 = new BitSet(new long[]{0x0000000000040000L});
-    public static final BitSet FOLLOW_KEY_EMPTY_in_final_condition389 = new BitSet(new long[]{0x0000000000004000L});
-    public static final BitSet FOLLOW_SEMICOLON_in_final_condition392 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_transition_in_transitions408 = new BitSet(new long[]{0x0000000000080002L});
-    public static final BitSet FOLLOW_KEY_TRANSITION_in_transition435 = new BitSet(new long[]{0x0000000000000C00L});
-    public static final BitSet FOLLOW_node_name_in_transition437 = new BitSet(new long[]{0x0000000000101000L});
-    public static final BitSet FOLLOW_roles_in_transition447 = new BitSet(new long[]{0x0000000000100000L});
-    public static final BitSet FOLLOW_KEY_CONSUME_in_transition453 = new BitSet(new long[]{0x0000000000004C00L});
-    public static final BitSet FOLLOW_arcs_in_transition462 = new BitSet(new long[]{0x0000000000200000L});
-    public static final BitSet FOLLOW_KEY_PRODUCE_in_transition466 = new BitSet(new long[]{0x0000000000004C00L});
-    public static final BitSet FOLLOW_arcs_in_transition475 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_arc_in_arcs486 = new BitSet(new long[]{0x0000000000006000L});
-    public static final BitSet FOLLOW_COMMA_in_arcs489 = new BitSet(new long[]{0x0000000000000C00L});
-    public static final BitSet FOLLOW_arc_in_arcs491 = new BitSet(new long[]{0x0000000000006000L});
-    public static final BitSet FOLLOW_SEMICOLON_in_arcs498 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_node_name_in_arc509 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_node_name_in_arc523 = new BitSet(new long[]{0x0000000000010000L});
-    public static final BitSet FOLLOW_COLON_in_arc525 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_NUMBER_in_arc527 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_KEY_TRUE_in_final_condition384 = new BitSet(new long[]{0x0000000000004000L});
+    public static final BitSet FOLLOW_SEMICOLON_in_final_condition386 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_transition_in_transitions402 = new BitSet(new long[]{0x0000000000040002L});
+    public static final BitSet FOLLOW_KEY_TRANSITION_in_transition429 = new BitSet(new long[]{0x0000000000000C00L});
+    public static final BitSet FOLLOW_node_name_in_transition431 = new BitSet(new long[]{0x0000000000081000L});
+    public static final BitSet FOLLOW_roles_in_transition441 = new BitSet(new long[]{0x0000000000080000L});
+    public static final BitSet FOLLOW_KEY_CONSUME_in_transition447 = new BitSet(new long[]{0x0000000000004C00L});
+    public static final BitSet FOLLOW_arcs_in_transition456 = new BitSet(new long[]{0x0000000000100000L});
+    public static final BitSet FOLLOW_KEY_PRODUCE_in_transition460 = new BitSet(new long[]{0x0000000000004C00L});
+    public static final BitSet FOLLOW_arcs_in_transition469 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_arc_in_arcs480 = new BitSet(new long[]{0x0000000000006000L});
+    public static final BitSet FOLLOW_COMMA_in_arcs483 = new BitSet(new long[]{0x0000000000000C00L});
+    public static final BitSet FOLLOW_arc_in_arcs485 = new BitSet(new long[]{0x0000000000006000L});
+    public static final BitSet FOLLOW_SEMICOLON_in_arcs492 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_node_name_in_arc503 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_node_name_in_arc517 = new BitSet(new long[]{0x0000000000010000L});
+    public static final BitSet FOLLOW_COLON_in_arc519 = new BitSet(new long[]{0x0000000000000800L});
+    public static final BitSet FOLLOW_NUMBER_in_arc521 = new BitSet(new long[]{0x0000000000000002L});
 
 }

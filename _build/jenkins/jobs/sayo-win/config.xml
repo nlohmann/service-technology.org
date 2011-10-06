@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+    <actions/>
+    <description>Standard continuos integration job for Sayo (Windows)</description>
+    <logRotator>
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>10</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+    </logRotator>
+    <keepDependencies>false</keepDependencies>
+    <properties/>
+    <scm class="hudson.scm.SubversionSCM">
+        <locations>
+            <hudson.scm.SubversionSCM_-ModuleLocation>
+                <remote>http://svn.gna.org/svn/service-tech/trunk/sayo</remote>
+                <local>.</local>
+            </hudson.scm.SubversionSCM_-ModuleLocation>
+        </locations>
+        <browser class="hudson.scm.browsers.ViewSVN">
+            <url>http://svn.gna.org/viewcvs/service-tech/</url>
+        </browser>
+        <excludedRegions></excludedRegions>
+        <includedRegions></includedRegions>
+        <excludedUsers></excludedUsers>
+        <excludedRevprop></excludedRevprop>
+        <excludedCommitMessages></excludedCommitMessages>
+        <workspaceUpdater class="hudson.scm.subversion.UpdateWithCleanUpdater"/>
+    </scm>
+    <assignedNode>Builder</assignedNode>
+    <canRoam>false</canRoam>
+    <disabled>false</disabled>
+    <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+    <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+    <triggers class="vector"/>
+    <concurrentBuild>false</concurrentBuild>
+    <builders>
+        <hudson.tasks.Shell>
+            <command>wget http://svn.gna.org/svn/service-tech/trunk/_build/build.xml</command>
+        </hudson.tasks.Shell>
+        <hudson.tasks.Ant>
+            <targets>all_win</targets>
+            <antName>ant</antName>
+            <properties>package=sayo</properties>
+        </hudson.tasks.Ant>
+    </builders>
+    <publishers>
+        <hudson.tasks.ArtifactArchiver>
+            <artifacts>*-win.zip</artifacts>
+            <latestOnly>false</latestOnly>
+        </hudson.tasks.ArtifactArchiver>
+        <hudson.plugins.emailext.ExtendedEmailPublisher>
+            <recipientList>$DEFAULT_RECIPIENTS</recipientList>
+            <configuredTriggers>
+                <hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+                    <email>
+                        <recipientList>$PROJECT_DEFAULT_RECIPIENTS</recipientList>
+                        <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+                        <body>$PROJECT_DEFAULT_CONTENT</body>
+                        <sendToDevelopers>true</sendToDevelopers>
+                        <sendToRequester>true</sendToRequester>
+                        <includeCulprits>true</includeCulprits>
+                        <sendToRecipientList>true</sendToRecipientList>
+                    </email>
+                </hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+                <hudson.plugins.emailext.plugins.trigger.StillFailingTrigger>
+                    <email>
+                        <recipientList>$PROJECT_DEFAULT_RECIPIENTS</recipientList>
+                        <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+                        <body>$PROJECT_DEFAULT_CONTENT</body>
+                        <sendToDevelopers>true</sendToDevelopers>
+                        <sendToRequester>true</sendToRequester>
+                        <includeCulprits>true</includeCulprits>
+                        <sendToRecipientList>true</sendToRecipientList>
+                    </email>
+                </hudson.plugins.emailext.plugins.trigger.StillFailingTrigger>
+                <hudson.plugins.emailext.plugins.trigger.SuccessTrigger>
+                    <email>
+                        <recipientList>$PROJECT_DEFAULT_RECIPIENTS</recipientList>
+                        <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+                        <body>$PROJECT_DEFAULT_CONTENT</body>
+                        <sendToDevelopers>true</sendToDevelopers>
+                        <sendToRequester>true</sendToRequester>
+                        <includeCulprits>false</includeCulprits>
+                        <sendToRecipientList>true</sendToRecipientList>
+                    </email>
+                </hudson.plugins.emailext.plugins.trigger.SuccessTrigger>
+            </configuredTriggers>
+            <contentType>default</contentType>
+            <defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
+            <defaultContent>$DEFAULT_CONTENT</defaultContent>
+            <attachmentsPattern></attachmentsPattern>
+        </hudson.plugins.emailext.ExtendedEmailPublisher>
+        <hudson.plugins.twitter.TwitterPublisher/>
+    </publishers>
+    <buildWrappers/>
+</project>

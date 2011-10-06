@@ -334,8 +334,14 @@ public class RunExperimentCompare {
       boolean subsumed = false;
       for (SScenario s : originalScenarios.values()) {
         if (originalScenarios.get(l).weakerThan(s) && !s.weakerThan(originalScenarios.get(l))) {
-              r.append("<b>scenario "+originalScenarios.get(l).toString().replace('>', '-')+" is subsumed by "+s.toString().replace('>', '-')+"</b><br/>\n");
-              subsumed = true;
+          r.append("<b>scenario "+originalScenarios.get(l).toString().replace('>', '-')+" is subsumed by "+s.toString().replace('>', '-')+"</b><br/>\n");
+          subsumed = true;
+          continue;
+        }
+        if (minerBranch.implies(s, originalScenarios.get(l)) && !minerBranch.implies(originalScenarios.get(l), s)) {
+          r.append("<b>scenario "+originalScenarios.get(l).toString().replace('>', '-')+" is implied by "+s.toString().replace('>', '-')+"</b><br/>\n");
+          subsumed = true;
+          continue;
         }
       }
       if (subsumed) continue;

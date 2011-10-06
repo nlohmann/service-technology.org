@@ -9,7 +9,14 @@
 	
 	<property name="dir.test-src" location="${test.basedir}/src-test" />
 	<property name="dir.test-bin" location="${test.basedir}/bin-test" />
+	<property name="dir.test-instrument" location="${test.basedir}/bin-test-instrument" />
 	
+	<property name="dir.coveragereport.html" location="${test.basedir}/cover-html" />
+	<property name="dir.coveragereport.xml" location="${test.basedir}/cover-xml" />
+	<property name="src.coveragereport" location="${src}" />
+	
+	<property name="cobertura.datafile" location="${test.basedir}/cobertura.ser" />
+
 	<property name="dir.testfiles" location="${test.basedir}/testfiles" />
 	
 	<property name="compiled.classes" location="${bin}" />
@@ -24,11 +31,21 @@
 		<pathelement location="${dir.test-bin}"/>
 	</path>
 
+	<path id="classpath.cobertura">
+		<pathelement location="${test.basedir}/libs-external/cobertura.jar" />
+		<pathelement location="${test.basedir}/libs-external/lib-cobertura/log4j-1.2.9.jar" />
+		<pathelement location="${test.basedir}/libs-external/lib-cobertura/asm-3.0.jar" />
+		<pathelement location="${test.basedir}/libs-external/lib-cobertura/asm-tree-3.0.jar" />
+		<pathelement location="${test.basedir}/libs-external/lib-cobertura/jakarta-oro-2.0.8.jar" />
+  	</path>
+
 	<!-- include JUnit to execute unit tests -->
 	<path id="classpath.test">
 		<pathelement location="${test.basedir}/libs-external/junit-4.8.1.jar" />
 		<path refid="classpath.run" />
   	</path>
+	
+	<taskdef classpathref="classpath.cobertura" resource="tasks.properties"/>
 	
 	<target name="build-test">
 		<mkdir dir="${dir.test-bin}" />
@@ -38,9 +55,27 @@
          	debug="on" />
 	</target>
 	
+	<target name="prepare-cobertura">
+	    <property name="myclasspath" refid="classpath.cobertura"/>
+	    <echo message="classpath= ${myclasspath}"/>
+		
+		<cobertura-instrument todir="${dir.test-instrument}" 
+				classpathref="classpath.cobertura" 
+				datafile="${cobertura.datafile}">
+			<ignore regex="org.apache.log4j.*" />
+			<ignore regex="gnu.trove.*" />
+
+		    <fileset dir="${compiled.classes}">
+		        <include name="org/st/sam/**/*.class"/>
+		    	<!-- the following class eats up too much performance on cobertura -->
+		    	<exclude name="org/st/sam/mine/MineBranchingTree.class"/>
+		    </fileset>
+		</cobertura-instrument>
+	</target>
+	
 	<property name="dir.testfiles.minetest" value="${dir.testfiles}/_minetest"/>
 
-	<target name="check" depends="svn-clean,build-test">
+	<target name="check" depends="svn-clean,build-test,prepare-cobertura">
 		
 		<!-- copy test files to separate directory (to ease clean up) --> 
 		<mkdir dir="${dir.testfiles.minetest}" />
@@ -52,6 +87,10 @@
 		
 		<echo message="Running JUnit tests in ${test.basedir}" />
 	    <junit fork="yes" dir="${home}">
+	      <!-- class path for code coverage by cobertura -->
+	      <classpath location="${dir.test-instrument}" />
+	      <classpath refid="classpath.cobertura"/>
+	      <jvmarg value="-Dnet.sourceforge.cobertura.datafile=${cobertura.datafile}"/>
 	    	
 	      <!-- class path of the code to test and the Junit framework -->
 	      <classpath refid="classpath.test"/>
@@ -65,16 +104,28 @@
 	      <test name="org.st.sam.mine.test.BranchingMinerTest" todir="${test.basedir}"/>
 	    </junit>
 		
+		<!-- Cobertura: generate HTML coverage report -->
+		<echo message="Creating Cobertura report, using ${test.basedir}/cobertura.ser" />
+		<cobertura-report destdir="${dir.coveragereport.html}" format="html" srcdir="${src.coveragereport}"
+			datafile="${cobertura.datafile}" />
+		<cobertura-report destdir="${dir.coveragereport.xml}" format="xml" srcdir="${src.coveragereport}"
+			datafile="${cobertura.datafile}" />
+		
 		<antcall target="clean" />
 	</target>
 	
 	<target name="clean">
 		<delete dir="${dir.test-bin}" includeemptydirs="true" failonerror="false"/>
+		<delete dir="${dir.test-instrument}" includeemptydirs="true" failonerror="false"/>
+		<delete file="${test.basedir}/cobertura.ser" failonerror="false"/>
 	</target>
 	
 	<target name="svn-clean" depends="clean">
 		<!-- clean test file directories -->
 		<delete dir="${dir.testfiles.minetest}" failonerror="false" />
+
+		<delete dir="${dir.coveragereport.html}" includeemptydirs="true" failonerror="false"/>
+		<delete dir="${dir.coveragereport.xml}" includeemptydirs="true" failonerror="false"/>
 
 		<!-- test reports -->
 		<delete failonerror="false">

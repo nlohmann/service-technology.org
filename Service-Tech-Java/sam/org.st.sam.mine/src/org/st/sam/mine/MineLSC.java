@@ -193,7 +193,7 @@ public class MineLSC {
                   boolean s_weaker = false;
                   List<SScenario> toRemove = new LinkedList<SScenario>();
                   for (SScenario s2 : scenarios) {
-                    if (s.weakerThan(s2) || subsumes(s2, s)
+                    if (s.weakerThan(s2)
                         //&& l.getSupport() <= s2l.get(s2).getSupport() 
                         //&& l.getConfidence() <= s2l.get(s2).getConfidence()
                         )
@@ -202,7 +202,7 @@ public class MineLSC {
                       s_weaker = true;
                       break;
                     }
-                    if (s2.weakerThan(s) || subsumes(s, s2)
+                    if (s2.weakerThan(s)
                         //&& l.getSupport() >= s2l.get(s2).getSupport() 
                         //&& l.getConfidence() >= s2l.get(s2).getConfidence()
                         )
@@ -257,11 +257,10 @@ public class MineLSC {
     System.out.println("tree statistics: "+stat);
   }
   
-  private boolean subsumes(SScenario s1, SScenario s2) {
-    /*
+  public boolean implies(SScenario s1, SScenario s2) {
     if (s1.implies(s2) && tree.support(s1) >= tree.support(s2))
       return true;
-    else*/
+    else
       return false;
   }
   

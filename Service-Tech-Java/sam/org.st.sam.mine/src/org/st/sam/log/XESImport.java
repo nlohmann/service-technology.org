@@ -108,4 +108,15 @@ public class XESImport {
 
     return log;
   }
+  
+  public static String getLogFileExtension(String fileName) {
+    if (fileName.endsWith(".xes.gz")) return ".xes.gz";
+    if (fileName.endsWith(".xes")) return ".xes";
+    return fileName.substring(fileName.lastIndexOf("."));
+  }
+  
+  public static String getLogFileName(String fileName) {
+    String ext = getLogFileExtension(fileName);
+    return fileName.substring(0, fileName.lastIndexOf(ext));
+  }
 }

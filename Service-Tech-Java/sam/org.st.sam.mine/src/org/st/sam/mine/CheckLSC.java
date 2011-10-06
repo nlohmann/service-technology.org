@@ -12,7 +12,7 @@ import org.st.sam.log.SLog;
 import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
 import org.st.sam.log.XESImport;
-import org.st.sam.util.LSCOutput;
+import org.st.sam.util.SAMOutput;
 
 public class CheckLSC {
   
@@ -74,11 +74,11 @@ public class CheckLSC {
     final String ct_dotfile = "tree_cov_"+scenario+".dot";
     final String ct_svgfile = "tree_cov_"+scenario+".svg";
     final String ct_pngfile = "tree_cov_"+scenario+".png";
-    LSCOutput.writeToFile(tree.toDot(), targetFilePrefix+"."+ct_dotfile);
+    SAMOutput.writeToFile(tree.toDot(), targetFilePrefix+"."+ct_dotfile);
     
     //Thread t2 = new Thread() {
     //  public void run() {
-    LSCOutput.systemCall(dotRenderer+" -Tsvg "+targetFilePrefix+"."+ct_dotfile+" -o"+targetFilePrefix+"."+ct_svgfile);
+    SAMOutput.systemCall(dotRenderer+" -Tsvg "+targetFilePrefix+"."+ct_dotfile+" -o"+targetFilePrefix+"."+ct_svgfile);
   }
   
   
@@ -121,16 +121,21 @@ public class CheckLSC {
     
     LinkedList<SLogTreeNode[]> occ = tree.countOccurrences(word, null, null);
     double conf = tree.confidence(s.pre, s.main, true);
+    int total_occurrences = getTotalOccurrences(occ);
 
+    
+    System.out.println("occurrences: "+total_occurrences);
+    System.out.println("confidence: "+conf);
+
+  }
+  
+  public int getTotalOccurrences(LinkedList<SLogTreeNode[]> occ) {
     int total_occurrences = 0;
     for (SLogTreeNode[] o : occ) {
       // total number of occurrences = number of different occurrences * number of traces having this occurrence until the end of the word
       total_occurrences += tree.nodeCount.get(o[o.length-1]);
     }
-    
-    System.out.println("occurrences: "+total_occurrences);
-    System.out.println("confidence: "+conf);
-
+    return total_occurrences;
   }
   
   private MineBranchingTree tree;

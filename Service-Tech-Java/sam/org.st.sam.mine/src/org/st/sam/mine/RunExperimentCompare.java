@@ -12,6 +12,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import com.google.gwt.dev.util.collect.HashMap;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +26,7 @@ import lscminer.datastructure.LSC;
 import org.st.sam.log.SLogTree.TreeStatistics;
 import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
-import org.st.sam.util.LSCOutput;
+import org.st.sam.util.SAMOutput;
 
 public class RunExperimentCompare {
 
@@ -114,10 +118,12 @@ public class RunExperimentCompare {
   public void experiment(final String dir, final String inputFile, final int minSupportThreshold, final double confidence) throws IOException {
     
     final MineLSC minerBranch = new MineBranchingLSC();
+    minerBranch.OPTIONS_WEIGHTED_OCCURRENCE = true;
     System.out.println("mining branching lscs from "+dir+"/"+inputFile);
     minerBranch.mineLSCs(dir+"/"+inputFile, minSupportThreshold, confidence);
     
-    final MineLSC minerLinear = new MineLinearLSC(minerBranch.getSupportedWords()); 
+    final MineLSC minerLinear = new MineLinearLSC(minerBranch.getSupportedWords());
+    minerLinear.OPTIONS_WEIGHTED_OCCURRENCE = true;
     System.out.println("mining linear lscs from "+dir+"/"+inputFile);
     //LSCEvent[][] dataSet = MineLinearLSC.readInput(experimentFileRoot+"/"+inputFile);
     //if (dataSet == null)
@@ -174,6 +180,9 @@ public class RunExperimentCompare {
       if (!is_branching) onlyLinear.add(l);
     }    
 
+    MineLSC.sortLSCs(both);
+    MineLSC.sortLSCs(linear_lscs);
+    MineLSC.sortLSCs(branching_lscs);
 
     // resulting html
     StringBuilder r = new StringBuilder();
@@ -212,7 +221,7 @@ public class RunExperimentCompare {
       String input_tree_png = inputFile+".png";
       
       minerBranch.getTree().clearCoverageMarking();
-      LSCOutput.writeToFile(minerBranch.getTree().toDot(minerBranch.getShortenedNames()), resultsDir+SLASH+input_tree_dot);
+      SAMOutput.writeToFile(minerBranch.getTree().toDot(minerBranch.getShortenedNames()), resultsDir+SLASH+input_tree_dot);
       systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+input_tree_dot+" -o"+resultsDir+SLASH+input_tree_svg);
       systemCall(dotRenderer+" -Tpng -Gsize=30 "+resultsDir+SLASH+input_tree_dot+" -o"+resultsDir+SLASH+input_tree_png);
       
@@ -235,9 +244,10 @@ public class RunExperimentCompare {
     writeResultsSection(r, both, resultsDir, treeFigHeight, minerBranch, originalScenarios, false, "Linear and Branching LSCs", "lsc_both");
 
     r.append("</body>\n");
-    LSCOutput.writeToFile(r.toString(), resultsDir+"/results.html");    
-    LSCOutput.writeToFile(linear_lscs.toString(), resultsDir+"/lscs_linear.txt");
-    LSCOutput.writeToFile(branching_lscs.toString(), resultsDir+"/lscs_branching.txt");
+    
+    SAMOutput.writeToFile(r.toString(), resultsDir+"/results.html");    
+    SAMOutput.writeToFile(linear_lscs.toString(), resultsDir+"/lscs_linear.txt");
+    SAMOutput.writeToFile(branching_lscs.toString(), resultsDir+"/lscs_branching.txt");
     
     System.out.println("waiting for diagram renderers to complete: "+runningThreads.size());
     for (Thread t : runningThreads) {
@@ -253,6 +263,7 @@ public class RunExperimentCompare {
     
     System.out.println("finished.");
   }
+
   
   private void writeResultsSection(StringBuilder r, ArrayList<LSC> lscs, final String resultsDir, int treeFigHeight,
                                    MineLSC minerBranch, Map<LSC, SScenario> originalScenarios, boolean render_trees,
@@ -261,8 +272,8 @@ public class RunExperimentCompare {
     if (minerBranch == null) render_trees = false;
     
     for (LSC l : lscs) {
-      LSCOutput.shortenLSCnames(l.getPreChart());
-      LSCOutput.shortenLSCnames(l.getMainChart());
+      SAMOutput.shortenLSCnames(l.getPreChart());
+      SAMOutput.shortenLSCnames(l.getMainChart());
     }
     
     r.append("<h2>"+title+"</h2>\n");
@@ -278,7 +289,7 @@ public class RunExperimentCompare {
     String output_tree_svg = inputFile+"_cov.svg";
     String output_tree_png = inputFile+"_cov.png";
     
-    LSCOutput.writeToFile(minerBranch.getCoverageTreeGlobal(), resultsDir+SLASH+output_tree_dot);
+    SAMOutput.writeToFile(minerBranch.getCoverageTreeGlobal(), resultsDir+SLASH+output_tree_dot);
     systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+output_tree_dot+" -o"+resultsDir+SLASH+output_tree_svg);
     systemCall(dotRenderer+" -Tpng -Gsize=30 "+resultsDir+SLASH+output_tree_dot+" -o"+resultsDir+SLASH+output_tree_png);
     
@@ -296,10 +307,10 @@ public class RunExperimentCompare {
       found_lscs.append(l.toString());
       found_lscs.append("\n");
 
-      String lsc_string = LSCOutput.toMSCRenderer("LSC "+(i+1)+" conf="+l.getConfidence()+" supp="+l.getSupport(), l);
+      String lsc_string = SAMOutput.toMSCRenderer("LSC "+(i+1)+" conf="+l.getConfidence()+" supp="+l.getSupport(), l);
       final String lsc_resultfile = "lsc_"+(i+1)+"_"+ref_prefix+".lsc.txt";
       final String lsc_renderfile = "lsc_"+(i+1)+"_"+ref_prefix+".lsc.svg";
-      LSCOutput.writeToFile(lsc_string, resultsDir+SLASH+lsc_resultfile);
+      SAMOutput.writeToFile(lsc_string, resultsDir+SLASH+lsc_resultfile);
       
       //Thread t = new Thread() {
       //  public void run() {
@@ -316,11 +327,7 @@ public class RunExperimentCompare {
       r.append("scenario: "+originalScenarios.get(l).toString().replace('>', '-')+"<br/>\n");
       
       List<SLogTreeNode[]> occ = minerBranch.getTree().countOccurrences(originalScenarios.get(l).getWord(), null, null);
-      int total_occurrences = 0;
-      for (SLogTreeNode[] o : occ) {
-        // total number of occurrences = number of different occurrences * number of traces having this occurrence until the end of the word
-        total_occurrences += minerBranch.getTree().nodeCount.get(o[o.length-1]);
-      }
+      int total_occurrences = minerBranch.getTotalOccurrences(occ);
       r.append("support (re-compute) "+total_occurrences+"/"+occ.size()+"<br/>\n");
       r.append("confidence (re-compute) "+minerBranch.getTree().confidence(originalScenarios.get(l).pre, originalScenarios.get(l).main, false)+"<br/>\n");
       
@@ -341,7 +348,7 @@ public class RunExperimentCompare {
           final String ct_dotfile = "tree_cov_"+ref_prefix+"_"+(i+1)+".dot";
           final String ct_svgfile = "tree_cov_"+ref_prefix+"_"+(i+1)+".svg";
           final String ct_pngfile = "tree_cov_"+ref_prefix+"_"+(i+1)+".png";
-          LSCOutput.writeToFile(ct_string, resultsDir+SLASH+ct_dotfile);
+          SAMOutput.writeToFile(ct_string, resultsDir+SLASH+ct_dotfile);
           
           //Thread t2 = new Thread() {
           //  public void run() {

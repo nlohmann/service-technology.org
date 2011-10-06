@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import com.google.gwt.dev.util.collect.HashMap;
 import com.google.gwt.dev.util.collect.HashSet;
+
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +23,11 @@ import org.st.sam.log.SLogTree;
 import org.st.sam.log.SLogTreeNode;
 import org.st.sam.log.SScenario;
 import org.st.sam.log.XESImport;
-import org.st.sam.util.LSCOutput;
+import org.st.sam.util.SAMOutput;
 
 public class MineLSC {
+  
+  public boolean OPTIONS_WEIGHTED_OCCURRENCE = true;
   
   private ArrayList<LSC> lscs;
   private HashMap<LSC, SScenario> originalScenarios;
@@ -66,14 +71,15 @@ public class MineLSC {
   public void mineLSCs_writeResults(String logFile, int minSupportThreshold, double confidence) throws IOException {
     
     mineLSCs(logFile, minSupportThreshold, confidence);
+    sortLSCs(getLSCs());
     
     String targetFilePrefix = logFile;
     
-    LSCOutput.writeToFile(getTree().toDot(getShortenedNames()), targetFilePrefix+".dot");
-    LSCOutput.writeToFile(getCoverageTreeGlobal(), targetFilePrefix+"_cov.dot");
+    SAMOutput.writeToFile(getTree().toDot(getShortenedNames()), targetFilePrefix+".dot");
+    SAMOutput.writeToFile(getCoverageTreeGlobal(), targetFilePrefix+"_cov.dot");
     for (int lscNum=0; lscNum<getLSCs().size(); lscNum++) {
       LSC l = getLSCs().get(lscNum);
-      LSCOutput.writeToFile(getCoverageTreeFor(originalScenarios.get(l)), targetFilePrefix+"_cov_"+(lscNum+1)+".dot");
+      SAMOutput.writeToFile(getCoverageTreeFor(originalScenarios.get(l)), targetFilePrefix+"_cov_"+(lscNum+1)+".dot");
     }
     
     StringBuilder found_lscs = new StringBuilder();
@@ -83,7 +89,7 @@ public class MineLSC {
       found_lscs.append(l.toString());
       found_lscs.append("\n");
     }
-    LSCOutput.writeToFile(found_lscs.toString(), targetFilePrefix+"_all_lscs.txt");
+    SAMOutput.writeToFile(found_lscs.toString(), targetFilePrefix+"_all_lscs.txt");
     
   }
   
@@ -179,11 +185,7 @@ public class MineLSC {
                 //System.out.println(s+" satisfies confidence");
                 
                 List<SLogTreeNode[]> occ = tree.countOccurrences(cand, null, null);
-                int total_occurrences = 0;
-                for (SLogTreeNode[] o : occ) {
-                  // total number of occurrences = number of different occurrences * number of traces having this occurrence until the end of the word
-                  total_occurrences += tree.nodeCount.get(o[o.length-1]);
-                }
+                int total_occurrences = getTotalOccurrences(occ);
                 
                 LSC l = slog.toLSC(s, total_occurrences, c);
                 
@@ -191,7 +193,7 @@ public class MineLSC {
                   boolean s_weaker = false;
                   List<SScenario> toRemove = new LinkedList<SScenario>();
                   for (SScenario s2 : scenarios) {
-                    if (s.weakerThan(s2)
+                    if (s.weakerThan(s2) || subsumes(s2, s)
                         //&& l.getSupport() <= s2l.get(s2).getSupport() 
                         //&& l.getConfidence() <= s2l.get(s2).getConfidence()
                         )
@@ -200,7 +202,7 @@ public class MineLSC {
                       s_weaker = true;
                       break;
                     }
-                    if (s2.weakerThan(s)
+                    if (s2.weakerThan(s) || subsumes(s, s2)
                         //&& l.getSupport() >= s2l.get(s2).getSupport() 
                         //&& l.getConfidence() >= s2l.get(s2).getConfidence()
                         )
@@ -253,8 +255,28 @@ public class MineLSC {
     
     System.out.println("reduced to "+lscs.size()+" scenarios");
     System.out.println("tree statistics: "+stat);
+  }
+  
+  private boolean subsumes(SScenario s1, SScenario s2) {
+    /*
+    if (s1.implies(s2) && tree.support(s1) >= tree.support(s2))
+      return true;
+    else*/
+      return false;
+  }
+  
+  public int getTotalOccurrences(List<SLogTreeNode[]> occ) {
     
-
+    if (OPTIONS_WEIGHTED_OCCURRENCE) {
+      int total_occurrences = 0;
+      for (SLogTreeNode[] o : occ) {
+        // total number of occurrences = number of different occurrences * number of traces having this occurrence until the end of the word
+        total_occurrences += tree.nodeCount.get(o[o.length-1]);
+      }
+      return total_occurrences;
+    } else {
+      return occ.size();
+    }
   }
   
   public Map<Short, String> getShortenedNames() {
@@ -262,7 +284,7 @@ public class MineLSC {
     Map<Short, String> ShortenedNames = new HashMap<Short, String>();
     for (Short i=0; i<getSLog().originalNames.length; i++) {
       LSCEvent e = getSLog().toLSCEvent(i);
-      ShortenedNames.put(i, LSCOutput.shortenNames(e.getMethod()));
+      ShortenedNames.put(i, SAMOutput.shortenNames(e.getMethod()));
     }
     
     return ShortenedNames;
@@ -291,6 +313,19 @@ public class MineLSC {
   
   public ArrayList<LSC> getLSCs() {
     return lscs;
+  }
+  
+  
+  public static void sortLSCs(ArrayList<LSC> lscs) {
+    
+    Comparator<LSC> comp = new Comparator<LSC>() {
+      @Override
+      public int compare(LSC o1, LSC o2) {
+        return o1.toString().compareTo(o2.toString());
+      }
+    };
+    
+    Collections.sort(lscs, comp);
   }
   
   public Map<LSC, SScenario> getScenarios() {
@@ -360,18 +395,12 @@ public class MineLSC {
     supportedWords = new SLogTree();
     int maxEventId = getSLog().originalNames.length;
     for (int e=0; e<maxEventId; e++) {
+      
+      //if (e < 11 || (e >= 16 && e <=26)) continue; 
+      
       List<SLogTreeNode[]> occ = tree.countOccurrences(new short[] { (short)e }, null, null);
 
-      int total_occurrences = 0;
-      for (SLogTreeNode[] o : occ) {
-        // total number of occurrences = number of different occurrences * number of traces having this occurrence until the end of the word
-        total_occurrences += tree.nodeCount.get(o[o.length-1]);
-        
-/*        if (o[o.length-1].post.length == 1 && o[o.length-1].post[0].id == e) {
-          total_occurrences = 0;
-          break;
-        }*/
-      }
+      int total_occurrences = getTotalOccurrences(occ);
 
       System.out.println("found "+e+" "+occ.size()+" times amounting to "+total_occurrences+" occurrences in the log");
       if (total_occurrences >= minSupThreshold) {
@@ -460,11 +489,7 @@ public class MineLSC {
       if (stuck_at == null) stuck_at = stuck_here;
       else stuck_at.retainAll(stuck_here);
       
-      int total_occurrences = 0;
-      for (SLogTreeNode[] o : occ) {
-        // total number of occurrences = number of different occurrences * number of traces having this occurrence until the end of the word
-        total_occurrences += tree.nodeCount.get(o[o.length-1]);
-      }
+      int total_occurrences = getTotalOccurrences(occ);
       
       if (total_occurrences >= minSupThreshold) {
       
@@ -602,12 +627,7 @@ public class MineLSC {
       nextWord[word.length] = e;
       
       List<SLogTreeNode[]> occ = tree.countOccurrences(nextWord, null, null);
-      
-      int total_occurrences = 0;
-      for (SLogTreeNode[] o : occ) {
-        // total number of occurrences = number of different occurrences * number of traces having this occurrence until the end of the word
-        total_occurrences += tree.nodeCount.get(o[o.length-1]);
-      }
+      int total_occurrences = getTotalOccurrences(occ);
       
       if (total_occurrences >= minSupThreshold) {
       

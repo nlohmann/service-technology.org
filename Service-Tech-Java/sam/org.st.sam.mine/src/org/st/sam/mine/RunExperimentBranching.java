@@ -16,7 +16,7 @@ import java.util.Properties;
 import lscminer.datastructure.LSC;
 
 import org.st.sam.log.SLogTree.TreeStatistics;
-import org.st.sam.util.LSCOutput;
+import org.st.sam.util.SAMOutput;
 
 public class RunExperimentBranching {
 
@@ -105,10 +105,11 @@ public class RunExperimentBranching {
     }
     
     ArrayList<LSC> lscs = miner.getLSCs();
+    MineLSC.sortLSCs(lscs);
     
     for (LSC l : lscs) {
-      LSCOutput.shortenLSCnames(l.getPreChart());
-      LSCOutput.shortenLSCnames(l.getMainChart());
+      SAMOutput.shortenLSCnames(l.getPreChart());
+      SAMOutput.shortenLSCnames(l.getMainChart());
     }
 
     // resulting html
@@ -148,7 +149,7 @@ public class RunExperimentBranching {
       String input_tree_png = inputFile+".png";
       
       miner.getTree().clearCoverageMarking();
-      LSCOutput.writeToFile(miner.getTree().toDot(miner.getShortenedNames()), resultsDir+SLASH+input_tree_dot);
+      SAMOutput.writeToFile(miner.getTree().toDot(miner.getShortenedNames()), resultsDir+SLASH+input_tree_dot);
       systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+input_tree_dot+" -o"+resultsDir+SLASH+input_tree_svg);
       systemCall(dotRenderer+" -Tpng -Gsize=30 "+resultsDir+SLASH+input_tree_dot+" -o"+resultsDir+SLASH+input_tree_png);
       
@@ -171,7 +172,7 @@ public class RunExperimentBranching {
     String output_tree_svg = inputFile+"_cov.svg";
     String output_tree_png = inputFile+"_cov.png";
     
-    LSCOutput.writeToFile(miner.getCoverageTreeGlobal(), resultsDir+SLASH+output_tree_dot);
+    SAMOutput.writeToFile(miner.getCoverageTreeGlobal(), resultsDir+SLASH+output_tree_dot);
     systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+output_tree_dot+" -o"+resultsDir+SLASH+output_tree_svg);
     systemCall(dotRenderer+" -Tpng -Gsize=30 "+resultsDir+SLASH+output_tree_dot+" -o"+resultsDir+SLASH+output_tree_png);
     
@@ -189,10 +190,10 @@ public class RunExperimentBranching {
       found_lscs.append(l.toString());
       found_lscs.append("\n");
 
-      String lsc_string = LSCOutput.toMSCRenderer("LSC "+(i+1)+" conf="+l.getConfidence()+" supp="+l.getSupport(), l);
+      String lsc_string = SAMOutput.toMSCRenderer("LSC "+(i+1)+" conf="+l.getConfidence()+" supp="+l.getSupport(), l);
       String lsc_resultfile = "lsc_"+(i+1)+".lsc.txt";
       String lsc_renderfile = "lsc_"+(i+1)+".lsc.svg";
-      LSCOutput.writeToFile(lsc_string, resultsDir+SLASH+lsc_resultfile);
+      SAMOutput.writeToFile(lsc_string, resultsDir+SLASH+lsc_resultfile);
       
       systemCall(mscRenderer+" -Tsvg -i"+resultsDir+SLASH+lsc_resultfile+" -o "+resultsDir+SLASH+lsc_renderfile);
 
@@ -207,7 +208,7 @@ public class RunExperimentBranching {
         String ct_dotfile = "tree_cov_"+(i+1)+".dot";
         String ct_svgfile = "tree_cov_"+(i+1)+".svg";
         String ct_pngfile = "tree_cov_"+(i+1)+".png";
-        LSCOutput.writeToFile(ct_string, resultsDir+SLASH+ct_dotfile);
+        SAMOutput.writeToFile(ct_string, resultsDir+SLASH+ct_dotfile);
         
         systemCall(dotRenderer+" -Tsvg "+resultsDir+SLASH+ct_dotfile+" -o"+resultsDir+SLASH+ct_svgfile);
         systemCall(dotRenderer+" -Tpng -Gsize=30 "+resultsDir+SLASH+ct_dotfile+" -o"+resultsDir+SLASH+ct_pngfile);
@@ -222,8 +223,8 @@ public class RunExperimentBranching {
       r.append("<hr/>\n");
     }
     r.append("</body>\n");
-    LSCOutput.writeToFile(r.toString(), resultsDir+"/results.html");    
-    LSCOutput.writeToFile(found_lscs.toString(), resultsDir+"/lscs.txt");
+    SAMOutput.writeToFile(r.toString(), resultsDir+"/results.html");    
+    SAMOutput.writeToFile(found_lscs.toString(), resultsDir+"/lscs.txt");
     System.out.println("finished.");
   }
   

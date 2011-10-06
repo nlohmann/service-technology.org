@@ -40,17 +40,6 @@ public class ConvertLog {
     }
   }
   
-  public void writeLog(String fileName) throws IOException {
-    FileOutputStream out = new FileOutputStream(fileName);
-    XSerializer logSerializer;
-    if (fileName.endsWith("gz"))
-      logSerializer = new XesXmlGZIPSerializer();
-    else
-      logSerializer = new XesXmlSerializer();
-    logSerializer.serialize(log, out);
-    out.close();
-  }
-  
   public XLog getLog() {
     return log;
   }
@@ -127,7 +116,7 @@ public class ConvertLog {
     ConvertLog rl = new ConvertLog();
     rl.read(args[0]);
     System.out.println("Writing "+args[1]);
-    rl.writeLog(args[1]);
+    XESExport.writeLog(rl.getLog(), args[1]);
   }
 
 }

@@ -19,6 +19,9 @@ public class SLog {
   public String originalNames[];
   public Map<String, Short> name2id;
   
+  public Map<SEvent, XEvent> event2event;
+  public Map<XEvent, Short> event2id;
+  
   public short[][] traces;
   
   public SLog(XLog xLog) {
@@ -29,6 +32,8 @@ public class SLog {
     List<String> allNamesOrdered = new LinkedList<String>();
     
     name2id = new HashMap<String, Short>();
+    event2event = new java.util.HashMap<SEvent, XEvent>();
+    event2id = new java.util.HashMap<XEvent, Short>();
     
     traces = new short[xLog.size()][];
     
@@ -47,6 +52,9 @@ public class SLog {
             name2id.put(name, name_id);
             name_id++;
           }
+          
+          event2event.put(event, xEvent);
+          event2id.put(xEvent, name2id.get(name));
         
           traces[traceNum][eventNum] = name2id.get(name);
         } catch (Exception e) {

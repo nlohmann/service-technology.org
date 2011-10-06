@@ -14,7 +14,7 @@ import java.util.List;
 import lscminer.datastructure.LSC;
 import lscminer.datastructure.LSCEvent;
 
-public class LSCOutput {
+public class SAMOutput {
   
   public static void shortenLSCnames(LSC l) {
     shortenLSCnames(l.getPreChart());

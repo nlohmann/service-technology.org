@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import org.junit.Test;
+import org.st.sam.log.SScenario;
 import org.st.sam.mine.MineBranchingLSC;
 import org.st.sam.mine.MineLSC;
 
@@ -32,8 +33,8 @@ public class BranchingMinerTest extends TestSuite {
     }
     return text.toString();
   }
-
-  public void checkOutputGeneral(String sourceFile, int expectedScenarios) throws IOException {
+  
+  public static void checkOutputGeneral(String sourceFile, int expectedScenarios) throws IOException {
     File f1 = new File(sourceFile+".dot");
     Assert.assertTrue("Deleted tree representation of the log", f1.delete());
     File f2 = new File(sourceFile+"_cov.dot");
@@ -80,6 +81,21 @@ public class BranchingMinerTest extends TestSuite {
     
     checkOutputGeneral(sourceFile, 56);
   }
+	
+	@Test
+	public void test_scenario_subsumption() {
+	  
+	  short[] pre1 = new short[] { 15 };
+	  short[] main1 = new short[] { 16, 17, 18, 19, 20, 30, 31, 32, 35, 36, 42, 43, 44, 57, 58, 59, 60, 61, 62, 13, 14 };
+	  
+	  short[] pre2 = new short[] { 19 };
+    short[] main2 = new short[] { 20, 30, 31, 32, 35, 36, 42, 43, 44, 57, 58, 59, 60, 61, 62, 13, 14 };
+    
+    SScenario s1 = new SScenario(pre1, main1);
+    SScenario s2 = new SScenario(pre2, main2);
+	  
+    Assert.assertEquals(true, s1.implies(s2));
+	}
 	
 	@Test
   public void mine_test_jeti_invariants () throws Exception {

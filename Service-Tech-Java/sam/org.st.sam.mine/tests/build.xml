@@ -38,7 +38,18 @@
          	debug="on" />
 	</target>
 	
+	<property name="dir.testfiles.minetest" value="${dir.testfiles}/_minetest"/>
+
 	<target name="check" depends="svn-clean,build-test">
+		
+		<!-- copy test files to separate directory (to ease clean up) --> 
+		<mkdir dir="${dir.testfiles.minetest}" />
+		<copy todir="${dir.testfiles.minetest}">
+			<fileset dir="${dir.testfiles}">
+				<include name="*.xes.gz*"/>
+			</fileset>
+		</copy>
+		
 		<echo message="Running JUnit tests in ${test.basedir}" />
 	    <junit fork="yes" dir="${home}">
 	    	
@@ -50,7 +61,7 @@
     	  <formatter type="plain" />
 	    	
 	      <!-- JUnit: test cases to run -->
-	      <sysproperty key="test.testFileRoot" path="${dir.testfiles}"/>
+	      <sysproperty key="test.testFileRoot" path="${dir.testfiles.minetest}"/>
 	      <test name="org.st.sam.mine.test.BranchingMinerTest" todir="${test.basedir}"/>
 	    </junit>
 		
@@ -62,6 +73,9 @@
 	</target>
 	
 	<target name="svn-clean" depends="clean">
+		<!-- clean test file directories -->
+		<delete dir="${dir.testfiles.minetest}" failonerror="false" />
+
 		<!-- test reports -->
 		<delete failonerror="false">
 			<fileset dir="${test.basedir}">

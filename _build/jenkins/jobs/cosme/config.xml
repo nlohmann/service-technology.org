@@ -186,6 +186,7 @@
         </hudson.plugins.doclinks.Document>
       </documents>
     </hudson.plugins.doclinks.DocLinksPublisher>
+    <hudson.plugins.cigame.GamePublisher/>
     <org.jenkinsci.plugins.cppcheck.CppcheckPublisher>
       <cppcheckConfig>
         <pattern></pattern>

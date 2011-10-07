@@ -259,6 +259,14 @@
       <attachmentsPattern></attachmentsPattern>
     </hudson.plugins.emailext.ExtendedEmailPublisher>
     <hudson.plugins.twitter.TwitterPublisher/>
+    <hudson.tasks.BuildTrigger>
+      <childProjects>genet-win</childProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+      </threshold>
+    </hudson.tasks.BuildTrigger>
   </publishers>
   <buildWrappers/>
 </project>

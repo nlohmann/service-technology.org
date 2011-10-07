@@ -260,7 +260,7 @@
     </hudson.plugins.emailext.ExtendedEmailPublisher>
     <hudson.plugins.twitter.TwitterPublisher/>
     <hudson.tasks.BuildTrigger>
-      <childProjects>lola-win</childProjects>
+      <childProjects>LoLA-win</childProjects>
       <threshold>
         <name>SUCCESS</name>
         <ordinal>0</ordinal>

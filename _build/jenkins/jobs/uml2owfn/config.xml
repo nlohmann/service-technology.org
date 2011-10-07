@@ -260,7 +260,7 @@
     </hudson.plugins.emailext.ExtendedEmailPublisher>
     <hudson.plugins.twitter.TwitterPublisher/>
     <hudson.tasks.BuildTrigger>
-      <childProjects>uml2owfn-win</childProjects>
+      <childProjects>UML2oWFN-win</childProjects>
       <threshold>
         <name>SUCCESS</name>
         <ordinal>0</ordinal>

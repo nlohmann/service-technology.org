@@ -260,7 +260,7 @@
     </hudson.plugins.emailext.ExtendedEmailPublisher>
     <hudson.plugins.twitter.TwitterPublisher/>
     <hudson.tasks.BuildTrigger>
-      <childProjects>ogapi-win</childProjects>
+      <childProjects>OGAPI-win</childProjects>
       <threshold>
         <name>SUCCESS</name>
         <ordinal>0</ordinal>

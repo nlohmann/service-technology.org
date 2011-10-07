@@ -20,7 +20,7 @@ all: ../ChangeLog
 # run "uml2owfn --help" to include output in documentation
 #############################################################################
 cmdline.out: $(top_srcdir)/src/options.cc $(top_srcdir)/src/options.h $(top_srcdir)/configure.ac
-	$(top_srcdir)/src/uml2owfn --help > cmdline.out
+	$(top_srcdir)/src/uml2owfn$(EXEEXT) --help > cmdline.out
 
 #############################################################################
 # create ASCII ChangeLog/NEWS out of Texinfo (8 is height of header)

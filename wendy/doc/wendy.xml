@@ -2,6 +2,8 @@
 <toolname>Wendy</toolname>
 <shortname>wendy</shortname> <!-- optional -->
 
+<status>active</status> <!-- active, inactive, deprecated -->
+
 <tagline>synthesizing partners for services</tagline>
 
 <purpose>

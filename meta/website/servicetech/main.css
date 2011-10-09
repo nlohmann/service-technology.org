@@ -1,0 +1,208 @@
+    .menu {
+      margin-top: 5px; margin-right: 70px; margin-bottom: 7px; 
+      font-size: 16pt;
+      color: #fff; 
+      font-family: 'Open Sans Condensed', 'Open sans', sans;
+    }
+
+    h1 {
+      margin-top: 5px; margin-left: 80px; margin-bottom: 7px;      
+      font-size: 28pt;
+      color: #ffd463; font-family: 'Open Sans Condensed', 'Open sans', sans; font-weight: bold; text-transform: uppercase;
+    }
+
+    
+    .menu a:link {
+      color: inherit;
+      text-decoration: inherit;
+    }
+
+    .menu a:active {
+      color: inherit;
+      text-decoration: inherit;
+    }
+    .menu a:visited {
+      color: inherit;
+      text-decoration: inherit;
+    }
+
+    .menu a:focus {
+          color: inherit;
+      text-decoration: inherit;
+
+    }
+    
+    .menu a:hover {
+      color: black;
+      text-decoration: inherit;
+      background: #ffd463;
+    }
+    
+    p {
+      margin-left: 80px;
+      margin-right: 100px;
+      margin-top: 0px;
+      margin-bottom: 5px;
+      font-size: 14pt; color: #000; font-family: 'Open Sans Condensed', 'Open sans', sans;
+      line-height: 20pt;
+    }
+    
+     .commandline {
+      font-size: 14pt; color: #000; font-family: consolas, 'courier new';
+      background: #333333;
+      color: #fff;
+      line-height: 40pt;
+      padding-left: 5px;
+      padding-right: 5px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+
+    }
+    
+    p.purpose {
+      font-style: inherit;
+    }
+
+    p.question {
+      font-style: italic;
+    }
+    p.answer {
+      margin-top: -5px;
+      font-style: none;
+    }
+
+    
+    .skip {
+    height: 40px;
+    }
+    
+    p a:visited, p a:link, a:focus, a:active {
+      color: black;
+      text-decoration: inherit;
+      background: #ffd463;
+      text-transform: uppercase;
+    }
+    
+    p a:hover {
+      color: #333333;
+      background: #ffd463;
+    }
+    
+    h2 {
+      margin-top: 20px;
+      margin-left: 80px;
+      margin-right: 80px;
+      margin-bottom: 10px;
+      font-size: 16pt;
+      color: #333333; font-family: 'Open Sans Condensed', 'Open sans', sans; 
+      font-weight: bold; 
+      text-transform: uppercase; 
+    }
+
+    td.featureHeader {
+      font-size: 16pt;
+      color: #333333; font-family: 'Open Sans Condensed', 'Open sans', sans; 
+      font-weight: bold; 
+      text-transform: uppercase; 
+    }
+
+    td.feature {
+      font-size: 14pt;
+      color: #000; font-family: 'Open Sans Condensed', 'Open sans', sans; 
+      font-weight: normal; 
+    }
+    
+    p.authors {
+      margin-top: 20px;
+      margin-left: 80px;
+      margin-right: 80px;
+
+      margin-bottom: 20px;
+      font-size: 14pt; color: #000; font-family: 'Open Sans Condensed', 'Open sans', sans; font-style: italic;
+    }
+   
+    .button {
+      position: relative;
+      top: -30;
+      left: 30;
+      float: right;
+    }
+
+    .badge {
+      position: relative;
+   /*   top: 50;
+      left: 20;*/
+      float: right;
+    }
+
+    .tab:link , .tab:active, .tab:visited {
+      padding-left: 10px;
+      padding-right: 10px;
+      background: #333333;
+      color: white;
+      font-size: 16pt;
+      color: #fff; 
+      font-family: 'Open Sans Condensed', 'Open sans', sans;
+      text-transform: uppercase;
+      margin-top: 0px; margin-bottom: 7px; 
+            text-decoration:none;
+  
+    }
+
+    .activetab {
+      padding-left: 10px;
+      padding-right: 10px;
+      background: #000000;
+      color: white;
+      font-size: 16pt;
+      color: #fff; 
+      font-family: 'Open Sans Condensed', 'Open sans', sans;
+      text-transform: uppercase;
+      margin-top: 0px; margin-bottom: 7px; 
+    }
+
+/*    .tab:link {
+      padding-left: inherit;
+      padding-right: inherit;
+      background: inherit;
+      color: inherit;
+      font-size: inherit;
+      color: inherit; 
+      font-family: inherit;
+      text-transform: inherit;
+      margin-top: inherit; margin-bottom: inherit; 
+      text-decoration: none;
+    }
+*/
+    .tab:hover {
+      padding-left: 10px;
+      padding-right: 10px;
+      background: black;
+      color: white;
+      font-size: 16pt;
+      color: #fff; 
+      font-family: 'Open Sans Condensed', 'Open sans', sans;
+      text-transform: uppercase;
+      margin-top: 0px; margin-bottom: 7px; 
+      text-decoration:none;
+    }
+    
+    
+    li.downloads {
+      margin-top: 0px;
+      font-size: 14pt; color: #000; font-family: 'Open Sans Condensed', 'Open sans', sans;
+    }
+      
+    ul {
+      margin-top: 0px;
+      margin-left: 80px;    
+    }
+    
+    h3 {
+      margin-top: 20px;
+      margin-left: 80px;
+      margin-right: 80px;
+      margin-bottom: 5px;
+      font-size: 16pt;
+      color: #333333; font-family: 'Open Sans Condensed', 'Open sans', sans; font-weight: bold; text-transform: uppercase;
+    }

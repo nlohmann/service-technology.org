@@ -1,3 +1,11 @@
 This folder contains software and scripts that are necessary to build the
 service-technology.org tools. Please DO NOT change anything is this
 directory. If I could, I would make this directory write-protected...
+
+How to build a tool? (e.g. Wendy)
+
+1) checkout at least wendy folder and _build folder
+3) build GNU toolchain: go to _build/tarballs folder on terminal and type "make"
+4) add _build/local/bin to $PATH variable: go to _build/local/bin folder and type "export PATH=$(pwd):$PATH"
+5) add ant script for wendy: copy _build/build.xml to wendy/build.xml
+6) build wendy: go to wendy folder and type "ant"

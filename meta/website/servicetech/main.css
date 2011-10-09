@@ -106,11 +106,17 @@
       text-transform: uppercase; 
     }
 
-    td.feature {
+    td.feature, td.form-desc {
       font-size: 14pt;
       color: #000; font-family: 'Open Sans Condensed', 'Open sans', sans; 
-      font-weight: normal; 
+      font-weight: normal;
     }
+
+    td.form-desc {
+      text-align: right;
+      padding-right: 5px;
+    }
+
     
     p.authors {
       margin-top: 20px;

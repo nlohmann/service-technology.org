@@ -23,6 +23,7 @@
 #include <vector>
 #include <set>
 #include <string>
+#include <cstdio>
 #include "Output.h"
 
 

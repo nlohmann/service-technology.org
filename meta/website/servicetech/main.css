@@ -159,11 +159,11 @@
       padding-left: 10px;
       padding-right: 10px;
       background: #000000;
-      color: white;
+      color: #ffd463;
       font-size: 16pt;
-      color: #fff; 
       font-family: 'Open Sans Condensed', 'Open sans', sans;
       text-transform: uppercase;
+      font-weight: bold;
       margin-top: 0px; margin-bottom: 7px; 
     }
 
@@ -184,9 +184,8 @@
       padding-left: 10px;
       padding-right: 10px;
       background: black;
-      color: white;
       font-size: 16pt;
-      color: #fff; 
+      color: #ffd463; 
       font-family: 'Open Sans Condensed', 'Open sans', sans;
       text-transform: uppercase;
       margin-top: 0px; margin-bottom: 7px; 
@@ -211,4 +210,12 @@
       margin-bottom: 5px;
       font-size: 16pt;
       color: #333333; font-family: 'Open Sans Condensed', 'Open sans', sans; font-weight: bold; text-transform: uppercase;
+    }
+    
+    img.portrait {
+      border:5px solid #333333;
+    }
+
+     img.plus-sign {
+      border:5px solid #cacaca;
     }

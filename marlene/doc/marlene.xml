@@ -2,6 +2,8 @@
 <toolname>Marlene</toolname>
 <shortname>marlene</shortname> <!-- optional -->
 
+<status>active</status> <!-- active, inactive, deprecated -->
+
 <tagline>making adapters behave</tagline>
 
 <purpose>

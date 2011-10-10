@@ -1,0 +1,30 @@
+<tool>
+<toolname>Cosme</toolname>
+<shortname>cosme</shortname> <!-- optional -->
+
+<status>inactive</status> <!-- active, inactive, deprecated -->
+
+<tagline>Cosme decides matchting and substituability for services</tagline>
+
+<purpose>
+Cosme [c]hecks [o]perating guidelines for [s]imulation, [m]atching, and [e]quivalence. Operating guidelines must be given in bit representation.  
+</purpose>
+
+<copyright>
+2010 Andreas Lehmann
+</copyright>
+
+<authors>
+* Andreas Lehmann implemented the core functionality of Cosme
+</authors>
+
+<maintainer>Andreas Lehmann</maintainer>
+
+<license>AGPL3+</license>
+
+<runtime>lola-statespace</runtime>
+
+<thanks>
+</thanks>
+
+</tool>

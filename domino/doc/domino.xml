@@ -1,0 +1,30 @@
+<tool>
+<toolname>Domino</toolname>
+<shortname>domino</shortname> <!-- optional -->
+
+<status>inactive</status> <!-- active, inactive, deprecated -->
+
+<tagline>Domino decomposes business processes into services</tagline>
+
+<purpose>
+Domino [d]ec[om]pose bus[in]ess w[o]rkflows (into services) based on a given annotation.  
+</purpose>
+
+<copyright>
+2010 Andreas Lehmann
+</copyright>
+
+<authors>
+* Andreas Lehmann implemented the core functionality of Domino
+</authors>
+
+<maintainer>Andreas Lehmann</maintainer>
+
+<license>AGPL3+</license>
+
+<runtime>lola-statespace, diane</runtime>
+
+<thanks>
+</thanks>
+
+</tool>

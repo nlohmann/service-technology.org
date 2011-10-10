@@ -1,6 +1,6 @@
 @heading Version 1.3-unreleased
 @itemize
-@item 
+@item .
 @end itemize
 
 @heading Version 1.2 (20 September 2011)

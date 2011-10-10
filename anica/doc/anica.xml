@@ -1,0 +1,31 @@
+<tool>
+<toolname>Anica</toolname>
+<shortname>anica</shortname> <!-- optional -->
+
+<status>active</status> <!-- active, inactive, deprecated -->
+
+<tagline>Automated Non-Interference Check Assistent</tagline>
+
+<purpose>
+Anica is an [A]utomated [N]on-[I]nterference [C]heck [A]ssistant, checking positive place based non-interference (PBNI+) and place based non-interference with downgrading (PBNID) for safe Petri nets.
+</purpose>
+
+<copyright>
+2011 Andreas Lehmann
+</copyright>
+
+<authors>
+* Andreas Lehmann implemented the core functionality of Anica
+</authors>
+
+<maintainer>Andreas Lehmann</maintainer>
+
+<license>AGPL3+</license>
+
+<runtime>lola-statepredicate1</runtime>
+
+<thanks>
+* Thanks to Niels Lohmann and Dirk Fahland for developing the idea to transform the problem to reachabilty.
+</thanks>
+
+</tool>

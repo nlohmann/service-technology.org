@@ -1,4 +1,4 @@
-AC_INIT([Anica], 1.2, anica@service-technology.org, anica, http://service-technology.org/anica)
+AC_INIT([Anica], 1.3-unreleased, anica@service-technology.org, anica, http://service-technology.org/anica)
 
 AC_MSG_NOTICE([    _          _           ])
 AC_MSG_NOTICE([   / \   _ __ (_) ___ __ _ ])

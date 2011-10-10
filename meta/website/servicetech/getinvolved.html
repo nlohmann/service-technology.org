@@ -35,7 +35,7 @@
         <!-- CONTENT STARTS HERE -->
         <div class="button"><img src="circle-button.png"></div>
 
-        <h2>Join the team</h2>
+        <h2>Join the team ...</h2>
         <p>
          
           <img width="75" src="niels.jpg" class="portrait">
@@ -47,17 +47,19 @@
           <img width="75" src="dummy-devel.png" class="portrait">
         </p>
 
-        <h2>Five steps to become a contributor</h2>
+        <h2>... become a contributor</h2>
         <p>
-        <table cellpadding="0" cellspacing="0" width="100%" border="0">
+        <table cellpadding="0" cellspacing="20" width="100%" border="0">
         <tr>
+        <td><img src="numberbuttons/button1.png"></td>
           <td class="feature">
-            1. <a href="http://gna.org/service-tech">Register at GNA</a> and <a href="#">set up subversion access</a>
+            <a href="http://gna.org/service-tech">Register at GNA</a> and <a href="#">set up subversion access</a>
           </td>
         </tr>
         <tr>
+<td><img src="numberbuttons/button2.png"></td>
           <td class="feature">
-            2. Check out sources 
+            Check out sources 
             <br>
             <span class="commandline">
 $ svn co svn+ssh://username@svn.gna.org/svn/trunk/service-tech/wendy
@@ -65,20 +67,39 @@ $ svn co svn+ssh://username@svn.gna.org/svn/trunk/service-tech/wendy
 </td>
 </tr>
 <tr>
+<td><img src="numberbuttons/button3.png"></td>
 <td class="feature">
- 3. Compile
+ Compile
 <br>
 <span class="commandline">
 $ autoreconf -i && ./configure && make
 </span>
 </td>
 </tr>
-<tr><td class="feature">
-   4. Add/change code
+<tr>
+<td><img src="numberbuttons/button4.png"></td>
+<td class="feature">
+   Add/change code
 </td>
 </tr>
-    <tr><td class="feature">
-   5. Contribute 
+    <tr>
+    <td><img src="numberbuttons/button5.png"></td>
+
+    <td class="feature">
+Review your changes
+<br>
+<span class="commandline">
+$ make check && make distcheck
+</span>
+</td>
+</tr>
+
+
+    <tr>
+    <td><img src="numberbuttons/button6.png"></td>
+
+    <td class="feature">
+Commit your changes
 <br>
 <span class="commandline">
 $ svn commit -m "your changes"

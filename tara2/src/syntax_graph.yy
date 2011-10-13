@@ -1,20 +1,20 @@
 /*****************************************************************************\
- Wendy -- Calculating Operating Guidelines
+ Tara -- 
 
  Copyright (C) 2009  Niels Lohmann <niels.lohmann@uni-rostock.de>
 
- Wendy is free software: you can redistribute it and/or modify it under the
+ Tara is free software: you can redistribute it and/or modify it under the
  terms of the GNU Affero General Public License as published by the Free
  Software Foundation, either version 3 of the License, or (at your option)
  any later version.
 
- Wendy is distributed in the hope that it will be useful, but WITHOUT ANY
+ Tara is distributed in the hope that it will be useful, but WITHOUT ANY
  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for
  more details.
 
  You should have received a copy of the GNU Affero General Public License
- along with Wendy.  If not, see <http://www.gnu.org/licenses/>.
+ along with Tara.  If not, see <http://www.gnu.org/licenses/>.
 \*****************************************************************************/
 
 
@@ -57,11 +57,6 @@ unsigned int currentState;
 std::vector<short> stateInfo(5); //starting with 5
 
 std::map<const unsigned int, innerState *const> innerGraph;
-
-/*legacy */
-///all relevant runs starting from a state
-///eg: state 1 -> [ (t3,t4,t5) , (t3,t5,t6,...), ...]
-std::map < const int,std::list < std::list <char*> >* > runs; //TODO: transitions statt C-Strings
 
 %}
 
@@ -183,13 +178,6 @@ transition:
        innerGraph[currentState]->curTransition=innerGraph[currentState]->transitions.begin();
        /* iterate through all runs of target state and copy
           them to runs of current State with current transition */
-
-/*       std::list<std::list<char *> >::iterator i;
-       for(i=runs[$3]->begin(); i!=runs[$3]->end(); i++) {
-         std::list <char*> copy=*i;
-         copy.push_front($1); // Do we need strdup ?
-         runs[currentState]->push_back(copy);
-       }*/
     }
   }
 ;

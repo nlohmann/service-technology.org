@@ -8,7 +8,8 @@ tara_SOURCES =  main.cc \
                 cmdline.c cmdline.h \
                 Output.cc Output.h \
                 DFS_graph.cc DFS_graph.h \
-		lexic_graph.ll syntax_graph.yy
+		lexic_graph.ll syntax_graph.yy \
+                Requirement.cc Requirement.h
                 
 # <<-- CHANGE END -->>
 

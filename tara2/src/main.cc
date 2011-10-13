@@ -209,7 +209,7 @@ int main(int argc, char** argv) {
 		std::stringstream inputerror;
 		inputerror << error;
 		abort(3, "pnapi error %i", inputerror.str().c_str());
-	}
+		}
 
     /*---------------------------------.
     | 2. normalize the net (via PNAPI) |
@@ -222,10 +222,10 @@ int main(int argc, char** argv) {
     | 3. call lola |
     `-------------*/
 
-    std::string command="lola-statespace -m "; //TODO: as cmd-paramd
+    std::string command="lola-statespace -m "; //TODO: as cmd-param
     std::string fileName;    
 
-        // create a temporary file
+      // create a temporary file
 #if defined(__MINGW32__)
         fileName = mktemp(basename(args_info.tmpfile_arg));
 #else
@@ -266,9 +266,17 @@ int main(int argc, char** argv) {
       cout << c;
     }*/
 
+    /*-------------------------.
+    | 4. Parse the inner Graph |
+    \-------------------------*/
+
     graph_in=fopen(fileName.c_str(),"r");
     graph_parse();
     /* TODO destroy lexer etc */
+
+    /*-----------------------------------------------------------.
+    | 5. Do DFS on the graph while running the requirement Check | 
+    \-----------------------------------------------------------*/
     DFS_graph();
 
     return EXIT_SUCCESS;

@@ -1,4 +1,17 @@
-    .menu {
+
+  table.content {
+    box-shadow: 0px 0px 14px #333;
+    margin-top: +30px;
+  }
+
+  td.content {
+  
+  background: #fff;
+
+  }
+
+
+  .menu {
       margin-top: 5px; margin-right: 70px; margin-bottom: 7px; 
       font-size: 16pt;
       color: #fff; 
@@ -8,7 +21,8 @@
     h1 {
       margin-top: 5px; margin-left: 80px; margin-bottom: 7px;      
       font-size: 28pt;
-      color: #ffd463; font-family: 'Open Sans Condensed', 'Open sans', sans; font-weight: bold; text-transform: uppercase;
+      color: #ffd463; 
+      font-family: 'Open Sans Condensed', 'Open sans', sans; font-weight: bold; text-transform: uppercase;
     }
 
     
@@ -80,12 +94,12 @@
       color: black;
       text-decoration: inherit;
       background: #ffd463;
-      text-transform: uppercase;
     }
     
     p a:hover {
       color: #333333;
       background: #ffd463;
+      text-decoration: underline;
     }
     
     h2 {
@@ -217,5 +231,5 @@
     }
 
      img.plus-sign {
-      border:5px solid #cacaca;
+      border:5px solid #ffffff;
     }

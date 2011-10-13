@@ -540,7 +540,7 @@ std::ostream & operator<<(std::ostream & os, const Edge & e)
  * \brief constructor
  */
 PntNodeData::PntNodeData():
-  placeID(0), transitionID(0), nameID(0)
+  placeID(0), transitionID(0)
 {
 }
 

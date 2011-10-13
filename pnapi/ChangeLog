@@ -36,6 +36,10 @@ Version 4.03-unreleased
 
 * fixed bug in exception output
 
+* LoLA will now be downloaded and compiled if missing
+
+* unfolder will now use temporary files instead of /tmp/input
+
 Version 4.02 (2010-07-28)
 =========================
 

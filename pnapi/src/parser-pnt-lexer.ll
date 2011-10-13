@@ -73,7 +73,7 @@ typedef pnapi::parser::pnt::yy::BisonParser::token tt;
 
  /* identifiers */
 [0-9]+                  { yylval->yt_int = atoi(yytext); return tt::NUMBER; }
-[0-9a-zA-Z_\-.=\[\]]+         { yylval->yt_str = strdup(yytext); return tt::IDENT; }
+[^ \t\r\n:,@]+         { yylval->yt_str = strdup(yytext); return tt::IDENT; }
 
  /* whitespace */
 [ \t]                   { /* skip */ } 

@@ -22,7 +22,7 @@ AC_PATH_PROG(BISON, [bison], not found)
 
 # use the service-technology.org macros
 AC_ST_BASIC
-AC_ST_LOLA([1.14])
+AC_ST_LOLA([1.16])
 AC_ST_AUTOTEST
 AC_ST_VERBOSE
 

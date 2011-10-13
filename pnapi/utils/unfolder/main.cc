@@ -28,6 +28,39 @@ FILE *pipe_out_final;
 
 FILE *inputFile;
 
+
+/*!
+ This function creates a temporary file using mkstemp(). It uses the value
+ of the tmpfile parameter as template. In case of MinGW compilations, the
+ basename has to be used to avoid problems with path names.
+
+ \return name of already opened temp file
+
+ \note mkstemp already opens the temp file, so there is no need to check
+       whether the creation of the std::ofstream succeeded.
+
+ \note copied from Output.cc
+ \todo kanonize this tool
+*/
+char * createTmp() {
+  std::string tempfileTemplate = "/tmp/unfolderTemp-XXXXXX";
+  char * result = NULL;
+#ifdef __MINGW32__
+    result = basename(const_cast<char*>(tempfileTemplate.c_str()));
+    if (mktemp(result) == NULL) {
+        fprintf(stderr, "could not create to temporary file '%s'", basename(const_cast<char*>(tempfileTemplate.c_str())));
+        exit(EXIT_FAILURE);
+    };
+#else
+    result = strdup(tempfileTemplate.c_str());
+    if (mkstemp(result) == -1) {
+        fprintf(stderr, "could not create to temporary file '%s'", result);
+        exit(EXIT_FAILURE);
+    };
+#endif
+    return result;
+}
+
 int main(int argc, char *argv[]) {
     if (argc == 2 && !strcmp(argv[1], "--version")) {
         printf("High level open net unfolder\n");
@@ -48,6 +81,7 @@ int main(int argc, char *argv[]) {
      */
 
     // write input from stdin to file
+    /*
     int ch;
     inputFile = fopen("/tmp/input", "w");
     ch = getchar();
@@ -56,11 +90,22 @@ int main(int argc, char *argv[]) {
         ch = getchar(); 
     }
     fclose(inputFile);
+    //*/
+    int ch;
+    char * tmpFileName = createTmp();
+    inputFile = fopen(tmpFileName, "w");
+    while((ch = getchar()) != EOF)
+    {
+      fputc(ch, inputFile);
+    }
+    fclose(inputFile);
+
+
 	
     
     // parse high-level net and pipe it to LoLA (initial marking)
     pipe_out_initial = popen("lola-statespace -nllnet1 2> /dev/null", "w");
-    hlowfn_initial_in = fopen("/tmp/input", "r");
+    hlowfn_initial_in = fopen(tmpFileName, "r");
     hlowfn_initial_out = pipe_out_initial;
     hlowfn_initial_parse();
     pclose(pipe_out_initial);
@@ -68,7 +113,7 @@ int main(int argc, char *argv[]) {
       
     // parse high-level net and pipe it to LoLA (final marking)
     pipe_out_final = popen("lola-statespace -nllnet2 2> /dev/null", "w");
-    hlowfn_final_in = fopen("/tmp/input", "r");
+    hlowfn_final_in = fopen(tmpFileName, "r");
     hlowfn_final_out = pipe_out_final;
     hlowfn_final_parse();
     pclose(pipe_out_final);

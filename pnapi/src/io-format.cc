@@ -1980,21 +1980,11 @@ int getNodeID(std::ostream & os, const Node & n)
  */
 std::string getNodeName(std::ostream & os, const Node & n)
 {
-  string result = n.getName();
-  if(n.getName().length() > 16)
-  {
-    // need to rename
-    stringstream ss;
-    while(n.getPetriNet().findNode(result) != NULL) // while name already used
-    {
-      // clear stream
-      ss.str("");
-      ss.clear();
-      // get next name
-      ss << "tooLong_" << (util::PntData::data(os).nameID++);
-      result = ss.str();
-    }
-  }
+  // get node id
+  stringstream ss;
+  ss << getNodeID(os, n);
+
+  string result = ((dynamic_cast<const Place *>(&n) == NULL) ? "t" : "p") + ss.str();
 
   // fill up with whitespace
   while(result.length() < 16)

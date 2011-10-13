@@ -12,6 +12,8 @@
 @item creating arcs between two nets will now raise an exception
 @item implemented INA file format (*.pnt) files
 @item fixed bug in exception output
+@item LoLA will now be downloaded and compiled if missing
+@item unfolder will now use temporary files instead of /tmp/input
 @end itemize
 
 @heading Version 4.02 (2010-07-28)

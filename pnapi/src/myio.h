@@ -598,8 +598,6 @@ struct PntNodeData
   int placeID;
   /// next transition id
   int transitionID;
-  /// next name number
-  unsigned int nameID;
   /// constructor
   PntNodeData();
 };

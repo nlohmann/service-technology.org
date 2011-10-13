@@ -9,3 +9,6 @@ svn-clean: maintainer-clean
 	       src/config-log.h build-aux m4/libtool.m4 m4/lt~obsolete.m4 \
 	       m4/ltoptions.m4 m4/ltsugar.m4 m4/ltversion.m4
 	for DIR in $(DIST_SUBDIRS) .; do rm -f $$DIR/Makefile.in; done
+
+# remove a built LoLA if present
+DISTCLEANFILES = $(top_builddir)/lola-statespace

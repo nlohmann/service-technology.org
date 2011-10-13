@@ -12,6 +12,7 @@ if test "$2" = ""; then
 else
   LOLASUFFIX="$2"
 fi
+AC_SUBST(LOLASUFFIX)
 
 export PATH=`pwd`:$PATH
 AC_PATH_PROG(LOLA, [lola-${LOLASUFFIX}], [])

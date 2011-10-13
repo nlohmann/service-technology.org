@@ -11,4 +11,4 @@ svn-clean: maintainer-clean
 	for DIR in $(DIST_SUBDIRS) .; do rm -f $$DIR/Makefile.in; done
 
 # remove a built LoLA if present
-DISTCLEANFILES = $(top_builddir)/lola-statespace
+DISTCLEANFILES = $(top_builddir)/lola-@LOLASUFFIX@

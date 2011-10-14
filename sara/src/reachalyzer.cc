@@ -137,6 +137,8 @@ Reachalyzer::~Reachalyzer() { if (problemcreated) delete problem; }
 void Reachalyzer::start() {
 	//start counting time here
 	starttime = clock();
+	//count length of JobQueue and delta for one solving attempt
+	int jsum(0),jmax(1),jloop(0),jold(0),dsum(0),dmax(1),dloop(0);
 
 	solved = false; // not solved yet
 	errors = false; // no errors yet
@@ -156,6 +158,17 @@ void Reachalyzer::start() {
 			tps.first()->show();
 		} 
 		if (verbose>1) cerr << "Lookup-Table-Size: " << shortcut.size() << endl; // debug info
+		// adapt avg/max number of jobs in queue and delta between steps
+		if (tps.size()>jold) {
+			dsum += tps.size()-jold;
+			if (dmax<tps.size()-jold) dmax = tps.size()-jold;
+			++dloop;
+		}
+		jold = tps.size();
+		if (jold>jmax) jmax=jold;
+		jsum += jold;
+		++jloop;
+
 		map<Transition*,int> oldvector(tps.first()->getFullVector()); // the previous (father) solution of lp_solve
 		// make a copy of the active job before we change it
 //		PartialSolution ps(*(tps.first()));
@@ -283,6 +296,9 @@ void Reachalyzer::start() {
 			<< tps.size() << " in queue, " << failure.trueSize() <<  " failure" 
 			<< (failure.trueSize()!=1?"s":"") << ", " 
 			<< solutions.trueSize() << " solution" << (solutions.trueSize()!=1?"s":"") << "." << endl;
+	if (stateinfo && !passedon) // print statistics on jobqueue
+		cout << "sara: JobQueue entries " << jmax << " max, " << jsum/jloop << " avg,"
+		<< " positive Delta " << dmax << " max, " << dsum/dloop << " avg." << endl;
 	//stop counting time here
 	endtime = clock();
 }

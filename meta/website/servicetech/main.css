@@ -207,14 +207,34 @@
     }
     
     
-    li.downloads {
-      margin-top: 0px;
-      font-size: 14pt; color: #000; font-family: 'Open Sans Condensed', 'Open sans', sans;
+     ul.downloads {
+    margin-top: 0px;
+    margin-left: -15px;
+    list-style-image: url(download-enumii.png);
+    background: inherit;
     }
-      
-    ul {
-      margin-top: 0px;
-      margin-left: 80px;    
+    
+    li {
+    background: inherit;
+    }
+    
+    a.downloads:link, a.downloads:visited  {
+      color: black;
+      text-decoration: inherit;
+      background: inherit;
+    }
+    
+    
+    a.downloads:hover {
+      color: #333333;
+      background: #ffd463;
+      text-decoration: underline;
+    }
+    
+    a.downloads:active {
+      color: black;
+      text-decoration: inherit;
+      background: #ffd463;
     }
     
     h3 {

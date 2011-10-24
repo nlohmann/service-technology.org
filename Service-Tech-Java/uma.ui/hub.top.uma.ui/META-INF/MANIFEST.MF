@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Uma Eclipse UI
+Bundle-SymbolicName: hub.top.uma.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: hub.top.uma.ui.Activator
+Bundle-Vendor: service-technology.org
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ hub.top.pnapi;bundle-version="1.0.1",
+ hub.top.uma;bundle-version="1.2.1",
+ hub.top.editor.resource;bundle-version="1.1.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
+Import-Package: org.eclipse.ui.console

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="hub.top.uma.ui.popupMenus"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               id="hub.top.uma.ui.Menu"
+               label="Uma"
+               path="additions">
+            <separator
+                  name="convert">
+            </separator>
+            <separator
+                  name="operations">
+            </separator>
+         </menu>
+         <action
+               class="hub.top.uma.ui.ConvertFileAction_OcletsToDot"
+               id="hub.top.uma.ui.oclets.ConvertToDot"
+               label="convert to DOT"
+               menubarPath="hub.top.uma.ui.Menu/convert">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_SynthesizeNet"
+               id="hub.top.uma.ui.oclets.SynthesizeNet"
+               label="synthesize labeled Petri net"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_Views_RenderCovering"
+               id="hub.top.uma.ui.view.RenderCovering"
+               label="render covering"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_Views_GenerateView"
+               id="hub.top.uma.ui.view.GenerateView"
+               label="generate view"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_Views_GenerateView_Block"
+               id="hub.top.uma.ui.view.GenerateView_Block"
+               label="generate view (block)"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_Views_GenerateView_BlockHide"
+               id="hub.top.uma.ui.view.GenerateView_BlockHide"
+               label="generate view (block, hide)"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_Views_Simplify"
+               id="hub.top.uma.ui.view.UnfoldingView_Simplify"
+               label="simplify mined model"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_Views_UnfoldingView_Block"
+               id="hub.top.uma.ui.view.UnfoldingView_Block"
+               label="generate view (unfolding)"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_Views_UnfoldingView_Modular"
+               id="hub.top.uma.ui.view.UnfoldingView_Modular"
+               label="generate view (modular)"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_Views_StructuralView_BlockHide"
+               id="hub.top.uma.ui.view.StructuralView_BlockHide"
+               label="generate view (structural)"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_ReduceSpaghettiNet2"
+               id="hub.top.uma.ui.view.ReduceSpaghettiNet2"
+               label="reduce spaghetti net (2)"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_ReduceSpaghettiNet"
+               id="hub.top.uma.ui.view.ReduceSpaghettiNet"
+               label="reduce spaghetti net"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_BuildPrefix"
+               id="hub.top.uma.ui.oclets.BuildPrefix"
+               label="build branching process"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_Views_GenerateTraces"
+               id="hub.top.uma.ui.view.GenerateTraces"
+               label="generate traces"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_Views_ReplayTraces"
+               id="hub.top.uma.ui.view.ReplayTraces"
+               label="replay traces"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+         <action
+               class="hub.top.uma.ui.Action_ComputePrecision"
+               id="hub.top.uma.ui.ComputePrecision"
+               label="compute precision"
+               menubarPath="hub.top.uma.ui.Menu/operations">
+         </action>
+      </objectContribution>
+   </extension>
+</plugin>

@@ -153,6 +153,7 @@
 		<zip destfile="${home}/${package}.zip">
 			<zipfileset dir="${dir.distdir}" />
 		</zip>
+		<copy tofile="${home}/${package.nonversion}.zip" file="${home}/${package}.zip" />
 	</target>
 	
 	<!-- build binary distribution file of this package -->
@@ -174,6 +175,7 @@
 		<zip destfile="${home}/${package}-bin.zip">
 			<zipfileset dir="${dir.distbindir}" />
 		</zip>
+		<copy tofile="${home}/${package.nonversion}-bin.zip" file="${home}/${package}-bin.zip" />
 	</target>
 	
 	<!-- build jar file and run test cases on the distributable -->

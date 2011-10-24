@@ -4,18 +4,24 @@ import hub.top.petrinet.ISystemModel;
 import hub.top.petrinet.PetriNet;
 import hub.top.petrinet.PetriNetIO;
 import hub.top.petrinet.Place;
+import hub.top.petrinet.Transition;
 import hub.top.petrinet.unfold.DNodeSys_OccurrenceNet;
 import hub.top.uma.DNodeSet.DNodeSetElement;
 import hub.top.uma.synthesis.NetSynthesis;
 import hub.top.uma.synthesis.TransitiveDependencies;
 import hub.top.uma.view.MineSimplify;
+import hub.top.uma.view.ViewGeneration2;
+import hub.top.uma.view.MineSimplify.Configuration;
 
+import java.awt.List;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
+
+import org.junit.Test;
 
 import com.google.gwt.dev.util.collect.HashSet;
 
@@ -30,8 +36,10 @@ public class UmaFoldTest extends hub.top.test.TestCase {
     junit.textui.TestRunner.run(UmaTest.class);
   }
   
+  @Test
   public void testMineSimplify_basic() {
     lastTest = "Simplify mined process model";
+    System.out.println(lastTest);
 
     try {
       MineSimplify simplify = new MineSimplify(testFileRoot+"/a12f0n05.lola", testFileRoot+"/a12f0n05.log.txt");
@@ -43,6 +51,9 @@ public class UmaFoldTest extends hub.top.test.TestCase {
       float compAfter = MineSimplify.complexitySimple(simplifiedNet);
       
       assertTrue(lastTest+": model is simpler", compBefore > compAfter);
+      assertFalse(lastTest+": model is non-empty", simplifiedNet.getTransitions().isEmpty());
+      assertFalse(lastTest+": model is non-empty", simplifiedNet.getPlaces().isEmpty());
+      assertFalse(lastTest+": model is non-empty", simplifiedNet.getArcs().isEmpty());
       
     } catch (InvalidModelException e) {
       System.err.println("Invalid model: "+e);
@@ -54,8 +65,50 @@ public class UmaFoldTest extends hub.top.test.TestCase {
 
   }
   
+  @Test
+  public void testMineSimplify_mapping() {
+    lastTest = "Simplify mined process model, map event names";
+    System.out.println(lastTest);
+    
+    try {
+      Configuration config = new Configuration();
+      
+      // create mapping from "Name+complete" to "Name"
+      LinkedList<String[]> log = ViewGeneration2.readTraces(testFileRoot+"/a12f0n05.log.txt");
+      for (String[] trace : log) {
+        for (String event : trace) {
+          config.eventToTransition.put(event, event.substring(0, event.indexOf('+')));
+        }
+      }
+      
+      // call miner with this event-to-transition mapping
+      MineSimplify simplify = new MineSimplify(testFileRoot+"/a12f0n05_shortened.lola", testFileRoot+"/a12f0n05.log.txt", config);
+      simplify.prepareModel();
+      simplify.run();
+      PetriNet simplifiedNet = simplify.getSimplifiedNet();
+      
+      float compBefore = MineSimplify.complexitySimple(simplify.getOriginalNet());
+      float compAfter = MineSimplify.complexitySimple(simplifiedNet);
+      
+      assertTrue(lastTest+": model is simpler", compBefore > compAfter);
+      assertFalse(lastTest+": model is non-empty", simplifiedNet.getTransitions().isEmpty());
+      assertFalse(lastTest+": model is non-empty", simplifiedNet.getPlaces().isEmpty());
+      assertFalse(lastTest+": model is non-empty", simplifiedNet.getArcs().isEmpty());
+      
+    } catch (InvalidModelException e) {
+      System.err.println("Invalid model: "+e);
+      assertTrue(lastTest, false);
+    } catch (IOException e) {
+      System.err.println("Couldn't read test file: "+e);
+      assertTrue(lastTest, false);
+    }
+
+  }
+  
+  @Test
   public void testUnfoldRefold_bpStruct_acyclic () {
     lastTest = "Unfold and refold model (acyclic)";
+    System.out.println(lastTest);
     
     try {
       
@@ -107,8 +160,10 @@ public class UmaFoldTest extends hub.top.test.TestCase {
     }
   }
   
+  @Test
   public void testUnfoldRefold_bpStruct_acyclic2 () {
     lastTest = "Unfold and refold model (acyclic)";
+    System.out.println(lastTest);
     
     try {
       

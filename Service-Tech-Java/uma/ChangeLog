@@ -1,3 +1,9 @@
+UMA v.1.2.6
+-----------
+
++ model simplification: mapping between event log and transitions now
+  a parameter of the simplification procedure
+  
 UMA v.1.2.5
 -----------
 

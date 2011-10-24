@@ -79,15 +79,17 @@ public class ViewGeneration2 {
   
   /**
    * Extend the branching process by the partially ordered run of the given
-   * trace. The names in the trace must correspond to names of actions in the
-   * system that generated the branching process. Also accumulate the
-   * number of actions in {@link ViewGeneration#eventOccurrences}.
+   * trace. A mapping determines which event corresponds to which transition
+   * in the system. Also accumulate the number of actions in
+   * {@link ViewGeneration#eventOccurrences}.
    *  
    * @param trace
+   * @param e2t maps event names to transition names, if {@code null}, then
+   *            event name and transition name are assumed to be equal
    * @return <code>true</code> if the branching process could be extended by
    * the trace, and <code>false</code> if one action could not be fired
    */
-  public boolean extendByTrace(String[] trace) {
+  public boolean extendByTrace(String[] trace, Map<String, String> e2t) {
     Set<DNode> run = new HashSet<DNode>();
     LinkedList<DNode> runCut = new LinkedList<DNode>();
     
@@ -100,13 +102,17 @@ public class ViewGeneration2 {
     
     for (int i = 0; i<trace.length; i++) {
       
+      String eventName;
+      if (e2t == null || !e2t.containsKey(trace[i])) eventName = trace[i];
+      else eventName = e2t.get(trace[i]);
+      
       HashSet<DNode> enabledEvents = new HashSet<DNode>();
       for (DNode b : runCut) {
         if (b.post == null ) continue;
         for (DNode e : b.post) {
           
           // only look for events that have the same name as the next action in the trace
-          if (!build.getSystem().properNames[e.id].equals(trace[i])) continue;
+          if (!build.getSystem().properNames[e.id].equals(eventName)) continue;
           //System.out.print(" yes ");
           
           boolean isEnabled = true;
@@ -139,7 +145,7 @@ public class ViewGeneration2 {
         
         HashSet<DNode> fireableEvents = new HashSet<DNode>();
         for (DNode e : build.getSystem().fireableEvents) {
-          if (build.getSystem().properNames[e.id].equals(trace[i]))
+          if (build.getSystem().properNames[e.id].equals(eventName))
             fireableEvents.add(e);
         }
         
@@ -216,7 +222,7 @@ public class ViewGeneration2 {
           }
         } else {
           
-          System.out.println("could not fire "+trace[i]);
+          System.out.println("could not fire "+eventName+" ("+trace[i]+")");
           return false;
         }
       }
@@ -265,7 +271,7 @@ public class ViewGeneration2 {
   
   public void extendByTraces(LinkedList<String[]> traces) {
     for (String[] trace : traces) {
-      extendByTrace(trace); 
+      extendByTrace(trace, null); 
     }
   }
   

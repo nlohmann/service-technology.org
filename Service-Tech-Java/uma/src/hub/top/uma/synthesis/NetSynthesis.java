@@ -179,7 +179,7 @@ public class NetSynthesis {
         Transition t = net.addTransition(label);
         d2n.put(e, t);
         n2d.put(t, e);
-        System.out.println(e + " --first--> "+t);
+        //System.out.println(e + " --first--> "+t);
       }
     }
 
@@ -207,7 +207,7 @@ public class NetSynthesis {
           d2n.put(e, t);
           n2d.put(t, e);
           
-          System.out.println(e + " --second--> "+t);
+          //System.out.println(e + " --second--> "+t);
         } else {
           
           // follow down the chain of equivalent events until
@@ -217,7 +217,7 @@ public class NetSynthesis {
           
           t = (Transition)d2n.get(e2);
           d2n.put(e, t);
-          System.out.println(e + " --recall--> "+t);
+          //System.out.println(e + " --recall--> "+t);
         }
       }
       
@@ -265,6 +265,7 @@ public class NetSynthesis {
       }
     }
     
+    /*
     for (Transition s1 : net.getTransitions()) {
       System.out.print(s1+" -->");
       for (DNode e: fromNodes) {
@@ -278,6 +279,7 @@ public class NetSynthesis {
       }
       System.out.println();
     }
+    */
     
     return net;
   }

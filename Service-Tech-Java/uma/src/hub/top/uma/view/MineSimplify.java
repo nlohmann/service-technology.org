@@ -82,10 +82,11 @@ public class MineSimplify {
     public static final int REMOVE_IMPLIED_PRESERVE_CONNECTED = 3;
     
     public boolean unfold_refold = true; 
-    public int remove_implied = REMOVE_IMPLIED_PRESERVE_CONNECTED;
+    public int remove_implied = REMOVE_IMPLIED_PRESERVE_ALL;
     public boolean abstract_chains = true;
     public boolean remove_flower_places = true;
     
+    public Map<String, String> eventToTransition = new HashMap<String, String>();
   }
   
   /**
@@ -205,6 +206,18 @@ public class MineSimplify {
     return (float)arcNum/(float)nodeNum;
   }
   
+  public String generateCSVString() {
+    String result_string = "";
+    result_string += originalNet.getInfo()+";"+(int)(netComplexity_original*100)+";";
+    result_string += _size_bp+";"+(_time_buildBP_finish - _time_buildBP_start)+";";
+    result_string += _size_fold+";"+(int)(_comp_fold*100)+";"+(_time_equiv_finish - _time_equiv_start)+";";
+    result_string += _size_implied+";"+(int)(_comp_implied*100)+";"+(_time_implied_finish - _time_implied_start)+";";
+    result_string += _size_chain+";"+(int)(_comp_chain*100)+";"+(_time_chain_finish - _time_chain_start)+";";
+    result_string += simplifiedNet.getInfo()+";"+(int)(netComplexity_simplified*100)+";"+(_time_chain_finish - _time_chain_start)+";";
+    result_string += "\n";
+    return result_string;
+  }
+  
   public String generateResultsFile() {
     String result_string = "";
     
@@ -221,12 +234,7 @@ public class MineSimplify {
     result_string += "threshold: "+simplestThreshold;
     result_string += "\n";
     
-    result_string += originalNet.getInfo()+";"+(int)(netComplexity_original*100)+";";
-    result_string += _size_bp+";"+(_time_buildBP_finish - _time_buildBP_start)+";";
-    result_string += _size_fold+";"+(int)(_comp_fold*100)+";"+(_time_equiv_finish - _time_equiv_start)+";";
-    result_string += _size_implied+";"+(int)(_comp_implied*100)+";"+(_time_implied_finish - _time_implied_start)+";";
-    result_string += _size_chain+";"+(int)(_comp_chain*100)+";"+(_time_chain_finish - _time_chain_start)+";";
-    result_string += simplifiedNet.getInfo()+";"+(int)(netComplexity_simplified*100)+";"+(_time_chain_finish - _time_chain_start)+";";
+    result_string += generateCSVString();
     
     return result_string;
   }
@@ -357,7 +365,7 @@ public class MineSimplify {
     //Uma.out.println("generating view for "+traces.size()+" traces...");
     viewGen = new ViewGeneration2(build);
     for (String[] trace : traces) {
-      viewGen.extendByTrace(trace);
+      viewGen.extendByTrace(trace, config.eventToTransition);
     }
     boolean printDetail = (build.getBranchingProcess().allConditions.size()
         +build.getBranchingProcess().allEvents.size() > 10000) ? true : false;
@@ -417,9 +425,6 @@ public class MineSimplify {
     _comp_fold = complexitySimple(net);
     _size_fold = net.getInfo();
     
-    _comp_implied = complexitySimple(net);
-    _size_implied = net.getInfo();
-    
     _debug_lastViewBuild = build;
 
     return net;
@@ -445,7 +450,7 @@ public class MineSimplify {
     //Uma.out.println("assert existence of branching process...");
     viewGen = new ViewGeneration2(build);
     for (String[] trace : traces) {
-      viewGen.extendByTrace(trace);
+      viewGen.extendByTrace(trace, config.eventToTransition);
     }
     _time_buildBP_finish = System.currentTimeMillis();
     _size_bp = build.getStatistics();
@@ -487,7 +492,9 @@ public class MineSimplify {
     HashSet<DNode> implied;
     if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED) {
       // locally find all implied conditions, regardless of equivalence classes
+      System.out.println("finding all");
       implied = dep.getImpliedConditions_solutionLocal();
+      //implied = dep.getAllImpliedConditions();
     } else if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_VISIBLE) {
       // find equivalence classes of implied conditions
       implied = dep.getImpliedConditions_solutionGlobal();
@@ -524,8 +531,10 @@ public class MineSimplify {
     LinkedList<Set<DNode>> v = new LinkedList<Set<DNode>>(build.futureEquivalence().values());
     for (int i=0; i<v.size(); i++) {
       for (DNode d : v.get(i)) {
-        if (_implied.contains(d))
-          colorMap.put(d, DotColors.colors[i]);
+        if (_implied.contains(d)) {
+          //colorMap.put(d, DotColors.colors[i]);
+          colorMap.put(d, "red");
+        }
       }
     }
     
@@ -560,6 +569,12 @@ public class MineSimplify {
     
     Uma.out.println("remove implied places..");
     LinkedList<Place> impliedPlaces = new LinkedList<Place>();
+    
+    LinkedList<Place> _weak_impliedPlaces = new LinkedList<Place>();
+    
+    TransitiveDependencies dep = new TransitiveDependencies(build);
+    HashSet<DNode> implied_local = dep.getImpliedConditions_solutionLocal();
+    
     for (Place p : net.getPlaces()) {
       
       boolean place_p_isImplied = findAllImplied;
@@ -570,6 +585,12 @@ public class MineSimplify {
           // remove place only if every condition is implied
           if (!implied.contains(bPrime)) {
             place_p_isImplied = false;
+            
+            for (DNode bPrime2 : place_conditions.get(p)) {
+              if (implied_local.contains(bPrime2))
+                _weak_impliedPlaces.add(p);
+            }
+
             break;
           }
 
@@ -616,6 +637,52 @@ public class MineSimplify {
       {
         Uma.out.println("removing implied place: "+p+" "+p.getPreSet()+" "+p.getPostSet());
         net.removePlace(p);
+        for (DNode d : place_conditions.get(p)) {
+          _debug_weakImpliedConditions.put(d, "red");
+        }
+      }
+    }
+    
+    List<Place> _removed_weak_impliedPlaces = new LinkedList<Place>();
+    for (Place p : _weak_impliedPlaces) {
+      boolean isSinglePost = false;
+      boolean isSinglePre = false;
+      // ensure that a place is only removed if it does not
+      // partition the net (by removing the last pre-place
+      // or post-place of a transition)
+      for (Transition t : p.getPreSet()) {
+        List<Place> t_post = t.getPostSet();
+        t_post.removeAll(_removed_weak_impliedPlaces);
+        if (t_post.size() == 1) {
+          isSinglePost = true;
+          break;
+        }
+      }
+      for (Transition t : p.getPostSet()) {
+        List<Place> t_pre = t.getPreSet();
+        t_pre.removeAll(_removed_weak_impliedPlaces);
+        if (t_pre.size() == 1) {
+          isSinglePre = true;
+          break;
+        }
+      }
+
+      if (!isSinglePost && !isSinglePre) {
+        _removed_weak_impliedPlaces.add(p);
+      }
+    }
+    
+    for (Place p : _removed_weak_impliedPlaces) {
+      _debug_weakImpliedPlaces.put(p, "orange");
+      for (Arc a : p.getIncoming())
+        _debug_weakImpliedPlaces.put(a, "orange");
+      for (Arc a : p.getOutgoing())
+        _debug_weakImpliedPlaces.put(a, "orange");
+      for (DNode d : place_conditions.get(p)) {
+        if (implied_local.contains(d))
+          _debug_weakImpliedConditions.put(d, "orange");
+        else
+          _debug_weakImpliedConditions.put(d, "green");
       }
     }
     
@@ -645,11 +712,13 @@ public class MineSimplify {
         }
       }
     }
+    
+    _comp_implied = complexitySimple(net);
+    _size_implied = net.getInfo();
   }
   
-
-  
-  private static HashMap<Object, String> _debug_cycleAbstraction_coloring;
+  public HashMap<Object, String> _debug_weakImpliedPlaces = new HashMap<Object, String>();
+  public HashMap<DNode, String> _debug_weakImpliedConditions = new HashMap<DNode, String>();
   
   /**
    * Collapse chains of consecutive transitions with the same label
@@ -875,7 +944,7 @@ public class MineSimplify {
     simplify(system, log, repeat, new Configuration());
   }
   
-  public static void simplify(String system, String log, boolean repeat, Configuration config) throws IOException, InvalidModelException {
+  public static String simplify(String system, String log, boolean repeat, Configuration config) throws IOException, InvalidModelException {
     
     MineSimplify bestSim = null;
     
@@ -906,44 +975,46 @@ public class MineSimplify {
       }
     }
     bestSim.writeResults();
+    return bestSim.generateCSVString();
   }
   
   public static void runExperiment(String path, Configuration config) throws IOException, InvalidModelException {
     //DNodeBP.ignoreFoldThreshold = false;
     
-    // AMC
-    simplify(path+"/Aandoening_A.lola", path+"/Aandoening_A.log.txt", true, config); // F
-    simplify(path+"/Aandoening_B.lola", path+"/Aandoening_B.log.txt", true, config); // F
-    simplify(path+"/Aandoening_C.lola", path+"/Aandoening_C.log.txt", true, config); // F
-    simplify(path+"/AMC.lola", path+"/AMC.log.txt", true, config); // F
+    StringBuilder sb = new StringBuilder();
     
-    // Catharina
-    simplify(path+"/Complications.filtered80.lola", path+"/Complications.filtered80.log.txt", true, config); // F
+    sb.append(simplify(path+"/a12f0n00.lola", path+"/a12f0n00.log.txt", true, config)); // F
+    sb.append(simplify(path+"/a12f0n05.lola", path+"/a12f0n05.log.txt", true, config)); // F
+    sb.append(simplify(path+"/a12f0n10.lola", path+"/a12f0n10.log.txt", true, config)); // F
+    sb.append(simplify(path+"/a12f0n20.lola", path+"/a12f0n20.log.txt", true, config)); // F
+    sb.append(simplify(path+"/a12f0n50.lola", path+"/a12f0n50.log.txt", true, config)); // F
     
-    // Heusden
-    simplify(path+"/Afschriften.lola", path+"/Afschriften.log.txt", true, config); // F
-    simplify(path+"/BezwaarWOZ_filtered_All.lola", path+"/BezwaarWOZ_filtered_All.log.txt", true, config); // F
-
-    simplify(path+"/a12f0n00.lola", path+"/a12f0n00.log.txt", true, config); // F
-    simplify(path+"/a12f0n05.lola", path+"/a12f0n05.log.txt", true, config); // F
-    simplify(path+"/a12f0n10.lola", path+"/a12f0n10.log.txt", true, config); // F
-    simplify(path+"/a12f0n20.lola", path+"/a12f0n20.log.txt", true, config); // F
-    simplify(path+"/a12f0n50.lola", path+"/a12f0n50.log.txt", true, config); // F
+    sb.append(simplify(path+"/a22f0n00.lola", path+"/a22f0n00.log.txt", true, config)); // F
+    sb.append(simplify(path+"/a22f0n05.lola", path+"/a22f0n05.log.txt", true, config)); // F
+    sb.append(simplify(path+"/a22f0n10.lola", path+"/a22f0n10.log.txt", false, config)); // slow
+    sb.append(simplify(path+"/a22f0n20.lola", path+"/a22f0n20.log.txt", false, config)); // slow
+    sb.append(simplify(path+"/a22f0n50.lola", path+"/a22f0n50.log.txt", false, config)); // slow
     
-    simplify(path+"/a22f0n00.lola", path+"/a22f0n00.log.txt", true, config); // F
-    simplify(path+"/a22f0n05.lola", path+"/a22f0n05.log.txt", true, config); // F
-    //simplify(path+"/a22f0n10.lola", path+"/a22f0n10.log.txt", false, config); // slow
-    //simplify(path+"/a22f0n20.lola", path+"/a22f0n20.log.txt", false, config); // slow
-    //simplify(path+"/a22f0n50.lola", path+"/a22f0n50.log.txt", false, config); // slow
-    
-    simplify(path+"/a32f0n00.lola", path+"/a32f0n00.log.txt", true, config);
-    simplify(path+"/a32f0n05.lola", path+"/a32f0n05.log.txt", true, config); // F
-    //simplify(path+"/a32f0n10.lola", path+"/a32f0n10.log.txt", false, config); // slow 
-    //simplify(path+"/a32f0n20.lola", path+"/a32f0n20.log.txt", false, config); // slow 
-    //simplify(path+"/a32f0n50.lola", path+"/a32f0n50.log.txt", false, config); // slow
+    sb.append(simplify(path+"/a32f0n00.lola", path+"/a32f0n00.log.txt", true, config));
+    sb.append(simplify(path+"/a32f0n05.lola", path+"/a32f0n05.log.txt", true, config)); // F
+    sb.append(simplify(path+"/a32f0n10.lola", path+"/a32f0n10.log.txt", false, config)); // slow 
+    sb.append(simplify(path+"/a32f0n20.lola", path+"/a32f0n20.log.txt", false, config)); // slow 
+    sb.append(simplify(path+"/a32f0n50.lola", path+"/a32f0n50.log.txt", false, config)); // slow
     
     //simplify(path+"/t32f0n05.lola", path+"/t32f0n05.log.txt", false, config); // slow
+
+    // AMC
+    sb.append(simplify(path+"/Aandoening_A.lola", path+"/Aandoening_A.log.txt", true, config)); // F
+    sb.append(simplify(path+"/Aandoening_B.lola", path+"/Aandoening_B.log.txt", true, config)); // F
+    sb.append(simplify(path+"/Aandoening_C.lola", path+"/Aandoening_C.log.txt", true, config)); // F
+    sb.append(simplify(path+"/AMC.lola", path+"/AMC.log.txt", true, config)); // F
     
+    // Heusden
+    sb.append(simplify(path+"/Afschriften.lola", path+"/Afschriften.log.txt", true, config)); // F
+    sb.append(simplify(path+"/BezwaarWOZ_filtered_All.lola", path+"/BezwaarWOZ_filtered_All.log.txt", true, config)); // F
+
+    // Catharina
+    sb.append(simplify(path+"/Complications.filtered80.lola", path+"/Complications.filtered80.log.txt", true, config)); // F
   }
   
   public static void main(String[] args) throws IOException, InvalidModelException {
@@ -955,19 +1026,19 @@ public class MineSimplify {
     c.abstract_chains = false;
     c.remove_flower_places = false;
     runExperiment("./examples/bpm11/exp1_foldRefold", c);
-    */
+
     c.unfold_refold = true;
     c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
     c.abstract_chains = false;
     c.remove_flower_places = false;
     runExperiment("./examples/bpm11/exp2_foldRefold_implied", c);
-    
+
     c.unfold_refold = false;
     c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
     c.abstract_chains = false;
     c.remove_flower_places = false;
     runExperiment("./examples/bpm11/exp3_implied", c);
-    /*
+
     c.unfold_refold = true;
     c.remove_implied = Configuration.REMOVE_IMPLIED_PRESERVE_ALL;
     c.abstract_chains = true;
@@ -980,6 +1051,7 @@ public class MineSimplify {
     c.remove_flower_places = true;
     runExperiment("./examples/bpm11/exp5_complete", c);
 
+    Precision.main(null);
   }
   
 }

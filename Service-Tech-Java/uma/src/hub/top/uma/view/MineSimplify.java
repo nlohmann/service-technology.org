@@ -82,7 +82,7 @@ public class MineSimplify {
     public static final int REMOVE_IMPLIED_PRESERVE_CONNECTED = 3;
     
     public boolean unfold_refold = true; 
-    public int remove_implied = REMOVE_IMPLIED_PRESERVE_ALL;
+    public int remove_implied = REMOVE_IMPLIED_PRESERVE_CONNECTED;
     public boolean abstract_chains = true;
     public boolean remove_flower_places = true;
     

@@ -95,6 +95,34 @@ public class MineSimplify {
   private Configuration config;
   
   /**
+   * complete and partial results collected throughout the computation process
+   */
+  public static class Result {
+    /**
+     * places that could be identified in some situations as implied
+     * and in other situations as not implied
+     */
+    public LinkedList<Place> weak_impliedPlaces;
+    
+    /**
+     * places removed by {@link MineSimplify#removeMaximalPlaces(PetriNet)}
+     */
+    public LinkedList<Place> removedMaximalPlaces;
+    
+    /**
+     * places removed by {@link MineSimplify#removeImpliedPlaces(PetriNet, List)}
+     */
+    public LinkedList<Place> removedImpliedPlaces;
+  }
+  
+  /**
+   * complete and partial results collected throughout the computation process
+   */
+  public Result result = new Result();
+  
+
+  
+  /**
    * Simplify a system model wrt. a given set of traces in the standard configuration.
    * Read the systemModel to simplify and the corresponding traces from files.
    * 
@@ -324,8 +352,13 @@ public class MineSimplify {
     _time_implied_start = System.currentTimeMillis();
     if (config.remove_implied != Configuration.REMOVE_IMPLIED_OFF) {
       assertBranchingProcess(net, sysModel, traces);
-      HashSet<DNode> implied = findImpliedConditions();
-      removeImpliedPlaces(net, place_conditions, implied);
+      HashSet<DNode> impliedConditions = findImpliedConditions();
+      List<Place> impliedPlaces = getImpliedPlaces(net, place_conditions, impliedConditions);
+      removeImpliedPlaces(net, impliedPlaces);
+      removeMaximalPlaces(net);
+      
+      _comp_implied = complexitySimple(net);
+      _size_implied = net.getInfo();
     }
     _time_implied_finish = System.currentTimeMillis();
     
@@ -472,12 +505,7 @@ public class MineSimplify {
     }
   }
   
-  /**
-   * list of nodes that were added to the branching process to ensure that
-   * only implied conditions that do not change the behavior get removed
-   */
-  private List<DNode> _extendedNodes = new LinkedList<DNode>();
-  
+
   /**
    * @return the set of implied conditions in the branching process of the system model
    */
@@ -489,92 +517,70 @@ public class MineSimplify {
     if (printDetail) Uma.out.println("transitive dependencies..");
     TransitiveDependencies dep = new TransitiveDependencies(build);
     if (printDetail) Uma.out.println("find solution..");
-    HashSet<DNode> implied;
+    HashSet<DNode> impliedConditions;
     if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED) {
       // locally find all implied conditions, regardless of equivalence classes
       System.out.println("finding all");
-      implied = dep.getImpliedConditions_solutionLocal();
+      impliedConditions = dep.getImpliedConditions_solutionLocal();
       //implied = dep.getAllImpliedConditions();
     } else if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_VISIBLE) {
       // find equivalence classes of implied conditions
-      implied = dep.getImpliedConditions_solutionGlobal();
+      impliedConditions = dep.getImpliedConditions_solutionGlobal();
     } else if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_ALL) {
       // find equivalence classes of implied conditions ensuring that no
       // new behavior is introduced by considering also future behavior
       
       // extend the branching process with events that are enabled, but
       // did not fire
-      _extendedNodes = dep.extendBranchingProcessWithNextEvents(viewGen.visitedMarkings);
+      List<DNode> extendedNodes = dep.extendBranchingProcessWithNextEvents(viewGen.visitedMarkings);
+      debug._extendedNodes = extendedNodes;
       // identify implied conditions in this branching process
-      implied = dep.getImpliedConditions_solutionGlobal();
+      impliedConditions = dep.getImpliedConditions_solutionGlobal();
       // and remove the added events again
-      implied.removeAll(_extendedNodes);
+      impliedConditions.removeAll(extendedNodes);
       dep.removeExtendedNodes();
     } else {
-      implied = new HashSet<DNode>();
+      impliedConditions = new HashSet<DNode>();
       System.out.println("Error! Unknown mode for finding implied conditions: "+config.remove_implied);
     }
-    return implied;
+    return impliedConditions;
   }
-  
-  /**
-   * conditions of the branching process identified as implied conditions
-   */
-  private Set<DNode> _implied;
 
-  /**
-   * @return map assigning each implied condition a GraphViz color, conditions
-   *         of the same equivalence class get the same color
-   */
-  public HashMap<DNode, String> _getColoringImplied() {
-    HashMap<DNode, String> colorMap = new HashMap<DNode, String>();
-    LinkedList<Set<DNode>> v = new LinkedList<Set<DNode>>(build.futureEquivalence().values());
-    for (int i=0; i<v.size(); i++) {
-      for (DNode d : v.get(i)) {
-        if (_implied.contains(d)) {
-          //colorMap.put(d, DotColors.colors[i]);
-          colorMap.put(d, "red");
-        }
-      }
-    }
-    
-    for (DNode d : _extendedNodes) {
-      colorMap.put(d, "black");
-    }
-    
-    return colorMap;
-  }
+
+
   
   /**
-   * Remove all implied places from the net. The implied places are computed from
+   * Identify all implied places of the net. The implied places are computed from
    * the set of implied conditions of the branching process ({@link #findImpliedConditions()}).
    * 
    * @param net
    * @param place_conditions
-   * @param implied
+   * @param impliedConditions
+   * 
+   * @return the identified implied places
    */
-  private void removeImpliedPlaces(PetriNet net, Map<Place, Set<DNode> > place_conditions, Set<DNode> implied)
+  private List<Place> getImpliedPlaces(PetriNet net, Map<Place, Set<DNode> > place_conditions, Set<DNode> impliedConditions)
   {
-    this._implied = implied;
-    
-    boolean printDetail = (build.getBranchingProcess().allConditions.size()
-        +build.getBranchingProcess().allEvents.size() > 10000) ? true : false;
+    debug._impliedConditions = impliedConditions;
     
     boolean findAllImplied;
+    HashSet<DNode> implied_local;
     if (config.remove_implied == Configuration.REMOVE_IMPLIED_PRESERVE_CONNECTED) {
       findAllImplied = false;
+      implied_local = new HashSet<DNode>();
     } else {
       findAllImplied = true;
+      
+      TransitiveDependencies dep = new TransitiveDependencies(build);
+      implied_local = dep.getImpliedConditions_solutionLocal();
     }
     
     Uma.out.println("remove implied places..");
     LinkedList<Place> impliedPlaces = new LinkedList<Place>();
+    result.weak_impliedPlaces = new LinkedList<Place>();
     
-    LinkedList<Place> _weak_impliedPlaces = new LinkedList<Place>();
-    
-    TransitiveDependencies dep = new TransitiveDependencies(build);
-    HashSet<DNode> implied_local = dep.getImpliedConditions_solutionLocal();
-    
+    // check for each place whether it is implied, depending
+    // on whether all its constituting conditions are implied
     for (Place p : net.getPlaces()) {
       
       boolean place_p_isImplied = findAllImplied;
@@ -583,12 +589,14 @@ public class MineSimplify {
 
         if (findAllImplied) {
           // remove place only if every condition is implied
-          if (!implied.contains(bPrime)) {
+          if (!impliedConditions.contains(bPrime)) {
             place_p_isImplied = false;
             
+            // remember those places which could be removed when allowing
+            // for a different setting
             for (DNode bPrime2 : place_conditions.get(p)) {
               if (implied_local.contains(bPrime2))
-                _weak_impliedPlaces.add(p);
+                result.weak_impliedPlaces.add(p);
             }
 
             break;
@@ -596,7 +604,7 @@ public class MineSimplify {
 
         } else {
           // remove place as soon as one condition is implied
-          if (implied.contains(bPrime)) {
+          if (impliedConditions.contains(bPrime)) {
             place_p_isImplied = true;
             break;
           }
@@ -613,6 +621,23 @@ public class MineSimplify {
         impliedPlaces.add(p);
       }
     }
+    debug._color_weak_impliedPlaces(implied_local);
+    
+    return impliedPlaces;
+  }
+  
+  /**
+   * Remove the given implied places from the net. Does not remove a place
+   * if this would disconnect the net (a transition would get an empty
+   * pre-set or post-set). Finally removed places are stored in
+   * {@link Result#removedImpliedPlaces}.
+   * 
+   * @param net
+   * @param impliedPlaces
+   */
+  private void removeImpliedPlaces(PetriNet net, List<Place> impliedPlaces) {
+    
+    result.removedImpliedPlaces = new LinkedList<Place>();
     
     for (Place p : impliedPlaces) {
       boolean isSinglePost = false;
@@ -637,55 +662,23 @@ public class MineSimplify {
       {
         Uma.out.println("removing implied place: "+p+" "+p.getPreSet()+" "+p.getPostSet());
         net.removePlace(p);
-        for (DNode d : place_conditions.get(p)) {
-          _debug_weakImpliedConditions.put(d, "red");
-        }
+        result.removedImpliedPlaces.add(p);
+        debug._color_weak_impliedConditions(p);
       }
     }
-    
-    List<Place> _removed_weak_impliedPlaces = new LinkedList<Place>();
-    for (Place p : _weak_impliedPlaces) {
-      boolean isSinglePost = false;
-      boolean isSinglePre = false;
-      // ensure that a place is only removed if it does not
-      // partition the net (by removing the last pre-place
-      // or post-place of a transition)
-      for (Transition t : p.getPreSet()) {
-        List<Place> t_post = t.getPostSet();
-        t_post.removeAll(_removed_weak_impliedPlaces);
-        if (t_post.size() == 1) {
-          isSinglePost = true;
-          break;
-        }
-      }
-      for (Transition t : p.getPostSet()) {
-        List<Place> t_pre = t.getPreSet();
-        t_pre.removeAll(_removed_weak_impliedPlaces);
-        if (t_pre.size() == 1) {
-          isSinglePre = true;
-          break;
-        }
-      }
 
-      if (!isSinglePost && !isSinglePre) {
-        _removed_weak_impliedPlaces.add(p);
-      }
-    }
+  }
+  
+
+  /**
+   * Remove maximal places of the net. Ensure that a transition that
+   * has one or more post-places keeps at least one post-place.
+   * 
+   * @param net
+   */
+  private void removeMaximalPlaces(PetriNet net) {
     
-    for (Place p : _removed_weak_impliedPlaces) {
-      _debug_weakImpliedPlaces.put(p, "orange");
-      for (Arc a : p.getIncoming())
-        _debug_weakImpliedPlaces.put(a, "orange");
-      for (Arc a : p.getOutgoing())
-        _debug_weakImpliedPlaces.put(a, "orange");
-      for (DNode d : place_conditions.get(p)) {
-        if (implied_local.contains(d))
-          _debug_weakImpliedConditions.put(d, "orange");
-        else
-          _debug_weakImpliedConditions.put(d, "green");
-      }
-    }
-    
+    result.removedMaximalPlaces = new LinkedList<Place>();
     
     for (Transition t : net.getTransitions()) {
       LinkedList<Place> maxPlaces = new LinkedList<Place>();
@@ -709,17 +702,14 @@ public class MineSimplify {
         if (!isSinglePost) {
           //Uma.out.println("removing terminal place: "+p);
           net.removePlace(p);
+          result.removedMaximalPlaces.add(p);
         }
       }
     }
-    
-    _comp_implied = complexitySimple(net);
-    _size_implied = net.getInfo();
+
   }
   
-  public HashMap<Object, String> _debug_weakImpliedPlaces = new HashMap<Object, String>();
-  public HashMap<DNode, String> _debug_weakImpliedConditions = new HashMap<DNode, String>();
-  
+
   /**
    * Collapse chains of consecutive transitions with the same label
    * to a loop of length 1. The loop produces on all post-places of the
@@ -909,6 +899,106 @@ public class MineSimplify {
       }
     }
   }
+  
+  /**
+   * Object collecting all debug information used in this class.
+   */
+  public class Debug {
+    
+    /**
+     * list of nodes that were added to the branching process to ensure that
+     * only implied conditions that do not change the behavior get removed
+     */
+    private List<DNode> _extendedNodes = new LinkedList<DNode>();
+    
+    /**
+     * conditions of the branching process identified as implied conditions
+     */
+    private Set<DNode> _impliedConditions;
+    
+    public HashMap<Object, String> _weakImpliedPlaces = new HashMap<Object, String>();
+    public HashMap<DNode, String> _weakImpliedConditions = new HashMap<DNode, String>();
+    
+    private void _color_weak_impliedConditions(Place p) {
+      for (DNode d : place_conditions.get(p)) {
+        _weakImpliedConditions.put(d, "red");
+      }
+    }
+
+    private void _color_weak_impliedPlaces(HashSet<DNode> implied_local) {
+      List<Place> _removed_weak_impliedPlaces = new LinkedList<Place>();
+      for (Place p : result.weak_impliedPlaces) {
+        boolean isSinglePost = false;
+        boolean isSinglePre = false;
+        // ensure that a place is only removed if it does not
+        // partition the net (by removing the last pre-place
+        // or post-place of a transition)
+        for (Transition t : p.getPreSet()) {
+          List<Place> t_post = t.getPostSet();
+          t_post.removeAll(_removed_weak_impliedPlaces);
+          if (t_post.size() == 1) {
+            isSinglePost = true;
+            break;
+          }
+        }
+        for (Transition t : p.getPostSet()) {
+          List<Place> t_pre = t.getPreSet();
+          t_pre.removeAll(_removed_weak_impliedPlaces);
+          if (t_pre.size() == 1) {
+            isSinglePre = true;
+            break;
+          }
+        }
+
+        if (!isSinglePost && !isSinglePre) {
+          _removed_weak_impliedPlaces.add(p);
+        }
+      }
+      
+      for (Place p : _removed_weak_impliedPlaces) {
+        debug._weakImpliedPlaces.put(p, "orange");
+        for (Arc a : p.getIncoming())
+          debug._weakImpliedPlaces.put(a, "orange");
+        for (Arc a : p.getOutgoing())
+          debug._weakImpliedPlaces.put(a, "orange");
+        for (DNode d : place_conditions.get(p)) {
+          if (implied_local.contains(d))
+            debug._weakImpliedConditions.put(d, "orange");
+          else
+            debug._weakImpliedConditions.put(d, "green");
+        }
+      }
+    }
+    
+    /**
+     * @return map assigning each implied condition a GraphViz color, conditions
+     *         of the same equivalence class get the same color
+     */
+    public HashMap<DNode, String> _getColoringImplied() {
+      HashMap<DNode, String> colorMap = new HashMap<DNode, String>();
+      LinkedList<Set<DNode>> v = new LinkedList<Set<DNode>>(build.futureEquivalence().values());
+      for (int i=0; i<v.size(); i++) {
+        for (DNode d : v.get(i)) {
+          if (_impliedConditions.contains(d)) {
+            //colorMap.put(d, DotColors.colors[i]);
+            colorMap.put(d, "red");
+          }
+        }
+      }
+      
+      for (DNode d : _extendedNodes) {
+        colorMap.put(d, "black");
+      }
+      
+      return colorMap;
+    }
+  }
+
+  /**
+   * collected debug information
+   */
+  public Debug debug = new Debug();
+  
   
   // fields for recording times and sizes for benchmark experiments
   private static DNodeBP _debug_lastViewBuild = null;

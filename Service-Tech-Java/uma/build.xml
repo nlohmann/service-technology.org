@@ -64,7 +64,8 @@
 		<javac classpathref="base.path"
 			srcdir="${dir.src}"
          	destdir="${dir.bin}"
-         	debug="on" />
+         	debug="on">
+		</javac>
 	</target>
 	
 	<!-- call check script to run test-cases -->
@@ -84,6 +85,7 @@
 			<!-- compiled class files -->
 			<fileset dir="${dir.bin}">
 				<include name="**/*.class"/>
+				<exclude name="gnu/**"/>
 			</fileset>
 			<!-- auxiliary files from home directory -->
 			<fileset dir="${home}">

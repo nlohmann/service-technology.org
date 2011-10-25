@@ -444,7 +444,14 @@ public class TransitiveDependencies {
       //Uma.out.print(id+"/"+maxID+": ");
       
       // check for each condition 'b' of the DNodeSet
-      for (DNode b : build.futureEquivalence().keySet()) {
+      //for (DNode b : build.futureEquivalence().keySet()) {
+      for (int i=0; i<nodes.length; i++) {
+        //if (nodes[i].id != id) continue;
+        
+        DNode b = nodes[i];
+        // b is not a canonical representative: skip
+        if (!build.futureEquivalence().containsKey(b)) continue;
+
         //if (nodes[i].id != id) continue;
         
         //if (i % 100 == 0) Uma.out.print(i+" ");

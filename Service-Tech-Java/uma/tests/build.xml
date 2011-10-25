@@ -90,6 +90,7 @@
     	  <sysproperty key="test.testFileRoot" path="${testfiles}"/>
 	      <test name="hub.top.scenario.OcletTest" todir="${test.basedir}" />	
 	      <test name="hub.top.uma.UmaTest" todir="${test.basedir}" />
+		  <test name="hub.top.uma.UmaImpliedTest" todir="${test.basedir}" />
 	   	  <test name="hub.top.uma.UmaFoldTest" todir="${test.basedir}" />
 	    </junit>
 		

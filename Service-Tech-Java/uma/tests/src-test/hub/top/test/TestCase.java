@@ -1,6 +1,6 @@
 package hub.top.test;
 
-public class TestCase extends junit.framework.TestCase{
+public class TestCase extends junit.framework.TestCase {
   
   public TestCase (String name) {
     super();

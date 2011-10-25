@@ -23,6 +23,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * A Petri net. Base class of the Petri net API. Provides all basic functions for
@@ -35,9 +38,9 @@ public class PetriNet implements ISystemModel {
   protected int nodeId;
 
   // all places of the net
-  private HashSet<Place> places;
+  private SortedSet<Place> places;
   // all transitions of the net
-  private HashSet<Transition> transitions;
+  private SortedSet<Transition> transitions;
   
   // all roles of the net
   private HashSet<String> roles;
@@ -46,8 +49,8 @@ public class PetriNet implements ISystemModel {
    * Create an empty Petri net
    */
   public PetriNet () {
-    this.places = new HashSet<Place>();
-    this.transitions = new HashSet<Transition>();
+    this.places = new TreeSet<Place>(new Node.Comparator());
+    this.transitions = new TreeSet<Transition>(new Node.Comparator());
     this.roles = new HashSet<String>();
     
     nodeId = 0;
@@ -344,14 +347,14 @@ public class PetriNet implements ISystemModel {
   /**
    * @return transitions of the net
    */
-  public HashSet<Transition> getTransitions() {
+  public Set<Transition> getTransitions() {
     return transitions;
   }
   
   /**
    * @return places of the net
    */
-  public HashSet<Place> getPlaces() {
+  public Set<Place> getPlaces() {
     return places;
   }
   

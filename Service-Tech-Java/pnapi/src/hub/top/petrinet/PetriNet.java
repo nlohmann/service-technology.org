@@ -677,12 +677,13 @@ public class PetriNet implements ISystemModel {
   /**
    * Ensures that each transition has at least one pre-place
    * and at least one post-place. If a transition has an empty
-   * pre- or post-set, we add a self-loop to an initially marked place.
+   * pre-set, add a self-loop to an initially marked place. If
+   * it has an empty post-set, add a place.
    */
   public void makeNormalNet() {
     LinkedList<Transition> isolated = new LinkedList<Transition>();
     for (Transition t : getTransitions()) {
-      if (t.getIncoming().isEmpty() || t.getOutgoing().isEmpty())
+      if (t.getIncoming().isEmpty())
         isolated.add(t);
     }
     
@@ -692,6 +693,18 @@ public class PetriNet implements ISystemModel {
       addArc(p, t);
       addArc(t, p);
     }
+
+    isolated.clear();
+    for (Transition t : getTransitions()) {
+      if (t.getOutgoing().isEmpty())
+        isolated.add(t);
+    }
+    
+    for (Transition t : isolated) {
+      Place p = addPlace(t.getName()+"_final");
+      addArc(t, p);
+    }
+
   }
 
   /**

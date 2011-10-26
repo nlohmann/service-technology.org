@@ -1,0 +1,131 @@
+{
+  input file:
+  invocation:
+  net size:     27;30;97
+}
+
+PLACE     __P4+schedule___-->___P4+start__P4+withdraw__, __P2+suspend___-->___P2+resume__, __P1+schedule___-->___P1+start__P1+withdraw__, __P3+schedule___-->___P3+start__P3+withdraw__, __P3+ate_abort__P3+withdraw__P3+complete___-->___P2+pi_abort__, __P4+suspend___-->___P4+resume__, __P3+withdraw__P2+resume___-->___P2+suspend__P2+pi_abort__, __P3+suspend___-->___P3+resume__, __P3+ate_abort___-->___P2+schedule__P2+complete__P2+pi_abort__, End, __P2+schedule___-->___P2+withdraw__P2+start__, __P1+complete___-->___P3+schedule__, __P2+schedule__P2+suspend__P2+ate_abort___-->___P3+resume__, __P4+start__P4+resume___-->___P4+suspend__P4+pi_abort__P4+complete__, __P2+resume__P2+start___-->___P2+suspend__P2+complete__P2+pi_abort__P2+ate_abort__, __P2+complete___-->___P4+schedule__P3+pi_abort__, __P2+withdraw__P2+complete__P2+ate_abort___-->___P3+pi_abort__, __P3+start__P3+resume___-->___P3+ate_abort__P3+complete__P3+suspend__P3+pi_abort__, __P1+complete__P3+ate_abort___-->___P2+schedule__, __P3+complete___-->___P4+schedule__P2+pi_abort__, __P3+schedule___-->___P3+withdraw__P2+resume__, Start, __P1+suspend___-->___P1+resume__, __P3+suspend___-->___P2+ate_abort__, __P2+ate_abort___-->___P3+complete__P3+pi_abort__, __P2+suspend__P2+withdraw__P2+ate_abort___-->___P3+resume__, __P1+resume__P1+start___-->___P1+complete__P1+suspend__P1+pi_abort__;
+
+MARKING
+   Start:1;
+
+TRANSITION P3+complete
+  CONSUME __P3+start__P3+resume___-->___P3+ate_abort__P3+complete__P3+suspend__P3+pi_abort__:1, __P2+ate_abort___-->___P3+complete__P3+pi_abort__:1;
+  PRODUCE End:1, __P3+complete___-->___P4+schedule__P2+pi_abort__:1, __P3+ate_abort__P3+withdraw__P3+complete___-->___P2+pi_abort__:1;
+
+TRANSITION P2+complete
+  CONSUME __P3+ate_abort___-->___P2+schedule__P2+complete__P2+pi_abort__:1, __P2+resume__P2+start___-->___P2+suspend__P2+complete__P2+pi_abort__P2+ate_abort__:1;
+  PRODUCE __P2+withdraw__P2+complete__P2+ate_abort___-->___P3+pi_abort__:1, __P2+complete___-->___P4+schedule__P3+pi_abort__:1, End:1;
+
+TRANSITION P1+pi_abort
+  CONSUME __P1+resume__P1+start___-->___P1+complete__P1+suspend__P1+pi_abort__:1;
+  PRODUCE End:1;
+
+TRANSITION P2+withdraw
+  CONSUME __P2+schedule___-->___P2+withdraw__P2+start__:1;
+  PRODUCE End:1, __P2+withdraw__P2+complete__P2+ate_abort___-->___P3+pi_abort__:1, __P2+suspend__P2+withdraw__P2+ate_abort___-->___P3+resume__:1;
+
+TRANSITION P3+start
+  CONSUME __P3+schedule___-->___P3+start__P3+withdraw__:1;
+  PRODUCE __P3+start__P3+resume___-->___P3+ate_abort__P3+complete__P3+suspend__P3+pi_abort__:1;
+
+TRANSITION P3+ate_abort
+  CONSUME __P3+start__P3+resume___-->___P3+ate_abort__P3+complete__P3+suspend__P3+pi_abort__:1;
+  PRODUCE __P3+ate_abort___-->___P2+schedule__P2+complete__P2+pi_abort__:1, __P3+ate_abort__P3+withdraw__P3+complete___-->___P2+pi_abort__:1, __P1+complete__P3+ate_abort___-->___P2+schedule__:1;
+
+TRANSITION P3+pi_abort
+  CONSUME __P2+withdraw__P2+complete__P2+ate_abort___-->___P3+pi_abort__:1, __P3+start__P3+resume___-->___P3+ate_abort__P3+complete__P3+suspend__P3+pi_abort__:1, __P2+complete___-->___P4+schedule__P3+pi_abort__:1, __P2+ate_abort___-->___P3+complete__P3+pi_abort__:1;
+  PRODUCE End:1;
+
+TRANSITION P1+resume
+  CONSUME __P1+suspend___-->___P1+resume__:1;
+  PRODUCE __P1+resume__P1+start___-->___P1+complete__P1+suspend__P1+pi_abort__:1;
+
+TRANSITION P4+resume
+  CONSUME __P4+suspend___-->___P4+resume__:1;
+  PRODUCE __P4+start__P4+resume___-->___P4+suspend__P4+pi_abort__P4+complete__:1;
+
+TRANSITION P2+schedule
+  CONSUME __P1+complete__P3+ate_abort___-->___P2+schedule__:1, __P3+ate_abort___-->___P2+schedule__P2+complete__P2+pi_abort__:1;
+  PRODUCE __P2+schedule__P2+suspend__P2+ate_abort___-->___P3+resume__:1, __P2+schedule___-->___P2+withdraw__P2+start__:1;
+
+TRANSITION P2+suspend
+  CONSUME __P3+withdraw__P2+resume___-->___P2+suspend__P2+pi_abort__:1, __P2+resume__P2+start___-->___P2+suspend__P2+complete__P2+pi_abort__P2+ate_abort__:1;
+  PRODUCE __P2+suspend___-->___P2+resume__:1, __P2+schedule__P2+suspend__P2+ate_abort___-->___P3+resume__:1, __P2+suspend__P2+withdraw__P2+ate_abort___-->___P3+resume__:1;
+
+TRANSITION P3+suspend
+  CONSUME __P3+start__P3+resume___-->___P3+ate_abort__P3+complete__P3+suspend__P3+pi_abort__:1;
+  PRODUCE __P3+suspend___-->___P3+resume__:1, __P3+suspend___-->___P2+ate_abort__:1;
+
+TRANSITION P4+complete
+  CONSUME __P4+start__P4+resume___-->___P4+suspend__P4+pi_abort__P4+complete__:1;
+  PRODUCE End:1;
+
+TRANSITION P4+schedule
+  CONSUME __P3+complete___-->___P4+schedule__P2+pi_abort__:1, __P2+complete___-->___P4+schedule__P3+pi_abort__:1;
+  PRODUCE __P4+schedule___-->___P4+start__P4+withdraw__:1;
+
+TRANSITION P2+pi_abort
+  CONSUME __P3+withdraw__P2+resume___-->___P2+suspend__P2+pi_abort__:1, __P3+ate_abort__P3+withdraw__P3+complete___-->___P2+pi_abort__:1, __P3+ate_abort___-->___P2+schedule__P2+complete__P2+pi_abort__:1, __P2+resume__P2+start___-->___P2+suspend__P2+complete__P2+pi_abort__P2+ate_abort__:1, __P3+complete___-->___P4+schedule__P2+pi_abort__:1;
+  PRODUCE End:1;
+
+TRANSITION P4+start
+  CONSUME __P4+schedule___-->___P4+start__P4+withdraw__:1;
+  PRODUCE __P4+start__P4+resume___-->___P4+suspend__P4+pi_abort__P4+complete__:1;
+
+TRANSITION P3+withdraw
+  CONSUME __P3+schedule___-->___P3+start__P3+withdraw__:1, __P3+schedule___-->___P3+withdraw__P2+resume__:1;
+  PRODUCE __P3+withdraw__P2+resume___-->___P2+suspend__P2+pi_abort__:1, End:1, __P3+ate_abort__P3+withdraw__P3+complete___-->___P2+pi_abort__:1;
+
+TRANSITION P4+withdraw
+  CONSUME __P4+schedule___-->___P4+start__P4+withdraw__:1;
+  PRODUCE End:1;
+
+TRANSITION P4+pi_abort
+  CONSUME __P4+start__P4+resume___-->___P4+suspend__P4+pi_abort__P4+complete__:1;
+  PRODUCE End:1;
+
+TRANSITION P1+suspend
+  CONSUME __P1+resume__P1+start___-->___P1+complete__P1+suspend__P1+pi_abort__:1;
+  PRODUCE __P1+suspend___-->___P1+resume__:1;
+
+TRANSITION P1+complete
+  CONSUME __P1+resume__P1+start___-->___P1+complete__P1+suspend__P1+pi_abort__:1;
+  PRODUCE __P1+complete___-->___P3+schedule__:1, __P1+complete__P3+ate_abort___-->___P2+schedule__:1;
+
+TRANSITION P1+schedule
+  CONSUME Start:1;
+  PRODUCE __P1+schedule___-->___P1+start__P1+withdraw__:1;
+
+TRANSITION P1+withdraw
+  CONSUME __P1+schedule___-->___P1+start__P1+withdraw__:1;
+  PRODUCE End:1;
+
+TRANSITION P2+ate_abort
+  CONSUME __P2+resume__P2+start___-->___P2+suspend__P2+complete__P2+pi_abort__P2+ate_abort__:1, __P3+suspend___-->___P2+ate_abort__:1;
+  PRODUCE __P2+schedule__P2+suspend__P2+ate_abort___-->___P3+resume__:1, __P2+suspend__P2+withdraw__P2+ate_abort___-->___P3+resume__:1, __P2+ate_abort___-->___P3+complete__P3+pi_abort__:1, __P2+withdraw__P2+complete__P2+ate_abort___-->___P3+pi_abort__:1;
+
+TRANSITION P3+resume
+  CONSUME __P2+suspend__P2+withdraw__P2+ate_abort___-->___P3+resume__:1, __P3+suspend___-->___P3+resume__:1, __P2+schedule__P2+suspend__P2+ate_abort___-->___P3+resume__:1;
+  PRODUCE __P3+start__P3+resume___-->___P3+ate_abort__P3+complete__P3+suspend__P3+pi_abort__:1;
+
+TRANSITION P2+resume
+  CONSUME __P3+schedule___-->___P3+withdraw__P2+resume__:1, __P2+suspend___-->___P2+resume__:1;
+  PRODUCE __P2+resume__P2+start___-->___P2+suspend__P2+complete__P2+pi_abort__P2+ate_abort__:1, __P3+withdraw__P2+resume___-->___P2+suspend__P2+pi_abort__:1;
+
+TRANSITION P1+start
+  CONSUME __P1+schedule___-->___P1+start__P1+withdraw__:1;
+  PRODUCE __P1+resume__P1+start___-->___P1+complete__P1+suspend__P1+pi_abort__:1;
+
+TRANSITION P3+schedule
+  CONSUME __P1+complete___-->___P3+schedule__:1;
+  PRODUCE __P3+schedule___-->___P3+withdraw__P2+resume__:1, __P3+schedule___-->___P3+start__P3+withdraw__:1;
+
+TRANSITION P2+start
+  CONSUME __P2+schedule___-->___P2+withdraw__P2+start__:1;
+  PRODUCE __P2+resume__P2+start___-->___P2+suspend__P2+complete__P2+pi_abort__P2+ate_abort__:1;
+
+TRANSITION P4+suspend
+  CONSUME __P4+start__P4+resume___-->___P4+suspend__P4+pi_abort__P4+complete__:1;
+  PRODUCE __P4+suspend___-->___P4+resume__:1;
+

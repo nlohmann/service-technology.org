@@ -42,6 +42,7 @@ import hub.top.greta.run.Activator;
 import hub.top.greta.run.actions.ActionHelper;
 import hub.top.greta.verification.BuildBP;
 import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeRefold;
 import hub.top.uma.InvalidModelException;
 import hub.top.uma.view.ViewGeneration2;
 
@@ -98,7 +99,7 @@ public class GenerateLogTraces implements IWorkbenchWindowActionDelegate {
     }
   }
   
-  private DNodeBP getBPconstructor() {
+  private DNodeRefold getBPconstructor() {
     // seek system to check from a given URI
     AdaptiveSystem adaptiveSystem = ActionHelper.getAdaptiveSystem(selectedURI);
     
@@ -132,7 +133,7 @@ public class GenerateLogTraces implements IWorkbenchWindowActionDelegate {
     if (!action.getId().equals(ID))
       return;
     
-    DNodeBP bpConstructor = getBPconstructor();
+    DNodeRefold bpConstructor = getBPconstructor();
     final BuildBP build = new BuildBP(bpConstructor, selectedFile);
     
     IInputValidator intValidator = new IInputValidator() {

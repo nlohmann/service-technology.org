@@ -185,7 +185,7 @@ public class BuildBranchingProcessMulti implements IWorkbenchWindowActionDelegat
           }
           boolean interrupted = !build.run(monitor, System.out);
           DNodeBP bp = build.getBranchingProcess();
-          bp.getStatistics();
+          bp.getStatistics(false);
           
           long end = System.currentTimeMillis();
 

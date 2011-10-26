@@ -44,7 +44,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-public class DNodeBP_Scenario extends DNodeBP {
+public class DNodeBP_Scenario extends DNodeRefold {
 
   public DNodeBP_Scenario(DNodeSys system, Options options) {
     super(system, options);

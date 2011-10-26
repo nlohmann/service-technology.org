@@ -151,7 +151,7 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
         
         long t1 = System.currentTimeMillis();
         System.out.println("completeted after "+(t1-t0)+"ms ");
-        System.out.println(build.getBranchingProcess().getStatistics());
+        System.out.println(build.getBranchingProcess().getStatistics(false));
         
         if (!interrupted && selectedFile != null) {
 
@@ -169,8 +169,10 @@ public class SynthesizeLabeledNetAction implements IWorkbenchWindowActionDelegat
           
           try {
             monitor.subTask("generating labeled net");
+            
+            hub.top.uma.synthesis.NetSynthesis synth = new hub.top.uma.synthesis.NetSynthesis(build.getBranchingProcess());
 
-            hub.top.petrinet.PetriNet net2 = hub.top.uma.synthesis.NetSynthesis.foldToNet_labeled(build.getBranchingProcess());
+            hub.top.petrinet.PetriNet net2 = synth.foldToNet_labeled();
             //String netFileName = selectedFile.getRawLocation().removeFileExtension().toString();
             //hub.top.petrinet.PetriNetIO.writeToFile(net2, netFileName, hub.top.petrinet.PetriNetIO.FORMAT_LOLA, 0);
             IPath targetPath = selectedFile.getFullPath().removeFileExtension().addFileExtension("lola");

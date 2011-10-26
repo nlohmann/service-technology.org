@@ -35,25 +35,23 @@
 
 package hub.top.greta.verification;
 
-import java.io.IOException;
+import hub.top.adaptiveSystem.AdaptiveSystem;
+import hub.top.editor.ptnetLoLA.PtNet;
+import hub.top.greta.run.actions.ActionHelper;
+import hub.top.uma.DNode;
+import hub.top.uma.DNodeBP;
+import hub.top.uma.DNodeBP_Scenario;
+import hub.top.uma.DNodeRefold;
+import hub.top.uma.DNodeSys_AdaptiveSystem;
+import hub.top.uma.DNodeSys_PtNet;
+import hub.top.uma.InvalidModelException;
+import hub.top.uma.Options;
+
 import java.io.PrintStream;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
-
-import hub.top.adaptiveSystem.AdaptiveSystem;
-import hub.top.editor.eclipse.FileIOHelper;
-import hub.top.editor.ptnetLoLA.PtNet;
-import hub.top.greta.run.actions.ActionHelper;
-import hub.top.uma.DNodeBP_Scenario;
-import hub.top.uma.DNodeSet;
-import hub.top.uma.DNodeSys_PtNet;
-import hub.top.uma.DNode;
-import hub.top.uma.DNodeBP;
-import hub.top.uma.DNodeSys_AdaptiveSystem;
-import hub.top.uma.InvalidModelException;
-import hub.top.uma.Options;
 
 public class BuildBP {
   
@@ -61,7 +59,7 @@ public class BuildBP {
   // if no other parameter is supplied
   private static int MAX_BOUND = 3;
 
-  private       DNodeBP bp;
+  private       DNodeRefold bp;
   private long  analysisTime = 0;
   private int   steps = 0;
   
@@ -71,7 +69,7 @@ public class BuildBP {
    * @param system
    * @param srcFile
    */
-  public BuildBP(DNodeBP bp, IFile srcFile) {
+  public BuildBP(DNodeRefold bp, IFile srcFile) {
     this.bp = bp;
     this.srcFile = srcFile;
   }
@@ -79,7 +77,7 @@ public class BuildBP {
   /**
    * @param system
    */
-  public BuildBP(DNodeBP bp) {
+  public BuildBP(DNodeRefold bp) {
     this(bp, null);
   }
   
@@ -244,47 +242,47 @@ public class BuildBP {
   
   public void printStatistics(PrintStream out) {
     out.println("after "+steps+" steps, "+(analysisTime)+"ms");
-    out.println(bp.getStatistics());
+    out.println(bp.getStatistics(false));
 
   }
   
   /**
    * @return the constructed branching process
    */
-  public DNodeBP getBranchingProcess() {
+  public DNodeRefold getBranchingProcess() {
     return bp;
   }
   
-  public static DNodeBP init(AdaptiveSystem adaptiveSystem) throws InvalidModelException {
+  public static DNodeRefold init(AdaptiveSystem adaptiveSystem) throws InvalidModelException {
     DNodeSys_AdaptiveSystem system = new DNodeSys_AdaptiveSystem(adaptiveSystem);
     
     Options o = new Options(system);
     o.configure_buildOnly();
 
-    DNodeBP bp = new DNodeBP_Scenario(system, o);
+    DNodeRefold bp = new DNodeBP_Scenario(system, o);
     //bp.configure_stopIfUnSafe();
     return bp;
   }
   
-  public static DNodeBP initSynthesis(AdaptiveSystem adaptiveSystem) throws InvalidModelException {
+  public static DNodeRefold initSynthesis(AdaptiveSystem adaptiveSystem) throws InvalidModelException {
     DNodeSys_AdaptiveSystem system = new DNodeSys_AdaptiveSystem(adaptiveSystem);
     
     Options o = new Options(system);
     o.configure_synthesis();
     o.configure_stopIfUnSafe();
 
-    DNodeBP bp = new DNodeBP_Scenario(system, o);
+    DNodeRefold bp = new DNodeBP_Scenario(system, o);
     return bp;
   }
   
-  public static DNodeBP init(PtNet net) throws InvalidModelException {
+  public static DNodeRefold init(PtNet net) throws InvalidModelException {
     DNodeSys_PtNet system = new DNodeSys_PtNet(net);
     
     Options o = new Options(system);
     o.configure_buildOnly();
     o.configure_stopIfUnSafe();
     
-    DNodeBP bp = new DNodeBP(system, o);
+    DNodeRefold bp = new DNodeRefold(system, o);
     return bp;
   }
   

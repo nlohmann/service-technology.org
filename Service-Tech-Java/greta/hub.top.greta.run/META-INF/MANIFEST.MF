@@ -18,7 +18,7 @@ Require-Bundle: org.eclipse.ui,
  hub.top.editor.resource;bundle-version="1.0.5";visibility:=reexport,
  hub.top.editor.ptnetLoLA;bundle-version="1.0.5";visibility:=reexport,
  hub.top.uma;bundle-version="1.2.1";visibility:=reexport,
- hub.top.pnapi;bundle-version="1.0.1"
+ hub.top.pnapi;bundle-version="1.0.2"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: hub.top.adaptiveSystem,

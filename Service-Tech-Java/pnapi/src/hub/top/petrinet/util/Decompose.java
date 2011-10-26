@@ -463,7 +463,7 @@ public class Decompose {
         
       System.out.println("decomposing: "+fileName);
       PetriNet net = PetriNetIO.readNetFromFile(fileName);
-      System.out.println("size of net: "+net.getInfo());
+      System.out.println("size of net: "+net.getInfo(false));
       
       net.setRoles_unassigned();
       PetriNet scenarioNet = decomposeToScenarios_split(net);

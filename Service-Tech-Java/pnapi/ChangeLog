@@ -1,3 +1,9 @@
+Petri Net API/Java v.1.0.2
+--------------------------
+
+* net normalization now introduces final places
+* net statistics can be rendered human readable and as CSV string
+
 Petri Net API/Java v.1.0.1
 --------------------------
 

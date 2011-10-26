@@ -1103,11 +1103,15 @@ public class PetriNet implements ISystemModel {
   }
   
   /**
+   * @param csvFormat summary in CSV file format for machine readable use in the
+   *                  order: "number of places; number of transitions; number of arcs"
    * @return brief summary about this net
    */
-  public String getInfo() {
-    //return "|P|= "+places.size()+"  |P_in|= "+0+"  |P_out|= "+0+"  |T|= "+transitions.size()+"  |F|= "+getArcs().size();
-    return places.size()+";"+transitions.size()+";"+getArcs().size();
+  public String getInfo(boolean csvFormat) {
+    if (csvFormat)
+      return places.size()+";"+transitions.size()+";"+getArcs().size();
+    else
+      return "|P|= "+places.size()+"  |P_in|= "+0+"  |P_out|= "+0+"  |T|= "+transitions.size()+"  |F|= "+getArcs().size();
   }
   
   /**

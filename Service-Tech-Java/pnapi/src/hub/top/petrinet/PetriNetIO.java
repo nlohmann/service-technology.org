@@ -152,7 +152,7 @@ public class PetriNetIO {
     b.append("{\n");
     b.append("  input file:\n");
     b.append("  invocation:\n");
-    b.append("  net size:     "+net.getInfo()+"\n");
+    b.append("  net size:     "+net.getInfo(false)+"\n");
     b.append("}\n\n");
     
     // ---------------------- places ------------------------
@@ -219,7 +219,7 @@ public class PetriNetIO {
     b.append("{\n");
     b.append("  input file:\n");
     b.append("  invocation:\n");
-    b.append("  net size:     "+net.getInfo()+"\n");
+    b.append("  net size:     "+net.getInfo(false)+"\n");
     b.append("}\n\n");
     
     // ---------------------- places ------------------------
